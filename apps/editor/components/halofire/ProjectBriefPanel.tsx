@@ -14,6 +14,7 @@
 import { generateId, useScene } from '@pascal-app/core'
 import { useCallback, useState } from 'react'
 import { AiPipelineRunner } from './AiPipelineRunner'
+import { BuildingGenerator } from './BuildingGenerator'
 
 const GATEWAY_URL =
   process.env.NEXT_PUBLIC_HALOPENCLAW_URL ?? 'http://localhost:18080'
@@ -370,6 +371,8 @@ export function ProjectBriefPanel() {
               {project.fdc.gridline_extension}.
             </p>
           </div>
+
+          <BuildingGenerator projectId={project.projectId} />
 
           <AiPipelineRunner projectId={project.projectId} />
 

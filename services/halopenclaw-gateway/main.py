@@ -447,6 +447,98 @@ async def quickbid(body: dict[str, Any], request: Request) -> dict[str, Any]:
     )
 
 
+@app.post("/building/generate")
+async def generate_building(
+    body: dict[str, Any], request: Request,
+) -> dict[str, Any]:
+    """Phase J — procedurally generate a Building + GLB shell.
+
+    The viewport polls /projects/{id}/building_shell.glb afterwards
+    to render the synthetic building. Honest per §13: output is
+    always marked synthesized=True.
+    """
+    _require_api_key(request)
+    project_id = _safe_project_id(str(body.get("project_id", "demo")))
+    proj_dir = _safe_project_dir(project_id) / "deliverables"
+    # Import the typed generator
+    cad_root = Path(__file__).resolve().parents[1] / "halofire-cad"
+    if str(cad_root) not in sys.path:
+        sys.path.insert(0, str(cad_root))
+    import importlib.util
+
+    def _load(name: str, rel: str):
+        spec = importlib.util.spec_from_file_location(name, cad_root / rel)
+        if spec is None or spec.loader is None:
+            raise HTTPException(500, f"cannot load {rel}")
+        m = importlib.util.module_from_spec(spec)
+        sys.modules[name] = m
+        spec.loader.exec_module(m)
+        return m
+
+    bg = _load("hf_bg_rest", "agents/14-building-gen/agent.py")
+    glb = _load("hf_bg_glb_rest", "agents/14-building-gen/glb.py")
+
+    try:
+        spec = bg._default_residential_spec(
+            total_sqft=float(body.get("total_sqft_target", 100000)),
+            stories=int(body.get("stories", 4)),
+            garage_levels=int(body.get("garage_levels", 2)),
+        )
+        spec.project_id = project_id
+        spec.aspect_ratio = float(body.get("aspect_ratio", 1.5))
+        bldg = bg.generate_building(spec)
+    except Exception as e:
+        raise HTTPException(400, f"generate failed: {e}")
+
+    proj_dir.mkdir(parents=True, exist_ok=True)
+    bldg_path = proj_dir / "building_synthetic.json"
+    bldg_path.write_text(
+        bldg.model_dump_json(indent=2), encoding="utf-8",
+    )
+    glb_path = proj_dir / "building_shell.glb"
+    try:
+        glb.building_to_glb(bldg, glb_path)
+    except Exception as e:
+        glb_path_str = ""
+        glb_error = str(e)
+    else:
+        glb_path_str = f"/projects/{project_id}/building_shell.glb"
+        glb_error = None
+
+    return {
+        "project_id": project_id,
+        "levels": len(bldg.levels),
+        "total_sqft": bldg.total_sqft,
+        "footprint_m": bldg.metadata.get("footprint_m", {}),
+        "synthesized": True,
+        "building_json": f"/projects/{project_id}/building_synthetic.json",
+        "glb_url": glb_path_str,
+        "glb_error": glb_error,
+    }
+
+
+@app.get("/projects/{project_id}/building_shell.glb")
+async def get_building_shell(project_id: str, request: Request):
+    _require_api_key(request)
+    project_id = _safe_project_id(project_id)
+    proj_dir = _safe_project_dir(project_id) / "deliverables"
+    path = proj_dir / "building_shell.glb"
+    if not path.exists():
+        raise HTTPException(404, "building shell not generated yet")
+    return FileResponse(path, media_type="model/gltf-binary")
+
+
+@app.get("/projects/{project_id}/building_synthetic.json")
+async def get_building_synthetic(project_id: str, request: Request):
+    _require_api_key(request)
+    project_id = _safe_project_id(project_id)
+    proj_dir = _safe_project_dir(project_id) / "deliverables"
+    path = proj_dir / "building_synthetic.json"
+    if not path.exists():
+        raise HTTPException(404, "synthetic building not generated yet")
+    return JSONResponse(json.loads(path.read_text(encoding="utf-8")))
+
+
 @app.post("/codex/run")
 async def codex_run(body: dict[str, Any], request: Request) -> dict[str, Any]:
     """Browser-side codex proxy. Forwards to local codex CLI on the server."""

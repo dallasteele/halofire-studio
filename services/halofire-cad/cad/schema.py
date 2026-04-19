@@ -420,6 +420,36 @@ class PeSignature(BaseModel):
     design_hash_sha256: Optional[str] = None
 
 
+# ── Phase J — procedural building generator ───────────────────────
+
+
+class LevelGenSpec(BaseModel):
+    """One level's parametric spec for generate_building()."""
+    name: str
+    use: LevelUse = "residential"
+    height_m: float = 3.0
+    unit_count: int = 0                  # 0 = open level (garage / mech)
+    ceiling: Ceiling = Field(default_factory=Ceiling)
+
+
+class BuildingGenSpec(BaseModel):
+    """Input to the procedural building generator.
+
+    Produces a plausible fictional building for demos, stress tests,
+    and regression fixtures. Output Building carries
+    metadata.synthesized=True so UIs + AHJ tools can flag it
+    clearly (AGENTIC_RULES §13).
+    """
+    project_id: str
+    total_sqft_target: float = 100_000
+    aspect_ratio: float = 1.5            # length / width; > 1 = long
+    levels: list[LevelGenSpec] = Field(default_factory=list)
+    stair_shaft_count: int = 2
+    mech_room_count: int = 1
+    include_corridor: bool = True
+    source_note: str = "synthesized procedurally for demo"
+
+
 JobStatusStr = Literal["queued", "running", "completed", "failed"]
 
 
