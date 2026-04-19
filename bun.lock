@@ -157,6 +157,17 @@
         "typescript": "5.9.3",
       },
     },
+    "packages/halofire-catalog": {
+      "name": "@halofire/catalog",
+      "version": "0.0.0",
+      "dependencies": {
+        "zod": "^3.23.8",
+      },
+      "devDependencies": {
+        "@pascal/typescript-config": "*",
+        "typescript": "5.9.3",
+      },
+    },
     "packages/halofire-ifc": {
       "name": "@halofire/ifc",
       "version": "0.0.0",
@@ -393,6 +404,8 @@
     "@floating-ui/utils": ["@floating-ui/utils@0.2.11", "", {}, "sha512-RiB/yIh78pcIxl6lLMG0CgBXAZ2Y0eVHqMPYugu+9U0AeT6YBeiJpf7lbdJNIugFP5SIjwNRgo4DhR1Qxi26Gg=="],
 
     "@halofire/ai-bridge": ["@halofire/ai-bridge@workspace:packages/halofire-ai-bridge"],
+
+    "@halofire/catalog": ["@halofire/catalog@workspace:packages/halofire-catalog"],
 
     "@halofire/ifc": ["@halofire/ifc@workspace:packages/halofire-ifc"],
 

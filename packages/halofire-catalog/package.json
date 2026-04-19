@@ -1,0 +1,33 @@
+{
+  "name": "@halofire/catalog",
+  "version": "0.0.0",
+  "description": "Fire-sprinkler component catalog — GLB meshes + NFPA metadata",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./manifest": {
+      "types": "./dist/manifest.d.ts",
+      "import": "./dist/manifest.js",
+      "default": "./dist/manifest.js"
+    }
+  },
+  "files": ["dist", "assets", "README.md"],
+  "scripts": {
+    "build": "tsc --build",
+    "dev": "tsc --build --watch",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@pascal/typescript-config": "*",
+    "typescript": "5.9.3"
+  }
+}

@@ -20,6 +20,12 @@ export interface MappingResult {
   nodesCreated: number
   rootNodeIds: string[]
   guidToNodeId: Map<string, string>
+  /** Count of IFC entities visited during the walk */
+  entitiesProcessed?: number
+  /** Entities that couldn't be mapped */
+  skippedEntities?: { ifcType: string; guid: string; reason: string }[]
+  /** Human-readable warnings */
+  warnings?: string[]
 }
 
 export async function mapIfcToNodeTree(
@@ -52,6 +58,11 @@ export async function mapIfcToNodeTree(
     nodesCreated: 0,
     rootNodeIds: [],
     guidToNodeId: new Map(),
+    entitiesProcessed: 0,
+    skippedEntities: [],
+    warnings: [
+      'mapIfcToNodeTree: walk logic is a stub. M1 week 3 wires the real spatial-tree walk with @thatopen/components IfcRelationsIndexer once the Halofire Studio app has a PDF/IFC upload UI for end-to-end testing.',
+    ],
   }
 }
 

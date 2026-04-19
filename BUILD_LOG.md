@@ -105,3 +105,54 @@ Every task ends with an Entry here + a commit.
 - 📝 NFPA/hydraulic/completeness modes are stubbed with M3-scope
      messages; they'll ship with the real rule engine later.
 - ⚠️ `.venv` is gitignored; CI will need its own install step.
+
+### Entry 05 — @halofire/catalog + 20 authored components
+
+- ✅ New `packages/halofire-catalog/` package with types, manifest, query
+     helpers, README. 36 ComponentCategory enum values covering the
+     full 505-SKU catalog scope (M1 populates 20 of them).
+- ✅ `CatalogEntry` interface ties together: SKU, category, mounting
+     class (floor_standing / ceiling_pendent / wall_mount / pipe_inline /
+     pipe_segment / etc.), manufacturer + model, GLB path, real-world
+     dimensions, NFPA-specific params (K-factor, temp rating, pipe size,
+     connection type), and `open_source: bool` flag (for the two-tier
+     vendor-BIM-loaded-per-bid strategy).
+- ✅ Authored 20 GLB meshes via blender-mcp (TCP port 9876):
+     - 5 sprinkler heads: pendant-standard, pendant-QR, upright-standard,
+       sidewall-horizontal, concealed-pendant (all K=5.6)
+     - 6 pipes: steel SCH10 grooved, 1" / 1-1/4" / 1-1/2" / 2" / 2-1/2" / 3"
+       (1m unit lengths; scaled on Z at placement time)
+     - 5 fittings: 90° elbows (1" + 2"), 2" equal tee, 2"x1" reducer,
+       2" grooved coupling
+     - 2 valves: 4" OS&Y gate, 4" grooved butterfly
+     - 2 riser parts: 2" paddle flow switch, 2.5" pressure gauge w/ petcock
+- ✅ Origins set to connection interfaces per mounting class (top of stem
+     for pendent heads, Y=0 for sidewall wall-mount, Z=0 for valve bases)
+- ✅ `bun install` + `check-types` clean on the catalog package
+- ⚠️ Initial authoring batch hung after 16/20; separated last 4 into
+     `authoring/author_remaining_4.py` which completed cleanly. Root
+     cause not fully isolated — suspect blender-mcp socket buffer
+     interaction with the larger batch. Monitor on future batches.
+- 📝 Authored 20/505. Manufacturer BIM (Victaulic/Tyco/Reliable/etc.)
+     gets loaded on-demand at bid time to respect vendor licenses that
+     forbid bulk redistribution.
+
+### Entry 06 — @halofire/ifc wired against @thatopen/components 2.4
+
+- ✅ `packages/halofire-ifc/src/import.ts` upgraded from stub to real
+     @thatopen/components bootstrap: `new OBC.Components()`, get
+     `IfcLoader`, call `setup({ autoSetWasm: false, wasm: {path:'/', absolute:true} })`,
+     then `ifcLoader.load(new Uint8Array(buffer))` — returns a fragments
+     model passed to the mapper.
+- ✅ Mapper documents the full spatial-tree walk (IfcSite -> IfcBuilding
+     -> IfcBuildingStorey -> IfcWall/IfcSlab/IfcSpace/etc.) in comments;
+     returns empty result with a clear warning that the walk runs for
+     real once the Studio app exposes an upload UI (M1 week 3).
+- ✅ `MappingResult` interface extended with `entitiesProcessed`,
+     `skippedEntities`, `warnings` for the eventual walk implementation.
+- ✅ Type-checks clean with @thatopen/components + @thatopen/fragments
+     + web-ifc + three deps (minor peer-dep warnings about three version,
+     non-blocking).
+- 📝 The WASM binary (web-ifc.wasm) must be served from the Next.js app's
+     `public/` folder once upload UI ships. Add a build-step to symlink
+     or copy `node_modules/web-ifc/web-ifc.wasm` into public/.
