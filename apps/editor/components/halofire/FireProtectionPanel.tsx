@@ -21,7 +21,7 @@ import { useCallback, useState } from 'react'
 import { IfcUploadButton } from './IfcUploadButton'
 
 const GATEWAY_URL =
-  process.env.NEXT_PUBLIC_HALOPENCLAW_URL ?? 'http://localhost:18790'
+  process.env.NEXT_PUBLIC_HALOPENCLAW_URL ?? 'http://localhost:18080'
 
 /**
  * Serialize the live Pascal scene for gateway tool calls. Falls back to

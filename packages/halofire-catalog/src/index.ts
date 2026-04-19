@@ -23,3 +23,10 @@ export {
   findHeadsByKFactor,
   findPipesBySize,
 } from './query.js'
+export {
+  PIPE_COLOR_BY_SIZE_IN,
+  pipeColorFor,
+  pipeLineweightFor,
+  pipeLayerName,
+  FP_LAYER_NAMES,
+} from './colors.js'

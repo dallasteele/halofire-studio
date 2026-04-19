@@ -1,0 +1,102 @@
+# NFPA 13-2022 testable rule set.
+#
+# Each rule has: id, section ref, severity, check.
+# The check key names a Python predicate in agents/05-rulecheck/rules.py
+# that receives (Design) and returns list of Violation objects.
+#
+# This is the Phase 6 scaffold — a subset of the ~300 testable rules.
+# Each release adds more.
+
+rules:
+
+  - id: NFPA13-8.3.1
+    section: "8.3.1"
+    severity: error
+    title: "Every occupiable space must be protected"
+    check: every_room_has_coverage
+    rationale: "NFPA 13 §8.3.1 requires sprinkler protection throughout."
+
+  - id: NFPA13-9.2.1
+    section: "9.2.1"
+    severity: warning
+    title: "Omitted small closets/bathrooms justified"
+    check: omitted_rooms_documented
+    rationale: "§9.2.1 allows omission of small closets/bathrooms only with specific criteria."
+
+  - id: NFPA13-11.2.3.1.1
+    section: "11.2.3.1.1"
+    severity: error
+    title: "Head spacing does not exceed maximum"
+    check: head_spacing_max
+    rationale: "§11.2.3.1.1 sets max spacing by hazard: light 15ft, ord 13.125/15ft, extra 12ft."
+
+  - id: NFPA13-11.2.3.1.2
+    section: "11.2.3.1.2"
+    severity: error
+    title: "Coverage area per head does not exceed maximum"
+    check: head_coverage_max
+    rationale: "§11.2.3.1.2 caps sqft/head: light 225, ord 130, extra 100/90."
+
+  - id: NFPA13-11.2.3.2
+    section: "11.2.3.2"
+    severity: error
+    title: "Obstruction clearance (beam rule)"
+    check: obstruction_clearance
+    rationale: "§11.2.3.2 requires 3x the obstruction width of clear distance (up to 60 in)."
+
+  - id: NFPA13-11.2.3.1.3
+    section: "11.2.3.1.3"
+    severity: error
+    title: "Head min distance from wall = s/2 max"
+    check: head_wall_offset
+    rationale: "§11.2.3.1.3 bounds: no head further than s/2 from wall; no closer than 4 in."
+
+  - id: NFPA13-7.2.3.1
+    section: "7.2.3.1"
+    severity: error
+    title: "Combination standpipe hose valves at each floor level"
+    check: standpipe_hose_valves
+    rationale: "§7.2.3.1.1 Class I standpipes require 2.5\" hose valves at each floor per §7.2.3.1.1."
+
+  - id: NFPA13-7.10.3
+    section: "7.10.3"
+    severity: error
+    title: "FDC sized per standpipe demand"
+    check: fdc_sized
+    rationale: "§7.10.3 FDC must support min 250 gpm per Class I standpipe + 500 gpm for first."
+
+  - id: NFPA13-9.2.2.1
+    section: "9.2.2.1"
+    severity: warning
+    title: "Hanger spacing not exceeded"
+    check: hanger_spacing
+    rationale: "§9.2.2.1 max hanger spacing by pipe size (e.g., 1.25\" steel = 12'-0\")."
+
+  - id: NFPA13-28.5
+    section: "28.5"
+    severity: error
+    title: "Pipe size meets schedule method per downstream head count"
+    check: pipe_schedule_method
+    rationale: "§28.5 pipe-schedule method: 1\"=1, 1.25\"=2, 1.5\"=3, 2\"=5, 2.5\"=10, 3\"=30 heads."
+
+  - id: NFPA13-28.6
+    section: "28.6"
+    severity: error
+    title: "Hydraulic demand less than available supply"
+    check: hydraulic_demand_ok
+    rationale: "§28.6 demand at base of riser must be below available supply curve with safety margin."
+
+  - id: NFPA13-19.3.3
+    section: "19.3.3"
+    severity: info
+    title: "Hose allowance applied"
+    check: hose_allowance
+    rationale: "§19.3.3 hose stream allowance 100 gpm light, 250 gpm ord, 500 gpm extra."
+
+  # AHJ-specific (SLC Fire Marshal) — loaded as separate file but mirrored here
+  - id: SLC-FDC-LOC
+    section: "SLC Amend. 2021"
+    severity: error
+    title: "FDC on address side"
+    check: fdc_address_side
+    rationale: "Salt Lake City AHJ requires FDC on address side of building (RFI A101b)."

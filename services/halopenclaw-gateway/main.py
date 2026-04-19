@@ -16,14 +16,41 @@ Healthcheck:
 """
 from __future__ import annotations
 
+import asyncio
+import importlib.util
+import json
+import os
+import sys
 import uuid
+from pathlib import Path
 from typing import Any
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, File, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel
 
 from tools import registry
+
+# Load the halofire-cad orchestrator once at startup so the in-process
+# pipeline can be kicked off from REST endpoints without shelling out.
+_HFCAD = Path(__file__).resolve().parents[1] / "halofire-cad"
+if _HFCAD.exists() and str(_HFCAD) not in sys.path:
+    sys.path.insert(0, str(_HFCAD))
+_ORCH = None
+
+
+def _orchestrator():
+    global _ORCH
+    if _ORCH is None:
+        spec = importlib.util.spec_from_file_location(
+            "hf_orchestrator", _HFCAD / "orchestrator.py",
+        )
+        if spec and spec.loader:
+            m = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(m)
+            _ORCH = m
+    return _ORCH
 
 app = FastAPI(
     title="Halopenclaw Gateway",
@@ -128,18 +155,137 @@ async def mcp(body: JsonRpcRequest) -> dict[str, Any]:
 # ── REST endpoints for browser-side use (non-tool ops) ──────────────────────
 
 
-@app.post("/takeoff/upload")
-async def takeoff_upload(request: Request) -> dict[str, Any]:
-    """Upload a PDF, kick off the 4-layer takeoff pipeline, return job ID."""
-    # TODO M2 week 7: accept multipart, stream bytes to disk, enqueue job
+# ── Input pipeline: upload + run the full CAD pipeline ─────────────
+
+# Job registry (in-memory for dev; production uses Redis)
+_JOBS: dict[str, dict[str, Any]] = {}
+
+# Upload + deliverables storage
+_DATA_ROOT = Path(os.environ.get(
+    "HALOFIRE_DATA", str(Path(__file__).resolve().parent / "data"),
+))
+_DATA_ROOT.mkdir(parents=True, exist_ok=True)
+
+
+@app.post("/intake/upload")
+async def intake_upload(
+    file: UploadFile = File(...),
+    project_id: str = "demo",
+    mode: str = "pipeline",  # "pipeline" | "quickbid" | "intake-only"
+) -> dict[str, Any]:
+    """Accept an architect's PDF/IFC/DWG. Start the CAD pipeline async.
+    Returns a job_id the client polls via /intake/status/{id}.
+    """
+    if not file.filename:
+        raise HTTPException(400, "no file provided")
+    proj_dir = _DATA_ROOT / project_id
+    uploads = proj_dir / "uploads"
+    uploads.mkdir(parents=True, exist_ok=True)
+    dest = uploads / file.filename
+    content = await file.read()
+    dest.write_bytes(content)
+
     job_id = str(uuid.uuid4())
-    return {"jobId": job_id, "status": "queued"}
+    _JOBS[job_id] = {
+        "job_id": job_id,
+        "project_id": project_id,
+        "file": str(dest),
+        "bytes": len(content),
+        "status": "queued",
+        "percent": 0,
+        "steps_complete": [],
+        "error": None,
+        "summary": None,
+    }
+
+    # Fire and forget — ensure we don't block the HTTP response
+    asyncio.create_task(_run_job(job_id, str(dest), project_id, mode))
+    return {
+        "job_id": job_id,
+        "project_id": project_id,
+        "file": file.filename,
+        "bytes": len(content),
+        "mode": mode,
+        "status": "queued",
+        "poll_url": f"/intake/status/{job_id}",
+    }
 
 
-@app.get("/takeoff/status/{job_id}")
-async def takeoff_status(job_id: str) -> dict[str, Any]:
-    # TODO M2: read job state from Redis or in-memory dict
-    return {"jobId": job_id, "status": "queued", "percent": 0}
+async def _run_job(job_id: str, pdf_path: str, project_id: str, mode: str) -> None:
+    """Background job runner. Pushes progress into _JOBS[job_id]."""
+    job = _JOBS[job_id]
+    job["status"] = "running"
+    try:
+        orch = _orchestrator()
+        if not orch:
+            raise RuntimeError("orchestrator not available")
+        out_dir = _DATA_ROOT / project_id / "deliverables"
+        if mode == "quickbid":
+            # Quickbid path — fake stats pending real extraction
+            result = orch.run_quickbid(
+                total_sqft=170000, project_id=project_id,
+                level_count=6, standpipe_count=2, dry_systems=2,
+            )
+            job["summary"] = result
+            job["percent"] = 100
+            job["status"] = "completed"
+            return
+        # Full pipeline — run_pipeline is synchronous Python; run in
+        # executor so we don't block the event loop.
+        loop = asyncio.get_running_loop()
+        def _run():
+            return orch.run_pipeline(
+                pdf_path, project_id=project_id, out_dir=out_dir,
+            )
+        summary = await loop.run_in_executor(None, _run)
+        job["summary"] = summary
+        job["percent"] = 100
+        job["steps_complete"] = [s.get("step") for s in summary.get("steps", [])]
+        job["status"] = "completed"
+    except Exception as e:
+        job["status"] = "failed"
+        job["error"] = str(e)
+
+
+@app.get("/intake/status/{job_id}")
+async def intake_status(job_id: str) -> dict[str, Any]:
+    if job_id not in _JOBS:
+        raise HTTPException(404, "no such job")
+    return _JOBS[job_id]
+
+
+@app.get("/projects/{project_id}/proposal.json")
+async def get_proposal_json(project_id: str) -> JSONResponse:
+    p = _DATA_ROOT / project_id / "deliverables" / "proposal.json"
+    if not p.exists():
+        raise HTTPException(404, "proposal not generated yet")
+    return JSONResponse(json.loads(p.read_text(encoding="utf-8")))
+
+
+@app.get("/projects/{project_id}/deliverable/{name}")
+async def get_deliverable(project_id: str, name: str):
+    p = _DATA_ROOT / project_id / "deliverables" / name
+    if not p.exists() or ".." in name:
+        raise HTTPException(404, "deliverable not found")
+    return FileResponse(p)
+
+
+# ── Quick bid ────────────────────────────────────────────────────────
+
+@app.post("/quickbid")
+async def quickbid(body: dict[str, Any]) -> dict[str, Any]:
+    """60-second quick-bid estimator."""
+    orch = _orchestrator()
+    if not orch:
+        raise HTTPException(500, "orchestrator not loaded")
+    return orch.run_quickbid(
+        total_sqft=float(body.get("total_sqft", 100000)),
+        project_id=str(body.get("project_id", "demo")),
+        level_count=int(body.get("level_count", 1)),
+        standpipe_count=int(body.get("standpipe_count", 0)),
+        dry_systems=int(body.get("dry_systems", 0)),
+        hazard_mix=body.get("hazard_mix"),
+    )
 
 
 @app.post("/codex/run")

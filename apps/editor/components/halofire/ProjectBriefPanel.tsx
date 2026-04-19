@@ -13,9 +13,10 @@
 
 import { generateId, useScene } from '@pascal-app/core'
 import { useCallback, useState } from 'react'
+import { AiPipelineRunner } from './AiPipelineRunner'
 
 const GATEWAY_URL =
-  process.env.NEXT_PUBLIC_HALOPENCLAW_URL ?? 'http://localhost:18790'
+  process.env.NEXT_PUBLIC_HALOPENCLAW_URL ?? 'http://localhost:18080'
 
 async function callTool(
   name: string,
@@ -373,6 +374,8 @@ export function ProjectBriefPanel() {
               {project.fdc.gridline_extension}.
             </p>
           </div>
+
+          <AiPipelineRunner projectId={project.projectId} />
 
           <button
             type="button"

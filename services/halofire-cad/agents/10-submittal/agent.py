@@ -1,0 +1,275 @@
+"""halofire submittal agent — IFC + DXF + GLB exports.
+
+- IFC export via IfcOpenShell: emits IfcSprinkler + IfcPipeSegment
+  entities as a subset IFC 4 model the GC's coordination team ingests.
+- DXF export via ezdxf: AutoSprink-compatible layer names for
+  architects/sprinkler contractors who still work in AutoCAD.
+- GLB export via trimesh: pipe cylinders + head spheres merged into a
+  single glTF the web bid viewer + Wade's iPad viewer can open.
+"""
+from __future__ import annotations
+
+import logging
+import math
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from cad.schema import Design  # noqa: E402
+
+log = logging.getLogger(__name__)
+
+
+# Industry pipe-size color convention (AutoSprink standard)
+PIPE_COLOR_BY_SIZE = {
+    1.0:  (255, 255, 0),    # yellow
+    1.25: (255, 0, 255),    # magenta
+    1.5:  (0, 255, 255),    # cyan
+    2.0:  (0, 102, 255),    # blue
+    2.5:  (0, 192, 64),     # green
+    3.0:  (232, 67, 45),    # red
+    4.0:  (255, 255, 255),  # white (heavy)
+}
+
+
+def _layer_name_for_pipe(size_in: float) -> str:
+    s = str(size_in).replace(".", "-")
+    return f"FP-PIPE-{s}"
+
+
+# ── DXF export ──────────────────────────────────────────────────────
+
+def export_dxf(design: Design, out_path: Path) -> str:
+    """Emit an AutoSprink-style DXF. One file per design; heads and
+    pipes go to industry-standard layers with industry colors.
+    """
+    import ezdxf
+    from ezdxf.colors import RGB
+
+    doc = ezdxf.new(dxfversion="R2018")
+    msp = doc.modelspace()
+
+    # Layer setup with industry colors
+    layers = {
+        "FP-HEADS": (232, 67, 45),
+        "FP-RISER": (255, 255, 255),
+        "FP-HANGERS": (128, 128, 128),
+        "FP-FDC": (232, 67, 45),
+    }
+    for size, color in PIPE_COLOR_BY_SIZE.items():
+        layers[_layer_name_for_pipe(size)] = color
+    for name, (r, g, b) in layers.items():
+        lay = doc.layers.add(name)
+        lay.rgb = (r, g, b)
+
+    # Heads
+    for system in design.systems:
+        for h in system.heads:
+            x, y, _ = h.position_m
+            # 4" diameter in drawing units — meters so 0.1 ≈ 10 cm marker
+            msp.add_circle((x, y), 0.1, dxfattribs={"layer": "FP-HEADS"})
+
+    # Pipes — one polyline per segment, colored by size
+    for system in design.systems:
+        for s in system.pipes:
+            layer = _layer_name_for_pipe(s.size_in)
+            msp.add_lwpolyline(
+                [(s.start_m[0], s.start_m[1]),
+                 (s.end_m[0], s.end_m[1])],
+                dxfattribs={"layer": layer},
+            )
+
+    # Risers
+    for system in design.systems:
+        r = system.riser
+        msp.add_circle(
+            (r.position_m[0], r.position_m[1]), 0.15,
+            dxfattribs={"layer": "FP-RISER"},
+        )
+        msp.add_text(
+            r.id, height=0.25, dxfattribs={"layer": "FP-RISER"},
+        ).set_placement((r.position_m[0] + 0.3, r.position_m[1]))
+
+    # Hangers
+    for system in design.systems:
+        for hg in system.hangers:
+            msp.add_point(
+                (hg.position_m[0], hg.position_m[1]),
+                dxfattribs={"layer": "FP-HANGERS"},
+            )
+
+    doc.saveas(out_path)
+    return str(out_path)
+
+
+# ── GLB export ──────────────────────────────────────────────────────
+
+def export_glb(design: Design, out_path: Path) -> str:
+    """Emit a glTF-2 binary (.glb) with pipe cylinders + head spheres.
+
+    The web bid viewer and Wade's iPad AR viewer (future) both load
+    this file. Pipes colored per industry convention.
+    """
+    import trimesh
+    import numpy as np
+
+    meshes: list = []
+
+    # Heads as red spheres
+    head_mat = trimesh.visual.material.PBRMaterial(
+        baseColorFactor=(0.91, 0.26, 0.18, 1.0),
+        emissiveFactor=(0.2, 0.05, 0.03),
+    )
+    for system in design.systems:
+        for h in system.heads:
+            s = trimesh.creation.uv_sphere(radius=0.06)
+            s.apply_translation(list(h.position_m))
+            s.visual = trimesh.visual.TextureVisuals(material=head_mat)
+            meshes.append(s)
+
+    # Pipes as cylinders
+    for system in design.systems:
+        for seg in system.pipes:
+            r = PIPE_COLOR_BY_SIZE.get(seg.size_in, (200, 200, 200))
+            pipe_mat = trimesh.visual.material.PBRMaterial(
+                baseColorFactor=(r[0] / 255, r[1] / 255, r[2] / 255, 1.0),
+                metallicFactor=0.6, roughnessFactor=0.4,
+            )
+            radius_m = seg.size_in * 0.0254 / 2
+            start = np.array(seg.start_m)
+            end = np.array(seg.end_m)
+            length = float(np.linalg.norm(end - start))
+            if length < 0.01:
+                continue
+            cyl = trimesh.creation.cylinder(radius=radius_m, height=length, sections=12)
+            # Orient cyl's default Z-axis along segment direction
+            z_axis = np.array([0, 0, 1])
+            direction = (end - start) / length
+            v = np.cross(z_axis, direction)
+            sina = float(np.linalg.norm(v))
+            cosa = float(np.dot(z_axis, direction))
+            if sina > 1e-6:
+                axis = v / sina
+                angle = math.atan2(sina, cosa)
+                R = trimesh.transformations.rotation_matrix(angle, axis)
+                cyl.apply_transform(R)
+            elif cosa < 0:
+                # Anti-parallel
+                cyl.apply_transform(
+                    trimesh.transformations.rotation_matrix(math.pi, [1, 0, 0])
+                )
+            mid = (start + end) / 2
+            cyl.apply_translation(list(mid))
+            cyl.visual = trimesh.visual.TextureVisuals(material=pipe_mat)
+            meshes.append(cyl)
+
+    if not meshes:
+        return ""
+
+    scene = trimesh.Scene(meshes)
+    scene.export(str(out_path), file_type="glb")
+    return str(out_path)
+
+
+# ── IFC export ──────────────────────────────────────────────────────
+
+def export_ifc(design: Design, out_path: Path) -> str:
+    """Emit an IFC 4 sprinkler subset via IfcOpenShell.
+
+    Outputs IfcProject → IfcSite → IfcBuilding → IfcBuildingStorey →
+    (IfcSprinkler, IfcPipeSegment). The GC drops this into Revit/
+    Navisworks for clash detection against the coordination model.
+    """
+    try:
+        import ifcopenshell
+        import ifcopenshell.api
+    except ImportError as e:
+        log.warning("ifcopenshell not available: %s", e)
+        return ""
+
+    ifc = ifcopenshell.api.run("project.create_file", version="IFC4")
+    project = ifcopenshell.api.run(
+        "root.create_entity", ifc,
+        ifc_class="IfcProject", name=design.project.name,
+    )
+    # Units (SI: meters)
+    try:
+        ifcopenshell.api.run("unit.assign_unit", ifc, length={"is_metric": True, "raw": "METERS"})
+    except Exception:
+        pass
+    # Context
+    ctx = ifcopenshell.api.run("context.add_context", ifc, context_type="Model")
+    body_ctx = ifcopenshell.api.run(
+        "context.add_context", ifc,
+        context_type="Model", context_identifier="Body",
+        target_view="MODEL_VIEW", parent=ctx,
+    )
+    site = ifcopenshell.api.run(
+        "root.create_entity", ifc, ifc_class="IfcSite",
+        name="Site",
+    )
+    ifcopenshell.api.run("aggregate.assign_object", ifc, relating_object=project, products=[site])
+    building = ifcopenshell.api.run(
+        "root.create_entity", ifc, ifc_class="IfcBuilding",
+        name="Phase I Building",
+    )
+    ifcopenshell.api.run("aggregate.assign_object", ifc, relating_object=site, products=[building])
+
+    storey_by_id: dict[str, object] = {}
+    for lvl in design.building.levels:
+        st = ifcopenshell.api.run(
+            "root.create_entity", ifc, ifc_class="IfcBuildingStorey",
+            name=lvl.name,
+        )
+        ifcopenshell.api.run(
+            "aggregate.assign_object", ifc,
+            relating_object=building, products=[st],
+        )
+        storey_by_id[lvl.id] = st
+
+    # Heads as IfcSprinkler, pipes as IfcPipeSegment — geometry omitted
+    # in v2 (need representation items). IFC-OpenShell 0.8's API surface
+    # for proxy placement is non-trivial; we ship entity attributes only.
+    for system in design.systems:
+        for h in system.heads:
+            try:
+                ifcopenshell.api.run(
+                    "root.create_entity", ifc,
+                    ifc_class="IfcSprinkler", name=h.id,
+                )
+            except Exception:
+                pass
+        for s in system.pipes:
+            try:
+                ifcopenshell.api.run(
+                    "root.create_entity", ifc,
+                    ifc_class="IfcPipeSegment", name=s.id,
+                )
+            except Exception:
+                pass
+
+    ifc.write(str(out_path))
+    return str(out_path)
+
+
+def export_all(design: Design, out_dir: Path) -> dict[str, str]:
+    """Convenience: emit DXF + GLB + IFC in one call."""
+    out_dir.mkdir(parents=True, exist_ok=True)
+    paths: dict[str, str] = {}
+    try:
+        paths["dxf"] = export_dxf(design, out_dir / "design.dxf")
+    except Exception as e:
+        paths["dxf_error"] = str(e)
+    try:
+        paths["glb"] = export_glb(design, out_dir / "design.glb")
+    except Exception as e:
+        paths["glb_error"] = str(e)
+    try:
+        paths["ifc"] = export_ifc(design, out_dir / "design.ifc")
+    except Exception as e:
+        paths["ifc_error"] = str(e)
+    return paths
+
+
+if __name__ == "__main__":
+    print("submittal — call export_all(design, out_dir)")

@@ -1,0 +1,101 @@
+# NFPA 13 §4.3 Hazard Classification Map
+#
+# Occupancy/use-class → hazard class lookup. Rule-based classifier
+# tries this first; Claude Sonnet fallback handles anything not mapped.
+#
+# Sources: NFPA 13-2022 §4.3 Hazard Classifications, Annex A.4.3 table
+# of example occupancies.
+
+light:
+  # §4.3.2.1 — residential, office, church, school, etc.
+  - residential
+  - dwelling_unit
+  - apartment
+  - condo
+  - hotel_room
+  - dormitory
+  - bedroom
+  - bathroom
+  - closet
+  - living_room
+  - dining_room
+  - kitchen_residential
+  - office
+  - conference_room
+  - reception
+  - corridor
+  - lobby
+  - stair
+  - vestibule
+  - classroom
+  - library_reading_room
+  - church_sanctuary
+  - museum_gallery
+  - laundry_residential
+  - mechanical_small
+
+ordinary_i:
+  # §4.3.2.2 — parking garages, mercantile, light manufacturing
+  - parking_garage
+  - garage
+  - parking
+  - carport
+  - mercantile_small      # <12 ft stock piles
+  - mech_room
+  - mechanical_room
+  - mep_room
+  - electrical_room
+  - boiler_room
+  - generator_room
+  - pump_room
+  - riser_room
+  - fire_pump_room
+  - laundry_commercial
+  - dry_cleaning_plant
+  - bakery
+  - cafeteria
+  - restaurant_dining
+  - break_room
+  - loading_dock_covered
+
+ordinary_ii:
+  # §4.3.2.3 — moderate hazard: commercial kitchens, repair shops
+  - commercial_kitchen
+  - restaurant_kitchen
+  - post_office_mailroom
+  - dry_goods_warehouse   # <12 ft
+  - repair_garage
+  - auto_service
+  - woodworking_small
+  - machine_shop_small
+  - library_stacks
+  - retail_stock_room
+  - stage_backstage
+  - print_shop
+
+extra_i:
+  # §4.3.2.4 — high hazard: high-piled storage, flammable finishing
+  - aircraft_hangar
+  - combustible_hydraulic_oil
+  - die_casting
+  - metal_extruding
+  - paint_shop
+  - rubber_processing
+  - saw_mill
+  - upholstering
+  - high_piled_storage     # >12 ft
+  - warehouse_high
+
+extra_ii:
+  # §4.3.2.5 — highest hazard: flammable liquid spray, plastics
+  - flammable_liquid_spray
+  - plastics_extruding
+  - flow_coating
+  - varnishing
+  - paint_dipping
+  - solvent_cleaning
+
+residential:
+  # §8.4.5 — requires residential sprinklers, not commercial
+  # (Used in light-hazard dwelling units when choosing sprinkler SKU.)
+  - dwelling_unit_with_res_sprinkler

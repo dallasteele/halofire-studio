@@ -1,0 +1,399 @@
+"""halofire router agent v2 — obstruction-aware pipe routing.
+
+Takes placed heads + building obstructions and produces a pipe
+network (PipeSegment[]). Strategy:
+
+1. Riser placement — one per system, in a mech room / stair shaft
+2. Build a weighted routing graph over each level:
+   - Nodes = head positions + riser + grid points at 1 m spacing
+   - Edges allowed along structural-grid directions (axis-aligned)
+   - Edge weight = length × axis_pref × obstruction_multiplier
+3. Steiner-tree approximation on the weighted graph connecting all
+   heads + riser: iterative shortest-path from each head to the
+   growing tree (same approach as Prim's MST but on the *graph*,
+   not directly on head-to-head distances — so pipes can bend
+   around obstacles).
+4. Pipe-schedule sizing via §28.5 downstream-head DFS.
+5. Hanger insertion per §9.2.2.1.
+
+For large buildings this is approximate; production ships A* + Steiner
+MST hybrid with joist-parallel preference.
+"""
+from __future__ import annotations
+
+import logging
+import math
+import sys
+from pathlib import Path
+from typing import Optional
+
+import networkx as nx
+from shapely.geometry import Polygon, Point, box
+from shapely.prepared import prep
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from cad.schema import (  # noqa: E402
+    Building, Head, Level, PipeSegment, Fitting,
+    Hanger, System, RiserSpec, Branch,
+)
+
+log = logging.getLogger(__name__)
+
+
+# Pipe-size selection per total downstream head count — §28.5 schedule
+def pipe_size_for_count(n: int) -> float:
+    if n <= 1: return 1.0
+    if n <= 2: return 1.25
+    if n <= 3: return 1.5
+    if n <= 5: return 2.0
+    if n <= 10: return 2.5
+    if n <= 30: return 3.0
+    return 4.0
+
+
+def _find_riser_location(level: Level) -> tuple[float, float]:
+    """Pick riser at a stair shaft if available, else centroid of level."""
+    # Prefer stair shafts per fire code (combo standpipe § 7.2)
+    if level.stair_shafts:
+        sh = level.stair_shafts[0]
+        poly = Polygon(sh.polygon_m)
+        c = poly.centroid
+        return (c.x, c.y)
+    if level.mech_rooms:
+        mr = level.mech_rooms[0]
+        poly = Polygon(mr.polygon_m)
+        c = poly.centroid
+        return (c.x, c.y)
+    # Fallback: centroid of all heads on this level (caller supplies)
+    if level.rooms:
+        poly = Polygon(level.rooms[0].polygon_m)
+        c = poly.centroid
+        return (c.x, c.y)
+    return (0.0, 0.0)
+
+
+def _build_routing_graph(
+    level: Level, heads: list[Head], riser_xy: tuple[float, float],
+    grid_step: float = 1.0,
+) -> nx.Graph:
+    """Weighted grid graph for routing.
+
+    Uses axis-aligned Manhattan grid at `grid_step` meters. Forbidden
+    edges = those passing through elevator shafts or obstruction
+    polygons. Each head + the riser gets its own node connected to
+    nearest grid point.
+    """
+    g = nx.Graph()
+
+    # Bounding box from level's rooms or head positions
+    xs = [h.position_m[0] for h in heads] + [riser_xy[0]]
+    ys = [h.position_m[1] for h in heads] + [riser_xy[1]]
+    for room in level.rooms:
+        for x, y in room.polygon_m:
+            xs.append(x); ys.append(y)
+    if not xs or not ys:
+        return g
+    minx, maxx = min(xs) - 1, max(xs) + 1
+    miny, maxy = min(ys) - 1, max(ys) + 1
+
+    # Obstruction regions we avoid — elevator + mech shafts
+    forbidden: list = []
+    for sh in level.elevator_shafts:
+        try:
+            forbidden.append(prep(Polygon(sh.polygon_m)))
+        except Exception:
+            pass
+    # Columns/beams add cost but aren't forbidden (pipes can run above)
+    cost_regions: list = []
+    for obs in level.obstructions:
+        try:
+            cost_regions.append(prep(Polygon(obs.polygon_m)))
+        except Exception:
+            pass
+
+    def edge_cost(p1: tuple[float, float], p2: tuple[float, float]) -> Optional[float]:
+        """None → forbidden. Positive float → edge weight."""
+        mid = ((p1[0] + p2[0]) / 2, (p1[1] + p2[1]) / 2)
+        pt = Point(mid)
+        for f in forbidden:
+            if f.intersects(pt):
+                return None
+        base = math.hypot(p2[0] - p1[0], p2[1] - p1[1])
+        mult = 1.0
+        for c in cost_regions:
+            if c.intersects(pt):
+                mult = 2.5
+                break
+        return base * mult
+
+    # Grid nodes — snap to axis-aligned lattice
+    nx_cells = max(2, int((maxx - minx) / grid_step) + 1)
+    ny_cells = max(2, int((maxy - miny) / grid_step) + 1)
+    for ix in range(nx_cells):
+        for iy in range(ny_cells):
+            x = minx + ix * grid_step
+            y = miny + iy * grid_step
+            node_id = f"g_{ix}_{iy}"
+            g.add_node(node_id, pos=(x, y), kind="grid")
+            # Connect to left + bottom neighbors
+            if ix > 0:
+                prev = f"g_{ix - 1}_{iy}"
+                c = edge_cost(g.nodes[prev]["pos"], (x, y))
+                if c is not None:
+                    g.add_edge(prev, node_id, weight=c)
+            if iy > 0:
+                prev = f"g_{ix}_{iy - 1}"
+                c = edge_cost(g.nodes[prev]["pos"], (x, y))
+                if c is not None:
+                    g.add_edge(prev, node_id, weight=c)
+
+    # Head nodes — snap each to nearest grid point
+    def nearest_grid(pos: tuple[float, float]) -> str:
+        ix = max(0, min(nx_cells - 1, int((pos[0] - minx) / grid_step)))
+        iy = max(0, min(ny_cells - 1, int((pos[1] - miny) / grid_step)))
+        return f"g_{ix}_{iy}"
+
+    for h in heads:
+        h_id = h.id
+        g.add_node(h_id, pos=(h.position_m[0], h.position_m[1]), kind="head")
+        anchor = nearest_grid((h.position_m[0], h.position_m[1]))
+        if anchor in g:
+            g.add_edge(h_id, anchor, weight=0.1)
+
+    riser_id = f"riser_{level.id}"
+    g.add_node(riser_id, pos=riser_xy, kind="riser")
+    anchor = nearest_grid(riser_xy)
+    if anchor in g:
+        g.add_edge(riser_id, anchor, weight=0.1)
+
+    return g
+
+
+def _steiner_tree_paths(
+    g: nx.Graph, terminals: list[str]
+) -> list[tuple[str, str, float, list[tuple[float, float]]]]:
+    """Greedy Steiner approximation: grow a tree from the first terminal,
+    adding the closest remaining terminal by shortest path each step.
+
+    Returns edges as (from_id, to_id, length_m, path_points).
+    The path_points are the full routed polyline (through grid nodes).
+    """
+    if not terminals or len(terminals) < 2:
+        return []
+    tree_nodes = {terminals[0]}
+    remaining = set(terminals[1:])
+    edges: list[tuple[str, str, float, list[tuple[float, float]]]] = []
+
+    while remaining:
+        # Find the remaining terminal with shortest path to tree
+        best: tuple[float, str, list[str]] | None = None
+        for t in remaining:
+            try:
+                # Shortest path from t to any node already in tree
+                # Networkx doesn't have multi-source → iterate
+                for anchor in tree_nodes:
+                    try:
+                        length, path = nx.single_source_dijkstra(
+                            g, anchor, target=t, weight="weight",
+                        )
+                        if best is None or length < best[0]:
+                            best = (length, t, path)
+                    except nx.NetworkXNoPath:
+                        continue
+            except Exception:
+                continue
+        if best is None:
+            # Disconnected — bail
+            break
+        length, target, path = best
+        # Convert path to polyline points
+        pts = [g.nodes[n]["pos"] for n in path]
+        from_id = path[0]
+        to_id = path[-1]
+        edges.append((from_id, to_id, length, pts))
+        # Add all path nodes to tree (Steiner step)
+        for n in path:
+            tree_nodes.add(n)
+        remaining.discard(target)
+    return edges
+
+
+def _explode_polyline_to_segments(
+    path: list[tuple[float, float]], z_m: float,
+    from_id: str, to_id: str, seg_idx: int,
+) -> list[PipeSegment]:
+    """Convert a polyline into individual PipeSegment objects (one per
+    consecutive pair of points). All segments inherit the from_id/to_id
+    as the branch identity; downstream-head sizing handled separately.
+    """
+    out: list[PipeSegment] = []
+    for i in range(len(path) - 1):
+        p1 = path[i]
+        p2 = path[i + 1]
+        length = math.hypot(p2[0] - p1[0], p2[1] - p1[1])
+        if length < 0.01:
+            continue
+        out.append(PipeSegment(
+            id=f"p_{from_id}__{to_id}_{seg_idx}_{i}",
+            from_node=from_id if i == 0 else f"j_{from_id}_{to_id}_{seg_idx}_{i}",
+            to_node=to_id if i == len(path) - 2 else f"j_{from_id}_{to_id}_{seg_idx}_{i + 1}",
+            size_in=1.0,  # resized after tree walk
+            schedule="sch10",
+            start_m=(p1[0], p1[1], z_m),
+            end_m=(p2[0], p2[1], z_m),
+            length_m=length,
+            elevation_change_m=0.0,
+            downstream_heads=1,
+        ))
+    return out
+
+
+def _resize_network(
+    segments: list[PipeSegment], heads: list[Head], riser_id: str,
+) -> list[PipeSegment]:
+    """Walk the tree from heads up to riser, computing downstream-head
+    count per segment, and assign §28.5 pipe size.
+    """
+    if not segments:
+        return segments
+    # Build adjacency
+    graph = nx.DiGraph()
+    for s in segments:
+        graph.add_edge(s.from_node, s.to_node, key=s.id, length=s.length_m)
+
+    # Count downstream heads (each edge's "downstream" side is whichever
+    # leads away from the riser). Build undirected reachability then
+    # orient edges toward riser.
+    u = graph.to_undirected()
+    head_ids = {h.id for h in heads}
+    for s in segments:
+        # Determine which endpoint is upstream (closer to riser by hops)
+        try:
+            from_to_riser = nx.shortest_path_length(u, s.from_node, riser_id)
+            to_to_riser = nx.shortest_path_length(u, s.to_node, riser_id)
+        except (nx.NetworkXNoPath, nx.NodeNotFound):
+            from_to_riser = 0
+            to_to_riser = 1
+        downstream_node = s.from_node if from_to_riser > to_to_riser else s.to_node
+        # Count heads reachable from downstream_node without crossing the
+        # upstream endpoint
+        upstream_node = s.to_node if downstream_node == s.from_node else s.from_node
+        u_copy = u.copy()
+        if u_copy.has_edge(upstream_node, downstream_node):
+            u_copy.remove_edge(upstream_node, downstream_node)
+        try:
+            reachable = nx.descendants(u_copy, downstream_node) | {downstream_node}
+        except Exception:
+            reachable = {downstream_node}
+        ds_heads = len(reachable & head_ids)
+        s.downstream_heads = max(1, ds_heads)
+        s.size_in = pipe_size_for_count(ds_heads)
+    return segments
+
+
+def _insert_hangers(segments: list[PipeSegment]) -> list[Hanger]:
+    """§9.2.2.1 hanger spacing per pipe size."""
+    spacing_by_size = {
+        1.0: 3.66, 1.25: 3.66, 1.5: 4.57, 2.0: 4.57,
+        2.5: 4.57, 3.0: 4.57, 4.0: 4.57,
+    }
+    hangers: list[Hanger] = []
+    for s in segments:
+        sp = spacing_by_size.get(s.size_in, 3.66)
+        n = max(1, int(s.length_m / sp))
+        for i in range(n):
+            t = (i + 0.5) / n
+            x = s.start_m[0] + (s.end_m[0] - s.start_m[0]) * t
+            y = s.start_m[1] + (s.end_m[1] - s.start_m[1]) * t
+            z = s.start_m[2]
+            hangers.append(Hanger(
+                id=f"hgr_{s.id}_{i}",
+                pipe_id=s.id,
+                position_m=(x, y, z),
+            ))
+    return hangers
+
+
+def route_systems(building: Building, heads: list[Head]) -> list[System]:
+    """Primary entry: route sprinkler systems for the whole building.
+
+    Simplified: one wet system per non-garage level; one dry system per
+    garage level; systems grouped by level first, combo standpipes
+    crossing levels ship in Phase 4.2.
+    """
+    systems: list[System] = []
+    heads_by_level: dict[str, list[Head]] = {}
+    for h in heads:
+        # Each head's room_id must map to a level; find which
+        for lvl in building.levels:
+            if any(r.id == h.room_id for r in lvl.rooms):
+                heads_by_level.setdefault(lvl.id, []).append(h)
+                break
+
+    for level in building.levels:
+        lvl_heads = heads_by_level.get(level.id, [])
+        if not lvl_heads:
+            continue
+        riser_xy = _find_riser_location(level)
+        sys_type = "dry" if level.use == "garage" else "wet"
+        riser_z = level.elevation_m + (level.height_m - 0.3)
+        sys_id = f"sys_{level.id}"
+        riser = RiserSpec(
+            id=f"riser_{level.id}",
+            position_m=(riser_xy[0], riser_xy[1], level.elevation_m),
+            size_in=4.0,
+        )
+        system = System(
+            id=sys_id,
+            type=sys_type,
+            supplies=[level.id],
+            riser=riser,
+        )
+        try:
+            g = _build_routing_graph(level, lvl_heads, riser_xy)
+            terminals = [riser.id] + [h.id for h in lvl_heads]
+            # Add riser node with its actual id to the graph
+            if riser.id not in g:
+                g.add_node(riser.id, pos=riser_xy, kind="riser")
+                # Connect to nearest grid
+                gx = int((riser_xy[0] - g.graph.get("minx", 0)) / 1.0)
+                gy = int((riser_xy[1] - g.graph.get("miny", 0)) / 1.0)
+                # Best-effort connection — iterate grid nodes for nearest
+                best_anchor: Optional[str] = None
+                best_d = float("inf")
+                for n, d in g.nodes(data=True):
+                    if d.get("kind") != "grid":
+                        continue
+                    nx_, ny_ = d["pos"]
+                    dist = math.hypot(nx_ - riser_xy[0], ny_ - riser_xy[1])
+                    if dist < best_d:
+                        best_d = dist; best_anchor = n
+                if best_anchor:
+                    g.add_edge(riser.id, best_anchor, weight=0.1)
+
+            tree_edges = _steiner_tree_paths(g, terminals)
+        except Exception as e:
+            log.warning("routing graph failed on level %s: %s", level.id, e)
+            tree_edges = []
+
+        # Convert tree edges to PipeSegments
+        segments: list[PipeSegment] = []
+        for i, (f, t, length, path) in enumerate(tree_edges):
+            segments.extend(_explode_polyline_to_segments(
+                path, riser_z, f, t, i,
+            ))
+
+        # Resize per §28.5
+        segments = _resize_network(segments, lvl_heads, riser.id)
+        # System IDs on segments
+        for s in segments:
+            s.system_id = sys_id
+        system.pipes = segments
+        system.heads = lvl_heads
+        system.hangers = _insert_hangers(segments)
+        systems.append(system)
+    return systems
+
+
+if __name__ == "__main__":
+    print("router v2 — call route_systems(building, heads)")
