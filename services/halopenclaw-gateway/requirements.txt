@@ -1,0 +1,28 @@
+fastapi>=0.115,<1.0
+uvicorn[standard]>=0.32,<1.0
+pydantic>=2.8,<3.0
+python-multipart>=0.0.9
+
+# PDF pipeline — free layer stack
+pdfplumber>=0.11.4       # Layer 1: vector PDF extraction
+pypdfium2>=4.30          # PDF rasterization
+opencv-python>=4.10      # Layer 2: raster + Hough + template match
+numpy>=1.26
+Pillow>=10.3
+
+# Layer 3: CubiCasa5k pretrained floor-plan segmentation (MIT, self-hosted)
+# Uncomment once model download script is finalized:
+# torch>=2.5
+# torchvision>=0.20
+
+# Layer 4: Claude Vision
+anthropic>=0.39,<1.0
+
+# 2D output
+ezdxf>=1.4               # DXF/DWG write
+reportlab>=4.2           # PDF sheet output
+svgwrite>=1.4            # SVG fallback
+
+# Dev / testing
+pytest>=8.3
+httpx>=0.28              # async HTTP client for tests

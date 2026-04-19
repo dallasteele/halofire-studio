@@ -1,0 +1,34 @@
+{
+  "name": "@halofire/ifc",
+  "version": "0.0.0",
+  "description": "IFC import into Pascal's BIM node tree via @thatopen/components",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": ["dist", "README.md"],
+  "scripts": {
+    "build": "tsc --build",
+    "dev": "tsc --build --watch",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@pascal-app/core": "*",
+    "@thatopen/components": "^2.4.0",
+    "@thatopen/fragments": "^2.3.0",
+    "web-ifc": "^0.0.68",
+    "three": "^0.170.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@pascal/typescript-config": "*",
+    "@types/three": "^0.170.0",
+    "typescript": "5.9.3"
+  }
+}
