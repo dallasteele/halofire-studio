@@ -156,3 +156,33 @@ Every task ends with an Entry here + a commit.
 - 📝 The WASM binary (web-ifc.wasm) must be served from the Next.js app's
      `public/` folder once upload UI ships. Add a build-step to symlink
      or copy `node_modules/web-ifc/web-ifc.wasm` into public/.
+
+### Entry 07 — Halofire sidebar tabs wired into Pascal editor
+
+- ✅ `apps/editor/components/halofire/CatalogPanel.tsx` — catalog browser
+     grouped by Sprinkler Heads / Pipes / Fittings / Valves / Riser, with
+     search by SKU/name/manufacturer, selected-item detail pane showing
+     all CatalogEntry metadata (K-factor, temp rating, pipe size, finish,
+     etc.), and a placeholder "Place in scene (M1 week 4)" action button.
+- ✅ `apps/editor/components/halofire/FireProtectionPanel.tsx` — live
+     calls to the halopenclaw gateway's /mcp endpoint:
+     - Shell audit: submits a demo scene with 1 floating wall, renders
+       the PASS/FAIL output including the FLOATING line
+     - Collision audit: submits demo scene with floor+wall+head, filters
+       intentional floor-wall overlap, renders result
+     - Ingest (PDF/IFC) buttons disabled with milestone labels until
+       upload UI ships
+     - Design + Export sections show scope + milestone placement
+- ✅ `apps/editor/app/page.tsx` sidebar config extended from 1 tab to 3:
+     Scene (Pascal built-in) / Catalog (ours) / Fire Protection (ours)
+- ✅ `@halofire/catalog` added to `apps/editor/package.json` deps
+- ✅ Catalog package type-checks clean. Editor app `check-types` surfaces
+     pre-existing upstream `@pascal-app/editor` errors (documented in
+     Entry 03), none from our new files. Runtime (Next.js SWC) compiles
+     through them fine — only strict tsc trips up.
+- 📝 Gateway URL is `process.env.NEXT_PUBLIC_HALOPENCLAW_URL ?? 'http://localhost:18790'`.
+     User runs gateway separately; when this env is set to the production
+     URL, the Studio talks to the deployed halopenclaw.
+- 📝 Demo scenes are hardcoded in FireProtectionPanel for now. The
+     halopenclaw-client package (planned) will serialize the live Pascal
+     scene so validate runs on real user data.

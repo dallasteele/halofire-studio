@@ -6,12 +6,24 @@ import {
   ViewerToolbarLeft,
   ViewerToolbarRight,
 } from '@pascal-app/editor'
+import { CatalogPanel } from '@/components/halofire/CatalogPanel'
+import { FireProtectionPanel } from '@/components/halofire/FireProtectionPanel'
 
 const SIDEBAR_TABS: (SidebarTab & { component: React.ComponentType })[] = [
   {
     id: 'site',
     label: 'Scene',
     component: () => null, // Built-in SitePanel handles this
+  },
+  {
+    id: 'halofire-catalog',
+    label: 'Catalog',
+    component: CatalogPanel,
+  },
+  {
+    id: 'halofire-fp',
+    label: 'Fire Protection',
+    component: FireProtectionPanel,
   },
 ]
 
