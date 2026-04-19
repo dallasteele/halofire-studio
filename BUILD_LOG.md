@@ -294,3 +294,50 @@ Non-blocking (already acknowledged):
 - Upstream Pascal TS errors in `packages/editor/`
 - 3-vs-0.184 three.js peer-dep warning on install
 - Blender MCP batch authoring hang workaround
+
+### Entry 10 — Real Hazen-Williams calc + auto-grid head placer
+
+- ✅ New `services/halopenclaw-gateway/calc/hazen_williams.py` implements
+     NFPA 13 §28.2 friction-loss formula:
+     `p = 4.52 Q^1.85 / (C^1.85 d^4.87)`
+     plus `equivalent_length_ft()` for fittings (NFPA Table 28.2.4.7.1),
+     `elevation_psi()` (0.433 psi/ft of water), `k_factor_flow()` for
+     K * sqrt(P) orifice flow, and `evaluate_branch()` which walks a list
+     of BranchSegment dataclasses accumulating losses.
+- ✅ Module ships C-factor table for 10 common pipe materials (steel
+     SCH10/40 wet/dry, copper, CPVC, ductile iron, cast iron) and
+     internal-diameter table for 9 pipe sizes × 2 schedules = 18 SKUs.
+- ✅ Fitting equivalent-length table covers 90/45 elbows, tee-branch,
+     gate/butterfly/check/alarm-check valves, DCDA backflow — 20 entries,
+     all with NFPA citations.
+- ✅ `halofire_calc` tool rewritten with 3 real modes:
+     - `hazen_williams`: given Q + C + d + L → friction psi
+     - `k_factor_flow`: given K + P → Q via K * sqrt(P)
+     - `single_branch`: walks a segments list, returns per-segment + total
+       friction, elevation, equivalent length, and total demand
+- ✅ Smoke tests: 100gpm through 2" SCH10 over 50ft = 3.817 psi
+     (0.0763 psi/ft) — matches published NFPA friction-loss tables.
+     K=5.6 at 7psi = 14.82 gpm — matches spec.
+     3-segment test branch correctly accumulates loss including 12ft
+     elevation head.
+- ✅ New `services/halopenclaw-gateway/tools/place_head.py` implements
+     `halofire_place_head` with 3 real modes:
+     - `auto_grid`: given room bbox + hazard → NFPA-compliant head grid
+     - `at_coords`: spawn at explicit [x,y,z] positions
+     - `manual`: pass-through (UI handles click-to-place)
+- ✅ HAZARD_LIMITS dict encodes NFPA 13-2022 §11.2.3.1.1 max spacing
+     (12-15 ft) + max distance from wall (6-7.5 ft) + max coverage area
+     (100-225 sq ft) per class (Light / Ordinary I/II / Extra I/II).
+- ✅ auto_grid algorithm correctly picks between spacing-limited and
+     coverage-limited regimes. Ensures first row ≤ max_from_wall from
+     wall, subsequent rows ≤ max_spacing apart.
+- ✅ Smoke tests:
+     - 10m × 8m Light Hazard: 6 heads, 144 sq ft/head coverage (< 225 lim)
+     - 20m × 15m Ordinary II:  30 heads, 108 sq ft/head coverage (< 130 lim)
+     Both cite NFPA 13-2022 §11.2.3.1.1 + §11.2.3.2.1.
+- 📝 One import quirk fixed: tools/ package imports `from calc.hazen_williams`
+     not `from ..calc.hazen_williams` because uvicorn loads main.py with
+     the gateway dir on sys.path, not as a sub-package.
+- 📝 Cleaned `__pycache__` forced on every test to dodge bytecode-cache
+     staleness when iterating on tool impls. Production uses `systemctl
+     restart halopenclaw.service` which Python re-imports cleanly.
