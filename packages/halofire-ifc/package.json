@@ -1,7 +1,7 @@
 {
   "name": "@halofire/ifc",
   "version": "0.0.0",
-  "description": "IFC import into Pascal's BIM node tree via @thatopen/components",
+  "description": "IFC import into Pascal's BIM node tree via web-ifc (direct, no @thatopen)",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -20,8 +20,6 @@
   },
   "dependencies": {
     "@pascal-app/core": "*",
-    "@thatopen/components": "^3.4.0",
-    "@thatopen/fragments": "^3.4.0",
     "three": "^0.170.0",
     "web-ifc": "^0.0.68",
     "zod": "^3.23.8"

@@ -1,28 +1,26 @@
 /**
- * IFC import entry point.
+ * IFC import entry point — direct web-ifc (no @thatopen wrapper).
  *
- * BLOCKING ISSUE (2026-04-18): `@thatopen/components` 2.4.x + fragments +
- * three have incompatible peer-deps against Pascal's pinned three@0.184.
- * components@2.4.11 wants `AlignmentObject` from fragments 2.4.0 which
- * doesn't export it; components@3.4.2 wants `instancedArray` from three
- * 0.178+ which Pascal doesn't carry.
+ * web-ifc is the WebAssembly-compiled IFC parser maintained by
+ * Tomas Lehtinen / ThatOpen Company. It powers @thatopen/components
+ * underneath, but using it directly sidesteps the peer-dependency drama
+ * between that-open's 2.x + 3.x lines and Pascal's three.js pinning.
  *
- * To keep the Halofire Studio page loading, this module intentionally
- * does NOT import @thatopen/components until the peer-dep conflict is
- * resolved. The function signature is stable; real parsing lands once:
- *   a) Pascal bumps three to 0.184 consistently (already in its root
- *      package.json but transitively @thatopen/core is dragging 0.170)
- *   b) OR we vendor a fragments build that exports both Alignment +
- *      AlignmentObject
- *   c) OR we switch to web-ifc directly (without @thatopen wrapper)
- *
- * For now: the uploader reads the file, reports basic byte-count + name,
- * and returns a clear "not yet parsing" warning. Users see their upload
- * was received and know what's coming.
+ * The real walk (M2 week 3 continuation) translates IFC spatial-tree
+ * entities into Pascal node shapes. For this commit the scaffold
+ * loads the file, enumerates IfcBuilding / IfcBuildingStorey /
+ * IfcWall counts, and returns them in the warnings + summary so the
+ * user sees concrete feedback that the file parsed.
  */
 
 import type { IfcImportOptions, IfcImportResult } from './types.js'
 import { mapIfcToNodeTree } from './mapper.js'
+
+// IFC entity type IDs (from web-ifc's IfcTypes). Hardcoded to avoid the
+// static import that would bundle the entire web-ifc constant map upfront.
+const IFC_SITE = 4097
+const IFC_BUILDING = 4098   // placeholder — web-ifc exposes IFCBUILDING via
+                            // the instance; we'll look it up via GetLineIDsWithType.
 
 export async function importIfcFile(
   options: IfcImportOptions,
@@ -30,18 +28,82 @@ export async function importIfcFile(
   const start =
     typeof performance !== 'undefined' ? performance.now() : Date.now()
 
-  const mapping = await mapIfcToNodeTree(null, options)
+  // Dynamic import to keep the 500+ KB WASM loader out of the initial
+  // page bundle. Only loads when a user actually uploads an IFC.
+  const webifc = await import('web-ifc')
+  const { IfcAPI, IFCSITE, IFCBUILDING, IFCBUILDINGSTOREY, IFCWALL, IFCSLAB, IFCSPACE, IFCCOLUMN } = webifc
+
+  const api = new IfcAPI()
+  // WASM path: web-ifc.wasm needs to be served from /public. The default
+  // `/` prefix works for Next.js apps.
+  api.SetWasmPath('/', true)
+  await api.Init()
+
+  let modelID = -1
+  const bytes = new Uint8Array(options.file)
+  try {
+    modelID = api.OpenModel(bytes, { COORDINATE_TO_ORIGIN: true })
+  } catch (e) {
+    api.CloseModel?.(modelID)
+    return {
+      entitiesProcessed: 0,
+      nodesCreated: 0,
+      skippedEntities: [],
+      warnings: [`web-ifc failed to open model: ${String(e)}`],
+      rootNodeIds: [],
+      durationMs:
+        (typeof performance !== 'undefined' ? performance.now() : Date.now()) - start,
+    }
+  }
+
+  // Count entities by type (for the scaffold summary)
+  const counts: Record<string, number> = {}
+  const countType = (name: string, typeId: number) => {
+    try {
+      const ids = api.GetLineIDsWithType(modelID, typeId)
+      const n = ids.size ? ids.size() : 0
+      if (n > 0) counts[name] = n
+    } catch {
+      // ignore types that aren't in this schema version
+    }
+  }
+  countType('IfcSite', IFCSITE)
+  countType('IfcBuilding', IFCBUILDING)
+  countType('IfcBuildingStorey', IFCBUILDINGSTOREY)
+  countType('IfcWall', IFCWALL)
+  countType('IfcSlab', IFCSLAB)
+  countType('IfcSpace', IFCSPACE)
+  countType('IfcColumn', IFCCOLUMN)
+
+  const entitiesProcessed = Object.values(counts).reduce((a, b) => a + b, 0)
+
+  // Run the mapper (still a scaffold — real walk emits Pascal nodes)
+  const mapping = await mapIfcToNodeTree({ api, modelID, counts }, options)
+
+  const entityLines = Object.entries(counts).map(
+    ([name, n]) => `  - ${name}: ${n}`,
+  )
+
+  try {
+    api.CloseModel(modelID)
+  } catch {
+    // best effort
+  }
+
+  const warnings = [
+    `Parsed ${options.filename ?? 'file'} (${(options.file.byteLength / 1024).toFixed(1)} KB) via web-ifc`,
+    `Entity inventory:`,
+    ...entityLines,
+    '',
+    'Real spatial-tree walk → Pascal nodes pending.',
+    'See packages/halofire-ifc/src/mapper.ts for the planned implementation.',
+  ]
 
   return {
-    entitiesProcessed: 0,
+    entitiesProcessed,
     nodesCreated: mapping.nodesCreated,
-    skippedEntities: [],
-    warnings: [
-      `Received ${options.filename ?? 'file'} (${(options.file.byteLength / 1024).toFixed(1)} KB).`,
-      'IFC parsing is currently disabled pending @thatopen/components peer-dep',
-      'resolution against Pascal\'s three.js version. Tracked in BUILD_LOG entry 16.',
-      'Real parse lands once the version conflict is resolved (next iteration).',
-    ],
+    skippedEntities: mapping.skippedEntities ?? [],
+    warnings,
     rootNodeIds: mapping.rootNodeIds,
     durationMs:
       (typeof performance !== 'undefined' ? performance.now() : Date.now()) - start,

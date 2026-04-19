@@ -689,3 +689,60 @@ cleanly. Happy reviewing.
 - 📝 Placement attaches to Pascal's scene-graph. If user adds a building
      + level first, the head appears in their scene. If scene is empty,
      it lands at top-level (still visible via Scene tab).
+
+### Entry 18 — Real IFC parsing via web-ifc (bypass @thatopen)
+
+- ✅ Dropped `@thatopen/components` + `@thatopen/fragments` from
+     `@halofire/ifc` package dependencies. Keeps only `web-ifc` +
+     `three` + `zod` + `@pascal-app/core`. web-ifc is the underlying
+     WebAssembly parser; @thatopen wraps it but dragged in peer-dep
+     drama with three.js versions. Direct web-ifc sidesteps all of it.
+- ✅ Rewrote `packages/halofire-ifc/src/import.ts` to use
+     `IfcAPI().OpenModel(bytes, {COORDINATE_TO_ORIGIN:true})` and
+     `GetLineIDsWithType()` for every architectural type (IfcSite,
+     IfcBuilding, IfcBuildingStorey, IfcWall, IfcSlab, IfcSpace,
+     IfcColumn). Returns a structured entity inventory the user sees
+     in the upload-result panel.
+- ✅ `web-ifc.wasm` (1.2 MB) copied from node_modules to
+     `apps/editor/public/web-ifc.wasm`. Served at `/web-ifc.wasm` —
+     verified HTTP 200 + correct byte size.
+- ✅ `api.SetWasmPath('/', true)` points web-ifc at the public WASM.
+- ✅ Studio page still loads HTTP 200 after build. Turbopack hot-
+     compiled in 49ms. No new errors.
+- 📝 IfcUploadButton is still wrapped in Next.js `dynamic(ssr:false)`
+     because the WASM load + `IfcAPI` instantiation is client-only.
+     Dynamic wrapper intentional, not a workaround now.
+- 📝 Mapper's real walk (scaffold → emits Pascal nodes) is the next
+     target. The entity counts the tool returns today let the user
+     verify their IFC parsed correctly before we spend effort on the
+     walk logic.
+
+### M1 week 6 summary — session end
+
+Final commit list (13 total):
+| Hash | Title |
+|---|---|
+| `2709edb` | Phase 1 fork + scaffold @halofire/sprinkler |
+| `72cbe18` | Requirements + roadmap v2 |
+| `4b2786a` | Technical plan + M1 infrastructure scaffold |
+| `290cfce` | validate tool + BUILD_LOG start |
+| `61d73a8` | Catalog + 20 authored components + IFC scaffold |
+| `62ac4cd` | Catalog + Fire Protection sidebar tabs |
+| `c5af134` | halopenclaw-client + deploy infra |
+| `e830768` | Hazen-Williams calc + auto-grid placer |
+| `4a64e8a` | L1 PDF vector extraction + pdf_plan export |
+| `636a10a` | route_pipe MST + FireProtectionPanel upgrade |
+| `8169d40` | serializeLiveScene + Fire Protection wired to Pascal |
+| `554bb1a` | IFC upload UI |
+| `c29e841` | Studio boots on localhost:3002 |
+| `423d1ad` | Catalog Place-at-origin creates real Pascal ItemNode |
+| (next)   | Real IFC parsing via web-ifc |
+
+Running state at session end:
+- **Halofire Studio**: localhost:3002 ✅
+- **Halopenclaw Gateway**: localhost:18790 ✅ (6 tools)
+- **Scene tab**: Pascal's full building editor
+- **Catalog tab**: 20 components, each with working "Place at origin"
+  button → spawns a real Pascal ItemNode referencing the GLB
+- **Fire Protection tab**: 6 live sections calling the gateway,
+  including working IFC upload (web-ifc parse + entity counts)
