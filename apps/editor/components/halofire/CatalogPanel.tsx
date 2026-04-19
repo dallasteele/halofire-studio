@@ -9,8 +9,9 @@
  * that demonstrates the 20 authored components + their NFPA metadata.
  */
 
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { CATALOG, type CatalogEntry } from '@halofire/catalog'
+import { generateId, useScene } from '@pascal-app/core'
 
 type Category = CatalogEntry['category']
 
@@ -158,14 +159,81 @@ function SelectedDetail({ entry }: { entry: CatalogEntry }) {
           {entry.notes}
         </p>
       )}
+      <PlaceButton entry={entry} />
+    </div>
+  )
+}
+
+function PlaceButton({ entry }: { entry: CatalogEntry }) {
+  const createNode = useScene((s) => s.createNode)
+  const rootNodeIds = useScene((s) => s.rootNodeIds)
+  const [status, setStatus] = useState<string | null>(null)
+
+  const onPlace = useCallback(() => {
+    // Build an ItemNode referencing the catalog entry's GLB.
+    const [w, d, h] = entry.dims_cm
+    // Pascal uses meters; convert cm -> m (divide by 100)
+    const dimsMeters: [number, number, number] = [w / 100, h / 100, d / 100]
+
+    // Determine attachment: ceiling_pendent / ceiling_upright / ceiling_flush
+    // -> attachTo 'ceiling'; wall_mount -> 'wall'; everything else -> 'floor'.
+    const attachTo: 'floor' | 'ceiling' | 'wall' =
+      entry.mounting.startsWith('ceiling') ? 'ceiling'
+      : entry.mounting === 'wall_mount' ? 'wall'
+      : 'floor'
+
+    const id = generateId('item') as `item_${string}`
+    const node = {
+      id,
+      type: 'item' as const,
+      position: [0, 0, 0] as [number, number, number],
+      rotation: [0, 0, 0] as [number, number, number],
+      scale: [1, 1, 1] as [number, number, number],
+      children: [],
+      asset: {
+        category: entry.category,
+        dimensions: dimsMeters,
+        src: `/halofire-catalog/glb/${entry.sku}.glb`,
+        attachTo,
+        offset: [0, 0, 0] as [number, number, number],
+        rotation: [0, 0, 0] as [number, number, number],
+        scale: [1, 1, 1] as [number, number, number],
+        tags: ['halofire', entry.category],
+      },
+    }
+
+    try {
+      // Pascal's store accepts any parent id; if no scene exists, fall back to
+      // top-level (will show under Scene sidebar).
+      const parentId = rootNodeIds?.[0]
+      // @ts-expect-error - ItemNode schema is strict; runtime accepts the shape
+      createNode(node, parentId)
+      setStatus(`Placed ${entry.sku} at origin`)
+    } catch (e) {
+      setStatus(`Failed: ${String(e)}`)
+    }
+  }, [entry, createNode, rootNodeIds])
+
+  return (
+    <>
       <button
         type="button"
-        disabled
-        className="mt-2 w-full rounded bg-blue-600 px-2 py-1 text-xs font-medium text-white opacity-50"
-        title="Placer tool ships in M1 week 4"
+        onClick={onPlace}
+        className="mt-2 w-full rounded bg-blue-600 px-2 py-1 text-xs font-medium text-white hover:bg-blue-700"
       >
-        Place in scene (M1 week 4)
+        Place at origin
       </button>
-    </div>
+      {status && (
+        <p
+          className={`mt-1 text-[10px] ${
+            status.startsWith('Failed')
+              ? 'text-red-700 dark:text-red-300'
+              : 'text-emerald-700 dark:text-emerald-300'
+          }`}
+        >
+          {status}
+        </p>
+      )}
+    </>
   )
 }

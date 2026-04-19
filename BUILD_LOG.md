@@ -663,3 +663,29 @@ cleanly. Happy reviewing.
      - Catalog: browses all 20 Halofire components
      - Fire Protection: 6 sections live-calling halopenclaw gateway
        (if gateway is running on :18790 in parallel)
+
+### Entry 17 — Place-in-scene wired + 20 GLBs served from public/
+
+- ✅ Copied all 20 GLBs from `packages/halofire-catalog/assets/glb/` to
+     `apps/editor/public/halofire-catalog/glb/` so Next.js serves them at
+     `http://localhost:3002/halofire-catalog/glb/<SKU>.glb`.
+- ✅ `CatalogPanel.tsx` detail pane now has a WORKING "Place at origin"
+     button (replaces disabled "M1 week 4" stub):
+     - Builds a Pascal `ItemNode` with `id`, `type: 'item'`, zero
+       position/rotation, scale [1,1,1], dims converted cm → m (/100),
+       `asset.src = /halofire-catalog/glb/<SKU>.glb`, `attachTo` derived
+       from mounting class (ceiling_* → ceiling; wall_mount → wall;
+       else → floor), tags `['halofire', category]`
+     - Calls `useScene(s => s.createNode)(node, parentId)` via the
+       Pascal store; uses first rootNodeId as parent, falls back to
+       top-level when scene is empty
+     - Inline status message: "Placed SM_Head_Pendant_Standard_K56 at
+       origin" or the raw error on failure
+- ✅ HTTP 200 after hot reload; Turbopack compiles in ~85ms; no server-
+     side errors introduced.
+- 📝 Known minor: upstream Pascal expects `/audios/sfx/snapshot_capture.mp3`
+     (404 in logs) + logs three.js `THREE.Clock` deprecation. Neither is
+     a Halofire bug; both precede our fork.
+- 📝 Placement attaches to Pascal's scene-graph. If user adds a building
+     + level first, the head appears in their scene. If scene is empty,
+     it lands at top-level (still visible via Scene tab).
