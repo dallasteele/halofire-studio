@@ -13,6 +13,7 @@
   "dependencies": {
     "@number-flow/react": "^0.5.14",
     "@halofire/catalog": "*",
+    "@halofire/halopenclaw-client": "*",
     "@pascal-app/core": "*",
     "@pascal-app/editor": "*",
     "@pascal-app/viewer": "*",

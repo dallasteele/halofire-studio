@@ -484,3 +484,42 @@ What's left for M1 completion (week 6):
 - [ ] Click-to-place head in viewport from Catalog tab
 - [ ] E2E demo video: open an architect's sample IFC, hit auto-grid,
       review placements, export PDF
+
+### Entry 14 — Live Pascal scene serialization into halopenclaw validate
+
+- ✅ New `packages/halofire-halopenclaw-client/src/serialize-live.ts`:
+     - `serializeLiveScene({useSceneRegistry, includeTypes?, project?})`
+       walks Pascal's `sceneRegistry` (from @pascal-app/core, which tracks
+       every rendered THREE.Object3D by type) and emits the flat
+       SerializedScene shape.
+     - Uses duck-typed Box3 lookup through `globalThis.THREE` to avoid
+       hard-pinning a three.js version. Falls back to null bbox if three
+       isn't on globals — fine for SSR / tree-shaking edge cases.
+     - Converts Pascal's meters (three.js convention) → gateway's
+       centimeters (×100).
+     - AUDITABLE_TYPES filter: site, building, level, wall, slab, ceiling,
+       zone, door, window, roof, stair, item. Skips scan/guide/fence by
+       default (not architecturally relevant to NFPA audits).
+     - Preserves Object3D.name as `metadata.label` + copies primitive
+       (string/number/boolean) fields from userData to metadata.
+- ✅ `FireProtectionPanel.tsx` wired: both shell + collisions buttons now
+     call `captureScene(demoFallback)` which tries
+     `serializeLiveScene(pascalRegistry)` first and falls back to the
+     hardcoded demo scene ONLY when the registry is empty (user hasn't
+     drawn anything). The demo nodes now have a "(demo — no live scene)"
+     label so it's obvious when we're on fallback data.
+- ✅ Added `@halofire/halopenclaw-client` to `apps/editor/package.json`
+     deps, built both halofire packages clean.
+- 📝 Users who draw even one wall in Pascal's scene tree will now have
+     their actual geometry audited — the floating-wall check the ClaudeBot
+     skill proved in UE months ago now runs on Halofire Studio's own
+     user-drawn content.
+- 📝 `serializeLiveScene` is three-version-agnostic by design (no import
+     of three at the module level). If a future consumer bundles without
+     three, the function returns an empty scene + the demo fallback kicks
+     in. Production Halofire Studio has three via Pascal's viewer.
+- ⚠️ `bbox_world` may be (0,0,0..0,0,0) for nodes whose geometry hasn't
+     computed yet on first render. Ship a useEffect that triggers a
+     re-audit after `useScene.subscribe` fires for full reliability.
+     Deferred — M1 wk6 polish.
+

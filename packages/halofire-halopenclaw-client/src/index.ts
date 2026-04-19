@@ -13,3 +13,5 @@
 export type { HalopenclawClient, ToolName, ValidateMode } from './types.js'
 export { createHalopenclawClient } from './client.js'
 export { serializePascalScene } from './serialize.js'
+export { serializeLiveScene } from './serialize-live.js'
+export type { SceneRegistryLike, SerializeLiveOptions } from './serialize-live.js'

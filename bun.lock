@@ -17,6 +17,7 @@
       "version": "0.1.0",
       "dependencies": {
         "@halofire/catalog": "*",
+        "@halofire/halopenclaw-client": "*",
         "@number-flow/react": "^0.5.14",
         "@pascal-app/core": "*",
         "@pascal-app/editor": "*",

@@ -14,10 +14,26 @@
  * M2-M3 adds: L2-L4 PDF, density-area calc, AHJ sheet set.
  */
 
+import { sceneRegistry } from '@pascal-app/core'
+import { serializeLiveScene } from '@halofire/halopenclaw-client'
 import { useCallback, useState } from 'react'
 
 const GATEWAY_URL =
   process.env.NEXT_PUBLIC_HALOPENCLAW_URL ?? 'http://localhost:18790'
+
+/**
+ * Serialize the live Pascal scene for gateway tool calls. Falls back to
+ * a demo scene if the registry is empty (user hasn't drawn anything).
+ */
+function captureScene(demo: Record<string, unknown>): Record<string, unknown> {
+  const serialized = serializeLiveScene({
+    useSceneRegistry: () => sceneRegistry,
+  })
+  if (serialized.nodes.length === 0) {
+    return demo
+  }
+  return serialized as unknown as Record<string, unknown>
+}
 
 type HazardClass = 'light' | 'ordinary_i' | 'ordinary_ii' | 'extra_i' | 'extra_ii'
 
@@ -61,27 +77,25 @@ export function FireProtectionPanel() {
   const runShell = useCallback(async () => {
     setShell({ running: true })
     try {
-      const output = await callTool('halofire_validate', {
-        mode: 'shell',
-        scene: {
-          nodes: [
-            {
-              id: 'demo_w1',
-              type: 'wall',
-              folder: 'Level/Walls/South',
-              bbox_world: { min: [0, 0, 0], max: [400, 20, 400] },
-              metadata: { label: 'South_OK' },
-            },
-            {
-              id: 'demo_w2',
-              type: 'wall',
-              folder: 'Level/Walls/North',
-              bbox_world: { min: [0, 3180, 200], max: [400, 3200, 600] },
-              metadata: { label: 'North_FLOATING' },
-            },
-          ],
-        },
+      const scene = captureScene({
+        nodes: [
+          {
+            id: 'demo_w1',
+            type: 'wall',
+            folder: 'Level/Walls/South',
+            bbox_world: { min: [0, 0, 0], max: [400, 20, 400] },
+            metadata: { label: 'South_OK (demo — no live scene)' },
+          },
+          {
+            id: 'demo_w2',
+            type: 'wall',
+            folder: 'Level/Walls/North',
+            bbox_world: { min: [0, 3180, 200], max: [400, 3200, 600] },
+            metadata: { label: 'North_FLOATING (demo)' },
+          },
+        ],
       })
+      const output = await callTool('halofire_validate', { mode: 'shell', scene })
       setShell({ running: false, output })
     } catch (e) {
       setShell({ running: false, error: String(e) })
@@ -91,23 +105,21 @@ export function FireProtectionPanel() {
   const runCollisions = useCallback(async () => {
     setCollisions({ running: true })
     try {
-      const output = await callTool('halofire_validate', {
-        mode: 'collisions',
-        scene: {
-          nodes: [
-            {
-              id: 'f1', type: 'slab', folder: 'Level/Floor',
-              bbox_world: { min: [0, 0, 0], max: [400, 400, 20] },
-              metadata: { label: 'Floor_0_0' },
-            },
-            {
-              id: 'h1', type: 'head', folder: 'Level/Heads',
-              bbox_world: { min: [100, 100, 380], max: [105, 105, 400] },
-              metadata: { label: 'H1' },
-            },
-          ],
-        },
+      const scene = captureScene({
+        nodes: [
+          {
+            id: 'f1', type: 'slab', folder: 'Level/Floor',
+            bbox_world: { min: [0, 0, 0], max: [400, 400, 20] },
+            metadata: { label: 'Floor_0_0 (demo — no live scene)' },
+          },
+          {
+            id: 'h1', type: 'head', folder: 'Level/Heads',
+            bbox_world: { min: [100, 100, 380], max: [105, 105, 400] },
+            metadata: { label: 'H1 (demo)' },
+          },
+        ],
       })
+      const output = await callTool('halofire_validate', { mode: 'collisions', scene })
       setCollisions({ running: false, output })
     } catch (e) {
       setCollisions({ running: false, error: String(e) })
