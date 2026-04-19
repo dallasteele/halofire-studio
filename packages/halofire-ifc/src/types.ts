@@ -34,6 +34,21 @@ export interface IfcImportResult {
   warnings: string[]
   /** Top-level site IDs created in the Pascal node tree */
   rootNodeIds: string[]
+  /**
+   * Pre-computed node payloads the caller should feed into
+   * `useScene.createNode(...)` one by one to populate the scene.
+   * Loosely typed because @halofire/ifc avoids hard-depending on
+   * @pascal-app/core's strict Zod schemas at the type level.
+   */
+  plannedNodes?: {
+    id: string
+    type: string
+    parentId?: string
+    ifcGuid?: string
+    name?: string
+    elevationM?: number
+    hazard?: string
+  }[]
   /** Processing time in ms */
   durationMs: number
 }

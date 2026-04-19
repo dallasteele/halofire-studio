@@ -10,11 +10,11 @@
  * surfaces the warning so user sees real feedback.
  */
 
+import { useScene } from '@pascal-app/core'
 import { useCallback, useRef, useState } from 'react'
 
-// Lazy-load @halofire/ifc — the @thatopen/components + web-ifc stack is
-// heavyweight (WASM, 400 KB+) and has version-resolution quirks with
-// @thatopen/fragments. Only load when the user actually picks a file.
+// Lazy-load @halofire/ifc — web-ifc WASM is ~1.2 MB. Only load when the
+// user actually picks a file.
 async function loadIfcImporter() {
   const { importIfcFile } = await import('@halofire/ifc')
   return importIfcFile
@@ -27,9 +27,56 @@ interface IngestState {
   filename?: string
 }
 
+/**
+ * Translate a mapper-produced PlannedNode into a Pascal node shape
+ * that useScene.createNode accepts. Pascal's strict Zod schemas are
+ * the source of truth at runtime; we construct the minimum viable
+ * payload for each node type + let the validator fill defaults.
+ */
+function translatePlannedNode(pn: {
+  id: string
+  type: string
+  name?: string
+  elevationM?: number
+  hazard?: string
+  ifcGuid?: string
+}): Record<string, unknown> {
+  const base = {
+    id: pn.id,
+    type: pn.type,
+    name: pn.name,
+    userData: {
+      ifc_guid: pn.ifcGuid,
+      ifc_hazard_inferred: pn.hazard,
+    },
+  }
+  switch (pn.type) {
+    case 'site':
+      return { ...base, position: [0, 0, 0], children: [] }
+    case 'building':
+      return { ...base, position: [0, 0, 0], children: [] }
+    case 'level':
+      return { ...base, elevation: pn.elevationM ?? 0, children: [] }
+    case 'wall':
+      // Minimal wall; geometry walk adds real start/end + thickness later
+      return { ...base, start: [0, 0, 0], end: [1, 0, 0], thickness: 0.2, height: 3 }
+    case 'slab':
+      return { ...base, polygon: [[0, 0], [1, 0], [1, 1], [0, 1]], thickness: 0.2, z: 0 }
+    case 'zone':
+      return {
+        ...base,
+        polygon: [[0, 0], [1, 0], [1, 1], [0, 1]],
+        hazard: pn.hazard,
+      }
+    default:
+      return base
+  }
+}
+
 export default function IfcUploadButtonImpl() {
   const [state, setState] = useState<IngestState>({ running: false })
   const inputRef = useRef<HTMLInputElement>(null)
+  const createNode = useScene((s) => s.createNode)
 
   const onFileChosen = useCallback(async (file: File | null) => {
     if (!file) return
@@ -43,21 +90,43 @@ export default function IfcUploadButtonImpl() {
         coordinateSystemFlip: 'ifc_to_pascal',
         preserveGuids: true,
       })
+
+      // Spawn planned nodes into Pascal scene. The mapper returns them
+      // in hierarchy order (sites first, then buildings, storeys, etc.)
+      // so parentId lookups always succeed.
+      let spawned = 0
+      const failures: string[] = []
+      for (const pn of result.plannedNodes ?? []) {
+        try {
+          const pascalNode = translatePlannedNode(pn)
+          // @ts-expect-error — runtime accepts our constructed shape
+          createNode(pascalNode, pn.parentId)
+          spawned++
+        } catch (e) {
+          failures.push(`${pn.type}:${pn.name ?? pn.id}: ${String(e)}`)
+        }
+      }
+
       const lines = [
         `Imported: ${file.name}`,
         `  ${result.entitiesProcessed} IFC entities processed`,
-        `  ${result.nodesCreated} Pascal nodes created`,
+        `  ${result.nodesCreated} Pascal nodes planned`,
+        `  ${spawned} spawned in scene`,
+        `  ${failures.length} failures`,
         `  ${result.skippedEntities.length} skipped`,
         `  ${result.durationMs.toFixed(0)} ms`,
       ]
       for (const w of result.warnings) {
         lines.push(`  WARN: ${w}`)
       }
+      for (const f of failures.slice(0, 5)) {
+        lines.push(`  FAIL: ${f}`)
+      }
       setState({ running: false, summary: lines.join('\n') })
     } catch (e) {
       setState({ running: false, error: String(e) })
     }
-  }, [])
+  }, [createNode])
 
   return (
     <div>

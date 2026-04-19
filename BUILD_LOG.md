@@ -746,3 +746,32 @@ Running state at session end:
   button → spawns a real Pascal ItemNode referencing the GLB
 - **Fire Protection tab**: 6 live sections calling the gateway,
   including working IFC upload (web-ifc parse + entity counts)
+
+### Entry 19 — IFC mapper walks spatial tree → spawns Pascal nodes
+
+- ✅ `packages/halofire-ifc/src/mapper.ts` rewritten from stub to real
+     walker. Iterates every IFC entity type (IfcSite, IfcBuilding,
+     IfcBuildingStorey, IfcSpace, IfcWall+WallStandardCase, IfcSlab) via
+     `api.GetLineIDsWithType()` + `api.GetLine()`, preserves IFC GUIDs
+     as userData, inferrs NFPA 13 hazard class from IfcSpace LongName.
+- ✅ Returns a `plannedNodes` array of pre-computed Pascal-node payloads
+     in hierarchy order (sites → buildings → storeys → zones → walls →
+     slabs), each with `parentId` pointing at the previously-created
+     parent. Consumer iterates + calls `useScene.createNode(pn, pn.parentId)`.
+- ✅ Synthesizes an implicit Site root when the IFC skips IfcSite (common
+     in Revit interior packages) so the hierarchy stays connected.
+- ✅ `IfcImportResult.plannedNodes?` added to types for the round-trip.
+- ✅ `IfcUploadButtonImpl.tsx` now spawns every planned node into Pascal
+     via `useScene((s) => s.createNode)`. `translatePlannedNode()` helper
+     maps the mapper's loose PlannedNode shape to each Pascal node's
+     constructor arguments (site/building/level/wall/slab/zone).
+- ✅ Summary panel shows entities processed / nodes planned / spawned /
+     failures / skipped / parse time, plus all warnings from the parser.
+- ✅ Halofire Studio still serves HTTP 200; Turbopack hot-compiled in
+     98ms after the changes.
+- 📝 Wall/slab geometry is placeholder (straight 1m wall, 1m² slab).
+     Real geometry extraction needs `api.StreamMeshes()` + the IfcGeometry
+     triangle-buffer walk — that's Phase M2 week 3 work. For now the
+     hierarchy is accurate + each placeholder carries its IFC GUID, so a
+     second-pass geometry walker will have stable references to attach
+     triangles to.

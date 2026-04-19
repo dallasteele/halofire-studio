@@ -103,8 +103,9 @@ export async function importIfcFile(
     entitiesProcessed,
     nodesCreated: mapping.nodesCreated,
     skippedEntities: mapping.skippedEntities ?? [],
-    warnings,
+    warnings: [...warnings, ...(mapping.warnings ?? [])],
     rootNodeIds: mapping.rootNodeIds,
+    plannedNodes: mapping.plannedNodes,
     durationMs:
       (typeof performance !== 'undefined' ? performance.now() : Date.now()) - start,
   }
