@@ -1,0 +1,32 @@
+{
+  "name": "@halofire/sprinkler",
+  "version": "0.0.0",
+  "description": "NFPA 13 sprinkler placement rules + head library for Halofire Studio",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc --build",
+    "dev": "tsc --build --watch",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@pascal-app/core": "*",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@pascal/typescript-config": "*",
+    "typescript": "5.9.3"
+  }
+}

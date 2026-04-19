@@ -2,8 +2,18 @@ import { Agentation } from 'agentation'
 import { GeistPixelSquare } from 'geist/font/pixel'
 import { Barlow } from 'next/font/google'
 import localFont from 'next/font/local'
+import type { Metadata } from 'next'
 import Script from 'next/script'
 import './globals.css'
+
+export const metadata: Metadata = {
+  title: {
+    default: 'Halofire Studio',
+    template: '%s — Halofire Studio',
+  },
+  description:
+    'CAD + visualization for fire sprinkler design and layout. Built on Pascal.',
+}
 
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',

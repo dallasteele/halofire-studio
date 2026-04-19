@@ -1,4 +1,23 @@
-# Pascal Editor
+# Halofire Studio
+
+**Specialized CAD + visualization tool for fire sprinkler design + layout.**
+
+Built as a fork of [Pascal Editor](https://github.com/pascalorg/editor) (MIT).
+See [HALOFIRE_ROADMAP.md](./HALOFIRE_ROADMAP.md) for the product plan.
+
+Target users: fire sprinkler contractors (first client: Halo Fire Protection).
+Target workflow: IFC import → NFPA 13 sprinkler placement → auto-routed pipe
+network → hydraulic calc → 2D shop drawings (DXF + PDF) → equipment schedule →
+proposal. All in a browser, zero install.
+
+This repository keeps full upstream compatibility with Pascal by preserving
+the `@pascal-app/*` package names. Halofire-specific work lives under the
+`@halofire/*` namespace. Upstream improvements merge in cleanly via quarterly
+rebase.
+
+---
+
+## Upstream (Pascal Editor)
 
 A 3D building editor built with React Three Fiber and WebGPU.
 
