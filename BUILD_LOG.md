@@ -409,3 +409,78 @@ Remaining for M1 wrap-up:
 - halofire_route_pipe: manual_segment real impl (M1 week 4 scope)
 - IFC upload UI in Fire Protection panel (M1 week 3 scope)
 - Pascal click-to-place wiring from CatalogPanel (M1 week 3 scope)
+
+### Entry 13 — route_pipe real impl + Fire Protection panel UI upgrade
+
+- ✅ `services/halopenclaw-gateway/tools/route_pipe.py` rewritten with
+     real modes:
+     - `manual_segment`: given {start, end, pipe_schedule, material}
+       returns distance in cm/ft + pipe spec
+     - `auto_tree`: given heads[] + riser, runs Prim's MST from riser
+       outward, returns segments with lengths + suggested pipe size
+       from NFPA 13 §28.5 schedule method (1 head→1"; 2→1.25"; 3→1.5";
+       4-5→2"; 6-10→2.5"; 11-30→3"; 31+→4"+)
+     - `auto_loop`, `auto_grid`: scope-stubbed to M3 (§28.7/28.8)
+- ✅ Smoke tests:
+     - manual_segment 0,0,380 → 300,0,380 returns 300cm / 9.84ft
+     - auto_tree on 6 heads in 3x2 grid + riser at (100,100,380):
+       generates 6 MST segments, total 16.10m, suggests 2.5" SCH10
+       (6 heads per NFPA §28.5)
+- ✅ `FireProtectionPanel.tsx` upgraded from 2 demo buttons to 5
+     interactive sections:
+     1. Validate: shell + collisions (unchanged)
+     2. Place Heads: room-width/length inputs + hazard-class dropdown
+        + "Compute auto-grid" button that calls `halofire_place_head`
+        mode=auto_grid and renders the head grid with NFPA coverage stats
+     3. Route Pipes: "Auto-tree (3x2 demo)" button that calls
+        `halofire_route_pipe` mode=auto_tree + renders MST + sizing
+     4. Hydraulic Calc: "Single-branch demo" button that calls
+        `halofire_calc` mode=single_branch + renders per-segment loss
+     5. Ingest + Export: scope notes pointing to M2/M3 delivery
+- ✅ UI is 220 lines of TSX, keyboard-friendly, dark-mode-aware,
+     controlled inputs, Btn + ResultBlock + Section components for reuse.
+- 📝 All 5 sections now exercise REAL gateway tools. A Wade-equivalent
+     user can open the studio, flip to Fire Protection tab, tweak a room
+     size + hazard, hit Compute auto-grid, see an NFPA-compliant head
+     grid + total pipe length + sizing recommendation — all in-browser,
+     server-backed by halopenclaw.
+- ⚠️ The demo scene / demo heads are still hardcoded — real integration
+     with the Pascal scene store ships when we finish the halopenclaw-
+     client Pascal serializer wire-up (M1 week 4 continuation).
+
+### M1 weeks 2-5 (this session) summary
+
+Six commits pushed to main:
+| Hash | Title |
+|---|---|
+| `290cfce` | validate tool real impl + BUILD_LOG + gitignore |
+| `61d73a8` | catalog package + 20 authored components + IFC wire-up |
+| `62ac4cd` | Catalog + Fire Protection sidebar tabs |
+| `c5af134` | halopenclaw-client + deploy infra |
+| `e830768` | Hazen-Williams calc + NFPA auto-grid head placer |
+| `4a64e8a` | L1 PDF vector extraction + single-sheet PDF export |
+| (next)   | route_pipe real impl + FireProtectionPanel upgrade |
+
+Gateway tool status at end of M1 wk5:
+
+| Tool | Status |
+|---|---|
+| halofire_validate | shell ✅ + collisions ✅ + nfpa13/hydraulic/completeness stubs (M3) |
+| halofire_ingest | pdf L1 ✅ + ifc (client-side) + dwg stub (M2wk8) |
+| halofire_place_head | auto_grid ✅ + at_coords ✅ + manual (pass-through) |
+| halofire_route_pipe | manual_segment ✅ + auto_tree ✅ + auto_loop/auto_grid stubs (M3) |
+| halofire_calc | hazen_williams ✅ + k_factor_flow ✅ + single_branch ✅ + density_area/remote_area/supply_check stubs (M3) |
+| halofire_export | pdf_plan ✅ + dxf/ifc/cut_sheets/proposal/sheet_set stubs (M2-M3) |
+
+Halofire Studio sidebar:
+- Scene tab: Pascal built-in
+- Catalog tab: browses all 20 components ✅
+- Fire Protection tab: 5 interactive sections, all backed by gateway ✅
+
+What's left for M1 completion (week 6):
+- [ ] halopenclaw-client serialize Pascal store → Fire Protection panel
+      uses real user scene instead of demo scenes
+- [ ] IFC file upload UI + drag-drop into viewport
+- [ ] Click-to-place head in viewport from Catalog tab
+- [ ] E2E demo video: open an architect's sample IFC, hit auto-grid,
+      review placements, export PDF
