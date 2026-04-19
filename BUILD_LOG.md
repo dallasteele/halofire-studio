@@ -882,7 +882,28 @@ Running state at session end:
 - ✅ Studio HTTP 200 after edits; Turbopack recompiled cleanly.
 - 📝 Downstream-head DFS is memoized so the cost is O(nodes) even for
      deep trees. For typical 20-50 head systems it's microseconds.
-- 📝 Next: hydraulic calc wiring (feed the live MST into
-     `halofire_calc single_branch` instead of hard-coded segments), then
-     a "Commit placements → scene.pen" serializer so Wade's session
-     survives a page reload.
+---
+
+### Entry 24 — Hydraulic calc wired to live scene
+
+- ✅ `runCalcFromScene`: new "Calc from live scene" button chains the
+     full pipeline — pulls live heads from `useScene`, calls
+     `halofire_route_pipe auto_tree` for the MST, parses segments,
+     re-runs the same downstream-heads DFS used by the router to assign
+     a §28.5 pipe size per segment, tags each segment with a fitting
+     (`tee_branch` for junctions / `elbow_90` for leaves), then calls
+     `halofire_calc single_branch` with the live payload.
+- ✅ System flow computed from Wade's default K-factor (K5.6 @ 7 psi
+     min working pressure = 14.8 gpm/head per NFPA 13 §11.2.6), scaled
+     by live head count. Output shows: `Using N heads, M segments, F gpm`.
+- ✅ Studio HTTP 200; button sits next to the demo calc button so users
+     see both the canned demo and the real scene-driven call.
+- 📝 Known simplifications: single-branch mode (not true grid/loop),
+     per-segment elevation_change = 0 (assumes flat ceiling; riser-up
+     handled by main calc term), friction accounting uses gateway's
+     Hazen-Williams with `pipe_material = steel_new`. Proper branched-
+     network calc + density-area method ships M2.
+- 📝 Next: scene persistence via `.pen` file so Wade can close the tab
+     and resume a bid mid-takeoff; also wire live scene into
+     `halofire_validate shell` + `collisions` so the demo placeholder
+     walls/floors are replaced by real scene data.

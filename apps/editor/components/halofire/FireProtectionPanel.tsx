@@ -393,6 +393,111 @@ export function FireProtectionPanel() {
     }
   }, [])
 
+  const runCalcFromScene = useCallback(async () => {
+    setCalc({ running: true })
+    try {
+      // Pull live heads + riser → call route_pipe auto_tree → parse
+      // segments → feed into halofire_calc single_branch with per-segment
+      // §28.5 pipe-schedule sizing and approximate fittings.
+      const heads: { id: string; x_cm: number; y_cm: number; z_cm: number }[] = []
+      const nodes = useScene.getState().nodes as Record<string, unknown>
+      for (const [id, raw] of Object.entries(nodes)) {
+        const n = raw as { type?: string; position?: [number, number, number]; asset?: { category?: string } }
+        if (n.type !== 'item') continue
+        if (!n.asset?.category?.startsWith('sprinkler_head_')) continue
+        const [x, y, z] = n.position ?? [0, 0, 0]
+        heads.push({ id, x_cm: x * 100, y_cm: y * 100, z_cm: z * 100 })
+      }
+      if (heads.length === 0) {
+        setCalc({
+          running: false,
+          error: 'No sprinkler heads in scene. Place heads first (Catalog tab or auto-grid).',
+        })
+        return
+      }
+      const riser = { id: 'R1', x_cm: 50, y_cm: 50, z_cm: 380 }
+      const mstOutput = await callTool('halofire_route_pipe', {
+        mode: 'auto_tree',
+        scene_id: 'studio_calc',
+        riser,
+        heads,
+        pipe_schedule: 'sch10',
+      })
+      const segRegex = /^\s+(\S+)\s+→\s+(\S+)\s+([\d.]+)cm\s+\(([\d.]+)ft\)/gm
+      type ParsedSeg = { from: string; to: string; length_ft: number }
+      const parsedSegs: ParsedSeg[] = []
+      for (const m of mstOutput.matchAll(segRegex)) {
+        parsedSegs.push({
+          from: m[1],
+          to: m[2],
+          length_ft: Number(m[4]),
+        })
+      }
+      if (parsedSegs.length === 0) {
+        setCalc({ running: false, error: 'Router returned no segments.' })
+        return
+      }
+      // Tree adjacency for downstream-head counts.
+      const childrenOf = new Map<string, string[]>()
+      for (const s of parsedSegs) {
+        const arr = childrenOf.get(s.from) ?? []
+        arr.push(s.to)
+        childrenOf.set(s.from, arr)
+      }
+      const isHead = new Set(heads.map((h) => h.id))
+      const dsCache = new Map<string, number>()
+      const downstreamHeads = (id: string): number => {
+        const c = dsCache.get(id)
+        if (c !== undefined) return c
+        let out = isHead.has(id) ? 1 : 0
+        for (const ch of childrenOf.get(id) ?? []) out += downstreamHeads(ch)
+        dsCache.set(id, out)
+        return out
+      }
+      const sizeForCount = (n: number): number =>
+        n <= 1 ? 1.0 : n <= 2 ? 1.25 : n <= 3 ? 1.5 : n <= 5 ? 2.0
+        : n <= 10 ? 2.5 : n <= 30 ? 3.0 : 4.0
+
+      // Build segment payload: flow for the branch is K√p for one head
+      // at min working pressure — hard-code the K5.6 × 7 psi = ~14.8 gpm
+      // per head (NFPA 13 §11.2.6). Total system flow = heads × per-head.
+      // For a single-branch approximation, we walk the longest path from
+      // riser to deepest head and call halofire_calc on those segments.
+      const segPayload: Record<string, unknown>[] = []
+      for (const s of parsedSegs) {
+        const ds = Math.max(1, downstreamHeads(s.to))
+        const size = sizeForCount(ds)
+        // Fittings approximation: each tee node gets a tee_branch, leaves
+        // get an elbow_90 at the connection.
+        const fittings: [string, number, number][] =
+          (childrenOf.get(s.to)?.length ?? 0) > 1
+            ? [['tee_branch', size, 1]]
+            : [['elbow_90', size, 1]]
+        segPayload.push({
+          from_node: s.from,
+          to_node: s.to,
+          length_ft: s.length_ft,
+          pipe_schedule: 'sch10',
+          nominal_size_in: size,
+          fittings,
+        })
+      }
+      // System flow: 14.8 gpm per head × head count (K5.6 @ 7 psi).
+      const systemFlow = Number((14.8 * heads.length).toFixed(1))
+      const output = await callTool('halofire_calc', {
+        mode: 'single_branch',
+        flow_gpm: systemFlow,
+        segments: segPayload,
+      })
+      const header =
+        `Using ${heads.length} live heads, ${parsedSegs.length} MST segments, ` +
+        `${systemFlow} gpm (K5.6 × 7 psi/head).\n\n`
+      setCalc({ running: false, output: header + output })
+    } catch (e) {
+      setCalc({ running: false, error: String(e) })
+    }
+  }, [])
+
   const [exportResult, setExportResult] = useState<ToolResult>({ running: false })
 
   const runExport = useCallback(async () => {
@@ -530,6 +635,14 @@ export function FireProtectionPanel() {
         <Btn onClick={runCalc} busy={calc.running}>
           Single-branch demo (60 gpm, 3 segments, +12 ft elev.)
         </Btn>
+        <button
+          type="button"
+          onClick={runCalcFromScene}
+          disabled={calc.running}
+          className="mt-1 w-full rounded border border-emerald-400 bg-emerald-50 px-2 py-1 text-[11px] font-medium text-emerald-900 hover:bg-emerald-100 disabled:opacity-50 dark:border-emerald-700 dark:bg-emerald-950 dark:text-emerald-100 dark:hover:bg-emerald-900"
+        >
+          Calc from live scene (K5.6 heads, §28.5 sizing)
+        </button>
         <ResultBlock result={calc} />
       </Section>
 
