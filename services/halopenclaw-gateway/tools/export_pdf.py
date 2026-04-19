@@ -68,7 +68,10 @@ async def invoke(args: dict[str, Any]) -> str:
             "pending."
         )
 
-    if mode in ("ifc", "cut_sheets", "proposal", "sheet_set"):
+    if mode == "sheet_set":
+        return await _render_sheet_set(args)
+
+    if mode in ("ifc", "cut_sheets", "proposal"):
         return (
             f"EXPORT {mode} (M3 scope): full AHJ sheet-set generator with "
             f"title blocks, dimensioning, schedules, cut-sheet assembly, "
@@ -125,6 +128,45 @@ async def _render_pdf_plan(args: dict[str, Any]) -> str:
         f"  Wrote {size} bytes to {out_path}\n"
         f"  Equipment count: {len(schedule.get('equipment', []))}\n"
         f"  Zones: {len(schedule.get('zones', []))}"
+    )
+
+
+async def _render_sheet_set(args: dict[str, Any]) -> str:
+    data = args.get("schedule") or args.get("sheet_set")
+    if not data or not isinstance(data, dict):
+        return (
+            "sheet_set: 'schedule' (or 'sheet_set') object required. "
+            "Expected keys: project, halofire, systems, levels[], hydraulic."
+        )
+
+    try:
+        from drafting_fp import render_sheet_set  # type: ignore[import-not-found]
+    except ImportError as e:
+        return f"drafting_fp not importable: {e}"
+
+    out_path = str(args.get("output_path") or "")
+    if not out_path:
+        out_path = (
+            "/tmp/halofire_sheetset.pdf"
+            if os.name != "nt"
+            else os.path.join(
+                os.environ.get("TEMP", "."), "halofire_sheetset.pdf"
+            )
+        )
+
+    pages = render_sheet_set(data, out_path)
+    try:
+        size = os.path.getsize(out_path)
+    except OSError:
+        size = 0
+    project_name = (data.get("project") or {}).get("name", "")
+    level_count = len(data.get("levels", []))
+    return (
+        f"EXPORT sheet_set:\n"
+        f"  Project: {project_name}\n"
+        f"  Wrote {pages} pages, {size} bytes → {out_path}\n"
+        f"  Level plan sheets: {level_count}\n"
+        f"  Includes FP-0 cover, FP-1..FP-{level_count} plans, FP-H hydraulic placard."
     )
 
 

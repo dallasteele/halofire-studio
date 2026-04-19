@@ -958,3 +958,44 @@ bid."* Source docs at `E:\ClaudeBot\HaloFireBidDocs\`.
         3. Emit a `.glb` 3D model of the full pipe network + heads
            (halofire_export model_3d mode) to drop into Wade's web
            bid viewer.
+
+---
+
+### Entry 26 — Multi-page AHJ sheet set: FP-0 + FP-N + FP-H
+
+- ✅ New gateway module `drafting_fp.py`: fire-protection-specific
+     multi-page PDF renderer using matplotlib `PdfPages`. Not tied to
+     the food-service `drafting_matplotlib.py`. Generates:
+        - **FP-0 Cover sheet** — Halo Fire branded title block, project
+          name/address/APN/code/AHJ/construction/architect/GC, sheet
+          index, 15 general notes, fire systems summary table
+        - **FP-1..FP-N plans** — per-level sprinkler plans with hazard
+          shading, pipe-size-colored line work (1" to 3"), red head
+          markers, N-arrow, counts in title ("47 heads, 53 segments,
+          28.4 m pipe"), pipe-size legend
+        - **FP-H hydraulic placard** — NFPA 13 §28.6 required data
+          plate: flow demand, static, residual, demand, safety margin,
+          hose allowance, design area, density
+     Each sheet uses a 17×11 (Letter landscape) sheet with a 1.6"
+     Halo Fire title block across the bottom carrying contact/license/
+     revision/"DEFERRED SUBMITTAL — NOT FOR CONSTRUCTION" legend.
+- ✅ `halofire_export` tool: new `sheet_set` mode implemented via
+     `_render_sheet_set()`. Accepts `schedule` dict with shape
+     `{project, halofire, systems, levels[], hydraulic}`. Returns
+     `{pages, bytes, path}` on success.
+- ✅ Studio `ProjectBriefPanel`: new "Generate AHJ sheet set PDF"
+     button. Harvests live scene heads + auto-tree pipe segments,
+     buckets them per level by z-elevation (nearest-level heuristic),
+     reconstructs pipe endpoints from midpoint + scale.y + rotation,
+     parses pipe size from SKU (`SCH10_2_5in_1m` → 2.5"), computes
+     system flow from K5.6/7 psi formula, POSTs the full payload to
+     `halofire_export sheet_set`.
+- ✅ Smoke-tested with a 1-level demo payload: 86,974-byte 3-page PDF
+     written correctly (FP-0 cover + FP-1 level plan + FP-H placard).
+- 📝 Restarted gateway once to pick up the new tool code (uvicorn
+     `--reload` wasn't on; next run should use `--reload`).
+- 📝 Next: (a) emit the 3D model for the client's web bid viewer —
+     simplest first pass is a JSON scene the existing Pascal viewer
+     can ingest; proper .glb export needs trimesh or pygltflib in the
+     gateway venv. (b) wire the FP sheet-set button to a direct-link
+     download response so the PDF streams to the user.

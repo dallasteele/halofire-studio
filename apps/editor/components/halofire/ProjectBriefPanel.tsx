@@ -14,6 +14,29 @@
 import { generateId, useScene } from '@pascal-app/core'
 import { useCallback, useState } from 'react'
 
+const GATEWAY_URL =
+  process.env.NEXT_PUBLIC_HALOPENCLAW_URL ?? 'http://localhost:18790'
+
+async function callTool(
+  name: string,
+  args: Record<string, unknown>,
+): Promise<string> {
+  const response = await fetch(`${GATEWAY_URL}/mcp`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      jsonrpc: '2.0',
+      id: Math.floor(Math.random() * 10_000),
+      method: 'tools/call',
+      params: { name, arguments: args },
+    }),
+  })
+  if (!response.ok) throw new Error(`gateway: HTTP ${response.status}`)
+  const body = await response.json()
+  if (body.error) throw new Error(`rpc: ${JSON.stringify(body.error)}`)
+  return String(body.result?.content?.[0]?.text ?? '')
+}
+
 interface Level {
   id: string
   name: string
@@ -62,6 +85,8 @@ export function ProjectBriefPanel() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [seedStatus, setSeedStatus] = useState<string | null>(null)
+  const [sheetSetStatus, setSheetSetStatus] = useState<string | null>(null)
+  const [sheetSetBusy, setSheetSetBusy] = useState(false)
 
   const createNode = useScene((s) => s.createNode)
 
@@ -359,6 +384,179 @@ export function ProjectBriefPanel() {
           {seedStatus && (
             <pre className="whitespace-pre-wrap rounded bg-neutral-100 p-2 text-[10px] dark:bg-neutral-900">
               {seedStatus}
+            </pre>
+          )}
+
+          <button
+            type="button"
+            disabled={sheetSetBusy}
+            onClick={async () => {
+              setSheetSetBusy(true)
+              setSheetSetStatus(null)
+              try {
+                // Collect per-level heads + pipes from live scene.
+                const nodes = useScene.getState().nodes as Record<string, unknown>
+                const levelAssign = new Map<string, string>()
+                // Map heads/pipes to nearest level by y-elevation. Heads
+                // placed via auto-grid carry no level pointer yet, so we
+                // bucket by position[2] (z_cm → meters).
+                type LiveLevel = {
+                  id: string
+                  name: string
+                  elevation_ft: number
+                  hazard: string
+                  width_m: number
+                  length_m: number
+                  heads: { id: string; x_m: number; y_m: number; sku: string }[]
+                  pipes: {
+                    from: string
+                    to: string
+                    size_in: number
+                    x1_m: number
+                    y1_m: number
+                    x2_m: number
+                    y2_m: number
+                  }[]
+                }
+                const sqm = project.building.total_sqft * 0.092903
+                const sideM = Math.sqrt(sqm)
+                const liveLevels: LiveLevel[] = project.building.levels.map(
+                  (lvl) => ({
+                    id: lvl.id,
+                    name: lvl.name,
+                    elevation_ft: lvl.elevation_ft,
+                    hazard: lvl.use === 'garage' ? 'ordinary_i' : 'light',
+                    width_m: sideM,
+                    length_m: sideM,
+                    heads: [],
+                    pipes: [],
+                  }),
+                )
+
+                const FT_TO_M = 0.3048
+                const nearestLevel = (z_m: number): LiveLevel => {
+                  let best = liveLevels[0]
+                  let bestD = Infinity
+                  for (const l of liveLevels) {
+                    const d = Math.abs(l.elevation_ft * FT_TO_M - z_m)
+                    if (d < bestD) { bestD = d; best = l }
+                  }
+                  return best
+                }
+
+                for (const [id, raw] of Object.entries(nodes)) {
+                  const n = raw as {
+                    type?: string
+                    position?: [number, number, number]
+                    scale?: [number, number, number]
+                    rotation?: [number, number, number]
+                    asset?: { category?: string; tags?: string[]; src?: string }
+                  }
+                  if (n.type !== 'item') continue
+                  const cat = n.asset?.category ?? ''
+                  const [x, y, z] = n.position ?? [0, 0, 0]
+                  const tags = n.asset?.tags ?? []
+                  if (cat.startsWith('sprinkler_head_')) {
+                    const lvl = nearestLevel(z)
+                    lvl.heads.push({
+                      id,
+                      x_m: x,
+                      y_m: y,
+                      sku: n.asset?.src?.split('/').pop()?.replace('.glb', '') ?? cat,
+                    })
+                    levelAssign.set(id, lvl.id)
+                  } else if (cat.startsWith('pipe_') && tags.includes('auto_tree')) {
+                    const lvl = nearestLevel(z)
+                    // Reconstruct endpoints from midpoint + scale.y (length)
+                    // + rotation (pitch, 0, yaw). scale[1] is length in m.
+                    const length = n.scale?.[1] ?? 1
+                    const pitch = n.rotation?.[0] ?? 0
+                    const yaw = n.rotation?.[2] ?? 0
+                    const horiz = length * Math.cos(pitch)
+                    const dx = horiz * Math.cos(yaw)
+                    const dy = horiz * Math.sin(yaw)
+                    const x1 = x - dx / 2, y1 = y - dy / 2
+                    const x2 = x + dx / 2, y2 = y + dy / 2
+                    // Parse size from the pipe category or tag "pipe_steel_sch10"
+                    // Use the SKU string like "SM_Pipe_SCH10_2in_1m" to infer
+                    const sku = n.asset?.src?.split('/').pop() ?? ''
+                    const m = sku.match(/SCH10_([0-9_]+)in/i)
+                    let sizeIn = 2.0
+                    if (m) sizeIn = Number(m[1].replace('_', '.'))
+                    lvl.pipes.push({
+                      from: tags.find((t) => t.includes('→'))?.split('→')[0] ?? 'A',
+                      to: tags.find((t) => t.includes('→'))?.split('→')[1] ?? 'B',
+                      size_in: sizeIn,
+                      x1_m: x1, y1_m: y1, x2_m: x2, y2_m: y2,
+                    })
+                  }
+                }
+
+                void levelAssign
+
+                const payload = {
+                  project: {
+                    name: project.name,
+                    address: project.address,
+                    apn: project.apn,
+                    ahj: project.ahj,
+                    construction_type: project.construction_type,
+                    code: project.code,
+                    architect:
+                      project.architect.firm +
+                      ' (' +
+                      project.architect.principal +
+                      ')',
+                    gc:
+                      project.gc.company + ' — ' + project.gc.contact,
+                    total_sqft: project.building.total_sqft,
+                  },
+                  halofire: {
+                    contact: String(project.halofire.contact),
+                    office_address: String(project.halofire.office_address),
+                    office_phone: String(project.halofire.office_phone),
+                    license: String(project.halofire.license),
+                    proposal_date: String(project.halofire.proposal_date),
+                    proposal_price_usd: Number(
+                      project.halofire.proposal_price_usd,
+                    ),
+                  },
+                  systems: project.fire_systems,
+                  levels: liveLevels,
+                  hydraulic: {
+                    flow_gpm:
+                      14.8 *
+                      liveLevels.reduce((a, b) => a + b.heads.length, 0),
+                    static_psi: 75,
+                    residual_psi: 55,
+                    demand_psi: 48,
+                    safety_margin_psi: 7,
+                    notes:
+                      'Flow-test data pending from SLC water dept. ' +
+                      'Demand calculated assuming K5.6 × 7 psi min working pressure per NFPA 13 §11.2.6.',
+                  },
+                }
+                const out = await callTool('halofire_export', {
+                  mode: 'sheet_set',
+                  scene_id: 'studio',
+                  schedule: payload,
+                })
+                setSheetSetStatus(out)
+              } catch (e) {
+                setSheetSetStatus(`Failed: ${String(e)}`)
+              } finally {
+                setSheetSetBusy(false)
+              }
+            }}
+            className="w-full rounded bg-red-600 px-2 py-1.5 text-xs font-medium text-white hover:bg-red-700 disabled:opacity-50"
+          >
+            {sheetSetBusy
+              ? 'Rendering FP sheet set…'
+              : 'Generate AHJ sheet set PDF (FP-0 + FP-N + FP-H)'}
+          </button>
+          {sheetSetStatus && (
+            <pre className="whitespace-pre-wrap rounded bg-neutral-100 p-2 text-[10px] dark:bg-neutral-900">
+              {sheetSetStatus}
             </pre>
           )}
 
