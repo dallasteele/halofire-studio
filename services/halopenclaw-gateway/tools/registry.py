@@ -32,3 +32,4 @@ from . import place_head as _p  # noqa: E402,F401
 from . import route_pipe as _r  # noqa: E402,F401
 from . import calc_hydraulic as _c  # noqa: E402,F401
 from . import export_pdf as _e  # noqa: E402,F401
+from . import ai_intake as _ai  # noqa: E402,F401

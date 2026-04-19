@@ -1,0 +1,282 @@
+"""Canonical domain types for the halofire-cad backend.
+
+All agents read and write these. Any intermediate step in the Design
+pipeline can be serialized to JSON via pydantic v2 and replayed for
+debugging / regression.
+
+Units: meters, SI, Z-up, right-handed coordinate system. Agents at
+the I/O boundary (drafter, proposal) convert to imperial for AHJ
+deliverables.
+"""
+from __future__ import annotations
+
+from typing import Literal, Optional
+
+from pydantic import BaseModel, Field
+
+# ── Enums ───────────────────────────────────────────────────────────
+
+NfpaHazard = Literal[
+    "light", "ordinary_i", "ordinary_ii", "extra_i", "extra_ii",
+    "residential",
+]
+
+LevelUse = Literal[
+    "garage", "residential", "retail", "mechanical", "office",
+    "storage", "amenity", "roof", "other",
+]
+
+SystemType = Literal[
+    "wet", "dry", "preaction", "deluge", "combo_standpipe",
+]
+
+HeadOrientation = Literal["pendent", "upright", "sidewall", "concealed"]
+PipeSchedule = Literal["sch10", "sch40", "cpvc", "copper"]
+
+
+# ── Geometry primitives ─────────────────────────────────────────────
+
+Point2D = tuple[float, float]   # (x, y) in meters
+Point3D = tuple[float, float, float]
+Polygon2D = list[Point2D]       # closed, CCW orientation
+
+
+class BBox2D(BaseModel):
+    min_xy: Point2D
+    max_xy: Point2D
+
+
+# ── Building ────────────────────────────────────────────────────────
+
+
+class Firm(BaseModel):
+    name: str
+    contact: Optional[str] = None
+    phone: Optional[str] = None
+    license: Optional[str] = None
+
+
+class FlowTestData(BaseModel):
+    """AHJ-provided hydrant flow-test data."""
+    static_psi: float
+    residual_psi: float
+    flow_gpm: float
+    test_date: Optional[str] = None
+    location: Optional[str] = None
+
+
+class Project(BaseModel):
+    id: str
+    name: str
+    address: str
+    ahj: str
+    code: str
+    construction_type: Optional[str] = None
+    total_sqft: Optional[float] = None
+    architect: Optional[Firm] = None
+    gc: Optional[Firm] = None
+    halofire: Optional[Firm] = None
+    supply: Optional[FlowTestData] = None
+
+
+class Opening(BaseModel):
+    id: str
+    kind: Literal["door", "window"]
+    wall_id: str
+    position_m: Point3D
+    width_m: float
+    height_m: float
+
+
+class Wall(BaseModel):
+    id: str
+    start_m: Point2D
+    end_m: Point2D
+    thickness_m: float = 0.2
+    height_m: float = 3.0
+    is_exterior: bool = False
+    openings: list[str] = Field(default_factory=list)
+
+
+class Obstruction(BaseModel):
+    id: str
+    kind: Literal["column", "beam", "duct", "soffit", "equipment", "other"]
+    polygon_m: Polygon2D
+    top_z_m: float
+    bottom_z_m: float
+
+
+class Ceiling(BaseModel):
+    height_m: float = 3.0
+    kind: Literal["flat", "sloped", "open_joist", "acoustic_tile", "deck"] = "flat"
+    slope_deg: float = 0.0
+
+
+class Room(BaseModel):
+    id: str
+    name: str
+    polygon_m: Polygon2D
+    area_sqm: float
+    use_class: str = "unknown"
+    hazard_class: Optional[NfpaHazard] = None
+    ceiling: Optional[Ceiling] = None
+
+
+class Shaft(BaseModel):
+    id: str
+    kind: Literal["stair", "elevator", "mech"]
+    polygon_m: Polygon2D
+    top_z_m: float
+    bottom_z_m: float
+
+
+class Level(BaseModel):
+    id: str
+    name: str
+    elevation_m: float
+    height_m: float = 3.0
+    use: LevelUse = "other"
+    polygon_m: Polygon2D = Field(default_factory=list)
+    rooms: list[Room] = Field(default_factory=list)
+    walls: list[Wall] = Field(default_factory=list)
+    openings: list[Opening] = Field(default_factory=list)
+    obstructions: list[Obstruction] = Field(default_factory=list)
+    ceiling: Ceiling = Field(default_factory=Ceiling)
+    stair_shafts: list[Shaft] = Field(default_factory=list)
+    elevator_shafts: list[Shaft] = Field(default_factory=list)
+    mech_rooms: list[Room] = Field(default_factory=list)
+
+
+class Building(BaseModel):
+    project_id: str
+    levels: list[Level] = Field(default_factory=list)
+    construction_type: Optional[str] = None
+    total_sqft: Optional[float] = None
+
+
+# ── Sprinkler system ────────────────────────────────────────────────
+
+
+class Head(BaseModel):
+    id: str
+    sku: str
+    k_factor: float
+    temp_rating_f: int = 155
+    position_m: Point3D
+    deflector_below_ceiling_mm: float = 100
+    orientation: HeadOrientation = "pendent"
+    room_id: Optional[str] = None
+    branch_id: Optional[str] = None
+    system_id: Optional[str] = None
+
+
+class Fitting(BaseModel):
+    id: str
+    kind: Literal[
+        "tee_branch", "tee_run", "elbow_90", "elbow_45",
+        "gate_valve", "check_valve", "reducer", "coupling",
+    ]
+    size_in: float
+    position_m: Point3D
+    equiv_length_ft: float
+
+
+class PipeSegment(BaseModel):
+    id: str
+    from_node: str
+    to_node: str
+    size_in: float
+    schedule: PipeSchedule = "sch10"
+    start_m: Point3D
+    end_m: Point3D
+    length_m: float
+    elevation_change_m: float = 0.0
+    fittings: list[str] = Field(default_factory=list)
+    downstream_heads: int = 1
+    system_id: Optional[str] = None
+
+
+class Hanger(BaseModel):
+    id: str
+    pipe_id: str
+    position_m: Point3D
+
+
+class Branch(BaseModel):
+    id: str
+    heads: list[str] = Field(default_factory=list)  # Head IDs
+    pipes: list[str] = Field(default_factory=list)  # PipeSegment IDs
+    upstream_branch_id: Optional[str] = None
+
+
+class RiserSpec(BaseModel):
+    id: str
+    position_m: Point3D
+    size_in: float
+    fdc_position_m: Optional[Point3D] = None
+    fdc_type: Literal["wall_mount", "yard", "remote"] = "wall_mount"
+
+
+class HydraulicResult(BaseModel):
+    design_area_sqft: float
+    density_gpm_per_sqft: float
+    required_flow_gpm: float
+    required_pressure_psi: float
+    supply_static_psi: float
+    supply_residual_psi: float
+    supply_flow_gpm: float
+    demand_at_base_of_riser_psi: float
+    safety_margin_psi: float
+    critical_path: list[str] = Field(default_factory=list)
+    converged: bool = False
+    iterations: int = 0
+
+
+class System(BaseModel):
+    id: str
+    type: SystemType
+    supplies: list[str] = Field(default_factory=list)  # Level IDs
+    riser: RiserSpec
+    branches: list[Branch] = Field(default_factory=list)
+    heads: list[Head] = Field(default_factory=list)
+    pipes: list[PipeSegment] = Field(default_factory=list)
+    fittings: list[Fitting] = Field(default_factory=list)
+    hangers: list[Hanger] = Field(default_factory=list)
+    hydraulic: Optional[HydraulicResult] = None
+
+
+# ── Top-level design artifact ──────────────────────────────────────
+
+
+class Design(BaseModel):
+    project: Project
+    building: Building
+    systems: list[System] = Field(default_factory=list)
+    metadata: dict = Field(default_factory=dict)
+
+
+# ── Agent I/O ───────────────────────────────────────────────────────
+
+
+class Violation(BaseModel):
+    rule_id: str
+    section: str
+    severity: Literal["error", "warning", "info"]
+    message: str
+    refs: list[str] = Field(default_factory=list)  # affected node IDs
+
+
+class BomRow(BaseModel):
+    sku: str
+    description: str
+    qty: float
+    unit: str = "ea"
+    unit_cost_usd: float = 0.0
+    extended_usd: float = 0.0
+
+
+class LaborRow(BaseModel):
+    role: str
+    hours: float
+    rate_usd_hr: float
+    extended_usd: float = 0.0
