@@ -45,3 +45,12 @@ yarn-error.log*
 /.playwright-mcp
 og-test
 .env*.local
+
+# Halofire — Python gateway service
+services/halopenclaw-gateway/.venv/
+services/halopenclaw-gateway/__pycache__/
+services/halopenclaw-gateway/**/__pycache__/
+services/halopenclaw-gateway/*.egg-info/
+services/halopenclaw-gateway/.pytest_cache/
+services/halopenclaw-gateway/jobs/
+services/halopenclaw-gateway/.env
