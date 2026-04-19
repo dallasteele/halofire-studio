@@ -6,21 +6,21 @@ list of Head objects ready for routing.
 """
 from __future__ import annotations
 
-import logging
 import math
 import sys
 from pathlib import Path
 from typing import Any
 
+from shapely.errors import GEOSException
 from shapely.geometry import Polygon, Point
-from shapely.affinity import translate
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from cad.schema import (  # noqa: E402
     Building, Room, Level, Head, HeadOrientation, NfpaHazard,
 )
+from cad.logging import get_logger, warn_swallowed  # noqa: E402
 
-log = logging.getLogger(__name__)
+log = get_logger("placer")
 
 
 # ── NFPA 13 §11.2.3.1.1 spacing table ────────────────────────────────
@@ -163,8 +163,9 @@ def place_heads_for_room(
         if not poly.is_valid:
             poly = poly.buffer(0)  # common fix
         usable = _shrink(poly, spacing_m * 0.5)
-    except Exception as e:
-        log.warning("room %s polygon failed: %s", room.id, e)
+    except (GEOSException, ValueError, TypeError) as e:
+        warn_swallowed(log, code="PLACER_BAD_ROOM_POLYGON",
+                       err=e, room_id=room.id)
         return []
 
     sku, orientation = _select_head_sku(

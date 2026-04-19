@@ -21,13 +21,13 @@ MST hybrid with joist-parallel preference.
 """
 from __future__ import annotations
 
-import logging
 import math
 import sys
 from pathlib import Path
 from typing import Optional
 
 import networkx as nx
+from shapely.errors import GEOSException
 from shapely.geometry import Polygon, Point, box
 from shapely.prepared import prep
 
@@ -36,8 +36,9 @@ from cad.schema import (  # noqa: E402
     Building, Head, Level, PipeSegment, Fitting,
     Hanger, System, RiserSpec, Branch,
 )
+from cad.logging import get_logger, warn_swallowed  # noqa: E402
 
-log = logging.getLogger(__name__)
+log = get_logger("router")
 
 
 # Pipe-size selection per total downstream head count — §28.5 schedule
@@ -101,15 +102,17 @@ def _build_routing_graph(
     for sh in level.elevator_shafts:
         try:
             forbidden.append(prep(Polygon(sh.polygon_m)))
-        except Exception:
-            pass
+        except (GEOSException, ValueError, TypeError) as e:
+            warn_swallowed(log, code="ROUTER_BAD_SHAFT_POLYGON",
+                           err=e, shaft_id=sh.id, level_id=level.id)
     # Columns/beams add cost but aren't forbidden (pipes can run above)
     cost_regions: list = []
     for obs in level.obstructions:
         try:
             cost_regions.append(prep(Polygon(obs.polygon_m)))
-        except Exception:
-            pass
+        except (GEOSException, ValueError, TypeError) as e:
+            warn_swallowed(log, code="ROUTER_BAD_OBSTRUCTION",
+                           err=e, obstruction_id=obs.id, level_id=level.id)
 
     def edge_cost(p1: tuple[float, float], p2: tuple[float, float]) -> Optional[float]:
         """None → forbidden. Positive float → edge weight."""
@@ -200,7 +203,9 @@ def _steiner_tree_paths(
                             best = (length, t, path)
                     except nx.NetworkXNoPath:
                         continue
-            except Exception:
+            except (nx.NodeNotFound, KeyError, ValueError) as e:
+                warn_swallowed(log, code="ROUTER_STEINER_PATH_FAIL",
+                               err=e, terminal=t)
                 continue
         if best is None:
             # Disconnected — bail
@@ -283,7 +288,9 @@ def _resize_network(
             u_copy.remove_edge(upstream_node, downstream_node)
         try:
             reachable = nx.descendants(u_copy, downstream_node) | {downstream_node}
-        except Exception:
+        except (nx.NodeNotFound, KeyError) as e:
+            warn_swallowed(log, code="ROUTER_DOWNSTREAM_COUNT_FAIL",
+                           err=e, seg_id=s.id, downstream_node=downstream_node)
             reachable = {downstream_node}
         ds_heads = len(reachable & head_ids)
         s.downstream_heads = max(1, ds_heads)
@@ -372,8 +379,9 @@ def route_systems(building: Building, heads: list[Head]) -> list[System]:
                     g.add_edge(riser.id, best_anchor, weight=0.1)
 
             tree_edges = _steiner_tree_paths(g, terminals)
-        except Exception as e:
-            log.warning("routing graph failed on level %s: %s", level.id, e)
+        except (nx.NodeNotFound, nx.NetworkXError, ValueError, KeyError) as e:
+            warn_swallowed(log, code="ROUTER_GRAPH_FAIL",
+                           err=e, level_id=level.id, head_count=len(lvl_heads))
             tree_edges = []
 
         # Convert tree edges to PipeSegments

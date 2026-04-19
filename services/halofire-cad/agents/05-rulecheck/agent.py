@@ -9,7 +9,6 @@ them back to the placer or router agent as constraints and re-runs.
 """
 from __future__ import annotations
 
-import logging
 import math
 import sys
 from pathlib import Path
@@ -21,8 +20,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from cad.schema import (  # noqa: E402
     Design, Violation, Room, Head, PipeSegment,
 )
+from cad.logging import get_logger, warn_swallowed  # noqa: E402
 
-log = logging.getLogger(__name__)
+log = get_logger("rulecheck")
 
 _RULES_PATH = Path(__file__).resolve().parents[2] / "rules" / "nfpa13_2022.yaml"
 
@@ -314,8 +314,19 @@ def check_design(design: Design) -> list[Violation]:
                 if not v.severity:
                     v.severity = rule.get("severity", "warning")
             violations.extend(result)
-        except Exception as e:
-            log.warning("rule %s crashed: %s", rule.get("id"), e)
+        except (TypeError, ValueError, AttributeError, KeyError) as e:
+            # A predicate crashed — log with stable code, append an
+            # Issue, keep evaluating other rules (one bad rule must
+            # not collapse the whole check).
+            warn_swallowed(log, code="RULECHECK_PREDICATE_CRASH",
+                           err=e, rule_id=rule.get("id"))
+            violations.append(Violation(
+                rule_id=rule.get("id", "UNKNOWN"),
+                section=rule.get("section", ""),
+                severity="warning",
+                message=f"rule predicate crashed: {type(e).__name__}: {e}",
+                refs=[],
+            ))
     # Sort: errors first, then warnings, then info
     order = {"error": 0, "warning": 1, "info": 2}
     violations.sort(key=lambda v: order.get(v.severity, 3))

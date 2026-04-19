@@ -9,15 +9,16 @@
 """
 from __future__ import annotations
 
-import logging
 import math
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from cad.schema import Design  # noqa: E402
+from cad.logging import get_logger, warn_swallowed  # noqa: E402
+from cad.exceptions import DXFExportError, IFCExportError, GLBExportError  # noqa: E402
 
-log = logging.getLogger(__name__)
+log = get_logger("submittal")
 
 
 # Industry pipe-size color convention (AutoSprink standard)
@@ -195,8 +196,10 @@ def export_ifc(design: Design, out_path: Path) -> str:
     # Units (SI: meters)
     try:
         ifcopenshell.api.run("unit.assign_unit", ifc, length={"is_metric": True, "raw": "METERS"})
-    except Exception:
-        pass
+    except (TypeError, ValueError, AttributeError) as e:
+        # IfcOpenShell API surface changes between versions; fall through
+        # silently is unacceptable, but unit assignment not strictly required.
+        warn_swallowed(log, code="IFC_UNIT_ASSIGN_FAILED", err=e)
     # Context
     ctx = ifcopenshell.api.run("context.add_context", ifc, context_type="Model")
     body_ctx = ifcopenshell.api.run(
@@ -237,36 +240,46 @@ def export_ifc(design: Design, out_path: Path) -> str:
                     "root.create_entity", ifc,
                     ifc_class="IfcSprinkler", name=h.id,
                 )
-            except Exception:
-                pass
+            except (TypeError, ValueError, AttributeError) as e:
+                warn_swallowed(log, code="IFC_SPRINKLER_CREATE_FAILED",
+                               err=e, head_id=h.id)
         for s in system.pipes:
             try:
                 ifcopenshell.api.run(
                     "root.create_entity", ifc,
                     ifc_class="IfcPipeSegment", name=s.id,
                 )
-            except Exception:
-                pass
+            except (TypeError, ValueError, AttributeError) as e:
+                warn_swallowed(log, code="IFC_PIPE_CREATE_FAILED",
+                               err=e, pipe_id=s.id)
 
     ifc.write(str(out_path))
     return str(out_path)
 
 
 def export_all(design: Design, out_dir: Path) -> dict[str, str]:
-    """Convenience: emit DXF + GLB + IFC in one call."""
+    """Convenience: emit DXF + GLB + IFC in one call.
+
+    Export failures are collected as error entries rather than raised
+    so a partial submittal bundle can still be returned. Per §1.3 each
+    failure is logged with a stable code.
+    """
     out_dir.mkdir(parents=True, exist_ok=True)
     paths: dict[str, str] = {}
     try:
         paths["dxf"] = export_dxf(design, out_dir / "design.dxf")
-    except Exception as e:
+    except (IOError, OSError, ValueError, RuntimeError, TypeError) as e:
+        warn_swallowed(log, code="DXF_EXPORT_FAILED", err=e)
         paths["dxf_error"] = str(e)
     try:
         paths["glb"] = export_glb(design, out_dir / "design.glb")
-    except Exception as e:
+    except (IOError, OSError, ValueError, RuntimeError, TypeError) as e:
+        warn_swallowed(log, code="GLB_EXPORT_FAILED", err=e)
         paths["glb_error"] = str(e)
     try:
         paths["ifc"] = export_ifc(design, out_dir / "design.ifc")
-    except Exception as e:
+    except (IOError, OSError, ValueError, RuntimeError, TypeError, AttributeError) as e:
+        warn_swallowed(log, code="IFC_EXPORT_FAILED", err=e)
         paths["ifc_error"] = str(e)
     return paths
 

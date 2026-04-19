@@ -1,0 +1,1261 @@
+{
+  "BBox2D": {
+    "properties": {
+      "max_xy": {
+        "items": null,
+        "type": "array"
+      },
+      "min_xy": {
+        "items": null,
+        "type": "array"
+      }
+    },
+    "required": [
+      "max_xy",
+      "min_xy"
+    ],
+    "title": "BBox2D",
+    "type": "object"
+  },
+  "BomRow": {
+    "properties": {
+      "description": {
+        "items": null,
+        "type": "string"
+      },
+      "extended_usd": {
+        "items": null,
+        "type": "number"
+      },
+      "qty": {
+        "items": null,
+        "type": "number"
+      },
+      "sku": {
+        "items": null,
+        "type": "string"
+      },
+      "unit": {
+        "items": null,
+        "type": "string"
+      },
+      "unit_cost_usd": {
+        "items": null,
+        "type": "number"
+      }
+    },
+    "required": [
+      "description",
+      "qty",
+      "sku"
+    ],
+    "title": "BomRow",
+    "type": "object"
+  },
+  "Branch": {
+    "properties": {
+      "heads": {
+        "items": "string",
+        "type": "array"
+      },
+      "id": {
+        "items": null,
+        "type": "string"
+      },
+      "pipes": {
+        "items": "string",
+        "type": "array"
+      },
+      "upstream_branch_id": {
+        "items": null,
+        "type": null
+      }
+    },
+    "required": [
+      "id"
+    ],
+    "title": "Branch",
+    "type": "object"
+  },
+  "Building": {
+    "properties": {
+      "construction_type": {
+        "items": null,
+        "type": null
+      },
+      "levels": {
+        "items": null,
+        "type": "array"
+      },
+      "metadata": {
+        "items": null,
+        "type": "object"
+      },
+      "project_id": {
+        "items": null,
+        "type": "string"
+      },
+      "total_sqft": {
+        "items": null,
+        "type": null
+      }
+    },
+    "required": [
+      "project_id"
+    ],
+    "title": "Building",
+    "type": "object"
+  },
+  "Ceiling": {
+    "properties": {
+      "height_m": {
+        "items": null,
+        "type": "number"
+      },
+      "kind": {
+        "items": null,
+        "type": "string"
+      },
+      "slope_deg": {
+        "items": null,
+        "type": "number"
+      }
+    },
+    "required": [],
+    "title": "Ceiling",
+    "type": "object"
+  },
+  "DeliverableManifest": {
+    "properties": {
+      "files": {
+        "items": null,
+        "type": "object"
+      },
+      "warnings": {
+        "items": "string",
+        "type": "array"
+      }
+    },
+    "required": [],
+    "title": "DeliverableManifest",
+    "type": "object"
+  },
+  "Design": {
+    "properties": {
+      "building": {
+        "items": null,
+        "type": null
+      },
+      "calculation": {
+        "items": null,
+        "type": "object"
+      },
+      "confidence": {
+        "items": null,
+        "type": null
+      },
+      "deliverables": {
+        "items": null,
+        "type": null
+      },
+      "issues": {
+        "items": null,
+        "type": "array"
+      },
+      "metadata": {
+        "items": null,
+        "type": "object"
+      },
+      "project": {
+        "items": null,
+        "type": null
+      },
+      "sources": {
+        "items": null,
+        "type": "array"
+      },
+      "systems": {
+        "items": null,
+        "type": "array"
+      }
+    },
+    "required": [
+      "building",
+      "project"
+    ],
+    "title": "Design",
+    "type": "object"
+  },
+  "DesignConfidence": {
+    "properties": {
+      "classification": {
+        "items": null,
+        "type": "number"
+      },
+      "hydraulic": {
+        "items": null,
+        "type": "number"
+      },
+      "ingest": {
+        "items": null,
+        "type": "number"
+      },
+      "layout": {
+        "items": null,
+        "type": "number"
+      },
+      "overall": {
+        "items": null,
+        "type": "number"
+      }
+    },
+    "required": [],
+    "title": "DesignConfidence",
+    "type": "object"
+  },
+  "DesignIssue": {
+    "properties": {
+      "code": {
+        "items": null,
+        "type": "string"
+      },
+      "message": {
+        "items": null,
+        "type": "string"
+      },
+      "refs": {
+        "items": "string",
+        "type": "array"
+      },
+      "severity": {
+        "items": null,
+        "type": "string"
+      },
+      "source": {
+        "items": null,
+        "type": null
+      }
+    },
+    "required": [
+      "code",
+      "message",
+      "severity"
+    ],
+    "title": "DesignIssue",
+    "type": "object"
+  },
+  "DesignSource": {
+    "properties": {
+      "confidence": {
+        "items": null,
+        "type": "number"
+      },
+      "id": {
+        "items": null,
+        "type": "string"
+      },
+      "kind": {
+        "items": null,
+        "type": "string"
+      },
+      "path": {
+        "items": null,
+        "type": null
+      },
+      "warnings": {
+        "items": "string",
+        "type": "array"
+      }
+    },
+    "required": [
+      "id",
+      "kind"
+    ],
+    "title": "DesignSource",
+    "type": "object"
+  },
+  "Firm": {
+    "properties": {
+      "contact": {
+        "items": null,
+        "type": null
+      },
+      "license": {
+        "items": null,
+        "type": null
+      },
+      "name": {
+        "items": null,
+        "type": "string"
+      },
+      "phone": {
+        "items": null,
+        "type": null
+      }
+    },
+    "required": [
+      "name"
+    ],
+    "title": "Firm",
+    "type": "object"
+  },
+  "Fitting": {
+    "properties": {
+      "equiv_length_ft": {
+        "items": null,
+        "type": "number"
+      },
+      "id": {
+        "items": null,
+        "type": "string"
+      },
+      "kind": {
+        "items": null,
+        "type": "string"
+      },
+      "position_m": {
+        "items": null,
+        "type": "array"
+      },
+      "size_in": {
+        "items": null,
+        "type": "number"
+      }
+    },
+    "required": [
+      "equiv_length_ft",
+      "id",
+      "kind",
+      "position_m",
+      "size_in"
+    ],
+    "title": "Fitting",
+    "type": "object"
+  },
+  "FlowTestData": {
+    "properties": {
+      "flow_gpm": {
+        "items": null,
+        "type": "number"
+      },
+      "location": {
+        "items": null,
+        "type": null
+      },
+      "residual_psi": {
+        "items": null,
+        "type": "number"
+      },
+      "static_psi": {
+        "items": null,
+        "type": "number"
+      },
+      "test_date": {
+        "items": null,
+        "type": null
+      }
+    },
+    "required": [
+      "flow_gpm",
+      "residual_psi",
+      "static_psi"
+    ],
+    "title": "FlowTestData",
+    "type": "object"
+  },
+  "Hanger": {
+    "properties": {
+      "id": {
+        "items": null,
+        "type": "string"
+      },
+      "pipe_id": {
+        "items": null,
+        "type": "string"
+      },
+      "position_m": {
+        "items": null,
+        "type": "array"
+      }
+    },
+    "required": [
+      "id",
+      "pipe_id",
+      "position_m"
+    ],
+    "title": "Hanger",
+    "type": "object"
+  },
+  "Head": {
+    "properties": {
+      "branch_id": {
+        "items": null,
+        "type": null
+      },
+      "deflector_below_ceiling_mm": {
+        "items": null,
+        "type": "number"
+      },
+      "id": {
+        "items": null,
+        "type": "string"
+      },
+      "k_factor": {
+        "items": null,
+        "type": "number"
+      },
+      "orientation": {
+        "items": null,
+        "type": "string"
+      },
+      "position_m": {
+        "items": null,
+        "type": "array"
+      },
+      "room_id": {
+        "items": null,
+        "type": null
+      },
+      "sku": {
+        "items": null,
+        "type": "string"
+      },
+      "system_id": {
+        "items": null,
+        "type": null
+      },
+      "temp_rating_f": {
+        "items": null,
+        "type": "integer"
+      }
+    },
+    "required": [
+      "id",
+      "k_factor",
+      "position_m",
+      "sku"
+    ],
+    "title": "Head",
+    "type": "object"
+  },
+  "HydraulicResult": {
+    "properties": {
+      "converged": {
+        "items": null,
+        "type": "boolean"
+      },
+      "critical_path": {
+        "items": "string",
+        "type": "array"
+      },
+      "demand_at_base_of_riser_psi": {
+        "items": null,
+        "type": "number"
+      },
+      "demand_curve": {
+        "items": "object",
+        "type": "array"
+      },
+      "density_gpm_per_sqft": {
+        "items": null,
+        "type": "number"
+      },
+      "design_area_sqft": {
+        "items": null,
+        "type": "number"
+      },
+      "issues": {
+        "items": "string",
+        "type": "array"
+      },
+      "iterations": {
+        "items": null,
+        "type": "integer"
+      },
+      "node_trace": {
+        "items": "object",
+        "type": "array"
+      },
+      "required_flow_gpm": {
+        "items": null,
+        "type": "number"
+      },
+      "required_pressure_psi": {
+        "items": null,
+        "type": "number"
+      },
+      "safety_margin_psi": {
+        "items": null,
+        "type": "number"
+      },
+      "supply_curve": {
+        "items": "object",
+        "type": "array"
+      },
+      "supply_flow_gpm": {
+        "items": null,
+        "type": "number"
+      },
+      "supply_residual_psi": {
+        "items": null,
+        "type": "number"
+      },
+      "supply_static_psi": {
+        "items": null,
+        "type": "number"
+      }
+    },
+    "required": [
+      "demand_at_base_of_riser_psi",
+      "density_gpm_per_sqft",
+      "design_area_sqft",
+      "required_flow_gpm",
+      "required_pressure_psi",
+      "safety_margin_psi",
+      "supply_flow_gpm",
+      "supply_residual_psi",
+      "supply_static_psi"
+    ],
+    "title": "HydraulicResult",
+    "type": "object"
+  },
+  "JobStatus": {
+    "properties": {
+      "bytes": {
+        "items": null,
+        "type": "integer"
+      },
+      "error": {
+        "items": null,
+        "type": null
+      },
+      "file": {
+        "items": null,
+        "type": null
+      },
+      "job_id": {
+        "items": null,
+        "type": "string"
+      },
+      "mode": {
+        "items": null,
+        "type": "string"
+      },
+      "percent": {
+        "items": null,
+        "type": "integer"
+      },
+      "project_id": {
+        "items": null,
+        "type": "string"
+      },
+      "schema_version": {
+        "items": null,
+        "type": "integer"
+      },
+      "status": {
+        "items": null,
+        "type": "string"
+      },
+      "steps_complete": {
+        "items": "string",
+        "type": "array"
+      },
+      "summary": {
+        "items": null,
+        "type": null
+      }
+    },
+    "required": [
+      "job_id",
+      "project_id"
+    ],
+    "title": "JobStatus",
+    "type": "object"
+  },
+  "LaborRow": {
+    "properties": {
+      "extended_usd": {
+        "items": null,
+        "type": "number"
+      },
+      "hours": {
+        "items": null,
+        "type": "number"
+      },
+      "rate_usd_hr": {
+        "items": null,
+        "type": "number"
+      },
+      "role": {
+        "items": null,
+        "type": "string"
+      }
+    },
+    "required": [
+      "hours",
+      "rate_usd_hr",
+      "role"
+    ],
+    "title": "LaborRow",
+    "type": "object"
+  },
+  "Level": {
+    "properties": {
+      "ceiling": {
+        "items": null,
+        "type": null
+      },
+      "elevation_m": {
+        "items": null,
+        "type": "number"
+      },
+      "elevator_shafts": {
+        "items": null,
+        "type": "array"
+      },
+      "height_m": {
+        "items": null,
+        "type": "number"
+      },
+      "id": {
+        "items": null,
+        "type": "string"
+      },
+      "mech_rooms": {
+        "items": null,
+        "type": "array"
+      },
+      "name": {
+        "items": null,
+        "type": "string"
+      },
+      "obstructions": {
+        "items": null,
+        "type": "array"
+      },
+      "openings": {
+        "items": null,
+        "type": "array"
+      },
+      "polygon_m": {
+        "items": "array",
+        "type": "array"
+      },
+      "rooms": {
+        "items": null,
+        "type": "array"
+      },
+      "stair_shafts": {
+        "items": null,
+        "type": "array"
+      },
+      "use": {
+        "items": null,
+        "type": "string"
+      },
+      "walls": {
+        "items": null,
+        "type": "array"
+      }
+    },
+    "required": [
+      "elevation_m",
+      "id",
+      "name"
+    ],
+    "title": "Level",
+    "type": "object"
+  },
+  "Obstruction": {
+    "properties": {
+      "bottom_z_m": {
+        "items": null,
+        "type": "number"
+      },
+      "id": {
+        "items": null,
+        "type": "string"
+      },
+      "kind": {
+        "items": null,
+        "type": "string"
+      },
+      "polygon_m": {
+        "items": "array",
+        "type": "array"
+      },
+      "top_z_m": {
+        "items": null,
+        "type": "number"
+      }
+    },
+    "required": [
+      "bottom_z_m",
+      "id",
+      "kind",
+      "polygon_m",
+      "top_z_m"
+    ],
+    "title": "Obstruction",
+    "type": "object"
+  },
+  "Opening": {
+    "properties": {
+      "height_m": {
+        "items": null,
+        "type": "number"
+      },
+      "id": {
+        "items": null,
+        "type": "string"
+      },
+      "kind": {
+        "items": null,
+        "type": "string"
+      },
+      "position_m": {
+        "items": null,
+        "type": "array"
+      },
+      "wall_id": {
+        "items": null,
+        "type": "string"
+      },
+      "width_m": {
+        "items": null,
+        "type": "number"
+      }
+    },
+    "required": [
+      "height_m",
+      "id",
+      "kind",
+      "position_m",
+      "wall_id",
+      "width_m"
+    ],
+    "title": "Opening",
+    "type": "object"
+  },
+  "PageIntakeResult": {
+    "properties": {
+      "page_h_pt": {
+        "items": null,
+        "type": "number"
+      },
+      "page_index": {
+        "items": null,
+        "type": "integer"
+      },
+      "page_w_pt": {
+        "items": null,
+        "type": "number"
+      },
+      "pdf_path": {
+        "items": null,
+        "type": "string"
+      },
+      "raw_line_count": {
+        "items": null,
+        "type": "integer"
+      },
+      "room_count": {
+        "items": null,
+        "type": "integer"
+      },
+      "rooms": {
+        "items": null,
+        "type": "array"
+      },
+      "scale_ft_per_pt": {
+        "items": null,
+        "type": "number"
+      },
+      "schema_version": {
+        "items": null,
+        "type": "integer"
+      },
+      "wall_count": {
+        "items": null,
+        "type": "integer"
+      },
+      "walls": {
+        "items": null,
+        "type": "array"
+      },
+      "warnings": {
+        "items": "string",
+        "type": "array"
+      }
+    },
+    "required": [
+      "page_index",
+      "pdf_path"
+    ],
+    "title": "PageIntakeResult",
+    "type": "object"
+  },
+  "PipeSegment": {
+    "properties": {
+      "downstream_heads": {
+        "items": null,
+        "type": "integer"
+      },
+      "elevation_change_m": {
+        "items": null,
+        "type": "number"
+      },
+      "end_m": {
+        "items": null,
+        "type": "array"
+      },
+      "fittings": {
+        "items": "string",
+        "type": "array"
+      },
+      "from_node": {
+        "items": null,
+        "type": "string"
+      },
+      "id": {
+        "items": null,
+        "type": "string"
+      },
+      "length_m": {
+        "items": null,
+        "type": "number"
+      },
+      "schedule": {
+        "items": null,
+        "type": "string"
+      },
+      "size_in": {
+        "items": null,
+        "type": "number"
+      },
+      "start_m": {
+        "items": null,
+        "type": "array"
+      },
+      "system_id": {
+        "items": null,
+        "type": null
+      },
+      "to_node": {
+        "items": null,
+        "type": "string"
+      }
+    },
+    "required": [
+      "end_m",
+      "from_node",
+      "id",
+      "length_m",
+      "size_in",
+      "start_m",
+      "to_node"
+    ],
+    "title": "PipeSegment",
+    "type": "object"
+  },
+  "PipelineStep": {
+    "properties": {
+      "duration_s": {
+        "items": null,
+        "type": null
+      },
+      "error": {
+        "items": null,
+        "type": null
+      },
+      "ok": {
+        "items": null,
+        "type": "boolean"
+      },
+      "stats": {
+        "items": null,
+        "type": "object"
+      },
+      "step": {
+        "items": null,
+        "type": "string"
+      }
+    },
+    "required": [
+      "step"
+    ],
+    "title": "PipelineStep",
+    "type": "object"
+  },
+  "PipelineSummary": {
+    "properties": {
+      "files": {
+        "items": null,
+        "type": "object"
+      },
+      "finished_at": {
+        "items": null,
+        "type": null
+      },
+      "issues": {
+        "items": null,
+        "type": "array"
+      },
+      "project_id": {
+        "items": null,
+        "type": "string"
+      },
+      "schema_version": {
+        "items": null,
+        "type": "integer"
+      },
+      "started_at": {
+        "items": null,
+        "type": null
+      },
+      "status": {
+        "items": null,
+        "type": "string"
+      },
+      "steps": {
+        "items": null,
+        "type": "array"
+      }
+    },
+    "required": [
+      "project_id"
+    ],
+    "title": "PipelineSummary",
+    "type": "object"
+  },
+  "Project": {
+    "properties": {
+      "address": {
+        "items": null,
+        "type": "string"
+      },
+      "ahj": {
+        "items": null,
+        "type": "string"
+      },
+      "architect": {
+        "items": null,
+        "type": null
+      },
+      "code": {
+        "items": null,
+        "type": "string"
+      },
+      "construction_type": {
+        "items": null,
+        "type": null
+      },
+      "gc": {
+        "items": null,
+        "type": null
+      },
+      "halofire": {
+        "items": null,
+        "type": null
+      },
+      "id": {
+        "items": null,
+        "type": "string"
+      },
+      "name": {
+        "items": null,
+        "type": "string"
+      },
+      "supply": {
+        "items": null,
+        "type": null
+      },
+      "total_sqft": {
+        "items": null,
+        "type": null
+      }
+    },
+    "required": [
+      "address",
+      "ahj",
+      "code",
+      "id",
+      "name"
+    ],
+    "title": "Project",
+    "type": "object"
+  },
+  "RiserSpec": {
+    "properties": {
+      "fdc_position_m": {
+        "items": null,
+        "type": null
+      },
+      "fdc_type": {
+        "items": null,
+        "type": "string"
+      },
+      "id": {
+        "items": null,
+        "type": "string"
+      },
+      "position_m": {
+        "items": null,
+        "type": "array"
+      },
+      "size_in": {
+        "items": null,
+        "type": "number"
+      }
+    },
+    "required": [
+      "id",
+      "position_m",
+      "size_in"
+    ],
+    "title": "RiserSpec",
+    "type": "object"
+  },
+  "Room": {
+    "properties": {
+      "area_sqm": {
+        "items": null,
+        "type": "number"
+      },
+      "ceiling": {
+        "items": null,
+        "type": null
+      },
+      "hazard_class": {
+        "items": null,
+        "type": null
+      },
+      "id": {
+        "items": null,
+        "type": "string"
+      },
+      "name": {
+        "items": null,
+        "type": "string"
+      },
+      "polygon_m": {
+        "items": "array",
+        "type": "array"
+      },
+      "use_class": {
+        "items": null,
+        "type": "string"
+      }
+    },
+    "required": [
+      "area_sqm",
+      "id",
+      "name",
+      "polygon_m"
+    ],
+    "title": "Room",
+    "type": "object"
+  },
+  "RoomCandidate": {
+    "properties": {
+      "area_pt2": {
+        "items": null,
+        "type": "number"
+      },
+      "polygon_pt": {
+        "items": "array",
+        "type": "array"
+      }
+    },
+    "required": [
+      "area_pt2",
+      "polygon_pt"
+    ],
+    "title": "RoomCandidate",
+    "type": "object"
+  },
+  "Shaft": {
+    "properties": {
+      "bottom_z_m": {
+        "items": null,
+        "type": "number"
+      },
+      "id": {
+        "items": null,
+        "type": "string"
+      },
+      "kind": {
+        "items": null,
+        "type": "string"
+      },
+      "polygon_m": {
+        "items": "array",
+        "type": "array"
+      },
+      "top_z_m": {
+        "items": null,
+        "type": "number"
+      }
+    },
+    "required": [
+      "bottom_z_m",
+      "id",
+      "kind",
+      "polygon_m",
+      "top_z_m"
+    ],
+    "title": "Shaft",
+    "type": "object"
+  },
+  "System": {
+    "properties": {
+      "branches": {
+        "items": null,
+        "type": "array"
+      },
+      "fittings": {
+        "items": null,
+        "type": "array"
+      },
+      "hangers": {
+        "items": null,
+        "type": "array"
+      },
+      "heads": {
+        "items": null,
+        "type": "array"
+      },
+      "hydraulic": {
+        "items": null,
+        "type": null
+      },
+      "id": {
+        "items": null,
+        "type": "string"
+      },
+      "pipes": {
+        "items": null,
+        "type": "array"
+      },
+      "riser": {
+        "items": null,
+        "type": null
+      },
+      "supplies": {
+        "items": "string",
+        "type": "array"
+      },
+      "type": {
+        "items": null,
+        "type": "string"
+      }
+    },
+    "required": [
+      "id",
+      "riser",
+      "type"
+    ],
+    "title": "System",
+    "type": "object"
+  },
+  "Violation": {
+    "properties": {
+      "message": {
+        "items": null,
+        "type": "string"
+      },
+      "refs": {
+        "items": "string",
+        "type": "array"
+      },
+      "rule_id": {
+        "items": null,
+        "type": "string"
+      },
+      "section": {
+        "items": null,
+        "type": "string"
+      },
+      "severity": {
+        "items": null,
+        "type": "string"
+      }
+    },
+    "required": [
+      "message",
+      "rule_id",
+      "section",
+      "severity"
+    ],
+    "title": "Violation",
+    "type": "object"
+  },
+  "Wall": {
+    "properties": {
+      "end_m": {
+        "items": null,
+        "type": "array"
+      },
+      "height_m": {
+        "items": null,
+        "type": "number"
+      },
+      "id": {
+        "items": null,
+        "type": "string"
+      },
+      "is_exterior": {
+        "items": null,
+        "type": "boolean"
+      },
+      "openings": {
+        "items": "string",
+        "type": "array"
+      },
+      "start_m": {
+        "items": null,
+        "type": "array"
+      },
+      "thickness_m": {
+        "items": null,
+        "type": "number"
+      }
+    },
+    "required": [
+      "end_m",
+      "id",
+      "start_m"
+    ],
+    "title": "Wall",
+    "type": "object"
+  },
+  "WallCandidate": {
+    "properties": {
+      "x0": {
+        "items": null,
+        "type": "number"
+      },
+      "x1": {
+        "items": null,
+        "type": "number"
+      },
+      "y0": {
+        "items": null,
+        "type": "number"
+      },
+      "y1": {
+        "items": null,
+        "type": "number"
+      }
+    },
+    "required": [
+      "x0",
+      "x1",
+      "y0",
+      "y1"
+    ],
+    "title": "WallCandidate",
+    "type": "object"
+  }
+}

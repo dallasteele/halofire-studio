@@ -1,0 +1,53 @@
+# Pre-commit hooks for halofire-studio.
+#
+# Enforces AGENTIC_RULES.md §7.1 (working code only), §7.3 (no hand-
+# waving), §9.3 (no silent except), and the --noCheck / @ts-nocheck
+# ban from the Phase A remediation work.
+#
+# Install: `pip install pre-commit && pre-commit install`
+# Run against all files: `pre-commit run --all-files`
+
+repos:
+  - repo: local
+    hooks:
+      # §7.1 / Phase A: ban `--noCheck` in package.json scripts
+      - id: ban-ts-nocheck-script
+        name: Ban --noCheck and @ts-nocheck additions
+        language: pygrep
+        entry: '(--noCheck|@ts-nocheck|noCheck: true)'
+        files: '\.(json|ts|tsx|js|jsx|mjs)$'
+        exclude: '^services/.*/\.venv/|^node_modules/'
+
+      # §9.3 anti-pattern: silent except Exception: pass with no log
+      - id: ban-silent-except
+        name: Ban silent `except Exception: pass` without log
+        language: pygrep
+        entry: '^\s*except\s+Exception\s*:\s*$'
+        files: '^services/halofire-cad/.*\.py$'
+        exclude: '^services/.*/\.venv/|__pycache__/'
+
+      # §13 honesty: print() in production code leaks noise
+      - id: ban-print-in-agents
+        name: Ban print() in agent modules
+        language: pygrep
+        entry: '^\s*print\('
+        files: '^services/halofire-cad/(agents|cad|orchestrator)\.py$|^services/halofire-cad/agents/.*/agent\.py$'
+
+      # Compile on commit — lightweight typecheck for Python
+      - id: compile-halofire-cad
+        name: compileall halofire-cad changed files
+        language: system
+        entry: C:/Python312/python.exe -m compileall -q
+        files: '^services/halofire-cad/.*\.py$'
+        pass_filenames: true
+
+  # Standard hygiene
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: '\.md$'
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-merge-conflict

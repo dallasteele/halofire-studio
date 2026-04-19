@@ -322,3 +322,89 @@ class LaborRow(BaseModel):
     hours: float
     rate_usd_hr: float
     extended_usd: float = 0.0
+
+
+# ── Typed pipeline I/O (AGENTIC_RULES §1.1) ─────────────────────────
+
+
+SCHEMA_VERSION: int = 1
+
+
+class WallCandidate(BaseModel):
+    """One detected wall segment in raw PDF points (pre-scale)."""
+    x0: float
+    y0: float
+    x1: float
+    y1: float
+
+
+class RoomCandidate(BaseModel):
+    """One detected room polygon in raw PDF points (pre-scale)."""
+    polygon_pt: list[tuple[float, float]]
+    area_pt2: float
+
+
+class PageIntakeResult(BaseModel):
+    """Typed output of `intake_pdf_page`.
+
+    Replaces the legacy `dict[str, Any]` return per AGENTIC_RULES §1.1.
+    Callers MUST receive this, not a dict.
+    """
+    schema_version: int = SCHEMA_VERSION
+    pdf_path: str
+    page_index: int
+    page_w_pt: float = 0.0
+    page_h_pt: float = 0.0
+    raw_line_count: int = 0
+    wall_count: int = 0
+    room_count: int = 0
+    scale_ft_per_pt: float = 0.0
+    walls: list[WallCandidate] = Field(default_factory=list)
+    rooms: list[RoomCandidate] = Field(default_factory=list)
+    warnings: list[str] = Field(default_factory=list)
+
+
+class PipelineStep(BaseModel):
+    """One entry in PipelineSummary.steps."""
+    step: str
+    ok: bool = True
+    duration_s: Optional[float] = None
+    stats: dict = Field(default_factory=dict)
+    error: Optional[str] = None
+
+
+class PipelineSummary(BaseModel):
+    """Typed return from orchestrator.run_pipeline.
+
+    Replaces the legacy dict. Gateway converts via
+    `summary.model_dump()` at the HTTP boundary.
+    """
+    schema_version: int = SCHEMA_VERSION
+    project_id: str
+    started_at: Optional[str] = None
+    finished_at: Optional[str] = None
+    steps: list[PipelineStep] = Field(default_factory=list)
+    files: dict[str, str] = Field(default_factory=dict)
+    issues: list[DesignIssue] = Field(default_factory=list)
+    status: Literal["queued", "running", "completed", "failed"] = "running"
+
+
+JobStatusStr = Literal["queued", "running", "completed", "failed"]
+
+
+class JobStatus(BaseModel):
+    """Typed JSON payload for the gateway's /intake/status/{job_id}.
+
+    Replaces the loosely-typed dict in gateway main.py's _JOBS.
+    """
+    schema_version: int = SCHEMA_VERSION
+    job_id: str
+    project_id: str
+    file: Optional[str] = None
+    bytes: int = 0
+    mode: str = "pipeline"
+    status: JobStatusStr = "queued"
+    percent: int = 0
+    steps_complete: list[str] = Field(default_factory=list)
+    error: Optional[str] = None
+    summary: Optional[PipelineSummary] = None

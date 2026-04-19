@@ -7,23 +7,25 @@ during Phase 2 of the plan.
 """
 from __future__ import annotations
 
-import logging
 import math
 import sys
 from pathlib import Path
 from typing import Any
 
 import pdfplumber  # type: ignore
-from shapely.geometry import LineString, Polygon, MultiPolygon
+from shapely.geometry import LineString, Polygon
 from shapely.ops import polygonize, unary_union
 
 # Ensure `cad/` is on the path when this file runs standalone
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from cad.schema import (  # noqa: E402
     Building, Level, Room, Wall, Ceiling,
+    PageIntakeResult, WallCandidate, RoomCandidate,
 )
+from cad.logging import get_logger, warn_swallowed  # noqa: E402
+from cad.exceptions import PDFParseError  # noqa: E402
 
-log = logging.getLogger(__name__)
+log = get_logger("intake")
 
 # Snap tolerance for orthogonality (degrees)
 ORTHO_TOL_DEG = 3.0
@@ -155,62 +157,61 @@ def _polygons_from_walls(
     return [p for p in polys if p.area > 100.0]
 
 
-def intake_pdf_page(pdf_path: str, page_index: int) -> dict[str, Any]:
+def intake_pdf_page(pdf_path: str, page_index: int) -> PageIntakeResult:
     """Run L1 + wall clustering + polygonization on one PDF page.
 
-    Returns a JSON-safe dict that includes the detected walls + room
-    polygons in PDF points + the detected scale. Caller converts to
-    meters using scale_ft_per_pt.
-
-    This is the L1 core. Full Building assembly (multi-page walk +
-    level separation + obstruction detection + IFC/DWG import) happens
-    in intake_file() below.
+    Returns a typed `PageIntakeResult` per AGENTIC_RULES §1.1.
+    Callers should not rely on dict shape — use attribute access or
+    `.model_dump()` at JSON boundaries.
     """
-    result: dict[str, Any] = {
-        "pdf_path": pdf_path,
-        "page_index": page_index,
-        "wall_count": 0,
-        "room_count": 0,
-        "scale_ft_per_pt": 0.0,
-        "warnings": [],
-        "walls": [],
-        "rooms": [],
-    }
+    result = PageIntakeResult(pdf_path=pdf_path, page_index=page_index)
     try:
         with pdfplumber.open(pdf_path) as pdf:
             if page_index >= len(pdf.pages):
-                result["warnings"].append(
+                result.warnings.append(
                     f"page {page_index} out of range ({len(pdf.pages)} pages)"
                 )
                 return result
             page = pdf.pages[page_index]
-            result["page_w_pt"] = float(page.width)
-            result["page_h_pt"] = float(page.height)
+            result.page_w_pt = float(page.width)
+            result.page_h_pt = float(page.height)
             lines = list(page.lines or [])
             chars = list(page.chars or [])[:5000]
             segments = _segments_from_pdfplumber(lines)
             walls = _cluster_walls(segments)
             polygons = _polygons_from_walls(walls)
-            scale_ft_per_pt = _detect_scale_ft_per_pt(chars)
-            result["wall_count"] = len(walls)
-            result["room_count"] = len(polygons)
-            result["scale_ft_per_pt"] = scale_ft_per_pt
-            result["raw_line_count"] = len(lines)
-            # Down-sample for JSON payload
-            result["walls"] = [
-                {"x0": x0, "y0": y0, "x1": x1, "y1": y1}
+            result.scale_ft_per_pt = _detect_scale_ft_per_pt(chars)
+            result.wall_count = len(walls)
+            result.room_count = len(polygons)
+            result.raw_line_count = len(lines)
+            # Down-sample for JSON payload (cap keeps response bounded)
+            result.walls = [
+                WallCandidate(x0=x0, y0=y0, x1=x1, y1=y1)
                 for x0, y0, x1, y1 in walls[:500]
             ]
-            result["rooms"] = [
-                {
-                    "polygon_pt": [(float(x), float(y)) for x, y in poly.exterior.coords],
-                    "area_pt2": float(poly.area),
-                }
+            result.rooms = [
+                RoomCandidate(
+                    polygon_pt=[(float(x), float(y)) for x, y in poly.exterior.coords],
+                    area_pt2=float(poly.area),
+                )
                 for poly in polygons[:200]
             ]
-    except Exception as e:
-        log.exception("intake_pdf_page failed")
-        result["warnings"].append(f"exception: {e}")
+    except (IOError, OSError) as e:
+        # File not readable. Log with stable code, return result with
+        # warning populated rather than crashing the pipeline.
+        warn_swallowed(log, code="INTAKE_PDF_UNREADABLE", err=e,
+                       pdf_path=pdf_path, page_index=page_index)
+        result.warnings.append(f"unreadable: {e}")
+    except (ValueError, TypeError, KeyError) as e:
+        # Malformed PDF content (pdfplumber sometimes raises KeyError
+        # on non-spec PDFs). Stable code lets ops grep by it.
+        warn_swallowed(log, code="INTAKE_PDF_MALFORMED", err=e,
+                       pdf_path=pdf_path, page_index=page_index)
+        result.warnings.append(f"malformed: {e}")
+    except pdfplumber.pdfminer.pdfparser.PDFSyntaxError as e:  # type: ignore[attr-defined]
+        warn_swallowed(log, code="INTAKE_PDF_SYNTAX", err=e,
+                       pdf_path=pdf_path, page_index=page_index)
+        result.warnings.append(f"pdf syntax: {e}")
     return result
 
 
@@ -429,12 +430,17 @@ def intake_file(pdf_path: str, project_id: str) -> Building:
     try:
         with pdfplumber.open(pdf_path) as pdf:
             n_pages = len(pdf.pages)
-    except Exception as e:
-        log.exception("intake_file open failed: %s", e)
+    except (IOError, OSError, ValueError) as e:
+        warn_swallowed(log, code="INTAKE_FILE_OPEN_FAILED", err=e,
+                       pdf_path=pdf_path)
         return Building(project_id=project_id, levels=[])
 
     for i in range(min(n_pages, 60)):  # cap walk length for dev
-        page_out = intake_pdf_page(pdf_path, i)
+        page_result = intake_pdf_page(pdf_path, i)
+        # Convert to dict for uniform handling with raster fallback
+        # (which still returns dict). PageIntakeResult.model_dump()
+        # yields a stable JSON-safe shape.
+        page_out: dict[str, Any] = page_result.model_dump()
         if page_out.get("wall_count", 0) < 20:
             raster_out = _raster_pdf_page(pdf_path, i)
             if raster_out.get("wall_count", 0) < 20:
