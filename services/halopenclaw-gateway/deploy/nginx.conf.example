@@ -1,0 +1,36 @@
+# Example nginx reverse-proxy for the halopenclaw gateway.
+#
+# Drop into /etc/nginx/conf.d/halopenclaw.conf or include from your
+# main rankempire.io virtual host. Assumes the service listens on
+# 127.0.0.1:18790 per deploy/halopenclaw.service.
+#
+# Route:   gateway.rankempire.io/halofire/*  →  local :18790
+# Auth:    relies on upstream RankEmpire SSO (jwt in cookie or bearer)
+
+location /halofire/ {
+    # Strip the /halofire prefix before forwarding
+    rewrite ^/halofire/(.*)$ /$1 break;
+
+    proxy_pass         http://127.0.0.1:18790;
+    proxy_http_version 1.1;
+
+    # Standard proxy headers
+    proxy_set_header   Host              $host;
+    proxy_set_header   X-Real-IP         $remote_addr;
+    proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+    proxy_set_header   X-Forwarded-Proto $scheme;
+
+    # JSON-RPC + SSE support
+    proxy_set_header   Connection        "";
+    proxy_buffering    off;
+    proxy_cache        off;
+    proxy_read_timeout 300s;
+
+    # Allow 50 MB IFC + large PDF uploads
+    client_max_body_size 100m;
+}
+
+# Health + ping route without stripping
+location = /halofire/health {
+    proxy_pass http://127.0.0.1:18790/health;
+}

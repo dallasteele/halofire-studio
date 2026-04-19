@@ -169,6 +169,17 @@
         "typescript": "5.9.3",
       },
     },
+    "packages/halofire-halopenclaw-client": {
+      "name": "@halofire/halopenclaw-client",
+      "version": "0.0.0",
+      "dependencies": {
+        "zod": "^3.23.8",
+      },
+      "devDependencies": {
+        "@pascal/typescript-config": "*",
+        "typescript": "5.9.3",
+      },
+    },
     "packages/halofire-ifc": {
       "name": "@halofire/ifc",
       "version": "0.0.0",
@@ -407,6 +418,8 @@
     "@halofire/ai-bridge": ["@halofire/ai-bridge@workspace:packages/halofire-ai-bridge"],
 
     "@halofire/catalog": ["@halofire/catalog@workspace:packages/halofire-catalog"],
+
+    "@halofire/halopenclaw-client": ["@halofire/halopenclaw-client@workspace:packages/halofire-halopenclaw-client"],
 
     "@halofire/ifc": ["@halofire/ifc@workspace:packages/halofire-ifc"],
 

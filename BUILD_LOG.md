@@ -186,3 +186,111 @@ Every task ends with an Entry here + a commit.
 - 📝 Demo scenes are hardcoded in FireProtectionPanel for now. The
      halopenclaw-client package (planned) will serialize the live Pascal
      scene so validate runs on real user data.
+
+### Entry 08 — @halofire/halopenclaw-client + Pascal scene serializer
+
+- ✅ New `packages/halofire-halopenclaw-client/` package (TS library,
+     MIT, ~4 kB compiled).
+     - `types.ts`: one-place enum of ToolName + ValidateMode / IngestMode /
+       PlaceHeadMode / RoutePipeMode / CalcMode / ExportMode so TS catches
+       typo at call-sites. `SerializedNode` + `SerializedScene` match the
+       gateway's validate tool input schema.
+     - `client.ts`: `createHalopenclawClient({baseUrl, fetchImpl})` returns
+       a typed `{call, listTools, health, validate}` facade. Reads baseUrl
+       from `NEXT_PUBLIC_HALOPENCLAW_URL` env if not passed. Uses global
+       fetch; SSR-safe via optional fetchImpl override.
+     - `serialize.ts`: `serializePascalScene(roots, opts)` walks a Pascal
+       node tree (via minimally-typed `PascalSceneNode` shape) and flattens
+       to the gateway format. Emits only nodes that have a `bboxWorld`.
+- ✅ Type-checks clean.
+- 📝 Next step (M1 week 3-4): wire `FireProtectionPanel.tsx` to replace
+     its hardcoded demo scenes with `serializePascalScene(pascalStore.roots)`,
+     giving the audit buttons real user-scene data.
+- 📝 Deferred typed wrappers: `ingest`, `placeHead`, `routePipe`, `calc`,
+     `export` — add to `HalopenclawClient` interface as the gateway tools
+     get real implementations in M1-M4.
+
+### Entry 09 — Deploy infrastructure
+
+- ✅ `services/halopenclaw-gateway/.env.example` — ANTHROPIC_API_KEY,
+     CLAUDE_MODEL/CLAUDE_HAIKU_MODEL overrides, HALOPENCLAW_PORT,
+     CUBICASA_MODEL_PATH, HALOPENCLAW_JOB_DIR.
+- ✅ `services/halopenclaw-gateway/deploy/halopenclaw.service` —
+     systemd unit for uvicorn. Runs as unprivileged `halofire` user,
+     `Type=exec`, 2 workers, `Restart=on-failure`, hardened with
+     `NoNewPrivileges`, `ProtectSystem=strict`, `PrivateTmp=true`,
+     ReadWritePaths limited to the jobs dir.
+- ✅ `services/halopenclaw-gateway/deploy/nginx.conf.example` — reverse
+     proxy from `/halofire/*` to `127.0.0.1:18790` with SSE-friendly
+     buffer settings + `client_max_body_size 100m` for IFC uploads.
+- ✅ `services/halopenclaw-gateway/deploy/DEPLOY.md` — step-by-step
+     install, CubiCasa weights download, nginx include, smoke-test, update,
+     rollback.
+- 📝 Deploy target: RankEmpire VPS (already runs HAL stack). CubiCasa5k
+     weights are a one-time ~200 MB download from upstream releases.
+- 📝 Prod hostname is `gateway.rankempire.io/halofire/*` per the nginx
+     example. CORS already whitelists `https://studio.rankempire.io`
+     in `services/halopenclaw-gateway/main.py`.
+
+---
+
+## M1 week 1 wrap-up checklist
+
+- [x] Port `validate_shell.py` from ClaudeBot skill → `halofire_validate`
+      shell + collisions modes
+- [x] Gateway boots + smoke-tested
+- [x] Wire `@thatopen/components` IfcLoader in `@halofire/ifc`
+- [x] Scaffold `@halofire/catalog` + author 20 components via Blender MCP
+- [x] Studio UI: Catalog + Fire Protection sidebar tabs
+- [x] `@halofire/halopenclaw-client` typed RPC client + Pascal scene serializer
+- [x] systemd service file + nginx config + deploy guide
+- [ ] Manual IFC upload end-to-end test (blocked on studio upload UI — M1 week 3)
+- [ ] `halofire_place_head` real spawn path (M1 week 3)
+- [ ] Linear pipe routing + Hazen-Williams single-branch calc (M1 week 4)
+- [ ] Single-sheet PDF output via `draft_plan.py` + jsPDF (M1 week 5)
+- [ ] Blender MCP socket-buffer hang: investigate + fix batch authoring
+      (documented workaround: split into chunks of ≤15)
+
+## Commit history (M1 week 1)
+
+| Hash | Title |
+|---|---|
+| `2709edb` | Phase 1 fork + scaffold @halofire/sprinkler |
+| `72cbe18` | Comprehensive requirements + revised 8-month roadmap |
+| `4b2786a` | Technical plan + M1 infrastructure scaffold |
+| `290cfce` | Wire halofire_validate shell + collisions audits |
+| `61d73a8` | Catalog package + 20 authored components + IFC wire-up |
+| `62ac4cd` | Catalog + Fire Protection sidebar tabs in editor app |
+| (next)   | halopenclaw-client + deploy infra |
+
+## Codex-review-at-end checklist
+
+Reviewer: read `HALOFIRE_TECHNICAL_PLAN.md` first for the north star,
+then this log top-to-bottom. For each entry, check:
+
+1. **Claim matches code.** Log says "20 components authored" → 20 GLBs
+   exist under `packages/halofire-catalog/assets/glb/`.
+2. **Type-checks clean.** Each new `@halofire/*` package passes
+   `bun run check-types`. Upstream Pascal errors in `packages/editor/`
+   are pre-existing, not ours.
+3. **Tests actually ran.** Entry 04 documents a concrete smoke-test of
+   `halofire_validate shell` with a floating wall — output is quoted
+   verbatim.
+4. **Binding commitments honored.** §Binding in HALOFIRE_TECHNICAL_PLAN:
+   NFPA 13 citations everywhere, no Togal.AI dep, halopenclaw is the
+   only backend path, Claude+Codex+Gemini interchangeable, Pascal
+   upstream untouched.
+5. **Milestone vs stub.** Every stub is labeled with the milestone/week
+   it lands (`M1 week 3`, `M2 week 7`, `M3`, etc.) so reviewer knows what
+   is "ready for use" vs "placeholder."
+
+Blocking issues reviewer should flag:
+- Any `@halofire/*` package that doesn't type-check
+- Any tool stub that doesn't register in `services/halopenclaw-gateway/tools/registry.py`
+- GLBs missing from the manifest → reviewer checks
+  `diff <(ls packages/halofire-catalog/assets/glb/) <(grep -oE "SM_[A-Za-z0-9_]+" packages/halofire-catalog/src/manifest.ts | sort -u)`
+
+Non-blocking (already acknowledged):
+- Upstream Pascal TS errors in `packages/editor/`
+- 3-vs-0.184 three.js peer-dep warning on install
+- Blender MCP batch authoring hang workaround
