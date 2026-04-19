@@ -25,10 +25,19 @@ import { useItemLightPool } from '../../../store/use-item-light-pool'
 import { ErrorBoundary } from '../../error-boundary'
 import { NodeRenderer } from '../node-renderer'
 
-const getMaterialForOriginal = (original: Material): MeshStandardNodeMaterial => {
+const getHalofireTint = (tags?: string[]): string | null => {
+  const colorTag = tags?.find((tag) => tag.startsWith('halofire_pipe_color:'))
+  return colorTag?.slice('halofire_pipe_color:'.length) ?? null
+}
+
+const getMaterialForOriginal = (
+  original: Material,
+  tintMaterial: MeshStandardNodeMaterial | null,
+): MeshStandardNodeMaterial => {
   if (original.name.toLowerCase() === 'glass') {
     return glassMaterial
   }
+  if (tintMaterial) return tintMaterial
   return baseMaterial
 }
 
@@ -95,6 +104,15 @@ const ModelRenderer = ({ node }: { node: ItemNode }) => {
   const { actions } = useAnimations(animations, ref)
   // Freeze the interactive definition at mount — asset schemas don't change at runtime
   const interactiveRef = useRef(node.asset.interactive)
+  const halofireTintMaterial = useMemo(() => {
+    const tint = getHalofireTint(node.asset.tags)
+    if (!tint) return null
+    return new MeshStandardNodeMaterial({
+      color: tint,
+      metalness: 0.55,
+      roughness: 0.35,
+    })
+  }, [node.asset.tags])
 
   if (nodes.cutout) {
     nodes.cutout.visible = false
@@ -127,7 +145,7 @@ const ModelRenderer = ({ node }: { node: ItemNode }) => {
 
         // Handle both single material and material array cases
         if (Array.isArray(mesh.material)) {
-          mesh.material = mesh.material.map((mat) => getMaterialForOriginal(mat))
+          mesh.material = mesh.material.map((mat) => getMaterialForOriginal(mat, halofireTintMaterial))
           hasGlass = mesh.material.some((mat) => mat.name === 'glass')
 
           // Fix geometry groups that reference materialIndex beyond the material
@@ -142,14 +160,14 @@ const ModelRenderer = ({ node }: { node: ItemNode }) => {
             }
           }
         } else {
-          mesh.material = getMaterialForOriginal(mesh.material)
+          mesh.material = getMaterialForOriginal(mesh.material, halofireTintMaterial)
           hasGlass = mesh.material.name === 'glass'
         }
         mesh.castShadow = !hasGlass
         mesh.receiveShadow = !hasGlass
       }
     })
-  }, [scene])
+  }, [scene, halofireTintMaterial])
 
   const interactive = interactiveRef.current
   const animEffect =

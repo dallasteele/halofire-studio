@@ -19,7 +19,7 @@ import { use, useEffect, useMemo, useState } from 'react'
 const FT_TO_M = 0.3048
 
 const GATEWAY_URL =
-  process.env.NEXT_PUBLIC_HALOPENCLAW_URL ?? 'http://localhost:18790'
+  process.env.NEXT_PUBLIC_HALOPENCLAW_URL ?? 'http://localhost:18080'
 
 // Industry pipe-size colors (AutoSprink convention)
 const PIPE_COLOR: Record<number, string> = {
@@ -102,6 +102,70 @@ interface LegacyProject {
   fire_systems: { id: string; type: string; serves: string; hazard: string }[]
 }
 
+type Vec2 = [number, number]
+type Vec3 = [number, number, number]
+
+interface DesignData {
+  project: {
+    id: string
+    name: string
+    address: string
+    ahj?: string
+    total_sqft?: number | null
+  }
+  building: {
+    total_sqft?: number | null
+    levels: DesignLevel[]
+  }
+  systems: DesignSystem[]
+}
+
+interface DesignLevel {
+  id: string
+  name: string
+  elevation_m: number
+  height_m?: number
+  use?: string
+  polygon_m?: Vec2[]
+  rooms?: { id: string; polygon_m?: Vec2[] }[]
+}
+
+interface DesignSystem {
+  id: string
+  supplies?: string[]
+  heads?: {
+    id: string
+    position_m: Vec3
+    room_id?: string | null
+  }[]
+  pipes?: {
+    id: string
+    size_in: number
+    start_m: Vec3
+    end_m: Vec3
+    system_id?: string | null
+  }[]
+}
+
+interface RenderLevel {
+  id: string
+  name: string
+  use: string
+  elevation_ft: number
+  elevation_m: number
+  sqft?: number
+}
+
+interface RenderGeometry {
+  heads: { id: string; pos: Vec3; levelId: string }[]
+  pipes: { id: string; from: Vec3; to: Vec3; sizeIn: number; levelId: string }[]
+  source: 'design' | 'synthetic'
+}
+
+function toViewerPoint([x, y, z]: Vec3): Vec3 {
+  return [x, z, y]
+}
+
 // ── 3D building blocks ──────────────────────────────────────────────
 
 function HeadMarker({ position }: { position: [number, number, number] }) {
@@ -158,12 +222,26 @@ function FloorSlab({
   )
 }
 
+function LevelSlab({
+  level, sideM, visible,
+}: { level: RenderLevel; sideM: number; visible: boolean }) {
+  return (
+    <FloorSlab
+      elevation_ft={level.elevation_ft}
+      sideM={sideM}
+      visible={visible}
+      isGarage={level.use === 'garage'}
+    />
+  )
+}
+
 // ── Page component ─────────────────────────────────────────────────
 
 export default function BidView(props: { params: Promise<{ project: string }> }) {
   const params = use(props.params)
   const [project, setProject] = useState<LegacyProject | null>(null)
   const [proposal, setProposal] = useState<ProposalData | null>(null)
+  const [design, setDesign] = useState<DesignData | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [visibleLevels, setVisibleLevels] = useState<Set<string>>(new Set())
   const [isMobile, setIsMobile] = useState(false)
@@ -202,39 +280,115 @@ export default function BidView(props: { params: Promise<{ project: string }> })
       })
   }, [params.project])
 
+  // Load the generated CAD design. This is the geometry source of truth
+  // when the agentic pipeline has produced heads + pipe networks.
+  useEffect(() => {
+    fetch(`${GATEWAY_URL}/projects/${params.project}/design.json`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d: DesignData | null) => {
+        if (d) setDesign(d)
+      })
+      .catch(() => {
+        // No design run yet; the viewer can still show static bid context.
+      })
+  }, [params.project])
+
+  const levels: RenderLevel[] = useMemo(() => {
+    if (design?.building?.levels?.length) {
+      return design.building.levels.map((level) => ({
+        id: level.id,
+        name: level.name,
+        use: level.use ?? 'other',
+        elevation_ft: Number((level.elevation_m * 3.28084).toFixed(1)),
+        elevation_m: level.elevation_m,
+      }))
+    }
+    return (project?.building?.levels ?? []).map((level) => ({
+      id: level.id,
+      name: level.name,
+      use: level.use,
+      elevation_ft: level.elevation_ft,
+      elevation_m: level.elevation_ft * FT_TO_M,
+      sqft: level.sqft,
+    }))
+  }, [design, project])
+
+  useEffect(() => {
+    if (visibleLevels.size > 0 || levels.length === 0) return
+    setVisibleLevels(new Set(levels.map((level) => level.id)))
+  }, [levels, visibleLevels.size])
+
   const sideM = useMemo(() => {
     const sqft = proposal?.building_summary?.total_sqft
+      ?? design?.building?.total_sqft
       ?? project?.building?.total_sqft
       ?? 50000
     return Math.sqrt(sqft * 0.092903)
-  }, [project, proposal])
+  }, [design, project, proposal])
 
-  // Demo geometry for the viewport until live design.json wires in
-  const demoGeometry = useMemo(() => {
-    if (!project) return { heads: [] as { id: string; pos: [number, number, number]; levelId: string }[], pipes: [] as { from: [number, number, number]; to: [number, number, number]; sizeIn: number; levelId: string }[] }
-    const heads: { id: string; pos: [number, number, number]; levelId: string }[] = []
-    const pipes: { from: [number, number, number]; to: [number, number, number]; sizeIn: number; levelId: string }[] = []
-    for (const lvl of project.building.levels) {
-      if (lvl.use !== 'residential') continue
-      const z = lvl.elevation_ft * FT_TO_M + 3.0
+  const renderedGeometry: RenderGeometry = useMemo(() => {
+    const heads: RenderGeometry['heads'] = []
+    const pipes: RenderGeometry['pipes'] = []
+    if (design?.systems?.length) {
+      const levelByRoom = new Map<string, string>()
+      for (const level of design.building.levels) {
+        for (const room of level.rooms ?? []) {
+          levelByRoom.set(room.id, level.id)
+        }
+      }
+      const nearestLevel = (verticalM: number): string => {
+        if (levels.length === 0) return 'design'
+        return levels.reduce((best, level) =>
+          Math.abs(level.elevation_m - verticalM) < Math.abs(best.elevation_m - verticalM)
+            ? level
+            : best,
+        ).id
+      }
+
+      for (const system of design.systems) {
+        const defaultLevelId = system.supplies?.[0] ?? levels[0]?.id ?? 'design'
+        for (const head of system.heads ?? []) {
+          heads.push({
+            id: head.id,
+            levelId: head.room_id ? (levelByRoom.get(head.room_id) ?? defaultLevelId) : defaultLevelId,
+            pos: toViewerPoint(head.position_m),
+          })
+        }
+        for (const pipe of system.pipes ?? []) {
+          pipes.push({
+            id: pipe.id,
+            from: toViewerPoint(pipe.start_m),
+            to: toViewerPoint(pipe.end_m),
+            sizeIn: pipe.size_in,
+            levelId: system.supplies?.[0] ?? nearestLevel(pipe.start_m[2]),
+          })
+        }
+      }
+      if (heads.length > 0 || pipes.length > 0) {
+        return { heads, pipes, source: 'design' }
+      }
+    }
+
+    for (const level of levels) {
+      if (level.use !== 'residential') continue
+      const y = level.elevation_m + 3.0
       const n = 6
       const spacing = sideM / (n + 1)
       for (let r = 0; r < n; r++) {
-        let prev: [number, number, number] | null = null
+        let prev: Vec3 | null = null
         for (let c = 0; c < n; c++) {
-          const p: [number, number, number] = [(c + 1) * spacing, z, (r + 1) * spacing]
-          heads.push({ id: `${lvl.id}_${r}_${c}`, pos: p, levelId: lvl.id })
+          const p: Vec3 = [(c + 1) * spacing, y, (r + 1) * spacing]
+          const id = `${level.id}_${r}_${c}`
+          heads.push({ id, pos: p, levelId: level.id })
           if (prev) {
-            pipes.push({ from: prev, to: p, sizeIn: c === 0 ? 2.0 : 1.0, levelId: lvl.id })
+            pipes.push({ id: `${id}_pipe`, from: prev, to: p, sizeIn: c === 0 ? 2.0 : 1.0, levelId: level.id })
           }
           prev = p
         }
       }
     }
-    return { heads, pipes }
-  }, [project, sideM])
-
-  const levels = project?.building?.levels ?? []
+    return { heads, pipes, source: 'synthetic' }
+  }, [design, levels, sideM])
   const displayPrice =
     proposal?.pricing?.total_usd ?? project?.halofire?.proposal_price_usd ?? 0
   const displayProjectName = proposal?.project?.name ?? project?.name ?? params.project
@@ -349,20 +503,19 @@ export default function BidView(props: { params: Promise<{ project: string }> })
                   fadeDistance={sideM * 3} infiniteGrid={false}
                 />
                 {levels.map((l) => (
-                  <FloorSlab
+                  <LevelSlab
                     key={l.id}
-                    elevation_ft={l.elevation_ft}
+                    level={l}
                     sideM={sideM}
                     visible={visibleLevels.has(l.id)}
-                    isGarage={l.use === 'garage'}
                   />
                 ))}
-                {demoGeometry.heads
+                {renderedGeometry.heads
                   .filter((h) => visibleLevels.has(h.levelId))
                   .map((h) => <HeadMarker key={h.id} position={h.pos} />)}
-                {demoGeometry.pipes
+                {renderedGeometry.pipes
                   .filter((p) => visibleLevels.has(p.levelId))
-                  .map((p, i) => <PipeSegment key={i} from={p.from} to={p.to} sizeIn={p.sizeIn} />)}
+                  .map((p) => <PipeSegment key={p.id} from={p.from} to={p.to} sizeIn={p.sizeIn} />)}
                 <OrbitControls
                   target={[sideM / 2, (levels[Math.floor(levels.length / 2)]?.elevation_ft ?? 24) * FT_TO_M, sideM / 2]}
                   makeDefault
@@ -374,13 +527,13 @@ export default function BidView(props: { params: Promise<{ project: string }> })
           {mobileTab === 'sheets' && (
             <div className="space-y-2 p-3">
               <h2 className="text-[10px] font-semibold uppercase tracking-widest text-neutral-400">Deliverables</h2>
-              <a href={`${GATEWAY_URL}/projects/${params.project}/deliverable/proposal.pdf`} target="_blank" className="block rounded bg-neutral-800 px-3 py-2 text-center text-xs">Proposal PDF</a>
-              <a href={`${GATEWAY_URL}/projects/${params.project}/deliverable/proposal.xlsx`} target="_blank" className="block rounded bg-neutral-800 px-3 py-2 text-center text-xs">Pricing XLSX</a>
-              <a href={`${GATEWAY_URL}/projects/${params.project}/deliverable/design.dxf`} target="_blank" className="block rounded bg-neutral-800 px-3 py-2 text-center text-xs">AutoCAD DXF</a>
-              <a href={`${GATEWAY_URL}/projects/${params.project}/deliverable/design.ifc`} target="_blank" className="block rounded bg-neutral-800 px-3 py-2 text-center text-xs">IFC (BIM)</a>
-              <a href={`${GATEWAY_URL}/projects/${params.project}/deliverable/design.glb`} target="_blank" className="block rounded bg-neutral-800 px-3 py-2 text-center text-xs">3D Model (GLB)</a>
-              <a href={`/projects/${params.project}/proposal.pdf`} target="_blank" className="block rounded bg-neutral-800 px-3 py-2 text-center text-xs">Original Halo Proposal</a>
-              <a href={`/projects/${params.project}/fire-rfis.pdf`} target="_blank" className="block rounded bg-neutral-800 px-3 py-2 text-center text-xs">Fire RFIs</a>
+              <a href={`${GATEWAY_URL}/projects/${params.project}/deliverable/proposal.pdf`} target="_blank" rel="noopener" className="block rounded bg-neutral-800 px-3 py-2 text-center text-xs">Proposal PDF</a>
+              <a href={`${GATEWAY_URL}/projects/${params.project}/deliverable/proposal.xlsx`} target="_blank" rel="noopener" className="block rounded bg-neutral-800 px-3 py-2 text-center text-xs">Pricing XLSX</a>
+              <a href={`${GATEWAY_URL}/projects/${params.project}/deliverable/design.dxf`} target="_blank" rel="noopener" className="block rounded bg-neutral-800 px-3 py-2 text-center text-xs">AutoCAD DXF</a>
+              <a href={`${GATEWAY_URL}/projects/${params.project}/deliverable/design.ifc`} target="_blank" rel="noopener" className="block rounded bg-neutral-800 px-3 py-2 text-center text-xs">IFC (BIM)</a>
+              <a href={`${GATEWAY_URL}/projects/${params.project}/deliverable/design.glb`} target="_blank" rel="noopener" className="block rounded bg-neutral-800 px-3 py-2 text-center text-xs">3D Model (GLB)</a>
+              <a href={`/projects/${params.project}/proposal.pdf`} target="_blank" rel="noopener" className="block rounded bg-neutral-800 px-3 py-2 text-center text-xs">Original Halo Proposal</a>
+              <a href={`/projects/${params.project}/fire-rfis.pdf`} target="_blank" rel="noopener" className="block rounded bg-neutral-800 px-3 py-2 text-center text-xs">Fire RFIs</a>
             </div>
           )}
 
@@ -493,13 +646,13 @@ export default function BidView(props: { params: Promise<{ project: string }> })
 
           <h2 className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-neutral-400">Deliverables</h2>
           <div className="flex flex-col gap-1">
-            <a href={`${GATEWAY_URL}/projects/${params.project}/deliverable/proposal.pdf`} target="_blank" className="rounded bg-neutral-800 px-2 py-1 text-center text-[10px] hover:bg-neutral-700">Proposal PDF</a>
-            <a href={`${GATEWAY_URL}/projects/${params.project}/deliverable/proposal.xlsx`} target="_blank" className="rounded bg-neutral-800 px-2 py-1 text-center text-[10px] hover:bg-neutral-700">Pricing XLSX</a>
-            <a href={`${GATEWAY_URL}/projects/${params.project}/deliverable/design.dxf`} target="_blank" className="rounded bg-neutral-800 px-2 py-1 text-center text-[10px] hover:bg-neutral-700">AutoCAD DXF</a>
-            <a href={`${GATEWAY_URL}/projects/${params.project}/deliverable/design.ifc`} target="_blank" className="rounded bg-neutral-800 px-2 py-1 text-center text-[10px] hover:bg-neutral-700">IFC</a>
-            <a href={`${GATEWAY_URL}/projects/${params.project}/deliverable/design.glb`} target="_blank" className="rounded bg-neutral-800 px-2 py-1 text-center text-[10px] hover:bg-neutral-700">3D Model GLB</a>
-            <a href={`/projects/${params.project}/proposal.pdf`} target="_blank" className="rounded bg-neutral-800 px-2 py-1 text-center text-[10px] hover:bg-neutral-700">Halo Proposal</a>
-            <a href={`/projects/${params.project}/fire-rfis.pdf`} target="_blank" className="rounded bg-neutral-800 px-2 py-1 text-center text-[10px] hover:bg-neutral-700">Fire RFIs</a>
+            <a href={`${GATEWAY_URL}/projects/${params.project}/deliverable/proposal.pdf`} target="_blank" rel="noopener" className="rounded bg-neutral-800 px-2 py-1 text-center text-[10px] hover:bg-neutral-700">Proposal PDF</a>
+            <a href={`${GATEWAY_URL}/projects/${params.project}/deliverable/proposal.xlsx`} target="_blank" rel="noopener" className="rounded bg-neutral-800 px-2 py-1 text-center text-[10px] hover:bg-neutral-700">Pricing XLSX</a>
+            <a href={`${GATEWAY_URL}/projects/${params.project}/deliverable/design.dxf`} target="_blank" rel="noopener" className="rounded bg-neutral-800 px-2 py-1 text-center text-[10px] hover:bg-neutral-700">AutoCAD DXF</a>
+            <a href={`${GATEWAY_URL}/projects/${params.project}/deliverable/design.ifc`} target="_blank" rel="noopener" className="rounded bg-neutral-800 px-2 py-1 text-center text-[10px] hover:bg-neutral-700">IFC</a>
+            <a href={`${GATEWAY_URL}/projects/${params.project}/deliverable/design.glb`} target="_blank" rel="noopener" className="rounded bg-neutral-800 px-2 py-1 text-center text-[10px] hover:bg-neutral-700">3D Model GLB</a>
+            <a href={`/projects/${params.project}/proposal.pdf`} target="_blank" rel="noopener" className="rounded bg-neutral-800 px-2 py-1 text-center text-[10px] hover:bg-neutral-700">Halo Proposal</a>
+            <a href={`/projects/${params.project}/fire-rfis.pdf`} target="_blank" rel="noopener" className="rounded bg-neutral-800 px-2 py-1 text-center text-[10px] hover:bg-neutral-700">Fire RFIs</a>
           </div>
 
           <p className="mt-4 text-[9px] italic text-neutral-600">
@@ -519,20 +672,19 @@ export default function BidView(props: { params: Promise<{ project: string }> })
               fadeDistance={sideM * 3} infiniteGrid={false}
             />
             {levels.map((l) => (
-              <FloorSlab
+              <LevelSlab
                 key={l.id}
-                elevation_ft={l.elevation_ft}
+                level={l}
                 sideM={sideM}
                 visible={visibleLevels.has(l.id)}
-                isGarage={l.use === 'garage'}
               />
             ))}
-            {demoGeometry.heads
+            {renderedGeometry.heads
               .filter((h) => visibleLevels.has(h.levelId))
               .map((h) => <HeadMarker key={h.id} position={h.pos} />)}
-            {demoGeometry.pipes
+            {renderedGeometry.pipes
               .filter((p) => visibleLevels.has(p.levelId))
-              .map((p, i) => <PipeSegment key={i} from={p.from} to={p.to} sizeIn={p.sizeIn} />)}
+              .map((p) => <PipeSegment key={p.id} from={p.from} to={p.to} sizeIn={p.sizeIn} />)}
             <OrbitControls
               target={[sideM / 2, (levels[Math.floor(levels.length / 2)]?.elevation_ft ?? 24) * FT_TO_M, sideM / 2]}
               makeDefault

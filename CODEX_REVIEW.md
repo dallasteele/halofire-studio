@@ -14,6 +14,56 @@ shipment."
 
 ---
 
+## 2026-04-19 corrective review addendum
+
+Codex re-reviewed the app after the initial package and applied a corrective
+refactor to the highest-risk gaps found in this pass. The current truth is
+that HaloFire CAD Studio is an agentic fire-protection CAD MVP with several
+useful pipelines, not yet a complete AutoSprINK/HydraCAD-class production CAD
+suite. Treat older "ship-ready" language in this file as historical context,
+not as the release bar.
+
+Changes made in this pass:
+
+- The bid viewer now loads generated `design.json` from the gateway and uses
+  real backend head/pipe geometry before falling back to sample project data.
+- The gateway now validates project ids and deliverable names, caps uploads,
+  strips unsafe upload filenames, exposes `/projects/{project_id}/design.json`,
+  and blocks path traversal through project and deliverable routes.
+- Fire-protection auto-grid and auto-route actions now create catalog-safe head
+  and pipe nodes with ids, names, thumbnails, size tags, and industry color tags.
+- The shared 3D renderer now reads HaloFire pipe color tags and tints placed
+  pipe models accordingly, so generated CAD geometry is visually inspectable.
+- Lint-blocking issues in related editor/core files were corrected.
+
+Verification from this pass:
+
+- `npm run lint` exits successfully, with 8 existing warnings and 11 infos still present.
+- `C:/Python312/python.exe -m compileall -q services/halofire-cad services/halopenclaw-gateway`
+  exits successfully.
+- FastAPI smoke checks pass for `/health`, missing design files, bad project
+  ids, and deliverable path traversal rejection.
+- A focused TypeScript check against changed HaloFire editor/bid files no
+  longer reports errors.
+
+Known blockers before calling this a full CAD design suite:
+
+- `npm run build` and `npm run check-types` are blocked by the repo's Bun/Turbo
+  package-manager setup because `bun@1.3.0` is not available on this machine.
+- Full `tsc` still fails in inherited Pascal/Three editor code outside this
+  HaloFire pass, including duplicate/incompatible Three typings.
+- PDF ingest remains mostly L1 vector extraction; L2 OCR, L3 AI vision, and L4
+  DWG/IFC semantic ingest are not complete production paths.
+- Hydraulic selection still needs real remote-area selection, loop/grid network
+  solving, pump/tank/backflow behavior, and jurisdiction-grade calculation
+  reports.
+- IFC/DXF/PDF exports exist but need geometry-rich BIM objects, symbol fidelity,
+  sheet revision workflows, title-block controls, and AHJ acceptance testing.
+- The app still needs auth, project permissions, pricing calibration, QA
+  fixtures, and end-to-end golden-file tests before customer deployment.
+
+---
+
 ## One-paragraph summary
 
 HaloFire CAD Studio is a standalone open-source agentic fire-sprinkler

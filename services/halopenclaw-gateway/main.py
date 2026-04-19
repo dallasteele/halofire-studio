@@ -20,6 +20,7 @@ import asyncio
 import importlib.util
 import json
 import os
+import re
 import sys
 import uuid
 from pathlib import Path
@@ -165,6 +166,23 @@ _DATA_ROOT = Path(os.environ.get(
     "HALOFIRE_DATA", str(Path(__file__).resolve().parent / "data"),
 ))
 _DATA_ROOT.mkdir(parents=True, exist_ok=True)
+_PROJECT_ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,79}$")
+_MAX_UPLOAD_BYTES = int(os.environ.get("HALOFIRE_MAX_UPLOAD_BYTES", str(200 * 1024 * 1024)))
+
+
+def _safe_project_id(project_id: str) -> str:
+    if not _PROJECT_ID_RE.fullmatch(project_id):
+        raise HTTPException(400, "project_id must be 1-80 chars: letters, numbers, dot, dash, underscore")
+    return project_id
+
+
+def _safe_project_dir(project_id: str) -> Path:
+    safe_id = _safe_project_id(project_id)
+    root = _DATA_ROOT.resolve()
+    path = (_DATA_ROOT / safe_id).resolve()
+    if root not in path.parents and path != root:
+        raise HTTPException(400, "invalid project path")
+    return path
 
 
 @app.post("/intake/upload")
@@ -178,11 +196,16 @@ async def intake_upload(
     """
     if not file.filename:
         raise HTTPException(400, "no file provided")
-    proj_dir = _DATA_ROOT / project_id
+    proj_dir = _safe_project_dir(project_id)
     uploads = proj_dir / "uploads"
     uploads.mkdir(parents=True, exist_ok=True)
-    dest = uploads / file.filename
-    content = await file.read()
+    filename = Path(file.filename).name
+    if not filename:
+        raise HTTPException(400, "invalid file name")
+    dest = uploads / filename
+    content = await file.read(_MAX_UPLOAD_BYTES + 1)
+    if len(content) > _MAX_UPLOAD_BYTES:
+        raise HTTPException(413, f"upload too large; max {_MAX_UPLOAD_BYTES} bytes")
     dest.write_bytes(content)
 
     job_id = str(uuid.uuid4())
@@ -256,16 +279,27 @@ async def intake_status(job_id: str) -> dict[str, Any]:
 
 @app.get("/projects/{project_id}/proposal.json")
 async def get_proposal_json(project_id: str) -> JSONResponse:
-    p = _DATA_ROOT / project_id / "deliverables" / "proposal.json"
+    p = _safe_project_dir(project_id) / "deliverables" / "proposal.json"
     if not p.exists():
         raise HTTPException(404, "proposal not generated yet")
     return JSONResponse(json.loads(p.read_text(encoding="utf-8")))
 
 
+@app.get("/projects/{project_id}/design.json")
+async def get_design_json(project_id: str) -> JSONResponse:
+    p = _safe_project_dir(project_id) / "deliverables" / "design.json"
+    if not p.exists():
+        raise HTTPException(404, "design not generated yet")
+    return JSONResponse(json.loads(p.read_text(encoding="utf-8")))
+
+
 @app.get("/projects/{project_id}/deliverable/{name}")
 async def get_deliverable(project_id: str, name: str):
-    p = _DATA_ROOT / project_id / "deliverables" / name
-    if not p.exists() or ".." in name:
+    if Path(name).name != name:
+        raise HTTPException(404, "deliverable not found")
+    deliverables = (_safe_project_dir(project_id) / "deliverables").resolve()
+    p = (deliverables / name).resolve()
+    if deliverables not in p.parents or not p.exists():
         raise HTTPException(404, "deliverable not found")
     return FileResponse(p)
 

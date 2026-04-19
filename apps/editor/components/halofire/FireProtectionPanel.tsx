@@ -16,7 +16,7 @@
 
 import { generateId, sceneRegistry, useScene } from '@pascal-app/core'
 import { serializeLiveScene } from '@halofire/halopenclaw-client'
-import { findBySku, findPipesBySize } from '@halofire/catalog'
+import { findBySku, findPipesBySize, pipeColorFor } from '@halofire/catalog'
 import { useCallback, useState } from 'react'
 import { IfcUploadButton } from './IfcUploadButton'
 
@@ -176,11 +176,12 @@ export function FireProtectionPanel() {
       let spawned = 0
       const coordRegex = /^\s*@ \(([-\d.]+), ([-\d.]+), ([-\d.]+)\)/gm
       for (const m of output.matchAll(coordRegex)) {
-        const px = Number(m[1]) / 100
-        const py = Number(m[2]) / 100
-        const pz = Number(m[3]) / 100
+        const [, rawX, rawY, rawZ] = m
+        if (!(rawX && rawY && rawZ)) continue
+        const px = Number(rawX) / 100
+        const py = Number(rawY) / 100
+        const pz = Number(rawZ) / 100
         try {
-          // @ts-expect-error — runtime accepts the shape
           createNode({
             id: generateId('item'),
             type: 'item',
@@ -189,7 +190,10 @@ export function FireProtectionPanel() {
             scale: [1, 1, 1],
             children: [],
             asset: {
+              id: entry.sku,
               category: entry.category,
+              name: entry.name,
+              thumbnail: '/icons/item.png',
               dimensions: dimsMeters,
               src: `/halofire-catalog/glb/${entry.sku}.glb`,
               attachTo: 'ceiling',
@@ -198,7 +202,7 @@ export function FireProtectionPanel() {
               scale: [1, 1, 1],
               tags: ['halofire', entry.category, 'auto_grid'],
             },
-          }, parentId)
+          } as any, parentId)
           spawned++
         } catch {
           // best-effort spawn; ignore per-head failures
@@ -276,7 +280,9 @@ export function FireProtectionPanel() {
       type ParsedSeg = { fromId: string; toId: string }
       const parsedSegs: ParsedSeg[] = []
       for (const m of output.matchAll(segRegex)) {
-        parsedSegs.push({ fromId: m[1], toId: m[2] })
+        const [, fromId, toId] = m
+        if (!(fromId && toId)) continue
+        parsedSegs.push({ fromId, toId })
       }
       // Build children adjacency assuming the MST roots at the riser:
       // each segment's `to` is a child of `from`.
@@ -333,7 +339,6 @@ export function FireProtectionPanel() {
         const yaw = Math.atan2(dy, dx)
         const pitch = Math.atan2(dz, horiz)
         try {
-          // @ts-expect-error — runtime accepts the shape
           createNode({
             id: generateId('item'),
             type: 'item',
@@ -343,16 +348,26 @@ export function FireProtectionPanel() {
             scale: [1, length_m, 1] as [number, number, number],
             children: [],
             asset: {
+              id: pipeEntry.sku,
               category: pipeEntry.category,
+              name: pipeEntry.name,
+              thumbnail: '/icons/item.png',
               dimensions: pipeDimsMeters,
               src: `/halofire-catalog/glb/${pipeEntry.sku}.glb`,
               attachTo: 'ceiling',
               offset: [0, 0, 0],
               rotation: [0, 0, 0],
               scale: [1, 1, 1],
-              tags: ['halofire', pipeEntry.category, 'auto_tree', `${fromId}→${toId}`],
+              tags: [
+                'halofire',
+                pipeEntry.category,
+                'auto_tree',
+                `${fromId}→${toId}`,
+                `halofire_pipe_size:${pipeSizeIn}`,
+                `halofire_pipe_color:${pipeColorFor(pipeSizeIn)}`,
+              ],
             },
-          }, parentId)
+          } as any, parentId)
           spawned++
         } catch {
           // best-effort
@@ -427,10 +442,12 @@ export function FireProtectionPanel() {
       type ParsedSeg = { from: string; to: string; length_ft: number }
       const parsedSegs: ParsedSeg[] = []
       for (const m of mstOutput.matchAll(segRegex)) {
+        const [, from, to, , lengthFt] = m
+        if (!(from && to && lengthFt)) continue
         parsedSegs.push({
-          from: m[1],
-          to: m[2],
-          length_ft: Number(m[4]),
+          from,
+          to,
+          length_ft: Number(lengthFt),
         })
       }
       if (parsedSegs.length === 0) {

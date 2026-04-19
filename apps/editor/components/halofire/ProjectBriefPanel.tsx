@@ -77,12 +77,13 @@ interface Project {
 const PROJECTS = [
   { id: '1881-cooperative', label: 'The Cooperative 1881 — Phase I (Salt Lake City)' },
 ]
+const DEFAULT_PROJECT_ID = PROJECTS[0]?.id ?? '1881-cooperative'
 
 const FT_TO_M = 0.3048
 
 export function ProjectBriefPanel() {
   const [project, setProject] = useState<Project | null>(null)
-  const [selected, setSelected] = useState(PROJECTS[0].id)
+  const [selected, setSelected] = useState(DEFAULT_PROJECT_ID)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [seedStatus, setSeedStatus] = useState<string | null>(null)
@@ -119,7 +120,6 @@ export function ProjectBriefPanel() {
       // ── Site root ─────────────────────────────────────────────────
       const siteId = generateId('site') as `site_${string}`
       try {
-        // @ts-expect-error — runtime accepts minimal shape
         createNode({
           id: siteId,
           type: 'site',
@@ -132,7 +132,7 @@ export function ProjectBriefPanel() {
             apn: project.apn,
             ahj: project.ahj,
           },
-        })
+        } as any)
       } catch {
         // best-effort
       }
@@ -140,7 +140,6 @@ export function ProjectBriefPanel() {
       // ── Building container ────────────────────────────────────────
       const buildingId = generateId('building') as `building_${string}`
       try {
-        // @ts-expect-error — runtime accepts minimal shape
         createNode({
           id: buildingId,
           type: 'building',
@@ -152,7 +151,7 @@ export function ProjectBriefPanel() {
             code: project.code,
             total_sqft: project.building.total_sqft,
           },
-        }, siteId)
+        } as any, siteId)
       } catch {
         // best-effort
       }
@@ -162,7 +161,6 @@ export function ProjectBriefPanel() {
       for (const lvl of project.building.levels) {
         const levelId = generateId('level') as `level_${string}`
         try {
-          // @ts-expect-error — runtime accepts minimal shape
           createNode({
             id: levelId,
             type: 'level',
@@ -170,7 +168,7 @@ export function ProjectBriefPanel() {
             elevation: lvl.elevation_ft * FT_TO_M,
             children: [],
             userData: { use: lvl.use, sqft: lvl.sqft, level_id: lvl.id },
-          }, buildingId)
+          } as any, buildingId)
           spawned++
         } catch {
           // best-effort
@@ -179,7 +177,6 @@ export function ProjectBriefPanel() {
         // Floor slab approximation: square footprint centered at origin
         const slabId = generateId('slab') as `slab_${string}`
         try {
-          // @ts-expect-error — runtime accepts minimal shape
           createNode({
             id: slabId,
             type: 'slab',
@@ -194,7 +191,7 @@ export function ProjectBriefPanel() {
             z: lvl.elevation_ft * FT_TO_M,
             children: [],
             userData: { level_id: lvl.id },
-          }, levelId)
+          } as any, levelId)
           spawned++
         } catch {
           // best-effort
@@ -205,7 +202,6 @@ export function ProjectBriefPanel() {
           lvl.use === 'garage' ? 'ordinary_i' : 'light'
         const zoneId = generateId('zone') as `zone_${string}`
         try {
-          // @ts-expect-error — runtime accepts minimal shape
           createNode({
             id: zoneId,
             type: 'zone',
@@ -219,7 +215,7 @@ export function ProjectBriefPanel() {
             hazard: hazardForLevel,
             children: [],
             userData: { level_id: lvl.id, use: lvl.use },
-          }, levelId)
+          } as any, levelId)
           spawned++
         } catch {
           // best-effort
@@ -438,7 +434,17 @@ export function ProjectBriefPanel() {
 
                 const FT_TO_M = 0.3048
                 const nearestLevel = (z_m: number): LiveLevel => {
-                  let best = liveLevels[0]
+                  const fallbackLevel: LiveLevel = {
+                    id: 'level-0',
+                    name: 'Level 0',
+                    elevation_ft: 0,
+                    hazard: 'light',
+                    width_m: 1,
+                    length_m: 1,
+                    heads: [],
+                    pipes: [],
+                  }
+                  let best: LiveLevel = liveLevels[0] ?? fallbackLevel
                   let bestD = Infinity
                   for (const l of liveLevels) {
                     const d = Math.abs(l.elevation_ft * FT_TO_M - z_m)
@@ -485,7 +491,7 @@ export function ProjectBriefPanel() {
                     const sku = n.asset?.src?.split('/').pop() ?? ''
                     const m = sku.match(/SCH10_([0-9_]+)in/i)
                     let sizeIn = 2.0
-                    if (m) sizeIn = Number(m[1].replace('_', '.'))
+                    if (m?.[1]) sizeIn = Number(m[1].replace('_', '.'))
                     lvl.pipes.push({
                       from: tags.find((t) => t.includes('→'))?.split('→')[0] ?? 'A',
                       to: tags.find((t) => t.includes('→'))?.split('→')[1] ?? 'B',
@@ -510,8 +516,7 @@ export function ProjectBriefPanel() {
                       ' (' +
                       project.architect.principal +
                       ')',
-                    gc:
-                      project.gc.company + ' — ' + project.gc.contact,
+                    gc: `${project.gc.company} — ${project.gc.contact}`,
                     total_sqft: project.building.total_sqft,
                   },
                   halofire: {
