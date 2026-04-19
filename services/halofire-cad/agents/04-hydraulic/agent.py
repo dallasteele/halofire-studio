@@ -104,6 +104,58 @@ def _compute_head_flow(
     return k_factor * math.sqrt(pressure_psi)
 
 
+def _select_remote_area_heads(
+    heads: list[Head], tree: nx.DiGraph, riser_id: str, area_sqft: float,
+) -> list[Head]:
+    """Pick the most hydraulically remote + demanding window of heads.
+
+    Per NFPA 13 §28.6 the design demand applies to the remote area of
+    the system — typically 1500 sqft for light/ordinary hazards. This
+    is the heads whose hydraulic path to the supply is longest (most
+    friction loss) and that together cover approximately `area_sqft`.
+
+    Algorithm (Alpha v1):
+      1. Measure each head's tree-hop distance from the riser.
+      2. Rank by distance descending (farthest first).
+      3. Walk down the ranked list accumulating per-head coverage
+         until Σ(coverage) reaches `area_sqft`.
+      4. Clamp to at least 1 head and at most all heads.
+
+    Limitations (flagged in issues):
+      - Tree-hop distance is a proxy for friction; real selection
+        weights by segment length + size + fittings.
+      - Coverage is approximated as area_sqft / total_heads; a real
+        solver uses per-head assigned coverage from the placer.
+    """
+    if not heads:
+        return []
+    # If tree is disconnected / riser missing, fall back to all heads
+    if riser_id not in tree:
+        return list(heads)
+    try:
+        dist = nx.single_source_shortest_path_length(
+            tree.to_undirected(), riser_id,
+        )
+    except (nx.NodeNotFound, nx.NetworkXError):
+        return list(heads)
+    ranked = sorted(
+        heads, key=lambda h: dist.get(h.id, 0), reverse=True,
+    )
+    # Each head covers area_sqft / total_heads — rough proxy; the
+    # real number is each head's placed coverage. This is fine for
+    # alpha because the density × coverage multiplication is what
+    # matters, not the per-head split.
+    per_head_coverage = area_sqft / max(1, len(heads))
+    selected: list[Head] = []
+    accumulated = 0.0
+    for h in ranked:
+        selected.append(h)
+        accumulated += per_head_coverage
+        if accumulated >= area_sqft:
+            break
+    return selected
+
+
 def _fitting_equiv_length_ft(fittings: list, size_in: float) -> float:
     """Sum equivalent length for a list of Fitting objects at `size_in`."""
     total = 0.0
@@ -148,12 +200,36 @@ def calc_system(
 
     tree = _build_tree_from_segments(system.pipes, system.riser.id)
 
-    # Per-head design flow from density (minimum); take max of K√P vs density
+    # Remote-area selection per NFPA 13 §28.6: the design demand
+    # applies only to the most HYDRAULICALLY REMOTE + DEMANDING
+    # window of heads covering `area_sqft`. Heads outside the window
+    # operate at a fraction of the design flow (effectively zero for
+    # calc purposes — §28.6.2.2).
+    #
+    # Heuristic: the hydraulically remote area is approximated by the
+    # heads farthest (by tree-graph distance) from the riser. More
+    # rigorous selection (density × actual coverage geometry) is
+    # Phase C refinement.
+    remote_heads = _select_remote_area_heads(
+        heads, tree, system.riser.id, area_sqft,
+    )
+    # Effective head coverage inside the design window
+    effective_coverage = area_sqft / max(1, len(remote_heads))
+
+    # Per-head design flow. Heads inside the remote area get
+    # max(density * coverage, K√P); outside heads contribute
+    # placeholder flow of 0 (they still exist but don't flow
+    # during the calc — a real commercial system isolates the
+    # remote area via zoning).
     head_flow: dict[str, float] = {}
+    remote_head_ids = {h.id for h in remote_heads}
     for h in heads:
-        q_density = density * (area_sqft / max(1, len(heads)))  # rough split
-        q_ksqrt = _compute_head_flow(h.k_factor, min_head_pressure_psi)
-        head_flow[h.id] = max(q_density, q_ksqrt)
+        if h.id in remote_head_ids:
+            q_density = density * effective_coverage
+            q_ksqrt = _compute_head_flow(h.k_factor, min_head_pressure_psi)
+            head_flow[h.id] = max(q_density, q_ksqrt)
+        else:
+            head_flow[h.id] = 0.0
 
     pipe_flow: dict[str, float] = {}
     head_paths: dict[str, list[str]] = {}

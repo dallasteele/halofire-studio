@@ -232,39 +232,109 @@ def _raster_pdf_page(pdf_path: str, page_index: int) -> dict[str, Any]:
         "walls": [],
         "rooms": [],
         "source_layer": "raster_opencv",
+        "confidence": 0.0,
     }
+    # Lazy-import heavyweight deps so the L1 vector path works even
+    # when opencv or the PDF rasterizers are not installed (e.g. in
+    # reduced CI environments).
     try:
         import cv2  # type: ignore
         import numpy as np  # type: ignore
-        import pypdfium2 as pdfium  # type: ignore
+    except ImportError as e:
+        warn_swallowed(log, code="INTAKE_RASTER_CV2_MISSING", err=e)
+        result["warnings"].append(f"opencv not available: {e}")
+        return result
 
-        pdf = pdfium.PdfDocument(pdf_path)
-        if page_index >= len(pdf):
+    # Pick the first available PDF rasterizer. pymupdf (fitz) is
+    # faster and preferred; pypdfium2 is the fallback (Codex's
+    # original choice) because its licensing is the most permissive.
+    bitmap_arr = None
+    rasterizer = None
+    try:
+        import fitz  # type: ignore  # pymupdf
+        doc = fitz.open(pdf_path)
+        if page_index >= doc.page_count:
+            doc.close()
             result["warnings"].append(f"page {page_index} out of range")
             return result
-        page = pdf[page_index]
-        bitmap = page.render(scale=3).to_pil()
-        gray = cv2.cvtColor(np.array(bitmap), cv2.COLOR_RGB2GRAY)
-        edges = cv2.Canny(gray, 50, 150, apertureSize=3)
-        lines = cv2.HoughLinesP(
-            edges, 1, np.pi / 180, threshold=140,
-            minLineLength=max(50, min(gray.shape[:2]) // 12),
-            maxLineGap=10,
+        page = doc.load_page(page_index)
+        pix = page.get_pixmap(matrix=fitz.Matrix(3, 3), alpha=False)
+        bitmap_arr = np.frombuffer(pix.samples, dtype=np.uint8).reshape(
+            pix.height, pix.width, 3,
         )
-        if lines is None:
-            result["warnings"].append("raster fallback found no linework")
+        doc.close()
+        rasterizer = "pymupdf"
+    except ImportError:
+        pass
+    except (RuntimeError, ValueError) as e:
+        warn_swallowed(log, code="INTAKE_PYMUPDF_FAILED", err=e,
+                       pdf_path=pdf_path, page_index=page_index)
+
+    if bitmap_arr is None:
+        try:
+            import pypdfium2 as pdfium  # type: ignore
+            pdf = pdfium.PdfDocument(pdf_path)
+            if page_index >= len(pdf):
+                result["warnings"].append(f"page {page_index} out of range")
+                return result
+            page = pdf[page_index]
+            bitmap = page.render(scale=3).to_pil()
+            bitmap_arr = np.array(bitmap)
+            rasterizer = "pypdfium2"
+        except ImportError as e:
+            warn_swallowed(log, code="INTAKE_RASTERIZER_MISSING", err=e)
+            result["warnings"].append(
+                "no PDF rasterizer installed (need pymupdf or pypdfium2)"
+            )
             return result
-        scale_to_pt = 1 / 3
-        walls: list[dict[str, float]] = []
-        for ln in lines[:600]:
+        except (RuntimeError, ValueError, OSError) as e:
+            warn_swallowed(log, code="INTAKE_PYPDFIUM2_FAILED", err=e,
+                           pdf_path=pdf_path, page_index=page_index)
+            result["warnings"].append(f"raster fallback unavailable: {e}")
+            return result
+
+    result["rasterizer"] = rasterizer
+    gray = cv2.cvtColor(bitmap_arr, cv2.COLOR_RGB2GRAY)
+    walls: list[dict[str, float]] = []
+    scale_to_pt = 1 / 3
+
+    # Primary: Hough with Canny edges
+    edges = cv2.Canny(gray, 50, 150, apertureSize=3)
+    hough_lines = cv2.HoughLinesP(
+        edges, 1, np.pi / 180, threshold=140,
+        minLineLength=max(50, min(gray.shape[:2]) // 12),
+        maxLineGap=10,
+    )
+    if hough_lines is not None:
+        for ln in hough_lines[:600]:
             x0, y0, x1, y1 = [float(v) * scale_to_pt for v in ln[0]]
             if _is_orthogonal(x0, y0, x1, y1):
                 walls.append({"x0": x0, "y0": y0, "x1": x1, "y1": y1})
-        result["walls"] = walls
-        result["wall_count"] = len(walls)
-        result["warnings"].append("raster fallback requires manual scale/room review")
-    except Exception as e:
-        result["warnings"].append(f"raster fallback unavailable: {e}")
+
+    # Secondary: LSD (Line Segment Detector) — better for thin
+    # architectural linework that Canny misses. Available in opencv-
+    # contrib; on plain opencv-python-headless, we try/fall back.
+    try:
+        lsd = cv2.createLineSegmentDetector()  # type: ignore[attr-defined]
+        lsd_lines, _width, _prec, _nfa = lsd.detect(gray)
+        if lsd_lines is not None:
+            for ln in lsd_lines[:600]:
+                x0, y0, x1, y1 = [float(v) * scale_to_pt for v in ln[0]]
+                if _is_orthogonal(x0, y0, x1, y1):
+                    walls.append({"x0": x0, "y0": y0, "x1": x1, "y1": y1})
+    except (AttributeError, cv2.error) as e:
+        warn_swallowed(log, code="INTAKE_LSD_UNAVAILABLE", err=e)
+
+    result["walls"] = walls[:1000]  # hard cap for payload size
+    result["wall_count"] = len(walls)
+    # Confidence: raster can never be as reliable as L1 vector. Cap at 0.65.
+    if walls:
+        result["confidence"] = min(0.65, 0.3 + 0.01 * len(walls))
+        result["warnings"].append(
+            "raster fallback requires manual scale/room review per AGENTIC_RULES §13",
+        )
+    else:
+        result["warnings"].append("raster fallback found no linework")
     return result
 
 

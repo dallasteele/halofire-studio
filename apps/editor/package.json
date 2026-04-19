@@ -8,7 +8,8 @@
     "build": "dotenv -e ./.env.local --override -- next build",
     "start": "next start",
     "lint": "biome lint",
-    "check-types": "next typegen && tsc --noEmit --noCheck"
+    "check-types": "next typegen && tsc --noEmit --noCheck",
+    "check-types:halofire": "next typegen && tsc --noEmit --project tsconfig.halofire.json"
   },
   "dependencies": {
     "@number-flow/react": "^0.5.14",

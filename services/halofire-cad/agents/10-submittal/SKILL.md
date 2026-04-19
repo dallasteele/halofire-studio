@@ -22,9 +22,11 @@ open in their native tools.
 - **GLB via `trimesh`** — pipe cylinders + head spheres in glTF 2.0;
   colored per pipe-size convention; used by the web bid viewer and
   Wade's iPad preview
-- **IFC 4 via `ifcopenshell`** — entity shells (IfcSprinkler +
-  IfcPipeSegment) for clash detection in Revit / Navisworks; full
-  placement geometry is Phase D work
+- **IFC 4 via `ifcopenshell`** — entity shells
+  (`IfcFireSuppressionTerminal` with PredefinedType `SPRINKLER` +
+  `IfcPipeSegment`) for clash detection in Revit / Navisworks.
+  `IfcSprinkler` is not in IFC4/IFC4X3 schemas; full placement
+  geometry (swept solids) is Phase D work.
 
 ## Honesty
 

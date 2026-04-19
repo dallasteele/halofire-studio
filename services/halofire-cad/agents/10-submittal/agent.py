@@ -188,6 +188,10 @@ def export_ifc(design: Design, out_path: Path) -> str:
         log.warning("ifcopenshell not available: %s", e)
         return ""
 
+    # IFC4 is the stable, widely-supported schema version. Sprinkler
+    # heads are represented as IfcFireSuppressionTerminal (not
+    # IfcSprinkler — that's reserved for future schemas) with
+    # PredefinedType SPRINKLER per IFC4 BSDD.
     ifc = ifcopenshell.api.run("project.create_file", version="IFC4")
     project = ifcopenshell.api.run(
         "root.create_entity", ifc,
@@ -236,20 +240,24 @@ def export_ifc(design: Design, out_path: Path) -> str:
     for system in design.systems:
         for h in system.heads:
             try:
+                # IfcFireSuppressionTerminal with SPRINKLER predefined
+                # type is the canonical IFC4 sprinkler-head entity.
                 ifcopenshell.api.run(
                     "root.create_entity", ifc,
-                    ifc_class="IfcSprinkler", name=h.id,
+                    ifc_class="IfcFireSuppressionTerminal", name=h.id,
+                    predefined_type="SPRINKLER",
                 )
-            except (TypeError, ValueError, AttributeError) as e:
+            except (TypeError, ValueError, AttributeError, RuntimeError) as e:
                 warn_swallowed(log, code="IFC_SPRINKLER_CREATE_FAILED",
                                err=e, head_id=h.id)
         for s in system.pipes:
             try:
+                # IfcPipeSegment is IFC4+; works under IFC4X3.
                 ifcopenshell.api.run(
                     "root.create_entity", ifc,
                     ifc_class="IfcPipeSegment", name=s.id,
                 )
-            except (TypeError, ValueError, AttributeError) as e:
+            except (TypeError, ValueError, AttributeError, RuntimeError) as e:
                 warn_swallowed(log, code="IFC_PIPE_CREATE_FAILED",
                                err=e, pipe_id=s.id)
 

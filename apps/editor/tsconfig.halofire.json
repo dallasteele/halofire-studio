@@ -1,0 +1,23 @@
+{
+  "// Purpose": "Strict type-check gate for HaloFire-specific code per AGENTIC_RULES.md §8 gate 2 + Phase A of 2026-04-19-internal-alpha-remediation.md.",
+  "// Pascal inherited debt": "The main tsconfig.json still uses --noCheck on packages/core + packages/editor + packages/viewer (inherited Pascal). Fixing that is separate tracked work. This config exercises ONLY code HaloFire owns.",
+  "extends": "@pascal/typescript-config/nextjs.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "plugins": [{ "name": "next" }],
+    "paths": {
+      "@/*": ["./*"]
+    },
+    "strict": true,
+    "noImplicitAny": true,
+    "noFallthroughCasesInSwitch": true
+  },
+  "include": [
+    "app/bid/**/*.ts",
+    "app/bid/**/*.tsx",
+    "components/halofire/**/*.ts",
+    "components/halofire/**/*.tsx",
+    "next-env.d.ts"
+  ],
+  "exclude": ["node_modules", ".next"]
+}
