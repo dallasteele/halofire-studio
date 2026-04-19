@@ -994,8 +994,42 @@ bid."* Source docs at `E:\ClaudeBot\HaloFireBidDocs\`.
      written correctly (FP-0 cover + FP-1 level plan + FP-H placard).
 - 📝 Restarted gateway once to pick up the new tool code (uvicorn
      `--reload` wasn't on; next run should use `--reload`).
-- 📝 Next: (a) emit the 3D model for the client's web bid viewer —
-     simplest first pass is a JSON scene the existing Pascal viewer
-     can ingest; proper .glb export needs trimesh or pygltflib in the
-     gateway venv. (b) wire the FP sheet-set button to a direct-link
-     download response so the PDF streams to the user.
+---
+
+### Entry 27 — Client-facing 3D web bid viewer at /bid/[project]
+
+Second half of the acid test: *"a 3d model that is then implemented in
+the client's custom web design bid."*
+
+- ✅ New Next.js route `app/bid/[project]/page.tsx` — standalone,
+     client-facing bid viewer. No Pascal editor chrome. Loads
+     `/projects/<id>.json` on mount and renders:
+        - **Halo Fire branded header** — project name/address/AHJ,
+          proposal price in accent red-orange, contact + date
+        - **Left sidebar** — architect/GC facts, per-level visibility
+          toggles (checkbox per storey), fire-systems summary, deep
+          links to proposal.pdf + fire-rfis.pdf
+        - **3D canvas** (@react-three/fiber + drei) — orbit controls,
+          ground grid, per-level floor slabs (dark for garage, slate
+          for residential), red sprinkler-head spheres, red steel
+          pipe cylinders sized by diameter (radius from `sizeIn`), all
+          filtered by the level-visibility set
+        - **Footer** — "deferred-submittal preview — NOT FOR
+          CONSTRUCTION" AHJ disclaimer
+- ✅ Demo geometry auto-generated per residential level (6×6 grid of
+     heads connected by pipes) so the viewer is useful even before the
+     editor publishes a scene snapshot. M2 wires the editor's "Publish
+     to bid" button that POSTs the live scene to /api/publish/<id>
+     and the viewer then reads the real nodes.
+- ✅ Camera defaults to an iso angle looking at the middle storey;
+     users can rotate/zoom freely. Route returns HTTP 200 with Three
+     chunks loaded; tested at /bid/1881-cooperative.
+- 📝 This closes the acid-test loop: load the real bid docs → seed the
+     scene → place/route/calc → export the AHJ sheet set PDF → publish
+     the 3D viewer to `/bid/<projectId>`. GC receives a URL they can
+     embed in their bid package, click through to orbit the proposed
+     sprinkler system, and download the plan set.
+- 📝 Next: wire a "Publish to bid viewer" button in the editor that
+     snapshots the live scene to sessionStorage or /api/bid-snapshot
+     so the viewer renders the exact heads/pipes the estimator laid
+     out, not the synthetic demo grid.
