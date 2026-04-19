@@ -804,3 +804,25 @@ Running state at session end:
      That's the full bid workflow from "blank room" to "NFPA-compliant
      head layout" in two clicks.
 
+
+### Entry 21 — Live-scene pipe routing + real PDF export from scene
+
+- ✅ `FireProtectionPanel.runAutoRoute`: now pulls live sprinkler heads
+     from the Pascal scene (via `useScene.getState().nodes`, filtering
+     `type==='item' && asset.category.startsWith('sprinkler_head_')`)
+     and sends them as the `heads[]` input to `halofire_route_pipe`.
+     Falls back to a 3x2 demo grid only when scene is empty. Prefix
+     "Using N live heads from Pascal scene." makes it obvious which
+     data source is active.
+- ✅ `FireProtectionPanel.runExport` (new Section 6): builds an equipment
+     schedule from every sprinkler_head ItemNode in the live scene,
+     calls `halofire_export pdf_plan` with the schedule, renders the
+     gateway response showing bytes written + asset count. Helpful
+     guard: if no heads exist in the scene, returns clear instruction
+     "Place some via the Catalog tab or the Place Heads section first".
+- ✅ Studio still HTTP 200; Turbopack hot-compiled in 62ms.
+- 📝 The export flow is the first end-to-end user journey that uses
+     data Wade would actually generate: draw room → place heads → click
+     Export → gateway renders a plan PNG on disk. Full AHJ-grade
+     multi-sheet output (FP-0..FP-5 with title blocks + dimensions +
+     schedules) is M3 work; this M1-scope export proves the pipeline.

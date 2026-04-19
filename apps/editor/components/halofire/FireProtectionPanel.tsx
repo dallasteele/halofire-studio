@@ -193,16 +193,29 @@ export function FireProtectionPanel() {
   const runAutoRoute = useCallback(async () => {
     setRouter({ running: true })
     try {
-      // Demo: a 3x2 grid of heads around a riser
-      const heads = []
-      for (let r = 0; r < 2; r++) {
-        for (let c = 0; c < 3; c++) {
-          heads.push({
-            id: `H${r}${c}`,
-            x_cm: 228 + c * 272,
-            y_cm: 228 + r * 343,
-            z_cm: 380,
-          })
+      // Pull live heads from the scene — any ItemNode tagged 'halofire'
+      // + category starting 'sprinkler_head_' counts as a head for routing.
+      // Fall back to a demo 3x2 grid when nothing has been placed yet.
+      let heads: { id: string; x_cm: number; y_cm: number; z_cm: number }[] = []
+      const nodes = useScene.getState().nodes as Record<string, unknown>
+      for (const [id, raw] of Object.entries(nodes)) {
+        const n = raw as { type?: string; position?: [number, number, number]; asset?: { category?: string } }
+        if (n.type !== 'item') continue
+        if (!n.asset?.category?.startsWith('sprinkler_head_')) continue
+        const [x, y, z] = n.position ?? [0, 0, 0]
+        heads.push({ id, x_cm: x * 100, y_cm: y * 100, z_cm: z * 100 })
+      }
+      const usingLive = heads.length > 0
+      if (!usingLive) {
+        for (let r = 0; r < 2; r++) {
+          for (let c = 0; c < 3; c++) {
+            heads.push({
+              id: `H${r}${c}`,
+              x_cm: 228 + c * 272,
+              y_cm: 228 + r * 343,
+              z_cm: 380,
+            })
+          }
         }
       }
       const output = await callTool('halofire_route_pipe', {
@@ -212,7 +225,10 @@ export function FireProtectionPanel() {
         heads,
         pipe_schedule: 'sch10',
       })
-      setRouter({ running: false, output })
+      const prefix = usingLive
+        ? `Using ${heads.length} live heads from Pascal scene.\n\n`
+        : `No live heads; using 3x2 demo grid.\n\n`
+      setRouter({ running: false, output: prefix + output })
     } catch (e) {
       setRouter({ running: false, error: String(e) })
     }
@@ -235,6 +251,63 @@ export function FireProtectionPanel() {
       setCalc({ running: false, error: String(e) })
     }
   }, [])
+
+  const [exportResult, setExportResult] = useState<ToolResult>({ running: false })
+
+  const runExport = useCallback(async () => {
+    setExportResult({ running: true })
+    try {
+      // Build a minimal schedule from the live Pascal scene's sprinkler
+      // heads. The drafting renderer accepts the same YAML schema the
+      // ClaudeBot skill's draft_plan_png.py uses.
+      const nodes = useScene.getState().nodes as Record<string, unknown>
+      const equipment: unknown[] = []
+      let i = 0
+      for (const [id, raw] of Object.entries(nodes)) {
+        const n = raw as { type?: string; position?: [number, number, number]; asset?: { category?: string; dimensions?: [number, number, number] } }
+        if (n.type !== 'item') continue
+        if (!n.asset?.category?.startsWith('sprinkler_head_')) continue
+        const [x, y, z] = n.position ?? [0, 0, 0]
+        const [dw, dh, dd] = n.asset.dimensions ?? [0.05, 0.05, 0.05]
+        equipment.push({
+          tag: `S-${++i}`,
+          name: 'Sprinkler head',
+          model: n.asset.category,
+          dims_cm: [dw * 100, dd * 100, dh * 100],
+          mounting: 'ceiling',
+          plan_xy_cm: [x * 100, y * 100],
+          yaw: 0,
+        })
+        void id
+      }
+      if (equipment.length === 0) {
+        setExportResult({
+          running: false,
+          error:
+            'No sprinkler heads in scene. Place some via the Catalog tab or the Place Heads section first, then export.',
+        })
+        return
+      }
+      const schedule = {
+        project: 'halofire_studio_session',
+        config: 'linear',
+        seats_target: 0,
+        room: { width_cm: roomW, length_cm: roomL, wall_height_cm: 400 },
+        zones: [
+          { id: 'dining', bbox_cm: [[0, 0], [roomW, roomL]] },
+        ],
+        equipment,
+      }
+      const output = await callTool('halofire_export', {
+        mode: 'pdf_plan',
+        scene_id: 'studio',
+        schedule,
+      })
+      setExportResult({ running: false, output })
+    } catch (e) {
+      setExportResult({ running: false, error: String(e) })
+    }
+  }, [roomW, roomL])
 
   return (
     <div className="flex h-full flex-col gap-3 overflow-y-auto p-3 text-sm">
@@ -320,12 +393,15 @@ export function FireProtectionPanel() {
         </p>
       </Section>
 
-      <Section title="6. Export" description="Single-sheet M1 week 5; full AHJ set M3">
-        <p className="text-[11px] text-neutral-500">
-          PDF plan export is wired via the gateway's `halofire_export pdf_plan`
-          tool (vendored matplotlib renderer). Hookup to a "Export" button
-          needs a serialized schedule from the live scene, due M1 week 6.
-          AHJ-grade sheet set (FP-0..FP-5): M3 weeks 21-22.
+      <Section title="6. Export PDF plan" description="Renders live scene heads as a 2D plan">
+        <Btn onClick={runExport} busy={exportResult.running}>
+          Export PDF plan from scene
+        </Btn>
+        <ResultBlock result={exportResult} />
+        <p className="mt-1 text-[10px] text-neutral-500">
+          Uses the live scene's sprinkler heads as the equipment schedule.
+          Full AHJ sheet set (FP-0..FP-5 + title blocks + dimensions +
+          schedules + hydraulic placard) ships M3 weeks 21-22.
         </p>
       </Section>
     </div>
