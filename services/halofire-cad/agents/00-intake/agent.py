@@ -214,6 +214,188 @@ def intake_pdf_page(pdf_path: str, page_index: int) -> dict[str, Any]:
     return result
 
 
+def _raster_pdf_page(pdf_path: str, page_index: int) -> dict[str, Any]:
+    """Layer 2 raster fallback: render a page and detect straight wall lines.
+
+    This intentionally returns conservative line geometry only. It is enough
+    for alpha confidence/warning behavior and simple plan sheets; ambiguous
+    raster rooms stay flagged for manual review instead of being invented.
+    """
+    result: dict[str, Any] = {
+        "pdf_path": pdf_path,
+        "page_index": page_index,
+        "wall_count": 0,
+        "room_count": 0,
+        "scale_ft_per_pt": 24 / 72,
+        "warnings": [],
+        "walls": [],
+        "rooms": [],
+        "source_layer": "raster_opencv",
+    }
+    try:
+        import cv2  # type: ignore
+        import numpy as np  # type: ignore
+        import pypdfium2 as pdfium  # type: ignore
+
+        pdf = pdfium.PdfDocument(pdf_path)
+        if page_index >= len(pdf):
+            result["warnings"].append(f"page {page_index} out of range")
+            return result
+        page = pdf[page_index]
+        bitmap = page.render(scale=3).to_pil()
+        gray = cv2.cvtColor(np.array(bitmap), cv2.COLOR_RGB2GRAY)
+        edges = cv2.Canny(gray, 50, 150, apertureSize=3)
+        lines = cv2.HoughLinesP(
+            edges, 1, np.pi / 180, threshold=140,
+            minLineLength=max(50, min(gray.shape[:2]) // 12),
+            maxLineGap=10,
+        )
+        if lines is None:
+            result["warnings"].append("raster fallback found no linework")
+            return result
+        scale_to_pt = 1 / 3
+        walls: list[dict[str, float]] = []
+        for ln in lines[:600]:
+            x0, y0, x1, y1 = [float(v) * scale_to_pt for v in ln[0]]
+            if _is_orthogonal(x0, y0, x1, y1):
+                walls.append({"x0": x0, "y0": y0, "x1": x1, "y1": y1})
+        result["walls"] = walls
+        result["wall_count"] = len(walls)
+        result["warnings"].append("raster fallback requires manual scale/room review")
+    except Exception as e:
+        result["warnings"].append(f"raster fallback unavailable: {e}")
+    return result
+
+
+def _intake_dxf_file(path: str, project_id: str) -> Building:
+    """Layer 4 CAD fallback for DXF: read modelspace linework as walls."""
+    bldg = Building(project_id=project_id, levels=[], metadata={
+        "sources": [{
+            "id": Path(path).name,
+            "kind": "dxf",
+            "path": path,
+            "confidence": 0.62,
+            "warnings": ["DXF linework imported without semantic room labels"],
+        }],
+        "issues": [{
+            "code": "LOW_INGEST_CONFIDENCE",
+            "severity": "warning",
+            "message": "DXF import needs manual room/hazard review before AHJ use.",
+            "refs": [],
+            "source": Path(path).name,
+        }],
+    })
+    try:
+        import ezdxf  # type: ignore
+        doc = ezdxf.readfile(path)
+        msp = doc.modelspace()
+        level = Level(
+            id="level_dxf_1", name="DXF modelspace", elevation_m=0,
+            height_m=3.0, use="other", ceiling=Ceiling(),
+        )
+        for entity in msp:
+            kind = entity.dxftype()
+            if kind == "LINE":
+                start = entity.dxf.start
+                end = entity.dxf.end
+                level.walls.append(Wall(
+                    id=f"w_dxf_{len(level.walls)}",
+                    start_m=(float(start.x), float(start.y)),
+                    end_m=(float(end.x), float(end.y)),
+                ))
+            elif kind in {"LWPOLYLINE", "POLYLINE"}:
+                pts = [(float(p[0]), float(p[1])) for p in entity.get_points()]  # type: ignore[attr-defined]
+                for a, b in zip(pts[:-1], pts[1:]):
+                    level.walls.append(Wall(
+                        id=f"w_dxf_{len(level.walls)}",
+                        start_m=a, end_m=b,
+                    ))
+        if level.walls:
+            xs = [x for w in level.walls for x in (w.start_m[0], w.end_m[0])]
+            ys = [y for w in level.walls for y in (w.start_m[1], w.end_m[1])]
+            level.polygon_m = [
+                (min(xs), min(ys)), (max(xs), min(ys)),
+                (max(xs), max(ys)), (min(xs), max(ys)), (min(xs), min(ys)),
+            ]
+        bldg.levels.append(level)
+    except Exception as e:
+        bldg.metadata["issues"].append({
+            "code": "DXF_IMPORT_FAILED",
+            "severity": "blocking",
+            "message": f"DXF import failed: {e}",
+            "refs": [],
+            "source": Path(path).name,
+        })
+    return bldg
+
+
+def _intake_ifc_file(path: str, project_id: str) -> Building:
+    """IFC hierarchy import. Geometry-rich conversion is beta scope."""
+    bldg = Building(project_id=project_id, levels=[], metadata={
+        "sources": [{
+            "id": Path(path).name,
+            "kind": "ifc",
+            "path": path,
+            "confidence": 0.68,
+            "warnings": ["IFC hierarchy imported; detailed geometry remains alpha-limited"],
+        }],
+        "issues": [],
+    })
+    try:
+        import ifcopenshell  # type: ignore
+        ifc = ifcopenshell.open(path)
+        storeys = ifc.by_type("IfcBuildingStorey") or []
+        spaces = ifc.by_type("IfcSpace") or []
+        if not storeys:
+            bldg.levels.append(Level(id="level_ifc_1", name="IFC model", elevation_m=0))
+        for i, storey in enumerate(storeys):
+            elev = float(getattr(storey, "Elevation", None) or i * 3.0)
+            level = Level(
+                id=f"level_ifc_{i + 1}",
+                name=str(getattr(storey, "Name", None) or f"IFC Storey {i + 1}"),
+                elevation_m=elev,
+                use="other",
+            )
+            for space in spaces:
+                level.rooms.append(Room(
+                    id=f"space_{getattr(space, 'GlobalId', len(level.rooms))}",
+                    name=str(getattr(space, "Name", None) or f"Space {len(level.rooms) + 1}"),
+                    polygon_m=[],
+                    area_sqm=0.0,
+                    use_class="ifc_space",
+                ))
+            bldg.levels.append(level)
+    except Exception as e:
+        bldg.metadata["issues"].append({
+            "code": "IFC_IMPORT_LIMITED",
+            "severity": "warning",
+            "message": f"IFC semantic import unavailable or limited: {e}",
+            "refs": [],
+            "source": Path(path).name,
+        })
+        bldg.levels.append(Level(id="level_ifc_1", name="IFC placeholder", elevation_m=0))
+    return bldg
+
+
+def _unsupported_dwg(path: str, project_id: str) -> Building:
+    return Building(project_id=project_id, levels=[], metadata={
+        "sources": [{
+            "id": Path(path).name,
+            "kind": "dwg",
+            "path": path,
+            "confidence": 0.0,
+            "warnings": ["DWG requires conversion to DXF or IFC for this alpha build"],
+        }],
+        "issues": [{
+            "code": "UNSUPPORTED_DWG",
+            "severity": "blocking",
+            "message": "Native DWG import is not configured. Export/convert to DXF or IFC and upload again.",
+            "refs": [],
+            "source": Path(path).name,
+        }],
+    })
+
+
 def intake_file(pdf_path: str, project_id: str) -> Building:
     """Scan every page, produce a Building with one Level per detected
     floor-plan page.
@@ -223,7 +405,25 @@ def intake_file(pdf_path: str, project_id: str) -> Building:
     names ("LEVEL 1", "SECOND FLOOR", "ROOF PLAN"). All pages that
     don't match a level are skipped.
     """
+    ext = Path(pdf_path).suffix.lower()
+    if ext == ".dxf":
+        return _intake_dxf_file(pdf_path, project_id)
+    if ext == ".ifc":
+        return _intake_ifc_file(pdf_path, project_id)
+    if ext == ".dwg":
+        return _unsupported_dwg(pdf_path, project_id)
+
     levels: list[Level] = []
+    metadata: dict[str, Any] = {
+        "sources": [{
+            "id": Path(pdf_path).name,
+            "kind": "pdf",
+            "path": pdf_path,
+            "confidence": 0.0,
+            "warnings": [],
+        }],
+        "issues": [],
+    }
     if not Path(pdf_path).exists():
         return Building(project_id=project_id, levels=[])
     try:
@@ -236,7 +436,19 @@ def intake_file(pdf_path: str, project_id: str) -> Building:
     for i in range(min(n_pages, 60)):  # cap walk length for dev
         page_out = intake_pdf_page(pdf_path, i)
         if page_out.get("wall_count", 0) < 20:
-            continue
+            raster_out = _raster_pdf_page(pdf_path, i)
+            if raster_out.get("wall_count", 0) < 20:
+                metadata["sources"][0]["warnings"].extend(page_out.get("warnings", []))
+                metadata["sources"][0]["warnings"].extend(raster_out.get("warnings", []))
+                continue
+            page_out = raster_out
+            metadata["sources"].append({
+                "id": f"{Path(pdf_path).name}:page:{i + 1}:raster",
+                "kind": "raster_pdf",
+                "path": pdf_path,
+                "confidence": 0.45,
+                "warnings": raster_out.get("warnings", []),
+            })
         scale = page_out.get("scale_ft_per_pt") or (24 / 72)
         m_per_pt = scale * 0.3048  # ft → m
         level = Level(
@@ -269,7 +481,26 @@ def intake_file(pdf_path: str, project_id: str) -> Building:
             ))
         levels.append(level)
 
-    return Building(project_id=project_id, levels=levels)
+    if levels:
+        confidence = 0.82 if any(l.rooms for l in levels) else 0.52
+        metadata["sources"][0]["confidence"] = confidence
+        if confidence < 0.8:
+            metadata["issues"].append({
+                "code": "LOW_INGEST_CONFIDENCE",
+                "severity": "warning",
+                "message": "Ingest found linework but room semantics need manual review.",
+                "refs": [l.id for l in levels],
+                "source": Path(pdf_path).name,
+            })
+    else:
+        metadata["issues"].append({
+            "code": "LOW_INGEST_CONFIDENCE",
+            "severity": "blocking",
+            "message": "No usable floor-plan geometry found in PDF.",
+            "refs": [],
+            "source": Path(pdf_path).name,
+        })
+    return Building(project_id=project_id, levels=levels, metadata=metadata)
 
 
 if __name__ == "__main__":

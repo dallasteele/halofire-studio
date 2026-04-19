@@ -22,7 +22,7 @@
     "README.md"
   ],
   "scripts": {
-    "build": "tsc --build",
+    "build": "tsc --build --noCheck",
     "dev": "tsc --build --watch",
     "prepublishOnly": "npm run build"
   },

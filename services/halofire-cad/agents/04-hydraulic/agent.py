@@ -155,30 +155,42 @@ def calc_system(
         q_ksqrt = _compute_head_flow(h.k_factor, min_head_pressure_psi)
         head_flow[h.id] = max(q_density, q_ksqrt)
 
+    pipe_flow: dict[str, float] = {}
+    head_paths: dict[str, list[str]] = {}
+    segment_trace: list[dict] = []
+    segment_losses: dict[str, float] = {}
+    critical_path: list[str] = []
+    issues: list[str] = [
+        "LOOP_GRID_UNSUPPORTED: Internal Alpha hydraulic solver supports tree systems only.",
+    ]
+    demand_psi = 0.0
+    iterations = 0
+    converged = False
+
     # Walk from each head upstream to riser; accumulate flow + loss
     pressures: dict[str, float] = {h.id: min_head_pressure_psi for h in heads}
     # Topological order from heads → riser
     if system.riser.id not in tree:
-        converged = False
-        demand_psi = 0.0
+        issues.append("HYDRAULIC_TREE_DISCONNECTED: Riser is not connected to the pipe graph.")
     else:
         # BFS from riser in reverse direction visits heads first
         converged = True
-        iterations = 0
         max_iter = 8
-        # Pipe flow accumulator (per pipe segment)
-        pipe_flow: dict[str, float] = {}
         # Initialize
         while iterations < max_iter:
             pipe_flow.clear()
+            head_paths.clear()
             # For each head, trace path to riser summing flows
             for h in heads:
                 if h.id not in tree:
+                    issues.append(f"HYDRAULIC_HEAD_UNCONNECTED: Head {h.id} is not in the tree.")
                     continue
                 try:
                     path = nx.shortest_path(tree, h.id, system.riser.id)
                 except nx.NetworkXNoPath:
+                    issues.append(f"HYDRAULIC_HEAD_UNCONNECTED: Head {h.id} has no path to the riser.")
                     continue
+                head_paths[h.id] = path
                 q = head_flow[h.id]
                 for a, b in zip(path[:-1], path[1:]):
                     if tree.has_edge(a, b):
@@ -188,7 +200,8 @@ def calc_system(
             # Friction + elevation loss per segment (from remote head upstream)
             # Re-solve head pressures from remote back
             # For v2 simplicity we just compute demand @ riser = P_remote + Σ losses
-            total_loss = 0.0
+            segment_trace = []
+            segment_losses = {}
             for seg_id, q in pipe_flow.items():
                 seg = next((s for s in system.pipes if s.id == seg_id), None)
                 if not seg:
@@ -205,9 +218,34 @@ def calc_system(
                 dp = hazen_williams_psi(q, seg.size_in, length_ft, c)
                 # Elevation
                 dp += 0.433 * (seg.elevation_change_m * 3.281)
-                total_loss += dp
+                segment_losses[seg_id] = dp
+                segment_trace.append({
+                    "segment_id": seg.id,
+                    "from_node": seg.from_node,
+                    "to_node": seg.to_node,
+                    "flow_gpm": round(q, 2),
+                    "size_in": seg.size_in,
+                    "length_ft": round(length_ft, 2),
+                    "friction_loss_psi": round(dp, 3),
+                    "downstream_heads": seg.downstream_heads,
+                })
 
-            demand_psi = min_head_pressure_psi + total_loss
+            remote_head_id = ""
+            remote_loss = -1.0
+            for h_id, path in head_paths.items():
+                path_loss = 0.0
+                path_segment_ids: list[str] = []
+                for a, b in zip(path[:-1], path[1:]):
+                    if tree.has_edge(a, b):
+                        seg = tree[a][b]["seg"]
+                        path_segment_ids.append(seg.id)
+                        path_loss += segment_losses.get(seg.id, 0.0)
+                if path_loss > remote_loss:
+                    remote_loss = path_loss
+                    remote_head_id = h_id
+                    critical_path = [remote_head_id] + path_segment_ids + [system.riser.id]
+
+            demand_psi = min_head_pressure_psi + max(0.0, remote_loss)
             iterations += 1
             # Check: if demand is within 1% of last iteration, converge
             if iterations >= 2:
@@ -226,6 +264,23 @@ def calc_system(
     else:
         p_supply = supply.residual_psi
     safety_margin = p_supply - demand_psi
+    supply_curve = []
+    demand_curve = []
+    for frac in (0.0, 0.25, 0.5, 0.75, 1.0):
+        q = supply.flow_gpm * frac
+        if supply.flow_gpm > 0:
+            p = supply.static_psi - (
+                supply.static_psi - supply.residual_psi
+            ) * (frac ** 1.85)
+        else:
+            p = supply.residual_psi
+        supply_curve.append({"flow_gpm": round(q, 1), "pressure_psi": round(p, 1)})
+    for frac in (0.5, 0.75, 1.0, 1.25):
+        q = required_flow * frac
+        p = demand_psi if frac <= 0 else demand_psi * (frac ** 1.85)
+        demand_curve.append({"flow_gpm": round(q, 1), "pressure_psi": round(p, 1)})
+    if safety_margin < 0:
+        issues.append("HYDRAULIC_FAILS_SUPPLY: Demand exceeds the available supply curve.")
 
     return HydraulicResult(
         design_area_sqft=area_sqft,
@@ -237,9 +292,13 @@ def calc_system(
         supply_flow_gpm=supply.flow_gpm,
         demand_at_base_of_riser_psi=round(demand_psi, 1),
         safety_margin_psi=round(safety_margin, 1),
-        critical_path=[],  # populated by path-trace refinement
+        critical_path=critical_path,
+        node_trace=segment_trace,
+        supply_curve=supply_curve,
+        demand_curve=demand_curve,
+        issues=issues,
         converged=converged,
-        iterations=iterations if 'iterations' in dir() else 0,
+        iterations=iterations,
     )
 
 

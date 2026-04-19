@@ -30,6 +30,7 @@ sys.path.insert(0, str(_HFCAD))
 
 from cad.schema import (  # noqa: E402
     Building, Design, Project, Firm, FlowTestData, System,
+    DesignConfidence, DesignIssue, DesignSource, DeliverableManifest,
 )
 
 log = logging.getLogger(__name__)
@@ -111,6 +112,22 @@ def run_pipeline(
     })
 
     # 2. CLASSIFIER — Room.hazard_class + Level.use
+    source_models, issue_models, ingest_confidence = _artifact_context(bldg)
+    if any(i.severity == "blocking" for i in issue_models) or not bldg.levels:
+        design = Design(
+            project=project,
+            building=bldg,
+            sources=source_models,
+            issues=issue_models,
+            confidence=DesignConfidence(ingest=ingest_confidence),
+            deliverables=DeliverableManifest(warnings=[
+                "Pipeline stopped before layout because ingest is blocking.",
+            ]),
+            metadata=_capability_metadata("blocked"),
+        )
+        _write_alpha_artifacts(design, out_dir, summary)
+        return summary
+
     CLASSIFIER.classify_building(bldg)
     CLASSIFIER.classify_level_use(bldg)
     (out_dir / "building_classified.json").write_text(
@@ -139,8 +156,60 @@ def run_pipeline(
         hazard = _system_hazard(bldg, s)
         s.hydraulic = HYDRAULIC.calc_system(s, supply, hazard)
 
-    # Build the Design
-    design = Design(project=project, building=bldg, systems=systems)
+    # Build the canonical alpha Design artifact.
+    design = Design(
+        project=project,
+        building=bldg,
+        systems=systems,
+        sources=source_models,
+        issues=issue_models,
+        confidence=DesignConfidence(
+            overall=0.70 if systems else 0.35,
+            ingest=ingest_confidence,
+            classification=0.72,
+            layout=0.70 if systems else 0.15,
+            hydraulic=0.72 if all(s.hydraulic for s in systems) else 0.0,
+        ),
+        metadata=_capability_metadata("alpha"),
+    )
+    for s in systems:
+        if s.hydraulic and s.hydraulic.safety_margin_psi < 5:
+            design.issues.append(DesignIssue(
+                code="HYDRAULIC_FAILS_SUPPLY",
+                severity="error",
+                message=(
+                    f"System {s.id} has only "
+                    f"{s.hydraulic.safety_margin_psi} psi supply margin."
+                ),
+                refs=[s.id],
+                source="hydraulic",
+            ))
+        if s.hydraulic and s.hydraulic.issues:
+            for message in s.hydraulic.issues:
+                design.issues.append(DesignIssue(
+                    code=message.split(":", 1)[0] if ":" in message else "HYDRAULIC_NOTE",
+                    severity="warning",
+                    message=message,
+                    refs=[s.id],
+                    source="hydraulic",
+                ))
+    design.calculation = {
+        "systems": [
+            {
+                "id": s.id,
+                "hydraulic": s.hydraulic.model_dump() if s.hydraulic else None,
+            }
+            for s in systems
+        ],
+        "unsupported": [{
+            "code": "LOOP_GRID_UNSUPPORTED",
+            "severity": "warning",
+            "message": (
+                "Loop/grid hydraulic solving is not supported in Internal Alpha; "
+                "tree systems only."
+            ),
+        }],
+    }
     (out_dir / "design.json").write_text(
         json.dumps(design.model_dump(), indent=2, default=str), encoding="utf-8",
     )
@@ -196,12 +265,94 @@ def run_pipeline(
     except Exception as e:
         summary["steps"].append({"step": "submittal", "error": str(e)})
 
+    _write_manifest(design, out_dir, summary)
+
     # Save the master summary
     (out_dir / "pipeline_summary.json").write_text(
         json.dumps(summary, indent=2), encoding="utf-8",
     )
     summary["files"]["summary"] = str(out_dir / "pipeline_summary.json")
     return summary
+
+
+def _artifact_context(bldg: Building) -> tuple[list[DesignSource], list[DesignIssue], float]:
+    meta = bldg.metadata or {}
+    sources = [DesignSource(**source) for source in meta.get("sources", [])]
+    issues = [DesignIssue(**issue) for issue in meta.get("issues", [])]
+    ingest_confidence = max([s.confidence for s in sources], default=0.0)
+    return sources, issues, ingest_confidence
+
+
+def _capability_metadata(stage: str) -> dict[str, Any]:
+    return {
+        "artifact_version": "halofire-design-alpha-1",
+        "stage": stage,
+        "units": {
+            "geometry": "meters",
+            "orientation": "Z-up",
+            "ui_export_converts_imperial": True,
+        },
+        "capabilities": {
+            "pdf_vector_intake": True,
+            "pdf_raster_opencv_fallback": True,
+            "dxf_intake": True,
+            "ifc_hierarchy_intake": True,
+            "dwg_native_intake": False,
+            "tree_hydraulic_solver": True,
+            "loop_grid_hydraulic_solver": False,
+            "dxf_export": True,
+            "glb_export": True,
+            "ifc_entity_export": True,
+            "ifc_full_geometry_export": False,
+            "ahj_ready_submittal": False,
+        },
+        "limitations": [
+            "Internal Alpha output requires Wade/PE review before AHJ submittal.",
+            "DWG files must be converted to DXF or IFC unless a licensed reader is configured.",
+            "Hydraulics support tree systems only; looped/gridded systems are reported unsupported.",
+            "PDF raster extraction is local OpenCV fallback and may require manual cleanup.",
+        ],
+    }
+
+
+def _write_manifest(design: Design, out_dir: Path, summary: dict[str, Any]) -> None:
+    files = {
+        key: value
+        for key, value in summary.get("files", {}).items()
+        if isinstance(value, str) and Path(value).exists()
+    }
+    warnings = [
+        issue.message
+        for issue in design.issues
+        if issue.severity in {"warning", "error", "blocking"}
+    ]
+    warnings.append("Internal Alpha output requires Wade/PE review before AHJ submittal.")
+    if not design.metadata.get("capabilities", {}).get("ifc_full_geometry_export", False):
+        warnings.append("IFC export contains entities and hierarchy; full placement geometry is beta scope.")
+    design.deliverables = DeliverableManifest(files=files, warnings=warnings)
+    manifest_path = out_dir / "manifest.json"
+    manifest_path.write_text(
+        json.dumps(design.deliverables.model_dump(), indent=2, default=str),
+        encoding="utf-8",
+    )
+    summary.setdefault("files", {})["manifest"] = str(manifest_path)
+    (out_dir / "design.json").write_text(
+        json.dumps(design.model_dump(), indent=2, default=str), encoding="utf-8",
+    )
+
+
+def _write_alpha_artifacts(
+    design: Design, out_dir: Path, summary: dict[str, Any],
+) -> None:
+    design_path = out_dir / "design.json"
+    design_path.write_text(
+        json.dumps(design.model_dump(), indent=2, default=str), encoding="utf-8",
+    )
+    summary.setdefault("files", {})["design"] = str(design_path)
+    _write_manifest(design, out_dir, summary)
+    summary_path = out_dir / "pipeline_summary.json"
+    summary_path.write_text(json.dumps(summary, indent=2), encoding="utf-8")
+    summary["files"]["summary"] = str(summary_path)
 
 
 def _count_hazards(bldg: Building) -> dict[str, int]:

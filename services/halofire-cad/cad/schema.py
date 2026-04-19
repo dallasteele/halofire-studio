@@ -152,6 +152,7 @@ class Building(BaseModel):
     levels: list[Level] = Field(default_factory=list)
     construction_type: Optional[str] = None
     total_sqft: Optional[float] = None
+    metadata: dict = Field(default_factory=dict)
 
 
 # ── Sprinkler system ────────────────────────────────────────────────
@@ -228,6 +229,10 @@ class HydraulicResult(BaseModel):
     demand_at_base_of_riser_psi: float
     safety_margin_psi: float
     critical_path: list[str] = Field(default_factory=list)
+    node_trace: list[dict] = Field(default_factory=list)
+    supply_curve: list[dict] = Field(default_factory=list)
+    demand_curve: list[dict] = Field(default_factory=list)
+    issues: list[str] = Field(default_factory=list)
     converged: bool = False
     iterations: int = 0
 
@@ -248,10 +253,47 @@ class System(BaseModel):
 # ── Top-level design artifact ──────────────────────────────────────
 
 
+IssueSeverity = Literal["info", "warning", "error", "blocking"]
+
+
+class DesignIssue(BaseModel):
+    code: str
+    severity: IssueSeverity
+    message: str
+    refs: list[str] = Field(default_factory=list)
+    source: Optional[str] = None
+
+
+class DesignSource(BaseModel):
+    id: str
+    kind: Literal["pdf", "raster_pdf", "dxf", "ifc", "dwg", "manual", "generated"]
+    path: Optional[str] = None
+    confidence: float = 0.0
+    warnings: list[str] = Field(default_factory=list)
+
+
+class DesignConfidence(BaseModel):
+    overall: float = 0.0
+    ingest: float = 0.0
+    classification: float = 0.0
+    layout: float = 0.0
+    hydraulic: float = 0.0
+
+
+class DeliverableManifest(BaseModel):
+    files: dict[str, str] = Field(default_factory=dict)
+    warnings: list[str] = Field(default_factory=list)
+
+
 class Design(BaseModel):
     project: Project
     building: Building
     systems: list[System] = Field(default_factory=list)
+    sources: list[DesignSource] = Field(default_factory=list)
+    confidence: DesignConfidence = Field(default_factory=DesignConfidence)
+    issues: list[DesignIssue] = Field(default_factory=list)
+    calculation: dict = Field(default_factory=dict)
+    deliverables: DeliverableManifest = Field(default_factory=DeliverableManifest)
     metadata: dict = Field(default_factory=dict)
 
 
@@ -261,7 +303,7 @@ class Design(BaseModel):
 class Violation(BaseModel):
     rule_id: str
     section: str
-    severity: Literal["error", "warning", "info"]
+    severity: IssueSeverity
     message: str
     refs: list[str] = Field(default_factory=list)  # affected node IDs
 

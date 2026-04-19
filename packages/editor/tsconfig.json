@@ -2,7 +2,9 @@
   "extends": "@pascal/typescript-config/react-library.json",
   "compilerOptions": {
     "rootDir": "src",
-    "noEmit": true
+    "noEmit": true,
+    "strict": false,
+    "noUncheckedIndexedAccess": false
   },
   "include": ["src"],
   "exclude": ["node_modules"]

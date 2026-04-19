@@ -23,16 +23,13 @@ import { IfcUploadButton } from './IfcUploadButton'
 const GATEWAY_URL =
   process.env.NEXT_PUBLIC_HALOPENCLAW_URL ?? 'http://localhost:18080'
 
-/**
- * Serialize the live Pascal scene for gateway tool calls. Falls back to
- * a demo scene if the registry is empty (user hasn't drawn anything).
- */
-function captureScene(demo: Record<string, unknown>): Record<string, unknown> {
+/** Serialize the live Pascal scene for gateway tool calls. */
+function captureScene(): Record<string, unknown> {
   const serialized = serializeLiveScene({
     useSceneRegistry: () => sceneRegistry,
   })
   if (serialized.nodes.length === 0) {
-    return demo
+    throw new Error('No live scene geometry found. Draw or import a model before running this audit.')
   }
   return serialized as unknown as Record<string, unknown>
 }
@@ -79,24 +76,7 @@ export function FireProtectionPanel() {
   const runShell = useCallback(async () => {
     setShell({ running: true })
     try {
-      const scene = captureScene({
-        nodes: [
-          {
-            id: 'demo_w1',
-            type: 'wall',
-            folder: 'Level/Walls/South',
-            bbox_world: { min: [0, 0, 0], max: [400, 20, 400] },
-            metadata: { label: 'South_OK (demo — no live scene)' },
-          },
-          {
-            id: 'demo_w2',
-            type: 'wall',
-            folder: 'Level/Walls/North',
-            bbox_world: { min: [0, 3180, 200], max: [400, 3200, 600] },
-            metadata: { label: 'North_FLOATING (demo)' },
-          },
-        ],
-      })
+      const scene = captureScene()
       const output = await callTool('halofire_validate', { mode: 'shell', scene })
       setShell({ running: false, output })
     } catch (e) {
@@ -107,20 +87,7 @@ export function FireProtectionPanel() {
   const runCollisions = useCallback(async () => {
     setCollisions({ running: true })
     try {
-      const scene = captureScene({
-        nodes: [
-          {
-            id: 'f1', type: 'slab', folder: 'Level/Floor',
-            bbox_world: { min: [0, 0, 0], max: [400, 400, 20] },
-            metadata: { label: 'Floor_0_0 (demo — no live scene)' },
-          },
-          {
-            id: 'h1', type: 'head', folder: 'Level/Heads',
-            bbox_world: { min: [100, 100, 380], max: [105, 105, 400] },
-            metadata: { label: 'H1 (demo)' },
-          },
-        ],
-      })
+      const scene = captureScene()
       const output = await callTool('halofire_validate', { mode: 'collisions', scene })
       setCollisions({ running: false, output })
     } catch (e) {
@@ -220,9 +187,8 @@ export function FireProtectionPanel() {
   const runAutoRoute = useCallback(async () => {
     setRouter({ running: true })
     try {
-      // Pull live heads from the scene — any ItemNode tagged 'halofire'
-      // + category starting 'sprinkler_head_' counts as a head for routing.
-      // Fall back to a demo 3x2 grid when nothing has been placed yet.
+      // Pull live heads from the scene; any sprinkler ItemNode counts as a
+      // head for routing.
       const heads: { id: string; x_cm: number; y_cm: number; z_cm: number }[] = []
       const nodes = useScene.getState().nodes as Record<string, unknown>
       for (const [id, raw] of Object.entries(nodes)) {
@@ -232,18 +198,12 @@ export function FireProtectionPanel() {
         const [x, y, z] = n.position ?? [0, 0, 0]
         heads.push({ id, x_cm: x * 100, y_cm: y * 100, z_cm: z * 100 })
       }
-      const usingLive = heads.length > 0
-      if (!usingLive) {
-        for (let r = 0; r < 2; r++) {
-          for (let c = 0; c < 3; c++) {
-            heads.push({
-              id: `H${r}${c}`,
-              x_cm: 228 + c * 272,
-              y_cm: 228 + r * 343,
-              z_cm: 380,
-            })
-          }
-        }
+      if (heads.length === 0) {
+        setRouter({
+          running: false,
+          error: 'No live sprinkler heads in scene. Place heads first, then run auto-tree routing.',
+        })
+        return
       }
       const riser = { id: 'R1', x_cm: 50, y_cm: 50, z_cm: 380 }
       const output = await callTool('halofire_route_pipe', {
@@ -374,9 +334,7 @@ export function FireProtectionPanel() {
         }
       }
 
-      const prefix = usingLive
-        ? `Using ${heads.length} live heads from Pascal scene.\n\n`
-        : `No live heads; using 3x2 demo grid.\n\n`
+      const prefix = `Using ${heads.length} live heads from Pascal scene.\n\n`
       const sizeBreakdown = Array.from(sizesUsed.entries())
         .sort((a, b) => b[0] - a[0])
         .map(([sz, n]) => `${n}×${sz}"`)
@@ -666,8 +624,8 @@ export function FireProtectionPanel() {
       <Section title="5. Ingest IFC" description="Upload an architect's .ifc file">
         <IfcUploadButton />
         <p className="mt-2 text-[10px] text-neutral-500">
-          PDF upload via the 4-layer free pipeline (pdfplumber → opencv →
-          CubiCasa5k → Claude Vision) ships M2 week 7-8. DWG import M2 week 8.
+          PDF/DXF/IFC uploads run through the local alpha intake pipeline. DWG
+          returns a structured convert-to-DXF/IFC response.
         </p>
       </Section>
 
@@ -678,8 +636,8 @@ export function FireProtectionPanel() {
         <ResultBlock result={exportResult} />
         <p className="mt-1 text-[10px] text-neutral-500">
           Uses the live scene's sprinkler heads as the equipment schedule.
-          Full AHJ sheet set (FP-0..FP-5 + title blocks + dimensions +
-          schedules + hydraulic placard) ships M3 weeks 21-22.
+          Alpha exports include explicit warnings when model or calculation
+          data is incomplete; Wade/PE review is still required.
         </p>
       </Section>
     </div>

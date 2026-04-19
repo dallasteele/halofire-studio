@@ -29,6 +29,10 @@
     "node": ">=18"
   },
   "packageManager": "bun@1.3.0",
+  "overrides": {
+    "three": "^0.184.0",
+    "@types/three": "^0.184.0"
+  },
   "workspaces": [
     "apps/*",
     "packages/*",

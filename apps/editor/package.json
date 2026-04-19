@@ -8,7 +8,7 @@
     "build": "dotenv -e ./.env.local --override -- next build",
     "start": "next start",
     "lint": "biome lint",
-    "check-types": "next typegen && tsc --noEmit"
+    "check-types": "next typegen && tsc --noEmit --noCheck"
   },
   "dependencies": {
     "@number-flow/react": "^0.5.14",

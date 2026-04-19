@@ -30,6 +30,7 @@ from fastapi import FastAPI, File, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from tools import registry
 
@@ -69,6 +70,20 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.exception_handler(StarletteHTTPException)
+async def _http_error(_request: Request, exc: StarletteHTTPException) -> JSONResponse:
+    detail = exc.detail if isinstance(exc.detail, str) else "request failed"
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "error": {
+                "code": detail.upper().replace(" ", "_")[:80],
+                "message": detail,
+            },
+        },
+    )
 
 
 # ── Health ───────────────────────────────────────────────────────────────────
@@ -168,6 +183,18 @@ _DATA_ROOT = Path(os.environ.get(
 _DATA_ROOT.mkdir(parents=True, exist_ok=True)
 _PROJECT_ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,79}$")
 _MAX_UPLOAD_BYTES = int(os.environ.get("HALOFIRE_MAX_UPLOAD_BYTES", str(200 * 1024 * 1024)))
+_API_KEY = os.environ.get("HALOFIRE_API_KEY")
+
+
+def _require_api_key(request: Request) -> None:
+    if not _API_KEY:
+        return
+    direct = request.headers.get("x-halofire-api-key")
+    auth = request.headers.get("authorization", "")
+    bearer = auth[7:] if auth.lower().startswith("bearer ") else None
+    if direct == _API_KEY or bearer == _API_KEY:
+        return
+    raise HTTPException(401, "missing or invalid HALOFIRE_API_KEY")
 
 
 def _safe_project_id(project_id: str) -> str:
@@ -187,6 +214,7 @@ def _safe_project_dir(project_id: str) -> Path:
 
 @app.post("/intake/upload")
 async def intake_upload(
+    request: Request,
     file: UploadFile = File(...),
     project_id: str = "demo",
     mode: str = "pipeline",  # "pipeline" | "quickbid" | "intake-only"
@@ -194,6 +222,7 @@ async def intake_upload(
     """Accept an architect's PDF/IFC/DWG. Start the CAD pipeline async.
     Returns a job_id the client polls via /intake/status/{id}.
     """
+    _require_api_key(request)
     if not file.filename:
         raise HTTPException(400, "no file provided")
     proj_dir = _safe_project_dir(project_id)
@@ -293,6 +322,101 @@ async def get_design_json(project_id: str) -> JSONResponse:
     return JSONResponse(json.loads(p.read_text(encoding="utf-8")))
 
 
+@app.get("/projects/{project_id}/manifest.json")
+async def get_manifest_json(project_id: str) -> JSONResponse:
+    p = _safe_project_dir(project_id) / "deliverables" / "manifest.json"
+    if not p.exists():
+        raise HTTPException(404, "manifest not generated yet")
+    return JSONResponse(json.loads(p.read_text(encoding="utf-8")))
+
+
+def _design_file(project_id: str) -> Path:
+    return _safe_project_dir(project_id) / "deliverables" / "design.json"
+
+
+def _load_design(project_id: str):
+    p = _design_file(project_id)
+    if not p.exists():
+        raise HTTPException(404, "design not generated yet")
+    orch = _orchestrator()
+    if not orch:
+        raise HTTPException(500, "orchestrator not loaded")
+    return orch.Design.model_validate(json.loads(p.read_text(encoding="utf-8")))
+
+
+def _write_design(project_id: str, design: Any) -> None:
+    p = _design_file(project_id)
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text(
+        json.dumps(design.model_dump(), indent=2, default=str),
+        encoding="utf-8",
+    )
+
+
+@app.post("/projects/{project_id}/validate")
+async def validate_design(project_id: str, request: Request) -> dict[str, Any]:
+    _require_api_key(request)
+    design = _load_design(project_id)
+    orch = _orchestrator()
+    if not orch:
+        raise HTTPException(500, "orchestrator not loaded")
+    violations = orch.RULECHECK.check_design(design)
+    out = _safe_project_dir(project_id) / "deliverables" / "violations.json"
+    out.write_text(
+        json.dumps([v.model_dump() for v in violations], indent=2),
+        encoding="utf-8",
+    )
+    return {
+        "project_id": project_id,
+        "issues": [i.model_dump() for i in design.issues],
+        "violations": [v.model_dump() for v in violations],
+        "blocking": any(i.severity == "blocking" for i in design.issues),
+    }
+
+
+@app.post("/projects/{project_id}/calculate")
+async def calculate_design(
+    project_id: str,
+    request: Request,
+    body: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    _require_api_key(request)
+    design = _load_design(project_id)
+    orch = _orchestrator()
+    if not orch:
+        raise HTTPException(500, "orchestrator not loaded")
+    body = body or {}
+    supply = orch.FlowTestData.model_validate(body.get("supply")) if body.get("supply") else orch._default_supply()
+    design.calculation = {
+        "systems": [],
+        "unsupported": [{
+            "code": "LOOP_GRID_UNSUPPORTED",
+            "severity": "warning",
+            "message": (
+                "Loop/grid hydraulic solving is not supported in Internal Alpha; "
+                "tree systems only."
+            ),
+        }],
+    }
+    for system in design.systems:
+        hazard = str(body.get("hazard") or orch._system_hazard(design.building, system))
+        system.hydraulic = orch.HYDRAULIC.calc_system(system, supply, hazard)
+        design.calculation["systems"].append({
+            "id": system.id,
+            "hazard": hazard,
+            "hydraulic": system.hydraulic.model_dump(),
+        })
+    report = {
+        "project_id": project_id,
+        "calculation": design.calculation,
+    }
+    out = _safe_project_dir(project_id) / "deliverables" / "hydraulic_report.json"
+    out.write_text(json.dumps(report, indent=2, default=str), encoding="utf-8")
+    design.deliverables.files["hydraulic_report"] = str(out)
+    _write_design(project_id, design)
+    return report
+
+
 @app.get("/projects/{project_id}/deliverable/{name}")
 async def get_deliverable(project_id: str, name: str):
     if Path(name).name != name:
@@ -307,8 +431,9 @@ async def get_deliverable(project_id: str, name: str):
 # ── Quick bid ────────────────────────────────────────────────────────
 
 @app.post("/quickbid")
-async def quickbid(body: dict[str, Any]) -> dict[str, Any]:
+async def quickbid(body: dict[str, Any], request: Request) -> dict[str, Any]:
     """60-second quick-bid estimator."""
+    _require_api_key(request)
     orch = _orchestrator()
     if not orch:
         raise HTTPException(500, "orchestrator not loaded")
@@ -323,8 +448,9 @@ async def quickbid(body: dict[str, Any]) -> dict[str, Any]:
 
 
 @app.post("/codex/run")
-async def codex_run(body: dict[str, Any]) -> dict[str, Any]:
+async def codex_run(body: dict[str, Any], request: Request) -> dict[str, Any]:
     """Browser-side codex proxy. Forwards to local codex CLI on the server."""
+    _require_api_key(request)
     # TODO M1 week 6: subprocess-based codex invocation with proper sanitization
     _ = body
     return {

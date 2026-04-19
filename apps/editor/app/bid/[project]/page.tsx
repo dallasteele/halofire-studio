@@ -118,6 +118,15 @@ interface DesignData {
     levels: DesignLevel[]
   }
   systems: DesignSystem[]
+  confidence?: {
+    overall?: number
+    ingest?: number
+    layout?: number
+    hydraulic?: number
+  }
+  issues?: { code: string; severity: string; message: string }[]
+  deliverables?: { files?: Record<string, string>; warnings?: string[] }
+  metadata?: { capabilities?: Record<string, boolean> }
 }
 
 interface DesignLevel {
@@ -159,7 +168,7 @@ interface RenderLevel {
 interface RenderGeometry {
   heads: { id: string; pos: Vec3; levelId: string }[]
   pipes: { id: string; from: Vec3; to: Vec3; sizeIn: number; levelId: string }[]
-  source: 'design' | 'synthetic'
+  source: 'design' | 'empty'
 }
 
 function toViewerPoint([x, y, z]: Vec3): Vec3 {
@@ -369,29 +378,20 @@ export default function BidView(props: { params: Promise<{ project: string }> })
       }
     }
 
-    for (const level of levels) {
-      if (level.use !== 'residential') continue
-      const y = level.elevation_m + 3.0
-      const n = 6
-      const spacing = sideM / (n + 1)
-      for (let r = 0; r < n; r++) {
-        let prev: Vec3 | null = null
-        for (let c = 0; c < n; c++) {
-          const p: Vec3 = [(c + 1) * spacing, y, (r + 1) * spacing]
-          const id = `${level.id}_${r}_${c}`
-          heads.push({ id, pos: p, levelId: level.id })
-          if (prev) {
-            pipes.push({ id: `${id}_pipe`, from: prev, to: p, sizeIn: c === 0 ? 2.0 : 1.0, levelId: level.id })
-          }
-          prev = p
-        }
-      }
-    }
-    return { heads, pipes, source: 'synthetic' }
-  }, [design, levels, sideM])
+    return { heads, pipes, source: 'empty' }
+  }, [design, levels])
   const displayPrice =
     proposal?.pricing?.total_usd ?? project?.halofire?.proposal_price_usd ?? 0
   const displayProjectName = proposal?.project?.name ?? project?.name ?? params.project
+  const designWarnings = [
+    ...(design?.issues ?? [])
+      .filter((issue) => ['warning', 'error', 'blocking'].includes(issue.severity))
+      .map((issue) => `${issue.code}: ${issue.message}`),
+    ...(design?.deliverables?.warnings ?? []),
+  ].slice(0, 6)
+  const confidencePct = design?.confidence?.overall !== undefined
+    ? Math.round((design.confidence.overall ?? 0) * 100)
+    : null
 
   if (error) {
     return (
@@ -454,7 +454,18 @@ export default function BidView(props: { params: Promise<{ project: string }> })
                 <h2 className="text-[10px] font-semibold uppercase tracking-widest text-neutral-400">Project</h2>
                 <p className="mt-1">{project?.address}</p>
                 <p className="mt-1 text-neutral-400">{project?.ahj}</p>
+                <p className="mt-1 text-[10px] text-neutral-500">
+                  {confidencePct !== null ? `Design confidence ${confidencePct}%` : 'No generated design artifact loaded'}
+                </p>
               </div>
+              {designWarnings.length > 0 && (
+                <div className="rounded border border-amber-900 bg-amber-950/40 p-2">
+                  <h2 className="text-[10px] font-semibold uppercase tracking-widest text-amber-300">Alpha warnings</h2>
+                  <ul className="mt-1 space-y-1 text-[10px] text-amber-100">
+                    {designWarnings.map((warning, i) => <li key={i}>{warning}</li>)}
+                  </ul>
+                </div>
+              )}
               <div>
                 <h2 className="text-[10px] font-semibold uppercase tracking-widest text-neutral-400">
                   Levels ({levels.length})
@@ -597,7 +608,16 @@ export default function BidView(props: { params: Promise<{ project: string }> })
             <div><dt className="text-neutral-500">Address</dt><dd>{project?.address}</dd></div>
             <div><dt className="text-neutral-500">AHJ</dt><dd>{project?.ahj}</dd></div>
             <div><dt className="text-neutral-500">Total sqft</dt><dd className="font-mono">{(proposal?.building_summary?.total_sqft ?? project?.building.total_sqft ?? 0).toLocaleString()}</dd></div>
+            <div><dt className="text-neutral-500">Design confidence</dt><dd className="font-mono">{confidencePct !== null ? `${confidencePct}%` : 'not generated'}</dd></div>
           </dl>
+          {designWarnings.length > 0 && (
+            <div className="mb-4 rounded border border-amber-900 bg-amber-950/40 p-2">
+              <h2 className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-amber-300">Alpha warnings</h2>
+              <ul className="space-y-1 text-[10px] text-amber-100">
+                {designWarnings.map((warning, i) => <li key={i}>{warning}</li>)}
+              </ul>
+            </div>
+          )}
 
           <h2 className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-neutral-400">Levels ({levels.length})</h2>
           <ul className="mb-4 space-y-1">
@@ -661,7 +681,7 @@ export default function BidView(props: { params: Promise<{ project: string }> })
         </aside>
 
         {/* 3D canvas */}
-        <main className="flex-1">
+        <main className="relative flex-1">
           <Canvas camera={{ position: [sideM * 1.3, sideM * 0.9, sideM * 1.3], fov: 45 }}>
             <ambientLight intensity={0.5} />
             <directionalLight position={[20, 30, 10]} intensity={1.2} castShadow />
@@ -690,6 +710,12 @@ export default function BidView(props: { params: Promise<{ project: string }> })
               makeDefault
             />
           </Canvas>
+          {renderedGeometry.source === 'empty' && (
+            <div className="pointer-events-none absolute inset-x-8 top-8 rounded border border-amber-900 bg-neutral-950/85 p-3 text-xs text-amber-100">
+              No generated sprinkler geometry is loaded. Run the intake pipeline
+              and wait for a real design.json before using this model view for review.
+            </div>
+          )}
         </main>
 
         {/* Right drawer — pricing + violations */}

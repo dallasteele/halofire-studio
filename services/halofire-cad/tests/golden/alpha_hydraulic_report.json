@@ -1,0 +1,19 @@
+{
+  "system_id": "sys_l1",
+  "hazard": "light",
+  "design_area_sqft": 1500,
+  "density_gpm_per_sqft": 0.1,
+  "required_flow_gpm": 150,
+  "required_pressure_psi": 14.1,
+  "critical_path": [
+    "head_1",
+    "pipe_1",
+    "riser_l1"
+  ],
+  "supply_curve_points": 5,
+  "demand_curve_points": 4,
+  "issues": [
+    "LOOP_GRID_UNSUPPORTED"
+  ],
+  "alpha_note": "Golden smoke fixture; exact friction values may shift when pipe sizing or fitting tables are calibrated."
+}

@@ -20,13 +20,13 @@
   },
   "dependencies": {
     "@pascal-app/core": "*",
-    "three": "^0.170.0",
+    "three": "^0.184.0",
     "web-ifc": "^0.0.68",
     "zod": "^3.23.8"
   },
   "devDependencies": {
     "@pascal/typescript-config": "*",
-    "@types/three": "^0.170.0",
+    "@types/three": "^0.184.0",
     "typescript": "5.9.3"
   }
 }

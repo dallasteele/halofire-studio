@@ -1,0 +1,70 @@
+{
+  "project": {
+    "id": "dwg-alpha",
+    "name": "Dwg Alpha",
+    "address": "",
+    "ahj": "Local AHJ",
+    "code": "NFPA 13 2022"
+  },
+  "building": {
+    "project_id": "dwg-alpha",
+    "levels": [],
+    "metadata": {
+      "sources": [
+        {
+          "id": "architect",
+          "kind": "dwg",
+          "confidence": 0.0
+        }
+      ],
+      "issues": [
+        {
+          "code": "UNSUPPORTED_DWG",
+          "severity": "blocking",
+          "message": "Native DWG intake is not enabled in Internal Alpha. Convert the file to DXF or IFC and re-upload.",
+          "source": "intake"
+        }
+      ]
+    }
+  },
+  "systems": [],
+  "sources": [
+    {
+      "id": "architect",
+      "kind": "dwg",
+      "confidence": 0.0
+    }
+  ],
+  "confidence": {
+    "overall": 0.0,
+    "ingest": 0.0,
+    "classification": 0.0,
+    "layout": 0.0,
+    "hydraulic": 0.0
+  },
+  "issues": [
+    {
+      "code": "UNSUPPORTED_DWG",
+      "severity": "blocking",
+      "message": "Native DWG intake is not enabled in Internal Alpha. Convert the file to DXF or IFC and re-upload.",
+      "source": "intake"
+    }
+  ],
+  "calculation": {},
+  "deliverables": {
+    "files": {},
+    "warnings": [
+      "Pipeline stopped before layout because ingest is blocking."
+    ]
+  },
+  "metadata": {
+    "artifact_version": "halofire-design-alpha-1",
+    "stage": "blocked",
+    "capabilities": {
+      "dwg_native_intake": false,
+      "tree_hydraulic_solver": true,
+      "loop_grid_hydraulic_solver": false,
+      "ahj_ready_submittal": false
+    }
+  }
+}
