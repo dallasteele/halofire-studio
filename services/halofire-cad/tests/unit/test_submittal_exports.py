@@ -143,6 +143,57 @@ def test_ifc_export_parses_as_valid_ifc(tiny_design, tmp_path: Path) -> None:
     assert len(storeys) >= 1
 
 
+def test_ifc_pipes_have_swept_solid_geometry(tiny_design, tmp_path: Path) -> None:
+    """Phase D.2: pipes must have IfcProductDefinitionShape with
+    IfcExtrudedAreaSolid body, not just entity shells."""
+    import ifcopenshell
+    out = tmp_path / "geom.ifc"
+    path = SUBMITTAL.export_ifc(tiny_design, out)
+    if not path:
+        pytest.skip("ifcopenshell not available")
+    ifc = ifcopenshell.open(str(out))
+    pipes = ifc.by_type("IfcPipeSegment")
+    assert len(pipes) >= 2, f"expected 2+ pipes, got {len(pipes)}"
+    # Every pipe has a Representation with at least one shape rep
+    for seg in pipes:
+        rep = seg.Representation
+        assert rep is not None, f"pipe {seg.Name} missing Representation"
+        shape_reps = rep.Representations
+        assert len(shape_reps) >= 1
+        # The first shape rep must be a SweptSolid with
+        # IfcExtrudedAreaSolid as its first item
+        sr = shape_reps[0]
+        assert sr.RepresentationType == "SweptSolid", (
+            f"pipe {seg.Name} has {sr.RepresentationType}, expected SweptSolid"
+        )
+        items = sr.Items
+        assert len(items) >= 1
+        assert items[0].is_a("IfcExtrudedAreaSolid"), (
+            f"pipe {seg.Name} first item is {items[0].is_a()}, "
+            "expected IfcExtrudedAreaSolid"
+        )
+        # Radius matches size_in × 0.0254 / 2
+        profile = items[0].SweptArea
+        assert profile.is_a("IfcCircleProfileDef")
+        # At least 0.5" radius (our pipes are 1.5" and 2")
+        assert profile.Radius > 0.005
+
+
+def test_ifc_heads_have_local_placement(tiny_design, tmp_path: Path) -> None:
+    """Phase D.2: each head's ObjectPlacement anchors it in space."""
+    import ifcopenshell
+    out = tmp_path / "placed.ifc"
+    path = SUBMITTAL.export_ifc(tiny_design, out)
+    if not path:
+        pytest.skip("ifcopenshell not available")
+    ifc = ifcopenshell.open(str(out))
+    terms = ifc.by_type("IfcFireSuppressionTerminal")
+    for term in terms:
+        placement = term.ObjectPlacement
+        assert placement is not None
+        assert placement.is_a("IfcLocalPlacement")
+
+
 def test_export_all_returns_paths_or_errors(tiny_design, tmp_path: Path) -> None:
     """export_all must return a dict with either a path or a typed
     error for each format — never silent failures."""

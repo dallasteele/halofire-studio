@@ -1,0 +1,12 @@
+{
+  "pdf_name": "fire-rfis.pdf",
+  "page_index": 0,
+  "schema_version": 1,
+  "wall_count_gte": 0,
+  "wall_count_lte": 5,
+  "room_count": 0,
+  "scale_ft_per_pt": 0.3333333333333333,
+  "page_w_pt": 792.0,
+  "page_h_pt": 612.0,
+  "warnings_empty": true
+}

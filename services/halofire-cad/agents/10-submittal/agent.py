@@ -234,29 +234,135 @@ def export_ifc(design: Design, out_path: Path) -> str:
         )
         storey_by_id[lvl.id] = st
 
-    # Heads as IfcSprinkler, pipes as IfcPipeSegment — geometry omitted
-    # in v2 (need representation items). IFC-OpenShell 0.8's API surface
-    # for proxy placement is non-trivial; we ship entity attributes only.
+    # Phase D.2 — write IfcLocalPlacement + IfcProductDefinitionShape
+    # + swept-solid geometry for pipes + block geometry for heads. The
+    # low-level `ifc.create_entity(...)` path is used because
+    # ifcopenshell.api 0.8 doesn't yet expose a clean geometry helper.
+    origin = ifc.create_entity("IfcCartesianPoint", Coordinates=(0.0, 0.0, 0.0))
+    z_axis = ifc.create_entity("IfcDirection", DirectionRatios=(0.0, 0.0, 1.0))
+    x_axis = ifc.create_entity("IfcDirection", DirectionRatios=(1.0, 0.0, 0.0))
+    world_axis = ifc.create_entity(
+        "IfcAxis2Placement3D",
+        Location=origin, Axis=z_axis, RefDirection=x_axis,
+    )
+    world_placement = ifc.create_entity(
+        "IfcLocalPlacement", PlacementRelTo=None, RelativePlacement=world_axis,
+    )
+
+    def _local_placement(xyz: tuple[float, float, float]):
+        pt = ifc.create_entity(
+            "IfcCartesianPoint",
+            Coordinates=(float(xyz[0]), float(xyz[1]), float(xyz[2])),
+        )
+        axis = ifc.create_entity(
+            "IfcAxis2Placement3D",
+            Location=pt, Axis=z_axis, RefDirection=x_axis,
+        )
+        return ifc.create_entity(
+            "IfcLocalPlacement",
+            PlacementRelTo=world_placement, RelativePlacement=axis,
+        )
+
+    def _head_shape_rep(radius_m: float = 0.05):
+        """Small sphere at origin as a block — IFC4 supports
+        IfcSphere as IfcCsgPrimitive3D."""
+        sphere = ifc.create_entity("IfcSphere", Radius=radius_m,
+                                   Position=world_axis)
+        solid = ifc.create_entity("IfcCsgSolid", TreeRootExpression=sphere)
+        shape_rep = ifc.create_entity(
+            "IfcShapeRepresentation",
+            ContextOfItems=body_ctx,
+            RepresentationIdentifier="Body",
+            RepresentationType="CSG",
+            Items=(solid,),
+        )
+        return ifc.create_entity(
+            "IfcProductDefinitionShape", Representations=(shape_rep,),
+        )
+
+    def _pipe_shape_rep(
+        start_m: tuple[float, float, float],
+        end_m: tuple[float, float, float],
+        diameter_in: float,
+    ):
+        """Swept-solid pipe: IfcCircleProfileDef extruded along the
+        segment vector, referenced in the segment's local coord
+        system."""
+        radius_m = diameter_in * 0.0254 / 2
+        dx = end_m[0] - start_m[0]
+        dy = end_m[1] - start_m[1]
+        dz = end_m[2] - start_m[2]
+        length = (dx * dx + dy * dy + dz * dz) ** 0.5
+        if length < 1e-6:
+            return None
+        # Extrusion is relative to the pipe's local placement (at
+        # start_m). Direction = normalized segment vector in world
+        # coords; caller applies local placement to the product.
+        ext_dir = ifc.create_entity(
+            "IfcDirection",
+            DirectionRatios=(dx / length, dy / length, dz / length),
+        )
+        profile_origin = ifc.create_entity(
+            "IfcCartesianPoint", Coordinates=(0.0, 0.0),
+        )
+        profile_placement = ifc.create_entity(
+            "IfcAxis2Placement2D", Location=profile_origin,
+        )
+        profile = ifc.create_entity(
+            "IfcCircleProfileDef",
+            ProfileType="AREA",
+            Position=profile_placement,
+            Radius=radius_m,
+        )
+        solid = ifc.create_entity(
+            "IfcExtrudedAreaSolid",
+            SweptArea=profile,
+            Position=world_axis,
+            ExtrudedDirection=ext_dir,
+            Depth=length,
+        )
+        shape_rep = ifc.create_entity(
+            "IfcShapeRepresentation",
+            ContextOfItems=body_ctx,
+            RepresentationIdentifier="Body",
+            RepresentationType="SweptSolid",
+            Items=(solid,),
+        )
+        return ifc.create_entity(
+            "IfcProductDefinitionShape", Representations=(shape_rep,),
+        )
+
     for system in design.systems:
         for h in system.heads:
             try:
-                # IfcFireSuppressionTerminal with SPRINKLER predefined
-                # type is the canonical IFC4 sprinkler-head entity.
-                ifcopenshell.api.run(
-                    "root.create_entity", ifc,
-                    ifc_class="IfcFireSuppressionTerminal", name=h.id,
-                    predefined_type="SPRINKLER",
+                # Full-geometry IfcFireSuppressionTerminal: placement
+                # at head position + CSG sphere body.
+                term = ifc.create_entity(
+                    "IfcFireSuppressionTerminal",
+                    GlobalId=ifcopenshell.guid.new(),
+                    Name=h.id,
+                    ObjectType="SPRINKLER",
+                    ObjectPlacement=_local_placement(h.position_m),
+                    Representation=_head_shape_rep(),
+                    PredefinedType="SPRINKLER",
                 )
+                _ = term
             except (TypeError, ValueError, AttributeError, RuntimeError) as e:
                 warn_swallowed(log, code="IFC_SPRINKLER_CREATE_FAILED",
                                err=e, head_id=h.id)
         for s in system.pipes:
             try:
-                # IfcPipeSegment is IFC4+; works under IFC4X3.
-                ifcopenshell.api.run(
-                    "root.create_entity", ifc,
-                    ifc_class="IfcPipeSegment", name=s.id,
+                shape = _pipe_shape_rep(s.start_m, s.end_m, s.size_in)
+                if shape is None:
+                    continue
+                seg = ifc.create_entity(
+                    "IfcPipeSegment",
+                    GlobalId=ifcopenshell.guid.new(),
+                    Name=s.id,
+                    ObjectPlacement=_local_placement(s.start_m),
+                    Representation=shape,
                 )
+                _ = seg
             except (TypeError, ValueError, AttributeError, RuntimeError) as e:
                 warn_swallowed(log, code="IFC_PIPE_CREATE_FAILED",
                                err=e, pipe_id=s.id)

@@ -389,6 +389,37 @@ class PipelineSummary(BaseModel):
     status: Literal["queued", "running", "completed", "failed"] = "running"
 
 
+# ── Phase H — PE sign-off ──────────────────────────────────────────
+
+
+DesignStatus = Literal[
+    "internal-alpha",        # default; NOT-FOR-CONSTRUCTION watermark
+    "pending-pe-review",     # submitted for PE review
+    "pe-reviewed",           # PE approved; submittal allowed
+    "pe-rejected",           # PE sent back with comments
+    "submitted",             # delivered to AHJ
+]
+
+
+class PeSignature(BaseModel):
+    """Phase H — licensed Professional Engineer sign-off record.
+
+    Every deliverable that carries "submittal-grade" status has a
+    PeSignature attached. The PE reviews the Design + violations + calc
+    reports, then approves or rejects. Approved designs lose the
+    NOT-FOR-CONSTRUCTION watermark; everything else keeps it per §13.
+    """
+    pe_name: str
+    pe_license_number: str
+    pe_license_state: str
+    signed_at: str             # ISO timestamp
+    decision: Literal["approved", "rejected", "conditional"]
+    review_notes: str = ""
+    conditional_items: list[str] = Field(default_factory=list)
+    # Hash of the Design at sign-time — prevents silent drift
+    design_hash_sha256: Optional[str] = None
+
+
 JobStatusStr = Literal["queued", "running", "completed", "failed"]
 
 

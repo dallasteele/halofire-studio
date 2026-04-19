@@ -1,0 +1,16 @@
+{
+  "description": "NFPA 13 Appendix A style tree network reference. Small 6-head branch line, 2\" main. Use as the canonical Hardy-Cross + remote-area solver regression case.",
+  "source": "Synthesized reference — replace with actual NFPA Appendix A example when licensed.",
+  "hazard": "light",
+  "supply": {"static_psi": 75, "residual_psi": 55, "flow_gpm": 1000},
+  "expected": {
+    "design_area_sqft": 1500,
+    "density_gpm_per_sqft": 0.10,
+    "required_flow_gpm_min": 90,
+    "required_flow_gpm_max": 200,
+    "demand_psi_min": 30,
+    "demand_psi_max": 70,
+    "safety_margin_psi_min": 0,
+    "has_loop_grid_unsupported": true
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "description": "Phase D.5 golden fingerprint for DXF/GLB/IFC exports against the test fixture tiny_design (2 heads + 2 pipes).",
+  "dxf": {
+    "layers_subset": [
+      "FP-HEADS", "FP-RISER", "FP-HANGERS", "FP-FDC",
+      "FP-PIPE-2-0", "FP-PIPE-1-5"
+    ],
+    "head_circle_count_gte": 2,
+    "head_circle_layer": "FP-HEADS"
+  },
+  "glb": {
+    "min_bytes": 1000,
+    "min_meshes": 1
+  },
+  "ifc": {
+    "schema": "IFC4",
+    "fire_terminal_count_gte": 2,
+    "pipe_segment_count_gte": 2,
+    "pipe_representation_type": "SweptSolid",
+    "pipe_extrusion_class": "IfcExtrudedAreaSolid",
+    "head_placement_class": "IfcLocalPlacement",
+    "head_predefined_type": "SPRINKLER"
+  }
+}
