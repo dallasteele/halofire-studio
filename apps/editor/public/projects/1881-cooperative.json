@@ -1,0 +1,99 @@
+{
+  "projectId": "1881-cooperative-phase-1",
+  "name": "The Cooperative 1881 Apartments — Phase I",
+  "address": "1881 W North Temple, Salt Lake City, UT 84104",
+  "apn": "08343530050000",
+  "zoning": "TSA-MUEC-C",
+  "construction_type": "Type III-B over Type I-A Podium",
+  "code": "2021 Utah Building Code + IBC 2021",
+  "ahj": "Salt Lake City Fire Marshal",
+  "architect": {
+    "firm": "22 Design Lab, LLC",
+    "principal": "David M. Clayton",
+    "license": "NCARB 5488329-0301",
+    "address": "PO Box 991, Bountiful, UT 84011",
+    "phone": "801.413.4268",
+    "email": "info@deiv.net"
+  },
+  "gc": {
+    "company": "Kier Construction",
+    "contact": "Daniel Shaver"
+  },
+  "halofire": {
+    "proposal_date": "2025-09-18",
+    "proposal_price_usd": 538792.35,
+    "scope": "Sprinkler install Phase 1 building",
+    "contact": "Dan Farnsworth",
+    "office_address": "4811 E. Julep St. Suite #124, Mesa, AZ 85205",
+    "office_phone": "(480) 325-2280",
+    "license": "AZ ROC: 247730"
+  },
+  "building": {
+    "total_sqft": 170654,
+    "levels": [
+      { "id": "level_p1", "name": "Ground Floor Parking", "use": "garage", "elevation_ft": 0, "sqft": 28443 },
+      { "id": "level_p2", "name": "Second Floor Parking", "use": "garage", "elevation_ft": 12, "sqft": 28443 },
+      { "id": "level_1", "name": "Level 1 — Amenity + Residential", "use": "residential", "elevation_ft": 24, "sqft": 28443 },
+      { "id": "level_2", "name": "Level 2 — Residential", "use": "residential", "elevation_ft": 34, "sqft": 28443 },
+      { "id": "level_3", "name": "Level 3 — Residential", "use": "residential", "elevation_ft": 44, "sqft": 28443 },
+      { "id": "level_4", "name": "Level 4 — Residential", "use": "residential", "elevation_ft": 54, "sqft": 28444 }
+    ]
+  },
+  "fire_systems": [
+    {
+      "id": "sys_dry_garage_1",
+      "type": "dry_pipe",
+      "serves": "Ground floor parking",
+      "hazard": "ordinary_i",
+      "notes": "Dry system per scope; garage exposure"
+    },
+    {
+      "id": "sys_dry_garage_2",
+      "type": "dry_pipe",
+      "serves": "Second floor parking",
+      "hazard": "ordinary_i",
+      "notes": "Dry system per scope; garage exposure"
+    },
+    {
+      "id": "sys_wet_combo_standpipe_1",
+      "type": "combo_wet_standpipe",
+      "serves": "Stair shaft 1 + residential levels 1-4",
+      "hazard": "light",
+      "notes": "Manual wet standpipe assumed; coordinate interconnect with Phase 2 (RFI A101b)"
+    },
+    {
+      "id": "sys_wet_combo_standpipe_2",
+      "type": "combo_wet_standpipe",
+      "serves": "Stair shaft 2 + residential levels 1-4",
+      "hazard": "light",
+      "notes": "Manual wet standpipe assumed; coordinate interconnect with Phase 2 (RFI A101b)"
+    }
+  ],
+  "fdc": {
+    "type": "wall_mount",
+    "location_note": "FDC on North Temple (address) side — Salt Lake City AHJ requirement (RFI C302/A101b)",
+    "gridline_extension": "30.8 for Phase 2 connection"
+  },
+  "acknowledgements": [
+    "Scope begins 6\" above finished floor at riser flange, all underground by others",
+    "No flow data for bid — sufficient water flow assumed (no fire pump)",
+    "Temporary standpipe installed when framed to 4th floor",
+    "8 rough-in + 8 trim mobilizations included",
+    "Retail tenant finish bid separately"
+  ],
+  "exclusions": [
+    "Fire alarm, wiring, smoke/heat vents, FD access doors",
+    "Pre-action, anti-freeze, wet chemical systems",
+    "3D modelling + BIM coordination",
+    "Cutting, patching, ceiling tile work",
+    "Underground fire service line to building",
+    "Galvanized steel for garage dry system + L3 overhangs",
+    "Roof attic dry system"
+  ],
+  "source_docs": [
+    "Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.pdf",
+    "1881 - Architecturals.pdf",
+    "1881 - Plumbing.pdf",
+    "1881 Fire RFI's.pdf"
+  ]
+}

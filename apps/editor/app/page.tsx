@@ -8,12 +8,18 @@ import {
 } from '@pascal-app/editor'
 import { CatalogPanel } from '@/components/halofire/CatalogPanel'
 import { FireProtectionPanel } from '@/components/halofire/FireProtectionPanel'
+import { ProjectBriefPanel } from '@/components/halofire/ProjectBriefPanel'
 
 const SIDEBAR_TABS: (SidebarTab & { component: React.ComponentType })[] = [
   {
     id: 'site',
     label: 'Scene',
     component: () => null, // Built-in SitePanel handles this
+  },
+  {
+    id: 'halofire-project',
+    label: 'Project',
+    component: ProjectBriefPanel,
   },
   {
     id: 'halofire-catalog',

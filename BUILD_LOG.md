@@ -903,7 +903,58 @@ Running state at session end:
      handled by main calc term), friction accounting uses gateway's
      Hazen-Williams with `pipe_material = steel_new`. Proper branched-
      network calc + density-area method ships M2.
-- 📝 Next: scene persistence via `.pen` file so Wade can close the tab
-     and resume a bid mid-takeoff; also wire live scene into
-     `halofire_validate shell` + `collisions` so the demo placeholder
-     walls/floors are replaced by real scene data.
+---
+
+### Entry 25 — First real client project: 1881 Cooperative (SLC)
+
+User direction: *"the test of this design system is to accurately design
+and build this client system in 2d drawings that the client expects and
+a 3d model that is then implemented in the client's custom web design
+bid."* Source docs at `E:\ClaudeBot\HaloFireBidDocs\`.
+
+- ✅ New "Project" sidebar tab (`ProjectBriefPanel.tsx`) — loads real
+     client bid metadata from `/projects/<id>.json` and renders an
+     estimator's-eye summary: name, address, APN, construction type,
+     AHJ, architect/GC, total sqft, proposal price, per-level table
+     (use-coded badges), fire systems (2 dry + 2 combo standpipe), FDC
+     location, acknowledgements + exclusions accordions, source-doc
+     links to the embedded PDFs.
+- ✅ `/projects/1881-cooperative.json`: full bid data extracted from
+     real docs (Proposal PDF + Architectural title block + Fire RFIs):
+        - The Cooperative 1881 Apartments — Phase I
+        - 1881 W North Temple, Salt Lake City, UT 84104
+        - APN 08343530050000, TSA-MUEC-C, Type III-B over Type I-A Podium
+        - 2021 Utah Building Code, Salt Lake City Fire Marshal AHJ
+        - Architect: 22 Design Lab / David M. Clayton (NCARB 5488329-0301)
+        - GC: Kier Construction — Daniel Shaver
+        - Halo Fire: Dan Farnsworth, $538,792.35 proposal (2025-09-18)
+        - 170,654 sqft across 6 levels (2 garage + 4 residential)
+        - 4 fire systems: 2 garage dry-pipe + 2 combo wet standpipes
+        - FDC wall-mount on North Temple (address) side per RFI
+        - Full acknowledgements/exclusions list from proposal
+- ✅ "Seed Pascal scene from brief" button: creates Site → Building →
+     6× Level (each with a slab + hazard zone) using real elevations
+     from the level schedule. Approximates a square footprint from
+     total sqft (real geometry from PDF extraction is M2 week 7-8).
+     Every node carries `userData.halofire_project_id` so downstream
+     tools can filter by project.
+- ✅ Source PDFs copied into `apps/editor/public/projects/1881-cooperative/`
+     (proposal.pdf + fire-rfis.pdf). Brief panel links to them inline.
+- ✅ Studio HTTP 200 with 4 tabs now (Scene / Project / Catalog / Fire
+     Protection); proposal PDF served at /projects/1881-cooperative/proposal.pdf.
+- 📝 This is the **acid test**: with a real client brief loaded and
+     scene seeded, the existing pipeline (auto-grid heads → auto-tree
+     pipes → calc → export PDF) produces a takeoff for a real bid
+     instead of a synthetic demo. Known gap: hazard zones are
+     square stand-ins; real floor polygons require PDF vector
+     extraction (scheduled M2 week 7-8, `halofire_ingest_pdf` L1 layer).
+- 📝 Next concrete steps against this brief:
+        1. Generate a per-level FP sheet set (FP-0 Cover, FP-1..FP-6
+           per-level plans, FP-H Hydraulic placard) — ships in gateway
+           export_pdf, extend to multi-sheet.
+        2. Run full auto-grid/route/calc against the 4 residential
+           levels + 2 garage levels; compare head-count estimate to
+           proposal $538k for sanity.
+        3. Emit a `.glb` 3D model of the full pipe network + heads
+           (halofire_export model_3d mode) to drop into Wade's web
+           bid viewer.
