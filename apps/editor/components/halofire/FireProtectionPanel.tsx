@@ -17,6 +17,7 @@
 import { sceneRegistry } from '@pascal-app/core'
 import { serializeLiveScene } from '@halofire/halopenclaw-client'
 import { useCallback, useState } from 'react'
+import { IfcUploadButton } from './IfcUploadButton'
 
 const GATEWAY_URL =
   process.env.NEXT_PUBLIC_HALOPENCLAW_URL ?? 'http://localhost:18790'
@@ -265,10 +266,20 @@ export function FireProtectionPanel() {
         <ResultBlock result={calc} />
       </Section>
 
-      <Section title="5. Ingest + Export" description="M2 week 7-8 for full PDF; M3 for AHJ set">
+      <Section title="5. Ingest IFC" description="Upload an architect's .ifc file">
+        <IfcUploadButton />
+        <p className="mt-2 text-[10px] text-neutral-500">
+          PDF upload via the 4-layer free pipeline (pdfplumber → opencv →
+          CubiCasa5k → Claude Vision) ships M2 week 7-8. DWG import M2 week 8.
+        </p>
+      </Section>
+
+      <Section title="6. Export" description="Single-sheet M1 week 5; full AHJ set M3">
         <p className="text-[11px] text-neutral-500">
-          IFC upload UI: M1 week 3. PDF upload + L1-L4 pipeline: M2 week 7-8.
-          AHJ-grade sheet set (FP-0..FP-5): M3 week 21-22.
+          PDF plan export is wired via the gateway's `halofire_export pdf_plan`
+          tool (vendored matplotlib renderer). Hookup to a "Export" button
+          needs a serialized schedule from the live scene, due M1 week 6.
+          AHJ-grade sheet set (FP-0..FP-5): M3 weeks 21-22.
         </p>
       </Section>
     </div>

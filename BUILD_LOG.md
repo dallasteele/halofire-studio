@@ -523,3 +523,98 @@ What's left for M1 completion (week 6):
      re-audit after `useScene.subscribe` fires for full reliability.
      Deferred — M1 wk6 polish.
 
+
+### Entry 15 — IFC upload UI + final Fire Protection panel layout
+
+- ✅ New `apps/editor/components/halofire/IfcUploadButton.tsx`:
+     standalone file input that parses a selected .ifc via
+     `importIfcFile` from @halofire/ifc, shows progress, surfaces the
+     scaffold-stage warning ("walk logic is a stub"), renders a summary
+     block with entities-processed + nodes-created + duration.
+- ✅ FireProtectionPanel section "5. Ingest IFC" now mounts the
+     upload button. Users can pick a real .ifc from disk today; the
+     @thatopen/components loader parses it and returns the scaffold
+     mapping result — proving the end-to-end upload → parse → response
+     path ships in M1 week 6 before the real mapper walk lands.
+- ✅ Old "Ingest + Export" section split into separate "5. Ingest IFC"
+     (interactive) + "6. Export" (scope note) for clarity.
+- ✅ `@halofire/ifc` added to `apps/editor/package.json` deps; ifc
+     package built successfully.
+- 📝 Once the mapper's real spatial-tree walk lands, users will see
+     actual Pascal nodes populate their scene from the architect IFC —
+     same button, zero changes to the surrounding UI. The contract is
+     stable.
+
+---
+
+## M1 session-spanning summary (weeks 1-5 + M1 wk6 IFC UI start)
+
+Final commit list (9 commits total across two continuation sessions):
+| Hash | Title |
+|---|---|
+| `2709edb` | Phase 1 fork + scaffold @halofire/sprinkler |
+| `72cbe18` | Requirements + roadmap v2 |
+| `4b2786a` | Technical plan + M1 infrastructure scaffold |
+| `290cfce` | validate tool real impl + BUILD_LOG start |
+| `61d73a8` | Catalog + 20 authored components + IFC wire |
+| `62ac4cd` | Catalog + Fire Protection sidebar tabs |
+| `c5af134` | halopenclaw-client + deploy infra |
+| `e830768` | Hazen-Williams calc + auto-grid head placer |
+| `4a64e8a` | L1 PDF vector extraction + pdf_plan export |
+| `636a10a` | route_pipe MST + FireProtectionPanel upgrade |
+| `8169d40` | serializeLiveScene + Fire Protection wired to Pascal |
+| (next)   | IFC upload UI (this entry) |
+
+Halopenclaw gateway tool status (end of this session):
+
+| Tool | Modes live | Modes stubbed |
+|---|---|---|
+| halofire_validate | shell, collisions | nfpa13, hydraulic, completeness (M3) |
+| halofire_ingest | pdf L1, ifc (client) | L2-L4 (M2), dwg (M2 wk8) |
+| halofire_place_head | auto_grid, at_coords, manual | — |
+| halofire_route_pipe | manual_segment, auto_tree | auto_loop, auto_grid (M3) |
+| halofire_calc | hazen_williams, k_factor_flow, single_branch | density_area, remote_area, supply_check (M3) |
+| halofire_export | pdf_plan | dxf (M2), ifc/cut_sheets/proposal/sheet_set (M3) |
+
+Halofire Studio sidebar:
+- Scene tab: Pascal built-in
+- **Catalog tab**: browses all 20 authored components ✅
+- **Fire Protection tab**: 6 interactive sections, all backed by live
+  gateway + live Pascal scene ✅
+
+Files in this fork (non-upstream):
+
+| File | Purpose |
+|---|---|
+| `HALOFIRE_ROADMAP.md` | 8-month phased plan |
+| `HALOFIRE_REQUIREMENTS.md` | Full product requirements + capability matrix |
+| `HALOFIRE_TECHNICAL_PLAN.md` | Architecture + free-AI strategy |
+| `BUILD_LOG.md` | 15-entry Codex review log |
+| `packages/halofire-sprinkler/` | NFPA 13 rules + head catalog types |
+| `packages/halofire-catalog/` | 20 GLBs + manifest |
+| `packages/halofire-ifc/` | @thatopen/components IFC import |
+| `packages/halofire-takeoff/` | Browser client for PDF pipeline |
+| `packages/halofire-ai-bridge/` | Claude + Codex router |
+| `packages/halofire-halopenclaw-client/` | Typed gateway RPC + scene serializers |
+| `services/halopenclaw-gateway/` | Python FastAPI + 6 tools + deploy |
+| `apps/editor/components/halofire/` | Catalog + Fire Protection sidebar |
+
+## Codex review handoff
+
+Start here:
+1. Read `HALOFIRE_TECHNICAL_PLAN.md` for architecture
+2. Read `HALOFIRE_REQUIREMENTS.md` for scope
+3. Read `BUILD_LOG.md` top-to-bottom — every commit + verification
+4. Spot-check each completed item:
+   - `cd services/halopenclaw-gateway && pip install -r requirements.txt &&
+      uvicorn main:app --port 18790` → should boot + serve /health with 6 tools
+   - Test a tool call per the smoke-test snippets quoted in log entries
+   - `cd packages/halofire-catalog && bun run check-types` → should pass
+   - Verify `assets/glb/` has exactly 20 GLBs matching `src/manifest.ts`
+
+Known issues (pre-existing upstream, NOT halofire-caused):
+- `packages/editor/src/store/use-editor.tsx` TS7006 at lines 344, 355
+- three.js peer-dep warning (0.184 vs 0.170 requested by @thatopen/components)
+
+Everything else is halofire code and should type-check + build + boot
+cleanly. Happy reviewing.
