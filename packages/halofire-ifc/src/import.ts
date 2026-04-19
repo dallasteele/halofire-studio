@@ -1,20 +1,26 @@
 /**
- * IFC import entry point (M1 week 1 wire-up).
+ * IFC import entry point.
  *
- * Uses @thatopen/components IfcLoader: initialize a headless components
- * world, configure web-ifc WASM path, load the user's IFC bytes, walk
- * the spatial tree, and emit Pascal nodes.
+ * BLOCKING ISSUE (2026-04-18): `@thatopen/components` 2.4.x + fragments +
+ * three have incompatible peer-deps against Pascal's pinned three@0.184.
+ * components@2.4.11 wants `AlignmentObject` from fragments 2.4.0 which
+ * doesn't export it; components@3.4.2 wants `instancedArray` from three
+ * 0.178+ which Pascal doesn't carry.
  *
- * This module runs in the browser (Next.js app). The components library
- * handles the web-ifc WASM worker itself, but we must tell it where to
- * find the .wasm file — normally `/web-ifc.wasm` served from public/.
+ * To keep the Halofire Studio page loading, this module intentionally
+ * does NOT import @thatopen/components until the peer-dep conflict is
+ * resolved. The function signature is stable; real parsing lands once:
+ *   a) Pascal bumps three to 0.184 consistently (already in its root
+ *      package.json but transitively @thatopen/core is dragging 0.170)
+ *   b) OR we vendor a fragments build that exports both Alignment +
+ *      AlignmentObject
+ *   c) OR we switch to web-ifc directly (without @thatopen wrapper)
  *
- * Implementation status: wired against @thatopen/components@^2.4.
- * Untested with real IFC files until the Halofire Studio app exposes an
- * upload UI in M1 week 3. Function signature is stable.
+ * For now: the uploader reads the file, reports basic byte-count + name,
+ * and returns a clear "not yet parsing" warning. Users see their upload
+ * was received and know what's coming.
  */
 
-import * as OBC from '@thatopen/components'
 import type { IfcImportOptions, IfcImportResult } from './types.js'
 import { mapIfcToNodeTree } from './mapper.js'
 
@@ -24,28 +30,18 @@ export async function importIfcFile(
   const start =
     typeof performance !== 'undefined' ? performance.now() : Date.now()
 
-  // 1. Initialize a world + loader
-  const components = new OBC.Components()
-  const ifcLoader = components.get(OBC.IfcLoader)
-
-  // Tell web-ifc where the WASM worker lives. In a Next.js app the WASM
-  // is served from public/. setup() accepts { autoSetWasm, wasm: {path, absolute} }.
-  await ifcLoader.setup({
-    autoSetWasm: false,
-    wasm: { path: '/', absolute: true },
-  })
-
-  // 2. Parse IFC bytes into a @thatopen/fragments model
-  const model = await ifcLoader.load(new Uint8Array(options.file))
-
-  // 3. Walk the hierarchy + create Pascal nodes
-  const mapping = await mapIfcToNodeTree(model, options)
+  const mapping = await mapIfcToNodeTree(null, options)
 
   return {
-    entitiesProcessed: mapping.entitiesProcessed ?? 0,
+    entitiesProcessed: 0,
     nodesCreated: mapping.nodesCreated,
-    skippedEntities: mapping.skippedEntities ?? [],
-    warnings: mapping.warnings ?? [],
+    skippedEntities: [],
+    warnings: [
+      `Received ${options.filename ?? 'file'} (${(options.file.byteLength / 1024).toFixed(1)} KB).`,
+      'IFC parsing is currently disabled pending @thatopen/components peer-dep',
+      'resolution against Pascal\'s three.js version. Tracked in BUILD_LOG entry 16.',
+      'Real parse lands once the version conflict is resolved (next iteration).',
+    ],
     rootNodeIds: mapping.rootNodeIds,
     durationMs:
       (typeof performance !== 'undefined' ? performance.now() : Date.now()) - start,

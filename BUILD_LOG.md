@@ -618,3 +618,48 @@ Known issues (pre-existing upstream, NOT halofire-caused):
 
 Everything else is halofire code and should type-check + build + boot
 cleanly. Happy reviewing.
+
+### Entry 16 — Halofire Studio live on localhost:3002 (peer-dep workaround)
+
+- ✅ Stopped upstream Pascal editor MCP instance (released port 3002)
+- ✅ Built `@pascal-app/core` + `@pascal-app/viewer` (tsc emits `dist/`
+     despite upstream 22 strict-mode errors — `noEmitOnError` isn't set
+     in their tsconfigs, so dist is produced and Next.js picks it up)
+- ✅ `cd apps/editor && bun x next dev --port 3002` runs Next.js
+     directly, bypassing `turbo run dev` which chains tsc --build first
+- ✅ Halofire Studio now serves at http://localhost:3002
+     - HTTP 200 on /
+     - Title: "Halofire Studio"
+     - 51 KB page payload
+     - Next.js 16.2.1 Turbopack, ready in 431ms
+- ⚠️ **Peer-dep deadlock** discovered + worked around:
+     - `@thatopen/components@2.4.11` imports `AlignmentObject` from
+       `@thatopen/fragments` but no published fragments version exports
+       that symbol (only `Alignment`). Components@2.4.11 is effectively
+       broken.
+     - `@thatopen/components@3.4.2` imports `instancedArray` from
+       three@0.178+ TSL namespace — Pascal pins three@0.170 transitively
+       via @pascal-app/core deps, so upgrading components to 3.x breaks
+       Pascal's ExtrudeGeometry + wall system.
+     - **Workaround:** stripped the `import * as OBC from '@thatopen/components'`
+       from `packages/halofire-ifc/src/import.ts`. The IFC import now
+       returns a no-op success message + warning "Received file; real
+       parse pending @thatopen peer-dep resolution." IfcUploadButton
+       still receives user files end-to-end.
+- ✅ `IfcUploadButton` wrapped with Next.js `dynamic(ssr:false)` — now
+     in two files:
+     - `IfcUploadButtonImpl.tsx` with the real logic (client-only)
+     - `IfcUploadButton.tsx` the dynamic-import wrapper with
+       `Loading IFC module...` fallback
+- 📝 Real IFC parsing resumes when EITHER:
+     (a) Pascal's three.js version bumps to 0.178+ across all workspaces
+         (allowing @thatopen/components@3.4.2), OR
+     (b) We switch to `web-ifc` directly (without @thatopen wrapper —
+         lower-level but no peer-dep drama), OR
+     (c) We vendor a patched @thatopen/fragments that exports both
+         symbols.
+- 📝 User can navigate all 3 sidebar tabs live:
+     - Scene: Pascal's built-in building editor
+     - Catalog: browses all 20 Halofire components
+     - Fire Protection: 6 sections live-calling halopenclaw gateway
+       (if gateway is running on :18790 in parallel)
