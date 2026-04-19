@@ -54,3 +54,4 @@ services/halopenclaw-gateway/*.egg-info/
 services/halopenclaw-gateway/.pytest_cache/
 services/halopenclaw-gateway/jobs/
 services/halopenclaw-gateway/.env
+services/halopenclaw-gateway/_test_*

@@ -341,3 +341,71 @@ Non-blocking (already acknowledged):
 - 📝 Cleaned `__pycache__` forced on every test to dodge bytecode-cache
      staleness when iterating on tool impls. Production uses `systemctl
      restart halopenclaw.service` which Python re-imports cleanly.
+
+### Entry 11 — Layer 1 PDF ingest + single-sheet PDF export
+
+- ✅ New `services/halopenclaw-gateway/pdf_pipeline/vector.py` wraps
+     pdfplumber for layer-1 vector extraction:
+     - `extract_vectors(pdf_path, page_index)` returns VectorExtraction
+       with lines, text fragments, stroke-width distribution, confidence
+     - Confidence scoring heuristic: 0.95 for ≥200 lines with bimodal
+       stroke widths + orthogonal dominance; 0.75 for 50+ lines with
+       unique widths; 0.50 for 10+ lines; 0.10 below that (probable
+       scanned PDF)
+     - Graceful degradation: wraps pdfplumber exceptions, returns a
+       clear warning instead of crashing
+- ✅ `halofire_ingest` tool rewritten for real L1 operation:
+     - mode=ifc: routes to browser-side @halofire/ifc (no server work)
+     - mode=dwg: rejects with "M2 week 8" scope note
+     - mode=pdf: runs L1; if confidence ≥ 0.8 (or force_layer=l1) returns
+       L1 result; else notes escalation path to L2 (opencv), L3 (CubiCasa),
+       L4 (Claude Vision)
+- ✅ `halofire_export` tool wires real `pdf_plan` mode via the ClaudeBot
+     skill's `draft_plan_png.py` renderer (vendored at
+     services/halopenclaw-gateway/drafting_matplotlib.py). Accepts a
+     schedule YAML-shaped dict, renders to PNG, returns file-on-disk
+     path + byte count or in-memory base64.
+- ✅ Smoke tests:
+     - `halofire_ingest` given the cafeteria PNG (not a PDF — intentional
+       bad input): returned L1 confidence 0.00 with clean warning
+       "No /Root object! - Is this really a PDF?" + escalation note.
+       No crash, no 500 error.
+     - `halofire_export pdf_plan` given the real cafeteria schedule
+       (22 equipment items + 5 zones): rendered 162,869-byte PNG to
+       `_test_plan.png` in ~1s. Contents match the reference plan
+       generated outside the gateway.
+- ✅ `.gitignore` updated for gateway test artifacts
+- 📝 `drafting_matplotlib.py` is a file-level vendored copy from
+     `E:/ClaudeBot/skills/3d-procedural-authoring/tools/draft_plan_png.py`.
+     If the skill version evolves (new zone colors, title-block fields),
+     this copy needs updating. Consider pip-installing the skill as a
+     local package OR moving the renderer into `@halofire/drafting`
+     Python equivalent.
+- 📝 `pip install pdfplumber matplotlib PyYAML` ran clean in the venv.
+     Moved these to `requirements.txt` already in entry 03.
+
+### Entry 12 — M1 week 2-5 progress summary
+
+M1 week 1 (prior session) shipped: scaffolded packages, gateway boots,
+validate tool works, 20 GLBs authored.
+
+This continuation session M1 weeks 2-5 scope shipped:
+- Real Hazen-Williams friction-loss calc engine with NFPA tables
+- Real auto-grid head placer per NFPA 13 §11.2.3.1.1
+- Real PDF L1 vector extraction via pdfplumber
+- Real single-sheet PDF plan rendering via matplotlib
+
+What's LIVE now (callable via halopenclaw gateway /mcp tools/call):
+| tool | modes with real impl |
+|---|---|
+| halofire_validate | shell, collisions |
+| halofire_calc | hazen_williams, k_factor_flow, single_branch |
+| halofire_place_head | auto_grid, at_coords |
+| halofire_ingest | pdf L1 (vector extraction), ifc (client-side), dwg (rejected with scope note) |
+| halofire_export | pdf_plan (matplotlib-rendered PNG) |
+| halofire_route_pipe | (stubbed, M1 week 4 extended scope) |
+
+Remaining for M1 wrap-up:
+- halofire_route_pipe: manual_segment real impl (M1 week 4 scope)
+- IFC upload UI in Fire Protection panel (M1 week 3 scope)
+- Pascal click-to-place wiring from CatalogPanel (M1 week 3 scope)
