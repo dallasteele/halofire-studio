@@ -775,3 +775,32 @@ Running state at session end:
      hierarchy is accurate + each placeholder carries its IFC GUID, so a
      second-pass geometry walker will have stable references to attach
      triangles to.
+
+### Entry 20 — XYZ placement + auto-grid spawns heads into scene
+
+- ✅ `CatalogPanel.tsx` PlaceButton now has X/Y/Z cm inputs in a 3-col
+     grid; "Place at origin" renamed "Place at coordinates"; reads the
+     inputs, converts cm → m, and creates the ItemNode with the user's
+     chosen position. Status message shows the placed coordinates in
+     meters: "Placed SM_Head_Pendant_Standard_K56 @ (1.23, 2.34, 3.80) m"
+- ✅ `FireProtectionPanel.tsx` `runAutoGrid` upgraded:
+     - After the gateway returns its NFPA-compliant head grid as text,
+       the callback parses the output with a regex `/@ \(([\d.]+), ([\d.]+), ([\d.]+)\)/gm`
+       to extract each placement
+     - For each extracted coordinate, creates a Pascal ItemNode using
+       the same ItemNode shape as the Catalog panel, with
+       `asset.src = /halofire-catalog/glb/SM_Head_Pendant_Standard_K56.glb`,
+       `attachTo: 'ceiling'`, `tags: ['halofire', 'auto_grid']`
+     - Appends "✓ Spawned N heads into the Pascal scene." to the
+       output block
+     - Uses `findBySku` from @halofire/catalog so the spawned items have
+       the correct real dimensions (45×90×45 cm for the K=5.6 pendant)
+- ✅ HTTP 200; Turbopack hot-compiled in 78ms. Minor `THREE.Material`
+     warning about missing `map` parameter — upstream viewer diagnostic,
+     not fatal.
+- 📝 User flow now: set room width + length + hazard → "Compute auto-
+     grid" → gateway returns positions → browser parses + spawns → Scene
+     tab shows the head layout populated into the user's building.
+     That's the full bid workflow from "blank room" to "NFPA-compliant
+     head layout" in two clicks.
+

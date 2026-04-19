@@ -14,8 +14,9 @@
  * M2-M3 adds: L2-L4 PDF, density-area calc, AHJ sheet set.
  */
 
-import { sceneRegistry } from '@pascal-app/core'
+import { generateId, sceneRegistry, useScene } from '@pascal-app/core'
 import { serializeLiveScene } from '@halofire/halopenclaw-client'
+import { findBySku } from '@halofire/catalog'
 import { useCallback, useState } from 'react'
 import { IfcUploadButton } from './IfcUploadButton'
 
@@ -127,22 +128,67 @@ export function FireProtectionPanel() {
     }
   }, [])
 
+  const createNode = useScene((s) => s.createNode)
+  const rootNodeIds = useScene((s) => s.rootNodeIds)
+
   const runAutoGrid = useCallback(async () => {
     setPlacer({ running: true })
     try {
+      const headSku = 'SM_Head_Pendant_Standard_K56'
       const output = await callTool('halofire_place_head', {
         mode: 'auto_grid',
         scene_id: 'studio_demo',
         room_bbox_cm: { min: [0, 0, 0], max: [roomW, roomL, 400] },
         ceiling_z_cm: 380,
         hazard_class: hazard,
-        head_model: 'SM_Head_Pendant_Standard_K56',
+        head_model: headSku,
       })
-      setPlacer({ running: false, output })
+
+      // Parse the "@ (x, y, z)" lines from the output and spawn each as
+      // a Pascal ItemNode. Format: "  @ (228.6, 228.6, 380.0) cm"
+      const entry = findBySku(headSku)
+      const [dw, dd, dh] = entry.dims_cm
+      const dimsMeters: [number, number, number] = [dw / 100, dh / 100, dd / 100]
+      const parentId = rootNodeIds?.[0]
+      let spawned = 0
+      const coordRegex = /^\s*@ \(([-\d.]+), ([-\d.]+), ([-\d.]+)\)/gm
+      for (const m of output.matchAll(coordRegex)) {
+        const px = Number(m[1]) / 100
+        const py = Number(m[2]) / 100
+        const pz = Number(m[3]) / 100
+        try {
+          // @ts-expect-error — runtime accepts the shape
+          createNode({
+            id: generateId('item'),
+            type: 'item',
+            position: [px, py, pz],
+            rotation: [0, 0, 0],
+            scale: [1, 1, 1],
+            children: [],
+            asset: {
+              category: entry.category,
+              dimensions: dimsMeters,
+              src: `/halofire-catalog/glb/${entry.sku}.glb`,
+              attachTo: 'ceiling',
+              offset: [0, 0, 0],
+              rotation: [0, 0, 0],
+              scale: [1, 1, 1],
+              tags: ['halofire', entry.category, 'auto_grid'],
+            },
+          }, parentId)
+          spawned++
+        } catch {
+          // best-effort spawn; ignore per-head failures
+        }
+      }
+      const suffix = spawned > 0
+        ? `\n\n✓ Spawned ${spawned} heads into the Pascal scene.`
+        : '\n\n(No heads spawned — check output for layout.)'
+      setPlacer({ running: false, output: output + suffix })
     } catch (e) {
       setPlacer({ running: false, error: String(e) })
     }
-  }, [roomW, roomL, hazard])
+  }, [roomW, roomL, hazard, createNode, rootNodeIds])
 
   const runAutoRoute = useCallback(async () => {
     setRouter({ running: true })

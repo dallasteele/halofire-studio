@@ -168,6 +168,9 @@ function PlaceButton({ entry }: { entry: CatalogEntry }) {
   const createNode = useScene((s) => s.createNode)
   const rootNodeIds = useScene((s) => s.rootNodeIds)
   const [status, setStatus] = useState<string | null>(null)
+  const [xStr, setXStr] = useState('0')
+  const [yStr, setYStr] = useState('0')
+  const [zStr, setZStr] = useState('0')
 
   const onPlace = useCallback(() => {
     // Build an ItemNode referencing the catalog entry's GLB.
@@ -182,11 +185,16 @@ function PlaceButton({ entry }: { entry: CatalogEntry }) {
       : entry.mounting === 'wall_mount' ? 'wall'
       : 'floor'
 
+    // User-input coords in cm → convert to meters for Pascal
+    const px = (Number(xStr) || 0) / 100
+    const py = (Number(yStr) || 0) / 100
+    const pz = (Number(zStr) || 0) / 100
+
     const id = generateId('item') as `item_${string}`
     const node = {
       id,
       type: 'item' as const,
-      position: [0, 0, 0] as [number, number, number],
+      position: [px, py, pz] as [number, number, number],
       rotation: [0, 0, 0] as [number, number, number],
       scale: [1, 1, 1] as [number, number, number],
       children: [],
@@ -208,20 +216,49 @@ function PlaceButton({ entry }: { entry: CatalogEntry }) {
       const parentId = rootNodeIds?.[0]
       // @ts-expect-error - ItemNode schema is strict; runtime accepts the shape
       createNode(node, parentId)
-      setStatus(`Placed ${entry.sku} at origin`)
+      setStatus(`Placed ${entry.sku} @ (${px.toFixed(2)}, ${py.toFixed(2)}, ${pz.toFixed(2)}) m`)
     } catch (e) {
       setStatus(`Failed: ${String(e)}`)
     }
-  }, [entry, createNode, rootNodeIds])
+  }, [entry, createNode, rootNodeIds, xStr, yStr, zStr])
 
   return (
     <>
+      <div className="mt-2 grid grid-cols-3 gap-1">
+        <label className="flex flex-col">
+          <span className="text-[9px] text-neutral-500">X (cm)</span>
+          <input
+            type="number"
+            value={xStr}
+            onChange={(e) => setXStr(e.target.value)}
+            className="w-full rounded border border-neutral-300 bg-neutral-50 px-1 py-0.5 text-[10px] dark:border-neutral-700 dark:bg-neutral-900"
+          />
+        </label>
+        <label className="flex flex-col">
+          <span className="text-[9px] text-neutral-500">Y (cm)</span>
+          <input
+            type="number"
+            value={yStr}
+            onChange={(e) => setYStr(e.target.value)}
+            className="w-full rounded border border-neutral-300 bg-neutral-50 px-1 py-0.5 text-[10px] dark:border-neutral-700 dark:bg-neutral-900"
+          />
+        </label>
+        <label className="flex flex-col">
+          <span className="text-[9px] text-neutral-500">Z (cm)</span>
+          <input
+            type="number"
+            value={zStr}
+            onChange={(e) => setZStr(e.target.value)}
+            className="w-full rounded border border-neutral-300 bg-neutral-50 px-1 py-0.5 text-[10px] dark:border-neutral-700 dark:bg-neutral-900"
+          />
+        </label>
+      </div>
       <button
         type="button"
         onClick={onPlace}
         className="mt-2 w-full rounded bg-blue-600 px-2 py-1 text-xs font-medium text-white hover:bg-blue-700"
       >
-        Place at origin
+        Place at coordinates
       </button>
       {status && (
         <p
