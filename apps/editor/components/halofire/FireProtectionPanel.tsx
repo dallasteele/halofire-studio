@@ -16,7 +16,7 @@
 
 import { generateId, sceneRegistry, useScene } from '@pascal-app/core'
 import { serializeLiveScene } from '@halofire/halopenclaw-client'
-import { findBySku } from '@halofire/catalog'
+import { findBySku, findPipesBySize } from '@halofire/catalog'
 import { useCallback, useState } from 'react'
 import { IfcUploadButton } from './IfcUploadButton'
 
@@ -129,7 +129,30 @@ export function FireProtectionPanel() {
   }, [])
 
   const createNode = useScene((s) => s.createNode)
+  const deleteNodes = useScene((s) => s.deleteNodes)
   const rootNodeIds = useScene((s) => s.rootNodeIds)
+
+  const clearAutoRouted = useCallback(() => {
+    const nodes = useScene.getState().nodes as Record<string, unknown>
+    const toDelete: string[] = []
+    for (const [id, raw] of Object.entries(nodes)) {
+      const n = raw as { type?: string; asset?: { tags?: string[] } }
+      if (n.type !== 'item') continue
+      if (!n.asset?.tags?.includes('auto_tree')) continue
+      toDelete.push(id)
+    }
+    if (toDelete.length === 0) {
+      setRouter({ running: false, output: 'No auto-routed pipes in scene.' })
+      return
+    }
+    try {
+      // @ts-expect-error — id is string; Pascal expects branded NodeId
+      deleteNodes(toDelete)
+      setRouter({ running: false, output: `✓ Removed ${toDelete.length} auto-routed pipe segments.` })
+    } catch (e) {
+      setRouter({ running: false, error: `deleteNodes failed: ${String(e)}` })
+    }
+  }, [deleteNodes])
 
   const runAutoGrid = useCallback(async () => {
     setPlacer({ running: true })
@@ -196,7 +219,7 @@ export function FireProtectionPanel() {
       // Pull live heads from the scene — any ItemNode tagged 'halofire'
       // + category starting 'sprinkler_head_' counts as a head for routing.
       // Fall back to a demo 3x2 grid when nothing has been placed yet.
-      let heads: { id: string; x_cm: number; y_cm: number; z_cm: number }[] = []
+      const heads: { id: string; x_cm: number; y_cm: number; z_cm: number }[] = []
       const nodes = useScene.getState().nodes as Record<string, unknown>
       for (const [id, raw] of Object.entries(nodes)) {
         const n = raw as { type?: string; position?: [number, number, number]; asset?: { category?: string } }
@@ -218,21 +241,139 @@ export function FireProtectionPanel() {
           }
         }
       }
+      const riser = { id: 'R1', x_cm: 50, y_cm: 50, z_cm: 380 }
       const output = await callTool('halofire_route_pipe', {
         mode: 'auto_tree',
         scene_id: 'studio_demo',
-        riser: { id: 'R1', x_cm: 50, y_cm: 50, z_cm: 380 },
+        riser,
         heads,
         pipe_schedule: 'sch10',
       })
+
+      // Parse segment lines from gateway output:
+      //   "  RISER → H0          332.8cm  (10.92ft)"
+      // Build id → position map so each segment can be spawned as a
+      // scaled pipe ItemNode between its endpoints.
+      const posById = new Map<string, [number, number, number]>()
+      posById.set(riser.id, [riser.x_cm / 100, riser.y_cm / 100, riser.z_cm / 100])
+      for (const h of heads) {
+        posById.set(h.id, [h.x_cm / 100, h.y_cm / 100, h.z_cm / 100])
+      }
+
+      // NFPA 13 §28.5 pipe-schedule sizing helper.
+      const sizeForCount = (n: number): number =>
+        n <= 1 ? 1.0
+        : n <= 2 ? 1.25
+        : n <= 3 ? 1.5
+        : n <= 5 ? 2.0
+        : n <= 10 ? 2.5
+        : n <= 30 ? 3.0
+        : 4.0
+
+      // Parse all segments first so we can do a downstream head-count
+      // walk (§28.5 sizing is per-segment, not per-system).
+      const segRegex = /^\s+(\S+)\s+→\s+(\S+)\s+([\d.]+)cm\s+\(([\d.]+)ft\)/gm
+      type ParsedSeg = { fromId: string; toId: string }
+      const parsedSegs: ParsedSeg[] = []
+      for (const m of output.matchAll(segRegex)) {
+        parsedSegs.push({ fromId: m[1], toId: m[2] })
+      }
+      // Build children adjacency assuming the MST roots at the riser:
+      // each segment's `to` is a child of `from`.
+      const childrenOf = new Map<string, string[]>()
+      for (const s of parsedSegs) {
+        const arr = childrenOf.get(s.fromId) ?? []
+        arr.push(s.toId)
+        childrenOf.set(s.fromId, arr)
+      }
+      const isHead = new Set(heads.map((h) => h.id))
+      // Count downstream heads from a node via DFS, memoized.
+      const dsCache = new Map<string, number>()
+      const downstreamHeads = (nodeId: string): number => {
+        const cached = dsCache.get(nodeId)
+        if (cached !== undefined) return cached
+        let c = isHead.has(nodeId) ? 1 : 0
+        for (const ch of childrenOf.get(nodeId) ?? []) {
+          c += downstreamHeads(ch)
+        }
+        dsCache.set(nodeId, c)
+        return c
+      }
+
+      let spawned = 0
+      const sizesUsed = new Map<number, number>() // pipeSizeIn → count
+      const parentId = rootNodeIds?.[0]
+      for (const seg of parsedSegs) {
+        const { fromId, toId } = seg
+        const p1 = posById.get(fromId)
+        const p2 = posById.get(toId)
+        if (!p1 || !p2) continue
+        // This segment carries flow for every head downstream of `to`.
+        const dsCount = Math.max(1, downstreamHeads(toId))
+        const pipeSizeIn = sizeForCount(dsCount)
+        const pipeEntries = findPipesBySize(pipeSizeIn)
+        const pipeEntry = pipeEntries[0] ?? findBySku('SM_Pipe_SCH10_2in_1m')
+        const [pw, pd, ph] = pipeEntry.dims_cm
+        const pipeDimsMeters: [number, number, number] = [pw / 100, ph / 100, pd / 100]
+        sizesUsed.set(pipeSizeIn, (sizesUsed.get(pipeSizeIn) ?? 0) + 1)
+
+        const dx = p2[0] - p1[0]
+        const dy = p2[1] - p1[1]
+        const dz = p2[2] - p1[2]
+        const length_m = Math.sqrt(dx * dx + dy * dy + dz * dz)
+        if (length_m < 0.001) continue
+        const mid: [number, number, number] = [
+          (p1[0] + p2[0]) / 2,
+          (p1[1] + p2[1]) / 2,
+          (p1[2] + p2[2]) / 2,
+        ]
+        // Align pipe's local Y (its 1m length axis) to segment direction.
+        // Yaw around world up (position[2]) + pitch tilts off horizontal.
+        const horiz = Math.sqrt(dx * dx + dy * dy)
+        const yaw = Math.atan2(dy, dx)
+        const pitch = Math.atan2(dz, horiz)
+        try {
+          // @ts-expect-error — runtime accepts the shape
+          createNode({
+            id: generateId('item'),
+            type: 'item',
+            position: mid,
+            rotation: [pitch, 0, yaw] as [number, number, number],
+            // Scale local Y to segment length (pipe GLB is 1m long)
+            scale: [1, length_m, 1] as [number, number, number],
+            children: [],
+            asset: {
+              category: pipeEntry.category,
+              dimensions: pipeDimsMeters,
+              src: `/halofire-catalog/glb/${pipeEntry.sku}.glb`,
+              attachTo: 'ceiling',
+              offset: [0, 0, 0],
+              rotation: [0, 0, 0],
+              scale: [1, 1, 1],
+              tags: ['halofire', pipeEntry.category, 'auto_tree', `${fromId}→${toId}`],
+            },
+          }, parentId)
+          spawned++
+        } catch {
+          // best-effort
+        }
+      }
+
       const prefix = usingLive
         ? `Using ${heads.length} live heads from Pascal scene.\n\n`
         : `No live heads; using 3x2 demo grid.\n\n`
-      setRouter({ running: false, output: prefix + output })
+      const sizeBreakdown = Array.from(sizesUsed.entries())
+        .sort((a, b) => b[0] - a[0])
+        .map(([sz, n]) => `${n}×${sz}"`)
+        .join(', ')
+      const suffix = spawned > 0
+        ? `\n\n✓ Spawned ${spawned} pipe segments into the Pascal scene (${sizeBreakdown}) — per-branch §28.5 sizing by downstream head count.`
+        : '\n\n(No pipe segments spawned — parser found 0 matching rows.)'
+      setRouter({ running: false, output: prefix + output + suffix })
     } catch (e) {
       setRouter({ running: false, error: String(e) })
     }
-  }, [])
+  }, [createNode, rootNodeIds])
 
   const runCalc = useCallback(async () => {
     setCalc({ running: true })
@@ -373,8 +514,15 @@ export function FireProtectionPanel() {
 
       <Section title="3. Route Pipes" description="Prim's MST, pipe-schedule sizing">
         <Btn onClick={runAutoRoute} busy={router.running}>
-          Auto-tree route (3x2 demo heads)
+          Auto-tree route (spawns pipe segments)
         </Btn>
+        <button
+          type="button"
+          onClick={clearAutoRouted}
+          className="mt-1 w-full rounded border border-neutral-400 bg-neutral-100 px-2 py-1 text-[11px] font-medium text-neutral-700 hover:bg-neutral-200 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700"
+        >
+          Clear auto-routed pipes
+        </button>
         <ResultBlock result={router} />
       </Section>
 

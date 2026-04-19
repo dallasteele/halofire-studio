@@ -826,3 +826,63 @@ Running state at session end:
      Export → gateway renders a plan PNG on disk. Full AHJ-grade
      multi-sheet output (FP-0..FP-5 with title blocks + dimensions +
      schedules) is M3 work; this M1-scope export proves the pipeline.
+
+---
+
+### Entry 22 — Auto-route spawns visible pipe segments in scene
+
+- ✅ `FireProtectionPanel.runAutoRoute` now **spawns real pipe ItemNodes**
+     for every MST segment returned by `halofire_route_pipe auto_tree`.
+     Parser regex matches the gateway's segment rows
+     (`  FROM → TO    NNN.Ncm  (F.FFft)`), maps `from_id` and `to_id`
+     back to world positions via a Map built from live heads + riser,
+     and creates one ItemNode per segment:
+       - `position`: segment midpoint (meters)
+       - `scale`: `[1, length_m, 1]` — the 1m pipe GLB stretches along
+         its local Y axis to match segment length
+       - `rotation`: `[pitch, 0, yaw]` where `yaw = atan2(dy, dx)` and
+         `pitch = atan2(dz, horiz_len)`, aligning the pipe's long axis
+         with the segment direction
+       - `asset.src`: the authored SCH10 pipe GLB whose `pipe_size_in`
+         matches the NFPA 13 §28.5 pipe-schedule size for the total
+         head count (1"→1 head, 1.25"→2, 1.5"→3, 2"→4-5, 2.5"→6-10,
+         3"→11-30). This mirrors the gateway's own sizing helper so the
+         visual pipes match the tool output.
+- ✅ New export: `findPipesBySize` added to `@halofire/catalog` barrel.
+     Was declared in `query.ts` but not re-exported from `index.ts`;
+     rebuilt `dist/` after patching.
+- ✅ Studio HTTP 200 after rebuild; Turbopack hot-compiled cleanly.
+- 📝 Known approximation: all segments use the SAME pipe size (based
+     on total head count), not proper per-branch downstream counting.
+     The gateway note says "simplified: just use the head count for the
+     single-branch case; proper sizing needs a real tree walk" — per-
+     branch sizing is M2 work. For M1 demos this still visually
+     communicates the header-pipe diameter of a small system.
+- 📝 Pascal's coordinate convention in this project is treated Z-up
+     (heads placed at `position[2] = ceiling_z_cm / 100 ≈ 3.8m`), so
+     the yaw rotation is applied around the Z axis. If upstream Pascal
+     clarifies to Y-up later, swap `rotation` index 1↔2.
+---
+
+### Entry 23 — Per-branch §28.5 sizing + Clear-pipes button
+
+- ✅ Per-segment pipe sizing: `runAutoRoute` now builds an adjacency
+     map from the parsed segments (each segment's `to` is a child of
+     `from`, riser is root), then does a memoized DFS to count
+     downstream heads under every node. Each segment's pipe size is
+     `sizeForCount(downstreamHeads(toId))` — so the main trunk near
+     the riser gets 2.5"/3" and the branch tails feeding a single head
+     get 1". Matches NFPA 13 §28.5 schedule-method per-branch sizing.
+- ✅ Size breakdown shown in the suffix (`2×2.5", 3×1.5", 6×1"`) so
+     users see at a glance how the tree graded down.
+- ✅ **Clear auto-routed pipes** button: walks `useScene.getState().nodes`,
+     filters `type==='item' && asset.tags.includes('auto_tree')`, calls
+     `deleteNodes(ids)`. Enables iterative workflow — re-run auto-tree
+     after placing more heads without accumulating duplicates.
+- ✅ Studio HTTP 200 after edits; Turbopack recompiled cleanly.
+- 📝 Downstream-head DFS is memoized so the cost is O(nodes) even for
+     deep trees. For typical 20-50 head systems it's microseconds.
+- 📝 Next: hydraulic calc wiring (feed the live MST into
+     `halofire_calc single_branch` instead of hard-coded segments), then
+     a "Commit placements → scene.pen" serializer so Wade's session
+     survives a page reload.

@@ -16,4 +16,10 @@
 
 export type { ComponentCategory, MountingClass, CatalogEntry } from './types.js'
 export { CATALOG } from './manifest.js'
-export { findByCategory, findByName, findBySku } from './query.js'
+export {
+  findByCategory,
+  findByName,
+  findBySku,
+  findHeadsByKFactor,
+  findPipesBySize,
+} from './query.js'
