@@ -213,6 +213,21 @@ def write_proposal_files(
     except Exception as e:
         paths["html_error"] = str(e)
 
+    # Submittal sheet set — what the AHJ reviews
+    try:
+        import importlib.util as _ilu
+        _sspec = _ilu.spec_from_file_location(
+            "_halofire_submittal",
+            str(Path(__file__).with_name("submittal.py")),
+        )
+        assert _sspec is not None and _sspec.loader is not None
+        _smod = _ilu.module_from_spec(_sspec)
+        _sspec.loader.exec_module(_smod)
+        sub_path = _smod.write_submittal_pdf(data, out_dir)
+        paths["submittal"] = str(sub_path)
+    except Exception as e:
+        paths["submittal_error"] = str(e)
+
     # PDF (reportlab)
     try:
         from reportlab.lib.pagesizes import LETTER
