@@ -69,6 +69,40 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
   const inputRef = useRef<HTMLInputElement>(null)
 
   const createNode = useScene((s) => s.createNode)
+  const sceneNodes = useScene((s) => s.nodes)
+  const deleteNode = useScene((s) => s.deleteNode)
+
+  /** Locate the first `level` node in the scene tree — same pattern
+   *  SceneBootstrap uses. Returns undefined if the tree isn't ready
+   *  yet; caller will retry on next render. */
+  const findLevelId = useCallback((): string | undefined => {
+    for (const n of Object.values(sceneNodes ?? {})) {
+      const typed = n as { type?: string; id?: string }
+      if (typed?.type === 'level' && typed.id) return typed.id
+    }
+    return undefined
+  }, [sceneNodes])
+
+  /** Remove any previous auto_design spawns so re-runs don't pile up. */
+  const clearPreviousAutoDesign = useCallback(() => {
+    for (const n of Object.values(sceneNodes ?? {})) {
+      const tags = (n as { asset?: { tags?: string[] } }).asset?.tags ?? []
+      if (tags.includes('auto_design')) {
+        try {
+          deleteNode((n as { id: string }).id)
+        } catch {
+          // best effort
+        }
+      }
+    }
+  }, [sceneNodes, deleteNode])
+
+  // Cap how many heads + pipes the auto-design dumps into the live
+  // viewport at once — a 583-head / 194-pipe 1881 design would swamp
+  // the scene. The full set stays in design.json for the pipeline;
+  // this is viewport-only throttling.
+  const MAX_HEADS_VIEWPORT = 150
+  const MAX_PIPES_VIEWPORT = 150
 
   const stopPoll = useCallback(() => {
     if (pollRef.current) {
@@ -91,6 +125,20 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
         )
         if (!res.ok) return
         const design = await res.json()
+
+        // Parent every spawned node to the active Pascal Level so
+        // items show in the viewport (not orphaned under Site).
+        // Same gate SceneBootstrap uses.
+        const levelId = findLevelId()
+        if (!levelId) {
+          setError(
+            'scene render: Pascal level tree not ready — try again in a moment',
+          )
+          return
+        }
+        // Fresh run — wipe any previous auto-design spawns so the
+        // viewport reflects the latest pipeline output.
+        clearPreviousAutoDesign()
         const levels: Array<{
           id: string
           name: string
@@ -144,16 +192,20 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
                   tags: ['halofire', 'slab', 'auto_design'],
                 },
               } as any,
-              undefined,
+              levelId,
             )
           } catch {
             // per-level spawn is best-effort; don't block others
           }
         }
 
-        // Heads — 1 sphere per head ref'd at its 3D position
+        // Heads — 1 sphere per head ref'd at its 3D position.
+        // Cap total heads in the viewport so a 583-head design doesn't
+        // swamp the scene; the FULL set still lives in design.json.
+        let headsSpawned = 0
         for (const sys of systems) {
           for (const h of sys.heads ?? []) {
+            if (headsSpawned >= MAX_HEADS_VIEWPORT) break
             try {
               createNode(
                 {
@@ -177,14 +229,20 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
                     tags: ['halofire', 'sprinkler_head_pendant', 'auto_design'],
                   },
                 } as any,
-                undefined,
+                levelId,
               )
+              headsSpawned++
             } catch {
               // best-effort per head
             }
           }
-          // Pipes — one thin cylinder per segment (positioned at midpoint)
+          if (headsSpawned >= MAX_HEADS_VIEWPORT) break
+        }
+
+        let pipesSpawned = 0
+        for (const sys of systems) {
           for (const p of sys.pipes ?? []) {
+            if (pipesSpawned >= MAX_PIPES_VIEWPORT) break
             try {
               const mx = (p.start_m[0] + p.end_m[0]) / 2
               const my = (p.start_m[1] + p.end_m[1]) / 2
@@ -223,18 +281,20 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
                     ],
                   },
                 } as any,
-                undefined,
+                levelId,
               )
+              pipesSpawned++
             } catch {
               // best-effort
             }
           }
+          if (pipesSpawned >= MAX_PIPES_VIEWPORT) break
         }
       } catch (e) {
         setError(`scene render: ${String(e)}`)
       }
     },
-    [createNode],
+    [createNode, findLevelId, clearPreviousAutoDesign],
   )
 
   const run = useCallback(async () => {
