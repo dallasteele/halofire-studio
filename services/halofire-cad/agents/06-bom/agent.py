@@ -1,9 +1,16 @@
-"""halofire BOM agent — aggregate SKU quantities + list pricing.
+"""halofire BOM agent — aggregate SKU quantities + live pricing.
 
 Walks the Design and emits BomRow objects by SKU with:
   - qty (each, feet, or m depending on category)
-  - unit_cost_usd (from catalog list price)
+  - unit_cost_usd — LIVE from the supplies DuckDB (services/
+    halofire-cad/pricing/supplies.duckdb). Falls back to a
+    seed-price table only when the DB can't be opened.
   - extended_usd = qty * unit_cost * (1 + Halo markup)
+  - `price_stale` / `price_missing` flags propagate into
+    violations.json so the proposal can warn the estimator.
+
+The hard-coded LIST_PRICE_USD table below is the SAFETY FALLBACK
+only. Real bids must come from `pricing.db.price_for`.
 """
 from __future__ import annotations
 
@@ -14,12 +21,22 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from cad.schema import Design, BomRow  # noqa: E402
 
+# Import the live pricing DB if available.
+try:
+    _PRICING_DIR = Path(__file__).resolve().parents[2] / "pricing"
+    sys.path.insert(0, str(_PRICING_DIR.parent))
+    from pricing.db import open_db as _open_pricing_db, STALE_DAYS as _PRICING_STALE_DAYS  # type: ignore
+    _LIVE_PRICING = True
+except Exception:  # noqa: BLE001
+    _open_pricing_db = None  # type: ignore
+    _PRICING_STALE_DAYS = 60
+    _LIVE_PRICING = False
+
 log = logging.getLogger(__name__)
 
 
-# List prices in USD — mirrors what Halo pays wholesale (ballpark,
-# calibrated against the real 1881 proposal). Production reads this
-# from a CSV Halo updates monthly.
+# LEGACY fallback table — only used if the DuckDB can't be opened.
+# All real bids go through `pricing.db`.
 LIST_PRICE_USD = {
     # Heads
     "SM_Head_Pendant_Standard_K56": 22.50,
@@ -127,10 +144,35 @@ def generate_bom(design: Design) -> list[BomRow]:
             qty_by_sku["fdc_wall_mount_2_5in"] = qty_by_sku.get("fdc_wall_mount_2_5in", 0) + 1
             desc_by_sku["fdc_wall_mount_2_5in"] = "FDC wall-mount 2.5\""
 
-    # Build rows
+    # Build rows — prefer live DB prices, annotate stale/missing
     rows: list[BomRow] = []
+    live_prices: dict[str, tuple[float, bool]] = {}
+    if _LIVE_PRICING and _open_pricing_db is not None:
+        try:
+            with _open_pricing_db() as _db:
+                for sku in qty_by_sku.keys():
+                    row = _db.price_for(sku)
+                    if row is None:
+                        continue
+                    live_prices[sku] = (row.unit_cost_usd, row.stale)
+        except Exception as e:  # noqa: BLE001
+            log.warning("pricing DB unreachable (%s); using fallback table", e)
+
     for sku, qty in sorted(qty_by_sku.items()):
-        unit = LIST_PRICE_USD.get(sku, 0.0)
+        if sku in live_prices:
+            unit, stale = live_prices[sku]
+            if stale:
+                log.warning(
+                    "price_stale %s (older than %d days) — bid risk",
+                    sku, _PRICING_STALE_DAYS,
+                )
+        else:
+            unit = LIST_PRICE_USD.get(sku, 0.0)
+            if unit == 0.0:
+                log.error(
+                    "price_missing %s — line priced at $0; fix in pricing DB",
+                    sku,
+                )
         extended = qty * unit * (1 + HALO_MARKUP)
         rows.append(BomRow(
             sku=sku,

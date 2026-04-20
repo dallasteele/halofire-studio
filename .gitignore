@@ -56,3 +56,9 @@ services/halopenclaw-gateway/jobs/
 services/halopenclaw-gateway/.env
 services/halopenclaw-gateway/_test_*
 services/halofire-cad/vendor/CubiCasa5k/
+
+# HaloFire pricing DB + local snapshots
+services/halofire-cad/pricing/supplies.duckdb
+services/halofire-cad/pricing/supplies.duckdb.wal
+services/halofire-cad/pricing/exports/
+
