@@ -19,7 +19,7 @@
  * Runs ONCE per session. Guarded by a sessionStorage flag.
  */
 
-import { CATALOG } from '@halofire/catalog'
+import { CATALOG, materialFor } from '@halofire/catalog'
 import { generateId, useScene } from '@pascal-app/core'
 import { useEffect, useRef } from 'react'
 
@@ -213,7 +213,18 @@ function placeCatalogShowcase(opts: {
             offset: [0, 0, 0],
             rotation: [0, 0, 0],
             scale: [1, 1, 1],
-            tags: ['halofire', entry.category, 'catalog_showcase'],
+            tags: [
+              'halofire',
+              entry.category,
+              'catalog_showcase',
+              // Renderer's getHalofireTint reads this and applies a
+              // MeshStandardNodeMaterial with the given base color,
+              // so chrome heads, brass gauges, and red-painted pipes
+              // actually look like their real-world finish instead
+              // of the GLB's raw grey default.
+              `halofire_pipe_color:${materialFor(entry).color_hex}`,
+              `halofire_material:${materialFor(entry).name}`,
+            ],
           },
         },
         parentId,

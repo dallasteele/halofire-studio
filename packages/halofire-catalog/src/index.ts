@@ -30,3 +30,11 @@ export {
   pipeLayerName,
   FP_LAYER_NAMES,
 } from './colors.js'
+export type { MaterialSpec, MaterialKey } from './material.js'
+export { MATERIAL_PRESETS, materialFor } from './material.js'
+export type {
+  Connector,
+  ConnectionType,
+  ConnectorRole,
+} from './connectors.js'
+export { connectorsFor, canMate } from './connectors.js'
