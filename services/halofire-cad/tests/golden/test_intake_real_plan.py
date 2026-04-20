@@ -200,6 +200,53 @@ def test_design_is_not_synthetic() -> None:
 @pytest.mark.golden
 @pytest.mark.e2e
 @pytest.mark.slow
+def test_rooms_carry_real_area() -> None:
+    """At least one room per building must report a non-trivial
+    area_sqm. Catches the 'rooms exist in name only with zero
+    polygon_pt' failure mode."""
+    raw = _load_or_skip(_BUILDING_RAW)
+    max_area = 0.0
+    for lvl in raw.get("levels") or []:
+        for room in lvl.get("rooms") or []:
+            a = float(room.get("area_sqm") or 0.0)
+            if a > max_area:
+                max_area = a
+    assert max_area >= 10.0, (
+        f"largest room is {max_area:.1f} sqm; for a real floor plan "
+        "the maximum room area should be >= 10 sqm."
+    )
+
+
+@pytest.mark.golden
+@pytest.mark.e2e
+@pytest.mark.slow
+def test_level_spans_are_reasonable() -> None:
+    """Every level's bounding-rectangle polygon must span a sane
+    building-scale footprint (between 10 m and 1000 m on each axis)."""
+    raw = _load_or_skip(_BUILDING_RAW)
+    bad: list[str] = []
+    for lvl in raw.get("levels") or []:
+        poly = lvl.get("polygon_m") or []
+        if len(poly) < 4:
+            continue
+        xs = [p[0] for p in poly]
+        ys = [p[1] for p in poly]
+        span_x = max(xs) - min(xs)
+        span_y = max(ys) - min(ys)
+        if not (1.0 <= span_x <= 1000.0 and 1.0 <= span_y <= 1000.0):
+            bad.append(
+                f"{lvl.get('id', '?')}: span_x={span_x:.1f} m, "
+                f"span_y={span_y:.1f} m"
+            )
+    assert not bad, (
+        "level polygons span impossible building-scale values: "
+        + "; ".join(bad[:3])
+    )
+
+
+@pytest.mark.golden
+@pytest.mark.e2e
+@pytest.mark.slow
 def test_classified_hazards_cover_levels() -> None:
     """At least half the levels must have rooms with NFPA hazard
     classifications. Field name per cad.schema.Room is
