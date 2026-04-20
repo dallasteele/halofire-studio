@@ -26,6 +26,7 @@ export type RibbonCommand =
   | 'snap-toggle'
   | 'measure'
   | 'section'
+  | 'remote-area'
   | 'hydraulic-calc'
   | 'rule-check'
   | 'stress-test'
@@ -83,6 +84,7 @@ const TABS: Record<RibbonTab, Group[]> = {
       label: 'Hydraulics',
       buttons: [
         { cmd: 'hydraulic-calc', label: 'Calculate', tone: 'accent' },
+        { cmd: 'remote-area', label: 'Remote area', hint: 'Draw the flowing head window' },
       ],
     },
     {

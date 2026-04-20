@@ -40,6 +40,7 @@ const DEFAULT_ENTRIES: Entry[] = [
   { id: 'cmd.snap',          label: 'Toggle snap',            group: 'Design',  cmd: 'snap-toggle' },
   // Analyze
   { id: 'cmd.hydraulic',     label: 'Hydraulic calculate',    group: 'Analyze', cmd: 'hydraulic-calc', hint: 'Run NFPA solver' },
+  { id: 'cmd.remote-area',   label: 'Remote area',            group: 'Analyze', cmd: 'remote-area', hint: 'Click-drag to pick flowing heads', keywords: ['boundary', 'design area'] },
   { id: 'cmd.nfpa',          label: 'NFPA rule check',        group: 'Analyze', cmd: 'rule-check', keywords: ['compliance', 'violations'] },
   { id: 'cmd.stress',        label: 'Stress test',            group: 'Analyze', cmd: 'stress-test' },
   // Report

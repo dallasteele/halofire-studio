@@ -15,6 +15,7 @@ import {
 } from '@/components/halofire/ProjectContextHeader'
 import { CommandPalette } from '@/components/halofire/CommandPalette'
 import { LiveCalc } from '@/components/halofire/LiveCalc'
+import { RemoteAreaDraw } from '@/components/halofire/RemoteAreaDraw'
 import { Ribbon, type RibbonCommand } from '@/components/halofire/Ribbon'
 import { SceneBootstrap } from '@/components/halofire/SceneBootstrap'
 import { StatusBar } from '@/components/halofire/StatusBar'
@@ -124,6 +125,7 @@ export default function Home() {
       <SceneBootstrap projectId={ACTIVE_PROJECT_ID} />
       <CommandPalette />
       <ToolOverlay />
+      <RemoteAreaDraw projectId={ACTIVE_PROJECT_ID} />
       <LiveCalc projectId={ACTIVE_PROJECT_ID} />
       <Ribbon onCommand={dispatchRibbon} />
       <div className="min-h-0 flex-1">
