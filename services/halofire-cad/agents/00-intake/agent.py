@@ -678,6 +678,21 @@ def intake_file(pdf_path: str, project_id: str) -> Building:
                 polygon_m=poly_m,
                 area_sqm=area_sqm,
             ))
+        # Level outline: bounding rectangle of detected walls. This is
+        # the bare-minimum guarantee that every level has a non-empty
+        # polygon_m downstream consumers (FP-N sheets, Studio slab
+        # renderer, IFC export) can rely on. The DXF intake path
+        # already does this; the PDF path used to leave polygon_m=[]
+        # which broke rendering + tests.
+        if level.walls and not level.polygon_m:
+            xs = [x for w in level.walls for x in (w.start_m[0], w.end_m[0])]
+            ys = [y for w in level.walls for y in (w.start_m[1], w.end_m[1])]
+            if xs and ys:
+                level.polygon_m = [
+                    (min(xs), min(ys)), (max(xs), min(ys)),
+                    (max(xs), max(ys)), (min(xs), max(ys)),
+                    (min(xs), min(ys)),
+                ]
         levels.append(level)
 
     if levels:
