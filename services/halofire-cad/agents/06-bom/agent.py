@@ -159,6 +159,8 @@ def generate_bom(design: Design) -> list[BomRow]:
             log.warning("pricing DB unreachable (%s); using fallback table", e)
 
     for sku, qty in sorted(qty_by_sku.items()):
+        stale = False
+        missing = False
         if sku in live_prices:
             unit, stale = live_prices[sku]
             if stale:
@@ -169,11 +171,13 @@ def generate_bom(design: Design) -> list[BomRow]:
         else:
             unit = LIST_PRICE_USD.get(sku, 0.0)
             if unit == 0.0:
+                missing = True
                 log.error(
                     "price_missing %s — line priced at $0; fix in pricing DB",
                     sku,
                 )
         extended = qty * unit * (1 + HALO_MARKUP)
+        do_not_fab = _is_do_not_fab(sku)
         rows.append(BomRow(
             sku=sku,
             description=desc_by_sku.get(sku, sku),
@@ -181,8 +185,29 @@ def generate_bom(design: Design) -> list[BomRow]:
             unit="ea" if not sku.endswith("_ft") else "ft",
             unit_cost_usd=unit,
             extended_usd=round(extended, 2),
+            do_not_fab=do_not_fab,
+            price_stale=stale,
+            price_missing=missing,
         ))
     return rows
+
+
+# AutoSprink convention: pipes under 3" nominal are cut in the field,
+# not sent to the fab shop. Flagging them here keeps fab-shop markup
+# off the BOM.
+_FAB_THRESHOLD_IN = 3.0
+_PIPE_SIZE_RE = __import__("re").compile(r"pipe_sch(?:10|40)_([\d_]+)in_ft")
+
+
+def _is_do_not_fab(sku: str) -> bool:
+    m = _PIPE_SIZE_RE.search(sku)
+    if not m:
+        return False
+    try:
+        size = float(m.group(1).replace("_", "."))
+    except ValueError:
+        return False
+    return size < _FAB_THRESHOLD_IN
 
 
 def bom_total(rows: list[BomRow]) -> float:

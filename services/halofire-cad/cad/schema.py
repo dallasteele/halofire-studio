@@ -344,6 +344,14 @@ class BomRow(BaseModel):
     unit: str = "ea"
     unit_cost_usd: float = 0.0
     extended_usd: float = 0.0
+    # AutoSprink convention: pipes under 3" nominal are not sent to
+    # the fab shop — they get cut on-site. Flagging these on the
+    # BOM prevents Halo from accidentally paying fab markup on
+    # field-cut scraps.
+    do_not_fab: bool = False
+    # Live-pricing flags surfaced from the DuckDB supplies layer.
+    price_stale: bool = False   # last observed > STALE_DAYS
+    price_missing: bool = False  # no price for this SKU in the DB
 
 
 class LaborRow(BaseModel):

@@ -479,6 +479,16 @@ def build_proposal_html(
         for label, value in kpi_cards
     )
 
+    def _flags(r: dict[str, Any]) -> str:
+        bits: list[str] = []
+        if r.get('do_not_fab'):
+            bits.append('DO NOT FAB')
+        if r.get('price_stale'):
+            bits.append('stale price')
+        if r.get('price_missing'):
+            bits.append('price missing')
+        return ' · '.join(bits)
+
     bom_rows = [
         [
             r.get('sku', ''),
@@ -487,6 +497,7 @@ def build_proposal_html(
             r.get('unit', ''),
             _fmt_usd(r.get('unit_cost_usd', 0)),
             _fmt_usd(r.get('extended_usd', 0)),
+            _flags(r),
         ]
         for r in bom
     ]
@@ -570,7 +581,7 @@ def build_proposal_html(
         # BOM
         + '<section><h2>Bill of materials</h2>'
         + _table(
-            ['SKU', 'Description', 'Qty', 'Unit', 'Unit $', 'Extended'],
+            ['SKU', 'Description', 'Qty', 'Unit', 'Unit $', 'Extended', 'Flags'],
             bom_rows,
         )
         + '</section>'
