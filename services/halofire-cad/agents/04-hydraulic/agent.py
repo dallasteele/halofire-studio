@@ -43,7 +43,22 @@ log = logging.getLogger(__name__)
 # Hazen-Williams C-factor for steel, new
 C_FACTOR = {"sch10": 120, "sch40": 120, "cpvc": 150, "copper": 150}
 
-# §23.4.3 fitting equivalent-length table (feet of pipe, rough values)
+# Fitting equivalent-length table lives in fitting_equiv.py — the
+# canonical NFPA 13 Table 28.2.4.1.1 + C-factor correction. The old
+# inline table is kept as a read-only shim for tests that still
+# reference it; new code must import from fitting_equiv.
+import importlib.util as _ilu
+from pathlib import Path as _P
+_spec = _ilu.spec_from_file_location(
+    "hf_fitting_equiv",
+    str(_P(__file__).with_name("fitting_equiv.py")),
+)
+assert _spec is not None and _spec.loader is not None
+_fe_mod = _ilu.module_from_spec(_spec)
+_spec.loader.exec_module(_fe_mod)
+_equiv_length_ft = _fe_mod.equiv_length_ft
+_total_equiv_length_ft = _fe_mod.total_equiv_length_ft
+
 FITTING_EQ_LEN_FT = {
     "elbow_90": {1.0: 2.0, 1.25: 3.0, 1.5: 4.0, 2.0: 5.0, 2.5: 6.0, 3.0: 7.0, 4.0: 10.0},
     "elbow_45": {1.0: 1.0, 1.25: 1.5, 1.5: 2.0, 2.0: 2.5, 2.5: 3.0, 3.0: 4.0, 4.0: 5.0},
@@ -161,16 +176,16 @@ def _select_remote_area_heads(
     return selected
 
 
-def _fitting_equiv_length_ft(fittings: list, size_in: float) -> float:
-    """Sum equivalent length for a list of Fitting objects at `size_in`."""
-    total = 0.0
-    for f in fittings:
-        kind = getattr(f, "kind", None) if hasattr(f, "kind") else f
-        if not kind:
-            continue
-        lookup = FITTING_EQ_LEN_FT.get(kind, {})
-        total += lookup.get(size_in, 0.0)
-    return total
+def _fitting_equiv_length_ft(
+    fittings: list, size_in: float, c_actual: float = 120.0,
+) -> float:
+    """Sum NFPA Le for fittings at `size_in`, C-factor-corrected.
+
+    Delegates to the canonical table in `fitting_equiv.py`. Preserved
+    for back-compat with existing call sites; new code should import
+    `fitting_equiv.total_equiv_length_ft` directly.
+    """
+    return _total_equiv_length_ft(fittings, size_in, c_actual=c_actual)
 
 
 def calc_system(
