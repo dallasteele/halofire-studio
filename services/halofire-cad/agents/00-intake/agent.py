@@ -223,22 +223,78 @@ def intake_pdf_page(pdf_path: str, page_index: int) -> PageIntakeResult:
             result.page_h_pt = float(page.height)
             lines = list(page.lines or [])
             chars = list(page.chars or [])[:5000]
-            segments = _segments_from_pdfplumber(lines)
-            walls = _cluster_walls(segments)
-            # §1.4 budget: cap polygonize input to 2000 walls. Beyond
-            # that is typically detail linework / dimension arrows /
-            # hatching — shapely polygonize is near-quadratic on the
-            # line count so 141k lines can lock the process for
-            # minutes. Real walls are always < 2000 per plan.
-            if len(walls) > 2000:
-                result.warnings.append(
-                    f"wall_candidate_count_capped: {len(walls)} "
-                    f"exceeded 2000; keeping first 2000 for polygonize"
+
+            # Phase A1 — try L3 CubiCasa5k FIRST. CNN returns:
+            #   • Wall polylines (for DXF/viz)
+            #   • Room polygons direct from per-class contours
+            #     (bypasses fragile Hough→polygonize path)
+            l3_walls: list[tuple[float, float, float, float]] = []
+            l3_rooms: list[dict[str, Any]] = []
+            try:
+                import importlib.util as _iu
+                _spec = _iu.spec_from_file_location(
+                    "_hf_l3",
+                    Path(__file__).parent / "l3_cubicasa.py",
                 )
-                polygon_input = walls[:2000]
+                if _spec and _spec.loader:
+                    _l3 = _iu.module_from_spec(_spec)
+                    sys.modules["_hf_l3"] = _l3
+                    _spec.loader.exec_module(_l3)
+                    if _l3.is_available():
+                        mask = _l3.predict_wall_mask(pdf_path, page_index)
+                        if mask is not None:
+                            polylines = _l3.mask_to_wall_polylines(
+                                mask, float(page.width), float(page.height),
+                            )
+                            l3_walls = [
+                                (w["x0"], w["y0"], w["x1"], w["y1"])
+                                for w in polylines
+                            ]
+                        rooms = _l3.predict_room_polygons(
+                            pdf_path, page_index,
+                        )
+                        if rooms:
+                            l3_rooms = rooms
+                        log.info(
+                            "hf.intake.l3",
+                            extra={
+                                "page_index": page_index,
+                                "l3_walls": len(l3_walls),
+                                "l3_rooms": len(l3_rooms),
+                            },
+                        )
+            except Exception as e:
+                warn_swallowed(log, code="INTAKE_L3_FAILED", err=e,
+                               page_index=page_index)
+
+            if l3_walls or l3_rooms:
+                walls = l3_walls
+                # Use L3 rooms directly as shapely Polygons;
+                # bypass the polygonize path entirely.
+                from shapely.geometry import Polygon as _ShPoly
+                polygons = []
+                for r in l3_rooms:
+                    try:
+                        p = _ShPoly(r["polygon_pt"])
+                        if p.is_valid and p.area > 100:
+                            polygons.append(p)
+                    except (ValueError, TypeError):
+                        continue
+                result.warnings.append(
+                    f"l3_cubicasa: {len(l3_walls)} walls, "
+                    f"{len(polygons)} rooms"
+                )
             else:
-                polygon_input = walls
-            polygons = _polygons_from_walls(polygon_input)
+                # Fallback: L1 pdfplumber + polygonize
+                segments = _segments_from_pdfplumber(lines)
+                walls = _cluster_walls(segments)
+                if len(walls) > 2000:
+                    result.warnings.append(
+                        f"wall_candidate_count_capped: {len(walls)} "
+                        f"exceeded 2000; keeping first 2000 for polygonize"
+                    )
+                    walls = walls[:2000]
+                polygons = _polygons_from_walls(walls)
             result.scale_ft_per_pt = _detect_scale_ft_per_pt(chars)
             result.wall_count = len(walls)
             result.room_count = len(polygons)

@@ -55,3 +55,4 @@ services/halopenclaw-gateway/.pytest_cache/
 services/halopenclaw-gateway/jobs/
 services/halopenclaw-gateway/.env
 services/halopenclaw-gateway/_test_*
+services/halofire-cad/vendor/CubiCasa5k/
