@@ -17,6 +17,7 @@ import { CommandPalette } from '@/components/halofire/CommandPalette'
 import { Ribbon, type RibbonCommand } from '@/components/halofire/Ribbon'
 import { SceneBootstrap } from '@/components/halofire/SceneBootstrap'
 import { StatusBar } from '@/components/halofire/StatusBar'
+import { ToolOverlay } from '@/components/halofire/ToolOverlay'
 
 const ACTIVE_PROJECT_ID = '1881-cooperative'
 
@@ -121,6 +122,7 @@ export default function Home() {
           now they render as a showcase at x=-50, z=-50. */}
       <SceneBootstrap projectId={ACTIVE_PROJECT_ID} />
       <CommandPalette />
+      <ToolOverlay />
       <Ribbon onCommand={dispatchRibbon} />
       <div className="min-h-0 flex-1">
         <Editor
