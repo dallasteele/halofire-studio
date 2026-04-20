@@ -223,10 +223,34 @@ def write_proposal_files(
         assert _sspec is not None and _sspec.loader is not None
         _smod = _ilu.module_from_spec(_sspec)
         _sspec.loader.exec_module(_smod)
-        sub_path = _smod.write_submittal_pdf(data, out_dir)
+        # The caller may pass design_payload; it's also used below.
+        sub_path = _smod.write_submittal_pdf(
+            data, out_dir, design=design_payload,
+        )
         paths["submittal"] = str(sub_path)
     except Exception as e:
         paths["submittal_error"] = str(e)
+
+    # Cut-sheet PDF bundle (one sheet per SKU, merged)
+    try:
+        import importlib.util as _ilu
+        _cspec = _ilu.spec_from_file_location(
+            "_halofire_cut_sheets",
+            str(Path(__file__).with_name("cut_sheets.py")),
+        )
+        assert _cspec is not None and _cspec.loader is not None
+        _cmod = _ilu.module_from_spec(_cspec)
+        _cspec.loader.exec_module(_cmod)
+        cs_res = _cmod.write_cut_sheet_bundle(
+            data.get("bom") or [], out_dir,
+            shared_library=out_dir.parent.parent / "cut_sheets_library",
+        )
+        paths["cut_sheets"] = cs_res.get("path", "")
+        paths["cut_sheets_stubbed"] = str(
+            len(cs_res.get("stubbed") or []),
+        )
+    except Exception as e:
+        paths["cut_sheets_error"] = str(e)
 
     # PDF (reportlab)
     try:
