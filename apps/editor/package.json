@@ -4,8 +4,8 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "dotenv -e ./.env.local --override -- next dev --port 3002",
-    "build": "dotenv -e ./.env.local --override -- next build",
+    "dev": "dotenv -e ./.env.development -e ./.env.local --override -- next dev --port 3002",
+    "build": "dotenv -e ./.env.development -e ./.env.local --override -- next build",
     "start": "next start",
     "lint": "biome lint",
     "check-types": "next typegen && tsc --noEmit --noCheck",
