@@ -13,7 +13,9 @@ import { ProjectBriefPanel } from '@/components/halofire/ProjectBriefPanel'
 import {
   ProjectContextHeader,
 } from '@/components/halofire/ProjectContextHeader'
+import { Ribbon, type RibbonCommand } from '@/components/halofire/Ribbon'
 import { SceneBootstrap } from '@/components/halofire/SceneBootstrap'
+import { StatusBar } from '@/components/halofire/StatusBar'
 
 const ACTIVE_PROJECT_ID = '1881-cooperative'
 
@@ -93,20 +95,43 @@ const SIDEBAR_TABS: (SidebarTab & { component: React.ComponentType })[] = [
   },
 ]
 
+function dispatchRibbon(cmd: RibbonCommand): void {
+  // Bridge ribbon events into whatever panel reacts to them. Today
+  // we fire a DOM event so any tab/sidebar can listen without a
+  // shared store; the AutoDesignPanel handles 'auto-design', the
+  // FireProtectionPanel handles layer toggles, etc.
+  if (typeof window === 'undefined') return
+  window.dispatchEvent(
+    new CustomEvent('halofire:ribbon', { detail: { cmd } }),
+  )
+  // Quick one-off actions without their own panel handler:
+  if (cmd === 'report-send-to-client') {
+    // Open the bundled bid demo in a new tab for now.
+    window.open(`/bid-demo/${ACTIVE_PROJECT_ID}/proposal.html`, '_blank')
+  }
+}
+
 export default function Home() {
   return (
-    <div className="h-screen w-screen">
+    <div className="flex h-screen w-screen flex-col">
       {/* Auto-populate the viewport on first session load so
           catalog SKUs + building shell are visible immediately.
           Addresses "none of these catalog items are real models" —
           now they render as a showcase at x=-50, z=-50. */}
       <SceneBootstrap projectId={ACTIVE_PROJECT_ID} />
-      <Editor
-        layoutVersion="v2"
-        projectId="local-editor"
-        sidebarTabs={SIDEBAR_TABS}
-        viewerToolbarLeft={<ViewerToolbarLeft />}
-        viewerToolbarRight={<ViewerToolbarRight />}
+      <Ribbon onCommand={dispatchRibbon} />
+      <div className="min-h-0 flex-1">
+        <Editor
+          layoutVersion="v2"
+          projectId="local-editor"
+          sidebarTabs={SIDEBAR_TABS}
+          viewerToolbarLeft={<ViewerToolbarLeft />}
+          viewerToolbarRight={<ViewerToolbarRight />}
+        />
+      </div>
+      <StatusBar
+        projectName="The Cooperative 1881 — Phase I"
+        projectAddress="1881 W North Temple, Salt Lake City, UT"
       />
     </div>
   )
