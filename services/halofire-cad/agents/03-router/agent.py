@@ -342,6 +342,29 @@ def route_systems(building: Building, heads: list[Head]) -> list[System]:
         if not lvl_heads:
             continue
         riser_xy = _find_riser_location(level)
+        # §1.4 budget enforcement — Steiner is near-O(N²×logN).
+        # More than 500 heads per level → we won't actually beat the
+        # iteration budget. Flag + skip routing with a typed issue so
+        # the pipeline still produces BOM + proposal outputs.
+        _ROUTER_HEAD_CAP = 500
+        if len(lvl_heads) > _ROUTER_HEAD_CAP:
+            warn_swallowed(
+                log, code="ROUTER_HEAD_CAP_EXCEEDED",
+                err=RuntimeError(f"{len(lvl_heads)} heads > {_ROUTER_HEAD_CAP}"),
+                level_id=level.id, head_count=len(lvl_heads),
+            )
+            sys_id = f"sys_{level.id}"
+            riser = RiserSpec(
+                id=f"riser_{level.id}",
+                position_m=(0.0, 0.0, level.elevation_m),
+                size_in=4.0,
+            )
+            systems.append(System(
+                id=sys_id, type="wet", supplies=[level.id],
+                riser=riser, heads=lvl_heads, pipes=[], hangers=[],
+            ))
+            continue
+
         sys_type = "dry" if level.use == "garage" else "wet"
         riser_z = level.elevation_m + (level.height_m - 0.3)
         sys_id = f"sys_{level.id}"

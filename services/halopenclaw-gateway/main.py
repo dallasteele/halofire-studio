@@ -447,6 +447,67 @@ async def quickbid(body: dict[str, Any], request: Request) -> dict[str, Any]:
     )
 
 
+@app.post("/intake/dispatch")
+async def intake_dispatch(
+    body: dict[str, Any], request: Request,
+) -> dict[str, Any]:
+    """Dispatch the pipeline against a file ALREADY on this server.
+
+    This is a dev-local path that lets the Studio's AutoDesignPanel
+    point at `E:/ClaudeBot/HaloFireBidDocs/...` without streaming
+    173 MB through a browser upload. Production swaps for a
+    signed-URL-with-scoped-access pattern.
+    """
+    _require_api_key(request)
+    project_id = _safe_project_id(str(body.get("project_id", "demo")))
+    server_path = str(body.get("server_path") or "")
+    if not server_path:
+        raise HTTPException(400, "server_path required")
+    path = Path(server_path)
+    if not path.exists() or not path.is_file():
+        raise HTTPException(404, f"file not found: {server_path}")
+
+    # Honest dev-local allowlist — only project bid-docs tree today.
+    # Production must enforce strict per-project path scoping.
+    allow_roots = [
+        Path(r"E:/ClaudeBot/HaloFireBidDocs").resolve(),
+        _DATA_ROOT.resolve(),
+    ]
+    resolved = path.resolve()
+    if not any(
+        str(resolved).startswith(str(root)) for root in allow_roots
+    ):
+        raise HTTPException(
+            403, f"path outside allowlist: {resolved}",
+        )
+
+    # Kick off the same async job the /intake/upload path uses.
+    job_id = str(uuid.uuid4())
+    _JOBS[job_id] = {
+        "job_id": job_id,
+        "project_id": project_id,
+        "file": str(path),
+        "bytes": path.stat().st_size,
+        "status": "queued",
+        "percent": 0,
+        "steps_complete": [],
+        "error": None,
+        "summary": None,
+    }
+    asyncio.create_task(
+        _run_job(job_id, str(path), project_id, "pipeline"),
+    )
+    return {
+        "job_id": job_id,
+        "project_id": project_id,
+        "file": path.name,
+        "bytes": path.stat().st_size,
+        "mode": "pipeline",
+        "status": "queued",
+        "poll_url": f"/intake/status/{job_id}",
+    }
+
+
 @app.post("/building/generate")
 async def generate_building(
     body: dict[str, Any], request: Request,

@@ -27,6 +27,36 @@ from cad.exceptions import PDFParseError  # noqa: E402
 
 log = get_logger("intake")
 
+# Page-kind predicate: which classifier kinds get processed vs skipped.
+# Matches the title_block.classify_page() return values.
+_PLAN_KINDS = {
+    "floor_plan", "fire_protection", "mechanical", "plumbing",
+    "electrical", "unknown",  # unknown = keep; cheap to try
+}
+_SKIP_KINDS = {
+    "cover", "elevation", "section", "detail", "schedule",
+    "structural", "civil", "landscape", "interior",
+}
+
+
+def _candidate_pages(
+    pdf_path: str, n_pages: int, hard_cap: int = 12,
+) -> list[int]:
+    """Return up to `hard_cap` candidate page indices for L1/L2 walk.
+
+    The text-based title-block pre-filter on 100+ page arch PDFs costs
+    several minutes (pdfplumber must parse every content stream). Not
+    worth it — the L1 wall-count filter downstream catches non-plan
+    pages in milliseconds.
+
+    Strategy: first N pages only. The FIRST 10-15 pages of any
+    architectural set almost always contain the site + ground-floor +
+    upper-floor plans. Elevations, sections, details, schedules
+    cluster later.
+    """
+    _ = pdf_path  # kept for future per-project overrides
+    return list(range(min(n_pages, hard_cap)))
+
 # Snap tolerance for orthogonality (degrees)
 ORTHO_TOL_DEG = 3.0
 
@@ -142,19 +172,27 @@ def _cluster_walls(segments: list[LineString]) -> list[tuple[float, float, float
 
 def _polygons_from_walls(
     walls: list[tuple[float, float, float, float]],
+    min_area_pt2: float = 20000.0,
+    max_rooms: int = 50,
 ) -> list[Polygon]:
     """Run shapely polygonize on the wall segment set to find rooms.
 
-    Uses unary_union to handle intersections, then polygonize. Rooms
-    smaller than 2 sqm are filtered as likely duct chases or junk.
+    Returns up to `max_rooms` largest polygons whose area is above
+    `min_area_pt2`. On real 1881 arch pages the earlier threshold
+    (100 pt²) over-reads detail linework + dimension hatching as
+    "rooms" → the placer explodes to 55k heads. A 4000 pt² floor is
+    ~3 sqm @ 1/8"=1'-0" scale, which filters out chases + dimension
+    arrows but keeps even the smallest utility closet.
     """
     if not walls:
         return []
     lines = [LineString([(x0, y0), (x1, y1)]) for x0, y0, x1, y1 in walls]
     merged = unary_union(lines)
     polys: list[Polygon] = list(polygonize(merged))
-    # Filter tiny fragments (< 2 sqm in PDF-point² — caller converts)
-    return [p for p in polys if p.area > 100.0]
+    # Filter + cap
+    polys = [p for p in polys if p.area > min_area_pt2]
+    polys.sort(key=lambda p: p.area, reverse=True)
+    return polys[:max_rooms]
 
 
 def intake_pdf_page(pdf_path: str, page_index: int) -> PageIntakeResult:
@@ -179,7 +217,20 @@ def intake_pdf_page(pdf_path: str, page_index: int) -> PageIntakeResult:
             chars = list(page.chars or [])[:5000]
             segments = _segments_from_pdfplumber(lines)
             walls = _cluster_walls(segments)
-            polygons = _polygons_from_walls(walls)
+            # §1.4 budget: cap polygonize input to 2000 walls. Beyond
+            # that is typically detail linework / dimension arrows /
+            # hatching — shapely polygonize is near-quadratic on the
+            # line count so 141k lines can lock the process for
+            # minutes. Real walls are always < 2000 per plan.
+            if len(walls) > 2000:
+                result.warnings.append(
+                    f"wall_candidate_count_capped: {len(walls)} "
+                    f"exceeded 2000; keeping first 2000 for polygonize"
+                )
+                polygon_input = walls[:2000]
+            else:
+                polygon_input = walls
+            polygons = _polygons_from_walls(polygon_input)
             result.scale_ft_per_pt = _detect_scale_ft_per_pt(chars)
             result.wall_count = len(walls)
             result.room_count = len(polygons)
@@ -505,7 +556,15 @@ def intake_file(pdf_path: str, project_id: str) -> Building:
                        pdf_path=pdf_path)
         return Building(project_id=project_id, levels=[])
 
-    for i in range(min(n_pages, 60)):  # cap walk length for dev
+    # Cap page walk to the first 12 pages — covers the site + ground
+    # + typical upper-floor plans on most architectural sets. Full-
+    # set processing is too slow on 100+ page PDFs and hits diminishing
+    # returns (elevations + details + schedules produce 0 walls).
+    plan_page_indices = _candidate_pages(pdf_path, n_pages)
+    metadata["plan_page_count"] = len(plan_page_indices)
+    metadata["total_page_count"] = n_pages
+
+    for i in plan_page_indices:
         page_result = intake_pdf_page(pdf_path, i)
         # Convert to dict for uniform handling with raster fallback
         # (which still returns dict). PageIntakeResult.model_dump()
