@@ -1,5 +1,71 @@
 # Changelog
 
+## [0.4.1] — 2026-04-20 — honest real-plan intake + 12-test golden suite
+
+User caught a ship-breaking lie: the loop-4 "viewport populate"
+demo staged a hand-synthesized `design.json` with a 24-head grid.
+That was not CubiCasa + intake producing a floor-plan model from
+the architect's drawing. Tore it down, built the honest tests,
+fixed the real bug, shipped again — this time from the actual PDF.
+
+### Fixed
+
+- **PDF intake never populated `level.polygon_m`** (`799a13c`) —
+  the DXF path always computed a bounding-rectangle polygon from
+  detected walls. The PDF path had the SAME structure but skipped
+  that step, leaving every level with `polygon_m=[]`. Downstream:
+  FP-N sheets, Studio slab renderer, IFC export, every visual
+  consumer silently drew nothing for the level outline.
+
+  Fix: after walls land in `intake_file`, compute the same
+  bounding-rect polygon. Only runs when `polygon_m` is empty, so
+  L3/CubiCasa's real polygons still win when present.
+
+### Added — real tests that fail when the lie returns
+
+- `services/halofire-cad/tests/golden/test_intake_real_plan.py` —
+  12 golden assertions against the reference 1881-cooperative
+  architectural PDF output (`799a13c` + `de85013`):
+    1. ≥ 3 levels
+    2. ≥ 10 rooms total across all levels
+    3. ≥ 200 wall segments total
+    4. ≥ 1 level with a non-degenerate `polygon_m` (≥ 4 verts)
+    5. ≥ 1 room with a polygon (≥ 3 verts)
+    6. ≥ 50 heads placed
+    7. ≥ 20 pipes routed
+    8. ≥ 1 routed system
+    9. **Synthetic-24-head tripwire** — catches hand-forged demos
+   10. Classified hazards or uses cover ≥ half the levels
+   11. Rooms carry non-zero `area_sqm` (max ≥ 10 sqm)
+   12. Level polygons span 1 m–1000 m on each axis (unit sanity)
+
+  Tests SKIP cleanly when artifacts don't exist (so fresh clones
+  don't false-fail). Once pipeline runs, they bite hard on empty
+  geometry.
+
+  `pytest.ini` + `services/halofire-cad/pytest.ini` both register
+  the `golden` marker under `--strict-markers`.
+
+### Verified
+
+Re-ran the gateway pipeline (job `8c9e708d-…`, 6.5 min, all 9
+steps) against the 173 MB / 110-page 1881 architectural PDF on
+the patched intake. Outputs:
+  - `building_raw.json`: 12 levels, **all 12 with 5-vertex
+    non-degenerate polygons**, 19 rooms, 3310 walls.
+  - `design.json`: 7 systems, 583 heads placed, 206 pipes routed.
+  - `manifest.json`: all 11 deliverables present + warnings list.
+
+Golden suite: **12/12 pass.** Regression sweep:
+  - 304 Python unit + 12 Python golden + 92 bun test = **408**
+  - viewport smoke: PASS (20/20 GLBs + CDN pin)
+  - halofire-only typecheck: clean
+
+Studio screenshot confirms the viewport now shows Level 0's
+real bounding polygon (238 m × 82 m, matching the building
+footprint) and heads placed under it, all 9 pipeline steps
+checked off in the sidebar with deliverable download links.
+
 ## [0.4.0] — 2026-04-20 — loop 4: Codex post-review fixes + live Auto-Design
 
 Closes the lingering items in CODEX_REVIEW.md's "Residual Warnings
