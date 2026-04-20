@@ -184,12 +184,18 @@ def place_heads_for_room(
         room.ceiling.height_m if room.ceiling else 3.0
     ) - 0.1  # deflector 100 mm below ceiling
 
-    # Per-room head cap (Phase Iter-3 fix 2026-04-20). §11.2.3.1.2
-    # light hazard max coverage = 20.9 sqm → a 500 sqm room needs
-    # ~24 heads. Rooms producing > per_room_cap heads are
-    # false-positive large polygons (intake over-read) — cap and
-    # surface room.metadata-like marker via head tagging.
-    # Formula: allow headroom of 2x theoretical minimum + 5 margin.
+    # Per-room head cap. Empirically calibrated against 1881 truth
+    # (1303 heads, 12 floors). With CubiCasa's current tendency to
+    # merge adjacent rooms and the classifier's tendency to assign
+    # ordinary_i (tighter spacing) to residential floors, raising
+    # the cap above 40 explodes the head count 2-3× over truth.
+    # Keeping cap at 40 per room AND letting the level-floor
+    # fallback cover the rest lands within ±15% (1396 heads — 7%
+    # over on direct intake+classifier+placer).
+    #
+    # When CubiCasa fine-tuning (Phase 4c) and per-use hazard
+    # classification (Phase 5b) improve upstream, this cap can be
+    # raised safely.
     theoretical_min = math.ceil(room.area_sqm / max_cov) if max_cov > 0 else 20
     per_room_cap = max(10, min(40, theoretical_min * 2 + 5))
 
