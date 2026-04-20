@@ -350,6 +350,26 @@ ul li {{ margin-bottom: 4px; }}
 }}
 @media (max-width: 760px) {{ .two-col {{ grid-template-columns: 1fr; }} }}
 .plan-svg {{ width: 100%; height: auto; display: block; border: 1px solid var(--border); }}
+.hero {{ margin-top: 28px; }}
+.hero-grid {{
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 20px;
+}}
+@media (max-width: 900px) {{ .hero-grid {{ grid-template-columns: 1fr; }} }}
+.hero-label {{
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+}}
+.hero-caption {{
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 12px;
+}}
+.hero .mv-shell {{ height: 420px; }}
 .plan-empty {{ padding: 18px; color: var(--muted); background: var(--panel); border: 1px dashed var(--border); }}
 .level-card {{
   margin-top: 20px; background: var(--panel); border: 1px solid var(--border); padding: 16px;
@@ -366,6 +386,71 @@ model-viewer {{ width: 100%; height: 100%; --poster-color: transparent; backgrou
 .system-row td.bad {{ color: #ff6464; }}
 footer {{ color: var(--muted); font-size: 11px; text-align: center; margin-top: 48px; }}
 """
+
+
+def _hero_section(
+    levels: list[dict[str, Any]],
+    design: dict[str, Any] | None,
+    design_glb: str,
+    project: dict[str, Any],
+) -> str:
+    """Landing-page hero — big plan + 3D model side by side."""
+    geom = _collect_level_geometry(design)
+    # Pick the first level that has any geometry
+    hero_level = None
+    hero_svg = ""
+    for lvl in levels:
+        lid = lvl["id"]
+        if lid in geom and (geom[lid]["heads"] or geom[lid]["pipes"]):
+            hero_level = lvl
+            hero_svg = _render_plan_svg(
+                lid, geom[lid], width_px=1000, height_px=580,
+                padding_px=24,
+            )
+            break
+    if hero_level is None and levels:
+        hero_level = levels[0]
+        hero_svg = (
+            f'<div class="plan-empty">'
+            f'Plan view not available yet — intake is still processing.'
+            f'</div>'
+        )
+
+    hero_meta = ""
+    if hero_level:
+        hero_meta = (
+            f'<div class="hero-caption">'
+            f'<strong>{_esc(hero_level.get("name") or hero_level.get("id", ""))}</strong>'
+            f' · {_fmt_n(hero_level.get("head_count", 0))} heads · '
+            f'{_fmt_n(hero_level.get("pipe_total_ft", 0), 1)} ft pipe'
+            f'</div>'
+        )
+
+    return (
+        '<section class="hero"><div class="hero-grid">'
+        '<div class="hero-plan">'
+        '<div class="hero-label">Plan view</div>'
+        f'{hero_svg}'
+        f'{hero_meta}'
+        '</div>'
+        '<div class="hero-3d">'
+        '<div class="hero-label">3D model</div>'
+        '<div class="mv-shell">'
+        f'<model-viewer src="{_esc(design_glb)}" '
+        'camera-controls touch-action="pan-y" '
+        'shadow-intensity="1.2" '
+        'exposure="0.95" '
+        'environment-image="neutral" '
+        'auto-rotate-delay="4000" '
+        f'alt="3D sprinkler model — {_esc(project.get("name", ""))}">'
+        '</model-viewer></div>'
+        '<div class="hero-caption">'
+        'Orbit: drag · Pan: shift-drag · Zoom: scroll. '
+        'All pipes colored to the AutoSprink / NFPA size convention.'
+        '</div>'
+        '</div>'
+        '</div></section>'
+    )
 
 
 def _level_plan_section(
@@ -542,20 +627,12 @@ def build_proposal_html(
         f'<div class="label" style="margin-top:4px">as of {_esc(data.get("generated_at", ""))}</div>'
         '</div></header>'
         '<div class="wrap">'
-        f'<section><h2>Project summary</h2><div class="kpi-grid">{kpi_html}</div></section>'
-        # 3D model
-        '<section><h2>3D model</h2>'
-        '<div class="mv-shell">'
-        f'<model-viewer src="{_esc(design_glb)}" '
-        'camera-controls touch-action="pan-y" '
-        'shadow-intensity="1.2" '
-        'exposure="0.95" '
-        'environment-image="neutral" '
-        'auto-rotate-delay="4000" '
-        f'alt="3D sprinkler model — {_esc(project.get("name", ""))}">'
-        '</model-viewer></div>'
-        '<p style="color:var(--muted); font-size:12px; margin-top:8px;">Click and drag to orbit. Shift-drag or two-finger drag to pan. Scroll to zoom. All pipes colored to the AutoSprink / NFPA size convention.</p>'
-        '</section>'
+        # Hero band — landing page moment. Two-panel: big plan SVG
+        # (first level that has any geometry) on the left, the
+        # live 3D model-viewer on the right. Falls back gracefully
+        # when a design payload isn't available.
+        + _hero_section(levels, design, design_glb, project)
+        + f'<section><h2>Project summary</h2><div class="kpi-grid">{kpi_html}</div></section>'
         # Floor plans
         + _level_plan_section(levels, design)
         # Systems table

@@ -142,8 +142,9 @@ def test_html_has_model_viewer_tag_with_glb() -> None:
 def test_html_has_every_required_section() -> None:
     html = PH.build_proposal_html(_SAMPLE_DATA, design=_SAMPLE_DESIGN)
     for needed in [
+        "Plan view",         # hero band (loop 3 P-L)
+        "3D model",          # hero band
         "Project summary",
-        "3D model",
         "Floor plans",
         "Systems + hydraulics",
         "Pricing",
@@ -154,6 +155,23 @@ def test_html_has_every_required_section() -> None:
         "Labor",
     ]:
         assert needed in html, f"missing section: {needed}"
+
+
+def test_hero_section_renders_first_populated_level() -> None:
+    """The hero picks the first level that actually has placed heads."""
+    html = PH.build_proposal_html(_SAMPLE_DATA, design=_SAMPLE_DESIGN)
+    # hero section class
+    assert 'class="hero"' in html
+    assert 'class="hero-grid"' in html
+    # First level in sample design has rooms — hero must show it
+    assert "hero-caption" in html
+
+
+def test_hero_falls_back_when_no_design() -> None:
+    """Without design geometry, hero still renders (placeholder)."""
+    html = PH.build_proposal_html(_SAMPLE_DATA, design=None)
+    assert 'class="hero"' in html
+    assert "<model-viewer" in html  # 3D half still loads
 
 
 def test_html_renders_total_price_in_header() -> None:
