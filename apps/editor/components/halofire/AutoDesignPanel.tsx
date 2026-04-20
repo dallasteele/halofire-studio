@@ -425,6 +425,19 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
         >
           {busy ? 'Dispatching…' : 'Run Auto-Design'}
         </button>
+
+        {/* Quick re-populate after a page reload — reads the last
+            design.json off disk and spawns the scene nodes without
+            re-running the ~3-minute pipeline. */}
+        <button
+          type="button"
+          disabled={busy}
+          onClick={() => { void renderResults(projectId) }}
+          className="mt-2 w-full rounded border border-white/15 bg-transparent px-3 py-1.5 text-xs text-neutral-200 hover:bg-white/5 disabled:opacity-50"
+          title="Load the last completed design into the viewport"
+        >
+          Render last bid
+        </button>
       </div>
 
       {error && (
