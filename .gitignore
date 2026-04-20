@@ -67,3 +67,7 @@ services/halofire-cad/pricing/exports/
 openclaw-halofire/**/__pycache__/
 openclaw-halofire/logs/
 
+# Staged bid demo binaries (regenerated; live in services/halopenclaw-gateway/data)
+apps/editor/public/bid-demo/**/*.glb
+apps/editor/public/bid-demo/**/*.pdf
+
