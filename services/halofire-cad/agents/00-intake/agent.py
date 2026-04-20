@@ -170,6 +170,77 @@ def _cluster_walls(segments: list[LineString]) -> list[tuple[float, float, float
     return walls
 
 
+def _trace_outer_boundary_m(walls) -> list:
+    """Extract a real outer-wall polygon for a Level from its
+    detected Wall segments (coordinates already in meters).
+
+    Strategy:
+      1. Build LineStrings for every wall segment.
+      2. Merge + polygonize — take the LARGEST closed polygon
+         (that's the outer building envelope).
+      3. Simplify the result to 0.5 m tolerance so FP-N sheets
+         don't carry hundreds of micro-vertices from OCR noise.
+      4. If polygonize returns nothing (open plans, sparse walls),
+         fall back to the convex hull of wall endpoints (tighter
+         than bbox).
+      5. Last resort: bounding rectangle.
+
+    Returns a list of (x_m, y_m) tuples. Always closes the ring
+    (first == last vertex).
+    """
+    try:
+        from shapely.geometry import LineString, MultiPoint, Polygon
+        from shapely.ops import polygonize, unary_union
+    except ImportError:  # pragma: no cover
+        return []
+    pts_all: list[tuple[float, float]] = []
+    lines: list[LineString] = []
+    for w in walls:
+        x0, y0 = w.start_m[0], w.start_m[1]
+        x1, y1 = w.end_m[0], w.end_m[1]
+        if (x0, y0) == (x1, y1):
+            continue
+        pts_all.append((x0, y0))
+        pts_all.append((x1, y1))
+        lines.append(LineString([(x0, y0), (x1, y1)]))
+    if not lines:
+        return []
+    # 1-2. polygonize
+    best: Polygon | None = None
+    try:
+        merged = unary_union(lines)
+        polys = list(polygonize(merged))
+        if polys:
+            best = max(polys, key=lambda p: p.area)
+    except Exception:  # noqa: BLE001
+        best = None
+    # 3. simplify
+    if best is not None and not best.is_empty:
+        try:
+            simp = best.simplify(0.5, preserve_topology=True)
+            if not simp.is_empty:
+                return [(float(x), float(y)) for x, y in list(simp.exterior.coords)]
+        except Exception:  # noqa: BLE001
+            pass
+    # 4. convex hull of wall endpoints
+    try:
+        hull = MultiPoint(pts_all).convex_hull
+        if hasattr(hull, "exterior") and not hull.is_empty:
+            return [(float(x), float(y)) for x, y in list(hull.exterior.coords)]
+    except Exception:  # noqa: BLE001
+        pass
+    # 5. bbox fallback
+    xs = [p[0] for p in pts_all]
+    ys = [p[1] for p in pts_all]
+    if not xs or not ys:
+        return []
+    return [
+        (min(xs), min(ys)), (max(xs), min(ys)),
+        (max(xs), max(ys)), (min(xs), max(ys)),
+        (min(xs), min(ys)),
+    ]
+
+
 def _polygons_from_walls(
     walls: list[tuple[float, float, float, float]],
     min_area_pt2: float = 20000.0,
@@ -678,21 +749,14 @@ def intake_file(pdf_path: str, project_id: str) -> Building:
                 polygon_m=poly_m,
                 area_sqm=area_sqm,
             ))
-        # Level outline: bounding rectangle of detected walls. This is
-        # the bare-minimum guarantee that every level has a non-empty
-        # polygon_m downstream consumers (FP-N sheets, Studio slab
-        # renderer, IFC export) can rely on. The DXF intake path
-        # already does this; the PDF path used to leave polygon_m=[]
-        # which broke rendering + tests.
+        # Level outline: real outer-boundary trace from detected
+        # walls (NOT a bounding rectangle). See
+        # `_trace_outer_boundary_m` below. Bbox path over-reads
+        # building-scale courtyards + site boundaries; measured 92%
+        # head-count overshoot on 1881 w/ bbox, caught by cruel
+        # tests.
         if level.walls and not level.polygon_m:
-            xs = [x for w in level.walls for x in (w.start_m[0], w.end_m[0])]
-            ys = [y for w in level.walls for y in (w.start_m[1], w.end_m[1])]
-            if xs and ys:
-                level.polygon_m = [
-                    (min(xs), min(ys)), (max(xs), min(ys)),
-                    (max(xs), max(ys)), (min(xs), max(ys)),
-                    (min(xs), min(ys)),
-                ]
+            level.polygon_m = _trace_outer_boundary_m(level.walls)
         levels.append(level)
 
     if levels:

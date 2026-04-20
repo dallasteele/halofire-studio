@@ -220,6 +220,147 @@ def place_heads_for_room(
 PLACER_TOTAL_HEAD_CAP = 2_500
 
 
+def _level_hazard(level: Level) -> NfpaHazard:
+    """Pick a hazard class for the LEVEL (not per-room).
+
+    Used by the floor-fallback placer. Priority:
+      1. Most common room hazard on the level.
+      2. level.use → default hazard (garage → ordinary_i, residential
+         → light, retail → ordinary_ii).
+      3. Default light.
+    """
+    hazard_counts: dict[str, int] = {}
+    for room in level.rooms:
+        h = room.hazard_class or "light"
+        hazard_counts[h] = hazard_counts.get(h, 0) + 1
+    if hazard_counts:
+        return max(hazard_counts, key=hazard_counts.get)  # type: ignore[arg-type,return-value]
+    use = (level.use or "other").lower()
+    if "garage" in use or "parking" in use:
+        return "ordinary_i"
+    if "retail" in use or "mercantile" in use or "commercial" in use:
+        return "ordinary_ii"
+    return "light"
+
+
+def place_heads_for_level_floor(
+    level: Level, existing_heads: list[Head],
+) -> list[Head]:
+    """Cover the level's entire floor with NFPA-spaced heads,
+    subtracting area already covered by room-level placement.
+
+    This is the fix for 'placer only covers a handful of detected
+    rooms'. Real Halo designs flood the whole building with heads at
+    light-hazard spacing; CubiCasa rarely returns every actual room,
+    so detected rooms + this floor-fallback together approximate
+    the full building coverage.
+
+    Guards:
+      * Skip if level.polygon_m < 4 verts (can't define a floor).
+      * Cap at `PLACER_PER_LEVEL_FLOOR_CAP` heads/level (prevents
+        runaway on 1000 × 1000 m degenerate polygons).
+      * Tag synthetic heads with `floor_fallback=True` in room_id.
+    """
+    if not level.polygon_m or len(level.polygon_m) < 4:
+        return []
+    try:
+        level_poly = Polygon(level.polygon_m)
+        if not level_poly.is_valid:
+            level_poly = level_poly.buffer(0)
+    except (GEOSException, ValueError):
+        return []
+    if level_poly.is_empty or level_poly.area < 10.0:
+        return []
+
+    # Subtract room polygons that already received heads
+    from shapely.ops import unary_union
+
+    room_polys = []
+    for room in level.rooms:
+        if room.polygon_m and len(room.polygon_m) >= 3:
+            try:
+                p = Polygon(room.polygon_m)
+                if p.is_valid and not p.is_empty:
+                    room_polys.append(p)
+            except (GEOSException, ValueError):
+                pass
+
+    # Uncovered = level minus the union of room polygons that were
+    # already populated. Add a small buffer so we don't double-cover
+    # the edges.
+    try:
+        if room_polys:
+            covered = unary_union(room_polys).buffer(0.5)
+            uncovered = level_poly.difference(covered)
+        else:
+            uncovered = level_poly
+    except (GEOSException, ValueError):
+        uncovered = level_poly
+
+    if uncovered.is_empty or uncovered.area < 10.0:
+        return []
+
+    hazard = _level_hazard(level)
+    spacing_m, max_cov = _spacing_for(hazard)
+    spacing_m = min(spacing_m, math.sqrt(max_cov))
+    # Small inward buffer so heads aren't on the exterior wall
+    MIN_WALL_OFFSET_M = 0.30
+    try:
+        usable = _shrink(uncovered, MIN_WALL_OFFSET_M)
+    except (GEOSException, ValueError, TypeError):
+        return []
+
+    sku, orientation = _select_head_sku(
+        hazard, level.use or "", level.ceiling.kind if level.ceiling else "flat",
+    )
+    k = K_FACTOR[hazard]
+    z = level.elevation_m + (
+        level.ceiling.height_m if level.ceiling else 3.0
+    ) - 0.1
+
+    # Grid across the uncovered geometry. Cap per level to prevent
+    # runaway on malformed polygons.
+    PLACER_PER_LEVEL_FLOOR_CAP = 350
+
+    # Handle MultiPolygon: grid each connected piece independently
+    pieces = (
+        list(usable.geoms)
+        if hasattr(usable, "geoms")
+        else [usable]
+    )
+    grid_points: list[tuple[float, float]] = []
+    for piece in pieces:
+        if piece.is_empty:
+            continue
+        grid_points.extend(_grid_points(piece, spacing_m))
+        if len(grid_points) >= PLACER_PER_LEVEL_FLOOR_CAP:
+            break
+    if len(grid_points) > PLACER_PER_LEVEL_FLOOR_CAP:
+        warn_swallowed(
+            log, code="PLACER_PER_LEVEL_FLOOR_CAP",
+            err=RuntimeError(
+                f"{len(grid_points)} > {PLACER_PER_LEVEL_FLOOR_CAP}",
+            ),
+            level_id=level.id, level_area_sqm=level_poly.area,
+            hazard=hazard,
+        )
+        grid_points = grid_points[:PLACER_PER_LEVEL_FLOOR_CAP]
+
+    out: list[Head] = []
+    for i, (x, y) in enumerate(grid_points):
+        out.append(Head(
+            id=f"h_{level.id}_floor_{i}",
+            sku=sku,
+            k_factor=k,
+            temp_rating_f=155 if hazard != "ordinary_ii" else 200,
+            position_m=(x, y, z),
+            deflector_below_ceiling_mm=100,
+            orientation=orientation,
+            room_id=f"floor_fallback_{level.id}",
+        ))
+    return out
+
+
 def place_heads_for_building(building: Building) -> list[Head]:
     """Run placement across every room in every level.
 
@@ -236,8 +377,10 @@ def place_heads_for_building(building: Building) -> list[Head]:
     for level in building.levels:
         if capped:
             break
+        level_heads: list[Head] = []
+        # 1. Per-room placement (existing path)
         for room in level.rooms:
-            if len(all_heads) >= PLACER_TOTAL_HEAD_CAP:
+            if len(all_heads) + len(level_heads) >= PLACER_TOTAL_HEAD_CAP:
                 capped = True
                 break
             ceiling_kind = (
@@ -245,10 +388,26 @@ def place_heads_for_building(building: Building) -> list[Head]:
                 level.ceiling.kind
             )
             heads = place_heads_for_room(room, level, ceiling_kind)
-            all_heads.extend(heads)
+            level_heads.extend(heads)
             stats[room.hazard_class or "light"] = (
                 stats.get(room.hazard_class or "light", 0) + len(heads)
             )
+        # 2. Level-floor fallback: cover remaining uncovered floor
+        #    area with NFPA-spaced heads. Without this, CubiCasa's
+        #    sparse room detection cascades into massive head-count
+        #    under-coverage. See SELF_TRAIN_PLAN Phase 5.
+        if not capped and len(all_heads) + len(level_heads) < PLACER_TOTAL_HEAD_CAP:
+            fallback = place_heads_for_level_floor(level, level_heads)
+            # Truncate if adding them would blow the global cap
+            remaining = PLACER_TOTAL_HEAD_CAP - (len(all_heads) + len(level_heads))
+            if len(fallback) > remaining:
+                fallback = fallback[:remaining]
+                capped = True
+            level_heads.extend(fallback)
+            stats["floor_fallback"] = (
+                stats.get("floor_fallback", 0) + len(fallback)
+            )
+        all_heads.extend(level_heads)
     if capped:
         building.metadata["placer_capped"] = True
         building.metadata["placer_cap_limit"] = PLACER_TOTAL_HEAD_CAP
