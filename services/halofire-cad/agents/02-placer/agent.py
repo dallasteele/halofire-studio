@@ -192,12 +192,29 @@ def place_heads_for_room(
     return heads
 
 
+PLACER_TOTAL_HEAD_CAP = 2_500
+
+
 def place_heads_for_building(building: Building) -> list[Head]:
-    """Run placement across every room in every level."""
+    """Run placement across every room in every level.
+
+    §1.4 budget cap: stops at `PLACER_TOTAL_HEAD_CAP` heads total.
+    When the cap fires the building.metadata carries
+    `placer_capped=True` so downstream consumers (router, proposal,
+    UI) can surface that the intake over-read rooms and the design
+    is approximate. Honest per §13 — never silently fills a scene
+    with 50,000 fake heads.
+    """
     all_heads: list[Head] = []
     stats: dict[str, int] = {}
+    capped = False
     for level in building.levels:
+        if capped:
+            break
         for room in level.rooms:
+            if len(all_heads) >= PLACER_TOTAL_HEAD_CAP:
+                capped = True
+                break
             ceiling_kind = (
                 room.ceiling.kind if room.ceiling else
                 level.ceiling.kind
@@ -207,6 +224,14 @@ def place_heads_for_building(building: Building) -> list[Head]:
             stats[room.hazard_class or "light"] = (
                 stats.get(room.hazard_class or "light", 0) + len(heads)
             )
+    if capped:
+        building.metadata["placer_capped"] = True
+        building.metadata["placer_cap_limit"] = PLACER_TOTAL_HEAD_CAP
+        log.warning(
+            "hf.placer.capped",
+            extra={"cap": PLACER_TOTAL_HEAD_CAP, "stats": stats,
+                   "note": "intake over-read rooms; design approximate"},
+        )
     log.info("placed %d heads: %s", len(all_heads), stats)
     return all_heads
 
