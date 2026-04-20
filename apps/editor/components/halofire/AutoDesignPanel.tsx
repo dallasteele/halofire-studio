@@ -16,7 +16,7 @@
  * zero walls, the UI says so — it does NOT spawn a fake building.
  */
 
-import { generateId, useScene } from '@pascal-app/core'
+import { generateId, LevelNode, SlabNode, useScene } from '@pascal-app/core'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 const GATEWAY_URL =
@@ -72,6 +72,16 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
   const sceneNodes = useScene((s) => s.nodes)
   const deleteNode = useScene((s) => s.deleteNode)
 
+  /** Find the first `building` node — we need it as the parent when
+   *  we create one Pascal LevelNode per architectural level. */
+  const findBuildingId = useCallback((): string | undefined => {
+    for (const n of Object.values(sceneNodes ?? {})) {
+      const typed = n as { type?: string; id?: string }
+      if (typed?.type === 'building' && typed.id) return typed.id
+    }
+    return undefined
+  }, [sceneNodes])
+
   /** Locate the first `level` node in the scene tree — same pattern
    *  SceneBootstrap uses. Returns undefined if the tree isn't ready
    *  yet; caller will retry on next render.
@@ -91,11 +101,18 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
     return undefined
   }, [sceneNodes])
 
-  /** Remove any previous auto_design spawns so re-runs don't pile up. */
+  /** Remove any previous auto_design spawns so re-runs don't pile up.
+   *  Scans both `asset.tags` (item nodes) and `metadata.tags` (slab /
+   *  level / wall nodes) — base Pascal nodes have no `asset` field so
+   *  we tag them via metadata.tags instead. */
   const clearPreviousAutoDesign = useCallback(() => {
     for (const n of Object.values(sceneNodes ?? {})) {
-      const tags = (n as { asset?: { tags?: string[] } }).asset?.tags ?? []
-      if (tags.includes('auto_design')) {
+      const assetTags = (n as { asset?: { tags?: string[] } }).asset?.tags ?? []
+      const metaTags =
+        ((n as { metadata?: { tags?: string[] } }).metadata?.tags as
+          | string[]
+          | undefined) ?? []
+      if (assetTags.includes('auto_design') || metaTags.includes('auto_design')) {
         try {
           deleteNode((n as { id: string }).id as any)
         } catch {
@@ -134,13 +151,16 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
         if (!res.ok) return
         const design = await res.json()
 
-        // Parent every spawned node to the active Pascal Level so
-        // items show in the viewport (not orphaned under Site).
-        // Same gate SceneBootstrap uses.
-        const levelId = findLevelId()
-        if (!levelId) {
+        // Parent strategy: create one Pascal LevelNode per architectural
+        // level (under the existing Building) and one SlabNode per level
+        // with the REAL polygon — not a bbox rectangle, not an empty
+        // `item` with src: ''. Previous version produced red placeholder
+        // boxes because it spawned `type: 'item'` nodes with no mesh src.
+        const buildingId = findBuildingId()
+        const defaultLevelId = findLevelId()
+        if (!buildingId || !defaultLevelId) {
           setError(
-            'scene render: Pascal level tree not ready — try again in a moment',
+            'scene render: Pascal site/building/level tree not ready — try again in a moment',
           )
           return
         }
@@ -170,41 +190,71 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
           }>
         }> = design.systems ?? []
 
-        // Simple slab renderer for each level — rectangles at elevation.
-        for (const lvl of levels) {
-          if (!lvl.polygon_m || lvl.polygon_m.length < 3) continue
-          const xs = lvl.polygon_m.map((p) => p[0])
-          const ys = lvl.polygon_m.map((p) => p[1])
-          const w = Math.max(1, Math.max(...xs) - Math.min(...xs))
-          const d = Math.max(1, Math.max(...ys) - Math.min(...ys))
-          try {
-            createNode(
-              {
-                id: generateId('item'),
-                type: 'item',
-                position: [Math.min(...xs) + w / 2, lvl.elevation_m, Math.min(...ys) + d / 2],
-                rotation: [0, 0, 0],
-                scale: [1, 1, 1],
+        // Map each architectural level → Pascal LevelNode id + elevation
+        // so we can attach heads/pipes to the right floor.
+        const levelIdByArch: Map<string, { pascalId: string; elevation: number; topZ: number }> =
+          new Map()
+
+        levels.forEach((lvl, idx) => {
+          if (!lvl.polygon_m || lvl.polygon_m.length < 3) return
+
+          // First arch level reuses Pascal's default level_0; subsequent
+          // levels get brand-new LevelNodes under the Building.
+          let pascalLevelId: string
+          if (idx === 0) {
+            pascalLevelId = defaultLevelId
+          } else {
+            try {
+              const newLevel = LevelNode.parse({
+                name: lvl.name,
+                level: idx,
                 children: [],
-                asset: {
-                  id: `slab_${lvl.id}`,
-                  category: 'slab',
-                  name: `${lvl.name} slab`,
-                  thumbnail: '/icons/item.png',
-                  dimensions: [w, 0.2, d],
-                  src: '',
-                  attachTo: 'floor',
-                  offset: [0, 0, 0],
-                  rotation: [0, 0, 0],
-                  scale: [1, 1, 1],
-                  tags: ['halofire', 'slab', 'auto_design'],
-                },
-              } as any,
-              levelId as any,
-            )
+                parentId: buildingId,
+                metadata: { tags: ['halofire', 'level', 'auto_design'] },
+              })
+              createNode(newLevel as any, buildingId as any)
+              pascalLevelId = newLevel.id
+            } catch {
+              pascalLevelId = defaultLevelId
+            }
+          }
+          levelIdByArch.set(lvl.id, {
+            pascalId: pascalLevelId,
+            elevation: lvl.elevation_m,
+            topZ: lvl.elevation_m + (lvl.height_m ?? 3.0),
+          })
+
+          // Slab with the REAL concave polygon. Pascal's SlabNode extrudes
+          // `polygon: [[x, z], ...]` at `elevation` via ExtrudeGeometry —
+          // this is what makes the floor visible (instead of a red bbox).
+          try {
+            const slab = SlabNode.parse({
+              name: `${lvl.name} slab`,
+              polygon: lvl.polygon_m,
+              elevation: Math.max(0.05, lvl.elevation_m || 0.05),
+              parentId: pascalLevelId,
+              metadata: { tags: ['halofire', 'slab', 'auto_design'] },
+            })
+            createNode(slab as any, pascalLevelId as any)
           } catch {
             // per-level spawn is best-effort; don't block others
           }
+        })
+
+        /** Route a head/pipe to the Pascal level whose elevation band
+         *  contains its Z coordinate. Falls back to the nearest level. */
+        const levelForZ = (z: number): string => {
+          let best = defaultLevelId
+          let bestDist = Infinity
+          for (const { pascalId, elevation, topZ } of levelIdByArch.values()) {
+            if (z >= elevation - 0.5 && z <= topZ + 0.5) return pascalId
+            const d = Math.min(Math.abs(z - elevation), Math.abs(z - topZ))
+            if (d < bestDist) {
+              bestDist = d
+              best = pascalId
+            }
+          }
+          return best
         }
 
         // Heads — 1 sphere per head ref'd at its 3D position.
@@ -237,7 +287,7 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
                     tags: ['halofire', 'sprinkler_head_pendant', 'auto_design'],
                   },
                 } as any,
-                levelId as any,
+                levelForZ(h.position_m[2]) as any,
               )
               headsSpawned++
             } catch {
@@ -289,7 +339,7 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
                     ],
                   },
                 } as any,
-                levelId as any,
+                levelForZ(mz) as any,
               )
               pipesSpawned++
             } catch {
@@ -302,7 +352,7 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
         setError(`scene render: ${String(e)}`)
       }
     },
-    [createNode, findLevelId, clearPreviousAutoDesign],
+    [createNode, findLevelId, findBuildingId, clearPreviousAutoDesign],
   )
 
   const run = useCallback(async () => {

@@ -188,7 +188,11 @@ def _steiner_tree_paths(
     ROUTER_STEINER_BUDGET issue.
     """
     import time as _time
-    _BUDGET_S = 25.0
+    # Tight budget: with 1000+ heads the Steiner is O(N^3). 5 s / level
+    # chunk gives the router enough to connect a meaningful fraction,
+    # degrades gracefully past that via ROUTER_STEINER_BUDGET. Phase 7
+    # of SELF_TRAIN_PLAN swaps this for a proper branch-main-cross router.
+    _BUDGET_S = 5.0
     _start = _time.perf_counter()
     if not terminals or len(terminals) < 2:
         return []
@@ -351,11 +355,41 @@ def route_systems(building: Building, heads: list[Head]) -> list[System]:
     systems: list[System] = []
     heads_by_level: dict[str, list[Head]] = {}
     for h in heads:
-        # Each head's room_id must map to a level; find which
-        for lvl in building.levels:
-            if any(r.id == h.room_id for r in lvl.rooms):
-                heads_by_level.setdefault(lvl.id, []).append(h)
-                break
+        # Map each head to its level. Primary path: room_id matches a
+        # room on the level. Fallback path (introduced w/
+        # place_heads_for_level_floor): room_id has shape
+        # 'floor_fallback_<level_id>' — extract the level id directly.
+        # Without this, floor-fallback heads get silently dropped and
+        # the router emits a sparse design that under-counts by
+        # hundreds of heads.
+        matched = False
+        if h.room_id and h.room_id.startswith("floor_fallback_"):
+            target_level_id = h.room_id[len("floor_fallback_"):]
+            for lvl in building.levels:
+                if lvl.id == target_level_id:
+                    heads_by_level.setdefault(lvl.id, []).append(h)
+                    matched = True
+                    break
+        if not matched:
+            for lvl in building.levels:
+                if any(r.id == h.room_id for r in lvl.rooms):
+                    heads_by_level.setdefault(lvl.id, []).append(h)
+                    matched = True
+                    break
+        if not matched:
+            # Last-resort: match by Z coordinate to nearest level.
+            # Prevents heads from being silently dropped when the
+            # intake mints a head without a clear room/level
+            # association.
+            if h.position_m:
+                z = h.position_m[2]
+                best = min(
+                    building.levels,
+                    key=lambda lv: abs(lv.elevation_m - z),
+                    default=None,
+                )
+                if best is not None:
+                    heads_by_level.setdefault(best.id, []).append(h)
 
     for level in building.levels:
         lvl_heads = heads_by_level.get(level.id, [])
@@ -400,10 +434,12 @@ def route_systems(building: Building, heads: list[Head]) -> list[System]:
             riser=riser,
         )
         # Router time budget per level — Steiner is near-O(N²×log N)
-        # on networkx. A reasonable apartment level (< 200 heads)
-        # finishes in ~10s; budget 45s catches pathological edge
-        # cases without losing good runs.
-        _ROUTER_LEVEL_BUDGET_S = 45.0
+        # on networkx. With 350-head cap from the floor-fallback placer
+        # a 45 s budget is not enough (12 levels = 9+ min total).
+        # Tighten to 10 s / level → pipeline completes in < 3 min total
+        # even with degraded routes; Phase 7 swaps in a real
+        # branch/cross/main router.
+        _ROUTER_LEVEL_BUDGET_S = 10.0
         import time as _time
         _router_level_start = _time.perf_counter()
         try:

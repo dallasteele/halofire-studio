@@ -72,6 +72,20 @@ def _row(metric: str, actual, truth, tol: float) -> tuple[str, int]:
     )
 
 
+def _append_history(row: dict) -> None:
+    """Append-only breadcrumb at docs/delta_history.jsonl. Every
+    run logs the numbers so the ratchet is visible over time."""
+    from datetime import datetime, timezone
+    history = _REPO / "docs" / "delta_history.jsonl"
+    history.parent.mkdir(parents=True, exist_ok=True)
+    row = {
+        "ts": datetime.now(timezone.utc).isoformat(),
+        **row,
+    }
+    with history.open("a", encoding="utf-8") as f:
+        f.write(json.dumps(row) + "\n")
+
+
 def main() -> int:
     t = truth_for("1881-cooperative")
     if t is None:
@@ -114,6 +128,17 @@ def main() -> int:
         fail += f
     print("=" * 64)
     print(f"  {fail} metric(s) out of tolerance")
+    # History breadcrumb
+    _append_history({
+        "project_id": "1881-cooperative",
+        "head_count": heads,
+        "total_bid_usd": bid_usd,
+        "system_count": len(systems),
+        "level_count": level_count,
+        "pipe_total_ft": pipes_ft,
+        "hydraulic_gpm": gpm,
+        "fail_count": fail,
+    })
     return 0 if fail == 0 else 1
 
 

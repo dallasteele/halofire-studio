@@ -404,6 +404,19 @@ def place_heads_for_building(building: Building) -> list[Head]:
         #    under-coverage. See SELF_TRAIN_PLAN Phase 5.
         if not capped and len(all_heads) + len(level_heads) < PLACER_TOTAL_HEAD_CAP:
             fallback = place_heads_for_level_floor(level, level_heads)
+            log.info(
+                "hf.placer.floor_fallback",
+                extra={
+                    "level_id": level.id,
+                    "room_heads": len(level_heads),
+                    "fallback_heads": len(fallback),
+                    "level_area_sqm": (
+                        __import__("shapely.geometry", fromlist=["Polygon"])
+                        .Polygon(level.polygon_m).area
+                        if level.polygon_m and len(level.polygon_m) >= 3 else 0
+                    ),
+                },
+            )
             # Truncate if adding them would blow the global cap
             remaining = PLACER_TOTAL_HEAD_CAP - (len(all_heads) + len(level_heads))
             if len(fallback) > remaining:
