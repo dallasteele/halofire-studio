@@ -13,6 +13,7 @@ import { ProjectBriefPanel } from '@/components/halofire/ProjectBriefPanel'
 import {
   ProjectContextHeader,
 } from '@/components/halofire/ProjectContextHeader'
+import { CommandPalette } from '@/components/halofire/CommandPalette'
 import { Ribbon, type RibbonCommand } from '@/components/halofire/Ribbon'
 import { SceneBootstrap } from '@/components/halofire/SceneBootstrap'
 import { StatusBar } from '@/components/halofire/StatusBar'
@@ -119,6 +120,7 @@ export default function Home() {
           Addresses "none of these catalog items are real models" —
           now they render as a showcase at x=-50, z=-50. */}
       <SceneBootstrap projectId={ACTIVE_PROJECT_ID} />
+      <CommandPalette />
       <Ribbon onCommand={dispatchRibbon} />
       <div className="min-h-0 flex-1">
         <Editor
