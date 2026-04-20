@@ -184,7 +184,26 @@ def place_heads_for_room(
         room.ceiling.height_m if room.ceiling else 3.0
     ) - 0.1  # deflector 100 mm below ceiling
 
-    for i, (x, y) in enumerate(_grid_points(usable, spacing_m)):
+    # Per-room head cap (Phase Iter-3 fix 2026-04-20). §11.2.3.1.2
+    # light hazard max coverage = 20.9 sqm → a 500 sqm room needs
+    # ~24 heads. Rooms producing > per_room_cap heads are
+    # false-positive large polygons (intake over-read) — cap and
+    # surface room.metadata-like marker via head tagging.
+    # Formula: allow headroom of 2x theoretical minimum + 5 margin.
+    theoretical_min = math.ceil(room.area_sqm / max_cov) if max_cov > 0 else 20
+    per_room_cap = max(10, min(40, theoretical_min * 2 + 5))
+
+    grid_points = _grid_points(usable, spacing_m)
+    if len(grid_points) > per_room_cap:
+        warn_swallowed(
+            log, code="PLACER_PER_ROOM_CAP",
+            err=RuntimeError(f"{len(grid_points)} > {per_room_cap}"),
+            room_id=room.id, room_area_sqm=room.area_sqm,
+            hazard=hazard,
+        )
+        grid_points = grid_points[:per_room_cap]
+
+    for i, (x, y) in enumerate(grid_points):
         heads.append(Head(
             id=f"h_{level.id}_{room.id}_{i}",
             sku=sku,

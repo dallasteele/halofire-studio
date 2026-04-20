@@ -379,6 +379,13 @@ def route_systems(building: Building, heads: list[Head]) -> list[System]:
             supplies=[level.id],
             riser=riser,
         )
+        # Router time budget per level — Steiner is near-O(N²×log N)
+        # on networkx. A reasonable apartment level (< 200 heads)
+        # finishes in ~10s; budget 45s catches pathological edge
+        # cases without losing good runs.
+        _ROUTER_LEVEL_BUDGET_S = 45.0
+        import time as _time
+        _router_level_start = _time.perf_counter()
         try:
             g = _build_routing_graph(level, lvl_heads, riser_xy)
             terminals = [riser.id] + [h.id for h in lvl_heads]
@@ -405,6 +412,17 @@ def route_systems(building: Building, heads: list[Head]) -> list[System]:
         except (nx.NodeNotFound, nx.NetworkXError, ValueError, KeyError) as e:
             warn_swallowed(log, code="ROUTER_GRAPH_FAIL",
                            err=e, level_id=level.id, head_count=len(lvl_heads))
+            tree_edges = []
+
+        # Budget enforcement: if the graph build + Steiner exceeded
+        # the level budget, bail with empty pipes (honest degrade).
+        _elapsed = _time.perf_counter() - _router_level_start
+        if _elapsed > _ROUTER_LEVEL_BUDGET_S:
+            warn_swallowed(
+                log, code="ROUTER_LEVEL_BUDGET_EXCEEDED",
+                err=RuntimeError(f"{_elapsed:.1f}s > {_ROUTER_LEVEL_BUDGET_S}s"),
+                level_id=level.id, head_count=len(lvl_heads),
+            )
             tree_edges = []
 
         # Convert tree edges to PipeSegments

@@ -173,6 +173,7 @@ def _cluster_walls(segments: list[LineString]) -> list[tuple[float, float, float
 def _polygons_from_walls(
     walls: list[tuple[float, float, float, float]],
     min_area_pt2: float = 20000.0,
+    max_area_pt2: float = 400_000.0,
     max_rooms: int = 50,
 ) -> list[Polygon]:
     """Run shapely polygonize on the wall segment set to find rooms.
@@ -189,8 +190,15 @@ def _polygons_from_walls(
     lines = [LineString([(x0, y0), (x1, y1)]) for x0, y0, x1, y1 in walls]
     merged = unary_union(lines)
     polys: list[Polygon] = list(polygonize(merged))
-    # Filter + cap
-    polys = [p for p in polys if p.area > min_area_pt2]
+    # Filter: reject both too-small (chases / dimension arrows) AND
+    # too-large (whole-floor polygons bordered by dimension lines =
+    # false positives). max_area_pt2=400k ≈ 258 sqm @ 1/8" scale, a
+    # reasonable maximum single room (even large warehouses have
+    # structural grid subdividing this).
+    polys = [
+        p for p in polys
+        if min_area_pt2 < p.area < max_area_pt2
+    ]
     polys.sort(key=lambda p: p.area, reverse=True)
     return polys[:max_rooms]
 
