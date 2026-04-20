@@ -507,6 +507,21 @@ def calc_system(
     if safety_margin < 0:
         issues.append("HYDRAULIC_FAILS_SUPPLY: Demand exceeds the available supply curve.")
 
+    # Per-area detail (NFPA 13 §11.2.3). Each entry holds the
+    # in-area head count and the area's contribution to the summed
+    # required flow. Pressure is the riser-base demand (same for all
+    # areas by definition — they share the supply).
+    remote_areas_detail: list[dict] = []
+    for idx, area in enumerate(remote_areas):
+        area_flow = sum(head_flow.get(h.id, 0.0) for h in area)
+        remote_areas_detail.append({
+            "index": idx,
+            "head_count": len(area),
+            "head_ids": [h.id for h in area],
+            "required_flow_gpm": round(area_flow, 1),
+            "required_pressure_psi": round(demand_psi, 1),
+        })
+
     return HydraulicResult(
         design_area_sqft=area_sqft,
         density_gpm_per_sqft=density,
@@ -524,6 +539,7 @@ def calc_system(
         issues=issues,
         converged=converged,
         iterations=iterations,
+        remote_areas_detail=remote_areas_detail,
     )
 
 

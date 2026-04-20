@@ -104,6 +104,33 @@ def test_two_areas_flow_sums_up() -> None:
     )
 
 
+def test_per_area_detail_exposed_on_result() -> None:
+    """HydraulicResult.remote_areas_detail must list each area with
+    its own head count + Q contribution."""
+    system = _linear_system(n_heads=16)
+    supply = FlowTestData(static_psi=90, residual_psi=70, flow_gpm=1200)
+    r = H.calc_system(system, supply, hazard="light", n_remote_areas=2)
+    assert len(r.remote_areas_detail) == 2
+    d = r.remote_areas_detail
+    for entry in d:
+        assert entry["head_count"] > 0
+        assert entry["required_flow_gpm"] > 0
+        assert entry["required_pressure_psi"] > 0
+    # Sum of per-area flows ~= total required_flow_gpm (rounding
+    # tolerance — per-area rounds independently)
+    sum_per_area = sum(e["required_flow_gpm"] for e in d)
+    assert abs(sum_per_area - r.required_flow_gpm) < 1.5
+
+
+def test_single_area_result_has_one_detail_entry() -> None:
+    """Even n_remote_areas=1 populates the detail list (consistency)."""
+    system = _linear_system(n_heads=10)
+    supply = FlowTestData(static_psi=90, residual_psi=70, flow_gpm=1200)
+    r = H.calc_system(system, supply, hazard="light", n_remote_areas=1)
+    assert len(r.remote_areas_detail) == 1
+    assert r.remote_areas_detail[0]["head_count"] >= 1
+
+
 def test_two_areas_empty_heads_returns_empty() -> None:
     areas = H._select_remote_area_heads_n(
         [], nx.DiGraph(), "riser", 300.0, n_areas=2,

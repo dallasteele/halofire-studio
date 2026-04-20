@@ -264,6 +264,11 @@ class HydraulicResult(BaseModel):
     issues: list[str] = Field(default_factory=list)
     converged: bool = False
     iterations: int = 0
+    # Per-area detail when multiple remote areas are calculated
+    # concurrently (NFPA 13 §11.2.3). Each entry mirrors the top-
+    # level Q/P/margin fields but scoped to a single window so the
+    # submittal + proposal can break out the split.
+    remote_areas_detail: list[dict] = Field(default_factory=list)
 
 
 class System(BaseModel):
