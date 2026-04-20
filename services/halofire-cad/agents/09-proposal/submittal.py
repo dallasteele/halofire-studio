@@ -30,6 +30,70 @@ except ImportError:  # pragma: no cover
 
 BRAND_RED = "#c8322a"
 
+# NFPA / AutoSprink pipe-size colors (same keys as proposal_html)
+_PIPE_COLORS: dict[str, str] = {
+    "1": "#ffd600",
+    "1.25": "#ff4aa8",
+    "1.5": "#00e5ff",
+    "2": "#448aff",
+    "2.5": "#00e676",
+    "3": "#e8432d",
+    "4": "#222222",  # 4" normally white; on white paper use dark gray
+    "6": "#222222",
+}
+
+
+def _nfpa_pipe_color_rl(size_in):  # noqa: ANN001
+    """Return a reportlab Color for an NFPA pipe size."""
+    if size_in is None:
+        return colors.grey
+    key = f"{float(size_in):g}"
+    hex_ = _PIPE_COLORS.get(key, "#888888")
+    return colors.HexColor(hex_)
+
+
+def _extract_level_geometry(
+    level: dict, design: dict | None,
+) -> tuple[list[dict], list[dict]]:
+    """Return (heads, pipes) for a single level in plan-view XZ.
+
+    `heads`: list of {x, z}
+    `pipes`: list of {x1, z1, x2, z2, size_in}
+    """
+    if not design:
+        return [], []
+    target_id = level.get("id")
+    levels = (design.get("building") or {}).get("levels") or []
+    systems = design.get("systems") or []
+    # room_id -> level_id map
+    room_level = {
+        r["id"]: lvl["id"]
+        for lvl in levels for r in (lvl.get("rooms") or [])
+    }
+    target_elev = None
+    for lvl in levels:
+        if lvl.get("id") == target_id:
+            target_elev = lvl.get("elevation_m")
+            break
+    heads: list[dict] = []
+    pipes: list[dict] = []
+    for s in systems:
+        for h in (s.get("heads") or []):
+            if room_level.get(h.get("room_id", "")) == target_id:
+                heads.append({"x": h["position_m"][0], "z": h["position_m"][2]})
+        for p in (s.get("pipes") or []):
+            start = p.get("start_m") or [0, 0, 0]
+            end = p.get("end_m") or [0, 0, 0]
+            y_mid = (start[1] + end[1]) / 2
+            if target_elev is not None and abs(y_mid - target_elev) > 1.5:
+                continue
+            pipes.append({
+                "x1": start[0], "z1": start[2],
+                "x2": end[0], "z2": end[2],
+                "size_in": p.get("size_in"),
+            })
+    return heads, pipes
+
 
 def _fmt_usd(x: Any) -> str:
     try:
@@ -147,7 +211,13 @@ def _draw_fph_placard(c, data: dict) -> None:
             break
 
 
-def _draw_level_plan(c, data: dict, level: dict, idx: int) -> None:
+def _draw_level_plan(
+    c, data: dict, level: dict, idx: int,
+    design: dict | None = None,
+) -> None:
+    """Draw an FP-N plan sheet. When `design` is given, embeds the
+    heads (circles) + pipes (NFPA-colored lines) for the level's
+    geometry; otherwise renders the stats-only placeholder."""
     project = data.get("project") or {}
     sheet_id = f"FP-N.{idx}"
     title = f"{level.get('name', level.get('id', ''))} — plan"
@@ -162,21 +232,77 @@ def _draw_level_plan(c, data: dict, level: dict, idx: int) -> None:
         f"{_fmt_n(level.get('room_count', 0))} rooms"
     )
     c.drawString(1.0 * inch, h - 1.9 * inch, stats)
-    # Placeholder plan area box (actual SVG/raster embed = later tick)
+
+    # Plan area box
+    plan_x = 1.0 * inch
+    plan_y = 1.0 * inch
+    plan_w = w - 2.0 * inch
+    plan_h = h - 3.2 * inch
     c.setLineWidth(0.7)
     c.setStrokeColor(colors.grey)
-    c.rect(
-        1.0 * inch, 1.0 * inch,
-        w - 2.0 * inch, h - 3.2 * inch,
-    )
-    c.setFont("Helvetica", 8)
-    c.setFillColor(colors.grey)
-    c.drawCentredString(
-        w / 2, h / 2 - 0.3 * inch,
-        "(plan area — inline SVG overlay ships in next tick; "
-        "proposal.html already embeds the SVG per level)",
-    )
+    c.rect(plan_x, plan_y, plan_w, plan_h)
+
+    # Extract per-level geometry from `design`
+    heads, pipes = _extract_level_geometry(level, design)
+    if not heads and not pipes:
+        c.setFont("Helvetica", 8)
+        c.setFillColor(colors.grey)
+        c.drawCentredString(
+            w / 2, h / 2 - 0.3 * inch,
+            "(no placed heads on this level)",
+        )
+        c.setFillColor(colors.black)
+        return
+
+    # Bounds + fit
+    xs: list[float] = []
+    zs: list[float] = []
+    for p in pipes:
+        xs.extend([p["x1"], p["x2"]])
+        zs.extend([p["z1"], p["z2"]])
+    for hd in heads:
+        xs.append(hd["x"])
+        zs.append(hd["z"])
+    xmin, xmax = min(xs), max(xs)
+    zmin, zmax = min(zs), max(zs)
+    span_x = max(xmax - xmin, 1.0)
+    span_z = max(zmax - zmin, 1.0)
+    pad = 12
+    scale = min((plan_w - 2 * pad) / span_x, (plan_h - 2 * pad) / span_z)
+    ox = plan_x + (plan_w - span_x * scale) / 2
+    oy = plan_y + (plan_h - span_z * scale) / 2
+
+    def tx(x: float) -> float:
+        return ox + (x - xmin) * scale
+
+    def ty_(z: float) -> float:
+        return oy + (z - zmin) * scale
+
+    # Pipes first (under heads)
+    for p in pipes:
+        col = _nfpa_pipe_color_rl(p.get("size_in"))
+        c.setStrokeColor(col)
+        sz = float(p.get("size_in") or 0)
+        c.setLineWidth(1.6 if sz >= 3 else 0.9)
+        c.line(tx(p["x1"]), ty_(p["z1"]), tx(p["x2"]), ty_(p["z2"]))
+    # Heads on top
+    c.setFillColor(colors.HexColor(BRAND_RED))
+    c.setStrokeColor(colors.white)
+    c.setLineWidth(0.4)
+    for hd in heads:
+        c.circle(tx(hd["x"]), ty_(hd["z"]), 2.0, stroke=1, fill=1)
     c.setFillColor(colors.black)
+    c.setStrokeColor(colors.black)
+    c.setLineWidth(1.0)
+
+    # 1-meter scale bar anchored bottom-right of the plan area
+    bar = 1.0 * scale
+    if 0 < bar < plan_w - 40:
+        bx = plan_x + plan_w - bar - 12
+        by = plan_y + 10
+        c.line(bx, by, bx + bar, by)
+        c.setFont("Helvetica", 7)
+        c.drawCentredString(bx + bar / 2, by + 3, "1 m")
 
 
 def _draw_fpr_riser(c, data: dict) -> None:
@@ -262,10 +388,14 @@ def _draw_fpd_details(c, data: dict) -> None:
 def write_submittal_pdf(
     data: dict[str, Any], out_dir: Path,
     filename: str = "submittal.pdf",
+    design: dict[str, Any] | None = None,
 ) -> Path:
     """Emit the six-sheet submittal. Returns the path.
 
     `data` is the proposal.json payload (same schema proposal.html uses).
+    `design` is the design.json payload — when given, the FP-N plan
+    sheets embed heads (red dots) + pipes (NFPA-colored lines) in
+    plan view. When absent, FP-N shows a stats-only placeholder.
     """
     out_dir.mkdir(parents=True, exist_ok=True)
     out = out_dir / filename
@@ -280,7 +410,8 @@ def write_submittal_pdf(
     _draw_fp0_cover(c, data); c.showPage()
     _draw_fph_placard(c, data); c.showPage()
     for i, lvl in enumerate(data.get("levels") or [], 1):
-        _draw_level_plan(c, data, lvl, i); c.showPage()
+        _draw_level_plan(c, data, lvl, i, design=design)
+        c.showPage()
     _draw_fpr_riser(c, data); c.showPage()
     _draw_fpb_bom(c, data); c.showPage()
     _draw_fpd_details(c, data); c.showPage()
@@ -299,5 +430,10 @@ if __name__ == "__main__":
         sys.exit(2)
     d = Path(sys.argv[1]).resolve()
     data = json.loads((d / "proposal.json").read_text(encoding="utf-8"))
-    p = write_submittal_pdf(data, d)
+    design_path = d / "design.json"
+    design = (
+        json.loads(design_path.read_text(encoding="utf-8"))
+        if design_path.exists() else None
+    )
+    p = write_submittal_pdf(data, d, design=design)
     print(f"wrote {p}")

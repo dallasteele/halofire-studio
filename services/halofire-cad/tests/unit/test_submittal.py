@@ -104,6 +104,84 @@ def test_fallback_when_reportlab_missing(monkeypatch, tmp_path: Path) -> None:
     assert "reportlab missing" in content
 
 
+@pytest.mark.skipif(not _HAS_REPORTLAB, reason="reportlab not installed")
+def test_submittal_with_design_embeds_plan_geometry(tmp_path: Path) -> None:
+    """When `design` is given, FP-N sheets must grow in byte size
+    vs the stats-only placeholder (plan lines + head circles land
+    on the page)."""
+    plain = SUB.write_submittal_pdf(_SAMPLE, tmp_path, filename="plain.pdf")
+    design = {
+        "building": {
+            "levels": [
+                {"id": "L0", "elevation_m": 0.0,
+                 "rooms": [{"id": "R1"}, {"id": "R2"}]},
+                {"id": "L1", "elevation_m": 3.6,
+                 "rooms": [{"id": "R3"}]},
+            ],
+        },
+        "systems": [
+            {
+                "heads": [
+                    {"room_id": "R1", "position_m": [1, 2, 1]},
+                    {"room_id": "R1", "position_m": [3, 2, 2]},
+                    {"room_id": "R2", "position_m": [4, 2, 5]},
+                ],
+                "pipes": [
+                    {"start_m": [0, 2, 0], "end_m": [5, 2, 0], "size_in": 2.0},
+                    {"start_m": [5, 2, 0], "end_m": [5, 2, 6], "size_in": 1.5},
+                ],
+            },
+        ],
+    }
+    with_geom = SUB.write_submittal_pdf(
+        _SAMPLE, tmp_path, filename="with_geom.pdf", design=design,
+    )
+    assert with_geom.stat().st_size > plain.stat().st_size
+
+
+def test_extract_level_geometry_filters_by_room_id() -> None:
+    design = {
+        "building": {
+            "levels": [
+                {"id": "L0", "elevation_m": 0.0,
+                 "rooms": [{"id": "R1"}]},
+                {"id": "L1", "elevation_m": 3.6,
+                 "rooms": [{"id": "R2"}]},
+            ],
+        },
+        "systems": [
+            {
+                "heads": [
+                    {"room_id": "R1", "position_m": [1, 2, 1]},
+                    {"room_id": "R2", "position_m": [4, 5, 5]},
+                ],
+                "pipes": [],
+            },
+        ],
+    }
+    heads_l0, _ = SUB._extract_level_geometry({"id": "L0"}, design)
+    assert len(heads_l0) == 1
+    assert heads_l0[0]["x"] == 1
+
+
+def test_extract_level_geometry_no_design_returns_empty() -> None:
+    assert SUB._extract_level_geometry({"id": "L0"}, None) == ([], [])
+
+
+def test_nfpa_pipe_color_2in_is_blue() -> None:
+    col = SUB._nfpa_pipe_color_rl(2.0)
+    # reportlab's Color.hexval() returns 0x-style string
+    hex_str = col.hexval().lower()
+    # #448aff => rgb(0x44, 0x8a, 0xff)
+    assert "448aff" in hex_str
+
+
+def test_nfpa_pipe_color_none_returns_grey() -> None:
+    col = SUB._nfpa_pipe_color_rl(None)
+    # reportlab's grey
+    assert col is not None
+
+
 def test_submittal_pdf_empty_bom_does_not_crash(tmp_path: Path) -> None:
     data = dict(_SAMPLE)
     data["bom"] = []
