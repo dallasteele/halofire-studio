@@ -175,12 +175,21 @@ def _build_routing_graph(
 def _steiner_tree_paths(
     g: nx.Graph, terminals: list[str]
 ) -> list[tuple[str, str, float, list[tuple[float, float]]]]:
-    """Greedy Steiner approximation: grow a tree from the first terminal,
-    adding the closest remaining terminal by shortest path each step.
+    """Greedy Steiner approximation with per-call time budget.
 
-    Returns edges as (from_id, to_id, length_m, path_points).
-    The path_points are the full routed polyline (through grid nodes).
+    Grows a tree from the first terminal, adding the closest remaining
+    terminal by shortest path each step. Each outer iteration costs
+    O(|tree_nodes| × |remaining|) Dijkstra calls × O(E log V) each.
+
+    A 160-head level with a 5000-node grid hits ~128_000 Dijkstra
+    invocations = minutes of wall clock per level. Time budget of
+    25 s checked inside the loop lets us stop with partial results
+    rather than hanging. Remaining unconnected terminals surface as
+    ROUTER_STEINER_BUDGET issue.
     """
+    import time as _time
+    _BUDGET_S = 25.0
+    _start = _time.perf_counter()
     if not terminals or len(terminals) < 2:
         return []
     tree_nodes = {terminals[0]}
@@ -188,6 +197,17 @@ def _steiner_tree_paths(
     edges: list[tuple[str, str, float, list[tuple[float, float]]]] = []
 
     while remaining:
+        if _time.perf_counter() - _start > _BUDGET_S:
+            warn_swallowed(
+                log, code="ROUTER_STEINER_BUDGET",
+                err=RuntimeError(
+                    f"steiner over {_BUDGET_S}s, "
+                    f"{len(remaining)} unconnected"
+                ),
+                remaining=len(remaining),
+                connected=len(tree_nodes),
+            )
+            break
         # Find the remaining terminal with shortest path to tree
         best: tuple[float, str, list[str]] | None = None
         for t in remaining:
