@@ -29,39 +29,78 @@ const SESSION_KEY = 'halofire-scene-bootstrapped'
 
 // Grid layout for the catalog showcase. One SKU per cell, 2 m apart,
 // laid out behind where the generated building drops.
-const SHOWCASE_ORIGIN: [number, number, number] = [-50, 0, -50]
-const SHOWCASE_SPACING = 3.0
+// Placed inside the default 30x30 site polygon so items are visible
+// in the initial camera view. Grid origin is the back-left corner
+// of a 5-wide x 4-deep showcase grid with 2.5m spacing.
+const SHOWCASE_ORIGIN: [number, number, number] = [-6, 0, -6]
+const SHOWCASE_SPACING = 2.5
 const SHOWCASE_COLS = 5
 
 export function SceneBootstrap({ projectId }: { projectId: string }) {
   const createNode = useScene((s) => s.createNode)
   const nodes = useScene((s) => s.nodes)
-  const nodeCount = Object.keys(nodes ?? {}).length
+  const rootNodeIds = useScene((s) => s.rootNodeIds)
   const ranRef = useRef(false)
 
   useEffect(() => {
-    // Guard: only run once per session AND only if the scene is
-    // essentially empty (< 5 pre-existing nodes)
     if (ranRef.current) return
     if (typeof window === 'undefined') return
-    if (sessionStorage.getItem(SESSION_KEY) === 'done') return
-    if (nodeCount > 5) {
-      // Scene has stuff — probably user-placed. Don't spawn.
+
+    // Wait until Pascal has set up the default site/building/level
+    // tree. rootNodeIds is populated after the first scene-store
+    // commit. If it's still empty, bail and let the next render try.
+    if (!rootNodeIds || rootNodeIds.length === 0) return
+
+    // Smart gate: check if catalog showcase is already present
+    // (by scanning existing node tags for 'catalog_showcase').
+    // If so, the bootstrap already ran; skip regardless of
+    // sessionStorage. If not, run — even if the session flag is
+    // stale from a prior session.
+    const existing = Object.values(nodes ?? {}).some((n) => {
+      const asset = (n as { asset?: { tags?: string[] } }).asset
+      return asset?.tags?.includes('catalog_showcase')
+    })
+    if (existing) {
+      ranRef.current = true
       return
     }
     ranRef.current = true
 
+    // Find the first Level node in the flat node dict.
+    // Catalog items must be parented to a Level, not the Site root,
+    // otherwise Pascal's viewer filters them out ("No elements on this level").
+    let levelId: string | undefined
+    for (const n of Object.values(nodes ?? {})) {
+      const typed = n as { type?: string; id?: string }
+      if (typed?.type === 'level' && typed.id) {
+        levelId = typed.id
+        break
+      }
+    }
+    if (!levelId) {
+      // Scene tree not ready yet — wait for next render
+      ranRef.current = false
+      return
+    }
+
+    console.info(
+      '[HaloFire] SceneBootstrap running — spawning catalog showcase under level',
+      levelId,
+    )
     void (async () => {
       try {
-        await bootstrapScene({ projectId, createNode })
+        await bootstrapScene({
+          projectId,
+          createNode,
+          parentId: levelId,
+        })
         sessionStorage.setItem(SESSION_KEY, 'done')
+        console.info('[HaloFire] SceneBootstrap complete')
       } catch (e) {
-        // Failure is non-fatal — the user can still manually use the
-        // Auto-Design or Catalog tabs.
-        console.warn('[HaloFire] scene bootstrap skipped:', e)
+        console.warn('[HaloFire] scene bootstrap failed:', e)
       }
     })()
-  }, [projectId, createNode, nodeCount])
+  }, [projectId, createNode, nodes, rootNodeIds])
 
   return null
 }
@@ -74,24 +113,16 @@ type CreateNodeFn = (node: any, parentId?: any) => void
 async function bootstrapScene(opts: {
   projectId: string
   createNode: CreateNodeFn
+  parentId?: unknown
 }): Promise<void> {
-  const { createNode } = opts
+  const { createNode, parentId } = opts
   void opts.projectId
 
-  // Place the catalog showcase only (static GLBs).
-  //
-  // The synthetic building auto-spawn was removed 2026-04-20 because
-  // its current GLB emitter renders walls as featureless full-height
-  // extruded prisms with no doors / windows / roof / use-class
-  // coloring → visually reads as a storage-unit honeycomb instead
-  // of a building. See docs/plans/2026-04-20-path-to-production.md
-  // gap A5. Re-enable when A5 ships (boolean-subtract openings +
-  // add roof slab + color by use class).
-  //
-  // Users who want the synthetic building explicitly can still click
-  // the Project tab's BuildingGenerator "Generate test building"
-  // button — that path is labeled SYNTHESIZED ⚠ in the UI.
-  placeCatalogShowcase({ createNode })
+  // Place the catalog showcase (static GLBs).
+  // SceneBootstrap passes Pascal's rootNodeIds[0] as parentId so
+  // the items are attached to the active site/level tree — otherwise
+  // they're orphans and don't show in the viewport.
+  placeCatalogShowcase({ createNode, parentId })
   return
 
   // eslint-disable-next-line no-unreachable
@@ -147,9 +178,11 @@ async function bootstrapScene(opts: {
 
 function placeCatalogShowcase(opts: {
   createNode: CreateNodeFn
+  parentId?: unknown
 }): void {
-  const { createNode } = opts
+  const { createNode, parentId } = opts
   let idx = 0
+  let spawned = 0
   for (const entry of CATALOG) {
     const row = Math.floor(idx / SHOWCASE_COLS)
     const col = idx % SHOWCASE_COLS
@@ -183,12 +216,18 @@ function placeCatalogShowcase(opts: {
             tags: ['halofire', entry.category, 'catalog_showcase'],
           },
         },
-        undefined,
+        parentId,
       )
       idx++
+      spawned++
     } catch (e) {
       // per-SKU failure is fine — keep placing others
       console.warn('[HaloFire] showcase skipped', entry.sku, e)
+      idx++
     }
   }
+  console.info(
+    `[HaloFire] catalog showcase: spawned ${spawned}/${CATALOG.length} `
+    + `at origin ${SHOWCASE_ORIGIN.join(',')} under parent ${String(parentId)}`,
+  )
 }
