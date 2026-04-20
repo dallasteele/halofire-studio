@@ -4,6 +4,14 @@ Misquoting a supply price is one of the top reasons a fire-sprinkler
 bid loses money. This package is the source of truth for every part
 Halo buys and the price they paid this week.
 
+## Model policy
+
+The sync agent is **Gemma only**. The default is `gemma3:4b`
+(same model HAL uses for Tier 1 diagnosis). The module-level
+`_require_gemma` guard rejects any non-Gemma tag at import time
+and at every call site. No Qwen, no Llama, no Mistral — this is
+enforced in code.
+
 ## Why DuckDB
 
 Open-source (MIT), embedded, columnar, SQL. Reads + writes Excel
@@ -53,12 +61,17 @@ The BOM agent MUST:
 
 ## Sync agent contract
 
-`sync_agent.py` drives the local LLM (Ollama Qwen) against a
-manufacturer source document (PDF, HTML, CSV) and emits typed
-`PriceUpdate` records. It never writes to the DB directly — it
-produces a JSON patch that `db.apply_updates()` validates and
-commits. Every run lands a row in `sync_runs` so you can always
-answer "where did this price come from?"
+`sync_agent.py` drives the local LLM against a manufacturer source
+document (PDF, HTML, CSV) and emits typed `PriceUpdate` records.
+It never writes to the DB directly — it produces a JSON patch that
+`db.apply_updates()` validates and commits. Every run lands a row
+in `sync_runs` so you can always answer "where did this price come
+from?"
+
+**Model policy: Gemma only.** The default tag is `gemma3:4b` (same
+model HAL uses for Tier 1 diagnosis). Any non-Gemma tag is rejected
+at import time by `_require_gemma` — no Qwen, Llama, or Mistral.
+Override only to bump size (e.g. `HALOFIRE_SYNC_MODEL=gemma3:12b`).
 
 See `sync_agent.py` docstring for the exact contract + prompting
 strategy. The agent is designed to run on a cron / Windows Task

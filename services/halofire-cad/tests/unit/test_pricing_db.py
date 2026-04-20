@@ -211,6 +211,41 @@ def test_sync_agent_csv_round_trip(tmp_path: Path, db: SuppliesDB) -> None:
     assert row.source.startswith("sync_agent:testmfr:")
 
 
+def test_gemma_only_policy_rejects_non_gemma_tag() -> None:
+    """sync_agent._require_gemma is the code-level enforcement of
+    the 'Gemma only' rule. Any non-Gemma tag (Qwen, Llama, Mistral,
+    empty string, random garbage) must raise ValueError BEFORE the
+    agent touches Ollama, the DB, or the network."""
+    sa_spec = importlib.util.spec_from_file_location(
+        "_sa_guard", _ROOT / "pricing" / "sync_agent.py",
+    )
+    assert sa_spec is not None and sa_spec.loader is not None
+    sa = importlib.util.module_from_spec(sa_spec)
+    sa_spec.loader.exec_module(sa)
+
+    # Accepted tags — anything starting with 'gemma', 'gemma2', 'gemma3'
+    for ok in ("gemma3:4b", "gemma3:12b", "gemma2:9b", "Gemma3:27b"):
+        sa._require_gemma(ok)  # must not raise
+
+    # Rejected: every non-Gemma family
+    for bad in ("qwen2.5:7b", "qwen3:8b", "llama3:8b",
+                "mistral:7b", "phi3:mini", "", "random"):
+        with pytest.raises(ValueError, match="Gemma-only"):
+            sa._require_gemma(bad)
+
+
+def test_default_model_is_gemma() -> None:
+    """The exported DEFAULT_MODEL must be a Gemma tag — ensures a
+    misconfigured env var can't silently flip us back to Qwen."""
+    sa_spec = importlib.util.spec_from_file_location(
+        "_sa_default", _ROOT / "pricing" / "sync_agent.py",
+    )
+    assert sa_spec is not None and sa_spec.loader is not None
+    sa = importlib.util.module_from_spec(sa_spec)
+    sa_spec.loader.exec_module(sa)
+    assert sa.DEFAULT_MODEL.lower().startswith("gemma")
+
+
 def test_sync_run_dry_run_commits_nothing(tmp_path: Path, db: SuppliesDB) -> None:
     sa_spec = importlib.util.spec_from_file_location(
         "_sa2", _ROOT / "pricing" / "sync_agent.py",

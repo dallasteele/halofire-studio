@@ -18,7 +18,7 @@ description: Local-LLM agent that pulls manufacturer price sheets into the HaloF
 | `--supplier <id>` | Row in `suppliers` table (victaulic, viking, tyco, …) |
 | `--source <path>` | PDF / HTML / CSV / XLSX the supplier just published |
 | `--source-url <url>` | (optional) canonical URL the file came from — logged in sync_runs |
-| `--model <tag>` | Override local LLM (default `qwen2.5:7b` via Ollama) |
+| `--model <tag>` | Override local LLM (default `gemma3:4b` via Ollama). **Gemma-only policy** — non-Gemma tags are rejected. |
 | `--dry-run` | Parse + print proposed updates; don't commit |
 
 ## Outputs
@@ -65,10 +65,12 @@ Excel export, CSV sync (deterministic path, no LLM), run logging.
 
 ## Scheduling recipe (Windows)
 
+Pre-req: `ollama pull gemma3:4b` so the daemon has the model cached.
+
 ```powershell
 # Weekly, Monday 02:00
 $A = New-ScheduledTaskAction -Execute "C:\Python312\python.exe" `
-  -Argument "E:\ClaudeBot\halofire-studio\services\halofire-cad\pricing\sync_agent.py --supplier victaulic --source E:\halofire\pricesheets\victaulic-latest.pdf"
+  -Argument "E:\ClaudeBot\halofire-studio\services\halofire-cad\pricing\sync_agent.py --supplier victaulic --source E:\halofire\pricesheets\victaulic-latest.pdf --model gemma3:4b"
 $T = New-ScheduledTaskTrigger -Weekly -DaysOfWeek Monday -At 02:00
 Register-ScheduledTask -TaskName "HaloFire-SyncVictaulic" -Action $A -Trigger $T
 ```

@@ -2,9 +2,12 @@
 local LLM and emits typed PriceUpdate records for db.apply_updates.
 
 Design principles
-  * Local-first. Default model is `qwen2.5:7b` via Ollama on
-    localhost:11434 (free, no cloud egress). Swap via
-    `HALOFIRE_SYNC_MODEL`.
+  * Local-first. The ONLY supported model family is **Gemma** (via
+    Ollama on localhost:11434). Default tag `gemma3:4b` = the 4B-
+    parameter Gemma 3 build used across HAL / ClaudeBot as the
+    Tier 1 diagnosis model. Swap to another Gemma tag via
+    `HALOFIRE_SYNC_MODEL` — but no other model families (no Qwen,
+    no Llama, no Mistral) are sanctioned for this pipeline.
   * Never writes directly. The agent extracts -> validates ->
     stages a JSON patch; `db.apply_updates` is the only code path
     to the DB.
@@ -39,7 +42,23 @@ from pricing.db import (  # noqa: E402
 )
 
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434")
-DEFAULT_MODEL = os.environ.get("HALOFIRE_SYNC_MODEL", "qwen2.5:7b")
+# Gemma-only policy (see module docstring). The env override exists
+# so you can bump the Gemma size (e.g. `gemma3:12b`) — any non-Gemma
+# tag is rejected below to prevent accidental backslide to Qwen/Llama.
+DEFAULT_MODEL = os.environ.get("HALOFIRE_SYNC_MODEL", "gemma3:4b")
+
+
+def _require_gemma(model: str) -> None:
+    """HaloFire pipelines use Gemma exclusively. Anything else is a bug."""
+    tag = model.lower().strip()
+    if not (tag.startswith("gemma") or tag.startswith("gemma3") or tag.startswith("gemma2")):
+        raise ValueError(
+            f"HALOFIRE_SYNC_MODEL={model!r} rejected — Gemma-only policy. "
+            "Use a 'gemma3:*' or 'gemma2:*' Ollama tag.",
+        )
+
+
+_require_gemma(DEFAULT_MODEL)
 
 
 # ── LLM bridge ─────────────────────────────────────────────────────
@@ -50,6 +69,7 @@ def _ollama_generate(prompt: str, model: str = DEFAULT_MODEL) -> str:
     Returns the raw model text. Caller parses JSON — the prompt
     asks the model for JSON-only output.
     """
+    _require_gemma(model)
     body = json.dumps(
         {
             "model": model,
@@ -107,6 +127,7 @@ Source text:
 def extract_updates_from_text(
     supplier: str, text: str, source_sha256: str, model: str = DEFAULT_MODEL,
 ) -> list[PriceUpdate]:
+    _require_gemma(model)
     prompt = _PROMPT_TEMPLATE.format(
         supplier=supplier, sha256=source_sha256, text=text[:80_000],
     )
@@ -207,6 +228,7 @@ def run_sync(
 
     Returns {'accepted': n, 'errors': [...], 'run_id': N}.
     """
+    _require_gemma(model)
     sha = sha256_of(source_path)
     ext = source_path.suffix.lower()
     with open_db() as db:
