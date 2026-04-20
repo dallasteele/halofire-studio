@@ -124,6 +124,50 @@ Source text:
 """
 
 
+def _extract_json_object(raw: str) -> dict | None:
+    """Pull the first balanced JSON object out of a string.
+
+    Gemma sometimes wraps its output in prose ('Sure, here is the
+    extraction:'). We locate the first '{' and read until the
+    matching '}' (respecting nested braces + quoted strings) so
+    trailing prose doesn't break the parse.
+    """
+    if not raw:
+        return None
+    try:
+        return json.loads(raw)
+    except json.JSONDecodeError:
+        pass
+    start = raw.find("{")
+    if start < 0:
+        return None
+    depth = 0
+    in_str = False
+    esc = False
+    for i in range(start, len(raw)):
+        ch = raw[i]
+        if in_str:
+            if esc:
+                esc = False
+            elif ch == "\\":
+                esc = True
+            elif ch == '"':
+                in_str = False
+            continue
+        if ch == '"':
+            in_str = True
+        elif ch == "{":
+            depth += 1
+        elif ch == "}":
+            depth -= 1
+            if depth == 0:
+                try:
+                    return json.loads(raw[start : i + 1])
+                except json.JSONDecodeError:
+                    return None
+    return None
+
+
 def extract_updates_from_text(
     supplier: str, text: str, source_sha256: str, model: str = DEFAULT_MODEL,
 ) -> list[PriceUpdate]:
@@ -132,14 +176,9 @@ def extract_updates_from_text(
         supplier=supplier, sha256=source_sha256, text=text[:80_000],
     )
     raw = _ollama_generate(prompt, model=model)
-    try:
-        parsed = json.loads(raw)
-    except json.JSONDecodeError:
-        # Last-resort: strip a prose preamble then retry
-        brace = raw.find("{")
-        if brace < 0:
-            return []
-        parsed = json.loads(raw[brace:])
+    parsed = _extract_json_object(raw)
+    if parsed is None:
+        return []
     out: list[PriceUpdate] = []
     for row in parsed.get("updates", []):
         try:
