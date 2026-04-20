@@ -231,6 +231,26 @@ def write_proposal_files(
     except Exception as e:
         paths["submittal_error"] = str(e)
 
+    # Prefab report + cut list (fab-shop deliverable)
+    try:
+        import importlib.util as _ilu
+        _pspec = _ilu.spec_from_file_location(
+            "_halofire_prefab",
+            str(Path(__file__).with_name("prefab.py")),
+        )
+        assert _pspec is not None and _pspec.loader is not None
+        _pmod = _ilu.module_from_spec(_pspec)
+        _pspec.loader.exec_module(_pmod)
+        prefab_src = {
+            "project": data.get("project", {}),
+            "systems": (design_payload or {}).get("systems", []),
+        }
+        pf_res = _pmod.write_prefab_pdf(prefab_src, out_dir)
+        paths["prefab_pdf"] = pf_res.get("pdf", "")
+        paths["cut_list_csv"] = pf_res.get("csv", "")
+    except Exception as e:
+        paths["prefab_error"] = str(e)
+
     # Cut-sheet PDF bundle (one sheet per SKU, merged)
     try:
         import importlib.util as _ilu
