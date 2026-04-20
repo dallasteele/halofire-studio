@@ -108,6 +108,28 @@ Gap-closer depth pass:
 Loop 2 new tests: **43**. Cumulative running suite: **237** plus
 viewport smoke.
 
+## Session log — 2026-04-20 (loop 3)
+
+Depth pass — every phase closes at least one row in the matrix
+with both unit + integration coverage:
+
+| phase | feature | commit | new tests |
+|---|---|---|---|
+| G | HydraulicResult.remote_areas_detail | `18ae791` | 2 |
+| H | DXF clean-import wizard | `fe4b45c` | 12 |
+| I | Studio LayerPanel | `776fefa` | 9 |
+| J | Prefab report + cut-list CSV | `e37d5ae` | 9 |
+| K | Seismic bracing NFPA §18 calc | `50ff845` | 13 |
+| L | proposal.html hero band | `a2f194b` | 2 |
+
+Loop 3 new tests: **47**. Cumulative running suite: **284** plus
+viewport smoke.
+
+Hand-off artifacts:
+- `CODEX_REVIEW.md` — reviewer packet
+- `CHANGELOG.md` — per-phase commit index
+- All 1881 deliverables regenerated; sizes in CODEX_REVIEW.
+
 ## Running the loop
 
 Per iteration:
