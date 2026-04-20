@@ -1,5 +1,51 @@
 # Changelog
 
+## [0.4.0] — 2026-04-20 — loop 4: Codex post-review fixes + live Auto-Design
+
+Closes the lingering items in CODEX_REVIEW.md's "Residual Warnings
+and Risks" section AND the user's explicit "I have not seen Auto-
+Design populate the viewport" blocker.
+
+### Fixed
+
+- **`datetime.utcnow()` deprecation** (`6d2cc77`) — every call site
+  in pricing/db, pricing/seed, pricing/sync_agent, and the pricing
+  tests moved to a new `utcnow_naive()` helper
+  (`datetime.now(timezone.utc).replace(tzinfo=None)`). Confirmed
+  clean with `-W error::DeprecationWarning`.
+- **ifcopenshell unraisable warning on non-IFC input** (`6d2cc77`)
+  — `obstructions_from_ifc` now does an ISO-10303/HDF magic-byte
+  check BEFORE handing the file to ifcopenshell, preventing a
+  partial C++ `file` object from being garbage-collected later.
+  Mocked tests opt out via `_validate_header=False`.
+- **AutoDesignPanel spawned nodes orphaned under Site** (`e5ceb4d`)
+  — root cause of "Auto-Design never populated the viewport."
+  Every `createNode` was passing `parentId=undefined`, same bug
+  SceneBootstrap had in loop 0. Fix: `findLevelId()` walks the
+  scene store for the first `level` node; every slab/head/pipe
+  spawn is parented to it. `clearPreviousAutoDesign()` wipes prior
+  auto-design tagged nodes on re-run. `MAX_HEADS_VIEWPORT =
+  MAX_PIPES_VIEWPORT = 150` caps viewport fill (full design lives
+  in design.json; this is viewport-only throttling).
+
+### Added
+
+- **`docs/PORTS.md`** (`ae8e54a`) — canonical dev + VPS port table
+  plus Windows + Linux recipes for killing stale `18790` gateway
+  processes.
+- **`pytest.ini` third-party filters** (`ae8e54a`) — filters out
+  noisy upstream deprecations from pyparsing, ezdxf, torch,
+  openpyxl so our own warnings stay visible.
+
+### Observed
+
+Live Auto-Design run against the 1881 Fire RFIs preset (48 KB
+PDF) from the Studio UI at port 3002, dispatching to gateway at
+18080. Job IDs captured via `preview_network`:
+`3f2e613b-…`, `9a908cfa-…`, `bdb983b8-…`. Pipeline runs through
+intake → classify → place → route → hydraulic → rule → BOM →
+labor → proposal → submittal.
+
 ## [0.3.0] — 2026-04-20 — loop 3: AutoSprink depth pass
 
 Third autonomous iteration through the AutoSprink gap matrix. All
