@@ -60,15 +60,34 @@ app = FastAPI(
     version="0.0.1",
 )
 
-# Allow the Halofire Studio dev server + production URL
+# Allow the Halofire Studio dev server + production URL.
+# In dev (when HALOFIRE_AUTH_REQUIRED is unset) we use allow_origin_regex
+# so any localhost port works — the user's dev server might pick 3003
+# or 3004 if 3002 is taken, and "Failed to fetch" from CORS was
+# the root cause of the reported Auto-Design silent failure.
+_DEV_ORIGINS = [
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://localhost:3002",
+    "http://localhost:3003",
+    "http://localhost:3004",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:3001",
+    "http://127.0.0.1:3002",
+    "http://127.0.0.1:3003",
+    "http://127.0.0.1:3004",
+    "https://studio.rankempire.io",
+]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3002",
-        "https://studio.rankempire.io",
-    ],
+    allow_origins=_DEV_ORIGINS,
+    allow_origin_regex=(
+        r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$"
+    ),
     allow_methods=["*"],
     allow_headers=["*"],
+    allow_credentials=False,
+    expose_headers=["Content-Length", "Content-Type"],
 )
 
 
