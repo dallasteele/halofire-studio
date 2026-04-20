@@ -6,8 +6,8 @@ REST endpoints to the browser-side studio.
 
 ## Ports
 
-- **Dev:** `18790`
-- **Prod:** behind nginx at `gateway.rankempire.io/halofire/*`
+- **Local Studio dev:** `18080` (matches `apps/editor` defaults)
+- **VPS service:** `18790` behind nginx at `gateway.rankempire.io/halofire/*`
 
 ## Run (dev)
 
@@ -16,24 +16,24 @@ cd services/halopenclaw-gateway
 python -m venv .venv
 source .venv/bin/activate   # or .venv\Scripts\activate on Windows
 pip install -r requirements.txt
-uvicorn main:app --reload --port 18790
+uvicorn main:app --reload --port 18080
 ```
 
 Healthcheck:
 ```bash
-curl http://localhost:18790/health
+curl http://localhost:18080/health
 ```
 
 List tools:
 ```bash
-curl -X POST http://localhost:18790/mcp \
+curl -X POST http://localhost:18080/mcp \
   -H "Content-Type: application/json" \
   -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
 ```
 
 Call a tool:
 ```bash
-curl -X POST http://localhost:18790/mcp \
+curl -X POST http://localhost:18080/mcp \
   -H "Content-Type: application/json" \
   -d '{"jsonrpc":"2.0","id":1,"method":"tools/call",
        "params":{"name":"halofire_validate",

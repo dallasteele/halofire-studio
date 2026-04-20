@@ -92,7 +92,6 @@ export function BuildingGenerator({ projectId }: { projectId: string }) {
               scale: [1, 1, 1],
               tags: ['halofire', 'synthetic', 'building_shell'],
             },
-            // biome-ignore lint/suspicious/noExplicitAny: Pascal shape expected at runtime
           } as any, undefined)
         } catch (e) {
           setError(`Scene spawn failed: ${String(e)}`)

@@ -6,13 +6,14 @@ as tools. Called by:
   - Codex CLI (via the /codex/run proxy)
   - Halofire Studio browser (direct REST for non-tool calls)
 
-Port 18790 (dev). Production: behind nginx at gateway.rankempire.io/halofire.
+Port 18080 for local Studio dev. Production may bind 18790 behind nginx
+at gateway.rankempire.io/halofire via the systemd unit.
 
 Run:
-    uvicorn main:app --reload --port 18790
+    uvicorn main:app --reload --port 18080
 
 Healthcheck:
-    curl http://localhost:18790/health
+    curl http://localhost:18080/health
 """
 from __future__ import annotations
 
@@ -638,4 +639,5 @@ async def codex_run(body: dict[str, Any], request: Request) -> dict[str, Any]:
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=18790, reload=True)
+    port = int(os.environ.get("HALOPENCLAW_PORT", "18080"))
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)

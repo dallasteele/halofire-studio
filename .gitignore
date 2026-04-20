@@ -42,6 +42,9 @@ yarn-error.log*
 # Misc
 .DS_Store
 *.pem
+__pycache__/
+**/__pycache__/
+*.py[cod]
 /.playwright-mcp
 og-test
 .env*.local

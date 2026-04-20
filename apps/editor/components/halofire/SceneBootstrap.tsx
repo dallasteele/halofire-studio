@@ -1,13 +1,11 @@
 'use client'
 
 /**
- * SceneBootstrap — on first mount, spawn a visible 3D scene so the
- * viewport is never empty.
+ * SceneBootstrap — on first mount, spawn a visible catalog showcase
+ * under the active Pascal level so the viewport is never empty.
  *
  * Strategy:
- *   1. If gateway is up, POST /building/generate → get GLB URL →
- *      spawn a Pascal item-node referencing it
- *   2. Place a "catalog showcase" — one copy of each of the 20
+ *   1. Place a "catalog showcase" — one copy of each of the 20
  *      catalog SKUs laid out in a grid so the user can see what
  *      components are available without clicking + placing each
  *      one individually
@@ -23,8 +21,6 @@ import { CATALOG, materialFor } from '@halofire/catalog'
 import { generateId, useScene } from '@pascal-app/core'
 import { useEffect, useRef } from 'react'
 
-const GATEWAY_URL =
-  process.env.NEXT_PUBLIC_HALOPENCLAW_URL ?? 'http://localhost:18080'
 const SESSION_KEY = 'halofire-scene-bootstrapped'
 
 // Grid layout for the catalog showcase. One SKU per cell, 2 m apart,
@@ -105,9 +101,6 @@ export function SceneBootstrap({ projectId }: { projectId: string }) {
   return null
 }
 
-// biome-ignore lint/suspicious/noExplicitAny: Pascal's createNode has a
-// complex AnyNode union; casting at the type boundary keeps parity with
-// the rest of the HaloFire call sites.
 type CreateNodeFn = (node: any, parentId?: any) => void
 
 async function bootstrapScene(opts: {
@@ -123,57 +116,6 @@ async function bootstrapScene(opts: {
   // the items are attached to the active site/level tree — otherwise
   // they're orphans and don't show in the viewport.
   placeCatalogShowcase({ createNode, parentId })
-  return
-
-  // eslint-disable-next-line no-unreachable
-  try {
-    const res = await fetch(`${GATEWAY_URL}/building/generate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        project_id: opts.projectId,
-        total_sqft_target: 100000,
-        stories: 4,
-        garage_levels: 2,
-        aspect_ratio: 1.6,
-      }),
-    })
-    if (!res.ok) return
-    const data = await res.json()
-    if (!data.glb_url) return
-
-    const widthM = data.footprint_m?.width ?? 30
-    const lengthM = data.footprint_m?.length ?? 45
-    const stories = 4 + 2
-    const totalHeight = stories * 3.0
-
-    createNode(
-      {
-        id: generateId('item'),
-        type: 'item',
-        position: [0, 0, 0],
-        rotation: [0, 0, 0],
-        scale: [1, 1, 1],
-        children: [],
-        asset: {
-          id: `synthetic_building_${opts.projectId}`,
-          category: 'synthetic_building',
-          name: 'Synthetic bid building',
-          thumbnail: '/icons/item.png',
-          dimensions: [widthM, totalHeight, lengthM],
-          src: `${GATEWAY_URL}${data.glb_url}`,
-          attachTo: 'floor',
-          offset: [0, 0, 0],
-          rotation: [0, 0, 0],
-          scale: [1, 1, 1],
-          tags: ['halofire', 'synthetic', 'building_shell', 'bootstrap'],
-        },
-      },
-      undefined,
-    )
-  } catch (e) {
-    console.warn('[HaloFire] gateway unreachable during bootstrap:', e)
-  }
 }
 
 function placeCatalogShowcase(opts: {

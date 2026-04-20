@@ -143,7 +143,6 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
                   scale: [1, 1, 1],
                   tags: ['halofire', 'slab', 'auto_design'],
                 },
-                // biome-ignore lint/suspicious/noExplicitAny: Pascal runtime shape
               } as any,
               undefined,
             )
@@ -177,7 +176,6 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
                     scale: [1, 1, 1],
                     tags: ['halofire', 'sprinkler_head_pendant', 'auto_design'],
                   },
-                  // biome-ignore lint/suspicious/noExplicitAny: Pascal runtime shape
                 } as any,
                 undefined,
               )
@@ -224,7 +222,6 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
                       'auto_design',
                     ],
                   },
-                  // biome-ignore lint/suspicious/noExplicitAny: Pascal runtime shape
                 } as any,
                 undefined,
               )

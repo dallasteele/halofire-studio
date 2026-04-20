@@ -16,7 +16,7 @@
  * inside child panels.
  */
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useGatewayHealth } from './useGatewayHealth'
 
 const GATEWAY_URL =

@@ -10,6 +10,30 @@ PORT="${PORT:-3002}"
 BASE="http://localhost:${PORT}"
 FAIL=0
 
+http_status() {
+  local url="$1"
+  local code
+
+  code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "$url" 2>/dev/null || true)"
+  if [[ "$code" =~ ^[0-9]{3}$ && "$code" != "000" ]]; then
+    echo "$code"
+    return
+  fi
+
+  # Windows Codex often invokes this script through WSL bash while the
+  # Next dev server is bound on the Windows host. In that case WSL
+  # localhost is a different network namespace, so use PowerShell's
+  # Invoke-WebRequest as the local-host probe.
+  if command -v powershell.exe >/dev/null 2>&1; then
+    powershell.exe -NoProfile -Command \
+      "try { (Invoke-WebRequest -UseBasicParsing '$url' -TimeoutSec 10).StatusCode } catch { '000' }" \
+      2>/dev/null | tr -d '\r' | tail -n 1
+    return
+  fi
+
+  echo "${code:-000}"
+}
+
 echo "== GLB availability =="
 # All 20 canonical SKUs — matches packages/halofire-catalog/src/manifest.ts
 SKUS=(
@@ -36,7 +60,7 @@ SKUS=(
 )
 
 for sku in "${SKUS[@]}"; do
-  code=$(curl -s -o /dev/null -w '%{http_code}' "${BASE}/halofire-catalog/glb/${sku}.glb" || echo '000')
+  code=$(http_status "${BASE}/halofire-catalog/glb/${sku}.glb")
   if [[ "$code" != "200" ]]; then
     echo "FAIL  ${sku}.glb -> ${code}"
     FAIL=1

@@ -67,7 +67,7 @@ export function StatusBar({
             'inline-block h-2 w-2 rounded-full ' +
             (gateway?.ok ? 'bg-[#22c55e]' : 'bg-[#ef4444]')
           }
-          aria-label={gateway?.ok ? 'gateway online' : 'gateway offline'}
+          title={gateway?.ok ? 'gateway online' : 'gateway offline'}
         />
         <span className="text-neutral-300">
           {gateway?.ok ? 'gateway' : 'gateway down'}

@@ -4,9 +4,8 @@
  *
  * Run: `bun test apps/editor/components/halofire/__tests__/Ribbon.test.tsx`
  */
-import { describe, expect, test, mock } from 'bun:test'
+import { describe, expect, test } from 'bun:test'
 import { renderToString } from 'react-dom/server'
-import React from 'react'
 import { Ribbon, type RibbonCommand } from '../Ribbon'
 
 describe('Ribbon', () => {

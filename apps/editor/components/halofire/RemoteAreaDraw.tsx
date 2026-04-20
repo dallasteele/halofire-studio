@@ -15,7 +15,7 @@
  * heads individually" mode can layer on later.
  */
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 export type RemoteAreaRect = {
   /** World-meter coords (x,z plane), meters from site origin. */
