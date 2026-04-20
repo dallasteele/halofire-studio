@@ -74,3 +74,5 @@ openclaw-halofire/logs/
 apps/editor/public/bid-demo/**/*.glb
 apps/editor/public/bid-demo/**/*.pdf
 
+# truth DB
+services/halofire-cad/truth/truth.duckdb
