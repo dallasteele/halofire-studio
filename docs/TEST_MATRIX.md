@@ -92,6 +92,22 @@ Every phase persisted to the shared Brain via
 `POST /brain/wiki/remember` at
 `hal-vault/wiki/decisions/phase-<n>-*.md`.
 
+## Session log — 2026-04-20 (loop 2)
+
+Gap-closer depth pass:
+
+| phase | feature | commit | new tests |
+|---|---|---|---|
+| A | IFC column/beam → arm_over.Obstruction bridge | `ba6e357` | 9 |
+| B | FP-N plan sheets embed heads + NFPA-colored pipes | `53c9681` | +5 (9 total) |
+| C | Per-SKU cut-sheet bundle merged via pypdf | `8434c0e` | 8 |
+| D | Batch OpenSCAD renderer with dry-run + workers | `c4c2251` | 9 (new scad) |
+| E | Interactive remote-area click-drag picker | `0aee189` | 5 |
+| F | Gemma sync-agent contract test + JSON extractor | `473bd68` | 7 |
+
+Loop 2 new tests: **43**. Cumulative running suite: **237** plus
+viewport smoke.
+
 ## Running the loop
 
 Per iteration:
