@@ -124,6 +124,68 @@ def _compute_head_flow(
     return k_factor * math.sqrt(pressure_psi)
 
 
+def _select_remote_area_heads_n(
+    heads: list[Head], tree: nx.DiGraph, riser_id: str, area_sqft: float,
+    n_areas: int = 1,
+) -> list[list[Head]]:
+    """Pick `n_areas` disjoint remote-area windows.
+
+    NFPA 13 §11.2.3 requires calculating the ceiling and in-rack
+    sprinkler demand TOGETHER for storage occupancies — each remote
+    area is selected independently but their flows sum at the common
+    supply point. This helper returns one list of heads per requested
+    area; callers sum the per-area required_flow_gpm before comparing
+    to the supply.
+
+    For n_areas == 1 this behaves exactly like the original single-
+    area selector — backwards-compatible.
+
+    Algorithm:
+      1. Rank by tree-hop distance descending (farthest from riser first).
+      2. Fill area 1 with the most-remote heads until coverage ≥ area_sqft.
+      3. Fill area 2 with the NEXT most-remote heads (never reusing).
+      4. Repeat up to n_areas.
+    """
+    if not heads or n_areas < 1:
+        return []
+    if riser_id not in tree:
+        return [list(heads)] + [[] for _ in range(n_areas - 1)]
+    try:
+        dist = nx.single_source_shortest_path_length(
+            tree.to_undirected(), riser_id,
+        )
+    except (nx.NodeNotFound, nx.NetworkXError):
+        return [list(heads)] + [[] for _ in range(n_areas - 1)]
+    ranked = sorted(heads, key=lambda h: dist.get(h.id, 0), reverse=True)
+    # Fair per-area split: give each area at most ceil(total / n_areas)
+    # heads so a single area can't swallow the whole system.
+    import math as _math
+    per_area_cap = max(1, _math.ceil(len(ranked) / max(1, n_areas)))
+    # NFPA 13 §8.6 default coverage per sprinkler (light hazard); the
+    # single-area path uses len(heads) scaling, we keep that for
+    # backward-compat and use the min of the two so small systems
+    # still terminate before per_area_cap is reached.
+    per_head_coverage = min(
+        225.0,
+        max(area_sqft / max(1, len(ranked)), area_sqft / 10.0),
+    )
+    areas: list[list[Head]] = []
+    idx = 0
+    for _ in range(n_areas):
+        acc = 0.0
+        window: list[Head] = []
+        while (
+            idx < len(ranked)
+            and acc < area_sqft
+            and len(window) < per_area_cap
+        ):
+            window.append(ranked[idx])
+            acc += per_head_coverage
+            idx += 1
+        areas.append(window)
+    return areas
+
+
 def _select_remote_area_heads(
     heads: list[Head], tree: nx.DiGraph, riser_id: str, area_sqft: float,
 ) -> list[Head]:
@@ -191,6 +253,7 @@ def _fitting_equiv_length_ft(
 def calc_system(
     system: System, supply: FlowTestData, hazard: str = "light",
     min_head_pressure_psi: float = 7.0,
+    n_remote_areas: int = 1,
 ) -> HydraulicResult:
     """Solve the hydraulic network for one system.
 
@@ -230,11 +293,30 @@ def calc_system(
     # heads farthest (by tree-graph distance) from the riser. More
     # rigorous selection (density × actual coverage geometry) is
     # Phase C refinement.
-    remote_heads = _select_remote_area_heads(
-        heads, tree, system.riser.id, area_sqft,
+    if n_remote_areas <= 1:
+        remote_heads = _select_remote_area_heads(
+            heads, tree, system.riser.id, area_sqft,
+        )
+        remote_areas: list[list[Head]] = [remote_heads]
+    else:
+        # NFPA 13 §11.2.3: multiple remote areas (e.g. ceiling +
+        # in-rack) are calculated TOGETHER. Each area is selected
+        # independently from the farthest-unselected heads; flows
+        # sum at the riser base — so `area_sqft` of density applies
+        # PER AREA, not divided across the combined head count.
+        remote_areas = _select_remote_area_heads_n(
+            heads, tree, system.riser.id, area_sqft,
+            n_areas=n_remote_areas,
+        )
+        remote_heads = [h for area in remote_areas for h in area]
+    # Effective head coverage inside a SINGLE design window — use the
+    # per-area head count so multi-area flows add correctly at the
+    # riser (two areas of N heads → 2× the single-area required flow).
+    heads_per_area = max(
+        1,
+        sum(len(a) for a in remote_areas) // max(1, len(remote_areas)),
     )
-    # Effective head coverage inside the design window
-    effective_coverage = area_sqft / max(1, len(remote_heads))
+    effective_coverage = area_sqft / heads_per_area
 
     # Per-head design flow. Heads inside the remote area get
     # max(density * coverage, K√P); outside heads contribute
