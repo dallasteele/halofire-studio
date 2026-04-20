@@ -75,20 +75,32 @@ async function bootstrapScene(opts: {
   projectId: string
   createNode: CreateNodeFn
 }): Promise<void> {
-  const { projectId, createNode } = opts
+  const { createNode } = opts
+  void opts.projectId
 
-  // Always place the catalog showcase first — works even with gateway
-  // offline because GLBs are static assets under /halofire-catalog/glb/
+  // Place the catalog showcase only (static GLBs).
+  //
+  // The synthetic building auto-spawn was removed 2026-04-20 because
+  // its current GLB emitter renders walls as featureless full-height
+  // extruded prisms with no doors / windows / roof / use-class
+  // coloring → visually reads as a storage-unit honeycomb instead
+  // of a building. See docs/plans/2026-04-20-path-to-production.md
+  // gap A5. Re-enable when A5 ships (boolean-subtract openings +
+  // add roof slab + color by use class).
+  //
+  // Users who want the synthetic building explicitly can still click
+  // the Project tab's BuildingGenerator "Generate test building"
+  // button — that path is labeled SYNTHESIZED ⚠ in the UI.
   placeCatalogShowcase({ createNode })
+  return
 
-  // Try the building shell (requires gateway). If offline, we at
-  // least have the catalog visible so the user sees assets.
+  // eslint-disable-next-line no-unreachable
   try {
     const res = await fetch(`${GATEWAY_URL}/building/generate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        project_id: projectId,
+        project_id: opts.projectId,
         total_sqft_target: 100000,
         stories: 4,
         garage_levels: 2,
@@ -113,7 +125,7 @@ async function bootstrapScene(opts: {
         scale: [1, 1, 1],
         children: [],
         asset: {
-          id: `synthetic_building_${projectId}`,
+          id: `synthetic_building_${opts.projectId}`,
           category: 'synthetic_building',
           name: 'Synthetic bid building',
           thumbnail: '/icons/item.png',
