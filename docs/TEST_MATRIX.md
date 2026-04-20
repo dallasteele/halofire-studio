@@ -70,6 +70,28 @@ Silence in a row = coverage gap.
 | Hydraulic pump/tank | — | — | `test_pump_boosts_supply_residual` | — |
 | Rule check errors ≥ 0 | — | — | `test_calc_system_explicit_loop_grid_unsupported_issue` | — |
 
+## Session log — 2026-04-20
+
+Phases 1-9 completed this session (AutoSprink gap-matrix closure):
+
+| phase | feature | commit | tests |
+|---|---|---|---|
+| 1 | NFPA 13 Table 28.2.4.1.1 fitting equiv lengths + C-correction | `4f5aa0f` | 23 |
+| 5 | DO_NOT_FAB + stale + missing price flags in BOM & proposal | `de11ace` | 5 |
+| 8 | Command palette (Ctrl+K / Ctrl+Shift+P) | `b61da78` | 10 |
+| 9 | Measure + Section tool overlay | `0a7501b` | 3 |
+| 6 | Submittal sheet-set PDF (FP-0/FP-H/FP-N/FP-R/FP-B/FP-D) | `7be97dc` | 4 |
+| 4 | NFPA §11.2.3 two-remote-areas-together selector | `96d2f18` | 7 |
+| 3 | LiveCalc floating card with scene-change debounce | `55d8daa` | 4 |
+| 2 | NFPA §14.2.9 arm-over around obstructions | `2d58008` | 10 |
+
+Total new tests this session: **66**. Cumulative running suite: **194**
+plus viewport smoke.
+
+Every phase persisted to the shared Brain via
+`POST /brain/wiki/remember` at
+`hal-vault/wiki/decisions/phase-<n>-*.md`.
+
 ## Running the loop
 
 Per iteration:
