@@ -62,3 +62,8 @@ services/halofire-cad/pricing/supplies.duckdb
 services/halofire-cad/pricing/supplies.duckdb.wal
 services/halofire-cad/pricing/exports/
 
+
+# openclaw-halofire cache
+openclaw-halofire/**/__pycache__/
+openclaw-halofire/logs/
+

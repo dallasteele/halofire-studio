@@ -1,0 +1,23 @@
+[module]
+name         = "halofire-studio"
+version      = "0.1.0"
+description  = "HaloFire CAD Studio — Next.js design + bid authoring UI"
+
+[runtime]
+type            = "service"
+command         = ["bun", "run", "dev"]
+working_dir     = "../apps/editor"
+restart_policy  = "on_failure"
+restart_delay_s = 10
+stdout_log      = "logs/halofire-studio.out"
+stderr_log      = "logs/halofire-studio.err"
+
+[health]
+http           = "http://localhost:3002/"
+timeout_s      = 5
+expect_status  = 200
+
+[ui]
+title = "Studio"
+icon  = "cube"
+route = "http://localhost:3002/"

@@ -1,0 +1,20 @@
+[module]
+name         = "halofire-pricing"
+version      = "0.1.0"
+description  = "Weekly supplier price sync — Gemma-only catalog-sync agent"
+
+[runtime]
+type            = "cron"
+command         = ["python", "../services/halofire-cad/pricing/sync_agent.py", "--supplier", "victaulic", "--source", "../services/halofire-cad/pricing/exports/victaulic-latest.pdf", "--model", "gemma3:4b"]
+working_dir     = "."
+restart_policy  = "never"
+stdout_log      = "logs/halofire-pricing.out"
+stderr_log      = "logs/halofire-pricing.err"
+
+[schedule]
+cron     = "0 2 * * 1"          # Mon 02:00 local
+timezone = "America/Denver"
+
+[deps]
+services = ["halofire-cad"]
+models   = ["gemma3:4b"]

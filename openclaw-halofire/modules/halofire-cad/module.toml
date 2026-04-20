@@ -1,0 +1,26 @@
+[module]
+name         = "halofire-cad"
+version      = "0.1.0"
+description  = "HaloFire CAD gateway — Auto-Design pipeline + deliverables (FastAPI)"
+
+[runtime]
+type            = "service"
+command         = ["python", "-m", "main"]
+working_dir     = "../services/halopenclaw-gateway"
+restart_policy  = "on_failure"
+restart_delay_s = 10
+stdout_log      = "logs/halofire-cad.out"
+stderr_log      = "logs/halofire-cad.err"
+
+[runtime.env]
+HALOFIRE_CAD_PORT = "18080"
+
+[health]
+http           = "http://localhost:18080/health"
+timeout_s      = 5
+expect_status  = 200
+
+[ui]
+title = "CAD gateway"
+icon  = "server"
+route = "http://localhost:18080/docs"
