@@ -19,5 +19,12 @@
     "components/halofire/**/*.tsx",
     "next-env.d.ts"
   ],
-  "exclude": ["node_modules", ".next"]
+  "exclude_rationale": [
+    "test files are covered by bun test, not tsc"
+  ],
+  "exclude": [
+    "node_modules",
+    ".next",
+    "components/halofire/__tests__/**"
+  ]
 }

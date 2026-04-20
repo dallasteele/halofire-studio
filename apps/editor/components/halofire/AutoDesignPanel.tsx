@@ -74,7 +74,15 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
 
   /** Locate the first `level` node in the scene tree — same pattern
    *  SceneBootstrap uses. Returns undefined if the tree isn't ready
-   *  yet; caller will retry on next render. */
+   *  yet; caller will retry on next render.
+   *
+   *  The cast to any is intentional: Pascal's AnyNodeId is a
+   *  template-literal union (`site_${string}` | `level_${string}`
+   *  | …). A level-node id looked up at runtime is the same string
+   *  shape the type system wants, but TypeScript can't prove that
+   *  from a `for…of Object.values(…)` walk. The createNode call
+   *  already uses `as any` at the node boundary for the same
+   *  reason. */
   const findLevelId = useCallback((): string | undefined => {
     for (const n of Object.values(sceneNodes ?? {})) {
       const typed = n as { type?: string; id?: string }
@@ -89,7 +97,7 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
       const tags = (n as { asset?: { tags?: string[] } }).asset?.tags ?? []
       if (tags.includes('auto_design')) {
         try {
-          deleteNode((n as { id: string }).id)
+          deleteNode((n as { id: string }).id as any)
         } catch {
           // best effort
         }
@@ -192,7 +200,7 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
                   tags: ['halofire', 'slab', 'auto_design'],
                 },
               } as any,
-              levelId,
+              levelId as any,
             )
           } catch {
             // per-level spawn is best-effort; don't block others
@@ -229,7 +237,7 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
                     tags: ['halofire', 'sprinkler_head_pendant', 'auto_design'],
                   },
                 } as any,
-                levelId,
+                levelId as any,
               )
               headsSpawned++
             } catch {
@@ -281,7 +289,7 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
                     ],
                   },
                 } as any,
-                levelId,
+                levelId as any,
               )
               pipesSpawned++
             } catch {
