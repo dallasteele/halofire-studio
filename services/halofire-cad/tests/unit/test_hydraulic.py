@@ -107,6 +107,70 @@ def test_calc_system_uses_remote_area_not_all_heads() -> None:
     )
 
 
+def test_pump_boosts_supply_residual() -> None:
+    """Phase S3: adding a pump raises available supply pressure →
+    safety margin improves."""
+    from cad.schema import PumpCurveSpec
+    system = _make_linear_system(n_heads=6)
+    supply_no_pump = FlowTestData(
+        static_psi=60, residual_psi=30, flow_gpm=500,
+    )
+    result_no_pump = HYDRAULIC.calc_system(
+        system, supply_no_pump, hazard="light",
+    )
+    supply_with_pump = FlowTestData(
+        static_psi=60, residual_psi=30, flow_gpm=500,
+        pump=PumpCurveSpec(
+            rated_q_gpm=500, rated_p_psi=100,
+            overload_q_gpm=750, overload_p_psi=70,
+            churn_p_psi=130,
+        ),
+    )
+    result_with_pump = HYDRAULIC.calc_system(
+        system, supply_with_pump, hazard="light",
+    )
+    # Pump adds >0 psi → margin improves by at least the pump P(Q)
+    assert result_with_pump.safety_margin_psi > result_no_pump.safety_margin_psi
+    # An issue line reports the pump contribution
+    assert any("PUMP_APPLIED" in i for i in result_with_pump.issues)
+
+
+def test_tank_adds_static_head() -> None:
+    """Phase S3: gravity tank at elevation adds static head to supply."""
+    from cad.schema import GravityTankSpec
+    system = _make_linear_system(n_heads=4)
+    supply = FlowTestData(
+        static_psi=40, residual_psi=25, flow_gpm=300,
+        tank=GravityTankSpec(
+            elevation_ft_surface=100,
+            elevation_ft_outlet=0,  # tank at grade, surface 100ft up
+            capacity_gal=50_000,
+            required_duration_min=30,
+        ),
+    )
+    result = HYDRAULIC.calc_system(system, supply, hazard="light")
+    assert any("TANK_APPLIED" in i for i in result.issues)
+
+
+def test_tank_duration_insufficient_issue() -> None:
+    """Phase S3: tank that can't sustain demand for required duration
+    surfaces TANK_DURATION_INSUFFICIENT."""
+    from cad.schema import GravityTankSpec
+    system = _make_linear_system(n_heads=20)
+    supply = FlowTestData(
+        static_psi=75, residual_psi=55, flow_gpm=1000,
+        tank=GravityTankSpec(
+            elevation_ft_surface=50, elevation_ft_outlet=0,
+            capacity_gal=100,  # tiny tank
+            required_duration_min=60,
+        ),
+    )
+    result = HYDRAULIC.calc_system(system, supply, hazard="light")
+    assert any(
+        "TANK_DURATION_INSUFFICIENT" in i for i in result.issues
+    )
+
+
 def test_calc_system_explicit_loop_grid_unsupported_issue() -> None:
     """§13 honesty: the Alpha solver must explicitly flag that loops
     are unsupported, not silently compute a wrong answer."""

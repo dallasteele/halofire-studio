@@ -106,6 +106,47 @@
     "title": "Building",
     "type": "object"
   },
+  "BuildingGenSpec": {
+    "properties": {
+      "aspect_ratio": {
+        "items": null,
+        "type": "number"
+      },
+      "include_corridor": {
+        "items": null,
+        "type": "boolean"
+      },
+      "levels": {
+        "items": null,
+        "type": "array"
+      },
+      "mech_room_count": {
+        "items": null,
+        "type": "integer"
+      },
+      "project_id": {
+        "items": null,
+        "type": "string"
+      },
+      "source_note": {
+        "items": null,
+        "type": "string"
+      },
+      "stair_shaft_count": {
+        "items": null,
+        "type": "integer"
+      },
+      "total_sqft_target": {
+        "items": null,
+        "type": "number"
+      }
+    },
+    "required": [
+      "project_id"
+    ],
+    "title": "BuildingGenSpec",
+    "type": "object"
+  },
   "Ceiling": {
     "properties": {
       "height_m": {
@@ -342,6 +383,10 @@
         "items": null,
         "type": null
       },
+      "pump": {
+        "items": null,
+        "type": null
+      },
       "residual_psi": {
         "items": null,
         "type": "number"
@@ -349,6 +394,10 @@
       "static_psi": {
         "items": null,
         "type": "number"
+      },
+      "tank": {
+        "items": null,
+        "type": null
       },
       "test_date": {
         "items": null,
@@ -361,6 +410,37 @@
       "static_psi"
     ],
     "title": "FlowTestData",
+    "type": "object"
+  },
+  "GravityTankSpec": {
+    "properties": {
+      "capacity_gal": {
+        "items": null,
+        "type": "number"
+      },
+      "elevation_ft_outlet": {
+        "items": null,
+        "type": "number"
+      },
+      "elevation_ft_surface": {
+        "items": null,
+        "type": "number"
+      },
+      "required_duration_min": {
+        "items": null,
+        "type": "number"
+      },
+      "usable_drawdown_fraction": {
+        "items": null,
+        "type": "number"
+      }
+    },
+    "required": [
+      "capacity_gal",
+      "elevation_ft_outlet",
+      "elevation_ft_surface"
+    ],
+    "title": "GravityTankSpec",
     "type": "object"
   },
   "Hanger": {
@@ -667,6 +747,35 @@
     "title": "Level",
     "type": "object"
   },
+  "LevelGenSpec": {
+    "properties": {
+      "ceiling": {
+        "items": null,
+        "type": null
+      },
+      "height_m": {
+        "items": null,
+        "type": "number"
+      },
+      "name": {
+        "items": null,
+        "type": "string"
+      },
+      "unit_count": {
+        "items": null,
+        "type": "integer"
+      },
+      "use": {
+        "items": null,
+        "type": "string"
+      }
+    },
+    "required": [
+      "name"
+    ],
+    "title": "LevelGenSpec",
+    "type": "object"
+  },
   "Obstruction": {
     "properties": {
       "bottom_z_m": {
@@ -794,6 +903,51 @@
       "pdf_path"
     ],
     "title": "PageIntakeResult",
+    "type": "object"
+  },
+  "PeSignature": {
+    "properties": {
+      "conditional_items": {
+        "items": "string",
+        "type": "array"
+      },
+      "decision": {
+        "items": null,
+        "type": "string"
+      },
+      "design_hash_sha256": {
+        "items": null,
+        "type": null
+      },
+      "pe_license_number": {
+        "items": null,
+        "type": "string"
+      },
+      "pe_license_state": {
+        "items": null,
+        "type": "string"
+      },
+      "pe_name": {
+        "items": null,
+        "type": "string"
+      },
+      "review_notes": {
+        "items": null,
+        "type": "string"
+      },
+      "signed_at": {
+        "items": null,
+        "type": "string"
+      }
+    },
+    "required": [
+      "decision",
+      "pe_license_number",
+      "pe_license_state",
+      "pe_name",
+      "signed_at"
+    ],
+    "title": "PeSignature",
     "type": "object"
   },
   "PipeSegment": {
@@ -984,6 +1138,39 @@
       "name"
     ],
     "title": "Project",
+    "type": "object"
+  },
+  "PumpCurveSpec": {
+    "properties": {
+      "churn_p_psi": {
+        "items": null,
+        "type": "number"
+      },
+      "overload_p_psi": {
+        "items": null,
+        "type": "number"
+      },
+      "overload_q_gpm": {
+        "items": null,
+        "type": "number"
+      },
+      "rated_p_psi": {
+        "items": null,
+        "type": "number"
+      },
+      "rated_q_gpm": {
+        "items": null,
+        "type": "number"
+      }
+    },
+    "required": [
+      "churn_p_psi",
+      "overload_p_psi",
+      "overload_q_gpm",
+      "rated_p_psi",
+      "rated_q_gpm"
+    ],
+    "title": "PumpCurveSpec",
     "type": "object"
   },
   "RiserSpec": {

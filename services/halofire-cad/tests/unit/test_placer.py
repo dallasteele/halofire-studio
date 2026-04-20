@@ -87,15 +87,6 @@ def test_place_heads_malformed_polygon_no_crash() -> None:
     assert heads == []
 
 
-@pytest.mark.xfail(
-    reason=(
-        "Known placer bug: spacing/2 wall inset + axis-aligned grid "
-        "under-covers 10x10 m rooms (25 sqm/head > 20.9 cap). Fix lives "
-        "in 2026-04-19-rulebook-compliance-refactor.md as a placer v3 "
-        "item. Test stays red to keep pressure on the fix."
-    ),
-    strict=True,
-)
 def test_place_heads_coverage_cap_light(tiny_building) -> None:
     """§11.2.3.1.2 light-hazard cap: sqft/head ≤ 225."""
     heads = PLACER.place_heads_for_building(tiny_building)

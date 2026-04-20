@@ -577,7 +577,9 @@ async def generate_building(
     )
     glb_path = proj_dir / "building_shell.glb"
     try:
-        glb.building_to_glb(bldg, glb_path)
+        # Studio users want the pretty render (doors + windows cut
+        # out). Slow but the request is user-initiated, not per-test.
+        glb.building_to_glb(bldg, glb_path, with_openings=True)
     except Exception as e:
         glb_path_str = ""
         glb_error = str(e)

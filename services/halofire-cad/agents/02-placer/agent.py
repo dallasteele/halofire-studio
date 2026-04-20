@@ -162,7 +162,13 @@ def place_heads_for_room(
         poly = Polygon(room.polygon_m)
         if not poly.is_valid:
             poly = poly.buffer(0)  # common fix
-        usable = _shrink(poly, spacing_m * 0.5)
+        # Phase S2 (2026-04-20): grid against the full room polygon,
+        # not a spacing/2-shrunk version. NFPA 13 §11.2.3.1.3 allows
+        # heads as close as 4 in from walls — we enforce that with a
+        # tiny 0.102 m inset, not spacing/2. The prior shrink
+        # under-covered 10×10 m rooms by ~20% (fixed xfail bug).
+        MIN_WALL_OFFSET_M = 0.102  # 4 inches
+        usable = _shrink(poly, MIN_WALL_OFFSET_M)
     except (GEOSException, ValueError, TypeError) as e:
         warn_swallowed(log, code="PLACER_BAD_ROOM_POLYGON",
                        err=e, room_id=room.id)

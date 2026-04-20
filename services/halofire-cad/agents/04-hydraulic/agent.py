@@ -29,6 +29,11 @@ from pathlib import Path
 import networkx as nx
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+# Also make the agent's own directory importable so pump_curve /
+# fittings_tanks siblings can be loaded without a package parent
+# (the agent dir starts with a digit so it's not an importable
+# Python package).
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 from cad.schema import (  # noqa: E402
     System, PipeSegment, Head, HydraulicResult, FlowTestData,
 )
@@ -330,7 +335,53 @@ def calc_system(
     # Total required flow at base of riser
     required_flow = sum(head_flow.values())
 
-    # Supply check — linearize flow-test curve
+    # Phase S3 (2026-04-20): apply optional pump curve + gravity tank.
+    # Base supply is the AHJ flow-test curve; pump ADDS its P(Q) to the
+    # residual at demand flow; tank adds static head. Caller's
+    # FlowTestData carries optional PumpCurveSpec / GravityTankSpec.
+    pump_contribution_psi = 0.0
+    tank_contribution_psi = 0.0
+    if getattr(supply, "pump", None):
+        from pump_curve import PumpCurve  # type: ignore[import-not-found]
+        p = supply.pump
+        curve = PumpCurve(
+            rated_q_gpm=p.rated_q_gpm, rated_p_psi=p.rated_p_psi,
+            overload_q_gpm=p.overload_q_gpm,
+            overload_p_psi=p.overload_p_psi,
+            churn_p_psi=p.churn_p_psi,
+        )
+        pump_contribution_psi = curve.pressure_at(required_flow)
+        issues.append(
+            f"PUMP_APPLIED: +{pump_contribution_psi:.1f} psi "
+            f"at {required_flow:.1f} gpm"
+        )
+
+    if getattr(supply, "tank", None):
+        from fittings_tanks import GravityTank  # type: ignore[import-not-found]
+        t = supply.tank
+        tank = GravityTank(
+            elevation_ft_surface=t.elevation_ft_surface,
+            elevation_ft_outlet=t.elevation_ft_outlet,
+            capacity_gal=t.capacity_gal,
+            usable_drawdown_fraction=t.usable_drawdown_fraction,
+        )
+        tank_contribution_psi = tank.static_head_psi(
+            reference_elevation_ft=t.elevation_ft_outlet,
+        )
+        # Duration compliance
+        ok, tank_issues = tank.is_nfpa13_compliant(
+            demand_gpm=required_flow,
+            duration_min=t.required_duration_min,
+        )
+        for msg in tank_issues:
+            issues.append(msg)
+        if ok:
+            issues.append(
+                f"TANK_APPLIED: +{tank_contribution_psi:.1f} psi "
+                f"static head"
+            )
+
+    # Supply check — linearize flow-test curve, then add pump+tank
     # P_supply @ Q = P_static - (P_static - P_residual) * (Q/flow_test)^1.85
     if supply.flow_gpm > 0:
         ratio = min(1.0, required_flow / supply.flow_gpm)
@@ -339,6 +390,7 @@ def calc_system(
         ) * (ratio ** 1.85)
     else:
         p_supply = supply.residual_psi
+    p_supply += pump_contribution_psi + tank_contribution_psi
     safety_margin = p_supply - demand_psi
     supply_curve = []
     demand_curve = []

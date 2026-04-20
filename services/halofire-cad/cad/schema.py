@@ -56,13 +56,42 @@ class Firm(BaseModel):
     license: Optional[str] = None
 
 
+class PumpCurveSpec(BaseModel):
+    """Subset of pump_curve.PumpCurve for serializable supply data.
+
+    Three-point NFPA 20 characterization. `calc_system` uses this to
+    adjust supply residual pressure via quadratic P(Q) interpolation.
+    """
+    rated_q_gpm: float
+    rated_p_psi: float
+    overload_q_gpm: float
+    overload_p_psi: float
+    churn_p_psi: float
+
+
+class GravityTankSpec(BaseModel):
+    """Serializable gravity-tank supply.
+
+    `calc_system` adjusts static_psi by the static head at the
+    building's reference elevation + enforces duration per
+    NFPA 13 §11.2.3.1.
+    """
+    elevation_ft_surface: float
+    elevation_ft_outlet: float
+    capacity_gal: float
+    usable_drawdown_fraction: float = 0.80
+    required_duration_min: float = 30.0
+
+
 class FlowTestData(BaseModel):
-    """AHJ-provided hydrant flow-test data."""
+    """AHJ-provided hydrant flow-test data + optional pump/tank."""
     static_psi: float
     residual_psi: float
     flow_gpm: float
     test_date: Optional[str] = None
     location: Optional[str] = None
+    pump: Optional[PumpCurveSpec] = None
+    tank: Optional[GravityTankSpec] = None
 
 
 class Project(BaseModel):
