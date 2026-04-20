@@ -180,6 +180,7 @@ def test_three_columns_and_one_beam(mocked_ifc: Path) -> None:
         mocked_ifc,
         _bbox_resolver=_bbox_for_coords,
         _level_resolver=_level_for_coords,
+        _validate_header=False,
     )
     # 3 columns + 1 beam = 4 obstructions (default classes include both)
     assert len(result) == 4
@@ -195,6 +196,7 @@ def test_classes_filter_to_only_columns(mocked_ifc: Path) -> None:
         mocked_ifc, classes=("IfcColumn",),
         _bbox_resolver=_bbox_for_coords,
         _level_resolver=_level_for_coords,
+        _validate_header=False,
     )
     assert len(result) == 3
 
@@ -204,12 +206,14 @@ def test_level_filter_matches_within_tolerance(mocked_ifc: Path) -> None:
         mocked_ifc, level_elevation_m=0.0,
         _bbox_resolver=_bbox_for_coords,
         _level_resolver=_level_for_coords,
+        _validate_header=False,
     )
     assert len(at_0) == 4
     at_10 = IFCOBS.obstructions_from_ifc(
         mocked_ifc, level_elevation_m=10.0,
         _bbox_resolver=_bbox_for_coords,
         _level_resolver=_level_for_coords,
+        _validate_header=False,
     )
     assert at_10 == []
 
@@ -221,6 +225,7 @@ def test_obstructions_feed_arm_over(mocked_ifc: Path) -> None:
         mocked_ifc, classes=("IfcColumn",),
         _bbox_resolver=_bbox_for_coords,
         _level_resolver=_level_for_coords,
+        _validate_header=False,
     )
     # Head placed inside an expanded buffer must be shifted out.
     # First column is at (0, 0) with a 0.4 m bbox → clearance 0.3

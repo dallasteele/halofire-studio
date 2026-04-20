@@ -152,6 +152,7 @@ def obstructions_from_ifc(
     level_elevation_m: float | None = None,
     _bbox_resolver=None,   # test hook; defaults to _elem_bbox_xy_m
     _level_resolver=None,  # test hook; defaults to _elem_matches_level
+    _validate_header: bool = True,
 ) -> list:
     """Return a list of Obstruction records from an IFC file.
 
@@ -168,6 +169,18 @@ def obstructions_from_ifc(
     p = Path(ifc_path)
     if not p.exists():
         return []
+    # Cheap header check before handing to ifcopenshell — saves a
+    # spurious partially-constructed `file.__del__` warning on
+    # non-IFC inputs (e.g. accidentally-loaded PDFs). Disable via
+    # _validate_header=False for tests that feed mocked ifcopenshell.
+    if _validate_header:
+        try:
+            head = p.open("rb").read(32)
+        except Exception:  # noqa: BLE001
+            return []
+        if not (head.lstrip().startswith(b"ISO-10303")
+                or head.lstrip().startswith(b"\x89HDF")):
+            return []
     try:
         model = ifcopenshell.open(str(p))
     except Exception:  # noqa: BLE001

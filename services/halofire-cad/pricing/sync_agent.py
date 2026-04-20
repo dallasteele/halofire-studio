@@ -38,7 +38,7 @@ from typing import Any
 _HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(_HERE.parent))
 from pricing.db import (  # noqa: E402
-    PriceUpdate, SyncRun, open_db, sha256_of,
+    PriceUpdate, SyncRun, open_db, sha256_of, utcnow_naive,
 )
 
 OLLAMA_URL = os.environ.get("OLLAMA_URL", "http://localhost:11434")
@@ -277,7 +277,7 @@ def run_sync(
                 source_url=source_url or str(source_path),
                 source_doc_sha256=sha,
                 llm_model=model,
-                started_at=datetime.utcnow(),
+                started_at=utcnow_naive(),
             ),
         )
         try:

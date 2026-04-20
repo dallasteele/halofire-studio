@@ -27,7 +27,8 @@ _ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(_ROOT))
 
 from pricing.db import (  # noqa: E402
-    STALE_DAYS, PriceUpdate, SuppliesDB, SyncRun, open_db, sha256_of,
+    STALE_DAYS, PriceUpdate, SuppliesDB, SyncRun,
+    open_db, sha256_of, utcnow_naive,
 )
 
 
@@ -71,7 +72,7 @@ def test_price_append_only(db: SuppliesDB) -> None:
 
 def test_price_for_returns_latest(db: SuppliesDB) -> None:
     # Insert old then new; `price_for` must return new
-    old = datetime.utcnow() - timedelta(days=30)
+    old = utcnow_naive() - timedelta(days=30)
     db.con().execute(
         "INSERT INTO prices (sku, unit_cost_usd, unit, observed_at, source, confidence, currency) "
         "VALUES ('TEST-1', 5.0, 'ea', ?, 'old', 1.0, 'USD')",
@@ -86,7 +87,7 @@ def test_price_for_returns_latest(db: SuppliesDB) -> None:
 
 
 def test_stale_flag_crosses_threshold(db: SuppliesDB) -> None:
-    old = datetime.utcnow() - timedelta(days=STALE_DAYS + 5)
+    old = utcnow_naive() - timedelta(days=STALE_DAYS + 5)
     db.con().execute(
         "INSERT INTO prices (sku, unit_cost_usd, unit, observed_at, source, confidence, currency) "
         "VALUES ('TEST-1', 5.0, 'ea', ?, 'ancient', 1.0, 'USD')",

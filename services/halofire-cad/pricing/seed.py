@@ -39,7 +39,7 @@ _HERE = Path(__file__).resolve().parent
 _REPO = _HERE.parents[2]  # .../halofire-studio
 sys.path.insert(0, str(_HERE.parent))  # so `import pricing.db` resolves
 
-from pricing.db import PriceUpdate, SyncRun, open_db  # noqa: E402
+from pricing.db import PriceUpdate, SyncRun, open_db, utcnow_naive  # noqa: E402
 
 
 # ── 1. suppliers (the companies Halo buys from) ───────────────────
@@ -307,7 +307,7 @@ def _coerce_open_source_row(o: dict) -> dict:
 
 
 def main() -> None:
-    now = datetime.utcnow().isoformat()
+    now = utcnow_naive().isoformat()
     open_source = _load_open_source_manifest()
     with open_db() as db:
         for s in _SUPPLIERS:
@@ -356,7 +356,7 @@ def main() -> None:
                 supplier_id="generic",
                 source_url="seed:manifest",
                 llm_model="none",
-                started_at=datetime.utcnow(),
+                started_at=utcnow_naive(),
             ),
         )
         added = 0

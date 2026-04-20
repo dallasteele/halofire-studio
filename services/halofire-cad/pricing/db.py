@@ -15,7 +15,14 @@ import hashlib
 import json
 from contextlib import contextmanager
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
+
+
+def utcnow_naive() -> datetime:
+    """UTC timestamp with no tzinfo — what DuckDB TIMESTAMP columns
+    expect. Wraps datetime.now(timezone.utc) to stop using the
+    deprecated datetime.utcnow() (Python 3.12+)."""
+    return datetime.now(timezone.utc).replace(tzinfo=None)
 from pathlib import Path
 from typing import Any, Iterable, Iterator
 
@@ -79,7 +86,7 @@ class SyncRun:
     source_url: str | None = None
     source_doc_sha256: str | None = None
     llm_model: str | None = None
-    started_at: datetime = field(default_factory=datetime.utcnow)
+    started_at: datetime = field(default_factory=utcnow_naive)
     finished_at: datetime | None = None
     parts_touched: int = 0
     prices_added: int = 0
@@ -215,7 +222,7 @@ class SuppliesDB:
         `as_of` pins the query to a historical moment (rebuilding an
         old bid). Default = now.
         """
-        cutoff = as_of or datetime.utcnow()
+        cutoff = as_of or utcnow_naive()
         row = self._con.execute(
             """
             SELECT sku, unit_cost_usd, unit, observed_at, source,
@@ -444,4 +451,5 @@ __all__ = [
     "price_for",
     "apply_updates",
     "dump_json",
+    "utcnow_naive",
 ]
