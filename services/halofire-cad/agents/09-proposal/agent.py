@@ -175,8 +175,14 @@ def build_proposal_data(
 
 def write_proposal_files(
     data: dict[str, Any], out_dir: Path,
+    design_payload: dict[str, Any] | None = None,
 ) -> dict[str, str]:
-    """Emit proposal.json + stub PDF + stub XLSX. Returns file paths."""
+    """Emit proposal.json + HTML + PDF + XLSX. Returns file paths.
+
+    ``design_payload`` is optional design.json content used by the
+    HTML generator to draw per-level plan SVGs. If it's None, the
+    HTML still renders — just without inline plans.
+    """
     out_dir.mkdir(parents=True, exist_ok=True)
     paths: dict[str, str] = {}
 
@@ -184,6 +190,28 @@ def write_proposal_files(
     json_path = out_dir / "proposal.json"
     json_path.write_text(json.dumps(data, indent=2, default=str), encoding="utf-8")
     paths["json"] = str(json_path)
+
+    # HTML — self-contained, embeds design.glb via <model-viewer>.
+    # This is the artifact the VPS halo-fire client demo consumes.
+    try:
+        import importlib.util
+        _spec = importlib.util.spec_from_file_location(
+            "_halofire_proposal_html",
+            str(Path(__file__).with_name("proposal_html.py")),
+        )
+        assert _spec is not None and _spec.loader is not None
+        _mod = importlib.util.module_from_spec(_spec)
+        _spec.loader.exec_module(_mod)
+        write_proposal_html = _mod.write_proposal_html
+
+        html_path = write_proposal_html(
+            data, out_dir,
+            design=design_payload,
+            design_glb="design.glb",
+        )
+        paths["html"] = str(html_path)
+    except Exception as e:
+        paths["html_error"] = str(e)
 
     # PDF (reportlab)
     try:
