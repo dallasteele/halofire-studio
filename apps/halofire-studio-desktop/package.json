@@ -1,0 +1,22 @@
+{
+  "name": "halofire-studio-desktop",
+  "version": "0.1.0",
+  "private": true,
+  "description": "HaloFire Studio — Tauri 2 desktop shell (AutoSPRINK-class CAD with integrated Pascal + OpenSCAD + agent pipeline)",
+  "scripts": {
+    "dev": "tauri dev",
+    "build": "tauri build",
+    "build:sidecar": "python python_sidecar/build.py",
+    "build:all": "pnpm run build:sidecar && pnpm run build",
+    "test:sidecar": "python -m pytest python_sidecar/test_entry.py -v"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2",
+    "@tauri-apps/plugin-dialog": "^2",
+    "@tauri-apps/plugin-fs": "^2",
+    "@tauri-apps/plugin-shell": "^2"
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "HaloFire Studio",
+  "version": "0.1.0",
+  "identifier": "com.halofire.studio",
+  "build": {
+    "beforeDevCommand": "cd ../../editor && bun run dev",
+    "beforeBuildCommand": "cd ../../editor && bun run build && bun run export",
+    "devUrl": "http://localhost:3002",
+    "frontendDist": "../../editor/out"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "HaloFire Studio",
+        "width": 1600,
+        "height": 1000,
+        "minWidth": 1200,
+        "minHeight": 800,
+        "resizable": true,
+        "fullscreen": false,
+        "decorations": true,
+        "transparent": false
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["msi", "nsis", "deb", "appimage", "dmg"],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "category": "DeveloperTool",
+    "shortDescription": "Fire-protection CAD — AutoSPRINK-class with integrated Pascal + OpenSCAD",
+    "longDescription": "HaloFire Studio bundles the CAD pipeline, Pascal 3D viewer, and OpenSCAD parametric parts forge into a single desktop app for fire-protection engineers.",
+    "externalBin": ["bin/halofire-pipeline", "bin/openscad"]
+  },
+  "plugins": {
+    "shell": {
+      "open": true
+    }
+  }
+}

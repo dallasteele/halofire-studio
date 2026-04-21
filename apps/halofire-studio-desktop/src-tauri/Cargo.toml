@@ -1,0 +1,35 @@
+[package]
+name = "halofire-studio-desktop"
+version = "0.1.0"
+description = "HaloFire Studio — integrated fire-protection CAD (Tauri 2 shell)"
+authors = ["HaloFire Studio"]
+edition = "2021"
+rust-version = "1.77"
+
+[lib]
+name = "halofire_studio_desktop_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-shell = "2"
+tauri-plugin-fs = "2"
+tauri-plugin-dialog = "2"
+tauri-plugin-opener = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["full"] }
+sha2 = "0.10"
+hex = "0.4"
+anyhow = "1"
+log = "0.4"
+env_logger = "0.11"
+
+[features]
+# Default features; "custom-protocol" is required for production bundles
+# so the webview can load the packaged frontend via tauri://localhost/.
+default = ["custom-protocol"]
+custom-protocol = ["tauri/custom-protocol"]
