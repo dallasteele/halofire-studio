@@ -126,6 +126,9 @@ def run_pipeline(
         "levels": len(bldg.levels),
         "walls": sum(len(l.walls) for l in bldg.levels),
         "rooms": sum(len(l.rooms) for l in bldg.levels),
+        "slice": {
+            "building": bldg.model_dump(),
+        },
     })
 
     # 2. CLASSIFIER — Room.hazard_class + Level.use
@@ -153,11 +156,20 @@ def run_pipeline(
     _emit_step({
         "step": "classify",
         "hazard_counts": _count_hazards(bldg),
+        "slice": {
+            "levels": [lvl.model_dump() for lvl in bldg.levels],
+        },
     })
 
     # 3. PLACER — Head[] per room
     heads = PLACER.place_heads_for_building(bldg)
-    _emit_step({"step": "place", "head_count": len(heads)})
+    _emit_step({
+        "step": "place",
+        "head_count": len(heads),
+        "slice": {
+            "sprinkler_heads": [h.model_dump() for h in heads],
+        },
+    })
 
     # 4. ROUTER — PipeSegment[] + Hangers
     systems = ROUTER.route_systems(bldg, heads)
@@ -166,12 +178,22 @@ def run_pipeline(
         "system_count": len(systems),
         "pipe_count": sum(len(s.pipes) for s in systems),
         "hanger_count": sum(len(s.hangers) for s in systems),
+        "slice": {
+            "systems": [_system_dump_without_hydraulic(s) for s in systems],
+        },
     })
 
     # 5. HYDRAULIC — per-system calc
     for s in systems:
         hazard = _system_hazard(bldg, s)
         s.hydraulic = HYDRAULIC.calc_system(s, supply, hazard)
+    _emit_step({
+        "step": "hydraulic",
+        "system_count": len(systems),
+        "slice": {
+            "systems": [s.model_dump() for s in systems],
+        },
+    })
 
     # Build the canonical alpha Design artifact.
     design = Design(
@@ -242,6 +264,9 @@ def run_pipeline(
         "step": "rulecheck",
         "error_count": sum(1 for v in violations if v.severity == "error"),
         "warning_count": sum(1 for v in violations if v.severity == "warning"),
+        "slice": {
+            "issues": [v.model_dump() for v in violations],
+        },
     })
 
     # 7. BOM
@@ -250,6 +275,9 @@ def run_pipeline(
         "step": "bom",
         "line_items": len(bom),
         "total_usd": BOM.bom_total(bom),
+        "slice": {
+            "bom": [row.model_dump() for row in bom],
+        },
     })
     # V2 Phase 3.2: Hydralist (.hlf) supplier-handoff export
     try:
@@ -267,6 +295,9 @@ def run_pipeline(
         "step": "labor",
         "total_hours": round(sum(r.hours for r in labor), 1),
         "total_usd": LABOR.labor_total(labor),
+        "slice": {
+            "labor": [row.model_dump() for row in labor],
+        },
     })
 
     # 9. PROPOSAL — json + pdf + xlsx
@@ -278,6 +309,9 @@ def run_pipeline(
     _emit_step({
         "step": "proposal",
         "total_usd": proposal_data["pricing"]["total_usd"],
+        "slice": {
+            "proposal": proposal_data,
+        },
     })
 
     # 10. SUBMITTAL — DXF + GLB + IFC exports + NFPA 8-section report
@@ -300,9 +334,16 @@ def run_pipeline(
         _emit_step({
             "step": "submittal",
             "files": list(submittal_paths.keys()),
+            "slice": {
+                "files": dict(submittal_paths),
+            },
         })
     except Exception as e:
-        _emit_step({"step": "submittal", "error": str(e)})
+        _emit_step({
+            "step": "submittal",
+            "error": str(e),
+            "slice": {"files": {}},
+        })
 
     _write_manifest(design, out_dir, summary)
 
@@ -311,7 +352,27 @@ def run_pipeline(
         json.dumps(summary, indent=2), encoding="utf-8",
     )
     summary["files"]["summary"] = str(out_dir / "pipeline_summary.json")
+
+    # Final done event — signals the editor's AutoPilot that streaming is
+    # complete and gives it the full deliverable manifest in one place.
+    if progress_callback is not None:
+        try:
+            progress_callback({
+                "step": "done",
+                "done": True,
+                "files": dict(summary.get("files", {})),
+            })
+        except Exception:
+            log.exception("progress_callback raised on done; continuing")
+
     return summary
+
+
+def _system_dump_without_hydraulic(system: System) -> dict[str, Any]:
+    """Dump a System but strip ``.hydraulic`` (not yet populated at route)."""
+    data = system.model_dump()
+    data["hydraulic"] = None
+    return data
 
 
 def _artifact_context(bldg: Building) -> tuple[list[DesignSource], list[DesignIssue], float]:
