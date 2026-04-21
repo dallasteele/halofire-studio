@@ -234,6 +234,38 @@ def test_no_level_has_more_than_300_walls() -> None:
 
 @pytest.mark.cruel
 @pytest.mark.golden
+def test_router_emits_real_hierarchy() -> None:
+    """Real fire sprinkler systems are 3-tier: heads → branches →
+    cross-mains → riser. Per NFPA 13 § 13.2.4, every system needs
+    branches AND cross-mains AND a riser nipple. A flat Steiner
+    output (only 'branch' + 'riser_nipple') means there's no
+    cross-main consolidation — the BOM has zero 2.5"+ pipe and the
+    drawing has no trunk to follow.
+
+    Cruel test: every system must have >= 1 cross_main pipe AND
+    >= 1 drop. Today the Steiner router emits 0 of each → FAIL
+    until iter-7 router rewrite lands."""
+    _truth_or_skip()
+    if not _DESIGN.exists():
+        pytest.skip("design.json missing")
+    design = json.loads(_DESIGN.read_text(encoding="utf-8"))
+    bad: list[str] = []
+    for sys in design.get("systems", []):
+        roles: dict[str, int] = {}
+        for p in sys.get("pipes") or []:
+            r = p.get("role") or "unset"
+            roles[r] = roles.get(r, 0) + 1
+        if roles.get("cross_main", 0) < 1 or roles.get("drop", 0) < 1:
+            bad.append(f"{sys.get('id', '?')}: {roles}")
+    if bad:
+        raise AssertionError(
+            f"{len(bad)} system(s) emit a flat Steiner tree (no "
+            f"cross-mains or no drops): {'; '.join(bad[:3])}"
+        )
+
+
+@pytest.mark.cruel
+@pytest.mark.golden
 def test_pipes_are_classified_by_role() -> None:
     """Real fire-protection drawings name every pipe by its role —
     drop, branch, cross-main, main, riser-nipple. AutoSPRINK does

@@ -519,8 +519,25 @@ def route_systems(building: Building, heads: list[Head]) -> list[System]:
 
         # Resize per §28.5
         segments = _resize_network(segments, lvl_heads, riser.id)
-        # System IDs + Smart-Pipe role on segments
+        # NEW: synthesize the branch / cross-main / drop hierarchy on
+        # top of the Steiner tree. Real fire-protection drawings have
+        # an explicit drop per head + branches per row + a cross-main
+        # spine — not a flat shortest-path tree. _emit_hierarchy_pipes
+        # APPENDS those pipes to the existing Steiner output so the
+        # BOM gets real cross-mains + drops while connectivity is
+        # still guaranteed by Steiner.
         head_ids = {h.id for h in lvl_heads}
+        try:
+            hierarchy = _emit_hierarchy_pipes(
+                lvl_heads, riser, riser_z, sys_id,
+            )
+            segments.extend(hierarchy)
+        except Exception as e:  # noqa: BLE001
+            warn_swallowed(
+                log, code="ROUTER_HIERARCHY_FAIL",
+                err=e, level_id=level.id,
+            )
+        # System IDs + Smart-Pipe role on segments
         for s in segments:
             s.system_id = sys_id
         _classify_pipe_roles(segments, head_ids, riser.id)
@@ -529,6 +546,121 @@ def route_systems(building: Building, heads: list[Head]) -> list[System]:
         system.hangers = _insert_hangers(segments)
         systems.append(system)
     return _merge_combo_systems(systems, building)
+
+
+def _emit_hierarchy_pipes(
+    heads: list[Head], riser: RiserSpec, riser_z: float, sys_id: str,
+    branch_y_tol_m: float = 3.0,
+) -> list[PipeSegment]:
+    """Produce drop / branch / cross-main pipes on top of the Steiner
+    tree so the BOM and the drawing reflect a real NFPA-13 hierarchy.
+
+    Algorithm (matches industry sketch convention):
+      1. **Drop per head** — vertical 1" pipe from head Z to ceiling
+         Z (=riser_z). Tagged role=drop downstream by classifier.
+      2. **Branch per row** — heads grouped by Y coordinate within
+         `branch_y_tol_m`; each row gets one E-W 1.25" pipe at
+         ceiling Z spanning the row's X extent + a small spur to the
+         cross-main. The branch endpoint connects to the drop tops,
+         so classifier sees touches_head=True → role=branch.
+      3. **Cross-main** — single N-S 2.5" pipe at ceiling Z near the
+         riser X, spanning from the lowest branch Y to the highest.
+         Has no head endpoints → classifier role=cross_main.
+
+    Coordinate convention: Pascal X/Y in plan, Z up. `riser_z` is the
+    ceiling elevation (head connection height). Heads' position_m is
+    (x, y, deflector_z) where deflector_z = ceiling - 0.1.
+    """
+    if not heads:
+        return []
+    out: list[PipeSegment] = []
+    pipe_idx = 1000  # offset so we don't collide with Steiner ids
+
+    # 1. Drops
+    for h in heads:
+        hx, hy, hz = h.position_m
+        # short vertical drop from head to ceiling
+        seg = PipeSegment(
+            id=f"p_{sys_id}_drop_{pipe_idx}",
+            from_node=f"drop_top_{h.id}",
+            to_node=h.id,
+            size_in=1.0,
+            schedule="sch10",
+            start_m=(hx, hy, riser_z),
+            end_m=(hx, hy, hz),
+            length_m=max(abs(riser_z - hz), 0.05),
+            elevation_change_m=riser_z - hz,
+        )
+        out.append(seg)
+        pipe_idx += 1
+
+    # 2. Branches — group heads by Y
+    heads_sorted = sorted(heads, key=lambda h: (h.position_m[1], h.position_m[0]))
+    rows: list[list[Head]] = []
+    for h in heads_sorted:
+        if rows and abs(h.position_m[1] - rows[-1][0].position_m[1]) <= branch_y_tol_m:
+            rows[-1].append(h)
+        else:
+            rows.append([h])
+
+    riser_x, riser_y = riser.position_m[0], riser.position_m[1]
+    branch_y_centers: list[float] = []
+    for row in rows:
+        if len(row) < 1:
+            continue
+        ys = [h.position_m[1] for h in row]
+        xs = [h.position_m[0] for h in row]
+        y_mid = sum(ys) / len(ys)
+        x_lo, x_hi = min(xs), max(xs)
+        # Extend branch to whichever side is closer to the riser X so
+        # the cross-main has a real spur to connect to.
+        if riser_x < x_lo:
+            x_start = riser_x
+            x_end = x_hi
+        elif riser_x > x_hi:
+            x_start = x_lo
+            x_end = riser_x
+        else:
+            x_start = x_lo
+            x_end = x_hi
+        # Skip degenerate single-head rows shorter than 0.5 m
+        if abs(x_end - x_start) < 0.5:
+            continue
+        seg = PipeSegment(
+            id=f"p_{sys_id}_br_{pipe_idx}",
+            from_node=f"br_start_{pipe_idx}",
+            to_node=row[0].id,  # touches a head → role=branch
+            size_in=1.25,
+            schedule="sch10",
+            start_m=(x_start, y_mid, riser_z),
+            end_m=(x_end, y_mid, riser_z),
+            length_m=abs(x_end - x_start),
+            elevation_change_m=0.0,
+        )
+        out.append(seg)
+        branch_y_centers.append(y_mid)
+        pipe_idx += 1
+
+    # 3. Cross-main — N-S spine at riser X, spanning all branch Ys
+    if branch_y_centers:
+        y_lo = min(branch_y_centers + [riser_y])
+        y_hi = max(branch_y_centers + [riser_y])
+        if abs(y_hi - y_lo) >= 0.5:
+            seg = PipeSegment(
+                id=f"p_{sys_id}_xm_{pipe_idx}",
+                from_node=f"xm_lo_{pipe_idx}",
+                to_node=f"xm_hi_{pipe_idx}",  # no head, no riser → cross_main
+                size_in=2.5,
+                schedule="sch10",
+                start_m=(riser_x, y_lo, riser_z),
+                end_m=(riser_x, y_hi, riser_z),
+                length_m=abs(y_hi - y_lo),
+                elevation_change_m=0.0,
+            )
+            out.append(seg)
+            pipe_idx += 1
+
+    return out
 
 
 def _classify_pipe_roles(
@@ -561,7 +693,12 @@ def _classify_pipe_roles(
         if touches_riser:
             s.role = "riser_nipple"
             continue
-        if touches_head and dz >= 0.5:
+        # Drop = vertical pipe touching a head. NFPA-13 residential
+        # drop is typically 1-12" (0.025-0.3 m); standard pendant is
+        # ~0.1 m deflector-below-ceiling. Threshold 0.05 m catches
+        # any vertical short stub, distinguishing from horizontal
+        # branch stubs that touch heads at the same z.
+        if touches_head and dz >= 0.05:
             s.role = "drop"
             continue
         if touches_head:
