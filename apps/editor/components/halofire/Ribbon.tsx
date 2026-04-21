@@ -29,6 +29,7 @@ export type RibbonCommand =
   | 'remote-area'
   | 'auto-dim-pipe-runs'
   | 'dimension'
+  | 'auto-dim-pipe-runs'
   | 'hydraulic-calc'
   | 'rule-check'
   | 'stress-test'
