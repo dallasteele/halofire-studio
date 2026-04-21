@@ -63,7 +63,7 @@ jobs:
 
       - name: Fetch OpenSCAD binary
         working-directory: apps/halofire-studio-desktop
-        run: python python_sidecar/download_openscad.py --skip-verify
+        run: python python_sidecar/download_openscad.py
 
       - name: Build editor (Next.js static export)
         working-directory: apps/editor

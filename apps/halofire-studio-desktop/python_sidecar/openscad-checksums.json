@@ -1,27 +1,31 @@
 {
-  "openscad_version": "2024.11.12",
-  "source": "https://github.com/openscad/openscad/releases/tag/openscad-2024.11.12",
-  "_warning": "SHA256 values marked PLACEHOLDER_VERIFY_BEFORE_RELEASE must be pinned against the upstream checksum file before any production release. The download script fails loudly unless --skip-verify is passed.",
+  "openscad_version": "2021.01",
+  "source": "https://files.openscad.org/ (stable release index)",
+  "_warning": "SHA256 values pinned from upstream .sha256 sidecar files at files.openscad.org on 2026-04-21. Re-verify against upstream before any production release. OpenSCAD 2021.01 is the latest published stable; newer builds are snapshots at files.openscad.org/snapshots/. No native aarch64-apple-darwin DMG is published for 2021.01 — Apple Silicon Macs run the x86_64 DMG via Rosetta 2. Bump to a dated snapshot (e.g. 2025.06.09) only after re-pinning all four hashes.",
   "checksums": {
     "x86_64-pc-windows-msvc": {
-      "url": "https://github.com/openscad/openscad/releases/download/openscad-2024.11.12/OpenSCAD-2024.11.12-x86_64-Installer.exe",
-      "sha256": "PLACEHOLDER_VERIFY_BEFORE_RELEASE",
-      "binary_path_in_archive": "openscad.exe"
+      "url": "https://files.openscad.org/OpenSCAD-2021.01-x86-64-Installer.exe",
+      "sha256": "fbe1e590e1af2af863f5d92bd263eb4644d0ee29352e3ab566366e87a8f6ed12",
+      "binary_path_in_archive": "openscad.exe",
+      "_note": "observed from upstream https://files.openscad.org/OpenSCAD-2021.01-x86-64-Installer.exe.sha256 on 2026-04-21"
     },
     "x86_64-apple-darwin": {
-      "url": "https://github.com/openscad/openscad/releases/download/openscad-2024.11.12/OpenSCAD-2024.11.12-x86_64.dmg",
-      "sha256": "PLACEHOLDER_VERIFY_BEFORE_RELEASE",
-      "binary_path_in_archive": "OpenSCAD.app/Contents/MacOS/OpenSCAD"
+      "url": "https://files.openscad.org/OpenSCAD-2021.01.dmg",
+      "sha256": "4e4568e19992636ba497c04bc2238399c92314fcb7bf75dc3632aa623ca3635e",
+      "binary_path_in_archive": "OpenSCAD.app/Contents/MacOS/OpenSCAD",
+      "_note": "observed from upstream https://files.openscad.org/OpenSCAD-2021.01.dmg.sha256 on 2026-04-21"
     },
     "aarch64-apple-darwin": {
-      "url": "https://github.com/openscad/openscad/releases/download/openscad-2024.11.12/OpenSCAD-2024.11.12-arm64.dmg",
-      "sha256": "PLACEHOLDER_VERIFY_BEFORE_RELEASE",
-      "binary_path_in_archive": "OpenSCAD.app/Contents/MacOS/OpenSCAD"
+      "url": "https://files.openscad.org/OpenSCAD-2021.01.dmg",
+      "sha256": "4e4568e19992636ba497c04bc2238399c92314fcb7bf75dc3632aa623ca3635e",
+      "binary_path_in_archive": "OpenSCAD.app/Contents/MacOS/OpenSCAD",
+      "_note": "same x86_64 DMG — runs on Apple Silicon via Rosetta 2. Swap to a native arm64 snapshot build once upstream publishes one for the stable channel."
     },
     "x86_64-unknown-linux-gnu": {
-      "url": "https://github.com/openscad/openscad/releases/download/openscad-2024.11.12/OpenSCAD-2024.11.12-x86_64.AppImage",
-      "sha256": "PLACEHOLDER_VERIFY_BEFORE_RELEASE",
-      "binary_path_in_archive": "openscad"
+      "url": "https://files.openscad.org/OpenSCAD-2021.01-x86_64.AppImage",
+      "sha256": "f758528f2cd213f773c7a105fb63bf3b45bf754b0f586fbb7c9cd653ffcd0882",
+      "binary_path_in_archive": "openscad",
+      "_note": "observed from upstream https://files.openscad.org/OpenSCAD-2021.01-x86_64.AppImage.sha256 on 2026-04-21"
     }
   }
 }

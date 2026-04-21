@@ -96,3 +96,16 @@ def test_dry_run_makes_no_network_or_writes(tmp_path, monkeypatch):
     # Nothing written.
     assert not out.exists()
     assert not bin_dir.exists() or not any(bin_dir.iterdir())
+
+
+def test_checksum_manifest_has_no_placeholders():
+    import json
+    from pathlib import Path
+    manifest = json.loads(
+        (Path(__file__).parent / "openscad-checksums.json").read_text()
+    )
+    for triple, spec in manifest["checksums"].items():
+        assert spec["sha256"] != "PLACEHOLDER_VERIFY_BEFORE_RELEASE", (
+            f"{triple} SHA still placeholder"
+        )
+        assert len(spec["sha256"]) == 64, f"{triple} SHA wrong length"
