@@ -92,6 +92,11 @@ export {
   Viewport,
 } from './nodes/sheet'
 export {
+  DEFAULT_DIM_STYLE,
+  DimArrowKind,
+  DimStyle,
+} from './nodes/dim-style'
+export {
   StairNode,
   StairRailingMode,
   StairSlabOpeningMode,

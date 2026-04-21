@@ -6,3 +6,13 @@ export * from './scad/parse-params.js'
 export * as sceneSpawn from './scene/spawn-from-design.js'
 export * as sceneSlice from './scene/translate-slice.js'
 export * as sheetsDefault from './sheets/generate-default-set.js'
+export {
+  type DimPrimitive,
+  dimensionToSvgPrimitives,
+  formatDimensionText,
+} from './drawing/dimension.js'
+export {
+  type AutoDimOptions,
+  autoDimensionPipeRun,
+  type SystemRef,
+} from './drawing/auto-dim-pipe-runs.js'

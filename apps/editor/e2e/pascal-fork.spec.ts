@@ -54,6 +54,11 @@ import {
 } from '@pascal-app/core/schema/nodes/sheet'
 // biome-ignore lint/style/noRelativeImport: direct module path is intentional
 import {
+  DEFAULT_DIM_STYLE,
+  DimStyle,
+} from '@pascal-app/core/schema/nodes/dim-style'
+// biome-ignore lint/style/noRelativeImport: direct module path is intentional
+import {
   DENSITY_AREA_DEFAULTS,
   HOSE_ALLOWANCE_GPM,
   SystemNode,
@@ -1290,5 +1295,48 @@ test.describe('Pascal fork — SheetNode schema', () => {
     expect(sheet.hatches[0]?.pattern).toBe('ansi31')
     expect(sheet.revision_clouds[0]?.status).toBe('open')
     expect(sheet.revision_clouds[0]?.bubble_number).toBe(1)
+  })
+})
+
+test.describe('Pascal fork — DimStyle schema', () => {
+  test('DimStyle parses with defaults', () => {
+    const style = DimStyle.parse({
+      id: 'dimstyle_arch',
+      name: 'Architectural',
+    })
+    expect(style.text_height_mm).toBe(2.5)
+    expect(style.arrow_kind).toBe('tick')
+    expect(style.arrow_size_mm).toBe(2.0)
+    expect(style.extension_line_offset_mm).toBe(1.5)
+    expect(style.extension_line_extend_mm).toBe(1.5)
+    expect(style.color).toBe('#000000')
+  })
+
+  test('DimStyle rejects non-hex color', () => {
+    expect(() =>
+      DimStyle.parse({
+        id: 'bad',
+        name: 'Bad',
+        color: 'red',
+      }),
+    ).toThrow()
+  })
+
+  test('DimStyle rejects negative text height', () => {
+    expect(() =>
+      DimStyle.parse({
+        id: 'bad',
+        name: 'Bad',
+        text_height_mm: -1,
+      }),
+    ).toThrow()
+  })
+
+  test('DEFAULT_DIM_STYLE is the HaloFire default and matches schema', () => {
+    expect(DEFAULT_DIM_STYLE.id).toBe('halofire.default')
+    expect(DEFAULT_DIM_STYLE.name).toBe('HaloFire Default')
+    // Round-trips through the parser (schema-valid).
+    const reparsed = DimStyle.parse(DEFAULT_DIM_STYLE)
+    expect(reparsed).toEqual(DEFAULT_DIM_STYLE)
   })
 })
