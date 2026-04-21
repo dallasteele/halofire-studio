@@ -1,0 +1,58 @@
+{
+  "name": "@halofire/schema",
+  "version": "0.0.0",
+  "description": "Zod schemas for the .hfproj project bundle (ProjectManifest, Correction, Comment, AuditEntry, CatalogLock, Design).",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./project": {
+      "types": "./dist/project.d.ts",
+      "import": "./dist/project.js",
+      "default": "./dist/project.js"
+    },
+    "./design": {
+      "types": "./dist/design.d.ts",
+      "import": "./dist/design.js",
+      "default": "./dist/design.js"
+    },
+    "./correction": {
+      "types": "./dist/correction.d.ts",
+      "import": "./dist/correction.js",
+      "default": "./dist/correction.js"
+    },
+    "./comment": {
+      "types": "./dist/comment.d.ts",
+      "import": "./dist/comment.js",
+      "default": "./dist/comment.js"
+    },
+    "./audit": {
+      "types": "./dist/audit.d.ts",
+      "import": "./dist/audit.js",
+      "default": "./dist/audit.js"
+    },
+    "./catalog-lock": {
+      "types": "./dist/catalog-lock.d.ts",
+      "import": "./dist/catalog-lock.js",
+      "default": "./dist/catalog-lock.js"
+    }
+  },
+  "files": ["dist", "README.md"],
+  "scripts": {
+    "build": "tsc --build --noCheck",
+    "dev": "tsc --build --watch",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "^4.3.5"
+  },
+  "devDependencies": {
+    "@pascal/typescript-config": "*",
+    "typescript": "5.9.3"
+  }
+}
