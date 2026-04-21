@@ -114,6 +114,25 @@ function dispatchRibbon(cmd: RibbonCommand): void {
     // Open the bundled bid demo in a new tab for now.
     window.open(`/bid-demo/${ACTIVE_PROJECT_ID}/proposal.html`, '_blank')
   }
+  // V2 Phase 5.1: AHJ submittal — open the NFPA 8-section JSON in a
+  // new tab. Once Phase 5.5 ships an HTML renderer this becomes a
+  // styled doc; for now the JSON is the audit trail.
+  if (cmd === 'report-nfpa-8') {
+    const gw = process.env.NEXT_PUBLIC_HALOPENCLAW_URL ?? 'http://localhost:18080'
+    window.open(
+      `${gw}/projects/${ACTIVE_PROJECT_ID}/deliverable/nfpa_report.json`,
+      '_blank',
+    )
+  }
+  // V2 Phase 5.2: Wade-flow Approve & Submit — flips bid status,
+  // posts to the gateway, opens the proposal preview.
+  if (cmd === 'report-approve-submit') {
+    const gw = process.env.NEXT_PUBLIC_HALOPENCLAW_URL ?? 'http://localhost:18080'
+    fetch(`${gw}/projects/${ACTIVE_PROJECT_ID}/approve`, {
+      method: 'POST',
+    }).catch(() => {/* best effort */})
+    window.open(`/bid-demo/${ACTIVE_PROJECT_ID}/proposal.html`, '_blank')
+  }
 }
 
 export default function Home() {

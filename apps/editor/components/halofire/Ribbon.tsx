@@ -34,6 +34,8 @@ export type RibbonCommand =
   | 'report-submittal'
   | 'report-export-dxf'
   | 'report-export-ifc'
+  | 'report-nfpa-8'
+  | 'report-approve-submit'
   | 'report-send-to-client'
 
 type RibbonTab = 'design' | 'analyze' | 'report'
@@ -97,10 +99,17 @@ const TABS: Record<RibbonTab, Group[]> = {
   ],
   report: [
     {
-      label: 'Generate',
+      label: 'Submittal',
       buttons: [
         { cmd: 'report-proposal', label: 'Proposal', tone: 'accent' },
-        { cmd: 'report-submittal', label: 'Submittal' },
+        // V2 Phase 5.1: NFPA 8-section AHJ submittal
+        {
+          cmd: 'report-nfpa-8',
+          label: 'NFPA 8-Report',
+          hint: 'Open the AHJ-grade NFPA 13 §27 + Annex E submittal',
+          tone: 'accent',
+        },
+        { cmd: 'report-submittal', label: 'Submittal package' },
       ],
     },
     {
@@ -111,13 +120,20 @@ const TABS: Record<RibbonTab, Group[]> = {
       ],
     },
     {
-      label: 'Client',
+      label: 'Approve',
       buttons: [
+        // V2 Phase 5.2: Wade-flow buttons. After Auto-Bid runs and
+        // the PE reviews the 3D model, one click sends the bid.
+        {
+          cmd: 'report-approve-submit',
+          label: 'Approve & Submit',
+          hint: 'Mark bid pe-reviewed, send to client + AHJ',
+          tone: 'accent',
+        },
         {
           cmd: 'report-send-to-client',
           label: 'Send bid',
           hint: 'Deliver proposal.html + design.glb to the client portal',
-          tone: 'accent',
         },
       ],
     },
