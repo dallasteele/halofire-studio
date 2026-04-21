@@ -116,3 +116,31 @@ export interface PipelineProgressEvent {
 export interface CatalogUpdatedEvent {
   version: string
 }
+
+/**
+ * Subset of the hydraulic solver's per-system output that the
+ * LiveCalc panel actually renders. The Rust `run_hydraulic` command
+ * returns this wrapped as `{ systems: [{ hydraulic: HydraulicResult, … }] }`
+ * — matching the gateway's `POST /projects/:id/hydraulic` shape so the
+ * fetch fallback and the Tauri path are interchangeable.
+ */
+export interface HydraulicResult {
+  required_flow_gpm?: number | null
+  required_pressure_psi?: number | null
+  safety_margin_psi?: number | null
+  supply_static_psi?: number | null
+  supply_residual_psi?: number | null
+  [key: string]: unknown
+}
+
+/** Wire shape of `run_hydraulic` — mirrors both the Tauri command
+ * and the FastAPI `POST /projects/:id/hydraulic` reply. */
+export interface RunHydraulicResponse {
+  systems: Array<{
+    id?: string
+    hazard?: string
+    hydraulic?: HydraulicResult
+    [key: string]: unknown
+  }>
+  [key: string]: unknown
+}

@@ -34,6 +34,8 @@ pub fn run() {
             commands::host::greet,
             commands::host::versions,
             commands::pipeline::run_pipeline,
+            commands::hydraulic::run_hydraulic,
+            commands::hydraulic::read_deliverable,
             commands::scad::render_scad,
             commands::scad::scad_runtime_status,
             commands::catalog::list_scad_templates,

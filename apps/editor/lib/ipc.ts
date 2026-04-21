@@ -33,6 +33,7 @@ import type {
   ProjectEntry,
   RenderResult,
   RenderScadArgs,
+  RunHydraulicResponse,
   RunPipelineArgs,
   RuntimeStatus,
 } from './ipc.types'
@@ -229,6 +230,50 @@ export const ipc = {
     const t = await loadTauri()
     if (t) return t.invoke<CatalogTemplate[]>('list_scad_templates')
     return fetchJson<CatalogTemplate[]>('/catalog/scad/templates')
+  },
+
+  // Hydraulic / deliverables (R10.3) -------------------------------
+
+  /**
+   * Re-run (read-semantics) the hydraulic solver for a project.
+   *
+   * * Tauri mode: invokes the Rust `run_hydraulic` command, which
+   *   reads `design.json` from the project's deliverables dir and
+   *   returns `{ systems: [...] }`. No localhost port required.
+   * * Fetch mode: POSTs to the gateway's
+   *   `POST /projects/:id/hydraulic`, which actually re-solves.
+   */
+  async runHydraulic(args: {
+    projectId: string
+  }): Promise<RunHydraulicResponse> {
+    const t = await loadTauri()
+    if (t) return t.invoke<RunHydraulicResponse>('run_hydraulic', { args })
+    return fetchJson<RunHydraulicResponse>(
+      `/projects/${encodeURIComponent(args.projectId)}/hydraulic`,
+      { method: 'POST', cache: 'no-store' },
+    )
+  },
+
+  /**
+   * Read a named JSON deliverable from a project.
+   *
+   * * Tauri mode: invokes the Rust `read_deliverable` command, which
+   *   resolves `app_data_dir()/projects/<id>/deliverables/<name>`
+   *   under allow-list + traversal guards (`..`, path separators,
+   *   non-`.json` extensions all rejected).
+   * * Fetch mode: GETs `GET /projects/:id/deliverable/:name` from the
+   *   gateway.
+   */
+  async readDeliverable(args: {
+    projectId: string
+    name: string
+  }): Promise<unknown> {
+    const t = await loadTauri()
+    if (t) return t.invoke<unknown>('read_deliverable', { args })
+    return fetchJson<unknown>(
+      `/projects/${encodeURIComponent(args.projectId)}/deliverable/${encodeURIComponent(args.name)}`,
+      { cache: 'no-store' },
+    )
   },
 
   // Project --------------------------------------------------------

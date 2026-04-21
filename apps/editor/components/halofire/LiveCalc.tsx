@@ -19,6 +19,8 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+import { ipc } from '@/lib/ipc'
+
 type Result = {
   required_flow_gpm?: number | null
   required_pressure_psi?: number | null
@@ -39,6 +41,8 @@ type State =
   | { kind: 'error'; error: string; at: number; origin?: string }
 
 interface Props {
+  /** @deprecated R10.3 — the IPC facade owns routing now; kept for
+   * backward-compat with callers that still pass it, but ignored. */
   gatewayUrl?: string
   projectId?: string
   /** Disable the auto-recalc debounce, keep manual trigger only. */
@@ -48,11 +52,12 @@ interface Props {
 }
 
 export function LiveCalc({
-  gatewayUrl = 'http://localhost:18080',
+  gatewayUrl: _gatewayUrl,
   projectId = '1881-cooperative',
   manualOnly = false,
   debounceMs = 1500,
 }: Props) {
+  void _gatewayUrl // R10.3: prop retained for API stability, unused
   const [state, setState] = useState<State>({ kind: 'idle' })
   const [visible, setVisible] = useState(false)
   const timerRef = useRef<number | null>(null)
@@ -63,51 +68,48 @@ export function LiveCalc({
     setState({ kind: 'running', origin })
     setVisible(true)
     try {
-      // Hydraulic re-calc (primary).
-      // TODO(R10.3 gap): no Tauri command yet for `POST /projects/:id/hydraulic`.
-      // Follow-up should add `ipc.runHydraulic({ projectId })` backed by a
-      // Rust command in `apps/halofire-studio-desktop/src-tauri/src/commands/`
-      // so this panel works inside the desktop shell without a gateway.
-      const res = await fetch(
-        `${gatewayUrl}/projects/${projectId}/hydraulic`,
-        { method: 'POST', cache: 'no-store' },
-      )
-      if (!res.ok) throw new Error(`gateway ${res.status}`)
-      const body = await res.json()
-      const hr = body?.systems?.[0]?.hydraulic ?? body ?? {}
-      // BOM snapshot (best-effort — if not exposed, leave nulls).
-      // TODO(R10.3 gap): no Tauri command for deliverable reads either —
-      // follow-up can add `ipc.readDeliverable({ projectId, name })` that
-      // reads from disk directly in desktop mode instead of re-fetching
-      // through the gateway.
+      // Hydraulic re-calc (primary). R10.3: routed through the IPC
+      // facade — Tauri mode reads `design.json` from the desktop
+      // shell's per-user data dir; browser/dev mode falls back to
+      // `POST /projects/:id/hydraulic` against the gateway.
+      const body = (await ipc.runHydraulic({ projectId })) as {
+        systems?: Array<{ hydraulic?: Record<string, unknown> }>
+      } & Record<string, unknown>
+      const hr = (body?.systems?.[0]?.hydraulic ?? body ?? {}) as Record<
+        string,
+        unknown
+      >
+      // BOM snapshot (best-effort — if not exposed, leave nulls). R10.3:
+      // routed through `ipc.readDeliverable` so the desktop shell
+      // reads the summary file directly from disk.
       let bid: number | null = null
       let heads: number | null = null
       try {
-        const br = await fetch(
-          `${gatewayUrl}/projects/${projectId}/deliverable/pipeline_summary.json`,
-          { cache: 'no-store' },
-        )
-        if (br.ok) {
-          const summary = await br.json()
-          const proposalStep = (summary?.steps ?? []).find(
-            (s: { step?: string }) => s?.step === 'proposal',
-          )
-          const bomStep = (summary?.steps ?? []).find(
-            (s: { step?: string }) => s?.step === 'bom',
-          )
-          bid = proposalStep?.total_usd ?? bomStep?.total_usd ?? null
-          // head_count lives on the building or hydraulic stage
-          const hstep = (summary?.steps ?? []).find(
-            (s: { step?: string; head_count?: number }) =>
-              s?.head_count !== undefined,
-          )
-          heads = hstep?.head_count ?? null
+        const summary = (await ipc.readDeliverable({
+          projectId,
+          name: 'pipeline_summary.json',
+        })) as {
+          steps?: Array<{
+            step?: string
+            total_usd?: number
+            head_count?: number
+          }>
         }
+        const proposalStep = (summary?.steps ?? []).find(
+          (s) => s?.step === 'proposal',
+        )
+        const bomStep = (summary?.steps ?? []).find((s) => s?.step === 'bom')
+        bid = proposalStep?.total_usd ?? bomStep?.total_usd ?? null
+        // head_count lives on the building or hydraulic stage
+        const hstep = (summary?.steps ?? []).find(
+          (s) => s?.head_count !== undefined,
+        )
+        heads = hstep?.head_count ?? null
       } catch {
         // non-fatal — bid/heads stay null
       }
       const result: Result = {
-        ...hr,
+        ...(hr as Result),
         bid_total_usd: bid,
         head_count: heads,
       }
@@ -123,7 +125,7 @@ export function LiveCalc({
     } catch (e) {
       setState({ kind: 'error', error: String(e), at: Date.now(), origin })
     }
-  }, [gatewayUrl, projectId])
+  }, [projectId])
 
   // Manual trigger via ribbon command
   useEffect(() => {
