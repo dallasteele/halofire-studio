@@ -2,6 +2,20 @@
 // NFPA 13 §17 mandates one hanger per pipe segment (per spacing
 // table). Local origin = pipe center; rod extends UP.
 // V2 Phase 4.1.
+//
+// @part hanger
+// @kind hanger
+// @category hanger.clevis
+// @display-name "Clevis Hanger + Rod (2\")"
+// @mfg anvil
+// @mfg-pn Fig-260
+// @price-usd 6.50
+// @install-minutes 10
+// @crew apprentice
+// @param pipe_size_in enum[1,1.25,1.5,2,2.5,3,4] default=2 label="Pipe Size" unit="in"
+// @param rod_length_mm number[100,1000] default=250 label="Rod Length" unit="mm"
+// @param rod_diameter_mm number[6,13] default=9.5 label="Rod Diameter" unit="mm"
+// @port pipe position=[0,0,0] direction=[0,0,1] style=none size_in=2 role=branch
 
 pipe_size_in = 2;
 rod_length_mm = 250;          // 10" drop typical

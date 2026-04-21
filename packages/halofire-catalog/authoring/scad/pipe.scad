@@ -9,6 +9,21 @@
 //
 // Local convention matches connectorsFor(): end_a at -Z/2, end_b at +Z/2.
 
+// @part pipe
+// @kind pipe_segment
+// @category pipe.sch10.grooved
+// @display-name "SCH10 Grooved Pipe (2\")"
+// @mfg generic
+// @mfg-pn SCH10-GRV
+// @price-usd 5.60
+// @install-minutes 4
+// @crew journeyman
+// @param size_in enum[1,1.25,1.5,2,2.5,3,4,5,6,8,10] default=2 label="Size" unit="in"
+// @param length_m number[0.1,12] default=1.0 label="Length" unit="m"
+// @param schedule enum[sch10,sch40] default=sch10 label="Schedule"
+// @port in  position=[0,0,-0.5] direction=[0,0,-1] style=grooved size_in=2 role=run_a
+// @port out position=[0,0, 0.5] direction=[0,0, 1] style=grooved size_in=2 role=run_b
+
 size_in   = 2;
 length_m  = 1.0;
 schedule  = "sch10";

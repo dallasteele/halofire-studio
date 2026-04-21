@@ -17,6 +17,7 @@
   "dependencies": {
     "@number-flow/react": "^0.5.14",
     "@halofire/catalog": "*",
+    "@halofire/core": "*",
     "@halofire/halopenclaw-client": "*",
     "@halofire/ifc": "*",
     "@halofire/schema": "*",

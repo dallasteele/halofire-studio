@@ -3,6 +3,20 @@
 //   inlet_large:  (-L/2, 0, 0), dir (-1, 0, 0)
 //   outlet_small: (+L/2, 0, 0), dir (+1, 0, 0)
 
+// @part reducer
+// @kind fitting
+// @category fitting.reducer.concentric
+// @display-name "Concentric Reducer (2\"x1\")"
+// @mfg victaulic
+// @mfg-pn Style-50
+// @price-usd 12.00
+// @install-minutes 7
+// @crew journeyman
+// @param size_in_large enum[1.25,1.5,2,2.5,3,4,6] default=2 label="Large Size" unit="in"
+// @param size_in_small enum[1,1.25,1.5,2,2.5,3,4] default=1 label="Small Size" unit="in"
+// @port inlet_large  position=[-0.05,0,0] direction=[-1,0,0] style=grooved size_in=2 role=run_a
+// @port outlet_small position=[ 0.05,0,0] direction=[ 1,0,0] style=grooved size_in=1 role=run_b
+
 size_in_large = 2;
 size_in_small = 1;
 

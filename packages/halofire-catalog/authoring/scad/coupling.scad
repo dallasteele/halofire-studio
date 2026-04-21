@@ -1,4 +1,18 @@
 // Grooved coupling — symmetric. Ends at ±X, origin at center.
+//
+// @part coupling
+// @kind fitting
+// @category fitting.union
+// @display-name "Grooved Coupling (2\")"
+// @mfg victaulic
+// @mfg-pn Style-77
+// @price-usd 7.20
+// @install-minutes 5
+// @crew journeyman
+// @param size_in enum[1,1.25,1.5,2,2.5,3,4] default=2 label="Size" unit="in"
+// @port in  position=[-0.04,0,0] direction=[-1,0,0] style=grooved size_in=2 role=run_a
+// @port out position=[ 0.04,0,0] direction=[ 1,0,0] style=grooved size_in=2 role=run_b
+
 size_in = 2;
 
 function od_mm(nps) =

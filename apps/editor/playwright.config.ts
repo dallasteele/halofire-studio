@@ -28,6 +28,11 @@ export default defineConfig({
       testDir: '../../packages/halofire-schema/tests',
       use: { ...devices['Desktop Chrome'] },
     },
+    {
+      name: 'hf-core',
+      testDir: '../../packages/hf-core/tests',
+      use: { ...devices['Desktop Chrome'] },
+    },
   ],
   webServer: {
     command: 'node ../../node_modules/.bin/next start -p 3002',

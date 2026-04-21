@@ -17,6 +17,7 @@
       "version": "0.1.0",
       "dependencies": {
         "@halofire/catalog": "*",
+        "@halofire/core": "*",
         "@halofire/halopenclaw-client": "*",
         "@halofire/ifc": "*",
         "@halofire/schema": "*",
@@ -248,6 +249,14 @@
         "typescript": "5.9.3",
       },
     },
+    "packages/hf-core": {
+      "name": "@halofire/core",
+      "version": "0.0.0",
+      "devDependencies": {
+        "@pascal/typescript-config": "*",
+        "typescript": "5.9.3",
+      },
+    },
     "packages/typescript-config": {
       "name": "@repo/typescript-config",
       "version": "0.0.0",
@@ -448,6 +457,8 @@
     "@halofire/ai-bridge": ["@halofire/ai-bridge@workspace:packages/halofire-ai-bridge"],
 
     "@halofire/catalog": ["@halofire/catalog@workspace:packages/halofire-catalog"],
+
+    "@halofire/core": ["@halofire/core@workspace:packages/hf-core"],
 
     "@halofire/halopenclaw-client": ["@halofire/halopenclaw-client@workspace:packages/halofire-halopenclaw-client"],
 

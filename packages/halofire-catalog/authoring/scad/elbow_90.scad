@@ -7,6 +7,19 @@
 //   inlet:  position (-L/2, 0, 0), direction (-1, 0, 0)
 //   outlet: position (0, 0, L/2), direction (0, 0, 1)
 
+// @part elbow_90
+// @kind fitting
+// @category fitting.elbow90.grooved
+// @display-name "90° Grooved Elbow (2\")"
+// @mfg victaulic
+// @mfg-pn Style-10
+// @price-usd 9.20
+// @install-minutes 6
+// @crew journeyman
+// @param size_in enum[1,1.25,1.5,2,2.5,3,4] default=2 label="Size" unit="in"
+// @port in  position=[-0.05,0,0] direction=[-1,0,0] style=grooved size_in=2 role=run_a
+// @port out position=[0,0,0.05]  direction=[0,0,1]  style=grooved size_in=2 role=run_b
+
 size_in = 2;
 
 function od_mm(nps) =

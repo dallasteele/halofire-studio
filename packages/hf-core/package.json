@@ -1,0 +1,36 @@
+{
+  "name": "@halofire/core",
+  "version": "0.0.0",
+  "description": "HaloFire Studio core — SCAD annotation parser, catalog Part schema, scene translation helpers.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./catalog/part": {
+      "types": "./dist/catalog/part.d.ts",
+      "import": "./dist/catalog/part.js",
+      "default": "./dist/catalog/part.js"
+    },
+    "./scad/parse-params": {
+      "types": "./dist/scad/parse-params.d.ts",
+      "import": "./dist/scad/parse-params.js",
+      "default": "./dist/scad/parse-params.js"
+    }
+  },
+  "files": ["dist", "README.md"],
+  "scripts": {
+    "build": "tsc --build --noCheck",
+    "dev": "tsc --build --watch",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@pascal/typescript-config": "*",
+    "typescript": "5.9.3"
+  }
+}

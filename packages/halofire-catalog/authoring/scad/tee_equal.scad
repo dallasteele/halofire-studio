@@ -4,6 +4,20 @@
 //   run_out: (+L/2, 0, 0), dir (+1, 0, 0)
 //   branch:  (0, 0, L/2),  dir (0, 0, +1)
 
+// @part tee_equal
+// @kind fitting
+// @category fitting.tee.grooved
+// @display-name "Equal-Run Grooved Tee (2\")"
+// @mfg victaulic
+// @mfg-pn Style-20
+// @price-usd 11.50
+// @install-minutes 8
+// @crew journeyman
+// @param size_in enum[1,1.25,1.5,2,2.5,3,4] default=2 label="Size" unit="in"
+// @port run_in  position=[-0.06,0,0] direction=[-1,0,0] style=grooved size_in=2 role=run_a
+// @port run_out position=[0.06,0,0]  direction=[1,0,0]  style=grooved size_in=2 role=run_b
+// @port branch  position=[0,0,0.06]  direction=[0,0,1]  style=grooved size_in=2 role=branch
+
 size_in = 2;
 
 function od_mm(nps) =
