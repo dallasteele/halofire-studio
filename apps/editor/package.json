@@ -9,7 +9,9 @@
     "start": "next start",
     "lint": "biome lint",
     "check-types": "next typegen && tsc --noEmit --noCheck",
-    "check-types:halofire": "next typegen && tsc --noEmit --project tsconfig.halofire.json"
+    "check-types:halofire": "next typegen && tsc --noEmit --project tsconfig.halofire.json",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed"
   },
   "dependencies": {
     "@number-flow/react": "^0.5.14",
@@ -34,6 +36,7 @@
   },
   "devDependencies": {
     "@pascal/typescript-config": "*",
+    "@playwright/test": "^1.59.1",
     "@types/howler": "^2.2.12",
     "@types/node": "^22.19.12",
     "@types/react": "19.2.2",
