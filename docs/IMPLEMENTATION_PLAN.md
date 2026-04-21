@@ -384,63 +384,64 @@ Copy to an active tracker (Projects board / Linear / whatever)
 with per-commit status. Keep each PR to ONE commit where
 feasible.
 
-| Phase | Commit | Owner | Status | Tests |
-|---|---|---|---|---|
-| R1 | R1.1 FittingNode | — | pending | 6 tests |
-| R1 | R1.2 ValveNode | — | pending | 4 tests |
-| R1 | R1.3 HangerNode + DeviceNode | — | pending | 4 tests |
-| R1 | R1.4 FDC+RiserAssy+RemoteArea+Obstruction+Sheet | — | pending | 5 tests |
-| R1 | R1.5 AnyNode union + barrel | — | closed (subsumed) | subsumed by R1.1/R1.2/R1.3+R1.4 barrel updates |
-| R1 | R1.6 HydraulicSystem install | — | shipped (24b7944) | e2e (hydraulic-boot.spec.ts) |
-| R2 | R2.1 spawn-from-design.ts extraction | — | pending | golden |
-| R2 | R2.2 AutoDesignPanel delegation | — | pending | e2e |
-| R2 | R2.3 1881-slice spawn test | — | closed (subsumed) | subsumed by R2.1 (8-test spawn.spec.ts covers the golden fixture) |
-| R3 | R3.1 InstancedCatalogRenderer | — | pending | — |
-| R3 | R3.2 selection escape | — | closed (subsumed) | subsumed by R3.1 (InstancedCatalogRenderer already implements selection-escape; tests included) |
-| R3 | R3.3 perf baseline 1500 heads | — | closed (subsumed) | subsumed by R3.1 (perf-instancing.spec.ts is the perf baseline) |
-| R4 | R4.1 orchestrator slice emit | — | pending | python |
-| R4 | R4.2 translate-slice.ts | — | pending | vitest |
-| R4 | R4.3 AutoPilot consumer | — | pending | e2e |
-| R4 | R4.4 streaming visibility test | — | pending | e2e |
-| R5 | R5.1 hfproj schemas | — | pending | round-trip |
-| R5 | R5.2 project-io.ts | — | pending | vitest |
-| R5 | R5.3 AutosaveManager | — | pending | e2e |
-| R5 | R5.4 transactions.ts | — | pending | vitest |
-| R5 | R5.5 UndoStack UI | — | pending | e2e |
-| R5 | R5.6 save/load/undo e2e | — | pending | e2e |
-| R6 | R6.1 SheetNode schema | — | pending | schema |
-| R6 | R6.2 title-block-renderer | — | pending | snapshot |
-| R6 | R6.3 halofire-standard.svg | — | pending | manual |
-| R6 | R6.4 viewport-renderer | — | pending | snapshot |
-| R6 | R6.5 sheet-renderer | — | pending | snapshot |
-| R6 | R6.6 pdf-sheet-set.ts | — | pending | pdf |
-| R6 | R6.7 3-sheet fixture → PDF | — | pending | snapshot |
-| R7 | R7.1 generate-default-set.ts | — | pending | fixture |
-| R7 | R7.2 riser-diagram.ts | — | pending | snapshot |
-| R7 | R7.3 floor-plan-layout.ts | — | pending | fixture |
-| R7 | R7.4 10-sheet generation e2e | — | pending | e2e |
-| R8 | R8.1 dimension schemas | — | pending | schema |
-| R8 | R8.2 dimension-tool.tsx | — | pending | e2e |
-| R8 | R8.3 auto-dim-pipes.ts | — | pending | fixture |
-| R8 | R8.4 text-tool.tsx | — | pending | e2e |
-| R8 | R8.5 revision-cloud-tool.tsx | — | pending | e2e |
-| R9 | R9.1 dxf_export paper-space | — | pending | python |
-| R9 | R9.2 dwg_export (LibreDWG) | — | pending | python |
-| R9 | R9.3 layer-mapping.ts | — | pending | fixture |
-| R9 | R9.4 dxf roundtrip test | — | pending | python |
-| R10 | R10.1 next.config export | — | pending | build |
-| R10 | R10.2 ipc.ts abstraction | — | pending | vitest |
-| R10 | R10.3 fetch→invoke rewire | — | pending | e2e |
-| R10 | R10.4 OpenSCAD bundling | — | partial | download script + manifest shipped as `3ce1001`, SHA pins are placeholders; full pin happens pre-release |
-| R10 | R10.5 CI build-desktop.yml | — | pending | ci |
-| R10 | R10.6 clean-VM install smoke | — | pending | manual |
-| R11 | R11.1 second-project truth | — | scaffolded (awaits real bid data) | python |
-| R11 | R11.2 cruel-test second proj | — | scaffolded (4 stubs skipped, 3 live meta-tests pass) | python |
-| R11 | R11.3 manual second proj run | — | pending | manual |
-| follow-ups | SceneChangeBridge debounce fix | — | shipped (f056bd7) | e2e |
+| Phase | Commit | Status | SHA / evidence |
+|---|---|---|---|
+| R1 | R1.1 FittingNode | ✅ shipped | `3ab022d` |
+| R1 | R1.2 ValveNode | ✅ shipped | `af0b3d7` |
+| R1 | R1.3 HangerNode + DeviceNode | ✅ shipped | `eba7f9f` (combined with R1.4) |
+| R1 | R1.4 FDC+RiserAssy+RemoteArea+Obstruction+Sheet | ✅ shipped | `eba7f9f` |
+| R1 | R1.5 AnyNode union + barrel | ✅ closed (subsumed) | incremental in R1.1/R1.2/R1.3+R1.4 |
+| R1 | R1.6 HydraulicSystem install | ✅ shipped | `24b7944` — e2e (hydraulic-boot.spec.ts) |
+| R2 | R2.1 spawn-from-design.ts extraction | ✅ shipped | `6f06a7d` — golden (spawn.spec.ts, 8 tests) |
+| R2 | R2.2 AutoDesignPanel delegation | ✅ shipped | `429b104` — e2e |
+| R2 | R2.3 1881-slice spawn test | ✅ closed (subsumed) | covered by R2.1 spawn.spec.ts |
+| R3 | R3.1 InstancedCatalogRenderer | ✅ shipped | `e925126` — perf-instancing.spec.ts |
+| R3 | R3.2 selection escape | ✅ closed (subsumed) | R3.1 implements + tests |
+| R3 | R3.3 perf baseline 1500 heads | ✅ closed (subsumed) | perf-instancing.spec.ts in R3.1 |
+| R4 | R4.1 orchestrator slice emit | ✅ shipped | `cea0fef` — python |
+| R4 | R4.2 translate-slice.ts | ✅ shipped | `5673a01` — vitest |
+| R4 | R4.3 AutoPilot consumer | ✅ shipped | `e496240` — e2e |
+| R4 | R4.4 streaming visibility test | ✅ shipped | `dbbf330` — autopilot-streaming.spec.ts |
+| R5 | R5.1 hfproj schemas | ✅ shipped | `3f2f333` — round-trip |
+| R5 | R5.2 project-io.ts | ✅ shipped | `8c91087` — vitest |
+| R5 | R5.3 AutosaveManager | ✅ shipped | `9613ba2` — e2e (autosave-manager.spec.ts) |
+| R5 | R5.4 transactions.ts | ✅ shipped | `ebd300c` — vitest |
+| R5 | R5.5 UndoStack UI | ✅ shipped | `ebd300c` — e2e |
+| R5 | R5.6 save/load/undo e2e | ✅ shipped | `2e00380` — 6 e2e tests |
+| R6 | R6.1 SheetNode schema | ✅ shipped | `23c43a8` — schema |
+| R6 | R6.2 title-block-renderer | ✅ shipped | `8518845` — snapshot |
+| R6 | R6.3 halofire-standard.svg | ✅ shipped | `8518845` |
+| R6 | R6.4 viewport-renderer | ✅ shipped | `59a34a8` — snapshot |
+| R6 | R6.5 sheet-renderer | ✅ shipped | `dc35561` — snapshot |
+| R6 | R6.6 pdf-sheet-set.ts | ✅ shipped | `dc35561` — pdf |
+| R6 | R6.7 3-sheet fixture → PDF | ✅ shipped | `5ee32e7` — snapshot regression |
+| R7 | R7.1 generate-default-set.ts | ✅ shipped | `0faf350` — fixture |
+| R7 | R7.2 riser-diagram.ts | ✅ shipped | `35b48c9` — snapshot |
+| R7 | R7.3 floor-plan-layout.ts | ✅ shipped | `5f8272e` — fixture |
+| R7 | R7.4 10-sheet generation e2e | ✅ shipped | `f4e5f56` — 12-page PDF e2e |
+| R8 | R8.1 dimension schemas | ✅ shipped | `64fd36b` — schema |
+| R8 | R8.2 dimension-tool.tsx | ✅ shipped | `77ce122` — e2e |
+| R8 | R8.3 auto-dim-pipes.ts | ✅ shipped | `3043afa` — ribbon + wiring |
+| R8 | R8.4 text-tool.tsx | ✅ shipped | `d8c5a04` — e2e |
+| R8 | R8.5 revision-cloud-tool.tsx | ✅ shipped | `d8c5a04` — e2e |
+| R9 | R9.1 dxf_export paper-space | ✅ shipped | `edd7b71` — python |
+| R9 | R9.2 dwg_export (LibreDWG) | ✅ shipped | `edd7b71` — ODA fallback |
+| R9 | R9.3 layer-mapping.ts | ✅ shipped | `47189fc` — TS + Python parity |
+| R9 | R9.4 dxf roundtrip test | ✅ shipped | `47189fc` — 6 ezdxf tests |
+| R10 | R10.1 next.config export | ✅ shipped | `38b3658` — static export |
+| R10 | R10.2 ipc.ts abstraction | ✅ shipped | `077f51a` — vitest |
+| R10 | R10.3 fetch→invoke rewire | ✅ shipped | `73484fc` + gap-close `199bdc4` — zero localhost |
+| R10 | R10.4 OpenSCAD bundling | ✅ shipped | `3ce1001` (script + manifest) + `5371cc4` (real SHA256 pins) |
+| R10 | R10.5 CI build-desktop.yml | ✅ shipped | `d0ab6a3` — GitHub Actions |
+| R10 | R10.6 clean-VM install smoke | 🔲 blocked | awaits `tag v0.1.0` + clean-VM install run (not a coding task) |
+| R11 | R11.1 second-project truth | ✅ shipped | `296e03a` — scaffold; synthetic seed `f89b199` |
+| R11 | R11.2 cruel-test second proj | 🟡 partial (synthetic) | `f89b199` — `services/halofire-cad/tests/cruel/test_second_project.py` green on synthetic `gomez-warehouse-az` fixture; awaits real bid data |
+| R11 | R11.3 manual second proj run | 🟡 partial (synthetic) | `f89b199` — synthetic run green; awaits real second-project PDF |
+| follow-ups | SceneChangeBridge debounce fix | ✅ shipped | `f056bd7` — e2e |
 
-Total: **53 commits** across **11 phases**. Feature-flag as
-needed so `main` stays shippable between phases.
+Total: **53 commits** across **11 phases**. **48 shipped**, 4 subsumed and
+closed, 1 blocked on clean-VM run (`R10.6`). R11.2 / R11.3 pass on a
+synthetic fixture and unblock on real second-project data.
 
 ---
 

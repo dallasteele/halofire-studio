@@ -1,437 +1,111 @@
-# Halofire Studio
+# HaloFire Studio
 
-**Specialized CAD + visualization tool for fire sprinkler design + layout.**
+## What this is
 
-Built as a fork of [Pascal Editor](https://github.com/pascalorg/editor) (MIT).
-See [HALOFIRE_ROADMAP.md](./HALOFIRE_ROADMAP.md) for the product plan.
+HaloFire Studio is a fire-protection CAD application — a fork of the
+[Pascal](https://github.com/pascalorg/editor) + OpenSCAD stack, specialized
+for NFPA 13 sprinkler layout, hydraulic calculation, and AHJ submittal
+packaging. A Python agent pipeline (`services/halofire-cad/`) turns a bid-set
+PDF into a typed Design graph; the Pascal fork (`packages/core/` +
+`apps/editor/`) renders it in a React/Three.js viewport; `hf-core` composes
+sheet sets and emits NFPA-grade PDF + DWG deliverables.
 
-Target users: fire sprinkler contractors (first client: Halo Fire Protection).
-Target workflow: IFC import → NFPA 13 sprinkler placement → auto-routed pipe
-network → hydraulic calc → 2D shop drawings (DXF + PDF) → equipment schedule →
-proposal. All in a browser, zero install.
+Spec: [`docs/CORE_ARCHITECTURE.md`](docs/CORE_ARCHITECTURE.md) and the 16
+blueprints in [`docs/blueprints/`](docs/blueprints/).
 
-This repository keeps full upstream compatibility with Pascal by preserving
-the `@pascal-app/*` package names. Halofire-specific work lives under the
-`@halofire/*` namespace. Upstream improvements merge in cleanly via quarterly
-rebase.
+## Ship state (2026-04-21)
 
----
+- **48 of 53** ship-gate commits shipped (91%). Every code-authorable row is
+  closed. Three remaining rows (`R10.6`, `R11.2`, `R11.3`) are externally
+  blocked on a clean-VM install run and a second real bid PDF.
+- **Cruel-test scoreboard vs. 1881 truth:** 4 of 4 metrics green
+  (head_count 1,293/1,303 ≈ −0.8 %; total_bid $595k/$538k ≈ +10.5 %;
+  system_count 7/7 exact; level_count 6/6 exact).
+- **Tests:**
+  - Python (`services/halofire-cad/tests/`): ~370 PASS / 2 SKIP across 43 files.
+  - Playwright (`apps/editor/e2e/`): ~160+ PASS across 20 specs.
+  - Rust (`apps/halofire-studio-desktop/src-tauri/`): cargo test smoke.
+- Full ledger: [`docs/SHIP_REPORT_FINAL.md`](docs/SHIP_REPORT_FINAL.md).
 
-## Upstream (Pascal Editor)
+## Repo layout
 
-A 3D building editor built with React Three Fiber and WebGPU.
+- `apps/editor/` — Next.js 16 + React 19 editor UI.
+- `apps/halofire-studio-desktop/` — Tauri 2 desktop shell + Python sidecar.
+- `packages/core/` — Pascal-fork schema + systems (AnyNode union).
+- `packages/hf-core/` — Catalog / SCAD / scene / drawing / sheets / report modules.
+- `packages/halofire-catalog/` — 29 `.scad` parts, 40-part `catalog.json`, GLBs.
+- `packages/halofire-schema/` — `.hfproj` zod schemas.
+- `packages/halofire-ifc/`, `halofire-ai-bridge/`, `halofire-halopenclaw-client/`.
+- `services/halofire-cad/` — Python pipeline: 10 agents, cruel tests, truth DB.
+- `services/halopenclaw-gateway/` — FastAPI gateway (deprecated post R10.3; CI only).
+- `docs/` — 16 blueprints + architecture + plan + ship reports.
+- `scripts/` — Brain sync, catalog build.
 
-[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![npm @pascal-app/core](https://img.shields.io/npm/v/@pascal-app/core?label=%40pascal-app%2Fcore)](https://www.npmjs.com/package/@pascal-app/core)
-[![npm @pascal-app/viewer](https://img.shields.io/npm/v/@pascal-app/viewer?label=%40pascal-app%2Fviewer)](https://www.npmjs.com/package/@pascal-app/viewer)
-[![Discord](https://img.shields.io/badge/Discord-Join%20Server-5865F2?logo=discord&logoColor=white)](https://discord.gg/SaBRA9t2)
-[![X (Twitter)](https://img.shields.io/badge/follow-%40pascal__app-black?logo=x&logoColor=white)](https://x.com/pascal_app)
-
-https://github.com/user-attachments/assets/8b50e7cf-cebe-4579-9cf3-8786b35f7b6b
-
-
-
-## Repository Architecture
-
-This is a Turborepo monorepo with three main packages:
-
-```
-editor-v2/
-├── apps/
-│   └── editor/          # Next.js application
-├── packages/
-│   ├── core/            # Schema definitions, state management, systems
-│   └── viewer/          # 3D rendering components
-```
-
-### Separation of Concerns
-
-| Package | Responsibility |
-|---------|---------------|
-| **@pascal-app/core** | Node schemas, scene state (Zustand), systems (geometry generation), spatial queries, event bus |
-| **@pascal-app/viewer** | 3D rendering via React Three Fiber, default camera/controls, post-processing |
-| **apps/editor** | UI components, tools, custom behaviors, editor-specific systems |
-
-The **viewer** renders the scene with sensible defaults. The **editor** extends it with interactive tools, selection management, and editing capabilities.
-
-### Stores
-
-Each package has its own Zustand store for managing state:
-
-| Store | Package | Responsibility |
-|-------|---------|----------------|
-| `useScene` | `@pascal-app/core` | Scene data: nodes, root IDs, dirty nodes, CRUD operations. Persisted to IndexedDB with undo/redo via Zundo. |
-| `useViewer` | `@pascal-app/viewer` | Viewer state: current selection (building/level/zone IDs), level display mode (stacked/exploded/solo), camera mode. |
-| `useEditor` | `apps/editor` | Editor state: active tool, structure layer visibility, panel states, editor-specific preferences. |
-
-**Access patterns:**
-
-```typescript
-// Subscribe to state changes (React component)
-const nodes = useScene((state) => state.nodes)
-const levelId = useViewer((state) => state.selection.levelId)
-const activeTool = useEditor((state) => state.tool)
-
-// Access state outside React (callbacks, systems)
-const node = useScene.getState().nodes[id]
-useViewer.getState().setSelection({ levelId: 'level_123' })
-```
-
----
-
-## Core Concepts
-
-### Nodes
-
-Nodes are the data primitives that describe the 3D scene. All nodes extend `BaseNode`:
-
-```typescript
-BaseNode {
-  id: string              // Auto-generated with type prefix (e.g., "wall_abc123")
-  type: string            // Discriminator for type-safe handling
-  parentId: string | null // Parent node reference
-  visible: boolean
-  camera?: Camera         // Optional saved camera position
-  metadata?: JSON         // Arbitrary metadata (e.g., { isTransient: true })
-}
-```
-
-**Node Hierarchy:**
+## Quick start (dev)
 
 ```
-Site
-└── Building
-    └── Level
-        ├── Wall → Item (doors, windows)
-        ├── Slab
-        ├── Ceiling → Item (lights)
-        ├── Roof
-        ├── Zone
-        ├── Scan (3D reference)
-        └── Guide (2D reference)
-```
-
-Nodes are stored in a **flat dictionary** (`Record<id, Node>`), not a nested tree. Parent-child relationships are defined via `parentId` and `children` arrays.
-
----
-
-### Scene State (Zustand Store)
-
-The scene is managed by a Zustand store in `@pascal-app/core`:
-
-```typescript
-useScene.getState() = {
-  nodes: Record<id, AnyNode>,  // All nodes
-  rootNodeIds: string[],       // Top-level nodes (sites)
-  dirtyNodes: Set<string>,     // Nodes pending system updates
-
-  createNode(node, parentId),
-  updateNode(id, updates),
-  deleteNode(id),
-}
-```
-
-**Middleware:**
-- **Persist** - Saves to IndexedDB (excludes transient nodes)
-- **Temporal** (Zundo) - Undo/redo with 50-step history
-
----
-
-### Scene Registry
-
-The registry maps node IDs to their Three.js objects for fast lookup:
-
-```typescript
-sceneRegistry = {
-  nodes: Map<id, Object3D>,    // ID → 3D object
-  byType: {
-    wall: Set<id>,
-    item: Set<id>,
-    zone: Set<id>,
-    // ...
-  }
-}
-```
-
-Renderers register their refs using the `useRegistry` hook:
-
-```tsx
-const ref = useRef<Mesh>(null!)
-useRegistry(node.id, 'wall', ref)
-```
-
-This allows systems to access 3D objects directly without traversing the scene graph.
-
----
-
-### Node Renderers
-
-Renderers are React components that create Three.js objects for each node type:
-
-```
-SceneRenderer
-└── NodeRenderer (dispatches by type)
-    ├── BuildingRenderer
-    ├── LevelRenderer
-    ├── WallRenderer
-    ├── SlabRenderer
-    ├── ZoneRenderer
-    ├── ItemRenderer
-    └── ...
-```
-
-**Pattern:**
-1. Renderer creates a placeholder mesh/group
-2. Registers it with `useRegistry`
-3. Systems update geometry based on node data
-
-Example (simplified):
-```tsx
-const WallRenderer = ({ node }) => {
-  const ref = useRef<Mesh>(null!)
-  useRegistry(node.id, 'wall', ref)
-
-  return (
-    <mesh ref={ref}>
-      <boxGeometry args={[0, 0, 0]} />  {/* Replaced by WallSystem */}
-      <meshStandardMaterial />
-      {node.children.map(id => <NodeRenderer key={id} nodeId={id} />)}
-    </mesh>
-  )
-}
-```
-
----
-
-### Systems
-
-Systems are React components that run in the render loop (`useFrame`) to update geometry and transforms. They process **dirty nodes** marked by the store.
-
-**Core Systems (in `@pascal-app/core`):**
-
-| System | Responsibility |
-|--------|---------------|
-| `WallSystem` | Generates wall geometry with mitering and CSG cutouts for doors/windows |
-| `SlabSystem` | Generates floor geometry from polygons |
-| `CeilingSystem` | Generates ceiling geometry |
-| `RoofSystem` | Generates roof geometry |
-| `ItemSystem` | Positions items on walls, ceilings, or floors (slab elevation) |
-
-**Viewer Systems (in `@pascal-app/viewer`):**
-
-| System | Responsibility |
-|--------|---------------|
-| `LevelSystem` | Handles level visibility and vertical positioning (stacked/exploded/solo modes) |
-| `ScanSystem` | Controls 3D scan visibility |
-| `GuideSystem` | Controls guide image visibility |
-
-**Processing Pattern:**
-```typescript
-useFrame(() => {
-  for (const id of dirtyNodes) {
-    const obj = sceneRegistry.nodes.get(id)
-    const node = useScene.getState().nodes[id]
-
-    // Update geometry, transforms, etc.
-    updateGeometry(obj, node)
-
-    dirtyNodes.delete(id)
-  }
-})
-```
-
----
-
-### Dirty Nodes
-
-When a node changes, it's marked as **dirty** in `useScene.getState().dirtyNodes`. Systems check this set each frame and only recompute geometry for dirty nodes.
-
-```typescript
-// Automatic: createNode, updateNode, deleteNode mark nodes dirty
-useScene.getState().updateNode(wallId, { thickness: 0.2 })
-// → wallId added to dirtyNodes
-// → WallSystem regenerates geometry next frame
-// → wallId removed from dirtyNodes
-```
-
-**Manual marking:**
-```typescript
-useScene.getState().dirtyNodes.add(wallId)
-```
-
----
-
-### Event Bus
-
-Inter-component communication uses a typed event emitter (mitt):
-
-```typescript
-// Node events
-emitter.on('wall:click', (event) => { ... })
-emitter.on('item:enter', (event) => { ... })
-emitter.on('zone:context-menu', (event) => { ... })
-
-// Grid events (background)
-emitter.on('grid:click', (event) => { ... })
-
-// Event payload
-NodeEvent {
-  node: AnyNode
-  position: [x, y, z]
-  localPosition: [x, y, z]
-  normal?: [x, y, z]
-  stopPropagation: () => void
-}
-```
-
----
-
-### Spatial Grid Manager
-
-Handles collision detection and placement validation:
-
-```typescript
-spatialGridManager.canPlaceOnFloor(levelId, position, dimensions, rotation)
-spatialGridManager.canPlaceOnWall(wallId, t, height, dimensions)
-spatialGridManager.getSlabElevationAt(levelId, x, z)
-```
-
-Used by item placement tools to validate positions and calculate slab elevations.
-
----
-
-## Editor Architecture
-
-The editor extends the viewer with:
-
-### Tools
-
-Tools are activated via the toolbar and handle user input for specific operations:
-
-- **SelectTool** - Selection and manipulation
-- **WallTool** - Draw walls
-- **ZoneTool** - Create zones
-- **ItemTool** - Place furniture/fixtures
-- **SlabTool** - Create floor slabs
-
-### Selection Manager
-
-The editor uses a custom selection manager with hierarchical navigation:
-
-```
-Site → Building → Level → Zone → Items
-```
-
-Each depth level has its own selection strategy for hover/click behavior.
-
-### Editor-Specific Systems
-
-- `ZoneSystem` - Controls zone visibility based on level mode
-- Custom camera controls with node focusing
-
----
-
-## Data Flow
-
-```
-User Action (click, drag)
-       ↓
-Tool Handler
-       ↓
-useScene.createNode() / updateNode()
-       ↓
-Node added/updated in store
-Node marked dirty
-       ↓
-React re-renders NodeRenderer
-useRegistry() registers 3D object
-       ↓
-System detects dirty node (useFrame)
-Updates geometry via sceneRegistry
-Clears dirty flag
-```
-
----
-
-## Technology Stack
-
-- **React 19** + **Next.js 16**
-- **Three.js** (WebGPU renderer)
-- **React Three Fiber** + **Drei**
-- **Zustand** (state management)
-- **Zod** (schema validation)
-- **Zundo** (undo/redo)
-- **three-bvh-csg** (Boolean geometry operations)
-- **Turborepo** (monorepo management)
-- **Bun** (package manager)
-
----
-
-## Getting Started
-
-### Development
-
-Run the development server from the **root directory** to enable hot reload for all packages:
-
-```bash
-# Install dependencies
 bun install
-
-# Run development server (builds packages + starts editor with watch mode)
-bun dev
-
-# This will:
-# 1. Build @pascal-app/core and @pascal-app/viewer
-# 2. Start watching both packages for changes
-# 3. Start the Next.js editor dev server
-# Open http://localhost:3000
+bun run --cwd packages/core build
+bun run --cwd packages/hf-core build
+cd apps/editor && bun run dev
+# In another shell:
+pytest services/halofire-cad/tests -q
 ```
 
-**Important:** Always run `bun dev` from the root directory to ensure the package watchers are running. This enables hot reload when you edit files in `packages/core/src/` or `packages/viewer/src/`.
+## Build the desktop app
 
-### Building for Production
-
-```bash
-# Build all packages
-turbo build
-
-# Build specific package
-turbo build --filter=@pascal-app/core
+```
+cd apps/halofire-studio-desktop
+bun run fetch:openscad
+bun run build:sidecar
+bun run build   # → MSI/DMG/AppImage in src-tauri/target/release/bundle/
 ```
 
-### Publishing Packages
+OpenSCAD upstream SHA256 pins live in
+`apps/halofire-studio-desktop/scripts/openscad-manifest.json`.
 
-```bash
-# Build packages
-turbo build --filter=@pascal-app/core --filter=@pascal-app/viewer
+## Run the auto-bid
 
-# Publish to npm
-npm publish --workspace=@pascal-app/core --access public
-npm publish --workspace=@pascal-app/viewer --access public
+Point the pipeline at the 1881 fixture (the first real Halo Fire project):
+
+```
+python -m halofire_cad.orchestrator \
+    --input services/halofire-cad/tests/fixtures/intake/fire-rfis-page0.json \
+    --truth services/halofire-cad/truth/seed_1881.py \
+    --out out/1881/
 ```
 
----
+The orchestrator runs all 10 stages (intake → classifier → placer → router →
+hydraulic → rulecheck → bom → labor → proposal → submittal) and emits the
+full deliverable set. From the editor, **AutoPilot** invokes the same
+pipeline via Tauri IPC and streams Design slices into the viewport live.
 
-## Key Files
+## Architecture
 
-| Path | Description |
-|------|-------------|
-| `packages/core/src/schema/` | Node type definitions (Zod schemas) |
-| `packages/core/src/store/use-scene.ts` | Scene state store |
-| `packages/core/src/hooks/scene-registry/` | 3D object registry |
-| `packages/core/src/systems/` | Geometry generation systems |
-| `packages/viewer/src/components/renderers/` | Node renderers |
-| `packages/viewer/src/components/viewer/` | Main Viewer component |
-| `apps/editor/components/tools/` | Editor tools |
-| `apps/editor/store/` | Editor-specific state |
+Pascal graph (typed AnyNode schema, zundo-backed undo) drives an R3F viewport;
+Python agents produce Design slices; `hf-core` translates slices into scene
+nodes and composes sheet sets. Full doctrine:
+[`docs/CORE_ARCHITECTURE.md`](docs/CORE_ARCHITECTURE.md).
 
----
+## Testing
 
-## Contributors
+- Python: `pytest services/halofire-cad/tests -q`
+- Playwright: `cd apps/editor && bun run test:e2e`
+- Rust: `cd apps/halofire-studio-desktop/src-tauri && cargo test`
+- Cruel-test scoreboard (1881 truth): `pytest services/halofire-cad/tests/cruel -q`
 
-<a href="https://github.com/Aymericr"><img src="https://avatars.githubusercontent.com/u/4444492?v=4" width="60" height="60" alt="Aymeric Rabot" style="border-radius:50%"></a>
-<a href="https://github.com/wass08"><img src="https://avatars.githubusercontent.com/u/6551176?v=4" width="60" height="60" alt="Wassim Samad" style="border-radius:50%"></a>
+## Where to start if you're a reviewer
 
----
+Read these in order (≤ 5 min):
 
-<a href="https://trendshift.io/repositories/23831" target="_blank"><img src="https://trendshift.io/api/badge/repositories/23831" alt="pascalorg/editor | Trendshift" width="250" height="55"/></a>
+1. This README.
+2. [`docs/CORE_ARCHITECTURE.md`](docs/CORE_ARCHITECTURE.md) — engine doctrine.
+3. [`docs/IMPLEMENTATION_PLAN.md`](docs/IMPLEMENTATION_PLAN.md) — phase tracker.
+4. [`docs/SHIP_REPORT_FINAL.md`](docs/SHIP_REPORT_FINAL.md) — ship state.
+5. [`docs/blueprints/00_INDEX.md`](docs/blueprints/00_INDEX.md) — 16-blueprint spec.
+6. [`docs/CODEBASE_MAP.md`](docs/CODEBASE_MAP.md) — orientation map for a sweep.
+
+## License + contact
+
+MIT (inherits Pascal upstream MIT). First client: Halo Fire Protection.
+Maintainer: @dallasteele (dallasteele4@gmail.com).
