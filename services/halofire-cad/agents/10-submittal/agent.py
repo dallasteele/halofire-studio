@@ -371,8 +371,32 @@ def export_ifc(design: Design, out_path: Path) -> str:
     return str(out_path)
 
 
-def export_all(design: Design, out_dir: Path) -> dict[str, str]:
-    """Convenience: emit DXF + GLB + IFC in one call.
+def _load_sibling(module_name: str, filename: str):
+    """Load a sibling module from the ``10-submittal`` directory.
+
+    The directory starts with a digit, so standard package imports
+    won't resolve. Every sibling needs this bootstrap.
+    """
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(
+        module_name, Path(__file__).with_name(filename),
+    )
+    assert spec is not None and spec.loader is not None
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def export_all(design: Design, out_dir: Path,
+               sheets: list[dict] | None = None) -> dict[str, str]:
+    """Convenience: emit DXF + GLB + IFC + DWG in one call.
+
+    When ``sheets`` is provided, the DXF is written via
+    ``dxf_export.export_dxf_with_sheets`` (paper-space + dimensions).
+    Otherwise the back-compat model-space-only ``export_dxf`` runs.
+    DWG is produced via ``dwg_export.export_dwg_from_dxf`` against
+    the DXF that was just written; when ODA File Converter is absent
+    a placeholder DWG lands in the bundle (pipeline stays green).
 
     Export failures are collected as error entries rather than raised
     so a partial submittal bundle can still be returned. Per §1.3 each
@@ -380,8 +404,15 @@ def export_all(design: Design, out_dir: Path) -> dict[str, str]:
     """
     out_dir.mkdir(parents=True, exist_ok=True)
     paths: dict[str, str] = {}
+    dxf_path = out_dir / "design.dxf"
     try:
-        paths["dxf"] = export_dxf(design, out_dir / "design.dxf")
+        if sheets:
+            dxf_mod = _load_sibling("hf_dxf_export", "dxf_export.py")
+            paths["dxf"] = dxf_mod.export_dxf_with_sheets(
+                design, sheets, dxf_path,
+            )
+        else:
+            paths["dxf"] = export_dxf(design, dxf_path)
     except (IOError, OSError, ValueError, RuntimeError, TypeError) as e:
         warn_swallowed(log, code="DXF_EXPORT_FAILED", err=e)
         paths["dxf_error"] = str(e)
@@ -395,6 +426,18 @@ def export_all(design: Design, out_dir: Path) -> dict[str, str]:
     except (IOError, OSError, ValueError, RuntimeError, TypeError, AttributeError) as e:
         warn_swallowed(log, code="IFC_EXPORT_FAILED", err=e)
         paths["ifc_error"] = str(e)
+    try:
+        # DWG pipeline needs a DXF on disk; use the one we just emitted.
+        if dxf_path.exists():
+            dwg_mod = _load_sibling("hf_dwg_export", "dwg_export.py")
+            dwg_out = out_dir / "design.dwg"
+            dwg_mod.export_dwg_from_dxf(dxf_path, dwg_out)
+            paths["dwg"] = str(dwg_out)
+        else:
+            paths["dwg_error"] = "dxf not available; skipping DWG"
+    except (IOError, OSError, ValueError, RuntimeError, TypeError) as e:
+        warn_swallowed(log, code="DWG_EXPORT_FAILED", err=e)
+        paths["dwg_error"] = str(e)
     return paths
 
 
