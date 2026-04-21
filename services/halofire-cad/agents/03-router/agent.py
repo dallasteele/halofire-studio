@@ -497,7 +497,77 @@ def route_systems(building: Building, heads: list[Head]) -> list[System]:
         system.heads = lvl_heads
         system.hangers = _insert_hangers(segments)
         systems.append(system)
-    return systems
+    return _merge_combo_systems(systems, building)
+
+
+def _merge_combo_systems(
+    systems: list[System], building: Building,
+) -> list[System]:
+    """Real Halo bids use one combo standpipe feeding 2–3 floors per
+    branch system — a 12-level tower rarely needs 12 independent
+    systems. Group consecutive same-type levels so the final count
+    tracks how an estimator would actually lay it out.
+
+    Rules:
+      * Dry (garage) systems: 1 system per up-to-3 consecutive
+        garage-use levels. Halo groups parking decks onto a single dry
+        manifold.
+      * Wet (everything else): 1 system per up-to-2 consecutive wet
+        levels. Keeps head-count per system ≤ ~300 for hydraulics.
+      * System id becomes `sys_<type>_<first_level>_<last_level>`.
+    """
+    if len(systems) <= 1:
+        return systems
+    # Order levels by elevation so "consecutive" means "stacked"
+    level_order = {lv.id: i for i, lv in enumerate(
+        sorted(building.levels, key=lambda l: l.elevation_m)
+    )}
+    # Order systems by their first supplied level's elevation
+    ordered = sorted(
+        systems, key=lambda s: level_order.get(s.supplies[0], 1e9)
+    )
+    out: list[System] = []
+    i = 0
+    while i < len(ordered):
+        s = ordered[i]
+        group_cap = 3 if s.type == "dry" else 2
+        grouped_supplies = list(s.supplies)
+        grouped_heads = list(s.heads)
+        grouped_pipes = list(s.pipes)
+        grouped_hangers = list(s.hangers)
+        j = i + 1
+        while (
+            j < len(ordered)
+            and ordered[j].type == s.type
+            and len(grouped_supplies) < group_cap
+        ):
+            nxt = ordered[j]
+            grouped_supplies.extend(nxt.supplies)
+            grouped_heads.extend(nxt.heads)
+            grouped_pipes.extend(nxt.pipes)
+            grouped_hangers.extend(nxt.hangers)
+            j += 1
+        first_lv = grouped_supplies[0]
+        last_lv = grouped_supplies[-1]
+        merged_id = (
+            f"sys_{s.type}_{first_lv}_{last_lv}"
+            if len(grouped_supplies) > 1 else s.id
+        )
+        # Rewrite system_id on every pipe segment so BOM/labor still
+        # attribute correctly.
+        for p in grouped_pipes:
+            p.system_id = merged_id
+        out.append(System(
+            id=merged_id,
+            type=s.type,
+            supplies=grouped_supplies,
+            riser=s.riser,  # keep the lowest-level riser as the combo standpipe
+            heads=grouped_heads,
+            pipes=grouped_pipes,
+            hangers=grouped_hangers,
+        ))
+        i = j
+    return out
 
 
 if __name__ == "__main__":

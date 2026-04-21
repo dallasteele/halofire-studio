@@ -16,7 +16,27 @@
  * zero walls, the UI says so — it does NOT spawn a fake building.
  */
 
-import { generateId, LevelNode, SlabNode, useScene } from '@pascal-app/core'
+import { generateId, LevelNode, SlabNode, WallNode, useScene } from '@pascal-app/core'
+
+/** Compute the bbox of a flat list of 2D points. */
+function bboxOf(pts: Iterable<[number, number]>): {
+  minX: number
+  minY: number
+  maxX: number
+  maxY: number
+} {
+  let minX = Infinity
+  let minY = Infinity
+  let maxX = -Infinity
+  let maxY = -Infinity
+  for (const [x, y] of pts) {
+    if (x < minX) minX = x
+    if (y < minY) minY = y
+    if (x > maxX) maxX = x
+    if (y > maxY) maxY = y
+  }
+  return { minX, minY, maxX, maxY }
+}
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 const GATEWAY_URL =
@@ -71,6 +91,7 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
   const createNode = useScene((s) => s.createNode)
   const sceneNodes = useScene((s) => s.nodes)
   const deleteNode = useScene((s) => s.deleteNode)
+  const updateNode = useScene((s) => (s as any).updateNode ?? (() => undefined))
 
   /** Find the first `building` node — we need it as the parent when
    *  we create one Pascal LevelNode per architectural level. */
@@ -167,6 +188,57 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
         // Fresh run — wipe any previous auto-design spawns so the
         // viewport reflects the latest pipeline output.
         clearPreviousAutoDesign()
+
+        // Compute the global bbox of all level polygons so we can
+        // center the building at world origin (CubiCasa outputs
+        // coords in the +X/+Y quadrant; without translation the
+        // whole building sits 80–250 m away from the default 30 m
+        // property line and looks disconnected).
+        const allLevelPts: [number, number][] = []
+        for (const l of design.building?.levels ?? []) {
+          for (const p of l.polygon_m ?? []) allLevelPts.push(p)
+        }
+        const bb = allLevelPts.length > 0
+          ? bboxOf(allLevelPts)
+          : { minX: -15, minY: -15, maxX: 15, maxY: 15 }
+        const cx = (bb.minX + bb.maxX) / 2
+        const cy = (bb.minY + bb.maxY) / 2
+        const halfW = Math.max((bb.maxX - bb.minX) / 2, 10)
+        const halfH = Math.max((bb.maxY - bb.minY) / 2, 10)
+        const PAD = 5 // metres of green around the building
+        /** Shift a 2D point so the building center is at origin. */
+        const T2 = (p: [number, number]): [number, number] => [
+          p[0] - cx, p[1] - cy,
+        ]
+        /** Shift a 3D point the same way (Pascal's X/Z are our X/Y). */
+        const T3 = (p: [number, number, number]): [number, number, number] => [
+          p[0] - cx, p[1] - cy, p[2],
+        ]
+
+        // Resize the existing Site polygon so the ground grid wraps
+        // the whole building. Pascal draws its property line at z=0
+        // — we expand it to bbox + 5 m padding so the building sits
+        // inside a real lot, not floating off the 30×30 default.
+        try {
+          const site = Object.values(sceneNodes ?? {}).find(
+            (n) => (n as { type?: string }).type === 'site',
+          ) as { id: string } | undefined
+          if (site) {
+            updateNode(site.id as any, {
+              polygon: {
+                type: 'polygon',
+                points: [
+                  [-halfW - PAD, -halfH - PAD],
+                  [halfW + PAD, -halfH - PAD],
+                  [halfW + PAD, halfH + PAD],
+                  [-halfW - PAD, halfH + PAD],
+                ],
+              },
+            })
+          }
+        } catch {
+          // best effort — Pascal may reject if the shape type is wrong
+        }
         const levels: Array<{
           id: string
           name: string
@@ -174,6 +246,14 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
           height_m?: number
           use?: string
           polygon_m?: [number, number][]
+          walls?: Array<{
+            id: string
+            start_m: [number, number]
+            end_m: [number, number]
+            thickness_m?: number
+            height_m?: number
+            is_exterior?: boolean
+          }>
         }> = design.building?.levels ?? []
         const systems: Array<{
           id: string
@@ -230,7 +310,7 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
           try {
             const slab = SlabNode.parse({
               name: `${lvl.name} slab`,
-              polygon: lvl.polygon_m,
+              polygon: (lvl.polygon_m ?? []).map(T2),
               elevation: Math.max(0.05, lvl.elevation_m || 0.05),
               parentId: pascalLevelId,
               metadata: { tags: ['halofire', 'slab', 'auto_design'] },
@@ -238,6 +318,30 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
             createNode(slab as any, pascalLevelId as any)
           } catch {
             // per-level spawn is best-effort; don't block others
+          }
+
+          // Walls from intake — cap at 200 per level so a 3000-wall
+          // CubiCasa output doesn't swamp the viewport. A real floor
+          // plan has 50-150 walls typically.
+          const wallCap = 200
+          const lvlWalls = (lvl.walls ?? []).slice(0, wallCap)
+          for (const w of lvlWalls) {
+            try {
+              const wallNode = WallNode.parse({
+                start: T2(w.start_m),
+                end: T2(w.end_m),
+                thickness: w.thickness_m ?? 0.2,
+                height: w.height_m ?? 3.0,
+                parentId: pascalLevelId,
+                metadata: {
+                  tags: ['halofire', 'wall', 'auto_design'],
+                  isExterior: !!w.is_exterior,
+                },
+              })
+              createNode(wallNode as any, pascalLevelId as any)
+            } catch {
+              // skip one bad wall, keep going
+            }
           }
         })
 
@@ -269,7 +373,7 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
                 {
                   id: generateId('item'),
                   type: 'item',
-                  position: h.position_m,
+                  position: T3(h.position_m),
                   rotation: [0, 0, 0],
                   scale: [1, 1, 1],
                   children: [],
@@ -302,8 +406,8 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
           for (const p of sys.pipes ?? []) {
             if (pipesSpawned >= MAX_PIPES_VIEWPORT) break
             try {
-              const mx = (p.start_m[0] + p.end_m[0]) / 2
-              const my = (p.start_m[1] + p.end_m[1]) / 2
+              const mx = (p.start_m[0] + p.end_m[0]) / 2 - cx
+              const my = (p.start_m[1] + p.end_m[1]) / 2 - cy
               const mz = (p.start_m[2] + p.end_m[2]) / 2
               const dx = p.end_m[0] - p.start_m[0]
               const dy = p.end_m[1] - p.start_m[1]
@@ -350,6 +454,33 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
         }
       } catch (e) {
         setError(`scene render: ${String(e)}`)
+      }
+      // Diagnostic: expose scene store to window so we can
+      // self-verify node counts from the preview browser.
+      try {
+        const allNodes = Object.values(
+          (useScene.getState() as any).nodes ?? {},
+        )
+        const byType: Record<string, number> = {}
+        const autoDesign: Record<string, number> = {}
+        for (const n of allNodes as any[]) {
+          byType[n.type] = (byType[n.type] || 0) + 1
+          const tags = [
+            ...((n.asset?.tags as string[]) ?? []),
+            ...((n.metadata?.tags as string[]) ?? []),
+          ]
+          if (tags.includes('auto_design')) {
+            autoDesign[n.type] = (autoDesign[n.type] || 0) + 1
+          }
+        }
+        ;(window as any).__hf_scene_snapshot = {
+          total: allNodes.length,
+          byType,
+          autoDesign,
+          at: new Date().toISOString(),
+        }
+      } catch {
+        // best-effort diagnostic
       }
     },
     [createNode, findLevelId, findBuildingId, clearPreviousAutoDesign],

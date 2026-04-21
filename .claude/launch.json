@@ -3,9 +3,10 @@
   "configurations": [
     {
       "name": "halofire-studio",
-      "runtimeExecutable": "curl",
-      "runtimeArgs": ["-sS", "http://localhost:3002/"],
-      "port": 3002
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["./apps/editor/node_modules/.bin/next", "start", "-p", "3002", "./apps/editor"],
+      "port": 3002,
+      "cwd": "E:\\ClaudeBot\\halofire-studio"
     }
   ]
 }
