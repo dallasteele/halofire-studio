@@ -25,6 +25,11 @@
       "types": "./dist/scene/spawn-from-design.d.ts",
       "import": "./dist/scene/spawn-from-design.js",
       "default": "./dist/scene/spawn-from-design.js"
+    },
+    "./scene/translate-slice": {
+      "types": "./dist/scene/translate-slice.d.ts",
+      "import": "./dist/scene/translate-slice.js",
+      "default": "./dist/scene/translate-slice.js"
     }
   },
   "files": ["dist", "README.md"],
