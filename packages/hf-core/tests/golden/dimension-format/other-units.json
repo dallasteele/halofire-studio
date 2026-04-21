@@ -1,0 +1,26 @@
+{
+  "name": "other-unit-modes",
+  "description": "formatDimensionText for decimal_ft, m, mm unit modes. mm always rounds to integer regardless of precision.",
+  "input": {
+    "cases": [
+      { "length_m": 3.81,  "unit_display": "m",          "precision": 2 },
+      { "length_m": 3.81,  "unit_display": "mm",         "precision": 0 },
+      { "length_m": 3.81,  "unit_display": "mm",         "precision": 4 },
+      { "length_m": 3.81,  "unit_display": "decimal_ft", "precision": 2 },
+      { "length_m": 10.0,  "unit_display": "decimal_ft", "precision": 3 },
+      { "length_m": 0.0,   "unit_display": "m",          "precision": 3 }
+    ]
+  },
+  "expected": {
+    "labels": [
+      "3.81 m",
+      "3810 mm",
+      "3810 mm",
+      "12.50 ft",
+      "32.808 ft",
+      "0.000 m"
+    ]
+  },
+  "tolerance": 0,
+  "tolerance_kind": "absolute"
+}

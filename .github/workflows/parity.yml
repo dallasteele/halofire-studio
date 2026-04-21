@@ -1,0 +1,40 @@
+name: Parity
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  parity:
+    name: TS ↔ Python parity
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install JS deps
+        run: bun install
+
+      - name: Install Python deps
+        run: pip install pytest pydantic
+
+      - name: Build @halofire/core
+        run: bun run --cwd packages/hf-core build
+
+      - name: Install Playwright (chromium only)
+        run: bunx playwright install chromium --with-deps
+
+      - name: TS golden parity
+        working-directory: apps/editor
+        run: bunx playwright test --project=hf-core golden/golden.spec.ts --reporter=list
+
+      - name: Python golden parity
+        run: pytest services/halofire-cad/tests/test_golden_parity.py -v
+
+      - name: Drift guard (parity-diff)
+        run: bun run scripts/parity-diff.ts

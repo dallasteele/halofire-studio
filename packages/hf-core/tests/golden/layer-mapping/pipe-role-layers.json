@@ -1,0 +1,34 @@
+{
+  "name": "pipe-role-refined-layers",
+  "description": "pipeLayerForRole / pipe_layer_for_role — refines FP-PIPES by pipe role. Drop / branch / main family / riser family / standpipe / unknown-fallback. Blueprint 07 §10.",
+  "input": {
+    "roles": [
+      "drop",
+      "branch",
+      "cross_main",
+      "feed_main",
+      "main",
+      "riser",
+      "riser_nipple",
+      "standpipe",
+      null,
+      "unknown-role"
+    ]
+  },
+  "expected": {
+    "layers": [
+      "FP-PIPES-DROP",
+      "FP-PIPES-BRANCH",
+      "FP-PIPES-MAIN",
+      "FP-PIPES-MAIN",
+      "FP-PIPES-MAIN",
+      "FP-PIPES-RISER",
+      "FP-PIPES-RISER",
+      "FP-STANDPIPE",
+      "FP-PIPES",
+      "FP-PIPES"
+    ]
+  },
+  "tolerance": 0,
+  "tolerance_kind": "absolute"
+}

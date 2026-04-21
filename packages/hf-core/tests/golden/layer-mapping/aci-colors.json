@@ -1,0 +1,34 @@
+{
+  "name": "layer-aci-colors",
+  "description": "LAYER_ACI_COLOR map — ezdxf ACI color index per layer. Downstream tooling (plotters, Bluebeam) relies on these values being identical across TS and Python.",
+  "input": {
+    "layers": [
+      "FP-HEADS",
+      "FP-PIPES",
+      "FP-PIPES-MAIN",
+      "FP-PIPES-BRANCH",
+      "FP-PIPES-DROP",
+      "FP-PIPES-RISER",
+      "FP-FITTINGS",
+      "FP-VALVES",
+      "FP-HANGERS",
+      "FP-DEVICES",
+      "FP-FDC",
+      "FP-STANDPIPE",
+      "0-ARCH",
+      "0-ARCH-SLAB",
+      "0-ARCH-CEIL",
+      "0-ARCH-DOOR",
+      "0-ARCH-WINDOW",
+      "OBS",
+      "0-TITLE",
+      "FP-DIMS",
+      "FP-ANNOT"
+    ]
+  },
+  "expected": {
+    "colors": [1, 1, 1, 1, 1, 1, 1, 6, 3, 4, 1, 1, 8, 8, 8, 8, 5, 7, 7, 2, 2]
+  },
+  "tolerance": 0,
+  "tolerance_kind": "absolute"
+}

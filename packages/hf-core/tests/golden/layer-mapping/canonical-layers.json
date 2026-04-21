@@ -1,0 +1,48 @@
+{
+  "name": "canonical-node-type-layers",
+  "description": "Canonical Pascal node.type → DXF layer mapping (R9.3). TS NODE_TYPE_TO_DXF_LAYER and Python NODE_TYPE_TO_DXF_LAYER must agree byte-for-byte. Blueprint 07 §10 / 11 §6.",
+  "input": {
+    "node_types": [
+      "sprinkler_head",
+      "pipe",
+      "fitting",
+      "valve",
+      "hanger",
+      "device",
+      "fdc",
+      "riser_assembly",
+      "remote_area",
+      "obstruction",
+      "wall",
+      "slab",
+      "ceiling",
+      "door",
+      "window",
+      "item",
+      "sheet"
+    ]
+  },
+  "expected": {
+    "layers": [
+      "FP-HEADS",
+      "FP-PIPES",
+      "FP-FITTINGS",
+      "FP-VALVES",
+      "FP-HANGERS",
+      "FP-DEVICES",
+      "FP-FDC",
+      "FP-RISER",
+      "FP-REMOTE-AREA",
+      "OBS",
+      "0-ARCH",
+      "0-ARCH-SLAB",
+      "0-ARCH-CEIL",
+      "0-ARCH-DOOR",
+      "0-ARCH-WINDOW",
+      "FP-ITEMS",
+      "0-TITLE"
+    ]
+  },
+  "tolerance": 0,
+  "tolerance_kind": "absolute"
+}

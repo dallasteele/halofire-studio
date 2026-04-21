@@ -1,0 +1,26 @@
+{
+  "name": "ft-in-roundtrip",
+  "description": "formatDimensionText in ft_in mode — precision 2 → quarter-inch snapping. Mirrors packages/hf-core/tests/drawing/dimension.spec.ts §3. Blueprint 07 §5.",
+  "input": {
+    "cases": [
+      { "length_m": 3.81,    "unit_display": "ft_in", "precision": 2 },
+      { "length_m": 0.3048,  "unit_display": "ft_in", "precision": 2 },
+      { "length_m": 0.0254,  "unit_display": "ft_in", "precision": 2 },
+      { "length_m": 0.3175,  "unit_display": "ft_in", "precision": 2 },
+      { "length_m": 0.0,     "unit_display": "ft_in", "precision": 2 },
+      { "length_m": 3.048,   "unit_display": "ft_in", "precision": 0 }
+    ]
+  },
+  "expected": {
+    "labels": [
+      "12'-6\"",
+      "1'-0\"",
+      "0'-1\"",
+      "1'-1/2\"",
+      "0'-0\"",
+      "10'-0\""
+    ]
+  },
+  "tolerance": 0,
+  "tolerance_kind": "absolute"
+}
