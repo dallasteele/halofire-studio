@@ -1,6 +1,7 @@
 import type { NextConfig } from 'next'
 
-// R10.1 — Tauri desktop bundle needs a static export (no Node runtime inside
+// R10.1 (Next.js static export for Tauri bundling)
+// Tauri desktop bundle needs a static export (no Node runtime inside
 // the Tauri webview). Gate on TAURI_BUILD so regular `next build` / `next dev`
 // keep full server-side behavior (API routes, dynamic segments, server actions).
 const isTauriBuild = process.env.TAURI_BUILD === '1'
