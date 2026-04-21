@@ -32,3 +32,8 @@ export {
   usePaletteViewRegistry,
 } from './store/use-palette-view-registry'
 export { useUploadStore } from './store/use-upload'
+export {
+  renderTitleBlockSvg,
+  TitleBlockRenderer,
+  type TitleBlockRendererProps,
+} from './components/sheet/title-block-renderer'
