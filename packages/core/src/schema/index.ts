@@ -49,6 +49,24 @@ export { ScanNode } from './nodes/scan'
 // Nodes
 export { SiteNode } from './nodes/site'
 export { SlabNode } from './nodes/slab'
+// Fire-protection nodes (HaloFire Studio fork additions).
+export {
+  deflectorHeightM,
+  flowAtPressure,
+  SprinklerHeadNode,
+  SprinklerOrientation,
+  SprinklerResponse,
+  SprinklerTemperatureRating,
+} from './nodes/sprinkler-head'
+export {
+  hazenWilliamsC,
+  pipeIdMm,
+  pipeLengthM,
+  pipeOdMm,
+  PipeNode,
+  PipeRole,
+  PipeSchedule,
+} from './nodes/pipe'
 export {
   StairNode,
   StairRailingMode,
