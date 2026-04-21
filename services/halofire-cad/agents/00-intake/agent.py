@@ -189,6 +189,153 @@ def _cluster_walls(segments: list[LineString]) -> list[tuple[float, float, float
     return walls
 
 
+def _chain_walls(
+    walls: list[dict],
+    snap_m: float = 0.30,
+    angle_tol_deg: float = 3.0,
+) -> list[dict]:
+    """Merge colinear, endpoint-touching wall fragments.
+
+    CubiCasa often emits 5-10 short segments where a single 12-m
+    interior wall belongs. The downstream visualizer renders each
+    fragment as a 0.2 × h × len box — fragmentation makes the
+    building look like a porcupine and inflates the wall count past
+    300/level. This pass:
+      1. Snap endpoints to a `snap_m` grid so colinear fragments
+         touch at exact common points.
+      2. Build an undirected graph of fragments by shared endpoint.
+      3. Walk paths of degree-2 connections that maintain heading
+         within `angle_tol_deg`; collapse each path into one
+         start-to-end segment.
+
+    Returns the chained list of wall dicts {x0,y0,x1,y1}.
+    Pure-python, no shapely required (called per-page in intake hot
+    path).
+    """
+    import math as _math
+    if not walls:
+        return walls
+    snap = max(snap_m, 0.01)
+    def snp(x: float, y: float) -> tuple[int, int]:
+        return (round(x / snap), round(y / snap))
+    # endpoint key → list of (wall_idx, end='start'|'end')
+    by_pt: dict[tuple[int, int], list[tuple[int, str]]] = {}
+    for i, w in enumerate(walls):
+        a = snp(w["x0"], w["y0"])
+        b = snp(w["x1"], w["y1"])
+        by_pt.setdefault(a, []).append((i, "start"))
+        by_pt.setdefault(b, []).append((i, "end"))
+    # mark each wall's heading vector (snapped to nearest 1°)
+    head: list[tuple[float, float]] = []
+    for w in walls:
+        dx = w["x1"] - w["x0"]
+        dy = w["y1"] - w["y0"]
+        L = _math.hypot(dx, dy) or 1.0
+        head.append((dx / L, dy / L))
+    visited = [False] * len(walls)
+    out: list[dict] = []
+    for seed in range(len(walls)):
+        if visited[seed]:
+            continue
+        # Walk forward then backward
+        chain = [seed]
+        visited[seed] = True
+        # forward
+        cur = seed
+        cur_end = snp(walls[cur]["x1"], walls[cur]["y1"])
+        while True:
+            cands = [
+                j for (j, _) in by_pt.get(cur_end, []) if not visited[j]
+            ]
+            nxt = _next_colinear(cands, head, cur, angle_tol_deg)
+            if nxt is None:
+                break
+            visited[nxt] = True
+            chain.append(nxt)
+            # advance to far end of nxt
+            wj = walls[nxt]
+            sj = snp(wj["x0"], wj["y0"])
+            ej = snp(wj["x1"], wj["y1"])
+            cur_end = ej if sj == cur_end else sj
+            cur = nxt
+        # backward
+        cur = seed
+        cur_start = snp(walls[cur]["x0"], walls[cur]["y0"])
+        while True:
+            cands = [
+                j for (j, _) in by_pt.get(cur_start, []) if not visited[j]
+            ]
+            prv = _next_colinear(cands, head, cur, angle_tol_deg)
+            if prv is None:
+                break
+            visited[prv] = True
+            chain.insert(0, prv)
+            wj = walls[prv]
+            sj = snp(wj["x0"], wj["y0"])
+            ej = snp(wj["x1"], wj["y1"])
+            cur_start = ej if sj == cur_start else sj
+            cur = prv
+        # Emit one merged wall start-of-first → end-of-last
+        first = walls[chain[0]]
+        last = walls[chain[-1]]
+        # Choose far ends: the endpoint of `first` that is NOT
+        # connected to the next, and the endpoint of `last` that is
+        # NOT connected to the previous.
+        if len(chain) == 1:
+            out.append(dict(first))
+            continue
+        sf = snp(first["x0"], first["y0"])
+        ef = snp(first["x1"], first["y1"])
+        next_w = walls[chain[1]]
+        sn = snp(next_w["x0"], next_w["y0"])
+        en = snp(next_w["x1"], next_w["y1"])
+        far_first = (
+            (first["x0"], first["y0"])
+            if sf not in (sn, en) else (first["x1"], first["y1"])
+        )
+        sl = snp(last["x0"], last["y0"])
+        el = snp(last["x1"], last["y1"])
+        prev_w = walls[chain[-2]]
+        spv = snp(prev_w["x0"], prev_w["y0"])
+        epv = snp(prev_w["x1"], prev_w["y1"])
+        far_last = (
+            (last["x0"], last["y0"])
+            if sl not in (spv, epv) else (last["x1"], last["y1"])
+        )
+        merged = dict(first)
+        merged["x0"], merged["y0"] = far_first
+        merged["x1"], merged["y1"] = far_last
+        out.append(merged)
+    return out
+
+
+def _next_colinear(
+    cands: list[int],
+    head: list[tuple[float, float]],
+    cur: int,
+    angle_tol_deg: float,
+) -> int | None:
+    """Pick the candidate whose heading is most aligned with `cur`,
+    only if within `angle_tol_deg`."""
+    import math as _math
+    if not cands:
+        return None
+    cdx, cdy = head[cur]
+    cos_tol = _math.cos(_math.radians(angle_tol_deg))
+    best_idx: int | None = None
+    best_cos = -1.0
+    for j in cands:
+        if j == cur:
+            continue
+        jdx, jdy = head[j]
+        # take absolute (direction-agnostic)
+        dot = abs(cdx * jdx + cdy * jdy)
+        if dot >= cos_tol and dot > best_cos:
+            best_cos = dot
+            best_idx = j
+    return best_idx
+
+
 def _trace_outer_boundary_m(walls) -> list:
     """Extract a real outer-wall polygon for a Level from its
     detected Wall segments (coordinates already in meters).
@@ -756,8 +903,20 @@ def intake_file(pdf_path: str, project_id: str) -> Building:
             polygon_m=[],
             ceiling=Ceiling(),
         )
+        # Chain wall fragments into runs BEFORE scaling — runs are
+        # emitted in pt space and scaled below. Snap tolerance is
+        # ~0.30 m, and we apply it to the m-equivalent radius of pt
+        # coords (snap_pt = 0.30 / m_per_pt). On a typical 1/8" page
+        # this is ~3 pt, on a 1/32" site plan ~1 pt — both reasonable.
+        snap_pt = max(0.30 / max(m_per_pt, 1e-6), 0.5)
+        try:
+            chained_walls = _chain_walls(
+                page_out.get("walls", []), snap_m=snap_pt,
+            )
+        except Exception:  # noqa: BLE001
+            chained_walls = page_out.get("walls", [])
         # Walls in meters
-        for w in page_out.get("walls", []):
+        for w in chained_walls:
             level.walls.append(Wall(
                 id=f"w_p{i}_{len(level.walls)}",
                 start_m=(w["x0"] * m_per_pt, w["y0"] * m_per_pt),
@@ -798,9 +957,15 @@ def intake_file(pdf_path: str, project_id: str) -> Building:
             )
         except Exception:  # noqa: BLE001
             poly_area = 0.0
+        # Reject if:
+        #   * area > 5000 sqm AND < 3 rooms (likely site plan), OR
+        #   * < 20 walls (cover sheet / schedule), OR
+        #   * > 300 walls AND < 3 rooms (CubiCasa misread dimension
+        #     hatching as walls — these floors render as porcupines).
         if (
             (poly_area > 5_000.0 and len(level.rooms) < 3)
             or len(level.walls) < 20
+            or (len(level.walls) > 300 and len(level.rooms) < 3)
         ):
             metadata["issues"].append({
                 "code": "INTAKE_PAGE_REJECTED",

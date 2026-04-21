@@ -205,6 +205,35 @@ def test_hydraulic_gpm_within_10pct_of_truth() -> None:
 
 @pytest.mark.cruel
 @pytest.mark.golden
+def test_no_level_has_more_than_300_walls() -> None:
+    """A real residential floor plan has 50-150 wall runs after
+    chaining. Pages where CubiCasa returns 900+ walls are almost
+    always misreading dimension hatching, exit signage, or section
+    cut lines as walls. The downstream visualizer renders each as a
+    300mm × 3m extruded box — a 900-wall page produces a porcupine.
+
+    Threshold: > 300 walls/level = noise. The intake's wall
+    pairing/chaining should compress these into runs."""
+    _truth_or_skip()
+    if not _DESIGN.exists():
+        pytest.skip("design.json missing")
+    design = json.loads(_DESIGN.read_text(encoding="utf-8"))
+    bad: list[tuple[str, int]] = []
+    for lvl in design.get("building", {}).get("levels", []):
+        n = len(lvl.get("walls") or [])
+        if n > 300:
+            bad.append((lvl.get("name", "?"), n))
+    if bad:
+        details = ", ".join(f"{n}={c} walls" for n, c in bad)
+        raise AssertionError(
+            f"{len(bad)} level(s) have > 300 walls — CubiCasa is "
+            f"reading dimension hatching as walls. Wall-chaining or "
+            f"a per-level wall cap would help: {details}"
+        )
+
+
+@pytest.mark.cruel
+@pytest.mark.golden
 def test_each_kept_level_has_realistic_polygon_area() -> None:
     """Every level the intake KEEPS must have a realistic floor-plate
     area. < 100 sqm means `_trace_outer_boundary_m` fell into a tiny
