@@ -234,6 +234,15 @@ def run_pipeline(
         "line_items": len(bom),
         "total_usd": BOM.bom_total(bom),
     })
+    # V2 Phase 3.2: Hydralist (.hlf) supplier-handoff export
+    try:
+        _hlf = _load_agent("agents/06-bom/hydralist.py", "hf_hydralist")
+        _hlf_path = out_dir / "supplier.hlf"
+        _hlf.write_hydralist(bom, project_id, _hlf_path)
+        summary["files"]["hydralist"] = str(_hlf_path)
+    except Exception as e:  # noqa: BLE001
+        log.warning("hydralist export failed: %s", e)
+        summary.setdefault("warnings", []).append(f"hydralist: {e}")
 
     # 8. LABOR
     labor = LABOR.compute_labor(design, bom)
