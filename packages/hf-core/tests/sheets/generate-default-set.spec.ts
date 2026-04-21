@@ -147,6 +147,17 @@ test('sheet names zero-pad sheet_index to 3 digits (FP-001 not FP-1)', () => {
   expect(sheets[0]!.name).toBe('FP-001')
 })
 
+test('FP-009 Riser Diagram sheet has annotations > 1 (R7.2 filled in the placeholder)', () => {
+  const sheets = generateDefaultSheetSet(fixture1881())
+  const riser = sheets.find((s) => s.title.startsWith('Riser Diagram'))
+  expect(riser).toBeDefined()
+  // R7.1 emitted 2 annotations (title + placeholder). R7.2 emits
+  // at least one per system column plus the title — well beyond 1.
+  expect(riser!.annotations.length).toBeGreaterThan(1)
+  // And riser-diagram layout is schematic only — no viewport.
+  expect(riser!.viewports).toHaveLength(0)
+})
+
 test('design with 0 levels → cover + site + riser + hydraulic + BOM + detail = 6 sheets', () => {
   const emptyDesign: Design = {
     building: { id: 'b_empty', name: 'Empty', levels: [] },

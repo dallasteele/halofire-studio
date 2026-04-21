@@ -31,6 +31,7 @@
 import type { SheetNode, Viewport, Annotation } from '@pascal-app/core/schema'
 
 import type { Design, Vec2 } from '../scene/spawn-from-design.js'
+import { buildRiserDiagramLayout } from './riser-diagram.js'
 
 // ------------------------------------------------------------------
 // Public options
@@ -268,33 +269,24 @@ export function generateDefaultSheetSet(
   })
 
   // ---- FP-(N+3) Riser diagram -------------------------------------
+  //
+  // R7.2 lands the real schematic ladder layout via
+  // `buildRiserDiagramLayout`. No viewport — riser diagrams are
+  // SVG-only schematic, not scaled model geometry.
   {
-    const [px, py, pw, ph] = plotableRect(paper_size)
-    const riserViewport: Viewport = {
-      id: nid('vp'),
-      paper_rect_mm: [px, py, pw, ph],
-      camera: { kind: 'front' },
-      // Riser diagrams are schematic / not-to-scale. Use a small
-      // engineering scale as a sentinel until R7.4 introduces an
-      // explicit schematic flag.
-      scale: '1_50',
-      layer_visibility: {
-        riser_schematic: true,
-        architectural: false,
-      },
-    }
+    const [paperW, paperH] = (PAPER_MM[paper_size] ?? PAPER_MM.ARCH_D) as [number, number]
+    const riserLayout = buildRiserDiagramLayout(design, {
+      paper_w_mm: paperW,
+      paper_h_mm: paperH,
+      margin_mm: MARGIN.left,
+    })
+    const riserAnnotations: Annotation[] = [
+      titleAnnotation(paper_size, 'Riser Diagram (Schematic)'),
+      ...riserLayout.annotations,
+    ]
+    const riserViewports = riserLayout.viewport ? [riserLayout.viewport] : []
     sheets.push(
-      baseSheet(
-        'Riser Diagram',
-        [riserViewport],
-        [
-          titleAnnotation(paper_size, 'Riser Diagram (Schematic)'),
-          placeholderNote(
-            paper_size,
-            'Riser diagram — schematic, not to scale. Full content in R7.4.',
-          ),
-        ],
-      ),
+      baseSheet('Riser Diagram', riserViewports, riserAnnotations),
     )
   }
 

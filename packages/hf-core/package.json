@@ -36,6 +36,11 @@
       "import": "./dist/sheets/generate-default-set.js",
       "default": "./dist/sheets/generate-default-set.js"
     },
+    "./sheets/riser-diagram": {
+      "types": "./dist/sheets/riser-diagram.d.ts",
+      "import": "./dist/sheets/riser-diagram.js",
+      "default": "./dist/sheets/riser-diagram.js"
+    },
     "./report/pdf-sheet-set": {
       "types": "./dist/report/pdf-sheet-set.d.ts",
       "import": "./dist/report/pdf-sheet-set.js",
