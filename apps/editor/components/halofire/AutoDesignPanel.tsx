@@ -301,6 +301,7 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
             size_in: number
             start_m: [number, number, number]
             end_m: [number, number, number]
+            role?: string
           }>
         }> = design.systems ?? []
 
@@ -450,6 +451,17 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
                 0.01,
                 Math.sqrt(dx * dx + dy * dy + dz * dz),
               )
+              // Smart-Pipe color code per AutoSPRINK convention
+              const role = p.role || 'unknown'
+              const roleColor: Record<string, string> = {
+                drop: '#3b82f6',          // blue — heads-to-branch
+                branch: '#22c55e',        // green — horizontal carrying heads
+                cross_main: '#f59e0b',    // amber — feeds branches
+                main: '#ef4444',          // red — system trunk
+                riser_nipple: '#a855f7',  // purple — vertical at riser
+                unknown: '#6b7280',       // grey — fallback
+              }
+              const color = roleColor[role] ?? roleColor.unknown
               createNode(
                 {
                   id: generateId('item'),
@@ -461,7 +473,7 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
                   asset: {
                     id: `pipe_${p.id}`,
                     category: 'pipe_steel_sch10',
-                    name: `${p.size_in}" pipe`,
+                    name: `${p.size_in}" ${role}`,
                     thumbnail: '/icons/item.png',
                     dimensions: [len, p.size_in * 0.0254, p.size_in * 0.0254],
                     src: `/halofire-catalog/glb/SM_Pipe_SCH10_${String(p.size_in).replace('.', '_')}in_1m.glb`,
@@ -473,8 +485,15 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
                       'halofire',
                       'pipe_steel_sch10',
                       `size_${p.size_in}`,
+                      `role_${role}`,
                       'auto_design',
                     ],
+                    color,
+                  },
+                  metadata: {
+                    color,
+                    role,
+                    size_in: p.size_in,
                   },
                 } as any,
                 levelForZ(mz) as any,
