@@ -1,9 +1,9 @@
 # HaloFire Studio — V2 Plan Phase Completion Report
 
 **Date:** 2026-04-20
-**Status:** Phases 0-5 SHIPPED, Phase 6 in progress
+**Status:** Phases 0-5 + 1.3 + 3.2 + 4.4 + G SHIPPED; Phase 6 in progress
 **Cruel-test scoreboard:** 27 PASS / 0 FAIL / 2 SKIP
-**Full test suite (incl all unit tests):** 311 PASS / 0 FAIL / 2 SKIP — 119 s
+**Full test suite (incl all unit tests):** 350 PASS / 0 FAIL / 2 SKIP — 16 s
 
 ## Final cruel-test results vs 1881 Cooperative truth
 
@@ -31,8 +31,12 @@ Plus 16 visual / structural / geometric cruel tests, 7 NFPA-report unit tests, a
 | 4.1 | OpenSCAD templates (drop-ceiling, hanger, FDC, beam) | ✅ | (same) |
 | 4.2 | Realistic Halo bid breakdown (overhead 10 %) | ✅ | 25fd8f7 |
 | 4.3 | LandScout-pattern catalog crawler | ✅ | (same) |
-| 5.1 | NFPA 13 § 27 + Annex E 8-section submittal | ✅ | 9d8d12b → next |
-| 5.2-5.4 | UI / UX redesign (ribbon, properties, layers) | ⏳ | — |
+| 5.1 | NFPA 13 § 27 + Annex E 8-section submittal | ✅ | 9d8d12b |
+| 5.2-5.4 | UI / UX redesign (ribbon, properties, layers) | ✅ | 2e9520e |
+| 1.3 | Title-block sheet-ID page-type filter | ✅ | 58114fb |
+| 3.2 | Hydralist (.hlf) BOM export | ✅ | 36c17af |
+| 4.4 | 25 new OpenSCAD templates (valves/fittings/switches/hangers) | ✅ | (this) |
+| G | Live re-calc loop (System Optimizer parity) | ✅ | 7e4d2ef |
 | 6.1 | End-to-end smoke test on second project | ⏳ | — |
 
 ## Journey numbers (start of session vs now)
