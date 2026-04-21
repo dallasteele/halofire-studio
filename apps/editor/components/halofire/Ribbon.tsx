@@ -29,7 +29,8 @@ export type RibbonCommand =
   | 'remote-area'
   | 'auto-dim-pipe-runs'
   | 'dimension'
-  | 'auto-dim-pipe-runs'
+  | 'text'
+  | 'revision-cloud'
   | 'hydraulic-calc'
   | 'rule-check'
   | 'stress-test'
@@ -93,6 +94,23 @@ const TABS: Record<RibbonTab, Group[]> = {
           label: 'Dimension',
           hint: 'R8.2 · Click two points to place a linear dimension · D · Tab cycle · Esc cancel',
           tone: 'accent',
+        },
+      ],
+    },
+    {
+      label: 'Notes',
+      buttons: [
+        {
+          cmd: 'text',
+          label: 'Text',
+          hint: 'R8.4 · Click anchor, type note · T · Tab cycle kind · Esc cancel',
+          tone: 'default',
+        },
+        {
+          cmd: 'revision-cloud',
+          label: 'Revision Cloud',
+          hint: 'R8.5 · Drag to outline a revision bubble · Shift+R · Esc cancel',
+          tone: 'default',
         },
       ],
     },

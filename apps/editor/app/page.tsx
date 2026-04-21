@@ -3,7 +3,9 @@
 import {
   DimensionTool,
   Editor,
+  RevisionCloudTool,
   type SidebarTab,
+  TextTool,
   ViewerToolbarLeft,
   ViewerToolbarRight,
 } from '@pascal-app/editor'
@@ -259,6 +261,8 @@ export default function Home() {
       <ToolOverlay />
       <RemoteAreaDraw projectId={ACTIVE_PROJECT_ID} />
       <DimensionTool />
+      <TextTool />
+      <RevisionCloudTool />
       <LiveCalc projectId={ACTIVE_PROJECT_ID} />
       <LayerPanel />
       {/* V2 Phase 5.3: selection-driven props for halofire items */}

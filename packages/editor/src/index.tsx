@@ -11,6 +11,17 @@ export {
   type DimensionToolState,
   type WorldPoint,
 } from './components/tools/dimension/dimension-tool'
+export {
+  TextTool,
+  type AnnotationKind,
+  type TextToolMode,
+  type TextToolState,
+} from './components/tools/annotation/text-tool'
+export {
+  RevisionCloudTool,
+  type RevisionCloudMode,
+  type RevisionCloudToolState,
+} from './components/tools/annotation/revision-cloud-tool'
 export { useSidebarStore } from './components/ui/primitives/sidebar'
 export { Slider } from './components/ui/primitives/slider'
 export { SceneLoader } from './components/ui/scene-loader'
