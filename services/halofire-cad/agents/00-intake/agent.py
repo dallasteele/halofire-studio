@@ -1046,6 +1046,43 @@ def _canonicalize_floor_plates(
         # per level so each level has its own list).
         from copy import deepcopy
         lv.obstructions = [deepcopy(c) for c in columns]
+        # (V2 Phase 1.5 unit subdivision moved to _align_levels_to_truth
+        # since lv.use isn't set until truth-alignment runs after this
+        # canonicalize pass.)
+        if False and (lv.use or "").lower() == "residential" and len(lv.rooms) < 10:
+            from cad.schema import Room as _Room
+            UNIT_SIZE_M = 9.0  # 9 m × 9 m unit ≈ 870 sqft
+            lv_bb_xs = [p[0] for p in centered_poly]
+            lv_bb_ys = [p[1] for p in centered_poly]
+            lvminx, lvmaxx = min(lv_bb_xs), max(lv_bb_xs)
+            lvminy, lvmaxy = min(lv_bb_ys), max(lv_bb_ys)
+            unit_idx = 0
+            x = lvminx
+            while x + UNIT_SIZE_M <= lvmaxx:
+                y = lvminy
+                while y + UNIT_SIZE_M <= lvmaxy:
+                    cx_u = x + UNIT_SIZE_M / 2
+                    cy_u = y + UNIT_SIZE_M / 2
+                    if canonical_poly_obj.contains(_PG([
+                        (x, y), (x + UNIT_SIZE_M, y),
+                        (x + UNIT_SIZE_M, y + UNIT_SIZE_M),
+                        (x, y + UNIT_SIZE_M),
+                    ]).centroid):
+                        lv.rooms.append(_Room(
+                            id=f"unit_{lv.id}_{unit_idx}",
+                            name=f"Unit {unit_idx + 1}",
+                            polygon_m=[
+                                (x, y), (x + UNIT_SIZE_M, y),
+                                (x + UNIT_SIZE_M, y + UNIT_SIZE_M),
+                                (x, y + UNIT_SIZE_M),
+                            ],
+                            area_sqm=UNIT_SIZE_M * UNIT_SIZE_M,
+                            use_class="residential",
+                            hazard_class="light",
+                        ))
+                        unit_idx += 1
+                    y += UNIT_SIZE_M
+                x += UNIT_SIZE_M
         # Renumber column ids per level so they're unique
         for c_idx, c in enumerate(lv.obstructions):
             c.id = f"col_{lv.id}_{c_idx}"
@@ -1158,6 +1195,42 @@ def _align_levels_to_truth(
         elif "parking" in nm or "garage" in nm:
             lv.use = "garage"
             lv.ceiling.kind = "deck"
+        # V2 Phase 1.5: per-unit room subdivision for residential.
+        # CubiCasa returns 1-4 rooms per page; real residential floors
+        # have ~10 units × 4 rooms ≈ 40 spaces. Synthesize a 9 m × 9 m
+        # unit grid (≈ 870 sqft per unit) so the placer hits NFPA-
+        # correct head density (light-hazard 20.9 sqm/head).
+        if lv.use == "residential" and len(lv.rooms) < 10 and lv.polygon_m:
+            from cad.schema import Room as _Room
+            from shapely.geometry import Polygon as _PG, Point as _Pt
+            UNIT_SIZE_M = 8.0  # 8m × 8m ≈ 690 sqft per unit
+            poly_obj = _PG(lv.polygon_m)
+            xs = [p[0] for p in lv.polygon_m]
+            ys = [p[1] for p in lv.polygon_m]
+            lvminx, lvmaxx = min(xs), max(xs)
+            lvminy, lvmaxy = min(ys), max(ys)
+            unit_idx = 0
+            x = lvminx
+            while x + UNIT_SIZE_M <= lvmaxx:
+                y = lvminy
+                while y + UNIT_SIZE_M <= lvmaxy:
+                    cx_u, cy_u = x + UNIT_SIZE_M / 2, y + UNIT_SIZE_M / 2
+                    if poly_obj.contains(_Pt(cx_u, cy_u)):
+                        lv.rooms.append(_Room(
+                            id=f"unit_{lv.id}_{unit_idx}",
+                            name=f"Unit {unit_idx + 1}",
+                            polygon_m=[
+                                (x, y), (x + UNIT_SIZE_M, y),
+                                (x + UNIT_SIZE_M, y + UNIT_SIZE_M),
+                                (x, y + UNIT_SIZE_M),
+                            ],
+                            area_sqm=UNIT_SIZE_M * UNIT_SIZE_M,
+                            use_class="residential",
+                            hazard_class="light",
+                        ))
+                        unit_idx += 1
+                    y += UNIT_SIZE_M
+                x += UNIT_SIZE_M
     metadata["issues"].append({
         "code": "INTAKE_ALIGNED_TO_TRUTH",
         "severity": "info",

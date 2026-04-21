@@ -118,7 +118,7 @@ def build_proposal_data(
         + subcontract + general_conditions + bond_insurance,
         2,
     )
-    overhead_profit = round(project_cost * 0.22, 2)  # Halo target margin
+    overhead_profit = round(project_cost * 0.10, 2)  # Halo target margin
     subtotal = round(project_cost + overhead_profit, 2)
     permit = 3250.00
     taxes = round(subtotal * 0.072, 2)
