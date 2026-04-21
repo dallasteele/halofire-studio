@@ -341,6 +341,112 @@ def test_each_kept_level_has_realistic_polygon_area() -> None:
         )
 
 
+# ── geometry sanity ─────────────────────────────────────────────
+
+@pytest.mark.cruel
+@pytest.mark.golden
+def test_drops_are_short_vertical() -> None:
+    """A 'drop' pipe is the short vertical sprig from ceiling to head
+    deflector. NFPA-13 + estimator convention: 1-12 inches (0.025 -
+    0.30 m). If a "drop" is multi-metres long it means we mis-rotated
+    a horizontal pipe through the axis-flip bug or routed a head's
+    drop across the building.
+    """
+    _truth_or_skip()
+    if not _DESIGN.exists():
+        pytest.skip("design.json missing")
+    design = json.loads(_DESIGN.read_text(encoding="utf-8"))
+    bad: list[tuple[str, float, float, float, float, float, float]] = []
+    for sys in design.get("systems", []):
+        for p in sys.get("pipes") or []:
+            if p.get("role") != "drop":
+                continue
+            s = p.get("start_m") or [0, 0, 0]
+            e = p.get("end_m") or [0, 0, 0]
+            dx = e[0] - s[0]
+            dy = e[1] - s[1]
+            dz = e[2] - s[2]
+            horizontal = (dx * dx + dy * dy) ** 0.5
+            vertical = abs(dz)
+            # Drop should be: vertical >> horizontal, |dz| < 1 m
+            if vertical > 1.5 or horizontal > 0.2:
+                bad.append((p["id"], *s, *e))
+    if bad:
+        sample = bad[:3]
+        raise AssertionError(
+            f"{len(bad)} 'drop' pipe(s) aren't short verticals. "
+            f"Sample: {sample}"
+        )
+
+
+@pytest.mark.cruel
+@pytest.mark.golden
+def test_pipes_within_building_envelope() -> None:
+    """No pipe should be outside the building bbox. After the axis-
+    flip bug, a "horizontal" cross-main spanning plan-Y 0→160 m
+    would sit at three.js Y=160 m — way above the building. This
+    test catches that by asserting every pipe endpoint Z (elevation)
+    is within [0, top_floor + 5 m].
+    """
+    _truth_or_skip()
+    if not _DESIGN.exists():
+        pytest.skip("design.json missing")
+    design = json.loads(_DESIGN.read_text(encoding="utf-8"))
+    levels = design.get("building", {}).get("levels", [])
+    if not levels:
+        pytest.skip("no levels")
+    max_elev = max(
+        (lvl.get("elevation_m", 0) + lvl.get("height_m", 3)) for lvl in levels
+    )
+    bad: list[tuple[str, float]] = []
+    for sys in design.get("systems", []):
+        for p in sys.get("pipes") or []:
+            for end_label, end in (("start", p.get("start_m")), ("end", p.get("end_m"))):
+                if not end:
+                    continue
+                z = end[2]
+                if z < -0.5 or z > max_elev + 5.0:
+                    bad.append((f"{p['id']}.{end_label}", z))
+    if bad:
+        sample = bad[:5]
+        raise AssertionError(
+            f"{len(bad)} pipe endpoint(s) outside building Z-envelope "
+            f"(0 ≤ z ≤ {max_elev + 5:.1f} m). Sample: {sample}"
+        )
+
+
+@pytest.mark.cruel
+@pytest.mark.golden
+def test_cross_mains_are_horizontal() -> None:
+    """Cross-mains run horizontally at ceiling height. After axis
+    fix, |dz| should be tiny (< 0.5 m) and horizontal length 1-50 m.
+    A cross-main with dz=160m means the axis flip regressed.
+    """
+    _truth_or_skip()
+    if not _DESIGN.exists():
+        pytest.skip("design.json missing")
+    design = json.loads(_DESIGN.read_text(encoding="utf-8"))
+    bad: list[tuple[str, float, float]] = []
+    for sys in design.get("systems", []):
+        for p in sys.get("pipes") or []:
+            if p.get("role") != "cross_main":
+                continue
+            s = p.get("start_m") or [0, 0, 0]
+            e = p.get("end_m") or [0, 0, 0]
+            dx = e[0] - s[0]
+            dy = e[1] - s[1]
+            dz = e[2] - s[2]
+            horizontal = (dx * dx + dy * dy) ** 0.5
+            if abs(dz) > 0.5:
+                bad.append((p["id"], horizontal, dz))
+    if bad:
+        sample = bad[:3]
+        raise AssertionError(
+            f"{len(bad)} 'cross_main' pipe(s) have |dz| > 0.5 m "
+            f"(should be horizontal). Sample (id, horiz, dz): {sample}"
+        )
+
+
 # ── corrections accounting ──────────────────────────────────────
 
 @pytest.mark.cruel
