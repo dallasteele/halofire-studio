@@ -1,8 +1,34 @@
 {
   "schema_version": 1,
   "catalog_version": "0.1.0",
-  "generated_at": "2026-04-21T22:04:34.526Z",
+  "generated_at": "2026-04-21T22:10:57.781Z",
   "parts": [
+    {
+      "sku": "beam",
+      "kind": "structural",
+      "category": "arch.beam",
+      "display_name": "Steel Beam W12x26 (20' span)",
+      "manufacturer": "other",
+      "mfg_part_number": "W12X26",
+      "price_usd": 420,
+      "install_minutes": 45,
+      "params": {
+        "length_m": {
+          "name": "length_m",
+          "type": {
+            "kind": "number",
+            "min": 1,
+            "max": 12
+          },
+          "default": 6,
+          "label": "Length",
+          "unit": "m"
+        }
+      },
+      "ports": [],
+      "scad_source": "beam.scad",
+      "warnings": []
+    },
     {
       "sku": "cap_end",
       "kind": "fitting",
@@ -51,6 +77,48 @@
         }
       ],
       "scad_source": "cap_end.scad",
+      "warnings": []
+    },
+    {
+      "sku": "column",
+      "kind": "structural",
+      "category": "arch.column",
+      "display_name": "Concrete Column 16\" × 10'",
+      "manufacturer": "other",
+      "mfg_part_number": "COL-16SQ-10",
+      "price_usd": 860,
+      "install_minutes": 60,
+      "params": {
+        "size_in": {
+          "name": "size_in",
+          "type": {
+            "kind": "enum",
+            "values": [
+              12,
+              14,
+              16,
+              18,
+              20
+            ]
+          },
+          "default": 16,
+          "label": "Size",
+          "unit": "in"
+        },
+        "height_ft": {
+          "name": "height_ft",
+          "type": {
+            "kind": "number",
+            "min": 8,
+            "max": 14
+          },
+          "default": 10,
+          "label": "Height",
+          "unit": "ft"
+        }
+      },
+      "ports": [],
+      "scad_source": "column.scad",
       "warnings": []
     },
     {
@@ -218,6 +286,32 @@
       "warnings": []
     },
     {
+      "sku": "drop_ceiling_tile",
+      "kind": "structural",
+      "category": "arch.ceiling.tile",
+      "display_name": "Drop Ceiling Tile 24\" × 24\"",
+      "manufacturer": "armstrong",
+      "mfg_part_number": "704A",
+      "price_usd": 4.25,
+      "install_minutes": 5,
+      "params": {
+        "tile_w_mm": {
+          "name": "tile_w_mm",
+          "type": {
+            "kind": "number",
+            "min": 300,
+            "max": 1200
+          },
+          "default": 600,
+          "label": "Tile Width",
+          "unit": "mm"
+        }
+      },
+      "ports": [],
+      "scad_source": "drop_ceiling_tile.scad",
+      "warnings": []
+    },
+    {
       "sku": "elbow_45",
       "kind": "fitting",
       "category": "fitting.elbow45.grooved",
@@ -347,6 +441,135 @@
         }
       ],
       "scad_source": "elbow_90.scad",
+      "warnings": []
+    },
+    {
+      "sku": "elbow_90_grooved",
+      "kind": "fitting",
+      "category": "fitting.elbow90.grooved",
+      "display_name": "90° Grooved Elbow Style 10 (2\")",
+      "manufacturer": "victaulic",
+      "mfg_part_number": "Style-10-Grooved",
+      "price_usd": 11.4,
+      "install_minutes": 7,
+      "params": {
+        "size_in": {
+          "name": "size_in",
+          "type": {
+            "kind": "enum",
+            "values": [
+              1,
+              1.25,
+              1.5,
+              2,
+              2.5,
+              3,
+              4
+            ]
+          },
+          "default": 2,
+          "label": "Size",
+          "unit": "in"
+        }
+      },
+      "ports": [
+        {
+          "name": "in",
+          "position_m": [
+            0.078,
+            0,
+            0
+          ],
+          "direction": [
+            1,
+            0,
+            0
+          ],
+          "style": "grooved",
+          "size_in": 2,
+          "role": "run_a"
+        },
+        {
+          "name": "out",
+          "position_m": [
+            0,
+            0.078,
+            0
+          ],
+          "direction": [
+            0,
+            1,
+            0
+          ],
+          "style": "grooved",
+          "size_in": 2,
+          "role": "run_b"
+        }
+      ],
+      "scad_source": "elbow_90_grooved.scad",
+      "warnings": []
+    },
+    {
+      "sku": "fdc",
+      "kind": "fdc",
+      "category": "fdc.2.5in.stortz",
+      "display_name": "FDC Twin 2-1/2\" Stortz (Wall-Mount)",
+      "manufacturer": "potter_roemer",
+      "mfg_part_number": "5775",
+      "listing": "UL",
+      "price_usd": 325,
+      "install_minutes": 45,
+      "params": {
+        "inlet_size_in": {
+          "name": "inlet_size_in",
+          "type": {
+            "kind": "enum",
+            "values": [
+              2.5,
+              3,
+              4
+            ]
+          },
+          "default": 2.5,
+          "label": "Inlet Size",
+          "unit": "in"
+        }
+      },
+      "ports": [
+        {
+          "name": "inlet_A",
+          "position_m": [
+            -0.05,
+            0,
+            0.086
+          ],
+          "direction": [
+            0,
+            -1,
+            0
+          ],
+          "style": "stortz",
+          "size_in": 2.5,
+          "role": "branch"
+        },
+        {
+          "name": "inlet_B",
+          "position_m": [
+            0.05,
+            0,
+            0.086
+          ],
+          "direction": [
+            0,
+            -1,
+            0
+          ],
+          "style": "stortz",
+          "size_in": 2.5,
+          "role": "branch"
+        }
+      ],
+      "scad_source": "fdc.scad",
       "warnings": []
     },
     {
@@ -537,6 +760,206 @@
       "warnings": []
     },
     {
+      "sku": "hanger_band_iron",
+      "kind": "hanger",
+      "category": "hanger.clevis",
+      "display_name": "Band-Iron Hanger (1\")",
+      "manufacturer": "anvil",
+      "mfg_part_number": "Fig-65",
+      "price_usd": 3.1,
+      "install_minutes": 6,
+      "params": {
+        "pipe_size_in": {
+          "name": "pipe_size_in",
+          "type": {
+            "kind": "enum",
+            "values": [
+              0.75,
+              1,
+              1.25,
+              1.5,
+              2
+            ]
+          },
+          "default": 1,
+          "label": "Pipe Size",
+          "unit": "in"
+        }
+      },
+      "ports": [
+        {
+          "name": "pipe",
+          "position_m": [
+            0,
+            0,
+            0
+          ],
+          "direction": [
+            0,
+            0,
+            1
+          ],
+          "style": "none",
+          "size_in": 1,
+          "role": "branch"
+        }
+      ],
+      "scad_source": "hanger_band_iron.scad",
+      "warnings": []
+    },
+    {
+      "sku": "hanger_c_clamp_beam",
+      "kind": "hanger",
+      "category": "hanger.c.clamp.beam",
+      "display_name": "C-Clamp Beam Hanger (3/8\" Rod)",
+      "manufacturer": "anvil",
+      "mfg_part_number": "Fig-86",
+      "price_usd": 4.75,
+      "install_minutes": 4,
+      "params": {
+        "rod_d": {
+          "name": "rod_d",
+          "type": {
+            "kind": "number",
+            "min": 6,
+            "max": 13
+          },
+          "default": 10,
+          "label": "Rod Diameter",
+          "unit": "mm"
+        }
+      },
+      "ports": [
+        {
+          "name": "pipe",
+          "position_m": [
+            0,
+            0,
+            -0.045
+          ],
+          "direction": [
+            0,
+            0,
+            -1
+          ],
+          "style": "none",
+          "size_in": 2,
+          "role": "branch"
+        }
+      ],
+      "scad_source": "hanger_c_clamp_beam.scad",
+      "warnings": []
+    },
+    {
+      "sku": "hanger_seismic_sway",
+      "kind": "hanger",
+      "category": "hanger.seismic.sway",
+      "display_name": "Seismic Sway Brace (1\" × 4')",
+      "manufacturer": "tolco",
+      "mfg_part_number": "Fig-4L",
+      "listing": "UL FM",
+      "price_usd": 38,
+      "install_minutes": 25,
+      "params": {
+        "brace_l": {
+          "name": "brace_l",
+          "type": {
+            "kind": "number",
+            "min": 600,
+            "max": 3000
+          },
+          "default": 1200,
+          "label": "Brace Length",
+          "unit": "mm"
+        },
+        "angle_deg": {
+          "name": "angle_deg",
+          "type": {
+            "kind": "number",
+            "min": 30,
+            "max": 60
+          },
+          "default": 45,
+          "label": "Brace Angle",
+          "unit": "deg"
+        }
+      },
+      "ports": [
+        {
+          "name": "pipe",
+          "position_m": [
+            0,
+            0,
+            0
+          ],
+          "direction": [
+            0,
+            0,
+            -1
+          ],
+          "style": "none",
+          "size_in": 2,
+          "role": "branch"
+        }
+      ],
+      "scad_source": "hanger_seismic_sway.scad",
+      "warnings": []
+    },
+    {
+      "sku": "hanger_trapeze",
+      "kind": "hanger",
+      "category": "hanger.trapeze",
+      "display_name": "Trapeze Hanger (Unistrut + 2 Rods)",
+      "manufacturer": "unistrut",
+      "mfg_part_number": "P1000-Trapeze",
+      "price_usd": 22,
+      "install_minutes": 20,
+      "params": {
+        "strut_l": {
+          "name": "strut_l",
+          "type": {
+            "kind": "number",
+            "min": 300,
+            "max": 1800
+          },
+          "default": 600,
+          "label": "Strut Length",
+          "unit": "mm"
+        },
+        "rod_l": {
+          "name": "rod_l",
+          "type": {
+            "kind": "number",
+            "min": 150,
+            "max": 600
+          },
+          "default": 300,
+          "label": "Rod Length",
+          "unit": "mm"
+        }
+      },
+      "ports": [
+        {
+          "name": "pipe",
+          "position_m": [
+            0,
+            0,
+            0.02
+          ],
+          "direction": [
+            0,
+            0,
+            1
+          ],
+          "style": "none",
+          "size_in": 2,
+          "role": "branch"
+        }
+      ],
+      "scad_source": "hanger_trapeze.scad",
+      "warnings": []
+    },
+    {
       "sku": "head_concealed_cover",
       "kind": "sprinkler_head",
       "category": "head.pendant.k56",
@@ -709,6 +1132,60 @@
         }
       ],
       "scad_source": "head_pendant_qr_k80.scad",
+      "warnings": []
+    },
+    {
+      "sku": "head_sidewall",
+      "kind": "sprinkler_head",
+      "category": "head.sidewall.k56",
+      "display_name": "Sidewall Sprinkler K5.6 (1/2\" NPT)",
+      "manufacturer": "tyco",
+      "mfg_part_number": "TY3331",
+      "listing": "UL FM",
+      "hazard_classes": [
+        "LH",
+        "OH1"
+      ],
+      "price_usd": 26.5,
+      "install_minutes": 6,
+      "k_factor": 5.6,
+      "orientation": "sidewall",
+      "response": "standard",
+      "temperature": "155F",
+      "params": {
+        "size_in": {
+          "name": "size_in",
+          "type": {
+            "kind": "enum",
+            "values": [
+              0.5,
+              0.75
+            ]
+          },
+          "default": 0.5,
+          "label": "Size",
+          "unit": "in"
+        }
+      },
+      "ports": [
+        {
+          "name": "inlet",
+          "position_m": [
+            -0.008,
+            0,
+            0
+          ],
+          "direction": [
+            -1,
+            0,
+            0
+          ],
+          "style": "NPT_threaded",
+          "size_in": 0.5,
+          "role": "drop"
+        }
+      ],
+      "scad_source": "head_sidewall.scad",
       "warnings": []
     },
     {
@@ -976,6 +1453,32 @@
         }
       ],
       "scad_source": "pipe.scad",
+      "warnings": []
+    },
+    {
+      "sku": "placeholder",
+      "kind": "structural",
+      "category": "arch.placeholder",
+      "display_name": "Placeholder Box (100mm)",
+      "manufacturer": "other",
+      "mfg_part_number": "PLACEHOLDER",
+      "price_usd": 0,
+      "install_minutes": 5,
+      "params": {
+        "dim_l_mm": {
+          "name": "dim_l_mm",
+          "type": {
+            "kind": "number",
+            "min": 10,
+            "max": 1000
+          },
+          "default": 100,
+          "label": "Length",
+          "unit": "mm"
+        }
+      },
+      "ports": [],
+      "scad_source": "placeholder.scad",
       "warnings": []
     },
     {
@@ -1798,6 +2301,74 @@
         }
       ],
       "scad_source": "valve_globe.scad",
+      "warnings": []
+    },
+    {
+      "sku": "valve_inline",
+      "kind": "valve",
+      "category": "valve.check.inline",
+      "display_name": "Inline Check Valve (4\" Grooved)",
+      "manufacturer": "victaulic",
+      "mfg_part_number": "Series-717",
+      "listing": "UL FM",
+      "price_usd": 320,
+      "install_minutes": 30,
+      "params": {
+        "size_in": {
+          "name": "size_in",
+          "type": {
+            "kind": "enum",
+            "values": [
+              2,
+              2.5,
+              3,
+              4,
+              5,
+              6,
+              8,
+              10
+            ]
+          },
+          "default": 4,
+          "label": "Size",
+          "unit": "in"
+        }
+      },
+      "ports": [
+        {
+          "name": "run_in",
+          "position_m": [
+            -0.091,
+            0,
+            0
+          ],
+          "direction": [
+            -1,
+            0,
+            0
+          ],
+          "style": "grooved",
+          "size_in": 4,
+          "role": "run_a"
+        },
+        {
+          "name": "run_out",
+          "position_m": [
+            0.091,
+            0,
+            0
+          ],
+          "direction": [
+            1,
+            0,
+            0
+          ],
+          "style": "grooved",
+          "size_in": 4,
+          "role": "run_b"
+        }
+      ],
+      "scad_source": "valve_inline.scad",
       "warnings": []
     },
     {

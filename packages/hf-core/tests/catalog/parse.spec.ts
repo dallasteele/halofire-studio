@@ -98,6 +98,33 @@ test.describe('@halofire/core — parseScad annotation grammar', () => {
     expect(port?.role).toBe('branch')
   })
 
+  test('catalog.json has 40 parts with expected kind distribution', () => {
+    const fp = resolve(
+      __dirname,
+      '../../../halofire-catalog/catalog.json',
+    )
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const catalog = JSON.parse(
+      // read via fs to avoid ESM/CJS import shenanigans
+      // biome-ignore lint: node:fs sync read is fine in a test
+      require('node:fs').readFileSync(fp, 'utf-8'),
+    ) as { parts: Array<{ kind: string }> }
+
+    expect(catalog.parts.length).toBe(40)
+
+    const dist: Record<string, number> = {}
+    for (const p of catalog.parts) dist[p.kind] = (dist[p.kind] ?? 0) + 1
+
+    expect(dist.sprinkler_head ?? 0).toBeGreaterThanOrEqual(5)
+    expect(dist.pipe_segment ?? 0).toBeGreaterThanOrEqual(1)
+    expect(dist.fitting ?? 0).toBeGreaterThanOrEqual(10)
+    expect(dist.valve ?? 0).toBeGreaterThanOrEqual(6)
+    expect(dist.hanger ?? 0).toBeGreaterThanOrEqual(5)
+    expect(dist.device ?? 0).toBeGreaterThanOrEqual(4)
+    expect(dist.fdc ?? 0).toBeGreaterThanOrEqual(1)
+    expect(dist.structural ?? 0).toBeGreaterThanOrEqual(3)
+  })
+
   test('real fixture pipe.scad parses with ports and params', () => {
     const fp = resolve(
       __dirname,

@@ -4,6 +4,20 @@
 //
 // Defaults: 16" square × 10' tall reinforced-concrete column,
 // chamfered top + base for a real-building look.
+//
+// Structural obstruction — no pipe connection, so no @port.
+
+// @part column
+// @kind structural
+// @category arch.column
+// @display-name "Concrete Column 16\" × 10'"
+// @mfg other
+// @mfg-pn COL-16SQ-10
+// @price-usd 860.00
+// @install-minutes 60
+// @crew foreman
+// @param size_in enum[12,14,16,18,20] default=16 label="Size" unit="in"
+// @param height_ft number[8,14] default=10 label="Height" unit="ft"
 
 size_in = 16;        // 12, 14, 16, 18, 20 — typical residential / commercial
 height_ft = 10;      // 8 - 14 ft typical

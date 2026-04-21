@@ -4,6 +4,20 @@
 //   inlet:  (-L/2, 0, 0), dir (-1, 0, 0)
 //   outlet: (+L/2, 0, 0), dir (+1, 0, 0)
 
+// @part valve_inline
+// @kind valve
+// @category valve.check.inline
+// @display-name "Inline Check Valve (4\" Grooved)"
+// @mfg victaulic
+// @mfg-pn Series-717
+// @listing UL FM
+// @price-usd 320.00
+// @install-minutes 30
+// @crew journeyman
+// @param size_in enum[2,2.5,3,4,5,6,8,10] default=4 label="Size" unit="in"
+// @port run_in  position=[-0.091,0,0] direction=[-1,0,0] style=grooved size_in=4 role=run_a
+// @port run_out position=[ 0.091,0,0] direction=[ 1,0,0] style=grooved size_in=4 role=run_b
+
 size_in = 4;
 stem_ratio = 1.8;   // OS&Y handwheels extend well above the body
 

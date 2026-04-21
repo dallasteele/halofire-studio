@@ -2,6 +2,19 @@
 // CubiCasa can't detect; pipes route AROUND via Arm Around tool.
 // Local origin = beam centerline, length = X axis.
 // V2 Phase 4.1.
+//
+// Structural obstruction — no pipe connection, so no @port.
+
+// @part beam
+// @kind structural
+// @category arch.beam
+// @display-name "Steel Beam W12x26 (20' span)"
+// @mfg other
+// @mfg-pn W12X26
+// @price-usd 420.00
+// @install-minutes 45
+// @crew foreman
+// @param length_m number[1,12] default=6 label="Length" unit="m"
 
 length_m = 6.0;          // beam clear span
 flange_w_in = 6.5;       // W12x26 flange width

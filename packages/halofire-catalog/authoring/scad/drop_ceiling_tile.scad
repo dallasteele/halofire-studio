@@ -1,6 +1,19 @@
 // 24" T-bar acoustic drop-ceiling tile + grid frame.
 // One tile = 0.6 m × 0.6 m × 0.016 m. Local origin = tile center.
 // V2 Phase 4.1.
+//
+// Structural finish — no pipe connection, so no @port.
+
+// @part drop_ceiling_tile
+// @kind structural
+// @category arch.ceiling.tile
+// @display-name "Drop Ceiling Tile 24\" × 24\""
+// @mfg armstrong
+// @mfg-pn 704A
+// @price-usd 4.25
+// @install-minutes 5
+// @crew apprentice
+// @param tile_w_mm number[300,1200] default=600 label="Tile Width" unit="mm"
 
 tile_w_mm = 600;
 tile_d_mm = 600;
