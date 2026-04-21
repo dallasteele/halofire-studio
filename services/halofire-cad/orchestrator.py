@@ -23,7 +23,7 @@ import json
 import logging
 import sys
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 _HFCAD = Path(__file__).resolve().parent
 sys.path.insert(0, str(_HFCAD))
@@ -89,8 +89,16 @@ def run_pipeline(
     project: Project | None = None,
     supply: FlowTestData | None = None,
     out_dir: Path | None = None,
+    progress_callback: "Callable[[dict[str, Any]], None] | None" = None,
 ) -> dict[str, Any]:
-    """Execute the full Design pipeline. Return paths + summary stats."""
+    """Execute the full Design pipeline. Return paths + summary stats.
+
+    V2 step 5 — ``progress_callback(event)`` is invoked after every
+    pipeline stage with a shallow dict describing what just finished:
+    ``{"stage": "intake", "done": True, "levels": 6, "walls": 312, ...}``.
+    The gateway's SSE endpoint forwards these into its per-job queue
+    so the editor can spawn nodes into the viewport incrementally.
+    """
     out_dir = out_dir or (Path.cwd() / "out" / project_id)
     out_dir.mkdir(parents=True, exist_ok=True)
     project = project or _default_project(project_id)
@@ -98,13 +106,22 @@ def run_pipeline(
 
     summary: dict[str, Any] = {"project_id": project_id, "steps": [], "files": {}}
 
+    def _emit_step(step: dict[str, Any]) -> None:
+        summary["steps"].append(step)
+        if progress_callback is not None:
+            try:
+                progress_callback({**step, "done": True})
+            except Exception:
+                # Never let a broken listener stop the pipeline.
+                log.exception("progress_callback raised; continuing")
+
     # 1. INTAKE — PDF → Building
     log.info("[%s] intake: %s", project_id, pdf_path)
     bldg = INTAKE.intake_file(pdf_path, project_id)
     (out_dir / "building_raw.json").write_text(
         json.dumps(bldg.model_dump(), indent=2), encoding="utf-8",
     )
-    summary["steps"].append({
+    _emit_step({
         "step": "intake",
         "levels": len(bldg.levels),
         "walls": sum(len(l.walls) for l in bldg.levels),
@@ -133,18 +150,18 @@ def run_pipeline(
     (out_dir / "building_classified.json").write_text(
         json.dumps(bldg.model_dump(), indent=2), encoding="utf-8",
     )
-    summary["steps"].append({
+    _emit_step({
         "step": "classify",
         "hazard_counts": _count_hazards(bldg),
     })
 
     # 3. PLACER — Head[] per room
     heads = PLACER.place_heads_for_building(bldg)
-    summary["steps"].append({"step": "place", "head_count": len(heads)})
+    _emit_step({"step": "place", "head_count": len(heads)})
 
     # 4. ROUTER — PipeSegment[] + Hangers
     systems = ROUTER.route_systems(bldg, heads)
-    summary["steps"].append({
+    _emit_step({
         "step": "route",
         "system_count": len(systems),
         "pipe_count": sum(len(s.pipes) for s in systems),
@@ -221,7 +238,7 @@ def run_pipeline(
         json.dumps([v.model_dump() for v in violations], indent=2),
         encoding="utf-8",
     )
-    summary["steps"].append({
+    _emit_step({
         "step": "rulecheck",
         "error_count": sum(1 for v in violations if v.severity == "error"),
         "warning_count": sum(1 for v in violations if v.severity == "warning"),
@@ -229,7 +246,7 @@ def run_pipeline(
 
     # 7. BOM
     bom = BOM.generate_bom(design)
-    summary["steps"].append({
+    _emit_step({
         "step": "bom",
         "line_items": len(bom),
         "total_usd": BOM.bom_total(bom),
@@ -246,7 +263,7 @@ def run_pipeline(
 
     # 8. LABOR
     labor = LABOR.compute_labor(design, bom)
-    summary["steps"].append({
+    _emit_step({
         "step": "labor",
         "total_hours": round(sum(r.hours for r in labor), 1),
         "total_usd": LABOR.labor_total(labor),
@@ -258,7 +275,7 @@ def run_pipeline(
     )
     paths = PROPOSAL.write_proposal_files(proposal_data, out_dir)
     summary["files"].update(paths)
-    summary["steps"].append({
+    _emit_step({
         "step": "proposal",
         "total_usd": proposal_data["pricing"]["total_usd"],
     })
@@ -280,12 +297,12 @@ def run_pipeline(
             submittal_paths["nfpa_report"] = str(nfpa_path)
         except Exception as e:  # noqa: BLE001
             submittal_paths["nfpa_report_error"] = str(e)
-        summary["steps"].append({
+        _emit_step({
             "step": "submittal",
             "files": list(submittal_paths.keys()),
         })
     except Exception as e:
-        summary["steps"].append({"step": "submittal", "error": str(e)})
+        _emit_step({"step": "submittal", "error": str(e)})
 
     _write_manifest(design, out_dir, summary)
 

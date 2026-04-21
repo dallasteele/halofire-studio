@@ -308,9 +308,30 @@ async def intake_upload(
 
 
 async def _run_job(job_id: str, pdf_path: str, project_id: str, mode: str) -> None:
-    """Background job runner. Pushes progress into _JOBS[job_id]."""
+    """Background job runner. Pushes progress into _JOBS[job_id].
+
+    V2 step 5 — also appends per-stage events to the job's
+    ``events`` list + wakes any SSE listeners on ``event_condition``
+    so ``/intake/stream/{job_id}`` can drip progress out as it lands.
+    """
     job = _JOBS[job_id]
     job["status"] = "running"
+    job.setdefault("events", [])
+    job.setdefault("event_condition", asyncio.Condition())
+    loop = asyncio.get_running_loop()
+
+    def _on_progress(event: dict[str, Any]) -> None:
+        # Called from the pipeline worker thread — schedule the
+        # condition wake on the event loop.
+        async def _push() -> None:
+            async with job["event_condition"]:
+                job["events"].append(event)
+                job["event_condition"].notify_all()
+        try:
+            asyncio.run_coroutine_threadsafe(_push(), loop)
+        except RuntimeError:
+            job["events"].append(event)
+
     try:
         orch = _orchestrator()
         if not orch:
@@ -332,6 +353,7 @@ async def _run_job(job_id: str, pdf_path: str, project_id: str, mode: str) -> No
         def _run():
             return orch.run_pipeline(
                 pdf_path, project_id=project_id, out_dir=out_dir,
+                progress_callback=_on_progress,
             )
         summary = await loop.run_in_executor(None, _run)
         job["summary"] = summary
@@ -347,7 +369,69 @@ async def _run_job(job_id: str, pdf_path: str, project_id: str, mode: str) -> No
 async def intake_status(job_id: str) -> dict[str, Any]:
     if job_id not in _JOBS:
         raise HTTPException(404, "no such job")
-    return _JOBS[job_id]
+    # Drop non-JSON-serializable internals (Condition) from the
+    # response payload.
+    job = _JOBS[job_id]
+    return {k: v for k, v in job.items() if k != "event_condition"}
+
+
+@app.get("/intake/stream/{job_id}")
+async def intake_stream(job_id: str):
+    """V2 step 5 — SSE stream of pipeline stage events.
+
+    Emits one ``data: <json>`` line per stage completion (intake,
+    classify, place, route, hydraulic, rulecheck, bom, labor,
+    proposal, submittal). Closes when the job reaches
+    status='completed' or 'failed'.
+
+    Editor consumers can use EventSource to spawn Pascal nodes into
+    the viewport as each stage lands — walls first, then rooms, then
+    heads, then pipes.
+    """
+    if job_id not in _JOBS:
+        raise HTTPException(404, "no such job")
+    from fastapi.responses import StreamingResponse  # local import ok
+
+    async def _gen():
+        job = _JOBS[job_id]
+        job.setdefault("events", [])
+        job.setdefault("event_condition", asyncio.Condition())
+        cursor = 0
+        yield f"event: hello\ndata: {json.dumps({'job_id': job_id})}\n\n"
+        while True:
+            # Emit any events we haven't emitted yet.
+            while cursor < len(job["events"]):
+                ev = job["events"][cursor]
+                cursor += 1
+                yield f"data: {json.dumps(ev)}\n\n"
+            status = job.get("status")
+            if status in ("completed", "failed"):
+                # Drain one more time in case a final event landed
+                # between the loop check and the condition notify.
+                while cursor < len(job["events"]):
+                    ev = job["events"][cursor]
+                    cursor += 1
+                    yield f"data: {json.dumps(ev)}\n\n"
+                yield f"event: end\ndata: {json.dumps({'status': status})}\n\n"
+                return
+            # Wait for another event or a status change (5 s keepalive).
+            try:
+                async with job["event_condition"]:
+                    await asyncio.wait_for(
+                        job["event_condition"].wait(), timeout=5,
+                    )
+            except asyncio.TimeoutError:
+                yield ": keepalive\n\n"
+
+    return StreamingResponse(
+        _gen(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",  # disable nginx buffering
+        },
+    )
 
 
 @app.get("/projects/{project_id}/proposal.json")

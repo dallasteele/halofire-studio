@@ -920,6 +920,10 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
         percent: 0,
         steps_complete: [],
       })
+      // V2 step 5 — tell AutoPilot to attach to this job's SSE stream.
+      window.dispatchEvent(
+        new CustomEvent('halofire:job-started', { detail: { jobId } }),
+      )
 
       pollRef.current = setInterval(async () => {
         try {

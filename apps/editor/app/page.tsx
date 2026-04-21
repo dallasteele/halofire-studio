@@ -22,6 +22,8 @@ import { Ribbon, type RibbonCommand } from '@/components/halofire/Ribbon'
 import { SceneBootstrap } from '@/components/halofire/SceneBootstrap'
 import { SceneChangeBridge } from '@/components/halofire/SceneChangeBridge'
 import { HalofireNodeWatcher } from '@/components/halofire/HalofireNodeWatcher'
+import { AutoPilot } from '@/components/halofire/AutoPilot'
+import { useEffect, useState } from 'react'
 import { StatusBar } from '@/components/halofire/StatusBar'
 import { ToolOverlay } from '@/components/halofire/ToolOverlay'
 
@@ -139,6 +141,21 @@ function dispatchRibbon(cmd: RibbonCommand): void {
 }
 
 export default function Home() {
+  // V2 step 5 — AutoPilot listens for job-started events that
+  // AutoDesignPanel dispatches, then subscribes to the SSE stream.
+  const [jobId, setJobId] = useState<string | null>(null)
+  useEffect(() => {
+    const onStart = (e: Event) => {
+      const detail = (e as CustomEvent).detail as { jobId?: string }
+      if (detail?.jobId) setJobId(detail.jobId)
+    }
+    window.addEventListener('halofire:job-started', onStart as EventListener)
+    return () =>
+      window.removeEventListener(
+        'halofire:job-started', onStart as EventListener,
+      )
+  }, [])
+
   return (
     <div className="flex h-screen w-screen flex-col">
       {/* Auto-populate the viewport on first session load so
@@ -160,6 +177,9 @@ export default function Home() {
       <LayerPanel />
       {/* V2 Phase 5.3: selection-driven props for halofire items */}
       <HalofireProperties />
+      {/* V2 step 5: live pipeline-stage SSE consumer — appears when
+          AutoDesignPanel kicks off a job and dispatches job-started. */}
+      <AutoPilot jobId={jobId} />
       <Ribbon onCommand={dispatchRibbon} />
       <div className="min-h-0 flex-1">
         <Editor
