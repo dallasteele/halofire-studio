@@ -215,17 +215,10 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
 
   useEffect(() => () => stopPoll(), [stopPoll])
 
-  // On mount, sweep any stale building_shell / synthetic nodes
-  // that point at 404 GLB URLs from prior sessions. Without this
-  // the Runtime-Error overlay covers the viewport before the user
-  // can even reach Auto-Design.
-  useEffect(() => {
-    const id = window.setTimeout(() => {
-      try { clearPreviousAutoDesign() } catch { /* best effort */ }
-    }, 100)
-    return () => window.clearTimeout(id)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  // (Previous iteration auto-cleared on mount to wipe stale 404
+  // building_shell nodes — but that nuked the rendered building
+  // 100 ms after every page reload. Removed. Stale-node sweep now
+  // runs only on explicit Clear scene / Render last bid clicks.)
 
   // When pipeline completes, spawn building shell + heads + pipes
   // into the Three.js viewport automatically (no manual clicks).
