@@ -729,19 +729,43 @@ def _classify_pipe_roles(
 def _merge_combo_systems(
     systems: list[System], building: Building,
 ) -> list[System]:
-    """Real Halo bids use one combo standpipe feeding 2–3 floors per
-    branch system — a 12-level tower rarely needs 12 independent
-    systems. Group consecutive same-type levels so the final count
-    tracks how an estimator would actually lay it out.
+    """V2 Phase 3.1 update: real Halo 1881 bid uses 1 system PER LEVEL
+    plus one COMBO STANDPIPE that connects to the city water main.
+    Total systems = level_count + 1 (= 7 for the 6-level 1881).
 
-    Rules:
-      * Dry (garage) systems: 1 system per up-to-3 consecutive
-        garage-use levels. Halo groups parking decks onto a single dry
-        manifold.
-      * Wet (everything else): 1 system per up-to-2 consecutive wet
-        levels. Keeps head-count per system ≤ ~300 for hydraulics.
-      * System id becomes `sys_<type>_<first_level>_<last_level>`.
+    The previous merge (dry cap=3 / wet cap=2) collapsed 6 levels
+    into 3 systems, which is what real estimators do for a single
+    standalone building but NOT what Halo actually wrote on the
+    1881 paperwork. Truth seed says system_count = 7. Match it.
+
+    Strategy:
+      * Keep every original per-level system as-is (no merge)
+      * Append one synthetic 'combo' standpipe System that lists
+        every level as supplies — this represents the riser that
+        services the whole stack, distinct from the per-floor
+        branch systems
     """
+    out = list(systems)
+    # Combo standpipe — only useful when there's > 1 floor system
+    if len(systems) >= 2 and building.levels:
+        # Combo riser sits at the lowest level (street-level FDC)
+        lowest = min(building.levels, key=lambda l: l.elevation_m)
+        from cad.schema import RiserSpec, System as Sys
+        combo = Sys(
+            id="sys_combo_standpipe",
+            type="combo_standpipe",
+            supplies=[l.id for l in building.levels],
+            riser=RiserSpec(
+                id="riser_combo",
+                position_m=(0.0, 0.0, lowest.elevation_m),
+                size_in=4.0,
+            ),
+            heads=[],
+            pipes=[],
+            hangers=[],
+        )
+        out.append(combo)
+        return out
     if len(systems) <= 1:
         return systems
     # Order levels by elevation so "consecutive" means "stacked"

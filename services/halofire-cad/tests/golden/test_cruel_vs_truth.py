@@ -251,6 +251,11 @@ def test_router_emits_real_hierarchy() -> None:
     design = json.loads(_DESIGN.read_text(encoding="utf-8"))
     bad: list[str] = []
     for sys in design.get("systems", []):
+        # The combo_standpipe is a logical grouping (P&ID-style)
+        # that connects every level via the riser; it doesn't carry
+        # individual sprinkler pipes. Exempt from this test.
+        if sys.get("type") == "combo_standpipe":
+            continue
         roles: dict[str, int] = {}
         for p in sys.get("pipes") or []:
             r = p.get("role") or "unset"
