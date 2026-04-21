@@ -30,6 +30,11 @@
       "types": "./dist/scene/translate-slice.d.ts",
       "import": "./dist/scene/translate-slice.js",
       "default": "./dist/scene/translate-slice.js"
+    },
+    "./sheets/generate-default-set": {
+      "types": "./dist/sheets/generate-default-set.d.ts",
+      "import": "./dist/sheets/generate-default-set.js",
+      "default": "./dist/sheets/generate-default-set.js"
     }
   },
   "files": ["dist", "README.md"],

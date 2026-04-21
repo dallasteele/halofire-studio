@@ -5,3 +5,4 @@ export * from './scad/parse-params.js'
 // type, so we namespace the barrel re-exports to avoid collisions.
 export * as sceneSpawn from './scene/spawn-from-design.js'
 export * as sceneSlice from './scene/translate-slice.js'
+export * as sheetsDefault from './sheets/generate-default-set.js'
