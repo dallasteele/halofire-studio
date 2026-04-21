@@ -1,6 +1,7 @@
 'use client'
 
 import {
+  DimensionTool,
   Editor,
   type SidebarTab,
   ViewerToolbarLeft,
@@ -19,6 +20,7 @@ import { HalofireProperties } from '@/components/halofire/HalofireProperties'
 import { LiveCalc } from '@/components/halofire/LiveCalc'
 import { RemoteAreaDraw } from '@/components/halofire/RemoteAreaDraw'
 import { Ribbon, type RibbonCommand } from '@/components/halofire/Ribbon'
+import { autoDimensionPipeRun } from '@halofire/core/drawing/auto-dim-pipe-runs'
 import { SceneBootstrap } from '@/components/halofire/SceneBootstrap'
 import { SceneChangeBridge } from '@/components/halofire/SceneChangeBridge'
 import { HalofireNodeWatcher } from '@/components/halofire/HalofireNodeWatcher'
@@ -106,6 +108,83 @@ const SIDEBAR_TABS: (SidebarTab & { component: React.ComponentType })[] = [
   },
 ]
 
+/**
+ * R8.3 — Auto-Dim Pipe Runs.
+ *
+ * Walks the live scene store, groups pipes + heads per system, and
+ * calls `autoDimensionPipeRun` from @halofire/core to produce
+ * continuous Dimension objects along every branch and cross-main.
+ *
+ * The aggregated Dimension[] is:
+ *   1. Stashed on `window.__hfAutoDim` so tests + dev tools can
+ *      inspect the last run.
+ *   2. Broadcast via `halofire:dimensions-ready` so a future sheet
+ *      consumer can append them to the active SheetNode's
+ *      `dimensions` array. If no system is found we emit a toast-ish
+ *      event (`halofire:toast`) instead so the user sees feedback.
+ */
+async function handleAutoDim(): Promise<void> {
+  if (typeof window === 'undefined') return
+  const scene = (window as unknown as { __hfScene?: { getState: () => { nodes: Record<string, unknown> } } }).__hfScene
+  const nodes: Record<string, unknown> = scene
+    ? (scene.getState().nodes ?? {})
+    : {}
+
+  const systems: { id: string }[] = []
+  const pipesBySystem = new Map<string, unknown[]>()
+  const headsBySystem = new Map<string, unknown[]>()
+  for (const raw of Object.values(nodes)) {
+    const n = raw as { id?: string; type?: string; systemId?: string }
+    if (!n || !n.type) continue
+    if (n.type === 'system' && n.id) systems.push({ id: n.id })
+    else if (n.type === 'pipe' && n.systemId) {
+      const arr = pipesBySystem.get(n.systemId) ?? []
+      arr.push(n)
+      pipesBySystem.set(n.systemId, arr)
+    } else if (n.type === 'sprinkler_head' && n.systemId) {
+      const arr = headsBySystem.get(n.systemId) ?? []
+      arr.push(n)
+      headsBySystem.set(n.systemId, arr)
+    }
+  }
+
+  if (systems.length === 0) {
+    window.dispatchEvent(
+      new CustomEvent('halofire:toast', {
+        detail: {
+          level: 'warn',
+          message: 'no systems to dimension',
+        },
+      }),
+    )
+    ;(window as unknown as { __hfAutoDim?: unknown[] }).__hfAutoDim = []
+    return
+  }
+
+  const dims: unknown[] = []
+  for (const sys of systems) {
+    const pipes = (pipesBySystem.get(sys.id) ?? []) as Parameters<
+      typeof autoDimensionPipeRun
+    >[1]
+    const heads = (headsBySystem.get(sys.id) ?? []) as Parameters<
+      typeof autoDimensionPipeRun
+    >[2]
+    const systemDims = autoDimensionPipeRun(sys, pipes, heads, {
+      style_id: 'halofire.default',
+      sheet_id: 'sheet_active',
+      unit_display: 'ft_in',
+    })
+    dims.push(...systemDims)
+  }
+
+  ;(window as unknown as { __hfAutoDim?: unknown[] }).__hfAutoDim = dims
+  window.dispatchEvent(
+    new CustomEvent('halofire:dimensions-ready', {
+      detail: { dimensions: dims },
+    }),
+  )
+}
+
 function dispatchRibbon(cmd: RibbonCommand): void {
   // Bridge ribbon events into whatever panel reacts to them. Today
   // we fire a DOM event so any tab/sidebar can listen without a
@@ -132,6 +211,9 @@ function dispatchRibbon(cmd: RibbonCommand): void {
   }
   // V2 Phase 5.2: Wade-flow Approve & Submit — flips bid status,
   // posts to the gateway, opens the proposal preview.
+  if (cmd === 'auto-dim-pipe-runs') {
+    void handleAutoDim()
+  }
   if (cmd === 'report-approve-submit') {
     const gw = process.env.NEXT_PUBLIC_HALOPENCLAW_URL ?? 'http://localhost:18080'
     fetch(`${gw}/projects/${ACTIVE_PROJECT_ID}/approve`, {
@@ -176,6 +258,7 @@ export default function Home() {
       <CommandPalette />
       <ToolOverlay />
       <RemoteAreaDraw projectId={ACTIVE_PROJECT_ID} />
+      <DimensionTool />
       <LiveCalc projectId={ACTIVE_PROJECT_ID} />
       <LayerPanel />
       {/* V2 Phase 5.3: selection-driven props for halofire items */}

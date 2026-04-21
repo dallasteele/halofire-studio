@@ -4,6 +4,13 @@ export { useCommandPalette } from './components/ui/command-palette'
 export { SliderControl } from './components/ui/controls/slider-control'
 export { FloatingLevelSelector } from './components/ui/floating-level-selector'
 export { CATALOG_ITEMS } from './components/ui/item-catalog/catalog-items'
+export {
+  DimensionTool,
+  type DimensionKind,
+  type DimensionMode,
+  type DimensionToolState,
+  type WorldPoint,
+} from './components/tools/dimension/dimension-tool'
 export { useSidebarStore } from './components/ui/primitives/sidebar'
 export { Slider } from './components/ui/primitives/slider'
 export { SceneLoader } from './components/ui/scene-loader'

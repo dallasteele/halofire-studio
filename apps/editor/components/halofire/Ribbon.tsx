@@ -27,6 +27,8 @@ export type RibbonCommand =
   | 'measure'
   | 'section'
   | 'remote-area'
+  | 'auto-dim-pipe-runs'
+  | 'dimension'
   | 'hydraulic-calc'
   | 'rule-check'
   | 'stress-test'
@@ -38,7 +40,7 @@ export type RibbonCommand =
   | 'report-approve-submit'
   | 'report-send-to-client'
 
-type RibbonTab = 'design' | 'analyze' | 'report'
+type RibbonTab = 'design' | 'annotate' | 'analyze' | 'report'
 
 interface Group {
   label: string
@@ -81,7 +83,31 @@ const TABS: Record<RibbonTab, Group[]> = {
       ],
     },
   ],
+  annotate: [
+    {
+      label: 'Dimensions',
+      buttons: [
+        {
+          cmd: 'dimension',
+          label: 'Dimension',
+          hint: 'R8.2 · Click two points to place a linear dimension · D · Tab cycle · Esc cancel',
+          tone: 'accent',
+        },
+      ],
+    },
+  ],
   analyze: [
+    {
+      label: 'Auto',
+      buttons: [
+        {
+          cmd: 'auto-dim-pipe-runs',
+          label: 'Auto-Dim Pipes',
+          hint: 'Generate continuous dimensions for every branch + cross-main',
+          tone: 'default',
+        },
+      ],
+    },
     {
       label: 'Hydraulics',
       buttons: [
@@ -169,7 +195,7 @@ export function Ribbon({ onCommand, defaultTab = 'design' }: RibbonProps) {
             Studio
           </span>
         </div>
-        {(['design', 'analyze', 'report'] as RibbonTab[]).map((t) => (
+        {(['design', 'annotate', 'analyze', 'report'] as RibbonTab[]).map((t) => (
           <button
             key={t}
             type="button"
