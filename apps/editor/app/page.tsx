@@ -28,6 +28,8 @@ import { SceneChangeBridge } from '@/components/halofire/SceneChangeBridge'
 import { HalofireNodeWatcher } from '@/components/halofire/HalofireNodeWatcher'
 import { UndoStack } from '@/components/halofire/UndoStack'
 import { AutoPilot } from '@/components/halofire/AutoPilot'
+import { installHydraulicSystem } from '@pascal-app/core/systems/hydraulic/hydraulic-system'
+import { useScene } from '@pascal-app/core'
 import { useEffect, useState } from 'react'
 import { StatusBar } from '@/components/halofire/StatusBar'
 import { ToolOverlay } from '@/components/halofire/ToolOverlay'
@@ -239,6 +241,18 @@ export default function Home() {
       window.removeEventListener(
         'halofire:job-started', onStart as EventListener,
       )
+  }, [])
+
+  // R1.6 — HydraulicSystem boot-install. Subscribes to the Pascal
+  // scene store and re-solves Hazen-Williams demand on every
+  // pipe/system/head mutation. The live solver debounces to 300 ms
+  // so a burst of mutations fires a single solve.
+  useEffect(() => {
+    const unsub = installHydraulicSystem(
+      useScene as unknown as Parameters<typeof installHydraulicSystem>[0],
+      { debounceMs: 300 },
+    )
+    return () => unsub()
   }, [])
 
   return (
