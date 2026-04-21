@@ -31,7 +31,7 @@ log = get_logger("intake")
 # Matches the title_block.classify_page() return values.
 _PLAN_KINDS = {
     "floor_plan", "fire_protection", "mechanical", "plumbing",
-    "electrical", "unknown",  # unknown = keep; cheap to try
+    "electrical",
 }
 _SKIP_KINDS = {
     "cover", "elevation", "section", "detail", "schedule",
@@ -42,26 +42,124 @@ _SKIP_KINDS = {
 def _candidate_pages(
     pdf_path: str, n_pages: int, hard_cap: int = 14,
 ) -> list[int]:
-    """Return up to `hard_cap` candidate page indices.
+    """Return candidate page indices that look like floor plans.
 
-    Page-text classification doesn't work on real architectural sets
-    because every sheet has a sheet-index sidebar listing every other
-    sheet — so substring matches like "A-101" or "FLOOR PLAN" hit on
-    every page. Visual / sheet-corner classification is the right
-    long-term fix; for now we return the first N pages and rely on
-    downstream filters (CubiCasa room/wall counts, the placer's
-    8000sqm site-plan guard) to drop obviously-non-residential pages
-    from the level stack.
+    V2 Phase 1.3 — sheet-ID page-type filter. The prior implementation
+    just returned `range(hard_cap)` which dragged cover pages,
+    elevations, sections, and schedules into the level stack as bogus
+    "floor plans" with inflated walls-on-titleblock geometry. The
+    long-standing sheet-list-sidebar false-positive problem is
+    sidestepped by confining the classifier to the bottom-right
+    quadrant, which is where the AIA title-block sheet ID actually
+    lives (sheet-index sidebars sit on the RIGHT edge but span the
+    full page height, so the bottom-right slice isolates the
+    sheet-stamp).
 
-    KNOWN LIMITATION: pages 1-7 of typical sets are still ingested as
-    "levels" with bogus geometry. The fix lives in `intake_file` —
-    reject any level whose CubiCasa output has < 2 rooms AND its
-    polygon area > 5 000 sqm. That guard will land in a follow-on
-    commit; this revert stops the previous attempt from blowing the
-    intake budget by 186 s on an unhelpful page-text scan.
+    Fallback to `range(hard_cap)` if classification fails on every
+    page (scanned PDFs, no text layer, etc.) so raster intake still
+    runs.
     """
-    _ = pdf_path
-    return list(range(min(n_pages, hard_cap)))
+    return _classify_plan_pages(pdf_path, n_pages, hard_cap)
+
+
+def _load_title_block():
+    """Load the sibling `title_block.py` module lazily (avoids
+    package-import issues when agent.py runs standalone)."""
+    import importlib.util as _iu
+    _spec = _iu.spec_from_file_location(
+        "_hf_tb", Path(__file__).parent / "title_block.py",
+    )
+    if not _spec or not _spec.loader:
+        return None
+    mod = _iu.module_from_spec(_spec)
+    sys.modules["_hf_tb"] = mod
+    _spec.loader.exec_module(mod)
+    return mod
+
+
+def _classify_plan_pages(
+    pdf_path: str, n_pages: int, hard_cap: int,
+) -> list[int]:
+    _tb = _load_title_block()
+    if _tb is None:
+        return list(range(min(n_pages, hard_cap)))
+    keep: list[int] = []
+    rejects: list[tuple[int, str, str | None]] = []
+    classified_any = False
+    try:
+        with pdfplumber.open(pdf_path) as pdf:
+            for i in range(min(n_pages, hard_cap * 2)):  # scan wider
+                try:
+                    page = pdf.pages[i]
+                    w = float(page.width or 612)
+                    h = float(page.height or 792)
+                    # AIA title block: bottom-right quadrant.
+                    # pdfplumber y-origin is TOP, so "bottom" = y > h*0.65,
+                    # "right" = x > w*0.65.
+                    # Use words (not chars) so classify_page's regex
+                    # matches "A-101" rather than space-joined "A - 1 0 1".
+                    try:
+                        words = page.extract_words() or []
+                    except (IOError, ValueError, AttributeError):
+                        words = []
+                    if not words:
+                        # Fallback: concat chars into one bottom-right
+                        # string so sheet-no regex still matches.
+                        chars_br = [
+                            c for c in (page.chars or [])
+                            if (c.get("x0") or 0) > w * 0.65
+                            and (c.get("top") or 0) > h * 0.65
+                        ]
+                        words = [{
+                            "text": "".join(
+                                str(c.get("text") or "") for c in chars_br
+                            ),
+                            "x0": w * 0.80, "top": h * 0.90,
+                        }] if chars_br else []
+                    fragments = [
+                        {"text": wd.get("text"),
+                         "x0": wd.get("x0"), "y0": wd.get("top")}
+                        for wd in words
+                        if (wd.get("x0") or 0) > w * 0.65
+                        and (wd.get("top") or 0) > h * 0.65
+                    ]
+                    cls = _tb.classify_page(fragments)
+                except (IOError, ValueError, KeyError, AttributeError):
+                    cls = {"kind": "unknown", "confidence": 0.0,
+                           "sheet_no": None}
+                classified_any = classified_any or bool(cls.get("sheet_no"))
+                if cls["kind"] in _PLAN_KINDS:
+                    keep.append(i)
+                    if len(keep) >= hard_cap:
+                        break
+                else:
+                    rejects.append((i, cls["kind"], cls.get("sheet_no")))
+    except (IOError, OSError, ValueError) as e:
+        warn_swallowed(
+            log, code="CANDIDATE_PAGES_OPEN_FAILED", err=e,
+            pdf_path=pdf_path,
+        )
+        return list(range(min(n_pages, hard_cap)))
+
+    if not classified_any and not keep:
+        # No text layer / scanned set — behave like the legacy scanner.
+        log.info(
+            "candidate_pages.no_text_layer_fallback",
+            extra={"pdf": Path(pdf_path).name, "n_pages": n_pages},
+        )
+        return list(range(min(n_pages, hard_cap)))
+
+    if rejects:
+        log.info(
+            "candidate_pages.filtered",
+            extra={
+                "pdf": Path(pdf_path).name,
+                "kept": keep,
+                "rejected": rejects[:20],  # cap noise
+                "rejected_count": len(rejects),
+            },
+        )
+    return keep
 
 # Snap tolerance for orthogonality (degrees)
 ORTHO_TOL_DEG = 3.0
