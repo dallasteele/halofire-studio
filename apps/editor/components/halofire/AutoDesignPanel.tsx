@@ -16,7 +16,7 @@
  * zero walls, the UI says so — it does NOT spawn a fake building.
  */
 
-import { emitter, generateId, LevelNode, SlabNode, WallNode, useScene } from '@pascal-app/core'
+import { CeilingNode, emitter, generateId, LevelNode, SlabNode, WallNode, useScene } from '@pascal-app/core'
 
 /** Compute the bbox of a flat list of 2D points. */
 function bboxOf(pts: Iterable<[number, number]>): {
@@ -261,15 +261,27 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
           const [lcx, lcy] = levelCenter.get(levelId) ?? [gx, gy]
           return [(p[0] - lcx) * scale, (p[1] - lcy) * scale]
         }
-        /** Convert a plan 3D point to three.js (Y-up) AND shift by
-         *  the matching level's centroid. */
+        /** Convert plan (x, y, z_world) → Pascal LEVEL-LOCAL
+         *  (x, y_in_level, z) for ItemNode positions. Pascal's
+         *  level-system positions each LevelNode at the right
+         *  world-Y; children of the level get position in the level
+         *  frame where Y=0 is the level floor. So we need to:
+         *    * x → x - level_centroid_x       (centred on level)
+         *    * y → z_world - level.elevation  (height inside level)
+         *    * z → y_plan - level_centroid_y  (centred on level)
+         *  This puts a head with deflector 0.1 m below the ceiling
+         *  at level-local Y = 2.9 inside a 3 m level frame.
+         */
+        const archLevels = design.building?.levels ?? []
         const T3 = (
           p: [number, number, number], levelId: string,
         ): [number, number, number] => {
           const [lcx, lcy] = levelCenter.get(levelId) ?? [gx, gy]
+          const lvl = archLevels.find((l: any) => l.id === levelId)
+          const baseElev = lvl?.elevation_m ?? 0
           return [
             (p[0] - lcx) * scale,
-            p[2] * scale,
+            (p[2] - baseElev) * scale,
             (p[1] - lcy) * scale,
           ]
         }
@@ -347,6 +359,10 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
             try {
               const newLevel = LevelNode.parse({
                 name: lvl.name,
+                // LevelSystem sorts by `level` integer + stacks via
+                // cumulative getLevelHeight(); idx (kept-level index)
+                // gives a clean 0,1,2,... sequence so the building
+                // stacks bottom-up with no gaps.
                 level: idx,
                 children: [],
                 parentId: buildingId,
@@ -364,20 +380,38 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
             topZ: lvl.elevation_m + (lvl.height_m ?? 3.0),
           })
 
-          // Slab with the REAL concave polygon. Pascal's SlabNode extrudes
-          // `polygon: [[x, z], ...]` at `elevation` via ExtrudeGeometry —
-          // this is what makes the floor visible (instead of a red bbox).
+          // Pascal SlabNode: polygon is [x, z] LEVEL-LOCAL coords
+          // and `elevation` is SLAB THICKNESS (default 0.05). Setting
+          // it to lvl.elevation_m (e.g. 30 m for the top floor)
+          // produced 30 m-thick concrete blocks. Slab thickness is
+          // ~0.2 m for real concrete; LevelSystem stacks levels
+          // vertically by reading getLevelHeight() of each level's
+          // children. We add a CeilingNode below to set that to 3 m.
           try {
             const slab = SlabNode.parse({
               name: `${lvl.name} slab`,
               polygon: (lvl.polygon_m ?? []).map((p) => T2(p, lvl.id)),
-              elevation: Math.max(0.05, lvl.elevation_m || 0.05),
+              elevation: 0.2,
               parentId: pascalLevelId,
               metadata: { tags: ['halofire', 'slab', 'auto_design'] },
             })
             createNode(slab as any, pascalLevelId as any)
           } catch {
             // per-level spawn is best-effort; don't block others
+          }
+          // Ceiling drives level height — without it Pascal's
+          // getLevelHeight defaults to 2.5 m and stacking is wrong.
+          try {
+            const ceil = CeilingNode.parse({
+              name: `${lvl.name} ceiling`,
+              polygon: (lvl.polygon_m ?? []).map((p) => T2(p, lvl.id)),
+              height: lvl.height_m ?? 3.0,
+              parentId: pascalLevelId,
+              metadata: { tags: ['halofire', 'ceiling', 'auto_design'] },
+            } as any)
+            createNode(ceil as any, pascalLevelId as any)
+          } catch {
+            // ceiling is optional — fall through with default 2.5 m
           }
 
           // Walls from intake — cap at 200 per level so a 3000-wall
@@ -491,15 +525,17 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
           for (const p of sys.pipes ?? []) {
             if (pipesSpawned >= MAX_PIPES_VIEWPORT) break
             try {
-              // Plan midpoint, recentered on the matching arch
-              // level's centroid so the pipe lands above its slab.
-              const archId = archLevelForZ(
-                (p.start_m[2] + p.end_m[2]) / 2,
-              )
+              // Plan midpoint → LEVEL-LOCAL coords (matching head
+              // logic). Pipe lives inside the level frame; world-Y
+              // for the level itself is set by Pascal's level-system.
+              const midZworld = (p.start_m[2] + p.end_m[2]) / 2
+              const archId = archLevelForZ(midZworld)
               const [pcx, pcy] = levelCenter.get(archId) ?? [gx, gy]
+              const archLvl = archLevels.find((l: any) => l.id === archId)
+              const baseElev = archLvl?.elevation_m ?? 0
               const mx_plan = (p.start_m[0] + p.end_m[0]) / 2 - pcx
               const my_plan = (p.start_m[1] + p.end_m[1]) / 2 - pcy
-              const mz_plan = (p.start_m[2] + p.end_m[2]) / 2
+              const mz_plan = midZworld - baseElev
               const dx = p.end_m[0] - p.start_m[0]
               const dy = p.end_m[1] - p.start_m[1]
               const dz = p.end_m[2] - p.start_m[2]

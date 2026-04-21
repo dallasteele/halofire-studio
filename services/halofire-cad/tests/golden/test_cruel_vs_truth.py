@@ -341,6 +341,63 @@ def test_each_kept_level_has_realistic_polygon_area() -> None:
         )
 
 
+# ── viewport coherence (UI side, run separately as smoke test) ──
+
+# (Slab-thickness check is a UI-side concern — Pascal's SlabNode
+#  uses `elevation` as the slab thickness, NOT the floor's height
+#  above ground. Setting it to 30 m for the top floor produced
+#  30 m-thick concrete blocks instead of 0.2 m slabs. The fix lives
+#  in apps/editor/components/halofire/AutoDesignPanel.tsx — slab
+#  elevation is hardcoded to 0.2 m and Pascal's level-system handles
+#  vertical stacking via LevelNode.level.)
+
+
+# ── stack coherence ─────────────────────────────────────────────
+
+@pytest.mark.cruel
+@pytest.mark.golden
+def test_floor_plates_have_similar_footprint() -> None:
+    """A real high-rise has consistent floor plates — residential
+    floors above the podium share the same outline. Stacking widely
+    different polygons per page produces a Jenga tower of mismatched
+    slabs, not a building.
+
+    Test: every level's polygon area must be within 50 % of the
+    median area. This forces the intake (or downstream level
+    canonicalization) to pick a representative footprint and reuse
+    it instead of letting per-page CubiCasa noise dictate every
+    floor's shape.
+    """
+    _truth_or_skip()
+    if not _DESIGN.exists():
+        pytest.skip("design.json missing")
+    design = json.loads(_DESIGN.read_text(encoding="utf-8"))
+    from shapely.geometry import Polygon
+    areas: list[tuple[str, float]] = []
+    for lvl in design.get("building", {}).get("levels", []):
+        poly = lvl.get("polygon_m") or []
+        a = Polygon(poly).area if len(poly) >= 3 else 0.0
+        areas.append((lvl.get("name", "?"), a))
+    if not areas:
+        pytest.skip("no levels")
+    sorted_areas = sorted(a for _, a in areas)
+    median = sorted_areas[len(sorted_areas) // 2]
+    if median <= 0:
+        pytest.skip("zero-area median")
+    bad = [
+        (n, a) for n, a in areas
+        if abs(a - median) / median > 0.5
+    ]
+    if bad:
+        details = ", ".join(f"{n}={a:.0f}sqm" for n, a in bad)
+        raise AssertionError(
+            f"{len(bad)} level(s) have area > 50 % off median "
+            f"({median:.0f} sqm). Use one canonical floor polygon "
+            f"per podium-tier instead of per-page CubiCasa noise. "
+            f"Outliers: {details}"
+        )
+
+
 # ── completeness ────────────────────────────────────────────────
 
 @pytest.mark.cruel

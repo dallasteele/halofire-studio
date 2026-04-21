@@ -897,6 +897,13 @@ def _fill_floor_gaps(
         for sh in (lv.stair_shafts + lv.elevator_shafts):
             sh.bottom_z_m = lv.elevation_m
             sh.top_z_m = lv.elevation_m + lv.height_m
+    # Footprint canonicalization. Real high-rises have the SAME
+    # floor outline above the podium — residential floors all share
+    # one polygon. Per-page CubiCasa output gives every floor a
+    # different shape, producing a Jenga tower of mismatched slabs
+    # in the viewer. Pick the BEST polygon for each tier and reuse it.
+    out = _canonicalize_floor_plates(out, metadata, pdf_path)
+
     if synthetic_count:
         metadata["issues"].append({
             "code": "INTAKE_SYNTHESIZED_LEVELS",
@@ -913,6 +920,88 @@ def _fill_floor_gaps(
             "source": Path(pdf_path).name,
         })
     return out
+
+
+def _canonicalize_floor_plates(
+    levels: list[Level], metadata: dict, pdf_path: str,
+) -> list[Level]:
+    """Reuse one canonical polygon per tier so the building stack
+    looks like a building, not a Jenga tower of noisy slabs.
+
+    Strategy:
+      * Score each kept (non-synthetic) level by area in [800, 4000]
+        sqm AND room_count >= 1 AND wall_count in [40, 250]. The
+        winning polygon becomes the canonical residential plate.
+      * Reuse the canonical polygon for every level — including
+        synthetic clones. Walls / rooms stay per-level (so per-page
+        CubiCasa room placement still drives sprinkler density),
+        but the SLAB outline is uniform.
+      * If no level scores well, leave levels untouched.
+    """
+    if not levels:
+        return levels
+    from shapely.geometry import Polygon as _PG
+    def score(lv: Level) -> float:
+        try:
+            a = _PG(lv.polygon_m).area if len(lv.polygon_m) >= 3 else 0
+        except Exception:  # noqa: BLE001
+            a = 0
+        if a < 800 or a > 4000:
+            return -1
+        if len(lv.rooms) < 1:
+            return -1
+        if len(lv.walls) < 40 or len(lv.walls) > 250:
+            return -1
+        # Prefer levels closer to 2000 sqm (typical residential floor)
+        # and with more rooms (more semantic content).
+        area_fit = 1.0 - abs(a - 2000) / 2000
+        room_bonus = min(len(lv.rooms), 10) / 10
+        return area_fit + room_bonus
+    scored = [(score(lv), lv) for lv in levels]
+    best = max(scored, key=lambda t: t[0])
+    if best[0] < 0:
+        return levels  # no winner; bail
+    canonical = best[1]
+    canonical_poly = list(canonical.polygon_m)
+    # Re-center canonical at origin so per-level shifts in the UI
+    # don't have to remember per-level centroids — every level's
+    # polygon is now in the same coord frame.
+    bb_xs = [p[0] for p in canonical_poly]
+    bb_ys = [p[1] for p in canonical_poly]
+    cx = (min(bb_xs) + max(bb_xs)) / 2
+    cy = (min(bb_ys) + max(bb_ys)) / 2
+    centered_poly = [(p[0] - cx, p[1] - cy) for p in canonical_poly]
+    for lv in levels:
+        # Same canonical polygon for every level — uniform stack.
+        lv.polygon_m = list(centered_poly)
+        # Shift this level's walls + rooms by THIS level's original
+        # centroid so they overlay the canonical polygon at origin.
+        try:
+            lv_bb_xs = [w.start_m[0] for w in lv.walls] + [w.end_m[0] for w in lv.walls]
+            lv_bb_ys = [w.start_m[1] for w in lv.walls] + [w.end_m[1] for w in lv.walls]
+            if lv_bb_xs and lv_bb_ys:
+                ldx = (min(lv_bb_xs) + max(lv_bb_xs)) / 2
+                ldy = (min(lv_bb_ys) + max(lv_bb_ys)) / 2
+                for w in lv.walls:
+                    w.start_m = (w.start_m[0] - ldx, w.start_m[1] - ldy)
+                    w.end_m = (w.end_m[0] - ldx, w.end_m[1] - ldy)
+                for r in lv.rooms:
+                    r.polygon_m = [(p[0] - ldx, p[1] - ldy) for p in r.polygon_m]
+        except Exception:  # noqa: BLE001
+            pass
+    metadata["issues"].append({
+        "code": "INTAKE_CANONICAL_PLATE",
+        "severity": "info",
+        "message": (
+            f"All {len(levels)} levels canonicalized to the polygon "
+            f"of {canonical.id} ({_PG(canonical_poly).area:.0f} sqm, "
+            f"{len(canonical.rooms)} rooms, {len(canonical.walls)} "
+            f"walls). Per-floor wall/room sets remain per-level."
+        ),
+        "refs": [lv.id for lv in levels],
+        "source": Path(pdf_path).name,
+    })
+    return levels
 
 
 def intake_file(pdf_path: str, project_id: str) -> Building:
