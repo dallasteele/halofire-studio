@@ -7,6 +7,7 @@ export * as sceneSpawn from './scene/spawn-from-design.js'
 export * as sceneSlice from './scene/translate-slice.js'
 export * as sheetsDefault from './sheets/generate-default-set.js'
 export * as sheetsRiser from './sheets/riser-diagram.js'
+export * as sheetsFloorPlan from './sheets/floor-plan-layout.js'
 export {
   type DimPrimitive,
   dimensionToSvgPrimitives,

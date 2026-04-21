@@ -41,10 +41,20 @@
       "import": "./dist/sheets/riser-diagram.js",
       "default": "./dist/sheets/riser-diagram.js"
     },
+    "./sheets/floor-plan-layout": {
+      "types": "./dist/sheets/floor-plan-layout.d.ts",
+      "import": "./dist/sheets/floor-plan-layout.js",
+      "default": "./dist/sheets/floor-plan-layout.js"
+    },
     "./report/pdf-sheet-set": {
       "types": "./dist/report/pdf-sheet-set.d.ts",
       "import": "./dist/report/pdf-sheet-set.js",
       "default": "./dist/report/pdf-sheet-set.js"
+    },
+    "./drawing/auto-dim-pipe-runs": {
+      "types": "./dist/drawing/auto-dim-pipe-runs.d.ts",
+      "import": "./dist/drawing/auto-dim-pipe-runs.js",
+      "default": "./dist/drawing/auto-dim-pipe-runs.js"
     }
   },
   "files": ["dist", "README.md"],

@@ -28,9 +28,10 @@
  *     defaults are ARCH_D + `halofire.standard` + cut-sheets OFF
  *     (R7.4 ships the cut-sheet generator).
  */
-import type { SheetNode, Viewport, Annotation } from '@pascal-app/core/schema'
+import type { AnyNode, LevelNode, SheetNode, Viewport, Annotation } from '@pascal-app/core/schema'
 
-import type { Design, Vec2 } from '../scene/spawn-from-design.js'
+import type { Design, DesignLevel, Vec2 } from '../scene/spawn-from-design.js'
+import { buildFloorPlanLayout } from './floor-plan-layout.js'
 import { buildRiserDiagramLayout } from './riser-diagram.js'
 
 // ------------------------------------------------------------------
@@ -143,6 +144,46 @@ function titleAnnotation(
 }
 
 // ------------------------------------------------------------------
+// Bridge: DesignLevel → LevelNode + scene snapshot
+// ------------------------------------------------------------------
+
+/**
+ * Build a minimal `LevelNode` + slab-only scene snapshot from a
+ * DesignLevel. The floor-plan-layout helper needs SlabNodes to compute
+ * the world-space bbox; we synthesize one from the level polygon so
+ * generate-default-set can run without a live Pascal store.
+ */
+function synthesizeLevelSnapshot(
+  lvl: DesignLevel,
+  levelIdx: number,
+): { levelNode: LevelNode; snapshot: Record<string, AnyNode> } {
+  const slabId = `slab_${lvl.id}`
+  const polygon: [number, number][] = (lvl.polygon_m ?? [
+    [0, 0],
+    [10, 0],
+    [10, 10],
+    [0, 10],
+  ]) as [number, number][]
+  const slab = {
+    id: slabId,
+    type: 'slab',
+    polygon,
+    holes: [],
+    holeMetadata: [],
+    elevation: 0.05,
+    autoFromWalls: false,
+  } as unknown as AnyNode
+  const levelNode = {
+    id: lvl.id,
+    type: 'level',
+    name: lvl.name ?? `Level ${levelIdx + 1}`,
+    level: levelIdx,
+    children: [slabId],
+  } as unknown as LevelNode
+  return { levelNode, snapshot: { [slabId]: slab } }
+}
+
+// ------------------------------------------------------------------
 // Main entry point
 // ------------------------------------------------------------------
 
@@ -163,6 +204,7 @@ export function generateDefaultSheetSet(
     title: string,
     viewports: Viewport[],
     annotations: Annotation[],
+    hatches: SheetNode['hatches'] = [],
   ): SheetNode => {
     idx++
     return {
@@ -176,7 +218,7 @@ export function generateDefaultSheetSet(
       viewports,
       dimensions: [],
       annotations,
-      hatches: [],
+      hatches,
       revision_clouds: [],
       sheet_index: idx,
       discipline: 'fire_protection',
@@ -232,38 +274,33 @@ export function generateDefaultSheetSet(
   }
 
   // ---- FP-003..FP-(N+2) Floor plans -------------------------------
+  //
+  // R7.3 replaces the stubbed per-level viewport with
+  // `buildFloorPlanLayout`: auto-scale, discipline-aware layer filter,
+  // and hazard-class hatches. We synthesize a minimal `LevelNode` +
+  // scene snapshot from the DesignLevel polygon so the layout helper
+  // can compute a proper bbox without needing the live Pascal store.
+  const [paperWFp, paperHFp] = (PAPER_MM[paper_size] ?? PAPER_MM.ARCH_D) as [number, number]
   levels.forEach((lvl, levelIdx) => {
-    const [px, py, pw, ph] = plotableRect(paper_size)
-    const floorViewport: Viewport = {
-      id: nid('vp'),
-      paper_rect_mm: [px, py, pw, ph],
-      camera: {
-        kind: 'top',
-        level_id: lvl.id,
-      },
-      scale: '1_8', // 1/4"=1'-0"
-      layer_visibility: {
-        architectural: true,
-        fire_protection: true,
-        hvac: false,
-        electrical: false,
-        plumbing: false,
-      },
-    }
+    const { levelNode, snapshot } = synthesizeLevelSnapshot(lvl, levelIdx)
+    const fp = buildFloorPlanLayout(levelNode, snapshot, {
+      paper_w_mm: paperWFp,
+      paper_h_mm: paperHFp,
+      margin_mm: MARGIN.left,
+      discipline: 'fire_protection',
+    })
     sheets.push(
       baseSheet(
         `Level ${levelIdx + 1} — Sprinkler Plan`,
-        [floorViewport],
+        [fp.viewport],
         [
           titleAnnotation(
             paper_size,
             `Level ${levelIdx + 1} — ${lvl.name} — Sprinkler Plan`,
           ),
-          placeholderNote(
-            paper_size,
-            `Sprinkler plan for level ${lvl.name}. Full content in R7.4.`,
-          ),
+          ...fp.annotations,
         ],
+        fp.hatches,
       ),
     )
   })
