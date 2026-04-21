@@ -239,14 +239,23 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
         const halfW = rawHalfW * scale
         const halfH = rawHalfH * scale
         const PAD = 5 // metres of green around the building
-        /** Shift a 2D point so the building center is at origin AND
-         *  scale to TARGET_LONGEST_M. */
+        /** Shift a 2D plan point so the building center is at origin
+         *  AND scale to TARGET_LONGEST_M. SlabNode + WallNode store
+         *  the polygon as [x, z] in three.js plan coords already, so
+         *  this is a 1:1 axis map. */
         const T2 = (p: [number, number]): [number, number] => [
           (p[0] - cx) * scale, (p[1] - cy) * scale,
         ]
-        /** Shift a 3D point the same way (Pascal's X/Z are our X/Y). */
+        /** Convert a plan 3D point (X right, Y forward, Z up) to
+         *  Pascal/three.js order (X right, Y UP, Z forward). Without
+         *  this the building lies on its side: plan-Y becomes
+         *  height and elevation becomes depth, so a 130 m horizontal
+         *  cross-main reads as a 130 m vertical pipe through the
+         *  ground. */
         const T3 = (p: [number, number, number]): [number, number, number] => [
-          (p[0] - cx) * scale, (p[1] - cy) * scale, p[2] * scale,
+          (p[0] - cx) * scale,  // plan X → three.js X
+          p[2] * scale,          // plan Z (elevation) → three.js Y (UP)
+          (p[1] - cy) * scale,  // plan Y → three.js Z
         ]
 
         // Resize the existing Site polygon so the ground grid wraps
@@ -446,9 +455,10 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
           for (const p of sys.pipes ?? []) {
             if (pipesSpawned >= MAX_PIPES_VIEWPORT) break
             try {
-              const mx = (p.start_m[0] + p.end_m[0]) / 2 - cx
-              const my = (p.start_m[1] + p.end_m[1]) / 2 - cy
-              const mz = (p.start_m[2] + p.end_m[2]) / 2
+              // Plan midpoint (cx/cy = building bbox center)
+              const mx_plan = (p.start_m[0] + p.end_m[0]) / 2 - cx
+              const my_plan = (p.start_m[1] + p.end_m[1]) / 2 - cy
+              const mz_plan = (p.start_m[2] + p.end_m[2]) / 2
               const dx = p.end_m[0] - p.start_m[0]
               const dy = p.end_m[1] - p.start_m[1]
               const dz = p.end_m[2] - p.start_m[2]
@@ -456,6 +466,20 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
                 0.01,
                 Math.sqrt(dx * dx + dy * dy + dz * dz),
               )
+              // Convert plan→three.js (Y up). Position: plan(x,y,z)
+              // becomes three.js(x, z, y) so elevation goes up.
+              const mx = mx_plan * scale
+              const my = mz_plan * scale         // elevation → height
+              const mz = my_plan * scale         // plan Y → three.js Z
+              // Rotation: pipe lies flat in the X-Z plane (horizontal
+              // axis). Original pipe yaw was atan2(dy_plan, dx_plan).
+              // After axis swap, that's still rotation around three.js
+              // Y axis = position[1] axis. Three.js Euler rotation
+              // [rx, ry, rz] applied to a 1×1×1 box scaled along X
+              // means we rotate around Y to point the X-axis along
+              // the plan vector.
+              const yaw = Math.atan2(dy, dx)
+              const isVertical = Math.abs(dz) > Math.max(Math.abs(dx), Math.abs(dy))
               // Smart-Pipe color code per AutoSPRINK convention
               const role = p.role || 'unknown'
               const roleColor: Record<string, string> = {
@@ -472,7 +496,9 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
                   id: generateId('item'),
                   type: 'item',
                   position: [mx, my, mz],
-                  rotation: [0, 0, Math.atan2(dy, dx)],
+                  // Vertical drops point up the Y axis; horizontal
+                  // pipes lie in the X-Z plane and yaw around Y.
+                  rotation: isVertical ? [0, 0, Math.PI / 2] : [0, -yaw, 0],
                   scale: [len, 1, 1],
                   children: [],
                   asset: {
