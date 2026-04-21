@@ -35,6 +35,30 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from tools import registry
 
+# V2 step 4 — real OpenSCAD runtime. Lazy-instantiated at first use so
+# the gateway starts even when OpenSCAD isn't installed; it'll fall
+# back to the Trimesh pre-bake in that case.
+_SCAD_MOD_PATH = Path(__file__).resolve().parent / "openscad_runtime.py"
+_scad_spec = importlib.util.spec_from_file_location(
+    "halofire_openscad_runtime", _SCAD_MOD_PATH,
+)
+if _scad_spec is not None and _scad_spec.loader is not None:
+    openscad_runtime = importlib.util.module_from_spec(_scad_spec)
+    _scad_spec.loader.exec_module(openscad_runtime)
+else:
+    openscad_runtime = None  # type: ignore[assignment]
+
+_scad_runtime_instance: Any | None = None
+
+
+def _get_scad():
+    """Return a process-wide OpenScadRuntime, creating it on first use."""
+    global _scad_runtime_instance
+    if _scad_runtime_instance is None and openscad_runtime is not None:
+        _scad_runtime_instance = openscad_runtime.OpenScadRuntime()
+    return _scad_runtime_instance
+
+
 # Load the halofire-cad orchestrator once at startup so the in-process
 # pipeline can be kicked off from REST endpoints without shelling out.
 _HFCAD = Path(__file__).resolve().parents[1] / "halofire-cad"
@@ -445,6 +469,89 @@ async def get_deliverable(project_id: str, name: str):
     p = (deliverables / name).resolve()
     if deliverables not in p.parents or not p.exists():
         raise HTTPException(404, "deliverable not found")
+    return FileResponse(p)
+
+
+# ── OpenSCAD runtime — real parametric catalog renders ────────────────
+
+@app.get("/catalog/openscad/status")
+async def catalog_openscad_status() -> dict[str, Any]:
+    """Report whether the OpenSCAD binary was located + cache stats."""
+    rt = _get_scad()
+    if rt is None:
+        return {"available": False, "binary": None, "cache_dir": None}
+    cache_dir = rt._cache_dir  # type: ignore[attr-defined]
+    hits = list(cache_dir.glob("*.glb")) if cache_dir.is_dir() else []
+    return {
+        "available": rt.available,
+        "binary": rt._bin,  # type: ignore[attr-defined]
+        "cache_dir": str(cache_dir),
+        "cache_entries": len(hits),
+    }
+
+
+@app.post("/catalog/openscad/render")
+async def catalog_openscad_render(body: dict[str, Any]) -> dict[str, Any]:
+    """Render a SCAD file with the given parameters.
+
+    Body::
+        {"scad": "valve_globe", "params": {"size_in": 4}}
+
+    Returns the cache-relative URL of the rendered GLB.
+    """
+    rt = _get_scad()
+    if rt is None:
+        raise HTTPException(500, "openscad runtime unavailable")
+    name = str(body.get("scad", "")).strip()
+    if not name or "/" in name or "\\" in name or ".." in name:
+        raise HTTPException(400, "invalid scad name")
+    if not name.endswith(".scad"):
+        name = f"{name}.scad"
+    scad_dir = (
+        Path(__file__).resolve().parents[1]
+        / "halofire-catalog" / "authoring" / "scad"
+    )
+    # Fall back to packages/ tree (where authored SCAD actually live).
+    if not (scad_dir / name).is_file():
+        scad_dir = (
+            Path(__file__).resolve().parents[2]
+            / "packages" / "halofire-catalog" / "authoring" / "scad"
+        )
+    scad_path = scad_dir / name
+    if not scad_path.is_file():
+        raise HTTPException(404, f"scad file not found: {name}")
+    params = body.get("params") or {}
+    if not isinstance(params, dict):
+        raise HTTPException(400, "params must be an object")
+    result = rt.render(scad_path, params=params)
+    return {
+        "engine": result.engine,
+        "cache_hit": result.cache_hit,
+        "cache_key": Path(result.path).stem,
+        "path": str(result.path),
+        "url": f"/catalog/openscad/glb/{Path(result.path).name}",
+    }
+
+
+@app.get("/catalog/openscad/glb/{name}")
+async def catalog_openscad_glb(name: str):
+    """Serve a cached OpenSCAD-rendered GLB by name."""
+    rt = _get_scad()
+    if rt is None:
+        raise HTTPException(500, "openscad runtime unavailable")
+    if Path(name).name != name:
+        raise HTTPException(404, "not found")
+    cache_dir = rt._cache_dir  # type: ignore[attr-defined]
+    p = (cache_dir / name).resolve()
+    if cache_dir.resolve() not in p.parents or not p.is_file():
+        # Pre-baked fallback lookup.
+        fallback = (
+            Path(__file__).resolve().parents[2]
+            / "packages" / "halofire-catalog" / "assets" / "glb" / name
+        )
+        if fallback.is_file():
+            return FileResponse(fallback)
+        raise HTTPException(404, "not found")
     return FileResponse(p)
 
 
