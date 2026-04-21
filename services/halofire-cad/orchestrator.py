@@ -254,10 +254,23 @@ def run_pipeline(
         "total_usd": proposal_data["pricing"]["total_usd"],
     })
 
-    # 10. SUBMITTAL — DXF + GLB + IFC exports
+    # 10. SUBMITTAL — DXF + GLB + IFC exports + NFPA 8-section report
     try:
         submittal_paths = SUBMITTAL.export_all(design, out_dir)
         summary["files"].update(submittal_paths)
+        # V2 Phase 5.1: NFPA 8-section AHJ submittal report
+        try:
+            import importlib.util as _ilu
+            _nfpa_path = _HFCAD / "agents" / "10-submittal" / "nfpa_report.py"
+            _spec = _ilu.spec_from_file_location("nfpa_report", _nfpa_path)
+            _nfpa_mod = _ilu.module_from_spec(_spec)
+            _spec.loader.exec_module(_nfpa_mod)
+            nfpa = _nfpa_mod.build_nfpa_report(design, bom)
+            nfpa_path = out_dir / "nfpa_report.json"
+            nfpa_path.write_text(json.dumps(nfpa, indent=2), encoding="utf-8")
+            submittal_paths["nfpa_report"] = str(nfpa_path)
+        except Exception as e:  # noqa: BLE001
+            submittal_paths["nfpa_report_error"] = str(e)
         summary["steps"].append({
             "step": "submittal",
             "files": list(submittal_paths.keys()),
