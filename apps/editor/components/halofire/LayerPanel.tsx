@@ -62,6 +62,16 @@ export function setAllLayers(
   return out
 }
 
+/** Solo: hide every other layer, keep only `id` visible. AutoSPRINK
+ *  parity — V2 Phase 5.4. */
+export function soloLayer(
+  current: LayerVisibility, id: LayerId,
+): LayerVisibility {
+  const out = { ...current }
+  for (const k of Object.keys(out) as LayerId[]) out[k] = (k === id)
+  return out
+}
+
 export interface LayerPanelProps {
   /** Callback fires whenever any toggle lands. */
   onChange?: (next: LayerVisibility) => void
@@ -211,7 +221,13 @@ export function LayerPanel({
               data-testid={`layer-toggle-${d.id}`}
               onClick={(e) => {
                 e.stopPropagation()
-                commit(toggleLayer(vis, d.id))
+                // Alt-click → solo this layer (V2 Phase 5.4
+                // AutoSPRINK parity); plain click → toggle.
+                if (e.altKey) {
+                  commit(soloLayer(vis, d.id))
+                } else {
+                  commit(toggleLayer(vis, d.id))
+                }
               }}
               className={
                 open
@@ -220,6 +236,7 @@ export function LayerPanel({
               }
               style={{ borderRadius: 0 }}
               aria-pressed={vis[d.id]}
+              title={open ? `Click to toggle · Alt-click to solo · ${d.hotkey ? `[${d.hotkey}]` : ''}` : undefined}
             >
               <span className={open ? 'flex items-center gap-2' : ''}>
                 <span

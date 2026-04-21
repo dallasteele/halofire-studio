@@ -15,6 +15,7 @@ import {
 } from '@/components/halofire/ProjectContextHeader'
 import { CommandPalette } from '@/components/halofire/CommandPalette'
 import { LayerPanel } from '@/components/halofire/LayerPanel'
+import { HalofireProperties } from '@/components/halofire/HalofireProperties'
 import { LiveCalc } from '@/components/halofire/LiveCalc'
 import { RemoteAreaDraw } from '@/components/halofire/RemoteAreaDraw'
 import { Ribbon, type RibbonCommand } from '@/components/halofire/Ribbon'
@@ -148,6 +149,8 @@ export default function Home() {
       <RemoteAreaDraw projectId={ACTIVE_PROJECT_ID} />
       <LiveCalc projectId={ACTIVE_PROJECT_ID} />
       <LayerPanel />
+      {/* V2 Phase 5.3: selection-driven props for halofire items */}
+      <HalofireProperties />
       <Ribbon onCommand={dispatchRibbon} />
       <div className="min-h-0 flex-1">
         <Editor
