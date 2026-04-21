@@ -508,6 +508,11 @@ def test_pipes_within_building_envelope() -> None:
     max_elev = max(
         (lvl.get("elevation_m", 0) + lvl.get("height_m", 3)) for lvl in levels
     )
+    # Allow below-grade garage levels — accept z down to the lowest
+    # level's elevation (e.g. -3.66 m for the 1881 Ground Floor
+    # Parking) minus a small margin. Without this, pipes on a real
+    # below-grade floor read as "outside the envelope".
+    min_elev = min(lvl.get("elevation_m", 0) for lvl in levels) - 0.5
     bad: list[tuple[str, float]] = []
     for sys in design.get("systems", []):
         for p in sys.get("pipes") or []:
@@ -515,7 +520,7 @@ def test_pipes_within_building_envelope() -> None:
                 if not end:
                     continue
                 z = end[2]
-                if z < -0.5 or z > max_elev + 5.0:
+                if z < min_elev or z > max_elev + 5.0:
                     bad.append((f"{p['id']}.{end_label}", z))
     if bad:
         sample = bad[:5]

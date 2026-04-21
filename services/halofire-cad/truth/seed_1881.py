@@ -23,6 +23,26 @@ from truth.db import LevelTruth, TruthRecord, open_db  # noqa: E402
 
 
 def main() -> None:
+    # CORRECTED 2026-04-20: real building has 6 levels (2 below-grade
+    # parking + 4 above-grade residential), each ~28 443 sf
+    # (~2 642 sqm). Elevations from the project's Level Plans:
+    #   -12 ft  Ground Floor Parking      (28 443 sf)
+    #     0 ft  Second Floor Parking      (28 443 sf)
+    #    12 ft  Level 1 — Amenity + Resi  (28 443 sf)
+    #    24 ft  Level 2 — Residential     (28 443 sf)
+    #    34 ft  Level 3 — Residential     (28 443 sf)
+    #    44 ft  Level 4 — Residential     (28 443 sf)
+    # Total area 170 658 sf. Previous seed said 12 levels which is
+    # what made every cruel test scoreboard "level_count=13 vs 12 ≈
+    # PASS" — but truth was actually 6, so we were 117 % over.
+    LEVELS = [
+        ("Ground Floor Parking",       -3.66,  2_642.0),  # -12 ft
+        ("Second Floor Parking",        0.00,  2_642.0),  #   0 ft
+        ("Level 1 — Amenity + Resi",    3.66,  2_642.0),  #  12 ft
+        ("Level 2 — Residential",       7.32,  2_642.0),  #  24 ft (≈ 10 ft floor-to-floor)
+        ("Level 3 — Residential",      10.36,  2_642.0),  #  34 ft
+        ("Level 4 — Residential",      13.41,  2_642.0),  #  44 ft
+    ]
     rec = TruthRecord(
         project_id="1881-cooperative",
         project_name="The Cooperative 1881 — Phase I",
@@ -30,42 +50,44 @@ def main() -> None:
             "E:/ClaudeBot/HaloFireBidDocs/1-Bid Documents/"
             "GC - Bid Plans/1881 - Architecturals.pdf"
         ),
-        as_built_pdf_path=None,  # Phase 1b: trace Halo's as-built
+        as_built_pdf_path=None,
         permit_reviewed=True,
-        # Halo's final submitted numbers (Brain: halo-fire-v2 decision,
-        # 2026-04-17). These are the numbers cruel tests compare to.
         total_bid_usd=538_792.35,
         head_count=1303,
-        pipe_count=None,            # needs as-built parse
-        pipe_total_ft=None,         # needs as-built parse
+        pipe_count=None,
+        pipe_total_ft=None,
         system_count=7,
-        level_count=12,
-        hydraulic_gpm=None,         # needs as-built parse
-        hydraulic_psi=None,         # needs as-built parse
-        signed_off_at="2025-12-01", # placeholder — correct later
+        level_count=len(LEVELS),
+        hydraulic_gpm=None,
+        hydraulic_psi=None,
+        signed_off_at="2025-12-01",
         notes=(
             "Reference bid for HaloFire CAD Studio self-training. "
-            "Loop-1..loop-5 pipeline output is compared against "
-            "these numbers via tests/golden/test_cruel_vs_truth.py. "
-            "pipe_*/hydraulic_* fields pending as-built parse in "
-            "Phase 1b of SELF_TRAIN_PLAN.md."
+            "Real building: 6 levels (2 below-grade parking + 4 "
+            "above-grade residential), each ~28 443 sf. Cruel-test "
+            "level_count was incorrectly seeded as 12 until "
+            "2026-04-20."
         ),
     )
     with open_db() as db:
         db.upsert(rec)
-        # No per-level truth yet — Phase 4a traces the real outline.
-        # We register 12 levels as placeholders so loop counts match.
-        for i in range(12):
+        # Idempotent: drop any prior per-level rows for this project
+        # so re-running the seed doesn't accumulate stale levels.
+        # (Caught 2026-04-20: prior seed inserted 12 placeholders;
+        # the new seed only added 6 more, total 18, breaking the
+        # truth-aligned intake count.)
+        db._con.execute(
+            "DELETE FROM bids_level_truth WHERE project_id = ?",
+            [rec.project_id],
+        )
+        for i, (name, elev_m, area) in enumerate(LEVELS):
             db.upsert_level(LevelTruth(
                 project_id=rec.project_id,
                 level_index=i,
-                level_name=(
-                    f"Garage P{i + 1}" if i < 2
-                    else f"Level {i - 1}"
-                ),
-                elevation_m=None,
+                level_name=name,
+                elevation_m=elev_m,
                 outline_polygon_wkt=None,
-                area_sqm=None,
+                area_sqm=area,
                 room_count=None,
                 head_count=None,
             ))

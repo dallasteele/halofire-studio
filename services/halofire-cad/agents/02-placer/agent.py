@@ -208,7 +208,12 @@ def place_heads_for_room(
     # classification (Phase 5b) improve upstream, this cap can be
     # raised safely.
     theoretical_min = math.ceil(room.area_sqm / max_cov) if max_cov > 0 else 20
-    per_room_cap = max(10, min(40, theoretical_min * 2 + 5))
+    # Per-room cap. Old 40 was tuned when CubiCasa over-merged
+    # adjacent rooms. With the truth-aligned 6-level cap and
+    # canonical-plate normalization, rooms are real (1-4 per floor),
+    # so allow up to 100 heads per room — a 1 200 sqm parking room
+    # at ord-i needs ~99 heads.
+    per_room_cap = max(10, min(100, theoretical_min * 2 + 5))
 
     grid_points = _grid_points(usable, spacing_m)
     if len(grid_points) > per_room_cap:
@@ -353,8 +358,11 @@ def place_heads_for_level_floor(
     ) - 0.1
 
     # Grid across the uncovered geometry. Cap per level to prevent
-    # runaway on malformed polygons.
-    PLACER_PER_LEVEL_FLOOR_CAP = 350
+    # runaway on malformed polygons. NFPA 13 light-hazard at 20.9
+    # sqm/head means a 2 600 sqm residential floor needs ~125 heads;
+    # a parking deck at 12.1 sqm/head ord-i needs ~215. Cap 500 lets
+    # both fit while still bounding pathological cases.
+    PLACER_PER_LEVEL_FLOOR_CAP = 500
 
     # Handle MultiPolygon: grid each connected piece independently
     pieces = (
