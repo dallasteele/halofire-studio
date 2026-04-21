@@ -124,30 +124,43 @@ def _detect_scale_ft_per_pt(text_fragments: list[dict[str, Any]]) -> float:
     Common arch scales (imperial) at 72 dpi Letter:
       1/32" = 1'-0"  →  96 ft/in  →  1.333 ft/pt (tiny)
       1/16" = 1'-0"  →  48 ft/in  →  0.667 ft/pt
+      3/32" = 1'-0"  →  32 ft/in  →  0.444 ft/pt
       1/8"  = 1'-0"  →  24 ft/in  →  0.333 ft/pt  (most common @ Letter)
       3/16" = 1'-0"  →  16 ft/in  →  0.222 ft/pt
       1/4"  = 1'-0"  →  12 ft/in  →  0.167 ft/pt  (most common @ D-size)
       1/2"  = 1'-0"  →   6 ft/in  →  0.083 ft/pt
 
-    Fallback: 0.333 ft/pt (1/8" = 1'-0" at Letter).
+    Engineering-scale (decimal-feet) site sheets also appear:
+      1"  = 10' →  10 ft/in →  0.139 ft/pt
+      1"  = 20' →  20 ft/in →  0.278 ft/pt
+      1"  = 30' →  30 ft/in →  0.417 ft/pt
+      1"  = 50' →  50 ft/in →  0.694 ft/pt
+
+    Robust to: char-level fragments (joined and de-spaced), `'-0"`
+    suffix, `SCALE:` prefix, `1" = 10'` engineering form. Returns the
+    first scale callout found by regex; falls back to 1/8" = 1'-0".
     """
-    text = " ".join(
+    import re
+    # Concatenate all text — chars come space-joined when each fragment
+    # is one character, so we strip ALL whitespace before regex matching.
+    raw = " ".join(
         str(f.get("text") or "") for f in (text_fragments or [])
-    ).lower()
-    mapping = {
-        '1/32" = 1\'': 96 / 72,
-        '1/16" = 1\'': 48 / 72,
-        '1/8" = 1\'': 24 / 72,
-        '3/16" = 1\'': 16 / 72,
-        '1/4" = 1\'': 12 / 72,
-        '3/8" = 1\'':  8 / 72,
-        '1/2" = 1\'':  6 / 72,
-        '3/4" = 1\'':  4 / 72,
-        '1" = 1\'':    1 / 72,
-    }
-    for key, value in mapping.items():
-        if key in text:
-            return value
+    )
+    text = re.sub(r"\s+", "", raw)  # "1 / 8 \" = 1 ' - 0 \"" → '1/8"=1\'-0"'
+    # Architectural fraction scale: e.g. 1/8" = 1'-0", 3/32" = 1'-0"
+    arch = re.search(r'(\d+)/(\d+)"=1\'(?:-0\"?)?', text)
+    if arch:
+        num = int(arch.group(1))
+        den = int(arch.group(2))
+        if num > 0 and den > 0:
+            ft_per_in = den / num  # e.g. 1/8 → 8 ft/in
+            return ft_per_in / 72
+    # Engineering decimal scale: e.g. 1" = 10', 1"=30'
+    eng = re.search(r'1"=(\d+)\'', text)
+    if eng:
+        ft_per_in = float(eng.group(1))
+        if ft_per_in > 0:
+            return ft_per_in / 72
     return 24 / 72  # default 1/8"=1'-0"
 
 
