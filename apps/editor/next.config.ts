@@ -1,6 +1,19 @@
 import type { NextConfig } from 'next'
 
+// R10.1 — Tauri desktop bundle needs a static export (no Node runtime inside
+// the Tauri webview). Gate on TAURI_BUILD so regular `next build` / `next dev`
+// keep full server-side behavior (API routes, dynamic segments, server actions).
+const isTauriBuild = process.env.TAURI_BUILD === '1'
+
 const nextConfig: NextConfig = {
+  ...(isTauriBuild
+    ? {
+        output: 'export' as const,
+        trailingSlash: true,
+        // The Next image loader is a server feature; static export cannot use it.
+        // Also suppress server-only experimental flags under Tauri.
+      }
+    : {}),
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -13,13 +26,19 @@ const nextConfig: NextConfig = {
       '@react-three/drei': './node_modules/@react-three/drei',
     },
   },
-  experimental: {
-    serverActions: {
-      bodySizeLimit: '100mb',
-    },
-  },
+  ...(isTauriBuild
+    ? {}
+    : {
+        experimental: {
+          serverActions: {
+            bodySizeLimit: '100mb',
+          },
+        },
+      }),
   images: {
-    unoptimized: process.env.NEXT_PUBLIC_ASSETS_CDN_URL?.startsWith('http://localhost') ?? false,
+    unoptimized:
+      isTauriBuild ||
+      (process.env.NEXT_PUBLIC_ASSETS_CDN_URL?.startsWith('http://localhost') ?? false),
     remotePatterns: [
       {
         protocol: 'https',
