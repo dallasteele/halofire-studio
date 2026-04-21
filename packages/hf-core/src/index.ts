@@ -1,4 +1,14 @@
 export * from './catalog/part.js'
+export {
+  type Catalog,
+  type CatalogPart,
+  type LoadCatalogOptions,
+  loadCatalog,
+  findBySku,
+  findByCategory,
+  findByKind,
+  catalogStats,
+} from './catalog/load.js'
 export * from './scad/parse-params.js'
 // Subpath exports (`@halofire/core/scene/...`) are the canonical entry
 // points for scene translators. Both modules export a `NodeCreateOp`

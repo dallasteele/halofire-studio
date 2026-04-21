@@ -9,8 +9,13 @@
  * that demonstrates the 20 authored components + their NFPA metadata.
  */
 
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { CATALOG, type CatalogEntry } from '@halofire/catalog'
+import {
+  type Catalog as HfCatalog,
+  type CatalogPart as HfCatalogPart,
+  loadCatalog,
+} from '@halofire/core/catalog/load'
 import { generateId, useScene } from '@pascal-app/core'
 
 type Category = CatalogEntry['category']
@@ -114,7 +119,185 @@ export function CatalogPanel() {
       {selectedSku && (
         <SelectedDetail entry={CATALOG.find((e) => e.sku === selectedSku)!} />
       )}
+
+      <HfCatalogBrowser />
     </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// New @halofire/core loadCatalog-backed browser (M1 week 4).
+// Renders parts shipped in packages/halofire-catalog/catalog.json with
+// kind-pill + search + manufacturer filters. Clicking a row dispatches
+// a `halofire:catalog-select` CustomEvent carrying `{ sku }`.
+// ---------------------------------------------------------------------------
+
+const KIND_PILLS: { label: string; kind: string | 'all' }[] = [
+  { label: 'All', kind: 'all' },
+  { label: 'Heads', kind: 'sprinkler_head' },
+  { label: 'Pipes', kind: 'pipe_segment' },
+  { label: 'Fittings', kind: 'fitting' },
+  { label: 'Valves', kind: 'valve' },
+  { label: 'Hangers', kind: 'hanger' },
+  { label: 'Devices', kind: 'device' },
+  { label: 'FDC', kind: 'fdc' },
+  { label: 'Structural', kind: 'structural' },
+]
+
+function HfCatalogBrowser() {
+  const [catalog, setCatalog] = useState<HfCatalog | null>(null)
+  const [loadErr, setLoadErr] = useState<string | null>(null)
+  const [query, setQuery] = useState('')
+  const [kindFilter, setKindFilter] = useState<string>('all')
+  const [mfgFilter, setMfgFilter] = useState<string>('all')
+
+  useEffect(() => {
+    let cancelled = false
+    loadCatalog()
+      .then((c) => {
+        if (!cancelled) setCatalog(c)
+      })
+      .catch((e) => {
+        if (!cancelled) setLoadErr(String(e))
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const manufacturers = useMemo(() => {
+    if (!catalog) return []
+    const s = new Set<string>()
+    for (const p of catalog.parts) if (p.manufacturer) s.add(p.manufacturer)
+    return ['all', ...Array.from(s).sort()]
+  }, [catalog])
+
+  const filtered = useMemo<HfCatalogPart[]>(() => {
+    if (!catalog) return []
+    const q = query.trim().toLowerCase()
+    return catalog.parts.filter((p) => {
+      if (kindFilter !== 'all' && p.kind !== kindFilter) return false
+      if (mfgFilter !== 'all' && (p.manufacturer ?? '') !== mfgFilter) return false
+      if (!q) return true
+      return (
+        p.sku.toLowerCase().includes(q) ||
+        p.display_name.toLowerCase().includes(q) ||
+        p.category.toLowerCase().includes(q)
+      )
+    })
+  }, [catalog, query, kindFilter, mfgFilter])
+
+  const onSelect = useCallback((sku: string) => {
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(
+        new CustomEvent('halofire:catalog-select', { detail: { sku } }),
+      )
+    }
+  }, [])
+
+  return (
+    <section
+      data-testid="hf-catalog-browser"
+      className="mt-4 border-t border-neutral-200 pt-3 dark:border-neutral-800"
+    >
+      <div className="mb-2 flex items-baseline justify-between">
+        <h3 className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
+          Parts Catalog
+        </h3>
+        <span className="text-[10px] text-neutral-500">
+          {catalog ? `${catalog.parts.length} parts · v${catalog.catalog_version}` : '…'}
+        </span>
+      </div>
+
+      {loadErr && (
+        <p className="mb-2 text-[11px] text-red-600 dark:text-red-400">
+          Failed to load catalog: {loadErr}
+        </p>
+      )}
+
+      <input
+        data-testid="hf-catalog-search"
+        type="text"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="Search parts…"
+        className="mb-2 w-full rounded border border-neutral-300 bg-neutral-50 px-2 py-1 text-xs outline-none focus:border-neutral-500 dark:border-neutral-700 dark:bg-neutral-900"
+      />
+
+      <div
+        data-testid="hf-catalog-kind-pills"
+        className="mb-2 flex flex-wrap gap-1"
+      >
+        {KIND_PILLS.map((p) => (
+          <button
+            key={p.kind}
+            type="button"
+            onClick={() => setKindFilter(p.kind)}
+            data-testid={`hf-kind-pill-${p.kind}`}
+            className={`rounded-full border px-2 py-0.5 text-[10px] transition-colors ${
+              kindFilter === p.kind
+                ? 'border-blue-600 bg-blue-600 text-white'
+                : 'border-neutral-300 text-neutral-700 hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800'
+            }`}
+          >
+            {p.label}
+          </button>
+        ))}
+      </div>
+
+      {manufacturers.length > 1 && (
+        <select
+          data-testid="hf-catalog-mfg-filter"
+          value={mfgFilter}
+          onChange={(e) => setMfgFilter(e.target.value)}
+          className="mb-2 w-full rounded border border-neutral-300 bg-neutral-50 px-2 py-1 text-xs dark:border-neutral-700 dark:bg-neutral-900"
+        >
+          {manufacturers.map((m) => (
+            <option key={m} value={m}>
+              {m === 'all' ? 'All manufacturers' : m}
+            </option>
+          ))}
+        </select>
+      )}
+
+      <ul className="max-h-72 space-y-0.5 overflow-y-auto" data-testid="hf-catalog-list">
+        {filtered.length === 0 && catalog && (
+          <li className="py-6 text-center text-[11px] text-neutral-500">
+            No matching parts.
+          </li>
+        )}
+        {filtered.map((p) => (
+          <li key={p.sku}>
+            <button
+              type="button"
+              onClick={() => onSelect(p.sku)}
+              data-testid={`hf-catalog-row-${p.sku}`}
+              className="w-full rounded px-2 py-1.5 text-left text-xs transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-800"
+            >
+              <div className="flex items-center justify-between gap-2">
+                <span className="truncate font-medium">{p.display_name}</span>
+                {typeof p.price_usd === 'number' && (
+                  <span className="shrink-0 font-mono text-[10px] text-neutral-500">
+                    ${p.price_usd.toFixed(2)}
+                  </span>
+                )}
+              </div>
+              <div className="mt-0.5 flex items-center gap-1.5 text-[10px] opacity-75">
+                <span className="font-mono">{p.sku}</span>
+                <span className="rounded bg-neutral-200 px-1 py-[1px] text-[9px] uppercase tracking-wide dark:bg-neutral-800">
+                  {p.kind}
+                </span>
+                {p.manufacturer && (
+                  <span className="rounded bg-blue-100 px-1 py-[1px] text-[9px] text-blue-900 dark:bg-blue-950 dark:text-blue-200">
+                    {p.manufacturer}
+                  </span>
+                )}
+              </div>
+            </button>
+          </li>
+        ))}
+      </ul>
+    </section>
   )
 }
 
