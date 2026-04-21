@@ -212,25 +212,54 @@ def _steiner_tree_paths(
                 connected=len(tree_nodes),
             )
             break
-        # Find the remaining terminal with shortest path to tree
+        # Find the remaining terminal with shortest path to tree.
+        # Inner loop also checks budget — a single outer iteration can
+        # do `|remaining| × |tree_nodes|` Dijkstras, each O(E log V),
+        # which on a 5000-node grid takes 100 ms easily. Without an
+        # inner check the per-level budget gets blown by 60-100×.
         best: tuple[float, str, list[str]] | None = None
+        _budget_blown = False
         for t in remaining:
+            if _time.perf_counter() - _start > _BUDGET_S:
+                _budget_blown = True
+                break
             try:
-                # Shortest path from t to any node already in tree
-                # Networkx doesn't have multi-source → iterate
+                # Multi-source Dijkstra trick: only call dijkstra ONCE
+                # per remaining terminal (from the terminal outward
+                # until any tree node is reached) — the prior code
+                # called it `|tree_nodes|` extra times per terminal
+                # which was the real O(N²) hit.
+                length, path = nx.single_source_dijkstra(
+                    g, t, weight="weight",
+                )
+                # Pick nearest tree node
+                near_dist: float | None = None
+                near_anchor: str | None = None
                 for anchor in tree_nodes:
-                    try:
-                        length, path = nx.single_source_dijkstra(
-                            g, anchor, target=t, weight="weight",
-                        )
-                        if best is None or length < best[0]:
-                            best = (length, t, path)
-                    except nx.NetworkXNoPath:
-                        continue
+                    if anchor in length:
+                        d = length[anchor]
+                        if near_dist is None or d < near_dist:
+                            near_dist = d
+                            near_anchor = anchor
+                if near_anchor is not None and near_dist is not None:
+                    p = path[near_anchor]
+                    if best is None or near_dist < best[0]:
+                        best = (near_dist, t, p)
             except (nx.NodeNotFound, KeyError, ValueError) as e:
                 warn_swallowed(log, code="ROUTER_STEINER_PATH_FAIL",
                                err=e, terminal=t)
                 continue
+        if _budget_blown:
+            warn_swallowed(
+                log, code="ROUTER_STEINER_BUDGET",
+                err=RuntimeError(
+                    f"steiner inner over {_BUDGET_S}s, "
+                    f"{len(remaining)} unconnected"
+                ),
+                remaining=len(remaining),
+                connected=len(tree_nodes),
+            )
+            break
         if best is None:
             # Disconnected — bail
             break

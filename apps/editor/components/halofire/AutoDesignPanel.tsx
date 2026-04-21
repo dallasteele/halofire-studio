@@ -16,7 +16,7 @@
  * zero walls, the UI says so — it does NOT spawn a fake building.
  */
 
-import { generateId, LevelNode, SlabNode, WallNode, useScene } from '@pascal-app/core'
+import { emitter, generateId, LevelNode, SlabNode, WallNode, useScene } from '@pascal-app/core'
 
 /** Compute the bbox of a flat list of 2D points. */
 function bboxOf(pts: Iterable<[number, number]>): {
@@ -123,25 +123,45 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
   }, [sceneNodes])
 
   /** Remove any previous auto_design spawns so re-runs don't pile up.
+   *  Pascal's deleteNode is forgiving when called on already-deleted
+   *  ids, but it can leave orphaned children if a parent goes first.
+   *  Two-pass delete: leaves first (walls, slabs, items), containers
+   *  second (levels) — keeps the default level_0 + building + site so
+   *  a fresh render still has a parent tree to attach into.
+   *
    *  Scans both `asset.tags` (item nodes) and `metadata.tags` (slab /
    *  level / wall nodes) — base Pascal nodes have no `asset` field so
-   *  we tag them via metadata.tags instead. */
+   *  we tag them via metadata.tags instead. Always reads the LIVE
+   *  store via useScene.getState() so back-to-back clear calls see
+   *  fresh state.
+   */
   const clearPreviousAutoDesign = useCallback(() => {
-    for (const n of Object.values(sceneNodes ?? {})) {
-      const assetTags = (n as { asset?: { tags?: string[] } }).asset?.tags ?? []
-      const metaTags =
-        ((n as { metadata?: { tags?: string[] } }).metadata?.tags as
-          | string[]
-          | undefined) ?? []
-      if (assetTags.includes('auto_design') || metaTags.includes('auto_design')) {
-        try {
-          deleteNode((n as { id: string }).id as any)
-        } catch {
-          // best effort
-        }
+    const isAutoDesign = (n: any): boolean => {
+      const aTags = n?.asset?.tags ?? []
+      const mTags = n?.metadata?.tags ?? []
+      return (
+        (Array.isArray(aTags) && aTags.includes('auto_design')) ||
+        (Array.isArray(mTags) && mTags.includes('auto_design'))
+      )
+    }
+    const live = (useScene.getState() as any).nodes ?? {}
+    const all = Object.values(live) as any[]
+    // Pass 1: leaves
+    const leafTypes = new Set(['wall', 'slab', 'item', 'zone'])
+    for (const n of all) {
+      if (leafTypes.has(n.type) && isAutoDesign(n)) {
+        try { deleteNode(n.id as any) } catch { /* best effort */ }
       }
     }
-  }, [sceneNodes, deleteNode])
+    // Pass 2: containers (levels) — re-read live state because pass-1
+    // edits may have removed children
+    const live2 = (useScene.getState() as any).nodes ?? {}
+    for (const n of Object.values(live2) as any[]) {
+      if (n.type === 'level' && isAutoDesign(n)) {
+        try { deleteNode(n.id as any) } catch { /* best effort */ }
+      }
+    }
+  }, [deleteNode])
 
   // Cap how many heads + pipes the auto-design dumps into the live
   // viewport at once — a 583-head / 194-pipe 1881 design would swamp
@@ -203,16 +223,30 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
           : { minX: -15, minY: -15, maxX: 15, maxY: 15 }
         const cx = (bb.minX + bb.maxX) / 2
         const cy = (bb.minY + bb.maxY) / 2
-        const halfW = Math.max((bb.maxX - bb.minX) / 2, 10)
-        const halfH = Math.max((bb.maxY - bb.minY) / 2, 10)
+        const rawHalfW = Math.max((bb.maxX - bb.minX) / 2, 10)
+        const rawHalfH = Math.max((bb.maxY - bb.minY) / 2, 10)
+        // Pascal's default OrbitControls + camera at (10,10,10) with
+        // FOV 50 see comfortably out to ~50 m. Anything bigger and
+        // the building either clips or fills the screen with a
+        // micro-detail. Auto-scale so the building's longest side
+        // fits 60 m. This also helps pages misclassified as
+        // 250m-wide site plans land at a viewable size.
+        const TARGET_LONGEST_M = 60
+        const longest = Math.max(rawHalfW, rawHalfH) * 2
+        const scale = longest > TARGET_LONGEST_M
+          ? TARGET_LONGEST_M / longest
+          : 1
+        const halfW = rawHalfW * scale
+        const halfH = rawHalfH * scale
         const PAD = 5 // metres of green around the building
-        /** Shift a 2D point so the building center is at origin. */
+        /** Shift a 2D point so the building center is at origin AND
+         *  scale to TARGET_LONGEST_M. */
         const T2 = (p: [number, number]): [number, number] => [
-          p[0] - cx, p[1] - cy,
+          (p[0] - cx) * scale, (p[1] - cy) * scale,
         ]
         /** Shift a 3D point the same way (Pascal's X/Z are our X/Y). */
         const T3 = (p: [number, number, number]): [number, number, number] => [
-          p[0] - cx, p[1] - cy, p[2],
+          (p[0] - cx) * scale, (p[1] - cy) * scale, p[2] * scale,
         ]
 
         // Resize the existing Site polygon so the ground grid wraps
@@ -452,6 +486,20 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
           }
           if (pipesSpawned >= MAX_PIPES_VIEWPORT) break
         }
+        // Frame the camera on the freshly-spawned building so the
+        // user sees what we just rendered. Without this the default
+        // (10,10,10) → (0,0,0) frame can't see a 140×72 m level
+        // that's centered at origin and the viewport looks blank.
+        // Wait two animation frames so R3F has actually mounted the
+        // new slab/wall meshes into sceneRegistry — emitting earlier
+        // is a no-op because focusNode looks them up by id.
+        try {
+          requestAnimationFrame(() => requestAnimationFrame(() => {
+            emitter.emit('camera-controls:focus', { nodeId: buildingId })
+          }))
+        } catch {
+          // emitter may be uninitialized in tests
+        }
       } catch (e) {
         setError(`scene render: ${String(e)}`)
       }
@@ -626,6 +674,15 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
           title="Load the last completed design into the viewport"
         >
           Render last bid
+        </button>
+        <button
+          type="button"
+          disabled={busy}
+          onClick={() => clearPreviousAutoDesign()}
+          className="mt-2 w-full rounded border border-white/10 bg-transparent px-3 py-1.5 text-xs text-neutral-400 hover:bg-white/5 disabled:opacity-50"
+          title="Wipe every auto-design slab/wall/level/item from the scene"
+        >
+          Clear scene
         </button>
       </div>
 

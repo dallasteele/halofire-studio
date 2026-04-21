@@ -105,6 +105,17 @@ def _grid_points(usable: Polygon, spacing_m: float) -> list[tuple[float, float]]
     h = maxy - miny
     nx = max(1, int(math.ceil(w / spacing_m)))
     ny = max(1, int(math.ceil(h / spacing_m)))
+    # Hard ceiling: a bbox > 100×100 cells is almost certainly a
+    # site-plan misread that slipped through. Subdividing 10 000+
+    # `usable.contains(Point)` checks per room is what hung the
+    # pipeline at 7+ minutes per page; a 100×100 cap caps that at
+    # ~10 ms even for a 460×460 m polygon, and the per-room/per-
+    # level head caps further bound the result.
+    GRID_CELL_CAP = 100
+    if nx > GRID_CELL_CAP:
+        nx = GRID_CELL_CAP
+    if ny > GRID_CELL_CAP:
+        ny = GRID_CELL_CAP
     sx = w / nx
     sy = h / ny
     for j in range(ny):
@@ -277,6 +288,23 @@ def place_heads_for_level_floor(
         return []
     if level_poly.is_empty or level_poly.area < 10.0:
         return []
+    # Site-plan / page-misclassification guard: real residential or
+    # commercial floor plates almost never exceed 8 000 sqm
+    # (~85 000 sqft). When a page comes back as 30 000+ sqm it's
+    # almost certainly a site plan or unscaled page that slipped
+    # through scale-detection. Grid-packing heads on a 350m × 230m
+    # polygon at NFPA spacing is O(N²) shapely ops and can hang
+    # the pipeline for minutes. Skip with a typed warning.
+    if level_poly.area > 8_000.0:
+        warn_swallowed(
+            log, code="PLACER_LEVEL_TOO_BIG",
+            err=RuntimeError(
+                f"level area {level_poly.area:.0f} sqm > 8000 — "
+                f"likely site plan, not a floor plan",
+            ),
+            level_id=level.id, level_area_sqm=level_poly.area,
+        )
+        return []
 
     # Subtract room polygons that already received heads
     from shapely.ops import unary_union
@@ -383,6 +411,14 @@ def place_heads_for_building(building: Building) -> list[Head]:
     for level in building.levels:
         if capped:
             break
+        log.info(
+            "hf.placer.level_start",
+            extra={
+                "level_id": level.id,
+                "rooms": len(level.rooms),
+                "polygon_pts": len(level.polygon_m or []),
+            },
+        )
         level_heads: list[Head] = []
         # 1. Per-room placement (existing path)
         for room in level.rooms:
