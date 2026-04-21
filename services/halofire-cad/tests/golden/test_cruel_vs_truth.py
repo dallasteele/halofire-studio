@@ -201,6 +201,46 @@ def test_hydraulic_gpm_within_10pct_of_truth() -> None:
     )
 
 
+# ── intake quality ──────────────────────────────────────────────
+
+@pytest.mark.cruel
+@pytest.mark.golden
+def test_each_kept_level_has_realistic_polygon_area() -> None:
+    """Every level the intake KEEPS must have a realistic floor-plate
+    area. < 100 sqm means `_trace_outer_boundary_m` fell into a tiny
+    micro-loop CubiCasa accidentally closed (a corner detail or a
+    label box) instead of the building outline. Convex hull is the
+    safer fallback in that case.
+
+    1881 floor plates are 1 000-2 500 sqm; we use 100 sqm as the
+    minimum-realistic threshold (a parking ramp closet).
+    """
+    _truth_or_skip()
+    if not _DESIGN.exists():
+        pytest.skip("design.json missing")
+    design = json.loads(_DESIGN.read_text(encoding="utf-8"))
+    from shapely.geometry import Polygon
+    bad: list[tuple[str, float]] = []
+    for lvl in design.get("building", {}).get("levels", []):
+        poly = lvl.get("polygon_m") or []
+        if len(poly) < 3:
+            bad.append((lvl.get("name", "?"), 0.0))
+            continue
+        try:
+            a = Polygon(poly).area
+        except Exception:  # noqa: BLE001
+            a = 0.0
+        if a < 100.0:
+            bad.append((lvl.get("name", "?"), a))
+    if bad:
+        details = ", ".join(f"{n}={a:.1f}sqm" for n, a in bad)
+        raise AssertionError(
+            f"{len(bad)} level(s) have polygon area < 100 sqm "
+            f"(intake outline failed → falling back to convex hull "
+            f"would help): {details}"
+        )
+
+
 # ── corrections accounting ──────────────────────────────────────
 
 @pytest.mark.cruel

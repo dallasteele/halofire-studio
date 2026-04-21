@@ -224,13 +224,20 @@ def _trace_outer_boundary_m(walls) -> list:
         lines.append(LineString([(x0, y0), (x1, y1)]))
     if not lines:
         return []
-    # 1-2. polygonize
+    # 1-2. polygonize. Real building outlines are 200+ sqm. With
+    # noisy CubiCasa walls the largest closed loop is often a tiny
+    # corner detail (3 sqm) — rejecting < 100 sqm forces a hull
+    # fallback that actually wraps the building. Without this guard
+    # 7 of 11 1881 levels came back with 1-13 sqm polygons.
+    MIN_LEVEL_AREA_SQM = 100.0
     best: Polygon | None = None
     try:
         merged = unary_union(lines)
         polys = list(polygonize(merged))
         if polys:
-            best = max(polys, key=lambda p: p.area)
+            cand = max(polys, key=lambda p: p.area)
+            if cand.area >= MIN_LEVEL_AREA_SQM:
+                best = cand
     except Exception:  # noqa: BLE001
         best = None
     # 3. simplify
