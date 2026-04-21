@@ -35,6 +35,11 @@
       "types": "./dist/sheets/generate-default-set.d.ts",
       "import": "./dist/sheets/generate-default-set.js",
       "default": "./dist/sheets/generate-default-set.js"
+    },
+    "./report/pdf-sheet-set": {
+      "types": "./dist/report/pdf-sheet-set.d.ts",
+      "import": "./dist/report/pdf-sheet-set.js",
+      "default": "./dist/report/pdf-sheet-set.js"
     }
   },
   "files": ["dist", "README.md"],
@@ -43,8 +48,15 @@
     "dev": "tsc --build --watch",
     "check-types": "tsc --noEmit"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@resvg/resvg-js": "^2.6.2",
+    "pdf-lib": "^1.17.1"
+  },
+  "peerDependencies": {
+    "@pascal-app/core": "^0.5.1"
+  },
   "devDependencies": {
+    "@pascal-app/core": "*",
     "@pascal/typescript-config": "*",
     "typescript": "5.9.3"
   }
