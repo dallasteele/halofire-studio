@@ -247,3 +247,41 @@ fixture data) remain externally blocked.
 to ✅.
 
 Session truly complete.
+
+---
+
+## Addendum 2 — wave 12 (beyond-ship-gate progress)
+
+Four additional commits landed after the 44-commit checkpoint:
+
+| # | Commit | Title |
+|---|---|---|
+| 45 | `1403c44` | P2 capstone — build-catalog.ts + catalog.json (28 parts) |
+| 46 | `f89b199` | R11.2+R11.3 synthetic — gomez-warehouse-az cruel tests green |
+| 47 | `79d6147` | P2 complete — 11 more SCAD annotated, catalog.json at 40 parts |
+| 48 | `5ff533c` | catalog consumer — loadCatalog + CatalogPanel browser UI |
+
+### DoD reassessment
+
+- **#11 second-project cruel** 🔲 → 🟡 (synthetic-validated;
+  awaits real Halo Fire second bid for green).
+- **Catalog capability** (not a DoD gate but a product pillar):
+  40 parts parametrically authored, generated into catalog.json,
+  consumable via `loadCatalog()`, browsable via CatalogPanel UI
+  with search + 9 kind filters + manufacturer dropdown.
+
+### Revised scorecard
+
+**48 of 53 = 91 %** of the ship-gate plan on origin/main.
+
+DoD: **8 ✅ / 3 🟡 / 2 🔲**
+
+The 2 remaining 🔲 rows are still externally blocked:
+- **R10.6** — clean-Windows-VM install smoke (needs hardware).
+- **Real R11.2/R11.3** — real Halo Fire second bid PDF (synthetic
+  validation proves scaffold, real validation proves the product).
+
+48 commits on origin/main. No further code paths unblocked by
+agent dispatch.
+
+Session absolutely complete.
