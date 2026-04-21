@@ -1,0 +1,86 @@
+name: Build Desktop
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag to build'
+        required: false
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            artifact_glob: 'apps/halofire-studio-desktop/src-tauri/target/release/bundle/msi/*.msi'
+          - os: macos-14
+            target: aarch64-apple-darwin
+            artifact_glob: 'apps/halofire-studio-desktop/src-tauri/target/release/bundle/dmg/*.dmg'
+          - os: macos-13
+            target: x86_64-apple-darwin
+            artifact_glob: 'apps/halofire-studio-desktop/src-tauri/target/release/bundle/dmg/*.dmg'
+          - os: ubuntu-22.04
+            target: x86_64-unknown-linux-gnu
+            artifact_glob: 'apps/halofire-studio-desktop/src-tauri/target/release/bundle/{appimage,deb}/*'
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - uses: oven-sh/setup-bun@v1
+
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Install Linux system deps (webkit2gtk, etc.)
+        if: matrix.os == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - name: Install Python build deps
+        run: |
+          pip install pyinstaller pdfplumber shapely ezdxf pydantic duckdb
+
+      - name: Install JS deps
+        run: bun install
+
+      - name: Build Python sidecar (PyInstaller)
+        working-directory: apps/halofire-studio-desktop
+        run: python python_sidecar/build.py
+
+      - name: Fetch OpenSCAD binary
+        working-directory: apps/halofire-studio-desktop
+        run: python python_sidecar/download_openscad.py --skip-verify
+
+      - name: Build editor (Next.js static export)
+        working-directory: apps/editor
+        run: TAURI_BUILD=1 bun run build
+
+      - name: Tauri build
+        working-directory: apps/halofire-studio-desktop
+        run: bun run build -- --target ${{ matrix.target }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: halofire-studio-${{ matrix.target }}
+          path: ${{ matrix.artifact_glob }}
+
+      - name: Attach to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ matrix.artifact_glob }}

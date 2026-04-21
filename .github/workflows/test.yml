@@ -1,0 +1,38 @@
+name: Test
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - uses: oven-sh/setup-bun@v1
+
+      - name: Install JS deps
+        run: bun install
+
+      - name: Install Python deps
+        run: |
+          pip install pytest pdfplumber shapely ezdxf pydantic duckdb
+
+      - name: Install Playwright browsers
+        run: bunx playwright install --with-deps
+
+      - name: Build @halofire/core
+        run: bun run --cwd packages/core build
+
+      - name: Build @halofire/hf-core
+        run: bun run --cwd packages/hf-core build
+
+      - name: Run Python tests
+        run: pytest services/halofire-cad/tests -q
+
+      - name: Run Playwright tests
+        run: bunx playwright test
