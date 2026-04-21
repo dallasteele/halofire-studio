@@ -37,3 +37,15 @@ export {
   TitleBlockRenderer,
   type TitleBlockRendererProps,
 } from './components/sheet/title-block-renderer'
+export {
+  computeBBox,
+  filterSceneForViewport,
+  isRenderableType,
+  metresPerPaperMm,
+  nodeLayerKey,
+  rasteriseViewport,
+  renderViewportSvg,
+  ViewportRenderer,
+  type ViewportDebugInfo,
+  type ViewportRendererProps,
+} from './components/sheet/viewport-renderer'
