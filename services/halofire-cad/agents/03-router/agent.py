@@ -519,14 +519,65 @@ def route_systems(building: Building, heads: list[Head]) -> list[System]:
 
         # Resize per §28.5
         segments = _resize_network(segments, lvl_heads, riser.id)
-        # System IDs on segments
+        # System IDs + Smart-Pipe role on segments
+        head_ids = {h.id for h in lvl_heads}
         for s in segments:
             s.system_id = sys_id
+        _classify_pipe_roles(segments, head_ids, riser.id)
         system.pipes = segments
         system.heads = lvl_heads
         system.hangers = _insert_hangers(segments)
         systems.append(system)
     return _merge_combo_systems(systems, building)
+
+
+def _classify_pipe_roles(
+    segments: list[PipeSegment], head_ids: set[str], riser_id: str,
+) -> None:
+    """AutoSPRINK Smart-Pipe parity. Walks the segment graph and
+    assigns a `role` to every pipe so the BOM groups correctly and
+    the viewer can color-code by hierarchy.
+
+    Heuristic (per NFPA 13 §3.3.197 + estimator convention):
+      * `drop`        — segment whose vertical span > 0.5 m AND one
+                        endpoint is a head (head→ceiling)
+      * `riser_nipple`— segment touching the riser node
+      * `branch`      — horizontal pipe carrying ≥ 1 head, < 30 m,
+                        ≤ 1.5"
+      * `cross_main`  — horizontal pipe carrying multiple branches
+                        (no direct heads), 2.5"+
+      * `main`        — anything ≥ 4" not on the riser
+      * `unknown`     — fallback (geometry didn't fit any rule)
+
+    Pure-functional, mutates `segments[].role` in place.
+    """
+    # Build per-pipe degree info — count head endpoints, riser endpoints
+    for s in segments:
+        a, b = s.from_node, s.to_node
+        touches_riser = (a == riser_id or b == riser_id)
+        touches_head = (a in head_ids or b in head_ids)
+        dz = abs(s.elevation_change_m)
+
+        if touches_riser:
+            s.role = "riser_nipple"
+            continue
+        if touches_head and dz >= 0.5:
+            s.role = "drop"
+            continue
+        if touches_head:
+            # Head connection but mostly horizontal → it's the
+            # short stub of a branch (treat as branch).
+            s.role = "branch"
+            continue
+        # No head, no riser → trunk pipe. Diameter triages.
+        if s.size_in >= 4.0:
+            s.role = "main"
+        elif s.size_in >= 2.5:
+            s.role = "cross_main"
+        elif s.size_in <= 1.5 and s.length_m < 30:
+            s.role = "branch"
+        else:
+            s.role = "cross_main"
 
 
 def _merge_combo_systems(

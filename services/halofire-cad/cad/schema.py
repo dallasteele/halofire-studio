@@ -224,6 +224,12 @@ class PipeSegment(BaseModel):
     fittings: list[str] = Field(default_factory=list)
     downstream_heads: int = 1
     system_id: Optional[str] = None
+    # AutoSPRINK Smart-Pipe parity. Set by router classifier
+    # (see _classify_pipe_roles in agents/03-router/agent.py).
+    # Drives BOM grouping, drawing color-code, hydraulic topology.
+    role: Literal[
+        "drop", "branch", "cross_main", "main", "riser_nipple", "unknown",
+    ] = "unknown"
 
 
 class Hanger(BaseModel):

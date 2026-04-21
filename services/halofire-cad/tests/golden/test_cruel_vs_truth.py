@@ -234,6 +234,45 @@ def test_no_level_has_more_than_300_walls() -> None:
 
 @pytest.mark.cruel
 @pytest.mark.golden
+def test_pipes_are_classified_by_role() -> None:
+    """Real fire-protection drawings name every pipe by its role —
+    drop, branch, cross-main, main, riser-nipple. AutoSPRINK does
+    this via Smart Pipe; the BOM groups by role; the drawing
+    color-codes by role.
+
+    Cruel test: design.json's `systems[].pipes[].role` should be one
+    of {drop, branch, cross_main, main, riser_nipple} for at least
+    90 % of pipes. Today every pipe is unset/'branch' — this test
+    fails until the router classifies."""
+    _truth_or_skip()
+    if not _DESIGN.exists():
+        pytest.skip("design.json missing")
+    design = json.loads(_DESIGN.read_text(encoding="utf-8"))
+    valid = {"drop", "branch", "cross_main", "main", "riser_nipple"}
+    total = 0
+    classified = 0
+    role_counts: dict[str, int] = {}
+    for sys in design.get("systems", []):
+        for p in sys.get("pipes") or []:
+            total += 1
+            r = p.get("role") or ""
+            role_counts[r] = role_counts.get(r, 0) + 1
+            if r in valid:
+                classified += 1
+    if total == 0:
+        pytest.skip("no pipes in design.json")
+    frac = classified / total
+    if frac < 0.90:
+        raise AssertionError(
+            f"Only {classified}/{total} pipes ({frac:.0%}) classified "
+            f"with a valid role. Role counts: {role_counts}. Need "
+            f"Smart Pipe-style classification before BOM grouping "
+            f"and color-coded visualization can land."
+        )
+
+
+@pytest.mark.cruel
+@pytest.mark.golden
 def test_each_kept_level_has_realistic_polygon_area() -> None:
     """Every level the intake KEEPS must have a realistic floor-plate
     area. < 100 sqm means `_trace_outer_boundary_m` fell into a tiny
