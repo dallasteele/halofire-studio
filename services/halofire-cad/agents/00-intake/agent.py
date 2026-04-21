@@ -40,21 +40,27 @@ _SKIP_KINDS = {
 
 
 def _candidate_pages(
-    pdf_path: str, n_pages: int, hard_cap: int = 12,
+    pdf_path: str, n_pages: int, hard_cap: int = 14,
 ) -> list[int]:
-    """Return up to `hard_cap` candidate page indices for L1/L2 walk.
+    """Return up to `hard_cap` candidate page indices.
 
-    The text-based title-block pre-filter on 100+ page arch PDFs costs
-    several minutes (pdfplumber must parse every content stream). Not
-    worth it — the L1 wall-count filter downstream catches non-plan
-    pages in milliseconds.
+    Page-text classification doesn't work on real architectural sets
+    because every sheet has a sheet-index sidebar listing every other
+    sheet — so substring matches like "A-101" or "FLOOR PLAN" hit on
+    every page. Visual / sheet-corner classification is the right
+    long-term fix; for now we return the first N pages and rely on
+    downstream filters (CubiCasa room/wall counts, the placer's
+    8000sqm site-plan guard) to drop obviously-non-residential pages
+    from the level stack.
 
-    Strategy: first N pages only. The FIRST 10-15 pages of any
-    architectural set almost always contain the site + ground-floor +
-    upper-floor plans. Elevations, sections, details, schedules
-    cluster later.
+    KNOWN LIMITATION: pages 1-7 of typical sets are still ingested as
+    "levels" with bogus geometry. The fix lives in `intake_file` —
+    reject any level whose CubiCasa output has < 2 rooms AND its
+    polygon area > 5 000 sqm. That guard will land in a follow-on
+    commit; this revert stops the previous attempt from blowing the
+    intake budget by 186 s on an unhelpful page-text scan.
     """
-    _ = pdf_path  # kept for future per-project overrides
+    _ = pdf_path
     return list(range(min(n_pages, hard_cap)))
 
 # Snap tolerance for orthogonality (degrees)
@@ -770,6 +776,41 @@ def intake_file(pdf_path: str, project_id: str) -> Building:
         # tests.
         if level.walls and not level.polygon_m:
             level.polygon_m = _trace_outer_boundary_m(level.walls)
+        # Page-type guard: drop pages that look like site plans /
+        # cover sheets / sections rather than residential floors.
+        # Heuristics:
+        #   * polygon_m area > 5000 sqm AND fewer than 3 rooms — site
+        #     plans + civils have huge property boundaries with no
+        #     interior rooms.
+        #   * fewer than 20 walls — cover sheets, schedules, indices.
+        try:
+            from shapely.geometry import Polygon as _PG
+            poly_area = (
+                _PG(level.polygon_m).area
+                if level.polygon_m and len(level.polygon_m) >= 3 else 0.0
+            )
+        except Exception:  # noqa: BLE001
+            poly_area = 0.0
+        if (
+            (poly_area > 5_000.0 and len(level.rooms) < 3)
+            or len(level.walls) < 20
+        ):
+            metadata["issues"].append({
+                "code": "INTAKE_PAGE_REJECTED",
+                "severity": "info",
+                "message": (
+                    f"page {i + 1} skipped — looks like site plan / "
+                    f"non-floor (area={poly_area:.0f} sqm, "
+                    f"rooms={len(level.rooms)}, walls={len(level.walls)})"
+                ),
+                "refs": [level.id],
+                "source": Path(pdf_path).name,
+            })
+            continue
+        # Re-number elevation by KEPT-level index, not page index, so
+        # an 8-floor building doesn't end up with elevations 24m, 27m,
+        # 30m... when its first 8 pages were site plans.
+        level.elevation_m = float(len(levels)) * 3.0
         levels.append(level)
 
     if levels:
