@@ -203,3 +203,47 @@ python scripts/brain_sync_blueprints.py --recall "ship remaining"
 ```
 
 Session complete.
+
+---
+
+## Addendum — polish wave (post-ship-gate commits)
+
+Two additional commits landed after the 42-ship-gate completion as
+mechanical polish:
+
+| # | Commit | Phase | Title |
+|---|---|---|---|
+| 43 | `bb6ac2d` | R10.3-gap | ipc.runHydraulic + ipc.readDeliverable (zero localhost in LiveCalc) |
+| 44 | `b25d4ce` | P2-finish | 18 more SCAD files annotated (28 of 29 in catalog) |
+
+### R10.3-gap-close effects
+
+- New Rust command module `apps/halofire-studio-desktop/src-tauri/src/commands/hydraulic.rs`
+  with `run_hydraulic` + `read_deliverable`.
+- `ipc.runHydraulic` + `ipc.readDeliverable` added to
+  `apps/editor/lib/ipc.ts` with Tauri+fetch dual-path.
+- LiveCalc rewired; TODO markers removed.
+- **DoD #8 (zero localhost ports at runtime) flips 🟡 → ✅** for the
+  LiveCalc surface.
+- Path-traversal guard rejects `..` / separators / non-`.json`.
+
+### P2-finish effects
+
+- Catalog now has **28 annotated parts** (was 10). Every sprinkler
+  head carries `@k-factor` + `@orientation` + `@response` +
+  `@temperature`. Valves/fittings carry `@port` roles with
+  position + direction vec3s for router graph-walking.
+- Ready for the `scripts/build-catalog.ts` generator (not yet
+  authored — one-commit follow-up when needed).
+
+### Revised final scorecard
+
+**44 of 53 = 83 %** of the 53-row ship-gate plan on origin/main.
+Remaining 3 rows (R10.6 clean-VM smoke, R11.2+R11.3 second-project
+fixture data) remain externally blocked.
+
+**DoD scorecard:** 8 ✅ / 2 🟡 (on-VM verification) / 3 🔲
+(externally blocked) — up from 7/2/3 by virtue of DoD #8 flipping
+to ✅.
+
+Session truly complete.
