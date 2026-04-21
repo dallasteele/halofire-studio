@@ -197,6 +197,28 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
         try { deleteNode(n.id as any) } catch { /* best effort */ }
       }
     }
+    // Pass 4: collapse duplicate Building / Site nodes to one each.
+    // Pascal's stock + ProjectBriefPanel each spawn a Site/Building
+    // pair, and every "Render last bid" without a clean-up adds
+    // another. Multiple Buildings at the same coordinates means the
+    // viewer renders them stacked / clipping / fighting for the
+    // camera's attention. Keep the FIRST of each type, delete the
+    // rest.
+    const live4 = (useScene.getState() as any).nodes ?? {}
+    const seenBuilding = new Set<string>()
+    const seenSite = new Set<string>()
+    for (const n of Object.values(live4) as any[]) {
+      if (n.type === 'building') {
+        if (seenBuilding.size > 0) {
+          try { deleteNode(n.id as any) } catch { /* best effort */ }
+        } else seenBuilding.add(n.id)
+      }
+      if (n.type === 'site') {
+        if (seenSite.size > 0) {
+          try { deleteNode(n.id as any) } catch { /* best effort */ }
+        } else seenSite.add(n.id)
+      }
+    }
   }, [deleteNode])
 
   // Cap how many heads + pipes the auto-design dumps into the live

@@ -131,10 +131,11 @@ export function LayerPanel({
     return () => window.removeEventListener('keydown', onKey)
   }, [onChange])
 
-  // Collapsed by default — viewport widget convention from
-  // AutoSPRINK / Revit / AutoCAD: layer toggles are reach-tools,
-  // not browse-tools. Show 36 px of dots, expand to 224 px on click.
-  const [open, setOpen] = useState<boolean>(false)
+  // Default-EXPANDED so the user immediately sees what the widget
+  // does. Collapse on click for power users who want viewport real
+  // estate back. (Tried collapsed-default — unfamiliar users couldn't
+  // tell what the dot column was.)
+  const [open, setOpen] = useState<boolean>(true)
 
   // Hover preview for collapsed state — hovering a dot shows a
   // floating chip with the layer name + hotkey to its right so
