@@ -814,39 +814,101 @@ test.describe('25 solved 3D issues — regression protection', () => {
     await page.goto('/')
     await page.waitForSelector('[data-testid=layer-toggle-pipes]')
     const result = await page.evaluate(async () => {
+      // Filter out HalofireNodeWatcher-origin events — those are
+      // per-NODE mutation notifications (meaningfully distinct,
+      // debounced separately). We're asserting SceneChangeBridge's
+      // PANEL-level coalescing here.
+      const NODE_WATCHER_ORIGINS = new Set([
+        'move',
+        'add-head',
+        'remove-head',
+        'mixed',
+        'node-mutation',
+      ])
+      let bridgeTotal = 0
       let total = 0
       const origins: string[] = []
       const h = (e: Event) => {
         total++
         const o = (e as CustomEvent).detail?.origin
-        if (typeof o === 'string') origins.push(o)
+        if (typeof o === 'string') {
+          origins.push(o)
+          if (!NODE_WATCHER_ORIGINS.has(o)) bridgeTotal++
+        }
       }
       window.addEventListener('halofire:scene-changed', h)
       const btn = document.querySelector(
         '[data-testid=layer-toggle-pipes]',
       ) as HTMLButtonElement | null
       btn?.click()
-      await new Promise((r) => setTimeout(r, 60))
+      await new Promise((r) => setTimeout(r, 30))
       btn?.click()
-      await new Promise((r) => setTimeout(r, 60))
+      await new Promise((r) => setTimeout(r, 30))
       btn?.click()
       await new Promise((r) => setTimeout(r, 400))
       window.removeEventListener('halofire:scene-changed', h)
-      return { total, origins }
+      return { total, bridgeTotal, origins }
     })
-    // SceneChangeBridge forwards layer-visibility → scene-changed, one
-    // event per click, with origin='layer-visibility'. The
-    // HalofireNodeWatcher may also fire scene-changed for each
-    // tagged node whose visibility flips as part of the layer
-    // operation, so per-click fan-out is roughly O(visible tagged
-    // nodes). Historical regression: fan-out to hundreds or thousands
-    // per click (infinite loop, re-entrant store updates). A bound of
-    // ≤50 events for 3 clicks catches that storm without being so
-    // tight that it fails when the default scene gets slightly richer.
-    expect(result.total).toBeGreaterThanOrEqual(3)
-    expect(result.total).toBeLessThanOrEqual(50)
+    // SceneChangeBridge now DEBOUNCES (150ms window), coalescing a
+    // burst of mutation events into exactly one trailing
+    // scene-changed. Three rapid layer-toggle clicks within the
+    // window → exactly 1 bridge-origin scene-changed event.
+    // Historical regression (pre-debounce): 23 events for 3 clicks.
+    expect(result.bridgeTotal).toBeGreaterThanOrEqual(1)
+    expect(result.bridgeTotal).toBeLessThanOrEqual(4)
     // And the user action must actually reach the bridge.
     expect(result.origins).toContain('layer-visibility')
+  })
+
+  // --------------------------------------------------------------
+  // 24b. SceneChangeBridge debounce semantics — 5 rapid events → 1
+  // --------------------------------------------------------------
+  test('24b. SceneChangeBridge coalesces rapid mutations via 150ms debounce', async ({
+    page,
+  }) => {
+    await page.goto('/')
+    await page.waitForFunction(() => !!(window as any).__hfScene, null, {
+      timeout: 10_000,
+    })
+    const result = await page.evaluate(async () => {
+      const NODE_WATCHER_ORIGINS = new Set([
+        'move',
+        'add-head',
+        'remove-head',
+        'mixed',
+        'node-mutation',
+      ])
+      const events: Array<{ at: number; detail: any }> = []
+      const h = (e: Event) => {
+        const detail = (e as CustomEvent).detail
+        if (detail && NODE_WATCHER_ORIGINS.has(detail.origin)) return
+        events.push({ at: Date.now(), detail })
+      }
+      window.addEventListener('halofire:scene-changed', h)
+      const start = Date.now()
+      // Fire 5 synthetic mutation events 30ms apart — well under the
+      // 150ms debounce window, so they MUST coalesce into 1.
+      for (let i = 0; i < 5; i++) {
+        window.dispatchEvent(new CustomEvent('halofire:swap-sku', {
+          detail: { i },
+        }))
+        await new Promise((r) => setTimeout(r, 30))
+      }
+      // Wait past the debounce window for the trailing flush.
+      await new Promise((r) => setTimeout(r, 250))
+      window.removeEventListener('halofire:scene-changed', h)
+      return { events, start }
+    })
+    // Exactly one coalesced event.
+    expect(result.events.length).toBe(1)
+    const detail = result.events[0].detail
+    // Coalesced detail carries count and origins set.
+    expect(detail.count).toBe(5)
+    expect(detail.origins).toEqual(['swap-sku'])
+    // Trailing emit: fires roughly 150ms AFTER the last source event
+    // (last source was at ~start + 4*30 = 120ms; flush at ~270ms).
+    const delay = result.events[0].at - result.start
+    expect(delay).toBeGreaterThanOrEqual(150)
   })
 
   // --------------------------------------------------------------
