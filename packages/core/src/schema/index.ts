@@ -75,6 +75,7 @@ export {
   SystemNode,
   withHazardDefaults,
 } from './nodes/system'
+export { FittingNode } from './nodes/fitting'
 export {
   StairNode,
   StairRailingMode,

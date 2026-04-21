@@ -14,6 +14,7 @@ import { PipeNode } from './nodes/pipe'
 import { SlabNode } from './nodes/slab'
 import { SprinklerHeadNode } from './nodes/sprinkler-head'
 import { SystemNode } from './nodes/system'
+import { FittingNode } from './nodes/fitting'
 import { StairNode } from './nodes/stair'
 import { StairSegmentNode } from './nodes/stair-segment'
 import { WallNode } from './nodes/wall'
@@ -41,6 +42,7 @@ export const AnyNode = z.discriminatedUnion('type', [
   SprinklerHeadNode,
   PipeNode,
   SystemNode,
+  FittingNode,
 ])
 
 export type AnyNode = z.infer<typeof AnyNode>

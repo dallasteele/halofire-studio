@@ -28,6 +28,8 @@ import {
   PipeNode,
 } from '@pascal-app/core/schema/nodes/pipe'
 // biome-ignore lint/style/noRelativeImport: direct module path is intentional
+import { FittingNode } from '@pascal-app/core/schema/nodes/fitting'
+// biome-ignore lint/style/noRelativeImport: direct module path is intentional
 import {
   DENSITY_AREA_DEFAULTS,
   HOSE_ALLOWANCE_GPM,
@@ -451,5 +453,117 @@ test.describe('Pascal fork — HydraulicSystem solver', () => {
     // friction loss should explode past the supply pressure.
     expect(demand.required_psi).toBeGreaterThan(200)
     expect(demand.passes).toBe(false)
+  })
+})
+
+test.describe('Pascal fork — FittingNode schema', () => {
+  test('parses a valid 2" threaded tee with all required fields', () => {
+    const fitting = FittingNode.parse({
+      id: generateId('fitting'),
+      type: 'fitting',
+      name: '2" threaded tee',
+      sku: 'VIC-TEE-2',
+      kind: 'tee',
+      size_in: 2,
+      connection_style: 'NPT_threaded',
+      port_connections: [
+        { port_role: 'run_a', pipe_id: 'pipe_abc' },
+        { port_role: 'run_b', pipe_id: 'pipe_def' },
+        { port_role: 'branch', pipe_id: 'pipe_ghi' },
+      ],
+    })
+    expect(fitting.type).toBe('fitting')
+    expect(fitting.kind).toBe('tee')
+    expect(fitting.size_in).toBe(2)
+    expect(fitting.connection_style).toBe('NPT_threaded')
+    expect(fitting.port_connections).toHaveLength(3)
+    expect(fitting.id).toMatch(/^fitting_/)
+  })
+
+  test('rejects unknown kind values', () => {
+    expect(() =>
+      FittingNode.parse({
+        id: generateId('fitting'),
+        type: 'fitting',
+        sku: 'X',
+        kind: 'wye', // not in enum
+        size_in: 2,
+        connection_style: 'grooved',
+      }),
+    ).toThrow()
+  })
+
+  test('rejects non-positive sizes (size_in must be > 0)', () => {
+    expect(() =>
+      FittingNode.parse({
+        id: generateId('fitting'),
+        type: 'fitting',
+        sku: 'X',
+        kind: 'elbow_90',
+        size_in: 0,
+        connection_style: 'grooved',
+      }),
+    ).toThrow()
+    expect(() =>
+      FittingNode.parse({
+        id: generateId('fitting'),
+        type: 'fitting',
+        sku: 'X',
+        kind: 'elbow_90',
+        size_in: -2,
+        connection_style: 'grooved',
+      }),
+    ).toThrow()
+  })
+
+  test("AnyNode discriminated union narrows on type='fitting'", () => {
+    const node = AnyNode.parse({
+      id: generateId('fitting'),
+      type: 'fitting',
+      sku: 'VIC-ELB-4',
+      kind: 'elbow_45',
+      size_in: 4,
+      connection_style: 'grooved',
+    })
+    expect(node.type).toBe('fitting')
+    if (node.type === 'fitting') {
+      expect(node.kind).toBe('elbow_45')
+      expect(node.size_in).toBe(4)
+    }
+  })
+
+  test('port_connections defaults to empty array when omitted', () => {
+    const fitting = FittingNode.parse({
+      id: generateId('fitting'),
+      type: 'fitting',
+      sku: 'CAP-2',
+      kind: 'cap',
+      size_in: 2,
+      connection_style: 'NPT_threaded',
+    })
+    expect(fitting.port_connections).toEqual([])
+  })
+
+  test('size_branch_in is optional (omitted parses cleanly)', () => {
+    const fitting = FittingNode.parse({
+      id: generateId('fitting'),
+      type: 'fitting',
+      sku: 'TEE-4',
+      kind: 'tee',
+      size_in: 4,
+      connection_style: 'grooved',
+    })
+    expect(fitting.size_branch_in).toBeUndefined()
+    // And when present, it's preserved.
+    const reducer = FittingNode.parse({
+      id: generateId('fitting'),
+      type: 'fitting',
+      sku: 'RED-4x2',
+      kind: 'reducer_concentric',
+      size_in: 4,
+      size_branch_in: 2,
+      connection_style: 'grooved',
+    })
+    expect(reducer.size_branch_in).toBe(2)
   })
 })
