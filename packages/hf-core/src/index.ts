@@ -9,6 +9,12 @@ export * as sheetsDefault from './sheets/generate-default-set.js'
 export * as sheetsRiser from './sheets/riser-diagram.js'
 export * as sheetsFloorPlan from './sheets/floor-plan-layout.js'
 export {
+  NODE_TYPE_TO_DXF_LAYER,
+  LAYER_ACI_COLOR,
+  pipeLayerForRole,
+  filterByLayerVisibility,
+} from './sheets/layer-mapping.js'
+export {
   type DimPrimitive,
   dimensionToSvgPrimitives,
   formatDimensionText,

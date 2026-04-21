@@ -44,6 +44,11 @@ from typing import Any, Sequence
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from cad.schema import Design  # noqa: E402
 from cad.logging import get_logger  # noqa: E402
+from cad.layer_mapping import (  # noqa: E402
+    LAYER_ACI_COLOR,
+    NODE_TYPE_TO_DXF_LAYER,
+    pipe_layer_for_role,
+)
 
 log = get_logger("submittal.dxf")
 
@@ -63,11 +68,12 @@ def _layer_name_for_pipe(size_in: float) -> str:
     return f"FP-PIPE-{str(size_in).replace('.', '-')}"
 
 
-# Layer set used by both the back-compat model-only emitter and the
-# sheet-aware one. Keys beyond what ``agent.py`` ships are additive
-# per the R9.1 blueprint (FP-PIPES-MAIN/BRANCH/DROP, FP-VALVES,
-# 0-ARCH for walls).
-_BASE_LAYERS = {
+# Layers required by R9.1 paper-space exports. Colors come from the
+# canonical LAYER_ACI_COLOR table in cad/layer_mapping.py — one
+# source of truth shared with packages/hf-core/src/sheets/layer-
+# mapping.ts. RGB overrides from the original palette are kept for
+# a handful of layers where plotters expected specific tones.
+_RGB_OVERRIDES: dict[str, tuple[int, int, int]] = {
     "FP-HEADS": (232, 67, 45),
     "FP-RISER": (255, 255, 255),
     "FP-HANGERS": (128, 128, 128),
@@ -79,16 +85,51 @@ _BASE_LAYERS = {
     "0-ARCH": (160, 160, 160),
 }
 
+# The minimum set of layers the R9.1 pipeline guarantees exist on
+# every emitted DXF (so downstream roundtrip tests can assert by
+# name).
+_REQUIRED_LAYERS: tuple[str, ...] = (
+    "FP-HEADS",
+    "FP-PIPES-MAIN",
+    "FP-PIPES-BRANCH",
+    "FP-PIPES-DROP",
+    "FP-VALVES",
+    "FP-HANGERS",
+    "0-ARCH",
+    "FP-RISER",
+    "FP-FDC",
+)
+
 
 def _install_layers(doc: Any) -> None:
-    layers = dict(_BASE_LAYERS)
-    for size, color in PIPE_COLOR_BY_SIZE.items():
-        layers[_layer_name_for_pipe(size)] = color
-    for name, (r, g, b) in layers.items():
+    for name in _REQUIRED_LAYERS:
         if name in doc.layers:
             continue
         lay = doc.layers.add(name)
-        lay.rgb = (r, g, b)
+        aci = LAYER_ACI_COLOR.get(name)
+        if aci is not None:
+            lay.color = aci
+        rgb = _RGB_OVERRIDES.get(name)
+        if rgb is not None:
+            lay.rgb = rgb
+    # Any other canonical layer referenced by NODE_TYPE_TO_DXF_LAYER
+    # — create on demand with its ACI so node emitters can just
+    # reference layer name without a pre-registration dance.
+    for name in set(NODE_TYPE_TO_DXF_LAYER.values()) | set(LAYER_ACI_COLOR.keys()):
+        if name in doc.layers:
+            continue
+        lay = doc.layers.add(name)
+        aci = LAYER_ACI_COLOR.get(name)
+        if aci is not None:
+            lay.color = aci
+    # Per-size pipe layers (legacy — still emitted for back-compat
+    # with agent.py's model-space pipeline).
+    for size, color in PIPE_COLOR_BY_SIZE.items():
+        name = _layer_name_for_pipe(size)
+        if name in doc.layers:
+            continue
+        lay = doc.layers.add(name)
+        lay.rgb = color
 
 
 def _emit_model_geometry(doc: Any, design: Design) -> None:
@@ -213,4 +254,9 @@ def export_dxf_with_sheets(
     return str(out_path)
 
 
-__all__ = ["export_dxf_with_sheets"]
+__all__ = [
+    "export_dxf_with_sheets",
+    "LAYER_ACI_COLOR",
+    "NODE_TYPE_TO_DXF_LAYER",
+    "pipe_layer_for_role",
+]

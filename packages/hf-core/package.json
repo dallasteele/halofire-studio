@@ -46,6 +46,11 @@
       "import": "./dist/sheets/floor-plan-layout.js",
       "default": "./dist/sheets/floor-plan-layout.js"
     },
+    "./sheets/layer-mapping": {
+      "types": "./dist/sheets/layer-mapping.d.ts",
+      "import": "./dist/sheets/layer-mapping.js",
+      "default": "./dist/sheets/layer-mapping.js"
+    },
     "./report/pdf-sheet-set": {
       "types": "./dist/report/pdf-sheet-set.d.ts",
       "import": "./dist/report/pdf-sheet-set.js",
