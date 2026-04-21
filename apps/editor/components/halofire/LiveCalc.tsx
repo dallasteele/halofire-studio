@@ -25,13 +25,18 @@ type Result = {
   safety_margin_psi?: number | null
   supply_static_psi?: number | null
   supply_residual_psi?: number | null
+  /** V2 Phase G — total bid $ and head count so the optimizer can
+   * show $-delta + head-delta since the last full run. */
+  bid_total_usd?: number | null
+  head_count?: number | null
 }
 
 type State =
   | { kind: 'idle' }
-  | { kind: 'running' }
-  | { kind: 'ok'; result: Result; at: number }
-  | { kind: 'error'; error: string; at: number }
+  | { kind: 'running'; origin?: string }
+  | { kind: 'ok'; result: Result; at: number; origin?: string;
+      baseline?: { bid: number; heads: number } }
+  | { kind: 'error'; error: string; at: number; origin?: string }
 
 interface Props {
   gatewayUrl?: string
@@ -52,20 +57,63 @@ export function LiveCalc({
   const [visible, setVisible] = useState(false)
   const timerRef = useRef<number | null>(null)
 
-  const runCalc = useCallback(async () => {
-    setState({ kind: 'running' })
+  const baselineRef = useRef<{ bid: number; heads: number } | null>(null)
+
+  const runCalc = useCallback(async (origin?: string) => {
+    setState({ kind: 'running', origin })
     setVisible(true)
     try {
+      // Hydraulic re-calc (primary)
       const res = await fetch(
         `${gatewayUrl}/projects/${projectId}/hydraulic`,
         { method: 'POST', cache: 'no-store' },
       )
       if (!res.ok) throw new Error(`gateway ${res.status}`)
       const body = await res.json()
-      const r: Result = body?.systems?.[0]?.hydraulic ?? body ?? {}
-      setState({ kind: 'ok', result: r, at: Date.now() })
+      const hr = body?.systems?.[0]?.hydraulic ?? body ?? {}
+      // BOM snapshot (best-effort — if not exposed, leave nulls)
+      let bid: number | null = null
+      let heads: number | null = null
+      try {
+        const br = await fetch(
+          `${gatewayUrl}/projects/${projectId}/deliverable/pipeline_summary.json`,
+          { cache: 'no-store' },
+        )
+        if (br.ok) {
+          const summary = await br.json()
+          const proposalStep = (summary?.steps ?? []).find(
+            (s: { step?: string }) => s?.step === 'proposal',
+          )
+          const bomStep = (summary?.steps ?? []).find(
+            (s: { step?: string }) => s?.step === 'bom',
+          )
+          bid = proposalStep?.total_usd ?? bomStep?.total_usd ?? null
+          // head_count lives on the building or hydraulic stage
+          const hstep = (summary?.steps ?? []).find(
+            (s: { step?: string; head_count?: number }) =>
+              s?.head_count !== undefined,
+          )
+          heads = hstep?.head_count ?? null
+        }
+      } catch {
+        // non-fatal — bid/heads stay null
+      }
+      const result: Result = {
+        ...hr,
+        bid_total_usd: bid,
+        head_count: heads,
+      }
+      // Lock baseline on the first successful run so deltas read
+      // against the pre-edit snapshot.
+      if (baselineRef.current === null && bid !== null && heads !== null) {
+        baselineRef.current = { bid, heads }
+      }
+      setState({
+        kind: 'ok', result, at: Date.now(), origin,
+        baseline: baselineRef.current ?? undefined,
+      })
     } catch (e) {
-      setState({ kind: 'error', error: String(e), at: Date.now() })
+      setState({ kind: 'error', error: String(e), at: Date.now(), origin })
     }
   }, [gatewayUrl, projectId])
 
@@ -74,7 +122,7 @@ export function LiveCalc({
     const onCmd = (e: Event) => {
       const detail = (e as CustomEvent).detail as { cmd?: string } | undefined
       if (detail?.cmd === 'hydraulic-calc') {
-        void runCalc()
+        void runCalc('manual')
       }
     }
     window.addEventListener('halofire:ribbon', onCmd as EventListener)
@@ -86,12 +134,15 @@ export function LiveCalc({
   // event here — downstream panels can dispatch it when they edit.
   useEffect(() => {
     if (manualOnly) return
-    const onChange = () => {
+    const onChange = (e: Event) => {
+      const detail = (e as CustomEvent).detail as
+        | { origin?: string }
+        | undefined
       if (timerRef.current !== null) {
         clearTimeout(timerRef.current)
       }
       timerRef.current = window.setTimeout(() => {
-        void runCalc()
+        void runCalc(detail?.origin)
         timerRef.current = null
       }, debounceMs)
     }
@@ -132,22 +183,77 @@ export function LiveCalc({
         <div className="text-[#ffd600]">running…</div>
       )}
       {state.kind === 'ok' && (
-        <dl className="grid grid-cols-2 gap-x-3 gap-y-1">
-          <dt className="text-neutral-400">flow</dt>
-          <dd>{fmt(state.result.required_flow_gpm, 'gpm')}</dd>
-          <dt className="text-neutral-400">pressure</dt>
-          <dd>{fmt(state.result.required_pressure_psi, 'psi')}</dd>
-          <dt className="text-neutral-400">margin</dt>
-          <dd
-            className={
-              (state.result.safety_margin_psi ?? 0) > 0
-                ? 'text-[#22c55e]'
-                : 'text-[#ef4444]'
-            }
-          >
-            {fmt(state.result.safety_margin_psi, 'psi')}
-          </dd>
-        </dl>
+        <>
+          {state.origin && (
+            <div className="mb-1 text-[9px] uppercase tracking-wider text-neutral-600">
+              trigger: {state.origin}
+            </div>
+          )}
+          <dl className="grid grid-cols-2 gap-x-3 gap-y-1">
+            <dt className="text-neutral-400">flow</dt>
+            <dd>{fmt(state.result.required_flow_gpm, 'gpm')}</dd>
+            <dt className="text-neutral-400">pressure</dt>
+            <dd>{fmt(state.result.required_pressure_psi, 'psi')}</dd>
+            <dt className="text-neutral-400">margin</dt>
+            <dd
+              className={
+                (state.result.safety_margin_psi ?? 0) > 0
+                  ? 'text-[#22c55e]'
+                  : 'text-[#ef4444]'
+              }
+            >
+              {fmt(state.result.safety_margin_psi, 'psi')}
+            </dd>
+            {state.result.bid_total_usd != null && (
+              <>
+                <dt className="text-neutral-400">bid $</dt>
+                <dd>
+                  ${state.result.bid_total_usd.toLocaleString(undefined, {
+                    maximumFractionDigits: 0,
+                  })}
+                </dd>
+              </>
+            )}
+            {state.baseline && state.result.bid_total_usd != null && (
+              <>
+                <dt className="text-neutral-400">Δ bid</dt>
+                <dd
+                  className={
+                    state.result.bid_total_usd - state.baseline.bid > 0
+                      ? 'text-[#f59e0b]'
+                      : 'text-[#22c55e]'
+                  }
+                >
+                  {formatDelta(
+                    state.result.bid_total_usd - state.baseline.bid, 0, '$',
+                  )}
+                </dd>
+              </>
+            )}
+            {state.result.head_count != null && (
+              <>
+                <dt className="text-neutral-400">heads</dt>
+                <dd>{state.result.head_count}</dd>
+              </>
+            )}
+            {state.baseline && state.result.head_count != null && (
+              <>
+                <dt className="text-neutral-400">Δ heads</dt>
+                <dd
+                  className={
+                    state.result.head_count - state.baseline.heads > 0
+                      ? 'text-[#f59e0b]'
+                      : 'text-[#22c55e]'
+                  }
+                >
+                  {formatDelta(
+                    state.result.head_count - state.baseline.heads, 0, '',
+                  )}
+                </dd>
+              </>
+            )}
+          </dl>
+        </>
       )}
       {state.kind === 'error' && (
         <div className="text-[#ef4444]">gateway offline — {state.error}</div>
@@ -156,10 +262,21 @@ export function LiveCalc({
   )
 }
 
+function formatDelta(n: number, digits: number, prefix: string): string {
+  const s = Math.abs(n).toLocaleString(undefined, {
+    maximumFractionDigits: digits,
+  })
+  const sign = n > 0 ? '+' : n < 0 ? '−' : ''
+  return `${sign}${prefix}${s}`
+}
+
 // Pure helpers exported for unit tests
 export const _internals = {
-  emitSceneChange(): void {
+  emitSceneChange(origin?: string): void {
     if (typeof window === 'undefined') return
-    window.dispatchEvent(new CustomEvent('halofire:scene-changed'))
+    window.dispatchEvent(
+      new CustomEvent('halofire:scene-changed', { detail: { origin } }),
+    )
   },
+  formatDelta,
 }

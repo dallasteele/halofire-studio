@@ -20,6 +20,7 @@ import { LiveCalc } from '@/components/halofire/LiveCalc'
 import { RemoteAreaDraw } from '@/components/halofire/RemoteAreaDraw'
 import { Ribbon, type RibbonCommand } from '@/components/halofire/Ribbon'
 import { SceneBootstrap } from '@/components/halofire/SceneBootstrap'
+import { SceneChangeBridge } from '@/components/halofire/SceneChangeBridge'
 import { StatusBar } from '@/components/halofire/StatusBar'
 import { ToolOverlay } from '@/components/halofire/ToolOverlay'
 
@@ -144,6 +145,9 @@ export default function Home() {
           Addresses "none of these catalog items are real models" —
           now they render as a showcase at x=-50, z=-50. */}
       <SceneBootstrap projectId={ACTIVE_PROJECT_ID} />
+      {/* V2 Phase G: bridge granular halofire mutation events into
+          a single halofire:scene-changed signal consumed by LiveCalc. */}
+      <SceneChangeBridge />
       <CommandPalette />
       <ToolOverlay />
       <RemoteAreaDraw projectId={ACTIVE_PROJECT_ID} />
