@@ -78,6 +78,8 @@ def _template_for(category: str) -> str:
         return "head_upright.scad"
     if c == "sprinkler_head_sidewall":
         return "head_sidewall.scad"
+    if c == "column" or c == "structural_column":
+        return "column.scad"
     return "placeholder.scad"
 
 

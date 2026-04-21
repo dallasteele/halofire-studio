@@ -352,6 +352,35 @@ def test_each_kept_level_has_realistic_polygon_area() -> None:
 #  vertical stacking via LevelNode.level.)
 
 
+# ── interior detail ─────────────────────────────────────────────
+
+@pytest.mark.cruel
+@pytest.mark.golden
+def test_levels_have_columns_or_obstructions() -> None:
+    """A real residential or commercial floor has 6-30 structural
+    columns (parking decks have grids, towers have a core + outer
+    columns). Pages with 0 obstructions and 0 columns mean intake
+    didn't synthesize the column grid — the visualization will
+    look hollow and the placer's coverage analysis can't dodge
+    spray shadows.
+    """
+    _truth_or_skip()
+    if not _DESIGN.exists():
+        pytest.skip("design.json missing")
+    design = json.loads(_DESIGN.read_text(encoding="utf-8"))
+    bad: list[str] = []
+    for lvl in design.get("building", {}).get("levels", []):
+        obs = lvl.get("obstructions") or []
+        col_count = sum(1 for o in obs if o.get("kind") == "column")
+        if col_count < 1:
+            bad.append(f"{lvl.get('name', '?')}: 0 columns")
+    if bad:
+        raise AssertionError(
+            f"{len(bad)} level(s) have no columns: "
+            f"{'; '.join(bad[:5])}"
+        )
+
+
 # ── stack coherence ─────────────────────────────────────────────
 
 @pytest.mark.cruel

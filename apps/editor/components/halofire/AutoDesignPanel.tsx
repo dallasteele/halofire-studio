@@ -451,6 +451,68 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
             // ceiling is optional — fall through with default 2.5 m
           }
 
+          // STRUCTURAL COLUMNS — proper catalog item rendered from
+          // OpenSCAD-authored geometry (column.scad / Trimesh
+          // fallback at packages/halofire-catalog/authoring/scad/).
+          // The GLB lives at /halofire-catalog/glb/SM_Column_*. We
+          // pre-rendered a 16"-square × 10' tall reinforced
+          // concrete column; AutoDesignPanel scales it to match
+          // the per-column dimension from intake's obstruction
+          // polygon. NO MORE BrokenItemFallback red wireframes.
+          const obstructions = (lvl as any).obstructions ?? []
+          for (const o of obstructions) {
+            if (o.kind !== 'column' || !o.polygon_m || o.polygon_m.length < 3) continue
+            try {
+              const xs = o.polygon_m.map((p: [number, number]) => p[0])
+              const ys = o.polygon_m.map((p: [number, number]) => p[1])
+              const cx = xs.reduce((a: number, b: number) => a + b, 0) / xs.length
+              const cy = ys.reduce((a: number, b: number) => a + b, 0) / ys.length
+              const w = Math.max(0.2, Math.max(...xs) - Math.min(...xs))
+              const d = Math.max(0.2, Math.max(...ys) - Math.min(...ys))
+              const h = (o.top_z_m ?? 3.0) - (o.bottom_z_m ?? 0.0)
+              // GLB is 16" × 10' reinforced concrete. Scale to fit
+              // the obstruction's actual footprint + height.
+              const baselineMmX = 16 * 0.0254  // 0.4064 m
+              const baselineHM = 10 * 0.3048   // 3.048 m
+              const sx = w / baselineMmX
+              const sz = d / baselineMmX
+              const sy = h / baselineHM
+              createNode(
+                {
+                  id: generateId('item'),
+                  type: 'item',
+                  // Column GLB is centered at origin; Pascal item
+                  // position[1] is level-local Y, so place at h/2
+                  // so the column sits on the slab.
+                  position: [cx, h / 2, cy],
+                  rotation: [0, 0, 0],
+                  scale: [sx, sy, sz],
+                  children: [],
+                  asset: {
+                    id: `column_${o.id}`,
+                    category: 'column',
+                    name: 'Reinforced concrete column',
+                    thumbnail: '/icons/item.png',
+                    dimensions: [w, h, d],
+                    src: '/halofire-catalog/glb/SM_Column_Concrete_16in_10ft.glb',
+                    attachTo: 'floor',
+                    offset: [0, 0, 0],
+                    rotation: [0, 0, 0],
+                    scale: [1, 1, 1],
+                    tags: [
+                      'halofire', 'column', 'auto_design',
+                      'halofire_pipe_color:#71717a',
+                    ],
+                  },
+                  metadata: { tags: ['halofire', 'column', 'auto_design'] },
+                } as any,
+                pascalLevelId as any,
+              )
+            } catch {
+              // best effort
+            }
+          }
+
           // CLEAN PERIMETER WALLS — one wall per slab edge, NOT the
           // 100-500 fragmented CubiCasa segments. Real fire-protection
           // visualizations show the building shell + interior
@@ -480,6 +542,49 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
                 // best effort
               }
             }
+          }
+
+          // INTERIOR PARTITION WALLS — derived from each room's
+          // polygon edges. Cap at 100/level so a noisy CubiCasa
+          // run doesn't repaint the porcupine. Walls thinner than
+          // perimeter (0.1 m vs 0.2 m) and slightly shorter so
+          // they read as interior partitions, not exterior shell.
+          const rooms = (lvl as any).rooms ?? []
+          let partitionCount = 0
+          const PARTITION_CAP = 100
+          for (const r of rooms) {
+            if (!r.polygon_m || r.polygon_m.length < 3) continue
+            // Intake's canonicalize pass already shifted room
+            // polygons onto the canonical centroid, so they're
+            // already in the same coord frame as slabPoly.
+            for (let i = 0; i < r.polygon_m.length; i++) {
+              if (partitionCount >= PARTITION_CAP) break
+              const a = r.polygon_m[i] as [number, number]
+              const b = r.polygon_m[(i + 1) % r.polygon_m.length] as [number, number]
+              const dx = b[0] - a[0]
+              const dy = b[1] - a[1]
+              const len2 = dx * dx + dy * dy
+              if (len2 < 1.0 || len2 > 400) continue // 1 - 20 m walls only
+              try {
+                const wallNode = WallNode.parse({
+                  start: a,
+                  end: b,
+                  thickness: 0.1,
+                  height: (lvl.height_m ?? 3.0) * 0.85,
+                  parentId: pascalLevelId,
+                  metadata: {
+                    tags: [
+                      'halofire', 'wall', 'auto_design', 'partition',
+                    ],
+                  },
+                })
+                createNode(wallNode as any, pascalLevelId as any)
+                partitionCount++
+              } catch {
+                // best effort
+              }
+            }
+            if (partitionCount >= PARTITION_CAP) break
           }
         })
 

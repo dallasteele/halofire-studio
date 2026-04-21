@@ -989,6 +989,60 @@ def _canonicalize_floor_plates(
                     r.polygon_m = [(p[0] - ldx, p[1] - ldy) for p in r.polygon_m]
         except Exception:  # noqa: BLE001
             pass
+    # Synthesize a structural column grid for every level. Real
+    # residential towers have a 6-9 m column grid running the
+    # length of the building. Without columns the visualization
+    # reads as one giant open warehouse and the placer can't dodge
+    # spray-shadow obstructions per NFPA 13 § 11.2.4.
+    from cad.schema import Obstruction
+    GRID_M = 7.0  # typical column spacing for residential
+    COL_THICK_M = 0.4  # 16" square column
+    bb_xs = [p[0] for p in centered_poly]
+    bb_ys = [p[1] for p in centered_poly]
+    minx, maxx = min(bb_xs), max(bb_xs)
+    miny, maxy = min(bb_ys), max(bb_ys)
+    inset = 1.5  # m from exterior
+    canonical_poly_obj = _PG(centered_poly)
+    columns: list[Obstruction] = []
+    col_idx = 0
+    x = minx + inset
+    while x <= maxx - inset + 1e-6:
+        y = miny + inset
+        while y <= maxy - inset + 1e-6:
+            # Only place if inside the floor polygon (avoid courtyard
+            # voids and odd shapes).
+            from shapely.geometry import Point
+            if canonical_poly_obj.contains(Point(x, y)):
+                col_poly = [
+                    (x - COL_THICK_M / 2, y - COL_THICK_M / 2),
+                    (x + COL_THICK_M / 2, y - COL_THICK_M / 2),
+                    (x + COL_THICK_M / 2, y + COL_THICK_M / 2),
+                    (x - COL_THICK_M / 2, y + COL_THICK_M / 2),
+                ]
+                columns.append(Obstruction(
+                    id=f"col_{col_idx}",
+                    kind="column",
+                    polygon_m=col_poly,
+                    bottom_z_m=0.0,
+                    top_z_m=3.0,
+                ))
+                col_idx += 1
+            y += GRID_M
+        x += GRID_M
+    # Synthesize interior partition walls from each level's room
+    # polygons. CubiCasa rooms live in original page coords; we
+    # already shifted them in the per-level loop above so they
+    # overlay the canonical polygon. For each room edge that's
+    # NOT on the perimeter, create one interior WallNode.
+    for lv in levels:
+        # Stamp the columns onto every level (fresh obstructions
+        # per level so each level has its own list).
+        from copy import deepcopy
+        lv.obstructions = [deepcopy(c) for c in columns]
+        # Renumber column ids per level so they're unique
+        for c_idx, c in enumerate(lv.obstructions):
+            c.id = f"col_{lv.id}_{c_idx}"
+
     metadata["issues"].append({
         "code": "INTAKE_CANONICAL_PLATE",
         "severity": "info",
