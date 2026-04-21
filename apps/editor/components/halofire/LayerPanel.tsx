@@ -131,67 +131,153 @@ export function LayerPanel({
     return () => window.removeEventListener('keydown', onKey)
   }, [onChange])
 
+  // Collapsed by default — viewport widget convention from
+  // AutoSPRINK / Revit / AutoCAD: layer toggles are reach-tools,
+  // not browse-tools. Show 36 px of dots, expand to 224 px on click.
+  const [open, setOpen] = useState<boolean>(false)
+
+  // Hover preview for collapsed state — hovering a dot shows a
+  // floating chip with the layer name + hotkey to its right so
+  // users can identify each row without expanding the whole widget.
+  const [hover, setHover] = useState<LayerId | null>(null)
+
   return (
     <div
       data-testid="halofire-layer-panel"
-      className="pointer-events-auto fixed right-4 top-28 z-[700] w-[220px] rounded-sm border border-white/10 bg-[#0f0f14] text-white shadow-xl"
+      // Bottom-left of the viewport, always-on-top below modals.
+      // bottom-20 sits above the bottom toolbar (which lives at
+      // bottom-4 / bottom-2 depending on layout); left-3 floats off
+      // the sidebar without overlapping the viewport canvas.
+      // backdrop-blur lets the model bleed through subtly.
+      className={
+        'pointer-events-auto fixed bottom-20 left-3 z-40 ' +
+        'border border-white/8 bg-[#0a0a0b]/95 backdrop-blur-sm ' +
+        'text-white shadow-[0_4px_20px_rgba(0,0,0,0.5)] ' +
+        'transition-[width] duration-200 ease-out ' +
+        (open ? 'w-[224px]' : 'w-[36px]')
+      }
+      style={{ borderRadius: 0 }}
     >
-      <div className="flex items-center justify-between border-b border-white/10 px-3 py-1.5">
-        <span className="text-[10px] uppercase tracking-[0.1em] text-neutral-400">
-          Layers
-        </span>
-        <div className="flex gap-1">
-          <button
-            type="button"
-            className="rounded-sm border border-white/10 px-1.5 text-[10px] text-neutral-400 hover:text-white"
-            onClick={() => commit(setAllLayers(vis, true))}
-            aria-label="show all layers"
-          >
-            all
-          </button>
-          <button
-            type="button"
-            className="rounded-sm border border-white/10 px-1.5 text-[10px] text-neutral-400 hover:text-white"
-            onClick={() => commit(setAllLayers(vis, false))}
-            aria-label="hide all layers"
-          >
-            none
-          </button>
+      {/* Header — only visible when expanded. Collapsed state has no
+          header so the column reads as a pure tool, not a panel. */}
+      {open && (
+        <div className="flex items-center justify-between border-b border-white/8 px-2.5 py-1">
+          <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-neutral-500">
+            Layers
+          </span>
+          <div className="flex items-center gap-0.5">
+            <button
+              type="button"
+              className="border border-white/10 px-1 py-0.5 font-mono text-[9px] uppercase tracking-wider text-neutral-400 transition-colors hover:border-[#e8432d]/40 hover:text-[#e8432d]"
+              onClick={() => commit(setAllLayers(vis, true))}
+              aria-label="show all layers"
+              style={{ borderRadius: 0 }}
+            >
+              all
+            </button>
+            <button
+              type="button"
+              className="border border-white/10 px-1 py-0.5 font-mono text-[9px] uppercase tracking-wider text-neutral-400 transition-colors hover:border-[#e8432d]/40 hover:text-[#e8432d]"
+              onClick={() => commit(setAllLayers(vis, false))}
+              aria-label="hide all layers"
+              style={{ borderRadius: 0 }}
+            >
+              none
+            </button>
+            <button
+              type="button"
+              className="ml-0.5 border border-white/10 px-1 py-0.5 font-mono text-[10px] leading-none text-neutral-400 transition-colors hover:border-[#e8432d]/40 hover:text-[#e8432d]"
+              onClick={() => setOpen(false)}
+              aria-label="collapse layer panel"
+              style={{ borderRadius: 0 }}
+            >
+              ‹
+            </button>
+          </div>
         </div>
-      </div>
-      <ul className="p-1 text-sm">
+      )}
+
+      <ul className={open ? 'py-1' : 'flex flex-col items-center py-1'}>
         {LAYER_DEFS.map((d) => (
-          <li key={d.id}>
+          <li
+            key={d.id}
+            className={open ? '' : 'relative w-full'}
+            onMouseEnter={() => !open && setHover(d.id)}
+            onMouseLeave={() => !open && setHover(null)}
+          >
             <button
               type="button"
               data-testid={`layer-toggle-${d.id}`}
-              onClick={() => commit(toggleLayer(vis, d.id))}
+              onClick={(e) => {
+                e.stopPropagation()
+                commit(toggleLayer(vis, d.id))
+              }}
               className={
-                'flex w-full items-center justify-between rounded-sm px-2 py-1 text-xs transition-colors ' +
-                (vis[d.id]
-                  ? 'text-white hover:bg-neutral-900'
-                  : 'text-neutral-500 hover:bg-neutral-900')
+                open
+                  ? 'group flex w-full items-center justify-between border-l-2 border-transparent px-2.5 py-1 text-xs transition-colors hover:border-[#e8432d] hover:bg-white/5'
+                  : 'group flex h-7 w-full items-center justify-center transition-colors hover:bg-white/5'
               }
+              style={{ borderRadius: 0 }}
+              aria-pressed={vis[d.id]}
             >
-              <span className="flex items-center gap-2">
+              <span className={open ? 'flex items-center gap-2' : ''}>
                 <span
                   className={
-                    'inline-block h-2 w-2 rounded-full ' +
-                    (vis[d.id] ? 'bg-[#e8432d]' : 'bg-neutral-700')
+                    'inline-block h-1.5 w-1.5 transition-colors ' +
+                    (vis[d.id]
+                      ? 'bg-[#e8432d] shadow-[0_0_4px_rgba(232,67,45,0.6)]'
+                      : 'border border-neutral-600 bg-transparent')
                   }
                   aria-hidden
                 />
-                {d.label}
+                {open && (
+                  <span
+                    className={
+                      'font-mono text-[11px] tracking-wide ' +
+                      (vis[d.id] ? 'text-neutral-100' : 'text-neutral-500')
+                    }
+                  >
+                    {d.label}
+                  </span>
+                )}
               </span>
-              {d.hotkey && (
-                <span className="font-mono text-[10px] text-neutral-500">
+              {open && d.hotkey && (
+                <span className="font-mono text-[9px] uppercase tracking-wider text-neutral-600 group-hover:text-neutral-400">
                   {d.hotkey}
                 </span>
               )}
             </button>
+
+            {/* Floating tooltip when collapsed and this row hovered */}
+            {!open && hover === d.id && (
+              <span
+                className="pointer-events-none absolute left-full top-1/2 ml-2 -translate-y-1/2 whitespace-nowrap border border-white/8 bg-[#0a0a0b]/95 px-2 py-1 font-mono text-[10px] tracking-wide text-neutral-200 shadow-[0_2px_8px_rgba(0,0,0,0.5)]"
+                style={{ borderRadius: 0 }}
+              >
+                {d.label}
+                {d.hotkey && (
+                  <span className="ml-2 text-neutral-500">[{d.hotkey}]</span>
+                )}
+              </span>
+            )}
           </li>
         ))}
       </ul>
+
+      {/* Expand affordance when collapsed — small chevron at the
+          bottom of the dot column. Click ANYWHERE on the collapsed
+          column expands; chevron is just a visual cue. */}
+      {!open && (
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          aria-label="expand layer panel"
+          className="flex w-full items-center justify-center border-t border-white/8 py-1 font-mono text-[10px] leading-none text-neutral-600 transition-colors hover:bg-white/5 hover:text-[#e8432d]"
+          style={{ borderRadius: 0 }}
+        >
+          ›
+        </button>
+      )}
     </div>
   )
 }

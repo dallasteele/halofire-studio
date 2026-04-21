@@ -155,9 +155,15 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
     const isAutoDesign = (n: any): boolean => {
       const aTags = n?.asset?.tags ?? []
       const mTags = n?.metadata?.tags ?? []
+      const tagSet = [...(Array.isArray(aTags) ? aTags : []), ...(Array.isArray(mTags) ? mTags : [])]
       return (
-        (Array.isArray(aTags) && aTags.includes('auto_design')) ||
-        (Array.isArray(mTags) && mTags.includes('auto_design'))
+        tagSet.includes('auto_design')
+        // Also wipe stale BuildingGenerator artifacts that 404 on
+        // load (their `building_shell` ItemNode points at a GLB the
+        // gateway doesn't actually serve, throwing a Runtime Error
+        // that blocks the whole viewport).
+        || tagSet.includes('building_shell')
+        || tagSet.includes('synthetic')
       )
     }
     const live = (useScene.getState() as any).nodes ?? {}
@@ -208,6 +214,18 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
   }, [])
 
   useEffect(() => () => stopPoll(), [stopPoll])
+
+  // On mount, sweep any stale building_shell / synthetic nodes
+  // that point at 404 GLB URLs from prior sessions. Without this
+  // the Runtime-Error overlay covers the viewport before the user
+  // can even reach Auto-Design.
+  useEffect(() => {
+    const id = window.setTimeout(() => {
+      try { clearPreviousAutoDesign() } catch { /* best effort */ }
+    }, 100)
+    return () => window.clearTimeout(id)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // When pipeline completes, spawn building shell + heads + pipes
   // into the Three.js viewport automatically (no manual clicks).
