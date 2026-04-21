@@ -44,13 +44,21 @@ rustup toolchain install stable
 cd apps/halofire-studio-desktop
 bun install
 
+# vendor the OpenSCAD native binary into src-tauri/bin/ (current target).
+# Uses python_sidecar/openscad-checksums.json. Binaries are gitignored;
+# this step is required before `tauri build` can bundle externalBin.
+bun run fetch:openscad
+# NOTE: pinned SHA256 values are placeholders — see the manifest. For local
+# dev pass --skip-verify; before release, pin real checksums and remove the
+# flag. Run on each host OS to produce that triple's binary.
+
 # build the Python sidecar (requires PyInstaller in the active env)
 python python_sidecar/build.py
 
 # dev run — spins up Next.js on 3002 + Tauri webview
 bun run dev
 
-# production .msi / .exe
+# production .msi / .exe (fetches openscad + builds sidecar first)
 bun run build:all
 ```
 

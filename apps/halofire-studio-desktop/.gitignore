@@ -1,0 +1,4 @@
+src-tauri/bin/openscad-*
+src-tauri/bin/halofire-pipeline-*
+src-tauri/_work/
+src-tauri/_spec/

@@ -1,0 +1,27 @@
+{
+  "openscad_version": "2024.11.12",
+  "source": "https://github.com/openscad/openscad/releases/tag/openscad-2024.11.12",
+  "_warning": "SHA256 values marked PLACEHOLDER_VERIFY_BEFORE_RELEASE must be pinned against the upstream checksum file before any production release. The download script fails loudly unless --skip-verify is passed.",
+  "checksums": {
+    "x86_64-pc-windows-msvc": {
+      "url": "https://github.com/openscad/openscad/releases/download/openscad-2024.11.12/OpenSCAD-2024.11.12-x86_64-Installer.exe",
+      "sha256": "PLACEHOLDER_VERIFY_BEFORE_RELEASE",
+      "binary_path_in_archive": "openscad.exe"
+    },
+    "x86_64-apple-darwin": {
+      "url": "https://github.com/openscad/openscad/releases/download/openscad-2024.11.12/OpenSCAD-2024.11.12-x86_64.dmg",
+      "sha256": "PLACEHOLDER_VERIFY_BEFORE_RELEASE",
+      "binary_path_in_archive": "OpenSCAD.app/Contents/MacOS/OpenSCAD"
+    },
+    "aarch64-apple-darwin": {
+      "url": "https://github.com/openscad/openscad/releases/download/openscad-2024.11.12/OpenSCAD-2024.11.12-arm64.dmg",
+      "sha256": "PLACEHOLDER_VERIFY_BEFORE_RELEASE",
+      "binary_path_in_archive": "OpenSCAD.app/Contents/MacOS/OpenSCAD"
+    },
+    "x86_64-unknown-linux-gnu": {
+      "url": "https://github.com/openscad/openscad/releases/download/openscad-2024.11.12/OpenSCAD-2024.11.12-x86_64.AppImage",
+      "sha256": "PLACEHOLDER_VERIFY_BEFORE_RELEASE",
+      "binary_path_in_archive": "openscad"
+    }
+  }
+}

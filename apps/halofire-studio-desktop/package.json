@@ -7,8 +7,10 @@
     "dev": "tauri dev",
     "build": "tauri build",
     "build:sidecar": "python python_sidecar/build.py",
-    "build:all": "pnpm run build:sidecar && pnpm run build",
-    "test:sidecar": "python -m pytest python_sidecar/test_entry.py -v"
+    "fetch:openscad": "python python_sidecar/download_openscad.py",
+    "build:all": "bun run fetch:openscad && bun run build:sidecar && bun run build",
+    "test:sidecar": "python -m pytest python_sidecar/test_entry.py -v",
+    "test:fetch-openscad": "python -m pytest python_sidecar/test_download_openscad.py -v"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2"
