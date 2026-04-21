@@ -1,0 +1,239 @@
+"""Cruel-test scoreboard for a second real Halo Fire project.
+
+Phase R11.2 of IMPLEMENTATION_PLAN.md. We CANNOT write the real
+scoreboard until a second real bid PDF + truth numbers have been
+ingested — otherwise every "actual ≈ truth" assertion is just
+checking self-authored fiction. So this file scaffolds the shape
+of the scoreboard (skipped until real data arrives) AND adds
+three LIVE meta-tests that prove the R11.1 scaffolding (seed
+script + scoreboard file) loads cleanly.
+
+When a real second project is available:
+  1. Run the seed via CLI (or call `seed_project(...)` from a
+     one-off script), providing the real head / system / bid
+     numbers.
+  2. Change `SECOND_PROJECT_ID` from `'TBD'` to the real id.
+  3. Replace `@pytest.mark.skip` with
+     `@pytest.mark.parametrize("project_id", [SECOND_PROJECT_ID])`
+     (or simply delete the skip) so the 4 cruel tests run.
+  4. Expect failures; the ratchet tightens over iterations — same
+     pattern as `tests/golden/test_cruel_vs_truth.py` for 1881.
+"""
+from __future__ import annotations
+
+import importlib.util
+import json
+import sys
+from pathlib import Path
+
+import pytest
+
+_HERE = Path(__file__).resolve().parent
+_CAD = _HERE.parents[1]           # services/halofire-cad
+_REPO = _CAD.parents[1]           # repo root
+sys.path.insert(0, str(_CAD))
+
+
+# Replace with the real project_id once a second Halo bid PDF has
+# been seeded. Until then the class below is skipped.
+SECOND_PROJECT_ID = "TBD"
+
+
+# ── scaffolded cruel scoreboard (skipped until real data arrives) ──
+
+@pytest.mark.cruel
+@pytest.mark.golden
+@pytest.mark.skip(
+    reason=(
+        "Second-project truth data not yet seeded. "
+        "See truth/seed_generic_project.py for the scaffolding; "
+        "swap SECOND_PROJECT_ID='TBD' for the real project id and "
+        "remove this skip once the seed has run."
+    ),
+)
+class TestSecondProjectCruel:
+    """Mirrors `tests/golden/test_cruel_vs_truth.py` — same four
+    hard asserts against Halo's actual submitted numbers."""
+
+    def _truth(self):
+        from truth.db import truth_for  # local import; conftest put _CAD on sys.path
+        t = truth_for(SECOND_PROJECT_ID)
+        if t is None:
+            pytest.skip(
+                f"No truth seeded for {SECOND_PROJECT_ID}; run "
+                "seed_generic_project.py with the real numbers.",
+            )
+        return t
+
+    def _design(self) -> dict:
+        path = (
+            _REPO / "services" / "halopenclaw-gateway" / "data"
+            / SECOND_PROJECT_ID / "deliverables" / "design.json"
+        )
+        if not path.exists():
+            pytest.skip(f"design.json missing at {path}.")
+        return json.loads(path.read_text(encoding="utf-8"))
+
+    def _proposal(self) -> dict:
+        path = (
+            _REPO / "services" / "halopenclaw-gateway" / "data"
+            / SECOND_PROJECT_ID / "deliverables" / "proposal.json"
+        )
+        if not path.exists():
+            pytest.skip(f"proposal.json missing at {path}.")
+        return json.loads(path.read_text(encoding="utf-8"))
+
+    def _raw(self) -> dict:
+        path = (
+            _REPO / "services" / "halopenclaw-gateway" / "data"
+            / SECOND_PROJECT_ID / "deliverables" / "building_raw.json"
+        )
+        if not path.exists():
+            pytest.skip(f"building_raw.json missing at {path}.")
+        return json.loads(path.read_text(encoding="utf-8"))
+
+    @staticmethod
+    def _delta(actual: float, truth: float) -> float:
+        if truth == 0:
+            return float("inf") if actual != 0 else 0.0
+        return abs(actual - truth) / abs(truth)
+
+    def test_head_count_within_15pct_of_truth(self):
+        truth = self._truth()
+        design = self._design()
+        actual = sum(
+            len(s.get("heads") or []) for s in design.get("systems") or []
+        )
+        delta = self._delta(actual, float(truth.head_count))
+        assert delta <= 0.15, (
+            f"head_count: actual={actual}, truth={truth.head_count}, "
+            f"delta={delta:.0%} (tolerance 15%)."
+        )
+
+    def test_total_bid_within_15pct_of_truth(self):
+        truth = self._truth()
+        proposal = self._proposal()
+        actual = float(
+            (proposal.get("pricing") or {}).get("total_usd") or 0.0,
+        )
+        delta = self._delta(actual, float(truth.total_bid_usd))
+        assert delta <= 0.15, (
+            f"total_bid_usd: actual=${actual:,.2f}, "
+            f"truth=${truth.total_bid_usd:,.2f}, "
+            f"delta={delta:.0%} (tolerance 15%)."
+        )
+
+    def test_system_count_within_25pct_of_truth(self):
+        truth = self._truth()
+        design = self._design()
+        actual = len(design.get("systems") or [])
+        delta = self._delta(actual, float(truth.system_count))
+        assert delta <= 0.25, (
+            f"system_count: actual={actual}, "
+            f"truth={truth.system_count}, "
+            f"delta={delta:.0%} (tolerance 25%)."
+        )
+
+    def test_level_count_exact(self):
+        truth = self._truth()
+        raw = self._raw()
+        actual = len(raw.get("levels") or [])
+        assert actual == truth.level_count, (
+            f"level_count: actual={actual}, truth={truth.level_count}."
+        )
+
+
+# ── live scaffolding meta-tests (always run) ──────────────────────
+
+
+def test_seed_generic_project_is_importable() -> None:
+    """Seed script parses + imports cleanly as a standalone file."""
+    seed_path = (
+        _CAD / "truth" / "seed_generic_project.py"
+    )
+    assert seed_path.exists(), f"missing: {seed_path}"
+    spec = importlib.util.spec_from_file_location(
+        "seed_generic_probe", seed_path,
+    )
+    assert spec is not None and spec.loader is not None
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    assert hasattr(mod, "seed_project"), (
+        "seed_generic_project.py must expose a `seed_project` function"
+    )
+
+
+def test_seed_generic_writes_to_tmp_truth(tmp_path: Path) -> None:
+    """Seeding a project writes a bids_truth row + per-level rows.
+
+    Uses an isolated tmp DuckDB file so we do not clobber the
+    canonical `truth.duckdb` that 1881 lives in.
+    """
+    from truth.seed_generic_project import seed_project  # noqa: E402
+    from truth.db import TruthDB  # noqa: E402
+
+    out_db = tmp_path / "truth.duckdb"
+    seed_project(
+        project_id="test-proj",
+        levels=2,
+        hazard="light",
+        total_sqft=10_000,
+        expected_heads=50,
+        expected_bid_usd=50_000,
+        expected_systems=1,
+        out_path=out_db,
+    )
+
+    assert out_db.exists(), "seed_project should create the DuckDB file"
+
+    db = TruthDB(out_db)
+    try:
+        rec = db.get("test-proj")
+        assert rec is not None, "expected bids_truth row for test-proj"
+        assert rec.level_count == 2
+        assert rec.head_count == 50
+        assert rec.system_count == 1
+        assert rec.total_bid_usd == 50_000
+
+        levels = db.levels_for("test-proj")
+        assert len(levels) == 2, f"expected 2 level rows, got {len(levels)}"
+        assert all(lvl.hazard_class == "light" for lvl in levels)
+    finally:
+        db.close()
+
+    # Re-seeding must be idempotent: call again, expect the same row
+    # counts (not duplicates).
+    seed_project(
+        project_id="test-proj",
+        levels=2,
+        hazard="light",
+        total_sqft=10_000,
+        expected_heads=50,
+        expected_bid_usd=50_000,
+        expected_systems=1,
+        out_path=out_db,
+    )
+    db = TruthDB(out_db)
+    try:
+        assert len(db.levels_for("test-proj")) == 2, (
+            "re-seeding must not duplicate level rows"
+        )
+    finally:
+        db.close()
+
+
+def test_second_project_spec_exists() -> None:
+    """Meta-test: the scaffolded scoreboard class is present so it's
+    ready to unskip when real data arrives."""
+    import tests.cruel.test_second_project as tp  # self-import via testpath
+    assert hasattr(tp, "TestSecondProjectCruel")
+    assert hasattr(tp, "SECOND_PROJECT_ID")
+    # The 4 scaffolded cruel tests must all be defined on the class.
+    cls = tp.TestSecondProjectCruel
+    for name in (
+        "test_head_count_within_15pct_of_truth",
+        "test_total_bid_within_15pct_of_truth",
+        "test_system_count_within_25pct_of_truth",
+        "test_level_count_exact",
+    ):
+        assert hasattr(cls, name), f"missing scaffolded method: {name}"

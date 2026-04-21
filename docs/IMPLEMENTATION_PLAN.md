@@ -293,8 +293,8 @@ ports in `netstat` during operation.
 
 | Commit | File | Deliverable |
 |---|---|---|
-| R11.1 | `services/halofire-cad/truth/seed_<second-project>.py` | Truth table for a second real Halo bid |
-| R11.2 | `services/halofire-cad/tests/cruel/test_second_project.py` | Full pipeline + cruel scoreboard must pass on first run |
+| R11.1 | `services/halofire-cad/truth/seed_generic_project.py` | **Scaffolded (2026-04-21):** parametric truth seed + 3 live scaffold tests + 4 skipped cruel-test stubs in `tests/cruel/test_second_project.py`. Awaits a real second Halo bid PDF to fill in truth numbers. |
+| R11.2 | `services/halofire-cad/tests/cruel/test_second_project.py` | Full pipeline + cruel scoreboard must pass on first run (scaffolded; cruel class is `@pytest.mark.skip` until R11.1 is fed real data) |
 | R11.3 | Manual: run desktop app on the second project | Bid within 15 %, submittal bundle complete |
 
 **DoD:** Full round-trip on a bid Halo Fire hasn't seen the
@@ -434,8 +434,8 @@ feasible.
 | R10 | R10.4 OpenSCAD bundling | — | pending | manual |
 | R10 | R10.5 CI build-desktop.yml | — | pending | ci |
 | R10 | R10.6 clean-VM install smoke | — | pending | manual |
-| R11 | R11.1 second-project truth | — | pending | python |
-| R11 | R11.2 cruel-test second proj | — | pending | python |
+| R11 | R11.1 second-project truth | — | scaffolded (awaits real bid data) | python |
+| R11 | R11.2 cruel-test second proj | — | scaffolded (4 stubs skipped, 3 live meta-tests pass) | python |
 | R11 | R11.3 manual second proj run | — | pending | manual |
 
 Total: **53 commits** across **11 phases**. Feature-flag as
