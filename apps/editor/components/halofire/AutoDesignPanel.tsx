@@ -37,6 +37,22 @@ function bboxOf(pts: Iterable<[number, number]>): {
   }
   return { minX, minY, maxX, maxY }
 }
+
+/** Signed area (positive = CCW in plan, negative = CW). */
+function signedArea(pts: [number, number][]): number {
+  let s = 0
+  for (let i = 0; i < pts.length; i++) {
+    const a = pts[i]!
+    const b = pts[(i + 1) % pts.length]!
+    s += a[0] * b[1] - b[0] * a[1]
+  }
+  return s / 2
+}
+
+/** Orient polygon CCW so Pascal's slab extrudes with normals UP. */
+function ccwOrient(pts: [number, number][]): [number, number][] {
+  return signedArea(pts) >= 0 ? pts : [...pts].reverse()
+}
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 const GATEWAY_URL =
@@ -387,10 +403,16 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
           // ~0.2 m for real concrete; LevelSystem stacks levels
           // vertically by reading getLevelHeight() of each level's
           // children. We add a CeilingNode below to set that to 3 m.
+          // CCW-orient the polygon so Pascal's slab extrudes with
+          // normals UP (visible from above as a floor, not a ceiling).
+          const slabPoly: [number, number][] = ccwOrient(
+            (lvl.polygon_m ?? []).map((p) => T2(p, lvl.id)),
+          )
+
           try {
             const slab = SlabNode.parse({
               name: `${lvl.name} slab`,
-              polygon: (lvl.polygon_m ?? []).map((p) => T2(p, lvl.id)),
+              polygon: slabPoly,
               elevation: 0.2,
               parentId: pascalLevelId,
               metadata: { tags: ['halofire', 'slab', 'auto_design'] },
@@ -404,7 +426,7 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
           try {
             const ceil = CeilingNode.parse({
               name: `${lvl.name} ceiling`,
-              polygon: (lvl.polygon_m ?? []).map((p) => T2(p, lvl.id)),
+              polygon: slabPoly,
               height: lvl.height_m ?? 3.0,
               parentId: pascalLevelId,
               metadata: { tags: ['halofire', 'ceiling', 'auto_design'] },
@@ -414,27 +436,34 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
             // ceiling is optional — fall through with default 2.5 m
           }
 
-          // Walls from intake — cap at 200 per level so a 3000-wall
-          // CubiCasa output doesn't swamp the viewport. A real floor
-          // plan has 50-150 walls typically.
-          const wallCap = 200
-          const lvlWalls = (lvl.walls ?? []).slice(0, wallCap)
-          for (const w of lvlWalls) {
-            try {
-              const wallNode = WallNode.parse({
-                start: T2(w.start_m, lvl.id),
-                end: T2(w.end_m, lvl.id),
-                thickness: w.thickness_m ?? 0.2,
-                height: w.height_m ?? 3.0,
-                parentId: pascalLevelId,
-                metadata: {
-                  tags: ['halofire', 'wall', 'auto_design'],
-                  isExterior: !!w.is_exterior,
-                },
-              })
-              createNode(wallNode as any, pascalLevelId as any)
-            } catch {
-              // skip one bad wall, keep going
+          // CLEAN PERIMETER WALLS — one wall per slab edge, NOT the
+          // 100-500 fragmented CubiCasa segments. Real fire-protection
+          // visualizations show the building shell + interior
+          // partitions; CubiCasa noise (dimension hatching, leaders,
+          // etc.) only adds visual chaos. We extrude one 0.2 m × 3 m
+          // wall along each slab perimeter edge.
+          if (slabPoly.length >= 3) {
+            for (let i = 0; i < slabPoly.length; i++) {
+              const a = slabPoly[i]!
+              const b = slabPoly[(i + 1) % slabPoly.length]!
+              const dx = b[0] - a[0]
+              const dy = b[1] - a[1]
+              if (dx * dx + dy * dy < 0.25) continue // skip < 0.5 m stubs
+              try {
+                const wallNode = WallNode.parse({
+                  start: a,
+                  end: b,
+                  thickness: 0.2,
+                  height: lvl.height_m ?? 3.0,
+                  parentId: pascalLevelId,
+                  metadata: {
+                    tags: ['halofire', 'wall', 'auto_design', 'perimeter'],
+                  },
+                })
+                createNode(wallNode as any, pascalLevelId as any)
+              } catch {
+                // best effort
+              }
             }
           }
         })
@@ -496,7 +525,11 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
                     category: 'sprinkler_head_pendant',
                     name: h.sku ?? 'K5.6 head',
                     thumbnail: '/icons/item.png',
-                    dimensions: [0.1, 0.1, 0.1],
+                    // 0.4 m sphere reads at building scale; real
+                    // pendant deflectors are ~10 cm but invisible
+                    // when the building is 100 m wide. Visualization
+                    // exaggeration so the user can see what's there.
+                    dimensions: [0.4, 0.4, 0.4],
                     src: '/halofire-catalog/glb/SM_Head_Pendant_Standard_K56.glb',
                     attachTo: 'ceiling',
                     offset: [0, 0, 0],
