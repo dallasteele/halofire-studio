@@ -25,6 +25,11 @@
       "types": "./dist/schema/*.d.ts",
       "import": "./dist/schema/*.js",
       "default": "./dist/schema/*.js"
+    },
+    "./systems/*": {
+      "types": "./dist/systems/*.d.ts",
+      "import": "./dist/systems/*.js",
+      "default": "./dist/systems/*.js"
     }
   },
   "files": [

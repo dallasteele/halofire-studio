@@ -68,6 +68,14 @@ export {
   PipeSchedule,
 } from './nodes/pipe'
 export {
+  DENSITY_AREA_DEFAULTS,
+  HazardClass,
+  HOSE_ALLOWANCE_GPM,
+  SystemKind,
+  SystemNode,
+  withHazardDefaults,
+} from './nodes/system'
+export {
   StairNode,
   StairRailingMode,
   StairSlabOpeningMode,
