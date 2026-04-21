@@ -63,7 +63,11 @@ export function LiveCalc({
     setState({ kind: 'running', origin })
     setVisible(true)
     try {
-      // Hydraulic re-calc (primary)
+      // Hydraulic re-calc (primary).
+      // TODO(R10.3 gap): no Tauri command yet for `POST /projects/:id/hydraulic`.
+      // Follow-up should add `ipc.runHydraulic({ projectId })` backed by a
+      // Rust command in `apps/halofire-studio-desktop/src-tauri/src/commands/`
+      // so this panel works inside the desktop shell without a gateway.
       const res = await fetch(
         `${gatewayUrl}/projects/${projectId}/hydraulic`,
         { method: 'POST', cache: 'no-store' },
@@ -71,7 +75,11 @@ export function LiveCalc({
       if (!res.ok) throw new Error(`gateway ${res.status}`)
       const body = await res.json()
       const hr = body?.systems?.[0]?.hydraulic ?? body ?? {}
-      // BOM snapshot (best-effort — if not exposed, leave nulls)
+      // BOM snapshot (best-effort — if not exposed, leave nulls).
+      // TODO(R10.3 gap): no Tauri command for deliverable reads either —
+      // follow-up can add `ipc.readDeliverable({ projectId, name })` that
+      // reads from disk directly in desktop mode instead of re-fetching
+      // through the gateway.
       let bid: number | null = null
       let heads: number | null = null
       try {

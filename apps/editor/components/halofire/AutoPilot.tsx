@@ -31,7 +31,7 @@ import type { StageEvent as SliceStageEvent } from '@halofire/core/scene/transla
 import { emitter, useScene } from '@pascal-app/core'
 import type { AnyNode } from '@pascal-app/core/schema'
 
-import { ipc } from '@/lib/ipc'
+import { detectTauri, ipc } from '@/lib/ipc'
 import type { PipelineProgressEvent } from '@/lib/ipc.types'
 
 const GATEWAY_URL =
@@ -159,7 +159,11 @@ export function AutoPilot({
     }
   }, [jobId, processEvent])
 
-  // SSE path — gateway fallback.
+  // SSE path — gateway fallback. Only active when NOT running inside
+  // Tauri; the IPC subscription below is the primary source of truth
+  // in the desktop shell, and opening a redundant EventSource would
+  // double-apply every slice (the translator is idempotent so it
+  // would no-op, but the extra network traffic is wasteful).
   useEffect(() => {
     if (esRef.current) {
       esRef.current.close()
@@ -168,6 +172,11 @@ export function AutoPilot({
     setEvents([])
     if (!jobId) {
       setStatus('idle')
+      return
+    }
+    if (detectTauri()) {
+      // Tauri path owns streaming — leave status to the IPC effect.
+      setStatus('streaming')
       return
     }
     setStatus('streaming')
