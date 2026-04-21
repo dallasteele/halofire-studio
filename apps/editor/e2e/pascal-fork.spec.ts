@@ -30,6 +30,8 @@ import {
 // biome-ignore lint/style/noRelativeImport: direct module path is intentional
 import { FittingNode } from '@pascal-app/core/schema/nodes/fitting'
 // biome-ignore lint/style/noRelativeImport: direct module path is intentional
+import { ValveNode } from '@pascal-app/core/schema/nodes/valve'
+// biome-ignore lint/style/noRelativeImport: direct module path is intentional
 import {
   DENSITY_AREA_DEFAULTS,
   HOSE_ALLOWANCE_GPM,
@@ -565,5 +567,67 @@ test.describe('Pascal fork — FittingNode schema', () => {
       connection_style: 'grooved',
     })
     expect(reducer.size_branch_in).toBe(2)
+  })
+})
+
+test.describe('Pascal fork — ValveNode schema', () => {
+  test('parses a valid 4" grooved butterfly valve', () => {
+    const valve = ValveNode.parse({
+      id: generateId('valve'),
+      type: 'valve',
+      name: '4" butterfly',
+      sku: 'VIC-BFV-4',
+      kind: 'butterfly',
+      size_in: 4,
+      connection_style: 'grooved',
+      supervised: true,
+    })
+    expect(valve.type).toBe('valve')
+    expect(valve.kind).toBe('butterfly')
+    expect(valve.size_in).toBe(4)
+    expect(valve.connection_style).toBe('grooved')
+    expect(valve.supervised).toBe(true)
+    expect(valve.id).toMatch(/^valve_/)
+  })
+
+  test('rejects unknown valve kinds', () => {
+    expect(() =>
+      ValveNode.parse({
+        id: generateId('valve'),
+        type: 'valve',
+        sku: 'X',
+        kind: 'pinch', // not in enum
+        size_in: 2,
+        connection_style: 'grooved',
+      }),
+    ).toThrow()
+  })
+
+  test("state defaults to 'open'", () => {
+    const valve = ValveNode.parse({
+      id: generateId('valve'),
+      type: 'valve',
+      sku: 'VIC-GATE-6',
+      kind: 'gate_osy',
+      size_in: 6,
+      connection_style: 'flanged_150',
+    })
+    expect(valve.state).toBe('open')
+  })
+
+  test("AnyNode discriminator narrows on type='valve'", () => {
+    const node = AnyNode.parse({
+      id: generateId('valve'),
+      type: 'valve',
+      sku: 'VIC-CHK-4',
+      kind: 'check_swing',
+      size_in: 4,
+      connection_style: 'grooved',
+    })
+    expect(node.type).toBe('valve')
+    if (node.type === 'valve') {
+      expect(node.kind).toBe('check_swing')
+      expect(node.state).toBe('open')
+    }
   })
 })
