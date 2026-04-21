@@ -16,7 +16,8 @@
  * Empty selection or non-halofire item → component renders null.
  */
 
-import { useScene } from '@pascal-app/core'
+import { generateId, useScene } from '@pascal-app/core'
+import { useEditor } from '@pascal-app/editor'
 import { useViewer } from '@pascal-app/viewer'
 
 interface SelectedItem {
@@ -57,6 +58,12 @@ export function HalofireProperties() {
   const node = selectedId
     ? (nodes[selectedId as keyof typeof nodes] as SelectedItem | undefined)
     : undefined
+
+  // Real edit actions — wire into Pascal's built-in move/delete and
+  // Pascal's scene store. No stubs; these mutate the actual design.
+  const setMovingNode = useEditor((s) => s.setMovingNode)
+  const deleteNode = useScene((s) => s.deleteNode)
+  const createNode = useScene((s) => s.createNode)
 
   if (!isHalofire(node)) return null
 
@@ -131,14 +138,101 @@ export function HalofireProperties() {
         )}
       </dl>
 
+      {/* Real edit actions — Move / Duplicate / Delete go through
+          Pascal's built-in tool stack and scene store. */}
+      <div className="grid grid-cols-3 border-t border-white/8">
+        <button
+          type="button"
+          data-testid="halofire-props-move"
+          className="border-r border-white/8 px-2 py-1.5 font-mono text-[10px] uppercase tracking-wider text-neutral-300 transition-colors hover:bg-white/5 hover:text-[#e8432d] disabled:opacity-40"
+          disabled={!node || !selectedId}
+          onClick={() => {
+            if (!node || !selectedId) return
+            // Enter Pascal's placement coordinator. On commit it
+            // writes the new position back to the scene store,
+            // which HalofireNodeWatcher observes and re-dispatches
+            // as halofire:scene-changed so LiveCalc re-runs.
+            setMovingNode(node as any)
+          }}
+          style={{ borderRadius: 0 }}
+          title="Move this item (uses Pascal placement coordinator)"
+        >
+          Move
+        </button>
+        <button
+          type="button"
+          data-testid="halofire-props-duplicate"
+          className="border-r border-white/8 px-2 py-1.5 font-mono text-[10px] uppercase tracking-wider text-neutral-300 transition-colors hover:bg-white/5 hover:text-[#e8432d] disabled:opacity-40"
+          disabled={!node || !selectedId}
+          onClick={() => {
+            if (!node || !selectedId) return
+            // Clone the node with a fresh id and isNew metadata so
+            // Pascal's MoveTool adopts it as a draft (ghost follows
+            // the cursor, clicks commit it). This is how Pascal
+            // duplicates live nodes.
+            const clone: any = {
+              ...(node as any),
+              id: generateId('item'),
+              children: [],
+              metadata: {
+                ...((node as any).metadata ?? {}),
+                isNew: true,
+              },
+            }
+            // Commit the clone to the scene under the same parent so
+            // Pascal's coordinator finds it, then enter move mode.
+            try {
+              createNode(clone, (node as any).parentId ?? null)
+              setMovingNode(clone)
+              window.dispatchEvent(
+                new CustomEvent('halofire:add-head', {
+                  detail: { id: clone.id, source: selectedId },
+                }),
+              )
+            } catch (e) {
+              console.warn('duplicate failed', e)
+            }
+          }}
+          style={{ borderRadius: 0 }}
+          title="Duplicate + place a copy"
+        >
+          Duplicate
+        </button>
+        <button
+          type="button"
+          data-testid="halofire-props-delete"
+          className="px-2 py-1.5 font-mono text-[10px] uppercase tracking-wider text-neutral-300 transition-colors hover:bg-red-900/20 hover:text-red-300 disabled:opacity-40"
+          disabled={!node || !selectedId}
+          onClick={() => {
+            if (!selectedId) return
+            // Optimistic removal from the scene store. Pascal's
+            // systems pick up the deletion in the next frame and
+            // unmount the Three.js mesh.
+            try {
+              deleteNode(selectedId as any)
+              window.dispatchEvent(
+                new CustomEvent('halofire:remove-head', {
+                  detail: { id: selectedId },
+                }),
+              )
+            } catch (e) {
+              console.warn('delete failed', e)
+            }
+          }}
+          style={{ borderRadius: 0 }}
+          title="Remove this item from the design"
+        >
+          Delete
+        </button>
+      </div>
+      {/* Swap SKU + Isolate kept as a secondary row for Phase 5.5
+          catalog picker + future isolation-view tool. */}
       <div className="flex border-t border-white/8">
         <button
           type="button"
-          className="flex-1 border-r border-white/8 px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-neutral-400 transition-colors hover:bg-white/5 hover:text-[#e8432d]"
+          data-testid="halofire-props-swap-sku"
+          className="flex-1 border-r border-white/8 px-2 py-1 font-mono text-[9px] uppercase tracking-wider text-neutral-500 transition-colors hover:bg-white/5 hover:text-[#e8432d]"
           onClick={() => {
-            // V2 Phase 5.3 placeholder — opens catalog picker once
-            // Phase 5.5 lands. For now, log intent so user sees it
-            // wired.
             window.dispatchEvent(
               new CustomEvent('halofire:swap-sku', { detail: { id: selectedId } }),
             )
@@ -149,7 +243,8 @@ export function HalofireProperties() {
         </button>
         <button
           type="button"
-          className="flex-1 px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-neutral-400 transition-colors hover:bg-white/5 hover:text-[#e8432d]"
+          data-testid="halofire-props-isolate"
+          className="flex-1 px-2 py-1 font-mono text-[9px] uppercase tracking-wider text-neutral-500 transition-colors hover:bg-white/5 hover:text-[#e8432d]"
           onClick={() => {
             window.dispatchEvent(
               new CustomEvent('halofire:isolate', { detail: { id: selectedId } }),

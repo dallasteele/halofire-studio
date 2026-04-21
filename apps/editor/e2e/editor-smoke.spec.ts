@@ -90,10 +90,17 @@ test.describe('editor smoke', () => {
     const kinds = bridgeFired.map((e) => e.type)
     expect(kinds).toContain('halofire:layer-visibility')
     expect(kinds).toContain('halofire:scene-changed')
-    const sceneChange = bridgeFired.find(
-      (e) => e.type === 'halofire:scene-changed',
+    // SceneChangeBridge forwards the layer-visibility mutation event
+    // as a scene-changed event with origin='layer-visibility'. Use
+    // .some() rather than "first event" because HalofireNodeWatcher
+    // may also fire independent scene-changed events for node
+    // mutations that happen as SceneBootstrap spawns chrome.
+    const layerVisChange = bridgeFired.some(
+      (e) =>
+        e.type === 'halofire:scene-changed' &&
+        e.origin === 'layer-visibility',
     )
-    expect(sceneChange?.origin).toBe('layer-visibility')
+    expect(layerVisChange).toBe(true)
   })
 
   test('ribbon tabs switch tab content', async ({ page }) => {
@@ -112,5 +119,84 @@ test.describe('editor smoke', () => {
     await page.goto('/')
     const body = await page.locator('body').innerText()
     expect(body).toMatch(/1881|Cooperative|Halo/i)
+  })
+
+  test('HalofireNodeWatcher observes real scene mutations', async ({ page }) => {
+    await page.goto('/')
+    // Wait for the dev hook that HalofireNodeWatcher exposes.
+    await page.waitForFunction(() => !!(window as any).__hfScene, null, {
+      timeout: 5000,
+    })
+
+    const result = await page.evaluate(async () => {
+      const events: Array<{
+        origin?: string
+        moved?: number
+        added?: number
+        removed?: number
+      }> = []
+      const handler = (e: Event) => {
+        const d = (e as CustomEvent).detail
+        events.push({
+          origin: d?.origin,
+          moved: d?.moved,
+          added: d?.added,
+          removed: d?.removed,
+        })
+      }
+      window.addEventListener('halofire:scene-changed', handler)
+
+      const hf = (window as any).__hfScene
+      const st = hf.getState()
+      const level = Object.values(st.nodes).find(
+        (n: any) => n.type === 'level',
+      ) as any
+      if (!level) {
+        window.removeEventListener('halofire:scene-changed', handler)
+        return { err: 'no level' }
+      }
+
+      const id = 'item_pw_probe_' + Date.now()
+      const probe = {
+        id,
+        type: 'item',
+        position: [0, 1, 0],
+        rotation: [0, 0, 0],
+        scale: [1, 1, 1],
+        children: [],
+        parentId: level.id,
+        asset: {
+          id: 'probe',
+          category: 'sprinkler_head_pendant',
+          name: 'probe',
+          thumbnail: '',
+          dimensions: [0.4, 0.4, 0.4],
+          src: '',
+          attachTo: 'ceiling',
+          offset: [0, 0, 0],
+          rotation: [0, 0, 0],
+          scale: [1, 1, 1],
+          tags: ['halofire', 'sprinkler_head_pendant'],
+        },
+        metadata: { tags: ['halofire'] },
+      }
+      hf.createNode(probe, level.id)
+      await new Promise((r) => setTimeout(r, 250))
+
+      hf.updateNode(id, { position: [5, 1, 5] })
+      await new Promise((r) => setTimeout(r, 250))
+
+      hf.deleteNode(id)
+      await new Promise((r) => setTimeout(r, 250))
+
+      window.removeEventListener('halofire:scene-changed', handler)
+      return { events }
+    })
+
+    expect(result.err).toBeUndefined()
+    const origins = (result.events ?? []).map((e) => e.origin)
+    expect(origins).toContain('add-head')
+    expect(origins).toContain('move')
+    expect(origins).toContain('remove-head')
   })
 })

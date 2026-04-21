@@ -21,6 +21,7 @@ import { RemoteAreaDraw } from '@/components/halofire/RemoteAreaDraw'
 import { Ribbon, type RibbonCommand } from '@/components/halofire/Ribbon'
 import { SceneBootstrap } from '@/components/halofire/SceneBootstrap'
 import { SceneChangeBridge } from '@/components/halofire/SceneChangeBridge'
+import { HalofireNodeWatcher } from '@/components/halofire/HalofireNodeWatcher'
 import { StatusBar } from '@/components/halofire/StatusBar'
 import { ToolOverlay } from '@/components/halofire/ToolOverlay'
 
@@ -148,6 +149,10 @@ export default function Home() {
       {/* V2 Phase G: bridge granular halofire mutation events into
           a single halofire:scene-changed signal consumed by LiveCalc. */}
       <SceneChangeBridge />
+      {/* Real scene-store subscription — fires scene-changed with
+          origin='move'/'add-head'/'remove-head' whenever any
+          halofire-tagged Pascal node actually mutates. */}
+      <HalofireNodeWatcher />
       <CommandPalette />
       <ToolOverlay />
       <RemoteAreaDraw projectId={ACTIVE_PROJECT_ID} />
