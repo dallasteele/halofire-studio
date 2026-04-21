@@ -3,6 +3,7 @@
 **Date:** 2026-04-20
 **Status:** Phases 0-5 SHIPPED, Phase 6 in progress
 **Cruel-test scoreboard:** 27 PASS / 0 FAIL / 2 SKIP
+**Full test suite (incl all unit tests):** 311 PASS / 0 FAIL / 2 SKIP — 119 s
 
 ## Final cruel-test results vs 1881 Cooperative truth
 
