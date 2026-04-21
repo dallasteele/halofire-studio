@@ -44,7 +44,14 @@ import { RemoteAreaNode } from '@pascal-app/core/schema/nodes/remote-area'
 // biome-ignore lint/style/noRelativeImport: direct module path is intentional
 import { ObstructionNode } from '@pascal-app/core/schema/nodes/obstruction'
 // biome-ignore lint/style/noRelativeImport: direct module path is intentional
-import { SheetNode } from '@pascal-app/core/schema/nodes/sheet'
+import {
+  Annotation,
+  Dimension,
+  Hatch,
+  RevisionCloud,
+  SheetNode,
+  Viewport,
+} from '@pascal-app/core/schema/nodes/sheet'
 // biome-ignore lint/style/noRelativeImport: direct module path is intentional
 import {
   DENSITY_AREA_DEFAULTS,
@@ -1091,5 +1098,197 @@ test.describe('Pascal fork — SheetNode schema', () => {
     expect(sheet.viewports).toEqual([])
     expect(sheet.annotations).toEqual([])
     expect(sheet.revision_clouds).toEqual([])
+  })
+
+  test('Viewport parses valid iso camera + 1_8 scale', () => {
+    const vp = Viewport.parse({
+      id: 'vp_1',
+      paper_rect_mm: [10, 10, 500, 300],
+      camera: {
+        kind: 'iso',
+        level_id: 'level_2',
+        target: [0, 0, 0],
+        up: [0, 0, 1],
+      },
+      scale: '1_8',
+    })
+    expect(vp.camera.kind).toBe('iso')
+    expect(vp.scale).toBe('1_8')
+  })
+
+  test('Viewport rejects unknown scale string', () => {
+    expect(() =>
+      Viewport.parse({
+        id: 'vp_2',
+        paper_rect_mm: [0, 0, 100, 100],
+        camera: { kind: 'top' },
+        scale: '1_200', // not in enum
+      }),
+    ).toThrow()
+  })
+
+  test('Dimension parses linear with 2 points', () => {
+    const dim = Dimension.parse({
+      id: 'dim_1',
+      kind: 'linear',
+      points: [[0, 0], [3.048, 0]],
+      dim_line_offset_m: 0.3,
+      style_id: 'dimstyle_default',
+    })
+    expect(dim.kind).toBe('linear')
+    expect(dim.points).toHaveLength(2)
+    expect(dim.precision).toBe(2)
+    expect(dim.unit_display).toBe('ft_in')
+  })
+
+  test('Dimension rejects unknown kind', () => {
+    expect(() =>
+      Dimension.parse({
+        id: 'dim_2',
+        kind: 'chamfer', // not in enum
+        points: [[0, 0], [1, 0]],
+        dim_line_offset_m: 0.3,
+        style_id: 'dimstyle_default',
+      }),
+    ).toThrow()
+  })
+
+  test('Annotation parses callout with leader_polyline_mm', () => {
+    const ann = Annotation.parse({
+      id: 'ann_1',
+      kind: 'callout',
+      text: 'See detail 3/FP-301',
+      anchor_model: [10, 5, 2.8],
+      text_position_paper_mm: [120, 80],
+      leader_polyline_mm: [[100, 90], [110, 85], [120, 80]],
+      style_id: 'txt_default',
+    })
+    expect(ann.kind).toBe('callout')
+    expect(ann.leader_polyline_mm).toHaveLength(3)
+  })
+
+  test('Annotation default leader_polyline_mm is empty array', () => {
+    const ann = Annotation.parse({
+      id: 'ann_2',
+      kind: 'note',
+      text: 'TYP.',
+      text_position_paper_mm: [50, 50],
+      style_id: 'txt_default',
+    })
+    expect(ann.leader_polyline_mm).toEqual([])
+  })
+
+  test('Hatch parses ansi31 pattern', () => {
+    const hatch = Hatch.parse({
+      id: 'hatch_1',
+      polygon_m: [[0, 0], [5, 0], [5, 5], [0, 5]],
+      pattern: 'ansi31',
+      color: '#ff0000',
+      opacity: 0.35,
+      label: 'Remote area #1',
+    })
+    expect(hatch.pattern).toBe('ansi31')
+    expect(hatch.opacity).toBeCloseTo(0.35)
+  })
+
+  test('Hatch opacity clamps 0-1 (out of range rejects)', () => {
+    expect(() =>
+      Hatch.parse({
+        id: 'hatch_2',
+        polygon_m: [[0, 0], [1, 0], [1, 1]],
+        pattern: 'solid',
+        color: '#00ff00',
+        opacity: 1.5, // out of range
+      }),
+    ).toThrow()
+    expect(() =>
+      Hatch.parse({
+        id: 'hatch_3',
+        polygon_m: [[0, 0], [1, 0], [1, 1]],
+        pattern: 'solid',
+        color: '#00ff00',
+        opacity: -0.1, // out of range
+      }),
+    ).toThrow()
+  })
+
+  test("RevisionCloud status defaults to 'open'", () => {
+    const rc = RevisionCloud.parse({
+      id: 'rc_1',
+      revision_id: 'rev_V2',
+      polyline_m: [[0, 0], [1, 0], [1, 1], [0, 1]],
+      bubble_number: 3,
+      note: 'Relocated main per RFI-012',
+    })
+    expect(rc.status).toBe('open')
+    expect(rc.bubble_number).toBe(3)
+  })
+
+  test('SheetNode full: viewports + dimensions + annotations + hatches + revision_clouds all round-trip', () => {
+    const sheet = SheetNode.parse({
+      id: generateId('sheet'),
+      type: 'sheet',
+      name: 'FP-101',
+      title: 'Level 1 — Sprinkler Plan',
+      paper_size: 'ARCH_D',
+      orientation: 'landscape',
+      title_block_id: 'tb_halofire_default',
+      sheet_index: 1,
+      discipline: 'fire_protection',
+      revision: 'V2',
+      viewports: [
+        {
+          id: 'vp_plan',
+          paper_rect_mm: [25, 25, 800, 500],
+          camera: { kind: 'top', level_id: 'level_1' },
+          scale: '1_96',
+          layer_visibility: { sprinklers: true, obstructions: false },
+        },
+      ],
+      dimensions: [
+        {
+          id: 'dim_a',
+          kind: 'linear',
+          points: [[0, 0], [4.572, 0]],
+          dim_line_offset_m: 0.45,
+          style_id: 'dimstyle_default',
+          sheet_id: 'sheet_FP-101',
+        },
+      ],
+      annotations: [
+        {
+          id: 'ann_a',
+          kind: 'zone_name',
+          text: 'Remote Area 1',
+          text_position_paper_mm: [400, 250],
+          style_id: 'txt_default',
+        },
+      ],
+      hatches: [
+        {
+          id: 'hatch_a',
+          polygon_m: [[0, 0], [10, 0], [10, 14], [0, 14]],
+          pattern: 'ansi31',
+          color: '#ff6600',
+          opacity: 0.25,
+        },
+      ],
+      revision_clouds: [
+        {
+          id: 'rc_a',
+          revision_id: 'rev_V2',
+          polyline_m: [[3, 3], [5, 3], [5, 5], [3, 5]],
+          bubble_number: 1,
+          note: 'Added head per RFI-008',
+        },
+      ],
+    })
+    expect(sheet.viewports[0]?.scale).toBe('1_96')
+    expect(sheet.viewports[0]?.layer_visibility?.sprinklers).toBe(true)
+    expect(sheet.dimensions[0]?.kind).toBe('linear')
+    expect(sheet.annotations[0]?.kind).toBe('zone_name')
+    expect(sheet.hatches[0]?.pattern).toBe('ansi31')
+    expect(sheet.revision_clouds[0]?.status).toBe('open')
+    expect(sheet.revision_clouds[0]?.bubble_number).toBe(1)
   })
 })

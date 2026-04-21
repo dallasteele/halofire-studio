@@ -83,7 +83,14 @@ export { FDCNode } from './nodes/fdc'
 export { RiserAssemblyNode } from './nodes/riser-assembly'
 export { RemoteAreaNode } from './nodes/remote-area'
 export { ObstructionNode } from './nodes/obstruction'
-export { SheetNode } from './nodes/sheet'
+export {
+  Annotation,
+  Dimension,
+  Hatch,
+  RevisionCloud,
+  SheetNode,
+  Viewport,
+} from './nodes/sheet'
 export {
   StairNode,
   StairRailingMode,
