@@ -71,8 +71,12 @@
     "@pascal-app/core": "^0.5.1"
   },
   "devDependencies": {
+    "@napi-rs/canvas": "^0.1.53",
     "@pascal-app/core": "*",
     "@pascal/typescript-config": "*",
+    "pdfjs-dist": "^5.0.0",
+    "pixelmatch": "^7.1.0",
+    "pngjs": "^7.0.0",
     "typescript": "5.9.3"
   }
 }
