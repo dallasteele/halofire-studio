@@ -1,4 +1,18 @@
 // 150# ANSI raised-face flange, 4" NPS.
+//
+// @part flange_150_raised
+// @kind fitting
+// @category fitting.flange.150
+// @display-name "ANSI 150# Raised-Face Flange (4\")"
+// @mfg generic
+// @mfg-pn ANSI-150-RF
+// @price-usd 42.00
+// @install-minutes 15
+// @crew journeyman
+// @param size_in enum[2,2.5,3,4,6,8] default=4 label="Size" unit="in"
+// @port face  position=[0,0,0.012]  direction=[0,0,1]  style=flanged.150 size_in=4 role=run_a
+// @port weld  position=[0,0,-0.012] direction=[0,0,-1] style=grooved     size_in=4 role=run_b
+
 flange_od = 229;
 flange_t = 24;
 raised_d = 171;

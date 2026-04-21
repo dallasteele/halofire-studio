@@ -1,4 +1,18 @@
 // Globe valve 2" threaded (used for drains + test valves).
+//
+// @part valve_globe
+// @kind valve
+// @category valve.globe
+// @display-name "Globe Valve (2\" NPT)"
+// @mfg globe
+// @mfg-pn GV-200
+// @price-usd 95.00
+// @install-minutes 15
+// @crew journeyman
+// @param size_in enum[1,1.5,2,2.5,3] default=2 label="Size" unit="in"
+// @port run_in  position=[-0.055,0,0] direction=[-1,0,0] style=NPT_threaded size_in=2 role=run_a
+// @port run_out position=[0.055,0,0]  direction=[1,0,0]  style=NPT_threaded size_in=2 role=run_b
+
 body_d = 85;
 body_l = 110;
 union() {

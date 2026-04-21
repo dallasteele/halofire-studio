@@ -1,4 +1,18 @@
 // Paddle flow switch (Potter VSR), saddle-mounted on pipe.
+//
+// @part flow_switch
+// @kind device
+// @category device.flow.switch
+// @display-name "Paddle Flow Switch (Potter VSR)"
+// @mfg potter
+// @mfg-pn VSR-2
+// @listing UL FM
+// @price-usd 88.00
+// @install-minutes 20
+// @crew journeyman
+// @param pipe_size_in enum[2,2.5,3,4,6,8] default=4 label="Pipe Size" unit="in"
+// @port saddle position=[0,0,-0.01] direction=[0,0,-1] style=none size_in=4 role=branch
+
 saddle_l = 100;
 saddle_w = 60;
 saddle_h = 20;
