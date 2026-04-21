@@ -390,14 +390,14 @@ feasible.
 | R1 | R1.2 ValveNode | — | pending | 4 tests |
 | R1 | R1.3 HangerNode + DeviceNode | — | pending | 4 tests |
 | R1 | R1.4 FDC+RiserAssy+RemoteArea+Obstruction+Sheet | — | pending | 5 tests |
-| R1 | R1.5 AnyNode union + barrel | — | pending | round-trip |
-| R1 | R1.6 HydraulicSystem install | — | pending | e2e |
+| R1 | R1.5 AnyNode union + barrel | — | closed (subsumed) | subsumed by R1.1/R1.2/R1.3+R1.4 barrel updates |
+| R1 | R1.6 HydraulicSystem install | — | shipped (24b7944) | e2e (hydraulic-boot.spec.ts) |
 | R2 | R2.1 spawn-from-design.ts extraction | — | pending | golden |
 | R2 | R2.2 AutoDesignPanel delegation | — | pending | e2e |
-| R2 | R2.3 1881-slice spawn test | — | pending | golden |
+| R2 | R2.3 1881-slice spawn test | — | closed (subsumed) | subsumed by R2.1 (8-test spawn.spec.ts covers the golden fixture) |
 | R3 | R3.1 InstancedCatalogRenderer | — | pending | — |
-| R3 | R3.2 selection escape | — | pending | e2e |
-| R3 | R3.3 perf baseline 1500 heads | — | pending | perf |
+| R3 | R3.2 selection escape | — | closed (subsumed) | subsumed by R3.1 (InstancedCatalogRenderer already implements selection-escape; tests included) |
+| R3 | R3.3 perf baseline 1500 heads | — | closed (subsumed) | subsumed by R3.1 (perf-instancing.spec.ts is the perf baseline) |
 | R4 | R4.1 orchestrator slice emit | — | pending | python |
 | R4 | R4.2 translate-slice.ts | — | pending | vitest |
 | R4 | R4.3 AutoPilot consumer | — | pending | e2e |
@@ -431,12 +431,13 @@ feasible.
 | R10 | R10.1 next.config export | — | pending | build |
 | R10 | R10.2 ipc.ts abstraction | — | pending | vitest |
 | R10 | R10.3 fetch→invoke rewire | — | pending | e2e |
-| R10 | R10.4 OpenSCAD bundling | — | pending | manual |
+| R10 | R10.4 OpenSCAD bundling | — | partial | download script + manifest shipped as `3ce1001`, SHA pins are placeholders; full pin happens pre-release |
 | R10 | R10.5 CI build-desktop.yml | — | pending | ci |
 | R10 | R10.6 clean-VM install smoke | — | pending | manual |
 | R11 | R11.1 second-project truth | — | scaffolded (awaits real bid data) | python |
 | R11 | R11.2 cruel-test second proj | — | scaffolded (4 stubs skipped, 3 live meta-tests pass) | python |
 | R11 | R11.3 manual second proj run | — | pending | manual |
+| follow-ups | SceneChangeBridge debounce fix | — | shipped (f056bd7) | e2e |
 
 Total: **53 commits** across **11 phases**. Feature-flag as
 needed so `main` stays shippable between phases.

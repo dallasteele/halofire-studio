@@ -1,5 +1,15 @@
 # HaloFire Studio — V2 Plan Phase Completion Report
 
+> ## 2026-04-21 update — 37 / 53 commits shipped (70 %)
+>
+> See [`SHIP_REPORT_2026-04-21.md`](./SHIP_REPORT_2026-04-21.md) for the
+> authoritative state. Today's pass closed out R1.6 (HydraulicSystem
+> boot-install, commit `24b7944`) and marked R1.5, R2.3, R3.2, R3.3
+> as subsumed in the Part 6 tracker of `IMPLEMENTATION_PLAN.md`.
+> R10.4 is partial (OpenSCAD manifest `3ce1001` with placeholder SHAs
+> pending pre-release pinning). Follow-up `f056bd7` shipped the
+> SceneChangeBridge debounce fix.
+
 **Date:** 2026-04-20
 **Status:** Phases 0-5 + 1.3 + 3.2 + 4.4 + G SHIPPED; Phase 6 in progress
 **Cruel-test scoreboard:** 27 PASS / 0 FAIL / 2 SKIP
