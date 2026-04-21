@@ -177,6 +177,20 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
         try { deleteNode(n.id as any) } catch { /* best effort */ }
       }
     }
+    // Pass 3: kill Pascal's stock default LevelNode (level=0) — it
+    // collides with our level=0 and Pascal's level-system stacks
+    // duplicates at Y=0, collapsing the building. The default level
+    // has no children of its own (no walls/slabs/items), so removing
+    // it is safe.
+    const live3 = (useScene.getState() as any).nodes ?? {}
+    for (const n of Object.values(live3) as any[]) {
+      if (
+        n.type === 'level'
+        && (!n.children || n.children.length === 0)
+      ) {
+        try { deleteNode(n.id as any) } catch { /* best effort */ }
+      }
+    }
   }, [deleteNode])
 
   // Cap how many heads + pipes the auto-design dumps into the live
@@ -366,29 +380,30 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
         levels.forEach((lvl, idx) => {
           if (!lvl.polygon_m || lvl.polygon_m.length < 3) return
 
-          // First arch level reuses Pascal's default level_0; subsequent
-          // levels get brand-new LevelNodes under the Building.
+          // Create a brand-new LevelNode for every architectural
+          // level. We previously reused Pascal's default level_0
+          // for idx=0, but that left a competing un-tagged level
+          // at level=0 when we also created level=0 ourselves —
+          // Pascal's level-system stacks by `level` integer so the
+          // duplicate collapsed everything to Y=0. Now every level
+          // we spawn is auto_design-tagged and gets a clean
+          // sequential level number.
           let pascalLevelId: string
-          if (idx === 0) {
+          try {
+            const newLevel = LevelNode.parse({
+              name: lvl.name,
+              // LevelSystem sorts by `level` integer + stacks via
+              // cumulative getLevelHeight(). Sequential 0..N so the
+              // building stacks bottom-up with no gaps.
+              level: idx,
+              children: [],
+              parentId: buildingId,
+              metadata: { tags: ['halofire', 'level', 'auto_design'] },
+            })
+            createNode(newLevel as any, buildingId as any)
+            pascalLevelId = newLevel.id
+          } catch {
             pascalLevelId = defaultLevelId
-          } else {
-            try {
-              const newLevel = LevelNode.parse({
-                name: lvl.name,
-                // LevelSystem sorts by `level` integer + stacks via
-                // cumulative getLevelHeight(); idx (kept-level index)
-                // gives a clean 0,1,2,... sequence so the building
-                // stacks bottom-up with no gaps.
-                level: idx,
-                children: [],
-                parentId: buildingId,
-                metadata: { tags: ['halofire', 'level', 'auto_design'] },
-              })
-              createNode(newLevel as any, buildingId as any)
-              pascalLevelId = newLevel.id
-            } catch {
-              pascalLevelId = defaultLevelId
-            }
           }
           levelIdByArch.set(lvl.id, {
             pascalId: pascalLevelId,
