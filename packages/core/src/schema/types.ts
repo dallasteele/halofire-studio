@@ -16,6 +16,13 @@ import { SprinklerHeadNode } from './nodes/sprinkler-head'
 import { SystemNode } from './nodes/system'
 import { FittingNode } from './nodes/fitting'
 import { ValveNode } from './nodes/valve'
+import { HangerNode } from './nodes/hanger'
+import { DeviceNode } from './nodes/device'
+import { FDCNode } from './nodes/fdc'
+import { RiserAssemblyNode } from './nodes/riser-assembly'
+import { RemoteAreaNode } from './nodes/remote-area'
+import { ObstructionNode } from './nodes/obstruction'
+import { SheetNode } from './nodes/sheet'
 import { StairNode } from './nodes/stair'
 import { StairSegmentNode } from './nodes/stair-segment'
 import { WallNode } from './nodes/wall'
@@ -45,6 +52,13 @@ export const AnyNode = z.discriminatedUnion('type', [
   SystemNode,
   FittingNode,
   ValveNode,
+  HangerNode,
+  DeviceNode,
+  FDCNode,
+  RiserAssemblyNode,
+  RemoteAreaNode,
+  ObstructionNode,
+  SheetNode,
 ])
 
 export type AnyNode = z.infer<typeof AnyNode>

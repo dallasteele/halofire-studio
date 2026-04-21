@@ -32,6 +32,20 @@ import { FittingNode } from '@pascal-app/core/schema/nodes/fitting'
 // biome-ignore lint/style/noRelativeImport: direct module path is intentional
 import { ValveNode } from '@pascal-app/core/schema/nodes/valve'
 // biome-ignore lint/style/noRelativeImport: direct module path is intentional
+import { HangerNode } from '@pascal-app/core/schema/nodes/hanger'
+// biome-ignore lint/style/noRelativeImport: direct module path is intentional
+import { DeviceNode } from '@pascal-app/core/schema/nodes/device'
+// biome-ignore lint/style/noRelativeImport: direct module path is intentional
+import { FDCNode } from '@pascal-app/core/schema/nodes/fdc'
+// biome-ignore lint/style/noRelativeImport: direct module path is intentional
+import { RiserAssemblyNode } from '@pascal-app/core/schema/nodes/riser-assembly'
+// biome-ignore lint/style/noRelativeImport: direct module path is intentional
+import { RemoteAreaNode } from '@pascal-app/core/schema/nodes/remote-area'
+// biome-ignore lint/style/noRelativeImport: direct module path is intentional
+import { ObstructionNode } from '@pascal-app/core/schema/nodes/obstruction'
+// biome-ignore lint/style/noRelativeImport: direct module path is intentional
+import { SheetNode } from '@pascal-app/core/schema/nodes/sheet'
+// biome-ignore lint/style/noRelativeImport: direct module path is intentional
 import {
   DENSITY_AREA_DEFAULTS,
   HOSE_ALLOWANCE_GPM,
@@ -629,5 +643,453 @@ test.describe('Pascal fork — ValveNode schema', () => {
       expect(node.kind).toBe('check_swing')
       expect(node.state).toBe('open')
     }
+  })
+})
+
+test.describe('Pascal fork — HangerNode schema', () => {
+  test('parses a valid 2" clevis hanger on a beam', () => {
+    const hanger = HangerNode.parse({
+      id: generateId('hanger'),
+      type: 'hanger',
+      sku: 'TOLCO-1-2',
+      kind: 'clevis',
+      pipe_id: 'pipe_abc',
+      size_in: 2,
+      structural: {
+        attach_to_type: 'beam',
+        attach_to_id: 'beam_123',
+        load_kg: 45,
+      },
+    })
+    expect(hanger.type).toBe('hanger')
+    expect(hanger.kind).toBe('clevis')
+    expect(hanger.structural?.attach_to_type).toBe('beam')
+    expect(hanger.id).toMatch(/^hanger_/)
+  })
+
+  test('rejects unknown hanger kinds', () => {
+    expect(() =>
+      HangerNode.parse({
+        id: generateId('hanger'),
+        type: 'hanger',
+        sku: 'X',
+        kind: 'zip_tie',
+        pipe_id: 'p_1',
+        size_in: 2,
+      }),
+    ).toThrow()
+  })
+
+  test('rejects invalid structural attach_to_type', () => {
+    expect(() =>
+      HangerNode.parse({
+        id: generateId('hanger'),
+        type: 'hanger',
+        sku: 'X',
+        kind: 'trapeze',
+        pipe_id: 'p_1',
+        size_in: 4,
+        structural: { attach_to_type: 'drywall' },
+      }),
+    ).toThrow()
+  })
+
+  test("AnyNode discriminator narrows on type='hanger'", () => {
+    const node = AnyNode.parse({
+      id: generateId('hanger'),
+      type: 'hanger',
+      sku: 'X',
+      kind: 'seismic_sway_lateral',
+      pipe_id: 'p_1',
+      size_in: 4,
+    })
+    expect(node.type).toBe('hanger')
+    if (node.type === 'hanger') {
+      expect(node.kind).toBe('seismic_sway_lateral')
+    }
+  })
+})
+
+test.describe('Pascal fork — DeviceNode schema', () => {
+  test('parses a supervised tamper switch attached to a valve', () => {
+    const dev = DeviceNode.parse({
+      id: generateId('device'),
+      type: 'device',
+      sku: 'POTTER-OSYSU',
+      kind: 'tamper_switch_osy',
+      attaches_to: 'valve',
+      attaches_to_id: 'valve_abc',
+      conduit_run_id: 'cr_1',
+    })
+    expect(dev.type).toBe('device')
+    expect(dev.kind).toBe('tamper_switch_osy')
+    expect(dev.attaches_to).toBe('valve')
+    expect(dev.supervised).toBe(true)
+  })
+
+  test('rejects unknown device kinds', () => {
+    expect(() =>
+      DeviceNode.parse({
+        id: generateId('device'),
+        type: 'device',
+        sku: 'X',
+        kind: 'smoke_detector',
+        attaches_to: 'pipe',
+      }),
+    ).toThrow()
+  })
+
+  test('rejects invalid attaches_to host', () => {
+    expect(() =>
+      DeviceNode.parse({
+        id: generateId('device'),
+        type: 'device',
+        sku: 'X',
+        kind: 'pressure_gauge',
+        attaches_to: 'ceiling',
+      }),
+    ).toThrow()
+  })
+
+  test("AnyNode discriminator narrows on type='device'", () => {
+    const node = AnyNode.parse({
+      id: generateId('device'),
+      type: 'device',
+      sku: 'POTTER-VSR',
+      kind: 'flow_switch_vane',
+      attaches_to: 'pipe',
+      attaches_to_id: 'pipe_xyz',
+    })
+    expect(node.type).toBe('device')
+    if (node.type === 'device') {
+      expect(node.kind).toBe('flow_switch_vane')
+      expect(node.supervised).toBe(true)
+    }
+  })
+})
+
+test.describe('Pascal fork — FDCNode schema', () => {
+  test('parses a valid 5" Stortz FDC', () => {
+    const fdc = FDCNode.parse({
+      id: generateId('fdc'),
+      type: 'fdc',
+      class_kind: 'stortz_5in',
+      sign_id: 'sign_fdc_1',
+      distance_to_hydrant_ft: 75,
+      height_above_grade_m: 0.9,
+    })
+    expect(fdc.type).toBe('fdc')
+    expect(fdc.class_kind).toBe('stortz_5in')
+    expect(fdc.distance_to_hydrant_ft).toBe(75)
+    expect(fdc.id).toMatch(/^fdc_/)
+  })
+
+  test('rejects unknown class_kind values', () => {
+    expect(() =>
+      FDCNode.parse({
+        id: generateId('fdc'),
+        type: 'fdc',
+        class_kind: 'quick_connect_4in',
+        distance_to_hydrant_ft: 40,
+      }),
+    ).toThrow()
+  })
+
+  test('rejects negative distance_to_hydrant_ft', () => {
+    expect(() =>
+      FDCNode.parse({
+        id: generateId('fdc'),
+        type: 'fdc',
+        class_kind: 'threaded_2_5in',
+        distance_to_hydrant_ft: -5,
+      }),
+    ).toThrow()
+  })
+
+  test("AnyNode discriminator narrows on type='fdc'", () => {
+    const node = AnyNode.parse({
+      id: generateId('fdc'),
+      type: 'fdc',
+      class_kind: 'stortz_2_5in_twin',
+      distance_to_hydrant_ft: 50,
+    })
+    expect(node.type).toBe('fdc')
+    if (node.type === 'fdc') {
+      expect(node.class_kind).toBe('stortz_2_5in_twin')
+    }
+  })
+
+  test('sign_id and height_above_grade_m are optional', () => {
+    const fdc = FDCNode.parse({
+      id: generateId('fdc'),
+      type: 'fdc',
+      class_kind: 'threaded_2_5in',
+      distance_to_hydrant_ft: 60,
+    })
+    expect(fdc.sign_id).toBeUndefined()
+    expect(fdc.height_above_grade_m).toBeUndefined()
+  })
+})
+
+test.describe('Pascal fork — RiserAssemblyNode schema', () => {
+  test('parses a riser assembly with children_ids', () => {
+    const ra = RiserAssemblyNode.parse({
+      id: generateId('riser_assembly'),
+      type: 'riser_assembly',
+      systemId: 'system_wet_1',
+      children_ids: ['pipe_1', 'valve_1', 'device_1', 'device_2'],
+      installed_at: '2026-04-21',
+      location_description: 'West riser room, level 1',
+    })
+    expect(ra.type).toBe('riser_assembly')
+    expect(ra.systemId).toBe('system_wet_1')
+    expect(ra.children_ids).toHaveLength(4)
+    expect(ra.id).toMatch(/^riser_assembly_/)
+  })
+
+  test('rejects missing required systemId', () => {
+    expect(() =>
+      RiserAssemblyNode.parse({
+        id: generateId('riser_assembly'),
+        type: 'riser_assembly',
+      }),
+    ).toThrow()
+  })
+
+  test("AnyNode discriminator narrows on type='riser_assembly'", () => {
+    const node = AnyNode.parse({
+      id: generateId('riser_assembly'),
+      type: 'riser_assembly',
+      systemId: 'system_1',
+    })
+    expect(node.type).toBe('riser_assembly')
+    if (node.type === 'riser_assembly') {
+      expect(node.systemId).toBe('system_1')
+      expect(node.children_ids).toEqual([])
+    }
+  })
+
+  test('children_ids defaults to empty array', () => {
+    const ra = RiserAssemblyNode.parse({
+      id: generateId('riser_assembly'),
+      type: 'riser_assembly',
+      systemId: 'system_1',
+    })
+    expect(ra.children_ids).toEqual([])
+    expect(ra.installed_at).toBeUndefined()
+  })
+})
+
+test.describe('Pascal fork — RemoteAreaNode schema', () => {
+  test('parses a valid ordinary-group-2 remote area', () => {
+    const ra = RemoteAreaNode.parse({
+      id: generateId('remote_area'),
+      type: 'remote_area',
+      polygon_m: [[0, 0], [10, 0], [10, 14], [0, 14]],
+      hazard_class: 'ordinary_group_2',
+      computed_area_ft2: 1506,
+      is_most_remote: true,
+      design_density_gpm_ft2: 0.2,
+    })
+    expect(ra.type).toBe('remote_area')
+    expect(ra.hazard_class).toBe('ordinary_group_2')
+    expect(ra.polygon_m).toHaveLength(4)
+    expect(ra.is_most_remote).toBe(true)
+  })
+
+  test('rejects polygon with fewer than 3 vertices', () => {
+    expect(() =>
+      RemoteAreaNode.parse({
+        id: generateId('remote_area'),
+        type: 'remote_area',
+        polygon_m: [[0, 0], [1, 1]],
+        hazard_class: 'light',
+      }),
+    ).toThrow()
+  })
+
+  test('rejects invalid hazard_class', () => {
+    expect(() =>
+      RemoteAreaNode.parse({
+        id: generateId('remote_area'),
+        type: 'remote_area',
+        polygon_m: [[0, 0], [1, 0], [1, 1]],
+        hazard_class: 'fluffy',
+      }),
+    ).toThrow()
+  })
+
+  test("AnyNode discriminator narrows on type='remote_area'", () => {
+    const node = AnyNode.parse({
+      id: generateId('remote_area'),
+      type: 'remote_area',
+      polygon_m: [[0, 0], [10, 0], [10, 10]],
+      hazard_class: 'light',
+    })
+    expect(node.type).toBe('remote_area')
+    if (node.type === 'remote_area') {
+      expect(node.hazard_class).toBe('light')
+    }
+  })
+
+  test('is_most_remote defaults to false', () => {
+    const ra = RemoteAreaNode.parse({
+      id: generateId('remote_area'),
+      type: 'remote_area',
+      polygon_m: [[0, 0], [1, 0], [0, 1]],
+      hazard_class: 'light',
+    })
+    expect(ra.is_most_remote).toBe(false)
+    expect(ra.computed_area_ft2).toBeUndefined()
+  })
+})
+
+test.describe('Pascal fork — ObstructionNode schema', () => {
+  test('parses a duct obstruction from IFC import', () => {
+    const obs = ObstructionNode.parse({
+      id: generateId('obstruction'),
+      type: 'obstruction',
+      kind: 'duct',
+      bbox_min: [0, 0, 2.8],
+      bbox_max: [3.2, 0.6, 3.2],
+      source: 'ifc',
+    })
+    expect(obs.type).toBe('obstruction')
+    expect(obs.kind).toBe('duct')
+    expect(obs.source).toBe('ifc')
+    expect(obs.id).toMatch(/^obstruction_/)
+  })
+
+  test('rejects unknown obstruction kinds', () => {
+    expect(() =>
+      ObstructionNode.parse({
+        id: generateId('obstruction'),
+        type: 'obstruction',
+        kind: 'partition',
+        bbox_min: [0, 0, 0],
+        bbox_max: [1, 1, 1],
+      }),
+    ).toThrow()
+  })
+
+  test('rejects invalid source provenance', () => {
+    expect(() =>
+      ObstructionNode.parse({
+        id: generateId('obstruction'),
+        type: 'obstruction',
+        kind: 'beam',
+        bbox_min: [0, 0, 0],
+        bbox_max: [1, 1, 1],
+        source: 'revit',
+      }),
+    ).toThrow()
+  })
+
+  test("AnyNode discriminator narrows on type='obstruction'", () => {
+    const node = AnyNode.parse({
+      id: generateId('obstruction'),
+      type: 'obstruction',
+      kind: 'column',
+      bbox_min: [10, 0, 0],
+      bbox_max: [10.3, 0.3, 4],
+    })
+    expect(node.type).toBe('obstruction')
+    if (node.type === 'obstruction') {
+      expect(node.kind).toBe('column')
+      expect(node.source).toBe('manual')
+    }
+  })
+
+  test("source defaults to 'manual'", () => {
+    const obs = ObstructionNode.parse({
+      id: generateId('obstruction'),
+      type: 'obstruction',
+      kind: 'equipment',
+      bbox_min: [0, 0, 0],
+      bbox_max: [1, 1, 1],
+    })
+    expect(obs.source).toBe('manual')
+  })
+})
+
+test.describe('Pascal fork — SheetNode schema', () => {
+  test('parses a valid FP plan sheet', () => {
+    const sheet = SheetNode.parse({
+      id: generateId('sheet'),
+      type: 'sheet',
+      name: 'FP-003',
+      title: 'Level 2 — Sprinkler Plan',
+      paper_size: 'ARCH_D',
+      orientation: 'landscape',
+      title_block_id: 'tb_halofire_default',
+      sheet_index: 3,
+      discipline: 'fire_protection',
+      revision: 'V1',
+    })
+    expect(sheet.type).toBe('sheet')
+    expect(sheet.name).toBe('FP-003')
+    expect(sheet.paper_size).toBe('ARCH_D')
+    expect(sheet.sheet_index).toBe(3)
+    expect(sheet.id).toMatch(/^sheet_/)
+  })
+
+  test('rejects invalid paper_size', () => {
+    expect(() =>
+      SheetNode.parse({
+        id: generateId('sheet'),
+        type: 'sheet',
+        name: 'FP-001',
+        title: 'Cover',
+        paper_size: 'LEGAL',
+        title_block_id: 'tb_1',
+        sheet_index: 0,
+      }),
+    ).toThrow()
+  })
+
+  test('rejects non-integer sheet_index', () => {
+    expect(() =>
+      SheetNode.parse({
+        id: generateId('sheet'),
+        type: 'sheet',
+        name: 'FP-002',
+        title: 'Riser Diagram',
+        title_block_id: 'tb_1',
+        sheet_index: 1.5,
+      }),
+    ).toThrow()
+  })
+
+  test("AnyNode discriminator narrows on type='sheet'", () => {
+    const node = AnyNode.parse({
+      id: generateId('sheet'),
+      type: 'sheet',
+      name: 'FP-001',
+      title: 'Cover',
+      title_block_id: 'tb_1',
+      sheet_index: 0,
+    })
+    expect(node.type).toBe('sheet')
+    if (node.type === 'sheet') {
+      expect(node.name).toBe('FP-001')
+      expect(node.discipline).toBe('fire_protection')
+    }
+  })
+
+  test('defaults: paper_size=ARCH_D, orientation=landscape, revision=V0', () => {
+    const sheet = SheetNode.parse({
+      id: generateId('sheet'),
+      type: 'sheet',
+      name: 'FP-005',
+      title: 'Details',
+      title_block_id: 'tb_1',
+      sheet_index: 5,
+    })
+    expect(sheet.paper_size).toBe('ARCH_D')
+    expect(sheet.orientation).toBe('landscape')
+    expect(sheet.revision).toBe('V0')
+    expect(sheet.viewports).toEqual([])
+    expect(sheet.annotations).toEqual([])
+    expect(sheet.revision_clouds).toEqual([])
   })
 })

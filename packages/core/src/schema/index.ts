@@ -77,6 +77,13 @@ export {
 } from './nodes/system'
 export { FittingNode } from './nodes/fitting'
 export { ValveNode } from './nodes/valve'
+export { HangerNode } from './nodes/hanger'
+export { DeviceNode } from './nodes/device'
+export { FDCNode } from './nodes/fdc'
+export { RiserAssemblyNode } from './nodes/riser-assembly'
+export { RemoteAreaNode } from './nodes/remote-area'
+export { ObstructionNode } from './nodes/obstruction'
+export { SheetNode } from './nodes/sheet'
 export {
   StairNode,
   StairRailingMode,
