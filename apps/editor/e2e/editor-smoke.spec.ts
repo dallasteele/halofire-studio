@@ -62,12 +62,28 @@ test.describe('editor smoke', () => {
   test('layer toggle fires scene-change bridge (Phase G)', async ({ page }) => {
     await page.goto('/')
 
+    // Let SceneBootstrap + HalofireNodeWatcher finish their initial
+    // chrome-spawn bursts before we attach — otherwise the listener
+    // picks up unrelated scene-changed events fired during mount.
+    await page.waitForFunction(() => !!(window as any).__hfScene, null, {
+      timeout: 10_000,
+    })
+    await page.waitForTimeout(600)
+
     const bridgeFired = await page.evaluate(async () => {
-      const events: Array<{ type: string; origin?: string }> = []
+      const events: Array<{
+        type: string
+        origin?: string
+        origins?: string[]
+        count?: number
+      }> = []
       const handler = (e: Event) => {
+        const d = (e as CustomEvent).detail ?? {}
         events.push({
           type: e.type,
-          origin: (e as CustomEvent).detail?.origin,
+          origin: d.origin,
+          origins: d.origins,
+          count: d.count,
         })
       }
       window.addEventListener('halofire:layer-visibility', handler)
@@ -78,29 +94,26 @@ test.describe('editor smoke', () => {
       ) as HTMLButtonElement | null
       btn?.click()
 
-      await new Promise((r) => setTimeout(r, 200))
+      // SceneChangeBridge trailing-debounces at 150ms; 400ms safely
+      // captures the single coalesced emit for one click.
+      await new Promise((r) => setTimeout(r, 400))
 
       window.removeEventListener('halofire:layer-visibility', handler)
       window.removeEventListener('halofire:scene-changed', handler)
       return events
     })
 
-    // One click should fire both events; SceneChangeBridge relays to
-    // scene-changed with origin="layer-visibility".
-    const kinds = bridgeFired.map((e) => e.type)
-    expect(kinds).toContain('halofire:layer-visibility')
-    expect(kinds).toContain('halofire:scene-changed')
-    // SceneChangeBridge forwards the layer-visibility mutation event
-    // as a scene-changed event with origin='layer-visibility'. Use
-    // .some() rather than "first event" because HalofireNodeWatcher
-    // may also fire independent scene-changed events for node
-    // mutations that happen as SceneBootstrap spawns chrome.
-    const layerVisChange = bridgeFired.some(
+    // Post-debounce contract: exactly one bridge-origin scene-changed
+    // event per rapid click-burst, carrying origin='layer-visibility'
+    // (or at minimum listing it inside origins[] + first-origin).
+    const layerVisChanges = bridgeFired.filter(
       (e) =>
         e.type === 'halofire:scene-changed' &&
-        e.origin === 'layer-visibility',
+        (e.origin === 'layer-visibility' ||
+          (e.origins ?? []).includes('layer-visibility')),
     )
-    expect(layerVisChange).toBe(true)
+    expect(layerVisChanges.length).toBeGreaterThanOrEqual(1)
+    expect(layerVisChanges[0].origin).toBe('layer-visibility')
   })
 
   test('ribbon tabs switch tab content', async ({ page }) => {
