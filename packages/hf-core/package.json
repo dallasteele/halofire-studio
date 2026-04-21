@@ -20,6 +20,11 @@
       "types": "./dist/scad/parse-params.d.ts",
       "import": "./dist/scad/parse-params.js",
       "default": "./dist/scad/parse-params.js"
+    },
+    "./scene/spawn-from-design": {
+      "types": "./dist/scene/spawn-from-design.d.ts",
+      "import": "./dist/scene/spawn-from-design.js",
+      "default": "./dist/scene/spawn-from-design.js"
     }
   },
   "files": ["dist", "README.md"],
