@@ -16,6 +16,7 @@
  */
 
 import { useScene } from '@pascal-app/core'
+import { installHydraulicSystem } from '@pascal-app/core/systems/hydraulic/hydraulic-system'
 import { useEffect, useRef } from 'react'
 
 type AnyNode = {
@@ -80,6 +81,22 @@ export function HalofireNodeWatcher() {
       }
     } catch {
       // non-fatal — the watcher still works without the test hook
+    }
+
+    // R1.6 — HydraulicSystem boot-install. Mounted here (not page.tsx)
+    // so it installs as soon as the scene store is live, independent
+    // of any optional page-level components that might fail to mount.
+    let unsubHyd: (() => void) | undefined
+    try {
+      unsubHyd = installHydraulicSystem(
+        useScene as unknown as Parameters<typeof installHydraulicSystem>[0],
+        { debounceMs: 300 },
+      )
+    } catch {
+      // non-fatal — hydraulic solver will just not auto-run
+    }
+    return () => {
+      if (unsubHyd) unsubHyd()
     }
   }, [])
 

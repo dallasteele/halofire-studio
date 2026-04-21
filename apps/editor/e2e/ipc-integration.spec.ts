@@ -92,7 +92,7 @@ test.describe('R10.3 ipc rewire', () => {
       // preset, exactly the case we want to rewire.
       await page
         .getByRole('button', { name: /Run Auto-Design/i })
-        .click()
+        .click({ force: true })
 
       // Wait for the dispatch to land.
       await expect

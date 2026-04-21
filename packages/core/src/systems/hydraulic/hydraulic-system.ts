@@ -149,7 +149,15 @@ export function installHydraulicSystem(
   opts: { debounceMs?: number } = {},
 ): () => void {
   const debounceMs = opts.debounceMs ?? 300
+  // Poll interval: even under continuous store-mutation storms the
+  // solver runs at least this often when the node graph is dirty.
+  // Keeps the solver honest when a RAF/ref loop prevents the
+  // debounce from ever firing. Tuned to ≤ debounceMs so the solver
+  // never stalls longer than the debounce promise.
+  const pollMs = debounceMs
   let timer: ReturnType<typeof setTimeout> | null = null
+  let poll: ReturnType<typeof setInterval> | null = null
+  let dirty = false
   let lastNodesRef: Record<string, unknown> | null = null
 
   const solveAll = () => {
@@ -174,29 +182,42 @@ export function installHydraulicSystem(
 
     const update = state.updateNode
     for (const sys of systems) {
-      const demand = solveSystemDemand(sys, pipes, heads)
-      if (update) {
-        update(sys.id, {
-          demand: {
-            sprinkler_flow_gpm: demand.sprinkler_flow_gpm,
-            hose_flow_gpm: demand.hose_flow_gpm,
-            total_flow_gpm: demand.total_flow_gpm,
-            required_psi: demand.required_psi,
-            safety_margin_psi: demand.safety_margin_psi,
-            passes: demand.passes,
-            solved_at: Date.now(),
-          },
-        } as Partial<SystemNode>)
+      // Per-system try/catch: a single malformed pipe (missing
+      // start_m / size_in / schedule) mustn't kill the whole solver.
+      try {
+        const demand = solveSystemDemand(sys, pipes, heads)
+        if (update) {
+          update(sys.id, {
+            demand: {
+              sprinkler_flow_gpm: demand.sprinkler_flow_gpm,
+              hose_flow_gpm: demand.hose_flow_gpm,
+              total_flow_gpm: demand.total_flow_gpm,
+              required_psi: demand.required_psi,
+              safety_margin_psi: demand.safety_margin_psi,
+              passes: demand.passes,
+              solved_at: Date.now(),
+            },
+          } as Partial<SystemNode>)
+        }
+      } catch {
+        // Partial-graph edit in flight — skip this solve pass.
       }
     }
   }
 
-  const schedule = () => {
-    if (timer) clearTimeout(timer)
-    timer = setTimeout(() => {
+  const runSolve = () => {
+    if (timer) {
+      clearTimeout(timer)
       timer = null
-      solveAll()
-    }, debounceMs)
+    }
+    dirty = false
+    solveAll()
+  }
+
+  const schedule = () => {
+    dirty = true
+    if (timer) clearTimeout(timer)
+    timer = setTimeout(runSolve, debounceMs)
   }
 
   const unsub = store.subscribe((state) => {
@@ -210,11 +231,24 @@ export function installHydraulicSystem(
   // Prime once so systems populated before install get solved.
   schedule()
 
+  // Poll fallback: every pollMs, if the graph is dirty, solve. This
+  // guarantees the solver runs under continuous-mutation storms
+  // (React-ref / RAF loops) that would otherwise keep resetting the
+  // debounce timer indefinitely.
+  poll = setInterval(() => {
+    if (dirty) runSolve()
+  }, pollMs)
+
   return () => {
     unsub()
     if (timer) {
       clearTimeout(timer)
       timer = null
     }
+    if (poll) {
+      clearInterval(poll)
+      poll = null
+    }
+    dirty = false
   }
 }

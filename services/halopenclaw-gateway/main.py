@@ -44,6 +44,9 @@ _scad_spec = importlib.util.spec_from_file_location(
 )
 if _scad_spec is not None and _scad_spec.loader is not None:
     openscad_runtime = importlib.util.module_from_spec(_scad_spec)
+    # Register in sys.modules before exec_module so that dataclass
+    # decorators (which look up cls.__module__ in sys.modules) work.
+    sys.modules[_scad_spec.name] = openscad_runtime
     _scad_spec.loader.exec_module(openscad_runtime)
 else:
     openscad_runtime = None  # type: ignore[assignment]

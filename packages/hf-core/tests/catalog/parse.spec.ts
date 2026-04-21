@@ -12,6 +12,7 @@
  *   4. @port round-trips name, vec3s, style, size_in, role.
  *   5. Real fixture pipe.scad → ≥1 port, ≥1 param, slug==='pipe'.
  */
+import { readFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { expect, test } from '@playwright/test'
@@ -103,11 +104,8 @@ test.describe('@halofire/core — parseScad annotation grammar', () => {
       __dirname,
       '../../../halofire-catalog/catalog.json',
     )
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const catalog = JSON.parse(
-      // read via fs to avoid ESM/CJS import shenanigans
-      // biome-ignore lint: node:fs sync read is fine in a test
-      require('node:fs').readFileSync(fp, 'utf-8'),
+      readFileSync(fp, 'utf-8'),
     ) as { parts: Array<{ kind: string }> }
 
     expect(catalog.parts.length).toBe(40)

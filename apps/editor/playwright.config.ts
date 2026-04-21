@@ -35,7 +35,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'node ../../node_modules/.bin/next start -p 3002',
+    command: 'bun run start -- -p 3002',
     url: 'http://localhost:3002',
     timeout: 60_000,
     reuseExistingServer: true,

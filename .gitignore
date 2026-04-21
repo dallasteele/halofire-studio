@@ -76,3 +76,6 @@ apps/editor/public/bid-demo/**/*.pdf
 
 # truth DB
 services/halofire-cad/truth/truth.duckdb
+
+# Claude Code / agent worktrees
+.claude/worktrees/
