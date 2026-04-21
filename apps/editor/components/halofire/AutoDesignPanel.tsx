@@ -195,12 +195,15 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
     }
   }, [deleteNode])
 
-  // Cap how many heads + pipes the auto-design dumps into the live
-  // viewport at once — a 583-head / 194-pipe 1881 design would swamp
-  // the scene. The full set stays in design.json for the pipeline;
-  // this is viewport-only throttling.
-  const MAX_HEADS_VIEWPORT = 150
-  const MAX_PIPES_VIEWPORT = 150
+  // R3.1 — the 150-head cap was necessary when each head mounted a
+  // per-node <ItemRenderer> (+ a drei <Clone> of the GLB scene).
+  // InstancedCatalogRenderer now collapses N heads of the same SKU
+  // into one draw call, so jobs with thousands of heads render at
+  // 60 fps. We keep a 10k safety ceiling so a corrupt design.json
+  // can't allocate an unbounded InstancedMesh. The full set still
+  // lives in design.json for the pipeline.
+  const MAX_HEADS_VIEWPORT = 10_000
+  const MAX_PIPES_VIEWPORT = 10_000
 
   const stopPoll = useCallback(() => {
     if (pollRef.current) {

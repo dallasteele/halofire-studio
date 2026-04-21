@@ -22,8 +22,20 @@ import { MeshStandardNodeMaterial } from 'three/webgpu'
 import { useNodeEvents } from '../../../hooks/use-node-events'
 import { resolveCdnUrl } from '../../../lib/asset-url'
 import { useItemLightPool } from '../../../store/use-item-light-pool'
+import useViewer from '../../../store/use-viewer'
 import { ErrorBoundary } from '../../error-boundary'
 import { NodeRenderer } from '../node-renderer'
+
+// R3.1 — when the InstancedCatalogRenderer is active, ItemNodes
+// that carry a .glb catalog asset are rendered in one draw call
+// per unique SKU by the instanced path. The per-node ItemRenderer
+// skips them here to avoid double-rendering. Selected / hovered
+// nodes are kept on the per-node path so gizmos + outlines work.
+const HF_INSTANCING_ENABLED = (() => {
+  const raw = process.env.NEXT_PUBLIC_HF_INSTANCING
+  if (raw === undefined) return true
+  return raw !== 'false' && raw !== '0'
+})()
 
 const getHalofireTint = (tags?: string[]): string | null => {
   const colorTag = tags?.find((tag) => tag.startsWith('halofire_pipe_color:'))
@@ -56,6 +68,19 @@ export const ItemRenderer = ({ node }: { node: ItemNode }) => {
   const ref = useRef<Group>(null!)
 
   useRegistry(node.id, node.type, ref)
+
+  const isSelected = useViewer((s) => s.selection.selectedIds.includes(node.id))
+  const isHovered = useViewer((s) => s.hoveredId === node.id)
+  const src = node.asset?.src
+  const isInstanceable =
+    HF_INSTANCING_ENABLED &&
+    typeof src === 'string' &&
+    src.toLowerCase().endsWith('.glb') &&
+    !isSelected &&
+    !isHovered
+
+  // Rendered by InstancedCatalogRenderer — skip the per-node path.
+  if (isInstanceable) return null
 
   return (
     <group position={node.position} ref={ref} rotation={node.rotation} visible={node.visible}>

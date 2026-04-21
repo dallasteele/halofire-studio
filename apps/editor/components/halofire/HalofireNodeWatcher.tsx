@@ -63,6 +63,21 @@ export function HalofireNodeWatcher() {
         updateNode: api.updateNode,
         deleteNode: api.deleteNode,
       }
+      // R3.1 — expose the viewer store so Playwright can flip
+      // selection state for the perf-instancing suite.
+      try {
+        // Lazy import to avoid pulling viewer internals into SSR.
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const vm = require('@pascal-app/viewer') as {
+          useViewer?: unknown
+        }
+        if (vm?.useViewer) {
+          ;(window as unknown as { __hfUseViewer?: unknown }).__hfUseViewer =
+            vm.useViewer
+        }
+      } catch {
+        // viewer not loaded yet — tests will fall back to event bus
+      }
     } catch {
       // non-fatal — the watcher still works without the test hook
     }
