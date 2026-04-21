@@ -22,6 +22,7 @@ import { Ribbon, type RibbonCommand } from '@/components/halofire/Ribbon'
 import { SceneBootstrap } from '@/components/halofire/SceneBootstrap'
 import { SceneChangeBridge } from '@/components/halofire/SceneChangeBridge'
 import { HalofireNodeWatcher } from '@/components/halofire/HalofireNodeWatcher'
+import { UndoStack } from '@/components/halofire/UndoStack'
 import { AutoPilot } from '@/components/halofire/AutoPilot'
 import { useEffect, useState } from 'react'
 import { StatusBar } from '@/components/halofire/StatusBar'
@@ -170,6 +171,8 @@ export default function Home() {
           origin='move'/'add-head'/'remove-head' whenever any
           halofire-tagged Pascal node actually mutates. */}
       <HalofireNodeWatcher />
+      {/* R5.5: global Cmd/Ctrl-Z undo + optional history dropdown. */}
+      <UndoStack />
       <CommandPalette />
       <ToolOverlay />
       <RemoteAreaDraw projectId={ACTIVE_PROJECT_ID} />
