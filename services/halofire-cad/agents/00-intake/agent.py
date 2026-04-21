@@ -1146,6 +1146,18 @@ def _align_levels_to_truth(
     for lv, tl in zip(levels, sorted_truth):
         lv.name = tl.level_name or lv.name
         lv.elevation_m = float(tl.elevation_m if tl.elevation_m is not None else 0)
+        # V2 Phase 1.2: drop-ceiling synthesis. Residential, amenity,
+        # office floors get acoustic-tile ceilings (24" T-bar / 18"
+        # plenum). Garage / mechanical levels keep exposed deck.
+        nm = (tl.level_name or "").lower()
+        if any(w in nm for w in ("residential", "amenity", "office")):
+            lv.use = "residential"
+            lv.ceiling.kind = "acoustic_tile"
+            lv.ceiling.tile_size_m = 0.6
+            lv.ceiling.plenum_depth_m = 0.45
+        elif "parking" in nm or "garage" in nm:
+            lv.use = "garage"
+            lv.ceiling.kind = "deck"
     metadata["issues"].append({
         "code": "INTAKE_ALIGNED_TO_TRUTH",
         "severity": "info",

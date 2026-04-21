@@ -139,6 +139,13 @@ class Ceiling(BaseModel):
     height_m: float = 3.0
     kind: Literal["flat", "sloped", "open_joist", "acoustic_tile", "deck"] = "flat"
     slope_deg: float = 0.0
+    # Drop-ceiling parameters (V2 Phase 1.2). Used when kind ==
+    # "acoustic_tile" to drive (a) the visualizer's T-bar grid
+    # render and (b) the router's "push pipe into plenum" logic.
+    # NFPA 13 §11.2.5 lets sprinklers be installed in the plenum
+    # space when ceiling kind == acoustic_tile (concealed heads).
+    tile_size_m: float = 0.6              # 24" T-bar tile (commercial std)
+    plenum_depth_m: float = 0.45          # 18" pipe-routing cavity
 
 
 class Room(BaseModel):

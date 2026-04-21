@@ -577,47 +577,68 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
             }
           }
 
-          // INTERIOR PARTITION WALLS — derived from each room's
-          // polygon edges. Cap at 100/level so a noisy CubiCasa
-          // run doesn't repaint the porcupine. Walls thinner than
-          // perimeter (0.1 m vs 0.2 m) and slightly shorter so
-          // they read as interior partitions, not exterior shell.
+          // INTERIOR PARTITION WALLS — derived from ROOM-SHARED EDGES
+          // (Phase 1.1 of V2 plan). CubiCasa room polygons are
+          // reliable; CubiCasa wall fragments are noise. A real
+          // interior partition is an edge that two rooms share
+          // (each room's boundary contains the same line segment
+          // ± snap tolerance). Edges that belong to only one room
+          // are the building exterior, already handled by slab
+          // perimeter walls above.
           const rooms = (lvl as any).rooms ?? []
-          let partitionCount = 0
-          const PARTITION_CAP = 100
+          // Build edge set with multiplicity. Snap endpoints to
+          // 0.20 m grid so floating-point matches.
+          const SNAP = 0.20
+          const snap = (v: number) => Math.round(v / SNAP) * SNAP
+          const edgeKey = (
+            a: [number, number], b: [number, number],
+          ): string => {
+            const k1 = `${snap(a[0]).toFixed(2)},${snap(a[1]).toFixed(2)}`
+            const k2 = `${snap(b[0]).toFixed(2)},${snap(b[1]).toFixed(2)}`
+            return k1 < k2 ? `${k1}|${k2}` : `${k2}|${k1}`
+          }
+          const edgeCount: Map<string, [number, [number, number], [number, number]]> = new Map()
           for (const r of rooms) {
             if (!r.polygon_m || r.polygon_m.length < 3) continue
-            // Intake's canonicalize pass already shifted room
-            // polygons onto the canonical centroid, so they're
-            // already in the same coord frame as slabPoly.
             for (let i = 0; i < r.polygon_m.length; i++) {
-              if (partitionCount >= PARTITION_CAP) break
               const a = r.polygon_m[i] as [number, number]
               const b = r.polygon_m[(i + 1) % r.polygon_m.length] as [number, number]
-              const dx = b[0] - a[0]
-              const dy = b[1] - a[1]
-              const len2 = dx * dx + dy * dy
-              if (len2 < 1.0 || len2 > 400) continue // 1 - 20 m walls only
-              try {
-                const wallNode = WallNode.parse({
-                  start: a,
-                  end: b,
-                  thickness: 0.1,
-                  height: (lvl.height_m ?? 3.0) * 0.85,
-                  parentId: pascalLevelId,
-                  metadata: {
-                    tags: [
-                      'halofire', 'wall', 'auto_design', 'partition',
-                    ],
-                  },
-                })
-                createNode(wallNode as any, pascalLevelId as any)
-                partitionCount++
-              } catch {
-                // best effort
+              const k = edgeKey(a, b)
+              const existing = edgeCount.get(k)
+              if (existing) {
+                existing[0]++
+              } else {
+                edgeCount.set(k, [1, a, b])
               }
             }
+          }
+          let partitionCount = 0
+          const PARTITION_CAP = 80
+          for (const [, [count, a, b]] of edgeCount) {
+            if (count < 2) continue // exterior edge — slab handles it
             if (partitionCount >= PARTITION_CAP) break
+            const dx = b[0] - a[0]
+            const dy = b[1] - a[1]
+            const len2 = dx * dx + dy * dy
+            if (len2 < 1.0 || len2 > 400) continue // 1-20 m walls only
+            try {
+              const wallNode = WallNode.parse({
+                start: a,
+                end: b,
+                thickness: 0.1,
+                height: (lvl.height_m ?? 3.0) * 0.85,
+                parentId: pascalLevelId,
+                metadata: {
+                  tags: [
+                    'halofire', 'wall', 'auto_design', 'partition',
+                  ],
+                },
+              })
+              createNode(wallNode as any, pascalLevelId as any)
+              partitionCount++
+            } catch {
+              // best effort
+            }
           }
         })
 
@@ -743,17 +764,15 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
               // the plan vector.
               const yaw = Math.atan2(dy, dx)
               const isVertical = Math.abs(dz) > Math.max(Math.abs(dx), Math.abs(dy))
-              // Smart-Pipe color code per AutoSPRINK convention
+              // ALL pipes render fire-protection red paint per
+              // NFPA 13 §6.7 (V2 Decision Q2). Role data stays in
+              // metadata.role for BOM grouping; the rainbow role
+              // color confused estimators because the drawing
+              // should look like the finished product (painted-red
+              // pipe). #e8432d = HaloFire brand red, close to
+              // NFPA-recommended fire-protection red.
               const role = p.role || 'unknown'
-              const roleColor: Record<string, string> = {
-                drop: '#3b82f6',          // blue — heads-to-branch
-                branch: '#22c55e',        // green — horizontal carrying heads
-                cross_main: '#f59e0b',    // amber — feeds branches
-                main: '#ef4444',          // red — system trunk
-                riser_nipple: '#a855f7',  // purple — vertical at riser
-                unknown: '#6b7280',       // grey — fallback
-              }
-              const color = roleColor[role] ?? roleColor.unknown
+              const color = '#e8432d'
               createNode(
                 {
                   id: generateId('item'),

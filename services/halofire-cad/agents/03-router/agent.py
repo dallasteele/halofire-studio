@@ -449,7 +449,16 @@ def route_systems(building: Building, heads: list[Head]) -> list[System]:
             continue
 
         sys_type = "dry" if level.use == "garage" else "wet"
-        riser_z = level.elevation_m + (level.height_m - 0.3)
+        # V2 Phase 2.2: drop-ceiling-aware routing. When the ceiling
+        # is acoustic_tile, route pipes UP IN THE PLENUM (above the
+        # tiles) per NFPA 13 § 11.2.5. Heads then drop down through
+        # the tiles via short `drop` pipes. For exposed-deck floors
+        # (garage / mech) pipes ride 0.3 m below the structural deck.
+        if level.ceiling.kind == "acoustic_tile":
+            ceiling_face_z = level.elevation_m + level.ceiling.height_m
+            riser_z = ceiling_face_z + (level.ceiling.plenum_depth_m or 0.45) * 0.5
+        else:
+            riser_z = level.elevation_m + (level.height_m - 0.3)
         sys_id = f"sys_{level.id}"
         riser = RiserSpec(
             id=f"riser_{level.id}",
