@@ -341,6 +341,30 @@ def test_each_kept_level_has_realistic_polygon_area() -> None:
         )
 
 
+# ── completeness ────────────────────────────────────────────────
+
+@pytest.mark.cruel
+@pytest.mark.golden
+def test_level_count_within_25pct_of_truth() -> None:
+    """The previous test (test_level_count_matches_truth) demands
+    EXACT match, which fails when CubiCasa fumbles a few residential
+    floors. Within ±25 % is what an estimator would tolerate from a
+    first-pass auto-bid that the human will correct upstairs.
+    """
+    _truth_or_skip()
+    if not _DESIGN.exists():
+        pytest.skip("design.json missing")
+    design = json.loads(_DESIGN.read_text(encoding="utf-8"))
+    actual = len(design.get("building", {}).get("levels", []))
+    truth = truth_for("1881-cooperative").level_count
+    delta = abs(actual - truth) / truth
+    assert delta <= 0.25, (
+        f"level_count {actual} vs truth {truth} = {delta:.0%} "
+        f"(tolerance 25 %). Synthesize fumbled floors before claiming "
+        f"a complete bid."
+    )
+
+
 # ── geometry sanity ─────────────────────────────────────────────
 
 @pytest.mark.cruel

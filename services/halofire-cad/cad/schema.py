@@ -174,6 +174,10 @@ class Level(BaseModel):
     stair_shafts: list[Shaft] = Field(default_factory=list)
     elevator_shafts: list[Shaft] = Field(default_factory=list)
     mech_rooms: list[Room] = Field(default_factory=list)
+    # Open-form metadata. Used by intake to record source page index +
+    # synthesized flag (gap-filled levels), and by downstream UI to
+    # tag levels in reports.
+    metadata: dict = Field(default_factory=dict)
 
 
 class Building(BaseModel):

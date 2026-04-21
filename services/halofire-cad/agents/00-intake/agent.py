@@ -826,6 +826,95 @@ def _unsupported_dwg(path: str, project_id: str) -> Building:
     })
 
 
+def _fill_floor_gaps(
+    levels: list[Level],
+    plan_page_indices: list[int],
+    metadata: dict,
+    pdf_path: str,
+) -> list[Level]:
+    """If pages were dropped between two kept floors, fabricate clone
+    levels at the missing elevations. CubiCasa frequently fumbles a
+    residential floor (over-reads dimension hatching, gives 0 rooms);
+    a real building still has that floor, so silently skipping it
+    under-counts heads + bid by 30-50 %. Synthesizing a clone of the
+    median kept floor at the missing elevation keeps the bid honest.
+
+    Strategy:
+      1. Find kept page indices and the rejected ones between them.
+      2. For each contiguous rejected span, generate one clone level
+         per missing page using the deepest-area kept level as
+         template (deepest area = most representative residential
+         footprint).
+      3. Tag clones with `metadata.synthetic=True` so downstream UI /
+         reports show them as "auto-filled" rather than as-built.
+      4. Re-number elevations so the stack is contiguous.
+    """
+    if len(levels) < 1 or not plan_page_indices:
+        return levels
+    kept_pages = sorted(
+        l.metadata.get("source_page_index", 0) for l in levels
+    )
+    page_to_level = {
+        l.metadata.get("source_page_index", 0): l for l in levels
+    }
+    template = max(
+        levels,
+        key=lambda lv: (
+            __import__("shapely.geometry", fromlist=["Polygon"])
+            .Polygon(lv.polygon_m).area
+            if lv.polygon_m and len(lv.polygon_m) >= 3 else 0
+        ),
+    )
+
+    out: list[Level] = []
+    synthetic_count = 0
+    last_kept = min(kept_pages)
+    for page in plan_page_indices:
+        if page in page_to_level:
+            out.append(page_to_level[page])
+            last_kept = page
+            continue
+        if page <= max(kept_pages) and page >= min(kept_pages):
+            # Gap — clone the template
+            from copy import deepcopy
+            clone = deepcopy(template)
+            clone.id = f"level_p{page}_synth"
+            clone.name = f"Floor plan (page {page + 1}, synthesized)"
+            clone.metadata = dict(clone.metadata or {})
+            clone.metadata["synthetic"] = True
+            clone.metadata["source_page_index"] = page
+            # Renumber wall + room ids so they're unique
+            for w in clone.walls:
+                w.id = f"w_p{page}s_{clone.walls.index(w)}"
+            for r in clone.rooms:
+                r.id = f"r_p{page}s_{clone.rooms.index(r)}"
+            out.append(clone)
+            synthetic_count += 1
+    # Renumber elevation contiguously
+    for idx, lv in enumerate(out):
+        lv.elevation_m = float(idx) * 3.0
+        # Renumber stair/elevator shaft elevations too
+        for sh in (lv.stair_shafts + lv.elevator_shafts):
+            sh.bottom_z_m = lv.elevation_m
+            sh.top_z_m = lv.elevation_m + lv.height_m
+    if synthetic_count:
+        metadata["issues"].append({
+            "code": "INTAKE_SYNTHESIZED_LEVELS",
+            "severity": "info",
+            "message": (
+                f"{synthetic_count} level(s) synthesized to fill gaps "
+                f"left by CubiCasa misreads. They clone the median "
+                f"kept floor and are tagged `metadata.synthetic=True` "
+                f"so the estimator can correct upstairs."
+            ),
+            "refs": [
+                lv.id for lv in out if lv.metadata.get("synthetic")
+            ],
+            "source": Path(pdf_path).name,
+        })
+    return out
+
+
 def intake_file(pdf_path: str, project_id: str) -> Building:
     """Scan every page, produce a Building with one Level per detected
     floor-plan page.
@@ -983,7 +1072,18 @@ def intake_file(pdf_path: str, project_id: str) -> Building:
         # an 8-floor building doesn't end up with elevations 24m, 27m,
         # 30m... when its first 8 pages were site plans.
         level.elevation_m = float(len(levels)) * 3.0
+        # Track original page index so we can detect gaps and
+        # synthesize the levels CubiCasa fumbled.
+        level.metadata = level.metadata or {}
+        level.metadata["source_page_index"] = i
         levels.append(level)
+
+    # Gap-fill: when a contiguous span of pages was rejected between
+    # two kept floors, those pages are almost certainly residential
+    # floors CubiCasa misread. Synthesize a clone of the median kept
+    # level for each missing page so the level_count + head_count
+    # tracks reality. Estimator can correct details upstairs.
+    levels = _fill_floor_gaps(levels, plan_page_indices, metadata, pdf_path)
 
     if levels:
         confidence = 0.82 if any(l.rooms for l in levels) else 0.52

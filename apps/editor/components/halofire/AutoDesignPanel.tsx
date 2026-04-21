@@ -209,54 +209,70 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
         // viewport reflects the latest pipeline output.
         clearPreviousAutoDesign()
 
-        // Compute the global bbox of all level polygons so we can
-        // center the building at world origin (CubiCasa outputs
-        // coords in the +X/+Y quadrant; without translation the
-        // whole building sits 80–250 m away from the default 30 m
-        // property line and looks disconnected).
-        const allLevelPts: [number, number][] = []
-        for (const l of design.building?.levels ?? []) {
-          for (const p of l.polygon_m ?? []) allLevelPts.push(p)
-        }
-        const bb = allLevelPts.length > 0
-          ? bboxOf(allLevelPts)
-          : { minX: -15, minY: -15, maxX: 15, maxY: 15 }
-        const cx = (bb.minX + bb.maxX) / 2
-        const cy = (bb.minY + bb.maxY) / 2
-        const rawHalfW = Math.max((bb.maxX - bb.minX) / 2, 10)
-        const rawHalfH = Math.max((bb.maxY - bb.minY) / 2, 10)
-        // Pascal's default OrbitControls + camera at (10,10,10) with
-        // FOV 50 see comfortably out to ~50 m. Anything bigger and
-        // the building either clips or fills the screen with a
-        // micro-detail. Auto-scale so the building's longest side
-        // fits 60 m. This also helps pages misclassified as
-        // 250m-wide site plans land at a viewable size.
-        const TARGET_LONGEST_M = 60
-        const longest = Math.max(rawHalfW, rawHalfH) * 2
-        const scale = longest > TARGET_LONGEST_M
-          ? TARGET_LONGEST_M / longest
-          : 1
-        const halfW = rawHalfW * scale
-        const halfH = rawHalfH * scale
+        // Per-level centering. Each PDF page has walls in a
+        // different part of page-coordinate space, so a global
+        // bbox-center makes each level's polygon land at a
+        // different XY position relative to origin → floors look
+        // stacked but offset laterally. Computing per-level
+        // centroids and shifting each level's geometry by ITS OWN
+        // centroid lines all the floors up under each other,
+        // matching how the real building stacks.
+        //
+        // Render at 1:1 metres. The previous autoscale shrank a
+        // 250 m bbox to 60 m → 0.2 m walls became 0.05 m walls and
+        // pipes became 6 mm specks. Real residential floors are
+        // 30-60 m wide; a camera that can't frame them needs to
+        // dolly back, not shrink the building.
+        const scale = 1.0
         const PAD = 5 // metres of green around the building
-        /** Shift a 2D plan point so the building center is at origin
-         *  AND scale to TARGET_LONGEST_M. SlabNode + WallNode store
-         *  the polygon as [x, z] in three.js plan coords already, so
-         *  this is a 1:1 axis map. */
-        const T2 = (p: [number, number]): [number, number] => [
-          (p[0] - cx) * scale, (p[1] - cy) * scale,
-        ]
-        /** Convert a plan 3D point (X right, Y forward, Z up) to
-         *  Pascal/three.js order (X right, Y UP, Z forward). Without
-         *  this the building lies on its side: plan-Y becomes
-         *  height and elevation becomes depth, so a 130 m horizontal
-         *  cross-main reads as a 130 m vertical pipe through the
-         *  ground. */
-        const T3 = (p: [number, number, number]): [number, number, number] => [
-          (p[0] - cx) * scale,  // plan X → three.js X
-          p[2] * scale,          // plan Z (elevation) → three.js Y (UP)
-          (p[1] - cy) * scale,  // plan Y → three.js Z
-        ]
+        // Per-level centroid map: levelId → [cx, cy]
+        const levelCenter: Map<string, [number, number]> = new Map()
+        for (const l of design.building?.levels ?? []) {
+          const pts = l.polygon_m ?? []
+          if (pts.length < 1) {
+            levelCenter.set(l.id, [0, 0])
+            continue
+          }
+          const bb = bboxOf(pts)
+          levelCenter.set(l.id, [
+            (bb.minX + bb.maxX) / 2,
+            (bb.minY + bb.maxY) / 2,
+          ])
+        }
+        // Global anchor = centroid of the FIRST level's centroid, so
+        // ground floor is centered at origin and upper floors stack
+        // by elevation alone.
+        const firstLevelId = (design.building?.levels ?? [])[0]?.id ?? ''
+        const [gx, gy] = levelCenter.get(firstLevelId) ?? [0, 0]
+        // Site polygon size = bbox of FIRST level's polygon (the
+        // actual ground footprint).
+        const firstLevelPts = (design.building?.levels ?? [])[0]?.polygon_m ?? []
+        const firstBB = firstLevelPts.length
+          ? bboxOf(firstLevelPts)
+          : { minX: -15, minY: -15, maxX: 15, maxY: 15 }
+        const halfW = Math.max((firstBB.maxX - firstBB.minX) / 2, 10)
+        const halfH = Math.max((firstBB.maxY - firstBB.minY) / 2, 10)
+
+        /** Shift a 2D plan point by THIS LEVEL's centroid so the
+         *  level lands centered at origin. */
+        const T2 = (
+          p: [number, number], levelId: string,
+        ): [number, number] => {
+          const [lcx, lcy] = levelCenter.get(levelId) ?? [gx, gy]
+          return [(p[0] - lcx) * scale, (p[1] - lcy) * scale]
+        }
+        /** Convert a plan 3D point to three.js (Y-up) AND shift by
+         *  the matching level's centroid. */
+        const T3 = (
+          p: [number, number, number], levelId: string,
+        ): [number, number, number] => {
+          const [lcx, lcy] = levelCenter.get(levelId) ?? [gx, gy]
+          return [
+            (p[0] - lcx) * scale,
+            p[2] * scale,
+            (p[1] - lcy) * scale,
+          ]
+        }
 
         // Resize the existing Site polygon so the ground grid wraps
         // the whole building. Pascal draws its property line at z=0
@@ -354,7 +370,7 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
           try {
             const slab = SlabNode.parse({
               name: `${lvl.name} slab`,
-              polygon: (lvl.polygon_m ?? []).map(T2),
+              polygon: (lvl.polygon_m ?? []).map((p) => T2(p, lvl.id)),
               elevation: Math.max(0.05, lvl.elevation_m || 0.05),
               parentId: pascalLevelId,
               metadata: { tags: ['halofire', 'slab', 'auto_design'] },
@@ -372,8 +388,8 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
           for (const w of lvlWalls) {
             try {
               const wallNode = WallNode.parse({
-                start: T2(w.start_m),
-                end: T2(w.end_m),
+                start: T2(w.start_m, lvl.id),
+                end: T2(w.end_m, lvl.id),
                 thickness: w.thickness_m ?? 0.2,
                 height: w.height_m ?? 3.0,
                 parentId: pascalLevelId,
@@ -388,6 +404,26 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
             }
           }
         })
+
+        /** Find the architectural level id (design.json key) whose
+         *  elevation band contains z. Used to look up the matching
+         *  per-level centroid when re-centering heads + pipes. */
+        const archLevelForZ = (z: number): string => {
+          let best = (design.building?.levels ?? [])[0]?.id ?? ''
+          let bestDist = Infinity
+          for (const l of design.building?.levels ?? []) {
+            const top = l.elevation_m + (l.height_m ?? 3.0)
+            if (z >= l.elevation_m - 0.5 && z <= top + 0.5) return l.id
+            const d = Math.min(
+              Math.abs(z - l.elevation_m), Math.abs(z - top),
+            )
+            if (d < bestDist) {
+              bestDist = d
+              best = l.id
+            }
+          }
+          return best
+        }
 
         /** Route a head/pipe to the Pascal level whose elevation band
          *  contains its Z coordinate. Falls back to the nearest level. */
@@ -417,7 +453,7 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
                 {
                   id: generateId('item'),
                   type: 'item',
-                  position: T3(h.position_m),
+                  position: T3(h.position_m, archLevelForZ(h.position_m[2])),
                   rotation: [0, 0, 0],
                   scale: [1, 1, 1],
                   children: [],
@@ -455,9 +491,14 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
           for (const p of sys.pipes ?? []) {
             if (pipesSpawned >= MAX_PIPES_VIEWPORT) break
             try {
-              // Plan midpoint (cx/cy = building bbox center)
-              const mx_plan = (p.start_m[0] + p.end_m[0]) / 2 - cx
-              const my_plan = (p.start_m[1] + p.end_m[1]) / 2 - cy
+              // Plan midpoint, recentered on the matching arch
+              // level's centroid so the pipe lands above its slab.
+              const archId = archLevelForZ(
+                (p.start_m[2] + p.end_m[2]) / 2,
+              )
+              const [pcx, pcy] = levelCenter.get(archId) ?? [gx, gy]
+              const mx_plan = (p.start_m[0] + p.end_m[0]) / 2 - pcx
+              const my_plan = (p.start_m[1] + p.end_m[1]) / 2 - pcy
               const mz_plan = (p.start_m[2] + p.end_m[2]) / 2
               const dx = p.end_m[0] - p.start_m[0]
               const dy = p.end_m[1] - p.start_m[1]
