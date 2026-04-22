@@ -1,5 +1,102 @@
 # Changelog
 
+All notable changes to HaloFire Studio are documented here.
+Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+## [0.1.0] — 2026-04-21 (planned)
+
+First public ship of HaloFire Studio — a Tauri 2 desktop CAD app for
+fire-protection engineers (sprinkler, standpipe, FDC, riser) that
+goes from architect PDF → bid-ready submittal in one tool.
+
+### Added
+
+- **Pascal fork — 12 first-class fire-protection node types.**
+  `SprinklerHead`, `Pipe`, `System`, `Fitting`, `Valve`, `Hanger`,
+  `Device`, `FDC`, `RiserAssembly`, `RemoteArea`, `Obstruction`,
+  `Sheet`. All are typed end-to-end (TypeScript schema +
+  Python Pydantic dataclass + round-trip golden fixtures).
+- **Python CAD pipeline — 10 stages** streaming back Design slices:
+  `intake → classify → place → route → hydraulic → rulecheck →
+  bom → labor → proposal → submittal`. Each stage is a pure
+  function with property tests; the pipeline is re-runnable per
+  slice so LiveCalc can reflect upstream edits without a full
+  re-solve.
+- **40-part OpenSCAD-authored catalog** with annotation parser,
+  generated `catalog.json`, and a consumer-side `CatalogPanel`
+  (thumbnail tile, searchable facets, drag-to-place).
+- **`.hfproj` project file format** — single-file atomic saves with
+  crash-recovery autosave, undo/redo history, and embedded IFC +
+  catalog version stamps for reproducibility.
+- **Tauri 2 desktop shell** — Rust IPC front door over a Python
+  sidecar (CAD pipeline) and an OpenSCAD subprocess (catalog
+  rebuild). Zero `localhost:*` at runtime; everything is IPC
+  channels, so the app runs air-gapped on field laptops.
+- **Sheet-set renderer** — `SheetNode` → title-block SVG →
+  viewport raster → bound PDF submittal. Additional DXF
+  (paper-space + dims) and DWG (via bundled ODA File Converter,
+  with placeholder fallback) exports for plan-check workflows.
+- **Auto-Design** — drop an architect PDF and get a compliant
+  sprinkler plan within spec tolerance. Against the 1881 truth
+  fixture: `head_count` 0.8% under, `bid` 10.5% over,
+  `system_count` exact, `level_count` exact.
+- **Pascal tools (native editor feel)** — sprinkler place, pipe
+  route, dimension, text, revision-cloud.
+  `InstancedCatalogRenderer` holds 60fps at 1500+ heads.
+- **Testing** — 403 Python tests, 274 Playwright tests, a
+  TypeScript ↔ Python parity CI that keeps both sides of the
+  schema bit-identical on golden fixtures.
+
+### Changed
+
+- Upgraded Next.js build to Turbopack with `turbopackIgnore` hints
+  so the Node fallback in `@halofire/core`'s catalog loader no
+  longer leaks into the client bundle NFT trace.
+- Migrated all Biome lint suppressions to current-reason comments;
+  repo-wide `bun run lint` now reports zero warnings and zero
+  infos.
+
+### Fixed
+
+- PDF intake path no longer skips `level.polygon_m` wall-polygon
+  computation (symptom: FP-N sheets, Studio slab renderer, and
+  IFC export silently drew nothing). DXF and PDF paths now share
+  the same post-walls polygon step. See `[0.4.1]` entry below.
+- 12-test golden intake suite (`tests/golden/intake/`) locks in
+  the PDF → `design.json` mapping so regressions surface the next
+  time a schema changes.
+
+### Known limitations
+
+- **Real second-project validation pending real customer PDF.**
+  Scaffold proven against the synthetic `gomez-warehouse-az`
+  fixture (f89b199). Ship gate DoD-#11 will close with the first
+  real customer intake.
+- **Clean-VM MSI install smoke is manual-only.** Ship gate
+  DoD-#12 will close with the first tagged release artifact's
+  `install → launch → open example → build submittal` pass on a
+  bare Windows 11 VM.
+- **Cold-launch time unmeasured.** DoD-#4 closes once we have
+  the first Tauri `.msi` artifact to stopwatch.
+- **LiveCalc hydraulic is re-READ, not re-SOLVE.** Edits to
+  upstream inputs update the panel's display but do not re-run
+  the solver. See `docs/CODEX_SWEEP_READY.md` Q1.
+- **OpenSCAD on Apple Silicon ships x86 2021.01 via Rosetta.**
+  Native arm64 OpenSCAD is still upstream-unreleased. See
+  `docs/CODEX_SWEEP_READY.md` Q2.
+
+### Upgrade notes
+
+- First release — no upgrade path. Clean install.
+- `.hfproj` schema is frozen at `schema_version: 1`. Backward-
+  compatible schema changes land in 0.1.x; breaking schema
+  changes bump to 0.2.0 with an in-app migrator.
+
+## Pre-release history
+
 ## [0.4.1] — 2026-04-20 — honest real-plan intake + 12-test golden suite
 
 User caught a ship-breaking lie: the loop-4 "viewport populate"

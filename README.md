@@ -15,16 +15,23 @@ blueprints in [`docs/blueprints/`](docs/blueprints/).
 
 ## Ship state (2026-04-21)
 
-- **48 of 53** ship-gate commits shipped (91%). Every code-authorable row is
-  closed. Three remaining rows (`R10.6`, `R11.2`, `R11.3`) are externally
-  blocked on a clean-VM install run and a second real bid PDF.
+- **49 of 53** ship-gate commits shipped (92%). Every code-authorable row is
+  closed. Four remaining rows (`R10.6`, `R11.2`, `R11.3`, `DoD-#4` cold-launch)
+  are externally blocked on a clean-VM install run, a second real bid PDF,
+  and the first tagged Tauri artifact.
 - **Cruel-test scoreboard vs. 1881 truth:** 4 of 4 metrics green
   (head_count 1,293/1,303 ≈ −0.8 %; total_bid $595k/$538k ≈ +10.5 %;
   system_count 7/7 exact; level_count 6/6 exact).
 - **Tests:**
-  - Python (`services/halofire-cad/tests/`): ~370 PASS / 2 SKIP across 43 files.
-  - Playwright (`apps/editor/e2e/`): ~160+ PASS across 20 specs.
+  - Python (`services/halofire-cad/tests/`): 403 PASS across 43+ files.
+  - Playwright (`apps/editor/e2e/`): 274 PASS / 1 SKIP across 20 specs.
   - Rust (`apps/halofire-studio-desktop/src-tauri/`): cargo test smoke.
+- **Lint:** repo-wide `bun run lint` reports 0 warnings, 0 infos
+  (post lint-sweep, 2026-04-21).
+- Release pipeline: see [`CHANGELOG.md`](CHANGELOG.md) for the
+  `[0.1.0]` entry and
+  [`docs/RELEASE_NOTES_v0.1.0.md`](docs/RELEASE_NOTES_v0.1.0.md)
+  for the ship note.
 - Full ledger: [`docs/SHIP_REPORT_FINAL.md`](docs/SHIP_REPORT_FINAL.md).
 
 ## Repo layout
