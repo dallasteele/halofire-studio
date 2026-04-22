@@ -546,7 +546,15 @@ async def calculate_design(
     out = _safe_project_dir(project_id) / "deliverables" / "hydraulic_report.json"
     out.write_text(json.dumps(report, indent=2, default=str), encoding="utf-8")
     design.deliverables.files["hydraulic_report"] = str(out)
-    _write_design(project_id, design)
+    # Phase A.1 — round-trip through the single_ops path so the
+    # per-pipe / per-head ``node_trace`` fields land on the scene
+    # graph. We already computed the hydraulic result above; here we
+    # just persist it onto the design dict and write that to disk.
+    design_dict = json.loads(design.model_dump_json())
+    single_ops._persist_node_trace(design_dict, design, None)
+    _design_file(project_id).write_text(
+        json.dumps(design_dict, indent=2, default=str), encoding="utf-8",
+    )
     return report
 
 
@@ -1151,6 +1159,133 @@ async def sop_redo(project_id: str, request: Request) -> DeltaResponse:
     if delta is None:
         raise HTTPException(409, "nothing to redo")
     return DeltaResponse(op="redo", delta=delta.to_dict())
+
+
+# ── Phase A.1 — Auto-peak + hydraulic report ────────────────────────
+
+
+class AutoPeakBody(BaseModel):
+    candidates: list[list[_Point2]] | None = None
+    system_id: str | None = None
+    supply: dict[str, Any] | None = None
+    hazard: str | None = None
+
+
+@app.post("/projects/{project_id}/auto-peak")
+async def sop_auto_peak(
+    project_id: str, body: AutoPeakBody | None, request: Request,
+) -> dict[str, Any]:
+    """Server-side worst-case remote-area selector (Phase A.1).
+
+    Iterates candidate polygons (or 4 default quadrant windows around
+    the head cloud's bounding box), runs the hydraulic solver on each,
+    picks the worst (lowest residual pressure), and persists that
+    polygon as the active ``remote_area`` on the scene graph.
+
+    Emits both ``scene_delta`` (so generic SSE consumers refresh) and
+    ``auto_peak`` (so the Phase C ribbon can highlight the chosen
+    window in the viewport).
+    """
+    _require_api_key(request)
+    body = body or AutoPeakBody()
+    store = _store(project_id)
+    candidates = None
+    if body.candidates:
+        candidates = [[p.as_tuple() for p in poly] for poly in body.candidates]
+
+    def _do(d: dict[str, Any]) -> SceneDelta:
+        result = single_ops.auto_peak(
+            d, candidates=candidates, supply=body.supply,
+            hazard_override=body.hazard, system_id=body.system_id,
+        )
+        # Stash the full candidate list on the scene under a well-known
+        # key so the UI can re-paint without re-running the solve.
+        d.setdefault("metadata", {})
+        d["metadata"]["last_auto_peak"] = {
+            "system_id": result["system_id"],
+            "chosen_residual_psi": result["residual_psi"],
+            "chosen_flow_gpm": result["flow_gpm"],
+            "all_candidates": result["all_candidates"],
+        }
+        # Carry the result through the mutate() closure so the outer
+        # handler can return the full payload to the client.
+        _do.result = result  # type: ignore[attr-defined]
+        ra_id = result["chosen_area"].get("id")
+        return SceneDelta(
+            changed_nodes=[result["system_id"]],
+            added_nodes=[ra_id] if ra_id else [],
+            recalc={"auto_peak": {
+                "chosen_area": result["chosen_area"],
+                "residual_psi": result["residual_psi"],
+                "flow_gpm": result["flow_gpm"],
+            }},
+        )
+
+    try:
+        delta, event = store.mutate("auto_peak", _actor(request), _do)
+    except (ValueError, KeyError) as e:
+        raise HTTPException(400, str(e))
+    result = getattr(_do, "result")
+    # Dedicated auto_peak event so the Ribbon can react without having
+    # to sniff every scene_delta for the recalc.auto_peak key.
+    get_event_bus().emit(project_id, {
+        "kind": "auto_peak",
+        "seq": event.seq,
+        "chosen_area": result["chosen_area"],
+        "residual_psi": result["residual_psi"],
+        "flow_gpm": result["flow_gpm"],
+        "all_candidates": result["all_candidates"],
+    })
+    return {
+        "ok": True,
+        "op": "auto_peak",
+        "seq": event.seq,
+        "chosen_area": result["chosen_area"],
+        "residual_psi": result["residual_psi"],
+        "flow_gpm": result["flow_gpm"],
+        "demand_psi": result.get("demand_psi"),
+        "all_candidates": result["all_candidates"],
+        "system_id": result["system_id"],
+    }
+
+
+@app.post("/projects/{project_id}/reports/hydraulic")
+async def regen_hydraulic_report(
+    project_id: str, request: Request,
+) -> dict[str, Any]:
+    """Regenerate ``hydraulic_report.pdf`` from the current JSON report.
+
+    Looks for ``hydraulic_report.json`` first (written by /calculate),
+    then ``nfpa_report.json`` (written by the submittal agent). Fails
+    with 404 if neither is present — run /calculate or the full
+    pipeline first.
+    """
+    _require_api_key(request)
+    _safe_project_id(project_id)
+    deliverables = _safe_project_dir(project_id) / "deliverables"
+    for candidate in ("nfpa_report.json", "hydraulic_report.json"):
+        src = deliverables / candidate
+        if src.exists():
+            break
+    else:
+        raise HTTPException(
+            404,
+            "no hydraulic_report.json / nfpa_report.json — run /calculate "
+            "or the full pipeline first",
+        )
+    pdf_path = deliverables / "hydraulic_report.pdf"
+    import hydraulic_report_pdf as _hrp
+    try:
+        _hrp.render_hydraulic_report_pdf(src, pdf_path, project_id=project_id)
+    except Exception as e:  # pragma: no cover — defensive
+        raise HTTPException(500, f"pdf render failed: {e}")
+    return {
+        "ok": True,
+        "project_id": project_id,
+        "source_json": str(src.name),
+        "pdf_path": f"/projects/{project_id}/deliverable/hydraulic_report.pdf",
+        "bytes": pdf_path.stat().st_size,
+    }
 
 
 @app.get("/projects/{project_id}/events")

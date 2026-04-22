@@ -426,6 +426,36 @@ def export_all(design: Design, out_dir: Path,
     except (IOError, OSError, ValueError, RuntimeError, TypeError, AttributeError) as e:
         warn_swallowed(log, code="IFC_EXPORT_FAILED", err=e)
         paths["ifc_error"] = str(e)
+    # Phase A.1 — hydraulic report PDF. Generated alongside the other
+    # deliverables when the gateway's renderer is importable AND an
+    # NFPA/hydraulic JSON is present in out_dir. Failure is soft so
+    # the rest of the submittal bundle still lands on disk.
+    try:
+        import importlib.util as _ilu
+        from pathlib import Path as _P
+        _src = None
+        for cand in ("nfpa_report.json", "hydraulic_report.json"):
+            p = out_dir / cand
+            if p.exists():
+                _src = p
+                break
+        if _src is not None:
+            gateway_root = _P(__file__).resolve().parents[3] / "halopenclaw-gateway"
+            _renderer_path = gateway_root / "hydraulic_report_pdf.py"
+            if _renderer_path.is_file():
+                _rspec = _ilu.spec_from_file_location(
+                    "hydraulic_report_pdf", _renderer_path,
+                )
+                if _rspec and _rspec.loader:
+                    _rmod = _ilu.module_from_spec(_rspec)
+                    _rspec.loader.exec_module(_rmod)
+                    pdf_out = out_dir / "hydraulic_report.pdf"
+                    _rmod.render_hydraulic_report_pdf(_src, pdf_out)
+                    paths["hydraulic_report_pdf"] = str(pdf_out)
+    except Exception as e:  # noqa: BLE001
+        warn_swallowed(log, code="HYDRAULIC_PDF_FAILED", err=e)
+        paths["hydraulic_report_pdf_error"] = str(e)
+
     try:
         # DWG pipeline needs a DXF on disk; use the one we just emitted.
         if dxf_path.exists():

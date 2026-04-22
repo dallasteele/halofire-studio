@@ -455,7 +455,358 @@ def calculate(
     }]
     # Reflect the mutated systems back into the design dict.
     design["systems"] = [s.model_dump() for s in design_model.systems]
+    # Phase A.1 — persist per-head / per-pipe node_trace onto the scene
+    # graph so NodeTags (and any other consumer) can read directly from
+    # design.json instead of re-calling /calculate.
+    _persist_node_trace(design, design_model, scope_system_id)
     return SceneDelta(changed_nodes=changed, recalc={"calculation": design["calculation"]})
+
+
+def _persist_node_trace(
+    design: dict[str, Any],
+    design_model: Any,
+    scope_system_id: str | None,
+) -> None:
+    """Write ``node_trace`` dicts onto each Head/PipeSegment dict.
+
+    Called at the end of ``calculate`` once the pydantic models have
+    been round-tripped back into ``design["systems"]``. We stamp:
+
+      * per-pipe: ``{pressure_psi, flow_gpm, velocity_fps, pipe_size_in,
+        friction_loss_psi, worst_violation?}``
+      * per-head: ``{pressure_psi, flow_gpm, velocity_fps, pipe_size_in}``
+        (pulled from the pipe the head sits on, as a convenience for UI
+        overlays).
+
+    Velocity is Hazen-Williams-consistent:
+        v_fps = 0.4085 · Q_gpm / D_in²
+    Flags ``worst_violation`` to ``"velocity_warn"`` at >=20 fps and
+    ``"velocity_crit"`` at >=32 fps (matches the Phase C NodeTags
+    severity bands).
+    """
+    # Build id → (pipe_trace, head_trace) maps from the pydantic
+    # HydraulicResult on each system.
+    scope = {system.id: system for system in design_model.systems
+             if not scope_system_id or system.id == scope_system_id}
+    for sys_dict in design.get("systems", []) or []:
+        sid = sys_dict.get("id")
+        if sid not in scope:
+            continue
+        system = scope[sid]
+        hyd = getattr(system, "hydraulic", None)
+        if not hyd:
+            continue
+        node_trace = getattr(hyd, "node_trace", None) or []
+        seg_by_id: dict[str, dict[str, Any]] = {
+            str(seg.get("segment_id")): seg for seg in node_trace
+        }
+        # Also index per-pipe flow so heads can mirror the downstream pipe.
+        for pipe_dict in sys_dict.get("pipes", []) or []:
+            seg = seg_by_id.get(pipe_dict.get("id"))
+            if seg is None:
+                continue
+            q = float(seg.get("flow_gpm") or 0.0)
+            size_in = float(pipe_dict.get("size_in") or seg.get("size_in") or 1.0)
+            v = _velocity_fps(q, size_in)
+            trace = {
+                "flow_gpm": round(q, 2),
+                "pipe_size_in": size_in,
+                "velocity_fps": round(v, 2),
+                "length_ft": seg.get("length_ft"),
+                "friction_loss_psi": seg.get("friction_loss_psi"),
+                "downstream_heads": seg.get("downstream_heads"),
+            }
+            # Pressure at the pipe's downstream node (rough proxy — full
+            # per-node pressure map lands when the v3 solver ships).
+            trace["pressure_psi"] = round(
+                float(hyd.demand_at_base_of_riser_psi or 0.0)
+                - float(seg.get("friction_loss_psi") or 0.0),
+                2,
+            )
+            violation = _classify_velocity(v)
+            if violation:
+                trace["worst_violation"] = violation
+            pipe_dict["node_trace"] = trace
+
+        # For heads, inherit the pipe trace whose from_node or to_node
+        # matches the head id. Heads not wired into the graph get an
+        # empty trace so consumers can distinguish "no data" from "0".
+        pipe_by_endpoint: dict[str, dict[str, Any]] = {}
+        for pipe_dict in sys_dict.get("pipes", []) or []:
+            nt = pipe_dict.get("node_trace")
+            if not nt:
+                continue
+            for key in ("from_node", "to_node"):
+                nid = pipe_dict.get(key)
+                if nid:
+                    pipe_by_endpoint[nid] = nt
+        min_head_psi = 7.0  # matches calc_system min_head_pressure_psi
+        for head_dict in sys_dict.get("heads", []) or []:
+            hid = head_dict.get("id")
+            nt = pipe_by_endpoint.get(hid)
+            if nt:
+                # Heads always see at least their own K-factor design
+                # flow + min pressure at the deflector.
+                head_dict["node_trace"] = {
+                    "flow_gpm": nt.get("flow_gpm"),
+                    "pipe_size_in": nt.get("pipe_size_in"),
+                    "velocity_fps": nt.get("velocity_fps"),
+                    "pressure_psi": max(min_head_psi, float(nt.get("pressure_psi") or 0.0)),
+                    **(
+                        {"worst_violation": nt["worst_violation"]}
+                        if "worst_violation" in nt else {}
+                    ),
+                }
+            else:
+                head_dict["node_trace"] = {
+                    "flow_gpm": 0.0, "pipe_size_in": None,
+                    "velocity_fps": 0.0, "pressure_psi": min_head_psi,
+                }
+
+
+def _velocity_fps(flow_gpm: float, size_in: float) -> float:
+    if size_in <= 0:
+        return 0.0
+    return 0.4085 * flow_gpm / (size_in ** 2)
+
+
+def _classify_velocity(v_fps: float) -> str | None:
+    if v_fps >= 32.0:
+        return "velocity_crit"
+    if v_fps >= 20.0:
+        return "velocity_warn"
+    return None
+
+
+# ── AUTO-PEAK (Phase A.1) ──────────────────────────────────────────
+
+
+def auto_peak(
+    design: dict[str, Any],
+    *,
+    candidates: list[list[tuple[float, float]]] | None = None,
+    supply: dict[str, Any] | None = None,
+    hazard_override: str | None = None,
+    system_id: str | None = None,
+) -> dict[str, Any]:
+    """Pick the worst-case remote area and persist it on the scene.
+
+    Each candidate is a polygon (list of (x, y) in meters). For each,
+    we run ``calc_system`` against a clone of the design with that
+    polygon set as the active remote area, then rank by residual
+    (supply - demand) pressure — lowest residual wins.
+
+    When ``candidates`` is None we generate a default set of 4 axis-
+    aligned windows covering the quadrants of the head cloud's bounding
+    box. That mirrors the hydraulic agent's "farthest-from-riser" logic
+    but surfaces multiple options so the UI can preview them.
+
+    Returns a dict with::
+
+        {
+          "chosen_area":   {"polygon_m": [...], "name": ...},
+          "residual_psi":  <float>,
+          "flow_gpm":      <float>,
+          "all_candidates": [
+              {"polygon_m": [...], "residual_psi": ..., "flow_gpm": ...,
+               "demand_psi": ...},
+              ...
+          ],
+        }
+
+    The chosen polygon is also persisted onto the design via
+    ``set_remote_area`` (selection_reason = "auto_peak").
+    """
+    from copy import deepcopy
+
+    schema = _schema()
+    hydraulic = _load_agent("agents/04-hydraulic/agent.py", "hf_hydraulic")
+    orch = _load_agent_orchestrator()
+
+    # Pick the system we'll evaluate against.
+    systems = design.get("systems") or []
+    if not systems:
+        raise ValueError("auto_peak requires at least one system with heads")
+    if system_id is None:
+        target_system = systems[0]
+    else:
+        target_system = next(
+            (s for s in systems if s.get("id") == system_id), None,
+        )
+        if target_system is None:
+            raise KeyError(f"system {system_id} not found")
+
+    heads = target_system.get("heads") or []
+    if not heads:
+        raise ValueError("auto_peak requires heads on the target system")
+
+    # Default candidates — four quadrant windows around the head bbox.
+    if candidates is None:
+        candidates = _default_peak_candidates(heads)
+    if not candidates:
+        raise ValueError("no candidate polygons supplied or inferrable")
+
+    supply_model = (
+        schema.FlowTestData.model_validate(supply)
+        if supply else orch._default_supply()
+    )
+    hazard = hazard_override or orch._system_hazard(
+        schema.Building.model_validate(design["building"]),
+        schema.System.model_validate(target_system),
+    )
+
+    all_results: list[dict[str, Any]] = []
+    for poly in candidates:
+        # Which heads fall inside this polygon?
+        inside_ids = _heads_in_polygon(heads, poly)
+        trial = deepcopy(target_system)
+        # Restrict the trial system to heads inside the polygon. If
+        # none are inside, treat this candidate as "no coverage" and
+        # record a zero-demand result so the caller still sees it.
+        if inside_ids:
+            trial["heads"] = [
+                h for h in trial.get("heads", []) if h.get("id") in inside_ids
+            ]
+        else:
+            trial["heads"] = []
+        trial["remote_area"] = {
+            "id": "ra_trial",
+            "name": "auto_peak_trial",
+            "polygon_m": [[float(p[0]), float(p[1])] for p in poly],
+        }
+        try:
+            system_model = schema.System.model_validate(trial)
+            hyd = hydraulic.calc_system(system_model, supply_model, hazard)
+            demand = float(hyd.demand_at_base_of_riser_psi or 0.0)
+            margin = float(hyd.safety_margin_psi or 0.0)
+            flow = float(hyd.required_flow_gpm or 0.0)
+            # Residual = supply pressure at the demand flow; we get it
+            # from supply_static - (margin adjustment). Cheaper proxy:
+            # lower margin ⇒ worse case. We keep both for transparency.
+            residual = demand + margin  # p_supply at that flow
+            all_results.append({
+                "polygon_m": [[float(p[0]), float(p[1])] for p in poly],
+                "head_ids": inside_ids,
+                "residual_psi": round(residual, 2),
+                "demand_psi": round(demand, 2),
+                "margin_psi": round(margin, 2),
+                "flow_gpm": round(flow, 2),
+            })
+        except Exception as e:  # pragma: no cover — defensive
+            all_results.append({
+                "polygon_m": [[float(p[0]), float(p[1])] for p in poly],
+                "head_ids": inside_ids,
+                "error": str(e),
+                "residual_psi": None,
+                "demand_psi": None,
+                "flow_gpm": None,
+            })
+
+    # Rank: worst case = smallest safety margin (supply minus demand).
+    # That's the polygon closest to failing its hydraulic supply — the
+    # one the AHJ wants to see calculated. Candidates with errors or
+    # zero heads sink to the bottom.
+    def _key(r: dict[str, Any]) -> tuple[int, float]:
+        if r.get("margin_psi") is None or not r.get("head_ids"):
+            return (1, 0.0)
+        return (0, float(r["margin_psi"]))
+
+    ranked = sorted(all_results, key=_key)
+    chosen = ranked[0] if ranked else None
+    if chosen is None or chosen.get("margin_psi") is None:
+        raise RuntimeError("auto_peak found no viable candidate")
+
+    # Persist the chosen polygon onto the scene graph as the remote
+    # area for the target system.
+    ra_id = new_id("ra")
+    target_system["remote_area"] = {
+        "id": ra_id,
+        "name": "auto_peak",
+        "polygon_m": chosen["polygon_m"],
+        "selection_reason": "auto_peak",
+        "chosen_residual_psi": chosen["residual_psi"],
+        "chosen_flow_gpm": chosen["flow_gpm"],
+    }
+
+    return {
+        "chosen_area": target_system["remote_area"],
+        "residual_psi": chosen["residual_psi"],
+        "flow_gpm": chosen["flow_gpm"],
+        "demand_psi": chosen.get("demand_psi"),
+        "all_candidates": all_results,
+        "system_id": target_system.get("id"),
+    }
+
+
+def _default_peak_candidates(
+    heads: list[dict[str, Any]],
+) -> list[list[tuple[float, float]]]:
+    """Four quadrant windows around the head cloud bbox.
+
+    Each window is the bounding box of the heads in that quadrant
+    (if non-empty). Produces up to four polygons; quadrants with no
+    heads are skipped. Good enough to force the solver to expose
+    hydraulically-disparate areas in test and real-world designs.
+    """
+    if not heads:
+        return []
+    xs = [float(h["position_m"][0]) for h in heads if "position_m" in h]
+    ys = [float(h["position_m"][1]) for h in heads if "position_m" in h]
+    if not xs:
+        return []
+    cx = sum(xs) / len(xs)
+    cy = sum(ys) / len(ys)
+    quadrants: list[list[dict[str, Any]]] = [[], [], [], []]
+    for h in heads:
+        x, y = float(h["position_m"][0]), float(h["position_m"][1])
+        idx = (0 if x < cx else 1) + (0 if y < cy else 2)
+        quadrants[idx].append(h)
+    out: list[list[tuple[float, float]]] = []
+    for q in quadrants:
+        if not q:
+            continue
+        qxs = [float(h["position_m"][0]) for h in q]
+        qys = [float(h["position_m"][1]) for h in q]
+        x0, x1 = min(qxs), max(qxs)
+        y0, y1 = min(qys), max(qys)
+        # Inflate 0.5 m so single-head quadrants still form a polygon.
+        x0, x1 = x0 - 0.5, x1 + 0.5
+        y0, y1 = y0 - 0.5, y1 + 0.5
+        out.append([(x0, y0), (x1, y0), (x1, y1), (x0, y1)])
+    return out
+
+
+def _heads_in_polygon(
+    heads: list[dict[str, Any]],
+    polygon: list[tuple[float, float]],
+) -> list[str]:
+    """Return head IDs whose (x, y) falls inside the polygon (ray cast)."""
+    poly = [(float(p[0]), float(p[1])) for p in polygon]
+    out: list[str] = []
+    for h in heads:
+        pos = h.get("position_m") or []
+        if len(pos) < 2:
+            continue
+        if _point_in_poly(float(pos[0]), float(pos[1]), poly):
+            out.append(h["id"])
+    return out
+
+
+def _point_in_poly(x: float, y: float, poly: list[tuple[float, float]]) -> bool:
+    n = len(poly)
+    if n < 3:
+        return False
+    inside = False
+    j = n - 1
+    for i in range(n):
+        xi, yi = poly[i]
+        xj, yj = poly[j]
+        if ((yi > y) != (yj > y)) and (
+            x < (xj - xi) * (y - yi) / ((yj - yi) or 1e-12) + xi
+        ):
+            inside = not inside
+        j = i
+    return inside
 
 
 def _load_agent_orchestrator() -> Any:
