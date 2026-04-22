@@ -173,3 +173,19 @@ test commands are documented and should be green.
 ```
 
 Session complete.
+
+---
+
+## Release invocation
+
+When ready to ship v0.1.0 — after the post-Codex lint sweep +
+CHANGELOG land and the repo is committed clean:
+
+```
+bash scripts/release.sh v0.1.0
+```
+
+The script validates the tag format, checks the working tree is
+clean, creates an annotated tag, and pushes it to `origin`. The
+tag push triggers `.github/workflows/build-desktop.yml` to produce
+the MSI / DMG / AppImage matrix on the release page.
