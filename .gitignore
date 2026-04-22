@@ -79,3 +79,7 @@ services/halofire-cad/truth/truth.duckdb
 
 # Claude Code / agent worktrees
 .claude/worktrees/
+
+# Phase D.4.A render artifacts (regenerated each run)
+packages/halofire-catalog/assets/glb/.render_report.json
+packages/halofire-catalog/assets/glb/.render_cache.json
