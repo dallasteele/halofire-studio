@@ -93,6 +93,41 @@ def default_audit_log() -> Path:
     return _HERE / "data" / "enrichment_audit.jsonl"
 
 
+# ── SSE fan-out ─────────────────────────────────────────────────────
+#
+# Phase H.4 — the Studio's CatalogPanel subscribes to the gateway's SSE
+# event bus on a reserved `_catalog` project id. When the orchestrator
+# finishes a SKU (success, fallback, or failure), we load that SKU's
+# record from `enriched.json` and emit it on that topic so every open
+# tab converges without polling. This is best-effort: the event bus is
+# imported lazily so running the orchestrator as a standalone script
+# (outside FastAPI) doesn't require the scene_store side-effect module.
+
+_CATALOG_SSE_TOPIC = "_catalog"
+
+
+def _emit_catalog_enriched(enriched_path: Path, sku_id: str) -> None:
+    if not sku_id:
+        return
+    try:
+        from scene_store import get_event_bus  # type: ignore
+    except Exception:  # pragma: no cover - best effort
+        return
+    try:
+        if not enriched_path.exists():
+            return
+        doc = json.loads(enriched_path.read_text(encoding="utf-8"))
+        record = (doc.get("entries") or {}).get(sku_id)
+        if record is None:
+            return
+        get_event_bus().emit(
+            _CATALOG_SSE_TOPIC,
+            {"kind": "catalog_enriched", "sku_id": sku_id, "record": record},
+        )
+    except Exception as exc:  # pragma: no cover - bus can't take us down
+        log.warning("catalog_enriched emit failed for %s: %s", sku_id, exc)
+
+
 # ── orchestrator ────────────────────────────────────────────────────
 
 
@@ -175,6 +210,14 @@ class Orchestrator:
         return False
 
     async def run_sku(self, entry: dict) -> dict[str, Any]:
+        out = await self._run_sku(entry)
+        # Phase H.4 — fan out a `catalog_enriched` SSE event so the Studio's
+        # CatalogPanel updates live without a re-fetch. Best-effort: we
+        # never want a broken event bus to fail enrichment itself.
+        _emit_catalog_enriched(self.enriched_path, str(entry.get("sku") or ""))
+        return out
+
+    async def _run_sku(self, entry: dict) -> dict[str, Any]:
         sku = entry["sku"]
         workdir = self.jobs_dir / sku
         workdir.mkdir(parents=True, exist_ok=True)
