@@ -34,6 +34,8 @@ from pydantic import BaseModel
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from tools import registry
+from scene_store import SceneStore, SceneDelta, get_event_bus
+import single_ops
 
 # V2 step 4 — real OpenSCAD runtime. Lazy-instantiated at first use so
 # the gateway starts even when OpenSCAD isn't installed; it'll fall
@@ -826,6 +828,366 @@ async def codex_run(body: dict[str, Any], request: Request) -> dict[str, Any]:
         "backend": "codex",
         "text": "codex bridge not yet wired — M1 week 6",
     }
+
+
+# ── Phase A — Single-op scene endpoints ─────────────────────────────────────
+#
+# Every endpoint below is a thin wrapper: load SceneStore → call a
+# single_ops helper → return the SceneDelta. Emits onto the project's
+# SSE bus so connected UIs can patch their local scene stores.
+# See docs/PHASE_A_COMPLETE.md for request/response schemas.
+
+
+def _store(project_id: str) -> SceneStore:
+    pid = _safe_project_id(project_id)
+    pdir = _safe_project_dir(pid)
+    s = SceneStore(pdir, pid)
+    if not s.exists():
+        raise HTTPException(404, "design.json not found; run /intake or /building/generate first")
+    return s
+
+
+class _Point3(BaseModel):
+    x: float
+    y: float
+    z: float = 0.0
+
+    def as_tuple(self) -> tuple[float, float, float]:
+        return (self.x, self.y, self.z)
+
+
+class _Point2(BaseModel):
+    x: float
+    y: float
+
+    def as_tuple(self) -> tuple[float, float]:
+        return (self.x, self.y)
+
+
+class InsertHeadBody(BaseModel):
+    position_m: _Point3
+    sku: str = "TY3231"
+    k_factor: float = 5.6
+    temp_rating_f: int = 155
+    orientation: str = "pendent"
+    room_id: str | None = None
+    system_id: str | None = None
+
+
+class ModifyHeadBody(BaseModel):
+    sku: str | None = None
+    k_factor: float | None = None
+    temp_rating_f: int | None = None
+    position_m: _Point3 | None = None
+    orientation: str | None = None
+    room_id: str | None = None
+
+
+class InsertPipeBody(BaseModel):
+    from_point_m: _Point3
+    to_point_m: _Point3
+    from_node: str | None = None
+    to_node: str | None = None
+    size_in: float = 1.0
+    schedule: str = "sch10"
+    role: str = "branch"
+    system_id: str | None = None
+
+
+class ModifyPipeBody(BaseModel):
+    size_in: float | None = None
+    schedule: str | None = None
+    role: str | None = None
+    start_m: _Point3 | None = None
+    end_m: _Point3 | None = None
+    downstream_heads: int | None = None
+
+
+class InsertFittingBody(BaseModel):
+    kind: str
+    position_m: _Point3
+    size_in: float
+    pipe_id: str | None = None
+    system_id: str | None = None
+
+
+class InsertHangerBody(BaseModel):
+    pipe_id: str
+    position_m: _Point3
+    system_id: str | None = None
+
+
+class InsertBraceBody(BaseModel):
+    pipe_id: str
+    position_m: _Point3
+    kind: str = "lateral"
+    system_id: str | None = None
+
+
+class RemoteAreaBody(BaseModel):
+    polygon_m: list[_Point2]
+    system_id: str | None = None
+    name: str = "remote_area_1"
+
+
+class SkuSwapBody(BaseModel):
+    sku: str
+    k_factor: float | None = None
+
+
+class CalculateBody(BaseModel):
+    supply: dict[str, Any] | None = None
+    hazard: str | None = None
+    scope_system_id: str | None = None
+
+
+class DeltaResponse(BaseModel):
+    ok: bool = True
+    op: str
+    seq: int | None = None
+    delta: dict[str, Any]
+
+
+def _dispatch(
+    project_id: str, op: str, actor: str,
+    fn: "callable",
+) -> DeltaResponse:
+    store = _store(project_id)
+    delta, event = store.mutate(op, actor, fn)
+    return DeltaResponse(op=op, seq=event.seq, delta=delta.to_dict())
+
+
+def _actor(request: Request) -> str:
+    return request.headers.get("x-halofire-actor", "user")
+
+
+@app.post("/projects/{project_id}/heads", response_model=DeltaResponse)
+async def sop_insert_head(project_id: str, body: InsertHeadBody, request: Request) -> DeltaResponse:
+    _require_api_key(request)
+    return _dispatch(project_id, "insert_head", _actor(request),
+        lambda d: single_ops.insert_head(
+            d, position_m=body.position_m.as_tuple(), sku=body.sku,
+            k_factor=body.k_factor, temp_rating_f=body.temp_rating_f,
+            orientation=body.orientation, room_id=body.room_id,
+            system_id=body.system_id,
+        ))
+
+
+@app.patch("/projects/{project_id}/heads/{node_id}", response_model=DeltaResponse)
+async def sop_modify_head(project_id: str, node_id: str, body: ModifyHeadBody, request: Request) -> DeltaResponse:
+    _require_api_key(request)
+    updates = body.model_dump(exclude_none=True)
+    if "position_m" in updates:
+        p = body.position_m
+        updates["position_m"] = [p.x, p.y, p.z] if p else None
+    try:
+        return _dispatch(project_id, "modify_head", _actor(request),
+            lambda d: single_ops.modify_head(d, node_id, updates))
+    except KeyError as e:
+        raise HTTPException(404, str(e))
+
+
+@app.delete("/projects/{project_id}/heads/{node_id}", response_model=DeltaResponse)
+async def sop_delete_head(project_id: str, node_id: str, request: Request) -> DeltaResponse:
+    _require_api_key(request)
+    try:
+        return _dispatch(project_id, "delete_head", _actor(request),
+            lambda d: single_ops.delete_head(d, node_id))
+    except KeyError as e:
+        raise HTTPException(404, str(e))
+
+
+@app.post("/projects/{project_id}/pipes", response_model=DeltaResponse)
+async def sop_insert_pipe(project_id: str, body: InsertPipeBody, request: Request) -> DeltaResponse:
+    _require_api_key(request)
+    return _dispatch(project_id, "insert_pipe", _actor(request),
+        lambda d: single_ops.insert_pipe(
+            d, from_point_m=body.from_point_m.as_tuple(),
+            to_point_m=body.to_point_m.as_tuple(),
+            from_node=body.from_node, to_node=body.to_node,
+            size_in=body.size_in, schedule=body.schedule,
+            role=body.role, system_id=body.system_id,
+        ))
+
+
+@app.patch("/projects/{project_id}/pipes/{node_id}", response_model=DeltaResponse)
+async def sop_modify_pipe(project_id: str, node_id: str, body: ModifyPipeBody, request: Request) -> DeltaResponse:
+    _require_api_key(request)
+    updates = body.model_dump(exclude_none=True)
+    for k in ("start_m", "end_m"):
+        if k in updates and updates[k] is not None:
+            v = getattr(body, k)
+            updates[k] = [v.x, v.y, v.z]
+    try:
+        return _dispatch(project_id, "modify_pipe", _actor(request),
+            lambda d: single_ops.modify_pipe(d, node_id, updates))
+    except KeyError as e:
+        raise HTTPException(404, str(e))
+
+
+@app.delete("/projects/{project_id}/pipes/{node_id}", response_model=DeltaResponse)
+async def sop_delete_pipe(project_id: str, node_id: str, request: Request) -> DeltaResponse:
+    _require_api_key(request)
+    try:
+        return _dispatch(project_id, "delete_pipe", _actor(request),
+            lambda d: single_ops.delete_pipe(d, node_id))
+    except KeyError as e:
+        raise HTTPException(404, str(e))
+
+
+@app.post("/projects/{project_id}/fittings", response_model=DeltaResponse)
+async def sop_insert_fitting(project_id: str, body: InsertFittingBody, request: Request) -> DeltaResponse:
+    _require_api_key(request)
+    try:
+        return _dispatch(project_id, "insert_fitting", _actor(request),
+            lambda d: single_ops.insert_fitting(
+                d, kind=body.kind, position_m=body.position_m.as_tuple(),
+                size_in=body.size_in, pipe_id=body.pipe_id,
+                system_id=body.system_id,
+            ))
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+
+@app.post("/projects/{project_id}/hangers", response_model=DeltaResponse)
+async def sop_insert_hanger(project_id: str, body: InsertHangerBody, request: Request) -> DeltaResponse:
+    _require_api_key(request)
+    try:
+        return _dispatch(project_id, "insert_hanger", _actor(request),
+            lambda d: single_ops.insert_hanger(
+                d, pipe_id=body.pipe_id,
+                position_m=body.position_m.as_tuple(),
+                system_id=body.system_id,
+            ))
+    except KeyError as e:
+        raise HTTPException(404, str(e))
+
+
+@app.post("/projects/{project_id}/braces", response_model=DeltaResponse)
+async def sop_insert_brace(project_id: str, body: InsertBraceBody, request: Request) -> DeltaResponse:
+    _require_api_key(request)
+    try:
+        return _dispatch(project_id, "insert_sway_brace", _actor(request),
+            lambda d: single_ops.insert_sway_brace(
+                d, pipe_id=body.pipe_id,
+                position_m=body.position_m.as_tuple(),
+                kind=body.kind, system_id=body.system_id,
+            ))
+    except (KeyError, ValueError) as e:
+        raise HTTPException(400, str(e))
+
+
+@app.post("/projects/{project_id}/remote-areas", response_model=DeltaResponse)
+async def sop_set_remote_area(project_id: str, body: RemoteAreaBody, request: Request) -> DeltaResponse:
+    _require_api_key(request)
+    polygon = [p.as_tuple() for p in body.polygon_m]
+    return _dispatch(project_id, "set_remote_area", _actor(request),
+        lambda d: single_ops.set_remote_area(
+            d, polygon_m=polygon, system_id=body.system_id, name=body.name,
+        ))
+
+
+@app.patch("/projects/{project_id}/nodes/{node_id}/sku", response_model=DeltaResponse)
+async def sop_swap_sku(project_id: str, node_id: str, body: SkuSwapBody, request: Request) -> DeltaResponse:
+    _require_api_key(request)
+    try:
+        return _dispatch(project_id, "swap_sku", _actor(request),
+            lambda d: single_ops.swap_sku(d, node_id, body.sku, body.k_factor))
+    except KeyError as e:
+        raise HTTPException(404, str(e))
+
+
+class RulesResponse(BaseModel):
+    ok: bool = True
+    violations: list[dict[str, Any]]
+
+
+@app.post("/projects/{project_id}/rules/run", response_model=RulesResponse)
+async def sop_rule_check(project_id: str, request: Request) -> RulesResponse:
+    _require_api_key(request)
+    store = _store(project_id)
+    design = store.load_design_dict()
+    violations = single_ops.run_rules(design)
+    out = store.deliverables_dir / "violations.json"
+    out.write_text(json.dumps(violations, indent=2), encoding="utf-8")
+    get_event_bus().emit(project_id, {
+        "kind": "rules_run", "violations": violations,
+    })
+    return RulesResponse(violations=violations)
+
+
+class BomResponse(BaseModel):
+    ok: bool = True
+    rows: list[dict[str, Any]]
+    total_usd: float
+
+
+@app.post("/projects/{project_id}/bom/recompute", response_model=BomResponse)
+async def sop_bom_recompute(project_id: str, request: Request) -> BomResponse:
+    _require_api_key(request)
+    store = _store(project_id)
+    design = store.load_design_dict()
+    rows = single_ops.recompute_bom(design)
+    total = sum(r.get("extended_usd", 0.0) for r in rows)
+    get_event_bus().emit(project_id, {"kind": "bom_recompute", "total_usd": total})
+    return BomResponse(rows=rows, total_usd=round(total, 2))
+
+
+@app.post("/projects/{project_id}/undo", response_model=DeltaResponse)
+async def sop_undo(project_id: str, request: Request) -> DeltaResponse:
+    _require_api_key(request)
+    store = _store(project_id)
+    delta = store.undo(actor=_actor(request))
+    if delta is None:
+        raise HTTPException(409, "nothing to undo")
+    return DeltaResponse(op="undo", delta=delta.to_dict())
+
+
+@app.post("/projects/{project_id}/redo", response_model=DeltaResponse)
+async def sop_redo(project_id: str, request: Request) -> DeltaResponse:
+    _require_api_key(request)
+    store = _store(project_id)
+    delta = store.redo(actor=_actor(request))
+    if delta is None:
+        raise HTTPException(409, "nothing to redo")
+    return DeltaResponse(op="redo", delta=delta.to_dict())
+
+
+@app.get("/projects/{project_id}/events")
+async def project_events_sse(project_id: str, request: Request):
+    """SSE stream of scene deltas + recalc events for one project.
+
+    Clients connect once and receive ``scene_delta``, ``rules_run``,
+    and ``bom_recompute`` events as they happen. 15 s keepalives so
+    proxies don't drop idle connections.
+    """
+    _require_api_key(request)
+    _safe_project_id(project_id)
+    from fastapi.responses import StreamingResponse
+    bus = get_event_bus()
+    q = bus.subscribe(project_id)
+
+    async def _gen():
+        try:
+            yield f"event: hello\ndata: {json.dumps({'project_id': project_id})}\n\n"
+            while True:
+                try:
+                    payload = await asyncio.wait_for(q.get(), timeout=15)
+                    yield f"data: {json.dumps(payload)}\n\n"
+                except asyncio.TimeoutError:
+                    yield ": keepalive\n\n"
+        finally:
+            bus.unsubscribe(project_id, q)
+
+    return StreamingResponse(
+        _gen(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+    )
 
 
 # ── Entrypoint for uvicorn ──────────────────────────────────────────────────
