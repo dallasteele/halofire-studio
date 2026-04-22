@@ -1155,3 +1155,32 @@ User direction across 4 messages this session:
      chains, the agents produce real NFPA-referenced output, the
      viewer is responsive. Full NFPA rule engine and Layer 2-4 PDF
      ingest are the next phase — scoped but not implemented this run.
+
+### Entry 31 - Codex HaloFire CAD Sweep
+
+- Fixed lint blockers in AutosaveManager, IPC e2e setup, title-block token
+  parsing, stale Biome suppressions, and the BOM hydralist timestamp helper.
+- Hardened browser regressions exposed by the full Playwright suite:
+  LayerPanel now waits for the styled floating layout invariant, and the IPC
+  status-poll assertion observes routed requests across the component's 2.5s
+  polling cadence.
+- Verified gates:
+  - `bun run --cwd packages/core build`
+  - `bun run --cwd packages/hf-core build`
+  - `bun run --cwd packages/halofire-schema build`
+  - `bun run --cwd apps/editor check-types`
+  - `bun run --cwd apps/editor build`
+  - `TAURI_BUILD=1 bun run --cwd apps/editor build`
+  - `bun run lint -- --max-diagnostics=300`
+  - `C:\Python312\python.exe -m pytest -q services/halofire-cad/tests services/halopenclaw-gateway/tests services/halofire-catalog-crawler packages/halofire-catalog/authoring/scad/tests apps/halofire-studio-desktop/python_sidecar`
+  - `C:\Python312\python.exe services\halofire-cad\scripts\check_schema_drift.py`
+  - `bunx playwright test` from `apps/editor` (274 passed, 1 skipped)
+  - `C:\Python312\python.exe scripts\verify_agentic_rules.py`
+- Smoke evidence:
+  - Editor `GET http://127.0.0.1:3002/api/health` returned
+    `{"status":"ok","app":"editor",...}`.
+  - Gateway `GET http://127.0.0.1:18080/health` returned
+    `{"ok":true,"service":"halopenclaw-gateway","version":"0.0.1",...}`.
+- Residual known noise: Next/Turbopack still reports the existing NFT tracing
+  warning through `next.config.ts -> packages/hf-core/dist/catalog/load.js`;
+  Biome exits zero but still reports 18 warnings and 44 infos.

@@ -18,7 +18,7 @@
  * let downstream stores (active sheet, in-memory pending list) listen.
  */
 
-// biome-ignore lint/style/noRelativeImport: schema subpath import
+// Schema subpath import is intentional.
 import type { Dimension } from '@pascal-app/core/schema/nodes/sheet'
 import { useCallback, useEffect, useRef, useState } from 'react'
 

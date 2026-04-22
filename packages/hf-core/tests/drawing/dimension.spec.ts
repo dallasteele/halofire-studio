@@ -20,13 +20,13 @@ import {
   dimensionToSvgPrimitives,
   formatDimensionText,
 } from '@halofire/core'
-// biome-ignore lint/style/noRelativeImport: schema subpath import
+// Schema subpath import is intentional.
 import { DEFAULT_DIM_STYLE } from '@pascal-app/core/schema/nodes/dim-style'
-// biome-ignore lint/style/noRelativeImport: schema subpath import
+// Schema subpath import is intentional.
 import type { Dimension } from '@pascal-app/core/schema/nodes/sheet'
-// biome-ignore lint/style/noRelativeImport: schema subpath import
+// Schema subpath import is intentional.
 import type { PipeNode } from '@pascal-app/core/schema/nodes/pipe'
-// biome-ignore lint/style/noRelativeImport: schema subpath import
+// Schema subpath import is intentional.
 import type { SprinklerHeadNode } from '@pascal-app/core/schema/nodes/sprinkler-head'
 
 test.describe('@halofire/core — formatDimensionText', () => {

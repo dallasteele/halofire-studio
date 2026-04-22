@@ -109,6 +109,17 @@ test.describe('25 solved 3D issues — regression protection', () => {
     await page.goto('/')
     const panel = page.getByTestId('halofire-layer-panel')
     await expect(panel).toBeVisible()
+    await expect
+      .poll(
+        async () =>
+          panel.evaluate((el) => {
+            const style = window.getComputedStyle(el)
+            const width = (el as HTMLElement).getBoundingClientRect().width
+            return /^(fixed|absolute)$/.test(style.position) && width > 0
+          }),
+        { timeout: 10_000 },
+      )
+      .toBe(true)
     const box = await panel.evaluate((el) => {
       const style = window.getComputedStyle(el)
       return {

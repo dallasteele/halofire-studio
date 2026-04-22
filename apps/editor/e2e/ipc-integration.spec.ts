@@ -52,6 +52,7 @@ test.describe('R10.3 ipc rewire', () => {
     async ({ page }) => {
       let dispatchBody: Record<string, unknown> | null = null
       let dispatchQuery: string | null = null
+      const statusUrls: string[] = []
 
       await page.route('**/intake/dispatch*', async (route) => {
         const req = route.request()
@@ -72,6 +73,7 @@ test.describe('R10.3 ipc rewire', () => {
       // Satisfy the status-poll route so the test doesn't error out
       // on the first poll — return a stable running state.
       await page.route('**/intake/status/**', async (route) => {
+        statusUrls.push(route.request().url())
         await route.fulfill({
           status: 200,
           contentType: 'application/json',
@@ -107,12 +109,11 @@ test.describe('R10.3 ipc rewire', () => {
       expect(dispatchQuery).toMatch(/project_id=/)
 
       // Status polling should kick in — verify a status GET fires.
-      const statusHit = await page.waitForRequest(
-        (req) =>
-          req.url().includes('/intake/status/') && req.method() === 'GET',
-        { timeout: 5_000 },
-      )
-      expect(statusHit.url()).toContain('job_r103_dispatch')
+      await expect
+        .poll(() => statusUrls.find((url) => url.includes('job_r103_dispatch')), {
+          timeout: 15_000,
+        })
+        .toBeTruthy()
     },
   )
 
@@ -136,13 +137,12 @@ test.describe('R10.3 ipc rewire', () => {
         ;(window as any).__TAURI_INTERNALS__ = {}
         let count = 0
         const OrigES = window.EventSource
-        class CountingES {
-          static OPEN = 1
-          constructor(url: string | URL) {
+        const CountingES = new Proxy(OrigES, {
+          construct(target, args) {
             count += 1
-            return new OrigES(String(url))
-          }
-        }
+            return new target(String(args[0]))
+          },
+        })
         ;(window as any).__esCount = () => count
         // @ts-expect-error — override global for the test
         window.EventSource = CountingES as unknown as typeof EventSource

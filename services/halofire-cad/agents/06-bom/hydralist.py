@@ -94,7 +94,8 @@ def format_hydralist(
     now: _dt.datetime | None = None,
 ) -> str:
     """Return the Hydralist payload as a string."""
-    ts = (now or _dt.datetime.utcnow()).replace(microsecond=0).isoformat()
+    default_now = _dt.datetime.now(_dt.UTC).replace(tzinfo=None)
+    ts = (now or default_now).replace(microsecond=0).isoformat()
     lines: list[str] = [
         f"#HYDRALIST|v{HLF_VERSION}|{project_id}|{ts}",
         "|".join(HEADER_COLS),

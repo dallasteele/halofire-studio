@@ -14,12 +14,12 @@ import { expect, test } from '@playwright/test'
 // Import the schema module directly (bypass the core barrel which
 // transitively pulls three.js systems that can't load in a pure Node
 // test environment).
-// biome-ignore lint/style/noRelativeImport: direct module path is intentional
+// Direct schema subpath import is intentional.
 import {
   flowAtPressure,
   SprinklerHeadNode,
 } from '@pascal-app/core/schema/nodes/sprinkler-head'
-// biome-ignore lint/style/noRelativeImport: direct module path is intentional
+// Direct schema subpath import is intentional.
 import {
   hazenWilliamsC,
   pipeIdMm,
@@ -27,23 +27,23 @@ import {
   pipeOdMm,
   PipeNode,
 } from '@pascal-app/core/schema/nodes/pipe'
-// biome-ignore lint/style/noRelativeImport: direct module path is intentional
+// Direct schema subpath import is intentional.
 import { FittingNode } from '@pascal-app/core/schema/nodes/fitting'
-// biome-ignore lint/style/noRelativeImport: direct module path is intentional
+// Direct schema subpath import is intentional.
 import { ValveNode } from '@pascal-app/core/schema/nodes/valve'
-// biome-ignore lint/style/noRelativeImport: direct module path is intentional
+// Direct schema subpath import is intentional.
 import { HangerNode } from '@pascal-app/core/schema/nodes/hanger'
-// biome-ignore lint/style/noRelativeImport: direct module path is intentional
+// Direct schema subpath import is intentional.
 import { DeviceNode } from '@pascal-app/core/schema/nodes/device'
-// biome-ignore lint/style/noRelativeImport: direct module path is intentional
+// Direct schema subpath import is intentional.
 import { FDCNode } from '@pascal-app/core/schema/nodes/fdc'
-// biome-ignore lint/style/noRelativeImport: direct module path is intentional
+// Direct schema subpath import is intentional.
 import { RiserAssemblyNode } from '@pascal-app/core/schema/nodes/riser-assembly'
-// biome-ignore lint/style/noRelativeImport: direct module path is intentional
+// Direct schema subpath import is intentional.
 import { RemoteAreaNode } from '@pascal-app/core/schema/nodes/remote-area'
-// biome-ignore lint/style/noRelativeImport: direct module path is intentional
+// Direct schema subpath import is intentional.
 import { ObstructionNode } from '@pascal-app/core/schema/nodes/obstruction'
-// biome-ignore lint/style/noRelativeImport: direct module path is intentional
+// Direct schema subpath import is intentional.
 import {
   Annotation,
   Dimension,
@@ -52,27 +52,27 @@ import {
   SheetNode,
   Viewport,
 } from '@pascal-app/core/schema/nodes/sheet'
-// biome-ignore lint/style/noRelativeImport: direct module path is intentional
+// Direct schema subpath import is intentional.
 import {
   DEFAULT_DIM_STYLE,
   DimStyle,
 } from '@pascal-app/core/schema/nodes/dim-style'
-// biome-ignore lint/style/noRelativeImport: direct module path is intentional
+// Direct schema subpath import is intentional.
 import {
   DENSITY_AREA_DEFAULTS,
   HOSE_ALLOWANCE_GPM,
   SystemNode,
   withHazardDefaults,
 } from '@pascal-app/core/schema/nodes/system'
-// biome-ignore lint/style/noRelativeImport: direct module path is intentional
+// Direct schema subpath import is intentional.
 import {
   hazenWilliamsLossPsiPerFt,
   pipeFrictionLossPsi,
   solveSystemDemand,
 } from '@pascal-app/core/systems/hydraulic/hydraulic-system'
-// biome-ignore lint/style/noRelativeImport: subpath import bypasses three-pulling barrel
+// Subpath import bypasses the three-pulling barrel.
 import { AnyNode } from '@pascal-app/core/schema/types'
-// biome-ignore lint/style/noRelativeImport: subpath import bypasses three-pulling barrel
+// Subpath import bypasses the three-pulling barrel.
 import { generateId } from '@pascal-app/core/schema/base'
 
 test.describe('Pascal fork — SprinklerHeadNode schema', () => {

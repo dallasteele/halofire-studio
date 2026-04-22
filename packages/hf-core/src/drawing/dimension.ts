@@ -13,9 +13,9 @@
  * records, each representing one SVG element. Callers (hf-sheet-render)
  * map these into JSX / Paper.js / PDF primitives.
  */
-// biome-ignore lint/style/noRelativeImport: schema subpath import
+// Schema subpath import is intentional.
 import type { Dimension } from '@pascal-app/core/schema/nodes/sheet'
-// biome-ignore lint/style/noRelativeImport: schema subpath import
+// Schema subpath import is intentional.
 import type { DimStyle } from '@pascal-app/core/schema/nodes/dim-style'
 
 export type { Dimension, DimStyle }

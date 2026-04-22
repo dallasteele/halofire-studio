@@ -22,7 +22,7 @@
  * SVG, `halofire:tool-active` broadcast).
  */
 
-// biome-ignore lint/style/noRelativeImport: schema subpath import
+// Schema subpath import is intentional.
 import type { Annotation } from '@pascal-app/core/schema/nodes/sheet'
 import { useCallback, useEffect, useRef, useState } from 'react'
 

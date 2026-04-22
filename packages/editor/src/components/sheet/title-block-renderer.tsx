@@ -48,8 +48,11 @@ function escapeXml(raw: string): string {
 function collectTokens(template: string): Set<string> {
   const tokens = new Set<string>()
   const re = /\{\{\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*\}\}/g
-  let match: RegExpExecArray | null
-  while ((match = re.exec(template)) !== null) tokens.add(match[1]!)
+  let match = re.exec(template)
+  while (match !== null) {
+    tokens.add(match[1]!)
+    match = re.exec(template)
+  }
   return tokens
 }
 

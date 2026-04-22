@@ -19,11 +19,11 @@
  *   5. Emit one 'continuous' Dimension with points:
  *      [branch_start, head_1_projected, …, head_N_projected, branch_end].
  */
-// biome-ignore lint/style/noRelativeImport: schema subpath import
+// Schema subpath import is intentional.
 import type { Dimension } from '@pascal-app/core/schema/nodes/sheet'
-// biome-ignore lint/style/noRelativeImport: schema subpath import
+// Schema subpath import is intentional.
 import type { PipeNode } from '@pascal-app/core/schema/nodes/pipe'
-// biome-ignore lint/style/noRelativeImport: schema subpath import
+// Schema subpath import is intentional.
 import type { SprinklerHeadNode } from '@pascal-app/core/schema/nodes/sprinkler-head'
 
 /** Minimal shape the auto-dim needs from a System — we only use the id. */

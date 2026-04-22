@@ -280,17 +280,18 @@ export default function AutosaveManager({
   const [indicatorVisible, setIndicatorVisible] = useState(false)
   const controllerRef = useRef<AutosaveController | null>(null)
   const indicatorTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const projectDir = project?.projectDir ?? null
 
   // Crash-recovery check: runs once per projectDir.
   useEffect(() => {
-    if (!project) {
+    if (!projectDir) {
       setRecoveryPath(null)
       return
     }
     let cancelled = false
     ;(async () => {
       try {
-        const path = await checkAutosaveRecovery(project.projectDir)
+        const path = await checkAutosaveRecovery(projectDir)
         if (!cancelled) setRecoveryPath(path)
       } catch {
         if (!cancelled) setRecoveryPath(null)
@@ -299,7 +300,7 @@ export default function AutosaveManager({
     return () => {
       cancelled = true
     }
-  }, [project?.projectDir])
+  }, [projectDir])
 
   // Autosave controller lifecycle.
   useEffect(() => {

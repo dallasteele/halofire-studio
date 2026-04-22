@@ -19,7 +19,7 @@
  * A module-level counter auto-increments bubble_number each commit.
  */
 
-// biome-ignore lint/style/noRelativeImport: schema subpath import
+// Schema subpath import is intentional.
 import type { RevisionCloud } from '@pascal-app/core/schema/nodes/sheet'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
