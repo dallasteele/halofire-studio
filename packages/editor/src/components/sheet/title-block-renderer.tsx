@@ -99,6 +99,7 @@ export function TitleBlockRenderer(
       data-testid="halofire-title-block"
       data-template-id={templateId}
       className={className}
+      // biome-ignore lint/security/noDangerouslySetInnerHtml: svg produced by our own template renderer, no user HTML
       dangerouslySetInnerHTML={{ __html: svg }}
     />
   )

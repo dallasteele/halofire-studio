@@ -181,9 +181,7 @@ function InstancedGroup({
       userData={{ hfAssetSrc: assetSrc, hfInstanceCount: nodes.length }}
     >
       {/* drei picks up geometry + material from primitive children */}
-      {/* biome-ignore lint/suspicious/noExplicitAny: three primitives */}
       <primitive attach="geometry" object={firstMesh.geometry as any} />
-      {/* biome-ignore lint/suspicious/noExplicitAny: three primitives */}
       <primitive attach="material" object={firstMesh.material as any} />
       {nodes.map((n) => (
         <Instance

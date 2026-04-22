@@ -74,8 +74,6 @@ import { furnishTools } from '../ui/action-menu/furnish-tools'
 import { tools as structureTools } from '../ui/action-menu/structure-tools'
 
 import { PALETTE_COLORS } from '../ui/primitives/color-dot'
-import { Popover, PopoverContent, PopoverTrigger } from '../ui/primitives/popover'
-import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/primitives/tooltip'
 import { NodeActionMenu } from './node-action-menu'
 
 const FALLBACK_VIEW_SIZE = 12
@@ -4119,7 +4117,7 @@ function FloorplanZoneLabel({
     if (textRef.current) {
       setTextWidth(textRef.current.getComputedTextLength())
     }
-  }, [zone.name])
+  }, [])
 
   const isDeleteMode = mode === 'delete'
 
@@ -5199,7 +5197,7 @@ export function FloorplanPanel() {
     if (structureLayer === 'zones' && floorplanSelectionTool === 'marquee') {
       setFloorplanSelectionTool('click')
     }
-  }, [floorplanSelectionTool, structureLayer])
+  }, [floorplanSelectionTool, structureLayer, setFloorplanSelectionTool])
 
   useEffect(() => {
     setIsMacPlatform(navigator.platform.toUpperCase().includes('MAC'))
@@ -5546,7 +5544,7 @@ export function FloorplanPanel() {
         },
       ]
     })
-  }, [cursorPoint, floorplanItems, levelDescendantNodeById, movingFloorplanNodeRevision])
+  }, [floorplanItems, levelDescendantNodeById])
   const floorplanStairEntries = useMemo(
     () =>
       floorplanStairs.flatMap((stair) => {
@@ -5575,11 +5573,10 @@ export function FloorplanPanel() {
         return entry ? [entry] : []
       }),
     [
-      cursorPoint,
-      floorplanStairs,
-      levelDescendantNodeById,
-      movingFloorplanNodeRevision,
-      movingNode,
+      cursorPoint, 
+      floorplanStairs, 
+      levelDescendantNodeById, 
+      movingNode
     ],
   )
   const selectedOpeningEntry = useMemo(() => {
@@ -6264,7 +6261,7 @@ export function FloorplanPanel() {
 
   useEffect(() => {
     setHoveredGuideCorner(null)
-  }, [selectedGuide?.id])
+  }, [])
 
   useEffect(() => {
     if (!(selectedGuide && showGuides && canInteractWithGuides)) {
@@ -7181,7 +7178,7 @@ export function FloorplanPanel() {
   useEffect(() => {
     clearWallEndpointDrag()
     clearWallCurveDrag()
-  }, [clearWallCurveDrag, clearWallEndpointDrag, levelId])
+  }, [clearWallCurveDrag, clearWallEndpointDrag])
 
   useEffect(() => {
     if (shouldShowSiteBoundaryHandles) {
@@ -7949,28 +7946,26 @@ export function FloorplanPanel() {
       handleWallPlacementPoint(snappedPoint)
     },
     [
-      draftStart,
-      emitFloorplanGridEvent,
-      floorplanOpeningLocalY,
-      getPlanPointFromClientPoint,
-      activePolygonDraftPoints,
-      canSelectFloorplanZones,
-      handleSlabPlacementPoint,
-      handleZonePlacementPoint,
-      handleWallPlacementPoint,
-      isFloorplanGridInteractionActive,
-      isOpeningPlacementActive,
-      isPolygonBuildActive,
-      isWallBuildActive,
-      isWindowBuildActive,
-      isZoneBuildActive,
-      movingOpeningType,
-      setSelectedReferenceId,
-      setSelection,
-      shiftPressed,
-      structureLayer,
-      visibleZonePolygons,
-      walls,
+      draftStart, 
+      emitFloorplanGridEvent, 
+      floorplanOpeningLocalY, 
+      getPlanPointFromClientPoint, 
+      activePolygonDraftPoints, 
+      canSelectFloorplanZones, 
+      handleSlabPlacementPoint, 
+      handleZonePlacementPoint, 
+      handleWallPlacementPoint, 
+      isFloorplanGridInteractionActive, 
+      isOpeningPlacementActive, 
+      isPolygonBuildActive, 
+      isWallBuildActive, 
+      isZoneBuildActive, 
+      setSelectedReferenceId, 
+      setSelection, 
+      shiftPressed, 
+      structureLayer, 
+      visibleZonePolygons, 
+      walls
     ],
   )
   const handleBackgroundDoubleClick = useCallback(

@@ -33,7 +33,7 @@ test.describe('R5.4 + R5.5 — txn / undo / redo', () => {
       if (!level) return { err: 'no level' }
       hu.clear()
       const before = hu.getHistory().length
-      const id = 'txn_one_' + Date.now()
+      const id = `txn_one_${Date.now()}`
       hu.txn('Add head', () => {
         hf.createNode(
           {
@@ -81,7 +81,7 @@ test.describe('R5.4 + R5.5 — txn / undo / redo', () => {
       const level = Object.values(hf.getState().nodes).find(
         (n: any) => n.type === 'level',
       ) as any
-      const id = 'txn_undo_' + Date.now()
+      const id = `txn_undo_${Date.now()}`
       hu.txn('Add head', () => {
         hf.createNode(
           {
@@ -127,7 +127,7 @@ test.describe('R5.4 + R5.5 — txn / undo / redo', () => {
       const level = Object.values(hf.getState().nodes).find(
         (n: any) => n.type === 'level',
       ) as any
-      const id = 'txn_redo_' + Date.now()
+      const id = `txn_redo_${Date.now()}`
       hu.txn('Add head', () => {
         hf.createNode(
           {
@@ -178,8 +178,8 @@ test.describe('R5.4 + R5.5 — txn / undo / redo', () => {
       ) as any
       hu.clear()
       const before = hu.getHistory().length
-      const idA = 'nested_a_' + Date.now()
-      const idB = 'nested_b_' + Date.now()
+      const idA = `nested_a_${Date.now()}`
+      const idB = `nested_b_${Date.now()}`
       const mk = (id: string) => ({
         id,
         type: 'item',
@@ -232,7 +232,7 @@ test.describe('R5.4 + R5.5 — txn / undo / redo', () => {
       const level = Object.values(hf.getState().nodes).find(
         (n: any) => n.type === 'level',
       ) as any
-      const id = 'kbd_undo_' + Date.now()
+      const id = `kbd_undo_${Date.now()}`
       hu.txn('Add head', () => {
         hf.createNode(
           {

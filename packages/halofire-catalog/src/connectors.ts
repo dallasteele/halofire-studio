@@ -120,7 +120,7 @@ function teeEqual(e: CatalogEntry): Connector[] {
 function reducer(e: CatalogEntry): Connector[] {
   const big = e.pipe_size_in ?? 2.0
   const m = /(\d+(?:\.\d+)?)to(\d+(?:\.\d+)?)/i.exec(e.model)
-  const small = m && m[2] ? Number.parseFloat(m[2]) : big / 2
+  const small = m?.[2] ? Number.parseFloat(m[2]) : big / 2
   const hx = e.dims_cm[0] / 200
   return [
     {

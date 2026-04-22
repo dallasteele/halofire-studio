@@ -169,7 +169,7 @@ test.describe('editor smoke', () => {
         return { err: 'no level' }
       }
 
-      const id = 'item_pw_probe_' + Date.now()
+      const id = `item_pw_probe_${Date.now()}`
       const probe = {
         id,
         type: 'item',

@@ -227,7 +227,7 @@ function expandBbox(b: Bbox2D, p: readonly [number, number]): void {
 }
 
 function bboxIsEmpty(b: Bbox2D): boolean {
-  return !isFinite(b.minX) || !isFinite(b.maxX) || !isFinite(b.minY) || !isFinite(b.maxY)
+  return !Number.isFinite(b.minX) || !Number.isFinite(b.maxX) || !Number.isFinite(b.minY) || !Number.isFinite(b.maxY)
 }
 
 /**

@@ -92,29 +92,14 @@ export async function loadCatalog(
     return (await res.json()) as Catalog
   }
 
-  // Node fallback — resolve via the workspace layout.
-  const { readFile } = await import('node:fs/promises')
-  const { fileURLToPath } = await import('node:url')
-  const { dirname, resolve } = await import('node:path')
-  const here = dirname(fileURLToPath(import.meta.url))
-  // dist layout: packages/hf-core/dist/catalog/load.js
-  // src layout:  packages/hf-core/src/catalog/load.ts
-  // Both are 4 levels up from the workspace root's packages/halofire-catalog/.
-  const candidates = [
-    resolve(here, '../../../halofire-catalog/catalog.json'),
-    resolve(here, '../../../../packages/halofire-catalog/catalog.json'),
-  ]
-  for (const candidate of candidates) {
-    try {
-      const raw = await readFile(candidate, 'utf8')
-      return JSON.parse(raw) as Catalog
-    } catch {
-      // try next candidate
-    }
-  }
-  throw new Error(
-    `loadCatalog: unable to locate catalog.json (tried ${candidates.join(', ')})`,
-  )
+  // Node fallback — delegated to a side module so Turbopack / Next.js NFT
+  // tracing only sees `fetch` in the primary module's import graph. This
+  // branch only runs under Node (tests/scripts); browser/Tauri webview
+  // always takes the `fetch` path above.
+  const { loadCatalogFromFs } = (await import(
+    /* turbopackIgnore: true */ './load-node.js'
+  )) as typeof import('./load-node.js')
+  return loadCatalogFromFs()
 }
 
 /** Find a single part by SKU. */

@@ -215,7 +215,7 @@ test.describe('R5.6 — save/load/undo full e2e', () => {
       // marker node. We use a real scene-store mutation (createNode
       // against the default level) rather than wiring up
       // translateDesignToScene — the txn/undo contract is the same.
-      const bldgId = 'r56_bldg_' + Date.now()
+      const bldgId = `r56_bldg_${Date.now()}`
       hu.txn('pipeline:intake', () => {
         hf.createNode(
           {
@@ -231,9 +231,9 @@ test.describe('R5.6 — save/load/undo full e2e', () => {
 
       // Stage 2: a place-heads txn adding 3 heads.
       const headIds = [
-        'r56_h_' + Date.now() + '_a',
-        'r56_h_' + Date.now() + '_b',
-        'r56_h_' + Date.now() + '_c',
+        `r56_h_${Date.now()}_a`,
+        `r56_h_${Date.now()}_b`,
+        `r56_h_${Date.now()}_c`,
       ]
       hu.txn('place heads', () => {
         for (let i = 0; i < headIds.length; i += 1) {

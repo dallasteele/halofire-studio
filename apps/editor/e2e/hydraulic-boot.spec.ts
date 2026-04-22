@@ -39,8 +39,8 @@ test.describe('HydraulicSystem boot-install', () => {
       ) as any
       if (!level) return { err: 'no level' }
 
-      const sysId = 'system_hyd_probe_' + Date.now()
-      const pipeId = 'pipe_hyd_probe_' + Date.now()
+      const sysId = `system_hyd_probe_${Date.now()}`
+      const pipeId = `pipe_hyd_probe_${Date.now()}`
 
       hf.createNode(
         {
@@ -79,7 +79,7 @@ test.describe('HydraulicSystem boot-install', () => {
       const deadline = Date.now() + 5000
       while (Date.now() < deadline) {
         const sys = hf.getState().nodes[sysId]
-        if (sys && sys.demand && typeof sys.demand.required_psi === 'number') {
+        if (sys?.demand && typeof sys.demand.required_psi === 'number') {
           return {
             ok: true,
             demand: sys.demand,

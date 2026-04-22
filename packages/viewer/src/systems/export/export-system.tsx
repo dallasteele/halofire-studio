@@ -3,7 +3,7 @@
 import { useThree } from '@react-three/fiber'
 import { useEffect } from 'react'
 import type { Scene } from 'three'
-import * as THREE from 'three'
+import type * as THREE from 'three'
 import { STLExporter } from 'three/examples/jsm/exporters/STLExporter.js'
 import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter.js'
 import { OBJExporter } from 'three/examples/jsm/exporters/OBJExporter.js'

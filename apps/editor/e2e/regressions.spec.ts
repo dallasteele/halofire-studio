@@ -47,7 +47,7 @@ test.describe('25 solved 3D issues — regression protection', () => {
         (n: any) => n.type === 'level',
       ) as any
       if (!level) return { err: 'no level' }
-      const id = 'regression_1_' + Date.now()
+      const id = `regression_1_${Date.now()}`
       hf.createNode(
         {
           id,
@@ -242,7 +242,7 @@ test.describe('25 solved 3D issues — regression protection', () => {
         (n: any) => n.type === 'level',
       ) as any
       if (!level) return { err: 'no level' }
-      const id = 'regression_11_pipe_' + Date.now()
+      const id = `regression_11_pipe_${Date.now()}`
       hf.createNode(
         {
           id,
@@ -304,7 +304,7 @@ test.describe('25 solved 3D issues — regression protection', () => {
         (n: any) => n.type === 'level',
       ) as any
       if (!level) return null
-      const id = 'regression_12_pipe_' + Date.now()
+      const id = `regression_12_pipe_${Date.now()}`
       hf.createNode(
         {
           id,
@@ -358,7 +358,7 @@ test.describe('25 solved 3D issues — regression protection', () => {
       if (levels.length < 2) {
         const base = levels[0]
         if (!base) return { err: 'no base level' }
-        const id = 'regression_13_level_' + Date.now()
+        const id = `regression_13_level_${Date.now()}`
         hf.createNode(
           {
             id,
@@ -404,7 +404,7 @@ test.describe('25 solved 3D issues — regression protection', () => {
         (n: any) => n.type === 'level',
       ) as any
       if (!level) return null
-      const id = 'regression_14_slab_' + Date.now()
+      const id = `regression_14_slab_${Date.now()}`
       hf.createNode(
         {
           id,
@@ -593,7 +593,7 @@ test.describe('25 solved 3D issues — regression protection', () => {
       if (!level) return
       hf.createNode(
         {
-          id: 'regression_20_' + Date.now(),
+          id: `regression_20_${Date.now()}`,
           type: 'item',
           position: [0, 1, 0],
           rotation: [0, 0, 0],
@@ -638,7 +638,7 @@ test.describe('25 solved 3D issues — regression protection', () => {
         (n: any) => n.type === 'level',
       ) as any
       if (!level) return null
-      const id = 'regression_21_' + Date.now()
+      const id = `regression_21_${Date.now()}`
       hf.createNode(
         {
           id,
@@ -692,7 +692,7 @@ test.describe('25 solved 3D issues — regression protection', () => {
         (n: any) => n.type === 'level',
       ) as any
       if (!level) return null
-      const id = 'regression_22_' + Date.now()
+      const id = `regression_22_${Date.now()}`
       // start at origin, end displaced only along +X → rotation
       // around Y MUST be 0.
       hf.createNode(
@@ -747,7 +747,7 @@ test.describe('25 solved 3D issues — regression protection', () => {
         (n: any) => n.type === 'building' || n.type === 'site',
       ) as any
       if (!root) return { err: 'no root' }
-      const levelId = 'regression_23_level_' + Date.now()
+      const levelId = `regression_23_level_${Date.now()}`
       hf.createNode(
         {
           id: levelId,

@@ -26,7 +26,6 @@ import {
   pipeLengthM,
 } from '../../schema/nodes/pipe'
 import type { SprinklerHeadNode } from '../../schema/nodes/sprinkler-head'
-import { flowAtPressure } from '../../schema/nodes/sprinkler-head'
 
 export interface HydraulicDemand {
   systemId: string
@@ -48,9 +47,9 @@ export function hazenWilliamsLossPsiPerFt(
   flowGpm: number, idIn: number, c: number,
 ): number {
   if (flowGpm <= 0 || idIn <= 0 || c <= 0) return 0
-  const qPow = Math.pow(flowGpm, 1.85)
-  const cPow = Math.pow(c, 1.85)
-  const dPow = Math.pow(idIn, 4.87)
+  const qPow = flowGpm ** 1.85
+  const cPow = c ** 1.85
+  const dPow = idIn ** 4.87
   return (4.52 * qPow) / (cPow * dPow)
 }
 

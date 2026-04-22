@@ -14,7 +14,7 @@ import {
 } from '@pascal-app/core'
 import { useViewer } from '@pascal-app/viewer'
 import { useThree } from '@react-three/fiber'
-import { useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import {
   Box3,
   BufferAttribute,
@@ -418,14 +418,14 @@ const BoxSelectToolInner: React.FC = () => {
     }
   }, [setPreviewSelectedIds])
 
-  const syncPreviewSelectedIds = (nextIds: string[]) => {
+  const syncPreviewSelectedIds = useCallback((nextIds: string[]) => {
     if (haveSameIds(previewSelectedIdsRef.current, nextIds)) {
       return
     }
 
     previewSelectedIdsRef.current = nextIds
     setPreviewSelectedIds(nextIds)
-  }
+  }, [setPreviewSelectedIds])
 
   // Sync ground plane Y with the current level
   useEffect(() => {
@@ -444,7 +444,7 @@ const BoxSelectToolInner: React.FC = () => {
     return unsubscribe
   }, [])
 
-  const raycastToGround = (e: PointerEvent): Vector3 | null => {
+  const raycastToGround = useCallback((e: PointerEvent): Vector3 | null => {
     const rect = gl.domElement.getBoundingClientRect()
     pointerNDC.current.x = ((e.clientX - rect.left) / rect.width) * 2 - 1
     pointerNDC.current.y = -((e.clientY - rect.top) / rect.height) * 2 + 1
@@ -453,7 +453,7 @@ const BoxSelectToolInner: React.FC = () => {
       return hitPoint.current
     }
     return null
-  }
+  }, [gl, camera])
 
   useEffect(() => {
     const canvas = gl.domElement
@@ -536,7 +536,7 @@ const BoxSelectToolInner: React.FC = () => {
       canvas.removeEventListener('pointerdown', onCanvasPointerDown)
       canvas.removeEventListener('pointerup', onCanvasPointerUp)
     }
-  }, [camera, gl])
+  }, [gl, raycastToGround, syncPreviewSelectedIds])
 
   // grid:move for cursor tracking + rectangle update during drag
   useEffect(() => {
@@ -593,7 +593,7 @@ const BoxSelectToolInner: React.FC = () => {
     return () => {
       emitter.off('grid:move', onMove)
     }
-  }, [])
+  }, [syncPreviewSelectedIds])
 
   return (
     <group>

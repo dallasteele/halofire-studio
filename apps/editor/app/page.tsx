@@ -137,7 +137,7 @@ async function handleAutoDim(): Promise<void> {
   const headsBySystem = new Map<string, unknown[]>()
   for (const raw of Object.values(nodes)) {
     const n = raw as { id?: string; type?: string; systemId?: string }
-    if (!n || !n.type) continue
+    if (!n?.type) continue
     if (n.type === 'system' && n.id) systems.push({ id: n.id })
     else if (n.type === 'pipe' && n.systemId) {
       const arr = pipesBySystem.get(n.systemId) ?? []

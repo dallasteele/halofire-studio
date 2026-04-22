@@ -141,8 +141,6 @@ function mapSprinklerOrientation(py: unknown): 'pendant' | 'upright' | 'sidewall
       return 'sidewall_horizontal'
     case 'concealed':
       return 'concealed_pendant'
-    case 'pendent':
-    case 'pendant':
     default:
       return 'pendant'
   }
@@ -161,8 +159,6 @@ function mapPipeSchedule(
     case 'copper':
     case 'copper_M':
       return 'copper_M'
-    case 'sch10':
-    case 'SCH10':
     default:
       return 'SCH10'
   }
@@ -235,7 +231,6 @@ function mapSystemKind(
     case 'deluge':
     case 'combo_standpipe':
       return py
-    case 'wet':
     default:
       return 'wet'
   }
@@ -259,8 +254,6 @@ function mapHazard(
       return 'extra_group_1'
     case 'extra_ii':
       return 'extra_group_2'
-    case 'residential':
-    case 'light':
     default:
       return 'light'
   }
