@@ -10,7 +10,7 @@
  * pointing OUTWARD from the part — the mating connector must point
  * back (opposite direction, same line).
  */
-import type { CatalogEntry } from './types.js'
+import type { LegacyCatalogEntry } from './types.js'
 
 export type ConnectionType =
   | 'grooved'
@@ -38,7 +38,7 @@ export interface Connector {
 
 // ── per-category generators ─────────────────────────────────────────
 
-function pipeSegment(e: CatalogEntry): Connector[] {
+function pipeSegment(e: LegacyCatalogEntry): Connector[] {
   const size = e.pipe_size_in ?? 2.0
   const halfLen = e.dims_cm[2] / 200 // cm/100/2
   const ct: ConnectionType = e.connection === 'npt' ? 'npt' : 'grooved'
@@ -62,7 +62,7 @@ function pipeSegment(e: CatalogEntry): Connector[] {
   ]
 }
 
-function elbow90(e: CatalogEntry): Connector[] {
+function elbow90(e: LegacyCatalogEntry): Connector[] {
   const size = e.pipe_size_in ?? 2.0
   const half = e.dims_cm[0] / 200
   return [
@@ -85,7 +85,7 @@ function elbow90(e: CatalogEntry): Connector[] {
   ]
 }
 
-function teeEqual(e: CatalogEntry): Connector[] {
+function teeEqual(e: LegacyCatalogEntry): Connector[] {
   const size = e.pipe_size_in ?? 2.0
   const hx = e.dims_cm[0] / 200
   const hz = e.dims_cm[2] / 200
@@ -117,7 +117,7 @@ function teeEqual(e: CatalogEntry): Connector[] {
   ]
 }
 
-function reducer(e: CatalogEntry): Connector[] {
+function reducer(e: LegacyCatalogEntry): Connector[] {
   const big = e.pipe_size_in ?? 2.0
   const m = /(\d+(?:\.\d+)?)to(\d+(?:\.\d+)?)/i.exec(e.model)
   const small = m?.[2] ? Number.parseFloat(m[2]) : big / 2
@@ -142,7 +142,7 @@ function reducer(e: CatalogEntry): Connector[] {
   ]
 }
 
-function coupling(e: CatalogEntry): Connector[] {
+function coupling(e: LegacyCatalogEntry): Connector[] {
   const size = e.pipe_size_in ?? 2.0
   const hx = e.dims_cm[0] / 200
   return [
@@ -165,7 +165,7 @@ function coupling(e: CatalogEntry): Connector[] {
   ]
 }
 
-function valveInline(e: CatalogEntry): Connector[] {
+function valveInline(e: LegacyCatalogEntry): Connector[] {
   const size = e.pipe_size_in ?? 4.0
   const hx = e.dims_cm[0] / 200
   const type: ConnectionType =
@@ -192,7 +192,7 @@ function valveInline(e: CatalogEntry): Connector[] {
   ]
 }
 
-function flowSwitch(e: CatalogEntry): Connector[] {
+function flowSwitch(e: LegacyCatalogEntry): Connector[] {
   const size = e.pipe_size_in ?? 2.0
   return [
     {
@@ -207,7 +207,7 @@ function flowSwitch(e: CatalogEntry): Connector[] {
   ]
 }
 
-function headPendent(e: CatalogEntry): Connector[] {
+function headPendent(e: LegacyCatalogEntry): Connector[] {
   return [
     {
       id: 'inlet',
@@ -221,7 +221,7 @@ function headPendent(e: CatalogEntry): Connector[] {
   ]
 }
 
-function headUpright(e: CatalogEntry): Connector[] {
+function headUpright(e: LegacyCatalogEntry): Connector[] {
   return [
     {
       id: 'inlet',
@@ -235,7 +235,7 @@ function headUpright(e: CatalogEntry): Connector[] {
   ]
 }
 
-function headSidewall(e: CatalogEntry): Connector[] {
+function headSidewall(e: LegacyCatalogEntry): Connector[] {
   return [
     {
       id: 'inlet',
@@ -249,7 +249,7 @@ function headSidewall(e: CatalogEntry): Connector[] {
   ]
 }
 
-function gauge(e: CatalogEntry): Connector[] {
+function gauge(e: LegacyCatalogEntry): Connector[] {
   return [
     {
       id: 'pipe_tap',
@@ -265,7 +265,7 @@ function gauge(e: CatalogEntry): Connector[] {
 
 // ── public resolver ─────────────────────────────────────────────────
 
-export function connectorsFor(entry: CatalogEntry): Connector[] {
+export function connectorsFor(entry: LegacyCatalogEntry): Connector[] {
   switch (entry.category) {
     case 'pipe_steel_sch10':
     case 'pipe_steel_sch40':

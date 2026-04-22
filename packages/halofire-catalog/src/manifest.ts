@@ -7,9 +7,9 @@
  * Phase M2+: grow to 100+ via Blender + manufacturer BIM imports.
  */
 
-import type { CatalogEntry } from './types.js'
+import type { LegacyCatalogEntry } from './types.js'
 
-export const CATALOG: readonly CatalogEntry[] = [
+export const CATALOG: readonly LegacyCatalogEntry[] = [
   // ── 5 sprinkler heads ──────────────────────────────────────────────────
 
   {

@@ -8,7 +8,7 @@
  * mounting + pipe_size_in) rather than stamped into every manifest
  * row. One source of truth = the category + finish fields.
  */
-import type { CatalogEntry } from './types.js'
+import type { LegacyCatalogEntry } from './types.js'
 
 export interface MaterialSpec {
   /** Display name for palettes / reports */
@@ -98,7 +98,7 @@ export type MaterialKey = keyof typeof MATERIAL_PRESETS
  *
  * AI agents MUST use this instead of parsing `finish` strings.
  */
-export function materialFor(entry: CatalogEntry): MaterialSpec {
+export function materialFor(entry: LegacyCatalogEntry): MaterialSpec {
   const f = (entry.finish || '').toLowerCase()
   if (f.includes('chrome')) return MATERIAL_PRESETS.chrome
   if (f.includes('brass')) return MATERIAL_PRESETS.brass

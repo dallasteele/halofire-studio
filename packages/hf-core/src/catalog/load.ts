@@ -4,58 +4,67 @@
  * handful of in-memory lookup + summary utilities.
  *
  * Blueprint reference: docs/blueprints/03_CATALOG_ENGINE.md §6.
+ *
+ * Schema: see `@halofire/catalog` (`CatalogEntry`, `CatalogManifest`,
+ * `parseCatalog`). That package is the single source of truth for the
+ * shape of `catalog.json`; everything here validates + re-exports it.
  */
 
+import {
+  type CatalogEntry,
+  type CatalogManifest,
+  parseCatalog,
+} from '@halofire/catalog'
 import type { Part } from './part.js'
 
 /**
- * The envelope shape emitted by `scripts/build-catalog.ts`. Kept
- * intentionally loose on `parts` so downstream consumers that only
- * need `{sku, kind, category, display_name, manufacturer, price_usd}`
- * don't have to pull in the full SCAD-strict Part type.
+ * The envelope shape emitted by `scripts/build-catalog.ts`.
+ *
+ * Alias of `CatalogManifest` from `@halofire/catalog`. Kept as a
+ * separate name so existing consumers that import `Catalog` from this
+ * module don't have to change — but new code should prefer the
+ * canonical name.
  */
-export interface Catalog {
-  schema_version: number
-  catalog_version: string
-  generated_at: string
-  parts: CatalogPart[]
-}
+export type Catalog = CatalogManifest
 
 /**
- * Runtime Part as emitted by `catalog.json`. This is a superset of the
- * SCAD-authored `Part` type — we allow snake_case fields because that
- * is the JSON-on-disk convention, and we keep everything optional so
- * the schema can grow without breaking consumers.
+ * Runtime Part as emitted by `catalog.json`.
+ *
+ * Alias of `CatalogEntry` from `@halofire/catalog`. See that type for
+ * the authoritative field list; do NOT add fields here without adding
+ * them to the canonical schema first.
  */
-export interface CatalogPart {
-  sku: string
-  kind: string
-  category: string
-  display_name: string
-  manufacturer?: string
-  mfg_part_number?: string
-  price_usd?: number
-  install_minutes?: number
-  k_factor?: number
-  orientation?: string
-  response?: string
-  temperature?: string
-  listing?: string
-  tags?: string[]
-  warnings?: string[]
-  // Allow additional build-pipeline fields (params, ports, etc.) without
-  // forcing consumers to type them.
-  [key: string]: unknown
-}
+export type CatalogPart = CatalogEntry
 
 export interface LoadCatalogOptions {
   /** Override the HTTP fetcher — used in tests. */
   fetchImpl?: typeof fetch
   /** Override the public URL where catalog.json is served. */
   url?: string
+  /**
+   * Skip Zod validation. Default `false` — you almost never want this.
+   * The one legitimate case is a test that deliberately feeds a partial
+   * fixture; production consumers must leave validation on.
+   */
+  skipValidation?: boolean
 }
 
 const DEFAULT_URL = '/halofire-catalog/catalog.json'
+
+function validate(raw: unknown, skip: boolean | undefined): Catalog {
+  if (skip) return raw as Catalog
+  try {
+    return parseCatalog(raw)
+  } catch (e) {
+    // Surface the schema violation with enough detail that the build /
+    // CI log actually tells the dev what drifted.
+    throw new Error(
+      `loadCatalog: catalog.json failed schema validation: ${
+        e instanceof Error ? e.message : String(e)
+      }`,
+    )
+  }
+}
 
 /**
  * Load the catalog.json bundled with `@halofire/catalog`.
@@ -66,6 +75,11 @@ const DEFAULT_URL = '/halofire-catalog/catalog.json'
  * - In Node, resolves the monorepo path to
  *   `packages/halofire-catalog/catalog.json` and reads it via `node:fs`.
  * - A custom `fetchImpl` always takes precedence (test injection).
+ *
+ * The loaded JSON is validated against the canonical Zod schema from
+ * `@halofire/catalog` before being returned — if the on-disk shape
+ * drifts from the TS types, this throws immediately instead of
+ * silently handing back garbage.
  */
 export async function loadCatalog(
   opts: LoadCatalogOptions = {},
@@ -78,7 +92,7 @@ export async function loadCatalog(
     if (!res.ok) {
       throw new Error(`loadCatalog: fetch ${url} failed: ${res.status}`)
     }
-    return (await res.json()) as Catalog
+    return validate(await res.json(), opts.skipValidation)
   }
 
   // Browser / webview path.
@@ -89,7 +103,7 @@ export async function loadCatalog(
     if (!res.ok) {
       throw new Error(`loadCatalog: fetch ${url} failed: ${res.status}`)
     }
-    return (await res.json()) as Catalog
+    return validate(await res.json(), opts.skipValidation)
   }
 
   // Node fallback — delegated to a side module so Turbopack / Next.js NFT
@@ -99,7 +113,7 @@ export async function loadCatalog(
   const { loadCatalogFromFs } = (await import(
     /* turbopackIgnore: true */ './load-node.js'
   )) as typeof import('./load-node.js')
-  return loadCatalogFromFs()
+  return validate(await loadCatalogFromFs(), opts.skipValidation)
 }
 
 /** Find a single part by SKU. */

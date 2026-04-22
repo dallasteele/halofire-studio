@@ -2,138 +2,179 @@
 
 Read this before you place, route, or BOM a single component.
 
-## 1. What every catalog entry means
+## 0. Schema source-of-truth (Phase D.1 reconcile — 2026-04-21)
 
-Every row in `CATALOG` is a real, purchaseable part. It has:
-
-| field | meaning | AI agent uses it for |
-|---|---|---|
-| `sku` | stable id, also the GLB filename stem | cross-ref between BOM + viewport + IFC |
-| `category` | part type (typed string union) | dispatch to placer rules, hydraulic K-table, NFPA §14 sizing |
-| `mounting` | where the part physically attaches | decide attachment node in Pascal tree (ceiling/wall/floor/inline) |
-| `dims_cm` | `[L, D, H]` bounding dims in cm | collision, clearance, grid placement |
-| `pipe_size_in` | nominal pipe size (pipes + fittings) | size matching at connectors, pricebook lookup |
-| `k_factor` | NFPA 13 K (heads only, `GPM/psi^0.5`) | hydraulic demand per head |
-| `temp_rating_f` | thermal element rating (heads only) | §6.2.5 temp class selection |
-| `response` | `'fast' \| 'standard'` (heads) | §11.2.3 design-area reduction |
-| `connection` | `'npt' \| 'grooved' \| 'flanged' \| 'solvent_weld'` | connector type |
-| `finish` | free-form finish string | → `materialFor(entry)` PBR material |
-
-`dims_cm` is authoritative — it matches what's really in the GLB.
-
-## 2. Material system
-
-Do **NOT** parse `entry.finish` by hand. Call `materialFor(entry)`
-from `@halofire/catalog` — it returns a typed `MaterialSpec` with:
-
-- `color_hex` — PBR base color (for the viewport + DXF fills)
-- `metalness` / `roughness` — PBR shading inputs
-- `nfpa_paint_hex` — NFPA-13 regulatory paint color, or `null` if
-  this part has no regulatory finish requirement. Sprinkler supply
-  mains (red pipe, red valves, red enclosures) have this set;
-  chrome heads and brass gauges do not.
-- `description` — one-line summary for generated proposals
-
-The item-renderer in `packages/viewer` already consumes the
-`halofire_pipe_color:<hex>` tag and builds a `MeshStandardNodeMaterial`
-at render time. SceneBootstrap writes both
-`halofire_pipe_color:<color_hex>` and `halofire_material:<name>` on
-every spawned item.
-
-When you need to answer "what color should this be painted in the
-field?" return `nfpa_paint_hex` (not `color_hex`).
-
-## 3. Connector graph
-
-The connector graph is how parts physically fit together. Every
-placement / routing / fitting decision must round-trip through
-`connectorsFor(entry)` + `canMate(a, b)` — do not eyeball geometry.
-
-```ts
-import { connectorsFor, canMate } from '@halofire/catalog'
-
-const pipeConns = connectorsFor(pipeEntry)      // 2 connectors (end_a, end_b)
-const teeConns  = connectorsFor(teeEntry)       // 3 connectors (run_in, run_out, branch)
-const headConns = connectorsFor(pendantEntry)   // 1 connector (inlet, pointing +Y)
-
-// Before placing a pipe end at a tee branch, verify compat:
-const ok = canMate(pipeConns[0], teeConns[2])   // true iff size + type match
+```
+ ┌─────────────────────────────┐   build-catalog.ts   ┌───────────────┐
+ │ authoring/scad/*.scad       │ ──────────────────▶  │ catalog.json  │
+ │   @part / @kind / @category │  (parseScad)         │  parts: [...] │
+ │   @mfg / @mfg-pn / @param   │                      └──────┬────────┘
+ │   @port / @k-factor / ...   │                             │
+ └─────────────────────────────┘                             │ loadCatalog()
+                                                             │  (zod-validated)
+                                                             ▼
+                                                      agents / editor
 ```
 
-### Connector semantics
+The **`.scad` file is the source of truth**. Every field on
+`CatalogEntry` traces back to a `@`-annotation in a single `.scad`
+file under `authoring/scad/`. The build script walks those files,
+calls `parseScad()` from `@halofire/core/scad/parse-params`, and
+writes `packages/halofire-catalog/catalog.json`. Consumers read the
+JSON via `loadCatalog()` from `@halofire/core/catalog/load`, which
+validates the envelope against `CatalogManifestSchema` from
+`@halofire/catalog`.
 
-| role | meaning | can mate with |
-|---|---|---|
-| `inlet` | upstream / supply side | `outlet`, `coupling`, `branch` |
-| `outlet` | downstream / discharge | `inlet`, `coupling`, `branch` |
-| `branch` | lateral tap off a main (tee side-leg) | `inlet`, `outlet`, `coupling` |
-| `coupling` | symmetric — either direction | anything except `tap` |
-| `tap` | saddle-mount instrument tap (gauge, flow switch) | **never** mates directly — it pierces an EXISTING pipe, not a connector |
+If any of these four layers drift — SCAD vocabulary, parser,
+emitter, TS types — the schema test (`tests/schema.test.ts`) will
+fail immediately and tell you which path is wrong.
 
-### Coordinate convention
+**Do NOT hand-edit `catalog.json`.** Fix the annotation in the
+`.scad` file and re-run `bun run scripts/build-catalog.ts`.
 
-- `position_m` is in **meters**, relative to the item's local origin
+## 1. Canonical `CatalogEntry` fields
+
+Each element of `catalog.parts[]` (= `CatalogEntry`):
+
+| field | JSON type | SCAD annotation | meaning |
+|---|---|---|---|
+| `sku` | string | `@part <slug>` | unique id, also the .scad file stem and GLB filename stem |
+| `kind` | `PartKind` | `@kind <value>` | coarse dispatch — see list below |
+| `category` | string (dotted) | `@category <dotted>` | fine-grained class (e.g. `head.pendant.k56`, `pipe.sch10.grooved`) |
+| `display_name` | string | `@display-name "..."` | human label shown in UI |
+| `manufacturer` | string? | `@mfg <name>` | e.g. `victaulic`, `tyco`, `generic` |
+| `mfg_part_number` | string? | `@mfg-pn <pn>` | part number in manufacturer's catalog |
+| `listing` | string? | `@listing UL FM` | regulatory listing tokens |
+| `hazard_classes` | string[]? | `@hazard-classes LH OH1 OH2` | NFPA 13 hazard classes |
+| `price_usd` | number? | `@price-usd <n>` | list price, USD |
+| `install_minutes` | number? | `@install-minutes <n>` | labor minutes per unit |
+| `crew` | string? | `@crew <role>` | `foreman` / `journeyman` / `apprentice` / `mixed` |
+| `weight_kg` | number? | `@weight-kg <n>` | mass |
+| `k_factor` | number? | `@k-factor <n>` | sprinkler head K-factor (heads only) |
+| `orientation` | string? | `@orientation <o>` | `pendant` / `upright` / `sidewall` / `concealed` |
+| `response` | string? | `@response <r>` | `standard` / `quick` / `esfr` |
+| `temperature` | string? | `@temperature <t>` | e.g. `155F`, `200F` |
+| `params` | `Record<string,CatalogParam>` | `@param <name> ...` | tunable SCAD variables |
+| `ports` | `CatalogPort[]` | `@port <name> ...` | connection sockets (position, direction, size, style, role) |
+| `scad_source` | string | — | source file name, relative to `authoring/scad/` |
+| `warnings` | string[] | — | non-fatal parser warnings |
+
+`PartKind` enum: `sprinkler_head`, `pipe_segment`, `fitting`,
+`valve`, `hanger`, `device`, `fdc`, `riser_assy`, `compound`,
+`structural`, `unknown`.
+
+### Example entry (from `coupling.scad`)
+
+```json
+{
+  "sku": "coupling",
+  "kind": "fitting",
+  "category": "fitting.union",
+  "display_name": "Grooved Coupling (2\")",
+  "manufacturer": "victaulic",
+  "mfg_part_number": "Style-77",
+  "price_usd": 7.2,
+  "install_minutes": 5,
+  "params": {
+    "size_in": {
+      "name": "size_in",
+      "type": { "kind": "enum", "values": [1, 1.25, 1.5, 2, 2.5, 3, 4] },
+      "default": 2,
+      "label": "Size",
+      "unit": "in"
+    }
+  },
+  "ports": [
+    { "name": "in",  "position_m": [-0.04, 0, 0], "direction": [-1, 0, 0],
+      "style": "grooved", "size_in": 2, "role": "run_a" },
+    { "name": "out", "position_m": [ 0.04, 0, 0], "direction": [ 1, 0, 0],
+      "style": "grooved", "size_in": 2, "role": "run_b" }
+  ],
+  "scad_source": "coupling.scad",
+  "warnings": []
+}
+```
+
+## 2. Canonical port vocabulary
+
+`CatalogPort.style` ∈ {
+ `NPT_threaded`, `grooved`, `flanged.150`, `flanged.300`,
+ `solvent_welded`, `soldered`, `stortz`, `none`
+}.
+
+`CatalogPort.role` ∈ { `run_a`, `run_b`, `branch`, `drop` }.
+
+Coordinate convention:
+- `position_m` is in **meters**, relative to the part's local origin
   (same frame as Pascal's `ItemNode.position`).
-- `direction` is a unit outward vector. Two connectors that mate must
-  point at each other: `a.direction = -b.direction` in world space.
-- Default local axes per category (what you'll see in the GLB):
+- `direction` is a unit vector pointing **outward** from the part.
+  Two mating ports must point at each other:
+  `a.direction = -b.direction` in world space.
+- Local axes per part-kind (as rendered by the .scad templates):
   - **pipes**: long axis = **+Z**, ends at `z = ±length/2`
-  - **elbows 90°**: inlet face at **−X**, outlet face at **+Z**
+  - **elbows 90°**: inlet at **−X**, outlet at **+Z**
   - **tees**: run along **X**, branch along **+Z**
   - **valves / couplings**: inline along **X**
-  - **pendant / concealed heads**: thread points **+Y** (up)
-  - **upright heads**: thread points **−Y** (down)
-  - **sidewall heads**: thread points **−X** (into wall)
+  - **pendant / concealed heads**: thread points **+Y**
+  - **upright heads**: thread points **−Y**
+  - **sidewall heads**: thread points **−X**
 
-### Canonical examples
+## 3. Runtime validation
 
-Pendant head on a branch line:
-```
-  pipe end_b  (+Z, 1")  ─┐
-                         │   reducing bushing 1"→½" NPT
-  pendant head inlet     │   (not in catalog — added by placer as
-   (+Y, ½" NPT)  ────────┘   virtual fitting)
-```
+```ts
+import { parseCatalog } from '@halofire/catalog'
+import { loadCatalog } from '@halofire/core/catalog/load'
 
-Tee feeding two branches:
-```
-         branch (+Z)  ──── to head cluster
-          │
-run_in (−X) ── TEE ── run_out (+X)
+const catalog = await loadCatalog()  // already validated
+// or, validating raw JSON yourself:
+const catalog2 = parseCatalog(rawJson)
 ```
 
-OS&Y gate valve at riser base:
-```
-   inlet (−X, 4" flanged)  ←  incoming 4" underground supply
-   outlet (+X, 4" flanged) →  vertical riser via 90° elbow
-```
+`loadCatalog()` calls `parseCatalog()` under the hood. If the
+generated JSON drifts from the schema, you get a `ZodError` with
+the exact path (e.g. `parts[17].ports[0].size_in`) — not a silent
+`undefined` at first use.
+
+The schema test (`tests/schema.test.ts`) runs this against the real
+on-disk `catalog.json` in CI.
 
 ## 4. What agents should NEVER do
 
-1. **Don't** invent SKUs — every placed item must reference a real
-   `CatalogEntry.sku`. If you need a component that isn't in
-   `CATALOG`, open a PR to add it; don't string-concatenate a fake.
-2. **Don't** guess dimensions. Use `entry.dims_cm` → meters.
-3. **Don't** parse `entry.finish` with regex. Use `materialFor()`.
-4. **Don't** place two items so their connectors overlap without
-   calling `canMate`. Size/type mismatches break hydraulic calc and
-   produce non-buildable BOMs.
-5. **Don't** mate a `tap` connector to anything directly. A flow
-   switch or gauge is a saddle — it attaches to an existing pipe
-   node, not to another connector.
+1. **Don't invent SKUs.** Every placed item must reference a real
+   `CatalogEntry.sku` that exists in `catalog.json`. If you need a
+   component that isn't there, add a new `.scad` file (or a new
+   `@param` variant) and re-run the build.
+2. **Don't hand-edit `catalog.json`** — it is generated.
+3. **Don't mate two ports without a `size_in` / `style` match.**
+4. **Don't read legacy fields on new code.** The pre-reconcile shape
+   (`dims_cm`, `mounting`, `glb_path`, `connection`, `finish`,
+   `open_source`) lives on `LegacyCatalogEntry` and is only there
+   to keep the old in-memory `CATALOG` array + three editor panels
+   (`CatalogPanel`, `SceneBootstrap`, `FireProtectionPanel`)
+   compiling. New work must go through the JSON / `CatalogEntry`
+   path.
 
-## 5. Running the smoke check
+## 5. Legacy helpers (deprecated — do not extend)
+
+Until the three editor consumers migrate, the package still exports
+the pre-reconcile helpers against `LegacyCatalogEntry`:
+
+- `CATALOG` — hard-coded array in `src/manifest.ts`
+- `findBySku`, `findByCategory`, `findByName`, `findPipesBySize`,
+  `findHeadsByKFactor` — query helpers
+- `materialFor(entry)` — PBR + NFPA paint color (derived from
+  legacy `finish` string)
+- `connectorsFor(entry)` / `canMate(a, b)` — geometric connector
+  graph (derived from legacy `dims_cm` + `category`)
+
+New agents must read `CatalogEntry.ports` directly. The
+`connectorsFor` helper predates the SCAD `@port` annotation and will
+be retired once all callers cut over.
+
+## 6. Running the tests
 
 ```
-bash apps/editor/tests/smoke/run-viewport-smoke.sh
-bun test packages/halofire-catalog/tests/catalog.test.ts
+bun test packages/halofire-catalog/tests/catalog.test.ts   # legacy metadata
+bun test packages/halofire-catalog/tests/schema.test.ts    # canonical schema
+bash apps/editor/tests/smoke/run-viewport-smoke.sh         # end-to-end
 ```
-
-The catalog smoke verifies:
-- every SKU resolves to a `MaterialSpec` (no "brass fallback" for
-  real parts)
-- every non-segment SKU has ≥ 1 connector
-- pipes have exactly 2 collinear end connectors
-- tees have exactly 3 connectors (2 colinear + 1 orthogonal)
-- elbow 90° connectors are orthogonal
-- `canMate` is symmetric and rejects size/type mismatches

@@ -10,7 +10,7 @@
  */
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { CATALOG, type CatalogEntry } from '@halofire/catalog'
+import { CATALOG, type LegacyCatalogEntry } from '@halofire/catalog'
 import {
   type Catalog as HfCatalog,
   type CatalogPart as HfCatalogPart,
@@ -18,7 +18,7 @@ import {
 } from '@halofire/core/catalog/load'
 import { generateId, useScene } from '@pascal-app/core'
 
-type Category = CatalogEntry['category']
+type Category = LegacyCatalogEntry['category']
 
 const CATEGORY_GROUPS: { label: string; prefixes: string[] }[] = [
   { label: 'Sprinkler Heads', prefixes: ['sprinkler_head_'] },
@@ -51,7 +51,7 @@ export function CatalogPanel() {
   }, [query])
 
   const grouped = useMemo(() => {
-    const out: { label: string; items: CatalogEntry[] }[] = []
+    const out: { label: string; items: LegacyCatalogEntry[] }[] = []
     for (const group of CATEGORY_GROUPS) {
       const items = filtered.filter((e) => matchesGroup(e.category, group.prefixes))
       if (items.length > 0) out.push({ label: group.label, items })
@@ -301,7 +301,7 @@ function HfCatalogBrowser() {
   )
 }
 
-function SelectedDetail({ entry }: { entry: CatalogEntry }) {
+function SelectedDetail({ entry }: { entry: LegacyCatalogEntry }) {
   return (
     <div className="rounded border border-neutral-300 bg-neutral-50 p-2 text-xs dark:border-neutral-700 dark:bg-neutral-900">
       <div className="mb-1 font-semibold">{entry.name}</div>
@@ -347,7 +347,7 @@ function SelectedDetail({ entry }: { entry: CatalogEntry }) {
   )
 }
 
-function PlaceButton({ entry }: { entry: CatalogEntry }) {
+function PlaceButton({ entry }: { entry: LegacyCatalogEntry }) {
   const createNode = useScene((s) => s.createNode)
   const rootNodeIds = useScene((s) => s.rootNodeIds)
   const [status, setStatus] = useState<string | null>(null)
