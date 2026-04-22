@@ -130,6 +130,27 @@ export interface HydraulicResult {
   safety_margin_psi?: number | null
   supply_static_psi?: number | null
   supply_residual_psi?: number | null
+  demand_at_base_of_riser_psi?: number | null
+  supply_flow_gpm?: number | null
+  critical_path?: string[]
+  /**
+   * Phase C — per-segment friction-loss trace. Each entry carries
+   * the pipe/node id, pressure at both ends, computed velocity,
+   * and size. The viewport NodeTags overlay reads these to place
+   * pressure/flow/velocity labels on the drawing.
+   */
+  node_trace?: Array<{
+    segment_id?: string
+    node_id?: string
+    pressure_start_psi?: number
+    pressure_end_psi?: number
+    pressure_psi?: number
+    flow_gpm?: number
+    velocity_fps?: number
+    size_in?: number
+    [key: string]: unknown
+  }>
+  issues?: string[]
   [key: string]: unknown
 }
 

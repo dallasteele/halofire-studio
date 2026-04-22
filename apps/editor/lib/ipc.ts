@@ -240,18 +240,41 @@ export const ipc = {
    * * Tauri mode: invokes the Rust `run_hydraulic` command, which
    *   reads `design.json` from the project's deliverables dir and
    *   returns `{ systems: [...] }`. No localhost port required.
-   * * Fetch mode: POSTs to the gateway's
-   *   `POST /projects/:id/hydraulic`, which actually re-solves.
+   * * Fetch mode (Phase C): POSTs to the gateway's
+   *   `POST /projects/:id/calculate` (the Phase A single-op endpoint
+   *   that replaced `/hydraulic`). Accepts an optional `scope` so
+   *   System Optimizer / Auto Peak can narrow the re-solve.
+   *
+   * The gateway returns `{ project_id, calculation: { systems: [...] } }`.
+   * We normalize this to the `{ systems: [...] }` shape that legacy
+   * callers (LiveCalc, BidClient, Playwright fixtures) already speak.
    */
   async runHydraulic(args: {
     projectId: string
+    scope?: { scope_system_id?: string; hazard?: string }
   }): Promise<RunHydraulicResponse> {
     const t = await loadTauri()
     if (t) return t.invoke<RunHydraulicResponse>('run_hydraulic', { args })
-    return fetchJson<RunHydraulicResponse>(
-      `/projects/${encodeURIComponent(args.projectId)}/hydraulic`,
-      { method: 'POST', cache: 'no-store' },
+    const body = await fetchJson<
+      { systems?: unknown[] }
+      & { calculation?: { systems?: unknown[] } }
+    >(
+      `/projects/${encodeURIComponent(args.projectId)}/calculate`,
+      {
+        method: 'POST',
+        cache: 'no-store',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(args.scope ?? {}),
+      },
     )
+    // Normalize: Phase A returns `{ calculation: { systems } }`;
+    // legacy `/hydraulic` returned `{ systems }`. Accept either so a
+    // mocked test fixture keeps working.
+    if (Array.isArray((body as { systems?: unknown[] }).systems)) {
+      return body as RunHydraulicResponse
+    }
+    const calcSystems = body?.calculation?.systems
+    return { systems: Array.isArray(calcSystems) ? calcSystems : [] } as RunHydraulicResponse
   },
 
   /**

@@ -19,6 +19,23 @@ export type RibbonCommand =
   | 'bid-load'
   | 'bid-save'
   | 'auto-design'
+  // Phase B — tool activations. Routed through ToolManager, not just
+  // halofire:ribbon. Legacy `measure`/`section`/`remote-area` kept
+  // below for the older overlays.
+  | 'tool-sprinkler'
+  | 'tool-pipe'
+  | 'tool-fitting'
+  | 'tool-hanger'
+  | 'tool-sway-brace'
+  | 'tool-remote-area'
+  | 'tool-move'
+  | 'tool-resize'
+  | 'tool-measure'
+  | 'tool-section'
+  | 'undo'
+  | 'redo'
+  | 'rules-run'
+  | 'bom-recompute'
   | 'layer-heads'
   | 'layer-pipes'
   | 'layer-walls'
@@ -32,6 +49,13 @@ export type RibbonCommand =
   | 'text'
   | 'revision-cloud'
   | 'hydraulic-calc'
+  // Phase C (Hydraulics) — owned by dispatchHydraulicsRibbon. New
+  // commands prefixed `hydraulics-*` to avoid stepping on Phase B's
+  // ribbon work.
+  | 'hydraulics-optimize'
+  | 'hydraulics-auto-peak'
+  | 'hydraulics-report'
+  | 'node-tags-toggle'
   | 'rule-check'
   | 'stress-test'
   | 'report-proposal'
@@ -77,10 +101,29 @@ const TABS: Record<RibbonTab, Group[]> = {
       ],
     },
     {
+      label: 'CAD',
+      buttons: [
+        { cmd: 'tool-sprinkler',   label: 'Sprinkler',   hint: 'Click to place a head at the snapped grid (active catalog SKU)', tone: 'accent' },
+        { cmd: 'tool-pipe',        label: 'Pipe',        hint: 'Click start, click end' },
+        { cmd: 'tool-fitting',     label: 'Fitting',     hint: 'Click to drop a fitting (default elbow_90)' },
+        { cmd: 'tool-hanger',      label: 'Hanger',      hint: 'Click along a pipe' },
+        { cmd: 'tool-sway-brace',  label: 'Sway brace',  hint: 'Click along a pipe · Tab cycles direction' },
+      ],
+    },
+    {
+      label: 'Edit',
+      buttons: [
+        { cmd: 'tool-move',   label: 'Move',   hint: 'Drag selected head · PATCH on release' },
+        { cmd: 'tool-resize', label: 'Resize', hint: 'Pipe diameter · +/- cycles schedule' },
+        { cmd: 'undo',        label: 'Undo',   hint: 'Ctrl-Z · backend event-log pop' },
+        { cmd: 'redo',        label: 'Redo',   hint: 'Ctrl-Shift-Z' },
+      ],
+    },
+    {
       label: 'Tools',
       buttons: [
-        { cmd: 'measure', label: 'Measure' },
-        { cmd: 'section', label: 'Section' },
+        { cmd: 'tool-measure', label: 'Measure', hint: 'Two clicks, distance in m' },
+        { cmd: 'tool-section', label: 'Section', hint: 'Drag a cutting plane' },
         { cmd: 'snap-toggle', label: 'Snap' },
       ],
     },
@@ -131,6 +174,30 @@ const TABS: Record<RibbonTab, Group[]> = {
       label: 'Hydraulics',
       buttons: [
         { cmd: 'hydraulic-calc', label: 'Calculate', tone: 'accent' },
+        {
+          cmd: 'hydraulics-optimize',
+          label: 'System Optimizer',
+          hint: 'Iteratively upsize pipe schedules to gain safety margin',
+          tone: 'default',
+        },
+        {
+          cmd: 'hydraulics-auto-peak',
+          label: 'Auto Peak',
+          hint: 'Find the worst-case remote area automatically',
+          tone: 'default',
+        },
+        {
+          cmd: 'node-tags-toggle',
+          label: 'Node Tags',
+          hint: 'Toggle pressure / flow / velocity labels on every head',
+          tone: 'default',
+        },
+        {
+          cmd: 'hydraulics-report',
+          label: 'Hydraulic Report',
+          hint: 'Open the NFPA 13 §27 8-section submittal PDF',
+          tone: 'default',
+        },
         { cmd: 'remote-area', label: 'Remote area', hint: 'Draw the flowing head window' },
       ],
     },
@@ -138,7 +205,15 @@ const TABS: Record<RibbonTab, Group[]> = {
       label: 'Compliance',
       buttons: [
         { cmd: 'rule-check', label: 'NFPA check' },
+        { cmd: 'rules-run',  label: 'Run rules (live)', hint: 'POST /rules/run against current scene' },
+        { cmd: 'bom-recompute', label: 'Recompute BOM', hint: 'POST /bom/recompute' },
         { cmd: 'stress-test', label: 'Stress test' },
+      ],
+    },
+    {
+      label: 'Tools',
+      buttons: [
+        { cmd: 'tool-remote-area', label: 'Remote area (polygon)', hint: 'Click vertices · double-click to close' },
       ],
     },
   ],

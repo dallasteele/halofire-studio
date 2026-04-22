@@ -16,6 +16,18 @@ export interface StatusBarProps {
   projectAddress?: string
   gatewayUrl?: string
   sceneNodeCount?: number
+  /**
+   * Phase C — live hydraulic readout. When present the status bar
+   * shows pressure / flow / velocity-warning count inline, matching
+   * AutoSprink's bottom-row habit of keeping live numbers in the
+   * estimator's peripheral vision.
+   */
+  hydraulics?: {
+    pressure_psi: number | null
+    flow_gpm: number | null
+    margin_psi: number | null
+    velocity_warnings: number
+  } | null
 }
 
 type Gateway = { ok: boolean; latency_ms?: number; err?: string }
@@ -36,6 +48,7 @@ export function StatusBar({
   projectAddress = '',
   gatewayUrl = 'http://localhost:18080/health',
   sceneNodeCount,
+  hydraulics,
 }: StatusBarProps) {
   const [gateway, setGateway] = useState<Gateway | null>(null)
   const [now, setNow] = useState(() => new Date())
@@ -89,6 +102,50 @@ export function StatusBar({
         <>
           <span className="text-neutral-600">·</span>
           <span>{sceneNodeCount} nodes</span>
+        </>
+      )}
+      {hydraulics && (
+        <>
+          <span className="text-neutral-600">·</span>
+          <span data-testid="status-hydraulics" className="flex items-center gap-2">
+            <span>
+              Pressure{' '}
+              <span className="text-neutral-200">
+                {hydraulics.pressure_psi != null
+                  ? `${hydraulics.pressure_psi.toFixed(0)} psi`
+                  : '—'}
+              </span>
+            </span>
+            <span className="text-neutral-600">·</span>
+            <span>
+              Flow{' '}
+              <span className="text-neutral-200">
+                {hydraulics.flow_gpm != null
+                  ? `${hydraulics.flow_gpm.toFixed(0)} gpm`
+                  : '—'}
+              </span>
+            </span>
+            {hydraulics.velocity_warnings > 0 && (
+              <>
+                <span className="text-neutral-600">·</span>
+                <span
+                  data-testid="status-velocity-warn"
+                  className="text-[#ffb800]"
+                >
+                  ⚠ {hydraulics.velocity_warnings} velocity warning
+                  {hydraulics.velocity_warnings === 1 ? '' : 's'}
+                </span>
+              </>
+            )}
+            {hydraulics.margin_psi != null && hydraulics.margin_psi < 0 && (
+              <>
+                <span className="text-neutral-600">·</span>
+                <span className="text-[#ff3333]">
+                  ⚠ margin {hydraulics.margin_psi.toFixed(1)} psi
+                </span>
+              </>
+            )}
+          </span>
         </>
       )}
       <span className="ml-auto flex items-center gap-3">

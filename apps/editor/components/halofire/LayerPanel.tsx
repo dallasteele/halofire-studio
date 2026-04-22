@@ -185,7 +185,9 @@ export function LayerPanel({
       // the sidebar without overlapping the viewport canvas.
       // backdrop-blur lets the model bleed through subtly.
       className={
-        'pointer-events-auto fixed bottom-10 left-3 z-40 ' +
+        // StatusBar is h-8 (32px); sit above it with ~12px clearance.
+        // bottom-11 = 44px, clears the 32px bar without touching.
+        'pointer-events-auto fixed bottom-11 left-3 z-40 ' +
         'border border-white/10 border-t-[#e8432d]/60 bg-[#0a0a0b]/95 ' +
         'backdrop-blur-sm text-white ' +
         'shadow-[0_8px_24px_rgba(0,0,0,0.6)] ' +

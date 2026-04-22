@@ -20,17 +20,28 @@ import { CommandPalette } from '@/components/halofire/CommandPalette'
 import { LayerPanel } from '@/components/halofire/LayerPanel'
 import { HalofireProperties } from '@/components/halofire/HalofireProperties'
 import { LiveCalc } from '@/components/halofire/LiveCalc'
+import { NodeTags } from '@/components/halofire/NodeTags'
 import { RemoteAreaDraw } from '@/components/halofire/RemoteAreaDraw'
 import { Ribbon, type RibbonCommand } from '@/components/halofire/Ribbon'
+import { SystemOptimizer } from '@/components/halofire/SystemOptimizer'
+import { useLiveHydraulics } from '@/lib/hooks/useLiveHydraulics'
 import { autoDimensionPipeRun } from '@halofire/core/drawing/auto-dim-pipe-runs'
 import { SceneBootstrap } from '@/components/halofire/SceneBootstrap'
 import { SceneChangeBridge } from '@/components/halofire/SceneChangeBridge'
 import { HalofireNodeWatcher } from '@/components/halofire/HalofireNodeWatcher'
 import { UndoStack } from '@/components/halofire/UndoStack'
 import { AutoPilot } from '@/components/halofire/AutoPilot'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { StatusBar } from '@/components/halofire/StatusBar'
 import { ToolOverlay } from '@/components/halofire/ToolOverlay'
+import { ReportTab } from '@/components/halofire/ReportTab'
+import { ToolManagerProvider, useToolManager } from '@/lib/tools'
+// Side-effect imports — each module registers its Tool with the
+// global ToolRegistry. This must run before ToolManagerProvider
+// attempts to activate anything.
+import '@/lib/tools'
+import { connectHalofireSSE } from '@/lib/halofire/scene-store'
+import { halofireGateway } from '@/lib/halofire/gateway-client'
 
 const ACTIVE_PROJECT_ID = '1881-cooperative'
 
@@ -108,6 +119,41 @@ const SIDEBAR_TABS: (SidebarTab & { component: React.ComponentType })[] = [
     label: 'Manual FP',
     component: WrappedFireProtection,
   },
+  {
+    id: 'halofire-report',
+    label: 'Report',
+    component: withProjectChrome(
+      ReportTab as React.ComponentType<{ projectId?: string }>,
+    ) as unknown as React.ComponentType,
+  },
+]
+
+/** Ribbon command → Phase B tool id. */
+const RIBBON_TO_TOOL: Partial<Record<string, string>> = {
+  'tool-sprinkler': 'sprinkler',
+  'tool-pipe': 'pipe',
+  'tool-fitting': 'fitting',
+  'tool-hanger': 'hanger',
+  'tool-sway-brace': 'sway_brace',
+  'tool-remote-area': 'remote_area',
+  'tool-move': 'move',
+  'tool-resize': 'resize',
+  'tool-measure': 'measure',
+  'tool-section': 'section',
+}
+
+const SILENTLY_HANDLED_ELSEWHERE: readonly string[] = [
+  // Legacy commands still consumed by existing overlays via
+  // halofire:ribbon — not orphans, just handled upstream.
+  'bid-new', 'bid-load', 'bid-save', 'auto-design',
+  'layer-heads', 'layer-pipes', 'layer-walls', 'layer-zones',
+  'snap-toggle', 'measure', 'section', 'remote-area',
+  'auto-dim-pipe-runs', 'dimension', 'text', 'revision-cloud',
+  'hydraulic-calc', 'rule-check', 'stress-test',
+  'report-proposal', 'report-submittal', 'report-export-dxf',
+  'report-export-ifc', 'report-nfpa-8', 'report-approve-submit',
+  'report-send-to-client', 'hydraulics-optimize',
+  'hydraulics-auto-peak', 'hydraulics-report', 'node-tags-toggle',
 ]
 
 /**
@@ -187,7 +233,79 @@ async function handleAutoDim(): Promise<void> {
   )
 }
 
+/**
+ * Phase C — Hydraulics ribbon commands. Split out into its own
+ * dispatcher so Phase B's parallel work on `dispatchRibbon` doesn't
+ * collide. The top-level dispatcher delegates to this for any
+ * `hydraulics-*` command; other Phase-C commands (`node-tags-toggle`,
+ * `hydraulics-report`) route here too.
+ *
+ * Returns `true` when it handled the command so callers skip the
+ * generic bridge.
+ */
+function dispatchHydraulicsRibbon(cmd: RibbonCommand): boolean {
+  if (typeof window === 'undefined') return false
+  const HANDLED: readonly RibbonCommand[] = [
+    'hydraulics-optimize',
+    'hydraulics-auto-peak',
+    'hydraulics-report',
+    'node-tags-toggle',
+  ]
+  if (!HANDLED.includes(cmd)) return false
+
+  // All handled commands still broadcast on the bus so listeners
+  // (SystemOptimizer, NodeTags) can react. They're idempotent — the
+  // components filter by cmd id in their own event listeners.
+  window.dispatchEvent(
+    new CustomEvent('halofire:ribbon', { detail: { cmd } }),
+  )
+
+  if (cmd === 'hydraulics-auto-peak') {
+    // Phase A's `/calculate` supports scoping via `scope_system_id`
+    // today but not explicit remote-area selection. The heuristic
+    // Auto Peak ships in Phase C is client-side: re-run the calc
+    // and surface the result; the solver already picks the
+    // hydraulically most-remote window (agent.py `_select_remote_area_heads`).
+    // If a dedicated endpoint lands in Phase A.1 we'll call it here.
+    const gw = process.env.NEXT_PUBLIC_HALOPENCLAW_URL ?? 'http://localhost:18080'
+    void fetch(`${gw}/projects/${ACTIVE_PROJECT_ID}/calculate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({}),
+    }).then(() => {
+      window.dispatchEvent(
+        new CustomEvent('halofire:scene-changed', {
+          detail: { origin: 'auto-peak' },
+        }),
+      )
+      window.dispatchEvent(
+        new CustomEvent('halofire:toast', {
+          detail: {
+            level: 'info',
+            message: 'auto-peak · re-ran hydraulics on most-remote area',
+          },
+        }),
+      )
+    }).catch(() => {/* LiveCalc will surface the error */})
+  }
+
+  if (cmd === 'hydraulics-report') {
+    // The submittal agent writes `reports/hydraulic.pdf` and a JSON
+    // payload next to it. Prefer the PDF; fall back to the JSON.
+    const gw = process.env.NEXT_PUBLIC_HALOPENCLAW_URL ?? 'http://localhost:18080'
+    const pdf = `${gw}/projects/${ACTIVE_PROJECT_ID}/deliverable/hydraulic_report.pdf`
+    const json = `${gw}/projects/${ACTIVE_PROJECT_ID}/deliverable/hydraulic_report.json`
+    // Try PDF first; if it's 404 the tab will show the JSON.
+    const w = window.open(pdf, '_blank')
+    if (!w) window.open(json, '_blank')
+  }
+
+  return true
+}
+
 function dispatchRibbon(cmd: RibbonCommand): void {
+  // Phase C: hydraulics commands are handled in a sibling dispatcher.
+  if (dispatchHydraulicsRibbon(cmd)) return
   // Bridge ribbon events into whatever panel reacts to them. Today
   // we fire a DOM event so any tab/sidebar can listen without a
   // shared store; the AutoDesignPanel handles 'auto-design', the
@@ -226,9 +344,110 @@ function dispatchRibbon(cmd: RibbonCommand): void {
 }
 
 export default function Home() {
+  return (
+    <ToolManagerProvider projectId={ACTIVE_PROJECT_ID}>
+      <HomeInner />
+    </ToolManagerProvider>
+  )
+}
+
+function HomeInner() {
+  const toolManager = useToolManager()
   // V2 step 5 — AutoPilot listens for job-started events that
   // AutoDesignPanel dispatches, then subscribes to the SSE stream.
   const [jobId, setJobId] = useState<string | null>(null)
+
+  // Phase B — open SSE stream so mutations from other tabs / HAL /
+  // auto-design runs reflect in the local scene store.
+  useEffect(() => {
+    const dispose = connectHalofireSSE(ACTIVE_PROJECT_ID)
+    return () => dispose()
+  }, [])
+
+  // Phase B — ribbon dispatcher that knows about the ToolManager.
+  const dispatchRibbonWithTools = useCallback((cmd: RibbonCommand): void => {
+    if (typeof window === 'undefined') return
+    // Phase B: tool activations
+    const toolId = RIBBON_TO_TOOL[cmd]
+    if (toolId) {
+      void toolManager.activate(toolId)
+      window.dispatchEvent(new CustomEvent('halofire:ribbon', { detail: { cmd } }))
+      return
+    }
+    // Phase B: direct backend calls
+    if (cmd === 'undo') {
+      halofireGateway.undo(ACTIVE_PROJECT_ID)
+        .then(() => {
+          window.dispatchEvent(new CustomEvent('halofire:scene-changed', { detail: { origin: 'undo' } }))
+        })
+        .catch((e) => {
+          window.dispatchEvent(new CustomEvent('halofire:toast', {
+            detail: { level: 'warn', message: `undo: ${String(e)}` },
+          }))
+        })
+      return
+    }
+    if (cmd === 'redo') {
+      halofireGateway.redo(ACTIVE_PROJECT_ID)
+        .then(() => {
+          window.dispatchEvent(new CustomEvent('halofire:scene-changed', { detail: { origin: 'redo' } }))
+        })
+        .catch((e) => {
+          window.dispatchEvent(new CustomEvent('halofire:toast', {
+            detail: { level: 'warn', message: `redo: ${String(e)}` },
+          }))
+        })
+      return
+    }
+    if (cmd === 'rules-run') {
+      halofireGateway.runRules(ACTIVE_PROJECT_ID)
+        .then(() => {
+          window.dispatchEvent(new CustomEvent('halofire:toast', {
+            detail: { level: 'info', message: 'rules: check complete — see warnings' },
+          }))
+        })
+        .catch((e) => {
+          window.dispatchEvent(new CustomEvent('halofire:toast', {
+            detail: { level: 'error', message: `rules: ${String(e)}` },
+          }))
+        })
+      return
+    }
+    if (cmd === 'bom-recompute') {
+      halofireGateway.recomputeBom(ACTIVE_PROJECT_ID)
+        .then(() => {
+          window.dispatchEvent(new CustomEvent('halofire:toast', {
+            detail: { level: 'info', message: 'BOM recomputed' },
+          }))
+          window.dispatchEvent(new CustomEvent('halofire:bom-recomputed'))
+        })
+        .catch((e) => {
+          window.dispatchEvent(new CustomEvent('halofire:toast', {
+            detail: { level: 'error', message: `bom: ${String(e)}` },
+          }))
+        })
+      return
+    }
+    // Fall through to legacy dispatcher
+    dispatchRibbon(cmd)
+    // Fire a "not implemented" toast when a command isn't recognized.
+    // This is noisy, so we only warn for unknown commands.
+    if (!(SILENTLY_HANDLED_ELSEWHERE as readonly string[]).includes(cmd) && !RIBBON_TO_TOOL[cmd]) {
+      const known = ['undo','redo','rules-run','bom-recompute']
+      if (!known.includes(cmd)) {
+        window.dispatchEvent(new CustomEvent('halofire:toast', {
+          detail: { level: 'warn', message: `Not implemented: ${cmd}` },
+        }))
+      }
+    }
+  }, [toolManager])
+
+  // Phase C — page-level live hydraulics so NodeTags + StatusBar
+  // share one subscription. LiveCalc keeps its own hook instance
+  // so it stays self-contained, but both pull from the same
+  // `/calculate` endpoint + SSE stream — the gateway's per-project
+  // `SceneStore` debounces duplicate recalc bursts for us.
+  const liveHyd = useLiveHydraulics({ projectId: ACTIVE_PROJECT_ID })
   useEffect(() => {
     const onStart = (e: Event) => {
       const detail = (e as CustomEvent).detail as { jobId?: string }
@@ -269,13 +488,15 @@ export default function Home() {
       <TextTool />
       <RevisionCloudTool />
       <LiveCalc projectId={ACTIVE_PROJECT_ID} />
+      <NodeTags snapshot={liveHyd.snapshot} />
+      <SystemOptimizer projectId={ACTIVE_PROJECT_ID} />
       <LayerPanel />
       {/* V2 Phase 5.3: selection-driven props for halofire items */}
       <HalofireProperties />
       {/* V2 step 5: live pipeline-stage SSE consumer — appears when
           AutoDesignPanel kicks off a job and dispatches job-started. */}
       <AutoPilot jobId={jobId} />
-      <Ribbon onCommand={dispatchRibbon} />
+      <Ribbon onCommand={dispatchRibbonWithTools} />
       <div className="min-h-0 flex-1">
         <Editor
           layoutVersion="v2"
@@ -288,6 +509,18 @@ export default function Home() {
       <StatusBar
         projectName="The Cooperative 1881 — Phase I"
         projectAddress="1881 W North Temple, Salt Lake City, UT"
+        hydraulics={
+          liveHyd.snapshot
+            ? {
+                pressure_psi:
+                  liveHyd.snapshot.headline.supply_residual_psi,
+                flow_gpm: liveHyd.snapshot.headline.required_flow_gpm,
+                margin_psi: liveHyd.snapshot.headline.safety_margin_psi,
+                velocity_warnings:
+                  liveHyd.snapshot.headline.velocity_warnings,
+              }
+            : null
+        }
       />
     </div>
   )
