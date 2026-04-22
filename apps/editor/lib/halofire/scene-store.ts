@@ -128,6 +128,15 @@ export interface HalofireSceneState {
   updateLocal(id: string, patch: Partial<AnyHalofireNode>): void
   reset(): void
   setConnected(v: boolean): void
+  /**
+   * Phase F — rebuild the local nodes map from a server-side
+   * `design.json` dict. Used after undo/redo to resync. Best-effort:
+   * we keep richer fields round-tripped by the server but only
+   * extract the subset the UI mutates.
+   */
+  rebuildFromDesign(design: unknown): void
+  /** Phase F — fetch /projects/:id/scene and rebuild. */
+  resyncFromServer(): Promise<void>
 }
 
 function freshId(prefix: string): string {
@@ -443,9 +452,16 @@ function buildStore(projectId: string) {
       const r = await halofireGateway.undo(projectId)
       set({ lastSeq: r.seq })
       get().applyDelta(r.delta)
-      // Local state may drift; simplest reconciliation is to clear
-      // nodes and wait for server-side SSE / next /calculate to
-      // repopulate richer state. For now mark stale via warnings.
+      // Phase F — fetch the canonical post-undo scene and rebuild
+      // the local nodes map so the viewport reflects the actual
+      // server state rather than the now-stale optimistic view.
+      try {
+        await get().resyncFromServer()
+      } catch {
+        // Non-fatal — SSE will eventually fire and older mutations
+        // will rolled back via applyDelta. The viewport may look
+        // stale in the meantime.
+      }
       return r
     },
 
@@ -453,6 +469,9 @@ function buildStore(projectId: string) {
       const r = await halofireGateway.redo(projectId)
       set({ lastSeq: r.seq })
       get().applyDelta(r.delta)
+      try {
+        await get().resyncFromServer()
+      } catch { /* see undo */ }
       return r
     },
 
@@ -478,6 +497,109 @@ function buildStore(projectId: string) {
     },
     clearSelection() {
       set({ selection: new Set() })
+    },
+
+    rebuildFromDesign(design: unknown) {
+      if (!design || typeof design !== 'object') {
+        set({ nodes: {}, remoteArea: null })
+        return
+      }
+      const d = design as Record<string, unknown>
+      const systems = (d.systems as Array<Record<string, unknown>> | undefined) ?? []
+      const nodes: Record<string, AnyHalofireNode> = {}
+      let remote: RemoteArea | null = null
+      for (const system of systems) {
+        const heads = (system.heads as Array<Record<string, unknown>> | undefined) ?? []
+        for (const h of heads) {
+          const id = h.id as string | undefined
+          const pos = h.position_m as [number, number, number] | undefined
+          if (!id || !pos) continue
+          nodes[id] = {
+            id,
+            kind: 'head',
+            position_m: { x: pos[0], y: pos[1], z: pos[2] },
+            sku: h.sku as string | undefined,
+            k_factor: h.k_factor as number | undefined,
+            temp_rating_f: h.temp_rating_f as number | undefined,
+            orientation: h.orientation as string | undefined,
+            room_id: h.room_id as string | undefined,
+          }
+        }
+        const pipes = (system.pipes as Array<Record<string, unknown>> | undefined) ?? []
+        for (const p of pipes) {
+          const id = p.id as string | undefined
+          const from = p.from_point_m as [number, number, number] | undefined
+          const to = p.to_point_m as [number, number, number] | undefined
+          if (!id || !from || !to) continue
+          nodes[id] = {
+            id,
+            kind: 'pipe',
+            start_m: { x: from[0], y: from[1], z: from[2] },
+            end_m: { x: to[0], y: to[1], z: to[2] },
+            size_in: p.size_in as number | undefined,
+            schedule: p.schedule as string | undefined,
+            role: p.role as string | undefined,
+          }
+        }
+        const hangers = (system.hangers as Array<Record<string, unknown>> | undefined) ?? []
+        for (const hg of hangers) {
+          const id = hg.id as string | undefined
+          const pos = hg.position_m as [number, number, number] | undefined
+          if (!id || !pos) continue
+          nodes[id] = {
+            id,
+            kind: 'hanger',
+            position_m: { x: pos[0], y: pos[1], z: pos[2] },
+            pipe_id: (hg.pipe_id as string | undefined) ?? '',
+          }
+        }
+        const braces = (system.sway_braces as Array<Record<string, unknown>> | undefined) ?? []
+        for (const b of braces) {
+          const id = b.id as string | undefined
+          const pos = b.position_m as [number, number, number] | undefined
+          if (!id || !pos) continue
+          nodes[id] = {
+            id,
+            kind: 'brace',
+            position_m: { x: pos[0], y: pos[1], z: pos[2] },
+            brace_kind: (b.kind as 'lateral' | 'longitudinal' | 'four_way' | undefined) ?? 'lateral',
+            pipe_id: b.pipe_id as string | undefined,
+          }
+        }
+        const fittings = (system.fittings as Array<Record<string, unknown>> | undefined) ?? []
+        for (const f of fittings) {
+          const id = f.id as string | undefined
+          const pos = f.position_m as [number, number, number] | undefined
+          if (!id || !pos) continue
+          nodes[id] = {
+            id,
+            kind: 'fitting',
+            position_m: { x: pos[0], y: pos[1], z: pos[2] },
+            fitting_kind: (f.kind as string | undefined) ?? 'elbow_90',
+            size_in: f.size_in as number | undefined,
+          }
+        }
+        const ra = system.remote_area as Record<string, unknown> | undefined
+        if (ra && Array.isArray(ra.polygon_m)) {
+          remote = {
+            name: ra.name as string | undefined,
+            polygon_m: (ra.polygon_m as Array<[number, number]>).map(
+              ([x, y]) => ({ x, y }),
+            ),
+          }
+        }
+      }
+      set({ nodes, remoteArea: remote })
+    },
+
+    async resyncFromServer() {
+      const r = await halofireGateway.getScene(projectId)
+      if (r.empty) {
+        set({ nodes: {}, remoteArea: null })
+        return
+      }
+      if (r.design) get().rebuildFromDesign(r.design)
+      if (typeof r.seq === 'number') set({ lastSeq: r.seq })
     },
   }))
 }

@@ -28,6 +28,8 @@ import {
 } from 'react'
 import type { Tool, ToolContext, ToolPointerEvent, ToolKeyEvent } from './Tool'
 import { getTool, listTools } from './ToolRegistry'
+import { useHalofireBridge } from '@pascal-app/viewer/halofire'
+import * as THREE from 'three'
 
 interface ToolManagerAPI {
   activeId: string | null
@@ -39,22 +41,51 @@ interface ToolManagerAPI {
 const ToolManagerCtx = createContext<ToolManagerAPI | null>(null)
 
 /**
- * Approximate screen→world projection. Matches the convention the
- * existing `RemoteAreaDraw` and `ToolOverlay` use: the visible
- * viewport shows a 30 m × 30 m slice centred on the origin. A proper
- * r3f raycaster is Phase F cleanup; this gets us real tool dispatch
- * in the meantime.
+ * Screen→world projection. Phase F: uses the real r3f raycaster
+ * published by the HalofireBridgeSlot whenever the viewer is mounted.
+ * Falls back to the legacy 30 m grid approximation only when the
+ * bridge refs aren't available yet (very first frame before the
+ * Canvas mounts, or tests that don't spin up r3f).
  */
 function screenToWorld(
   x: number,
   y: number,
   canvas: HTMLCanvasElement,
 ): { x: number; y: number; z: number } {
+  // Prefer the real raycaster.
+  try {
+    const { camera, raycaster } = useHalofireBridge.getState().refs
+    if (camera && raycaster) {
+      const w = canvas.clientWidth || canvas.width || 1
+      const h = canvas.clientHeight || canvas.height || 1
+      const ndc = new THREE.Vector2((x / w) * 2 - 1, -(y / h) * 2 + 1)
+      raycaster.setFromCamera(ndc, camera)
+      // First try intersecting the scene to snap onto geometry.
+      const scene = useHalofireBridge.getState().refs.scene
+      if (scene) {
+        const hits = raycaster.intersectObject(scene, true)
+        // Filter handles + helpers
+        const real = hits.find((h) => {
+          const ud = (h.object.userData ?? {}) as Record<string, unknown>
+          return !ud.halofireHandle
+        })
+        if (real) {
+          return { x: real.point.x, y: real.point.y, z: real.point.z }
+        }
+      }
+      // Fallback: intersect the ground plane y = 0.
+      const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0)
+      const target = new THREE.Vector3()
+      if (raycaster.ray.intersectPlane(plane, target)) {
+        return { x: target.x, y: target.y, z: target.z }
+      }
+    }
+  } catch {
+    // Bridge not ready — fall through to legacy projection.
+  }
+  // Legacy fallback — 30 m × 30 m grid centred on origin.
   const w = canvas.clientWidth || canvas.width || 1
   const h = canvas.clientHeight || canvas.height || 1
-  // Map (0,0)→(-15,-15), (w,h)→(+15,+15) in world x/z; y (up) is
-  // ceiling-ish by default (2.8 m). The manual tools caller can
-  // override the y component per-tool.
   const worldX = (x / w) * 30 - 15
   const worldZ = (y / h) * 30 - 15
   return { x: worldX, y: 2.8, z: worldZ }

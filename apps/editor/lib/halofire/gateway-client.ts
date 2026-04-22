@@ -188,6 +188,16 @@ export const halofireGateway = {
   eventsUrl(projectId: string): string {
     return `${GATEWAY_URL}/projects/${encodeURIComponent(projectId)}/events`
   },
+  /**
+   * Phase F — canonical scene fetch used to resync the TS store
+   * after undo / redo pops. Returns the raw design.json plus the
+   * current seq so stale events are de-duped.
+   */
+  getScene(
+    projectId: string,
+  ): Promise<{ project_id: string; seq: number; design?: unknown; empty?: boolean }> {
+    return req('GET', `/projects/${encodeURIComponent(projectId)}/scene`)
+  },
 }
 
 export type HalofireGateway = typeof halofireGateway

@@ -329,3 +329,50 @@ def test_new_mutation_clears_redo_stack(client: TestClient) -> None:
     client.post("/projects/alpha/heads", json={"position_m": {"x": 1, "y": 1, "z": 2.8}})
     r = client.post("/projects/alpha/redo")
     assert r.status_code == 409
+
+
+# ── Phase F — GET /scene ─────────────────────────────────────────────
+
+
+def test_scene_returns_design_with_seq(client: TestClient) -> None:
+    client.post(
+        "/projects/alpha/heads",
+        json={"position_m": {"x": 2, "y": 2, "z": 2.8}, "sku": "TY3231"},
+    )
+    r = client.get("/projects/alpha/scene")
+    assert r.status_code == 200
+    body = r.json()
+    assert body["project_id"] == "alpha"
+    assert "design" in body
+    assert "systems" in body["design"]
+    # seq reflects the one insert we performed.
+    assert body["seq"] >= 1
+
+
+def test_scene_after_undo_reflects_reverted_state(client: TestClient) -> None:
+    insert = client.post(
+        "/projects/alpha/heads",
+        json={"position_m": {"x": 5, "y": 5, "z": 2.8}},
+    ).json()
+    head_id = insert["delta"]["added_nodes"][0]
+    client.post("/projects/alpha/undo")
+    body = client.get("/projects/alpha/scene").json()
+    # After undo the head should be gone from the returned design.
+    ids = [
+        h["id"]
+        for system in body["design"].get("systems", [])
+        for h in (system.get("heads") or [])
+    ]
+    assert head_id not in ids
+
+
+def test_scene_empty_project_returns_empty_marker(
+    tmp_path: Path, monkeypatch,
+) -> None:
+    # No design on disk for this project.
+    monkeypatch.setattr(main, "_DATA_ROOT", tmp_path)
+    monkeypatch.setattr(main, "_API_KEY", None)
+    c = TestClient(main.app)
+    r = c.get("/projects/nonexistent/scene")
+    assert r.status_code == 200
+    assert r.json().get("empty") is True

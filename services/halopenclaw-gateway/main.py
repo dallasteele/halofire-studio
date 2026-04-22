@@ -455,6 +455,31 @@ async def get_design_json(project_id: str) -> JSONResponse:
     return JSONResponse(json.loads(p.read_text(encoding="utf-8")))
 
 
+@app.get("/projects/{project_id}/scene")
+async def get_scene(project_id: str) -> JSONResponse:
+    """Phase F — canonical scene snapshot for post-undo / post-redo
+    resync by the TS scene store. Mirrors ``/design.json`` but is
+    named after the client-side abstraction; returns an empty scene
+    (``{}``) rather than 404 when no design exists yet so the
+    optimistic store can reconcile on a fresh project.
+    """
+    p = _safe_project_dir(project_id) / "deliverables" / "design.json"
+    if not p.exists():
+        return JSONResponse({"project_id": project_id, "empty": True})
+    seq = 0
+    try:
+        store = _store(project_id)
+        # _next_seq is 1-indexed; current seq = next - 1.
+        seq = max(0, store._next_seq() - 1)  # noqa: SLF001 — intentional peek
+    except Exception:
+        seq = 0
+    return JSONResponse({
+        "project_id": project_id,
+        "seq": seq,
+        "design": json.loads(p.read_text(encoding="utf-8")),
+    })
+
+
 @app.get("/projects/{project_id}/manifest.json")
 async def get_manifest_json(project_id: str) -> JSONResponse:
     p = _safe_project_dir(project_id) / "deliverables" / "manifest.json"

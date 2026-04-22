@@ -31,6 +31,8 @@ import { SceneChangeBridge } from '@/components/halofire/SceneChangeBridge'
 import { HalofireNodeWatcher } from '@/components/halofire/HalofireNodeWatcher'
 import { UndoStack } from '@/components/halofire/UndoStack'
 import { AutoPilot } from '@/components/halofire/AutoPilot'
+import { PipeHandles } from '@/components/halofire/PipeHandles'
+import AutosaveManager from '@/components/halofire/AutosaveManager'
 import { useCallback, useEffect, useState } from 'react'
 import { StatusBar } from '@/components/halofire/StatusBar'
 import { ToolOverlay } from '@/components/halofire/ToolOverlay'
@@ -442,6 +444,27 @@ function HomeInner() {
     }
   }, [toolManager])
 
+  // Phase F — listen for halofire:ribbon events fired by the
+  // CommandPalette (which doesn't go through <Ribbon onCommand>)
+  // and re-route tool-activation commands through the tool manager.
+  // We key on `cmd.startsWith('tool-')` and only activate; we do not
+  // re-broadcast the event (it was already fired by the palette).
+  useEffect(() => {
+    const onRibbon = (e: Event) => {
+      const detail = (e as CustomEvent).detail as { cmd?: string } | undefined
+      const cmd = detail?.cmd
+      if (!cmd) return
+      const toolId = RIBBON_TO_TOOL[cmd]
+      if (toolId) {
+        // Avoid infinite loop — the palette already dispatched the
+        // event, so we just activate the tool without re-dispatching.
+        void toolManager.activate(toolId)
+      }
+    }
+    window.addEventListener('halofire:ribbon', onRibbon as EventListener)
+    return () => window.removeEventListener('halofire:ribbon', onRibbon as EventListener)
+  }, [toolManager])
+
   // Phase C — page-level live hydraulics so NodeTags + StatusBar
   // share one subscription. LiveCalc keeps its own hook instance
   // so it stays self-contained, but both pull from the same
@@ -489,6 +512,11 @@ function HomeInner() {
       <RevisionCloudTool />
       <LiveCalc projectId={ACTIVE_PROJECT_ID} />
       <NodeTags snapshot={liveHyd.snapshot} />
+      <PipeHandles projectId={ACTIVE_PROJECT_ID} />
+      {/* Phase F — top-level autosave. Guards internally on null
+          project; becomes active once a LoadedProject is threaded
+          through the project-loading flow. */}
+      <AutosaveManager project={null} />
       <SystemOptimizer projectId={ACTIVE_PROJECT_ID} />
       <LayerPanel />
       {/* V2 Phase 5.3: selection-driven props for halofire items */}

@@ -13,6 +13,7 @@
  */
 
 import { useCallback, useEffect, useState } from 'react'
+import { useHalofireBridge } from '@pascal-app/viewer/halofire'
 
 export type LayerId =
   | 'heads'
@@ -85,10 +86,22 @@ export function LayerPanel({
 }: LayerPanelProps) {
   const [vis, setVis] = useState<LayerVisibility>(initial)
 
+  // Push the initial visibility into the r3f bridge so a freshly
+  // mounted viewport reflects defaults (e.g. obstructions hidden).
+  useEffect(() => {
+    try { useHalofireBridge.getState().setLayerVisibility(initial) } catch { /* */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   // Single place to commit a new visibility map
   const commit = useCallback((next: LayerVisibility) => {
     setVis(next)
     onChange?.(next)
+    // Push into the r3f bridge so Pascal's viewport actually hides
+    // the toggled layers.
+    try {
+      useHalofireBridge.getState().setLayerVisibility(next)
+    } catch { /* bridge may be unmounted in tests */ }
     if (typeof window !== 'undefined') {
       window.dispatchEvent(
         new CustomEvent('halofire:layer-visibility', { detail: next }),
@@ -107,6 +120,7 @@ export function LayerPanel({
       setVis((prev) => {
         const next = toggleLayer(prev, id)
         onChange?.(next)
+        try { useHalofireBridge.getState().setLayerVisibility(next) } catch { /* */ }
         window.dispatchEvent(
           new CustomEvent('halofire:layer-visibility', { detail: next }),
         )
@@ -131,6 +145,7 @@ export function LayerPanel({
       setVis((prev) => {
         const next = toggleLayer(prev, match.id)
         onChange?.(next)
+        try { useHalofireBridge.getState().setLayerVisibility(next) } catch { /* */ }
         window.dispatchEvent(
           new CustomEvent('halofire:layer-visibility', { detail: next }),
         )

@@ -10,6 +10,11 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "default": "./dist/index.js"
+    },
+    "./halofire": {
+      "types": "./dist/halofire/bridge.d.ts",
+      "import": "./dist/halofire/bridge.js",
+      "default": "./dist/halofire/bridge.js"
     }
   },
   "files": [

@@ -17,5 +17,17 @@ export {
 } from './lib/materials'
 export { mergedOutline } from './lib/merged-outline-node'
 export { default as useViewer } from './store/use-viewer'
+export {
+  useHalofireBridge,
+  DEFAULT_LAYER_VISIBILITY as HALOFIRE_DEFAULT_LAYER_VISIBILITY,
+  resolveHalofireLayer,
+  type HalofireBridgeState,
+  type HalofireNodeTag,
+  type HalofirePipeHandle,
+  type HalofireR3FRefs,
+  type LayerId as HalofireLayerId,
+  type LayerVisibility as HalofireLayerVisibility,
+} from './halofire/bridge'
+export { HalofireBridgeSlot } from './halofire/bridge-slot'
 export { InteractiveSystem } from './systems/interactive/interactive-system'
 export { snapLevelsToTruePositions } from './systems/level/level-utils'

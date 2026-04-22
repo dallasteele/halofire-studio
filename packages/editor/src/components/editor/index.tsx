@@ -7,7 +7,7 @@ import {
   spatialGridManager,
   useScene,
 } from '@pascal-app/core'
-import { InteractiveSystem, useViewer, Viewer } from '@pascal-app/viewer'
+import { HalofireBridgeSlot, InteractiveSystem, useViewer, Viewer } from '@pascal-app/viewer'
 import { memo, type ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 import { ViewerOverlay } from '../../components/viewer-overlay'
 import { ViewerZoneSystem } from '../../components/viewer-zone-system'
@@ -537,6 +537,9 @@ const ViewerSceneContent = memo(function ViewerSceneContent({
       <PresetThumbnailGenerator />
       {!isFirstPersonMode && <SiteEdgeLabels />}
       {isFirstPersonMode && <InteractiveSystem />}
+      {/* Phase F — halofire r3f bridge: real raycaster refs, Html
+          node tags, pipe handles, layer-visibility enforcement. */}
+      <HalofireBridgeSlot />
     </>
   )
 })

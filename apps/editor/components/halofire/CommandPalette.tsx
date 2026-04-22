@@ -53,6 +53,22 @@ const DEFAULT_ENTRIES: Entry[] = [
   { id: 'cmd.new',           label: 'New bid',                group: 'File',    cmd: 'bid-new' },
   { id: 'cmd.load',          label: 'Load bid',               group: 'File',    cmd: 'bid-load' },
   { id: 'cmd.save',          label: 'Save bid',               group: 'File',    cmd: 'bid-save' },
+  // Tools (Phase F — mirror ribbon Tools group)
+  { id: 'cmd.tool-sprinkler',  label: 'Sprinkler tool',         group: 'Tools', cmd: 'tool-sprinkler', hint: 'Tools ▸ Sprinkler', keywords: ['head', 'place'] },
+  { id: 'cmd.tool-pipe',       label: 'Pipe tool',              group: 'Tools', cmd: 'tool-pipe', hint: 'Tools ▸ Pipe', keywords: ['segment', 'run'] },
+  { id: 'cmd.tool-fitting',    label: 'Fitting tool',           group: 'Tools', cmd: 'tool-fitting', hint: 'Tools ▸ Fitting', keywords: ['elbow', 'tee'] },
+  { id: 'cmd.tool-hanger',     label: 'Hanger tool',            group: 'Tools', cmd: 'tool-hanger', hint: 'Tools ▸ Hanger', keywords: ['support'] },
+  { id: 'cmd.tool-sway-brace', label: 'Sway brace tool',        group: 'Tools', cmd: 'tool-sway-brace', hint: 'Tools ▸ Sway Brace', keywords: ['seismic', 'brace'] },
+  { id: 'cmd.tool-remote-area',label: 'Remote area tool',       group: 'Tools', cmd: 'tool-remote-area', hint: 'Hydraulics ▸ Remote Area', keywords: ['polygon', 'design area'] },
+  { id: 'cmd.tool-move',       label: 'Move tool',              group: 'Tools', cmd: 'tool-move', hint: 'Edit ▸ Move' },
+  { id: 'cmd.tool-resize',     label: 'Resize tool',            group: 'Tools', cmd: 'tool-resize', hint: 'Edit ▸ Resize', keywords: ['schedule', 'diameter'] },
+  { id: 'cmd.tool-measure',    label: 'Measure tool',           group: 'Tools', cmd: 'tool-measure', hint: 'Tools ▸ Measure', keywords: ['distance', 'ruler'] },
+  { id: 'cmd.tool-section',    label: 'Section tool',           group: 'Tools', cmd: 'tool-section', hint: 'View ▸ Section', keywords: ['cut', 'plane'] },
+  // Hydraulics (Phase C)
+  { id: 'cmd.hy-opt',          label: 'System Optimizer',       group: 'Hydraulics', cmd: 'hydraulics-optimize', keywords: ['upsize', 'pipe'] },
+  { id: 'cmd.hy-peak',         label: 'Auto Peak remote area',  group: 'Hydraulics', cmd: 'hydraulics-auto-peak', keywords: ['worst case'] },
+  { id: 'cmd.hy-report',       label: 'Hydraulic report',       group: 'Hydraulics', cmd: 'hydraulics-report', keywords: ['nfpa', 'pdf'] },
+  { id: 'cmd.hy-tags',         label: 'Toggle node tags',       group: 'Hydraulics', cmd: 'node-tags-toggle', keywords: ['labels'] },
   // Navigation
   { id: 'go.auto',           label: 'Go to Auto-Design panel', group: 'Go to', goTab: 'halofire-auto' },
   { id: 'go.project',        label: 'Go to Project brief',    group: 'Go to',  goTab: 'halofire-project' },
