@@ -154,38 +154,52 @@ export function LiveCalc({
 
   const headline = snapshot?.headline ?? null
 
+  const headlineMargin = headline?.safety_margin_psi ?? null
+  const marginTone: 'ok' | 'warn' | 'crit' =
+    headlineMargin == null
+      ? 'ok'
+      : headlineMargin >= 10
+        ? 'ok'
+        : headlineMargin >= 0
+          ? 'warn'
+          : 'crit'
+
   return (
     <div
       data-testid="halofire-live-calc"
-      style={{ bottom: bottomOffset }}
-      className="pointer-events-auto fixed right-4 z-[800] w-[300px] border border-white/10 bg-[#0a0a0b] text-[11px] text-neutral-100 shadow-[0_8px_24px_rgba(0,0,0,0.45)]"
+      style={{
+        bottom: bottomOffset,
+        borderRadius: 0,
+        boxShadow:
+          '0 10px 30px rgba(0,0,0,0.55), inset 0 1px 0 0 rgba(232,67,45,0.4)',
+      }}
+      className="pointer-events-auto fixed right-4 z-[800] w-[312px] border border-[var(--color-hf-edge)] bg-[var(--color-hf-surface)] text-[11px] text-[var(--color-hf-ink)]"
     >
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-white/5 bg-[#0c0c10] px-3 py-2">
+      <div className="flex items-center justify-between border-b border-[var(--color-hf-edge)] bg-[var(--color-hf-bg)] px-3 py-1.5">
         <div className="flex items-center gap-2">
           <span
             aria-hidden
             className={
-              'inline-block h-2 w-2 ' +
+              'inline-block h-1.5 w-1.5 ' +
               (isCalculating
-                ? 'animate-pulse bg-[#ffb800]'
+                ? 'bg-[var(--color-hf-gold)] hf-pulse-hot'
                 : state.kind === 'error'
-                  ? 'bg-[#ff3333]'
+                  ? 'bg-[var(--color-hf-brick)]'
                   : snapshot
-                    ? 'bg-[#4af626]'
-                    : 'bg-neutral-600')
+                    ? 'bg-[var(--color-hf-moss)]'
+                    : 'bg-[var(--color-hf-ink-deep)]')
             }
           />
-          <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-neutral-300">
-            Live hydraulic
-          </span>
+          <span className="hf-label tracking-[0.22em]">Live hydraulic</span>
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-0.5">
           <button
             type="button"
             onClick={handleRetry}
             title="Recalculate now"
-            className="px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-neutral-400 hover:bg-neutral-800 hover:text-white"
+            style={{ borderRadius: 0 }}
+            className="px-1.5 py-0.5 hf-label hover:bg-[var(--color-hf-surface-2)] hover:text-[var(--color-hf-paper)]"
           >
             recalc
           </button>
@@ -193,16 +207,18 @@ export function LiveCalc({
             type="button"
             onClick={() => setCollapsed((c) => !c)}
             title={collapsed ? 'expand' : 'collapse'}
-            className="px-1.5 py-0.5 text-neutral-400 hover:bg-neutral-800 hover:text-white"
             aria-label={collapsed ? 'expand' : 'collapse'}
+            style={{ borderRadius: 0 }}
+            className="px-1.5 py-0.5 text-[var(--color-hf-ink-mute)] hover:bg-[var(--color-hf-surface-2)] hover:text-[var(--color-hf-paper)]"
           >
             {collapsed ? '▴' : '▾'}
           </button>
           <button
             type="button"
             onClick={() => setVisible(false)}
-            className="px-1.5 py-0.5 text-neutral-400 hover:bg-neutral-800 hover:text-white"
             aria-label="close"
+            style={{ borderRadius: 0 }}
+            className="px-1.5 py-0.5 text-[var(--color-hf-ink-mute)] hover:bg-[var(--color-hf-surface-2)] hover:text-[var(--color-hf-paper)]"
           >
             ×
           </button>
@@ -210,13 +226,13 @@ export function LiveCalc({
       </div>
 
       {!collapsed && (
-        <div className="p-3 font-mono">
-          {state.kind === 'idle' && (
-            <EmptyState />
-          )}
+        <div className="px-3 py-3">
+          {state.kind === 'idle' && <EmptyState />}
 
           {state.kind === 'calculating' && !snapshot && (
-            <div className="text-[#ffb800]">calculating…</div>
+            <div className="hf-label text-[var(--color-hf-gold)]">
+              calculating…
+            </div>
           )}
 
           {state.kind === 'error' && !snapshot && (
@@ -225,57 +241,80 @@ export function LiveCalc({
 
           {headline && (
             <>
-              {state.kind === 'calculating' && (
-                <div className="mb-1 text-[9px] uppercase tracking-wider text-[#ffb800]">
-                  recalculating…
+              {/* Hero — residual pressure is the estimator's north star. */}
+              <div className="pb-3">
+                <div className="flex items-baseline justify-between gap-2">
+                  <span className="hf-label tracking-[0.22em]">Residual</span>
+                  <ToneDot tone={marginTone} />
                 </div>
-              )}
-              {state.kind === 'ready' && state.origin && (
-                <div className="mb-1 text-[9px] uppercase tracking-wider text-neutral-600">
-                  trigger · {state.origin}
+                <div className="flex items-baseline">
+                  <span
+                    className="hf-hero text-[46px] text-[var(--color-hf-paper)]"
+                    style={{ fontVariationSettings: '"SOFT" 30, "WONK" 0, "opsz" 144' }}
+                  >
+                    {headline.supply_residual_psi != null
+                      ? headline.supply_residual_psi.toFixed(1)
+                      : '—'}
+                  </span>
+                  <span className="hf-label ml-1.5 pb-1.5 text-[var(--color-hf-ink-mute)]">
+                    psi
+                  </span>
                 </div>
-              )}
-              <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1">
+                <div className="mt-1 flex items-baseline gap-3">
+                  <span className="hf-label">Flow</span>
+                  <span className="hf-num text-[13px] text-[var(--color-hf-paper)]">
+                    {headline.required_flow_gpm != null
+                      ? headline.required_flow_gpm.toFixed(0)
+                      : '—'}
+                  </span>
+                  <span className="hf-label">gpm</span>
+                </div>
+              </div>
+
+              {/* Status band: trigger / calc lifecycle */}
+              <div className="flex items-center justify-between pb-2 hf-label">
+                <span>
+                  {state.kind === 'calculating'
+                    ? 'recalculating…'
+                    : state.kind === 'ready' && state.origin
+                      ? `trigger · ${state.origin}`
+                      : 'steady'}
+                </span>
+                <span className="hf-num text-[var(--color-hf-ink-deep)]">
+                  {snapshot?.systems[0]?.id?.slice(0, 10) ?? ''}
+                </span>
+              </div>
+
+              {/* Supporting readouts — 2-column compact table. */}
+              <dl
+                className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1.5 border-t border-[var(--color-hf-edge)] pt-2"
+              >
                 <Row
-                  label="static"
+                  label="Static"
                   value={fmt(
                     snapshot?.systems[0]?.hydraulic?.supply_static_psi ?? null,
                     'psi',
                   )}
                 />
                 <Row
-                  label="residual"
-                  value={fmt(headline.supply_residual_psi, 'psi')}
-                />
-                <Row
-                  label="base demand"
+                  label="Base dem"
                   value={fmt(headline.demand_at_base_of_riser_psi, 'psi')}
                 />
                 <Row
-                  label="flow"
-                  value={fmt(headline.required_flow_gpm, 'gpm')}
-                />
-                <Row
-                  label="margin"
+                  label="Margin"
                   value={fmt(headline.safety_margin_psi, 'psi')}
-                  tone={
-                    (headline.safety_margin_psi ?? 0) >= 10
-                      ? 'ok'
-                      : (headline.safety_margin_psi ?? 0) >= 0
-                        ? 'warn'
-                        : 'crit'
-                  }
+                  tone={marginTone}
                 />
                 {headline.velocity_warnings > 0 && (
                   <Row
-                    label="velocity"
-                    value={`${headline.velocity_warnings} warning${headline.velocity_warnings === 1 ? '' : 's'}`}
+                    label="Velocity"
+                    value={`${headline.velocity_warnings} warn`}
                     tone="warn"
                   />
                 )}
                 {bid != null && (
                   <Row
-                    label="bid $"
+                    label="Bid"
                     value={`$${bid.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
                   />
                 )}
@@ -283,26 +322,22 @@ export function LiveCalc({
                   <Row
                     label="Δ bid"
                     value={formatDelta(bid - baselineRef.current.bid, 0, '$')}
-                    tone={
-                      bid - baselineRef.current.bid > 0 ? 'warn' : 'ok'
-                    }
+                    tone={bid - baselineRef.current.bid > 0 ? 'warn' : 'ok'}
                   />
                 )}
-                {heads != null && <Row label="heads" value={`${heads}`} />}
+                {heads != null && <Row label="Heads" value={`${heads}`} />}
                 {baselineRef.current && heads != null && (
                   <Row
                     label="Δ heads"
                     value={formatDelta(
                       heads - baselineRef.current.heads, 0, '',
                     )}
-                    tone={
-                      heads - baselineRef.current.heads > 0 ? 'warn' : 'ok'
-                    }
+                    tone={heads - baselineRef.current.heads > 0 ? 'warn' : 'ok'}
                   />
                 )}
               </dl>
               {state.kind === 'error' && (
-                <div className="mt-2 border-t border-white/5 pt-2 text-[10px] text-[#ff3333]">
+                <div className="mt-2 border-t border-[var(--color-hf-edge)] pt-2 text-[10px] text-[var(--color-hf-brick)]">
                   last recalc failed — {friendlyError}
                 </div>
               )}
@@ -314,14 +349,34 @@ export function LiveCalc({
   )
 }
 
+function ToneDot({ tone }: { tone: 'ok' | 'warn' | 'crit' }) {
+  const color =
+    tone === 'ok'
+      ? 'var(--color-hf-moss)'
+      : tone === 'warn'
+        ? 'var(--color-hf-gold)'
+        : 'var(--color-hf-brick)'
+  return (
+    <span
+      aria-hidden
+      className="inline-block h-1.5 w-1.5"
+      style={{ background: color }}
+    />
+  )
+}
+
 function EmptyState() {
   return (
-    <div className="space-y-1 text-[11px] leading-snug text-neutral-400">
-      <div className="text-neutral-200">No hydraulic data yet</div>
-      <div>
-        Run <span className="text-[#e8432d]">Auto-Design</span> or place
-        sprinkler heads to populate the solver.
-      </div>
+    <div className="space-y-1.5 text-[11px] leading-relaxed text-[var(--color-hf-ink-mute)]">
+      <div className="hf-label">Awaiting geometry</div>
+      <p className="text-[var(--color-hf-paper)]">
+        Place sprinkler heads or run{' '}
+        <span className="text-[var(--color-hf-accent)]">Auto-Design</span>.
+      </p>
+      <p className="text-[10.5px] text-[var(--color-hf-ink-dim)]">
+        The solver reports static, residual, flow, margin, and
+        velocity flags as the scene changes.
+      </p>
     </div>
   )
 }
@@ -330,12 +385,13 @@ function ErrorState({
   message, onRetry,
 }: { message: string; onRetry: () => void }) {
   return (
-    <div className="space-y-2">
-      <div className="text-[#ff3333]">{message}</div>
+    <div className="space-y-2 text-[11px] leading-relaxed">
+      <div className="text-[var(--color-hf-brick)]">{message}</div>
       <button
         type="button"
         onClick={onRetry}
-        className="border border-[#e8432d]/40 bg-[#e8432d]/10 px-2 py-1 text-[10px] uppercase tracking-wider text-[#ffb4a6] hover:bg-[#e8432d]/20 hover:text-white"
+        style={{ borderRadius: 0 }}
+        className="border border-[rgba(232,67,45,0.4)] bg-[rgba(232,67,45,0.08)] px-2 py-1 hf-label text-[var(--color-hf-accent)] hover:bg-[rgba(232,67,45,0.18)] hover:text-white"
       >
         retry
       </button>
@@ -350,20 +406,20 @@ function Row({
   value: string
   tone?: 'default' | 'ok' | 'warn' | 'crit'
 }) {
-  const cls =
+  const color =
     tone === 'ok'
-      ? 'text-[#4af626]'
+      ? 'var(--color-hf-moss)'
       : tone === 'warn'
-        ? 'text-[#ffb800]'
+        ? 'var(--color-hf-gold)'
         : tone === 'crit'
-          ? 'text-[#ff3333]'
-          : 'text-neutral-100'
+          ? 'var(--color-hf-brick)'
+          : 'var(--color-hf-paper)'
   return (
     <>
-      <dt className="text-[10px] uppercase tracking-wider text-neutral-500">
-        {label}
-      </dt>
-      <dd className={cls}>{value}</dd>
+      <dt className="hf-label">{label}</dt>
+      <dd className="hf-num text-[11px] text-right" style={{ color }}>
+        {value}
+      </dd>
     </>
   )
 }

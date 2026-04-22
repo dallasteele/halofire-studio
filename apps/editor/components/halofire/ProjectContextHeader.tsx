@@ -1,19 +1,17 @@
 'use client'
 
 /**
- * ProjectContextHeader — the ALWAYS-VISIBLE bid context band.
+ * ProjectContextHeader — the always-visible bid context block.
  *
- * UX research: every production CAD product (AutoSprink, HydraCAD,
- * Revit) keeps the project name, path, and service-status visible at
- * all times. A user should never have to click a tab to know what
- * project they're in or whether the backend is reachable.
+ * Phase G redesign: this is the piece every sidebar panel sits
+ * beneath. The bid total is the loudest element on screen — it's
+ * the single number the estimator is ultimately paid for. Fraunces
+ * at 32–40px, tightly tracked, with `$` and the `BID TOTAL` label
+ * in quiet Plex small-caps.
  *
- * This component renders ABOVE the sidebar tab content, inside every
- * sidebar panel, so it's present regardless of which tab is active.
- *
- * Per AGENTIC_RULES §13 honesty: if the gateway is offline the
- * banner says so, loudly. No silent "Failed to fetch" errors hidden
- * inside child panels.
+ * Gateway status is a CALM inline chip — not a red alarm band.
+ * Empty states speak in prose; no stack traces, no giant red boxes
+ * dominating what should be a tool surface.
  */
 
 import { useState } from 'react'
@@ -39,108 +37,179 @@ const DEFAULT_PROJECT: ActiveProject = {
 export function ProjectContextHeader() {
   const gw = useGatewayHealth()
   const [project] = useState<ActiveProject>(DEFAULT_PROJECT)
-  const [dismissed, setDismissed] = useState(false)
+  const [showHelp, setShowHelp] = useState(false)
 
   const offline = gw.status === 'offline'
   const checking = gw.status === 'checking'
 
   return (
-    <div className="border-b border-neutral-800 bg-neutral-950 text-neutral-100">
-      {/* Branded header row */}
-      <div className="flex items-center gap-2 px-3 py-2">
-        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-[#e8432d] text-[10px] font-bold text-white">
-          HF
+    <div className="relative bg-[var(--color-hf-bg)] border-b border-[var(--color-hf-edge)]">
+      {/* Hero block — the numbers that matter. */}
+      <div className="px-3 py-3">
+        {/* Label row */}
+        <div className="flex items-center gap-2 pb-1.5">
+          <div
+            aria-hidden
+            className="flex h-6 w-6 shrink-0 items-center justify-center border border-[rgba(232,67,45,0.5)] text-[10px] font-semibold tracking-wider text-[var(--color-hf-accent)]"
+            style={{
+              borderRadius: 0,
+              background:
+                'linear-gradient(180deg, rgba(232,67,45,0.15), rgba(232,67,45,0.04))',
+              fontFamily: 'var(--font-fraunces), serif',
+              fontStyle: 'italic',
+            }}
+          >
+            hf
+          </div>
+          <span className="hf-label tracking-[0.22em]">Active bid</span>
+          <span className="ml-auto hf-label tracking-[0.22em]">
+            {project.projectId}
+          </span>
         </div>
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-[11px] font-semibold">
+
+        {/* Project line */}
+        <div className="min-w-0 pb-3">
+          <p
+            className="truncate text-[13px] font-medium tracking-tight text-[var(--color-hf-paper)]"
+            title={project.name}
+          >
             {project.name}
           </p>
-          <p className="truncate text-[9px] text-neutral-500">
+          <p className="mt-0.5 truncate text-[10px] text-[var(--color-hf-ink-dim)]">
             {project.address}
           </p>
         </div>
-        <div className="text-right">
-          <p className="font-mono text-[11px] font-bold text-[#e8432d]">
-            ${project.price.toLocaleString()}
-          </p>
-          <p className="text-[8px] uppercase text-neutral-500">
-            Bid total
-          </p>
+
+        {/* Bid total — hero treatment. */}
+        <div className="flex items-end justify-between gap-2 pb-1">
+          <div className="hf-label tracking-[0.24em]">Bid total</div>
+          <div className="flex items-baseline">
+            <span
+              className="hf-num text-[11px] text-[var(--color-hf-ink-dim)] pr-1"
+              aria-hidden
+            >
+              $
+            </span>
+            <span
+              className="hf-hero text-[34px] text-[var(--color-hf-accent)]"
+              style={{
+                fontVariationSettings: '"SOFT" 30, "WONK" 0, "opsz" 144',
+              }}
+            >
+              {project.price.toLocaleString()}
+            </span>
+          </div>
+        </div>
+        {/* Thin accent rule under the hero figure */}
+        <div
+          aria-hidden
+          className="h-px w-full"
+          style={{
+            background:
+              'linear-gradient(to right, rgba(232,67,45,0.6), rgba(232,67,45,0.05))',
+          }}
+        />
+      </div>
+
+      {/* Service health — calm inline chip, never a red alarm band. */}
+      <div className="flex items-center gap-2 border-t border-[var(--color-hf-edge)] px-3 py-1.5">
+        <GatewayDot status={offline ? 'offline' : checking ? 'checking' : 'online'} />
+        <span className="hf-label tracking-[0.22em]">halopenclaw</span>
+        <span
+          className="text-[10px] leading-none"
+          style={{
+            color: offline
+              ? 'var(--color-hf-brick)'
+              : checking
+                ? 'var(--color-hf-gold)'
+                : 'var(--color-hf-moss)',
+          }}
+        >
+          {offline ? 'offline' : checking ? 'checking…' : 'online'}
+        </span>
+        {!offline && !checking && gw.tools.length > 0 && (
+          <span className="hf-num text-[10px] text-[var(--color-hf-ink-deep)]">
+            · {gw.tools.length}
+            <span className="ml-0.5 hf-label">tools</span>
+          </span>
+        )}
+        <div className="ml-auto flex items-center gap-1">
+          {offline && (
+            <>
+              <button
+                type="button"
+                onClick={() => setShowHelp((v) => !v)}
+                className="hf-label underline decoration-dotted underline-offset-2 hover:text-[var(--color-hf-paper)]"
+              >
+                {showHelp ? 'hide' : 'help'}
+              </button>
+              <button
+                type="button"
+                onClick={gw.retry}
+                className="border border-[var(--color-hf-edge)] px-1.5 py-0.5 hf-label hover:border-[var(--color-hf-accent)] hover:text-[var(--color-hf-paper)]"
+                style={{ borderRadius: 0 }}
+              >
+                retry
+              </button>
+            </>
+          )}
         </div>
       </div>
 
-      {/* Service health row */}
-      <div
-        className={`flex items-center gap-2 border-t border-neutral-800 px-3 py-1 text-[10px] ${
-          offline
-            ? 'bg-red-950/50 text-red-200'
-            : checking
-              ? 'bg-amber-950/30 text-amber-200'
-              : 'bg-neutral-900 text-neutral-500'
-        }`}
-      >
-        <span
-          className={`h-2 w-2 shrink-0 rounded-full ${
-            offline
-              ? 'bg-red-500'
-              : checking
-                ? 'bg-amber-400 animate-pulse'
-                : 'bg-emerald-500'
-          }`}
-        />
-        <span className="flex-1 truncate">
-          {offline
-            ? `Gateway offline — ${gw.error ?? 'no connection'}`
-            : checking
-              ? 'Checking halopenclaw…'
-              : `halopenclaw online · ${gw.tools.length} tools`}
-        </span>
-        {offline && (
-          <button
-            type="button"
-            onClick={gw.retry}
-            className="rounded bg-red-900 px-2 py-0.5 font-medium text-red-100 hover:bg-red-800"
+      {/* Help drawer — opt-in, quiet prose. No red banner. */}
+      {offline && showHelp && (
+        <div className="border-t border-[var(--color-hf-edge)] bg-[var(--color-hf-surface)] px-3 py-2 text-[10.5px] leading-relaxed text-[var(--color-hf-ink-mute)]">
+          <p>
+            Start the halopenclaw gateway from the repo root:
+          </p>
+          <pre
+            className="mt-1.5 overflow-x-auto border border-[var(--color-hf-edge)] bg-[var(--color-hf-bg)] px-2 py-1.5 hf-num text-[10px] text-[var(--color-hf-paper)]"
+            style={{ borderRadius: 0 }}
           >
-            Retry
-          </button>
-        )}
-      </div>
-
-      {/* Offline help (dismissible) */}
-      {offline && !dismissed && (
-        <div className="border-t border-red-900 bg-red-950/60 px-3 py-2 text-[10px] text-red-100">
-          <p className="font-semibold">Start the halopenclaw gateway:</p>
-          <pre className="mt-1 overflow-x-auto rounded bg-neutral-950 p-1 font-mono text-[9px]">
-            cd services/halopenclaw-gateway{"\n"}
-            .venv/Scripts/python.exe -m uvicorn main:app --port 18080
+{`cd services/halopenclaw-gateway
+.venv/Scripts/python.exe -m uvicorn main:app --port 18080`}
           </pre>
-          <p className="mt-1">
-            Expected:{' '}
+          <p className="mt-1.5">
+            Health probe ·{' '}
             <a
               href={`${GATEWAY_URL}/health`}
               target="_blank"
               rel="noreferrer"
-              className="underline"
+              className="underline decoration-dotted underline-offset-2 hover:text-[var(--color-hf-accent)]"
             >
               {GATEWAY_URL}/health
             </a>
           </p>
-          <button
-            type="button"
-            onClick={() => setDismissed(true)}
-            className="mt-1 text-[9px] underline text-red-200"
-          >
-            Dismiss
-          </button>
         </div>
       )}
     </div>
   )
 }
 
+function GatewayDot({
+  status,
+}: {
+  status: 'online' | 'offline' | 'checking'
+}) {
+  const color =
+    status === 'online'
+      ? 'var(--color-hf-moss)'
+      : status === 'offline'
+        ? 'var(--color-hf-brick)'
+        : 'var(--color-hf-gold)'
+  return (
+    <span
+      aria-hidden
+      className={
+        'inline-block h-2 w-2 shrink-0 ' +
+        (status === 'checking' ? 'hf-pulse-hot' : '')
+      }
+      style={{ background: color }}
+    />
+  )
+}
+
 /** Hook used by child panels that want to know the active project. */
 export function useActiveProject(): ActiveProject {
-  // In the future this pulls from a context or URL param; today all
-  // Studio sessions are 1881-cooperative.
   return DEFAULT_PROJECT
 }

@@ -4,10 +4,22 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* =============================================================
+   HaloFire Studio — Phase G design system
+   "Engineer's drafting room meets NASA mission console"
+
+   - Warm-neutral dark surfaces (never blue-gray)
+   - Surgical #e8432d accent, earthen data palette
+   - Fraunces (display) / IBM Plex Mono (body) / JetBrains Mono (numeric)
+   - Zero-radius primary surfaces; 2px inside for friendliness
+   - Grain overlay + 10% grid for drafting-canvas feel
+   ============================================================= */
+
 @theme {
+  /* Core typography stacks — the app-wide "voice". */
   --font-sans:
-    var(--font-barlow), var(--font-geist-sans), ui-sans-serif, system-ui,
-    sans-serif;
+    var(--font-plex-mono), var(--font-geist-mono), ui-monospace,
+    SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   --font-mono:
     var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, Monaco,
     Consolas, monospace;
@@ -17,12 +29,39 @@
   --font-barlow:
     var(--font-barlow), var(--font-geist-sans), ui-sans-serif, system-ui,
     sans-serif;
+  /* Phase G — new display + numeric voices. */
+  --font-display:
+    var(--font-fraunces), "Fraunces", "Didot", Georgia, ui-serif, serif;
+  --font-plex:
+    var(--font-plex-mono), "IBM Plex Mono", ui-monospace, Menlo, Monaco,
+    Consolas, monospace;
+  --font-numeric:
+    var(--font-jetbrains-mono), "JetBrains Mono", ui-monospace, Menlo,
+    Monaco, Consolas, monospace;
+
+  /* HaloFire palette */
+  --color-hf-bg:            #0d0c0a;
+  --color-hf-surface:       #141210;
+  --color-hf-surface-2:     #1b1815;
+  --color-hf-edge:          rgba(255, 255, 255, 0.06);
+  --color-hf-edge-strong:   rgba(255, 255, 255, 0.12);
+  --color-hf-rule:          rgba(255, 255, 255, 0.08);
+  --color-hf-ink:           #f2ece0;
+  --color-hf-ink-mute:      #a8a095;
+  --color-hf-ink-dim:       #6b655c;
+  --color-hf-ink-deep:      #413c36;
+  --color-hf-accent:        #e8432d; /* surgical red-orange */
+  --color-hf-accent-hot:    #ff5533; /* live pulse only */
+  --color-hf-gold:          #c89a3c; /* informational */
+  --color-hf-moss:          #6b8e3a; /* within-spec */
+  --color-hf-brick:         #9a3c3c; /* critical violation */
+  --color-hf-paper:         #e8dfcf; /* light-on-dark chrome */
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-barlow), sans-serif;
+  --font-sans: var(--font-plex-mono), monospace;
   --font-mono: var(--font-geist-mono), monospace;
   --font-pixel:
     var(--font-geist-pixel-square), var(--font-geist-mono), monospace;
@@ -96,57 +135,308 @@
   --sidebar-ring: oklch(0.708 0 0);
 }
 
+/* HaloFire is a dark tool first and foremost — the Pascal shell
+   toggles `.dark` on <html>, but we force-apply dark tokens on
+   :root too so the editor is never white-flash on cold boot.    */
+:root,
 .dark {
-  --background: oklch(0.205 0 0); /* ~171717 */
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(
-    0.235 0 0
-  ); /* slightly lighter than background (0.205) but darker than previous (0.269) */
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.235 0 0); /* matching accent */
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --background: #0d0c0a;
+  --foreground: #f2ece0;
+  --card: #141210;
+  --card-foreground: #f2ece0;
+  --popover: #141210;
+  --popover-foreground: #f2ece0;
+  --primary: #f2ece0;
+  --primary-foreground: #0d0c0a;
+  --secondary: #1b1815;
+  --secondary-foreground: #f2ece0;
+  --muted: #1b1815;
+  --muted-foreground: #a8a095;
+  --accent: #1b1815;
+  --accent-foreground: #e8432d;
+  --destructive: #9a3c3c;
+  --border: rgba(255, 255, 255, 0.08);
+  --input: rgba(255, 255, 255, 0.12);
+  --ring: rgba(232, 67, 45, 0.5);
+  --chart-1: #e8432d;
+  --chart-2: #c89a3c;
+  --chart-3: #6b8e3a;
+  --chart-4: #9a3c3c;
+  --chart-5: #a8a095;
+  --sidebar: #0d0c0a;
+  --sidebar-foreground: #f2ece0;
+  --sidebar-primary: #e8432d;
+  --sidebar-primary-foreground: #f2ece0;
+  --sidebar-accent: #141210;
+  --sidebar-accent-foreground: #f2ece0;
+  --sidebar-border: rgba(255, 255, 255, 0.08);
+  --sidebar-ring: rgba(232, 67, 45, 0.5);
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
-  body {
-    @apply bg-background text-foreground;
+  html, body {
+    background: var(--color-hf-bg);
+    color: var(--color-hf-ink);
+    font-family: var(--font-plex), ui-monospace, monospace;
+    font-feature-settings: "ss01", "cv02", "cv11";
+    letter-spacing: 0.005em;
+    text-rendering: geometricPrecision;
+    -webkit-font-smoothing: antialiased;
+  }
+  /* Faint drafting-paper grain, globally — never on the 3D viewport,
+     which owns its own canvas. */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.035;
+    mix-blend-mode: overlay;
+    background-image:
+      url("data:image/svg+xml;utf8,\
+<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'>\
+<filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='7'/>\
+<feColorMatrix values='0 0 0 0 0.9  0 0 0 0 0.85  0 0 0 0 0.7  0 0 0 0.7 0'/></filter>\
+<rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    background-size: 160px 160px;
   }
   button,
   [role="button"],
   a {
     cursor: pointer;
   }
+  ::selection {
+    background: rgba(232, 67, 45, 0.35);
+    color: #fff;
+  }
 }
 
-/* Apple-style smooth corners (squircle) — progressive enhancement */
+/* =============================================================
+   Drafting utilities
+   ============================================================= */
+
+/* Hairline rule — used at the top of major panels. */
+.hf-rule-top {
+  box-shadow: inset 0 1px 0 0 var(--color-hf-rule);
+}
+/* Heavier bottom rule with tick marks — CAD drawing-frame feel. */
+.hf-rule-bottom {
+  position: relative;
+}
+.hf-rule-bottom::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: linear-gradient(
+    to right,
+    var(--color-hf-rule) 0,
+    var(--color-hf-rule) 100%
+  );
+  background-size: 10px 2px;
+  background-image:
+    linear-gradient(
+      to right,
+      var(--color-hf-edge-strong) 0 1px,
+      transparent 1px 10px
+    );
+  opacity: 0.6;
+}
+
+/* Drafting grid behind the viewport — subtle, 40px major / 8px minor. */
+.hf-grid-overlay {
+  background-image:
+    linear-gradient(to right, rgba(232, 67, 45, 0.04) 0 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(232, 67, 45, 0.04) 0 1px, transparent 1px),
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 0 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 0 1px, transparent 1px);
+  background-size: 160px 160px, 160px 160px, 40px 40px, 40px 40px;
+}
+
+/* Small-caps engineering label — 9px, wide tracking, muted. */
+.hf-label {
+  font-family: var(--font-plex), monospace;
+  font-size: 9px;
+  line-height: 1;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-hf-ink-dim);
+}
+.hf-label-strong {
+  color: var(--color-hf-ink-mute);
+}
+
+/* Numeric hero — Fraunces, tight tracking, baseline shift for unit. */
+.hf-hero {
+  font-family: var(--font-display), serif;
+  font-variation-settings: "opsz" 144, "SOFT" 20, "WONK" 0;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 0.9;
+  color: var(--color-hf-ink);
+}
+.hf-hero-unit {
+  font-family: var(--font-plex), monospace;
+  font-size: 0.28em;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-hf-ink-mute);
+  margin-left: 0.5em;
+  vertical-align: 0.6em;
+}
+
+/* Numeric readout — JetBrains Mono for coordinates, SKUs, table figures. */
+.hf-num {
+  font-family: var(--font-numeric), ui-monospace, monospace;
+  font-feature-settings: "tnum", "zero";
+  font-variant-numeric: tabular-nums;
+}
+
+/* Active-tool 1.5s pulse — used on the ribbon + LiveCalc dot. */
+@keyframes hf-pulse {
+  0%, 100% {
+    opacity: 0.6;
+    box-shadow: 0 0 0 0 rgba(232, 67, 45, 0.45);
+  }
+  50% {
+    opacity: 1;
+    box-shadow: 0 0 0 4px rgba(232, 67, 45, 0);
+  }
+}
+.hf-pulse {
+  animation: hf-pulse 1.5s ease-in-out infinite;
+}
+
+/* Live hot pulse — bright accent, faster. For 1-of-100 moments only. */
+@keyframes hf-pulse-hot {
+  0%, 100% { opacity: 0.75; transform: scale(1); }
+  50%      { opacity: 1;    transform: scale(1.15); }
+}
+.hf-pulse-hot {
+  animation: hf-pulse-hot 900ms ease-in-out infinite;
+}
+
+/* Selection ring (edge-only, used on viewport hover/select). */
+.hf-ring-select {
+  box-shadow:
+    inset 0 0 0 1px var(--color-hf-accent),
+    0 0 0 1px rgba(232, 67, 45, 0.25);
+}
+
+/* Button primitives — drafting-correct, zero-radius, 2px inside. */
+.hf-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem 0.7rem;
+  font-family: var(--font-plex), monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-hf-ink);
+  background: var(--color-hf-surface);
+  border: 1px solid var(--color-hf-edge);
+  border-radius: 0;
+  transition:
+    background 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease;
+}
+.hf-btn:hover {
+  background: var(--color-hf-surface-2);
+  border-color: var(--color-hf-edge-strong);
+  color: var(--color-hf-paper);
+}
+.hf-btn-accent {
+  background: linear-gradient(
+    180deg,
+    rgba(232, 67, 45, 0.18),
+    rgba(232, 67, 45, 0.08)
+  );
+  border-color: rgba(232, 67, 45, 0.55);
+  color: #ffd7cd;
+}
+.hf-btn-accent:hover {
+  background: linear-gradient(
+    180deg,
+    rgba(232, 67, 45, 0.3),
+    rgba(232, 67, 45, 0.14)
+  );
+  border-color: rgba(232, 67, 45, 0.8);
+  color: #fff;
+}
+.hf-btn-ghost {
+  background: transparent;
+  border-color: transparent;
+  color: var(--color-hf-ink-mute);
+}
+.hf-btn-ghost:hover {
+  background: var(--color-hf-surface);
+  color: var(--color-hf-ink);
+  border-color: var(--color-hf-edge);
+}
+
+/* Ribbon tab — underline indicator, no fill. */
+.hf-tab {
+  position: relative;
+  padding: 0.35rem 0.8rem 0.55rem;
+  font-family: var(--font-plex), monospace;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-hf-ink-mute);
+  background: transparent;
+  border: 0;
+  transition: color 140ms ease;
+  white-space: nowrap;
+}
+.hf-tab:hover { color: var(--color-hf-paper); }
+.hf-tab[data-active="true"] {
+  color: var(--color-hf-paper);
+}
+.hf-tab[data-active="true"]::after {
+  content: "";
+  position: absolute;
+  left: 0.8rem;
+  right: 0.8rem;
+  bottom: 0;
+  height: 2px;
+  background: var(--color-hf-accent);
+  box-shadow: 0 0 8px rgba(232, 67, 45, 0.4);
+}
+
+/* Card surface. */
+.hf-card {
+  background: var(--color-hf-surface);
+  border: 1px solid var(--color-hf-edge);
+  border-radius: 0;
+}
+.hf-card-inset {
+  background: var(--color-hf-bg);
+  border: 1px solid var(--color-hf-edge);
+  border-radius: 0;
+}
+
+/* Scrollbar. */
+.hf-scroll::-webkit-scrollbar { width: 8px; height: 8px; }
+.hf-scroll::-webkit-scrollbar-track { background: transparent; }
+.hf-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.06);
+  border: 2px solid var(--color-hf-bg);
+}
+.hf-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(232, 67, 45, 0.35);
+}
+
+/* Apple-style smooth corners — preserved for Pascal components that
+   opt into them. HaloFire surfaces stay zero-radius. */
 .rounded-smooth {
   border-radius: var(--radius-lg);
   corner-shape: squircle;
@@ -156,13 +446,10 @@
   corner-shape: squircle;
 }
 
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-
+.no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -176,7 +463,9 @@
   }
 }
 
-/* Loaders */
+/* =============================================================
+   Pascal loaders (unchanged — Pascal editor depends on these).
+   ============================================================= */
 .pascal-loader-1 {
   width: 45px;
   aspect-ratio: 1;
@@ -187,29 +476,15 @@
     pascal-l1-2 1s infinite;
 }
 @keyframes pascal-l1-1 {
-  0%,
-  100% {
-    background-size: 20% 100%;
-  }
-  33%,
-  66% {
-    background-size: 20% 20%;
-  }
+  0%, 100% { background-size: 20% 100%; }
+  33%, 66% { background-size: 20% 20%; }
 }
 @keyframes pascal-l1-2 {
-  0%,
-  33% {
-    background-position:
-      0 0,
-      50% 50%,
-      100% 100%;
+  0%, 33% {
+    background-position: 0 0, 50% 50%, 100% 100%;
   }
-  66%,
-  100% {
-    background-position:
-      100% 0,
-      50% 50%,
-      0 100%;
+  66%, 100% {
+    background-position: 100% 0, 50% 50%, 0 100%;
   }
 }
 
@@ -225,30 +500,10 @@
   animation: pascal-l2 1s infinite linear;
 }
 @keyframes pascal-l2 {
-  20% {
-    background-position:
-      0% 0%,
-      50% 50%,
-      100% 50%;
-  }
-  40% {
-    background-position:
-      0% 100%,
-      50% 0%,
-      100% 50%;
-  }
-  60% {
-    background-position:
-      0% 50%,
-      50% 100%,
-      100% 0%;
-  }
-  80% {
-    background-position:
-      0% 50%,
-      50% 50%,
-      100% 100%;
-  }
+  20% { background-position: 0% 0%, 50% 50%, 100% 50%; }
+  40% { background-position: 0% 100%, 50% 0%, 100% 50%; }
+  60% { background-position: 0% 50%, 50% 100%, 100% 0%; }
+  80% { background-position: 0% 50%, 50% 50%, 100% 100%; }
 }
 
 .pascal-loader-3 {
@@ -263,36 +518,11 @@
   animation: pascal-l3 1s infinite linear;
 }
 @keyframes pascal-l3 {
-  16.67% {
-    background-position:
-      0% 0%,
-      50% 100%,
-      100% 100%;
-  }
-  33.33% {
-    background-position:
-      0% 0%,
-      50% 0%,
-      100% 100%;
-  }
-  50% {
-    background-position:
-      0% 0%,
-      50% 0%,
-      100% 0%;
-  }
-  66.67% {
-    background-position:
-      0% 100%,
-      50% 0%,
-      100% 0%;
-  }
-  83.33% {
-    background-position:
-      0% 100%,
-      50% 100%,
-      100% 0%;
-  }
+  16.67% { background-position: 0% 0%, 50% 100%, 100% 100%; }
+  33.33% { background-position: 0% 0%, 50% 0%, 100% 100%; }
+  50%    { background-position: 0% 0%, 50% 0%, 100% 0%; }
+  66.67% { background-position: 0% 100%, 50% 0%, 100% 0%; }
+  83.33% { background-position: 0% 100%, 50% 100%, 100% 0%; }
 }
 
 .pascal-loader-4 {
@@ -305,30 +535,12 @@
     pascal-l4-2 1s infinite;
 }
 @keyframes pascal-l4-1 {
-  0%,
-  100% {
-    background-size: 20% 100%;
-  }
-  33%,
-  66% {
-    background-size: 20% 40%;
-  }
+  0%, 100% { background-size: 20% 100%; }
+  33%, 66% { background-size: 20% 40%; }
 }
 @keyframes pascal-l4-2 {
-  0%,
-  33% {
-    background-position:
-      0 0,
-      50% 100%,
-      100% 100%;
-  }
-  66%,
-  100% {
-    background-position:
-      100% 0,
-      0 100%,
-      50% 100%;
-  }
+  0%, 33% { background-position: 0 0, 50% 100%, 100% 100%; }
+  66%, 100% { background-position: 100% 0, 0 100%, 50% 100%; }
 }
 
 .pascal-loader-5 {
@@ -341,28 +553,10 @@
     pascal-l5-2 1s infinite;
 }
 @keyframes pascal-l5-1 {
-  0%,
-  100% {
-    background-size: 20% 100%;
-  }
-  33%,
-  66% {
-    background-size: 20% 40%;
-  }
+  0%, 100% { background-size: 20% 100%; }
+  33%, 66% { background-size: 20% 40%; }
 }
 @keyframes pascal-l5-2 {
-  0%,
-  33% {
-    background-position:
-      0 0,
-      50% 100%,
-      100% 0;
-  }
-  66%,
-  100% {
-    background-position:
-      0 100%,
-      50% 0,
-      100% 100%;
-  }
+  0%, 33% { background-position: 0 0, 50% 100%, 100% 0; }
+  66%, 100% { background-position: 0 100%, 50% 0, 100% 100%; }
 }

@@ -414,23 +414,34 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
   }, [preset, file, projectId, stopPoll, renderResults])
 
   return (
-    <div className="flex h-full flex-col gap-3 overflow-y-auto p-3 text-sm">
-      <div>
-        <h2 className="mb-1 text-base font-semibold">Auto-Design</h2>
-        <p className="text-[11px] text-neutral-500">
-          Drop an architect PDF / IFC / DWG. The agent pipeline runs:
-          intake → classify → place heads → route pipes → hydraulic
-          calc → rule check → BOM + labor → proposal + submittal.
-          Everything renders in the viewport automatically.
+    <div className="hf-scroll flex h-full flex-col gap-4 overflow-y-auto px-3 py-4">
+      {/* Hero header — the single most important entry point in the
+          whole app. Fraunces wordmark, small-caps crumb, prose intent. */}
+      <header className="pb-1">
+        <div className="hf-label tracking-[0.24em] pb-1">Primary action</div>
+        <h2
+          className="text-[26px] leading-none tracking-tight text-[var(--color-hf-paper)]"
+          style={{
+            fontFamily: 'var(--font-fraunces), serif',
+            fontVariationSettings: '"SOFT" 30, "WONK" 0, "opsz" 144',
+          }}
+        >
+          Auto-Design
+        </h2>
+        <p className="mt-2 text-[11.5px] leading-relaxed text-[var(--color-hf-ink-mute)]">
+          Drop an architect set. The agent roster runs intake, classification,
+          head placement, pipe routing, hydraulic solve, rule check, BOM, labor
+          and proposal — every stage streams into the viewport as it lands.
         </p>
-      </div>
+      </header>
 
-      <div className="rounded border border-neutral-300 p-3 dark:border-neutral-700">
-        <label className="block text-xs font-semibold">Source</label>
+      <div className="hf-card p-3">
+        <label className="hf-label tracking-[0.22em]">Source</label>
         <select
           value={preset}
           onChange={(e) => setPreset(e.target.value)}
-          className="mt-1 w-full rounded border border-neutral-300 bg-neutral-50 px-2 py-1 text-xs dark:border-neutral-700 dark:bg-neutral-900"
+          style={{ borderRadius: 0 }}
+          className="mt-1.5 w-full border border-[var(--color-hf-edge)] bg-[var(--color-hf-bg)] px-2 py-1.5 text-[11.5px] text-[var(--color-hf-paper)] focus:border-[var(--color-hf-accent)] focus:outline-none"
         >
           {PRESETS.map((p) => (
             <option key={p.id} value={p.id}>
@@ -446,10 +457,10 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
               type="file"
               accept=".pdf,.ifc,.dwg,.dxf"
               onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-              className="w-full text-[11px]"
+              className="w-full text-[11px] text-[var(--color-hf-ink-mute)] file:mr-2 file:border file:border-[var(--color-hf-edge)] file:bg-[var(--color-hf-surface-2)] file:px-2 file:py-1 file:text-[10px] file:uppercase file:tracking-wider file:text-[var(--color-hf-paper)]"
             />
             {file && (
-              <p className="mt-1 text-[10px] text-neutral-500">
+              <p className="mt-1 hf-num text-[10px] text-[var(--color-hf-ink-dim)]">
                 {file.name} · {(file.size / 1024 / 1024).toFixed(2)} MB
               </p>
             )}
@@ -460,108 +471,155 @@ export function AutoDesignPanel({ projectId }: { projectId: string }) {
           type="button"
           disabled={busy}
           onClick={run}
-          className="mt-3 w-full rounded bg-[#e8432d] px-3 py-2 text-sm font-semibold text-white hover:bg-[#c43719] disabled:opacity-50"
+          style={{ borderRadius: 0 }}
+          className="mt-3 w-full border border-[rgba(232,67,45,0.8)] bg-[linear-gradient(180deg,rgba(232,67,45,0.3),rgba(232,67,45,0.1))] px-3 py-2.5 text-[12px] font-semibold uppercase tracking-[0.14em] text-white hover:border-[var(--color-hf-accent)] hover:bg-[rgba(232,67,45,0.35)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
         >
           {busy ? 'Dispatching…' : 'Run Auto-Design'}
         </button>
 
-        {/* Quick re-populate after a page reload — reads the last
-            design.json off disk and spawns the scene nodes without
-            re-running the ~3-minute pipeline. */}
-        <button
-          type="button"
-          disabled={busy}
-          onClick={() => { void renderResults(projectId) }}
-          className="mt-2 w-full rounded border border-white/15 bg-transparent px-3 py-1.5 text-xs text-neutral-200 hover:bg-white/5 disabled:opacity-50"
-          title="Load the last completed design into the viewport"
-        >
-          Render last bid
-        </button>
-        <button
-          type="button"
-          disabled={busy}
-          onClick={() => clearPreviousAutoDesign()}
-          className="mt-2 w-full rounded border border-white/10 bg-transparent px-3 py-1.5 text-xs text-neutral-400 hover:bg-white/5 disabled:opacity-50"
-          title="Wipe every auto-design slab/wall/level/item from the scene"
-        >
-          Clear scene
-        </button>
+        <div className="mt-2 grid grid-cols-2 gap-1.5">
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => { void renderResults(projectId) }}
+            style={{ borderRadius: 0 }}
+            className="border border-[var(--color-hf-edge)] bg-transparent px-2 py-1.5 text-[10.5px] uppercase tracking-[0.1em] text-[var(--color-hf-paper)] hover:border-[var(--color-hf-accent)]/60 hover:bg-[var(--color-hf-surface-2)] disabled:opacity-40"
+            title="Load the last completed design into the viewport"
+          >
+            Render last
+          </button>
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => clearPreviousAutoDesign()}
+            style={{ borderRadius: 0 }}
+            className="border border-[var(--color-hf-edge)] bg-transparent px-2 py-1.5 text-[10.5px] uppercase tracking-[0.1em] text-[var(--color-hf-ink-mute)] hover:border-[var(--color-hf-edge-strong)] hover:text-[var(--color-hf-paper)] disabled:opacity-40"
+            title="Wipe every auto-design slab/wall/level/item from the scene"
+          >
+            Clear scene
+          </button>
+        </div>
       </div>
 
       {error && (
-        <div className="rounded bg-red-50 p-2 text-[11px] text-red-900 dark:bg-red-950 dark:text-red-200">
-          {error}
+        <div
+          className="border-l-2 border-[var(--color-hf-brick)] bg-[rgba(154,60,60,0.08)] px-3 py-2 text-[11px] leading-relaxed text-[var(--color-hf-paper)]"
+          style={{ borderRadius: 0 }}
+        >
+          <div className="hf-label text-[var(--color-hf-brick)]">Error</div>
+          <div className="mt-1 font-[var(--font-plex)]">{error}</div>
         </div>
       )}
 
       {job && (
-        <div className="rounded border border-neutral-300 p-2 text-[11px] dark:border-neutral-700">
-          <div className="flex items-center justify-between">
-            <span className="font-mono text-[10px]">
+        <div className="hf-card p-3">
+          <div className="flex items-center justify-between pb-2">
+            <span className="hf-num text-[10px] text-[var(--color-hf-ink-dim)]">
               {job.job_id.slice(0, 8)}
             </span>
-            <span
-              className={`rounded px-2 py-0.5 font-mono text-[10px] ${
-                job.status === 'completed'
-                  ? 'bg-green-200 text-green-900 dark:bg-green-950 dark:text-green-300'
-                  : job.status === 'failed'
-                    ? 'bg-red-200 text-red-900 dark:bg-red-950 dark:text-red-300'
-                    : 'bg-amber-200 text-amber-900 dark:bg-amber-950 dark:text-amber-300'
-              }`}
-            >
-              {job.status}
-            </span>
+            <JobStatusPill status={job.status} />
           </div>
           {job.steps_complete.length > 0 && (
-            <ol className="mt-2 space-y-0.5 text-[10px] text-neutral-600 dark:text-neutral-400">
-              {job.steps_complete.map((s) => (
-                <li key={s} className="font-mono">
-                  ✓ {s}
+            <ol className="mt-1 space-y-1 border-t border-[var(--color-hf-edge)] pt-2">
+              {job.steps_complete.map((s, i) => (
+                <li
+                  key={s}
+                  className="flex items-center gap-2 text-[10.5px] text-[var(--color-hf-ink-mute)]"
+                >
+                  <span
+                    aria-hidden
+                    className="inline-block h-1 w-1 bg-[var(--color-hf-moss)]"
+                  />
+                  <span className="hf-num text-[9px] text-[var(--color-hf-ink-deep)]">
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <span className="font-[var(--font-plex)]">{s}</span>
                 </li>
               ))}
             </ol>
           )}
           {job.summary?.steps && (
-            <details className="mt-1">
-              <summary className="cursor-pointer text-[10px] text-neutral-500">
-                Pipeline detail ({job.summary.steps.length} steps)
+            <details className="mt-2">
+              <summary className="cursor-pointer hf-label hover:text-[var(--color-hf-paper)]">
+                Pipeline detail · {job.summary.steps.length} steps
               </summary>
-              <pre className="mt-1 max-h-60 overflow-y-auto whitespace-pre-wrap rounded bg-neutral-100 p-1 text-[9px] dark:bg-neutral-900">
+              <pre
+                className="mt-1 max-h-60 overflow-y-auto whitespace-pre-wrap border border-[var(--color-hf-edge)] bg-[var(--color-hf-bg)] p-1.5 font-[var(--font-numeric)] text-[9px] text-[var(--color-hf-ink-mute)] hf-scroll"
+                style={{ borderRadius: 0 }}
+              >
                 {JSON.stringify(job.summary.steps, null, 2)}
               </pre>
             </details>
           )}
           {job.error && (
-            <p className="mt-1 text-red-700 dark:text-red-300">
+            <p className="mt-2 text-[11px] text-[var(--color-hf-brick)]">
               {job.error}
             </p>
           )}
           {job.status === 'completed' && (
-            <div className="mt-2 space-y-1">
-              <p className="text-[10px] font-semibold">Deliverables:</p>
+            <div className="mt-3 space-y-1 border-t border-[var(--color-hf-edge)] pt-2">
+              <p className="hf-label pb-1">Deliverables</p>
               {['proposal.json', 'proposal.pdf', 'design.dxf', 'design.glb', 'design.ifc'].map((name) => (
                 <a
                   key={name}
                   href={`${GATEWAY_URL}/projects/${projectId}/deliverable/${name}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="block rounded bg-neutral-800 px-2 py-1 text-center text-[10px] text-white hover:bg-neutral-700"
+                  style={{ borderRadius: 0 }}
+                  className="flex items-center justify-between border border-[var(--color-hf-edge)] bg-[var(--color-hf-bg)] px-2 py-1.5 hf-num text-[10.5px] text-[var(--color-hf-paper)] hover:border-[var(--color-hf-accent)]/60 hover:bg-[var(--color-hf-surface-2)] transition-colors"
                 >
-                  {name}
+                  <span>{name}</span>
+                  <span className="hf-label text-[var(--color-hf-accent)]">open ↗</span>
                 </a>
               ))}
               <a
                 href={`/bid/${projectId}`}
                 target="_blank"
                 rel="noreferrer"
-                className="block rounded bg-[#e8432d] px-2 py-1 text-center text-[10px] font-semibold text-white hover:bg-[#c43719]"
+                style={{ borderRadius: 0 }}
+                className="mt-2 flex items-center justify-between border border-[rgba(232,67,45,0.7)] bg-[linear-gradient(180deg,rgba(232,67,45,0.22),rgba(232,67,45,0.08))] px-2 py-1.5 text-[11px] font-semibold uppercase tracking-[0.1em] text-white hover:bg-[rgba(232,67,45,0.3)]"
               >
-                Open bid viewer ↗
+                <span>Open bid viewer</span>
+                <span>↗</span>
               </a>
             </div>
           )}
         </div>
       )}
     </div>
+  )
+}
+
+function JobStatusPill({
+  status,
+}: {
+  status: JobStatus['status']
+}) {
+  const [bg, fg, dot] =
+    status === 'completed'
+      ? ['rgba(107,142,58,0.14)', 'var(--color-hf-moss)', 'var(--color-hf-moss)']
+      : status === 'failed'
+        ? ['rgba(154,60,60,0.14)', 'var(--color-hf-brick)', 'var(--color-hf-brick)']
+        : ['rgba(200,154,60,0.14)', 'var(--color-hf-gold)', 'var(--color-hf-gold)']
+  return (
+    <span
+      className="inline-flex items-center gap-1.5 border px-2 py-0.5 hf-label"
+      style={{
+        background: bg,
+        color: fg,
+        borderColor: bg,
+        borderRadius: 0,
+      }}
+    >
+      <span
+        aria-hidden
+        className={
+          'inline-block h-1 w-1 ' +
+          (status === 'running' || status === 'queued' ? 'hf-pulse-hot' : '')
+        }
+        style={{ background: dot }}
+      />
+      {status}
+    </span>
   )
 }

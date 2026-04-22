@@ -1,12 +1,17 @@
 'use client'
 
 /**
- * StatusBar — AutoSprink-style bottom bar. Shows:
- *   - active project + address
- *   - gateway health (ticks green / red dot)
- *   - quick stats (scene node counts)
- *   - snap / grid / units on the right (mirrors AutoSprink's 2D
- *     status row so the estimator always knows the mode they're in)
+ * StatusBar — CAD command line.
+ *
+ * Exactly 28px tall (h-7). No padding tricks, no wrap. Reads
+ * peripherally while the estimator drafts — pressure, flow, velocity
+ * flags, gateway health, clock. The estimator never looks at this
+ * directly; it just stops seeing numbers change when something's
+ * wrong. That's the job.
+ *
+ * Earthen palette: within-spec = moss, caution = gold, violation =
+ * brick. No neon reds, no hazard yellows — we're imitating an
+ * engineering drawing's title block, not a dashboard.
  */
 
 import { useEffect, useState } from 'react'
@@ -16,12 +21,6 @@ export interface StatusBarProps {
   projectAddress?: string
   gatewayUrl?: string
   sceneNodeCount?: number
-  /**
-   * Phase C — live hydraulic readout. When present the status bar
-   * shows pressure / flow / velocity-warning count inline, matching
-   * AutoSprink's bottom-row habit of keeping live numbers in the
-   * estimator's peripheral vision.
-   */
   hydraulics?: {
     pressure_psi: number | null
     flow_gpm: number | null
@@ -69,93 +68,194 @@ export function StatusBar({
     }
   }, [gatewayUrl])
 
+  const ok = gateway?.ok === true
+  const dotColor = ok
+    ? 'var(--color-hf-moss)'
+    : 'var(--color-hf-brick)'
+
   return (
     <div
       data-testid="halofire-status-bar"
-      className="flex h-8 w-full items-center gap-4 border-t border-white/10 bg-[#0c0c10] px-3 font-mono text-[11px] text-neutral-400"
+      // Exactly 28px — zero padding tricks.
+      style={{ height: 28 }}
+      className="flex w-full items-center gap-3 border-t border-[var(--color-hf-edge)] bg-[var(--color-hf-bg)] px-3 font-[var(--font-plex)] text-[10.5px] leading-none text-[var(--color-hf-ink-mute)]"
     >
+      {/* Gateway ping */}
       <span className="flex items-center gap-1.5">
         <span
-          className={
-            'inline-block h-2 w-2 rounded-full ' +
-            (gateway?.ok ? 'bg-[#22c55e]' : 'bg-[#ef4444]')
-          }
-          title={gateway?.ok ? 'gateway online' : 'gateway offline'}
+          style={{ background: dotColor, borderRadius: 0 }}
+          className="inline-block h-1.5 w-1.5"
+          title={ok ? 'gateway online' : 'gateway offline'}
         />
-        <span className="text-neutral-300">
-          {gateway?.ok ? 'gateway' : 'gateway down'}
-        </span>
-        {gateway?.ok && gateway.latency_ms !== undefined && (
-          <span className="text-neutral-600">
-            {gateway.latency_ms}ms
+        <Label>Gateway</Label>
+        <Value tone={ok ? 'default' : 'crit'}>
+          {ok ? 'online' : 'offline'}
+        </Value>
+        {ok && gateway?.latency_ms !== undefined && (
+          <span className="hf-num text-[var(--color-hf-ink-deep)]">
+            {gateway.latency_ms}
+            <span className="ml-0.5 hf-label">ms</span>
           </span>
         )}
       </span>
-      <span className="text-neutral-600">·</span>
-      <span className="truncate">
-        <span className="text-neutral-200">{projectName}</span>
+      <Tick />
+
+      {/* Project context */}
+      <span className="flex min-w-0 items-center gap-1.5 truncate">
+        <Label>Job</Label>
+        <span className="truncate text-[var(--color-hf-paper)]">
+          {projectName}
+        </span>
         {projectAddress && (
-          <span className="ml-2 text-neutral-600">{projectAddress}</span>
+          <span className="truncate text-[var(--color-hf-ink-deep)]">
+            · {projectAddress}
+          </span>
         )}
       </span>
+
       {sceneNodeCount !== undefined && (
         <>
-          <span className="text-neutral-600">·</span>
-          <span>{sceneNodeCount} nodes</span>
+          <Tick />
+          <span className="flex items-center gap-1.5">
+            <Label>Nodes</Label>
+            <span className="hf-num text-[var(--color-hf-ink)]">
+              {sceneNodeCount}
+            </span>
+          </span>
         </>
       )}
+
       {hydraulics && (
         <>
-          <span className="text-neutral-600">·</span>
-          <span data-testid="status-hydraulics" className="flex items-center gap-2">
-            <span>
-              Pressure{' '}
-              <span className="text-neutral-200">
-                {hydraulics.pressure_psi != null
-                  ? `${hydraulics.pressure_psi.toFixed(0)} psi`
-                  : '—'}
-              </span>
-            </span>
-            <span className="text-neutral-600">·</span>
-            <span>
-              Flow{' '}
-              <span className="text-neutral-200">
-                {hydraulics.flow_gpm != null
-                  ? `${hydraulics.flow_gpm.toFixed(0)} gpm`
-                  : '—'}
-              </span>
-            </span>
+          <Tick />
+          <span
+            data-testid="status-hydraulics"
+            className="flex items-center gap-3"
+          >
+            <Metric
+              label="P-res"
+              value={hydraulics.pressure_psi}
+              unit="psi"
+              digits={0}
+            />
+            <Metric
+              label="Flow"
+              value={hydraulics.flow_gpm}
+              unit="gpm"
+              digits={0}
+            />
             {hydraulics.velocity_warnings > 0 && (
-              <>
-                <span className="text-neutral-600">·</span>
+              <span
+                data-testid="status-velocity-warn"
+                className="flex items-center gap-1 text-[var(--color-hf-gold)]"
+              >
                 <span
-                  data-testid="status-velocity-warn"
-                  className="text-[#ffb800]"
-                >
-                  ⚠ {hydraulics.velocity_warnings} velocity warning
-                  {hydraulics.velocity_warnings === 1 ? '' : 's'}
-                </span>
-              </>
+                  className="inline-block h-1.5 w-1.5"
+                  style={{ background: 'var(--color-hf-gold)' }}
+                />
+                <Label>vel</Label>
+                <span className="hf-num">{hydraulics.velocity_warnings}</span>
+              </span>
             )}
             {hydraulics.margin_psi != null && hydraulics.margin_psi < 0 && (
-              <>
-                <span className="text-neutral-600">·</span>
-                <span className="text-[#ff3333]">
-                  ⚠ margin {hydraulics.margin_psi.toFixed(1)} psi
+              <span className="flex items-center gap-1 text-[var(--color-hf-brick)]">
+                <span
+                  className="inline-block h-1.5 w-1.5 hf-pulse-hot"
+                  style={{ background: 'var(--color-hf-brick)' }}
+                />
+                <Label>margin</Label>
+                <span className="hf-num">
+                  {hydraulics.margin_psi.toFixed(1)}
                 </span>
-              </>
+                <span className="hf-label">psi</span>
+              </span>
             )}
           </span>
         </>
       )}
-      <span className="ml-auto flex items-center gap-3">
-        <span>units: m</span>
-        <span>grid: 0.5m</span>
-        <span>snap: on</span>
-        <span className="text-neutral-600">
-          {now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+
+      {/* Right-edge modes — always present, peripheral. */}
+      <span className="ml-auto flex items-center gap-3 text-[var(--color-hf-ink-deep)]">
+        <span className="flex items-center gap-1">
+          <Label>units</Label>
+          <span className="hf-num text-[var(--color-hf-ink-mute)]">m</span>
+        </span>
+        <span className="flex items-center gap-1">
+          <Label>grid</Label>
+          <span className="hf-num text-[var(--color-hf-ink-mute)]">
+            0.5<span className="hf-label">m</span>
+          </span>
+        </span>
+        <span className="flex items-center gap-1">
+          <Label>snap</Label>
+          <span className="text-[var(--color-hf-moss)]">on</span>
+        </span>
+        <span className="hf-num text-[var(--color-hf-ink-deep)]">
+          {now.toLocaleTimeString([], {
+            hour: '2-digit',
+            minute: '2-digit',
+          })}
         </span>
       </span>
     </div>
+  )
+}
+
+function Tick() {
+  return (
+    <span
+      aria-hidden
+      className="inline-block h-2 w-px bg-[var(--color-hf-edge-strong)]"
+    />
+  )
+}
+
+function Label({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="hf-label tracking-[0.2em]">
+      {children}
+    </span>
+  )
+}
+
+function Value({
+  children,
+  tone = 'default',
+}: {
+  children: React.ReactNode
+  tone?: 'default' | 'warn' | 'crit'
+}) {
+  const color =
+    tone === 'crit'
+      ? 'var(--color-hf-brick)'
+      : tone === 'warn'
+        ? 'var(--color-hf-gold)'
+        : 'var(--color-hf-paper)'
+  return (
+    <span style={{ color }} className="uppercase tracking-wider">
+      {children}
+    </span>
+  )
+}
+
+function Metric({
+  label,
+  value,
+  unit,
+  digits,
+}: {
+  label: string
+  value: number | null
+  unit: string
+  digits: number
+}) {
+  return (
+    <span className="flex items-baseline gap-1">
+      <Label>{label}</Label>
+      <span className="hf-num text-[var(--color-hf-paper)]">
+        {value != null ? value.toFixed(digits) : '—'}
+      </span>
+      <span className="hf-label">{unit}</span>
+    </span>
   )
 }

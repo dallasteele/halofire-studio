@@ -60,57 +60,104 @@ export function CatalogPanel() {
   }, [filtered])
 
   return (
-    <div className="flex h-full flex-col gap-3 p-3 text-sm">
-      <div>
-        <h2 className="mb-2 text-base font-semibold">Component Catalog</h2>
-        <p className="text-xs text-neutral-500">
-          {CATALOG.length} components authored. Click to select for placement.
+    <div className="hf-scroll flex h-full flex-col gap-3 overflow-y-auto px-3 py-4">
+      <header>
+        <div className="hf-label tracking-[0.24em] pb-1">Library</div>
+        <h2
+          className="text-[22px] leading-none tracking-tight text-[var(--color-hf-paper)]"
+          style={{
+            fontFamily: 'var(--font-fraunces), serif',
+            fontVariationSettings: '"SOFT" 30, "WONK" 0, "opsz" 144',
+          }}
+        >
+          Components
+        </h2>
+        <p className="mt-1.5 text-[11px] text-[var(--color-hf-ink-mute)]">
+          <span className="hf-num text-[var(--color-hf-paper)]">
+            {CATALOG.length}
+          </span>{' '}
+          authored parts · click a row to select for placement.
         </p>
-      </div>
+      </header>
 
       <input
         type="text"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        placeholder="Search SKU, name, manufacturer…"
-        className="w-full rounded border border-neutral-300 bg-neutral-50 px-2 py-1 text-xs outline-none focus:border-neutral-500 dark:border-neutral-700 dark:bg-neutral-900"
+        placeholder="Search SKU · name · manufacturer"
+        style={{ borderRadius: 0 }}
+        className="w-full border border-[var(--color-hf-edge)] bg-[var(--color-hf-bg)] px-2 py-1.5 font-[var(--font-plex)] text-[11px] text-[var(--color-hf-paper)] placeholder:text-[var(--color-hf-ink-dim)] focus:border-[var(--color-hf-accent)] focus:outline-none"
       />
 
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto hf-scroll">
         {grouped.length === 0 && (
-          <p className="py-8 text-center text-xs text-neutral-500">No matches.</p>
+          <p className="py-8 text-center text-[11px] text-[var(--color-hf-ink-dim)]">
+            No matches.
+          </p>
         )}
         {grouped.map((group) => (
           <div key={group.label} className="mb-4">
-            <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide text-neutral-500">
-              {group.label}
+            <h3 className="pb-1.5 hf-label tracking-[0.22em]">
+              {group.label} ·{' '}
+              <span className="hf-num text-[var(--color-hf-ink-mute)]">
+                {group.items.length}
+              </span>
             </h3>
-            <ul className="space-y-0.5">
-              {group.items.map((e) => (
-                <li key={e.sku}>
-                  <button
-                    type="button"
-                    onClick={() => setSelectedSku(e.sku)}
-                    className={`w-full rounded px-2 py-1.5 text-left text-xs transition-colors ${
-                      selectedSku === e.sku
-                        ? 'bg-blue-600 text-white'
-                        : 'hover:bg-neutral-100 dark:hover:bg-neutral-800'
-                    }`}
-                  >
-                    <div className="font-medium">{e.name}</div>
-                    <div className="mt-0.5 flex items-center gap-2 text-[10px] opacity-75">
-                      <span className="font-mono">{e.sku}</span>
-                      {e.k_factor !== undefined && <span>K={e.k_factor}</span>}
-                      {e.pipe_size_in !== undefined && (
-                        <span>{e.pipe_size_in}&quot;</span>
-                      )}
-                      <span>
-                        {e.dims_cm[0]}×{e.dims_cm[1]}×{e.dims_cm[2]}cm
+            <ul className="divide-y divide-[var(--color-hf-edge)] border-y border-[var(--color-hf-edge)]">
+              {group.items.map((e) => {
+                const active = selectedSku === e.sku
+                return (
+                  <li key={e.sku}>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedSku(e.sku)}
+                      style={{ borderRadius: 0 }}
+                      className={
+                        'group flex w-full items-start gap-2.5 px-2 py-2 text-left transition-colors ' +
+                        (active
+                          ? 'bg-[rgba(232,67,45,0.12)] border-l-2 border-[var(--color-hf-accent)]'
+                          : 'border-l-2 border-transparent hover:bg-white/[0.03] hover:border-[var(--color-hf-accent)]/40')
+                      }
+                    >
+                      {/* Part kind glyph square */}
+                      <span
+                        aria-hidden
+                        className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center border border-[var(--color-hf-edge)] bg-[var(--color-hf-bg)]"
+                        style={{ borderRadius: 0 }}
+                      >
+                        <span
+                          className="block h-2 w-2"
+                          style={{
+                            background: active
+                              ? 'var(--color-hf-accent)'
+                              : 'var(--color-hf-ink-deep)',
+                          }}
+                        />
                       </span>
-                    </div>
-                  </button>
-                </li>
-              ))}
+                      <div className="min-w-0 flex-1">
+                        <div className="truncate text-[11.5px] font-medium text-[var(--color-hf-paper)]">
+                          {e.name}
+                        </div>
+                        <div className="mt-0.5 flex items-center gap-2 text-[9.5px] text-[var(--color-hf-ink-dim)]">
+                          <span className="hf-num text-[var(--color-hf-ink-mute)]">{e.sku}</span>
+                          {e.k_factor !== undefined && (
+                            <span className="hf-label">
+                              K=<span className="hf-num normal-case text-[var(--color-hf-paper)]">{e.k_factor}</span>
+                            </span>
+                          )}
+                          {e.pipe_size_in !== undefined && (
+                            <span className="hf-num text-[var(--color-hf-paper)]">{e.pipe_size_in}"</span>
+                          )}
+                          <span className="hf-num">
+                            {e.dims_cm[0]}×{e.dims_cm[1]}×{e.dims_cm[2]}
+                            <span className="hf-label ml-0.5">cm</span>
+                          </span>
+                        </div>
+                      </div>
+                    </button>
+                  </li>
+                )
+              })}
             </ul>
           </div>
         ))}
@@ -198,19 +245,19 @@ function HfCatalogBrowser() {
   return (
     <section
       data-testid="hf-catalog-browser"
-      className="mt-4 border-t border-neutral-200 pt-3 dark:border-neutral-800"
+      className="mt-4 border-t border-[var(--color-hf-edge)] pt-3"
     >
       <div className="mb-2 flex items-baseline justify-between">
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
-          Parts Catalog
-        </h3>
-        <span className="text-[10px] text-neutral-500">
-          {catalog ? `${catalog.parts.length} parts · v${catalog.catalog_version}` : '…'}
+        <h3 className="hf-label tracking-[0.22em]">Parts Catalog</h3>
+        <span className="hf-num text-[10px] text-[var(--color-hf-ink-dim)]">
+          {catalog
+            ? `${catalog.parts.length} · v${catalog.catalog_version}`
+            : '…'}
         </span>
       </div>
 
       {loadErr && (
-        <p className="mb-2 text-[11px] text-red-600 dark:text-red-400">
+        <p className="mb-2 text-[11px] text-[var(--color-hf-brick)]">
           Failed to load catalog: {loadErr}
         </p>
       )}
@@ -220,29 +267,35 @@ function HfCatalogBrowser() {
         type="text"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        placeholder="Search parts…"
-        className="mb-2 w-full rounded border border-neutral-300 bg-neutral-50 px-2 py-1 text-xs outline-none focus:border-neutral-500 dark:border-neutral-700 dark:bg-neutral-900"
+        placeholder="Search parts"
+        style={{ borderRadius: 0 }}
+        className="mb-2 w-full border border-[var(--color-hf-edge)] bg-[var(--color-hf-bg)] px-2 py-1.5 text-[11px] text-[var(--color-hf-paper)] placeholder:text-[var(--color-hf-ink-dim)] focus:border-[var(--color-hf-accent)] focus:outline-none"
       />
 
       <div
         data-testid="hf-catalog-kind-pills"
         className="mb-2 flex flex-wrap gap-1"
       >
-        {KIND_PILLS.map((p) => (
-          <button
-            key={p.kind}
-            type="button"
-            onClick={() => setKindFilter(p.kind)}
-            data-testid={`hf-kind-pill-${p.kind}`}
-            className={`rounded-full border px-2 py-0.5 text-[10px] transition-colors ${
-              kindFilter === p.kind
-                ? 'border-blue-600 bg-blue-600 text-white'
-                : 'border-neutral-300 text-neutral-700 hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-800'
-            }`}
-          >
-            {p.label}
-          </button>
-        ))}
+        {KIND_PILLS.map((p) => {
+          const active = kindFilter === p.kind
+          return (
+            <button
+              key={p.kind}
+              type="button"
+              onClick={() => setKindFilter(p.kind)}
+              data-testid={`hf-kind-pill-${p.kind}`}
+              style={{ borderRadius: 0 }}
+              className={
+                'border px-2 py-0.5 text-[10px] uppercase tracking-[0.1em] transition-colors ' +
+                (active
+                  ? 'border-[var(--color-hf-accent)] bg-[rgba(232,67,45,0.18)] text-[var(--color-hf-paper)]'
+                  : 'border-[var(--color-hf-edge)] text-[var(--color-hf-ink-mute)] hover:border-[var(--color-hf-edge-strong)] hover:text-[var(--color-hf-paper)]')
+              }
+            >
+              {p.label}
+            </button>
+          )
+        })}
       </div>
 
       {manufacturers.length > 1 && (
@@ -250,7 +303,8 @@ function HfCatalogBrowser() {
           data-testid="hf-catalog-mfg-filter"
           value={mfgFilter}
           onChange={(e) => setMfgFilter(e.target.value)}
-          className="mb-2 w-full rounded border border-neutral-300 bg-neutral-50 px-2 py-1 text-xs dark:border-neutral-700 dark:bg-neutral-900"
+          style={{ borderRadius: 0 }}
+          className="mb-2 w-full border border-[var(--color-hf-edge)] bg-[var(--color-hf-bg)] px-2 py-1.5 text-[11px] text-[var(--color-hf-paper)]"
         >
           {manufacturers.map((m) => (
             <option key={m} value={m}>
@@ -260,9 +314,12 @@ function HfCatalogBrowser() {
         </select>
       )}
 
-      <ul className="max-h-72 space-y-0.5 overflow-y-auto" data-testid="hf-catalog-list">
+      <ul
+        className="max-h-72 divide-y divide-[var(--color-hf-edge)] overflow-y-auto border border-[var(--color-hf-edge)] hf-scroll"
+        data-testid="hf-catalog-list"
+      >
         {filtered.length === 0 && catalog && (
-          <li className="py-6 text-center text-[11px] text-neutral-500">
+          <li className="py-6 text-center text-[11px] text-[var(--color-hf-ink-dim)]">
             No matching parts.
           </li>
         )}
@@ -272,23 +329,30 @@ function HfCatalogBrowser() {
               type="button"
               onClick={() => onSelect(p.sku)}
               data-testid={`hf-catalog-row-${p.sku}`}
-              className="w-full rounded px-2 py-1.5 text-left text-xs transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-800"
+              style={{ borderRadius: 0 }}
+              className="w-full px-2 py-1.5 text-left text-[11px] text-[var(--color-hf-paper)] transition-colors hover:bg-white/[0.03] hover:border-l-2 hover:border-[var(--color-hf-accent)]"
             >
               <div className="flex items-center justify-between gap-2">
                 <span className="truncate font-medium">{p.display_name}</span>
                 {typeof p.price_usd === 'number' && (
-                  <span className="shrink-0 font-mono text-[10px] text-neutral-500">
+                  <span className="shrink-0 hf-num text-[10px] text-[var(--color-hf-gold)]">
                     ${p.price_usd.toFixed(2)}
                   </span>
                 )}
               </div>
-              <div className="mt-0.5 flex items-center gap-1.5 text-[10px] opacity-75">
-                <span className="font-mono">{p.sku}</span>
-                <span className="rounded bg-neutral-200 px-1 py-[1px] text-[9px] uppercase tracking-wide dark:bg-neutral-800">
+              <div className="mt-0.5 flex items-center gap-1.5 text-[9.5px] text-[var(--color-hf-ink-dim)]">
+                <span className="hf-num">{p.sku}</span>
+                <span
+                  className="border border-[var(--color-hf-edge)] px-1 py-[1px] uppercase tracking-wide text-[var(--color-hf-ink-mute)]"
+                  style={{ borderRadius: 0 }}
+                >
                   {p.kind}
                 </span>
                 {p.manufacturer && (
-                  <span className="rounded bg-blue-100 px-1 py-[1px] text-[9px] text-blue-900 dark:bg-blue-950 dark:text-blue-200">
+                  <span
+                    className="border border-[rgba(200,154,60,0.35)] bg-[rgba(200,154,60,0.08)] px-1 py-[1px] text-[var(--color-hf-gold)]"
+                    style={{ borderRadius: 0 }}
+                  >
                     {p.manufacturer}
                   </span>
                 )}
@@ -303,47 +367,64 @@ function HfCatalogBrowser() {
 
 function SelectedDetail({ entry }: { entry: LegacyCatalogEntry }) {
   return (
-    <div className="rounded border border-neutral-300 bg-neutral-50 p-2 text-xs dark:border-neutral-700 dark:bg-neutral-900">
-      <div className="mb-1 font-semibold">{entry.name}</div>
-      <dl className="grid grid-cols-[auto_1fr] gap-x-2 gap-y-0.5 text-[11px]">
-        <dt className="text-neutral-500">SKU</dt>
-        <dd className="font-mono">{entry.sku}</dd>
-        <dt className="text-neutral-500">Manufacturer</dt>
-        <dd>
-          {entry.manufacturer} {entry.model}
-        </dd>
-        <dt className="text-neutral-500">Mounting</dt>
-        <dd>{entry.mounting}</dd>
-        <dt className="text-neutral-500">Connection</dt>
-        <dd>{entry.connection ?? '—'}</dd>
-        <dt className="text-neutral-500">Finish</dt>
-        <dd>{entry.finish ?? '—'}</dd>
+    <div
+      className="hf-card p-3"
+      style={{
+        borderRadius: 0,
+        boxShadow: 'inset 0 1px 0 0 rgba(232,67,45,0.45)',
+      }}
+    >
+      <div className="hf-label pb-1 tracking-[0.22em]">Selected</div>
+      <div
+        className="mb-2 text-[13px] font-medium text-[var(--color-hf-paper)]"
+        style={{
+          fontFamily: 'var(--font-fraunces), serif',
+          fontVariationSettings: '"SOFT" 30, "WONK" 0, "opsz" 144',
+        }}
+      >
+        {entry.name}
+      </div>
+      <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-[10.5px]">
+        <DtDd k="SKU" v={<span className="hf-num">{entry.sku}</span>} />
+        <DtDd
+          k="Mfr"
+          v={`${entry.manufacturer} ${entry.model}`}
+        />
+        <DtDd k="Mount" v={entry.mounting} />
+        <DtDd k="Conn" v={entry.connection ?? '—'} />
+        <DtDd k="Finish" v={entry.finish ?? '—'} />
         {entry.k_factor !== undefined && (
-          <>
-            <dt className="text-neutral-500">K-factor</dt>
-            <dd>{entry.k_factor}</dd>
-          </>
+          <DtDd k="K-factor" v={<span className="hf-num">{entry.k_factor}</span>} />
         )}
         {entry.temp_rating_f !== undefined && (
-          <>
-            <dt className="text-neutral-500">Temp</dt>
-            <dd>{entry.temp_rating_f}°F</dd>
-          </>
+          <DtDd
+            k="Temp"
+            v={<span className="hf-num">{entry.temp_rating_f}°F</span>}
+          />
         )}
         {entry.pipe_size_in !== undefined && (
-          <>
-            <dt className="text-neutral-500">Pipe size</dt>
-            <dd>{entry.pipe_size_in}&quot;</dd>
-          </>
+          <DtDd
+            k="Pipe size"
+            v={<span className="hf-num">{entry.pipe_size_in}&quot;</span>}
+          />
         )}
       </dl>
       {entry.notes && (
-        <p className="mt-2 border-t border-neutral-200 pt-1 text-[10px] text-neutral-600 dark:border-neutral-800 dark:text-neutral-400">
+        <p className="mt-2 border-t border-[var(--color-hf-edge)] pt-2 text-[10px] leading-relaxed text-[var(--color-hf-ink-mute)]">
           {entry.notes}
         </p>
       )}
       <PlaceButton entry={entry} />
     </div>
+  )
+}
+
+function DtDd({ k, v }: { k: string; v: React.ReactNode }) {
+  return (
+    <>
+      <dt className="hf-label">{k}</dt>
+      <dd className="text-[var(--color-hf-paper)]">{v}</dd>
+    </>
   )
 }
 
@@ -407,49 +488,42 @@ function PlaceButton({ entry }: { entry: LegacyCatalogEntry }) {
 
   return (
     <>
-      <div className="mt-2 grid grid-cols-3 gap-1">
-        <label className="flex flex-col">
-          <span className="text-[9px] text-neutral-500">X (cm)</span>
-          <input
-            type="number"
-            value={xStr}
-            onChange={(e) => setXStr(e.target.value)}
-            className="w-full rounded border border-neutral-300 bg-neutral-50 px-1 py-0.5 text-[10px] dark:border-neutral-700 dark:bg-neutral-900"
-          />
-        </label>
-        <label className="flex flex-col">
-          <span className="text-[9px] text-neutral-500">Y (cm)</span>
-          <input
-            type="number"
-            value={yStr}
-            onChange={(e) => setYStr(e.target.value)}
-            className="w-full rounded border border-neutral-300 bg-neutral-50 px-1 py-0.5 text-[10px] dark:border-neutral-700 dark:bg-neutral-900"
-          />
-        </label>
-        <label className="flex flex-col">
-          <span className="text-[9px] text-neutral-500">Z (cm)</span>
-          <input
-            type="number"
-            value={zStr}
-            onChange={(e) => setZStr(e.target.value)}
-            className="w-full rounded border border-neutral-300 bg-neutral-50 px-1 py-0.5 text-[10px] dark:border-neutral-700 dark:bg-neutral-900"
-          />
-        </label>
+      <div className="mt-3 grid grid-cols-3 gap-1.5">
+        {(['X', 'Y', 'Z'] as const).map((axis, i) => {
+          const [val, setter] =
+            axis === 'X' ? [xStr, setXStr] : axis === 'Y' ? [yStr, setYStr] : [zStr, setZStr]
+          return (
+            <label key={axis} className="flex flex-col gap-0.5">
+              <span className="hf-label">
+                {axis} <span className="text-[var(--color-hf-ink-deep)]">cm</span>
+              </span>
+              <input
+                type="number"
+                value={val}
+                onChange={(e) => setter(e.target.value)}
+                style={{ borderRadius: 0 }}
+                className="w-full border border-[var(--color-hf-edge)] bg-[var(--color-hf-bg)] px-1.5 py-0.5 hf-num text-[11px] text-[var(--color-hf-paper)] focus:border-[var(--color-hf-accent)] focus:outline-none"
+              />
+            </label>
+          )
+        })}
       </div>
       <button
         type="button"
         onClick={onPlace}
-        className="mt-2 w-full rounded bg-blue-600 px-2 py-1 text-xs font-medium text-white hover:bg-blue-700"
+        style={{ borderRadius: 0 }}
+        className="mt-2.5 w-full border border-[rgba(232,67,45,0.6)] bg-[linear-gradient(180deg,rgba(232,67,45,0.2),rgba(232,67,45,0.06))] px-2 py-1.5 text-[10.5px] font-medium uppercase tracking-[0.14em] text-[var(--color-hf-paper)] hover:border-[var(--color-hf-accent)] hover:bg-[rgba(232,67,45,0.28)]"
       >
         Place at coordinates
       </button>
       {status && (
         <p
-          className={`mt-1 text-[10px] ${
-            status.startsWith('Failed')
-              ? 'text-red-700 dark:text-red-300'
-              : 'text-emerald-700 dark:text-emerald-300'
-          }`}
+          className="mt-1.5 text-[10px] font-[var(--font-plex)]"
+          style={{
+            color: status.startsWith('Failed')
+              ? 'var(--color-hf-brick)'
+              : 'var(--color-hf-moss)',
+          }}
         >
           {status}
         </p>

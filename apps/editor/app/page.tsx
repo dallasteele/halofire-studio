@@ -525,7 +525,10 @@ function HomeInner() {
           AutoDesignPanel kicks off a job and dispatches job-started. */}
       <AutoPilot jobId={jobId} />
       <Ribbon onCommand={dispatchRibbonWithTools} />
-      <div className="min-h-0 flex-1">
+      {/* Drafting-canvas grid overlay, painted behind Pascal's
+          viewport + sidebars. Very low contrast — it only reads
+          once the 3D scene is empty or zoomed out. */}
+      <div className="relative min-h-0 flex-1 hf-grid-overlay">
         <Editor
           layoutVersion="v2"
           projectId="local-editor"
