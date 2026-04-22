@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "log_start": "2026-04-22T00:00:00Z",
+  "purpose": "Audit trail for Phase D.4.B pricing scrape. Every search run appended here with query, tool, response summary, and sku_intents updated. Intended to let the next agent (Codex, Claude, or HAL) resume without re-running the same searches.",
+  "runs": [
+    {
+      "run_id": "d4b-pass-1-2026-04-22",
+      "agent": "claude-opus-4-7",
+      "started_at": "2026-04-22T00:00:00Z",
+      "tool_cascade_used": ["WebSearch"],
+      "tool_cascade_not_used": ["mcp__Claude_in_Chrome", "WebFetch (PDP pages)", "curl"],
+      "searches": [
+        {"query": "Tyco TY3251 pendent sprinkler price", "hit": true, "source_domain": "ferguson.com, qrfs.com, bulkindustries.com", "price_found": "$14-18 range", "confidence": "medium"},
+        {"query": "Victaulic FireLock 009N grooved coupling price", "hit": false, "note": "distributor range only, no US list pulled"},
+        {"query": "Viking VK102 upright sprinkler price", "hit": true, "source_domain": "vikinggroupinc.com", "price_found": "$45.87 (2025 list)", "confidence": "high", "note": "found Viking May 2025 price book PDF"},
+        {"query": "Potter PS10-2 pressure switch price fire protection", "hit": true, "source_domain": "bassunited.com, bsasi.com", "price_found": "$169-$228", "confidence": "high"},
+        {"query": "Viking VK100 upright sprinkler list price 2025", "hit": true, "source_domain": "vikinggroupinc.com Section E", "price_found": "$37.32 list", "confidence": "high"},
+        {"query": "Reliable F1-56 sprinkler price pendent", "hit": true, "source_domain": "bulkindustries.com, reliablesprinkler.com pricebooks", "price_found": "~$14", "confidence": "medium"},
+        {"query": "Victaulic Style 005 grooved coupling 2 inch price", "hit": true, "source_domain": "assets.victaulic.com PL2025-A-FP", "price_found": "$157.50 for 2in w/ Grade E gasket", "confidence": "high"},
+        {"query": "Anvil FIG 1 threaded cap 2 inch price fire protection", "hit": false, "note": "no price surfaced; catalog/PDF links only"},
+        {"query": "Viking VK200 quick response pendent sprinkler price list", "hit": true, "source_domain": "vikinggroupinc.com", "price_found": "$45.87 list (standard finish)", "confidence": "high"},
+        {"query": "Tyco AV-1-300 alarm check valve price", "hit": false, "note": "QRFS + 24hr.supply carry it but no visible price in snippet — PDP scrape needed"},
+        {"query": "Nibco LC-2000 butterfly valve fire price", "hit": false, "note": "catalog/spec page only, no list price"},
+        {"query": "Potter VSR-2 waterflow switch price", "hit": true, "source_domain": "bassunited.com, clevelandplumbing.com", "price_found": "$177-$227 range", "confidence": "high"}
+      ],
+      "skus_priced": 36,
+      "unique_mfg_pn_priced": 9,
+      "finished_at": "2026-04-22T00:00:00Z"
+    }
+  ],
+  "todo_for_next_pass": [
+    "Chrome-MCP scrape: QRFS + 24hr.supply PDPs for all Tyco TY-family (TY4251, TY1234, TY6226, TY7226, TY8226, EC-11, RFII, TY3596, TY3231, TY3331) — ~30 SKUs",
+    "Viking PDF parse: pull VK300, VK457, VK530, VK597, VK630 rows from May 2025 price book — ~12 SKUs",
+    "Victaulic PL2025-A-FP: extract full Style 009N, 107V, FIG 10/7, No. 10/11/20 rows — ~15 SKUs",
+    "Nibco catalog page: LC-2000 sizes 2-8in, F-619 sizes 2-6in — 8 SKUs",
+    "Watts 957 RPZ: per-size list — 2 SKUs",
+    "Reliable Model DV deluge valve: per-size list — 3 SKUs",
+    "Tolco hanger catalog: FIG 4, FIG 1, FIG 82 — 9 SKUs"
+  ]
+}

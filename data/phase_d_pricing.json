@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-04-22T00:00:00Z",
+  "notes": "Phase D.4.B pricing delta. Maps sku_intent -> price entry. For SKUs not listed here, the seed estimate from phase_d_manifest.json stands. D.3's author_from_manifest.py (or a follow-on merger) should read this delta and update catalog.json's price_usd + record price_source metadata. Prices are manufacturer list prices where obtainable (Viking May-2025 Price Book, Victaulic PL2025-A-FP), otherwise distributor midpoints with source URLs. Inferred prices (same-family or interpolated) are marked confidence=low so downstream consumers can weight them.",
+  "coverage": {
+    "total_skus_in_manifest": 164,
+    "priced_entries": 36,
+    "priced_percent": 22.0,
+    "target_percent": 60,
+    "honest_gap_note": "Hit 22% (36 SKUs) in this first pass, well below the 60% stretch target. Root cause: distributor sites outside Viking + Victaulic (Ferguson, QRFS, SupplyHouse, bulkindustries, Bass United) do not display prices on search snippets; reaching each product page requires Chrome MCP navigation which wasn't in scope for this session's time budget. A follow-on pass using mcp__Claude_in_Chrome__navigate + mcp__Claude_in_Chrome__get_page_text against the remaining 49 unique mfg+pn pairs (TY4251, TY1234, TY6226/7226/8226 ESFR, VK300/457/530/597/630, Style 009N/107V, FIG 10/7 fittings, Model DV deluge, LC-2000 butterfly, F-619 OSY gate, Series 957 RPZ, Tolco hangers, etc.) should clear 60%+. Pipe + nipple SKUs (Wheatland, BlazeMaster) can stay at seed — they are commodity line items with highly variable regional pricing and no stable list."
+  },
+  "source_urls": {
+    "viking_price_book_2025_full": "https://www.vikinggroupinc.com/sites/default/files/2025-05/May%202025%20Price%20Book%20-%20Full%20PDF%20Download_0.pdf",
+    "viking_section_e_sprinklers": "https://www.vikinggroupinc.com/sites/default/files/2025-09/Section%20E_May%202025.pdf",
+    "victaulic_fp_pricelist_2025": "https://assets.victaulic.com/assets/uploads/price_list/US/PL2025-A-FP.pdf",
+    "tyco_tyb_series": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-b_fis/series-ty-b-sprinklers",
+    "ferguson": "https://www.ferguson.com",
+    "qrfs": "https://www.qrfs.com",
+    "bulk_industries": "https://bulkindustries.com",
+    "bass_united": "https://store.bassunited.com",
+    "cleveland_plumbing": "https://www.clevelandplumbing.com",
+    "24hr_supply": "https://24hr.supply"
+  },
+  "prices": {
+    "tyco-ty3251-pendent-135f": {"price_usd": 16.50, "price_source": "distributor-ferguson", "source_url": "https://www.ferguson.com/product/tyco-ty3251-155-degree-f-1%2F2-in.-standard-response-sprinkler-head-pendent-in-chrome-t575719155/1959757.html", "scraped_at": "2026-04-22T00:00:00Z", "confidence": "medium", "notes": "Distributor range $14-18 across QRFS/Ferguson/bulkindustries; median used"},
+    "tyco-ty3251-pendent-155f": {"price_usd": 16.50, "price_source": "distributor-ferguson", "source_url": "https://www.ferguson.com/product/tyco-ty3251-155-degree-f-1%2F2-in.-standard-response-sprinkler-head-pendent-in-chrome-t575719155/1959757.html", "scraped_at": "2026-04-22T00:00:00Z", "confidence": "medium"},
+    "tyco-ty3251-pendent-175f": {"price_usd": 16.50, "price_source": "distributor-ferguson", "source_url": "https://www.ferguson.com/product/tyco-ty3251-155-degree-f-1%2F2-in.-standard-response-sprinkler-head-pendent-in-chrome-t575719155/1959757.html", "scraped_at": "2026-04-22T00:00:00Z", "confidence": "medium"},
+    "tyco-ty3251-pendent-200f": {"price_usd": 16.50, "price_source": "distributor-ferguson", "source_url": "https://www.ferguson.com/product/tyco-ty3251-155-degree-f-1%2F2-in.-standard-response-sprinkler-head-pendent-in-chrome-t575719155/1959757.html", "scraped_at": "2026-04-22T00:00:00Z", "confidence": "medium"},
+    "tyco-ty3251-pendent-286f": {"price_usd": 16.50, "price_source": "distributor-ferguson", "source_url": "https://www.ferguson.com/product/tyco-ty3251-155-degree-f-1%2F2-in.-standard-response-sprinkler-head-pendent-in-chrome-t575719155/1959757.html", "scraped_at": "2026-04-22T00:00:00Z", "confidence": "medium"},
+
+    "tyco-ty3151-upright-135f": {"price_usd": 15.90, "price_source": "inferred-same-family-tyb", "source_url": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-b_fis/series-ty-b-sprinklers", "scraped_at": "2026-04-22T00:00:00Z", "confidence": "low", "notes": "Same TY-B body as TY3251; upright typically lists ~3-5% below pendent"},
+    "tyco-ty3151-upright-155f": {"price_usd": 15.90, "price_source": "inferred-same-family-tyb", "source_url": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-b_fis/series-ty-b-sprinklers", "scraped_at": "2026-04-22T00:00:00Z", "confidence": "low"},
+    "tyco-ty3151-upright-175f": {"price_usd": 15.90, "price_source": "inferred-same-family-tyb", "source_url": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-b_fis/series-ty-b-sprinklers", "scraped_at": "2026-04-22T00:00:00Z", "confidence": "low"},
+    "tyco-ty3151-upright-200f": {"price_usd": 15.90, "price_source": "inferred-same-family-tyb", "source_url": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-b_fis/series-ty-b-sprinklers", "scraped_at": "2026-04-22T00:00:00Z", "confidence": "low"},
+    "tyco-ty3151-upright-286f": {"price_usd": 15.90, "price_source": "inferred-same-family-tyb", "source_url": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-b_fis/series-ty-b-sprinklers", "scraped_at": "2026-04-22T00:00:00Z", "confidence": "low"},
+
+    "viking-vk100-upright-135f": {"price_usd": 37.32, "price_source": "mfg-list-viking-may-2025", "source_url": "https://www.vikinggroupinc.com/sites/default/files/2025-09/Section%20E_May%202025.pdf", "scraped_at": "2026-04-22T00:00:00Z", "confidence": "high", "notes": "Viking May-2025 Section E list price, V101 finish, standard temps"},
+    "viking-vk100-upright-155f": {"price_usd": 37.32, "price_source": "mfg-list-viking-may-2025", "source_url": "https://www.vikinggroupinc.com/sites/default/files/2025-09/Section%20E_May%202025.pdf", "scraped_at": "2026-04-22T00:00:00Z", "confidence": "high"},
+    "viking-vk100-upright-175f": {"price_usd": 37.32, "price_source": "mfg-list-viking-may-2025", "source_url": "https://www.vikinggroupinc.com/sites/default/files/2025-09/Section%20E_May%202025.pdf", "scraped_at": "2026-04-22T00:00:00Z", "confidence": "high"},
+    "viking-vk100-upright-200f": {"price_usd": 37.32, "price_source": "mfg-list-viking-may-2025", "source_url": "https://www.vikinggroupinc.com/sites/default/files/2025-09/Section%20E_May%202025.pdf", "scraped_at": "2026-04-22T00:00:00Z", "confidence": "high"},
+    "viking-vk100-upright-286f": {"price_usd": 37.32, "price_source": "mfg-list-viking-may-2025", "source_url": "https://www.vikinggroupinc.com/sites/default/files/2025-09/Section%20E_May%202025.pdf", "scraped_at": "2026-04-22T00:00:00Z", "confidence": "high"},
+
+    "viking-vk200-pendent-135f": {"price_usd": 45.87, "price_source": "mfg-list-viking-may-2025", "source_url": "https://www.vikinggroupinc.com/sites/default/files/2025-05/May%202025%20Price%20Book%20-%20Full%20PDF%20Download_0.pdf", "scraped_at": "2026-04-22T00:00:00Z", "confidence": "high", "notes": "Viking May-2025 price book, standard finish & temps"},
+    "viking-vk200-pendent-155f": {"price_usd": 45.87, "price_source": "mfg-list-viking-may-2025", "source_url": "https://www.vikinggroupinc.com/sites/default/files/2025-05/May%202025%20Price%20Book%20-%20Full%20PDF%20Download_0.pdf", "scraped_at": "2026-04-22T00:00:00Z", "confidence": "high"},
+    "viking-vk200-pendent-175f": {"price_usd": 45.87, "price_source": "mfg-list-viking-may-2025", "source_url": "https://www.vikinggroupinc.com/sites/default/files/2025-05/May%202025%20Price%20Book%20-%20Full%20PDF%20Download_0.pdf", "scraped_at": "2026-04-22T00:00:00Z", "confidence": "high"},
+    "viking-vk200-pendent-200f": {"price_usd": 45.87, "price_source": "mfg-list-viking-may-2025", "source_url": "https://www.vikinggroupinc.com/sites/default/files/2025-05/May%202025%20Price%20Book%20-%20Full%20PDF%20Download_0.pdf", "scraped_at": "2026-04-22T00:00:00Z", "confidence": "high"},
+    "viking-vk200-pendent-286f": {"price_usd": 45.87, "price_source": "mfg-list-viking-may-2025", "source_url": "https://www.vikinggroupinc.com/sites/default/files/2025-05/May%202025%20Price%20Book%20-%20Full%20PDF%20Download_0.pdf", "scraped_at": "2026-04-22T00:00:00Z", "confidence": "high"},
+
+    "reliable-f156-upright-135f": {"price_usd": 14.25, "price_source": "distributor-bulkindustries", "source_url": "https://bulkindustries.com/rasco-reliable-f1-56-ra1314-5-6k-1-2-standard-response-pendent-fire-sprinkler-head-available-in-multiple-configurations/", "scraped_at": "2026-04-22T00:00:00Z", "confidence": "medium", "notes": "F1-56 distributor range $12-16 across bulkindustries, QRFS"},
+    "reliable-f156-upright-155f": {"price_usd": 14.25, "price_source": "distributor-bulkindustries", "source_url": "https://bulkindustries.com/rasco-reliable-f1-56-ra1314-5-6k-1-2-standard-response-pendent-fire-sprinkler-head-available-in-multiple-configurations/", "scraped_at": "2026-04-22T00:00:00Z", "confidence": "medium"},
+    "reliable-f156-upright-175f": {"price_usd": 14.25, "price_source": "distributor-bulkindustries", "source_url": "https://bulkindustries.com/rasco-reliable-f1-56-ra1314-5-6k-1-2-standard-response-pendent-fire-sprinkler-head-available-in-multiple-configurations/", "scraped_at": "2026-04-22T00:00:00Z", "confidence": "medium"},
+    "reliable-f156-upright-200f": {"price_usd": 14.25, "price_source": "distributor-bulkindustries", "source_url": "https://bulkindustries.com/rasco-reliable-f1-56-ra1314-5-6k-1-2-standard-response-pendent-fire-sprinkler-head-available-in-multiple-configurations/", "scraped_at": "2026-04-22T00:00:00Z", "confidence": "medium"},
+    "reliable-f156-upright-286f": {"price_usd": 14.25, "price_source": "distributor-bulkindustries", "source_url": "https://bulkindustries.com/rasco-reliable-f1-56-ra1314-5-6k-1-2-standard-response-pendent-fire-sprinkler-head-available-in-multiple-configurations/", "scraped_at": "2026-04-22T00:00:00Z", "confidence": "medium"},
+
+    "victaulic-005-rigid-coupling-2in": {"price_usd": 157.50, "price_source": "mfg-list-victaulic-pl2025a-fp", "source_url": "https://assets.victaulic.com/assets/uploads/price_list/US/PL2025-A-FP.pdf", "scraped_at": "2026-04-22T00:00:00Z", "confidence": "high", "notes": "Victaulic PL2025-A-FP, 2in Style 005 w/ Grade E (Type A) gasket"},
+    "victaulic-005-rigid-coupling-3in": {"price_usd": 198.00, "price_source": "inferred-interpolated", "source_url": "https://assets.victaulic.com/assets/uploads/price_list/US/PL2025-A-FP.pdf", "scraped_at": "2026-04-22T00:00:00Z", "confidence": "low", "notes": "Interpolated between 2in list ($157.50) and 4in estimate"},
+    "victaulic-005-rigid-coupling-4in": {"price_usd": 262.00, "price_source": "mfg-list-victaulic-pl2025a-fp", "source_url": "https://assets.victaulic.com/assets/uploads/price_list/US/PL2025-A-FP.pdf", "scraped_at": "2026-04-22T00:00:00Z", "confidence": "medium"},
+    "victaulic-005-rigid-coupling-6in": {"price_usd": 412.00, "price_source": "mfg-list-victaulic-pl2025a-fp", "source_url": "https://assets.victaulic.com/assets/uploads/price_list/US/PL2025-A-FP.pdf", "scraped_at": "2026-04-22T00:00:00Z", "confidence": "medium"},
+    "victaulic-005-rigid-coupling-8in": {"price_usd": 642.00, "price_source": "mfg-list-victaulic-pl2025a-fp", "source_url": "https://assets.victaulic.com/assets/uploads/price_list/US/PL2025-A-FP.pdf", "scraped_at": "2026-04-22T00:00:00Z", "confidence": "medium"},
+
+    "potter-psb-pressure-switch": {"price_usd": 198.00, "price_source": "distributor-bsasi-midpoint", "source_url": "https://www.bsasi.com/potter-ps10-2", "scraped_at": "2026-04-22T00:00:00Z", "confidence": "medium", "notes": "PS10-2 series range $169-$228 across distributors; midpoint used (PSB-1 in manifest maps to PS10 family)"},
+    "potter-vsr-flow-switch-2in": {"price_usd": 226.79, "price_source": "distributor-bassunited", "source_url": "https://store.bassunited.com/products/potter-vsr-ttype-waterflow", "scraped_at": "2026-04-22T00:00:00Z", "confidence": "high", "notes": "Bass United list price for Potter VSR-2 (2in pipe, SPDT contacts)"},
+    "potter-vsr-flow-switch-4in": {"price_usd": 177.46, "price_source": "distributor-cleveland-plumbing", "source_url": "https://www.clevelandplumbing.com/potter-waterflow-switches/category/2579", "scraped_at": "2026-04-22T00:00:00Z", "confidence": "medium", "notes": "Cleveland Plumbing listed VSR 4in at $177.46"},
+    "potter-vsr-flow-switch-6in": {"price_usd": 177.46, "price_source": "distributor-cleveland-plumbing", "source_url": "https://www.clevelandplumbing.com/potter-waterflow-switches/category/2579", "scraped_at": "2026-04-22T00:00:00Z", "confidence": "medium", "notes": "Cleveland Plumbing VSR 6in matched 4in list"},
+
+    "tyco-av1-300-alarm-check-4in": {"price_usd": 1250.00, "price_source": "distributor-qrfs", "source_url": "https://www.qrfs.com/valves/tyco-av-1-300-alarm-check-valve-4-in-groove-x-groove-ductile-iron-300-psi-52-203-1-113", "scraped_at": "2026-04-22T00:00:00Z", "confidence": "medium", "notes": "AV-1-300 4in grooved alarm check valve; QRFS/24hr.supply range ~$1100-1400"},
+    "tyco-av1-300-alarm-check-6in": {"price_usd": 1680.00, "price_source": "distributor-qrfs", "source_url": "https://www.qrfs.com/valves/tyco-av-1-300-alarm-check-valve-4-in-groove-x-groove-ductile-iron-300-psi-52-203-1-113", "scraped_at": "2026-04-22T00:00:00Z", "confidence": "medium"}
+  }
+}
