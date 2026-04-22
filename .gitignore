@@ -83,3 +83,11 @@ services/halofire-cad/truth/truth.duckdb
 # Phase D.4.A render artifacts (regenerated each run)
 packages/halofire-catalog/assets/glb/.render_report.json
 packages/halofire-catalog/assets/glb/.render_cache.json
+
+# Tauri desktop build artifacts
+apps/halofire-studio-desktop/src-tauri/Cargo.lock
+apps/halofire-studio-desktop/src-tauri/gen/
+apps/halofire-studio-desktop/src-tauri/target/
+
+# SAM sidecar runtime audit log
+data/sam_requests.jsonl
