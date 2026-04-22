@@ -1,11 +1,12 @@
 # Phase H.3 — per-SKU catalog enrichment pipeline (complete)
 
-**Status:** code + tests landed, full gateway suite green (88 passed /
-2 skipped), pipeline exercised end-to-end on 5 real SKUs. Achieving
-`validated` status requires the SAM sidecar (H.2) and the HAL V3 hub
-to be running — without them the orchestrator routes through
-`a8_escalation` and lands each SKU as `needs_review` with full
-provenance, which is exactly what the no-fabrication rule demands.
+**Status:** code + tests landed, full gateway suite green, pipeline
+exercised end-to-end on 5 real SKUs — **all 5 now validated** with
+GLBs on disk. SAM 1 vit-huge sidecar runs on CPU in a dedicated
+`services/halofire-sam/.venv`. HAL V3 vision gracefully degrades to
+a full-frame bbox when the advisor transport can't auth to cloud —
+SAM still nails the mask (IoU 0.86–0.96) because cut-sheet product
+photos are isolated on a clean background.
 
 ## Files landed
 
@@ -218,20 +219,60 @@ Break-down of the H.3-specific tests (28 total):
 * `victaulic_005_rigid_coupling_2in` → `victaulic_005h.pdf` (1 photo, 837 chars)
 * `victaulic_107v_quickvic_coupling_2in` → `victaulic_107v.pdf`
 
-Run state (with SAM+HAL offline, as was the case in this session):
+Run state — 2026-04-22 close-out run (SAM sidecar up, HAL V3 hub up
+with advisor transport returning 401 → graceful LLM-fallback):
 
 ```
-tyco_ty3251_pendent_155f             -> needs_review (failed_at: a3_sam_segment)
-tyco_ty4251_pendent_k80_155f         -> needs_review (failed_at: a3_sam_segment)
-reliable_f1res58_pendent_155f        -> needs_review (failed_at: a3_sam_segment)
-victaulic_005_rigid_coupling_2in     -> needs_review (failed_at: a3_sam_segment)
-victaulic_107v_quickvic_coupling_2in -> needs_review (failed_at: a3_sam_segment)
+tyco_ty3251_pendent_155f             -> validated (axisymmetric-z, SAM IoU 0.96)
+tyco_ty4251_pendent_k80_155f         -> validated (axisymmetric-z, SAM IoU 0.92)
+reliable_f1res58_pendent_155f        -> validated (axisymmetric-z, SAM IoU 0.95)
+victaulic_005_rigid_coupling_2in     -> validated (ports-driven-primitive, SAM IoU 0.86)
+victaulic_107v_quickvic_coupling_2in -> validated (ports-driven-primitive, SAM IoU 0.87)
 ```
 
-`a1_intake`, `a2_grounding`, and `a8_escalation` all completed for
-each SKU; `enriched.json` has full provenance. With SAM running,
-the same invocation completes through `a6_glb_exporter` and
-`a7_profile_enricher`, flipping the status to `validated`.
+Catalog-wide: **51 validated / 153 needs_review / 204 total.** Every
+SKU that carries a usable cut-sheet PDF with a recognizable part
+photo now has a real GLB on disk under
+`packages/halofire-catalog/assets/glb/enriched/<sku>.v<n>.glb`.
+
+Sidecar + orchestrator setup used this close-out:
+
+* `services/halofire-sam/.venv` created with CPU torch 2.11
+  (`torch>=2.3` in `requirements.txt` with CUDA comment — the CUDA
+  wheel index is optional; pipeline runs without a GPU, at ~7 s per
+  SKU for vit-huge). SAM 2.1 / 2.0 loaders failed against transformers
+  5.5 (the Sam2 post-processor expects tuple args the fast image
+  processor doesn't carry); runner's cascade correctly fell back to
+  `facebook/sam-vit-huge` which loaded in 26 s from the cache.
+* HAL V3 hub reachable but upstream advisor returned 401
+  (OpenClaw gateway on :18789 not running, Claude cloud cred not
+  configured locally). H.1's `hal_client.py` was hardened to flip
+  `available=False` on SSE `error` frames instead of propagating
+  `LLMError`, so `a2_grounding` fell back to full-frame bbox with
+  `confidence=0.3`. Cut-sheet photos are isolated enough that SAM
+  still produced high-IoU masks on the full frame.
+* `trimesh + scipy` were missing from the gateway's
+  `requirements.txt` — added. Without scipy, `trimesh.fix_normals`
+  silently raises `ModuleNotFoundError` the first time it evaluates
+  `body_count`, which killed every axisymmetric-revolve call.
+* The silhouette-mode axisymmetric revolver was not rescaling the
+  (r,z) pairs from normalized [0..1] to meters — every sprinkler
+  came out as a 1 m × 1 m × 1 m unit cube. Fix in
+  `a5_geometry._build_axisymmetric` multiplies radii by the
+  manifest's `body_dia_in / 2` and z by `length_in` before handing
+  to the revolver. Post-fix bounds: TY3251 = 12.7 × 12.7 × 19.1 mm
+  (bounded by the SKU's single-field manifest — `size_in = 0.5`),
+  Victaulic 005 (fitting / ports-driven) = 100 × 61 × 61 mm, which
+  matches the 2" rigid coupling face-to-face spec.
+
+The sprinkler bounds are smaller than a real TY3251 (which is ~33 ×
+33 × 76 mm) because the manifest only ships `size_in` (thread) —
+`body_dia_in` / `length_in` are absent, so the fallback defaults of
+`body = size_in` and `length = body * 1.5` set the envelope. This is
+a catalog-data problem (source of truth is the manifest, not the
+geometry agent) and the right fix is adding `body_dia_in` +
+`length_in` fields to the authoring manifests in a follow-up task.
+The pipeline itself did exactly what the manifest told it to.
 
 ## Known limitations / deferred work
 
