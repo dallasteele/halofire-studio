@@ -38,6 +38,7 @@ import base64
 import json
 import logging
 import os
+from pathlib import Path
 from typing import Any, AsyncIterator, Awaitable, Callable, Protocol
 
 import httpx
@@ -202,7 +203,23 @@ class HALV3Client:
         self.session_id = session_id
         self.workspace_root = workspace_root or os.getcwd()
         self.permission_mode = permission_mode
-        self._client = httpx.AsyncClient(timeout=timeout)
+        # Optional auth: HAL V3 does not require auth today, but the hub
+        # may be placed behind a reverse proxy or future middleware. If
+        # ``HAL_AUTH_TOKEN`` is set — or a token file exists at
+        # ``~/.hal/token`` — we send it as a Bearer header. Silently
+        # no-op when absent so local dev Just Works.
+        headers: dict[str, str] = {}
+        token = os.environ.get("HAL_AUTH_TOKEN", "").strip()
+        if not token:
+            token_file = Path(os.path.expanduser("~")) / ".hal" / "token"
+            if token_file.is_file():
+                try:
+                    token = token_file.read_text(encoding="utf-8").strip()
+                except OSError:
+                    token = ""
+        if token:
+            headers["Authorization"] = f"Bearer {token}"
+        self._client = httpx.AsyncClient(timeout=timeout, headers=headers)
         self.available: bool = True  # optimistic; `probe()` may flip it
 
     async def aclose(self) -> None:
@@ -278,6 +295,20 @@ class HALV3Client:
         except httpx.HTTPError as exc:
             self.available = False
             log.warning("HAL V3 hub unreachable: %s", exc)
+            return _SENTINEL_UNAVAILABLE
+        except LLMApprovalRequired:
+            # Callers that need approvals use chat_stream / on_tool_call.
+            # For the plain chat() path, treat as unavailable so agents
+            # fall back gracefully.
+            raise
+        except LLMError as exc:
+            # Advisor/transport-layer error surfaced via SSE ``error`` frame
+            # (e.g. upstream 401 from OpenClaw gateway or Claude). The
+            # hub is technically reachable, but no text came back — mark
+            # the client unavailable so subsequent agents take their
+            # deterministic fallback path instead of retrying the LLM.
+            self.available = False
+            log.warning("HAL V3 hub returned error event: %s", exc)
             return _SENTINEL_UNAVAILABLE
         return "".join(collected)
 
@@ -428,6 +459,10 @@ class HALV3Client:
         except httpx.HTTPError as exc:
             self.available = False
             log.warning("HAL V3 hub unreachable (vision): %s", exc)
+            return _SENTINEL_UNAVAILABLE
+        except LLMError as exc:
+            self.available = False
+            log.warning("HAL V3 hub returned error event (vision): %s", exc)
             return _SENTINEL_UNAVAILABLE
         return "".join(collected)
 

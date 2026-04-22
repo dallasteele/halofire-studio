@@ -100,7 +100,11 @@ async def test_chat_accumulates_text_delta():
 
 
 @pytest.mark.asyncio
-async def test_error_event_raises():
+async def test_error_event_returns_sentinel_and_marks_unavailable():
+    """An ``error`` SSE frame (e.g. upstream 401 from the advisor) should
+    flip ``available`` off and return the unavailable sentinel, so
+    downstream agents fall back gracefully instead of crashing the
+    pipeline."""
     body = _sse([
         ("advisor_start", {"advisor": "claude"}),
         ("error", {"message": "model unavailable"}),
@@ -109,8 +113,9 @@ async def test_error_event_raises():
     client = HALV3Client(base_url="http://fake")
     _inject_transport(client, _make_mock_transport(body))
     try:
-        with pytest.raises(LLMError, match="model unavailable"):
-            await client.chat("anything")
+        out = await client.chat("anything")
+        assert json.loads(out) == {"error": "llm_unavailable"}
+        assert client.available is False
     finally:
         await client.aclose()
 
