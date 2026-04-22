@@ -29,6 +29,15 @@ OpenSCAD discovery order:
 If no OpenSCAD is found, the runner exits with code 2 and a clear message —
 the SCAD authoring itself is intact and can be rendered later on a box
 with OpenSCAD installed.
+
+Docker mode (`--docker <image>`):
+  Upstream OpenSCAD (including 2021.01 and current dev builds through
+  2026.01) does NOT emit GLB directly — supported formats are stl, off,
+  3mf, amf, etc. To produce GLBs we render to STL via OpenSCAD then
+  convert STL → GLB with trimesh. In Docker mode we invoke
+  `docker run --rm -v <scad>:/scad:ro -v <out>:/out <image> openscad
+  -o /out/<sku>.stl /scad/<sku>.scad` per part, then load the STL with
+  trimesh and export as `.glb`. The STL is removed after conversion.
 """
 from __future__ import annotations
 
@@ -167,11 +176,29 @@ def _write_cache(cache: dict[str, str]) -> None:
 
 def _render_one(
     scad: Path, out_dir: Path, openscad_bin: str, timeout_s: int,
+    *, docker_image: str | None = None, scad_dir: Path | None = None,
 ) -> RenderStat:
     sku = scad.stem
     out = out_dir / f"{sku}.glb"
     t0 = time.time()
-    argv = [openscad_bin, "--export-format", "glb", "-o", str(out), str(scad)]
+
+    # ── STL intermediate (OpenSCAD emits STL, we convert to GLB) ──
+    stl_path = out_dir / f".{sku}.stl"
+    if docker_image:
+        # Docker invocation: mount scad dir read-only, out dir read-write
+        src_mount = (scad_dir or scad.parent).as_posix()
+        out_mount = out_dir.as_posix()
+        argv = [
+            openscad_bin, "run", "--rm",
+            "-v", f"{src_mount}:/scad:ro",
+            "-v", f"{out_mount}:/out",
+            docker_image,
+            "openscad", "-o", f"/out/.{sku}.stl", f"/scad/{scad.name}",
+        ]
+    else:
+        # Native openscad: try STL first (GLB often unsupported)
+        argv = [openscad_bin, "-o", str(stl_path), str(scad)]
+
     try:
         res = subprocess.run(  # noqa: S603
             argv, capture_output=True, text=True, timeout=timeout_s,
@@ -189,12 +216,42 @@ def _render_one(
             error=f"exit {res.returncode}: {res.stderr.strip()[:300]}",
             duration_ms=dur_ms,
         )
+    if not stl_path.exists():
+        return RenderStat(
+            sku=sku, scad=scad.name, status="failed",
+            error="openscad produced no STL output", duration_ms=dur_ms,
+        )
+
+    # ── STL → GLB via trimesh ─────────────────────────────────────
+    try:
+        import trimesh  # lazy import — not needed for dry-run
+        mesh = trimesh.load(str(stl_path), force="mesh")
+        if mesh is None or (hasattr(mesh, "vertices") and len(mesh.vertices) == 0):
+            stl_path.unlink(missing_ok=True)
+            return RenderStat(
+                sku=sku, scad=scad.name, status="failed",
+                error="trimesh loaded empty/degenerate mesh",
+                duration_ms=dur_ms,
+            )
+        mesh.export(str(out), file_type="glb")
+    except Exception as e:  # noqa: BLE001
+        stl_path.unlink(missing_ok=True)
+        return RenderStat(
+            sku=sku, scad=scad.name, status="failed",
+            error=f"trimesh STL→GLB: {type(e).__name__}: {str(e)[:200]}",
+            duration_ms=int((time.time() - t0) * 1000),
+        )
+    finally:
+        stl_path.unlink(missing_ok=True)
+
     if not out.exists():
         return RenderStat(
             sku=sku, scad=scad.name, status="failed",
-            error="openscad produced no output file", duration_ms=dur_ms,
+            error="trimesh export produced no GLB",
+            duration_ms=int((time.time() - t0) * 1000),
         )
     sz = out.stat().st_size
+    dur_ms = int((time.time() - t0) * 1000)
     if sz < 100:
         return RenderStat(
             sku=sku, scad=scad.name, status="failed",
@@ -223,13 +280,19 @@ def run(
     force: bool = False,
     timeout_s: int = 120,
     dry_run: bool = False,
+    docker_image: str | None = None,
 ) -> RunReport:
     _GLB_DIR.mkdir(parents=True, exist_ok=True)
     report = RunReport(started_at=time.time())
     scads = _collect_scads()
     cache = _load_cache()
-    openscad_bin = discover_openscad(openscad_override)
-    report.openscad_bin = openscad_bin
+    if docker_image:
+        openscad_bin = shutil.which("docker") or "docker"
+    else:
+        openscad_bin = discover_openscad(openscad_override)
+    report.openscad_bin = (
+        f"docker:{docker_image}" if docker_image else openscad_bin
+    )
 
     if dry_run:
         for p in scads:
@@ -270,7 +333,10 @@ def run(
     if pending:
         with concurrent.futures.ProcessPoolExecutor(max_workers=max_workers) as ex:
             futs = {
-                ex.submit(_render_one, p, _GLB_DIR, openscad_bin, timeout_s): p
+                ex.submit(
+                    _render_one, p, _GLB_DIR, openscad_bin, timeout_s,
+                    docker_image=docker_image, scad_dir=_SCAD_DIR,
+                ): p
                 for p in pending
             }
             for fut in concurrent.futures.as_completed(futs):
@@ -300,6 +366,10 @@ def _cli() -> int:
                     help="list what would run without invoking openscad")
     ap.add_argument("--report", default=None,
                     help="report path (default: assets/glb/.render_report.json)")
+    ap.add_argument("--docker", default=None, metavar="IMAGE",
+                    help="render via docker image (e.g. openscad/openscad:dev). "
+                         "OpenSCAD emits STL inside the container; trimesh "
+                         "converts STL→GLB on the host.")
     args = ap.parse_args()
 
     report = run(
@@ -308,6 +378,7 @@ def _cli() -> int:
         force=args.force,
         timeout_s=args.timeout,
         dry_run=args.dry_run,
+        docker_image=args.docker,
     )
     rp = Path(args.report) if args.report else (_GLB_DIR / ".render_report.json")
     report.write(rp)
