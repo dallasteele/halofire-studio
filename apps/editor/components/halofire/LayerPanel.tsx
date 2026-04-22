@@ -144,8 +144,32 @@ export function LayerPanel({
   // Default-EXPANDED so the user immediately sees what the widget
   // does. Collapse on click for power users who want viewport real
   // estate back. (Tried collapsed-default — unfamiliar users couldn't
-  // tell what the dot column was.)
+  // tell what the dot column was.) Persist choice to localStorage so
+  // power users stay collapsed across reloads.
   const [open, setOpen] = useState<boolean>(true)
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const saved = window.localStorage.getItem('halofire:layer-panel-open')
+    if (saved === '0') setOpen(false)
+    else if (saved === '1') setOpen(true)
+  }, [])
+  const setOpenPersist = useCallback((v: boolean) => {
+    setOpen(v)
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem('halofire:layer-panel-open', v ? '1' : '0')
+    }
+  }, [])
+
+  // Auto-collapse on narrow viewports (<1024px) — the 224px panel
+  // eats too much canvas on laptops. User can still manually expand.
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const mq = window.matchMedia('(max-width: 1024px)')
+    const apply = () => { if (mq.matches) setOpen(false) }
+    apply()
+    mq.addEventListener('change', apply)
+    return () => mq.removeEventListener('change', apply)
+  }, [])
 
   // Hover preview for collapsed state — hovering a dot shows a
   // floating chip with the layer name + hotkey to its right so
@@ -161,11 +185,12 @@ export function LayerPanel({
       // the sidebar without overlapping the viewport canvas.
       // backdrop-blur lets the model bleed through subtly.
       className={
-        'pointer-events-auto fixed bottom-20 left-3 z-40 ' +
-        'border border-white/8 bg-[#0a0a0b]/95 backdrop-blur-sm ' +
-        'text-white shadow-[0_4px_20px_rgba(0,0,0,0.5)] ' +
+        'pointer-events-auto fixed bottom-10 left-3 z-40 ' +
+        'border border-white/10 border-t-[#e8432d]/60 bg-[#0a0a0b]/95 ' +
+        'backdrop-blur-sm text-white ' +
+        'shadow-[0_8px_24px_rgba(0,0,0,0.6)] ' +
         'transition-[width] duration-200 ease-out ' +
-        (open ? 'w-[224px]' : 'w-[36px]')
+        (open ? 'w-[220px]' : 'w-[32px]')
       }
       style={{ borderRadius: 0 }}
     >
@@ -198,7 +223,7 @@ export function LayerPanel({
             <button
               type="button"
               className="ml-0.5 border border-white/10 px-1 py-0.5 font-mono text-[10px] leading-none text-neutral-400 transition-colors hover:border-[#e8432d]/40 hover:text-[#e8432d]"
-              onClick={() => setOpen(false)}
+              onClick={() => setOpenPersist(false)}
               aria-label="collapse layer panel"
               style={{ borderRadius: 0 }}
             >
@@ -288,7 +313,7 @@ export function LayerPanel({
       {!open && (
         <button
           type="button"
-          onClick={() => setOpen(true)}
+          onClick={() => setOpenPersist(true)}
           aria-label="expand layer panel"
           className="flex w-full items-center justify-center border-t border-white/8 py-1 font-mono text-[10px] leading-none text-neutral-600 transition-colors hover:bg-white/5 hover:text-[#e8432d]"
           style={{ borderRadius: 0 }}
