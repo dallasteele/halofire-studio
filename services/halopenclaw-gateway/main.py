@@ -148,6 +148,25 @@ def health() -> dict[str, Any]:
     }
 
 
+@app.get("/health/llm")
+async def health_llm() -> dict[str, Any]:
+    """Phase H.1 — probe the configured LLM backend (HAL V3 or OpenClaw).
+
+    Returns the underlying client's ``health()`` payload plus the
+    ``available`` flag so callers can distinguish "hub responded" from
+    "hub unreachable — agents in degraded mode".
+    """
+    from hal_client import get_llm_client
+
+    client = get_llm_client()
+    payload = await client.health()
+    return {
+        "available": client.available,
+        "backend": type(client).__name__,
+        "detail": payload,
+    }
+
+
 # ── JSON-RPC 2.0 MCP-compatible endpoint ────────────────────────────────────
 
 

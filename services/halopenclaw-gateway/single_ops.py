@@ -27,6 +27,28 @@ from typing import Any
 from scene_store import SceneDelta, new_id
 
 
+# ── Phase H.1 — LLM client helper (proves the interface) ───────────
+#
+# Agents in halofire-cad/agents/ that want LLM classification or
+# reasoning should go through ``get_llm_client()`` so the env-driven
+# swap between HAL V3 hub and an embedded OpenClaw sidecar is a
+# single config change. See ``hal_client.py`` for the contract.
+
+
+async def llm_classify(prompt: str, system: str) -> str:
+    """Thin convenience wrapper — returns the LLM's short answer or
+    the empty string when the hub is unavailable. Phase H.3 agents
+    will consume this; right now it just proves the interface works.
+    """
+    from hal_client import get_llm_client  # local import to keep the
+    # single_ops module importable without httpx in unrelated tests.
+
+    client = get_llm_client()
+    if not client.available:
+        return ""
+    return await client.chat(prompt, system=system, max_tokens=256)
+
+
 # ── Agent module loader (matches orchestrator.py style) ─────────────
 
 _HFCAD = Path(__file__).resolve().parents[1] / "halofire-cad"
