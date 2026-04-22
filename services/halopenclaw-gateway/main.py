@@ -167,6 +167,47 @@ async def health_llm() -> dict[str, Any]:
     }
 
 
+# ── H.3 — Catalog enrichment trigger ────────────────────────────────────────
+
+
+class CatalogEnrichRequest(BaseModel):
+    mode: str = "incremental"  # "full" | "incremental" | "sku"
+    sku: str | None = None
+    parallel: int = 2
+    sam_url: str | None = None
+
+
+@app.post("/projects/catalog/enrich")
+async def projects_catalog_enrich(body: CatalogEnrichRequest) -> dict[str, Any]:
+    """Phase H.3 — kick the per-SKU enrichment pipeline.
+
+    Runs the orchestrator in-process so the response carries the per-SKU
+    outcome summary. For long production runs the caller should shell
+    out to ``python -m catalog_enrichment`` directly; this endpoint is
+    for tight dev loops and the Phase H.4 Catalog panel "re-run" button.
+    """
+    from catalog_enrichment import Orchestrator
+    from hal_client import get_llm_client
+
+    mode = body.mode
+    sku_filter = body.sku
+    if sku_filter and mode == "incremental":
+        mode = "sku"
+    if mode not in ("full", "incremental", "sku"):
+        raise HTTPException(400, f"invalid mode: {body.mode}")
+
+    orch = Orchestrator(
+        sam_url=body.sam_url or os.environ.get("HALOFIRE_SAM_URL", "http://127.0.0.1:18081"),
+        llm_client=get_llm_client(),
+    )
+    out = await orch.run_all(
+        mode=("full" if mode == "full" else "incremental"),
+        sku_filter=sku_filter,
+        parallel=max(1, min(8, body.parallel)),
+    )
+    return out
+
+
 # ── JSON-RPC 2.0 MCP-compatible endpoint ────────────────────────────────────
 
 

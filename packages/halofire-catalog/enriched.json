@@ -1,0 +1,381 @@
+{
+  "schema_version": 1,
+  "entries": {
+    "tyco_ty3251_pendent_155f": {
+      "sku_id": "tyco_ty3251_pendent_155f",
+      "status": "needs_review",
+      "enriched_at": "2026-04-22T14:47:17.976236+00:00",
+      "failure": {
+        "step": "a3_sam_segment",
+        "reason": "sam-unavailable: All connection attempts failed"
+      },
+      "provenance": [
+        {
+          "agent": "a1_intake",
+          "timestamp": "2026-04-22T14:47:15.313369+00:00",
+          "ok": true,
+          "confidence": 1.0,
+          "reason": null,
+          "output_keys": [
+            "cut_sheet_path",
+            "cut_sheet_sha256",
+            "photos",
+            "spec_text"
+          ],
+          "duration_ms": 179
+        },
+        {
+          "agent": "a2_grounding",
+          "timestamp": "2026-04-22T14:47:15.538423+00:00",
+          "ok": true,
+          "confidence": 0.3,
+          "reason": null,
+          "output_keys": [
+            "grounding"
+          ],
+          "duration_ms": 224
+        },
+        {
+          "agent": "a3_sam_segment",
+          "timestamp": "2026-04-22T14:47:17.785707+00:00",
+          "ok": false,
+          "confidence": 1.0,
+          "reason": "sam-unavailable: All connection attempts failed",
+          "output_keys": [],
+          "duration_ms": 2246
+        },
+        {
+          "agent": "a8_escalation",
+          "timestamp": "2026-04-22T14:47:17.976236+00:00",
+          "ok": true,
+          "confidence": 0.0,
+          "reason": null,
+          "output_keys": [
+            "escalation",
+            "status_override"
+          ],
+          "duration_ms": 189
+        }
+      ],
+      "grounding": {
+        "bbox": [
+          0.1,
+          0.1,
+          0.9,
+          0.9
+        ],
+        "confidence": 0.3,
+        "reasoning": "empty llm response",
+        "source": "fallback"
+      },
+      "mask_rejections": [],
+      "escalation": {
+        "action": "flag",
+        "reasoning": "llm-error: unknown hub error",
+        "original_step": "a3_sam_segment",
+        "original_reason": "sam-unavailable: All connection attempts failed"
+      }
+    },
+    "tyco_ty4251_pendent_k80_155f": {
+      "sku_id": "tyco_ty4251_pendent_k80_155f",
+      "status": "needs_review",
+      "enriched_at": "2026-04-22T14:47:20.947344+00:00",
+      "failure": {
+        "step": "a3_sam_segment",
+        "reason": "sam-unavailable: All connection attempts failed"
+      },
+      "provenance": [
+        {
+          "agent": "a1_intake",
+          "timestamp": "2026-04-22T14:47:18.022244+00:00",
+          "ok": true,
+          "confidence": 1.0,
+          "reason": null,
+          "output_keys": [
+            "cut_sheet_path",
+            "cut_sheet_sha256",
+            "photos",
+            "spec_text"
+          ],
+          "duration_ms": 44
+        },
+        {
+          "agent": "a2_grounding",
+          "timestamp": "2026-04-22T14:47:18.219573+00:00",
+          "ok": true,
+          "confidence": 0.3,
+          "reason": null,
+          "output_keys": [
+            "grounding"
+          ],
+          "duration_ms": 197
+        },
+        {
+          "agent": "a3_sam_segment",
+          "timestamp": "2026-04-22T14:47:20.452690+00:00",
+          "ok": false,
+          "confidence": 1.0,
+          "reason": "sam-unavailable: All connection attempts failed",
+          "output_keys": [],
+          "duration_ms": 2231
+        },
+        {
+          "agent": "a8_escalation",
+          "timestamp": "2026-04-22T14:47:20.947344+00:00",
+          "ok": true,
+          "confidence": 0.0,
+          "reason": null,
+          "output_keys": [
+            "escalation",
+            "status_override"
+          ],
+          "duration_ms": 493
+        }
+      ],
+      "grounding": {
+        "bbox": [
+          0.1,
+          0.1,
+          0.9,
+          0.9
+        ],
+        "confidence": 0.3,
+        "reasoning": "empty llm response",
+        "source": "fallback"
+      },
+      "mask_rejections": [],
+      "escalation": {
+        "action": "flag",
+        "reasoning": "llm-error: unknown hub error",
+        "original_step": "a3_sam_segment",
+        "original_reason": "sam-unavailable: All connection attempts failed"
+      }
+    },
+    "reliable_f1res58_pendent_155f": {
+      "sku_id": "reliable_f1res58_pendent_155f",
+      "status": "needs_review",
+      "enriched_at": "2026-04-22T14:47:23.960064+00:00",
+      "failure": {
+        "step": "a3_sam_segment",
+        "reason": "sam-unavailable: All connection attempts failed"
+      },
+      "provenance": [
+        {
+          "agent": "a1_intake",
+          "timestamp": "2026-04-22T14:47:20.989090+00:00",
+          "ok": true,
+          "confidence": 1.0,
+          "reason": null,
+          "output_keys": [
+            "cut_sheet_path",
+            "cut_sheet_sha256",
+            "photos",
+            "spec_text"
+          ],
+          "duration_ms": 35
+        },
+        {
+          "agent": "a2_grounding",
+          "timestamp": "2026-04-22T14:47:21.509060+00:00",
+          "ok": true,
+          "confidence": 0.3,
+          "reason": null,
+          "output_keys": [
+            "grounding"
+          ],
+          "duration_ms": 518
+        },
+        {
+          "agent": "a3_sam_segment",
+          "timestamp": "2026-04-22T14:47:23.772023+00:00",
+          "ok": false,
+          "confidence": 1.0,
+          "reason": "sam-unavailable: All connection attempts failed",
+          "output_keys": [],
+          "duration_ms": 2262
+        },
+        {
+          "agent": "a8_escalation",
+          "timestamp": "2026-04-22T14:47:23.959064+00:00",
+          "ok": true,
+          "confidence": 0.0,
+          "reason": null,
+          "output_keys": [
+            "escalation",
+            "status_override"
+          ],
+          "duration_ms": 185
+        }
+      ],
+      "grounding": {
+        "bbox": [
+          0.1,
+          0.1,
+          0.9,
+          0.9
+        ],
+        "confidence": 0.3,
+        "reasoning": "empty llm response",
+        "source": "fallback"
+      },
+      "mask_rejections": [],
+      "escalation": {
+        "action": "flag",
+        "reasoning": "llm-error: unknown hub error",
+        "original_step": "a3_sam_segment",
+        "original_reason": "sam-unavailable: All connection attempts failed"
+      }
+    },
+    "victaulic_005_rigid_coupling_2in": {
+      "sku_id": "victaulic_005_rigid_coupling_2in",
+      "status": "needs_review",
+      "enriched_at": "2026-04-22T14:47:26.615154+00:00",
+      "failure": {
+        "step": "a3_sam_segment",
+        "reason": "sam-unavailable: All connection attempts failed"
+      },
+      "provenance": [
+        {
+          "agent": "a1_intake",
+          "timestamp": "2026-04-22T14:47:23.974571+00:00",
+          "ok": true,
+          "confidence": 1.0,
+          "reason": null,
+          "output_keys": [
+            "cut_sheet_path",
+            "cut_sheet_sha256",
+            "photos",
+            "spec_text"
+          ],
+          "duration_ms": 7
+        },
+        {
+          "agent": "a2_grounding",
+          "timestamp": "2026-04-22T14:47:24.170128+00:00",
+          "ok": true,
+          "confidence": 0.3,
+          "reason": null,
+          "output_keys": [
+            "grounding"
+          ],
+          "duration_ms": 194
+        },
+        {
+          "agent": "a3_sam_segment",
+          "timestamp": "2026-04-22T14:47:26.414460+00:00",
+          "ok": false,
+          "confidence": 1.0,
+          "reason": "sam-unavailable: All connection attempts failed",
+          "output_keys": [],
+          "duration_ms": 2243
+        },
+        {
+          "agent": "a8_escalation",
+          "timestamp": "2026-04-22T14:47:26.614153+00:00",
+          "ok": true,
+          "confidence": 0.0,
+          "reason": null,
+          "output_keys": [
+            "escalation",
+            "status_override"
+          ],
+          "duration_ms": 199
+        }
+      ],
+      "grounding": {
+        "bbox": [
+          0.1,
+          0.1,
+          0.9,
+          0.9
+        ],
+        "confidence": 0.3,
+        "reasoning": "empty llm response",
+        "source": "fallback"
+      },
+      "mask_rejections": [],
+      "escalation": {
+        "action": "flag",
+        "reasoning": "llm-error: unknown hub error",
+        "original_step": "a3_sam_segment",
+        "original_reason": "sam-unavailable: All connection attempts failed"
+      }
+    },
+    "victaulic_107v_quickvic_coupling_2in": {
+      "sku_id": "victaulic_107v_quickvic_coupling_2in",
+      "status": "needs_review",
+      "enriched_at": "2026-04-22T14:47:29.267593+00:00",
+      "failure": {
+        "step": "a3_sam_segment",
+        "reason": "sam-unavailable: All connection attempts failed"
+      },
+      "provenance": [
+        {
+          "agent": "a1_intake",
+          "timestamp": "2026-04-22T14:47:26.627661+00:00",
+          "ok": true,
+          "confidence": 1.0,
+          "reason": null,
+          "output_keys": [
+            "cut_sheet_path",
+            "cut_sheet_sha256",
+            "photos",
+            "spec_text"
+          ],
+          "duration_ms": 5
+        },
+        {
+          "agent": "a2_grounding",
+          "timestamp": "2026-04-22T14:47:26.829520+00:00",
+          "ok": true,
+          "confidence": 0.3,
+          "reason": null,
+          "output_keys": [
+            "grounding"
+          ],
+          "duration_ms": 201
+        },
+        {
+          "agent": "a3_sam_segment",
+          "timestamp": "2026-04-22T14:47:29.070413+00:00",
+          "ok": false,
+          "confidence": 1.0,
+          "reason": "sam-unavailable: All connection attempts failed",
+          "output_keys": [],
+          "duration_ms": 2239
+        },
+        {
+          "agent": "a8_escalation",
+          "timestamp": "2026-04-22T14:47:29.266090+00:00",
+          "ok": true,
+          "confidence": 0.0,
+          "reason": null,
+          "output_keys": [
+            "escalation",
+            "status_override"
+          ],
+          "duration_ms": 196
+        }
+      ],
+      "grounding": {
+        "bbox": [
+          0.1,
+          0.1,
+          0.9,
+          0.9
+        ],
+        "confidence": 0.3,
+        "reasoning": "empty llm response",
+        "source": "fallback"
+      },
+      "mask_rejections": [],
+      "escalation": {
+        "action": "flag",
+        "reasoning": "llm-error: unknown hub error",
+        "original_step": "a3_sam_segment",
+        "original_reason": "sam-unavailable: All connection attempts failed"
+      }
+    }
+  },
+  "updated_at": "2026-04-22T14:47:29.273599+00:00"
+}
