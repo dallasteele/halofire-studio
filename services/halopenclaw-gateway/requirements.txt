@@ -23,6 +23,10 @@ ezdxf>=1.4               # DXF/DWG write
 reportlab>=4.2           # PDF sheet output
 svgwrite>=1.4            # SVG fallback
 
+# 3D geometry (Phase H.3 enrichment — axisymmetric revolve + GLB export)
+trimesh>=4.5
+scipy>=1.11              # trimesh.fix_normals uses scipy.sparse.csgraph
+
 # Dev / testing
 pytest>=8.3
 httpx>=0.28              # async HTTP client for tests

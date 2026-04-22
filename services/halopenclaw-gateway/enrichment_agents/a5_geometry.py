@@ -112,10 +112,17 @@ def _build_axisymmetric(
     if profile is None:
         # Fallback: parametric stepped cylinder.
         profile = _parametric_profile(kind, body_dia_m, length_m)
-
-    # profile is [(r, z)] pairs with r in meters and z in [0,length_m]
-    # ensure r >= 0 everywhere
-    profile = [(max(0.0, r), z) for (r, z) in profile]
+        # Parametric radii are already in meters; only z needs scaling.
+        profile = [(max(0.0, r), z * length_m) for (r, z) in profile]
+    else:
+        # Silhouette path returned (r_norm[0..1], z_norm[0..1]). Scale
+        # both axes to real-world meters using the manifest's body
+        # diameter and length, so the exported GLB comes out at the
+        # correct physical size instead of a unit cube.
+        body_radius_m = body_dia_m / 2.0 if body_dia_m > 0 else 0.5
+        profile = [
+            (max(0.0, r) * body_radius_m, z * length_m) for (r, z) in profile
+        ]
 
     mesh = _revolve(profile, segments=32)
 
