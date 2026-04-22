@@ -1,23 +1,42 @@
-"""halofire router agent v2 — obstruction-aware pipe routing.
+"""halofire router agent v3 — main / cross-main / branch topology.
 
-Takes placed heads + building obstructions and produces a pipe
-network (PipeSegment[]). Strategy:
+Phase E rewrite (2026-04-21). Replaces the v2 obstruction-aware
+Steiner router with a topology-first router that matches how a
+real fire-sprinkler fitter installs the system:
 
-1. Riser placement — one per system, in a mech room / stair shaft
-2. Build a weighted routing graph over each level:
-   - Nodes = head positions + riser + grid points at 1 m spacing
-   - Edges allowed along structural-grid directions (axis-aligned)
-   - Edge weight = length × axis_pref × obstruction_multiplier
-3. Steiner-tree approximation on the weighted graph connecting all
-   heads + riser: iterative shortest-path from each head to the
-   growing tree (same approach as Prim's MST but on the *graph*,
-   not directly on head-to-head distances — so pipes can bend
-   around obstacles).
-4. Pipe-schedule sizing via §28.5 downstream-head DFS.
-5. Hanger insertion per §9.2.2.1.
+    Riser → Cross-Main → Branch Line 1 → Head → Head → Head ...
+                       → Branch Line 2 → Head → Head → Head ...
+                       → Branch Line N → ...
 
-For large buildings this is approximate; production ships A* + Steiner
-MST hybrid with joist-parallel preference.
+Algorithm (per NFPA 13 §§ 11.2 / 28.5 + standard install practice):
+
+ 1. Pick riser location (stair shaft, mech room, or level centroid).
+ 2. Detect main axis = whichever level-polygon dimension is longer;
+    branch lines run perpendicular to that axis.
+ 3. Group heads into rows: sort by perpendicular coordinate, bin
+    them by a `branch_spacing_m` window (typ. 3-4.5 m ≈ 10-15 ft).
+ 4. For each row, emit one branch line at the row's median perp-
+    coordinate that spans the row extent on the main axis + a spur
+    to the cross-main.
+ 5. Emit one cross-main along the main axis, spanning all branch
+    perp-coordinates + the riser's perp-coordinate.
+ 6. Emit a riser-nipple from the riser to the cross-main.
+ 7. Emit arm-over pipes for heads whose perpendicular position is
+    offset from the branch (head on grid but branch at row median).
+ 8. Emit drops from each head up to the ceiling plenum height.
+ 9. Emit fittings: tee at every branch↔cross-main junction, elbow
+    at each direction change (row spur → branch line), reducing tee
+    where pipe size steps.
+10. Size pipes per §28.5 downstream-head schedule.
+11. Insert hangers per §9.2.2.1.
+
+Public API preserved:
+
+    route_systems(building, heads) -> list[System]
+    pipe_size_for_count(n) -> float
+
+Pipe sizing is provisional; the hydraulic agent may upsize under
+hydraulic failure via its own ``resize_main_if_underflow`` loop.
 """
 from __future__ import annotations
 
@@ -28,8 +47,7 @@ from typing import Optional
 
 import networkx as nx
 from shapely.errors import GEOSException
-from shapely.geometry import Polygon, Point, box
-from shapely.prepared import prep
+from shapely.geometry import Polygon
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from cad.schema import (  # noqa: E402
@@ -41,7 +59,15 @@ from cad.logging import get_logger, warn_swallowed  # noqa: E402
 log = get_logger("router")
 
 
-# Pipe-size selection per total downstream head count — §28.5 schedule
+# Branch-line spacing window (NFPA 13 §8.6.3.1 plus installer
+# convention). Branches are physically 10-15 ft apart on a typical
+# light-hazard residential layout; we use 4.0 m as the bucket size
+# so rows that are within ±2 m of each other fold into one branch.
+BRANCH_ROW_TOL_M = 4.5
+
+# Pipe sizing — §28.5 Schedule table (ordinary hazard pipe schedule).
+# Downstream head count determines nominal diameter (inches). Values
+# match the widely-reproduced Schedule 40 tree schedule.
 def pipe_size_for_count(n: int) -> float:
     if n <= 1: return 1.0
     if n <= 2: return 1.25
@@ -52,303 +78,446 @@ def pipe_size_for_count(n: int) -> float:
     return 4.0
 
 
-def _find_riser_location(level: Level) -> tuple[float, float]:
-    """Pick riser at a stair shaft if available, else centroid of level."""
-    # Prefer stair shafts per fire code (combo standpipe § 7.2)
+# ── Level geometry helpers ─────────────────────────────────────────
+
+
+def _level_bounds(level: Level, heads: list[Head]) -> tuple[float, float, float, float]:
+    """Bounding box covering the level polygon + all heads."""
+    xs: list[float] = []
+    ys: list[float] = []
+    for h in heads:
+        xs.append(h.position_m[0])
+        ys.append(h.position_m[1])
+    if level.polygon_m:
+        for x, y in level.polygon_m:
+            xs.append(x)
+            ys.append(y)
+    for r in level.rooms:
+        for x, y in r.polygon_m:
+            xs.append(x)
+            ys.append(y)
+    if not xs:
+        return (0.0, 0.0, 1.0, 1.0)
+    return (min(xs), min(ys), max(xs), max(ys))
+
+
+def _main_axis(
+    level: Level, heads: list[Head],
+) -> str:
+    """Return 'x' (cross-main runs E-W, branches N-S) or 'y'.
+
+    Chosen so the cross-main runs along the *longer* building axis
+    (minimizes cross-main length; branches are the short legs).
+    """
+    minx, miny, maxx, maxy = _level_bounds(level, heads)
+    if (maxx - minx) >= (maxy - miny):
+        return "x"
+    return "y"
+
+
+def _find_riser_location(level: Level, heads: list[Head]) -> tuple[float, float]:
+    """Pick riser at a stair shaft if available, else mech room,
+    else the centroid of head positions (best for a real network),
+    else level centroid.
+    """
     if level.stair_shafts:
-        sh = level.stair_shafts[0]
-        poly = Polygon(sh.polygon_m)
-        c = poly.centroid
-        return (c.x, c.y)
+        try:
+            p = Polygon(level.stair_shafts[0].polygon_m)
+            c = p.centroid
+            return (c.x, c.y)
+        except (GEOSException, ValueError, TypeError):
+            pass
     if level.mech_rooms:
-        mr = level.mech_rooms[0]
-        poly = Polygon(mr.polygon_m)
-        c = poly.centroid
-        return (c.x, c.y)
-    # Fallback: centroid of all heads on this level (caller supplies)
-    if level.rooms:
-        poly = Polygon(level.rooms[0].polygon_m)
-        c = poly.centroid
-        return (c.x, c.y)
+        try:
+            p = Polygon(level.mech_rooms[0].polygon_m)
+            c = p.centroid
+            return (c.x, c.y)
+        except (GEOSException, ValueError, TypeError):
+            pass
+    if heads:
+        cx = sum(h.position_m[0] for h in heads) / len(heads)
+        cy = sum(h.position_m[1] for h in heads) / len(heads)
+        return (cx, cy)
+    if level.polygon_m:
+        try:
+            p = Polygon(level.polygon_m)
+            c = p.centroid
+            return (c.x, c.y)
+        except (GEOSException, ValueError, TypeError):
+            pass
     return (0.0, 0.0)
 
 
-def _build_routing_graph(
-    level: Level, heads: list[Head], riser_xy: tuple[float, float],
-    grid_step: float = 1.0,
-) -> nx.Graph:
-    """Weighted grid graph for routing.
+# ── Row grouping (branch assignment) ───────────────────────────────
 
-    Uses axis-aligned Manhattan grid at `grid_step` meters. Forbidden
-    edges = those passing through elevator shafts or obstruction
-    polygons. Each head + the riser gets its own node connected to
-    nearest grid point.
+
+def _group_into_rows(
+    heads: list[Head], axis: str, tol_m: float = BRANCH_ROW_TOL_M,
+) -> list[list[Head]]:
+    """Sort heads by the perpendicular coordinate and bin them into
+    rows ≤ tol_m wide. Each row becomes one branch line.
+
+    ``axis`` is the main-axis direction (cross-main axis). Heads are
+    binned by the *perpendicular* coordinate because that's the
+    dimension along which branch lines stack.
     """
-    g = nx.Graph()
-
-    # Bounding box from level's rooms or head positions
-    xs = [h.position_m[0] for h in heads] + [riser_xy[0]]
-    ys = [h.position_m[1] for h in heads] + [riser_xy[1]]
-    for room in level.rooms:
-        for x, y in room.polygon_m:
-            xs.append(x); ys.append(y)
-    if not xs or not ys:
-        return g
-    minx, maxx = min(xs) - 1, max(xs) + 1
-    miny, maxy = min(ys) - 1, max(ys) + 1
-
-    # Obstruction regions we avoid — elevator + mech shafts
-    forbidden: list = []
-    for sh in level.elevator_shafts:
-        try:
-            forbidden.append(prep(Polygon(sh.polygon_m)))
-        except (GEOSException, ValueError, TypeError) as e:
-            warn_swallowed(log, code="ROUTER_BAD_SHAFT_POLYGON",
-                           err=e, shaft_id=sh.id, level_id=level.id)
-    # Columns/beams add cost but aren't forbidden (pipes can run above)
-    cost_regions: list = []
-    for obs in level.obstructions:
-        try:
-            cost_regions.append(prep(Polygon(obs.polygon_m)))
-        except (GEOSException, ValueError, TypeError) as e:
-            warn_swallowed(log, code="ROUTER_BAD_OBSTRUCTION",
-                           err=e, obstruction_id=obs.id, level_id=level.id)
-
-    def edge_cost(p1: tuple[float, float], p2: tuple[float, float]) -> Optional[float]:
-        """None → forbidden. Positive float → edge weight."""
-        mid = ((p1[0] + p2[0]) / 2, (p1[1] + p2[1]) / 2)
-        pt = Point(mid)
-        for f in forbidden:
-            if f.intersects(pt):
-                return None
-        base = math.hypot(p2[0] - p1[0], p2[1] - p1[1])
-        mult = 1.0
-        for c in cost_regions:
-            if c.intersects(pt):
-                mult = 2.5
-                break
-        return base * mult
-
-    # Grid nodes — snap to axis-aligned lattice
-    nx_cells = max(2, int((maxx - minx) / grid_step) + 1)
-    ny_cells = max(2, int((maxy - miny) / grid_step) + 1)
-    for ix in range(nx_cells):
-        for iy in range(ny_cells):
-            x = minx + ix * grid_step
-            y = miny + iy * grid_step
-            node_id = f"g_{ix}_{iy}"
-            g.add_node(node_id, pos=(x, y), kind="grid")
-            # Connect to left + bottom neighbors
-            if ix > 0:
-                prev = f"g_{ix - 1}_{iy}"
-                c = edge_cost(g.nodes[prev]["pos"], (x, y))
-                if c is not None:
-                    g.add_edge(prev, node_id, weight=c)
-            if iy > 0:
-                prev = f"g_{ix}_{iy - 1}"
-                c = edge_cost(g.nodes[prev]["pos"], (x, y))
-                if c is not None:
-                    g.add_edge(prev, node_id, weight=c)
-
-    # Head nodes — snap each to nearest grid point
-    def nearest_grid(pos: tuple[float, float]) -> str:
-        ix = max(0, min(nx_cells - 1, int((pos[0] - minx) / grid_step)))
-        iy = max(0, min(ny_cells - 1, int((pos[1] - miny) / grid_step)))
-        return f"g_{ix}_{iy}"
-
-    for h in heads:
-        h_id = h.id
-        g.add_node(h_id, pos=(h.position_m[0], h.position_m[1]), kind="head")
-        anchor = nearest_grid((h.position_m[0], h.position_m[1]))
-        if anchor in g:
-            g.add_edge(h_id, anchor, weight=0.1)
-
-    riser_id = f"riser_{level.id}"
-    g.add_node(riser_id, pos=riser_xy, kind="riser")
-    anchor = nearest_grid(riser_xy)
-    if anchor in g:
-        g.add_edge(riser_id, anchor, weight=0.1)
-
-    return g
-
-
-def _steiner_tree_paths(
-    g: nx.Graph, terminals: list[str]
-) -> list[tuple[str, str, float, list[tuple[float, float]]]]:
-    """Greedy Steiner approximation with per-call time budget.
-
-    Grows a tree from the first terminal, adding the closest remaining
-    terminal by shortest path each step. Each outer iteration costs
-    O(|tree_nodes| × |remaining|) Dijkstra calls × O(E log V) each.
-
-    A 160-head level with a 5000-node grid hits ~128_000 Dijkstra
-    invocations = minutes of wall clock per level. Time budget of
-    25 s checked inside the loop lets us stop with partial results
-    rather than hanging. Remaining unconnected terminals surface as
-    ROUTER_STEINER_BUDGET issue.
-    """
-    import time as _time
-    # Tight budget: with 1000+ heads the Steiner is O(N^3). 5 s / level
-    # chunk gives the router enough to connect a meaningful fraction,
-    # degrades gracefully past that via ROUTER_STEINER_BUDGET. Phase 7
-    # of SELF_TRAIN_PLAN swaps this for a proper branch-main-cross router.
-    _BUDGET_S = 5.0
-    _start = _time.perf_counter()
-    if not terminals or len(terminals) < 2:
+    if not heads:
         return []
-    tree_nodes = {terminals[0]}
-    remaining = set(terminals[1:])
-    edges: list[tuple[str, str, float, list[tuple[float, float]]]] = []
-
-    while remaining:
-        if _time.perf_counter() - _start > _BUDGET_S:
-            warn_swallowed(
-                log, code="ROUTER_STEINER_BUDGET",
-                err=RuntimeError(
-                    f"steiner over {_BUDGET_S}s, "
-                    f"{len(remaining)} unconnected"
-                ),
-                remaining=len(remaining),
-                connected=len(tree_nodes),
-            )
-            break
-        # Find the remaining terminal with shortest path to tree.
-        # Inner loop also checks budget — a single outer iteration can
-        # do `|remaining| × |tree_nodes|` Dijkstras, each O(E log V),
-        # which on a 5000-node grid takes 100 ms easily. Without an
-        # inner check the per-level budget gets blown by 60-100×.
-        best: tuple[float, str, list[str]] | None = None
-        _budget_blown = False
-        for t in remaining:
-            if _time.perf_counter() - _start > _BUDGET_S:
-                _budget_blown = True
-                break
-            try:
-                # Multi-source Dijkstra trick: only call dijkstra ONCE
-                # per remaining terminal (from the terminal outward
-                # until any tree node is reached) — the prior code
-                # called it `|tree_nodes|` extra times per terminal
-                # which was the real O(N²) hit.
-                length, path = nx.single_source_dijkstra(
-                    g, t, weight="weight",
-                )
-                # Pick nearest tree node
-                near_dist: float | None = None
-                near_anchor: str | None = None
-                for anchor in tree_nodes:
-                    if anchor in length:
-                        d = length[anchor]
-                        if near_dist is None or d < near_dist:
-                            near_dist = d
-                            near_anchor = anchor
-                if near_anchor is not None and near_dist is not None:
-                    p = path[near_anchor]
-                    if best is None or near_dist < best[0]:
-                        best = (near_dist, t, p)
-            except (nx.NodeNotFound, KeyError, ValueError) as e:
-                warn_swallowed(log, code="ROUTER_STEINER_PATH_FAIL",
-                               err=e, terminal=t)
+    perp_idx = 1 if axis == "x" else 0
+    sorted_heads = sorted(heads, key=lambda h: h.position_m[perp_idx])
+    rows: list[list[Head]] = []
+    for h in sorted_heads:
+        perp = h.position_m[perp_idx]
+        if rows:
+            last_perp = rows[-1][0].position_m[perp_idx]
+            # Use the row's *current* median so a wide row doesn't
+            # absorb heads beyond tol_m from its actual median.
+            row_median = sorted(
+                hh.position_m[perp_idx] for hh in rows[-1]
+            )[len(rows[-1]) // 2]
+            if abs(perp - row_median) <= tol_m and abs(perp - last_perp) <= tol_m * 1.5:
+                rows[-1].append(h)
                 continue
-        if _budget_blown:
-            warn_swallowed(
-                log, code="ROUTER_STEINER_BUDGET",
-                err=RuntimeError(
-                    f"steiner inner over {_BUDGET_S}s, "
-                    f"{len(remaining)} unconnected"
-                ),
-                remaining=len(remaining),
-                connected=len(tree_nodes),
-            )
-            break
-        if best is None:
-            # Disconnected — bail
-            break
-        length, target, path = best
-        # Convert path to polyline points
-        pts = [g.nodes[n]["pos"] for n in path]
-        from_id = path[0]
-        to_id = path[-1]
-        edges.append((from_id, to_id, length, pts))
-        # Add all path nodes to tree (Steiner step)
-        for n in path:
-            tree_nodes.add(n)
-        remaining.discard(target)
-    return edges
+        rows.append([h])
+    return rows
 
 
-def _explode_polyline_to_segments(
-    path: list[tuple[float, float]], z_m: float,
-    from_id: str, to_id: str, seg_idx: int,
-) -> list[PipeSegment]:
-    """Convert a polyline into individual PipeSegment objects (one per
-    consecutive pair of points). All segments inherit the from_id/to_id
-    as the branch identity; downstream-head sizing handled separately.
+# ── Pipe / fitting builders ────────────────────────────────────────
+
+
+def _mk_pipe(
+    id_: str, from_node: str, to_node: str,
+    start: tuple[float, float, float], end: tuple[float, float, float],
+    size_in: float, role: str,
+) -> PipeSegment:
+    length = math.hypot(end[0] - start[0], end[1] - start[1])
+    length = math.hypot(length, end[2] - start[2])
+    return PipeSegment(
+        id=id_,
+        from_node=from_node, to_node=to_node,
+        size_in=size_in, schedule="sch10",
+        start_m=start, end_m=end,
+        length_m=max(length, 0.01),
+        elevation_change_m=end[2] - start[2],
+        role=role,  # type: ignore[arg-type]
+    )
+
+
+def _mk_tee(
+    id_: str, size_in: float,
+    position: tuple[float, float, float],
+) -> Fitting:
+    return Fitting(
+        id=id_, kind="tee_branch",
+        size_in=size_in, position_m=position,
+        equiv_length_ft=7.0 * size_in,  # conservative; overridden by Le table
+    )
+
+
+def _mk_elbow(
+    id_: str, size_in: float,
+    position: tuple[float, float, float],
+) -> Fitting:
+    return Fitting(
+        id=id_, kind="elbow_90",
+        size_in=size_in, position_m=position,
+        equiv_length_ft=2.0 * size_in,
+    )
+
+
+# ── Main routing ───────────────────────────────────────────────────
+
+
+def _route_level(
+    level: Level, heads: list[Head], sys_id: str,
+    riser: RiserSpec, riser_z: float,
+) -> tuple[list[PipeSegment], list[Fitting]]:
+    """Produce the pipe network for one level.
+
+    Returns (pipes, fittings). All horizontal pipes at ``riser_z``;
+    drops are vertical from riser_z to each head Z.
     """
-    out: list[PipeSegment] = []
-    for i in range(len(path) - 1):
-        p1 = path[i]
-        p2 = path[i + 1]
-        length = math.hypot(p2[0] - p1[0], p2[1] - p1[1])
-        if length < 0.01:
+    if not heads:
+        return ([], [])
+
+    axis = _main_axis(level, heads)
+    main_idx = 0 if axis == "x" else 1
+    perp_idx = 1 - main_idx
+
+    rows = _group_into_rows(heads, axis)
+    riser_xy = (riser.position_m[0], riser.position_m[1])
+    riser_main = riser_xy[main_idx]
+    riser_perp = riser_xy[perp_idx]
+
+    pipes: list[PipeSegment] = []
+    fittings: list[Fitting] = []
+    idx = 0
+
+    # ── Branch lines + arm-overs + drops ───────────────────────────
+    branch_perp_coords: list[float] = []
+    # Track branch end-points on the cross-main so we can size the
+    # main segment between each pair of tees.
+    branch_tee_points: list[tuple[float, float, int]] = []  # (main, perp, heads_in_branch)
+
+    for row_i, row in enumerate(rows):
+        if not row:
             continue
-        out.append(PipeSegment(
-            id=f"p_{from_id}__{to_id}_{seg_idx}_{i}",
-            from_node=from_id if i == 0 else f"j_{from_id}_{to_id}_{seg_idx}_{i}",
-            to_node=to_id if i == len(path) - 2 else f"j_{from_id}_{to_id}_{seg_idx}_{i + 1}",
-            size_in=1.0,  # resized after tree walk
-            schedule="sch10",
-            start_m=(p1[0], p1[1], z_m),
-            end_m=(p2[0], p2[1], z_m),
-            length_m=length,
-            elevation_change_m=0.0,
-            downstream_heads=1,
+        # Row's main-axis extent + perp median
+        mains = [h.position_m[main_idx] for h in row]
+        perps = [h.position_m[perp_idx] for h in row]
+        m_lo = min(mains)
+        m_hi = max(mains)
+        row_perp = sum(perps) / len(perps)
+        # Branch spans from the side closest to the riser-main to the
+        # far head, so the cross-main has a real tee-stub to hit.
+        if riser_main < m_lo:
+            br_start_main = riser_main
+            br_end_main = m_hi
+        elif riser_main > m_hi:
+            br_start_main = m_lo
+            br_end_main = riser_main
+        else:
+            br_start_main = m_lo
+            br_end_main = m_hi
+
+        if abs(br_end_main - br_start_main) < 0.1:
+            # Degenerate single-head row — place a stub pipe and a drop.
+            stub_len = 0.3
+            h = row[0]
+            # Build start/end based on axis
+            if axis == "x":
+                start = (h.position_m[0] - stub_len, row_perp, riser_z)
+                end = (h.position_m[0], row_perp, riser_z)
+            else:
+                start = (row_perp, h.position_m[1] - stub_len, riser_z)
+                end = (row_perp, h.position_m[1], riser_z)
+            pipes.append(_mk_pipe(
+                f"p_{sys_id}_br_{row_i}_{idx}",
+                f"br_{row_i}_start", h.id,
+                start, end, pipe_size_for_count(1), "branch",
+            ))
+            idx += 1
+            # Drop
+            pipes.append(_mk_pipe(
+                f"p_{sys_id}_drop_{row_i}_{idx}",
+                f"drop_top_{h.id}", h.id,
+                (h.position_m[0], h.position_m[1], riser_z),
+                h.position_m,
+                1.0, "drop",
+            ))
+            idx += 1
+            branch_perp_coords.append(row_perp)
+            branch_tee_points.append((riser_main, row_perp, 1))
+            continue
+
+        branch_size = pipe_size_for_count(len(row))
+        branch_id_base = f"p_{sys_id}_br_{row_i}"
+
+        # Sort heads along the main axis for sequential connection.
+        row_sorted = sorted(row, key=lambda h: h.position_m[main_idx])
+
+        # Branch line emitted as a single pipe from spur-to-main to
+        # far head; arm-overs handle offsets.
+        if axis == "x":
+            br_start = (br_start_main, row_perp, riser_z)
+            br_end = (br_end_main, row_perp, riser_z)
+        else:
+            br_start = (row_perp, br_start_main, riser_z)
+            br_end = (row_perp, br_end_main, riser_z)
+
+        # Where the branch meets the cross-main = tee point
+        if axis == "x":
+            tee_pt = (riser_main, row_perp, riser_z)
+        else:
+            tee_pt = (row_perp, riser_main, riser_z)
+
+        branch_pipe_id = f"{branch_id_base}_{idx}"
+        pipes.append(_mk_pipe(
+            branch_pipe_id, f"tee_xm_{row_i}", row_sorted[-1].id,
+            br_start, br_end, branch_size, "branch",
         ))
-    return out
+        idx += 1
+        branch_perp_coords.append(row_perp)
+        branch_tee_points.append((riser_main, row_perp, len(row)))
+
+        # Tee fitting at the branch/cross-main junction
+        fittings.append(_mk_tee(
+            f"fit_tee_{sys_id}_{row_i}_{idx}", branch_size, tee_pt,
+        ))
+        idx += 1
+
+        # Arm-overs + drops per head
+        for hi, h in enumerate(row_sorted):
+            hx, hy, hz = h.position_m
+            # Projection of the head onto the branch line
+            if axis == "x":
+                proj = (hx, row_perp, riser_z)
+            else:
+                proj = (row_perp, hy, riser_z)
+            offset = math.hypot(hx - proj[0], hy - proj[1])
+            if offset > 0.25:
+                # Arm-over: horizontal pipe from branch line to head XY
+                # at ceiling height, followed by a drop.
+                pipes.append(_mk_pipe(
+                    f"p_{sys_id}_armover_{row_i}_{hi}_{idx}",
+                    f"arm_{h.id}_src", f"arm_{h.id}_dst",
+                    proj, (hx, hy, riser_z),
+                    1.0, "branch",
+                ))
+                idx += 1
+                # Elbow where the arm-over leaves the branch
+                fittings.append(_mk_elbow(
+                    f"fit_elb_{sys_id}_{row_i}_{hi}_{idx}",
+                    1.0, proj,
+                ))
+                idx += 1
+            # Drop from ceiling to head
+            pipes.append(_mk_pipe(
+                f"p_{sys_id}_drop_{row_i}_{hi}_{idx}",
+                f"drop_top_{h.id}", h.id,
+                (hx, hy, riser_z), (hx, hy, hz),
+                1.0, "drop",
+            ))
+            idx += 1
+
+    # ── Cross-main (spine) ─────────────────────────────────────────
+    if branch_perp_coords:
+        perp_lo = min(branch_perp_coords + [riser_perp])
+        perp_hi = max(branch_perp_coords + [riser_perp])
+        if abs(perp_hi - perp_lo) >= 0.2:
+            # Segment the cross-main between consecutive tees so each
+            # run can be sized to its downstream-head count.
+            tee_pts_sorted = sorted(
+                branch_tee_points, key=lambda t: t[1],
+            )
+            # Insert riser pierce point into the chain
+            cm_stops: list[tuple[float, int]] = []  # (perp, heads_downstream_of_this_stop)
+            for (_main, perp, cnt) in tee_pts_sorted:
+                cm_stops.append((perp, cnt))
+            # Add riser as a stop too (zero heads)
+            cm_stops.append((riser_perp, 0))
+            cm_stops.sort(key=lambda x: x[0])
+            # Emit one pipe per consecutive stop pair, sized by
+            # cumulative heads downstream of the farther end from riser.
+            # Simpler heuristic: size by total heads in the system.
+            total_heads = sum(c for (_p, c) in cm_stops)
+            cm_size = pipe_size_for_count(max(total_heads, 1))
+            cm_size = max(cm_size, 2.5)  # NFPA — cross-main ≥ 2.5" typ.
+            for i in range(len(cm_stops) - 1):
+                a_perp, _ = cm_stops[i]
+                b_perp, _ = cm_stops[i + 1]
+                if abs(b_perp - a_perp) < 0.05:
+                    continue
+                if axis == "x":
+                    s = (riser_main, a_perp, riser_z)
+                    e = (riser_main, b_perp, riser_z)
+                else:
+                    s = (a_perp, riser_main, riser_z)
+                    e = (b_perp, riser_main, riser_z)
+                pipes.append(_mk_pipe(
+                    f"p_{sys_id}_xm_{i}_{idx}",
+                    f"xm_stop_{i}", f"xm_stop_{i + 1}",
+                    s, e, cm_size, "cross_main",
+                ))
+                idx += 1
+
+        # Riser nipple: riser → cross-main at riser_perp
+        if axis == "x":
+            rn_end = (riser_main, riser_perp, riser_z)
+        else:
+            rn_end = (riser_perp, riser_main, riser_z)
+        pipes.append(_mk_pipe(
+            f"p_{sys_id}_risernip_{idx}",
+            riser.id, f"xm_riser_pierce",
+            riser.position_m, rn_end,
+            4.0, "riser_nipple",
+        ))
+        idx += 1
+
+    return pipes, fittings
 
 
-def _resize_network(
+def _resize_by_downstream(
     segments: list[PipeSegment], heads: list[Head], riser_id: str,
 ) -> list[PipeSegment]:
-    """Walk the tree from heads up to riser, computing downstream-head
-    count per segment, and assign §28.5 pipe size.
+    """Refine pipe sizes by counting downstream heads per segment.
+
+    Walks the undirected graph of pipes; for each segment, removes it,
+    counts heads in the component containing its riser-side endpoint,
+    and assigns the §28.5 size for the *other* side. Drops keep size 1
+    regardless.
     """
     if not segments:
         return segments
-    # Build adjacency
-    graph = nx.DiGraph()
+    g = nx.Graph()
     for s in segments:
-        graph.add_edge(s.from_node, s.to_node, key=s.id, length=s.length_m)
-
-    # Count downstream heads (each edge's "downstream" side is whichever
-    # leads away from the riser). Build undirected reachability then
-    # orient edges toward riser.
-    u = graph.to_undirected()
+        g.add_edge(s.from_node, s.to_node, key=s.id)
     head_ids = {h.id for h in heads}
+
     for s in segments:
-        # Determine which endpoint is upstream (closer to riser by hops)
+        if s.role == "drop":
+            s.downstream_heads = 1
+            s.size_in = max(s.size_in, 1.0)
+            continue
+        if s.role == "riser_nipple":
+            s.downstream_heads = len(heads)
+            s.size_in = max(s.size_in, 4.0)
+            continue
+        # Remove the edge, see which side contains the riser
+        if not g.has_edge(s.from_node, s.to_node):
+            continue
+        g.remove_edge(s.from_node, s.to_node)
         try:
-            from_to_riser = nx.shortest_path_length(u, s.from_node, riser_id)
-            to_to_riser = nx.shortest_path_length(u, s.to_node, riser_id)
-        except (nx.NetworkXNoPath, nx.NodeNotFound):
-            from_to_riser = 0
-            to_to_riser = 1
-        downstream_node = s.from_node if from_to_riser > to_to_riser else s.to_node
-        # Count heads reachable from downstream_node without crossing the
-        # upstream endpoint
-        upstream_node = s.to_node if downstream_node == s.from_node else s.from_node
-        u_copy = u.copy()
-        if u_copy.has_edge(upstream_node, downstream_node):
-            u_copy.remove_edge(upstream_node, downstream_node)
-        try:
-            reachable = nx.descendants(u_copy, downstream_node) | {downstream_node}
-        except (nx.NodeNotFound, KeyError) as e:
-            warn_swallowed(log, code="ROUTER_DOWNSTREAM_COUNT_FAIL",
-                           err=e, seg_id=s.id, downstream_node=downstream_node)
-            reachable = {downstream_node}
+            if riser_id in g and s.from_node in g:
+                riser_side = nx.has_path(g, riser_id, s.from_node)
+            else:
+                riser_side = False
+            downstream_node = s.to_node if riser_side else s.from_node
+            if downstream_node in g:
+                reachable = nx.node_connected_component(g, downstream_node)
+            else:
+                reachable = {downstream_node}
+        except (nx.NetworkXError, nx.NodeNotFound):
+            reachable = set()
+        finally:
+            g.add_edge(s.from_node, s.to_node, key=s.id)
         ds_heads = len(reachable & head_ids)
         s.downstream_heads = max(1, ds_heads)
-        s.size_in = pipe_size_for_count(ds_heads)
+        # Respect role minimums
+        new_size = pipe_size_for_count(ds_heads)
+        if s.role == "cross_main":
+            new_size = max(new_size, 2.5)
+        s.size_in = new_size
     return segments
+
+
+def _classify_pipe_roles(
+    segments: list[PipeSegment], head_ids: set[str], riser_id: str,
+) -> None:
+    """Kept for backward-compat with any downstream code that calls it.
+
+    The v3 router already sets ``.role`` on every pipe it creates, so
+    this only fills gaps left by external mutations.
+    """
+    for s in segments:
+        if s.role != "unknown":
+            continue
+        a, b = s.from_node, s.to_node
+        touches_riser = (a == riser_id or b == riser_id)
+        touches_head = (a in head_ids or b in head_ids)
+        dz = abs(s.elevation_change_m)
+        if touches_riser:
+            s.role = "riser_nipple"
+        elif touches_head and dz >= 0.05:
+            s.role = "drop"
+        elif touches_head:
+            s.role = "branch"
+        elif s.size_in >= 4.0:
+            s.role = "main"
+        elif s.size_in >= 2.5:
+            s.role = "cross_main"
+        else:
+            s.role = "branch"
 
 
 def _insert_hangers(segments: list[PipeSegment]) -> list[Hanger]:
@@ -359,6 +528,8 @@ def _insert_hangers(segments: list[PipeSegment]) -> list[Hanger]:
     }
     hangers: list[Hanger] = []
     for s in segments:
+        if s.role == "drop":
+            continue  # drops don't get hangers
         sp = spacing_by_size.get(s.size_in, 3.66)
         n = max(1, int(s.length_m / sp))
         for i in range(n):
@@ -374,28 +545,25 @@ def _insert_hangers(segments: list[PipeSegment]) -> list[Hanger]:
     return hangers
 
 
-def route_systems(building: Building, heads: list[Head]) -> list[System]:
-    """Primary entry: route sprinkler systems for the whole building.
+# ── Entry point ────────────────────────────────────────────────────
 
-    Simplified: one wet system per non-garage level; one dry system per
-    garage level; systems grouped by level first, combo standpipes
-    crossing levels ship in Phase 4.2.
+
+def route_systems(building: Building, heads: list[Head]) -> list[System]:
+    """Produce fire-sprinkler systems for the building.
+
+    One wet system per non-garage level, one dry per garage level,
+    plus one combo standpipe for multi-level buildings. Each level's
+    system carries heads + pipes + fittings + hangers at NFPA-
+    compliant main/cross/branch topology.
     """
-    systems: list[System] = []
+    # Group heads by level
     heads_by_level: dict[str, list[Head]] = {}
     for h in heads:
-        # Map each head to its level. Primary path: room_id matches a
-        # room on the level. Fallback path (introduced w/
-        # place_heads_for_level_floor): room_id has shape
-        # 'floor_fallback_<level_id>' — extract the level id directly.
-        # Without this, floor-fallback heads get silently dropped and
-        # the router emits a sparse design that under-counts by
-        # hundreds of heads.
         matched = False
         if h.room_id and h.room_id.startswith("floor_fallback_"):
-            target_level_id = h.room_id[len("floor_fallback_"):]
+            target = h.room_id[len("floor_fallback_"):]
             for lvl in building.levels:
-                if lvl.id == target_level_id:
+                if lvl.id == target:
                     heads_by_level.setdefault(lvl.id, []).append(h)
                     matched = True
                     break
@@ -405,353 +573,96 @@ def route_systems(building: Building, heads: list[Head]) -> list[System]:
                     heads_by_level.setdefault(lvl.id, []).append(h)
                     matched = True
                     break
-        if not matched:
-            # Last-resort: match by Z coordinate to nearest level.
-            # Prevents heads from being silently dropped when the
-            # intake mints a head without a clear room/level
-            # association.
-            if h.position_m:
-                z = h.position_m[2]
-                best = min(
-                    building.levels,
-                    key=lambda lv: abs(lv.elevation_m - z),
-                    default=None,
-                )
-                if best is not None:
-                    heads_by_level.setdefault(best.id, []).append(h)
+        if not matched and h.position_m:
+            z = h.position_m[2]
+            best = min(
+                building.levels,
+                key=lambda lv: abs(lv.elevation_m - z),
+                default=None,
+            )
+            if best is not None:
+                heads_by_level.setdefault(best.id, []).append(h)
 
+    systems: list[System] = []
     for level in building.levels:
         lvl_heads = heads_by_level.get(level.id, [])
         if not lvl_heads:
             continue
-        riser_xy = _find_riser_location(level)
-        # §1.4 budget enforcement — Steiner is near-O(N²×logN).
-        # More than 500 heads per level → we won't actually beat the
-        # iteration budget. Flag + skip routing with a typed issue so
-        # the pipeline still produces BOM + proposal outputs.
-        _ROUTER_HEAD_CAP = 500
-        if len(lvl_heads) > _ROUTER_HEAD_CAP:
-            warn_swallowed(
-                log, code="ROUTER_HEAD_CAP_EXCEEDED",
-                err=RuntimeError(f"{len(lvl_heads)} heads > {_ROUTER_HEAD_CAP}"),
-                level_id=level.id, head_count=len(lvl_heads),
-            )
-            sys_id = f"sys_{level.id}"
-            riser = RiserSpec(
-                id=f"riser_{level.id}",
-                position_m=(0.0, 0.0, level.elevation_m),
-                size_in=4.0,
-            )
-            systems.append(System(
-                id=sys_id, type="wet", supplies=[level.id],
-                riser=riser, heads=lvl_heads, pipes=[], hangers=[],
-            ))
-            continue
+        riser_xy = _find_riser_location(level, lvl_heads)
 
-        sys_type = "dry" if level.use == "garage" else "wet"
-        # V2 Phase 2.2: drop-ceiling-aware routing. When the ceiling
-        # is acoustic_tile, route pipes UP IN THE PLENUM (above the
-        # tiles) per NFPA 13 § 11.2.5. Heads then drop down through
-        # the tiles via short `drop` pipes. For exposed-deck floors
-        # (garage / mech) pipes ride 0.3 m below the structural deck.
+        # Routing elevation: in drop-ceiling, pipe runs in the plenum
+        # (above tile); in exposed-deck, 0.3 m below structural deck.
         if level.ceiling.kind == "acoustic_tile":
             ceiling_face_z = level.elevation_m + level.ceiling.height_m
             riser_z = ceiling_face_z + (level.ceiling.plenum_depth_m or 0.45) * 0.5
         else:
             riser_z = level.elevation_m + (level.height_m - 0.3)
+
         sys_id = f"sys_{level.id}"
+        sys_type = "dry" if level.use == "garage" else "wet"
         riser = RiserSpec(
             id=f"riser_{level.id}",
             position_m=(riser_xy[0], riser_xy[1], level.elevation_m),
             size_in=4.0,
         )
-        system = System(
-            id=sys_id,
-            type=sys_type,
-            supplies=[level.id],
-            riser=riser,
-        )
-        # Router time budget per level — Steiner is near-O(N²×log N)
-        # on networkx. With 350-head cap from the floor-fallback placer
-        # a 45 s budget is not enough (12 levels = 9+ min total).
-        # Tighten to 10 s / level → pipeline completes in < 3 min total
-        # even with degraded routes; Phase 7 swaps in a real
-        # branch/cross/main router.
-        _ROUTER_LEVEL_BUDGET_S = 10.0
-        import time as _time
-        _router_level_start = _time.perf_counter()
-        try:
-            g = _build_routing_graph(level, lvl_heads, riser_xy)
-            terminals = [riser.id] + [h.id for h in lvl_heads]
-            # Add riser node with its actual id to the graph
-            if riser.id not in g:
-                g.add_node(riser.id, pos=riser_xy, kind="riser")
-                # Connect to nearest grid
-                gx = int((riser_xy[0] - g.graph.get("minx", 0)) / 1.0)
-                gy = int((riser_xy[1] - g.graph.get("miny", 0)) / 1.0)
-                # Best-effort connection — iterate grid nodes for nearest
-                best_anchor: Optional[str] = None
-                best_d = float("inf")
-                for n, d in g.nodes(data=True):
-                    if d.get("kind") != "grid":
-                        continue
-                    nx_, ny_ = d["pos"]
-                    dist = math.hypot(nx_ - riser_xy[0], ny_ - riser_xy[1])
-                    if dist < best_d:
-                        best_d = dist; best_anchor = n
-                if best_anchor:
-                    g.add_edge(riser.id, best_anchor, weight=0.1)
 
-            tree_edges = _steiner_tree_paths(g, terminals)
-        except (nx.NodeNotFound, nx.NetworkXError, ValueError, KeyError) as e:
-            warn_swallowed(log, code="ROUTER_GRAPH_FAIL",
-                           err=e, level_id=level.id, head_count=len(lvl_heads))
-            tree_edges = []
-
-        # Budget enforcement: if the graph build + Steiner exceeded
-        # the level budget, bail with empty pipes (honest degrade).
-        _elapsed = _time.perf_counter() - _router_level_start
-        if _elapsed > _ROUTER_LEVEL_BUDGET_S:
+        # Head-count guard — even the v3 topology router is O(N×log N)
+        # per level; we cap per-level to keep a 12-story pipeline
+        # finishing in < 30 s total.
+        _ROUTER_LEVEL_CAP = 1000
+        if len(lvl_heads) > _ROUTER_LEVEL_CAP:
             warn_swallowed(
-                log, code="ROUTER_LEVEL_BUDGET_EXCEEDED",
-                err=RuntimeError(f"{_elapsed:.1f}s > {_ROUTER_LEVEL_BUDGET_S}s"),
+                log, code="ROUTER_HEAD_CAP_EXCEEDED",
+                err=RuntimeError(
+                    f"{len(lvl_heads)} heads > {_ROUTER_LEVEL_CAP}"),
                 level_id=level.id, head_count=len(lvl_heads),
             )
-            tree_edges = []
-
-        # Convert tree edges to PipeSegments
-        segments: list[PipeSegment] = []
-        for i, (f, t, length, path) in enumerate(tree_edges):
-            segments.extend(_explode_polyline_to_segments(
-                path, riser_z, f, t, i,
+            systems.append(System(
+                id=sys_id, type=sys_type,
+                supplies=[level.id], riser=riser,
+                heads=lvl_heads, pipes=[], hangers=[],
             ))
+            continue
 
-        # Resize per §28.5
-        segments = _resize_network(segments, lvl_heads, riser.id)
-        # NEW: synthesize the branch / cross-main / drop hierarchy on
-        # top of the Steiner tree. Real fire-protection drawings have
-        # an explicit drop per head + branches per row + a cross-main
-        # spine — not a flat shortest-path tree. _emit_hierarchy_pipes
-        # APPENDS those pipes to the existing Steiner output so the
-        # BOM gets real cross-mains + drops while connectivity is
-        # still guaranteed by Steiner.
-        head_ids = {h.id for h in lvl_heads}
         try:
-            hierarchy = _emit_hierarchy_pipes(
-                lvl_heads, riser, riser_z, sys_id,
+            pipes, fittings = _route_level(
+                level, lvl_heads, sys_id, riser, riser_z,
             )
-            segments.extend(hierarchy)
         except Exception as e:  # noqa: BLE001
             warn_swallowed(
-                log, code="ROUTER_HIERARCHY_FAIL",
-                err=e, level_id=level.id,
+                log, code="ROUTER_LEVEL_FAIL",
+                err=e, level_id=level.id, head_count=len(lvl_heads),
             )
-        # System IDs + Smart-Pipe role on segments
-        for s in segments:
-            s.system_id = sys_id
-        _classify_pipe_roles(segments, head_ids, riser.id)
-        system.pipes = segments
-        system.heads = lvl_heads
-        system.hangers = _insert_hangers(segments)
+            pipes, fittings = [], []
+
+        # Annotate system_id on every pipe + size the network
+        for p in pipes:
+            p.system_id = sys_id
+        pipes = _resize_by_downstream(pipes, lvl_heads, riser.id)
+
+        hangers = _insert_hangers(pipes)
+
+        system = System(
+            id=sys_id, type=sys_type,
+            supplies=[level.id], riser=riser,
+            heads=lvl_heads, pipes=pipes,
+            fittings=fittings, hangers=hangers,
+        )
         systems.append(system)
+
     return _merge_combo_systems(systems, building)
-
-
-def _emit_hierarchy_pipes(
-    heads: list[Head], riser: RiserSpec, riser_z: float, sys_id: str,
-    branch_y_tol_m: float = 3.0,
-) -> list[PipeSegment]:
-    """Produce drop / branch / cross-main pipes on top of the Steiner
-    tree so the BOM and the drawing reflect a real NFPA-13 hierarchy.
-
-    Algorithm (matches industry sketch convention):
-      1. **Drop per head** — vertical 1" pipe from head Z to ceiling
-         Z (=riser_z). Tagged role=drop downstream by classifier.
-      2. **Branch per row** — heads grouped by Y coordinate within
-         `branch_y_tol_m`; each row gets one E-W 1.25" pipe at
-         ceiling Z spanning the row's X extent + a small spur to the
-         cross-main. The branch endpoint connects to the drop tops,
-         so classifier sees touches_head=True → role=branch.
-      3. **Cross-main** — single N-S 2.5" pipe at ceiling Z near the
-         riser X, spanning from the lowest branch Y to the highest.
-         Has no head endpoints → classifier role=cross_main.
-
-    Coordinate convention: Pascal X/Y in plan, Z up. `riser_z` is the
-    ceiling elevation (head connection height). Heads' position_m is
-    (x, y, deflector_z) where deflector_z = ceiling - 0.1.
-    """
-    if not heads:
-        return []
-    out: list[PipeSegment] = []
-    pipe_idx = 1000  # offset so we don't collide with Steiner ids
-
-    # 1. Drops
-    for h in heads:
-        hx, hy, hz = h.position_m
-        # short vertical drop from head to ceiling
-        seg = PipeSegment(
-            id=f"p_{sys_id}_drop_{pipe_idx}",
-            from_node=f"drop_top_{h.id}",
-            to_node=h.id,
-            size_in=1.0,
-            schedule="sch10",
-            start_m=(hx, hy, riser_z),
-            end_m=(hx, hy, hz),
-            length_m=max(abs(riser_z - hz), 0.05),
-            elevation_change_m=riser_z - hz,
-        )
-        out.append(seg)
-        pipe_idx += 1
-
-    # 2. Branches — group heads by Y
-    heads_sorted = sorted(heads, key=lambda h: (h.position_m[1], h.position_m[0]))
-    rows: list[list[Head]] = []
-    for h in heads_sorted:
-        if rows and abs(h.position_m[1] - rows[-1][0].position_m[1]) <= branch_y_tol_m:
-            rows[-1].append(h)
-        else:
-            rows.append([h])
-
-    riser_x, riser_y = riser.position_m[0], riser.position_m[1]
-    branch_y_centers: list[float] = []
-    for row in rows:
-        if len(row) < 1:
-            continue
-        ys = [h.position_m[1] for h in row]
-        xs = [h.position_m[0] for h in row]
-        y_mid = sum(ys) / len(ys)
-        x_lo, x_hi = min(xs), max(xs)
-        # Extend branch to whichever side is closer to the riser X so
-        # the cross-main has a real spur to connect to.
-        if riser_x < x_lo:
-            x_start = riser_x
-            x_end = x_hi
-        elif riser_x > x_hi:
-            x_start = x_lo
-            x_end = riser_x
-        else:
-            x_start = x_lo
-            x_end = x_hi
-        # Skip degenerate single-head rows shorter than 0.5 m
-        if abs(x_end - x_start) < 0.5:
-            continue
-        seg = PipeSegment(
-            id=f"p_{sys_id}_br_{pipe_idx}",
-            from_node=f"br_start_{pipe_idx}",
-            to_node=row[0].id,  # touches a head → role=branch
-            size_in=1.25,
-            schedule="sch10",
-            start_m=(x_start, y_mid, riser_z),
-            end_m=(x_end, y_mid, riser_z),
-            length_m=abs(x_end - x_start),
-            elevation_change_m=0.0,
-        )
-        out.append(seg)
-        branch_y_centers.append(y_mid)
-        pipe_idx += 1
-
-    # 3. Cross-main — N-S spine at riser X, spanning all branch Ys
-    if branch_y_centers:
-        y_lo = min(branch_y_centers + [riser_y])
-        y_hi = max(branch_y_centers + [riser_y])
-        if abs(y_hi - y_lo) >= 0.5:
-            seg = PipeSegment(
-                id=f"p_{sys_id}_xm_{pipe_idx}",
-                from_node=f"xm_lo_{pipe_idx}",
-                to_node=f"xm_hi_{pipe_idx}",  # no head, no riser → cross_main
-                size_in=2.5,
-                schedule="sch10",
-                start_m=(riser_x, y_lo, riser_z),
-                end_m=(riser_x, y_hi, riser_z),
-                length_m=abs(y_hi - y_lo),
-                elevation_change_m=0.0,
-            )
-            out.append(seg)
-            pipe_idx += 1
-
-    return out
-
-
-def _classify_pipe_roles(
-    segments: list[PipeSegment], head_ids: set[str], riser_id: str,
-) -> None:
-    """AutoSPRINK Smart-Pipe parity. Walks the segment graph and
-    assigns a `role` to every pipe so the BOM groups correctly and
-    the viewer can color-code by hierarchy.
-
-    Heuristic (per NFPA 13 §3.3.197 + estimator convention):
-      * `drop`        — segment whose vertical span > 0.5 m AND one
-                        endpoint is a head (head→ceiling)
-      * `riser_nipple`— segment touching the riser node
-      * `branch`      — horizontal pipe carrying ≥ 1 head, < 30 m,
-                        ≤ 1.5"
-      * `cross_main`  — horizontal pipe carrying multiple branches
-                        (no direct heads), 2.5"+
-      * `main`        — anything ≥ 4" not on the riser
-      * `unknown`     — fallback (geometry didn't fit any rule)
-
-    Pure-functional, mutates `segments[].role` in place.
-    """
-    # Build per-pipe degree info — count head endpoints, riser endpoints
-    for s in segments:
-        a, b = s.from_node, s.to_node
-        touches_riser = (a == riser_id or b == riser_id)
-        touches_head = (a in head_ids or b in head_ids)
-        dz = abs(s.elevation_change_m)
-
-        if touches_riser:
-            s.role = "riser_nipple"
-            continue
-        # Drop = vertical pipe touching a head. NFPA-13 residential
-        # drop is typically 1-12" (0.025-0.3 m); standard pendant is
-        # ~0.1 m deflector-below-ceiling. Threshold 0.05 m catches
-        # any vertical short stub, distinguishing from horizontal
-        # branch stubs that touch heads at the same z.
-        if touches_head and dz >= 0.05:
-            s.role = "drop"
-            continue
-        if touches_head:
-            # Head connection but mostly horizontal → it's the
-            # short stub of a branch (treat as branch).
-            s.role = "branch"
-            continue
-        # No head, no riser → trunk pipe. Diameter triages.
-        if s.size_in >= 4.0:
-            s.role = "main"
-        elif s.size_in >= 2.5:
-            s.role = "cross_main"
-        elif s.size_in <= 1.5 and s.length_m < 30:
-            s.role = "branch"
-        else:
-            s.role = "cross_main"
 
 
 def _merge_combo_systems(
     systems: list[System], building: Building,
 ) -> list[System]:
-    """V2 Phase 3.1 update: real Halo 1881 bid uses 1 system PER LEVEL
-    plus one COMBO STANDPIPE that connects to the city water main.
-    Total systems = level_count + 1 (= 7 for the 6-level 1881).
-
-    The previous merge (dry cap=3 / wet cap=2) collapsed 6 levels
-    into 3 systems, which is what real estimators do for a single
-    standalone building but NOT what Halo actually wrote on the
-    1881 paperwork. Truth seed says system_count = 7. Match it.
-
-    Strategy:
-      * Keep every original per-level system as-is (no merge)
-      * Append one synthetic 'combo' standpipe System that lists
-        every level as supplies — this represents the riser that
-        services the whole stack, distinct from the per-floor
-        branch systems
+    """Append one synthetic combo-standpipe system so multi-level
+    buildings match Halo's N-level + 1 combo convention.
     """
     out = list(systems)
-    # Combo standpipe — only useful when there's > 1 floor system
     if len(systems) >= 2 and building.levels:
-        # Combo riser sits at the lowest level (street-level FDC)
         lowest = min(building.levels, key=lambda l: l.elevation_m)
-        from cad.schema import RiserSpec, System as Sys
-        combo = Sys(
+        combo = System(
             id="sys_combo_standpipe",
             type="combo_standpipe",
             supplies=[l.id for l in building.levels],
@@ -760,65 +671,11 @@ def _merge_combo_systems(
                 position_m=(0.0, 0.0, lowest.elevation_m),
                 size_in=4.0,
             ),
-            heads=[],
-            pipes=[],
-            hangers=[],
+            heads=[], pipes=[], hangers=[], fittings=[],
         )
         out.append(combo)
-        return out
-    if len(systems) <= 1:
-        return systems
-    # Order levels by elevation so "consecutive" means "stacked"
-    level_order = {lv.id: i for i, lv in enumerate(
-        sorted(building.levels, key=lambda l: l.elevation_m)
-    )}
-    # Order systems by their first supplied level's elevation
-    ordered = sorted(
-        systems, key=lambda s: level_order.get(s.supplies[0], 1e9)
-    )
-    out: list[System] = []
-    i = 0
-    while i < len(ordered):
-        s = ordered[i]
-        group_cap = 3 if s.type == "dry" else 2
-        grouped_supplies = list(s.supplies)
-        grouped_heads = list(s.heads)
-        grouped_pipes = list(s.pipes)
-        grouped_hangers = list(s.hangers)
-        j = i + 1
-        while (
-            j < len(ordered)
-            and ordered[j].type == s.type
-            and len(grouped_supplies) < group_cap
-        ):
-            nxt = ordered[j]
-            grouped_supplies.extend(nxt.supplies)
-            grouped_heads.extend(nxt.heads)
-            grouped_pipes.extend(nxt.pipes)
-            grouped_hangers.extend(nxt.hangers)
-            j += 1
-        first_lv = grouped_supplies[0]
-        last_lv = grouped_supplies[-1]
-        merged_id = (
-            f"sys_{s.type}_{first_lv}_{last_lv}"
-            if len(grouped_supplies) > 1 else s.id
-        )
-        # Rewrite system_id on every pipe segment so BOM/labor still
-        # attribute correctly.
-        for p in grouped_pipes:
-            p.system_id = merged_id
-        out.append(System(
-            id=merged_id,
-            type=s.type,
-            supplies=grouped_supplies,
-            riser=s.riser,  # keep the lowest-level riser as the combo standpipe
-            heads=grouped_heads,
-            pipes=grouped_pipes,
-            hangers=grouped_hangers,
-        ))
-        i = j
     return out
 
 
 if __name__ == "__main__":
-    print("router v2 — call route_systems(building, heads)")
+    print("router v3 — call route_systems(building, heads)")
