@@ -1,0 +1,15 @@
+fastapi>=0.115
+uvicorn[standard]>=0.32
+pydantic>=2.9
+pillow>=10.4
+opencv-python>=4.10
+numpy>=1.26
+# torch is expected to be preinstalled with CUDA support.
+# If missing:
+#   pip install torch --index-url https://download.pytorch.org/whl/cu126
+torch>=2.3
+transformers>=4.45
+# Hugging Face auth / weight cache
+huggingface_hub>=0.24
+# Progress / logging niceties
+tqdm>=4.66
