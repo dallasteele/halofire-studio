@@ -1184,3 +1184,22 @@ User direction across 4 messages this session:
 - Residual known noise: Next/Turbopack still reports the existing NFT tracing
   warning through `next.config.ts -> packages/hf-core/dist/catalog/load.js`;
   Biome exits zero but still reports 18 warnings and 44 infos.
+
+### Entry 32 - Halo Forge Stream F catalog resolver fix
+
+- Fixed `core/hal/halofire_v2/presentation/components_library.py` so
+  `list_components(lib_dir)` and `get_component(..., lib_dir=...)` resolve
+  `SOURCES.json` and `family_contracts.json` from the caller's library root
+  instead of always reading the default catalog directory.
+- Added a regression test that builds a temporary distributor-backed salvage
+  catalog and proves `source_kind=distributor`, source license metadata, and
+  family contracts are loaded from the custom library path.
+- Verified with `C:/Python312/python.exe -m pytest -q
+  tests/core/hal/halofire_v2/test_components_library.py
+  tests/core/hal/halo_forge/test_schemas.py`, `bun test
+  halofire-studio/packages/halofire-catalog/tests/schema.test.ts
+  halofire-studio/packages/halofire-catalog/tests/catalog.test.ts`, and
+  `C:/Python312/python.exe scripts/verify_agentic_rules.py`.
+- Open blocker remains the same: the next catalog slice needs a real
+  distributor/manufacturer promotion path beyond `visual_reference` once
+  verified dimensions and approval records exist.
