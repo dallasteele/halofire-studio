@@ -21,7 +21,9 @@ import type {
   CatalogFamilyContract,
   CatalogParam,
   CatalogPort,
+  CatalogSourceIngestionPolicy,
   CatalogSourceLicense,
+  CatalogSourceKind,
   PartKind,
 } from './types.js'
 
@@ -46,6 +48,12 @@ export const CatalogModelStatusSchema = z.enum([
   'manufacturer_verified',
   'halo_fire_approved',
 ])
+
+export const CatalogSourceKindSchema = z.enum([
+  'procedural',
+  'manufacturer',
+  'distributor',
+]) satisfies z.ZodType<CatalogSourceKind>
 
 // ── CatalogParam ────────────────────────────────────────────────────────
 const ParamNumberSchema = z.object({
@@ -109,6 +117,7 @@ export const CatalogPortSchema: z.ZodType<CatalogPort> = z.object({
 
 export const CatalogSourceLicenseSchema: z.ZodType<CatalogSourceLicense> = z.object({
   part_ref: z.string().min(1),
+  source_kind: CatalogSourceKindSchema.optional().default('procedural'),
   manufacturer: z.string().optional(),
   distributor: z.string().nullable().optional(),
   public_url: z.string().nullable().optional(),
@@ -122,6 +131,33 @@ export const CatalogSourceLicenseSchema: z.ZodType<CatalogSourceLicense> = z.obj
   source_captured_at: z.string().min(1),
   model_status: CatalogModelStatusSchema,
   approved_by: z.string().nullable().optional(),
+}).superRefine((value, ctx) => {
+  if (
+    (value.source_kind === 'manufacturer' || value.source_kind === 'distributor') &&
+    !value.public_url
+  ) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['public_url'],
+      message: 'manufacturer/distributor source licenses require public_url',
+    })
+  }
+  if (value.source_kind === 'procedural') {
+    if (value.allowed_download) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['allowed_download'],
+        message: 'procedural source licenses cannot allow download',
+      })
+    }
+    if (!value.redistribution_blocked) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['redistribution_blocked'],
+        message: 'procedural source licenses must block redistribution',
+      })
+    }
+  }
 })
 
 export const CatalogFamilyContractSchema: z.ZodType<CatalogFamilyContract> = z.object({
@@ -134,6 +170,63 @@ export const CatalogFamilyContractSchema: z.ZodType<CatalogFamilyContract> = z.o
   dimensions_verified: z.boolean(),
   source_license_ref: z.string().nullable().optional(),
   evidence_refs: z.array(z.string()),
+}).superRefine((value, ctx) => {
+  if (value.model_status === 'visual_reference') {
+    if (value.manufacturer_verified || value.dimensions_verified) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'visual_reference family contracts cannot be marked verified',
+      })
+    }
+  }
+  if (value.model_status === 'dimensioned_parametric') {
+    if (value.manufacturer_verified || !value.dimensions_verified) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message:
+          'dimensioned_parametric family contracts must have dimensions_verified=true and manufacturer_verified=false',
+      })
+    }
+  }
+  if (value.model_status === 'manufacturer_verified') {
+    if (!value.manufacturer_verified || !value.dimensions_verified) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message:
+          'manufacturer_verified family contracts must have both verification flags true',
+      })
+    }
+  }
+  if (value.model_status === 'halo_fire_approved') {
+    if (!value.manufacturer_verified || !value.dimensions_verified) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message:
+          'halo_fire_approved family contracts must have both verification flags true',
+      })
+    }
+  }
+})
+
+export const CatalogSourceIngestionPolicySchema: z.ZodType<CatalogSourceIngestionPolicy> = z.object({
+  allowed_sources: z.array(CatalogSourceKindSchema),
+  require_public_url: z.boolean(),
+  require_terms_summary: z.boolean(),
+  require_internal_use_flag: z.boolean(),
+  require_client_render_flag: z.boolean(),
+  require_download_flag: z.boolean(),
+  require_redistribution_blocked_flag: z.boolean(),
+  require_dimension_verification: z.boolean(),
+  require_manufacturer_verification: z.boolean(),
+  default_model_status: CatalogModelStatusSchema,
+}).superRefine((value, ctx) => {
+  if (value.allowed_sources.length === 0) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['allowed_sources'],
+      message: 'allowed_sources must not be empty',
+    })
+  }
 })
 
 // ── CatalogEntry ────────────────────────────────────────────────────────

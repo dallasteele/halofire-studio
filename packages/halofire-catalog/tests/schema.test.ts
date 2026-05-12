@@ -18,6 +18,7 @@ import {
   CatalogManifestSchema,
   parseCatalog,
   safeParseCatalog,
+  CatalogSourceIngestionPolicySchema,
 } from '../src/index.js'
 
 const CATALOG_PATH = resolve(
@@ -98,6 +99,7 @@ describe('catalog.json matches the canonical schema', () => {
       model_status: 'visual_reference',
       source_license: {
         part_ref: 'demo_part',
+        source_kind: 'procedural',
         manufacturer: 'DemoCo',
         public_url: 'https://example.com/demo',
         terms_summary: 'Demo preview only',
@@ -123,6 +125,22 @@ describe('catalog.json matches the canonical schema', () => {
       ports: [],
       scad_source: 'demo.scad',
       warnings: [],
+    })
+    expect(result.success).toBe(true)
+  })
+
+  test('ingestion policy schema parses the shared policy shape', () => {
+    const result = CatalogSourceIngestionPolicySchema.safeParse({
+      allowed_sources: ['procedural', 'manufacturer', 'distributor'],
+      require_public_url: true,
+      require_terms_summary: true,
+      require_internal_use_flag: true,
+      require_client_render_flag: true,
+      require_download_flag: true,
+      require_redistribution_blocked_flag: true,
+      require_dimension_verification: true,
+      require_manufacturer_verification: true,
+      default_model_status: 'visual_reference',
     })
     expect(result.success).toBe(true)
   })

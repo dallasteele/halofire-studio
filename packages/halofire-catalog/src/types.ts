@@ -50,6 +50,11 @@ export type CatalogModelStatus =
   | 'manufacturer_verified'
   | 'halo_fire_approved'
 
+export type CatalogSourceKind =
+  | 'procedural'
+  | 'manufacturer'
+  | 'distributor'
+
 // ── Parameter schema (matches what `parseScad` emits) ───────────────────
 export type CatalogParamType =
   | { kind: 'number'; min?: number; max?: number }
@@ -134,6 +139,7 @@ export interface CatalogEntry {
 
   source_license?: {
     part_ref: string
+    source_kind?: CatalogSourceKind
     manufacturer?: string
     distributor?: string | null
     public_url?: string | null
@@ -280,6 +286,7 @@ export interface LegacyCatalogEntry {
 
 export interface CatalogSourceLicense {
   part_ref: string
+  source_kind?: CatalogSourceKind
   manufacturer?: string
   distributor?: string | null
   public_url?: string | null
@@ -305,6 +312,19 @@ export interface CatalogFamilyContract {
   dimensions_verified: boolean
   source_license_ref?: string | null
   evidence_refs: string[]
+}
+
+export interface CatalogSourceIngestionPolicy {
+  allowed_sources: CatalogSourceKind[]
+  require_public_url: boolean
+  require_terms_summary: boolean
+  require_internal_use_flag: boolean
+  require_client_render_flag: boolean
+  require_download_flag: boolean
+  require_redistribution_blocked_flag: boolean
+  require_dimension_verification: boolean
+  require_manufacturer_verification: boolean
+  default_model_status: CatalogModelStatus
 }
 
 // Back-compat aliases so existing external imports keep resolving. Once

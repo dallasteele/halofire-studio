@@ -30,6 +30,8 @@ export type {
   CatalogPort,
   CatalogPortRole,
   CatalogPortStyle,
+  CatalogSourceIngestionPolicy,
+  CatalogSourceKind,
   PartKind,
 } from './types.js'
 
@@ -43,6 +45,8 @@ export {
   CatalogPortSchema,
   CatalogPortStyleSchema,
   CatalogModelStatusSchema,
+  CatalogSourceIngestionPolicySchema,
+  CatalogSourceKindSchema,
   PartKindSchema,
   CatalogSourceLicenseSchema,
   parseCatalog,
