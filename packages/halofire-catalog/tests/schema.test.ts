@@ -87,6 +87,45 @@ describe('catalog.json matches the canonical schema', () => {
       }
     }
   })
+
+  test('optional source and family metadata parses when present', () => {
+    const result = CatalogEntrySchema.safeParse({
+      sku: 'demo_part',
+      kind: 'sprinkler_head',
+      category: 'head.demo',
+      display_name: 'Demo Part',
+      manufacturer: 'DemoCo',
+      model_status: 'visual_reference',
+      source_license: {
+        part_ref: 'demo_part',
+        manufacturer: 'DemoCo',
+        public_url: 'https://example.com/demo',
+        terms_summary: 'Demo preview only',
+        allowed_internal_use: true,
+        allowed_client_render: true,
+        allowed_download: false,
+        redistribution_blocked: true,
+        source_captured_at: '2026-05-11T00:00:00Z',
+        model_status: 'visual_reference',
+      },
+      family_contract: {
+        part_ref: 'demo_part',
+        glb_path: 'demo_part.glb',
+        ifc_path: null,
+        dxf_path: null,
+        model_status: 'visual_reference',
+        manufacturer_verified: false,
+        dimensions_verified: false,
+        source_license_ref: 'license:demo_part',
+        evidence_refs: ['SOURCES.json'],
+      },
+      params: {},
+      ports: [],
+      scad_source: 'demo.scad',
+      warnings: [],
+    })
+    expect(result.success).toBe(true)
+  })
 })
 
 describe('schema rejects malformed input', () => {

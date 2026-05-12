@@ -18,8 +18,10 @@ import { z } from 'zod'
 import type {
   CatalogEntry,
   CatalogManifest,
+  CatalogFamilyContract,
   CatalogParam,
   CatalogPort,
+  CatalogSourceLicense,
   PartKind,
 } from './types.js'
 
@@ -37,6 +39,13 @@ export const PartKindSchema = z.enum([
   'structural',
   'unknown',
 ]) satisfies z.ZodType<PartKind>
+
+export const CatalogModelStatusSchema = z.enum([
+  'visual_reference',
+  'dimensioned_parametric',
+  'manufacturer_verified',
+  'halo_fire_approved',
+])
 
 // ── CatalogParam ────────────────────────────────────────────────────────
 const ParamNumberSchema = z.object({
@@ -98,6 +107,35 @@ export const CatalogPortSchema: z.ZodType<CatalogPort> = z.object({
   role: CatalogPortRoleSchema,
 })
 
+export const CatalogSourceLicenseSchema: z.ZodType<CatalogSourceLicense> = z.object({
+  part_ref: z.string().min(1),
+  manufacturer: z.string().optional(),
+  distributor: z.string().nullable().optional(),
+  public_url: z.string().nullable().optional(),
+  source_url: z.string().nullable().optional(),
+  source_file_ref: z.string().nullable().optional(),
+  terms_summary: z.string().min(1),
+  allowed_internal_use: z.boolean(),
+  allowed_client_render: z.boolean(),
+  allowed_download: z.boolean(),
+  redistribution_blocked: z.boolean(),
+  source_captured_at: z.string().min(1),
+  model_status: CatalogModelStatusSchema,
+  approved_by: z.string().nullable().optional(),
+})
+
+export const CatalogFamilyContractSchema: z.ZodType<CatalogFamilyContract> = z.object({
+  part_ref: z.string().min(1),
+  glb_path: z.string().min(1),
+  ifc_path: z.string().nullable().optional(),
+  dxf_path: z.string().nullable().optional(),
+  model_status: CatalogModelStatusSchema,
+  manufacturer_verified: z.boolean(),
+  dimensions_verified: z.boolean(),
+  source_license_ref: z.string().nullable().optional(),
+  evidence_refs: z.array(z.string()),
+})
+
 // ── CatalogEntry ────────────────────────────────────────────────────────
 export const CatalogEntrySchema: z.ZodType<CatalogEntry> = z.object({
   sku: z.string().min(1),
@@ -109,6 +147,10 @@ export const CatalogEntrySchema: z.ZodType<CatalogEntry> = z.object({
   mfg_part_number: z.string().optional(),
   listing: z.string().optional(),
   hazard_classes: z.array(z.string()).optional(),
+  model_status: CatalogModelStatusSchema.optional(),
+
+  source_license: CatalogSourceLicenseSchema.optional(),
+  family_contract: CatalogFamilyContractSchema.optional(),
 
   price_usd: z.number().nonnegative().optional(),
   install_minutes: z.number().nonnegative().optional(),
@@ -156,4 +198,3 @@ export function safeParseCatalog(
   if (result.success) return { ok: true, data: result.data }
   return { ok: false, error: result.error }
 }
-

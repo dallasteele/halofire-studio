@@ -35,13 +35,16 @@ export type {
 
 export {
   CatalogEntrySchema,
+  CatalogFamilyContractSchema,
   CatalogManifestSchema,
   CatalogParamSchema,
   CatalogParamTypeSchema,
   CatalogPortRoleSchema,
   CatalogPortSchema,
   CatalogPortStyleSchema,
+  CatalogModelStatusSchema,
   PartKindSchema,
+  CatalogSourceLicenseSchema,
   parseCatalog,
   safeParseCatalog,
 } from './schema.js'

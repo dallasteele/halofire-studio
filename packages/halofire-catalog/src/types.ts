@@ -44,6 +44,12 @@ export type PartKind =
   | 'structural'
   | 'unknown'
 
+export type CatalogModelStatus =
+  | 'visual_reference'
+  | 'dimensioned_parametric'
+  | 'manufacturer_verified'
+  | 'halo_fire_approved'
+
 // ── Parameter schema (matches what `parseScad` emits) ───────────────────
 export type CatalogParamType =
   | { kind: 'number'; min?: number; max?: number }
@@ -124,6 +130,35 @@ export interface CatalogEntry {
   mfg_part_number?: string
   listing?: string
   hazard_classes?: string[]
+  model_status?: CatalogModelStatus
+
+  source_license?: {
+    part_ref: string
+    manufacturer?: string
+    distributor?: string | null
+    public_url?: string | null
+    source_url?: string | null
+    source_file_ref?: string | null
+    terms_summary: string
+    allowed_internal_use: boolean
+    allowed_client_render: boolean
+    allowed_download: boolean
+    redistribution_blocked: boolean
+    source_captured_at: string
+    model_status: CatalogModelStatus
+    approved_by?: string | null
+  }
+  family_contract?: {
+    part_ref: string
+    glb_path: string
+    ifc_path?: string | null
+    dxf_path?: string | null
+    model_status: CatalogModelStatus
+    manufacturer_verified: boolean
+    dimensions_verified: boolean
+    source_license_ref?: string | null
+    evidence_refs: string[]
+  }
 
   price_usd?: number
   /** Minutes of install labor per unit. */
@@ -238,6 +273,38 @@ export interface LegacyCatalogEntry {
   finish?: string
   notes?: string
   open_source: boolean
+  model_status?: CatalogModelStatus
+  source_license?: CatalogSourceLicense
+  family_contract?: CatalogFamilyContract
+}
+
+export interface CatalogSourceLicense {
+  part_ref: string
+  manufacturer?: string
+  distributor?: string | null
+  public_url?: string | null
+  source_url?: string | null
+  source_file_ref?: string | null
+  terms_summary: string
+  allowed_internal_use: boolean
+  allowed_client_render: boolean
+  allowed_download: boolean
+  redistribution_blocked: boolean
+  source_captured_at: string
+  model_status: CatalogModelStatus
+  approved_by?: string | null
+}
+
+export interface CatalogFamilyContract {
+  part_ref: string
+  glb_path: string
+  ifc_path?: string | null
+  dxf_path?: string | null
+  model_status: CatalogModelStatus
+  manufacturer_verified: boolean
+  dimensions_verified: boolean
+  source_license_ref?: string | null
+  evidence_refs: string[]
 }
 
 // Back-compat aliases so existing external imports keep resolving. Once
