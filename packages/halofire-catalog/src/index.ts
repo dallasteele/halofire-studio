@@ -52,6 +52,7 @@ export {
   parseCatalog,
   safeParseCatalog,
 } from './schema.js'
+export { CATALOG_SOURCE_INGESTION_POLICY } from './source-policy.js'
 
 // ── Legacy in-memory CATALOG + helpers (do not extend) ─────────────────
 export type {

@@ -7,11 +7,18 @@ Fire-sprinkler component catalog for Halofire Studio. Ships:
 
 ## Scope
 
-Only **open-authored** components (generic, generated via Blender MCP)
-live in this package. Manufacturer-specific BIM (Victaulic, Tyco, etc.)
-is loaded on-demand at bid time because most vendor licenses restrict
-redistribution. See `HALOFIRE_TECHNICAL_PLAN.md` §catalog for the
-two-tier strategy.
+This package is the catalog/model owner surface for Halo Forge Stream F.
+It ships a mixed salvage catalog with explicit provenance:
+
+- open-authored procedural parts stay `visual_reference`
+- manufacturer and distributor salvage carry `source_license` records
+- verified families carry `family_contract` records with GLB/IFC/DXF paths
+- source ingestion remains policy-driven and license-aware
+
+Manufacturer-specific BIM (Victaulic, Tyco, Reliable, Viking, etc.) is
+only promoted when the source-license and verification gates are met.
+See `SOURCES.json` and `family_contracts.json` for the current on-disk
+truth surface.
 
 ## M1 contents
 
@@ -38,10 +45,16 @@ them to host surfaces without manual offsets.
 3. Run `bun run check-types` to verify
 4. Commit with a clear message
 
-## Manufacturer imports (M2+)
+## Ingestion policy
 
-When a bid requires, say, Victaulic VK102, the halopenclaw gateway
-downloads the Revit family from Victaulic's BIM library, converts to
-GLB via Blender headless, and registers an entry in an
-`EPHEMERAL_CATALOG` scoped to that bid. This keeps us compliant with
-manufacturer license terms (no redistribution).
+The canonical source ingestion policy is:
+
+- allowed sources: procedural, manufacturer, distributor
+- public/source URL, source file ref, terms summary, and usage flags are
+  required for non-procedural salvage
+- `default_model_status` is `visual_reference`
+- `manufacturer_verified` and `dimensions_verified` must be explicit
+
+Package consumers should use `CATALOG_SOURCE_INGESTION_POLICY` and the
+runtime schemas in `src/schema.ts` rather than inferring policy from the
+asset list.
