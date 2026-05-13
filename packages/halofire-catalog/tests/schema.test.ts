@@ -231,10 +231,30 @@ describe('catalog.json matches the canonical schema', () => {
     expect(licenseResult.success).toBe(true)
   })
 
+  test('manufacturer/distributor source licenses require captured source files', () => {
+    const missingSourceFile = CatalogSourceLicenseSchema.safeParse({
+      part_ref: 'demo_file_ref',
+      source_kind: 'manufacturer',
+      manufacturer: 'Tyco Fire Protection',
+      public_url: 'https://example.com/demo',
+      source_url: 'https://example.com/demo',
+      terms_summary: 'Missing source file ref should fail.',
+      allowed_internal_use: true,
+      allowed_client_render: true,
+      allowed_download: false,
+      redistribution_blocked: true,
+      source_captured_at: '2026-05-12T08:38:19Z',
+      model_status: 'dimensioned_parametric',
+    })
+    expect(missingSourceFile.success).toBe(false)
+  })
+
   test('ingestion policy schema parses the shared policy shape', () => {
     const result = CatalogSourceIngestionPolicySchema.safeParse({
       allowed_sources: ['procedural', 'manufacturer', 'distributor'],
       require_public_url: true,
+      require_source_url: true,
+      require_source_file_ref: true,
       require_terms_summary: true,
       require_internal_use_flag: true,
       require_client_render_flag: true,

@@ -317,6 +317,8 @@ export interface CatalogFamilyContract {
 export interface CatalogSourceIngestionPolicy {
   allowed_sources: CatalogSourceKind[]
   require_public_url: boolean
+  require_source_url: boolean
+  require_source_file_ref: boolean
   require_terms_summary: boolean
   require_internal_use_flag: boolean
   require_client_render_flag: boolean

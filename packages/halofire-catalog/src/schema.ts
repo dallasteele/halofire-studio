@@ -165,6 +165,26 @@ export const CatalogSourceLicenseSchema: z.ZodType<CatalogSourceLicense> = z.obj
       message: 'manufacturer/distributor source licenses require public_url',
     })
   }
+  if (
+    (value.source_kind === 'manufacturer' || value.source_kind === 'distributor') &&
+    !value.source_url
+  ) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['source_url'],
+      message: 'manufacturer/distributor source licenses require source_url',
+    })
+  }
+  if (
+    (value.source_kind === 'manufacturer' || value.source_kind === 'distributor') &&
+    !value.source_file_ref
+  ) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['source_file_ref'],
+      message: 'manufacturer/distributor source licenses require source_file_ref',
+    })
+  }
   if (value.source_kind === 'procedural') {
     if (value.allowed_download) {
       ctx.addIssue({
@@ -254,6 +274,8 @@ export const CatalogFamilyContractSchema: z.ZodType<CatalogFamilyContract> = z.o
 export const CatalogSourceIngestionPolicySchema: z.ZodType<CatalogSourceIngestionPolicy> = z.object({
   allowed_sources: z.array(CatalogSourceKindSchema),
   require_public_url: z.boolean(),
+  require_source_url: z.boolean(),
+  require_source_file_ref: z.boolean(),
   require_terms_summary: z.boolean(),
   require_internal_use_flag: z.boolean(),
   require_client_render_flag: z.boolean(),
