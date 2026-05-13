@@ -14,7 +14,7 @@
 
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, Grid } from '@react-three/drei'
-import { use, useEffect, useMemo, useState } from 'react'
+import { use, useEffect, useMemo, useRef, useState } from 'react'
 
 const FT_TO_M = 0.3048
 
@@ -80,7 +80,7 @@ interface ProposalData {
   exclusions: string[]
   bom: { sku: string; description: string; qty: number; unit: string; extended_usd: number }[]
   labor: { role: string; hours: number; rate_usd_hr: number; extended_usd: number }[]
-  violations: { rule_id: string; severity: string; message: string }[]
+  violations: { code?: string; rule_id?: string; severity: string; message: string }[]
   pricing: {
     materials_usd: number
     labor_usd: number
@@ -127,6 +127,55 @@ interface DesignData {
   issues?: { code: string; severity: string; message: string }[]
   deliverables?: { files?: Record<string, string>; warnings?: string[] }
   metadata?: { capabilities?: Record<string, boolean> }
+}
+
+interface PortalDownload {
+  name: string
+  label: string
+  href: string
+  media_type: string
+  signed: boolean
+  size_bytes?: number | null
+}
+
+interface PortalChartItem {
+  label: string
+  value: number
+  color?: string
+  meta?: string
+}
+
+interface PortalProject {
+  id: string
+  name: string
+  address: string
+  ahj?: string
+  code?: string
+  construction_type?: string
+  halofire?: { name?: string; contact?: string; license?: string }
+}
+
+interface PortalBundle {
+  version: number
+  project_id: string
+  generated_at: string
+  access: {
+    auth_required: boolean
+    signed_downloads: boolean
+    deliverable_ttl_seconds?: number
+    mode?: string
+  }
+  project: PortalProject
+  manifest: { files?: Record<string, string>; warnings?: string[] }
+  proposal: ProposalData
+  design: DesignData
+  charts: {
+    cost_breakdown: PortalChartItem[]
+    level_heads: PortalChartItem[]
+    system_heads: PortalChartItem[]
+  }
+  downloads: PortalDownload[]
+  warnings: string[]
 }
 
 interface DesignLevel {
@@ -248,9 +297,11 @@ function LevelSlab({
 
 export default function BidView(props: { params: Promise<{ project: string }> }) {
   const params = use(props.params)
+  const portalBundleRef = useRef<PortalBundle | null>(null)
   const [project, setProject] = useState<LegacyProject | null>(null)
   const [proposal, setProposal] = useState<ProposalData | null>(null)
   const [design, setDesign] = useState<DesignData | null>(null)
+  const [portal, setPortal] = useState<PortalBundle | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [visibleLevels, setVisibleLevels] = useState<Set<string>>(new Set())
   const [isMobile, setIsMobile] = useState(false)
@@ -264,43 +315,105 @@ export default function BidView(props: { params: Promise<{ project: string }> })
     return () => window.removeEventListener('resize', check)
   }, [])
 
+  // Prefer the canonical portal bundle when it is available. The
+  // legacy fetches remain as a fallback for older runs.
+  useEffect(() => {
+    let cancelled = false
+    portalBundleRef.current = null
+    setPortal(null)
+
+    fetch(`${GATEWAY_URL}/projects/${params.project}/portal.json`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d: PortalBundle | null) => {
+        if (cancelled || !d) return
+        portalBundleRef.current = d
+        setPortal(d)
+        setProposal(d.proposal ?? null)
+        setDesign(d.design ?? null)
+        setProject({
+          projectId: d.project.id,
+          name: d.project.name,
+          address: d.project.address,
+          ahj: d.project.ahj ?? 'Local AHJ',
+          halofire: {
+            proposal_price_usd: d.proposal?.pricing?.total_usd ?? 0,
+            proposal_date: d.generated_at || d.proposal?.generated_at || '',
+            contact: d.project.halofire?.contact ?? 'Halo Fire Protection',
+          },
+          building: {
+            total_sqft: d.proposal?.building_summary?.total_sqft ?? d.design?.building?.total_sqft ?? 0,
+            levels: (d.proposal?.levels ?? []).map((level) => ({
+              id: level.id,
+              name: level.name,
+              use: level.use,
+              elevation_ft: level.elevation_ft,
+              sqft: 0,
+            })),
+          },
+          fire_systems: (d.proposal?.systems ?? []).map((system) => ({
+            id: system.id,
+            type: system.type,
+            serves: system.type,
+            hazard: system.hydraulic?.required_flow_gpm ? 'ordinary' : 'light',
+          })),
+        })
+        if (d.design?.building?.levels?.length) {
+          setVisibleLevels(new Set(d.design.building.levels.map((l) => l.id)))
+        }
+      })
+      .catch(() => {
+        // Fallback below.
+      })
+
+    return () => { cancelled = true }
+  }, [params.project])
+
   // Load static project metadata
   useEffect(() => {
+    if (portalBundleRef.current) return
+    let cancelled = false
     fetch(`/projects/${params.project}.json`)
       .then((r) => (r.ok ? r.json() : null))
       .then((d: LegacyProject | null) => {
-        if (d) {
+        if (!cancelled && d && !portalBundleRef.current) {
           setProject(d)
           setVisibleLevels(new Set(d.building.levels.map((l) => l.id)))
         }
       })
       .catch((e) => setError(String(e)))
-  }, [params.project])
+    return () => { cancelled = true }
+  }, [params.project, portal])
 
   // Load live proposal from the CAD pipeline
   useEffect(() => {
+    if (portalBundleRef.current) return
+    let cancelled = false
     fetch(`${GATEWAY_URL}/projects/${params.project}/proposal.json`)
       .then((r) => (r.ok ? r.json() : null))
       .then((d: ProposalData | null) => {
-        if (d) setProposal(d)
+        if (d && !cancelled && !portalBundleRef.current) setProposal(d)
       })
       .catch(() => {
         // No pipeline run yet — fall back to static data
       })
-  }, [params.project])
+    return () => { cancelled = true }
+  }, [params.project, portal])
 
   // Load the generated CAD design. This is the geometry source of truth
   // when the agentic pipeline has produced heads + pipe networks.
   useEffect(() => {
+    if (portalBundleRef.current) return
+    let cancelled = false
     fetch(`${GATEWAY_URL}/projects/${params.project}/design.json`)
       .then((r) => (r.ok ? r.json() : null))
       .then((d: DesignData | null) => {
-        if (d) setDesign(d)
+        if (d && !cancelled && !portalBundleRef.current) setDesign(d)
       })
       .catch(() => {
         // No design run yet; the viewer can still show static bid context.
       })
-  }, [params.project])
+    return () => { cancelled = true }
+  }, [params.project, portal])
 
   const levels: RenderLevel[] = useMemo(() => {
     if (design?.building?.levels?.length) {
@@ -381,14 +494,28 @@ export default function BidView(props: { params: Promise<{ project: string }> })
     return { heads, pipes, source: 'empty' }
   }, [design, levels])
   const displayPrice =
-    proposal?.pricing?.total_usd ?? project?.halofire?.proposal_price_usd ?? 0
-  const displayProjectName = proposal?.project?.name ?? project?.name ?? params.project
-  const designWarnings = [
+    portal?.proposal?.pricing?.total_usd
+    ?? proposal?.pricing?.total_usd
+    ?? project?.halofire?.proposal_price_usd
+    ?? 0
+  const displayProjectName = portal?.project?.name ?? proposal?.project?.name ?? project?.name ?? params.project
+  const manifestWarnings = portal?.manifest?.warnings ?? []
+  const designWarningsSource = [
+    ...manifestWarnings,
+    ...(portal?.warnings ?? []),
     ...(design?.issues ?? [])
       .filter((issue) => ['warning', 'error', 'blocking'].includes(issue.severity))
       .map((issue) => `${issue.code}: ${issue.message}`),
     ...(design?.deliverables?.warnings ?? []),
-  ].slice(0, 6)
+  ]
+  const designWarnings = designWarningsSource.filter((warning, index) => designWarningsSource.indexOf(warning) === index).slice(0, 6)
+  const downloadLinks = portal?.downloads ?? []
+  const accessModeLabel = portal
+    ? (portal.access.auth_required ? 'Signed access' : 'Open portal')
+    : 'Legacy preview'
+  const downloadStatusText = portal
+    ? `${portal.access.auth_required ? 'Signed access' : 'Open portal'} · ${downloadLinks.length} signed files`
+    : 'Legacy preview · downloads hidden until a signed portal bundle exists'
   const confidencePct = design?.confidence?.overall !== undefined
     ? Math.round((design.confidence.overall ?? 0) * 100)
     : null
@@ -537,14 +664,29 @@ export default function BidView(props: { params: Promise<{ project: string }> })
 
           {mobileTab === 'sheets' && (
             <div className="space-y-2 p-3">
+              <div className="rounded border border-neutral-800 bg-neutral-900 px-3 py-2 text-[10px] text-neutral-400">
+                {downloadStatusText}
+              </div>
               <h2 className="text-[10px] font-semibold uppercase tracking-widest text-neutral-400">Deliverables</h2>
-              <a href={`${GATEWAY_URL}/projects/${params.project}/deliverable/proposal.pdf`} target="_blank" rel="noopener" className="block rounded bg-neutral-800 px-3 py-2 text-center text-xs">Proposal PDF</a>
-              <a href={`${GATEWAY_URL}/projects/${params.project}/deliverable/proposal.xlsx`} target="_blank" rel="noopener" className="block rounded bg-neutral-800 px-3 py-2 text-center text-xs">Pricing XLSX</a>
-              <a href={`${GATEWAY_URL}/projects/${params.project}/deliverable/design.dxf`} target="_blank" rel="noopener" className="block rounded bg-neutral-800 px-3 py-2 text-center text-xs">AutoCAD DXF</a>
-              <a href={`${GATEWAY_URL}/projects/${params.project}/deliverable/design.ifc`} target="_blank" rel="noopener" className="block rounded bg-neutral-800 px-3 py-2 text-center text-xs">IFC (BIM)</a>
-              <a href={`${GATEWAY_URL}/projects/${params.project}/deliverable/design.glb`} target="_blank" rel="noopener" className="block rounded bg-neutral-800 px-3 py-2 text-center text-xs">3D Model (GLB)</a>
-              <a href={`/projects/${params.project}/proposal.pdf`} target="_blank" rel="noopener" className="block rounded bg-neutral-800 px-3 py-2 text-center text-xs">Original Halo Proposal</a>
-              <a href={`/projects/${params.project}/fire-rfis.pdf`} target="_blank" rel="noopener" className="block rounded bg-neutral-800 px-3 py-2 text-center text-xs">Fire RFIs</a>
+              <div className="space-y-1">
+                {downloadLinks.length > 0 ? (
+                  downloadLinks.map((item) => (
+                    <a
+                      key={item.name}
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener"
+                      className="block rounded bg-neutral-800 px-3 py-2 text-center text-xs"
+                    >
+                      {item.label}
+                    </a>
+                  ))
+                ) : (
+                  <div className="rounded border border-dashed border-neutral-700 bg-neutral-950 px-3 py-2 text-[10px] text-neutral-500">
+                    {downloadStatusText}
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
@@ -562,6 +704,13 @@ export default function BidView(props: { params: Promise<{ project: string }> })
                   <span className="font-mono text-[#e8432d]">${proposal.pricing.total_usd.toLocaleString()}</span>
                 </div>
               </div>
+              {portal && (
+                <div className="rounded border border-neutral-800 bg-neutral-900 p-3">
+                  <h3 className="text-[10px] font-semibold uppercase tracking-widest text-neutral-400">Charts</h3>
+                  <MiniBars title="Cost breakdown" items={portal.charts.cost_breakdown} />
+                  <MiniBars title="Heads by level" items={portal.charts.level_heads} />
+                </div>
+              )}
             </div>
           )}
           {mobileTab === 'price' && !proposal && (
@@ -610,6 +759,10 @@ export default function BidView(props: { params: Promise<{ project: string }> })
             <div><dt className="text-neutral-500">Total sqft</dt><dd className="font-mono">{(proposal?.building_summary?.total_sqft ?? project?.building.total_sqft ?? 0).toLocaleString()}</dd></div>
             <div><dt className="text-neutral-500">Design confidence</dt><dd className="font-mono">{confidencePct !== null ? `${confidencePct}%` : 'not generated'}</dd></div>
           </dl>
+          <div className="mb-4 rounded border border-neutral-800 bg-neutral-950 px-2 py-2 text-[10px] text-neutral-400">
+            {accessModeLabel}
+            {portal?.generated_at ? ` · ${portal.generated_at}` : ''}
+          </div>
           {designWarnings.length > 0 && (
             <div className="mb-4 rounded border border-amber-900 bg-amber-950/40 p-2">
               <h2 className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-amber-300">Alpha warnings</h2>
@@ -665,19 +818,41 @@ export default function BidView(props: { params: Promise<{ project: string }> })
           )}
 
           <h2 className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-neutral-400">Deliverables</h2>
+          <div className="mb-2 rounded border border-neutral-800 bg-neutral-950 px-2 py-2 text-[10px] text-neutral-400">
+            {downloadStatusText}
+          </div>
           <div className="flex flex-col gap-1">
-            <a href={`${GATEWAY_URL}/projects/${params.project}/deliverable/proposal.pdf`} target="_blank" rel="noopener" className="rounded bg-neutral-800 px-2 py-1 text-center text-[10px] hover:bg-neutral-700">Proposal PDF</a>
-            <a href={`${GATEWAY_URL}/projects/${params.project}/deliverable/proposal.xlsx`} target="_blank" rel="noopener" className="rounded bg-neutral-800 px-2 py-1 text-center text-[10px] hover:bg-neutral-700">Pricing XLSX</a>
-            <a href={`${GATEWAY_URL}/projects/${params.project}/deliverable/design.dxf`} target="_blank" rel="noopener" className="rounded bg-neutral-800 px-2 py-1 text-center text-[10px] hover:bg-neutral-700">AutoCAD DXF</a>
-            <a href={`${GATEWAY_URL}/projects/${params.project}/deliverable/design.ifc`} target="_blank" rel="noopener" className="rounded bg-neutral-800 px-2 py-1 text-center text-[10px] hover:bg-neutral-700">IFC</a>
-            <a href={`${GATEWAY_URL}/projects/${params.project}/deliverable/design.glb`} target="_blank" rel="noopener" className="rounded bg-neutral-800 px-2 py-1 text-center text-[10px] hover:bg-neutral-700">3D Model GLB</a>
-            <a href={`/projects/${params.project}/proposal.pdf`} target="_blank" rel="noopener" className="rounded bg-neutral-800 px-2 py-1 text-center text-[10px] hover:bg-neutral-700">Halo Proposal</a>
-            <a href={`/projects/${params.project}/fire-rfis.pdf`} target="_blank" rel="noopener" className="rounded bg-neutral-800 px-2 py-1 text-center text-[10px] hover:bg-neutral-700">Fire RFIs</a>
+            {downloadLinks.length > 0 ? (
+              downloadLinks.map((item) => (
+                <a
+                  key={item.name}
+                  href={item.href}
+                  target="_blank"
+                  rel="noopener"
+                  className="rounded bg-neutral-800 px-2 py-1 text-center text-[10px] hover:bg-neutral-700"
+                >
+                  {item.label}
+                </a>
+              ))
+            ) : (
+              <div className="rounded border border-dashed border-neutral-700 bg-neutral-950 px-2 py-2 text-[10px] text-neutral-500">
+                {downloadStatusText}
+              </div>
+            )}
           </div>
 
           <p className="mt-4 text-[9px] italic text-neutral-600">
             Interactive 3D bid viewer · Drag to orbit · Scroll to zoom
           </p>
+
+          {portal && (
+            <div className="mt-4 space-y-3">
+              <h2 className="text-[10px] font-semibold uppercase tracking-widest text-neutral-400">Charts</h2>
+              <MiniBars title="Cost breakdown" items={portal.charts.cost_breakdown} />
+              <MiniBars title="Heads by level" items={portal.charts.level_heads} />
+              <MiniBars title="Heads by system" items={portal.charts.system_heads} />
+            </div>
+          )}
         </aside>
 
         {/* 3D canvas */}
@@ -747,7 +922,7 @@ export default function BidView(props: { params: Promise<{ project: string }> })
                       ? 'border-red-900 bg-red-950/50 text-red-200'
                       : 'border-amber-900 bg-amber-950/50 text-amber-200'
                   }`}>
-                    <span className="font-mono">{v.rule_id}</span>
+                    <span className="font-mono">{v.code ?? v.rule_id ?? 'RULE'}</span>
                     <p className="mt-0.5">{v.message}</p>
                   </li>
                 ))}
@@ -769,6 +944,37 @@ function Row({ label, usd }: { label: string; usd: number }) {
     <div className="flex justify-between border-b border-neutral-800 py-1 last:border-0">
       <span className="text-neutral-400">{label}</span>
       <span className="font-mono">${usd.toLocaleString()}</span>
+    </div>
+  )
+}
+
+function MiniBars({ title, items }: { title: string; items: PortalChartItem[] }) {
+  const max = Math.max(1, ...items.map((item) => item.value || 0))
+  return (
+    <div className="rounded border border-neutral-800 bg-neutral-950 p-2">
+      <div className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-neutral-400">{title}</div>
+      <div className="space-y-2">
+        {items.slice(0, 6).map((item) => (
+          <div key={item.label} className="space-y-1">
+            <div className="flex items-center justify-between gap-2 text-[10px] text-neutral-300">
+              <span className="truncate">{item.label}</span>
+              <span className="font-mono text-neutral-500">{item.meta ?? item.value.toLocaleString()}</span>
+            </div>
+            <div className="h-1.5 w-full bg-neutral-800">
+              <div
+                className="h-1.5"
+                style={{
+                  width: `${Math.max(6, (item.value / max) * 100)}%`,
+                  background: item.color ?? '#e8432d',
+                }}
+              />
+            </div>
+          </div>
+        ))}
+        {items.length === 0 && (
+          <div className="text-[10px] text-neutral-600">No chart data yet.</div>
+        )}
+      </div>
     </div>
   )
 }

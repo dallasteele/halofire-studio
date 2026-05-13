@@ -148,6 +148,8 @@ def test_html_has_every_required_section() -> None:
         "Floor plans",
         "Systems + hydraulics",
         "Pricing",
+        "Charts",
+        "Downloads",
         "Scope of work",
         "Inclusions",
         "Exclusions",
@@ -177,6 +179,14 @@ def test_hero_falls_back_when_no_design() -> None:
 def test_html_renders_total_price_in_header() -> None:
     html = PH.build_proposal_html(_SAMPLE_DATA)
     assert "$89,450.00" in html
+
+
+def test_html_shows_access_banner_and_artifact_links() -> None:
+    html = PH.build_proposal_html(_SAMPLE_DATA, design=_SAMPLE_DESIGN)
+    assert "Signed client share delivery" in html
+    assert "./proposal.pdf" in html
+    assert "./proposal.xlsx" in html
+    assert "./design.glb" in html
 
 
 def test_html_escapes_user_content() -> None:

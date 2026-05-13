@@ -253,6 +253,89 @@ def _bullet_list(items: Iterable[str]) -> str:
     return f'<ul>{lis}</ul>'
 
 
+def _chart_card(title: str, items: list[dict[str, Any]]) -> str:
+    if not items:
+        return (
+            '<div class="chart-card">'
+            f'<div class="chart-title">{_esc(title)}</div>'
+            '<div class="plan-empty" style="margin: 0;">No chart data yet.</div>'
+            '</div>'
+        )
+
+    max_value = max(1.0, max(float(item.get('value') or 0) for item in items))
+    rows: list[str] = []
+    for item in items[:6]:
+        value = float(item.get('value') or 0)
+        width = max(6.0, (value / max_value) * 100.0)
+        rows.append(
+            '<div class="chart-row">'
+            f'<div class="chart-row-head">'
+            f'<span class="chart-label">{_esc(item.get("label", title))}</span>'
+            f'<span class="chart-meta">{_esc(item.get("meta") or f"{value:,.0f}")}</span>'
+            '</div>'
+            '<div class="chart-track">'
+            f'<div class="chart-fill" style="width:{width:.1f}%; background:{_esc(item.get("color") or "#e8432d")}"></div>'
+            '</div>'
+            '</div>'
+        )
+    return (
+        '<div class="chart-card">'
+        f'<div class="chart-title">{_esc(title)}</div>'
+        + ''.join(rows)
+        + '</div>'
+    )
+
+
+def _artifact_downloads(data: dict[str, Any]) -> list[tuple[str, str]]:
+    refs = data.get('artifact_refs')
+    if isinstance(refs, dict):
+        ordered = [
+            ('proposal_html', 'Client HTML bid page'),
+            ('proposal_json', 'Proposal JSON'),
+            ('proposal_pdf', 'Proposal PDF'),
+            ('proposal_xlsx', 'V-09 workbook'),
+            ('design_json', 'Design JSON'),
+            ('design_dxf', 'AutoCAD DXF'),
+            ('design_ifc', 'IFC model'),
+            ('design_glb', '3D model GLB'),
+            ('manifest_json', 'Artifact manifest'),
+        ]
+        out: list[tuple[str, str]] = []
+        for key, label in ordered:
+            name = refs.get(key)
+            if name:
+                out.append((str(name), label))
+        if out:
+            return out
+    return [
+        ('proposal.html', 'Client HTML bid page'),
+        ('proposal.json', 'Proposal JSON'),
+        ('proposal.pdf', 'Proposal PDF'),
+        ('proposal.xlsx', 'V-09 workbook'),
+        ('design.json', 'Design JSON'),
+        ('design.dxf', 'AutoCAD DXF'),
+        ('design.ifc', 'IFC model'),
+        ('design.glb', '3D model GLB'),
+        ('manifest.json', 'Artifact manifest'),
+    ]
+
+
+def _download_grid(data: dict[str, Any]) -> str:
+    cards = []
+    for name, label in _artifact_downloads(data):
+        cards.append(
+            '<a class="download-link" href="./' + _esc(name) + '" target="_blank" rel="noopener">'
+            f'<span class="download-label">{_esc(label)}</span>'
+            f'<span class="download-path">{_esc(name)}</span>'
+            '</a>'
+        )
+    return (
+        '<div class="download-grid">'
+        + ''.join(cards)
+        + '</div>'
+    )
+
+
 # ── main entry ──────────────────────────────────────────────────────
 
 _CSS = f"""
@@ -349,6 +432,94 @@ ul li {{ margin-bottom: 4px; }}
   gap: 24px;
 }}
 @media (max-width: 760px) {{ .two-col {{ grid-template-columns: 1fr; }} }}
+.chart-grid {{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+}}
+.chart-card {{
+  background: var(--panel);
+  border: 1px solid var(--border);
+  padding: 14px;
+}}
+.chart-title {{
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #fff;
+  margin-bottom: 10px;
+}}
+.chart-row {{
+  margin-bottom: 10px;
+}}
+.chart-row:last-child {{
+  margin-bottom: 0;
+}}
+.chart-row-head {{
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12px;
+  margin-bottom: 4px;
+}}
+.chart-label {{
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}}
+.chart-meta {{
+  color: var(--muted);
+  font-family: "JetBrains Mono", monospace;
+  flex-shrink: 0;
+}}
+.chart-track {{
+  height: 8px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: #202028;
+}}
+.chart-fill {{
+  height: 100%;
+  border-radius: 999px;
+}}
+.download-grid {{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+}}
+.download-link {{
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  text-decoration: none;
+}}
+.download-label {{
+  color: #fff;
+  font-weight: 600;
+}}
+.download-path {{
+  color: var(--muted);
+  font-size: 11px;
+  font-family: "JetBrains Mono", monospace;
+}}
+.access-banner {{
+  margin-top: 16px;
+  padding: 12px 14px;
+  border: 1px solid rgba(232, 67, 45, 0.35);
+  background: rgba(232, 67, 45, 0.08);
+  color: #ffd9d4;
+  font-size: 12px;
+}}
+.section-note {{
+  color: var(--muted);
+  font-size: 12px;
+  margin: 0 0 12px;
+}}
 .plan-svg {{ width: 100%; height: auto; display: block; border: 1px solid var(--border); }}
 .hero {{ margin-top: 28px; }}
 .hero-grid {{
@@ -450,6 +621,64 @@ def _hero_section(
         '</div>'
         '</div>'
         '</div></section>'
+    )
+
+
+def _access_banner() -> str:
+    return (
+        '<div class="access-banner">'
+        'Signed client share delivery. The portal serves the HTML, PDF, '
+        'workbook, and model artifacts from the same signed deliverable bundle '
+        'so the bid page stays tied to real files.'
+        '</div>'
+    )
+
+
+def _chart_section(data: dict[str, Any], levels: list[dict[str, Any]], systems: list[dict[str, Any]]) -> str:
+    pricing = data.get('pricing') or {}
+    cost_items = [
+        {'label': 'Materials', 'value': float(pricing.get('materials_usd', 0) or 0), 'color': '#e8432d'},
+        {'label': 'Labor', 'value': float(pricing.get('labor_usd', 0) or 0), 'color': '#f6a04d'},
+        {'label': 'Permit', 'value': float(pricing.get('permit_allowance_usd', 0) or 0), 'color': '#7cc6fe'},
+        {'label': 'Taxes', 'value': float(pricing.get('taxes_usd', 0) or 0), 'color': '#8dd36b'},
+        {'label': 'Subtotal', 'value': float(pricing.get('subtotal_usd', 0) or 0), 'color': '#d9d9d9'},
+        {'label': 'Total', 'value': float(pricing.get('total_usd', 0) or 0), 'color': '#ffffff'},
+    ]
+    level_items = [
+        {
+            'label': lvl.get('name') or lvl.get('id') or 'Level',
+            'value': float(lvl.get('head_count', 0) or 0),
+            'meta': f"{lvl.get('pipe_count', 0)} pipes",
+            'color': '#7cc6fe',
+        }
+        for lvl in levels
+    ]
+    system_items = [
+        {
+            'label': system.get('type') or system.get('id') or 'System',
+            'value': float(system.get('head_count', 0) or 0),
+            'meta': f"{float(system.get('pipe_total_m', 0) or 0):.1f} m pipe",
+            'color': '#f6a04d',
+        }
+        for system in systems
+    ]
+    return (
+        '<section><h2>Charts</h2>'
+        '<p class="section-note">The cost, level, and system charts are derived from the same proposal JSON that feeds the gateway portal.</p>'
+        '<div class="chart-grid">'
+        f'{_chart_card("Cost breakdown", cost_items)}'
+        f'{_chart_card("Heads by level", level_items)}'
+        f'{_chart_card("Heads by system", system_items)}'
+        '</div></section>'
+    )
+
+
+def _download_section(data: dict[str, Any]) -> str:
+    return (
+        '<section><h2>Downloads</h2>'
+        '<p class="section-note">These are the real bid artifacts generated beside this HTML page.</p>'
+        f'{_download_grid(data)}'
+        '</section>'
     )
 
 
@@ -627,6 +856,7 @@ def build_proposal_html(
         f'<div class="label" style="margin-top:4px">as of {_esc(data.get("generated_at", ""))}</div>'
         '</div></header>'
         '<div class="wrap">'
+        + _access_banner()
         # Hero band — landing page moment. Two-panel: big plan SVG
         # (first level that has any geometry) on the left, the
         # live 3D model-viewer on the right. Falls back gracefully
@@ -643,6 +873,8 @@ def build_proposal_html(
         + '<section><h2>Pricing</h2>'
         + _table(['Line', 'Amount'], pricing_rows)
         + '</section>'
+        + _chart_section(data, levels, systems)
+        + _download_section(data)
         # Scope / inclusions / exclusions — two-col
         + '<section><div class="two-col">'
         '<div><h2>Scope of work</h2>'

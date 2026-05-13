@@ -197,6 +197,17 @@ def build_proposal_data(
             "web_bid_viewer": "Interactive 3D model at /bid/{project_id}",
             "cut_sheets": "Manufacturer data sheets bundled PDF",
         },
+        "artifact_refs": {
+            "proposal_html": "proposal.html",
+            "proposal_json": "proposal.json",
+            "proposal_pdf": "proposal.pdf",
+            "proposal_xlsx": "proposal.xlsx",
+            "design_json": "design.json",
+            "design_dxf": "design.dxf",
+            "design_ifc": "design.ifc",
+            "design_glb": "design.glb",
+            "manifest_json": "manifest.json",
+        },
     }
 
 
