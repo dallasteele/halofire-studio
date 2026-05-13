@@ -249,6 +249,42 @@ describe('catalog.json matches the canonical schema', () => {
     expect(missingSourceFile.success).toBe(false)
   })
 
+  test('procedural source licenses stay visual_reference until verified', () => {
+    const result = CatalogSourceLicenseSchema.safeParse({
+      part_ref: 'demo_procedural',
+      source_kind: 'procedural',
+      manufacturer: 'DemoCo',
+      terms_summary: 'Procedural salvage must remain visual_reference.',
+      allowed_internal_use: true,
+      allowed_client_render: true,
+      allowed_download: false,
+      redistribution_blocked: true,
+      source_captured_at: '2026-05-12T08:38:19Z',
+      model_status: 'dimensioned_parametric',
+    })
+    expect(result.success).toBe(false)
+  })
+
+  test('distributor source licenses cannot self-promote to manufacturer verified', () => {
+    const result = CatalogSourceLicenseSchema.safeParse({
+      part_ref: 'demo_distributor',
+      source_kind: 'distributor',
+      manufacturer: 'Tyco Fire Protection',
+      distributor: 'Ferguson',
+      public_url: 'https://api.ferguson.com/dar-step-service/Query?ASSET_ID=4685770&PRODUCT_ID=1959635&USE_TYPE=SPECIFICATION',
+      source_url: 'https://api.ferguson.com/dar-step-service/Query?ASSET_ID=4685770&PRODUCT_ID=1959635&USE_TYPE=SPECIFICATION',
+      source_file_ref: 'ferguson_tyco_ty3251_spec.pdf',
+      terms_summary: 'Distributor source must not claim manufacturer verification.',
+      allowed_internal_use: true,
+      allowed_client_render: true,
+      allowed_download: false,
+      redistribution_blocked: true,
+      source_captured_at: '2026-05-12T08:38:19Z',
+      model_status: 'manufacturer_verified',
+    })
+    expect(result.success).toBe(false)
+  })
+
   test('ingestion policy schema parses the shared policy shape', () => {
     const result = CatalogSourceIngestionPolicySchema.safeParse({
       allowed_sources: ['procedural', 'manufacturer', 'distributor'],

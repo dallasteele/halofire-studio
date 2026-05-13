@@ -200,6 +200,24 @@ export const CatalogSourceLicenseSchema: z.ZodType<CatalogSourceLicense> = z.obj
         message: 'procedural source licenses must block redistribution',
       })
     }
+    if (value.model_status !== 'visual_reference') {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['model_status'],
+        message: 'procedural source licenses must remain visual_reference until verified',
+      })
+    }
+  }
+  if (
+    value.source_kind === 'distributor' &&
+    (value.model_status === 'manufacturer_verified' || value.model_status === 'halo_fire_approved')
+  ) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['model_status'],
+      message:
+        'distributor source licenses cannot claim manufacturer_verified or halo_fire_approved status',
+    })
   }
 })
 
