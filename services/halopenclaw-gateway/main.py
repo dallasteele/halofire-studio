@@ -30,12 +30,14 @@ from typing import Any
 from fastapi import FastAPI, File, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+import auth as hf_auth
 from tools import registry
 from scene_store import SceneStore, SceneDelta, get_event_bus
 import single_ops
+from core.hal.halofire_v2.presentation.summary import build_head_count_truth
 
 # V2 step 4 — real OpenSCAD runtime. Lazy-instantiated at first use so
 # the gateway starts even when OpenSCAD isn't installed; it'll fall
@@ -175,6 +177,29 @@ class CatalogEnrichRequest(BaseModel):
     sku: str | None = None
     parallel: int = 2
     sam_url: str | None = None
+
+
+class PortalDownload(BaseModel):
+    name: str
+    label: str
+    href: str
+    media_type: str
+    signed: bool = True
+    size_bytes: int | None = None
+
+
+class PortalBundle(BaseModel):
+    version: int = 1
+    project_id: str
+    generated_at: str
+    access: dict[str, Any] = Field(default_factory=dict)
+    project: dict[str, Any] = Field(default_factory=dict)
+    manifest: dict[str, Any] = Field(default_factory=dict)
+    proposal: dict[str, Any] = Field(default_factory=dict)
+    design: dict[str, Any] = Field(default_factory=dict)
+    charts: dict[str, Any] = Field(default_factory=dict)
+    downloads: list[PortalDownload] = Field(default_factory=list)
+    warnings: list[str] = Field(default_factory=list)
 
 
 @app.post("/projects/catalog/enrich")
@@ -548,6 +573,304 @@ async def get_manifest_json(project_id: str) -> JSONResponse:
     return JSONResponse(json.loads(p.read_text(encoding="utf-8")))
 
 
+def _load_json_artifact(path: Path) -> dict[str, Any]:
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _require_portal_artifacts(project_id: str) -> tuple[Path, dict[str, Any], dict[str, Any], dict[str, Any]]:
+    deliverables = (_safe_project_dir(project_id) / "deliverables").resolve()
+    proposal_path = deliverables / "proposal.json"
+    design_path = deliverables / "design.json"
+    manifest_path = deliverables / "manifest.json"
+    missing = [
+        name
+        for name, path in (
+            ("proposal.json", proposal_path),
+            ("design.json", design_path),
+            ("manifest.json", manifest_path),
+        )
+        if not path.exists()
+    ]
+    if missing:
+        raise HTTPException(
+            404,
+            f"portal bundle unavailable; missing {', '.join(missing)}",
+        )
+    return (
+        deliverables,
+        _load_json_artifact(proposal_path),
+        _load_json_artifact(design_path),
+        _load_json_artifact(manifest_path),
+    )
+
+
+def _jwt_from_request(request: Request) -> dict[str, Any] | None:
+    header = request.headers.get("authorization", "")
+    if header.lower().startswith("bearer "):
+        token = header[7:].strip()
+        if token:
+            payload = hf_auth.verify_jwt(token)
+            if payload is not None:
+                return payload
+    fallback = request.headers.get("x-halofire-jwt", "").strip()
+    if fallback:
+        return hf_auth.verify_jwt(fallback)
+    return None
+
+
+def _signed_download_href(project_id: str, name: str) -> str:
+    token = hf_auth.sign_deliverable(project_id, name)
+    return f"/projects/{project_id}/deliverable/{name}?sig={token}"
+
+
+def _media_type_for_name(name: str) -> str:
+    lower = name.lower()
+    if lower.endswith(".pdf"):
+        return "application/pdf"
+    if lower.endswith(".xlsx"):
+        return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    if lower.endswith(".html") or lower.endswith(".htm"):
+        return "text/html"
+    if lower.endswith(".json"):
+        return "application/json"
+    if lower.endswith(".csv"):
+        return "text/csv"
+    if lower.endswith(".dxf"):
+        return "application/dxf"
+    if lower.endswith(".ifc"):
+        return "application/octet-stream"
+    if lower.endswith(".glb"):
+        return "model/gltf-binary"
+    return "application/octet-stream"
+
+
+def _label_for_download_name(name: str) -> str:
+    labels = {
+        "proposal.json": "Proposal JSON",
+        "proposal.html": "Client HTML bid page",
+        "proposal.pdf": "Proposal PDF",
+        "proposal.xlsx": "V-09 workbook",
+        "design.json": "Design JSON",
+        "design.dxf": "AutoCAD DXF",
+        "design.ifc": "IFC model",
+        "design.glb": "3D model GLB",
+        "manifest.json": "Artifact manifest",
+        "submittal.pdf": "Submittal PDF",
+        "prefab.pdf": "Prefab PDF",
+        "cut_list.csv": "Cut list CSV",
+        "hydraulic_report.json": "Hydraulic report",
+        "nfpa_report.json": "NFPA report",
+    }
+    return labels.get(name, Path(name).stem.replace("_", " ").title())
+
+
+def _portal_downloads(
+    project_id: str,
+    deliverables: Path,
+    manifest: dict[str, Any],
+) -> list[PortalDownload]:
+    ordered_names = [
+        "proposal.html",
+        "proposal.pdf",
+        "proposal.xlsx",
+        "design.json",
+        "design.dxf",
+        "design.ifc",
+        "design.glb",
+        "submittal.pdf",
+        "prefab.pdf",
+        "cut_list.csv",
+        "hydraulic_report.json",
+        "nfpa_report.json",
+        "manifest.json",
+    ]
+    names: list[str] = []
+    seen: set[str] = set()
+    manifest_files = manifest.get("files") or {}
+    for path_value in manifest_files.values():
+        name = Path(str(path_value)).name
+        if name and name not in seen:
+            seen.add(name)
+            names.append(name)
+    for name in ordered_names:
+        if name not in seen:
+            seen.add(name)
+            names.append(name)
+
+    downloads: list[PortalDownload] = []
+    ordered = [name for name in ordered_names if name in seen]
+    extras = [name for name in names if name not in ordered]
+    for name in ordered + extras:
+        path = (deliverables / name).resolve()
+        if deliverables not in path.parents or not path.is_file():
+            continue
+        downloads.append(PortalDownload(
+            name=name,
+            label=_label_for_download_name(name),
+            href=_signed_download_href(project_id, name),
+            media_type=_media_type_for_name(name),
+            size_bytes=path.stat().st_size,
+        ))
+    return downloads
+
+
+def _portal_charts(proposal: dict[str, Any]) -> dict[str, Any]:
+    pricing = proposal.get("pricing") or {}
+    levels = proposal.get("levels") or []
+    systems = proposal.get("systems") or []
+    return {
+        "cost_breakdown": [
+            {"label": "Materials", "value": float(pricing.get("materials_usd", 0) or 0), "color": "#e8432d"},
+            {"label": "Labor", "value": float(pricing.get("labor_usd", 0) or 0), "color": "#f6a04d"},
+            {"label": "Permit", "value": float(pricing.get("permit_allowance_usd", 0) or 0), "color": "#7cc6fe"},
+            {"label": "Taxes", "value": float(pricing.get("taxes_usd", 0) or 0), "color": "#8dd36b"},
+            {"label": "Subtotal", "value": float(pricing.get("subtotal_usd", 0) or 0), "color": "#d9d9d9"},
+            {"label": "Total", "value": float(pricing.get("total_usd", 0) or 0), "color": "#ffffff"},
+        ],
+        "level_heads": [
+            {
+                "label": level.get("name") or level.get("id") or "Level",
+                "value": float(level.get("head_count", 0) or 0),
+                "meta": f"{level.get('pipe_count', 0)} pipes",
+            }
+            for level in levels
+        ],
+        "system_heads": [
+            {
+                "label": system.get("type") or system.get("id") or "System",
+                "value": float(system.get("head_count", 0) or 0),
+                "meta": (
+                    f"{float(system.get('pipe_total_m', 0) or 0):.1f} m pipe"
+                    if system.get("pipe_total_m") is not None
+                    else "no pipe total"
+                ),
+            }
+            for system in systems
+        ],
+    }
+
+
+def _portal_warnings(
+    manifest: dict[str, Any],
+    proposal: dict[str, Any],
+    design: dict[str, Any],
+) -> list[str]:
+    warnings: list[str] = []
+    for source in (
+        manifest.get("warnings") or [],
+        (design.get("issues") or []),
+        (design.get("deliverables") or {}).get("warnings") or [],
+        proposal.get("violations") or [],
+    ):
+        for item in source:
+            if isinstance(item, str):
+                warnings.append(item)
+            elif isinstance(item, dict):
+                message = item.get("message") or item.get("code")
+                if message:
+                    warnings.append(str(message))
+    deduped: list[str] = []
+    seen: set[str] = set()
+    for warning in warnings:
+        if warning not in seen:
+            seen.add(warning)
+            deduped.append(warning)
+    actual_heads = _portal_actual_head_count(proposal, design)
+    head_truth = build_head_count_truth(str(proposal.get("project", {}).get("id") or design.get("project", {}).get("id") or ""), actual_heads)
+    head_warning = str(head_truth.get("warning") or "").strip()
+    if head_warning and head_warning not in seen:
+        deduped.append(head_warning)
+    return deduped
+
+
+def _portal_actual_head_count(proposal: dict[str, Any], design: dict[str, Any]) -> int:
+    for source in (design, proposal):
+        total = source.get("total_heads")
+        try:
+            if total is not None:
+                return int(total)
+        except (TypeError, ValueError):
+            pass
+        systems = source.get("systems")
+        if isinstance(systems, list):
+            head_total = 0
+            found = False
+            for system in systems:
+                if not isinstance(system, dict):
+                    continue
+                value = system.get("head_count")
+                if value is None:
+                    continue
+                try:
+                    head_total += int(value)
+                    found = True
+                except (TypeError, ValueError):
+                    continue
+            if found:
+                return head_total
+    return 0
+
+
+def _portal_bundle(project_id: str) -> PortalBundle:
+    deliverables, proposal, design, manifest = _require_portal_artifacts(project_id)
+    manifest_public = dict(manifest)
+    files = manifest_public.get("files") or {}
+    manifest_public["files"] = {
+        key: Path(str(value)).name
+        for key, value in files.items()
+    }
+    portal = PortalBundle(
+        project_id=project_id,
+        generated_at=str(
+            proposal.get("generated_at")
+            or design.get("generated_at")
+            or manifest.get("generated_at")
+            or ""
+        ),
+        access={
+            "auth_required": hf_auth.auth_is_required(),
+            "signed_downloads": True,
+            "deliverable_ttl_seconds": getattr(hf_auth, "_SIGNED_URL_TTL_SECONDS", 600),
+            "mode": "signed-access" if hf_auth.auth_is_required() else "open-preview",
+        },
+        project=proposal.get("project") or design.get("project") or {},
+        manifest=manifest_public,
+        proposal=proposal,
+        design=design,
+        charts=_portal_charts(proposal),
+        downloads=_portal_downloads(project_id, deliverables, manifest),
+        warnings=_portal_warnings(manifest, proposal, design),
+    )
+    return portal
+
+
+@app.get("/projects/{project_id}/portal.json")
+async def get_portal_json(project_id: str, request: Request) -> JSONResponse:
+    jwt = _jwt_from_request(request)
+    if hf_auth.auth_is_required() and not hf_auth.authorize(jwt, project_id, "read"):
+        raise HTTPException(401, "portal access denied")
+    portal = _portal_bundle(project_id)
+    return JSONResponse(portal.model_dump())
+
+
+@app.get("/projects/{project_id}/charts.json")
+async def get_portal_charts(project_id: str, request: Request) -> JSONResponse:
+    jwt = _jwt_from_request(request)
+    if hf_auth.auth_is_required() and not hf_auth.authorize(jwt, project_id, "read"):
+        raise HTTPException(401, "portal access denied")
+    portal = _portal_bundle(project_id)
+    return JSONResponse(portal.charts)
+
+
+@app.get("/projects/{project_id}/downloads.json")
+async def get_portal_downloads(project_id: str, request: Request) -> JSONResponse:
+    jwt = _jwt_from_request(request)
+    if hf_auth.auth_is_required() and not hf_auth.authorize(jwt, project_id, "read"):
+        raise HTTPException(401, "portal access denied")
+    portal = _portal_bundle(project_id)
+    return JSONResponse({"project_id": project_id, "downloads": [d.model_dump() for d in portal.downloads]})
+
+
 def _design_file(project_id: str) -> Path:
     return _safe_project_dir(project_id) / "deliverables" / "design.json"
 
@@ -644,13 +967,27 @@ async def calculate_design(
 
 
 @app.get("/projects/{project_id}/deliverable/{name}")
-async def get_deliverable(project_id: str, name: str):
+async def get_deliverable(
+    project_id: str,
+    name: str,
+    request: Request,
+    sig: str | None = None,
+):
     if Path(name).name != name:
         raise HTTPException(404, "deliverable not found")
     deliverables = (_safe_project_dir(project_id) / "deliverables").resolve()
     p = (deliverables / name).resolve()
     if deliverables not in p.parents or not p.exists():
         raise HTTPException(404, "deliverable not found")
+    jwt = _jwt_from_request(request)
+    if hf_auth.auth_is_required():
+        if hf_auth.authorize(jwt, project_id, "read"):
+            return FileResponse(p)
+        if sig and hf_auth.verify_deliverable_sig(project_id, name, sig):
+            return FileResponse(p)
+        raise HTTPException(401, "deliverable access denied")
+    if sig and not hf_auth.verify_deliverable_sig(project_id, name, sig):
+        raise HTTPException(401, "invalid or expired deliverable signature")
     return FileResponse(p)
 
 
