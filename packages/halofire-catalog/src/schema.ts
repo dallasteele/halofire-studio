@@ -132,6 +132,29 @@ export const CatalogSourceLicenseSchema: z.ZodType<CatalogSourceLicense> = z.obj
   model_status: CatalogModelStatusSchema,
   approved_by: z.string().nullable().optional(),
 }).superRefine((value, ctx) => {
+  if (value.source_kind === 'manufacturer' && !value.manufacturer) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['manufacturer'],
+      message: 'manufacturer source licenses require manufacturer',
+    })
+  }
+  if (value.source_kind === 'distributor') {
+    if (!value.manufacturer) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['manufacturer'],
+        message: 'distributor source licenses require manufacturer',
+      })
+    }
+    if (!value.distributor) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['distributor'],
+        message: 'distributor source licenses require distributor',
+      })
+    }
+  }
   if (
     (value.source_kind === 'manufacturer' || value.source_kind === 'distributor') &&
     !value.public_url

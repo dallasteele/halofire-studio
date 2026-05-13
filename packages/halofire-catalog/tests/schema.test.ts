@@ -18,6 +18,7 @@ import {
   CatalogManifestSchema,
   parseCatalog,
   safeParseCatalog,
+  CatalogSourceLicenseSchema,
   CatalogSourceIngestionPolicySchema,
 } from '../src/index.js'
 
@@ -127,6 +128,26 @@ describe('catalog.json matches the canonical schema', () => {
       warnings: [],
     })
     expect(result.success).toBe(true)
+  })
+
+  test('distributor source licenses require distributor attribution and can be dimensioned parametric', () => {
+    const licenseResult = CatalogSourceLicenseSchema.safeParse({
+      part_ref: 'demo_part',
+      source_kind: 'distributor',
+      manufacturer: 'Tyco Fire Protection',
+      distributor: 'Ferguson',
+      public_url: 'https://api.ferguson.com/dar-step-service/Query?ASSET_ID=4685770&PRODUCT_ID=1959635&USE_TYPE=SPECIFICATION',
+      source_url: 'https://api.ferguson.com/dar-step-service/Query?ASSET_ID=4685770&PRODUCT_ID=1959635&USE_TYPE=SPECIFICATION',
+      source_file_ref: 'ferguson_tyco_ty3251_spec.pdf',
+      terms_summary: 'Distributor-hosted cut sheet used to derive a dimensioned parametric proxy.',
+      allowed_internal_use: true,
+      allowed_client_render: true,
+      allowed_download: false,
+      redistribution_blocked: true,
+      source_captured_at: '2026-05-12T08:38:19Z',
+      model_status: 'dimensioned_parametric',
+    })
+    expect(licenseResult.success).toBe(true)
   })
 
   test('ingestion policy schema parses the shared policy shape', () => {
