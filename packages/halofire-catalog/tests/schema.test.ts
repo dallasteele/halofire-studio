@@ -130,6 +130,87 @@ describe('catalog.json matches the canonical schema', () => {
     expect(result.success).toBe(true)
   })
 
+  test('manufacturer_verified family contracts require IFC and DXF paths', () => {
+    const result = CatalogEntrySchema.safeParse({
+      sku: 'demo_verified',
+      kind: 'sprinkler_head',
+      category: 'head.demo',
+      display_name: 'Demo Verified Part',
+      manufacturer: 'DemoCo',
+      model_status: 'manufacturer_verified',
+      source_license: {
+        part_ref: 'demo_verified',
+        source_kind: 'manufacturer',
+        manufacturer: 'DemoCo',
+        public_url: 'https://example.com/demo',
+        source_url: 'https://example.com/demo',
+        source_file_ref: 'demo.pdf',
+        terms_summary: 'Demo verified asset',
+        allowed_internal_use: true,
+        allowed_client_render: true,
+        allowed_download: false,
+        redistribution_blocked: true,
+        source_captured_at: '2026-05-11T00:00:00Z',
+        model_status: 'manufacturer_verified',
+      },
+      family_contract: {
+        part_ref: 'demo_verified',
+        glb_path: 'demo_verified.glb',
+        ifc_path: 'demo_verified.ifc',
+        dxf_path: 'demo_verified.dxf',
+        model_status: 'manufacturer_verified',
+        manufacturer_verified: true,
+        dimensions_verified: true,
+        source_license_ref: 'license:demo_verified',
+        evidence_refs: ['SOURCES.json'],
+      },
+      params: {},
+      ports: [],
+      scad_source: 'demo_verified.scad',
+      warnings: [],
+    })
+    expect(result.success).toBe(true)
+  })
+
+  test('visual_reference family contracts cannot expose IFC or DXF paths', () => {
+    const result = CatalogEntrySchema.safeParse({
+      sku: 'demo_visual',
+      kind: 'sprinkler_head',
+      category: 'head.demo',
+      display_name: 'Demo Visual Part',
+      manufacturer: 'DemoCo',
+      model_status: 'visual_reference',
+      source_license: {
+        part_ref: 'demo_visual',
+        source_kind: 'procedural',
+        manufacturer: 'DemoCo',
+        terms_summary: 'Demo preview only',
+        allowed_internal_use: true,
+        allowed_client_render: true,
+        allowed_download: false,
+        redistribution_blocked: true,
+        source_captured_at: '2026-05-11T00:00:00Z',
+        model_status: 'visual_reference',
+      },
+      family_contract: {
+        part_ref: 'demo_visual',
+        glb_path: 'demo_visual.glb',
+        ifc_path: 'demo_visual.ifc',
+        dxf_path: 'demo_visual.dxf',
+        model_status: 'visual_reference',
+        manufacturer_verified: false,
+        dimensions_verified: false,
+        source_license_ref: 'license:demo_visual',
+        evidence_refs: ['SOURCES.json'],
+      },
+      params: {},
+      ports: [],
+      scad_source: 'demo_visual.scad',
+      warnings: [],
+    })
+    expect(result.success).toBe(false)
+  })
+
   test('distributor source licenses require distributor attribution and can be dimensioned parametric', () => {
     const licenseResult = CatalogSourceLicenseSchema.safeParse({
       part_ref: 'demo_part',

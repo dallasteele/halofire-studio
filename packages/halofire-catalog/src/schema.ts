@@ -201,6 +201,12 @@ export const CatalogFamilyContractSchema: z.ZodType<CatalogFamilyContract> = z.o
         message: 'visual_reference family contracts cannot be marked verified',
       })
     }
+    if (value.ifc_path || value.dxf_path) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'visual_reference family contracts cannot expose IFC/DXF deliverables',
+      })
+    }
   }
   if (value.model_status === 'dimensioned_parametric') {
     if (value.manufacturer_verified || !value.dimensions_verified) {
@@ -219,6 +225,13 @@ export const CatalogFamilyContractSchema: z.ZodType<CatalogFamilyContract> = z.o
           'manufacturer_verified family contracts must have both verification flags true',
       })
     }
+    if (!value.ifc_path || !value.dxf_path) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message:
+          'manufacturer_verified family contracts must expose IFC and DXF deliverables',
+      })
+    }
   }
   if (value.model_status === 'halo_fire_approved') {
     if (!value.manufacturer_verified || !value.dimensions_verified) {
@@ -226,6 +239,13 @@ export const CatalogFamilyContractSchema: z.ZodType<CatalogFamilyContract> = z.o
         code: z.ZodIssueCode.custom,
         message:
           'halo_fire_approved family contracts must have both verification flags true',
+      })
+    }
+    if (!value.ifc_path || !value.dxf_path) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message:
+          'halo_fire_approved family contracts must expose IFC and DXF deliverables',
       })
     }
   }
