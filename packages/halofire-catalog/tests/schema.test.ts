@@ -16,6 +16,7 @@ import { join, resolve } from 'node:path'
 import {
   CatalogEntrySchema,
   CatalogManifestSchema,
+  CatalogFamilyContractSchema,
   parseCatalog,
   safeParseCatalog,
   CatalogSourceLicenseSchema,
@@ -211,6 +212,20 @@ describe('catalog.json matches the canonical schema', () => {
     expect(result.success).toBe(false)
   })
 
+  test('promoted family contracts require source_license_ref and evidence_refs', () => {
+    const missingProvenance = CatalogFamilyContractSchema.safeParse({
+      part_ref: 'demo_family',
+      glb_path: 'demo_family.glb',
+      ifc_path: 'demo_family.ifc',
+      dxf_path: 'demo_family.dxf',
+      model_status: 'dimensioned_parametric',
+      manufacturer_verified: false,
+      dimensions_verified: true,
+      evidence_refs: [],
+    })
+    expect(missingProvenance.success).toBe(false)
+  })
+
   test('distributor source licenses require distributor attribution and can be dimensioned parametric', () => {
     const licenseResult = CatalogSourceLicenseSchema.safeParse({
       part_ref: 'demo_part',
@@ -229,6 +244,22 @@ describe('catalog.json matches the canonical schema', () => {
       model_status: 'dimensioned_parametric',
     })
     expect(licenseResult.success).toBe(true)
+  })
+
+  test('source licenses reject blank terms summaries', () => {
+    const result = CatalogSourceLicenseSchema.safeParse({
+      part_ref: 'demo_terms',
+      source_kind: 'procedural',
+      manufacturer: 'DemoCo',
+      terms_summary: '   ',
+      allowed_internal_use: true,
+      allowed_client_render: true,
+      allowed_download: false,
+      redistribution_blocked: true,
+      source_captured_at: '2026-05-12T08:38:19Z',
+      model_status: 'visual_reference',
+    })
+    expect(result.success).toBe(false)
   })
 
   test('manufacturer/distributor source licenses require captured source files', () => {

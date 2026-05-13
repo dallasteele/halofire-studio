@@ -55,6 +55,9 @@ export const CatalogSourceKindSchema = z.enum([
   'distributor',
 ]) satisfies z.ZodType<CatalogSourceKind>
 
+const hasText = (value: string | null | undefined): value is string =>
+  typeof value === 'string' && value.trim().length > 0
+
 // ── CatalogParam ────────────────────────────────────────────────────────
 const ParamNumberSchema = z.object({
   kind: z.literal('number'),
@@ -132,7 +135,7 @@ export const CatalogSourceLicenseSchema: z.ZodType<CatalogSourceLicense> = z.obj
   model_status: CatalogModelStatusSchema,
   approved_by: z.string().nullable().optional(),
 }).superRefine((value, ctx) => {
-  if (value.source_kind === 'manufacturer' && !value.manufacturer) {
+  if (value.source_kind === 'manufacturer' && !hasText(value.manufacturer)) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: ['manufacturer'],
@@ -140,14 +143,14 @@ export const CatalogSourceLicenseSchema: z.ZodType<CatalogSourceLicense> = z.obj
     })
   }
   if (value.source_kind === 'distributor') {
-    if (!value.manufacturer) {
+    if (!hasText(value.manufacturer)) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['manufacturer'],
         message: 'distributor source licenses require manufacturer',
       })
     }
-    if (!value.distributor) {
+    if (!hasText(value.distributor)) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['distributor'],
@@ -157,7 +160,7 @@ export const CatalogSourceLicenseSchema: z.ZodType<CatalogSourceLicense> = z.obj
   }
   if (
     (value.source_kind === 'manufacturer' || value.source_kind === 'distributor') &&
-    !value.public_url
+    !hasText(value.public_url)
   ) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
@@ -167,7 +170,7 @@ export const CatalogSourceLicenseSchema: z.ZodType<CatalogSourceLicense> = z.obj
   }
   if (
     (value.source_kind === 'manufacturer' || value.source_kind === 'distributor') &&
-    !value.source_url
+    !hasText(value.source_url)
   ) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
@@ -177,12 +180,19 @@ export const CatalogSourceLicenseSchema: z.ZodType<CatalogSourceLicense> = z.obj
   }
   if (
     (value.source_kind === 'manufacturer' || value.source_kind === 'distributor') &&
-    !value.source_file_ref
+    !hasText(value.source_file_ref)
   ) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: ['source_file_ref'],
       message: 'manufacturer/distributor source licenses require source_file_ref',
+    })
+  }
+  if (!hasText(value.terms_summary)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['terms_summary'],
+      message: 'source licenses require a non-blank terms_summary',
     })
   }
   if (value.source_kind === 'procedural') {
@@ -247,6 +257,20 @@ export const CatalogFamilyContractSchema: z.ZodType<CatalogFamilyContract> = z.o
     }
   }
   if (value.model_status === 'dimensioned_parametric') {
+    if (!hasText(value.source_license_ref)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['source_license_ref'],
+        message: 'dimensioned_parametric family contracts require source_license_ref',
+      })
+    }
+    if (value.evidence_refs.length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['evidence_refs'],
+        message: 'dimensioned_parametric family contracts require evidence_refs',
+      })
+    }
     if (value.manufacturer_verified || !value.dimensions_verified) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -256,6 +280,20 @@ export const CatalogFamilyContractSchema: z.ZodType<CatalogFamilyContract> = z.o
     }
   }
   if (value.model_status === 'manufacturer_verified') {
+    if (!hasText(value.source_license_ref)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['source_license_ref'],
+        message: 'manufacturer_verified family contracts require source_license_ref',
+      })
+    }
+    if (value.evidence_refs.length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['evidence_refs'],
+        message: 'manufacturer_verified family contracts require evidence_refs',
+      })
+    }
     if (!value.manufacturer_verified || !value.dimensions_verified) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -272,6 +310,20 @@ export const CatalogFamilyContractSchema: z.ZodType<CatalogFamilyContract> = z.o
     }
   }
   if (value.model_status === 'halo_fire_approved') {
+    if (!hasText(value.source_license_ref)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['source_license_ref'],
+        message: 'halo_fire_approved family contracts require source_license_ref',
+      })
+    }
+    if (value.evidence_refs.length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['evidence_refs'],
+        message: 'halo_fire_approved family contracts require evidence_refs',
+      })
+    }
     if (!value.manufacturer_verified || !value.dimensions_verified) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
