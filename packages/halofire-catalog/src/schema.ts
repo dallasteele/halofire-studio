@@ -278,6 +278,13 @@ export const CatalogFamilyContractSchema: z.ZodType<CatalogFamilyContract> = z.o
           'dimensioned_parametric family contracts must have dimensions_verified=true and manufacturer_verified=false',
       })
     }
+    if (!value.ifc_path || !value.dxf_path) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message:
+          'dimensioned_parametric family contracts must expose IFC and DXF deliverables',
+      })
+    }
   }
   if (value.model_status === 'manufacturer_verified') {
     if (!hasText(value.source_license_ref)) {

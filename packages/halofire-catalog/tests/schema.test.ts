@@ -226,6 +226,19 @@ describe('catalog.json matches the canonical schema', () => {
     expect(missingProvenance.success).toBe(false)
   })
 
+  test('dimensioned_parametric family contracts require IFC and DXF paths', () => {
+    const missingDeliverables = CatalogFamilyContractSchema.safeParse({
+      part_ref: 'demo_dimensioned',
+      glb_path: 'demo_dimensioned.glb',
+      model_status: 'dimensioned_parametric',
+      manufacturer_verified: false,
+      dimensions_verified: true,
+      source_license_ref: 'license:demo_dimensioned',
+      evidence_refs: ['SOURCES.json'],
+    })
+    expect(missingDeliverables.success).toBe(false)
+  })
+
   test('distributor source licenses require distributor attribution and can be dimensioned parametric', () => {
     const licenseResult = CatalogSourceLicenseSchema.safeParse({
       part_ref: 'demo_part',
