@@ -29,7 +29,7 @@ from typing import Any
 
 from fastapi import FastAPI, File, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, Response
 from pydantic import BaseModel, Field
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
@@ -525,7 +525,8 @@ async def intake_stream(job_id: str):
 
 
 @app.get("/projects/{project_id}/proposal.json")
-async def get_proposal_json(project_id: str) -> JSONResponse:
+async def get_proposal_json(project_id: str, request: Request) -> JSONResponse:
+    _require_portal_read_access(project_id, request)
     p = _safe_project_dir(project_id) / "deliverables" / "proposal.json"
     if not p.exists():
         raise HTTPException(404, "proposal not generated yet")
@@ -533,7 +534,8 @@ async def get_proposal_json(project_id: str) -> JSONResponse:
 
 
 @app.get("/projects/{project_id}/design.json")
-async def get_design_json(project_id: str) -> JSONResponse:
+async def get_design_json(project_id: str, request: Request) -> JSONResponse:
+    _require_portal_read_access(project_id, request)
     p = _safe_project_dir(project_id) / "deliverables" / "design.json"
     if not p.exists():
         raise HTTPException(404, "design not generated yet")
@@ -541,13 +543,14 @@ async def get_design_json(project_id: str) -> JSONResponse:
 
 
 @app.get("/projects/{project_id}/scene")
-async def get_scene(project_id: str) -> JSONResponse:
+async def get_scene(project_id: str, request: Request) -> JSONResponse:
     """Phase F — canonical scene snapshot for post-undo / post-redo
     resync by the TS scene store. Mirrors ``/design.json`` but is
     named after the client-side abstraction; returns an empty scene
     (``{}``) rather than 404 when no design exists yet so the
     optimistic store can reconcile on a fresh project.
     """
+    _require_portal_read_access(project_id, request)
     p = _safe_project_dir(project_id) / "deliverables" / "design.json"
     if not p.exists():
         return JSONResponse({"project_id": project_id, "empty": True})
@@ -566,7 +569,8 @@ async def get_scene(project_id: str) -> JSONResponse:
 
 
 @app.get("/projects/{project_id}/manifest.json")
-async def get_manifest_json(project_id: str) -> JSONResponse:
+async def get_manifest_json(project_id: str, request: Request) -> JSONResponse:
+    _require_portal_read_access(project_id, request)
     p = _safe_project_dir(project_id) / "deliverables" / "manifest.json"
     if not p.exists():
         raise HTTPException(404, "manifest not generated yet")
@@ -618,9 +622,25 @@ def _jwt_from_request(request: Request) -> dict[str, Any] | None:
     return None
 
 
+def _require_portal_read_access(project_id: str, request: Request) -> None:
+    jwt = _jwt_from_request(request)
+    if hf_auth.auth_is_required() and not hf_auth.authorize(jwt, project_id, "read"):
+        raise HTTPException(401, "portal access denied")
+
+
 def _signed_download_href(project_id: str, name: str) -> str:
     token = hf_auth.sign_deliverable(project_id, name)
     return f"/projects/{project_id}/deliverable/{name}?sig={token}"
+
+
+def _rewrite_proposal_html_assets(html: str, download_map: dict[str, str]) -> str:
+    """Rewrite local proposal.html artifact links onto signed deliverable URLs."""
+    for name, href in download_map.items():
+        html = html.replace(f'href="./{name}"', f'href="{href}"')
+        html = html.replace(f'href="{name}"', f'href="{href}"')
+        html = html.replace(f'src="./{name}"', f'src="{href}"')
+        html = html.replace(f'src="{name}"', f'src="{href}"')
+    return html
 
 
 def _media_type_for_name(name: str) -> str:
@@ -846,27 +866,21 @@ def _portal_bundle(project_id: str) -> PortalBundle:
 
 @app.get("/projects/{project_id}/portal.json")
 async def get_portal_json(project_id: str, request: Request) -> JSONResponse:
-    jwt = _jwt_from_request(request)
-    if hf_auth.auth_is_required() and not hf_auth.authorize(jwt, project_id, "read"):
-        raise HTTPException(401, "portal access denied")
+    _require_portal_read_access(project_id, request)
     portal = _portal_bundle(project_id)
     return JSONResponse(portal.model_dump())
 
 
 @app.get("/projects/{project_id}/charts.json")
 async def get_portal_charts(project_id: str, request: Request) -> JSONResponse:
-    jwt = _jwt_from_request(request)
-    if hf_auth.auth_is_required() and not hf_auth.authorize(jwt, project_id, "read"):
-        raise HTTPException(401, "portal access denied")
+    _require_portal_read_access(project_id, request)
     portal = _portal_bundle(project_id)
     return JSONResponse(portal.charts)
 
 
 @app.get("/projects/{project_id}/downloads.json")
 async def get_portal_downloads(project_id: str, request: Request) -> JSONResponse:
-    jwt = _jwt_from_request(request)
-    if hf_auth.auth_is_required() and not hf_auth.authorize(jwt, project_id, "read"):
-        raise HTTPException(401, "portal access denied")
+    _require_portal_read_access(project_id, request)
     portal = _portal_bundle(project_id)
     return JSONResponse({"project_id": project_id, "downloads": [d.model_dump() for d in portal.downloads]})
 
@@ -982,12 +996,57 @@ async def get_deliverable(
     jwt = _jwt_from_request(request)
     if hf_auth.auth_is_required():
         if hf_auth.authorize(jwt, project_id, "read"):
+            if name == "proposal.html":
+                portal = _portal_bundle(project_id)
+                html = p.read_text(encoding="utf-8")
+                html = _rewrite_proposal_html_assets(
+                    html,
+                    {item.name: item.href for item in portal.downloads},
+                )
+                return Response(
+                    content=html,
+                    media_type="text/html; charset=utf-8",
+                    headers={
+                        "Cache-Control": "private, no-store",
+                        "X-Robots-Tag": "noindex, nofollow",
+                    },
+                )
             return FileResponse(p)
         if sig and hf_auth.verify_deliverable_sig(project_id, name, sig):
+            if name == "proposal.html":
+                portal = _portal_bundle(project_id)
+                html = p.read_text(encoding="utf-8")
+                html = _rewrite_proposal_html_assets(
+                    html,
+                    {item.name: item.href for item in portal.downloads},
+                )
+                return Response(
+                    content=html,
+                    media_type="text/html; charset=utf-8",
+                    headers={
+                        "Cache-Control": "private, no-store",
+                        "X-Robots-Tag": "noindex, nofollow",
+                    },
+                )
             return FileResponse(p)
         raise HTTPException(401, "deliverable access denied")
     if sig and not hf_auth.verify_deliverable_sig(project_id, name, sig):
         raise HTTPException(401, "invalid or expired deliverable signature")
+    if name == "proposal.html":
+        portal = _portal_bundle(project_id)
+        html = p.read_text(encoding="utf-8")
+        html = _rewrite_proposal_html_assets(
+            html,
+            {item.name: item.href for item in portal.downloads},
+        )
+        return Response(
+            content=html,
+            media_type="text/html; charset=utf-8",
+            headers={
+                "Cache-Control": "private, no-store",
+                "X-Robots-Tag": "noindex, nofollow",
+            },
+        )
     return FileResponse(p)
 
 

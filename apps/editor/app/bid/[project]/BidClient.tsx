@@ -14,7 +14,12 @@
 
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, Grid } from '@react-three/drei'
+import { useSearchParams } from 'next/navigation'
 import { use, useEffect, useMemo, useRef, useState } from 'react'
+import {
+  buildPortalRequestInit,
+  resolvePortalAuthToken,
+} from '../portal-access'
 
 const FT_TO_M = 0.3048
 
@@ -297,15 +302,19 @@ function LevelSlab({
 
 export default function BidView(props: { params: Promise<{ project: string }> }) {
   const params = use(props.params)
+  const searchParams = useSearchParams()
   const portalBundleRef = useRef<PortalBundle | null>(null)
   const [project, setProject] = useState<LegacyProject | null>(null)
   const [proposal, setProposal] = useState<ProposalData | null>(null)
   const [design, setDesign] = useState<DesignData | null>(null)
   const [portal, setPortal] = useState<PortalBundle | null>(null)
+  const [portalAccessDenied, setPortalAccessDenied] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [visibleLevels, setVisibleLevels] = useState<Set<string>>(new Set())
   const [isMobile, setIsMobile] = useState(false)
   const [mobileTab, setMobileTab] = useState<'overview' | 'model' | 'sheets' | 'price'>('overview')
+  const portalAuthToken = useMemo(() => resolvePortalAuthToken(searchParams), [searchParams])
+  const portalRequestInit = useMemo(() => buildPortalRequestInit(portalAuthToken), [portalAuthToken])
 
   // Detect mobile viewport
   useEffect(() => {
@@ -321,11 +330,19 @@ export default function BidView(props: { params: Promise<{ project: string }> })
     let cancelled = false
     portalBundleRef.current = null
     setPortal(null)
+    setPortalAccessDenied(false)
 
-    fetch(`${GATEWAY_URL}/projects/${params.project}/portal.json`)
-      .then((r) => (r.ok ? r.json() : null))
+    fetch(`${GATEWAY_URL}/projects/${params.project}/portal.json`, portalRequestInit)
+      .then((r) => {
+        if (r.ok) return r.json()
+        if (r.status === 401 || r.status === 403) {
+          if (!cancelled) setPortalAccessDenied(true)
+        }
+        return null
+      })
       .then((d: PortalBundle | null) => {
         if (cancelled || !d) return
+        setPortalAccessDenied(false)
         portalBundleRef.current = d
         setPortal(d)
         setProposal(d.proposal ?? null)
@@ -366,7 +383,7 @@ export default function BidView(props: { params: Promise<{ project: string }> })
       })
 
     return () => { cancelled = true }
-  }, [params.project])
+  }, [params.project, portalRequestInit])
 
   // Load static project metadata
   useEffect(() => {
@@ -388,7 +405,7 @@ export default function BidView(props: { params: Promise<{ project: string }> })
   useEffect(() => {
     if (portalBundleRef.current) return
     let cancelled = false
-    fetch(`${GATEWAY_URL}/projects/${params.project}/proposal.json`)
+    fetch(`${GATEWAY_URL}/projects/${params.project}/proposal.json`, portalRequestInit)
       .then((r) => (r.ok ? r.json() : null))
       .then((d: ProposalData | null) => {
         if (d && !cancelled && !portalBundleRef.current) setProposal(d)
@@ -397,14 +414,14 @@ export default function BidView(props: { params: Promise<{ project: string }> })
         // No pipeline run yet — fall back to static data
       })
     return () => { cancelled = true }
-  }, [params.project, portal])
+  }, [params.project, portal, portalRequestInit])
 
   // Load the generated CAD design. This is the geometry source of truth
   // when the agentic pipeline has produced heads + pipe networks.
   useEffect(() => {
     if (portalBundleRef.current) return
     let cancelled = false
-    fetch(`${GATEWAY_URL}/projects/${params.project}/design.json`)
+    fetch(`${GATEWAY_URL}/projects/${params.project}/design.json`, portalRequestInit)
       .then((r) => (r.ok ? r.json() : null))
       .then((d: DesignData | null) => {
         if (d && !cancelled && !portalBundleRef.current) setDesign(d)
@@ -413,7 +430,7 @@ export default function BidView(props: { params: Promise<{ project: string }> })
         // No design run yet; the viewer can still show static bid context.
       })
     return () => { cancelled = true }
-  }, [params.project, portal])
+  }, [params.project, portal, portalRequestInit])
 
   const levels: RenderLevel[] = useMemo(() => {
     if (design?.building?.levels?.length) {
@@ -512,13 +529,35 @@ export default function BidView(props: { params: Promise<{ project: string }> })
   const downloadLinks = portal?.downloads ?? []
   const accessModeLabel = portal
     ? (portal.access.auth_required ? 'Signed access' : 'Open portal')
-    : 'Legacy preview'
+    : (portalAccessDenied ? 'Signed access required' : 'Legacy preview')
   const downloadStatusText = portal
     ? `${portal.access.auth_required ? 'Signed access' : 'Open portal'} · ${downloadLinks.length} signed files`
-    : 'Legacy preview · downloads hidden until a signed portal bundle exists'
+    : (
+        portalAccessDenied
+          ? 'Signed access required · portal bundle unavailable without a token'
+          : 'Legacy preview · downloads hidden until a signed portal bundle exists'
+      )
   const confidencePct = design?.confidence?.overall !== undefined
     ? Math.round((design.confidence.overall ?? 0) * 100)
     : null
+
+  if (portalAccessDenied && !portal) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-black text-white">
+        <div className="max-w-lg rounded border border-neutral-800 bg-neutral-950 p-6 text-left">
+          <p className="text-[10px] uppercase tracking-[0.3em] text-amber-400">Signed access required</p>
+          <h1 className="mt-2 text-xl font-semibold">This bid page needs a portal token</h1>
+          <p className="mt-3 text-sm text-neutral-300">
+            The signed Halo Forge portal bundle could not be loaded without a valid JWT.
+            Open the link from the client share email or append the token as `?jwt=...`.
+          </p>
+          <p className="mt-4 text-xs text-neutral-500">
+            Legacy preview content is withheld until the signed portal request succeeds.
+          </p>
+        </div>
+      </div>
+    )
+  }
 
   if (error) {
     return (

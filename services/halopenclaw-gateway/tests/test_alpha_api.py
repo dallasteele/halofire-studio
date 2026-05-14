@@ -194,9 +194,21 @@ def _write_portal_bundle(root: Path, project_id: str = "alpha") -> None:
     (out / "proposal.json").write_text(json.dumps(proposal, indent=2), encoding="utf-8")
     (out / "design.json").write_text(json.dumps(design, indent=2), encoding="utf-8")
     (out / "manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
-    (out / "proposal.html").write_text("<html>portal</html>", encoding="utf-8")
+    (out / "proposal.html").write_text(
+        (
+            "<html><body>"
+            '<a href="./proposal.json">proposal.json</a>'
+            '<a href="./proposal.pdf">proposal.pdf</a>'
+            '<a href="./proposal.xlsx">proposal.xlsx</a>'
+            '<a href="./design.json">design.json</a>'
+            '<model-viewer src="design.glb"></model-viewer>'
+            "</body></html>"
+        ),
+        encoding="utf-8",
+    )
     (out / "proposal.pdf").write_text("pdf", encoding="utf-8")
     (out / "proposal.xlsx").write_text("xlsx", encoding="utf-8")
+    (out / "design.glb").write_text("glb", encoding="utf-8")
 
 
 def test_manifest_validate_calculate_and_local_api_key(tmp_path: Path, monkeypatch) -> None:
@@ -267,6 +279,13 @@ def test_portal_bundle_includes_real_artifacts_and_signed_downloads(tmp_path: Pa
     assert served.status_code == 200
     assert served.text == "pdf"
 
+    html_sig = main.hf_auth.sign_deliverable("alpha", "proposal.html", ttl_seconds=60)
+    proposal_html = client.get("/projects/alpha/deliverable/proposal.html", params={"sig": html_sig})
+    assert proposal_html.status_code == 200
+    assert 'href="./proposal.json"' not in proposal_html.text
+    assert "/projects/alpha/deliverable/proposal.json?sig=" in proposal_html.text
+    assert "/projects/alpha/deliverable/design.glb?sig=" in proposal_html.text
+
     bad = client.get("/projects/alpha/deliverable/proposal.pdf", params={"sig": "1.deadbeef"})
     assert bad.status_code == 401
 
@@ -280,6 +299,8 @@ def test_portal_bundle_honors_auth_when_enabled(tmp_path: Path, monkeypatch) -> 
 
     denied = client.get("/projects/alpha/portal.json")
     assert denied.status_code == 401
+    assert client.get("/projects/alpha/proposal.json").status_code == 401
+    assert client.get("/projects/alpha/design.json").status_code == 401
 
     token = main.hf_auth.sign_jwt("wade", {"alpha": "viewer"})
     allowed = client.get(
@@ -287,3 +308,11 @@ def test_portal_bundle_honors_auth_when_enabled(tmp_path: Path, monkeypatch) -> 
         headers={"Authorization": f"Bearer {token}"},
     )
     assert allowed.status_code == 200
+    assert client.get(
+        "/projects/alpha/proposal.json",
+        headers={"Authorization": f"Bearer {token}"},
+    ).status_code == 200
+    assert client.get(
+        "/projects/alpha/design.json",
+        headers={"Authorization": f"Bearer {token}"},
+    ).status_code == 200
