@@ -7,7 +7,7 @@ Usage:
 Output example:
 
     metric              actual    truth   delta   tol   status
-    head_count            1396     1303    7%    15%   PASS
+    head_count            1396     1420    2%    15%   PASS
     total_bid_usd     $502,310  $538,792   7%    15%   PASS
     system_count             7        7    0%    0%    PASS
     level_count             12       12    0%    0%    PASS

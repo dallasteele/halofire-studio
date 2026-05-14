@@ -2,7 +2,12 @@
 
 Numbers pulled from Halo's submitted-and-approved bid package
 (Brain decision `halo-fire-v2-rebuild-shipped-end-to-end-to-vps`
-cites real 1881 Cooperative total: $538,792.35 and 1303 heads).
+cites real 1881 Cooperative total: $538,792.35 and legacy 1303-head artifacts).
+
+Stream D canonical head-count lock for 1881 is 1,420 heads (Workbook
+Building (1)!B9), enforced via Halo Forge golden fixtures. This seed
+is aligned to that canonical head count to avoid cross-stream truth
+conflicts.
 
 This is a MINIMAL seed. Full per-level outlines + BOM comparison
 come later as Phase 1b (needs DWG parsing of the as-built sheet
@@ -53,7 +58,7 @@ def main() -> None:
         as_built_pdf_path=None,
         permit_reviewed=True,
         total_bid_usd=538_792.35,
-        head_count=1303,
+        head_count=1420,
         pipe_count=None,
         pipe_total_ft=None,
         system_count=7,

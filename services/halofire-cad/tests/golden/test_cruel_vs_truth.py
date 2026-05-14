@@ -75,7 +75,7 @@ def _delta(actual: float, truth: float) -> float:
 @pytest.mark.e2e
 def test_head_count_within_15pct_of_truth() -> None:
     """Our placer's head_count must be within ±15% of what Halo
-    shipped. 1881 truth: 1303 heads. Current pipeline output
+    shipped. 1881 truth: 1420 heads. Current pipeline output
     landed at ~583. That's ~55% under — a real failure."""
     truth = _truth_or_skip()
     if truth.head_count is None:
