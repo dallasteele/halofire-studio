@@ -1,0 +1,517 @@
+{
+  "version": 1,
+  "generated_at": "2026-04-20",
+  "project": {
+    "id": "1881-cooperative",
+    "name": "1881 Cooperative",
+    "address": "",
+    "ahj": "Local AHJ",
+    "code": "NFPA 13 2022",
+    "construction_type": null,
+    "total_sqft": null,
+    "architect": null,
+    "gc": null,
+    "halofire": {
+      "name": "Halo Fire Protection, LLC",
+      "contact": "Dan Farnsworth",
+      "phone": "(480) 325-2280",
+      "license": "AZ ROC: 247730"
+    },
+    "supply": null
+  },
+  "building_summary": {
+    "total_sqft": null,
+    "construction_type": null,
+    "level_count": 6
+  },
+  "levels": [
+    {
+      "id": "level_p1",
+      "name": "Ground Floor Parking",
+      "use": "garage",
+      "elevation_m": -3.66,
+      "elevation_ft": -12.0,
+      "room_count": 4,
+      "head_count": 230,
+      "pipe_count": 261,
+      "pipe_total_m": 1442.3,
+      "pipe_total_ft": 4732.1
+    },
+    {
+      "id": "level_p2",
+      "name": "Second Floor Parking",
+      "use": "garage",
+      "elevation_m": 0.0,
+      "elevation_ft": 0.0,
+      "room_count": 1,
+      "head_count": 100,
+      "pipe_count": 153,
+      "pipe_total_m": 455.9,
+      "pipe_total_ft": 1495.7
+    },
+    {
+      "id": "level_p3",
+      "name": "Level 1 \u2014 Amenity + Resi",
+      "use": "residential",
+      "elevation_m": 3.66,
+      "elevation_ft": 12.0,
+      "room_count": 36,
+      "head_count": 231,
+      "pipe_count": 245,
+      "pipe_total_m": 766.0,
+      "pipe_total_ft": 2513.1
+    },
+    {
+      "id": "level_p5_synth",
+      "name": "Level 2 \u2014 Residential",
+      "use": "residential",
+      "elevation_m": 7.32,
+      "elevation_ft": 24.0,
+      "room_count": 33,
+      "head_count": 228,
+      "pipe_count": 241,
+      "pipe_total_m": 723.1,
+      "pipe_total_ft": 2372.4
+    },
+    {
+      "id": "level_p6_synth",
+      "name": "Level 3 \u2014 Residential",
+      "use": "residential",
+      "elevation_m": 10.36,
+      "elevation_ft": 34.0,
+      "room_count": 33,
+      "head_count": 228,
+      "pipe_count": 241,
+      "pipe_total_m": 723.7,
+      "pipe_total_ft": 2374.4
+    },
+    {
+      "id": "level_p8_synth",
+      "name": "Level 4 \u2014 Residential",
+      "use": "residential",
+      "elevation_m": 13.41,
+      "elevation_ft": 44.0,
+      "room_count": 33,
+      "head_count": 228,
+      "pipe_count": 241,
+      "pipe_total_m": 723.7,
+      "pipe_total_ft": 2374.4
+    }
+  ],
+  "systems": [
+    {
+      "id": "sys_level_p1",
+      "type": "dry",
+      "supplies": [
+        "level_p1"
+      ],
+      "head_count": 239,
+      "pipe_count": 261,
+      "pipe_total_m": 1442.3,
+      "hanger_count": 603,
+      "riser_position_m": [
+        -71.49165366791244,
+        -48.05633959957286,
+        -3.66
+      ],
+      "riser_size_in": 4.0,
+      "fdc_type": "wall_mount",
+      "hydraulic": {
+        "design_area_sqft": 1500.0,
+        "density_gpm_per_sqft": 0.15,
+        "required_flow_gpm": 4868.2,
+        "required_pressure_psi": 0.0,
+        "supply_static_psi": 75.0,
+        "supply_residual_psi": 55.0,
+        "demand_psi": 0.0,
+        "safety_margin_psi": 55.0
+      }
+    },
+    {
+      "id": "sys_level_p2",
+      "type": "dry",
+      "supplies": [
+        "level_p2"
+      ],
+      "head_count": 138,
+      "pipe_count": 153,
+      "pipe_total_m": 455.9,
+      "hanger_count": 258,
+      "riser_position_m": [
+        -5.914516437497761,
+        2.29842297049628,
+        0.0
+      ],
+      "riser_size_in": 4.0,
+      "fdc_type": "wall_mount",
+      "hydraulic": {
+        "design_area_sqft": 1500.0,
+        "density_gpm_per_sqft": 0.15,
+        "required_flow_gpm": 2920.9,
+        "required_pressure_psi": 8.9,
+        "supply_static_psi": 75.0,
+        "supply_residual_psi": 55.0,
+        "demand_psi": 8.9,
+        "safety_margin_psi": 46.1
+      }
+    },
+    {
+      "id": "sys_level_p3",
+      "type": "wet",
+      "supplies": [
+        "level_p3"
+      ],
+      "head_count": 232,
+      "pipe_count": 245,
+      "pipe_total_m": 766.0,
+      "hanger_count": 415,
+      "riser_position_m": [
+        32.35432648416887,
+        -0.25013806068602085,
+        3.66
+      ],
+      "riser_size_in": 4.0,
+      "fdc_type": "wall_mount",
+      "hydraulic": {
+        "design_area_sqft": 1500.0,
+        "density_gpm_per_sqft": 0.15,
+        "required_flow_gpm": 3983.4,
+        "required_pressure_psi": 7.8,
+        "supply_static_psi": 75.0,
+        "supply_residual_psi": 55.0,
+        "demand_psi": 7.8,
+        "safety_margin_psi": 47.2
+      }
+    },
+    {
+      "id": "sys_level_p5_synth",
+      "type": "wet",
+      "supplies": [
+        "level_p5_synth"
+      ],
+      "head_count": 228,
+      "pipe_count": 241,
+      "pipe_total_m": 723.1,
+      "hanger_count": 402,
+      "riser_position_m": [
+        -5.914516437497761,
+        2.29842297049628,
+        7.32
+      ],
+      "riser_size_in": 4.0,
+      "fdc_type": "wall_mount",
+      "hydraulic": {
+        "design_area_sqft": 1500.0,
+        "density_gpm_per_sqft": 0.15,
+        "required_flow_gpm": 4013.1,
+        "required_pressure_psi": 8.9,
+        "supply_static_psi": 75.0,
+        "supply_residual_psi": 55.0,
+        "demand_psi": 8.9,
+        "safety_margin_psi": 46.1
+      }
+    },
+    {
+      "id": "sys_level_p6_synth",
+      "type": "wet",
+      "supplies": [
+        "level_p6_synth"
+      ],
+      "head_count": 228,
+      "pipe_count": 241,
+      "pipe_total_m": 723.7,
+      "hanger_count": 402,
+      "riser_position_m": [
+        -5.914516437497761,
+        2.29842297049628,
+        10.36
+      ],
+      "riser_size_in": 4.0,
+      "fdc_type": "wall_mount",
+      "hydraulic": {
+        "design_area_sqft": 1500.0,
+        "density_gpm_per_sqft": 0.15,
+        "required_flow_gpm": 4013.1,
+        "required_pressure_psi": 8.2,
+        "supply_static_psi": 75.0,
+        "supply_residual_psi": 55.0,
+        "demand_psi": 8.2,
+        "safety_margin_psi": 46.8
+      }
+    },
+    {
+      "id": "sys_level_p8_synth",
+      "type": "wet",
+      "supplies": [
+        "level_p8_synth"
+      ],
+      "head_count": 228,
+      "pipe_count": 241,
+      "pipe_total_m": 723.7,
+      "hanger_count": 402,
+      "riser_position_m": [
+        -5.914516437497761,
+        2.29842297049628,
+        13.41
+      ],
+      "riser_size_in": 4.0,
+      "fdc_type": "wall_mount",
+      "hydraulic": {
+        "design_area_sqft": 1500.0,
+        "density_gpm_per_sqft": 0.15,
+        "required_flow_gpm": 4013.1,
+        "required_pressure_psi": 8.2,
+        "supply_static_psi": 75.0,
+        "supply_residual_psi": 55.0,
+        "demand_psi": 8.2,
+        "safety_margin_psi": 46.8
+      }
+    },
+    {
+      "id": "sys_combo_standpipe",
+      "type": "combo_standpipe",
+      "supplies": [
+        "level_p1",
+        "level_p2",
+        "level_p3",
+        "level_p5_synth",
+        "level_p6_synth",
+        "level_p8_synth"
+      ],
+      "head_count": 0,
+      "pipe_count": 0,
+      "pipe_total_m": 0,
+      "hanger_count": 0,
+      "riser_position_m": [
+        0.0,
+        0.0,
+        -3.66
+      ],
+      "riser_size_in": 4.0,
+      "fdc_type": "wall_mount",
+      "hydraulic": {
+        "design_area_sqft": 1500.0,
+        "density_gpm_per_sqft": 0.15,
+        "required_flow_gpm": 0.0,
+        "required_pressure_psi": 0.0,
+        "supply_static_psi": 75.0,
+        "supply_residual_psi": 55.0,
+        "demand_psi": 0.0,
+        "safety_margin_psi": 0.0
+      }
+    }
+  ],
+  "scope_of_work": [
+    "Perform fire sprinkler design, calculations, and material listings booklet for deferred submittals permit review",
+    "Provide materials, equipment, & skilled labor to build the fully-functioning systems as permitted",
+    "Garage dry systems + combination wet standpipe & sprinkler systems",
+    "Schedule and complete inspections as required to close out permit",
+    "Installed in accordance with NFPA and local AHJ code"
+  ],
+  "acknowledgements": [
+    "Pricing valid for 10 days from the date of this proposal",
+    "Scope begins 6\" above finished floor at the riser flange",
+    "All underground by others",
+    "Installation lead times to be coordinated no less than 6 weeks in advance",
+    "Estimate assumes sufficient water flow; no fire pump",
+    "Import, domestic, light wall, and threaded light wall NFPA piping acceptable",
+    "A temporary standpipe will be installed when framed to the 4th floor",
+    "Halo assumed a manual wet standpipe for this estimate",
+    "Work schedule: 8.5 hours/day, 5 days/week"
+  ],
+  "inclusions": [
+    "Pricing covers install based on documents provided for bidding",
+    "Project management, travel, close-out docs, submittals included",
+    "New piping, fittings, valves, sprinkler heads per bid documents",
+    "Sales taxes included",
+    "Scissor lifts, service vehicles, and small hand tools included",
+    "White or chrome semi-recessed heads in finished ceilings",
+    "Permit fees included up to $3,250.00",
+    "8 Rough-in mobilizations + 8 Trim mobilizations",
+    "Wall-mount FDC at riser room"
+  ],
+  "exclusions": [
+    "Pricing increases received after the date of this proposal",
+    "Wiring, alarm, temp power, smoke & heat vents, FD access doors",
+    "Pre-action, anti-freeze, hose valves, wet chemical systems",
+    "Premium time, double time, prevailing wages",
+    "Heads around equipment not shown on bid documents",
+    "Paint, paint prep, refuse containers, haul-off",
+    "3D modeling / BIM coordination",
+    "Building signage, fire extinguishers & cabinets",
+    "Cutting, patching, ceiling tile work",
+    "Underground fire service line to building",
+    "Galvanized steel for garage dry system + overhangs"
+  ],
+  "bom": [
+    {
+      "sku": "SM_Head_Pendant_Concealed_K56",
+      "description": "SM Head Pendant Concealed K56",
+      "qty": 530.0,
+      "unit": "ea",
+      "unit_cost_usd": 38.0,
+      "extended_usd": 27189.0,
+      "do_not_fab": false,
+      "price_stale": false,
+      "price_missing": false
+    },
+    {
+      "sku": "SM_Head_Pendant_Standard_K56",
+      "description": "SM Head Pendant Standard K56",
+      "qty": 30.0,
+      "unit": "ea",
+      "unit_cost_usd": 8.5,
+      "extended_usd": 344.25,
+      "do_not_fab": false,
+      "price_stale": false,
+      "price_missing": false
+    },
+    {
+      "sku": "SM_Head_Pendant_Standard_K80",
+      "description": "SM Head Pendant Standard K80",
+      "qty": 386.0,
+      "unit": "ea",
+      "unit_cost_usd": 31.0,
+      "extended_usd": 16154.1,
+      "do_not_fab": false,
+      "price_stale": false,
+      "price_missing": false
+    },
+    {
+      "sku": "SM_Head_Upright_Standard_K80",
+      "description": "SM Head Upright Standard K80",
+      "qty": 347.0,
+      "unit": "ea",
+      "unit_cost_usd": 31.0,
+      "extended_usd": 14521.95,
+      "do_not_fab": false,
+      "price_stale": false,
+      "price_missing": false
+    },
+    {
+      "sku": "hanger_clevis_1in",
+      "description": "Clevis hanger 1.25\"",
+      "qty": 2428.0,
+      "unit": "ea",
+      "unit_cost_usd": 4.0,
+      "extended_usd": 13111.2,
+      "do_not_fab": false,
+      "price_stale": false,
+      "price_missing": false
+    },
+    {
+      "sku": "hanger_clevis_2in",
+      "description": "Clevis hanger 2.5\"",
+      "qty": 54.0,
+      "unit": "ea",
+      "unit_cost_usd": 6.5,
+      "extended_usd": 473.85,
+      "do_not_fab": false,
+      "price_stale": false,
+      "price_missing": false
+    },
+    {
+      "sku": "pipe_sch10_1_0in_ft",
+      "description": "1.0\" SCH10 pipe, linear feet",
+      "qty": 1291.5,
+      "unit": "ft",
+      "unit_cost_usd": 0.0,
+      "extended_usd": 0.0,
+      "do_not_fab": true,
+      "price_stale": false,
+      "price_missing": true
+    },
+    {
+      "sku": "pipe_sch10_1_25in_ft",
+      "description": "1.25\" SCH10 pipe, linear feet",
+      "qty": 13731.5,
+      "unit": "ft",
+      "unit_cost_usd": 3.1,
+      "extended_usd": 57466.33,
+      "do_not_fab": true,
+      "price_stale": false,
+      "price_missing": false
+    },
+    {
+      "sku": "pipe_sch10_2_5in_ft",
+      "description": "2.5\" SCH10 pipe, linear feet",
+      "qty": 839.1,
+      "unit": "ft",
+      "unit_cost_usd": 8.0,
+      "extended_usd": 9062.28,
+      "do_not_fab": true,
+      "price_stale": false,
+      "price_missing": false
+    },
+    {
+      "sku": "riser_dry_4in",
+      "description": "Dry riser w/ air compressor 4\"",
+      "qty": 2.0,
+      "unit": "ea",
+      "unit_cost_usd": 8500.0,
+      "extended_usd": 22950.0,
+      "do_not_fab": false,
+      "price_stale": false,
+      "price_missing": false
+    },
+    {
+      "sku": "riser_wet_4in",
+      "description": "Wet riser assembly 4\"",
+      "qty": 5.0,
+      "unit": "ea",
+      "unit_cost_usd": 3500.0,
+      "extended_usd": 23625.0,
+      "do_not_fab": false,
+      "price_stale": false,
+      "price_missing": false
+    }
+  ],
+  "labor": [
+    {
+      "role": "Foreman",
+      "hours": 473.0,
+      "rate_usd_hr": 78.0,
+      "extended_usd": 36894.0
+    },
+    {
+      "role": "Journeyman",
+      "hours": 1419.1,
+      "rate_usd_hr": 62.0,
+      "extended_usd": 87984.2
+    },
+    {
+      "role": "Apprentice",
+      "hours": 788.4,
+      "rate_usd_hr": 40.0,
+      "extended_usd": 31536.0
+    },
+    {
+      "role": "Helper",
+      "hours": 315.4,
+      "rate_usd_hr": 32.0,
+      "extended_usd": 10092.8
+    },
+    {
+      "role": "Project Manager",
+      "hours": 157.7,
+      "rate_usd_hr": 95.0,
+      "extended_usd": 14981.5
+    }
+  ],
+  "violations": [],
+  "pricing": {
+    "materials_usd": 184897.96,
+    "labor_usd": 181488.5,
+    "permit_allowance_usd": 3250.0,
+    "taxes_usd": 39754.4,
+    "subtotal_usd": 552144.4,
+    "total_usd": 538792.35
+  },
+  "deliverables": {
+    "sheet_set_pdf": "FP-0 cover, FP-H hydraulic placard, per-level FP-N plans, FP-R riser detail, FP-B BOM, FP-D details",
+    "ifc_export": "IFC 4.x sprinkler subset for GC coordination model",
+    "dxf_export": "AutoCAD DXF with AutoSprink-compatible layer names",
+    "web_bid_viewer": "Interactive 3D model at /bid/{project_id}",
+    "cut_sheets": "Manufacturer data sheets bundled PDF"
+  }
+}
