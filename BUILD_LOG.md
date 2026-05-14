@@ -1203,3 +1203,25 @@ User direction across 4 messages this session:
 - Open blocker remains the same: the next catalog slice needs a real
   distributor/manufacturer promotion path beyond `visual_reference` once
   verified dimensions and approval records exist.
+
+### Entry 33 - Halo Forge Stream F catalog asset refresh
+
+- Refreshed the generated IFC/DXF proxy artifacts for the verified
+  `pendent_standard`, `pendent_standard_ferguson`, and
+  `viking_vk100_upright_155f` families so the committed family-contract
+  assets stay aligned with the current source-capture pass.
+- Captured the matching cut-sheet PDFs under
+  `packages/halofire-catalog/cut_sheets/` so the source-license refs stay
+  file-backed instead of dangling on an inferred path.
+- Kept the provenance surface unchanged: `pendent_standard` and
+  `viking_vk100_upright_155f` remain `manufacturer_verified`, while
+  `pendent_standard_ferguson` remains `dimensioned_parametric` with
+  distributor provenance and blocked redistribution.
+- Verified with `C:/Python312/python.exe scripts/verify_agentic_rules.py`,
+  `bun test E:\\ClaudeBot\\halofire-studio\\packages\\halofire-catalog\\tests\\schema.test.ts
+  E:\\ClaudeBot\\halofire-studio\\packages\\halofire-catalog\\tests\\catalog.test.ts`,
+  and a structural smoke that confirmed the regenerated IFC/DXF files
+  still carry the expected headers and end markers.
+- Open blocker remains unchanged: no additional verified
+  manufacturer/distributor source record is available to promote another
+  family beyond the current verified trio.
