@@ -304,7 +304,11 @@ def run_pipeline(
     proposal_data = PROPOSAL.build_proposal_data(
         design, bom, labor, [v.model_dump() for v in violations],
     )
-    paths = PROPOSAL.write_proposal_files(proposal_data, out_dir)
+    paths = PROPOSAL.write_proposal_files(
+        proposal_data,
+        out_dir,
+        design_payload=design,
+    )
     summary["files"].update(paths)
     _emit_step({
         "step": "proposal",

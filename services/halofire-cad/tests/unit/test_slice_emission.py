@@ -111,3 +111,47 @@ def test_place_slice_has_sprinkler_heads_list(
     assert isinstance(heads, list), (
         f"place.slice.sprinkler_heads must be a list, got {type(heads).__name__}"
     )
+
+
+def test_proposal_stage_receives_design_payload(
+    tmp_path: Path,
+) -> None:
+    """The proposal stage must pass real design geometry into HTML generation."""
+    out = tmp_path / "proposal-pass"
+    out.mkdir(parents=True, exist_ok=True)
+    events: list[dict] = []
+    captured: dict[str, object] = {}
+
+    original_intake = ORCH.INTAKE.intake_file
+    original_write = ORCH.PROPOSAL.write_proposal_files
+    original_export_all = ORCH.SUBMITTAL.export_all
+    bldg = _tiny_building()
+
+    def _fake_write_proposal_files(proposal_data, out_dir, design_payload=None):
+        captured["design_payload"] = design_payload
+        html_path = out_dir / "proposal.html"
+        html_path.write_text(
+            "<!doctype html><html><body><div class='plan-svg'></div></body></html>",
+            encoding="utf-8",
+        )
+        return {"html": str(html_path)}
+
+    ORCH.INTAKE.intake_file = lambda pdf_path, project_id: bldg
+    ORCH.PROPOSAL.write_proposal_files = _fake_write_proposal_files
+    ORCH.SUBMITTAL.export_all = lambda design, out_dir: {}
+    try:
+        ORCH.run_pipeline(
+            "unused.pdf",
+            project_id="slice-test-proposal",
+            out_dir=out,
+            progress_callback=lambda e: events.append(e),
+        )
+    finally:
+        ORCH.INTAKE.intake_file = original_intake
+        ORCH.PROPOSAL.write_proposal_files = original_write
+        ORCH.SUBMITTAL.export_all = original_export_all
+
+    assert captured.get("design_payload") is not None
+    assert getattr(captured["design_payload"], "systems", None), (
+        "proposal stage should pass the real design payload, not None"
+    )
