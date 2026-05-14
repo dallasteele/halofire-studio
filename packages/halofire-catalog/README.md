@@ -53,6 +53,9 @@ The canonical source ingestion policy is:
 - public/source URL, source file ref, terms summary, and usage flags are
   required for non-procedural salvage
 - `default_model_status` is `visual_reference`
+- `dimensions_verified` must be explicit for any promoted family
+- distributor-backed families may stop at `dimensioned_parametric`
+- `manufacturer_verified` still requires manufacturer-backed evidence
 - `manufacturer_verified` and `dimensions_verified` must be explicit
 
 Package consumers should use `CATALOG_SOURCE_INGESTION_POLICY` and the
