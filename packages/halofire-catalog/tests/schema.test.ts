@@ -260,6 +260,28 @@ describe('catalog.json matches the canonical schema', () => {
     expect(licenseResult.success).toBe(true)
   })
 
+  test('distributor source licenses cannot be downloadable or redistributable', () => {
+    const result = CatalogSourceLicenseSchema.safeParse({
+      part_ref: 'demo_distributor_flags',
+      source_kind: 'distributor',
+      manufacturer: 'Tyco Fire Protection',
+      distributor: 'Ferguson',
+      public_url:
+        'https://api.ferguson.com/dar-step-service/Query?ASSET_ID=4685770&PRODUCT_ID=1959635&USE_TYPE=SPECIFICATION',
+      source_url:
+        'https://api.ferguson.com/dar-step-service/Query?ASSET_ID=4685770&PRODUCT_ID=1959635&USE_TYPE=SPECIFICATION',
+      source_file_ref: 'ferguson_tyco_ty3251_spec.pdf',
+      terms_summary: 'Distributor salvage must remain internal-use only.',
+      allowed_internal_use: true,
+      allowed_client_render: true,
+      allowed_download: true,
+      redistribution_blocked: false,
+      source_captured_at: '2026-05-12T08:38:19Z',
+      model_status: 'dimensioned_parametric',
+    })
+    expect(result.success).toBe(false)
+  })
+
   test('source licenses reject blank terms summaries', () => {
     const result = CatalogSourceLicenseSchema.safeParse({
       part_ref: 'demo_terms',

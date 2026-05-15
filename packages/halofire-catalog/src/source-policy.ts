@@ -12,7 +12,10 @@ import type { CatalogSourceIngestionPolicy } from './types.js'
  * `dimensioned_parametric` when dimensions are extracted from a public
  * distributor spec. It must stay there until a manufacturer-backed
  * evidence path exists; `manufacturer_verified` still requires a
- * manufacturer approval path.
+ * manufacturer approval path. Non-procedural salvage remains internal
+ * only: the package requires `allowed_download=false` and
+ * `redistribution_blocked=true` for manufacturer and distributor
+ * source records.
  */
 export const CATALOG_SOURCE_INGESTION_POLICY = {
   allowed_sources: ['procedural', 'manufacturer', 'distributor'],

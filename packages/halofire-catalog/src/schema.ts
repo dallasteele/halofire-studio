@@ -188,6 +188,24 @@ export const CatalogSourceLicenseSchema: z.ZodType<CatalogSourceLicense> = z.obj
       message: 'manufacturer/distributor source licenses require source_file_ref',
     })
   }
+  if (value.source_kind === 'manufacturer' || value.source_kind === 'distributor') {
+    if (value.allowed_download) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['allowed_download'],
+        message:
+          'manufacturer/distributor source licenses cannot allow download',
+      })
+    }
+    if (!value.redistribution_blocked) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['redistribution_blocked'],
+        message:
+          'manufacturer/distributor source licenses must block redistribution',
+      })
+    }
+  }
   if (!hasText(value.terms_summary)) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
