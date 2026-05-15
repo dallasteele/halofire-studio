@@ -190,6 +190,41 @@ describe('provenance artifacts', () => {
     }
   })
 
+  test('Tyco TY3251 keeps the manufacturer-backed family separate from the Ferguson salvage proxy', () => {
+    const sources = loadJson<SourcesManifest>(SOURCES_PATH)
+    const byKey = new Map(sources.components.map((component) => [component.key, component]))
+
+    const official = byKey.get('pendent_standard')
+    expect(official).toBeDefined()
+    expect(official?.source_kind).toBe('manufacturer')
+    expect(official?.model_status).toBe('manufacturer_verified')
+    expect(official?.manufacturer_verified).toBe(true)
+    expect(official?.dimensions_verified).toBe(true)
+    expect(official?.source_license.model_status).toBe('manufacturer_verified')
+    expect(official?.source_license.source_kind).toBe('manufacturer')
+    expect(official?.source_license.source_file_ref).toContain('tyco_ty3251_tyb.pdf')
+    expect(official?.family_contract.model_status).toBe('manufacturer_verified')
+    expect(official?.family_contract.manufacturer_verified).toBe(true)
+    expect(official?.family_contract.dimensions_verified).toBe(true)
+    expect(official?.family_contract.ifc_path).toBe('pendent_standard.ifc')
+    expect(official?.family_contract.dxf_path).toBe('pendent_standard.dxf')
+
+    const proxy = byKey.get('pendent_standard_ferguson')
+    expect(proxy).toBeDefined()
+    expect(proxy?.source_kind).toBe('distributor')
+    expect(proxy?.model_status).toBe('dimensioned_parametric')
+    expect(proxy?.manufacturer_verified).toBe(false)
+    expect(proxy?.dimensions_verified).toBe(true)
+    expect(proxy?.source_license.model_status).toBe('dimensioned_parametric')
+    expect(proxy?.source_license.source_kind).toBe('distributor')
+    expect(proxy?.source_license.source_file_ref).toContain('ferguson_tyco_ty3251_spec.pdf')
+    expect(proxy?.family_contract.model_status).toBe('dimensioned_parametric')
+    expect(proxy?.family_contract.manufacturer_verified).toBe(false)
+    expect(proxy?.family_contract.dimensions_verified).toBe(true)
+    expect(proxy?.family_contract.ifc_path).toBe('pendent_standard_ferguson.ifc')
+    expect(proxy?.family_contract.dxf_path).toBe('pendent_standard_ferguson.dxf')
+  })
+
   test('Victaulic No. 10, No. 11, and No. 20 grooved fittings are manufacturer verified with IFC and DXF deliverables', () => {
     const sources = loadJson<SourcesManifest>(SOURCES_PATH)
     const byKey = new Map(sources.components.map((component) => [component.key, component]))
