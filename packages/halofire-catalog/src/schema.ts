@@ -188,6 +188,20 @@ export const CatalogSourceLicenseSchema: z.ZodType<CatalogSourceLicense> = z.obj
       message: 'manufacturer/distributor source licenses require source_file_ref',
     })
   }
+  if (!value.allowed_internal_use) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['allowed_internal_use'],
+      message: 'source licenses must allow internal use',
+    })
+  }
+  if (!value.allowed_client_render) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['allowed_client_render'],
+      message: 'source licenses must allow client render',
+    })
+  }
   if (value.source_kind === 'manufacturer' || value.source_kind === 'distributor') {
     if (value.allowed_download) {
       ctx.addIssue({

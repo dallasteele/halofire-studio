@@ -282,6 +282,25 @@ describe('catalog.json matches the canonical schema', () => {
     expect(result.success).toBe(false)
   })
 
+  test('source licenses must allow internal use and client render', () => {
+    const result = CatalogSourceLicenseSchema.safeParse({
+      part_ref: 'demo_usage_flags',
+      source_kind: 'manufacturer',
+      manufacturer: 'Tyco Fire Protection',
+      public_url: 'https://example.com/demo',
+      source_url: 'https://example.com/demo',
+      source_file_ref: 'demo.pdf',
+      terms_summary: 'Usage flags should be explicit and true.',
+      allowed_internal_use: false,
+      allowed_client_render: false,
+      allowed_download: false,
+      redistribution_blocked: true,
+      source_captured_at: '2026-05-12T08:38:19Z',
+      model_status: 'manufacturer_verified',
+    })
+    expect(result.success).toBe(false)
+  })
+
   test('source licenses reject blank terms summaries', () => {
     const result = CatalogSourceLicenseSchema.safeParse({
       part_ref: 'demo_terms',

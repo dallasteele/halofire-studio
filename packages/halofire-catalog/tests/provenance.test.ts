@@ -113,6 +113,8 @@ describe('provenance artifacts', () => {
       expect(family.part_ref).toBe(component.key)
       expect(license.model_status).toBe(component.model_status)
       expect(family.model_status).toBe(component.model_status)
+      expect(license.allowed_internal_use).toBe(true)
+      expect(license.allowed_client_render).toBe(true)
       expect(family.manufacturer_verified).toBe(mapped.manufacturer_verified)
       expect(family.dimensions_verified).toBe(mapped.dimensions_verified)
 
