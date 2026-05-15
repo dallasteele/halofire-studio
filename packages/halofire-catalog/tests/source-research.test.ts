@@ -47,7 +47,9 @@ describe('source research ledger contract', () => {
     ).toContain('source_step_parts/hebi_r25_actuator.step')
     expect(seed.research_records.some((record) => record.source_id === 'ferguson_tyco_ty3251_spec')).toBe(true)
     expect(seed.research_records.some((record) => record.source_id === 'tyco_ty3251_tyb')).toBe(true)
-    expect(seed.correction_records).toHaveLength(2)
+    expect(seed.research_records.some((record) => record.source_id === 'tyco_ty4251_series_ty_b')).toBe(true)
+    expect(seed.research_records.some((record) => record.part_ref === 'tyco_ty4251_pendent_k80_135f')).toBe(true)
+    expect(seed.correction_records).toHaveLength(3)
   })
 
   test('checked-in research ledger validates and carries the step.parts candidate', () => {
@@ -65,7 +67,9 @@ describe('source research ledger contract', () => {
     ).toContain('source_step_parts/hebi_r25_actuator.step')
     expect(ledger.research_records.some((record) => record.source_id === 'ferguson_tyco_ty3251_spec')).toBe(true)
     expect(ledger.research_records.some((record) => record.part_ref === 'pendent_standard')).toBe(true)
-    expect(ledger.correction_records).toHaveLength(2)
+    expect(ledger.research_records.some((record) => record.source_id === 'tyco_ty4251_series_ty_b')).toBe(true)
+    expect(ledger.research_records.some((record) => record.part_ref === 'tyco_ty4251_pendent_k80_135f')).toBe(true)
+    expect(ledger.correction_records).toHaveLength(3)
     expect(ledger.summary).toEqual(summarizeSourceResearchLedger(ledger))
   })
 
@@ -151,6 +155,29 @@ describe('source research ledger contract', () => {
           ],
           notes: 'Manufacturer-backed source research row for the official TY3251 family.',
         },
+        {
+          part_ref: 'tyco_ty4251_pendent_k80_135f',
+          source_id: 'tyco_ty4251_series_ty_b',
+          source_kind: 'manufacturer',
+          manufacturer: 'Tyco Fire Protection',
+          model: 'TY4251',
+          public_url:
+            'https://docs.johnsoncontrols.com/tycofire/api/khub/documents/MbMoAJm4beEEsSDSyfV87g/content',
+          source_url:
+            'https://docs.johnsoncontrols.com/tycofire/api/khub/documents/MbMoAJm4beEEsSDSyfV87g/content',
+          source_file_ref: 'E:/ClaudeBot/halofire-studio/packages/halofire-catalog/cut_sheets/tyco_ty4251_k80.pdf',
+          third_party_notice_ref: null,
+          capture_date: '2026-05-15T22:18:37Z',
+          license_summary: 'Tyco Series TY-B manufacturer page used with the TY4251 cut sheet to confirm the family identity and dimensions; redistribution remains blocked.',
+          redistribution_blocked: true,
+          model_status: 'manufacturer_verified',
+          disposition: 'promoted',
+          evidence_refs: [
+            'https://docs.johnsoncontrols.com/tycofire/api/khub/documents/MbMoAJm4beEEsSDSyfV87g/content',
+            'E:/ClaudeBot/halofire-studio/packages/halofire-catalog/cut_sheets/tyco_ty4251_k80.pdf',
+          ],
+          notes: 'Manufacturer-backed source research row for the TY4251 family variant tied to the official Series TY-B page.',
+        },
       ],
       correction_records: [
         {
@@ -183,27 +210,44 @@ describe('source research ledger contract', () => {
           captured_at_utc: '2026-05-15T19:30:00Z',
           notes: 'Valid manufacturer-backed promotion path.',
         },
+        {
+          part_ref: 'tyco_ty4251_pendent_k80_135f',
+          source_kind: 'manufacturer',
+          from_status: 'visual_reference',
+          to_status: 'manufacturer_verified',
+          action: 'promote_manufacturer_verified',
+          reason: 'Official Tyco Series TY-B page and TY4251 cut sheet both confirm the family identity and dimensions.',
+          evidence_refs: [
+            'https://docs.johnsoncontrols.com/tycofire/api/khub/documents/MbMoAJm4beEEsSDSyfV87g/content',
+            'E:/ClaudeBot/halofire-studio/packages/halofire-catalog/cut_sheets/tyco_ty4251_k80.pdf',
+          ],
+          reviewer: 'stream-f-owner',
+          captured_at_utc: '2026-05-15T22:18:37Z',
+          notes: 'Manufacturer-backed correction path for the TY4251 family variant.',
+        },
       ],
       summary: {
-        total_records: 3,
+        total_records: 4,
         candidate_count: 1,
         blocked_count: 0,
         rejected_count: 0,
-        promoted_count: 2,
-        correction_count: 2,
+        promoted_count: 3,
+        correction_count: 3,
       },
     })
 
     expect(ledger.source_collections).toHaveLength(1)
-    expect(ledger.research_records).toHaveLength(3)
+    expect(ledger.research_records).toHaveLength(4)
     expect(ledger.research_records[0]?.source_id).toBe('step.parts')
     expect(ledger.research_records[0]?.redistribution_blocked).toBe(true)
     expect(ledger.research_records[0]?.model_status).toBe('visual_reference')
     expect(ledger.research_records[1]?.source_kind).toBe('distributor')
     expect(ledger.research_records[1]?.model_status).toBe('dimensioned_parametric')
     expect(ledger.research_records[2]?.model_status).toBe('manufacturer_verified')
-    expect(ledger.correction_records).toHaveLength(2)
-    expect(ledger.summary.promoted_count).toBe(2)
+    expect(ledger.research_records[3]?.source_id).toBe('tyco_ty4251_series_ty_b')
+    expect(ledger.research_records[3]?.model_status).toBe('manufacturer_verified')
+    expect(ledger.correction_records).toHaveLength(3)
+    expect(ledger.summary.promoted_count).toBe(3)
   })
 
   test('step.parts candidates cannot self-promote to manufacturer verified', () => {
