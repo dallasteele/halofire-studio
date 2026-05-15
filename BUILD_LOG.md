@@ -1275,3 +1275,22 @@ User direction across 4 messages this session:
 - Next blocker: still no additional source-backed family is ready for
   promotion; wait for new manufacturer/distributor evidence before the
   next catalog status change.
+
+### Entry 37 - Halo Forge Stream F blocker recheck
+
+- Re-checked the on-disk catalog truth surface and confirmed it remains
+  84 components: 36 `manufacturer_verified`, 1
+  `dimensioned_parametric` distributor-backed family
+  (`pendent_standard_ferguson`), and 47 `visual_reference` procedural
+  parts.
+- Confirmed there is still no additional source-backed family with
+  verified dimensions and an approved source/license path ready for
+  promotion in this slice.
+- Queried the local GX10/OpenClaw brain bridge successfully through
+  `C:/Python312/python.exe scripts/brain_sync_session.py start --source
+  codex ...`; the remote `session-start` and `recall` curls returned
+  `Internal Server Error`, so the local sync path is the only working
+  brain readback route I could use this run.
+- Next blocker: obtain a real source-backed family with verified
+  dimensions and an approved source/license path before the next
+  promotion attempt.

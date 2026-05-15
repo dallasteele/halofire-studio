@@ -20,7 +20,12 @@ only promoted when the source-license and verification gates are met.
 See `SOURCES.json` and `family_contracts.json` for the current on-disk
 truth surface.
 
-## M1 contents
+## Legacy M1 contents
+
+Historical starter set from the original salvage pass. The authoritative live
+truth surface is `SOURCES.json`, `component_map.json`, and
+`family_contracts.json`; use those files for current status, licensing, and
+verification counts.
 
 | Count | Category |
 |---|---|
