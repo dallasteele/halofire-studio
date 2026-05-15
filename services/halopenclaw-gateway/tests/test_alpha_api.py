@@ -257,6 +257,8 @@ def test_portal_bundle_includes_real_artifacts_and_signed_downloads(tmp_path: Pa
     payload = portal.json()
     assert payload["project_id"] == "alpha"
     assert payload["access"]["signed_downloads"] is True
+    assert payload["manifest"]["files"]["design"] == "design.json"
+    assert payload["manifest"]["file_refs"]["design"] == str(tmp_path / "alpha" / "deliverables" / "design.json")
     assert payload["charts"]["cost_breakdown"][0]["label"] == "Materials"
     download_names = {item["name"] for item in payload["downloads"]}
     assert "proposal.html" in download_names

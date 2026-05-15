@@ -850,6 +850,10 @@ def _portal_bundle(project_id: str) -> PortalBundle:
         key: Path(str(value)).name
         for key, value in files.items()
     }
+    manifest_public["file_refs"] = {
+        key: str(value)
+        for key, value in files.items()
+    }
     portal = PortalBundle(
         project_id=project_id,
         generated_at=str(
