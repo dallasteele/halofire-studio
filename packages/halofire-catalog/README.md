@@ -25,6 +25,17 @@ The catalog owner pipeline also emits `source_coverage_ledger.json` and
 vendor/model coverage gaps, rejected candidates, missing downloads, and
 open-source STEP provenance stay explicit.
 
+The catalog package now also exposes a typed source-research and
+correction workflow contract. Use it when you need to track the exact
+internet-backed URLs, captured files, license/redistribution status, and
+human correction decisions that led to a model staying in
+`visual_reference`, `dimensioned_parametric`, or `manufacturer_verified`.
+The step.parts directory is tracked as an open-source STEP source
+candidate only; it is not manufacturer approval and cannot self-promote a
+sprinkler family.
+The checked-in replay artifact lives at
+`data/halofire/brand/components/source_research_ledger.json`.
+
 ## Legacy M1 contents
 
 Historical starter set from the original salvage pass. The authoritative live
@@ -79,3 +90,24 @@ The canonical source ingestion policy is:
 Package consumers should use `CATALOG_SOURCE_INGESTION_POLICY` and the
 runtime schemas in `src/schema.ts` rather than inferring policy from the
 asset list.
+
+## Source research and correction workflow
+
+`src/source-research.ts` defines the typed research ledger and correction
+records used by the Stream F owner pipeline.
+
+Use it to record:
+
+- the source URL and captured file ref for each product or STEP candidate
+- license and redistribution status
+- disposition changes caused by human review or missing evidence
+- explicit blocked promotions when a distributor or open-source STEP
+  candidate cannot become manufacturer verified
+
+The ledger is intentionally stricter than the coverage file:
+
+- procedural salvage stays `visual_reference`
+- distributor salvage can land at `dimensioned_parametric`
+- manufacturer verification requires a manufacturer-backed evidence path
+- open-source STEP assets remain source candidates until provenance proves
+  the exact product or authority

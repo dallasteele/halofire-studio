@@ -72,6 +72,21 @@ export type {
   CatalogCoverageStatus,
   CatalogSourceCollectionCoverage,
 } from './source-coverage.js'
+export {
+  CatalogCorrectionActionSchema,
+  CatalogCorrectionRecordSchema,
+  CatalogSourceResearchDispositionSchema,
+  CatalogSourceResearchLedgerSchema,
+  CatalogSourceResearchRecordSchema,
+  parseSourceResearchLedger,
+} from './source-research.js'
+export type {
+  CatalogCorrectionAction,
+  CatalogCorrectionRecord,
+  CatalogSourceResearchDisposition,
+  CatalogSourceResearchLedger,
+  CatalogSourceResearchRecord,
+} from './source-research.js'
 
 // ── Legacy in-memory CATALOG + helpers (do not extend) ─────────────────
 export type {
