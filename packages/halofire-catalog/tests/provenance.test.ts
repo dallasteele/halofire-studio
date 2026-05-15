@@ -152,6 +152,8 @@ describe('provenance artifacts', () => {
       'pipe_steel_sch40_3p0in',
       'pipe_steel_sch40_4p0in',
       'pipe_steel_sch40_6p0in',
+      'pendent_residential',
+      'reliable_f156_upright_155f',
       'valve_alarm_check_4p0in',
       'valve_alarm_check_6p0in',
       'valve_alarm_check_8p0in',
@@ -169,7 +171,7 @@ describe('provenance artifacts', () => {
       expect(component?.family_contract.dimensions_verified).toBe(true)
     }
 
-    for (const key of ['pipe_steel_sch40_2p0in', 'fitting_tee_2p0in', 'valve_check_2p5in']) {
+    for (const key of ['pendent_standard_ferguson']) {
       const component = byKey.get(key)
       expect(component).toBeDefined()
       expect(component?.model_status).toBe('dimensioned_parametric')
@@ -179,6 +181,36 @@ describe('provenance artifacts', () => {
       expect(component?.family_contract.model_status).toBe('dimensioned_parametric')
       expect(component?.family_contract.manufacturer_verified).toBe(false)
       expect(component?.family_contract.dimensions_verified).toBe(true)
+    }
+  })
+
+  test('Victaulic No. 10, No. 11, and No. 20 grooved fittings are manufacturer verified with IFC and DXF deliverables', () => {
+    const sources = loadJson<SourcesManifest>(SOURCES_PATH)
+    const byKey = new Map(sources.components.map((component) => [component.key, component]))
+
+    for (const key of [
+      'victaulic_no10_elbow_90_grooved_2in',
+      'victaulic_no10_elbow_90_grooved_4in',
+      'victaulic_no10_elbow_90_grooved_6in',
+      'victaulic_no11_elbow_45_grooved_2in',
+      'victaulic_no11_elbow_45_grooved_4in',
+      'victaulic_no20_tee_grooved_2in',
+      'victaulic_no20_tee_grooved_4in',
+      'victaulic_no20_tee_grooved_6in',
+    ]) {
+      const component = byKey.get(key)
+      expect(component).toBeDefined()
+      expect(component?.model_status).toBe('manufacturer_verified')
+      expect(component?.manufacturer_verified).toBe(true)
+      expect(component?.dimensions_verified).toBe(true)
+      expect(component?.source_kind).toBe('manufacturer')
+      expect(component?.source_license.model_status).toBe('manufacturer_verified')
+      expect(component?.family_contract.model_status).toBe('manufacturer_verified')
+      expect(component?.family_contract.manufacturer_verified).toBe(true)
+      expect(component?.family_contract.dimensions_verified).toBe(true)
+      expect(component?.family_contract.ifc_path).toBe(`${key}.ifc`)
+      expect(component?.family_contract.dxf_path).toBe(`${key}.dxf`)
+      expect(component?.family_contract.source_license_ref).toBe(component?.source_license_ref)
     }
   })
 })
