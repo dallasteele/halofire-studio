@@ -53,6 +53,25 @@ export {
   safeParseCatalog,
 } from './schema.js'
 export { CATALOG_SOURCE_INGESTION_POLICY } from './source-policy.js'
+export {
+  CatalogCoverageAssetKindSchema,
+  CatalogCoverageAssetSchema,
+  CatalogCoverageAssetStatusSchema,
+  CatalogCoverageLedgerSchema,
+  CatalogCoverageRowSchema,
+  CatalogCoverageStatusSchema,
+  CatalogSourceCollectionCoverageSchema,
+  parseCoverageLedger,
+} from './source-coverage.js'
+export type {
+  CatalogCoverageAsset,
+  CatalogCoverageAssetKind,
+  CatalogCoverageAssetStatus,
+  CatalogCoverageLedger,
+  CatalogCoverageRow,
+  CatalogCoverageStatus,
+  CatalogSourceCollectionCoverage,
+} from './source-coverage.js'
 
 // ── Legacy in-memory CATALOG + helpers (do not extend) ─────────────────
 export type {

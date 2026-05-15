@@ -20,6 +20,11 @@ only promoted when the source-license and verification gates are met.
 See `SOURCES.json` and `family_contracts.json` for the current on-disk
 truth surface.
 
+The catalog owner pipeline also emits `source_coverage_ledger.json` and
+`THIRD_PARTY_NOTICES.md` under `data/halofire/brand/components/` so
+vendor/model coverage gaps, rejected candidates, missing downloads, and
+open-source STEP provenance stay explicit.
+
 ## Legacy M1 contents
 
 Historical starter set from the original salvage pass. The authoritative live

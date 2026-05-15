@@ -1,0 +1,83 @@
+/**
+ * Stream F source coverage regression.
+ *
+ * The catalog owner pipeline must surface coverage gaps explicitly:
+ * source collections, vendor/model rows, missing downloads, and rejected
+ * candidates. The generated ledger is the contract.
+ */
+import { describe, expect, test } from 'bun:test'
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
+import { CatalogCoverageLedgerSchema } from '../src/index.js'
+
+const COMPONENT_DIR = resolve(
+  import.meta.dirname,
+  '..',
+  '..',
+  '..',
+  '..',
+  'data',
+  'halofire',
+  'brand',
+  'components',
+)
+
+const LEDGER_PATH = resolve(COMPONENT_DIR, 'source_coverage_ledger.json')
+const THIRD_PARTY_NOTICES_PATH = resolve(COMPONENT_DIR, 'THIRD_PARTY_NOTICES.md')
+
+function loadJson<T>(path: string): T {
+  return JSON.parse(readFileSync(path, 'utf-8')) as T
+}
+
+describe('source coverage ledger', () => {
+  test('generated ledger validates and carries the step.parts source candidate', () => {
+    const ledger = CatalogCoverageLedgerSchema.parse(loadJson(LEDGER_PATH))
+
+    expect(ledger.scope).toContain('Stream F')
+    expect(ledger.source_collections).toHaveLength(1)
+
+    const [stepParts] = ledger.source_collections
+    expect(stepParts.source_id).toBe('step.parts')
+    expect(stepParts.source_kind).toBe('open_source_step_directory')
+    expect(stepParts.public_url).toBe('https://www.step.parts')
+    expect(stepParts.repo_url).toBe('https://github.com/earthtojake/step.parts')
+    expect(stepParts.license_spdx).toBe('MIT')
+    expect(stepParts.third_party_notice_ref).toBe('THIRD_PARTY_NOTICES.md')
+    expect(stepParts.redistribution_blocked).toBe(true)
+
+    expect(ledger.vendor_model_coverage.length).toBeGreaterThan(0)
+    expect(ledger.summary.total_rows).toBe(ledger.vendor_model_coverage.length)
+    expect(ledger.summary.missing_download_count).toBeGreaterThan(0)
+    expect(ledger.summary.rejected_candidate_count).toBeGreaterThan(0)
+    expect(ledger.missing_downloads).toContain('pendent_standard:step')
+    expect(ledger.rejected_candidates).toContain('pendent_standard_ferguson')
+
+    const tyco = ledger.vendor_model_coverage.find(
+      (row) => row.part_ref === 'pendent_standard',
+    )
+    expect(tyco).toBeDefined()
+    expect(tyco?.coverage_status).toBe('promoted')
+    expect(tyco?.asset_coverage.map((asset) => asset.kind)).toEqual([
+      'product_page',
+      'image',
+      'cut_sheet',
+      'glb',
+      'ifc',
+      'dxf',
+      'step',
+      'revit',
+      'dwg',
+      'third_party_notice',
+    ])
+    expect(tyco?.asset_coverage.find((asset) => asset.kind === 'product_page')?.status).toBe('available')
+    expect(tyco?.asset_coverage.find((asset) => asset.kind === 'step')?.status).toBe('missing')
+    expect(tyco?.asset_coverage.find((asset) => asset.kind === 'third_party_notice')?.status).toBe('missing')
+  })
+
+  test('third-party notice file documents the open-source STEP provenance policy', () => {
+    const notices = readFileSync(THIRD_PARTY_NOTICES_PATH, 'utf-8')
+    expect(notices).toContain('step.parts source candidate')
+    expect(notices).toContain('https://www.step.parts')
+    expect(notices).toContain('https://github.com/earthtojake/step.parts')
+  })
+})
