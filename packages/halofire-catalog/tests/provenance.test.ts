@@ -139,4 +139,46 @@ describe('provenance artifacts', () => {
       }
     }
   })
+
+  test('the current verified pipe and alarm-check families are promoted while known upgrade candidates stay dimensioned', () => {
+    const sources = loadJson<SourcesManifest>(SOURCES_PATH)
+    const byKey = new Map(sources.components.map((component) => [component.key, component]))
+
+    const promotedKeys = [
+      'pipe_steel_sch40_1p0in',
+      'pipe_steel_sch40_1p25in',
+      'pipe_steel_sch40_1p5in',
+      'pipe_steel_sch40_2p5in',
+      'pipe_steel_sch40_3p0in',
+      'pipe_steel_sch40_4p0in',
+      'pipe_steel_sch40_6p0in',
+      'valve_alarm_check_4p0in',
+      'valve_alarm_check_6p0in',
+      'valve_alarm_check_8p0in',
+    ]
+
+    for (const key of promotedKeys) {
+      const component = byKey.get(key)
+      expect(component).toBeDefined()
+      expect(component?.model_status).toBe('manufacturer_verified')
+      expect(component?.manufacturer_verified).toBe(true)
+      expect(component?.dimensions_verified).toBe(true)
+      expect(component?.source_license.model_status).toBe('manufacturer_verified')
+      expect(component?.family_contract.model_status).toBe('manufacturer_verified')
+      expect(component?.family_contract.manufacturer_verified).toBe(true)
+      expect(component?.family_contract.dimensions_verified).toBe(true)
+    }
+
+    for (const key of ['pipe_steel_sch40_2p0in', 'fitting_tee_2p0in', 'valve_check_2p5in']) {
+      const component = byKey.get(key)
+      expect(component).toBeDefined()
+      expect(component?.model_status).toBe('dimensioned_parametric')
+      expect(component?.manufacturer_verified).toBe(false)
+      expect(component?.dimensions_verified).toBe(true)
+      expect(component?.source_license.model_status).toBe('dimensioned_parametric')
+      expect(component?.family_contract.model_status).toBe('dimensioned_parametric')
+      expect(component?.family_contract.manufacturer_verified).toBe(false)
+      expect(component?.family_contract.dimensions_verified).toBe(true)
+    }
+  })
 })
