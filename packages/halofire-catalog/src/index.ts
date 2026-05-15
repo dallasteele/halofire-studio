@@ -77,14 +77,17 @@ export {
   CatalogCorrectionRecordSchema,
   CatalogSourceResearchDispositionSchema,
   CatalogSourceResearchLedgerSchema,
+  CatalogSourceResearchSeedSchema,
   CatalogSourceResearchRecordSchema,
   parseSourceResearchLedger,
+  summarizeSourceResearchLedger,
 } from './source-research.js'
 export type {
   CatalogCorrectionAction,
   CatalogCorrectionRecord,
   CatalogSourceResearchDisposition,
   CatalogSourceResearchLedger,
+  CatalogSourceResearchSeed,
   CatalogSourceResearchRecord,
 } from './source-research.js'
 

@@ -35,6 +35,9 @@ candidate only; it is not manufacturer approval and cannot self-promote a
 sprinkler family.
 The checked-in replay artifact lives at
 `data/halofire/brand/components/source_research_ledger.json`.
+The replay artifact is generated from
+`scripts/build_halofire_catalog_source_research.py` and the checked-in
+seed at `data/halofire/brand/components/source_research_seed.json`.
 
 ## Legacy M1 contents
 

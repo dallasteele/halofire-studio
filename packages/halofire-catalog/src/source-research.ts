@@ -381,6 +381,36 @@ export const CatalogSourceResearchLedgerSchema: z.ZodType<CatalogSourceResearchL
     }),
   })
 
+export type CatalogSourceResearchSeed = Omit<
+  CatalogSourceResearchLedger,
+  'summary'
+>
+
+export const CatalogSourceResearchSeedSchema: z.ZodType<CatalogSourceResearchSeed> = (
+  CatalogSourceResearchLedgerSchema as unknown as z.AnyZodObject
+).omit({ summary: true }) as unknown as z.ZodType<CatalogSourceResearchSeed>
+
+export function summarizeSourceResearchLedger(
+  ledger: Pick<CatalogSourceResearchLedger, 'research_records' | 'correction_records'>,
+): CatalogSourceResearchLedger['summary'] {
+  return {
+    total_records: ledger.research_records.length,
+    candidate_count: ledger.research_records.filter(
+      (record) => record.disposition === 'candidate',
+    ).length,
+    blocked_count: ledger.research_records.filter(
+      (record) => record.disposition === 'blocked',
+    ).length,
+    rejected_count: ledger.research_records.filter(
+      (record) => record.disposition === 'rejected',
+    ).length,
+    promoted_count: ledger.research_records.filter(
+      (record) => record.disposition === 'promoted',
+    ).length,
+    correction_count: ledger.correction_records.length,
+  }
+}
+
 export function parseSourceResearchLedger(raw: unknown): CatalogSourceResearchLedger {
   return CatalogSourceResearchLedgerSchema.parse(raw)
 }

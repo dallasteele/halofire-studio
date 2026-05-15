@@ -12,7 +12,9 @@ import { resolve } from 'node:path'
 import {
   CatalogCorrectionRecordSchema,
   CatalogSourceResearchLedgerSchema,
+  CatalogSourceResearchSeedSchema,
   CatalogSourceResearchRecordSchema,
+  summarizeSourceResearchLedger,
 } from '../src/index.js'
 
 const COMPONENT_DIR = resolve(
@@ -27,9 +29,23 @@ const COMPONENT_DIR = resolve(
   'components',
 )
 
+const SEED_PATH = resolve(COMPONENT_DIR, 'source_research_seed.json')
 const LEDGER_PATH = resolve(COMPONENT_DIR, 'source_research_ledger.json')
 
 describe('source research ledger contract', () => {
+  test('checked-in research seed validates and carries the step.parts candidate', () => {
+    const seed = CatalogSourceResearchSeedSchema.parse(
+      JSON.parse(readFileSync(SEED_PATH, 'utf-8')),
+    )
+
+    expect(seed.source_collections).toHaveLength(1)
+    expect(seed.source_collections[0]?.source_id).toBe('step.parts')
+    expect(seed.research_records.some((record) => record.source_id === 'step.parts')).toBe(true)
+    expect(seed.research_records.some((record) => record.source_id === 'ferguson_tyco_ty3251_spec')).toBe(true)
+    expect(seed.research_records.some((record) => record.source_id === 'tyco_ty3251_tyb')).toBe(true)
+    expect(seed.correction_records).toHaveLength(2)
+  })
+
   test('checked-in research ledger validates and carries the step.parts candidate', () => {
     const ledger = CatalogSourceResearchLedgerSchema.parse(
       JSON.parse(readFileSync(LEDGER_PATH, 'utf-8')),
@@ -39,11 +55,13 @@ describe('source research ledger contract', () => {
     expect(ledger.source_collections[0]?.source_id).toBe('step.parts')
     expect(ledger.source_collections[0]?.license_spdx).toBe('MIT')
     expect(ledger.research_records.some((record) => record.source_id === 'step.parts')).toBe(true)
+    expect(ledger.research_records.some((record) => record.source_id === 'ferguson_tyco_ty3251_spec')).toBe(true)
     expect(ledger.research_records.some((record) => record.part_ref === 'pendent_standard')).toBe(true)
-    expect(ledger.correction_records).toHaveLength(1)
+    expect(ledger.correction_records).toHaveLength(2)
+    expect(ledger.summary).toEqual(summarizeSourceResearchLedger(ledger))
   })
 
-  test('parses a mixed research ledger with the step.parts candidate and a manufacturer-backed record', () => {
+  test('parses a mixed research ledger with the step.parts candidate, distributor salvage, and a manufacturer-backed record', () => {
     const ledger = CatalogSourceResearchLedgerSchema.parse({
       generated_at_utc: '2026-05-15T19:30:00Z',
       scope: 'Halo Forge Stream F catalog source research and correction workflow',
@@ -81,6 +99,28 @@ describe('source research ledger contract', () => {
           notes: 'Source candidate only; useful for open-source STEP ingestion, not sprinkler approval.',
         },
         {
+          part_ref: 'pendent_standard_ferguson',
+          source_id: 'ferguson_tyco_ty3251_spec',
+          source_kind: 'distributor',
+          manufacturer: 'Tyco Fire Protection',
+          model: 'TY3251',
+          public_url: 'https://api.ferguson.com/dar-step-service/Query?ASSET_ID=4685770&PRODUCT_ID=1959635&USE_TYPE=SPECIFICATION',
+          source_url:
+            'https://api.ferguson.com/dar-step-service/Query?ASSET_ID=4685770&PRODUCT_ID=1959635&USE_TYPE=SPECIFICATION',
+          source_file_ref: 'E:/ClaudeBot/halofire-studio/packages/halofire-catalog/cut_sheets/ferguson_tyco_ty3251_spec.pdf',
+          third_party_notice_ref: null,
+          capture_date: '2026-05-15T05:03:05.031677Z',
+          license_summary: 'Ferguson-hosted Tyco TY3251 specification page used to derive a dimensioned parametric proxy; redistribution blocked until manufacturer verification is completed.',
+          redistribution_blocked: true,
+          model_status: 'dimensioned_parametric',
+          disposition: 'promoted',
+          evidence_refs: [
+            'https://api.ferguson.com/dar-step-service/Query?ASSET_ID=4685770&PRODUCT_ID=1959635&USE_TYPE=SPECIFICATION',
+            'E:/ClaudeBot/halofire-studio/packages/halofire-catalog/cut_sheets/ferguson_tyco_ty3251_spec.pdf',
+          ],
+          notes: 'Distributor-backed salvage remains a dimensioned parametric proxy until a manufacturer-backed evidence path exists.',
+        },
+        {
           part_ref: 'pendent_standard',
           source_id: 'tyco_ty3251_tyb',
           source_kind: 'manufacturer',
@@ -97,11 +137,29 @@ describe('source research ledger contract', () => {
           redistribution_blocked: true,
           model_status: 'manufacturer_verified',
           disposition: 'promoted',
-          evidence_refs: ['SOURCES.json', 'component_map.json'],
+          evidence_refs: [
+            'https://docs.johnsoncontrols.com/tycofire/api/khub/documents/Y5s5g2HZNr6Um_t5iOK7dw/content',
+            'E:/ClaudeBot/halofire-studio/packages/halofire-catalog/cut_sheets/tyco_ty3251_tyb.pdf',
+          ],
           notes: 'Manufacturer-backed source research row for the official TY3251 family.',
         },
       ],
       correction_records: [
+        {
+          part_ref: 'pendent_standard_ferguson',
+          source_kind: 'distributor',
+          from_status: 'visual_reference',
+          to_status: 'dimensioned_parametric',
+          action: 'promote_dimensioned_parametric',
+          reason: 'Distributor specification and captured dimensions are both verified.',
+          evidence_refs: [
+            'https://api.ferguson.com/dar-step-service/Query?ASSET_ID=4685770&PRODUCT_ID=1959635&USE_TYPE=SPECIFICATION',
+            'E:/ClaudeBot/halofire-studio/packages/halofire-catalog/cut_sheets/ferguson_tyco_ty3251_spec.pdf',
+          ],
+          reviewer: 'stream-f-owner',
+          captured_at_utc: '2026-05-15T19:30:00Z',
+          notes: 'Distributor-backed correction stays below manufacturer verification.',
+        },
         {
           part_ref: 'pendent_standard',
           source_kind: 'manufacturer',
@@ -109,30 +167,35 @@ describe('source research ledger contract', () => {
           to_status: 'manufacturer_verified',
           action: 'promote_manufacturer_verified',
           reason: 'Manufacturer cut sheet and dimensions are both verified.',
-          evidence_refs: ['SOURCES.json', 'component_map.json'],
+          evidence_refs: [
+            'https://docs.johnsoncontrols.com/tycofire/api/khub/documents/Y5s5g2HZNr6Um_t5iOK7dw/content',
+            'E:/ClaudeBot/halofire-studio/packages/halofire-catalog/cut_sheets/tyco_ty3251_tyb.pdf',
+          ],
           reviewer: 'stream-f-owner',
           captured_at_utc: '2026-05-15T19:30:00Z',
           notes: 'Valid manufacturer-backed promotion path.',
         },
       ],
       summary: {
-        total_records: 2,
+        total_records: 3,
         candidate_count: 1,
         blocked_count: 0,
         rejected_count: 0,
-        promoted_count: 1,
-        correction_count: 1,
+        promoted_count: 2,
+        correction_count: 2,
       },
     })
 
     expect(ledger.source_collections).toHaveLength(1)
-    expect(ledger.research_records).toHaveLength(2)
+    expect(ledger.research_records).toHaveLength(3)
     expect(ledger.research_records[0]?.source_id).toBe('step.parts')
     expect(ledger.research_records[0]?.redistribution_blocked).toBe(true)
     expect(ledger.research_records[0]?.model_status).toBe('visual_reference')
-    expect(ledger.research_records[1]?.model_status).toBe('manufacturer_verified')
-    expect(ledger.correction_records).toHaveLength(1)
-    expect(ledger.summary.promoted_count).toBe(1)
+    expect(ledger.research_records[1]?.source_kind).toBe('distributor')
+    expect(ledger.research_records[1]?.model_status).toBe('dimensioned_parametric')
+    expect(ledger.research_records[2]?.model_status).toBe('manufacturer_verified')
+    expect(ledger.correction_records).toHaveLength(2)
+    expect(ledger.summary.promoted_count).toBe(2)
   })
 
   test('step.parts candidates cannot self-promote to manufacturer verified', () => {
