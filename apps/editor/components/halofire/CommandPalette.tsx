@@ -48,7 +48,7 @@ const DEFAULT_ENTRIES: Entry[] = [
   { id: 'cmd.submittal',     label: 'Generate submittal',     group: 'Report',  cmd: 'report-submittal' },
   { id: 'cmd.dxf',           label: 'Export DXF',             group: 'Report',  cmd: 'report-export-dxf' },
   { id: 'cmd.ifc',           label: 'Export IFC',             group: 'Report',  cmd: 'report-export-ifc' },
-  { id: 'cmd.send',          label: 'Send bid to client',     group: 'Report',  cmd: 'report-send-to-client', hint: 'Opens proposal.html', keywords: ['deliver', 'portal'] },
+  { id: 'cmd.send',          label: 'Send bid to client',     group: 'Report',  cmd: 'report-send-to-client', hint: 'Opens signed client bid page', keywords: ['deliver', 'portal'] },
   // File
   { id: 'cmd.new',           label: 'New bid',                group: 'File',    cmd: 'bid-new' },
   { id: 'cmd.load',          label: 'Load bid',               group: 'File',    cmd: 'bid-load' },

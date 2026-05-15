@@ -38,6 +38,7 @@ import { StatusBar } from '@/components/halofire/StatusBar'
 import { ToolOverlay } from '@/components/halofire/ToolOverlay'
 import { ReportTab } from '@/components/halofire/ReportTab'
 import { ToolManagerProvider, useToolManager } from '@/lib/tools'
+import { buildClientBidShareUrl } from '@/lib/halofire/bid-share-url'
 // Side-effect imports — each module registers its Tool with the
 // global ToolRegistry. This must run before ToolManagerProvider
 // attempts to activate anything.
@@ -318,8 +319,9 @@ function dispatchRibbon(cmd: RibbonCommand): void {
   )
   // Quick one-off actions without their own panel handler:
   if (cmd === 'report-send-to-client') {
-    // Open the bundled bid demo in a new tab for now.
-    window.open(`/bid-demo/${ACTIVE_PROJECT_ID}/proposal.html`, '_blank')
+    const gw = process.env.NEXT_PUBLIC_HALOPENCLAW_URL ?? 'http://localhost:18080'
+    const shareUrl = buildClientBidShareUrl(gw, ACTIVE_PROJECT_ID, window.location.search)
+    window.open(shareUrl, '_blank', 'noopener,noreferrer')
   }
   // V2 Phase 5.1: AHJ submittal — open the NFPA 8-section JSON in a
   // new tab. Once Phase 5.5 ships an HTML renderer this becomes a
@@ -341,7 +343,8 @@ function dispatchRibbon(cmd: RibbonCommand): void {
     fetch(`${gw}/projects/${ACTIVE_PROJECT_ID}/approve`, {
       method: 'POST',
     }).catch(() => {/* best effort */})
-    window.open(`/bid-demo/${ACTIVE_PROJECT_ID}/proposal.html`, '_blank')
+    const shareUrl = buildClientBidShareUrl(gw, ACTIVE_PROJECT_ID, window.location.search)
+    window.open(shareUrl, '_blank', 'noopener,noreferrer')
   }
 }
 

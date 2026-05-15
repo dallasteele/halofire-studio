@@ -257,7 +257,7 @@ const TABS: Record<RibbonTab, Group[]> = {
       label: 'Approve',
       buttons: [
         { cmd: 'report-approve-submit', label: 'Approve & Submit', abbr: 'Apprv', hint: 'Mark bid pe-reviewed, send to client + AHJ', tone: 'accent', glyph: g.approve },
-        { cmd: 'report-send-to-client', label: 'Send bid',         abbr: 'Send',  hint: 'Deliver proposal.html + design.glb to the client portal', glyph: g.sendBid },
+        { cmd: 'report-send-to-client', label: 'Send bid',         abbr: 'Send',  hint: 'Deliver the signed client bid page + real portal artifacts', glyph: g.sendBid },
       ],
     },
   ],
