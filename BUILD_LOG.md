@@ -1236,3 +1236,22 @@ User direction across 4 messages this session:
   checks the Ferguson attribution explicitly.
 - Verification pending for this slice: targeted catalog tests and the
   workspace rulebook check still need to run before commit.
+
+### Entry 35 - Halo Forge Stream F blocker capture
+
+- Re-checked the live catalog truth surface and confirmed the current
+  state is unchanged: 36 `manufacturer_verified` components, 1
+  `dimensioned_parametric` distributor salvage family
+  (`pendent_standard_ferguson`), and 47 `visual_reference` procedural
+  parts.
+- Confirmed there is no new manufacturer/distributor-backed family with
+  verified source evidence and dimensions ready for promotion in this
+  slice.
+- Kept the on-disk policy unchanged: procedural assets remain
+  `visual_reference`, distributor salvage cannot self-promote, and
+  manufacturer verification still requires source-backed evidence.
+- Verification for this slice is limited to the rulebook check:
+  `C:/Python312/python.exe scripts/verify_agentic_rules.py`.
+- Next blocker: obtain a real source-backed family with verified
+  dimensions and an approved source/license path before the next
+  catalog promotion attempt.
