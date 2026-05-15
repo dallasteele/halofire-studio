@@ -1255,3 +1255,23 @@ User direction across 4 messages this session:
 - Next blocker: obtain a real source-backed family with verified
   dimensions and an approved source/license path before the next
   catalog promotion attempt.
+
+### Entry 36 - Halo Forge Stream F status-lock hardening
+
+- Tightened the catalog schema so `source_license.model_status`,
+  `family_contract.model_status`, and the component `model_status`
+  must stay aligned, and `part_ref` must match the component SKU.
+- Added regressions that fail on mismatched source/family status or
+  mismatched part refs, plus a provenance test that locks the live
+  `family_contracts.json` file to the current on-disk truth surface.
+- Updated the catalog README and source-policy comment to spell out
+  the lockstep status contract for promoted families.
+- Verification passed:
+  `C:/Python312/python.exe scripts/verify_agentic_rules.py`,
+  `bun run --cwd E:\\ClaudeBot\\halofire-studio\\packages\\halofire-catalog check-types`,
+  and `bun test E:\\ClaudeBot\\halofire-studio\\packages\\halofire-catalog\\tests\\schema.test.ts
+  E:\\ClaudeBot\\halofire-studio\\packages\\halofire-catalog\\tests\\provenance.test.ts`.
+- Run time: 2026-05-15T13:10:42.4617918Z
+- Next blocker: still no additional source-backed family is ready for
+  promotion; wait for new manufacturer/distributor evidence before the
+  next catalog status change.

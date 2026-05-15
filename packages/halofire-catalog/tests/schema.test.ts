@@ -174,6 +174,87 @@ describe('catalog.json matches the canonical schema', () => {
     expect(result.success).toBe(true)
   })
 
+  test('catalog entries reject mismatched source license and family contract status', () => {
+    const result = CatalogEntrySchema.safeParse({
+      sku: 'demo_status_mismatch',
+      kind: 'sprinkler_head',
+      category: 'head.demo',
+      display_name: 'Demo Status Mismatch Part',
+      manufacturer: 'DemoCo',
+      model_status: 'manufacturer_verified',
+      source_license: {
+        part_ref: 'demo_status_mismatch',
+        source_kind: 'manufacturer',
+        manufacturer: 'DemoCo',
+        public_url: 'https://example.com/demo',
+        source_url: 'https://example.com/demo',
+        source_file_ref: 'demo.pdf',
+        terms_summary: 'Status mismatch should fail.',
+        allowed_internal_use: true,
+        allowed_client_render: true,
+        allowed_download: false,
+        redistribution_blocked: true,
+        source_captured_at: '2026-05-11T00:00:00Z',
+        model_status: 'manufacturer_verified',
+      },
+      family_contract: {
+        part_ref: 'demo_status_mismatch',
+        glb_path: 'demo_status_mismatch.glb',
+        ifc_path: 'demo_status_mismatch.ifc',
+        dxf_path: 'demo_status_mismatch.dxf',
+        model_status: 'dimensioned_parametric',
+        manufacturer_verified: false,
+        dimensions_verified: true,
+        source_license_ref: 'license:demo_status_mismatch',
+        evidence_refs: ['SOURCES.json'],
+      },
+      params: {},
+      ports: [],
+      scad_source: 'demo_status_mismatch.scad',
+      warnings: [],
+    })
+    expect(result.success).toBe(false)
+  })
+
+  test('catalog entries reject mismatched part refs on source and family contracts', () => {
+    const result = CatalogEntrySchema.safeParse({
+      sku: 'demo_part_ref_mismatch',
+      kind: 'sprinkler_head',
+      category: 'head.demo',
+      display_name: 'Demo Part Ref Mismatch',
+      manufacturer: 'DemoCo',
+      model_status: 'visual_reference',
+      source_license: {
+        part_ref: 'demo_part_ref_mismatch_source',
+        source_kind: 'procedural',
+        manufacturer: 'DemoCo',
+        terms_summary: 'Part ref mismatch should fail.',
+        allowed_internal_use: true,
+        allowed_client_render: true,
+        allowed_download: false,
+        redistribution_blocked: true,
+        source_captured_at: '2026-05-11T00:00:00Z',
+        model_status: 'visual_reference',
+      },
+      family_contract: {
+        part_ref: 'demo_part_ref_mismatch_family',
+        glb_path: 'demo_part_ref_mismatch.glb',
+        ifc_path: null,
+        dxf_path: null,
+        model_status: 'visual_reference',
+        manufacturer_verified: false,
+        dimensions_verified: false,
+        source_license_ref: 'license:demo_part_ref_mismatch',
+        evidence_refs: ['SOURCES.json'],
+      },
+      params: {},
+      ports: [],
+      scad_source: 'demo_part_ref_mismatch.scad',
+      warnings: [],
+    })
+    expect(result.success).toBe(false)
+  })
+
   test('visual_reference family contracts cannot expose IFC or DXF paths', () => {
     const result = CatalogEntrySchema.safeParse({
       sku: 'demo_visual',

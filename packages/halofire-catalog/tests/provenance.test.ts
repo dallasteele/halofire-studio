@@ -36,6 +36,7 @@ const COMPONENT_DIR = resolve(
 
 const SOURCES_PATH = resolve(COMPONENT_DIR, 'SOURCES.json')
 const COMPONENT_MAP_PATH = resolve(COMPONENT_DIR, 'component_map.json')
+const FAMILY_CONTRACTS_PATH = resolve(COMPONENT_DIR, 'family_contracts.json')
 
 type SourceEntry = {
   key: string
@@ -43,8 +44,23 @@ type SourceEntry = {
   family_contract_ref: string
   source_kind: 'procedural' | 'manufacturer' | 'distributor'
   model_status: 'visual_reference' | 'dimensioned_parametric' | 'manufacturer_verified' | 'halo_fire_approved'
-  source_license: unknown
-  family_contract: unknown
+  source_license: {
+    part_ref: string
+    model_status: SourceEntry['model_status']
+    source_kind?: SourceEntry['source_kind']
+  }
+  family_contract: {
+    part_ref: string
+    ref: string
+    glb_path: string
+    ifc_path: string | null
+    dxf_path: string | null
+    model_status: SourceEntry['model_status']
+    manufacturer_verified: boolean
+    dimensions_verified: boolean
+    source_license_ref: string | null
+    evidence_refs: string[]
+  }
 }
 
 type SourcesManifest = {
@@ -139,6 +155,55 @@ describe('provenance artifacts', () => {
         expect(family.ifc_path).not.toBeNull()
         expect(family.dxf_path).not.toBeNull()
       }
+    }
+  })
+
+  test('family_contracts.json stays aligned with the per-component source and family status contract', () => {
+    const sources = loadJson<SourcesManifest>(SOURCES_PATH)
+    const familyContracts = loadJson<{
+      generated_at_utc: string
+      contracts: Array<{
+        ref: string
+        part_ref: string
+        glb_path: string
+        ifc_path: string | null
+        dxf_path: string | null
+        model_status: SourceEntry['model_status']
+        manufacturer_verified: boolean
+        dimensions_verified: boolean
+        source_license_ref: string | null
+        evidence_refs: string[]
+      }>
+    }>(FAMILY_CONTRACTS_PATH)
+
+    const sourceByKey = new Map(sources.components.map((component) => [component.key, component]))
+    const contractByPart = new Map(
+      familyContracts.contracts.map((contract) => [contract.part_ref, contract]),
+    )
+
+    expect(familyContracts.contracts.length).toBe(sources.components.length)
+
+    for (const component of sources.components) {
+      const contract = contractByPart.get(component.key)
+      expect(contract).toBeDefined()
+      expect(contract?.part_ref).toBe(component.key)
+      expect(contract?.ref).toBe(component.family_contract_ref)
+      expect(contract?.glb_path).toBe(component.family_contract.glb_path)
+      expect(contract?.ifc_path).toBe(component.family_contract.ifc_path ?? null)
+      expect(contract?.dxf_path).toBe(component.family_contract.dxf_path ?? null)
+      expect(contract?.model_status).toBe(component.model_status)
+      expect(contract?.manufacturer_verified).toBe(
+        component.manufacturer_verified,
+      )
+      expect(contract?.dimensions_verified).toBe(component.dimensions_verified)
+      expect(contract?.source_license_ref).toBe(component.source_license_ref)
+      expect(contract?.evidence_refs).toEqual(['SOURCES.json', 'component_map.json'])
+      expect(sourceByKey.get(component.key)?.source_license.model_status).toBe(
+        component.model_status,
+      )
+      expect(sourceByKey.get(component.key)?.family_contract.model_status).toBe(
+        component.model_status,
+      )
     }
   })
 

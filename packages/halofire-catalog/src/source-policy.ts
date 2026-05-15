@@ -16,6 +16,8 @@ import type { CatalogSourceIngestionPolicy } from './types.js'
  * `allowed_internal_use=true` and `allowed_client_render=true`; manufacturer
  * and distributor source records additionally require
  * `allowed_download=false` and `redistribution_blocked=true`.
+ * The catalog entry, source license, and family contract status fields
+ * must stay in lockstep for every promoted family.
  */
 export const CATALOG_SOURCE_INGESTION_POLICY = {
   allowed_sources: ['procedural', 'manufacturer', 'distributor'],

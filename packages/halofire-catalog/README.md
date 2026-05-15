@@ -63,6 +63,8 @@ The canonical source ingestion policy is:
   `allowed_download=false` and `redistribution_blocked=true`
 - `manufacturer_verified` still requires manufacturer-backed evidence
 - `manufacturer_verified` and `dimensions_verified` must be explicit
+- component, source-license, and family-contract `model_status` fields
+  must match for every promoted family
 
 Package consumers should use `CATALOG_SOURCE_INGESTION_POLICY` and the
 runtime schemas in `src/schema.ts` rather than inferring policy from the

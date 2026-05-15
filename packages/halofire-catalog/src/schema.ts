@@ -404,7 +404,7 @@ export const CatalogSourceIngestionPolicySchema: z.ZodType<CatalogSourceIngestio
 })
 
 // ── CatalogEntry ────────────────────────────────────────────────────────
-export const CatalogEntrySchema: z.ZodType<CatalogEntry> = z.object({
+const CatalogEntrySchemaBase = z.object({
   sku: z.string().min(1),
   kind: PartKindSchema,
   category: z.string(), // dotted category — not enum-restricted on purpose
@@ -436,6 +436,61 @@ export const CatalogEntrySchema: z.ZodType<CatalogEntry> = z.object({
   scad_source: z.string().min(1),
   warnings: z.array(z.string()),
 })
+
+export const CatalogEntrySchema: z.ZodType<CatalogEntry> =
+  CatalogEntrySchemaBase.superRefine((value, ctx) => {
+    const sourceLicense = value.source_license
+    const familyContract = value.family_contract
+
+    if (sourceLicense && sourceLicense.part_ref !== value.sku) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['source_license', 'part_ref'],
+        message: 'source_license.part_ref must match sku',
+      })
+    }
+    if (familyContract && familyContract.part_ref !== value.sku) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['family_contract', 'part_ref'],
+        message: 'family_contract.part_ref must match sku',
+      })
+    }
+    if (
+      value.model_status &&
+      sourceLicense &&
+      sourceLicense.model_status !== value.model_status
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['source_license', 'model_status'],
+        message: 'source_license.model_status must match the component model_status',
+      })
+    }
+    if (
+      value.model_status &&
+      familyContract &&
+      familyContract.model_status !== value.model_status
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['family_contract', 'model_status'],
+        message: 'family_contract.model_status must match the component model_status',
+      })
+    }
+    if (
+      sourceLicense &&
+      familyContract &&
+      sourceLicense.model_status !== familyContract.model_status
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['family_contract', 'model_status'],
+        message:
+          'source_license.model_status and family_contract.model_status must stay aligned',
+      })
+    }
+  })
 
 // ── CatalogManifest (top-level envelope of catalog.json) ────────────────
 export const CatalogManifestSchema: z.ZodType<CatalogManifest> = z.object({
