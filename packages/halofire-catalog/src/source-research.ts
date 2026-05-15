@@ -176,13 +176,14 @@ export const CatalogSourceResearchRecordSchema: z.ZodType<CatalogSourceResearchR
     }
     if (
       value.source_kind === 'open_source_step_directory' &&
-      value.model_status === 'halo_fire_approved'
+      (value.model_status === 'manufacturer_verified' ||
+        value.model_status === 'halo_fire_approved')
     ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['model_status'],
         message:
-          'open-source STEP research records cannot claim halo_fire_approved',
+          'open-source STEP research records cannot claim manufacturer_verified or halo_fire_approved',
       })
     }
     if (

@@ -41,6 +41,10 @@ describe('source research ledger contract', () => {
     expect(seed.source_collections).toHaveLength(1)
     expect(seed.source_collections[0]?.source_id).toBe('step.parts')
     expect(seed.research_records.some((record) => record.source_id === 'step.parts')).toBe(true)
+    expect(
+      seed.research_records.find((record) => record.source_id === 'step.parts')
+        ?.source_file_ref,
+    ).toContain('source_step_parts/hebi_r25_actuator.step')
     expect(seed.research_records.some((record) => record.source_id === 'ferguson_tyco_ty3251_spec')).toBe(true)
     expect(seed.research_records.some((record) => record.source_id === 'tyco_ty3251_tyb')).toBe(true)
     expect(seed.correction_records).toHaveLength(2)
@@ -55,6 +59,10 @@ describe('source research ledger contract', () => {
     expect(ledger.source_collections[0]?.source_id).toBe('step.parts')
     expect(ledger.source_collections[0]?.license_spdx).toBe('MIT')
     expect(ledger.research_records.some((record) => record.source_id === 'step.parts')).toBe(true)
+    expect(
+      ledger.research_records.find((record) => record.source_id === 'step.parts')
+        ?.source_file_ref,
+    ).toContain('source_step_parts/hebi_r25_actuator.step')
     expect(ledger.research_records.some((record) => record.source_id === 'ferguson_tyco_ty3251_spec')).toBe(true)
     expect(ledger.research_records.some((record) => record.part_ref === 'pendent_standard')).toBe(true)
     expect(ledger.correction_records).toHaveLength(2)
@@ -63,7 +71,7 @@ describe('source research ledger contract', () => {
 
   test('parses a mixed research ledger with the step.parts candidate, distributor salvage, and a manufacturer-backed record', () => {
     const ledger = CatalogSourceResearchLedgerSchema.parse({
-      generated_at_utc: '2026-05-15T19:30:00Z',
+      generated_at_utc: '2026-05-15T21:20:27Z',
       scope: 'Halo Forge Stream F catalog source research and correction workflow',
       source_collections: [
         {
@@ -73,7 +81,7 @@ describe('source research ledger contract', () => {
           repo_url: 'https://github.com/earthtojake/step.parts',
           license_spdx: 'MIT',
           third_party_notice_ref: 'THIRD_PARTY_NOTICES.md',
-          capture_date: '2026-05-15T19:15:00Z',
+          capture_date: '2026-05-15T21:20:27Z',
           redistribution_blocked: true,
           notes: 'Open-source STEP directory candidate only; not manufacturer approval.',
         },
@@ -88,10 +96,10 @@ describe('source research ledger contract', () => {
           public_url: 'https://www.step.parts/parts/hebi_r25_actuator',
           source_url:
             'https://media.githubusercontent.com/media/HebiRobotics/hebi-cad/main/A-2700-25-XX_R25_Actuator/R25_Export.STEP',
-          source_file_ref: null,
+          source_file_ref: 'E:/ClaudeBot/data/halofire/brand/components/source_step_parts/hebi_r25_actuator.step',
           third_party_notice_ref: 'THIRD_PARTY_NOTICES.md',
-          capture_date: '2026-05-15T19:15:00Z',
-          license_summary: 'MIT upstream directory entry; downstream STEP file remains upstream-governed.',
+          capture_date: '2026-05-15T21:20:27Z',
+          license_summary: 'MIT upstream directory entry; locally ingested STEP sample remains upstream-governed.',
           redistribution_blocked: true,
           model_status: 'visual_reference',
           disposition: 'candidate',
@@ -208,10 +216,10 @@ describe('source research ledger contract', () => {
       public_url: 'https://www.step.parts/parts/hebi_r25_actuator',
       source_url:
         'https://media.githubusercontent.com/media/HebiRobotics/hebi-cad/main/A-2700-25-XX_R25_Actuator/R25_Export.STEP',
-      source_file_ref: null,
+      source_file_ref: 'E:/ClaudeBot/data/halofire/brand/components/source_step_parts/hebi_r25_actuator.step',
       third_party_notice_ref: 'THIRD_PARTY_NOTICES.md',
-      capture_date: '2026-05-15T19:15:00Z',
-      license_summary: 'MIT upstream directory entry.',
+      capture_date: '2026-05-15T21:20:27Z',
+      license_summary: 'MIT upstream directory entry; locally ingested STEP sample remains upstream-governed.',
       redistribution_blocked: true,
       model_status: 'manufacturer_verified',
       disposition: 'candidate',

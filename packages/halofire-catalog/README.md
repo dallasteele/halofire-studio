@@ -33,6 +33,9 @@ human correction decisions that led to a model staying in
 The step.parts directory is tracked as an open-source STEP source
 candidate only; it is not manufacturer approval and cannot self-promote a
 sprinkler family.
+The checked-in research seed now includes a locally ingested STEP sample
+for `step.parts:hebi_r25_actuator` so open-source STEP intake stays
+replayable instead of URL-only.
 The checked-in replay artifact lives at
 `data/halofire/brand/components/source_research_ledger.json`.
 The replay artifact is generated from
