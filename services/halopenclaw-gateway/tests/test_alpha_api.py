@@ -286,6 +286,11 @@ def test_portal_bundle_includes_real_artifacts_and_signed_downloads(tmp_path: Pa
     assert "/projects/alpha/deliverable/proposal.json?sig=" in proposal_html.text
     assert "/projects/alpha/deliverable/design.glb?sig=" in proposal_html.text
 
+    bid_alias = client.get("/bids/alpha", params={"sig": html_sig})
+    assert bid_alias.status_code == 200
+    assert 'href="./proposal.json"' not in bid_alias.text
+    assert "/projects/alpha/deliverable/proposal.json?sig=" in bid_alias.text
+
     bad = client.get("/projects/alpha/deliverable/proposal.pdf", params={"sig": "1.deadbeef"})
     assert bad.status_code == 401
 

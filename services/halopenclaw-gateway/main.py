@@ -577,6 +577,17 @@ async def get_manifest_json(project_id: str, request: Request) -> JSONResponse:
     return JSONResponse(json.loads(p.read_text(encoding="utf-8")))
 
 
+@app.get("/bids/{project_id}")
+async def get_bid_portal(project_id: str, request: Request, sig: str | None = None):
+    """Canonical signed client bid page alias.
+
+    The live portal redirects here from /demo/halo-fire. Keep this route as a
+    thin alias to the generated proposal.html deliverable so the public share
+    path stays aligned with the real portal artifact bundle.
+    """
+    return await get_deliverable(project_id, "proposal.html", request, sig)
+
+
 def _load_json_artifact(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
