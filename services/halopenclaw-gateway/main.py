@@ -202,6 +202,11 @@ class PortalBundle(BaseModel):
     warnings: list[str] = Field(default_factory=list)
 
 
+_DELIVERABLE_ALIASES: dict[str, str] = {
+    "workbook_xlsx": "proposal.xlsx",
+}
+
+
 @app.post("/projects/catalog/enrich")
 async def projects_catalog_enrich(body: CatalogEnrichRequest) -> dict[str, Any]:
     """Phase H.3 — kick the per-SKU enrichment pipeline.
@@ -680,6 +685,7 @@ def _label_for_download_name(name: str) -> str:
         "proposal.json": "Proposal JSON",
         "proposal.html": "Client HTML bid page",
         "proposal.pdf": "Proposal PDF",
+        "workbook_xlsx": "V-09 workbook",
         "proposal.xlsx": "V-09 workbook",
         "design.json": "Design JSON",
         "design.dxf": "AutoCAD DXF",
@@ -703,6 +709,7 @@ def _portal_downloads(
     ordered_names = [
         "proposal.html",
         "proposal.pdf",
+        "workbook_xlsx",
         "proposal.xlsx",
         "design.json",
         "design.dxf",
@@ -732,7 +739,8 @@ def _portal_downloads(
     ordered = [name for name in ordered_names if name in seen]
     extras = [name for name in names if name not in ordered]
     for name in ordered + extras:
-        path = (deliverables / name).resolve()
+        resolved_name = _DELIVERABLE_ALIASES.get(name, name)
+        path = (deliverables / resolved_name).resolve()
         if deliverables not in path.parents or not path.is_file():
             continue
         downloads.append(PortalDownload(
@@ -879,6 +887,10 @@ def _portal_bundle(project_id: str) -> PortalBundle:
     return portal
 
 
+def _resolve_deliverable_filename(name: str) -> str:
+    return _DELIVERABLE_ALIASES.get(name, name)
+
+
 @app.get("/projects/{project_id}/portal.json")
 async def get_portal_json(project_id: str, request: Request) -> JSONResponse:
     _require_portal_read_access(project_id, request)
@@ -1005,7 +1017,8 @@ async def get_deliverable(
     if Path(name).name != name:
         raise HTTPException(404, "deliverable not found")
     deliverables = (_safe_project_dir(project_id) / "deliverables").resolve()
-    p = (deliverables / name).resolve()
+    canonical_name = _resolve_deliverable_filename(name)
+    p = (deliverables / canonical_name).resolve()
     if deliverables not in p.parents or not p.exists():
         raise HTTPException(404, "deliverable not found")
     jwt = _jwt_from_request(request)

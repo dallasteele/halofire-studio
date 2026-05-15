@@ -263,6 +263,7 @@ def test_portal_bundle_includes_real_artifacts_and_signed_downloads(tmp_path: Pa
     download_names = {item["name"] for item in payload["downloads"]}
     assert "proposal.html" in download_names
     assert "proposal.pdf" in download_names
+    assert "workbook_xlsx" in download_names
     assert "proposal.xlsx" in download_names
     assert all("?sig=" in item["href"] for item in payload["downloads"])
     assert "Manifest warning" in payload["warnings"]
@@ -281,12 +282,18 @@ def test_portal_bundle_includes_real_artifacts_and_signed_downloads(tmp_path: Pa
     assert served.status_code == 200
     assert served.text == "pdf"
 
+    workbook_sig = main.hf_auth.sign_deliverable("alpha", "workbook_xlsx", ttl_seconds=60)
+    workbook = client.get("/projects/alpha/deliverable/workbook_xlsx", params={"sig": workbook_sig})
+    assert workbook.status_code == 200
+    assert workbook.text == "xlsx"
+
     html_sig = main.hf_auth.sign_deliverable("alpha", "proposal.html", ttl_seconds=60)
     proposal_html = client.get("/projects/alpha/deliverable/proposal.html", params={"sig": html_sig})
     assert proposal_html.status_code == 200
     assert 'href="./proposal.json"' not in proposal_html.text
     assert "/projects/alpha/deliverable/proposal.json?sig=" in proposal_html.text
     assert "/projects/alpha/deliverable/design.glb?sig=" in proposal_html.text
+    assert "/projects/alpha/deliverable/proposal.xlsx?sig=" in proposal_html.text
 
     bid_alias = client.get("/bids/alpha", params={"sig": html_sig})
     assert bid_alias.status_code == 200
