@@ -55,6 +55,8 @@ The canonical source ingestion policy is:
 - `default_model_status` is `visual_reference`
 - `dimensions_verified` must be explicit for any promoted family
 - distributor-backed families may stop at `dimensioned_parametric`
+  and must not be promoted to `manufacturer_verified` without a
+  manufacturer-backed evidence path
 - `manufacturer_verified` still requires manufacturer-backed evidence
 - `manufacturer_verified` and `dimensions_verified` must be explicit
 

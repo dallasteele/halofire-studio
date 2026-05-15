@@ -177,6 +177,8 @@ describe('provenance artifacts', () => {
       expect(component?.model_status).toBe('dimensioned_parametric')
       expect(component?.manufacturer_verified).toBe(false)
       expect(component?.dimensions_verified).toBe(true)
+      expect(component?.source_license.source_kind).toBe('distributor')
+      expect(component?.source_license.distributor).toBe('Ferguson')
       expect(component?.source_license.model_status).toBe('dimensioned_parametric')
       expect(component?.family_contract.model_status).toBe('dimensioned_parametric')
       expect(component?.family_contract.manufacturer_verified).toBe(false)

@@ -10,8 +10,9 @@ import type { CatalogSourceIngestionPolicy } from './types.js'
  *
  * Important nuance: distributor-backed salvage may legitimately land at
  * `dimensioned_parametric` when dimensions are extracted from a public
- * distributor spec, but `manufacturer_verified` still requires a
- * manufacturer-backed approval path.
+ * distributor spec. It must stay there until a manufacturer-backed
+ * evidence path exists; `manufacturer_verified` still requires a
+ * manufacturer approval path.
  */
 export const CATALOG_SOURCE_INGESTION_POLICY = {
   allowed_sources: ['procedural', 'manufacturer', 'distributor'],

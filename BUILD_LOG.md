@@ -1225,3 +1225,14 @@ User direction across 4 messages this session:
 - Open blocker remains unchanged: no additional verified
   manufacturer/distributor source record is available to promote another
   family beyond the current verified trio.
+
+### Entry 34 - Halo Forge Stream F distributor salvage policy lock
+
+- Tightened the catalog package guidance so distributor-backed salvage
+  may remain `dimensioned_parametric` but must not be promoted to
+  `manufacturer_verified` without a manufacturer-backed evidence path.
+- Added a provenance regression that keeps `pendent_standard_ferguson`
+  pinned to distributor-backed `dimensioned_parametric` status and
+  checks the Ferguson attribution explicitly.
+- Verification pending for this slice: targeted catalog tests and the
+  workspace rulebook check still need to run before commit.
