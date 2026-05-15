@@ -11,13 +11,14 @@ import type { CatalogSourceIngestionPolicy } from './types.js'
  * Important nuance: distributor-backed salvage may legitimately land at
  * `dimensioned_parametric` when dimensions are extracted from a public
  * distributor spec. It must stay there until a manufacturer-backed
- * evidence path exists; `manufacturer_verified` still requires a
- * manufacturer approval path. Every source license in the catalog keeps
- * `allowed_internal_use=true` and `allowed_client_render=true`; manufacturer
- * and distributor source records additionally require
- * `allowed_download=false` and `redistribution_blocked=true`.
- * The catalog entry, source license, and family contract status fields
- * must stay in lockstep for every promoted family.
+ * evidence path exists; distributor records cannot self-promote to
+ * `manufacturer_verified` or `halo_fire_approved`. Every source license in
+ * the catalog keeps `allowed_internal_use=true` and
+ * `allowed_client_render=true`; manufacturer and distributor source records
+ * additionally require `allowed_download=false` and
+ * `redistribution_blocked=true`. The catalog entry, source license, and
+ * family contract status fields must stay in lockstep for every promoted
+ * family.
  */
 export const CATALOG_SOURCE_INGESTION_POLICY = {
   allowed_sources: ['procedural', 'manufacturer', 'distributor'],

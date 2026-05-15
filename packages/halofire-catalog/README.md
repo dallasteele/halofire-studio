@@ -57,8 +57,8 @@ The canonical source ingestion policy is:
   `allowed_client_render=true`
 - `dimensions_verified` must be explicit for any promoted family
 - distributor-backed families may stop at `dimensioned_parametric`
-  and must not be promoted to `manufacturer_verified` without a
-  manufacturer-backed evidence path
+  and must not be promoted to `manufacturer_verified` or
+  `halo_fire_approved` without a manufacturer-backed evidence path
 - manufacturer and distributor source records are internal-use only:
   `allowed_download=false` and `redistribution_blocked=true`
 - `manufacturer_verified` still requires manufacturer-backed evidence

@@ -290,6 +290,36 @@ describe('provenance artifacts', () => {
     expect(proxy?.family_contract.dxf_path).toBe('pendent_standard_ferguson.dxf')
   })
 
+  test('catalog source kinds stay inside their allowed status lanes', () => {
+    const sources = loadJson<SourcesManifest>(SOURCES_PATH)
+
+    for (const component of sources.components) {
+      if (component.source_kind === 'procedural') {
+        expect(component.model_status).toBe('visual_reference')
+        expect(component.manufacturer_verified).toBe(false)
+        expect(component.dimensions_verified).toBe(false)
+        expect(component.source_license.model_status).toBe('visual_reference')
+        expect(component.family_contract.model_status).toBe('visual_reference')
+        expect(component.family_contract.ifc_path).toBeNull()
+        expect(component.family_contract.dxf_path).toBeNull()
+        continue
+      }
+
+      if (component.source_kind === 'distributor') {
+        expect(component.model_status).not.toBe('manufacturer_verified')
+        expect(component.model_status).not.toBe('halo_fire_approved')
+        expect(component.source_license.allowed_download).toBe(false)
+        expect(component.source_license.redistribution_blocked).toBe(true)
+        expect(component.source_license.model_status).toBe(component.model_status)
+        expect(component.family_contract.model_status).toBe(component.model_status)
+        expect(component.family_contract.manufacturer_verified).toBe(false)
+        expect(component.family_contract.dimensions_verified).toBe(true)
+        expect(component.family_contract.ifc_path).not.toBeNull()
+        expect(component.family_contract.dxf_path).not.toBeNull()
+      }
+    }
+  })
+
   test('Victaulic No. 10, No. 11, and No. 20 grooved fittings are manufacturer verified with IFC and DXF deliverables', () => {
     const sources = loadJson<SourcesManifest>(SOURCES_PATH)
     const byKey = new Map(sources.components.map((component) => [component.key, component]))
