@@ -16,7 +16,10 @@
  */
 import { z } from 'zod'
 import type { CatalogModelStatus, CatalogSourceKind } from './types.js'
-import type { CatalogSourceCollectionCoverage } from './source-coverage.js'
+import {
+  CatalogSourceCollectionCoverageSchema,
+  type CatalogSourceCollectionCoverage,
+} from './source-coverage.js'
 
 export type CatalogSourceResearchDisposition =
   | 'candidate'
@@ -357,19 +360,7 @@ export const CatalogSourceResearchLedgerSchema: z.ZodType<CatalogSourceResearchL
   z.object({
     generated_at_utc: z.string().min(1),
     scope: z.string().min(1),
-    source_collections: z.array(
-      z.object({
-        source_id: z.string().min(1),
-        source_kind: z.literal('open_source_step_directory'),
-        public_url: z.string().min(1),
-        repo_url: z.string().min(1),
-        license_spdx: z.string().min(1),
-        third_party_notice_ref: z.string().min(1),
-        capture_date: z.string().min(1),
-        redistribution_blocked: z.boolean(),
-        notes: z.string().min(1),
-      }),
-    ),
+    source_collections: z.array(CatalogSourceCollectionCoverageSchema),
     research_records: z.array(CatalogSourceResearchRecordSchema),
     correction_records: z.array(CatalogCorrectionRecordSchema),
     summary: z.object({

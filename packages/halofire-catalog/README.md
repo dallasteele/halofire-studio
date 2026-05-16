@@ -30,6 +30,10 @@ correction workflow contract. Use it when you need to track the exact
 internet-backed URLs, captured files, license/redistribution status, and
 human correction decisions that led to a model staying in
 `visual_reference`, `dimensioned_parametric`, or `manufacturer_verified`.
+The package also exposes replayable ledger builders in
+`src/source-ledger.ts` so the checked-in research and coverage artifacts
+can be regenerated from typed inputs instead of treated as opaque data
+blobs.
 The step.parts directory is tracked as an open-source STEP source
 candidate only; it is not manufacturer approval and cannot self-promote a
 sprinkler family.

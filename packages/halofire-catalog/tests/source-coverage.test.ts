@@ -34,7 +34,13 @@ describe('source coverage ledger', () => {
     const ledger = CatalogCoverageLedgerSchema.parse(loadJson(LEDGER_PATH))
 
     expect(ledger.scope).toContain('Stream F')
-    expect(ledger.source_collections).toHaveLength(1)
+    expect(ledger.source_collections).toHaveLength(4)
+    expect(ledger.source_collections.map((collection) => collection.source_id)).toEqual([
+      'step.parts',
+      'wheatland_schedule40',
+      'victaulic_firelock_fittings',
+      'tyco_av1_300',
+    ])
 
     const [stepParts] = ledger.source_collections
     expect(stepParts.source_id).toBe('step.parts')

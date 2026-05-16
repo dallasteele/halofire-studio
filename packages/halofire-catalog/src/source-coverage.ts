@@ -37,11 +37,12 @@ export interface CatalogCoverageAsset {
 
 export interface CatalogSourceCollectionCoverage {
   source_id: string
-  source_kind: 'open_source_step_directory'
+  source_kind: CatalogSourceKind | 'open_source_step_directory'
   public_url: string
-  repo_url: string
+  repo_url?: string | null
+  source_url?: string | null
   license_spdx: string
-  third_party_notice_ref: string
+  third_party_notice_ref: string | null
   capture_date: string
   redistribution_blocked: boolean
   notes: string
@@ -127,11 +128,15 @@ export const CatalogCoverageAssetSchema: z.ZodType<CatalogCoverageAsset> =
 export const CatalogSourceCollectionCoverageSchema: z.ZodType<CatalogSourceCollectionCoverage> =
   z.object({
     source_id: z.string().min(1),
-    source_kind: z.literal('open_source_step_directory'),
+    source_kind: z.union([
+      z.enum(['procedural', 'manufacturer', 'distributor']),
+      z.literal('open_source_step_directory'),
+    ]),
     public_url: z.string().min(1),
-    repo_url: z.string().min(1),
+    repo_url: z.string().nullable().optional(),
+    source_url: z.string().nullable().optional(),
     license_spdx: z.string().min(1),
-    third_party_notice_ref: z.string().min(1),
+    third_party_notice_ref: z.string().nullable(),
     capture_date: z.string().min(1),
     redistribution_blocked: z.boolean(),
     notes: z.string().min(1),
@@ -140,14 +145,38 @@ export const CatalogSourceCollectionCoverageSchema: z.ZodType<CatalogSourceColle
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['public_url'],
-        message: 'step.parts source collection requires public_url',
+        message: 'source collection requires public_url',
       })
     }
-    if (!hasText(value.repo_url)) {
+    if (
+      value.source_kind === 'open_source_step_directory' &&
+      !hasText(value.repo_url)
+    ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['repo_url'],
         message: 'step.parts source collection requires repo_url',
+      })
+    }
+    if (
+      (value.source_kind === 'manufacturer' ||
+        value.source_kind === 'distributor') &&
+      !hasText(value.source_url)
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['source_url'],
+        message: 'manufacturer/distributor source collections require source_url',
+      })
+    }
+    if (
+      value.source_kind === 'open_source_step_directory' &&
+      !hasText(value.third_party_notice_ref)
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['third_party_notice_ref'],
+        message: 'step.parts source collection requires third_party_notice_ref',
       })
     }
   })

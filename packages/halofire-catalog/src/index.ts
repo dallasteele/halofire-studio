@@ -90,6 +90,16 @@ export type {
   CatalogSourceResearchSeed,
   CatalogSourceResearchRecord,
 } from './source-research.js'
+export {
+  buildCoverageLedger,
+  buildSourceCollectionCoverage,
+  buildSourceResearchLedger,
+  summarizeCoverageLedger,
+} from './source-ledger.js'
+export type {
+  CatalogCoverageComponentInput,
+  CatalogCoverageLedgerInput,
+} from './source-ledger.js'
 
 // ── Legacy in-memory CATALOG + helpers (do not extend) ─────────────────
 export type {
