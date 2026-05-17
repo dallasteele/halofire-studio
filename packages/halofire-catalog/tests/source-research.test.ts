@@ -47,6 +47,7 @@ describe('source research ledger contract', () => {
       'reliable_f156_bulletin_031',
     ])
     expect(seed.source_collections[0]?.source_kind).toBe('open_source_step_directory')
+    expect(seed.source_collections[0]?.source_file_ref).toContain('source_step_parts/hebi_r25_actuator.step')
     expect(seed.research_records.some((record) => record.source_id === 'step.parts')).toBe(true)
     expect(
       seed.research_records.find((record) => record.source_id === 'step.parts')
@@ -74,6 +75,7 @@ describe('source research ledger contract', () => {
       'reliable_f156_bulletin_031',
     ])
     expect(ledger.source_collections[0]?.license_spdx).toBe('MIT')
+    expect(ledger.source_collections[0]?.source_file_ref).toContain('source_step_parts/hebi_r25_actuator.step')
     expect(ledger.research_records.some((record) => record.source_id === 'step.parts')).toBe(true)
     expect(
       ledger.research_records.find((record) => record.source_id === 'step.parts')
@@ -100,6 +102,7 @@ describe('source research ledger contract', () => {
           source_kind: 'open_source_step_directory',
           public_url: 'https://www.step.parts',
           repo_url: 'https://github.com/earthtojake/step.parts',
+          source_file_ref: 'E:/ClaudeBot/data/halofire/brand/components/source_step_parts/hebi_r25_actuator.step',
           license_spdx: 'MIT',
           third_party_notice_ref: 'THIRD_PARTY_NOTICES.md',
           capture_date: '2026-05-15T21:20:27Z',
@@ -111,6 +114,7 @@ describe('source research ledger contract', () => {
           source_kind: 'manufacturer',
           public_url: 'https://www.wheatland.com/products/fire-sprinkler-pipe/schedule-40',
           source_url: 'https://www.wheatland.com/wp-content/uploads/2017/12/Schedule-40-Submittal-Sheet.pdf',
+          source_file_ref: 'E:/ClaudeBot/halofire-studio/packages/halofire-catalog/cut_sheets/wheatland_schedule40_sprinkler_pipe.pdf',
           license_spdx: 'proprietary',
           third_party_notice_ref: null,
           capture_date: '2026-05-15T05:03:05.031677Z',
@@ -122,6 +126,7 @@ describe('source research ledger contract', () => {
           source_kind: 'manufacturer',
           public_url: 'https://www.victaulic.com/products/firelock-grooved-fittings/',
           source_url: 'https://assets.victaulic.com/assets/uploads/literature/10.03.pdf',
+          source_file_ref: 'E:/ClaudeBot/halofire-studio/packages/halofire-catalog/cut_sheets/victaulic_009n.pdf',
           license_spdx: 'proprietary',
           third_party_notice_ref: null,
           capture_date: '2026-05-15T05:03:05.031677Z',
@@ -133,6 +138,7 @@ describe('source research ledger contract', () => {
           source_kind: 'manufacturer',
           public_url: 'https://www.tyco-fire.com/products-and-solutions/valves-devices-and-components/wet-system-valves-and-components/av-1-300_fis/av-1-300-alarm-check-valve',
           source_url: 'https://docs.johnsoncontrols.com/tycofire/api/khub/documents/1BlAbiphbAgwMOTfSiHCug/content',
+          source_file_ref: 'E:/ClaudeBot/halofire-studio/packages/halofire-catalog/cut_sheets/tyco_av1_300.pdf',
           license_spdx: 'proprietary',
           third_party_notice_ref: null,
           capture_date: '2026-05-15T05:03:05.031677Z',

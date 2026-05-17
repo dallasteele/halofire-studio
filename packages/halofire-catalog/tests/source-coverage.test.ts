@@ -48,6 +48,8 @@ describe('source coverage ledger', () => {
     expect(stepParts.source_kind).toBe('open_source_step_directory')
     expect(stepParts.public_url).toBe('https://www.step.parts')
     expect(stepParts.repo_url).toBe('https://github.com/earthtojake/step.parts')
+    expect(stepParts.source_url).toBe('https://www.step.parts/parts/hebi_r25_actuator')
+    expect(stepParts.source_file_ref).toContain('source_step_parts/hebi_r25_actuator.step')
     expect(stepParts.license_spdx).toBe('MIT')
     expect(stepParts.third_party_notice_ref).toBe('THIRD_PARTY_NOTICES.md')
     expect(stepParts.redistribution_blocked).toBe(true)

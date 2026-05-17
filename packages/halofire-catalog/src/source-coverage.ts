@@ -41,6 +41,7 @@ export interface CatalogSourceCollectionCoverage {
   public_url: string
   repo_url?: string | null
   source_url?: string | null
+  source_file_ref?: string | null
   license_spdx: string
   third_party_notice_ref: string | null
   capture_date: string
@@ -135,6 +136,7 @@ export const CatalogSourceCollectionCoverageSchema: z.ZodType<CatalogSourceColle
     public_url: z.string().min(1),
     repo_url: z.string().nullable().optional(),
     source_url: z.string().nullable().optional(),
+    source_file_ref: z.string().nullable().optional(),
     license_spdx: z.string().min(1),
     third_party_notice_ref: z.string().nullable(),
     capture_date: z.string().min(1),

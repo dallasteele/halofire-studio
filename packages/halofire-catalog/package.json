@@ -21,7 +21,10 @@
   "scripts": {
     "build": "tsc --build",
     "dev": "tsc --build --watch",
-    "check-types": "tsc --noEmit"
+    "check-types": "tsc --noEmit",
+    "build:source-research": "C:/Python312/python.exe ../../../scripts/build_halofire_catalog_source_research.py",
+    "build:source-coverage": "C:/Python312/python.exe ../../../scripts/build_halofire_catalog_source_coverage.py",
+    "build:source-ledgers": "C:/Python312/python.exe ../../../scripts/build_halofire_catalog_source_research.py && C:/Python312/python.exe ../../../scripts/build_halofire_catalog_source_coverage.py"
   },
   "dependencies": {
     "zod": "^3.23.8"

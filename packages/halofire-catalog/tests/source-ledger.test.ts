@@ -56,6 +56,9 @@ describe('source ledger builders', () => {
       'tyco_av1_300',
       'reliable_f156_bulletin_031',
     ])
+    expect(built.source_collections[0]?.source_url).toBe(
+      'https://www.step.parts/parts/hebi_r25_actuator',
+    )
     expect(
       built.research_records.find((record: any) => record.source_id === 'step.parts')
         ?.third_party_notice_ref,
@@ -86,6 +89,9 @@ describe('source ledger builders', () => {
       'tyco_av1_300',
       'reliable_f156_bulletin_031',
     ])
+    expect(built.source_collections[0]?.source_url).toBe(
+      'https://www.step.parts/parts/hebi_r25_actuator',
+    )
     expect(built.source_collections[0]?.license_spdx).toBe('MIT')
     expect(built.rejected_candidates).toContain('pendent_standard_ferguson')
     expect(built.missing_downloads).toContain('pendent_standard:step')

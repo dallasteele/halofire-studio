@@ -17,3 +17,9 @@
 - Added a Reliable F156 manufacturer source collection plus a replayable `reliable_f156_upright_155f` research row so the catalog owner surface now inventories both the open-source step.parts candidate and the Reliable manufacturer source trail explicitly.
 - Updated the source research / source coverage / source owner pipeline regressions to expect the new fifth source collection and the Reliable manufacturer-backed research row.
 - Pending verification: regenerate the checked-in ledgers and rerun the focused catalog tests after the source seed refresh.
+
+## 2026-05-17
+
+- Tightened Stream F source provenance so each checked-in source collection now carries a `source_file_ref` alongside the URL, license, capture date, and redistribution gate.
+- Refreshed the seed, research ledger, and coverage ledger to track the canonical local file backing for the open-source step.parts sample and the manufacturer cut-sheet inputs.
+- Verification pending: focused catalog tests plus the package typecheck/build after the ledger refresh.

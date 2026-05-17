@@ -91,6 +91,11 @@ describe('source owner pipeline', () => {
       )?.third_party_notice_ref,
     ).toBe('THIRD_PARTY_NOTICES.md')
     expect(
+      pipeline.source_research_ledger.source_collections.find(
+        (collection) => collection.source_id === 'step.parts',
+      )?.source_file_ref,
+    ).toContain('source_step_parts/hebi_r25_actuator.step')
+    expect(
       pipeline.source_research_ledger.research_records.find(
         (record) => record.part_ref === 'reliable_f156_upright_155f',
       )?.model_status,

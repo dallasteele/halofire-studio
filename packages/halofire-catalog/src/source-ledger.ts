@@ -336,7 +336,7 @@ function buildCoverageRow(component: CatalogCoverageComponentInput): CatalogCove
     third_party_notice_ref: null,
     asset_coverage: buildAssetCoverage(component),
     rejected_candidate_reason: rejectedReasonFor(component),
-    notes: component.notes ?? component.key,
+    notes: hasText(component.notes) ? component.notes : component.key,
   }
 }
 
@@ -360,7 +360,7 @@ function buildOpenSourceStepCoverageRow(
     asset_coverage: buildStepPartsAssetCoverage(record),
     rejected_candidate_reason:
       'Open-source STEP directory assets remain candidates until provenance proves the exact product or authority.',
-    notes: record.notes,
+    notes: hasText(record.notes) ? record.notes : record.part_ref,
   }
 }
 
@@ -422,6 +422,7 @@ export function buildCoverageLedger(
       source_kind: 'open_source_step_directory',
       public_url: 'https://www.step.parts',
       repo_url: 'https://github.com/earthtojake/step.parts',
+      source_url: 'https://www.step.parts/parts/hebi_r25_actuator',
       license_spdx: 'MIT',
       third_party_notice_ref: 'THIRD_PARTY_NOTICES.md',
       capture_date: input.generated_at_utc ?? new Date().toISOString(),
