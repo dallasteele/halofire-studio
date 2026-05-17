@@ -32,13 +32,18 @@ internet-backed URLs, captured files, license/redistribution status, and
 human correction decisions that led to a model staying in
 `visual_reference`, `proxy`, `dimensioned_parametric`, `manufacturer_verified`,
 or `sealed_approved`.
+The package also exposes a typed component-library contract for the
+checked-in `SOURCES.json`, `component_map.json`, and
+`family_contracts.json` truth surface so the current catalog, licensing,
+and family-approval rows can be validated together.
 The package also exposes replayable ledger builders in
 `src/source-ledger.ts` so the checked-in research and coverage artifacts
 can be regenerated from typed inputs instead of treated as opaque data
 blobs.
 The `buildCatalogSourcePipeline()` helper in `src/source-owner-pipeline.ts`
-composes the research seed and coverage inputs into one validated,
-replayable owner artifact for downstream automation.
+composes the research seed, component library seed, coverage inputs, and
+model-fit proof run into one validated, replayable owner artifact for
+downstream automation.
 The catalog package also exposes a typed model-fit proof inventory for
 the current Stream F approval blocker. Use it to keep the proof rows,
 source hashes, GLB/IFC/DXF hashes, required reviewer decisions, blocked
@@ -120,6 +125,9 @@ The canonical source ingestion policy is:
 - `manufacturer_verified` and `dimensions_verified` must be explicit
 - component, source-license, and family-contract `model_status` fields
   must match for every promoted family
+- the component-library source manifest, component map, and family
+  contracts must stay aligned on GLB / IFC / DXF paths, verification
+  flags, and source-license references
 
 Package consumers should use `CATALOG_SOURCE_INGESTION_POLICY` and the
 runtime schemas in `src/schema.ts` rather than inferring policy from the

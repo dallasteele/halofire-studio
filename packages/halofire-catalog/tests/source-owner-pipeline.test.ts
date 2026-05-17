@@ -32,6 +32,8 @@ const SOURCE_RESEARCH_SEED_PATH = resolve(
   COMPONENT_DIR,
   'source_research_seed.json',
 )
+const COMPONENT_MAP_PATH = resolve(COMPONENT_DIR, 'component_map.json')
+const FAMILY_CONTRACTS_PATH = resolve(COMPONENT_DIR, 'family_contracts.json')
 const SOURCE_COVERAGE_LEDGER_PATH = resolve(
   COMPONENT_DIR,
   'source_coverage_ledger.json',
@@ -65,6 +67,11 @@ describe('source owner pipeline', () => {
       ).generated_at_utc,
       components: loadJson<{ components: unknown[] }>(SOURCES_PATH).components,
       source_research_seed: loadJson(SOURCE_RESEARCH_SEED_PATH),
+      component_library_seed: {
+        source_manifest: loadJson(SOURCES_PATH),
+        component_map: loadJson(COMPONENT_MAP_PATH),
+        family_contracts: loadJson(FAMILY_CONTRACTS_PATH),
+      },
       model_fit_proof_run: loadJson(MODEL_FIT_PROOF_RUN_PATH),
     })
 
@@ -82,6 +89,15 @@ describe('source owner pipeline', () => {
     expect(pipeline.summary.research_record_count).toBe(
       checkedInResearch.research_records.length,
     )
+    expect(pipeline.summary.source_manifest_component_count).toBe(89)
+    expect(pipeline.summary.component_map_entry_count).toBe(89)
+    expect(pipeline.summary.family_contract_count).toBe(89)
+    expect(pipeline.summary.family_contract_ifc_count).toBe(37)
+    expect(pipeline.summary.family_contract_dxf_count).toBe(37)
+    expect(pipeline.summary.family_contract_manufacturer_verified_count).toBe(36)
+    expect(pipeline.summary.family_contract_dimensions_verified_count).toBe(37)
+    expect(pipeline.component_library).not.toBeNull()
+    expect(pipeline.component_library?.summary.source_manifest_component_count).toBe(89)
     expect(pipeline.summary.coverage_row_count).toBe(
       checkedInCoverage.vendor_model_coverage.length,
     )

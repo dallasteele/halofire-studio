@@ -101,6 +101,30 @@ export type {
   CatalogCoverageLedgerInput,
 } from './source-ledger.js'
 export {
+  buildCatalogComponentLibrary,
+  CatalogComponentLibrarySchema,
+  CatalogComponentLibraryInputSchema,
+  CatalogComponentLibrarySummarySchema,
+  CatalogComponentMapEntrySchema,
+  CatalogComponentMapSchema,
+  CatalogComponentSourceManifestSchema,
+  CatalogComponentSourceRecordSchema,
+  CatalogFamilyContractsCollectionSchema,
+  CatalogFamilyContractRecordSchema,
+  summarizeCatalogComponentLibrary,
+} from './component-library.js'
+export type {
+  CatalogComponentLibrary,
+  CatalogComponentLibraryInput,
+  CatalogComponentLibrarySummary,
+  CatalogComponentMap,
+  CatalogComponentMapEntry,
+  CatalogComponentSourceManifest,
+  CatalogComponentSourceRecord,
+  CatalogFamilyContractsCollection,
+  CatalogFamilyContractRecord,
+} from './component-library.js'
+export {
   buildCatalogEngineeringApprovalInventory,
   summarizeCatalogModelFitProofRun,
   CatalogEngineeringApprovalInventorySchema,

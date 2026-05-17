@@ -100,7 +100,7 @@ describe('source ledger builders', () => {
       (row) => row.part_ref === 'step.parts:hebi_r25_actuator',
     )
     expect(stepCandidate).toBeDefined()
-    expect(stepCandidate?.coverage_status).toBe('candidate')
+    expect(stepCandidate?.coverage_status).toBe('salvage_proxy')
     expect(stepCandidate?.source_kind).toBe('open_source_step_directory')
     expect(stepCandidate?.third_party_notice_ref).toBe('THIRD_PARTY_NOTICES.md')
     expect(

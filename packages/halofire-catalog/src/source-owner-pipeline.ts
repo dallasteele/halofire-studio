@@ -12,6 +12,11 @@
 
 import { z } from 'zod'
 import {
+  buildCatalogComponentLibrary,
+  CatalogComponentLibraryInputSchema,
+  CatalogComponentLibrarySchema,
+} from './component-library.js'
+import {
   CatalogFamilyContractSchema,
   CatalogSourceKindSchema,
   CatalogSourceLicenseSchema,
@@ -57,6 +62,7 @@ export const CatalogSourcePipelineInputSchema = z.object({
   generated_at_utc: z.string().min(1).optional(),
   components: z.array(CatalogCoverageComponentInputSchema).min(1),
   source_research_seed: CatalogSourceResearchSeedSchema,
+  component_library_seed: CatalogComponentLibraryInputSchema.optional(),
   model_fit_proof_run: CatalogModelFitProofRunSchema.optional(),
 })
 
@@ -64,6 +70,13 @@ export const CatalogSourcePipelineSummarySchema = z.object({
   source_collection_count: z.number().int().nonnegative(),
   research_record_count: z.number().int().nonnegative(),
   correction_record_count: z.number().int().nonnegative(),
+  source_manifest_component_count: z.number().int().nonnegative(),
+  component_map_entry_count: z.number().int().nonnegative(),
+  family_contract_count: z.number().int().nonnegative(),
+  family_contract_ifc_count: z.number().int().nonnegative(),
+  family_contract_dxf_count: z.number().int().nonnegative(),
+  family_contract_manufacturer_verified_count: z.number().int().nonnegative(),
+  family_contract_dimensions_verified_count: z.number().int().nonnegative(),
   coverage_row_count: z.number().int().nonnegative(),
   manufacturer_verified_count: z.number().int().nonnegative(),
   proxy_count: z.number().int().nonnegative(),
@@ -83,6 +96,7 @@ export const CatalogSourcePipelineSummarySchema = z.object({
 export const CatalogSourcePipelineOutputSchema = z.object({
   source_research_ledger: CatalogSourceResearchLedgerSchema,
   source_coverage_ledger: CatalogCoverageLedgerSchema,
+  component_library: z.union([CatalogComponentLibrarySchema, z.null()]),
   model_fit_inventory: z.union([
     CatalogEngineeringApprovalInventorySchema,
     z.null(),
@@ -100,14 +114,31 @@ export type CatalogSourcePipelineOutput = z.infer<
 export function summarizeCatalogSourcePipeline(
   output: Pick<
     CatalogSourcePipelineOutput,
-    'source_research_ledger' | 'source_coverage_ledger' | 'model_fit_inventory'
+    | 'source_research_ledger'
+    | 'source_coverage_ledger'
+    | 'component_library'
+    | 'model_fit_inventory'
   >,
 ): CatalogSourcePipelineOutput['summary'] {
   const modelFitInventory = output.model_fit_inventory ?? null
+  const componentLibrary = output.component_library ?? null
   return {
     source_collection_count: output.source_research_ledger.source_collections.length,
     research_record_count: output.source_research_ledger.research_records.length,
     correction_record_count: output.source_research_ledger.correction_records.length,
+    source_manifest_component_count:
+      componentLibrary?.summary.source_manifest_component_count ?? 0,
+    component_map_entry_count:
+      componentLibrary?.summary.component_map_entry_count ?? 0,
+    family_contract_count: componentLibrary?.summary.family_contract_count ?? 0,
+    family_contract_ifc_count:
+      componentLibrary?.summary.family_contract_ifc_count ?? 0,
+    family_contract_dxf_count:
+      componentLibrary?.summary.family_contract_dxf_count ?? 0,
+    family_contract_manufacturer_verified_count:
+      componentLibrary?.summary.family_contract_manufacturer_verified_count ?? 0,
+    family_contract_dimensions_verified_count:
+      componentLibrary?.summary.family_contract_dimensions_verified_count ?? 0,
     coverage_row_count: output.source_coverage_ledger.vendor_model_coverage.length,
     manufacturer_verified_count:
       output.source_coverage_ledger.summary.manufacturer_verified_count,
@@ -143,6 +174,9 @@ export function buildCatalogSourcePipeline(
   rawInput: unknown,
 ): CatalogSourcePipelineOutput {
   const input = CatalogSourcePipelineInputSchema.parse(rawInput)
+  const componentLibrary = input.component_library_seed
+    ? buildCatalogComponentLibrary(input.component_library_seed)
+    : null
   const sourceResearchLedger: CatalogSourceResearchLedger = buildSourceResearchLedger(
     input.source_research_seed,
   )
@@ -160,10 +194,12 @@ export function buildCatalogSourcePipeline(
   const output = CatalogSourcePipelineOutputSchema.parse({
     source_research_ledger: sourceResearchLedger,
     source_coverage_ledger: sourceCoverageLedger,
+    component_library: componentLibrary,
     model_fit_inventory: modelFitInventory,
     summary: summarizeCatalogSourcePipeline({
       source_research_ledger: sourceResearchLedger,
       source_coverage_ledger: sourceCoverageLedger,
+      component_library: componentLibrary,
       model_fit_inventory: modelFitInventory,
     }),
   })
@@ -174,6 +210,26 @@ export function buildCatalogSourcePipeline(
   }
   if (output.summary.source_collection_count !== output.source_research_ledger.source_collections.length) {
     throw new Error('catalog source pipeline summary drifted from source collections')
+  }
+  if (output.component_library) {
+    if (
+      output.summary.source_manifest_component_count !==
+      output.component_library.summary.source_manifest_component_count
+    ) {
+      throw new Error('catalog source pipeline summary drifted from component manifest count')
+    }
+    if (
+      output.summary.component_map_entry_count !==
+      output.component_library.summary.component_map_entry_count
+    ) {
+      throw new Error('catalog source pipeline summary drifted from component_map count')
+    }
+    if (
+      output.summary.family_contract_count !==
+      output.component_library.summary.family_contract_count
+    ) {
+      throw new Error('catalog source pipeline summary drifted from family contract count')
+    }
   }
   if (output.model_fit_inventory) {
     if (output.summary.model_fit_proof_count !== output.model_fit_inventory.proof_count) {
