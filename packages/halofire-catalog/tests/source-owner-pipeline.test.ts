@@ -78,7 +78,7 @@ describe('source owner pipeline', () => {
     expect(pipeline.source_coverage_ledger.summary).toEqual(
       checkedInCoverage.summary,
     )
-    expect(pipeline.summary.source_collection_count).toBe(4)
+    expect(pipeline.summary.source_collection_count).toBe(5)
     expect(pipeline.summary.research_record_count).toBe(
       checkedInResearch.research_records.length,
     )
@@ -90,6 +90,11 @@ describe('source owner pipeline', () => {
         (record) => record.source_id === 'step.parts',
       )?.third_party_notice_ref,
     ).toBe('THIRD_PARTY_NOTICES.md')
+    expect(
+      pipeline.source_research_ledger.research_records.find(
+        (record) => record.part_ref === 'reliable_f156_upright_155f',
+      )?.model_status,
+    ).toBe('manufacturer_verified')
     expect(
       pipeline.source_coverage_ledger.vendor_model_coverage.find(
         (row) => row.part_ref === 'step.parts:hebi_r25_actuator',

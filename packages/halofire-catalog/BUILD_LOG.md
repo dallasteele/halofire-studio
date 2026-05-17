@@ -13,3 +13,7 @@
 - Refreshed `data/halofire/brand/components/source_coverage_ledger.json` from the typed builder so the checked-in coverage truth matches the current missing-download accounting.
 - Wrote a replayable combined owner artifact at `out/halo-forge/2026-05-17-catalog-owner-pipeline/catalog_owner_pipeline/` alongside the source research and model-fit proof inputs.
 - Verification: `bun test` on `source-owner-pipeline.test.ts`, `source-coverage.test.ts`, `source-ledger.test.ts`, `provenance.test.ts`, and `model-fit-proof.test.ts`; `bun run --cwd E:/ClaudeBot/halofire-studio/packages/halofire-catalog check-types`; `bun run --cwd E:/ClaudeBot/halofire-studio/packages/halofire-catalog build`.
+
+- Added a Reliable F156 manufacturer source collection plus a replayable `reliable_f156_upright_155f` research row so the catalog owner surface now inventories both the open-source step.parts candidate and the Reliable manufacturer source trail explicitly.
+- Updated the source research / source coverage / source owner pipeline regressions to expect the new fifth source collection and the Reliable manufacturer-backed research row.
+- Pending verification: regenerate the checked-in ledgers and rerun the focused catalog tests after the source seed refresh.

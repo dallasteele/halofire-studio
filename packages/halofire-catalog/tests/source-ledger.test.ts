@@ -48,17 +48,22 @@ describe('source ledger builders', () => {
     const built = buildSourceResearchLedger(seed)
 
     expect(built.summary).toEqual(summarizeSourceResearchLedger(built))
-    expect(built.source_collections).toHaveLength(4)
+    expect(built.source_collections).toHaveLength(5)
     expect(built.source_collections.map((collection) => collection.source_id)).toEqual([
       'step.parts',
       'wheatland_schedule40',
       'victaulic_firelock_fittings',
       'tyco_av1_300',
+      'reliable_f156_bulletin_031',
     ])
     expect(
       built.research_records.find((record: any) => record.source_id === 'step.parts')
         ?.third_party_notice_ref,
     ).toBe('THIRD_PARTY_NOTICES.md')
+    expect(
+      built.research_records.find((record: any) => record.part_ref === 'reliable_f156_upright_155f')
+        ?.model_status,
+    ).toBe('manufacturer_verified')
   })
 
   test('coverage builder reproduces the explicit vendor/model ledger and step.parts candidate', () => {
@@ -73,12 +78,13 @@ describe('source ledger builders', () => {
     })
 
     expect(built.summary).toEqual(summarizeCoverageLedger(built))
-    expect(built.source_collections).toHaveLength(4)
+    expect(built.source_collections).toHaveLength(5)
     expect(built.source_collections.map((collection) => collection.source_id)).toEqual([
       'step.parts',
       'wheatland_schedule40',
       'victaulic_firelock_fittings',
       'tyco_av1_300',
+      'reliable_f156_bulletin_031',
     ])
     expect(built.source_collections[0]?.license_spdx).toBe('MIT')
     expect(built.rejected_candidates).toContain('pendent_standard_ferguson')
