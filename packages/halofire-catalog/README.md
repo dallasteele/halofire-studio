@@ -34,6 +34,14 @@ The package also exposes replayable ledger builders in
 `src/source-ledger.ts` so the checked-in research and coverage artifacts
 can be regenerated from typed inputs instead of treated as opaque data
 blobs.
+The `buildCatalogSourcePipeline()` helper in `src/source-owner-pipeline.ts`
+composes the research seed and coverage inputs into one validated,
+replayable owner artifact for downstream automation.
+The catalog package also exposes a typed model-fit proof inventory for
+the current Stream F approval blocker. Use it to keep the proof rows,
+source hashes, GLB/IFC/DXF hashes, required reviewer decisions, blocked
+claims, and next action explicit until a reviewer or geometry comparator
+actually clears the row.
 The step.parts directory is tracked as an open-source STEP source
 candidate only; it is not manufacturer approval and cannot self-promote a
 sprinkler family.
@@ -45,6 +53,20 @@ The checked-in replay artifact lives at
 The replay artifact is generated from
 `scripts/build_halofire_catalog_source_research.py` and the checked-in
 seed at `data/halofire/brand/components/source_research_seed.json`.
+
+## Regeneration
+
+Use the checked-in Python builders to refresh the replay artifacts:
+
+- `C:/Python312/python.exe ../../../scripts/build_halofire_catalog_source_research.py`
+- `C:/Python312/python.exe ../../../scripts/build_halofire_catalog_source_coverage.py`
+- `C:/Python312/python.exe ../../../scripts/build_halofire_catalog_source_research.py && C:/Python312/python.exe ../../../scripts/build_halofire_catalog_source_coverage.py`
+
+The companion package scripts mirror those entrypoints for convenience:
+
+- `bun run build:source-research`
+- `bun run build:source-coverage`
+- `bun run build:source-ledgers`
 
 ## Legacy M1 contents
 

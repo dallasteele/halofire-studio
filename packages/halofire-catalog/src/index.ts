@@ -100,6 +100,47 @@ export type {
   CatalogCoverageComponentInput,
   CatalogCoverageLedgerInput,
 } from './source-ledger.js'
+export {
+  buildCatalogEngineeringApprovalInventory,
+  summarizeCatalogModelFitProofRun,
+  CatalogEngineeringApprovalInventorySchema,
+  CatalogModelFitCheckStatusSchema,
+  CatalogModelFitProofArtifactSchema,
+  CatalogModelFitProofIssueSchema,
+  CatalogModelFitProofManifestSchema,
+  CatalogModelFitProofRunSchema,
+  CatalogModelFitProofRunSummarySchema,
+  CatalogModelFitProofSchema,
+  CatalogModelFitProofStatusSchema,
+  CatalogModelFitReviewerDecisionSchema,
+  CatalogModelFitWorkbenchRowSchema,
+  CATALOG_MODEL_FIT_REQUIRED_REVIEWER_DECISIONS,
+} from './model-fit-proof.js'
+export type {
+  CatalogEngineeringApprovalInventory,
+  CatalogModelFitCheckStatus,
+  CatalogModelFitProof,
+  CatalogModelFitProofArtifact,
+  CatalogModelFitProofIssue,
+  CatalogModelFitProofManifest,
+  CatalogModelFitProofRun,
+  CatalogModelFitProofRunSummary,
+  CatalogModelFitProofStatus,
+  CatalogModelFitReviewerDecision,
+  CatalogModelFitReviewerDecisionKey,
+  CatalogModelFitWorkbenchRow,
+} from './model-fit-proof.js'
+export {
+  buildCatalogSourcePipeline,
+  summarizeCatalogSourcePipeline,
+  CatalogSourcePipelineInputSchema,
+  CatalogSourcePipelineOutputSchema,
+  CatalogSourcePipelineSummarySchema,
+} from './source-owner-pipeline.js'
+export type {
+  CatalogSourcePipelineInput,
+  CatalogSourcePipelineOutput,
+} from './source-owner-pipeline.js'
 
 // ── Legacy in-memory CATALOG + helpers (do not extend) ─────────────────
 export type {
