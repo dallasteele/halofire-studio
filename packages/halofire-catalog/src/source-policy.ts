@@ -9,10 +9,10 @@ import type { CatalogSourceIngestionPolicy } from './types.js'
  * on-disk provenance manifest directly.
  *
  * Important nuance: distributor-backed salvage may legitimately land at
- * `dimensioned_parametric` when dimensions are extracted from a public
- * distributor spec. It must stay there until a manufacturer-backed
- * evidence path exists; distributor records cannot self-promote to
- * `manufacturer_verified` or `halo_fire_approved`. Every source license in
+ * `proxy` or `dimensioned_parametric` when the provenance is thin or the
+ * distributor spec provides dimensions only. It must stay there until a
+ * manufacturer-backed evidence path exists; distributor records cannot
+ * self-promote to `manufacturer_verified` or `sealed_approved`. Every source license in
  * the catalog keeps `allowed_internal_use=true` and
  * `allowed_client_render=true`; manufacturer and distributor source records
  * additionally require `allowed_download=false` and

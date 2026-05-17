@@ -58,6 +58,8 @@ describe('source coverage ledger', () => {
     expect(ledger.summary.total_rows).toBe(ledger.vendor_model_coverage.length)
     expect(ledger.summary.missing_download_count).toBeGreaterThan(0)
     expect(ledger.summary.rejected_candidate_count).toBeGreaterThan(0)
+    expect(ledger.summary.proxy_count).toBe(1)
+    expect(ledger.summary.sealed_approved_count).toBe(0)
     expect(ledger.missing_downloads).toContain('pendent_standard:step')
     expect(ledger.rejected_candidates).toContain('pendent_standard_ferguson')
 
@@ -65,8 +67,9 @@ describe('source coverage ledger', () => {
       (row) => row.part_ref === 'step.parts:hebi_r25_actuator',
     )
     expect(stepCandidate).toBeDefined()
-    expect(stepCandidate?.coverage_status).toBe('candidate')
+    expect(stepCandidate?.coverage_status).toBe('salvage_proxy')
     expect(stepCandidate?.source_kind).toBe('open_source_step_directory')
+    expect(stepCandidate?.model_status).toBe('proxy')
     expect(stepCandidate?.source_file_ref).toContain('source_step_parts/hebi_r25_actuator.step')
     expect(stepCandidate?.asset_coverage.find((asset) => asset.kind === 'step')?.status).toBe('available')
     expect(stepCandidate?.asset_coverage.find((asset) => asset.kind === 'third_party_notice')?.status).toBe('available')

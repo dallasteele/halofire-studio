@@ -66,8 +66,10 @@ export const CatalogSourcePipelineSummarySchema = z.object({
   correction_record_count: z.number().int().nonnegative(),
   coverage_row_count: z.number().int().nonnegative(),
   manufacturer_verified_count: z.number().int().nonnegative(),
+  proxy_count: z.number().int().nonnegative(),
   dimensioned_parametric_count: z.number().int().nonnegative(),
   visual_reference_count: z.number().int().nonnegative(),
+  sealed_approved_count: z.number().int().nonnegative(),
   missing_download_count: z.number().int().nonnegative(),
   rejected_candidate_count: z.number().int().nonnegative(),
   model_fit_proof_count: z.number().int().nonnegative(),
@@ -109,10 +111,13 @@ export function summarizeCatalogSourcePipeline(
     coverage_row_count: output.source_coverage_ledger.vendor_model_coverage.length,
     manufacturer_verified_count:
       output.source_coverage_ledger.summary.manufacturer_verified_count,
+    proxy_count: output.source_coverage_ledger.summary.proxy_count,
     dimensioned_parametric_count:
       output.source_coverage_ledger.summary.dimensioned_parametric_count,
     visual_reference_count:
       output.source_coverage_ledger.summary.visual_reference_count,
+    sealed_approved_count:
+      output.source_coverage_ledger.summary.sealed_approved_count,
     missing_download_count:
       output.source_coverage_ledger.summary.missing_download_count,
     rejected_candidate_count:

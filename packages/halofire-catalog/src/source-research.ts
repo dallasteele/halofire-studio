@@ -29,6 +29,7 @@ export type CatalogSourceResearchDisposition =
   | 'promoted'
 
 export type CatalogCorrectionAction =
+  | 'promote_proxy'
   | 'request_source_capture'
   | 'capture_product_page'
   | 'capture_cut_sheet'
@@ -39,7 +40,7 @@ export type CatalogCorrectionAction =
   | 'request_human_correction'
   | 'promote_dimensioned_parametric'
   | 'promote_manufacturer_verified'
-  | 'promote_halo_fire_approved'
+  | 'promote_sealed_approved'
 
 export interface CatalogSourceResearchRecord {
   part_ref: string
@@ -109,9 +110,10 @@ export const CatalogCorrectionActionSchema = z.enum([
   'mark_missing_download',
   'mark_rejected_candidate',
   'request_human_correction',
+  'promote_proxy',
   'promote_dimensioned_parametric',
   'promote_manufacturer_verified',
-  'promote_halo_fire_approved',
+  'promote_sealed_approved',
 ])
 
 export const CatalogSourceResearchRecordSchema: z.ZodType<CatalogSourceResearchRecord> =
@@ -133,9 +135,10 @@ export const CatalogSourceResearchRecordSchema: z.ZodType<CatalogSourceResearchR
     redistribution_blocked: z.boolean(),
     model_status: z.enum([
       'visual_reference',
+      'proxy',
       'dimensioned_parametric',
       'manufacturer_verified',
-      'halo_fire_approved',
+      'sealed_approved',
     ]),
     disposition: CatalogSourceResearchDispositionSchema,
     evidence_refs: z.array(z.string()),
@@ -168,31 +171,32 @@ export const CatalogSourceResearchRecordSchema: z.ZodType<CatalogSourceResearchR
     if (
       value.source_kind === 'distributor' &&
       (value.model_status === 'manufacturer_verified' ||
-        value.model_status === 'halo_fire_approved')
+        value.model_status === 'sealed_approved')
     ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['model_status'],
         message:
-          'distributor research records cannot self-promote to manufacturer_verified or halo_fire_approved',
+          'distributor research records cannot self-promote to manufacturer_verified or sealed_approved',
       })
     }
     if (
       value.source_kind === 'open_source_step_directory' &&
       (value.model_status === 'manufacturer_verified' ||
-        value.model_status === 'halo_fire_approved')
+        value.model_status === 'sealed_approved')
     ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['model_status'],
         message:
-          'open-source STEP research records cannot claim manufacturer_verified or halo_fire_approved',
+          'open-source STEP research records cannot claim manufacturer_verified or sealed_approved',
       })
     }
     if (
-      (value.model_status === 'dimensioned_parametric' ||
+      (value.model_status === 'proxy' ||
+        value.model_status === 'dimensioned_parametric' ||
         value.model_status === 'manufacturer_verified' ||
-        value.model_status === 'halo_fire_approved') &&
+        value.model_status === 'sealed_approved') &&
       !hasText(value.source_file_ref)
     ) {
       ctx.addIssue({
@@ -224,15 +228,17 @@ export const CatalogCorrectionRecordSchema: z.ZodType<CatalogCorrectionRecord> =
     ]),
     from_status: z.enum([
       'visual_reference',
+      'proxy',
       'dimensioned_parametric',
       'manufacturer_verified',
-      'halo_fire_approved',
+      'sealed_approved',
     ]),
     to_status: z.enum([
       'visual_reference',
+      'proxy',
       'dimensioned_parametric',
       'manufacturer_verified',
-      'halo_fire_approved',
+      'sealed_approved',
     ]),
     action: CatalogCorrectionActionSchema,
     reason: z.string().min(1),
@@ -260,13 +266,19 @@ export const CatalogCorrectionRecordSchema: z.ZodType<CatalogCorrectionRecord> =
     }
     if (
       value.from_status === 'visual_reference' &&
-      value.to_status === 'halo_fire_approved'
+      value.to_status === 'sealed_approved'
     ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['to_status'],
-        message:
-          'visual_reference cannot jump directly to halo_fire_approved',
+        message: 'visual_reference cannot jump directly to sealed_approved',
+      })
+    }
+    if (value.action === 'promote_proxy' && value.to_status !== 'proxy') {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['action'],
+        message: 'promote_proxy corrections must end at proxy',
       })
     }
     if (
@@ -283,13 +295,12 @@ export const CatalogCorrectionRecordSchema: z.ZodType<CatalogCorrectionRecord> =
     }
     if (
       value.source_kind !== 'manufacturer' &&
-      value.to_status === 'halo_fire_approved'
+      value.to_status === 'sealed_approved'
     ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['to_status'],
-        message:
-          'only manufacturer-backed correction records can reach halo_fire_approved',
+        message: 'only manufacturer-backed correction records can reach sealed_approved',
       })
     }
     if (
@@ -304,14 +315,13 @@ export const CatalogCorrectionRecordSchema: z.ZodType<CatalogCorrectionRecord> =
       })
     }
     if (
-      value.action === 'promote_halo_fire_approved' &&
-      value.to_status !== 'halo_fire_approved'
+      value.action === 'promote_sealed_approved' &&
+      value.to_status !== 'sealed_approved'
     ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['action'],
-        message:
-          'promote_halo_fire_approved corrections must end at halo_fire_approved',
+        message: 'promote_sealed_approved corrections must end at sealed_approved',
       })
     }
     if (
@@ -326,25 +336,23 @@ export const CatalogCorrectionRecordSchema: z.ZodType<CatalogCorrectionRecord> =
       })
     }
     if (
-      value.action === 'promote_halo_fire_approved' &&
+      value.action === 'promote_sealed_approved' &&
       value.source_kind !== 'manufacturer'
     ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['source_kind'],
-        message:
-          'only manufacturer-backed corrections can promote to halo_fire_approved',
+        message: 'only manufacturer-backed corrections can promote to sealed_approved',
       })
     }
     if (
       value.from_status === 'dimensioned_parametric' &&
-      value.to_status === 'halo_fire_approved'
+      value.to_status === 'sealed_approved'
     ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['to_status'],
-        message:
-          'dimensioned_parametric cannot jump directly to halo_fire_approved',
+        message: 'dimensioned_parametric cannot jump directly to sealed_approved',
       })
     }
     if (value.evidence_refs.length === 0) {

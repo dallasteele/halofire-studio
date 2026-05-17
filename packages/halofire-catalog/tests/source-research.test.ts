@@ -53,6 +53,10 @@ describe('source research ledger contract', () => {
       seed.research_records.find((record) => record.source_id === 'step.parts')
         ?.source_file_ref,
     ).toContain('source_step_parts/hebi_r25_actuator.step')
+    expect(
+      seed.research_records.find((record) => record.source_id === 'step.parts')
+        ?.model_status,
+    ).toBe('proxy')
     expect(seed.research_records.some((record) => record.source_id === 'ferguson_tyco_ty3251_spec')).toBe(true)
     expect(seed.research_records.some((record) => record.source_id === 'tyco_ty3251_tyb')).toBe(true)
     expect(seed.research_records.some((record) => record.source_id === 'tyco_ty4251_series_ty_b')).toBe(true)
@@ -81,6 +85,10 @@ describe('source research ledger contract', () => {
       ledger.research_records.find((record) => record.source_id === 'step.parts')
         ?.source_file_ref,
     ).toContain('source_step_parts/hebi_r25_actuator.step')
+    expect(
+      ledger.research_records.find((record) => record.source_id === 'step.parts')
+        ?.model_status,
+    ).toBe('proxy')
     expect(ledger.research_records.some((record) => record.source_id === 'ferguson_tyco_ty3251_spec')).toBe(true)
     expect(ledger.research_records.some((record) => record.part_ref === 'pendent_standard')).toBe(true)
     expect(ledger.research_records.some((record) => record.source_id === 'tyco_ty4251_series_ty_b')).toBe(true)
@@ -161,7 +169,7 @@ describe('source research ledger contract', () => {
           capture_date: '2026-05-15T21:20:27Z',
           license_summary: 'MIT upstream directory entry; locally ingested STEP sample remains upstream-governed.',
           redistribution_blocked: true,
-          model_status: 'visual_reference',
+          model_status: 'proxy',
           disposition: 'candidate',
           evidence_refs: ['https://www.step.parts', 'https://github.com/earthtojake/step.parts'],
           notes: 'Source candidate only; useful for open-source STEP ingestion, not sprinkler approval.',
@@ -296,7 +304,7 @@ describe('source research ledger contract', () => {
     expect(ledger.research_records).toHaveLength(4)
     expect(ledger.research_records[0]?.source_id).toBe('step.parts')
     expect(ledger.research_records[0]?.redistribution_blocked).toBe(true)
-    expect(ledger.research_records[0]?.model_status).toBe('visual_reference')
+    expect(ledger.research_records[0]?.model_status).toBe('proxy')
     expect(ledger.research_records[1]?.source_kind).toBe('distributor')
     expect(ledger.research_records[1]?.model_status).toBe('dimensioned_parametric')
     expect(ledger.research_records[2]?.model_status).toBe('manufacturer_verified')
@@ -328,6 +336,30 @@ describe('source research ledger contract', () => {
     })
 
     expect(result.success).toBe(false)
+  })
+
+  test('step.parts candidates can remain proxy without becoming manufacturer verified', () => {
+    const result = CatalogSourceResearchRecordSchema.safeParse({
+      part_ref: 'step.parts:hebi_r25_actuator',
+      source_id: 'step.parts',
+      source_kind: 'open_source_step_directory',
+      manufacturer: 'HEBI Robotics',
+      model: 'R25 actuator',
+      public_url: 'https://www.step.parts/parts/hebi_r25_actuator',
+      source_url:
+        'https://media.githubusercontent.com/media/HebiRobotics/hebi-cad/main/A-2700-25-XX_R25_Actuator/R25_Export.STEP',
+      source_file_ref: 'E:/ClaudeBot/data/halofire/brand/components/source_step_parts/hebi_r25_actuator.step',
+      third_party_notice_ref: 'THIRD_PARTY_NOTICES.md',
+      capture_date: '2026-05-15T21:20:27Z',
+      license_summary: 'MIT upstream directory entry; locally ingested STEP sample remains upstream-governed.',
+      redistribution_blocked: true,
+      model_status: 'proxy',
+      disposition: 'candidate',
+      evidence_refs: ['https://www.step.parts'],
+      notes: 'Open-source STEP candidate stays proxy until provenance proves the exact product.',
+    })
+
+    expect(result.success).toBe(true)
   })
 
   test('correction records block open-source STEP self-promotion', () => {

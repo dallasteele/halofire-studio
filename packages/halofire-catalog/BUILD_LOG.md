@@ -20,6 +20,6 @@
 
 ## 2026-05-17
 
-- Tightened Stream F source provenance so each checked-in source collection now carries a `source_file_ref` alongside the URL, license, capture date, and redistribution gate.
-- Refreshed the seed, research ledger, and coverage ledger to track the canonical local file backing for the open-source step.parts sample and the manufacturer cut-sheet inputs.
-- Verification pending: focused catalog tests plus the package typecheck/build after the ledger refresh.
+- Migrated the Stream F catalog/model vocabulary to `proxy` and `sealed_approved`, including the typed schemas, source-policy checks, source-ledger builders, and the source coverage summary counts.
+- Rebuilt the checked-in research and coverage ledgers so the step.parts open-source STEP candidate now stays in the proxy lane with explicit third-party notice tracking and salvage coverage.
+- Verification: `C:/Python312/python.exe scripts/verify_agentic_rules.py`; `C:/Python312/python.exe -m pytest tests/core/hal/halo_forge/test_sprinkler_catalog_source_research_and_coverage.py -q`; `C:/Python312/python.exe -m pytest tests/core/hal/halo_forge/test_sprinkler_catalog_source_acquisition.py -q`; `bun test halofire-studio/packages/halofire-catalog/tests/source-research.test.ts`; `bun test halofire-studio/packages/halofire-catalog/tests/source-coverage.test.ts`; `bun test halofire-studio/packages/halofire-catalog/tests/source-owner-pipeline.test.ts`; `bun test halofire-studio/packages/halofire-catalog/tests/schema.test.ts`; `bun test halofire-studio/packages/halofire-catalog/tests/provenance.test.ts`.

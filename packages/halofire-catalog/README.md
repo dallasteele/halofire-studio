@@ -11,6 +11,7 @@ This package is the catalog/model owner surface for Halo Forge Stream F.
 It ships a mixed salvage catalog with explicit provenance:
 
 - open-authored procedural parts stay `visual_reference`
+- open-source STEP candidates stay `proxy` until provenance proves the exact product or authority
 - manufacturer and distributor salvage carry `source_license` records
 - verified families carry `family_contract` records with GLB/IFC/DXF paths
 - source ingestion remains policy-driven and license-aware
@@ -29,7 +30,8 @@ The catalog package now also exposes a typed source-research and
 correction workflow contract. Use it when you need to track the exact
 internet-backed URLs, captured files, license/redistribution status, and
 human correction decisions that led to a model staying in
-`visual_reference`, `dimensioned_parametric`, or `manufacturer_verified`.
+`visual_reference`, `proxy`, `dimensioned_parametric`, `manufacturer_verified`,
+or `sealed_approved`.
 The package also exposes replayable ledger builders in
 `src/source-ledger.ts` so the checked-in research and coverage artifacts
 can be regenerated from typed inputs instead of treated as opaque data
@@ -109,9 +111,9 @@ The canonical source ingestion policy is:
 - all source licenses keep `allowed_internal_use=true` and
   `allowed_client_render=true`
 - `dimensions_verified` must be explicit for any promoted family
-- distributor-backed families may stop at `dimensioned_parametric`
+- distributor-backed families may stop at `proxy` or `dimensioned_parametric`
   and must not be promoted to `manufacturer_verified` or
-  `halo_fire_approved` without a manufacturer-backed evidence path
+  `sealed_approved` without a manufacturer-backed evidence path
 - manufacturer and distributor source records are internal-use only:
   `allowed_download=false` and `redistribution_blocked=true`
 - `manufacturer_verified` still requires manufacturer-backed evidence

@@ -64,11 +64,17 @@ export function summarizeCoverageLedger(
     manufacturer_verified_count: ledger.vendor_model_coverage.filter(
       (row) => row.model_status === 'manufacturer_verified',
     ).length,
+    proxy_count: ledger.vendor_model_coverage.filter(
+      (row) => row.model_status === 'proxy',
+    ).length,
     dimensioned_parametric_count: ledger.vendor_model_coverage.filter(
       (row) => row.model_status === 'dimensioned_parametric',
     ).length,
     visual_reference_count: ledger.vendor_model_coverage.filter(
       (row) => row.model_status === 'visual_reference',
+    ).length,
+    sealed_approved_count: ledger.vendor_model_coverage.filter(
+      (row) => row.model_status === 'sealed_approved',
     ).length,
     missing_download_count: ledger.missing_downloads.length,
     rejected_candidate_count: ledger.rejected_candidates.length,
@@ -91,10 +97,16 @@ export function buildSourceCollectionCoverage(
 }
 
 function coverageStatusFor(component: CatalogCoverageComponentInput): CatalogCoverageRow['coverage_status'] {
-  if (component.model_status === 'manufacturer_verified' || component.model_status === 'halo_fire_approved') {
+  if (
+    component.model_status === 'manufacturer_verified' ||
+    component.model_status === 'sealed_approved'
+  ) {
     return 'promoted'
   }
-  if (component.model_status === 'dimensioned_parametric') {
+  if (
+    component.model_status === 'proxy' ||
+    component.model_status === 'dimensioned_parametric'
+  ) {
     return 'salvage_proxy'
   }
   if (component.source_kind === 'procedural') {
@@ -104,8 +116,14 @@ function coverageStatusFor(component: CatalogCoverageComponentInput): CatalogCov
 }
 
 function rejectedReasonFor(component: CatalogCoverageComponentInput): string | null {
-  if (component.model_status === 'manufacturer_verified') {
+  if (
+    component.model_status === 'manufacturer_verified' ||
+    component.model_status === 'sealed_approved'
+  ) {
     return null
+  }
+  if (component.source_kind === 'open_source_step_directory') {
+    return 'Open-source STEP directory assets remain proxy candidates until provenance proves the exact product or authority.'
   }
   if (component.source_kind === 'distributor') {
     return 'Distributor-backed salvage remains a proxy until a manufacturer evidence path exists.'
@@ -214,6 +232,21 @@ function buildAssetCoverage(
       ref: dxfAsset?.ref ?? null,
       notes: 'Manufacturer-verified DXF proxy',
     }
+  } else if (component.model_status === 'proxy') {
+    const ifcAsset = assetCoverage[4]
+    const dxfAsset = assetCoverage[5]
+    assetCoverage[4] = {
+      kind: 'ifc',
+      status: ifcAsset?.status ?? 'missing',
+      ref: ifcAsset?.ref ?? null,
+      notes: 'Proxy IFC placeholder only; IFC missing until dimensioned parametric review',
+    }
+    assetCoverage[5] = {
+      kind: 'dxf',
+      status: dxfAsset?.status ?? 'missing',
+      ref: dxfAsset?.ref ?? null,
+      notes: 'Proxy DXF placeholder only; DXF missing until dimensioned parametric review',
+    }
   } else if (component.model_status === 'dimensioned_parametric') {
     const ifcAsset = assetCoverage[4]
     const dxfAsset = assetCoverage[5]
@@ -275,7 +308,7 @@ function buildStepPartsAssetCoverage(
       kind: 'glb',
       status: 'missing',
       ref: null,
-      notes: 'No checked-in GLB has been generated from the STEP candidate yet',
+      notes: 'No checked-in GLB has been generated from the STEP proxy candidate yet',
     },
     {
       kind: 'ifc',
@@ -293,7 +326,7 @@ function buildStepPartsAssetCoverage(
       kind: 'step',
       status: hasText(record.source_file_ref) ? 'available' : 'missing',
       ref: record.source_file_ref,
-      notes: 'Locally ingested open-source STEP sample',
+      notes: 'Locally ingested open-source STEP proxy sample',
     },
     {
       kind: 'revit',
@@ -349,7 +382,7 @@ function buildOpenSourceStepCoverageRow(
     model: record.model,
     source_kind: 'open_source_step_directory',
     model_status: record.model_status,
-    coverage_status: 'candidate',
+    coverage_status: 'salvage_proxy',
     product_page_url: record.public_url,
     product_page_capture_at: record.capture_date,
     source_file_ref: record.source_file_ref,
@@ -359,7 +392,7 @@ function buildOpenSourceStepCoverageRow(
     third_party_notice_ref: record.third_party_notice_ref ?? null,
     asset_coverage: buildStepPartsAssetCoverage(record),
     rejected_candidate_reason:
-      'Open-source STEP directory assets remain candidates until provenance proves the exact product or authority.',
+      'Open-source STEP directory assets remain proxy candidates until provenance proves the exact product or authority.',
     notes: hasText(record.notes) ? record.notes : record.part_ref,
   }
 }
@@ -444,11 +477,17 @@ export function buildCoverageLedger(
       manufacturer_verified_count: vendorModelCoverage.filter(
         (row) => row.model_status === 'manufacturer_verified',
       ).length,
+      proxy_count: vendorModelCoverage.filter(
+        (row) => row.model_status === 'proxy',
+      ).length,
       dimensioned_parametric_count: vendorModelCoverage.filter(
         (row) => row.model_status === 'dimensioned_parametric',
       ).length,
       visual_reference_count: vendorModelCoverage.filter(
         (row) => row.model_status === 'visual_reference',
+      ).length,
+      sealed_approved_count: vendorModelCoverage.filter(
+        (row) => row.model_status === 'sealed_approved',
       ).length,
       missing_download_count: missingDownloads.size,
       rejected_candidate_count: rejectedCandidates.size,

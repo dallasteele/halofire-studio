@@ -46,9 +46,10 @@ export type PartKind =
 
 export type CatalogModelStatus =
   | 'visual_reference'
+  | 'proxy'
   | 'dimensioned_parametric'
   | 'manufacturer_verified'
-  | 'halo_fire_approved'
+  | 'sealed_approved'
 
 export type CatalogSourceKind =
   | 'procedural'

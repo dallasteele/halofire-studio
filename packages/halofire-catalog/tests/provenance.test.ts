@@ -43,7 +43,7 @@ type SourceEntry = {
   source_license_ref: string
   family_contract_ref: string
   source_kind: 'procedural' | 'manufacturer' | 'distributor'
-  model_status: 'visual_reference' | 'dimensioned_parametric' | 'manufacturer_verified' | 'halo_fire_approved'
+  model_status: 'visual_reference' | 'proxy' | 'dimensioned_parametric' | 'manufacturer_verified' | 'sealed_approved'
   source_license: {
     part_ref: string
     model_status: SourceEntry['model_status']
@@ -148,7 +148,7 @@ describe('provenance artifacts', () => {
       if (
         component.model_status === 'dimensioned_parametric' ||
         component.model_status === 'manufacturer_verified' ||
-        component.model_status === 'halo_fire_approved'
+        component.model_status === 'sealed_approved'
       ) {
         expect(family.source_license_ref).toBe(component.source_license_ref)
         expect(family.evidence_refs.length).toBeGreaterThan(0)
@@ -307,7 +307,7 @@ describe('provenance artifacts', () => {
 
       if (component.source_kind === 'distributor') {
         expect(component.model_status).not.toBe('manufacturer_verified')
-        expect(component.model_status).not.toBe('halo_fire_approved')
+        expect(component.model_status).not.toBe('sealed_approved')
         expect(component.source_license.allowed_download).toBe(false)
         expect(component.source_license.redistribution_blocked).toBe(true)
         expect(component.source_license.model_status).toBe(component.model_status)

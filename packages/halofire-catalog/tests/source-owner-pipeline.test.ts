@@ -101,15 +101,22 @@ describe('source owner pipeline', () => {
       )?.model_status,
     ).toBe('manufacturer_verified')
     expect(
+      pipeline.source_research_ledger.research_records.find(
+        (record) => record.source_id === 'step.parts',
+      )?.model_status,
+    ).toBe('proxy')
+    expect(
       pipeline.source_coverage_ledger.vendor_model_coverage.find(
         (row) => row.part_ref === 'step.parts:hebi_r25_actuator',
       )?.coverage_status,
-    ).toBe('candidate')
+    ).toBe('salvage_proxy')
     expect(
       pipeline.source_coverage_ledger.vendor_model_coverage.find(
         (row) => row.part_ref === 'pendent_standard',
       )?.coverage_status,
     ).toBe('promoted')
+    expect(pipeline.summary.proxy_count).toBe(1)
+    expect(pipeline.summary.sealed_approved_count).toBe(0)
     expect(pipeline.model_fit_inventory?.proof_count).toBe(3)
     expect(pipeline.model_fit_inventory?.review_ready_proof_count).toBe(3)
     expect(pipeline.model_fit_inventory?.cleared_proof_count).toBe(0)

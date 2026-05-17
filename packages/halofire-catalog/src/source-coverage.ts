@@ -78,8 +78,10 @@ export interface CatalogCoverageLedger {
   summary: {
     total_rows: number
     manufacturer_verified_count: number
+    proxy_count: number
     dimensioned_parametric_count: number
     visual_reference_count: number
+    sealed_approved_count: number
     missing_download_count: number
     rejected_candidate_count: number
   }
@@ -194,9 +196,10 @@ export const CatalogCoverageRowSchema: z.ZodType<CatalogCoverageRow> =
     ]),
     model_status: z.enum([
       'visual_reference',
+      'proxy',
       'dimensioned_parametric',
       'manufacturer_verified',
-      'halo_fire_approved',
+      'sealed_approved',
     ]),
     coverage_status: CatalogCoverageStatusSchema,
     product_page_url: z.string().nullable(),
@@ -222,8 +225,10 @@ export const CatalogCoverageLedgerSchema: z.ZodType<CatalogCoverageLedger> =
     summary: z.object({
       total_rows: z.number().int().nonnegative(),
       manufacturer_verified_count: z.number().int().nonnegative(),
+      proxy_count: z.number().int().nonnegative(),
       dimensioned_parametric_count: z.number().int().nonnegative(),
       visual_reference_count: z.number().int().nonnegative(),
+      sealed_approved_count: z.number().int().nonnegative(),
       missing_download_count: z.number().int().nonnegative(),
       rejected_candidate_count: z.number().int().nonnegative(),
     }),
