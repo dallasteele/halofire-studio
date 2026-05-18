@@ -34,7 +34,7 @@ describe('source coverage ledger', () => {
     const ledger = CatalogCoverageLedgerSchema.parse(loadJson(LEDGER_PATH))
 
     expect(ledger.scope).toContain('Stream F')
-    expect(ledger.source_collections).toHaveLength(10)
+    expect(ledger.source_collections).toHaveLength(12)
     expect(ledger.source_collections.map((collection) => collection.source_id)).toEqual([
       'step.parts',
       'wheatland_schedule40',
@@ -46,6 +46,8 @@ describe('source coverage ledger', () => {
       'viking_vk3021_qr_pendent',
       'viking_vk3021_qr_pendent_revit2017',
       'victaulic_fl_qr_sw',
+      'tyco_lfii_hsw_tfp417',
+      'reliable_dh56_bulletin_016',
     ])
 
     const [stepParts] = ledger.source_collections
@@ -88,7 +90,7 @@ describe('source coverage ledger', () => {
     expect(ledger.summary.total_rows).toBe(ledger.vendor_model_coverage.length)
     expect(ledger.summary.missing_download_count).toBeGreaterThan(0)
     expect(ledger.summary.rejected_candidate_count).toBeGreaterThan(0)
-    expect(ledger.summary.proxy_count).toBe(4)
+    expect(ledger.summary.proxy_count).toBe(6)
     expect(ledger.summary.sealed_approved_count).toBe(0)
     expect(ledger.missing_downloads).toContain('pendent_standard:step')
     expect(ledger.rejected_candidates).toContain('pendent_standard_ferguson')
@@ -138,6 +140,28 @@ describe('source coverage ledger', () => {
     expect(tyco3251?.asset_coverage.find((asset) => asset.kind === 'cut_sheet')?.status).toBe('available')
     expect(tyco3251?.asset_coverage.find((asset) => asset.kind === 'ifc')?.status).toBe('available')
     expect(tyco3251?.asset_coverage.find((asset) => asset.kind === 'dxf')?.status).toBe('available')
+
+    const sidewallHorizontal = ledger.vendor_model_coverage.find(
+      (row) => row.part_ref === 'sidewall_horizontal',
+    )
+    expect(sidewallHorizontal).toBeDefined()
+    expect(sidewallHorizontal?.coverage_status).toBe('salvage_proxy')
+    expect(sidewallHorizontal?.model_status).toBe('proxy')
+    expect(sidewallHorizontal?.source_kind).toBe('manufacturer')
+    expect(sidewallHorizontal?.asset_coverage.find((asset) => asset.kind === 'product_page')?.status).toBe('available')
+    expect(sidewallHorizontal?.asset_coverage.find((asset) => asset.kind === 'cut_sheet')?.status).toBe('available')
+    expect(sidewallHorizontal?.asset_coverage.find((asset) => asset.kind === 'ifc')?.status).toBe('missing')
+
+    const sidewallDry = ledger.vendor_model_coverage.find(
+      (row) => row.part_ref === 'sidewall_dry',
+    )
+    expect(sidewallDry).toBeDefined()
+    expect(sidewallDry?.coverage_status).toBe('salvage_proxy')
+    expect(sidewallDry?.model_status).toBe('proxy')
+    expect(sidewallDry?.source_kind).toBe('manufacturer')
+    expect(sidewallDry?.asset_coverage.find((asset) => asset.kind === 'product_page')?.status).toBe('available')
+    expect(sidewallDry?.asset_coverage.find((asset) => asset.kind === 'cut_sheet')?.status).toBe('available')
+    expect(sidewallDry?.asset_coverage.find((asset) => asset.kind === 'ifc')?.status).toBe('missing')
 
     const vikingRow = ledger.vendor_model_coverage.find(
       (row) => row.part_ref === 'viking_vk100_upright_155f',

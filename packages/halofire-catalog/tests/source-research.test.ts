@@ -38,7 +38,7 @@ describe('source research ledger contract', () => {
       JSON.parse(readFileSync(SEED_PATH, 'utf-8')),
     )
 
-    expect(seed.source_collections).toHaveLength(10)
+    expect(seed.source_collections).toHaveLength(12)
     expect(seed.source_collections.map((collection) => collection.source_id)).toEqual([
       'step.parts',
       'wheatland_schedule40',
@@ -50,6 +50,8 @@ describe('source research ledger contract', () => {
       'viking_vk3021_qr_pendent',
       'viking_vk3021_qr_pendent_revit2017',
       'victaulic_fl_qr_sw',
+      'tyco_lfii_hsw_tfp417',
+      'reliable_dh56_bulletin_016',
     ])
     expect(seed.source_collections[0]?.source_kind).toBe('open_source_step_directory')
     expect(seed.source_collections[0]?.source_file_ref).toContain('source_step_parts/hebi_r25_actuator.step')
@@ -75,7 +77,11 @@ describe('source research ledger contract', () => {
     expect(seed.research_records.some((record) => record.part_ref === 'viking_vk100_upright_286f')).toBe(true)
     expect(seed.research_records.some((record) => record.source_id === 'viking_vk3021_qr_pendent')).toBe(true)
     expect(seed.research_records.some((record) => record.part_ref === 'viking_vk300_qr_pendent_155f')).toBe(true)
-    expect(seed.correction_records).toHaveLength(16)
+    expect(seed.research_records.some((record) => record.source_id === 'tyco_lfii_hsw_tfp417')).toBe(true)
+    expect(seed.research_records.some((record) => record.part_ref === 'sidewall_horizontal')).toBe(true)
+    expect(seed.research_records.some((record) => record.source_id === 'reliable_dh56_bulletin_016')).toBe(true)
+    expect(seed.research_records.some((record) => record.part_ref === 'sidewall_dry')).toBe(true)
+    expect(seed.correction_records).toHaveLength(18)
   })
 
   test('checked-in research ledger validates and carries the step.parts candidate', () => {
@@ -83,7 +89,7 @@ describe('source research ledger contract', () => {
       JSON.parse(readFileSync(LEDGER_PATH, 'utf-8')),
     )
 
-    expect(ledger.source_collections).toHaveLength(10)
+    expect(ledger.source_collections).toHaveLength(12)
     expect(ledger.source_collections.map((collection) => collection.source_id)).toEqual([
       'step.parts',
       'wheatland_schedule40',
@@ -95,6 +101,8 @@ describe('source research ledger contract', () => {
       'viking_vk3021_qr_pendent',
       'viking_vk3021_qr_pendent_revit2017',
       'victaulic_fl_qr_sw',
+      'tyco_lfii_hsw_tfp417',
+      'reliable_dh56_bulletin_016',
     ])
     expect(ledger.source_collections[0]?.license_spdx).toBe('MIT')
     expect(ledger.source_collections[0]?.source_file_ref).toContain('source_step_parts/hebi_r25_actuator.step')
@@ -120,10 +128,14 @@ describe('source research ledger contract', () => {
     expect(ledger.research_records.some((record) => record.part_ref === 'viking_vk100_upright_135f')).toBe(true)
     expect(ledger.research_records.some((record) => record.source_id === 'viking_vk3021_qr_pendent')).toBe(true)
     expect(ledger.research_records.some((record) => record.part_ref === 'viking_vk300_qr_pendent_200f')).toBe(true)
-    expect(ledger.correction_records).toHaveLength(16)
-    expect(ledger.summary.total_records).toBe(21)
-    expect(ledger.summary.promoted_count).toBe(20)
-    expect(ledger.summary.correction_count).toBe(16)
+    expect(ledger.research_records.some((record) => record.source_id === 'tyco_lfii_hsw_tfp417')).toBe(true)
+    expect(ledger.research_records.some((record) => record.part_ref === 'sidewall_horizontal')).toBe(true)
+    expect(ledger.research_records.some((record) => record.source_id === 'reliable_dh56_bulletin_016')).toBe(true)
+    expect(ledger.research_records.some((record) => record.part_ref === 'sidewall_dry')).toBe(true)
+    expect(ledger.correction_records).toHaveLength(18)
+    expect(ledger.summary.total_records).toBe(23)
+    expect(ledger.summary.promoted_count).toBe(22)
+    expect(ledger.summary.correction_count).toBe(18)
     expect(ledger.summary).toEqual(summarizeSourceResearchLedger(ledger))
   })
 

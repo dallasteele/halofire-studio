@@ -85,7 +85,7 @@ describe('source owner pipeline', () => {
     expect(pipeline.source_coverage_ledger.summary).toEqual(
       checkedInCoverage.summary,
     )
-    expect(pipeline.summary.source_collection_count).toBe(10)
+    expect(pipeline.summary.source_collection_count).toBe(12)
     expect(pipeline.summary.research_record_count).toBe(
       checkedInResearch.research_records.length,
     )
@@ -154,7 +154,7 @@ describe('source owner pipeline', () => {
         (row) => row.part_ref === 'viking_vk300_qr_pendent_155f',
       )?.coverage_status,
     ).toBe('salvage_proxy')
-    expect(pipeline.summary.proxy_count).toBe(4)
+    expect(pipeline.summary.proxy_count).toBe(6)
     expect(pipeline.summary.sealed_approved_count).toBe(0)
     expect(pipeline.model_fit_inventory?.proof_count).toBe(3)
     expect(pipeline.model_fit_inventory?.review_ready_proof_count).toBe(3)

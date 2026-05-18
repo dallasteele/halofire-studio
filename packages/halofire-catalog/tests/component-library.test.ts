@@ -47,11 +47,11 @@ describe('component library contract', () => {
     expect(library.summary.source_manifest_component_count).toBe(92)
     expect(library.summary.component_map_entry_count).toBe(92)
     expect(library.summary.family_contract_count).toBe(92)
-    expect(library.summary.procedural_count).toBe(47)
-    expect(library.summary.manufacturer_count).toBe(44)
+    expect(library.summary.procedural_count).toBe(45)
+    expect(library.summary.manufacturer_count).toBe(46)
     expect(library.summary.distributor_count).toBe(1)
-    expect(library.summary.visual_reference_count).toBe(47)
-    expect(library.summary.proxy_count).toBe(3)
+    expect(library.summary.visual_reference_count).toBe(45)
+    expect(library.summary.proxy_count).toBe(5)
     expect(library.summary.dimensioned_parametric_count).toBe(1)
     expect(library.summary.manufacturer_verified_count).toBe(41)
     expect(library.summary.sealed_approved_count).toBe(0)
@@ -97,5 +97,19 @@ describe('component library contract', () => {
       'E:/ClaudeBot/halofire-studio/packages/halofire-catalog/assets/revit/viking_vk3021_qr_pendent_revit2017.zip',
     )
     expect(vikingProxy?.family_contract.dwg_path).toBeNull()
+
+    const sidewallHorizontal = library.source_manifest.components.find(
+      (component) => component.key === 'sidewall_horizontal',
+    )
+    expect(sidewallHorizontal).toBeDefined()
+    expect(sidewallHorizontal?.source_kind).toBe('manufacturer')
+    expect(sidewallHorizontal?.model_status).toBe('proxy')
+
+    const sidewallDry = library.source_manifest.components.find(
+      (component) => component.key === 'sidewall_dry',
+    )
+    expect(sidewallDry).toBeDefined()
+    expect(sidewallDry?.source_kind).toBe('manufacturer')
+    expect(sidewallDry?.model_status).toBe('proxy')
   })
 })

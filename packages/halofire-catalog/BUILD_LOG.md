@@ -2,6 +2,12 @@
 
 ## 2026-05-18
 
+- Promoted manufacturer-backed sidewall catalog depth for Tyco LFII HSW and Reliable DH56, regenerated the source research and source coverage ledgers, and threaded the new proxy rows through the component library, provenance, and source-owner pipeline regressions.
+- Verification pending: `C:/Python312/python.exe scripts/verify_agentic_rules.py`; targeted `bun test` runs for the five catalog regression files changed in this slice.
+
+- Aligned the root Halo Forge Stream F regression with the current checked-in research ledger truth: the ledger now carries 21 research records, 20 promoted rows, 16 corrections, and the open-source step.parts candidate stays in the `salvage_proxy` coverage tier.
+- Verification: `C:/Python312/python.exe -m pytest tests/core/hal/halo_forge/test_sprinkler_catalog_source_research_and_coverage.py -q`; `bun test E:/ClaudeBot/halofire-studio/packages/halofire-catalog/tests/source-research.test.ts E:/ClaudeBot/halofire-studio/packages/halofire-catalog/tests/source-coverage.test.ts E:/ClaudeBot/halofire-studio/packages/halofire-catalog/tests/component-library.test.ts`.
+
 - Promoted the five TY3251 temperature variants to manufacturer-backed status using the official Tyco TY-B source collection, regenerated the source research and source coverage ledgers, and created variant IFC/DXF proxy contracts so the component library now carries honest manufacturer evidence for the TY3251 family depth.
 - Verification: `C:/Python312/python.exe scripts/verify_agentic_rules.py`; `bun test halofire-studio/packages/halofire-catalog/tests/component-library.test.ts halofire-studio/packages/halofire-catalog/tests/source-research.test.ts halofire-studio/packages/halofire-catalog/tests/source-ledger.test.ts halofire-studio/packages/halofire-catalog/tests/source-coverage.test.ts halofire-studio/packages/halofire-catalog/tests/source-owner-pipeline.test.ts halofire-studio/packages/halofire-catalog/tests/provenance.test.ts`; `bun run --cwd E:/ClaudeBot/halofire-studio/packages/halofire-catalog check-types`; `bun run --cwd E:/ClaudeBot/halofire-studio/packages/halofire-catalog build`.
 
