@@ -34,7 +34,7 @@ describe('source coverage ledger', () => {
     const ledger = CatalogCoverageLedgerSchema.parse(loadJson(LEDGER_PATH))
 
     expect(ledger.scope).toContain('Stream F')
-    expect(ledger.source_collections).toHaveLength(6)
+    expect(ledger.source_collections).toHaveLength(7)
     expect(ledger.source_collections.map((collection) => collection.source_id)).toEqual([
       'step.parts',
       'wheatland_schedule40',
@@ -42,6 +42,7 @@ describe('source coverage ledger', () => {
       'tyco_av1_300',
       'reliable_f156_bulletin_031',
       'tyco_ty3251_tyb',
+      'viking_vk100',
     ])
 
     const [stepParts] = ledger.source_collections
@@ -54,6 +55,19 @@ describe('source coverage ledger', () => {
     expect(stepParts.license_spdx).toBe('MIT')
     expect(stepParts.third_party_notice_ref).toBe('THIRD_PARTY_NOTICES.md')
     expect(stepParts.redistribution_blocked).toBe(true)
+
+    const viking = ledger.source_collections.find(
+      (collection) => collection.source_id === 'viking_vk100',
+    )
+    expect(viking).toBeDefined()
+    expect(viking?.public_url).toBe(
+      'https://www.vikinggroupinc.com/products/fire-sprinklers/standard-coverage-sr/upright-conventional/vk100',
+    )
+    expect(viking?.source_file_ref).toContain('cut_sheets/viking_vk100.pdf')
+    expect(viking?.source_url).toBe(
+      'https://www.vikinggroupinc.com/databook/current_tds/052014.pdf',
+    )
+    expect(viking?.license_spdx).toBe('proprietary')
 
     expect(ledger.vendor_model_coverage.length).toBeGreaterThan(0)
     expect(ledger.summary.total_rows).toBe(ledger.vendor_model_coverage.length)
@@ -109,6 +123,17 @@ describe('source coverage ledger', () => {
     expect(tyco3251?.asset_coverage.find((asset) => asset.kind === 'cut_sheet')?.status).toBe('available')
     expect(tyco3251?.asset_coverage.find((asset) => asset.kind === 'ifc')?.status).toBe('available')
     expect(tyco3251?.asset_coverage.find((asset) => asset.kind === 'dxf')?.status).toBe('available')
+
+    const vikingRow = ledger.vendor_model_coverage.find(
+      (row) => row.part_ref === 'viking_vk100_upright_155f',
+    )
+    expect(vikingRow).toBeDefined()
+    expect(vikingRow?.coverage_status).toBe('promoted')
+    expect(vikingRow?.model_status).toBe('manufacturer_verified')
+    expect(vikingRow?.asset_coverage.find((asset) => asset.kind === 'product_page')?.status).toBe('available')
+    expect(vikingRow?.asset_coverage.find((asset) => asset.kind === 'cut_sheet')?.status).toBe('available')
+    expect(vikingRow?.asset_coverage.find((asset) => asset.kind === 'ifc')?.status).toBe('available')
+    expect(vikingRow?.asset_coverage.find((asset) => asset.kind === 'dxf')?.status).toBe('available')
   })
 
   test('third-party notice file documents the open-source STEP provenance policy', () => {

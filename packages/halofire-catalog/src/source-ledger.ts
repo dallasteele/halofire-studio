@@ -56,6 +56,58 @@ export interface CatalogCoverageLedgerInput {
 const hasText = (value: string | null | undefined): value is string =>
   typeof value === 'string' && value.trim().length > 0
 
+const COVERAGE_DOWNLOAD_KINDS = new Set<CatalogCoverageAsset['kind']>([
+  'product_page',
+  'image',
+  'cut_sheet',
+  'ifc',
+  'dxf',
+  'step',
+  'revit',
+  'dwg',
+  'third_party_notice',
+])
+
+type CatalogCoverageMissingSummary = {
+  product_page_missing_count: number
+  image_missing_count: number
+  cut_sheet_missing_count: number
+  glb_missing_count: number
+  ifc_missing_count: number
+  dxf_missing_count: number
+  step_missing_count: number
+  revit_missing_count: number
+  dwg_missing_count: number
+  third_party_notice_missing_count: number
+}
+
+function countMissingByKind(
+  rows: CatalogCoverageRow[],
+): CatalogCoverageMissingSummary {
+  const counts: CatalogCoverageMissingSummary = {
+    product_page_missing_count: 0,
+    image_missing_count: 0,
+    cut_sheet_missing_count: 0,
+    glb_missing_count: 0,
+    ifc_missing_count: 0,
+    dxf_missing_count: 0,
+    step_missing_count: 0,
+    revit_missing_count: 0,
+    dwg_missing_count: 0,
+    third_party_notice_missing_count: 0,
+  }
+
+  for (const row of rows) {
+    for (const asset of row.asset_coverage) {
+      if (asset.status === 'missing') {
+        counts[`${asset.kind}_missing_count` as const] += 1
+      }
+    }
+  }
+
+  return counts
+}
+
 export function summarizeCoverageLedger(
   ledger: Pick<CatalogCoverageLedger, 'vendor_model_coverage' | 'missing_downloads' | 'rejected_candidates'>,
 ): CatalogCoverageLedger['summary'] {
@@ -78,6 +130,7 @@ export function summarizeCoverageLedger(
     ).length,
     missing_download_count: ledger.missing_downloads.length,
     rejected_candidate_count: ledger.rejected_candidates.length,
+    ...countMissingByKind(ledger.vendor_model_coverage),
   }
 }
 
@@ -410,11 +463,7 @@ export function buildCoverageLedger(
     for (const asset of row.asset_coverage) {
       if (
         asset.status === 'missing' &&
-        (asset.kind === 'ifc' ||
-          asset.kind === 'dxf' ||
-          asset.kind === 'step' ||
-          asset.kind === 'revit' ||
-          asset.kind === 'dwg')
+        COVERAGE_DOWNLOAD_KINDS.has(asset.kind)
       ) {
         missingDownloads.add(`${row.part_ref}:${asset.kind}`)
       }
@@ -438,11 +487,7 @@ export function buildCoverageLedger(
     for (const asset of row.asset_coverage) {
       if (
         asset.status === 'missing' &&
-        (asset.kind === 'ifc' ||
-          asset.kind === 'dxf' ||
-          asset.kind === 'step' ||
-          asset.kind === 'revit' ||
-          asset.kind === 'dwg')
+        COVERAGE_DOWNLOAD_KINDS.has(asset.kind)
       ) {
         missingDownloads.add(`${row.part_ref}:${asset.kind}`)
       }
@@ -491,6 +536,7 @@ export function buildCoverageLedger(
       ).length,
       missing_download_count: missingDownloads.size,
       rejected_candidate_count: rejectedCandidates.size,
+      ...countMissingByKind(vendorModelCoverage),
     },
   }
 

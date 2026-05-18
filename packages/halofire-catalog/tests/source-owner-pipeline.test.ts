@@ -85,7 +85,7 @@ describe('source owner pipeline', () => {
     expect(pipeline.source_coverage_ledger.summary).toEqual(
       checkedInCoverage.summary,
     )
-    expect(pipeline.summary.source_collection_count).toBe(6)
+    expect(pipeline.summary.source_collection_count).toBe(7)
     expect(pipeline.summary.research_record_count).toBe(
       checkedInResearch.research_records.length,
     )
@@ -123,6 +123,11 @@ describe('source owner pipeline', () => {
     ).toBe('manufacturer_verified')
     expect(
       pipeline.source_research_ledger.research_records.find(
+        (record) => record.part_ref === 'viking_vk100_upright_155f',
+      )?.model_status,
+    ).toBe('manufacturer_verified')
+    expect(
+      pipeline.source_research_ledger.research_records.find(
         (record) => record.source_id === 'step.parts',
       )?.model_status,
     ).toBe('proxy')
@@ -134,6 +139,11 @@ describe('source owner pipeline', () => {
     expect(
       pipeline.source_coverage_ledger.vendor_model_coverage.find(
         (row) => row.part_ref === 'pendent_standard',
+      )?.coverage_status,
+    ).toBe('promoted')
+    expect(
+      pipeline.source_coverage_ledger.vendor_model_coverage.find(
+        (row) => row.part_ref === 'viking_vk100_upright_155f',
       )?.coverage_status,
     ).toBe('promoted')
     expect(pipeline.summary.proxy_count).toBe(1)

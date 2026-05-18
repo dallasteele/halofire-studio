@@ -84,6 +84,16 @@ export interface CatalogCoverageLedger {
     sealed_approved_count: number
     missing_download_count: number
     rejected_candidate_count: number
+    product_page_missing_count: number
+    image_missing_count: number
+    cut_sheet_missing_count: number
+    glb_missing_count: number
+    ifc_missing_count: number
+    dxf_missing_count: number
+    step_missing_count: number
+    revit_missing_count: number
+    dwg_missing_count: number
+    third_party_notice_missing_count: number
   }
 }
 
@@ -231,6 +241,16 @@ export const CatalogCoverageLedgerSchema: z.ZodType<CatalogCoverageLedger> =
       sealed_approved_count: z.number().int().nonnegative(),
       missing_download_count: z.number().int().nonnegative(),
       rejected_candidate_count: z.number().int().nonnegative(),
+      product_page_missing_count: z.number().int().nonnegative(),
+      image_missing_count: z.number().int().nonnegative(),
+      cut_sheet_missing_count: z.number().int().nonnegative(),
+      glb_missing_count: z.number().int().nonnegative(),
+      ifc_missing_count: z.number().int().nonnegative(),
+      dxf_missing_count: z.number().int().nonnegative(),
+      step_missing_count: z.number().int().nonnegative(),
+      revit_missing_count: z.number().int().nonnegative(),
+      dwg_missing_count: z.number().int().nonnegative(),
+      third_party_notice_missing_count: z.number().int().nonnegative(),
     }),
   })
 
