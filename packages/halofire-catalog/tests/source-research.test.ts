@@ -38,7 +38,7 @@ describe('source research ledger contract', () => {
       JSON.parse(readFileSync(SEED_PATH, 'utf-8')),
     )
 
-    expect(seed.source_collections).toHaveLength(8)
+    expect(seed.source_collections).toHaveLength(10)
     expect(seed.source_collections.map((collection) => collection.source_id)).toEqual([
       'step.parts',
       'wheatland_schedule40',
@@ -48,6 +48,8 @@ describe('source research ledger contract', () => {
       'tyco_ty3251_tyb',
       'viking_vk100',
       'viking_vk3021_qr_pendent',
+      'viking_vk3021_qr_pendent_revit2017',
+      'victaulic_fl_qr_sw',
     ])
     expect(seed.source_collections[0]?.source_kind).toBe('open_source_step_directory')
     expect(seed.source_collections[0]?.source_file_ref).toContain('source_step_parts/hebi_r25_actuator.step')
@@ -77,7 +79,7 @@ describe('source research ledger contract', () => {
       JSON.parse(readFileSync(LEDGER_PATH, 'utf-8')),
     )
 
-    expect(ledger.source_collections).toHaveLength(8)
+    expect(ledger.source_collections).toHaveLength(10)
     expect(ledger.source_collections.map((collection) => collection.source_id)).toEqual([
       'step.parts',
       'wheatland_schedule40',
@@ -87,6 +89,8 @@ describe('source research ledger contract', () => {
       'tyco_ty3251_tyb',
       'viking_vk100',
       'viking_vk3021_qr_pendent',
+      'viking_vk3021_qr_pendent_revit2017',
+      'victaulic_fl_qr_sw',
     ])
     expect(ledger.source_collections[0]?.license_spdx).toBe('MIT')
     expect(ledger.source_collections[0]?.source_file_ref).toContain('source_step_parts/hebi_r25_actuator.step')

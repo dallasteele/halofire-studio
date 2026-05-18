@@ -34,7 +34,7 @@ describe('source coverage ledger', () => {
     const ledger = CatalogCoverageLedgerSchema.parse(loadJson(LEDGER_PATH))
 
     expect(ledger.scope).toContain('Stream F')
-    expect(ledger.source_collections).toHaveLength(8)
+    expect(ledger.source_collections).toHaveLength(10)
     expect(ledger.source_collections.map((collection) => collection.source_id)).toEqual([
       'step.parts',
       'wheatland_schedule40',
@@ -44,6 +44,8 @@ describe('source coverage ledger', () => {
       'tyco_ty3251_tyb',
       'viking_vk100',
       'viking_vk3021_qr_pendent',
+      'viking_vk3021_qr_pendent_revit2017',
+      'victaulic_fl_qr_sw',
     ])
 
     const [stepParts] = ledger.source_collections
