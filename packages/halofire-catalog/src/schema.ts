@@ -277,6 +277,8 @@ export const CatalogFamilyContractSchema: z.ZodType<CatalogFamilyContract> = z.o
   glb_path: z.string().min(1),
   ifc_path: z.string().nullable().optional(),
   dxf_path: z.string().nullable().optional(),
+  revit_path: z.string().nullable().optional(),
+  dwg_path: z.string().nullable().optional(),
   model_status: CatalogModelStatusSchema,
   manufacturer_verified: z.boolean(),
   dimensions_verified: z.boolean(),

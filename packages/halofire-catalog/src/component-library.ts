@@ -132,6 +132,8 @@ export const CatalogFamilyContractRecordSchema = z.object({
   glb_path: z.string().min(1),
   ifc_path: z.string().nullable().optional(),
   dxf_path: z.string().nullable().optional(),
+  revit_path: z.string().nullable().optional(),
+  dwg_path: z.string().nullable().optional(),
   model_status: CatalogModelStatusSchema,
   manufacturer_verified: z.boolean(),
   dimensions_verified: z.boolean(),
@@ -313,6 +315,20 @@ export const CatalogComponentLibraryInputSchema = CatalogComponentLibraryInputSc
           code: z.ZodIssueCode.custom,
           path: ['family_contracts', 'contracts', component.key, 'dxf_path'],
           message: 'family_contracts.dxf_path must match the source manifest',
+        })
+      }
+      if (contract.revit_path !== component.family_contract.revit_path) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['family_contracts', 'contracts', component.key, 'revit_path'],
+          message: 'family_contracts.revit_path must match the source manifest',
+        })
+      }
+      if (contract.dwg_path !== component.family_contract.dwg_path) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['family_contracts', 'contracts', component.key, 'dwg_path'],
+          message: 'family_contracts.dwg_path must match the source manifest',
         })
       }
       if (contract.model_status !== component.model_status) {

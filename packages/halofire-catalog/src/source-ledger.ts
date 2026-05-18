@@ -175,6 +175,18 @@ function rejectedReasonFor(component: CatalogCoverageComponentInput): string | n
   ) {
     return null
   }
+  if (
+    component.source_kind === 'manufacturer' &&
+    component.model_status === 'proxy'
+  ) {
+    return 'Manufacturer-backed salvage remains a proxy until IFC/DXF and verification evidence are captured.'
+  }
+  if (
+    component.source_kind === 'manufacturer' &&
+    component.model_status === 'visual_reference'
+  ) {
+    return 'Manufacturer-backed geometry remains visual_reference until verification evidence is captured.'
+  }
   if (component.source_kind === 'open_source_step_directory') {
     return 'Open-source STEP directory assets remain proxy candidates until provenance proves the exact product or authority.'
   }
@@ -194,6 +206,8 @@ function buildAssetCoverage(
     component.source_license.source_url ?? component.source_license.public_url
   const sourceFileRef = component.source_license.source_file_ref
   const familyContract = component.family_contract
+  const revitPath = familyContract?.revit_path
+  const dwgPath = familyContract?.dwg_path
 
   const assetCoverage: CatalogCoverageAsset[] = [
     {
@@ -246,15 +260,19 @@ function buildAssetCoverage(
     },
     {
       kind: 'revit',
-      status: 'missing',
-      ref: null,
-      notes: 'No explicit Revit asset was captured',
+      status: hasText(revitPath) ? 'available' : 'missing',
+      ref: revitPath ?? null,
+      notes: hasText(revitPath)
+        ? 'Revit asset captured from the official manufacturer portal'
+        : 'No explicit Revit asset was captured',
     },
     {
       kind: 'dwg',
-      status: 'missing',
-      ref: null,
-      notes: 'No explicit DWG asset was captured',
+      status: hasText(dwgPath) ? 'available' : 'missing',
+      ref: dwgPath ?? null,
+      notes: hasText(dwgPath)
+        ? 'DWG asset captured from the official manufacturer portal'
+        : 'No explicit DWG asset was captured',
     },
     {
       kind: 'third_party_notice',

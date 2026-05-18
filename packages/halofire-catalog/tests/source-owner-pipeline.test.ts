@@ -85,22 +85,20 @@ describe('source owner pipeline', () => {
     expect(pipeline.source_coverage_ledger.summary).toEqual(
       checkedInCoverage.summary,
     )
-    expect(pipeline.summary.source_collection_count).toBe(7)
+    expect(pipeline.summary.source_collection_count).toBe(8)
     expect(pipeline.summary.research_record_count).toBe(
       checkedInResearch.research_records.length,
     )
-    expect(pipeline.summary.source_manifest_component_count).toBe(89)
-    expect(pipeline.summary.component_map_entry_count).toBe(89)
-    expect(pipeline.summary.family_contract_count).toBe(89)
+    expect(pipeline.summary.source_manifest_component_count).toBe(92)
+    expect(pipeline.summary.component_map_entry_count).toBe(92)
+    expect(pipeline.summary.family_contract_count).toBe(92)
     expect(pipeline.summary.family_contract_ifc_count).toBe(42)
     expect(pipeline.summary.family_contract_dxf_count).toBe(42)
     expect(pipeline.summary.family_contract_manufacturer_verified_count).toBe(41)
     expect(pipeline.summary.family_contract_dimensions_verified_count).toBe(42)
     expect(pipeline.component_library).not.toBeNull()
-    expect(pipeline.component_library?.summary.source_manifest_component_count).toBe(89)
-    expect(pipeline.summary.coverage_row_count).toBe(
-      checkedInCoverage.vendor_model_coverage.length,
-    )
+    expect(pipeline.component_library?.summary.source_manifest_component_count).toBe(92)
+    expect(pipeline.summary.coverage_row_count).toBe(93)
     expect(
       pipeline.source_research_ledger.research_records.find(
         (record) => record.source_id === 'step.parts',
@@ -132,6 +130,11 @@ describe('source owner pipeline', () => {
       )?.model_status,
     ).toBe('proxy')
     expect(
+      pipeline.source_research_ledger.research_records.find(
+        (record) => record.source_id === 'viking_vk3021_qr_pendent',
+      )?.model_status,
+    ).toBe('proxy')
+    expect(
       pipeline.source_coverage_ledger.vendor_model_coverage.find(
         (row) => row.part_ref === 'step.parts:hebi_r25_actuator',
       )?.coverage_status,
@@ -146,7 +149,12 @@ describe('source owner pipeline', () => {
         (row) => row.part_ref === 'viking_vk100_upright_155f',
       )?.coverage_status,
     ).toBe('promoted')
-    expect(pipeline.summary.proxy_count).toBe(1)
+    expect(
+      pipeline.source_coverage_ledger.vendor_model_coverage.find(
+        (row) => row.part_ref === 'viking_vk300_qr_pendent_155f',
+      )?.coverage_status,
+    ).toBe('salvage_proxy')
+    expect(pipeline.summary.proxy_count).toBe(4)
     expect(pipeline.summary.sealed_approved_count).toBe(0)
     expect(pipeline.model_fit_inventory?.proof_count).toBe(3)
     expect(pipeline.model_fit_inventory?.review_ready_proof_count).toBe(3)

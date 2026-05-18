@@ -48,7 +48,7 @@ describe('source ledger builders', () => {
     const built = buildSourceResearchLedger(seed)
 
     expect(built.summary).toEqual(summarizeSourceResearchLedger(built))
-    expect(built.source_collections).toHaveLength(7)
+    expect(built.source_collections).toHaveLength(8)
     expect(built.source_collections.map((collection) => collection.source_id)).toEqual([
       'step.parts',
       'wheatland_schedule40',
@@ -57,6 +57,7 @@ describe('source ledger builders', () => {
       'reliable_f156_bulletin_031',
       'tyco_ty3251_tyb',
       'viking_vk100',
+      'viking_vk3021_qr_pendent',
     ])
     expect(built.source_collections[0]?.source_url).toBe(
       'https://www.step.parts/parts/hebi_r25_actuator',
@@ -83,7 +84,7 @@ describe('source ledger builders', () => {
     })
 
     expect(built.summary).toEqual(summarizeCoverageLedger(built))
-    expect(built.source_collections).toHaveLength(7)
+    expect(built.source_collections).toHaveLength(8)
     expect(built.source_collections.map((collection) => collection.source_id)).toEqual([
       'step.parts',
       'wheatland_schedule40',
@@ -92,6 +93,7 @@ describe('source ledger builders', () => {
       'reliable_f156_bulletin_031',
       'tyco_ty3251_tyb',
       'viking_vk100',
+      'viking_vk3021_qr_pendent',
     ])
     expect(built.source_collections[0]?.source_url).toBe(
       'https://www.step.parts/parts/hebi_r25_actuator',

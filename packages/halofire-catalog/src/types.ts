@@ -308,6 +308,8 @@ export interface CatalogFamilyContract {
   glb_path: string
   ifc_path?: string | null
   dxf_path?: string | null
+  revit_path?: string | null
+  dwg_path?: string | null
   model_status: CatalogModelStatus
   manufacturer_verified: boolean
   dimensions_verified: boolean

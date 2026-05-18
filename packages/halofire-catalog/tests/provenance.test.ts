@@ -49,17 +49,19 @@ type SourceEntry = {
     model_status: SourceEntry['model_status']
     source_kind?: SourceEntry['source_kind']
   }
-  family_contract: {
-    part_ref: string
-    ref: string
-    glb_path: string
-    ifc_path: string | null
-    dxf_path: string | null
-    model_status: SourceEntry['model_status']
-    manufacturer_verified: boolean
-    dimensions_verified: boolean
-    source_license_ref: string | null
-    evidence_refs: string[]
+    family_contract: {
+      part_ref: string
+      ref: string
+      glb_path: string
+      ifc_path: string | null
+      dxf_path: string | null
+      revit_path?: string | null
+      dwg_path?: string | null
+      model_status: SourceEntry['model_status']
+      manufacturer_verified: boolean
+      dimensions_verified: boolean
+      source_license_ref: string | null
+      evidence_refs: string[]
   }
 }
 
@@ -81,15 +83,17 @@ type ComponentMapEntry = {
   manufacturer_verified: boolean
   dimensions_verified: boolean
   family_contract_ref: string
-  family_contract: {
-    model_status: SourceEntry['model_status']
-    manufacturer_verified: boolean
-    dimensions_verified: boolean
-    ifc_path?: string | null
-    dxf_path?: string | null
-    source_license_ref?: string | null
+    family_contract: {
+      model_status: SourceEntry['model_status']
+      manufacturer_verified: boolean
+      dimensions_verified: boolean
+      ifc_path?: string | null
+      dxf_path?: string | null
+      revit_path?: string | null
+      dwg_path?: string | null
+      source_license_ref?: string | null
+    }
   }
-}
 
 function loadJson<T>(path: string): T {
   return JSON.parse(readFileSync(path, 'utf-8')) as T
@@ -143,6 +147,8 @@ describe('provenance artifacts', () => {
         expect(family.dimensions_verified).toBe(false)
         expect(family.ifc_path).toBeNull()
         expect(family.dxf_path).toBeNull()
+        expect(family.revit_path).toBeUndefined()
+        expect(family.dwg_path).toBeUndefined()
       }
 
       if (
@@ -163,16 +169,18 @@ describe('provenance artifacts', () => {
     const familyContracts = loadJson<{
       generated_at_utc: string
       contracts: Array<{
-        ref: string
-        part_ref: string
-        glb_path: string
-        ifc_path: string | null
-        dxf_path: string | null
-        model_status: SourceEntry['model_status']
-        manufacturer_verified: boolean
-        dimensions_verified: boolean
-        source_license_ref: string | null
-        evidence_refs: string[]
+      ref: string
+      part_ref: string
+      glb_path: string
+      ifc_path: string | null
+      dxf_path: string | null
+      revit_path?: string | null
+      dwg_path?: string | null
+      model_status: SourceEntry['model_status']
+      manufacturer_verified: boolean
+      dimensions_verified: boolean
+      source_license_ref: string | null
+      evidence_refs: string[]
       }>
     }>(FAMILY_CONTRACTS_PATH)
 
@@ -288,6 +296,22 @@ describe('provenance artifacts', () => {
     expect(proxy?.family_contract.dimensions_verified).toBe(true)
     expect(proxy?.family_contract.ifc_path).toBe('pendent_standard_ferguson.ifc')
     expect(proxy?.family_contract.dxf_path).toBe('pendent_standard_ferguson.dxf')
+
+    const vikingProxy = byKey.get('viking_vk300_qr_pendent_155f')
+    expect(vikingProxy).toBeDefined()
+    expect(vikingProxy?.source_kind).toBe('manufacturer')
+    expect(vikingProxy?.model_status).toBe('proxy')
+    expect(vikingProxy?.manufacturer_verified).toBe(false)
+    expect(vikingProxy?.dimensions_verified).toBe(false)
+    expect(vikingProxy?.source_license.allowed_download).toBe(false)
+    expect(vikingProxy?.source_license.redistribution_blocked).toBe(true)
+    expect(vikingProxy?.family_contract.model_status).toBe('proxy')
+    expect(vikingProxy?.family_contract.manufacturer_verified).toBe(false)
+    expect(vikingProxy?.family_contract.dimensions_verified).toBe(false)
+    expect(vikingProxy?.family_contract.revit_path).toBe(
+      'E:/ClaudeBot/halofire-studio/packages/halofire-catalog/assets/revit/viking_vk3021_qr_pendent_revit2017.zip',
+    )
+    expect(vikingProxy?.family_contract.dwg_path).toBeNull()
   })
 
   test('Tyco TY3251 temperature variants are manufacturer verified with IFC and DXF contracts', () => {
