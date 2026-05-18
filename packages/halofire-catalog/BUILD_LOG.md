@@ -2,6 +2,9 @@
 
 ## 2026-05-18
 
+- Added `glb` to the source-coverage download accounting so the open-source step.parts candidate now contributes an explicit missing-GLB row, regenerated `data/halofire/brand/components/source_coverage_ledger.json`, and updated the catalog regression expectations to match the current 12-source collection ledger truth.
+- Verification: `C:/Python312/python.exe -m pytest tests/core/hal/halo_forge/test_sprinkler_catalog_source_research_and_coverage.py -q`; `bun test packages/halofire-catalog/tests/source-ledger.test.ts packages/halofire-catalog/tests/source-coverage.test.ts`; `C:/Python312/python.exe scripts/verify_agentic_rules.py`.
+
 - Promoted manufacturer-backed sidewall catalog depth for Tyco LFII HSW and Reliable DH56, regenerated the source research and source coverage ledgers, and threaded the new proxy rows through the component library, provenance, and source-owner pipeline regressions.
 - Verification pending: `C:/Python312/python.exe scripts/verify_agentic_rules.py`; targeted `bun test` runs for the five catalog regression files changed in this slice.
 

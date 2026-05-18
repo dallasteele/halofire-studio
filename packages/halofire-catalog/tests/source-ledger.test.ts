@@ -48,7 +48,7 @@ describe('source ledger builders', () => {
     const built = buildSourceResearchLedger(seed)
 
     expect(built.summary).toEqual(summarizeSourceResearchLedger(built))
-    expect(built.source_collections).toHaveLength(10)
+    expect(built.source_collections).toHaveLength(12)
     expect(built.source_collections.map((collection) => collection.source_id)).toEqual([
       'step.parts',
       'wheatland_schedule40',
@@ -60,6 +60,8 @@ describe('source ledger builders', () => {
       'viking_vk3021_qr_pendent',
       'viking_vk3021_qr_pendent_revit2017',
       'victaulic_fl_qr_sw',
+      'tyco_lfii_hsw_tfp417',
+      'reliable_dh56_bulletin_016',
     ])
     expect(built.source_collections[0]?.source_url).toBe(
       'https://www.step.parts/parts/hebi_r25_actuator',
@@ -90,7 +92,7 @@ describe('source ledger builders', () => {
     })
 
     expect(built.summary).toEqual(summarizeCoverageLedger(built))
-    expect(built.source_collections).toHaveLength(10)
+    expect(built.source_collections).toHaveLength(12)
     expect(built.source_collections.map((collection) => collection.source_id)).toEqual([
       'step.parts',
       'wheatland_schedule40',
@@ -102,6 +104,8 @@ describe('source ledger builders', () => {
       'viking_vk3021_qr_pendent',
       'viking_vk3021_qr_pendent_revit2017',
       'victaulic_fl_qr_sw',
+      'tyco_lfii_hsw_tfp417',
+      'reliable_dh56_bulletin_016',
     ])
     expect(built.source_collections[0]?.source_url).toBe(
       'https://www.step.parts/parts/hebi_r25_actuator',
@@ -109,6 +113,7 @@ describe('source ledger builders', () => {
     expect(built.source_collections[0]?.license_spdx).toBe('MIT')
     expect(built.rejected_candidates).toContain('pendent_standard_ferguson')
     expect(built.missing_downloads).toContain('pendent_standard:step')
+    expect(built.missing_downloads).toContain('step.parts:hebi_r25_actuator:glb')
     expect(built.rejected_candidates).not.toContain('tyco_ty3251_pendent_135f')
 
     const stepCandidate = built.vendor_model_coverage.find(

@@ -60,6 +60,7 @@ const COVERAGE_DOWNLOAD_KINDS = new Set<CatalogCoverageAsset['kind']>([
   'product_page',
   'image',
   'cut_sheet',
+  'glb',
   'ifc',
   'dxf',
   'step',

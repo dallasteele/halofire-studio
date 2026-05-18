@@ -93,6 +93,7 @@ describe('source coverage ledger', () => {
     expect(ledger.summary.proxy_count).toBe(6)
     expect(ledger.summary.sealed_approved_count).toBe(0)
     expect(ledger.missing_downloads).toContain('pendent_standard:step')
+    expect(ledger.missing_downloads).toContain('step.parts:hebi_r25_actuator:glb')
     expect(ledger.rejected_candidates).toContain('pendent_standard_ferguson')
     expect(ledger.rejected_candidates).not.toContain('tyco_ty3251_pendent_135f')
 
