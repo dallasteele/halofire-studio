@@ -2,6 +2,10 @@
 
 ## 2026-05-18
 
+- Added explicit `asset_kinds` coverage to the Stream F source collections so the checked-in research and coverage ledgers now record the confirmed upstream asset classes for step.parts, manufacturer cut sheets, and the captured Revit/DWG evidence trail.
+- Updated the source research, source coverage, and source-owner pipeline regressions to assert the new source-collection asset coverage contract.
+- Verification passed: `C:/Python312/python.exe scripts/verify_agentic_rules.py`, `C:/Python312/python.exe -m pytest tests/core/hal/halo_forge/test_sprinkler_catalog_source_research_and_coverage.py -q`, `bun test E:/ClaudeBot/halofire-studio/packages/halofire-catalog/tests/source-research.test.ts`, `bun test E:/ClaudeBot/halofire-studio/packages/halofire-catalog/tests/source-coverage.test.ts`, and `bun test E:/ClaudeBot/halofire-studio/packages/halofire-catalog/tests/source-owner-pipeline.test.ts`.
+
 - Added `glb` to the source-coverage download accounting so the open-source step.parts candidate now contributes an explicit missing-GLB row, regenerated `data/halofire/brand/components/source_coverage_ledger.json`, and updated the catalog regression expectations to match the current 12-source collection ledger truth.
 - Verification: `C:/Python312/python.exe -m pytest tests/core/hal/halo_forge/test_sprinkler_catalog_source_research_and_coverage.py -q`; `bun test packages/halofire-catalog/tests/source-ledger.test.ts packages/halofire-catalog/tests/source-coverage.test.ts`; `C:/Python312/python.exe scripts/verify_agentic_rules.py`.
 

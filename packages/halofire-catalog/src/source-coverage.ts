@@ -44,6 +44,7 @@ export interface CatalogSourceCollectionCoverage {
   source_file_ref?: string | null
   license_spdx: string
   third_party_notice_ref: string | null
+  asset_kinds?: CatalogCoverageAssetKind[]
   capture_date: string
   redistribution_blocked: boolean
   notes: string
@@ -151,6 +152,7 @@ export const CatalogSourceCollectionCoverageSchema: z.ZodType<CatalogSourceColle
     source_file_ref: z.string().nullable().optional(),
     license_spdx: z.string().min(1),
     third_party_notice_ref: z.string().nullable(),
+    asset_kinds: z.array(CatalogCoverageAssetKindSchema).min(1).optional(),
     capture_date: z.string().min(1),
     redistribution_blocked: z.boolean(),
     notes: z.string().min(1),

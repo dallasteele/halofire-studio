@@ -55,6 +55,11 @@ describe('source research ledger contract', () => {
     ])
     expect(seed.source_collections[0]?.source_kind).toBe('open_source_step_directory')
     expect(seed.source_collections[0]?.source_file_ref).toContain('source_step_parts/hebi_r25_actuator.step')
+    expect(seed.source_collections[0]?.asset_kinds).toEqual([
+      'product_page',
+      'step',
+      'third_party_notice',
+    ])
     expect(seed.research_records.some((record) => record.source_id === 'step.parts')).toBe(true)
     expect(
       seed.research_records.find((record) => record.source_id === 'step.parts')
@@ -106,6 +111,11 @@ describe('source research ledger contract', () => {
     ])
     expect(ledger.source_collections[0]?.license_spdx).toBe('MIT')
     expect(ledger.source_collections[0]?.source_file_ref).toContain('source_step_parts/hebi_r25_actuator.step')
+    expect(ledger.source_collections[0]?.asset_kinds).toEqual([
+      'product_page',
+      'step',
+      'third_party_notice',
+    ])
     expect(ledger.research_records.some((record) => record.source_id === 'step.parts')).toBe(true)
     expect(
       ledger.research_records.find((record) => record.source_id === 'step.parts')
@@ -132,6 +142,10 @@ describe('source research ledger contract', () => {
     expect(ledger.research_records.some((record) => record.part_ref === 'sidewall_horizontal')).toBe(true)
     expect(ledger.research_records.some((record) => record.source_id === 'reliable_dh56_bulletin_016')).toBe(true)
     expect(ledger.research_records.some((record) => record.part_ref === 'sidewall_dry')).toBe(true)
+    expect(
+      ledger.source_collections.find((collection) => collection.source_id === 'victaulic_fl_qr_sw')
+        ?.asset_kinds,
+    ).toEqual(['product_page', 'cut_sheet', 'revit', 'dwg'])
     expect(ledger.correction_records).toHaveLength(18)
     expect(ledger.summary.total_records).toBe(23)
     expect(ledger.summary.promoted_count).toBe(22)

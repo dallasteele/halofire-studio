@@ -59,6 +59,11 @@ describe('source coverage ledger', () => {
     expect(stepParts.source_file_ref).toContain('source_step_parts/hebi_r25_actuator.step')
     expect(stepParts.license_spdx).toBe('MIT')
     expect(stepParts.third_party_notice_ref).toBe('THIRD_PARTY_NOTICES.md')
+    expect(stepParts.asset_kinds).toEqual([
+      'product_page',
+      'step',
+      'third_party_notice',
+    ])
     expect(stepParts.redistribution_blocked).toBe(true)
 
     const viking = ledger.source_collections.find(
@@ -73,6 +78,7 @@ describe('source coverage ledger', () => {
       'https://www.vikinggroupinc.com/databook/current_tds/052014.pdf',
     )
     expect(viking?.license_spdx).toBe('proprietary')
+    expect(viking?.asset_kinds).toEqual(['product_page', 'cut_sheet'])
 
     const viking3021 = ledger.source_collections.find(
       (collection) => collection.source_id === 'viking_vk3021_qr_pendent',
@@ -85,6 +91,27 @@ describe('source coverage ledger', () => {
       'https://www.vikinggroupinc.com/sites/default/files/2025-07/110720.pdf',
     )
     expect(viking3021?.license_spdx).toBe('proprietary')
+    expect(viking3021?.asset_kinds).toEqual(['product_page', 'cut_sheet'])
+
+    const viking3021Revit = ledger.source_collections.find(
+      (collection) => collection.source_id === 'viking_vk3021_qr_pendent_revit2017',
+    )
+    expect(viking3021Revit?.asset_kinds).toEqual(['product_page', 'cut_sheet', 'revit'])
+
+    const victaulicFlQrSw = ledger.source_collections.find(
+      (collection) => collection.source_id === 'victaulic_fl_qr_sw',
+    )
+    expect(victaulicFlQrSw?.asset_kinds).toEqual([
+      'product_page',
+      'cut_sheet',
+      'revit',
+      'dwg',
+    ])
+
+    const reliableDh56 = ledger.source_collections.find(
+      (collection) => collection.source_id === 'reliable_dh56_bulletin_016',
+    )
+    expect(reliableDh56?.asset_kinds).toEqual(['product_page', 'cut_sheet', 'revit'])
 
     expect(ledger.vendor_model_coverage.length).toBeGreaterThan(0)
     expect(ledger.summary.total_rows).toBe(ledger.vendor_model_coverage.length)

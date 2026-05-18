@@ -110,6 +110,11 @@ describe('source owner pipeline', () => {
       )?.source_file_ref,
     ).toContain('source_step_parts/hebi_r25_actuator.step')
     expect(
+      pipeline.source_research_ledger.source_collections.find(
+        (collection) => collection.source_id === 'step.parts',
+      )?.asset_kinds,
+    ).toEqual(['product_page', 'step', 'third_party_notice'])
+    expect(
       pipeline.source_research_ledger.research_records.find(
         (record) => record.part_ref === 'reliable_f156_upright_155f',
       )?.model_status,
@@ -154,6 +159,11 @@ describe('source owner pipeline', () => {
         (row) => row.part_ref === 'viking_vk300_qr_pendent_155f',
       )?.coverage_status,
     ).toBe('salvage_proxy')
+    expect(
+      pipeline.source_coverage_ledger.source_collections.find(
+        (collection) => collection.source_id === 'victaulic_fl_qr_sw',
+      )?.asset_kinds,
+    ).toEqual(['product_page', 'cut_sheet', 'revit', 'dwg'])
     expect(pipeline.summary.proxy_count).toBe(6)
     expect(pipeline.summary.sealed_approved_count).toBe(0)
     expect(pipeline.model_fit_inventory?.proof_count).toBe(3)
