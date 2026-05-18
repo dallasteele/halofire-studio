@@ -290,6 +290,32 @@ describe('provenance artifacts', () => {
     expect(proxy?.family_contract.dxf_path).toBe('pendent_standard_ferguson.dxf')
   })
 
+  test('Tyco TY3251 temperature variants are manufacturer verified with IFC and DXF contracts', () => {
+    const sources = loadJson<SourcesManifest>(SOURCES_PATH)
+    const byKey = new Map(sources.components.map((component) => [component.key, component]))
+
+    for (const key of [
+      'tyco_ty3251_pendent_135f',
+      'tyco_ty3251_pendent_155f',
+      'tyco_ty3251_pendent_175f',
+      'tyco_ty3251_pendent_200f',
+      'tyco_ty3251_pendent_286f',
+    ]) {
+      const component = byKey.get(key)
+      expect(component).toBeDefined()
+      expect(component?.source_kind).toBe('manufacturer')
+      expect(component?.model_status).toBe('manufacturer_verified')
+      expect(component?.manufacturer_verified).toBe(true)
+      expect(component?.dimensions_verified).toBe(true)
+      expect(component?.source_license.source_file_ref).toContain('tyco_ty3251_tyb.pdf')
+      expect(component?.family_contract.model_status).toBe('manufacturer_verified')
+      expect(component?.family_contract.manufacturer_verified).toBe(true)
+      expect(component?.family_contract.dimensions_verified).toBe(true)
+      expect(component?.family_contract.ifc_path).toBe(`${key}.ifc`)
+      expect(component?.family_contract.dxf_path).toBe(`${key}.dxf`)
+    }
+  })
+
   test('catalog source kinds stay inside their allowed status lanes', () => {
     const sources = loadJson<SourcesManifest>(SOURCES_PATH)
 

@@ -48,13 +48,14 @@ describe('source ledger builders', () => {
     const built = buildSourceResearchLedger(seed)
 
     expect(built.summary).toEqual(summarizeSourceResearchLedger(built))
-    expect(built.source_collections).toHaveLength(5)
+    expect(built.source_collections).toHaveLength(6)
     expect(built.source_collections.map((collection) => collection.source_id)).toEqual([
       'step.parts',
       'wheatland_schedule40',
       'victaulic_firelock_fittings',
       'tyco_av1_300',
       'reliable_f156_bulletin_031',
+      'tyco_ty3251_tyb',
     ])
     expect(built.source_collections[0]?.source_url).toBe(
       'https://www.step.parts/parts/hebi_r25_actuator',
@@ -81,13 +82,14 @@ describe('source ledger builders', () => {
     })
 
     expect(built.summary).toEqual(summarizeCoverageLedger(built))
-    expect(built.source_collections).toHaveLength(5)
+    expect(built.source_collections).toHaveLength(6)
     expect(built.source_collections.map((collection) => collection.source_id)).toEqual([
       'step.parts',
       'wheatland_schedule40',
       'victaulic_firelock_fittings',
       'tyco_av1_300',
       'reliable_f156_bulletin_031',
+      'tyco_ty3251_tyb',
     ])
     expect(built.source_collections[0]?.source_url).toBe(
       'https://www.step.parts/parts/hebi_r25_actuator',
@@ -95,6 +97,7 @@ describe('source ledger builders', () => {
     expect(built.source_collections[0]?.license_spdx).toBe('MIT')
     expect(built.rejected_candidates).toContain('pendent_standard_ferguson')
     expect(built.missing_downloads).toContain('pendent_standard:step')
+    expect(built.rejected_candidates).not.toContain('tyco_ty3251_pendent_135f')
 
     const stepCandidate = built.vendor_model_coverage.find(
       (row) => row.part_ref === 'step.parts:hebi_r25_actuator',

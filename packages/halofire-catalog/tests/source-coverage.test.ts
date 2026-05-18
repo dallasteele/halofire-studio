@@ -34,13 +34,14 @@ describe('source coverage ledger', () => {
     const ledger = CatalogCoverageLedgerSchema.parse(loadJson(LEDGER_PATH))
 
     expect(ledger.scope).toContain('Stream F')
-    expect(ledger.source_collections).toHaveLength(5)
+    expect(ledger.source_collections).toHaveLength(6)
     expect(ledger.source_collections.map((collection) => collection.source_id)).toEqual([
       'step.parts',
       'wheatland_schedule40',
       'victaulic_firelock_fittings',
       'tyco_av1_300',
       'reliable_f156_bulletin_031',
+      'tyco_ty3251_tyb',
     ])
 
     const [stepParts] = ledger.source_collections
@@ -62,6 +63,7 @@ describe('source coverage ledger', () => {
     expect(ledger.summary.sealed_approved_count).toBe(0)
     expect(ledger.missing_downloads).toContain('pendent_standard:step')
     expect(ledger.rejected_candidates).toContain('pendent_standard_ferguson')
+    expect(ledger.rejected_candidates).not.toContain('tyco_ty3251_pendent_135f')
 
     const stepCandidate = ledger.vendor_model_coverage.find(
       (row) => row.part_ref === 'step.parts:hebi_r25_actuator',
@@ -95,6 +97,18 @@ describe('source coverage ledger', () => {
     expect(tyco?.asset_coverage.find((asset) => asset.kind === 'product_page')?.status).toBe('available')
     expect(tyco?.asset_coverage.find((asset) => asset.kind === 'step')?.status).toBe('missing')
     expect(tyco?.asset_coverage.find((asset) => asset.kind === 'third_party_notice')?.status).toBe('missing')
+
+    const tyco3251 = ledger.vendor_model_coverage.find(
+      (row) => row.part_ref === 'tyco_ty3251_pendent_135f',
+    )
+    expect(tyco3251).toBeDefined()
+    expect(tyco3251?.coverage_status).toBe('promoted')
+    expect(tyco3251?.model_status).toBe('manufacturer_verified')
+    expect(tyco3251?.source_kind).toBe('manufacturer')
+    expect(tyco3251?.asset_coverage.find((asset) => asset.kind === 'product_page')?.status).toBe('available')
+    expect(tyco3251?.asset_coverage.find((asset) => asset.kind === 'cut_sheet')?.status).toBe('available')
+    expect(tyco3251?.asset_coverage.find((asset) => asset.kind === 'ifc')?.status).toBe('available')
+    expect(tyco3251?.asset_coverage.find((asset) => asset.kind === 'dxf')?.status).toBe('available')
   })
 
   test('third-party notice file documents the open-source STEP provenance policy', () => {

@@ -85,17 +85,17 @@ describe('source owner pipeline', () => {
     expect(pipeline.source_coverage_ledger.summary).toEqual(
       checkedInCoverage.summary,
     )
-    expect(pipeline.summary.source_collection_count).toBe(5)
+    expect(pipeline.summary.source_collection_count).toBe(6)
     expect(pipeline.summary.research_record_count).toBe(
       checkedInResearch.research_records.length,
     )
     expect(pipeline.summary.source_manifest_component_count).toBe(89)
     expect(pipeline.summary.component_map_entry_count).toBe(89)
     expect(pipeline.summary.family_contract_count).toBe(89)
-    expect(pipeline.summary.family_contract_ifc_count).toBe(37)
-    expect(pipeline.summary.family_contract_dxf_count).toBe(37)
-    expect(pipeline.summary.family_contract_manufacturer_verified_count).toBe(36)
-    expect(pipeline.summary.family_contract_dimensions_verified_count).toBe(37)
+    expect(pipeline.summary.family_contract_ifc_count).toBe(42)
+    expect(pipeline.summary.family_contract_dxf_count).toBe(42)
+    expect(pipeline.summary.family_contract_manufacturer_verified_count).toBe(41)
+    expect(pipeline.summary.family_contract_dimensions_verified_count).toBe(42)
     expect(pipeline.component_library).not.toBeNull()
     expect(pipeline.component_library?.summary.source_manifest_component_count).toBe(89)
     expect(pipeline.summary.coverage_row_count).toBe(
@@ -114,6 +114,11 @@ describe('source owner pipeline', () => {
     expect(
       pipeline.source_research_ledger.research_records.find(
         (record) => record.part_ref === 'reliable_f156_upright_155f',
+      )?.model_status,
+    ).toBe('manufacturer_verified')
+    expect(
+      pipeline.source_research_ledger.research_records.find(
+        (record) => record.part_ref === 'tyco_ty3251_pendent_135f',
       )?.model_status,
     ).toBe('manufacturer_verified')
     expect(

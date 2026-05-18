@@ -1,5 +1,10 @@
 # BUILD_LOG
 
+## 2026-05-18
+
+- Promoted the five TY3251 temperature variants to manufacturer-backed status using the official Tyco TY-B source collection, regenerated the source research and source coverage ledgers, and created variant IFC/DXF proxy contracts so the component library now carries honest manufacturer evidence for the TY3251 family depth.
+- Verification: `C:/Python312/python.exe scripts/verify_agentic_rules.py`; `bun test halofire-studio/packages/halofire-catalog/tests/component-library.test.ts halofire-studio/packages/halofire-catalog/tests/source-research.test.ts halofire-studio/packages/halofire-catalog/tests/source-ledger.test.ts halofire-studio/packages/halofire-catalog/tests/source-coverage.test.ts halofire-studio/packages/halofire-catalog/tests/source-owner-pipeline.test.ts halofire-studio/packages/halofire-catalog/tests/provenance.test.ts`; `bun run --cwd E:/ClaudeBot/halofire-studio/packages/halofire-catalog check-types`; `bun run --cwd E:/ClaudeBot/halofire-studio/packages/halofire-catalog build`.
+
 ## 2026-05-15
 
 - Added a typed Stream F source-owner pipeline in `src/source-owner-pipeline.ts` so the research seed and vendor/model coverage ledger can be built and validated together.
