@@ -52,7 +52,7 @@ export interface CatalogSourceResearchRecord {
   source_url: string
   source_file_ref: string | null
   source_license_ref?: string | null
-  source_license_spdx?: string | null
+  source_license_spdx: string
   third_party_notice_ref: string | null
   capture_date: string
   license_summary: string
@@ -132,7 +132,7 @@ export const CatalogSourceResearchRecordSchema: z.ZodType<CatalogSourceResearchR
     source_url: z.string().min(1),
     source_file_ref: z.string().nullable(),
     source_license_ref: z.string().nullable().optional(),
-    source_license_spdx: z.string().nullable().optional(),
+    source_license_spdx: z.string().min(1),
     third_party_notice_ref: z.string().nullable(),
     capture_date: z.string().min(1),
     license_summary: z.string().min(1),

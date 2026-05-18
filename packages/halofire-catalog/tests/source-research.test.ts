@@ -60,6 +60,10 @@ describe('source research ledger contract', () => {
     ).toContain('source_step_parts/hebi_r25_actuator.step')
     expect(
       seed.research_records.find((record) => record.source_id === 'step.parts')
+        ?.source_license_spdx,
+    ).toBe('MIT')
+    expect(
+      seed.research_records.find((record) => record.source_id === 'step.parts')
         ?.model_status,
     ).toBe('proxy')
     expect(seed.research_records.some((record) => record.source_id === 'ferguson_tyco_ty3251_spec')).toBe(true)
@@ -99,6 +103,10 @@ describe('source research ledger contract', () => {
       ledger.research_records.find((record) => record.source_id === 'step.parts')
         ?.source_file_ref,
     ).toContain('source_step_parts/hebi_r25_actuator.step')
+    expect(
+      ledger.research_records.find((record) => record.source_id === 'step.parts')
+        ?.source_license_spdx,
+    ).toBe('MIT')
     expect(
       ledger.research_records.find((record) => record.source_id === 'step.parts')
         ?.model_status,
@@ -184,6 +192,7 @@ describe('source research ledger contract', () => {
           source_url:
             'https://media.githubusercontent.com/media/HebiRobotics/hebi-cad/main/A-2700-25-XX_R25_Actuator/R25_Export.STEP',
           source_file_ref: 'E:/ClaudeBot/data/halofire/brand/components/source_step_parts/hebi_r25_actuator.step',
+          source_license_spdx: 'MIT',
           third_party_notice_ref: 'THIRD_PARTY_NOTICES.md',
           capture_date: '2026-05-15T21:20:27Z',
           license_summary: 'MIT upstream directory entry; locally ingested STEP sample remains upstream-governed.',
@@ -203,6 +212,7 @@ describe('source research ledger contract', () => {
           source_url:
             'https://api.ferguson.com/dar-step-service/Query?ASSET_ID=4685770&PRODUCT_ID=1959635&USE_TYPE=SPECIFICATION',
           source_file_ref: 'E:/ClaudeBot/halofire-studio/packages/halofire-catalog/cut_sheets/ferguson_tyco_ty3251_spec.pdf',
+          source_license_spdx: 'proprietary',
           third_party_notice_ref: null,
           capture_date: '2026-05-15T05:03:05.031677Z',
           license_summary: 'Ferguson-hosted Tyco TY3251 specification page used to derive a dimensioned parametric proxy; redistribution blocked until manufacturer verification is completed.',
@@ -226,6 +236,7 @@ describe('source research ledger contract', () => {
           source_url:
             'https://docs.johnsoncontrols.com/tycofire/api/khub/documents/Y5s5g2HZNr6Um_t5iOK7dw/content',
           source_file_ref: 'E:/ClaudeBot/halofire-studio/packages/halofire-catalog/cut_sheets/tyco_ty3251_tyb.pdf',
+          source_license_spdx: 'proprietary',
           third_party_notice_ref: null,
           capture_date: '2026-05-15T05:03:05.031677Z',
           license_summary: 'Public manufacturer cut sheet used for an internal parametric proxy; redistribution blocked.',
@@ -249,6 +260,7 @@ describe('source research ledger contract', () => {
           source_url:
             'https://docs.johnsoncontrols.com/tycofire/api/khub/documents/MbMoAJm4beEEsSDSyfV87g/content',
           source_file_ref: 'E:/ClaudeBot/halofire-studio/packages/halofire-catalog/cut_sheets/tyco_ty4251_k80.pdf',
+          source_license_spdx: 'proprietary',
           third_party_notice_ref: null,
           capture_date: '2026-05-15T22:18:37Z',
           license_summary: 'Tyco Series TY-B manufacturer page used with the TY4251 cut sheet to confirm the family identity and dimensions; redistribution remains blocked.',
@@ -348,6 +360,7 @@ describe('source research ledger contract', () => {
       capture_date: '2026-05-15T21:20:27Z',
       license_summary: 'MIT upstream directory entry; locally ingested STEP sample remains upstream-governed.',
       redistribution_blocked: true,
+      source_license_spdx: 'MIT',
       model_status: 'manufacturer_verified',
       disposition: 'candidate',
       evidence_refs: ['https://www.step.parts'],
@@ -372,6 +385,7 @@ describe('source research ledger contract', () => {
       capture_date: '2026-05-15T21:20:27Z',
       license_summary: 'MIT upstream directory entry; locally ingested STEP sample remains upstream-governed.',
       redistribution_blocked: true,
+      source_license_spdx: 'MIT',
       model_status: 'proxy',
       disposition: 'candidate',
       evidence_refs: ['https://www.step.parts'],

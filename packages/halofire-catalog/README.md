@@ -13,6 +13,7 @@ It ships a mixed salvage catalog with explicit provenance:
 - open-authored procedural parts stay `visual_reference`
 - open-source STEP candidates stay `proxy` until provenance proves the exact product or authority
 - manufacturer and distributor salvage carry `source_license` records
+- every source-license record carries an explicit SPDX-style `source_license_spdx`
 - verified families carry `family_contract` records with GLB/IFC/DXF paths
 - source ingestion remains policy-driven and license-aware
 

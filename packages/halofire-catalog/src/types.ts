@@ -293,6 +293,7 @@ export interface CatalogSourceLicense {
   public_url?: string | null
   source_url?: string | null
   source_file_ref?: string | null
+  source_license_spdx: string
   terms_summary: string
   allowed_internal_use: boolean
   allowed_client_render: boolean

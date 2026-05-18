@@ -135,6 +135,12 @@ describe('provenance artifacts', () => {
       expect(family.model_status).toBe(component.model_status)
       expect(license.allowed_internal_use).toBe(true)
       expect(license.allowed_client_render).toBe(true)
+      expect(license.source_license_spdx.length).toBeGreaterThan(0)
+      if (component.source_kind === 'procedural') {
+        expect(license.source_license_spdx).toBe('CC0-1.0')
+      } else {
+        expect(license.source_license_spdx).toBe('proprietary')
+      }
       expect(family.manufacturer_verified).toBe(mapped.manufacturer_verified)
       expect(family.dimensions_verified).toBe(mapped.dimensions_verified)
 

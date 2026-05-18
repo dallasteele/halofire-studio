@@ -127,6 +127,7 @@ export const CatalogSourceLicenseSchema: z.ZodType<CatalogSourceLicense> = z.obj
   public_url: z.string().nullable().optional(),
   source_url: z.string().nullable().optional(),
   source_file_ref: z.string().nullable().optional(),
+  source_license_spdx: z.string().min(1),
   terms_summary: z.string().min(1),
   allowed_internal_use: z.boolean(),
   allowed_client_render: z.boolean(),

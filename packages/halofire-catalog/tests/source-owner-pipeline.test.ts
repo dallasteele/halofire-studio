@@ -85,7 +85,7 @@ describe('source owner pipeline', () => {
     expect(pipeline.source_coverage_ledger.summary).toEqual(
       checkedInCoverage.summary,
     )
-    expect(pipeline.summary.source_collection_count).toBe(8)
+    expect(pipeline.summary.source_collection_count).toBe(10)
     expect(pipeline.summary.research_record_count).toBe(
       checkedInResearch.research_records.length,
     )
