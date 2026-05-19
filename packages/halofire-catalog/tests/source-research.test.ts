@@ -65,6 +65,10 @@ describe('source research ledger contract', () => {
       'step',
       'third_party_notice',
     ])
+    expect(
+      seed.source_collections.find((collection) => collection.source_id === 'victaulic_firelock_fittings')
+        ?.asset_kinds,
+    ).toEqual(['product_page', 'cut_sheet', 'revit', 'dwg'])
     expect(seed.source_collections[0]?.image_url).toBe(
       'https://www.step.parts/step-parts-social-preview.png',
     )
@@ -129,6 +133,10 @@ describe('source research ledger contract', () => {
       'step',
       'third_party_notice',
     ])
+    expect(
+      ledger.source_collections.find((collection) => collection.source_id === 'victaulic_firelock_fittings')
+        ?.asset_kinds,
+    ).toEqual(['product_page', 'cut_sheet', 'revit', 'dwg'])
     expect(ledger.source_collections[0]?.image_url).toBe(
       'https://www.step.parts/step-parts-social-preview.png',
     )

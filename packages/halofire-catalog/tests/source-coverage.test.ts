@@ -88,6 +88,16 @@ describe('source coverage ledger', () => {
     expect(viking?.license_spdx).toBe('proprietary')
     expect(viking?.asset_kinds).toEqual(['product_page', 'cut_sheet'])
 
+    const victaulicFittings = ledger.source_collections.find(
+      (collection) => collection.source_id === 'victaulic_firelock_fittings',
+    )
+    expect(victaulicFittings?.asset_kinds).toEqual([
+      'product_page',
+      'cut_sheet',
+      'revit',
+      'dwg',
+    ])
+
     const viking3021 = ledger.source_collections.find(
       (collection) => collection.source_id === 'viking_vk3021_qr_pendent',
     )

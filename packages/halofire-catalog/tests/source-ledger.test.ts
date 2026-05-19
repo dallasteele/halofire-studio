@@ -92,6 +92,10 @@ describe('source ledger builders', () => {
       'https://www.reliablesprinkler.com/wp-content/uploads/2020/03/DH56-dry-white-crop-1-e1583452746731.png',
     )
     expect(
+      built.source_collections.find((collection) => collection.source_id === 'victaulic_firelock_fittings')
+        ?.asset_kinds,
+    ).toEqual(['product_page', 'cut_sheet', 'revit', 'dwg'])
+    expect(
       built.source_collections.find((collection) => collection.source_id === 'viking_vk100_revit2017')
         ?.source_file_ref,
     ).toContain('assets/revit/viking_vk100_revit2017.zip')

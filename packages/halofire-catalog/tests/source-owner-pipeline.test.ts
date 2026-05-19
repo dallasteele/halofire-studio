@@ -183,6 +183,11 @@ describe('source owner pipeline', () => {
     ).toBe('salvage_proxy')
     expect(
       pipeline.source_coverage_ledger.source_collections.find(
+        (collection) => collection.source_id === 'victaulic_firelock_fittings',
+      )?.asset_kinds,
+    ).toEqual(['product_page', 'cut_sheet', 'revit', 'dwg'])
+    expect(
+      pipeline.source_coverage_ledger.source_collections.find(
         (collection) => collection.source_id === 'victaulic_fl_qr_sw',
       )?.asset_kinds,
     ).toEqual(['product_page', 'cut_sheet', 'revit', 'dwg'])
