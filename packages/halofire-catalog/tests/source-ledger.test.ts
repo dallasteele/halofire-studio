@@ -79,6 +79,10 @@ describe('source ledger builders', () => {
     ).toBe('THIRD_PARTY_NOTICES.md')
     expect(
       built.research_records.find((record: any) => record.source_id === 'step.parts')
+        ?.source_license_ref,
+    ).toBe('license:step.parts:hebi_r25_actuator')
+    expect(
+      built.research_records.find((record: any) => record.source_id === 'step.parts')
         ?.source_license_spdx,
     ).toBe('MIT')
     expect(
@@ -94,7 +98,7 @@ describe('source ledger builders', () => {
     expect(
       built.source_collections.find((collection) => collection.source_id === 'victaulic_firelock_fittings')
         ?.asset_kinds,
-    ).toEqual(['product_page', 'cut_sheet', 'revit', 'dwg'])
+    ).toEqual(['product_page', 'image', 'cut_sheet', 'revit', 'dwg'])
     expect(
       built.source_collections.find((collection) => collection.source_id === 'viking_vk100_revit2017')
         ?.source_file_ref,

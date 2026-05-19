@@ -93,6 +93,10 @@ describe('source research ledger contract', () => {
     ).toContain('source_step_parts/hebi_r25_actuator.step')
     expect(
       seed.research_records.find((record) => record.source_id === 'step.parts')
+        ?.source_license_ref,
+    ).toBe('license:step.parts:hebi_r25_actuator')
+    expect(
+      seed.research_records.find((record) => record.source_id === 'step.parts')
         ?.source_license_spdx,
     ).toBe('MIT')
     expect(
@@ -173,6 +177,10 @@ describe('source research ledger contract', () => {
       ledger.research_records.find((record) => record.source_id === 'step.parts')
         ?.source_file_ref,
     ).toContain('source_step_parts/hebi_r25_actuator.step')
+    expect(
+      ledger.research_records.find((record) => record.source_id === 'step.parts')
+        ?.source_license_ref,
+    ).toBe('license:step.parts:hebi_r25_actuator')
     expect(
       ledger.research_records.find((record) => record.source_id === 'step.parts')
         ?.source_license_spdx,

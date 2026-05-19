@@ -2,6 +2,9 @@
 
 ## 2026-05-19
 
+- Hardened the open-source STEP source-research row so `step.parts:hebi_r25_actuator` now carries an explicit local `source_license_ref`, refreshed the upstream third-party notice note with live GitHub/page verification, and added focused regressions for the step.parts license ref in the research and pipeline builders.
+- Verification pending: regenerate the source research ledger and run the focused catalog tests plus `scripts/verify_agentic_rules.py`.
+
 - Tightened the Stream F source coverage schema so open-source STEP directory collections must carry a local `source_file_ref` alongside the existing repo URL and third-party notice requirements.
 - Added a regression that fails open-source STEP collections missing the local STEP file ref, keeping the step.parts candidate honest at the collection boundary.
 - Verification passed: `bun test E:/ClaudeBot/halofire-studio/packages/halofire-catalog/tests/source-coverage.test.ts`.
