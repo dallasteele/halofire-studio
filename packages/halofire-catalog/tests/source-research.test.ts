@@ -113,6 +113,18 @@ describe('source research ledger contract', () => {
       seed.research_records.find((record) => record.source_id === 'step.parts')
         ?.model_status,
     ).toBe('proxy')
+    expect(
+      seed.research_records.find((record) => record.part_ref === 'pipe_steel_sch40_2p0in')
+        ?.source_license_ref,
+    ).toBe('license:pipe_steel_sch40_2p0in')
+    expect(
+      seed.research_records.find((record) => record.part_ref === 'valve_check_2p5in')
+        ?.source_license_ref,
+    ).toBe('license:valve_check_2p5in')
+    expect(
+      seed.research_records.find((record) => record.part_ref === 'reliable_f156_upright_155f')
+        ?.source_license_ref,
+    ).toBe('license:reliable_f156_upright_155f')
     expect(seed.research_records.some((record) => record.source_id === 'ferguson_tyco_ty3251_spec')).toBe(true)
     expect(seed.research_records.some((record) => record.source_id === 'tyco_ty3251_tyb')).toBe(true)
     expect(seed.research_records.some((record) => record.source_id === 'tyco_ty4251_series_ty_b')).toBe(true)
@@ -361,6 +373,7 @@ describe('source research ledger contract', () => {
           source_url:
             'https://media.githubusercontent.com/media/HebiRobotics/hebi-cad/main/A-2700-25-XX_R25_Actuator/R25_Export.STEP',
           source_file_ref: 'E:/ClaudeBot/data/halofire/brand/components/source_step_parts/hebi_r25_actuator.step',
+          source_license_ref: 'license:step.parts:hebi_r25_actuator',
           source_license_spdx: 'MIT',
           third_party_notice_ref: 'THIRD_PARTY_NOTICES.md',
           capture_date: '2026-05-15T21:20:27Z',
@@ -381,6 +394,7 @@ describe('source research ledger contract', () => {
           source_url:
             'https://api.ferguson.com/dar-step-service/Query?ASSET_ID=4685770&PRODUCT_ID=1959635&USE_TYPE=SPECIFICATION',
           source_file_ref: 'E:/ClaudeBot/halofire-studio/packages/halofire-catalog/cut_sheets/ferguson_tyco_ty3251_spec.pdf',
+          source_license_ref: 'license:pendent_standard_ferguson',
           source_license_spdx: 'proprietary',
           third_party_notice_ref: null,
           capture_date: '2026-05-15T05:03:05.031677Z',
@@ -405,6 +419,7 @@ describe('source research ledger contract', () => {
           source_url:
             'https://docs.johnsoncontrols.com/tycofire/api/khub/documents/Y5s5g2HZNr6Um_t5iOK7dw/content',
           source_file_ref: 'E:/ClaudeBot/halofire-studio/packages/halofire-catalog/cut_sheets/tyco_ty3251_tyb.pdf',
+          source_license_ref: 'license:pendent_standard',
           source_license_spdx: 'proprietary',
           third_party_notice_ref: null,
           capture_date: '2026-05-15T05:03:05.031677Z',
@@ -429,6 +444,7 @@ describe('source research ledger contract', () => {
           source_url:
             'https://docs.johnsoncontrols.com/tycofire/api/khub/documents/MbMoAJm4beEEsSDSyfV87g/content',
           source_file_ref: 'E:/ClaudeBot/halofire-studio/packages/halofire-catalog/cut_sheets/tyco_ty4251_k80.pdf',
+          source_license_ref: 'license:tyco_ty4251_pendent_k80_135f',
           source_license_spdx: 'proprietary',
           third_party_notice_ref: null,
           capture_date: '2026-05-15T22:18:37Z',
@@ -521,11 +537,12 @@ describe('source research ledger contract', () => {
       source_kind: 'open_source_step_directory',
       manufacturer: 'HEBI Robotics',
       model: 'R25 actuator',
-      public_url: 'https://www.step.parts/parts/hebi_r25_actuator',
-      source_url:
-        'https://media.githubusercontent.com/media/HebiRobotics/hebi-cad/main/A-2700-25-XX_R25_Actuator/R25_Export.STEP',
-      source_file_ref: 'E:/ClaudeBot/data/halofire/brand/components/source_step_parts/hebi_r25_actuator.step',
-      third_party_notice_ref: 'THIRD_PARTY_NOTICES.md',
+          public_url: 'https://www.step.parts/parts/hebi_r25_actuator',
+          source_url:
+            'https://media.githubusercontent.com/media/HebiRobotics/hebi-cad/main/A-2700-25-XX_R25_Actuator/R25_Export.STEP',
+          source_file_ref: 'E:/ClaudeBot/data/halofire/brand/components/source_step_parts/hebi_r25_actuator.step',
+          source_license_ref: 'license:step.parts:hebi_r25_actuator',
+          third_party_notice_ref: 'THIRD_PARTY_NOTICES.md',
       capture_date: '2026-05-15T21:20:27Z',
       license_summary: 'MIT upstream directory entry; locally ingested STEP sample remains upstream-governed.',
       redistribution_blocked: true,
@@ -550,6 +567,7 @@ describe('source research ledger contract', () => {
       source_url:
         'https://media.githubusercontent.com/media/HebiRobotics/hebi-cad/main/A-2700-25-XX_R25_Actuator/R25_Export.STEP',
       source_file_ref: 'E:/ClaudeBot/data/halofire/brand/components/source_step_parts/hebi_r25_actuator.step',
+      source_license_ref: 'license:step.parts:hebi_r25_actuator',
       third_party_notice_ref: 'THIRD_PARTY_NOTICES.md',
       capture_date: '2026-05-15T21:20:27Z',
       license_summary: 'MIT upstream directory entry; locally ingested STEP sample remains upstream-governed.',
@@ -562,6 +580,19 @@ describe('source research ledger contract', () => {
     })
 
     expect(result.success).toBe(true)
+  })
+
+  test('source research records reject missing source_license_ref', () => {
+    const record = {
+      ...JSON.parse(readFileSync(SEED_PATH, 'utf-8')).research_records.find(
+        (entry: { part_ref: string }) => entry.part_ref === 'pipe_steel_sch40_2p0in',
+      ),
+    }
+    delete record.source_license_ref
+
+    const result = CatalogSourceResearchRecordSchema.safeParse(record)
+
+    expect(result.success).toBe(false)
   })
 
   test('correction records block open-source STEP self-promotion', () => {

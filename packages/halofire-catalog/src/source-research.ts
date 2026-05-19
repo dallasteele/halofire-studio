@@ -51,7 +51,7 @@ export interface CatalogSourceResearchRecord {
   public_url: string
   source_url: string
   source_file_ref: string | null
-  source_license_ref?: string | null
+  source_license_ref: string
   source_license_spdx: string
   third_party_notice_ref: string | null
   capture_date: string
@@ -131,7 +131,7 @@ export const CatalogSourceResearchRecordSchema: z.ZodType<CatalogSourceResearchR
     public_url: z.string().min(1),
     source_url: z.string().min(1),
     source_file_ref: z.string().nullable(),
-    source_license_ref: z.string().nullable().optional(),
+    source_license_ref: z.string().min(1),
     source_license_spdx: z.string().min(1),
     third_party_notice_ref: z.string().nullable(),
     capture_date: z.string().min(1),
@@ -160,6 +160,13 @@ export const CatalogSourceResearchRecordSchema: z.ZodType<CatalogSourceResearchR
         code: z.ZodIssueCode.custom,
         path: ['source_url'],
         message: 'source research records require source_url',
+      })
+    }
+    if (!hasText(value.source_license_ref)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['source_license_ref'],
+        message: 'source research records require source_license_ref',
       })
     }
     if (

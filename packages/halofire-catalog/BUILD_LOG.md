@@ -2,6 +2,9 @@
 
 ## 2026-05-19
 
+- Backfilled the Stream F research seed so the manufacturer/distributor rows now carry explicit `source_license_ref` values for the remaining pipe, fitting, valve, Reliable, and TY3251 families. The source research schema now rejects missing license refs, and the focused seed/ledger regressions are being extended to cover that contract.
+- Next approval gate remains locked: the open-source step.parts row is still candidate-only, and no manufacturer or sealed approval changed as part of the provenance tightening.
+
 - Added explicit correction-workflow records for the remaining Stream F catalog blockers: Tyco LFII HSW image/BIM capture, Reliable DH56 BIM/CAD capture, Ferguson TY3251 manufacturer replacement, and the open-source step.parts exact-product authority check. The research seed summary now reflects 22 correction records while the promoted research rows stay at 22 and the open-source STEP candidate remains proxy-only.
 - Next approval gates remain locked: no manufacturer or sealed approval was promoted for the new blocker queue, and the Tyco LFII HSW / Reliable DH56 rows still need downstream BIM/CAD evidence before any higher-tier claim.
 

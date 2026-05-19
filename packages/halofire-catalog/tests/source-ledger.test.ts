@@ -90,6 +90,14 @@ describe('source ledger builders', () => {
         ?.model_status,
     ).toBe('manufacturer_verified')
     expect(
+      built.research_records.find((record: any) => record.part_ref === 'pipe_steel_sch40_2p0in')
+        ?.source_license_ref,
+    ).toBe('license:pipe_steel_sch40_2p0in')
+    expect(
+      built.research_records.find((record: any) => record.part_ref === 'fitting_tee_2p0in')
+        ?.source_license_ref,
+    ).toBe('license:fitting_tee_2p0in')
+    expect(
       built.source_collections.find((collection) => collection.source_id === 'reliable_dh56_bulletin_016')
         ?.image_url,
     ).toBe(
