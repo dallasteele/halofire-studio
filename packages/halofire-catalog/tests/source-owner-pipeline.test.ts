@@ -185,7 +185,24 @@ describe('source owner pipeline', () => {
       pipeline.source_coverage_ledger.source_collections.find(
         (collection) => collection.source_id === 'victaulic_firelock_fittings',
       )?.asset_kinds,
-    ).toEqual(['product_page', 'cut_sheet', 'revit', 'dwg'])
+    ).toEqual(['product_page', 'image', 'cut_sheet', 'revit', 'dwg'])
+    expect(
+      pipeline.source_research_ledger.source_collections.find(
+        (collection) => collection.source_id === 'wheatland_schedule40',
+      )?.image_url,
+    ).toBe('https://www.wheatland.com/wp-content/uploads/2018/02/header-schedule40.jpg')
+    expect(
+      pipeline.source_research_ledger.source_collections.find(
+        (collection) => collection.source_id === 'victaulic_firelock_fittings',
+      )?.image_url,
+    ).toBe('https://www.victaulic.com/wp-content/uploads/2018/01/installation-ready-system-300x300-square.jpg')
+    expect(
+      pipeline.source_research_ledger.source_collections.find(
+        (collection) => collection.source_id === 'tyco_av1_300',
+      )?.image_url,
+    ).toBe(
+      'https://tyco.widen.net/content/fe6teog93x/jpeg/FIS_residentialproductdetail_product_AV-1-300_1.jpeg?color=ffffffff&position=c&quality=80&u=ncoxvb',
+    )
     expect(
       pipeline.source_coverage_ledger.source_collections.find(
         (collection) => collection.source_id === 'victaulic_fl_qr_sw',
@@ -216,6 +233,7 @@ describe('source owner pipeline', () => {
         (collection) => collection.source_id === 'victaulic_fl_qr_sw_autocad2d_41_02',
       )?.asset_kinds,
     ).toEqual(['product_page', 'cut_sheet', 'dwg'])
+    expect(pipeline.summary.image_missing_count).toBe(88)
     expect(pipeline.summary.proxy_count).toBe(6)
     expect(pipeline.summary.sealed_approved_count).toBe(0)
     expect(pipeline.model_fit_inventory?.proof_count).toBe(3)

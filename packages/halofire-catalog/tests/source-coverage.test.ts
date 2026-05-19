@@ -88,15 +88,33 @@ describe('source coverage ledger', () => {
     expect(viking?.license_spdx).toBe('proprietary')
     expect(viking?.asset_kinds).toEqual(['product_page', 'cut_sheet'])
 
+    const wheatland = ledger.source_collections.find(
+      (collection) => collection.source_id === 'wheatland_schedule40',
+    )
+    expect(wheatland?.image_url).toBe(
+      'https://www.wheatland.com/wp-content/uploads/2018/02/header-schedule40.jpg',
+    )
+    expect(wheatland?.asset_kinds).toEqual([
+      'product_page',
+      'image',
+      'cut_sheet',
+      'revit',
+      'dwg',
+    ])
+
     const victaulicFittings = ledger.source_collections.find(
       (collection) => collection.source_id === 'victaulic_firelock_fittings',
     )
     expect(victaulicFittings?.asset_kinds).toEqual([
       'product_page',
+      'image',
       'cut_sheet',
       'revit',
       'dwg',
     ])
+    expect(victaulicFittings?.image_url).toBe(
+      'https://www.victaulic.com/wp-content/uploads/2018/01/installation-ready-system-300x300-square.jpg',
+    )
 
     const viking3021 = ledger.source_collections.find(
       (collection) => collection.source_id === 'viking_vk3021_qr_pendent',
@@ -124,6 +142,14 @@ describe('source coverage ledger', () => {
       'https://www.vikinggroupinc.com/sites/default/files/migrated/Viking%20-%20Standard%20Spray%20-%20Standard%20Response%20-%20VK100_Revit2017.zip',
     )
     expect(viking100Revit?.asset_kinds).toEqual(['product_page', 'cut_sheet', 'revit'])
+
+    const tycoAv1 = ledger.source_collections.find(
+      (collection) => collection.source_id === 'tyco_av1_300',
+    )
+    expect(tycoAv1?.image_url).toBe(
+      'https://tyco.widen.net/content/fe6teog93x/jpeg/FIS_residentialproductdetail_product_AV-1-300_1.jpeg?color=ffffffff&position=c&quality=80&u=ncoxvb',
+    )
+    expect(tycoAv1?.asset_kinds).toEqual(['product_page', 'image', 'cut_sheet'])
 
     const victaulicFlQrSw = ledger.source_collections.find(
       (collection) => collection.source_id === 'victaulic_fl_qr_sw',
@@ -185,6 +211,7 @@ describe('source coverage ledger', () => {
     expect(ledger.summary.rejected_candidate_count).toBeGreaterThan(0)
     expect(ledger.summary.proxy_count).toBe(6)
     expect(ledger.summary.sealed_approved_count).toBe(0)
+    expect(ledger.summary.image_missing_count).toBe(88)
     expect(ledger.missing_downloads).toContain('pendent_standard:step')
     expect(ledger.missing_downloads).toContain('step.parts:hebi_r25_actuator:glb')
     expect(ledger.rejected_candidates).toContain('pendent_standard_ferguson')
@@ -226,6 +253,15 @@ describe('source coverage ledger', () => {
     expect(tyco?.asset_coverage.find((asset) => asset.kind === 'product_page')?.status).toBe('available')
     expect(tyco?.asset_coverage.find((asset) => asset.kind === 'step')?.status).toBe('missing')
     expect(tyco?.asset_coverage.find((asset) => asset.kind === 'third_party_notice')?.status).toBe('missing')
+
+    const tycoAv1Coverage = ledger.vendor_model_coverage.find(
+      (row) => row.part_ref === 'valve_check_2p5in',
+    )
+    expect(tycoAv1Coverage?.asset_coverage.find((asset) => asset.kind === 'product_page')?.status).toBe('available')
+    expect(tycoAv1Coverage?.asset_coverage.find((asset) => asset.kind === 'image')?.status).toBe('available')
+    expect(tycoAv1Coverage?.asset_coverage.find((asset) => asset.kind === 'image')?.ref).toBe(
+      'https://tyco.widen.net/content/fe6teog93x/jpeg/FIS_residentialproductdetail_product_AV-1-300_1.jpeg?color=ffffffff&position=c&quality=80&u=ncoxvb',
+    )
 
     const tyco3251 = ledger.vendor_model_coverage.find(
       (row) => row.part_ref === 'tyco_ty3251_pendent_135f',

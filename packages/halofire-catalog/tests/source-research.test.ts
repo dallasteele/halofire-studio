@@ -68,7 +68,21 @@ describe('source research ledger contract', () => {
     expect(
       seed.source_collections.find((collection) => collection.source_id === 'victaulic_firelock_fittings')
         ?.asset_kinds,
-    ).toEqual(['product_page', 'cut_sheet', 'revit', 'dwg'])
+    ).toEqual(['product_page', 'image', 'cut_sheet', 'revit', 'dwg'])
+    expect(
+      seed.source_collections.find((collection) => collection.source_id === 'victaulic_firelock_fittings')
+        ?.image_url,
+    ).toBe('https://www.victaulic.com/wp-content/uploads/2018/01/installation-ready-system-300x300-square.jpg')
+    expect(
+      seed.source_collections.find((collection) => collection.source_id === 'wheatland_schedule40')
+        ?.image_url,
+    ).toBe('https://www.wheatland.com/wp-content/uploads/2018/02/header-schedule40.jpg')
+    expect(
+      seed.source_collections.find((collection) => collection.source_id === 'tyco_av1_300')
+        ?.image_url,
+    ).toBe(
+      'https://tyco.widen.net/content/fe6teog93x/jpeg/FIS_residentialproductdetail_product_AV-1-300_1.jpeg?color=ffffffff&position=c&quality=80&u=ncoxvb',
+    )
     expect(seed.source_collections[0]?.image_url).toBe(
       'https://www.step.parts/step-parts-social-preview.png',
     )
@@ -136,7 +150,21 @@ describe('source research ledger contract', () => {
     expect(
       ledger.source_collections.find((collection) => collection.source_id === 'victaulic_firelock_fittings')
         ?.asset_kinds,
-    ).toEqual(['product_page', 'cut_sheet', 'revit', 'dwg'])
+    ).toEqual(['product_page', 'image', 'cut_sheet', 'revit', 'dwg'])
+    expect(
+      ledger.source_collections.find((collection) => collection.source_id === 'victaulic_firelock_fittings')
+        ?.image_url,
+    ).toBe('https://www.victaulic.com/wp-content/uploads/2018/01/installation-ready-system-300x300-square.jpg')
+    expect(
+      ledger.source_collections.find((collection) => collection.source_id === 'wheatland_schedule40')
+        ?.image_url,
+    ).toBe('https://www.wheatland.com/wp-content/uploads/2018/02/header-schedule40.jpg')
+    expect(
+      ledger.source_collections.find((collection) => collection.source_id === 'tyco_av1_300')
+        ?.image_url,
+    ).toBe(
+      'https://tyco.widen.net/content/fe6teog93x/jpeg/FIS_residentialproductdetail_product_AV-1-300_1.jpeg?color=ffffffff&position=c&quality=80&u=ncoxvb',
+    )
     expect(ledger.source_collections[0]?.image_url).toBe(
       'https://www.step.parts/step-parts-social-preview.png',
     )
@@ -230,6 +258,7 @@ describe('source research ledger contract', () => {
           source_id: 'wheatland_schedule40',
           source_kind: 'manufacturer',
           public_url: 'https://www.wheatland.com/products/fire-sprinkler-pipe/schedule-40',
+          image_url: 'https://www.wheatland.com/wp-content/uploads/2018/02/header-schedule40.jpg',
           source_url: 'https://www.wheatland.com/wp-content/uploads/2017/12/Schedule-40-Submittal-Sheet.pdf',
           source_file_ref: 'E:/ClaudeBot/halofire-studio/packages/halofire-catalog/cut_sheets/wheatland_schedule40_sprinkler_pipe.pdf',
           license_spdx: 'proprietary',
@@ -242,6 +271,7 @@ describe('source research ledger contract', () => {
           source_id: 'victaulic_firelock_fittings',
           source_kind: 'manufacturer',
           public_url: 'https://www.victaulic.com/products/firelock-grooved-fittings/',
+          image_url: 'https://www.victaulic.com/wp-content/uploads/2018/01/installation-ready-system-300x300-square.jpg',
           source_url: 'https://assets.victaulic.com/assets/uploads/literature/10.03.pdf',
           source_file_ref: 'E:/ClaudeBot/halofire-studio/packages/halofire-catalog/cut_sheets/victaulic_009n.pdf',
           license_spdx: 'proprietary',
@@ -254,6 +284,7 @@ describe('source research ledger contract', () => {
           source_id: 'tyco_av1_300',
           source_kind: 'manufacturer',
           public_url: 'https://www.tyco-fire.com/products-and-solutions/valves-devices-and-components/wet-system-valves-and-components/av-1-300_fis/av-1-300-alarm-check-valve',
+          image_url: 'https://tyco.widen.net/content/fe6teog93x/jpeg/FIS_residentialproductdetail_product_AV-1-300_1.jpeg?color=ffffffff&position=c&quality=80&u=ncoxvb',
           source_url: 'https://docs.johnsoncontrols.com/tycofire/api/khub/documents/1BlAbiphbAgwMOTfSiHCug/content',
           source_file_ref: 'E:/ClaudeBot/halofire-studio/packages/halofire-catalog/cut_sheets/tyco_av1_300.pdf',
           license_spdx: 'proprietary',
