@@ -96,6 +96,16 @@ describe('source ledger builders', () => {
       'https://www.reliablesprinkler.com/wp-content/uploads/2020/03/DH56-dry-white-crop-1-e1583452746731.png',
     )
     expect(
+      built.source_collections.find((collection) => collection.source_id === 'viking_vk100')
+        ?.image_url,
+    ).toBe(
+      'https://www.vikinggroupinc.com/sites/default/files/styles/extra_large/public/2024-06/12986AB_VK100_K5_6_SR_UP_BR_155.png?itok=4w4zcTjK',
+    )
+    expect(
+      built.source_collections.find((collection) => collection.source_id === 'viking_vk3021_qr_pendent')
+        ?.image_url,
+    ).toBe('https://www.vikinggroupinc.com/sites/default/files/2023-12/viking-share-image-default.png')
+    expect(
       built.source_collections.find((collection) => collection.source_id === 'victaulic_firelock_fittings')
         ?.asset_kinds,
     ).toEqual(['product_page', 'image', 'cut_sheet', 'revit', 'dwg'])

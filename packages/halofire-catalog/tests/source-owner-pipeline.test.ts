@@ -132,6 +132,18 @@ describe('source owner pipeline', () => {
       'https://www.reliablesprinkler.com/wp-content/uploads/2020/03/DH56-dry-white-crop-1-e1583452746731.png',
     )
     expect(
+      pipeline.source_research_ledger.source_collections.find(
+        (collection) => collection.source_id === 'viking_vk100',
+      )?.image_url,
+    ).toBe(
+      'https://www.vikinggroupinc.com/sites/default/files/styles/extra_large/public/2024-06/12986AB_VK100_K5_6_SR_UP_BR_155.png?itok=4w4zcTjK',
+    )
+    expect(
+      pipeline.source_research_ledger.source_collections.find(
+        (collection) => collection.source_id === 'viking_vk3021_qr_pendent',
+      )?.image_url,
+    ).toBe('https://www.vikinggroupinc.com/sites/default/files/2023-12/viking-share-image-default.png')
+    expect(
       pipeline.source_research_ledger.research_records.find(
         (record) => record.part_ref === 'reliable_f156_upright_155f',
       )?.model_status,
@@ -214,6 +226,13 @@ describe('source owner pipeline', () => {
       )?.asset_kinds,
     ).toEqual(['product_page', 'cut_sheet', 'revit', 'dwg'])
     expect(
+      pipeline.source_coverage_ledger.source_collections.find(
+        (collection) => collection.source_id === 'victaulic_fl_qr_sw',
+      )?.image_url,
+    ).toBe(
+      'https://victaulic.widen.net/content/wmhd64rlht/jpeg/Series-FL-QR-SW-Group-1.jpg?crop=false&position=c&q=80&color=ffffffff&u=6weima&w=500&h=500',
+    )
+    expect(
       pipeline.source_research_ledger.source_collections.find(
         (collection) => collection.source_id === 'viking_vk100_revit2017',
       )?.source_file_ref,
@@ -238,7 +257,7 @@ describe('source owner pipeline', () => {
         (collection) => collection.source_id === 'victaulic_fl_qr_sw_autocad2d_41_02',
       )?.asset_kinds,
     ).toEqual(['product_page', 'cut_sheet', 'dwg'])
-    expect(pipeline.summary.image_missing_count).toBe(88)
+    expect(pipeline.summary.image_missing_count).toBe(80)
     expect(pipeline.summary.proxy_count).toBe(6)
     expect(pipeline.summary.sealed_approved_count).toBe(0)
     expect(pipeline.model_fit_inventory?.proof_count).toBe(3)

@@ -2,6 +2,10 @@
 
 ## 2026-05-19
 
+- Added official upstream image provenance to the Viking VK100, Viking VK3021, and Victaulic FL-QR/SW source collections so the replayable source ledgers now carry concrete image URLs for those families.
+- Regenerated the checked-in source research and source coverage ledgers, lowering the explicit image-missing count from 88 to 80 and the missing-download count from 649 to 641.
+- Verification passed: `C:/Python312/python.exe scripts/verify_agentic_rules.py` and focused `bun test` for `tests/source-research.test.ts`, `tests/source-coverage.test.ts`, `tests/source-ledger.test.ts`, and `tests/source-owner-pipeline.test.ts`.
+
 - Hardened the open-source STEP source-research row so `step.parts:hebi_r25_actuator` now carries an explicit local `source_license_ref`, refreshed the upstream third-party notice note with live GitHub/page verification, and added focused regressions for the step.parts license ref in the research and pipeline builders.
 - Verification pending: regenerate the source research ledger and run the focused catalog tests plus `scripts/verify_agentic_rules.py`.
 

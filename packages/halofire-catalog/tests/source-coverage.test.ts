@@ -90,6 +90,9 @@ describe('source coverage ledger', () => {
     )
     expect(viking?.license_spdx).toBe('proprietary')
     expect(viking?.asset_kinds).toEqual(['product_page', 'cut_sheet'])
+    expect(viking?.image_url).toBe(
+      'https://www.vikinggroupinc.com/sites/default/files/styles/extra_large/public/2024-06/12986AB_VK100_K5_6_SR_UP_BR_155.png?itok=4w4zcTjK',
+    )
 
     const wheatland = ledger.source_collections.find(
       (collection) => collection.source_id === 'wheatland_schedule40',
@@ -131,6 +134,9 @@ describe('source coverage ledger', () => {
     )
     expect(viking3021?.license_spdx).toBe('proprietary')
     expect(viking3021?.asset_kinds).toEqual(['product_page', 'cut_sheet'])
+    expect(viking3021?.image_url).toBe(
+      'https://www.vikinggroupinc.com/sites/default/files/2023-12/viking-share-image-default.png',
+    )
 
     const viking3021Revit = ledger.source_collections.find(
       (collection) => collection.source_id === 'viking_vk3021_qr_pendent_revit2017',
@@ -163,6 +169,9 @@ describe('source coverage ledger', () => {
       'revit',
       'dwg',
     ])
+    expect(victaulicFlQrSw?.image_url).toBe(
+      'https://victaulic.widen.net/content/wmhd64rlht/jpeg/Series-FL-QR-SW-Group-1.jpg?crop=false&position=c&q=80&color=ffffffff&u=6weima&w=500&h=500',
+    )
 
     const victaulicFlQrSwRevit = ledger.source_collections.find(
       (collection) => collection.source_id === 'victaulic_fl_qr_sw_revit41_02',
@@ -214,7 +223,7 @@ describe('source coverage ledger', () => {
     expect(ledger.summary.rejected_candidate_count).toBeGreaterThan(0)
     expect(ledger.summary.proxy_count).toBe(6)
     expect(ledger.summary.sealed_approved_count).toBe(0)
-    expect(ledger.summary.image_missing_count).toBe(88)
+    expect(ledger.summary.image_missing_count).toBe(80)
     expect(ledger.missing_downloads).toContain('pendent_standard:step')
     expect(ledger.missing_downloads).toContain('step.parts:hebi_r25_actuator:glb')
     expect(ledger.rejected_candidates).toContain('pendent_standard_ferguson')

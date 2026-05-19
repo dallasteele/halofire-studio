@@ -83,6 +83,16 @@ describe('source research ledger contract', () => {
     ).toBe(
       'https://tyco.widen.net/content/fe6teog93x/jpeg/FIS_residentialproductdetail_product_AV-1-300_1.jpeg?color=ffffffff&position=c&quality=80&u=ncoxvb',
     )
+    expect(
+      seed.source_collections.find((collection) => collection.source_id === 'viking_vk100')
+        ?.image_url,
+    ).toBe(
+      'https://www.vikinggroupinc.com/sites/default/files/styles/extra_large/public/2024-06/12986AB_VK100_K5_6_SR_UP_BR_155.png?itok=4w4zcTjK',
+    )
+    expect(
+      seed.source_collections.find((collection) => collection.source_id === 'viking_vk3021_qr_pendent')
+        ?.image_url,
+    ).toBe('https://www.vikinggroupinc.com/sites/default/files/2023-12/viking-share-image-default.png')
     expect(seed.source_collections[0]?.image_url).toBe(
       'https://www.step.parts/step-parts-social-preview.png',
     )
@@ -169,6 +179,16 @@ describe('source research ledger contract', () => {
     ).toBe(
       'https://tyco.widen.net/content/fe6teog93x/jpeg/FIS_residentialproductdetail_product_AV-1-300_1.jpeg?color=ffffffff&position=c&quality=80&u=ncoxvb',
     )
+    expect(
+      ledger.source_collections.find((collection) => collection.source_id === 'viking_vk100')
+        ?.image_url,
+    ).toBe(
+      'https://www.vikinggroupinc.com/sites/default/files/styles/extra_large/public/2024-06/12986AB_VK100_K5_6_SR_UP_BR_155.png?itok=4w4zcTjK',
+    )
+    expect(
+      ledger.source_collections.find((collection) => collection.source_id === 'viking_vk3021_qr_pendent')
+        ?.image_url,
+    ).toBe('https://www.vikinggroupinc.com/sites/default/files/2023-12/viking-share-image-default.png')
     expect(ledger.source_collections[0]?.image_url).toBe(
       'https://www.step.parts/step-parts-social-preview.png',
     )
