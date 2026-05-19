@@ -202,6 +202,7 @@ function rejectedReasonFor(component: CatalogCoverageComponentInput): string | n
 
 function buildAssetCoverage(
   component: CatalogCoverageComponentInput,
+  sourceCollection?: CatalogSourceCollectionCoverage | null,
 ): CatalogCoverageAsset[] {
   const sourceUrl =
     component.source_license.source_url ?? component.source_license.public_url
@@ -209,6 +210,7 @@ function buildAssetCoverage(
   const familyContract = component.family_contract
   const revitPath = familyContract?.revit_path
   const dwgPath = familyContract?.dwg_path
+  const imageUrl = sourceCollection?.image_url ?? null
 
   const assetCoverage: CatalogCoverageAsset[] = [
     {
@@ -219,9 +221,11 @@ function buildAssetCoverage(
     },
     {
       kind: 'image',
-      status: 'missing',
-      ref: null,
-      notes: 'No explicit upstream product-image URL was captured',
+      status: imageUrl ? 'available' : 'missing',
+      ref: imageUrl,
+      notes: imageUrl
+        ? 'Upstream image evidence captured from the source collection'
+        : 'No explicit upstream product-image URL was captured',
     },
     {
       kind: 'cut_sheet',
@@ -356,7 +360,9 @@ function buildAssetCoverage(
 
 function buildStepPartsAssetCoverage(
   record: CatalogSourceResearchRecord,
+  sourceCollection?: CatalogSourceCollectionCoverage | null,
 ): CatalogCoverageAsset[] {
+  const imageUrl = sourceCollection?.image_url ?? null
   return [
     {
       kind: 'product_page',
@@ -366,9 +372,11 @@ function buildStepPartsAssetCoverage(
     },
     {
       kind: 'image',
-      status: 'missing',
-      ref: null,
-      notes: 'No explicit upstream product-image URL was captured',
+      status: imageUrl ? 'available' : 'missing',
+      ref: imageUrl,
+      notes: imageUrl
+        ? 'Upstream STEP directory image evidence captured from the source collection'
+        : 'No explicit upstream product-image URL was captured',
     },
     {
       kind: 'cut_sheet',
@@ -421,7 +429,10 @@ function buildStepPartsAssetCoverage(
   ]
 }
 
-function buildCoverageRow(component: CatalogCoverageComponentInput): CatalogCoverageRow {
+function buildCoverageRow(
+  component: CatalogCoverageComponentInput,
+  sourceCollection?: CatalogSourceCollectionCoverage | null,
+): CatalogCoverageRow {
   return {
     part_ref: component.key,
     manufacturer:
@@ -439,7 +450,7 @@ function buildCoverageRow(component: CatalogCoverageComponentInput): CatalogCove
     license_summary: component.source_license.terms_summary,
     redistribution_blocked: component.source_license.redistribution_blocked,
     third_party_notice_ref: null,
-    asset_coverage: buildAssetCoverage(component),
+    asset_coverage: buildAssetCoverage(component, sourceCollection),
     rejected_candidate_reason: rejectedReasonFor(component),
     notes: hasText(component.notes) ? component.notes : component.key,
   }
@@ -447,6 +458,7 @@ function buildCoverageRow(component: CatalogCoverageComponentInput): CatalogCove
 
 function buildOpenSourceStepCoverageRow(
   record: CatalogSourceResearchRecord,
+  sourceCollection?: CatalogSourceCollectionCoverage | null,
 ): CatalogCoverageRow {
   return {
     part_ref: record.part_ref,
@@ -462,7 +474,7 @@ function buildOpenSourceStepCoverageRow(
     license_summary: record.license_summary,
     redistribution_blocked: record.redistribution_blocked,
     third_party_notice_ref: record.third_party_notice_ref ?? null,
-    asset_coverage: buildStepPartsAssetCoverage(record),
+    asset_coverage: buildStepPartsAssetCoverage(record, sourceCollection),
     rejected_candidate_reason:
       'Open-source STEP directory assets remain proxy candidates until provenance proves the exact product or authority.',
     notes: hasText(record.notes) ? record.notes : record.part_ref,
@@ -473,10 +485,19 @@ export function buildCoverageLedger(
   input: CatalogCoverageLedgerInput,
 ): CatalogCoverageLedger {
   const vendorModelCoverage = input.components.map((component) =>
-    buildCoverageRow(component),
+    buildCoverageRow(
+      component,
+      sourceCollectionsByPartRef(input.source_research, component.key),
+    ),
   )
   const missingDownloads = new Set<string>()
   const rejectedCandidates = new Set<string>()
+  const sourceCollections = buildSourceCollectionCoverage(
+    input.source_research.source_collections,
+  )
+  const sourceCollectionsById = new Map(
+    sourceCollections.map((collection) => [collection.source_id, collection]),
+  )
 
   for (const row of vendorModelCoverage) {
     for (const asset of row.asset_coverage) {
@@ -492,15 +513,14 @@ export function buildCoverageLedger(
     }
   }
 
-  const sourceCollections = buildSourceCollectionCoverage(
-    input.source_research.source_collections,
-  )
-
   for (const record of input.source_research.research_records) {
     if (record.source_kind !== 'open_source_step_directory') {
       continue
     }
-    const row = buildOpenSourceStepCoverageRow(record)
+    const row = buildOpenSourceStepCoverageRow(
+      record,
+      sourceCollectionsById.get(record.source_id) ?? null,
+    )
     vendorModelCoverage.push(row)
     rejectedCandidates.add(record.part_ref)
     for (const asset of row.asset_coverage) {
@@ -519,6 +539,7 @@ export function buildCoverageLedger(
       source_kind: 'open_source_step_directory',
       public_url: 'https://www.step.parts',
       repo_url: 'https://github.com/earthtojake/step.parts',
+      image_url: 'https://www.step.parts/step-parts-social-preview.png',
       source_url: 'https://www.step.parts/parts/hebi_r25_actuator',
       license_spdx: 'MIT',
       third_party_notice_ref: 'THIRD_PARTY_NOTICES.md',
@@ -560,4 +581,21 @@ export function buildCoverageLedger(
   }
 
   return ledger
+}
+
+function sourceCollectionsByPartRef(
+  sourceResearch: Pick<CatalogCoverageLedgerInput['source_research'], 'research_records' | 'source_collections'>,
+  partRef: string,
+): CatalogSourceCollectionCoverage | null {
+  const record = sourceResearch.research_records.find(
+    (entry) => entry.part_ref === partRef,
+  )
+  if (!record) {
+    return null
+  }
+  return (
+    sourceResearch.source_collections.find(
+      (collection) => collection.source_id === record.source_id,
+    ) ?? null
+  )
 }

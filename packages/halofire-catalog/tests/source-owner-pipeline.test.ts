@@ -85,7 +85,7 @@ describe('source owner pipeline', () => {
     expect(pipeline.source_coverage_ledger.summary).toEqual(
       checkedInCoverage.summary,
     )
-    expect(pipeline.summary.source_collection_count).toBe(12)
+    expect(pipeline.summary.source_collection_count).toBe(16)
     expect(pipeline.summary.research_record_count).toBe(
       checkedInResearch.research_records.length,
     )
@@ -113,7 +113,19 @@ describe('source owner pipeline', () => {
       pipeline.source_research_ledger.source_collections.find(
         (collection) => collection.source_id === 'step.parts',
       )?.asset_kinds,
-    ).toEqual(['product_page', 'step', 'third_party_notice'])
+    ).toEqual(['product_page', 'image', 'step', 'third_party_notice'])
+    expect(
+      pipeline.source_research_ledger.source_collections.find(
+        (collection) => collection.source_id === 'step.parts',
+      )?.image_url,
+    ).toBe('https://www.step.parts/step-parts-social-preview.png')
+    expect(
+      pipeline.source_coverage_ledger.source_collections.find(
+        (collection) => collection.source_id === 'reliable_dh56_bulletin_016',
+      )?.image_url,
+    ).toBe(
+      'https://www.reliablesprinkler.com/wp-content/uploads/2020/03/DH56-dry-white-crop-1-e1583452746731.png',
+    )
     expect(
       pipeline.source_research_ledger.research_records.find(
         (record) => record.part_ref === 'reliable_f156_upright_155f',
@@ -146,6 +158,16 @@ describe('source owner pipeline', () => {
     ).toBe('salvage_proxy')
     expect(
       pipeline.source_coverage_ledger.vendor_model_coverage.find(
+        (row) => row.part_ref === 'step.parts:hebi_r25_actuator',
+      )?.asset_coverage.find((asset) => asset.kind === 'image')?.status,
+    ).toBe('available')
+    expect(
+      pipeline.source_coverage_ledger.vendor_model_coverage.find(
+        (row) => row.part_ref === 'sidewall_dry',
+      )?.asset_coverage.find((asset) => asset.kind === 'image')?.status,
+    ).toBe('available')
+    expect(
+      pipeline.source_coverage_ledger.vendor_model_coverage.find(
         (row) => row.part_ref === 'pendent_standard',
       )?.coverage_status,
     ).toBe('promoted')
@@ -164,6 +186,31 @@ describe('source owner pipeline', () => {
         (collection) => collection.source_id === 'victaulic_fl_qr_sw',
       )?.asset_kinds,
     ).toEqual(['product_page', 'cut_sheet', 'revit', 'dwg'])
+    expect(
+      pipeline.source_research_ledger.source_collections.find(
+        (collection) => collection.source_id === 'viking_vk100_revit2017',
+      )?.source_file_ref,
+    ).toContain('assets/revit/viking_vk100_revit2017.zip')
+    expect(
+      pipeline.source_coverage_ledger.source_collections.find(
+        (collection) => collection.source_id === 'viking_vk100_revit2017',
+      )?.asset_kinds,
+    ).toEqual(['product_page', 'cut_sheet', 'revit'])
+    expect(
+      pipeline.source_coverage_ledger.source_collections.find(
+        (collection) => collection.source_id === 'victaulic_fl_qr_sw_revit41_02',
+      )?.asset_kinds,
+    ).toEqual(['product_page', 'cut_sheet', 'revit'])
+    expect(
+      pipeline.source_coverage_ledger.source_collections.find(
+        (collection) => collection.source_id === 'victaulic_fl_qr_sw_autocad3d_41_02',
+      )?.asset_kinds,
+    ).toEqual(['product_page', 'cut_sheet', 'dwg'])
+    expect(
+      pipeline.source_coverage_ledger.source_collections.find(
+        (collection) => collection.source_id === 'victaulic_fl_qr_sw_autocad2d_41_02',
+      )?.asset_kinds,
+    ).toEqual(['product_page', 'cut_sheet', 'dwg'])
     expect(pipeline.summary.proxy_count).toBe(6)
     expect(pipeline.summary.sealed_approved_count).toBe(0)
     expect(pipeline.model_fit_inventory?.proof_count).toBe(3)

@@ -48,7 +48,7 @@ describe('source ledger builders', () => {
     const built = buildSourceResearchLedger(seed)
 
     expect(built.summary).toEqual(summarizeSourceResearchLedger(built))
-    expect(built.source_collections).toHaveLength(12)
+    expect(built.source_collections).toHaveLength(16)
     expect(built.source_collections.map((collection) => collection.source_id)).toEqual([
       'step.parts',
       'wheatland_schedule40',
@@ -59,12 +59,19 @@ describe('source ledger builders', () => {
       'viking_vk100',
       'viking_vk3021_qr_pendent',
       'viking_vk3021_qr_pendent_revit2017',
+      'viking_vk100_revit2017',
       'victaulic_fl_qr_sw',
+      'victaulic_fl_qr_sw_revit41_02',
+      'victaulic_fl_qr_sw_autocad3d_41_02',
+      'victaulic_fl_qr_sw_autocad2d_41_02',
       'tyco_lfii_hsw_tfp417',
       'reliable_dh56_bulletin_016',
     ])
     expect(built.source_collections[0]?.source_url).toBe(
       'https://www.step.parts/parts/hebi_r25_actuator',
+    )
+    expect(built.source_collections[0]?.image_url).toBe(
+      'https://www.step.parts/step-parts-social-preview.png',
     )
     expect(
       built.research_records.find((record: any) => record.source_id === 'step.parts')
@@ -78,6 +85,28 @@ describe('source ledger builders', () => {
       built.research_records.find((record: any) => record.part_ref === 'reliable_f156_upright_155f')
         ?.model_status,
     ).toBe('manufacturer_verified')
+    expect(
+      built.source_collections.find((collection) => collection.source_id === 'reliable_dh56_bulletin_016')
+        ?.image_url,
+    ).toBe(
+      'https://www.reliablesprinkler.com/wp-content/uploads/2020/03/DH56-dry-white-crop-1-e1583452746731.png',
+    )
+    expect(
+      built.source_collections.find((collection) => collection.source_id === 'viking_vk100_revit2017')
+        ?.source_file_ref,
+    ).toContain('assets/revit/viking_vk100_revit2017.zip')
+    expect(
+      built.source_collections.find((collection) => collection.source_id === 'victaulic_fl_qr_sw_revit41_02')
+        ?.source_file_ref,
+    ).toContain('assets/revit/victaulic_fl_qr_sw_revit41_02.zip')
+    expect(
+      built.source_collections.find((collection) => collection.source_id === 'victaulic_fl_qr_sw_autocad3d_41_02')
+        ?.source_file_ref,
+    ).toContain('assets/dwg/victaulic_fl_qr_sw_autocad3d_41_02.zip')
+    expect(
+      built.source_collections.find((collection) => collection.source_id === 'victaulic_fl_qr_sw_autocad2d_41_02')
+        ?.source_file_ref,
+    ).toContain('assets/dwg/victaulic_fl_qr_sw_autocad2d_41_02.zip')
   })
 
   test('coverage builder reproduces the explicit vendor/model ledger and step.parts candidate', () => {
@@ -92,7 +121,7 @@ describe('source ledger builders', () => {
     })
 
     expect(built.summary).toEqual(summarizeCoverageLedger(built))
-    expect(built.source_collections).toHaveLength(12)
+    expect(built.source_collections).toHaveLength(16)
     expect(built.source_collections.map((collection) => collection.source_id)).toEqual([
       'step.parts',
       'wheatland_schedule40',
@@ -103,7 +132,11 @@ describe('source ledger builders', () => {
       'viking_vk100',
       'viking_vk3021_qr_pendent',
       'viking_vk3021_qr_pendent_revit2017',
+      'viking_vk100_revit2017',
       'victaulic_fl_qr_sw',
+      'victaulic_fl_qr_sw_revit41_02',
+      'victaulic_fl_qr_sw_autocad3d_41_02',
+      'victaulic_fl_qr_sw_autocad2d_41_02',
       'tyco_lfii_hsw_tfp417',
       'reliable_dh56_bulletin_016',
     ])
@@ -125,6 +158,9 @@ describe('source ledger builders', () => {
     expect(stepCandidate?.third_party_notice_ref).toBe('THIRD_PARTY_NOTICES.md')
     expect(
       stepCandidate?.asset_coverage.find((asset) => asset.kind === 'step')?.status,
+    ).toBe('available')
+    expect(
+      stepCandidate?.asset_coverage.find((asset) => asset.kind === 'image')?.status,
     ).toBe('available')
     expect(
       stepCandidate?.asset_coverage.find((asset) => asset.kind === 'ifc')?.status,

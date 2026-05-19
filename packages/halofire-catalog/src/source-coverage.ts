@@ -40,6 +40,7 @@ export interface CatalogSourceCollectionCoverage {
   source_kind: CatalogSourceKind | 'open_source_step_directory'
   public_url: string
   repo_url?: string | null
+  image_url?: string | null
   source_url?: string | null
   source_file_ref?: string | null
   license_spdx: string
@@ -148,6 +149,7 @@ export const CatalogSourceCollectionCoverageSchema: z.ZodType<CatalogSourceColle
     ]),
     public_url: z.string().min(1),
     repo_url: z.string().nullable().optional(),
+    image_url: z.string().nullable().optional(),
     source_url: z.string().nullable().optional(),
     source_file_ref: z.string().nullable().optional(),
     license_spdx: z.string().min(1),

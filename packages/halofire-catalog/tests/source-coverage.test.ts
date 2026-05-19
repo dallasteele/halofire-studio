@@ -34,7 +34,7 @@ describe('source coverage ledger', () => {
     const ledger = CatalogCoverageLedgerSchema.parse(loadJson(LEDGER_PATH))
 
     expect(ledger.scope).toContain('Stream F')
-    expect(ledger.source_collections).toHaveLength(12)
+    expect(ledger.source_collections).toHaveLength(16)
     expect(ledger.source_collections.map((collection) => collection.source_id)).toEqual([
       'step.parts',
       'wheatland_schedule40',
@@ -45,7 +45,11 @@ describe('source coverage ledger', () => {
       'viking_vk100',
       'viking_vk3021_qr_pendent',
       'viking_vk3021_qr_pendent_revit2017',
+      'viking_vk100_revit2017',
       'victaulic_fl_qr_sw',
+      'victaulic_fl_qr_sw_revit41_02',
+      'victaulic_fl_qr_sw_autocad3d_41_02',
+      'victaulic_fl_qr_sw_autocad2d_41_02',
       'tyco_lfii_hsw_tfp417',
       'reliable_dh56_bulletin_016',
     ])
@@ -61,9 +65,13 @@ describe('source coverage ledger', () => {
     expect(stepParts.third_party_notice_ref).toBe('THIRD_PARTY_NOTICES.md')
     expect(stepParts.asset_kinds).toEqual([
       'product_page',
+      'image',
       'step',
       'third_party_notice',
     ])
+    expect(stepParts.image_url).toBe(
+      'https://www.step.parts/step-parts-social-preview.png',
+    )
     expect(stepParts.redistribution_blocked).toBe(true)
 
     const viking = ledger.source_collections.find(
@@ -98,6 +106,15 @@ describe('source coverage ledger', () => {
     )
     expect(viking3021Revit?.asset_kinds).toEqual(['product_page', 'cut_sheet', 'revit'])
 
+    const viking100Revit = ledger.source_collections.find(
+      (collection) => collection.source_id === 'viking_vk100_revit2017',
+    )
+    expect(viking100Revit).toBeDefined()
+    expect(viking100Revit?.source_url).toBe(
+      'https://www.vikinggroupinc.com/sites/default/files/migrated/Viking%20-%20Standard%20Spray%20-%20Standard%20Response%20-%20VK100_Revit2017.zip',
+    )
+    expect(viking100Revit?.asset_kinds).toEqual(['product_page', 'cut_sheet', 'revit'])
+
     const victaulicFlQrSw = ledger.source_collections.find(
       (collection) => collection.source_id === 'victaulic_fl_qr_sw',
     )
@@ -108,10 +125,49 @@ describe('source coverage ledger', () => {
       'dwg',
     ])
 
+    const victaulicFlQrSwRevit = ledger.source_collections.find(
+      (collection) => collection.source_id === 'victaulic_fl_qr_sw_revit41_02',
+    )
+    expect(victaulicFlQrSwRevit).toBeDefined()
+    expect(victaulicFlQrSwRevit?.source_url).toBe(
+      'https://www.victaulicsoftware.com/vdc/content/zip/41.02%20Revit.zip?guid=%7B5B24A28F-628E-4F28-AE32-4C630A20F815%7D&version=US',
+    )
+    expect(victaulicFlQrSwRevit?.asset_kinds).toEqual([
+      'product_page',
+      'cut_sheet',
+      'revit',
+    ])
+
+    const victaulicFlQrSwCad3d = ledger.source_collections.find(
+      (collection) => collection.source_id === 'victaulic_fl_qr_sw_autocad3d_41_02',
+    )
+    expect(victaulicFlQrSwCad3d).toBeDefined()
+    expect(victaulicFlQrSwCad3d?.source_file_ref).toContain(
+      'assets/dwg/victaulic_fl_qr_sw_autocad3d_41_02.zip',
+    )
+    expect(victaulicFlQrSwCad3d?.asset_kinds).toEqual([
+      'product_page',
+      'cut_sheet',
+      'dwg',
+    ])
+
+    const victaulicFlQrSwCad2d = ledger.source_collections.find(
+      (collection) => collection.source_id === 'victaulic_fl_qr_sw_autocad2d_41_02',
+    )
+    expect(victaulicFlQrSwCad2d).toBeDefined()
+    expect(victaulicFlQrSwCad2d?.source_file_ref).toContain(
+      'assets/dwg/victaulic_fl_qr_sw_autocad2d_41_02.zip',
+    )
+    expect(victaulicFlQrSwCad2d?.asset_kinds).toEqual([
+      'product_page',
+      'cut_sheet',
+      'dwg',
+    ])
+
     const reliableDh56 = ledger.source_collections.find(
       (collection) => collection.source_id === 'reliable_dh56_bulletin_016',
     )
-    expect(reliableDh56?.asset_kinds).toEqual(['product_page', 'cut_sheet', 'revit'])
+    expect(reliableDh56?.asset_kinds).toEqual(['product_page', 'cut_sheet', 'image', 'revit'])
 
     expect(ledger.vendor_model_coverage.length).toBeGreaterThan(0)
     expect(ledger.summary.total_rows).toBe(ledger.vendor_model_coverage.length)
@@ -133,6 +189,10 @@ describe('source coverage ledger', () => {
     expect(stepCandidate?.model_status).toBe('proxy')
     expect(stepCandidate?.source_file_ref).toContain('source_step_parts/hebi_r25_actuator.step')
     expect(stepCandidate?.asset_coverage.find((asset) => asset.kind === 'step')?.status).toBe('available')
+    expect(stepCandidate?.asset_coverage.find((asset) => asset.kind === 'image')?.status).toBe('available')
+    expect(stepCandidate?.asset_coverage.find((asset) => asset.kind === 'image')?.ref).toBe(
+      'https://www.step.parts/step-parts-social-preview.png',
+    )
     expect(stepCandidate?.asset_coverage.find((asset) => asset.kind === 'third_party_notice')?.status).toBe('available')
     expect(stepCandidate?.asset_coverage.find((asset) => asset.kind === 'ifc')?.status).toBe('missing')
 
@@ -188,6 +248,10 @@ describe('source coverage ledger', () => {
     expect(sidewallDry?.model_status).toBe('proxy')
     expect(sidewallDry?.source_kind).toBe('manufacturer')
     expect(sidewallDry?.asset_coverage.find((asset) => asset.kind === 'product_page')?.status).toBe('available')
+    expect(sidewallDry?.asset_coverage.find((asset) => asset.kind === 'image')?.status).toBe('available')
+    expect(sidewallDry?.asset_coverage.find((asset) => asset.kind === 'image')?.ref).toBe(
+      'https://www.reliablesprinkler.com/wp-content/uploads/2020/03/DH56-dry-white-crop-1-e1583452746731.png',
+    )
     expect(sidewallDry?.asset_coverage.find((asset) => asset.kind === 'cut_sheet')?.status).toBe('available')
     expect(sidewallDry?.asset_coverage.find((asset) => asset.kind === 'ifc')?.status).toBe('missing')
 

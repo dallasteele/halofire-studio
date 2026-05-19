@@ -38,7 +38,7 @@ describe('source research ledger contract', () => {
       JSON.parse(readFileSync(SEED_PATH, 'utf-8')),
     )
 
-    expect(seed.source_collections).toHaveLength(12)
+    expect(seed.source_collections).toHaveLength(16)
     expect(seed.source_collections.map((collection) => collection.source_id)).toEqual([
       'step.parts',
       'wheatland_schedule40',
@@ -49,7 +49,11 @@ describe('source research ledger contract', () => {
       'viking_vk100',
       'viking_vk3021_qr_pendent',
       'viking_vk3021_qr_pendent_revit2017',
+      'viking_vk100_revit2017',
       'victaulic_fl_qr_sw',
+      'victaulic_fl_qr_sw_revit41_02',
+      'victaulic_fl_qr_sw_autocad3d_41_02',
+      'victaulic_fl_qr_sw_autocad2d_41_02',
       'tyco_lfii_hsw_tfp417',
       'reliable_dh56_bulletin_016',
     ])
@@ -57,9 +61,13 @@ describe('source research ledger contract', () => {
     expect(seed.source_collections[0]?.source_file_ref).toContain('source_step_parts/hebi_r25_actuator.step')
     expect(seed.source_collections[0]?.asset_kinds).toEqual([
       'product_page',
+      'image',
       'step',
       'third_party_notice',
     ])
+    expect(seed.source_collections[0]?.image_url).toBe(
+      'https://www.step.parts/step-parts-social-preview.png',
+    )
     expect(seed.research_records.some((record) => record.source_id === 'step.parts')).toBe(true)
     expect(
       seed.research_records.find((record) => record.source_id === 'step.parts')
@@ -94,7 +102,7 @@ describe('source research ledger contract', () => {
       JSON.parse(readFileSync(LEDGER_PATH, 'utf-8')),
     )
 
-    expect(ledger.source_collections).toHaveLength(12)
+    expect(ledger.source_collections).toHaveLength(16)
     expect(ledger.source_collections.map((collection) => collection.source_id)).toEqual([
       'step.parts',
       'wheatland_schedule40',
@@ -105,7 +113,11 @@ describe('source research ledger contract', () => {
       'viking_vk100',
       'viking_vk3021_qr_pendent',
       'viking_vk3021_qr_pendent_revit2017',
+      'viking_vk100_revit2017',
       'victaulic_fl_qr_sw',
+      'victaulic_fl_qr_sw_revit41_02',
+      'victaulic_fl_qr_sw_autocad3d_41_02',
+      'victaulic_fl_qr_sw_autocad2d_41_02',
       'tyco_lfii_hsw_tfp417',
       'reliable_dh56_bulletin_016',
     ])
@@ -113,9 +125,13 @@ describe('source research ledger contract', () => {
     expect(ledger.source_collections[0]?.source_file_ref).toContain('source_step_parts/hebi_r25_actuator.step')
     expect(ledger.source_collections[0]?.asset_kinds).toEqual([
       'product_page',
+      'image',
       'step',
       'third_party_notice',
     ])
+    expect(ledger.source_collections[0]?.image_url).toBe(
+      'https://www.step.parts/step-parts-social-preview.png',
+    )
     expect(ledger.research_records.some((record) => record.source_id === 'step.parts')).toBe(true)
     expect(
       ledger.research_records.find((record) => record.source_id === 'step.parts')
@@ -146,6 +162,38 @@ describe('source research ledger contract', () => {
       ledger.source_collections.find((collection) => collection.source_id === 'victaulic_fl_qr_sw')
         ?.asset_kinds,
     ).toEqual(['product_page', 'cut_sheet', 'revit', 'dwg'])
+    expect(
+      ledger.source_collections.find((collection) => collection.source_id === 'viking_vk100_revit2017')
+        ?.source_file_ref,
+    ).toContain('assets/revit/viking_vk100_revit2017.zip')
+    expect(
+      ledger.source_collections.find((collection) => collection.source_id === 'viking_vk100_revit2017')
+        ?.asset_kinds,
+    ).toEqual(['product_page', 'cut_sheet', 'revit'])
+    expect(
+      ledger.source_collections.find((collection) => collection.source_id === 'victaulic_fl_qr_sw_revit41_02')
+        ?.source_file_ref,
+    ).toContain('assets/revit/victaulic_fl_qr_sw_revit41_02.zip')
+    expect(
+      ledger.source_collections.find((collection) => collection.source_id === 'victaulic_fl_qr_sw_revit41_02')
+        ?.asset_kinds,
+    ).toEqual(['product_page', 'cut_sheet', 'revit'])
+    expect(
+      ledger.source_collections.find((collection) => collection.source_id === 'victaulic_fl_qr_sw_autocad3d_41_02')
+        ?.source_file_ref,
+    ).toContain('assets/dwg/victaulic_fl_qr_sw_autocad3d_41_02.zip')
+    expect(
+      ledger.source_collections.find((collection) => collection.source_id === 'victaulic_fl_qr_sw_autocad3d_41_02')
+        ?.asset_kinds,
+    ).toEqual(['product_page', 'cut_sheet', 'dwg'])
+    expect(
+      ledger.source_collections.find((collection) => collection.source_id === 'victaulic_fl_qr_sw_autocad2d_41_02')
+        ?.source_file_ref,
+    ).toContain('assets/dwg/victaulic_fl_qr_sw_autocad2d_41_02.zip')
+    expect(
+      ledger.source_collections.find((collection) => collection.source_id === 'victaulic_fl_qr_sw_autocad2d_41_02')
+        ?.asset_kinds,
+    ).toEqual(['product_page', 'cut_sheet', 'dwg'])
     expect(ledger.correction_records).toHaveLength(18)
     expect(ledger.summary.total_records).toBe(23)
     expect(ledger.summary.promoted_count).toBe(22)
