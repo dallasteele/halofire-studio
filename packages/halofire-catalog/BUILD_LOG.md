@@ -1,5 +1,11 @@
 # BUILD_LOG
 
+## 2026-05-19
+
+- Tightened the Stream F source coverage schema so open-source STEP directory collections must carry a local `source_file_ref` alongside the existing repo URL and third-party notice requirements.
+- Added a regression that fails open-source STEP collections missing the local STEP file ref, keeping the step.parts candidate honest at the collection boundary.
+- Verification passed: `bun test E:/ClaudeBot/halofire-studio/packages/halofire-catalog/tests/source-coverage.test.ts`.
+
 ## 2026-05-18
 
 - Added explicit `asset_kinds` coverage to the Stream F source collections so the checked-in research and coverage ledgers now record the confirmed upstream asset classes for step.parts, manufacturer cut sheets, and the captured Revit/DWG evidence trail.

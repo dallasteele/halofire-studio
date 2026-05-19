@@ -197,6 +197,16 @@ export const CatalogSourceCollectionCoverageSchema: z.ZodType<CatalogSourceColle
         message: 'step.parts source collection requires third_party_notice_ref',
       })
     }
+    if (
+      value.source_kind === 'open_source_step_directory' &&
+      !hasText(value.source_file_ref)
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['source_file_ref'],
+        message: 'step.parts source collection requires source_file_ref',
+      })
+    }
   })
 
 export const CatalogCoverageRowSchema: z.ZodType<CatalogCoverageRow> =

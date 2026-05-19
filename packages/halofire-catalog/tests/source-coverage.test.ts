@@ -8,7 +8,10 @@
 import { describe, expect, test } from 'bun:test'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
-import { CatalogCoverageLedgerSchema } from '../src/index.js'
+import {
+  CatalogCoverageLedgerSchema,
+  CatalogSourceCollectionCoverageSchema,
+} from '../src/index.js'
 
 const COMPONENT_DIR = resolve(
   import.meta.dirname,
@@ -332,5 +335,23 @@ describe('source coverage ledger', () => {
     expect(notices).toContain('step.parts source candidate')
     expect(notices).toContain('https://www.step.parts')
     expect(notices).toContain('https://github.com/earthtojake/step.parts')
+  })
+
+  test('open-source STEP source collections must carry a local source file ref', () => {
+    const result = CatalogSourceCollectionCoverageSchema.safeParse({
+      source_id: 'step.parts',
+      source_kind: 'open_source_step_directory',
+      public_url: 'https://www.step.parts',
+      repo_url: 'https://github.com/earthtojake/step.parts',
+      image_url: 'https://www.step.parts/step-parts-social-preview.png',
+      source_url: 'https://www.step.parts/parts/hebi_r25_actuator',
+      license_spdx: 'MIT',
+      third_party_notice_ref: 'THIRD_PARTY_NOTICES.md',
+      capture_date: '2026-05-19T16:54:15Z',
+      redistribution_blocked: true,
+      notes: 'Open-source STEP directory candidate only; not manufacturer approval.',
+    })
+
+    expect(result.success).toBe(false)
   })
 })
