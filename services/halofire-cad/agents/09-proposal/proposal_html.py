@@ -634,6 +634,53 @@ def _access_banner() -> str:
     )
 
 
+def _portal_bundle_section(violations: list[dict[str, Any]]) -> str:
+    blocked_count = len(violations)
+    return (
+        '<section style="margin-top:24px;padding:18px 20px;border:1px solid rgba(126,211,255,0.22);border-radius:14px;background:linear-gradient(180deg,#08121c,#0a0c12);">'
+        '<div style="font-size:12px;letter-spacing:0.22em;text-transform:uppercase;color:#7ed3ff;margin-bottom:8px">Bid deliverables</div>'
+        '<div style="font-size:20px;font-weight:700;line-height:1.25;margin-bottom:8px">Signed portal, workbook, proposal, and design artifacts for bid 1881</div>'
+        '<div style="font-size:12px;letter-spacing:0.22em;text-transform:uppercase;color:#ffb800;margin-bottom:8px">Access-Controlled Bid Bundle</div>'
+        '<div style="font-size:14px;line-height:1.55;color:#d0d0d6;margin-bottom:12px">This portal opens as a client-facing bid bundle: access-controlled HTML, estimator workbook, proposal PDF, proposal HTML, and design downloads all read from the same real Halo Forge artifacts.</div>'
+        '<div class="download-grid" style="margin-bottom:12px">'
+        '<a class="download-link" href="./proposal.html" target="_blank" rel="noopener"><span class="download-label">Client HTML bid page</span><span class="download-path">proposal.html</span></a>'
+        '<a class="download-link" href="./proposal.xlsx" target="_blank" rel="noopener"><span class="download-label">Estimator workbook</span><span class="download-path">proposal.xlsx</span></a>'
+        '<a class="download-link" href="./proposal.pdf" target="_blank" rel="noopener"><span class="download-label">Proposal PDF</span><span class="download-path">proposal.pdf</span></a>'
+        '<a class="download-link" href="./proposal.json" target="_blank" rel="noopener"><span class="download-label">Proposal JSON</span><span class="download-path">proposal.json</span></a>'
+        '<a class="download-link" href="./design.glb" target="_blank" rel="noopener"><span class="download-label">Design GLB</span><span class="download-path">design.glb</span></a>'
+        '<a class="download-link" href="./design.ifc" target="_blank" rel="noopener"><span class="download-label">Design IFC</span><span class="download-path">design.ifc</span></a>'
+        '<a class="download-link" href="./design.dxf" target="_blank" rel="noopener"><span class="download-label">Design DXF</span><span class="download-path">design.dxf</span></a>'
+        '<a class="download-link" href="./evidence_workbench.json" target="_blank" rel="noopener"><span class="download-label">Approval/evidence workbench</span><span class="download-path">evidence_workbench.json</span></a>'
+        '<a class="download-link" href="./missing_evidence_ledger.json" target="_blank" rel="noopener"><span class="download-label">Missing-evidence ledger</span><span class="download-path">missing_evidence_ledger.json</span></a>'
+        '<a class="download-link" href="./missing_evidence_resolver_queue.json" target="_blank" rel="noopener"><span class="download-label">AI-guided correction tasks</span><span class="download-path">missing_evidence_resolver_queue.json</span></a>'
+        '</div>'
+        '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-bottom:12px">'
+        '<div style="padding:12px 13px;border-radius:12px;border:1px solid rgba(126,211,255,0.16);background:rgba(126,211,255,0.05)">'
+        '<div style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#7ed3ff;margin-bottom:6px">Client portal</div>'
+        '<div style="font-size:13px;line-height:1.5;color:#f5f5f7">Signed, access-controlled HTML bid page with visible caveats and the current blocked claims overlay.</div>'
+        '</div>'
+        '<div style="padding:12px 13px;border-radius:12px;border:1px solid rgba(255,184,0,0.18);background:rgba(255,184,0,0.05)">'
+        '<div style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#ffcf6d;margin-bottom:6px">Estimator workbook</div>'
+        '<div style="font-size:13px;line-height:1.5;color:#f5f5f7">Workbook download, proposal PDF, and proposal HTML stay tied to the same bid state for review and client handoff.</div>'
+        '</div>'
+        '<div style="padding:12px 13px;border-radius:12px;border:1px solid rgba(110,230,162,0.16);background:rgba(110,230,162,0.05)">'
+        '<div style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#9ef0bf;margin-bottom:6px">Design artifacts</div>'
+        '<div style="font-size:13px;line-height:1.5;color:#f5f5f7">GLB, IFC, and DXF downloads are available for internal review, estimate support, and downstream correction workflows.</div>'
+        '</div>'
+        '<div style="padding:12px 13px;border-radius:12px;border:1px solid rgba(255,184,0,0.20);background:rgba(255,184,0,0.06)">'
+        '<div style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#ffcf6d;margin-bottom:6px">Approval/evidence workbench</div>'
+        '<div style="font-size:13px;line-height:1.5;color:#f5f5f7">Open the exact ledger rows, rejected candidates, and AI-guided correction tasks that keep client and company workflows anchored to real Halo Forge artifacts.</div>'
+        '</div>'
+        '</div>'
+        '<div style="display:flex;flex-wrap:wrap;gap:6px">'
+        f'<span style="display:inline-flex;padding:5px 9px;border-radius:999px;background:rgba(255,255,255,0.08);color:#f5f5f7;font-size:11px">Visible caveats: missing approval gates stay visible</span>'
+        f'<span style="display:inline-flex;padding:5px 9px;border-radius:999px;background:rgba(232,67,45,0.14);color:#ffb4aa;font-size:11px">Blocked claims: {_esc(blocked_count)} rule-check row(s)</span>'
+        '<span style="display:inline-flex;padding:5px 9px;border-radius:999px;background:rgba(126,211,255,0.10);color:#d9f2ff;font-size:11px">Client and company workflows stay on real Halo Forge artifacts</span>'
+        '</div>'
+        '</section>'
+    )
+
+
 def _chart_section(data: dict[str, Any], levels: list[dict[str, Any]], systems: list[dict[str, Any]]) -> str:
     pricing = data.get('pricing') or {}
     cost_items = [
@@ -857,6 +904,7 @@ def build_proposal_html(
         '</div></header>'
         '<div class="wrap">'
         + _access_banner()
+        + _portal_bundle_section(violations)
         # Hero band — landing page moment. Two-panel: big plan SVG
         # (first level that has any geometry) on the left, the
         # live 3D model-viewer on the right. Falls back gracefully
@@ -931,8 +979,16 @@ def write_proposal_html(
     """Serialize proposal.html next to the other deliverables."""
     out_dir.mkdir(parents=True, exist_ok=True)
     out = out_dir / filename
+    render_data = dict(data)
+    if not render_data.get('violations'):
+        violations_path = out_dir / 'violations.json'
+        if violations_path.exists():
+            try:
+                render_data['violations'] = json.loads(violations_path.read_text(encoding='utf-8'))
+            except json.JSONDecodeError:
+                render_data['violations'] = []
     out.write_text(
-        build_proposal_html(data, design=design, design_glb=design_glb),
+        build_proposal_html(render_data, design=design, design_glb=design_glb),
         encoding='utf-8',
     )
     return out

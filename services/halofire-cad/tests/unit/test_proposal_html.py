@@ -184,9 +184,16 @@ def test_html_renders_total_price_in_header() -> None:
 def test_html_shows_access_banner_and_artifact_links() -> None:
     html = PH.build_proposal_html(_SAMPLE_DATA, design=_SAMPLE_DESIGN)
     assert "Signed client share delivery" in html
+    assert "Bid deliverables" in html
+    assert "Access-Controlled Bid Bundle" in html
+    assert "Approval/evidence workbench" in html
+    assert "AI-guided correction tasks" in html
+    assert "Client and company workflows" in html
     assert "./proposal.pdf" in html
     assert "./proposal.xlsx" in html
     assert "./design.glb" in html
+    assert "./evidence_workbench.json" in html
+    assert "./missing_evidence_ledger.json" in html
 
 
 def test_html_escapes_user_content() -> None:
