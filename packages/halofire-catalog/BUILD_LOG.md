@@ -2,6 +2,9 @@
 
 ## 2026-05-19
 
+- Added explicit correction-workflow records for the remaining Stream F catalog blockers: Tyco LFII HSW image/BIM capture, Reliable DH56 BIM/CAD capture, Ferguson TY3251 manufacturer replacement, and the open-source step.parts exact-product authority check. The research seed summary now reflects 22 correction records while the promoted research rows stay at 22 and the open-source STEP candidate remains proxy-only.
+- Next approval gates remain locked: no manufacturer or sealed approval was promoted for the new blocker queue, and the Tyco LFII HSW / Reliable DH56 rows still need downstream BIM/CAD evidence before any higher-tier claim.
+
 - Synchronized the `step.parts` third-party notice with a live GitHub API
   check: `earthtojake/step.parts` is public and MIT-licensed at the repo
   level, while the catalog still treats the directory as an open-source STEP

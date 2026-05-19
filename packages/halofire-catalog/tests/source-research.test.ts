@@ -126,7 +126,35 @@ describe('source research ledger contract', () => {
     expect(seed.research_records.some((record) => record.part_ref === 'sidewall_horizontal')).toBe(true)
     expect(seed.research_records.some((record) => record.source_id === 'reliable_dh56_bulletin_016')).toBe(true)
     expect(seed.research_records.some((record) => record.part_ref === 'sidewall_dry')).toBe(true)
-    expect(seed.correction_records).toHaveLength(18)
+    expect(seed.correction_records).toHaveLength(22)
+    expect(
+      seed.correction_records.some(
+        (record) =>
+          record.part_ref === 'sidewall_horizontal' &&
+          record.action === 'request_source_capture',
+      ),
+    ).toBe(true)
+    expect(
+      seed.correction_records.some(
+        (record) =>
+          record.part_ref === 'sidewall_dry' &&
+          record.action === 'request_source_capture',
+      ),
+    ).toBe(true)
+    expect(
+      seed.correction_records.some(
+        (record) =>
+          record.part_ref === 'pendent_standard_ferguson' &&
+          record.action === 'request_human_correction',
+      ),
+    ).toBe(true)
+    expect(
+      seed.correction_records.some(
+        (record) =>
+          record.part_ref === 'step.parts:hebi_r25_actuator' &&
+          record.action === 'request_source_capture',
+      ),
+    ).toBe(true)
   })
 
   test('checked-in research ledger validates and carries the step.parts candidate', () => {
@@ -258,10 +286,10 @@ describe('source research ledger contract', () => {
       ledger.source_collections.find((collection) => collection.source_id === 'victaulic_fl_qr_sw_autocad2d_41_02')
         ?.asset_kinds,
     ).toEqual(['product_page', 'cut_sheet', 'dwg'])
-    expect(ledger.correction_records).toHaveLength(18)
+    expect(ledger.correction_records).toHaveLength(22)
     expect(ledger.summary.total_records).toBe(23)
     expect(ledger.summary.promoted_count).toBe(22)
-    expect(ledger.summary.correction_count).toBe(18)
+    expect(ledger.summary.correction_count).toBe(22)
     expect(ledger.summary).toEqual(summarizeSourceResearchLedger(ledger))
   })
 
