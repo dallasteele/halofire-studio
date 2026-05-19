@@ -2,6 +2,15 @@
 
 ## 2026-05-19
 
+- Synchronized the `step.parts` third-party notice with a live GitHub API
+  check: `earthtojake/step.parts` is public and MIT-licensed at the repo
+  level, while the catalog still treats the directory as an open-source STEP
+  source candidate rather than manufacturer approval.
+- Kept the open-source STEP provenance rule explicit in
+  `data/halofire/brand/components/THIRD_PARTY_NOTICES.md` so downstream
+  consumers can see the license boundary without inferring manufacturer
+  authority.
+
 - Added official upstream image provenance to the Viking VK100, Viking VK3021, and Victaulic FL-QR/SW source collections so the replayable source ledgers now carry concrete image URLs for those families.
 - Regenerated the checked-in source research and source coverage ledgers, lowering the explicit image-missing count from 88 to 80 and the missing-download count from 649 to 641.
 - Verification passed: `C:/Python312/python.exe scripts/verify_agentic_rules.py` and focused `bun test` for `tests/source-research.test.ts`, `tests/source-coverage.test.ts`, `tests/source-ledger.test.ts`, and `tests/source-owner-pipeline.test.ts`.
