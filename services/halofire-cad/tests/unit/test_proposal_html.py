@@ -341,6 +341,21 @@ def test_html_shows_access_banner_and_artifact_links() -> None:
     assert "./missing_evidence_ledger.json" in html
 
 
+def test_html_renders_all_ledger_rows_not_just_a_preview() -> None:
+    data = dict(_SAMPLE_DATA)
+    workbench = dict(data["evidence_workbench"])
+    workbench["ledger_rows"] = [
+        dict(workbench["ledger_rows"][0], gate_kind="row-1", human_label="Row 1", gate_id="gate-1"),
+        dict(workbench["ledger_rows"][0], gate_kind="row-2", human_label="Row 2", gate_id="gate-2"),
+        dict(workbench["ledger_rows"][0], gate_kind="row-3", human_label="Row 3", gate_id="gate-3"),
+        dict(workbench["ledger_rows"][0], gate_kind="row-4", human_label="Row 4", gate_id="gate-4"),
+    ]
+    data["evidence_workbench"] = workbench
+    html = PH.build_proposal_html(data)
+    assert html.count("Gate ID:") == 4
+    assert "Row 4" in html
+
+
 def test_html_escapes_user_content() -> None:
     """Client-supplied strings must be HTML-escaped."""
     data = dict(_SAMPLE_DATA)

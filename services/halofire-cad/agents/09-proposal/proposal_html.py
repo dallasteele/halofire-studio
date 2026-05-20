@@ -721,7 +721,7 @@ def _approval_workbench_section(data: dict[str, Any], violations: list[dict[str,
         return " | ".join(items) if items else empty
 
     row_cards: list[str] = []
-    for row in ledger_rows[:3]:
+    for row in ledger_rows:
         if not isinstance(row, dict):
             continue
         rejected_candidates = row.get("rejected_candidates") if isinstance(row.get("rejected_candidates"), list) else []
