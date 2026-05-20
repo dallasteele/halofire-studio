@@ -25,6 +25,16 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from cad.schema import Design, BomRow, LaborRow  # noqa: E402
 
 
+def _load_optional_json(path: Path) -> dict[str, Any] | list[Any] | None:
+    """Load a supplemental JSON artifact if it exists."""
+    if not path.exists():
+        return None
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return None
+
+
 def _level_summary(design: Design) -> list[dict]:
     """One row per level with head + pipe + hazard counts."""
     out = []
@@ -242,8 +252,19 @@ def write_proposal_files(
         _spec.loader.exec_module(_mod)
         write_proposal_html = _mod.write_proposal_html
 
+        render_data = dict(data)
+        supplemental_summary = _load_optional_json(out_dir / "summary.json")
+        if isinstance(supplemental_summary, dict):
+            for key in ("portal_workflows", "evidence_workbench", "missing_evidence_ledger"):
+                if key not in render_data and key in supplemental_summary:
+                    render_data[key] = supplemental_summary.get(key)
+        for key in ("evidence_workbench", "missing_evidence_ledger"):
+            supplemental = _load_optional_json(out_dir / f"{key}.json")
+            if supplemental is not None and key not in render_data:
+                render_data[key] = supplemental
+
         html_path = write_proposal_html(
-            data, out_dir,
+            render_data, out_dir,
             design=design_payload,
             design_glb="design.glb",
         )

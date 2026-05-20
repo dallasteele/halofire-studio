@@ -88,6 +88,138 @@ _SAMPLE_DATA = {
         {"role": "Fitter", "hours": 180, "rate_usd_hr": 58.0, "extended_usd": 10440.0},
     ],
     "violations": [],
+    "evidence_workbench": {
+        "current_gate": "sprinkler_evidence_gate:1881:room_boundary_professional_approval",
+        "claims_blocked": [
+            "full_building_scope_evidence_ready",
+            "permit_ready",
+            "professional_approval",
+        ],
+        "visible_caveats": [
+            "Visible caveat: room boundary approvals remain open.",
+            "Visible caveat: catalog engineering evidence is still review-only.",
+        ],
+        "ledger_rows": [
+            {
+                "gate_kind": "room_boundary_professional_approval",
+                "human_label": "Room boundary professional approval",
+                "ledger_ref": "sprinkler_missing_evidence:1881:room_boundary:room_boundary_professional_approval",
+                "ledger_row_summary": (
+                    "Gate ID: sprinkler_evidence_gate:1881:room_boundary_professional_approval | "
+                    "Missing artifact: sprinkler_room_boundary_visual_audit_packet:1881:A-101a | "
+                    "Missing ref: room_boundary_sheet_approval:1881:A-101a | "
+                    "Acceptable evidence formats: sealed review packet; signed PDF; accepted inventory rerun | "
+                    "Required fields: reviewer_name; reviewer_license; source_refs | "
+                    "Signature metadata: {\"review_status\": \"designer_review\"} | "
+                    "Who can satisfy: licensed reviewer; Halo Fire operator | "
+                    "Role authority: licensed reviewer | "
+                    "Scanned paths: data/halofire/bids/1881/halo_forge/sprinkler_missing_evidence_ledger | "
+                    "Claims blocked: full_building_scope_evidence_ready; permit_ready | "
+                    "Blocked claim gates: full_building_scope_evidence_ready; permit_ready | "
+                    "Rejected candidate refs: room_boundary_candidate:1 | "
+                    "Rejected candidate reasons: source-link missing | "
+                    "Rejected candidate summary: source-linked review packet required | "
+                    "Next action: Attach licensed/professional room-boundary approval evidence | "
+                    "Next collection action: capture sealed approval"
+                ),
+                "missing_ref": "room_boundary_sheet_approval:1881:A-101a",
+                "missing_artifact_ref": "sprinkler_room_boundary_visual_audit_packet:1881:A-101a",
+                "acceptable_evidence": [
+                    "licensed/professional room-boundary approval record for A-101a",
+                    "source-linked reviewed room-boundary packet",
+                ],
+                "acceptable_evidence_formats": [
+                    "sealed review packet",
+                    "signed PDF",
+                    "accepted inventory rerun",
+                ],
+                "required_fields": [
+                    "reviewer_name",
+                    "reviewer_license",
+                    "source_refs",
+                ],
+                "signature_metadata": {"review_status": "designer_review"},
+                "who_can_satisfy": ["licensed reviewer", "Halo Fire operator"],
+                "satisfying_roles": ["licensed reviewer"],
+                "role_authority": ["licensed reviewer"],
+                "scanned_paths": [
+                    "data/halofire/bids/1881/halo_forge/sprinkler_missing_evidence_ledger",
+                ],
+                "scanned_source_refs": ["sprinkler_room_boundary_visual_audit_packet:1881:A-101a"],
+                "rejected_candidates": [
+                    {
+                        "candidate_ref": "room_boundary_candidate:1",
+                        "evidence_kind": "visual audit packet",
+                        "rejection_reason": "source-link missing",
+                        "source_refs": ["room_boundary_visual_audit_packet:1881:A-101a"],
+                    },
+                ],
+                "rejected_candidate_count": 1,
+                "rejected_candidate_refs": ["room_boundary_candidate:1"],
+                "rejected_candidate_reasons": ["source-link missing"],
+                "rejected_candidate_summary": "source-linked review packet required",
+                "current_candidate_count": 1,
+                "usable_evidence_count": 0,
+                "blocked_claims": [
+                    "full_building_scope_evidence_ready",
+                    "permit_ready",
+                ],
+                "blocked_claim_gates": [
+                    "full_building_scope_evidence_ready",
+                    "permit_ready",
+                ],
+                "claims_blocked": [
+                    "full_building_scope_evidence_ready",
+                    "permit_ready",
+                ],
+                "ai_fallback": "no",
+                "next_collection_action": "capture sealed approval",
+                "next_action": "Attach licensed/professional room-boundary approval evidence",
+            }
+        ],
+    },
+    "missing_evidence_ledger": {
+        "rows": [
+            {
+                "gate_id": "sprinkler_evidence_gate:1881:room_boundary_professional_approval",
+                "missing_artifact_ref": "sprinkler_room_boundary_visual_audit_packet:1881:A-101a",
+                "missing_ref": "room_boundary_sheet_approval:1881:A-101a",
+            }
+        ]
+    },
+    "portal_workflows": [
+        {
+            "workflow_id": "client-bid-review",
+            "audience": "client",
+            "title": "Signed client bid review",
+            "summary": "Client-facing bundle with visible caveats and exact blocked claims.",
+            "status": "access-controlled",
+            "current_gate": "sprinkler_evidence_gate:1881:room_boundary_professional_approval",
+            "next_action": "Open the signed proposal HTML and review the current caveats.",
+            "visible_caveats": [
+                "Visible caveat: room boundary approvals remain open.",
+            ],
+            "claims_blocked": [
+                "full_building_scope_evidence_ready",
+            ],
+        },
+        {
+            "workflow_id": "company-delivery-workflow",
+            "audience": "company",
+            "title": "Halo Fire delivery workflow",
+            "summary": "Resolve exact evidence rows before republishing the bundle.",
+            "status": "review queue",
+            "current_gate": "sprinkler_evidence_gate:1881:room_boundary_professional_approval",
+            "next_action": "Resolve the missing-evidence ledger rows and rerun the workflow.",
+            "visible_caveats": [
+                "Visible caveat: catalog engineering evidence is still review-only.",
+            ],
+            "claims_blocked": [
+                "permit_ready",
+                "professional_approval",
+            ],
+        },
+    ],
     "pricing": {
         "materials_usd": 50000.0,
         "labor_usd": 30000.0,
@@ -189,6 +321,19 @@ def test_html_shows_access_banner_and_artifact_links() -> None:
     assert "Approval/evidence workbench" in html
     assert "AI-guided correction tasks" in html
     assert "Client and company workflows" in html
+    assert "Exact missing-evidence ledger rows for bid 1881" in html
+    assert "Gate ID:" in html
+    assert "Missing artifact:" in html
+    assert "Acceptable evidence formats:" in html
+    assert "Required fields:" in html
+    assert "Signature metadata:" in html
+    assert "Who can satisfy:" in html
+    assert "Scanned paths:" in html
+    assert "Rejected candidates" in html
+    assert "Rejected candidate reasons:" in html
+    assert "Next action:" in html
+    assert "Signed client bid review" in html
+    assert "Halo Fire delivery workflow" in html
     assert "./proposal.pdf" in html
     assert "./proposal.xlsx" in html
     assert "./design.glb" in html

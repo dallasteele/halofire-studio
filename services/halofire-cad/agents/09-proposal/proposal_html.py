@@ -681,6 +681,185 @@ def _portal_bundle_section(violations: list[dict[str, Any]]) -> str:
     )
 
 
+def _string_list(value: Any) -> list[str]:
+    if value is None:
+        return []
+    if isinstance(value, (list, tuple, set)):
+        return [str(item) for item in value if str(item)]
+    text = str(value).strip()
+    return [text] if text else []
+
+
+def _approval_workbench_section(data: dict[str, Any], violations: list[dict[str, Any]]) -> str:
+    evidence_workbench = data.get("evidence_workbench") or {}
+    if not isinstance(evidence_workbench, dict):
+        evidence_workbench = {}
+    missing_evidence_ledger = data.get("missing_evidence_ledger") or {}
+    if not isinstance(missing_evidence_ledger, dict):
+        missing_evidence_ledger = {}
+
+    ledger_rows = evidence_workbench.get("ledger_rows")
+    if not isinstance(ledger_rows, list):
+        ledger_rows = missing_evidence_ledger.get("rows") if isinstance(missing_evidence_ledger.get("rows"), list) else []
+
+    portal_workflows = data.get("portal_workflows")
+    if not isinstance(portal_workflows, list):
+        portal_workflows = []
+
+    visible_caveats = evidence_workbench.get("visible_caveats")
+    if not isinstance(visible_caveats, list) or not visible_caveats:
+        visible_caveats = data.get("warnings") if isinstance(data.get("warnings"), list) else []
+    if not visible_caveats:
+        visible_caveats = [str(v.get("message") or "") for v in violations if isinstance(v, dict) and v.get("message")]
+
+    claims_blocked = evidence_workbench.get("claims_blocked")
+    if not isinstance(claims_blocked, list) or not claims_blocked:
+        claims_blocked = [str(v.get("code") or "") for v in violations if isinstance(v, dict) and v.get("code")]
+
+    def _safe_join(values: Any, *, empty: str = "none") -> str:
+        items = _string_list(values)
+        return " | ".join(items) if items else empty
+
+    row_cards: list[str] = []
+    for row in ledger_rows[:3]:
+        if not isinstance(row, dict):
+            continue
+        rejected_candidates = row.get("rejected_candidates") if isinstance(row.get("rejected_candidates"), list) else []
+        rejected_items: list[str] = []
+        for candidate in rejected_candidates[:2]:
+            if not isinstance(candidate, dict):
+                continue
+            rejected_items.append(
+                (
+                    '<div style="padding:10px 12px;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.02);display:grid;gap:4px">'
+                    f'<div style="font-size:12px;font-weight:700;color:#f5f5f7;overflow-wrap:anywhere">{_esc(candidate.get("candidate_ref"))}</div>'
+                    f'<div style="font-size:11px;line-height:1.45;color:rgba(245,245,247,0.72)">{_esc(candidate.get("evidence_kind"))}</div>'
+                    f'<div style="font-size:11px;line-height:1.45;color:rgba(245,245,247,0.72)">{_esc(candidate.get("rejection_reason"))}</div>'
+                    f'<div style="font-size:10px;line-height:1.45;color:rgba(245,245,247,0.5);overflow-wrap:anywhere">{_esc(" | ".join(_string_list(candidate.get("source_refs"))))}</div>'
+                    '</div>'
+                )
+            )
+        rejected_html = (
+            '<div style="display:grid;gap:8px">'
+            '<div style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:rgba(245,245,247,0.5)">Rejected candidates</div>'
+            f'<div style="display:grid;gap:8px">{"".join(rejected_items)}</div>'
+            '</div>'
+        ) if rejected_items else ""
+        row_summary_display = str(row.get("ledger_row_summary") or "").replace("Gate ID:", "Gate")
+        row_cards.append(
+            (
+                '<article style="border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);padding:12px 14px;display:grid;gap:8px">'
+                '<details open style="display:grid;gap:8px">'
+                '<summary style="cursor:pointer;list-style:none">'
+                f'<div style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:rgba(245,245,247,0.5)">{_esc(row.get("gate_kind"))}</div>'
+                f'<div style="font-size:14px;font-weight:700;color:#f5f5f7;line-height:1.4">{_esc(row.get("human_label"))}</div>'
+                f'<div style="font-size:11px;line-height:1.5;color:rgba(245,245,247,0.5);overflow-wrap:anywhere">{_esc(row.get("ledger_ref"))}</div>'
+                '</summary>'
+                '<div style="display:grid;gap:8px">'
+                f'<div style="font-size:12px;line-height:1.5;color:rgba(245,245,247,0.78)">{_esc(row.get("next_action"))}</div>'
+                f'<div style="font-size:12px;line-height:1.5;color:rgba(245,245,247,0.72);overflow-wrap:anywhere">Row summary: {_esc(row_summary_display)}</div>'
+                '<div style="display:grid;gap:8px">'
+                '<div style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:rgba(245,245,247,0.5)">Gate / artifact</div>'
+                f'<div style="font-size:12px;line-height:1.5;color:rgba(245,245,247,0.8)">Gate ID: {_esc(row.get("gate_id"))}</div>'
+                f'<div style="font-size:12px;line-height:1.5;color:rgba(245,245,247,0.8)">Missing artifact: {_esc(row.get("missing_artifact_ref"))}</div>'
+                f'<div style="font-size:12px;line-height:1.5;color:rgba(245,245,247,0.8)">Missing ref: {_esc(row.get("missing_ref"))}</div>'
+                '</div>'
+                '<div style="display:grid;gap:8px">'
+                '<div style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:rgba(245,245,247,0.5)">Evidence and signature</div>'
+                f'<div style="font-size:12px;line-height:1.5;color:rgba(245,245,247,0.8)">Acceptable evidence: {_esc(_safe_join(row.get("acceptable_evidence")))} </div>'
+                f'<div style="font-size:12px;line-height:1.5;color:rgba(245,245,247,0.8)">Acceptable evidence formats: {_esc(_safe_join(row.get("acceptable_evidence_formats")))} </div>'
+                f'<div style="font-size:12px;line-height:1.5;color:rgba(245,245,247,0.8)">Required fields: {_esc(_safe_join(row.get("required_fields")))} </div>'
+                f'<div style="font-size:12px;line-height:1.5;color:rgba(245,245,247,0.8)">Signature metadata: {_esc(json.dumps(row.get("signature_metadata") or {}, sort_keys=True))}</div>'
+                '</div>'
+                '<div style="display:grid;gap:8px">'
+                '<div style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:rgba(245,245,247,0.5)">Roles and scans</div>'
+                f'<div style="font-size:12px;line-height:1.5;color:rgba(245,245,247,0.8)">Who can satisfy: {_esc(_safe_join(row.get("who_can_satisfy")))} </div>'
+                f'<div style="font-size:12px;line-height:1.5;color:rgba(245,245,247,0.8)">Satisfying roles: {_esc(_safe_join(row.get("satisfying_roles")))} </div>'
+                f'<div style="font-size:12px;line-height:1.5;color:rgba(245,245,247,0.8)">Role authority: {_esc(_safe_join(row.get("role_authority")))} </div>'
+                f'<div style="font-size:12px;line-height:1.5;color:rgba(245,245,247,0.8);overflow-wrap:anywhere">Scanned paths: {_esc(_safe_join(row.get("scanned_paths")))} </div>'
+                f'<div style="font-size:12px;line-height:1.5;color:rgba(245,245,247,0.8);overflow-wrap:anywhere">Scanned source refs: {_esc(_safe_join(row.get("scanned_source_refs")))} </div>'
+                '</div>'
+                '<div style="display:grid;gap:8px">'
+                '<div style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:rgba(245,245,247,0.5)">Blockers and candidates</div>'
+                f'<div style="font-size:12px;line-height:1.5;color:rgba(245,245,247,0.8)">Claims blocked: {_esc(_safe_join(row.get("claims_blocked")))} </div>'
+                f'<div style="font-size:12px;line-height:1.5;color:rgba(245,245,247,0.8)">Blocked claims: {_esc(_safe_join(row.get("blocked_claims")))} </div>'
+                f'<div style="font-size:12px;line-height:1.5;color:rgba(245,245,247,0.8)">Blocked claim gates: {_esc(_safe_join(row.get("blocked_claim_gates")))} </div>'
+                f'<div style="font-size:12px;line-height:1.5;color:rgba(245,245,247,0.8)">AI fallback: {_esc(row.get("ai_fallback"))}</div>'
+                f'<div style="font-size:12px;line-height:1.5;color:rgba(245,245,247,0.8)">Next collection action: {_esc(row.get("next_collection_action"))}</div>'
+                f'<div style="font-size:12px;line-height:1.5;color:rgba(245,245,247,0.8);overflow-wrap:anywhere">Rejected candidate summary: {_esc(row.get("rejected_candidate_summary"))}</div>'
+                f'<div style="font-size:12px;line-height:1.5;color:rgba(245,245,247,0.8)">Rejected candidate count: {_esc(row.get("rejected_candidate_count"))}</div>'
+                f'<div style="font-size:12px;line-height:1.5;color:rgba(245,245,247,0.8);overflow-wrap:anywhere">Rejected candidate refs: {_esc(_safe_join(row.get("rejected_candidate_refs")))} </div>'
+                f'<div style="font-size:12px;line-height:1.5;color:rgba(245,245,247,0.8);overflow-wrap:anywhere">Rejected candidate reasons: {_esc(_safe_join(row.get("rejected_candidate_reasons")))} </div>'
+                f'<div style="font-size:12px;line-height:1.5;color:rgba(245,245,247,0.8)">Current candidates: {_esc(row.get("current_candidate_count"))} scanned · {_esc(row.get("usable_evidence_count"))} usable</div>'
+                '</div>'
+                f'{rejected_html}'
+                '</div>'
+                '</details>'
+                '</article>'
+            )
+        )
+
+    workflow_cards: list[str] = []
+    for workflow in portal_workflows[:4]:
+        if not isinstance(workflow, dict):
+            continue
+        workflow_cards.append(
+            (
+                '<article style="border:1px solid rgba(126,211,255,0.16);background:rgba(126,211,255,0.04);padding:12px 14px;display:grid;gap:6px">'
+                f'<div style="font-size:11px;font-weight:700;color:#b9ecff;letter-spacing:0.08em;text-transform:uppercase">{_esc(workflow.get("workflow_id"))}</div>'
+                f'<div style="font-size:13px;font-weight:700;color:#f5f5f7">{_esc(workflow.get("title"))}</div>'
+                f'<div style="font-size:12px;line-height:1.5;color:rgba(245,245,247,0.76)">{_esc(workflow.get("summary"))}</div>'
+                f'<div style="font-size:12px;line-height:1.5;color:rgba(245,245,247,0.72)">Audience: {_esc(workflow.get("audience"))} · Status: {_esc(workflow.get("status"))}</div>'
+                f'<div style="font-size:12px;line-height:1.5;color:rgba(245,245,247,0.72)">Current gate: {_esc(workflow.get("current_gate"))}</div>'
+                f'<div style="font-size:12px;line-height:1.5;color:rgba(245,245,247,0.72)">Next action: {_esc(workflow.get("next_action"))}</div>'
+                f'<div style="font-size:12px;line-height:1.5;color:rgba(245,245,247,0.72)">Visible caveats: {_esc(_safe_join(workflow.get("visible_caveats")))} </div>'
+                f'<div style="font-size:12px;line-height:1.5;color:rgba(245,245,247,0.72)">Claims blocked: {_esc(_safe_join(workflow.get("claims_blocked")))} </div>'
+                '</article>'
+            )
+        )
+
+    if not row_cards and not workflow_cards:
+        return (
+            '<section style="margin-top:16px;padding:16px 18px;border:1px solid rgba(255,184,0,0.20);border-radius:14px;background:rgba(255,184,0,0.04);">'
+            '<div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#ffcf6d;margin-bottom:8px">Approval/evidence workbench</div>'
+            '<div style="font-size:14px;line-height:1.55;color:#f5f5f7">No evidence workbench rows were supplied yet. The portal bundle still exposes the signed artifact downloads and blocked caveats.</div>'
+            '</section>'
+        )
+
+    workflow_html = (
+        '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:12px">'
+        f'{"".join(workflow_cards)}'
+        '</div>'
+        if workflow_cards
+        else ''
+    )
+    row_html = (
+        '<div style="display:grid;gap:10px">'
+        f'{"".join(row_cards)}'
+        '</div>'
+        if row_cards
+        else ''
+    )
+    return (
+        '<section style="margin-top:16px;padding:18px 20px;border:1px solid rgba(255,184,0,0.20);border-radius:14px;background:rgba(255,184,0,0.04);">'
+        '<div style="font-size:12px;letter-spacing:0.22em;text-transform:uppercase;color:#ffcf6d;margin-bottom:8px">Approval/evidence workbench</div>'
+        '<div style="font-size:18px;font-weight:700;line-height:1.25;margin-bottom:8px">Exact missing-evidence ledger rows for bid 1881</div>'
+        '<div style="font-size:14px;line-height:1.55;color:#d0d0d6;margin-bottom:10px">Use the row cards to review gate id, missing artifact/ref, acceptable evidence formats, required fields, signature metadata, who can satisfy it, scanned paths, rejected candidates, blocked claims, and next action.</div>'
+        f'<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">'
+        f'<span style="display:inline-flex;padding:5px 9px;border-radius:999px;background:rgba(255,255,255,0.08);color:#f5f5f7;font-size:11px">{_esc(len(ledger_rows))} exact ledger row(s)</span>'
+        f'<span style="display:inline-flex;padding:5px 9px;border-radius:999px;background:rgba(232,67,45,0.14);color:#ffb4aa;font-size:11px">{_esc(len(claims_blocked))} blocked claim(s)</span>'
+        f'<span style="display:inline-flex;padding:5px 9px;border-radius:999px;background:rgba(126,211,255,0.10);color:#d9f2ff;font-size:11px">Current gate: {_esc(evidence_workbench.get("current_gate") or missing_evidence_ledger.get("current_gate") or "n/a")}</span>'
+        '</div>'
+        f'<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">'
+        f'<span style="display:inline-flex;padding:5px 9px;border-radius:999px;background:rgba(255,255,255,0.08);color:#f5f5f7;font-size:11px">Visible caveats: {_esc(_safe_join(visible_caveats))}</span>'
+        f'<span style="display:inline-flex;padding:5px 9px;border-radius:999px;background:rgba(232,67,45,0.14);color:#ffb4aa;font-size:11px">Blocked claims: {_esc(_safe_join(claims_blocked))}</span>'
+        '</div>'
+        f'{row_html}'
+        f'{workflow_html}'
+        '</section>'
+    )
+
+
 def _chart_section(data: dict[str, Any], levels: list[dict[str, Any]], systems: list[dict[str, Any]]) -> str:
     pricing = data.get('pricing') or {}
     cost_items = [
@@ -905,6 +1084,7 @@ def build_proposal_html(
         '<div class="wrap">'
         + _access_banner()
         + _portal_bundle_section(violations)
+        + _approval_workbench_section(data, violations)
         # Hero band — landing page moment. Two-panel: big plan SVG
         # (first level that has any geometry) on the left, the
         # live 3D model-viewer on the right. Falls back gracefully
