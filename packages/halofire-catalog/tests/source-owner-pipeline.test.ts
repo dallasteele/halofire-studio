@@ -257,7 +257,7 @@ describe('source owner pipeline', () => {
         (collection) => collection.source_id === 'victaulic_fl_qr_sw_autocad2d_41_02',
       )?.asset_kinds,
     ).toEqual(['product_page', 'cut_sheet', 'dwg'])
-    expect(pipeline.summary.image_missing_count).toBe(80)
+    expect(pipeline.summary.image_missing_count).toBe(79)
     expect(pipeline.summary.proxy_count).toBe(6)
     expect(pipeline.summary.sealed_approved_count).toBe(0)
     expect(pipeline.model_fit_inventory?.proof_count).toBe(3)

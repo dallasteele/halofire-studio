@@ -223,7 +223,7 @@ describe('source coverage ledger', () => {
     expect(ledger.summary.rejected_candidate_count).toBeGreaterThan(0)
     expect(ledger.summary.proxy_count).toBe(6)
     expect(ledger.summary.sealed_approved_count).toBe(0)
-    expect(ledger.summary.image_missing_count).toBe(80)
+    expect(ledger.summary.image_missing_count).toBe(79)
     expect(ledger.missing_downloads).toContain('pendent_standard:step')
     expect(ledger.missing_downloads).toContain('step.parts:hebi_r25_actuator:glb')
     expect(ledger.rejected_candidates).toContain('pendent_standard_ferguson')
@@ -295,6 +295,10 @@ describe('source coverage ledger', () => {
     expect(sidewallHorizontal?.model_status).toBe('proxy')
     expect(sidewallHorizontal?.source_kind).toBe('manufacturer')
     expect(sidewallHorizontal?.asset_coverage.find((asset) => asset.kind === 'product_page')?.status).toBe('available')
+    expect(sidewallHorizontal?.asset_coverage.find((asset) => asset.kind === 'image')?.status).toBe('available')
+    expect(sidewallHorizontal?.asset_coverage.find((asset) => asset.kind === 'image')?.ref).toBe(
+      'https://tyco.widen.net/content/upgo1g6cdj/jpeg/bts_imageleftcontentright_lfii_hsw_sprinklers_Stock%20photo%20ID182218173.jpeg?color=ffffffff&position=c&quality=80&u=ncoxvb',
+    )
     expect(sidewallHorizontal?.asset_coverage.find((asset) => asset.kind === 'cut_sheet')?.status).toBe('available')
     expect(sidewallHorizontal?.asset_coverage.find((asset) => asset.kind === 'ifc')?.status).toBe('missing')
 

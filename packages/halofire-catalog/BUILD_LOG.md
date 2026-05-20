@@ -2,6 +2,13 @@
 
 ## 2026-05-19
 
+- Captured the official Tyco LFII HSW product image URL in the Stream F source research seed and source collections, regenerated the checked-in research and coverage ledgers, and reduced the explicit image-missing count by one while keeping the manufacturer approval gate locked.
+- Verification pending: focused catalog tests for `source-research`, `source-coverage`, and `source-owner-pipeline`, plus `scripts/verify_agentic_rules.py`.
+
+- Backfilled the Stream F research seed and ledger with explicit `source_license_ref` values for the manufacturer/distributor sprinkler rows, including the LFII HSW and DH56 sidewall families, so the provenance manifest no longer leaves those license refs null. Also tightened the mirrored HAL test to assert the step.parts image evidence and the reliable sidewall image evidence, and corrected the research-ledger correction-count expectation to 22.
+- Verification passed: `C:/Python312/python.exe scripts/verify_agentic_rules.py`, `bun test halofire-studio/packages/halofire-catalog/tests/source-research.test.ts halofire-studio/packages/halofire-catalog/tests/source-coverage.test.ts halofire-studio/packages/halofire-catalog/tests/source-owner-pipeline.test.ts`, and `C:/Python312/python.exe -m pytest tests/core/hal/halo_forge/test_sprinkler_catalog_source_research_and_coverage.py -q`.
+- Next approval gate remains locked: the newly explicit license refs improve provenance clarity, but they do not promote any distributor or open-source STEP row to manufacturer_verified or sealed_approved.
+
 - Backfilled the Stream F research seed so the manufacturer/distributor rows now carry explicit `source_license_ref` values for the remaining pipe, fitting, valve, Reliable, and TY3251 families. The source research schema now rejects missing license refs, and the focused seed/ledger regressions are being extended to cover that contract.
 - Next approval gate remains locked: the open-source step.parts row is still candidate-only, and no manufacturer or sealed approval changed as part of the provenance tightening.
 

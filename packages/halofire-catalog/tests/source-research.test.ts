@@ -84,6 +84,16 @@ describe('source research ledger contract', () => {
       'https://tyco.widen.net/content/fe6teog93x/jpeg/FIS_residentialproductdetail_product_AV-1-300_1.jpeg?color=ffffffff&position=c&quality=80&u=ncoxvb',
     )
     expect(
+      seed.source_collections.find((collection) => collection.source_id === 'tyco_lfii_hsw_tfp417')
+        ?.asset_kinds,
+    ).toEqual(['product_page', 'image', 'cut_sheet', 'revit'])
+    expect(
+      seed.source_collections.find((collection) => collection.source_id === 'tyco_lfii_hsw_tfp417')
+        ?.image_url,
+    ).toBe(
+      'https://tyco.widen.net/content/upgo1g6cdj/jpeg/bts_imageleftcontentright_lfii_hsw_sprinklers_Stock%20photo%20ID182218173.jpeg?color=ffffffff&position=c&quality=80&u=ncoxvb',
+    )
+    expect(
       seed.source_collections.find((collection) => collection.source_id === 'viking_vk100')
         ?.image_url,
     ).toBe(
@@ -218,6 +228,16 @@ describe('source research ledger contract', () => {
         ?.image_url,
     ).toBe(
       'https://tyco.widen.net/content/fe6teog93x/jpeg/FIS_residentialproductdetail_product_AV-1-300_1.jpeg?color=ffffffff&position=c&quality=80&u=ncoxvb',
+    )
+    expect(
+      ledger.source_collections.find((collection) => collection.source_id === 'tyco_lfii_hsw_tfp417')
+        ?.asset_kinds,
+    ).toEqual(['product_page', 'image', 'cut_sheet', 'revit'])
+    expect(
+      ledger.source_collections.find((collection) => collection.source_id === 'tyco_lfii_hsw_tfp417')
+        ?.image_url,
+    ).toBe(
+      'https://tyco.widen.net/content/upgo1g6cdj/jpeg/bts_imageleftcontentright_lfii_hsw_sprinklers_Stock%20photo%20ID182218173.jpeg?color=ffffffff&position=c&quality=80&u=ncoxvb',
     )
     expect(
       ledger.source_collections.find((collection) => collection.source_id === 'viking_vk100')
