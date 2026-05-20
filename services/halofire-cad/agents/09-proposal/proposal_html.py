@@ -800,7 +800,7 @@ def _approval_workbench_section(data: dict[str, Any], violations: list[dict[str,
         )
 
     workflow_cards: list[str] = []
-    for workflow in portal_workflows[:4]:
+    for workflow in portal_workflows:
         if not isinstance(workflow, dict):
             continue
         workflow_cards.append(
@@ -855,6 +855,8 @@ def _approval_workbench_section(data: dict[str, Any], violations: list[dict[str,
         f'<span style="display:inline-flex;padding:5px 9px;border-radius:999px;background:rgba(232,67,45,0.14);color:#ffb4aa;font-size:11px">Blocked claims: {_esc(_safe_join(claims_blocked))}</span>'
         '</div>'
         f'{row_html}'
+        '<div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#ffcf6d;margin:16px 0 8px">Client and company workflows</div>'
+        f'<div style="font-size:13px;line-height:1.55;color:#d0d0d6;margin-bottom:10px">{_esc(len(workflow_cards))} workflow card(s) keep the client share, delivery workflow, catalog approval, capture preflight, hydraulic replay, correction tasks, upload status, and obstruction review aligned to the same signed bid state.</div>'
         f'{workflow_html}'
         '</section>'
     )
