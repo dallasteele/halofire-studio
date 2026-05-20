@@ -1,5 +1,11 @@
 # BUILD_LOG
 
+## 2026-05-20
+
+- Rechecked the Stream F catalog/model owner surface against the current checked-in truth and confirmed the requested contract is already present: typed source licensing, model-status tiers, component-library GLB/IFC/DXF alignment, internet-backed source research, open-source STEP candidate tracking, correction records, and the explicit vendor/model coverage ledger with product pages, images, cut sheets, BIM/CAD downloads, rejected candidates, and missing-download accounting.
+- No code or data changes were needed for this pass. The remaining blocker is still approval depth: `manufacturer_verified` and `sealed_approved` rows need stronger manufacturer-backed or sealed evidence, and the live runner still reports the step.parts DNS probe as unavailable from the current environment.
+- Verification: `C:/Python312/python.exe scripts/verify_agentic_rules.py`.
+
 ## 2026-05-19
 
 - Captured the official Tyco LFII HSW product image URL in the Stream F source research seed and source collections, regenerated the checked-in research and coverage ledgers, and reduced the explicit image-missing count by one while keeping the manufacturer approval gate locked.
