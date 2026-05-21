@@ -58,6 +58,12 @@
 - Added a regression that fails open-source STEP collections missing the local STEP file ref, keeping the step.parts candidate honest at the collection boundary.
 - Verification passed: `bun test E:/ClaudeBot/halofire-studio/packages/halofire-catalog/tests/source-coverage.test.ts`.
 
+## 2026-05-21
+
+- Reverified the Stream F catalog/model owner surface against the shared brain and the checked-in source inventory. The package still carries the requested component library, source licensing, model status tiers, GLB/IFC/DXF contracts, distributor/source ingestion, and correction workflows, plus the step.parts open-source STEP candidate with explicit third-party-notice tracking.
+- No source edits were required for this pass; the remaining blocker is still approval depth and manufacturer-backed evidence for promotion beyond proxy/manufacturer_verified on the locked families.
+- Verification run: `C:/Python312/python.exe scripts/verify_agentic_rules.py` and focused catalog truth checks remained the expected next gate if source files change again.
+
 ## 2026-05-18
 
 - Added explicit `asset_kinds` coverage to the Stream F source collections so the checked-in research and coverage ledgers now record the confirmed upstream asset classes for step.parts, manufacturer cut sheets, and the captured Revit/DWG evidence trail.
