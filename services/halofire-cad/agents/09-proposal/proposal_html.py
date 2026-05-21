@@ -298,6 +298,7 @@ def _artifact_downloads(data: dict[str, Any]) -> list[tuple[str, str]]:
             ('design_dxf', 'AutoCAD DXF'),
             ('design_ifc', 'IFC model'),
             ('design_glb', '3D model GLB'),
+            ('evidence_upload_status', 'Evidence upload status'),
             ('manifest_json', 'Artifact manifest'),
         ]
         out: list[tuple[str, str]] = []
@@ -316,6 +317,7 @@ def _artifact_downloads(data: dict[str, Any]) -> list[tuple[str, str]]:
         ('design.dxf', 'AutoCAD DXF'),
         ('design.ifc', 'IFC model'),
         ('design.glb', '3D model GLB'),
+        ('evidence_upload_status.json', 'Evidence upload status'),
         ('manifest.json', 'Artifact manifest'),
     ]
 
@@ -862,6 +864,119 @@ def _approval_workbench_section(data: dict[str, Any], violations: list[dict[str,
     )
 
 
+def _evidence_upload_status_section(data: dict[str, Any]) -> str:
+    upload_status = data.get("evidence_upload_status")
+    if not isinstance(upload_status, dict):
+        return (
+            '<section style="margin-top:16px;padding:16px 18px;border:1px solid rgba(126,211,255,0.18);border-radius:14px;background:rgba(126,211,255,0.04);">'
+            '<div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#7ed3ff;margin-bottom:8px">Evidence upload status</div>'
+            '<div style="font-size:14px;line-height:1.55;color:#f5f5f7">No upload-status payload was supplied yet. The signed bundle still exposes the downloads and blocked caveats, but the upload lane remains visible as a separate gate.</div>'
+            '</section>'
+        )
+
+    summary = upload_status.get("summary") if isinstance(upload_status.get("summary"), dict) else {}
+    uploads = [
+        upload for upload in upload_status.get("uploads", [])
+        if isinstance(upload, dict)
+    ] if isinstance(upload_status.get("uploads"), list) else []
+    rejected_uploads = [
+        upload for upload in upload_status.get("rejected_uploads", [])
+        if isinstance(upload, dict)
+    ] if isinstance(upload_status.get("rejected_uploads"), list) else []
+
+    def _upload_card(upload: dict[str, Any], *, label: str, border: str, background: str) -> str:
+        fields = [
+            ("File", upload.get("file_name")),
+            ("Upload ref", upload.get("upload_ref")),
+            ("Evidence lane", upload.get("evidence_lane")),
+            ("Status", upload.get("status")),
+            ("Saved path", upload.get("saved_path")),
+            ("SHA256", upload.get("sha256")),
+            ("Size bytes", upload.get("size_bytes")),
+            ("Source ref", upload.get("source_ref")),
+            ("Note", upload.get("note")),
+            ("Rejection reason", upload.get("rejection_reason")),
+        ]
+        details = "".join(
+            f'<div style="font-size:12px;line-height:1.5;color:rgba(245,245,247,0.78);overflow-wrap:anywhere"><strong>{_esc(field_label)}:</strong> {_esc(field_value)}</div>'
+            for field_label, field_value in fields
+            if field_value not in (None, "", [])
+        )
+        return (
+            f'<article style="border:1px solid {border};background:{background};padding:12px 14px;display:grid;gap:6px">'
+            f'<div style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#7ed3ff">{_esc(label)}</div>'
+            f'{details}'
+            '</article>'
+        )
+
+    staged_cards = [
+        _upload_card(
+            upload,
+            label="Staged upload",
+            border="rgba(126,211,255,0.16)",
+            background="rgba(126,211,255,0.04)",
+        )
+        for upload in uploads
+    ]
+    rejected_cards = [
+        _upload_card(
+            upload,
+            label="Rejected upload",
+            border="rgba(232,67,45,0.22)",
+            background="rgba(232,67,45,0.05)",
+        )
+        for upload in rejected_uploads
+    ]
+
+    staged_html = (
+        '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px">'
+        f'{"".join(staged_cards)}'
+        '</div>'
+        if staged_cards
+        else '<div style="font-size:13px;line-height:1.55;color:rgba(245,245,247,0.72)">No staged uploads yet.</div>'
+    )
+    rejected_html = (
+        '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px">'
+        f'{"".join(rejected_cards)}'
+        '</div>'
+        if rejected_cards
+        else '<div style="font-size:13px;line-height:1.55;color:rgba(245,245,247,0.72)">No rejected uploads recorded.</div>'
+    )
+
+    status = str(upload_status.get("status") or "missing")
+    artifact_dir = str(upload_status.get("artifact_dir") or "")
+    source_ref = str(upload_status.get("source_ref") or "")
+    upload_lane_ready = bool(upload_status.get("upload_lane_ready"))
+    claims_cleared = bool(upload_status.get("claims_cleared"))
+    upload_count = int(upload_status.get("upload_count") or len(uploads))
+    staged_upload_count = int(upload_status.get("staged_upload_count") or len(uploads))
+    rejected_upload_count = int(upload_status.get("rejected_upload_count") or len(rejected_uploads))
+    overwritten_upload_count = int(upload_status.get("overwritten_upload_count") or 0)
+    claims_cleared_count = int(upload_status.get("claims_cleared_count") or summary.get("claims_cleared_count") or 0)
+    next_action = str(summary.get("next_action") or upload_status.get("next_action") or "").strip()
+
+    return (
+        '<section style="margin-top:16px;padding:18px 20px;border:1px solid rgba(126,211,255,0.18);border-radius:14px;background:rgba(126,211,255,0.04);">'
+        '<div style="font-size:12px;letter-spacing:0.22em;text-transform:uppercase;color:#7ed3ff;margin-bottom:8px">Evidence upload status</div>'
+        '<div style="font-size:18px;font-weight:700;line-height:1.25;margin-bottom:8px">Upload lane and rejected-file truth</div>'
+        '<div style="font-size:14px;line-height:1.55;color:#d0d0d6;margin-bottom:10px">Use this lane to inspect staged uploads, rejected uploads, saved paths, hashes, source refs, and rejection reasons before asking anyone to treat a file as cleared evidence.</div>'
+        f'<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">'
+        f'<span style="display:inline-flex;padding:5px 9px;border-radius:999px;background:rgba(126,211,255,0.10);color:#d9f2ff;font-size:11px">Status: {_esc(status)}</span>'
+        f'<span style="display:inline-flex;padding:5px 9px;border-radius:999px;background:rgba(126,211,255,0.10);color:#d9f2ff;font-size:11px">Upload lane ready: {_esc(upload_lane_ready)}</span>'
+        f'<span style="display:inline-flex;padding:5px 9px;border-radius:999px;background:rgba(255,255,255,0.08);color:#f5f5f7;font-size:11px">{_esc(upload_count)} total upload(s)</span>'
+        f'<span style="display:inline-flex;padding:5px 9px;border-radius:999px;background:rgba(255,255,255,0.08);color:#f5f5f7;font-size:11px">{_esc(staged_upload_count)} staged</span>'
+        f'<span style="display:inline-flex;padding:5px 9px;border-radius:999px;background:rgba(232,67,45,0.14);color:#ffb4aa;font-size:11px">{_esc(rejected_upload_count)} rejected</span>'
+        f'<span style="display:inline-flex;padding:5px 9px;border-radius:999px;background:rgba(255,255,255,0.08);color:#f5f5f7;font-size:11px">{_esc(overwritten_upload_count)} overwritten</span>'
+        f'<span style="display:inline-flex;padding:5px 9px;border-radius:999px;background:rgba(255,255,255,0.08);color:#f5f5f7;font-size:11px">Claims cleared: {_esc(claims_cleared)} · { _esc(claims_cleared_count) } cleared claim(s)</span>'
+        '</div>'
+        f'<div style="font-size:12px;line-height:1.55;color:rgba(245,245,247,0.72);margin-bottom:10px;overflow-wrap:anywhere">Artifact dir: {_esc(artifact_dir)}</div>'
+        f'<div style="font-size:12px;line-height:1.55;color:rgba(245,245,247,0.72);margin-bottom:10px;overflow-wrap:anywhere">Source ref: {_esc(source_ref)}</div>'
+        f'<div style="display:grid;gap:12px;margin-bottom:10px"><div><div style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#7ed3ff;margin-bottom:6px">Staged uploads</div>{staged_html}</div><div><div style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#ffcf6d;margin-bottom:6px">Rejected uploads</div>{rejected_html}</div></div>'
+        f'<div style="font-size:12px;line-height:1.55;color:rgba(245,245,247,0.72)">Next action: {_esc(next_action or "Review staged uploads and rejected-file reasons before clearing any claim.")}</div>'
+        '</section>'
+    )
+
+
 def _chart_section(data: dict[str, Any], levels: list[dict[str, Any]], systems: list[dict[str, Any]]) -> str:
     pricing = data.get('pricing') or {}
     cost_items = [
@@ -1087,6 +1202,7 @@ def build_proposal_html(
         + _access_banner()
         + _portal_bundle_section(violations)
         + _approval_workbench_section(data, violations)
+        + _evidence_upload_status_section(data)
         # Hero band — landing page moment. Two-panel: big plan SVG
         # (first level that has any geometry) on the left, the
         # live 3D model-viewer on the right. Falls back gracefully

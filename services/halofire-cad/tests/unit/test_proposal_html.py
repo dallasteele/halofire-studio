@@ -220,6 +220,49 @@ _SAMPLE_DATA = {
             ],
         },
     ],
+    "evidence_upload_status": {
+        "status": "loaded",
+        "artifact_dir": "data/halofire/bids/1881/halo_forge/evidence_upload_status",
+        "upload_count": 2,
+        "staged_upload_count": 1,
+        "rejected_upload_count": 1,
+        "overwritten_upload_count": 0,
+        "claims_cleared_count": 0,
+        "upload_lane_ready": False,
+        "source_ref": "data/halofire/bids/1881/halo_forge/evidence_upload_status/output.json",
+        "uploads": [
+            {
+                "upload_ref": "upload:1881:openclaw-scene-packet-001",
+                "file_name": "openclaw_scene_packet.json",
+                "saved_path": "data/halofire/bids/1881/halo_forge/evidence_upload_status/uploads/openclaw_scene_packet.json",
+                "sha256": "abc123",
+                "size_bytes": 1234,
+                "evidence_lane": "openclaw_scene_packet",
+                "source_ref": "openclaw_scene_packet:1881:review",
+                "note": "Staged for replay bootstrap review.",
+                "status": "staged",
+            }
+        ],
+        "rejected_uploads": [
+            {
+                "upload_ref": "upload:1881:openclaw-scene-packet-002",
+                "file_name": "openclaw_scene_packet_invalid.json",
+                "saved_path": "data/halofire/bids/1881/halo_forge/evidence_upload_status/uploads/openclaw_scene_packet_invalid.json",
+                "sha256": "def456",
+                "size_bytes": 789,
+                "evidence_lane": "openclaw_scene_packet",
+                "source_ref": "openclaw_scene_packet:1881:review",
+                "note": "Missing runtime log ref.",
+                "status": "rejected",
+                "rejection_reason": "runtime log ref missing",
+            }
+        ],
+        "summary": {
+            "next_action": "Review staged uploads before clearing any claim.",
+            "claims_cleared_count": 0,
+        },
+        "claims_cleared": False,
+    },
     "pricing": {
         "materials_usd": 50000.0,
         "labor_usd": 30000.0,
@@ -322,6 +365,7 @@ def test_html_shows_access_banner_and_artifact_links() -> None:
     assert "AI-guided correction tasks" in html
     assert "Client and company workflows" in html
     assert "Exact missing-evidence ledger rows for bid 1881" in html
+    assert "Evidence upload status" in html
     assert "Gate ID:" in html
     assert "Missing artifact:" in html
     assert "Acceptable evidence formats:" in html
@@ -339,6 +383,17 @@ def test_html_shows_access_banner_and_artifact_links() -> None:
     assert "./design.glb" in html
     assert "./evidence_workbench.json" in html
     assert "./missing_evidence_ledger.json" in html
+    assert "./evidence_upload_status.json" in html
+
+
+def test_html_renders_evidence_upload_status_lane() -> None:
+    html = PH.build_proposal_html(_SAMPLE_DATA, design=_SAMPLE_DESIGN)
+    assert "Upload lane and rejected-file truth" in html
+    assert "Upload lane ready:" in html
+    assert "openclaw_scene_packet.json" in html
+    assert "openclaw_scene_packet_invalid.json" in html
+    assert "runtime log ref missing" in html
+    assert "Review staged uploads before clearing any claim." in html
 
 
 def test_html_renders_all_ledger_rows_not_just_a_preview() -> None:
