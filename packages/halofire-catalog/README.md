@@ -129,6 +129,10 @@ The canonical source ingestion policy is:
 - the component-library source manifest, component map, and family
   contracts must stay aligned on GLB / IFC / DXF paths, verification
   flags, and source-license references
+- source collections must declare explicit asset coverage: manufacturer
+  and distributor rows require at least `product_page` and `cut_sheet`,
+  while step.parts rows require `step` and `third_party_notice` in the
+  declared asset list
 
 Package consumers should use `CATALOG_SOURCE_INGESTION_POLICY` and the
 runtime schemas in `src/schema.ts` rather than inferring policy from the

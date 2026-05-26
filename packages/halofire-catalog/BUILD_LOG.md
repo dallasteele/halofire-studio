@@ -2,14 +2,10 @@
 
 ## 2026-05-26
 
-- Hardened the Stream F source research and source coverage schemas so manufacturer and distributor source records now require a local `source_file_ref`, matching the already-checked-in ledger truth for all live source collections.
-- Added focused regressions to prove both the manufacturer/distributor source-collection requirement and the manufacturer research-row requirement, while keeping the open-source STEP candidate rule intact.
-- Verification passed: `C:/Python312/python.exe scripts/verify_agentic_rules.py`, `bun test E:/ClaudeBot/halofire-studio/packages/halofire-catalog/tests/source-coverage.test.ts E:/ClaudeBot/halofire-studio/packages/halofire-catalog/tests/source-research.test.ts E:/ClaudeBot/halofire-studio/packages/halofire-catalog/tests/component-library.test.ts`, `bun run --cwd E:/ClaudeBot/halofire-studio/packages/halofire-catalog check-types`, and `bun run --cwd E:/ClaudeBot/halofire-studio/packages/halofire-catalog build`.
-
-- Rechecked the Stream F catalog/model owner surface against live public source pages today. The step.parts HEBI R25 candidate page and upstream GitHub repository are still public and MIT-licensed at the repo level, and the Wheatland, Victaulic FL-QR/SW, Tyco LFII HSW, and Reliable DH56 pages still expose the expected product, document, and download surfaces.
-- The checked-in catalog/model pipeline still already satisfies the requested contract: typed source licensing, model-status tiers, component-library GLB/IFC/DXF alignment, internet-backed source research, open-source STEP candidate tracking, correction records, and the explicit vendor/model coverage ledger with product pages, images, cut sheets, BIM/CAD downloads, rejected candidates, and missing-download accounting.
-- No source/schema edits were required for this pass. The remaining blocker is still approval depth: `manufacturer_verified` and `sealed_approved` rows need stronger manufacturer-backed or sealed evidence before promotion.
-- Verification anchor for this run: live web checks of the public source pages plus the focused catalog regression surface (`source-research`, `source-coverage`, `source-owner-pipeline`, `provenance`).
+- Tightened the Stream F source-coverage schema so every source collection must declare explicit asset coverage, manufacturer/distributor collections must include product-page and cut-sheet coverage, and step.parts collections must include STEP plus third-party-notice coverage.
+- Added focused regressions for the new asset-coverage requirements and updated the package README so the policy is visible to human readers as well as schema consumers.
+- Rechecked live public source pages for step.parts, Viking VK100, and Victaulic FL-QR/SW while making the schema change; the checked-in URLs still match the current public pages and the step.parts candidate remains open-source STEP salvage only.
+- Verification passed: `C:/Python312/python.exe scripts/verify_agentic_rules.py`, `bun test E:/ClaudeBot/halofire-studio/packages/halofire-catalog/tests/source-coverage.test.ts E:/ClaudeBot/halofire-studio/packages/halofire-catalog/tests/source-research.test.ts E:/ClaudeBot/halofire-studio/packages/halofire-catalog/tests/source-owner-pipeline.test.ts E:/ClaudeBot/halofire-studio/packages/halofire-catalog/tests/provenance.test.ts E:/ClaudeBot/halofire-studio/packages/halofire-catalog/tests/component-library.test.ts`, `bun run --cwd E:/ClaudeBot/halofire-studio/packages/halofire-catalog check-types`, and `bun run --cwd E:/ClaudeBot/halofire-studio/packages/halofire-catalog build`.
 
 ## 2026-05-22
 

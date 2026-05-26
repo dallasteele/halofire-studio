@@ -219,6 +219,55 @@ export const CatalogSourceCollectionCoverageSchema: z.ZodType<CatalogSourceColle
         message: 'step.parts source collection requires source_file_ref',
       })
     }
+    if (!value.asset_kinds || value.asset_kinds.length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['asset_kinds'],
+        message: 'source collections require explicit asset_kinds coverage',
+      })
+    }
+    if (value.source_kind === 'open_source_step_directory') {
+      const assetKinds = new Set(value.asset_kinds ?? [])
+      if (!assetKinds.has('step')) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['asset_kinds'],
+          message: 'step.parts source collections require step asset coverage',
+        })
+      }
+      if (!assetKinds.has('third_party_notice')) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['asset_kinds'],
+          message:
+            'step.parts source collections require third_party_notice asset coverage',
+        })
+      }
+    }
+    if (
+      (value.source_kind === 'manufacturer' ||
+        value.source_kind === 'distributor') &&
+      !value.asset_kinds?.includes('product_page')
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['asset_kinds'],
+        message:
+          'manufacturer/distributor source collections require product_page coverage',
+      })
+    }
+    if (
+      (value.source_kind === 'manufacturer' ||
+        value.source_kind === 'distributor') &&
+      !value.asset_kinds?.includes('cut_sheet')
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['asset_kinds'],
+        message:
+          'manufacturer/distributor source collections require cut_sheet coverage',
+      })
+    }
   })
 
 export const CatalogCoverageRowSchema: z.ZodType<CatalogCoverageRow> =

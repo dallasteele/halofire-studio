@@ -368,6 +368,26 @@ describe('source coverage ledger', () => {
     expect(result.success).toBe(false)
   })
 
+  test('open-source STEP source collections must declare STEP and third-party notice asset coverage', () => {
+    const result = CatalogSourceCollectionCoverageSchema.safeParse({
+      source_id: 'step.parts',
+      source_kind: 'open_source_step_directory',
+      public_url: 'https://www.step.parts',
+      repo_url: 'https://github.com/earthtojake/step.parts',
+      image_url: 'https://www.step.parts/step-parts-social-preview.png',
+      source_url: 'https://www.step.parts/parts/hebi_r25_actuator',
+      source_file_ref: 'E:/ClaudeBot/data/halofire/brand/components/source_step_parts/hebi_r25_actuator.step',
+      license_spdx: 'MIT',
+      third_party_notice_ref: 'THIRD_PARTY_NOTICES.md',
+      asset_kinds: ['product_page', 'image'],
+      capture_date: '2026-05-19T16:54:15Z',
+      redistribution_blocked: true,
+      notes: 'Open-source STEP directory candidate only; not manufacturer approval.',
+    })
+
+    expect(result.success).toBe(false)
+  })
+
   test('manufacturer source collections must carry a local source file ref', () => {
     const result = CatalogSourceCollectionCoverageSchema.safeParse({
       source_id: 'wheatland_schedule40',
@@ -380,6 +400,25 @@ describe('source coverage ledger', () => {
       capture_date: '2026-05-19T16:54:15Z',
       redistribution_blocked: true,
       notes: 'Manufacturer source collection without a local file ref should fail.',
+    })
+
+    expect(result.success).toBe(false)
+  })
+
+  test('manufacturer source collections must declare product-page and cut-sheet asset coverage', () => {
+    const result = CatalogSourceCollectionCoverageSchema.safeParse({
+      source_id: 'wheatland_schedule40',
+      source_kind: 'manufacturer',
+      public_url: 'https://www.wheatland.com/products/fire-sprinkler-pipe/schedule-40',
+      image_url: 'https://www.wheatland.com/wp-content/uploads/2018/02/header-schedule40.jpg',
+      source_url: 'https://www.wheatland.com/wp-content/uploads/2017/12/Schedule-40-Submittal-Sheet.pdf',
+      source_file_ref: 'E:/ClaudeBot/halofire-studio/packages/halofire-catalog/cut_sheets/wheatland_schedule40_sprinkler_pipe.pdf',
+      license_spdx: 'proprietary',
+      third_party_notice_ref: null,
+      asset_kinds: ['image'],
+      capture_date: '2026-05-19T16:54:15Z',
+      redistribution_blocked: true,
+      notes: 'Manufacturer source collection without product-page/cut-sheet coverage should fail.',
     })
 
     expect(result.success).toBe(false)
