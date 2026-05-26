@@ -170,6 +170,19 @@ export const CatalogSourceResearchRecordSchema: z.ZodType<CatalogSourceResearchR
       })
     }
     if (
+      (value.source_kind === 'manufacturer' ||
+        value.source_kind === 'distributor' ||
+        value.source_kind === 'open_source_step_directory') &&
+      !hasText(value.source_file_ref)
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['source_file_ref'],
+        message:
+          'manufacturer/distributor/open-source STEP research records require source_file_ref',
+      })
+    }
+    if (
       value.source_kind === 'procedural' &&
       value.model_status !== 'visual_reference'
     ) {
@@ -201,20 +214,6 @@ export const CatalogSourceResearchRecordSchema: z.ZodType<CatalogSourceResearchR
         path: ['model_status'],
         message:
           'open-source STEP research records cannot claim manufacturer_verified or sealed_approved',
-      })
-    }
-    if (
-      (value.model_status === 'proxy' ||
-        value.model_status === 'dimensioned_parametric' ||
-        value.model_status === 'manufacturer_verified' ||
-        value.model_status === 'sealed_approved') &&
-      !hasText(value.source_file_ref)
-    ) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['source_file_ref'],
-        message:
-          'promoted research records require a source_file_ref or captured source asset',
       })
     }
     if (

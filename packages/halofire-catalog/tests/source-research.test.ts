@@ -615,6 +615,19 @@ describe('source research ledger contract', () => {
     expect(result.success).toBe(false)
   })
 
+  test('manufacturer source research records reject missing source_file_ref', () => {
+    const record = {
+      ...JSON.parse(readFileSync(SEED_PATH, 'utf-8')).research_records.find(
+        (entry: { part_ref: string }) => entry.part_ref === 'pipe_steel_sch40_2p0in',
+      ),
+    }
+    delete record.source_file_ref
+
+    const result = CatalogSourceResearchRecordSchema.safeParse(record)
+
+    expect(result.success).toBe(false)
+  })
+
   test('correction records block open-source STEP self-promotion', () => {
     const result = CatalogCorrectionRecordSchema.safeParse({
       part_ref: 'step.parts:hebi_r25_actuator',

@@ -367,4 +367,21 @@ describe('source coverage ledger', () => {
 
     expect(result.success).toBe(false)
   })
+
+  test('manufacturer source collections must carry a local source file ref', () => {
+    const result = CatalogSourceCollectionCoverageSchema.safeParse({
+      source_id: 'wheatland_schedule40',
+      source_kind: 'manufacturer',
+      public_url: 'https://www.wheatland.com/products/fire-sprinkler-pipe/schedule-40',
+      image_url: 'https://www.wheatland.com/wp-content/uploads/2018/02/header-schedule40.jpg',
+      source_url: 'https://www.wheatland.com/wp-content/uploads/2017/12/Schedule-40-Submittal-Sheet.pdf',
+      license_spdx: 'proprietary',
+      third_party_notice_ref: null,
+      capture_date: '2026-05-19T16:54:15Z',
+      redistribution_blocked: true,
+      notes: 'Manufacturer source collection without a local file ref should fail.',
+    })
+
+    expect(result.success).toBe(false)
+  })
 })

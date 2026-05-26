@@ -167,6 +167,18 @@ export const CatalogSourceCollectionCoverageSchema: z.ZodType<CatalogSourceColle
       })
     }
     if (
+      (value.source_kind === 'manufacturer' ||
+        value.source_kind === 'distributor') &&
+      !hasText(value.source_file_ref)
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['source_file_ref'],
+        message:
+          'manufacturer/distributor source collections require source_file_ref',
+      })
+    }
+    if (
       value.source_kind === 'open_source_step_directory' &&
       !hasText(value.repo_url)
     ) {
