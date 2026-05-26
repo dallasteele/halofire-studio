@@ -203,6 +203,10 @@ _SAMPLE_DATA = {
             "claims_blocked": [
                 "full_building_scope_evidence_ready",
             ],
+            "download_names": [
+                {"label": "Client HTML bid page", "artifact": "proposal.html"},
+                {"label": "Proposal PDF", "artifact": "proposal.pdf"},
+            ],
         },
         {
             "workflow_id": "company-delivery-workflow",
@@ -218,6 +222,10 @@ _SAMPLE_DATA = {
             "claims_blocked": [
                 "permit_ready",
                 "professional_approval",
+            ],
+            "download_names": [
+                {"label": "Approval/evidence workbench", "artifact": "evidence_workbench.json"},
+                {"label": "Missing-evidence ledger", "artifact": "missing_evidence_ledger.json"},
             ],
         },
     ],
@@ -380,6 +388,8 @@ def test_html_shows_access_banner_and_artifact_links() -> None:
     assert "Next action:" in html
     assert "Signed client bid review" in html
     assert "Halo Fire delivery workflow" in html
+    assert "Client HTML bid page" in html
+    assert "Approval/evidence workbench" in html
     assert "./proposal.pdf" in html
     assert "./proposal.xlsx" in html
     assert "./design.glb" in html

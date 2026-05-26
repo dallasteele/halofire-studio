@@ -806,6 +806,31 @@ def _approval_workbench_section(data: dict[str, Any], violations: list[dict[str,
     for workflow in portal_workflows:
         if not isinstance(workflow, dict):
             continue
+        download_names = workflow.get("download_names")
+        workflow_downloads: list[str] = []
+        if isinstance(download_names, list):
+            for download in download_names:
+                if not isinstance(download, dict):
+                    continue
+                artifact = str(download.get("artifact") or "").strip()
+                label = str(download.get("label") or artifact).strip()
+                if not artifact:
+                    continue
+                workflow_downloads.append(
+                    (
+                        '<a class="download-link" href="./'
+                        + _esc(artifact)
+                        + '" target="_blank" rel="noopener">'
+                        f'<span class="download-label">{_esc(label)}</span>'
+                        f'<span class="download-path">{_esc(artifact)}</span>'
+                        '</a>'
+                    )
+                )
+        workflow_downloads_html = (
+            '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;margin-top:8px">'
+            f'{"".join(workflow_downloads)}'
+            '</div>'
+        ) if workflow_downloads else ''
         workflow_cards.append(
             (
                 '<article style="border:1px solid rgba(126,211,255,0.16);background:rgba(126,211,255,0.04);padding:12px 14px;display:grid;gap:6px">'
@@ -817,6 +842,7 @@ def _approval_workbench_section(data: dict[str, Any], violations: list[dict[str,
                 f'<div style="font-size:12px;line-height:1.5;color:rgba(245,245,247,0.72)">Next action: {_esc(workflow.get("next_action"))}</div>'
                 f'<div style="font-size:12px;line-height:1.5;color:rgba(245,245,247,0.72)">Visible caveats: {_esc(_safe_join(workflow.get("visible_caveats")))} </div>'
                 f'<div style="font-size:12px;line-height:1.5;color:rgba(245,245,247,0.72)">Claims blocked: {_esc(_safe_join(workflow.get("claims_blocked")))} </div>'
+                f'{workflow_downloads_html}'
                 '</article>'
             )
         )
@@ -859,7 +885,7 @@ def _approval_workbench_section(data: dict[str, Any], violations: list[dict[str,
         '</div>'
         f'{row_html}'
         '<div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#ffcf6d;margin:16px 0 8px">Client and company workflows</div>'
-        f'<div style="font-size:13px;line-height:1.55;color:#d0d0d6;margin-bottom:10px">{_esc(len(workflow_cards))} workflow card(s) keep the client share, delivery workflow, catalog approval, capture preflight, hydraulic replay, correction tasks, upload status, and obstruction review aligned to the same signed bid state.</div>'
+        f'<div style="font-size:13px;line-height:1.55;color:#d0d0d6;margin-bottom:10px">{_esc(len(workflow_cards))} workflow card(s) keep the client share, delivery workflow, catalog approval, capture preflight, hydraulic replay, correction tasks, upload status, obstruction review, and workflow-specific downloads aligned to the same signed bid state.</div>'
         f'{workflow_html}'
         '</section>'
     )
