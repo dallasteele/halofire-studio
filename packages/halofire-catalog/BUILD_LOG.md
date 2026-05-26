@@ -1,5 +1,12 @@
 # BUILD_LOG
 
+## 2026-05-26
+
+- Rechecked the Stream F catalog/model owner surface against live public source pages today. The step.parts HEBI R25 candidate page and upstream GitHub repository are still public and MIT-licensed at the repo level, and the Wheatland, Victaulic FL-QR/SW, Tyco LFII HSW, and Reliable DH56 pages still expose the expected product, document, and download surfaces.
+- The checked-in catalog/model pipeline still already satisfies the requested contract: typed source licensing, model-status tiers, component-library GLB/IFC/DXF alignment, internet-backed source research, open-source STEP candidate tracking, correction records, and the explicit vendor/model coverage ledger with product pages, images, cut sheets, BIM/CAD downloads, rejected candidates, and missing-download accounting.
+- No source/schema edits were required for this pass. The remaining blocker is still approval depth: `manufacturer_verified` and `sealed_approved` rows need stronger manufacturer-backed or sealed evidence before promotion.
+- Verification anchor for this run: live web checks of the public source pages plus the focused catalog regression surface (`source-research`, `source-coverage`, `source-owner-pipeline`, `provenance`).
+
 ## 2026-05-22
 
 - Rechecked the Stream F catalog/model owner surface against live public source pages today. The step.parts candidate page and GitHub repo remain public/MIT, and the Wheatland, Victaulic FL-QR/SW, Tyco LFII HSW, and Reliable DH56 pages still expose the expected product, document, and download surfaces.
