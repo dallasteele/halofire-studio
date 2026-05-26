@@ -157,6 +157,7 @@ _SAMPLE_DATA = {
                 "rejected_candidate_count": 1,
                 "rejected_candidate_refs": ["room_boundary_candidate:1"],
                 "rejected_candidate_reasons": ["source-link missing"],
+                "rejected_candidate_source_refs": ["room_boundary_visual_audit_packet:1881:A-101a"],
                 "rejected_candidate_summary": "source-linked review packet required",
                 "current_candidate_count": 1,
                 "usable_evidence_count": 0,
@@ -375,6 +376,7 @@ def test_html_shows_access_banner_and_artifact_links() -> None:
     assert "Scanned paths:" in html
     assert "Rejected candidates" in html
     assert "Rejected candidate reasons:" in html
+    assert "Rejected candidate source refs:" in html
     assert "Next action:" in html
     assert "Signed client bid review" in html
     assert "Halo Fire delivery workflow" in html

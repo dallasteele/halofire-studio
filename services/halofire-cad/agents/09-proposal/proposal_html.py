@@ -792,6 +792,7 @@ def _approval_workbench_section(data: dict[str, Any], violations: list[dict[str,
                 f'<div style="font-size:12px;line-height:1.5;color:rgba(245,245,247,0.8)">Rejected candidate count: {_esc(row.get("rejected_candidate_count"))}</div>'
                 f'<div style="font-size:12px;line-height:1.5;color:rgba(245,245,247,0.8);overflow-wrap:anywhere">Rejected candidate refs: {_esc(_safe_join(row.get("rejected_candidate_refs")))} </div>'
                 f'<div style="font-size:12px;line-height:1.5;color:rgba(245,245,247,0.8);overflow-wrap:anywhere">Rejected candidate reasons: {_esc(_safe_join(row.get("rejected_candidate_reasons")))} </div>'
+                f'<div style="font-size:12px;line-height:1.5;color:rgba(245,245,247,0.8);overflow-wrap:anywhere">Rejected candidate source refs: {_esc(_safe_join(row.get("rejected_candidate_source_refs")))} </div>'
                 f'<div style="font-size:12px;line-height:1.5;color:rgba(245,245,247,0.8)">Current candidates: {_esc(row.get("current_candidate_count"))} scanned · {_esc(row.get("usable_evidence_count"))} usable</div>'
                 '</div>'
                 f'{rejected_html}'
