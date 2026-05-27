@@ -439,7 +439,7 @@ describe('source research ledger contract', () => {
           manufacturer: 'Tyco Fire Protection',
           model: 'TY3251',
           public_url:
-            'https://docs.johnsoncontrols.com/tycofire/api/khub/documents/Y5s5g2HZNr6Um_t5iOK7dw/content',
+            'https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-b_fis/series-ty-b-sprinklers',
           source_url:
             'https://docs.johnsoncontrols.com/tycofire/api/khub/documents/Y5s5g2HZNr6Um_t5iOK7dw/content',
           source_file_ref: 'E:/ClaudeBot/halofire-studio/packages/halofire-catalog/cut_sheets/tyco_ty3251_tyb.pdf',
@@ -452,10 +452,10 @@ describe('source research ledger contract', () => {
           model_status: 'manufacturer_verified',
           disposition: 'promoted',
           evidence_refs: [
-            'https://docs.johnsoncontrols.com/tycofire/api/khub/documents/Y5s5g2HZNr6Um_t5iOK7dw/content',
+            'https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-b_fis/series-ty-b-sprinklers',
             'E:/ClaudeBot/halofire-studio/packages/halofire-catalog/cut_sheets/tyco_ty3251_tyb.pdf',
           ],
-          notes: 'Manufacturer-backed source research row for the official TY3251 family.',
+          notes: 'Manufacturer-backed source research row for the official TY3251 family and its product-page image evidence.',
         },
         {
           part_ref: 'tyco_ty4251_pendent_k80_135f',

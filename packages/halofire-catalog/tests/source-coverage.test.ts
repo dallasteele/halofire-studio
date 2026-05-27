@@ -89,7 +89,7 @@ describe('source coverage ledger', () => {
       'https://www.vikinggroupinc.com/databook/current_tds/052014.pdf',
     )
     expect(viking?.license_spdx).toBe('proprietary')
-    expect(viking?.asset_kinds).toEqual(['product_page', 'cut_sheet'])
+    expect(viking?.asset_kinds).toEqual(['product_page', 'image', 'revit', 'cut_sheet'])
     expect(viking?.image_url).toBe(
       'https://www.vikinggroupinc.com/sites/default/files/styles/extra_large/public/2024-06/12986AB_VK100_K5_6_SR_UP_BR_155.png?itok=4w4zcTjK',
     )
@@ -133,7 +133,7 @@ describe('source coverage ledger', () => {
       'https://www.vikinggroupinc.com/sites/default/files/2025-07/110720.pdf',
     )
     expect(viking3021?.license_spdx).toBe('proprietary')
-    expect(viking3021?.asset_kinds).toEqual(['product_page', 'cut_sheet'])
+    expect(viking3021?.asset_kinds).toEqual(['product_page', 'image', 'revit', 'cut_sheet'])
     expect(viking3021?.image_url).toBe(
       'https://www.vikinggroupinc.com/sites/default/files/2023-12/viking-share-image-default.png',
     )
