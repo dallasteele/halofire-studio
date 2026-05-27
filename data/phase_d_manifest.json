@@ -3699,9 +3699,9 @@
       "sku_intent": "reliable-f156-upright-135f",
       "kind": "sprinkler_head",
       "category": "head",
-      "display_name": "Reliable F1-56 Upright K5.6 SR 135°F",
+      "display_name": "Reliable F156 Upright K5.6 SR 135°F",
       "mfg": "Reliable Automatic Sprinkler",
-      "mfg_pn": "F1-56",
+      "mfg_pn": "F156",
       "listing": [
         "UL",
         "FM"
@@ -3741,11 +3741,11 @@
           "style": "threaded_m"
         }
       ],
-      "cut_sheet_url": "https://www.reliablesprinkler.com/files/bulletins/182.pdf",
-      "cut_sheet_local": "packages/halofire-catalog/cut_sheets/reliable_f156_bul182.pdf",
+      "cut_sheet_url": "https://www.reliablesprinkler.com/files/bulletins/031.pdf",
+      "cut_sheet_local": "packages/halofire-catalog/cut_sheets/reliable_f156_bul031.pdf",
       "confidence": "high",
       "scraped_at": "2026-04-22T03:56:33Z",
-      "source_url": "https://www.reliablesprinkler.com/files/bulletins/182.pdf",
+      "source_url": "https://www.reliablesprinkler.com/files/bulletins/031.pdf",
       "source_tool": "WebSearch",
       "_estimate_fields": [
         "price_usd",
@@ -3756,9 +3756,9 @@
       "sku_intent": "reliable-f156-upright-155f",
       "kind": "sprinkler_head",
       "category": "head",
-      "display_name": "Reliable F1-56 Upright K5.6 SR 155°F",
+      "display_name": "Reliable F156 Upright K5.6 SR 155°F",
       "mfg": "Reliable Automatic Sprinkler",
-      "mfg_pn": "F1-56",
+      "mfg_pn": "F156",
       "listing": [
         "UL",
         "FM"
@@ -3798,11 +3798,11 @@
           "style": "threaded_m"
         }
       ],
-      "cut_sheet_url": "https://www.reliablesprinkler.com/files/bulletins/182.pdf",
-      "cut_sheet_local": "packages/halofire-catalog/cut_sheets/reliable_f156_bul182.pdf",
+      "cut_sheet_url": "https://www.reliablesprinkler.com/files/bulletins/031.pdf",
+      "cut_sheet_local": "packages/halofire-catalog/cut_sheets/reliable_f156_bul031.pdf",
       "confidence": "high",
       "scraped_at": "2026-04-22T03:56:33Z",
-      "source_url": "https://www.reliablesprinkler.com/files/bulletins/182.pdf",
+      "source_url": "https://www.reliablesprinkler.com/files/bulletins/031.pdf",
       "source_tool": "WebSearch",
       "_estimate_fields": [
         "price_usd",
@@ -3813,9 +3813,9 @@
       "sku_intent": "reliable-f156-upright-175f",
       "kind": "sprinkler_head",
       "category": "head",
-      "display_name": "Reliable F1-56 Upright K5.6 SR 175°F",
+      "display_name": "Reliable F156 Upright K5.6 SR 175°F",
       "mfg": "Reliable Automatic Sprinkler",
-      "mfg_pn": "F1-56",
+      "mfg_pn": "F156",
       "listing": [
         "UL",
         "FM"
@@ -3855,11 +3855,11 @@
           "style": "threaded_m"
         }
       ],
-      "cut_sheet_url": "https://www.reliablesprinkler.com/files/bulletins/182.pdf",
-      "cut_sheet_local": "packages/halofire-catalog/cut_sheets/reliable_f156_bul182.pdf",
+      "cut_sheet_url": "https://www.reliablesprinkler.com/files/bulletins/031.pdf",
+      "cut_sheet_local": "packages/halofire-catalog/cut_sheets/reliable_f156_bul031.pdf",
       "confidence": "high",
       "scraped_at": "2026-04-22T03:56:33Z",
-      "source_url": "https://www.reliablesprinkler.com/files/bulletins/182.pdf",
+      "source_url": "https://www.reliablesprinkler.com/files/bulletins/031.pdf",
       "source_tool": "WebSearch",
       "_estimate_fields": [
         "price_usd",
@@ -3870,9 +3870,9 @@
       "sku_intent": "reliable-f156-upright-200f",
       "kind": "sprinkler_head",
       "category": "head",
-      "display_name": "Reliable F1-56 Upright K5.6 SR 200°F",
+      "display_name": "Reliable F156 Upright K5.6 SR 200°F",
       "mfg": "Reliable Automatic Sprinkler",
-      "mfg_pn": "F1-56",
+      "mfg_pn": "F156",
       "listing": [
         "UL",
         "FM"
@@ -3912,11 +3912,11 @@
           "style": "threaded_m"
         }
       ],
-      "cut_sheet_url": "https://www.reliablesprinkler.com/files/bulletins/182.pdf",
-      "cut_sheet_local": "packages/halofire-catalog/cut_sheets/reliable_f156_bul182.pdf",
+      "cut_sheet_url": "https://www.reliablesprinkler.com/files/bulletins/031.pdf",
+      "cut_sheet_local": "packages/halofire-catalog/cut_sheets/reliable_f156_bul031.pdf",
       "confidence": "high",
       "scraped_at": "2026-04-22T03:56:33Z",
-      "source_url": "https://www.reliablesprinkler.com/files/bulletins/182.pdf",
+      "source_url": "https://www.reliablesprinkler.com/files/bulletins/031.pdf",
       "source_tool": "WebSearch",
       "_estimate_fields": [
         "price_usd",
@@ -3927,9 +3927,9 @@
       "sku_intent": "reliable-f156-upright-286f",
       "kind": "sprinkler_head",
       "category": "head",
-      "display_name": "Reliable F1-56 Upright K5.6 SR 286°F",
+      "display_name": "Reliable F156 Upright K5.6 SR 286°F",
       "mfg": "Reliable Automatic Sprinkler",
-      "mfg_pn": "F1-56",
+      "mfg_pn": "F156",
       "listing": [
         "UL",
         "FM"
@@ -3969,11 +3969,11 @@
           "style": "threaded_m"
         }
       ],
-      "cut_sheet_url": "https://www.reliablesprinkler.com/files/bulletins/182.pdf",
-      "cut_sheet_local": "packages/halofire-catalog/cut_sheets/reliable_f156_bul182.pdf",
+      "cut_sheet_url": "https://www.reliablesprinkler.com/files/bulletins/031.pdf",
+      "cut_sheet_local": "packages/halofire-catalog/cut_sheets/reliable_f156_bul031.pdf",
       "confidence": "high",
       "scraped_at": "2026-04-22T03:56:33Z",
-      "source_url": "https://www.reliablesprinkler.com/files/bulletins/182.pdf",
+      "source_url": "https://www.reliablesprinkler.com/files/bulletins/031.pdf",
       "source_tool": "WebSearch",
       "_estimate_fields": [
         "price_usd",
@@ -4026,11 +4026,11 @@
           "style": "threaded_m"
         }
       ],
-      "cut_sheet_url": "https://www.reliablesprinkler.com/files/bulletins/182.pdf",
-      "cut_sheet_local": "packages/halofire-catalog/cut_sheets/reliable_f156_bul182.pdf",
+      "cut_sheet_url": "https://www.reliablesprinkler.com/files/bulletins/031.pdf",
+      "cut_sheet_local": "packages/halofire-catalog/cut_sheets/reliable_f156_bul031.pdf",
       "confidence": "high",
       "scraped_at": "2026-04-22T03:56:33Z",
-      "source_url": "https://www.reliablesprinkler.com/files/bulletins/182.pdf",
+      "source_url": "https://www.reliablesprinkler.com/files/bulletins/031.pdf",
       "source_tool": "training_knowledge",
       "_estimate_fields": [
         "price_usd",
@@ -4083,11 +4083,11 @@
           "style": "threaded_m"
         }
       ],
-      "cut_sheet_url": "https://www.reliablesprinkler.com/files/bulletins/182.pdf",
-      "cut_sheet_local": "packages/halofire-catalog/cut_sheets/reliable_f156_bul182.pdf",
+      "cut_sheet_url": "https://www.reliablesprinkler.com/files/bulletins/031.pdf",
+      "cut_sheet_local": "packages/halofire-catalog/cut_sheets/reliable_f156_bul031.pdf",
       "confidence": "high",
       "scraped_at": "2026-04-22T03:56:33Z",
-      "source_url": "https://www.reliablesprinkler.com/files/bulletins/182.pdf",
+      "source_url": "https://www.reliablesprinkler.com/files/bulletins/031.pdf",
       "source_tool": "training_knowledge",
       "_estimate_fields": [
         "price_usd",
@@ -4140,11 +4140,11 @@
           "style": "threaded_m"
         }
       ],
-      "cut_sheet_url": "https://www.reliablesprinkler.com/files/bulletins/182.pdf",
-      "cut_sheet_local": "packages/halofire-catalog/cut_sheets/reliable_f156_bul182.pdf",
+      "cut_sheet_url": "https://www.reliablesprinkler.com/files/bulletins/031.pdf",
+      "cut_sheet_local": "packages/halofire-catalog/cut_sheets/reliable_f156_bul031.pdf",
       "confidence": "high",
       "scraped_at": "2026-04-22T03:56:33Z",
-      "source_url": "https://www.reliablesprinkler.com/files/bulletins/182.pdf",
+      "source_url": "https://www.reliablesprinkler.com/files/bulletins/031.pdf",
       "source_tool": "training_knowledge",
       "_estimate_fields": [
         "price_usd",
@@ -4197,11 +4197,11 @@
           "style": "threaded_m"
         }
       ],
-      "cut_sheet_url": "https://www.reliablesprinkler.com/files/bulletins/182.pdf",
-      "cut_sheet_local": "packages/halofire-catalog/cut_sheets/reliable_f156_bul182.pdf",
+      "cut_sheet_url": "https://www.reliablesprinkler.com/files/bulletins/031.pdf",
+      "cut_sheet_local": "packages/halofire-catalog/cut_sheets/reliable_f156_bul031.pdf",
       "confidence": "high",
       "scraped_at": "2026-04-22T03:56:33Z",
-      "source_url": "https://www.reliablesprinkler.com/files/bulletins/182.pdf",
+      "source_url": "https://www.reliablesprinkler.com/files/bulletins/031.pdf",
       "source_tool": "training_knowledge",
       "_estimate_fields": [
         "price_usd",
@@ -4254,11 +4254,11 @@
           "style": "threaded_m"
         }
       ],
-      "cut_sheet_url": "https://www.reliablesprinkler.com/files/bulletins/182.pdf",
-      "cut_sheet_local": "packages/halofire-catalog/cut_sheets/reliable_f156_bul182.pdf",
+      "cut_sheet_url": "https://www.reliablesprinkler.com/files/bulletins/031.pdf",
+      "cut_sheet_local": "packages/halofire-catalog/cut_sheets/reliable_f156_bul031.pdf",
       "confidence": "high",
       "scraped_at": "2026-04-22T03:56:33Z",
-      "source_url": "https://www.reliablesprinkler.com/files/bulletins/182.pdf",
+      "source_url": "https://www.reliablesprinkler.com/files/bulletins/031.pdf",
       "source_tool": "training_knowledge",
       "_estimate_fields": [
         "price_usd",

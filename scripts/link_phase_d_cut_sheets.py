@@ -19,8 +19,8 @@ URL_TO_LOCAL = {
         "packages/halofire-catalog/cut_sheets/viking_vk100.pdf",
     "https://www.reliablesprinkler.com/files/bulletins/033.pdf":
         "packages/halofire-catalog/cut_sheets/reliable_f1res_bul033.pdf",
-    "https://www.reliablesprinkler.com/files/bulletins/182.pdf":
-        "packages/halofire-catalog/cut_sheets/reliable_f156_bul182.pdf",
+    "https://www.reliablesprinkler.com/files/bulletins/031.pdf":
+        "packages/halofire-catalog/cut_sheets/reliable_f156_bul031.pdf",
     "https://assets.victaulic.com/assets/uploads/literature/10.02.pdf":
         "packages/halofire-catalog/cut_sheets/victaulic_005h.pdf",
     "https://assets.victaulic.com/assets/uploads/literature/10.03.pdf":
