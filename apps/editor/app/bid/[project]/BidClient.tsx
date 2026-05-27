@@ -12,19 +12,15 @@
  * Mobile layout: tabbed (Overview / 3D / Sheets / Price) — swipe.
  */
 
+import { Grid, OrbitControls } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
-import { OrbitControls, Grid } from '@react-three/drei'
 import { useSearchParams } from 'next/navigation'
 import { use, useEffect, useMemo, useRef, useState } from 'react'
-import {
-  buildPortalRequestInit,
-  resolvePortalAuthToken,
-} from '../portal-access'
+import { buildPortalRequestInit, resolvePortalAuthToken } from '../portal-access'
 
 const FT_TO_M = 0.3048
 
-const GATEWAY_URL =
-  process.env.NEXT_PUBLIC_HALOPENCLAW_URL ?? 'http://localhost:18080'
+const GATEWAY_URL = process.env.NEXT_PUBLIC_HALOPENCLAW_URL ?? 'http://localhost:18080'
 
 // Industry pipe-size colors (AutoSprink convention)
 const PIPE_COLOR: Record<number, string> = {
@@ -95,6 +91,97 @@ interface ProposalData {
     total_usd: number
   }
   deliverables: Record<string, string>
+  evidence_workbench?: EvidenceWorkbench
+  missing_evidence_ledger?: { rows?: EvidenceLedgerRow[] }
+  portal_workflows?: PortalWorkflow[]
+  evidence_upload_status?: EvidenceUploadStatus
+}
+
+interface EvidenceCandidate {
+  candidate_ref?: string
+  evidence_kind?: string
+  rejection_reason?: string
+  source_refs?: string[]
+}
+
+interface EvidenceLedgerRow {
+  gate_id?: string
+  gate_kind?: string
+  human_label?: string
+  ledger_ref?: string
+  ledger_row_summary?: string
+  missing_ref?: string
+  missing_artifact_ref?: string
+  acceptable_evidence?: string[]
+  acceptable_evidence_formats?: string[]
+  required_fields?: string[]
+  signature_metadata?: Record<string, unknown>
+  who_can_satisfy?: string[]
+  satisfying_roles?: string[]
+  role_authority?: string[]
+  scanned_paths?: string[]
+  scanned_source_refs?: string[]
+  rejected_candidates?: EvidenceCandidate[]
+  rejected_candidate_refs?: string[]
+  rejected_candidate_reasons?: string[]
+  rejected_candidate_source_refs?: string[]
+  rejected_candidate_summary?: string
+  current_candidate_count?: number
+  usable_evidence_count?: number
+  blocked_claims?: string[]
+  blocked_claim_gates?: string[]
+  claims_blocked?: string[]
+  next_collection_action?: string
+  next_action?: string
+}
+
+interface EvidenceWorkbench {
+  current_gate?: string
+  claims_blocked?: string[]
+  visible_caveats?: string[]
+  ledger_rows?: EvidenceLedgerRow[]
+}
+
+interface PortalWorkflow {
+  workflow_id?: string
+  audience?: string
+  title?: string
+  summary?: string
+  status?: string
+  current_gate?: string
+  next_action?: string
+  visible_caveats?: string[]
+  claims_blocked?: string[]
+  download_names?: { label?: string; artifact?: string }[]
+}
+
+interface EvidenceUploadItem {
+  upload_ref?: string
+  file_name?: string
+  saved_path?: string
+  sha256?: string
+  size_bytes?: number
+  evidence_lane?: string
+  source_ref?: string
+  note?: string
+  status?: string
+  rejection_reason?: string
+}
+
+interface EvidenceUploadStatus {
+  status?: string
+  artifact_dir?: string
+  source_ref?: string
+  upload_count?: number
+  staged_upload_count?: number
+  rejected_upload_count?: number
+  overwritten_upload_count?: number
+  claims_cleared_count?: number
+  upload_lane_ready?: boolean
+  claims_cleared?: boolean
+  uploads?: EvidenceUploadItem[]
+  rejected_uploads?: EvidenceUploadItem[]
+  summary?: { next_action?: string; claims_cleared_count?: number }
 }
 
 interface LegacyProject {
@@ -103,7 +190,10 @@ interface LegacyProject {
   address: string
   ahj: string
   halofire: { proposal_price_usd: number; proposal_date: string; contact: string }
-  building: { total_sqft: number; levels: { id: string; name: string; use: string; elevation_ft: number; sqft: number }[] }
+  building: {
+    total_sqft: number
+    levels: { id: string; name: string; use: string; elevation_ft: number; sqft: number }[]
+  }
   fire_systems: { id: string; type: string; serves: string; hazard: string }[]
 }
 
@@ -241,13 +331,15 @@ function HeadMarker({ position }: { position: [number, number, number] }) {
 }
 
 function PipeSegment({
-  from, to, sizeIn,
-}: { from: [number, number, number]; to: [number, number, number]; sizeIn: number }) {
-  const [midX, midY, midZ] = [
-    (from[0] + to[0]) / 2,
-    (from[1] + to[1]) / 2,
-    (from[2] + to[2]) / 2,
-  ]
+  from,
+  to,
+  sizeIn,
+}: {
+  from: [number, number, number]
+  to: [number, number, number]
+  sizeIn: number
+}) {
+  const [midX, midY, midZ] = [(from[0] + to[0]) / 2, (from[1] + to[1]) / 2, (from[2] + to[2]) / 2]
   const dx = to[0] - from[0]
   const dy = to[1] - from[1]
   const dz = to[2] - from[2]
@@ -265,15 +357,20 @@ function PipeSegment({
 }
 
 function FloorSlab({
-  elevation_ft, sideM, visible, isGarage,
-}: { elevation_ft: number; sideM: number; visible: boolean; isGarage: boolean }) {
+  elevation_ft,
+  sideM,
+  visible,
+  isGarage,
+}: {
+  elevation_ft: number
+  sideM: number
+  visible: boolean
+  isGarage: boolean
+}) {
   if (!visible) return null
   const y = elevation_ft * FT_TO_M
   return (
-    <mesh
-      position={[sideM / 2, y, sideM / 2]}
-      rotation={[-Math.PI / 2, 0, 0]}
-    >
+    <mesh position={[sideM / 2, y, sideM / 2]} rotation={[-Math.PI / 2, 0, 0]}>
       <planeGeometry args={[sideM, sideM]} />
       <meshStandardMaterial
         color={isGarage ? '#3a3530' : '#5a5a6a'}
@@ -286,8 +383,14 @@ function FloorSlab({
 }
 
 function LevelSlab({
-  level, sideM, visible,
-}: { level: RenderLevel; sideM: number; visible: boolean }) {
+  level,
+  sideM,
+  visible,
+}: {
+  level: RenderLevel
+  sideM: number
+  visible: boolean
+}) {
   return (
     <FloorSlab
       elevation_ft={level.elevation_ft}
@@ -314,7 +417,10 @@ export default function BidView(props: { params: Promise<{ project: string }> })
   const [isMobile, setIsMobile] = useState(false)
   const [mobileTab, setMobileTab] = useState<'overview' | 'model' | 'sheets' | 'price'>('overview')
   const portalAuthToken = useMemo(() => resolvePortalAuthToken(searchParams), [searchParams])
-  const portalRequestInit = useMemo(() => buildPortalRequestInit(portalAuthToken), [portalAuthToken])
+  const portalRequestInit = useMemo(
+    () => buildPortalRequestInit(portalAuthToken),
+    [portalAuthToken],
+  )
 
   // Detect mobile viewport
   useEffect(() => {
@@ -358,7 +464,8 @@ export default function BidView(props: { params: Promise<{ project: string }> })
             contact: d.project.halofire?.contact ?? 'Halo Fire Protection',
           },
           building: {
-            total_sqft: d.proposal?.building_summary?.total_sqft ?? d.design?.building?.total_sqft ?? 0,
+            total_sqft:
+              d.proposal?.building_summary?.total_sqft ?? d.design?.building?.total_sqft ?? 0,
             levels: (d.proposal?.levels ?? []).map((level) => ({
               id: level.id,
               name: level.name,
@@ -382,7 +489,9 @@ export default function BidView(props: { params: Promise<{ project: string }> })
         // Fallback below.
       })
 
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+    }
   }, [params.project, portalRequestInit])
 
   // Load static project metadata
@@ -398,8 +507,10 @@ export default function BidView(props: { params: Promise<{ project: string }> })
         }
       })
       .catch((e) => setError(String(e)))
-    return () => { cancelled = true }
-  }, [params.project, portal])
+    return () => {
+      cancelled = true
+    }
+  }, [params.project])
 
   // Load live proposal from the CAD pipeline
   useEffect(() => {
@@ -413,8 +524,10 @@ export default function BidView(props: { params: Promise<{ project: string }> })
       .catch(() => {
         // No pipeline run yet — fall back to static data
       })
-    return () => { cancelled = true }
-  }, [params.project, portal, portalRequestInit])
+    return () => {
+      cancelled = true
+    }
+  }, [params.project, portalRequestInit])
 
   // Load the generated CAD design. This is the geometry source of truth
   // when the agentic pipeline has produced heads + pipe networks.
@@ -429,8 +542,10 @@ export default function BidView(props: { params: Promise<{ project: string }> })
       .catch(() => {
         // No design run yet; the viewer can still show static bid context.
       })
-    return () => { cancelled = true }
-  }, [params.project, portal, portalRequestInit])
+    return () => {
+      cancelled = true
+    }
+  }, [params.project, portalRequestInit])
 
   const levels: RenderLevel[] = useMemo(() => {
     if (design?.building?.levels?.length) {
@@ -458,10 +573,11 @@ export default function BidView(props: { params: Promise<{ project: string }> })
   }, [levels, visibleLevels.size])
 
   const sideM = useMemo(() => {
-    const sqft = proposal?.building_summary?.total_sqft
-      ?? design?.building?.total_sqft
-      ?? project?.building?.total_sqft
-      ?? 50000
+    const sqft =
+      proposal?.building_summary?.total_sqft ??
+      design?.building?.total_sqft ??
+      project?.building?.total_sqft ??
+      50000
     return Math.sqrt(sqft * 0.092903)
   }, [design, project, proposal])
 
@@ -489,7 +605,9 @@ export default function BidView(props: { params: Promise<{ project: string }> })
         for (const head of system.heads ?? []) {
           heads.push({
             id: head.id,
-            levelId: head.room_id ? (levelByRoom.get(head.room_id) ?? defaultLevelId) : defaultLevelId,
+            levelId: head.room_id
+              ? (levelByRoom.get(head.room_id) ?? defaultLevelId)
+              : defaultLevelId,
             pos: toViewerPoint(head.position_m),
           })
         }
@@ -511,11 +629,12 @@ export default function BidView(props: { params: Promise<{ project: string }> })
     return { heads, pipes, source: 'empty' }
   }, [design, levels])
   const displayPrice =
-    portal?.proposal?.pricing?.total_usd
-    ?? proposal?.pricing?.total_usd
-    ?? project?.halofire?.proposal_price_usd
-    ?? 0
-  const displayProjectName = portal?.project?.name ?? proposal?.project?.name ?? project?.name ?? params.project
+    portal?.proposal?.pricing?.total_usd ??
+    proposal?.pricing?.total_usd ??
+    project?.halofire?.proposal_price_usd ??
+    0
+  const displayProjectName =
+    portal?.project?.name ?? proposal?.project?.name ?? project?.name ?? params.project
   const manifestWarnings = portal?.manifest?.warnings ?? []
   const designWarningsSource = [
     ...manifestWarnings,
@@ -525,31 +644,42 @@ export default function BidView(props: { params: Promise<{ project: string }> })
       .map((issue) => `${issue.code}: ${issue.message}`),
     ...(design?.deliverables?.warnings ?? []),
   ]
-  const designWarnings = designWarningsSource.filter((warning, index) => designWarningsSource.indexOf(warning) === index).slice(0, 6)
+  const designWarnings = designWarningsSource
+    .filter((warning, index) => designWarningsSource.indexOf(warning) === index)
+    .slice(0, 6)
   const downloadLinks = portal?.downloads ?? []
+  const evidenceWorkbench = portal?.proposal?.evidence_workbench ?? proposal?.evidence_workbench
+  const portalWorkflows = portal?.proposal?.portal_workflows ?? proposal?.portal_workflows
+  const evidenceUploadStatus =
+    portal?.proposal?.evidence_upload_status ?? proposal?.evidence_upload_status
   const accessModeLabel = portal
-    ? (portal.access.auth_required ? 'Signed access' : 'Open portal')
-    : (portalAccessDenied ? 'Signed access required' : 'Legacy preview')
+    ? portal.access.auth_required
+      ? 'Signed access'
+      : 'Open portal'
+    : portalAccessDenied
+      ? 'Signed access required'
+      : 'Legacy preview'
   const downloadStatusText = portal
     ? `${portal.access.auth_required ? 'Signed access' : 'Open portal'} · ${downloadLinks.length} signed files`
-    : (
-        portalAccessDenied
-          ? 'Signed access required · portal bundle unavailable without a token'
-          : 'Legacy preview · downloads hidden until a signed portal bundle exists'
-      )
-  const confidencePct = design?.confidence?.overall !== undefined
-    ? Math.round((design.confidence.overall ?? 0) * 100)
-    : null
+    : portalAccessDenied
+      ? 'Signed access required · portal bundle unavailable without a token'
+      : 'Legacy preview · downloads hidden until a signed portal bundle exists'
+  const confidencePct =
+    design?.confidence?.overall !== undefined
+      ? Math.round((design.confidence.overall ?? 0) * 100)
+      : null
 
   if (portalAccessDenied && !portal) {
     return (
       <div className="flex h-screen items-center justify-center bg-black text-white">
         <div className="max-w-lg rounded border border-neutral-800 bg-neutral-950 p-6 text-left">
-          <p className="text-[10px] uppercase tracking-[0.3em] text-amber-400">Signed access required</p>
+          <p className="text-[10px] uppercase tracking-[0.3em] text-amber-400">
+            Signed access required
+          </p>
           <h1 className="mt-2 text-xl font-semibold">This bid page needs a portal token</h1>
           <p className="mt-3 text-sm text-neutral-300">
-            The signed Halo Forge portal bundle could not be loaded without a valid JWT.
-            Open the link from the client share email or append the token as `?jwt=...`.
+            The signed Halo Forge portal bundle could not be loaded without a valid JWT. Open the
+            link from the client share email or append the token as `?jwt=...`.
           </p>
           <p className="mt-4 text-xs text-neutral-500">
             Legacy preview content is withheld until the signed portal request succeeds.
@@ -603,9 +733,7 @@ export default function BidView(props: { params: Promise<{ project: string }> })
               key={t}
               onClick={() => setMobileTab(t)}
               className={`py-2 capitalize ${
-                mobileTab === t
-                  ? 'border-b-2 border-[#e8432d] text-white'
-                  : 'text-neutral-400'
+                mobileTab === t ? 'border-b-2 border-[#e8432d] text-white' : 'text-neutral-400'
               }`}
             >
               {t}
@@ -617,18 +745,26 @@ export default function BidView(props: { params: Promise<{ project: string }> })
           {mobileTab === 'overview' && (
             <div className="space-y-3 p-3 text-xs">
               <div>
-                <h2 className="text-[10px] font-semibold uppercase tracking-widest text-neutral-400">Project</h2>
+                <h2 className="text-[10px] font-semibold uppercase tracking-widest text-neutral-400">
+                  Project
+                </h2>
                 <p className="mt-1">{project?.address}</p>
                 <p className="mt-1 text-neutral-400">{project?.ahj}</p>
                 <p className="mt-1 text-[10px] text-neutral-500">
-                  {confidencePct !== null ? `Design confidence ${confidencePct}%` : 'No generated design artifact loaded'}
+                  {confidencePct !== null
+                    ? `Design confidence ${confidencePct}%`
+                    : 'No generated design artifact loaded'}
                 </p>
               </div>
               {designWarnings.length > 0 && (
                 <div className="rounded border border-amber-900 bg-amber-950/40 p-2">
-                  <h2 className="text-[10px] font-semibold uppercase tracking-widest text-amber-300">Alpha warnings</h2>
+                  <h2 className="text-[10px] font-semibold uppercase tracking-widest text-amber-300">
+                    Alpha warnings
+                  </h2>
                   <ul className="mt-1 space-y-1 text-[10px] text-amber-100">
-                    {designWarnings.map((warning, i) => <li key={i}>{warning}</li>)}
+                    {designWarnings.map((warning, i) => (
+                      <li key={i}>{warning}</li>
+                    ))}
                   </ul>
                 </div>
               )}
@@ -638,10 +774,17 @@ export default function BidView(props: { params: Promise<{ project: string }> })
                 </h2>
                 <ul className="mt-1 space-y-0.5">
                   {levels.map((l) => (
-                    <li key={l.id} className="flex items-center gap-2 border-b border-neutral-800 py-1">
-                      <span className="w-12 font-mono text-[10px] text-neutral-500">+{l.elevation_ft}ft</span>
+                    <li
+                      key={l.id}
+                      className="flex items-center gap-2 border-b border-neutral-800 py-1"
+                    >
+                      <span className="w-12 font-mono text-[10px] text-neutral-500">
+                        +{l.elevation_ft}ft
+                      </span>
                       <span className="flex-1">{l.name}</span>
-                      <span className={`rounded px-1 font-mono text-[9px] ${l.use === 'garage' ? 'bg-amber-900 text-amber-200' : 'bg-sky-900 text-sky-200'}`}>
+                      <span
+                        className={`rounded px-1 font-mono text-[9px] ${l.use === 'garage' ? 'bg-amber-900 text-amber-200' : 'bg-sky-900 text-sky-200'}`}
+                      >
                         {l.use}
                       </span>
                     </li>
@@ -650,12 +793,16 @@ export default function BidView(props: { params: Promise<{ project: string }> })
               </div>
               {proposal && (
                 <div>
-                  <h2 className="text-[10px] font-semibold uppercase tracking-widest text-neutral-400">Systems</h2>
+                  <h2 className="text-[10px] font-semibold uppercase tracking-widest text-neutral-400">
+                    Systems
+                  </h2>
                   <ul className="mt-1 space-y-1">
                     {proposal.systems.map((s) => (
                       <li key={s.id} className="border-b border-neutral-800 pb-1">
                         <div className="flex items-center gap-2">
-                          <span className="rounded bg-red-900 px-1 font-mono text-[9px] text-red-200">{s.type}</span>
+                          <span className="rounded bg-red-900 px-1 font-mono text-[9px] text-red-200">
+                            {s.type}
+                          </span>
                           <span>{s.head_count} heads</span>
                           <span className="text-neutral-500">·</span>
                           <span>{(s.pipe_total_m * 3.281).toFixed(0)}ft pipe</span>
@@ -665,6 +812,11 @@ export default function BidView(props: { params: Promise<{ project: string }> })
                   </ul>
                 </div>
               )}
+              <PortalEvidencePanel
+                workbench={evidenceWorkbench}
+                workflows={portalWorkflows}
+                uploadStatus={evidenceUploadStatus}
+              />
             </div>
           )}
 
@@ -676,25 +828,32 @@ export default function BidView(props: { params: Promise<{ project: string }> })
                 <Grid
                   position={[sideM / 2, 0, sideM / 2]}
                   args={[sideM * 1.5, sideM * 1.5]}
-                  cellSize={1} cellColor="#333" sectionSize={10} sectionColor="#555"
-                  fadeDistance={sideM * 3} infiniteGrid={false}
+                  cellSize={1}
+                  cellColor="#333"
+                  sectionSize={10}
+                  sectionColor="#555"
+                  fadeDistance={sideM * 3}
+                  infiniteGrid={false}
                 />
                 {levels.map((l) => (
-                  <LevelSlab
-                    key={l.id}
-                    level={l}
-                    sideM={sideM}
-                    visible={visibleLevels.has(l.id)}
-                  />
+                  <LevelSlab key={l.id} level={l} sideM={sideM} visible={visibleLevels.has(l.id)} />
                 ))}
                 {renderedGeometry.heads
                   .filter((h) => visibleLevels.has(h.levelId))
-                  .map((h) => <HeadMarker key={h.id} position={h.pos} />)}
+                  .map((h) => (
+                    <HeadMarker key={h.id} position={h.pos} />
+                  ))}
                 {renderedGeometry.pipes
                   .filter((p) => visibleLevels.has(p.levelId))
-                  .map((p) => <PipeSegment key={p.id} from={p.from} to={p.to} sizeIn={p.sizeIn} />)}
+                  .map((p) => (
+                    <PipeSegment key={p.id} from={p.from} to={p.to} sizeIn={p.sizeIn} />
+                  ))}
                 <OrbitControls
-                  target={[sideM / 2, (levels[Math.floor(levels.length / 2)]?.elevation_ft ?? 24) * FT_TO_M, sideM / 2]}
+                  target={[
+                    sideM / 2,
+                    (levels[Math.floor(levels.length / 2)]?.elevation_ft ?? 24) * FT_TO_M,
+                    sideM / 2,
+                  ]}
                   makeDefault
                 />
               </Canvas>
@@ -706,7 +865,9 @@ export default function BidView(props: { params: Promise<{ project: string }> })
               <div className="rounded border border-neutral-800 bg-neutral-900 px-3 py-2 text-[10px] text-neutral-400">
                 {downloadStatusText}
               </div>
-              <h2 className="text-[10px] font-semibold uppercase tracking-widest text-neutral-400">Deliverables</h2>
+              <h2 className="text-[10px] font-semibold uppercase tracking-widest text-neutral-400">
+                Deliverables
+              </h2>
               <div className="space-y-1">
                 {downloadLinks.length > 0 ? (
                   downloadLinks.map((item) => (
@@ -731,7 +892,9 @@ export default function BidView(props: { params: Promise<{ project: string }> })
 
           {mobileTab === 'price' && proposal && (
             <div className="space-y-2 p-3 text-xs">
-              <h2 className="text-[10px] font-semibold uppercase tracking-widest text-neutral-400">Pricing</h2>
+              <h2 className="text-[10px] font-semibold uppercase tracking-widest text-neutral-400">
+                Pricing
+              </h2>
               <div className="rounded border border-neutral-800 bg-neutral-900 p-3">
                 <Row label="Materials" usd={proposal.pricing.materials_usd} />
                 <Row label="Labor" usd={proposal.pricing.labor_usd} />
@@ -740,12 +903,16 @@ export default function BidView(props: { params: Promise<{ project: string }> })
                 <Row label="Taxes" usd={proposal.pricing.taxes_usd} />
                 <div className="mt-2 flex justify-between border-t border-neutral-800 pt-2 text-sm font-bold">
                   <span>Total</span>
-                  <span className="font-mono text-[#e8432d]">${proposal.pricing.total_usd.toLocaleString()}</span>
+                  <span className="font-mono text-[#e8432d]">
+                    ${proposal.pricing.total_usd.toLocaleString()}
+                  </span>
                 </div>
               </div>
               {portal && (
                 <div className="rounded border border-neutral-800 bg-neutral-900 p-3">
-                  <h3 className="text-[10px] font-semibold uppercase tracking-widest text-neutral-400">Charts</h3>
+                  <h3 className="text-[10px] font-semibold uppercase tracking-widest text-neutral-400">
+                    Charts
+                  </h3>
                   <MiniBars title="Cost breakdown" items={portal.charts.cost_breakdown} />
                   <MiniBars title="Heads by level" items={portal.charts.level_heads} />
                 </div>
@@ -754,7 +921,8 @@ export default function BidView(props: { params: Promise<{ project: string }> })
           )}
           {mobileTab === 'price' && !proposal && (
             <div className="p-3 text-xs text-neutral-400">
-              No live proposal generated yet. Run the CAD pipeline via Studio or POST to /intake/upload.
+              No live proposal generated yet. Run the CAD pipeline via Studio or POST to
+              /intake/upload.
             </div>
           )}
         </div>
@@ -770,11 +938,14 @@ export default function BidView(props: { params: Promise<{ project: string }> })
   return (
     <div className="flex h-screen flex-col bg-neutral-950 text-white">
       <header className="flex items-center gap-4 border-b border-neutral-800 bg-neutral-900 px-6 py-3">
-        <div className="flex h-8 w-8 items-center justify-center rounded bg-[#e8432d] text-sm font-bold">HF</div>
+        <div className="flex h-8 w-8 items-center justify-center rounded bg-[#e8432d] text-sm font-bold">
+          HF
+        </div>
         <div className="flex-1">
           <h1 className="text-sm font-semibold uppercase tracking-wide">{displayProjectName}</h1>
           <p className="text-[11px] text-neutral-400">
-            {project?.address} · {project?.ahj} · {project?.halofire?.contact ?? 'Halo Fire Protection'}
+            {project?.address} · {project?.ahj} ·{' '}
+            {project?.halofire?.contact ?? 'Halo Fire Protection'}
           </p>
         </div>
         <div className="text-right">
@@ -783,7 +954,9 @@ export default function BidView(props: { params: Promise<{ project: string }> })
             ${Number(displayPrice).toLocaleString()}
           </p>
           <p className="text-[10px] text-neutral-500">
-            {proposal ? `v${proposal.version} · ${proposal.generated_at}` : project?.halofire?.proposal_date}
+            {proposal
+              ? `v${proposal.version} · ${proposal.generated_at}`
+              : project?.halofire?.proposal_date}
           </p>
         </div>
       </header>
@@ -791,12 +964,34 @@ export default function BidView(props: { params: Promise<{ project: string }> })
       <div className="flex flex-1 overflow-hidden">
         {/* Left sidebar */}
         <aside className="w-64 shrink-0 overflow-y-auto border-r border-neutral-800 bg-neutral-900 p-4 text-xs">
-          <h2 className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-neutral-400">Project</h2>
+          <h2 className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-neutral-400">
+            Project
+          </h2>
           <dl className="mb-4 space-y-1">
-            <div><dt className="text-neutral-500">Address</dt><dd>{project?.address}</dd></div>
-            <div><dt className="text-neutral-500">AHJ</dt><dd>{project?.ahj}</dd></div>
-            <div><dt className="text-neutral-500">Total sqft</dt><dd className="font-mono">{(proposal?.building_summary?.total_sqft ?? project?.building.total_sqft ?? 0).toLocaleString()}</dd></div>
-            <div><dt className="text-neutral-500">Design confidence</dt><dd className="font-mono">{confidencePct !== null ? `${confidencePct}%` : 'not generated'}</dd></div>
+            <div>
+              <dt className="text-neutral-500">Address</dt>
+              <dd>{project?.address}</dd>
+            </div>
+            <div>
+              <dt className="text-neutral-500">AHJ</dt>
+              <dd>{project?.ahj}</dd>
+            </div>
+            <div>
+              <dt className="text-neutral-500">Total sqft</dt>
+              <dd className="font-mono">
+                {(
+                  proposal?.building_summary?.total_sqft ??
+                  project?.building.total_sqft ??
+                  0
+                ).toLocaleString()}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-neutral-500">Design confidence</dt>
+              <dd className="font-mono">
+                {confidencePct !== null ? `${confidencePct}%` : 'not generated'}
+              </dd>
+            </div>
           </dl>
           <div className="mb-4 rounded border border-neutral-800 bg-neutral-950 px-2 py-2 text-[10px] text-neutral-400">
             {accessModeLabel}
@@ -804,31 +999,47 @@ export default function BidView(props: { params: Promise<{ project: string }> })
           </div>
           {designWarnings.length > 0 && (
             <div className="mb-4 rounded border border-amber-900 bg-amber-950/40 p-2">
-              <h2 className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-amber-300">Alpha warnings</h2>
+              <h2 className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-amber-300">
+                Alpha warnings
+              </h2>
               <ul className="space-y-1 text-[10px] text-amber-100">
-                {designWarnings.map((warning, i) => <li key={i}>{warning}</li>)}
+                {designWarnings.map((warning, i) => (
+                  <li key={i}>{warning}</li>
+                ))}
               </ul>
             </div>
           )}
 
-          <h2 className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-neutral-400">Levels ({levels.length})</h2>
+          <h2 className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-neutral-400">
+            Levels ({levels.length})
+          </h2>
           <ul className="mb-4 space-y-1">
             {levels.map((l) => (
-              <li key={l.id} className="flex items-center gap-2 border-b border-neutral-800 pb-1 last:border-0">
+              <li
+                key={l.id}
+                className="flex items-center gap-2 border-b border-neutral-800 pb-1 last:border-0"
+              >
                 <input
-                  id={`lvl-${l.id}`} type="checkbox"
+                  id={`lvl-${l.id}`}
+                  type="checkbox"
                   checked={visibleLevels.has(l.id)}
                   onChange={(e) => {
                     const next = new Set(visibleLevels)
-                    if (e.target.checked) next.add(l.id); else next.delete(l.id)
+                    if (e.target.checked) next.add(l.id)
+                    else next.delete(l.id)
                     setVisibleLevels(next)
                   }}
                   className="accent-[#e8432d]"
                 />
                 <label htmlFor={`lvl-${l.id}`} className="flex-1 cursor-pointer">
-                  <span className="font-mono text-[10px] text-neutral-500">+{l.elevation_ft}ft</span> {l.name}
+                  <span className="font-mono text-[10px] text-neutral-500">
+                    +{l.elevation_ft}ft
+                  </span>{' '}
+                  {l.name}
                 </label>
-                <span className={`rounded px-1 font-mono text-[9px] ${l.use === 'garage' ? 'bg-amber-900 text-amber-200' : 'bg-sky-900 text-sky-200'}`}>
+                <span
+                  className={`rounded px-1 font-mono text-[9px] ${l.use === 'garage' ? 'bg-amber-900 text-amber-200' : 'bg-sky-900 text-sky-200'}`}
+                >
                   {l.use}
                 </span>
               </li>
@@ -837,7 +1048,9 @@ export default function BidView(props: { params: Promise<{ project: string }> })
 
           {proposal && (
             <>
-              <h2 className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-neutral-400">Systems ({proposal.systems.length})</h2>
+              <h2 className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-neutral-400">
+                Systems ({proposal.systems.length})
+              </h2>
               <ul className="mb-4 space-y-1">
                 {proposal.systems.map((s) => (
                   <li key={s.id} className="border-b border-neutral-800 pb-1 text-[10px]">
@@ -847,7 +1060,8 @@ export default function BidView(props: { params: Promise<{ project: string }> })
                     </div>
                     {s.hydraulic && (
                       <div className="mt-0.5 font-mono text-[9px] text-neutral-500">
-                        {s.hydraulic.required_flow_gpm} gpm · {s.hydraulic.demand_psi} psi demand · margin {s.hydraulic.safety_margin_psi}
+                        {s.hydraulic.required_flow_gpm} gpm · {s.hydraulic.demand_psi} psi demand ·
+                        margin {s.hydraulic.safety_margin_psi}
                       </div>
                     )}
                   </li>
@@ -856,7 +1070,9 @@ export default function BidView(props: { params: Promise<{ project: string }> })
             </>
           )}
 
-          <h2 className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-neutral-400">Deliverables</h2>
+          <h2 className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-neutral-400">
+            Deliverables
+          </h2>
           <div className="mb-2 rounded border border-neutral-800 bg-neutral-950 px-2 py-2 text-[10px] text-neutral-400">
             {downloadStatusText}
           </div>
@@ -886,12 +1102,21 @@ export default function BidView(props: { params: Promise<{ project: string }> })
 
           {portal && (
             <div className="mt-4 space-y-3">
-              <h2 className="text-[10px] font-semibold uppercase tracking-widest text-neutral-400">Charts</h2>
+              <h2 className="text-[10px] font-semibold uppercase tracking-widest text-neutral-400">
+                Charts
+              </h2>
               <MiniBars title="Cost breakdown" items={portal.charts.cost_breakdown} />
               <MiniBars title="Heads by level" items={portal.charts.level_heads} />
               <MiniBars title="Heads by system" items={portal.charts.system_heads} />
             </div>
           )}
+          <div className="mt-4">
+            <PortalEvidencePanel
+              workbench={evidenceWorkbench}
+              workflows={portalWorkflows}
+              uploadStatus={evidenceUploadStatus}
+            />
+          </div>
         </aside>
 
         {/* 3D canvas */}
@@ -902,32 +1127,39 @@ export default function BidView(props: { params: Promise<{ project: string }> })
             <Grid
               position={[sideM / 2, 0, sideM / 2]}
               args={[sideM * 1.5, sideM * 1.5]}
-              cellSize={1} cellColor="#333" sectionSize={10} sectionColor="#555"
-              fadeDistance={sideM * 3} infiniteGrid={false}
+              cellSize={1}
+              cellColor="#333"
+              sectionSize={10}
+              sectionColor="#555"
+              fadeDistance={sideM * 3}
+              infiniteGrid={false}
             />
             {levels.map((l) => (
-              <LevelSlab
-                key={l.id}
-                level={l}
-                sideM={sideM}
-                visible={visibleLevels.has(l.id)}
-              />
+              <LevelSlab key={l.id} level={l} sideM={sideM} visible={visibleLevels.has(l.id)} />
             ))}
             {renderedGeometry.heads
               .filter((h) => visibleLevels.has(h.levelId))
-              .map((h) => <HeadMarker key={h.id} position={h.pos} />)}
+              .map((h) => (
+                <HeadMarker key={h.id} position={h.pos} />
+              ))}
             {renderedGeometry.pipes
               .filter((p) => visibleLevels.has(p.levelId))
-              .map((p) => <PipeSegment key={p.id} from={p.from} to={p.to} sizeIn={p.sizeIn} />)}
+              .map((p) => (
+                <PipeSegment key={p.id} from={p.from} to={p.to} sizeIn={p.sizeIn} />
+              ))}
             <OrbitControls
-              target={[sideM / 2, (levels[Math.floor(levels.length / 2)]?.elevation_ft ?? 24) * FT_TO_M, sideM / 2]}
+              target={[
+                sideM / 2,
+                (levels[Math.floor(levels.length / 2)]?.elevation_ft ?? 24) * FT_TO_M,
+                sideM / 2,
+              ]}
               makeDefault
             />
           </Canvas>
           {renderedGeometry.source === 'empty' && (
             <div className="pointer-events-none absolute inset-x-8 top-8 rounded border border-amber-900 bg-neutral-950/85 p-3 text-xs text-amber-100">
-              No generated sprinkler geometry is loaded. Run the intake pipeline
-              and wait for a real design.json before using this model view for review.
+              No generated sprinkler geometry is loaded. Run the intake pipeline and wait for a real
+              design.json before using this model view for review.
             </div>
           )}
         </main>
@@ -935,7 +1167,9 @@ export default function BidView(props: { params: Promise<{ project: string }> })
         {/* Right drawer — pricing + violations */}
         {proposal && (
           <aside className="w-80 shrink-0 overflow-y-auto border-l border-neutral-800 bg-neutral-900 p-4 text-xs">
-            <h2 className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-neutral-400">Pricing</h2>
+            <h2 className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-neutral-400">
+              Pricing
+            </h2>
             <div className="rounded border border-neutral-800 bg-neutral-950 p-3 text-[11px]">
               <Row label="Materials" usd={proposal.pricing.materials_usd} />
               <Row label="Labor" usd={proposal.pricing.labor_usd} />
@@ -944,7 +1178,9 @@ export default function BidView(props: { params: Promise<{ project: string }> })
               <Row label="Taxes" usd={proposal.pricing.taxes_usd} />
               <div className="mt-2 flex justify-between border-t border-neutral-800 pt-2 text-sm font-bold">
                 <span>TOTAL</span>
-                <span className="font-mono text-[#e8432d]">${proposal.pricing.total_usd.toLocaleString()}</span>
+                <span className="font-mono text-[#e8432d]">
+                  ${proposal.pricing.total_usd.toLocaleString()}
+                </span>
               </div>
             </div>
 
@@ -956,11 +1192,14 @@ export default function BidView(props: { params: Promise<{ project: string }> })
             ) : (
               <ul className="space-y-1">
                 {proposal.violations.slice(0, 10).map((v, i) => (
-                  <li key={i} className={`rounded border px-2 py-1 text-[10px] ${
-                    v.severity === 'error'
-                      ? 'border-red-900 bg-red-950/50 text-red-200'
-                      : 'border-amber-900 bg-amber-950/50 text-amber-200'
-                  }`}>
+                  <li
+                    key={i}
+                    className={`rounded border px-2 py-1 text-[10px] ${
+                      v.severity === 'error'
+                        ? 'border-red-900 bg-red-950/50 text-red-200'
+                        : 'border-amber-900 bg-amber-950/50 text-amber-200'
+                    }`}
+                  >
                     <span className="font-mono">{v.code ?? v.rule_id ?? 'RULE'}</span>
                     <p className="mt-0.5">{v.message}</p>
                   </li>
@@ -972,7 +1211,8 @@ export default function BidView(props: { params: Promise<{ project: string }> })
       </div>
 
       <footer className="border-t border-neutral-800 bg-neutral-900 px-6 py-2 text-[10px] text-neutral-500">
-        HaloFire CAD · deferred-submittal preview — NOT FOR CONSTRUCTION · Full plan set on permit release
+        HaloFire CAD · deferred-submittal preview — NOT FOR CONSTRUCTION · Full plan set on permit
+        release
       </footer>
     </div>
   )
@@ -991,13 +1231,17 @@ function MiniBars({ title, items }: { title: string; items: PortalChartItem[] })
   const max = Math.max(1, ...items.map((item) => item.value || 0))
   return (
     <div className="rounded border border-neutral-800 bg-neutral-950 p-2">
-      <div className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-neutral-400">{title}</div>
+      <div className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-neutral-400">
+        {title}
+      </div>
       <div className="space-y-2">
         {items.slice(0, 6).map((item) => (
           <div key={item.label} className="space-y-1">
             <div className="flex items-center justify-between gap-2 text-[10px] text-neutral-300">
               <span className="truncate">{item.label}</span>
-              <span className="font-mono text-neutral-500">{item.meta ?? item.value.toLocaleString()}</span>
+              <span className="font-mono text-neutral-500">
+                {item.meta ?? item.value.toLocaleString()}
+              </span>
             </div>
             <div className="h-1.5 w-full bg-neutral-800">
               <div
@@ -1015,5 +1259,283 @@ function MiniBars({ title, items }: { title: string; items: PortalChartItem[] })
         )}
       </div>
     </div>
+  )
+}
+
+function PortalEvidencePanel({
+  workbench,
+  workflows,
+  uploadStatus,
+}: {
+  workbench?: EvidenceWorkbench | null
+  workflows?: PortalWorkflow[] | null
+  uploadStatus?: EvidenceUploadStatus | null
+}) {
+  const ledgerRows = workbench?.ledger_rows ?? []
+  const uploads = uploadStatus?.uploads ?? []
+  const rejectedUploads = uploadStatus?.rejected_uploads ?? []
+  const visibleCaveats = workbench?.visible_caveats ?? []
+
+  const renderList = (items?: string[]) => (
+    <ul className="mt-1 space-y-1 text-[10px] text-neutral-300">
+      {(items ?? []).map((item, index) => (
+        <li key={`${item}-${index}`}>{item}</li>
+      ))}
+      {(items ?? []).length === 0 && <li className="text-neutral-600">None</li>}
+    </ul>
+  )
+
+  const renderLedgerRow = (row: EvidenceLedgerRow, index: number) => {
+    const rejectedCandidates = row.rejected_candidates ?? []
+    const rejectedReasons = row.rejected_candidate_reasons ?? []
+    return (
+      <article
+        key={row.gate_id ?? row.ledger_ref ?? index}
+        className="rounded border border-neutral-800 bg-neutral-950 p-3"
+      >
+        <div className="text-[10px] font-semibold uppercase tracking-widest text-sky-300">
+          {row.human_label ?? row.gate_kind ?? 'Evidence row'}
+        </div>
+        <div className="mt-1 font-mono text-[10px] text-neutral-400">
+          Gate ID: {row.gate_id ?? 'n/a'}
+        </div>
+        <div className="mt-2 space-y-1 text-[10px] leading-5 text-neutral-300">
+          {row.ledger_row_summary && <p>{row.ledger_row_summary}</p>}
+          <p>
+            <span className="text-neutral-500">Missing artifact:</span>{' '}
+            {row.missing_artifact_ref ?? 'n/a'}
+          </p>
+          <p>
+            <span className="text-neutral-500">Missing ref:</span> {row.missing_ref ?? 'n/a'}
+          </p>
+          <p>
+            <span className="text-neutral-500">Acceptable formats:</span>{' '}
+            {(row.acceptable_evidence_formats ?? []).join('; ') || 'n/a'}
+          </p>
+          <p>
+            <span className="text-neutral-500">Required fields:</span>{' '}
+            {(row.required_fields ?? []).join('; ') || 'n/a'}
+          </p>
+          <p>
+            <span className="text-neutral-500">Who can satisfy:</span>{' '}
+            {(row.who_can_satisfy ?? row.satisfying_roles ?? []).join('; ') || 'n/a'}
+          </p>
+          <p>
+            <span className="text-neutral-500">Scanned paths:</span>{' '}
+            {(row.scanned_paths ?? []).join('; ') || 'n/a'}
+          </p>
+          <p>
+            <span className="text-neutral-500">Claims blocked:</span>{' '}
+            {(row.blocked_claims ?? row.claims_blocked ?? []).join('; ') || 'n/a'}
+          </p>
+          <p>
+            <span className="text-neutral-500">Next action:</span>{' '}
+            {row.next_action ?? row.next_collection_action ?? 'n/a'}
+          </p>
+          <p>
+            <span className="text-neutral-500">Signature metadata:</span>{' '}
+            {JSON.stringify(row.signature_metadata ?? {})}
+          </p>
+          {rejectedCandidates.length > 0 && (
+            <div>
+              <div className="text-neutral-500">Rejected candidates</div>
+              <ul className="mt-1 space-y-1">
+                {rejectedCandidates.map((candidate, candidateIndex) => (
+                  <li key={`${candidate.candidate_ref ?? 'candidate'}-${candidateIndex}`}>
+                    {candidate.candidate_ref ?? 'candidate'} ·{' '}
+                    {candidate.evidence_kind ?? 'unknown'} ·{' '}
+                    {candidate.rejection_reason ?? 'no reason'}
+                    {candidate.source_refs?.length
+                      ? ` · sources: ${candidate.source_refs.join('; ')}`
+                      : ''}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {!rejectedCandidates.length && rejectedReasons.length > 0 && (
+            <p>
+              <span className="text-neutral-500">Rejected reasons:</span>{' '}
+              {rejectedReasons.join('; ')}
+            </p>
+          )}
+        </div>
+      </article>
+    )
+  }
+
+  return (
+    <section className="space-y-3 rounded border border-neutral-800 bg-neutral-900 p-3">
+      <h2 className="text-[10px] font-semibold uppercase tracking-widest text-neutral-400">
+        Approval / evidence workbench
+      </h2>
+      <div className="text-[10px] text-neutral-400">
+        {workbench?.current_gate ?? 'No current gate supplied'}
+      </div>
+      {visibleCaveats.length > 0 && (
+        <div>
+          <div className="text-[10px] font-semibold uppercase tracking-widest text-amber-300">
+            Visible caveats
+          </div>
+          {renderList(visibleCaveats)}
+        </div>
+      )}
+      <div>
+        <div className="text-[10px] font-semibold uppercase tracking-widest text-neutral-400">
+          Ledger rows
+        </div>
+        <div className="mt-2 space-y-2">
+          {ledgerRows.length > 0 ? (
+            ledgerRows.map((row, index) => renderLedgerRow(row, index))
+          ) : (
+            <div className="rounded border border-dashed border-neutral-700 bg-neutral-950 p-3 text-[10px] text-neutral-500">
+              No evidence ledger rows were supplied yet.
+            </div>
+          )}
+        </div>
+      </div>
+      <div className="grid gap-2">
+        <div>
+          <div className="text-[10px] font-semibold uppercase tracking-widest text-neutral-400">
+            AI-guided correction tasks
+          </div>
+          <div className="mt-1 rounded border border-neutral-800 bg-neutral-950 p-3 text-[10px] text-neutral-300">
+            {(workflows ?? []).length > 0
+              ? `${(workflows ?? []).length} workflow(s) ready for review.`
+              : 'No correction tasks supplied yet.'}
+          </div>
+        </div>
+        <div>
+          <div className="text-[10px] font-semibold uppercase tracking-widest text-neutral-400">
+            Client and company workflows
+          </div>
+          <div className="mt-2 space-y-2">
+            {(workflows ?? []).map((workflow) => (
+              <article
+                key={workflow.workflow_id ?? workflow.title}
+                className="rounded border border-neutral-800 bg-neutral-950 p-3"
+              >
+                <div className="text-[10px] font-semibold uppercase tracking-widest text-red-300">
+                  {workflow.audience ?? 'workflow'}
+                </div>
+                <div className="mt-1 text-sm font-semibold">{workflow.title ?? 'Workflow'}</div>
+                <div className="mt-1 text-[10px] text-neutral-400">
+                  {workflow.summary ?? 'No summary supplied.'}
+                </div>
+                <div className="mt-2 space-y-1 text-[10px] text-neutral-300">
+                  <div>
+                    <span className="text-neutral-500">Status:</span> {workflow.status ?? 'n/a'}
+                  </div>
+                  <div>
+                    <span className="text-neutral-500">Current gate:</span>{' '}
+                    {workflow.current_gate ?? 'n/a'}
+                  </div>
+                  <div>
+                    <span className="text-neutral-500">Next action:</span>{' '}
+                    {workflow.next_action ?? 'n/a'}
+                  </div>
+                  <div>
+                    <span className="text-neutral-500">Claims blocked:</span>{' '}
+                    {(workflow.claims_blocked ?? []).join('; ') || 'n/a'}
+                  </div>
+                  <div>
+                    <span className="text-neutral-500">Downloads:</span>{' '}
+                    {(workflow.download_names ?? [])
+                      .map(
+                        (download) =>
+                          `${download.label ?? 'download'} (${download.artifact ?? 'n/a'})`,
+                      )
+                      .join('; ') || 'n/a'}
+                  </div>
+                </div>
+                {workflow.visible_caveats?.length ? (
+                  <div className="mt-2">
+                    <div className="text-neutral-500 text-[10px] uppercase tracking-widest">
+                      Visible caveats
+                    </div>
+                    {renderList(workflow.visible_caveats)}
+                  </div>
+                ) : null}
+              </article>
+            ))}
+            {(workflows ?? []).length === 0 && (
+              <div className="rounded border border-dashed border-neutral-700 bg-neutral-950 p-3 text-[10px] text-neutral-500">
+                No workflow cards supplied yet.
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+      <div>
+        <div className="text-[10px] font-semibold uppercase tracking-widest text-neutral-400">
+          Evidence upload status
+        </div>
+        <div className="mt-1 text-[10px] text-neutral-300">
+          <div>Status: {uploadStatus?.status ?? 'missing'}</div>
+          <div>Upload lane ready: {String(uploadStatus?.upload_lane_ready ?? false)}</div>
+          <div>
+            Claims cleared: {String(uploadStatus?.claims_cleared ?? false)} ·{' '}
+            {uploadStatus?.claims_cleared_count ?? uploadStatus?.summary?.claims_cleared_count ?? 0}{' '}
+            cleared
+          </div>
+          <div>Artifact dir: {uploadStatus?.artifact_dir ?? 'n/a'}</div>
+          <div>
+            Next action:{' '}
+            {uploadStatus?.summary?.next_action ?? 'Review uploads before clearing any claim.'}
+          </div>
+        </div>
+        <div className="mt-2 grid gap-2">
+          <div>
+            <div className="text-[10px] uppercase tracking-widest text-sky-300">Staged uploads</div>
+            <div className="mt-1 space-y-1 text-[10px] text-neutral-300">
+              {uploads.length > 0 ? (
+                uploads.map((upload, index) => (
+                  <div
+                    key={`${upload.upload_ref ?? upload.file_name ?? 'upload'}-${index}`}
+                    className="rounded border border-neutral-800 bg-neutral-950 p-2"
+                  >
+                    <div>{upload.file_name ?? 'Unnamed file'}</div>
+                    <div className="text-neutral-500">
+                      {upload.evidence_lane ?? 'n/a'} · {upload.status ?? 'n/a'}
+                    </div>
+                    <div className="text-neutral-500">SHA256: {upload.sha256 ?? 'n/a'}</div>
+                    <div className="text-neutral-500">Saved path: {upload.saved_path ?? 'n/a'}</div>
+                  </div>
+                ))
+              ) : (
+                <div className="rounded border border-dashed border-neutral-700 bg-neutral-950 p-2 text-neutral-500">
+                  No staged uploads yet.
+                </div>
+              )}
+            </div>
+          </div>
+          <div>
+            <div className="text-[10px] uppercase tracking-widest text-red-300">
+              Rejected uploads
+            </div>
+            <div className="mt-1 space-y-1 text-[10px] text-neutral-300">
+              {rejectedUploads.length > 0 ? (
+                rejectedUploads.map((upload, index) => (
+                  <div
+                    key={`${upload.upload_ref ?? upload.file_name ?? 'rejected'}-${index}`}
+                    className="rounded border border-neutral-800 bg-neutral-950 p-2"
+                  >
+                    <div>{upload.file_name ?? 'Unnamed file'}</div>
+                    <div className="text-neutral-500">
+                      {upload.rejection_reason ?? 'No rejection reason supplied.'}
+                    </div>
+                    <div className="text-neutral-500">Source ref: {upload.source_ref ?? 'n/a'}</div>
+                  </div>
+                ))
+              ) : (
+                <div className="rounded border border-dashed border-neutral-700 bg-neutral-950 p-2 text-neutral-500">
+                  No rejected uploads recorded.
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   )
 }
