@@ -74,6 +74,16 @@ describe('source ledger builders', () => {
       'https://www.step.parts/step-parts-social-preview.png',
     )
     expect(
+      built.source_collections.find((collection) => collection.source_id === 'tyco_ty3251_tyb')
+        ?.image_url,
+    ).toBe(
+      'https://tyco.widen.net/content/ftavruk2ll/jpeg/FIS_residentialproductdetail_product_TY-B_1.jpeg?color=ffffffff&position=c&quality=80&u=ncoxvb',
+    )
+    expect(
+      built.source_collections.find((collection) => collection.source_id === 'tyco_ty3251_tyb')
+        ?.asset_kinds,
+    ).toEqual(['product_page', 'image', 'cut_sheet', 'revit'])
+    expect(
       built.research_records.find((record: any) => record.source_id === 'step.parts')
         ?.third_party_notice_ref,
     ).toBe('THIRD_PARTY_NOTICES.md')

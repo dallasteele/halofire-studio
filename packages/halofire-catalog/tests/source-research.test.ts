@@ -88,6 +88,16 @@ describe('source research ledger contract', () => {
         ?.asset_kinds,
     ).toEqual(['product_page', 'image', 'cut_sheet', 'revit'])
     expect(
+      seed.source_collections.find((collection) => collection.source_id === 'tyco_ty3251_tyb')
+        ?.image_url,
+    ).toBe(
+      'https://tyco.widen.net/content/ftavruk2ll/jpeg/FIS_residentialproductdetail_product_TY-B_1.jpeg?color=ffffffff&position=c&quality=80&u=ncoxvb',
+    )
+    expect(
+      seed.source_collections.find((collection) => collection.source_id === 'tyco_ty3251_tyb')
+        ?.asset_kinds,
+    ).toEqual(['product_page', 'image', 'cut_sheet', 'revit'])
+    expect(
       seed.source_collections.find((collection) => collection.source_id === 'tyco_lfii_hsw_tfp417')
         ?.image_url,
     ).toBe(
@@ -231,6 +241,16 @@ describe('source research ledger contract', () => {
     )
     expect(
       ledger.source_collections.find((collection) => collection.source_id === 'tyco_lfii_hsw_tfp417')
+        ?.asset_kinds,
+    ).toEqual(['product_page', 'image', 'cut_sheet', 'revit'])
+    expect(
+      ledger.source_collections.find((collection) => collection.source_id === 'tyco_ty3251_tyb')
+        ?.image_url,
+    ).toBe(
+      'https://tyco.widen.net/content/ftavruk2ll/jpeg/FIS_residentialproductdetail_product_TY-B_1.jpeg?color=ffffffff&position=c&quality=80&u=ncoxvb',
+    )
+    expect(
+      ledger.source_collections.find((collection) => collection.source_id === 'tyco_ty3251_tyb')
         ?.asset_kinds,
     ).toEqual(['product_page', 'image', 'cut_sheet', 'revit'])
     expect(
@@ -440,22 +460,26 @@ describe('source research ledger contract', () => {
           model: 'TY3251',
           public_url:
             'https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-b_fis/series-ty-b-sprinklers',
+          image_url:
+            'https://tyco.widen.net/content/ftavruk2ll/jpeg/FIS_residentialproductdetail_product_TY-B_1.jpeg?color=ffffffff&position=c&quality=80&u=ncoxvb',
           source_url:
             'https://docs.johnsoncontrols.com/tycofire/api/khub/documents/Y5s5g2HZNr6Um_t5iOK7dw/content',
           source_file_ref: 'E:/ClaudeBot/halofire-studio/packages/halofire-catalog/cut_sheets/tyco_ty3251_tyb.pdf',
           source_license_ref: 'license:pendent_standard',
           source_license_spdx: 'proprietary',
           third_party_notice_ref: null,
-          capture_date: '2026-05-15T05:03:05.031677Z',
-          license_summary: 'Public manufacturer cut sheet used for an internal parametric proxy; redistribution blocked.',
+          capture_date: '2026-05-27T00:00:00Z',
+          license_summary: 'Tyco TY-B product page, product image, and technical data sheet verify the TY3251 family; redistribution remains blocked.',
           redistribution_blocked: true,
           model_status: 'manufacturer_verified',
           disposition: 'promoted',
           evidence_refs: [
             'https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-b_fis/series-ty-b-sprinklers',
+            'https://tyco.widen.net/content/ftavruk2ll/jpeg/FIS_residentialproductdetail_product_TY-B_1.jpeg?color=ffffffff&position=c&quality=80&u=ncoxvb',
+            'https://docs.johnsoncontrols.com/tycofire/api/khub/documents/Y5s5g2HZNr6Um_t5iOK7dw/content',
             'E:/ClaudeBot/halofire-studio/packages/halofire-catalog/cut_sheets/tyco_ty3251_tyb.pdf',
           ],
-          notes: 'Manufacturer-backed source research row for the official TY3251 family and its product-page image evidence.',
+          notes: 'Manufacturer-backed source research row for the official TY3251 family with image evidence captured from the live product page.',
         },
         {
           part_ref: 'tyco_ty4251_pendent_k80_135f',

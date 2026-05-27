@@ -2,6 +2,10 @@
 
 ## 2026-05-27
 
+- Rechecked the step.parts open-source STEP candidate against the live public page and upstream repository today; the candidate page still exposes the HEBI R25 actuator source, the repo remains public/MIT for original project material, and the checked-in `THIRD_PARTY_NOTICES.md` now carries the refreshed live-verification note.
+- Kept the catalog/model truth surface honest: the step.parts asset stays `proxy` / candidate-only, and no manufacturer or sealed approval moved as part of this pass.
+- Verification anchor for this pass will be the focused Stream F package tests plus the rulebook check; no broad pytest sweep is needed for this docs-only refresh.
+
 - Tightened the Python Stream F source-collection contract so catalog source rows now require explicit `license_spdx`, `public_url`, and asset coverage, with manufacturer/distributor rows also requiring product-page and cut-sheet coverage and step.parts rows also requiring repo, local STEP file, third-party notice, and STEP/notice asset coverage.
 - Added focused Python regressions for manufacturer and step.parts source-collection validation so the catalog pipeline cannot drift back to license-optional or notice-optional ingestion.
 - Verification passed: `C:/Python312/python.exe scripts/verify_agentic_rules.py`, `C:/Python312/python.exe -m pytest tests/core/hal/halo_forge/test_catalog_source_collection.py -q`, `bun test E:/ClaudeBot/halofire-studio/packages/halofire-catalog/tests/source-coverage.test.ts E:/ClaudeBot/halofire-studio/packages/halofire-catalog/tests/source-research.test.ts E:/ClaudeBot/halofire-studio/packages/halofire-catalog/tests/component-library.test.ts`, `bun run --cwd E:/ClaudeBot/halofire-studio/packages/halofire-catalog check-types`, and `bun run --cwd E:/ClaudeBot/halofire-studio/packages/halofire-catalog build`.

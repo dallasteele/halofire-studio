@@ -138,6 +138,20 @@ describe('source coverage ledger', () => {
       'https://www.vikinggroupinc.com/sites/default/files/2023-12/viking-share-image-default.png',
     )
 
+    const tycoTy3251 = ledger.source_collections.find(
+      (collection) => collection.source_id === 'tyco_ty3251_tyb',
+    )
+    expect(tycoTy3251).toBeDefined()
+    expect(tycoTy3251?.image_url).toBe(
+      'https://tyco.widen.net/content/ftavruk2ll/jpeg/FIS_residentialproductdetail_product_TY-B_1.jpeg?color=ffffffff&position=c&quality=80&u=ncoxvb',
+    )
+    expect(tycoTy3251?.asset_kinds).toEqual([
+      'product_page',
+      'image',
+      'cut_sheet',
+      'revit',
+    ])
+
     const viking3021Revit = ledger.source_collections.find(
       (collection) => collection.source_id === 'viking_vk3021_qr_pendent_revit2017',
     )
@@ -223,7 +237,7 @@ describe('source coverage ledger', () => {
     expect(ledger.summary.rejected_candidate_count).toBeGreaterThan(0)
     expect(ledger.summary.proxy_count).toBe(6)
     expect(ledger.summary.sealed_approved_count).toBe(0)
-    expect(ledger.summary.image_missing_count).toBe(79)
+    expect(ledger.summary.image_missing_count).toBe(73)
     expect(ledger.missing_downloads).toContain('pendent_standard:step')
     expect(ledger.missing_downloads).toContain('step.parts:hebi_r25_actuator:glb')
     expect(ledger.rejected_candidates).toContain('pendent_standard_ferguson')
