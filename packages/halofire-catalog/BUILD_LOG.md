@@ -2,6 +2,11 @@
 
 ## 2026-05-27
 
+- Reverified the Stream F catalog/model owner surface against the checked-in research, coverage, component-library, provenance, and source-owner pipeline contracts. Live public pages were checked again for step.parts, Wheatland, Tyco TY-B, Victaulic FL-QR/SW, Tyco LFII HSW, and Reliable DH56.
+- No source or schema edits were required because the package already carries the requested licensing, model-tier, GLB/IFC/DXF, correction-workflow, and coverage-ledger contracts.
+- Verification passed: `C:/Python312/python.exe scripts/verify_agentic_rules.py`, `bun test E:/ClaudeBot/halofire-studio/packages/halofire-catalog/tests/source-research.test.ts E:/ClaudeBot/halofire-studio/packages/halofire-catalog/tests/source-coverage.test.ts E:/ClaudeBot/halofire-studio/packages/halofire-catalog/tests/component-library.test.ts E:/ClaudeBot/halofire-studio/packages/halofire-catalog/tests/source-owner-pipeline.test.ts E:/ClaudeBot/halofire-studio/packages/halofire-catalog/tests/provenance.test.ts`, `bun run --cwd E:/ClaudeBot/halofire-studio/packages/halofire-catalog check-types`, and `bun run --cwd E:/ClaudeBot/halofire-studio/packages/halofire-catalog build`.
+- Remaining blocker is still approval depth: `manufacturer_verified` and `sealed_approved` need stronger manufacturer-backed or sealed evidence before promotion.
+
 - Rechecked the step.parts open-source STEP candidate against the live public page and upstream repository today; the candidate page still exposes the HEBI R25 actuator source, the repo remains public/MIT for original project material, and the checked-in `THIRD_PARTY_NOTICES.md` now carries the refreshed live-verification note.
 - Kept the catalog/model truth surface honest: the step.parts asset stays `proxy` / candidate-only, and no manufacturer or sealed approval moved as part of this pass.
 - Verification anchor for this pass will be the focused Stream F package tests plus the rulebook check; no broad pytest sweep is needed for this docs-only refresh.
