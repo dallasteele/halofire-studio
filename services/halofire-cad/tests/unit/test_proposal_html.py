@@ -371,6 +371,7 @@ def test_html_shows_access_banner_and_artifact_links() -> None:
     assert "Bid deliverables" in html
     assert "Access-Controlled Bid Bundle" in html
     assert "Approval/evidence workbench" in html
+    assert "Surface staged uploads, rejected uploads, and lane readiness as a first-class artifact in the shared bid bundle." in html
     assert "AI-guided correction tasks" in html
     assert "Client and company workflows" in html
     assert "Exact missing-evidence ledger rows for bid 1881" in html
