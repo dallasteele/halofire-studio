@@ -1,5 +1,11 @@
 # BUILD_LOG
 
+## 2026-05-27
+
+- Tightened the Python Stream F source-collection contract so catalog source rows now require explicit `license_spdx`, `public_url`, and asset coverage, with manufacturer/distributor rows also requiring product-page and cut-sheet coverage and step.parts rows also requiring repo, local STEP file, third-party notice, and STEP/notice asset coverage.
+- Added focused Python regressions for manufacturer and step.parts source-collection validation so the catalog pipeline cannot drift back to license-optional or notice-optional ingestion.
+- Verification passed: `C:/Python312/python.exe scripts/verify_agentic_rules.py`, `C:/Python312/python.exe -m pytest tests/core/hal/halo_forge/test_catalog_source_collection.py -q`, `bun test E:/ClaudeBot/halofire-studio/packages/halofire-catalog/tests/source-coverage.test.ts E:/ClaudeBot/halofire-studio/packages/halofire-catalog/tests/source-research.test.ts E:/ClaudeBot/halofire-studio/packages/halofire-catalog/tests/component-library.test.ts`, `bun run --cwd E:/ClaudeBot/halofire-studio/packages/halofire-catalog check-types`, and `bun run --cwd E:/ClaudeBot/halofire-studio/packages/halofire-catalog build`.
+
 ## 2026-05-26
 
 - Corrected the Reliable F156 source bundle so the live manufacturer reference, local cut sheet, generator scripts, and checked-in ledgers all point at Bulletin 031 instead of the stale Bulletin 182/F1-56 mixup.
