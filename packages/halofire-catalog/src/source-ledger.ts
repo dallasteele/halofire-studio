@@ -540,9 +540,12 @@ export function buildCoverageLedger(
       public_url: 'https://www.step.parts',
       repo_url: 'https://github.com/earthtojake/step.parts',
       image_url: 'https://www.step.parts/step-parts-social-preview.png',
+      source_file_ref:
+        'E:/ClaudeBot/data/halofire/brand/components/source_step_parts/hebi_r25_actuator.step',
       source_url: 'https://www.step.parts/parts/hebi_r25_actuator',
       license_spdx: 'MIT',
       third_party_notice_ref: 'THIRD_PARTY_NOTICES.md',
+      asset_kinds: ['product_page', 'image', 'step', 'third_party_notice'],
       capture_date: input.generated_at_utc ?? new Date().toISOString(),
       redistribution_blocked: true,
       notes:

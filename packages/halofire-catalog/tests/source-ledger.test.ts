@@ -202,4 +202,38 @@ describe('source ledger builders', () => {
       stepCandidate?.asset_coverage.find((asset) => asset.kind === 'ifc')?.status,
     ).toBe('missing')
   })
+
+  test('coverage builder fallback step.parts collection stays schema-safe', () => {
+    const sources = loadJson<{ components: any[] }>(SOURCES_PATH)
+    const research = loadJson<any>(SOURCE_RESEARCH_SEED_PATH)
+    const checkedInLedger = loadJson<any>(SOURCE_COVERAGE_LEDGER_PATH)
+    const sourceResearchWithoutStepParts = {
+      ...research,
+      source_collections: research.source_collections.filter(
+        (collection: any) => collection.source_id !== 'step.parts',
+      ),
+    }
+
+    const built = buildCoverageLedger({
+      generated_at_utc: checkedInLedger.generated_at_utc,
+      components: sources.components,
+      source_research: sourceResearchWithoutStepParts,
+    })
+
+    const fallbackCollection = built.source_collections.find(
+      (collection) => collection.source_id === 'step.parts',
+    )
+
+    expect(fallbackCollection).toBeDefined()
+    expect(fallbackCollection?.source_file_ref).toBe(
+      'E:/ClaudeBot/data/halofire/brand/components/source_step_parts/hebi_r25_actuator.step',
+    )
+    expect(fallbackCollection?.asset_kinds).toEqual([
+      'product_page',
+      'image',
+      'step',
+      'third_party_notice',
+    ])
+    expect(fallbackCollection?.third_party_notice_ref).toBe('THIRD_PARTY_NOTICES.md')
+  })
 })

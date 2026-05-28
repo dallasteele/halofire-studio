@@ -1,5 +1,12 @@
 # BUILD_LOG
 
+## 2026-05-28T21:41Z
+
+- Hardened the Stream F catalog source-ledger fallback so a missing `step.parts` collection still carries `source_file_ref`, `source_url`, `asset_kinds`, and third-party notice evidence, then regenerated `source_research_ledger.json`, `source_coverage_ledger.json`, and `THIRD_PARTY_NOTICES.md` from the live-backed builders.
+- Refreshed the step.parts live-verification text to the current run date and kept the upstream repo-license note explicit so the open-source STEP candidate remains candidate-only, not manufacturer approval.
+- Verification passed: `C:/Python312/python.exe scripts/verify_agentic_rules.py`, `bun test E:/ClaudeBot/halofire-studio/packages/halofire-catalog/tests/source-ledger.test.ts`, `bun test E:/ClaudeBot/halofire-studio/packages/halofire-catalog/tests/source-owner-pipeline.test.ts`, `bun run --cwd E:/ClaudeBot/halofire-studio/packages/halofire-catalog check-types`, and `bun run --cwd E:/ClaudeBot/halofire-studio/packages/halofire-catalog build`.
+- GX10 brain writeback stayed blocked by `HAL_BRAIN_UNREACHABLE` from this runner path.
+
 ## 2026-05-28T20:38Z
 
 - Refreshed the step.parts provenance stamps in `data/halofire/brand/components/source_research_seed.json` and `data/halofire/brand/components/source_research_ledger.json` so the open-source STEP candidate stays explicitly candidate-only while matching the latest live verification timestamp.
