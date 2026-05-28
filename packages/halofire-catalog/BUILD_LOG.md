@@ -1,5 +1,13 @@
 # BUILD_LOG
 
+## 2026-05-28
+
+- Rechecked the Stream F catalog/model owner surface against the live public manufacturer and distributor sources for step.parts, Wheatland, Victaulic FL-QR/SW, Tyco TY-B, Tyco LFII HSW, and Reliable DH56.
+- Refreshed the step.parts live-verification stamp in `data/halofire/brand/components/THIRD_PARTY_NOTICES.md` so the open-source STEP candidate stays explicitly candidate-only and does not drift toward manufacturer approval.
+- No schema, source-ledger, or component-library edits were required because the checked-in catalog/model pipeline already carries the requested licensing, model-status, GLB/IFC/DXF, correction-workflow, and coverage-ledger contracts.
+- Remaining blocker is still approval depth: `manufacturer_verified` and `sealed_approved` need stronger manufacturer-backed or sealed evidence before promotion.
+- Verification passed: `C:/Python312/python.exe scripts/verify_agentic_rules.py`, `bun test E:/ClaudeBot/halofire-studio/packages/halofire-catalog/tests/source-research.test.ts E:/ClaudeBot/halofire-studio/packages/halofire-catalog/tests/source-coverage.test.ts E:/ClaudeBot/halofire-studio/packages/halofire-catalog/tests/source-owner-pipeline.test.ts E:/ClaudeBot/halofire-studio/packages/halofire-catalog/tests/provenance.test.ts E:/ClaudeBot/halofire-studio/packages/halofire-catalog/tests/component-library.test.ts`, `bun run --cwd E:/ClaudeBot/halofire-studio/packages/halofire-catalog check-types`, and `bun run --cwd E:/ClaudeBot/halofire-studio/packages/halofire-catalog build`.
+
 ## 2026-05-27
 
 - Reverified the Stream F catalog/model owner surface against the checked-in research, coverage, component-library, provenance, and source-owner pipeline contracts. Live public pages were checked again for step.parts, Wheatland, Tyco TY-B, Victaulic FL-QR/SW, Tyco LFII HSW, and Reliable DH56.
