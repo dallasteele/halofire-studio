@@ -362,6 +362,11 @@ describe('source coverage ledger', () => {
     expect(notices).toContain('step.parts source candidate')
     expect(notices).toContain('https://www.step.parts')
     expect(notices).toContain('https://github.com/earthtojake/step.parts')
+    expect(notices).toContain('Stream F coverage contract')
+    expect(notices).toContain('source_research_ledger.json')
+    expect(notices).toContain('source_coverage_ledger.json')
+    expect(notices).toContain('manufacturer_verified')
+    expect(notices).toContain('sealed_approved')
   })
 
   test('open-source STEP source collections must carry a local source file ref', () => {

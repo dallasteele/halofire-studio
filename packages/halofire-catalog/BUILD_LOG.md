@@ -1,5 +1,12 @@
 # BUILD_LOG
 
+## 2026-05-28T22:13Z
+
+- Clarified the Stream F coverage contract in `data/halofire/brand/components/THIRD_PARTY_NOTICES.md` so the catalog docs explicitly call out source-research provenance, product-page/image/cut-sheet coverage, open-source STEP candidate boundaries, and the full vendor/model coverage ledger obligations.
+- Kept the core schema untouched because `src/source-coverage.ts`, `src/source-research.ts`, `src/schema.ts`, and the checked-in ledgers already enforce the required source licensing, model-status tiers, and missing-download accounting.
+- Verification passed for the existing focused catalog surface: `C:/Python312/python.exe scripts/verify_agentic_rules.py`, `bun test E:/ClaudeBot/halofire-studio/packages/halofire-catalog/tests/source-research.test.ts E:/ClaudeBot/halofire-studio/packages/halofire-catalog/tests/source-coverage.test.ts E:/ClaudeBot/halofire-studio/packages/halofire-catalog/tests/source-owner-pipeline.test.ts E:/ClaudeBot/halofire-studio/packages/halofire-catalog/tests/component-library.test.ts`, `bun run --cwd E:/ClaudeBot/halofire-studio/packages/halofire-catalog check-types`, and `bun run --cwd E:/ClaudeBot/halofire-studio/packages/halofire-catalog build`.
+- GX10 brain writeback was attempted through the session bootstrap but remained blocked by `HAL_BRAIN_UNREACHABLE` from this runner path.
+
 ## 2026-05-28T21:41Z
 
 - Hardened the Stream F catalog source-ledger fallback so a missing `step.parts` collection still carries `source_file_ref`, `source_url`, `asset_kinds`, and third-party notice evidence, then regenerated `source_research_ledger.json`, `source_coverage_ledger.json`, and `THIRD_PARTY_NOTICES.md` from the live-backed builders.
