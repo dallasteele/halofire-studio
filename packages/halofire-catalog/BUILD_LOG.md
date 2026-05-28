@@ -1,5 +1,12 @@
 # BUILD_LOG
 
+## 2026-05-28T20:38Z
+
+- Refreshed the step.parts provenance stamps in `data/halofire/brand/components/source_research_seed.json` and `data/halofire/brand/components/source_research_ledger.json` so the open-source STEP candidate stays explicitly candidate-only while matching the latest live verification timestamp.
+- Kept the approval ladder unchanged: no manufacturer-backed or sealed approval claims moved in this slice.
+- Verification passed: `C:/Python312/python.exe scripts/verify_agentic_rules.py` and `bun test E:/ClaudeBot/halofire-studio/packages/halofire-catalog/tests/source-research.test.ts E:/ClaudeBot/halofire-studio/packages/halofire-catalog/tests/source-coverage.test.ts`.
+- Brain sync writeback remained blocked by `HAL_BRAIN_UNREACHABLE` from the GX10/OpenClaw host path.
+
 ## 2026-05-28
 
 - Rechecked the Stream F catalog/model owner surface against the live public manufacturer and distributor sources for step.parts, Wheatland, Victaulic FL-QR/SW, Tyco TY-B, Tyco LFII HSW, and Reliable DH56.
