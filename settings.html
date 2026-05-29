@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HaloFire — Settings, Library &amp; Parity</title>
+<style>
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+  :root{--bg:#08080a;--surface:#111114;--surface2:#18181c;--fire:#E53935;--gold:#FFD54F;--cyan:#4DD0E1;--green:#4ade80;--text:#d4d4d8;--muted:#71717a;--bright:#fafafa;--border:rgba(255,255,255,.08);--font:'Inter',system-ui,sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
+  body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh}
+  header{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:1px solid var(--border);background:rgba(8,8,10,.9);position:sticky;top:0;z-index:10}
+  .brand{font-weight:900;font-style:italic;font-size:20px;color:var(--bright)} .brand span{color:var(--fire)}
+  .nav a{color:var(--cyan);text-decoration:none;margin-left:14px;font-size:13px;cursor:pointer}
+  main{max-width:1180px;margin:0 auto;padding:22px;display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px}
+  .card.wide{grid-column:1/-1}
+  h2{font-size:12px;text-transform:uppercase;letter-spacing:1.4px;color:var(--muted);margin-bottom:12px;font-weight:700}
+  .gate{background:linear-gradient(90deg,rgba(229,57,53,.16),rgba(255,213,79,.1));border:1px solid rgba(229,57,53,.4);color:var(--gold);font-family:var(--mono);font-size:12px;padding:10px 14px;border-radius:8px;margin-bottom:12px}
+  .row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px}
+  .st{font-family:var(--mono);font-size:10px;padding:2px 8px;border-radius:99px}
+  .st.present,.st.satisfied,.st.linked,.st.true{background:rgba(74,222,128,.15);color:var(--green)}
+  .st.missing,.st.false,.st.blocked{background:rgba(229,57,53,.15);color:var(--fire)}
+  .st.partial,.st.gated,.st.unknown,.st.generated{background:rgba(255,213,79,.15);color:var(--gold)}
+  input,select{background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:6px 8px;font-size:12px;font-family:var(--font)}
+  button{background:var(--fire);color:#fff;border:none;border-radius:7px;padding:7px 12px;font-weight:700;cursor:pointer;font-size:12px}
+  button:hover{filter:brightness(1.1)}
+  .muted{color:var(--muted);font-size:12px} .err{color:var(--fire);font-size:11px;font-family:var(--mono)}
+  .cat{margin-top:10px;font-size:11px;color:var(--cyan);font-family:var(--mono)}
+  .pill{display:inline-block;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:2px 7px;margin:2px;font-size:11px}
+  .pill.missing{border-color:rgba(229,57,53,.3)} .pill.present{border-color:rgba(74,222,128,.3)}
+  code{font-family:var(--mono);font-size:11px;color:var(--gold)}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">Halo<span>Fire</span> · Settings &amp; Parity</div>
+  <div class="nav"><a href="/workbench.html">Workbench</a><a href="/autosprink.html">Studio</a><a id="logout">Sign out</a></div>
+</header>
+<main>
+  <div class="card wide">
+    <h2>AutoSprink Parity</h2>
+    <div id="gate" class="gate">checking parity gate…</div>
+    <div id="matrix"></div>
+  </div>
+
+  <div class="card">
+    <h2>Required Documentation</h2>
+    <p class="muted" style="margin-bottom:8px">Upload or link the docs the system can't auto-source. These are recorded as evidence — but a catalog/cut-sheet link never auto-clears a regulated gate.</p>
+    <div id="docs"><span class="muted">loading…</span></div>
+    <h2 style="margin-top:16px">Add a document (admin)</h2>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+      <select id="docType"></select>
+      <select id="docMode"><option value="link">Link (URL)</option><option value="upload">Upload (filename)</option></select>
+      <input id="docVal" placeholder="https://… or filename" style="flex:1;min-width:160px">
+      <button id="docAdd">Add</button>
+    </div>
+    <div id="docMsg" class="err" style="margin-top:6px"></div>
+  </div>
+
+  <div class="card">
+    <h2>Stack Dependencies</h2>
+    <div id="deps"><span class="muted">loading…</span></div>
+  </div>
+
+  <div class="card wide">
+    <h2>Component Library <span class="muted" style="text-transform:none">· catalog → OpenSCAD → SAM 3.1 → gated</span></h2>
+    <div id="lib"><span class="muted">loading…</span></div>
+  </div>
+</main>
+
+<script type="module">
+const token = localStorage.getItem('halofire_token');
+if (!token) location.href = '/';
+const $ = (id) => document.getElementById(id);
+$('logout').onclick = () => { localStorage.removeItem('halofire_token'); location.href = '/'; };
+function api(path, opts={}) {
+  return fetch('/api'+path, { ...opts, headers:{ 'Content-Type':'application/json', Authorization:'Bearer '+token, ...(opts.headers||{}) }})
+    .then(async r => { if (r.status===401){ localStorage.removeItem('halofire_token'); location.href='/'; throw new Error('unauth'); } if(!r.ok) throw new Error(await r.text()); return r.json(); });
+}
+const stClass = (s) => String(s).toLowerCase().replace(/[^a-z]/g,'');
+
+async function loadParity() {
+  try {
+    const p = await api('/parity');
+    const gate = (p.gate && p.gate.status) || p.gateStatus || 'blocked';
+    $('gate').innerHTML = `AUTOSPRINK PARITY GATE: <b class="st ${stClass(gate)}">${String(gate).toUpperCase()}</b> · parityAchieved: <b>${p.parityAchieved}</b> — manufacturer-exact models + licensed PE/AHJ review required (best-effort engine ≠ parity).`;
+    const areas = (p.matrix && p.matrix.areas) || [];
+    $('matrix').innerHTML = areas.map(a => `<div class="row"><span title="${(a.evidence||'').replace(/"/g,'&quot;')}">${a.name||a.key}${a.gated?' <span class="st gated" style="padding:1px 5px">gated</span>':''}</span><span class="st ${stClass(a.status)}">${a.status}</span></div>`).join('') || '<span class="muted">no matrix</span>';
+  } catch(e){ $('gate').innerHTML = '<span class="err">parity unavailable: '+e.message+'</span>'; }
+}
+
+async function loadDocs() {
+  try {
+    const docs = await api('/settings/documents');
+    const slots = Array.isArray(docs) ? docs : (docs.slots || docs.documents || []);
+    $('docs').innerHTML = slots.map(s => `<div class="row"><span>${s.doc_type||s.slot||s.type}</span><span class="st ${stClass(s.satisfied?'satisfied':(s.status||'missing'))}">${s.satisfied?'satisfied':(s.status||'missing')}</span></div>`).join('') || '<span class="muted">no slots</span>';
+    $('docType').innerHTML = slots.map(s => `<option value="${s.doc_type||s.slot||s.type}">${s.doc_type||s.slot||s.type}</option>`).join('');
+  } catch(e){ $('docs').innerHTML = '<span class="err">'+e.message+'</span>'; }
+}
+$('docAdd').onclick = async () => {
+  $('docMsg').textContent='';
+  const doc_type=$('docType').value, mode=$('docMode').value, val=$('docVal').value.trim();
+  if(!val){ $('docMsg').textContent='enter a URL or filename'; return; }
+  const body = { doc_type, mode, ...(mode==='link'?{url:val}:{filename:val}) };
+  try { await api('/settings/documents',{method:'POST',body:JSON.stringify(body)}); $('docVal').value=''; await loadDocs(); }
+  catch(e){ $('docMsg').textContent = e.message; }
+};
+
+async function loadDeps() {
+  try {
+    const d = await api('/settings/dependencies');
+    $('deps').innerHTML = Object.entries(d).map(([k,v]) => `<div class="row"><span>${k}</span><span class="st ${stClass(v)}">${v}</span></div>`).join('');
+  } catch(e){ $('deps').innerHTML = '<span class="err">'+e.message+'</span>'; }
+}
+
+async function loadLibrary() {
+  try {
+    const reg = await import('/src/components/registry.js');
+    const byCat = reg.componentsByCategory();
+    // Honest inventory: no real catalog/generated models are attached yet, so the
+    // registry's own fail-closed inventory reports every component as missing.
+    // (Mirrors the server's /api/parity gate, which is derived the same way.)
+    const inv = reg.buildParityInventory({});
+    const missing = new Set(inv.missing);
+    const cats = Object.keys(byCat).sort();
+    $('lib').innerHTML = cats.map(cat => {
+      const items = byCat[cat].map(c => {
+        const present = !missing.has(c.key);
+        const req = c.required ? '' : ' <span class="muted">(optional)</span>';
+        return `<span class="pill ${present?'present':'missing'}">${c.name||c.key}${req} · ${present?'model':'no model'}</span>`;
+      }).join('');
+      return `<div class="cat">${cat} · ${byCat[cat].length}</div><div>${items}</div>`;
+    }).join('');
+    $('lib').insertAdjacentHTML('afterbegin', `<div class="muted" style="margin-bottom:8px">${inv.total} components across ${cats.length} categories · ${inv.present} with real models, ${inv.missing.length} missing. All ‘no model’ until real catalog or generated models are attached — the AUTOSPRINK parity gate stays <b style="color:var(--fire)">blocked</b>.</div>`);
+  } catch(e){ $('lib').innerHTML = '<span class="err">library unavailable: '+e.message+'</span>'; }
+}
+
+loadParity(); loadDocs(); loadDeps(); loadLibrary();
+</script>
+</body>
+</html>
