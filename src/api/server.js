@@ -491,6 +491,10 @@ app.post('/api/projects/:name/sprinkler-bid', authMiddleware, (req, res) => {
     if (!floorPlan) {
       return res.status(400).json({ error: 'Provide an svg, a floorPlan spec, or use a project with a built-in plan' });
     }
+    // Optional hazard override from the studio UI (applies to all rooms).
+    if (req.body && ['light', 'ordinary', 'extra'].includes(String(req.body.hazard))) {
+      floorPlan = { ...floorPlan, rooms: floorPlan.rooms.map((r) => ({ ...r, hazard: req.body.hazard })) };
+    }
     const opts = {
       priceResolver: buildResolverFromDb(db),
       laborRatePerHead: Number(req.body?.laborRatePerHead) || 85,
