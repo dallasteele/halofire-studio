@@ -1,17 +1,20 @@
 /**
  * HaloFire Database Seed Script
- * Populates the database with sample data derived from the real bid log
+ * Populates the database with source-linked bid rows from the real bid log.
  */
 
 import Database from 'better-sqlite3';
 import bcrypt from 'bcryptjs';
-import path from 'path';
-import fs from 'fs';
-import { fileURLToPath } from 'url';
+import path from 'node:path';
+import fs from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { buildHomeDepotSeedRows } from '../data/home-depot-bid-package.js';
+import { readBidLogRows } from '../data/bid-log-importer.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const DB_PATH = path.resolve(__dirname, '../../data/halofire.db');
+const DB_PATH = process.env.HALOFIRE_DB_PATH
+  ? path.resolve(process.env.HALOFIRE_DB_PATH)
+  : path.resolve(__dirname, '../../data/halofire.db');
 const DATA_DIR = path.dirname(DB_PATH);
 const PROJECT_ROOT = path.resolve(__dirname, '../..');
 
@@ -91,119 +94,137 @@ db.exec(`
   );
 `);
 
-const existingAdmin = db.prepare('SELECT id FROM users WHERE username = ?').get('admin');
+const adminUser = process.env.HALOFIRE_ADMIN_USER || 'admin';
+const existingAdmin = db.prepare('SELECT id FROM users WHERE username = ?').get(adminUser);
 if (!existingAdmin) {
   const fallbackAllowed = process.env.HALOFIRE_ALLOW_DEV_DEFAULTS === '1';
-  const bootstrapPassword = process.env.HALOFIRE_ADMIN_PASSWORD || process.env.HALOFIRE_BOOTSTRAP_PASSWORD || (fallbackAllowed ? 'halofire2026' : null);
+  const bootstrapPassword = process.env.HALOFIRE_ADMIN_PASSWORD
+    || process.env.HALOFIRE_BOOTSTRAP_PASSWORD
+    || (fallbackAllowed ? 'halofire2026' : null);
+
   if (!bootstrapPassword) {
     throw new Error('HALOFIRE_ADMIN_PASSWORD is required for seed unless HALOFIRE_ALLOW_DEV_DEFAULTS=1');
   }
+
   const hash = bcrypt.hashSync(bootstrapPassword, 12);
-  db.prepare('INSERT INTO users (username, password_hash, name, role, email) VALUES (?, ?, ?, ?, ?)').run('admin', hash, 'Dallas Steele', 'admin', 'admin@halofireus.com');
+  db.prepare('INSERT INTO users (username, password_hash, name, role, email) VALUES (?, ?, ?, ?, ?)').run(
+    adminUser,
+    hash,
+    'Dallas Steele',
+    'admin',
+    'admin@halofireus.com',
+  );
 }
 
 console.log('[seed] Starting database seed...');
 
 const homeDepotRows = buildHomeDepotSeedRows(PROJECT_ROOT);
-db.prepare('DELETE FROM bids WHERE project = ?').run(homeDepotRows.bid.project);
-db.prepare('DELETE FROM projects WHERE name = ?').run(homeDepotRows.project.name);
-db.prepare('DELETE FROM compliance WHERE project_name = ?').run(homeDepotRows.compliance.project_name);
+const homeDepotPackageNotes = JSON.parse(homeDepotRows.bid.notes);
 
-// ── Seed Bids (from real bid log patterns) ──
-const bids = [
-  homeDepotRows.bid,
-  { project: "Walmart Supercenter - Twin Falls", contractor: "Boise Commercial Builders", value: 342000, status: "Pending", date: "2026-02-20", due_date: "2026-03-15", sqft: 185000, system_type: "Wet/Dry", contact: "Sarah Chen" },
-  { project: "St. Luke's Medical - Meridian", contractor: "Hoffman Construction", value: 895000, status: "Won", date: "2026-01-08", due_date: "2026-01-20", sqft: 340000, system_type: "Wet/Preaction", contact: "Tom Bradley" },
-  { project: "Micron Office Complex B3", contractor: "Engineered Structures", value: 567000, status: "Lost", date: "2025-12-10", due_date: "2025-12-28", sqft: 220000, system_type: "Wet", contact: "Linda Park" },
-  { project: "Amazon Fulfillment - Nampa", contractor: "Turner Construction", value: 1250000, status: "Won", date: "2026-02-01", due_date: "2026-02-15", sqft: 850000, system_type: "ESFR", contact: "James Rodriguez" },
-  { project: "Boise State Recreation Center", contractor: "Andersen Construction", value: 445000, status: "Pending", date: "2026-03-01", due_date: "2026-03-20", sqft: 175000, system_type: "Wet", contact: "Emily Watson" },
-  { project: "Idaho Power HQ Renovation", contractor: "Petra Inc", value: 278000, status: "Won", date: "2025-11-15", due_date: "2025-12-01", sqft: 95000, system_type: "Wet/Standpipe", contact: "David Kim" },
-  { project: "Costco - Caldwell", contractor: "Big-D Construction", value: 198000, status: "Pending", date: "2026-03-05", due_date: "2026-03-25", sqft: 150000, system_type: "ESFR", contact: "Rachel Moore" },
-  { project: "Simplot Agribusiness Plant", contractor: "Hensel Phelps", value: 1780000, status: "Won", date: "2025-10-20", due_date: "2025-11-05", sqft: 520000, system_type: "Deluge/Preaction", contact: "Mark Sullivan" },
-  { project: "Eagle High School Addition", contractor: "Wright Brothers", value: 165000, status: "Lost", date: "2026-01-25", due_date: "2026-02-10", sqft: 48000, system_type: "Wet", contact: "Karen Olsen" },
-  { project: "Fred Meyer - Boise Towne", contractor: "Lease Crutcher Lewis", value: 225000, status: "Won", date: "2025-09-12", due_date: "2025-09-30", sqft: 110000, system_type: "Wet", contact: "Paul Nguyen" },
-  { project: "St. Alphonsus ER Expansion", contractor: "Layton Construction", value: 612000, status: "Pending", date: "2026-03-10", due_date: "2026-04-01", sqft: 85000, system_type: "Wet/Preaction", contact: "Dr. Amy Cho" },
-  { project: "WinCo Foods - Mountain Home", contractor: "McAlvain Construction", value: 245000, status: "Won", date: "2025-08-15", due_date: "2025-09-01", sqft: 130000, system_type: "ESFR", contact: "Tyler Graham" },
-  { project: "Albertsons Distribution Center", contractor: "Okland Construction", value: 2100000, status: "Won", date: "2025-07-20", due_date: "2025-08-10", sqft: 780000, system_type: "ESFR", contact: "Beth Anderson" },
-  { project: "Boise Airport Terminal B", contractor: "Mortenson Construction", value: 1450000, status: "Pending", date: "2026-02-28", due_date: "2026-03-30", sqft: 420000, system_type: "Wet/Standpipe", contact: "Greg Phillips" },
-];
+function buildBidNotes(row) {
+  const notes = {
+    source: 'actual_bid_log',
+    worksheetRow: row.worksheetRow,
+    source_file: row.source_file,
+    sheet: row.sheet,
+    sourceRefs: row.sourceRefs,
+  };
+
+  if (row.status === 'needs_amount_review') {
+    notes.issue = {
+      code: 'BID_AMOUNT_MISSING',
+      severity: 'warning',
+      message: 'Bid log row has no amount and needs Halo Fire employee review.',
+    };
+  }
+
+  if (row.project === homeDepotRows.bid.project) {
+    notes.source = 'actual_bid_log_with_actual_bid_package';
+    notes.package = homeDepotPackageNotes;
+    notes.issue = {
+      code: 'BID_LOG_SQFT_DIFFERS_FROM_PROPOSAL',
+      bidLogSqft: row.sqft,
+      proposalSqft: homeDepotRows.bid.sqft,
+      severity: 'warning',
+      message: 'Bid log square footage differs from proposal workbook square footage; employee must choose the pricing basis.',
+    };
+  }
+
+  return JSON.stringify(notes);
+}
+
+const bids = readBidLogRows(PROJECT_ROOT)
+  .filter((row) => row.project)
+  .map((row) => ({
+    project: row.project,
+    contractor: row.contractor,
+    value: row.value || 0,
+    status: row.status || 'Bidding',
+    date: row.submitted_date,
+    due_date: row.due_date,
+    sqft: row.sqft || 0,
+    system_type: row.project === homeDepotRows.bid.project ? homeDepotRows.bid.system_type : 'Unknown',
+    contact: row.project === homeDepotRows.bid.project ? homeDepotRows.bid.contact : row.contractor,
+    notes: buildBidNotes(row),
+  }));
+
+db.prepare('DELETE FROM bids').run();
+db.prepare('DELETE FROM projects').run();
+db.prepare('DELETE FROM compliance').run();
 
 const insertBid = db.prepare('INSERT INTO bids (project, contractor, value, status, date, due_date, sqft, system_type, contact, notes, created_by) VALUES (?,?,?,?,?,?,?,?,?,?,1)');
-const deleteSeedBid = db.prepare('DELETE FROM bids WHERE project = ?');
-const bidTx = db.transaction(() => { for (const b of bids) insertBid.run(b.project, b.contractor, b.value, b.status, b.date, b.due_date, b.sqft, b.system_type, b.contact, b.notes || null); });
-for (const b of bids) deleteSeedBid.run(b.project);
-bidTx();
-console.log(`[seed] Inserted ${bids.length} bids`);
-
-// ── Seed Projects ──
-const projects = [
-  homeDepotRows.project,
-  { name: "St. Luke's Medical - Meridian", phase: "Design", progress: 35, budget: 895000, spent: 156800, manager: "Dallas Steele", start_date: "2026-02-15", end_date: "2026-11-30", status: "On Track" },
-  { name: "Amazon Fulfillment - Nampa", phase: "Fabrication", progress: 48, budget: 1250000, spent: 387000, manager: "Jake Torres", start_date: "2026-03-01", end_date: "2027-01-15", status: "Ahead" },
-  { name: "Simplot Agribusiness Plant", phase: "Testing", progress: 91, budget: 1780000, spent: 1654000, manager: "Dallas Steele", start_date: "2025-06-01", end_date: "2026-04-01", status: "On Track" },
-  { name: "Idaho Power HQ Renovation", phase: "Closeout", progress: 96, budget: 278000, spent: 271500, manager: "Maria Santos", start_date: "2025-08-01", end_date: "2026-03-30", status: "On Track" },
-  { name: "Fred Meyer - Boise Towne", phase: "Closeout", progress: 100, budget: 225000, spent: 218400, manager: "Maria Santos", start_date: "2025-07-01", end_date: "2026-01-15", status: "Complete" },
-  { name: "WinCo Foods - Mountain Home", phase: "Installation", progress: 65, budget: 245000, spent: 142300, manager: "Jake Torres", start_date: "2025-09-15", end_date: "2026-04-30", status: "On Track" },
-  { name: "Albertsons Distribution Center", phase: "Installation", progress: 55, budget: 2100000, spent: 978000, manager: "Dallas Steele", start_date: "2025-09-01", end_date: "2026-08-15", status: "On Track" },
-];
+db.transaction((rows) => {
+  for (const bid of rows) {
+    insertBid.run(bid.project, bid.contractor, bid.value, bid.status, bid.date, bid.due_date, bid.sqft, bid.system_type, bid.contact, bid.notes);
+  }
+})(bids);
+console.log(`[seed] Inserted ${bids.length} sourced bid-log bids`);
 
 const insertProject = db.prepare('INSERT INTO projects (name, phase, progress, budget, spent, manager, start_date, end_date, status, notes) VALUES (?,?,?,?,?,?,?,?,?,?)');
-const deleteSeedProject = db.prepare('DELETE FROM projects WHERE name = ?');
-const projTx = db.transaction(() => { for (const p of projects) insertProject.run(p.name, p.phase, p.progress, p.budget, p.spent, p.manager, p.start_date, p.end_date, p.status, p.notes || null); });
-for (const p of projects) deleteSeedProject.run(p.name);
-projTx();
-console.log(`[seed] Inserted ${projects.length} projects`);
+insertProject.run(
+  homeDepotRows.project.name,
+  homeDepotRows.project.phase,
+  homeDepotRows.project.progress,
+  homeDepotRows.project.budget,
+  homeDepotRows.project.spent,
+  homeDepotRows.project.manager,
+  homeDepotRows.project.start_date,
+  homeDepotRows.project.end_date,
+  homeDepotRows.project.status,
+  homeDepotRows.project.notes,
+);
+console.log('[seed] Inserted 1 sourced project');
 
-// ── Seed Pricebook (sample from ARGCO, FFF, Victaulic) ──
 const priceItems = [
-  { item: '1" CPVC Pipe (10ft)', supplier: "ARGCO", price: 12.45, unit: "LF", category: "Pipe" },
-  { item: '1-1/4" CPVC Pipe (10ft)', supplier: "ARGCO", price: 15.80, unit: "LF", category: "Pipe" },
-  { item: '1-1/2" CPVC Pipe (10ft)', supplier: "ARGCO", price: 19.25, unit: "LF", category: "Pipe" },
-  { item: '2" Sch 40 Black Steel (21ft)', supplier: "ARGCO", price: 38.90, unit: "LF", category: "Pipe" },
-  { item: '2-1/2" Sch 40 Black Steel (21ft)', supplier: "ARGCO", price: 52.30, unit: "LF", category: "Pipe" },
-  { item: '3" Sch 40 Black Steel (21ft)', supplier: "ARGCO", price: 68.50, unit: "LF", category: "Pipe" },
-  { item: '4" Sch 40 Black Steel (21ft)', supplier: "ARGCO", price: 95.00, unit: "LF", category: "Pipe" },
-  { item: '6" Sch 40 Black Steel (21ft)', supplier: "ARGCO", price: 158.00, unit: "LF", category: "Pipe" },
-  { item: '1-1/4" CPVC Tee', supplier: "ARGCO", price: 6.80, unit: "EA", category: "Fittings" },
-  { item: '1-1/4" CPVC 90° Elbow', supplier: "ARGCO", price: 5.40, unit: "EA", category: "Fittings" },
-  { item: '2" Grooved Tee', supplier: "ARGCO", price: 18.50, unit: "EA", category: "Fittings" },
-  { item: '1" Viking Pendent Head (155°F)', supplier: "FFF", price: 8.75, unit: "EA", category: "Heads" },
-  { item: '3/4" Viking Pendent Head (155°F)', supplier: "FFF", price: 7.90, unit: "EA", category: "Heads" },
-  { item: '3/4" Sidewall Head (175°F)', supplier: "FFF", price: 15.20, unit: "EA", category: "Heads" },
-  { item: 'Viking Concealed Head (165°F)', supplier: "FFF", price: 22.50, unit: "EA", category: "Heads" },
-  { item: 'ESFR K25.2 Pendent (165°F)', supplier: "FFF", price: 48.00, unit: "EA", category: "Heads" },
-  { item: '4" Alarm Check Valve', supplier: "FFF", price: 1250.00, unit: "EA", category: "Valves" },
-  { item: '6" Alarm Check Valve', supplier: "FFF", price: 1850.00, unit: "EA", category: "Valves" },
-  { item: '4" OS&Y Gate Valve', supplier: "FFF", price: 425.00, unit: "EA", category: "Valves" },
-  { item: '2" Victaulic Style 77 Coupling', supplier: "Victaulic", price: 24.30, unit: "EA", category: "Fittings" },
-  { item: '3" Victaulic Style 77 Coupling', supplier: "Victaulic", price: 35.60, unit: "EA", category: "Fittings" },
-  { item: '4" Victaulic Style 77 Coupling', supplier: "Victaulic", price: 48.90, unit: "EA", category: "Fittings" },
-  { item: '6" Victaulic Style 77 Coupling', supplier: "Victaulic", price: 67.80, unit: "EA", category: "Fittings" },
-  { item: 'Victaulic Style 607 Valve 4"', supplier: "Victaulic", price: 485.00, unit: "EA", category: "Valves" },
-  { item: 'Victaulic Style 607 Valve 6"', supplier: "Victaulic", price: 720.00, unit: "EA", category: "Valves" },
+  { item: '1 in CPVC Pipe (10ft)', supplier: 'ARGCO', price: 12.45, unit: 'LF', category: 'Pipe' },
+  { item: '1-1/4 in CPVC Pipe (10ft)', supplier: 'ARGCO', price: 15.8, unit: 'LF', category: 'Pipe' },
+  { item: '2 in Sch 40 Black Steel (21ft)', supplier: 'ARGCO', price: 38.9, unit: 'LF', category: 'Pipe' },
+  { item: '2 in Grooved Tee', supplier: 'ARGCO', price: 18.5, unit: 'EA', category: 'Fittings' },
+  { item: '1 in Viking Pendent Head (155F)', supplier: 'FFF', price: 8.75, unit: 'EA', category: 'Heads' },
+  { item: '4 in Alarm Check Valve', supplier: 'FFF', price: 1250, unit: 'EA', category: 'Valves' },
+  { item: '2 in Victaulic Style 77 Coupling', supplier: 'Victaulic', price: 24.3, unit: 'EA', category: 'Fittings' },
+  { item: 'Victaulic Style 607 Valve 4 in', supplier: 'Victaulic', price: 485, unit: 'EA', category: 'Valves' },
 ];
 
+db.prepare('DELETE FROM pricebook').run();
 const insertPrice = db.prepare('INSERT INTO pricebook (item, supplier, price, unit, category, last_updated) VALUES (?,?,?,?,?,?)');
-const priceTx = db.transaction(() => { for (const p of priceItems) insertPrice.run(p.item, p.supplier, p.price, p.unit, p.category, '2026-01-15'); });
-priceTx();
-console.log(`[seed] Inserted ${priceItems.length} pricebook items`);
+db.transaction((rows) => {
+  for (const item of rows) {
+    insertPrice.run(item.item, item.supplier, item.price, item.unit, item.category, '2026-01-15');
+  }
+})(priceItems);
+console.log(`[seed] Inserted ${priceItems.length} placeholder pricebook items pending real importer seeding`);
 
-// ── Seed Compliance ──
-const complianceItems = [
-  homeDepotRows.compliance,
-  { project_name: "St. Luke's Medical - Meridian", type: "Design Review", due_date: "2026-03-25", status: "Due Soon", authority: "Ada County AHJ" },
-  { project_name: "Simplot Agribusiness Plant", type: "Acceptance Test", due_date: "2026-03-18", status: "Due Soon", authority: "Canyon County Fire" },
-  { project_name: "Idaho Power HQ", type: "Final Closeout", due_date: "2026-03-30", status: "In Progress", authority: "Boise Fire Dept" },
-  { project_name: "Amazon Fulfillment - Nampa", type: "Rough-In Inspection", due_date: "2026-06-15", status: "Upcoming", authority: "Nampa Fire Marshal" },
-  { project_name: "Albertsons Distribution Center", type: "Underground Inspection", due_date: "2026-04-10", status: "Upcoming", authority: "Meridian Fire Dept" },
-];
-
-const insertComp = db.prepare('INSERT INTO compliance (project_name, type, due_date, status, authority, notes) VALUES (?,?,?,?,?,?)');
-const deleteSeedComp = db.prepare('DELETE FROM compliance WHERE project_name = ? AND type = ?');
-const compTx = db.transaction(() => { for (const c of complianceItems) insertComp.run(c.project_name, c.type, c.due_date, c.status, c.authority, c.notes || null); });
-for (const c of complianceItems) deleteSeedComp.run(c.project_name, c.type);
-compTx();
-console.log(`[seed] Inserted ${complianceItems.length} compliance items`);
+const insertCompliance = db.prepare('INSERT INTO compliance (project_name, type, due_date, status, authority, notes) VALUES (?,?,?,?,?,?)');
+insertCompliance.run(
+  homeDepotRows.compliance.project_name,
+  homeDepotRows.compliance.type,
+  homeDepotRows.compliance.due_date,
+  homeDepotRows.compliance.status,
+  homeDepotRows.compliance.authority,
+  homeDepotRows.compliance.notes,
+);
+console.log('[seed] Inserted 1 sourced compliance item');
 
 console.log('[seed] Database seeded successfully!');
 db.close();
