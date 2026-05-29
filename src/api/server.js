@@ -204,6 +204,11 @@ function initDatabase() {
   db.exec('DROP INDEX IF EXISTS pricebook_supplier_sku_source_idx');
   db.exec('DROP INDEX IF EXISTS pricebook_supplier_sku_source_row_idx');
 
+  // Claim-gate resolution provenance (who/what/when cleared a gate).
+  ensureColumn('claim_gates', 'resolved_by', 'TEXT');
+  ensureColumn('claim_gates', 'resolved_at', 'DATETIME');
+  ensureColumn('claim_gates', 'resolved_evidence_ref', 'TEXT');
+
   // Bootstrap the configured admin user without hardcoded credentials.
   const existing = db.prepare('SELECT id FROM users WHERE username = ?').get(ADMIN_USERNAME);
   if (!existing) {
@@ -443,6 +448,17 @@ app.get('/api/analytics/summary', authMiddleware, (req, res) => {
 // that resolution path is intentionally not exposed as a casual write here.
 const EVIDENCE_INSERT_FIELDS = new Set(['evidence_type', 'source_file', 'source_ref', 'status', 'notes']);
 
+// Only these real-world artifact types may clear a fail-closed claim gate.
+// AI/best-effort output is intentionally excluded — it can never clear a gate.
+const GATE_CLEARING_EVIDENCE_TYPES = new Set([
+  'ahj_approval',
+  'professional_review',
+  'pe_signoff',
+  'manufacturer_approval',
+  'autosprink_packet',
+  'employee_signoff',
+]);
+
 app.get('/api/projects/:name/claim-gates', authMiddleware, (req, res) => {
   const gates = db
     .prepare('SELECT * FROM claim_gates WHERE project_name = ? ORDER BY severity DESC, code')
@@ -472,6 +488,63 @@ app.post('/api/projects/:name/evidence', authMiddleware, requireRole('admin'), (
               VALUES (?, ?, ?, ?, ?, ?)`)
     .run(req.params.name, evidence_type, source_file, source_ref, status, notes);
   res.status(201).json({ id: result.lastInsertRowid, message: 'Evidence recorded' });
+});
+
+// Resolve a fail-closed claim gate. Admin-only, and only with a real evidence
+// artifact. The evidence row is recorded (status 'present') and the gate is
+// flipped blocked->cleared with who/what/when provenance. Best-effort/AI
+// evidence is rejected and the gate stays blocked — fail-closed by design.
+app.post('/api/projects/:name/claim-gates/:code/resolve', authMiddleware, requireRole('admin'), (req, res) => {
+  const projectName = req.params.name;
+  const code = req.params.code;
+  const evidence = req.body?.evidence;
+  if (!evidence || typeof evidence !== 'object') {
+    return res.status(400).json({ error: 'A real evidence object is required to clear a gate' });
+  }
+  const { evidence_type, source_ref = null, source_file = null, notes = null } = evidence;
+  if (!evidence_type || !source_ref) {
+    return res.status(400).json({ error: 'evidence.evidence_type and evidence.source_ref are required' });
+  }
+  // Status is treated as 'present' on success; an explicit best_effort status is rejected.
+  const status = evidence.status === undefined ? 'present' : String(evidence.status);
+  if (status === 'best_effort') {
+    return res.status(400).json({ error: 'best_effort evidence cannot clear a claim gate' });
+  }
+  if (status !== 'present') {
+    return res.status(400).json({ error: "evidence status must be 'present' to clear a gate" });
+  }
+  if (!GATE_CLEARING_EVIDENCE_TYPES.has(evidence_type)) {
+    return res.status(400).json({
+      error: `evidence_type '${evidence_type}' cannot clear a gate; must be one of: ${[...GATE_CLEARING_EVIDENCE_TYPES].join(', ')}`,
+    });
+  }
+
+  const existing = db
+    .prepare('SELECT * FROM claim_gates WHERE project_name = ? AND code = ?')
+    .get(projectName, code);
+  if (!existing) {
+    return res.status(404).json({ error: 'Claim gate not found' });
+  }
+
+  const resolvedAt = new Date().toISOString();
+  const tx = db.transaction(() => {
+    db.prepare(`INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+                VALUES (?, ?, ?, ?, ?, ?)`)
+      .run(projectName, evidence_type, source_file, source_ref, 'present', notes);
+    db.prepare(`UPDATE claim_gates
+                SET status = 'cleared', resolved_by = ?, resolved_at = ?, resolved_evidence_ref = ?
+                WHERE project_name = ? AND code = ?`)
+      .run(req.user.username, resolvedAt, source_ref, projectName, code);
+  });
+  tx();
+
+  res.status(200).json({
+    cleared: true,
+    code,
+    resolved_by: req.user.username,
+    resolved_at: resolvedAt,
+    resolved_evidence_ref: source_ref,
+  });
 });
 
 // Best-effort sprinkler auto-layout + auto-bid. Fail-closed: this NEVER clears

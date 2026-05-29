@@ -141,6 +141,11 @@ ensureColumn('pricebook', 'status', "TEXT DEFAULT 'vendor_pricebook'");
 db.exec('DROP INDEX IF EXISTS pricebook_supplier_sku_source_idx');
 db.exec('DROP INDEX IF EXISTS pricebook_supplier_sku_source_row_idx');
 
+// Claim-gate resolution provenance (who/what/when cleared a gate).
+ensureColumn('claim_gates', 'resolved_by', 'TEXT');
+ensureColumn('claim_gates', 'resolved_at', 'DATETIME');
+ensureColumn('claim_gates', 'resolved_evidence_ref', 'TEXT');
+
 const adminUser = process.env.HALOFIRE_ADMIN_USER || 'admin';
 const existingAdmin = db.prepare('SELECT id FROM users WHERE username = ?').get(adminUser);
 if (!existingAdmin) {
