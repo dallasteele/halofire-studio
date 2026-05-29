@@ -479,7 +479,7 @@ async function generate() {
     lastBody = currentBody();
     const importSrc = ['svg', 'building', 'dxf', 'building-dxf'].includes($('planSource').value);
     if (importSrc && !$('svgInput').value.trim()) { $('status').textContent = 'paste the drawing first'; return; }
-    const { bid, cadModel, hydraulics, hydraulicNetwork, compliance, isBuilding } = await api('/projects/' + encodeURIComponent(HOME_DEPOT) + '/sprinkler-bid', {
+    const { bid, cadModel, hydraulics, hydraulicNetwork, compliance, fullScopeBid, isBuilding } = await api('/projects/' + encodeURIComponent(HOME_DEPOT) + '/sprinkler-bid', {
       method: 'POST', body: JSON.stringify(lastBody),
     });
     renderModel(cadModel);
@@ -532,10 +532,23 @@ async function generate() {
       $('compliance').innerHTML = '<span class="est">compliance unavailable' + (compliance && compliance.error ? ': ' + compliance.error : '') + '</span>';
     }
     $('submitBtn').disabled = false;
+    let fsHtml = '';
+    if (fullScopeBid && !fullScopeBid.error) {
+      const cal = fullScopeBid.calibration;
+      fsHtml = `
+      <div class="kv" style="border-top:1px solid var(--border);margin-top:6px;padding-top:6px"><span>System components</span><b>${usd(fullScopeBid.systemComponentCost)}</b></div>
+      <div class="kv"><span>Soft costs (permit/design/freight)</span><b>${usd(fullScopeBid.softCostTotal)}</b></div>
+      <div class="kv"><span>Full-scope estimate</span><b class="total" style="font-size:14px">${usd(fullScopeBid.fullScopeTotal)}</b></div>
+      <div class="muted" style="font-size:10px">best-effort full scope — system components + soft costs are fallback/assumption estimates, NOT a quoted bid</div>`
+      + (cal ? `<div class="muted" style="font-size:10px;margin-top:4px">vs real bid-log ${usd(cal.referenceTotal)}: <b style="color:${Math.abs(cal.deltaPct) <= 25 ? 'var(--gold)' : 'var(--fire)'}">${cal.deltaPct > 0 ? '+' : ''}${cal.deltaPct}%</b> — ${cal.note}</div>` : '');
+    } else if (fullScopeBid && fullScopeBid.error) {
+      fsHtml = `<div class="est" style="font-size:10px">full-scope unavailable: ${fullScopeBid.error}</div>`;
+    }
     $('bid').innerHTML = `
-      <div class="kv"><span>Material</span><b>${usd(bid.pricing.materialCost)}</b></div>
+      <div class="kv"><span>Bare materials</span><b>${usd(bid.pricing.materialCost)}</b></div>
       <div class="kv"><span>Labor</span><b>${usd(bid.pricing.laborCost)}</b></div>
-      <div class="kv"><span>Best-effort total (+${bid.pricing.markupPct}%)</span><b class="total" style="font-size:14px">${usd(bid.pricing.total)}</b></div>`;
+      <div class="kv"><span>Bare-materials total (+${bid.pricing.markupPct}%)</span><b>${usd(bid.pricing.total)}</b></div>`
+      + fsHtml;
     $('bom').innerHTML = `<table><tr><th>Item</th><th>Qty</th><th>Cost</th><th>Total</th></tr>${
       bid.pricing.lines.map((l) => `<tr><td>${l.description.split('(')[0]}</td><td class="n">${l.quantity}</td><td class="n">${usd(l.unitCost)}</td><td class="n">${usd(l.lineTotal)}</td></tr>`).join('')}</table>`;
     $('warn').textContent = (bid.pricing.anyEstimated ? '⚠ some unit costs are fallback estimates. ' : '')

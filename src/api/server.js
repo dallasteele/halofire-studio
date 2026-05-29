@@ -17,6 +17,7 @@ import rateLimit from 'express-rate-limit';
 import 'dotenv/config';
 import { createLogger } from '../core/logger.js';
 import { generateSprinklerBid } from '../engine/sprinkler-layout.js';
+import { buildFullScopeBid } from '../engine/bid-scope.js';
 import { buildScene } from '../engine/geometry.js';
 import { buildResolverFromDb } from '../engine/pricebook-pricing.js';
 import { floorPlanFromSvg, floorPlanFromDxf, normalizeFloorPlan, buildingFromSvg, buildingFromDxf } from '../engine/floorplan-import.js';
@@ -50,6 +51,13 @@ const CORS_ORIGINS = (process.env.HALOFIRE_CORS_ORIGINS || 'http://localhost:300
   .split(',')
   .map((origin) => origin.trim())
   .filter(Boolean);
+
+// Real submitted ESI bid-log total for the Home Depot - Rexburg ID job
+// ('01-Bid Log.xlsx' -> sheet 'Bid Log', amount column, ~792543.8391569464
+// rounded to cents). Used ONLY as an INFORMATIONAL calibration reference for the
+// best-effort full-scope estimate on the built-in Home Depot project — it is
+// never an accuracy/parity claim and never clears a gate.
+const HOME_DEPOT_BID_LOG_TOTAL = 792543.84;
 
 if (!JWT_SECRET) {
   throw new Error('JWT_SECRET is required unless HALOFIRE_ALLOW_DEV_DEFAULTS=1 in local development');
@@ -721,7 +729,50 @@ function runSprinklerPipeline(req) {
     compliance = { error: e.message };
   }
 
-  return { projectName, floorPlan, building, bid, scene, cadModel, hydraulics, hydraulicNetwork, compliance };
+  // Best-effort FULL-SCOPE estimate: bare-materials priced bid + assumed system
+  // components + assumed soft costs. Every non-pricebook line stays flagged
+  // (fallback_estimate / soft_cost_assumption) and estimate:true rides along.
+  // This is NOT a complete/quoted bid and clears NO gate. Fail-closed: if the
+  // build throws we surface { error } rather than fabricating a number.
+  let fullScopeBid = null;
+  try {
+    fullScopeBid = buildFullScopeBid(bid.pricing, {
+      priceResolver: opts.priceResolver,
+      totalHeadCount: bid.totalHeadCount,
+      hazard,
+      // Required pressure from the single-path estimate (when it ran) lets the
+      // fire-pump conditional evaluate honestly. availablePressure is left
+      // undefined for generic projects so NO fire pump is fabricated.
+      requiredPressure: (hydraulics && !hydraulics.error) ? hydraulics.requiredPressurePsi : undefined,
+    });
+    // INFORMATIONAL calibration vs the real submitted Home Depot bid-log total.
+    // Built-in Home Depot project only; informational delta, not an accuracy or
+    // parity claim, and it never clears a gate.
+    if (projectName === HOME_DEPOT_PROJECT_NAME && typeof fullScopeBid.fullScopeTotal === 'number') {
+      const deltaUsd = round2(fullScopeBid.fullScopeTotal - HOME_DEPOT_BID_LOG_TOTAL);
+      const deltaPct = HOME_DEPOT_BID_LOG_TOTAL
+        ? round2((deltaUsd / HOME_DEPOT_BID_LOG_TOTAL) * 100)
+        : 0;
+      fullScopeBid.calibration = {
+        source: 'home-depot-bid-log',
+        referenceTotal: HOME_DEPOT_BID_LOG_TOTAL,
+        fullScopeTotal: fullScopeBid.fullScopeTotal,
+        deltaUsd,
+        deltaPct,
+        note: 'informational comparison only — not an accuracy or parity claim, '
+          + 'and it clears no regulated gate. The full-scope figure is a best-effort '
+          + 'estimate, not a complete or quoted bid.',
+      };
+    }
+  } catch (e) {
+    fullScopeBid = { error: e.message };
+  }
+
+  return { projectName, floorPlan, building, bid, scene, cadModel, hydraulics, hydraulicNetwork, compliance, fullScopeBid };
+}
+
+function round2(n) {
+  return Math.round((Number(n) || 0) * 100) / 100;
 }
 
 // Best-effort sprinkler auto-layout + auto-bid + hydraulic network balance +
@@ -730,8 +781,8 @@ app.post('/api/projects/:name/sprinkler-bid', authMiddleware, (req, res) => {
   try {
     const out = runSprinklerPipeline(req);
     if (out.httpError) return res.status(out.httpError.status).json({ error: out.httpError.error });
-    const { bid, scene, cadModel, hydraulics, hydraulicNetwork, compliance, building } = out;
-    res.json({ bid, scene, cadModel, hydraulics, hydraulicNetwork, compliance, isBuilding: !!building });
+    const { bid, scene, cadModel, hydraulics, hydraulicNetwork, compliance, fullScopeBid, building } = out;
+    res.json({ bid, scene, cadModel, hydraulics, hydraulicNetwork, compliance, fullScopeBid, isBuilding: !!building });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
