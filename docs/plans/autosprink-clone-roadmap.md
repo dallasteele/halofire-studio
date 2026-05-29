@@ -77,6 +77,41 @@ Geometry MUST be built on OpenGeometry (npm `opengeometry`). Keep the 68+ tests 
       STEP = 6,805,478 bytes from 1950 entities, no regression. Browser-verified.
 - [ ] **T9 — Consolidate surfaces.** Retire/replace legacy static app.html; route
       all UI through workbench + studio. Remove dead code.
+
+## ACCURATE BUILDING epic (user priority): real buildings from drawings + full systems
+Current gap: import treats each polygon as ONE room and grids its bounding box;
+the "building" is just an extruded perimeter wall + flat slab. Real drawings have
+interior walls, multiple spaces, doors/windows, and columns; the system must
+cover EVERY space with a proper building-wide network. Build that.
+
+- [ ] **T11 — Building model + multi-space drawing parser.** New
+      `src/engine/building-model.js`: a building schema
+      `{ name, units, stories:[{ level, baseElevationFt, ceilingHeightFt, spaces:[{name,polygon,hazard}], walls:[{a,b,thicknessFt,type:'exterior'|'interior',openings:[{offsetFt,widthFt,heightFt,sill?,type:'door'|'window'}]}], columns:[{x,y,sizeFt}] }] }`
+      + `normalizeBuilding(spec)`. Extend floorplan-import.js with
+      `buildingFromDxf(text,opts)` / `buildingFromSvg(text,opts)` that extract
+      walls (LINE/LWPOLYLINE on a WALLS layer → segments w/ thickness+type),
+      spaces (closed room polygons / labeled regions), doors+windows (DOOR/WINDOW
+      layers or SVG attrs → wall openings), and columns (COLUMN layer / circles).
+      Layer/attr-convention based, best-effort (NOT CAD recognition AI). Backward
+      compat: a single-polygon input still yields one space. Deterministic; tests.
+- [ ] **T12 — Full per-space sprinkler system.** New `src/engine/system-layout.js`:
+      `layoutBuilding(building)` lays out EACH space independently (reuse
+      layoutRoom per space polygon, clipped to that space, column-aware: drop/shift
+      heads that collide with columns), then builds a building-wide network — a feed
+      main, per-space cross-mains/branch lines, drops, heads — so coverage fills all
+      spaces. Returns per-space + whole-building head counts, pipe schedule, and a
+      `coverageOk` flag (every space has heads). Deterministic; hand-checked tests.
+- [ ] **T13 — Accurate building CAD model.** Extend `buildCadModel` to consume a
+      building: emit interior + exterior wall solids (carry opening metadata
+      {offsetFt,widthFt,heightFt,sill,type} so the viewer can cut them), column
+      solids, per-space pipe networks, multi-story stacking. counts include
+      spaces/walls/columns/openings. Backward compat with floorPlan.rooms/floors
+      preserved. dxf-export emits walls/columns/openings on layers. Tests.
+- [ ] **T14 — Studio: render accurate building + full system (BROWSER).** Studio
+      renders interior+exterior walls, door/window openings cut via OpenGeometry
+      boolean subtract (Opening/booleanSubtraction), columns, and the full per-space
+      system; per-space breakdown in the panel. Done by main session w/ preview
+      screenshots (workflow agents can't verify 3D).
 - [x] **T10 — Deploy packaging + review packet refresh.** DONE 2026-05-29.
       New truthful packet docs/reviews/2026-05-29-autosprink-clone-review.md
       (what works w/ file cites, exact test count, explicit "still NOT done /
