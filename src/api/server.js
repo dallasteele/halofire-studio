@@ -23,6 +23,8 @@ import { floorPlanFromSvg, normalizeFloorPlan, buildingFromSvg } from '../engine
 import { buildCadModel } from '../engine/cad-model.js';
 import { toDxf } from '../engine/dxf-export.js';
 import { requiredPressureAtRiser, flagSchedule, remoteAreaDemand } from '../engine/hydraulics.js';
+import { buildParityMatrix, parityAchieved } from '../engine/parity-matrix.js';
+import { AUTOSPRINK_PARITY_GATE, buildParityInventory, parityGateStatus } from '../components/registry.js';
 import { homeDepotRexburgFloorPlan } from '../data/floorplans.js';
 import { HOME_DEPOT_PROJECT_NAME } from '../data/evidence-gates.js';
 
@@ -773,6 +775,53 @@ app.get('/api/settings/dependencies', authMiddleware, (req, res) => {
     openscad_installed: openscadInstalled(),
     sam_gateway: 'unknown', // GX10 'sam3' via OpenClaw bridge — status not probed here.
     autosprink_reference: hasSamRef ? 'linked' : 'missing',
+  });
+});
+
+// ── Parity matrix + fail-closed AUTOSPRINK_PARITY gate status (P6) ──
+// Reports FUNCTIONAL feature-area coverage only. The AHJ/PE/manufacturer-exact
+// rows are GATED: they require real-world evidence and are never auto-present.
+// HONESTY/fail-closed: this surface NEVER flips the AUTOSPRINK_PARITY gate. The
+// gate is derived from an EMPTY component inventory (no manufacturer-exact models
+// proven here), so it stays 'blocked', and parityAchieved stays false.
+app.get('/api/parity', authMiddleware, (req, res) => {
+  // The deterministic engine modules below all exist and emit output, so their
+  // functional areas are PRESENT. PDF drawing import is still deferred, so the
+  // gated rows (AHJ/PE/manufacturer-exact) carry NO real evidence here.
+  const state = {
+    drawingImport: true,
+    buildingModeling: true,
+    headLayout: true,
+    scheduleSizing: true,
+    hydraulicNetwork: true,
+    nfpaCompliance: true,
+    supports: true,
+    componentLibrary: true,
+    submittal: true,
+    cadExport: true,
+    bidBom: true,
+    evidenceSettings: true,
+    // GATED: no real AHJ/PE/manufacturer evidence is asserted by this surface.
+    ahjEvidence: false,
+    peEvidence: false,
+    manufacturerEvidence: false,
+  };
+  const matrix = buildParityMatrix(state);
+  // Component model inventory is empty here -> no manufacturer-exact models ->
+  // the AUTOSPRINK_PARITY gate is fail-closed BLOCKED.
+  const inventory = buildParityInventory({});
+  const gateStatus = parityGateStatus(inventory);
+  res.json({
+    matrix,
+    parityAchieved: parityAchieved(matrix, { generatedOnly: false, inventory }),
+    gate: {
+      code: AUTOSPRINK_PARITY_GATE.code,
+      severity: AUTOSPRINK_PARITY_GATE.severity,
+      status: gateStatus, // always 'blocked' from an empty inventory (fail-closed)
+      blockedClaims: AUTOSPRINK_PARITY_GATE.blockedClaims,
+      reason: AUTOSPRINK_PARITY_GATE.reason,
+    },
+    disclaimer: matrix.disclaimer,
   });
 });
 
