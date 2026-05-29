@@ -171,6 +171,61 @@ bridge (best-effort, graceful skip). Parity claim stays BLOCKED until complete.
       uploads/links + component browser + render catalog/generated models in the 3D
       layout. Main session w/ preview screenshots.
 
+## AUTOSPRINK PARITY epic (the goal): close functional gaps to AutoSprink feature parity
+HONESTY CONTRACT: "parity" is tracked, not asserted. The `AUTOSPRINK_PARITY_INCOMPLETE`
+gate (registry.js) stays BLOCKED until every parity-matrix row is genuinely PRESENT
+*and* the regulated/manufacturer rows have real evidence (manufacturer-exact catalog
+models + licensed PE/AHJ review, user-supplied via Settings/T19). The P-tasks below
+build the FUNCTIONAL engine parity we can build honestly; they NEVER flip the gate or
+claim AutoSprink/AutoCAD parity, AHJ/permit/PE/manufacturer/fabrication readiness.
+
+### Parity matrix (AutoSprink feature area -> HaloFire status)
+- Drawing import (DXF/SVG) — PRESENT (T4/T11); PDF import — MISSING (deferred)
+- Building + multi-space modeling, walls/openings/columns — PRESENT (T11-T14)
+- Head layout (NFPA-13 spacing, hazard) — PRESENT (sprinkler-layout)
+- Pipe routing + schedule sizing — PRESENT; demand-balanced hydraulic sizing — PARTIAL (single-path est, T2)
+- Full hydraulic network balance (K-factor Q=K√P, node pressures, system demand) — MISSING -> P1
+- NFPA-13 compliance checker (spacing/coverage/area/density/obstruction/branch limits) — MISSING -> P2
+- Hanger / seismic support placement + schedule — MISSING -> P3
+- Component CAD model library (per-component models) — SCAFFOLD only (T15/16/17); generated models — MISSING -> P4; manufacturer-exact catalog models — GATED (user/Settings)
+- Submittal package (head/pipe schedules, hydraulic summary, BOM) + PDF report — MISSING -> P5
+- Parity matrix + status surface + gate wiring — MISSING -> P6
+- 3D model + CAD export (DXF/STEP/IFC/STL) — PRESENT (T1/T8/T13)
+- Bid / takeoff / BOM / full scope — PRESENT (T3)
+- Evidence gates + resolve workflow + Settings doc upload — PRESENT (T5/T19)
+- AHJ/PE stamp, manufacturer approval — GATED by design (real-world evidence only)
+
+- [ ] **P1 — Full hydraulic network balance.** Extend `src/engine/hydraulics.js` (or new
+      module): K-factor head discharge (Q=K√P), per-node flow accumulation riser->main->
+      branch->head over the remote design area, node pressures (friction + elevation +
+      velocity), total system demand (gpm @ psi) at the source. Best-effort engineering
+      estimate, NOT a sealed calc. Hand-computed vitest cases. Surface in studio Hydraulics panel.
+- [ ] **P2 — NFPA-13 compliance checker.** `src/engine/nfpa-compliance.js`: check a
+      layout/building against public NFPA-13 rules (max coverage area & spacing & min
+      spacing & max-to-wall by hazard, max heads per branch/system, obstruction note) ->
+      pass/fail findings list. Deterministic; tests. Surface as a compliance panel + a
+      COMPLIANCE_REVIEW gate note (still requires PE sign-off; never auto-clears).
+- [ ] **P3 — Hanger + seismic support placement.** `src/engine/supports.js`: place hangers
+      along pipes at NFPA-13 max spacing (size-dependent) + seismic brace intervals -> support
+      solids + counts feeding the BOM/takeoff. Tests. Render in studio + add to cad-model.
+- [ ] **P4 — Generate component models -> populate parity inventory.** Pipeline that runs the
+      T17 OpenSCAD generators for every registry component to produce a model (and renders STL
+      where the openscad binary exists, e.g. VPS), marking each 'generated' in
+      buildParityInventory. Generated != manufacturer-exact, so the PARITY gate stays blocked
+      on catalog+PE evidence; this raises functional coverage + drives the BOM model refs. Tests.
+- [ ] **P5 — Submittal package + PDF report.** `src/engine/submittal.js`: assemble a submittal
+      package (project header, head schedule, pipe schedule, hydraulic summary, BOM, gate
+      status) as structured data + drive OpenClaw generate_pdf_report via an injected invoker
+      (graceful skip). Labelled best-effort, NOT a stamped submittal. Tests on package shape.
+- [ ] **P6 — Parity matrix module + status API + gate wiring.** `src/engine/parity-matrix.js`:
+      compute the matrix above from actual module/inventory state -> {area,status,evidence}.
+      `GET /api/parity` returns it + AUTOSPRINK_PARITY gate (blocked until all required areas
+      PRESENT with real evidence). Tests prove the gate stays blocked while any area is missing
+      and that generated-only component models do NOT satisfy the manufacturer/PE rows.
+- [ ] **P7 — Parity + component-library + compliance UI (BROWSER).** Studio/Settings surface:
+      parity matrix, component library (source/status per component), compliance findings,
+      hydraulic summary, submittal download. Main session w/ preview verification.
+
 ## Log
 - 2026-05-29: T19 Settings + documentation upload/link API shipped — new tests/settings-documents.test.js (7 spawned-server tests) + routes in src/api/server.js + a settings_documents table mirrored into BOTH server.js initDatabase and seed.js (CREATE TABLE + defensive ensureColumn for mode/url/filename/notes/evidence_id/created_by). REQUIRED_DOC_SLOTS = [catalogs, manufacturer_cut_sheets, ahj_approval, autosprink_reference, openscad_binary, pricebook_updates]; a slot reads 'missing' (satisfied:false) until a link/upload row exists. GET /api/settings/documents (authMiddleware) lists every slot + status (latest row attached). POST /api/settings/documents (authMiddleware + requireRole('admin')) body {doc_type, mode:'link'|'upload', url?, filename?, notes}: validates doc_type against the slot list (400 unknown), mode link requires url / upload requires filename (400 otherwise), rejects unsupported fields (400). On success a single transaction inserts a PRESENT project_evidence row (project_name 'HaloFire Library', evidence_type=doc_type, source_ref=url|filename) so the link/upload can satisfy resolve-gate evidence, then the settings_documents row referencing it; returns {id, evidence_id, status:'satisfied'}. GET /api/settings/dependencies (authMiddleware) reports {openscad_installed:boolean (best-effort spawnSync 'openscad --version' detection, never throws), sam_gateway:'unknown' (GX10 sam3 via OpenClaw bridge, not probed here), autosprink_reference:'linked'|'missing' (from settings_documents)}. HONESTY/fail-closed: a catalog/cut-sheet link is recorded as evidence but NEVER auto-clears a regulated claim gate — AHJ/PE/AutoSprink parity gates still require their specific approved evidence via the T5 resolve route (test proves an AUTOSPRINK_EVIDENCE_MISSING gate stays 'blocked' after a catalog upload). Also added a vitest.config.js with fileParallelism:false (several suites spawn a real server on its own port; running them in parallel oversubscribed the machine and caused intermittent 401/429/timeout — serial spawned-server execution is deterministic, full suite ~16s) and raised the API/login rate-limit ceilings only when NODE_ENV=test (production limits 100/10 unchanged) so repeated logins in the spawned-server suites don't 429. Tests cover: 401 without auth, all 6 slots missing initially, non-admin POST -> 403, admin link -> 200 + slot satisfied + a present project_evidence row exists, unknown doc_type / link-without-url -> 400, catalog upload does NOT clear a blocking gate, dependencies returns an openscad_installed boolean + sam_gateway + autosprink_reference. Full suite 25 files / 226 tests green (was 24/219). Backward compat preserved (existing suites unchanged; pre-existing parallel flakiness in the other spawned-server suites also resolved by the config). NOT AutoSprink/AutoCAD/manufacturer parity, NOT AHJ/PE approved — uploading a doc is evidence only; the AUTOSPRINK_PARITY gate stays fail-closed BLOCKED until the inventory is genuinely complete with real evidence. Next: T20 Settings UI + component-library browser (browser).
 - 2026-05-29: T18 SAM 3.1 reconstruction adapter shipped — new src/components/sam-reconstruct.js + tests/sam-reconstruct.test.js (10 tests). buildSamReconstructPayload(component, imageRef) returns a DETERMINISTIC plain-object request for the GX10 SAM 3.1 service: { service:'sam-3.1', op:'reconstruct', componentKey (from a component object's key or a bare string key), imageRef, outputFormat:'stl' } — component key + image ref + desired output mesh format always present, same inputs -> identical object. async reconstructComponentModel(component, imageRef, {invoker}) builds that payload and calls the INJECTED async invoker(payload) (production wires the OpenClaw bridge / hal_sam_status — SAM 3.1 is external on GX10, never called directly here). On success returns { ok:true, source:'generated_sam', model, label:'best-effort SAM 3.1 reconstruction — NOT manufacturer-exact' } (raw or {mesh,format} returns both accepted as the model). HONESTY/fail-closed: if the invoker is absent / not a function (no bridge wired) OR throws (GX10/gateway down) OR yields an empty mesh, returns { ok:false, skipped:true, reason } WITHOUT throwing — success is never fabricated, a missing model stays missing for the parity inventory. Browser-free, no process/binary spawned in engine code. Tests cover: payload shape (key + image ref + format present), determinism, bare-string component; reconstructComponentModel ok + best-effort label with a mock invoker, raw-string model accepted, and ok:false skipped:true (no throw) for absent invoker / omitted opts / non-function invoker / throwing invoker / empty model. Full suite 24 files / 219 tests green (was 23/209). Backward compat preserved (no existing file touched; new src/components/sam-reconstruct.js). NOT AutoSprink/AutoCAD/manufacturer parity, NOT AHJ/PE approved — SAM-reconstructed models are best-effort and the AUTOSPRINK_PARITY gate stays fail-closed BLOCKED until the inventory is genuinely complete with real evidence. Next: T19 settings + documentation upload/link API.
