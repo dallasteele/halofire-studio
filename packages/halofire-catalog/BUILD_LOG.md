@@ -1,5 +1,11 @@
 # BUILD_LOG
 
+## 2026-05-29T03:05Z
+
+- Rechecked the Stream F catalog/model owner surface against the live public step.parts, Tyco LFII HSW, and Victaulic FL-QR/SW pages before making any source edits. The checked-in package already carries the requested typed source licensing, model-status tiers, GLB/IFC/DXF family contracts, distributor/source ingestion, source-research ledger, coverage ledger, and correction workflow surface.
+- Kept the open-source STEP candidate boundary explicit: `step.parts` remains a proxy/candidate-only source with third-party notice tracking, and no manufacturer_verified or sealed_approved promotion moved in this pass.
+- No schema or ledger regeneration was necessary for this slice because the current contracts already satisfy the best-effort catalog/model pipeline request. The only remaining blocker is still approval depth: stronger manufacturer-backed or sealed evidence is required before any higher-tier promotion.
+
 ## 2026-05-29T01:42Z
 
 - Refreshed the Stream F source research and source coverage ledgers from the checked-in seeds against the current live-backed evidence set, then regenerated `source_coverage_ledger.json` and `THIRD_PARTY_NOTICES.md` with the current step.parts verification date.
