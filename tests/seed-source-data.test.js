@@ -6,6 +6,7 @@ import path from 'node:path';
 import Database from 'better-sqlite3';
 
 import { readBidLogRows } from '../src/data/bid-log-importer.js';
+import { readPricebooks } from '../src/data/pricebook-importer.js';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
 
@@ -31,6 +32,7 @@ describe('database seed source data', () => {
     const bids = db.prepare('SELECT project, value, notes FROM bids ORDER BY id').all();
     const projects = db.prepare('SELECT name, notes FROM projects ORDER BY id').all();
     const compliance = db.prepare('SELECT project_name, notes FROM compliance ORDER BY id').all();
+    const pricebook = db.prepare('SELECT supplier, sku, item, price, source_file, source_sheet, source_row FROM pricebook ORDER BY id').all();
     db.close();
     fs.rmSync(tempDir, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
 
@@ -47,5 +49,15 @@ describe('database seed source data', () => {
     expect(projects[0].name).toBe('Home Depot - Rexburg ID');
     expect(compliance).toHaveLength(1);
     expect(compliance[0].project_name).toBe('Home Depot - Rexburg ID');
+
+    const expectedPricebookRows = readPricebooks(ROOT);
+    expect(pricebook).toHaveLength(expectedPricebookRows.length);
+    expect(pricebook.find((item) => item.supplier === 'ARGCO' && item.sku === '7010802')).toMatchObject({
+      item: 'Grooved Coupling PUSH-ON Rigid 1-1/4" (109)',
+      price: 3.56,
+      source_file: 'Halo FIre Pricebook ARGCO 2026.xlsx',
+      source_sheet: 'ARGCOPricebookTravisResults',
+      source_row: 7,
+    });
   });
 });

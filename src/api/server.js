@@ -105,6 +105,11 @@ function initDatabase() {
       unit TEXT DEFAULT 'EA',
       category TEXT,
       sku TEXT,
+      source_file TEXT,
+      source_sheet TEXT,
+      source_row INTEGER,
+      confidence REAL DEFAULT 1,
+      status TEXT DEFAULT 'vendor_pricebook',
       last_updated TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
@@ -150,6 +155,21 @@ function initDatabase() {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
   `);
+
+  function ensureColumn(table, column, definition) {
+    const columns = db.prepare(`PRAGMA table_info(${table})`).all().map((row) => row.name);
+    if (!columns.includes(column)) {
+      db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
+    }
+  }
+
+  ensureColumn('pricebook', 'source_file', 'TEXT');
+  ensureColumn('pricebook', 'source_sheet', 'TEXT');
+  ensureColumn('pricebook', 'source_row', 'INTEGER');
+  ensureColumn('pricebook', 'confidence', 'REAL DEFAULT 1');
+  ensureColumn('pricebook', 'status', "TEXT DEFAULT 'vendor_pricebook'");
+  db.exec('DROP INDEX IF EXISTS pricebook_supplier_sku_source_idx');
+  db.exec('DROP INDEX IF EXISTS pricebook_supplier_sku_source_row_idx');
 
   // Bootstrap the configured admin user without hardcoded credentials.
   const existing = db.prepare('SELECT id FROM users WHERE username = ?').get(ADMIN_USERNAME);
@@ -309,9 +329,29 @@ app.get('/api/pricebook', authMiddleware, (req, res) => {
 
 app.post('/api/pricebook/bulk', authMiddleware, requireRole('admin'), (req, res) => {
   const { items } = req.body;
-  const insert = db.prepare('INSERT OR REPLACE INTO pricebook (item, supplier, price, unit, category, sku, last_updated) VALUES (?,?,?,?,?,?,?)');
+  const insert = db.prepare(`
+    INSERT OR REPLACE INTO pricebook
+      (item, supplier, price, unit, category, sku, source_file, source_sheet, source_row, confidence, status, last_updated)
+    VALUES
+      (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `);
   const tx = db.transaction((items) => {
-    for (const i of items) insert.run(i.item, i.supplier, i.price, i.unit, i.category, i.sku, i.last_updated || new Date().toISOString().slice(0, 10));
+    for (const i of items) {
+      insert.run(
+        i.item || i.description,
+        i.supplier,
+        i.price,
+        i.unit || 'EA',
+        i.category || i.supplier,
+        i.sku,
+        i.source_file || null,
+        i.source_sheet || null,
+        i.source_row || null,
+        i.confidence ?? 1,
+        i.status || 'vendor_pricebook',
+        i.last_updated || new Date().toISOString().slice(0, 10),
+      );
+    }
   });
   tx(items);
   res.json({ imported: items.length });

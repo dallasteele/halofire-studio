@@ -10,6 +10,7 @@ import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { buildHomeDepotSeedRows } from '../data/home-depot-bid-package.js';
 import { readBidLogRows } from '../data/bid-log-importer.js';
+import { readPricebooks } from '../data/pricebook-importer.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DB_PATH = process.env.HALOFIRE_DB_PATH
@@ -77,6 +78,11 @@ db.exec(`
     unit TEXT DEFAULT 'EA',
     category TEXT,
     sku TEXT,
+    source_file TEXT,
+    source_sheet TEXT,
+    source_row INTEGER,
+    confidence REAL DEFAULT 1,
+    status TEXT DEFAULT 'vendor_pricebook',
     last_updated TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
@@ -93,6 +99,21 @@ db.exec(`
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 `);
+
+function ensureColumn(table, column, definition) {
+  const columns = db.prepare(`PRAGMA table_info(${table})`).all().map((row) => row.name);
+  if (!columns.includes(column)) {
+    db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
+  }
+}
+
+ensureColumn('pricebook', 'source_file', 'TEXT');
+ensureColumn('pricebook', 'source_sheet', 'TEXT');
+ensureColumn('pricebook', 'source_row', 'INTEGER');
+ensureColumn('pricebook', 'confidence', 'REAL DEFAULT 1');
+ensureColumn('pricebook', 'status', "TEXT DEFAULT 'vendor_pricebook'");
+db.exec('DROP INDEX IF EXISTS pricebook_supplier_sku_source_idx');
+db.exec('DROP INDEX IF EXISTS pricebook_supplier_sku_source_row_idx');
 
 const adminUser = process.env.HALOFIRE_ADMIN_USER || 'admin';
 const existingAdmin = db.prepare('SELECT id FROM users WHERE username = ?').get(adminUser);
@@ -195,25 +216,33 @@ insertProject.run(
 );
 console.log('[seed] Inserted 1 sourced project');
 
-const priceItems = [
-  { item: '1 in CPVC Pipe (10ft)', supplier: 'ARGCO', price: 12.45, unit: 'LF', category: 'Pipe' },
-  { item: '1-1/4 in CPVC Pipe (10ft)', supplier: 'ARGCO', price: 15.8, unit: 'LF', category: 'Pipe' },
-  { item: '2 in Sch 40 Black Steel (21ft)', supplier: 'ARGCO', price: 38.9, unit: 'LF', category: 'Pipe' },
-  { item: '2 in Grooved Tee', supplier: 'ARGCO', price: 18.5, unit: 'EA', category: 'Fittings' },
-  { item: '1 in Viking Pendent Head (155F)', supplier: 'FFF', price: 8.75, unit: 'EA', category: 'Heads' },
-  { item: '4 in Alarm Check Valve', supplier: 'FFF', price: 1250, unit: 'EA', category: 'Valves' },
-  { item: '2 in Victaulic Style 77 Coupling', supplier: 'Victaulic', price: 24.3, unit: 'EA', category: 'Fittings' },
-  { item: 'Victaulic Style 607 Valve 4 in', supplier: 'Victaulic', price: 485, unit: 'EA', category: 'Valves' },
-];
-
 db.prepare('DELETE FROM pricebook').run();
-const insertPrice = db.prepare('INSERT INTO pricebook (item, supplier, price, unit, category, last_updated) VALUES (?,?,?,?,?,?)');
+const priceItems = readPricebooks(PROJECT_ROOT);
+const insertPrice = db.prepare(`
+  INSERT INTO pricebook
+    (item, supplier, price, unit, category, sku, source_file, source_sheet, source_row, confidence, status, last_updated)
+  VALUES
+    (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+`);
 db.transaction((rows) => {
   for (const item of rows) {
-    insertPrice.run(item.item, item.supplier, item.price, item.unit, item.category, '2026-01-15');
+    insertPrice.run(
+      item.description,
+      item.supplier,
+      item.price,
+      'EA',
+      item.supplier,
+      item.sku,
+      item.source_file,
+      item.source_sheet,
+      item.source_row,
+      1,
+      'vendor_pricebook',
+      '2026-01-15',
+    );
   }
 })(priceItems);
-console.log(`[seed] Inserted ${priceItems.length} placeholder pricebook items pending real importer seeding`);
+console.log(`[seed] Inserted ${priceItems.length} sourced pricebook items`);
 
 const insertCompliance = db.prepare('INSERT INTO compliance (project_name, type, due_date, status, authority, notes) VALUES (?,?,?,?,?,?)');
 insertCompliance.run(
