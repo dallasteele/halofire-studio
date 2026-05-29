@@ -9,6 +9,7 @@
     "dev:api": "nodemon --experimental-specifier-resolution=node src/api/server.js",
     "dev:ui": "vite --config vite.config.js",
     "build": "vite build",
+    "build:parts": "node scripts/build-parts.mjs",
     "start": "node src/api/server.js",
     "cron": "node src/cron/scheduler.js",
     "skill:list": "node src/core/skill-runner.js --list",

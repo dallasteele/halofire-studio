@@ -25,6 +25,7 @@ import { toDxf } from '../engine/dxf-export.js';
 import { requiredPressureAtRiser, flagSchedule, remoteAreaDemand } from '../engine/hydraulics.js';
 import { buildParityMatrix, parityAchieved } from '../engine/parity-matrix.js';
 import { AUTOSPRINK_PARITY_GATE, buildParityInventory, parityGateStatus } from '../components/registry.js';
+import { buildPartManifest } from '../components/part-mesh.js';
 import { balanceNetwork } from '../engine/hydraulic-network.js';
 import { checkCompliance } from '../engine/nfpa-compliance.js';
 import { buildSubmittal, renderSubmittalPdf } from '../engine/submittal.js';
@@ -907,6 +908,64 @@ app.get('/api/parity', authMiddleware, (req, res) => {
       reason: AUTOSPRINK_PARITY_GATE.reason,
     },
     disclaimer: matrix.disclaimer,
+  });
+});
+
+// ── Part-mesh manifest (R2) ──
+// Serves the prebuilt parts/parts-manifest.json when present (written by
+// `npm run build:parts`), else computes a LIVE all-from-registry manifest with
+// no runner (every part 'missing'). The parts/<key>.stl files themselves are
+// reachable via the repo-root static mount (line ~278), so no extra static
+// route is needed.
+// HONESTY/fail-closed: generated meshes are best-effort, NOT manufacturer-exact;
+// manufacturerExactCount is always 0 and the AUTOSPRINK_PARITY gate stays
+// 'blocked'. No STL is ever fabricated for a part without a real mesh.
+const PARTS_MANIFEST_PATH = path.resolve(__dirname, '../../parts/parts-manifest.json');
+const PARTS_DISCLAIMER =
+  'Generated part meshes are best-effort parametric massing — NOT ' +
+  'manufacturer-exact and conferring NO AutoSprink/AutoCAD/AHJ/PE approval. ' +
+  'The AUTOSPRINK_PARITY gate stays BLOCKED.';
+
+// A part is manufacturer-exact ONLY if it comes from a real licensed
+// catalog/manufacturer source. Generated/missing parts (and any tampered
+// on-disk manifest entry) are coerced to manufacturerExact:false here so the
+// served manifest can never leak a false manufacturer-exact claim.
+const REAL_PART_SOURCES = new Set(['catalog', 'manufacturer']);
+function sanitizePartEntry(entry) {
+  const e = entry && typeof entry === 'object' ? entry : {};
+  const source = typeof e.source === 'string' ? e.source : 'missing';
+  return { ...e, source, manufacturerExact: REAL_PART_SOURCES.has(source) && e.manufacturerExact === true };
+}
+
+app.get('/api/parts', authMiddleware, async (req, res) => {
+  // Prefer a prebuilt on-disk manifest.
+  try {
+    if (fs.existsSync(PARTS_MANIFEST_PATH)) {
+      const raw = JSON.parse(fs.readFileSync(PARTS_MANIFEST_PATH, 'utf8'));
+      const components = (Array.isArray(raw.components) ? raw.components : []).map(sanitizePartEntry);
+      return res.json({
+        components,
+        generatedCount: raw.generatedCount ?? 0,
+        missingCount: raw.missingCount ?? 0,
+        // Derived from sanitized entries (still never clears the gate below).
+        manufacturerExactCount: components.filter((c) => c.manufacturerExact === true).length,
+        parityGateStatus: 'blocked', // fail-closed: found/generated parts never clear parity
+        disclaimer: raw.disclaimer || PARTS_DISCLAIMER,
+      });
+    }
+  } catch (err) {
+    log.warn(`parts manifest read failed: ${err.message}`);
+  }
+
+  // No prebuilt manifest -> live registry view with no runner (all 'missing').
+  const manifest = await buildPartManifest({});
+  res.json({
+    components: manifest.components,
+    generatedCount: manifest.generatedCount,
+    missingCount: manifest.missingCount,
+    manufacturerExactCount: 0,
+    parityGateStatus: 'blocked',
+    disclaimer: PARTS_DISCLAIMER,
   });
 });
 

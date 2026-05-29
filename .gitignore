@@ -9,6 +9,10 @@ data/locks/
 dist/
 coverage/
 *.log
+# Generated part meshes (R1 build:parts). STL binaries are build artifacts and
+# are never committed; the small parts-manifest.json build record is allowed.
+parts/*.stl
+!parts/parts-manifest.json
 # Local-only preview helpers (may contain dev credentials)
 scripts/preview-server.js
 .claude/
