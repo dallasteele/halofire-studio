@@ -128,6 +128,7 @@ interface EvidenceLedgerRow {
   rejected_candidate_summary?: string
   current_candidate_count?: number
   usable_evidence_count?: number
+  ai_fallback?: string
   blocked_claims?: string[]
   blocked_claim_gates?: string[]
   claims_blocked?: string[]
@@ -1285,6 +1286,8 @@ function PortalEvidencePanel({
     </ul>
   )
 
+  const renderJoined = (items?: string[] | null) => (items ?? []).join('; ') || 'n/a'
+
   const renderLedgerRow = (row: EvidenceLedgerRow, index: number) => {
     const rejectedCandidates = row.rejected_candidates ?? []
     const rejectedReasons = row.rejected_candidate_reasons ?? []
@@ -1310,31 +1313,87 @@ function PortalEvidencePanel({
           </p>
           <p>
             <span className="text-neutral-500">Acceptable formats:</span>{' '}
-            {(row.acceptable_evidence_formats ?? []).join('; ') || 'n/a'}
+            {renderJoined(row.acceptable_evidence_formats)}
+          </p>
+          <p>
+            <span className="text-neutral-500">Acceptable evidence:</span>{' '}
+            {renderJoined(row.acceptable_evidence)}
           </p>
           <p>
             <span className="text-neutral-500">Required fields:</span>{' '}
-            {(row.required_fields ?? []).join('; ') || 'n/a'}
+            {renderJoined(row.required_fields)}
           </p>
           <p>
             <span className="text-neutral-500">Who can satisfy:</span>{' '}
-            {(row.who_can_satisfy ?? row.satisfying_roles ?? []).join('; ') || 'n/a'}
+            {renderJoined(row.who_can_satisfy ?? row.satisfying_roles)}
+          </p>
+          <p>
+            <span className="text-neutral-500">Satisfying roles:</span>{' '}
+            {renderJoined(row.satisfying_roles)}
+          </p>
+          <p>
+            <span className="text-neutral-500">Role authority:</span>{' '}
+            {renderJoined(row.role_authority)}
           </p>
           <p>
             <span className="text-neutral-500">Scanned paths:</span>{' '}
-            {(row.scanned_paths ?? []).join('; ') || 'n/a'}
+            {renderJoined(row.scanned_paths)}
+          </p>
+          <p>
+            <span className="text-neutral-500">Scanned source refs:</span>{' '}
+            {renderJoined(row.scanned_source_refs)}
           </p>
           <p>
             <span className="text-neutral-500">Claims blocked:</span>{' '}
-            {(row.blocked_claims ?? row.claims_blocked ?? []).join('; ') || 'n/a'}
+            {renderJoined(row.blocked_claims ?? row.claims_blocked)}
+          </p>
+          <p>
+            <span className="text-neutral-500">Blocked claims:</span>{' '}
+            {renderJoined(row.blocked_claims)}
+          </p>
+          <p>
+            <span className="text-neutral-500">Blocked claim gates:</span>{' '}
+            {renderJoined(row.blocked_claim_gates)}
           </p>
           <p>
             <span className="text-neutral-500">Next action:</span>{' '}
             {row.next_action ?? row.next_collection_action ?? 'n/a'}
           </p>
           <p>
+            <span className="text-neutral-500">Next collection action:</span>{' '}
+            {row.next_collection_action ?? 'n/a'}
+          </p>
+          <p>
+            <span className="text-neutral-500">AI fallback:</span>{' '}
+            {row.ai_fallback ?? 'n/a'}
+          </p>
+          <p>
             <span className="text-neutral-500">Signature metadata:</span>{' '}
             {JSON.stringify(row.signature_metadata ?? {})}
+          </p>
+          <p>
+            <span className="text-neutral-500">Rejected candidate summary:</span>{' '}
+            {row.rejected_candidate_summary ?? 'n/a'}
+          </p>
+          <p>
+            <span className="text-neutral-500">Rejected candidate count:</span>{' '}
+            {row.rejected_candidates?.length ?? row.rejected_candidate_refs?.length ?? 0}
+          </p>
+          <p>
+            <span className="text-neutral-500">Rejected candidate refs:</span>{' '}
+            {renderJoined(row.rejected_candidate_refs)}
+          </p>
+          <p>
+            <span className="text-neutral-500">Rejected candidate reasons:</span>{' '}
+            {renderJoined(row.rejected_candidate_reasons)}
+          </p>
+          <p>
+            <span className="text-neutral-500">Rejected candidate source refs:</span>{' '}
+            {renderJoined(row.rejected_candidate_source_refs)}
+          </p>
+          <p>
+            <span className="text-neutral-500">Current candidates:</span>{' '}
+            {row.current_candidate_count ?? 0} scanned · {row.usable_evidence_count ?? 0} usable
           </p>
           {rejectedCandidates.length > 0 && (
             <div>
