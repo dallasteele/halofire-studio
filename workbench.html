@@ -73,7 +73,17 @@
   <div class="card">
     <h2>Auto Layout &amp; Auto Bid</h2>
     <p class="muted">Generate a deterministic best-effort sprinkler layout from the floor plan, priced from imported vendor pricebooks.</p>
-    <p style="margin:14px 0"><button class="go" id="genBtn">Generate sprinkler layout</button></p>
+    <p style="margin:14px 0"><button class="go" id="genBtn">Generate from built-in plan</button></p>
+    <details style="margin-bottom:12px">
+      <summary class="muted" style="cursor:pointer">Import a floor plan from SVG (rect / polygon / path)</summary>
+      <p class="muted" style="margin:8px 0">Paste an SVG. Each &lt;rect&gt;/&lt;polygon&gt;/&lt;path&gt; becomes a room. Use <code>data-hazard</code>/<code>data-name</code> to tag rooms.</p>
+      <label class="muted" style="font-size:11px">Feet per SVG unit (px)
+        <input id="unitsPerPx" type="number" value="1" step="0.1" style="width:70px;background:var(--surface2);color:var(--bright);border:1px solid var(--border);border-radius:6px;padding:4px 6px;margin-left:6px">
+      </label>
+      <textarea id="svgInput" placeholder='&lt;svg&gt;&lt;rect x="0" y="0" width="60" height="40" data-hazard="ordinary"/&gt;&lt;/svg&gt;'
+        style="width:100%;height:90px;margin-top:8px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:8px;font-family:var(--mono);font-size:11px"></textarea>
+      <p style="margin-top:8px"><button class="go" id="genSvgBtn">Generate from SVG</button></p>
+    </details>
     <div id="bidSummary"></div>
   </div>
   <div class="card wide">
@@ -209,11 +219,11 @@ function renderScene(sceneData) {
   controls.target.set(cx, 0, cz); controls.update();
 }
 
-document.getElementById('genBtn').onclick = async () => {
-  const btn = document.getElementById('genBtn'); btn.disabled = true; btn.textContent = 'Generating…';
+async function runBid(extraBody, btn) {
+  const orig = btn.textContent; btn.disabled = true; btn.textContent = 'Generating…';
   try {
     const { bid, scene: sceneData } = await api('/projects/' + encodeURIComponent(HOME_DEPOT) + '/sprinkler-bid', {
-      method: 'POST', body: JSON.stringify({ markupPct: 25 }),
+      method: 'POST', body: JSON.stringify({ markupPct: 25, ...extraBody }),
     });
     const r = bid.rooms[0];
     document.getElementById('bidSummary').innerHTML = `
@@ -239,7 +249,14 @@ document.getElementById('genBtn').onclick = async () => {
     await refreshEvidence(); // shows the best_effort evidence row the engine recorded
   } catch (e) {
     document.getElementById('bidSummary').innerHTML = '<span class="est">Error: ' + e.message + '</span>';
-  } finally { btn.disabled = false; btn.textContent = 'Regenerate layout'; }
+  } finally { btn.disabled = false; btn.textContent = orig; }
+}
+
+document.getElementById('genBtn').onclick = (e) => runBid({}, e.target);
+document.getElementById('genSvgBtn').onclick = (e) => {
+  const svg = document.getElementById('svgInput').value.trim();
+  if (!svg) { document.getElementById('bidSummary').innerHTML = '<span class="est">Paste SVG first.</span>'; return; }
+  runBid({ svg, unitsPerPx: Number(document.getElementById('unitsPerPx').value) || 1 }, e.target);
 };
 
 initViewport();

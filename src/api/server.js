@@ -18,6 +18,7 @@ import { createLogger } from '../core/logger.js';
 import { generateSprinklerBid } from '../engine/sprinkler-layout.js';
 import { buildScene } from '../engine/geometry.js';
 import { buildResolverFromDb } from '../engine/pricebook-pricing.js';
+import { floorPlanFromSvg, normalizeFloorPlan } from '../engine/floorplan-import.js';
 import { homeDepotRexburgFloorPlan } from '../data/floorplans.js';
 import { HOME_DEPOT_PROJECT_NAME } from '../data/evidence-gates.js';
 
@@ -475,12 +476,17 @@ app.post('/api/projects/:name/evidence', authMiddleware, requireRole('admin'), (
 app.post('/api/projects/:name/sprinkler-bid', authMiddleware, (req, res) => {
   try {
     const projectName = req.params.name;
-    let floorPlan = req.body && req.body.floorPlan;
-    if (!floorPlan && projectName === HOME_DEPOT_PROJECT_NAME) {
+    let floorPlan = null;
+    if (req.body && typeof req.body.svg === 'string' && req.body.svg.trim()) {
+      // Import a floor plan from pasted/uploaded SVG (px scaled to ft).
+      floorPlan = floorPlanFromSvg(req.body.svg, { name: projectName, unitsPerPx: Number(req.body.unitsPerPx) || 1 });
+    } else if (req.body && req.body.floorPlan) {
+      floorPlan = normalizeFloorPlan(req.body.floorPlan);
+    } else if (projectName === HOME_DEPOT_PROJECT_NAME) {
       floorPlan = homeDepotRexburgFloorPlan();
     }
     if (!floorPlan) {
-      return res.status(400).json({ error: 'No floorPlan provided and no built-in plan for this project' });
+      return res.status(400).json({ error: 'Provide an svg, a floorPlan spec, or use a project with a built-in plan' });
     }
     const opts = {
       priceResolver: buildResolverFromDb(db),
