@@ -1,0 +1,52 @@
+{
+  "app": {
+    "name": "HaloFire Platform",
+    "version": "1.0.0",
+    "port": 3001,
+    "host": "0.0.0.0",
+    "env": "development"
+  },
+  "auth": {
+    "jwtSecret": "hf-dev-secret-change-in-production-2026",
+    "jwtExpiry": "8h",
+    "bcryptRounds": 12,
+    "defaultAdmin": {
+      "username": "admin",
+      "password": "halofire2026",
+      "role": "admin",
+      "name": "System Administrator"
+    }
+  },
+  "db": {
+    "path": "./data/halofire.db",
+    "backupDir": "./data/backups"
+  },
+  "ai": {
+    "provider": "ollama",
+    "model": "qwen2.5:7b",
+    "baseUrl": "http://localhost:11434",
+    "timeout": 120000,
+    "maxTokens": 4096,
+    "temperature": 0.3
+  },
+  "skills": {
+    "directory": "./src/skills",
+    "maxConcurrent": 3,
+    "defaultTimeout": 60000,
+    "logLevel": "info"
+  },
+  "cron": {
+    "enabled": true,
+    "lockDir": "./data/locks",
+    "logDir": "./data/logs/cron"
+  },
+  "security": {
+    "rateLimit": {
+      "windowMs": 900000,
+      "max": 100
+    },
+    "cors": {
+      "origins": ["http://localhost:5173", "http://localhost:3001"]
+    }
+  }
+}

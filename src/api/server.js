@@ -1,0 +1,318 @@
+/**
+ * HaloFire API Server
+ * Express backend with SQLite database, JWT auth, and skill integration
+ */
+
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import Database from 'better-sqlite3';
+import { createLogger } from '../core/logger.js';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const log = createLogger('api-server');
+
+// ── Config ──
+const PORT = process.env.PORT || 3001;
+const JWT_SECRET = process.env.JWT_SECRET || 'halofire-dev-secret-2026';
+const DB_PATH = path.resolve(__dirname, '../../data/halofire.db');
+const DATA_DIR = path.dirname(DB_PATH);
+
+if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+
+// ── Database ──
+const db = new Database(DB_PATH);
+db.pragma('journal_mode = WAL');
+db.pragma('foreign_keys = ON');
+
+// ── Init Tables ──
+function initDatabase() {
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      username TEXT UNIQUE NOT NULL,
+      password_hash TEXT NOT NULL,
+      name TEXT NOT NULL,
+      role TEXT DEFAULT 'user',
+      email TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS bids (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      project TEXT NOT NULL,
+      contractor TEXT,
+      value REAL DEFAULT 0,
+      status TEXT DEFAULT 'Pending',
+      date TEXT,
+      due_date TEXT,
+      sqft INTEGER DEFAULT 0,
+      system_type TEXT DEFAULT 'Wet',
+      contact TEXT,
+      notes TEXT,
+      created_by INTEGER REFERENCES users(id),
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS projects (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      bid_id INTEGER REFERENCES bids(id),
+      phase TEXT DEFAULT 'Design',
+      progress INTEGER DEFAULT 0,
+      budget REAL DEFAULT 0,
+      spent REAL DEFAULT 0,
+      manager TEXT,
+      start_date TEXT,
+      end_date TEXT,
+      status TEXT DEFAULT 'On Track',
+      notes TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS pricebook (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      item TEXT NOT NULL,
+      supplier TEXT,
+      price REAL DEFAULT 0,
+      unit TEXT DEFAULT 'EA',
+      category TEXT,
+      sku TEXT,
+      last_updated TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS compliance (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      project_id INTEGER REFERENCES projects(id),
+      project_name TEXT,
+      type TEXT NOT NULL,
+      due_date TEXT,
+      status TEXT DEFAULT 'Upcoming',
+      authority TEXT,
+      notes TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS estimates (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      project_name TEXT,
+      sqft INTEGER,
+      stories INTEGER DEFAULT 1,
+      system_type TEXT DEFAULT 'Wet',
+      hazard TEXT DEFAULT 'Light',
+      labor_rate REAL DEFAULT 85,
+      markup REAL DEFAULT 25,
+      material_cost REAL,
+      labor_cost REAL,
+      total REAL,
+      head_count INTEGER,
+      pipe_length INTEGER,
+      notes TEXT,
+      created_by INTEGER REFERENCES users(id),
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS activity_log (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER REFERENCES users(id),
+      action TEXT NOT NULL,
+      entity_type TEXT,
+      entity_id INTEGER,
+      details TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
+  // Seed default admin user
+  const existing = db.prepare('SELECT id FROM users WHERE username = ?').get('admin');
+  if (!existing) {
+    const hash = bcrypt.hashSync('halofire2026', 12);
+    db.prepare('INSERT INTO users (username, password_hash, name, role, email) VALUES (?, ?, ?, ?, ?)').run('admin', hash, 'Dallas Steele', 'President', 'admin@halofireus.com');
+    log.info('Default admin user created');
+  }
+
+  log.info('Database initialized');
+}
+
+initDatabase();
+
+// ── Express App ──
+const app = express();
+app.use(cors());
+app.use(helmet({ contentSecurityPolicy: false }));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.static(path.resolve(__dirname, '../../')));
+
+// ── Auth Middleware ──
+function authMiddleware(req, res, next) {
+  const token = req.headers.authorization?.replace('Bearer ', '');
+  if (!token) return res.status(401).json({ error: 'No token provided' });
+  try {
+    req.user = jwt.verify(token, JWT_SECRET);
+    next();
+  } catch {
+    res.status(401).json({ error: 'Invalid token' });
+  }
+}
+
+// ── Auth Routes ──
+app.post('/api/auth/login', (req, res) => {
+  const { username, password } = req.body;
+  const user = db.prepare('SELECT * FROM users WHERE username = ?').get(username);
+  if (!user || !bcrypt.compareSync(password, user.password_hash)) {
+    return res.status(401).json({ error: 'Invalid credentials' });
+  }
+  const token = jwt.sign({ id: user.id, username: user.username, name: user.name, role: user.role }, JWT_SECRET, { expiresIn: '24h' });
+  res.json({ token, user: { id: user.id, username: user.username, name: user.name, role: user.role } });
+});
+
+app.get('/api/auth/me', authMiddleware, (req, res) => {
+  const user = db.prepare('SELECT id, username, name, role, email FROM users WHERE id = ?').get(req.user.id);
+  res.json(user);
+});
+
+// ── Bids CRUD ──
+app.get('/api/bids', authMiddleware, (req, res) => {
+  const { status, search, limit = 100, offset = 0 } = req.query;
+  let query = 'SELECT * FROM bids WHERE 1=1';
+  const params = [];
+  if (status && status !== 'All') { query += ' AND status = ?'; params.push(status); }
+  if (search) { query += ' AND (project LIKE ? OR contractor LIKE ?)'; params.push(`%${search}%`, `%${search}%`); }
+  query += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
+  params.push(parseInt(limit), parseInt(offset));
+  const bids = db.prepare(query).all(...params);
+  const total = db.prepare('SELECT COUNT(*) as count FROM bids').get().count;
+  res.json({ bids, total });
+});
+
+app.post('/api/bids', authMiddleware, (req, res) => {
+  const { project, contractor, value, status, date, due_date, sqft, system_type, contact, notes } = req.body;
+  const result = db.prepare('INSERT INTO bids (project, contractor, value, status, date, due_date, sqft, system_type, contact, notes, created_by) VALUES (?,?,?,?,?,?,?,?,?,?,?)').run(project, contractor, value || 0, status || 'Pending', date, due_date, sqft || 0, system_type || 'Wet', contact, notes, req.user.id);
+  res.json({ id: result.lastInsertRowid, message: 'Bid created' });
+});
+
+app.put('/api/bids/:id', authMiddleware, (req, res) => {
+  const fields = Object.entries(req.body).filter(([k]) => k !== 'id');
+  if (!fields.length) return res.status(400).json({ error: 'No fields to update' });
+  const sets = fields.map(([k]) => `${k} = ?`).join(', ');
+  const values = fields.map(([, v]) => v);
+  db.prepare(`UPDATE bids SET ${sets}, updated_at = CURRENT_TIMESTAMP WHERE id = ?`).run(...values, req.params.id);
+  res.json({ message: 'Bid updated' });
+});
+
+app.delete('/api/bids/:id', authMiddleware, (req, res) => {
+  db.prepare('DELETE FROM bids WHERE id = ?').run(req.params.id);
+  res.json({ message: 'Bid deleted' });
+});
+
+// ── Projects CRUD ──
+app.get('/api/projects', authMiddleware, (req, res) => {
+  const projects = db.prepare('SELECT * FROM projects ORDER BY created_at DESC').all();
+  res.json(projects);
+});
+
+app.post('/api/projects', authMiddleware, (req, res) => {
+  const { name, bid_id, phase, progress, budget, spent, manager, start_date, end_date, status, notes } = req.body;
+  const result = db.prepare('INSERT INTO projects (name, bid_id, phase, progress, budget, spent, manager, start_date, end_date, status, notes) VALUES (?,?,?,?,?,?,?,?,?,?,?)').run(name, bid_id, phase||'Design', progress||0, budget||0, spent||0, manager, start_date, end_date, status||'On Track', notes);
+  res.json({ id: result.lastInsertRowid });
+});
+
+app.put('/api/projects/:id', authMiddleware, (req, res) => {
+  const fields = Object.entries(req.body).filter(([k]) => k !== 'id');
+  const sets = fields.map(([k]) => `${k} = ?`).join(', ');
+  const values = fields.map(([, v]) => v);
+  db.prepare(`UPDATE projects SET ${sets}, updated_at = CURRENT_TIMESTAMP WHERE id = ?`).run(...values, req.params.id);
+  res.json({ message: 'Project updated' });
+});
+
+// ── Pricebook ──
+app.get('/api/pricebook', authMiddleware, (req, res) => {
+  const { search, category, supplier, limit = 500 } = req.query;
+  let query = 'SELECT * FROM pricebook WHERE 1=1';
+  const params = [];
+  if (search) { query += ' AND (item LIKE ? OR sku LIKE ?)'; params.push(`%${search}%`, `%${search}%`); }
+  if (category && category !== 'All') { query += ' AND category = ?'; params.push(category); }
+  if (supplier) { query += ' AND supplier = ?'; params.push(supplier); }
+  query += ' ORDER BY category, item LIMIT ?';
+  params.push(parseInt(limit));
+  res.json(db.prepare(query).all(...params));
+});
+
+app.post('/api/pricebook/bulk', authMiddleware, (req, res) => {
+  const { items } = req.body;
+  const insert = db.prepare('INSERT OR REPLACE INTO pricebook (item, supplier, price, unit, category, sku, last_updated) VALUES (?,?,?,?,?,?,?)');
+  const tx = db.transaction((items) => {
+    for (const i of items) insert.run(i.item, i.supplier, i.price, i.unit, i.category, i.sku, i.last_updated || new Date().toISOString().slice(0, 10));
+  });
+  tx(items);
+  res.json({ imported: items.length });
+});
+
+// ── Compliance ──
+app.get('/api/compliance', authMiddleware, (req, res) => {
+  res.json(db.prepare('SELECT * FROM compliance ORDER BY due_date ASC').all());
+});
+
+app.post('/api/compliance', authMiddleware, (req, res) => {
+  const { project_id, project_name, type, due_date, status, authority, notes } = req.body;
+  const result = db.prepare('INSERT INTO compliance (project_id, project_name, type, due_date, status, authority, notes) VALUES (?,?,?,?,?,?,?)').run(project_id, project_name, type, due_date, status||'Upcoming', authority, notes);
+  res.json({ id: result.lastInsertRowid });
+});
+
+app.put('/api/compliance/:id', authMiddleware, (req, res) => {
+  const fields = Object.entries(req.body).filter(([k]) => k !== 'id');
+  const sets = fields.map(([k]) => `${k} = ?`).join(', ');
+  const values = fields.map(([, v]) => v);
+  db.prepare(`UPDATE compliance SET ${sets} WHERE id = ?`).run(...values, req.params.id);
+  res.json({ message: 'Updated' });
+});
+
+// ── Estimates ──
+app.get('/api/estimates', authMiddleware, (req, res) => {
+  res.json(db.prepare('SELECT * FROM estimates ORDER BY created_at DESC').all());
+});
+
+app.post('/api/estimates', authMiddleware, (req, res) => {
+  const e = req.body;
+  const result = db.prepare('INSERT INTO estimates (project_name, sqft, stories, system_type, hazard, labor_rate, markup, material_cost, labor_cost, total, head_count, pipe_length, notes, created_by) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)').run(e.project_name, e.sqft, e.stories, e.system_type, e.hazard, e.labor_rate, e.markup, e.material_cost, e.labor_cost, e.total, e.head_count, e.pipe_length, e.notes, req.user.id);
+  res.json({ id: result.lastInsertRowid });
+});
+
+// ── Analytics ──
+app.get('/api/analytics/summary', authMiddleware, (req, res) => {
+  const totalBids = db.prepare('SELECT COUNT(*) as count FROM bids').get().count;
+  const wonBids = db.prepare("SELECT COUNT(*) as count FROM bids WHERE status = 'Won'").get().count;
+  const totalRevenue = db.prepare("SELECT COALESCE(SUM(value), 0) as total FROM bids WHERE status = 'Won'").get().total;
+  const activeProjects = db.prepare("SELECT COUNT(*) as count FROM projects WHERE status != 'Complete'").get().count;
+  const avgDealSize = wonBids > 0 ? Math.round(totalRevenue / wonBids) : 0;
+
+  res.json({
+    totalBids, wonBids, totalRevenue, activeProjects, avgDealSize,
+    winRate: totalBids > 0 ? Math.round(wonBids / totalBids * 100) : 0,
+  });
+});
+
+// ── Health Check ──
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', version: '1.0.0', uptime: process.uptime() });
+});
+
+// ── Serve SPA ──
+app.get('*', (req, res) => {
+  res.sendFile(path.resolve(__dirname, '../../app.html'));
+});
+
+// ── Start ──
+app.listen(PORT, () => {
+  log.info(`HaloFire API running on port ${PORT}`);
+});
+
+export default app;

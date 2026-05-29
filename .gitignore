@@ -1,0 +1,11 @@
+node_modules/
+data/halofire.db
+data/halofire.db-*
+data/logs/
+data/locks/
+.env
+.env.*
+!.env.example
+dist/
+coverage/
+*.log

@@ -1,0 +1,1629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HaloFire Platform — Architecture Diagrams</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+  <!-- html2pdf for PDF export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --surface2: #1a1a2e;
+      --border: #2a2a3e;
+      --gold: #f0a500;
+      --gold-dim: #c48800;
+      --fire: #ff4500;
+      --text: #e0e0e0;
+      --text-dim: #888;
+      --accent: #4ecdc4;
+      --purple: #a78bfa;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    header {
+      background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%);
+      border-bottom: 2px solid var(--gold);
+      padding: 2rem 3rem;
+      text-align: center;
+    }
+    header h1 {
+      font-size: 2.5rem;
+      font-weight: 300;
+      letter-spacing: 4px;
+      color: var(--gold);
+    }
+    header h1 span { color: var(--fire); font-weight: 700; }
+    header p {
+      color: var(--text-dim);
+      margin-top: 0.5rem;
+      font-size: 1rem;
+      letter-spacing: 2px;
+    }
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0.75rem 2rem;
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    nav a {
+      color: var(--text-dim);
+      text-decoration: none;
+      padding: 0.4rem 1rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+      border: 1px solid transparent;
+    }
+    nav a:hover, nav a.active {
+      color: var(--gold);
+      border-color: var(--gold);
+      background: rgba(240,165,0,0.08);
+    }
+    main { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+    section {
+      margin-bottom: 3rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    section h2 {
+      padding: 1.5rem 2rem;
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--gold);
+      border-bottom: 1px solid var(--border);
+      background: var(--surface2);
+      letter-spacing: 1px;
+    }
+    section h2 span.num {
+      display: inline-block;
+      width: 32px; height: 32px;
+      background: var(--gold);
+      color: var(--bg);
+      border-radius: 50%;
+      text-align: center;
+      line-height: 32px;
+      font-size: 0.9rem;
+      margin-right: 12px;
+    }
+    .diagram-wrap {
+      padding: 2rem;
+      display: flex;
+      justify-content: center;
+      overflow-x: auto;
+    }
+    .diagram-wrap .mermaid {
+      width: 100%;
+      max-width: 1200px;
+    }
+    .description {
+      padding: 0 2rem 1.5rem;
+      color: var(--text-dim);
+      font-size: 0.9rem;
+      max-width: 900px;
+    }
+    .description strong { color: var(--accent); }
+    .description em { color: var(--gold-dim); font-style: normal; }
+
+    /* Mermaid theme overrides */
+    .mermaid svg {
+      max-width: 100%;
+      height: auto;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-dim);
+      font-size: 0.8rem;
+      border-top: 1px solid var(--border);
+    }
+    footer span { color: var(--gold); }
+
+    /* ─── CLIENT TOOLBAR ─── */
+    .client-toolbar {
+      background: linear-gradient(135deg, #1a1a2e 0%, #12121a 100%);
+      border-bottom: 1px solid var(--gold);
+      padding: 0.75rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+    .client-toolbar .client-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .client-toolbar .client-name {
+      color: var(--gold);
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    .client-toolbar .client-date {
+      color: var(--text-dim);
+      font-size: 0.8rem;
+    }
+    .client-toolbar .toolbar-actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .toolbar-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.4rem 1rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .toolbar-btn:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: rgba(240,165,0,0.08);
+    }
+    .toolbar-btn.primary {
+      background: var(--gold);
+      color: var(--bg);
+      border-color: var(--gold);
+      font-weight: 600;
+    }
+    .toolbar-btn.primary:hover {
+      background: var(--gold-dim);
+    }
+    .toolbar-btn svg {
+      width: 16px;
+      height: 16px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* ─── NOTE COUNT BADGE ─── */
+    .note-badge {
+      background: var(--fire);
+      color: #fff;
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 0.1rem 0.4rem;
+      border-radius: 10px;
+      margin-left: 0.5rem;
+      display: none;
+    }
+    .note-badge.visible { display: inline; }
+
+    /* ─── NOTES PANEL ─── */
+    .notes-panel {
+      border-top: 1px solid var(--border);
+      background: rgba(26,26,46,0.5);
+    }
+    .notes-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 2rem;
+      cursor: pointer;
+      color: var(--text-dim);
+      font-size: 0.85rem;
+      transition: all 0.2s;
+      user-select: none;
+      border: none;
+      background: transparent;
+      width: 100%;
+      text-align: left;
+      font-family: inherit;
+    }
+    .notes-toggle:hover {
+      color: var(--gold);
+      background: rgba(240,165,0,0.04);
+    }
+    .notes-toggle .toggle-left {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .notes-toggle svg {
+      width: 16px;
+      height: 16px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      transition: transform 0.2s;
+    }
+    .notes-toggle.open svg { transform: rotate(90deg); }
+    .notes-content {
+      display: none;
+      padding: 0 2rem 1.5rem;
+    }
+    .notes-content.open { display: block; }
+    .notes-list {
+      list-style: none;
+      margin-bottom: 1rem;
+    }
+    .notes-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.75rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 0.5rem;
+      font-size: 0.85rem;
+    }
+    .notes-list .note-meta {
+      flex-shrink: 0;
+      text-align: right;
+      min-width: 100px;
+    }
+    .notes-list .note-author {
+      color: var(--accent);
+      font-weight: 600;
+      font-size: 0.8rem;
+    }
+    .notes-list .note-time {
+      color: var(--text-dim);
+      font-size: 0.7rem;
+    }
+    .notes-list .note-text {
+      flex: 1;
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .notes-list .note-delete {
+      flex-shrink: 0;
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      cursor: pointer;
+      padding: 0.2rem;
+      font-size: 0.9rem;
+      line-height: 1;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+    .notes-list .note-delete:hover {
+      color: var(--fire);
+      background: rgba(255,69,0,0.1);
+    }
+    .note-input-row {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .note-input-row input[type="text"] {
+      flex: 1;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.6rem 1rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .note-input-row input:focus {
+      border-color: var(--gold);
+    }
+    .note-input-row button {
+      background: var(--gold);
+      color: var(--bg);
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+    .note-input-row button:hover { background: var(--gold-dim); }
+
+    /* ─── CLIENT NAME MODAL ─── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+    .modal-overlay.hidden { display: none; }
+    .modal-box {
+      background: var(--surface);
+      border: 1px solid var(--gold);
+      border-radius: 12px;
+      padding: 2rem;
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+    }
+    .modal-box h3 {
+      color: var(--gold);
+      margin-bottom: 0.5rem;
+      font-size: 1.2rem;
+    }
+    .modal-box p {
+      color: var(--text-dim);
+      font-size: 0.85rem;
+      margin-bottom: 1.5rem;
+    }
+    .modal-box input {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.75rem 1rem;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-family: inherit;
+      outline: none;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    .modal-box input:focus { border-color: var(--gold); }
+    .modal-box button {
+      background: var(--gold);
+      color: var(--bg);
+      border: none;
+      padding: 0.75rem 2rem;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    /* ─── TOAST NOTIFICATION ─── */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--surface2);
+      border: 1px solid var(--gold);
+      color: var(--text);
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      z-index: 1000;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s;
+    }
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* ─── PRINT STYLES ─── */
+    @media print {
+      body { background: #fff; color: #000; }
+      .client-toolbar, nav, .notes-toggle, .note-input-row, .note-delete, .toolbar-btn { display: none !important; }
+      section { break-inside: avoid; border-color: #ccc; }
+      section h2 { background: #f5f5f5; color: #333; }
+      .notes-content { display: block !important; }
+      .notes-content.has-notes { border-top: 1px solid #ccc; padding-top: 1rem; }
+      .notes-list li { border-color: #ddd; background: #f9f9f9; }
+      .note-author { color: #0066cc; }
+      .description { color: #555; }
+      footer { color: #888; }
+    }
+
+    @media (max-width: 768px) {
+      header h1 { font-size: 1.5rem; }
+      main { padding: 1rem; }
+      section h2 { font-size: 1.1rem; padding: 1rem; }
+      .diagram-wrap { padding: 1rem; }
+      .client-toolbar { padding: 0.5rem 1rem; }
+      .notes-toggle, .notes-content { padding-left: 1rem; padding-right: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Client name modal -->
+<div class="modal-overlay hidden" id="nameModal">
+  <div class="modal-box">
+    <h3>Welcome</h3>
+    <p>Enter your name to add notes and feedback to these diagrams.</p>
+    <input type="text" id="nameInput" placeholder="Your name..." autofocus>
+    <br>
+    <button onclick="setClientName()">Continue</button>
+  </div>
+</div>
+
+<!-- Toast notification -->
+<div class="toast" id="toast"></div>
+
+<header>
+  <h1>HALO<span>FIRE</span> PLATFORM</h1>
+  <p>AI-Driven Business Automation — Architecture &amp; Process Diagrams</p>
+</header>
+
+<!-- Client toolbar -->
+<div class="client-toolbar">
+  <div class="client-info">
+    <span class="client-name" id="clientNameDisplay">Reviewer</span>
+    <span class="client-date" id="clientDate"></span>
+    <button class="toolbar-btn" onclick="changeName()" title="Change reviewer name">
+      <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Change
+    </button>
+  </div>
+  <div class="toolbar-actions">
+    <button class="toolbar-btn" onclick="expandAllNotes()">
+      <svg viewBox="0 0 24 24"><path d="M7 8l5 5 5-5"/></svg>
+      Expand All Notes
+    </button>
+    <button class="toolbar-btn" onclick="collapseAllNotes()">
+      <svg viewBox="0 0 24 24"><path d="M7 15l5-5 5 5"/></svg>
+      Collapse All
+    </button>
+    <button class="toolbar-btn" onclick="exportNotesJSON()">
+      <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Export Notes
+    </button>
+    <button class="toolbar-btn" onclick="emailSummary()">
+      <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      Email Summary
+    </button>
+    <button class="toolbar-btn primary" onclick="exportPDF()">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Export PDF
+    </button>
+  </div>
+</div>
+
+<nav>
+  <a href="#meta-process">Meta Process</a>
+  <a href="#plugin-flow">Plugin Flow</a>
+  <a href="#template-arch">Template Architecture</a>
+  <a href="#tiered-ai">Tiered AI</a>
+  <a href="#integration-hub">Integration Hub</a>
+  <a href="#learn-replace">Learn &amp; Replace</a>
+  <a href="#guide-agent">Guide Agent</a>
+  <a href="#halofire-roles">HaloFire Roles</a>
+  <a href="#halofire-lifecycle">Project Lifecycle</a>
+  <a href="#automation-audit">Automation Audit</a>
+  <a href="#security">Security</a>
+  <a href="#data-flow">Data Flow</a>
+</nav>
+
+<main>
+
+<!-- 1. META PROCESS -->
+<section id="meta-process">
+  <h2><span class="num">1</span> Meta Process — How We Build Software for Any Business</h2>
+  <p class="description">
+    The <strong>Business Automator</strong> plugin follows a 6-step consulting process (inspired by Luke Pierce).
+    This is the master workflow for creating custom AI-automated software for any small business.
+  </p>
+  <div class="diagram-wrap">
+    <pre class="mermaid">
+flowchart TD
+    START([🔥 New Client Engagement]) --> D
+
+    D[/"📋 STEP 1: DISCOVERY (20 min)\n─────────────────────\n• Client interview (org chart, tools, pain points)\n• Scrapling auto-researches industry\n• Process inventory ranked by time cost\n• Everything saved to Obsidian Brain"/]
+    D --> M
+
+    M[/"🗺️ STEP 2: WORKFLOW MAPPING (15 min per dept)\n─────────────────────\n• Client describes operations in plain English\n• Claude builds process maps (these diagrams)\n• Flags: manual handoffs, redundant steps\n• Assigns automation score (0-100%) per task"/]
+    M --> A
+
+    A[/"🔍 STEP 3: OPPORTUNITY AUDIT (10 min)\n─────────────────────\n• Top 10 automation opportunities\n• Ranked by ROI, complexity, build time\n• Identifies which ROLES can be automated\n• Hybrid scoring: what AI does vs. human"/]
+    A --> AR
+
+    AR[/"🏗️ STEP 4: ARCHITECTURE DESIGN (20 min)\n─────────────────────\n• Full system: React + Express + SQLite\n• Brain vault + Local AI + Integration Hub\n• Role-based UI wireframes (minimal clicks)\n• Security architecture"/]
+    AR --> B
+
+    B[/"⚡ STEP 5: SCAFFOLD & BUILD (ongoing)\n─────────────────────\n• Generate codebase from template\n• Pre-configured: auth, roles, brain,\n  calendar, email, tasks\n• Industry-specific modules from audit"/]
+    B --> DA
+
+    DA[/"📊 STEP 6: DEPLOY & DASHBOARD\n─────────────────────\n• Live monitoring dashboard\n• Process maps + automation scores + KPIs\n• One link for the whole team\n• Guide AI assists all users"/]
+    DA --> LIVE([✅ Live Platform with Self-Improving AI])
+
+    style START fill:#ff4500,stroke:#ff6b35,color:#fff
+    style LIVE fill:#f0a500,stroke:#c48800,color:#000
+    style D fill:#1a1a2e,stroke:#4ecdc4,color:#e0e0e0
+    style M fill:#1a1a2e,stroke:#4ecdc4,color:#e0e0e0
+    style A fill:#1a1a2e,stroke:#4ecdc4,color:#e0e0e0
+    style AR fill:#1a1a2e,stroke:#4ecdc4,color:#e0e0e0
+    style B fill:#1a1a2e,stroke:#4ecdc4,color:#e0e0e0
+    style DA fill:#1a1a2e,stroke:#4ecdc4,color:#e0e0e0
+    </pre>
+  </div>
+  <div class="notes-panel"></div>
+</section>
+
+<!-- 2. PLUGIN SLASH COMMANDS -->
+<section id="plugin-flow">
+  <h2><span class="num">2</span> Business Automator Plugin — Claude Code Slash Commands</h2>
+  <p class="description">
+    Each step of the meta process is a <strong>/slash command</strong> in the Claude Code plugin.
+    You (the consultant) run these commands. Claude does the heavy lifting.
+  </p>
+  <div class="diagram-wrap">
+    <pre class="mermaid">
+flowchart LR
+    subgraph PLUGIN["🔌 Business Automator Plugin"]
+        direction TB
+        C1["/discover\n──────\nClient interview\nIndustry research\nProcess inventory"]
+        C2["/map-workflow\n──────\nDepartment mapping\nHandoff detection\nAutomation triggers"]
+        C3["/audit\n──────\nROI ranking\nRole automation %\nBuild complexity"]
+        C4["/architect\n──────\nSystem design\nData flow\nUI wireframes"]
+        C5["/scaffold\n──────\nCode generation\nFrom template\nIndustry modules"]
+        C6["/dashboard\n──────\nLive monitoring\nKPI tracking\nTeam access"]
+    end
+
+    subgraph TOOLS["🛠️ Plugin Tools"]
+        direction TB
+        T1["Scrapling MCP\n(web research)"]
+        T2["Obsidian Brain\n(knowledge store)"]
+        T3["Template Engine\n(code generation)"]
+    end
+
+    subgraph AGENTS["🤖 Plugin Agents"]
+        direction TB
+        A1["industry-researcher\n(Scrapling + search)"]
+        A2["process-mapper\n(workflow → diagrams)"]
+        A3["code-generator\n(scaffold from template)"]
+    end
+
+    C1 --> C2 --> C3 --> C4 --> C5 --> C6
+    PLUGIN --- TOOLS
+    PLUGIN --- AGENTS
+
+    style PLUGIN fill:#12121a,stroke:#f0a500,color:#e0e0e0
+    style TOOLS fill:#12121a,stroke:#4ecdc4,color:#e0e0e0
+    style AGENTS fill:#12121a,stroke:#a78bfa,color:#e0e0e0
+    </pre>
+  </div>
+  <div class="notes-panel"></div>
+</section>
+
+<!-- 3. TEMPLATE ARCHITECTURE -->
+<section id="template-arch">
+  <h2><span class="num">3</span> Template Architecture — Every Generated App Follows This</h2>
+  <p class="description">
+    The <em>HAL Pattern</em> adapted for business automation. Same architecture for every client —
+    only the roles, integrations, and industry knowledge change.
+  </p>
+  <div class="diagram-wrap">
+    <pre class="mermaid">
+flowchart TB
+    subgraph USERS["👤 Role-Based UIs (Browser / Mobile)"]
+        direction LR
+        U1["Owner\nKPIs + Alerts\nAuto Score"]
+        U2["Role A\nCalendar + Tasks\nDomain Tools"]
+        U3["Role B\nCalendar + Tasks\nDomain Tools"]
+        U4["Role C\nField Tools\nOne-Tap Actions"]
+        U5["Admin\nUnified Inbox\nCompliance"]
+    end
+
+    subgraph GUIDE["💬 AI Guide (every screen)"]
+        G1["Setup Wizard"]
+        G2["Tutorials"]
+        G3["Ongoing Chat"]
+        G4["Proactive Nudges"]
+    end
+
+    subgraph FRONTEND["⚛️ React Frontend"]
+        F1["Role Router + Auth"]
+        F2["Shared Components\nCalendar | Tasks | Feed\nForms | Charts"]
+        F3["Guide Chat Panel\nSpotlight Overlay\nStreaming Responses"]
+    end
+
+    subgraph API["🔧 Express API (Port 3001)"]
+        A1["/api/auth/* — JWT + RBAC"]
+        A2["/api/{domain}/* — CRUD"]
+        A3["/api/tasks/* — Auto-assign"]
+        A4["/api/guide/* — Chat + Tutorials"]
+        A5["/api/integrations/* — Sync"]
+        A6["/api/brain/* — Knowledge"]
+        A7["/api/analytics/* — KPIs"]
+    end
+
+    subgraph DATA["💾 Data Layer"]
+        DB[("SQLite\n──────\nTransactional Data\nAudit Trail\nBehavior Logs")]
+        BRAIN[("Obsidian Brain\n──────\n01-Core/\n02-Knowledge/\n03-Episodes/\n04-Decisions/\n05-Lessons/\n06-Patterns/")]
+    end
+
+    subgraph AI["🧠 Autonomous Agent (Port 9000)"]
+        T0["TIER 0: Watchdog\n(rules only, FREE)\nDeadlines | Conflicts | Alerts"]
+        T1["TIER 1: Qwen (CPU, FREE)\nCross-check | Auto-tasks\nPatterns | Pre-fill | Draft"]
+        T2["TIER 2: Claude (paid, rare)\nComplex decisions\nSystem improvements"]
+        T0 --> T1 --> T2
+    end
+
+    subgraph INTEGRATIONS["🔗 Integration Hub"]
+        I1["Calendar\nGoogle | Outlook\niCloud | CalDAV"]
+        I2["Email\nGmail | Outlook\nIMAP/SMTP"]
+        I3["Messaging\nSlack | Teams\nDiscord | WhatsApp"]
+        I4["Accounting\nQuickBooks | Xero\nFreshBooks"]
+        I5["Phone/SMS\nTwilio | Ring\nGoogle Voice"]
+        I6["Industry\nCustom APIs\nPer Client"]
+    end
+
+    subgraph SCRAPER["🕷️ Scrapling (Port 8000)"]
+        S1["Supplier Catalogs"]
+        S2["Competitor Pricing"]
+        S3["Regulatory Updates"]
+    end
+
+    USERS --> FRONTEND
+    GUIDE --> FRONTEND
+    FRONTEND --> API
+    API --> DATA
+    API --> AI
+    API --> INTEGRATIONS
+    AI --> DATA
+    AI --> SCRAPER
+
+    style USERS fill:#1a1a2e,stroke:#f0a500,color:#e0e0e0
+    style GUIDE fill:#1a1a2e,stroke:#a78bfa,color:#e0e0e0
+    style FRONTEND fill:#1a1a2e,stroke:#4ecdc4,color:#e0e0e0
+    style API fill:#1a1a2e,stroke:#4ecdc4,color:#e0e0e0
+    style DATA fill:#1a1a2e,stroke:#f0a500,color:#e0e0e0
+    style AI fill:#1a1a2e,stroke:#ff4500,color:#e0e0e0
+    style INTEGRATIONS fill:#1a1a2e,stroke:#4ecdc4,color:#e0e0e0
+    style SCRAPER fill:#1a1a2e,stroke:#a78bfa,color:#e0e0e0
+    </pre>
+  </div>
+  <div class="notes-panel"></div>
+</section>
+
+<!-- 4. TIERED AI -->
+<section id="tiered-ai">
+  <h2><span class="num">4</span> Tiered AI — Cost-Optimized Intelligence</h2>
+  <p class="description">
+    The <em>HAL Pattern</em>: Free local AI handles 95% of decisions. Paid Claude only for complex escalations.
+    Same architecture that runs your trading bot — proven and cost-effective.
+  </p>
+  <div class="diagram-wrap">
+    <pre class="mermaid">
+flowchart TB
+    EVENT([Event Occurs\nUser action | Schedule | Integration sync]) --> T0
+
+    T0{"TIER 0: WATCHDOG\n(Pure Rules — FREE)\n──────\nDoes a rule match?"}
+    T0 -->|"Deadline missed\nConflict detected\nSync failed"| ACTION0["Auto-Alert\nAuto-Block\nAuto-Remind"]
+    T0 -->|"Needs reasoning"| T1
+
+    T1{"TIER 1: QWEN\n(Local CPU — FREE)\n──────\nCan Qwen handle it?"}
+    T1 -->|"Pattern match\nForm pre-fill\nDraft response\nAnomaly detection\nTutorial help"| ACTION1["Execute Action\nStore in Brain\nUpdate Patterns"]
+    T1 -->|"Confidence < 60%\nCode change needed\nComplex decision"| CACHE
+
+    CACHE{"Check Brain Cache\n──────\nSimilar decision\nin vault?"}
+    CACHE -->|"Match ≥ 85%\nDirect reuse"| ACTION1
+    CACHE -->|"Match 70-85%\nPartial hint"| T2_HINT["Claude with Hint\n(cheaper call)"]
+    CACHE -->|"No match"| T2
+
+    T2["TIER 2: CLAUDE\n(API Call — PAID)\n──────\nComplex reasoning\nSystem improvements\nMonthly reviews"]
+    T2 --> STORE["Store Solution\nin Brain Cache\n──────\nNEVER pay for\nsame problem twice"]
+    T2_HINT --> STORE
+
+    STORE --> ACTION1
+
+    style EVENT fill:#f0a500,stroke:#c48800,color:#000
+    style T0 fill:#1a4a1a,stroke:#4ecdc4,color:#e0e0e0
+    style T1 fill:#1a1a4a,stroke:#a78bfa,color:#e0e0e0
+    style T2 fill:#4a1a1a,stroke:#ff4500,color:#e0e0e0
+    style CACHE fill:#1a1a2e,stroke:#f0a500,color:#e0e0e0
+    style ACTION0 fill:#1a4a1a,stroke:#4ecdc4,color:#e0e0e0
+    style ACTION1 fill:#1a4a1a,stroke:#4ecdc4,color:#e0e0e0
+    style STORE fill:#1a1a2e,stroke:#f0a500,color:#e0e0e0
+    style T2_HINT fill:#4a1a1a,stroke:#ff6b35,color:#e0e0e0
+    </pre>
+  </div>
+  <div class="notes-panel"></div>
+</section>
+
+<!-- 5. INTEGRATION HUB -->
+<section id="integration-hub">
+  <h2><span class="num">5</span> Integration Hub — Connect Any Business Tool</h2>
+  <p class="description">
+    Every client picks their tools from a settings page. All integrations flow through a <strong>Sync Engine</strong>
+    that normalizes events into a <strong>Unified Inbox</strong> — users see tasks, not raw events.
+  </p>
+  <div class="diagram-wrap">
+    <pre class="mermaid">
+flowchart TB
+    subgraph EXTERNAL["External Services (OAuth2 / API Key)"]
+        direction LR
+        E1["📅 Google Calendar"]
+        E2["📅 Outlook Calendar"]
+        E3["✉️ Gmail"]
+        E4["✉️ Outlook Email"]
+        E5["💬 Slack"]
+        E6["💬 Microsoft Teams"]
+        E7["📞 Twilio"]
+        E8["💰 QuickBooks"]
+        E9["💳 Stripe"]
+        E10["📁 Google Drive"]
+        E11["📁 OneDrive"]
+        E12["🔧 Industry API"]
+    end
+
+    subgraph SYNC["⚙️ Sync Engine (Background Service)"]
+        direction TB
+        S1["Webhook Listener\n(real-time where supported)"]
+        S2["Poll Scheduler\n(configurable intervals)"]
+        S3["Conflict Resolver\n(last-write-wins + audit)"]
+        S4["Retry Engine\n(exponential backoff)"]
+        S5["Health Monitor\n(Qwen watches for failures)"]
+    end
+
+    subgraph UNIFIED["📥 Unified Inbox / Feed"]
+        direction TB
+        U1["Email: GC requesting COI"]
+        U2["Calendar: Inspection tomorrow 9am"]
+        U3["Slack: Foreman sent job photos"]
+        U4["QuickBooks: Invoice #1042 overdue"]
+        U5["↓ AI auto-creates TASKS from events ↓"]
+    end
+
+    subgraph ROLES["Role-Filtered Views"]
+        direction LR
+        R1["Owner sees:\nKPIs from QuickBooks\nAlerts from all"]
+        R2["Estimator sees:\nBid emails\nSupplier updates"]
+        R3["PM sees:\nSchedule changes\nField updates"]
+        R4["Admin sees:\nAll emails\nAll invoices\nCompliance"]
+    end
+
+    EXTERNAL --> SYNC
+    SYNC --> UNIFIED
+    UNIFIED --> ROLES
+
+    style EXTERNAL fill:#1a1a2e,stroke:#4ecdc4,color:#e0e0e0
+    style SYNC fill:#1a1a2e,stroke:#f0a500,color:#e0e0e0
+    style UNIFIED fill:#1a1a2e,stroke:#a78bfa,color:#e0e0e0
+    style ROLES fill:#1a1a2e,stroke:#ff4500,color:#e0e0e0
+    </pre>
+  </div>
+  <div class="notes-panel"></div>
+</section>
+
+<!-- 6. LEARN & REPLACE LOOP -->
+<section id="learn-replace">
+  <h2><span class="num">6</span> Learn &amp; Replace — How AI Progressively Automates Roles</h2>
+  <p class="description">
+    The core innovation: the system watches how humans use it, detects patterns, proposes automation,
+    and tracks an <strong>Automation Score</strong> per role. Like Dentrix — but one that actually learns.
+  </p>
+  <div class="diagram-wrap">
+    <pre class="mermaid">
+flowchart TB
+    USER["👤 User Does Task Manually"] --> LOG
+
+    LOG["📝 Behavior Logger\n──────\nWho: Estimator (Jake)\nWhat: Looked up pipe price\nHow: Manual search\nTime: 45 seconds\nScreen: Bids/Edit\nFrequency: 12x this week"]
+
+    LOG --> PATTERN
+
+    PATTERN["🔍 Pattern Detector (Qwen, weekly)\n──────\n'Estimator does manual price lookup\n12x/week × 45sec = 9 min/week\n= 7.8 hours/year\nAUTOMATABLE: HIGH'"]
+
+    PATTERN --> PROPOSE
+
+    PROPOSE["💡 Guide Surfaces Suggestion\n──────\n'Hey Jake — I noticed you manually\nlook up pipe prices for every bid.\nI can auto-fill from ARGCO catalog.\nWant me to start doing that?'"]
+
+    PROPOSE --> APPROVED["✅ Approved\n──────\nAutomation Score +5%\nTask now auto-handled\nBrain stores pattern"]
+
+    PROPOSE --> DENIED["❌ Denied\n──────\nBrain stores:\n'User prefers manual\nfor price lookups'\nNever suggests again"]
+
+    APPROVED --> SCORE
+
+    SCORE["📊 Role Automation Score\n──────\nEstimator: 45% → 50%\nPM: 30%\nAdmin: 72%\nForeman: 20%"]
+
+    SCORE --> THRESHOLD{"Score > 75%?"}
+
+    THRESHOLD -->|"Yes"| ALERT["🔔 Owner Alert\n──────\n'Admin role is 75% automated.\nConsider: reduce to part-time\nor reassign to higher-value work'"]
+
+    THRESHOLD -->|"No"| CONTINUE["Continue Learning\n──────\nMore patterns detected\nover time → score climbs"]
+
+    CONTINUE --> USER
+
+    style USER fill:#1a1a2e,stroke:#4ecdc4,color:#e0e0e0
+    style LOG fill:#1a1a2e,stroke:#f0a500,color:#e0e0e0
+    style PATTERN fill:#1a1a2e,stroke:#a78bfa,color:#e0e0e0
+    style PROPOSE fill:#1a1a2e,stroke:#f0a500,color:#e0e0e0
+    style APPROVED fill:#1a4a1a,stroke:#4ecdc4,color:#e0e0e0
+    style DENIED fill:#4a1a1a,stroke:#ff4500,color:#e0e0e0
+    style SCORE fill:#1a1a2e,stroke:#f0a500,color:#e0e0e0
+    style ALERT fill:#4a4a1a,stroke:#f0a500,color:#e0e0e0
+    style CONTINUE fill:#1a1a2e,stroke:#4ecdc4,color:#e0e0e0
+    </pre>
+  </div>
+  <div class="notes-panel"></div>
+</section>
+
+<!-- 7. GUIDE AGENT -->
+<section id="guide-agent">
+  <h2><span class="num">7</span> AI Guide — In-App Chat Agent (3 Modes)</h2>
+  <p class="description">
+    The Guide lives on every screen. It <strong>sets up new users</strong>, <strong>teaches them their role</strong>,
+    and <strong>answers questions</strong> using company knowledge. Powered by local Qwen (FREE).
+  </p>
+  <div class="diagram-wrap">
+    <pre class="mermaid">
+flowchart TB
+    subgraph MODE1["🎯 MODE 1: Setup Wizard (First Login)"]
+        direction TB
+        S1["Guide: 'Welcome! Let's get you set up. ~10 min'"]
+        S2["Connect email + calendar (OAuth flow)"]
+        S3["Set notification preferences"]
+        S4["Import existing data"]
+        S5["Quick tour of YOUR dashboard"]
+        S6["Practice task (guided, with undo)"]
+        S1 --> S2 --> S3 --> S4 --> S5 --> S6
+    end
+
+    subgraph MODE2["📚 MODE 2: Interactive Tutorials"]
+        direction TB
+        T0["Role-Specific Tutorials"]
+        T1["Estimator: Create Bid (5m)\nRead Takeoff (3m)\nAdjust Pricing (2m)"]
+        T2["PM: Manage Phases (5m)\nSchedule Inspection (2m)\nReview AI Flags (3m)"]
+        T3["Foreman: Start Job (2m)\nReport Issue (1m)\nTake Photos (1m)"]
+        T4["Platform Tutorials"]
+        T5["Big Picture (10m)\nAutomation Scores (5m)\nIntegrations (5m)"]
+        T0 --> T1
+        T0 --> T2
+        T0 --> T3
+        T4 --> T5
+    end
+
+    subgraph MODE3["💬 MODE 3: Ongoing Assistant"]
+        direction TB
+        C1["Context-Aware Chat\n──────\nKnows: who you are\nKnows: what screen\nKnows: company data"]
+        C2["'Is this bid too low?'\n→ Compares to 8 historical bids\n→ Shows cost floor analysis"]
+        C3["Proactive Nudges\n──────\n'Bid due tomorrow —\nmarkup not set yet.\nApply usual 18%?'"]
+        C1 --> C2
+        C1 --> C3
+    end
+
+    subgraph LEARN["🧠 Guide Learns From Every Interaction"]
+        L1["Questions asked → FAQ patterns"]
+        L2["Tutorial struggles → UI improvement suggestions"]
+        L3["Accepted/rejected nudges → personalization"]
+        L4["All stored in Brain 06-Patterns/"]
+    end
+
+    MODE1 --> LEARN
+    MODE2 --> LEARN
+    MODE3 --> LEARN
+
+    style MODE1 fill:#1a1a2e,stroke:#4ecdc4,color:#e0e0e0
+    style MODE2 fill:#1a1a2e,stroke:#a78bfa,color:#e0e0e0
+    style MODE3 fill:#1a1a2e,stroke:#f0a500,color:#e0e0e0
+    style LEARN fill:#1a1a2e,stroke:#ff4500,color:#e0e0e0
+    </pre>
+  </div>
+  <div class="notes-panel"></div>
+</section>
+
+<!-- 8. HALOFIRE ROLES -->
+<section id="halofire-roles">
+  <h2><span class="num">8</span> HaloFire — Role-Based UI Map</h2>
+  <p class="description">
+    Each role gets a <strong>tailored dashboard</strong> showing only what they need.
+    The <em>"Today First"</em> principle: most urgent item is always front and center, zero navigation.
+  </p>
+  <div class="diagram-wrap">
+    <pre class="mermaid">
+flowchart TB
+    LOGIN["🔐 Login\n(JWT + Role Detection)"] --> ROUTER{"Role Router"}
+
+    ROUTER --> OWNER
+    ROUTER --> EST
+    ROUTER --> PM
+    ROUTER --> FIELD
+    ROUTER --> SERVICE
+    ROUTER --> ADMIN
+
+    subgraph OWNER["👑 Owner / Principal"]
+        O1["Revenue + Win Rate + Auto Score KPIs"]
+        O2["AI-Generated Alerts (ranked by urgency)"]
+        O3["Automation Insights (monthly AI review)"]
+        O4["All-Department Overview"]
+    end
+
+    subgraph EST["📐 Estimator"]
+        E1["Today's Bids (auto-prioritized by deadline)"]
+        E2["AI Pre-Filled Estimates (review + adjust)"]
+        E3["Pricebook (live from suppliers via Scrapling)"]
+        E4["Calendar (synced)"]
+        E5["Cross-Check Alerts (pricing errors caught)"]
+    end
+
+    subgraph PM["📋 Project Manager"]
+        P1["Active Projects (Gantt-style progress)"]
+        P2["Today's Tasks (AI-flagged priorities)"]
+        P3["Schedule + Inspections"]
+        P4["Material Tracking"]
+        P5["Change Order Management"]
+    end
+
+    subgraph FIELD["🔧 Foreman / Field"]
+        F1["Today's Jobs (map + list)"]
+        F2["Crew Assignments + Materials Status"]
+        F3["One-Tap: Photo | Done | Issue | Need Material"]
+        F4["Auto-Logs: time, location, progress"]
+    end
+
+    subgraph SERVICE["🔍 Service Coordinator"]
+        SC1["Inspection Calendar (auto from agreements)"]
+        SC2["Route Optimization"]
+        SC3["Deficiency → Repair Pipeline"]
+        SC4["Service Agreement Tracking"]
+    end
+
+    subgraph ADMIN["📨 Office Admin"]
+        A1["Unified Inbox (email + Slack + phone)"]
+        A2["AI-Drafted Responses"]
+        A3["Multi-State Compliance Tracker"]
+        A4["AR/AP Status (synced from accounting)"]
+    end
+
+    style LOGIN fill:#f0a500,stroke:#c48800,color:#000
+    style ROUTER fill:#1a1a2e,stroke:#f0a500,color:#e0e0e0
+    style OWNER fill:#1a1a2e,stroke:#f0a500,color:#e0e0e0
+    style EST fill:#1a1a2e,stroke:#4ecdc4,color:#e0e0e0
+    style PM fill:#1a1a2e,stroke:#4ecdc4,color:#e0e0e0
+    style FIELD fill:#1a1a2e,stroke:#a78bfa,color:#e0e0e0
+    style SERVICE fill:#1a1a2e,stroke:#a78bfa,color:#e0e0e0
+    style ADMIN fill:#1a1a2e,stroke:#ff4500,color:#e0e0e0
+    </pre>
+  </div>
+  <div class="notes-panel"></div>
+</section>
+
+<!-- 9. HALOFIRE PROJECT LIFECYCLE -->
+<section id="halofire-lifecycle">
+  <h2><span class="num">9</span> HaloFire — Project Lifecycle (Industry-Specific)</h2>
+  <p class="description">
+    A fire protection project from bid to closeout. <strong>Gold nodes</strong> = AI-automated steps.
+    <strong>Blue nodes</strong> = human-required. The system handles the gold, cross-checks the blue.
+  </p>
+  <div class="diagram-wrap">
+    <pre class="mermaid">
+flowchart LR
+    subgraph SALES["Phase 1: Sales & Estimating"]
+        direction TB
+        S1["📥 Receive RFP/Bid Invite"]
+        S2["📋 AI: Auto-parse plans\n+ count heads + measure pipe"]
+        S3["💰 AI: Price from live pricebook\n(Scrapling → ARGCO/FFF/Victaulic)"]
+        S4["🧮 AI: Calculate labor\nfrom historical data"]
+        S5["👤 Human: Set markup %\n+ review + approve"]
+        S6["📤 AI: Generate proposal\n+ submit by deadline"]
+        S1 --> S2 --> S3 --> S4 --> S5 --> S6
+    end
+
+    subgraph DESIGN["Phase 2: Design & Permit"]
+        direction TB
+        D1["📐 Human: Create hydraulic\ndesign (AutoSPRINK)"]
+        D2["✅ AI: NFPA 13 compliance\ncheck on design"]
+        D3["📤 AI: Submit to AHJ\n+ track permit status"]
+        D4["📦 AI: Generate material\norders from design"]
+        D1 --> D2 --> D3 --> D4
+    end
+
+    subgraph INSTALL["Phase 3: Installation"]
+        direction TB
+        I1["👤 Human: Install pipe,\nheads, valves"]
+        I2["📸 AI: Photo → daily report\nauto-generation"]
+        I3["⚠️ AI: Track progress vs\nschedule, flag delays"]
+        I4["📦 AI: Auto-reorder\nbackordered materials"]
+        I1 --> I2 --> I3 --> I4
+    end
+
+    subgraph TEST["Phase 4: Test & Close"]
+        direction TB
+        T1["🔧 Human: Hydrostatic test\n200 PSI / 2 hours"]
+        T2["📋 AI: Schedule fire marshal\ninspection"]
+        T3["📄 AI: Generate as-builts\n+ O&M manuals"]
+        T4["💰 AI: Final invoice\n→ QuickBooks"]
+        T1 --> T2 --> T3 --> T4
+    end
+
+    subgraph SERVICE["Phase 5: Recurring Service"]
+        direction TB
+        R1["📅 AI: Auto-schedule\nNFPA 25 inspections"]
+        R2["👤 Human: Perform\ninspection"]
+        R3["📋 AI: Deficiency report\n→ repair proposal"]
+        R4["💰 AI: Invoice + track\nservice agreement"]
+        R1 --> R2 --> R3 --> R4
+    end
+
+    SALES --> DESIGN --> INSTALL --> TEST --> SERVICE
+
+    style SALES fill:#1a1a2e,stroke:#f0a500,color:#e0e0e0
+    style DESIGN fill:#1a1a2e,stroke:#4ecdc4,color:#e0e0e0
+    style INSTALL fill:#1a1a2e,stroke:#a78bfa,color:#e0e0e0
+    style TEST fill:#1a1a2e,stroke:#ff4500,color:#e0e0e0
+    style SERVICE fill:#1a1a2e,stroke:#f0a500,color:#e0e0e0
+    </pre>
+  </div>
+  <div class="notes-panel"></div>
+</section>
+
+<!-- 10. AUTOMATION AUDIT -->
+<section id="automation-audit">
+  <h2><span class="num">10</span> HaloFire — Automation Opportunity Audit</h2>
+  <p class="description">
+    Top 10 automation opportunities ranked by ROI. This is what the <strong>/audit</strong> command generates
+    for each client — the business case for AI.
+  </p>
+  <div class="diagram-wrap">
+    <pre class="mermaid">
+quadrantChart
+    title Automation Opportunities: ROI vs Complexity
+    x-axis Low Complexity --> High Complexity
+    y-axis Low ROI --> High ROI
+    quadrant-1 High ROI + High Complexity
+    quadrant-2 Quick Wins
+    quadrant-3 Low Priority
+    quadrant-4 Consider Later
+    Pricebook Auto-Update: [0.2, 0.85]
+    Inspection Scheduling: [0.25, 0.8]
+    Invoice Auto-Gen: [0.2, 0.65]
+    License Tracking: [0.3, 0.6]
+    Deficiency Pipeline: [0.45, 0.82]
+    Email Triage: [0.5, 0.65]
+    Material Auto-PO: [0.55, 0.7]
+    Bid Pre-Fill: [0.7, 0.88]
+    Photo Reports: [0.6, 0.45]
+    NFPA Compliance: [0.85, 0.5]
+    </pre>
+  </div>
+  <div class="notes-panel"></div>
+</section>
+
+<!-- 11. SECURITY -->
+<section id="security">
+  <h2><span class="num">11</span> Security Architecture — Non-Negotiable Layers</h2>
+  <p class="description">
+    Four layers of security. Every action is <strong>audited</strong>, every human decision is <strong>cross-checked</strong>,
+    and local AI means <strong>data never leaves the building</strong>.
+  </p>
+  <div class="diagram-wrap">
+    <pre class="mermaid">
+flowchart TB
+    subgraph L1["🔐 Layer 1: Authentication & Authorization"]
+        direction LR
+        A1["JWT Tokens\n(8hr expiry)"]
+        A2["bcrypt Passwords\n(12 rounds)"]
+        A3["RBAC Per Role\n(see only your data)"]
+        A4["Session Management\n(auto-logout)"]
+    end
+
+    subgraph L2["🛡️ Layer 2: Cross-Check Engine"]
+        direction LR
+        B1["Bid below cost?\n→ BLOCK + ALERT"]
+        B2["Schedule conflict?\n→ BLOCK + ALTERNATIVES"]
+        B3["Missing permit?\n→ BLOCK + REMIND"]
+        B4["Unusual pattern?\n→ FLAG for review"]
+    end
+
+    subgraph L3["🔒 Layer 3: Data Protection"]
+        direction LR
+        C1["SQLite encrypted\nat rest"]
+        C2["HTTPS only\n(all API calls)"]
+        C3["No PII in logs\nor brain vault"]
+        C4["Auto-backups\nevery 6 hours"]
+    end
+
+    subgraph L4["🤖 Layer 4: AI Safety"]
+        direction LR
+        D1["Local Qwen =\ndata stays on-site"]
+        D2["Claude calls =\nanonymized context"]
+        D3["All AI decisions\nlogged + auditable"]
+        D4["Human override\nalways available"]
+    end
+
+    subgraph AUDIT["📋 Immutable Audit Trail"]
+        direction LR
+        E1["Every action logged:\nwho, what, when, where, why"]
+        E2["Cannot delete or modify\naudit records"]
+        E3["Owner can review\nany employee's actions"]
+    end
+
+    L1 --> L2 --> L3 --> L4 --> AUDIT
+
+    style L1 fill:#1a4a1a,stroke:#4ecdc4,color:#e0e0e0
+    style L2 fill:#4a4a1a,stroke:#f0a500,color:#e0e0e0
+    style L3 fill:#1a1a4a,stroke:#a78bfa,color:#e0e0e0
+    style L4 fill:#4a1a1a,stroke:#ff4500,color:#e0e0e0
+    style AUDIT fill:#1a1a2e,stroke:#f0a500,color:#e0e0e0
+    </pre>
+  </div>
+  <div class="notes-panel"></div>
+</section>
+
+<!-- 12. DATA FLOW -->
+<section id="data-flow">
+  <h2><span class="num">12</span> Complete Data Flow — End to End</h2>
+  <p class="description">
+    How data flows through the entire system — from external events through the brain to user actions.
+  </p>
+  <div class="diagram-wrap">
+    <pre class="mermaid">
+flowchart TB
+    EXT["🌐 External Events\nEmails, Calendar, Slack,\nQuickBooks, Suppliers"] --> SYNC["⚙️ Sync Engine"]
+
+    SYNC --> UNIFIED["📥 Unified Event Stream"]
+
+    UNIFIED --> AI_PROCESS["🧠 Qwen Processing\n──────\n1. Classify event type\n2. Extract action items\n3. Check brain for context\n4. Cross-check against rules\n5. Generate tasks"]
+
+    AI_PROCESS --> TASKS["📋 Task Queue\n(auto-assigned to roles)"]
+    AI_PROCESS --> ALERTS["⚠️ Alerts\n(if cross-check fails)"]
+    AI_PROCESS --> BRAIN_WRITE["💾 Brain: Store Episode"]
+
+    TASKS --> ROLE_UI["👤 Role Dashboard\n'Here's what you need to do today'"]
+    ALERTS --> ROLE_UI
+
+    ROLE_UI --> USER_ACTION["User Takes Action\n(form fill, approve, reject, etc.)"]
+
+    USER_ACTION --> BEHAVIOR["📝 Behavior Logger"]
+    USER_ACTION --> CROSSCHECK{"🛡️ Cross-Check\nValid action?"}
+
+    CROSSCHECK -->|"✅ Valid"| EXECUTE["Execute Action\n(save to DB, send email,\nupdate calendar, etc.)"]
+    CROSSCHECK -->|"❌ Invalid"| BLOCK["Block + Explain\n'This bid is 21% below\nyour cost floor. Adjust?'"]
+
+    EXECUTE --> AUDIT["📋 Audit Trail"]
+    EXECUTE --> INTEGRATIONS["🔗 Push to Integrations\n(QuickBooks, Calendar, etc.)"]
+
+    BEHAVIOR --> PATTERN["🔍 Weekly Pattern Analysis"]
+    PATTERN --> AUTOMATION["💡 Automation Proposals\n(Guide suggests to user)"]
+    AUTOMATION --> SCORE["📊 Update Automation Score"]
+
+    BLOCK --> ROLE_UI
+
+    style EXT fill:#1a1a2e,stroke:#4ecdc4,color:#e0e0e0
+    style SYNC fill:#1a1a2e,stroke:#4ecdc4,color:#e0e0e0
+    style UNIFIED fill:#1a1a2e,stroke:#a78bfa,color:#e0e0e0
+    style AI_PROCESS fill:#1a1a2e,stroke:#f0a500,color:#e0e0e0
+    style TASKS fill:#1a1a2e,stroke:#4ecdc4,color:#e0e0e0
+    style ALERTS fill:#4a1a1a,stroke:#ff4500,color:#e0e0e0
+    style ROLE_UI fill:#1a1a2e,stroke:#f0a500,color:#e0e0e0
+    style USER_ACTION fill:#1a1a2e,stroke:#4ecdc4,color:#e0e0e0
+    style CROSSCHECK fill:#4a4a1a,stroke:#f0a500,color:#e0e0e0
+    style EXECUTE fill:#1a4a1a,stroke:#4ecdc4,color:#e0e0e0
+    style BLOCK fill:#4a1a1a,stroke:#ff4500,color:#e0e0e0
+    style BEHAVIOR fill:#1a1a2e,stroke:#a78bfa,color:#e0e0e0
+    style PATTERN fill:#1a1a2e,stroke:#a78bfa,color:#e0e0e0
+    style AUTOMATION fill:#1a1a2e,stroke:#f0a500,color:#e0e0e0
+    style SCORE fill:#1a1a2e,stroke:#f0a500,color:#e0e0e0
+    style AUDIT fill:#1a1a2e,stroke:#f0a500,color:#e0e0e0
+    </pre>
+  </div>
+  <div class="notes-panel"></div>
+</section>
+
+</main>
+
+<footer>
+  <p>HALO<span>FIRE</span> PLATFORM — Architecture v1.0 — Generated 2026-03-15</p>
+  <p style="margin-top:0.5rem">Business Automator Plugin for Claude Code — Template for AI-Driven Business Automation</p>
+</footer>
+
+<script>
+  // ─── MERMAID INIT ───
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'dark',
+    themeVariables: {
+      primaryColor: '#1a1a2e',
+      primaryTextColor: '#e0e0e0',
+      primaryBorderColor: '#f0a500',
+      lineColor: '#4ecdc4',
+      secondaryColor: '#12121a',
+      tertiaryColor: '#2a2a3e',
+      fontFamily: 'Segoe UI, system-ui, sans-serif',
+      fontSize: '14px',
+      quadrant1Fill: '#1a4a1a',
+      quadrant2Fill: '#1a1a4a',
+      quadrant3Fill: '#2a2a2a',
+      quadrant4Fill: '#4a4a1a',
+      quadrant1TextFill: '#e0e0e0',
+      quadrant2TextFill: '#e0e0e0',
+      quadrant3TextFill: '#888',
+      quadrant4TextFill: '#e0e0e0',
+      quadrantPointFill: '#f0a500',
+      quadrantPointTextFill: '#e0e0e0',
+      quadrantXAxisTextFill: '#e0e0e0',
+      quadrantYAxisTextFill: '#e0e0e0',
+      quadrantTitleFill: '#f0a500'
+    },
+    flowchart: {
+      htmlLabels: true,
+      curve: 'basis',
+      padding: 20,
+      nodeSpacing: 30,
+      rankSpacing: 50
+    }
+  });
+
+  // ─── STATE ───
+  const STORAGE_KEY = 'halofire-diagram-notes';
+  const NAME_KEY = 'halofire-reviewer-name';
+  let allNotes = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+  let reviewerName = localStorage.getItem(NAME_KEY) || '';
+
+  // ─── INIT ───
+  document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('clientDate').textContent = new Date().toLocaleDateString('en-US', {
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+    });
+
+    if (!reviewerName) {
+      document.getElementById('nameModal').classList.remove('hidden');
+      document.getElementById('nameInput').focus();
+    } else {
+      document.getElementById('clientNameDisplay').textContent = reviewerName;
+    }
+
+    document.getElementById('nameInput').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') setClientName();
+    });
+
+    buildAllNotePanels();
+  });
+
+  // ─── NAME MANAGEMENT ───
+  function setClientName() {
+    var input = document.getElementById('nameInput');
+    var name = input.value.trim();
+    if (!name) { input.focus(); return; }
+    reviewerName = name;
+    localStorage.setItem(NAME_KEY, name);
+    document.getElementById('clientNameDisplay').textContent = name;
+    document.getElementById('nameModal').classList.add('hidden');
+    showToast('Welcome, ' + name + '! Click "Notes & Feedback" on any section to leave feedback.');
+  }
+
+  function changeName() {
+    document.getElementById('nameInput').value = reviewerName;
+    document.getElementById('nameModal').classList.remove('hidden');
+    document.getElementById('nameInput').focus();
+    document.getElementById('nameInput').select();
+  }
+
+  // ─── SAFE DOM HELPERS ───
+  function createNoteElement(sectionId, note, index) {
+    var li = document.createElement('li');
+
+    var textDiv = document.createElement('div');
+    textDiv.className = 'note-text';
+    textDiv.textContent = note.text;
+
+    var metaDiv = document.createElement('div');
+    metaDiv.className = 'note-meta';
+    var authorDiv = document.createElement('div');
+    authorDiv.className = 'note-author';
+    authorDiv.textContent = note.author;
+    var timeDiv = document.createElement('div');
+    timeDiv.className = 'note-time';
+    timeDiv.textContent = new Date(note.timestamp).toLocaleString('en-US', {
+      month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'
+    });
+    metaDiv.appendChild(authorDiv);
+    metaDiv.appendChild(timeDiv);
+
+    var delBtn = document.createElement('button');
+    delBtn.className = 'note-delete';
+    delBtn.title = 'Delete note';
+    delBtn.textContent = '\u00d7';
+    delBtn.addEventListener('click', function() { deleteNote(sectionId, index); });
+
+    li.appendChild(textDiv);
+    li.appendChild(metaDiv);
+    li.appendChild(delBtn);
+    return li;
+  }
+
+  // ─── NOTE PANEL BUILDER ───
+  function buildAllNotePanels() {
+    document.querySelectorAll('section[id]').forEach(function(section) {
+      var sectionId = section.id;
+      var panel = section.querySelector('.notes-panel');
+      if (!panel) return;
+
+      var notes = allNotes[sectionId] || [];
+      var noteCount = notes.length;
+
+      // Clear panel
+      while (panel.firstChild) panel.removeChild(panel.firstChild);
+
+      // Toggle button
+      var toggleBtn = document.createElement('button');
+      toggleBtn.className = 'notes-toggle';
+      toggleBtn.addEventListener('click', function() { toggleNotes(toggleBtn, sectionId); });
+
+      var toggleLeft = document.createElement('span');
+      toggleLeft.className = 'toggle-left';
+
+      var chevronSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      chevronSvg.setAttribute('viewBox', '0 0 24 24');
+      var chevronPath = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+      chevronPath.setAttribute('points', '9 18 15 12 9 6');
+      chevronSvg.appendChild(chevronPath);
+      toggleLeft.appendChild(chevronSvg);
+
+      var toggleText = document.createTextNode(' Notes & Feedback ');
+      toggleLeft.appendChild(toggleText);
+
+      if (noteCount > 0) {
+        var badge = document.createElement('span');
+        badge.className = 'note-badge visible';
+        badge.textContent = noteCount;
+        toggleLeft.appendChild(badge);
+      }
+
+      var countSpan = document.createElement('span');
+      countSpan.style.cssText = 'color: var(--text-dim); font-size: 0.75rem';
+      countSpan.textContent = noteCount > 0 ? noteCount + ' note' + (noteCount > 1 ? 's' : '') : 'No notes yet';
+
+      toggleBtn.appendChild(toggleLeft);
+      toggleBtn.appendChild(countSpan);
+      panel.appendChild(toggleBtn);
+
+      // Content div
+      var contentDiv = document.createElement('div');
+      contentDiv.className = 'notes-content';
+      contentDiv.id = 'notes-' + sectionId;
+
+      // Notes list
+      var ul = document.createElement('ul');
+      ul.className = 'notes-list';
+      notes.forEach(function(note, i) {
+        ul.appendChild(createNoteElement(sectionId, note, i));
+      });
+      contentDiv.appendChild(ul);
+
+      // Input row
+      var inputRow = document.createElement('div');
+      inputRow.className = 'note-input-row';
+
+      var textInput = document.createElement('input');
+      textInput.type = 'text';
+      textInput.placeholder = 'Add a note or feedback on this section...';
+      textInput.id = 'input-' + sectionId;
+      textInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') addNote(sectionId);
+      });
+
+      var addBtn = document.createElement('button');
+      addBtn.textContent = 'Add Note';
+      addBtn.addEventListener('click', function() { addNote(sectionId); });
+
+      inputRow.appendChild(textInput);
+      inputRow.appendChild(addBtn);
+      contentDiv.appendChild(inputRow);
+
+      panel.appendChild(contentDiv);
+    });
+  }
+
+  // ─── NOTE ACTIONS ───
+  function toggleNotes(btn, sectionId) {
+    var content = document.getElementById('notes-' + sectionId);
+    btn.classList.toggle('open');
+    content.classList.toggle('open');
+  }
+
+  function addNote(sectionId) {
+    var input = document.getElementById('input-' + sectionId);
+    var text = input.value.trim();
+    if (!text) { input.focus(); return; }
+    if (!reviewerName) {
+      document.getElementById('nameModal').classList.remove('hidden');
+      document.getElementById('nameInput').focus();
+      return;
+    }
+
+    if (!allNotes[sectionId]) allNotes[sectionId] = [];
+    allNotes[sectionId].push({
+      text: text,
+      author: reviewerName,
+      timestamp: new Date().toISOString()
+    });
+    saveNotes();
+    buildAllNotePanels();
+
+    // Re-open the panel
+    var btn = document.querySelector('#' + sectionId + ' .notes-toggle');
+    var content = document.getElementById('notes-' + sectionId);
+    if (btn && content) {
+      btn.classList.add('open');
+      content.classList.add('open');
+    }
+    showToast('Note added');
+  }
+
+  function deleteNote(sectionId, index) {
+    if (!allNotes[sectionId]) return;
+    allNotes[sectionId].splice(index, 1);
+    if (allNotes[sectionId].length === 0) delete allNotes[sectionId];
+    saveNotes();
+    buildAllNotePanels();
+    var btn = document.querySelector('#' + sectionId + ' .notes-toggle');
+    var content = document.getElementById('notes-' + sectionId);
+    if (btn && content) {
+      btn.classList.add('open');
+      content.classList.add('open');
+    }
+  }
+
+  function saveNotes() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(allNotes));
+  }
+
+  // ─── EXPAND / COLLAPSE ALL ───
+  function expandAllNotes() {
+    document.querySelectorAll('.notes-toggle').forEach(function(btn) { btn.classList.add('open'); });
+    document.querySelectorAll('.notes-content').forEach(function(c) { c.classList.add('open'); });
+  }
+
+  function collapseAllNotes() {
+    document.querySelectorAll('.notes-toggle').forEach(function(btn) { btn.classList.remove('open'); });
+    document.querySelectorAll('.notes-content').forEach(function(c) { c.classList.remove('open'); });
+  }
+
+  // ─── EXPORT NOTES AS JSON ───
+  function exportNotesJSON() {
+    var totalNotes = Object.values(allNotes).reduce(function(s, arr) { return s + arr.length; }, 0);
+    if (totalNotes === 0) {
+      showToast('No notes to export yet. Add notes to any section first.');
+      return;
+    }
+
+    var sectionEls = document.querySelectorAll('section[id]');
+    var summary = {
+      document: 'HaloFire Platform — Architecture Diagrams',
+      exported: new Date().toISOString(),
+      totalNotes: totalNotes,
+      sections: {}
+    };
+
+    sectionEls.forEach(function(s) {
+      var id = s.id;
+      var h2 = s.querySelector('h2');
+      var title = h2 ? h2.textContent.trim() : id;
+      if (allNotes[id] && allNotes[id].length > 0) {
+        summary.sections[title] = allNotes[id].map(function(n) {
+          return { note: n.text, by: n.author, date: new Date(n.timestamp).toLocaleString() };
+        });
+      }
+    });
+
+    var blob = new Blob([JSON.stringify(summary, null, 2)], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'halofire-notes-' + new Date().toISOString().slice(0,10) + '.json';
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('Exported ' + totalNotes + ' notes');
+  }
+
+  // ─── EMAIL SUMMARY ───
+  function emailSummary() {
+    var totalNotes = Object.values(allNotes).reduce(function(s, arr) { return s + arr.length; }, 0);
+    var sectionEls = document.querySelectorAll('section[id]');
+    var body = 'HaloFire Platform — Architecture Review Notes\n';
+    body += '==================================================\n\n';
+    body += 'Reviewer: ' + (reviewerName || 'Anonymous') + '\n';
+    body += 'Date: ' + new Date().toLocaleDateString() + '\n';
+    body += 'Total Notes: ' + totalNotes + '\n\n';
+
+    if (totalNotes === 0) {
+      body += 'No notes have been added yet.\n\nPlease review the diagrams and add your feedback.\n';
+    } else {
+      sectionEls.forEach(function(s) {
+        var id = s.id;
+        var h2 = s.querySelector('h2');
+        var title = h2 ? h2.textContent.trim() : id;
+        var notes = allNotes[id] || [];
+        if (notes.length > 0) {
+          body += '----------------------------------------\n';
+          body += title + '\n';
+          body += '----------------------------------------\n';
+          notes.forEach(function(n, i) {
+            var time = new Date(n.timestamp).toLocaleString();
+            body += '  ' + (i + 1) + '. [' + n.author + ', ' + time + ']\n';
+            body += '     ' + n.text + '\n\n';
+          });
+        }
+      });
+    }
+
+    body += '\n==================================================\n';
+    body += 'Generated from HaloFire Architecture Diagrams\n';
+
+    var subject = 'HaloFire Architecture Review — ' + totalNotes + ' Notes from ' + (reviewerName || 'Reviewer');
+    window.location.href = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+  }
+
+  // ─── EXPORT PDF ───
+  function exportPDF() {
+    showToast('Generating PDF... This may take a moment.');
+    expandAllNotes();
+
+    setTimeout(function() {
+      var element = document.querySelector('main');
+      var opt = {
+        margin: [0.5, 0.5, 0.5, 0.5],
+        filename: 'halofire-architecture-' + new Date().toISOString().slice(0,10) + '.pdf',
+        image: { type: 'jpeg', quality: 0.95 },
+        html2canvas: { scale: 1.5, useCORS: true, logging: false },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'landscape' },
+        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+      };
+      html2pdf().set(opt).from(element).save().then(function() {
+        showToast('PDF saved!');
+      }).catch(function(err) {
+        showToast('PDF export failed — try Print > Save as PDF instead');
+        console.error(err);
+      });
+    }, 500);
+  }
+
+  // ─── TOAST ───
+  function showToast(msg) {
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(function() { t.classList.remove('show'); }, 3000);
+  }
+
+  // ─── NAV SMOOTH SCROLL ───
+  document.querySelectorAll('nav a').forEach(function(a) {
+    a.addEventListener('click', function(e) {
+      e.preventDefault();
+      var target = document.querySelector(a.getAttribute('href'));
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        document.querySelectorAll('nav a').forEach(function(n) { n.classList.remove('active'); });
+        a.classList.add('active');
+      }
+    });
+  });
+
+  // ─── NAV SCROLL HIGHLIGHT ───
+  var sectionNavEls = document.querySelectorAll('section[id]');
+  var navLinkEls = document.querySelectorAll('nav a');
+  window.addEventListener('scroll', function() {
+    var current = '';
+    sectionNavEls.forEach(function(s) {
+      if (window.scrollY >= s.offsetTop - 100) current = s.id;
+    });
+    navLinkEls.forEach(function(a) {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+    });
+  });
+</script>
+
+</body>
+</html>

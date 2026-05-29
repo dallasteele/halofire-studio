@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HaloFire — Fire Protection Management Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0a0a0f;--sidebar-bg:#0f0f16;--surface:#13131a;--surface-hover:#1a1a24;
+  --card:#15151e;--card-hover:#1a1a26;--border:#1e1e2e;--border-light:#2a2a3a;
+  --primary:#e53935;--primary-light:#ff6e40;--primary-glow:rgba(229,57,53,0.15);
+  --success:#4caf50;--warning:#ff9800;--danger:#f44336;--info:#2196f3;
+  --text:#e0e0e6;--text-secondary:#8888a0;--text-muted:#5a5a72;--white:#fff;
+  --font:'Inter',system-ui,-apple-system,sans-serif;
+  --radius:8px;--radius-lg:12px;--shadow-lg:0 8px 32px rgba(0,0,0,0.5);
+  --sidebar-w:260px;--sidebar-collapsed:72px;--header-h:64px;
+}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:var(--font);color:var(--text);-webkit-font-smoothing:antialiased;font-size:14px}
+#app{width:100%;height:100%;display:flex}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#2a2a3a;border-radius:3px}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn .3s ease}
+button{font-family:var(--font)}
+input,select,textarea{font-family:var(--font)}
+</style>
+</head>
+<body>
+
+<div id="app"></div>
+
+<script>
+// ============================================================
+// HaloFire Platform — Pure Vanilla JS, Zero Dependencies
+// ============================================================
+
+// ── State Management ──
+var state = {
+  user: null,
+  page: 'dashboard',
+  sidebarCollapsed: false,
+  bidFilter: 'All',
+  showAddBid: false,
+  selectedProject: null,
+  priceSearch: '',
+  priceCat: 'All',
+  estimateResult: null,
+};
+
+// ── Data ──
+var BIDS = [
+  {id:1,project:"Home Depot - Rexburg ID",contractor:"Jacobsen Construction",value:187500,status:"Won",date:"2026-01-15",dueDate:"2026-02-01",sqft:121500,system:"Wet",contact:"Mike Jensen"},
+  {id:2,project:"Walmart Supercenter - Twin Falls",contractor:"Boise Commercial Builders",value:342000,status:"Pending",date:"2026-02-20",dueDate:"2026-03-15",sqft:185000,system:"Wet/Dry",contact:"Sarah Chen"},
+  {id:3,project:"St. Luke's Medical - Meridian",contractor:"Hoffman Construction",value:895000,status:"Won",date:"2026-01-08",dueDate:"2026-01-20",sqft:340000,system:"Wet/Preaction",contact:"Tom Bradley"},
+  {id:4,project:"Micron Office Complex B3",contractor:"Engineered Structures",value:567000,status:"Lost",date:"2025-12-10",dueDate:"2025-12-28",sqft:220000,system:"Wet",contact:"Linda Park"},
+  {id:5,project:"Amazon Fulfillment - Nampa",contractor:"Turner Construction",value:1250000,status:"Won",date:"2026-02-01",dueDate:"2026-02-15",sqft:850000,system:"ESFR",contact:"James Rodriguez"},
+  {id:6,project:"Boise State Recreation Center",contractor:"Andersen Construction",value:445000,status:"Pending",date:"2026-03-01",dueDate:"2026-03-20",sqft:175000,system:"Wet",contact:"Emily Watson"},
+  {id:7,project:"Idaho Power HQ Renovation",contractor:"Petra Inc",value:278000,status:"Won",date:"2025-11-15",dueDate:"2025-12-01",sqft:95000,system:"Wet/Standpipe",contact:"David Kim"},
+  {id:8,project:"Costco - Caldwell",contractor:"Big-D Construction",value:198000,status:"Pending",date:"2026-03-05",dueDate:"2026-03-25",sqft:150000,system:"ESFR",contact:"Rachel Moore"},
+  {id:9,project:"Simplot Agribusiness Plant",contractor:"Hensel Phelps",value:1780000,status:"Won",date:"2025-10-20",dueDate:"2025-11-05",sqft:520000,system:"Deluge/Preaction",contact:"Mark Sullivan"},
+  {id:10,project:"Eagle High School Addition",contractor:"Wright Brothers",value:165000,status:"Lost",date:"2026-01-25",dueDate:"2026-02-10",sqft:48000,system:"Wet",contact:"Karen Olsen"},
+  {id:11,project:"Fred Meyer - Boise Towne",contractor:"Lease Crutcher Lewis",value:225000,status:"Won",date:"2025-09-12",dueDate:"2025-09-30",sqft:110000,system:"Wet",contact:"Paul Nguyen"},
+  {id:12,project:"St. Alphonsus ER Expansion",contractor:"Layton Construction",value:612000,status:"Pending",date:"2026-03-10",dueDate:"2026-04-01",sqft:85000,system:"Wet/Preaction",contact:"Dr. Amy Cho"},
+];
+
+var PROJECTS = [
+  {id:1,name:"Home Depot - Rexburg ID",phase:"Installation",progress:72,budget:187500,spent:134200,manager:"Jake Torres",startDate:"2026-02-01",endDate:"2026-05-15",status:"On Track"},
+  {id:2,name:"St. Luke's Medical - Meridian",phase:"Design",progress:35,budget:895000,spent:156800,manager:"Dallas Steele",startDate:"2026-02-15",endDate:"2026-11-30",status:"On Track"},
+  {id:3,name:"Amazon Fulfillment - Nampa",phase:"Fabrication",progress:48,budget:1250000,spent:387000,manager:"Jake Torres",startDate:"2026-03-01",endDate:"2027-01-15",status:"Ahead"},
+  {id:4,name:"Simplot Agribusiness Plant",phase:"Testing",progress:91,budget:1780000,spent:1654000,manager:"Dallas Steele",startDate:"2025-06-01",endDate:"2026-04-01",status:"On Track"},
+  {id:5,name:"Idaho Power HQ Renovation",phase:"Closeout",progress:96,budget:278000,spent:271500,manager:"Maria Santos",startDate:"2025-08-01",endDate:"2026-03-30",status:"On Track"},
+  {id:6,name:"Fred Meyer - Boise Towne",phase:"Closeout",progress:100,budget:225000,spent:218400,manager:"Maria Santos",startDate:"2025-07-01",endDate:"2026-01-15",status:"Complete"},
+];
+
+var PRICEBOOK = [
+  {id:1,item:'1" CPVC Pipe (10ft)',supplier:"ARGCO",price:12.45,unit:"LF",category:"Pipe",lastUpdated:"2026-01-15"},
+  {id:2,item:'1" Viking Pendent Head (155F)',supplier:"FFF",price:8.75,unit:"EA",category:"Heads",lastUpdated:"2026-01-15"},
+  {id:3,item:'2" Victaulic Style 77 Coupling',supplier:"Victaulic",price:24.30,unit:"EA",category:"Fittings",lastUpdated:"2026-02-01"},
+  {id:4,item:'1-1/4" CPVC Tee',supplier:"ARGCO",price:6.80,unit:"EA",category:"Fittings",lastUpdated:"2026-01-15"},
+  {id:5,item:'3/4" Sidewall Head (175F)',supplier:"FFF",price:15.20,unit:"EA",category:"Heads",lastUpdated:"2026-01-15"},
+  {id:6,item:'Victaulic Style 607 Valve 4"',supplier:"Victaulic",price:485.00,unit:"EA",category:"Valves",lastUpdated:"2026-02-01"},
+  {id:7,item:'2" Sch 40 Black Steel (21ft)',supplier:"ARGCO",price:38.90,unit:"LF",category:"Pipe",lastUpdated:"2026-01-15"},
+  {id:8,item:'Viking Concealed Head (165F)',supplier:"FFF",price:22.50,unit:"EA",category:"Heads",lastUpdated:"2026-01-15"},
+  {id:9,item:'6" Victaulic Style 77 Coupling',supplier:"Victaulic",price:67.80,unit:"EA",category:"Fittings",lastUpdated:"2026-02-01"},
+  {id:10,item:'4" Alarm Check Valve',supplier:"FFF",price:1250.00,unit:"EA",category:"Valves",lastUpdated:"2026-01-15"},
+];
+
+var COMPLIANCE = [
+  {id:1,project:"Home Depot - Rexburg ID",type:"Final Inspection",dueDate:"2026-05-20",status:"Upcoming",authority:"Rexburg Fire Marshal"},
+  {id:2,project:"St. Luke's Medical - Meridian",type:"Design Review",dueDate:"2026-03-25",status:"Due Soon",authority:"Ada County AHJ"},
+  {id:3,project:"Simplot Agribusiness Plant",type:"Acceptance Test",dueDate:"2026-03-18",status:"Due Soon",authority:"Canyon County Fire"},
+  {id:4,project:"Idaho Power HQ",type:"Final Closeout",dueDate:"2026-03-30",status:"In Progress",authority:"Boise Fire Dept"},
+  {id:5,project:"Amazon Fulfillment - Nampa",type:"Rough-In Inspection",dueDate:"2026-06-15",status:"Upcoming",authority:"Nampa Fire Marshal"},
+];
+
+var REVENUE = [
+  {month:'Jul',revenue:285000,expenses:198000},
+  {month:'Aug',revenue:342000,expenses:215000},
+  {month:'Sep',revenue:398000,expenses:245000},
+  {month:'Oct',revenue:520000,expenses:312000},
+  {month:'Nov',revenue:445000,expenses:267000},
+  {month:'Dec',revenue:380000,expenses:234000},
+  {month:'Jan',revenue:467000,expenses:278000},
+  {month:'Feb',revenue:512000,expenses:298000},
+  {month:'Mar',revenue:380000,expenses:245000},
+];
+
+// ── SVG Icons ──
+var ICONS = {
+  dashboard:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
+  sales:'<path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>',
+  estimate:'<rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>',
+  projects:'<path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/>',
+  compliance:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+  analytics:'<path d="M18 20V10M12 20V4M6 20v-6"/>',
+  logout:'<path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>',
+  search:'<circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>',
+  bell:'<path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  check:'<polyline points="20 6 9 17 4 12"/>',
+  x:'<path d="M18 6L6 18M6 6l12 12"/>',
+  menu:'<line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>',
+  fire:'<path d="M8.5 14.5A2.5 2.5 0 0011 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 11-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 002.5 2.5z"/>',
+  arrowUp:'<path d="M12 19V5M5 12l7-7 7 7"/>',
+  arrowDown:'<path d="M12 5v14M5 12l7 7 7-7"/>',
+  clock:'<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+  building:'<rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4M8 6h.01M16 6h.01M12 6h.01M12 10h.01M8 10h.01M16 10h.01M12 14h.01M8 14h.01M16 14h.01"/>',
+  dollar:'<line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>',
+  pricebook:'<path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>',
+};
+
+function icon(name, size, color) {
+  var s = size || 20;
+  var c = color || 'currentColor';
+  return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 24 24" fill="none" stroke="'+c+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+(ICONS[name]||'')+'</svg>';
+}
+
+// ── Helpers ──
+function $(sel) { return document.querySelector(sel); }
+function $$(sel) { return document.querySelectorAll(sel); }
+function esc(s) { var d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+function money(n) { return '$'+Number(n).toLocaleString(); }
+function pct(n) { return Math.round(n)+'%'; }
+
+function statusColor(s) {
+  return {Won:'var(--success)',Pending:'var(--warning)',Lost:'var(--danger)','On Track':'var(--success)',Ahead:'var(--info)',Complete:'var(--text-muted)','Due Soon':'var(--warning)',Upcoming:'var(--info)','In Progress':'var(--primary)'}[s] || 'var(--text-muted)';
+}
+
+function badge(text, color) {
+  var c = color || 'var(--primary)';
+  return '<span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;background:'+c+'20;color:'+c+';letter-spacing:.3px">'+esc(text)+'</span>';
+}
+
+function statusBadge(s) { return badge(s, statusColor(s)); }
+
+function progressBar(val, color, height) {
+  var h = height||6, c=color||'var(--primary)', v=Math.min(val,100);
+  return '<div style="width:100%;height:'+h+'px;background:var(--bg);border-radius:'+(h/2)+'px;overflow:hidden"><div style="width:'+v+'%;height:100%;background:'+c+';border-radius:'+(h/2)+'px;transition:width .5s ease"></div></div>';
+}
+
+// ── Simple SVG Bar Chart ──
+function svgBarChart(data, width, height, key1, key2, color1, color2) {
+  var w=width, h=height, max=0, pad=40, gap=8;
+  data.forEach(function(d){ if(d[key1]>max)max=d[key1]; if(key2&&d[key2]>max)max=d[key2]; });
+  max = max * 1.1;
+  var barW = key2 ? ((w-pad*2)/data.length - gap*2)/2 : (w-pad*2)/data.length - gap;
+  var svg = '<svg width="'+w+'" height="'+h+'" style="display:block">';
+  // Grid lines
+  for(var i=0;i<=4;i++){
+    var y = pad + (h-pad*2) * i/4;
+    svg += '<line x1="'+pad+'" y1="'+y+'" x2="'+(w-10)+'" y2="'+y+'" stroke="#1e1e2e" stroke-dasharray="3,3"/>';
+    svg += '<text x="'+(pad-5)+'" y="'+(y+4)+'" fill="#5a5a72" font-size="10" text-anchor="end">$'+(Math.round(max*(1-i/4)/1000))+'k</text>';
+  }
+  data.forEach(function(d,idx){
+    var x = pad + idx * ((w-pad*2)/data.length) + gap;
+    var h1 = (d[key1]/max) * (h-pad*2);
+    svg += '<rect x="'+x+'" y="'+(h-pad-h1)+'" width="'+barW+'" height="'+h1+'" rx="3" fill="'+color1+'" opacity="0.9"/>';
+    if(key2){
+      var h2 = (d[key2]/max) * (h-pad*2);
+      svg += '<rect x="'+(x+barW+2)+'" y="'+(h-pad-h2)+'" width="'+barW+'" height="'+h2+'" rx="3" fill="'+color2+'" opacity="0.9"/>';
+    }
+    svg += '<text x="'+(x+barW)+'" y="'+(h-10)+'" fill="#5a5a72" font-size="10" text-anchor="middle">'+d.month+'</text>';
+  });
+  svg += '</svg>';
+  return svg;
+}
+
+// ── Simple SVG Area Chart ──
+function svgAreaChart(data, width, height, key1, key2, color1, color2) {
+  var w=width, h=height, max=0, pad=40;
+  data.forEach(function(d){ if(d[key1]>max)max=d[key1]; if(key2&&d[key2]>max)max=d[key2]; });
+  max = max * 1.1;
+  var step = (w-pad*2)/(data.length-1);
+
+  function points(key){
+    return data.map(function(d,i){ return (pad+i*step)+','+(h-pad-(d[key]/max)*(h-pad*2)); }).join(' ');
+  }
+  function areaPath(key){
+    var pts = data.map(function(d,i){ return (pad+i*step)+','+(h-pad-(d[key]/max)*(h-pad*2)); });
+    return 'M'+pts.join(' L')+' L'+(pad+(data.length-1)*step)+','+(h-pad)+' L'+pad+','+(h-pad)+' Z';
+  }
+
+  var svg = '<svg width="'+w+'" height="'+h+'" style="display:block">';
+  svg += '<defs><linearGradient id="ag1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="'+color1+'" stop-opacity="0.3"/><stop offset="100%" stop-color="'+color1+'" stop-opacity="0"/></linearGradient>';
+  if(key2) svg += '<linearGradient id="ag2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="'+color2+'" stop-opacity="0.2"/><stop offset="100%" stop-color="'+color2+'" stop-opacity="0"/></linearGradient>';
+  svg += '</defs>';
+  for(var i=0;i<=4;i++){
+    var y=pad+(h-pad*2)*i/4;
+    svg += '<line x1="'+pad+'" y1="'+y+'" x2="'+(w-10)+'" y2="'+y+'" stroke="#1e1e2e" stroke-dasharray="3,3"/>';
+    svg += '<text x="'+(pad-5)+'" y="'+(y+4)+'" fill="#5a5a72" font-size="10" text-anchor="end">$'+(Math.round(max*(1-i/4)/1000))+'k</text>';
+  }
+  svg += '<path d="'+areaPath(key1)+'" fill="url(#ag1)"/>';
+  svg += '<polyline points="'+points(key1)+'" fill="none" stroke="'+color1+'" stroke-width="2"/>';
+  if(key2){
+    svg += '<path d="'+areaPath(key2)+'" fill="url(#ag2)"/>';
+    svg += '<polyline points="'+points(key2)+'" fill="none" stroke="'+color2+'" stroke-width="2"/>';
+  }
+  data.forEach(function(d,i){
+    svg += '<text x="'+(pad+i*step)+'" y="'+(h-10)+'" fill="#5a5a72" font-size="10" text-anchor="middle">'+d.month+'</text>';
+  });
+  svg += '</svg>';
+  return svg;
+}
+
+// ── Simple SVG Donut ──
+function svgDonut(data, size) {
+  var r=size/2, cr=r*0.55, or=r*0.7, total=0;
+  data.forEach(function(d){total+=d.value});
+  var svg = '<svg width="'+size+'" height="'+size+'" style="display:block;margin:0 auto">';
+  var angle = -90;
+  data.forEach(function(d){
+    var pct = d.value/total;
+    var a1 = angle * Math.PI/180;
+    var a2 = (angle + pct*360) * Math.PI/180;
+    var large = pct > 0.5 ? 1 : 0;
+    var x1=r+or*Math.cos(a1), y1=r+or*Math.sin(a1);
+    var x2=r+or*Math.cos(a2), y2=r+or*Math.sin(a2);
+    var ix1=r+cr*Math.cos(a1), iy1=r+cr*Math.sin(a1);
+    var ix2=r+cr*Math.cos(a2), iy2=r+cr*Math.sin(a2);
+    svg += '<path d="M'+x1+','+y1+' A'+or+','+or+' 0 '+large+',1 '+x2+','+y2+' L'+ix2+','+iy2+' A'+cr+','+cr+' 0 '+large+',0 '+ix1+','+iy1+' Z" fill="'+d.color+'"/>';
+    angle += pct*360;
+  });
+  svg += '</svg>';
+  return svg;
+}
+
+// ── Card wrapper ──
+function card(content, style) { return '<div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;'+(style||'')+'">' + content + '</div>'; }
+
+function statCard(iconName, label, value, change, changeType, color) {
+  var c = color || 'var(--primary)';
+  var changeHtml = '';
+  if(change){
+    var cc = changeType==='up'?'var(--success)':'var(--danger)';
+    changeHtml = '<div style="display:flex;align-items:center;gap:4px;margin-top:8px">'+icon(changeType==='up'?'arrowUp':'arrowDown',14,cc)+'<span style="font-size:12px;font-weight:600;color:'+cc+'">'+change+'</span><span style="font-size:12px;color:var(--text-muted)">vs last month</span></div>';
+  }
+  return card(
+    '<div style="display:flex;align-items:flex-start;justify-content:space-between">'+
+      '<div><p style="font-size:12px;color:var(--text-muted);font-weight:500;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">'+esc(label)+'</p>'+
+      '<p style="font-size:28px;font-weight:800;color:var(--white);letter-spacing:-.5px">'+esc(value)+'</p>'+changeHtml+'</div>'+
+      '<div style="width:44px;height:44px;border-radius:var(--radius);background:'+c+'15;display:flex;align-items:center;justify-content:center">'+icon(iconName,22,c)+'</div>'+
+    '</div>'
+  );
+}
+
+// ── Render Engine ──
+function render() {
+  var app = document.getElementById('app');
+  if (!state.user) {
+    app.innerHTML = renderLogin();
+    app.style.display = 'flex';
+  } else {
+    app.innerHTML = renderSidebar() + '<div style="flex:1;display:flex;flex-direction:column;overflow:hidden">' + renderHeader() + '<main id="main" style="flex:1;overflow:auto;padding:24px;background:var(--bg)">' + renderPage() + '</main></div>';
+    app.style.display = 'flex';
+    if(state.showAddBid) renderAddBidModal();
+    if(state.selectedProject) renderProjectModal();
+  }
+  bindEvents();
+}
+
+// ── Login ──
+function renderLogin() {
+  return '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0a0a0f 0%,#1a0a0a 50%,#0a0a0f 100%)">'+
+    '<div style="width:400px;background:var(--surface);border-radius:var(--radius-lg);border:1px solid var(--border);padding:40px;box-shadow:var(--shadow-lg)">'+
+      '<div style="text-align:center;margin-bottom:32px">'+
+        '<div style="display:inline-flex;align-items:center;gap:10px;margin-bottom:16px">'+icon('fire',36,'var(--primary)')+
+          '<span style="font-size:28px;font-weight:800;letter-spacing:-.5px"><i style="color:var(--white)">Halo</i><i style="color:var(--primary)">Fire</i></span></div>'+
+        '<p style="color:var(--text-secondary);font-size:13px">Fire Protection Management Platform</p></div>'+
+      '<form id="loginForm">'+
+        '<div style="margin-bottom:16px"><label style="display:block;font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Username</label>'+
+        '<input id="loginUser" type="text" placeholder="admin" value="admin" autofocus style="width:100%;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:14px;outline:none"></div>'+
+        '<div style="margin-bottom:24px"><label style="display:block;font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Password</label>'+
+        '<input id="loginPass" type="password" placeholder="Enter password" value="halofire2026" style="width:100%;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:14px;outline:none"></div>'+
+        '<div id="loginError" style="display:none;padding:8px 12px;background:rgba(244,67,54,.1);border:1px solid rgba(244,67,54,.3);border-radius:var(--radius);color:var(--danger);font-size:13px;margin-bottom:16px"></div>'+
+        '<button type="submit" style="width:100%;padding:12px;background:var(--primary);color:var(--white);border:none;border-radius:var(--radius);font-size:14px;font-weight:600;cursor:pointer">Sign In</button>'+
+      '</form>'+
+      '<p style="text-align:center;margin-top:20px;font-size:12px;color:var(--text-muted)">Serving, Protecting, Nationwide</p>'+
+    '</div></div>';
+}
+
+// ── Sidebar ──
+function renderSidebar() {
+  var c = state.sidebarCollapsed;
+  var w = c ? 'var(--sidebar-collapsed)' : 'var(--sidebar-w)';
+  var items = [
+    {id:'dashboard',label:'Dashboard',icon:'dashboard'},
+    {id:'sales',label:'Sales & Bids',icon:'sales'},
+    {id:'estimating',label:'Estimating',icon:'estimate'},
+    {id:'projects',label:'Projects',icon:'projects'},
+    {id:'pricebook',label:'Pricebook',icon:'pricebook'},
+    {id:'compliance',label:'Compliance',icon:'compliance'},
+    {id:'analytics',label:'Analytics',icon:'analytics'},
+  ];
+  var nav = items.map(function(item) {
+    var active = state.page === item.id;
+    var bg = active ? 'var(--primary-glow)' : 'transparent';
+    var col = active ? 'var(--primary-light)' : 'var(--text-secondary)';
+    var fw = active ? 600 : 400;
+    var bl = active ? '3px solid var(--primary)' : '3px solid transparent';
+    return '<button data-nav="'+item.id+'" style="display:flex;align-items:center;gap:12px;padding:'+(c?'10px 0':'10px 12px')+';background:'+bg+';border:none;border-left:'+bl+';border-radius:var(--radius);color:'+col+';cursor:pointer;font-size:13px;font-weight:'+fw+';justify-content:'+(c?'center':'flex-start')+';width:100%" title="'+item.label+'">'+
+      icon(item.icon,20,active?'var(--primary)':'currentColor') + (c?'':'<span>'+item.label+'</span>') + '</button>';
+  }).join('');
+
+  var user = state.user;
+  return '<div style="width:'+w+';height:100%;background:var(--sidebar-bg);border-right:1px solid var(--border);display:flex;flex-direction:column;transition:width .25s ease;overflow:hidden;flex-shrink:0">'+
+    '<div id="sidebarToggle" style="padding:'+(c?'16px 0':'16px 20px')+';display:flex;align-items:center;gap:10px;height:64px;border-bottom:1px solid var(--border);justify-content:'+(c?'center':'flex-start')+';cursor:pointer">'+
+      icon('fire',28,'var(--primary)') + (c?'':'<span style="font-size:20px;font-weight:800;letter-spacing:-.3px;white-space:nowrap"><i style="color:var(--white)">Halo</i><i style="color:var(--primary)">Fire</i></span>') +
+    '</div>'+
+    '<nav style="flex:1;padding:12px 8px;display:flex;flex-direction:column;gap:2px">' + nav + '</nav>'+
+    '<div style="padding:'+(c?'12px 0':'12px 16px')+';border-top:1px solid var(--border);display:flex;align-items:center;gap:10px;justify-content:'+(c?'center':'flex-start')+'">'+
+      '<div style="width:32px;height:32px;border-radius:50%;background:var(--primary-glow);color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0">DS</div>'+
+      (c?'':'<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(user.name)+'</div><div style="font-size:11px;color:var(--text-muted)">'+esc(user.role)+'</div></div>'+
+      '<button id="logoutBtn" style="background:none;border:none;color:var(--text-muted);cursor:pointer;padding:4px" title="Sign Out">'+icon('logout',16)+'</button>') +
+    '</div></div>';
+}
+
+// ── Header ──
+function renderHeader() {
+  var titles = {dashboard:'Dashboard',sales:'Sales & Bids',estimating:'Estimating',projects:'Projects',pricebook:'Pricebook',compliance:'Compliance',analytics:'Analytics'};
+  return '<div style="height:var(--header-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;flex-shrink:0">'+
+    '<button id="menuToggle" style="background:none;border:none;color:var(--text-secondary);cursor:pointer;padding:4px;display:flex">'+icon('menu')+'</button>'+
+    '<h1 style="font-size:18px;font-weight:700;color:var(--white);flex:0 0 auto">'+(titles[state.page]||'Dashboard')+'</h1>'+
+    '<div style="flex:1"></div>'+
+    '<div style="position:relative;width:280px">'+icon('search',16,'var(--text-muted)')
+      .replace('<svg','<svg style="position:absolute;left:12px;top:50%;transform:translateY(-50%)"')+
+      '<input type="text" placeholder="Search anything..." style="width:100%;padding:8px 12px 8px 36px;background:var(--bg);border:1px solid var(--border);border-radius:20px;color:var(--text);font-size:13px;outline:none"></div>'+
+    '<button style="background:none;border:none;color:var(--text-secondary);cursor:pointer;padding:6px;position:relative">'+icon('bell')+
+      '<span style="position:absolute;top:2px;right:2px;width:8px;height:8px;background:var(--primary);border-radius:50%;border:2px solid var(--surface)"></span></button>'+
+  '</div>';
+}
+
+// ── Page Router ──
+function renderPage() {
+  var pages = {dashboard:renderDashboard,sales:renderSales,estimating:renderEstimating,projects:renderProjects,pricebook:renderPricebook,compliance:renderCompliance,analytics:renderAnalytics};
+  return '<div class="fade-in">'+(pages[state.page]||renderDashboard)()+'</div>';
+}
+
+// ── DASHBOARD ──
+function renderDashboard() {
+  var won = BIDS.filter(function(b){return b.status==='Won'});
+  var rev = won.reduce(function(s,b){return s+b.value},0);
+  var active = PROJECTS.filter(function(p){return p.status!=='Complete'});
+
+  var kpis = '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px">'+
+    statCard('projects','Active Projects',String(active.length),'12%','up','var(--info)')+
+    statCard('sales','Bids Won (YTD)',String(won.length),'8%','up','var(--success)')+
+    statCard('dollar','Revenue YTD','$'+(rev/1e6).toFixed(1)+'M','15%','up','var(--primary)')+
+    statCard('compliance','Compliance Rate','98%','2%','up','var(--warning)')+
+  '</div>';
+
+  var charts = '<div style="display:grid;grid-template-columns:2fr 1fr;gap:16px">'+
+    card('<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="font-size:15px;font-weight:700;color:var(--white)">Revenue Overview</h3>'+badge('Last 9 Months')+'</div>'+
+      '<div style="overflow-x:auto">'+svgAreaChart(REVENUE,580,240,'revenue','expenses','#e53935','#2196f3')+'</div>'+
+      '<div style="display:flex;gap:16px;margin-top:8px;justify-content:center"><span style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--text-secondary)"><span style="width:12px;height:3px;background:#e53935;border-radius:2px;display:inline-block"></span>Revenue</span><span style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--text-secondary)"><span style="width:12px;height:3px;background:#2196f3;border-radius:2px;display:inline-block"></span>Expenses</span></div>')+
+    card('<h3 style="font-size:15px;font-weight:700;color:var(--white);margin-bottom:16px">Bid Pipeline</h3>'+
+      svgDonut([{name:'Won',value:312,color:'#4caf50'},{name:'Pending',value:87,color:'#ff9800'},{name:'Lost',value:145,color:'#f44336'}],180)+
+      '<div style="display:flex;justify-content:center;gap:16px;margin-top:12px">'+
+        [{n:'Won',v:312,c:'#4caf50'},{n:'Pending',v:87,c:'#ff9800'},{n:'Lost',v:145,c:'#f44336'}].map(function(d){
+          return '<div style="display:flex;align-items:center;gap:6px"><div style="width:8px;height:8px;border-radius:50%;background:'+d.c+'"></div><span style="font-size:12px;color:var(--text-secondary)">'+d.n+': '+d.v+'</span></div>';
+        }).join('')+'</div>')+
+  '</div>';
+
+  var projList = active.slice(0,4).map(function(p){
+    var c = p.status==='Ahead'?'var(--info)':p.progress>80?'var(--success)':'var(--primary)';
+    return '<div style="display:flex;align-items:center;gap:12px"><div style="flex:1;min-width:0"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(p.name)+'</span><span style="font-size:12px;color:var(--text-muted);flex-shrink:0;margin-left:8px">'+p.progress+'%</span></div>'+progressBar(p.progress,c)+'</div></div>';
+  }).join('');
+
+  var compList = COMPLIANCE.slice(0,4).map(function(c){
+    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--bg);border-radius:var(--radius);border:1px solid var(--border)"><div><div style="font-size:13px;font-weight:500;color:var(--text)">'+esc(c.project)+'</div><div style="font-size:11px;color:var(--text-muted);margin-top:2px">'+esc(c.type)+' — '+esc(c.authority)+'</div></div><div style="text-align:right">'+statusBadge(c.status)+'<div style="font-size:11px;color:var(--text-muted);margin-top:4px">'+c.dueDate+'</div></div></div>';
+  }).join('');
+
+  var bottom = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">'+
+    card('<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="font-size:15px;font-weight:700;color:var(--white)">Active Projects</h3><span style="font-size:12px;color:var(--text-muted)">'+active.length+' projects</span></div><div style="display:flex;flex-direction:column;gap:12px">'+projList+'</div>')+
+    card('<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="font-size:15px;font-weight:700;color:var(--white)">Compliance Deadlines</h3>'+badge('Action Required','var(--warning)')+'</div><div style="display:flex;flex-direction:column;gap:10px">'+compList+'</div>')+
+  '</div>';
+
+  return kpis + '<div style="margin-top:20px">' + charts + '</div><div style="margin-top:20px">' + bottom + '</div>';
+}
+
+// ── SALES ──
+function renderSales() {
+  var filtered = state.bidFilter==='All' ? BIDS : BIDS.filter(function(b){return b.status===state.bidFilter});
+  var s = {total:BIDS.length, won:BIDS.filter(function(b){return b.status==='Won'}).length, pending:BIDS.filter(function(b){return b.status==='Pending'}).length, lost:BIDS.filter(function(b){return b.status==='Lost'}).length};
+  var wr = s.total ? Math.round(s.won/s.total*100) : 0;
+
+  var kpis = '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px">'+
+    statCard('sales','Total Bids',String(s.total),null,null,'var(--info)')+
+    statCard('check','Won',String(s.won),null,null,'var(--success)')+
+    statCard('clock','Pending',String(s.pending),null,null,'var(--warning)')+
+    statCard('analytics','Win Rate',wr+'%',null,null,'var(--primary)')+
+  '</div>';
+
+  var filters = ['All','Won','Pending','Lost'].map(function(f){
+    var active = state.bidFilter===f;
+    return '<button data-bidfilter="'+f+'" style="padding:6px 12px;font-size:12px;font-weight:600;border-radius:var(--radius);cursor:pointer;border:'+(active?'none':'1px solid var(--border)')+';background:'+(active?'var(--primary)':'var(--surface-hover)')+';color:'+(active?'var(--white)':'var(--text)')+'">'+f+'</button>';
+  }).join('');
+
+  var rows = filtered.map(function(b){
+    var sc = b.status==='Won'?'var(--success)':b.status==='Lost'?'var(--danger)':'var(--warning)';
+    return '<tr><td style="padding:12px 14px;font-size:13px;border-bottom:1px solid var(--border);font-weight:600;color:var(--white)">'+esc(b.project)+'</td>'+
+      '<td style="padding:12px 14px;font-size:13px;border-bottom:1px solid var(--border)">'+esc(b.contractor)+'</td>'+
+      '<td style="padding:12px 14px;font-size:13px;border-bottom:1px solid var(--border);font-weight:500">'+money(b.value)+'</td>'+
+      '<td style="padding:12px 14px;font-size:13px;border-bottom:1px solid var(--border)">'+b.sqft.toLocaleString()+'</td>'+
+      '<td style="padding:12px 14px;font-size:13px;border-bottom:1px solid var(--border)">'+esc(b.system)+'</td>'+
+      '<td style="padding:12px 14px;font-size:13px;border-bottom:1px solid var(--border)"><select data-bidstatus="'+b.id+'" style="background:transparent;border:none;color:'+sc+';font-size:13px;font-weight:600;cursor:pointer;outline:none"><option'+(b.status==='Pending'?' selected':'')+'>Pending</option><option'+(b.status==='Won'?' selected':'')+'>Won</option><option'+(b.status==='Lost'?' selected':'')+'>Lost</option></select></td>'+
+      '<td style="padding:12px 14px;font-size:13px;border-bottom:1px solid var(--border)">'+esc(b.dueDate||'')+'</td></tr>';
+  }).join('');
+
+  var table = '<table style="width:100%;border-collapse:collapse"><thead><tr>'+
+    ['Project','Contractor','Value','Sq Ft','System','Status','Due Date'].map(function(h){
+      return '<th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);white-space:nowrap">'+h+'</th>';
+    }).join('')+'</tr></thead><tbody>'+rows+'</tbody></table>';
+
+  return kpis+'<div style="margin-top:20px">'+card(
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div style="display:flex;gap:8px">'+filters+'</div>'+
+    '<button id="addBidBtn" style="padding:10px 16px;font-size:13px;font-weight:600;border-radius:var(--radius);cursor:pointer;border:none;background:var(--primary);color:var(--white);display:inline-flex;align-items:center;gap:8px">'+icon('plus',16)+' New Bid</button></div>'+
+    '<div style="overflow-x:auto">'+table+'</div>'
+  )+'</div>';
+}
+
+// ── ESTIMATING ──
+function renderEstimating() {
+  var r = state.estimateResult;
+  var rightContent = '';
+  if(r) {
+    rightContent = card('<div style="text-align:center;padding:12px 0"><p style="font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Estimated Total</p><p style="font-size:42px;font-weight:800;color:var(--white);letter-spacing:-1px">'+money(r.total)+'</p><p style="font-size:14px;color:var(--primary);margin-top:4px">$'+r.pricePerSqft+' / sq ft</p></div>','background:linear-gradient(135deg,var(--card) 0%,#1a1015 100%);border-color:var(--primary)') +
+      '<div style="margin-top:16px">'+card('<h4 style="font-size:14px;font-weight:600;color:var(--white);margin-bottom:16px">Cost Breakdown</h4>'+
+        [['Material Cost',money(r.materialCost)],['Labor Hours',r.laborHours.toLocaleString()+' hrs'],['Labor Cost',money(r.laborCost)],['Subtotal',money(r.subtotal)],['Markup',money(r.markup)]].map(function(p,i){
+          return '<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:'+(i<4?'1px solid var(--border)':'none')+'"><span style="color:var(--text-secondary);font-size:13px">'+p[0]+'</span><span style="color:var(--text);font-weight:500;font-size:13px">'+p[1]+'</span></div>';
+        }).join(''))+'</div>'+
+      '<div style="margin-top:16px">'+card('<h4 style="font-size:14px;font-weight:600;color:var(--white);margin-bottom:12px">Material Quantities</h4><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><div style="padding:12px;background:var(--bg);border-radius:var(--radius);text-align:center"><p style="font-size:24px;font-weight:700;color:var(--primary)">'+r.headCount+'</p><p style="font-size:11px;color:var(--text-muted)">Sprinkler Heads</p></div><div style="padding:12px;background:var(--bg);border-radius:var(--radius);text-align:center"><p style="font-size:24px;font-weight:700;color:var(--info)">'+r.pipeLength.toLocaleString()+"'"+'</p><p style="font-size:11px;color:var(--text-muted)">Pipe (LF)</p></div></div>')+'</div>';
+  } else {
+    rightContent = card('<div style="display:flex;align-items:center;justify-content:center;min-height:300px"><div style="text-align:center">'+icon('estimate',48,'var(--text-muted)')+'<p style="color:var(--text-muted);font-size:14px;margin-top:16px">Enter project details and click Calculate</p></div></div>');
+  }
+
+  function field(label, input) { return '<div style="margin-bottom:16px"><label style="display:block;font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">'+label+'</label>'+input+'</div>'; }
+  var is = 'style="width:100%;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:14px;outline:none"';
+
+  return '<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">'+
+    card('<h3 style="font-size:16px;font-weight:700;color:var(--white);margin-bottom:20px">Quick Estimate Calculator</h3>'+
+      field('Project Name','<input id="estProject" '+is+' placeholder="Project name">')+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">'+
+        field('Total Sq Ft','<input id="estSqft" type="number" '+is+' placeholder="150000">')+
+        field('Stories','<input id="estStories" type="number" '+is+' value="1" min="1">')+
+        field('System Type','<select id="estSystem" '+is+'><option>Wet</option><option>Dry</option><option>Preaction</option><option>Deluge</option><option>ESFR</option><option>Wet/Dry</option><option>Standpipe</option></select>')+
+        field('Hazard Classification','<select id="estHazard" '+is+'><option>Light</option><option>Ordinary</option><option>Extra Hazard</option></select>')+
+        field('Labor Rate ($/hr)','<input id="estLabor" type="number" '+is+' value="85">')+
+        field('Markup %','<input id="estMarkup" type="number" '+is+' value="25">')+
+      '</div>'+
+      '<button id="calcBtn" style="width:100%;margin-top:8px;padding:10px 16px;font-size:13px;font-weight:600;border-radius:var(--radius);cursor:pointer;border:none;background:var(--primary);color:var(--white)">Calculate Estimate</button>')+
+    '<div>'+rightContent+'</div></div>';
+}
+
+// ── PROJECTS ──
+function renderProjects() {
+  return '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">'+
+    PROJECTS.map(function(p){
+      var pc = p.progress>=90?'var(--success)':p.progress>=50?'var(--primary)':'var(--info)';
+      return '<div data-project="'+p.id+'" style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;cursor:pointer;transition:all .2s ease">'+
+        '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px"><div><h4 style="font-size:14px;font-weight:600;color:var(--white);margin-bottom:4px">'+esc(p.name)+'</h4><p style="font-size:12px;color:var(--text-muted)">PM: '+esc(p.manager)+'</p></div>'+statusBadge(p.status)+'</div>'+
+        '<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:11px;color:var(--text-muted);text-transform:uppercase">'+esc(p.phase)+'</span><span style="font-size:12px;font-weight:600;color:var(--white)">'+p.progress+'%</span></div>'+progressBar(p.progress,pc,8)+'</div>'+
+        '<div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--text-muted)">Budget: $'+(p.budget/1e3).toFixed(0)+'k</span><span style="color:'+(p.spent>p.budget*.9?'var(--danger)':'var(--text-secondary)')+'">Spent: $'+(p.spent/1e3).toFixed(0)+'k</span></div></div>';
+    }).join('')+'</div>';
+}
+
+// ── PRICEBOOK ──
+function renderPricebook() {
+  var items = PRICEBOOK.filter(function(i){
+    var ms = i.item.toLowerCase().indexOf(state.priceSearch.toLowerCase())>=0 || i.supplier.toLowerCase().indexOf(state.priceSearch.toLowerCase())>=0;
+    var mc = state.priceCat==='All' || i.category===state.priceCat;
+    return ms && mc;
+  });
+
+  var cats = ['All','Pipe','Heads','Fittings','Valves'].map(function(c){
+    var active = state.priceCat===c;
+    return '<button data-pricecat="'+c+'" style="padding:6px 12px;font-size:12px;font-weight:600;border-radius:var(--radius);cursor:pointer;border:'+(active?'none':'1px solid var(--border)')+';background:'+(active?'var(--primary)':'var(--surface-hover)')+';color:'+(active?'var(--white)':'var(--text)')+'">'+c+'</button>';
+  }).join('');
+
+  var rows = items.map(function(i){
+    var sc = i.supplier==='ARGCO'?'var(--info)':i.supplier==='FFF'?'var(--success)':'var(--warning)';
+    return '<tr><td style="padding:12px 14px;font-size:13px;border-bottom:1px solid var(--border);font-weight:500;color:var(--white)">'+esc(i.item)+'</td>'+
+      '<td style="padding:12px 14px;font-size:13px;border-bottom:1px solid var(--border)">'+badge(i.supplier,sc)+'</td>'+
+      '<td style="padding:12px 14px;font-size:13px;border-bottom:1px solid var(--border);font-weight:600">$'+i.price.toFixed(2)+'</td>'+
+      '<td style="padding:12px 14px;font-size:13px;border-bottom:1px solid var(--border)">'+i.unit+'</td>'+
+      '<td style="padding:12px 14px;font-size:13px;border-bottom:1px solid var(--border)">'+i.category+'</td>'+
+      '<td style="padding:12px 14px;font-size:13px;border-bottom:1px solid var(--border)">'+i.lastUpdated+'</td></tr>';
+  }).join('');
+
+  return '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">'+
+    statCard('pricebook','Total Items',String(PRICEBOOK.length),null,null,'var(--info)')+
+    statCard('building','Suppliers','3',null,null,'var(--success)')+
+    statCard('clock','Last Sync','Today',null,null,'var(--warning)')+
+  '</div><div style="margin-top:20px">'+card(
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:16px"><div style="position:relative;flex:1;max-width:300px">'+
+      icon('search',16,'var(--text-muted)').replace('<svg','<svg style="position:absolute;left:12px;top:50%;transform:translateY(-50%)"')+
+      '<input id="priceSearchInput" type="text" placeholder="Search items..." value="'+esc(state.priceSearch)+'" style="width:100%;padding:8px 12px 8px 36px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px;outline:none"></div>'+
+      '<div style="display:flex;gap:6px">'+cats+'</div></div>'+
+    '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse"><thead><tr>'+
+      ['Item','Supplier','Price','Unit','Category','Updated'].map(function(h){return '<th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border)">'+h+'</th>'}).join('')+
+    '</tr></thead><tbody>'+rows+'</tbody></table></div>'
+  )+'</div>';
+}
+
+// ── COMPLIANCE ──
+function renderCompliance() {
+  var dueSoon = COMPLIANCE.filter(function(c){return c.status==='Due Soon'}).length;
+  var rows = COMPLIANCE.map(function(c){
+    var days = Math.ceil((new Date(c.dueDate)-new Date())/864e5);
+    var dc = days<7?'var(--danger)':days<14?'var(--warning)':'var(--text)';
+    return '<tr><td style="padding:12px 14px;font-size:13px;border-bottom:1px solid var(--border);font-weight:600;color:var(--white)">'+esc(c.project)+'</td>'+
+      '<td style="padding:12px 14px;font-size:13px;border-bottom:1px solid var(--border)">'+esc(c.type)+'</td>'+
+      '<td style="padding:12px 14px;font-size:13px;border-bottom:1px solid var(--border)">'+esc(c.authority)+'</td>'+
+      '<td style="padding:12px 14px;font-size:13px;border-bottom:1px solid var(--border);color:'+dc+'">'+c.dueDate+' ('+days+'d)</td>'+
+      '<td style="padding:12px 14px;font-size:13px;border-bottom:1px solid var(--border)">'+statusBadge(c.status)+'</td></tr>';
+  }).join('');
+
+  return '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px">'+
+    statCard('compliance','Total Items',String(COMPLIANCE.length),null,null,'var(--info)')+
+    statCard('clock','Due Soon',String(dueSoon),null,null,'var(--warning)')+
+    statCard('check','Compliance Rate','98%',null,null,'var(--success)')+
+    statCard('fire','Open Inspections','3',null,null,'var(--primary)')+
+  '</div><div style="margin-top:20px">'+card('<h3 style="font-size:15px;font-weight:700;color:var(--white);margin-bottom:16px">Compliance Tracker</h3>'+
+    '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse"><thead><tr>'+
+      ['Project','Type','Authority','Due Date','Status'].map(function(h){return '<th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border)">'+h+'</th>'}).join('')+
+    '</tr></thead><tbody>'+rows+'</tbody></table></div>')+'</div>';
+}
+
+// ── ANALYTICS ──
+function renderAnalytics() {
+  var mData = REVENUE.map(function(d){return {month:d.month,revenue:d.revenue,profit:d.revenue-d.expenses}});
+  var projRows = PROJECTS.map(function(p){
+    return '<tr><td style="padding:12px 14px;font-size:13px;border-bottom:1px solid var(--border);font-weight:600;color:var(--white)">'+esc(p.name)+'</td>'+
+      '<td style="padding:12px 14px;font-size:13px;border-bottom:1px solid var(--border)">'+money(p.budget)+'</td>'+
+      '<td style="padding:12px 14px;font-size:13px;border-bottom:1px solid var(--border)">'+money(p.spent)+'</td>'+
+      '<td style="padding:12px 14px;font-size:13px;border-bottom:1px solid var(--border)"><div style="display:flex;align-items:center;gap:8px;min-width:120px">'+progressBar(p.progress,p.progress>=90?'var(--success)':'var(--primary)')+'<span style="font-size:12px;font-weight:500">'+p.progress+'%</span></div></td>'+
+      '<td style="padding:12px 14px;font-size:13px;border-bottom:1px solid var(--border)">'+statusBadge(p.status)+'</td>'+
+      '<td style="padding:12px 14px;font-size:13px;border-bottom:1px solid var(--border)">'+esc(p.manager)+'</td></tr>';
+  }).join('');
+
+  return '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px">'+
+    statCard('dollar','Total Revenue','$3.7M','18%','up','var(--success)')+
+    statCard('analytics','Avg Deal Size','$487K','5%','up','var(--info)')+
+    statCard('clock','Avg Close Time','32 days','8%','down','var(--warning)')+
+    statCard('projects','Backlog Value','$2.1M',null,null,'var(--primary)')+
+  '</div><div style="margin-top:20px;display:grid;grid-template-columns:1fr 1fr;gap:16px">'+
+    card('<h3 style="font-size:15px;font-weight:700;color:var(--white);margin-bottom:16px">Revenue vs Profit</h3><div style="overflow-x:auto">'+svgBarChart(mData,480,260,'revenue','profit','#e53935','#4caf50')+'</div>'+
+      '<div style="display:flex;gap:16px;margin-top:8px;justify-content:center"><span style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--text-secondary)"><span style="width:12px;height:12px;background:#e53935;border-radius:2px;display:inline-block"></span>Revenue</span><span style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--text-secondary)"><span style="width:12px;height:12px;background:#4caf50;border-radius:2px;display:inline-block"></span>Profit</span></div>')+
+    card('<h3 style="font-size:15px;font-weight:700;color:var(--white);margin-bottom:16px">Revenue Trend</h3><div style="overflow-x:auto">'+svgAreaChart(REVENUE,480,260,'revenue','expenses','#e53935','#2196f3')+'</div>'+
+      '<div style="display:flex;gap:16px;margin-top:8px;justify-content:center"><span style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--text-secondary)"><span style="width:12px;height:3px;background:#e53935;border-radius:2px;display:inline-block"></span>Revenue</span><span style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--text-secondary)"><span style="width:12px;height:3px;background:#2196f3;border-radius:2px;display:inline-block"></span>Expenses</span></div>')+
+  '</div><div style="margin-top:20px">'+card('<h3 style="font-size:15px;font-weight:700;color:var(--white);margin-bottom:16px">Project Performance</h3>'+
+    '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse"><thead><tr>'+
+      ['Project','Budget','Spent','Progress','Status','PM'].map(function(h){return '<th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border)">'+h+'</th>'}).join('')+
+    '</tr></thead><tbody>'+projRows+'</tbody></table></div>')+'</div>';
+}
+
+// ── Modals ──
+function renderAddBidModal() {
+  var overlay = document.createElement('div');
+  overlay.id='modalOverlay';
+  overlay.style.cssText='position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);backdrop-filter:blur(4px)';
+  var is = 'style="width:100%;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:14px;outline:none;font-family:var(--font)"';
+  function field(l,input){return '<div style="margin-bottom:16px"><label style="display:block;font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">'+l+'</label>'+input+'</div>';}
+  overlay.innerHTML = '<div class="fade-in" style="width:560px;max-width:90vw;max-height:85vh;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:auto;box-shadow:var(--shadow-lg)">'+
+    '<div style="display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid var(--border)"><h3 style="font-size:16px;font-weight:700;color:var(--white)">New Bid Entry</h3><button id="closeModal" style="background:none;border:none;color:var(--text-muted);cursor:pointer">'+icon('x')+'</button></div>'+
+    '<div style="padding:24px"><div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">'+
+      field('Project Name','<input id="newBidProject" '+is+' placeholder="e.g. Home Depot - Meridian">')+
+      field('Contractor','<input id="newBidContractor" '+is+' placeholder="e.g. Turner Construction">')+
+      field('Bid Value ($)','<input id="newBidValue" type="number" '+is+' placeholder="250000">')+
+      field('Square Footage','<input id="newBidSqft" type="number" '+is+' placeholder="150000">')+
+      field('System Type','<select id="newBidSystem" '+is+'><option>Wet</option><option>Dry</option><option>Preaction</option><option>Deluge</option><option>ESFR</option><option>Wet/Dry</option><option>Wet/Preaction</option><option>Standpipe</option></select>')+
+      field('Contact','<input id="newBidContact" '+is+' placeholder="Contact name">')+
+      field('Due Date','<input id="newBidDue" type="date" '+is+'>')+
+    '</div>'+
+    '<div style="display:flex;justify-content:flex-end;gap:8px;margin-top:24px">'+
+      '<button id="cancelBid" style="padding:10px 16px;font-size:13px;font-weight:600;border-radius:var(--radius);cursor:pointer;border:1px solid var(--border);background:var(--surface-hover);color:var(--text)">Cancel</button>'+
+      '<button id="saveBid" style="padding:10px 16px;font-size:13px;font-weight:600;border-radius:var(--radius);cursor:pointer;border:none;background:var(--primary);color:var(--white)">Add Bid</button>'+
+    '</div></div></div>';
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click',function(e){if(e.target===overlay){state.showAddBid=false;overlay.remove();}});
+  $('#closeModal').addEventListener('click',function(){state.showAddBid=false;overlay.remove();});
+  $('#cancelBid').addEventListener('click',function(){state.showAddBid=false;overlay.remove();});
+  $('#saveBid').addEventListener('click',function(){
+    var p=$('#newBidProject').value, c=$('#newBidContractor').value;
+    if(!p||!c) return;
+    BIDS.push({id:BIDS.length+1,project:p,contractor:c,value:parseFloat($('#newBidValue').value)||0,status:'Pending',date:new Date().toISOString().slice(0,10),dueDate:$('#newBidDue').value,sqft:parseInt($('#newBidSqft').value)||0,system:$('#newBidSystem').value,contact:$('#newBidContact').value});
+    state.showAddBid=false;overlay.remove();render();
+  });
+}
+
+function renderProjectModal() {
+  var p = PROJECTS.find(function(pr){return pr.id===state.selectedProject});
+  if(!p) return;
+  var phases=['Design','Fabrication','Installation','Testing','Closeout'];
+  var ci=phases.indexOf(p.phase);
+  var timeline = phases.map(function(ph,i){
+    var done=i<ci, active=i===ci;
+    return '<div style="flex:1;text-align:center"><div style="height:4px;border-radius:2px;background:'+(done?'var(--success)':active?'var(--primary)':'var(--border)')+';margin-bottom:6px"></div><span style="font-size:11px;color:'+(done?'var(--success)':active?'var(--primary)':'var(--text-muted)')+';font-weight:'+(active?600:400)+'">'+ph+'</span></div>';
+  }).join('');
+
+  var overlay = document.createElement('div');
+  overlay.id='modalOverlay';
+  overlay.style.cssText='position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);backdrop-filter:blur(4px)';
+  function info(l,v,c){return '<div style="margin-bottom:16px"><label style="display:block;font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">'+l+'</label><div style="color:'+(c||'var(--text)')+';font-size:14px">'+v+'</div></div>';}
+  overlay.innerHTML = '<div class="fade-in" style="width:700px;max-width:90vw;max-height:85vh;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:auto;box-shadow:var(--shadow-lg)">'+
+    '<div style="display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid var(--border)"><h3 style="font-size:16px;font-weight:700;color:var(--white)">'+esc(p.name)+'</h3><button id="closeProjModal" style="background:none;border:none;color:var(--text-muted);cursor:pointer">'+icon('x')+'</button></div>'+
+    '<div style="padding:24px"><div style="display:flex;gap:4px;margin-bottom:24px">'+timeline+'</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">'+
+      '<div>'+info('Project Manager',esc(p.manager))+info('Start Date',p.startDate)+info('End Date',p.endDate)+'</div>'+
+      '<div>'+info('Budget',money(p.budget))+info('Spent',money(p.spent),p.spent>p.budget*.9?'var(--danger)':'')+info('Remaining',money(p.budget-p.spent),'var(--success)')+'</div>'+
+    '</div>'+
+    '<div style="margin-top:16px"><label style="display:block;font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Budget Utilization</label>'+
+      progressBar(p.spent/p.budget*100,p.spent>p.budget*.9?'var(--danger)':'var(--success)',10)+
+      '<div style="display:flex;justify-content:space-between;margin-top:4px"><span style="font-size:11px;color:var(--text-muted)">'+Math.round(p.spent/p.budget*100)+'% used</span><span style="font-size:11px;color:var(--text-muted)">'+money(p.budget-p.spent)+' remaining</span></div></div></div></div>';
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click',function(e){if(e.target===overlay){state.selectedProject=null;overlay.remove();}});
+  $('#closeProjModal').addEventListener('click',function(){state.selectedProject=null;overlay.remove();});
+}
+
+// ── Event Binding ──
+function bindEvents() {
+  // Login
+  var loginForm = document.getElementById('loginForm');
+  if(loginForm) {
+    var doLogin = function(e) {
+      if(e) e.preventDefault();
+      var u = document.getElementById('loginUser').value;
+      var p = document.getElementById('loginPass').value;
+      if(u==='admin' && p==='halofire2026'){
+        state.user = {username:'admin',name:'Dallas Steele',role:'President'};
+        render();
+      } else {
+        var err = document.getElementById('loginError');
+        if(err) { err.style.display='block'; err.textContent='Invalid credentials'; }
+      }
+    };
+    loginForm.addEventListener('submit', doLogin);
+    var signInBtn = loginForm.querySelector('button[type="submit"]');
+    if(signInBtn) signInBtn.addEventListener('click', doLogin);
+  }
+
+  // Nav
+  $$('[data-nav]').forEach(function(btn){
+    btn.addEventListener('click', function(){ state.page=this.dataset.nav; render(); });
+  });
+
+  // Sidebar toggle
+  var st=$('#sidebarToggle'); if(st) st.addEventListener('click',function(){state.sidebarCollapsed=!state.sidebarCollapsed;render();});
+  var mt=$('#menuToggle'); if(mt) mt.addEventListener('click',function(){state.sidebarCollapsed=!state.sidebarCollapsed;render();});
+
+  // Logout
+  var lb=$('#logoutBtn'); if(lb) lb.addEventListener('click',function(){state.user=null;render();});
+
+  // Bid filters
+  $$('[data-bidfilter]').forEach(function(btn){
+    btn.addEventListener('click',function(){state.bidFilter=this.dataset.bidfilter;render();});
+  });
+
+  // Bid status change
+  $$('[data-bidstatus]').forEach(function(sel){
+    sel.addEventListener('change',function(){
+      var id=parseInt(this.dataset.bidstatus);
+      BIDS.forEach(function(b){if(b.id===id)b.status=sel.value;});
+      render();
+    });
+  });
+
+  // Add bid
+  var ab=$('#addBidBtn'); if(ab) ab.addEventListener('click',function(){state.showAddBid=true;renderAddBidModal();});
+
+  // Calculate estimate
+  var cb=$('#calcBtn'); if(cb) cb.addEventListener('click',function(){
+    var sqft=parseFloat($('#estSqft').value)||0;
+    var stories=parseInt($('#estStories').value)||1;
+    var dm={Light:1,Ordinary:1.3,'Extra Hazard':1.8}[$('#estHazard').value]||1;
+    var sm={Wet:1,Dry:1.35,Preaction:1.5,Deluge:1.6,ESFR:1.25,'Wet/Dry':1.2,Standpipe:.6}[$('#estSystem').value]||1;
+    var mc=sqft*3.5*dm*sm*stories;
+    var lh=sqft/200*dm*stories;
+    var lc=lh*(parseFloat($('#estLabor').value)||85);
+    var sub=mc+lc;
+    var mk=sub*((parseFloat($('#estMarkup').value)||25)/100);
+    var tot=sub+mk;
+    state.estimateResult={materialCost:Math.round(mc),laborHours:Math.round(lh),laborCost:Math.round(lc),subtotal:Math.round(sub),markup:Math.round(mk),total:Math.round(tot),pricePerSqft:sqft?(tot/sqft).toFixed(2):'0',headCount:Math.ceil(sqft/130*dm),pipeLength:Math.ceil(sqft/20*dm)};
+    render();
+  });
+
+  // Project cards
+  $$('[data-project]').forEach(function(el){
+    el.addEventListener('click',function(){state.selectedProject=parseInt(this.dataset.project);renderProjectModal();});
+  });
+
+  // Price search
+  var ps=$('#priceSearchInput'); if(ps) ps.addEventListener('input',function(){state.priceSearch=this.value;render();});
+
+  // Price category
+  $$('[data-pricecat]').forEach(function(btn){
+    btn.addEventListener('click',function(){state.priceCat=this.dataset.pricecat;render();});
+  });
+}
+
+// ── Start ──
+render();
+</script>
+</body>
+</html>
