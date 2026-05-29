@@ -20,6 +20,7 @@
 
 import { layoutRoom } from './sprinkler-layout.js';
 import { layoutBuilding } from './system-layout.js';
+import { getComponent } from '../components/registry.js';
 
 // NFPA 13 schedule pipe sizing — max sprinklers served by a steel pipe size.
 // Public code values. Returned diameter is the smallest size that covers count.
@@ -135,6 +136,10 @@ export function buildRoomCad(room, layoutArg) {
     // System riser: floor up to the cross-main at y0.
     solids.push({ kind: 'pipe', name: 'system-riser', layer: 'RISER', role: 'riser',
       from: [mainX, y0, 0], to: [mainX, y0, mainZ], diameterIn: mainDia });
+
+    // Discrete component placement markers, derived from the riser/cross-main
+    // network coords above (never fabricated). Fail-closed: skip unknown keys.
+    pushComponentMarkers(solids, '', mainX, y0, mainZ, branchLines);
   }
 
   return {
@@ -150,6 +155,7 @@ function tallyCounts(solids, roomResults) {
     heads: solids.filter((s) => s.kind === 'head').length,
     pipes: solids.filter((s) => s.kind === 'pipe').length,
     walls: solids.filter((s) => s.kind === 'wall').length,
+    components: solids.filter((s) => s.kind === 'component').length,
     branchLines: roomResults.reduce((n, r) => n + r.network.branchLines.length, 0),
   };
 }
@@ -180,6 +186,9 @@ function offsetSolidZ(solid, dz) {
       s.to = [s.to[0], s.to[1], round(s.to[2] + dz)];
       break;
     case 'head':
+      s.position = [s.position[0], s.position[1], round(s.position[2] + dz)];
+      break;
+    case 'component':
       s.position = [s.position[0], s.position[1], round(s.position[2] + dz)];
       break;
     default:
@@ -332,6 +341,10 @@ function buildStoryCad(story, layoutStory) {
     }
     localSolids.push({ kind: 'pipe', name: `${space.name}/system-riser`, layer: 'RISER', role: 'riser',
       from: [mainX, y0, 0], to: [mainX, y0, mainZ], diameterIn: mainDia });
+
+    // Per-space component placement markers, derived from this space's network
+    // coords (never fabricated). Z-lifted below by offsetSolidZ. Fail-closed.
+    pushComponentMarkers(localSolids, `${space.name}/`, mainX, y0, mainZ, space.branchLines);
   }
 
   const solids = localSolids.map((s) => offsetSolidZ(s, baseElevationFt));
@@ -357,6 +370,7 @@ function tallyBuildingCounts(solids, spaceCount) {
     openings: walls.reduce((n, w) => n + (Array.isArray(w.openings) ? w.openings.length : 0), 0),
     heads: solids.filter((s) => s.kind === 'head').length,
     pipes: solids.filter((s) => s.kind === 'pipe').length,
+    components: solids.filter((s) => s.kind === 'component').length,
   };
 }
 
@@ -449,6 +463,45 @@ export function buildCadModel(floorPlan) {
     solids,
     counts: tallyCounts(solids, rooms),
   };
+}
+
+/**
+ * Push discrete kind:'component' placement markers for one riser network onto
+ * `solids`. Every position is DERIVED from the supplied network coords (mainX,
+ * y0, mainZ + each branchLine.y) via the same round() helper — nothing is
+ * fabricated or random. These are placement markers keyed to registry component
+ * keys (for rendering/instancing + takeoff); they are NOT manufacturer-exact and
+ * confer NO AutoSprink/AutoCAD/AHJ/PE parity, and flip NO gate. Each marker is
+ * fail-closed: an unknown registry key (getComponent returns undefined) is
+ * skipped rather than emitted.
+ *
+ * @param {Array} solids  target solid list (mutated)
+ * @param {string} prefix name prefix (e.g. `${space.name}/`) for building paths
+ * @param {number} mainX  cross-main / riser X (plan)
+ * @param {number} y0     riser foot Y (min branch Y)
+ * @param {number} mainZ  cross-main elevation (riser top)
+ * @param {Array} branchLines branch lines, each with a `.y` and `.row`
+ */
+function pushComponentMarkers(solids, prefix, mainX, y0, mainZ, branchLines) {
+  const place = (key, name, position) => {
+    const def = getComponent(key);
+    if (!def) return; // fail-closed: skip unknown registry keys
+    solids.push({
+      kind: 'component', name: `${prefix}${name}`, layer: 'COMPONENTS',
+      componentKey: key, category: def.category, position,
+    });
+  };
+
+  // System riser assembly at the riser top (where the riser meets the cross-main).
+  place('riser_assembly', 'riser-assembly', [mainX, y0, mainZ]);
+  // Alarm check valve on the riser, just below the assembly (deterministic -1 ft).
+  place('valve_alarm_check', 'alarm-check', [mainX, y0, round(mainZ - 1)]);
+  // Fire department connection at the riser base, on the floor.
+  place('fdc', 'fdc', [mainX, y0, 0]);
+  // A tee at each branch-to-cross-main junction (the riser-tie top points).
+  for (const b of branchLines) {
+    place('fitting_tee', `tee-main-${b.row}`, [mainX, b.y, mainZ]);
+  }
 }
 
 function round(n) {

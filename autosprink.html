@@ -175,7 +175,7 @@ function api(path, options = {}) {
 }
 
 // ── OpenGeometry / Three scene ──
-const COLORS = { WALLS: 0x6b7280, WALLS_INT: 0x9aa3b2, COLUMN: 0x8a8f98, FLOOR: 0x16161c, MAIN: 0xE53935, BRANCH: 0x3b82f6, DROPS: 0x22d3ee, HEADS: 0xff3b30 };
+const COLORS = { WALLS: 0x6b7280, WALLS_INT: 0x9aa3b2, COLUMN: 0x8a8f98, FLOOR: 0x16161c, MAIN: 0xE53935, BRANCH: 0x3b82f6, DROPS: 0x22d3ee, HEADS: 0xff3b30, COMPONENTS: 0xfbbf24 };
 // Viewer pipe-radius exaggeration (true-scale=1). CAD-structural geometry
 // (walls/mains/branches/riser) is built on the OpenGeometry kernel; the many
 // identical heads + drops are drawn with Three InstancedMesh for performance at
@@ -189,25 +189,41 @@ let modelGroup, currentCadModel = null;
 // (GET /api/parts -> /parts/<key>.stl). Falls back to a primitive when no part
 // is available. Generated parts are best-effort, NOT manufacturer-exact.
 let headPartGeo = null, partsSource = 'primitive';
+let partsManifest = null;          // cached GET /api/parts response
+const partGeoCache = {};           // componentKey -> normalized BufferGeometry | null (attempted)
 
-// Fetch the parts manifest and load the head part mesh (best-effort, fail-soft).
-async function loadPartMeshes() {
+// Normalize a loaded STL: center at origin, OpenSCAD Z-up -> three Y-up, scale to ~targetFt.
+function normalizePartGeo(geo, targetFt) {
+  geo.computeBoundingBox();
+  const bb = geo.boundingBox, size = new THREE.Vector3(), center = new THREE.Vector3();
+  bb.getSize(size); bb.getCenter(center);
+  geo.translate(-center.x, -center.y, -center.z);
+  geo.rotateX(-Math.PI / 2);
+  const maxDim = Math.max(size.x, size.y, size.z) || 1;
+  const sc = targetFt / maxDim; geo.scale(sc, sc, sc); geo.computeVertexNormals();
+  return geo;
+}
+
+// Load + cache the part mesh for a registry component key (best-effort, fail-soft).
+// Returns the normalized geometry, or null (caller renders a marked primitive).
+async function loadPartGeo(key, targetFt) {
+  if (key in partGeoCache) return partGeoCache[key];
+  partGeoCache[key] = null; // mark attempted up-front
   try {
-    const parts = await api('/parts');
-    const head = (parts.components || []).find((c) => c.key === 'head_pendent' && c.present && c.file);
-    if (!head) { partsSource = 'primitive'; return; }
-    const geo = await new STLLoader().loadAsync('/' + String(head.file).replace(/^\/+/, ''));
-    geo.computeBoundingBox();
-    const bb = geo.boundingBox, size = new THREE.Vector3(), center = new THREE.Vector3();
-    bb.getSize(size); bb.getCenter(center);
-    geo.translate(-center.x, -center.y, -center.z); // center at origin
-    geo.rotateX(-Math.PI / 2);                       // OpenSCAD Z-up -> three.js Y-up
-    const maxDim = Math.max(size.x, size.y, size.z) || 1;
-    const sc = 1.0 / maxDim;                          // normalize to ~1 ft for visibility
-    geo.scale(sc, sc, sc); geo.computeVertexNormals();
-    headPartGeo = geo;
-    partsSource = head.source === 'catalog' ? 'catalog' : 'generated';
-  } catch (e) { headPartGeo = null; partsSource = 'primitive'; }
+    if (!partsManifest) partsManifest = await api('/parts');
+    const entry = (partsManifest.components || []).find((c) => c.key === key && c.present && c.file);
+    if (!entry) return null;
+    const geo = normalizePartGeo(await new STLLoader().loadAsync('/' + String(entry.file).replace(/^\/+/, '')), targetFt);
+    partGeoCache[key] = geo;
+    return geo;
+  } catch (e) { return null; }
+}
+
+// Preload the head part mesh at init so the first render shows real heads.
+async function loadPartMeshes() {
+  headPartGeo = await loadPartGeo('head_pendent', 1.0);
+  const entry = partsManifest && (partsManifest.components || []).find((c) => c.key === 'head_pendent');
+  partsSource = headPartGeo ? (entry && entry.source === 'catalog' ? 'catalog' : 'generated') : 'primitive';
 }
 
 async function initStudio() {
@@ -302,6 +318,37 @@ function addInstancedDrops(dropSolids) {
   layerGroups.DROPS.add(inst);
 }
 
+// R6: render discrete component placement solids (riser assembly, alarm valve,
+// FDC, tees) using their real CAD part meshes when the parts library has one,
+// else a clearly-marked primitive box. Grouped per componentKey for perf.
+// Sets window.__componentDebug for verification. Best-effort; not mfg-exact.
+function addComponentParts(componentSolids) {
+  if (!componentSolids.length) return;
+  const byKey = {};
+  for (const s of componentSolids) (byKey[s.componentKey] || (byKey[s.componentKey] = [])).push(s);
+  const debug = { total: componentSolids.length, byKey: {}, partKeys: 0, primitiveKeys: 0 };
+  for (const key of Object.keys(byKey)) {
+    const pts = byKey[key].map((s) => W(s.position));
+    const geo = partGeoCache[key]; // preloaded in generate(); null -> primitive fallback
+    const usingPart = !!geo;
+    const g = geo || new THREE.BoxGeometry(2, 2, 2);
+    const mat = new THREE.MeshStandardMaterial({
+      color: COLORS.COMPONENTS,
+      emissive: usingPart ? 0x000000 : 0x3a2a00,
+      metalness: usingPart ? 0.55 : 0, roughness: usingPart ? 0.45 : 1,
+      wireframe: !usingPart, // marked: missing-part fallback drawn as a wire box
+    });
+    const inst = new THREE.InstancedMesh(g, mat, pts.length);
+    const d = new THREE.Object3D();
+    pts.forEach((p, i) => { d.position.set(p[0], p[1], p[2]); d.rotation.set(0, 0, 0); d.scale.set(1, 1, 1); d.updateMatrix(); inst.setMatrixAt(i, d.matrix); });
+    inst.instanceMatrix.needsUpdate = true;
+    layerGroups.COMPONENTS.add(inst);
+    debug.byKey[key] = { count: pts.length, usingPartMesh: usingPart };
+    if (usingPart) debug.partKeys++; else debug.primitiveKeys++;
+  }
+  window.__componentDebug = debug;
+}
+
 // Cut door/window openings into a wall via OpenGeometry boolean subtract and
 // return the mesh to render. Each opening sits along the wall at offsetFt,
 // sized widthFt x heightFt at sill. subtract() takes an OPERAND ARRAY and
@@ -334,7 +381,7 @@ function renderModel(cadModel) {
   modelGroup = new THREE.Group(); scene.add(modelGroup);
   for (const k of Object.keys(COLORS)) { layerGroups[k] = new THREE.Group(); modelGroup.add(layerGroups[k]); }
 
-  const headPts = []; const dropSolids = [];
+  const headPts = []; const dropSolids = []; const componentSolids = [];
   let minX=Infinity,maxX=-Infinity,minZ=Infinity,maxZ=-Infinity,ceil=14;
   for (const s of cadModel.solids) {
     if (s.kind === 'wall') {
@@ -366,11 +413,14 @@ function renderModel(cadModel) {
       if (s.role === 'drop') dropSolids.push(s); else addPipe(s);
     } else if (s.kind === 'head') {
       headPts.push(W(s.position));
+    } else if (s.kind === 'component') {
+      componentSolids.push(s);
     }
   }
   // Heads + drops are the high-count, identical geometry -> instanced (perf).
   addInstancedHeads(headPts);
   addInstancedDrops(dropSolids);
+  addComponentParts(componentSolids); // R6: riser assembly / valve / FDC / tees as part meshes
 
   const fw = maxX-minX, fd = maxZ-minZ;
   if (fw > 0 && fd > 0) {
@@ -482,6 +532,11 @@ async function generate() {
     const { bid, cadModel, hydraulics, hydraulicNetwork, compliance, fullScopeBid, isBuilding } = await api('/projects/' + encodeURIComponent(HOME_DEPOT) + '/sprinkler-bid', {
       method: 'POST', body: JSON.stringify(lastBody),
     });
+    // R6: preload the part meshes for the distinct component keys in this model
+    // (riser_assembly/valve_alarm_check/fdc/fitting_tee) so renderModel can
+    // instance them synchronously; missing parts fall back to a marked primitive.
+    const compKeys = [...new Set((cadModel.solids || []).filter((s) => s.kind === 'component').map((s) => s.componentKey))];
+    await Promise.all(compKeys.map((k) => loadPartGeo(k, 2.5)));
     renderModel(cadModel);
     const r = bid.rooms[0];
     $('layout').innerHTML = `
@@ -557,7 +612,11 @@ async function generate() {
     const headsNote = headPartGeo
       ? `heads: ${partsSource} CAD part${partsSource === 'catalog' ? '' : ' (best-effort, not mfg-exact)'}`
       : 'heads: primitive (no part mesh)';
-    $('status').textContent = `rendered ${cadModel.counts.heads} heads · ${cadModel.counts.pipes} pipe segments · ${headsNote}`;
+    const cd = window.__componentDebug;
+    const compNote = (cadModel.counts && cadModel.counts.components)
+      ? ` · ${cadModel.counts.components} components (${cd ? cd.partKeys : 0} part types as meshes, ${cd ? cd.primitiveKeys : 0} primitive fallback)`
+      : '';
+    $('status').textContent = `rendered ${cadModel.counts.heads} heads · ${cadModel.counts.pipes} pipe segments · ${headsNote}${compNote}`;
   } catch (e) {
     $('status').textContent = 'error: ' + e.message;
   } finally { btn.disabled = false; btn.textContent = 'Generate Layout'; }
