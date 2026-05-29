@@ -120,6 +120,42 @@ cover EVERY space with a proper building-wide network. Build that.
       `npx vitest run` (no file list) so it can't drift from the test count;
       seed + agentic-rules steps kept. Docs/script only — no behavior change.
 
+## COMPONENT CAD LIBRARY + AUTOSPRINK PARITY epic (user priority)
+Every fire-sprinkler component must have a CAD-accurate 3D model, sourced:
+catalog download -> OpenSCAD-generated -> SAM 3.1-reconstructed -> gated
+placeholder. Full AutoSprink parity (no missing modules/components), tracked +
+fail-closed until real. Auto-bid = takeoff from the component set. Any doc we
+can't auto-source (catalogs, cut sheets, approvals, AutoSprink ref, OpenSCAD
+binary) is user-uploaded/linked in Settings, wired to the evidence/gate system.
+Grounding: OpenSCAD NOT installed locally (generate .scad source; render needs
+the binary = a Settings dependency). SAM 3.1 = GX10 'sam3' via the OpenClaw
+bridge (best-effort, graceful skip). Parity claim stays BLOCKED until complete.
+
+- [ ] **T15 — Component registry + AutoSprink parity inventory.** `src/components/registry.js`:
+      canonical list of every component/module (heads pendent/upright/sidewall/
+      concealed/ESFR; pipe sch10/40; fittings tee/elbow/coupling/reducer/cap;
+      grooved couplings; valves alarm/check/butterfly/OS&Y/PRV; FDC; backflow;
+      riser+trim; gauges; hangers/seismic bracing; drains; inspector test; signs)
+      + parity matrix (present vs missing) + fail-closed AUTOSPRINK_PARITY gate
+      blocked until inventory complete w/ real evidence. Node-tested.
+- [ ] **T16 — Component 3D-model resolver pipeline.** `src/components/model-resolver.js`:
+      resolve each component's model in priority order catalog-file -> OpenSCAD ->
+      SAM3.1 -> placeholder+gate; record per-component source/status. Injected
+      sourcers; Node-tested.
+- [ ] **T17 — OpenSCAD parametric generators.** `src/components/openscad/*`:
+      deterministic .scad source per component type (Node string-gen, tested) +
+      render adapter (openscad CLI when present, else gated 'openscad_not_installed').
+- [ ] **T18 — SAM 3.1 reconstruction adapter.** `src/components/sam-reconstruct.js`:
+      catalog image -> SAM3.1 segment -> mesh via injected GX10/OpenClaw invoker;
+      graceful skip when gateway down. Node-tested payload + skip.
+- [ ] **T19 — Settings + documentation upload/link API.** Authenticated routes to
+      upload OR link missing docs (catalogs, cut sheets, approvals, AutoSprink ref,
+      OpenSCAD path); each -> project_evidence row / dependency status; missing-doc
+      resolver queue. Node-tested (spawned-server pattern).
+- [ ] **T20 — Settings UI + component-library browser (BROWSER).** Settings page for
+      uploads/links + component browser + render catalog/generated models in the 3D
+      layout. Main session w/ preview screenshots.
+
 ## Log
 - 2026-05-29: studio + OpenGeometry CAD + DXF shipped (commits 3764b64, 2b5b7ba). 68 tests green.
 - 2026-05-29: T1 STEP/IFC/STL export shipped — verified 79KB STEP from 23 OpenGeometry entities. Next: T2 hydraulics.
