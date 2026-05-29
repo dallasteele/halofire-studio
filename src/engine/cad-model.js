@@ -143,34 +143,142 @@ export function buildRoomCad(room, layoutArg) {
   };
 }
 
+/** Tally the standard solid counts for a list of solids + per-floor/room CAD results. */
+function tallyCounts(solids, roomResults) {
+  return {
+    heads: solids.filter((s) => s.kind === 'head').length,
+    pipes: solids.filter((s) => s.kind === 'pipe').length,
+    walls: solids.filter((s) => s.kind === 'wall').length,
+    branchLines: roomResults.reduce((n, r) => n + r.network.branchLines.length, 0),
+  };
+}
+
 /**
- * Build the CAD model for a whole floor plan (multiple rooms).
- * @returns {{name:string, units:string, rooms:Array, solids:Array, counts:object, disclaimer:string}}
+ * Offset a single solid's elevation (Z) fields by `dz` feet so a floor's whole
+ * network stacks above the floors below it. Pure: returns a new solid, never
+ * mutates the input. Plan (X/Y) coordinates are untouched.
+ */
+function offsetSolidZ(solid, dz) {
+  if (!dz) return solid;
+  const s = { ...solid };
+  switch (s.kind) {
+    case 'slab':
+      s.z = round(s.z + dz);
+      break;
+    case 'wall':
+      // Walls are extruded from baseZ up by heightFt; record the base elevation
+      // so the floor sits on the slab below it (DXF/3D honor baseZ, default 0).
+      s.baseZ = round((s.baseZ || 0) + dz);
+      break;
+    case 'pipe':
+      s.from = [s.from[0], s.from[1], round(s.from[2] + dz)];
+      s.to = [s.to[0], s.to[1], round(s.to[2] + dz)];
+      break;
+    case 'head':
+      s.position = [s.position[0], s.position[1], round(s.position[2] + dz)];
+      break;
+    default:
+      break;
+  }
+  return s;
+}
+
+/** Lift a per-floor CAD result (room solids + network elevations) by `dz` feet. */
+function offsetRoomCadZ(cad, dz) {
+  if (!dz) return cad;
+  return {
+    ...cad,
+    solids: cad.solids.map((s) => offsetSolidZ(s, dz)),
+    network: {
+      ...cad.network,
+      mainZ: round(cad.network.mainZ + dz),
+      branchZ: round(cad.network.branchZ + dz),
+      headZ: round(cad.network.headZ + dz),
+      baseElevationFt: dz,
+    },
+  };
+}
+
+/**
+ * Build the CAD model for one floor (a list of rooms at a common base elevation).
+ * Each floor keeps its own independent riser -> cross-main -> branch -> drop ->
+ * head network and NFPA pipe sizing; its solids are offset in Z by baseElevationFt
+ * so floors stack vertically.
+ */
+function buildFloorCad(floor, baseElevationFt) {
+  if (!floor || !Array.isArray(floor.rooms) || floor.rooms.length === 0) {
+    throw new Error('floor.rooms must be a non-empty array');
+  }
+  const rooms = floor.rooms.map((room) => {
+    // A floor-level ceilingHeightFt is the default; per-room overrides win.
+    const merged = (floor.ceilingHeightFt && !room.ceilingHeightFt)
+      ? { ...room, ceilingHeightFt: floor.ceilingHeightFt }
+      : room;
+    const cad = offsetRoomCadZ(buildRoomCad(merged), baseElevationFt);
+    return { name: room.name, ...cad };
+  });
+  const solids = rooms.flatMap((r) => r.solids);
+  return {
+    level: floor.level ?? null,
+    baseElevationFt,
+    ceilingHeightFt: floor.ceilingHeightFt ?? null,
+    rooms,
+    solids,
+    counts: tallyCounts(solids, rooms),
+  };
+}
+
+/**
+ * Build the CAD model for a whole floor plan.
+ *
+ * Two shapes are accepted, and they are 100% backward compatible:
+ *   - LEGACY: { rooms: [...] }  -> a single floor at base elevation 0 (UNCHANGED).
+ *   - MULTI-FLOOR: { floors: [{ level, baseElevationFt, ceilingHeightFt?, rooms }] }
+ *     -> each floor's solids are offset in Z by baseElevationFt so floors stack;
+ *        counts aggregate across floors; each floor keeps its own riser network.
+ *
+ * @returns {{name:string, units:string, rooms:Array, solids:Array, counts:object,
+ *   floors?:Array, disclaimer:string}}
  */
 export function buildCadModel(floorPlan) {
-  if (!floorPlan || !Array.isArray(floorPlan.rooms) || floorPlan.rooms.length === 0) {
+  const hasFloors = floorPlan && Array.isArray(floorPlan.floors) && floorPlan.floors.length > 0;
+  if (!hasFloors && (!floorPlan || !Array.isArray(floorPlan.rooms) || floorPlan.rooms.length === 0)) {
     throw new Error('floorPlan.rooms must be a non-empty array');
   }
+
+  const base = {
+    name: floorPlan.name,
+    units: floorPlan.units || 'ft',
+    generatedBy: 'halofire-cad-model',
+    disclaimer: 'best-effort internal alpha 3D model — NFPA-13 schedule pipe sizing, '
+      + 'NOT hydraulically calculated, NOT AHJ/PE-reviewed, NOT AutoSprink/AutoCAD parity.',
+  };
+
+  // Multi-floor: build each floor independently, then aggregate.
+  if (hasFloors) {
+    const floors = floorPlan.floors.map((floor) => buildFloorCad(floor, floor.baseElevationFt || 0));
+    const rooms = floors.flatMap((f) => f.rooms);
+    const solids = floors.flatMap((f) => f.solids);
+    return {
+      ...base,
+      floors,
+      rooms,
+      solids,
+      counts: tallyCounts(solids, rooms),
+    };
+  }
+
+  // Legacy single-floor path — output is byte-identical to the pre-T6 model.
   const rooms = floorPlan.rooms.map((room) => {
     const cad = buildRoomCad(room);
     return { name: room.name, ...cad };
   });
   const solids = rooms.flatMap((r) => r.solids);
-  const counts = {
-    heads: solids.filter((s) => s.kind === 'head').length,
-    pipes: solids.filter((s) => s.kind === 'pipe').length,
-    walls: solids.filter((s) => s.kind === 'wall').length,
-    branchLines: rooms.reduce((n, r) => n + r.network.branchLines.length, 0),
-  };
   return {
-    name: floorPlan.name,
-    units: floorPlan.units || 'ft',
+    ...base,
     rooms,
     solids,
-    counts,
-    generatedBy: 'halofire-cad-model',
-    disclaimer: 'best-effort internal alpha 3D model — NFPA-13 schedule pipe sizing, '
-      + 'NOT hydraulically calculated, NOT AHJ/PE-reviewed, NOT AutoSprink/AutoCAD parity.',
+    counts: tallyCounts(solids, rooms),
   };
 }
 

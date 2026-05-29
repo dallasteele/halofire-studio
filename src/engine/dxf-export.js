@@ -55,12 +55,14 @@ export function toDxf(cadModel) {
         entities += line(layer, [a[0], a[1], s.z], [b[0], b[1], s.z]);
       }
     } else if (s.kind === 'wall') {
-      const h = s.heightFt;
+      // baseZ stacks multi-floor walls (default 0 -> backward compatible).
+      const z0 = s.baseZ || 0;
+      const z1 = z0 + s.heightFt;
       // plan base, top, and two vertical posts -> 3D wall wireframe
-      entities += line('WALLS', [s.a[0], s.a[1], 0], [s.b[0], s.b[1], 0]);
-      entities += line('WALLS', [s.a[0], s.a[1], h], [s.b[0], s.b[1], h]);
-      entities += line('WALLS', [s.a[0], s.a[1], 0], [s.a[0], s.a[1], h]);
-      entities += line('WALLS', [s.b[0], s.b[1], 0], [s.b[0], s.b[1], h]);
+      entities += line('WALLS', [s.a[0], s.a[1], z0], [s.b[0], s.b[1], z0]);
+      entities += line('WALLS', [s.a[0], s.a[1], z1], [s.b[0], s.b[1], z1]);
+      entities += line('WALLS', [s.a[0], s.a[1], z0], [s.a[0], s.a[1], z1]);
+      entities += line('WALLS', [s.b[0], s.b[1], z0], [s.b[0], s.b[1], z1]);
     } else if (s.kind === 'pipe') {
       entities += line(s.layer, s.from, s.to);
       // Label branch + main pipe sizes at their midpoint (shop-drawing convention).
