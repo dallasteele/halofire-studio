@@ -7,15 +7,9 @@
     "env": "development"
   },
   "auth": {
-    "jwtSecret": "hf-dev-secret-change-in-production-2026",
     "jwtExpiry": "8h",
     "bcryptRounds": 12,
-    "defaultAdmin": {
-      "username": "admin",
-      "password": "halofire2026",
-      "role": "admin",
-      "name": "System Administrator"
-    }
+    "requiresEnv": ["JWT_SECRET", "HALOFIRE_ADMIN_USER", "HALOFIRE_ADMIN_PASSWORD"]
   },
   "db": {
     "path": "./data/halofire.db",

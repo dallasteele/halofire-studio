@@ -93,8 +93,13 @@ db.exec(`
 
 const existingAdmin = db.prepare('SELECT id FROM users WHERE username = ?').get('admin');
 if (!existingAdmin) {
-  const hash = bcrypt.hashSync(process.env.HALOFIRE_BOOTSTRAP_PASSWORD || 'halofire2026', 12);
-  db.prepare('INSERT INTO users (username, password_hash, name, role, email) VALUES (?, ?, ?, ?, ?)').run('admin', hash, 'Dallas Steele', 'President', 'admin@halofireus.com');
+  const fallbackAllowed = process.env.HALOFIRE_ALLOW_DEV_DEFAULTS === '1';
+  const bootstrapPassword = process.env.HALOFIRE_ADMIN_PASSWORD || process.env.HALOFIRE_BOOTSTRAP_PASSWORD || (fallbackAllowed ? 'halofire2026' : null);
+  if (!bootstrapPassword) {
+    throw new Error('HALOFIRE_ADMIN_PASSWORD is required for seed unless HALOFIRE_ALLOW_DEV_DEFAULTS=1');
+  }
+  const hash = bcrypt.hashSync(bootstrapPassword, 12);
+  db.prepare('INSERT INTO users (username, password_hash, name, role, email) VALUES (?, ?, ?, ?, ?)').run('admin', hash, 'Dallas Steele', 'admin', 'admin@halofireus.com');
 }
 
 console.log('[seed] Starting database seed...');

@@ -12,6 +12,8 @@ import { fileURLToPath } from 'url';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import Database from 'better-sqlite3';
+import rateLimit from 'express-rate-limit';
+import 'dotenv/config';
 import { createLogger } from '../core/logger.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -19,9 +21,27 @@ const log = createLogger('api-server');
 
 // ── Config ──
 const PORT = process.env.PORT || 3001;
-const JWT_SECRET = process.env.JWT_SECRET || 'halofire-dev-secret-2026';
-const DB_PATH = path.resolve(__dirname, '../../data/halofire.db');
+const NODE_ENV = process.env.NODE_ENV || 'development';
+const ALLOW_DEV_DEFAULTS = process.env.HALOFIRE_ALLOW_DEV_DEFAULTS === '1';
+const JWT_SECRET = process.env.JWT_SECRET || (NODE_ENV === 'development' && ALLOW_DEV_DEFAULTS ? 'halofire-local-dev-secret-change-me' : null);
+const ADMIN_USERNAME = process.env.HALOFIRE_ADMIN_USER || (ALLOW_DEV_DEFAULTS ? 'admin' : null);
+const ADMIN_PASSWORD = process.env.HALOFIRE_ADMIN_PASSWORD || (ALLOW_DEV_DEFAULTS ? 'halofire2026' : null);
+const DB_PATH = process.env.HALOFIRE_DB_PATH
+  ? path.resolve(process.env.HALOFIRE_DB_PATH)
+  : path.resolve(__dirname, '../../data/halofire.db');
 const DATA_DIR = path.dirname(DB_PATH);
+const CORS_ORIGINS = (process.env.HALOFIRE_CORS_ORIGINS || 'http://localhost:3001,http://localhost:5173')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET is required unless HALOFIRE_ALLOW_DEV_DEFAULTS=1 in local development');
+}
+
+if (!ADMIN_USERNAME || !ADMIN_PASSWORD) {
+  throw new Error('HALOFIRE_ADMIN_USER and HALOFIRE_ADMIN_PASSWORD are required unless HALOFIRE_ALLOW_DEV_DEFAULTS=1');
+}
 
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 
@@ -131,12 +151,18 @@ function initDatabase() {
     );
   `);
 
-  // Seed default admin user
-  const existing = db.prepare('SELECT id FROM users WHERE username = ?').get('admin');
+  // Bootstrap the configured admin user without hardcoded credentials.
+  const existing = db.prepare('SELECT id FROM users WHERE username = ?').get(ADMIN_USERNAME);
   if (!existing) {
-    const hash = bcrypt.hashSync('halofire2026', 12);
-    db.prepare('INSERT INTO users (username, password_hash, name, role, email) VALUES (?, ?, ?, ?, ?)').run('admin', hash, 'Dallas Steele', 'President', 'admin@halofireus.com');
-    log.info('Default admin user created');
+    const hash = bcrypt.hashSync(ADMIN_PASSWORD, 12);
+    db.prepare('INSERT INTO users (username, password_hash, name, role, email) VALUES (?, ?, ?, ?, ?)').run(
+      ADMIN_USERNAME,
+      hash,
+      'HaloFire Admin',
+      'admin',
+      'admin@halofire.local',
+    );
+    log.info('Configured admin user created');
   }
 
   log.info('Database initialized');
@@ -146,9 +172,18 @@ initDatabase();
 
 // ── Express App ──
 const app = express();
-app.use(cors());
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (origin && !CORS_ORIGINS.includes(origin)) {
+    return res.status(403).json({ error: 'CORS origin not allowed' });
+  }
+  next();
+});
+app.use(cors({ origin: CORS_ORIGINS, credentials: true }));
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(express.json({ limit: '10mb' }));
+app.use('/api/', rateLimit({ windowMs: 15 * 60 * 1000, max: 100, standardHeaders: true, legacyHeaders: false }));
+app.use('/api/auth/login', rateLimit({ windowMs: 15 * 60 * 1000, max: 10, standardHeaders: true, legacyHeaders: false }));
 app.use(express.static(path.resolve(__dirname, '../../')));
 
 // ── Auth Middleware ──
@@ -163,6 +198,34 @@ function authMiddleware(req, res, next) {
   }
 }
 
+function normalizeRole(role) {
+  return String(role || 'user').trim().toLowerCase();
+}
+
+function requireRole(role) {
+  return (req, res, next) => {
+    if (normalizeRole(req.user?.role) !== role) {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
+    next();
+  };
+}
+
+function buildAllowedUpdate(body, allowedFields) {
+  const entries = Object.entries(body).filter(([key]) => key !== 'id');
+  const rejected = entries.filter(([key]) => !allowedFields.has(key)).map(([key]) => key);
+  if (rejected.length) return { error: `Unsupported fields: ${rejected.join(', ')}` };
+  if (!entries.length) return { error: 'No fields to update' };
+  return {
+    sets: entries.map(([key]) => `${key} = ?`).join(', '),
+    values: entries.map(([, value]) => value),
+  };
+}
+
+const BID_UPDATE_FIELDS = new Set(['project', 'contractor', 'value', 'status', 'date', 'due_date', 'sqft', 'system_type', 'contact', 'notes']);
+const PROJECT_UPDATE_FIELDS = new Set(['name', 'bid_id', 'phase', 'progress', 'budget', 'spent', 'manager', 'start_date', 'end_date', 'status', 'notes']);
+const COMPLIANCE_UPDATE_FIELDS = new Set(['project_id', 'project_name', 'type', 'due_date', 'status', 'authority', 'notes']);
+
 // ── Auth Routes ──
 app.post('/api/auth/login', (req, res) => {
   const { username, password } = req.body;
@@ -170,8 +233,9 @@ app.post('/api/auth/login', (req, res) => {
   if (!user || !bcrypt.compareSync(password, user.password_hash)) {
     return res.status(401).json({ error: 'Invalid credentials' });
   }
-  const token = jwt.sign({ id: user.id, username: user.username, name: user.name, role: user.role }, JWT_SECRET, { expiresIn: '24h' });
-  res.json({ token, user: { id: user.id, username: user.username, name: user.name, role: user.role } });
+  const role = normalizeRole(user.role);
+  const token = jwt.sign({ id: user.id, username: user.username, name: user.name, role }, JWT_SECRET, { expiresIn: '24h' });
+  res.json({ token, user: { id: user.id, username: user.username, name: user.name, role } });
 });
 
 app.get('/api/auth/me', authMiddleware, (req, res) => {
@@ -200,15 +264,13 @@ app.post('/api/bids', authMiddleware, (req, res) => {
 });
 
 app.put('/api/bids/:id', authMiddleware, (req, res) => {
-  const fields = Object.entries(req.body).filter(([k]) => k !== 'id');
-  if (!fields.length) return res.status(400).json({ error: 'No fields to update' });
-  const sets = fields.map(([k]) => `${k} = ?`).join(', ');
-  const values = fields.map(([, v]) => v);
-  db.prepare(`UPDATE bids SET ${sets}, updated_at = CURRENT_TIMESTAMP WHERE id = ?`).run(...values, req.params.id);
+  const update = buildAllowedUpdate(req.body, BID_UPDATE_FIELDS);
+  if (update.error) return res.status(400).json({ error: update.error });
+  db.prepare(`UPDATE bids SET ${update.sets}, updated_at = CURRENT_TIMESTAMP WHERE id = ?`).run(...update.values, req.params.id);
   res.json({ message: 'Bid updated' });
 });
 
-app.delete('/api/bids/:id', authMiddleware, (req, res) => {
+app.delete('/api/bids/:id', authMiddleware, requireRole('admin'), (req, res) => {
   db.prepare('DELETE FROM bids WHERE id = ?').run(req.params.id);
   res.json({ message: 'Bid deleted' });
 });
@@ -226,10 +288,9 @@ app.post('/api/projects', authMiddleware, (req, res) => {
 });
 
 app.put('/api/projects/:id', authMiddleware, (req, res) => {
-  const fields = Object.entries(req.body).filter(([k]) => k !== 'id');
-  const sets = fields.map(([k]) => `${k} = ?`).join(', ');
-  const values = fields.map(([, v]) => v);
-  db.prepare(`UPDATE projects SET ${sets}, updated_at = CURRENT_TIMESTAMP WHERE id = ?`).run(...values, req.params.id);
+  const update = buildAllowedUpdate(req.body, PROJECT_UPDATE_FIELDS);
+  if (update.error) return res.status(400).json({ error: update.error });
+  db.prepare(`UPDATE projects SET ${update.sets}, updated_at = CURRENT_TIMESTAMP WHERE id = ?`).run(...update.values, req.params.id);
   res.json({ message: 'Project updated' });
 });
 
@@ -246,7 +307,7 @@ app.get('/api/pricebook', authMiddleware, (req, res) => {
   res.json(db.prepare(query).all(...params));
 });
 
-app.post('/api/pricebook/bulk', authMiddleware, (req, res) => {
+app.post('/api/pricebook/bulk', authMiddleware, requireRole('admin'), (req, res) => {
   const { items } = req.body;
   const insert = db.prepare('INSERT OR REPLACE INTO pricebook (item, supplier, price, unit, category, sku, last_updated) VALUES (?,?,?,?,?,?,?)');
   const tx = db.transaction((items) => {
@@ -268,10 +329,9 @@ app.post('/api/compliance', authMiddleware, (req, res) => {
 });
 
 app.put('/api/compliance/:id', authMiddleware, (req, res) => {
-  const fields = Object.entries(req.body).filter(([k]) => k !== 'id');
-  const sets = fields.map(([k]) => `${k} = ?`).join(', ');
-  const values = fields.map(([, v]) => v);
-  db.prepare(`UPDATE compliance SET ${sets} WHERE id = ?`).run(...values, req.params.id);
+  const update = buildAllowedUpdate(req.body, COMPLIANCE_UPDATE_FIELDS);
+  if (update.error) return res.status(400).json({ error: update.error });
+  db.prepare(`UPDATE compliance SET ${update.sets} WHERE id = ?`).run(...update.values, req.params.id);
   res.json({ message: 'Updated' });
 });
 
