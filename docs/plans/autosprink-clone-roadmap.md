@@ -131,7 +131,7 @@ Grounding: OpenSCAD NOT installed locally (generate .scad source; render needs
 the binary = a Settings dependency). SAM 3.1 = GX10 'sam3' via the OpenClaw
 bridge (best-effort, graceful skip). Parity claim stays BLOCKED until complete.
 
-- [ ] **T15 — Component registry + AutoSprink parity inventory.** `src/components/registry.js`:
+- [x] **T15 — Component registry + AutoSprink parity inventory.** `src/components/registry.js`:
       canonical list of every component/module (heads pendent/upright/sidewall/
       concealed/ESFR; pipe sch10/40; fittings tee/elbow/coupling/reducer/cap;
       grooved couplings; valves alarm/check/butterfly/OS&Y/PRV; FDC; backflow;
@@ -157,6 +157,7 @@ bridge (best-effort, graceful skip). Parity claim stays BLOCKED until complete.
       layout. Main session w/ preview screenshots.
 
 ## Log
+- 2026-05-29: T15 component registry + AutoSprink parity inventory shipped — new src/components/registry.js + tests/component-registry.test.js (22 tests). COMPONENTS is a deep-frozen canonical array (33 entries) of every fire-sprinkler module a layout/bid needs, each { key, category, name, params:{nominal sizes/options}, required:boolean }. Categories + members: heads (pendent/upright/sidewall/concealed/dry_pendent/esfr), pipe (sch10/sch40), fittings (tee/elbow_90/elbow_45/coupling/reducer/cap/cross), grooved (coupling/flange_adapter), valves (alarm_check/check/butterfly/osy_gate/prv/deluge), fdc, backflow_preventer, riser_assembly, riser_trim, gauge, hanger, seismic_brace, drain (main/aux), inspector_test, identification_sign. Exports getComponent(key) (O(1) Map lookup, undefined for unknown), componentsByCategory() (groups all into {[cat]:Component[]}), buildParityInventory(modelStatusByKey) -> {total,present,missing[],byCategory:{[cat]:{present,total,missing[]}},parityComplete}. HONESTY/fail-closed: a component counts 'present' ONLY when modelStatusByKey[key].source is a REAL source ('catalog'|'generated') AND carries an actual model — a 'placeholder'/'missing' status, or a real source with no model, counts MISSING. parityComplete is true only when EVERY required component has a real model. AUTOSPRINK_PARITY_GATE = frozen claim-gate {code:'AUTOSPRINK_PARITY_INCOMPLETE', severity:'blocking', status:'blocked', blockedClaims:['AutoSprink parity','complete component library','manufacturer-exact models'], reason:...}; parityGateStatus(inventory) returns 'blocked' unless parityComplete (then 'clear'). Pure/deterministic, browser-free; no models in this module (resolver T16 feeds status). Full suite 21 files / 175 tests green (was 20/153). Backward compat preserved (no existing file touched). NOT AutoSprink/AutoCAD/manufacturer parity, NOT AHJ/PE approved — gate stays fail-closed BLOCKED until the inventory is genuinely complete with real evidence. Next: T16 component 3D-model resolver pipeline.
 - 2026-05-29: studio + OpenGeometry CAD + DXF shipped (commits 3764b64, 2b5b7ba). 68 tests green.
 - 2026-05-29: T1 STEP/IFC/STL export shipped — verified 79KB STEP from 23 OpenGeometry entities. Next: T2 hydraulics.
 - 2026-05-29: T2 hydraulic engine shipped — src/engine/hydraulics.js + tests/hydraulics.test.js (21 hand-computed tests). Full suite 13 files / 89 tests green (was 12/68). Single-path estimate only; NOT a full network balance, NOT PE/AHJ/AutoSprink parity. Next: T3 full bid scope.
