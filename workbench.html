@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HaloFire — Bid &amp; Layout Workbench (Internal Alpha)</title>
+<style>
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --bg:#08080a;--surface:#111114;--surface2:#18181c;--fire:#E53935;--fire-light:#FF6E40;
+    --gold:#FFD54F;--cyan:#4DD0E1;--green:#4ade80;--text:#d4d4d8;--muted:#71717a;--bright:#fafafa;
+    --border:rgba(255,255,255,0.08);--font:'Inter',system-ui,sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace;
+  }
+  body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh}
+  header{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:1px solid var(--border);background:rgba(8,8,10,.9);position:sticky;top:0;z-index:10}
+  .brand{font-weight:900;font-style:italic;font-size:20px;color:var(--bright)}
+  .brand span{color:var(--fire)}
+  .who{font-family:var(--mono);font-size:11px;color:var(--muted)}
+  .who a{color:var(--cyan);text-decoration:none;margin-left:12px;cursor:pointer}
+  .alpha-banner{background:linear-gradient(90deg,rgba(229,57,53,.18),rgba(255,213,79,.12));border:1px solid rgba(229,57,53,.4);
+    color:var(--gold);font-family:var(--mono);font-size:11px;letter-spacing:.5px;padding:8px 24px;text-align:center}
+  main{max-width:1280px;margin:0 auto;padding:24px;display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px}
+  .card.wide{grid-column:1/-1}
+  h2{font-size:13px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:14px;font-weight:700}
+  .kv{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:14px}
+  .kv b{color:var(--bright);font-family:var(--mono)}
+  .big{font-size:30px;font-weight:900;color:var(--bright);font-family:var(--mono)}
+  .gate{border:1px solid rgba(229,57,53,.35);border-radius:8px;padding:12px;margin-bottom:10px;background:rgba(229,57,53,.06)}
+  .gate.warning{border-color:rgba(255,213,79,.4);background:rgba(255,213,79,.06)}
+  .gate .code{font-family:var(--mono);font-size:12px;color:var(--fire-light);font-weight:600}
+  .gate.warning .code{color:var(--gold)}
+  .gate .na{font-size:12px;color:var(--text);margin-top:6px}
+  .gate .claims{font-size:11px;color:var(--muted);margin-top:6px}
+  .chip{display:inline-block;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:99px;padding:2px 9px;font-size:10px;margin:2px 4px 2px 0;font-family:var(--mono)}
+  .ev{font-size:13px;padding:7px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;gap:10px}
+  .ev .st{font-family:var(--mono);font-size:10px;padding:1px 7px;border-radius:99px}
+  .st.present{background:rgba(74,222,128,.15);color:var(--green)}
+  .st.best_effort{background:rgba(255,213,79,.15);color:var(--gold)}
+  button.go{background:var(--fire);color:#fff;border:none;border-radius:8px;padding:11px 18px;font-weight:700;cursor:pointer;font-size:14px}
+  button.go:hover{background:var(--fire-light)}
+  button.go:disabled{opacity:.5;cursor:wait}
+  table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}
+  th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--border)}
+  th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:1px}
+  td.num{text-align:right;font-family:var(--mono)}
+  .est{color:var(--gold);font-size:10px;font-family:var(--mono)}
+  #viewport{width:100%;height:460px;background:#0a0a0c;border-radius:10px;border:1px solid var(--border);position:relative}
+  #viewport .hint{position:absolute;bottom:8px;left:10px;font-family:var(--mono);font-size:10px;color:var(--muted)}
+  .muted{color:var(--muted);font-size:12px}
+  .disclaimer{font-size:11px;color:var(--gold);font-family:var(--mono);margin-top:10px;line-height:1.5}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">Halo<span>Fire</span> · Workbench</div>
+  <div class="who"><span id="whoami">…</span><a id="logout">Sign out</a></div>
+</header>
+<div class="alpha-banner" id="banner">INTERNAL ALPHA · best-effort · NOT AHJ-approved · NOT PE-reviewed · NOT AutoSprink-parity · NOT fabrication-ready</div>
+<main>
+  <div class="card">
+    <h2>Project</h2>
+    <div id="project"><span class="muted">Loading…</span></div>
+  </div>
+  <div class="card">
+    <h2>Claim Gates (fail-closed)</h2>
+    <div id="gates"><span class="muted">Loading…</span></div>
+  </div>
+  <div class="card">
+    <h2>Source Evidence</h2>
+    <div id="evidence"><span class="muted">Loading…</span></div>
+  </div>
+  <div class="card">
+    <h2>Auto Layout &amp; Auto Bid</h2>
+    <p class="muted">Generate a deterministic best-effort sprinkler layout from the floor plan, priced from imported vendor pricebooks.</p>
+    <p style="margin:14px 0"><button class="go" id="genBtn">Generate sprinkler layout</button></p>
+    <div id="bidSummary"></div>
+  </div>
+  <div class="card wide">
+    <h2>3D Building &amp; Sprinkler Geometry</h2>
+    <div id="viewport"><div class="hint">drag to orbit · scroll to zoom</div></div>
+    <div class="disclaimer" id="sceneDisclaimer"></div>
+  </div>
+  <div class="card wide" id="bomCard" style="display:none">
+    <h2>Bill of Materials &amp; Pricing</h2>
+    <div id="bom"></div>
+  </div>
+</main>
+
+<script type="importmap">
+{ "imports": { "three": "/vendor/three/build/three.module.js" } }
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from '/vendor/three/examples/jsm/controls/OrbitControls.js';
+
+const HOME_DEPOT = 'Home Depot - Rexburg ID';
+const token = localStorage.getItem('halofire_token');
+if (!token) location.href = '/';
+
+function api(path, options = {}) {
+  return fetch('/api' + path, {
+    ...options,
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token, ...(options.headers || {}) },
+  }).then(async (r) => {
+    if (r.status === 401) { localStorage.removeItem('halofire_token'); location.href = '/'; throw new Error('unauth'); }
+    if (!r.ok) throw new Error(await r.text());
+    return r.json();
+  });
+}
+
+document.getElementById('logout').onclick = () => { localStorage.removeItem('halofire_token'); location.href = '/'; };
+
+const usd = (n) => '$' + Number(n).toLocaleString('en-US', { maximumFractionDigits: 0 });
+
+async function load() {
+  try {
+    const me = await api('/auth/me');
+    document.getElementById('whoami').textContent = me.name + ' · ' + me.role;
+  } catch (_) { return; }
+
+  const projects = await api('/projects');
+  const proj = projects.find((p) => p.name === HOME_DEPOT) || projects[0];
+  const bids = await api('/bids?search=' + encodeURIComponent('Home Depot'));
+  const bid = (bids.bids || []).find((b) => b.project === HOME_DEPOT);
+  document.getElementById('project').innerHTML = proj ? `
+    <div class="big">${proj.name}</div>
+    <div class="kv"><span>Bid amount (submitted)</span><b>${bid ? usd(bid.value) : '—'}</b></div>
+    <div class="kv"><span>Contractor</span><b>${bid ? (bid.contractor || '—') : '—'}</b></div>
+    <div class="kv"><span>Phase</span><b>${proj.phase || '—'}</b></div>
+    <div class="kv"><span>Due date</span><b>${bid ? (bid.due_date || '—') : '—'}</b></div>
+  ` : '<span class="muted">No project found.</span>';
+
+  const gates = await api('/projects/' + encodeURIComponent(HOME_DEPOT) + '/claim-gates');
+  document.getElementById('gates').innerHTML = gates.length ? gates.map((g) => `
+    <div class="gate ${g.severity === 'warning' ? 'warning' : ''}">
+      <div class="code">${g.code} · ${g.status.toUpperCase()}</div>
+      <div class="na">${g.next_action}</div>
+      <div class="claims">Blocks: ${(g.blocked_claims || []).map((c) => `<span class="chip">${c}</span>`).join('')}</div>
+    </div>`).join('') : '<span class="muted">No gates.</span>';
+
+  await refreshEvidence();
+}
+
+async function refreshEvidence() {
+  const evidence = await api('/projects/' + encodeURIComponent(HOME_DEPOT) + '/evidence');
+  document.getElementById('evidence').innerHTML = evidence.length ? evidence.map((e) => `
+    <div class="ev">
+      <span>${e.evidence_type}${e.source_file ? ' · ' + e.source_file : ''}</span>
+      <span class="st ${e.status}">${e.status}</span>
+    </div>`).join('') : '<span class="muted">No evidence rows.</span>';
+}
+
+// ── 3D rendering ──
+let renderer, scene3, camera, controls;
+function initViewport() {
+  const el = document.getElementById('viewport');
+  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(el.clientWidth, el.clientHeight);
+  renderer.setPixelRatio(window.devicePixelRatio);
+  el.appendChild(renderer.domElement);
+  scene3 = new THREE.Scene();
+  scene3.background = new THREE.Color(0x0a0a0c);
+  camera = new THREE.PerspectiveCamera(55, el.clientWidth / el.clientHeight, 0.1, 5000);
+  controls = new OrbitControls(camera, renderer.domElement);
+  scene3.add(new THREE.AmbientLight(0xffffff, 0.6));
+  const dir = new THREE.DirectionalLight(0xffffff, 0.8); dir.position.set(200, 400, 200); scene3.add(dir);
+  (function animate() { requestAnimationFrame(animate); controls.update(); renderer.render(scene3, camera); })();
+}
+
+function renderScene(sceneData) {
+  // clear previous meshes (keep lights)
+  for (let i = scene3.children.length - 1; i >= 0; i--) {
+    const c = scene3.children[i];
+    if (c.isMesh || c.isLine || c.isGroup) scene3.remove(c);
+  }
+  const b = sceneData.bounds;
+  const cx = (b.minX + b.maxX) / 2, cz = (b.minZ + b.maxZ) / 2;
+  const span = Math.max(b.maxX - b.minX, b.maxZ - b.minZ) || 100;
+
+  // floor
+  sceneData.floors.forEach((f) => {
+    const w = b.maxX - b.minX, d = b.maxZ - b.minZ;
+    const floor = new THREE.Mesh(new THREE.PlaneGeometry(w, d),
+      new THREE.MeshStandardMaterial({ color: 0x1b1b22, side: THREE.DoubleSide }));
+    floor.rotation.x = -Math.PI / 2; floor.position.set(cx, 0, cz); scene3.add(floor);
+  });
+  // walls
+  const wallMat = new THREE.MeshStandardMaterial({ color: 0x2a2a33 });
+  sceneData.walls.forEach((w) => {
+    const m = new THREE.Mesh(new THREE.BoxGeometry(w.lengthFt, w.heightFt, w.thicknessFt), wallMat);
+    m.position.set(w.center[0], w.center[1], w.center[2]); m.rotation.y = w.rotationY; scene3.add(m);
+  });
+  // pipes
+  const pipeMat = new THREE.LineBasicMaterial({ color: 0x4DD0E1 });
+  sceneData.pipes.forEach((p) => {
+    const g = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(...p.from), new THREE.Vector3(...p.to)]);
+    scene3.add(new THREE.Line(g, pipeMat));
+  });
+  // heads (instanced for performance — hundreds of heads)
+  const headGeo = new THREE.SphereGeometry(1.1, 8, 8);
+  const headMat = new THREE.MeshStandardMaterial({ color: 0xE53935, emissive: 0x4a0000 });
+  const inst = new THREE.InstancedMesh(headGeo, headMat, sceneData.heads.length);
+  const dummy = new THREE.Object3D();
+  sceneData.heads.forEach((h, i) => { dummy.position.set(...h.position); dummy.updateMatrix(); inst.setMatrixAt(i, dummy.matrix); });
+  scene3.add(inst);
+
+  camera.position.set(cx + span * 0.7, span * 0.9, cz + span * 0.7);
+  controls.target.set(cx, 0, cz); controls.update();
+}
+
+document.getElementById('genBtn').onclick = async () => {
+  const btn = document.getElementById('genBtn'); btn.disabled = true; btn.textContent = 'Generating…';
+  try {
+    const { bid, scene: sceneData } = await api('/projects/' + encodeURIComponent(HOME_DEPOT) + '/sprinkler-bid', {
+      method: 'POST', body: JSON.stringify({ markupPct: 25 }),
+    });
+    const r = bid.rooms[0];
+    document.getElementById('bidSummary').innerHTML = `
+      <div class="kv"><span>Total area</span><b>${bid.totalAreaSqFt.toLocaleString()} sqft</b></div>
+      <div class="kv"><span>Sprinkler heads</span><b>${bid.totalHeadCount}</b></div>
+      <div class="kv"><span>Head spacing</span><b>${r.spacingX} × ${r.spacingY} ft (cov ${r.coveragePerHeadSqFt})</b></div>
+      <div class="kv"><span>Material</span><b>${usd(bid.pricing.materialCost)}</b></div>
+      <div class="kv"><span>Labor</span><b>${usd(bid.pricing.laborCost)}</b></div>
+      <div class="kv"><span>Best-effort total (+${bid.pricing.markupPct}%)</span><b>${usd(bid.pricing.total)}</b></div>
+      ${bid.pricing.anyEstimated ? '<div class="est">⚠ some unit costs are fallback estimates (no pricebook match)</div>' : ''}`;
+
+    document.getElementById('bomCard').style.display = '';
+    document.getElementById('bom').innerHTML = `<table>
+      <tr><th>Item</th><th>Qty</th><th>Unit</th><th>Unit cost</th><th>Line total</th><th>Source</th></tr>
+      ${bid.pricing.lines.map((l) => `<tr>
+        <td>${l.description}</td><td class="num">${l.quantity}</td><td>${l.unit}</td>
+        <td class="num">${usd(l.unitCost)}</td><td class="num">${usd(l.lineTotal)}</td>
+        <td class="${l.priceSource === 'pricebook' ? '' : 'est'}">${l.priceSource}</td></tr>`).join('')}
+    </table>`;
+
+    document.getElementById('sceneDisclaimer').textContent = sceneData.disclaimer + ' — ' + bid.disclaimer;
+    renderScene(sceneData);
+    await refreshEvidence(); // shows the best_effort evidence row the engine recorded
+  } catch (e) {
+    document.getElementById('bidSummary').innerHTML = '<span class="est">Error: ' + e.message + '</span>';
+  } finally { btn.disabled = false; btn.textContent = 'Regenerate layout'; }
+};
+
+initViewport();
+load();
+</script>
+</body>
+</html>

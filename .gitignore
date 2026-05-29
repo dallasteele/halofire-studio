@@ -9,3 +9,7 @@ data/locks/
 dist/
 coverage/
 *.log
+# Local-only preview helpers (may contain dev credentials)
+scripts/preview-server.js
+.claude/
+data/state/

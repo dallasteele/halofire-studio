@@ -234,6 +234,8 @@ app.use(express.json({ limit: '10mb' }));
 app.use('/api/', rateLimit({ windowMs: 15 * 60 * 1000, max: 100, standardHeaders: true, legacyHeaders: false }));
 app.use('/api/auth/login', rateLimit({ windowMs: 15 * 60 * 1000, max: 10, standardHeaders: true, legacyHeaders: false }));
 app.use(express.static(path.resolve(__dirname, '../../')));
+// Serve the bundled Three.js locally (no external CDN dependency for the 3D view).
+app.use('/vendor/three', express.static(path.resolve(__dirname, '../../node_modules/three')));
 
 // ── Auth Middleware ──
 function authMiddleware(req, res, next) {

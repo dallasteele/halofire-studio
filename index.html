@@ -174,7 +174,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:55px;display:flex;ali
       <button type="submit" class="submit-btn">Sign In</button>
       <div class="login-err" id="err">Invalid credentials</div>
     </form>
-    <div class="login-hint">dev credentials: admin / halofire2026</div>
+    <div class="login-hint">Internal alpha — authorized Halo Fire staff only</div>
   </div>
 </div>
 
@@ -402,13 +402,25 @@ document.getElementById('signBtn').onclick=()=>ov.classList.add('on');
 document.getElementById('enterBtn').onclick=()=>ov.classList.add('on');
 document.getElementById('closeBtn').onclick=()=>ov.classList.remove('on');
 ov.onclick=e=>{if(e.target===ov)ov.classList.remove('on');};
-document.getElementById('form').onsubmit=e=>{
+document.getElementById('form').onsubmit=async e=>{
   e.preventDefault();
-  if(document.getElementById('user').value==='admin'&&document.getElementById('pass').value==='halofire2026'){
-    ov.classList.remove('on');
-    const b=document.querySelector('.btn-sign');b.textContent='ADMIN';b.style.background='#4ade80';b.style.color='#000';
-  }else{
-    const er=document.getElementById('err');er.style.display='block';setTimeout(()=>er.style.display='none',2000);
+  const er=document.getElementById('err');
+  try{
+    const res=await fetch('/api/auth/login',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        username:document.getElementById('user').value,
+        password:document.getElementById('pass').value,
+      }),
+    });
+    if(!res.ok)throw new Error('bad credentials');
+    const data=await res.json();
+    localStorage.setItem('halofire_token',data.token);
+    localStorage.setItem('halofire_user',JSON.stringify(data.user));
+    window.location.href='/workbench.html';
+  }catch(_){
+    er.style.display='block';setTimeout(()=>er.style.display='none',2500);
   }
 };
 document.getElementById('menuBtn').onclick=()=>document.getElementById('navLinks').classList.toggle('open');
