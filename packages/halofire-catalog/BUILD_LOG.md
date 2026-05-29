@@ -1,5 +1,19 @@
 # BUILD_LOG
 
+## 2026-05-29T05:47Z
+
+- Regenerated `data/halofire/brand/components/source_coverage_ledger.json` from the checked-in source research and component-library seeds so the Stream F coverage ledger stays replayable with a fresh `generated_at_utc` and the current missing-download accounting.
+- Rechecked the live public source surfaces during the refresh window: step.parts remains a proxy/candidate-only source candidate, and the manufacturer/distributor pages for Wheatland, Victaulic FL-QR/SW, Tyco TY-B, Tyco LFII HSW, Viking VK100/VK3021, and Reliable DH56 still expose the expected public evidence paths.
+- No promotion status changed in this slice. The catalog/model pipeline remains limited by approval depth: manufacturer_verified and sealed_approved still need stronger manufacturer-backed or sealed evidence before promotion.
+- Verification passed for the regenerated coverage surface: `C:/Python312/python.exe scripts/verify_agentic_rules.py`, `bun test E:/ClaudeBot/halofire-studio/packages/halofire-catalog/tests/source-coverage.test.ts E:/ClaudeBot/halofire-studio/packages/halofire-catalog/tests/source-research.test.ts E:/ClaudeBot/halofire-studio/packages/halofire-catalog/tests/source-owner-pipeline.test.ts`, `bun run --cwd E:/ClaudeBot/halofire-studio/packages/halofire-catalog check-types`, and `bun run --cwd E:/ClaudeBot/halofire-studio/packages/halofire-catalog build`.
+
+## 2026-05-28T19:40Z
+
+- Hardened the Stream F component-library contract so each nested source-license row must explicitly match the component source kind. This keeps the source-license, source-kind, and family-contract lanes aligned instead of relying on downstream inference.
+- Added a provenance regression that checks the resolved source-license kind against the component source kind for every checked-in catalog row.
+- Verified the live public source pages again for step.parts, Wheatland, Tyco TY-B, Victaulic FL-QR/SW, Tyco LFII HSW, and Reliable DH56; the checked-in URLs still match the current public surfaces, and the open-source STEP candidate remains candidate-only.
+- Next blocker remains approval depth: manufacturer_verified and sealed_approved still need stronger manufacturer-backed or sealed evidence before promotion.
+
 ## 2026-05-29T03:05Z
 
 - Rechecked the Stream F catalog/model owner surface against the live public step.parts, Tyco LFII HSW, and Victaulic FL-QR/SW pages before making any source edits. The checked-in package already carries the requested typed source licensing, model-status tiers, GLB/IFC/DXF family contracts, distributor/source ingestion, source-research ledger, coverage ledger, and correction workflow surface.
