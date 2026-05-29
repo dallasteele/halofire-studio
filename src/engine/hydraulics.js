@@ -229,6 +229,12 @@ export function flagSchedule(networkOrCad, hazard) {
   return warnings;
 }
 
+// Re-export the full hydraulic NETWORK balance (P1) so callers can import the
+// K-factor head discharge + node-by-node balance from the same hydraulics entry
+// point as the T2 single-path estimate. The network module is the source of
+// truth; this is a convenience re-export and keeps the T2 API above untouched.
+export { kFactorFlow, balanceNetwork } from './hydraulic-network.js';
+
 function num(v, fallback = 0) {
   const n = Number(v);
   return Number.isFinite(n) ? n : fallback;
