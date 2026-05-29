@@ -19,7 +19,7 @@ import { createLogger } from '../core/logger.js';
 import { generateSprinklerBid } from '../engine/sprinkler-layout.js';
 import { buildScene } from '../engine/geometry.js';
 import { buildResolverFromDb } from '../engine/pricebook-pricing.js';
-import { floorPlanFromSvg, normalizeFloorPlan, buildingFromSvg } from '../engine/floorplan-import.js';
+import { floorPlanFromSvg, floorPlanFromDxf, normalizeFloorPlan, buildingFromSvg, buildingFromDxf } from '../engine/floorplan-import.js';
 import { buildCadModel } from '../engine/cad-model.js';
 import { toDxf } from '../engine/dxf-export.js';
 import { requiredPressureAtRiser, flagSchedule, remoteAreaDemand } from '../engine/hydraulics.js';
@@ -587,6 +587,17 @@ app.post('/api/projects/:name/claim-gates/:code/resolve', authMiddleware, requir
 // either { httpError:{status,error} } or the assembled artifacts. Fail-closed:
 // this NEVER clears AutoSprink/AHJ/PE/manufacturer gates; it records a best_effort
 // evidence row only. Used by both /sprinkler-bid and /submittal.
+
+// Default AutoCAD-style layer name conventions for a building DXF import. Callers
+// may override per-request via req.body.dxfLayers. Matching is exact per layer name.
+const DEFAULT_DXF_LAYERS = Object.freeze({
+  spaces: ['ROOMS', 'SPACES', 'A-AREA', 'PLAN'],
+  wallsExterior: ['WALLS-EXT', 'A-WALL-EXT', 'WALLS'],
+  wallsInterior: ['WALLS-INT', 'A-WALL-INT', 'PARTITIONS'],
+  doors: ['DOOR', 'DOORS', 'A-DOOR'],
+  columns: ['COLUMN', 'COLUMNS', 'COLS', 'A-COLS'],
+});
+
 function runSprinklerPipeline(req) {
   const projectName = req.params.name;
   let floorPlan = null;
@@ -594,22 +605,39 @@ function runSprinklerPipeline(req) {
   if (req.body && typeof req.body.buildingSvg === 'string' && req.body.buildingSvg.trim()) {
     // Accurate multi-space building drawing (walls/spaces/doors/columns by layer/attr).
     building = buildingFromSvg(req.body.buildingSvg, { name: projectName, unitsPerPx: Number(req.body.unitsPerPx) || 1 });
-    // Synthesize a flat floor plan from the building's spaces for bid/hydraulics/scene.
-    floorPlan = {
-      name: projectName, units: building.units || 'ft',
-      rooms: building.stories.flatMap((s) => s.spaces.map((sp) => ({ ...sp, ceilingHeightFt: sp.ceilingHeightFt || s.ceilingHeightFt }))),
-    };
-    if (!floorPlan.rooms.length) return { httpError: { status: 400, error: 'Building drawing has no spaces (need data-space polygons)' } };
+  } else if (req.body && typeof req.body.buildingDxf === 'string' && req.body.buildingDxf.trim()) {
+    // Multi-space building from a DXF drawing (layer-mapped spaces/walls/doors/columns).
+    building = buildingFromDxf(req.body.buildingDxf, {
+      name: projectName,
+      unitsPerDrawingUnit: Number(req.body.unitsPerDrawingUnit) || 1,
+      layers: req.body.dxfLayers || DEFAULT_DXF_LAYERS,
+    });
   } else if (req.body && typeof req.body.svg === 'string' && req.body.svg.trim()) {
     // Import a floor plan from pasted/uploaded SVG (px scaled to ft).
     floorPlan = floorPlanFromSvg(req.body.svg, { name: projectName, unitsPerPx: Number(req.body.unitsPerPx) || 1 });
+  } else if (req.body && typeof req.body.dxf === 'string' && req.body.dxf.trim()) {
+    // Single-space floor plan from a DXF drawing (closed polylines/loops scaled to ft).
+    floorPlan = floorPlanFromDxf(req.body.dxf, {
+      name: projectName,
+      unitsPerDrawingUnit: Number(req.body.unitsPerDrawingUnit) || 1,
+      layer: req.body.dxfLayer || undefined,
+      hazard: req.body.hazard,
+    });
   } else if (req.body && req.body.floorPlan) {
     floorPlan = normalizeFloorPlan(req.body.floorPlan);
   } else if (projectName === HOME_DEPOT_PROJECT_NAME) {
     floorPlan = homeDepotRexburgFloorPlan();
   }
+  // A building drawing (SVG or DXF) -> synthesize a flat floor plan for bid/hydraulics/scene.
+  if (building && !floorPlan) {
+    floorPlan = {
+      name: projectName, units: building.units || 'ft',
+      rooms: building.stories.flatMap((s) => s.spaces.map((sp) => ({ ...sp, ceilingHeightFt: sp.ceilingHeightFt || s.ceilingHeightFt }))),
+    };
+    if (!floorPlan.rooms.length) return { httpError: { status: 400, error: 'Building drawing has no spaces (need space polygons / mapped layers)' } };
+  }
   if (!floorPlan) {
-    return { httpError: { status: 400, error: 'Provide an svg, a floorPlan spec, or use a project with a built-in plan' } };
+    return { httpError: { status: 400, error: 'Provide an svg/dxf, a buildingSvg/buildingDxf, a floorPlan spec, or use a project with a built-in plan' } };
   }
   // Optional hazard override from the studio UI (applies to all rooms).
   if (req.body && ['light', 'ordinary', 'extra'].includes(String(req.body.hazard))) {
