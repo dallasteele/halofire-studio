@@ -25,6 +25,9 @@ import { toDxf } from '../engine/dxf-export.js';
 import { requiredPressureAtRiser, flagSchedule, remoteAreaDemand } from '../engine/hydraulics.js';
 import { buildParityMatrix, parityAchieved } from '../engine/parity-matrix.js';
 import { AUTOSPRINK_PARITY_GATE, buildParityInventory, parityGateStatus } from '../components/registry.js';
+import { balanceNetwork } from '../engine/hydraulic-network.js';
+import { checkCompliance } from '../engine/nfpa-compliance.js';
+import { buildSubmittal, renderSubmittalPdf } from '../engine/submittal.js';
 import { homeDepotRexburgFloorPlan } from '../data/floorplans.js';
 import { HOME_DEPOT_PROJECT_NAME } from '../data/evidence-gates.js';
 
@@ -577,81 +580,163 @@ app.post('/api/projects/:name/claim-gates/:code/resolve', authMiddleware, requir
   });
 });
 
-// Best-effort sprinkler auto-layout + auto-bid. Fail-closed: this NEVER clears
-// AutoSprink/AHJ/PE/manufacturer gates; it records a best_effort evidence row.
+// Shared best-effort sprinkler pipeline: resolve the input drawing, generate the
+// auto-layout/bid, build the 3D CAD model, run the single-path hydraulic estimate,
+// the FULL network balance, and the NFPA-13 geometric compliance check. Returns
+// either { httpError:{status,error} } or the assembled artifacts. Fail-closed:
+// this NEVER clears AutoSprink/AHJ/PE/manufacturer gates; it records a best_effort
+// evidence row only. Used by both /sprinkler-bid and /submittal.
+function runSprinklerPipeline(req) {
+  const projectName = req.params.name;
+  let floorPlan = null;
+  let building = null;
+  if (req.body && typeof req.body.buildingSvg === 'string' && req.body.buildingSvg.trim()) {
+    // Accurate multi-space building drawing (walls/spaces/doors/columns by layer/attr).
+    building = buildingFromSvg(req.body.buildingSvg, { name: projectName, unitsPerPx: Number(req.body.unitsPerPx) || 1 });
+    // Synthesize a flat floor plan from the building's spaces for bid/hydraulics/scene.
+    floorPlan = {
+      name: projectName, units: building.units || 'ft',
+      rooms: building.stories.flatMap((s) => s.spaces.map((sp) => ({ ...sp, ceilingHeightFt: sp.ceilingHeightFt || s.ceilingHeightFt }))),
+    };
+    if (!floorPlan.rooms.length) return { httpError: { status: 400, error: 'Building drawing has no spaces (need data-space polygons)' } };
+  } else if (req.body && typeof req.body.svg === 'string' && req.body.svg.trim()) {
+    // Import a floor plan from pasted/uploaded SVG (px scaled to ft).
+    floorPlan = floorPlanFromSvg(req.body.svg, { name: projectName, unitsPerPx: Number(req.body.unitsPerPx) || 1 });
+  } else if (req.body && req.body.floorPlan) {
+    floorPlan = normalizeFloorPlan(req.body.floorPlan);
+  } else if (projectName === HOME_DEPOT_PROJECT_NAME) {
+    floorPlan = homeDepotRexburgFloorPlan();
+  }
+  if (!floorPlan) {
+    return { httpError: { status: 400, error: 'Provide an svg, a floorPlan spec, or use a project with a built-in plan' } };
+  }
+  // Optional hazard override from the studio UI (applies to all rooms).
+  if (req.body && ['light', 'ordinary', 'extra'].includes(String(req.body.hazard))) {
+    floorPlan = { ...floorPlan, rooms: floorPlan.rooms.map((r) => ({ ...r, hazard: req.body.hazard })) };
+  }
+  const opts = {
+    priceResolver: buildResolverFromDb(db),
+    laborRatePerHead: Number(req.body?.laborRatePerHead) || 85,
+    markupPct: Number(req.body?.markupPct) || 25,
+  };
+  const bid = generateSprinklerBid(floorPlan, opts);
+  const scene = buildScene(floorPlan, bid);
+  // 3D-correct CAD model. For a building drawing this carries interior+exterior
+  // walls (with door/window opening metadata) + columns + per-space networks.
+  const cadModel = building ? buildCadModel(building) : buildCadModel(floorPlan);
+
+  // Record that a best-effort layout was generated — as evidence, not a clearance.
+  if (normalizeRole(req.user?.role) === 'admin') {
+    db.prepare(`INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+                VALUES (?, ?, ?, ?, ?, ?)`).run(
+      projectName,
+      'best_effort_ai_layout',
+      null,
+      `engine ${bid.generatedBy}`,
+      'best_effort',
+      `Generated ${bid.totalHeadCount} heads over ${bid.totalAreaSqFt} sqft. ${bid.disclaimer}`,
+    );
+  }
+
+  const hazard = bid.rooms?.[0]?.hazard || 'ordinary';
+
+  // Best-effort NFPA-13 hydraulic check (single representative path; NOT a
+  // full network balance). Surfaced in the studio; never clears a gate.
+  let hydraulics = null;
+  try {
+    // buildCadModel nests the network under rooms[].network (or floors[].rooms[]).
+    const room0 = (cadModel.rooms && cadModel.rooms[0])
+      || (cadModel.floors && cadModel.floors[0] && cadModel.floors[0].rooms && cadModel.floors[0].rooms[0]);
+    const network = room0 && room0.network;
+    if (!network) throw new Error('no network in cad model');
+    const required = requiredPressureAtRiser({ network, hazard });
+    hydraulics = {
+      ...required,
+      demand: remoteAreaDemand(hazard),
+      warnings: flagSchedule(network, hazard),
+      disclaimer: 'best-effort single-path estimate — NOT a full hydraulic network balance, NOT PE/AHJ reviewed.',
+    };
+  } catch (e) {
+    hydraulics = { error: e.message };
+  }
+
+  // Best-effort FULL hydraulic NETWORK balance over the remote design area.
+  // balanceNetwork resolves the network from cadModel.network (TOP-LEVEL), which
+  // buildCadModel does not produce — the network lives at cadModel.rooms[0].network
+  // (legacy/floorPlan path). Building drawings expose no rooms[].network, so this
+  // skips gracefully rather than fabricating one. Never clears a gate.
+  let hydraulicNetwork = null;
+  try {
+    const room0 = (cadModel.rooms && cadModel.rooms[0])
+      || (cadModel.floors && cadModel.floors[0] && cadModel.floors[0].rooms && cadModel.floors[0].rooms[0]);
+    const network = room0 && room0.network;
+    if (!network) throw new Error('no per-room network for full balance (building path)');
+    hydraulicNetwork = balanceNetwork({ network, hazard });
+  } catch (e) {
+    hydraulicNetwork = { error: e.message };
+  }
+
+  // Best-effort NFPA-13 GEOMETRIC compliance check. Build a system-layout shape
+  // from the bid (per-room laid-out heads/spacing/bbox) so the check has real
+  // geometry. checkCompliance ALWAYS appends a 'warn' honesty note and clears NO
+  // gate — a geometric "passed" is not AHJ/PE/permit-ready approval.
+  let compliance = null;
+  try {
+    const complianceInput = {
+      stories: [{
+        spaces: bid.rooms.map((r) => ({ name: r.name, hazard: r.hazard, ...(r.layout || {}) })),
+      }],
+    };
+    compliance = checkCompliance(complianceInput, hazard);
+  } catch (e) {
+    compliance = { error: e.message };
+  }
+
+  return { projectName, floorPlan, building, bid, scene, cadModel, hydraulics, hydraulicNetwork, compliance };
+}
+
+// Best-effort sprinkler auto-layout + auto-bid + hydraulic network balance +
+// NFPA-13 geometric compliance. Fail-closed: NEVER clears any regulated gate.
 app.post('/api/projects/:name/sprinkler-bid', authMiddleware, (req, res) => {
   try {
-    const projectName = req.params.name;
-    let floorPlan = null;
-    let building = null;
-    if (req.body && typeof req.body.buildingSvg === 'string' && req.body.buildingSvg.trim()) {
-      // Accurate multi-space building drawing (walls/spaces/doors/columns by layer/attr).
-      building = buildingFromSvg(req.body.buildingSvg, { name: projectName, unitsPerPx: Number(req.body.unitsPerPx) || 1 });
-      // Synthesize a flat floor plan from the building's spaces for bid/hydraulics/scene.
-      floorPlan = {
-        name: projectName, units: building.units || 'ft',
-        rooms: building.stories.flatMap((s) => s.spaces.map((sp) => ({ ...sp, ceilingHeightFt: sp.ceilingHeightFt || s.ceilingHeightFt }))),
-      };
-      if (!floorPlan.rooms.length) return res.status(400).json({ error: 'Building drawing has no spaces (need data-space polygons)' });
-    } else if (req.body && typeof req.body.svg === 'string' && req.body.svg.trim()) {
-      // Import a floor plan from pasted/uploaded SVG (px scaled to ft).
-      floorPlan = floorPlanFromSvg(req.body.svg, { name: projectName, unitsPerPx: Number(req.body.unitsPerPx) || 1 });
-    } else if (req.body && req.body.floorPlan) {
-      floorPlan = normalizeFloorPlan(req.body.floorPlan);
-    } else if (projectName === HOME_DEPOT_PROJECT_NAME) {
-      floorPlan = homeDepotRexburgFloorPlan();
-    }
-    if (!floorPlan) {
-      return res.status(400).json({ error: 'Provide an svg, a floorPlan spec, or use a project with a built-in plan' });
-    }
-    // Optional hazard override from the studio UI (applies to all rooms).
-    if (req.body && ['light', 'ordinary', 'extra'].includes(String(req.body.hazard))) {
-      floorPlan = { ...floorPlan, rooms: floorPlan.rooms.map((r) => ({ ...r, hazard: req.body.hazard })) };
-    }
-    const opts = {
-      priceResolver: buildResolverFromDb(db),
-      laborRatePerHead: Number(req.body?.laborRatePerHead) || 85,
-      markupPct: Number(req.body?.markupPct) || 25,
-    };
-    const bid = generateSprinklerBid(floorPlan, opts);
-    const scene = buildScene(floorPlan, bid);
-    // 3D-correct CAD model. For a building drawing this carries interior+exterior
-    // walls (with door/window opening metadata) + columns + per-space networks.
-    const cadModel = building ? buildCadModel(building) : buildCadModel(floorPlan);
+    const out = runSprinklerPipeline(req);
+    if (out.httpError) return res.status(out.httpError.status).json({ error: out.httpError.error });
+    const { bid, scene, cadModel, hydraulics, hydraulicNetwork, compliance, building } = out;
+    res.json({ bid, scene, cadModel, hydraulics, hydraulicNetwork, compliance, isBuilding: !!building });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
 
-    // Record that a best-effort layout was generated — as evidence, not a clearance.
-    if (normalizeRole(req.user?.role) === 'admin') {
-      db.prepare(`INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
-                  VALUES (?, ?, ?, ?, ?, ?)`).run(
-        projectName,
-        'best_effort_ai_layout',
-        null,
-        `engine ${bid.generatedBy}`,
-        'best_effort',
-        `Generated ${bid.totalHeadCount} heads over ${bid.totalAreaSqFt} sqft. ${bid.disclaimer}`,
-      );
+// Best-effort downloadable SUBMITTAL package (head/pipe schedules, hydraulic
+// summary, BOM, gate status). Fail-closed: header honesty flags stay false,
+// gateStatus.submittalReady stays false, and the AUTOSPRINK_PARITY gate stays
+// blocked — this clears NO regulated gate.
+app.post('/api/projects/:name/submittal', authMiddleware, async (req, res) => {
+  try {
+    const out = runSprinklerPipeline(req);
+    if (out.httpError) return res.status(out.httpError.status).json({ error: out.httpError.error });
+    const { projectName, bid, cadModel, hydraulics, hydraulicNetwork, compliance } = out;
+    const pkg = buildSubmittal({
+      project: { name: projectName },
+      bid,
+      cadModel,
+      // Prefer the full network balance when it ran; fall back to the single-path
+      // estimate. Either way it is best-effort and carries its own disclaimer.
+      hydraulics: (hydraulicNetwork && !hydraulicNetwork.error) ? hydraulicNetwork : hydraulics,
+      compliance: (compliance && !compliance.error) ? compliance : null,
+    });
+    // Optional PDF render via an injected tool invoker. No server-side invoker is
+    // wired here, so renderSubmittalPdf returns a { skipped } shape (never throws)
+    // — surfaced honestly so the studio can show that no PDF was produced.
+    let pdf = null;
+    if (req.body && (req.body.pdf === true || req.body.pdf === 'true')) {
+      pdf = await renderSubmittalPdf(pkg);
     }
-    // Best-effort NFPA-13 hydraulic check (single representative path; NOT a
-    // full network balance). Surfaced in the studio; never clears a gate.
-    let hydraulics = null;
-    try {
-      const hazard = bid.rooms?.[0]?.hazard || 'ordinary';
-      // buildCadModel nests the network under rooms[].network (or floors[].rooms[]).
-      const room0 = (cadModel.rooms && cadModel.rooms[0])
-        || (cadModel.floors && cadModel.floors[0] && cadModel.floors[0].rooms && cadModel.floors[0].rooms[0]);
-      const network = room0 && room0.network;
-      if (!network) throw new Error('no network in cad model');
-      const required = requiredPressureAtRiser({ network, hazard });
-      hydraulics = {
-        ...required,
-        demand: remoteAreaDemand(hazard),
-        warnings: flagSchedule(network, hazard),
-        disclaimer: 'best-effort single-path estimate — NOT a full hydraulic network balance, NOT PE/AHJ reviewed.',
-      };
-    } catch (e) {
-      hydraulics = { error: e.message };
-    }
-    res.json({ bid, scene, cadModel, hydraulics, isBuilding: !!building });
+    const safeName = String(projectName).replace(/[^A-Za-z0-9._-]+/g, '_') || 'project';
+    res.setHeader('Content-Disposition', `attachment; filename="${safeName}-submittal.json"`);
+    res.setHeader('Content-Type', 'application/json');
+    res.json(pdf ? { ...pkg, pdf } : pkg);
   } catch (err) {
     res.status(400).json({ error: err.message });
   }

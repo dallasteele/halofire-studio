@@ -128,10 +128,15 @@
     <div id="pipes"><span class="muted" style="font-size:12px">—</span></div>
     <h3>Hydraulics (NFPA-13, est.)</h3>
     <div id="hydraulics"><span class="muted" style="font-size:12px">—</span></div>
+    <h3>Compliance (NFPA-13, geometric)</h3>
+    <div id="compliance"><span class="muted" style="font-size:12px">—</span></div>
     <h3>Auto Bid</h3>
     <div id="bid"></div>
     <div id="bom"></div>
     <div class="warn" id="warn"></div>
+    <h3>Submittal</h3>
+    <button id="submitBtn" disabled style="width:100%;margin-bottom:4px">Download submittal (.json)</button>
+    <div class="muted" style="font-size:10px">Best-effort internal-alpha package — NOT a stamped/sealed submittal, NOT AHJ/PE approved, NOT permit-ready.</div>
   </aside>
 </div>
 
@@ -441,7 +446,7 @@ async function generate() {
     lastBody = currentBody();
     if ($('planSource').value === 'svg' && !lastBody.svg) { $('status').textContent = 'paste SVG first'; return; }
     if ($('planSource').value === 'building' && !lastBody.buildingSvg) { $('status').textContent = 'paste building SVG first'; return; }
-    const { bid, cadModel, hydraulics, isBuilding } = await api('/projects/' + encodeURIComponent(HOME_DEPOT) + '/sprinkler-bid', {
+    const { bid, cadModel, hydraulics, hydraulicNetwork, compliance, isBuilding } = await api('/projects/' + encodeURIComponent(HOME_DEPOT) + '/sprinkler-bid', {
       method: 'POST', body: JSON.stringify(lastBody),
     });
     renderModel(cadModel);
@@ -467,15 +472,33 @@ async function generate() {
     }
     if (hydraulics && !hydraulics.error) {
       const warns = (hydraulics.warnings || []);
+      const net = (hydraulicNetwork && !hydraulicNetwork.error) ? `
+        <div class="kv" style="border-top:1px solid var(--border);margin-top:4px;padding-top:4px"><span>Network demand</span><b>${Math.round(hydraulicNetwork.totalDemandGpm)} gpm</b></div>
+        <div class="kv"><span>Network friction</span><b>${hydraulicNetwork.frictionLossPsi} psi</b></div>
+        <div class="kv"><span>Req. @ source (balanced)</span><b class="total" style="font-size:14px">${hydraulicNetwork.requiredSourcePsi} psi</b></div>
+        <div class="muted" style="font-size:10px">full iterative network balance (best-effort, NOT a sealed Hardy-Cross / PE calc)</div>`
+        : `<div class="muted" style="font-size:10px">network balance: ${(hydraulicNetwork && hydraulicNetwork.error) ? hydraulicNetwork.error + ' (per-space building network — see export)' : 'n/a'}</div>`;
       $('hydraulics').innerHTML = `
         <div class="kv"><span>Design demand</span><b>${Math.round(hydraulics.demand.requiredFlowGpm)} gpm</b></div>
-        <div class="kv"><span>Friction loss</span><b>${hydraulics.frictionLossPsi} psi</b></div>
+        <div class="kv"><span>Single-path friction</span><b>${hydraulics.frictionLossPsi} psi</b></div>
         <div class="kv"><span>Elevation head</span><b>${hydraulics.elevationPsi} psi</b></div>
-        <div class="kv"><span>Req. pressure @ riser</span><b class="total" style="font-size:14px">${hydraulics.requiredPressurePsi} psi</b></div>
-        ${warns.length ? `<div class="est">⚠ ${warns.length} schedule warning(s)</div>` : '<div class="muted" style="font-size:10px">no velocity/loss warnings</div>'}`;
+        <div class="kv"><span>Req. pressure @ riser (1-path)</span><b>${hydraulics.requiredPressurePsi} psi</b></div>
+        ${warns.length ? `<div class="est">⚠ ${warns.length} schedule warning(s)</div>` : '<div class="muted" style="font-size:10px">no velocity/loss warnings</div>'}
+        ${net}`;
     } else {
       $('hydraulics').innerHTML = '<span class="est">hydraulics unavailable' + (hydraulics && hydraulics.error ? ': ' + hydraulics.error : '') + '</span>';
     }
+    // Compliance findings (NFPA-13 geometric checks — a pass is NOT AHJ/PE approval).
+    if (compliance && !compliance.error && Array.isArray(compliance.findings)) {
+      const sev = { pass: '#4ade80', warn: '#FFD54F', fail: '#E53935' };
+      const fails = compliance.findings.filter((f) => f.severity === 'fail').length;
+      const head = `<div class="kv"><span>Geometric result</span><b style="color:${fails ? sev.fail : sev.pass}">${fails ? fails + ' fail(s)' : 'no failures'}</b></div>`;
+      const rows = compliance.findings.map((f) => `<div class="kv" style="align-items:flex-start"><span style="color:${sev[f.severity] || '#71717a'}">${f.severity.toUpperCase()}</span><b style="font-weight:500;font-size:11px;text-align:right;max-width:200px">${f.rule || f.code}</b></div>`).join('');
+      $('compliance').innerHTML = head + rows + `<div class="muted" style="font-size:10px;margin-top:4px">${compliance.note || ''}</div>`;
+    } else {
+      $('compliance').innerHTML = '<span class="est">compliance unavailable' + (compliance && compliance.error ? ': ' + compliance.error : '') + '</span>';
+    }
+    $('submitBtn').disabled = false;
     $('bid').innerHTML = `
       <div class="kv"><span>Material</span><b>${usd(bid.pricing.materialCost)}</b></div>
       <div class="kv"><span>Labor</span><b>${usd(bid.pricing.laborCost)}</b></div>
@@ -494,6 +517,19 @@ async function generate() {
 $('planSource').onchange = (e) => { $('svgBox').style.display = (e.target.value === 'svg' || e.target.value === 'building') ? '' : 'none'; };
 $('exaggerate').onchange = (e) => { pipeVizScale = e.target.checked ? 6 : 1; if (currentCadModel) renderModel(currentCadModel); };
 $('genBtn').onclick = generate;
+$('submitBtn').onclick = async () => {
+  const btn = $('submitBtn'); btn.disabled = true; const label = btn.textContent; btn.textContent = 'Building…';
+  try {
+    const res = await fetch('/api/projects/' + encodeURIComponent(HOME_DEPOT) + '/submittal', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+      body: JSON.stringify(lastBody),
+    });
+    if (!res.ok) { $('status').textContent = 'submittal error: ' + res.status; return; }
+    const blob = await res.blob(); const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = 'halofire-submittal.json'; a.click(); URL.revokeObjectURL(a.href);
+    $('status').textContent = 'submittal downloaded (best-effort package)';
+  } finally { btn.disabled = false; btn.textContent = label; }
+};
 $('dxfBtn').onclick = async () => {
   const res = await fetch('/api/projects/' + encodeURIComponent(HOME_DEPOT) + '/cad.dxf', {
     method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
