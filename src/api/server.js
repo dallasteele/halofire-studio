@@ -25,7 +25,7 @@ import { buildCadModel } from '../engine/cad-model.js';
 import { toDxf } from '../engine/dxf-export.js';
 import { requiredPressureAtRiser, flagSchedule, remoteAreaDemand } from '../engine/hydraulics.js';
 import { buildParityMatrix, parityAchieved } from '../engine/parity-matrix.js';
-import { AUTOSPRINK_PARITY_GATE, buildParityInventory, parityGateStatus } from '../components/registry.js';
+import { AUTOSPRINK_PARITY_GATE, buildParityInventory, parityGateStatus, getComponent } from '../components/registry.js';
 import { buildPartManifest } from '../components/part-mesh.js';
 import { balanceNetwork } from '../engine/hydraulic-network.js';
 import { checkCompliance } from '../engine/nfpa-compliance.js';
@@ -215,6 +215,20 @@ function initDatabase() {
       created_by TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
+
+    CREATE TABLE IF NOT EXISTS part_overrides (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      key TEXT NOT NULL,
+      mode TEXT NOT NULL,
+      ref TEXT,
+      format TEXT,
+      manufacturer TEXT,
+      license TEXT,
+      notes TEXT,
+      evidence_id INTEGER REFERENCES project_evidence(id),
+      created_by TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
   `);
 
   function ensureColumn(table, column, definition) {
@@ -244,6 +258,16 @@ function initDatabase() {
   ensureColumn('settings_documents', 'notes', 'TEXT');
   ensureColumn('settings_documents', 'evidence_id', 'INTEGER');
   ensureColumn('settings_documents', 'created_by', 'TEXT');
+
+  // Per-component catalog part override records (R4).
+  ensureColumn('part_overrides', 'mode', 'TEXT');
+  ensureColumn('part_overrides', 'ref', 'TEXT');
+  ensureColumn('part_overrides', 'format', 'TEXT');
+  ensureColumn('part_overrides', 'manufacturer', 'TEXT');
+  ensureColumn('part_overrides', 'license', 'TEXT');
+  ensureColumn('part_overrides', 'notes', 'TEXT');
+  ensureColumn('part_overrides', 'evidence_id', 'INTEGER');
+  ensureColumn('part_overrides', 'created_by', 'TEXT');
 
   // Bootstrap the configured admin user without hardcoded credentials.
   const existing = db.prepare('SELECT id FROM users WHERE username = ?').get(ADMIN_USERNAME);
@@ -996,9 +1020,12 @@ app.get('/api/parity', authMiddleware, (req, res) => {
 // no runner (every part 'missing'). The parts/<key>.stl files themselves are
 // reachable via the repo-root static mount (line ~278), so no extra static
 // route is needed.
-// HONESTY/fail-closed: generated meshes are best-effort, NOT manufacturer-exact;
-// manufacturerExactCount is always 0 and the AUTOSPRINK_PARITY gate stays
-// 'blocked'. No STL is ever fabricated for a part without a real mesh.
+// HONESTY/fail-closed: generated meshes are best-effort, NOT manufacturer-exact.
+// manufacturerExactCount is 0 for generated/missing parts; it only rises when a
+// user attaches a real catalog model (manufacturer+license) via the R4 override
+// route. EITHER WAY the AUTOSPRINK_PARITY gate stays hardcoded 'blocked' (parity
+// needs manufacturer-exact models for EVERY required part + PE/AHJ review). No STL
+// is ever fabricated for a part without a real mesh.
 const PARTS_MANIFEST_PATH = path.resolve(__dirname, '../../parts/parts-manifest.json');
 const PARTS_DISCLAIMER =
   'Generated part meshes are best-effort parametric massing — NOT ' +
@@ -1016,19 +1043,73 @@ function sanitizePartEntry(entry) {
   return { ...e, source, manufacturerExact: REAL_PART_SOURCES.has(source) && e.manufacturerExact === true };
 }
 
+// Only these formats are web-renderable 3D meshes. A non-mesh upload (STEP/DWG)
+// is recorded as catalog evidence but carries NO renderable file (file stays
+// null, present stays false) — we never fabricate a mesh from CAD source.
+const WEB_MESH_FORMATS = new Set(['stl', 'glb', 'gltf', 'obj']);
+const PART_OVERRIDE_FIELDS = new Set(['mode', 'url', 'filename', 'format', 'manufacturer', 'license', 'notes']);
+
+// Merge user-attached catalog part overrides over a base manifest's components.
+// For an overridden key: source -> 'catalog'; manufacturerExact -> true ONLY when
+// BOTH a manufacturer AND a license were attested; file/present -> set ONLY for a
+// web-renderable mesh format. Every merged entry is re-run through
+// sanitizePartEntry (defense in depth: it re-affirms the source-set guard so a
+// tampered row can never leak a false manufacturer-exact claim). Overrides NEVER
+// touch parityGateStatus — that gate stays hardcoded 'blocked' at the call site.
+function mergePartOverrides(components) {
+  let rows;
+  try {
+    rows = db.prepare('SELECT * FROM part_overrides ORDER BY created_at DESC, id DESC').all();
+  } catch {
+    return components;
+  }
+  const byKey = new Map();
+  for (const row of rows) {
+    if (!byKey.has(row.key)) byKey.set(row.key, row); // latest override per component
+  }
+  return components.map((c) => {
+    const o = byKey.get(c.key);
+    if (!o) return c;
+    const fmt = o.format ? String(o.format).toLowerCase() : null;
+    const isWebMesh = Boolean(fmt && WEB_MESH_FORMATS.has(fmt));
+    const manufacturerExact = Boolean(
+      o.manufacturer && String(o.manufacturer).trim() && o.license && String(o.license).trim(),
+    );
+    return sanitizePartEntry({
+      ...c,
+      source: 'catalog',
+      manufacturer: o.manufacturer || null,
+      license: o.license || null,
+      provenance: o.mode === 'link' ? 'catalog_link' : 'catalog_upload',
+      format: isWebMesh ? fmt : null,
+      file: isWebMesh ? (o.ref || null) : null, // web mesh only; non-mesh => null
+      present: isWebMesh ? Boolean(o.ref) : false,
+      manufacturerExact, // sanitizePartEntry re-affirms source ∈ {catalog,manufacturer}
+    });
+  });
+}
+
+// Recompute the honest count fields from a (possibly override-merged) component
+// list. parityGateStatus is intentionally NOT derived here — see call sites.
+function recountParts(components) {
+  return {
+    generatedCount: components.filter((c) => c.source === 'generated' && c.present === true).length,
+    missingCount: components.filter((c) => c.present !== true).length,
+    manufacturerExactCount: components.filter((c) => c.manufacturerExact === true).length,
+  };
+}
+
 app.get('/api/parts', authMiddleware, async (req, res) => {
   // Prefer a prebuilt on-disk manifest.
   try {
     if (fs.existsSync(PARTS_MANIFEST_PATH)) {
       const raw = JSON.parse(fs.readFileSync(PARTS_MANIFEST_PATH, 'utf8'));
-      const components = (Array.isArray(raw.components) ? raw.components : []).map(sanitizePartEntry);
+      const base = (Array.isArray(raw.components) ? raw.components : []).map(sanitizePartEntry);
+      const components = mergePartOverrides(base);
       return res.json({
         components,
-        generatedCount: raw.generatedCount ?? 0,
-        missingCount: raw.missingCount ?? 0,
-        // Derived from sanitized entries (still never clears the gate below).
-        manufacturerExactCount: components.filter((c) => c.manufacturerExact === true).length,
-        parityGateStatus: 'blocked', // fail-closed: found/generated parts never clear parity
+        ...recountParts(components),
+        parityGateStatus: 'blocked', // fail-closed: found/generated/override parts never clear parity
         disclaimer: raw.disclaimer || PARTS_DISCLAIMER,
       });
     }
@@ -1038,14 +1119,85 @@ app.get('/api/parts', authMiddleware, async (req, res) => {
 
   // No prebuilt manifest -> live registry view with no runner (all 'missing').
   const manifest = await buildPartManifest({});
+  const components = mergePartOverrides(manifest.components);
   res.json({
-    components: manifest.components,
-    generatedCount: manifest.generatedCount,
-    missingCount: manifest.missingCount,
-    manufacturerExactCount: 0,
+    components,
+    ...recountParts(components),
     parityGateStatus: 'blocked',
     disclaimer: PARTS_DISCLAIMER,
   });
+});
+
+// ── Per-component catalog part override (R4) ──
+// A user attaches a real catalog/manufacturer part for one component via Settings
+// to override its generated/missing mesh. This is the ONLY path to source
+// 'catalog' + manufacturerExact:true (the build pipeline only produces
+// generated/missing and is hardcoded manufacturerExact:false).
+// HONESTY/fail-closed: attaching a part is recorded as PRESENT catalog evidence,
+// but it NEVER clears AUTOSPRINK_PARITY — that gate requires manufacturer-exact
+// models for EVERY required component PLUS licensed PE/AHJ review, none of which
+// a single upload provides. GET /api/parts keeps parityGateStatus hardcoded
+// 'blocked'. A non-mesh format (STEP/DWG) is recorded but is NOT web-renderable
+// (file stays null); we never fabricate a renderable mesh or a license.
+app.post('/api/parts/:key/override', authMiddleware, requireRole('admin'), (req, res) => {
+  const rejected = Object.keys(req.body).filter((k) => !PART_OVERRIDE_FIELDS.has(k));
+  if (rejected.length) return res.status(400).json({ error: `Unsupported fields: ${rejected.join(', ')}` });
+
+  const key = req.params.key;
+  if (!getComponent(key)) return res.status(404).json({ error: 'Unknown component key' });
+
+  const { mode, url = null, filename = null, format = null, manufacturer = null, license = null, notes = null } = req.body;
+  if (mode !== 'link' && mode !== 'upload') {
+    return res.status(400).json({ error: "mode must be 'link' or 'upload'" });
+  }
+  const ref = mode === 'link' ? url : filename;
+  if (!ref || !String(ref).trim()) {
+    return res.status(400).json({ error: mode === 'link' ? 'url is required for mode=link' : 'filename is required for mode=upload' });
+  }
+
+  const fmt = format ? String(format).toLowerCase() : null;
+  const isWebMesh = Boolean(fmt && WEB_MESH_FORMATS.has(fmt));
+  // manufacturerExact requires BOTH a manufacturer AND a license attestation.
+  const manufacturerExact = Boolean(
+    manufacturer && String(manufacturer).trim() && license && String(license).trim(),
+  );
+
+  const evidenceNotes =
+    `Catalog part override (${mode}) for ${key}` +
+    `${manufacturer ? ` — mfr ${manufacturer}` : ''}` +
+    `${license ? `, license ${license}` : ''}` +
+    `${isWebMesh ? '' : ' [non-mesh: recorded as evidence, not web-renderable]'}` +
+    `${notes ? `: ${notes}` : ''}`;
+
+  const tx = db.transaction(() => {
+    const evidence = db
+      .prepare(`INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+                VALUES (?, ?, ?, ?, ?, ?)`)
+      .run('HaloFire Library', 'catalog_part', mode === 'upload' ? String(ref) : null, String(ref), 'present', evidenceNotes);
+    const ov = db
+      .prepare(`INSERT INTO part_overrides (key, mode, ref, format, manufacturer, license, notes, evidence_id, created_by)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+      .run(key, mode, String(ref), fmt, manufacturer, license, notes, evidence.lastInsertRowid, req.user.username);
+    return { id: ov.lastInsertRowid, evidence_id: evidence.lastInsertRowid };
+  });
+  const result = tx();
+  res.status(200).json({
+    ...result,
+    key,
+    source: 'catalog',
+    manufacturerExact,
+    message: 'Part override recorded',
+  });
+});
+
+// Remove the override(s) for a component (admin). Returns 404 if none exist so
+// the caller knows nothing was changed.
+app.delete('/api/parts/:key/override', authMiddleware, requireRole('admin'), (req, res) => {
+  const key = req.params.key;
+  if (!getComponent(key)) return res.status(404).json({ error: 'Unknown component key' });
+  const info = db.prepare('DELETE FROM part_overrides WHERE key = ?').run(key);
+  if (info.changes === 0) return res.status(404).json({ error: 'No override for component key' });
+  res.status(200).json({ key, removed: info.changes, message: 'Part override removed' });
 });
 
 function safeParseJsonArray(value) {
