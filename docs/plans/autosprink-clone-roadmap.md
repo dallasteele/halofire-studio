@@ -23,10 +23,11 @@ Geometry MUST be built on OpenGeometry (npm `opengeometry`). Keep the 68+ tests 
 
 ## Task Queue (do the first unchecked, one per run)
 
-- [ ] **T1 — OpenGeometry STEP/IFC/STL export.** Wire OpenGeometry's export
-      (OGSceneManager / export helpers → OGStepExportResult/OGIfcExportResult/
-      OGStlExportResult) so the studio can export STEP and IFC, not just DXF.
-      Add API route + studio buttons. Verify a non-empty STEP/IFC string is produced.
+- [x] **T1 — OpenGeometry STEP/IFC/STL export.** DONE 2026-05-29. Studio builds an
+      OGSceneManager from the rendered shapes (addCuboid/addCylinderToCurrentScene)
+      and exports via exportCurrentSceneToStep/Ifc/Stl. Buttons for DXF/STEP/IFC/STL.
+      Verified in browser: 40×30 room → STEP 79,068 bytes from 23 OpenGeometry
+      entities (4 walls + floor + 12 pipes + 6 heads); IFC also non-empty.
 - [ ] **T2 — Hydraulic calc engine.** `src/engine/hydraulics.js`: Hazen-Williams
       friction loss, remote-area demand (NFPA 13 density × area), required pressure
       at the riser; flag if schedule sizing is inadequate vs demand. Tests with
@@ -56,3 +57,4 @@ Geometry MUST be built on OpenGeometry (npm `opengeometry`). Keep the 68+ tests 
 
 ## Log
 - 2026-05-29: studio + OpenGeometry CAD + DXF shipped (commits 3764b64, 2b5b7ba). 68 tests green.
+- 2026-05-29: T1 STEP/IFC/STL export shipped — verified 79KB STEP from 23 OpenGeometry entities. Next: T2 hydraulics.

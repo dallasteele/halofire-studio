@@ -93,7 +93,12 @@
     <input id="markup" type="number" value="25" min="0" max="100">
 
     <button class="act" id="genBtn">Generate Layout</button>
-    <button class="act ghost" id="dxfBtn" disabled>Download DXF (AutoCAD)</button>
+    <h3>Export (CAD interchange)</h3>
+    <button class="act ghost" id="dxfBtn" disabled>DXF (AutoCAD)</button>
+    <button class="act ghost" id="stepBtn" disabled>STEP (.step)</button>
+    <button class="act ghost" id="ifcBtn" disabled>IFC (BIM)</button>
+    <button class="act ghost" id="stlBtn" disabled>STL (mesh)</button>
+    <div class="warn" id="exportMsg"></div>
 
     <h3>Layers</h3>
     <div id="layers"></div>
@@ -135,7 +140,7 @@
 <script type="module">
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { OpenGeometry, Vector3, Cuboid, Cylinder } from 'opengeometry';
+import { OpenGeometry, Vector3, Cuboid, Cylinder, OGSceneManager } from 'opengeometry';
 
 const HOME_DEPOT = 'Home Depot - Rexburg ID';
 const token = localStorage.getItem('halofire_token');
@@ -159,7 +164,7 @@ const COLORS = { WALLS: 0x6b7280, FLOOR: 0x16161c, MAIN: 0xE53935, BRANCH: 0x3b8
 const PIPE_VIZ_SCALE = 6;
 let renderer, scene, perspCam, orthoCam, camera, controls, ogReady = false;
 const layerGroups = {};
-let modelGroup;
+let modelGroup, ogShapes = [];
 
 async function initStudio() {
   const canvas = $('canvas');
@@ -213,6 +218,7 @@ function addPipe(s) {
     rotation: new Vector3(rx, ry, rz),
   });
   layerGroups[layer].add(cyl);
+  ogShapes.push({ m: cyl, kind: 'cylinder' });
 }
 
 function renderModel(cadModel) {
@@ -220,36 +226,71 @@ function renderModel(cadModel) {
   modelGroup = new THREE.Group(); scene.add(modelGroup);
   for (const k of Object.keys(COLORS)) { layerGroups[k] = new THREE.Group(); modelGroup.add(layerGroups[k]); }
 
+  ogShapes = [];
   let minX=Infinity,maxX=-Infinity,minZ=Infinity,maxZ=-Infinity,ceil=14;
   for (const s of cadModel.solids) {
     if (s.kind === 'wall') {
       ceil = Math.max(ceil, s.heightFt);
       const wc = W([s.center[0], s.center[1], s.heightFt/2]);
-      layerGroups.WALLS.add(new Cuboid({
+      const wall = new Cuboid({
         center: new Vector3(wc[0], wc[1], wc[2]),
         width: s.lengthFt, height: s.heightFt, depth: s.thicknessFt,
         color: COLORS.WALLS, rotation: new Vector3(0, s.rotationY, 0),
-      }));
+      });
+      layerGroups.WALLS.add(wall); ogShapes.push({ m: wall, kind: 'cuboid' });
       for (const p of [s.a, s.b]) { minX=Math.min(minX,p[0]);maxX=Math.max(maxX,p[0]);minZ=Math.min(minZ,p[1]);maxZ=Math.max(maxZ,p[1]); }
     } else if (s.kind === 'pipe') {
       addPipe(s);
     } else if (s.kind === 'head') {
       const w = W(s.position);
-      layerGroups.HEADS.add(new Cylinder({
+      const head = new Cylinder({
         center: new Vector3(w[0], w[1], w[2]), radius: 0.5, height: 0.6,
         segments: 6, angle: 360, color: COLORS.HEADS, rotation: new Vector3(0,0,0),
-      }));
+      });
+      layerGroups.HEADS.add(head); ogShapes.push({ m: head, kind: 'cylinder' });
     }
   }
   const fw = maxX-minX, fd = maxZ-minZ;
   if (fw > 0 && fd > 0) {
-    layerGroups.FLOOR.add(new Cuboid({
+    const floor = new Cuboid({
       center: new Vector3((minX+maxX)/2, -0.25, (minZ+maxZ)/2),
       width: fw, height: 0.5, depth: fd, color: COLORS.FLOOR,
-    }));
+    });
+    layerGroups.FLOOR.add(floor); ogShapes.push({ m: floor, kind: 'cuboid' });
   }
   frameCamera(minX, maxX, minZ, maxZ, ceil);
   buildLayerToggles();
+}
+
+// Build a kernel scene from the current shapes and export STEP/IFC/STL.
+// Runs entirely in the OpenGeometry WASM kernel (no server round-trip).
+function exportCad(format) {
+  if (!ogShapes.length) return null;
+  const sm = new OGSceneManager();
+  const sceneId = sm.createScene('halofire-' + format);
+  sm.setCurrentScene(sceneId);
+  let n = 0;
+  for (const { m, kind } of ogShapes) {
+    const id = 'e' + n;
+    try {
+      if (kind === 'cylinder' && m.cylinder) {
+        sm.addCylinderToCurrentScene(id, m.cylinder); n++;
+      } else if (kind === 'cuboid' && m.cuboid) {
+        sm.addCuboidToCurrentScene(id, m.cuboid); n++;
+      } else if (typeof m.getBrepData === 'function') {
+        let brep = m.getBrepData();
+        if (brep != null) { sm.addBrepEntityToCurrentScene(id, kind, typeof brep === 'string' ? brep : JSON.stringify(brep)); n++; }
+      }
+    } catch (_) { /* skip a shape that can't serialize */ }
+  }
+  if (format === 'step') return { res: sm.exportCurrentSceneToStep(), ext: 'step', text: true, registered: n };
+  if (format === 'ifc') return { res: sm.exportCurrentSceneToIfc(), ext: 'ifc', text: true, registered: n };
+  return { res: sm.exportCurrentSceneToStl(), ext: 'stl', text: false, registered: n };
+}
+
+function download(name, dataOrBytes, isText) {
+  const blob = isText ? new Blob([dataOrBytes], { type: 'text/plain' }) : new Blob([dataOrBytes], { type: 'application/octet-stream' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click(); URL.revokeObjectURL(a.href);
 }
 
 function frameCamera(minX, maxX, minZ, maxZ, ceil) {
@@ -325,7 +366,7 @@ async function generate() {
       bid.pricing.lines.map((l) => `<tr><td>${l.description.split('(')[0]}</td><td class="n">${l.quantity}</td><td class="n">${usd(l.unitCost)}</td><td class="n">${usd(l.lineTotal)}</td></tr>`).join('')}</table>`;
     $('warn').textContent = (bid.pricing.anyEstimated ? '⚠ some unit costs are fallback estimates. ' : '')
       + cadModel.disclaimer;
-    $('dxfBtn').disabled = false;
+    ['dxfBtn','stepBtn','ifcBtn','stlBtn'].forEach((id) => { $(id).disabled = false; });
     $('status').textContent = `rendered ${cadModel.counts.heads} heads · ${cadModel.counts.pipes} pipe segments`;
   } catch (e) {
     $('status').textContent = 'error: ' + e.message;
@@ -343,6 +384,19 @@ $('dxfBtn').onclick = async () => {
   const blob = await res.blob(); const a = document.createElement('a');
   a.href = URL.createObjectURL(blob); a.download = 'halofire-cad.dxf'; a.click(); URL.revokeObjectURL(a.href);
 };
+for (const [id, fmt] of [['stepBtn','step'],['ifcBtn','ifc'],['stlBtn','stl']]) {
+  $(id).onclick = () => {
+    try {
+      const out = exportCad(fmt);
+      if (!out) { $('exportMsg').textContent = 'Generate a layout first.'; return; }
+      const payload = out.text ? out.res.text : out.res.bytes;
+      const size = out.text ? (payload ? payload.length : 0) : (payload ? payload.byteLength : 0);
+      if (!size) { $('exportMsg').textContent = `${fmt.toUpperCase()} export returned empty (${out.registered} entities registered).`; return; }
+      download('halofire-cad.' + out.ext, payload, out.text);
+      $('exportMsg').textContent = `${fmt.toUpperCase()}: ${size.toLocaleString()} bytes from ${out.registered} OpenGeometry entities.`;
+    } catch (e) { $('exportMsg').textContent = fmt.toUpperCase() + ' export error: ' + e.message; }
+  };
+}
 document.querySelectorAll('#viewSeg button').forEach((b) => {
   b.onclick = () => { document.querySelectorAll('#viewSeg button').forEach((x) => x.classList.remove('on')); b.classList.add('on'); setView(b.dataset.view); };
 });
