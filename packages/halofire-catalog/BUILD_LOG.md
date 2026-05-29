@@ -1,5 +1,12 @@
 # BUILD_LOG
 
+## 2026-05-29T01:42Z
+
+- Refreshed the Stream F source research and source coverage ledgers from the checked-in seeds against the current live-backed evidence set, then regenerated `source_coverage_ledger.json` and `THIRD_PARTY_NOTICES.md` with the current step.parts verification date.
+- Restored the Stream F coverage-contract block in `scripts/build_halofire_catalog_source_coverage.py` after the first regeneration pass dropped it; the generated notice now again states the mandatory source-research, asset-coverage, model-tier, and vendor/model ledger obligations.
+- No approval status moved in this slice: step.parts remains an open-source STEP candidate, and no manufacturer-backed or sealed evidence was added.
+- Verification passed for the regeneration path and policy surface: `C:/Python312/python.exe scripts/verify_agentic_rules.py`, `C:/Python312/python.exe -m pytest tests/core/hal/halo_forge/test_catalog_source_collection.py -q`, `bun test E:/ClaudeBot/halofire-studio/packages/halofire-catalog/tests/source-research.test.ts E:/ClaudeBot/halofire-studio/packages/halofire-catalog/tests/source-coverage.test.ts E:/ClaudeBot/halofire-studio/packages/halofire-catalog/tests/source-owner-pipeline.test.ts`, `bun run --cwd E:/ClaudeBot/halofire-studio/packages/halofire-catalog check-types`, and `bun run --cwd E:/ClaudeBot/halofire-studio/packages/halofire-catalog build`.
+
 ## 2026-05-28T23:38Z
 
 - Re-ran live source verification for the Stream F catalog/model owner lane against the current public manufacturer/distributor surfaces and the open-source step.parts candidate. The notices file now records the refreshed live-source note for step.parts plus the current product-page/resource evidence for Tyco TY-B, Viking VK100, Victaulic FL-QR/SW, Wheatland Schedule 40, Tyco LFII HSW, and Reliable DH56.
