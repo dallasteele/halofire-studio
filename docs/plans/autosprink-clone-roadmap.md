@@ -28,10 +28,13 @@ Geometry MUST be built on OpenGeometry (npm `opengeometry`). Keep the 68+ tests 
       and exports via exportCurrentSceneToStep/Ifc/Stl. Buttons for DXF/STEP/IFC/STL.
       Verified in browser: 40×30 room → STEP 79,068 bytes from 23 OpenGeometry
       entities (4 walls + floor + 12 pipes + 6 heads); IFC also non-empty.
-- [ ] **T2 — Hydraulic calc engine.** `src/engine/hydraulics.js`: Hazen-Williams
-      friction loss, remote-area demand (NFPA 13 density × area), required pressure
-      at the riser; flag if schedule sizing is inadequate vs demand. Tests with
-      hand-computed cases. Surface in the studio pipe schedule.
+- [x] **T2 — Hydraulic calc engine.** DONE 2026-05-29. `src/engine/hydraulics.js`
+      (pure/deterministic): Hazen-Williams friction loss (psi/ft), velocity (fps),
+      remote-area demand (NFPA 13 density × area — light 0.10/1500, ordinary
+      0.18/1500, extra 0.30/2500), single-path requiredPressureAtRiser (riser →
+      cross-main → remote branch friction + 0.433 psi/ft elevation + 7 psi min head),
+      and flagSchedule velocity(>32 fps)/loss warnings. Hand-computed vitest cases.
+      Studio surfacing still pending (engine + tests are the deliverable).
 - [ ] **T3 — Full bid scope.** Add system components (alarm/check valve, FDC,
       backflow, riser trim, inspector's test, fire pump if required) + soft costs
       (permit/design/freight as labelled assumptions) priced via pricebook resolver,
@@ -58,3 +61,4 @@ Geometry MUST be built on OpenGeometry (npm `opengeometry`). Keep the 68+ tests 
 ## Log
 - 2026-05-29: studio + OpenGeometry CAD + DXF shipped (commits 3764b64, 2b5b7ba). 68 tests green.
 - 2026-05-29: T1 STEP/IFC/STL export shipped — verified 79KB STEP from 23 OpenGeometry entities. Next: T2 hydraulics.
+- 2026-05-29: T2 hydraulic engine shipped — src/engine/hydraulics.js + tests/hydraulics.test.js (21 hand-computed tests). Full suite 13 files / 89 tests green (was 12/68). Single-path estimate only; NOT a full network balance, NOT PE/AHJ/AutoSprink parity. Next: T3 full bid scope.
