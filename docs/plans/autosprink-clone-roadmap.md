@@ -39,8 +39,12 @@ Geometry MUST be built on OpenGeometry (npm `opengeometry`). Keep the 68+ tests 
       backflow, riser trim, inspector's test, fire pump if required) + soft costs
       (permit/design/freight as labelled assumptions) priced via pricebook resolver,
       behind a clear "estimate" label. Tests. Show in bid.
-- [ ] **T4 — DXF/PDF floor-plan import.** Parse simple DXF (LINE/LWPOLYLINE on a
-      plan layer) → room polygons, extending floorplan-import.js. Tests.
+- [x] **T4 — DXF/PDF floor-plan import.** DONE 2026-05-29. `floorPlanFromDxf` in
+      floorplan-import.js parses the DXF ENTITIES section: LWPOLYLINE (code 10/20
+      vertex pairs), POLYLINE/VERTEX, and best-effort closed-loop assembly from
+      LINE segments by endpoint chaining. opts.layer (code 8) filter,
+      opts.unitsPerDrawingUnit scale to feet, opts.hazard default ordinary; reuses
+      normalizeFloorPlan; skips <3-vertex shapes. PDF import DEFERRED. Tests.
 - [ ] **T5 — Resolve-gate workflow.** Authenticated admin route + studio UI to
       attach evidence (AHJ/PE/manufacturer/AutoSprink) that flips a specific gate
       from blocked→cleared, recorded with who/what/when. Tests prove a gate only
@@ -63,3 +67,4 @@ Geometry MUST be built on OpenGeometry (npm `opengeometry`). Keep the 68+ tests 
 - 2026-05-29: T1 STEP/IFC/STL export shipped — verified 79KB STEP from 23 OpenGeometry entities. Next: T2 hydraulics.
 - 2026-05-29: T2 hydraulic engine shipped — src/engine/hydraulics.js + tests/hydraulics.test.js (21 hand-computed tests). Full suite 13 files / 89 tests green (was 12/68). Single-path estimate only; NOT a full network balance, NOT PE/AHJ/AutoSprink parity. Next: T3 full bid scope.
 - 2026-05-29: T3 full bid scope shipped — src/engine/bid-scope.js + tests/bid-scope.test.js (11 tests). buildSystemComponents (6 core riser-assembly components + conditional fire pump via boolean or required>available pressure), buildSoftCosts (permit 2% / design 6% / freight 3% labelled assumptions, priceSource:soft_cost_assumption), buildFullScopeBid (prices components via priceResolver with flagged fallback, computes fullScopeTotal alongside bareMaterialsTotal). Full suite 14 files / 100 tests green (was 13/89). Best-effort estimate only, fail-closed; NOT a complete priced bid, NOT manufacturer-quoted, NOT AHJ/PE/AutoSprink parity. Next: T4 DXF/PDF floor-plan import.
+- 2026-05-29: T4 DXF floor-plan import shipped — floorPlanFromDxf in src/engine/floorplan-import.js + 8 new tests in tests/floorplan-import.test.js. Parses ENTITIES section: LWPOLYLINE, POLYLINE/VERTEX, and best-effort closed-loop assembly from LINE segments; opts.layer filter, opts.unitsPerDrawingUnit scale-to-feet, opts.hazard default; reuses normalizeFloorPlan; skips degenerate <3-vertex shapes. generateSprinklerBid verified to run on imported plan. Full suite 14 files / 108 tests green (was 14/100). PDF import DEFERRED (not a deterministic dependency-free parse). Best-effort geometry only, NOT CAD-grade, claim gates stay fail-closed. Next: T5 resolve-gate workflow.
