@@ -35,7 +35,7 @@ Geometry MUST be built on OpenGeometry (npm `opengeometry`). Keep the 68+ tests 
       cross-main → remote branch friction + 0.433 psi/ft elevation + 7 psi min head),
       and flagSchedule velocity(>32 fps)/loss warnings. Hand-computed vitest cases.
       Studio surfacing still pending (engine + tests are the deliverable).
-- [ ] **T3 — Full bid scope.** Add system components (alarm/check valve, FDC,
+- [x] **T3 — Full bid scope.** DONE 2026-05-29. Add system components (alarm/check valve, FDC,
       backflow, riser trim, inspector's test, fire pump if required) + soft costs
       (permit/design/freight as labelled assumptions) priced via pricebook resolver,
       behind a clear "estimate" label. Tests. Show in bid.
@@ -62,3 +62,4 @@ Geometry MUST be built on OpenGeometry (npm `opengeometry`). Keep the 68+ tests 
 - 2026-05-29: studio + OpenGeometry CAD + DXF shipped (commits 3764b64, 2b5b7ba). 68 tests green.
 - 2026-05-29: T1 STEP/IFC/STL export shipped — verified 79KB STEP from 23 OpenGeometry entities. Next: T2 hydraulics.
 - 2026-05-29: T2 hydraulic engine shipped — src/engine/hydraulics.js + tests/hydraulics.test.js (21 hand-computed tests). Full suite 13 files / 89 tests green (was 12/68). Single-path estimate only; NOT a full network balance, NOT PE/AHJ/AutoSprink parity. Next: T3 full bid scope.
+- 2026-05-29: T3 full bid scope shipped — src/engine/bid-scope.js + tests/bid-scope.test.js (11 tests). buildSystemComponents (6 core riser-assembly components + conditional fire pump via boolean or required>available pressure), buildSoftCosts (permit 2% / design 6% / freight 3% labelled assumptions, priceSource:soft_cost_assumption), buildFullScopeBid (prices components via priceResolver with flagged fallback, computes fullScopeTotal alongside bareMaterialsTotal). Full suite 14 files / 100 tests green (was 13/89). Best-effort estimate only, fail-closed; NOT a complete priced bid, NOT manufacturer-quoted, NOT AHJ/PE/AutoSprink parity. Next: T4 DXF/PDF floor-plan import.
