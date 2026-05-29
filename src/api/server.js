@@ -154,6 +154,31 @@ function initDatabase() {
       details TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
+
+    CREATE TABLE IF NOT EXISTS project_evidence (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      project_name TEXT NOT NULL,
+      evidence_type TEXT NOT NULL,
+      source_file TEXT,
+      source_ref TEXT,
+      status TEXT NOT NULL,
+      notes TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS claim_gates (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      project_name TEXT NOT NULL,
+      code TEXT NOT NULL,
+      severity TEXT NOT NULL,
+      missing_artifact TEXT NOT NULL,
+      acceptable_evidence TEXT NOT NULL,
+      blocked_claims TEXT NOT NULL,
+      next_action TEXT NOT NULL,
+      status TEXT NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(project_name, code)
+    );
   `);
 
   function ensureColumn(table, column, definition) {
@@ -399,6 +424,54 @@ app.get('/api/analytics/summary', authMiddleware, (req, res) => {
     winRate: totalBids > 0 ? Math.round(wonBids / totalBids * 100) : 0,
   });
 });
+
+// ── Project Evidence & Claim Gates ──
+// Evidence rows are append-only source-of-truth records. Claim gates are
+// fail-closed: adding best-effort/AI evidence never flips a blocking gate to
+// cleared. Only a recorded human/professional/AHJ artifact can do that, and
+// that resolution path is intentionally not exposed as a casual write here.
+const EVIDENCE_INSERT_FIELDS = new Set(['evidence_type', 'source_file', 'source_ref', 'status', 'notes']);
+
+app.get('/api/projects/:name/claim-gates', authMiddleware, (req, res) => {
+  const gates = db
+    .prepare('SELECT * FROM claim_gates WHERE project_name = ? ORDER BY severity DESC, code')
+    .all(req.params.name);
+  res.json(gates.map((gate) => ({
+    ...gate,
+    blocked_claims: safeParseJsonArray(gate.blocked_claims),
+  })));
+});
+
+app.get('/api/projects/:name/evidence', authMiddleware, (req, res) => {
+  const evidence = db
+    .prepare('SELECT * FROM project_evidence WHERE project_name = ? ORDER BY created_at DESC, id DESC')
+    .all(req.params.name);
+  res.json(evidence);
+});
+
+app.post('/api/projects/:name/evidence', authMiddleware, requireRole('admin'), (req, res) => {
+  const rejected = Object.keys(req.body).filter((key) => !EVIDENCE_INSERT_FIELDS.has(key));
+  if (rejected.length) return res.status(400).json({ error: `Unsupported fields: ${rejected.join(', ')}` });
+  const { evidence_type, source_file = null, source_ref = null, status, notes = null } = req.body;
+  if (!evidence_type || !status) {
+    return res.status(400).json({ error: 'evidence_type and status are required' });
+  }
+  const result = db
+    .prepare(`INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+              VALUES (?, ?, ?, ?, ?, ?)`)
+    .run(req.params.name, evidence_type, source_file, source_ref, status, notes);
+  res.status(201).json({ id: result.lastInsertRowid, message: 'Evidence recorded' });
+});
+
+function safeParseJsonArray(value) {
+  if (Array.isArray(value)) return value;
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
 
 // ── Health Check ──
 app.get('/api/health', (req, res) => {

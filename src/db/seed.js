@@ -11,6 +11,7 @@ import { fileURLToPath } from 'node:url';
 import { buildHomeDepotSeedRows } from '../data/home-depot-bid-package.js';
 import { readBidLogRows } from '../data/bid-log-importer.js';
 import { readPricebooks } from '../data/pricebook-importer.js';
+import { buildHomeDepotEvidenceRows, buildHomeDepotClaimGates } from '../data/evidence-gates.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DB_PATH = process.env.HALOFIRE_DB_PATH
@@ -97,6 +98,31 @@ db.exec(`
     authority TEXT,
     notes TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS project_evidence (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    project_name TEXT NOT NULL,
+    evidence_type TEXT NOT NULL,
+    source_file TEXT,
+    source_ref TEXT,
+    status TEXT NOT NULL,
+    notes TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS claim_gates (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    project_name TEXT NOT NULL,
+    code TEXT NOT NULL,
+    severity TEXT NOT NULL,
+    missing_artifact TEXT NOT NULL,
+    acceptable_evidence TEXT NOT NULL,
+    blocked_claims TEXT NOT NULL,
+    next_action TEXT NOT NULL,
+    status TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(project_name, code)
   );
 `);
 
@@ -254,6 +280,44 @@ insertCompliance.run(
   homeDepotRows.compliance.notes,
 );
 console.log('[seed] Inserted 1 sourced compliance item');
+
+// ── Evidence + fail-closed claim gates (source-linked, fail-closed on claims) ──
+db.prepare('DELETE FROM project_evidence').run();
+db.prepare('DELETE FROM claim_gates').run();
+
+const insertEvidence = db.prepare(
+  `INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+   VALUES (?, ?, ?, ?, ?, ?)`,
+);
+const evidenceRows = buildHomeDepotEvidenceRows();
+db.transaction((rows) => {
+  for (const row of rows) {
+    insertEvidence.run(row.projectName, row.evidenceType, row.sourceFile, row.sourceRef, row.status, row.notes);
+  }
+})(evidenceRows);
+console.log(`[seed] Inserted ${evidenceRows.length} sourced evidence rows`);
+
+const insertGate = db.prepare(
+  `INSERT OR REPLACE INTO claim_gates
+     (project_name, code, severity, missing_artifact, acceptable_evidence, blocked_claims, next_action, status)
+   VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+);
+const claimGates = buildHomeDepotClaimGates();
+db.transaction((gates) => {
+  for (const gate of gates) {
+    insertGate.run(
+      gate.projectName,
+      gate.code,
+      gate.severity,
+      gate.missingArtifact,
+      gate.acceptableEvidence,
+      JSON.stringify(gate.blockedClaims),
+      gate.nextAction,
+      gate.status,
+    );
+  }
+})(claimGates);
+console.log(`[seed] Inserted ${claimGates.length} fail-closed claim gates`);
 
 console.log('[seed] Database seeded successfully!');
 db.close();
