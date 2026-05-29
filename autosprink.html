@@ -229,7 +229,9 @@ async function loadPartMeshes() {
 async function initStudio() {
   const canvas = $('canvas');
   const w = canvas.clientWidth, h = canvas.clientHeight;
-  renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+  // preserveDrawingBuffer lets us capture the WebGL canvas to a PNG for headless
+  // visual verification (the continuous rAF loop makes preview_screenshot hang).
+  renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true });
   renderer.setSize(w, h, false);
   renderer.setPixelRatio(window.devicePixelRatio);
   scene = new THREE.Scene();
@@ -242,6 +244,15 @@ async function initStudio() {
   const d = new THREE.DirectionalLight(0xffffff, 0.9); d.position.set(300, 600, 400); scene.add(d);
   scene.add(new THREE.GridHelper(2000, 80, 0x222228, 0x18181c));
   (function loop() { requestAnimationFrame(loop); controls.update(); renderer.render(scene, camera); })();
+  // Headless capture hook: render at a capped size + return a compact JPEG data URL
+  // for visual verification (the rAF loop makes preview_screenshot hang). Restores
+  // the live canvas size via onResize() afterward.
+  window.__snapshot = (mw = 760, mh = 500, q = 0.6) => {
+    renderer.setSize(mw, mh, false); renderer.render(scene, camera);
+    const d = renderer.domElement.toDataURL('image/jpeg', q);
+    onResize();
+    return d;
+  };
   window.addEventListener('resize', onResize);
   await OpenGeometry.create({ wasmURL: '/vendor/opengeometry/opengeometry_bg.wasm' });
   ogReady = true;
