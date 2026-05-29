@@ -524,6 +524,18 @@ function safeParseJsonArray(value) {
   }
 }
 
+// ── Public summary (pre-login landing): real, non-sensitive scale counts ──
+app.get('/api/public/summary', (req, res) => {
+  const count = (sql) => { try { return db.prepare(sql).get().c; } catch { return 0; } };
+  res.json({
+    status: 'internal-alpha',
+    bidsTracked: count('SELECT COUNT(*) c FROM bids'),
+    pricebookItems: count('SELECT COUNT(*) c FROM pricebook'),
+    sourceWorkbooks: 4, // ARGCO, FFF, Victaulic pricebooks + bid log
+    claimGates: count('SELECT COUNT(*) c FROM claim_gates'),
+  });
+});
+
 // ── Health Check ──
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', version: '1.0.0', uptime: process.uptime() });

@@ -119,6 +119,16 @@ afterAll(async () => {
 });
 
 describe('HaloFire evidence and claim-gate API', () => {
+  it('exposes a public summary with real non-sensitive counts (no auth)', async () => {
+    const res = await request('/api/public/summary');
+    expect(res.status).toBe(200);
+    const s = await res.json();
+    expect(s.status).toBe('internal-alpha');
+    expect(s.claimGates).toBeGreaterThanOrEqual(5);
+    expect(typeof s.bidsTracked).toBe('number');
+    expect(s.sourceWorkbooks).toBe(4);
+  });
+
   it('requires authentication to read claim gates', async () => {
     const res = await request(`${PROJECT_PATH}/claim-gates`);
     expect(res.status).toBe(401);
