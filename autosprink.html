@@ -152,6 +152,7 @@
 <script type="module">
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
 import { OpenGeometry, Vector3, Cuboid, Cylinder, Opening, OGSceneManager } from 'opengeometry';
 
 const HOME_DEPOT = 'Home Depot - Rexburg ID';
@@ -182,6 +183,30 @@ let pipeVizScale = 6;
 let renderer, scene, perspCam, orthoCam, camera, controls, ogReady = false;
 const layerGroups = {};
 let modelGroup, currentCadModel = null;
+// R3: real CAD part mesh for sprinkler heads, loaded from the parts library
+// (GET /api/parts -> /parts/<key>.stl). Falls back to a primitive when no part
+// is available. Generated parts are best-effort, NOT manufacturer-exact.
+let headPartGeo = null, partsSource = 'primitive';
+
+// Fetch the parts manifest and load the head part mesh (best-effort, fail-soft).
+async function loadPartMeshes() {
+  try {
+    const parts = await api('/parts');
+    const head = (parts.components || []).find((c) => c.key === 'head_pendent' && c.present && c.file);
+    if (!head) { partsSource = 'primitive'; return; }
+    const geo = await new STLLoader().loadAsync('/' + String(head.file).replace(/^\/+/, ''));
+    geo.computeBoundingBox();
+    const bb = geo.boundingBox, size = new THREE.Vector3(), center = new THREE.Vector3();
+    bb.getSize(size); bb.getCenter(center);
+    geo.translate(-center.x, -center.y, -center.z); // center at origin
+    geo.rotateX(-Math.PI / 2);                       // OpenSCAD Z-up -> three.js Y-up
+    const maxDim = Math.max(size.x, size.y, size.z) || 1;
+    const sc = 1.0 / maxDim;                          // normalize to ~1 ft for visibility
+    geo.scale(sc, sc, sc); geo.computeVertexNormals();
+    headPartGeo = geo;
+    partsSource = head.source === 'catalog' ? 'catalog' : 'generated';
+  } catch (e) { headPartGeo = null; partsSource = 'primitive'; }
+}
 
 async function initStudio() {
   const canvas = $('canvas');
@@ -202,7 +227,8 @@ async function initStudio() {
   window.addEventListener('resize', onResize);
   await OpenGeometry.create({ wasmURL: '/vendor/opengeometry/opengeometry_bg.wasm' });
   ogReady = true;
-  $('status').textContent = 'OpenGeometry ready';
+  await loadPartMeshes(); // best-effort; heads render as a real part mesh when available
+  $('status').textContent = 'OpenGeometry ready' + (headPartGeo ? ` · head part: ${partsSource}` : '');
 }
 function onResize() {
   const c = $('canvas'); const w = c.clientWidth, h = c.clientHeight;
@@ -238,16 +264,21 @@ function addPipe(s) {
   layerGroups[layer].add(cyl);
 }
 
-// Instanced heads (one draw call for all sprinkler heads).
+// Instanced heads (one draw call for all sprinkler heads). Uses the real CAD
+// part mesh (headPartGeo) when the parts library has one; else a primitive.
 function addInstancedHeads(worldPts) {
   if (!worldPts.length) return;
-  const geo = new THREE.SphereGeometry(0.6, 8, 8);
-  const mat = new THREE.MeshStandardMaterial({ color: COLORS.HEADS, emissive: 0x330000 });
+  const geo = headPartGeo || new THREE.SphereGeometry(0.6, 8, 8);
+  const mat = new THREE.MeshStandardMaterial({
+    color: COLORS.HEADS, emissive: 0x330000,
+    metalness: headPartGeo ? 0.55 : 0, roughness: headPartGeo ? 0.45 : 1,
+  });
   const inst = new THREE.InstancedMesh(geo, mat, worldPts.length);
   const d = new THREE.Object3D();
   worldPts.forEach((p, i) => { d.position.set(p[0], p[1], p[2]); d.rotation.set(0,0,0); d.scale.set(1,1,1); d.updateMatrix(); inst.setMatrixAt(i, d.matrix); });
   inst.instanceMatrix.needsUpdate = true;
   layerGroups.HEADS.add(inst);
+  window.__headDebug = { usingPartMesh: !!headPartGeo, source: partsSource, vertsPerHead: geo.attributes.position.count, instances: worldPts.length };
 }
 
 // Instanced drops (vertical pipe stubs; cylinder default axis is world Y).
@@ -508,7 +539,10 @@ async function generate() {
     $('warn').textContent = (bid.pricing.anyEstimated ? '⚠ some unit costs are fallback estimates. ' : '')
       + cadModel.disclaimer;
     ['dxfBtn','stepBtn','ifcBtn','stlBtn'].forEach((id) => { $(id).disabled = false; });
-    $('status').textContent = `rendered ${cadModel.counts.heads} heads · ${cadModel.counts.pipes} pipe segments`;
+    const headsNote = headPartGeo
+      ? `heads: ${partsSource} CAD part${partsSource === 'catalog' ? '' : ' (best-effort, not mfg-exact)'}`
+      : 'heads: primitive (no part mesh)';
+    $('status').textContent = `rendered ${cadModel.counts.heads} heads · ${cadModel.counts.pipes} pipe segments · ${headsNote}`;
   } catch (e) {
     $('status').textContent = 'error: ' + e.message;
   } finally { btn.disabled = false; btn.textContent = 'Generate Layout'; }

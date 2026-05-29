@@ -28,10 +28,13 @@ const REPO_ROOT = path.resolve(__dirname, '..');
 const OUT_DIR = path.join(REPO_ROOT, 'parts');
 const MANIFEST_PATH = path.join(OUT_DIR, 'parts-manifest.json');
 
+// Binary location: honor OPENSCAD_BIN (the VPS .env sets this), else PATH.
+const OPENSCAD_BIN = process.env.OPENSCAD_BIN || 'openscad';
+
 /** True only when the openscad CLI answers --version cleanly. */
 function openscadInstalled() {
   try {
-    const result = spawnSync('openscad', ['--version'], { timeout: 4000, stdio: 'ignore' });
+    const result = spawnSync(OPENSCAD_BIN, ['--version'], { timeout: 4000, stdio: 'ignore' });
     return result.status === 0 || (!result.error && result.status === null);
   } catch {
     return false;
@@ -52,7 +55,7 @@ function makeOpenscadRunner() {
     const outPath = path.join(tmp, 'out.stl');
     try {
       fs.writeFileSync(inPath, scad);
-      const result = spawnSync('openscad', ['-o', outPath, inPath], {
+      const result = spawnSync(OPENSCAD_BIN, ['-o', outPath, inPath], {
         timeout: 60000,
         stdio: 'ignore',
       });
