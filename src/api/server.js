@@ -19,7 +19,7 @@ import { createLogger } from '../core/logger.js';
 import { generateSprinklerBid } from '../engine/sprinkler-layout.js';
 import { buildScene } from '../engine/geometry.js';
 import { buildResolverFromDb } from '../engine/pricebook-pricing.js';
-import { floorPlanFromSvg, normalizeFloorPlan } from '../engine/floorplan-import.js';
+import { floorPlanFromSvg, normalizeFloorPlan, buildingFromSvg } from '../engine/floorplan-import.js';
 import { buildCadModel } from '../engine/cad-model.js';
 import { toDxf } from '../engine/dxf-export.js';
 import { requiredPressureAtRiser, flagSchedule, remoteAreaDemand } from '../engine/hydraulics.js';
@@ -581,7 +581,17 @@ app.post('/api/projects/:name/sprinkler-bid', authMiddleware, (req, res) => {
   try {
     const projectName = req.params.name;
     let floorPlan = null;
-    if (req.body && typeof req.body.svg === 'string' && req.body.svg.trim()) {
+    let building = null;
+    if (req.body && typeof req.body.buildingSvg === 'string' && req.body.buildingSvg.trim()) {
+      // Accurate multi-space building drawing (walls/spaces/doors/columns by layer/attr).
+      building = buildingFromSvg(req.body.buildingSvg, { name: projectName, unitsPerPx: Number(req.body.unitsPerPx) || 1 });
+      // Synthesize a flat floor plan from the building's spaces for bid/hydraulics/scene.
+      floorPlan = {
+        name: projectName, units: building.units || 'ft',
+        rooms: building.stories.flatMap((s) => s.spaces.map((sp) => ({ ...sp, ceilingHeightFt: sp.ceilingHeightFt || s.ceilingHeightFt }))),
+      };
+      if (!floorPlan.rooms.length) return res.status(400).json({ error: 'Building drawing has no spaces (need data-space polygons)' });
+    } else if (req.body && typeof req.body.svg === 'string' && req.body.svg.trim()) {
       // Import a floor plan from pasted/uploaded SVG (px scaled to ft).
       floorPlan = floorPlanFromSvg(req.body.svg, { name: projectName, unitsPerPx: Number(req.body.unitsPerPx) || 1 });
     } else if (req.body && req.body.floorPlan) {
@@ -603,9 +613,9 @@ app.post('/api/projects/:name/sprinkler-bid', authMiddleware, (req, res) => {
     };
     const bid = generateSprinklerBid(floorPlan, opts);
     const scene = buildScene(floorPlan, bid);
-    // 3D-correct CAD model (riser->main->branch->drop->head + NFPA pipe sizing)
-    // rendered in-browser by the OpenGeometry kernel and exportable to DXF.
-    const cadModel = buildCadModel(floorPlan);
+    // 3D-correct CAD model. For a building drawing this carries interior+exterior
+    // walls (with door/window opening metadata) + columns + per-space networks.
+    const cadModel = building ? buildCadModel(building) : buildCadModel(floorPlan);
 
     // Record that a best-effort layout was generated — as evidence, not a clearance.
     if (normalizeRole(req.user?.role) === 'admin') {
@@ -639,7 +649,7 @@ app.post('/api/projects/:name/sprinkler-bid', authMiddleware, (req, res) => {
     } catch (e) {
       hydraulics = { error: e.message };
     }
-    res.json({ bid, scene, cadModel, hydraulics });
+    res.json({ bid, scene, cadModel, hydraulics, isBuilding: !!building });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
