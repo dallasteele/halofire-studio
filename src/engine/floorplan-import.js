@@ -23,6 +23,8 @@
  * all claim gates remain fail-closed.
  */
 
+import { normalizeBuilding } from './building-model.js';
+
 const VALID_HAZARDS = new Set(['light', 'ordinary', 'extra']);
 
 /** Parse an SVG points string ("x,y x,y" or "x y x y") into [[x,y], ...]. */
@@ -55,6 +57,11 @@ export function parseSimplePath(d) {
 function attr(tag, name) {
   const m = tag.match(new RegExp(`${name}\\s*=\\s*["']([^"']*)["']`, 'i'));
   return m ? m[1] : null;
+}
+
+/** True if a (possibly valueless) attribute like `data-space` is present. */
+function hasAttr(tag, name) {
+  return new RegExp(`(?:^|[\\s"'])${name}(?=[\\s=>/]|$)`, 'i').test(tag);
 }
 
 function roomMeta(tag, index, fallbackHazard) {
@@ -311,4 +318,291 @@ export function normalizeFloorPlan(spec) {
 
 function round(n) {
   return Math.round((n + Number.EPSILON) * 100) / 100;
+}
+
+/* ------------------------------------------------------------------------- *
+ * Building (multi-space) import — best-effort, layer/convention-based.
+ *
+ * These parse a richer building (walls / spaces / openings / columns) from a
+ * single drawing using LAYER NAMES (DXF group code 8) and ATTRIBUTE CONVENTIONS
+ * (SVG data-* attrs). This is NOT CAD object-recognition AI — it only honors the
+ * conventions documented below; anything else is ignored. Deterministic.
+ * All claim gates remain fail-closed.
+ * ------------------------------------------------------------------------- */
+
+/** Default layer-name groups; opts.layers overrides any of these. */
+const DEFAULT_BUILDING_LAYERS = Object.freeze({
+  spaces: ['ROOMS', 'SPACES'],
+  walls: ['WALLS', 'WALL'],
+  wallsExterior: ['WALLS-EXT', 'WALL-EXT', 'A-WALL-EXT', 'EXTERIOR'],
+  wallsInterior: ['WALLS-INT', 'WALL-INT', 'A-WALL-INT', 'INTERIOR'],
+  doors: ['DOOR', 'DOORS', 'A-DOOR'],
+  windows: ['WINDOW', 'WINDOWS', 'A-GLAZ'],
+  columns: ['COLUMN', 'COLUMNS', 'COLS', 'A-COLS'],
+});
+
+function mergeLayerGroups(opts) {
+  const o = (opts && opts.layers) || {};
+  const norm = (arr) => (arr || []).map((s) => String(s).trim().toUpperCase());
+  const groups = {};
+  for (const key of Object.keys(DEFAULT_BUILDING_LAYERS)) {
+    groups[key] = new Set([...norm(DEFAULT_BUILDING_LAYERS[key]), ...norm(o[key])]);
+  }
+  return groups;
+}
+
+function inGroup(layer, set) {
+  return layer != null && set.has(String(layer).trim().toUpperCase());
+}
+
+/** Perpendicular distance from point p to the segment a-b, and nearest fraction. */
+function segDistance(p, a, b) {
+  const vx = b[0] - a[0];
+  const vy = b[1] - a[1];
+  const wx = p[0] - a[0];
+  const wy = p[1] - a[1];
+  const len2 = vx * vx + vy * vy;
+  let t = len2 > 0 ? (wx * vx + wy * vy) / len2 : 0;
+  if (t < 0) t = 0; else if (t > 1) t = 1;
+  const cx = a[0] + t * vx;
+  const cy = a[1] + t * vy;
+  return { dist: Math.hypot(p[0] - cx, p[1] - cy), t };
+}
+
+/**
+ * Attach an opening (its midpoint + width + type) to the nearest wall as a
+ * wall-local opening {offsetFt,widthFt,heightFt,type}. Mutates walls in place.
+ */
+function attachOpeningToNearestWall(walls, mid, widthFt, type, heightFt) {
+  if (!walls.length) return;
+  let best = -1;
+  let bestDist = Infinity;
+  let bestT = 0;
+  for (let i = 0; i < walls.length; i++) {
+    const { dist, t } = segDistance(mid, walls[i].a, walls[i].b);
+    if (dist < bestDist) { bestDist = dist; best = i; bestT = t; }
+  }
+  if (best === -1) return;
+  const w = walls[best];
+  const len = Math.hypot(w.b[0] - w.a[0], w.b[1] - w.a[1]);
+  const center = bestT * len;
+  const offsetFt = Math.max(0, center - widthFt / 2);
+  if (!w.openings) w.openings = [];
+  w.openings.push({ offsetFt, widthFt, heightFt: heightFt || 7, type });
+}
+
+/**
+ * Build a building from SVG text (best-effort, attribute-convention based).
+ * Conventions:
+ *  - spaces:  <polygon data-space ...> (data-name / data-hazard optional)
+ *  - walls:   <line data-wall ...> or <polyline data-wall ...>; type from
+ *             data-wall-type="exterior"|"interior" (default interior)
+ *  - openings:<line data-opening ...> with data-opening-type="door"|"window";
+ *             attached to the nearest wall. width = segment length.
+ *  - columns: <circle data-column cx cy r> (sizeFt = 2*r)
+ * Coordinates scaled px->ft via opts.unitsPerPx. opts.layers is accepted for
+ * API symmetry with DXF but SVG keys off data-* attrs. NOT CAD recognition AI.
+ * @param {string} svgText
+ * @param {{name?:string, unitsPerPx?:number}} [opts]
+ */
+export function buildingFromSvg(svgText, opts = {}) {
+  const unitsPerPx = opts.unitsPerPx && opts.unitsPerPx > 0 ? opts.unitsPerPx : 1;
+  const sc = (n) => round(Number(n) * unitsPerPx);
+  const scPt = (p) => [sc(p[0]), sc(p[1])];
+  const svg = String(svgText || '');
+
+  const spaces = [];
+  const walls = [];
+  const columns = [];
+
+  // Spaces: <polygon data-space>
+  let m;
+  const polyRe = /<polygon\b[^>]*>/gi;
+  while ((m = polyRe.exec(svg)) !== null) {
+    const t = m[0];
+    if (!hasAttr(t, 'data-space')) continue;
+    const pts = parsePolygonPoints(attr(t, 'points') || '').map(scPt);
+    if (pts.length < 3) continue;
+    const meta = roomMeta(t, spaces.length, opts.hazard);
+    spaces.push({ name: meta.name, polygon: pts, hazard: meta.hazard });
+  }
+
+  // Walls: <line data-wall> / <polyline data-wall>
+  const lineRe = /<line\b[^>]*>/gi;
+  const wallTags = [];
+  while ((m = lineRe.exec(svg)) !== null) wallTags.push(m[0]);
+  const polylineRe = /<polyline\b[^>]*>/gi;
+  while ((m = polylineRe.exec(svg)) !== null) wallTags.push(m[0]);
+
+  const pushWall = (a, b, type) => {
+    if (Math.hypot(b[0] - a[0], b[1] - a[1]) < 1e-9) return;
+    walls.push({ a, b, thicknessFt: 0.5, type, openings: [] });
+  };
+
+  for (const t of wallTags) {
+    if (!hasAttr(t, 'data-wall')) continue;
+    const wt = (attr(t, 'data-wall-type') || 'interior').toLowerCase();
+    const type = wt === 'exterior' ? 'exterior' : 'interior';
+    if (/^<line/i.test(t)) {
+      const a = scPt([Number(attr(t, 'x1')) || 0, Number(attr(t, 'y1')) || 0]);
+      const b = scPt([Number(attr(t, 'x2')) || 0, Number(attr(t, 'y2')) || 0]);
+      pushWall(a, b, type);
+    } else {
+      const pts = parsePolygonPoints(attr(t, 'points') || '').map(scPt);
+      for (let i = 0; i + 1 < pts.length; i++) pushWall(pts[i], pts[i + 1], type);
+    }
+  }
+
+  // Openings: <line data-opening>
+  for (const t of wallTags) {
+    if (!hasAttr(t, 'data-opening')) continue;
+    if (!/^<line/i.test(t)) continue;
+    const a = scPt([Number(attr(t, 'x1')) || 0, Number(attr(t, 'y1')) || 0]);
+    const b = scPt([Number(attr(t, 'x2')) || 0, Number(attr(t, 'y2')) || 0]);
+    const widthFt = Math.hypot(b[0] - a[0], b[1] - a[1]);
+    if (widthFt < 1e-9) continue;
+    const ot = (attr(t, 'data-opening-type') || 'door').toLowerCase();
+    const type = ot === 'window' ? 'window' : 'door';
+    const heightFt = Number(attr(t, 'data-height')) || (type === 'window' ? 4 : 7);
+    attachOpeningToNearestWall(walls, [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], round(widthFt), type, heightFt);
+  }
+
+  // Columns: <circle data-column>
+  const circleRe = /<circle\b[^>]*>/gi;
+  while ((m = circleRe.exec(svg)) !== null) {
+    const t = m[0];
+    if (!hasAttr(t, 'data-column')) continue;
+    const cx = Number(attr(t, 'cx'));
+    const cy = Number(attr(t, 'cy'));
+    const r = Number(attr(t, 'r')) || 0.5;
+    if (!Number.isFinite(cx) || !Number.isFinite(cy)) continue;
+    columns.push({ x: sc(cx), y: sc(cy), sizeFt: round(2 * r * unitsPerPx) });
+  }
+
+  if (!spaces.length && !walls.length) {
+    throw new Error('No data-space / data-wall elements found in SVG');
+  }
+
+  const story = {
+    level: 0,
+    baseElevationFt: 0,
+    ceilingHeightFt: Number(opts.ceilingHeightFt) || 14,
+    spaces,
+    walls,
+    columns,
+  };
+  return normalizeBuilding({ name: opts.name || 'Imported SVG Building', units: 'ft', stories: [story] });
+}
+
+/** CIRCLE center (code 10/20) + radius (code 40). */
+function circleEntity(ent) {
+  const cx = ent.tags.find((t) => t[0] === 10);
+  const cy = ent.tags.find((t) => t[0] === 20);
+  const r = ent.tags.find((t) => t[0] === 40);
+  if (!cx || !cy) return null;
+  return { x: Number(cx[1]), y: Number(cy[1]), r: r ? Number(r[1]) : 0.5 };
+}
+
+/** LINE endpoints (codes 10/20 -> 11/21). */
+function lineEntity(ent) {
+  const x1 = ent.tags.find((t) => t[0] === 10);
+  const y1 = ent.tags.find((t) => t[0] === 20);
+  const x2 = ent.tags.find((t) => t[0] === 11);
+  const y2 = ent.tags.find((t) => t[0] === 21);
+  if (!x1 || !y1 || !x2 || !y2) return null;
+  return [[Number(x1[1]), Number(y1[1])], [Number(x2[1]), Number(y2[1])]];
+}
+
+/**
+ * Build a building from DXF text (best-effort, layer-convention based).
+ * Conventions (override layer names via opts.layers):
+ *  - spaces:  LWPOLYLINE on a ROOMS/SPACES layer -> space polygons
+ *  - walls:   LINE (and LWPOLYLINE segments) on a WALLS layer -> wall segments;
+ *             type from layer (exterior vs interior groups) else interior
+ *  - openings:LINE on a DOOR/WINDOW layer -> attached to the nearest wall
+ *  - columns: CIRCLE (or POINT) on a COLUMN layer
+ * opts.unitsPerDrawingUnit scales to feet. NOT CAD object-recognition AI —
+ * only the documented layer/attr conventions are honored. Deterministic.
+ * @param {string} dxfText
+ * @param {{name?:string, unitsPerDrawingUnit?:number, layers?:object}} [opts]
+ */
+export function buildingFromDxf(dxfText, opts = {}) {
+  const scaleFactor = opts.unitsPerDrawingUnit && opts.unitsPerDrawingUnit > 0 ? opts.unitsPerDrawingUnit : 1;
+  const sc = (n) => round(Number(n) * scaleFactor);
+  const scPt = (p) => [sc(p[0]), sc(p[1])];
+  const groups = mergeLayerGroups(opts);
+
+  const entities = splitEntities(entitiesTags(parseDxfTags(dxfText)));
+
+  const spaces = [];
+  const walls = [];
+  const columns = [];
+  const openings = []; // {mid, widthFt, type, heightFt}
+
+  const wallTypeFor = (layer) => {
+    if (inGroup(layer, groups.wallsExterior)) return 'exterior';
+    if (inGroup(layer, groups.wallsInterior)) return 'interior';
+    return 'interior';
+  };
+  const isWallLayer = (layer) => inGroup(layer, groups.walls)
+    || inGroup(layer, groups.wallsExterior) || inGroup(layer, groups.wallsInterior);
+
+  const pushWall = (a, b, type) => {
+    if (Math.hypot(b[0] - a[0], b[1] - a[1]) < 1e-9) return;
+    walls.push({ a, b, thicknessFt: 0.5, type, openings: [] });
+  };
+
+  for (const ent of entities) {
+    const layer = entityLayer(ent);
+    if (ent.type === 'LWPOLYLINE') {
+      const verts = lwpolylineVerts(ent);
+      let v = verts;
+      if (v.length > 1 && samePt(v[0], v[v.length - 1])) v = v.slice(0, -1);
+      if (inGroup(layer, groups.spaces)) {
+        if (v.length >= 3) {
+          spaces.push({ name: `Space ${spaces.length + 1}`, polygon: v.map(scPt), hazard: 'ordinary' });
+        }
+      } else if (isWallLayer(layer)) {
+        const type = wallTypeFor(layer);
+        for (let i = 0; i + 1 < v.length; i++) pushWall(scPt(v[i]), scPt(v[i + 1]), type);
+      }
+    } else if (ent.type === 'LINE') {
+      const seg = lineEntity(ent);
+      if (!seg) continue;
+      if (isWallLayer(layer)) {
+        pushWall(scPt(seg[0]), scPt(seg[1]), wallTypeFor(layer));
+      } else if (inGroup(layer, groups.doors) || inGroup(layer, groups.windows)) {
+        const a = scPt(seg[0]);
+        const b = scPt(seg[1]);
+        const widthFt = round(Math.hypot(b[0] - a[0], b[1] - a[1]));
+        if (widthFt < 1e-9) continue;
+        const type = inGroup(layer, groups.windows) ? 'window' : 'door';
+        openings.push({ mid: [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], widthFt, type, heightFt: type === 'window' ? 4 : 7 });
+      }
+    } else if (ent.type === 'CIRCLE' || ent.type === 'POINT') {
+      if (!inGroup(layer, groups.columns)) continue;
+      const c = circleEntity(ent);
+      if (!c) continue;
+      columns.push({ x: sc(c.x), y: sc(c.y), sizeFt: round(2 * (c.r || 0.5) * scaleFactor) });
+    }
+  }
+
+  // Attach openings to nearest walls after all walls are collected (deterministic order).
+  for (const op of openings) {
+    attachOpeningToNearestWall(walls, op.mid, op.widthFt, op.type, op.heightFt);
+  }
+
+  if (!spaces.length && !walls.length) {
+    throw new Error('No ROOMS/SPACES or WALLS layer entities found in DXF');
+  }
+
+  const story = {
+    level: 0,
+    baseElevationFt: 0,
+    ceilingHeightFt: 14,
+    spaces,
+    walls,
+    columns,
+  };
+  return normalizeBuilding({ name: opts.name || 'Imported DXF Building', units: 'ft', stories: [story] });
 }
