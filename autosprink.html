@@ -156,6 +156,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
 import { OpenGeometry, Vector3, Cuboid, Cylinder, Opening, OGSceneManager } from 'opengeometry';
+import { planOrthoFrustum, planCenter } from '/src/engine/plan-view.js';
 
 const HOME_DEPOT = 'Home Depot - Rexburg ID';
 const token = localStorage.getItem('halofire_token');
@@ -263,6 +264,10 @@ function onResize() {
   const c = $('canvas'); const w = c.clientWidth, h = c.clientHeight;
   renderer.setSize(w, h, false);
   perspCam.aspect = w / h; perspCam.updateProjectionMatrix();
+  // Re-fit the plan ortho frustum to the new aspect so the drawing stays framed.
+  if (camera === orthoCam && window._frame && window._frame.bbox) {
+    const b = window._frame.bbox; fitPlanOrtho(b.minX, b.maxX, b.minY, b.maxY, (w / h) || 1.5);
+  }
 }
 
 const W = ([x, y, z]) => [x, z, y]; // cad (planX,planY,elevZ) -> world Y-up
@@ -488,22 +493,45 @@ function download(name, dataOrBytes, isText) {
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click(); URL.revokeObjectURL(a.href);
 }
 
+// Fit the ortho frustum to the plan bbox (cad planX = world x, planY = world z)
+// so the WHOLE floor-plan drawing frames edge-to-edge (V1, tested helper).
+function fitPlanOrtho(minX, maxX, minZ, maxZ, aspect) {
+  const f = planOrthoFrustum({ minX, maxX, minY: minZ, maxY: maxZ }, aspect || 1.5, 0.08);
+  const o = orthoCam; o.left = f.left; o.right = f.right; o.top = f.top; o.bottom = f.bottom; o.updateProjectionMatrix();
+}
+
+// Plan-mode look: lighter backdrop + brighter floor so the footprint reads like
+// a drawing surface; restore the dark 3D look otherwise. Defensive (OG meshes).
+function setPlanStyle(isPlan) {
+  if (scene) scene.background = new THREE.Color(isPlan ? 0x0e1320 : 0x08080b);
+  if (layerGroups.FLOOR) {
+    try { layerGroups.FLOOR.traverse((o) => { if (o.material && o.material.color) o.material.color.set(isPlan ? 0x232a38 : COLORS.FLOOR); }); } catch (_) { /* OG mesh shape */ }
+  }
+}
+
 function frameCamera(minX, maxX, minZ, maxZ, ceil) {
   const cx = (minX+maxX)/2, cz = (minZ+maxZ)/2; const span = Math.max(maxX-minX, maxZ-minZ, 40);
   perspCam.position.set(cx + span*0.8, ceil + span*0.8, cz + span*0.8);
-  const o = orthoCam; const m = span*0.62; const a = $('canvas').clientWidth/$('canvas').clientHeight;
-  o.left=-m*a; o.right=m*a; o.top=m; o.bottom=-m; o.updateProjectionMatrix();
-  o.position.set(cx, span*2, cz);
+  const a = ($('canvas').clientWidth / $('canvas').clientHeight) || 1.5;
+  fitPlanOrtho(minX, maxX, minZ, maxZ, a);
+  orthoCam.up.set(0, 0, -1);                          // north-up plan orientation
+  orthoCam.position.set(cx, Math.max(ceil, span) * 2, cz);
   controls.target.set(cx, ceil/2, cz); controls.update();
-  window._frame = { cx, cz, span };
+  window._frame = { cx, cz, span, ceil, bbox: { minX, maxX, minY: minZ, maxY: maxZ } };
 }
 
 function setView(view) {
   camera = view === 'top' ? orthoCam : perspCam;
   controls.object = camera;
+  setPlanStyle(view === 'top');
   if (window._frame) {
-    const { cx, cz, span } = window._frame;
-    if (view === 'top') orthoCam.position.set(cx, span*2, cz);
+    const { cx, cz, span, ceil, bbox } = window._frame;
+    if (view === 'top') {
+      const a = ($('canvas').clientWidth / $('canvas').clientHeight) || 1.5;
+      if (bbox) fitPlanOrtho(bbox.minX, bbox.maxX, bbox.minY, bbox.maxY, a);
+      orthoCam.up.set(0, 0, -1);
+      orthoCam.position.set(cx, Math.max(ceil || 14, span) * 2, cz);
+    }
   }
   controls.update();
 }
