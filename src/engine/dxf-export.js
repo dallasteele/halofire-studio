@@ -13,7 +13,8 @@
 
 // AutoCAD Color Index per layer.
 const LAYERS = {
-  WALLS: 7, FLOOR: 8, ROOF: 9, MAIN: 1, BRANCH: 5, DROPS: 4, RISER: 2, HEADS: 3, LABELS: 7,
+  WALLS: 7, 'WALLS-INT': 6, COLUMNS: 8, OPENINGS: 30, FLOOR: 8, ROOF: 9,
+  MAIN: 1, BRANCH: 5, DROPS: 4, RISER: 2, HEADS: 3, LABELS: 7,
 };
 
 function pair(code, value) {
@@ -58,11 +59,49 @@ export function toDxf(cadModel) {
       // baseZ stacks multi-floor walls (default 0 -> backward compatible).
       const z0 = s.baseZ || 0;
       const z1 = z0 + s.heightFt;
+      // Interior walls draw on WALLS-INT, exterior (and legacy, no type) on WALLS.
+      const wlayer = s.type === 'interior' ? 'WALLS-INT' : 'WALLS';
       // plan base, top, and two vertical posts -> 3D wall wireframe
-      entities += line('WALLS', [s.a[0], s.a[1], z0], [s.b[0], s.b[1], z0]);
-      entities += line('WALLS', [s.a[0], s.a[1], z1], [s.b[0], s.b[1], z1]);
-      entities += line('WALLS', [s.a[0], s.a[1], z0], [s.a[0], s.a[1], z1]);
-      entities += line('WALLS', [s.b[0], s.b[1], z0], [s.b[0], s.b[1], z1]);
+      entities += line(wlayer, [s.a[0], s.a[1], z0], [s.b[0], s.b[1], z0]);
+      entities += line(wlayer, [s.a[0], s.a[1], z1], [s.b[0], s.b[1], z1]);
+      entities += line(wlayer, [s.a[0], s.a[1], z0], [s.a[0], s.a[1], z1]);
+      entities += line(wlayer, [s.b[0], s.b[1], z0], [s.b[0], s.b[1], z1]);
+      // Opening centerlines (doors/windows) on OPENINGS so the viewer can cut them.
+      if (Array.isArray(s.openings) && s.openings.length) {
+        const len = Math.hypot(s.b[0] - s.a[0], s.b[1] - s.a[1]) || 1;
+        const ux = (s.b[0] - s.a[0]) / len;
+        const uy = (s.b[1] - s.a[1]) / len;
+        for (const op of s.openings) {
+          const startT = op.offsetFt;
+          const endT = op.offsetFt + op.widthFt;
+          const sill = z0 + (op.sill || 0);
+          const head = sill + op.heightFt;
+          const ax = s.a[0] + ux * startT;
+          const ay = s.a[1] + uy * startT;
+          const bx = s.a[0] + ux * endT;
+          const by = s.a[1] + uy * endT;
+          // sill + head centerlines mark the opening span on the wall
+          entities += line('OPENINGS', [ax, ay, sill], [bx, by, sill]);
+          entities += line('OPENINGS', [ax, ay, head], [bx, by, head]);
+          entities += line('OPENINGS', [ax, ay, sill], [ax, ay, head]);
+          entities += line('OPENINGS', [bx, by, sill], [bx, by, head]);
+        }
+      }
+    } else if (s.kind === 'column') {
+      // Square column footprint extruded baseZ -> baseZ+heightFt on COLUMNS.
+      const z0 = s.baseZ || 0;
+      const z1 = z0 + s.heightFt;
+      const h = s.sizeFt / 2;
+      const corners = [
+        [s.x - h, s.y - h], [s.x + h, s.y - h], [s.x + h, s.y + h], [s.x - h, s.y + h],
+      ];
+      for (let i = 0; i < 4; i += 1) {
+        const a = corners[i];
+        const b = corners[(i + 1) % 4];
+        entities += line('COLUMNS', [a[0], a[1], z0], [b[0], b[1], z0]);
+        entities += line('COLUMNS', [a[0], a[1], z1], [b[0], b[1], z1]);
+        entities += line('COLUMNS', [a[0], a[1], z0], [a[0], a[1], z1]);
+      }
     } else if (s.kind === 'pipe') {
       entities += line(s.layer, s.from, s.to);
       // Label branch + main pipe sizes at their midpoint (shop-drawing convention).

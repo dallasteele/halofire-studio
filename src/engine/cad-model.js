@@ -19,6 +19,7 @@
  */
 
 import { layoutRoom } from './sprinkler-layout.js';
+import { layoutBuilding } from './system-layout.js';
 
 // NFPA 13 schedule pipe sizing — max sprinklers served by a steel pipe size.
 // Public code values. Returned diameter is the smallest size that covers count.
@@ -170,6 +171,10 @@ function offsetSolidZ(solid, dz) {
       // so the floor sits on the slab below it (DXF/3D honor baseZ, default 0).
       s.baseZ = round((s.baseZ || 0) + dz);
       break;
+    case 'column':
+      // Columns extrude from baseZ up by heightFt like walls.
+      s.baseZ = round((s.baseZ || 0) + dz);
+      break;
     case 'pipe':
       s.from = [s.from[0], s.from[1], round(s.from[2] + dz)];
       s.to = [s.to[0], s.to[1], round(s.to[2] + dz)];
@@ -228,6 +233,164 @@ function buildFloorCad(floor, baseElevationFt) {
   };
 }
 
+/** True iff `input` is a normalized building (stories[] each with spaces/walls). */
+function isBuilding(input) {
+  return !!(input && Array.isArray(input.stories) && input.stories.length > 0
+    && input.stories.some((st) => st && (Array.isArray(st.spaces) || Array.isArray(st.walls))));
+}
+
+/** Wall solid in the existing wall shape, typed exterior/interior + opening metadata. */
+function buildWallSolid(wall, ceiling, name) {
+  const { a, b } = wall;
+  const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
+  return {
+    kind: 'wall', name,
+    layer: wall.type === 'interior' ? 'WALLS-INT' : 'WALLS',
+    type: wall.type === 'interior' ? 'interior' : 'exterior',
+    a: [round(a[0]), round(a[1])], b: [round(b[0]), round(b[1])],
+    center: [round((a[0] + b[0]) / 2), round((a[1] + b[1]) / 2)],
+    lengthFt: round(len), heightFt: ceiling, thicknessFt: wall.thicknessFt ?? WALL_THICKNESS_FT,
+    rotationY: round(-Math.atan2(b[1] - a[1], b[0] - a[0])),
+    baseZ: 0,
+    openings: (Array.isArray(wall.openings) ? wall.openings : []).map((op) => ({
+      offsetFt: round(op.offsetFt ?? 0),
+      widthFt: round(op.widthFt ?? 0),
+      heightFt: round(op.heightFt ?? 0),
+      sill: round(op.sill ?? 0),
+      type: op.type === 'window' ? 'window' : 'door',
+    })),
+  };
+}
+
+/** Column solid: a vertical square post at (x,y), sizeFt across, full ceiling height. */
+function buildColumnSolid(col, ceiling, name) {
+  return {
+    kind: 'column', name, layer: 'COLUMNS',
+    x: round(col.x), y: round(col.y), sizeFt: round(col.sizeFt ?? 1),
+    heightFt: ceiling, baseZ: 0,
+  };
+}
+
+/**
+ * Build the CAD model for ONE story of a normalized building: a wall solid per
+ * wall segment (typed + opening metadata), a column solid per column, and the
+ * per-space pipe networks + heads from the system-layout (NFPA sizing). All
+ * solids are offset in Z by baseElevationFt so stories stack.
+ */
+function buildStoryCad(story, layoutStory) {
+  const ceiling = story.ceilingHeightFt || DEFAULT_CEILING_FT;
+  const baseElevationFt = story.baseElevationFt || 0;
+  const localSolids = [];
+
+  // Slab per story so stories read as distinct floors in DXF/3D.
+  // (Use the union bbox of all spaces as a single floor outline.)
+
+  // Walls: one solid per segment, typed exterior/interior, opening metadata.
+  story.walls.forEach((wall, i) => {
+    localSolids.push(buildWallSolid(wall, ceiling, `${story.level}/wall${i}`));
+  });
+
+  // Columns: one solid per structural column.
+  story.columns.forEach((col, i) => {
+    localSolids.push(buildColumnSolid(col, ceiling, `${story.level}/col${i}`));
+  });
+
+  // Pipe networks + heads, per space, from the laid-out story.
+  // Elevations mirror buildRoomCad: main highest, branch below, head lowest.
+  const mainZ = round(ceiling - 0.75);
+  const branchZ = round(ceiling - 1.0);
+  const headZ = round(ceiling - 1.5);
+
+  for (const space of layoutStory.spaces) {
+    if (!space.branchLines.length) continue;
+    let totalHeads = 0;
+    for (const bl of space.branchLines) {
+      totalHeads += bl.headCount;
+      const y = bl.y;
+      const startX = round(bl.startX);
+      const endX = round(bl.endX);
+      localSolids.push({ kind: 'pipe', name: `${space.name}/branch-${bl.row}`, layer: 'BRANCH', role: 'branch',
+        from: [startX, y, branchZ], to: [endX, y, branchZ], diameterIn: bl.diameterIn });
+      for (const h of bl.heads) {
+        localSolids.push({ kind: 'pipe', name: `${space.name}/drop-${bl.row}-${h.col}`, layer: 'DROPS', role: 'drop',
+          from: [round(h.x), y, branchZ], to: [round(h.x), y, headZ], diameterIn: 1.0 });
+        localSolids.push({ kind: 'head', name: `${space.name}/head-${bl.row}-${h.col}`, layer: 'HEADS',
+          position: [round(h.x), y, headZ], orientation: 'pendent' });
+      }
+    }
+    // Per-space cross-main + ties + riser tying the branch lines together.
+    const mainDia = space.sizing.crossMainDiameterIn;
+    const mainX = round(Math.min(...space.branchLines.map((b) => b.startX)));
+    const ys = space.branchLines.map((b) => b.y);
+    const y0 = round(Math.min(...ys));
+    const y1 = round(Math.max(...ys));
+    localSolids.push({ kind: 'pipe', name: `${space.name}/cross-main`, layer: 'MAIN', role: 'main',
+      from: [mainX, y0, mainZ], to: [mainX, y1, mainZ], diameterIn: mainDia });
+    for (const bl of space.branchLines) {
+      localSolids.push({ kind: 'pipe', name: `${space.name}/riser-tie-${bl.row}`, layer: 'MAIN', role: 'main-tie',
+        from: [mainX, bl.y, mainZ], to: [mainX, bl.y, branchZ], diameterIn: mainDia });
+    }
+    localSolids.push({ kind: 'pipe', name: `${space.name}/system-riser`, layer: 'RISER', role: 'riser',
+      from: [mainX, y0, 0], to: [mainX, y0, mainZ], diameterIn: mainDia });
+  }
+
+  const solids = localSolids.map((s) => offsetSolidZ(s, baseElevationFt));
+  return {
+    level: story.level ?? null,
+    baseElevationFt,
+    ceilingHeightFt: story.ceilingHeightFt ?? null,
+    spaces: layoutStory.spaces.map((sp) => ({ name: sp.name, hazard: sp.hazard, headCount: sp.headCount, sizing: sp.sizing })),
+    feedMain: layoutStory.feedMain,
+    solids,
+    counts: tallyBuildingCounts(solids),
+  };
+}
+
+/** Tally building-shaped counts (spaces/walls/interiorWalls/columns/openings/heads/pipes). */
+function tallyBuildingCounts(solids, spaceCount) {
+  const walls = solids.filter((s) => s.kind === 'wall');
+  return {
+    spaces: spaceCount ?? 0,
+    walls: walls.length,
+    interiorWalls: walls.filter((w) => w.type === 'interior').length,
+    columns: solids.filter((s) => s.kind === 'column').length,
+    openings: walls.reduce((n, w) => n + (Array.isArray(w.openings) ? w.openings.length : 0), 0),
+    heads: solids.filter((s) => s.kind === 'head').length,
+    pipes: solids.filter((s) => s.kind === 'pipe').length,
+  };
+}
+
+/**
+ * Build the CAD model for a whole normalized building (see building-model.js):
+ * accurate interior/exterior walls + opening metadata, structural columns, and
+ * per-space pipe networks + heads from the system-layout, multi-story stacked
+ * by baseElevationFt. counts include spaces/walls/interiorWalls/columns/
+ * openings/heads/pipes. Geometry only — NFPA-13 schedule sizing, NOT
+ * hydraulically calculated, NOT AHJ/PE/AutoSprink parity; gates stay fail-closed.
+ */
+function buildBuildingCad(building) {
+  const layout = layoutBuilding(building);
+  const layoutByLevel = new Map(layout.stories.map((st) => [st.level, st]));
+
+  const stories = building.stories.map((story) => buildStoryCad(story, layoutByLevel.get(story.level)));
+  const solids = stories.flatMap((st) => st.solids);
+  const spaceCount = building.stories.reduce((n, st) => n + (Array.isArray(st.spaces) ? st.spaces.length : 0), 0);
+
+  return {
+    name: building.name,
+    units: building.units || 'ft',
+    generatedBy: 'halofire-cad-model',
+    stories,
+    solids,
+    counts: tallyBuildingCounts(solids, spaceCount),
+    coverageOk: layout.coverageOk,
+    disclaimer: 'best-effort internal alpha 3D building model — interior/exterior walls with '
+      + 'opening metadata, columns, per-space NFPA-13 schedule pipe sizing, '
+      + 'NOT hydraulically calculated, NOT AHJ/PE-reviewed, NOT AutoSprink/AutoCAD parity.',
+    blockedClaims: layout.blockedClaims,
+  };
+}
+
 /**
  * Build the CAD model for a whole floor plan.
  *
@@ -241,6 +404,12 @@ function buildFloorCad(floor, baseElevationFt) {
  *   floors?:Array, disclaimer:string}}
  */
 export function buildCadModel(floorPlan) {
+  // Building shape: a normalized building (stories[] with spaces/walls). Detect
+  // by the building schema so legacy {rooms}/{floors} plans take the path below.
+  if (isBuilding(floorPlan)) {
+    return buildBuildingCad(floorPlan);
+  }
+
   const hasFloors = floorPlan && Array.isArray(floorPlan.floors) && floorPlan.floors.length > 0;
   if (!hasFloors && (!floorPlan || !Array.isArray(floorPlan.rooms) || floorPlan.rooms.length === 0)) {
     throw new Error('floorPlan.rooms must be a non-empty array');
