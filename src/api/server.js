@@ -15,6 +15,10 @@ import Database from 'better-sqlite3';
 import rateLimit from 'express-rate-limit';
 import 'dotenv/config';
 import { createLogger } from '../core/logger.js';
+import { generateSprinklerBid } from '../engine/sprinkler-layout.js';
+import { buildScene } from '../engine/geometry.js';
+import { homeDepotRexburgFloorPlan } from '../data/floorplans.js';
+import { HOME_DEPOT_PROJECT_NAME } from '../data/evidence-gates.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const log = createLogger('api-server');
@@ -461,6 +465,74 @@ app.post('/api/projects/:name/evidence', authMiddleware, requireRole('admin'), (
               VALUES (?, ?, ?, ?, ?, ?)`)
     .run(req.params.name, evidence_type, source_file, source_ref, status, notes);
   res.status(201).json({ id: result.lastInsertRowid, message: 'Evidence recorded' });
+});
+
+// Map BOM keys to pricebook keyword searches and return a deterministic
+// median price from the real imported vendor pricebooks, or null if no match.
+const PRICEBOOK_KEYWORDS = {
+  sprinkler_head: ['sprinkler', 'pendent', 'upright'],
+  branch_pipe: ['pipe', 'sch 40', 'sch10'],
+  fitting: ['fitting', 'tee', 'elbow', 'coupling'],
+  hanger: ['hanger'],
+  escutcheon: ['escutcheon', 'cover plate'],
+};
+
+function buildPricebookResolver() {
+  const cache = new Map();
+  return (key) => {
+    if (cache.has(key)) return cache.get(key);
+    const keywords = PRICEBOOK_KEYWORDS[key] || [];
+    let price = null;
+    for (const kw of keywords) {
+      const rows = db
+        .prepare("SELECT price FROM pricebook WHERE LOWER(item) LIKE ? AND price > 0 ORDER BY price")
+        .all(`%${kw.toLowerCase()}%`);
+      if (rows.length) {
+        price = rows[Math.floor(rows.length / 2)].price; // deterministic median
+        break;
+      }
+    }
+    cache.set(key, price);
+    return price;
+  };
+}
+
+// Best-effort sprinkler auto-layout + auto-bid. Fail-closed: this NEVER clears
+// AutoSprink/AHJ/PE/manufacturer gates; it records a best_effort evidence row.
+app.post('/api/projects/:name/sprinkler-bid', authMiddleware, (req, res) => {
+  try {
+    const projectName = req.params.name;
+    let floorPlan = req.body && req.body.floorPlan;
+    if (!floorPlan && projectName === HOME_DEPOT_PROJECT_NAME) {
+      floorPlan = homeDepotRexburgFloorPlan();
+    }
+    if (!floorPlan) {
+      return res.status(400).json({ error: 'No floorPlan provided and no built-in plan for this project' });
+    }
+    const opts = {
+      priceResolver: buildPricebookResolver(),
+      laborRatePerHead: Number(req.body?.laborRatePerHead) || 85,
+      markupPct: Number(req.body?.markupPct) || 25,
+    };
+    const bid = generateSprinklerBid(floorPlan, opts);
+    const scene = buildScene(floorPlan, bid);
+
+    // Record that a best-effort layout was generated — as evidence, not a clearance.
+    if (normalizeRole(req.user?.role) === 'admin') {
+      db.prepare(`INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+                  VALUES (?, ?, ?, ?, ?, ?)`).run(
+        projectName,
+        'best_effort_ai_layout',
+        null,
+        `engine ${bid.generatedBy}`,
+        'best_effort',
+        `Generated ${bid.totalHeadCount} heads over ${bid.totalAreaSqFt} sqft. ${bid.disclaimer}`,
+      );
+    }
+    res.json({ bid, scene });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
 });
 
 function safeParseJsonArray(value) {

@@ -187,6 +187,30 @@ describe('HaloFire evidence and claim-gate API', () => {
     expect(list.some((e) => e.evidence_type === 'employee_note')).toBe(true);
   });
 
+  it('generates a best-effort sprinkler bid + 3D scene without clearing any gate', async () => {
+    const token = await tokenFor('evidence-admin', 'actual-test-password');
+    const res = await request(`${PROJECT_PATH}/sprinkler-bid`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ markupPct: 30 }),
+    });
+    expect(res.status).toBe(200);
+    const { bid, scene } = await res.json();
+    expect(bid.totalAreaSqFt).toBe(121500);
+    expect(bid.totalHeadCount).toBeGreaterThan(0);
+    expect(bid.pricing.total).toBeGreaterThan(0);
+    expect(bid.pricing.markupPct).toBe(30);
+    expect(bid.blockedClaims).toContain('AutoSprink parity');
+    expect(scene.walls.length).toBe(4);
+    expect(scene.heads.length).toBe(bid.totalHeadCount);
+
+    // The generated layout must NOT have cleared the blocking gates.
+    const gates = await (await request(`${PROJECT_PATH}/claim-gates`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })).json();
+    expect(gates.find((g) => g.code === 'AUTOSPRINK_EVIDENCE_MISSING').status).toBe('blocked');
+  });
+
   it('does not let best-effort AI evidence clear a blocking professional/AHJ/AutoSprink gate', async () => {
     const token = await tokenFor('evidence-admin', 'actual-test-password');
     await request(`${PROJECT_PATH}/evidence`, {
