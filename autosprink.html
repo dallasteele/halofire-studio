@@ -121,6 +121,8 @@
     <div id="layout"><span class="muted" style="font-size:12px">Generate a layout to begin.</span></div>
     <h3>Pipe Schedule (NFPA-13)</h3>
     <div id="pipes"><span class="muted" style="font-size:12px">—</span></div>
+    <h3>Hydraulics (NFPA-13, est.)</h3>
+    <div id="hydraulics"><span class="muted" style="font-size:12px">—</span></div>
     <h3>Auto Bid</h3>
     <div id="bid"></div>
     <div id="bom"></div>
@@ -341,7 +343,7 @@ async function generate() {
   try {
     lastBody = currentBody();
     if ($('planSource').value === 'svg' && !lastBody.svg) { $('status').textContent = 'paste SVG first'; return; }
-    const { bid, cadModel } = await api('/projects/' + encodeURIComponent(HOME_DEPOT) + '/sprinkler-bid', {
+    const { bid, cadModel, hydraulics } = await api('/projects/' + encodeURIComponent(HOME_DEPOT) + '/sprinkler-bid', {
       method: 'POST', body: JSON.stringify(lastBody),
     });
     renderModel(cadModel);
@@ -358,6 +360,17 @@ async function generate() {
       <div class="kv"><span>Cross-main</span><b>${room0.sizing.mainDiameterIn}"</b></div>
       <div class="kv"><span>Branch lines</span><b>${room0.network.branchLines.length} @ ${[...new Set(room0.sizing.branchDiameters)].join('/')}"</b></div>
       <div class="kv"><span>System riser</span><b>${room0.sizing.mainDiameterIn}"</b></div>`;
+    if (hydraulics && !hydraulics.error) {
+      const warns = (hydraulics.warnings || []);
+      $('hydraulics').innerHTML = `
+        <div class="kv"><span>Design demand</span><b>${Math.round(hydraulics.demand.requiredFlowGpm)} gpm</b></div>
+        <div class="kv"><span>Friction loss</span><b>${hydraulics.frictionLossPsi} psi</b></div>
+        <div class="kv"><span>Elevation head</span><b>${hydraulics.elevationPsi} psi</b></div>
+        <div class="kv"><span>Req. pressure @ riser</span><b class="total" style="font-size:14px">${hydraulics.requiredPressurePsi} psi</b></div>
+        ${warns.length ? `<div class="est">⚠ ${warns.length} schedule warning(s)</div>` : '<div class="muted" style="font-size:10px">no velocity/loss warnings</div>'}`;
+    } else {
+      $('hydraulics').innerHTML = '<span class="est">hydraulics unavailable' + (hydraulics && hydraulics.error ? ': ' + hydraulics.error : '') + '</span>';
+    }
     $('bid').innerHTML = `
       <div class="kv"><span>Material</span><b>${usd(bid.pricing.materialCost)}</b></div>
       <div class="kv"><span>Labor</span><b>${usd(bid.pricing.laborCost)}</b></div>

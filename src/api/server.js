@@ -21,6 +21,7 @@ import { buildResolverFromDb } from '../engine/pricebook-pricing.js';
 import { floorPlanFromSvg, normalizeFloorPlan } from '../engine/floorplan-import.js';
 import { buildCadModel } from '../engine/cad-model.js';
 import { toDxf } from '../engine/dxf-export.js';
+import { requiredPressureAtRiser, flagSchedule, remoteAreaDemand } from '../engine/hydraulics.js';
 import { homeDepotRexburgFloorPlan } from '../data/floorplans.js';
 import { HOME_DEPOT_PROJECT_NAME } from '../data/evidence-gates.js';
 
@@ -591,7 +592,27 @@ app.post('/api/projects/:name/sprinkler-bid', authMiddleware, (req, res) => {
         `Generated ${bid.totalHeadCount} heads over ${bid.totalAreaSqFt} sqft. ${bid.disclaimer}`,
       );
     }
-    res.json({ bid, scene, cadModel });
+    // Best-effort NFPA-13 hydraulic check (single representative path; NOT a
+    // full network balance). Surfaced in the studio; never clears a gate.
+    let hydraulics = null;
+    try {
+      const hazard = bid.rooms?.[0]?.hazard || 'ordinary';
+      // buildCadModel nests the network under rooms[].network (or floors[].rooms[]).
+      const room0 = (cadModel.rooms && cadModel.rooms[0])
+        || (cadModel.floors && cadModel.floors[0] && cadModel.floors[0].rooms && cadModel.floors[0].rooms[0]);
+      const network = room0 && room0.network;
+      if (!network) throw new Error('no network in cad model');
+      const required = requiredPressureAtRiser({ network, hazard });
+      hydraulics = {
+        ...required,
+        demand: remoteAreaDemand(hazard),
+        warnings: flagSchedule(network, hazard),
+        disclaimer: 'best-effort single-path estimate — NOT a full hydraulic network balance, NOT PE/AHJ reviewed.',
+      };
+    } catch (e) {
+      hydraulics = { error: e.message };
+    }
+    res.json({ bid, scene, cadModel, hydraulics });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
