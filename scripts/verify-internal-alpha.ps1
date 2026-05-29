@@ -27,7 +27,7 @@ try {
   node -e "const D=require('better-sqlite3');const d=new D(process.env.HALOFIRE_DB_PATH);const g=d.prepare('SELECT COUNT(*) c FROM claim_gates').get().c;const e=d.prepare('SELECT COUNT(*) c FROM project_evidence').get().c;if(g<5||e<5)throw new Error('expected >=5 gates and >=5 evidence, got '+g+'/'+e);console.log('  gates='+g+' evidence='+e)"
 
   Write-Host "== Unit/integration tests (incl. live-server evidence-api smoke) =="
-  npx vitest run tests/bid-package.test.js tests/bid-log-importer.test.js tests/pricebook-importer.test.js tests/evidence-gates.test.js tests/evidence-api.test.js tests/api-security.test.js tests/seed-source-data.test.js tests/sprinkler-layout.test.js tests/geometry.test.js
+  npx vitest run tests/bid-package.test.js tests/bid-log-importer.test.js tests/pricebook-importer.test.js tests/evidence-gates.test.js tests/evidence-api.test.js tests/api-security.test.js tests/seed-source-data.test.js tests/sprinkler-layout.test.js tests/geometry.test.js tests/pricebook-pricing.test.js tests/floorplan-import.test.js
   if ($LASTEXITCODE -ne 0) { throw "vitest failed" }
 } finally {
   Remove-Item "$tmpDb*" -Force -ErrorAction SilentlyContinue
