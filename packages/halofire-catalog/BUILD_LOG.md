@@ -1,5 +1,11 @@
 # BUILD_LOG
 
+## 2026-05-28T23:38Z
+
+- Re-ran live source verification for the Stream F catalog/model owner lane against the current public manufacturer/distributor surfaces and the open-source step.parts candidate. The notices file now records the refreshed live-source note for step.parts plus the current product-page/resource evidence for Tyco TY-B, Viking VK100, Victaulic FL-QR/SW, Wheatland Schedule 40, Tyco LFII HSW, and Reliable DH56.
+- No schema or ledger changes were required because the checked-in Stream F contracts already carry the typed source licensing, model-status tiers, GLB/IFC/DXF contracts, distributor/source ingestion, coverage ledger, and correction workflow surface requested for this slice.
+- Verification passed for the changed evidence surface: `C:/Python312/python.exe scripts/verify_agentic_rules.py`, `bun test E:/ClaudeBot/halofire-studio/packages/halofire-catalog/tests/source-research.test.ts E:/ClaudeBot/halofire-studio/packages/halofire-catalog/tests/source-coverage.test.ts E:/ClaudeBot/halofire-studio/packages/halofire-catalog/tests/source-owner-pipeline.test.ts`, and `bun run --cwd E:/ClaudeBot/halofire-studio/packages/halofire-catalog build`.
+
 ## 2026-05-28T22:13Z
 
 - Clarified the Stream F coverage contract in `data/halofire/brand/components/THIRD_PARTY_NOTICES.md` so the catalog docs explicitly call out source-research provenance, product-page/image/cut-sheet coverage, open-source STEP candidate boundaries, and the full vendor/model coverage ledger obligations.
