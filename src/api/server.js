@@ -795,7 +795,9 @@ app.get('/api/health', (req, res) => {
 
 // ── Serve SPA ──
 app.get('*', (req, res) => {
-  res.sendFile(path.resolve(__dirname, '../../app.html'));
+  // T9: serve the landing (index) for unknown routes; the legacy app.html
+  // dashboard is retired (now a redirect to the real workbench/studio).
+  res.sendFile(path.resolve(__dirname, '../../index.html'));
 });
 
 // ── Start ──
