@@ -17,6 +17,7 @@ import 'dotenv/config';
 import { createLogger } from '../core/logger.js';
 import { generateSprinklerBid } from '../engine/sprinkler-layout.js';
 import { buildScene } from '../engine/geometry.js';
+import { buildResolverFromDb } from '../engine/pricebook-pricing.js';
 import { homeDepotRexburgFloorPlan } from '../data/floorplans.js';
 import { HOME_DEPOT_PROJECT_NAME } from '../data/evidence-gates.js';
 
@@ -469,36 +470,6 @@ app.post('/api/projects/:name/evidence', authMiddleware, requireRole('admin'), (
   res.status(201).json({ id: result.lastInsertRowid, message: 'Evidence recorded' });
 });
 
-// Map BOM keys to pricebook keyword searches and return a deterministic
-// median price from the real imported vendor pricebooks, or null if no match.
-const PRICEBOOK_KEYWORDS = {
-  sprinkler_head: ['sprinkler', 'pendent', 'upright'],
-  branch_pipe: ['pipe', 'sch 40', 'sch10'],
-  fitting: ['fitting', 'tee', 'elbow', 'coupling'],
-  hanger: ['hanger'],
-  escutcheon: ['escutcheon', 'cover plate'],
-};
-
-function buildPricebookResolver() {
-  const cache = new Map();
-  return (key) => {
-    if (cache.has(key)) return cache.get(key);
-    const keywords = PRICEBOOK_KEYWORDS[key] || [];
-    let price = null;
-    for (const kw of keywords) {
-      const rows = db
-        .prepare("SELECT price FROM pricebook WHERE LOWER(item) LIKE ? AND price > 0 ORDER BY price")
-        .all(`%${kw.toLowerCase()}%`);
-      if (rows.length) {
-        price = rows[Math.floor(rows.length / 2)].price; // deterministic median
-        break;
-      }
-    }
-    cache.set(key, price);
-    return price;
-  };
-}
-
 // Best-effort sprinkler auto-layout + auto-bid. Fail-closed: this NEVER clears
 // AutoSprink/AHJ/PE/manufacturer gates; it records a best_effort evidence row.
 app.post('/api/projects/:name/sprinkler-bid', authMiddleware, (req, res) => {
@@ -512,7 +483,7 @@ app.post('/api/projects/:name/sprinkler-bid', authMiddleware, (req, res) => {
       return res.status(400).json({ error: 'No floorPlan provided and no built-in plan for this project' });
     }
     const opts = {
-      priceResolver: buildPricebookResolver(),
+      priceResolver: buildResolverFromDb(db),
       laborRatePerHead: Number(req.body?.laborRatePerHead) || 85,
       markupPct: Number(req.body?.markupPct) || 25,
     };
