@@ -100,6 +100,9 @@
     <button class="act ghost" id="stlBtn" disabled>STL (mesh)</button>
     <div class="warn" id="exportMsg"></div>
 
+    <h3>View</h3>
+    <div class="layer"><input type="checkbox" id="exaggerate" checked><label for="exaggerate" style="margin:0;color:var(--text)">Exaggerate pipe radius (×6)</label></div>
+    <p class="muted" style="font-size:10px;margin-top:4px">Off = true NFPA pipe scale (thin at building scale).</p>
     <h3>Layers</h3>
     <div id="layers"></div>
   </aside>
@@ -163,10 +166,15 @@ function api(path, options = {}) {
 
 // ── OpenGeometry / Three scene ──
 const COLORS = { WALLS: 0x6b7280, FLOOR: 0x16161c, MAIN: 0xE53935, BRANCH: 0x3b82f6, DROPS: 0x22d3ee, HEADS: 0xff3b30 };
-const PIPE_VIZ_SCALE = 6;
+// Viewer pipe-radius exaggeration (true-scale=1). CAD-structural geometry
+// (walls/mains/branches/riser) is built on the OpenGeometry kernel; the many
+// identical heads + drops are drawn with Three InstancedMesh for performance at
+// 900+ count. The full kernel model (incl. heads/drops) is rebuilt on-demand at
+// export time (buildExportScene), so STEP/IFC/STL stay complete & true-scale.
+let pipeVizScale = 6;
 let renderer, scene, perspCam, orthoCam, camera, controls, ogReady = false;
 const layerGroups = {};
-let modelGroup, ogShapes = [];
+let modelGroup, currentCadModel = null;
 
 async function initStudio() {
   const canvas = $('canvas');
@@ -208,6 +216,7 @@ function layerOf(role) {
   return 'MAIN'; // main, main-tie, riser
 }
 function addPipe(s) {
+  if (s.role === 'drop') return; // drops are instanced in renderModel for perf
   const aw = W(s.from), bw = W(s.to);
   const len = Math.hypot(bw[0]-aw[0], bw[1]-aw[1], bw[2]-aw[2]);
   if (len < 1e-3) return;
@@ -215,76 +224,118 @@ function addPipe(s) {
   const layer = layerOf(s.role);
   const cyl = new Cylinder({
     center: new Vector3((aw[0]+bw[0])/2, (aw[1]+bw[1])/2, (aw[2]+bw[2])/2),
-    radius: Math.max(0.25, (s.diameterIn/12/2) * PIPE_VIZ_SCALE),
+    radius: Math.max(0.25, (s.diameterIn/12/2) * pipeVizScale),
     height: len, segments: 10, angle: 360, color: COLORS[layer],
     rotation: new Vector3(rx, ry, rz),
   });
   layerGroups[layer].add(cyl);
-  ogShapes.push({ m: cyl, kind: 'cylinder' });
+}
+
+// Instanced heads (one draw call for all sprinkler heads).
+function addInstancedHeads(worldPts) {
+  if (!worldPts.length) return;
+  const geo = new THREE.SphereGeometry(0.6, 8, 8);
+  const mat = new THREE.MeshStandardMaterial({ color: COLORS.HEADS, emissive: 0x330000 });
+  const inst = new THREE.InstancedMesh(geo, mat, worldPts.length);
+  const d = new THREE.Object3D();
+  worldPts.forEach((p, i) => { d.position.set(p[0], p[1], p[2]); d.rotation.set(0,0,0); d.scale.set(1,1,1); d.updateMatrix(); inst.setMatrixAt(i, d.matrix); });
+  inst.instanceMatrix.needsUpdate = true;
+  layerGroups.HEADS.add(inst);
+}
+
+// Instanced drops (vertical pipe stubs; cylinder default axis is world Y).
+function addInstancedDrops(dropSolids) {
+  if (!dropSolids.length) return;
+  const r = Math.max(0.12, (1.0/12/2) * pipeVizScale); // drop pipe dia 1"
+  const geo = new THREE.CylinderGeometry(r, r, 1, 6); // unit height, scaled per drop
+  const mat = new THREE.MeshStandardMaterial({ color: COLORS.DROPS });
+  const inst = new THREE.InstancedMesh(geo, mat, dropSolids.length);
+  const d = new THREE.Object3D();
+  dropSolids.forEach((s, i) => {
+    const aw = W(s.from), bw = W(s.to);
+    const len = Math.hypot(aw[0]-bw[0], aw[1]-bw[1], aw[2]-bw[2]) || 0.5;
+    d.position.set((aw[0]+bw[0])/2, (aw[1]+bw[1])/2, (aw[2]+bw[2])/2);
+    d.rotation.set(0, 0, 0); d.scale.set(1, len, 1);
+    d.updateMatrix(); inst.setMatrixAt(i, d.matrix);
+  });
+  inst.instanceMatrix.needsUpdate = true;
+  layerGroups.DROPS.add(inst);
 }
 
 function renderModel(cadModel) {
+  currentCadModel = cadModel;
   if (modelGroup) scene.remove(modelGroup);
   modelGroup = new THREE.Group(); scene.add(modelGroup);
   for (const k of Object.keys(COLORS)) { layerGroups[k] = new THREE.Group(); modelGroup.add(layerGroups[k]); }
 
-  ogShapes = [];
+  const headPts = []; const dropSolids = [];
   let minX=Infinity,maxX=-Infinity,minZ=Infinity,maxZ=-Infinity,ceil=14;
   for (const s of cadModel.solids) {
     if (s.kind === 'wall') {
-      ceil = Math.max(ceil, s.heightFt);
-      const wc = W([s.center[0], s.center[1], s.heightFt/2]);
+      ceil = Math.max(ceil, s.heightFt + (s.baseZ || 0));
+      const wc = W([s.center[0], s.center[1], (s.baseZ || 0) + s.heightFt/2]);
       const wall = new Cuboid({
         center: new Vector3(wc[0], wc[1], wc[2]),
         width: s.lengthFt, height: s.heightFt, depth: s.thicknessFt,
         color: COLORS.WALLS, rotation: new Vector3(0, s.rotationY, 0),
       });
-      layerGroups.WALLS.add(wall); ogShapes.push({ m: wall, kind: 'cuboid' });
+      layerGroups.WALLS.add(wall);
       for (const p of [s.a, s.b]) { minX=Math.min(minX,p[0]);maxX=Math.max(maxX,p[0]);minZ=Math.min(minZ,p[1]);maxZ=Math.max(maxZ,p[1]); }
     } else if (s.kind === 'pipe') {
-      addPipe(s);
+      if (s.role === 'drop') dropSolids.push(s); else addPipe(s);
     } else if (s.kind === 'head') {
-      const w = W(s.position);
-      const head = new Cylinder({
-        center: new Vector3(w[0], w[1], w[2]), radius: 0.5, height: 0.6,
-        segments: 6, angle: 360, color: COLORS.HEADS, rotation: new Vector3(0,0,0),
-      });
-      layerGroups.HEADS.add(head); ogShapes.push({ m: head, kind: 'cylinder' });
+      headPts.push(W(s.position));
     }
   }
+  // Heads + drops are the high-count, identical geometry -> instanced (perf).
+  addInstancedHeads(headPts);
+  addInstancedDrops(dropSolids);
+
   const fw = maxX-minX, fd = maxZ-minZ;
   if (fw > 0 && fd > 0) {
     const floor = new Cuboid({
       center: new Vector3((minX+maxX)/2, -0.25, (minZ+maxZ)/2),
       width: fw, height: 0.5, depth: fd, color: COLORS.FLOOR,
     });
-    layerGroups.FLOOR.add(floor); ogShapes.push({ m: floor, kind: 'cuboid' });
+    layerGroups.FLOOR.add(floor);
   }
   frameCamera(minX, maxX, minZ, maxZ, ceil);
   buildLayerToggles();
 }
 
-// Build a kernel scene from the current shapes and export STEP/IFC/STL.
-// Runs entirely in the OpenGeometry WASM kernel (no server round-trip).
-function exportCad(format) {
-  if (!ogShapes.length) return null;
+// Rebuild the COMPLETE kernel scene (walls + every pipe + every head, at TRUE
+// scale) from the stored cad model, on-demand at export time. Decoupled from
+// the viewer (which instances heads/drops) so STEP/IFC/STL are always complete.
+function buildExportScene() {
   const sm = new OGSceneManager();
-  const sceneId = sm.createScene('halofire-' + format);
-  sm.setCurrentScene(sceneId);
+  const id = sm.createScene('halofire-export'); sm.setCurrentScene(id);
   let n = 0;
-  for (const { m, kind } of ogShapes) {
-    const id = 'e' + n;
+  if (!currentCadModel) return { sm, n };
+  for (const s of currentCadModel.solids) {
     try {
-      if (kind === 'cylinder' && m.cylinder) {
-        sm.addCylinderToCurrentScene(id, m.cylinder); n++;
-      } else if (kind === 'cuboid' && m.cuboid) {
-        sm.addCuboidToCurrentScene(id, m.cuboid); n++;
-      } else if (typeof m.getBrepData === 'function') {
-        let brep = m.getBrepData();
-        if (brep != null) { sm.addBrepEntityToCurrentScene(id, kind, typeof brep === 'string' ? brep : JSON.stringify(brep)); n++; }
+      if (s.kind === 'wall') {
+        const wc = W([s.center[0], s.center[1], (s.baseZ || 0) + s.heightFt/2]);
+        const c = new Cuboid({ center: new Vector3(wc[0], wc[1], wc[2]), width: s.lengthFt, height: s.heightFt, depth: s.thicknessFt, color: COLORS.WALLS, rotation: new Vector3(0, s.rotationY, 0) });
+        if (c.cuboid) { sm.addCuboidToCurrentScene('e'+n, c.cuboid); n++; }
+      } else if (s.kind === 'pipe') {
+        const aw = W(s.from), bw = W(s.to); const len = Math.hypot(aw[0]-bw[0], aw[1]-bw[1], aw[2]-bw[2]); if (len < 1e-3) continue;
+        const [rx, ry, rz] = pipeRot(aw, bw);
+        const cyl = new Cylinder({ center: new Vector3((aw[0]+bw[0])/2, (aw[1]+bw[1])/2, (aw[2]+bw[2])/2), radius: Math.max(0.04, s.diameterIn/12/2), height: len, segments: 8, angle: 360, color: 0x888888, rotation: new Vector3(rx, ry, rz) });
+        if (cyl.cylinder) { sm.addCylinderToCurrentScene('e'+n, cyl.cylinder); n++; }
+      } else if (s.kind === 'head') {
+        const w = W(s.position);
+        const cyl = new Cylinder({ center: new Vector3(w[0], w[1], w[2]), radius: 0.5, height: 0.6, segments: 6, angle: 360, color: 0xff0000, rotation: new Vector3(0,0,0) });
+        if (cyl.cylinder) { sm.addCylinderToCurrentScene('e'+n, cyl.cylinder); n++; }
       }
     } catch (_) { /* skip a shape that can't serialize */ }
   }
+  return { sm, n };
+}
+
+function exportCad(format) {
+  if (!currentCadModel) return null;
+  const { sm, n } = buildExportScene();
+  if (!n) return null;
   if (format === 'step') return { res: sm.exportCurrentSceneToStep(), ext: 'step', text: true, registered: n };
   if (format === 'ifc') return { res: sm.exportCurrentSceneToIfc(), ext: 'ifc', text: true, registered: n };
   return { res: sm.exportCurrentSceneToStl(), ext: 'stl', text: false, registered: n };
@@ -387,6 +438,7 @@ async function generate() {
 }
 
 $('planSource').onchange = (e) => { $('svgBox').style.display = e.target.value === 'svg' ? '' : 'none'; };
+$('exaggerate').onchange = (e) => { pipeVizScale = e.target.checked ? 6 : 1; if (currentCadModel) renderModel(currentCadModel); };
 $('genBtn').onclick = generate;
 $('dxfBtn').onclick = async () => {
   const res = await fetch('/api/projects/' + encodeURIComponent(HOME_DEPOT) + '/cad.dxf', {
