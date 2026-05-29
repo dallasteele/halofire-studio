@@ -87,7 +87,8 @@
     <div id="bidSummary"></div>
   </div>
   <div class="card wide">
-    <h2>3D Building &amp; Sprinkler Geometry</h2>
+    <h2>3D Building &amp; Sprinkler Geometry <span class="muted" style="font-size:10px;text-transform:none">· OpenGeometry CAD kernel</span></h2>
+    <p style="margin-bottom:10px"><button class="go" id="dxfBtn" style="display:none;background:#3b82f6">Download DXF (AutoCAD)</button></p>
     <div id="viewport"><div class="hint">drag to orbit · scroll to zoom</div></div>
     <div class="disclaimer" id="sceneDisclaimer"></div>
   </div>
@@ -98,11 +99,18 @@
 </main>
 
 <script type="importmap">
-{ "imports": { "three": "/vendor/three/build/three.module.js" } }
+{
+  "imports": {
+    "three": "/vendor/three/build/three.module.js",
+    "three/examples/jsm/": "/vendor/three/examples/jsm/",
+    "opengeometry": "/vendor/opengeometry/index.js"
+  }
+}
 </script>
 <script type="module">
 import * as THREE from 'three';
-import { OrbitControls } from '/vendor/three/examples/jsm/controls/OrbitControls.js';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { OpenGeometry, Vector3, Cuboid, Cylinder } from 'opengeometry';
 
 const HOME_DEPOT = 'Home Depot - Rexburg ID';
 const token = localStorage.getItem('halofire_token');
@@ -161,9 +169,16 @@ async function refreshEvidence() {
     </div>`).join('') : '<span class="muted">No evidence rows.</span>';
 }
 
-// ── 3D rendering ──
-let renderer, scene3, camera, controls;
-function initViewport() {
+// ── 3D rendering via the OpenGeometry CAD kernel (Rust/WASM) ──
+// Building shell, sized piping (riser->main->branch->drop), and pendent heads
+// are all built from OpenGeometry primitives (Cuboid/Cylinder), not raw Three
+// geometry. cad-model coords are [planX, planY, elevZ]; the scene is Y-up so we
+// map cad (x,y,z) -> world (x, z, y).
+let renderer, scene3, camera, controls, ogReady = false, cadGroup;
+const COLORS = { wall: 0x6b7280, floor: 0x1b1b22, main: 0xE53935, branch: 0x3b82f6, drop: 0x22d3ee, riser: 0xFFD54F, head: 0xff3b30 };
+const PIPE_VIZ_SCALE = 6; // exaggerate pipe radius for visibility at building scale
+
+async function initViewport() {
   const el = document.getElementById('viewport');
   renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(el.clientWidth, el.clientHeight);
@@ -171,59 +186,95 @@ function initViewport() {
   el.appendChild(renderer.domElement);
   scene3 = new THREE.Scene();
   scene3.background = new THREE.Color(0x0a0a0c);
-  camera = new THREE.PerspectiveCamera(55, el.clientWidth / el.clientHeight, 0.1, 5000);
+  camera = new THREE.PerspectiveCamera(55, el.clientWidth / el.clientHeight, 0.1, 8000);
   controls = new OrbitControls(camera, renderer.domElement);
-  scene3.add(new THREE.AmbientLight(0xffffff, 0.6));
-  const dir = new THREE.DirectionalLight(0xffffff, 0.8); dir.position.set(200, 400, 200); scene3.add(dir);
+  scene3.add(new THREE.AmbientLight(0xffffff, 0.7));
+  const dir = new THREE.DirectionalLight(0xffffff, 0.9); dir.position.set(200, 500, 300); scene3.add(dir);
   (function animate() { requestAnimationFrame(animate); controls.update(); renderer.render(scene3, camera); })();
+  // Initialize the OpenGeometry WASM kernel once.
+  await OpenGeometry.create({ wasmURL: '/vendor/opengeometry/opengeometry_bg.wasm' });
+  ogReady = true;
 }
 
-function renderScene(sceneData) {
-  // clear previous meshes (keep lights)
-  for (let i = scene3.children.length - 1; i >= 0; i--) {
-    const c = scene3.children[i];
-    if (c.isMesh || c.isLine || c.isGroup) scene3.remove(c);
+const W = ([x, y, z]) => [x, z, y]; // cad -> world (Y-up)
+
+// Cylinder default axis is +Y; pick an Euler rotation to align it to an
+// axis-aligned pipe direction in world space.
+function pipeRotation(aw, bw) {
+  const dx = Math.abs(bw[0] - aw[0]), dy = Math.abs(bw[1] - aw[1]), dz = Math.abs(bw[2] - aw[2]);
+  if (dy >= dx && dy >= dz) return [0, 0, 0];          // vertical (drops/riser)
+  if (dx >= dz) return [0, 0, Math.PI / 2];            // along world X (branches)
+  return [Math.PI / 2, 0, 0];                          // along world Z (main)
+}
+
+function addPipe(from, to, diameterIn, color) {
+  const aw = W(from), bw = W(to);
+  const len = Math.hypot(bw[0] - aw[0], bw[1] - aw[1], bw[2] - aw[2]);
+  if (len < 1e-3) return;
+  const center = [(aw[0] + bw[0]) / 2, (aw[1] + bw[1]) / 2, (aw[2] + bw[2]) / 2];
+  const [rx, ry, rz] = pipeRotation(aw, bw);
+  const radius = Math.max(0.25, (diameterIn / 12 / 2) * PIPE_VIZ_SCALE);
+  const cyl = new Cylinder({
+    center: new Vector3(center[0], center[1], center[2]),
+    radius, height: len, segments: 12, angle: 360, color,
+    rotation: new Vector3(rx, ry, rz),
+  });
+  cadGroup.add(cyl);
+}
+
+function renderCad(cadModel) {
+  if (!ogReady) return;
+  if (cadGroup) { scene3.remove(cadGroup); }
+  cadGroup = new THREE.Group();
+  scene3.add(cadGroup);
+
+  let minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity, ceil = 14;
+  for (const s of cadModel.solids) {
+    if (s.kind === 'wall') {
+      ceil = Math.max(ceil, s.heightFt);
+      const wc = W([s.center[0], s.center[1], s.heightFt / 2]);
+      const wall = new Cuboid({
+        center: new Vector3(wc[0], wc[1], wc[2]),
+        width: s.lengthFt, height: s.heightFt, depth: s.thicknessFt,
+        color: COLORS.wall, rotation: new Vector3(0, s.rotationY, 0),
+      });
+      cadGroup.add(wall);
+      for (const p of [s.a, s.b]) { minX = Math.min(minX, p[0]); maxX = Math.max(maxX, p[0]); minZ = Math.min(minZ, p[1]); maxZ = Math.max(maxZ, p[1]); }
+    } else if (s.kind === 'pipe') {
+      const c = COLORS[s.role] || COLORS.branch;
+      addPipe(s.from, s.to, s.diameterIn, c);
+    } else if (s.kind === 'head') {
+      const w = W(s.position);
+      const head = new Cylinder({
+        center: new Vector3(w[0], w[1], w[2]),
+        radius: 0.5, height: 0.6, segments: 8, angle: 360, color: COLORS.head,
+        rotation: new Vector3(0, 0, 0),
+      });
+      cadGroup.add(head);
+    }
   }
-  const b = sceneData.bounds;
-  const cx = (b.minX + b.maxX) / 2, cz = (b.minZ + b.maxZ) / 2;
-  const span = Math.max(b.maxX - b.minX, b.maxZ - b.minZ) || 100;
+  // floor slab (thin Cuboid spanning the footprint)
+  const fw = maxX - minX, fd = maxZ - minZ;
+  if (fw > 0 && fd > 0) {
+    const floor = new Cuboid({
+      center: new Vector3((minX + maxX) / 2, -0.25, (minZ + maxZ) / 2),
+      width: fw, height: 0.5, depth: fd, color: COLORS.floor,
+    });
+    cadGroup.add(floor);
+  }
 
-  // floor
-  sceneData.floors.forEach((f) => {
-    const w = b.maxX - b.minX, d = b.maxZ - b.minZ;
-    const floor = new THREE.Mesh(new THREE.PlaneGeometry(w, d),
-      new THREE.MeshStandardMaterial({ color: 0x1b1b22, side: THREE.DoubleSide }));
-    floor.rotation.x = -Math.PI / 2; floor.position.set(cx, 0, cz); scene3.add(floor);
-  });
-  // walls
-  const wallMat = new THREE.MeshStandardMaterial({ color: 0x2a2a33 });
-  sceneData.walls.forEach((w) => {
-    const m = new THREE.Mesh(new THREE.BoxGeometry(w.lengthFt, w.heightFt, w.thicknessFt), wallMat);
-    m.position.set(w.center[0], w.center[1], w.center[2]); m.rotation.y = w.rotationY; scene3.add(m);
-  });
-  // pipes
-  const pipeMat = new THREE.LineBasicMaterial({ color: 0x4DD0E1 });
-  sceneData.pipes.forEach((p) => {
-    const g = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(...p.from), new THREE.Vector3(...p.to)]);
-    scene3.add(new THREE.Line(g, pipeMat));
-  });
-  // heads (instanced for performance — hundreds of heads)
-  const headGeo = new THREE.SphereGeometry(1.1, 8, 8);
-  const headMat = new THREE.MeshStandardMaterial({ color: 0xE53935, emissive: 0x4a0000 });
-  const inst = new THREE.InstancedMesh(headGeo, headMat, sceneData.heads.length);
-  const dummy = new THREE.Object3D();
-  sceneData.heads.forEach((h, i) => { dummy.position.set(...h.position); dummy.updateMatrix(); inst.setMatrixAt(i, dummy.matrix); });
-  scene3.add(inst);
-
-  camera.position.set(cx + span * 0.7, span * 0.9, cz + span * 0.7);
-  controls.target.set(cx, 0, cz); controls.update();
+  const cx = (minX + maxX) / 2, cz = (minZ + maxZ) / 2;
+  const span = Math.max(fw, fd, 40);
+  camera.position.set(cx + span * 0.8, ceil + span * 0.8, cz + span * 0.8);
+  controls.target.set(cx, ceil / 2, cz); controls.update();
 }
 
 async function runBid(extraBody, btn) {
   const orig = btn.textContent; btn.disabled = true; btn.textContent = 'Generating…';
   try {
-    const { bid, scene: sceneData } = await api('/projects/' + encodeURIComponent(HOME_DEPOT) + '/sprinkler-bid', {
-      method: 'POST', body: JSON.stringify({ markupPct: 25, ...extraBody }),
+    lastBody = { markupPct: 25, ...extraBody };
+    const { bid, scene: sceneData, cadModel } = await api('/projects/' + encodeURIComponent(HOME_DEPOT) + '/sprinkler-bid', {
+      method: 'POST', body: JSON.stringify(lastBody),
     });
     const r = bid.rooms[0];
     document.getElementById('bidSummary').innerHTML = `
@@ -244,23 +295,37 @@ async function runBid(extraBody, btn) {
         <td class="${l.priceSource === 'pricebook' ? '' : 'est'}">${l.priceSource}</td></tr>`).join('')}
     </table>`;
 
-    document.getElementById('sceneDisclaimer').textContent = sceneData.disclaimer + ' — ' + bid.disclaimer;
-    renderScene(sceneData);
+    const cm = cadModel ? ` · OpenGeometry: ${cadModel.counts.walls} walls, ${cadModel.counts.pipes} pipes, ${cadModel.counts.heads} heads` : '';
+    document.getElementById('sceneDisclaimer').textContent = cadModel.disclaimer + cm;
+    document.getElementById('dxfBtn').style.display = '';
+    renderCad(cadModel);
     await refreshEvidence(); // shows the best_effort evidence row the engine recorded
   } catch (e) {
     document.getElementById('bidSummary').innerHTML = '<span class="est">Error: ' + e.message + '</span>';
   } finally { btn.disabled = false; btn.textContent = orig; }
 }
 
+let lastBody = { markupPct: 25 };
 document.getElementById('genBtn').onclick = (e) => runBid({}, e.target);
 document.getElementById('genSvgBtn').onclick = (e) => {
   const svg = document.getElementById('svgInput').value.trim();
   if (!svg) { document.getElementById('bidSummary').innerHTML = '<span class="est">Paste SVG first.</span>'; return; }
   runBid({ svg, unitsPerPx: Number(document.getElementById('unitsPerPx').value) || 1 }, e.target);
 };
+document.getElementById('dxfBtn').onclick = async () => {
+  const res = await fetch('/api/projects/' + encodeURIComponent(HOME_DEPOT) + '/cad.dxf', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+    body: JSON.stringify(lastBody),
+  });
+  if (!res.ok) return;
+  const blob = await res.blob();
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = 'halofire-cad.dxf'; a.click();
+  URL.revokeObjectURL(a.href);
+};
 
-initViewport();
-load();
+(async () => { await initViewport(); await load(); })();
 </script>
 </body>
 </html>

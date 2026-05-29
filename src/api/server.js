@@ -19,6 +19,8 @@ import { generateSprinklerBid } from '../engine/sprinkler-layout.js';
 import { buildScene } from '../engine/geometry.js';
 import { buildResolverFromDb } from '../engine/pricebook-pricing.js';
 import { floorPlanFromSvg, normalizeFloorPlan } from '../engine/floorplan-import.js';
+import { buildCadModel } from '../engine/cad-model.js';
+import { toDxf } from '../engine/dxf-export.js';
 import { homeDepotRexburgFloorPlan } from '../data/floorplans.js';
 import { HOME_DEPOT_PROJECT_NAME } from '../data/evidence-gates.js';
 
@@ -236,8 +238,9 @@ app.use(express.json({ limit: '10mb' }));
 app.use('/api/', rateLimit({ windowMs: 15 * 60 * 1000, max: 100, standardHeaders: true, legacyHeaders: false }));
 app.use('/api/auth/login', rateLimit({ windowMs: 15 * 60 * 1000, max: 10, standardHeaders: true, legacyHeaders: false }));
 app.use(express.static(path.resolve(__dirname, '../../')));
-// Serve the bundled Three.js locally (no external CDN dependency for the 3D view).
+// Serve the bundled Three.js + OpenGeometry CAD kernel locally (no CDN).
 app.use('/vendor/three', express.static(path.resolve(__dirname, '../../node_modules/three')));
+app.use('/vendor/opengeometry', express.static(path.resolve(__dirname, '../../node_modules/opengeometry')));
 
 // ── Auth Middleware ──
 function authMiddleware(req, res, next) {
@@ -495,6 +498,9 @@ app.post('/api/projects/:name/sprinkler-bid', authMiddleware, (req, res) => {
     };
     const bid = generateSprinklerBid(floorPlan, opts);
     const scene = buildScene(floorPlan, bid);
+    // 3D-correct CAD model (riser->main->branch->drop->head + NFPA pipe sizing)
+    // rendered in-browser by the OpenGeometry kernel and exportable to DXF.
+    const cadModel = buildCadModel(floorPlan);
 
     // Record that a best-effort layout was generated — as evidence, not a clearance.
     if (normalizeRole(req.user?.role) === 'admin') {
@@ -508,7 +514,30 @@ app.post('/api/projects/:name/sprinkler-bid', authMiddleware, (req, res) => {
         `Generated ${bid.totalHeadCount} heads over ${bid.totalAreaSqFt} sqft. ${bid.disclaimer}`,
       );
     }
-    res.json({ bid, scene });
+    res.json({ bid, scene, cadModel });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// Export the CAD model as an AutoCAD-openable DXF (layered 3D wireframe:
+// building shell, sized piping centerlines, head symbols, pipe-size labels).
+app.post('/api/projects/:name/cad.dxf', authMiddleware, (req, res) => {
+  try {
+    const projectName = req.params.name;
+    let floorPlan = null;
+    if (req.body && typeof req.body.svg === 'string' && req.body.svg.trim()) {
+      floorPlan = floorPlanFromSvg(req.body.svg, { name: projectName, unitsPerPx: Number(req.body.unitsPerPx) || 1 });
+    } else if (req.body && req.body.floorPlan) {
+      floorPlan = normalizeFloorPlan(req.body.floorPlan);
+    } else if (projectName === HOME_DEPOT_PROJECT_NAME) {
+      floorPlan = homeDepotRexburgFloorPlan();
+    }
+    if (!floorPlan) return res.status(400).json({ error: 'No floor plan for DXF export' });
+    const dxf = toDxf(buildCadModel(floorPlan));
+    res.setHeader('Content-Type', 'application/dxf');
+    res.setHeader('Content-Disposition', `attachment; filename="${projectName.replace(/[^a-z0-9]+/gi, '_')}.dxf"`);
+    res.send(dxf);
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
