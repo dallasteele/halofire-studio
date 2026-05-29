@@ -115,23 +115,40 @@ async function loadDeps() {
 
 async function loadLibrary() {
   try {
-    const reg = await import('/src/components/registry.js');
-    const byCat = reg.componentsByCategory();
-    // Honest inventory: no real catalog/generated models are attached yet, so the
-    // registry's own fail-closed inventory reports every component as missing.
-    // (Mirrors the server's /api/parity gate, which is derived the same way.)
-    const inv = reg.buildParityInventory({});
-    const missing = new Set(inv.missing);
+    // Live auto-source manifest: what OpenClaw/OpenSCAD has found or created vs
+    // what still needs a human import. (GET /api/parts — generated/found models
+    // are best-effort, never manufacturer-exact; the parity gate stays blocked.)
+    const parts = await api('/parts');
+    const comps = parts.components || [];
+    const byCat = {};
+    for (const c of comps) (byCat[c.category || 'other'] ||= []).push(c);
     const cats = Object.keys(byCat).sort();
+    const missing = comps.filter(c => !c.present);
+    const srcClass = (c) => c.present ? (c.source === 'catalog' ? 'present' : 'partial') : 'missing';
+    const srcLabel = (c) => c.present ? (c.source === 'catalog' ? 'catalog' : 'auto-built') : 'needs import';
     $('lib').innerHTML = cats.map(cat => {
       const items = byCat[cat].map(c => {
-        const present = !missing.has(c.key);
-        const req = c.required ? '' : ' <span class="muted">(optional)</span>';
-        return `<span class="pill ${present?'present':'missing'}">${c.name||c.key}${req} · ${present?'model':'no model'}</span>`;
+        const cls = srcClass(c);
+        const click = c.present ? '' : ` data-import="${c.key}" style="cursor:pointer" title="click to import a model for this part"`;
+        return `<span class="pill ${cls}"${click}>${c.name || c.key} · ${srcLabel(c)}</span>`;
       }).join('');
       return `<div class="cat">${cat} · ${byCat[cat].length}</div><div>${items}</div>`;
     }).join('');
-    $('lib').insertAdjacentHTML('afterbegin', `<div class="muted" style="margin-bottom:8px">${inv.total} components across ${cats.length} categories · ${inv.present} with real models, ${inv.missing.length} missing. All ‘no model’ until real catalog or generated models are attached — the AUTOSPRINK parity gate stays <b style="color:var(--fire)">blocked</b>.</div>`);
+    const gen = parts.generatedCount ?? comps.filter(c => c.present).length;
+    const miss = parts.missingCount ?? missing.length;
+    $('lib').insertAdjacentHTML('afterbegin',
+      `<div class="muted" style="margin-bottom:8px">${comps.length} components · `
+      + `<b style="color:var(--gold)">${gen} auto-sourced</b> (best-effort, ${parts.manufacturerExactCount || 0} manufacturer-exact) · `
+      + `<b style="color:var(--fire)">${miss} need import</b>. OpenClaw finds/creates parts automatically; you only import the rest. `
+      + `Parity gate stays <b style="color:var(--fire)">${parts.parityGateStatus || 'blocked'}</b> — auto-built parts are not manufacturer-exact.</div>`
+      + (miss ? `<div style="margin:6px 0 10px;padding:8px;border:1px solid rgba(229,57,53,.3);border-radius:8px"><b style="color:var(--fire);font-size:12px">Needs import (${miss})</b> <span class="muted">— OpenClaw hasn't sourced these; point the importer below at a catalog doc/URL.</span><div style="margin-top:6px">${missing.map(c=>`<span class="pill missing" data-import="${c.key}" style="cursor:pointer">${c.name||c.key}</span>`).join('')}</div></div>` : ''));
+    // Clicking a "needs import" part jumps to the documentation importer (the
+    // current per-part import path is the catalogs / manufacturer-cut-sheets slots).
+    $('lib').querySelectorAll('[data-import]').forEach(el => el.addEventListener('click', () => {
+      const sel = $('docType'); if (sel) { sel.value = 'manufacturer_cut_sheets'; }
+      const v = $('docVal'); if (v) { v.placeholder = `catalog URL / file for: ${el.getAttribute('data-import')}`; v.focus(); }
+      $('docVal') && $('docVal').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }));
   } catch(e){ $('lib').innerHTML = '<span class="err">library unavailable: '+e.message+'</span>'; }
 }
 
