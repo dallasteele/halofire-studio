@@ -112,20 +112,21 @@ cover EVERY space with a proper building-wide network. Build that.
       solids, per-space pipe networks, multi-story stacking. counts include
       spaces/walls/columns/openings. Backward compat with floorPlan.rooms/floors
       preserved. dxf-export emits walls/columns/openings on layers. Tests.
-- [~] **T14 — Studio: render accurate building + full system.** IMPLEMENTED + render-
-      path verified 2026-05-29; PIXEL SCREENSHOT PENDING (preview-tooling hang this
-      session — re-confirm the door-cut visually next run). server.js sprinkler-bid
-      accepts a multi-space building drawing (`buildingSvg`) -> buildCadModel(building)
-      (returns isBuilding:true). Studio: "Building drawing (multi-space SVG)" source;
-      renders walls colored by type (interior vs exterior), columns (Cuboid), the full
-      per-space system, and a per-space breakdown panel; door/window openings are cut
-      via OpenGeometry boolean (Cuboid.subtract(Opening), aligned to wall rotation,
-      try/catch -> solid wall fallback). VERIFIED: tests/building-studio-api.test.js
-      (2 tests: cadModel has interior walls + columns + opening metadata + per-space
-      heads; rejects spaceless drawing); full suite 27 files / 232 tests green; live
-      studio render executed cleanly (status "rendered 8 heads · 20 pipe segments";
-      panel "2 spaces · 1 int walls · 2 cols · 1 openings"; no console errors; canvas
-      840x852). NOT pixel-confirmed: the boolean cut producing a visible hole.
+- [x] **T14 — Studio: render accurate building + full system.** DONE 2026-05-29.
+      server.js sprinkler-bid accepts a multi-space building drawing (`buildingSvg`)
+      -> buildCadModel(building) (isBuilding:true). Studio: "Building drawing
+      (multi-space SVG)" source; renders walls colored by type (interior vs
+      exterior), columns (Cuboid), the full per-space system, and a per-space
+      breakdown panel; door/window openings cut via OpenGeometry boolean. FIXED a
+      real bug: subtract requires an OPERAND ARRAY and returns a NEW cut mesh
+      (cutWall now calls wallCuboid.subtract([openings], {}) and renders the
+      returned mesh — the prior single-arg call threw + was swallowed -> solid wall).
+      VERIFIED: tests/building-studio-api.test.js (2 tests); full suite 27 files /
+      232 tests green; live studio render of a 2-space building (status "rendered 10
+      heads · 22 pipe segments") with PROGRAMMATIC PROOF the door-cut worked —
+      window.__wallDebug shows the interior wall (1 opening) at 84 verts vs the 4
+      exterior walls at 36 verts (a hole was cut). Screenshot tool hung this session
+      (WebGL rAF capture), so verified by geometry vertex counts instead.
 - [x] **T10 — Deploy packaging + review packet refresh.** DONE 2026-05-29.
       New truthful packet docs/reviews/2026-05-29-autosprink-clone-review.md
       (what works w/ file cites, exact test count, explicit "still NOT done /
@@ -191,3 +192,4 @@ bridge (best-effort, graceful skip). Parity claim stays BLOCKED until complete.
 - 2026-05-29: T12 full per-space sprinkler system shipped — new src/engine/system-layout.js (layoutBuilding(building) consumes normalizeBuilding output). For EACH story and EACH space it lays out heads independently via the existing layoutRoom() on that space's own polygon (heads fill + are clipped to every space), then COLUMN-AWARE: any head within (sizeFt/2 + 0.5ft clearance) of a story column is nudged to a deterministic ring of nearby in-polygon candidates (+x,-x,+y,-y,diagonals) or dropped if none clear. Building-wide network reuses the riser->cross-main->branch->drop->head topology + NFPA sizePipe from cad-model.js: per-space cross-main sized for space head count, per-row branch lines sized for their head count, plus a per-story FEED MAIN sized for the story head count. Returns {stories:[{level, spaces:[{name,headCount,heads,branchLines,sizing}], storyHeadCount, feedMain}], totalHeadCount, pipeSchedule (diameter->linear ft, sorted), coverageOk (true iff every non-degenerate space has >=1 head), perSpace[]}. New tests/system-layout.test.js (5 hand-checked tests: 2-space 30x20 ordinary building -> both spaces get 6 heads each, totals sum, coverageOk true; heads clipped inside their own polygon; column on a baseline head grid point removes/shifts >=1 head vs no-column baseline; cross-main/branch/feed-main diameters match sizePipe for known counts; every non-degenerate space covered). Full suite 19 files / 144 tests green (was 18/139). Backward compat preserved (no existing file touched; engine consumes building-model output). Pure Node, deterministic, NOT CAD-recognition AI, NO hydraulic calc, NOT AutoSprink/AHJ/PE/manufacturer parity — claim gates stay fail-closed. Next: T13 accurate building CAD model.
 - 2026-05-29: T9 consolidate surfaces shipped — retired the 725-line legacy static fake-data app.html (now a redirect to /workbench.html; fake $revenue/dashboard arrays gone); SPA catch-all in src/api/server.js now serves index.html (landing) for unknown routes, not the old dashboard. All UI flows index->login->workbench->studio. tests/consolidate-surfaces.test.js (4 spawned-server tests: landing at /, /app.html redirects + no fake content, unknown route->landing, workbench+studio still served). Full suite 26 files / 230 tests green; agentic rules ok. Routing/content verified by the spawned-server HTTP test (authoritative for served bytes). Next: T14 studio render accurate multi-space building (openings via OG boolean).
 - 2026-05-29: T14 (partial) accurate-building studio render shipped — server.js sprinkler-bid accepts buildingSvg -> buildCadModel(building) (isBuilding:true); autosprink.html adds a 'Building drawing (multi-space SVG)' source, renders walls by type (interior/exterior color), columns, full per-space system + per-space breakdown panel, and cuts door/window openings via OpenGeometry Cuboid.subtract(Opening) (rotation-aligned, try/catch fallback to solid). tests/building-studio-api.test.js (2 tests). Full suite 27 files/232 tests green; agentic rules ok. Live render executed (status 'rendered 8 heads · 20 pipe segments'; panel '2 spaces · 1 int walls · 2 cols · 1 openings'; canvas 840x852; no console errors). MARKED [~] not [x]: pixel screenshot of the door-cut blocked by a preview-tooling hang this session — re-confirm visually next run. Next: re-verify T14 screenshot, then T20 Settings UI + component-library browser.
+- 2026-05-29: T14 COMPLETED (was [~]) — fixed the door-cut bug: OpenGeometry Cuboid.subtract requires an OPERAND ARRAY and returns a NEW cut mesh, not in-place mutation. cutWall() now calls wallCuboid.subtract([openings], {}) and renderModel adds the RETURNED mesh (prior single-arg subtract(opening) threw 'requires an operand array' + was swallowed by try/catch -> walls rendered solid, no holes). PROOF via window.__wallDebug on a live 2-space building render: 4 exterior walls = 36 verts (solid box) each, interior wall with 1 door opening = 84 verts (hole cut). Status 'rendered 10 heads · 22 pipe segments'. Full suite 27 files/232 tests green; agentic rules ok. Screenshot tool hung (WebGL rAF capture) so verified by geometry vertex counts. Next: T20 Settings UI + component-library browser (BROWSER).
