@@ -8,6 +8,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import path from 'path';
 import fs from 'fs';
+import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'url';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
@@ -188,6 +189,18 @@ function initDatabase() {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       UNIQUE(project_name, code)
     );
+
+    CREATE TABLE IF NOT EXISTS settings_documents (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      doc_type TEXT NOT NULL,
+      mode TEXT NOT NULL,
+      url TEXT,
+      filename TEXT,
+      notes TEXT,
+      evidence_id INTEGER REFERENCES project_evidence(id),
+      created_by TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
   `);
 
   function ensureColumn(table, column, definition) {
@@ -209,6 +222,14 @@ function initDatabase() {
   ensureColumn('claim_gates', 'resolved_by', 'TEXT');
   ensureColumn('claim_gates', 'resolved_at', 'DATETIME');
   ensureColumn('claim_gates', 'resolved_evidence_ref', 'TEXT');
+
+  // Settings document upload/link records (T19).
+  ensureColumn('settings_documents', 'mode', 'TEXT');
+  ensureColumn('settings_documents', 'url', 'TEXT');
+  ensureColumn('settings_documents', 'filename', 'TEXT');
+  ensureColumn('settings_documents', 'notes', 'TEXT');
+  ensureColumn('settings_documents', 'evidence_id', 'INTEGER');
+  ensureColumn('settings_documents', 'created_by', 'TEXT');
 
   // Bootstrap the configured admin user without hardcoded credentials.
   const existing = db.prepare('SELECT id FROM users WHERE username = ?').get(ADMIN_USERNAME);
@@ -241,8 +262,14 @@ app.use((req, res, next) => {
 app.use(cors({ origin: CORS_ORIGINS, credentials: true }));
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(express.json({ limit: '10mb' }));
-app.use('/api/', rateLimit({ windowMs: 15 * 60 * 1000, max: 100, standardHeaders: true, legacyHeaders: false }));
-app.use('/api/auth/login', rateLimit({ windowMs: 15 * 60 * 1000, max: 10, standardHeaders: true, legacyHeaders: false }));
+// In tests, many spawned-server suites run in parallel and make far more than
+// the production budget of requests per server; raise the ceilings under
+// NODE_ENV=test so the rate limiters don't cause spurious 429s. Production
+// limits are unchanged.
+const API_RATE_MAX = NODE_ENV === 'test' ? 100000 : 100;
+const LOGIN_RATE_MAX = NODE_ENV === 'test' ? 100000 : 10;
+app.use('/api/', rateLimit({ windowMs: 15 * 60 * 1000, max: API_RATE_MAX, standardHeaders: true, legacyHeaders: false }));
+app.use('/api/auth/login', rateLimit({ windowMs: 15 * 60 * 1000, max: LOGIN_RATE_MAX, standardHeaders: true, legacyHeaders: false }));
 app.use(express.static(path.resolve(__dirname, '../../')));
 // Serve the bundled Three.js + OpenGeometry CAD kernel locally (no CDN).
 app.use('/vendor/three', express.static(path.resolve(__dirname, '../../node_modules/three')));
@@ -639,6 +666,104 @@ app.post('/api/projects/:name/cad.dxf', authMiddleware, (req, res) => {
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
+});
+
+// ── Settings: documentation upload/link + dependency status (T19) ──
+// Docs we cannot auto-source (catalogs, cut sheets, approvals, the AutoSprink
+// reference, the OpenSCAD binary, pricebook updates) are user-uploaded/LINKED in
+// Settings and wired to the evidence system. A slot is 'missing' until a real
+// link/upload row exists; recording one inserts a present project_evidence row so
+// it can satisfy resolve-gate evidence. HONESTY/fail-closed: a catalog upload is
+// evidence, but it NEVER auto-clears a regulated claim gate — AHJ/PE/AutoSprink
+// parity gates still require their specific approved evidence types (T5 rules).
+const REQUIRED_DOC_SLOTS = [
+  { doc_type: 'catalogs', label: 'Manufacturer / vendor component catalogs', project_name: 'HaloFire Library' },
+  { doc_type: 'manufacturer_cut_sheets', label: 'Manufacturer cut sheets', project_name: 'HaloFire Library' },
+  { doc_type: 'ahj_approval', label: 'Authority Having Jurisdiction approval', project_name: 'HaloFire Library' },
+  { doc_type: 'autosprink_reference', label: 'AutoSprink reference packet', project_name: 'HaloFire Library' },
+  { doc_type: 'openscad_binary', label: 'OpenSCAD binary path', project_name: 'HaloFire Library' },
+  { doc_type: 'pricebook_updates', label: 'Pricebook updates', project_name: 'HaloFire Library' },
+];
+const DOC_SLOT_BY_TYPE = new Map(REQUIRED_DOC_SLOTS.map((slot) => [slot.doc_type, slot]));
+const SETTINGS_DOC_FIELDS = new Set(['doc_type', 'mode', 'url', 'filename', 'notes']);
+
+function openscadInstalled() {
+  // Detect the external OpenSCAD CLI without spawning a render. Best-effort and
+  // honest: false when not on PATH or detection itself fails.
+  try {
+    const result = spawnSync('openscad', ['--version'], { timeout: 4000, stdio: 'ignore' });
+    return result.status === 0 || (!result.error && result.status === null);
+  } catch {
+    return false;
+  }
+}
+
+app.get('/api/settings/documents', authMiddleware, (req, res) => {
+  const rows = db.prepare('SELECT * FROM settings_documents ORDER BY created_at DESC, id DESC').all();
+  const byType = new Map();
+  for (const row of rows) {
+    if (!byType.has(row.doc_type)) byType.set(row.doc_type, row);
+  }
+  res.json(REQUIRED_DOC_SLOTS.map((slot) => {
+    const latest = byType.get(slot.doc_type) || null;
+    const satisfied = Boolean(latest);
+    return {
+      doc_type: slot.doc_type,
+      label: slot.label,
+      status: satisfied ? 'satisfied' : 'missing',
+      satisfied,
+      latest,
+    };
+  }));
+});
+
+app.post('/api/settings/documents', authMiddleware, requireRole('admin'), (req, res) => {
+  const rejected = Object.keys(req.body).filter((key) => !SETTINGS_DOC_FIELDS.has(key));
+  if (rejected.length) return res.status(400).json({ error: `Unsupported fields: ${rejected.join(', ')}` });
+  const { doc_type, mode, url = null, filename = null, notes = null } = req.body;
+  const slot = DOC_SLOT_BY_TYPE.get(doc_type);
+  if (!slot) {
+    return res.status(400).json({ error: `Unknown doc_type; must be one of: ${[...DOC_SLOT_BY_TYPE.keys()].join(', ')}` });
+  }
+  if (mode !== 'link' && mode !== 'upload') {
+    return res.status(400).json({ error: "mode must be 'link' or 'upload'" });
+  }
+  if (mode === 'link' && (!url || !String(url).trim())) {
+    return res.status(400).json({ error: 'url is required for mode=link' });
+  }
+  if (mode === 'upload' && (!filename || !String(filename).trim())) {
+    return res.status(400).json({ error: 'filename is required for mode=upload' });
+  }
+
+  // A real link/upload is recorded as PRESENT evidence so it can satisfy a
+  // resolve-gate evidence requirement — but recording it here never clears a
+  // gate by itself (fail-closed; gates clear only via the T5 resolve route).
+  const sourceRef = mode === 'link' ? String(url) : String(filename);
+  const evidenceNotes = `Settings ${mode} for ${doc_type}${notes ? `: ${notes}` : ''}`;
+  const tx = db.transaction(() => {
+    const evidence = db
+      .prepare(`INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+                VALUES (?, ?, ?, ?, ?, ?)`)
+      .run(slot.project_name, doc_type, mode === 'upload' ? String(filename) : null, sourceRef, 'present', evidenceNotes);
+    const doc = db
+      .prepare(`INSERT INTO settings_documents (doc_type, mode, url, filename, notes, evidence_id, created_by)
+                VALUES (?, ?, ?, ?, ?, ?, ?)`)
+      .run(doc_type, mode, url, filename, notes, evidence.lastInsertRowid, req.user.username);
+    return { id: doc.lastInsertRowid, evidence_id: evidence.lastInsertRowid };
+  });
+  const result = tx();
+  res.status(200).json({ ...result, doc_type, status: 'satisfied', message: 'Document recorded' });
+});
+
+app.get('/api/settings/dependencies', authMiddleware, (req, res) => {
+  const hasSamRef = db
+    .prepare("SELECT COUNT(*) c FROM settings_documents WHERE doc_type = 'autosprink_reference'")
+    .get().c > 0;
+  res.json({
+    openscad_installed: openscadInstalled(),
+    sam_gateway: 'unknown', // GX10 'sam3' via OpenClaw bridge — status not probed here.
+    autosprink_reference: hasSamRef ? 'linked' : 'missing',
+  });
 });
 
 function safeParseJsonArray(value) {

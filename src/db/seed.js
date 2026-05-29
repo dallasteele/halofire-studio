@@ -124,6 +124,18 @@ db.exec(`
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(project_name, code)
   );
+
+  CREATE TABLE IF NOT EXISTS settings_documents (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    doc_type TEXT NOT NULL,
+    mode TEXT NOT NULL,
+    url TEXT,
+    filename TEXT,
+    notes TEXT,
+    evidence_id INTEGER REFERENCES project_evidence(id),
+    created_by TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
 `);
 
 function ensureColumn(table, column, definition) {
@@ -145,6 +157,14 @@ db.exec('DROP INDEX IF EXISTS pricebook_supplier_sku_source_row_idx');
 ensureColumn('claim_gates', 'resolved_by', 'TEXT');
 ensureColumn('claim_gates', 'resolved_at', 'DATETIME');
 ensureColumn('claim_gates', 'resolved_evidence_ref', 'TEXT');
+
+// Settings document upload/link records (T19).
+ensureColumn('settings_documents', 'mode', 'TEXT');
+ensureColumn('settings_documents', 'url', 'TEXT');
+ensureColumn('settings_documents', 'filename', 'TEXT');
+ensureColumn('settings_documents', 'notes', 'TEXT');
+ensureColumn('settings_documents', 'evidence_id', 'INTEGER');
+ensureColumn('settings_documents', 'created_by', 'TEXT');
 
 const adminUser = process.env.HALOFIRE_ADMIN_USER || 'admin';
 const existingAdmin = db.prepare('SELECT id FROM users WHERE username = ?').get(adminUser);
