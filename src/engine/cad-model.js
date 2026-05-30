@@ -139,7 +139,7 @@ export function buildRoomCad(room, layoutArg) {
 
     // Discrete component placement markers, derived from the riser/cross-main
     // network coords above (never fabricated). Fail-closed: skip unknown keys.
-    pushComponentMarkers(solids, '', mainX, y0, mainZ, branchLines);
+    pushComponentMarkers(solids, '', mainX, y0, mainZ, branchZ, mainDia, branchLines);
   }
 
   return {
@@ -344,7 +344,7 @@ function buildStoryCad(story, layoutStory) {
 
     // Per-space component placement markers, derived from this space's network
     // coords (never fabricated). Z-lifted below by offsetSolidZ. Fail-closed.
-    pushComponentMarkers(localSolids, `${space.name}/`, mainX, y0, mainZ, space.branchLines);
+    pushComponentMarkers(localSolids, `${space.name}/`, mainX, y0, mainZ, branchZ, mainDia, space.branchLines);
   }
 
   const solids = localSolids.map((s) => offsetSolidZ(s, baseElevationFt));
@@ -480,9 +480,11 @@ export function buildCadModel(floorPlan) {
  * @param {number} mainX  cross-main / riser X (plan)
  * @param {number} y0     riser foot Y (min branch Y)
  * @param {number} mainZ  cross-main elevation (riser top)
- * @param {Array} branchLines branch lines, each with a `.y` and `.row`
+ * @param {number} branchZ branch-line elevation (drops hang below this)
+ * @param {number} mainDia cross-main pipe diameter (in) for reducer step detection
+ * @param {Array} branchLines branch lines, each with `.row`/`.y`/`.startX`/`.endX`/`.diameterIn`
  */
-function pushComponentMarkers(solids, prefix, mainX, y0, mainZ, branchLines) {
+function pushComponentMarkers(solids, prefix, mainX, y0, mainZ, branchZ, mainDia, branchLines) {
   const place = (key, name, position) => {
     const def = getComponent(key);
     if (!def) return; // fail-closed: skip unknown registry keys
@@ -501,6 +503,25 @@ function pushComponentMarkers(solids, prefix, mainX, y0, mainZ, branchLines) {
   // A tee at each branch-to-cross-main junction (the riser-tie top points).
   for (const b of branchLines) {
     place('fitting_tee', `tee-main-${b.row}`, [mainX, b.y, mainZ]);
+  }
+
+  // 90° elbow at the riser top turn (vertical riser -> horizontal cross-main),
+  // co-located with the riser assembly but a distinct fitting marker.
+  place('fitting_elbow_90', 'elbow-riser-top', [mainX, y0, mainZ]);
+
+  for (const b of branchLines) {
+    // 90° elbow at the far (end-of-line) end of each branch run, where the
+    // branch turns/terminates. Derived from the branch endX coordinate.
+    place('fitting_elbow_90', `elbow-branch-${b.row}`, [round(b.endX), b.y, branchZ]);
+    // Coupling at the interior midpoint of each branch run (pipe-stick joint),
+    // derived from startX/endX — never invented.
+    const midX = round((b.startX + b.endX) / 2);
+    place('fitting_coupling', `coupling-branch-${b.row}`, [midX, b.y, branchZ]);
+    // Concentric reducer only where the branch is genuinely smaller than the
+    // cross-main it ties into (a real size change). Equal diameters -> none.
+    if (b.diameterIn < mainDia) {
+      place('fitting_reducer', `reducer-branch-${b.row}`, [mainX, b.y, branchZ]);
+    }
   }
 }
 

@@ -42,6 +42,10 @@ describe('buildRoomCad — discrete component placement markers', () => {
     const ys = cad.network.branchLines.map((b) => b.y);
     const yMin = Math.min(...ys);
     const yMax = Math.max(...ys);
+    // plan X span across the riser axis and every branch run end (derived).
+    const xsAll = cad.network.branchLines.flatMap((b) => [b.startX, b.endX]).concat([mainX]);
+    const xMin = Math.min(...xsAll);
+    const xMax = Math.max(...xsAll);
     // plan bbox of the 60x40 room
     expect(mainX).toBeGreaterThanOrEqual(0);
     expect(mainX).toBeLessThanOrEqual(60);
@@ -50,14 +54,93 @@ describe('buildRoomCad — discrete component placement markers', () => {
       expect(typeof x).toBe('number');
       expect(typeof y).toBe('number');
       expect(typeof z).toBe('number');
-      // X is the riser/cross-main X — every marker shares it (derived, not fabricated)
-      expect(x).toBe(mainX);
+      // X within the derived network plan span (riser axis .. branch ends).
+      expect(x).toBeGreaterThanOrEqual(xMin);
+      expect(x).toBeLessThanOrEqual(xMax);
       // Y within the branch-line span
       expect(y).toBeGreaterThanOrEqual(yMin);
       expect(y).toBeLessThanOrEqual(yMax);
       // Z within floor..main elevation
       expect(z).toBeGreaterThanOrEqual(0);
       expect(z).toBeLessThanOrEqual(mainZ);
+    }
+  });
+});
+
+describe('buildRoomCad — connector fittings (elbow / coupling / reducer)', () => {
+  const cad = buildRoomCad(room);
+  const components = cad.solids.filter((s) => s.kind === 'component');
+  const byKey = (k) => components.filter((c) => c.componentKey === k);
+
+  it('emits >=1 fitting_elbow_90 and >=1 fitting_coupling for a 60x40 room', () => {
+    expect(byKey('fitting_elbow_90').length).toBeGreaterThanOrEqual(1);
+    expect(byKey('fitting_coupling').length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('emits one elbow per branch far-end plus one riser-top elbow', () => {
+    const n = cad.network.branchLines.length;
+    expect(byKey('fitting_elbow_90')).toHaveLength(n + 1);
+  });
+
+  it('emits one coupling per branch line at its interior midpoint', () => {
+    const couplings = byKey('fitting_coupling');
+    expect(couplings).toHaveLength(cad.network.branchLines.length);
+    for (const b of cad.network.branchLines) {
+      const midX = Math.round(((b.startX + b.endX) / 2) * 1000) / 1000;
+      const c = couplings.find((cc) => cc.name.endsWith(`coupling-branch-${b.row}`));
+      expect(c).toBeTruthy();
+      expect(c.position[0]).toBe(midX);
+      expect(c.position[1]).toBe(b.y);
+      expect(c.position[2]).toBe(cad.network.branchZ);
+    }
+  });
+
+  it('every connector componentKey resolves via getComponent and is numeric within bbox', () => {
+    const { mainX, mainZ, branchZ } = cad.network;
+    const xs = cad.network.branchLines.flatMap((b) => [b.startX, b.endX]);
+    const xMax = Math.max(mainX, ...xs);
+    const connectorKeys = ['fitting_elbow_90', 'fitting_coupling', 'fitting_reducer'];
+    const connectors = components.filter((c) => connectorKeys.includes(c.componentKey));
+    expect(connectors.length).toBeGreaterThan(0);
+    for (const c of connectors) {
+      const def = getComponent(c.componentKey);
+      expect(def).toBeTruthy();
+      expect(c.category).toBe(def.category);
+      const [x, y, z] = c.position;
+      expect(typeof x).toBe('number');
+      expect(typeof y).toBe('number');
+      expect(typeof z).toBe('number');
+      expect(x).toBeGreaterThanOrEqual(0);
+      expect(x).toBeLessThanOrEqual(xMax);
+      expect(z).toBeGreaterThanOrEqual(0);
+      expect(z).toBeLessThanOrEqual(mainZ);
+      // connectors sit at or below the cross-main elevation
+      expect(z).toBeLessThanOrEqual(branchZ === undefined ? mainZ : Math.max(branchZ, mainZ));
+    }
+  });
+
+  it('emits fitting_reducer exactly where a branch is smaller than the cross-main', () => {
+    const reducers = byKey('fitting_reducer');
+    const expectedSteps = cad.network.branchLines
+      .filter((b) => b.diameterIn < cad.sizing.mainDiameterIn).length;
+    expect(reducers).toHaveLength(expectedSteps);
+    // each reducer sits at the branch/cross-main junction (mainX, b.y, branchZ)
+    for (const r of reducers) {
+      expect(r.position[0]).toBe(cad.network.mainX);
+      expect(r.position[2]).toBe(cad.network.branchZ);
+    }
+  });
+
+  it('emits no reducer when every branch diameter equals the cross-main (single-branch space)', () => {
+    // A tiny room with a single branch line: cross-main dia == branch dia.
+    const tiny = buildRoomCad({ name: 'Closet', polygon: rect(10, 8), hazard: 'light', ceilingHeightFt: 12 });
+    const tinyBranches = tiny.network.branchLines;
+    const allEqual = tinyBranches.every((b) => b.diameterIn === tiny.sizing.mainDiameterIn);
+    const reducers = tiny.solids.filter((s) => s.kind === 'component' && s.componentKey === 'fitting_reducer');
+    if (allEqual) {
+      expect(reducers).toHaveLength(0);
+    } else {
+      expect(reducers.length).toBeGreaterThan(0);
     }
   });
 });
