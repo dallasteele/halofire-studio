@@ -211,6 +211,54 @@ describe('T22 full-scope bid wired into sprinkler-bid', () => {
     expect(body.fullScopeBid.calibration ?? null).toBeNull();
   });
 
+  // T25: Home Depot is an ESFR warehouse system. The auto-estimate now models
+  // the ESFR class -> materialsOnly grows materially past the pre-T25 ~$66k and
+  // the BOM carries the ESFR main lines. No gate flips; calibration stays
+  // informational and the delta stays honest.
+  it('Home Depot uses the ESFR class: materially larger materials + ESFR main lines', async () => {
+    const res = await post(HOME_DEPOT, {});
+    expect(res.status).toBe(200);
+    const body = await res.json();
+
+    // BOM carries the ESFR head + diameter-aware main lines.
+    const bomKeys = (body.bid.bom || []).map((b) => b.key);
+    expect(bomKeys).toContain('esfr_head');
+    expect(bomKeys).toContain('cross_main_pipe');
+    expect(bomKeys).toContain('feed_main_pipe');
+    expect(bomKeys).toContain('bulk_main_pipe');
+    expect(bomKeys).toContain('underground_main');
+    // ESFR replaces the basic spray head line (no double-counting heads).
+    expect(bomKeys).not.toContain('sprinkler_head');
+
+    const fsb = body.fullScopeBid;
+    expect(fsb.error).toBeUndefined();
+    // Materially larger than the pre-T25 ~$66k bare-materials estimate.
+    expect(fsb.materialsOnly).toBeGreaterThan(120000);
+
+    // Calibration delta is still computed and stays honest (short of real).
+    const cal = fsb.calibration;
+    expect(typeof cal.deltaPct).toBe('number');
+    expect(cal.deltaPct).toBeLessThan(0);
+
+    // No gate flips on the full-scope bid.
+    expect(fsb.estimate).toBe(true);
+    expect(fsb.parity).toBeUndefined();
+    expect(fsb.approved).not.toBe(true);
+  });
+
+  it('a generic ordinary-hazard project carries NO ESFR lines', async () => {
+    const res = await post(GENERIC, { floorPlan: FLOOR_PLAN });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    const bomKeys = (body.bid.bom || []).map((b) => b.key);
+    expect(bomKeys).toContain('sprinkler_head');
+    expect(bomKeys).not.toContain('esfr_head');
+    expect(bomKeys).not.toContain('cross_main_pipe');
+    expect(bomKeys).not.toContain('feed_main_pipe');
+    expect(bomKeys).not.toContain('bulk_main_pipe');
+    expect(bomKeys).not.toContain('underground_main');
+  });
+
   it('does not flip any gate: /submittal stays submittalReady=false', async () => {
     const res = await fetch(`${BASE}${HOME_DEPOT}/submittal`, {
       method: 'POST',

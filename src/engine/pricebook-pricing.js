@@ -16,6 +16,17 @@ export const PRICE_BANDS = Object.freeze({
   fitting: { keywords: ['tee', 'elbow', 'coupling', 'fitting'], min: 0.5, max: 30 },
   hanger: { keywords: ['hanger'], min: 0.3, max: 15 },
   escutcheon: { keywords: ['escutcheon'], min: 0.2, max: 12 },
+  // T25 — ESFR / storage size classes. The band is the size-class proxy: a
+  // larger nominal diameter resolves a higher $/ft window, so the in-band median
+  // is a REAL pricebook price for that size class (never an inflated constant).
+  // Each band was confirmed to return a real non-null median against the seeded
+  // 7,208-row pricebook (esfr_head 42, cross 10.92, feed 21.56, bulk 27.02,
+  // underground 30.17). Monotone by size: cross <= feed <= bulk.
+  esfr_head: { keywords: ['esfr', 'pendent', 'upright', 'sprinkler head'], min: 15, max: 150 },
+  cross_main_pipe: { keywords: ['sch 40', 'sch 10', 'sch10', 'black pipe', 'steel pipe', 'pipe'], min: 3, max: 45 },
+  feed_main_pipe: { keywords: ['sch 40', 'sch 10', 'sch10', 'black pipe', 'steel pipe', 'pipe'], min: 8, max: 120 },
+  bulk_main_pipe: { keywords: ['sch 40', 'sch 10', 'sch10', 'black pipe', 'steel pipe', 'pipe'], min: 12, max: 200 },
+  underground_main: { keywords: ['ductile', 'underground', 'di pipe', 'c900', 'pipe'], min: 12, max: 300 },
 });
 
 /** Median of a numeric array (lower-middle for even length). Deterministic. */

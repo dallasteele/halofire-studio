@@ -22,11 +22,22 @@ export const HAZARD_RULES = Object.freeze({
   extra: { label: 'Extra Hazard', maxAreaSqFt: 100, maxSpacingFt: 12, minSpacingFt: 6 },
 });
 
+// NFPA 13 STORAGE / ESFR protection values (public code). ESFR (Early
+// Suppression Fast Response) for high-piled / rack storage warehouses uses a
+// max coverage of 100 sqft per head and a minimum spacing of 8 ft (NFPA 13
+// storage chapters). Kept SEPARATE from the standard-spray HAZARD_RULES map so
+// light/ordinary/extra projects are byte-for-byte unchanged; getHazardRule
+// merges this in additively. `storage:true` marks the storage system class.
+export const STORAGE_RULES = Object.freeze({
+  esfr: { label: 'ESFR Storage', maxAreaSqFt: 100, maxSpacingFt: 12, minSpacingFt: 8, storage: true },
+});
+
 export function getHazardRule(hazard) {
   const key = String(hazard || 'ordinary').toLowerCase();
-  const rule = HAZARD_RULES[key];
+  const rule = HAZARD_RULES[key] || STORAGE_RULES[key];
   if (!rule) {
-    throw new Error(`Unknown hazard class "${hazard}". Use one of: ${Object.keys(HAZARD_RULES).join(', ')}`);
+    const known = [...Object.keys(HAZARD_RULES), ...Object.keys(STORAGE_RULES)];
+    throw new Error(`Unknown hazard class "${hazard}". Use one of: ${known.join(', ')}`);
   }
   return { key, ...rule };
 }
@@ -175,9 +186,70 @@ export function buildBillOfMaterials(layout, piping) {
 }
 
 /**
+ * Documented default assumptions for the ESFR/storage system scope. These are
+ * NOT derived from geometry — they are labelled, overridable documented
+ * conventions (like SOFT_COST_ASSUMPTIONS / LABOR_ASSUMPTIONS), so the lines
+ * that use them carry assumption:true. NEVER tuned to hit a target number.
+ *   bulkMainFt    — assumed riser / bulk-main vertical run feeding the system.
+ *   undergroundFt — assumed underground lead-in from the city main to the riser.
+ */
+export const ESFR_SCOPE_ASSUMPTIONS = Object.freeze({
+  bulkMainFt: 40,
+  undergroundFt: 100,
+});
+
+/**
+ * Build the EXTRA, diameter-aware BOM lines for an ESFR storage system, ADDITIVE
+ * on top of the existing branch-pipe / fitting / hanger lines. Every quantity is
+ * either (a) derived from the routed geometry the engine already produced, or
+ * (b) a clearly-labelled documented assumption (assumption:true). Nothing here
+ * is reverse-engineered to match a known total.
+ *
+ * The ESFR head line REPLACES the standard-spray sprinkler_head line at the call
+ * site (heads are not double-counted): same head count, ESFR head price class.
+ *
+ * Derivations:
+ *   esfr_head        EA  qty = layout.heads.length                         (geometry)
+ *   cross_main_pipe  FT  qty = piping.crossMainFt, 3" ESFR cross main      (geometry)
+ *   feed_main_pipe   FT  qty = round(max(bbox.width, bbox.height)) — ONE   (geometry)
+ *                        feed main running the long dimension of the system,
+ *                        6" nominal.
+ *   bulk_main_pipe   FT  qty = ESFR_SCOPE_ASSUMPTIONS.bulkMainFt, 6"       (assumption)
+ *   underground_main FT  qty = ESFR_SCOPE_ASSUMPTIONS.undergroundFt, 8"    (assumption)
+ *
+ * @param {{heads:Array, bbox:{width:number,height:number}}} layout
+ * @param {{crossMainFt:number}} piping
+ * @param {{bulkMainFt?:number, undergroundFt?:number}} opts
+ * @returns {Array<{key,description,unit,quantity,nominalIn,scope,assumption?}>}
+ */
+export function buildEsfrSystemScope(layout, piping, opts = {}) {
+  const bbox = layout?.bbox || boundingBox((layout?.heads || []).map((h) => [h.x, h.y]).length >= 3
+    ? layout.heads.map((h) => [h.x, h.y]) : [[0, 0], [0, 0], [0, 0]]);
+  const headCount = Array.isArray(layout?.heads) ? layout.heads.length : 0;
+  const crossMainFt = round(piping?.crossMainFt ?? 0);
+  // ONE feed main running the long building dimension (NFPA-13 storage systems
+  // feed cross mains from a feed main spanning the long axis of the system).
+  const feedMainFt = round(Math.max(bbox.width || 0, bbox.height || 0));
+  const bulkMainFt = round(opts.bulkMainFt ?? ESFR_SCOPE_ASSUMPTIONS.bulkMainFt);
+  const undergroundFt = round(opts.undergroundFt ?? ESFR_SCOPE_ASSUMPTIONS.undergroundFt);
+
+  return [
+    { key: 'esfr_head', description: 'ESFR storage sprinkler head', unit: 'EA', quantity: headCount, nominalIn: null, scope: 'esfr' },
+    { key: 'cross_main_pipe', description: 'ESFR cross main', unit: 'FT', quantity: crossMainFt, nominalIn: 3, scope: 'esfr' },
+    { key: 'feed_main_pipe', description: 'ESFR feed main (long building dimension)', unit: 'FT', quantity: feedMainFt, nominalIn: 6, scope: 'esfr' },
+    { key: 'bulk_main_pipe', description: 'ESFR riser / bulk main run (documented assumption)', unit: 'FT', quantity: bulkMainFt, nominalIn: 6, scope: 'esfr', assumption: true },
+    { key: 'underground_main', description: 'Underground lead-in main (documented assumption)', unit: 'FT', quantity: undergroundFt, nominalIn: 8, scope: 'esfr', assumption: true },
+  ];
+}
+
+/**
  * Default unit-cost map (USD) used only when a pricebook lookup is unavailable.
  * Real bids must resolve prices from the imported vendor pricebooks; these are
  * clearly-labelled fallback placeholders for internal-alpha math only.
+ *
+ * The ESFR/storage entries (cross/feed/bulk/underground/esfr_head) are likewise
+ * labelled fallbacks: representative size-class $/ft figures used ONLY when the
+ * real pricebook band lookup returns null. Real bids use the pricebook median.
  */
 export const FALLBACK_UNIT_COSTS = Object.freeze({
   sprinkler_head: 12.5,
@@ -185,6 +257,12 @@ export const FALLBACK_UNIT_COSTS = Object.freeze({
   fitting: 3.75,
   hanger: 2.1,
   escutcheon: 1.6,
+  // ESFR / storage size classes (labelled fallbacks only).
+  esfr_head: 38,
+  cross_main_pipe: 9,
+  feed_main_pipe: 22,
+  bulk_main_pipe: 35,
+  underground_main: 30,
 });
 
 /**
@@ -205,7 +283,11 @@ export function priceBid(bom, { priceResolver = () => null, laborRatePerHead = 8
     };
   });
   const materialCost = round(lines.reduce((sum, l) => sum + l.lineTotal, 0));
-  const headCount = bom.find((b) => b.key === 'sprinkler_head')?.quantity ?? 0;
+  // Head count drives the flat labor allowance. For ESFR systems the head line
+  // is esfr_head (the standard spray sprinkler_head line is replaced upstream).
+  const headCount = bom.find((b) => b.key === 'sprinkler_head')?.quantity
+    ?? bom.find((b) => b.key === 'esfr_head')?.quantity
+    ?? 0;
   const laborCost = round(headCount * laborRatePerHead);
   const subtotal = round(materialCost + laborCost);
   const markup = round(subtotal * (markupPct / 100));

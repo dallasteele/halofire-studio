@@ -16,7 +16,7 @@ import Database from 'better-sqlite3';
 import rateLimit from 'express-rate-limit';
 import 'dotenv/config';
 import { createLogger } from '../core/logger.js';
-import { generateSprinklerBid } from '../engine/sprinkler-layout.js';
+import { generateSprinklerBid, buildEsfrSystemScope, priceBid } from '../engine/sprinkler-layout.js';
 import { buildFullScopeBid } from '../engine/bid-scope.js';
 import { buildScene } from '../engine/geometry.js';
 import { buildResolverFromDb } from '../engine/pricebook-pricing.js';
@@ -676,12 +676,62 @@ function runSprinklerPipeline(req) {
   if (req.body && ['light', 'ordinary', 'extra'].includes(String(req.body.hazard))) {
     floorPlan = { ...floorPlan, rooms: floorPlan.rooms.map((r) => ({ ...r, hazard: req.body.hazard })) };
   }
+
+  // T25 — ESFR/storage system class. The built-in Home Depot project is an ESFR
+  // warehouse system; a caller may also request it explicitly via
+  // systemClass:"esfr". When ESFR, lay the system out with the ESFR storage
+  // hazard rule AND append the diameter-aware ESFR mains scope to the BOM below.
+  // Non-ESFR projects are byte-for-byte unchanged (this branch never runs).
+  const isEsfr = projectName === HOME_DEPOT_PROJECT_NAME
+    || String(req.body?.systemClass || '').toLowerCase() === 'esfr';
+  if (isEsfr) {
+    floorPlan = { ...floorPlan, rooms: floorPlan.rooms.map((r) => ({ ...r, hazard: 'esfr' })) };
+  }
+
   const opts = {
     priceResolver: buildResolverFromDb(db),
     laborRatePerHead: Number(req.body?.laborRatePerHead) || 85,
     markupPct: Number(req.body?.markupPct) || 25,
   };
   const bid = generateSprinklerBid(floorPlan, opts);
+
+  // T25 — Append the ESFR system scope (esfr heads + diameter-aware feed/cross/
+  // bulk mains + underground lead-in) to the aggregated BOM, then re-price so the
+  // materialCost reflects the real ESFR materials from the pricebook. ADDITIVE +
+  // fail-soft: any error leaves the standard bid untouched. ESFR heads REPLACE
+  // the standard spray sprinkler_head line (no double-counting); pricing flows
+  // through the same priceResolver (real pricebook medians, labelled fallbacks).
+  if (isEsfr) {
+    try {
+      const esfrScope = [];
+      for (const room of bid.rooms) {
+        if (room.layout && room.piping) {
+          esfrScope.push(...buildEsfrSystemScope(room.layout, room.piping, {
+            bulkMainFt: Number(req.body?.esfrBulkMainFt) || undefined,
+            undergroundFt: Number(req.body?.esfrUndergroundFt) || undefined,
+          }));
+        }
+      }
+      if (esfrScope.length) {
+        // Aggregate ESFR scope by key across rooms.
+        const esfrByKey = new Map();
+        for (const line of esfrScope) {
+          const prev = esfrByKey.get(line.key);
+          if (prev) prev.quantity = round2(prev.quantity + line.quantity);
+          else esfrByKey.set(line.key, { ...line });
+        }
+        // Drop the standard spray head line; ESFR heads take its place.
+        const augmentedBom = bid.bom.filter((b) => b.key !== 'sprinkler_head');
+        augmentedBom.push(...esfrByKey.values());
+        bid.bom = augmentedBom;
+        bid.systemClass = 'esfr';
+        // Re-price the augmented BOM through the same resolver + markup options.
+        bid.pricing = priceBid(bid.bom, opts);
+      }
+    } catch (e) {
+      log.warn?.('esfr scope augmentation failed; keeping standard bid', { error: e.message });
+    }
+  }
   const scene = buildScene(floorPlan, bid);
   // 3D-correct CAD model. For a building drawing this carries interior+exterior
   // walls (with door/window opening metadata) + columns + per-space networks.
