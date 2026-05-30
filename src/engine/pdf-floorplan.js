@@ -257,6 +257,208 @@ function boundingBox(segments) {
   };
 }
 
+const ISOLATE_NOTE =
+  'Heuristic content-region approximation (T29): the sheet-frame border and ' +
+  'detached title-block/legend clusters are stripped and the densest contiguous ' +
+  'geometry cluster is isolated, yielding a tighter bbox than the whole sheet. ' +
+  'This is a BEST-EFFORT APPROXIMATION — NOT a precise building outline, NOT a ' +
+  'room segmentation, and NOT an AHJ/PE/accurate drawing. No scale guessing: the ' +
+  'PDF-point->feet scale stays operator-supplied. Deterministic.';
+
+/**
+ * PURE. Heuristic content-region tightener (T29).
+ *
+ * Given the raw extracted segments (already in feet — the operator-supplied scale
+ * was applied upstream by extractSegmentsFromOpList), narrow the WHOLE-SHEET bbox
+ * down to the dominant plan-body content region. This is explicitly a HEURISTIC
+ * APPROXIMATION (see ISOLATE_NOTE): it strips the sheet frame and isolates the
+ * densest geometry cluster. It is NOT a building outline, NOT a room segmentation,
+ * and introduces NO scale guessing.
+ *
+ * Algorithm (deterministic):
+ *  a) Compute the full bbox of all segments.
+ *  b) STRIP THE SHEET FRAME: drop axis-aligned segments that hug a full-bbox edge
+ *     (within `borderMarginFrac` of the bbox size from that edge) AND span at least
+ *     `borderSpanFrac` of that edge dimension. These are the drawing border/frame.
+ *  c) DOMINANT CLUSTER: bin the remaining segment MIDPOINTS into a coarse `gridN` x
+ *     `gridN` grid over the post-border bbox; flood-fill (4-neighbour) the occupied
+ *     cells into contiguous groups; pick the group whose cells hold the most
+ *     segments; return the bbox of those segments. This drops detached title-block /
+ *     legend / detail clusters that are not part of the main plan body.
+ *  d) FALLBACKS (never throw, never return an empty/zero region): if stripping +
+ *     clustering leaves < 3 segments, fall back to the post-border bbox; if that is
+ *     empty, fall back to the full bbox. The result is always clamped within the
+ *     full bbox.
+ *
+ * @param {Array<{x1,y1,x2,y2}>} segments
+ * @param {{borderMarginFrac?:number, borderSpanFrac?:number, gridN?:number}} [opts]
+ * @returns {{bbox:{minX,minY,maxX,maxY,widthFt,heightFt}, keptCount:number, droppedBorderCount:number, note:string}}
+ */
+export function isolateContentRegion(segments, opts = {}) {
+  const borderMarginFrac = Number.isFinite(opts.borderMarginFrac) ? Number(opts.borderMarginFrac) : 0.02;
+  const borderSpanFrac = Number.isFinite(opts.borderSpanFrac) ? Number(opts.borderSpanFrac) : 0.6;
+  const gridN = Number.isInteger(opts.gridN) && opts.gridN > 0 ? opts.gridN : 24;
+
+  const segs = Array.isArray(segments) ? segments : [];
+
+  // (a) Full bbox of everything.
+  const full = boundingBox(segs);
+
+  // Degenerate: nothing, or a zero-area extent -> return the full bbox as-is.
+  if (segs.length === 0 || full.widthFt <= 0 || full.heightFt <= 0) {
+    return {
+      bbox: { ...full },
+      keptCount: segs.length,
+      droppedBorderCount: 0,
+      note: ISOLATE_NOTE,
+    };
+  }
+
+  const w = full.maxX - full.minX;
+  const h = full.maxY - full.minY;
+  const marginX = w * borderMarginFrac;
+  const marginY = h * borderMarginFrac;
+
+  // (b) Strip the sheet frame: axis-aligned segments hugging an edge AND spanning
+  // most of that edge dimension.
+  const EPS = Math.max(w, h) * 1e-9;
+  const isHorizontal = (s) => Math.abs(s.y1 - s.y2) <= EPS;
+  const isVertical = (s) => Math.abs(s.x1 - s.x2) <= EPS;
+
+  const interior = [];
+  let droppedBorderCount = 0;
+  for (const s of segs) {
+    const loX = Math.min(s.x1, s.x2);
+    const hiX = Math.max(s.x1, s.x2);
+    const loY = Math.min(s.y1, s.y2);
+    const hiY = Math.max(s.y1, s.y2);
+    const spanX = hiX - loX;
+    const spanY = hiY - loY;
+
+    let isFrame = false;
+    if (isHorizontal(s) && spanX >= borderSpanFrac * w) {
+      // Hugs top or bottom edge?
+      const midY = (loY + hiY) / 2;
+      if (midY <= full.minY + marginY || midY >= full.maxY - marginY) isFrame = true;
+    }
+    if (!isFrame && isVertical(s) && spanY >= borderSpanFrac * h) {
+      // Hugs left or right edge?
+      const midX = (loX + hiX) / 2;
+      if (midX <= full.minX + marginX || midX >= full.maxX - marginX) isFrame = true;
+    }
+
+    if (isFrame) droppedBorderCount += 1;
+    else interior.push(s);
+  }
+
+  const clampBbox = (b) => ({
+    minX: Math.max(full.minX, round(b.minX)),
+    minY: Math.max(full.minY, round(b.minY)),
+    maxX: Math.min(full.maxX, round(b.maxX)),
+    maxY: Math.min(full.maxY, round(b.maxY)),
+  });
+  const finalize = (b, kept) => {
+    const c = clampBbox(b);
+    return {
+      bbox: {
+        minX: c.minX,
+        minY: c.minY,
+        maxX: c.maxX,
+        maxY: c.maxY,
+        widthFt: round(c.maxX - c.minX),
+        heightFt: round(c.maxY - c.minY),
+      },
+      keptCount: kept,
+      droppedBorderCount,
+      note: ISOLATE_NOTE,
+    };
+  };
+
+  const postBorderBbox = boundingBox(interior);
+
+  // Fallback: stripping left too little to cluster meaningfully.
+  if (interior.length < 3 || postBorderBbox.widthFt <= 0 || postBorderBbox.heightFt <= 0) {
+    if (interior.length > 0 && postBorderBbox.widthFt > 0 && postBorderBbox.heightFt > 0) {
+      return finalize(postBorderBbox, interior.length);
+    }
+    return finalize(full, segs.length);
+  }
+
+  // (c) Dominant cluster via coarse-grid flood-fill on segment midpoints.
+  const ow = postBorderBbox.maxX - postBorderBbox.minX;
+  const oh = postBorderBbox.maxY - postBorderBbox.minY;
+  const cellOf = (mx, my) => {
+    let cx = Math.floor(((mx - postBorderBbox.minX) / ow) * gridN);
+    let cy = Math.floor(((my - postBorderBbox.minY) / oh) * gridN);
+    if (cx < 0) cx = 0; else if (cx >= gridN) cx = gridN - 1;
+    if (cy < 0) cy = 0; else if (cy >= gridN) cy = gridN - 1;
+    return [cx, cy];
+  };
+
+  // cellKey -> array of segment indices whose midpoint falls in that cell.
+  const cellSegs = new Map();
+  const keyOf = (cx, cy) => cy * gridN + cx;
+  for (let i = 0; i < interior.length; i++) {
+    const s = interior[i];
+    const mx = (s.x1 + s.x2) / 2;
+    const my = (s.y1 + s.y2) / 2;
+    const [cx, cy] = cellOf(mx, my);
+    const k = keyOf(cx, cy);
+    let arr = cellSegs.get(k);
+    if (!arr) { arr = []; cellSegs.set(k, arr); }
+    arr.push(i);
+  }
+
+  // Flood-fill occupied cells (4-neighbour) into contiguous groups; track the group
+  // holding the most segments. Iterate cell keys in sorted order for determinism.
+  const visited = new Set();
+  const occupiedKeys = Array.from(cellSegs.keys()).sort((a, b) => a - b);
+  let bestSegIdx = null;
+  let bestCount = -1;
+  for (const startKey of occupiedKeys) {
+    if (visited.has(startKey)) continue;
+    // BFS over occupied neighbours.
+    const stack = [startKey];
+    visited.add(startKey);
+    const groupSegIdx = [];
+    while (stack.length) {
+      const k = stack.pop();
+      const arr = cellSegs.get(k);
+      for (const idx of arr) groupSegIdx.push(idx);
+      const cx = k % gridN;
+      const cy = Math.floor(k / gridN);
+      const neighbours = [
+        cx > 0 ? keyOf(cx - 1, cy) : -1,
+        cx < gridN - 1 ? keyOf(cx + 1, cy) : -1,
+        cy > 0 ? keyOf(cx, cy - 1) : -1,
+        cy < gridN - 1 ? keyOf(cx, cy + 1) : -1,
+      ];
+      for (const nk of neighbours) {
+        if (nk >= 0 && cellSegs.has(nk) && !visited.has(nk)) {
+          visited.add(nk);
+          stack.push(nk);
+        }
+      }
+    }
+    if (groupSegIdx.length > bestCount) {
+      bestCount = groupSegIdx.length;
+      bestSegIdx = groupSegIdx;
+    }
+  }
+
+  // Fallback: clustering somehow produced too few segments.
+  if (!bestSegIdx || bestSegIdx.length < 3) {
+    return finalize(postBorderBbox, interior.length);
+  }
+
+  const clusterSegs = bestSegIdx.map((i) => interior[i]);
+  const clusterBbox = boundingBox(clusterSegs);
+  if (clusterBbox.widthFt <= 0 || clusterBbox.heightFt <= 0) {
+    return finalize(postBorderBbox, interior.length);
+  }
+  return finalize(clusterBbox, clusterSegs.length);
+}
+
 const VALID_HAZARDS = new Set(['light', 'ordinary', 'extra', 'esfr']);
 const FOOTPRINT_NOTE =
   'Best-effort bbox footprint of the extracted PDF vector geometry — NOT a full ' +
@@ -268,9 +470,15 @@ const FOOTPRINT_NOTE =
  * whose polygon is the overall bbox footprint (in feet), plus the raw segments as
  * wall candidates. Honest first-pass — see FOOTPRINT_NOTE.
  *
+ * When opts.isolate is true (default false — preserves existing behavior/tests),
+ * the room polygon uses the T29 heuristic content-region bbox (sheet frame stripped,
+ * densest cluster isolated) instead of the whole-sheet bbox, and the isolation
+ * metadata (keptCount, droppedBorderCount) + the heuristic note are attached. The
+ * isolated region is a BEST-EFFORT APPROXIMATION, not a building outline.
+ *
  * @param {Array<{x1,y1,x2,y2}>} segments
- * @param {{hazard?:string}} [opts]
- * @returns {{rooms:Array, bbox:Object, wallCandidates:Array, segmentCount:number, note:string}}
+ * @param {{hazard?:string, isolate?:boolean, isolateOpts?:Object}} [opts]
+ * @returns {{rooms:Array, bbox:Object, wallCandidates:Array, segmentCount:number, note:string, keptCount?:number, droppedBorderCount?:number}}
  */
 export function segmentsToFloorPlan(segments, opts = {}) {
   if (!Array.isArray(segments) || segments.length === 0) {
@@ -279,7 +487,18 @@ export function segmentsToFloorPlan(segments, opts = {}) {
   const hazard = VALID_HAZARDS.has(String(opts.hazard).toLowerCase())
     ? String(opts.hazard).toLowerCase()
     : 'ordinary';
-  const bbox = boundingBox(segments);
+
+  let bbox;
+  let note;
+  let isolation = null;
+  if (opts.isolate) {
+    isolation = isolateContentRegion(segments, opts.isolateOpts || {});
+    bbox = isolation.bbox;
+    note = isolation.note;
+  } else {
+    bbox = boundingBox(segments);
+    note = FOOTPRINT_NOTE;
+  }
   const { minX, minY, maxX, maxY } = bbox;
   const polygon = [
     [minX, minY],
@@ -287,13 +506,18 @@ export function segmentsToFloorPlan(segments, opts = {}) {
     [maxX, maxY],
     [minX, maxY],
   ];
-  return {
+  const result = {
     rooms: [{ name: 'Extracted Footprint', polygon, hazard }],
     bbox,
     wallCandidates: segments,
     segmentCount: segments.length,
-    note: FOOTPRINT_NOTE,
+    note,
   };
+  if (isolation) {
+    result.keptCount = isolation.keptCount;
+    result.droppedBorderCount = isolation.droppedBorderCount;
+  }
+  return result;
 }
 
 /**
@@ -304,9 +528,14 @@ export function segmentsToFloorPlan(segments, opts = {}) {
  * @param {number} [opts.pageIndex=0] - 0-based page index (page pageIndex+1 is parsed).
  * @param {number} opts.scale - feet per PDF point. REQUIRED, must be > 0. Never guessed.
  * @param {string} [opts.hazard='ordinary']
+ * @param {boolean} [opts.isolate=false] - opt-in T29 heuristic content-region
+ *   tightener (default false preserves T28 whole-sheet bbox behavior). When true,
+ *   the room polygon uses the isolated content-region bbox (BEST-EFFORT
+ *   APPROXIMATION, not a building outline) and the result carries keptCount /
+ *   droppedBorderCount. No scale guessing either way.
  * @param {Object} opts.pdfjs - injected/imported pdfjs module exposing getDocument.
  *   Worker setup (GlobalWorkerOptions.workerSrc) is the caller's responsibility.
- * @returns {Promise<{rooms,bbox,segmentCount,pageIndex,scale,note}>}
+ * @returns {Promise<{rooms,bbox,segmentCount,pageIndex,scale,note,keptCount?,droppedBorderCount?}>}
  */
 export async function floorPlanFromPdf(source, opts = {}) {
   const pageIndex = Number.isInteger(opts.pageIndex) ? opts.pageIndex : 0;
@@ -347,14 +576,22 @@ export async function floorPlanFromPdf(source, opts = {}) {
       'the page may be raster/scanned (no extractable vector ops) or text-only.',
     );
   }
-  const fp = segmentsToFloorPlan(segments, { hazard });
-  return {
+  const isolate = opts.isolate === true;
+  const fp = segmentsToFloorPlan(segments, { hazard, isolate });
+  const result = {
     rooms: fp.rooms,
-    bbox,
+    // When isolating, surface the tightened bbox (matches the room polygon); else
+    // the whole-sheet bbox, exactly as T28.
+    bbox: isolate ? fp.bbox : bbox,
     wallCandidates: fp.wallCandidates,
     segmentCount: count,
     pageIndex,
     scale,
     note: fp.note,
   };
+  if (isolate) {
+    result.keptCount = fp.keptCount;
+    result.droppedBorderCount = fp.droppedBorderCount;
+  }
+  return result;
 }

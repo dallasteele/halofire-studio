@@ -5,6 +5,7 @@ import {
   extractSegmentsFromOpList,
   segmentsToFloorPlan,
   floorPlanFromPdf,
+  isolateContentRegion,
 } from '../src/engine/pdf-floorplan.js';
 
 // T28 — PDF plan ingestion. These tests exercise the PURE, portable core of the
@@ -225,6 +226,201 @@ describe('segmentsToFloorPlan', () => {
 
   test('throws when there are no segments to bound', () => {
     expect(() => segmentsToFloorPlan([], {})).toThrow();
+  });
+});
+
+describe('isolateContentRegion — heuristic content-region tightener (T29)', () => {
+  // HONESTY: this is a HEURISTIC content-region tightener, NOT a precise building
+  // outline and NOT a room segmentation. It strips the sheet frame and isolates the
+  // densest geometry cluster; the result is a tighter bbox than the whole sheet but
+  // is still an APPROXIMATION. No scale guessing here — coords are already in feet
+  // (operator-supplied scale applied upstream). Nothing tuned to a real total.
+
+  // Build a synthetic SHEET segment set:
+  //  - an outer drawing-border rectangle 0,0 .. 1000,800 (the sheet frame)
+  //  - a dense BUILDING cluster of many small segments in 150,150 .. 650,550
+  //  - a small detached TITLE-BLOCK cluster in 820,40 .. 980,200
+  function buildSyntheticSheet(scale = 1) {
+    const s = (v) => v * scale;
+    const segs = [];
+    // Sheet frame: the 4 perimeter edges, each spanning a full edge.
+    segs.push({ x1: s(0), y1: s(0), x2: s(1000), y2: s(0) }); // bottom
+    segs.push({ x1: s(1000), y1: s(0), x2: s(1000), y2: s(800) }); // right
+    segs.push({ x1: s(1000), y1: s(800), x2: s(0), y2: s(800) }); // top
+    segs.push({ x1: s(0), y1: s(800), x2: s(0), y2: s(0) }); // left
+    // Building cluster: a DENSE grid of many small wall segments inside
+    // 150..650 x 150..550. Spacing (20) is fine enough that the cluster occupies
+    // contiguous coarse-grid cells — mirroring how a real plan body is densely
+    // packed (the 1881 plan extracts ~64k segments).
+    for (let gx = 0; gx <= 25; gx++) {
+      for (let gy = 0; gy <= 20; gy++) {
+        const x = 150 + gx * 20;
+        const y = 150 + gy * 20;
+        segs.push({ x1: s(x), y1: s(y), x2: s(x + 15), y2: s(y) });
+        segs.push({ x1: s(x), y1: s(y), x2: s(x), y2: s(y + 15) });
+      }
+    }
+    // Detached title-block cluster: a few small segments way over at the right edge.
+    for (let i = 0; i < 6; i++) {
+      const x = 820 + i * 20;
+      segs.push({ x1: s(x), y1: s(40), x2: s(x + 15), y2: s(40) });
+      segs.push({ x1: s(x), y1: s(60), x2: s(x + 15), y2: s(60) });
+    }
+    return segs;
+  }
+
+  test('drops the sheet frame (droppedBorderCount >= 4) and tightens below the full sheet', () => {
+    const segs = buildSyntheticSheet(1);
+    const res = isolateContentRegion(segs);
+    // (i) The 4 frame edges were identified and removed.
+    expect(res.droppedBorderCount).toBeGreaterThanOrEqual(4);
+    expect(res.keptCount).toBeGreaterThan(0);
+    // (ii) Returned bbox is strictly SMALLER than the full sheet bbox.
+    expect(res.bbox.minX).toBeGreaterThanOrEqual(0);
+    expect(res.bbox.maxX).toBeLessThan(1000);
+    expect(res.bbox.maxY).toBeLessThan(800);
+    expect(res.bbox.widthFt).toBeLessThan(1000);
+    expect(res.bbox.heightFt).toBeLessThan(800);
+  });
+
+  test('isolates the building cluster and EXCLUDES the detached title block', () => {
+    const segs = buildSyntheticSheet(1);
+    const res = isolateContentRegion(segs);
+    // The building cluster lives in x:150..650; the title block sits at x>=820.
+    // The dominant cluster must exclude the title block (maxX well below 820).
+    expect(res.bbox.maxX).toBeLessThan(820);
+    // And it should hug the building region.
+    expect(res.bbox.minX).toBeGreaterThanOrEqual(140);
+    expect(res.bbox.maxX).toBeGreaterThan(600);
+    expect(res.bbox.minY).toBeGreaterThanOrEqual(140);
+    expect(res.bbox.maxY).toBeGreaterThan(500);
+    expect(res.bbox.maxY).toBeLessThan(620);
+  });
+
+  test('widthFt/heightFt scale with the input coordinates', () => {
+    const r1 = isolateContentRegion(buildSyntheticSheet(1));
+    const r2 = isolateContentRegion(buildSyntheticSheet(2));
+    expect(r2.bbox.widthFt).toBeCloseTo(r1.bbox.widthFt * 2, 4);
+    expect(r2.bbox.heightFt).toBeCloseTo(r1.bbox.heightFt * 2, 4);
+  });
+
+  test('returned bbox is always clamped within the full bbox', () => {
+    const segs = buildSyntheticSheet(1);
+    const full = { minX: 0, minY: 0, maxX: 1000, maxY: 800 };
+    const res = isolateContentRegion(segs);
+    expect(res.bbox.minX).toBeGreaterThanOrEqual(full.minX);
+    expect(res.bbox.minY).toBeGreaterThanOrEqual(full.minY);
+    expect(res.bbox.maxX).toBeLessThanOrEqual(full.maxX);
+    expect(res.bbox.maxY).toBeLessThanOrEqual(full.maxY);
+  });
+
+  test('degenerate inputs fall back without throwing', () => {
+    // Empty -> a zeroed-but-defined region, never throws.
+    expect(() => isolateContentRegion([])).not.toThrow();
+    const empty = isolateContentRegion([]);
+    expect(empty.bbox).toBeDefined();
+    expect(Number.isFinite(empty.bbox.widthFt)).toBe(true);
+
+    // Single segment -> falls back to its own bbox, never throws.
+    const single = isolateContentRegion([{ x1: 5, y1: 5, x2: 25, y2: 5 }]);
+    expect(single.bbox.minX).toBe(5);
+    expect(single.bbox.maxX).toBe(25);
+
+    // All-border (just a frame, nothing inside) -> falls back, no throw, finite.
+    const frameOnly = [
+      { x1: 0, y1: 0, x2: 1000, y2: 0 },
+      { x1: 1000, y1: 0, x2: 1000, y2: 800 },
+      { x1: 1000, y1: 800, x2: 0, y2: 800 },
+      { x1: 0, y1: 800, x2: 0, y2: 0 },
+    ];
+    expect(() => isolateContentRegion(frameOnly)).not.toThrow();
+    const fr = isolateContentRegion(frameOnly);
+    expect(Number.isFinite(fr.bbox.widthFt)).toBe(true);
+    expect(fr.bbox.widthFt).toBeGreaterThanOrEqual(0);
+  });
+
+  test('overridable opts do not throw and stay within full bbox', () => {
+    const segs = buildSyntheticSheet(1);
+    const res = isolateContentRegion(segs, { borderMarginFrac: 0.05, borderSpanFrac: 0.5, gridN: 12 });
+    expect(res.bbox.maxX).toBeLessThanOrEqual(1000);
+    expect(res.bbox.maxY).toBeLessThanOrEqual(800);
+    expect(res.keptCount).toBeGreaterThan(0);
+  });
+
+  test('carries a heuristic/approximation note (NOT a building outline claim)', () => {
+    const res = isolateContentRegion(buildSyntheticSheet(1));
+    const note = String(res.note);
+    // Positively labelled as heuristic/approximate.
+    expect(note).toMatch(/heurist|approxim/i);
+    // Explicitly DENIES being a building outline / room segmentation / AHJ/PE.
+    expect(note).toMatch(/NOT a (precise )?building outline/i);
+    expect(note).toMatch(/NOT a room segmentation/i);
+    expect(note).toMatch(/NOT an AHJ\/PE/i);
+    // Makes no POSITIVE accuracy/parity claim.
+    expect(note).not.toMatch(/\bis accurate\b|\bparity\b|\bexact\b/i);
+  });
+
+  describe('segmentsToFloorPlan({ isolate: true })', () => {
+    function syntheticSheet() {
+      const segs = [];
+      segs.push({ x1: 0, y1: 0, x2: 1000, y2: 0 });
+      segs.push({ x1: 1000, y1: 0, x2: 1000, y2: 800 });
+      segs.push({ x1: 1000, y1: 800, x2: 0, y2: 800 });
+      segs.push({ x1: 0, y1: 800, x2: 0, y2: 0 });
+      for (let gx = 0; gx <= 25; gx++) {
+        for (let gy = 0; gy <= 20; gy++) {
+          const x = 150 + gx * 20;
+          const y = 150 + gy * 20;
+          segs.push({ x1: x, y1: y, x2: x + 15, y2: y });
+          segs.push({ x1: x, y1: y, x2: x, y2: y + 15 });
+        }
+      }
+      for (let i = 0; i < 6; i++) {
+        const x = 820 + i * 20;
+        segs.push({ x1: x, y1: 40, x2: x + 15, y2: 40 });
+      }
+      return segs;
+    }
+
+    test('uses the ISOLATED bbox for the room polygon + carries the heuristic note', () => {
+      const segs = syntheticSheet();
+      const def = segmentsToFloorPlan(segs); // isolate defaults false
+      const iso = segmentsToFloorPlan(segs, { isolate: true });
+      // Default polygon = full sheet bbox.
+      expect(def.bbox.minX).toBe(0);
+      expect(def.bbox.maxX).toBe(1000);
+      // Isolated polygon is strictly tighter than the full sheet.
+      expect(iso.bbox.widthFt).toBeLessThan(def.bbox.widthFt);
+      expect(iso.bbox.heightFt).toBeLessThan(def.bbox.heightFt);
+      // Room polygon matches the isolated bbox corners.
+      const b = iso.bbox;
+      expect(iso.rooms[0].polygon).toEqual([
+        [b.minX, b.minY],
+        [b.maxX, b.minY],
+        [b.maxX, b.maxY],
+        [b.minX, b.maxY],
+      ]);
+      // Isolation metadata + a heuristic note attached.
+      expect(iso.keptCount).toBeGreaterThan(0);
+      expect(iso.droppedBorderCount).toBeGreaterThanOrEqual(4);
+      expect(String(iso.note)).toMatch(/heurist|content-region|approxim/i);
+    });
+
+    test('default (isolate: false) is UNCHANGED — full bbox + original note', () => {
+      const segs = syntheticSheet();
+      const def = segmentsToFloorPlan(segs);
+      expect(def.rooms[0].polygon).toEqual([
+        [0, 0],
+        [1000, 0],
+        [1000, 800],
+        [0, 800],
+      ]);
+      expect(def.bbox.widthFt).toBe(1000);
+      expect(def.bbox.heightFt).toBe(800);
+      expect(def.keptCount).toBeUndefined();
+      expect(def.droppedBorderCount).toBeUndefined();
+      expect(String(def.note)).toMatch(/bbox/i);
+    });
   });
 });
 
