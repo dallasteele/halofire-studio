@@ -682,6 +682,19 @@ async function generate() {
       <div class="kv"><span>Full-scope estimate</span><b class="total" style="font-size:14px">${usd(fullScopeBid.fullScopeTotal)}</b></div>
       <div class="muted" style="font-size:10px">best-effort full scope — field labor, system components, soft costs, and overhead &amp; profit are assumption-based estimates (documented public conventions), NOT a quoted bid</div>`
       + (cal ? `<div class="muted" style="font-size:10px;margin-top:4px">vs real bid-log ${usd(cal.referenceTotal)}: <b style="color:${Math.abs(cal.deltaPct) <= 25 ? 'var(--gold)' : 'var(--fire)'}">${cal.deltaPct > 0 ? '+' : ''}${cal.deltaPct}%</b> — ${cal.note}</div>` : '');
+      const rt = cal && cal.realTakeoff;
+      if (rt) {
+        fsHtml += `
+      <div style="border-top:1px solid var(--border);margin-top:8px;padding-top:6px">
+        <div class="muted" style="font-size:11px;font-weight:600;color:var(--gold)">Real ESI takeoff (parsed from the proposal — source cells cited)</div>
+        <div class="kv"><span>Materials (w/ markup)</span><b>${usd(rt.withMarkup.materials)}</b></div>
+        <div class="kv"><span>Labor + equipment (w/ markup)</span><b>${usd(rt.withMarkup.labor)}</b></div>
+        <div class="kv"><span>Design (sub + misc, w/ markup)</span><b>${usd(rt.withMarkup.design)}</b></div>
+        <div class="kv"><span>SOV total</span><b>${usd(rt.withMarkup.sovTotal)}</b></div>
+        <div class="kv"><span>Total price (base)</span><b class="total">${usd(rt.totalPrice)}</b></div>
+        <div class="muted" style="font-size:10px;margin-top:4px">This is the <b>actual submitted breakdown</b> (real rows parsed from <code>${rt.sourceRefs[0].split('#')[0]}</code> — cells ${rt.sourceRefs.map((r) => r.split('!')[1]).join(', ')}). The auto-generated estimate above is the model's best effort and is still short (materials-limited by simplified geometry). This is real source data, not an auto-bidder result, and asserts no accuracy/AHJ/PE/AutoSprink/manufacturer parity claim.</div>
+      </div>`;
+      }
     } else if (fullScopeBid && fullScopeBid.error) {
       fsHtml = `<div class="est" style="font-size:10px">full-scope unavailable: ${fullScopeBid.error}</div>`;
     }

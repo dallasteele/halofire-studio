@@ -1,3 +1,4 @@
+import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import XLSX from 'xlsx';
@@ -111,6 +112,85 @@ export function readHomeDepotBidPackage(rootDir = DEFAULT_ROOT) {
       `${PROPOSAL_FILE}#Job Information!B3:B7`,
       `${BID_LOG_FILE}#Bid Log row ${bidLog.worksheetRow}`,
     ],
+  };
+}
+
+// T24 — Real-takeoff bid calibration. The REAL ESI takeoff (the actual submitted
+// bid-line rows) lives in the "Building 1" sheet's Knowify SOV block. We parse the
+// verified cells into a structured scope breakdown so the Home Depot calibration is
+// backed by real source rows (an explicit evidence trail), NOT a model achievement.
+// This clears NO regulated gate and asserts NO accuracy/AHJ/PE/parity claim.
+const REAL_TAKEOFF_BID_LOG_TOTAL = 792543.84;
+
+export function readHomeDepotRealTakeoff(rootDir = DEFAULT_ROOT) {
+  const filePath = path.join(rootDir, PROPOSAL_FILE);
+  if (!fs.existsSync(filePath)) {
+    throw new Error(
+      `Home Depot proposal workbook not found at ${filePath} — real takeoff unavailable`,
+    );
+  }
+  const proposalWb = readWorkbook(rootDir, PROPOSAL_FILE);
+  const building = proposalWb.Sheets['Building 1'];
+  if (!building) {
+    throw new Error(`"Building 1" sheet missing in ${PROPOSAL_FILE} — real takeoff unavailable`);
+  }
+
+  // COST breakdown (un-marked-up ESI takeoff categories).
+  const material = money(cell(building, 'N31'));
+  const labor = money(cell(building, 'O32'));
+  const equipment = money(cell(building, 'Q32'));
+  const subcontractor = money(cell(building, 'P30'));
+  const miscellaneous = money(cell(building, 'R30'));
+  const costTotal = money(material + labor + equipment + subcontractor + miscellaneous);
+
+  // WITH-MARKUP submitted SOV line items.
+  const materialsMarked = money(cell(building, 'U31'));
+  const laborMarked = money(cell(building, 'U32')); // labor (+ equipment)
+  const designMarked = money(cell(building, 'U30')); // design (sub + misc)
+  const sovTotal = money(cell(building, 'U34'));
+
+  const totalPrice = money(cell(building, 'G11'));
+  const rawMaterial = Number(cell(building, 'N31') || 0);
+  const rawMaterialMarked = Number(cell(building, 'U31') || 0);
+  const markupPct = rawMaterial
+    ? Math.round((rawMaterialMarked / rawMaterial - 1) * 10000) / 10000
+    : 0;
+
+  return {
+    cost: {
+      material,
+      labor,
+      equipment,
+      subcontractor,
+      miscellaneous,
+      total: costTotal,
+    },
+    withMarkup: {
+      materials: materialsMarked,
+      labor: laborMarked,
+      design: designMarked,
+      sovTotal,
+    },
+    totalPrice,
+    bidLogTotal: REAL_TAKEOFF_BID_LOG_TOTAL,
+    markupPct,
+    sourceRefs: [
+      `${PROPOSAL_FILE}#Building 1!N31`,
+      `${PROPOSAL_FILE}#Building 1!O32`,
+      `${PROPOSAL_FILE}#Building 1!Q32`,
+      `${PROPOSAL_FILE}#Building 1!P30`,
+      `${PROPOSAL_FILE}#Building 1!R30`,
+      `${PROPOSAL_FILE}#Building 1!U31`,
+      `${PROPOSAL_FILE}#Building 1!U32`,
+      `${PROPOSAL_FILE}#Building 1!U30`,
+      `${PROPOSAL_FILE}#Building 1!U34`,
+      `${PROPOSAL_FILE}#Building 1!G11`,
+    ],
+    disclaimer:
+      'Real ESI takeoff parsed verbatim from the submitted proposal workbook '
+      + '(Building 1 SOV block; source cells cited). It is the actual submitted '
+      + 'breakdown, NOT produced by the auto-bidder and NOT an accuracy, AHJ, PE, '
+      + 'AutoSprink, or manufacturer claim. It clears no regulated gate.',
   };
 }
 

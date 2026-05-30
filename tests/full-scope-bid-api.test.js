@@ -11,6 +11,9 @@ import path from 'node:path';
 // submitted ESI bid-log total ($792,543.84) — never an accuracy/parity claim
 // and never a gate clearance. This asserts the wiring + the fail-closed flags.
 const ROOT = path.resolve(import.meta.dirname, '..');
+// T24: the real ESI takeoff is parsed from this untracked-but-present workbook.
+// Skip the realTakeoff assertion on a fresh clone / CI that lacks the file.
+const HAVE_WORKBOOK = fs.existsSync(path.join(ROOT, 'Proposal- Home Depot - Rexburg ID.xlsx'));
 const PORT = 3199;
 const BASE = `http://127.0.0.1:${PORT}`;
 const HOME_DEPOT_NAME = 'Home Depot - Rexburg ID';
@@ -147,6 +150,65 @@ describe('T22 full-scope bid wired into sprinkler-bid', () => {
     expect(cal.parity).toBeUndefined();
     expect(cal.approved).toBeUndefined();
     expect(fsb.estimate).toBe(true);
+  });
+
+  // T24: the Home Depot calibration carries the REAL ESI takeoff parsed from the
+  // proposal workbook (Building 1 SOV block) as an explicit evidence trail.
+  // SKIP-IF-ABSENT: untracked workbook may be missing on a fresh clone / CI.
+  it.skipIf(!HAVE_WORKBOOK)('enriches Home Depot calibration with the real ESI takeoff (no gate flips)', async () => {
+    const res = await post(HOME_DEPOT, {});
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    const cal = body.fullScopeBid.calibration;
+    expect(cal).toBeTruthy();
+
+    const rt = cal.realTakeoff;
+    expect(rt).toBeTruthy();
+    // Real parsed numbers from the submitted takeoff.
+    expect(rt.cost.material).toBeCloseTo(396097.57, 2);
+    expect(rt.cost.labor).toBeCloseTo(143473.33, 2);
+    expect(rt.cost.equipment).toBeCloseTo(36431.44, 2);
+    expect(rt.withMarkup.materials).toBeCloseTo(514926.85, 2);
+    expect(rt.withMarkup.labor).toBeCloseTo(233876.19, 2);
+    expect(rt.withMarkup.sovTotal).toBeCloseTo(758553.04, 2);
+    expect(rt.totalPrice).toBeCloseTo(767543.84, 2);
+    expect(rt.bidLogTotal).toBe(792543.84);
+    expect(rt.markupPct).toBeCloseTo(0.30, 2);
+
+    // Explicit evidence trail: cited Building 1 source cells.
+    expect(rt.sourceRefs).toContain('Proposal- Home Depot - Rexburg ID.xlsx#Building 1!N31');
+    expect(rt.sourceRefs).toContain('Proposal- Home Depot - Rexburg ID.xlsx#Building 1!U34');
+
+    // Itemized comparison present + labelled informational.
+    expect(Array.isArray(cal.byCategory.rows)).toBe(true);
+    expect(cal.byCategory.rows.length).toBeGreaterThan(0);
+    expect(cal.byCategory.note.toLowerCase()).toContain('not an accuracy or parity claim');
+
+    // Honesty: the real takeoff clears NOTHING. No parity/approval flag anywhere.
+    expect(rt.disclaimer.toLowerCase()).not.toContain('parity');
+    expect(cal.realTakeoff.parity).toBeUndefined();
+    expect(cal.realTakeoff.approved).toBeUndefined();
+    expect(body.fullScopeBid.estimate).toBe(true);
+
+    // The auto-estimate stays honestly short (negative delta vs the real total).
+    expect(cal.deltaPct).toBeLessThan(0);
+
+    // Gate UNCHANGED: AUTOSPRINK_PARITY stays blocked; realTakeoff clears nothing.
+    const parityRes = await fetch(`${BASE}/api/parity`, {
+      method: 'GET', headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(parityRes.status).toBe(200);
+    const parityBody = await parityRes.json();
+    expect(parityBody.gate.status).toBe('blocked');
+    expect(parityBody.parityAchieved).not.toBe(true);
+  });
+
+  it('a generic project carries NO realTakeoff', async () => {
+    const res = await post(GENERIC, { floorPlan: FLOOR_PLAN });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    // Generic projects get no calibration at all -> no realTakeoff.
+    expect(body.fullScopeBid.calibration ?? null).toBeNull();
   });
 
   it('does not flip any gate: /submittal stays submittalReady=false', async () => {

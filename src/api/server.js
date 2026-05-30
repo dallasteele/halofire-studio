@@ -32,6 +32,7 @@ import { checkCompliance } from '../engine/nfpa-compliance.js';
 import { buildSubmittal, renderSubmittalPdf } from '../engine/submittal.js';
 import { homeDepotRexburgFloorPlan } from '../data/floorplans.js';
 import { HOME_DEPOT_PROJECT_NAME } from '../data/evidence-gates.js';
+import { readHomeDepotRealTakeoff } from '../data/home-depot-bid-package.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const log = createLogger('api-server');
@@ -794,6 +795,48 @@ function runSprinklerPipeline(req) {
           + 'and it clears no regulated gate. The full-scope figure is a best-effort '
           + 'estimate, not a complete or quoted bid.',
       };
+
+      // T24: enrich the calibration with the REAL ESI takeoff parsed from the
+      // proposal workbook (Building 1 SOV block; source cells cited). Fail-closed:
+      // an absent/unparseable workbook OMITS realTakeoff and leaves the existing
+      // calibration intact — it must NEVER throw or 500. The real takeoff is REAL
+      // parsed data (an evidence trail), NOT a model achievement and NOT a parity
+      // claim; it flips NO gate.
+      try {
+        const realTakeoff = readHomeDepotRealTakeoff();
+        fullScopeBid.calibration.realTakeoff = realTakeoff;
+
+        // Itemized model-vs-real category comparison (INFORMATIONAL). The real
+        // takeoff bundles equipment under labor and sub+misc under design, so we
+        // compare against the model's analogous roll-ups. Each delta is labelled
+        // informational and asserts no parity.
+        const m = fullScopeBid;
+        const modelSoftPlusOhp = round2((m.softCostTotal || 0) + (m.ohp?.ohpTotal || 0));
+        const realLaborPlusEquip = round2(realTakeoff.cost.labor + realTakeoff.cost.equipment);
+        const realDesignSub = round2(realTakeoff.cost.subcontractor + realTakeoff.cost.miscellaneous);
+        const cmp = (label, modelUsd, realUsd) => ({
+          label,
+          modelUsd: round2(modelUsd),
+          realUsd: round2(realUsd),
+          deltaUsd: round2((modelUsd || 0) - (realUsd || 0)),
+        });
+        fullScopeBid.calibration.byCategory = {
+          basis: 'cost (un-marked-up) — model estimate categories vs real ESI takeoff categories',
+          rows: [
+            cmp('materials', m.materialsOnly, realTakeoff.cost.material),
+            cmp('labor (+ equipment)', m.laborCost, realLaborPlusEquip),
+            cmp('system components', m.systemComponentCost, 0),
+            cmp('design (sub + misc)', modelSoftPlusOhp, realDesignSub),
+          ],
+          note: 'informational itemized comparison only — not an accuracy or '
+            + 'parity claim, and it clears no regulated gate. The dominant gap is '
+            + 'MATERIALS: the auto-estimate models simplified geometry and does not '
+            + 'capture the full ESFR/bulk-main scope in the real submitted takeoff.',
+        };
+      } catch (takeoffErr) {
+        // Absent or unparseable workbook: omit realTakeoff, keep base calibration.
+        log.warn?.('home-depot real takeoff unavailable', { error: takeoffErr.message });
+      }
     }
   } catch (e) {
     fullScopeBid = { error: e.message };
