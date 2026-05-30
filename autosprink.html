@@ -63,6 +63,7 @@
         <button data-view="iso" class="on">3D</button>
         <button data-view="top">Plan</button>
       </div>
+      <button id="demoBtn" title="Animate the structure + sprinkler system rising out of the plan">▶ Demo</button>
       <a class="link" href="/workbench.html">Workbench →</a>
       <a class="link" href="/settings.html">Settings &amp; Parity</a>
     </div>
@@ -157,6 +158,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
 import { OpenGeometry, Vector3, Cuboid, Cylinder, Opening, OGSceneManager } from 'opengeometry';
 import { planOrthoFrustum, planCenter } from '/src/engine/plan-view.js';
+import { demoTimeline } from '/src/engine/demo-timeline.js';
 
 const HOME_DEPOT = 'Home Depot - Rexburg ID';
 const token = localStorage.getItem('halofire_token');
@@ -536,6 +538,48 @@ function setView(view) {
   controls.update();
 }
 
+// V2 Demo: animate the structure rising out of the floor plan, then the
+// sprinkler system rising into place. Pure timeline (demo-timeline.js) maps
+// elapsed time -> per-group rise. Scaling a layer group's Y about world y=0
+// (groups sit at the origin) makes its geometry grow up FROM the floor.
+let demoRAF = null;
+function playDemo() {
+  if (!currentCadModel) { $('status').textContent = 'generate a layout first'; return; }
+  if (demoRAF) { cancelAnimationFrame(demoRAF); demoRAF = null; }
+  document.querySelectorAll('#viewSeg button').forEach((x) => x.classList.toggle('on', x.dataset.view === 'iso'));
+  setView('iso');
+  const structure = ['WALLS', 'COLUMN'];          // rise first
+  const system = ['MAIN', 'BRANCH', 'DROPS', 'HEADS', 'COMPONENTS']; // then the sprinkler system
+  const setY = (keys, sy) => keys.forEach((k) => { if (layerGroups[k]) layerGroups[k].scale.set(1, Math.max(0.0001, sy), 1); });
+  setY(structure, 0.0001); setY(system, 0.0001);
+  const opts = { wallsMs: 1300, systemMs: 1400, gapMs: 250 };
+  const start = performance.now();
+  $('demoBtn').disabled = true; window.__demoDone = false;
+  $('status').textContent = 'demo: structure rising out of the plan…';
+  function step(now) {
+    const tl = demoTimeline(now - start, opts);
+    setY(structure, tl.wallsT);
+    setY(system, tl.systemT);
+    if (tl.systemT > 0.02) $('status').textContent = 'demo: sprinkler system rising into place…';
+    if (!tl.done) { demoRAF = requestAnimationFrame(step); }
+    else {
+      setY(structure, 1); setY(system, 1); demoRAF = null;
+      $('demoBtn').disabled = false; window.__demoDone = true;
+      $('status').textContent = 'demo complete · structure + sprinkler system in place';
+    }
+  }
+  demoRAF = requestAnimationFrame(step);
+}
+
+// Deterministic demo-frame applier (verification + rAF-throttle-proof): apply the
+// rise at an explicit elapsed time without the rAF clock. Same mapping as playDemo.
+window.__applyDemoFrame = (ms) => {
+  const tl = demoTimeline(ms, { wallsMs: 1300, systemMs: 1400, gapMs: 250 });
+  ['WALLS', 'COLUMN'].forEach((k) => { if (layerGroups[k]) layerGroups[k].scale.set(1, Math.max(0.0001, tl.wallsT), 1); });
+  ['MAIN', 'BRANCH', 'DROPS', 'HEADS', 'COMPONENTS'].forEach((k) => { if (layerGroups[k]) layerGroups[k].scale.set(1, Math.max(0.0001, tl.systemT), 1); });
+  return { wallsT: +tl.wallsT.toFixed(3), systemT: +tl.systemT.toFixed(3), done: tl.done };
+};
+
 function buildLayerToggles() {
   const names = { WALLS: 'Building shell', COLUMN: 'Columns', FLOOR: 'Floor', MAIN: 'Mains / riser', BRANCH: 'Branch lines', DROPS: 'Drops', HEADS: 'Sprinkler heads' };
   $('layers').innerHTML = Object.keys(names).map((k) =>
@@ -708,8 +752,9 @@ for (const [id, fmt] of [['stepBtn','step'],['ifcBtn','ifc'],['stlBtn','stl']]) 
     } catch (e) { $('exportMsg').textContent = fmt.toUpperCase() + ' export error: ' + e.message; }
   };
 }
+$('demoBtn').onclick = playDemo;
 document.querySelectorAll('#viewSeg button').forEach((b) => {
-  b.onclick = () => { document.querySelectorAll('#viewSeg button').forEach((x) => x.classList.remove('on')); b.classList.add('on'); setView(b.dataset.view); };
+  b.onclick = () => { if (demoRAF) { cancelAnimationFrame(demoRAF); demoRAF = null; $('demoBtn').disabled = false; } document.querySelectorAll('#viewSeg button').forEach((x) => x.classList.remove('on')); b.classList.add('on'); setView(b.dataset.view); };
 });
 
 (async () => { await initStudio(); })();
