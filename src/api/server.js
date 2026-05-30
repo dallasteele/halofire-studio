@@ -1027,6 +1027,9 @@ app.get('/api/parity', authMiddleware, (req, res) => {
 // needs manufacturer-exact models for EVERY required part + PE/AHJ review). No STL
 // is ever fabricated for a part without a real mesh.
 const PARTS_MANIFEST_PATH = path.resolve(__dirname, '../../parts/parts-manifest.json');
+// S5: the autonomous part-sourcing run (scripts/auto-source-run.mjs) writes its
+// observable status here, relative to the repo root (same place the script writes).
+const AUTO_SOURCE_STATUS_PATH = path.resolve(__dirname, '../../out/auto-source-status.json');
 const PARTS_DISCLAIMER =
   'Generated part meshes are best-effort parametric massing — NOT ' +
   'manufacturer-exact and conferring NO AutoSprink/AutoCAD/AHJ/PE approval. ' +
@@ -1219,6 +1222,35 @@ app.get('/api/public/summary', (req, res) => {
     pricebookItems: count('SELECT COUNT(*) c FROM pricebook'),
     sourceWorkbooks: 4, // ARGCO, FFF, Victaulic pricebooks + bid log
     claimGates: count('SELECT COUNT(*) c FROM claim_gates'),
+  });
+});
+
+// ── Auto-source run status (S5) ──
+// Read-only observability of the autonomous part-sourcing loop (NOT admin-only).
+// HONESTY/fail-closed: nothing here is manufacturer-exact and auto-sourced parts
+// NEVER clear parity. We DEFENSIVELY re-force parityGateStatus 'blocked' +
+// manufacturerExactCount 0 on the response so a tampered status file can never
+// surface a cleared gate (mirrors the /api/parts sanitize discipline). If the file
+// is missing/unreadable we return a 200 'never-run' status — never a 500.
+app.get('/api/auto-source/status', authMiddleware, (req, res) => {
+  try {
+    if (fs.existsSync(AUTO_SOURCE_STATUS_PATH)) {
+      const status = JSON.parse(fs.readFileSync(AUTO_SOURCE_STATUS_PATH, 'utf8'));
+      return res.json({
+        ...status,
+        // Re-forced regardless of file contents — auto-source never clears parity.
+        parityGateStatus: 'blocked',
+        manufacturerExactCount: 0,
+      });
+    }
+  } catch (err) {
+    log.warn(`auto-source status read failed: ${err.message}`);
+  }
+  return res.json({
+    status: 'never-run',
+    parityGateStatus: 'blocked',
+    manufacturerExactCount: 0,
+    note: 'Auto-source loop has not run yet.',
   });
 });
 

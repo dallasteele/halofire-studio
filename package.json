@@ -10,6 +10,7 @@
     "dev:ui": "vite --config vite.config.js",
     "build": "vite build",
     "build:parts": "node scripts/build-parts.mjs",
+    "auto-source": "node scripts/auto-source-run.mjs",
     "start": "node src/api/server.js",
     "cron": "node src/cron/scheduler.js",
     "skill:list": "node src/core/skill-runner.js --list",
