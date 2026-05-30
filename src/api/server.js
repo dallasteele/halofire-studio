@@ -21,6 +21,7 @@ import { buildFullScopeBid } from '../engine/bid-scope.js';
 import { buildScene } from '../engine/geometry.js';
 import { buildResolverFromDb } from '../engine/pricebook-pricing.js';
 import { floorPlanFromSvg, floorPlanFromDxf, normalizeFloorPlan, buildingFromSvg, buildingFromDxf } from '../engine/floorplan-import.js';
+import { floorPlanFromPdf } from '../engine/pdf-floorplan.js';
 import { buildCadModel } from '../engine/cad-model.js';
 import { toDxf } from '../engine/dxf-export.js';
 import { requiredPressureAtRiser, flagSchedule, remoteAreaDemand } from '../engine/hydraulics.js';
@@ -632,11 +633,76 @@ const DEFAULT_DXF_LAYERS = Object.freeze({
   columns: ['COLUMN', 'COLUMNS', 'COLS', 'A-COLS'],
 });
 
-function runSprinklerPipeline(req) {
+// Lazily-loaded pdfjs (legacy build) for headless Node vector-PDF extraction.
+// Cached after first load. Worker is pointed at the legacy worker module via a
+// file:// URL so it runs without a browser/canvas.
+let _pdfjsModulePromise = null;
+async function loadPdfjs() {
+  if (!_pdfjsModulePromise) {
+    _pdfjsModulePromise = (async () => {
+      const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs');
+      try {
+        const { createRequire } = await import('node:module');
+        const { pathToFileURL } = await import('node:url');
+        const require = createRequire(import.meta.url);
+        pdfjs.GlobalWorkerOptions.workerSrc = pathToFileURL(
+          require.resolve('pdfjs-dist/legacy/build/pdf.worker.mjs'),
+        ).href;
+      } catch {
+        // If worker wiring fails, pdfjs falls back to its in-process fake worker.
+      }
+      return pdfjs;
+    })();
+  }
+  return _pdfjsModulePromise;
+}
+
+// T28 — Resolve a "pdf" plan source (base64 vector PDF) into a normalized floor
+// plan, ASYNCHRONOUSLY (PDF parsing is async). Returns null when no pdf was sent.
+// Throws an Error with .httpStatus=400 on a bad/missing scale or unparseable PDF
+// so the caller can fail-soft to a clear 400 (never 500). The extracted geometry
+// is REAL; the scale is operator-supplied and never guessed.
+async function resolvePdfFloorPlan(req) {
+  if (!req.body || typeof req.body.pdf !== 'string' || !req.body.pdf.trim()) return null;
+  let data;
+  try {
+    data = Buffer.from(req.body.pdf, 'base64');
+    if (!data.length) throw new Error('empty PDF payload');
+  } catch (err) {
+    const e = new Error(`Invalid base64 PDF payload: ${err.message}`);
+    e.httpStatus = 400;
+    throw e;
+  }
+  const pageIndex = Number.isFinite(Number(req.body.pdfPageIndex)) ? Number(req.body.pdfPageIndex) : 0;
+  const scale = Number(req.body.pdfScale);
+  try {
+    const pdfjs = await loadPdfjs();
+    const extracted = await floorPlanFromPdf(new Uint8Array(data), {
+      pageIndex,
+      scale, // operator-supplied feet-per-PDF-point; floorPlanFromPdf throws if absent/<=0
+      hazard: req.body.hazard,
+      pdfjs,
+    });
+    const floorPlan = normalizeFloorPlan({
+      name: req.params.name || 'Imported PDF Plan',
+      units: 'ft',
+      rooms: extracted.rooms,
+    });
+    return { floorPlan, pdfMeta: { pageIndex: extracted.pageIndex, scale: extracted.scale, segmentCount: extracted.segmentCount, bbox: extracted.bbox, note: extracted.note } };
+  } catch (err) {
+    const e = new Error(err && err.message ? err.message : String(err));
+    e.httpStatus = 400; // bad scale / unparseable pdf -> 400, never 500
+    throw e;
+  }
+}
+
+function runSprinklerPipeline(req, prebuilt = null) {
   const projectName = req.params.name;
-  let floorPlan = null;
+  let floorPlan = (prebuilt && prebuilt.floorPlan) || null;
   let building = null;
-  if (req.body && typeof req.body.buildingSvg === 'string' && req.body.buildingSvg.trim()) {
+  if (floorPlan) {
+    // A PDF (or other async) source was resolved upstream; skip source selection.
+  } else if (req.body && typeof req.body.buildingSvg === 'string' && req.body.buildingSvg.trim()) {
     // Accurate multi-space building drawing (walls/spaces/doors/columns by layer/attr).
     building = buildingFromSvg(req.body.buildingSvg, { name: projectName, unitsPerPx: Number(req.body.unitsPerPx) || 1 });
   } else if (req.body && typeof req.body.buildingDxf === 'string' && req.body.buildingDxf.trim()) {
@@ -675,7 +741,7 @@ function runSprinklerPipeline(req) {
     if (!floorPlan.rooms.length) return { httpError: { status: 400, error: 'Building drawing has no spaces (need space polygons / mapped layers)' } };
   }
   if (!floorPlan) {
-    return { httpError: { status: 400, error: 'Provide an svg/dxf, a buildingSvg/buildingDxf, a floorPlan spec, or use a project with a built-in plan' } };
+    return { httpError: { status: 400, error: 'Provide an svg/dxf/pdf, a buildingSvg/buildingDxf, a floorPlan spec, or use a project with a built-in plan' } };
   }
   // Optional hazard override from the studio UI (applies to all rooms).
   if (req.body && ['light', 'ordinary', 'extra'].includes(String(req.body.hazard))) {
@@ -968,14 +1034,15 @@ function round2(n) {
 
 // Best-effort sprinkler auto-layout + auto-bid + hydraulic network balance +
 // NFPA-13 geometric compliance. Fail-closed: NEVER clears any regulated gate.
-app.post('/api/projects/:name/sprinkler-bid', authMiddleware, (req, res) => {
+app.post('/api/projects/:name/sprinkler-bid', authMiddleware, async (req, res) => {
   try {
-    const out = runSprinklerPipeline(req);
+    const prebuilt = await resolvePdfFloorPlan(req);
+    const out = runSprinklerPipeline(req, prebuilt);
     if (out.httpError) return res.status(out.httpError.status).json({ error: out.httpError.error });
     const { bid, scene, cadModel, hydraulics, hydraulicNetwork, compliance, fullScopeBid, building } = out;
-    res.json({ bid, scene, cadModel, hydraulics, hydraulicNetwork, compliance, fullScopeBid, isBuilding: !!building });
+    res.json({ bid, scene, cadModel, hydraulics, hydraulicNetwork, compliance, fullScopeBid, isBuilding: !!building, ...(prebuilt && prebuilt.pdfMeta ? { pdfMeta: prebuilt.pdfMeta } : {}) });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    res.status(err.httpStatus || 400).json({ error: err.message });
   }
 });
 
@@ -985,7 +1052,8 @@ app.post('/api/projects/:name/sprinkler-bid', authMiddleware, (req, res) => {
 // blocked — this clears NO regulated gate.
 app.post('/api/projects/:name/submittal', authMiddleware, async (req, res) => {
   try {
-    const out = runSprinklerPipeline(req);
+    const prebuilt = await resolvePdfFloorPlan(req);
+    const out = runSprinklerPipeline(req, prebuilt);
     if (out.httpError) return res.status(out.httpError.status).json({ error: out.httpError.error });
     const { projectName, bid, cadModel, hydraulics, hydraulicNetwork, compliance } = out;
     const pkg = buildSubmittal({
@@ -1009,7 +1077,7 @@ app.post('/api/projects/:name/submittal', authMiddleware, async (req, res) => {
     res.setHeader('Content-Type', 'application/json');
     res.json(pdf ? { ...pkg, pdf } : pkg);
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    res.status(err.httpStatus || 400).json({ error: err.message });
   }
 });
 

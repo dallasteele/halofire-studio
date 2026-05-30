@@ -78,12 +78,27 @@
       <option value="building">Building drawing (multi-space SVG)…</option>
       <option value="dxf">Import DXF (single space)…</option>
       <option value="building-dxf">Building drawing (multi-space DXF)…</option>
+      <option value="pdf">Import vector PDF (plan set)…</option>
     </select>
     <div id="svgBox" style="display:none">
       <label>Feet per drawing unit</label>
       <input id="unitsPerPx" type="number" value="1" step="0.1">
       <label id="drawingLabel">SVG (rect / polygon / path)</label>
       <textarea id="svgInput" placeholder='&lt;svg&gt;&lt;rect x="0" y="0" width="60" height="40" data-hazard="ordinary"/&gt;&lt;/svg&gt;'></textarea>
+    </div>
+    <div id="pdfBox" style="display:none">
+      <label>PDF page (0-based index)</label>
+      <input id="pdfPageIndex" type="number" value="0" min="0" step="1">
+      <label>Drawing scale (feet per PDF point)</label>
+      <input id="pdfScale" type="number" value="" step="0.001" placeholder="e.g. 0.0833 (1 pt = 1 in @ 1:1)">
+      <label>Vector PDF plan</label>
+      <input id="pdfFile" type="file" accept="application/pdf,.pdf">
+      <p style="font-size:11px;opacity:.75;margin:6px 0 0">
+        Extracts the plan's real vector geometry. The footprint shown is a
+        best-effort <b>bbox of the extracted geometry</b> — not a full room
+        segmentation, and not an AHJ/PE/accurate drawing. The scale is
+        operator-supplied (never guessed); enter the drawing's real scale.
+      </p>
     </div>
 
     <h3>Design Basis</h3>
@@ -601,7 +616,27 @@ function currentBody() {
   else if (src === 'building') { body.buildingSvg = txt; body.unitsPerPx = units; }
   else if (src === 'dxf') { body.dxf = txt; body.unitsPerDrawingUnit = units; }
   else if (src === 'building-dxf') { body.buildingDxf = txt; body.unitsPerDrawingUnit = units; }
+  else if (src === 'pdf') {
+    body.pdf = pdfBase64 || '';
+    body.pdfPageIndex = Number($('pdfPageIndex').value) || 0;
+    body.pdfScale = Number($('pdfScale').value); // operator-supplied; server throws if absent/<=0
+  }
   return body;
+}
+
+// Holds the base64 of the selected vector PDF (read on file pick).
+let pdfBase64 = '';
+function readPdfFile(file) {
+  return new Promise((resolve, reject) => {
+    const fr = new FileReader();
+    fr.onload = () => {
+      // data URL -> strip the "data:...;base64," prefix.
+      const s = String(fr.result);
+      resolve(s.slice(s.indexOf(',') + 1));
+    };
+    fr.onerror = () => reject(fr.error);
+    fr.readAsDataURL(file);
+  });
 }
 
 async function generate() {
@@ -610,8 +645,13 @@ async function generate() {
   $('status').textContent = 'building layout…';
   try {
     lastBody = currentBody();
-    const importSrc = ['svg', 'building', 'dxf', 'building-dxf'].includes($('planSource').value);
+    const planSrc = $('planSource').value;
+    const importSrc = ['svg', 'building', 'dxf', 'building-dxf'].includes(planSrc);
     if (importSrc && !$('svgInput').value.trim()) { $('status').textContent = 'paste the drawing first'; return; }
+    if (planSrc === 'pdf') {
+      if (!pdfBase64) { $('status').textContent = 'pick a vector PDF first'; return; }
+      if (!(Number($('pdfScale').value) > 0)) { $('status').textContent = 'enter the drawing scale (feet per PDF point) — never guessed'; return; }
+    }
     const { bid, cadModel, hydraulics, hydraulicNetwork, compliance, fullScopeBid, isBuilding } = await api('/projects/' + encodeURIComponent(HOME_DEPOT) + '/sprinkler-bid', {
       method: 'POST', body: JSON.stringify(lastBody),
     });
@@ -725,11 +765,19 @@ $('planSource').onchange = (e) => {
   const v = e.target.value;
   const isImport = ['svg', 'building', 'dxf', 'building-dxf'].includes(v);
   $('svgBox').style.display = isImport ? '' : 'none';
+  if ($('pdfBox')) $('pdfBox').style.display = v === 'pdf' ? '' : 'none';
   const isDxf = v === 'dxf' || v === 'building-dxf';
   if ($('drawingLabel')) $('drawingLabel').textContent = isDxf
     ? 'DXF (ENTITIES: LWPOLYLINE / LINE / CIRCLE; layers ROOMS/WALLS-EXT/WALLS-INT/DOOR/COLUMN for buildings)'
     : 'SVG (rect / polygon / path)';
   if ($('svgInput')) $('svgInput').placeholder = isDxf ? '0\nSECTION\n2\nENTITIES\n…\n0\nEOF' : '<svg><rect x="0" y="0" width="60" height="40" data-hazard="ordinary"/></svg>';
+};
+if ($('pdfFile')) $('pdfFile').onchange = async (e) => {
+  const f = e.target.files && e.target.files[0];
+  if (!f) { pdfBase64 = ''; return; }
+  $('status').textContent = 'reading PDF…';
+  try { pdfBase64 = await readPdfFile(f); $('status').textContent = 'PDF loaded (' + Math.round(f.size / 1024) + ' KB) — set the scale, then Generate'; }
+  catch (err) { pdfBase64 = ''; $('status').textContent = 'PDF read error: ' + err.message; }
 };
 $('exaggerate').onchange = (e) => { pipeVizScale = e.target.checked ? 6 : 1; if (currentCadModel) renderModel(currentCadModel); };
 $('genBtn').onclick = generate;
