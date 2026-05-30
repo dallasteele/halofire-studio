@@ -66,6 +66,49 @@
     <h2>Component Library <span class="muted" style="text-transform:none">· catalog → OpenSCAD → SAM 3.1 → gated</span></h2>
     <div id="lib"><span class="muted">loading…</span></div>
   </div>
+
+  <div class="card wide">
+    <h2>Attach catalog part (admin)</h2>
+    <p class="muted" style="margin-bottom:8px">
+      Attach a real catalog model to one component so the demo renders the ACTUAL part instead of the generated shape.
+      Web-mesh formats (<code>stl</code>/<code>glb</code>/<code>gltf</code>/<code>obj</code>) render the actual component;
+      other formats (<code>step</code>/<code>stp</code>/<code>dwg</code>/<code>dxf</code>/<code>pdf</code>) are recorded as evidence only and are NOT rendered.
+      Manufacturer-exact applies per-part and ONLY when BOTH manufacturer and license are attested.
+      This affects one component at a time — it does NOT clear the AUTOSPRINK parity gate, which stays
+      <b style="color:var(--fire)">blocked</b> (no parity/AHJ/PE/permit/fabrication claim).
+    </p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;max-width:720px">
+      <label class="muted">Component key
+        <input id="attKey" placeholder="component key (click a part above to prefill)" style="width:100%;margin-top:3px" list="attKeyList">
+        <datalist id="attKeyList"></datalist>
+      </label>
+      <label class="muted">Mode
+        <select id="attMode" style="width:100%;margin-top:3px"><option value="link">link (catalog URL)</option><option value="upload">upload (filename)</option></select>
+      </label>
+      <label class="muted" id="attRefLabel">Catalog URL
+        <input id="attRef" placeholder="https://manufacturer.com/catalog/part" style="width:100%;margin-top:3px">
+      </label>
+      <label class="muted">Format
+        <input id="attFormat" placeholder="stl / glb / gltf / obj / step / dwg" style="width:100%;margin-top:3px" list="attFormatList">
+        <datalist id="attFormatList">
+          <option value="stl"><option value="glb"><option value="gltf"><option value="obj"><option value="step"><option value="dwg">
+        </datalist>
+      </label>
+      <label class="muted">Manufacturer
+        <input id="attManufacturer" placeholder="e.g. Tyco (optional)" style="width:100%;margin-top:3px">
+      </label>
+      <label class="muted">License
+        <input id="attLicense" placeholder="license / attestation (optional)" style="width:100%;margin-top:3px">
+      </label>
+      <label class="muted" style="grid-column:1/-1">Notes
+        <input id="attNotes" placeholder="evidence notes (optional)" style="width:100%;margin-top:3px">
+      </label>
+    </div>
+    <div style="margin-top:10px;display:flex;gap:10px;align-items:center">
+      <button id="attSubmit">Attach catalog part</button>
+      <span id="attMsg" class="muted"></span>
+    </div>
+  </div>
 </main>
 
 <script type="module">
@@ -142,15 +185,53 @@ async function loadLibrary() {
       + `<b style="color:var(--fire)">${miss} need import</b>. OpenClaw finds/creates parts automatically; you only import the rest. `
       + `Parity gate stays <b style="color:var(--fire)">${parts.parityGateStatus || 'blocked'}</b> — auto-built parts are not manufacturer-exact.</div>`
       + (miss ? `<div style="margin:6px 0 10px;padding:8px;border:1px solid rgba(229,57,53,.3);border-radius:8px"><b style="color:var(--fire);font-size:12px">Needs import (${miss})</b> <span class="muted">— OpenClaw hasn't sourced these; point the importer below at a catalog doc/URL.</span><div style="margin-top:6px">${missing.map(c=>`<span class="pill missing" data-import="${c.key}" style="cursor:pointer">${c.name||c.key}</span>`).join('')}</div></div>` : ''));
-    // Clicking a "needs import" part jumps to the documentation importer (the
-    // current per-part import path is the catalogs / manufacturer-cut-sheets slots).
+    // Populate the attach-catalog-part key datalist so admins can pick any component.
+    const keyList = $('attKeyList');
+    if (keyList) keyList.innerHTML = comps.map(c => `<option value="${c.key}">${(c.name||c.key)}${c.present?'':' · needs import'}</option>`).join('');
+    // Clicking a part prefills the "Attach catalog part" form key field, focuses it,
+    // and scrolls it into view so the admin can attach a REAL catalog model via
+    // POST /api/parts/:key/override (this replaces the generated mesh for that part).
     $('lib').querySelectorAll('[data-import]').forEach(el => el.addEventListener('click', () => {
-      const sel = $('docType'); if (sel) { sel.value = 'manufacturer_cut_sheets'; }
-      const v = $('docVal'); if (v) { v.placeholder = `catalog URL / file for: ${el.getAttribute('data-import')}`; v.focus(); }
-      $('docVal') && $('docVal').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const key = el.getAttribute('data-import');
+      const k = $('attKey'); if (k) { k.value = key; k.focus(); k.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
     }));
   } catch(e){ $('lib').innerHTML = '<span class="err">library unavailable: '+e.message+'</span>'; }
 }
+
+// Swap the ref input label + placeholder between catalog URL (link) and filename (upload).
+function syncAttMode() {
+  const mode = $('attMode').value;
+  if (mode === 'upload') {
+    $('attRefLabel').firstChild.textContent = 'Filename';
+    $('attRef').placeholder = 'part-model.stl';
+  } else {
+    $('attRefLabel').firstChild.textContent = 'Catalog URL';
+    $('attRef').placeholder = 'https://manufacturer.com/catalog/part';
+  }
+}
+$('attMode').addEventListener('change', syncAttMode);
+syncAttMode();
+
+$('attSubmit').onclick = async () => {
+  const msg = $('attMsg'); msg.className = 'muted'; msg.textContent = '';
+  const key = $('attKey').value.trim();
+  const mode = $('attMode').value;
+  const ref = $('attRef').value.trim();
+  if (!key) { msg.className = 'err'; msg.textContent = 'enter a component key'; return; }
+  if (!ref) { msg.className = 'err'; msg.textContent = mode === 'upload' ? 'enter a filename' : 'enter a catalog URL'; return; }
+  // Build the body with ONLY allowed fields; omit empty optional fields (no empty-string noise).
+  const body = { mode, ...(mode === 'upload' ? { filename: ref } : { url: ref }) };
+  const fmt = $('attFormat').value.trim(); if (fmt) body.format = fmt;
+  const manu = $('attManufacturer').value.trim(); if (manu) body.manufacturer = manu;
+  const lic = $('attLicense').value.trim(); if (lic) body.license = lic;
+  const notes = $('attNotes').value.trim(); if (notes) body.notes = notes;
+  try {
+    const r = await api('/parts/' + key + '/override', { method: 'POST', body: JSON.stringify(body) });
+    msg.className = 'muted';
+    msg.innerHTML = `attached · source: <b style="color:var(--green)">${r.source}</b> · manufacturer-exact: <b class="st ${r.manufacturerExact?'true':'false'}" style="padding:1px 6px">${r.manufacturerExact}</b> — parity gate stays <b style="color:var(--fire)">blocked</b>.`;
+    await loadLibrary();
+  } catch(e){ msg.className = 'err'; msg.textContent = e.message; }
+};
 
 loadParity(); loadDocs(); loadDeps(); loadLibrary();
 </script>
