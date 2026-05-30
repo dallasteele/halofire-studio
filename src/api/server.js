@@ -30,9 +30,10 @@ import { buildPartManifest } from '../components/part-mesh.js';
 import { balanceNetwork } from '../engine/hydraulic-network.js';
 import { checkCompliance } from '../engine/nfpa-compliance.js';
 import { buildSubmittal, renderSubmittalPdf } from '../engine/submittal.js';
-import { homeDepotRexburgFloorPlan } from '../data/floorplans.js';
+import { homeDepotRexburgFloorPlan, cooperative1881FloorPlan, COOPERATIVE_1881_PROJECT_NAME } from '../data/floorplans.js';
 import { HOME_DEPOT_PROJECT_NAME } from '../data/evidence-gates.js';
 import { readHomeDepotRealTakeoff } from '../data/home-depot-bid-package.js';
+import { readCooperative1881RealTakeoff } from '../data/cooperative-1881-bid-package.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const log = createLogger('api-server');
@@ -660,6 +661,10 @@ function runSprinklerPipeline(req) {
     floorPlan = normalizeFloorPlan(req.body.floorPlan);
   } else if (projectName === HOME_DEPOT_PROJECT_NAME) {
     floorPlan = homeDepotRexburgFloorPlan();
+  } else if (projectName === COOPERATIVE_1881_PROJECT_NAME) {
+    // Residential apartment job with no DXF — built-in plan uses the REAL
+    // sprinklered area (170,654 sqft) with a placeholder footprint shape.
+    floorPlan = cooperative1881FloorPlan();
   }
   // A building drawing (SVG or DXF) -> synthesize a flat floor plan for bid/hydraulics/scene.
   if (building && !floorPlan) {
@@ -886,6 +891,68 @@ function runSprinklerPipeline(req) {
       } catch (takeoffErr) {
         // Absent or unparseable workbook: omit realTakeoff, keep base calibration.
         log.warn?.('home-depot real takeoff unavailable', { error: takeoffErr.message });
+      }
+    }
+
+    // Cooperative 1881 — a RESIDENTIAL apartment job (standard-spray, NOT ESFR).
+    // Enrich the full-scope bid with the REAL ESI/Knowify takeoff parsed from the
+    // proposal workbook (Building (1) Knowify SOV cost block; column sums
+    // validated against the sheet "Knowify Check" total; source cells cited).
+    // Fail-soft: an absent/unparseable workbook OMITS the calibration entirely
+    // and leaves the bid intact — it must NEVER throw or 500. The real takeoff is
+    // REAL parsed data (an evidence trail), NOT a model achievement and NOT a
+    // parity/accuracy/AHJ/PE claim; it flips NO gate. Home Depot + generic
+    // projects are untouched (this branch never runs for them).
+    if (projectName === COOPERATIVE_1881_PROJECT_NAME && typeof fullScopeBid.fullScopeTotal === 'number') {
+      try {
+        const realTakeoff = readCooperative1881RealTakeoff();
+        const referenceTotal = realTakeoff.total; // 538,792.35 single-building proposal total
+        const deltaUsd = round2(fullScopeBid.fullScopeTotal - referenceTotal);
+        const deltaPct = referenceTotal
+          ? round2((deltaUsd / referenceTotal) * 100)
+          : 0;
+        const m = fullScopeBid;
+        // The real takeoff bundles equipment alongside labor at the cost level,
+        // so compare labor (+ equipment) like the Home Depot calibration. Misc +
+        // subcontractor map to the model's soft-cost + OH&P roll-up.
+        const modelSoftPlusOhp = round2((m.softCostTotal || 0) + (m.ohp?.ohpTotal || 0));
+        const realLaborPlusEquip = round2(realTakeoff.cost.labor + realTakeoff.cost.equipment);
+        const realDesignSub = round2(realTakeoff.cost.subcontractor + realTakeoff.cost.miscellaneous);
+        const cmp = (label, modelUsd, realUsd) => ({
+          label,
+          modelUsd: round2(modelUsd),
+          realUsd: round2(realUsd),
+          deltaUsd: round2((modelUsd || 0) - (realUsd || 0)),
+        });
+        fullScopeBid.calibration = {
+          source: 'cooperative-1881-proposal',
+          referenceTotal,
+          fullScopeTotal: fullScopeBid.fullScopeTotal,
+          deltaUsd,
+          deltaPct,
+          realTakeoff,
+          byCategory: {
+            basis: 'cost (un-marked-up) — model estimate categories vs real ESI/Knowify takeoff categories',
+            rows: [
+              cmp('materials', m.materialsOnly, realTakeoff.cost.material),
+              cmp('labor (+ equipment)', m.laborCost, realLaborPlusEquip),
+              cmp('system components', m.systemComponentCost, 0),
+              cmp('design (sub + misc)', modelSoftPlusOhp, realDesignSub),
+            ],
+            note: 'informational itemized comparison only — not an accuracy or '
+              + 'parity claim, and it clears no regulated gate. Residential '
+              + 'standard-spray materials are well-modeled by the engine, so this '
+              + 'is an honest second calibration check distinct from the ESFR '
+              + 'Home Depot job.',
+          },
+          note: 'informational comparison only — not an accuracy or parity claim, '
+            + 'and it clears no regulated gate. The full-scope figure is a '
+            + 'best-effort estimate, not a complete or quoted bid. The reference '
+            + 'is the REAL single-building proposal total (538,792.35).',
+        };
+      } catch (takeoffErr) {
+        // Absent or unparseable workbook: omit calibration entirely (fail-soft).
+        log.warn?.('cooperative-1881 real takeoff unavailable', { error: takeoffErr.message });
       }
     }
   } catch (e) {

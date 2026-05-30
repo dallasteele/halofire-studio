@@ -14,11 +14,16 @@ const ROOT = path.resolve(import.meta.dirname, '..');
 // T24: the real ESI takeoff is parsed from this untracked-but-present workbook.
 // Skip the realTakeoff assertion on a fresh clone / CI that lacks the file.
 const HAVE_WORKBOOK = fs.existsSync(path.join(ROOT, 'Proposal- Home Depot - Rexburg ID.xlsx'));
+// Cooperative 1881 — RESIDENTIAL apartment job (standard-spray, NOT ESFR). Its
+// real ESI/Knowify proposal workbook is present locally but untracked.
+const HAVE_COOP_WORKBOOK = fs.existsSync(path.join(ROOT, 'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx'));
 const PORT = 3199;
 const BASE = `http://127.0.0.1:${PORT}`;
 const HOME_DEPOT_NAME = 'Home Depot - Rexburg ID';
+const COOP_1881_NAME = 'The Cooperative 1881 - Salt Lake City UT';
 const GENERIC = '/api/projects/FullScope%20Test';
 const HOME_DEPOT = `/api/projects/${encodeURIComponent(HOME_DEPOT_NAME)}`;
+const COOP_1881 = `/api/projects/${encodeURIComponent(COOP_1881_NAME)}`;
 
 let server; let tempDir; let token;
 
@@ -302,6 +307,76 @@ describe('T22 full-scope bid wired into sprinkler-bid', () => {
 
     // No gate flips on the full-scope bid.
     expect(fsb.estimate).toBe(true);
+    expect(fsb.parity).toBeUndefined();
+    expect(fsb.approved).not.toBe(true);
+
+    // AUTOSPRINK_PARITY stays blocked.
+    const parityRes = await fetch(`${BASE}/api/parity`, {
+      method: 'GET', headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(parityRes.status).toBe(200);
+    const parityBody = await parityRes.json();
+    expect(parityBody.gate.status).toBe('blocked');
+    expect(parityBody.parityAchieved).not.toBe(true);
+  });
+
+  // Cooperative 1881 — RESIDENTIAL apartment job. The built-in plan uses the
+  // REAL sprinklered area (170,654 sqft) with a placeholder footprint, runs the
+  // ordinary (residential standard-spray) hazard — NOT ESFR — and carries an
+  // INFORMATIONAL calibration vs the REAL ESI/Knowify takeoff (538,792.35).
+  // SKIP-IF-ABSENT: untracked workbook may be missing on a fresh clone / CI.
+  it.skipIf(!HAVE_COOP_WORKBOOK)('Cooperative 1881 runs residential (NOT ESFR) with a real-takeoff calibration; gates unchanged', async () => {
+    const res = await post(COOP_1881, {});
+    expect(res.status).toBe(200);
+    const body = await res.json();
+
+    // Residential standard-spray: NO ESFR lines, has the basic spray head line.
+    const bomKeys = (body.bid.bom || []).map((b) => b.key);
+    expect(bomKeys).toContain('sprinkler_head');
+    expect(bomKeys).not.toContain('esfr_head');
+    expect(bomKeys).not.toContain('bulk_main_pipe');
+    expect(bomKeys).not.toContain('underground_main');
+    // Hazard is the residential standard-spray class, not a storage class.
+    expect(body.bid.rooms?.[0]?.hazard).toBe('ordinary');
+
+    const fsb = body.fullScopeBid;
+    expect(fsb).toBeTruthy();
+    expect(fsb.error).toBeUndefined();
+    expect(fsb.estimate).toBe(true);
+    expect(fsb.materialsOnly).toBeGreaterThan(0);
+
+    // Calibration vs the REAL parsed takeoff.
+    const cal = fsb.calibration;
+    expect(cal).toBeTruthy();
+    expect(cal.source).toBe('cooperative-1881-proposal');
+    expect(cal.referenceTotal).toBeCloseTo(538792.35, 1);
+    expect(cal.fullScopeTotal).toBe(fsb.fullScopeTotal);
+    expect(cal.deltaUsd).toBeCloseTo(fsb.fullScopeTotal - 538792.35, 1);
+    expect(typeof cal.deltaPct).toBe('number');
+    expect(cal.note.toLowerCase()).toContain('not an accuracy or parity claim');
+
+    // Real takeoff numbers present + cited.
+    const rt = cal.realTakeoff;
+    expect(rt).toBeTruthy();
+    expect(rt.cost.material).toBeCloseTo(188777.67, 2);
+    expect(rt.cost.labor).toBeCloseTo(152694.67, 2);
+    expect(rt.cost.equipment).toBeCloseTo(25525.50, 2);
+    expect(rt.cost.subcontractor).toBe(19432);
+    expect(rt.cost.total).toBeCloseTo(405107.03, 2);
+    expect(rt.total).toBeCloseTo(538792.35, 2);
+    expect(rt.headCount).toBe(1420);
+    expect(rt.sqft).toBe(170654);
+    expect(rt.sourceRefs.join(' ')).toContain('#Building (1)!');
+
+    // Itemized comparison present + labelled informational.
+    expect(Array.isArray(cal.byCategory.rows)).toBe(true);
+    expect(cal.byCategory.rows.length).toBeGreaterThan(0);
+    expect(cal.byCategory.note.toLowerCase()).toContain('not an accuracy or parity claim');
+
+    // Honesty: real takeoff clears NOTHING; no parity/approval flag anywhere.
+    expect(rt.disclaimer.toLowerCase()).not.toContain('parity');
+    expect(cal.realTakeoff.parity).toBeUndefined();
+    expect(cal.realTakeoff.approved).toBeUndefined();
     expect(fsb.parity).toBeUndefined();
     expect(fsb.approved).not.toBe(true);
 
