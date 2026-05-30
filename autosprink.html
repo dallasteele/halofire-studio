@@ -673,11 +673,14 @@ async function generate() {
     let fsHtml = '';
     if (fullScopeBid && !fullScopeBid.error) {
       const cal = fullScopeBid.calibration;
+      const ohpTotal = fullScopeBid.ohp ? fullScopeBid.ohp.ohpTotal : 0;
       fsHtml = `
       <div class="kv" style="border-top:1px solid var(--border);margin-top:6px;padding-top:6px"><span>System components</span><b>${usd(fullScopeBid.systemComponentCost)}</b></div>
+      <div class="kv"><span>Field labor (est)</span><b>${usd(fullScopeBid.laborCost)}</b></div>
       <div class="kv"><span>Soft costs (permit/design/freight)</span><b>${usd(fullScopeBid.softCostTotal)}</b></div>
+      <div class="kv"><span>Overhead &amp; Profit (est)</span><b>${usd(ohpTotal)}</b></div>
       <div class="kv"><span>Full-scope estimate</span><b class="total" style="font-size:14px">${usd(fullScopeBid.fullScopeTotal)}</b></div>
-      <div class="muted" style="font-size:10px">best-effort full scope — system components + soft costs are fallback/assumption estimates, NOT a quoted bid</div>`
+      <div class="muted" style="font-size:10px">best-effort full scope — field labor, system components, soft costs, and overhead &amp; profit are assumption-based estimates (documented public conventions), NOT a quoted bid</div>`
       + (cal ? `<div class="muted" style="font-size:10px;margin-top:4px">vs real bid-log ${usd(cal.referenceTotal)}: <b style="color:${Math.abs(cal.deltaPct) <= 25 ? 'var(--gold)' : 'var(--fire)'}">${cal.deltaPct > 0 ? '+' : ''}${cal.deltaPct}%</b> — ${cal.note}</div>` : '');
     } else if (fullScopeBid && fullScopeBid.error) {
       fsHtml = `<div class="est" style="font-size:10px">full-scope unavailable: ${fullScopeBid.error}</div>`;

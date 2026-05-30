@@ -760,9 +760,16 @@ function runSprinklerPipeline(req) {
   // build throws we surface { error } rather than fabricating a number.
   let fullScopeBid = null;
   try {
+    // T23: feed the detailed field-labor model from the bid BOM. branch_pipe is
+    // priced per-FT (quantity = pipe footage); fitting quantity = fitting count.
+    const bomItems = Array.isArray(bid.bom) ? bid.bom : [];
+    const pipeFootage = bomItems.find((b) => b.key === 'branch_pipe')?.quantity ?? 0;
+    const fittingCount = bomItems.find((b) => b.key === 'fitting')?.quantity ?? 0;
     fullScopeBid = buildFullScopeBid(bid.pricing, {
       priceResolver: opts.priceResolver,
       totalHeadCount: bid.totalHeadCount,
+      pipeFootage,
+      fittingCount,
       hazard,
       // Required pressure from the single-path estimate (when it ran) lets the
       // fire-pump conditional evaluate honestly. availablePressure is left

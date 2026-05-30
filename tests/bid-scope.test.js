@@ -2,8 +2,12 @@ import { describe, expect, it } from 'vitest';
 import {
   buildSystemComponents,
   buildSoftCosts,
+  buildLaborScope,
+  buildOverheadProfit,
   buildFullScopeBid,
   SOFT_COST_ASSUMPTIONS,
+  LABOR_ASSUMPTIONS,
+  OHP_ASSUMPTIONS,
   SYSTEM_COMPONENT_FALLBACK_COSTS,
 } from '../src/engine/bid-scope.js';
 
@@ -127,17 +131,32 @@ describe('buildFullScopeBid', () => {
   });
 
   it('computes a full-scope total alongside the bare materials total', () => {
-    const full = buildFullScopeBid(baseBid, { totalHeadCount: 200, hazard: 'ordinary' });
+    // Supply the labor drivers so labor + OH&P participate (T23).
+    const full = buildFullScopeBid(baseBid, {
+      totalHeadCount: 200,
+      hazard: 'ordinary',
+      pipeFootage: 1200,
+      fittingCount: 215,
+    });
 
-    // Bare materials total is preserved untouched.
+    // Bare materials total is preserved untouched (back-compat reference).
     expect(full.bareMaterialsTotal).toBe(baseBid.total);
+
+    // T23: full-scope is built from the bare MATERIAL cost (un-marked-up), NOT
+    // the marked-up priceBid total, to avoid double-counting labor/markup.
+    expect(full.materialsOnly).toBe(baseBid.materialCost);
 
     // System components cost = sum of fallback line totals (no resolver supplied).
     const expectedComponentCost = full.systemComponentLines.reduce((s, l) => s + l.lineTotal, 0);
     expect(full.systemComponentCost).toBeCloseTo(expectedComponentCost, 2);
 
-    // Soft costs are computed on (bareMaterialsTotal + systemComponentCost).
-    const softBase = full.bareMaterialsTotal + full.systemComponentCost;
+    // Detailed field labor is present and priced from documented assumptions.
+    expect(full.laborScope).toBeTruthy();
+    expect(full.laborCost).toBeCloseTo(full.laborScope.laborCost, 2);
+    expect(full.laborCost).toBeGreaterThan(0);
+
+    // Soft costs are computed on (materialsOnly + systemComponentCost + laborCost).
+    const softBase = full.materialsOnly + full.systemComponentCost + full.laborCost;
     const expectedSoft = softBase * (
       SOFT_COST_ASSUMPTIONS.permit
       + SOFT_COST_ASSUMPTIONS.engineering_design
@@ -145,11 +164,12 @@ describe('buildFullScopeBid', () => {
     );
     expect(full.softCostTotal).toBeCloseTo(expectedSoft, 2);
 
-    // Full-scope total = bare + components + soft.
-    expect(full.fullScopeTotal).toBeCloseTo(
-      full.bareMaterialsTotal + full.systemComponentCost + full.softCostTotal,
-      2,
-    );
+    // OH&P rides on the cost subtotal (materials + components + labor + soft).
+    expect(full.ohp).toBeTruthy();
+    const costSubtotal = full.materialsOnly + full.systemComponentCost + full.laborCost + full.softCostTotal;
+    expect(full.fullScopeTotal).toBeCloseTo(costSubtotal + full.ohp.ohpTotal, 2);
+
+    // Full-scope total still exceeds the bare-materials reference total.
     expect(full.fullScopeTotal).toBeGreaterThan(full.bareMaterialsTotal);
   });
 
@@ -167,5 +187,111 @@ describe('buildFullScopeBid', () => {
       firePumpRequired: true,
     });
     expect(full.systemComponentLines.some((l) => l.key === 'fire_pump')).toBe(true);
+  });
+
+  it('includes labor + OH&P scope, flagged as assumptions (T23)', () => {
+    const full = buildFullScopeBid(baseBid, {
+      totalHeadCount: 200,
+      hazard: 'ordinary',
+      pipeFootage: 1200,
+      fittingCount: 215,
+    });
+    // Labor lines are flagged labor_assumption.
+    expect(full.laborScope.lines.length).toBe(3);
+    for (const line of full.laborScope.lines) {
+      expect(line.priceSource).toBe('labor_assumption');
+      expect(line.unit).toBe('HR');
+    }
+    // OH&P lines are flagged ohp_assumption.
+    expect(full.ohp.lines.length).toBe(2);
+    for (const line of full.ohp.lines) {
+      expect(line.priceSource).toBe('ohp_assumption');
+    }
+    // Assumptions present -> the scope flags estimated pricing.
+    expect(full.anyEstimated).toBe(true);
+    // Disclaimer now mentions labor + OH&P as assumptions.
+    expect(full.disclaimer.toLowerCase()).toContain('labor');
+    expect(full.disclaimer.toLowerCase()).toMatch(/oh&p|overhead/);
+  });
+
+  it('handles zero labor drivers without throwing (zero labor cost)', () => {
+    const full = buildFullScopeBid(baseBid, { totalHeadCount: 0, hazard: 'ordinary' });
+    expect(full.laborScope.laborCost).toBe(0);
+    expect(full.laborScope.laborHours).toBe(0);
+    // Still produces a coherent total (>= bare materials reference).
+    expect(full.fullScopeTotal).toBeGreaterThanOrEqual(0);
+  });
+});
+
+describe('buildLaborScope', () => {
+  it('prices head/pipe/fitting labor from documented hour assumptions', () => {
+    const labor = buildLaborScope({ totalHeadCount: 100, pipeFootage: 1000, fittingCount: 200 });
+    const head = labor.lines.find((l) => l.key === 'head_install');
+    const pipe = labor.lines.find((l) => l.key === 'pipe_handling');
+    const fitting = labor.lines.find((l) => l.key === 'fitting_install');
+
+    expect(head.hours).toBeCloseTo(100 * LABOR_ASSUMPTIONS.hoursPerHead, 4);
+    expect(pipe.hours).toBeCloseTo(1000 * LABOR_ASSUMPTIONS.hoursPerPipeFt, 4);
+    expect(fitting.hours).toBeCloseTo(200 * LABOR_ASSUMPTIONS.hoursPerFitting, 4);
+
+    for (const line of labor.lines) {
+      expect(line.unit).toBe('HR');
+      expect(line.ratePerHour).toBe(LABOR_ASSUMPTIONS.laborRatePerHour);
+      expect(line.priceSource).toBe('labor_assumption');
+      expect(line.lineTotal).toBeCloseTo(line.hours * line.ratePerHour, 2);
+    }
+
+    const expectedHours = 100 * LABOR_ASSUMPTIONS.hoursPerHead
+      + 1000 * LABOR_ASSUMPTIONS.hoursPerPipeFt
+      + 200 * LABOR_ASSUMPTIONS.hoursPerFitting;
+    expect(labor.laborHours).toBeCloseTo(expectedHours, 4);
+    expect(labor.laborCost).toBeCloseTo(expectedHours * LABOR_ASSUMPTIONS.laborRatePerHour, 2);
+  });
+
+  it('honours per-constant overrides while defaulting the rest', () => {
+    const labor = buildLaborScope(
+      { totalHeadCount: 10, pipeFootage: 0, fittingCount: 0 },
+      { hoursPerHead: 1.0, laborRatePerHour: 100 },
+    );
+    const head = labor.lines.find((l) => l.key === 'head_install');
+    expect(head.hours).toBe(10); // 10 * 1.0 override
+    expect(head.ratePerHour).toBe(100); // rate override
+    expect(head.lineTotal).toBe(1000);
+    expect(labor.laborCost).toBe(1000);
+  });
+
+  it('returns zero hours for missing/zero drivers without throwing', () => {
+    const labor = buildLaborScope({});
+    expect(labor.laborHours).toBe(0);
+    expect(labor.laborCost).toBe(0);
+    for (const line of labor.lines) expect(line.hours).toBe(0);
+  });
+});
+
+describe('buildOverheadProfit', () => {
+  it('applies overhead on cost then profit on cost+overhead (documented order)', () => {
+    const cost = 100000;
+    const ohp = buildOverheadProfit(cost);
+    const overhead = ohp.lines.find((l) => l.key === 'overhead');
+    const profit = ohp.lines.find((l) => l.key === 'profit');
+
+    expect(overhead.pct).toBe(OHP_ASSUMPTIONS.overhead);
+    expect(profit.pct).toBe(OHP_ASSUMPTIONS.profit);
+    expect(overhead.priceSource).toBe('ohp_assumption');
+    expect(profit.priceSource).toBe('ohp_assumption');
+
+    const expectedOverhead = cost * OHP_ASSUMPTIONS.overhead; // 10000
+    const expectedProfit = (cost + expectedOverhead) * OHP_ASSUMPTIONS.profit; // 11000
+    expect(ohp.overheadTotal).toBeCloseTo(expectedOverhead, 2);
+    expect(ohp.profitTotal).toBeCloseTo(expectedProfit, 2);
+    expect(ohp.ohpTotal).toBeCloseTo(expectedOverhead + expectedProfit, 2);
+  });
+
+  it('honours overhead/profit overrides and zero subtotal', () => {
+    expect(buildOverheadProfit(0).ohpTotal).toBe(0);
+    const ohp = buildOverheadProfit(1000, { overhead: 0.2, profit: 0 });
+    expect(ohp.overheadTotal).toBe(200);
+    expect(ohp.profitTotal).toBe(0);
+    expect(ohp.ohpTotal).toBe(200);
   });
 });
