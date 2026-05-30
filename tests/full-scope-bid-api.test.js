@@ -257,6 +257,62 @@ describe('T22 full-scope bid wired into sprinkler-bid', () => {
     expect(bomKeys).not.toContain('feed_main_pipe');
     expect(bomKeys).not.toContain('bulk_main_pipe');
     expect(bomKeys).not.toContain('underground_main');
+    // T26 — additive ESFR-only categories must NOT leak into a non-ESFR project.
+    expect(bomKeys).not.toContain('drop_armover');
+    expect(bomKeys).not.toContain('seismic_brace');
+  });
+
+  // T26: fold the two GENUINELY-OMITTED, geometry/NFPA-derivable material
+  // categories (drop/armover per head + seismic sway bracing) into the ESFR
+  // auto-estimate. materialsOnly grows past the pre-T26 $113,494.78; the BOM
+  // carries the two new lines; in-rack is NOT added (real ESFR is ceiling-only);
+  // gates stay UNCHANGED (parity blocked, estimate:true). NOT tuned to any total.
+  it('Home Depot folds in drop_armover + seismic_brace; materials grow, gates unchanged', async () => {
+    const PRE_T26_MATERIALS_ONLY = 113494.78;
+    const res = await post(HOME_DEPOT, {});
+    expect(res.status).toBe(200);
+    const body = await res.json();
+
+    const bom = body.bid.bom || [];
+    const bomKeys = bom.map((b) => b.key);
+    // The two genuinely-omitted categories are now present.
+    expect(bomKeys).toContain('drop_armover');
+    expect(bomKeys).toContain('seismic_brace');
+    // In-rack is correctly EXCLUDED (ESFR is ceiling-only; in-rack would over-scope).
+    for (const k of bomKeys) expect(k).not.toMatch(/in.?rack/i);
+
+    // drop_armover qty == ESFR head count (one per ceiling head).
+    const drop = bom.find((b) => b.key === 'drop_armover');
+    const esfrHead = bom.find((b) => b.key === 'esfr_head');
+    expect(drop.quantity).toBe(esfrHead.quantity);
+    // seismic_brace count is a positive integer derived from the routed mains.
+    const brace = bom.find((b) => b.key === 'seismic_brace');
+    expect(Number.isInteger(brace.quantity)).toBe(true);
+    expect(brace.quantity).toBeGreaterThan(0);
+
+    const fsb = body.fullScopeBid;
+    expect(fsb.error).toBeUndefined();
+    // materialsOnly grew vs the pre-T26 figure (the two omitted categories add cost).
+    expect(fsb.materialsOnly).toBeGreaterThan(PRE_T26_MATERIALS_ONLY);
+
+    // Calibration delta still computed and still honest (short of the real total).
+    const cal = fsb.calibration;
+    expect(typeof cal.deltaPct).toBe('number');
+    expect(cal.deltaPct).toBeLessThan(0);
+
+    // No gate flips on the full-scope bid.
+    expect(fsb.estimate).toBe(true);
+    expect(fsb.parity).toBeUndefined();
+    expect(fsb.approved).not.toBe(true);
+
+    // AUTOSPRINK_PARITY stays blocked.
+    const parityRes = await fetch(`${BASE}/api/parity`, {
+      method: 'GET', headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(parityRes.status).toBe(200);
+    const parityBody = await parityRes.json();
+    expect(parityBody.gate.status).toBe('blocked');
+    expect(parityBody.parityAchieved).not.toBe(true);
   });
 
   it('does not flip any gate: /submittal stays submittalReady=false', async () => {

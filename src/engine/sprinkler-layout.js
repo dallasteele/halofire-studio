@@ -14,6 +14,8 @@
  * All math is deterministic: identical input always yields identical output.
  */
 
+import { SEISMIC_BRACE_INTERVAL_FT, SUPPORTS_NOTE } from './supports.js';
+
 // NFPA 13 standard-spray protection-area + max-spacing limits by hazard class.
 // (Public code values; light/ordinary/extra hazard, non-storage, smooth ceiling.)
 export const HAZARD_RULES = Object.freeze({
@@ -199,6 +201,17 @@ export const ESFR_SCOPE_ASSUMPTIONS = Object.freeze({
 });
 
 /**
+ * T26 — Seismic sway-brace count interval (ft) for the ESFR scope. This is the
+ * SAME public NFPA-13 best-effort lateral-brace interval that supports.js uses
+ * (SEISMIC_BRACE_INTERVAL_FT); re-exported here as a frozen named constant so the
+ * derived brace COUNT is documented at the call site. The brace count is derived
+ * from the routed main footage (floor(totalMainFt / interval)), NOT tuned, and is
+ * carried as a best-effort estimate (assumption:true) — supports.js already
+ * carries the SUPPORTS_NOTE honesty disclaimer for the same interval math.
+ */
+export const ESFR_SEISMIC_BRACE_INTERVAL_FT = SEISMIC_BRACE_INTERVAL_FT;
+
+/**
  * Build the EXTRA, diameter-aware BOM lines for an ESFR storage system, ADDITIVE
  * on top of the existing branch-pipe / fitting / hanger lines. Every quantity is
  * either (a) derived from the routed geometry the engine already produced, or
@@ -217,9 +230,23 @@ export const ESFR_SCOPE_ASSUMPTIONS = Object.freeze({
  *   bulk_main_pipe   FT  qty = ESFR_SCOPE_ASSUMPTIONS.bulkMainFt, 6"       (assumption)
  *   underground_main FT  qty = ESFR_SCOPE_ASSUMPTIONS.undergroundFt, 8"    (assumption)
  *
+ * T26 — two GENUINELY-OMITTED, geometry/NFPA-derivable material categories the
+ * BOM previously dropped (additive, ESFR-only, NOT tuned, NOT in-rack):
+ *   drop_armover     EA  qty = layout.heads.length                         (geometry)
+ *                        Every ESFR ceiling head needs a drop/armover set
+ *                        (nipple + reducer + fitting) from the branch line —
+ *                        one per head, 1:1 with the head count.
+ *   seismic_brace    EA  qty = floor(totalMainFt / interval), where         (geometry)
+ *                        totalMainFt = crossMainFt + feedMainFt + bulkMainFt
+ *                        and interval = ESFR_SEISMIC_BRACE_INTERVAL_FT. NFPA-13
+ *                        lateral sway bracing hardware along the mains; best-effort
+ *                        interval estimate, so assumption:true (mirrors supports.js
+ *                        SUPPORTS_NOTE). In-rack sprinklers are NOT added: real ESFR
+ *                        is ceiling-only, so in-rack would over-scope dishonestly.
+ *
  * @param {{heads:Array, bbox:{width:number,height:number}}} layout
  * @param {{crossMainFt:number}} piping
- * @param {{bulkMainFt?:number, undergroundFt?:number}} opts
+ * @param {{bulkMainFt?:number, undergroundFt?:number, seismicIntervalFt?:number}} opts
  * @returns {Array<{key,description,unit,quantity,nominalIn,scope,assumption?}>}
  */
 export function buildEsfrSystemScope(layout, piping, opts = {}) {
@@ -233,12 +260,23 @@ export function buildEsfrSystemScope(layout, piping, opts = {}) {
   const bulkMainFt = round(opts.bulkMainFt ?? ESFR_SCOPE_ASSUMPTIONS.bulkMainFt);
   const undergroundFt = round(opts.undergroundFt ?? ESFR_SCOPE_ASSUMPTIONS.undergroundFt);
 
+  // T26 — seismic sway-brace count from the routed main footage. Geometry-derived:
+  // total horizontal main run (cross + feed + bulk) divided by the public NFPA-13
+  // lateral-brace interval. floor() so partial intervals do not invent a brace.
+  const seismicIntervalFt = Number(opts.seismicIntervalFt) > 0
+    ? Number(opts.seismicIntervalFt) : ESFR_SEISMIC_BRACE_INTERVAL_FT;
+  const totalMainFt = round(crossMainFt + feedMainFt + bulkMainFt);
+  const braceCount = Math.floor(totalMainFt / seismicIntervalFt);
+
   return [
     { key: 'esfr_head', description: 'ESFR storage sprinkler head', unit: 'EA', quantity: headCount, nominalIn: null, scope: 'esfr' },
     { key: 'cross_main_pipe', description: 'ESFR cross main', unit: 'FT', quantity: crossMainFt, nominalIn: 3, scope: 'esfr' },
     { key: 'feed_main_pipe', description: 'ESFR feed main (long building dimension)', unit: 'FT', quantity: feedMainFt, nominalIn: 6, scope: 'esfr' },
     { key: 'bulk_main_pipe', description: 'ESFR riser / bulk main run (documented assumption)', unit: 'FT', quantity: bulkMainFt, nominalIn: 6, scope: 'esfr', assumption: true },
     { key: 'underground_main', description: 'Underground lead-in main (documented assumption)', unit: 'FT', quantity: undergroundFt, nominalIn: 8, scope: 'esfr', assumption: true },
+    // T26 — genuinely-omitted, geometry/NFPA-derivable categories (ESFR-only).
+    { key: 'drop_armover', description: 'ESFR drop/armover (per head)', unit: 'EA', quantity: headCount, scope: 'esfr' },
+    { key: 'seismic_brace', description: 'Seismic sway brace (NFPA-13, est)', unit: 'EA', quantity: braceCount, scope: 'esfr', assumption: true },
   ];
 }
 
@@ -263,6 +301,12 @@ export const FALLBACK_UNIT_COSTS = Object.freeze({
   feed_main_pipe: 22,
   bulk_main_pipe: 35,
   underground_main: 30,
+  // T26 — genuinely-omitted ESFR categories (labelled fallbacks; used only when
+  // the pricebook band lookup returns null). A drop/armover set (nipple + reducer
+  // + fitting) is a small-component cost; a seismic sway-brace assembly is a
+  // mid-size hardware kit.
+  drop_armover: 8,
+  seismic_brace: 45,
 });
 
 /**

@@ -27,6 +27,12 @@ export const PRICE_BANDS = Object.freeze({
   feed_main_pipe: { keywords: ['sch 40', 'sch 10', 'sch10', 'black pipe', 'steel pipe', 'pipe'], min: 8, max: 120 },
   bulk_main_pipe: { keywords: ['sch 40', 'sch 10', 'sch10', 'black pipe', 'steel pipe', 'pipe'], min: 12, max: 200 },
   underground_main: { keywords: ['ductile', 'underground', 'di pipe', 'c900', 'pipe'], min: 12, max: 300 },
+  // T26 — genuinely-omitted, geometry/NFPA-derivable ESFR categories. The bands
+  // resolve a REAL in-band pricebook median (never an inflated constant): a
+  // drop/armover set is built from small nipple/reducer/fitting stock; a seismic
+  // sway brace is a mid-size bracing-hardware kit.
+  drop_armover: { keywords: ['nipple', 'drop', 'reducer', 'fitting'], min: 1, max: 40 },
+  seismic_brace: { keywords: ['brace', 'seismic', 'sway'], min: 5, max: 120 },
 });
 
 /** Median of a numeric array (lower-middle for even length). Deterministic. */

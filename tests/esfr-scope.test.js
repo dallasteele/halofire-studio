@@ -7,7 +7,9 @@ import {
   buildBillOfMaterials,
   buildEsfrSystemScope,
   ESFR_SCOPE_ASSUMPTIONS,
+  ESFR_SEISMIC_BRACE_INTERVAL_FT,
 } from '../src/engine/sprinkler-layout.js';
+import { SEISMIC_BRACE_INTERVAL_FT } from '../src/engine/supports.js';
 
 const rect = (w, h) => [[0, 0], [w, 0], [w, h], [0, h]];
 
@@ -57,14 +59,26 @@ describe('buildEsfrSystemScope (T25)', () => {
     expect(Object.isFrozen(ESFR_SCOPE_ASSUMPTIONS)).toBe(true);
   });
 
-  it('emits exactly the five ESFR scope lines', () => {
+  it('emits exactly the seven ESFR scope lines (T26 adds drop_armover + seismic_brace)', () => {
     expect(scope.map((l) => l.key).sort()).toEqual(
-      ['bulk_main_pipe', 'cross_main_pipe', 'esfr_head', 'feed_main_pipe', 'underground_main'].sort(),
+      [
+        'bulk_main_pipe', 'cross_main_pipe', 'drop_armover', 'esfr_head',
+        'feed_main_pipe', 'seismic_brace', 'underground_main',
+      ].sort(),
     );
     for (const line of scope) {
       expect(line.scope).toBe('esfr');
       expect(typeof line.description).toBe('string');
     }
+  });
+
+  it('does NOT add an in-rack sprinkler line (real ESFR is ceiling-only)', () => {
+    // In-rack would over-scope dishonestly — assert it is never emitted under any key.
+    const keys = scope.map((l) => l.key);
+    for (const k of keys) {
+      expect(k).not.toMatch(/in.?rack/i);
+    }
+    expect(scope.some((l) => /in.?rack/i.test(l.description))).toBe(false);
   });
 
   it('esfr_head qty = head count, replaces the spray head line', () => {
@@ -99,6 +113,43 @@ describe('buildEsfrSystemScope (T25)', () => {
     expect(byKey.underground_main.quantity).toBe(ESFR_SCOPE_ASSUMPTIONS.undergroundFt); // 100
     expect(byKey.underground_main.nominalIn).toBe(8);
     expect(byKey.underground_main.assumption).toBe(true);
+  });
+
+  it('drop_armover qty = head count (one drop/armover per ESFR ceiling head)', () => {
+    expect(byKey.drop_armover.unit).toBe('EA');
+    expect(byKey.drop_armover.quantity).toBe(layout.heads.length); // 24, 1:1 with heads
+    expect(byKey.drop_armover.quantity).toBe(byKey.esfr_head.quantity);
+    // A real omitted material, NOT a documented assumption — it is geometry-derived.
+    expect(byKey.drop_armover.assumption).not.toBe(true);
+  });
+
+  it('seismic_brace qty = floor(totalMainFt / interval), flagged as an estimate', () => {
+    // Geometry-derived from the routed mains: cross(40) + feed(60) + bulk(40) = 140.
+    const crossMainFt = piping.crossMainFt; // 40
+    const feedMainFt = 60; // round(max(width=60, height=40))
+    const bulkMainFt = ESFR_SCOPE_ASSUMPTIONS.bulkMainFt; // 40
+    const totalMainFt = crossMainFt + feedMainFt + bulkMainFt; // 140
+    const expectedBraces = Math.floor(totalMainFt / ESFR_SEISMIC_BRACE_INTERVAL_FT); // floor(140/40)=3
+    expect(crossMainFt).toBe(40);
+    expect(ESFR_SEISMIC_BRACE_INTERVAL_FT).toBe(40);
+    expect(byKey.seismic_brace.unit).toBe('EA');
+    expect(byKey.seismic_brace.quantity).toBe(expectedBraces); // 3
+    // Best-effort interval estimate -> assumption:true (mirrors supports.js note).
+    expect(byKey.seismic_brace.assumption).toBe(true);
+  });
+
+  it('the seismic interval is the SAME public NFPA-13 interval supports.js uses', () => {
+    expect(ESFR_SEISMIC_BRACE_INTERVAL_FT).toBe(SEISMIC_BRACE_INTERVAL_FT);
+  });
+
+  it('brace count tracks the routed main footage (more main -> >= braces)', () => {
+    // Longer bulk main run -> longer total main -> at least as many braces.
+    const more = buildEsfrSystemScope(layout, piping, { bulkMainFt: 400 });
+    const moreByKey = Object.fromEntries(more.map((l) => [l.key, l]));
+    expect(moreByKey.seismic_brace.quantity)
+      .toBeGreaterThanOrEqual(byKey.seismic_brace.quantity);
+    // cross(40)+feed(60)+bulk(400)=500 -> floor(500/40)=12.
+    expect(moreByKey.seismic_brace.quantity).toBe(12);
   });
 
   it('honors overrides for the documented assumptions', () => {

@@ -114,3 +114,50 @@ describe('ESFR/storage size-class price bands (T25)', () => {
     expect(esfr).toBeGreaterThanOrEqual(spray ?? 0);
   });
 });
+
+// T26: genuinely-omitted, geometry/NFPA-derivable categories. The two new bands
+// must each resolve a REAL non-null in-band pricebook median (never a constant).
+describe('drop_armover + seismic_brace price bands (T26)', () => {
+  // Representative pricebook rows for the two new categories, plus out-of-band
+  // noise that must be excluded.
+  const rows = [
+    // drop / armover stock (nipple + reducer + fitting)
+    { item: 'Black Steel Nipple 1" x 4"', price: 1.85 },
+    { item: 'Reducer Coupling 2" x 1"', price: 6.2 },
+    { item: 'Armover Drop Nipple Assembly', price: 12 },
+    { item: 'Threaded Fitting 1"', price: 3.4 },
+    { item: 'Specialty Drop Assembly Large', price: 950 }, // out of band -> excluded
+    // seismic sway-brace hardware
+    { item: 'Seismic Sway Brace Kit Lateral', price: 38 },
+    { item: 'Pipe Brace Attachment Fitting', price: 22 },
+    { item: 'Sway Brace Pipe Clamp', price: 15 },
+    { item: 'Seismic Brace Assembly Heavy', price: 5000 }, // out of band -> excluded
+    // generic noise that matches neither band's keywords
+    { item: 'Pendent Sprinkler 1/2" Brass', price: 12 },
+  ];
+
+  it('resolves a real non-null median for drop_armover', () => {
+    const p = resolvePriceFromRows(rows, 'drop_armover');
+    expect(p).not.toBeNull();
+    expect(p).toBeGreaterThan(0);
+    // in-band drop matches (nipple/reducer/drop/fitting keywords): 1.85, 6.2, 12,
+    // 3.4, and 22 ("...Fitting") -> sorted [1.85,3.4,6.2,12,22], median = 6.2
+    expect(p).toBe(6.2);
+  });
+
+  it('resolves a real non-null median for seismic_brace', () => {
+    const p = resolvePriceFromRows(rows, 'seismic_brace');
+    expect(p).not.toBeNull();
+    expect(p).toBeGreaterThan(0);
+    // in-band brace matches: 38, 22, 15 -> sorted [15,22,38] median = 22 ($5000 excluded)
+    expect(p).toBe(22);
+  });
+
+  it('both new bands stay within a sane unit-cost window', () => {
+    for (const key of ['drop_armover', 'seismic_brace']) {
+      const band = PRICE_BANDS[key];
+      expect(band.min).toBeGreaterThan(0);
+      expect(band.max).toBeGreaterThan(band.min);
+    }
+  });
+});
