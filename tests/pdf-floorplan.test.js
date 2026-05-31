@@ -6,6 +6,7 @@ import {
   segmentsToFloorPlan,
   floorPlanFromPdf,
   isolateContentRegion,
+  isolatePlanExtent,
 } from '../src/engine/pdf-floorplan.js';
 
 // T28 — PDF plan ingestion. These tests exercise the PURE, portable core of the
@@ -516,5 +517,176 @@ describe('floorPlanFromPdf — async path with an injected FAKE pdfjs', () => {
     };
     await expect(floorPlanFromPdf(new Uint8Array([1]), { pageIndex: 0, scale: 1, pdfjs }))
       .rejects.toThrow(/pdf/i);
+  });
+});
+
+describe('isolatePlanExtent — full-extent content-region isolator (T32)', () => {
+  // HONESTY: this is a HEURISTIC full-extent isolator, NOT a precise building outline
+  // and NOT a room segmentation. It strips the sheet frame, then takes the UNION bbox
+  // of all non-trivial clusters, dropping only tiny detached annotation islands. The
+  // result captures the WHOLE building extent (multi-wing / courtyard) but is still an
+  // APPROXIMATION. No scale guessing — coords are already in feet. Nothing tuned to a
+  // dollar total: the outlier threshold is a principled segment-share, not a percentile
+  // fit to a number.
+
+  // Build a synthetic MULTI-WING sheet:
+  //  - an outer drawing-border rectangle 0,0 .. 1000,700 (the sheet frame)
+  //  - a LEFT wing: dense small segments in 100,100 .. 300,500
+  //  - a RIGHT wing: dense small segments in 350,100 .. 600,500 (separated by a gap
+  //    from the left wing — they form TWO flood-fill clusters, like a building drawn
+  //    as two dense regions or split by an interior courtyard)
+  //  - a small DETACHED title-block cluster in 820,40 .. 980,160 (a handful of segs)
+  // The left+right wings together make the building; the title block is the outlier.
+  function buildMultiWingSheet(scale = 1) {
+    const s = (v) => v * scale;
+    const segs = [];
+    // Sheet frame (4 perimeter edges spanning full edges).
+    segs.push({ x1: s(0), y1: s(0), x2: s(1000), y2: s(0) }); // bottom
+    segs.push({ x1: s(1000), y1: s(0), x2: s(1000), y2: s(700) }); // right
+    segs.push({ x1: s(1000), y1: s(700), x2: s(0), y2: s(700) }); // top
+    segs.push({ x1: s(0), y1: s(700), x2: s(0), y2: s(0) }); // left
+    // LEFT wing — dense grid 100..300 x 100..500.
+    for (let gx = 0; gx <= 10; gx++) {
+      for (let gy = 0; gy <= 20; gy++) {
+        const x = 100 + gx * 20;
+        const y = 100 + gy * 20;
+        segs.push({ x1: s(x), y1: s(y), x2: s(x + 12), y2: s(y) });
+        segs.push({ x1: s(x), y1: s(y), x2: s(x), y2: s(y + 12) });
+      }
+    }
+    // RIGHT wing — dense grid 460..680 x 100..500. The 312->460 gap (well over one
+    // coarse cell at gridN=24 over the post-border bbox => leaves an empty cell column
+    // between wings) detaches it into its own flood-fill cluster, mirroring a connected
+    // building drawn as two dense regions (or split by an interior courtyard).
+    for (let gx = 0; gx <= 11; gx++) {
+      for (let gy = 0; gy <= 20; gy++) {
+        const x = 460 + gx * 20;
+        const y = 100 + gy * 20;
+        segs.push({ x1: s(x), y1: s(y), x2: s(x + 12), y2: s(y) });
+        segs.push({ x1: s(x), y1: s(y), x2: s(x), y2: s(y + 12) });
+      }
+    }
+    // DETACHED title block — a tiny handful of segments far to the right.
+    for (let i = 0; i < 5; i++) {
+      const x = 820 + i * 20;
+      segs.push({ x1: s(x), y1: s(40), x2: s(x + 12), y2: s(40) });
+      segs.push({ x1: s(x), y1: s(120), x2: s(x + 12), y2: s(120) });
+    }
+    return segs;
+  }
+
+  test('dominant-cluster mode returns only ONE wing (the old under-capture)', () => {
+    const segs = buildMultiWingSheet(1);
+    const dom = isolateContentRegion(segs);
+    // The dominant cluster is a single wing. Whichever wing wins, its width is far
+    // short of spanning BOTH wings (100..692 ≈ 592 wide). One wing is ~210-240 wide.
+    expect(dom.bbox.widthFt).toBeLessThan(350);
+    // And it cannot reach across the gap to cover the full 100..692 span.
+    const spansBothWings = dom.bbox.minX <= 130 && dom.bbox.maxX >= 660;
+    expect(spansBothWings).toBe(false);
+    // Title block excluded either way.
+    expect(dom.bbox.maxX).toBeLessThan(820);
+  });
+
+  test('full-extent mode spans BOTH wings and EXCLUDES the title block', () => {
+    const segs = buildMultiWingSheet(1);
+    const ext = isolatePlanExtent(segs);
+    // Frame stripped.
+    expect(ext.droppedBorderCount).toBeGreaterThanOrEqual(4);
+    // Spans the union of both wings: left wing starts ~100, right wing ends ~692.
+    expect(ext.bbox.minX).toBeLessThanOrEqual(130);
+    expect(ext.bbox.maxX).toBeGreaterThan(660);
+    // Title block (x >= 820) is dropped as a tiny detached outlier island.
+    expect(ext.bbox.maxX).toBeLessThan(820);
+    // Vertically hugs the wings (100..512), not the full 0..700 sheet.
+    expect(ext.bbox.minY).toBeGreaterThanOrEqual(90);
+    expect(ext.bbox.maxY).toBeLessThan(620);
+    // It found multiple groups and retained at least the two wings; the tiny title
+    // block was dropped as an outlier.
+    expect(ext.groupCount).toBeGreaterThanOrEqual(3);
+    expect(ext.retainedGroupCount).toBeGreaterThanOrEqual(2);
+    expect(ext.droppedOutlierCount).toBeGreaterThan(0);
+  });
+
+  test('full-extent bbox is strictly WIDER than the dominant-cluster bbox here', () => {
+    const segs = buildMultiWingSheet(1);
+    const dom = isolateContentRegion(segs);
+    const ext = isolatePlanExtent(segs);
+    expect(ext.bbox.widthFt).toBeGreaterThan(dom.bbox.widthFt);
+  });
+
+  test('widthFt/heightFt scale with the input coordinates', () => {
+    const r1 = isolatePlanExtent(buildMultiWingSheet(1));
+    const r2 = isolatePlanExtent(buildMultiWingSheet(2));
+    expect(r2.bbox.widthFt).toBeCloseTo(r1.bbox.widthFt * 2, 4);
+    expect(r2.bbox.heightFt).toBeCloseTo(r1.bbox.heightFt * 2, 4);
+  });
+
+  test('returned bbox is always clamped within the full bbox', () => {
+    const ext = isolatePlanExtent(buildMultiWingSheet(1));
+    expect(ext.bbox.minX).toBeGreaterThanOrEqual(0);
+    expect(ext.bbox.minY).toBeGreaterThanOrEqual(0);
+    expect(ext.bbox.maxX).toBeLessThanOrEqual(1000);
+    expect(ext.bbox.maxY).toBeLessThanOrEqual(700);
+  });
+
+  test('degenerate inputs fall back without throwing', () => {
+    expect(() => isolatePlanExtent([])).not.toThrow();
+    const empty = isolatePlanExtent([]);
+    expect(empty.bbox).toBeDefined();
+    expect(Number.isFinite(empty.bbox.widthFt)).toBe(true);
+
+    const single = isolatePlanExtent([{ x1: 5, y1: 5, x2: 25, y2: 5 }]);
+    expect(single.bbox.minX).toBe(5);
+    expect(single.bbox.maxX).toBe(25);
+
+    const frameOnly = [
+      { x1: 0, y1: 0, x2: 1000, y2: 0 },
+      { x1: 1000, y1: 0, x2: 1000, y2: 800 },
+      { x1: 1000, y1: 800, x2: 0, y2: 800 },
+      { x1: 0, y1: 800, x2: 0, y2: 0 },
+    ];
+    expect(() => isolatePlanExtent(frameOnly)).not.toThrow();
+    const fr = isolatePlanExtent(frameOnly);
+    expect(Number.isFinite(fr.bbox.widthFt)).toBe(true);
+    expect(fr.bbox.widthFt).toBeGreaterThanOrEqual(0);
+  });
+
+  test('carries a heuristic/approximation note (NOT a building outline claim)', () => {
+    const note = String(isolatePlanExtent(buildMultiWingSheet(1)).note);
+    expect(note).toMatch(/heurist|approxim/i);
+    expect(note).toMatch(/NOT a (precise )?building outline/i);
+    expect(note).toMatch(/NOT a room segmentation/i);
+    expect(note).toMatch(/NOT an AHJ\/PE/i);
+    expect(note).not.toMatch(/\bis accurate\b|\bparity\b|\bexact\b/i);
+  });
+
+  describe('segmentsToFloorPlan({ isolate: "fullExtent" })', () => {
+    test('uses the full-extent bbox and carries outlier metadata + heuristic note', () => {
+      const segs = buildMultiWingSheet(1);
+      const dom = segmentsToFloorPlan(segs, { isolate: true });
+      const ext = segmentsToFloorPlan(segs, { isolate: 'fullExtent' });
+      // Full-extent polygon is wider than the dominant-cluster polygon.
+      expect(ext.bbox.widthFt).toBeGreaterThan(dom.bbox.widthFt);
+      const b = ext.bbox;
+      expect(ext.rooms[0].polygon).toEqual([
+        [b.minX, b.minY],
+        [b.maxX, b.minY],
+        [b.maxX, b.maxY],
+        [b.minX, b.maxY],
+      ]);
+      expect(ext.keptCount).toBeGreaterThan(0);
+      expect(ext.droppedBorderCount).toBeGreaterThanOrEqual(4);
+      expect(ext.droppedOutlierCount).toBeGreaterThan(0);
+      expect(String(ext.note)).toMatch(/full-extent|heurist|approxim/i);
+    });
+
+    test('default (isolate: false) stays UNCHANGED — full sheet bbox', () => {
+      const segs = buildMultiWingSheet(1);
+      const def = segmentsToFloorPlan(segs);
+      expect(def.bbox.widthFt).toBe(1000);
+      expect(def.bbox.heightFt).toBe(700);
+      expect(def.droppedOutlierCount).toBeUndefined();
+    });
   });
 });

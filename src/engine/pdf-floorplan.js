@@ -65,6 +65,20 @@ function round(n) {
 /**
  * PURE. Walk a pdfjs operator list and emit line segments in FEET.
  *
+ * Coordinates inside path-construction ops are in the CURRENT USER SPACE, which the
+ * content stream warps via the Current Transformation Matrix (CTM) — `OPS.transform`
+ * pre-multiplies the CTM, `OPS.save`/`OPS.restore` push/pop it. Bluebeam/AutoCAD
+ * sheets routinely author the whole drawing in a compact model space and blow it up
+ * to page space with a base scale transform (e.g. the 2.83465x = 72/25.4 mm->pt
+ * matrix this 1881 plan uses). If we ignore the CTM we read the UN-transformed local
+ * coordinates and grossly UNDER-CAPTURE the plan extent (the 1881 p8 building reads
+ * 915pt wide locally but 2594pt = the full sheet once the CTM is applied). So this
+ * extractor maintains a CTM stack and maps every path coordinate to PAGE SPACE before
+ * applying the operator-supplied feet-per-point `scale`. The identity CTM (a sheet
+ * with no transforms) leaves coordinates unchanged, so synthetic op lists are
+ * unaffected. This is REAL geometry — the plan's own ops mapped by the plan's own
+ * matrices — never fabricated and never scale-guessed.
+ *
  * @param {{fnArray:number[], argsArray:any[]}} opList - from page.getOperatorList()
  * @param {{scale?:number}} [opts] - scale = feet per PDF point (default 1).
  * @returns {{segments:Array<{x1,y1,x2,y2}>, bbox:{minX,minY,maxX,maxY,widthFt,heightFt}, count:number}}
@@ -75,9 +89,31 @@ export function extractSegmentsFromOpList(opList, opts = {}) {
   const argsArray = (opList && opList.argsArray) || [];
 
   const segments = [];
-  // Path state, in PDF points (scaled to feet only at emit time).
-  let cur = null; // current point [x, y]
-  let start = null; // current subpath start [x, y]
+  // Path state, in PAGE-SPACE PDF points (CTM already applied; scaled to feet only at
+  // emit time). cur/start track the CTM-mapped current point and subpath start.
+  let cur = null; // current point [x, y] in page space
+  let start = null; // current subpath start [x, y] in page space
+
+  // CTM stack. ctm = [a, b, c, d, e, f] maps (x,y) -> (a*x+c*y+e, b*x+d*y+f).
+  let ctm = [1, 0, 0, 1, 0, 0];
+  const ctmStack = [];
+  const applyCtm = (x, y) => [
+    ctm[0] * x + ctm[2] * y + ctm[4],
+    ctm[1] * x + ctm[3] * y + ctm[5],
+  ];
+  // m2 pre-multiplied into the CTM: ctm' = ctm * m2 (column-vector convention, so a
+  // later transform composes on the right exactly as the content stream applies it).
+  const multiplyCtm = (m) => {
+    const a = ctm;
+    ctm = [
+      a[0] * m[0] + a[2] * m[1],
+      a[1] * m[0] + a[3] * m[1],
+      a[0] * m[2] + a[2] * m[3],
+      a[1] * m[2] + a[3] * m[3],
+      a[0] * m[4] + a[2] * m[5] + a[4],
+      a[1] * m[4] + a[3] * m[5] + a[5],
+    ];
+  };
 
   const emit = (x1, y1, x2, y2) => {
     segments.push({
@@ -87,11 +123,15 @@ export function extractSegmentsFromOpList(opList, opts = {}) {
       y2: round(y2 * scale),
     });
   };
-  const moveTo = (x, y) => {
+  // moveTo/lineTo/rectangle receive RAW user-space coords; map them through the CTM
+  // so all stored path state is in page space.
+  const moveTo = (rx, ry) => {
+    const [x, y] = applyCtm(rx, ry);
     cur = [x, y];
     start = [x, y];
   };
-  const lineTo = (x, y) => {
+  const lineTo = (rx, ry) => {
+    const [x, y] = applyCtm(rx, ry);
     if (cur) emit(cur[0], cur[1], x, y);
     else start = [x, y];
     cur = [x, y];
@@ -204,8 +244,22 @@ export function extractSegmentsFromOpList(opList, opts = {}) {
       case OPS.constructPath:
         constructPathDispatch(args, walkDrawBuffer, walkLegacyConstructPath);
         break;
+      case OPS.save:
+        // Push a copy of the CTM (graphics-state save).
+        ctmStack.push(ctm.slice());
+        break;
+      case OPS.restore:
+        // Pop back to the saved CTM (defensive: ignore an unbalanced restore).
+        if (ctmStack.length) ctm = ctmStack.pop();
+        break;
+      case OPS.transform:
+        // Pre-multiply the supplied matrix into the CTM, exactly as the renderer does.
+        if (args.length >= 6) {
+          multiplyCtm([args[0], args[1], args[2], args[3], args[4], args[5]]);
+        }
+        break;
       default:
-        break; // ignore text/image/state ops
+        break; // ignore text/image/other state ops
     }
   }
 
@@ -459,6 +513,252 @@ export function isolateContentRegion(segments, opts = {}) {
   return finalize(clusterBbox, clusterSegs.length);
 }
 
+const EXTENT_NOTE =
+  'Heuristic FULL-EXTENT content-region approximation (T32): the sheet-frame ' +
+  'border is stripped, then the bbox of the UNION of all non-trivial content ' +
+  'clusters is returned — dropping ONLY tiny detached annotation islands ' +
+  '(title block / legend / north-arrow / notes) whose segment-share is below a ' +
+  'small outlier threshold. This captures the WHOLE building extent (all wings, ' +
+  'even across courtyards/gaps) instead of a single dominant cluster. It is a ' +
+  'BEST-EFFORT APPROXIMATION — NOT a precise building outline, NOT a room ' +
+  'segmentation, and NOT an AHJ/PE/accurate drawing. No scale guessing: the ' +
+  'PDF-point->feet scale stays operator-supplied. Deterministic.';
+
+/**
+ * PURE. Heuristic FULL-EXTENT content-region isolator (T32).
+ *
+ * The T29 isolateContentRegion keeps only the single densest flood-fill cluster,
+ * which UNDER-CAPTURES multi-wing / connected plans (a building drawn as two dense
+ * regions, or with an interior courtyard, splits into separate clusters and only one
+ * is kept). This isolator instead returns the bbox of the UNION of ALL non-trivial
+ * content clusters, dropping ONLY tiny detached annotation islands.
+ *
+ * Algorithm (deterministic), sharing T29's frame-strip:
+ *  a) Compute the full bbox of all segments.
+ *  b) STRIP THE SHEET FRAME using the SAME criterion as isolateContentRegion
+ *     (axis-aligned segment hugging a full-bbox edge AND spanning >= borderSpanFrac
+ *     of that edge dimension).
+ *  c) Bin the remaining segment MIDPOINTS into a coarse gridN x gridN grid; flood-fill
+ *     (4-neighbour) the occupied cells into contiguous groups (each distinct group is,
+ *     by 4-neighbour connectivity, spatially DETACHED from every other group).
+ *  d) OUTLIER DROP (principled, not a tuned percentile): a group is discarded ONLY
+ *     when it is BOTH (i) tiny — its segment-share < outlierFrac of the total interior
+ *     segments — AND (ii) detached, i.e. it is not the largest "main mass" group. All
+ *     other groups are RETAINED. The result is the UNION bbox of the retained groups.
+ *     This keeps every substantial wing of the building (even with internal gaps the
+ *     grid splits into multiple groups) while discarding small detached annotation
+ *     clusters (title block / legend / north arrow / notes).
+ *  e) FALLBACKS (never throw, never return an empty region): if stripping/clustering
+ *     leaves too little, fall back to the post-border bbox, then the full bbox. The
+ *     result is always clamped within the full bbox.
+ *
+ * Defaults are principled and overridable; NONE is chosen to hit a dollar figure.
+ *
+ * @param {Array<{x1,y1,x2,y2}>} segments
+ * @param {{borderMarginFrac?:number, borderSpanFrac?:number, gridN?:number, outlierFrac?:number}} [opts]
+ * @returns {{bbox:{minX,minY,maxX,maxY,widthFt,heightFt}, keptCount:number, droppedBorderCount:number, droppedOutlierCount:number, groupCount:number, retainedGroupCount:number, note:string}}
+ */
+export function isolatePlanExtent(segments, opts = {}) {
+  const borderMarginFrac = Number.isFinite(opts.borderMarginFrac) ? Number(opts.borderMarginFrac) : 0.02;
+  const borderSpanFrac = Number.isFinite(opts.borderSpanFrac) ? Number(opts.borderSpanFrac) : 0.6;
+  const gridN = Number.isInteger(opts.gridN) && opts.gridN > 0 ? opts.gridN : 24;
+  const outlierFrac = Number.isFinite(opts.outlierFrac) ? Number(opts.outlierFrac) : 0.02;
+
+  const segs = Array.isArray(segments) ? segments : [];
+  const full = boundingBox(segs);
+
+  // Degenerate: nothing, or zero-area -> full bbox as-is.
+  if (segs.length === 0 || full.widthFt <= 0 || full.heightFt <= 0) {
+    return {
+      bbox: { ...full },
+      keptCount: segs.length,
+      droppedBorderCount: 0,
+      droppedOutlierCount: 0,
+      groupCount: 0,
+      retainedGroupCount: 0,
+      note: EXTENT_NOTE,
+    };
+  }
+
+  const w = full.maxX - full.minX;
+  const h = full.maxY - full.minY;
+  const marginX = w * borderMarginFrac;
+  const marginY = h * borderMarginFrac;
+
+  // (b) Strip the sheet frame — identical criterion to isolateContentRegion.
+  const EPS = Math.max(w, h) * 1e-9;
+  const isHorizontal = (s) => Math.abs(s.y1 - s.y2) <= EPS;
+  const isVertical = (s) => Math.abs(s.x1 - s.x2) <= EPS;
+
+  const interior = [];
+  let droppedBorderCount = 0;
+  for (const s of segs) {
+    const loX = Math.min(s.x1, s.x2);
+    const hiX = Math.max(s.x1, s.x2);
+    const loY = Math.min(s.y1, s.y2);
+    const hiY = Math.max(s.y1, s.y2);
+    const spanX = hiX - loX;
+    const spanY = hiY - loY;
+
+    let isFrame = false;
+    if (isHorizontal(s) && spanX >= borderSpanFrac * w) {
+      const midY = (loY + hiY) / 2;
+      if (midY <= full.minY + marginY || midY >= full.maxY - marginY) isFrame = true;
+    }
+    if (!isFrame && isVertical(s) && spanY >= borderSpanFrac * h) {
+      const midX = (loX + hiX) / 2;
+      if (midX <= full.minX + marginX || midX >= full.maxX - marginX) isFrame = true;
+    }
+
+    if (isFrame) droppedBorderCount += 1;
+    else interior.push(s);
+  }
+
+  const clampBbox = (b) => ({
+    minX: Math.max(full.minX, round(b.minX)),
+    minY: Math.max(full.minY, round(b.minY)),
+    maxX: Math.min(full.maxX, round(b.maxX)),
+    maxY: Math.min(full.maxY, round(b.maxY)),
+  });
+  const finalize = (b, kept, extra = {}) => {
+    const c = clampBbox(b);
+    return {
+      bbox: {
+        minX: c.minX,
+        minY: c.minY,
+        maxX: c.maxX,
+        maxY: c.maxY,
+        widthFt: round(c.maxX - c.minX),
+        heightFt: round(c.maxY - c.minY),
+      },
+      keptCount: kept,
+      droppedBorderCount,
+      droppedOutlierCount: 0,
+      groupCount: 0,
+      retainedGroupCount: 0,
+      note: EXTENT_NOTE,
+      ...extra,
+    };
+  };
+
+  const postBorderBbox = boundingBox(interior);
+
+  // Fallback: stripping left too little to cluster meaningfully.
+  if (interior.length < 3 || postBorderBbox.widthFt <= 0 || postBorderBbox.heightFt <= 0) {
+    if (interior.length > 0 && postBorderBbox.widthFt > 0 && postBorderBbox.heightFt > 0) {
+      return finalize(postBorderBbox, interior.length);
+    }
+    return finalize(full, segs.length);
+  }
+
+  // (c) Bin midpoints into a coarse grid and flood-fill into contiguous groups.
+  const ow = postBorderBbox.maxX - postBorderBbox.minX;
+  const oh = postBorderBbox.maxY - postBorderBbox.minY;
+  const keyOf = (cx, cy) => cy * gridN + cx;
+  const cellOf = (mx, my) => {
+    let cx = Math.floor(((mx - postBorderBbox.minX) / ow) * gridN);
+    let cy = Math.floor(((my - postBorderBbox.minY) / oh) * gridN);
+    if (cx < 0) cx = 0; else if (cx >= gridN) cx = gridN - 1;
+    if (cy < 0) cy = 0; else if (cy >= gridN) cy = gridN - 1;
+    return [cx, cy];
+  };
+
+  const cellSegs = new Map();
+  for (let i = 0; i < interior.length; i++) {
+    const s = interior[i];
+    const mx = (s.x1 + s.x2) / 2;
+    const my = (s.y1 + s.y2) / 2;
+    const [cx, cy] = cellOf(mx, my);
+    const k = keyOf(cx, cy);
+    let arr = cellSegs.get(k);
+    if (!arr) { arr = []; cellSegs.set(k, arr); }
+    arr.push(i);
+  }
+
+  // Flood-fill occupied cells into contiguous groups; record each group's segment
+  // index list. Sorted iteration -> deterministic group ordering.
+  const visited = new Set();
+  const occupiedKeys = Array.from(cellSegs.keys()).sort((a, b) => a - b);
+  const groups = []; // each: { segIdx: number[] }
+  for (const startKey of occupiedKeys) {
+    if (visited.has(startKey)) continue;
+    const stack = [startKey];
+    visited.add(startKey);
+    const groupSegIdx = [];
+    while (stack.length) {
+      const k = stack.pop();
+      const arr = cellSegs.get(k);
+      for (const idx of arr) groupSegIdx.push(idx);
+      const cx = k % gridN;
+      const cy = Math.floor(k / gridN);
+      const neighbours = [
+        cx > 0 ? keyOf(cx - 1, cy) : -1,
+        cx < gridN - 1 ? keyOf(cx + 1, cy) : -1,
+        cy > 0 ? keyOf(cx, cy - 1) : -1,
+        cy < gridN - 1 ? keyOf(cx, cy + 1) : -1,
+      ];
+      for (const nk of neighbours) {
+        if (nk >= 0 && cellSegs.has(nk) && !visited.has(nk)) {
+          visited.add(nk);
+          stack.push(nk);
+        }
+      }
+    }
+    groups.push({ segIdx: groupSegIdx });
+  }
+
+  // Fallback: no usable groups.
+  if (groups.length === 0) {
+    return finalize(postBorderBbox, interior.length);
+  }
+
+  // (d) OUTLIER DROP. The "main mass" is the largest group; never dropped. Every
+  // OTHER group is dropped ONLY when its segment-share < outlierFrac (tiny AND
+  // detached). Retain all the rest and take the UNION of their segments.
+  const total = interior.length;
+  let mainIdx = 0;
+  for (let g = 1; g < groups.length; g++) {
+    if (groups[g].segIdx.length > groups[mainIdx].segIdx.length) mainIdx = g;
+  }
+
+  const retained = [];
+  let droppedOutlierCount = 0;
+  for (let g = 0; g < groups.length; g++) {
+    const share = groups[g].segIdx.length / total;
+    if (g !== mainIdx && share < outlierFrac) {
+      droppedOutlierCount += groups[g].segIdx.length;
+      continue; // tiny detached annotation island -> drop
+    }
+    retained.push(groups[g]);
+  }
+
+  // Union of retained segments.
+  const retainedSegIdx = [];
+  for (const grp of retained) for (const idx of grp.segIdx) retainedSegIdx.push(idx);
+
+  if (retainedSegIdx.length < 3) {
+    return finalize(postBorderBbox, interior.length, {
+      groupCount: groups.length,
+      retainedGroupCount: retained.length,
+    });
+  }
+
+  const unionSegs = retainedSegIdx.map((i) => interior[i]);
+  const unionBbox = boundingBox(unionSegs);
+  if (unionBbox.widthFt <= 0 || unionBbox.heightFt <= 0) {
+    return finalize(postBorderBbox, interior.length, {
+      groupCount: groups.length,
+      retainedGroupCount: retained.length,
+    });
+  }
+
+  return finalize(unionBbox, unionSegs.length, {
+    droppedOutlierCount,
+    groupCount: groups.length,
+    retainedGroupCount: retained.length,
+  });
+}
+
 /**
  * PURE. Parse a STATED architectural drawing scale out of sheet text and return
  * the feet-per-PDF-point conversion factor, or null when no recognizable scale is
@@ -563,15 +863,20 @@ const FOOTPRINT_NOTE =
  * whose polygon is the overall bbox footprint (in feet), plus the raw segments as
  * wall candidates. Honest first-pass — see FOOTPRINT_NOTE.
  *
- * When opts.isolate is true (default false — preserves existing behavior/tests),
- * the room polygon uses the T29 heuristic content-region bbox (sheet frame stripped,
- * densest cluster isolated) instead of the whole-sheet bbox, and the isolation
- * metadata (keptCount, droppedBorderCount) + the heuristic note are attached. The
- * isolated region is a BEST-EFFORT APPROXIMATION, not a building outline.
+ * Isolation modes (opts.isolate; default falsy — preserves existing behavior/tests):
+ *  - falsy            -> whole-sheet bbox (T28).
+ *  - true / 'dominant'-> T29 dominant-cluster bbox (sheet frame stripped, single
+ *                        densest cluster isolated).
+ *  - 'fullExtent'     -> T32 full-extent bbox (sheet frame stripped, UNION of all
+ *                        non-trivial clusters minus tiny detached annotation islands).
+ * When isolating, the room polygon uses the isolated bbox and the isolation metadata
+ * (keptCount, droppedBorderCount, and for fullExtent droppedOutlierCount) + the
+ * heuristic note are attached. The isolated region is a BEST-EFFORT APPROXIMATION,
+ * not a building outline.
  *
  * @param {Array<{x1,y1,x2,y2}>} segments
- * @param {{hazard?:string, isolate?:boolean, isolateOpts?:Object}} [opts]
- * @returns {{rooms:Array, bbox:Object, wallCandidates:Array, segmentCount:number, note:string, keptCount?:number, droppedBorderCount?:number}}
+ * @param {{hazard?:string, isolate?:(boolean|'dominant'|'fullExtent'), isolateOpts?:Object}} [opts]
+ * @returns {{rooms:Array, bbox:Object, wallCandidates:Array, segmentCount:number, note:string, keptCount?:number, droppedBorderCount?:number, droppedOutlierCount?:number}}
  */
 export function segmentsToFloorPlan(segments, opts = {}) {
   if (!Array.isArray(segments) || segments.length === 0) {
@@ -584,7 +889,12 @@ export function segmentsToFloorPlan(segments, opts = {}) {
   let bbox;
   let note;
   let isolation = null;
-  if (opts.isolate) {
+  const fullExtentMode = opts.isolate === 'fullExtent';
+  if (fullExtentMode) {
+    isolation = isolatePlanExtent(segments, opts.isolateOpts || {});
+    bbox = isolation.bbox;
+    note = isolation.note;
+  } else if (opts.isolate) {
     isolation = isolateContentRegion(segments, opts.isolateOpts || {});
     bbox = isolation.bbox;
     note = isolation.note;
@@ -609,6 +919,11 @@ export function segmentsToFloorPlan(segments, opts = {}) {
   if (isolation) {
     result.keptCount = isolation.keptCount;
     result.droppedBorderCount = isolation.droppedBorderCount;
+    if (fullExtentMode) {
+      result.droppedOutlierCount = isolation.droppedOutlierCount;
+      result.groupCount = isolation.groupCount;
+      result.retainedGroupCount = isolation.retainedGroupCount;
+    }
   }
   return result;
 }
@@ -621,11 +936,14 @@ export function segmentsToFloorPlan(segments, opts = {}) {
  * @param {number} [opts.pageIndex=0] - 0-based page index (page pageIndex+1 is parsed).
  * @param {number} opts.scale - feet per PDF point. REQUIRED, must be > 0. Never guessed.
  * @param {string} [opts.hazard='ordinary']
- * @param {boolean} [opts.isolate=false] - opt-in T29 heuristic content-region
- *   tightener (default false preserves T28 whole-sheet bbox behavior). When true,
- *   the room polygon uses the isolated content-region bbox (BEST-EFFORT
- *   APPROXIMATION, not a building outline) and the result carries keptCount /
- *   droppedBorderCount. No scale guessing either way.
+ * @param {(boolean|'dominant'|'fullExtent')} [opts.isolate=false] - opt-in heuristic
+ *   content-region isolation (default false preserves T28 whole-sheet bbox behavior).
+ *   true/'dominant' = T29 single densest cluster; 'fullExtent' = T32 union of all
+ *   non-trivial clusters minus tiny detached annotation islands (captures the FULL
+ *   building extent across wings/courtyards). The room polygon uses the isolated
+ *   bbox (BEST-EFFORT APPROXIMATION, not a building outline) and the result carries
+ *   keptCount / droppedBorderCount (+ droppedOutlierCount for fullExtent). No scale
+ *   guessing either way.
  * @param {Object} opts.pdfjs - injected/imported pdfjs module exposing getDocument.
  *   Worker setup (GlobalWorkerOptions.workerSrc) is the caller's responsibility.
  * @returns {Promise<{rooms,bbox,segmentCount,pageIndex,scale,note,keptCount?,droppedBorderCount?}>}
@@ -669,22 +987,33 @@ export async function floorPlanFromPdf(source, opts = {}) {
       'the page may be raster/scanned (no extractable vector ops) or text-only.',
     );
   }
-  const isolate = opts.isolate === true;
+  // Normalize the isolate mode: true/'dominant' -> T29 dominant cluster;
+  // 'fullExtent' -> T32 full-extent union; anything else falsy -> T28 whole sheet.
+  const fullExtentMode = opts.isolate === 'fullExtent';
+  const isolate = fullExtentMode
+    ? 'fullExtent'
+    : (opts.isolate === true || opts.isolate === 'dominant');
+  const isolating = isolate !== false;
   const fp = segmentsToFloorPlan(segments, { hazard, isolate });
   const result = {
     rooms: fp.rooms,
     // When isolating, surface the tightened bbox (matches the room polygon); else
     // the whole-sheet bbox, exactly as T28.
-    bbox: isolate ? fp.bbox : bbox,
+    bbox: isolating ? fp.bbox : bbox,
     wallCandidates: fp.wallCandidates,
     segmentCount: count,
     pageIndex,
     scale,
     note: fp.note,
   };
-  if (isolate) {
+  if (isolating) {
     result.keptCount = fp.keptCount;
     result.droppedBorderCount = fp.droppedBorderCount;
+    if (fullExtentMode) {
+      result.droppedOutlierCount = fp.droppedOutlierCount;
+      result.groupCount = fp.groupCount;
+      result.retainedGroupCount = fp.retainedGroupCount;
+    }
   }
   return result;
 }
