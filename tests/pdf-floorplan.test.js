@@ -1193,3 +1193,114 @@ describe('T34 — PDF graphics-state layer extraction (lineWidth + strokeColor t
     expect(u.groups.length).toBe(1);
   });
 });
+
+// T35 — floorPlanFromPdf extract:'sam'. OpenClaw reads the PDF and SAM 3.1 segments
+// the rendered page image; the bridge is currently HTTP_UNREACHABLE so these use a
+// MOCK samInvoker. The real SAM run + d4 re-measure is DEFERRED until the bridge is up.
+describe("floorPlanFromPdf extract:'sam' — SAM 3.1 plan segmentation (mock invoker)", () => {
+  const SAM_SEG = {
+    building_outline: [[100, 100], [700, 100], [700, 500], [100, 500]],
+    walls: [{ x1: 100, y1: 100, x2: 700, y2: 100 }],
+    rooms: [{ name: 'Unit A' }],
+    imageSize: { w: 800, h: 600 },
+  };
+
+  test('mock samInvoker -> reconstructed rooms scaled px->ft (no pdfjs needed)', async () => {
+    const samInvoker = async (payload) => {
+      expect(payload.service).toBe('sam-3.1');
+      expect(payload.op).toBe('segment_floorplan');
+      expect(payload.pdfRef).toBe('plans/1881.pdf');
+      return SAM_SEG;
+    };
+    const result = await floorPlanFromPdf(new Uint8Array([1, 2, 3]), {
+      extract: 'sam',
+      scale: 0.1,
+      pdfRef: 'plans/1881.pdf',
+      samInvoker,
+    });
+    expect(result.samSkipped).toBeUndefined();
+    expect(result.source).toBe('sam-3.1');
+    expect(result.method).toBe('sam-3.1');
+    expect(result.rooms).toHaveLength(1);
+    // 600px x 400px @ 0.1 ft/px -> 60 x 40 ft -> 2400 sqft.
+    expect(result.rooms[0].polygon).toEqual([[10, 10], [70, 10], [70, 50], [10, 50]]);
+    expect(result.areaSqft).toBeCloseTo(2400, 6);
+    expect(polygonArea(result.rooms[0].polygon)).toBeCloseTo(2400, 6);
+    expect(result.layerMap.walls).toEqual(SAM_SEG.walls);
+    expect(result.label).toMatch(/best-effort SAM 3\.1/);
+  });
+
+  test('FAIL-SOFT: no samInvoker -> samSkipped:true, no throw, no fabricated rooms', async () => {
+    const result = await floorPlanFromPdf(new Uint8Array([1, 2, 3]), {
+      extract: 'sam',
+      scale: 0.1,
+      pdfRef: 'plans/1881.pdf',
+    });
+    expect(result.samSkipped).toBe(true);
+    expect(typeof result.reason).toBe('string');
+    expect(result.rooms).toBeUndefined();
+  });
+
+  test('FAIL-SOFT: samInvoker throws (OpenClaw down) -> samSkipped:true, no throw', async () => {
+    const samInvoker = async () => {
+      throw new Error('ECONNREFUSED openclaw bridge');
+    };
+    let result;
+    await expect(
+      (async () => {
+        result = await floorPlanFromPdf(new Uint8Array([1, 2, 3]), {
+          extract: 'sam',
+          scale: 0.1,
+          pdfRef: 'plans/1881.pdf',
+          samInvoker,
+        });
+      })(),
+    ).resolves.toBeUndefined();
+    expect(result.samSkipped).toBe(true);
+    expect(typeof result.reason).toBe('string');
+    expect(result.rooms).toBeUndefined();
+  });
+
+  test('FAIL-SOFT: samInvoker returns empty -> samSkipped:true', async () => {
+    const result = await floorPlanFromPdf(new Uint8Array([1, 2, 3]), {
+      extract: 'sam',
+      scale: 0.1,
+      pdfRef: 'plans/1881.pdf',
+      samInvoker: async () => ({}),
+    });
+    expect(result.samSkipped).toBe(true);
+    expect(result.rooms).toBeUndefined();
+  });
+
+  test('SAM path still requires operator scale (throws on missing/<=0 scale)', async () => {
+    await expect(
+      floorPlanFromPdf(new Uint8Array([1, 2, 3]), {
+        extract: 'sam',
+        pdfRef: 'plans/1881.pdf',
+        samInvoker: async () => SAM_SEG,
+      }),
+    ).rejects.toThrow(/scale/i);
+  });
+
+  test('default path (no extract:sam) unchanged — still parses vector ops', async () => {
+    // A tiny synthetic pdfjs that yields one rectangle op list.
+    const fakePdfjs = {
+      getDocument() {
+        return {
+          promise: Promise.resolve({
+            getPage: async () => ({
+              getOperatorList: async () => opList([[OPS.rectangle, [0, 0, 100, 60]]]),
+            }),
+          }),
+        };
+      },
+    };
+    const result = await floorPlanFromPdf(new Uint8Array([1, 2, 3]), {
+      scale: 1,
+      pdfjs: fakePdfjs,
+    });
+    expect(result.source).toBeUndefined(); // not the SAM envelope
+    expect(result.rooms).toHaveLength(1);
+    expect(result.segmentCount).toBeGreaterThan(0);
+  });
+});

@@ -38,6 +38,7 @@
  */
 
 import { OPS } from 'pdfjs-dist/legacy/build/pdf.mjs';
+import { segmentFloorPlanViaSam, reconstructFloorPlanFromSam } from '../components/sam-floorplan.js';
 
 // pdfjs-internal DrawOPS codes for the v6 constructPath path buffer. These are a
 // stable wire contract of the operator list (see pdf.worker buildPath); mirrored
@@ -1734,6 +1735,45 @@ export async function floorPlanFromPdf(source, opts = {}) {
     );
   }
   const hazard = opts.hazard || 'ordinary';
+
+  // T35 SAM-3.1 plan-segmentation extraction. OpenClaw reads the PDF and SAM 3.1
+  // segments the rendered page IMAGE (it does NOT need our pdfjs vector parse — the
+  // PDF-read tool renders the page itself), so this branch runs BEFORE the pdfjs
+  // requirement. It hands a deterministic payload to the INJECTED async
+  // opts.samInvoker (production wires the OpenClaw governed bridge -> GX10 SAM 3.1).
+  // FAIL-SOFT: if SAM is skipped / unreachable / throws / yields no polygon, return a
+  // clear { samSkipped:true, reason } WITHOUT throwing and WITHOUT fabricating — the
+  // caller (server) may then fall back to the vector path. The real SAM run is
+  // DEFERRED until the bridge is reachable (currently HTTP_UNREACHABLE).
+  if (opts.extract === 'sam') {
+    const sam = await segmentFloorPlanViaSam({
+      invoker: opts.samInvoker,
+      pdfRef: opts.pdfRef != null ? opts.pdfRef : source,
+      pageIndex,
+      scale,
+      targets: opts.samTargets,
+    });
+    if (!sam.ok) {
+      return { samSkipped: true, reason: sam.reason, pageIndex, scale };
+    }
+    const recon = reconstructFloorPlanFromSam(sam, { scale, hazard });
+    return {
+      rooms: recon.rooms,
+      bbox: recon.bbox,
+      wallCandidates: [],
+      segmentCount: recon.rooms[0] ? recon.rooms[0].polygon.length : 0,
+      pageIndex,
+      scale,
+      note: recon.note,
+      areaSqft: recon.areaSqft,
+      method: 'sam-3.1',
+      source: 'sam-3.1',
+      label: sam.label,
+      layerMap: recon.layerMap,
+      imageSize: sam.imageSize,
+    };
+  }
+
   const pdfjs = opts.pdfjs;
   if (!pdfjs || typeof pdfjs.getDocument !== 'function') {
     throw new Error('floorPlanFromPdf: a pdfjs module with getDocument must be provided');
