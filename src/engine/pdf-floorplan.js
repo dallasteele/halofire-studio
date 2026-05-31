@@ -459,6 +459,99 @@ export function isolateContentRegion(segments, opts = {}) {
   return finalize(clusterBbox, clusterSegs.length);
 }
 
+/**
+ * PURE. Parse a STATED architectural drawing scale out of sheet text and return
+ * the feet-per-PDF-point conversion factor, or null when no recognizable scale is
+ * present.
+ *
+ * This DERIVES the scale FROM THE DRAWING (a real datum printed on the sheet, e.g.
+ * the SCALE: 3/32" = 1'-0" label on an ARCH-D plan). It is explicitly NOT a guess
+ * and NOT an auto-derivation from geometry — it reads the architect's own stated
+ * scale, exactly like a human estimator reading the title block. floorPlanFromPdf
+ * still requires an operator/caller to PASS the scale; this helper lets the caller
+ * obtain it honestly from the sheet rather than inventing one.
+ *
+ * Recognized form (whitespace/symbol tolerant):
+ *   [SCALE[:]]  <lhs inches>  "  =  <rhs feet>  '  [- 0"]
+ * where:
+ *   - the inch mark may be a straight double-quote ", a curly ” / “, or the word-
+ *     break is implicit; the foot mark may be a straight prime ', a curly ’ / ‘;
+ *   - <lhs inches> is a fraction (a/b), a mixed number (a b/c), or a decimal/integer;
+ *   - <rhs feet> is a decimal/integer;
+ *   - an optional trailing dash + zero-inch suffix ( - 0" ) is accepted and ignored.
+ *
+ * Conversion: the drawing says lhsInches drawing-inches represent rhsFeet real feet.
+ * So real-feet-per-drawing-inch = rhsFeet / lhsInches, and since 1 inch = 72 PDF
+ * points, feetPerPoint = (rhsFeet / lhsInches) / 72.
+ *
+ * Examples (all computed, never table-looked-up):
+ *   3/32" = 1'-0"  -> (1 / (3/32)) / 72 = (32/3) / 72 = 0.148148...
+ *   1/8"  = 1'-0"  -> (1 / (1/8))  / 72 = 8 / 72       = 0.111111...
+ *   1/16" = 1'-0"  -> (1 / (1/16)) / 72 = 16 / 72      = 0.222222...
+ *   1"    = 20'    -> (20 / 1)     / 72 = 20 / 72      = 0.277778...
+ *
+ * @param {string} text - raw text extracted from the sheet (e.g. joined textContent).
+ * @returns {number|null} feet per PDF point, or null when no scale is recognized.
+ */
+export function parseArchitecturalScale(text) {
+  if (typeof text !== 'string' || !text.trim()) return null;
+
+  // Normalize unicode quote/prime variants to straight marks so one regex covers
+  // the curly glyphs Bluebeam/AutoCAD title blocks emit.
+  const norm = text
+    .replace(/[′‘’´]/g, "'") // primes / curly singles -> '
+    .replace(/[″“”]/g, '"'); // double-primes / curly doubles -> "
+
+  // <lhs> "  =  <rhs> '  [ - 0 " ]   with optional leading SCALE[:] label.
+  // lhs: mixed number / fraction / decimal. rhs: decimal/integer.
+  const re = new RegExp(
+    String.raw`(?:scale\s*:?\s*)?` + // optional SCALE label
+    String.raw`(\d+(?:\s+\d+\s*\/\s*\d+|\s*\/\s*\d+)?|\d*\.\d+)` + // (1) lhs inches
+    String.raw`\s*"` + // inch mark
+    String.raw`\s*=\s*` + // =
+    String.raw`(\d+(?:\.\d+)?)` + // (2) rhs feet
+    String.raw`\s*'` + // foot mark
+    String.raw`(?:\s*-\s*0\s*")?`, // optional - 0" suffix
+    'i',
+  );
+
+  const m = norm.match(re);
+  if (!m) return null;
+
+  const lhsInches = parseNumberOrFraction(m[1]);
+  const rhsFeet = Number(m[2]);
+  if (!Number.isFinite(lhsInches) || lhsInches <= 0) return null;
+  if (!Number.isFinite(rhsFeet) || rhsFeet <= 0) return null;
+
+  // feetPerPoint = (real feet per drawing inch) / 72 points-per-inch.
+  return (rhsFeet / lhsInches) / 72;
+}
+
+// Parse "a", "a.b", "a/b", or mixed "a b/c" into a Number. Returns NaN on junk.
+function parseNumberOrFraction(token) {
+  const t = String(token).trim();
+  // Mixed number: whole + space + fraction.
+  const mixed = t.match(/^(\d+)\s+(\d+)\s*\/\s*(\d+)$/);
+  if (mixed) {
+    const whole = Number(mixed[1]);
+    const num = Number(mixed[2]);
+    const den = Number(mixed[3]);
+    if (den === 0) return NaN;
+    return whole + num / den;
+  }
+  // Pure fraction.
+  const frac = t.match(/^(\d+)\s*\/\s*(\d+)$/);
+  if (frac) {
+    const num = Number(frac[1]);
+    const den = Number(frac[2]);
+    if (den === 0) return NaN;
+    return num / den;
+  }
+  // Decimal / integer.
+  if (/^\d*\.?\d+$/.test(t)) return Number(t);
+  return NaN;
+}
+
 const VALID_HAZARDS = new Set(['light', 'ordinary', 'extra', 'esfr']);
 const FOOTPRINT_NOTE =
   'Best-effort bbox footprint of the extracted PDF vector geometry — NOT a full ' +
