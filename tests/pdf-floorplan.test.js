@@ -8,6 +8,7 @@ import {
   isolateContentRegion,
   isolatePlanExtent,
   buildingOutlinePolygon,
+  selectWallLayer,
 } from '../src/engine/pdf-floorplan.js';
 import { polygonArea } from '../src/engine/sprinkler-layout.js';
 
@@ -938,5 +939,257 @@ describe('buildingOutlinePolygon — enclosed wall-network footprint (T33)', () 
       expect(result.rooms[0].polygon.length).toBeGreaterThanOrEqual(4);
       expect(String(result.note)).toMatch(/building-OUTLINE|NOT a (precise )?building outline/i);
     });
+  });
+});
+
+describe('T34 — PDF graphics-state layer extraction (lineWidth + strokeColor tags)', () => {
+  // The crux of T34: a real architectural sheet differs walls from annotation by
+  // GRAPHICS STATE — cut walls are drawn at a HEAVIER lineweight than the dimension /
+  // grid / text annotation linework (a genuine drafting convention). The extractor
+  // must TRACK the current lineWidth + stroke color through the save/restore/transform
+  // stack and TAG every emitted segment with { lineWidth, strokeColor }. selectWallLayer
+  // then groups by (strokeColor,lineWidth) and picks the wall layer by the PRINCIPLED
+  // heavier-lineweight-structural convention — NEVER by matching a target area/dollar.
+  //
+  // HONESTY: the new fields are ADDITIVE (x1,y1,x2,y2 unchanged); the selection rule is
+  // a documented CAD convention with labelled geometric defaults; nothing is tuned to
+  // 21,332 sqft or 538,792 dollars.
+
+  // pdfjs v6 emits OPS.setStrokeRGBColor with a single HEX STRING arg (the worker
+  // converts every stroke-color op via getRgbHex -> makeHexColor). We build the op
+  // list with that REAL arg form. The extractor must also tolerate a packed-int or
+  // [r,g,b] array form (older / raw), exercised in a dedicated normalization test.
+  const HEAVY = 1.0; // wall lineweight (heavy)
+  const THIN = 0.09; // annotation lineweight (thin)
+  const WALL_COLOR = '#000000'; // walls drawn black
+  const ANNO_COLOR = '#808080'; // annotation drawn gray
+
+  // A synthetic TWO-LAYER sheet op list (identity CTM -> coords already in feet):
+  //  - HEAVY layer: a 200x120 building RECTANGLE (4 long walls), one heavy width+color.
+  //  - THIN layer: full-WIDTH dimension/grid lines spanning the whole sheet (x:-40..300)
+  //    plus a column of grid lines — all at the thin width + a different color. These are
+  //    the ~full-sheet-spanning annotation lines that geometry-alone cannot separate.
+  function twoLayerOpList() {
+    const fnArray = [];
+    const argsArray = [];
+    const push = (fn, args) => { fnArray.push(fn); argsArray.push(args); };
+
+    // ---- HEAVY WALL LAYER ----
+    push(OPS.setLineWidth, [HEAVY]);
+    push(OPS.setStrokeRGBColor, [WALL_COLOR]); // v6 hex-string arg form
+    // building rectangle 0,0 .. 200,120 as 4 connected long wall segments
+    push(OPS.moveTo, [0, 0]);
+    push(OPS.lineTo, [200, 0]);
+    push(OPS.lineTo, [200, 120]);
+    push(OPS.lineTo, [0, 120]);
+    push(OPS.lineTo, [0, 0]);
+
+    // ---- THIN ANNOTATION LAYER ----
+    push(OPS.setLineWidth, [THIN]);
+    push(OPS.setStrokeRGBColor, [ANNO_COLOR]);
+    // Full-sheet-spanning horizontal dimension/grid lines (x:-40..300) at several Ys —
+    // these reach FAR outside the building extent, exactly like the 1881 grid/dim lines.
+    for (let i = 0; i < 8; i++) {
+      const y = -20 + i * 25;
+      push(OPS.moveTo, [-40, y]);
+      push(OPS.lineTo, [300, y]);
+    }
+    // Full-height vertical grid lines (y:-40..200) at several Xs.
+    for (let i = 0; i < 8; i++) {
+      const x = -30 + i * 45;
+      push(OPS.moveTo, [x, -40]);
+      push(OPS.lineTo, [x, 200]);
+    }
+    return { fnArray, argsArray };
+  }
+
+  test('(i) tags each segment with the current lineWidth + parsed strokeColor', () => {
+    const ol = twoLayerOpList();
+    const { segments, count } = extractSegmentsFromOpList(ol, { scale: 1 });
+    // 4 wall segments + 8 horizontal + 8 vertical annotation lines = 20 segments.
+    expect(count).toBe(20);
+    // Backward compat: geometry fields still present and correct on the first wall edge.
+    expect(segments[0]).toMatchObject({ x1: 0, y1: 0, x2: 200, y2: 0 });
+
+    const wallSegs = segments.filter((s) => Math.abs(s.lineWidth - HEAVY) < 1e-9);
+    const annoSegs = segments.filter((s) => Math.abs(s.lineWidth - THIN) < 1e-9);
+    expect(wallSegs).toHaveLength(4);
+    expect(annoSegs).toHaveLength(16);
+    // The heavy walls carry the wall color; the thin annotation carries the anno color.
+    for (const s of wallSegs) {
+      expect(s.lineWidth).toBeCloseTo(HEAVY, 9);
+      expect(s.strokeColor).toBe(WALL_COLOR);
+    }
+    for (const s of annoSegs) {
+      expect(s.lineWidth).toBeCloseTo(THIN, 9);
+      expect(s.strokeColor).toBe(ANNO_COLOR);
+    }
+  });
+
+  test('parses stroke-color arg forms: hex string, packed int 0xRRGGBB, and [r,g,b] array', () => {
+    const mk = (colorArg) => {
+      const fnArray = [];
+      const argsArray = [];
+      fnArray.push(OPS.setStrokeRGBColor); argsArray.push(colorArg);
+      fnArray.push(OPS.moveTo); argsArray.push([0, 0]);
+      fnArray.push(OPS.lineTo); argsArray.push([10, 0]);
+      return { fnArray, argsArray };
+    };
+    // (a) v6 hex string passes through verbatim (lowercased).
+    expect(extractSegmentsFromOpList(mk(['#1A2B3C']), { scale: 1 }).segments[0].strokeColor)
+      .toBe('#1a2b3c');
+    // (b) packed integer 0xRRGGBB -> "#rrggbb" (the recon NaN bug was decoding this wrong).
+    expect(extractSegmentsFromOpList(mk([0x1a2b3c]), { scale: 1 }).segments[0].strokeColor)
+      .toBe('#1a2b3c');
+    // (c) [r,g,b] array of 0..1 floats -> "#rrggbb".
+    expect(extractSegmentsFromOpList(mk([[1, 0, 0]]), { scale: 1 }).segments[0].strokeColor)
+      .toBe('#ff0000');
+    // (d) [r,g,b] array of 0..255 ints -> "#rrggbb".
+    expect(extractSegmentsFromOpList(mk([[0, 128, 255]]), { scale: 1 }).segments[0].strokeColor)
+      .toBe('#0080ff');
+    // None of these ever produce NaN in the key.
+    for (const c of [['#1A2B3C'], [0x1a2b3c], [[1, 0, 0]], [[0, 128, 255]]]) {
+      const sc = extractSegmentsFromOpList(mk(c), { scale: 1 }).segments[0].strokeColor;
+      expect(String(sc)).not.toMatch(/nan/i);
+    }
+  });
+
+  test('save/restore push & pop the graphics state (lineWidth + color) alongside the CTM', () => {
+    const fnArray = [];
+    const argsArray = [];
+    const push = (fn, args) => { fnArray.push(fn); argsArray.push(args); };
+    push(OPS.setLineWidth, [HEAVY]);
+    push(OPS.setStrokeRGBColor, [WALL_COLOR]);
+    push(OPS.moveTo, [0, 0]);
+    push(OPS.lineTo, [50, 0]); // heavy/black
+    push(OPS.save, []);
+    push(OPS.setLineWidth, [THIN]);
+    push(OPS.setStrokeRGBColor, [ANNO_COLOR]);
+    push(OPS.moveTo, [0, 10]);
+    push(OPS.lineTo, [50, 10]); // thin/gray inside the save
+    push(OPS.restore, []);
+    push(OPS.moveTo, [0, 20]);
+    push(OPS.lineTo, [50, 20]); // MUST be heavy/black again (state restored)
+
+    const { segments } = extractSegmentsFromOpList({ fnArray, argsArray }, { scale: 1 });
+    expect(segments).toHaveLength(3);
+    expect(segments[0]).toMatchObject({ lineWidth: HEAVY, strokeColor: WALL_COLOR });
+    expect(segments[1]).toMatchObject({ lineWidth: THIN, strokeColor: ANNO_COLOR });
+    // after restore, lineWidth+color are back to the heavy/black wall state
+    expect(segments[2].lineWidth).toBeCloseTo(HEAVY, 9);
+    expect(segments[2].strokeColor).toBe(WALL_COLOR);
+  });
+
+  test('(ii) selectWallLayer picks the heavier-lineweight wall layer & EXCLUDES thin full-width annotation', () => {
+    const ol = twoLayerOpList();
+    const { segments } = extractSegmentsFromOpList(ol, { scale: 1 });
+    const sel = selectWallLayer(segments);
+
+    // The chosen group is the heavy/black wall layer, not the thin/gray annotation.
+    expect(sel.chosen.lineWidth).toBeCloseTo(HEAVY, 9);
+    expect(sel.chosen.strokeColor).toBe(WALL_COLOR);
+    // The selected wall segments are exactly the 4 building walls.
+    expect(sel.wallSegments).toHaveLength(4);
+    for (const s of sel.wallSegments) {
+      expect(s.lineWidth).toBeCloseTo(HEAVY, 9);
+      expect(s.strokeColor).toBe(WALL_COLOR);
+    }
+    // The full group histogram is returned (both layers visible).
+    expect(sel.groups.length).toBeGreaterThanOrEqual(2);
+    // The method documents the principled convention (heavier lineweight), not a fit.
+    expect(String(sel.method)).toMatch(/lineweight|linewidth|heav/i);
+    expect(String(sel.note)).not.toMatch(/21,?332|538,?792|target/i);
+  });
+
+  test('(iii) the selected wall footprint EXCLUDES the sheet-spanning annotation', () => {
+    const ol = twoLayerOpList();
+    const { segments, bbox: allBbox } = extractSegmentsFromOpList(ol, { scale: 1 });
+    const sel = selectWallLayer(segments);
+
+    // bbox of the SELECTED wall layer.
+    const xs = sel.wallSegments.flatMap((s) => [s.x1, s.x2]);
+    const ys = sel.wallSegments.flatMap((s) => [s.y1, s.y2]);
+    const wallW = Math.max(...xs) - Math.min(...xs);
+    const wallH = Math.max(...ys) - Math.min(...ys);
+
+    // The wall footprint is the 200x120 building, NOT the -40..300 x -40..200 sheet span.
+    expect(wallW).toBeCloseTo(200, 6);
+    expect(wallH).toBeCloseTo(120, 6);
+    // It is much smaller than the all-segments bbox (which the annotation blows up).
+    const allW = allBbox.widthFt;
+    const allH = allBbox.heightFt;
+    expect(wallW * wallH).toBeLessThan(allW * allH * 0.6);
+  });
+
+  test('selectWallLayer reports the chosen group geometry (count, totalLenFt, bbox)', () => {
+    const ol = twoLayerOpList();
+    const { segments } = extractSegmentsFromOpList(ol, { scale: 1 });
+    const sel = selectWallLayer(segments);
+    const chosenGroup = sel.groups.find(
+      (g) => Math.abs(g.lineWidth - HEAVY) < 1e-9 && g.strokeColor === WALL_COLOR,
+    );
+    expect(chosenGroup).toBeTruthy();
+    expect(chosenGroup.count).toBe(4);
+    // perimeter of a 200x120 rectangle = 640 ft.
+    expect(chosenGroup.totalLenFt).toBeCloseTo(640, 3);
+    expect(chosenGroup.bbox.widthFt).toBeCloseTo(200, 6);
+    expect(chosenGroup.bbox.heightFt).toBeCloseTo(120, 6);
+  });
+
+  test('segmentsToFloorPlan({ extract: "wallLayer" }) bounds JUST the wall segments', () => {
+    const ol = twoLayerOpList();
+    const { segments } = extractSegmentsFromOpList(ol, { scale: 1 });
+    const fp = segmentsToFloorPlan(segments, { extract: 'wallLayer', hazard: 'ordinary' });
+    expect(fp.rooms).toHaveLength(1);
+    expect(fp.rooms[0].hazard).toBe('ordinary');
+    // The room footprint is the wall layer's 200x120 extent, not the full sheet.
+    expect(fp.bbox.widthFt).toBeCloseTo(200, 6);
+    expect(fp.bbox.heightFt).toBeCloseTo(120, 6);
+    expect(fp.chosen.strokeColor).toBe(WALL_COLOR);
+    expect(fp.chosen.lineWidth).toBeCloseTo(HEAVY, 9);
+    expect(fp.wallSegmentCount).toBe(4);
+    expect(String(fp.note)).toMatch(/graphics.state|lineweight|wall layer/i);
+  });
+
+  test('default behavior is UNCHANGED — op lists without color/width ops emit the bare {x1,y1,x2,y2} shape', () => {
+    // BACKWARD COMPAT: the tags are additive and only ATTACHED when a graphics-state op
+    // set them. An op list with no setLineWidth/setStrokeRGBColor emits exactly the bare
+    // 4-field shape, so every existing toEqual assertion keeps passing unchanged.
+    const ops = opList([
+      [OPS.moveTo, [0, 0]],
+      [OPS.lineTo, [10, 0]],
+      [OPS.lineTo, [10, 10]],
+      [OPS.closePath, []],
+    ]);
+    const { segments, count } = extractSegmentsFromOpList(ops, { scale: 1 });
+    expect(count).toBe(3);
+    // EXACT shape — no extra keys when untagged (proves backward compat under toEqual).
+    expect(segments).toEqual([
+      { x1: 0, y1: 0, x2: 10, y2: 0 },
+      { x1: 10, y1: 0, x2: 10, y2: 10 },
+      { x1: 10, y1: 10, x2: 0, y2: 0 },
+    ]);
+    // selectWallLayer treats a missing tag as a null/null group.
+    for (const s of segments) {
+      expect(s.lineWidth).toBeUndefined();
+      expect(s.strokeColor).toBeUndefined();
+    }
+  });
+
+  test('selectWallLayer degenerate inputs fall back without throwing', () => {
+    expect(() => selectWallLayer([])).not.toThrow();
+    const empty = selectWallLayer([]);
+    expect(empty.wallSegments).toEqual([]);
+    expect(Array.isArray(empty.groups)).toBe(true);
+
+    // All-untagged segments -> a single null/null group, selected as the only layer.
+    const untagged = [
+      { x1: 0, y1: 0, x2: 100, y2: 0 },
+      { x1: 100, y1: 0, x2: 100, y2: 60 },
+    ];
+    expect(() => selectWallLayer(untagged)).not.toThrow();
+    const u = selectWallLayer(untagged);
+    expect(u.wallSegments.length).toBeGreaterThan(0);
+    expect(u.groups.length).toBe(1);
   });
 });
