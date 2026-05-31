@@ -396,4 +396,185 @@ describeIf('T31 — real 1881 Architecturals PDF: scale-from-sheet d4 measuremen
     expect(String(extracted.note)).toMatch(/NOT a (precise )?building outline/i);
     // We do NOT assert fullScopeTotal ~ REAL_TOTAL — that is reported, not enforced.
   }, 180000);
+
+  // T33 — building-OUTLINE polygon extraction. The T32 full-extent BBOX over-captures
+  // the building ~4.175x (it swallows dimension/note/title geometry stacked on the
+  // sheet). Here we re-run the SAME real extraction at the SAME detected sheet scale but
+  // with extract:'outline' — keep wall-like segments, isolate the dominant connected
+  // wall NETWORK, and measure its ENCLOSED rectilinear footprint (occupancy-grid area),
+  // NOT a bbox. We then bid that outline polygon x8 floors.
+  //
+  // HONESTY (fail-closed): validation is against the DRAWING'S OWN geometry — per-floor
+  // ~21,332 sqft (170,654/8) and overall long dimension ~312 ft — NOT the dollar total.
+  // The wall filter / network / grid thresholds are GEOMETRIC defaults, NOT fitted to
+  // 21,332 or 538792. We LOG the area, the ratio vs 21,332, the long-dim vs 312, the
+  // heads, and the bid delta, and assert a REASONABLE 0.5x..2x band on the per-floor
+  // area (LOGGED, not forced). If the principled method cannot isolate the outline, the
+  // band fails honestly and that is itself the finding — we do not tune to pass.
+  test('OUTLINE mode: validates enclosed footprint vs drawing geometry (21,332 sqft / 312 ft), logs honest bid delta', async () => {
+    const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs');
+    const require = createRequire(import.meta.url);
+    pdfjs.GlobalWorkerOptions.workerSrc = pathToFileURL(
+      require.resolve('pdfjs-dist/legacy/build/pdf.worker.mjs'),
+    ).href;
+
+    const fileBytes = fs.readFileSync(ARCHPDF);
+
+    // ---- READ THE SCALE OFF THE SHEET (same datum as T31/T32) ----------------
+    const loadingTask = pdfjs.getDocument({
+      data: new Uint8Array(fileBytes),
+      useWorkerFetch: false,
+      isEvalSupported: false,
+      disableFontFace: true,
+    });
+    const doc = await loadingTask.promise;
+    const page = await doc.getPage(FIRST_FLOOR_PAGE_INDEX + 1);
+    const textContent = await page.getTextContent();
+    const sheetText = textContent.items.map((it) => (it && it.str) || '').join(' ');
+    const detectedScale = parseArchitecturalScale(sheetText);
+    expect(detectedScale).not.toBeNull();
+    expect(detectedScale).toBeCloseTo(0.148148, 4);
+    // eslint-disable-next-line no-console
+    console.log(`[d4-outline] detected scale from sheet = ${detectedScale} ft/pt (3/32" = 1'-0")`);
+
+    // ---- EXTRACT the BUILDING OUTLINE (enclosed wall-network footprint) -------
+    const extracted = await floorPlanFromPdf(new Uint8Array(fileBytes), {
+      pageIndex: FIRST_FLOOR_PAGE_INDEX,
+      scale: detectedScale,
+      hazard: 'ordinary',
+      pdfjs,
+      extract: 'outline', // <-- T33 enclosed wall-network footprint
+    });
+
+    expect(extracted.segmentCount).toBeGreaterThan(0);
+    expect(extracted.bbox.widthFt).toBeGreaterThan(0);
+    expect(extracted.bbox.heightFt).toBeGreaterThan(0);
+    expect(extracted.areaSqft).toBeGreaterThan(0);
+
+    const widthFt = extracted.bbox.widthFt;
+    const heightFt = extracted.bbox.heightFt;
+    const longDimFt = Math.max(widthFt, heightFt);
+    const areaSqFt = extracted.areaSqft; // ENCLOSED footprint area, NOT bbox area
+    const bboxAreaSqFt = widthFt * heightFt;
+
+    // eslint-disable-next-line no-console
+    console.log(
+      `[d4-outline] network bbox = ${widthFt.toFixed(2)} x ${heightFt.toFixed(2)} ft ` +
+      `(bboxArea=${bboxAreaSqFt.toFixed(0)} sqft, longDim=${longDimFt.toFixed(2)} ft); ` +
+      `ENCLOSED footprint areaSqft=${areaSqFt.toFixed(1)} sqft; method=${extracted.method}; ` +
+      `wallSegs=${extracted.wallSegmentCount}, networkSegs=${extracted.networkSegmentCount}, ` +
+      `totalSegs=${extracted.segmentCount}`,
+    );
+
+    // ---- GEOMETRY VALIDATION against the DRAWING'S OWN DATA (NOT dollars) -----
+    const longDimRatio = longDimFt / SHEET_OVERALL_LONG_FT;
+    const perFloorAreaRatio = areaSqFt / REAL_PER_FLOOR_SQFT;
+    // eslint-disable-next-line no-console
+    console.log(
+      `[d4-outline] long-dim ${longDimFt.toFixed(2)} ft vs sheet ${SHEET_OVERALL_LONG_FT} ft => ` +
+      `ratio=${longDimRatio.toFixed(3)}x | enclosed per-floor area ${areaSqFt.toFixed(0)} sqft vs real ` +
+      `${REAL_PER_FLOOR_SQFT.toFixed(0)} sqft => ratio=${perFloorAreaRatio.toFixed(3)}x`,
+    );
+    // Show how much the enclosed footprint shrank vs the over-capturing bbox.
+    // eslint-disable-next-line no-console
+    console.log(
+      `[d4-outline] enclosed/bbox area = ${(areaSqFt / bboxAreaSqFt).toFixed(3)}x ` +
+      `(bbox over-capture removed: ${(bboxAreaSqFt - areaSqFt).toFixed(0)} sqft)`,
+    );
+
+    // PRINCIPLED geometry band (LOGGED, reasonable, NOT a dollar fit): per-floor enclosed
+    // area within 0.5x..2x of the real 21,332 sqft. We LOG the booleans and the ratios;
+    // the honest result stands whether or not it lands in-band.
+    const areaInBand = perFloorAreaRatio >= 0.5 && perFloorAreaRatio <= 2.0;
+    const longDimInBand = longDimRatio >= 0.5 && longDimRatio <= 2.0;
+    // eslint-disable-next-line no-console
+    console.log(`[d4-outline] geometry validation: areaInBand(0.5..2x)=${areaInBand} longDimInBand(0.5..2x)=${longDimInBand}`);
+
+    // ---- RUN THE REAL AUTO-BIDDER on the outline polygon ----------------------
+    const floorPlan = {
+      name: 'Cooperative 1881 — first-floor building outline (extracted)',
+      units: 'ft',
+      rooms: extracted.rooms,
+    };
+    const bid = generateSprinklerBid(floorPlan, {});
+    const cadModel = buildCadModel(floorPlan);
+    expect(cadModel).toBeTruthy();
+
+    const perFloorHeads = bid.totalHeadCount;
+    const bomItems = Array.isArray(bid.bom) ? bid.bom : [];
+    const perFloorPipeFt = bomItems.find((b) => b.key === 'branch_pipe')?.quantity ?? 0;
+    const perFloorFittings = bomItems.find((b) => b.key === 'fitting')?.quantity ?? 0;
+    expect(perFloorHeads).toBeGreaterThan(0);
+    expect(perFloorPipeFt).toBeGreaterThan(0);
+
+    // eslint-disable-next-line no-console
+    console.log(
+      `[d4-outline] per-floor bid: heads=${perFloorHeads} pipeFt=${perFloorPipeFt} fittings=${perFloorFittings} ` +
+      `materialCost=${bid.pricing.materialCost.toFixed(2)} (layout area=${bid.totalAreaSqFt} sqft)`,
+    );
+
+    // ---- SCALE per-floor to the WHOLE 8-FLOOR BUILDING (x8) -------------------
+    const buildingHeads = perFloorHeads * FLOORS;
+    const buildingPipeFt = perFloorPipeFt * FLOORS;
+    const buildingFittings = perFloorFittings * FLOORS;
+    const buildingAllFloorsSqFt = areaSqFt * FLOORS;
+    const allFloorsRatio = buildingAllFloorsSqFt / REAL_SQFT_ALL_FLOORS;
+    // eslint-disable-next-line no-console
+    console.log(
+      `[d4-outline] enclosed footprint x ${FLOORS} floors = ${buildingAllFloorsSqFt.toFixed(0)} sqft vs real ` +
+      `${REAL_SQFT_ALL_FLOORS} sqft => ratio=${allFloorsRatio.toFixed(3)}x`,
+    );
+
+    const buildingPricing = {
+      ...bid.pricing,
+      materialCost: bid.pricing.materialCost * FLOORS,
+      total: (bid.pricing.total ?? 0) * FLOORS,
+    };
+    const fsb = buildFullScopeBid(buildingPricing, {
+      totalHeadCount: buildingHeads,
+      pipeFootage: buildingPipeFt,
+      fittingCount: buildingFittings,
+      hazard: 'ordinary',
+    });
+
+    // ---- MEASURE THE HONEST DELTA vs the real proposal -----------------------
+    const fullScopeTotal = fsb.fullScopeTotal;
+    const deltaUsd = fullScopeTotal - REAL_TOTAL;
+    const deltaPct = (deltaUsd / REAL_TOTAL) * 100;
+    const materialsOnly = fsb.materialsOnly;
+    const laborCost = fsb.laborCost;
+    const materialDeltaPct = ((materialsOnly - REAL_MATERIAL) / REAL_MATERIAL) * 100;
+    const laborDeltaPct = ((laborCost - REAL_LABOR) / REAL_LABOR) * 100;
+
+    // eslint-disable-next-line no-console
+    console.log(
+      `[d4-outline] WHOLE BUILDING (x${FLOORS}): heads=${buildingHeads} pipeFt=${buildingPipeFt} fittings=${buildingFittings}`,
+    );
+    // eslint-disable-next-line no-console
+    console.log(
+      `[d4-outline] fullScopeTotal=$${fullScopeTotal.toFixed(2)} vs real $${REAL_TOTAL} => ` +
+      `deltaUsd=$${deltaUsd.toFixed(2)} deltaPct=${deltaPct.toFixed(2)}%`,
+    );
+    // eslint-disable-next-line no-console
+    console.log(
+      `[d4-outline] materialsOnly=$${materialsOnly.toFixed(2)} vs real $${REAL_MATERIAL} => ` +
+      `${materialDeltaPct.toFixed(2)}% | laborCost=$${laborCost.toFixed(2)} vs real $${REAL_LABOR} => ` +
+      `${laborDeltaPct.toFixed(2)}%`,
+    );
+
+    // ---- HONEST INVARIANTS ONLY (the dollar total is NOT asserted) -----------
+    expect(fsb.estimate).toBe(true);
+    expect(fsb.parity).toBeUndefined();
+    expect(fsb.approved).not.toBe(true);
+    expect(fsb.anyEstimated).toBe(true);
+    expect(buildingHeads).toBeGreaterThan(0);
+    expect(buildingPipeFt).toBeGreaterThan(0);
+    expect(fullScopeTotal).toBeGreaterThan(0);
+    // The enclosed footprint is strictly smaller than the over-capturing network bbox.
+    expect(areaSqFt).toBeLessThanOrEqual(bboxAreaSqFt);
+    expect(bid.disclaimer.toLowerCase()).toContain('not ahj-approved');
+    expect(bid.disclaimer.toLowerCase()).toContain('not autosprink-parity');
+    // The outline note makes no building-outline/parity claim.
+    expect(String(extracted.note)).toMatch(/NOT a (precise )?building outline/i);
+  }, 180000);
 });

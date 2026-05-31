@@ -513,6 +513,23 @@ export function isolateContentRegion(segments, opts = {}) {
   return finalize(clusterBbox, clusterSegs.length);
 }
 
+const OUTLINE_NOTE =
+  'Heuristic building-OUTLINE polygon (T33): from the extracted vector segments, ' +
+  'only WALL-LIKE segments are kept (axis-aligned within a small angle tolerance ' +
+  'AND at least minWallFt long), which drops short dimension witness-lines, text ' +
+  'strokes and hatching; the DOMINANT connected wall NETWORK (segments joined ' +
+  'end-to-end within connectTolFt, largest by total wall length) is isolated, ' +
+  'dropping detached detail / legend / title geometry; the network is rasterized ' +
+  'onto a gridN occupancy grid, the exterior is flood-filled, and the ENCLOSED ' +
+  'footprint (wall + interior cells) is traced into a rectilinear polygon whose ' +
+  'SHOELACE area is the reported footprint. This is the building footprint AREA ' +
+  '(not the over-capturing bbox of the whole annotated sheet). It is a BEST-EFFORT ' +
+  'APPROXIMATION — NOT a precise building outline, NOT a room segmentation, and ' +
+  'NOT an AHJ/PE/accurate drawing. The minWallFt / connectTolFt / gridN thresholds ' +
+  'are GEOMETRIC defaults (wall length, join tolerance, raster resolution) — they ' +
+  'are NOT fitted to any target area or dollar figure. No scale guessing: coords ' +
+  'are already in feet (operator-supplied scale applied upstream). Deterministic.';
+
 const EXTENT_NOTE =
   'Heuristic FULL-EXTENT content-region approximation (T32): the sheet-frame ' +
   'border is stripped, then the bbox of the UNION of all non-trivial content ' +
@@ -852,6 +869,380 @@ function parseNumberOrFraction(token) {
   return NaN;
 }
 
+/**
+ * PURE. Extract the building OUTLINE polygon and its ENCLOSED footprint area from a
+ * raw segment set (already in feet — the operator-supplied scale was applied upstream
+ * by extractSegmentsFromOpList).
+ *
+ * Motivation (T33): a rectangular BBOX over an annotated architectural sheet grossly
+ * OVER-captures the building (it swallows dimension witness-lines, leader/notes,
+ * enlarged details, and title-block geometry stacked on the same sheet). The fix is to
+ * measure the building's actual ENCLOSED FOOTPRINT, not a bbox. This is done with three
+ * PRINCIPLED, geometric steps (defaults are geometric, NOT fitted to any area or dollar):
+ *
+ *  (a) WALL-LIKE FILTER. Keep only segments that are (near-)axis-aligned — their angle
+ *      from horizontal/vertical is within `axisTolDeg` — AND at least `minWallFt` long.
+ *      Real walls are long and orthogonal; dimension witness-lines, text strokes, and
+ *      hatching are short and/or skew, so this drops the annotation layer. (Diagonal
+ *      walls are rare in this stock and a near-axis test is the conservative choice; a
+ *      plan with genuinely diagonal walls would under-capture and is reported, not fudged.)
+ *
+ *  (b) DOMINANT CONNECTED WALL NETWORK. Build a graph over the kept wall segments where
+ *      two segments are joined when an endpoint of one lies within `connectTolFt` of an
+ *      endpoint of the other (snapped via a spatial hash for O(n) grouping). Take the
+ *      connected component with the greatest TOTAL WALL LENGTH — the main plan body —
+ *      discarding detached detail/legend/title drawings that live in their own component.
+ *
+ *  (c) ENCLOSED RECTILINEAR FOOTPRINT. Rasterize the dominant network onto a
+ *      `gridN` x `gridN` occupancy grid over the network bbox (mark every cell a wall
+ *      passes through, via a DDA cell walk). Flood-fill the EXTERIOR inward from the grid
+ *      border (4-neighbour, blocked by wall cells); every cell not reached is ENCLOSED.
+ *      The footprint = wall cells + enclosed cells. Its outer boundary is traced into a
+ *      rectilinear polygon (axis-aligned edges) and the SHOELACE area of that polygon is
+ *      returned as `areaSqft`. For a building whose plan is mostly rectilinear this is the
+ *      honest enclosed area — strictly the footprint, NOT the bbox of everything.
+ *
+ * FALLBACKS (never throw): if no wall-like segments survive (a), or the network/footprint
+ * is degenerate, fall back to the dominant-network bbox, then the all-segment bbox, and
+ * report the fallback in `method`. A degenerate (e.g. single short segment) input yields a
+ * defined zero/near-zero result without throwing.
+ *
+ * @param {Array<{x1,y1,x2,y2}>} segments  - segments in FEET.
+ * @param {{minWallFt?:number, connectTolFt?:number, gridN?:number, axisTolDeg?:number}} [opts]
+ *   GEOMETRIC defaults: minWallFt=3 (a true wall run, drops witness-ticks/text strokes),
+ *   connectTolFt=1.5 (join slop at corners), gridN=140 (raster resolution), axisTolDeg=5
+ *   (orthogonality tolerance). NONE is fitted to 21,332 sqft or any dollar.
+ * @returns {{polygon:Array<[number,number]>, areaSqft:number, bbox:{minX,minY,maxX,maxY,widthFt,heightFt}, method:string, note:string, wallSegmentCount:number, networkSegmentCount:number}}
+ */
+export function buildingOutlinePolygon(segments, opts = {}) {
+  const minWallFt = Number.isFinite(opts.minWallFt) ? Number(opts.minWallFt) : 3;
+  const connectTolFt = Number.isFinite(opts.connectTolFt) ? Number(opts.connectTolFt) : 1.5;
+  const gridN = Number.isInteger(opts.gridN) && opts.gridN > 1 ? opts.gridN : 140;
+  const axisTolDeg = Number.isFinite(opts.axisTolDeg) ? Number(opts.axisTolDeg) : 5;
+  const axisTol = Math.tan((axisTolDeg * Math.PI) / 180);
+
+  const segs = Array.isArray(segments) ? segments : [];
+
+  const bboxToObj = (b) => ({
+    minX: round(b.minX),
+    minY: round(b.minY),
+    maxX: round(b.maxX),
+    maxY: round(b.maxY),
+    widthFt: round(b.maxX - b.minX),
+    heightFt: round(b.maxY - b.minY),
+  });
+  const bboxPolygon = (b) => [
+    [round(b.minX), round(b.minY)],
+    [round(b.maxX), round(b.minY)],
+    [round(b.maxX), round(b.maxY)],
+    [round(b.minX), round(b.maxY)],
+  ];
+  const polyArea = (poly) => {
+    let sum = 0;
+    for (let i = 0; i < poly.length; i++) {
+      const [x1, y1] = poly[i];
+      const [x2, y2] = poly[(i + 1) % poly.length];
+      sum += x1 * y2 - x2 * y1;
+    }
+    return Math.abs(sum) / 2;
+  };
+
+  // Degenerate: nothing / zero-area -> defined empty result, never throw.
+  const full = boundingBox(segs);
+  if (segs.length === 0 || full.widthFt <= 0 || full.heightFt <= 0) {
+    const poly = bboxPolygon(full);
+    return {
+      polygon: poly,
+      areaSqft: round(polyArea(poly)),
+      bbox: bboxToObj(full),
+      method: 'degenerate-bbox',
+      note: OUTLINE_NOTE,
+      wallSegmentCount: 0,
+      networkSegmentCount: 0,
+    };
+  }
+
+  // ---- (a) WALL-LIKE FILTER -------------------------------------------------
+  const segLen = (s) => Math.hypot(s.x2 - s.x1, s.y2 - s.y1);
+  const isAxisAligned = (s) => {
+    const dx = Math.abs(s.x2 - s.x1);
+    const dy = Math.abs(s.y2 - s.y1);
+    if (dx === 0 || dy === 0) return true;
+    // near-horizontal (dy/dx small) OR near-vertical (dx/dy small)
+    return dy / dx <= axisTol || dx / dy <= axisTol;
+  };
+  const walls = segs.filter((s) => segLen(s) >= minWallFt && isAxisAligned(s));
+
+  // No walls survived -> fall back to the all-segment bbox (reported as fallback).
+  if (walls.length === 0) {
+    const poly = bboxPolygon(full);
+    return {
+      polygon: poly,
+      areaSqft: round(polyArea(poly)),
+      bbox: bboxToObj(full),
+      method: 'fallback-no-walls-bbox',
+      note: OUTLINE_NOTE,
+      wallSegmentCount: 0,
+      networkSegmentCount: 0,
+    };
+  }
+
+  // ---- (b) DOMINANT CONNECTED WALL NETWORK ----------------------------------
+  // Union-Find over wall segments; join two when an endpoint of one is within
+  // connectTolFt of an endpoint of the other. Endpoints are snapped to a spatial
+  // hash of cell size connectTolFt so each endpoint only checks its 3x3 neighbour
+  // cells (O(n) grouping, deterministic).
+  const parent = new Array(walls.length);
+  for (let i = 0; i < walls.length; i++) parent[i] = i;
+  const find = (x) => { while (parent[x] !== x) { parent[x] = parent[parent[x]]; x = parent[x]; } return x; };
+  const union = (a, b) => { const ra = find(a); const rb = find(b); if (ra !== rb) parent[Math.max(ra, rb)] = Math.min(ra, rb); };
+
+  const cell = Math.max(connectTolFt, 1e-9);
+  const hashKey = (gx, gy) => `${gx},${gy}`;
+  // endpoint bucket -> list of wall indices touching that bucket
+  const buckets = new Map();
+  const endpointsOf = (s) => [[s.x1, s.y1], [s.x2, s.y2]];
+  for (let i = 0; i < walls.length; i++) {
+    for (const [ex, ey] of endpointsOf(walls[i])) {
+      const gx = Math.floor(ex / cell);
+      const gy = Math.floor(ey / cell);
+      const k = hashKey(gx, gy);
+      let arr = buckets.get(k);
+      if (!arr) { arr = []; buckets.set(k, arr); }
+      arr.push(i);
+    }
+  }
+  const within = (ax, ay, bx, by) => Math.hypot(ax - bx, ay - by) <= connectTolFt;
+  for (let i = 0; i < walls.length; i++) {
+    for (const [ex, ey] of endpointsOf(walls[i])) {
+      const gx = Math.floor(ex / cell);
+      const gy = Math.floor(ey / cell);
+      for (let dx = -1; dx <= 1; dx++) {
+        for (let dy = -1; dy <= 1; dy++) {
+          const arr = buckets.get(hashKey(gx + dx, gy + dy));
+          if (!arr) continue;
+          for (const j of arr) {
+            if (j <= i) continue;
+            // join i,j if ANY endpoint pair is within tolerance
+            let joined = false;
+            for (const [px, py] of endpointsOf(walls[i])) {
+              for (const [qx, qy] of endpointsOf(walls[j])) {
+                if (within(px, py, qx, qy)) { joined = true; break; }
+              }
+              if (joined) break;
+            }
+            if (joined) union(i, j);
+          }
+        }
+      }
+    }
+  }
+
+  // Component with the greatest total wall length.
+  const compLen = new Map();
+  const compMembers = new Map();
+  for (let i = 0; i < walls.length; i++) {
+    const r = find(i);
+    compLen.set(r, (compLen.get(r) || 0) + segLen(walls[i]));
+    let m = compMembers.get(r);
+    if (!m) { m = []; compMembers.set(r, m); }
+    m.push(i);
+  }
+  let bestRoot = null;
+  let bestLen = -1;
+  for (const [r, len] of [...compLen.entries()].sort((a, b) => a[0] - b[0])) {
+    if (len > bestLen) { bestLen = len; bestRoot = r; }
+  }
+  const network = compMembers.get(bestRoot).map((i) => walls[i]);
+  const netBbox = boundingBox(network);
+
+  // Network degenerate -> fall back to wall bbox / full bbox.
+  if (network.length < 3 || netBbox.widthFt <= 0 || netBbox.heightFt <= 0) {
+    const base = netBbox.widthFt > 0 && netBbox.heightFt > 0 ? netBbox : full;
+    const poly = bboxPolygon(base);
+    return {
+      polygon: poly,
+      areaSqft: round(polyArea(poly)),
+      bbox: bboxToObj(base),
+      method: 'fallback-network-bbox',
+      note: OUTLINE_NOTE,
+      wallSegmentCount: walls.length,
+      networkSegmentCount: network.length,
+    };
+  }
+
+  // ---- (c) ENCLOSED RECTILINEAR FOOTPRINT via occupancy grid ----------------
+  const nbW = netBbox.maxX - netBbox.minX;
+  const nbH = netBbox.maxY - netBbox.minY;
+  const cw = nbW / gridN; // cell width in feet
+  const ch = nbH / gridN; // cell height in feet
+  const cellArea = cw * ch;
+  // wall[cy*gridN + cx] = true when a network wall passes through that cell.
+  const wall = new Uint8Array(gridN * gridN);
+  const idx = (cx, cy) => cy * gridN + cx;
+  const clampC = (v) => (v < 0 ? 0 : v >= gridN ? gridN - 1 : v);
+  const toCx = (x) => clampC(Math.floor((x - netBbox.minX) / cw));
+  const toCy = (y) => clampC(Math.floor((y - netBbox.minY) / ch));
+  // Rasterize each wall segment by sampling along it (dense enough that no cell is
+  // skipped — step = min(cw,ch)/2 in feet).
+  const step = Math.max(Math.min(cw, ch) / 2, 1e-9);
+  for (const s of network) {
+    const len = segLen(s);
+    const n = Math.max(1, Math.ceil(len / step));
+    for (let t = 0; t <= n; t++) {
+      const f = t / n;
+      const x = s.x1 + (s.x2 - s.x1) * f;
+      const y = s.y1 + (s.y2 - s.y1) * f;
+      wall[idx(toCx(x), toCy(y))] = 1;
+    }
+  }
+
+  // Flood-fill the EXTERIOR from the grid border (4-neighbour), blocked by wall cells.
+  const exterior = new Uint8Array(gridN * gridN);
+  const stack = [];
+  const pushIf = (cx, cy) => {
+    if (cx < 0 || cy < 0 || cx >= gridN || cy >= gridN) return;
+    const k = idx(cx, cy);
+    if (exterior[k] || wall[k]) return;
+    exterior[k] = 1;
+    stack.push(k);
+  };
+  for (let cx = 0; cx < gridN; cx++) { pushIf(cx, 0); pushIf(cx, gridN - 1); }
+  for (let cy = 0; cy < gridN; cy++) { pushIf(0, cy); pushIf(gridN - 1, cy); }
+  while (stack.length) {
+    const k = stack.pop();
+    const cx = k % gridN;
+    const cy = (k - cx) / gridN;
+    pushIf(cx - 1, cy); pushIf(cx + 1, cy); pushIf(cx, cy - 1); pushIf(cx, cy + 1);
+  }
+
+  // Footprint cells = wall OR not-exterior (enclosed interior + the walls themselves).
+  let footprintCells = 0;
+  const filled = new Uint8Array(gridN * gridN);
+  for (let k = 0; k < gridN * gridN; k++) {
+    if (wall[k] || !exterior[k]) { filled[k] = 1; footprintCells++; }
+  }
+  const footprintAreaSqft = footprintCells * cellArea;
+
+  // Trace the outer rectilinear boundary of the filled cell set into a polygon. We
+  // emit the boundary as the union of cell edges that separate a filled cell from a
+  // non-filled cell (or the grid border), then stitch them into one closed loop.
+  // (For the polygon handed to layoutRoom, point-in-polygon over this orthogonal
+  // boundary correctly drops heads outside the footprint.)
+  const polygon = traceFilledBoundary(filled, gridN, netBbox.minX, netBbox.minY, cw, ch);
+
+  // If the trace failed (shouldn't for a connected footprint), fall back to the
+  // network bbox polygon but keep the grid area as the honest footprint measure.
+  let outPoly = polygon;
+  let method = 'wall-network-occupancy-grid';
+  if (!outPoly || outPoly.length < 4) {
+    outPoly = bboxPolygon(netBbox);
+    method = 'wall-network-bbox';
+  }
+
+  // areaSqft is the OCCUPANCY-GRID enclosed footprint (the honest footprint area).
+  // The traced polygon's shoelace area should match it closely; we report the grid
+  // area as the primary measure (discretization-stable) and round it.
+  const areaSqft = round(footprintAreaSqft);
+
+  return {
+    polygon: outPoly.map(([x, y]) => [round(x), round(y)]),
+    areaSqft,
+    bbox: bboxToObj(netBbox),
+    method,
+    note: OUTLINE_NOTE,
+    wallSegmentCount: walls.length,
+    networkSegmentCount: network.length,
+  };
+}
+
+/**
+ * PURE helper. Trace the outer boundary of a filled cell mask into a single closed
+ * rectilinear polygon in FEET. Walks boundary edges (cell-edge segments separating a
+ * filled cell from a non-filled neighbour / the grid border) and stitches them.
+ * Returns vertices in feet; collinear runs are merged. Deterministic.
+ */
+function traceFilledBoundary(filled, gridN, originX, originY, cw, ch) {
+  const isFilled = (cx, cy) => cx >= 0 && cy >= 0 && cx < gridN && cy < gridN && filled[cy * gridN + cx] === 1;
+  // Collect directed boundary edges so the filled region stays on the LEFT, giving a
+  // CCW outer loop. Edge endpoints are grid-corner integer coords (gx,gy) in cell units.
+  // For each filled cell, any side adjacent to a non-filled cell is a boundary edge.
+  // Represent each edge by its two corner points and build an adjacency map.
+  const edges = new Map(); // "x,y" start corner -> [end corner "x,y"]
+  const cornerKey = (gx, gy) => `${gx},${gy}`;
+  const addEdge = (x1, y1, x2, y2) => {
+    const k = cornerKey(x1, y1);
+    let arr = edges.get(k);
+    if (!arr) { arr = []; edges.set(k, arr); }
+    arr.push([x2, y2]);
+  };
+  for (let cy = 0; cy < gridN; cy++) {
+    for (let cx = 0; cx < gridN; cx++) {
+      if (!isFilled(cx, cy)) continue;
+      // bottom edge (y=cy): neighbour below is (cx,cy-1). filled-on-left => direction +x
+      if (!isFilled(cx, cy - 1)) addEdge(cx, cy, cx + 1, cy);
+      // top edge (y=cy+1): neighbour above (cx,cy+1). direction -x
+      if (!isFilled(cx, cy + 1)) addEdge(cx + 1, cy + 1, cx, cy + 1);
+      // left edge (x=cx): neighbour left (cx-1,cy). direction -y
+      if (!isFilled(cx - 1, cy)) addEdge(cx, cy + 1, cx, cy);
+      // right edge (x=cx+1): neighbour right (cx+1,cy). direction +y
+      if (!isFilled(cx + 1, cy)) addEdge(cx + 1, cy, cx + 1, cy + 1);
+    }
+  }
+  if (edges.size === 0) return null;
+
+  // Pick the lexicographically smallest start corner for determinism, then walk the
+  // directed edges until we return to start. This yields the outer loop (the boundary
+  // is a set of closed loops; the outer one contains the min corner).
+  let startKey = null;
+  for (const k of edges.keys()) {
+    if (startKey === null) { startKey = k; continue; }
+    const [ax, ay] = startKey.split(',').map(Number);
+    const [bx, by] = k.split(',').map(Number);
+    if (bx < ax || (bx === ax && by < ay)) startKey = k;
+  }
+  const parseKey = (k) => k.split(',').map(Number);
+  const loop = [];
+  let cur = startKey;
+  const used = new Set();
+  let guard = 0;
+  const maxSteps = edges.size * 4 + 16;
+  while (guard++ < maxSteps) {
+    const outs = edges.get(cur);
+    if (!outs || outs.length === 0) break;
+    // Prefer an unused outgoing edge; deterministic order.
+    let nextPt = null;
+    for (const cand of outs) {
+      const ek = `${cur}->${cand[0]},${cand[1]}`;
+      if (!used.has(ek)) { nextPt = cand; used.add(ek); break; }
+    }
+    if (!nextPt) break;
+    const [cx, cy] = parseKey(cur);
+    loop.push([cx, cy]);
+    const nk = cornerKey(nextPt[0], nextPt[1]);
+    if (nk === startKey) break;
+    cur = nk;
+  }
+  if (loop.length < 4) return null;
+
+  // Merge collinear runs, then convert grid corners -> feet.
+  const merged = [];
+  for (let i = 0; i < loop.length; i++) {
+    const prev = loop[(i - 1 + loop.length) % loop.length];
+    const cur2 = loop[i];
+    const next = loop[(i + 1) % loop.length];
+    const d1x = cur2[0] - prev[0]; const d1y = cur2[1] - prev[1];
+    const d2x = next[0] - cur2[0]; const d2y = next[1] - cur2[1];
+    // keep vertex only when direction changes (not collinear)
+    if (d1x * d2y - d1y * d2x !== 0 || (d1x === 0 && d1y === 0)) merged.push(cur2);
+  }
+  const poly = (merged.length >= 4 ? merged : loop).map(([gx, gy]) => [
+    originX + gx * cw,
+    originY + gy * ch,
+  ]);
+  return poly;
+}
+
 const VALID_HAZARDS = new Set(['light', 'ordinary', 'extra', 'esfr']);
 const FOOTPRINT_NOTE =
   'Best-effort bbox footprint of the extracted PDF vector geometry — NOT a full ' +
@@ -874,9 +1265,16 @@ const FOOTPRINT_NOTE =
  * heuristic note are attached. The isolated region is a BEST-EFFORT APPROXIMATION,
  * not a building outline.
  *
+ * Extraction mode (opts.extract='outline', T33): instead of any bbox footprint, run
+ * buildingOutlinePolygon — keep wall-like segments, isolate the dominant connected wall
+ * network, and return its ENCLOSED rectilinear footprint polygon (the room polygon is
+ * that orthogonal outline, NOT a bbox) plus its shoelace/occupancy area. This avoids the
+ * bbox over-capture of annotated sheets. opts.outlineOpts is forwarded. Default
+ * (no extract) is UNCHANGED.
+ *
  * @param {Array<{x1,y1,x2,y2}>} segments
- * @param {{hazard?:string, isolate?:(boolean|'dominant'|'fullExtent'), isolateOpts?:Object}} [opts]
- * @returns {{rooms:Array, bbox:Object, wallCandidates:Array, segmentCount:number, note:string, keptCount?:number, droppedBorderCount?:number, droppedOutlierCount?:number}}
+ * @param {{hazard?:string, isolate?:(boolean|'dominant'|'fullExtent'), isolateOpts?:Object, extract?:'outline', outlineOpts?:Object}} [opts]
+ * @returns {{rooms:Array, bbox:Object, wallCandidates:Array, segmentCount:number, note:string, keptCount?:number, droppedBorderCount?:number, droppedOutlierCount?:number, areaSqft?:number, method?:string}}
  */
 export function segmentsToFloorPlan(segments, opts = {}) {
   if (!Array.isArray(segments) || segments.length === 0) {
@@ -885,6 +1283,22 @@ export function segmentsToFloorPlan(segments, opts = {}) {
   const hazard = VALID_HAZARDS.has(String(opts.hazard).toLowerCase())
     ? String(opts.hazard).toLowerCase()
     : 'ordinary';
+
+  // T33 OUTLINE extraction: enclosed wall-network footprint polygon (not a bbox).
+  if (opts.extract === 'outline') {
+    const outline = buildingOutlinePolygon(segments, opts.outlineOpts || {});
+    return {
+      rooms: [{ name: 'Extracted Building Outline', polygon: outline.polygon, hazard }],
+      bbox: outline.bbox,
+      wallCandidates: segments,
+      segmentCount: segments.length,
+      note: outline.note,
+      areaSqft: outline.areaSqft,
+      method: outline.method,
+      wallSegmentCount: outline.wallSegmentCount,
+      networkSegmentCount: outline.networkSegmentCount,
+    };
+  }
 
   let bbox;
   let note;
@@ -944,9 +1358,16 @@ export function segmentsToFloorPlan(segments, opts = {}) {
  *   bbox (BEST-EFFORT APPROXIMATION, not a building outline) and the result carries
  *   keptCount / droppedBorderCount (+ droppedOutlierCount for fullExtent). No scale
  *   guessing either way.
+ * @param {'outline'} [opts.extract] - T33 building-OUTLINE extraction. When 'outline',
+ *   the room polygon is the ENCLOSED rectilinear footprint of the dominant connected
+ *   wall network (see buildingOutlinePolygon), NOT a bbox, and the result carries
+ *   areaSqft / method / wallSegmentCount / networkSegmentCount. opts.outlineOpts is
+ *   forwarded. extract takes precedence over isolate; default (no extract) is unchanged.
+ * @param {Object} [opts.outlineOpts] - geometric opts for buildingOutlinePolygon
+ *   (minWallFt, connectTolFt, gridN, axisTolDeg). NONE is fitted to a target.
  * @param {Object} opts.pdfjs - injected/imported pdfjs module exposing getDocument.
  *   Worker setup (GlobalWorkerOptions.workerSrc) is the caller's responsibility.
- * @returns {Promise<{rooms,bbox,segmentCount,pageIndex,scale,note,keptCount?,droppedBorderCount?}>}
+ * @returns {Promise<{rooms,bbox,segmentCount,pageIndex,scale,note,keptCount?,droppedBorderCount?,areaSqft?,method?}>}
  */
 export async function floorPlanFromPdf(source, opts = {}) {
   const pageIndex = Number.isInteger(opts.pageIndex) ? opts.pageIndex : 0;
@@ -987,6 +1408,29 @@ export async function floorPlanFromPdf(source, opts = {}) {
       'the page may be raster/scanned (no extractable vector ops) or text-only.',
     );
   }
+  // T33 OUTLINE extraction takes precedence over isolate: enclosed wall-network
+  // footprint polygon (not a bbox).
+  if (opts.extract === 'outline') {
+    const fpOutline = segmentsToFloorPlan(segments, {
+      hazard,
+      extract: 'outline',
+      outlineOpts: opts.outlineOpts || {},
+    });
+    return {
+      rooms: fpOutline.rooms,
+      bbox: fpOutline.bbox,
+      wallCandidates: fpOutline.wallCandidates,
+      segmentCount: count,
+      pageIndex,
+      scale,
+      note: fpOutline.note,
+      areaSqft: fpOutline.areaSqft,
+      method: fpOutline.method,
+      wallSegmentCount: fpOutline.wallSegmentCount,
+      networkSegmentCount: fpOutline.networkSegmentCount,
+    };
+  }
+
   // Normalize the isolate mode: true/'dominant' -> T29 dominant cluster;
   // 'fullExtent' -> T32 full-extent union; anything else falsy -> T28 whole sheet.
   const fullExtentMode = opts.isolate === 'fullExtent';

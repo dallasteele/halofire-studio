@@ -7,7 +7,9 @@ import {
   floorPlanFromPdf,
   isolateContentRegion,
   isolatePlanExtent,
+  buildingOutlinePolygon,
 } from '../src/engine/pdf-floorplan.js';
+import { polygonArea } from '../src/engine/sprinkler-layout.js';
 
 // T28 — PDF plan ingestion. These tests exercise the PURE, portable core of the
 // vector-PDF floor-plan extractor with SYNTHETIC pdfjs operator lists, so they
@@ -687,6 +689,254 @@ describe('isolatePlanExtent — full-extent content-region isolator (T32)', () =
       expect(def.bbox.widthFt).toBe(1000);
       expect(def.bbox.heightFt).toBe(700);
       expect(def.droppedOutlierCount).toBeUndefined();
+    });
+  });
+});
+
+describe('buildingOutlinePolygon — enclosed wall-network footprint (T33)', () => {
+  // HONESTY: this returns the building FOOTPRINT (enclosed area of the dominant wall
+  // network), NOT the over-capturing bbox of the whole annotated sheet, and NOT a
+  // precise/AHJ outline. The wall filter (minWallFt + axis tolerance) and network /
+  // grid thresholds are GEOMETRIC defaults — they are NOT fitted to any target area or
+  // dollar. Coords are already in feet (operator-supplied scale applied upstream).
+  //
+  // SYNTHETIC ANNOTATED SHEET (all coords in feet):
+  //  - BUILDING: an L-shaped outline made of LONG axis-aligned wall segments. The L
+  //    outline is (0,0)->(200,0)->(200,40)->(100,40)->(100,80)->(0,80)->close. Its TRUE
+  //    enclosed area (shoelace, computed by hand below) is 12,000 sqft; the BBOX OF THE L
+  //    is 200x80 = 16,000 sqft, so the enclosed area is genuinely less than the L's own
+  //    bbox — and far less than the all-segments bbox.
+  //  - ANNOTATIONS around/outside it: short dimension WITNESS-LINES (len 1.5 ft) and tiny
+  //    TEXT-STROKE segments (len 0.5 ft), all below minWallFt -> must be dropped.
+  //  - A DETACHED small DETAIL-DRAWING cluster (a 40x30 ft rectangle of wall-like edges)
+  //    far away at x:400..440, y:400..430 -> a SEPARATE connected component with less
+  //    total wall length -> must be dropped by the dominant-network step.
+  //
+  // HAND-COMPUTED TRUE BUILDING AREA (shoelace of the L):
+  //   verts (0,0),(200,0),(200,40),(100,40),(100,80),(0,80)
+  //   2A = (0*0-200*0)+(200*40-200*0)+(200*40-100*40)+(100*80-100*40)+(100*80-0*80)+(0*0-0*80)
+  //      = 0 + 8000 + 4000 + 4000 + 8000 + 0 = 24000  ->  A = 12,000 sqft.
+  const TRUE_BUILDING_AREA = 12000;
+
+  function lShapeWalls() {
+    // L-shape perimeter as 6 connected long axis-aligned wall segments.
+    return [
+      { x1: 0, y1: 0, x2: 200, y2: 0 }, // 200
+      { x1: 200, y1: 0, x2: 200, y2: 40 }, // 40
+      { x1: 200, y1: 40, x2: 100, y2: 40 }, // 100
+      { x1: 100, y1: 40, x2: 100, y2: 80 }, // 40
+      { x1: 100, y1: 80, x2: 0, y2: 80 }, // 100
+      { x1: 0, y1: 80, x2: 0, y2: 0 }, // 80
+    ];
+  }
+
+  function annotationSegments() {
+    const segs = [];
+    // Short dimension witness-lines (len 1.5 ft) strung below the building.
+    for (let i = 0; i < 12; i++) {
+      const x = 10 + i * 15;
+      segs.push({ x1: x, y1: -10, x2: x, y2: -8.5 }); // vertical witness tick, len 1.5
+    }
+    // Tiny text-stroke segments (len 0.5 ft) scattered around.
+    for (let i = 0; i < 20; i++) {
+      const x = 5 + i * 9;
+      segs.push({ x1: x, y1: 90, x2: x + 0.5, y2: 90 }); // len 0.5
+      segs.push({ x1: x, y1: 92, x2: x + 0.3, y2: 92.4 }); // tiny skew stroke
+    }
+    return segs;
+  }
+
+  function detachedDetailCluster() {
+    // A small 40x30 detail rectangle far from the building (its own component).
+    return [
+      { x1: 400, y1: 400, x2: 440, y2: 400 }, // 40
+      { x1: 440, y1: 400, x2: 440, y2: 430 }, // 30
+      { x1: 440, y1: 430, x2: 400, y2: 430 }, // 40
+      { x1: 400, y1: 430, x2: 400, y2: 400 }, // 30
+    ];
+  }
+
+  function syntheticAnnotatedSheet() {
+    return [...lShapeWalls(), ...annotationSegments(), ...detachedDetailCluster()];
+  }
+
+  test('(i) drops short witness/text segments — keeps only wall-like segments', () => {
+    const segs = syntheticAnnotatedSheet();
+    const res = buildingOutlinePolygon(segs);
+    // 6 L walls + 4 detail-rect walls = 10 wall-like segments survive the filter; the
+    // 12 witness ticks (1.5 ft) + 40 text strokes (<=0.5 ft) are all dropped.
+    expect(res.wallSegmentCount).toBe(10);
+    // The dominant network is the L (6 connected long walls), not the 4-edge detail rect.
+    expect(res.networkSegmentCount).toBe(6);
+    expect(res.method).toBe('wall-network-occupancy-grid');
+  });
+
+  test('(ii) returns the TRUE building enclosed area (~12,000 sqft), NOT the bbox-of-everything', () => {
+    const segs = syntheticAnnotatedSheet();
+    const res = buildingOutlinePolygon(segs);
+
+    // The all-segments bbox swallows the detail cluster + witness lines:
+    //   x:0..440, y:-10..430  => 440 x 440 = 193,600 sqft.
+    const allSegBboxArea = 440 * 440;
+
+    // Enclosed footprint area is within ±20% of the hand-computed L area (12,000) — the
+    // small excess is occupancy-grid wall-cell thickness, a discretization effect, NOT a
+    // tuned fit. (Recomputed by hand above: 12,000 sqft.)
+    expect(res.areaSqft).toBeGreaterThan(TRUE_BUILDING_AREA * 0.85);
+    expect(res.areaSqft).toBeLessThan(TRUE_BUILDING_AREA * 1.2);
+
+    // PROOF it is much smaller than the all-segments bbox (the over-capture this fixes):
+    expect(res.areaSqft).toBeLessThan(allSegBboxArea * 0.15);
+
+    // And it is below the L's OWN bbox (16,000) — i.e. the concave notch is captured,
+    // not filled in as a rectangle.
+    expect(res.areaSqft).toBeLessThan(200 * 80);
+
+    // The returned polygon is a usable rectilinear outline whose shoelace area is in the
+    // same ballpark as the reported occupancy area.
+    const polyArea = polygonArea(res.polygon);
+    expect(polyArea).toBeGreaterThan(TRUE_BUILDING_AREA * 0.7);
+    expect(polyArea).toBeLessThan(TRUE_BUILDING_AREA * 1.3);
+  });
+
+  test('(iii) EXCLUDES the detached detail cluster (network bbox hugs the building only)', () => {
+    const segs = syntheticAnnotatedSheet();
+    const res = buildingOutlinePolygon(segs);
+    // Network bbox is the L (0..200 x 0..80); the detail rect lives at x>=400, y>=400.
+    expect(res.bbox.maxX).toBeLessThan(400);
+    expect(res.bbox.maxY).toBeLessThan(400);
+    expect(res.bbox.minX).toBeGreaterThanOrEqual(0);
+    expect(res.bbox.minY).toBeGreaterThanOrEqual(0);
+    expect(res.bbox.maxX).toBeCloseTo(200, 0);
+    expect(res.bbox.maxY).toBeCloseTo(80, 0);
+    // No polygon vertex reaches the detail cluster.
+    for (const [x, y] of res.polygon) {
+      expect(x).toBeLessThan(400);
+      expect(y).toBeLessThan(400);
+    }
+  });
+
+  test('carries a heuristic/approximation note (NOT a building-outline/parity claim)', () => {
+    const note = String(buildingOutlinePolygon(syntheticAnnotatedSheet()).note);
+    expect(note).toMatch(/heurist|approxim/i);
+    expect(note).toMatch(/NOT a (precise )?building outline/i);
+    expect(note).toMatch(/NOT a room segmentation/i);
+    expect(note).toMatch(/NOT an AHJ\/PE/i);
+    expect(note).not.toMatch(/\bis accurate\b|\bparity\b|\bexact\b/i);
+  });
+
+  test('a simple rectangle building recovers ~its enclosed area', () => {
+    // A 100x60 rectangle (closed loop of 4 long walls) -> ~6,000 sqft enclosed.
+    const rect = [
+      { x1: 0, y1: 0, x2: 100, y2: 0 },
+      { x1: 100, y1: 0, x2: 100, y2: 60 },
+      { x1: 100, y1: 60, x2: 0, y2: 60 },
+      { x1: 0, y1: 60, x2: 0, y2: 0 },
+    ];
+    const res = buildingOutlinePolygon(rect);
+    expect(res.areaSqft).toBeGreaterThan(6000 * 0.9);
+    expect(res.areaSqft).toBeLessThan(6000 * 1.15);
+    expect(res.bbox.widthFt).toBeCloseTo(100, 4);
+    expect(res.bbox.heightFt).toBeCloseTo(60, 4);
+  });
+
+  test('areaSqft scales with coordinate scale (geometry, not a fitted constant)', () => {
+    const rect1 = [
+      { x1: 0, y1: 0, x2: 100, y2: 0 },
+      { x1: 100, y1: 0, x2: 100, y2: 60 },
+      { x1: 100, y1: 60, x2: 0, y2: 60 },
+      { x1: 0, y1: 60, x2: 0, y2: 0 },
+    ];
+    const rect2 = rect1.map((s) => ({ x1: s.x1 * 2, y1: s.y1 * 2, x2: s.x2 * 2, y2: s.y2 * 2 }));
+    const a1 = buildingOutlinePolygon(rect1).areaSqft;
+    const a2 = buildingOutlinePolygon(rect2).areaSqft;
+    // Doubling all coords quadruples the area (+/- discretization).
+    expect(a2 / a1).toBeGreaterThan(3.6);
+    expect(a2 / a1).toBeLessThan(4.4);
+  });
+
+  test('degenerate inputs (no long segments / empty) fall back WITHOUT throwing', () => {
+    // Empty.
+    expect(() => buildingOutlinePolygon([])).not.toThrow();
+    const empty = buildingOutlinePolygon([]);
+    expect(empty.polygon.length).toBeGreaterThanOrEqual(4);
+    expect(Number.isFinite(empty.areaSqft)).toBe(true);
+    expect(empty.method).toBe('degenerate-bbox');
+
+    // Only short segments (all < minWallFt) -> no walls -> bbox fallback, no throw.
+    const shortOnly = [
+      { x1: 0, y1: 0, x2: 1, y2: 0 },
+      { x1: 0, y1: 0, x2: 0, y2: 1 },
+      { x1: 5, y1: 5, x2: 6, y2: 5 },
+    ];
+    expect(() => buildingOutlinePolygon(shortOnly)).not.toThrow();
+    const so = buildingOutlinePolygon(shortOnly);
+    expect(so.method).toBe('fallback-no-walls-bbox');
+    expect(so.wallSegmentCount).toBe(0);
+    expect(Number.isFinite(so.areaSqft)).toBe(true);
+
+    // Single long segment (no enclosed network) -> network bbox fallback, no throw.
+    const single = [{ x1: 0, y1: 0, x2: 50, y2: 0 }];
+    expect(() => buildingOutlinePolygon(single)).not.toThrow();
+    const sg = buildingOutlinePolygon(single);
+    expect(Number.isFinite(sg.areaSqft)).toBe(true);
+  });
+
+  describe('segmentsToFloorPlan / floorPlanFromPdf with extract:"outline"', () => {
+    test('segmentsToFloorPlan({ extract: "outline" }) uses the OUTLINE polygon (not a bbox)', () => {
+      const segs = syntheticAnnotatedSheet();
+      const fp = segmentsToFloorPlan(segs, { extract: 'outline', hazard: 'ordinary' });
+      expect(fp.rooms).toHaveLength(1);
+      expect(fp.rooms[0].name).toMatch(/outline/i);
+      expect(fp.rooms[0].hazard).toBe('ordinary');
+      // The room polygon is the rectilinear outline, NOT a 4-corner bbox of everything.
+      expect(fp.rooms[0].polygon.length).toBeGreaterThanOrEqual(4);
+      expect(fp.areaSqft).toBeGreaterThan(TRUE_BUILDING_AREA * 0.85);
+      expect(fp.areaSqft).toBeLessThan(TRUE_BUILDING_AREA * 1.2);
+      expect(fp.method).toBe('wall-network-occupancy-grid');
+      expect(String(fp.note)).toMatch(/building-OUTLINE|NOT a (precise )?building outline/i);
+    });
+
+    test('default (no extract) stays UNCHANGED — full bbox footprint', () => {
+      const segs = syntheticAnnotatedSheet();
+      const def = segmentsToFloorPlan(segs);
+      // Whole-sheet bbox of everything.
+      expect(def.bbox.minX).toBe(0);
+      expect(def.areaSqft).toBeUndefined();
+      expect(def.method).toBeUndefined();
+      expect(String(def.note)).toMatch(/bbox/i);
+    });
+
+    test('floorPlanFromPdf({ extract: "outline" }) via injected fake pdfjs', async () => {
+      // A fake pdfjs whose op list is the L-shape (identity CTM -> coords unchanged).
+      const ls = lShapeWalls();
+      const fnArray = [];
+      const argsArray = [];
+      for (const s of ls) {
+        fnArray.push(OPS.moveTo); argsArray.push([s.x1, s.y1]);
+        fnArray.push(OPS.lineTo); argsArray.push([s.x2, s.y2]);
+      }
+      const ol = { fnArray, argsArray };
+      const pdfjs = {
+        getDocument: () => ({
+          promise: Promise.resolve({
+            numPages: 1,
+            getPage: () => Promise.resolve({ getOperatorList: () => Promise.resolve(ol) }),
+          }),
+        }),
+      };
+      const result = await floorPlanFromPdf(new Uint8Array([1]), {
+        pageIndex: 0,
+        scale: 1, // coords already in feet
+        hazard: 'ordinary',
+        pdfjs,
+        extract: 'outline',
+      });
+      expect(result.areaSqft).toBeGreaterThan(TRUE_BUILDING_AREA * 0.8);
+      expect(result.areaSqft).toBeLessThan(TRUE_BUILDING_AREA * 1.25);
+      expect(result.method).toBe('wall-network-occupancy-grid');
+      expect(result.rooms[0].polygon.length).toBeGreaterThanOrEqual(4);
+      expect(String(result.note)).toMatch(/building-OUTLINE|NOT a (precise )?building outline/i);
     });
   });
 });
