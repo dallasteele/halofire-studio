@@ -35,6 +35,7 @@ import { homeDepotRexburgFloorPlan, cooperative1881FloorPlan, COOPERATIVE_1881_P
 import { HOME_DEPOT_PROJECT_NAME } from '../data/evidence-gates.js';
 import { readHomeDepotRealTakeoff } from '../data/home-depot-bid-package.js';
 import { readCooperative1881RealTakeoff } from '../data/cooperative-1881-bid-package.js';
+import { buildSamInvoker } from './sam-invoker.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const log = createLogger('api-server');
@@ -675,8 +676,63 @@ async function resolvePdfFloorPlan(req) {
   }
   const pageIndex = Number.isFinite(Number(req.body.pdfPageIndex)) ? Number(req.body.pdfPageIndex) : 0;
   const scale = Number(req.body.pdfScale);
+  // T36 — SAM-3.1 plan-segmentation request. Accepted via pdfExtract:"sam" (also the
+  // legacy alias extract:"sam"). The production SAM invoker is wired to the OpenClaw
+  // governed bridge ONLY when OPENCLAW_BRIDGE_URL is set; segmentFloorPlanViaSam calls
+  // it with a single payload arg, so buildSamInvoker adapts the (tool,args) bridge.
+  // FAIL-SOFT: with no bridge URL, OR when SAM is unreachable/empty (floorPlanFromPdf
+  // returns { samSkipped:true }), we FALL BACK to the existing vector footprint so the
+  // response still 200s with a real bid, marking pdfMeta.samSkipped + samReason. We
+  // NEVER throw to 500 and NEVER fabricate a segmentation. The scale guard still applies.
+  const wantsSam = req.body.pdfExtract === 'sam' || req.body.extract === 'sam';
   try {
     const pdfjs = await loadPdfjs();
+    let samSkipped = false;
+    let samReason = null;
+    if (wantsSam) {
+      const samInvoker = buildSamInvoker({
+        bridgeUrl: process.env.OPENCLAW_BRIDGE_URL,
+        fetchImpl: globalThis.fetch,
+      });
+      if (!samInvoker) {
+        samSkipped = true;
+        samReason = 'openclaw_bridge_url_unset';
+      } else {
+        const samExtracted = await floorPlanFromPdf(new Uint8Array(data), {
+          extract: 'sam',
+          pageIndex,
+          scale, // operator-supplied; floorPlanFromPdf throws if absent/<=0 (still 400)
+          hazard: req.body.hazard,
+          samInvoker,
+          pdfjs,
+        });
+        if (samExtracted.samSkipped) {
+          // SAM down/unreachable/empty -> fall through to the vector fallback below.
+          samSkipped = true;
+          samReason = samExtracted.reason || 'sam_unavailable';
+        } else {
+          const samFloorPlan = normalizeFloorPlan({
+            name: req.params.name || 'Imported PDF Plan',
+            units: 'ft',
+            rooms: samExtracted.rooms,
+          });
+          return {
+            floorPlan: samFloorPlan,
+            pdfMeta: {
+              pageIndex: samExtracted.pageIndex,
+              scale: samExtracted.scale,
+              segmentCount: samExtracted.segmentCount,
+              bbox: samExtracted.bbox,
+              note: samExtracted.note,
+              method: samExtracted.method,
+              source: samExtracted.source,
+              label: samExtracted.label,
+              areaSqft: samExtracted.areaSqft,
+            },
+          };
+        }
+      }
+    }
     const extracted = await floorPlanFromPdf(new Uint8Array(data), {
       pageIndex,
       scale, // operator-supplied feet-per-PDF-point; floorPlanFromPdf throws if absent/<=0
@@ -688,7 +744,14 @@ async function resolvePdfFloorPlan(req) {
       units: 'ft',
       rooms: extracted.rooms,
     });
-    return { floorPlan, pdfMeta: { pageIndex: extracted.pageIndex, scale: extracted.scale, segmentCount: extracted.segmentCount, bbox: extracted.bbox, note: extracted.note } };
+    const pdfMeta = { pageIndex: extracted.pageIndex, scale: extracted.scale, segmentCount: extracted.segmentCount, bbox: extracted.bbox, note: extracted.note };
+    if (samSkipped) {
+      // FAIL-SOFT fallback marker: SAM was requested but skipped; this bid is the
+      // honest VECTOR footprint, NOT a fabricated SAM segmentation.
+      pdfMeta.samSkipped = true;
+      pdfMeta.samReason = samReason;
+    }
+    return { floorPlan, pdfMeta };
   } catch (err) {
     const e = new Error(err && err.message ? err.message : String(err));
     e.httpStatus = 400; // bad scale / unparseable pdf -> 400, never 500
