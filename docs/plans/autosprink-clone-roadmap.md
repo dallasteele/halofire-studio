@@ -430,15 +430,6 @@ bridge (best-effort, graceful skip). Parity claim stays BLOCKED until complete.
       isolation captured only ~0.52× the building footprint (129 ft wide vs the real 312 ft plan) → uniformly low. → T32: fix
       footprint extraction to capture the FULL plan extent (validate against the sheet's stated 312 ft overall dim + ~21,332
       sqft/floor — a real-drawing datum, NOT the dollar total).
-- [ ] **T32 — Footprint extraction fidelity (capture the full plan extent).** T31 proved the real-drawing pipeline runs
-      but the footprint is under-captured: T29's isolateContentRegion dominant-cluster flood-fill grabbed ONE connected
-      sub-region (129×85 ft = 11,084 sqft) of a building whose sheet-stated overall dimension is 312 ft (~21,332 sqft/floor),
-      so the bid ran −57%. Fix: extract the full building plan extent (e.g. post-border bbox excluding far-flung note/legend
-      outliers, OR union the major connected clusters, OR a wall-line-aware extent) so the footprint matches the drawing's
-      OWN dimensions. VALIDATE against real-drawing data — the 312 ft overall dim + per-floor ~21,332 sqft (170,654/8) — NOT
-      the dollar total; never tune to hit $538,792. TDD on synthetic separable input + re-run the real-PDF measurement. Then
-      re-measure d4 category-honest (materials AND labor both approach). Gates stay blocked; honest heuristic, no parity claim.
-
 - [x] **T32 — Footprint extraction fidelity (CTM fix + full-extent mode).** DONE 2026-05-30 (ultra workflow w3e1irbwn,
       TDD, honesty + correctness verifiers both PASS — T32 itself honest, validated against drawing geometry not dollars).
       REAL BUG FOUND + FIXED: extractSegmentsFromOpList IGNORED the PDF Current Transformation Matrix (CTM). The 1881
