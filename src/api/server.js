@@ -530,6 +530,33 @@ const GATE_CLEARING_EVIDENCE_TYPES = new Set([
   'employee_signoff',
 ]);
 
+const GATE_EVIDENCE_RULES = Object.freeze({
+  AUTOSPRINK_EVIDENCE_MISSING: Object.freeze({
+    allowedEvidenceTypes: ['autosprink_packet'],
+    canResolve: true,
+  }),
+  AHJ_APPROVAL_MISSING: Object.freeze({
+    allowedEvidenceTypes: ['ahj_approval'],
+    canResolve: true,
+  }),
+  PROFESSIONAL_REVIEW_MISSING: Object.freeze({
+    allowedEvidenceTypes: ['professional_review', 'pe_signoff', 'employee_signoff'],
+    canResolve: true,
+  }),
+  MANUFACTURER_MODEL_APPROVAL_MISSING: Object.freeze({
+    allowedEvidenceTypes: ['manufacturer_approval'],
+    canResolve: true,
+  }),
+  BID_LOG_SQFT_DIFFERS_FROM_PROPOSAL: Object.freeze({
+    allowedEvidenceTypes: ['employee_signoff'],
+    canResolve: true,
+  }),
+});
+
+function gateEvidenceRule(code) {
+  return GATE_EVIDENCE_RULES[code] || { allowedEvidenceTypes: [], canResolve: false };
+}
+
 app.get('/api/projects/:name/claim-gates', authMiddleware, (req, res) => {
   const gates = db
     .prepare('SELECT * FROM claim_gates WHERE project_name = ? ORDER BY severity DESC, code')
@@ -538,6 +565,43 @@ app.get('/api/projects/:name/claim-gates', authMiddleware, (req, res) => {
     ...gate,
     blocked_claims: safeParseJsonArray(gate.blocked_claims),
   })));
+});
+
+app.get('/api/projects/:name/evidence-wizard', authMiddleware, (req, res) => {
+  const projectName = req.params.name;
+  const gates = db
+    .prepare('SELECT * FROM claim_gates WHERE project_name = ? ORDER BY severity DESC, code')
+    .all(projectName);
+  const evidence = db
+    .prepare('SELECT * FROM project_evidence WHERE project_name = ? ORDER BY created_at DESC, id DESC')
+    .all(projectName);
+  const evidenceByType = new Map();
+  for (const row of evidence) {
+    if (!evidenceByType.has(row.evidence_type)) evidenceByType.set(row.evidence_type, []);
+    evidenceByType.get(row.evidence_type).push(row);
+  }
+  const gateRows = gates.map((gate) => {
+    const rule = gateEvidenceRule(gate.code);
+    const matchingEvidence = rule.allowedEvidenceTypes.flatMap((type) => evidenceByType.get(type) || []);
+    return {
+      ...gate,
+      blocked_claims: safeParseJsonArray(gate.blocked_claims),
+      allowed_evidence_types: [...rule.allowedEvidenceTypes],
+      can_resolve: rule.canResolve,
+      matching_evidence_count: matchingEvidence.length,
+      matching_evidence: matchingEvidence.slice(0, 5),
+    };
+  });
+  res.json({
+    project_name: projectName,
+    can_write: normalizeRole(req.user?.role) === 'admin',
+    summary: {
+      blocked: gateRows.filter((gate) => gate.status === 'blocked').length,
+      cleared: gateRows.filter((gate) => gate.status === 'cleared').length,
+      evidence_rows: evidence.length,
+    },
+    gates: gateRows,
+  });
 });
 
 app.get('/api/projects/:name/evidence', authMiddleware, (req, res) => {
@@ -595,6 +659,15 @@ app.post('/api/projects/:name/claim-gates/:code/resolve', authMiddleware, requir
     .get(projectName, code);
   if (!existing) {
     return res.status(404).json({ error: 'Claim gate not found' });
+  }
+  const rule = gateEvidenceRule(code);
+  if (!rule.canResolve) {
+    return res.status(400).json({ error: 'This gate cannot be cleared through the evidence wizard' });
+  }
+  if (!rule.allowedEvidenceTypes.includes(evidence_type)) {
+    return res.status(400).json({
+      error: `Gate ${code} only accepts allowed evidence types: ${rule.allowedEvidenceTypes.join(', ')}`,
+    });
   }
 
   const resolvedAt = new Date().toISOString();
