@@ -3,10 +3,12 @@ import { spawn } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { COOPERATIVE_1881_PROJECT_NAME } from '../src/data/floorplans.js';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
 const PORT = 3202;
 const BASE = `http://127.0.0.1:${PORT}`;
+const COOPERATIVE_1881_PATH = `/api/projects/${encodeURIComponent(COOPERATIVE_1881_PROJECT_NAME)}`;
 
 let server;
 let tempDir;
@@ -185,4 +187,77 @@ describe('PDF page inspection API', () => {
     });
     expect(res.status).toBe(400);
   }, 30000);
+
+  it('persists an employee-selected boundary decision as best-effort evidence for 1881 without clearing gates', async () => {
+    const candidate = {
+      mode: 'outline',
+      label: 'Wall-network outline',
+      status: 'candidate',
+      bbox: { minX: 0, minY: 0, maxX: 120, maxY: 80, widthFt: 120, heightFt: 80 },
+      segmentCount: 12,
+      areaSqft: 9600,
+      method: 'wall-network-outline',
+      blockedClaims: [
+        'geometry_accuracy',
+        'drawing_scale',
+        'AHJ_approval',
+        'PE_review',
+        'AutoSprink_parity',
+        'permit_ready',
+        'fabrication_ready',
+        'manufacturer_exact',
+      ],
+    };
+    const res = await request(`${COOPERATIVE_1881_PATH}/pdf-boundary-decision`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        pdfPageIndex: 7,
+        pdfScale: 0.0833,
+        pdfExtract: 'outline',
+        candidate,
+        source_file: 'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx',
+        source_ref: '1881 plan PDF sheet 7 / outline candidate',
+        notes: 'Employee chose sheet 7 and outline extraction pending professional review.',
+      }),
+    });
+    expect(res.status).toBe(201);
+    const body = await res.json();
+    expect(body.evidence.evidence_type).toBe('pdf_boundary_decision');
+    expect(body.evidence.status).toBe('best_effort');
+    expect(body.decision.projectName).toBe(COOPERATIVE_1881_PROJECT_NAME);
+    expect(body.decision.pageIndex).toBe(7);
+    expect(body.decision.scale).toBe(0.0833);
+    expect(body.decision.extractMode).toBe('outline');
+    expect(body.decision.candidate.bbox.widthFt).toBe(120);
+    expect(body.decision.blockedClaims).toEqual(expect.arrayContaining(['AutoSprink_parity', 'permit_ready']));
+
+    const latest = await (await request(`${COOPERATIVE_1881_PATH}/pdf-boundary-decision`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })).json();
+    expect(latest.decision.pageIndex).toBe(7);
+    expect(latest.evidence.status).toBe('best_effort');
+
+    const evidence = await (await request(`${COOPERATIVE_1881_PATH}/evidence`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })).json();
+    const row = evidence.find((e) => e.id === body.evidence.id);
+    expect(row).toBeTruthy();
+    expect(row.status).toBe('best_effort');
+    expect(row.notes).toContain('claims still blocked');
+  }, 30000);
+
+  it('rejects a persisted boundary decision without a positive operator scale', async () => {
+    const res = await request(`${COOPERATIVE_1881_PATH}/pdf-boundary-decision`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        pdfPageIndex: 0,
+        pdfScale: 0,
+        pdfExtract: 'outline',
+        candidate: { mode: 'outline', bbox: { widthFt: 10, heightFt: 10 }, segmentCount: 4 },
+      }),
+    });
+    expect(res.status).toBe(400);
+  });
 });

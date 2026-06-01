@@ -160,12 +160,29 @@ async function load() {
   await refreshEvidence();
 }
 
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+function evidenceDetail(row) {
+  if (row.evidence_type !== 'pdf_boundary_decision') return row.source_file ? ' · ' + escapeHtml(row.source_file) : '';
+  try {
+    const packet = JSON.parse(row.notes || '{}');
+    const decision = packet.decision || {};
+    const candidate = decision.candidate || {};
+    const blocked = Array.isArray(decision.blockedClaims) ? decision.blockedClaims : [];
+    return `<div class="muted" style="font-size:11px;margin-top:3px">sheet ${escapeHtml(decision.pageIndex)} · scale ${escapeHtml(decision.scale)} ft/pt · ${escapeHtml(decision.extractMode)} · ${escapeHtml(candidate.label || candidate.mode || 'candidate')}<br>Blocks still active: ${blocked.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('')}</div>`;
+  } catch {
+    return '<div class="muted" style="font-size:11px;margin-top:3px">saved boundary decision; detail packet unavailable</div>';
+  }
+}
+
 async function refreshEvidence() {
   const evidence = await api('/projects/' + encodeURIComponent(HOME_DEPOT) + '/evidence');
   document.getElementById('evidence').innerHTML = evidence.length ? evidence.map((e) => `
     <div class="ev">
-      <span>${e.evidence_type}${e.source_file ? ' · ' + e.source_file : ''}</span>
-      <span class="st ${e.status}">${e.status}</span>
+      <span>${escapeHtml(e.evidence_type)}${evidenceDetail(e)}</span>
+      <span class="st ${escapeHtml(e.status)}">${escapeHtml(e.status)}</span>
     </div>`).join('') : '<span class="muted">No evidence rows.</span>';
 }
 

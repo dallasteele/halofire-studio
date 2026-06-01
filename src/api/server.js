@@ -1040,6 +1040,102 @@ app.post('/api/pdf/boundary-candidates', authMiddleware, async (req, res) => {
   }
 });
 
+function jsonClone(value) {
+  return JSON.parse(JSON.stringify(value));
+}
+
+function normalizePdfBoundaryDecision(projectName, body = {}) {
+  const scale = Number(body.pdfScale);
+  if (!Number.isFinite(scale) || scale <= 0) {
+    const e = new Error('A positive operator-supplied pdfScale is required');
+    e.httpStatus = 400;
+    throw e;
+  }
+  const pageIndex = Number.isFinite(Number(body.pdfPageIndex)) ? Math.max(0, Math.trunc(Number(body.pdfPageIndex))) : 0;
+  const candidate = body.candidate && typeof body.candidate === 'object' ? jsonClone(body.candidate) : null;
+  if (!candidate) {
+    const e = new Error('candidate is required');
+    e.httpStatus = 400;
+    throw e;
+  }
+  const extractMode = String(body.pdfExtract || candidate.mode || '').trim();
+  if (!extractMode) {
+    const e = new Error('pdfExtract or candidate.mode is required');
+    e.httpStatus = 400;
+    throw e;
+  }
+  const blockedClaims = [...new Set([
+    ...PDF_BOUNDARY_BLOCKED_CLAIMS,
+    ...(Array.isArray(candidate.blockedClaims) ? candidate.blockedClaims : []),
+  ])];
+  candidate.blockedClaims = blockedClaims;
+  return {
+    projectName,
+    pageIndex,
+    scale,
+    extractMode,
+    candidate,
+    sourceFile: body.source_file || body.sourceFile || null,
+    sourceRef: body.source_ref || body.sourceRef || `pdf-boundary:${projectName}:page-${pageIndex}:${extractMode}`,
+    employeeNotes: body.notes || null,
+    blockedClaims,
+    limitation: 'Employee boundary selection is best-effort correction evidence only; regulated claims still blocked until real AHJ/PE/AutoSprink/manufacturer evidence is attached.',
+  };
+}
+
+function decisionFromEvidence(row) {
+  if (!row) return null;
+  try {
+    const parsed = JSON.parse(row.notes || '{}');
+    return parsed && parsed.kind === 'pdf_boundary_decision' ? parsed.decision : null;
+  } catch {
+    return null;
+  }
+}
+
+app.get('/api/projects/:name/pdf-boundary-decision', authMiddleware, (req, res) => {
+  const evidence = db
+    .prepare(`SELECT * FROM project_evidence
+              WHERE project_name = ? AND evidence_type = 'pdf_boundary_decision'
+              ORDER BY created_at DESC, id DESC LIMIT 1`)
+    .get(req.params.name);
+  res.json({ evidence: evidence || null, decision: decisionFromEvidence(evidence) });
+});
+
+app.post('/api/projects/:name/pdf-boundary-decision', authMiddleware, requireRole('admin'), (req, res) => {
+  try {
+    const projectName = req.params.name;
+    const decision = normalizePdfBoundaryDecision(projectName, req.body);
+    const packet = {
+      kind: 'pdf_boundary_decision',
+      recordedBy: req.user.username,
+      recordedAt: new Date().toISOString(),
+      decision,
+      status: 'best_effort',
+    };
+    const result = db
+      .prepare(`INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+                VALUES (?, ?, ?, ?, ?, ?)`)
+      .run(
+        projectName,
+        'pdf_boundary_decision',
+        decision.sourceFile,
+        decision.sourceRef,
+        'best_effort',
+        JSON.stringify(packet),
+      );
+    const evidence = db.prepare('SELECT * FROM project_evidence WHERE id = ?').get(result.lastInsertRowid);
+    res.status(201).json({
+      id: result.lastInsertRowid,
+      message: 'PDF boundary decision recorded as best-effort evidence; claims still blocked',
+      evidence,
+      decision,
+    });
+  } catch (err) {
+    res.status(err.httpStatus || 400).json({ error: err.message });
+  }
+});
+
 function runSprinklerPipeline(req, prebuilt = null) {
   const projectName = req.params.name;
   let floorPlan = (prebuilt && prebuilt.floorPlan) || null;
