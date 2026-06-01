@@ -102,4 +102,24 @@ describe('studio static origin handling', () => {
     expect(html).toContain('/pdf-boundary-decision');
     expect(html).toContain('savePdfBoundaryDecision');
   });
+
+  it('lets the studio target the Cooperative 1881 project instead of only Home Depot', async () => {
+    const shell = await fetch(`${BASE}/autosprink.html`, { headers: { Origin: BASE } });
+    expect(shell.status).toBe(200);
+    const html = await shell.text();
+    expect(html).toContain('id="projectTarget"');
+    expect(html).toContain('The Cooperative 1881 - Salt Lake City UT');
+    expect(html).toContain('currentProjectName');
+    expect(html).toContain("encodeURIComponent(currentProjectName())");
+  });
+
+  it('lets the workbench target the Cooperative 1881 project instead of only Home Depot', async () => {
+    const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
+    expect(shell.status).toBe(200);
+    const html = await shell.text();
+    expect(html).toContain('id="projectTarget"');
+    expect(html).toContain('The Cooperative 1881 - Salt Lake City UT');
+    expect(html).toContain('currentProjectName');
+    expect(html).toContain("encodeURIComponent(currentProjectName())");
+  });
 });

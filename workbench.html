@@ -60,6 +60,11 @@
 <main>
   <div class="card">
     <h2>Project</h2>
+    <label class="muted" style="font-size:11px">Project target</label>
+    <select id="projectTarget" style="width:100%;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:7px 9px;font-size:12px;margin-bottom:10px">
+      <option value="Home Depot - Rexburg ID">Home Depot - Rexburg ID</option>
+      <option value="The Cooperative 1881 - Salt Lake City UT">The Cooperative 1881 - Salt Lake City UT</option>
+    </select>
     <div id="project"><span class="muted">Loading…</span></div>
   </div>
   <div class="card">
@@ -130,6 +135,9 @@ function api(path, options = {}) {
 document.getElementById('logout').onclick = () => { localStorage.removeItem('halofire_token'); location.href = '/'; };
 
 const usd = (n) => '$' + Number(n).toLocaleString('en-US', { maximumFractionDigits: 0 });
+function currentProjectName() {
+  return document.getElementById('projectTarget') ? document.getElementById('projectTarget').value : HOME_DEPOT;
+}
 
 async function load() {
   try {
@@ -137,10 +145,11 @@ async function load() {
     document.getElementById('whoami').textContent = me.name + ' · ' + me.role;
   } catch (_) { return; }
 
+  const projectName = currentProjectName();
   const projects = await api('/projects');
-  const proj = projects.find((p) => p.name === HOME_DEPOT) || projects[0];
-  const bids = await api('/bids?search=' + encodeURIComponent('Home Depot'));
-  const bid = (bids.bids || []).find((b) => b.project === HOME_DEPOT);
+  const proj = projects.find((p) => p.name === projectName) || { name: projectName, phase: 'Internal Alpha' };
+  const bids = await api('/bids?search=' + encodeURIComponent(projectName));
+  const bid = (bids.bids || []).find((b) => b.project === projectName);
   document.getElementById('project').innerHTML = proj ? `
     <div class="big">${proj.name}</div>
     <div class="kv"><span>Bid amount (submitted)</span><b>${bid ? usd(bid.value) : '—'}</b></div>
@@ -149,7 +158,7 @@ async function load() {
     <div class="kv"><span>Due date</span><b>${bid ? (bid.due_date || '—') : '—'}</b></div>
   ` : '<span class="muted">No project found.</span>';
 
-  const gates = await api('/projects/' + encodeURIComponent(HOME_DEPOT) + '/claim-gates');
+  const gates = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/claim-gates');
   document.getElementById('gates').innerHTML = gates.length ? gates.map((g) => `
     <div class="gate ${g.severity === 'warning' ? 'warning' : ''}">
       <div class="code">${g.code} · ${g.status.toUpperCase()}</div>
@@ -178,7 +187,7 @@ function evidenceDetail(row) {
 }
 
 async function refreshEvidence() {
-  const evidence = await api('/projects/' + encodeURIComponent(HOME_DEPOT) + '/evidence');
+  const evidence = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/evidence');
   document.getElementById('evidence').innerHTML = evidence.length ? evidence.map((e) => `
     <div class="ev">
       <span>${escapeHtml(e.evidence_type)}${evidenceDetail(e)}</span>
@@ -290,7 +299,7 @@ async function runBid(extraBody, btn) {
   const orig = btn.textContent; btn.disabled = true; btn.textContent = 'Generating…';
   try {
     lastBody = { markupPct: 25, ...extraBody };
-    const { bid, scene: sceneData, cadModel } = await api('/projects/' + encodeURIComponent(HOME_DEPOT) + '/sprinkler-bid', {
+    const { bid, scene: sceneData, cadModel } = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/sprinkler-bid', {
       method: 'POST', body: JSON.stringify(lastBody),
     });
     const r = bid.rooms[0];
@@ -323,6 +332,12 @@ async function runBid(extraBody, btn) {
 }
 
 let lastBody = { markupPct: 25 };
+document.getElementById('projectTarget').onchange = () => {
+  lastBody = { markupPct: 25 };
+  document.getElementById('bidSummary').innerHTML = '';
+  document.getElementById('bomCard').style.display = 'none';
+  load();
+};
 document.getElementById('genBtn').onclick = (e) => runBid({}, e.target);
 document.getElementById('genSvgBtn').onclick = (e) => {
   const svg = document.getElementById('svgInput').value.trim();
@@ -330,7 +345,7 @@ document.getElementById('genSvgBtn').onclick = (e) => {
   runBid({ svg, unitsPerPx: Number(document.getElementById('unitsPerPx').value) || 1 }, e.target);
 };
 document.getElementById('dxfBtn').onclick = async () => {
-  const res = await fetch('/api/projects/' + encodeURIComponent(HOME_DEPOT) + '/cad.dxf', {
+  const res = await fetch('/api/projects/' + encodeURIComponent(currentProjectName()) + '/cad.dxf', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
     body: JSON.stringify(lastBody),

@@ -71,9 +71,14 @@
 
   <aside class="left">
     <h3>Floor Plan</h3>
+    <label>Project target</label>
+    <select id="projectTarget">
+      <option value="Home Depot - Rexburg ID">Home Depot - Rexburg ID</option>
+      <option value="The Cooperative 1881 - Salt Lake City UT">The Cooperative 1881 - Salt Lake City UT</option>
+    </select>
     <label>Source</label>
     <select id="planSource">
-      <option value="builtin">Home Depot - Rexburg (built-in)</option>
+      <option value="builtin">Selected project built-in plan</option>
       <option value="svg">Import SVG (single space)…</option>
       <option value="building">Building drawing (multi-space SVG)…</option>
       <option value="dxf">Import DXF (single space)…</option>
@@ -197,6 +202,9 @@ const token = localStorage.getItem('halofire_token');
 if (!token) location.href = '/';
 const usd = (n) => '$' + Number(n).toLocaleString('en-US', { maximumFractionDigits: 0 });
 const $ = (id) => document.getElementById(id);
+function currentProjectName() {
+  return $('projectTarget') ? $('projectTarget').value : HOME_DEPOT;
+}
 
 function api(path, options = {}) {
   return fetch('/api' + path, {
@@ -750,7 +758,7 @@ async function savePdfBoundaryDecision() {
   try {
     const pageIndex = Number($('pdfPageIndex').value) || 0;
     const extractMode = $('pdfExtract').value || candidate.mode;
-    const saved = await api('/projects/' + encodeURIComponent(HOME_DEPOT) + '/pdf-boundary-decision', {
+    const saved = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/pdf-boundary-decision', {
       method: 'POST',
       body: JSON.stringify({
         pdfPageIndex: pageIndex,
@@ -784,7 +792,7 @@ async function generate() {
       if (!pdfBase64) { $('status').textContent = 'pick a vector PDF first'; return; }
       if (!(Number($('pdfScale').value) > 0)) { $('status').textContent = 'enter the drawing scale (feet per PDF point) — never guessed'; return; }
     }
-    const { bid, cadModel, hydraulics, hydraulicNetwork, compliance, fullScopeBid, isBuilding } = await api('/projects/' + encodeURIComponent(HOME_DEPOT) + '/sprinkler-bid', {
+    const { bid, cadModel, hydraulics, hydraulicNetwork, compliance, fullScopeBid, isBuilding } = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/sprinkler-bid', {
       method: 'POST', body: JSON.stringify(lastBody),
     });
     // R6: preload the part meshes for the distinct component keys in this model
@@ -981,7 +989,7 @@ $('genBtn').onclick = generate;
 $('submitBtn').onclick = async () => {
   const btn = $('submitBtn'); btn.disabled = true; const label = btn.textContent; btn.textContent = 'Building…';
   try {
-    const res = await fetch('/api/projects/' + encodeURIComponent(HOME_DEPOT) + '/submittal', {
+    const res = await fetch('/api/projects/' + encodeURIComponent(currentProjectName()) + '/submittal', {
       method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
       body: JSON.stringify(lastBody),
     });
@@ -992,7 +1000,7 @@ $('submitBtn').onclick = async () => {
   } finally { btn.disabled = false; btn.textContent = label; }
 };
 $('dxfBtn').onclick = async () => {
-  const res = await fetch('/api/projects/' + encodeURIComponent(HOME_DEPOT) + '/cad.dxf', {
+  const res = await fetch('/api/projects/' + encodeURIComponent(currentProjectName()) + '/cad.dxf', {
     method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
     body: JSON.stringify(lastBody),
   });
