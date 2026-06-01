@@ -873,6 +873,70 @@ async function resolvePdfFloorPlan(req) {
   }
 }
 
+async function inspectPdfPages(req) {
+  if (!req.body || typeof req.body.pdf !== 'string' || !req.body.pdf.trim()) {
+    const e = new Error('PDF payload is required');
+    e.httpStatus = 400;
+    throw e;
+  }
+  let data;
+  try {
+    data = Buffer.from(req.body.pdf, 'base64');
+    if (!data.length) throw new Error('empty PDF payload');
+  } catch (err) {
+    const e = new Error(`Invalid base64 PDF payload: ${err.message}`);
+    e.httpStatus = 400;
+    throw e;
+  }
+  try {
+    const pdfjs = await loadPdfjs();
+    const doc = await pdfjs.getDocument({
+      data: new Uint8Array(data),
+      useWorkerFetch: false,
+      isEvalSupported: false,
+      disableFontFace: true,
+    }).promise;
+    const pages = [];
+    for (let i = 1; i <= doc.numPages; i += 1) {
+      const page = await doc.getPage(i);
+      const viewport = page.getViewport({ scale: 1 });
+      pages.push({
+        index: i - 1,
+        widthPt: Math.round(viewport.width * 1000) / 1000,
+        heightPt: Math.round(viewport.height * 1000) / 1000,
+        rotation: Number(page.rotate) || 0,
+      });
+    }
+    return {
+      pageCount: doc.numPages,
+      pages,
+      note: 'Best-effort PDF page selection metadata only; it does not prove geometry_accuracy, scale, AHJ approval, PE review, AutoSprink parity, permit readiness, fabrication readiness, or manufacturer approval.',
+      blockedClaims: [
+        'geometry_accuracy',
+        'drawing_scale',
+        'AHJ_approval',
+        'PE_review',
+        'AutoSprink_parity',
+        'permit_ready',
+        'fabrication_ready',
+        'manufacturer_exact',
+      ],
+    };
+  } catch (err) {
+    const e = new Error(err && err.message ? err.message : String(err));
+    e.httpStatus = 400;
+    throw e;
+  }
+}
+
+app.post('/api/pdf/inspect', authMiddleware, async (req, res) => {
+  try {
+    res.json(await inspectPdfPages(req));
+  } catch (err) {
+    res.status(err.httpStatus || 400).json({ error: err.message });
+  }
+});
+
 function runSprinklerPipeline(req, prebuilt = null) {
   const projectName = req.params.name;
   let floorPlan = (prebuilt && prebuilt.floorPlan) || null;

@@ -1,7 +1,7 @@
 # HaloFire Current Review - 2026-06-01
 
 Repo: `C:/Users/dalla/OneDrive/Documents/HaloFire`
-HEAD reviewed: `304d57a` - `evidence: add project gate wizard`
+HEAD reviewed: current through T39 PDF page inspection workflow
 
 This is the current Codex pickup review after Claude ran out of credits. The
 project is a usable internal-alpha bid/CAD/evidence workbench, not a completed
@@ -13,6 +13,20 @@ until real evidence is supplied by Halo Fire staff or licensed/proper authoritie
 ## Verified Now
 
 Focused verification run on 2026-06-01:
+
+```powershell
+npx vitest run tests/pdf-inspect-api.test.js tests/studio-static-origin.test.js
+```
+
+Result: 2 files, 7 tests passed. This verifies T39 PDF page inspection:
+`POST /api/pdf/inspect` is authenticated, returns page count/sizes, rejects
+invalid PDFs with 400, and the Studio exposes page-inspection controls.
+
+```powershell
+npx vitest run tests/pdf-to-bid-api.test.js tests/pdf-floorplan.test.js tests/pdf-sam-server.test.js
+```
+
+Result: 3 files, 72 tests passed.
 
 ```powershell
 npx vitest run tests/pdf-to-bid-api.test.js tests/studio-static-origin.test.js
@@ -80,6 +94,10 @@ registered OpenGeometry entities.
   wall-layer selection, or SAM when the bridge is reachable. The API surfaces the
   selected/fallback extraction method in `pdfMeta`; this is correction evidence,
   not an accuracy or approval claim.
+- The Studio now supports employee page inspection before extraction: selected
+  local PDFs can be inspected through an authenticated endpoint for page count
+  and page dimensions, then the employee can click a page entry to update
+  `pdfPageIndex` and preview the selected page locally.
 - SAM 3.1/OpenClaw plan segmentation is wired fail-soft through
   `OPENCLAW_BRIDGE_URL`: when the bridge is unset or unavailable, the request
   falls back to vector PDF extraction, returns a real bid, and reports
@@ -125,8 +143,8 @@ and leave a truthful next blocker.
 1. When GX10 OpenClaw/SAM is reachable, run one real `pdfExtract:"sam"` call
    against the 1881 PDF and capture `pdfMeta` plus bid deltas without clearing
    any regulated gate.
-2. Finish the 1881 drawing workflow beyond T38 by adding floor-plan sheet
-   preview/selection and layer/room-boundary candidate review.
+2. Finish the 1881 drawing workflow beyond T39 by adding layer/room-boundary
+   candidate review on the selected page.
 3. Expand the employee-facing evidence wizard into a signed reviewer workflow
    for AHJ/PE/AutoSprink/manufacturer artifacts.
 4. Keep source workbook values as truth for actual bid numbers; use generated

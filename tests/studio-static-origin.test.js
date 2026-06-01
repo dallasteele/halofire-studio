@@ -71,4 +71,15 @@ describe('studio static origin handling', () => {
     expect(html).toContain('value="wallLayer"');
     expect(html).toContain('body.pdfExtract');
   });
+
+  it('surfaces PDF page-inspection controls for employee sheet selection', async () => {
+    const shell = await fetch(`${BASE}/autosprink.html`, { headers: { Origin: BASE } });
+    expect(shell.status).toBe(200);
+    const html = await shell.text();
+    expect(html).toContain('id="pdfInspectBtn"');
+    expect(html).toContain('id="pdfPageList"');
+    expect(html).toContain('id="pdfPreview"');
+    expect(html).toContain("api('/pdf/inspect'");
+    expect(html).toContain('setPdfPageFromInspection');
+  });
 });

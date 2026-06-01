@@ -588,6 +588,23 @@ bridge (best-effort, graceful skip). Parity claim stays BLOCKED until complete.
       geometry-accuracy claims. Real SAM remains blocked until the GX10 bridge exposes
       the required OpenClaw route and `OPENCLAW_BRIDGE_URL` is set.
 
+- [x] **T39 — Employee PDF page inspection + selected-page preview.** DONE 2026-06-01.
+      Added authenticated `POST /api/pdf/inspect` using the existing pdfjs loader to
+      return `{pageCount,pages:[{index,widthPt,heightPt,rotation}],note,blockedClaims}`
+      for a base64 PDF. The route requires auth, rejects invalid PDFs with 400, and
+      labels the metadata as page-selection evidence only: no geometry accuracy,
+      drawing-scale, AHJ, PE, AutoSprink parity, permit, fabrication, or
+      manufacturer-exact claim is cleared. `autosprink.html` now adds an Inspect
+      pages button, page list, and local PDF preview iframe; clicking a page sets
+      `pdfPageIndex` before extraction. TDD: `tests/pdf-inspect-api.test.js` covers
+      auth, page count/dimensions, blocked claims, and invalid PDF rejection;
+      `tests/studio-static-origin.test.js` covers the Studio controls and endpoint
+      wiring. Verification: `npx vitest run tests/pdf-inspect-api.test.js
+      tests/studio-static-origin.test.js` -> 7 passing; adjacent PDF checks
+      `npx vitest run tests/pdf-to-bid-api.test.js tests/pdf-floorplan.test.js
+      tests/pdf-sam-server.test.js` -> 72 passing. Remaining 1881 workflow gap:
+      layer/room-boundary candidate review on the selected page.
+
 ## AUTOSPRINK PARITY epic (the goal): close functional gaps to AutoSprink feature parity
 HONESTY CONTRACT: "parity" is tracked, not asserted. The `AUTOSPRINK_PARITY_INCOMPLETE`
 gate (registry.js) stays BLOCKED until every parity-matrix row is genuinely PRESENT

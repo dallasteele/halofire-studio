@@ -102,6 +102,9 @@
       </select>
       <label>Vector PDF plan</label>
       <input id="pdfFile" type="file" accept="application/pdf,.pdf">
+      <button class="act ghost" id="pdfInspectBtn" type="button">Inspect pages</button>
+      <div id="pdfPageList" style="font-size:10px;margin-top:6px;color:var(--muted)"></div>
+      <iframe id="pdfPreview" title="Selected PDF page preview" style="width:100%;height:170px;margin-top:6px;border:1px solid var(--line);border-radius:7px;background:var(--panel2)"></iframe>
       <p style="font-size:11px;opacity:.75;margin:6px 0 0">
         Extracts the plan's real vector geometry. The footprint shown is a
         best-effort <b>bbox of the extracted geometry</b> — not a full room
@@ -646,6 +649,7 @@ function currentBody() {
 
 // Holds the base64 of the selected vector PDF (read on file pick).
 let pdfBase64 = '';
+let pdfObjectUrl = '';
 function readPdfFile(file) {
   return new Promise((resolve, reject) => {
     const fr = new FileReader();
@@ -657,6 +661,36 @@ function readPdfFile(file) {
     fr.onerror = () => reject(fr.error);
     fr.readAsDataURL(file);
   });
+}
+
+function setPdfPageFromInspection(index) {
+  const pageIndex = Math.max(0, Number(index) || 0);
+  if ($('pdfPageIndex')) $('pdfPageIndex').value = String(pageIndex);
+  if (pdfObjectUrl && $('pdfPreview')) {
+    $('pdfPreview').src = `${pdfObjectUrl}#page=${pageIndex + 1}`;
+  }
+  document.querySelectorAll('[data-pdf-page-index]').forEach((btn) => {
+    btn.classList.toggle('on', Number(btn.dataset.pdfPageIndex) === pageIndex);
+  });
+}
+
+function renderPdfPageInspection(meta) {
+  if (!$('pdfPageList')) return;
+  const pages = Array.isArray(meta.pages) ? meta.pages : [];
+  if (!pages.length) {
+    $('pdfPageList').textContent = 'No pages found in this PDF.';
+    return;
+  }
+  $('pdfPageIndex').max = String(pages.length - 1);
+  $('pdfPageList').innerHTML = pages.map((p) => (
+    `<button type="button" class="ghost" data-pdf-page-index="${p.index}" style="width:auto;margin:2px 4px 2px 0;padding:4px 6px">` +
+    `p${p.index} · ${Math.round(p.widthPt)}×${Math.round(p.heightPt)} pt</button>`
+  )).join('');
+  document.querySelectorAll('[data-pdf-page-index]').forEach((btn) => {
+    btn.onclick = () => setPdfPageFromInspection(btn.dataset.pdfPageIndex);
+  });
+  const current = Math.min(Math.max(0, Number($('pdfPageIndex').value) || 0), pages.length - 1);
+  setPdfPageFromInspection(current);
 }
 
 async function generate() {
@@ -798,6 +832,44 @@ if ($('pdfFile')) $('pdfFile').onchange = async (e) => {
   $('status').textContent = 'reading PDF…';
   try { pdfBase64 = await readPdfFile(f); $('status').textContent = 'PDF loaded (' + Math.round(f.size / 1024) + ' KB) — set the scale, then Generate'; }
   catch (err) { pdfBase64 = ''; $('status').textContent = 'PDF read error: ' + err.message; }
+};
+if ($('pdfFile')) $('pdfFile').onchange = async (e) => {
+  const f = e.target.files && e.target.files[0];
+  if (!f) {
+    pdfBase64 = '';
+    if ($('pdfPageList')) $('pdfPageList').textContent = '';
+    if ($('pdfPreview')) $('pdfPreview').removeAttribute('src');
+    return;
+  }
+  $('status').textContent = 'reading PDF...';
+  try {
+    pdfBase64 = await readPdfFile(f);
+    if (pdfObjectUrl) URL.revokeObjectURL(pdfObjectUrl);
+    pdfObjectUrl = URL.createObjectURL(f);
+    setPdfPageFromInspection(Number($('pdfPageIndex').value) || 0);
+    if ($('pdfPageList')) $('pdfPageList').textContent = 'Click Inspect pages to list sheets before extraction.';
+    $('status').textContent = 'PDF loaded (' + Math.round(f.size / 1024) + ' KB) - inspect pages, set the scale, then Generate';
+  } catch (err) {
+    pdfBase64 = '';
+    $('status').textContent = 'PDF read error: ' + err.message;
+  }
+};
+if ($('pdfInspectBtn')) $('pdfInspectBtn').onclick = async () => {
+  if (!pdfBase64) { $('status').textContent = 'pick a vector PDF first'; return; }
+  const btn = $('pdfInspectBtn');
+  const label = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Inspecting...';
+  try {
+    const meta = await api('/pdf/inspect', { method: 'POST', body: JSON.stringify({ pdf: pdfBase64 }) });
+    renderPdfPageInspection(meta);
+    $('status').textContent = `PDF inspected: ${meta.pageCount} page(s) - choose the floor-plan sheet, then enter scale`;
+  } catch (err) {
+    $('status').textContent = 'PDF inspect error: ' + err.message;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = label;
+  }
 };
 $('exaggerate').onchange = (e) => { pipeVizScale = e.target.checked ? 6 : 1; if (currentCadModel) renderModel(currentCadModel); };
 $('genBtn').onclick = generate;
