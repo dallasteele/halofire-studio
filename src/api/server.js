@@ -1093,12 +1093,16 @@ function decisionFromEvidence(row) {
   }
 }
 
-app.get('/api/projects/:name/pdf-boundary-decision', authMiddleware, (req, res) => {
-  const evidence = db
+function latestPdfBoundaryDecisionEvidence(projectName) {
+  return db
     .prepare(`SELECT * FROM project_evidence
               WHERE project_name = ? AND evidence_type = 'pdf_boundary_decision'
               ORDER BY created_at DESC, id DESC LIMIT 1`)
-    .get(req.params.name);
+    .get(projectName);
+}
+
+app.get('/api/projects/:name/pdf-boundary-decision', authMiddleware, (req, res) => {
+  const evidence = latestPdfBoundaryDecisionEvidence(req.params.name);
   res.json({ evidence: evidence || null, decision: decisionFromEvidence(evidence) });
 });
 
@@ -1134,6 +1138,61 @@ app.post('/api/projects/:name/pdf-boundary-decision', authMiddleware, requireRol
   } catch (err) {
     res.status(err.httpStatus || 400).json({ error: err.message });
   }
+});
+
+function pdfBoundaryResolverQueueItem(projectName, evidence, decision) {
+  if (!evidence || !decision) return null;
+  const candidate = decision.candidate || {};
+  return {
+    id: `resolver:pdf-boundary:${evidence.id}`,
+    project_name: projectName,
+    kind: 'room_boundary_visual_audit',
+    title: 'Room-boundary visual audit from saved PDF boundary decision',
+    status: 'ready',
+    evidence_id: evidence.id,
+    source_evidence_type: 'pdf_boundary_decision',
+    source_ref: evidence.source_ref || decision.sourceRef || null,
+    next_action: 'Open the selected PDF sheet with these defaults, run a room-boundary visual audit packet, and attach employee review evidence before any geometry-accuracy claim.',
+    acceptable_evidence: [
+      'employee room-boundary review packet',
+      'source-linked marked-up plan screenshot',
+      'room polygon correction list',
+      'licensed professional review/signoff for regulated claims',
+    ],
+    ai_fallback: 'If manual room boundaries are not yet supplied, run best-effort SAM+LLM/OpenClaw room-boundary review using the saved sheet, scale, and extraction mode; label results as correction evidence only.',
+    input_defaults: {
+      pdfPageIndex: decision.pageIndex,
+      pdfScale: decision.scale,
+      pdfExtract: decision.extractMode,
+      candidate,
+    },
+    blocked_claims: Array.isArray(decision.blockedClaims) ? decision.blockedClaims : [...PDF_BOUNDARY_BLOCKED_CLAIMS],
+    limitations: [
+      decision.limitation || 'Saved boundary choice is best-effort evidence only.',
+      'This queue item does not prove geometry accuracy, AHJ approval, PE review, AutoSprink parity, permit readiness, fabrication readiness, or manufacturer-exact models.',
+    ],
+    actions: [
+      { label: 'Load defaults in Studio', href: `/autosprink.html?project=${encodeURIComponent(projectName)}&resolver=${encodeURIComponent(`pdf-boundary:${evidence.id}`)}` },
+      { label: 'View source evidence', href: `/workbench.html?project=${encodeURIComponent(projectName)}#evidence-${evidence.id}` },
+    ],
+  };
+}
+
+app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
+  const projectName = req.params.name;
+  const evidence = latestPdfBoundaryDecisionEvidence(projectName);
+  const decision = decisionFromEvidence(evidence);
+  const items = [];
+  const boundaryItem = pdfBoundaryResolverQueueItem(projectName, evidence, decision);
+  if (boundaryItem) items.push(boundaryItem);
+  res.json({
+    project_name: projectName,
+    items,
+    summary: {
+      ready: items.filter((item) => item.status === 'ready').length,
+      blocked: items.filter((item) => item.status === 'blocked').length,
+    },
+  });
 });
 
 function runSprinklerPipeline(req, prebuilt = null) {

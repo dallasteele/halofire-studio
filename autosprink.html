@@ -113,6 +113,7 @@
       <button class="act ghost" id="pdfCandidateBtn" type="button">Review boundary candidates</button>
       <div id="pdfBoundaryCandidates" style="font-size:10px;margin-top:6px;color:var(--muted)"></div>
       <button class="act ghost" id="pdfDecisionBtn" type="button">Save selected boundary decision</button>
+      <button class="act ghost" id="pdfDecisionLoadBtn" type="button">Load saved boundary decision</button>
       <div id="pdfDecisionStatus" style="font-size:10px;margin-top:6px;color:var(--muted)"></div>
       <p style="font-size:11px;opacity:.75;margin:6px 0 0">
         Extracts the plan's real vector geometry. The footprint shown is a
@@ -779,6 +780,40 @@ async function savePdfBoundaryDecision() {
   }
 }
 
+async function loadPdfBoundaryDecision() {
+  const btn = $('pdfDecisionLoadBtn');
+  const label = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Loading...';
+  try {
+    const latest = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/pdf-boundary-decision');
+    if (!latest.decision) {
+      $('pdfDecisionStatus').textContent = 'No saved boundary decision for this project yet.';
+      return;
+    }
+    const decision = latest.decision;
+    $('planSource').value = 'pdf';
+    $('planSource').dispatchEvent(new Event('change'));
+    $('pdfPageIndex').value = String(decision.pageIndex ?? 0);
+    $('pdfScale').value = String(decision.scale ?? '');
+    $('pdfExtract').value = decision.extractMode || (decision.candidate && decision.candidate.mode) || 'vector';
+    selectedPdfBoundaryCandidate = decision.candidate || null;
+    lastPdfBoundaryMeta = {
+      pageIndex: decision.pageIndex,
+      scale: decision.scale,
+      candidates: decision.candidate ? [decision.candidate] : [],
+    };
+    if (lastPdfBoundaryMeta.candidates.length) renderPdfBoundaryCandidates(lastPdfBoundaryMeta);
+    $('pdfDecisionStatus').textContent = `Loaded saved evidence #${latest.evidence.id}: page ${decision.pageIndex}, scale ${decision.scale}, ${decision.extractMode}. Pick the original PDF file before Generate.`;
+    $('status').textContent = 'loaded saved PDF boundary defaults';
+  } catch (err) {
+    $('status').textContent = 'Boundary decision load error: ' + err.message;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = label;
+  }
+}
+
 async function generate() {
   if (!ogReady) { $('status').textContent = 'kernel still loading…'; return; }
   const btn = $('genBtn'); btn.disabled = true; btn.textContent = 'Generating…';
@@ -984,6 +1019,7 @@ if ($('pdfCandidateBtn')) $('pdfCandidateBtn').onclick = async () => {
   }
 };
 if ($('pdfDecisionBtn')) $('pdfDecisionBtn').onclick = savePdfBoundaryDecision;
+if ($('pdfDecisionLoadBtn')) $('pdfDecisionLoadBtn').onclick = loadPdfBoundaryDecision;
 $('exaggerate').onchange = (e) => { pipeVizScale = e.target.checked ? 6 : 1; if (currentCadModel) renderModel(currentCadModel); };
 $('genBtn').onclick = generate;
 $('submitBtn').onclick = async () => {

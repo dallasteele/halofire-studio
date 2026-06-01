@@ -245,6 +245,22 @@ describe('PDF page inspection API', () => {
     expect(row).toBeTruthy();
     expect(row.status).toBe('best_effort');
     expect(row.notes).toContain('claims still blocked');
+
+    const queue = await (await request(`${COOPERATIVE_1881_PATH}/resolver-queue`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })).json();
+    const item = queue.items.find((q) => q.kind === 'room_boundary_visual_audit');
+    expect(item).toBeTruthy();
+    expect(item.status).toBe('ready');
+    expect(item.evidence_id).toBe(body.evidence.id);
+    expect(item.input_defaults.pdfPageIndex).toBe(7);
+    expect(item.input_defaults.pdfScale).toBe(0.0833);
+    expect(item.input_defaults.pdfExtract).toBe('outline');
+    expect(item.input_defaults.candidate.bbox.widthFt).toBe(120);
+    expect(item.blocked_claims).toEqual(expect.arrayContaining(['geometry_accuracy', 'AutoSprink_parity']));
+    expect(item.next_action).toMatch(/room-boundary/i);
+    expect(item.acceptable_evidence).toEqual(expect.arrayContaining(['employee room-boundary review packet']));
+    expect(item.ai_fallback).toMatch(/SAM/i);
   }, 30000);
 
   it('rejects a persisted boundary decision without a positive operator scale', async () => {

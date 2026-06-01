@@ -76,6 +76,10 @@
     <div id="evidence"><span class="muted">Loading…</span></div>
   </div>
   <div class="card">
+    <h2>Resolver Queue</h2>
+    <div id="resolverQueue"><span class="muted">Loading…</span></div>
+  </div>
+  <div class="card">
     <h2>Auto Layout &amp; Auto Bid</h2>
     <p class="muted">Generate a deterministic best-effort sprinkler layout from the floor plan, priced from imported vendor pricebooks.</p>
     <p style="margin:14px 0"><button class="go" id="genBtn">Generate from built-in plan</button></p>
@@ -167,6 +171,7 @@ async function load() {
     </div>`).join('') : '<span class="muted">No gates.</span>';
 
   await refreshEvidence();
+  await refreshResolverQueue();
 }
 
 function escapeHtml(value) {
@@ -200,6 +205,28 @@ async function refreshEvidence() {
 // are all built from OpenGeometry primitives (Cuboid/Cylinder), not raw Three
 // geometry. cad-model coords are [planX, planY, elevZ]; the scene is Y-up so we
 // map cad (x,y,z) -> world (x, z, y).
+function resolverQueueDetail(item) {
+  const defaults = item.input_defaults || {};
+  const claims = Array.isArray(item.blocked_claims) ? item.blocked_claims : [];
+  const acceptable = Array.isArray(item.acceptable_evidence) ? item.acceptable_evidence : [];
+  return `
+    <div class="gate warning" id="${escapeHtml(item.id)}">
+      <div class="code">${escapeHtml(item.kind)} · ${escapeHtml(item.status).toUpperCase()}</div>
+      <div class="na">${escapeHtml(item.next_action)}</div>
+      <div class="claims">Defaults: page ${escapeHtml(defaults.pdfPageIndex)} · scale ${escapeHtml(defaults.pdfScale)} ft/pt · ${escapeHtml(defaults.pdfExtract)}</div>
+      <div class="claims">Accepts: ${acceptable.map((e) => `<span class="chip">${escapeHtml(e)}</span>`).join('')}</div>
+      <div class="claims">AI fallback: ${escapeHtml(item.ai_fallback || '')}</div>
+      <div class="claims">Blocks: ${claims.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('')}</div>
+    </div>`;
+}
+
+async function refreshResolverQueue() {
+  const queue = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/resolver-queue');
+  document.getElementById('resolverQueue').innerHTML = queue.items && queue.items.length
+    ? queue.items.map(resolverQueueDetail).join('')
+    : '<span class="muted">No resolver queue rows yet. Save a PDF boundary decision from Studio to create a room_boundary_visual_audit item.</span>';
+}
+
 let renderer, scene3, camera, controls, ogReady = false, cadGroup;
 const COLORS = { wall: 0x6b7280, floor: 0x1b1b22, main: 0xE53935, branch: 0x3b82f6, drop: 0x22d3ee, riser: 0xFFD54F, head: 0xff3b30 };
 const PIPE_VIZ_SCALE = 6; // exaggerate pipe radius for visibility at building scale
@@ -326,6 +353,7 @@ async function runBid(extraBody, btn) {
     document.getElementById('dxfBtn').style.display = '';
     renderCad(cadModel);
     await refreshEvidence(); // shows the best_effort evidence row the engine recorded
+    await refreshResolverQueue();
   } catch (e) {
     document.getElementById('bidSummary').innerHTML = '<span class="est">Error: ' + e.message + '</span>';
   } finally { btn.disabled = false; btn.textContent = orig; }

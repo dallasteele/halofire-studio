@@ -122,4 +122,23 @@ describe('studio static origin handling', () => {
     expect(html).toContain('currentProjectName');
     expect(html).toContain("encodeURIComponent(currentProjectName())");
   });
+
+  it('surfaces resolver queue rows in the workbench', async () => {
+    const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
+    expect(shell.status).toBe(200);
+    const html = await shell.text();
+    expect(html).toContain('id="resolverQueue"');
+    expect(html).toContain('/resolver-queue');
+    expect(html).toContain('refreshResolverQueue');
+    expect(html).toContain('room_boundary_visual_audit');
+  });
+
+  it('lets the studio load the latest saved PDF boundary decision as import defaults', async () => {
+    const shell = await fetch(`${BASE}/autosprink.html`, { headers: { Origin: BASE } });
+    expect(shell.status).toBe(200);
+    const html = await shell.text();
+    expect(html).toContain('id="pdfDecisionLoadBtn"');
+    expect(html).toContain('loadPdfBoundaryDecision');
+    expect(html).toContain('/pdf-boundary-decision');
+  });
 });
