@@ -261,6 +261,50 @@ describe('PDF page inspection API', () => {
     expect(item.next_action).toMatch(/room-boundary/i);
     expect(item.acceptable_evidence).toEqual(expect.arrayContaining(['employee room-boundary review packet']));
     expect(item.ai_fallback).toMatch(/SAM/i);
+
+    const packetRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${body.evidence.id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(packetRes.status).toBe(200);
+    const packet = await packetRes.json();
+    expect(packet.artifact_type).toBe('room_boundary_review_packet');
+    expect(packet.project_name).toBe(COOPERATIVE_1881_PROJECT_NAME);
+    expect(packet.source_evidence_id).toBe(body.evidence.id);
+    expect(packet.source_ref).toBe('1881 plan PDF sheet 7 / outline candidate');
+    expect(packet.download_name).toContain('room-boundary-review-packet');
+    expect(packet.input_defaults).toMatchObject({
+      pdfPageIndex: 7,
+      pdfScale: 0.0833,
+      pdfExtract: 'outline',
+    });
+    expect(packet.candidate_summary).toMatchObject({
+      mode: 'outline',
+      label: 'Wall-network outline',
+      segmentCount: 12,
+      method: 'wall-network-outline',
+    });
+    expect(packet.source_refs).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        evidence_id: body.evidence.id,
+        evidence_type: 'pdf_boundary_decision',
+        source_ref: '1881 plan PDF sheet 7 / outline candidate',
+      }),
+    ]));
+    expect(packet.review_steps.join(' ')).toMatch(/marked-up plan screenshot/i);
+    expect(packet.employee_decision_fields).toEqual(expect.arrayContaining([
+      'review_decision',
+      'corrected_room_polygons',
+      'issue_list',
+      'marked_up_plan_ref',
+    ]));
+    expect(packet.issue_list_template[0]).toEqual(expect.objectContaining({
+      issue_type: 'room_boundary_mismatch',
+      required_action: expect.stringMatching(/correct/i),
+    }));
+    expect(packet.acceptable_evidence).toEqual(expect.arrayContaining(['employee room-boundary review packet']));
+    expect(packet.blocked_claims).toEqual(expect.arrayContaining(['geometry_accuracy', 'AutoSprink_parity', 'permit_ready']));
+    expect(packet.claim_gate_effect).toBe('no_claims_cleared');
+    expect(packet.limitations.join(' ')).toMatch(/does not prove/i);
   }, 30000);
 
   it('rejects a persisted boundary decision without a positive operator scale', async () => {

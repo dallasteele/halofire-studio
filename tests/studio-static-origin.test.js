@@ -133,6 +133,15 @@ describe('studio static origin handling', () => {
     expect(html).toContain('room_boundary_visual_audit');
   });
 
+  it('lets the workbench download room-boundary review packets from resolver rows', async () => {
+    const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
+    expect(shell.status).toBe(200);
+    const html = await shell.text();
+    expect(html).toContain('downloadResolverPacket');
+    expect(html).toContain('/resolver-packets/pdf-boundary/');
+    expect(html).toContain('Download review packet');
+  });
+
   it('lets the studio load the latest saved PDF boundary decision as import defaults', async () => {
     const shell = await fetch(`${BASE}/autosprink.html`, { headers: { Origin: BASE } });
     expect(shell.status).toBe(200);

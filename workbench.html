@@ -217,7 +217,18 @@ function resolverQueueDetail(item) {
       <div class="claims">Accepts: ${acceptable.map((e) => `<span class="chip">${escapeHtml(e)}</span>`).join('')}</div>
       <div class="claims">AI fallback: ${escapeHtml(item.ai_fallback || '')}</div>
       <div class="claims">Blocks: ${claims.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('')}</div>
+      <p style="margin-top:8px"><button class="go" type="button" style="padding:7px 10px;font-size:11px" data-resolver-packet-evidence-id="${escapeHtml(item.evidence_id)}">Download review packet</button></p>
     </div>`;
+}
+
+async function downloadResolverPacket(evidenceId) {
+  const packet = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/resolver-packets/pdf-boundary/' + encodeURIComponent(evidenceId));
+  const blob = new Blob([JSON.stringify(packet, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = packet.download_name || 'room-boundary-review-packet.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
 }
 
 async function refreshResolverQueue() {
@@ -225,6 +236,9 @@ async function refreshResolverQueue() {
   document.getElementById('resolverQueue').innerHTML = queue.items && queue.items.length
     ? queue.items.map(resolverQueueDetail).join('')
     : '<span class="muted">No resolver queue rows yet. Save a PDF boundary decision from Studio to create a room_boundary_visual_audit item.</span>';
+  document.querySelectorAll('[data-resolver-packet-evidence-id]').forEach((button) => {
+    button.onclick = () => downloadResolverPacket(button.dataset.resolverPacketEvidenceId);
+  });
 }
 
 let renderer, scene3, camera, controls, ogReady = false, cadGroup;

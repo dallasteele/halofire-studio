@@ -1178,6 +1178,94 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision) {
   };
 }
 
+function slugForDownloadName(value) {
+  return String(value || 'project')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 80) || 'project';
+}
+
+function pdfBoundaryReviewPacket(projectName, evidence, decision) {
+  const queueItem = pdfBoundaryResolverQueueItem(projectName, evidence, decision);
+  if (!queueItem) return null;
+  const candidate = decision.candidate || {};
+  return {
+    artifact_type: 'room_boundary_review_packet',
+    status: 'ready_for_employee_review',
+    project_name: projectName,
+    source_evidence_id: evidence.id,
+    source_evidence_type: 'pdf_boundary_decision',
+    source_ref: evidence.source_ref || decision.sourceRef || null,
+    source_file: evidence.source_file || decision.sourceFile || null,
+    download_name: `${slugForDownloadName(projectName)}-room-boundary-review-packet-${evidence.id}.json`,
+    generated_at: new Date().toISOString(),
+    input_defaults: queueItem.input_defaults,
+    candidate_summary: {
+      mode: candidate.mode || decision.extractMode,
+      label: candidate.label || candidate.mode || decision.extractMode,
+      status: candidate.status || 'candidate',
+      bbox: candidate.bbox || null,
+      segmentCount: candidate.segmentCount ?? null,
+      areaSqft: candidate.areaSqft ?? null,
+      method: candidate.method || null,
+      wallSegmentCount: candidate.wallSegmentCount ?? null,
+      networkSegmentCount: candidate.networkSegmentCount ?? null,
+    },
+    source_refs: [
+      {
+        evidence_id: evidence.id,
+        evidence_type: evidence.evidence_type,
+        source_file: evidence.source_file || decision.sourceFile || null,
+        source_ref: evidence.source_ref || decision.sourceRef || null,
+        status: evidence.status,
+      },
+    ],
+    review_steps: [
+      'Open the original PDF/source sheet referenced by source_ref.',
+      'Apply the saved page, operator scale, extraction mode, and candidate defaults.',
+      'Compare the extracted boundary against the visual plan and create a source-linked marked-up plan screenshot.',
+      'Record accepted, rejected, or corrected room polygons and list every mismatch as an issue.',
+      'Attach licensed professional, AHJ, manufacturer, or AutoSprink evidence separately before clearing any regulated claim.',
+    ],
+    employee_decision_fields: [
+      'review_decision',
+      'reviewer_name',
+      'reviewed_at',
+      'marked_up_plan_ref',
+      'corrected_room_polygons',
+      'issue_list',
+      'notes',
+    ],
+    issue_list_template: [
+      {
+        issue_type: 'room_boundary_mismatch',
+        severity: 'blocking',
+        source_ref: evidence.source_ref || decision.sourceRef || null,
+        observed: '',
+        expected: '',
+        required_action: 'Correct the room polygon or reject the extracted boundary before using it for layout.',
+      },
+      {
+        issue_type: 'scale_or_sheet_uncertainty',
+        severity: 'blocking',
+        source_ref: evidence.source_ref || decision.sourceRef || null,
+        observed: '',
+        expected: '',
+        required_action: 'Confirm the drawing sheet and operator scale against project documents.',
+      },
+    ],
+    acceptable_evidence: queueItem.acceptable_evidence,
+    ai_fallback: queueItem.ai_fallback,
+    blocked_claims: queueItem.blocked_claims,
+    claim_gate_effect: 'no_claims_cleared',
+    limitations: [
+      ...queueItem.limitations,
+      'This packet is a review aid; it does not prove geometry accuracy, drawing scale, AHJ approval, PE review, AutoSprink parity, permit readiness, fabrication readiness, or manufacturer-exact models.',
+    ],
+  };
+}
+
 app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
   const projectName = req.params.name;
   const evidence = latestPdfBoundaryDecisionEvidence(projectName);
@@ -1193,6 +1281,24 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
       blocked: items.filter((item) => item.status === 'blocked').length,
     },
   });
+});
+
+app.get('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId', authMiddleware, (req, res) => {
+  const projectName = req.params.name;
+  const evidenceId = Number(req.params.evidenceId);
+  if (!Number.isSafeInteger(evidenceId) || evidenceId <= 0) {
+    return res.status(400).json({ error: 'A positive evidence id is required' });
+  }
+  const evidence = db
+    .prepare(`SELECT * FROM project_evidence
+              WHERE id = ? AND project_name = ? AND evidence_type = 'pdf_boundary_decision'`)
+    .get(evidenceId, projectName);
+  const decision = decisionFromEvidence(evidence);
+  const packet = pdfBoundaryReviewPacket(projectName, evidence, decision);
+  if (!packet) {
+    return res.status(404).json({ error: 'PDF boundary decision evidence not found' });
+  }
+  res.json(packet);
 });
 
 function runSprinklerPipeline(req, prebuilt = null) {
