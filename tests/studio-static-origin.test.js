@@ -1,0 +1,64 @@
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { spawn } from 'node:child_process';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+
+const ROOT = path.resolve(import.meta.dirname, '..');
+const PORT = 3197;
+const BASE = `http://127.0.0.1:${PORT}`;
+let server; let tempDir;
+
+async function waitForHealth() {
+  const t0 = Date.now();
+  while (Date.now() - t0 < 8000) {
+    try {
+      const r = await fetch(`${BASE}/api/health`);
+      if (r.ok) return;
+    } catch {}
+    await new Promise((r) => setTimeout(r, 100));
+  }
+  throw new Error('server not healthy');
+}
+
+beforeAll(async () => {
+  tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'halofire-static-origin-'));
+  server = spawn(process.execPath, ['src/api/server.js'], {
+    cwd: ROOT,
+    env: {
+      ...process.env,
+      PORT: String(PORT),
+      NODE_ENV: 'test',
+      HALOFIRE_DB_PATH: path.join(tempDir, 'h.db'),
+      JWT_SECRET: 'test-jwt-secret-with-more-than-32-characters',
+      HALOFIRE_ADMIN_USER: 'admin',
+      HALOFIRE_ADMIN_PASSWORD: 'static-origin-pw',
+      HALOFIRE_ALLOW_DEV_DEFAULTS: '0',
+      HALOFIRE_CORS_ORIGINS: 'http://allowed.test',
+    },
+    stdio: ['ignore', 'pipe', 'pipe'],
+  });
+  await waitForHealth();
+});
+
+afterAll(async () => {
+  if (server && !server.killed) { server.kill(); await new Promise((r) => server.once('exit', r)); }
+  fs.rmSync(tempDir, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
+});
+
+describe('studio static origin handling', () => {
+  it('allows same-origin studio shell + module requests even when cross-origin allowlist is narrow', async () => {
+    const headers = { Origin: BASE };
+
+    const shell = await fetch(`${BASE}/autosprink.html`, { headers });
+    expect(shell.status).toBe(200);
+
+    const module = await fetch(`${BASE}/src/ui/export-proof.js`, { headers });
+    expect(module.status).toBe(200);
+  });
+
+  it('still blocks unrelated origins', async () => {
+    const shell = await fetch(`${BASE}/autosprink.html`, { headers: { Origin: 'http://evil.test' } });
+    expect(shell.status).toBe(403);
+  });
+});

@@ -174,6 +174,7 @@ import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
 import { OpenGeometry, Vector3, Cuboid, Cylinder, Opening, OGSceneManager } from 'opengeometry';
 import { planOrthoFrustum, planCenter } from '/src/engine/plan-view.js';
 import { demoTimeline } from '/src/engine/demo-timeline.js';
+import { summarizeExportArtifact, buildExportProofMessage } from '/src/ui/export-proof.js';
 
 const HOME_DEPOT = 'Home Depot - Rexburg ID';
 const token = localStorage.getItem('halofire_token');
@@ -510,6 +511,14 @@ function download(name, dataOrBytes, isText) {
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click(); URL.revokeObjectURL(a.href);
 }
 
+async function buildExportProof(format) {
+  const out = exportCad(format);
+  if (!out) return null;
+  const payload = out.text ? out.res.text : out.res.bytes;
+  const proof = await summarizeExportArtifact(out.ext, payload, { text: out.text, registered: out.registered });
+  return { out, payload, proof };
+}
+
 // Fit the ortho frustum to the plan bbox (cad planX = world x, planY = world z)
 // so the WHOLE floor-plan drawing frames edge-to-edge (V1, tested helper).
 function fitPlanOrtho(minX, maxX, minZ, maxZ, aspect) {
@@ -804,18 +813,19 @@ $('dxfBtn').onclick = async () => {
   a.href = URL.createObjectURL(blob); a.download = 'halofire-cad.dxf'; a.click(); URL.revokeObjectURL(a.href);
 };
 for (const [id, fmt] of [['stepBtn','step'],['ifcBtn','ifc'],['stlBtn','stl']]) {
-  $(id).onclick = () => {
+  $(id).onclick = async () => {
     try {
-      const out = exportCad(fmt);
-      if (!out) { $('exportMsg').textContent = 'Generate a layout first.'; return; }
-      const payload = out.text ? out.res.text : out.res.bytes;
-      const size = out.text ? (payload ? payload.length : 0) : (payload ? payload.byteLength : 0);
-      if (!size) { $('exportMsg').textContent = `${fmt.toUpperCase()} export returned empty (${out.registered} entities registered).`; return; }
-      download('halofire-cad.' + out.ext, payload, out.text);
-      $('exportMsg').textContent = `${fmt.toUpperCase()}: ${size.toLocaleString()} bytes from ${out.registered} OpenGeometry entities.`;
+      const built = await buildExportProof(fmt);
+      if (!built) { $('exportMsg').textContent = 'Generate a layout first.'; return; }
+      const { out, payload, proof } = built;
+      if (!proof.byteLength) { $('exportMsg').textContent = `${fmt.toUpperCase()} export returned empty (${out.registered} entities registered).`; return; }
+      download(proof.downloadName, payload, out.text);
+      window.__lastExportProof = proof;
+      $('exportMsg').textContent = buildExportProofMessage(proof);
     } catch (e) { $('exportMsg').textContent = fmt.toUpperCase() + ' export error: ' + e.message; }
   };
 }
+window.__exportCadProof = buildExportProof;
 $('demoBtn').onclick = playDemo;
 document.querySelectorAll('#viewSeg button').forEach((b) => {
   b.onclick = () => { if (demoRAF) { cancelAnimationFrame(demoRAF); demoRAF = null; $('demoBtn').disabled = false; } document.querySelectorAll('#viewSeg button').forEach((x) => x.classList.remove('on')); b.classList.add('on'); setView(b.dataset.view); };

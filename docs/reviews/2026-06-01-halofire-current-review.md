@@ -15,6 +15,12 @@ until real evidence is supplied by Halo Fire staff or licensed/proper authoritie
 Focused verification run on 2026-06-01:
 
 ```powershell
+npx vitest run tests/export-proof.test.js tests/studio-static-origin.test.js
+```
+
+Result: 2 files, 5 tests passed.
+
+```powershell
 npx vitest run tests/evidence-api.test.js tests/resolve-gate.test.js tests/settings-documents.test.js tests/pdf-sam-server.test.js tests/pdf-to-bid-api.test.js tests/real-pdf-d4-measure.test.js tests/p7-studio-surface.test.js
 ```
 
@@ -31,6 +37,16 @@ C:/Python312/python.exe E:/ClaudeBot/scripts/verify_agentic_rules.py
 ```
 
 Result: `AGENTIC_RULES_VERIFY ok`.
+
+Browser-backed local runtime proof on 2026-06-01 against `http://localhost:3300/autosprink.html`
+after authenticated Studio load:
+
+- STEP: `8,971,768` bytes, `sha256 19c3f8ac9c381e5bea600f16debfc0cc37424af945b2799dcf002f88de96d772`
+- IFC: `2,560,896` bytes, `sha256 763aca4fd3d6a751570b56c9650146c23ba2fe53237ed37e9da8a81579ae2804`
+- STL: `2,694,684` bytes, `sha256 1daa2fce63a5ea7679f225aefed345fda4aea9a2dadfd048b6bee862e3cf89e3`
+
+All three exports came from the same generated Home Depot layout with `2,548`
+registered OpenGeometry entities.
 
 ## What Works
 
@@ -49,6 +65,9 @@ Result: `AGENTIC_RULES_VERIFY ok`.
   `OPENCLAW_BRIDGE_URL`: when the bridge is unset or unavailable, the request
   falls back to vector PDF extraction, returns a real bid, and reports
   `pdfMeta.samSkipped` with a reason. It does not fabricate SAM geometry.
+- Same-origin Studio shell/module requests now pass the top-level origin guard,
+  so `/autosprink.html` can load its `/vendor/*` and `/src/*` modules in a real
+  browser session even when the cross-origin allowlist is narrow.
 - Full-scope bid plumbing exists and is surfaced as an estimate with calibration
   metadata for real packages. It remains informational and does not clear parity
   or accuracy claims.
@@ -66,7 +85,7 @@ Result: `AGENTIC_RULES_VERIFY ok`.
 | Manufacturer-exact models | BLOCKED | Generated/OpenClaw/SAM/OpenSCAD parts are not manufacturer-approved catalog models. | Use generated parts for visual/layout review; attach real catalog models via Settings as employees obtain them. |
 | Permit/fabrication readiness | BLOCKED | Depends on the above regulated approvals and exact submittals. | Export best-effort CAD/BIM artifacts as review aids only. |
 | Real SAM run | BLOCKED BY RUNTIME | Server wiring exists, but a live reachable OpenClaw/SAM bridge was not proven in this Codex pickup. | Keep fail-soft vector PDF fallback; set `OPENCLAW_BRIDGE_URL` when GX10 bridge is reachable. |
-| STEP/IFC/STL runtime proof | PARTIAL | UI/kernel bindings exist, but this pickup did not produce fresh exported files and validate them. | Use DXF as verified export; run a headless/browser export proof next. |
+| STEP/IFC/STL runtime proof | VERIFIED LOCALLY | Browser-backed Studio proof on 2026-06-01 produced fresh STEP/IFC/STL artifacts with recorded byte counts and SHA-256 hashes from the Home Depot layout. | Re-run the same browser proof after any exporter/kernel change; keep public/live claims blocked until a public target actually serves the updated Studio. |
 | Real 1881 geometry accuracy | PARTIAL | Current PDF extraction overcaptures the architectural sheet footprint; tests intentionally log the mismatch rather than tune to the bid. | Use real bid package values for totals and mark auto geometry as correction-needed until a floor-plan page/scale/layer decision is approved. |
 
 ## Delivery State
@@ -84,14 +103,12 @@ and leave a truthful next blocker.
 
 ## Next Slices
 
-1. Add a headless or browser-backed runtime proof for STEP/IFC/STL export from
-   the Studio/OpenGeometry path, with output size/hash recorded.
-2. When GX10 OpenClaw/SAM is reachable, run one real `pdfExtract:"sam"` call
+1. When GX10 OpenClaw/SAM is reachable, run one real `pdfExtract:"sam"` call
    against the 1881 PDF and capture `pdfMeta` plus bid deltas without clearing
    any regulated gate.
-3. Improve the 1881 drawing workflow so employees choose floor-plan sheet,
+2. Improve the 1881 drawing workflow so employees choose floor-plan sheet,
    scale, extraction mode, and layer/room boundary candidates inside the UI.
-4. Add an employee-facing evidence wizard for attaching AHJ/PE/AutoSprink/
+3. Add an employee-facing evidence wizard for attaching AHJ/PE/AutoSprink/
    manufacturer artifacts and resolving gates only through acceptable evidence.
-5. Keep source workbook values as truth for actual bid numbers; use generated
+4. Keep source workbook values as truth for actual bid numbers; use generated
    estimates as best-effort comparison/correction aids.

@@ -296,7 +296,8 @@ initDatabase();
 const app = express();
 app.use((req, res, next) => {
   const origin = req.headers.origin;
-  if (origin && !CORS_ORIGINS.includes(origin)) {
+  const sameOrigin = origin === `${req.protocol}://${req.get('host')}`;
+  if (origin && !sameOrigin && !CORS_ORIGINS.includes(origin)) {
     return res.status(403).json({ error: 'CORS origin not allowed' });
   }
   next();
