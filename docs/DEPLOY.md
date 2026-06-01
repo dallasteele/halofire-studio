@@ -2,7 +2,7 @@
 
 This is the exact local run path for the internal-alpha bid/CAD/evidence
 workbench. It is best-effort and fail-closed; see
-`docs/reviews/2026-05-29-autosprink-clone-review.md` for the truthful status of
+`docs/reviews/2026-06-01-halofire-current-review.md` for the truthful status of
 what works and what is NOT claimed.
 
 Repo root: `C:/Users/dalla/OneDrive/Documents/HaloFire`.
