@@ -305,6 +305,58 @@ describe('PDF page inspection API', () => {
     expect(packet.blocked_claims).toEqual(expect.arrayContaining(['geometry_accuracy', 'AutoSprink_parity', 'permit_ready']));
     expect(packet.claim_gate_effect).toBe('no_claims_cleared');
     expect(packet.limitations.join(' ')).toMatch(/does not prove/i);
+
+    const reviewRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${body.evidence.id}/reviews`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        review_decision: 'corrected',
+        reviewer_name: 'Halo Fire estimator',
+        marked_up_plan_ref: '1881://marked-up/sheet-7-room-boundary.png',
+        corrected_room_polygons: [
+          {
+            room_id: 'level-1-corridor-a',
+            source_ref: '1881 plan PDF sheet 7 / outline candidate',
+            polygon: [[0, 0], [40, 0], [40, 12], [0, 12]],
+          },
+        ],
+        issue_list: [
+          {
+            issue_type: 'room_boundary_mismatch',
+            severity: 'blocking',
+            observed: 'outline included annotation border',
+            expected: 'corridor boundary only',
+            required_action: 'Use corrected polygon before layout replay',
+          },
+        ],
+        notes: 'Corrected room boundary packet for internal alpha replay.',
+      }),
+    });
+    expect(reviewRes.status).toBe(201);
+    const reviewBody = await reviewRes.json();
+    expect(reviewBody.evidence.evidence_type).toBe('room_boundary_review_packet');
+    expect(reviewBody.evidence.status).toBe('best_effort');
+    expect(reviewBody.review.review_decision).toBe('corrected');
+    expect(reviewBody.review.source_evidence_id).toBe(body.evidence.id);
+    expect(reviewBody.review.marked_up_plan_ref).toBe('1881://marked-up/sheet-7-room-boundary.png');
+    expect(reviewBody.review.issue_list[0].issue_type).toBe('room_boundary_mismatch');
+    expect(reviewBody.review.corrected_room_polygons[0].room_id).toBe('level-1-corridor-a');
+    expect(reviewBody.review.blocked_claims).toEqual(expect.arrayContaining(['geometry_accuracy', 'AutoSprink_parity', 'permit_ready']));
+    expect(reviewBody.review.claim_gate_effect).toBe('no_claims_cleared');
+
+    const evidenceAfterReview = await (await request(`${COOPERATIVE_1881_PATH}/evidence`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })).json();
+    const reviewRow = evidenceAfterReview.find((e) => e.id === reviewBody.evidence.id);
+    expect(reviewRow).toBeTruthy();
+    expect(reviewRow.source_ref).toContain(`pdf-boundary:${body.evidence.id}:room-boundary-review`);
+    expect(reviewRow.notes).toContain('room_boundary_review_packet_decision');
+    expect(reviewRow.notes).toContain('no_claims_cleared');
+
+    const gatesAfterReview = await (await request(`${COOPERATIVE_1881_PATH}/claim-gates`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })).json();
+    expect(gatesAfterReview.some((g) => g.status === 'cleared')).toBe(false);
   }, 30000);
 
   it('rejects a persisted boundary decision without a positive operator scale', async () => {
@@ -319,5 +371,31 @@ describe('PDF page inspection API', () => {
       }),
     });
     expect(res.status).toBe(400);
+  });
+
+  it('rejects packet review decisions without a marked-up source reference', async () => {
+    const candidate = {
+      mode: 'outline',
+      bbox: { minX: 0, minY: 0, maxX: 10, maxY: 10, widthFt: 10, heightFt: 10 },
+      segmentCount: 4,
+    };
+    const saved = await (await request(`${COOPERATIVE_1881_PATH}/pdf-boundary-decision`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        pdfPageIndex: 2,
+        pdfScale: 0.1,
+        pdfExtract: 'outline',
+        candidate,
+      }),
+    })).json();
+    const res = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${saved.evidence.id}/reviews`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ review_decision: 'accepted', reviewer_name: 'Estimator' }),
+    });
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.error).toMatch(/marked_up_plan_ref/);
   });
 });

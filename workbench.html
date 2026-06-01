@@ -179,6 +179,17 @@ function escapeHtml(value) {
 }
 
 function evidenceDetail(row) {
+  if (row.evidence_type === 'room_boundary_review_packet') {
+    try {
+      const packet = JSON.parse(row.notes || '{}');
+      const review = packet.review || {};
+      const issues = Array.isArray(review.issue_list) ? review.issue_list.length : 0;
+      const blocked = Array.isArray(review.blocked_claims) ? review.blocked_claims : [];
+      return `<div class="muted" style="font-size:11px;margin-top:3px">${escapeHtml(review.review_decision || 'review')} by ${escapeHtml(review.reviewer_name || 'unknown')} Â· issues ${escapeHtml(issues)} Â· marked_up_plan_ref ${escapeHtml(review.marked_up_plan_ref || 'missing')}<br>Blocks still active: ${blocked.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('')}</div>`;
+    } catch {
+      return '<div class="muted" style="font-size:11px;margin-top:3px">room-boundary review packet; detail unavailable</div>';
+    }
+  }
   if (row.evidence_type !== 'pdf_boundary_decision') return row.source_file ? ' · ' + escapeHtml(row.source_file) : '';
   try {
     const packet = JSON.parse(row.notes || '{}');
@@ -209,6 +220,7 @@ function resolverQueueDetail(item) {
   const defaults = item.input_defaults || {};
   const claims = Array.isArray(item.blocked_claims) ? item.blocked_claims : [];
   const acceptable = Array.isArray(item.acceptable_evidence) ? item.acceptable_evidence : [];
+  const evidenceId = escapeHtml(item.evidence_id);
   return `
     <div class="gate warning" id="${escapeHtml(item.id)}">
       <div class="code">${escapeHtml(item.kind)} · ${escapeHtml(item.status).toUpperCase()}</div>
@@ -218,6 +230,23 @@ function resolverQueueDetail(item) {
       <div class="claims">AI fallback: ${escapeHtml(item.ai_fallback || '')}</div>
       <div class="claims">Blocks: ${claims.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('')}</div>
       <p style="margin-top:8px"><button class="go" type="button" style="padding:7px 10px;font-size:11px" data-resolver-packet-evidence-id="${escapeHtml(item.evidence_id)}">Download review packet</button></p>
+      <details style="margin-top:8px">
+        <summary class="muted" style="cursor:pointer">Record review decision</summary>
+        <div style="display:grid;gap:6px;margin-top:8px">
+          <select id="reviewDecision-${evidenceId}" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
+            <option value="corrected">Corrected boundary</option>
+            <option value="accepted">Accepted for internal replay</option>
+            <option value="rejected">Rejected boundary</option>
+          </select>
+          <input id="reviewerName-${evidenceId}" placeholder="reviewer_name" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
+          <input id="markedUpPlanRef-${evidenceId}" placeholder="marked_up_plan_ref" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
+          <textarea id="issueList-${evidenceId}" placeholder='issue_list JSON array' style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px;height:54px"></textarea>
+          <textarea id="correctedRoomPolygons-${evidenceId}" placeholder='corrected_room_polygons JSON array' style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px;height:54px"></textarea>
+          <textarea id="reviewNotes-${evidenceId}" placeholder="notes" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px;height:44px"></textarea>
+          <button class="go" type="button" style="padding:7px 10px;font-size:11px" data-resolver-review-evidence-id="${evidenceId}">Save review decision</button>
+          <div class="muted" id="reviewStatus-${evidenceId}" style="font-size:11px"></div>
+        </div>
+      </details>
     </div>`;
 }
 
@@ -231,6 +260,37 @@ async function downloadResolverPacket(evidenceId) {
   URL.revokeObjectURL(a.href);
 }
 
+function jsonArrayFromField(id) {
+  const text = document.getElementById(id)?.value.trim();
+  if (!text) return [];
+  const parsed = JSON.parse(text);
+  if (!Array.isArray(parsed)) throw new Error(id + ' must be a JSON array');
+  return parsed;
+}
+
+async function saveResolverPacketReview(evidenceId) {
+  const status = document.getElementById('reviewStatus-' + evidenceId);
+  try {
+    const body = {
+      review_decision: document.getElementById('reviewDecision-' + evidenceId).value,
+      reviewer_name: document.getElementById('reviewerName-' + evidenceId).value.trim(),
+      marked_up_plan_ref: document.getElementById('markedUpPlanRef-' + evidenceId).value.trim(),
+      issue_list: jsonArrayFromField('issueList-' + evidenceId),
+      corrected_room_polygons: jsonArrayFromField('correctedRoomPolygons-' + evidenceId),
+      notes: document.getElementById('reviewNotes-' + evidenceId).value.trim(),
+    };
+    const saved = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/resolver-packets/pdf-boundary/' + encodeURIComponent(evidenceId) + '/reviews', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    });
+    status.textContent = 'Saved review evidence #' + saved.id + ' Â· claims still blocked';
+    await refreshEvidence();
+    await refreshResolverQueue();
+  } catch (err) {
+    status.textContent = 'Error: ' + err.message;
+  }
+}
+
 async function refreshResolverQueue() {
   const queue = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/resolver-queue');
   document.getElementById('resolverQueue').innerHTML = queue.items && queue.items.length
@@ -238,6 +298,9 @@ async function refreshResolverQueue() {
     : '<span class="muted">No resolver queue rows yet. Save a PDF boundary decision from Studio to create a room_boundary_visual_audit item.</span>';
   document.querySelectorAll('[data-resolver-packet-evidence-id]').forEach((button) => {
     button.onclick = () => downloadResolverPacket(button.dataset.resolverPacketEvidenceId);
+  });
+  document.querySelectorAll('[data-resolver-review-evidence-id]').forEach((button) => {
+    button.onclick = () => saveResolverPacketReview(button.dataset.resolverReviewEvidenceId);
   });
 }
 

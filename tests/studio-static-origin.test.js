@@ -142,6 +142,17 @@ describe('studio static origin handling', () => {
     expect(html).toContain('Download review packet');
   });
 
+  it('lets the workbench save employee room-boundary review decisions', async () => {
+    const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
+    expect(shell.status).toBe(200);
+    const html = await shell.text();
+    expect(html).toContain('saveResolverPacketReview');
+    expect(html).toContain('/resolver-packets/pdf-boundary/');
+    expect(html).toContain('/reviews');
+    expect(html).toContain('Record review decision');
+    expect(html).toContain('marked_up_plan_ref');
+  });
+
   it('lets the studio load the latest saved PDF boundary decision as import defaults', async () => {
     const shell = await fetch(`${BASE}/autosprink.html`, { headers: { Origin: BASE } });
     expect(shell.status).toBe(200);

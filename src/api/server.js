@@ -1266,6 +1266,63 @@ function pdfBoundaryReviewPacket(projectName, evidence, decision) {
   };
 }
 
+function normalizePdfBoundaryReview(projectName, evidence, decision, body = {}, user = {}) {
+  const packet = pdfBoundaryReviewPacket(projectName, evidence, decision);
+  if (!packet) {
+    const e = new Error('PDF boundary decision evidence not found');
+    e.httpStatus = 404;
+    throw e;
+  }
+  const reviewDecision = String(body.review_decision || body.reviewDecision || '').trim();
+  if (!['accepted', 'rejected', 'corrected'].includes(reviewDecision)) {
+    const e = new Error("review_decision must be one of: accepted, rejected, corrected");
+    e.httpStatus = 400;
+    throw e;
+  }
+  const reviewerName = String(body.reviewer_name || body.reviewerName || user.username || '').trim();
+  if (!reviewerName) {
+    const e = new Error('reviewer_name is required');
+    e.httpStatus = 400;
+    throw e;
+  }
+  const markedUpPlanRef = String(body.marked_up_plan_ref || body.markedUpPlanRef || '').trim();
+  if (!markedUpPlanRef) {
+    const e = new Error('marked_up_plan_ref is required');
+    e.httpStatus = 400;
+    throw e;
+  }
+  const correctedRoomPolygons = Array.isArray(body.corrected_room_polygons)
+    ? jsonClone(body.corrected_room_polygons)
+    : [];
+  const issueList = Array.isArray(body.issue_list) ? jsonClone(body.issue_list) : [];
+  if (reviewDecision === 'corrected' && !correctedRoomPolygons.length) {
+    const e = new Error('corrected_room_polygons is required when review_decision is corrected');
+    e.httpStatus = 400;
+    throw e;
+  }
+  return {
+    kind: 'room_boundary_review_packet_decision',
+    project_name: projectName,
+    source_evidence_id: evidence.id,
+    source_packet_ref: packet.download_name,
+    source_ref: packet.source_ref,
+    review_decision: reviewDecision,
+    reviewer_name: reviewerName,
+    reviewed_at: body.reviewed_at || body.reviewedAt || new Date().toISOString(),
+    marked_up_plan_ref: markedUpPlanRef,
+    corrected_room_polygons: correctedRoomPolygons,
+    issue_list: issueList,
+    notes: body.notes || null,
+    acceptable_evidence: packet.acceptable_evidence,
+    blocked_claims: packet.blocked_claims,
+    claim_gate_effect: 'no_claims_cleared',
+    limitations: [
+      'Employee room-boundary review packets are internal-alpha correction evidence only.',
+      'This review does not clear geometry accuracy, drawing scale, AHJ approval, PE review, AutoSprink parity, permit readiness, fabrication readiness, or manufacturer-exact claims.',
+    ],
+  };
+}
+
 app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
   const projectName = req.params.name;
   const evidence = latestPdfBoundaryDecisionEvidence(projectName);
@@ -1299,6 +1356,50 @@ app.get('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId', authMid
     return res.status(404).json({ error: 'PDF boundary decision evidence not found' });
   }
   res.json(packet);
+});
+
+app.post('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/reviews', authMiddleware, requireRole('admin'), (req, res) => {
+  try {
+    const projectName = req.params.name;
+    const evidenceId = Number(req.params.evidenceId);
+    if (!Number.isSafeInteger(evidenceId) || evidenceId <= 0) {
+      return res.status(400).json({ error: 'A positive evidence id is required' });
+    }
+    const evidence = db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'pdf_boundary_decision'`)
+      .get(evidenceId, projectName);
+    const decision = decisionFromEvidence(evidence);
+    const review = normalizePdfBoundaryReview(projectName, evidence, decision, req.body, req.user);
+    const sourceRef = `pdf-boundary:${evidence.id}:room-boundary-review:${review.review_decision}`;
+    const packet = {
+      kind: 'room_boundary_review_packet_decision',
+      recordedBy: req.user.username,
+      recordedAt: new Date().toISOString(),
+      review,
+      status: 'best_effort',
+    };
+    const result = db
+      .prepare(`INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+                VALUES (?, ?, ?, ?, ?, ?)`)
+      .run(
+        projectName,
+        'room_boundary_review_packet',
+        evidence.source_file || decision.sourceFile || null,
+        sourceRef,
+        'best_effort',
+        JSON.stringify(packet),
+      );
+    const reviewEvidence = db.prepare('SELECT * FROM project_evidence WHERE id = ?').get(result.lastInsertRowid);
+    res.status(201).json({
+      id: result.lastInsertRowid,
+      message: 'Room-boundary review recorded as best-effort evidence; claims still blocked',
+      evidence: reviewEvidence,
+      review,
+    });
+  } catch (err) {
+    res.status(err.httpStatus || 400).json({ error: err.message });
+  }
 });
 
 function runSprinklerPipeline(req, prebuilt = null) {
