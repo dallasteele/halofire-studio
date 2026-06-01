@@ -1,7 +1,7 @@
 # HaloFire Current Review - 2026-06-01
 
 Repo: `C:/Users/dalla/OneDrive/Documents/HaloFire`
-HEAD reviewed: current through T39 PDF page inspection workflow
+HEAD reviewed: current through T40 PDF boundary-candidate review workflow
 
 This is the current Codex pickup review after Claude ran out of credits. The
 project is a usable internal-alpha bid/CAD/evidence workbench, not a completed
@@ -13,6 +13,21 @@ until real evidence is supplied by Halo Fire staff or licensed/proper authoritie
 ## Verified Now
 
 Focused verification run on 2026-06-01:
+
+```powershell
+npx vitest run tests/pdf-inspect-api.test.js tests/studio-static-origin.test.js
+```
+
+Result: 2 files, 10 tests passed. This verifies T40 PDF boundary candidates:
+`POST /api/pdf/boundary-candidates` returns selected-page vector/dominant/
+full-extent/outline/wall-layer candidates with blocked claims, rejects missing
+operator scale with 400, and the Studio exposes review/apply controls.
+
+```powershell
+npx vitest run tests/pdf-to-bid-api.test.js tests/pdf-floorplan.test.js tests/pdf-sam-server.test.js
+```
+
+Result: 3 files, 72 tests passed.
 
 ```powershell
 npx vitest run tests/pdf-inspect-api.test.js tests/studio-static-origin.test.js
@@ -98,6 +113,11 @@ registered OpenGeometry entities.
   local PDFs can be inspected through an authenticated endpoint for page count
   and page dimensions, then the employee can click a page entry to update
   `pdfPageIndex` and preview the selected page locally.
+- The Studio now supports selected-page boundary candidate review before
+  extraction: employees can compute vector, dominant-cluster, full-extent,
+  wall-network outline, and wall-layer candidates on the chosen page and apply
+  one to `pdfExtract` before generating. Every candidate is explicitly blocked
+  from geometry-accuracy and regulated claims until real review evidence exists.
 - SAM 3.1/OpenClaw plan segmentation is wired fail-soft through
   `OPENCLAW_BRIDGE_URL`: when the bridge is unset or unavailable, the request
   falls back to vector PDF extraction, returns a real bid, and reports
@@ -143,8 +163,8 @@ and leave a truthful next blocker.
 1. When GX10 OpenClaw/SAM is reachable, run one real `pdfExtract:"sam"` call
    against the 1881 PDF and capture `pdfMeta` plus bid deltas without clearing
    any regulated gate.
-2. Finish the 1881 drawing workflow beyond T39 by adding layer/room-boundary
-   candidate review on the selected page.
+2. Finish the 1881 drawing workflow beyond T40 by persisting the employee's
+   chosen sheet/scale/candidate decision into evidence/workbench rows.
 3. Expand the employee-facing evidence wizard into a signed reviewer workflow
    for AHJ/PE/AutoSprink/manufacturer artifacts.
 4. Keep source workbook values as truth for actual bid numbers; use generated

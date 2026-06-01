@@ -136,4 +136,53 @@ describe('PDF page inspection API', () => {
     });
     expect(res.status).toBe(400);
   }, 30000);
+
+  it('returns selected-page boundary candidates without clearing regulated claims', async () => {
+    const res = await request('/api/pdf/boundary-candidates', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        pdf: makeMultiPagePdf().toString('base64'),
+        pdfPageIndex: 0,
+        pdfScale: 0.1,
+      }),
+    });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.pageIndex).toBe(0);
+    expect(body.scale).toBe(0.1);
+    expect(body.candidates.map((c) => c.mode)).toEqual([
+      'vector',
+      'dominant',
+      'fullExtent',
+      'outline',
+      'wallLayer',
+    ]);
+    for (const candidate of body.candidates) {
+      expect(candidate.status).toBe('candidate');
+      expect(candidate.bbox.widthFt).toBeGreaterThan(0);
+      expect(candidate.bbox.heightFt).toBeGreaterThan(0);
+      expect(candidate.segmentCount).toBeGreaterThan(0);
+      expect(candidate.blockedClaims).toEqual(expect.arrayContaining(['geometry_accuracy', 'AHJ_approval']));
+    }
+    const outline = body.candidates.find((c) => c.mode === 'outline');
+    expect(outline.method).toBeTruthy();
+    expect(outline.areaSqft).toBeGreaterThan(0);
+    const wallLayer = body.candidates.find((c) => c.mode === 'wallLayer');
+    expect(wallLayer.method).toBeTruthy();
+    expect(wallLayer.wallSegmentCount).toBeGreaterThan(0);
+    expect(body.note).toContain('candidate');
+  }, 30000);
+
+  it('rejects boundary candidates when operator scale is missing', async () => {
+    const res = await request('/api/pdf/boundary-candidates', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        pdf: makeMultiPagePdf().toString('base64'),
+        pdfPageIndex: 0,
+      }),
+    });
+    expect(res.status).toBe(400);
+  }, 30000);
 });

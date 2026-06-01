@@ -605,6 +605,27 @@ bridge (best-effort, graceful skip). Parity claim stays BLOCKED until complete.
       tests/pdf-sam-server.test.js` -> 72 passing. Remaining 1881 workflow gap:
       layer/room-boundary candidate review on the selected page.
 
+- [x] **T40 — Selected-page boundary candidate review.** DONE 2026-06-01.
+      Added authenticated `POST /api/pdf/boundary-candidates` to run the same
+      selected-page PDF geometry through the existing vector extraction modes:
+      whole vector bbox, dominant cluster, full extent, wall-network outline, and
+      wall-layer selection. Each returned candidate includes mode/label/status,
+      bbox, segment counts, method/area/layer/isolation metadata when available,
+      and fail-closed blocked claims for geometry accuracy, scale, AHJ, PE,
+      AutoSprink parity, permit, fabrication, and manufacturer-exact status.
+      The route requires positive operator `pdfScale`; missing scale returns 400.
+      `autosprink.html` now has a Review boundary candidates button and candidate
+      list; Use applies the selected candidate to `pdfExtract` before Generate.
+      TDD: `tests/pdf-inspect-api.test.js` proves candidate modes/metadata and
+      missing-scale rejection; `tests/studio-static-origin.test.js` proves the
+      Studio controls/wiring. Verification: `npx vitest run
+      tests/pdf-inspect-api.test.js tests/studio-static-origin.test.js` -> 10
+      passing; adjacent PDF checks `npx vitest run tests/pdf-to-bid-api.test.js
+      tests/pdf-floorplan.test.js tests/pdf-sam-server.test.js` -> 72 passing.
+      HONESTY: candidate review helps employees choose a temporary best-effort
+      extraction path; it does not prove real geometry, clear claim gates, or
+      substitute for OpenClaw/SAM/professional/AHJ/manufacturer evidence.
+
 ## AUTOSPRINK PARITY epic (the goal): close functional gaps to AutoSprink feature parity
 HONESTY CONTRACT: "parity" is tracked, not asserted. The `AUTOSPRINK_PARITY_INCOMPLETE`
 gate (registry.js) stays BLOCKED until every parity-matrix row is genuinely PRESENT

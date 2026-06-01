@@ -105,6 +105,8 @@
       <button class="act ghost" id="pdfInspectBtn" type="button">Inspect pages</button>
       <div id="pdfPageList" style="font-size:10px;margin-top:6px;color:var(--muted)"></div>
       <iframe id="pdfPreview" title="Selected PDF page preview" style="width:100%;height:170px;margin-top:6px;border:1px solid var(--line);border-radius:7px;background:var(--panel2)"></iframe>
+      <button class="act ghost" id="pdfCandidateBtn" type="button">Review boundary candidates</button>
+      <div id="pdfBoundaryCandidates" style="font-size:10px;margin-top:6px;color:var(--muted)"></div>
       <p style="font-size:11px;opacity:.75;margin:6px 0 0">
         Extracts the plan's real vector geometry. The footprint shown is a
         best-effort <b>bbox of the extracted geometry</b> — not a full room
@@ -693,6 +695,38 @@ function renderPdfPageInspection(meta) {
   setPdfPageFromInspection(current);
 }
 
+function applyPdfBoundaryCandidate(mode) {
+  if (!$('pdfExtract')) return;
+  $('pdfExtract').value = mode || 'vector';
+  document.querySelectorAll('[data-pdf-candidate-mode]').forEach((btn) => {
+    btn.classList.toggle('on', btn.dataset.pdfCandidateMode === $('pdfExtract').value);
+  });
+}
+
+function renderPdfBoundaryCandidates(meta) {
+  if (!$('pdfBoundaryCandidates')) return;
+  const candidates = Array.isArray(meta.candidates) ? meta.candidates : [];
+  if (!candidates.length) {
+    $('pdfBoundaryCandidates').textContent = 'No boundary candidates returned for this page.';
+    return;
+  }
+  $('pdfBoundaryCandidates').innerHTML = candidates.map((c) => {
+    const bbox = c.bbox || {};
+    const area = c.areaSqft ? ` · ${Math.round(c.areaSqft).toLocaleString()} sqft` : '';
+    const method = c.method ? ` · ${c.method}` : '';
+    return `<div style="border:1px solid var(--line);border-radius:6px;padding:6px;margin-top:4px">` +
+      `<button type="button" class="ghost" data-pdf-candidate-mode="${c.mode}" style="width:auto;margin-right:6px;padding:4px 6px">Use</button>` +
+      `<b style="color:var(--bright)">${c.label}</b>` +
+      `<div>${Math.round(bbox.widthFt || 0)}×${Math.round(bbox.heightFt || 0)} ft${area}${method}</div>` +
+      `<div>${c.status || 'candidate'} · claims still blocked</div>` +
+      `</div>`;
+  }).join('');
+  document.querySelectorAll('[data-pdf-candidate-mode]').forEach((btn) => {
+    btn.onclick = () => applyPdfBoundaryCandidate(btn.dataset.pdfCandidateMode);
+  });
+  applyPdfBoundaryCandidate($('pdfExtract').value || 'vector');
+}
+
 async function generate() {
   if (!ogReady) { $('status').textContent = 'kernel still loading…'; return; }
   const btn = $('genBtn'); btn.disabled = true; btn.textContent = 'Generating…';
@@ -866,6 +900,32 @@ if ($('pdfInspectBtn')) $('pdfInspectBtn').onclick = async () => {
     $('status').textContent = `PDF inspected: ${meta.pageCount} page(s) - choose the floor-plan sheet, then enter scale`;
   } catch (err) {
     $('status').textContent = 'PDF inspect error: ' + err.message;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = label;
+  }
+};
+if ($('pdfCandidateBtn')) $('pdfCandidateBtn').onclick = async () => {
+  if (!pdfBase64) { $('status').textContent = 'pick a vector PDF first'; return; }
+  if (!(Number($('pdfScale').value) > 0)) { $('status').textContent = 'enter the drawing scale before reviewing boundary candidates'; return; }
+  const btn = $('pdfCandidateBtn');
+  const label = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Reviewing...';
+  try {
+    const meta = await api('/pdf/boundary-candidates', {
+      method: 'POST',
+      body: JSON.stringify({
+        pdf: pdfBase64,
+        pdfPageIndex: Number($('pdfPageIndex').value) || 0,
+        pdfScale: Number($('pdfScale').value),
+        hazard: $('hazard').value || undefined,
+      }),
+    });
+    renderPdfBoundaryCandidates(meta);
+    $('status').textContent = `Boundary candidates ready for page ${meta.pageIndex} - choose one, then Generate`;
+  } catch (err) {
+    $('status').textContent = 'Boundary candidate error: ' + err.message;
   } finally {
     btn.disabled = false;
     btn.textContent = label;

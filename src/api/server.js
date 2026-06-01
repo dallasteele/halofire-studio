@@ -937,6 +937,109 @@ app.post('/api/pdf/inspect', authMiddleware, async (req, res) => {
   }
 });
 
+const PDF_BOUNDARY_BLOCKED_CLAIMS = Object.freeze([
+  'geometry_accuracy',
+  'drawing_scale',
+  'AHJ_approval',
+  'PE_review',
+  'AutoSprink_parity',
+  'permit_ready',
+  'fabrication_ready',
+  'manufacturer_exact',
+]);
+
+function pdfCandidateFromExtraction(mode, label, extracted) {
+  const candidate = {
+    mode,
+    label,
+    status: 'candidate',
+    segmentCount: extracted.segmentCount,
+    bbox: extracted.bbox,
+    note: extracted.note,
+    blockedClaims: [...PDF_BOUNDARY_BLOCKED_CLAIMS],
+  };
+  for (const key of [
+    'areaSqft',
+    'method',
+    'wallSegmentCount',
+    'networkSegmentCount',
+    'chosen',
+    'groups',
+    'keptCount',
+    'droppedBorderCount',
+    'droppedOutlierCount',
+    'groupCount',
+    'retainedGroupCount',
+  ]) {
+    if (extracted[key] !== undefined) candidate[key] = extracted[key];
+  }
+  return candidate;
+}
+
+async function inspectPdfBoundaryCandidates(req) {
+  if (!req.body || typeof req.body.pdf !== 'string' || !req.body.pdf.trim()) {
+    const e = new Error('PDF payload is required');
+    e.httpStatus = 400;
+    throw e;
+  }
+  const scale = Number(req.body.pdfScale);
+  if (!Number.isFinite(scale) || scale <= 0) {
+    const e = new Error('A positive pdfScale is required for boundary candidates');
+    e.httpStatus = 400;
+    throw e;
+  }
+  let data;
+  try {
+    data = Buffer.from(req.body.pdf, 'base64');
+    if (!data.length) throw new Error('empty PDF payload');
+  } catch (err) {
+    const e = new Error(`Invalid base64 PDF payload: ${err.message}`);
+    e.httpStatus = 400;
+    throw e;
+  }
+  const pageIndex = Number.isFinite(Number(req.body.pdfPageIndex)) ? Number(req.body.pdfPageIndex) : 0;
+  try {
+    const pdfjs = await loadPdfjs();
+    const modes = [
+      { mode: 'vector', label: 'Whole vector bbox', opts: {} },
+      { mode: 'dominant', label: 'Dominant plan cluster', opts: { isolate: 'dominant' } },
+      { mode: 'fullExtent', label: 'Full plan extent', opts: { isolate: 'fullExtent' } },
+      { mode: 'outline', label: 'Wall-network outline', opts: { extract: 'outline' } },
+      { mode: 'wallLayer', label: 'Lineweight/color wall layer', opts: { extract: 'wallLayer' } },
+    ];
+    const candidates = [];
+    for (const spec of modes) {
+      const extracted = await floorPlanFromPdf(new Uint8Array(data), {
+        pageIndex,
+        scale,
+        hazard: req.body.hazard,
+        pdfjs,
+        ...spec.opts,
+      });
+      candidates.push(pdfCandidateFromExtraction(spec.mode, spec.label, extracted));
+    }
+    return {
+      pageIndex,
+      scale,
+      candidates,
+      note: 'Boundary candidates are best-effort extraction choices for employee review. Selecting one only sets the import mode; it does not prove geometry accuracy, scale, AHJ approval, PE review, AutoSprink parity, permit readiness, fabrication readiness, or manufacturer approval.',
+      blockedClaims: [...PDF_BOUNDARY_BLOCKED_CLAIMS],
+    };
+  } catch (err) {
+    const e = new Error(err && err.message ? err.message : String(err));
+    e.httpStatus = 400;
+    throw e;
+  }
+}
+
+app.post('/api/pdf/boundary-candidates', authMiddleware, async (req, res) => {
+  try {
+    res.json(await inspectPdfBoundaryCandidates(req));
+  } catch (err) {
+    res.status(err.httpStatus || 400).json({ error: err.message });
+  }
+});
+
 function runSprinklerPipeline(req, prebuilt = null) {
   const projectName = req.params.name;
   let floorPlan = (prebuilt && prebuilt.floorPlan) || null;

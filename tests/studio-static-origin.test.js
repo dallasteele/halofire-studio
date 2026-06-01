@@ -82,4 +82,14 @@ describe('studio static origin handling', () => {
     expect(html).toContain("api('/pdf/inspect'");
     expect(html).toContain('setPdfPageFromInspection');
   });
+
+  it('surfaces PDF boundary-candidate review controls for selected pages', async () => {
+    const shell = await fetch(`${BASE}/autosprink.html`, { headers: { Origin: BASE } });
+    expect(shell.status).toBe(200);
+    const html = await shell.text();
+    expect(html).toContain('id="pdfCandidateBtn"');
+    expect(html).toContain('id="pdfBoundaryCandidates"');
+    expect(html).toContain("api('/pdf/boundary-candidates'");
+    expect(html).toContain('applyPdfBoundaryCandidate');
+  });
 });
