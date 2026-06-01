@@ -199,4 +199,23 @@ describe('T30 PDF plan source wired end-to-end into sprinkler-bid', () => {
     expect(parityBody.gate.status).toBe('blocked');
     expect(parityBody.parityAchieved).not.toBe(true);
   }, 30000);
+
+  it('(e) honors pdfExtract:"outline" and surfaces the extraction method in pdfMeta', async () => {
+    const pdf = makeTinyVectorPdf().toString('base64');
+    const res = await post({
+      pdf,
+      pdfPageIndex: 0,
+      pdfScale: 0.05,
+      pdfExtract: 'outline',
+      hazard: 'ordinary',
+    });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.bid.totalHeadCount).toBeGreaterThan(0);
+    expect(body.pdfMeta).toBeTruthy();
+    expect(body.pdfMeta.method).toBe('wall-network-occupancy-grid');
+    expect(body.pdfMeta.wallSegmentCount).toBeGreaterThan(0);
+    expect(body.pdfMeta.areaSqft).toBeGreaterThan(0);
+    expect(body.pdfMeta.samSkipped).toBeUndefined();
+  }, 30000);
 });

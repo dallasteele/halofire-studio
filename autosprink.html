@@ -91,6 +91,15 @@
       <input id="pdfPageIndex" type="number" value="0" min="0" step="1">
       <label>Drawing scale (feet per PDF point)</label>
       <input id="pdfScale" type="number" value="" step="0.001" placeholder="e.g. 0.0833 (1 pt = 1 in @ 1:1)">
+      <label>Extraction mode</label>
+      <select id="pdfExtract">
+        <option value="vector">Whole vector bbox</option>
+        <option value="dominant">Dominant plan cluster</option>
+        <option value="fullExtent">Full plan extent</option>
+        <option value="outline">Wall-network outline</option>
+        <option value="wallLayer">Lineweight/color wall layer</option>
+        <option value="sam">OpenClaw/SAM 3.1 if reachable</option>
+      </select>
       <label>Vector PDF plan</label>
       <input id="pdfFile" type="file" accept="application/pdf,.pdf">
       <p style="font-size:11px;opacity:.75;margin:6px 0 0">
@@ -629,6 +638,8 @@ function currentBody() {
     body.pdf = pdfBase64 || '';
     body.pdfPageIndex = Number($('pdfPageIndex').value) || 0;
     body.pdfScale = Number($('pdfScale').value); // operator-supplied; server throws if absent/<=0
+    const pdfExtract = $('pdfExtract') ? $('pdfExtract').value : 'vector';
+    if (pdfExtract && pdfExtract !== 'vector') body.pdfExtract = pdfExtract;
   }
   return body;
 }

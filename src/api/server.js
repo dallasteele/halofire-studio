@@ -750,6 +750,23 @@ async function resolvePdfFloorPlan(req) {
   }
   const pageIndex = Number.isFinite(Number(req.body.pdfPageIndex)) ? Number(req.body.pdfPageIndex) : 0;
   const scale = Number(req.body.pdfScale);
+  const pdfExtract = typeof req.body.pdfExtract === 'string' && req.body.pdfExtract.trim()
+    ? req.body.pdfExtract.trim()
+    : (typeof req.body.extract === 'string' ? req.body.extract.trim() : '');
+  const vectorExtractOptions = {};
+  if (pdfExtract === 'outline') {
+    vectorExtractOptions.extract = 'outline';
+  } else if (pdfExtract === 'wallLayer' || pdfExtract === 'layerSelect') {
+    vectorExtractOptions.extract = 'wallLayer';
+  } else if (pdfExtract === 'dominant' || pdfExtract === 'isolated') {
+    vectorExtractOptions.isolate = 'dominant';
+  } else if (pdfExtract === 'fullExtent') {
+    vectorExtractOptions.isolate = 'fullExtent';
+  } else if (pdfExtract && !['sam', 'vector', 'bbox', 'wholeSheet'].includes(pdfExtract)) {
+    const e = new Error(`Unsupported PDF extraction mode: ${pdfExtract}`);
+    e.httpStatus = 400;
+    throw e;
+  }
   // T36 — SAM-3.1 plan-segmentation request. Accepted via pdfExtract:"sam" (also the
   // legacy alias extract:"sam"). The production SAM invoker is wired to the OpenClaw
   // governed bridge ONLY when OPENCLAW_BRIDGE_URL is set; segmentFloorPlanViaSam calls
@@ -758,7 +775,7 @@ async function resolvePdfFloorPlan(req) {
   // returns { samSkipped:true }), we FALL BACK to the existing vector footprint so the
   // response still 200s with a real bid, marking pdfMeta.samSkipped + samReason. We
   // NEVER throw to 500 and NEVER fabricate a segmentation. The scale guard still applies.
-  const wantsSam = req.body.pdfExtract === 'sam' || req.body.extract === 'sam';
+  const wantsSam = pdfExtract === 'sam';
   try {
     const pdfjs = await loadPdfjs();
     let samSkipped = false;
@@ -812,13 +829,36 @@ async function resolvePdfFloorPlan(req) {
       scale, // operator-supplied feet-per-PDF-point; floorPlanFromPdf throws if absent/<=0
       hazard: req.body.hazard,
       pdfjs,
+      ...vectorExtractOptions,
     });
     const floorPlan = normalizeFloorPlan({
       name: req.params.name || 'Imported PDF Plan',
       units: 'ft',
       rooms: extracted.rooms,
     });
-    const pdfMeta = { pageIndex: extracted.pageIndex, scale: extracted.scale, segmentCount: extracted.segmentCount, bbox: extracted.bbox, note: extracted.note };
+    const pdfMeta = {
+      pageIndex: extracted.pageIndex,
+      scale: extracted.scale,
+      segmentCount: extracted.segmentCount,
+      bbox: extracted.bbox,
+      note: extracted.note,
+      extraction: wantsSam && samSkipped ? 'vector-fallback' : (pdfExtract || 'vector'),
+    };
+    for (const key of [
+      'areaSqft',
+      'method',
+      'wallSegmentCount',
+      'networkSegmentCount',
+      'chosen',
+      'groups',
+      'keptCount',
+      'droppedBorderCount',
+      'droppedOutlierCount',
+      'groupCount',
+      'retainedGroupCount',
+    ]) {
+      if (extracted[key] !== undefined) pdfMeta[key] = extracted[key];
+    }
     if (samSkipped) {
       // FAIL-SOFT fallback marker: SAM was requested but skipped; this bid is the
       // honest VECTOR footprint, NOT a fabricated SAM segmentation.

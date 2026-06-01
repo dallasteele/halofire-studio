@@ -61,4 +61,14 @@ describe('studio static origin handling', () => {
     const shell = await fetch(`${BASE}/autosprink.html`, { headers: { Origin: 'http://evil.test' } });
     expect(shell.status).toBe(403);
   });
+
+  it('surfaces PDF extraction-mode controls for the employee correction workflow', async () => {
+    const shell = await fetch(`${BASE}/autosprink.html`, { headers: { Origin: BASE } });
+    expect(shell.status).toBe(200);
+    const html = await shell.text();
+    expect(html).toContain('id="pdfExtract"');
+    expect(html).toContain('value="outline"');
+    expect(html).toContain('value="wallLayer"');
+    expect(html).toContain('body.pdfExtract');
+  });
 });

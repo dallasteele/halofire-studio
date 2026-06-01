@@ -1,7 +1,7 @@
 # HaloFire Current Review - 2026-06-01
 
 Repo: `C:/Users/dalla/OneDrive/Documents/HaloFire`
-HEAD reviewed: `58de31f` - `T36: wire production OpenClaw SAM invoker into the server pdf path (fail-soft)`
+HEAD reviewed: `304d57a` - `evidence: add project gate wizard`
 
 This is the current Codex pickup review after Claude ran out of credits. The
 project is a usable internal-alpha bid/CAD/evidence workbench, not a completed
@@ -13,6 +13,20 @@ until real evidence is supplied by Halo Fire staff or licensed/proper authoritie
 ## Verified Now
 
 Focused verification run on 2026-06-01:
+
+```powershell
+npx vitest run tests/pdf-to-bid-api.test.js tests/studio-static-origin.test.js
+```
+
+Result: 2 files, 9 tests passed. This verifies T38 PDF extraction-mode
+selection: the Studio surfaces `pdfExtract`, and the running API honors
+`pdfExtract:"outline"` by returning wall-network method/area metadata.
+
+```powershell
+npx vitest run tests/pdf-floorplan.test.js tests/pdf-sam-server.test.js
+```
+
+Result: 2 files, 66 tests passed.
 
 ```powershell
 npx vitest run tests/export-proof.test.js tests/studio-static-origin.test.js
@@ -61,6 +75,11 @@ registered OpenGeometry entities.
   both single-space `dxf` and multi-space `buildingDxf` through the running API.
 - Vector PDF import is wired through the server path with explicit operator scale.
   It rejects missing/invalid scales and marks the extracted geometry as best-effort.
+- The Studio now lets employees select the PDF extraction mode before generating
+  a bid: whole vector bbox, dominant cluster, full extent, wall-network outline,
+  wall-layer selection, or SAM when the bridge is reachable. The API surfaces the
+  selected/fallback extraction method in `pdfMeta`; this is correction evidence,
+  not an accuracy or approval claim.
 - SAM 3.1/OpenClaw plan segmentation is wired fail-soft through
   `OPENCLAW_BRIDGE_URL`: when the bridge is unset or unavailable, the request
   falls back to vector PDF extraction, returns a real bid, and reports
@@ -86,7 +105,7 @@ registered OpenGeometry entities.
 | Permit/fabrication readiness | BLOCKED | Depends on the above regulated approvals and exact submittals. | Export best-effort CAD/BIM artifacts as review aids only. |
 | Real SAM run | BLOCKED BY RUNTIME | Server wiring exists, but a live reachable OpenClaw/SAM bridge was not proven in this Codex pickup. | Keep fail-soft vector PDF fallback; set `OPENCLAW_BRIDGE_URL` when GX10 bridge is reachable. |
 | STEP/IFC/STL runtime proof | VERIFIED LOCALLY | Browser-backed Studio proof on 2026-06-01 produced fresh STEP/IFC/STL artifacts with recorded byte counts and SHA-256 hashes from the Home Depot layout. | Re-run the same browser proof after any exporter/kernel change; keep public/live claims blocked until a public target actually serves the updated Studio. |
-| Real 1881 geometry accuracy | PARTIAL | Current PDF extraction overcaptures the architectural sheet footprint; tests intentionally log the mismatch rather than tune to the bid. | Use real bid package values for totals and mark auto geometry as correction-needed until a floor-plan page/scale/layer decision is approved. |
+| Real 1881 geometry accuracy | PARTIAL | Current PDF extraction can still overcapture the architectural sheet footprint; tests intentionally log the mismatch rather than tune to the bid. | Use real bid package values for totals and mark auto geometry as correction-needed until employees choose the correct floor-plan page, scale, and extraction/layer mode. |
 
 ## Delivery State
 
@@ -106,9 +125,9 @@ and leave a truthful next blocker.
 1. When GX10 OpenClaw/SAM is reachable, run one real `pdfExtract:"sam"` call
    against the 1881 PDF and capture `pdfMeta` plus bid deltas without clearing
    any regulated gate.
-2. Improve the 1881 drawing workflow so employees choose floor-plan sheet,
-   scale, extraction mode, and layer/room boundary candidates inside the UI.
-3. Add an employee-facing evidence wizard for attaching AHJ/PE/AutoSprink/
-   manufacturer artifacts and resolving gates only through acceptable evidence.
+2. Finish the 1881 drawing workflow beyond T38 by adding floor-plan sheet
+   preview/selection and layer/room-boundary candidate review.
+3. Expand the employee-facing evidence wizard into a signed reviewer workflow
+   for AHJ/PE/AutoSprink/manufacturer artifacts.
 4. Keep source workbook values as truth for actual bid numbers; use generated
    estimates as best-effort comparison/correction aids.

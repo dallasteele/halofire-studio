@@ -568,6 +568,26 @@ bridge (best-effort, graceful skip). Parity claim stays BLOCKED until complete.
       blocked; no parity/accuracy claim. After T36 the system is FULLY wired end-to-end: when OpenClaw/SAM is reachable a single
       API call (pdf + pdfExtract:"sam" + pdfScale) runs the real segmentation → reconstruction → bid, and d4 can be re-measured.
 
+- [x] **T38 — Employee-selectable PDF extraction modes in Studio + API.** DONE 2026-06-01.
+      `autosprink.html` now exposes an extraction-mode selector for vector PDF import:
+      whole vector bbox, dominant plan cluster, full plan extent, wall-network outline,
+      lineweight/color wall layer, and OpenClaw/SAM 3.1 when reachable. The Studio sends
+      `body.pdfExtract` only when the employee chooses a non-default mode. `server.js`
+      maps `pdfExtract` into the existing `floorPlanFromPdf` vector modes
+      (`outline`, `wallLayer`, `dominant`, `fullExtent`) or the existing SAM fail-soft
+      path, rejects unknown modes with 400, and surfaces method/area/layer/isolation
+      metadata in `pdfMeta` so employees can see what evidence path actually ran. TDD:
+      `tests/pdf-to-bid-api.test.js` proves `pdfExtract:"outline"` returns a real bid
+      plus `wall-network-occupancy-grid`, wall count, and area metadata;
+      `tests/studio-static-origin.test.js` proves the control is present and request
+      wiring exists. Verification: `npx vitest run tests/pdf-to-bid-api.test.js
+      tests/studio-static-origin.test.js` -> 9 passing; `npx vitest run
+      tests/pdf-floorplan.test.js tests/pdf-sam-server.test.js` -> 66 passing.
+      HONESTY: this improves employee correction workflow only; it does NOT clear
+      AutoSprink parity, AHJ, PE, permit, fabrication, manufacturer-exact, or real
+      geometry-accuracy claims. Real SAM remains blocked until the GX10 bridge exposes
+      the required OpenClaw route and `OPENCLAW_BRIDGE_URL` is set.
+
 ## AUTOSPRINK PARITY epic (the goal): close functional gaps to AutoSprink feature parity
 HONESTY CONTRACT: "parity" is tracked, not asserted. The `AUTOSPRINK_PARITY_INCOMPLETE`
 gate (registry.js) stays BLOCKED until every parity-matrix row is genuinely PRESENT
@@ -577,7 +597,8 @@ build the FUNCTIONAL engine parity we can build honestly; they NEVER flip the ga
 claim AutoSprink/AutoCAD parity, AHJ/permit/PE/manufacturer/fabrication readiness.
 
 ### Parity matrix (AutoSprink feature area -> HaloFire status)
-- Drawing import (DXF/SVG) — PRESENT (T4/T11); PDF import — MISSING (deferred)
+- Drawing import (DXF/SVG) — PRESENT (T4/T11); PDF import — PRESENT as best-effort
+  vector/SAM-fail-soft import with employee-selected extraction modes (T28-T38)
 - Building + multi-space modeling, walls/openings/columns — PRESENT (T11-T14)
 - Head layout (NFPA-13 spacing, hazard) — PRESENT (sprinkler-layout)
 - Pipe routing + schedule sizing — PRESENT; demand-balanced hydraulic sizing — PARTIAL (single-path est, T2)
