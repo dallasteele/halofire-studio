@@ -87,6 +87,7 @@
   <div class="card wide">
     <h2>SAM31 Actual-Value Queue</h2>
     <p class="muted" style="margin-bottom:8px">OpenClaw SAM31+LLM sectioning can identify objects, semantic labels, vector overlays, and 3D model candidates. These are employee actual-value work items only until HaloFire replaces the best guesses with 1881/source evidence.</p>
+    <p class="muted" style="margin-bottom:8px;font-family:var(--mono);font-size:10px">source index /openclaw/sam31/actual-value-work-items · shared resolver queue /openclaw/sam31/actual-value-resolver-queue</p>
     <div id="sam31ActualValueQueue"><span class="muted">Loading SAM31 actual-value work items...</span></div>
     <div id="sam31ActualValueQueueStatus" class="muted" style="font-size:11px;margin-top:8px"></div>
   </div>
@@ -1028,7 +1029,7 @@ async function recordSam31ActualValueQueueEvidence(index) {
 
 async function refreshSam31ActualValueQueue() {
   const target = document.getElementById('sam31ActualValueQueue');
-  const index = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/openclaw/sam31/actual-value-work-items');
+  const index = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/openclaw/sam31/actual-value-resolver-queue');
   const rows = Array.isArray(index.items) ? index.items : [];
   sam31ActualValueQueueRows = rows;
   target.innerHTML = rows.length

@@ -807,6 +807,142 @@ app.get('/api/projects/:name/openclaw/sam31/actual-value-work-items', authMiddle
   res.json(buildOpenClawSam31ActualValueWorkItemIndex(req.params.name));
 });
 
+function sam31ActualValueReplacementFromEvidence(row) {
+  if (!row) return null;
+  try {
+    const parsed = JSON.parse(row.notes || '{}');
+    return parsed && parsed.kind === 'sam31ActualValueReplacement'
+      ? parsed
+      : null;
+  } catch {
+    return null;
+  }
+}
+
+function latestSam31ActualValueReplacementEvidenceByReview(projectName) {
+  const rows = db
+    .prepare(`SELECT * FROM project_evidence
+              WHERE project_name = ? AND evidence_type = 'sam31_actual_value_replacement'
+              ORDER BY created_at DESC, id DESC`)
+    .all(projectName);
+  const latestByReviewEvidenceId = new Map();
+  for (const row of rows) {
+    const replacement = sam31ActualValueReplacementFromEvidence(row);
+    const reviewEvidenceId = Number(replacement?.source_openclaw_sam31_consumer_review_evidence_id);
+    if (!Number.isSafeInteger(reviewEvidenceId) || reviewEvidenceId <= 0) continue;
+    if (latestByReviewEvidenceId.has(reviewEvidenceId)) continue;
+    latestByReviewEvidenceId.set(reviewEvidenceId, {
+      evidence_id: row.id,
+      evidence_type: row.evidence_type,
+      evidence_status: row.status,
+      source_ref: row.source_ref,
+      source_file: row.source_file,
+      artifact_type: replacement.artifact_type || 'halofire.sam31_actual_value_replacement_evidence_note.v1',
+      source_pdf_boundary_evidence_id: replacement.source_pdf_boundary_evidence_id || null,
+      source_openclaw_sam31_consumer_review_evidence_id: reviewEvidenceId,
+      source_openclaw_sam31_consumer_smoke_evidence_id: replacement.source_openclaw_sam31_consumer_smoke_evidence_id || null,
+      consumer: replacement.consumer || null,
+      replacement_values_source_ref: replacement.replacement_values_source_ref || row.source_ref || null,
+      acceptable_actual_evidence: Array.isArray(replacement.acceptable_actual_evidence) ? replacement.acceptable_actual_evidence : [],
+      use_for_claims: false,
+      claim_gate_effect: replacement.claim_gate_effect || 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    });
+  }
+  return latestByReviewEvidenceId;
+}
+
+function openClawSam31ActualValueResolverConsumerActions(projectName, item) {
+  return ['halo_fire', 'landscout', 'nameforge'].map((consumer) => ({
+    consumer,
+    action: 'poll_actual_value_resolver_queue',
+    method: 'GET',
+    href: `/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/actual-value-resolver-queue?consumer=${encodeURIComponent(consumer)}`,
+    consumes: 'openclaw.sam31.actual_value_resolver_queue_item.v1',
+    source_openclaw_sam31_consumer_review_evidence_id: item.source_openclaw_sam31_consumer_review_evidence_id,
+    use_for_claims: false,
+    claim_gate_effect: 'no_claims_cleared',
+  }));
+}
+
+function buildOpenClawSam31ActualValueResolverQueue(projectName, options = {}) {
+  const consumerFilter = String(options.consumer || '').trim().toLowerCase();
+  const index = buildOpenClawSam31ActualValueWorkItemIndex(projectName);
+  const latestReplacementByReview = latestSam31ActualValueReplacementEvidenceByReview(projectName);
+  const items = index.items
+    .filter((item) => !consumerFilter || String(item.consumer || '').toLowerCase() === consumerFilter)
+    .map((item) => {
+      const latestReplacement = latestReplacementByReview.get(Number(item.source_openclaw_sam31_consumer_review_evidence_id)) || null;
+      const status = latestReplacement ? 'actual_value_evidence_recorded' : 'requires_employee_actual_value_update';
+      return {
+        artifact_type: 'openclaw.sam31.actual_value_resolver_queue_item.v1',
+        id: `sam31-actual-value:${projectName}:${item.source_openclaw_sam31_consumer_review_evidence_id}`,
+        project_name: projectName,
+        status,
+        intake_status: latestReplacement ? 'recorded' : 'missing',
+        source_runtime: 'sam-3.1+llm',
+        consumer: item.consumer,
+        source_application: item.source_application || 'halo_fire',
+        source_pdf_boundary_evidence_id: item.source_pdf_boundary_evidence_id,
+        source_openclaw_sam31_consumer_review_evidence_id: item.source_openclaw_sam31_consumer_review_evidence_id,
+        source_openclaw_sam31_consumer_smoke_evidence_id: item.source_openclaw_sam31_consumer_smoke_evidence_id,
+        accepted_queue_id: item.accepted_queue_id || null,
+        persisted_review_packet_ref: item.persisted_review_packet_ref || null,
+        replacement_ref: item.replacement_ref || null,
+        replacement_values_source_ref: item.replacement_values_source_ref || null,
+        replacement_summary: item.replacement_summary || {},
+        acceptable_actual_evidence: Array.isArray(item.acceptable_actual_evidence) ? item.acceptable_actual_evidence : [],
+        evidence_record_type: item.evidence_record_type || 'sam31_actual_value_replacement',
+        evidence_record_next_action: item.evidence_record_next_action || 'Record the actual HaloFire documentation evidence that replaces this SAM31 best guess.',
+        next_action: latestReplacement
+          ? 'Review the recorded sam31_actual_value_replacement evidence before using it in downstream bid/export decisions; regulated claims remain blocked.'
+          : 'Record sam31_actual_value_replacement evidence from the 1881 workbook/sheet, reviewed vector overlay, reviewed 3D model candidate, screenshot, or console evidence.',
+        download_href: item.download_href,
+        latest_actual_value_replacement_evidence: latestReplacement,
+        consumer_actions: openClawSam31ActualValueResolverConsumerActions(projectName, item),
+        use_for_claims: false,
+        blocked_claims: Array.isArray(item.blocked_claims) ? item.blocked_claims : [],
+        claim_gate_effect: 'no_claims_cleared',
+        no_claim_gates_cleared: true,
+        limitations: [
+          'SAM31 plus LLM sectioning can identify likely objects, semantic labels, vector overlays, and 3D candidates, but this queue only tracks evidence replacement status.',
+          'Resolver queue rows never clear permit-ready, fabrication-ready, AHJ-ready, engineering-grade, AutoSprink parity, professional approval, or manufacturer-exact claims.',
+        ],
+      };
+    });
+  const recordedCount = items.filter((item) => item.intake_status === 'recorded').length;
+  const pendingCount = items.filter((item) => item.intake_status !== 'recorded').length;
+  return {
+    artifact_type: 'openclaw.sam31.actual_value_resolver_queue.v1',
+    status: items.length
+      ? (pendingCount ? 'actual_value_replacements_pending' : 'actual_value_replacements_recorded')
+      : 'no_sam31_actual_value_work_items',
+    project_name: projectName,
+    generated_at: new Date().toISOString(),
+    supported_consumers: ['halo_fire', 'landscout', 'nameforge'],
+    source_index_artifact_type: index.artifact_type,
+    item_count: items.length,
+    pending_count: pendingCount,
+    recorded_count: recordedCount,
+    acceptable_actual_evidence: [
+      '1881 proposal workbook row or sheet reference',
+      'reviewed vector overlay SVG or marked-up plan ref',
+      'reviewed 3D model candidate ref or model note',
+      'screenshot or console evidence for the reviewed SAM31 section',
+    ],
+    items,
+    use_for_claims: false,
+    claim_gate_effect: 'no_claims_cleared',
+    no_claim_gates_cleared: true,
+  };
+}
+
+app.get('/api/projects/:name/openclaw/sam31/actual-value-resolver-queue', authMiddleware, (req, res) => {
+  res.json(buildOpenClawSam31ActualValueResolverQueue(req.params.name, {
+    consumer: req.query?.consumer,
+  }));
+});
+
 app.get('/api/projects/:name/evidence/:evidenceId/replay-bid-artifact', authMiddleware, (req, res) => {
   const row = db
     .prepare('SELECT * FROM project_evidence WHERE project_name = ? AND id = ?')

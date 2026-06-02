@@ -315,4 +315,164 @@ describe('HaloFire settings + documentation upload/link API', () => {
       'AutoSprink_parity',
     ]));
   });
+
+  it('builds a shared SAM31 actual-value resolver queue with intake status for HaloFire, LandScout, and NameForge', async () => {
+    const token = await tokenFor('settings-admin', 'actual-test-password');
+    const projectName = 'Shared SAM31 Actual Queue Project';
+    const db = new Database(dbPath);
+    const insertReview = db.prepare(
+      `INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+    );
+    const landscoutReview = insertReview.run(
+      projectName,
+      'openclaw_sam31_consumer_review',
+      '1881-sheet-7.png',
+      'landscout://sam31/reviews/shared/replacement.json',
+      'present',
+      JSON.stringify({
+        kind: 'openclaw_sam31_consumer_review',
+        review: {
+          artifact_type: 'openclaw.sam31.consumer_review_task_decision.v1',
+          source_application: 'halo_fire',
+          source_pdf_boundary_evidence_id: 74,
+          source_openclaw_sam31_consumer_smoke_evidence_id: 73,
+          consumer: 'landscout',
+          review_decision: 'replaced',
+          accepted_queue_id: 'shared-sam31-landscout',
+          persisted_review_packet_ref: 'openclaw://landscout/sam31/product-review/shared-sam31-landscout',
+          replacement_ref: 'landscout://sam31/reviews/shared/replacement.json',
+          replacement_values: {
+            semantic_labels: ['employee reviewed riser room'],
+            object_hypotheses: [{ id: 'obj:riser-room' }],
+            vector_overlays: [{ id: 'vector:riser-room' }],
+            model_3d_candidates: [{ id: 'model:riser-room' }],
+            source_ref: '1881://sheet-7/riser-room',
+          },
+          blocked_claims: ['permit_ready', 'fabrication_ready'],
+          use_for_claims: false,
+          no_claim_gates_cleared: true,
+          claim_gate_effect: 'no_claims_cleared',
+        },
+      }),
+    );
+    insertReview.run(
+      projectName,
+      'openclaw_sam31_consumer_review',
+      '1881-sheet-8.png',
+      'nameforge://sam31/reviews/shared/replacement.json',
+      'present',
+      JSON.stringify({
+        kind: 'openclaw_sam31_consumer_review',
+        review: {
+          artifact_type: 'openclaw.sam31.consumer_review_task_decision.v1',
+          source_application: 'halo_fire',
+          source_pdf_boundary_evidence_id: 84,
+          source_openclaw_sam31_consumer_smoke_evidence_id: 83,
+          consumer: 'nameforge',
+          review_decision: 'replaced',
+          accepted_queue_id: 'shared-sam31-nameforge',
+          persisted_review_packet_ref: 'openclaw://nameforge/sam31/product-review/shared-sam31-nameforge',
+          replacement_ref: 'nameforge://sam31/reviews/shared/replacement.json',
+          replacement_values: {
+            semantic_labels: ['reviewed monument sign zone'],
+            object_hypotheses: [{ id: 'obj:monument-sign' }],
+            vector_overlays: [{ id: 'vector:monument-sign' }],
+            model_3d_candidates: [{ id: 'model:monument-sign' }],
+            source_ref: '1881://sheet-8/monument-sign',
+          },
+          blocked_claims: ['permit_ready', 'AHJ_approval'],
+          use_for_claims: false,
+          no_claim_gates_cleared: true,
+          claim_gate_effect: 'no_claims_cleared',
+        },
+      }),
+    );
+    db.prepare(
+      `INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+    ).run(
+      projectName,
+      'sam31_actual_value_replacement',
+      `openclaw_sam31_consumer_review:${landscoutReview.lastInsertRowid}`,
+      '1881://sheet-7/riser-room',
+      'present',
+      JSON.stringify({
+        kind: 'sam31ActualValueReplacement',
+        artifact_type: 'halofire.sam31_actual_value_replacement_evidence_note.v1',
+        source_pdf_boundary_evidence_id: 74,
+        source_openclaw_sam31_consumer_review_evidence_id: landscoutReview.lastInsertRowid,
+        source_openclaw_sam31_consumer_smoke_evidence_id: 73,
+        consumer: 'landscout',
+        replacement_values_source_ref: '1881://sheet-7/riser-room',
+        acceptable_actual_evidence: ['1881 proposal workbook row or sheet reference'],
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+        no_claim_gates_cleared: true,
+      }),
+    );
+    db.close();
+
+    const res = await request(`/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/actual-value-resolver-queue`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(res.status).toBe(200);
+    const queue = await res.json();
+    expect(queue).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.actual_value_resolver_queue.v1',
+      status: 'actual_value_replacements_pending',
+      project_name: projectName,
+      item_count: 2,
+      pending_count: 1,
+      recorded_count: 1,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(queue.supported_consumers).toEqual(expect.arrayContaining(['halo_fire', 'landscout', 'nameforge']));
+    expect(queue.acceptable_actual_evidence).toEqual(expect.arrayContaining([
+      '1881 proposal workbook row or sheet reference',
+      'reviewed vector overlay SVG or marked-up plan ref',
+      'reviewed 3D model candidate ref or model note',
+    ]));
+    const landscout = queue.items.find((item) => item.consumer === 'landscout');
+    const nameforge = queue.items.find((item) => item.consumer === 'nameforge');
+    expect(landscout).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.actual_value_resolver_queue_item.v1',
+      status: 'actual_value_evidence_recorded',
+      consumer: 'landscout',
+      source_runtime: 'sam-3.1+llm',
+      source_pdf_boundary_evidence_id: 74,
+      source_openclaw_sam31_consumer_review_evidence_id: Number(landscoutReview.lastInsertRowid),
+      evidence_record_type: 'sam31_actual_value_replacement',
+      intake_status: 'recorded',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(landscout.latest_actual_value_replacement_evidence).toEqual(expect.objectContaining({
+      evidence_type: 'sam31_actual_value_replacement',
+      evidence_id: expect.any(Number),
+      source_ref: '1881://sheet-7/riser-room',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(nameforge).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.actual_value_resolver_queue_item.v1',
+      status: 'requires_employee_actual_value_update',
+      consumer: 'nameforge',
+      source_runtime: 'sam-3.1+llm',
+      source_pdf_boundary_evidence_id: 84,
+      evidence_record_type: 'sam31_actual_value_replacement',
+      intake_status: 'missing',
+      latest_actual_value_replacement_evidence: null,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(nameforge.next_action).toContain('Record sam31_actual_value_replacement evidence');
+    expect(nameforge.download_href).toContain('/actual-value-work-item');
+    expect(nameforge.consumer_actions).toEqual(expect.arrayContaining([
+      expect.objectContaining({ consumer: 'halo_fire', action: 'poll_actual_value_resolver_queue' }),
+      expect.objectContaining({ consumer: 'landscout', action: 'poll_actual_value_resolver_queue' }),
+      expect.objectContaining({ consumer: 'nameforge', action: 'poll_actual_value_resolver_queue' }),
+    ]));
+  });
 });
