@@ -1036,6 +1036,27 @@ describe('OpenClaw SAM31 bridge status API', () => {
       downstream_resolver_queue_item_count: 2,
       claim_gate_effect: 'no_claims_cleared',
     }));
+    expect(persistedSectioningQueue.summary.sam31_sectioning_sprinkler_review_adapters_recorded).toBeGreaterThanOrEqual(1);
+    expect(persistedSectioningItem.latest_halofire_sam31_sectioning_sprinkler_review_adapter).toEqual(expect.objectContaining({
+      evidence_id: sectioningSprinklerAdapter.id,
+      evidence_type: 'halofire_sam31_sectioning_sprinkler_review_adapter',
+      artifact_type: 'openclaw.sam31_to_sprinkler_review_adapter.v1',
+      adapter_source: 'halofire.sam31_sectioning_downstream_resolver_packet.v1',
+      source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id: persistedSectioningDownstreamPacket.id,
+      sprinkler_review_issue_seed_count: 2,
+      supported_sprinkler_review_lanes: expect.arrayContaining([
+        'room_boundary_visual_audit',
+        'obstruction_or_clash_review',
+      ]),
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(persistedSectioningItem.openclaw_sam31_sectioning_sprinkler_review_adapter_action).toEqual(expect.objectContaining({
+      label: 'Save SAM31 sectioning sprinkler review adapter',
+      method: 'POST',
+      href: expect.stringContaining(`/sectioning-downstream-resolvers/${persistedSectioningDownstreamPacket.id}/sprinkler-review-adapter`),
+      source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id: persistedSectioningDownstreamPacket.id,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
 
     const queueItemRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/product-review-queue-item`, {
       headers: { Authorization: `Bearer ${token}` },

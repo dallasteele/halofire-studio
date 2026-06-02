@@ -3492,6 +3492,63 @@ function halofireSam31SectioningDownstreamResolverPacketSummary(packetEvidence) 
   };
 }
 
+function halofireSam31SectioningSprinklerReviewAdapterFromEvidence(row) {
+  if (!row) return null;
+  try {
+    const parsed = JSON.parse(row.notes || '{}');
+    return parsed && parsed.kind === 'halofire_sam31_sectioning_sprinkler_review_adapter' && parsed.adapter
+      ? parsed.adapter
+      : null;
+  } catch {
+    return null;
+  }
+}
+
+function latestHalofireSam31SectioningSprinklerReviewAdapterEvidence(projectName, sourceEvidenceId = null) {
+  const rows = db
+    .prepare(`SELECT * FROM project_evidence
+              WHERE project_name = ? AND evidence_type = 'halofire_sam31_sectioning_sprinkler_review_adapter'
+              ORDER BY created_at DESC, id DESC`)
+    .all(projectName);
+  for (const row of rows) {
+    const adapter = halofireSam31SectioningSprinklerReviewAdapterFromEvidence(row);
+    if (!adapter) continue;
+    if (sourceEvidenceId && Number(adapter.source_pdf_boundary_evidence_id) !== Number(sourceEvidenceId)) continue;
+    return { evidence: row, adapter };
+  }
+  return null;
+}
+
+function halofireSam31SectioningSprinklerReviewAdapterSummary(adapterEvidence) {
+  if (!adapterEvidence?.evidence || !adapterEvidence?.adapter) return null;
+  const { evidence, adapter } = adapterEvidence;
+  const issueSeeds = Array.isArray(adapter.sprinkler_review_packet?.issue_seeds)
+    ? adapter.sprinkler_review_packet.issue_seeds
+    : [];
+  return {
+    evidence_id: evidence.id,
+    evidence_type: evidence.evidence_type,
+    evidence_status: evidence.status,
+    artifact_type: adapter.artifact_type || SAM31_TO_SPRINKLER_REVIEW_ADAPTER_TYPE,
+    status: adapter.status || 'ready_for_internal_alpha_sprinkler_review',
+    adapter_source: adapter.adapter_source || HALOFIRE_SAM31_SECTIONING_DOWNSTREAM_RESOLVER_PACKET_TYPE,
+    source_ref: evidence.source_ref,
+    source_pdf_boundary_evidence_id: adapter.source_pdf_boundary_evidence_id || null,
+    source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id: adapter.source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id || null,
+    source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id: adapter.source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id || null,
+    source_openclaw_sam31_extrapolation_evidence_id: adapter.source_openclaw_sam31_extrapolation_evidence_id || null,
+    sprinkler_review_issue_seed_count: issueSeeds.length,
+    supported_sprinkler_review_lanes: Array.isArray(adapter.supported_sprinkler_review_lanes)
+      ? [...adapter.supported_sprinkler_review_lanes]
+      : [],
+    source_linked_vector_overlay_count: Array.isArray(adapter.source_linked_vector_overlays) ? adapter.source_linked_vector_overlays.length : 0,
+    source_linked_model_3d_candidate_count: Array.isArray(adapter.source_linked_model_3d_candidates) ? adapter.source_linked_model_3d_candidates.length : 0,
+    claim_gate_effect: adapter.claim_gate_effect || 'no_claims_cleared',
+    blocked_claims: Array.isArray(adapter.blocked_claims) ? [...adapter.blocked_claims] : [],
+    limitations: Array.isArray(adapter.limitations) ? [...adapter.limitations] : [],
+  };
+}
+
 function halofireSam31SectioningSprinklerIssueSeeds(packet) {
   const rows = Array.isArray(packet?.downstream_resolver_queue_items)
     ? packet.downstream_resolver_queue_items
@@ -6186,7 +6243,7 @@ app.post('/api/projects/:name/pdf-boundary-decision', authMiddleware, requireRol
   }
 });
 
-function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence = null, sam31Evidence = null, sam31ReplacementEvidence = null, sam31SmokeEvidence = null, sam31ExtrapolationEvidence = null, sam31ExtrapolationReviewEvidence = null, sam31SectioningContractReviewEvidence = null, sam31SectioningDownstreamPacketEvidence = null, sam31ConsumerSmokeEvidence = null, sam31ConsumerReviewEvidences = [], sam31SprinklerReviewDecisionEvidences = [], sam31SprinklerPreliminaryReplayFollowupDecisionEvidences = [], sam31SprinklerFollowupPacketReviewDecisionEvidences = [], sam31ApprovalUploadIntakeEvidences = []) {
+function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence = null, sam31Evidence = null, sam31ReplacementEvidence = null, sam31SmokeEvidence = null, sam31ExtrapolationEvidence = null, sam31ExtrapolationReviewEvidence = null, sam31SectioningContractReviewEvidence = null, sam31SectioningDownstreamPacketEvidence = null, sam31SectioningSprinklerReviewAdapterEvidence = null, sam31ConsumerSmokeEvidence = null, sam31ConsumerReviewEvidences = [], sam31SprinklerReviewDecisionEvidences = [], sam31SprinklerPreliminaryReplayFollowupDecisionEvidences = [], sam31SprinklerFollowupPacketReviewDecisionEvidences = [], sam31ApprovalUploadIntakeEvidences = []) {
   if (!evidence || !decision) return null;
   const candidate = decision.candidate || {};
   const pdfRef = evidence.source_file || decision.sourceFile || evidence.source_ref || decision.sourceRef || `${projectName}:pdf-boundary:${evidence.id}`;
@@ -6346,6 +6403,7 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
   const latestOpenClawSam31ExtrapolationReview = openClawSam31ExtrapolationReviewSummary(sam31ExtrapolationReviewEvidence);
   const latestOpenClawSam31SectioningPipelineContractReview = openClawSam31SectioningPipelineContractReviewSummary(sam31SectioningContractReviewEvidence);
   const latestHalofireSam31SectioningDownstreamResolverPacket = halofireSam31SectioningDownstreamResolverPacketSummary(sam31SectioningDownstreamPacketEvidence);
+  const latestHalofireSam31SectioningSprinklerReviewAdapter = halofireSam31SectioningSprinklerReviewAdapterSummary(sam31SectioningSprinklerReviewAdapterEvidence);
   const latestOpenClawSam31VectorModelArtifact = openClawSam31VectorModelArtifactSummary(latestOpenClawSam31VectorModelArtifactEvidence(projectName, evidence.id));
   const latestOpenClawSam31ConsumerSmokeArtifact = openClawSam31ConsumerSmokeReplaySummary(sam31ConsumerSmokeEvidence);
   const latestOpenClawSam31ConsumerReviews = openClawSam31ConsumerReviewSummaries(sam31ConsumerReviewEvidences);
@@ -6420,6 +6478,23 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
       'This action records employee/product-owner replacement values for SAM31 sectioning outputs only; it does not clear geometry or regulated claims.',
     ],
   };
+  const openclawSam31SectioningSprinklerReviewAdapterAction = latestHalofireSam31SectioningDownstreamResolverPacket ? {
+    label: 'Save SAM31 sectioning sprinkler review adapter',
+    method: 'POST',
+    href: `/api/projects/${encodeURIComponent(projectName)}/resolver-packets/pdf-boundary/${evidence.id}/openclaw/sam31/sectioning-downstream-resolvers/${latestHalofireSam31SectioningDownstreamResolverPacket.evidence_id}/sprinkler-review-adapter`,
+    status: latestHalofireSam31SectioningSprinklerReviewAdapter ? 'adapter_recorded' : 'ready_for_internal_alpha_sprinkler_review',
+    artifact_type: SAM31_TO_SPRINKLER_REVIEW_ADAPTER_TYPE,
+    source_pdf_boundary_evidence_id: evidence.id,
+    source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id: latestHalofireSam31SectioningDownstreamResolverPacket.evidence_id,
+    source_adapter_artifact_type: HALOFIRE_SAM31_SECTIONING_DOWNSTREAM_RESOLVER_PACKET_TYPE,
+    use_for_claims: false,
+    no_claim_gates_cleared: true,
+    claim_gate_effect: 'no_claims_cleared',
+    limitations: [
+      'This action persists a sectioning-derived sprinkler review adapter for internal-alpha review only.',
+      'It does not clear permit-ready, AHJ, professional, AutoSprink, fabrication, manufacturer, geometry, or drawing-scale claims.',
+    ],
+  } : null;
   let status = 'ready';
   let nextAction = 'Open the selected PDF sheet with these defaults, run a room-boundary visual audit packet, and attach employee review evidence before any geometry-accuracy claim.';
   if (latestReview?.review_decision === 'corrected') {
@@ -6477,6 +6552,7 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
     latest_openclaw_sam31_extrapolation_review: latestOpenClawSam31ExtrapolationReview,
     latest_openclaw_sam31_sectioning_pipeline_contract_review: latestOpenClawSam31SectioningPipelineContractReview,
     latest_halofire_sam31_sectioning_downstream_resolver_packet: latestHalofireSam31SectioningDownstreamResolverPacket,
+    latest_halofire_sam31_sectioning_sprinkler_review_adapter: latestHalofireSam31SectioningSprinklerReviewAdapter,
     latest_openclaw_sam31_vector_model_artifact: latestOpenClawSam31VectorModelArtifact,
     latest_openclaw_sam31_consumer_smoke_artifact: latestOpenClawSam31ConsumerSmokeArtifact,
     latest_openclaw_sam31_consumer_reviews: latestOpenClawSam31ConsumerReviews,
@@ -6489,6 +6565,7 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
     openclaw_sam31_tool_contract_action: openclawSam31ToolContractAction,
     openclaw_sam31_sectioning_pipeline_contract_action: openclawSam31SectioningPipelineContractAction,
     openclaw_sam31_sectioning_pipeline_contract_review_action: openclawSam31SectioningPipelineContractReviewAction,
+    openclaw_sam31_sectioning_sprinkler_review_adapter_action: openclawSam31SectioningSprinklerReviewAdapterAction,
     openclaw_sam31_vector_model_artifact_action: openclawSam31VectorModelArtifactAction,
     openclaw_sam31_extrapolation_status: extrapolateStatus,
     openclaw_sam31_extrapolation_action: openclawSam31ExtrapolationAction,
@@ -9665,6 +9742,7 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
   const sam31ExtrapolationReviewEvidence = evidence ? latestOpenClawSam31ExtrapolationReviewEvidence(projectName, evidence.id) : null;
   const sam31SectioningContractReviewEvidence = evidence ? latestOpenClawSam31SectioningPipelineContractReviewEvidence(projectName, evidence.id) : null;
   const sam31SectioningDownstreamPacketEvidence = evidence ? latestHalofireSam31SectioningDownstreamResolverPacketEvidence(projectName, evidence.id) : null;
+  const sam31SectioningSprinklerReviewAdapterEvidence = evidence ? latestHalofireSam31SectioningSprinklerReviewAdapterEvidence(projectName, evidence.id) : null;
   const sam31ConsumerSmokeEvidence = evidence ? latestOpenClawSam31ConsumerSmokeArtifactEvidence(projectName, evidence.id) : null;
   const sam31ConsumerReviewEvidences = evidence ? latestOpenClawSam31ConsumerReviewEvidence(projectName, evidence.id) : [];
   const sam31SprinklerReviewDecisionEvidences = evidence ? latestHalofireSam31SprinklerReviewDecisionEvidence(projectName, evidence.id) : [];
@@ -9681,7 +9759,7 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
     const replayItem = officialFlowReplayReviewQueueItem(projectName, replayEvidence);
     if (replayItem) items.push(replayItem);
   }
-  const boundaryItem = pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence, sam31Evidence, sam31ReplacementEvidence, sam31SmokeEvidence, sam31ExtrapolationEvidence, sam31ExtrapolationReviewEvidence, sam31SectioningContractReviewEvidence, sam31SectioningDownstreamPacketEvidence, sam31ConsumerSmokeEvidence, sam31ConsumerReviewEvidences, sam31SprinklerReviewDecisionEvidences, sam31SprinklerPreliminaryReplayFollowupDecisionEvidences, sam31SprinklerFollowupPacketReviewDecisionEvidences, sam31ApprovalUploadIntakeEvidences);
+  const boundaryItem = pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence, sam31Evidence, sam31ReplacementEvidence, sam31SmokeEvidence, sam31ExtrapolationEvidence, sam31ExtrapolationReviewEvidence, sam31SectioningContractReviewEvidence, sam31SectioningDownstreamPacketEvidence, sam31SectioningSprinklerReviewAdapterEvidence, sam31ConsumerSmokeEvidence, sam31ConsumerReviewEvidences, sam31SprinklerReviewDecisionEvidences, sam31SprinklerPreliminaryReplayFollowupDecisionEvidences, sam31SprinklerFollowupPacketReviewDecisionEvidences, sam31ApprovalUploadIntakeEvidences);
   if (boundaryItem) items.push(boundaryItem);
   const catalogEvidence = matchingCatalogEvidenceByFamily(projectName);
   for (const row of currentSourceAcquisitionLedger()) {
@@ -9783,6 +9861,7 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
       sam31_sectioning_contract_reviews_recorded: visibleItems.filter((item) => item.latest_openclaw_sam31_sectioning_pipeline_contract_review).length,
       sam31_sectioning_downstream_resolver_queue_items: visibleItems.reduce((acc, item) => acc + (Array.isArray(item.sam31_sectioning_downstream_resolver_queue_items) ? item.sam31_sectioning_downstream_resolver_queue_items.length : 0), 0),
       sam31_sectioning_downstream_resolver_packets_recorded: visibleItems.filter((item) => item.latest_halofire_sam31_sectioning_downstream_resolver_packet).length,
+      sam31_sectioning_sprinkler_review_adapters_recorded: visibleItems.filter((item) => item.latest_halofire_sam31_sectioning_sprinkler_review_adapter).length,
       sam31_vector_model_artifacts_recorded: visibleItems.filter((item) => item.latest_openclaw_sam31_vector_model_artifact).length,
       sam31_consumer_smoke_recorded: visibleItems.filter((item) => item.latest_openclaw_sam31_consumer_smoke_artifact).length,
       sam31_consumer_reviews_recorded: visibleItems.reduce((acc, item) => acc + (Array.isArray(item.latest_openclaw_sam31_consumer_reviews) ? item.latest_openclaw_sam31_consumer_reviews.length : 0), 0),

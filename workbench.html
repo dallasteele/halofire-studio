@@ -314,6 +314,7 @@ function renderSam31BridgeSmokeAction(item, action, latest) {
 const SAM31_EXTRAPOLATION_ROUTE_SUFFIX = '/openclaw/sam31/extrapolation-artifact';
 const SAM31_SECTIONING_PIPELINE_CONTRACT_ROUTE_SUFFIX = '/openclaw/sam31/sectioning-pipeline-contract';
 const SAM31_SECTIONING_DOWNSTREAM_RESOLVER_ROUTE_SUFFIX = '/openclaw/sam31/sectioning-downstream-resolvers';
+const SAM31_SECTIONING_SPRINKLER_REVIEW_ADAPTER_ROUTE_SUFFIX = '/sprinkler-review-adapter';
 const SAM31_VECTOR_MODEL_ARTIFACT_ROUTE_SUFFIX = '/openclaw/sam31/vector-model-artifacts';
 const SAM31_CONSUMER_SMOKE_ROUTE_SUFFIX = '/openclaw/sam31/consumer-smoke';
 const SAM31_CONSUMER_SMOKE_PACKET_ROUTE_SUFFIX = '/openclaw/sam31/consumer-smoke-packet';
@@ -518,6 +519,24 @@ function renderHalofireSam31SectioningDownstreamResolverQueue(rows, sourcePdfBou
   }).join('')}<span class="muted" style="font-size:10px">Filter API: /resolver-queue?sam31SectioningReview=ready&lane=obstruction_or_clash_review - all rows keep use_for_claims false</span></div>`;
 }
 
+function renderHalofireSam31SectioningSprinklerReviewAdapter(latestAdapter, adapterAction, sourcePdfBoundaryEvidenceId) {
+  if (!latestAdapter && !adapterAction) return '';
+  const packetEvidenceId = latestAdapter?.source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id
+    || adapterAction?.source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id
+    || '';
+  const lanes = Array.isArray(latestAdapter?.supported_sprinkler_review_lanes) ? latestAdapter.supported_sprinkler_review_lanes : [];
+  const downloadButton = packetEvidenceId
+    ? `<button class="go" type="button" style="padding:7px 10px;font-size:11px;margin-top:6px;background:#0369a1" data-sam31-sectioning-sprinkler-review-adapter-evidence-id="${escapeHtml(sourcePdfBoundaryEvidenceId || '')}" data-sam31-sectioning-sprinkler-review-adapter-packet-evidence-id="${escapeHtml(packetEvidenceId)}">Download SAM31 sectioning sprinkler review adapter</button>`
+    : '';
+  const saveButton = packetEvidenceId
+    ? `<button class="go" type="button" style="padding:7px 10px;font-size:11px;margin-top:6px;background:#0f766e" data-sam31-sectioning-sprinkler-review-adapter-save-evidence-id="${escapeHtml(sourcePdfBoundaryEvidenceId || '')}" data-sam31-sectioning-sprinkler-review-adapter-save-packet-evidence-id="${escapeHtml(packetEvidenceId)}">Save SAM31 sectioning sprinkler review adapter</button>`
+    : '';
+  const latestText = latestAdapter
+    ? `<span class="muted" style="font-size:10px">latest_halofire_sam31_sectioning_sprinkler_review_adapter evidence #${escapeHtml(latestAdapter.evidence_id)} - ${escapeHtml(latestAdapter.artifact_type || 'openclaw.sam31_to_sprinkler_review_adapter.v1')} - adapter_source ${escapeHtml(latestAdapter.adapter_source || 'halofire.sam31_sectioning_downstream_resolver_packet.v1')} - issue_seeds ${escapeHtml(latestAdapter.sprinkler_review_issue_seed_count ?? 0)} - vectors ${escapeHtml(latestAdapter.source_linked_vector_overlay_count ?? 0)} - models ${escapeHtml(latestAdapter.source_linked_model_3d_candidate_count ?? 0)} - claim_gate_effect ${escapeHtml(latestAdapter.claim_gate_effect || 'no_claims_cleared')}</span><br>`
+    : '<span class="muted" style="font-size:10px">latest_halofire_sam31_sectioning_sprinkler_review_adapter missing - ready to save from latest sectioning downstream packet</span><br>';
+  return `<div class="claims">SAM31 sectioning sprinkler review adapter: <span class="chip">halofire_sam31_sectioning_sprinkler_review_adapter</span> <span class="chip">openclaw.sam31_to_sprinkler_review_adapter.v1</span> <span class="chip">adapter_source halofire.sam31_sectioning_downstream_resolver_packet.v1</span><br>${latestText}<span class="muted" style="font-size:10px">source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id ${escapeHtml(packetEvidenceId || 'missing')} - use_for_claims false - claim_gate_effect no_claims_cleared</span><br>Supported sprinkler lanes: ${lanes.map((lane) => `<span class="chip">${escapeHtml(lane)}</span>`).join('') || '<span class="chip">lanes pending adapter save</span>'}<br>${downloadButton} ${saveButton}<div class="muted" id="sam31SectioningSprinklerReviewAdapterStatus-${escapeHtml(sourcePdfBoundaryEvidenceId || '')}-${escapeHtml(packetEvidenceId || '')}" style="font-size:11px;margin-top:4px"></div></div>`;
+}
+
 function renderHalofireSam31SprinklerReviewQueue(rows, sourcePdfBoundaryEvidenceId) {
   if (!Array.isArray(rows) || !rows.length) return '';
   return `<div class="claims">SAM31 sprinkler review queue: <span class="chip">sam31_sprinkler_review_queue_items ${escapeHtml(rows.length)}</span> <span class="chip">halofire.sam31_sprinkler_review_queue_item.v1</span> <span class="chip">halofire.sam31_sprinkler_review_decision.v1</span><br>${rows.map((row) => {
@@ -639,6 +658,19 @@ function evidenceDetail(row) {
       return '<div class="muted" style="font-size:11px;margin-top:3px">OpenClaw SAM31 sectioning contract review evidence; detail unavailable</div>';
     }
   }
+  if (row.evidence_type === 'halofire_sam31_sectioning_sprinkler_review_adapter') {
+    try {
+      const packet = JSON.parse(row.notes || '{}');
+      const adapter = packet.adapter || {};
+      const sprinklerPacket = adapter.sprinkler_review_packet || {};
+      const seeds = Array.isArray(sprinklerPacket.issue_seeds) ? sprinklerPacket.issue_seeds : [];
+      const lanes = Array.isArray(adapter.supported_sprinkler_review_lanes) ? adapter.supported_sprinkler_review_lanes : [];
+      const blocked = Array.isArray(packet.blocked_claims) ? packet.blocked_claims : (Array.isArray(adapter.blocked_claims) ? adapter.blocked_claims : []);
+      return `<div class="muted" style="font-size:11px;margin-top:3px">Saved SAM31 sectioning sprinkler review adapter: ${escapeHtml(adapter.artifact_type || 'openclaw.sam31_to_sprinkler_review_adapter.v1')}<br>adapter_source ${escapeHtml(adapter.adapter_source || 'halofire.sam31_sectioning_downstream_resolver_packet.v1')} - source_pdf_boundary_evidence_id ${escapeHtml(adapter.source_pdf_boundary_evidence_id || 'missing')} - source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id ${escapeHtml(adapter.source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id || 'missing')}<br>source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id ${escapeHtml(adapter.source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id || 'missing')} - source_openclaw_sam31_extrapolation_evidence_id ${escapeHtml(adapter.source_openclaw_sam31_extrapolation_evidence_id || 'missing')} - claim_gate_effect ${escapeHtml(packet.claim_gate_effect || adapter.claim_gate_effect || 'no_claims_cleared')}<br>halofire.sam31_sprinkler_review_packet.v1 issue_seeds ${escapeHtml(seeds.length)} - vectors ${escapeHtml(adapter.source_linked_vector_overlays?.length || 0)} - models ${escapeHtml(adapter.source_linked_model_3d_candidates?.length || 0)}<br>Supported sprinkler lanes: ${lanes.map((lane) => `<span class="chip">${escapeHtml(lane)}</span>`).join('') || '<span class="chip">lanes missing</span>'}<br>Blocks still active: ${blocked.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('') || '<span class="chip">claim gates remain blocked</span>'}</div>`;
+    } catch {
+      return '<div class="muted" style="font-size:11px;margin-top:3px">HaloFire SAM31 sectioning sprinkler review adapter evidence; detail unavailable</div>';
+    }
+  }
   if (row.evidence_type === 'openclaw_sam31_vector_model_artifact_packet') {
     try {
       const packet = JSON.parse(row.notes || '{}');
@@ -756,6 +788,18 @@ async function refreshEvidence() {
   });
   document.querySelectorAll('[data-sam31-sectioning-downstream-resolver-save-evidence-id]').forEach((button) => {
     button.onclick = () => persistHalofireSam31SectioningDownstreamResolverPacket(button.dataset.sam31SectioningDownstreamResolverSaveEvidenceId);
+  });
+  document.querySelectorAll('[data-sam31-sectioning-sprinkler-review-adapter-evidence-id]').forEach((button) => {
+    button.onclick = () => downloadHalofireSam31SectioningSprinklerReviewAdapter(
+      button.dataset.sam31SectioningSprinklerReviewAdapterEvidenceId,
+      button.dataset.sam31SectioningSprinklerReviewAdapterPacketEvidenceId,
+    );
+  });
+  document.querySelectorAll('[data-sam31-sectioning-sprinkler-review-adapter-save-evidence-id]').forEach((button) => {
+    button.onclick = () => persistHalofireSam31SectioningSprinklerReviewAdapter(
+      button.dataset.sam31SectioningSprinklerReviewAdapterSaveEvidenceId,
+      button.dataset.sam31SectioningSprinklerReviewAdapterSavePacketEvidenceId,
+    );
   });
   document.querySelectorAll('[data-sam31-vector-model-artifact-evidence-id]').forEach((button) => {
     button.onclick = () => downloadOpenClawSam31VectorModelArtifactPacket(button.dataset.sam31VectorModelArtifactEvidenceId);
@@ -1175,6 +1219,8 @@ function resolverQueueDetail(item) {
   const openclaw_sam31_sectioning_pipeline_contract_review_action = item.openclaw_sam31_sectioning_pipeline_contract_review_action || null;
   const latest_openclaw_sam31_sectioning_pipeline_contract_review = item.latest_openclaw_sam31_sectioning_pipeline_contract_review || null;
   const latest_halofire_sam31_sectioning_downstream_resolver_packet = item.latest_halofire_sam31_sectioning_downstream_resolver_packet || null;
+  const latest_halofire_sam31_sectioning_sprinkler_review_adapter = item.latest_halofire_sam31_sectioning_sprinkler_review_adapter || null;
+  const openclaw_sam31_sectioning_sprinkler_review_adapter_action = item.openclaw_sam31_sectioning_sprinkler_review_adapter_action || null;
   const openclaw_sam31_vector_model_artifact_action = item.openclaw_sam31_vector_model_artifact_action || null;
   const latest_openclaw_sam31_vector_model_artifact = item.latest_openclaw_sam31_vector_model_artifact || null;
   const openclaw_sam31_consumer_smoke_action = item.openclaw_sam31_consumer_smoke_action || null;
@@ -1278,6 +1324,7 @@ function resolverQueueDetail(item) {
       ${renderOpenClawSam31ExtrapolationAction(item, openclaw_sam31_extrapolation_action, latest_openclaw_sam31_extrapolation_artifact, latest_openclaw_sam31_extrapolation_review)}
       ${renderOpenClawSam31SectioningPipelineContractAction(item, openclaw_sam31_sectioning_pipeline_contract_action, latest_openclaw_sam31_extrapolation_artifact, latest_openclaw_sam31_sectioning_pipeline_contract_review, openclaw_sam31_sectioning_pipeline_contract_review_action)}
       ${latest_halofire_sam31_sectioning_downstream_resolver_packet ? `<div class="claims">latest_halofire_sam31_sectioning_downstream_resolver_packet: evidence #${escapeHtml(latest_halofire_sam31_sectioning_downstream_resolver_packet.evidence_id)} - ${escapeHtml(latest_halofire_sam31_sectioning_downstream_resolver_packet.artifact_type || 'halofire.sam31_sectioning_downstream_resolver_packet.v1')} - downstream_resolver_queue_item_count ${escapeHtml(latest_halofire_sam31_sectioning_downstream_resolver_packet.downstream_resolver_queue_item_count || 0)} - claim_gate_effect ${escapeHtml(latest_halofire_sam31_sectioning_downstream_resolver_packet.claim_gate_effect || 'no_claims_cleared')}</div>` : ''}
+      ${renderHalofireSam31SectioningSprinklerReviewAdapter(latest_halofire_sam31_sectioning_sprinkler_review_adapter, openclaw_sam31_sectioning_sprinkler_review_adapter_action, item.evidence_id)}
       ${renderOpenClawSam31VectorModelArtifactAction(item, openclaw_sam31_vector_model_artifact_action, latest_openclaw_sam31_vector_model_artifact)}
       ${renderOpenClawSam31ConsumerSmokeAction(item, openclaw_sam31_consumer_smoke_action, latest_openclaw_sam31_consumer_smoke_artifact)}
       ${sam31_unresolved_consumer_reviews.length ? `<div class="claims">sam31_unresolved_consumer_reviews: ${sam31_unresolved_consumer_reviews.map((review) => `<span class="chip">${escapeHtml(review.consumer)}:${escapeHtml(review.status || 'requires_product_review')} accepted_queue_id ${escapeHtml(review.accepted_queue_id || 'missing')}</span>`).join('')}<br><span class="muted" style="font-size:10px">Filter API: /resolver-queue?sam31ConsumerReview=unresolved&consumer=nameforge</span></div>` : ''}
@@ -1688,6 +1735,34 @@ async function persistHalofireSam31SectioningDownstreamResolverPacket(evidenceId
       method: 'POST',
     });
     if (status) status.textContent = 'Saved halofire_sam31_sectioning_downstream_resolver_packet evidence #' + saved.id + ' - claims still blocked';
+    await refreshEvidence();
+    await refreshResolverQueue();
+  } catch (err) {
+    if (status) status.textContent = 'Error: ' + err.message;
+  }
+}
+
+async function downloadHalofireSam31SectioningSprinklerReviewAdapter(evidenceId, packetEvidenceId) {
+  const packet = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/resolver-packets/pdf-boundary/' + encodeURIComponent(evidenceId) + SAM31_SECTIONING_DOWNSTREAM_RESOLVER_ROUTE_SUFFIX + '/' + encodeURIComponent(packetEvidenceId) + SAM31_SECTIONING_SPRINKLER_REVIEW_ADAPTER_ROUTE_SUFFIX);
+  if (packet.artifact_type !== 'openclaw.sam31_to_sprinkler_review_adapter.v1') {
+    throw new Error('Unexpected SAM31 sectioning sprinkler review adapter type');
+  }
+  const blob = new Blob([JSON.stringify(packet, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = packet.download_name || 'sam31-sectioning-sprinkler-review-adapter.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+async function persistHalofireSam31SectioningSprinklerReviewAdapter(evidenceId, packetEvidenceId) {
+  const status = document.getElementById('sam31SectioningSprinklerReviewAdapterStatus-' + evidenceId + '-' + packetEvidenceId);
+  if (status) status.textContent = 'Saving SAM31 sectioning sprinkler review adapter as best-effort evidence...';
+  try {
+    const saved = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/resolver-packets/pdf-boundary/' + encodeURIComponent(evidenceId) + SAM31_SECTIONING_DOWNSTREAM_RESOLVER_ROUTE_SUFFIX + '/' + encodeURIComponent(packetEvidenceId) + SAM31_SECTIONING_SPRINKLER_REVIEW_ADAPTER_ROUTE_SUFFIX, {
+      method: 'POST',
+    });
+    if (status) status.textContent = 'Saved halofire_sam31_sectioning_sprinkler_review_adapter evidence #' + saved.id + ' - claims still blocked';
     await refreshEvidence();
     await refreshResolverQueue();
   } catch (err) {
@@ -2269,6 +2344,18 @@ async function refreshResolverQueue() {
   });
   document.querySelectorAll('[data-sam31-sectioning-downstream-resolver-save-evidence-id]').forEach((button) => {
     button.onclick = () => persistHalofireSam31SectioningDownstreamResolverPacket(button.dataset.sam31SectioningDownstreamResolverSaveEvidenceId);
+  });
+  document.querySelectorAll('[data-sam31-sectioning-sprinkler-review-adapter-evidence-id]').forEach((button) => {
+    button.onclick = () => downloadHalofireSam31SectioningSprinklerReviewAdapter(
+      button.dataset.sam31SectioningSprinklerReviewAdapterEvidenceId,
+      button.dataset.sam31SectioningSprinklerReviewAdapterPacketEvidenceId,
+    );
+  });
+  document.querySelectorAll('[data-sam31-sectioning-sprinkler-review-adapter-save-evidence-id]').forEach((button) => {
+    button.onclick = () => persistHalofireSam31SectioningSprinklerReviewAdapter(
+      button.dataset.sam31SectioningSprinklerReviewAdapterSaveEvidenceId,
+      button.dataset.sam31SectioningSprinklerReviewAdapterSavePacketEvidenceId,
+    );
   });
   document.querySelectorAll('[data-sam31-vector-model-artifact-evidence-id]').forEach((button) => {
     button.onclick = () => downloadOpenClawSam31VectorModelArtifactPacket(button.dataset.sam31VectorModelArtifactEvidenceId);

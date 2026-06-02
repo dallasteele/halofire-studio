@@ -122,6 +122,16 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toContain('data-sam31-sectioning-downstream-resolver-evidence-id');
     expect(html).toContain('data-sam31-sectioning-downstream-resolver-save-evidence-id');
     expect(html).toContain('latest_halofire_sam31_sectioning_downstream_resolver_packet');
+    expect(html).toContain('latest_halofire_sam31_sectioning_sprinkler_review_adapter');
+    expect(html).toContain('Download SAM31 sectioning sprinkler review adapter');
+    expect(html).toContain('Save SAM31 sectioning sprinkler review adapter');
+    expect(html).toContain('halofire_sam31_sectioning_sprinkler_review_adapter');
+    expect(html).toContain('data-sam31-sectioning-sprinkler-review-adapter-evidence-id');
+    expect(html).toContain('data-sam31-sectioning-sprinkler-review-adapter-save-evidence-id');
+    expect(html).toContain('downloadHalofireSam31SectioningSprinklerReviewAdapter');
+    expect(html).toContain('persistHalofireSam31SectioningSprinklerReviewAdapter');
+    expect(html).toContain('adapter_source');
+    expect(html).toContain('halofire.sam31_sectioning_downstream_resolver_packet.v1');
     expect(html).toContain('no_claims_cleared');
   });
 
