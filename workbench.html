@@ -281,6 +281,42 @@ function renderSam31BridgeSmokeAction(item, action, latest) {
 }
 
 const SAM31_EXTRAPOLATION_ROUTE_SUFFIX = '/openclaw/sam31/extrapolation-artifact';
+const SAM31_1881_MISSING_EVIDENCE_CODES = [
+  'HALOFIRE_1881_ROOM_BOUNDARY_EMPLOYEE_REVIEW_MISSING',
+  'HALOFIRE_1881_PROFESSIONAL_AHJ_APPROVAL_MISSING',
+];
+
+function renderSam31BidTruth(latest) {
+  const truth = latest && latest.bid_truth && typeof latest.bid_truth === 'object' ? latest.bid_truth : null;
+  if (!truth) return '';
+  const refs = Array.isArray(truth.source_refs) ? truth.source_refs : [];
+  return `<div class="muted" style="font-size:11px;margin-top:5px;border:1px solid rgba(77,208,225,.28);border-radius:8px;padding:8px;background:rgba(77,208,225,.05)">SAM31 1881 bid truth<br>project ${escapeHtml(truth.project || latest.project_ref || 'missing')} - head_count ${escapeHtml(truth.head_count ?? 'missing')} - square_feet ${escapeHtml(truth.square_feet ?? 'missing')} - bid_total ${escapeHtml(truth.bid_total ?? 'missing')}<br>Source refs: ${refs.length ? refs.map((ref) => `<span class="chip">${escapeHtml(ref)}</span>`).join('') : '<span class="chip">source refs unavailable</span>'}<br>claim_gate_effect ${escapeHtml(latest.claim_gate_effect || 'no_claims_cleared')} - use_for_claims false</div>`;
+}
+
+function renderSam31MissingEvidenceRows(latest) {
+  const rows = latest && Array.isArray(latest.missing_evidence_rows)
+    ? latest.missing_evidence_rows
+    : (latest && latest.product_review_queue_item && Array.isArray(latest.product_review_queue_item.missing_evidence_rows)
+      ? latest.product_review_queue_item.missing_evidence_rows
+      : []);
+  const normalized = rows.length
+    ? rows
+    : SAM31_1881_MISSING_EVIDENCE_CODES.map((code) => ({
+      code,
+      status: 'missing',
+      next_action: code.endsWith('EMPLOYEE_REVIEW_MISSING')
+        ? 'Halo Fire employee reviews SAM31 boundary/vector/3D candidates and saves acceptance or replacement evidence.'
+        : 'Attach professional/AHJ/AutoSprink evidence before regulated claims.',
+      acceptable_evidence: [],
+      blocked_claims: ['permit_ready', 'AHJ_approval', 'AutoSprink_parity'],
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+  return `<div class="muted" style="font-size:11px;margin-top:5px;border:1px solid rgba(255,213,79,.28);border-radius:8px;padding:8px;background:rgba(255,213,79,.05)">SAM31 missing evidence rows<br>${normalized.map((row) => {
+    const acceptable = Array.isArray(row.acceptable_evidence) ? row.acceptable_evidence : [];
+    const blocked = Array.isArray(row.blocked_claims) ? row.blocked_claims : [];
+    return `<div style="margin-top:5px"><b>${escapeHtml(row.code || 'missing_evidence_row')}</b> - ${escapeHtml(row.status || 'missing')} - ${escapeHtml(row.claim_gate_effect || 'no_claims_cleared')}<br>next_action ${escapeHtml(row.next_action || 'Save acceptable evidence before clearing claims.')}<br>Accepts: ${acceptable.length ? acceptable.map((item) => `<span class="chip">${escapeHtml(item)}</span>`).join('') : '<span class="chip">employee/professional source evidence required</span>'}<br>Blocks: ${blocked.length ? blocked.map((claim) => `<span class="chip">${escapeHtml(claim)}</span>`).join('') : '<span class="chip">claim gates remain blocked</span>'}</div>`;
+  }).join('')}</div>`;
+}
 
 function renderOpenClawSam31ExtrapolationAction(item, action, latest, latestReview) {
   if (!action || typeof action !== 'object') return '';
@@ -324,7 +360,7 @@ function renderOpenClawSam31ExtrapolationAction(item, action, latest, latestRevi
         <div class="muted" id="sam31ExtrapolationReviewStatus-${escapeHtml(evidenceId)}" style="font-size:11px"></div>
       </div>
     </details>` : '';
-  return `<div class="muted" style="font-size:11px;margin-top:5px;border:1px solid rgba(79,70,229,.34);border-radius:8px;padding:8px;background:rgba(79,70,229,.06)">OpenClaw SAM31 LLM extrapolation artifact<br>status ${escapeHtml(action.status || 'unavailable')} - method ${escapeHtml(action.method || 'POST')} - claim_gate_effect ${escapeHtml(action.claim_gate_effect || 'no_claims_cleared')}<br>endpoint ${escapeHtml(endpoint)} - source_evidence_id ${escapeHtml(evidenceId)}<br>${latest ? `Latest extrapolation: evidence #${escapeHtml(latest.evidence_id)} - ${escapeHtml(latest.status || 'best_effort')} - packet ${escapeHtml(latestPacket?.artifact_type || latest.artifact_type || 'openclaw.sam31_llm_extrapolation_artifact')} - sections ${escapeHtml(latest.section_count ?? latestPacket?.segment_count ?? 0)} - hypotheses ${escapeHtml(latest.object_hypothesis_count ?? latestPacket?.object_hypothesis_count ?? 0)} - extrapolation_index ${escapeHtml(latestExtrapolationIndexCount)} - ${escapeHtml(latest.claim_gate_effect || 'no_claims_cleared')}<br>` : ''}${reviewSummary}${queueItemAction}${reviewPacketAction}${productReviewAction ? `Product review: ${escapeHtml(productReviewAction.label || 'Review extrapolated objects, vectors, and 3D candidates')} - ${escapeHtml(productReviewAction.href || 'missing')}<br>` : ''}Blocks still active: ${blocked.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('') || '<span class="chip">claim gates remain blocked</span>'}<br><button class="go" type="button" style="padding:7px 10px;font-size:11px;margin-top:6px;background:#4f46e5" data-sam31-extrapolation-evidence-id="${escapeHtml(evidenceId)}">${escapeHtml(action.label || 'Run OpenClaw SAM31 extrapolation artifact')}</button><div class="muted" id="sam31ExtrapolationStatus-${escapeHtml(evidenceId)}" style="font-size:11px;margin-top:4px"></div>${reviewForm}</div>`;
+  return `<div class="muted" style="font-size:11px;margin-top:5px;border:1px solid rgba(79,70,229,.34);border-radius:8px;padding:8px;background:rgba(79,70,229,.06)">OpenClaw SAM31 LLM extrapolation artifact<br>status ${escapeHtml(action.status || 'unavailable')} - method ${escapeHtml(action.method || 'POST')} - claim_gate_effect ${escapeHtml(action.claim_gate_effect || 'no_claims_cleared')}<br>endpoint ${escapeHtml(endpoint)} - source_evidence_id ${escapeHtml(evidenceId)}<br>${latest ? `Latest extrapolation: evidence #${escapeHtml(latest.evidence_id)} - ${escapeHtml(latest.status || 'best_effort')} - packet ${escapeHtml(latestPacket?.artifact_type || latest.artifact_type || 'openclaw.sam31_llm_extrapolation_artifact')} - sections ${escapeHtml(latest.section_count ?? latestPacket?.segment_count ?? 0)} - hypotheses ${escapeHtml(latest.object_hypothesis_count ?? latestPacket?.object_hypothesis_count ?? 0)} - extrapolation_index ${escapeHtml(latestExtrapolationIndexCount)} - ${escapeHtml(latest.claim_gate_effect || 'no_claims_cleared')}<br>` : ''}${latest ? renderSam31BidTruth(latest) + renderSam31MissingEvidenceRows(latest) : ''}${reviewSummary}${queueItemAction}${reviewPacketAction}${productReviewAction ? `Product review: ${escapeHtml(productReviewAction.label || 'Review extrapolated objects, vectors, and 3D candidates')} - ${escapeHtml(productReviewAction.href || 'missing')}<br>` : ''}Blocks still active: ${blocked.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('') || '<span class="chip">claim gates remain blocked</span>'}<br><button class="go" type="button" style="padding:7px 10px;font-size:11px;margin-top:6px;background:#4f46e5" data-sam31-extrapolation-evidence-id="${escapeHtml(evidenceId)}">${escapeHtml(action.label || 'Run OpenClaw SAM31 extrapolation artifact')}</button><div class="muted" id="sam31ExtrapolationStatus-${escapeHtml(evidenceId)}" style="font-size:11px;margin-top:4px"></div>${reviewForm}</div>`;
 }
 
 function evidenceDetail(row) {
@@ -338,7 +374,7 @@ function evidenceDetail(row) {
         ? artifact.extrapolation_index
         : (Array.isArray(queueItem.extrapolation_index) ? queueItem.extrapolation_index : []);
       const blocked = Array.isArray(packet.blocked_claims) ? packet.blocked_claims : (Array.isArray(artifact.blocked_claims) ? artifact.blocked_claims : []);
-      return `<div class="muted" style="font-size:11px;margin-top:3px">openclaw.sam31_llm_extrapolation_artifact<br>source_evidence_id ${escapeHtml(artifact.source_pdf_boundary_evidence_id || artifact.source_evidence_id || 'missing')} - sections ${escapeHtml(artifact.section_count ?? perception.segment_count ?? 0)} - hypotheses ${escapeHtml(artifact.object_hypothesis_count ?? perception.object_hypothesis_count ?? 0)} - extrapolation_index ${escapeHtml(extrapolationIndex.length)} - source_ref ${escapeHtml(row.source_ref || artifact.openclaw_endpoint || 'missing')}<br>product_review_action ${escapeHtml(artifact.product_review_action?.label || 'Review extrapolated objects, vectors, and 3D candidates')} - product_review_queue_item ${escapeHtml(queueItem.artifact_type || 'openclaw.sam31.product_review_queue_item.v1')} - use_for_claims ${escapeHtml(queueItem.use_for_claims === true ? 'true' : 'false')} - claim_gate_effect ${escapeHtml(packet.claim_gate_effect || artifact.claim_gate_effect || queueItem.claim_gate_effect || 'no_claims_cleared')}<br>Blocks still active: ${blocked.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('')}</div>`;
+      return `<div class="muted" style="font-size:11px;margin-top:3px">openclaw.sam31_llm_extrapolation_artifact<br>source_evidence_id ${escapeHtml(artifact.source_pdf_boundary_evidence_id || artifact.source_evidence_id || 'missing')} - sections ${escapeHtml(artifact.section_count ?? perception.segment_count ?? 0)} - hypotheses ${escapeHtml(artifact.object_hypothesis_count ?? perception.object_hypothesis_count ?? 0)} - extrapolation_index ${escapeHtml(extrapolationIndex.length)} - source_ref ${escapeHtml(row.source_ref || artifact.openclaw_endpoint || 'missing')}<br>product_review_action ${escapeHtml(artifact.product_review_action?.label || 'Review extrapolated objects, vectors, and 3D candidates')} - product_review_queue_item ${escapeHtml(queueItem.artifact_type || 'openclaw.sam31.product_review_queue_item.v1')} - use_for_claims ${escapeHtml(queueItem.use_for_claims === true ? 'true' : 'false')} - claim_gate_effect ${escapeHtml(packet.claim_gate_effect || artifact.claim_gate_effect || queueItem.claim_gate_effect || 'no_claims_cleared')}<br>${renderSam31BidTruth(artifact)}${renderSam31MissingEvidenceRows(artifact)}Blocks still active: ${blocked.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('')}</div>`;
     } catch {
       return '<div class="muted" style="font-size:11px;margin-top:3px">OpenClaw SAM31 extrapolation artifact; detail unavailable</div>';
     }

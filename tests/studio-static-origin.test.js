@@ -232,6 +232,12 @@ describe('studio static origin handling', () => {
     expect(html).toContain('data-sam31-product-review-queue-item-evidence-id');
     expect(html).toContain('openclaw.sam31.product_review_queue_item.v1 - extrapolation_index');
     expect(html).toContain('extrapolation_index_count');
+    expect(html).toContain('SAM31 1881 bid truth');
+    expect(html).toContain('head_count');
+    expect(html).toContain('bid_total');
+    expect(html).toContain('SAM31 missing evidence rows');
+    expect(html).toContain('HALOFIRE_1881_ROOM_BOUNDARY_EMPLOYEE_REVIEW_MISSING');
+    expect(html).toContain('HALOFIRE_1881_PROFESSIONAL_AHJ_APPROVAL_MISSING');
   });
 
   it('lets the workbench save employee room-boundary review decisions', async () => {
