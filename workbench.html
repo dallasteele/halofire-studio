@@ -153,6 +153,7 @@ document.getElementById('logout').onclick = () => { localStorage.removeItem('hal
 const usd = (n) => '$' + Number(n).toLocaleString('en-US', { maximumFractionDigits: 0 });
 let resolverQueueFilterQuery = '';
 let sam31ActualValueQueueRows = [];
+let sam31ActualValueQueueConsumerFilter = '';
 const SAM31_ACTUAL_VALUE_GLOBAL_READBACK_ROUTE = '/api/openclaw/sam31/actual-value-resolver-queue?projectName=';
 function currentProjectName() {
   return document.getElementById('projectTarget') ? document.getElementById('projectTarget').value : HOME_DEPOT;
@@ -973,6 +974,20 @@ function sam31ActualValueQueueEvidencePayload(row) {
   };
 }
 
+function renderSam31ActualValueReplacementDetail(row) {
+  const evidence = row && row.latest_actual_value_replacement_evidence && typeof row.latest_actual_value_replacement_evidence === 'object'
+    ? row.latest_actual_value_replacement_evidence
+    : null;
+  if (!evidence) {
+    return `<div class="claims">actual-value evidence missing - evidence_status missing - source_ref missing - no_claim_gates_cleared true</div>`;
+  }
+  const evidenceStatus = evidence.status || evidence.evidence_status || 'actual_value_evidence_recorded';
+  const sourceRef = evidence.source_ref || evidence.replacement_values_source_ref || evidence.source_file || 'missing';
+  const replacementSourceRef = evidence.replacement_values_source_ref || evidence.source_ref || 'missing';
+  const claimGateEffect = evidence.claim_gate_effect || 'no_claims_cleared';
+  return `<div class="claims">actual-value evidence #${escapeHtml(evidence.id || evidence.evidence_id || 'recorded')} - evidence_status ${escapeHtml(evidenceStatus)} - source_ref ${escapeHtml(sourceRef)} - replacement_values_source_ref ${escapeHtml(replacementSourceRef)} - claim_gate_effect ${escapeHtml(claimGateEffect)} - no_claim_gates_cleared ${escapeHtml(evidence.no_claim_gates_cleared === false ? 'false' : 'true')}</div>`;
+}
+
 function renderSam31ActualValueQueueSummary(readback) {
   const queue = readback && readback.queue && typeof readback.queue === 'object' ? readback.queue : readback;
   if (!queue || typeof queue !== 'object') return '';
@@ -985,13 +1000,16 @@ function renderSam31ActualValueQueueSummary(readback) {
       action: 'poll_actual_value_resolver_queue',
       href: `${SAM31_ACTUAL_VALUE_GLOBAL_READBACK_ROUTE}${encodeURIComponent(currentProjectName())}&consumer=${encodeURIComponent(consumer)}`,
     };
-    return `<span class="chip">${escapeHtml(consumer)} ${escapeHtml(endpoint.action || 'poll_actual_value_resolver_queue')}</span>`;
+    const endpointHref = endpoint.href || `${SAM31_ACTUAL_VALUE_GLOBAL_READBACK_ROUTE}${encodeURIComponent(currentProjectName())}&consumer=${encodeURIComponent(consumer)}`;
+    const active = sam31ActualValueQueueConsumerFilter === consumer ? ' active' : '';
+    return `<button class="go" type="button" style="padding:5px 8px;font-size:10px;margin:2px;background:#0f766e" data-sam31-actual-value-consumer-filter="${escapeHtml(consumer)}" data-sam31-actual-value-consumer-href="${escapeHtml(endpointHref)}">${escapeHtml(consumer)} ${escapeHtml(endpoint.action || 'poll_actual_value_resolver_queue')}${active}</button>`;
   }).join('');
   return `<div id="sam31ActualValueQueueSummary" class="gate warning">
     <div class="code">openclaw.sam31.actual_value_resolver_queue.v1 Â· ${escapeHtml(queue.status || 'actual_value_replacements_pending')}</div>
     <div class="na">global_readback ${escapeHtml(SAM31_ACTUAL_VALUE_GLOBAL_READBACK_ROUTE)} Â· source_project_route ${escapeHtml(readback?.source_project_route || '/api/projects/{projectName}/openclaw/sam31/actual-value-resolver-queue')}</div>
     <div class="claims">item_count ${escapeHtml(queue.item_count ?? 0)} Â· pending_count ${escapeHtml(queue.pending_count ?? 0)} Â· recorded_count ${escapeHtml(queue.recorded_count ?? 0)} Â· use_for_claims false Â· claim_gate_effect no_claims_cleared</div>
-    <div class="claims">Consumer pull: ${endpointRows}</div>
+    <div class="claims">Consumer pull: ${endpointRows} <button class="go" type="button" style="padding:5px 8px;font-size:10px;margin:2px;background:#52525b" data-sam31-actual-value-clear-filter="true">all consumers</button></div>
+    <div class="claims">Supported filter keys: consumer=halo_fire consumer=landscout consumer=nameforge</div>
     <div class="claims">SAM31+LLM sectioning/object/vector/3D outputs are temporary values until replaced with actual evidence.</div>
   </div>`;
 }
@@ -1008,6 +1026,7 @@ function renderSam31ActualValueQueueItem(row, index) {
     <div class="claims">replacement_summary: <span class="chip">semantic_label_count ${escapeHtml(summary.semantic_label_count || 0)}</span><span class="chip">object_hypothesis_count ${escapeHtml(summary.object_hypothesis_count || 0)}</span><span class="chip">vector_overlay_count ${escapeHtml(summary.vector_overlay_count || 0)}</span><span class="chip">model_3d_candidate_count ${escapeHtml(summary.model_3d_candidate_count || 0)}</span></div>
     <div class="claims">employee_actual_value_next_action: ${escapeHtml(row.employee_actual_value_next_action || 'Replace SAM31 best guesses with actual HaloFire documentation values before bid/export use.')}</div>
     <div class="claims">acceptable_actual_evidence: ${acceptable.map((item) => `<span class="chip">${escapeHtml(item)}</span>`).join('') || '<span class="chip">actual evidence missing</span>'}</div>
+    ${renderSam31ActualValueReplacementDetail(row)}
     <div class="claims">Blocks: ${blocked.map((claim) => `<span class="chip">${escapeHtml(claim)}</span>`).join('') || '<span class="chip">claim gates remain blocked</span>'}</div>
     <div class="claims">evidence_record_type ${escapeHtml(row.evidence_record_type || 'sam31_actual_value_replacement')} · use_for_claims false · claim_gate_effect no_claims_cleared</div>
     <p style="margin-top:8px"><button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#92400e" data-sam31-actual-value-queue-download-index="${escapeHtml(index)}" ${row.download_href ? '' : 'disabled'}>Download actual-value packet</button> <button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#b45309" data-sam31-actual-value-queue-record-index="${escapeHtml(index)}">Record actual-value evidence</button></p>
@@ -1051,9 +1070,15 @@ async function recordSam31ActualValueQueueEvidence(index) {
   await refreshSam31ActualValueQueue();
 }
 
+async function filterSam31ActualValueQueueByConsumer(consumer = '') {
+  sam31ActualValueQueueConsumerFilter = String(consumer || '').trim();
+  await refreshSam31ActualValueQueue();
+}
+
 async function refreshSam31ActualValueQueue() {
   const target = document.getElementById('sam31ActualValueQueue');
-  const readback = await api('/openclaw/sam31/actual-value-resolver-queue?projectName=' + encodeURIComponent(currentProjectName()));
+  const consumerParam = sam31ActualValueQueueConsumerFilter ? '&consumer=' + encodeURIComponent(sam31ActualValueQueueConsumerFilter) : '';
+  const readback = await api('/openclaw/sam31/actual-value-resolver-queue?projectName=' + encodeURIComponent(currentProjectName()) + consumerParam);
   const queue = readback.queue && typeof readback.queue === 'object' ? readback.queue : readback;
   const index = queue;
   const rows = Array.isArray(queue.items) ? queue.items : [];
@@ -1067,6 +1092,12 @@ async function refreshSam31ActualValueQueue() {
   });
   document.querySelectorAll('[data-sam31-actual-value-queue-record-index]').forEach((button) => {
     button.onclick = () => recordSam31ActualValueQueueEvidence(button.dataset.sam31ActualValueQueueRecordIndex);
+  });
+  document.querySelectorAll('[data-sam31-actual-value-consumer-filter]').forEach((button) => {
+    button.onclick = () => filterSam31ActualValueQueueByConsumer(button.dataset.sam31ActualValueConsumerFilter);
+  });
+  document.querySelectorAll('[data-sam31-actual-value-clear-filter]').forEach((button) => {
+    button.onclick = () => filterSam31ActualValueQueueByConsumer('');
   });
 }
 
@@ -2939,6 +2970,7 @@ let lastBody = { markupPct: 25 };
 document.getElementById('projectTarget').onchange = () => {
   lastBody = { markupPct: 25 };
   lastSuppliedBidTruthDownstreamDefaults = null;
+  sam31ActualValueQueueConsumerFilter = '';
   document.getElementById('bidSummary').innerHTML = '';
   document.getElementById('bomCard').style.display = 'none';
   load();
