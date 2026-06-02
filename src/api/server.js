@@ -5967,6 +5967,42 @@ function suppliedDocumentBidTruthDownstreamDefaults(projectName) {
   };
 }
 
+function suppliedDocumentBidTruthDownstreamDefaultsPacket(projectName) {
+  const defaults = suppliedDocumentBidTruthDownstreamDefaults(projectName);
+  if (!defaults) {
+    const e = new Error('No supplied_document_bid_truth_replacement evidence is available for downstream defaults');
+    e.httpStatus = 409;
+    throw e;
+  }
+  return {
+    ...defaults,
+    artifact_type: 'halofire.supplied_document_bid_truth_downstream_defaults_packet.v1',
+    artifact_type_source: defaults.artifact_type,
+    status: defaults.status,
+    project_name: projectName,
+    generated_at: new Date().toISOString(),
+    download_name: `${slugForDownloadName(projectName)}-supplied-bid-truth-downstream-defaults.json`,
+    source_supplied_document_bid_truth_replacement_evidence_id: defaults.source_replacement_evidence_id,
+    downstream_application: {
+      endpoint: `/api/projects/${encodeURIComponent(projectName)}/sprinkler-bid`,
+      applies_to: 'built_in_internal_alpha_floorplan_defaults',
+      geometry_policy: 'scale_placeholder_footprint_area_only',
+      head_count_policy: 'metadata_only_not_forced_into_layout_engine',
+      temporary_value_policy: defaults.temporary_value_policy,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    },
+    use_for_claims: false,
+    no_claim_gates_cleared: true,
+    claim_gate_effect: 'no_claims_cleared',
+    limitations: [
+      ...(Array.isArray(defaults.limitations) ? defaults.limitations : []),
+      'This packet is a downloadable resolver artifact for workbench replay/provenance only.',
+      'Downloading or applying this packet does not clear regulated claims.',
+    ],
+  };
+}
+
 function scaleFloorPlanAreaForSuppliedBidTruth(floorPlan, suppliedDocumentBidTruth) {
   const targetSqFt = Number(suppliedDocumentBidTruth?.project_truth?.square_feet);
   if (!(targetSqFt > 0) || !floorPlan?.rooms?.length) return floorPlan;
@@ -10225,6 +10261,14 @@ app.post('/api/projects/:name/resolver-packets/catalog-source/:familyRef/approva
 app.get('/api/projects/:name/resolver-packets/supplied-document-bid-truth/review-packet', authMiddleware, (req, res) => {
   try {
     return res.json(suppliedDocumentBidTruthReviewPacket(req.params.name));
+  } catch (err) {
+    return res.status(err.httpStatus || 400).json({ error: err.message });
+  }
+});
+
+app.get('/api/projects/:name/resolver-packets/supplied-document-bid-truth/downstream-defaults-packet', authMiddleware, (req, res) => {
+  try {
+    return res.json(suppliedDocumentBidTruthDownstreamDefaultsPacket(req.params.name));
   } catch (err) {
     return res.status(err.httpStatus || 400).json({ error: err.message });
   }

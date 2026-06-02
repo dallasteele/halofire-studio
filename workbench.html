@@ -1441,20 +1441,13 @@ function renderSuppliedBidTruthDownstreamDefaults(defaults, bid, floorPlan) {
   </div>`;
 }
 
-function downloadSuppliedBidTruthDownstreamDefaults() {
+async function downloadSuppliedBidTruthDownstreamDefaults() {
   if (!lastSuppliedBidTruthDownstreamDefaults) return;
-  const packet = {
-    ...lastSuppliedBidTruthDownstreamDefaults,
-    source_supplied_document_bid_truth_replacement_evidence_id: lastSuppliedBidTruthDownstreamDefaults.source_replacement_evidence_id || null,
-    downloaded_from: 'halofire-workbench-sprinkler-bid-result',
-    use_for_claims: false,
-    no_claim_gates_cleared: true,
-    claim_gate_effect: 'no_claims_cleared',
-  };
+  const packet = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/resolver-packets/supplied-document-bid-truth/downstream-defaults-packet');
   const blob = new Blob([JSON.stringify(packet, null, 2)], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `${currentProjectName().replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '').toLowerCase()}-supplied-bid-truth-downstream-defaults.json`;
+  a.download = packet.download_name || `${currentProjectName().replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '').toLowerCase()}-supplied-bid-truth-downstream-defaults.json`;
   a.click();
   URL.revokeObjectURL(a.href);
 }

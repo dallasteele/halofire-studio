@@ -937,6 +937,74 @@ describe('S5 GET /api/auto-source/status', () => {
     expect(layoutRow.notes).toContain('no_claims_cleared');
   });
 
+  it('downloads supplied document bid-truth downstream defaults packet after employee replacement', async () => {
+    const projectName = 'The Cooperative 1881 - Salt Lake City UT';
+    const replacementRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-packets/supplied-document-bid-truth/replacements`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        reviewer_name: 'HaloFire estimator',
+        review_decision: 'replaced_temporary_values',
+        replacement_ref: '1881://employee-bid-truth/downstream-packet-001',
+        source_file: 'employee-bid-truth-downstream-packet.json',
+        source_refs: [
+          'employee://bid-truth/downstream-packet-001',
+          'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G6',
+        ],
+        replacement_values: {
+          square_feet: 88000,
+          head_count: 733,
+          total_man_hours: 1775.5,
+          construction_days: 41,
+          flow_data_available: false,
+        },
+        notes: 'Download packet test for employee downstream defaults.',
+      }),
+    });
+    expect(replacementRes.status).toBe(201);
+    const replacement = await replacementRes.json();
+
+    const packetRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-packets/supplied-document-bid-truth/downstream-defaults-packet`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(packetRes.status).toBe(200);
+    const packet = await packetRes.json();
+
+    expect(packet).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.supplied_document_bid_truth_downstream_defaults_packet.v1',
+      status: 'employee_replacement_applied',
+      download_name: 'the-cooperative-1881-salt-lake-city-ut-supplied-bid-truth-downstream-defaults.json',
+      source_evidence_type: 'supplied_document_bid_truth_replacement',
+      source_replacement_evidence_id: replacement.evidence.id,
+      source_supplied_document_bid_truth_replacement_evidence_id: replacement.evidence.id,
+      replacement_ref: '1881://employee-bid-truth/downstream-packet-001',
+      use_for_claims: false,
+      no_claim_gates_cleared: true,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(packet.project_truth).toEqual(expect.objectContaining({
+      square_feet: 88000,
+      head_count: 733,
+      total_man_hours: 1775.5,
+      construction_days: 41,
+      source_status: 'employee_replacement_recorded',
+    }));
+    expect(packet.downstream_application).toEqual(expect.objectContaining({
+      endpoint: `/api/projects/${encodeURIComponent(projectName)}/sprinkler-bid`,
+      applies_to: 'built_in_internal_alpha_floorplan_defaults',
+      geometry_policy: 'scale_placeholder_footprint_area_only',
+      head_count_policy: 'metadata_only_not_forced_into_layout_engine',
+    }));
+    expect(packet.blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'AHJ_approval',
+      'AutoSprink_parity',
+      'engineering_grade',
+      'fabrication_ready',
+      'manufacturer_exact',
+    ]));
+  });
+
   it('records official-flow intake evidence and updates the resolver queue without clearing claims', async () => {
     const projectName = 'The Cooperative 1881 - Salt Lake City UT';
     const createRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-packets/official-flow/intake`, {
