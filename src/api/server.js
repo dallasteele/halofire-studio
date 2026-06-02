@@ -6321,7 +6321,6 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
     latest_openclaw_sam31_extrapolation_review: latestOpenClawSam31ExtrapolationReview,
     latest_openclaw_sam31_sectioning_pipeline_contract_review: latestOpenClawSam31SectioningPipelineContractReview,
     latest_halofire_sam31_sectioning_downstream_resolver_packet: latestHalofireSam31SectioningDownstreamResolverPacket,
-    latest_halofire_sam31_sectioning_downstream_resolver_packet: latestHalofireSam31SectioningDownstreamResolverPacket,
     latest_openclaw_sam31_vector_model_artifact: latestOpenClawSam31VectorModelArtifact,
     latest_openclaw_sam31_consumer_smoke_artifact: latestOpenClawSam31ConsumerSmokeArtifact,
     latest_openclaw_sam31_consumer_reviews: latestOpenClawSam31ConsumerReviews,
@@ -9991,56 +9990,6 @@ app.post('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/openclaw
       message: 'HaloFire SAM31 sectioning downstream resolver packet saved as best-effort evidence; claims still blocked',
       evidence: evidenceRow,
       ...artifact,
-    });
-  } catch (err) {
-    return res.status(err.httpStatus || 400).json({ error: err.message });
-  }
-});
-
-app.post('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/openclaw/sam31/sectioning-downstream-resolvers', authMiddleware, requireRole('admin'), (req, res) => {
-  try {
-    const projectName = req.params.name;
-    const evidenceId = Number(req.params.evidenceId);
-    if (!Number.isSafeInteger(evidenceId) || evidenceId <= 0) {
-      return res.status(400).json({ error: 'A positive evidence id is required' });
-    }
-    const evidence = db
-      .prepare(`SELECT * FROM project_evidence
-                WHERE id = ? AND project_name = ? AND evidence_type = 'pdf_boundary_decision'`)
-      .get(evidenceId, projectName);
-    const decision = decisionFromEvidence(evidence);
-    if (!evidence || !decision) {
-      return res.status(404).json({ error: 'PDF boundary decision evidence not found' });
-    }
-    const reviewEvidence = latestOpenClawSam31SectioningPipelineContractReviewEvidence(projectName, evidence.id);
-    const packet = buildHalofireSam31SectioningDownstreamResolverPacket(projectName, evidence, decision, reviewEvidence);
-    const notes = {
-      kind: 'halofire_sam31_sectioning_downstream_resolver_packet',
-      packet,
-      source_pdf_boundary_evidence_id: evidence.id,
-      source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id: reviewEvidence.evidence.id,
-      source_openclaw_sam31_extrapolation_evidence_id: packet.source_openclaw_sam31_extrapolation_evidence_id,
-      blocked_claims: packet.blocked_claims,
-      claim_gate_effect: packet.claim_gate_effect,
-      limitations: packet.limitations,
-    };
-    const result = db
-      .prepare(`INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
-                VALUES (?, ?, ?, ?, ?, ?)`)
-      .run(
-        projectName,
-        'halofire_sam31_sectioning_downstream_resolver_packet',
-        evidence.source_file || decision.sourceFile || null,
-        `pdf-boundary:${evidence.id}:sam31-sectioning-downstream-resolvers:${reviewEvidence.evidence.id}`,
-        'best_effort',
-        JSON.stringify(notes),
-      );
-    const evidenceRow = db.prepare('SELECT * FROM project_evidence WHERE id = ?').get(result.lastInsertRowid);
-    return res.status(201).json({
-      id: result.lastInsertRowid,
-      message: 'HaloFire SAM31 sectioning downstream resolver packet saved as best-effort evidence; claims still blocked',
-      evidence: evidenceRow,
-      ...packet,
     });
   } catch (err) {
     return res.status(err.httpStatus || 400).json({ error: err.message });
