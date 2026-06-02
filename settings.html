@@ -134,7 +134,7 @@
   </div>
 
   <div class="card wide">
-    <h2>Attach catalog part (admin)</h2>
+    <h2 id="attachCatalogPart">Attach catalog part (admin)</h2>
     <p class="muted" style="margin-bottom:8px">
       Attach a real catalog model to one component so the demo renders the ACTUAL part instead of the generated shape.
       Web-mesh formats (<code>stl</code>/<code>glb</code>/<code>gltf</code>/<code>obj</code>) render the actual component;
@@ -430,6 +430,23 @@ function syncAttMode() {
 }
 $('attMode').addEventListener('change', syncAttMode);
 syncAttMode();
+
+function prefillCatalogPartFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const component = params.get('component');
+  const catalogUrl = params.get('catalogUrl');
+  if (component) $('attKey').value = component;
+  if (catalogUrl) {
+    $('attMode').value = 'link';
+    $('attRef').value = catalogUrl;
+    syncAttMode();
+  }
+  if (component || catalogUrl) {
+    $('attNotes').value = 'sourceAcquisitionLedger handoff; evidence upload/link only, no claim gates cleared';
+    $('attachCatalogPart').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+}
+prefillCatalogPartFromUrl();
 
 $('attSubmit').onclick = async () => {
   const msg = $('attMsg'); msg.className = 'muted'; msg.textContent = '';

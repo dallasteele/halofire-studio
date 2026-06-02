@@ -133,6 +133,34 @@ describe('studio static origin handling', () => {
     expect(html).toContain('room_boundary_visual_audit');
   });
 
+  it('surfaces catalog source-acquisition ledger rows in the workbench with settings handoff actions', async () => {
+    const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
+    expect(shell.status).toBe(200);
+    const html = await shell.text();
+    expect(html).toContain('id="catalogSourceAcquisition"');
+    expect(html).toContain('/auto-source/status');
+    expect(html).toContain('refreshCatalogSourceAcquisition');
+    expect(html).toContain('sourceAcquisitionLedger');
+    expect(html).toContain('openCatalogEvidenceAction');
+    expect(html).toContain('family:pipe_steel_sch40_2p0in');
+    expect(html).toContain('family:fitting_tee_2p0in');
+    expect(html).toContain('family:valve_check_2p5in');
+    expect(html).toContain('claim_gate_effect');
+    expect(html).toContain('manufacturer_exact');
+    expect(html).toContain('Attach catalog evidence');
+  });
+
+  it('lets Settings receive a catalog source-acquisition handoff for part override evidence', async () => {
+    const shell = await fetch(`${BASE}/settings.html`, { headers: { Origin: BASE } });
+    expect(shell.status).toBe(200);
+    const html = await shell.text();
+    expect(html).toContain('id="attachCatalogPart"');
+    expect(html).toContain('prefillCatalogPartFromUrl');
+    expect(html).toContain('URLSearchParams');
+    expect(html).toContain('component');
+    expect(html).toContain('catalogUrl');
+  });
+
   it('lets the workbench download room-boundary review packets from resolver rows', async () => {
     const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
     expect(shell.status).toBe(200);
