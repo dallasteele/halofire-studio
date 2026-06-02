@@ -394,6 +394,78 @@ describe('PDF page inspection API', () => {
       expect.objectContaining({ semantic_label: 'sleeve_or_penetration_candidate' }),
       expect.objectContaining({ semantic_label: 'sprinkler_obstruction_candidate' }),
     ]));
+    expect(samPacket.openclaw_sam31_perception_request.extrapolation_contract).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31_extrapolation_contract',
+      status: 'best_effort_extrapolation_ready',
+      source_runtime: 'sam-3.1+llm',
+      consumes: ['segments', 'object_hypotheses'],
+      produces: ['llm_observations', 'vector_overlays', 'model_3d_candidates'],
+      supported_applications: ['halo_fire', 'landscout', 'nameforge'],
+      temporary_value_policy: expect.stringContaining('editable best guesses'),
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(Object.keys(samPacket.openclaw_sam31_perception_request.application_contracts)).toEqual([
+      'halo_fire',
+      'landscout',
+      'nameforge',
+    ]);
+    expect(samPacket.openclaw_sam31_perception_request.application_contracts.halo_fire).toEqual(expect.objectContaining({
+      contract_ref: 'openclaw.sam31.application_contract.halo_fire.v1',
+      temporary_value_policy: 'best_guess_until_employee_replaced',
+      acceptable_human_updates: [
+        'semantic_label',
+        'polygon',
+        'bbox',
+        'object_hypothesis',
+        'vector_overlay',
+        'model_3d_candidate',
+        'source_ref',
+        'confidence',
+      ],
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(samPacket.openclaw_sam31_perception_request.application_contracts.landscout.blocked_claims).toEqual(expect.arrayContaining([
+      'survey_grade',
+      'CEO_ready',
+      'production_ready',
+    ]));
+    expect(samPacket.openclaw_sam31_perception_request.application_contracts.nameforge.blocked_claims).toEqual(expect.arrayContaining([
+      'brand_ready',
+      'trademark_ready',
+      'production_ready',
+    ]));
+    expect(samPacket.openclaw_sam31_perception_request.application_adapter).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.application_adapter.halo_fire.v1',
+      application: 'halo_fire',
+      contract_ref: 'openclaw.sam31.application_contract.halo_fire.v1',
+      status: 'best_effort_adapter_ready',
+      next_action: expect.stringContaining('Queue HaloFire room-boundary or sleeve/firestop review'),
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(samPacket.openclaw_sam31_perception_request.vector_overlays[0]).toEqual(expect.objectContaining({
+      id: 'vector:candidate:pdf-boundary',
+      segment_id: 'candidate:pdf-boundary',
+      kind: 'polygon_path',
+      svg_path: expect.stringMatching(/^M /),
+      source: 'generated_best_effort_from_segment_polygon',
+    }));
+    expect(samPacket.openclaw_sam31_perception_request.model_3d_candidates[0]).toEqual(expect.objectContaining({
+      id: 'model3d:candidate:pdf-boundary',
+      segment_id: 'candidate:pdf-boundary',
+      primitive: 'extruded_polygon',
+      source: 'generated_best_effort_from_segment_polygon',
+    }));
+    expect(samPacket.openclaw_sam31_perception_request.perception_summary).toEqual(expect.objectContaining({
+      extrapolation_contract_ref: 'openclaw.sam31_extrapolation_contract',
+      active_application_contract_ref: 'openclaw.sam31.application_contract.halo_fire.v1',
+      application_adapter_ref: 'openclaw.sam31.application_adapter.halo_fire.v1',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(samPacket.openclaw_sam31_perception_request.perception_summary.application_contract_refs).toEqual([
+      'openclaw.sam31.application_contract.halo_fire.v1',
+      'openclaw.sam31.application_contract.landscout.v1',
+      'openclaw.sam31.application_contract.nameforge.v1',
+    ]);
     expect(samPacket.bridge).toEqual(expect.objectContaining({
       openclaw_bridge_url_configured: false,
       local_bridge_command: 'npm run sam31:bridge',

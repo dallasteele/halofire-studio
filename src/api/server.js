@@ -1195,6 +1195,14 @@ const SAM31_PERCEPTION_LANES = Object.freeze([
   'spatial_observation',
 ]);
 
+const SAM31_SUPPORTED_APPLICATIONS = Object.freeze(['halo_fire', 'landscout', 'nameforge']);
+
+const SAM31_BLOCKED_CLAIMS = Object.freeze(uniqueStrings([
+  ...PDF_BOUNDARY_BLOCKED_CLAIMS,
+  'engineering_grade',
+  'survey_grade',
+]));
+
 const SAM31_EMPLOYEE_REPLACEMENT_FIELDS = Object.freeze([
   'semantic_label',
   'polygon',
@@ -1205,6 +1213,61 @@ const SAM31_EMPLOYEE_REPLACEMENT_FIELDS = Object.freeze([
   'source_ref',
   'confidence',
 ]);
+
+const SAM31_EXTRAPOLATION_CONTRACT_REF = 'openclaw.sam31_extrapolation_contract';
+
+const SAM31_EXTRAPOLATION_CONTRACT = Object.freeze({
+  artifact_type: SAM31_EXTRAPOLATION_CONTRACT_REF,
+  status: 'best_effort_extrapolation_ready',
+  source_runtime: 'sam-3.1+llm',
+  consumes: ['segments', 'object_hypotheses'],
+  produces: ['llm_observations', 'vector_overlays', 'model_3d_candidates'],
+  supported_applications: [...SAM31_SUPPORTED_APPLICATIONS],
+  temporary_value_policy: 'Generated object labels, vector overlays, and 3D candidates are editable best guesses until HaloFire employees or owning product reviewers replace them with actual values.',
+  claim_gate_effect: 'no_claims_cleared',
+});
+
+const SAM31_APPLICATION_CONTRACTS = Object.freeze({
+  halo_fire: {
+    contract_ref: 'openclaw.sam31.application_contract.halo_fire.v1',
+    supported_evidence_lanes: [
+      'room_boundary_visual_audit',
+      'sleeve_or_firestop_candidate_review',
+      'obstruction_or_clash_review',
+      'vector_overlay_generation',
+      'model_3d_candidate_generation',
+    ],
+    blocked_claims: [...SAM31_BLOCKED_CLAIMS],
+  },
+  landscout: {
+    contract_ref: 'openclaw.sam31.application_contract.landscout.v1',
+    supported_evidence_lanes: [
+      'parcel_or_site_boundary_review',
+      'map_marker_visual_audit',
+      'roof_or_driveway_visual_review',
+      'vector_overlay_generation',
+      'model_3d_candidate_generation',
+    ],
+    blocked_claims: uniqueStrings([...SAM31_BLOCKED_CLAIMS, 'CEO_ready', 'production_ready']),
+  },
+  nameforge: {
+    contract_ref: 'openclaw.sam31.application_contract.nameforge.v1',
+    supported_evidence_lanes: [
+      'logo_or_sign_vector_draft',
+      'storefront_or_site_visual_review',
+      'object_identification_review',
+      'vector_overlay_generation',
+      'model_3d_candidate_generation',
+    ],
+    blocked_claims: uniqueStrings([...SAM31_BLOCKED_CLAIMS, 'brand_ready', 'trademark_ready', 'production_ready']),
+  },
+});
+
+const SAM31_APPLICATION_NEXT_ACTIONS = Object.freeze({
+  halo_fire: 'Queue HaloFire room-boundary or sleeve/firestop review with SAM31 vector/3D best guesses; keep permit, AHJ, AutoSprink, fabrication, and manufacturer claims blocked.',
+  landscout: 'Queue LandScout visual review with SAM31 vector/3D best guesses; keep CEO-ready and survey claims blocked.',
+  nameforge: 'Queue NameForge creative review with SAM31 vector/3D best guesses; keep brand, trademark, and production claims blocked.',
+});
 
 function uniqueStrings(values) {
   return [...new Set((values || []).map((v) => String(v || '').trim()).filter(Boolean))];
@@ -1436,7 +1499,122 @@ function bboxToPolygon(bbox) {
   return null;
 }
 
+function roundSam31Confidence(value, multiplier = 1) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return 0;
+  return Math.round(Math.max(0, Math.min(1, n * multiplier)) * 100) / 100;
+}
+
+function polygonToSvgPath(polygon) {
+  if (!Array.isArray(polygon) || !polygon.length) return '';
+  const points = polygon
+    .map((point) => Array.isArray(point) && point.length >= 2 ? [Number(point[0]), Number(point[1])] : null)
+    .filter((point) => point && point.every(Number.isFinite));
+  if (!points.length) return '';
+  const [first, ...rest] = points;
+  return [
+    `M ${first[0]} ${first[1]}`,
+    ...rest.map((point) => `L ${point[0]} ${point[1]}`),
+    'Z',
+  ].join(' ');
+}
+
+function sam31GeneratedVectorOverlays(segments, supplied = []) {
+  if (Array.isArray(supplied) && supplied.length) return jsonClone(supplied);
+  return (Array.isArray(segments) ? segments : [])
+    .filter((segment) => Array.isArray(segment.polygon) && segment.polygon.length)
+    .map((segment) => ({
+      id: `vector:${segment.id}`,
+      segment_id: segment.id,
+      kind: 'polygon_path',
+      svg_path: polygonToSvgPath(segment.polygon),
+      confidence: roundSam31Confidence(segment.confidence, 0.8),
+      source: 'generated_best_effort_from_segment_polygon',
+    }));
+}
+
+function sam31GeneratedModel3dCandidates(segments, supplied = []) {
+  if (Array.isArray(supplied) && supplied.length) return jsonClone(supplied);
+  return (Array.isArray(segments) ? segments : [])
+    .filter((segment) => Array.isArray(segment.polygon) && segment.polygon.length)
+    .map((segment) => ({
+      id: `model3d:${segment.id}`,
+      segment_id: segment.id,
+      primitive: 'extruded_polygon',
+      height_ft: 10,
+      confidence: roundSam31Confidence(segment.confidence, 0.5),
+      source: 'generated_best_effort_from_segment_polygon',
+      limitations: [
+        'Generated from 2D SAM polygon only; not a surveyed, engineered, or manufacturer-approved 3D model.',
+      ],
+    }));
+}
+
+function sam31ApplicationContracts() {
+  const contracts = {};
+  for (const application of SAM31_SUPPORTED_APPLICATIONS) {
+    const contract = SAM31_APPLICATION_CONTRACTS[application];
+    contracts[application] = {
+      application,
+      contract_ref: contract.contract_ref,
+      supported_evidence_lanes: [...contract.supported_evidence_lanes],
+      temporary_value_policy: 'best_guess_until_employee_replaced',
+      acceptable_human_updates: [...SAM31_EMPLOYEE_REPLACEMENT_FIELDS],
+      blocked_claims: [...contract.blocked_claims],
+      claim_gate_effect: 'no_claims_cleared',
+    };
+  }
+  return contracts;
+}
+
+function sam31ApplicationAdapter(application, projectRef, sourceRef, contracts = sam31ApplicationContracts()) {
+  const contract = contracts[application] || contracts.halo_fire;
+  const normalizedApplication = contract.application || application || 'halo_fire';
+  return {
+    artifact_type: `openclaw.sam31.application_adapter.${normalizedApplication}.v1`,
+    application: normalizedApplication,
+    project_ref: projectRef,
+    source_ref: sourceRef || null,
+    contract_ref: contract.contract_ref,
+    status: 'best_effort_adapter_ready',
+    source_runtime: 'sam-3.1+llm',
+    temporary_value_policy: contract.temporary_value_policy,
+    acceptable_human_updates: [...contract.acceptable_human_updates],
+    supported_evidence_lanes: [...contract.supported_evidence_lanes],
+    blocked_claims: [...contract.blocked_claims],
+    claim_gate_effect: 'no_claims_cleared',
+    next_action: SAM31_APPLICATION_NEXT_ACTIONS[normalizedApplication],
+  };
+}
+
+function sam31PerceptionSummaryFromParts(packet, vectorOverlays, modelCandidates, applicationAdapter) {
+  const applicationContracts = packet.application_contracts || sam31ApplicationContracts();
+  return {
+    artifact_type: 'openclaw.sam31_perception_summary',
+    status: packet.status || 'best_effort_perception_ready',
+    project_ref: packet.project_ref || 'halo_fire:unknown',
+    application: packet.application || 'halo_fire',
+    source_runtime: packet.source_runtime || 'sam-3.1+llm',
+    source_ref: packet.source_ref || null,
+    claim_gate_effect: 'no_claims_cleared',
+    perception_lanes: Array.isArray(packet.perception_lanes) ? [...packet.perception_lanes] : [...SAM31_PERCEPTION_LANES],
+    segment_count: Array.isArray(packet.segments) ? packet.segments.length : 0,
+    object_hypothesis_count: Array.isArray(packet.object_hypotheses) ? packet.object_hypotheses.length : 0,
+    vector_overlay_count: Array.isArray(vectorOverlays) ? vectorOverlays.length : 0,
+    model_3d_candidate_count: Array.isArray(modelCandidates) ? modelCandidates.length : 0,
+    spatial_observation_count: Array.isArray(packet.spatial_observations) ? packet.spatial_observations.length : 0,
+    blocked_claims: uniqueStrings([...(Array.isArray(packet.blocked_claims) ? packet.blocked_claims : []), ...SAM31_BLOCKED_CLAIMS]),
+    extrapolation_contract_ref: SAM31_EXTRAPOLATION_CONTRACT_REF,
+    application_contract_refs: SAM31_SUPPORTED_APPLICATIONS.map((application) => applicationContracts[application]?.contract_ref).filter(Boolean),
+    active_application_contract_ref: applicationAdapter?.contract_ref || applicationContracts.halo_fire?.contract_ref || null,
+    application_adapter_ref: applicationAdapter?.artifact_type || null,
+    next_action: 'Use this summary to queue product review or download the full SAM31 perception packet; do not promote blocked claims.',
+  };
+}
+
 function buildOpenClawSam31PerceptionRequest(projectName, evidence, decision, candidate = {}, pdfRef = null) {
+  const projectRef = `halo_fire:${projectName}`;
+  const sourceRef = evidence.source_ref || decision.sourceRef || null;
   const segment = {
     id: 'candidate:pdf-boundary',
     semantic_label: 'room_boundary_candidate',
@@ -1449,53 +1627,83 @@ function buildOpenClawSam31PerceptionRequest(projectName, evidence, decision, ca
       'This segment does not prove drawing scale, geometry accuracy, or regulated readiness.',
     ],
   };
-  return {
+  const segments = [segment];
+  const objectHypotheses = [
+    {
+      id: 'object:room-boundary',
+      segment_id: segment.id,
+      semantic_label: 'room_boundary',
+      confidence: 0.65,
+    },
+    {
+      id: 'object:wall-candidate',
+      segment_id: segment.id,
+      semantic_label: 'wall_candidate',
+      confidence: 0.55,
+    },
+    {
+      id: 'object:sleeve-or-penetration-candidate',
+      segment_id: segment.id,
+      semantic_label: 'sleeve_or_penetration_candidate',
+      confidence: 0.42,
+    },
+    {
+      id: 'object:sprinkler-obstruction-candidate',
+      segment_id: segment.id,
+      semantic_label: 'sprinkler_obstruction_candidate',
+      confidence: 0.42,
+    },
+  ];
+  const vectorOverlays = sam31GeneratedVectorOverlays(segments);
+  const model3dCandidates = sam31GeneratedModel3dCandidates(segments);
+  const applicationContracts = sam31ApplicationContracts();
+  const applicationAdapter = sam31ApplicationAdapter('halo_fire', projectRef, sourceRef, applicationContracts);
+  const request = {
     artifact_type: 'openclaw.sam31_perception_request',
-    project_ref: `halo_fire:${projectName}`,
+    project_ref: projectRef,
     application: 'halo_fire',
+    supported_applications: [...SAM31_SUPPORTED_APPLICATIONS],
     source_runtime: 'sam-3.1+llm',
-    source_ref: evidence.source_ref || decision.sourceRef || null,
+    source_ref: sourceRef,
     image_ref: evidence.source_file || decision.sourceFile || pdfRef || evidence.source_ref || decision.sourceRef || null,
     coordinate_frame_ref: 'rendered_pdf_page_pixels_scaled_to_feet_by_pdfScale',
     unit: 'feet',
     llm_model: 'openclaw-local-llm-best-effort',
     prompt: 'Use SAM 3.1 segmentation plus LLM review to identify room boundaries, walls, sleeve or penetration candidates, sprinkler obstruction candidates, vector overlays, and best-effort 3D model candidates from this floorplan evidence.',
     perception_lanes: [...SAM31_PERCEPTION_LANES],
-    segments: [segment],
-    object_hypotheses: [
-      {
-        id: 'object:room-boundary',
-        segment_id: segment.id,
-        semantic_label: 'room_boundary',
-        confidence: 0.65,
-      },
-      {
-        id: 'object:wall-candidate',
-        segment_id: segment.id,
-        semantic_label: 'wall_candidate',
-        confidence: 0.55,
-      },
-      {
-        id: 'object:sleeve-or-penetration-candidate',
-        segment_id: segment.id,
-        semantic_label: 'sleeve_or_penetration_candidate',
-        confidence: 0.42,
-      },
-      {
-        id: 'object:sprinkler-obstruction-candidate',
-        segment_id: segment.id,
-        semantic_label: 'sprinkler_obstruction_candidate',
-        confidence: 0.42,
-      },
-    ],
+    segments,
+    object_hypotheses: objectHypotheses,
+    vector_overlays: vectorOverlays,
+    model_3d_candidates: model3dCandidates,
+    llm_observations: segments.map((entry) => ({
+      segment_id: entry.id,
+      semantic_label: entry.semantic_label,
+      confidence: roundSam31Confidence(entry.confidence, 0.75),
+      source: 'openclaw-local-llm-best-effort',
+      observation: `${entry.semantic_label} inferred from SAM 3.1 segment ${entry.id}`,
+    })),
+    extrapolation_contract: jsonClone(SAM31_EXTRAPOLATION_CONTRACT),
+    application_contracts: applicationContracts,
+    application_adapter: applicationAdapter,
     requested_outputs: ['segmentation_masks', 'semantic_labels', 'vector_overlays', 'model_3d_candidates', 'spatial_observation_packet'],
-    blocked_claims: [...PDF_BOUNDARY_BLOCKED_CLAIMS],
+    supported_evidence_lanes: [
+      'room_boundary_visual_audit',
+      'object_identification_review',
+      'sleeve_or_firestop_candidate_review',
+      'vector_overlay_generation',
+      'model_3d_candidate_generation',
+      'spatial_observation_correction_loop',
+    ],
+    blocked_claims: [...SAM31_BLOCKED_CLAIMS],
     claim_gate_effect: 'no_claims_cleared',
     limitations: [
       'SAM 3.1 plus LLM perception is measurement and correction evidence only.',
       'It cannot clear geometry accuracy, AHJ approval, PE review, AutoSprink parity, permit readiness, fabrication readiness, or manufacturer-exact claims.',
+      'Generated vector overlays and 3D candidates are best-effort temporary values until Halo Fire employees or owning product reviewers replace them with actual values.',
     ],
   };
+  request.perception_summary = sam31PerceptionSummaryFromParts(request, vectorOverlays, model3dCandidates, applicationAdapter);
+  return request;
 }
 
 function normalizeOpenClawSam31PerceptionPacket(body = {}) {
@@ -1507,15 +1715,56 @@ function normalizeOpenClawSam31PerceptionPacket(body = {}) {
     throw e;
   }
   const packet = jsonClone(raw);
+  const upstreamSummary = packet.perception_summary && typeof packet.perception_summary === 'object' && !Array.isArray(packet.perception_summary)
+    ? jsonClone(packet.perception_summary)
+    : {};
   packet.artifact_type = 'openclaw.sam31_perception_packet';
-  packet.application = packet.application || 'halo_fire';
+  packet.application = SAM31_SUPPORTED_APPLICATIONS.includes(packet.application) ? packet.application : 'halo_fire';
+  packet.project_ref = packet.project_ref || upstreamSummary.project_ref || 'halo_fire:unknown';
+  packet.source_ref = packet.source_ref || upstreamSummary.source_ref || null;
   packet.source_runtime = packet.source_runtime || 'sam-3.1+llm';
   packet.status = packet.status || 'best_effort_perception_ready';
   packet.segments = Array.isArray(packet.segments) ? packet.segments : [];
   packet.object_hypotheses = Array.isArray(packet.object_hypotheses) ? packet.object_hypotheses : [];
-  packet.vector_overlays = Array.isArray(packet.vector_overlays) ? packet.vector_overlays : [];
-  packet.model_3d_candidates = Array.isArray(packet.model_3d_candidates) ? packet.model_3d_candidates : [];
-  packet.blocked_claims = uniqueStrings([...(packet.blocked_claims || []), ...PDF_BOUNDARY_BLOCKED_CLAIMS]);
+  packet.vector_overlays = sam31GeneratedVectorOverlays(packet.segments, packet.vector_overlays);
+  packet.model_3d_candidates = sam31GeneratedModel3dCandidates(packet.segments, packet.model_3d_candidates);
+  packet.extrapolation_contract = packet.extrapolation_contract && typeof packet.extrapolation_contract === 'object'
+    ? { ...jsonClone(SAM31_EXTRAPOLATION_CONTRACT), ...jsonClone(packet.extrapolation_contract), claim_gate_effect: 'no_claims_cleared' }
+    : jsonClone(SAM31_EXTRAPOLATION_CONTRACT);
+  const applicationContracts = sam31ApplicationContracts();
+  if (packet.application_contracts && typeof packet.application_contracts === 'object' && !Array.isArray(packet.application_contracts)) {
+    const suppliedContracts = jsonClone(packet.application_contracts);
+    for (const application of SAM31_SUPPORTED_APPLICATIONS) {
+      if (suppliedContracts[application] && typeof suppliedContracts[application] === 'object') {
+        applicationContracts[application] = {
+          ...applicationContracts[application],
+          ...suppliedContracts[application],
+          blocked_claims: uniqueStrings([
+            ...(Array.isArray(applicationContracts[application].blocked_claims) ? applicationContracts[application].blocked_claims : []),
+            ...(Array.isArray(suppliedContracts[application].blocked_claims) ? suppliedContracts[application].blocked_claims : []),
+          ]),
+          claim_gate_effect: 'no_claims_cleared',
+        };
+      }
+    }
+  }
+  packet.application_contracts = applicationContracts;
+  const generatedAdapter = sam31ApplicationAdapter(packet.application, packet.project_ref || 'halo_fire:unknown', packet.source_ref || null, applicationContracts);
+  if (packet.application_adapter && typeof packet.application_adapter === 'object' && !Array.isArray(packet.application_adapter)) {
+    const suppliedAdapter = jsonClone(packet.application_adapter);
+    packet.application_adapter = {
+      ...generatedAdapter,
+      ...suppliedAdapter,
+      blocked_claims: uniqueStrings([
+        ...(Array.isArray(generatedAdapter.blocked_claims) ? generatedAdapter.blocked_claims : []),
+        ...(Array.isArray(suppliedAdapter.blocked_claims) ? suppliedAdapter.blocked_claims : []),
+      ]),
+      claim_gate_effect: 'no_claims_cleared',
+    };
+  } else {
+    packet.application_adapter = generatedAdapter;
+  }
+  packet.blocked_claims = uniqueStrings([...(packet.blocked_claims || []), ...SAM31_BLOCKED_CLAIMS, ...packet.application_adapter.blocked_claims]);
   packet.claim_gate_effect = 'no_claims_cleared';
   packet.limitations = [
     ...(Array.isArray(packet.limitations) ? packet.limitations : []),
