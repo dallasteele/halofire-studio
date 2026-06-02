@@ -161,6 +161,23 @@ describe('studio static origin handling', () => {
     expect(html).toContain('catalogUrl');
   });
 
+  it('surfaces catalog source-acquisition ledger rows in Settings beside the attach form', async () => {
+    const shell = await fetch(`${BASE}/settings.html`, { headers: { Origin: BASE } });
+    expect(shell.status).toBe(200);
+    const html = await shell.text();
+    expect(html).toContain('id="settingsCatalogSourceAcquisition"');
+    expect(html).toContain('/auto-source/status');
+    expect(html).toContain('loadSettingsCatalogSourceAcquisition');
+    expect(html).toContain('sourceAcquisitionLedger');
+    expect(html).toContain('prefillCatalogEvidenceFromLedger');
+    expect(html).toContain('family:pipe_steel_sch40_2p0in');
+    expect(html).toContain('family:fitting_tee_2p0in');
+    expect(html).toContain('family:valve_check_2p5in');
+    expect(html).toContain('acceptable_evidence');
+    expect(html).toContain('blocked_claims');
+    expect(html).toContain('no claim gates cleared');
+  });
+
   it('lets the workbench download room-boundary review packets from resolver rows', async () => {
     const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
     expect(shell.status).toBe(200);

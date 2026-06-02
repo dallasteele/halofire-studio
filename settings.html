@@ -71,6 +71,15 @@
   </div>
 
   <div class="card wide">
+    <h2>Catalog Source Acquisition</h2>
+    <p class="muted" style="margin-bottom:8px">
+      Source-acquisition ledger rows for catalog families that still need employee evidence. Use these to prefill the attach form below.
+      Evidence is recorded only; no claim gates cleared until the required manufacturer/AHJ/PE/AutoSprink proof exists.
+    </p>
+    <div id="settingsCatalogSourceAcquisition"><span class="muted">loading source-acquisition ledger...</span></div>
+  </div>
+
+  <div class="card wide">
     <h2>Evidence Wizard</h2>
     <p class="muted" style="margin-bottom:8px">Pick a project gate, attach the exact acceptable evidence, then either resolve the gate or record evidence only. This stays fail-closed: the wizard never clears a gate with the wrong evidence type.</p>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
@@ -188,6 +197,12 @@ function api(path, opts={}) {
 }
 const stClass = (s) => String(s).toLowerCase().replace(/[^a-z]/g,'');
 let wizardState = { projects: [], gateMap: new Map(), selectedProject: '', canWrite: false };
+let settingsCatalogLedgerRows = [];
+const SETTINGS_CATALOG_LEDGER_FAMILIES = [
+  'family:pipe_steel_sch40_2p0in',
+  'family:fitting_tee_2p0in',
+  'family:valve_check_2p5in',
+];
 
 function escapeHtml(value) {
   return String(value ?? '')
@@ -417,6 +432,57 @@ async function loadLibrary() {
   } catch(e){ $('lib').innerHTML = '<span class="err">library unavailable: '+e.message+'</span>'; }
 }
 
+function prefillCatalogEvidenceFromLedger(index) {
+  const row = settingsCatalogLedgerRows[Number(index)];
+  if (!row) return;
+  if (row.component_key) $('attKey').value = row.component_key;
+  if (row.source_url) {
+    $('attMode').value = 'link';
+    $('attRef').value = row.source_url;
+    syncAttMode();
+  }
+  if (row.license) $('attLicense').value = row.license;
+  $('attNotes').value = [
+    'sourceAcquisitionLedger handoff',
+    `family_ref=${row.family_ref || 'unknown'}`,
+    `status_tier=${row.status_tier || 'unknown'}`,
+    `acceptable_evidence=${row.acceptable_evidence || 'missing'}`,
+    `blocked_claims=${(row.blocked_claims || []).join(',') || 'none listed'}`,
+    'evidence upload/link only; no claim gates cleared',
+  ].join('; ');
+  $('attachCatalogPart').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  $('attKey').focus();
+}
+
+async function loadSettingsCatalogSourceAcquisition() {
+  const target = $('settingsCatalogSourceAcquisition');
+  try {
+    const status = await api('/auto-source/status');
+    const rows = Array.isArray(status.sourceAcquisitionLedger) ? status.sourceAcquisitionLedger : [];
+    settingsCatalogLedgerRows = rows;
+    target.innerHTML = rows.map((row, index) => {
+      const blocked = Array.isArray(row.blocked_claims) ? row.blocked_claims : [];
+      const rejected = Array.isArray(row.rejected_candidates) ? row.rejected_candidates : [];
+      return `<div class="note" style="margin-bottom:10px">
+        <div class="row" style="padding-top:0"><span>${escapeHtml(row.family_ref || SETTINGS_CATALOG_LEDGER_FAMILIES[index] || 'unknown family')}</span><span class="st ${stClass(row.status_tier || 'missing')}">${escapeHtml(row.status_tier || 'missing_catalog_source')}</span></div>
+        <div class="muted" style="margin-top:6px">component_key <code>${escapeHtml(row.component_key || 'missing')}</code> · nominal_size_in <code>${escapeHtml(row.nominal_size_in || 'unknown')}</code></div>
+        <div class="muted" style="margin-top:6px">acceptable_evidence: ${escapeHtml(row.acceptable_evidence || 'manufacturer catalog URL, cut sheet, or STEP/parts proof')}</div>
+        <div class="muted" style="margin-top:6px">source_url: ${row.source_url ? `<code>${escapeHtml(row.source_url)}</code>` : '<span class="pill missing">missing</span>'}</div>
+        <div class="muted" style="margin-top:6px">license: ${escapeHtml(row.license || 'missing')} · downloaded_artifact_hash: ${escapeHtml(row.downloaded_artifact_hash || 'not captured')}</div>
+        <div class="muted" style="margin-top:6px">claim_gate_effect: ${escapeHtml(row.claim_gate_effect || 'no_claims_cleared')} · manufacturer_exact: ${escapeHtml(row.manufacturer_exact)}</div>
+        <div class="muted" style="margin-top:6px">rejected_candidates: ${rejected.map((candidate) => `<span class="pill missing">${escapeHtml(candidate)}</span>`).join('') || '<span class="pill">none recorded</span>'}</div>
+        <div class="muted" style="margin-top:6px">blocked_claims: ${blocked.map((claim) => `<span class="pill missing">${escapeHtml(claim)}</span>`).join('') || '<span class="pill">none listed</span>'}</div>
+        <div style="margin-top:8px"><button type="button" data-catalog-ledger-index="${index}">Prefill attach evidence</button></div>
+      </div>`;
+    }).join('') || '<span class="muted">No sourceAcquisitionLedger rows returned. Families expected: '+SETTINGS_CATALOG_LEDGER_FAMILIES.map(escapeHtml).join(', ')+'</span>';
+    target.querySelectorAll('[data-catalog-ledger-index]').forEach((btn) => {
+      btn.addEventListener('click', () => prefillCatalogEvidenceFromLedger(btn.getAttribute('data-catalog-ledger-index')));
+    });
+  } catch(e) {
+    target.innerHTML = '<span class="err">sourceAcquisitionLedger unavailable: '+escapeHtml(e.message)+'</span>';
+  }
+}
+
 // Swap the ref input label + placeholder between catalog URL (link) and filename (upload).
 function syncAttMode() {
   const mode = $('attMode').value;
@@ -469,7 +535,7 @@ $('attSubmit').onclick = async () => {
   } catch(e){ msg.className = 'err'; msg.textContent = e.message; }
 };
 
-loadParity(); loadDocs(); loadDeps(); initWizard(); loadLibrary();
+loadParity(); loadDocs(); loadDeps(); initWizard(); loadLibrary(); loadSettingsCatalogSourceAcquisition();
 </script>
 </body>
 </html>
