@@ -468,6 +468,36 @@ async function runBrowserSmoke(token, evidenceIds) {
     if (consumerReview.claim_gate_effect !== 'no_claims_cleared') {
       throw new Error(`SAM31 LandScout review cleared a claim gate: ${JSON.stringify(consumerReview)}`);
     }
+    await page.waitForSelector('text=Download SAM31 consumer review decision', { timeout: 8_000 });
+    const consumerReviewDownloadPromise = page.waitForEvent('download');
+    await page.locator(`button[data-sam31-consumer-review-packet-evidence-id="${consumerReview.evidence_id}"]`).click();
+    const consumerReviewDownload = await consumerReviewDownloadPromise;
+    const consumerReviewPath = await consumerReviewDownload.path();
+    const consumerReviewSuggestedName = consumerReviewDownload.suggestedFilename();
+    const consumerReviewDownloadBytes = consumerReviewPath ? fs.statSync(consumerReviewPath).size : 0;
+    downloads.push({ suggestedName: consumerReviewSuggestedName, bytes: consumerReviewDownloadBytes });
+    if (!consumerReviewSuggestedName.includes('sam31-consumer-review-decision') || consumerReviewDownloadBytes <= 0) {
+      throw new Error(`Unexpected SAM31 consumer review decision download ${consumerReviewSuggestedName} (${consumerReviewDownloadBytes} bytes)`);
+    }
+    const consumerReviewPacket = JSON.parse(fs.readFileSync(consumerReviewPath, 'utf8'));
+    if (consumerReviewPacket.artifact_type !== 'openclaw.sam31.consumer_review_decision_packet.v1') {
+      throw new Error(`Unexpected SAM31 consumer review decision packet type ${consumerReviewPacket.artifact_type}`);
+    }
+    if (consumerReviewPacket.accepted_queue_id !== consumerReview.accepted_queue_id) {
+      throw new Error(`SAM31 consumer review packet accepted_queue_id mismatch: ${JSON.stringify(consumerReviewPacket)}`);
+    }
+    if (consumerReviewPacket.claim_gate_effect !== 'no_claims_cleared') {
+      throw new Error(`SAM31 consumer review packet cleared a claim gate: ${consumerReviewPacket.claim_gate_effect}`);
+    }
+    const unresolvedNameForge = await request(`${PROJECT_PATH}/resolver-queue?sam31ConsumerReview=unresolved&consumer=nameforge`, token);
+    const unresolvedItem = unresolvedNameForge.items.find((item) => item.evidence_id === evidenceIds.boundaryEvidenceId);
+    const unresolvedNameForgeReviews = unresolvedItem?.sam31_unresolved_consumer_reviews || [];
+    if (!unresolvedNameForgeReviews.some((review) => review.consumer === 'nameforge')) {
+      throw new Error(`SAM31 unresolved NameForge review filter did not return NameForge: ${JSON.stringify(unresolvedNameForge)}`);
+    }
+    if (unresolvedNameForgeReviews.some((review) => review.consumer === 'landscout')) {
+      throw new Error(`SAM31 unresolved NameForge review filter leaked LandScout: ${JSON.stringify(unresolvedNameForgeReviews)}`);
+    }
     await page.waitForSelector('[data-sam31-replacement-action-field="semantic_label"]', { timeout: 8_000 });
     await page.waitForSelector('[data-sam31-replacement-action-field="polygon"]', { timeout: 8_000 });
     await page.waitForSelector('[data-sam31-replacement-action-field="bbox"]', { timeout: 8_000 });
@@ -600,6 +630,18 @@ async function runBrowserSmoke(token, evidenceIds) {
         accepted_queue_id: consumerReview.accepted_queue_id,
         persisted_review_packet_ref: consumerReview.persisted_review_packet_ref,
         claim_gate_effect: consumerReview.claim_gate_effect,
+      },
+      consumerReviewDecisionPacket: {
+        artifact_type: consumerReviewPacket.artifact_type,
+        suggestedName: consumerReviewSuggestedName,
+        accepted_queue_id: consumerReviewPacket.accepted_queue_id,
+        source_openclaw_sam31_consumer_review_evidence_id: consumerReviewPacket.source_openclaw_sam31_consumer_review_evidence_id,
+        claim_gate_effect: consumerReviewPacket.claim_gate_effect,
+      },
+      unresolvedNameForgeReview: {
+        filter: 'sam31ConsumerReview=unresolved',
+        count: unresolvedNameForgeReviews.length,
+        consumers: unresolvedNameForgeReviews.map((review) => review.consumer),
       },
       replayArtifact: {
         artifact_type: replayArtifact.artifact_type,

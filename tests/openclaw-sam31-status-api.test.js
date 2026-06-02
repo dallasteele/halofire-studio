@@ -1286,6 +1286,44 @@ describe('OpenClaw SAM31 bridge status API', () => {
       status: 'present',
       source_ref: 'landscout://sam31/reviews/sam31-landscout-testqueue/replacement.json',
     }));
+    const consumerReviewPacketRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/consumer-review/${consumerReview.id}/packet`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(consumerReviewPacketRes.status).toBe(200);
+    const consumerReviewPacket = await consumerReviewPacketRes.json();
+    expect(consumerReviewPacket).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.consumer_review_decision_packet.v1',
+      status: 'ready_for_consumer_review_replay',
+      consumer: 'landscout',
+      source_application: 'halo_fire',
+      source_pdf_boundary_evidence_id: boundary.id,
+      source_openclaw_sam31_consumer_review_evidence_id: consumerReview.id,
+      source_openclaw_sam31_consumer_smoke_evidence_id: consumerSmoke.id,
+      accepted_queue_id: 'sam31-landscout-testqueue',
+      persisted_review_packet_ref: 'openclaw://landscout/sam31/product-review/sam31-landscout-testqueue',
+      replacement_ref: 'landscout://sam31/reviews/sam31-landscout-testqueue/replacement.json',
+      download_name: expect.stringContaining('sam31-consumer-review-decision-landscout'),
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(consumerReviewPacket.consumer_review_decision).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.consumer_review_task_decision.v1',
+      review_decision: 'replaced',
+      replacement_values: expect.objectContaining({
+        semantic_labels: ['employee reviewed parcel edge'],
+        confidence: 0.82,
+      }),
+    }));
+    expect(consumerReviewPacket.consumer_review_task).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.consumer_review_task.v1',
+      consumer: 'landscout',
+      accepted_queue_id: 'sam31-landscout-testqueue',
+    }));
+    expect(consumerReviewPacket.source_refs).toEqual(expect.arrayContaining([
+      expect.objectContaining({ evidence_type: 'pdf_boundary_decision', evidence_id: boundary.id }),
+      expect.objectContaining({ evidence_type: 'openclaw_sam31_consumer_smoke_artifact', evidence_id: consumerSmoke.id }),
+      expect.objectContaining({ evidence_type: 'openclaw_sam31_consumer_review', evidence_id: consumerReview.id }),
+    ]));
     expect(consumerQueuePosts.map((post) => post.consumer).sort()).toEqual(['landscout', 'nameforge']);
     for (const post of consumerQueuePosts) {
       expect(post.body.product_review_queue_item).toEqual(expect.objectContaining({
@@ -1356,6 +1394,33 @@ describe('OpenClaw SAM31 bridge status API', () => {
       }),
     ]));
     expect(queue.summary.sam31_consumer_smoke_recorded).toBeGreaterThanOrEqual(1);
+    expect(queue.summary.sam31_consumer_reviews_recorded).toBeGreaterThanOrEqual(1);
+    expect(queue.summary.sam31_consumer_reviews_unresolved).toBeGreaterThanOrEqual(1);
+
+    const unresolvedNameForgeRes = await request(`${COOPERATIVE_1881_PATH}/resolver-queue?sam31ConsumerReview=unresolved&consumer=nameforge`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(unresolvedNameForgeRes.status).toBe(200);
+    const unresolvedNameForge = await unresolvedNameForgeRes.json();
+    expect(unresolvedNameForge.filters).toEqual(expect.objectContaining({
+      sam31ConsumerReview: 'unresolved',
+      consumer: 'nameforge',
+    }));
+    expect(unresolvedNameForge.summary.sam31_consumer_reviews_unresolved).toBeGreaterThanOrEqual(1);
+    const unresolvedItem = unresolvedNameForge.items.find((row) => row.evidence_id === boundary.id);
+    expect(unresolvedItem).toEqual(expect.objectContaining({
+      evidence_id: boundary.id,
+      sam31_unresolved_consumer_reviews: expect.arrayContaining([
+        expect.objectContaining({
+          consumer: 'nameforge',
+          accepted_queue_id: 'sam31-nameforge-testqueue',
+          persisted_review_packet_ref: 'openclaw://nameforge/sam31/product-review/sam31-nameforge-testqueue',
+          status: 'requires_product_review',
+          claim_gate_effect: 'no_claims_cleared',
+        }),
+      ]),
+    }));
+    expect(unresolvedItem.sam31_unresolved_consumer_reviews.some((review) => review.consumer === 'landscout')).toBe(false);
   });
 
   it('carries saved bridge smoke artifacts into SAM31 audit defaults and replay evidence without clearing claims', async () => {

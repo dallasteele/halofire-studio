@@ -254,6 +254,13 @@ describe('studio static origin handling', () => {
     expect(html).toContain('Save SAM31 consumer review decision');
     expect(html).toContain('saveOpenClawSam31ConsumerReview');
     expect(html).toContain('/openclaw/sam31/consumer-review');
+    expect(html).toContain('Download SAM31 consumer review decision');
+    expect(html).toContain('downloadOpenClawSam31ConsumerReviewPacket');
+    expect(html).toContain('data-sam31-consumer-review-packet-evidence-id');
+    expect(html).toContain('openclaw.sam31.consumer_review_decision_packet.v1');
+    expect(html).toContain('sam31-consumer-review-decision');
+    expect(html).toContain('sam31_unresolved_consumer_reviews');
+    expect(html).toContain('sam31ConsumerReview=unresolved');
     expect(html).toContain('latest_openclaw_sam31_consumer_reviews');
     expect(html).toContain('consumer_queue_statuses');
     expect(html).toContain('OPENCLAW_SAM31_LANDSCOUT_QUEUE_URL');
