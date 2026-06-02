@@ -555,6 +555,12 @@ describe('studio static origin handling', () => {
     expect(html).toContain('data-sam31-actual-value-work-item-record-index');
     expect(html).toContain('sam31_actual_value_replacement');
     expect(html).toContain('employee_actual_value_next_action');
+    expect(html).toContain('settingsSam31ActualValueSourceRef-');
+    expect(html).toContain('settingsSam31ActualValueSourceFile-');
+    expect(html).toContain('settingsSam31ActualValueReplacementValuesSourceRef-');
+    expect(html).toContain('settingsSam31ActualValueSourceRefs-');
+    expect(html).toContain('settingsSam31ActualValueFieldValue');
+    expect(html).toContain('settings.sam31_actual_value_queue');
     expect(html).toContain('acceptable_actual_evidence');
     expect(html).toContain('claim_gate_effect no_claims_cleared');
   });
