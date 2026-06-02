@@ -248,6 +248,14 @@ function renderSam31PerceptionSummary(packetOrSummary, sourceBoundaryEvidenceId)
   return `<div class="muted" style="font-size:11px;margin-top:5px;border:1px solid var(--border);border-radius:8px;padding:8px;background:rgba(77,208,225,.05)">SAM31 perception summary<br>artifact_type ${escapeHtml(summary.artifact_type || 'openclaw.sam31_perception_summary')} - project_ref ${escapeHtml(summary.project_ref || 'missing')} - claim_gate_effect ${escapeHtml(summary.claim_gate_effect || 'no_claims_cleared')}<br>${countFields.map((field) => `${field} ${escapeHtml(summary[field] ?? 0)}`).join(' - ')}<br>next_action ${escapeHtml(summary.next_action || 'Use this summary to queue product review; do not promote blocked claims.')}<br>Blocks still active: ${blocked.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('') || '<span class="chip">claim gates remain blocked</span>'}${renderSam31ApplicationContract(packetOrSummary, sourceBoundaryEvidenceId)}${sourceBoundaryEvidenceId ? `<br><button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0f766e" data-sam31-visual-audit-evidence-id="${escapeHtml(sourceBoundaryEvidenceId)}">Download full SAM31 packet</button>` : ''}</div>`;
 }
 
+function renderOpenClawSam31BridgeStatus(status) {
+  if (!status || typeof status !== 'object') return '';
+  const blocked = Array.isArray(status.blocked_claims) ? status.blocked_claims : [];
+  const apps = Array.isArray(status.supported_applications) ? status.supported_applications : [];
+  const lanes = Array.isArray(status.supported_evidence_lanes) ? status.supported_evidence_lanes : [];
+  return `<div class="muted" style="font-size:11px;margin-top:5px;border:1px solid rgba(255,110,64,.28);border-radius:8px;padding:8px;background:rgba(229,57,53,.05)">OpenClaw SAM31 bridge<br>artifact_type ${escapeHtml(status.artifact_type || 'openclaw.sam31_bridge_status')} - status ${escapeHtml(status.status || 'unavailable')} - tool_ref ${escapeHtml(status.tool_ref || 'pdfExtract:sam')} - bridge_url_configured ${escapeHtml(status.bridge_url_configured ? 'true' : 'false')} - claim_gate_effect ${escapeHtml(status.claim_gate_effect || 'no_claims_cleared')}<br>next_action ${escapeHtml(status.next_action || 'Connect OpenClaw SAM31 bridge and attach screenshot/console evidence before trusting runtime capture.')}<br>Applications: ${apps.map((app) => `<span class="chip">${escapeHtml(app)}</span>`).join('') || '<span class="chip">halo_fire</span>'}<br>Evidence lanes: ${lanes.map((lane) => `<span class="chip">${escapeHtml(lane)}</span>`).join('') || '<span class="chip">room_boundary_visual_audit</span>'}<br>Blocks still active: ${blocked.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('') || '<span class="chip">claim gates remain blocked</span>'}</div>`;
+}
+
 function evidenceDetail(row) {
   if (row.evidence_type === 'official_flow_hydraulic_replay_artifact') {
     try {
@@ -376,6 +384,7 @@ function resolverQueueDetail(item) {
   const latest_review = item.latest_review || null;
   const latest_sam31_visual_audit = item.latest_sam31_visual_audit || null;
   const latest_sam31_employee_replacement = item.latest_sam31_employee_replacement || null;
+  const openclaw_sam31_bridge_status = item.openclaw_sam31_bridge_status || null;
   const replay_review = latest_review || latest_sam31_visual_audit;
   const review_source = latest_review ? 'latest_employee_review_packet' : (latest_sam31_visual_audit ? 'latest_sam31_visual_audit' : null);
   const evidenceId = escapeHtml(item.evidence_id);
@@ -453,6 +462,7 @@ function resolverQueueDetail(item) {
       <div class="code">${escapeHtml(item.kind)} · ${escapeHtml(item.status).toUpperCase()}</div>
       <div class="na">${escapeHtml(item.next_action)}</div>
       <div class="claims">Defaults: page ${escapeHtml(defaults.pdfPageIndex)} · scale ${escapeHtml(defaults.pdfScale)} ft/pt · ${escapeHtml(defaults.pdfExtract)}</div>
+      ${renderOpenClawSam31BridgeStatus(openclaw_sam31_bridge_status)}
       ${replay_review ? `<div class="claims">Review: ${escapeHtml(replay_review.review_decision)} by ${escapeHtml(replay_review.reviewer_name || 'unknown')} - source ${escapeHtml(review_source || 'missing')} - issues ${escapeHtml(replay_review.issue_count)} - corrected polygons ${escapeHtml(replay_review.corrected_room_polygon_count)} - ${escapeHtml(replay_review.marked_up_plan_ref || '')}</div>` : ''}
       ${latest_sam31_employee_replacement ? `<div class="claims">Employee SAM31 replacements: evidence #${escapeHtml(latest_sam31_employee_replacement.evidence_id)} - source_sam31_evidence_id ${escapeHtml(latest_sam31_employee_replacement.source_sam31_evidence_id)} - ${escapeHtml(latest_sam31_employee_replacement.replacement_ref || 'missing')} - ${escapeHtml(latest_sam31_employee_replacement.claim_gate_effect || 'no_claims_cleared')}<br>Replaced fields: ${(Array.isArray(latest_sam31_employee_replacement.replaced_fields) ? latest_sam31_employee_replacement.replaced_fields : []).map((field) => `<span class="chip">${escapeHtml(field)}</span>`).join('')}<br>Replacement value preview: ${escapeHtml(JSON.stringify(latest_sam31_employee_replacement.replacement_values || {}))}</div>` : ''}
       ${latest_sam31_visual_audit ? renderSam31PerceptionSummary(latest_sam31_visual_audit.openclaw_sam31_perception_packet, item.evidence_id) : ''}

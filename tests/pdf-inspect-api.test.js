@@ -113,6 +113,25 @@ describe('PDF page inspection API', () => {
     expect(res.status).toBe(401);
   });
 
+  it('reports OpenClaw SAM31 bridge readiness as fail-closed when the bridge URL is unset', async () => {
+    const res = await request('/api/openclaw/sam31/status', {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31_bridge_status',
+      status: 'unavailable',
+      tool_ref: 'pdfExtract:sam',
+      bridge_url_configured: false,
+      bridge_url: null,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(body.supported_applications).toEqual(expect.arrayContaining(['halo_fire', 'landscout', 'nameforge']));
+    expect(body.blocked_claims).toEqual(expect.arrayContaining(['geometry_accuracy', 'OpenClaw_runtime_verified']));
+    expect(body.next_action).toMatch(/OPENCLAW_BRIDGE_URL|OpenClaw/i);
+  });
+
   it('returns page count and per-page dimensions for employee page selection', async () => {
     const res = await request('/api/pdf/inspect', {
       method: 'POST',
@@ -262,6 +281,25 @@ describe('PDF page inspection API', () => {
     expect(item.next_action).toMatch(/room-boundary/i);
     expect(item.acceptable_evidence).toEqual(expect.arrayContaining(['employee room-boundary review packet']));
     expect(item.ai_fallback).toMatch(/SAM/i);
+    expect(item.openclaw_sam31_bridge_status).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31_bridge_status',
+      status: 'unavailable',
+      tool_ref: 'pdfExtract:sam',
+      bridge_url_configured: false,
+      source_runtime: 'openclaw.sam31',
+      claim_gate_effect: 'no_claims_cleared',
+      next_action: expect.stringMatching(/OPENCLAW_BRIDGE_URL|OpenClaw/i),
+    }));
+    expect(item.openclaw_sam31_bridge_status.supported_applications).toEqual(expect.arrayContaining([
+      'halo_fire',
+      'landscout',
+      'nameforge',
+    ]));
+    expect(item.openclaw_sam31_bridge_status.blocked_claims).toEqual(expect.arrayContaining([
+      'geometry_accuracy',
+      'AutoSprink_parity',
+      'permit_ready',
+    ]));
 
     const packetRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${body.evidence.id}`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -360,6 +398,14 @@ describe('PDF page inspection API', () => {
       openclaw_bridge_url_configured: false,
       local_bridge_command: 'npm run sam31:bridge',
     }));
+    expect(samPacket.bridge.openclaw_sam31_bridge_status).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31_bridge_status',
+      status: 'unavailable',
+      tool_ref: 'pdfExtract:sam',
+      bridge_url_configured: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(samPacket.bridge.openclaw_sam31_bridge_status.limitations.join(' ')).toMatch(/does not clear/i);
     expect(samPacket.employee_capture_fields).toEqual(expect.arrayContaining([
       'sam31_result_ref',
       'screenshot_ref',

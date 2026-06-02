@@ -233,6 +233,10 @@ describe('studio static origin handling', () => {
     expect(html).toContain('openclaw_sam31_perception_packet');
     expect(html).toContain('renderSam31PerceptionSummary');
     expect(html).toContain('SAM31 perception summary');
+    expect(html).toContain('renderOpenClawSam31BridgeStatus');
+    expect(html).toContain('openclaw_sam31_bridge_status');
+    expect(html).toContain('OpenClaw SAM31 bridge');
+    expect(html).toContain('pdfExtract:sam');
     expect(html).toContain('object_hypothesis_count');
     expect(html).toContain('model_3d_candidate_count');
     expect(html).toContain('Download full SAM31 packet');

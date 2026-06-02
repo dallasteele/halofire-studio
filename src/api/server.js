@@ -1209,6 +1209,42 @@ function uniqueStrings(values) {
   return [...new Set((values || []).map((v) => String(v || '').trim()).filter(Boolean))];
 }
 
+function openClawSam31BridgeStatus(env = process.env) {
+  const bridgeUrl = String(env.OPENCLAW_BRIDGE_URL || '').trim();
+  const configured = !!bridgeUrl;
+  return {
+    artifact_type: 'openclaw.sam31_bridge_status',
+    status: configured ? 'configured_unverified' : 'unavailable',
+    tool_ref: 'pdfExtract:sam',
+    source_runtime: 'openclaw.sam31',
+    source_runtime_ref: 'sam-3.1+llm-openclaw-bridge',
+    bridge_url_configured: configured,
+    bridge_url: configured ? bridgeUrl : null,
+    supported_applications: ['halo_fire', 'landscout', 'nameforge'],
+    supported_evidence_lanes: [
+      'room_boundary_visual_audit',
+      'object_identification_review',
+      'vector_overlay_generation',
+      'model_3d_candidate_generation',
+      'spatial_observation_correction_loop',
+    ],
+    blocked_claims: uniqueStrings([
+      ...PDF_BOUNDARY_BLOCKED_CLAIMS,
+      'SAM31_runtime_verified',
+      'OpenClaw_runtime_verified',
+      'professional_approval',
+    ]),
+    claim_gate_effect: 'no_claims_cleared',
+    next_action: configured
+      ? 'Run a live OpenClaw SAM31 bridge smoke for pdfExtract:sam and attach screenshot/console evidence before trusting runtime availability; regulated claims remain blocked.'
+      : 'Set OPENCLAW_BRIDGE_URL to the governed OpenClaw SAM31 bridge, run npm run sam31:bridge or connect GX10/OpenClaw, then attach screenshot/console evidence; use saved employee replacements as local fallback only.',
+    limitations: [
+      'Bridge configuration or reachability is operational evidence only and does not clear geometry accuracy, AHJ, PE, AutoSprink, permit, fabrication, or manufacturer-exact claims.',
+      'Unavailable or configured_unverified bridge status must fail closed to vector/SAM packet fallback and employee replacement workflows.',
+    ],
+  };
+}
+
 function bboxToPolygon(bbox) {
   if (!bbox) return null;
   if (Array.isArray(bbox) && bbox.length >= 4) {
@@ -1676,6 +1712,7 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
     latest_review: latestReview,
     latest_sam31_visual_audit: latestSam31VisualAudit,
     latest_sam31_employee_replacement: latestSam31EmployeeReplacement,
+    openclaw_sam31_bridge_status: openClawSam31BridgeStatus(),
     limitations: [
       decision.limitation || 'Saved boundary choice is best-effort evidence only.',
       'This queue item does not prove geometry accuracy, AHJ approval, PE review, AutoSprink parity, permit readiness, fabrication readiness, or manufacturer-exact models.',
@@ -2474,6 +2511,7 @@ function pdfBoundarySam31VisualAuditPacket(projectName, evidence, decision) {
     openclaw_sam31_perception_request: buildOpenClawSam31PerceptionRequest(projectName, evidence, decision, candidate, pdfRef),
     bridge: {
       openclaw_bridge_url_configured: !!String(process.env.OPENCLAW_BRIDGE_URL || '').trim(),
+      openclaw_sam31_bridge_status: openClawSam31BridgeStatus(),
       local_bridge_host: bridgeHost,
       local_bridge_port: Number.isSafeInteger(bridgePort) ? bridgePort : 15000,
       local_bridge_status_url: `http://${bridgeHost}:${Number.isSafeInteger(bridgePort) ? bridgePort : 15000}/status`,
@@ -3149,6 +3187,10 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
       official_flow_replay_review_needed: statusCounts.official_flow_replay_review_needed || 0,
     },
   });
+});
+
+app.get('/api/openclaw/sam31/status', authMiddleware, (req, res) => {
+  res.json(openClawSam31BridgeStatus());
 });
 
 app.post('/api/projects/:name/resolver-packets/official-flow/intake', authMiddleware, requireRole('admin'), (req, res) => {
