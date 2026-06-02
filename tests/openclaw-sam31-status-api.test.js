@@ -727,6 +727,45 @@ describe('OpenClaw SAM31 bridge status API', () => {
       use_for_claims: false,
       claim_gate_effect: 'no_claims_cleared',
     }));
+
+    const evidenceRes = await request(`${COOPERATIVE_1881_PATH}/evidence`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(evidenceRes.status).toBe(200);
+    const evidenceRows = await evidenceRes.json();
+    const replayEvidence = evidenceRows.find((row) => row.evidence_type === 'best_effort_ai_layout'
+      && String(row.source_ref || '').includes(`pdf-boundary:${boundary.id}:room-boundary-replay:${boundaryReview.id}`));
+    expect(replayEvidence).toEqual(expect.objectContaining({
+      status: 'best_effort',
+    }));
+    const replayArtifactRes = await request(`${COOPERATIVE_1881_PATH}/evidence/${replayEvidence.id}/replay-bid-artifact`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(replayArtifactRes.status).toBe(200);
+    const replayArtifact = await replayArtifactRes.json();
+    expect(replayArtifact.openclaw_sam31_extrapolation_product_review_packet).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31_extrapolation_product_review_packet',
+      source_openclaw_sam31_extrapolation_evidence_id: artifact.id,
+      source_openclaw_sam31_extrapolation_review_evidence_id: review.id,
+      reviewed_values: expect.objectContaining({
+        object_hypotheses: expect.any(Array),
+        vector_overlays: expect.any(Array),
+        model_3d_candidates: expect.any(Array),
+      }),
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(replayArtifact.sam31_downstream_review_metadata).toEqual(expect.objectContaining({
+      source: 'openclaw.sam31_extrapolation_product_review_packet',
+      use_for_claims: false,
+      object_hypothesis_count: 1,
+      vector_overlay_count: 1,
+      model_3d_candidate_count: 1,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(replayArtifact.source_replay_packet).toEqual(expect.objectContaining({
+      source_openclaw_sam31_extrapolation_evidence_id: artifact.id,
+      source_openclaw_sam31_extrapolation_review_evidence_id: review.id,
+    }));
   });
 
   it('carries saved bridge smoke artifacts into SAM31 audit defaults and replay evidence without clearing claims', async () => {

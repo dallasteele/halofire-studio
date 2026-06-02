@@ -248,6 +248,19 @@ function renderSam31PerceptionSummary(packetOrSummary, sourceBoundaryEvidenceId)
   return `<div class="muted" style="font-size:11px;margin-top:5px;border:1px solid var(--border);border-radius:8px;padding:8px;background:rgba(77,208,225,.05)">SAM31 perception summary<br>artifact_type ${escapeHtml(summary.artifact_type || 'openclaw.sam31_perception_summary')} - project_ref ${escapeHtml(summary.project_ref || 'missing')} - claim_gate_effect ${escapeHtml(summary.claim_gate_effect || 'no_claims_cleared')}<br>${countFields.map((field) => `${field} ${escapeHtml(summary[field] ?? 0)}`).join(' - ')}<br>next_action ${escapeHtml(summary.next_action || 'Use this summary to queue product review; do not promote blocked claims.')}<br>Blocks still active: ${blocked.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('') || '<span class="chip">claim gates remain blocked</span>'}${renderSam31ApplicationContract(packetOrSummary, sourceBoundaryEvidenceId)}${sourceBoundaryEvidenceId ? `<br><button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0f766e" data-sam31-visual-audit-evidence-id="${escapeHtml(sourceBoundaryEvidenceId)}">Download full SAM31 packet</button>` : ''}</div>`;
 }
 
+function renderOpenClawSam31DownstreamReviewSummary(packet, metadata) {
+  if (!packet && !metadata) return '';
+  const reviewPacket = packet && typeof packet === 'object' ? packet : {};
+  const reviewMetadata = metadata && typeof metadata === 'object' ? metadata : {};
+  const objectCount = reviewMetadata.object_hypothesis_count ?? (Array.isArray(reviewPacket.reviewed_object_hypotheses) ? reviewPacket.reviewed_object_hypotheses.length : 0);
+  const vectorCount = reviewMetadata.vector_overlay_count ?? (Array.isArray(reviewPacket.reviewed_vector_overlays) ? reviewPacket.reviewed_vector_overlays.length : 0);
+  const modelCount = reviewMetadata.model_3d_candidate_count ?? (Array.isArray(reviewPacket.reviewed_model_3d_candidates) ? reviewPacket.reviewed_model_3d_candidates.length : 0);
+  const blocked = Array.isArray(reviewPacket.blocked_claims)
+    ? reviewPacket.blocked_claims
+    : (Array.isArray(reviewMetadata.blocked_claims) ? reviewMetadata.blocked_claims : []);
+  return `<div class="muted" style="font-size:11px;margin-top:5px;border:1px solid rgba(79,70,229,.34);border-radius:8px;padding:8px;background:rgba(79,70,229,.06)">SAM31 downstream product review<br>openclaw_sam31_extrapolation_product_review_packet ${escapeHtml(reviewPacket.artifact_type || 'openclaw.sam31_extrapolation_product_review_packet')} - sam31_downstream_review_metadata ${escapeHtml(reviewMetadata.source || 'openclaw.sam31_extrapolation_product_review_packet')}<br>source_openclaw_sam31_extrapolation_evidence_id ${escapeHtml(reviewPacket.source_openclaw_sam31_extrapolation_evidence_id || reviewMetadata.source_openclaw_sam31_extrapolation_evidence_id || 'missing')} - source_openclaw_sam31_extrapolation_review_evidence_id ${escapeHtml(reviewPacket.source_openclaw_sam31_extrapolation_review_evidence_id || reviewMetadata.source_openclaw_sam31_extrapolation_review_evidence_id || 'missing')}<br>object_hypothesis_count ${escapeHtml(objectCount)} - vector_overlay_count ${escapeHtml(vectorCount)} - model_3d_candidate_count ${escapeHtml(modelCount)}<br>use_for_claims ${escapeHtml(reviewMetadata.use_for_claims === true ? 'true' : 'false')} - claim_gate_effect ${escapeHtml(reviewPacket.claim_gate_effect || reviewMetadata.claim_gate_effect || 'no_claims_cleared')}<br>Blocks still active: ${blocked.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('') || '<span class="chip">claim gates remain blocked</span>'}</div>`;
+}
+
 function renderOpenClawSam31BridgeStatus(status) {
   if (!status || typeof status !== 'object') return '';
   const blocked = Array.isArray(status.blocked_claims) ? status.blocked_claims : [];
@@ -338,7 +351,8 @@ function evidenceDetail(row) {
       const packet = JSON.parse(row.notes || '{}');
       if (packet.kind === 'best_effort_ai_layout_replay') {
         const blocked = Array.isArray(packet.blocked_claims) ? packet.blocked_claims : [];
-        return `<div class="muted" style="font-size:11px;margin-top:3px">Replay evidence: best_effort_ai_layout_replay<br>review_source ${escapeHtml(packet.review_source || 'latest_employee_review_packet')} - source_evidence_id ${escapeHtml(packet.source_evidence_id || 'missing')} - source_review_evidence_id ${escapeHtml(packet.source_review_evidence_id || 'missing')} - source_sam31_evidence_id ${escapeHtml(packet.source_sam31_evidence_id || 'missing')}<br>marked_up_plan_ref ${escapeHtml(packet.marked_up_plan_ref || 'missing')} - corrected_room_polygon_count ${escapeHtml(packet.corrected_room_polygon_count || 0)} - heads ${escapeHtml(packet.total_head_count || 0)} - area ${escapeHtml(packet.total_area_sqft || 0)} sqft<br>openclaw_sam31_perception_packet ${escapeHtml(packet.openclaw_sam31_perception_packet?.artifact_type || 'missing')} - claim_gate_effect ${escapeHtml(packet.claim_gate_effect || 'no_claims_cleared')}${renderSam31PerceptionSummary(packet.openclaw_sam31_perception_packet, packet.source_evidence_id)}<br>Download: ${escapeHtml(packet.download_name || 'room-boundary-replay-bid-artifact.json')}<br><button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#4f46e5" data-replay-bid-artifact-evidence-id="${escapeHtml(row.id)}">Download replay artifact</button><br>Blocks still active: ${blocked.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('')}</div>`;
+        const downstreamReview = renderOpenClawSam31DownstreamReviewSummary(packet.openclaw_sam31_extrapolation_product_review_packet, packet.sam31_downstream_review_metadata);
+        return `<div class="muted" style="font-size:11px;margin-top:3px">Replay evidence: best_effort_ai_layout_replay<br>review_source ${escapeHtml(packet.review_source || 'latest_employee_review_packet')} - source_evidence_id ${escapeHtml(packet.source_evidence_id || 'missing')} - source_review_evidence_id ${escapeHtml(packet.source_review_evidence_id || 'missing')} - source_sam31_evidence_id ${escapeHtml(packet.source_sam31_evidence_id || 'missing')}<br>marked_up_plan_ref ${escapeHtml(packet.marked_up_plan_ref || 'missing')} - corrected_room_polygon_count ${escapeHtml(packet.corrected_room_polygon_count || 0)} - heads ${escapeHtml(packet.total_head_count || 0)} - area ${escapeHtml(packet.total_area_sqft || 0)} sqft<br>openclaw_sam31_perception_packet ${escapeHtml(packet.openclaw_sam31_perception_packet?.artifact_type || 'missing')} - claim_gate_effect ${escapeHtml(packet.claim_gate_effect || 'no_claims_cleared')}${renderSam31PerceptionSummary(packet.openclaw_sam31_perception_packet, packet.source_evidence_id)}${downstreamReview}<br>Download: ${escapeHtml(packet.download_name || 'room-boundary-replay-bid-artifact.json')}<br><button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#4f46e5" data-replay-bid-artifact-evidence-id="${escapeHtml(row.id)}">Download replay artifact</button><br>Blocks still active: ${blocked.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('')}</div>`;
       }
     } catch {
       return '<div class="muted" style="font-size:11px;margin-top:3px">best-effort layout evidence; detail unavailable</div>';
@@ -784,6 +798,8 @@ async function runResolverReplayBid(evidenceId) {
         source_review_evidence_id: replayPacket.source_review_evidence_id,
         source_sam31_evidence_id: replayPacket.source_sam31_evidence_id,
         source_sam31_replacement_evidence_id: replayPacket.source_sam31_replacement_evidence_id,
+        source_openclaw_sam31_extrapolation_evidence_id: replayPacket.source_openclaw_sam31_extrapolation_evidence_id,
+        source_openclaw_sam31_extrapolation_review_evidence_id: replayPacket.source_openclaw_sam31_extrapolation_review_evidence_id,
         sam31_replacement_source: replayPacket.sam31_replacement_source,
         download_name: replayPacket.download_name,
       },
@@ -795,9 +811,13 @@ async function runResolverReplayBid(evidenceId) {
       source_review_evidence_id: replayPacket.source_review_evidence_id,
       source_sam31_evidence_id: replayPacket.source_sam31_evidence_id,
       source_sam31_replacement_evidence_id: replayPacket.source_sam31_replacement_evidence_id,
+      source_openclaw_sam31_extrapolation_evidence_id: replayPacket.source_openclaw_sam31_extrapolation_evidence_id || result.roomBoundaryReplay?.source_openclaw_sam31_extrapolation_evidence_id || null,
+      source_openclaw_sam31_extrapolation_review_evidence_id: replayPacket.source_openclaw_sam31_extrapolation_review_evidence_id || result.roomBoundaryReplay?.source_openclaw_sam31_extrapolation_review_evidence_id || null,
       sam31_replacement_source: replayPacket.sam31_replacement_source,
       sam31_employee_replacement: replayPacket.latest_sam31_employee_replacement || replayPacket.sprinkler_bid_request?.sam31_employee_replacement || result.roomBoundaryReplay?.sam31_employee_replacement || null,
       openclaw_sam31_perception_packet: replayPacket.openclaw_sam31_perception_packet || result.roomBoundaryReplay?.openclaw_sam31_perception_packet || result.replayInput?.openclaw_sam31_perception_packet || null,
+      openclaw_sam31_extrapolation_product_review_packet: replayPacket.openclaw_sam31_extrapolation_product_review_packet || result.roomBoundaryReplay?.openclaw_sam31_extrapolation_product_review_packet || result.replayInput?.openclaw_sam31_extrapolation_product_review_packet || null,
+      sam31_downstream_review_metadata: replayPacket.sam31_downstream_review_metadata || result.roomBoundaryReplay?.sam31_downstream_review_metadata || result.replayInput?.sam31_downstream_review_metadata || null,
       blocked_claims: replayPacket.blocked_claims || result.bid?.blockedClaims || [],
       claim_gate_effect: 'no_claims_cleared',
       limitations: [

@@ -255,6 +255,12 @@ describe('studio static origin handling', () => {
     expect(html).toContain('review_source');
     expect(html).toContain('source_sam31_evidence_id');
     expect(html).toContain('openclaw_sam31_perception_packet');
+    expect(html).toContain('openclaw_sam31_extrapolation_product_review_packet');
+    expect(html).toContain('sam31_downstream_review_metadata');
+    expect(html).toContain('SAM31 downstream product review');
+    expect(html).toContain('object_hypothesis_count');
+    expect(html).toContain('vector_overlay_count');
+    expect(html).toContain('source_openclaw_sam31_extrapolation_review_evidence_id');
     expect(html).toContain('renderSam31PerceptionSummary');
     expect(html).toContain('SAM31 perception summary');
     expect(html).toContain('renderOpenClawSam31BridgeStatus');
