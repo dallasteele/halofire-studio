@@ -529,6 +529,13 @@ const GATE_CLEARING_EVIDENCE_TYPES = new Set([
   'autosprink_packet',
   'employee_signoff',
 ]);
+const SIGNED_REVIEW_EVIDENCE_TYPES = new Set([
+  'ahj_approval',
+  'professional_review',
+  'pe_signoff',
+  'manufacturer_approval',
+  'autosprink_packet',
+]);
 
 const GATE_EVIDENCE_RULES = Object.freeze({
   AUTOSPRINK_EVIDENCE_MISSING: Object.freeze({
@@ -555,6 +562,36 @@ const GATE_EVIDENCE_RULES = Object.freeze({
 
 function gateEvidenceRule(code) {
   return GATE_EVIDENCE_RULES[code] || { allowedEvidenceTypes: [], canResolve: false };
+}
+
+function normalizeSignedReviewerSignoff(evidenceType, signoff) {
+  if (!SIGNED_REVIEW_EVIDENCE_TYPES.has(evidenceType)) return null;
+  if (!signoff || typeof signoff !== 'object') {
+    const e = new Error(`evidence.signoff is required for ${evidenceType}`);
+    e.httpStatus = 400;
+    throw e;
+  }
+  const reviewerName = String(signoff.reviewer_name || signoff.reviewerName || '').trim();
+  const reviewerTitle = String(signoff.reviewer_title || signoff.reviewerTitle || '').trim();
+  const signedAt = String(signoff.signed_at || signoff.signedAt || '').trim();
+  if (!reviewerName || !reviewerTitle || !signedAt) {
+    const e = new Error('evidence.signoff must include reviewer_name, reviewer_title, and signed_at');
+    e.httpStatus = 400;
+    throw e;
+  }
+  const signedAtIso = new Date(signedAt).toISOString();
+  if (!signedAtIso || Number.isNaN(Date.parse(signedAtIso))) {
+    const e = new Error('evidence.signoff.signed_at must be a valid timestamp');
+    e.httpStatus = 400;
+    throw e;
+  }
+  return {
+    reviewer_name: reviewerName,
+    reviewer_title: reviewerTitle,
+    signed_at: signedAtIso,
+    ...(signoff.organization ? { organization: String(signoff.organization).trim() } : {}),
+    ...(signoff.license_id || signoff.licenseId ? { license_id: String(signoff.license_id || signoff.licenseId).trim() } : {}),
+  };
 }
 
 app.get('/api/projects/:name/claim-gates', authMiddleware, (req, res) => {
@@ -669,12 +706,28 @@ app.post('/api/projects/:name/claim-gates/:code/resolve', authMiddleware, requir
       error: `Gate ${code} only accepts allowed evidence types: ${rule.allowedEvidenceTypes.join(', ')}`,
     });
   }
+  let storedNotes = notes;
+  try {
+    const signoff = normalizeSignedReviewerSignoff(evidence_type, evidence.signoff);
+    if (signoff) {
+      storedNotes = JSON.stringify({
+        kind: 'signed_reviewer_evidence',
+        evidence_type,
+        source_ref,
+        signoff,
+        user_notes: notes,
+        claim_gate_effect: 'gate_cleared',
+      });
+    }
+  } catch (err) {
+    return res.status(err.httpStatus || 400).json({ error: err.message });
+  }
 
   const resolvedAt = new Date().toISOString();
   const tx = db.transaction(() => {
     db.prepare(`INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
                 VALUES (?, ?, ?, ?, ?, ?)`)
-      .run(projectName, evidence_type, source_file, source_ref, 'present', notes);
+      .run(projectName, evidence_type, source_file, source_ref, 'present', storedNotes);
     db.prepare(`UPDATE claim_gates
                 SET status = 'cleared', resolved_by = ?, resolved_at = ?, resolved_evidence_ref = ?
                 WHERE project_name = ? AND code = ?`)

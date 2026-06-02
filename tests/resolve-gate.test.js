@@ -140,6 +140,12 @@ describe('HaloFire resolve-gate API (evidence-gated)', () => {
           source_ref: 'AutoSprink export packet #HD-REX-001',
           source_file: 'home-depot-rexburg.sprink',
           notes: 'Signed AutoSprink comparison packet received from design partner.',
+          signoff: {
+            reviewer_name: 'Dana Ortiz',
+            reviewer_title: 'Design Manager',
+            signed_at: '2026-06-01T22:15:00.000Z',
+            organization: 'Halo Fire',
+          },
         },
       }),
     });
@@ -156,7 +162,17 @@ describe('HaloFire resolve-gate API (evidence-gated)', () => {
     const evidence = await (await request(`${PROJECT_PATH}/evidence`, {
       headers: { Authorization: `Bearer ${token}` },
     })).json();
-    expect(evidence.some((e) => e.evidence_type === 'autosprink_packet' && e.status === 'present')).toBe(true);
+    const row = evidence.find((e) => e.evidence_type === 'autosprink_packet' && e.status === 'present');
+    expect(row).toBeTruthy();
+    const notes = JSON.parse(row.notes);
+    expect(notes.kind).toBe('signed_reviewer_evidence');
+    expect(notes.claim_gate_effect).toBe('gate_cleared');
+    expect(notes.signoff).toEqual(expect.objectContaining({
+      reviewer_name: 'Dana Ortiz',
+      reviewer_title: 'Design Manager',
+      signed_at: '2026-06-01T22:15:00.000Z',
+      organization: 'Halo Fire',
+    }));
   });
 
   it('forbids non-admin users from resolving a gate', async () => {
@@ -207,6 +223,24 @@ describe('HaloFire resolve-gate API (evidence-gated)', () => {
     expect(res.status).toBeGreaterThanOrEqual(400);
     expect(res.status).toBeLessThan(500);
     expect((await gate(token, 'MANUFACTURER_MODEL_APPROVAL_MISSING')).status).toBe('blocked');
+  });
+
+  it('rejects regulated gate evidence without signed reviewer metadata and leaves the gate blocked', async () => {
+    const token = await tokenFor('gate-admin', 'actual-test-password');
+    const res = await request(RESOLVE_PATH('AHJ_APPROVAL_MISSING'), {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        evidence: {
+          evidence_type: 'ahj_approval',
+          source_ref: 'AHJ packet #R-42',
+        },
+      }),
+    });
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.error).toMatch(/signoff/i);
+    expect((await gate(token, 'AHJ_APPROVAL_MISSING')).status).toBe('blocked');
   });
 
   it('rejects a resolve with missing evidence (400)', async () => {
