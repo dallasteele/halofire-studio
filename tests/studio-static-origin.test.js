@@ -148,11 +148,16 @@ describe('studio static origin handling', () => {
     const html = await shell.text();
     expect(html).toContain('saveResolverPacketReview');
     expect(html).toContain('downloadResolverReplayInput');
+    expect(html).toContain('runResolverReplayBid');
     expect(html).toContain('/resolver-packets/pdf-boundary/');
     expect(html).toContain('/replay-input');
     expect(html).toContain('/reviews');
+    expect(html).toContain('/sprinkler-bid');
     expect(html).toContain('Record review decision');
     expect(html).toContain('Download replay input');
+    expect(html).toContain('Run replay bid');
+    expect(html).toContain('room_boundary_replay_bid_artifact');
+    expect(html).toContain('data-resolver-replay-bid-evidence-id');
     expect(html).toContain('marked_up_plan_ref');
     expect(html).toContain('latest_review');
     expect(html).toContain('Review:');

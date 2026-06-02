@@ -233,6 +233,7 @@ function resolverQueueDetail(item) {
       <div class="claims">Blocks: ${claims.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('')}</div>
       <p style="margin-top:8px"><button class="go" type="button" style="padding:7px 10px;font-size:11px" data-resolver-packet-evidence-id="${escapeHtml(item.evidence_id)}">Download review packet</button></p>
       ${latest_review && item.status !== 'blocked' ? `<p style="margin-top:8px"><button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#3b82f6" data-resolver-replay-evidence-id="${escapeHtml(item.evidence_id)}">Download replay input</button></p>` : ''}
+      ${latest_review && item.status !== 'blocked' ? `<p style="margin-top:8px"><button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#4f46e5" data-resolver-replay-bid-evidence-id="${escapeHtml(item.evidence_id)}">Run replay bid</button></p><div class="muted" id="replayBidStatus-${evidenceId}" style="font-size:11px"></div>` : ''}
       <details style="margin-top:8px">
         <summary class="muted" style="cursor:pointer">Record review decision</summary>
         <div style="display:grid;gap:6px;margin-top:8px">
@@ -271,6 +272,56 @@ async function downloadResolverReplayInput(evidenceId) {
   a.download = packet.download_name || 'room-boundary-replay-input.json';
   a.click();
   URL.revokeObjectURL(a.href);
+}
+
+async function runResolverReplayBid(evidenceId) {
+  const status = document.getElementById('replayBidStatus-' + evidenceId);
+  if (status) status.textContent = 'Running replay bid from latest employee review...';
+  try {
+    const replayPacket = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/resolver-packets/pdf-boundary/' + encodeURIComponent(evidenceId) + '/replay-input');
+    const replayBody = { markupPct: 25, ...replayPacket.sprinkler_bid_request };
+    const result = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/sprinkler-bid', {
+      method: 'POST',
+      body: JSON.stringify(replayBody),
+    });
+    const artifact = {
+      artifact_type: 'room_boundary_replay_bid_artifact',
+      status: 'best_effort_internal_alpha',
+      project_name: currentProjectName(),
+      generated_at: new Date().toISOString(),
+      source_replay_packet: {
+        source_evidence_id: replayPacket.source_evidence_id,
+        source_review_evidence_id: replayPacket.source_review_evidence_id,
+        download_name: replayPacket.download_name,
+      },
+      roomBoundaryReplay: result.roomBoundaryReplay || result.replayInput || null,
+      bid: result.bid,
+      fullScopeBid: result.fullScopeBid,
+      blocked_claims: replayPacket.blocked_claims || result.bid?.blockedClaims || [],
+      claim_gate_effect: 'no_claims_cleared',
+      limitations: [
+        'Generated from employee-reviewed room-boundary correction evidence for internal-alpha replay only.',
+        'This artifact does not prove geometry accuracy, drawing scale, AHJ approval, PE review, AutoSprink parity, permit readiness, fabrication readiness, or manufacturer-exact models.',
+      ],
+    };
+    const blob = new Blob([JSON.stringify(artifact, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = (replayPacket.download_name || 'room-boundary-replay-input.json').replace('replay-input', 'replay-bid-artifact');
+    a.click();
+    URL.revokeObjectURL(a.href);
+    const total = result.bid?.pricing?.total;
+    document.getElementById('bidSummary').innerHTML = `
+      <div class="kv"><span>Replay artifact</span><b>best-effort</b></div>
+      <div class="kv"><span>Total area</span><b>${Number(result.bid?.totalAreaSqFt || 0).toLocaleString()} sqft</b></div>
+      <div class="kv"><span>Sprinkler heads</span><b>${escapeHtml(result.bid?.totalHeadCount || 0)}</b></div>
+      <div class="kv"><span>Best-effort total</span><b>${typeof total === 'number' ? usd(total) : 'n/a'}</b></div>
+      <div class="est">room_boundary_replay_bid_artifact downloaded; claim_gate_effect=no_claims_cleared</div>`;
+    if (status) status.textContent = 'Replay bid artifact downloaded; claims still blocked.';
+    await refreshEvidence();
+  } catch (err) {
+    if (status) status.textContent = 'Error: ' + err.message;
+  }
 }
 
 function jsonArrayFromField(id) {
@@ -314,6 +365,9 @@ async function refreshResolverQueue() {
   });
   document.querySelectorAll('[data-resolver-replay-evidence-id]').forEach((button) => {
     button.onclick = () => downloadResolverReplayInput(button.dataset.resolverReplayEvidenceId);
+  });
+  document.querySelectorAll('[data-resolver-replay-bid-evidence-id]').forEach((button) => {
+    button.onclick = () => runResolverReplayBid(button.dataset.resolverReplayBidEvidenceId);
   });
   document.querySelectorAll('[data-resolver-review-evidence-id]').forEach((button) => {
     button.onclick = () => saveResolverPacketReview(button.dataset.resolverReviewEvidenceId);
