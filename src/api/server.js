@@ -1320,6 +1320,8 @@ const SAM31_TO_SPRINKLER_REVIEW_ADAPTER_TYPE = 'openclaw.sam31_to_sprinkler_revi
 const HALOFIRE_SAM31_SPRINKLER_REVIEW_PACKET_TYPE = 'halofire.sam31_sprinkler_review_packet.v1';
 const HALOFIRE_SAM31_SPRINKLER_REVIEW_QUEUE_ITEM_TYPE = 'halofire.sam31_sprinkler_review_queue_item.v1';
 const HALOFIRE_SAM31_SPRINKLER_REVIEW_DECISION_TYPE = 'halofire.sam31_sprinkler_review_decision.v1';
+const HALOFIRE_SAM31_SPRINKLER_REVIEW_DECISION_PACKET_TYPE = 'halofire.sam31_sprinkler_review_decision_packet.v1';
+const HALOFIRE_SAM31_SPRINKLER_REVIEW_PRELIMINARY_REPLAY_INPUTS_TYPE = 'halofire.sam31_sprinkler_review_preliminary_replay_inputs.v1';
 const SAM31_CONSUMER_QUEUE_TARGETS = Object.freeze(['landscout', 'nameforge']);
 const SAM31_CONSUMER_UNAVAILABLE_CODES = Object.freeze({
   landscout: 'OPENCLAW_SAM31_LANDSCOUT_QUEUE_UNAVAILABLE',
@@ -3664,6 +3666,161 @@ function normalizeHalofireSam31SprinklerReviewDecision(projectName, evidence, de
       'This decision records HaloFire employee review of one SAM31-derived sprinkler review queue row for internal-alpha use only.',
       'It can accept or replace temporary obstruction, sleeve/firestop, vector, or 3D model candidate values, but it does not clear regulated claims.',
     ],
+  };
+}
+
+function halofireSam31SprinklerReplayScope(lane) {
+  return ({
+    room_boundary_visual_audit: 'room_boundary_visual_audit',
+    obstruction_or_clash_review: 'obstruction_clash_candidate_review',
+    vector_overlay_generation: 'vector_overlay_generation',
+    model_3d_candidate_generation: 'model_3d_candidate_generation',
+  })[lane] || 'sprinkler_employee_review_replay';
+}
+
+function buildHalofireSam31SprinklerReviewDecisionPacket(projectName, evidence, decision, reviewEvidence, review, sprinklerReviewEvidence, sprinklerReview) {
+  if (!evidence || !decision) {
+    const e = new Error('PDF boundary decision evidence not found');
+    e.httpStatus = 404;
+    throw e;
+  }
+  if (!reviewEvidence || !review) {
+    const e = new Error('SAM31 consumer review evidence not found');
+    e.httpStatus = 404;
+    throw e;
+  }
+  if (!sprinklerReviewEvidence || !sprinklerReview) {
+    const e = new Error('HaloFire SAM31 sprinkler review decision evidence not found');
+    e.httpStatus = 404;
+    throw e;
+  }
+  if (Number(review.source_pdf_boundary_evidence_id) !== Number(evidence.id)) {
+    const e = new Error('SAM31 consumer review evidence does not belong to the requested PDF boundary evidence');
+    e.httpStatus = 409;
+    throw e;
+  }
+  if (Number(sprinklerReview.source_pdf_boundary_evidence_id) !== Number(evidence.id)) {
+    const e = new Error('SAM31 sprinkler review decision does not belong to the requested PDF boundary evidence');
+    e.httpStatus = 409;
+    throw e;
+  }
+  if (Number(sprinklerReview.source_openclaw_sam31_consumer_review_evidence_id) !== Number(reviewEvidence.id)) {
+    const e = new Error('SAM31 sprinkler review decision does not belong to the requested consumer review evidence');
+    e.httpStatus = 409;
+    throw e;
+  }
+  const lane = sprinklerReview.supported_sprinkler_review_lane || 'sprinkler_employee_review';
+  const reviewedValues = sprinklerReview.reviewed_values && typeof sprinklerReview.reviewed_values === 'object'
+    ? jsonClone(sprinklerReview.reviewed_values)
+    : {};
+  const blockedClaims = uniqueStrings([
+    ...(Array.isArray(sprinklerReview.blocked_claims) ? sprinklerReview.blocked_claims : []),
+    ...(Array.isArray(review.blocked_claims) ? review.blocked_claims : []),
+    ...(Array.isArray(decision.blockedClaims) ? decision.blockedClaims : PDF_BOUNDARY_BLOCKED_CLAIMS),
+    'permit_ready',
+    'professional_approval',
+    'AHJ_approval',
+    'AutoSprink_parity',
+    'fabrication_ready',
+    'manufacturer_exact',
+    'geometry_accuracy',
+    'drawing_scale',
+    'PE_review',
+  ]);
+  const sourceRefs = uniqueByJson([
+    {
+      evidence_id: evidence.id,
+      evidence_type: evidence.evidence_type,
+      source_file: evidence.source_file || decision.sourceFile || null,
+      source_ref: evidence.source_ref || decision.sourceRef || null,
+      status: evidence.status,
+    },
+    {
+      evidence_id: reviewEvidence.id,
+      evidence_type: reviewEvidence.evidence_type,
+      source_file: reviewEvidence.source_file || null,
+      source_ref: reviewEvidence.source_ref || review.replacement_ref || null,
+      status: reviewEvidence.status,
+      claim_gate_effect: 'no_claims_cleared',
+    },
+    {
+      evidence_id: sprinklerReviewEvidence.id,
+      evidence_type: sprinklerReviewEvidence.evidence_type,
+      source_file: sprinklerReviewEvidence.source_file || null,
+      source_ref: sprinklerReviewEvidence.source_ref || sprinklerReview.review_ref || null,
+      status: sprinklerReviewEvidence.status,
+      claim_gate_effect: 'no_claims_cleared',
+    },
+    ...(Array.isArray(sprinklerReview.source_refs) ? jsonClone(sprinklerReview.source_refs) : []),
+  ]);
+  const preliminaryReplayInputs = {
+    artifact_type: HALOFIRE_SAM31_SPRINKLER_REVIEW_PRELIMINARY_REPLAY_INPUTS_TYPE,
+    status: 'requires_internal_alpha_replay',
+    project_name: projectName,
+    generated_at: new Date().toISOString(),
+    source: HALOFIRE_SAM31_SPRINKLER_REVIEW_DECISION_PACKET_TYPE,
+    source_pdf_boundary_evidence_id: evidence.id,
+    source_openclaw_sam31_consumer_review_evidence_id: reviewEvidence.id,
+    source_halofire_sam31_sprinkler_review_decision_evidence_id: sprinklerReviewEvidence.id,
+    source_queue_item_id: sprinklerReview.source_queue_item_id || null,
+    issue_type: sprinklerReview.issue_type || null,
+    supported_sprinkler_review_lane: lane,
+    evidence_lanes: uniqueStrings([lane]),
+    replay_scope: halofireSam31SprinklerReplayScope(lane),
+    reviewed_values: reviewedValues,
+    source_refs: sourceRefs,
+    next_action: 'Replay these employee-reviewed SAM31 values as internal-alpha sprinkler review inputs, then attach official/professional/manufacturer evidence before clearing any regulated claim.',
+    use_for_claims: false,
+    blocked_claims: blockedClaims,
+    claim_gate_effect: 'no_claims_cleared',
+    no_claim_gates_cleared: true,
+    limitations: [
+      'These replay inputs are correction evidence for internal-alpha review only.',
+      'They do not prove AHJ approval, PE review, AutoSprink parity, fabrication readiness, drawing scale, geometry accuracy, or manufacturer exactness.',
+    ],
+  };
+  return {
+    artifact_type: HALOFIRE_SAM31_SPRINKLER_REVIEW_DECISION_PACKET_TYPE,
+    status: 'ready_for_internal_alpha_sprinkler_replay',
+    source: HALOFIRE_SAM31_SPRINKLER_REVIEW_DECISION_TYPE,
+    project_name: projectName,
+    generated_at: new Date().toISOString(),
+    source_queue_item_artifact_type: HALOFIRE_SAM31_SPRINKLER_REVIEW_QUEUE_ITEM_TYPE,
+    source_queue_item_id: sprinklerReview.source_queue_item_id || null,
+    source_adapter_artifact_type: SAM31_TO_SPRINKLER_REVIEW_ADAPTER_TYPE,
+    source_pdf_boundary_evidence_id: evidence.id,
+    source_openclaw_sam31_consumer_review_evidence_id: reviewEvidence.id,
+    source_halofire_sam31_sprinkler_review_decision_evidence_id: sprinklerReviewEvidence.id,
+    source_openclaw_sam31_consumer_smoke_evidence_id: sprinklerReview.source_openclaw_sam31_consumer_smoke_evidence_id || review.source_openclaw_sam31_consumer_smoke_evidence_id || null,
+    source_application: sprinklerReview.source_application || review.source_application || 'halo_fire',
+    consumer: sprinklerReview.consumer || review.consumer || null,
+    accepted_queue_id: sprinklerReview.accepted_queue_id || review.accepted_queue_id || null,
+    persisted_review_packet_ref: sprinklerReview.persisted_review_packet_ref || review.persisted_review_packet_ref || null,
+    issue_type: sprinklerReview.issue_type || null,
+    issue_count: Number.isFinite(Number(sprinklerReview.issue_count)) ? Number(sprinklerReview.issue_count) : 0,
+    supported_sprinkler_review_lane: lane,
+    review_decision: sprinklerReview.review_decision || null,
+    reviewer_name: sprinklerReview.reviewer_name || null,
+    reviewed_at: sprinklerReview.reviewed_at || null,
+    review_ref: sprinklerReview.review_ref || sprinklerReviewEvidence.source_ref || null,
+    screenshot_ref: sprinklerReview.screenshot_ref || null,
+    console_log_ref: sprinklerReview.console_log_ref || null,
+    download_name: `${slugForDownloadName(projectName)}-sam31-sprinkler-review-decision-${slugForDownloadName(sprinklerReview.consumer || review.consumer || 'consumer')}-${sprinklerReviewEvidence.id}.json`,
+    reviewed_values: reviewedValues,
+    consumer_review_decision: jsonClone(review),
+    sprinkler_review_decision: jsonClone(sprinklerReview),
+    preliminary_replay_inputs: preliminaryReplayInputs,
+    acceptable_evidence: Array.isArray(sprinklerReview.acceptable_evidence) ? [...sprinklerReview.acceptable_evidence] : [],
+    source_refs: sourceRefs,
+    use_for_claims: false,
+    blocked_claims: blockedClaims,
+    claim_gate_effect: 'no_claims_cleared',
+    no_claim_gates_cleared: true,
+    limitations: uniqueStrings([
+      ...(Array.isArray(sprinklerReview.limitations) ? sprinklerReview.limitations : []),
+      'This packet packages employee-reviewed SAM31+LLM segmentation/object/vector/3D-candidate corrections for replay only.',
+      'It cannot clear permit-ready, AHJ-ready, PE-reviewed, AutoSprink parity, fabrication-ready, or manufacturer-exact claims.',
+    ]),
   };
 }
 
@@ -7044,6 +7201,59 @@ app.get('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/openclaw/
       reviewEvidence,
       review,
       consumerSmokeEvidence,
+    ));
+  } catch (err) {
+    return res.status(err.httpStatus || 400).json({ error: err.message });
+  }
+});
+
+app.get('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/openclaw/sam31/sprinkler-review/:reviewEvidenceId/decision/:sprinklerReviewEvidenceId/packet', authMiddleware, (req, res) => {
+  try {
+    const projectName = req.params.name;
+    const evidenceId = Number(req.params.evidenceId);
+    const reviewEvidenceId = Number(req.params.reviewEvidenceId);
+    const sprinklerReviewEvidenceId = Number(req.params.sprinklerReviewEvidenceId);
+    if (!Number.isSafeInteger(evidenceId) || evidenceId <= 0) {
+      return res.status(400).json({ error: 'A positive evidence id is required' });
+    }
+    if (!Number.isSafeInteger(reviewEvidenceId) || reviewEvidenceId <= 0) {
+      return res.status(400).json({ error: 'A positive SAM31 consumer review evidence id is required' });
+    }
+    if (!Number.isSafeInteger(sprinklerReviewEvidenceId) || sprinklerReviewEvidenceId <= 0) {
+      return res.status(400).json({ error: 'A positive SAM31 sprinkler review decision evidence id is required' });
+    }
+    const evidence = db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'pdf_boundary_decision'`)
+      .get(evidenceId, projectName);
+    const decision = decisionFromEvidence(evidence);
+    if (!evidence || !decision) {
+      return res.status(404).json({ error: 'PDF boundary decision evidence not found' });
+    }
+    const reviewEvidence = db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'openclaw_sam31_consumer_review'`)
+      .get(reviewEvidenceId, projectName);
+    const review = openClawSam31ConsumerReviewFromEvidence(reviewEvidence);
+    if (!reviewEvidence || !review) {
+      return res.status(404).json({ error: 'SAM31 consumer review evidence not found' });
+    }
+    const sprinklerReviewEvidence = db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'halofire_sam31_sprinkler_review_decision'`)
+      .get(sprinklerReviewEvidenceId, projectName);
+    const sprinklerReview = halofireSam31SprinklerReviewDecisionFromEvidence(sprinklerReviewEvidence);
+    if (!sprinklerReviewEvidence || !sprinklerReview) {
+      return res.status(404).json({ error: 'HaloFire SAM31 sprinkler review decision evidence not found' });
+    }
+    return res.json(buildHalofireSam31SprinklerReviewDecisionPacket(
+      projectName,
+      evidence,
+      decision,
+      reviewEvidence,
+      review,
+      sprinklerReviewEvidence,
+      sprinklerReview,
     ));
   } catch (err) {
     return res.status(err.httpStatus || 400).json({ error: err.message });

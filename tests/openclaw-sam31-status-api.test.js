@@ -1614,6 +1614,59 @@ describe('OpenClaw SAM31 bridge status API', () => {
     ]));
     expect(reviewedSprinklerLane.summary.sam31_sprinkler_review_decisions_recorded).toBeGreaterThanOrEqual(1);
 
+    const sprinklerReviewPacketRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/sprinkler-review/${consumerReview.id}/decision/${sprinklerReview.id}/packet`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(sprinklerReviewPacketRes.status).toBe(200);
+    const sprinklerReviewPacket = await sprinklerReviewPacketRes.json();
+    expect(sprinklerReviewPacket).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.sam31_sprinkler_review_decision_packet.v1',
+      status: 'ready_for_internal_alpha_sprinkler_replay',
+      source: 'halofire.sam31_sprinkler_review_decision.v1',
+      source_queue_item_artifact_type: 'halofire.sam31_sprinkler_review_queue_item.v1',
+      source_adapter_artifact_type: 'openclaw.sam31_to_sprinkler_review_adapter.v1',
+      source_pdf_boundary_evidence_id: boundary.id,
+      source_openclaw_sam31_consumer_review_evidence_id: consumerReview.id,
+      source_halofire_sam31_sprinkler_review_decision_evidence_id: sprinklerReview.id,
+      consumer: 'landscout',
+      issue_type: 'sam31_consumer_reviewed_object_hypotheses',
+      supported_sprinkler_review_lane: 'obstruction_or_clash_review',
+      review_decision: 'replaced',
+      download_name: expect.stringContaining('sam31-sprinkler-review-decision-landscout'),
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(sprinklerReviewPacket.reviewed_values).toEqual(expect.objectContaining({
+      obstruction_candidates: [expect.objectContaining({ sprinkler_relevance: 'not_a_sprinkler_obstruction' })],
+      confidence: 0.74,
+    }));
+    expect(sprinklerReviewPacket.preliminary_replay_inputs).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.sam31_sprinkler_review_preliminary_replay_inputs.v1',
+      status: 'requires_internal_alpha_replay',
+      source_halofire_sam31_sprinkler_review_decision_evidence_id: sprinklerReview.id,
+      supported_sprinkler_review_lane: 'obstruction_or_clash_review',
+      replay_scope: 'obstruction_clash_candidate_review',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(sprinklerReviewPacket.preliminary_replay_inputs.evidence_lanes).toEqual(expect.arrayContaining([
+      'obstruction_or_clash_review',
+    ]));
+    expect(sprinklerReviewPacket.source_refs).toEqual(expect.arrayContaining([
+      expect.objectContaining({ evidence_id: boundary.id, evidence_type: 'pdf_boundary_decision' }),
+      expect.objectContaining({ evidence_id: consumerReview.id, evidence_type: 'openclaw_sam31_consumer_review' }),
+      expect.objectContaining({ evidence_id: sprinklerReview.id, evidence_type: 'halofire_sam31_sprinkler_review_decision' }),
+    ]));
+    expect(sprinklerReviewPacket.blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'AHJ_approval',
+      'AutoSprink_parity',
+      'fabrication_ready',
+      'professional_approval',
+      'manufacturer_exact',
+    ]));
+
     const nameForgeAdapterRes = await request(`${COOPERATIVE_1881_PATH}/openclaw/sam31/product-owner-replacements`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` },

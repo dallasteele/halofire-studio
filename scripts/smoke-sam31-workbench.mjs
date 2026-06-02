@@ -509,6 +509,10 @@ async function runBrowserSmoke(token, evidenceIds) {
     if (!reviewedObstructionRows.some((item) => item.latest_sam31_sprinkler_review_decision?.review_decision === 'replaced')) {
       throw new Error(`SAM31 sprinkler review decision did not persist to resolver queue: ${JSON.stringify(reviewedObstructionQueue)}`);
     }
+    const latestSprinklerDecision = reviewedObstructionRows.find((item) => item.latest_sam31_sprinkler_review_decision?.review_decision === 'replaced')?.latest_sam31_sprinkler_review_decision;
+    if (!latestSprinklerDecision?.evidence_id) {
+      throw new Error(`SAM31 sprinkler review decision evidence id missing from resolver queue: ${JSON.stringify(reviewedObstructionRows)}`);
+    }
     await page.waitForSelector('text=Download SAM31 consumer review decision', { timeout: 8_000 });
     const consumerReviewDownloadPromise = page.waitForEvent('download');
     await page.locator(`button[data-sam31-consumer-review-packet-evidence-id="${consumerReview.evidence_id}"]`).click();
@@ -553,6 +557,27 @@ async function runBrowserSmoke(token, evidenceIds) {
     }
     if (!Array.isArray(sprinklerAdapterPacket.supported_sprinkler_review_lanes) || !sprinklerAdapterPacket.supported_sprinkler_review_lanes.includes('obstruction_or_clash_review')) {
       throw new Error(`SAM31 sprinkler review adapter missing sprinkler review lanes: ${JSON.stringify(sprinklerAdapterPacket.supported_sprinkler_review_lanes)}`);
+    }
+    await page.waitForSelector('text=Download SAM31 sprinkler review decision packet', { timeout: 8_000 });
+    const sprinklerReviewPacketDownloadPromise = page.waitForEvent('download');
+    await page.locator(`button[data-sam31-sprinkler-review-packet-evidence-id="${latestSprinklerDecision.evidence_id}"]`).click();
+    const sprinklerReviewPacketDownload = await sprinklerReviewPacketDownloadPromise;
+    const sprinklerReviewPacketPath = await sprinklerReviewPacketDownload.path();
+    const sprinklerReviewPacketSuggestedName = sprinklerReviewPacketDownload.suggestedFilename();
+    const sprinklerReviewPacketDownloadBytes = sprinklerReviewPacketPath ? fs.statSync(sprinklerReviewPacketPath).size : 0;
+    downloads.push({ suggestedName: sprinklerReviewPacketSuggestedName, bytes: sprinklerReviewPacketDownloadBytes });
+    if (!sprinklerReviewPacketSuggestedName.includes('sam31-sprinkler-review-decision') || sprinklerReviewPacketDownloadBytes <= 0) {
+      throw new Error(`Unexpected SAM31 sprinkler review decision packet download ${sprinklerReviewPacketSuggestedName} (${sprinklerReviewPacketDownloadBytes} bytes)`);
+    }
+    const sprinklerReviewDecisionPacket = JSON.parse(fs.readFileSync(sprinklerReviewPacketPath, 'utf8'));
+    if (sprinklerReviewDecisionPacket.artifact_type !== 'halofire.sam31_sprinkler_review_decision_packet.v1') {
+      throw new Error(`Unexpected SAM31 sprinkler review decision packet type ${sprinklerReviewDecisionPacket.artifact_type}`);
+    }
+    if (sprinklerReviewDecisionPacket.preliminary_replay_inputs?.artifact_type !== 'halofire.sam31_sprinkler_review_preliminary_replay_inputs.v1') {
+      throw new Error(`Unexpected SAM31 sprinkler replay input type ${sprinklerReviewDecisionPacket.preliminary_replay_inputs?.artifact_type}`);
+    }
+    if (sprinklerReviewDecisionPacket.claim_gate_effect !== 'no_claims_cleared' || sprinklerReviewDecisionPacket.use_for_claims !== false) {
+      throw new Error(`SAM31 sprinkler review decision packet cleared a claim gate: ${JSON.stringify(sprinklerReviewDecisionPacket)}`);
     }
     const unresolvedNameForge = await request(`${PROJECT_PATH}/resolver-queue?sam31ConsumerReview=unresolved&consumer=nameforge`, token);
     const unresolvedItem = unresolvedNameForge.items.find((item) => item.evidence_id === evidenceIds.boundaryEvidenceId);
@@ -710,6 +735,14 @@ async function runBrowserSmoke(token, evidenceIds) {
         sprinkler_review_packet_type: sprinklerAdapterPacket.sprinkler_review_packet?.artifact_type,
         supported_sprinkler_review_lanes: sprinklerAdapterPacket.supported_sprinkler_review_lanes,
         claim_gate_effect: sprinklerAdapterPacket.claim_gate_effect,
+      },
+      sprinklerReviewDecisionPacket: {
+        artifact_type: sprinklerReviewDecisionPacket.artifact_type,
+        suggestedName: sprinklerReviewPacketSuggestedName,
+        source_halofire_sam31_sprinkler_review_decision_evidence_id: sprinklerReviewDecisionPacket.source_halofire_sam31_sprinkler_review_decision_evidence_id,
+        preliminary_replay_inputs_type: sprinklerReviewDecisionPacket.preliminary_replay_inputs?.artifact_type,
+        supported_sprinkler_review_lane: sprinklerReviewDecisionPacket.supported_sprinkler_review_lane,
+        claim_gate_effect: sprinklerReviewDecisionPacket.claim_gate_effect,
       },
       unresolvedNameForgeReview: {
         filter: 'sam31ConsumerReview=unresolved',

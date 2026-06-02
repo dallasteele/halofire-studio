@@ -279,6 +279,13 @@ describe('studio static origin handling', () => {
     expect(html).toContain('Save SAM31 sprinkler review decision');
     expect(html).toContain('saveHalofireSam31SprinklerReviewDecision');
     expect(html).toContain('/openclaw/sam31/sprinkler-review/');
+    expect(html).toContain('Download SAM31 sprinkler review decision packet');
+    expect(html).toContain('downloadHalofireSam31SprinklerReviewDecisionPacket');
+    expect(html).toContain('data-sam31-sprinkler-review-packet-evidence-id');
+    expect(html).toContain('/decision/');
+    expect(html).toContain('halofire.sam31_sprinkler_review_decision_packet.v1');
+    expect(html).toContain('halofire.sam31_sprinkler_review_preliminary_replay_inputs.v1');
+    expect(html).toContain('preliminary_replay_inputs');
     expect(html).toContain('halofire.sam31_sprinkler_review_decision.v1');
     expect(html).toContain('latest_sam31_sprinkler_review_decision');
     expect(html).toContain('supported_applications');
