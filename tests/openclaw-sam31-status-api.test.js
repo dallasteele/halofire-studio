@@ -1635,6 +1635,7 @@ describe('OpenClaw SAM31 bridge status API', () => {
       source_ref: `${perceptionBaseUrl}/vision/sam31/tool`,
       status: 'best_effort',
     }));
+    expect(consumerQueuePosts.map((post) => post.consumer).sort()).toEqual(['landscout', 'nameforge']);
     const packetRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/consumer-smoke-packet`, {
       headers: { Authorization: `Bearer ${token}` },
     });
