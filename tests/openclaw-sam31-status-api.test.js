@@ -548,6 +548,53 @@ describe('OpenClaw SAM31 bridge status API', () => {
       claim_gate_effect: 'no_claims_cleared',
     }));
     expect(reviewedQueue.summary.sam31_extrapolation_reviews_recorded).toBeGreaterThanOrEqual(1);
+
+    const packetRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/extrapolation-review-packet`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(packetRes.status).toBe(200);
+    const packet = await packetRes.json();
+    expect(packet).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31_extrapolation_product_review_packet',
+      status: 'ready_for_sprinkler_cad_review',
+      project_name: COOPERATIVE_1881_PROJECT_NAME,
+      source_pdf_boundary_evidence_id: boundary.id,
+      source_openclaw_sam31_extrapolation_evidence_id: artifact.id,
+      source_openclaw_sam31_extrapolation_review_evidence_id: review.id,
+      claim_gate_effect: 'no_claims_cleared',
+      download_name: expect.stringContaining('sam31-extrapolation-product-review-packet'),
+    }));
+    expect(packet.reviewed_values).toEqual(expect.objectContaining({
+      object_hypotheses: expect.arrayContaining([
+        expect.objectContaining({ id: 'obj:door-reviewed', label: 'rated corridor door' }),
+      ]),
+      vector_overlays: expect.arrayContaining([
+        expect.objectContaining({ id: 'vector:room-101-reviewed' }),
+      ]),
+      model_3d_candidates: expect.arrayContaining([
+        expect.objectContaining({ id: 'model3d:room-101-reviewed', primitive: 'extruded_polygon' }),
+      ]),
+      confidence: 0.81,
+    }));
+    expect(packet.downstream_review_lanes).toEqual(expect.arrayContaining([
+      'sprinkler_obstruction_review',
+      'cad_vector_overlay_review',
+      'model_3d_candidate_review',
+      'room_boundary_visual_audit',
+    ]));
+    expect(packet.source_refs).toEqual(expect.arrayContaining([
+      expect.objectContaining({ evidence_id: boundary.id, evidence_type: 'pdf_boundary_decision' }),
+      expect.objectContaining({ evidence_id: artifact.id, evidence_type: 'openclaw_sam31_extrapolation_artifact' }),
+      expect.objectContaining({ evidence_id: review.id, evidence_type: 'openclaw_sam31_extrapolation_review' }),
+    ]));
+    expect(packet.blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'AHJ_approval',
+      'AutoSprink_parity',
+      'professional_approval',
+      'SAM31_runtime_verified',
+      'OpenClaw_runtime_verified',
+    ]));
   });
 
   it('carries saved bridge smoke artifacts into SAM31 audit defaults and replay evidence without clearing claims', async () => {

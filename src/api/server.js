@@ -2166,6 +2166,110 @@ function openClawSam31ExtrapolationReviewSummary(reviewEvidence) {
   };
 }
 
+function buildOpenClawSam31ExtrapolationReviewPacket(projectName, evidence, decision, extrapolationEvidence, extrapolationArtifact, reviewEvidence, review) {
+  if (!evidence || !decision) {
+    const e = new Error('PDF boundary decision evidence not found');
+    e.httpStatus = 404;
+    throw e;
+  }
+  if (!extrapolationEvidence?.evidence || !extrapolationArtifact) {
+    const e = new Error('OpenClaw SAM31 extrapolation artifact evidence is required before downloading the product review packet');
+    e.httpStatus = 409;
+    throw e;
+  }
+  if (!reviewEvidence?.evidence || !review) {
+    const e = new Error('OpenClaw SAM31 extrapolation review evidence is required before downloading the product review packet');
+    e.httpStatus = 409;
+    throw e;
+  }
+  const perception = extrapolationArtifact.perception_packet && typeof extrapolationArtifact.perception_packet === 'object'
+    ? extrapolationArtifact.perception_packet
+    : {};
+  const originalValues = {
+    sections: Array.isArray(extrapolationArtifact.request?.sections)
+      ? jsonClone(extrapolationArtifact.request.sections)
+      : (Array.isArray(perception.segments) ? jsonClone(perception.segments) : []),
+    object_hypotheses: Array.isArray(perception.object_hypotheses)
+      ? jsonClone(perception.object_hypotheses)
+      : (Array.isArray(extrapolationArtifact.request?.object_hypotheses) ? jsonClone(extrapolationArtifact.request.object_hypotheses) : []),
+    vector_overlays: Array.isArray(perception.vector_overlays)
+      ? jsonClone(perception.vector_overlays)
+      : (Array.isArray(extrapolationArtifact.request?.vector_overlays) ? jsonClone(extrapolationArtifact.request.vector_overlays) : []),
+    model_3d_candidates: Array.isArray(perception.model_3d_candidates)
+      ? jsonClone(perception.model_3d_candidates)
+      : (Array.isArray(extrapolationArtifact.request?.model_3d_candidates) ? jsonClone(extrapolationArtifact.request.model_3d_candidates) : []),
+    semantic_labels: Array.isArray(perception.semantic_labels) ? jsonClone(perception.semantic_labels) : [],
+    source_ref: extrapolationArtifact.source_ref || evidence.source_ref || decision.sourceRef || null,
+    confidence: Number.isFinite(Number(perception.confidence)) ? Number(perception.confidence) : null,
+  };
+  const sourceRefs = [
+    {
+      evidence_id: evidence.id,
+      evidence_type: evidence.evidence_type,
+      source_file: evidence.source_file || decision.sourceFile || null,
+      source_ref: evidence.source_ref || decision.sourceRef || null,
+      status: evidence.status,
+    },
+    {
+      evidence_id: extrapolationEvidence.evidence.id,
+      evidence_type: extrapolationEvidence.evidence.evidence_type,
+      source_file: extrapolationEvidence.evidence.source_file || null,
+      source_ref: extrapolationEvidence.evidence.source_ref || extrapolationArtifact.openclaw_endpoint || null,
+      status: extrapolationEvidence.evidence.status,
+      claim_gate_effect: 'no_claims_cleared',
+    },
+    {
+      evidence_id: reviewEvidence.evidence.id,
+      evidence_type: reviewEvidence.evidence.evidence_type,
+      source_file: reviewEvidence.evidence.source_file || null,
+      source_ref: reviewEvidence.evidence.source_ref || review.replacement_ref || null,
+      status: reviewEvidence.evidence.status,
+      claim_gate_effect: 'no_claims_cleared',
+    },
+    ...(Array.isArray(review.source_refs) ? jsonClone(review.source_refs) : []),
+  ];
+  return {
+    artifact_type: 'openclaw.sam31_extrapolation_product_review_packet',
+    status: 'ready_for_sprinkler_cad_review',
+    project_name: projectName,
+    generated_at: new Date().toISOString(),
+    source_pdf_boundary_evidence_id: evidence.id,
+    source_openclaw_sam31_extrapolation_evidence_id: extrapolationEvidence.evidence.id,
+    source_openclaw_sam31_extrapolation_review_evidence_id: reviewEvidence.evidence.id,
+    source_ref: evidence.source_ref || decision.sourceRef || null,
+    source_file: evidence.source_file || decision.sourceFile || null,
+    download_name: `${slugForDownloadName(projectName)}-sam31-extrapolation-product-review-packet-${evidence.id}.json`,
+    downstream_review_lanes: [
+      'sprinkler_obstruction_review',
+      'cad_vector_overlay_review',
+      'model_3d_candidate_review',
+      'room_boundary_visual_audit',
+      'sleeve_or_firestop_candidate_review',
+    ],
+    original_values: originalValues,
+    reviewed_values: review.replacement_values && typeof review.replacement_values === 'object'
+      ? jsonClone(review.replacement_values)
+      : {},
+    product_review: jsonClone(review),
+    openclaw_sam31_extrapolation_artifact: jsonClone(extrapolationArtifact),
+    source_refs: sourceRefs,
+    blocked_claims: uniqueStrings([
+      ...(Array.isArray(extrapolationArtifact.blocked_claims) ? extrapolationArtifact.blocked_claims : []),
+      ...(Array.isArray(review.blocked_claims) ? review.blocked_claims : []),
+      ...(Array.isArray(decision.blockedClaims) ? decision.blockedClaims : PDF_BOUNDARY_BLOCKED_CLAIMS),
+      'professional_approval',
+      'SAM31_runtime_verified',
+      'OpenClaw_runtime_verified',
+    ]),
+    claim_gate_effect: 'no_claims_cleared',
+    no_claim_gates_cleared: true,
+    limitations: [
+      'This packet packages reviewed SAM31+LLM object, vector, and 3D candidate values for HaloFire sprinkler/CAD review only.',
+      'It can drive best-effort internal-alpha review and replay workflows, but it does not prove geometry accuracy, drawing scale, AHJ approval, PE review, AutoSprink parity, permit readiness, fabrication readiness, or manufacturer-exact models.',
+    ],
+  };
+}
+
 function sam31EmployeeReplacementReplaySummary(sam31ReplacementEvidence) {
   if (!sam31ReplacementEvidence?.evidence || !sam31ReplacementEvidence?.replacement) return null;
   const { evidence, replacement } = sam31ReplacementEvidence;
@@ -2426,6 +2530,11 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
       { label: 'Load defaults in Studio', href: `/autosprink.html?project=${encodeURIComponent(projectName)}&resolver=${encodeURIComponent(`pdf-boundary:${evidence.id}`)}` },
       { label: 'Download SAM 3.1 visual audit packet', href: `/api/projects/${encodeURIComponent(projectName)}/resolver-packets/pdf-boundary/${evidence.id}/sam31-visual-audit` },
       { label: 'Run OpenClaw SAM31 extrapolation artifact', href: extrapolateHref, method: 'POST' },
+      ...(latestOpenClawSam31ExtrapolationReview ? [{
+        label: 'Download SAM31 product review packet',
+        href: `/api/projects/${encodeURIComponent(projectName)}/resolver-packets/pdf-boundary/${evidence.id}/openclaw/sam31/extrapolation-review-packet`,
+        artifact_type: 'openclaw.sam31_extrapolation_product_review_packet',
+      }] : []),
       { label: 'Run OpenClaw SAM31 bridge smoke artifact', href: bridgeSmokeHref, method: 'POST' },
       { label: 'View source evidence', href: `/workbench.html?project=${encodeURIComponent(projectName)}#evidence-${evidence.id}` },
     ],
@@ -4485,6 +4594,37 @@ app.post('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/openclaw
       evidence: evidenceRow,
       ...reviewPacket,
     });
+  } catch (err) {
+    return res.status(err.httpStatus || 400).json({ error: err.message });
+  }
+});
+
+app.get('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/openclaw/sam31/extrapolation-review-packet', authMiddleware, (req, res) => {
+  try {
+    const projectName = req.params.name;
+    const evidenceId = Number(req.params.evidenceId);
+    if (!Number.isSafeInteger(evidenceId) || evidenceId <= 0) {
+      return res.status(400).json({ error: 'A positive evidence id is required' });
+    }
+    const evidence = db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'pdf_boundary_decision'`)
+      .get(evidenceId, projectName);
+    const decision = decisionFromEvidence(evidence);
+    if (!evidence || !decision) {
+      return res.status(404).json({ error: 'PDF boundary decision evidence not found' });
+    }
+    const extrapolationEvidence = latestOpenClawSam31ExtrapolationArtifactEvidence(projectName, evidence.id);
+    const reviewEvidence = latestOpenClawSam31ExtrapolationReviewEvidence(projectName, evidence.id);
+    return res.json(buildOpenClawSam31ExtrapolationReviewPacket(
+      projectName,
+      evidence,
+      decision,
+      extrapolationEvidence,
+      extrapolationEvidence?.artifact || null,
+      reviewEvidence,
+      reviewEvidence?.review || null,
+    ));
   } catch (err) {
     return res.status(err.httpStatus || 400).json({ error: err.message });
   }
