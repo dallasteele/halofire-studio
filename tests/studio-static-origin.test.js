@@ -291,6 +291,17 @@ describe('studio static origin handling', () => {
     expect(html).toContain('claim_gate_effect');
   });
 
+  it('lets Settings resolve a gate from recorded matching evidence rows', async () => {
+    const shell = await fetch(`${BASE}/settings.html`, { headers: { Origin: BASE } });
+    expect(shell.status).toBe(200);
+    const html = await shell.text();
+    expect(html).toContain('Use recorded evidence');
+    expect(html).toContain('id="wizExistingEvidence"');
+    expect(html).toContain('resolveWizardWithExistingEvidence');
+    expect(html).toContain('evidence_id');
+    expect(html).toContain('matching_evidence');
+  });
+
   it('lets the workbench download official-flow hydraulic replay artifacts', async () => {
     const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
     expect(shell.status).toBe(200);

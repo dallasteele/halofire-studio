@@ -98,6 +98,9 @@
         <label class="muted">Allowed evidence type
           <select id="wizType" style="width:100%;margin-top:3px"></select>
         </label>
+        <label class="muted">Recorded matching evidence
+          <select id="wizExistingEvidence" style="width:100%;margin-top:3px"></select>
+        </label>
         <label class="muted">Action
           <select id="wizAction" style="width:100%;margin-top:3px">
             <option value="resolve">Resolve gate</option>
@@ -137,6 +140,7 @@
         </div>
         <div class="muted" id="wizGateHelp">Choose a gate to see acceptable evidence.</div>
         <div style="display:flex;gap:10px;align-items:center">
+          <button id="wizUseExisting" type="button">Use recorded evidence</button>
           <button id="wizSubmit">Submit evidence</button>
           <span id="wizMsg" class="muted"></span>
         </div>
@@ -251,18 +255,37 @@ async function loadDeps() {
 function syncWizardGateForm() {
   const gate = wizardState.gateMap.get($('wizGate').value);
   const typeEl = $('wizType');
+  const existingEl = $('wizExistingEvidence');
   const actionEl = $('wizAction');
   if (!gate) {
     typeEl.innerHTML = '';
+    existingEl.innerHTML = '<option value="">no recorded evidence</option>';
+    $('wizUseExisting').disabled = true;
     $('wizGateHelp').textContent = 'Choose a gate to see acceptable evidence.';
     return;
   }
   const allowed = gate.allowed_evidence_types || [];
   typeEl.innerHTML = allowed.map((type) => `<option value="${type}">${type}</option>`).join('');
   if (!allowed.length) typeEl.innerHTML = '<option value="">no allowed type</option>';
+  const matchingEvidence = Array.isArray(gate.matching_evidence) ? gate.matching_evidence : [];
+  existingEl.innerHTML = matchingEvidence.length
+    ? ['<option value="">choose recorded evidence…</option>', ...matchingEvidence.map((row) => {
+      const signoff = (() => {
+        try {
+          const parsed = JSON.parse(row.notes || '{}');
+          return parsed.signoff?.reviewer_name ? ` · ${parsed.signoff.reviewer_name}` : '';
+        } catch {
+          return '';
+        }
+      })();
+      const sourceRef = row.source_ref || row.source_file || `evidence #${row.id}`;
+      return `<option value="${row.id}">${escapeHtml(row.evidence_type)} · ${escapeHtml(sourceRef)}${escapeHtml(signoff)}</option>`;
+    })].join('')
+    : '<option value="">no recorded evidence</option>';
   syncWizardSignoff();
   actionEl.disabled = !gate.can_resolve || !wizardState.canWrite;
   if (!gate.can_resolve) actionEl.value = 'record';
+  $('wizUseExisting').disabled = !wizardState.canWrite || !gate.can_resolve || !matchingEvidence.length;
   $('wizGateHelp').innerHTML =
     `<b>${escapeHtml(gate.code)}</b> — ${escapeHtml(gate.acceptable_evidence || gate.next_action || '')}`
     + (gate.blocked_claims?.length ? `<div style="margin-top:6px">Blocks: ${gate.blocked_claims.map((claim) => `<span class="pill missing">${escapeHtml(claim)}</span>`).join('')}</div>` : '');
@@ -326,6 +349,26 @@ async function loadWizard(projectName) {
   }
 }
 
+async function resolveWizardWithExistingEvidence() {
+  const msg = $('wizMsg'); msg.className = 'muted'; msg.textContent = '';
+  const gateCode = $('wizGate').value;
+  const evidenceId = Number($('wizExistingEvidence').value);
+  if (!gateCode) { msg.className = 'err'; msg.textContent = 'choose a gate'; return; }
+  if (!Number.isFinite(evidenceId) || evidenceId <= 0) { msg.className = 'err'; msg.textContent = 'choose recorded evidence first'; return; }
+  const projectName = $('wizProject').value;
+  try {
+    await api('/projects/' + encodeURIComponent(projectName) + '/claim-gates/' + encodeURIComponent(gateCode) + '/resolve', {
+      method: 'POST',
+      body: JSON.stringify({ evidence_id: evidenceId }),
+    });
+    msg.textContent = 'gate resolved with recorded evidence';
+    await loadWizard(projectName);
+  } catch (e) {
+    msg.className = 'err';
+    msg.textContent = e.message;
+  }
+}
+
 async function initWizard() {
   try {
     const me = await api('/auth/me');
@@ -349,6 +392,7 @@ $('wizProject').addEventListener('change', () => loadWizard($('wizProject').valu
 $('wizGate').addEventListener('change', syncWizardGateForm);
 $('wizType').addEventListener('change', syncWizardSignoff);
 $('wizAction').addEventListener('change', syncWizardGateForm);
+$('wizUseExisting').addEventListener('click', resolveWizardWithExistingEvidence);
 $('wizSubmit').onclick = async () => {
   const msg = $('wizMsg'); msg.className = 'muted'; msg.textContent = '';
   const gateCode = $('wizGate').value;

@@ -597,6 +597,23 @@ function normalizeSignedReviewerSignoff(evidenceType, signoff) {
   };
 }
 
+function hasStructuredSignedReviewerNotes(row) {
+  if (!row?.notes || typeof row.notes !== 'string') return false;
+  try {
+    const parsed = JSON.parse(row.notes);
+    return Boolean(
+      parsed
+      && parsed.kind === 'signed_reviewer_evidence'
+      && parsed.signoff
+      && parsed.signoff.reviewer_name
+      && parsed.signoff.reviewer_title
+      && parsed.signoff.signed_at,
+    );
+  } catch {
+    return false;
+  }
+}
+
 app.get('/api/projects/:name/claim-gates', authMiddleware, (req, res) => {
   const gates = db
     .prepare('SELECT * FROM claim_gates WHERE project_name = ? ORDER BY severity DESC, code')
@@ -779,15 +796,64 @@ app.post('/api/projects/:name/evidence', authMiddleware, requireRole('admin'), (
 app.post('/api/projects/:name/claim-gates/:code/resolve', authMiddleware, requireRole('admin'), (req, res) => {
   const projectName = req.params.name;
   const code = req.params.code;
+  const existing = db
+    .prepare('SELECT * FROM claim_gates WHERE project_name = ? AND code = ?')
+    .get(projectName, code);
+  if (!existing) {
+    return res.status(404).json({ error: 'Claim gate not found' });
+  }
+  const rule = gateEvidenceRule(code);
+  if (!rule.canResolve) {
+    return res.status(400).json({ error: 'This gate cannot be cleared through the evidence wizard' });
+  }
+  const resolvedAt = new Date().toISOString();
+  const requestedEvidenceId = Number(req.body?.evidence_id);
+  if (Number.isFinite(requestedEvidenceId) && requestedEvidenceId > 0) {
+    const existingEvidence = db
+      .prepare('SELECT * FROM project_evidence WHERE project_name = ? AND id = ?')
+      .get(projectName, requestedEvidenceId);
+    if (!existingEvidence) {
+      return res.status(404).json({ error: 'Existing evidence row not found for this project' });
+    }
+    const evidenceType = existingEvidence.evidence_type;
+    if (!GATE_CLEARING_EVIDENCE_TYPES.has(evidenceType)) {
+      return res.status(400).json({
+        error: `evidence_type '${evidenceType}' cannot clear a gate; must be one of: ${[...GATE_CLEARING_EVIDENCE_TYPES].join(', ')}`,
+      });
+    }
+    if (!rule.allowedEvidenceTypes.includes(evidenceType)) {
+      return res.status(400).json({
+        error: `Gate ${code} only accepts allowed evidence types: ${rule.allowedEvidenceTypes.join(', ')}`,
+      });
+    }
+    if (String(existingEvidence.status) !== 'present') {
+      return res.status(400).json({ error: "existing evidence row must have status 'present' to clear a gate" });
+    }
+    if (SIGNED_REVIEW_EVIDENCE_TYPES.has(evidenceType) && !hasStructuredSignedReviewerNotes(existingEvidence)) {
+      return res.status(400).json({ error: 'existing evidence row is missing signed reviewer metadata required for this gate' });
+    }
+    db.prepare(`UPDATE claim_gates
+                SET status = 'cleared', resolved_by = ?, resolved_at = ?, resolved_evidence_ref = ?
+                WHERE project_name = ? AND code = ?`)
+      .run(req.user.username, resolvedAt, existingEvidence.source_ref, projectName, code);
+    return res.status(200).json({
+      cleared: true,
+      code,
+      resolved_by: req.user.username,
+      resolved_at: resolvedAt,
+      resolved_evidence_id: existingEvidence.id,
+      resolved_evidence_ref: existingEvidence.source_ref,
+    });
+  }
+
   const evidence = req.body?.evidence;
   if (!evidence || typeof evidence !== 'object') {
-    return res.status(400).json({ error: 'A real evidence object is required to clear a gate' });
+    return res.status(400).json({ error: 'Provide either evidence_id or a real evidence object to clear a gate' });
   }
   const { evidence_type, source_ref = null, source_file = null, notes = null } = evidence;
   if (!evidence_type || !source_ref) {
     return res.status(400).json({ error: 'evidence.evidence_type and evidence.source_ref are required' });
   }
-  // Status is treated as 'present' on success; an explicit best_effort status is rejected.
   const status = evidence.status === undefined ? 'present' : String(evidence.status);
   if (status === 'best_effort') {
     return res.status(400).json({ error: 'best_effort evidence cannot clear a claim gate' });
@@ -799,17 +865,6 @@ app.post('/api/projects/:name/claim-gates/:code/resolve', authMiddleware, requir
     return res.status(400).json({
       error: `evidence_type '${evidence_type}' cannot clear a gate; must be one of: ${[...GATE_CLEARING_EVIDENCE_TYPES].join(', ')}`,
     });
-  }
-
-  const existing = db
-    .prepare('SELECT * FROM claim_gates WHERE project_name = ? AND code = ?')
-    .get(projectName, code);
-  if (!existing) {
-    return res.status(404).json({ error: 'Claim gate not found' });
-  }
-  const rule = gateEvidenceRule(code);
-  if (!rule.canResolve) {
-    return res.status(400).json({ error: 'This gate cannot be cleared through the evidence wizard' });
   }
   if (!rule.allowedEvidenceTypes.includes(evidence_type)) {
     return res.status(400).json({
@@ -833,7 +888,6 @@ app.post('/api/projects/:name/claim-gates/:code/resolve', authMiddleware, requir
     return res.status(err.httpStatus || 400).json({ error: err.message });
   }
 
-  const resolvedAt = new Date().toISOString();
   const tx = db.transaction(() => {
     db.prepare(`INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
                 VALUES (?, ?, ?, ?, ?, ?)`)

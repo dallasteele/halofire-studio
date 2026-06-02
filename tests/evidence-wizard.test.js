@@ -228,4 +228,61 @@ describe('HaloFire evidence wizard slice', () => {
     }));
     expect((await gate(token, 'PROFESSIONAL_REVIEW_MISSING')).status).toBe('blocked');
   });
+
+  it('resolves a regulated gate from an already-recorded signed evidence row without duplicating it', async () => {
+    const token = await tokenFor('wizard-admin', 'actual-test-password');
+
+    const recorded = await request(`${PROJECT_PATH}/evidence`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        evidence_type: 'professional_review',
+        source_ref: 'Signed reviewer packet PR-1881-002',
+        source_file: 'professional-review-packet-2.pdf',
+        status: 'present',
+        notes: 'Recorded first, resolve later.',
+        signoff: {
+          reviewer_name: 'Jamie Chen',
+          reviewer_title: 'Fire Protection Engineer',
+          signed_at: '2026-06-02T15:45:00.000Z',
+          organization: 'Halo Fire',
+          license_id: 'PE-4096',
+        },
+      }),
+    });
+    expect(recorded.status).toBe(201);
+    const recordedBody = await recorded.json();
+
+    const beforeRows = await (await request(`${PROJECT_PATH}/evidence`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })).json();
+    const rowCountBeforeResolve = beforeRows.length;
+
+    const resolve = await request(`${PROJECT_PATH}/claim-gates/PROFESSIONAL_REVIEW_MISSING/resolve`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        evidence_id: recordedBody.id,
+      }),
+    });
+    expect(resolve.status).toBe(200);
+    const resolvedBody = await resolve.json();
+    expect(resolvedBody.cleared).toBe(true);
+    expect(resolvedBody.resolved_evidence_id).toBe(recordedBody.id);
+    expect(resolvedBody.resolved_evidence_ref).toBe('Signed reviewer packet PR-1881-002');
+
+    const afterRows = await (await request(`${PROJECT_PATH}/evidence`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })).json();
+    expect(afterRows).toHaveLength(rowCountBeforeResolve);
+    const resolvedRow = afterRows.find((item) => item.id === recordedBody.id);
+    expect(resolvedRow).toBeTruthy();
+    const resolvedNotes = JSON.parse(resolvedRow.notes);
+    expect(resolvedNotes.signoff).toEqual(expect.objectContaining({
+      reviewer_name: 'Jamie Chen',
+      reviewer_title: 'Fire Protection Engineer',
+      signed_at: '2026-06-02T15:45:00.000Z',
+    }));
+    expect((await gate(token, 'PROFESSIONAL_REVIEW_MISSING')).status).toBe('cleared');
+  });
 });
