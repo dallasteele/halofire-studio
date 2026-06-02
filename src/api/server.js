@@ -1337,6 +1337,106 @@ function buildOpenClawSam31ActualValueResolverReplay(projectName, intake, eviden
   };
 }
 
+function buildOpenClawSam31ReplayActualValueHandoffPacket(projectName, replayEvidenceRow, replayNotes) {
+  const acceptableActualEvidence = [
+    '1881 proposal workbook row or sheet reference',
+    'reviewed vector overlay SVG or marked-up plan ref',
+    'reviewed 3D model candidate ref or model note',
+    'screenshot or console evidence for the reviewed SAM31 section',
+  ];
+  const employeeDecision = replayNotes.employee_decision && typeof replayNotes.employee_decision === 'object'
+    ? jsonClone(replayNotes.employee_decision)
+    : null;
+  const sourceRefs = uniqueByJson([
+    {
+      evidence_id: replayEvidenceRow.id,
+      evidence_type: replayEvidenceRow.evidence_type,
+      source_file: replayEvidenceRow.source_file || null,
+      source_ref: replayEvidenceRow.source_ref || null,
+      status: replayEvidenceRow.status,
+      artifact_type: replayNotes.artifact_type || 'room_boundary_replay_bid_artifact',
+      claim_gate_effect: replayNotes.claim_gate_effect || 'no_claims_cleared',
+    },
+    ...(Array.isArray(replayNotes.source_refs) ? jsonClone(replayNotes.source_refs) : []),
+  ]);
+  const blockedClaims = uniqueStrings([
+    ...(Array.isArray(replayNotes.blocked_claims) ? replayNotes.blocked_claims : []),
+    'permit_ready',
+    'fabrication_ready',
+    'AHJ_approval',
+    'professional_approval',
+    'manufacturer_exact',
+    'AutoSprink_parity',
+  ]);
+  return {
+    artifact_type: 'openclaw.sam31.actual_value_handoff_packet.v1',
+    status: 'ready_for_employee_actual_value_replacement',
+    project_name: projectName,
+    generated_at: new Date().toISOString(),
+    source_runtime: 'sam-3.1+llm',
+    source_replay_evidence_id: replayEvidenceRow.id,
+    source_replay_artifact_type: replayNotes.artifact_type || 'room_boundary_replay_bid_artifact',
+    source_replay_ref: replayEvidenceRow.source_ref || null,
+    source_replay_packet: {
+      source_evidence_id: replayNotes.source_evidence_id || null,
+      source_review_evidence_id: replayNotes.source_review_evidence_id || null,
+      source_sam31_evidence_id: replayNotes.source_sam31_evidence_id || null,
+      source_openclaw_sam31_extrapolation_evidence_id: replayNotes.source_openclaw_sam31_extrapolation_evidence_id || null,
+      source_openclaw_sam31_extrapolation_review_evidence_id: replayNotes.source_openclaw_sam31_extrapolation_review_evidence_id || null,
+      source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id: replayNotes.source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id || null,
+      marked_up_plan_ref: replayNotes.marked_up_plan_ref || null,
+      corrected_room_polygon_count: replayNotes.corrected_room_polygon_count || 0,
+    },
+    employee_decision: employeeDecision,
+    source_refs: sourceRefs,
+    supported_applications: [...SAM31_SUPPORTED_APPLICATIONS],
+    consumer_queue_status: [
+      {
+        consumer: 'halo_fire',
+        status: 'source_replay_ready',
+        queue_source: 'halofire_replay_evidence',
+        next_action: 'Replace replay SAM31/LLM temporary values with actual HaloFire source documentation values before downstream bid/export use.',
+      },
+      {
+        consumer: 'landscout',
+        status: 'poll_queue_not_required_for_handoff',
+        queue_source: 'openclaw.sam31.actual_value_handoff_packet.v1',
+        next_action: 'LandScout may consume the same typed handoff shape after its product queue is connected; HaloFire replay replacement is not blocked by that queue.',
+      },
+      {
+        consumer: 'nameforge',
+        status: 'poll_queue_not_required_for_handoff',
+        queue_source: 'openclaw.sam31.actual_value_handoff_packet.v1',
+        next_action: 'NameForge may consume the same typed handoff shape after its product queue is connected; HaloFire replay replacement is not blocked by that queue.',
+      },
+    ],
+    employee_replacement_fields: SAM31_EMPLOYEE_REPLACEMENT_FIELDS.map((field) => ({
+      field,
+      current_value_source: 'sam31_llm_best_guess',
+      acceptable_evidence: acceptableActualEvidence,
+      source_ref: replayEvidenceRow.source_ref || null,
+      required_action: `Replace ${field} with an actual source value or mark it not applicable before downstream use.`,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    })),
+    bid_summary: replayNotes.bid_summary || {
+      total_area_sqft: replayNotes.total_area_sqft || null,
+      total_head_count: replayNotes.total_head_count || null,
+    },
+    acceptable_actual_evidence: acceptableActualEvidence,
+    blocked_claims: blockedClaims,
+    use_for_claims: false,
+    claim_gate_effect: 'no_claims_cleared',
+    no_claim_gates_cleared: true,
+    limitations: uniqueStrings([
+      ...(Array.isArray(replayNotes.limitations) ? replayNotes.limitations : []),
+      'SAM31 plus LLM sectioning can identify likely objects, semantic labels, vector overlays, and 3D candidates, but those outputs remain temporary best guesses until replaced by actual employee/source evidence.',
+      'This handoff never clears permit-ready, fabrication-ready, AHJ-ready, engineering-grade, AutoSprink parity, professional approval, manufacturer-exact, survey-grade, brand-ready, trademark-ready, or production-ready claims.',
+    ]),
+    download_name: `${slugForDownloadName(projectName)}-sam31-actual-value-handoff-${replayEvidenceRow.id}.json`,
+  };
+}
+
 app.get('/api/projects/:name/openclaw/sam31/actual-value-resolver-queue', authMiddleware, (req, res) => {
   res.json(buildOpenClawSam31ActualValueResolverQueue(req.params.name, {
     consumer: req.query?.consumer,
@@ -1448,6 +1548,26 @@ app.get('/api/projects/:name/evidence/:evidenceId/replay-bid-artifact', authMidd
       'This replay artifact is internal-alpha evidence only and does not clear regulated claims.',
     ],
   });
+});
+
+app.get('/api/projects/:name/evidence/:evidenceId/openclaw/sam31/actual-value-handoff', authMiddleware, (req, res) => {
+  const row = db
+    .prepare('SELECT * FROM project_evidence WHERE project_name = ? AND id = ?')
+    .get(req.params.name, Number(req.params.evidenceId));
+  if (!row) return res.status(404).json({ error: 'Evidence row not found' });
+  if (row.evidence_type !== 'best_effort_ai_layout') {
+    return res.status(400).json({ error: 'Evidence row is not a replay bid artifact' });
+  }
+  let notes;
+  try {
+    notes = JSON.parse(row.notes || '{}');
+  } catch {
+    return res.status(400).json({ error: 'Evidence row does not contain structured replay artifact notes' });
+  }
+  if (notes.kind !== 'best_effort_ai_layout_replay') {
+    return res.status(400).json({ error: 'Evidence row is not a room-boundary replay artifact' });
+  }
+  return res.json(buildOpenClawSam31ReplayActualValueHandoffPacket(req.params.name, row, notes));
 });
 
 app.get('/api/projects/:name/evidence/:evidenceId/official-flow-hydraulic-replay-artifact', authMiddleware, (req, res) => {

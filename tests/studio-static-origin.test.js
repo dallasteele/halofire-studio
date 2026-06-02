@@ -333,6 +333,11 @@ describe('studio static origin handling', () => {
     expect(html).toContain('data-sam31-consumer-actual-value-work-item-evidence-id');
     expect(html).toContain('openclaw.sam31.actual_value_work_item_packet.v1');
     expect(html).toContain('/actual-value-work-item');
+    expect(html).toContain('Download replay SAM31 actual-value handoff');
+    expect(html).toContain('downloadReplaySam31ActualValueHandoff');
+    expect(html).toContain('data-replay-sam31-actual-value-handoff-evidence-id');
+    expect(html).toContain('openclaw.sam31.actual_value_handoff_packet.v1');
+    expect(html).toContain('/openclaw/sam31/actual-value-handoff');
     expect(html).toContain('sam31_unresolved_consumer_reviews');
     expect(html).toContain('sam31ConsumerReview=unresolved');
     expect(html).toContain('openclaw.sam31.product_owner_replacement_intake.v1');

@@ -1382,5 +1382,71 @@ describe('PDF page inspection API', () => {
         selected_boundary_candidate_ref: 'candidate:1881-replay-outline',
       }),
     ]));
+
+    const handoffRes = await request(`${COOPERATIVE_1881_PATH}/evidence/${replayEvidence.id}/openclaw/sam31/actual-value-handoff`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(handoffRes.status).toBe(200);
+    const handoff = await handoffRes.json();
+    expect(handoff).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.actual_value_handoff_packet.v1',
+      status: 'ready_for_employee_actual_value_replacement',
+      project_name: COOPERATIVE_1881_PROJECT_NAME,
+      source_replay_evidence_id: replayEvidence.id,
+      source_replay_artifact_type: 'room_boundary_replay_bid_artifact',
+      source_runtime: 'sam-3.1+llm',
+      claim_gate_effect: 'no_claims_cleared',
+      use_for_claims: false,
+      no_claim_gates_cleared: true,
+    }));
+    expect(handoff.supported_applications).toEqual(['halo_fire', 'landscout', 'nameforge']);
+    expect(handoff.employee_decision).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.pdf_boundary_employee_decision.v1',
+      selected_sheet_ref: '1881://proposal-cooperative/sheet-7',
+      selected_scale_ref: '1881://operator-scale/sheet-7/0.1',
+      selected_boundary_candidate_ref: 'candidate:1881-replay-outline',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(handoff.source_refs).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        evidence_type: 'halofire.pdf_boundary_employee_decision.v1',
+        selected_boundary_candidate_ref: 'candidate:1881-replay-outline',
+      }),
+      expect.objectContaining({
+        evidence_id: reviewBody.evidence.id,
+      }),
+    ]));
+    expect(handoff.employee_replacement_fields).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        field: 'semantic_label',
+        current_value_source: 'sam31_llm_best_guess',
+        acceptable_evidence: expect.arrayContaining(['1881 proposal workbook row or sheet reference']),
+      }),
+      expect.objectContaining({ field: 'polygon' }),
+      expect.objectContaining({ field: 'bbox' }),
+      expect.objectContaining({ field: 'vector_overlay' }),
+      expect.objectContaining({ field: 'model_3d_candidate' }),
+      expect.objectContaining({ field: 'source_ref' }),
+      expect.objectContaining({ field: 'confidence' }),
+    ]));
+    expect(handoff.consumer_queue_status).toEqual(expect.arrayContaining([
+      expect.objectContaining({ consumer: 'halo_fire', status: 'source_replay_ready' }),
+      expect.objectContaining({ consumer: 'landscout', status: 'poll_queue_not_required_for_handoff' }),
+      expect.objectContaining({ consumer: 'nameforge', status: 'poll_queue_not_required_for_handoff' }),
+    ]));
+    expect(handoff.acceptable_actual_evidence).toEqual(expect.arrayContaining([
+      '1881 proposal workbook row or sheet reference',
+      'reviewed vector overlay SVG or marked-up plan ref',
+      'reviewed 3D model candidate ref or model note',
+      'screenshot or console evidence for the reviewed SAM31 section',
+    ]));
+    expect(handoff.blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'AHJ_approval',
+      'professional_approval',
+      'AutoSprink_parity',
+      'fabrication_ready',
+      'manufacturer_exact',
+    ]));
   }, 30000);
 });
