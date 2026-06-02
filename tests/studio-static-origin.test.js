@@ -176,6 +176,12 @@ describe('studio static origin handling', () => {
     expect(html).toContain('/approval-packet');
     expect(html).toContain('data-catalog-source-approval-packet-family-ref');
     expect(html).toContain('Download selected approval packet');
+    expect(html).toContain('catalog_approval_packet_rows');
+    expect(html).toContain('catalog_approval_packet_ready');
+    expect(html).toContain('renderCatalogApprovalPacketRows');
+    expect(html).toContain('Ready approval packets');
+    expect(html).toContain('ready_for_signed_evidence_upload');
+    expect(html).toContain('no claim gates cleared');
     expect(html).toContain('data-catalog-source-approval-family-ref');
     expect(html).toContain('catalogApprovalReviewerName');
     expect(html).toContain('catalogApprovalSignedAt');

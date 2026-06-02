@@ -910,6 +910,29 @@ async function refreshCatalogSourceAcquisition() {
   bindCatalogSourceEvidenceButtons();
 }
 
+function renderCatalogApprovalPacketRows(rows) {
+  const catalog_approval_packet_rows = Array.isArray(rows) ? rows : [];
+  if (!catalog_approval_packet_rows.length) return '';
+  return `<div class="claims" style="border-top:1px solid rgba(255,213,79,.18);padding-top:7px;margin-top:8px">
+    <b style="color:var(--gold)">Ready approval packets</b>
+    <span class="chip">catalog_approval_packet_ready ${escapeHtml(catalog_approval_packet_rows.length)}</span>
+    <span class="chip">no claim gates cleared</span><br>
+    ${catalog_approval_packet_rows.map((row) => {
+      const acceptable = Array.isArray(row.acceptable_evidence) ? row.acceptable_evidence : [];
+      const blocked = Array.isArray(row.blocked_claims) ? row.blocked_claims : [];
+      return `<div style="margin-top:6px">
+        <span class="chip">${escapeHtml(row.status || 'ready_for_signed_evidence_upload')}</span>
+        <span class="chip">${escapeHtml(row.target_gate_code || 'gate_missing')}</span>
+        <span class="chip">${escapeHtml(row.required_evidence_type || 'evidence_missing')}</span>
+        <span class="chip">${escapeHtml(row.claim_gate_effect || 'no_claims_cleared')}</span><br>
+        ${escapeHtml(row.next_action || 'Upload signed gate-specific evidence before clearing claims.')}<br>
+        Accepts: ${acceptable.map((item) => `<span class="chip">${escapeHtml(item)}</span>`).join('')}
+        Blocks: ${blocked.map((claim) => `<span class="chip">${escapeHtml(claim)}</span>`).join('')}
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
 function resolverQueueDetail(item) {
   const defaults = item.input_defaults || {};
   const claims = Array.isArray(item.blocked_claims) ? item.blocked_claims : [];
@@ -950,6 +973,7 @@ function resolverQueueDetail(item) {
       <div class="claims">Accepts: ${acceptable.map((e) => `<span class="chip">${escapeHtml(e)}</span>`).join('')}</div>
       <div class="claims">AI fallback: ${escapeHtml(item.ai_fallback || '')}</div>
       <div class="claims">Blocks: ${claims.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('')}</div>
+      ${renderCatalogApprovalPacketRows(item.catalog_approval_packet_rows)}
       <p style="margin-top:8px"><button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#0f766e" data-catalog-source-packet-family-ref="${escapeHtml(defaults.family_ref || '')}">Download catalog source packet</button> ${visibleActions.map((action) => `<a class="go" style="padding:7px 10px;font-size:11px;text-decoration:none;display:inline-block;margin-right:6px" href="${escapeHtml(action.href || '#')}">${escapeHtml(action.label || 'Open')}</a>`).join('')}<button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#b45309" data-catalog-source-record-family-ref="${escapeHtml(defaults.family_ref || '')}" data-catalog-source-record-component-key="${escapeHtml(defaults.component_key || '')}" data-catalog-source-record-nominal-size-in="${escapeHtml(defaults.nominal_size_in ?? '')}" data-catalog-source-record-source-url="${escapeHtml(defaults.source_url || '')}" data-catalog-source-record-license="${escapeHtml(defaults.license || '')}" data-catalog-source-record-artifact-hash="${escapeHtml(defaults.downloaded_artifact_hash || '')}" data-catalog-source-record-status-tier="${escapeHtml(defaults.status_tier || 'missing_catalog_source')}" data-catalog-source-record-status-id="${catalogStatusId}">Record catalog source evidence</button></p>
       ${renderCatalogSourceApprovalValidation(defaults)}
       <div class="muted" id="${catalogStatusId}" style="font-size:11px"></div>
@@ -1723,8 +1747,16 @@ async function saveOfficialFlowIntake() {
 
 async function refreshResolverQueue() {
   const queue = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/resolver-queue');
+  const summary = queue.summary || {};
+  const summaryHtml = `<div class="muted" style="font-size:11px;margin-bottom:8px">
+    Resolver summary:
+    <span class="chip">catalog_approval_packet_ready ${escapeHtml(summary.catalog_approval_packet_ready || 0)}</span>
+    <span class="chip">ready_for_signed_evidence_upload</span>
+    <span class="chip">catalog_approval_claims_cleared ${escapeHtml(summary.catalog_approval_claims_cleared || 0)}</span>
+    <span class="chip">no claim gates cleared</span>
+  </div>`;
   document.getElementById('resolverQueue').innerHTML = queue.items && queue.items.length
-    ? queue.items.map(resolverQueueDetail).join('')
+    ? summaryHtml + queue.items.map(resolverQueueDetail).join('')
     : '<span class="muted">No resolver queue rows yet. Save a PDF boundary decision for room_boundary_visual_audit, record official_flow_intake, or run catalog acquisition for catalog_vendor_acquisition.</span>';
   bindCatalogSourceEvidenceButtons();
   document.querySelectorAll('[data-resolver-packet-evidence-id]').forEach((button) => {

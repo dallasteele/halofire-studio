@@ -5427,6 +5427,52 @@ function matchingCatalogEvidenceByFamily(projectName) {
   return byFamily;
 }
 
+function catalogApprovalPacketRows(projectName, row) {
+  if (!row || !row.family_ref) return [];
+  ensureProjectClaimGates(projectName);
+  const uploadRoute = `/api/projects/${encodeURIComponent(projectName)}/resolver-packets/catalog-source/${encodeURIComponent(row.family_ref)}/approval-validation`;
+  const rows = [];
+  for (const [approvalRefField, rule] of Object.entries(CATALOG_APPROVAL_VALIDATION_RULES)) {
+    for (const [targetGateCode, evidenceType] of Object.entries(rule.targetGates || {})) {
+      const detail = CATALOG_APPROVAL_PACKET_DETAILS[evidenceType] || CATALOG_APPROVAL_PACKET_DETAILS.manufacturer_approval;
+      const query = new URLSearchParams({
+        approval_ref_field: approvalRefField,
+        target_gate_code: targetGateCode,
+      });
+      const gate = db
+        .prepare('SELECT status, resolved_by, resolved_at, resolved_evidence_ref FROM claim_gates WHERE project_name = ? AND code = ?')
+        .get(projectName, targetGateCode);
+      rows.push({
+        artifact_type: 'halofire.catalog_approval_resolver_packet.v1',
+        status: 'ready_for_signed_evidence_upload',
+        project_name: projectName,
+        family_ref: row.family_ref,
+        component_key: row.component_key || null,
+        approval_ref_field: approvalRefField,
+        target_gate_code: targetGateCode,
+        required_evidence_type: evidenceType,
+        download_href: `/api/projects/${encodeURIComponent(projectName)}/resolver-packets/catalog-source/${encodeURIComponent(row.family_ref)}/approval-packet?${query.toString()}`,
+        upload_route: uploadRoute,
+        acceptable_evidence: Array.from(detail.acceptableEvidence || []),
+        blocked_claims: Array.from(detail.blockedClaims || []),
+        next_action: detail.nextAction,
+        claim_gate_effect: 'no_claims_cleared',
+        use_for_claims: false,
+        no_claim_gates_cleared: true,
+        latest_gate_status: gate?.status || 'blocked',
+        latest_resolved_by: gate?.resolved_by || null,
+        latest_resolved_at: gate?.resolved_at || null,
+        latest_resolved_evidence_ref: gate?.resolved_evidence_ref || null,
+        limitations: [
+          'This approval packet row is a resolver next action and download affordance only.',
+          'Downloading this packet does not clear permit-ready, AHJ-ready, professional, manufacturer, fabrication, engineering-grade, or AutoSprink parity claims.',
+        ],
+      });
+    }
+  }
+  return rows;
+}
+
 function catalogResolverQueueItem(projectName, row, matchedEvidence = null) {
   if (!row || !row.family_ref) return null;
   const hasCandidate = !!(row.source_url || row.downloaded_artifact_hash);
@@ -5473,6 +5519,7 @@ function catalogResolverQueueItem(projectName, row, matchedEvidence = null) {
       status_tier: row.status_tier || 'missing_catalog_source',
       rejected_candidates: Array.isArray(row.rejected_candidates) ? row.rejected_candidates : [],
     },
+    catalog_approval_packet_rows: catalogApprovalPacketRows(projectName, row),
     blocked_claims: Array.isArray(row.blocked_claims) ? row.blocked_claims : [],
     claim_gate_effect: row.claim_gate_effect || 'no_claims_cleared',
     latest_review: matchedEvidence ? {
@@ -8071,6 +8118,11 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
       catalog_source_needed: statusCounts.catalog_source_needed || 0,
       catalog_review_needed: statusCounts.catalog_review_needed || 0,
       catalog_evidence_recorded: statusCounts.catalog_evidence_recorded || 0,
+      catalog_approval_packet_ready: visibleItems.reduce((acc, item) => acc + (Array.isArray(item.catalog_approval_packet_rows) ? item.catalog_approval_packet_rows.filter((row) => row.status === 'ready_for_signed_evidence_upload').length : 0), 0),
+      catalog_approval_professional_packets: visibleItems.reduce((acc, item) => acc + (Array.isArray(item.catalog_approval_packet_rows) ? item.catalog_approval_packet_rows.filter((row) => row.required_evidence_type === 'professional_review').length : 0), 0),
+      catalog_approval_ahj_packets: visibleItems.reduce((acc, item) => acc + (Array.isArray(item.catalog_approval_packet_rows) ? item.catalog_approval_packet_rows.filter((row) => row.required_evidence_type === 'ahj_approval').length : 0), 0),
+      catalog_approval_autosprink_packets: visibleItems.reduce((acc, item) => acc + (Array.isArray(item.catalog_approval_packet_rows) ? item.catalog_approval_packet_rows.filter((row) => row.required_evidence_type === 'autosprink_packet').length : 0), 0),
+      catalog_approval_claims_cleared: visibleItems.reduce((acc, item) => acc + (Array.isArray(item.catalog_approval_packet_rows) ? item.catalog_approval_packet_rows.filter((row) => row.claim_gate_effect !== 'no_claims_cleared').length : 0), 0),
       official_flow_available: statusCounts.official_flow_available || 0,
       official_flow_needed: statusCounts.official_flow_needed || 0,
       official_flow_evidence_recorded: statusCounts.official_flow_evidence_recorded || 0,

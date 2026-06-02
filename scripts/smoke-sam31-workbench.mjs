@@ -323,12 +323,28 @@ async function runBrowserSmoke(token, evidenceIds) {
     await page.waitForSelector('text=Download SAM31 queue item', { timeout: 8_000 });
     await page.locator('[data-catalog-source-record-family-ref="family:pipe_steel_sch40_2p0in"]').first().click();
     await page.waitForSelector('text=Recorded evidence:', { timeout: 8_000 });
+    await page.waitForSelector('text=catalog_approval_packet_ready', { timeout: 8_000 });
+    await page.waitForSelector('text=Ready approval packets', { timeout: 8_000 });
+    await page.waitForSelector('text=ready_for_signed_evidence_upload', { timeout: 8_000 });
+    await page.waitForSelector('text=no claim gates cleared', { timeout: 8_000 });
     const catalogEvidenceQueue = await request(`${PROJECT_PATH}/resolver-queue`, token);
+    if (catalogEvidenceQueue.summary?.catalog_approval_packet_ready !== 12
+      || catalogEvidenceQueue.summary?.catalog_approval_professional_packets !== 3
+      || catalogEvidenceQueue.summary?.catalog_approval_ahj_packets !== 3
+      || catalogEvidenceQueue.summary?.catalog_approval_autosprink_packets !== 3
+      || catalogEvidenceQueue.summary?.catalog_approval_claims_cleared !== 0) {
+      throw new Error(`Catalog approval packet readiness summary is not fail-closed: ${JSON.stringify(catalogEvidenceQueue.summary)}`);
+    }
     const pipeCatalogItem = catalogEvidenceQueue.items.find((item) => item.kind === 'catalog_vendor_acquisition'
       && item.input_defaults?.family_ref === 'family:pipe_steel_sch40_2p0in');
     if (pipeCatalogItem?.status !== 'catalog_evidence_recorded'
       || pipeCatalogItem?.latest_review?.claim_gate_effect !== 'no_claims_cleared') {
       throw new Error(`Catalog source evidence was not recorded fail-closed from the workbench: ${JSON.stringify(pipeCatalogItem)}`);
+    }
+    if (!Array.isArray(pipeCatalogItem.catalog_approval_packet_rows)
+      || pipeCatalogItem.catalog_approval_packet_rows.length !== 4
+      || pipeCatalogItem.catalog_approval_packet_rows.some((row) => row.claim_gate_effect !== 'no_claims_cleared' || row.status !== 'ready_for_signed_evidence_upload')) {
+      throw new Error(`Catalog approval packet rows lost fail-closed readiness: ${JSON.stringify(pipeCatalogItem.catalog_approval_packet_rows)}`);
     }
     const catalogGates = await request(`${PROJECT_PATH}/claim-gates`, token);
     const manufacturerGate = catalogGates.find((gate) => gate.code === 'MANUFACTURER_MODEL_APPROVAL_MISSING');

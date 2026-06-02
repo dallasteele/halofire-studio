@@ -111,5 +111,8 @@ describe('SAM31 workbench browser smoke script', () => {
     expect(script).toContain('catalog-approval-autosprink-packet');
     expect(script).toContain('halofire.catalog_approval_resolver_packet.v1');
     expect(script).toContain('Download selected approval packet');
+    expect(script).toContain('catalog_approval_packet_ready');
+    expect(script).toContain('Ready approval packets');
+    expect(script).toContain('ready_for_signed_evidence_upload');
   });
 });
