@@ -190,8 +190,32 @@ function replaySourceLabel(reviewSource) {
     : 'latest employee review';
 }
 
-function renderSam31PerceptionSummary(summary, sourceBoundaryEvidenceId) {
-  if (!summary || typeof summary !== 'object') return '';
+function sam31ApplicationLabel(application) {
+  return ({
+    halo_fire: 'HaloFire',
+    landscout: 'LandScout',
+    nameforge: 'NameForge',
+  })[application] || String(application || 'HaloFire');
+}
+
+function renderSam31ApplicationContract(packet) {
+  if (!packet || typeof packet !== 'object') return '';
+  const contracts = packet.application_contracts || {};
+  const application = packet.application || 'halo_fire';
+  const contract = contracts[application] || contracts.halo_fire || null;
+  if (!contract || typeof contract !== 'object') return '';
+  const lanes = Array.isArray(contract.supported_evidence_lanes) ? contract.supported_evidence_lanes : [];
+  const updates = Array.isArray(contract.acceptable_human_updates) ? contract.acceptable_human_updates : [];
+  const blocked = Array.isArray(contract.blocked_claims) ? contract.blocked_claims : [];
+  const extrapolation = packet.extrapolation_contract && typeof packet.extrapolation_contract === 'object' ? packet.extrapolation_contract : {};
+  return `<div class="muted" style="font-size:11px;margin-top:6px;border:1px solid rgba(255,213,79,.22);border-radius:8px;padding:8px;background:rgba(255,213,79,.05)">SAM31 ${escapeHtml(sam31ApplicationLabel(application))} application contract<br>contract_ref ${escapeHtml(contract.contract_ref || 'missing')} - temporary_value_policy ${escapeHtml(contract.temporary_value_policy || extrapolation.temporary_value_policy || 'best_guess_until_employee_replaced')} - claim_gate_effect ${escapeHtml(contract.claim_gate_effect || packet.claim_gate_effect || 'no_claims_cleared')}<br>acceptable_human_updates: ${updates.length ? updates.map((field) => `<span class="chip">${escapeHtml(field)}</span>`).join('') : '<span class="chip">reviewer update fields missing</span>'}<br>Supported evidence lanes: ${lanes.length ? lanes.map((lane) => `<span class="chip">${escapeHtml(lane)}</span>`).join('') : '<span class="chip">application lanes missing</span>'}<br>Blocks still active: ${blocked.length ? blocked.map((claim) => `<span class="chip">${escapeHtml(claim)}</span>`).join('') : '<span class="chip">claim gates remain blocked</span>'}</div>`;
+}
+
+function renderSam31PerceptionSummary(packetOrSummary, sourceBoundaryEvidenceId) {
+  if (!packetOrSummary || typeof packetOrSummary !== 'object') return '';
+  const summary = packetOrSummary.perception_summary && typeof packetOrSummary.perception_summary === 'object'
+    ? packetOrSummary.perception_summary
+    : packetOrSummary;
   const blocked = Array.isArray(summary.blocked_claims) ? summary.blocked_claims : [];
   const countFields = [
     'segment_count',
@@ -200,7 +224,7 @@ function renderSam31PerceptionSummary(summary, sourceBoundaryEvidenceId) {
     'model_3d_candidate_count',
     'spatial_observation_count',
   ];
-  return `<div class="muted" style="font-size:11px;margin-top:5px;border:1px solid var(--border);border-radius:8px;padding:8px;background:rgba(77,208,225,.05)">SAM31 perception summary<br>artifact_type ${escapeHtml(summary.artifact_type || 'openclaw.sam31_perception_summary')} - project_ref ${escapeHtml(summary.project_ref || 'missing')} - claim_gate_effect ${escapeHtml(summary.claim_gate_effect || 'no_claims_cleared')}<br>${countFields.map((field) => `${field} ${escapeHtml(summary[field] ?? 0)}`).join(' - ')}<br>next_action ${escapeHtml(summary.next_action || 'Use this summary to queue product review; do not promote blocked claims.')}<br>Blocks still active: ${blocked.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('') || '<span class="chip">claim gates remain blocked</span>'}${sourceBoundaryEvidenceId ? `<br><button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0f766e" data-sam31-visual-audit-evidence-id="${escapeHtml(sourceBoundaryEvidenceId)}">Download full SAM31 packet</button>` : ''}</div>`;
+  return `<div class="muted" style="font-size:11px;margin-top:5px;border:1px solid var(--border);border-radius:8px;padding:8px;background:rgba(77,208,225,.05)">SAM31 perception summary<br>artifact_type ${escapeHtml(summary.artifact_type || 'openclaw.sam31_perception_summary')} - project_ref ${escapeHtml(summary.project_ref || 'missing')} - claim_gate_effect ${escapeHtml(summary.claim_gate_effect || 'no_claims_cleared')}<br>${countFields.map((field) => `${field} ${escapeHtml(summary[field] ?? 0)}`).join(' - ')}<br>next_action ${escapeHtml(summary.next_action || 'Use this summary to queue product review; do not promote blocked claims.')}<br>Blocks still active: ${blocked.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('') || '<span class="chip">claim gates remain blocked</span>'}${renderSam31ApplicationContract(packetOrSummary)}${sourceBoundaryEvidenceId ? `<br><button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0f766e" data-sam31-visual-audit-evidence-id="${escapeHtml(sourceBoundaryEvidenceId)}">Download full SAM31 packet</button>` : ''}</div>`;
 }
 
 function evidenceDetail(row) {

@@ -18,6 +18,11 @@ describe('SAM31 workbench browser smoke script', () => {
     expect(script).toContain('/pdf-boundary-decision');
     expect(script).toContain('/sam31-visual-audit/results');
     expect(script).toContain('SAM31 perception summary');
+    expect(script).toContain('SAM31 HaloFire application contract');
+    expect(script).toContain('openclaw.sam31.application_contract.halo_fire.v1');
+    expect(script).toContain('sleeve_or_firestop_candidate_review');
+    expect(script).toContain('acceptable_human_updates');
+    expect(script).toContain('best_guess_until_employee_replaced');
     expect(script).toContain('Download full SAM31 packet');
     expect(script).toContain('no_claims_cleared');
   });

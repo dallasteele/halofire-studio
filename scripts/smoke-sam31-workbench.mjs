@@ -175,6 +175,42 @@ async function seedSam31ReplayEvidence(token) {
             confidence: 0.46,
           },
         ],
+        extrapolation_contract: {
+          artifact_type: 'openclaw.sam31_extrapolation_contract',
+          status: 'best_effort_extrapolation_ready',
+          source_runtime: 'sam-3.1+llm',
+          consumes: ['segments', 'object_hypotheses'],
+          produces: ['llm_observations', 'vector_overlays', 'model_3d_candidates'],
+          supported_applications: ['halo_fire', 'landscout', 'nameforge'],
+          temporary_value_policy: 'Generated object labels, vector overlays, and 3D candidates are editable best guesses until HaloFire employees or owning product reviewers replace them with actual values.',
+          claim_gate_effect: 'no_claims_cleared',
+        },
+        application_contracts: {
+          halo_fire: {
+            application: 'halo_fire',
+            contract_ref: 'openclaw.sam31.application_contract.halo_fire.v1',
+            supported_evidence_lanes: [
+              'room_boundary_visual_audit',
+              'sleeve_or_firestop_candidate_review',
+              'obstruction_or_clash_review',
+              'vector_overlay_generation',
+              'model_3d_candidate_generation',
+            ],
+            temporary_value_policy: 'best_guess_until_employee_replaced',
+            acceptable_human_updates: [
+              'semantic_label',
+              'polygon',
+              'bbox',
+              'object_hypothesis',
+              'vector_overlay',
+              'model_3d_candidate',
+              'source_ref',
+              'confidence',
+            ],
+            blocked_claims: ['geometry_accuracy', 'permit_ready', 'AHJ_approval', 'AutoSprink_parity', 'fabrication_ready', 'manufacturer_exact'],
+            claim_gate_effect: 'no_claims_cleared',
+          },
+        },
         perception_summary: {
           artifact_type: 'openclaw.sam31_perception_summary',
           status: 'best_effort_perception_ready',
@@ -189,6 +225,8 @@ async function seedSam31ReplayEvidence(token) {
           model_3d_candidate_count: 1,
           spatial_observation_count: 0,
           blocked_claims: ['geometry_accuracy', 'permit_ready', 'AutoSprink_parity'],
+          extrapolation_contract_ref: 'openclaw.sam31_extrapolation_contract',
+          application_contract_refs: ['openclaw.sam31.application_contract.halo_fire.v1'],
           next_action: 'Use this summary to queue HaloFire room-boundary replay; do not promote blocked claims.',
         },
         blocked_claims: ['geometry_accuracy', 'permit_ready', 'AutoSprink_parity'],
@@ -224,6 +262,11 @@ async function runBrowserSmoke(token, evidenceIds) {
     await page.waitForSelector('text=SAM31 perception summary', { timeout: 8_000 });
     await page.waitForSelector('text=object_hypothesis_count 1', { timeout: 8_000 });
     await page.waitForSelector('text=model_3d_candidate_count 1', { timeout: 8_000 });
+    await page.waitForSelector('text=SAM31 HaloFire application contract', { timeout: 8_000 });
+    await page.waitForSelector('text=openclaw.sam31.application_contract.halo_fire.v1', { timeout: 8_000 });
+    await page.waitForSelector('text=sleeve_or_firestop_candidate_review', { timeout: 8_000 });
+    await page.waitForSelector('text=acceptable_human_updates', { timeout: 8_000 });
+    await page.waitForSelector('text=best_guess_until_employee_replaced', { timeout: 8_000 });
     await page.waitForSelector('text=no_claims_cleared', { timeout: 8_000 });
     await page.waitForSelector('text=Download full SAM31 packet', { timeout: 8_000 });
 

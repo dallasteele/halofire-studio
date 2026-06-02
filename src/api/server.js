@@ -1334,6 +1334,18 @@ function sam31PerceptionPacketSummary(packet) {
     spatial_observation_count: Number.isFinite(Number(upstream.spatial_observation_count)) ? Number(upstream.spatial_observation_count) : 0,
     blocked_claims: blockedClaims,
     claim_gate_effect: 'no_claims_cleared',
+    extrapolation_contract_ref: upstream.extrapolation_contract_ref || packet.extrapolation_contract?.artifact_type || null,
+    application_contract_refs: Array.isArray(upstream.application_contract_refs)
+      ? upstream.application_contract_refs
+      : Object.values(packet.application_contracts || {})
+        .map((contract) => contract && typeof contract === 'object' ? contract.contract_ref : null)
+        .filter(Boolean),
+    extrapolation_contract: packet.extrapolation_contract && typeof packet.extrapolation_contract === 'object'
+      ? jsonClone(packet.extrapolation_contract)
+      : (upstream.extrapolation_contract && typeof upstream.extrapolation_contract === 'object' ? jsonClone(upstream.extrapolation_contract) : null),
+    application_contracts: packet.application_contracts && typeof packet.application_contracts === 'object' && !Array.isArray(packet.application_contracts)
+      ? jsonClone(packet.application_contracts)
+      : (upstream.application_contracts && typeof upstream.application_contracts === 'object' && !Array.isArray(upstream.application_contracts) ? jsonClone(upstream.application_contracts) : null),
     next_action: upstream.next_action || 'Use this summary to queue HaloFire room-boundary replay; do not promote blocked claims.',
     limitations: [
       'Summary of best-effort OpenClaw/SAM31+LLM perception evidence; it clears no regulated gate.',
