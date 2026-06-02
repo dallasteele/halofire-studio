@@ -138,6 +138,14 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toContain('id="sam31ActualValueQueue"');
     expect(html).toContain('/openclaw/sam31/actual-value-work-items');
     expect(html).toContain('/openclaw/sam31/actual-value-resolver-queue');
+    expect(html).toContain('/api/openclaw/sam31/actual-value-resolver-queue?projectName=');
+    expect(html).toContain('renderSam31ActualValueQueueSummary');
+    expect(html).toContain('sam31ActualValueQueueSummary');
+    expect(html).toContain('openclaw.sam31.actual_value_resolver_queue.v1');
+    expect(html).toContain('actual_value_replacements_pending');
+    expect(html).toContain('pending_count');
+    expect(html).toContain('recorded_count');
+    expect(html).toContain('poll_actual_value_resolver_queue');
     expect(html).toContain('refreshSam31ActualValueQueue');
     expect(html).toContain('renderSam31ActualValueQueueItem');
     expect(html).toContain('downloadSam31ActualValueQueuePacket');

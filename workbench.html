@@ -153,6 +153,7 @@ document.getElementById('logout').onclick = () => { localStorage.removeItem('hal
 const usd = (n) => '$' + Number(n).toLocaleString('en-US', { maximumFractionDigits: 0 });
 let resolverQueueFilterQuery = '';
 let sam31ActualValueQueueRows = [];
+const SAM31_ACTUAL_VALUE_GLOBAL_READBACK_ROUTE = '/api/openclaw/sam31/actual-value-resolver-queue?projectName=';
 function currentProjectName() {
   return document.getElementById('projectTarget') ? document.getElementById('projectTarget').value : HOME_DEPOT;
 }
@@ -972,6 +973,29 @@ function sam31ActualValueQueueEvidencePayload(row) {
   };
 }
 
+function renderSam31ActualValueQueueSummary(readback) {
+  const queue = readback && readback.queue && typeof readback.queue === 'object' ? readback.queue : readback;
+  if (!queue || typeof queue !== 'object') return '';
+  const consumers = Array.isArray(queue.supported_consumers) ? queue.supported_consumers : ['halo_fire', 'landscout', 'nameforge'];
+  const endpoints = readback && readback.consumer_pull_endpoints && typeof readback.consumer_pull_endpoints === 'object'
+    ? readback.consumer_pull_endpoints
+    : {};
+  const endpointRows = consumers.map((consumer) => {
+    const endpoint = endpoints[consumer] || {
+      action: 'poll_actual_value_resolver_queue',
+      href: `${SAM31_ACTUAL_VALUE_GLOBAL_READBACK_ROUTE}${encodeURIComponent(currentProjectName())}&consumer=${encodeURIComponent(consumer)}`,
+    };
+    return `<span class="chip">${escapeHtml(consumer)} ${escapeHtml(endpoint.action || 'poll_actual_value_resolver_queue')}</span>`;
+  }).join('');
+  return `<div id="sam31ActualValueQueueSummary" class="gate warning">
+    <div class="code">openclaw.sam31.actual_value_resolver_queue.v1 Â· ${escapeHtml(queue.status || 'actual_value_replacements_pending')}</div>
+    <div class="na">global_readback ${escapeHtml(SAM31_ACTUAL_VALUE_GLOBAL_READBACK_ROUTE)} Â· source_project_route ${escapeHtml(readback?.source_project_route || '/api/projects/{projectName}/openclaw/sam31/actual-value-resolver-queue')}</div>
+    <div class="claims">item_count ${escapeHtml(queue.item_count ?? 0)} Â· pending_count ${escapeHtml(queue.pending_count ?? 0)} Â· recorded_count ${escapeHtml(queue.recorded_count ?? 0)} Â· use_for_claims false Â· claim_gate_effect no_claims_cleared</div>
+    <div class="claims">Consumer pull: ${endpointRows}</div>
+    <div class="claims">SAM31+LLM sectioning/object/vector/3D outputs are temporary values until replaced with actual evidence.</div>
+  </div>`;
+}
+
 function renderSam31ActualValueQueueItem(row, index) {
   const summary = row.replacement_summary || {};
   const blocked = Array.isArray(row.blocked_claims) ? row.blocked_claims : [];
@@ -1029,12 +1053,15 @@ async function recordSam31ActualValueQueueEvidence(index) {
 
 async function refreshSam31ActualValueQueue() {
   const target = document.getElementById('sam31ActualValueQueue');
-  const index = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/openclaw/sam31/actual-value-resolver-queue');
-  const rows = Array.isArray(index.items) ? index.items : [];
+  const readback = await api('/openclaw/sam31/actual-value-resolver-queue?projectName=' + encodeURIComponent(currentProjectName()));
+  const queue = readback.queue && typeof readback.queue === 'object' ? readback.queue : readback;
+  const index = queue;
+  const rows = Array.isArray(queue.items) ? queue.items : [];
   sam31ActualValueQueueRows = rows;
   target.innerHTML = rows.length
     ? rows.map(renderSam31ActualValueQueueItem).join('')
     : `<span class="muted">No SAM31 actual-value queue rows for ${escapeHtml(currentProjectName())}. halofire.sam31_actual_value_work_item_index.v1 · status ${escapeHtml(index.status || 'no_sam31_actual_value_work_items')} · use_for_claims false · claim_gate_effect no_claims_cleared</span>`;
+  target.innerHTML = renderSam31ActualValueQueueSummary(readback) + target.innerHTML;
   document.querySelectorAll('[data-sam31-actual-value-queue-download-index]').forEach((button) => {
     button.onclick = () => downloadSam31ActualValueQueuePacket(button.dataset.sam31ActualValueQueueDownloadIndex);
   });

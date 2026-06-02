@@ -475,4 +475,130 @@ describe('HaloFire settings + documentation upload/link API', () => {
       expect.objectContaining({ consumer: 'nameforge', action: 'poll_actual_value_resolver_queue' }),
     ]));
   });
+
+  it('exposes a global OpenClaw SAM31 actual-value resolver queue readback for consumer polling', async () => {
+    const token = await tokenFor('settings-admin', 'actual-test-password');
+    const projectName = 'Shared SAM31 Global Queue Project';
+    const db = new Database(dbPath);
+    const insertReview = db.prepare(
+      `INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+    );
+    insertReview.run(
+      projectName,
+      'openclaw_sam31_consumer_review',
+      '1881-sheet-7.png',
+      'landscout://sam31/reviews/global/replacement.json',
+      'present',
+      JSON.stringify({
+        kind: 'openclaw_sam31_consumer_review',
+        review: {
+          artifact_type: 'openclaw.sam31.consumer_review_task_decision.v1',
+          source_application: 'halo_fire',
+          source_pdf_boundary_evidence_id: 174,
+          source_openclaw_sam31_consumer_smoke_evidence_id: 173,
+          consumer: 'landscout',
+          review_decision: 'replaced',
+          accepted_queue_id: 'global-sam31-landscout',
+          persisted_review_packet_ref: 'openclaw://landscout/sam31/product-review/global-sam31-landscout',
+          replacement_ref: 'landscout://sam31/reviews/global/replacement.json',
+          replacement_values: {
+            semantic_labels: ['reviewed riser room'],
+            object_hypotheses: [{ id: 'obj:riser-room' }],
+            vector_overlays: [{ id: 'vector:riser-room' }],
+            model_3d_candidates: [{ id: 'model:riser-room' }],
+            source_ref: '1881://sheet-7/riser-room',
+          },
+          blocked_claims: ['permit_ready'],
+          use_for_claims: false,
+          no_claim_gates_cleared: true,
+          claim_gate_effect: 'no_claims_cleared',
+        },
+      }),
+    );
+    insertReview.run(
+      projectName,
+      'openclaw_sam31_consumer_review',
+      '1881-sheet-8.png',
+      'nameforge://sam31/reviews/global/replacement.json',
+      'present',
+      JSON.stringify({
+        kind: 'openclaw_sam31_consumer_review',
+        review: {
+          artifact_type: 'openclaw.sam31.consumer_review_task_decision.v1',
+          source_application: 'halo_fire',
+          source_pdf_boundary_evidence_id: 184,
+          source_openclaw_sam31_consumer_smoke_evidence_id: 183,
+          consumer: 'nameforge',
+          review_decision: 'replaced',
+          accepted_queue_id: 'global-sam31-nameforge',
+          persisted_review_packet_ref: 'openclaw://nameforge/sam31/product-review/global-sam31-nameforge',
+          replacement_ref: 'nameforge://sam31/reviews/global/replacement.json',
+          replacement_values: {
+            semantic_labels: ['reviewed monument sign zone'],
+            object_hypotheses: [{ id: 'obj:monument-sign' }],
+            vector_overlays: [{ id: 'vector:monument-sign' }],
+            model_3d_candidates: [{ id: 'model:monument-sign' }],
+            source_ref: '1881://sheet-8/monument-sign',
+          },
+          blocked_claims: ['permit_ready'],
+          use_for_claims: false,
+          no_claim_gates_cleared: true,
+          claim_gate_effect: 'no_claims_cleared',
+        },
+      }),
+    );
+    db.close();
+
+    const res = await request(`/api/openclaw/sam31/actual-value-resolver-queue?projectName=${encodeURIComponent(projectName)}&consumer=nameforge`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(res.status).toBe(200);
+    const readback = await res.json();
+    expect(readback).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.actual_value_resolver_queue_readback.v1',
+      status: 'actual_value_replacements_pending',
+      project_name: projectName,
+      requested_consumer: 'nameforge',
+      item_count: 1,
+      pending_count: 1,
+      recorded_count: 0,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(readback.source_project_route).toContain('/api/projects/');
+    expect(readback.source_project_route).toContain('/openclaw/sam31/actual-value-resolver-queue');
+    expect(readback.queue.artifact_type).toBe('openclaw.sam31.actual_value_resolver_queue.v1');
+    expect(readback.queue.items).toHaveLength(1);
+    expect(readback.queue.items[0]).toEqual(expect.objectContaining({
+      consumer: 'nameforge',
+      intake_status: 'missing',
+      source_pdf_boundary_evidence_id: 184,
+    }));
+    expect(readback.consumer_pull_endpoints).toEqual(expect.objectContaining({
+      halo_fire: expect.objectContaining({ method: 'GET', consumes: 'openclaw.sam31.actual_value_resolver_queue.v1' }),
+      landscout: expect.objectContaining({ href: expect.stringContaining('consumer=landscout') }),
+      nameforge: expect.objectContaining({ href: expect.stringContaining('consumer=nameforge') }),
+    }));
+    expect(readback.acceptable_actual_evidence).toEqual(expect.arrayContaining([
+      '1881 proposal workbook row or sheet reference',
+      'reviewed vector overlay SVG or marked-up plan ref',
+      'reviewed 3D model candidate ref or model note',
+    ]));
+
+    const tool = await (await request('/api/openclaw/sam31/tool', {
+      headers: { Authorization: `Bearer ${token}` },
+    })).json();
+    expect(tool.halofire_api_actions.actual_value_resolver_queue).toEqual(expect.objectContaining({
+      method: 'GET',
+      href_template: '/api/openclaw/sam31/actual-value-resolver-queue?projectName={projectName}&consumer={consumer}',
+      project_route_template: '/api/projects/{projectName}/openclaw/sam31/actual-value-resolver-queue?consumer={consumer}',
+      produces: 'openclaw.sam31.actual_value_resolver_queue_readback.v1',
+      queue_artifact_type: 'openclaw.sam31.actual_value_resolver_queue.v1',
+      consumer_action: 'poll_actual_value_resolver_queue',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+  });
 });
