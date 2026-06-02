@@ -232,6 +232,8 @@ beforeAll(async () => {
       artifact_type: 'openclaw.sam31.consumer_review_queue.landscout.v1',
       status: 'queued_for_product_review',
       accepted: true,
+      queue_id: 'sam31-landscout-testqueue',
+      persisted_review_packet_ref: 'openclaw://landscout/sam31/product-review/sam31-landscout-testqueue',
       claim_gate_effect: 'no_claims_cleared',
     });
   });
@@ -241,6 +243,8 @@ beforeAll(async () => {
       artifact_type: 'openclaw.sam31.consumer_review_queue.nameforge.v1',
       status: 'queued_for_product_review',
       accepted: true,
+      queue_id: 'sam31-nameforge-testqueue',
+      persisted_review_packet_ref: 'openclaw://nameforge/sam31/product-review/sam31-nameforge-testqueue',
       claim_gate_effect: 'no_claims_cleared',
     });
   });
@@ -1094,6 +1098,8 @@ describe('OpenClaw SAM31 bridge status API', () => {
         endpoint: `${perceptionBaseUrl}/landscout/sam31/product-review-queue`,
         endpoint_source_file: 'OPENCLAW_SAM31_LANDSCOUT_QUEUE_URL',
         response_status: 202,
+        accepted_queue_id: 'sam31-landscout-testqueue',
+        persisted_review_packet_ref: 'openclaw://landscout/sam31/product-review/sam31-landscout-testqueue',
         claim_gate_effect: 'no_claims_cleared',
       }),
       expect.objectContaining({
@@ -1102,6 +1108,8 @@ describe('OpenClaw SAM31 bridge status API', () => {
         endpoint: `${perceptionBaseUrl}/nameforge/sam31/product-review-queue`,
         endpoint_source_file: 'OPENCLAW_SAM31_NAMEFORGE_QUEUE_URL',
         response_status: 202,
+        accepted_queue_id: 'sam31-nameforge-testqueue',
+        persisted_review_packet_ref: 'openclaw://nameforge/sam31/product-review/sam31-nameforge-testqueue',
         claim_gate_effect: 'no_claims_cleared',
       }),
     ]));
@@ -1128,8 +1136,18 @@ describe('OpenClaw SAM31 bridge status API', () => {
       claim_gate_effect: 'no_claims_cleared',
     }));
     expect(packet.consumer_results).toEqual(expect.arrayContaining([
-      expect.objectContaining({ consumer: 'landscout', status: 'posted' }),
-      expect.objectContaining({ consumer: 'nameforge', status: 'posted' }),
+      expect.objectContaining({
+        consumer: 'landscout',
+        status: 'posted',
+        accepted_queue_id: 'sam31-landscout-testqueue',
+        persisted_review_packet_ref: 'openclaw://landscout/sam31/product-review/sam31-landscout-testqueue',
+      }),
+      expect.objectContaining({
+        consumer: 'nameforge',
+        status: 'posted',
+        accepted_queue_id: 'sam31-nameforge-testqueue',
+        persisted_review_packet_ref: 'openclaw://nameforge/sam31/product-review/sam31-nameforge-testqueue',
+      }),
     ]));
     expect(packet.product_review_queue_item).toEqual(expect.objectContaining({
       artifact_type: 'openclaw.sam31.product_review_queue_item.v1',
@@ -1166,6 +1184,18 @@ describe('OpenClaw SAM31 bridge status API', () => {
       blocked_consumer_count: 0,
       claim_gate_effect: 'no_claims_cleared',
     }));
+    expect(item.latest_openclaw_sam31_consumer_smoke_artifact.consumer_results).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        consumer: 'landscout',
+        accepted_queue_id: 'sam31-landscout-testqueue',
+        persisted_review_packet_ref: 'openclaw://landscout/sam31/product-review/sam31-landscout-testqueue',
+      }),
+      expect.objectContaining({
+        consumer: 'nameforge',
+        accepted_queue_id: 'sam31-nameforge-testqueue',
+        persisted_review_packet_ref: 'openclaw://nameforge/sam31/product-review/sam31-nameforge-testqueue',
+      }),
+    ]));
     expect(queue.summary.sam31_consumer_smoke_recorded).toBeGreaterThanOrEqual(1);
   });
 

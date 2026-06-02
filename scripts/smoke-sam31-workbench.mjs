@@ -360,6 +360,8 @@ async function runBrowserSmoke(token, evidenceIds) {
     await page.waitForSelector('text=blocked_consumer_count 0', { timeout: 8_000 });
     await page.waitForSelector('text=openclaw.sam31.consumer_smoke_artifact.v1', { timeout: 8_000 });
     await page.waitForSelector('text=consumer_result', { timeout: 8_000 });
+    await page.waitForSelector('text=accepted_queue_id', { timeout: 8_000 });
+    await page.waitForSelector('text=persisted_review_packet_ref', { timeout: 8_000 });
     await page.waitForSelector('text=no_claims_cleared', { timeout: 8_000 });
     await page.waitForSelector('[data-sam31-consumer-smoke-packet-evidence-id]', { timeout: 8_000 });
     const consumerSmokeDownloadPromise = page.waitForEvent('download');
@@ -392,6 +394,12 @@ async function runBrowserSmoke(token, evidenceIds) {
       const result = consumerSmokeResults.find((item) => item.consumer === consumer);
       if (!result || result.status !== 'posted' || result.response_status !== 202) {
         throw new Error(`SAM31 consumer smoke did not post ${consumer}: ${JSON.stringify(result)}`);
+      }
+      if (!result.accepted_queue_id || !String(result.accepted_queue_id).startsWith(`sam31-${consumer}-`)) {
+        throw new Error(`SAM31 consumer smoke ${consumer} is missing accepted_queue_id: ${JSON.stringify(result)}`);
+      }
+      if (!result.persisted_review_packet_ref || !String(result.persisted_review_packet_ref).startsWith(`openclaw://${consumer}/sam31/product-review/`)) {
+        throw new Error(`SAM31 consumer smoke ${consumer} is missing persisted_review_packet_ref: ${JSON.stringify(result)}`);
       }
     }
     await page.waitForSelector('[data-sam31-replacement-action-field="semantic_label"]', { timeout: 8_000 });
@@ -502,6 +510,8 @@ async function runBrowserSmoke(token, evidenceIds) {
           consumer: result.consumer,
           status: result.status,
           response_status: result.response_status,
+          accepted_queue_id: result.accepted_queue_id,
+          persisted_review_packet_ref: result.persisted_review_packet_ref,
         })),
         use_for_claims: consumerSmokeArtifact.use_for_claims,
         claim_gate_effect: consumerSmokeArtifact.claim_gate_effect,
