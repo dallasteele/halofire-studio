@@ -1328,6 +1328,8 @@ const HALOFIRE_SAM31_SPRINKLER_PRELIMINARY_REPLAY_OUTPUT_TYPE = 'halofire.sam31_
 const HALOFIRE_SAM31_SPRINKLER_PRELIMINARY_REPLAY_FOLLOWUP_DECISION_TYPE = 'halofire.sam31_sprinkler_preliminary_replay_followup_decision.v1';
 const HALOFIRE_SAM31_OBSTRUCTION_CLASH_PACKET_QUEUE_ITEM_TYPE = 'halofire.sam31_obstruction_clash_packet_queue_item.v1';
 const HALOFIRE_SAM31_SLEEVE_FIRESTOP_PACKET_QUEUE_ITEM_TYPE = 'halofire.sam31_sleeve_firestop_packet_queue_item.v1';
+const HALOFIRE_SAM31_OBSTRUCTION_CLASH_PACKET_TYPE = 'halofire.sam31_obstruction_clash_packet.v1';
+const HALOFIRE_SAM31_SLEEVE_FIRESTOP_PACKET_TYPE = 'halofire.sam31_sleeve_firestop_packet.v1';
 const SAM31_CONSUMER_QUEUE_TARGETS = Object.freeze(['landscout', 'nameforge']);
 const SAM31_CONSUMER_UNAVAILABLE_CODES = Object.freeze({
   landscout: 'OPENCLAW_SAM31_LANDSCOUT_QUEUE_UNAVAILABLE',
@@ -3948,6 +3950,118 @@ function halofireSam31SprinklerPreliminaryReplayPacketQueueItems(followup, follo
       no_claim_gates_cleared: true,
     };
   });
+}
+
+function halofireSam31SprinklerReplayFollowupPacketArtifactType(packetQueueItem) {
+  return packetQueueItem?.artifact_type === HALOFIRE_SAM31_SLEEVE_FIRESTOP_PACKET_QUEUE_ITEM_TYPE
+    ? HALOFIRE_SAM31_SLEEVE_FIRESTOP_PACKET_TYPE
+    : HALOFIRE_SAM31_OBSTRUCTION_CLASH_PACKET_TYPE;
+}
+
+function halofireSam31SprinklerReplayFollowupPacketDownloadSlug(packetQueueItem) {
+  return packetQueueItem?.artifact_type === HALOFIRE_SAM31_SLEEVE_FIRESTOP_PACKET_QUEUE_ITEM_TYPE
+    ? 'sam31-sleeve-firestop-packet'
+    : 'sam31-obstruction-clash-packet';
+}
+
+function buildHalofireSam31SprinklerReplayFollowupPacket(projectName, evidence, reviewEvidence, sprinklerReviewEvidence, followupEvidence, followup, packetIndex = 0) {
+  const packetQueueItems = halofireSam31SprinklerPreliminaryReplayPacketQueueItems(followup, followupEvidence.id);
+  const queueItem = packetQueueItems[packetIndex];
+  const issueDecision = Array.isArray(followup.issue_decisions) ? followup.issue_decisions[packetIndex] : null;
+  if (!queueItem || !issueDecision) {
+    const e = new Error('SAM31 sprinkler preliminary replay follow-up packet index not found');
+    e.httpStatus = 404;
+    throw e;
+  }
+  const artifactType = halofireSam31SprinklerReplayFollowupPacketArtifactType(queueItem);
+  const downloadSlug = halofireSam31SprinklerReplayFollowupPacketDownloadSlug(queueItem);
+  const acceptableEvidence = uniqueStrings([
+    ...(Array.isArray(queueItem.acceptable_evidence) ? queueItem.acceptable_evidence : []),
+    'source-linked packet JSON',
+    'professional/AHJ/manufacturer evidence for any regulated claim',
+  ]);
+  return {
+    artifact_type: artifactType,
+    id: `sam31-sprinkler-followup-packet:${followupEvidence.id}:${packetIndex}`,
+    project_name: projectName,
+    status: 'ready_for_internal_alpha_review',
+    download_name: `${slugForDownloadName(projectName)}-${downloadSlug}-${followupEvidence.id}-${packetIndex}.json`,
+    packet_index: packetIndex,
+    source_packet_queue_item_artifact_type: queueItem.artifact_type,
+    source_followup_decision_artifact_type: HALOFIRE_SAM31_SPRINKLER_PRELIMINARY_REPLAY_FOLLOWUP_DECISION_TYPE,
+    source_followup_decision_evidence_id: followupEvidence.id,
+    source_preliminary_replay_artifact_type: HALOFIRE_SAM31_SPRINKLER_PRELIMINARY_REPLAY_ARTIFACT_TYPE,
+    source_preliminary_replay_output_artifact_type: HALOFIRE_SAM31_SPRINKLER_PRELIMINARY_REPLAY_OUTPUT_TYPE,
+    source_pdf_boundary_evidence_id: evidence.id,
+    source_openclaw_sam31_consumer_review_evidence_id: reviewEvidence.id,
+    source_halofire_sam31_sprinkler_review_decision_evidence_id: sprinklerReviewEvidence.id,
+    source_application: followup.source_application || null,
+    consumer: followup.consumer || null,
+    accepted_queue_id: followup.accepted_queue_id || null,
+    persisted_review_packet_ref: followup.persisted_review_packet_ref || null,
+    target_packet_lane: queueItem.target_packet_lane,
+    supported_sprinkler_review_lane: followup.supported_sprinkler_review_lane,
+    replay_scope: followup.replay_scope,
+    issue_type: followup.issue_type,
+    source_field: queueItem.source_field,
+    source_index: queueItem.source_index,
+    decision: queueItem.decision,
+    issue_decision: {
+      ...jsonClone(issueDecision),
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    },
+    packet_queue_item: queueItem,
+    replay_output: followup.replay_output || null,
+    review_ref: followup.review_ref || null,
+    screenshot_ref: followup.screenshot_ref || null,
+    console_log_ref: followup.console_log_ref || null,
+    packet_ref: queueItem.packet_ref || followup.packet_ref || null,
+    reviewer_name: followup.reviewer_name || null,
+    reviewed_at: followup.reviewed_at || null,
+    next_action: queueItem.next_action || 'Create or download the source-linked obstruction/clash or sleeve/firestop packet for employee/professional review; keep regulated claims blocked until official evidence exists.',
+    acceptable_evidence: acceptableEvidence,
+    source_refs: uniqueByJson([
+      ...(Array.isArray(followup.source_refs) ? followup.source_refs : []),
+      {
+        evidence_type: 'pdf_boundary_decision',
+        evidence_id: evidence.id,
+        source_ref: evidence.source_ref || evidence.source_file || null,
+        status: evidence.status,
+      },
+      {
+        evidence_type: 'openclaw_sam31_consumer_review',
+        evidence_id: reviewEvidence.id,
+        source_ref: reviewEvidence.source_ref || null,
+        status: reviewEvidence.status,
+      },
+      {
+        evidence_type: 'halofire_sam31_sprinkler_review_decision',
+        evidence_id: sprinklerReviewEvidence.id,
+        source_ref: sprinklerReviewEvidence.source_ref || null,
+        status: sprinklerReviewEvidence.status,
+      },
+      {
+        evidence_type: 'halofire_sam31_sprinkler_preliminary_replay_followup_decision',
+        evidence_id: followupEvidence.id,
+        source_ref: followupEvidence.source_ref || followup.review_ref || null,
+        status: followupEvidence.status,
+      },
+      followup.packet_ref ? {
+        evidence_type: artifactType,
+        source_ref: followup.packet_ref,
+        status: 'queued_for_internal_alpha_review',
+      } : null,
+    ].filter(Boolean)),
+    blocked_claims: Array.isArray(followup.blocked_claims) ? [...followup.blocked_claims] : [],
+    limitations: uniqueStrings([
+      ...(Array.isArray(followup.limitations) ? followup.limitations : []),
+      'This packet is source-linked internal-alpha review evidence only; it cannot clear professional, AHJ, manufacturer, fabrication, permit, or AutoSprink parity claims by itself.',
+    ]),
+    use_for_claims: false,
+    claim_gate_effect: 'no_claims_cleared',
+    no_claim_gates_cleared: true,
+  };
 }
 
 function buildHalofireSam31SprinklerPreliminaryReplayArtifact(projectName, evidence, decision, reviewEvidence, review, sprinklerReviewEvidence, sprinklerReview) {
@@ -7682,6 +7796,80 @@ app.get('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/openclaw/
       review,
       sprinklerReviewEvidence,
       sprinklerReview,
+    ));
+  } catch (err) {
+    return res.status(err.httpStatus || 400).json({ error: err.message });
+  }
+});
+
+app.get('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/openclaw/sam31/sprinkler-review/:reviewEvidenceId/decision/:sprinklerReviewEvidenceId/preliminary-replay/followup/:followupEvidenceId/packet/:packetIndex', authMiddleware, (req, res) => {
+  try {
+    const projectName = req.params.name;
+    const evidenceId = Number(req.params.evidenceId);
+    const reviewEvidenceId = Number(req.params.reviewEvidenceId);
+    const sprinklerReviewEvidenceId = Number(req.params.sprinklerReviewEvidenceId);
+    const followupEvidenceId = Number(req.params.followupEvidenceId);
+    const packetIndex = Number(req.params.packetIndex);
+    if (!Number.isSafeInteger(evidenceId) || evidenceId <= 0) {
+      return res.status(400).json({ error: 'A positive evidence id is required' });
+    }
+    if (!Number.isSafeInteger(reviewEvidenceId) || reviewEvidenceId <= 0) {
+      return res.status(400).json({ error: 'A positive SAM31 consumer review evidence id is required' });
+    }
+    if (!Number.isSafeInteger(sprinklerReviewEvidenceId) || sprinklerReviewEvidenceId <= 0) {
+      return res.status(400).json({ error: 'A positive SAM31 sprinkler review decision evidence id is required' });
+    }
+    if (!Number.isSafeInteger(followupEvidenceId) || followupEvidenceId <= 0) {
+      return res.status(400).json({ error: 'A positive SAM31 preliminary replay follow-up evidence id is required' });
+    }
+    if (!Number.isSafeInteger(packetIndex) || packetIndex < 0) {
+      return res.status(400).json({ error: 'A non-negative SAM31 follow-up packet index is required' });
+    }
+    const evidence = db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'pdf_boundary_decision'`)
+      .get(evidenceId, projectName);
+    const decision = decisionFromEvidence(evidence);
+    if (!evidence || !decision) {
+      return res.status(404).json({ error: 'PDF boundary decision evidence not found' });
+    }
+    const reviewEvidence = db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'openclaw_sam31_consumer_review'`)
+      .get(reviewEvidenceId, projectName);
+    const review = openClawSam31ConsumerReviewFromEvidence(reviewEvidence);
+    if (!reviewEvidence || !review) {
+      return res.status(404).json({ error: 'SAM31 consumer review evidence not found' });
+    }
+    const sprinklerReviewEvidence = db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'halofire_sam31_sprinkler_review_decision'`)
+      .get(sprinklerReviewEvidenceId, projectName);
+    const sprinklerReview = halofireSam31SprinklerReviewDecisionFromEvidence(sprinklerReviewEvidence);
+    if (!sprinklerReviewEvidence || !sprinklerReview) {
+      return res.status(404).json({ error: 'HaloFire SAM31 sprinkler review decision evidence not found' });
+    }
+    const followupEvidence = db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'halofire_sam31_sprinkler_preliminary_replay_followup_decision'`)
+      .get(followupEvidenceId, projectName);
+    const followup = halofireSam31SprinklerPreliminaryReplayFollowupDecisionFromEvidence(followupEvidence);
+    if (!followupEvidence || !followup) {
+      return res.status(404).json({ error: 'SAM31 sprinkler preliminary replay follow-up evidence not found' });
+    }
+    if (Number(followup.source_pdf_boundary_evidence_id) !== evidenceId
+      || Number(followup.source_openclaw_sam31_consumer_review_evidence_id) !== reviewEvidenceId
+      || Number(followup.source_halofire_sam31_sprinkler_review_decision_evidence_id) !== sprinklerReviewEvidenceId) {
+      return res.status(409).json({ error: 'SAM31 sprinkler preliminary replay follow-up evidence does not match the requested source chain' });
+    }
+    return res.json(buildHalofireSam31SprinklerReplayFollowupPacket(
+      projectName,
+      evidence,
+      reviewEvidence,
+      sprinklerReviewEvidence,
+      followupEvidence,
+      followup,
+      packetIndex,
     ));
   } catch (err) {
     return res.status(err.httpStatus || 400).json({ error: err.message });

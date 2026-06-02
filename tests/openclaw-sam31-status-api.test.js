@@ -1832,6 +1832,52 @@ describe('OpenClaw SAM31 bridge status API', () => {
       }),
     ]));
 
+    const replayFollowupPacketRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/sprinkler-review/${consumerReview.id}/decision/${sprinklerReview.id}/preliminary-replay/followup/${replayFollowup.id}/packet/0`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(replayFollowupPacketRes.status).toBe(200);
+    const replayFollowupPacket = await replayFollowupPacketRes.json();
+    expect(replayFollowupPacket).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.sam31_obstruction_clash_packet.v1',
+      source_packet_queue_item_artifact_type: 'halofire.sam31_obstruction_clash_packet_queue_item.v1',
+      source_followup_decision_artifact_type: 'halofire.sam31_sprinkler_preliminary_replay_followup_decision.v1',
+      source_followup_decision_evidence_id: replayFollowup.id,
+      source_pdf_boundary_evidence_id: boundary.id,
+      source_openclaw_sam31_consumer_review_evidence_id: consumerReview.id,
+      source_halofire_sam31_sprinkler_review_decision_evidence_id: sprinklerReview.id,
+      target_packet_lane: 'obstruction_or_clash_review',
+      source_field: 'obstruction_candidates',
+      packet_index: 0,
+      status: 'ready_for_internal_alpha_review',
+      review_ref: 'halofire://sam31/sprinkler-preliminary-replay/sam31-landscout-testqueue/followup.json',
+      screenshot_ref: 'halofire://sam31/sprinkler-preliminary-replay/sam31-landscout-testqueue/followup.png',
+      packet_ref: 'halofire://sam31/obstruction-clash/sam31-landscout-testqueue/packet.json',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(replayFollowupPacket.download_name).toContain('sam31-obstruction-clash-packet');
+    expect(replayFollowupPacket.issue_decision).toEqual(expect.objectContaining({
+      source_field: 'obstruction_candidates',
+      target_packet_lane: 'obstruction_or_clash_review',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(replayFollowupPacket.acceptable_evidence).toEqual(expect.arrayContaining([
+      'HaloFire employee packet review',
+      'marked-up obstruction/clash or sleeve/firestop screenshot',
+      'source-linked packet JSON',
+      'professional/AHJ/manufacturer evidence for any regulated claim',
+    ]));
+    expect(replayFollowupPacket.blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'AHJ_approval',
+      'AutoSprink_parity',
+      'fabrication_ready',
+      'professional_approval',
+      'manufacturer_exact',
+    ]));
+
     const nameForgeAdapterRes = await request(`${COOPERATIVE_1881_PATH}/openclaw/sam31/product-owner-replacements`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` },

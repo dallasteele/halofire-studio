@@ -649,6 +649,27 @@ async function runBrowserSmoke(token, evidenceIds) {
     if (replayFollowupRow.packet_queue_items.some((item) => item.use_for_claims !== false || item.claim_gate_effect !== 'no_claims_cleared')) {
       throw new Error(`SAM31 preliminary replay follow-up packet queue cleared a claim gate: ${JSON.stringify(replayFollowupRow.packet_queue_items)}`);
     }
+    await page.waitForSelector('text=Download SAM31 follow-up packet', { timeout: 8_000 });
+    const replayFollowupPacketDownloadPromise = page.waitForEvent('download');
+    await page.locator(`button[data-sam31-sprinkler-replay-followup-packet-evidence-id="${latestSprinklerDecision.evidence_id}"]`).first().click();
+    const replayFollowupPacketDownload = await replayFollowupPacketDownloadPromise;
+    const replayFollowupPacketPath = await replayFollowupPacketDownload.path();
+    const replayFollowupPacketSuggestedName = replayFollowupPacketDownload.suggestedFilename();
+    const replayFollowupPacketDownloadBytes = replayFollowupPacketPath ? fs.statSync(replayFollowupPacketPath).size : 0;
+    downloads.push({ suggestedName: replayFollowupPacketSuggestedName, bytes: replayFollowupPacketDownloadBytes });
+    if (!replayFollowupPacketSuggestedName.includes('sam31-obstruction-clash-packet') || replayFollowupPacketDownloadBytes <= 0) {
+      throw new Error(`Unexpected SAM31 follow-up packet download ${replayFollowupPacketSuggestedName} (${replayFollowupPacketDownloadBytes} bytes)`);
+    }
+    const replayFollowupPacket = JSON.parse(fs.readFileSync(replayFollowupPacketPath, 'utf8'));
+    if (replayFollowupPacket.artifact_type !== 'halofire.sam31_obstruction_clash_packet.v1') {
+      throw new Error(`Unexpected SAM31 follow-up packet type ${replayFollowupPacket.artifact_type}`);
+    }
+    if (replayFollowupPacket.source_followup_decision_evidence_id !== replayFollowupRow.latest_sam31_sprinkler_preliminary_replay_followup_decision.evidence_id) {
+      throw new Error(`SAM31 follow-up packet source evidence mismatch: ${JSON.stringify(replayFollowupPacket)}`);
+    }
+    if (replayFollowupPacket.use_for_claims !== false || replayFollowupPacket.claim_gate_effect !== 'no_claims_cleared') {
+      throw new Error(`SAM31 follow-up packet cleared a claim gate: ${JSON.stringify(replayFollowupPacket)}`);
+    }
     const unresolvedNameForge = await request(`${PROJECT_PATH}/resolver-queue?sam31ConsumerReview=unresolved&consumer=nameforge`, token);
     const unresolvedItem = unresolvedNameForge.items.find((item) => item.evidence_id === evidenceIds.boundaryEvidenceId);
     const unresolvedNameForgeReviews = unresolvedItem?.sam31_unresolved_consumer_reviews || [];
@@ -828,6 +849,13 @@ async function runBrowserSmoke(token, evidenceIds) {
         followup_decision: replayFollowupRow.latest_sam31_sprinkler_preliminary_replay_followup_decision.followup_decision,
         packet_queue_item_type: replayFollowupRow.packet_queue_items[0]?.artifact_type,
         claim_gate_effect: replayFollowupRow.latest_sam31_sprinkler_preliminary_replay_followup_decision.claim_gate_effect,
+      },
+      sprinklerPreliminaryReplayFollowupPacket: {
+        artifact_type: replayFollowupPacket.artifact_type,
+        suggestedName: replayFollowupPacketSuggestedName,
+        source_followup_decision_evidence_id: replayFollowupPacket.source_followup_decision_evidence_id,
+        source_packet_queue_item_artifact_type: replayFollowupPacket.source_packet_queue_item_artifact_type,
+        claim_gate_effect: replayFollowupPacket.claim_gate_effect,
       },
       unresolvedNameForgeReview: {
         filter: 'sam31ConsumerReview=unresolved',
