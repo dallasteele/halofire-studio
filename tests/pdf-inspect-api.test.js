@@ -422,11 +422,28 @@ describe('PDF page inspection API', () => {
     expect(replayRow).toBeTruthy();
     const replayNotes = JSON.parse(replayRow.notes);
     expect(replayNotes.kind).toBe('best_effort_ai_layout_replay');
+    expect(replayNotes.artifact_type).toBe('room_boundary_replay_bid_artifact');
+    expect(replayNotes.download_name).toContain('room-boundary-replay-bid-artifact');
     expect(replayNotes.source_evidence_id).toBe(body.evidence.id);
     expect(replayNotes.source_review_evidence_id).toBe(reviewBody.evidence.id);
     expect(replayNotes.corrected_room_polygon_count).toBe(1);
     expect(replayNotes.claim_gate_effect).toBe('no_claims_cleared');
     expect(replayNotes.blocked_claims).toEqual(expect.arrayContaining(['geometry_accuracy', 'AutoSprink_parity', 'permit_ready']));
+
+    const replayArtifactRes = await request(`${COOPERATIVE_1881_PATH}/evidence/${replayRow.id}/replay-bid-artifact`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(replayArtifactRes.status).toBe(200);
+    const replayArtifact = await replayArtifactRes.json();
+    expect(replayArtifact.artifact_type).toBe('room_boundary_replay_bid_artifact');
+    expect(replayArtifact.evidence_id).toBe(replayRow.id);
+    expect(replayArtifact.download_name).toBe(replayNotes.download_name);
+    expect(replayArtifact.bid_summary).toEqual(expect.objectContaining({
+      total_area_sqft: 480,
+      total_head_count: replayBid.bid.totalHeadCount,
+    }));
+    expect(replayArtifact.claim_gate_effect).toBe('no_claims_cleared');
+    expect(replayArtifact.blocked_claims).toEqual(expect.arrayContaining(['geometry_accuracy', 'AutoSprink_parity', 'permit_ready']));
   }, 30000);
 
   it('rejects a persisted boundary decision without a positive operator scale', async () => {

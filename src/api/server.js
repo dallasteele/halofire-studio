@@ -650,6 +650,50 @@ app.get('/api/projects/:name/evidence', authMiddleware, (req, res) => {
   res.json(evidence);
 });
 
+app.get('/api/projects/:name/evidence/:evidenceId/replay-bid-artifact', authMiddleware, (req, res) => {
+  const row = db
+    .prepare('SELECT * FROM project_evidence WHERE project_name = ? AND id = ?')
+    .get(req.params.name, Number(req.params.evidenceId));
+  if (!row) return res.status(404).json({ error: 'Evidence row not found' });
+  if (row.evidence_type !== 'best_effort_ai_layout') {
+    return res.status(400).json({ error: 'Evidence row is not a replay bid artifact' });
+  }
+  let notes;
+  try {
+    notes = JSON.parse(row.notes || '{}');
+  } catch {
+    return res.status(400).json({ error: 'Evidence row does not contain structured replay artifact notes' });
+  }
+  if (notes.kind !== 'best_effort_ai_layout_replay') {
+    return res.status(400).json({ error: 'Evidence row is not a room-boundary replay artifact' });
+  }
+  res.json({
+    artifact_type: notes.artifact_type || 'room_boundary_replay_bid_artifact',
+    status: notes.artifact_status || 'best_effort_internal_alpha',
+    project_name: row.project_name,
+    evidence_id: row.id,
+    evidence_type: row.evidence_type,
+    generated_at: notes.replay_generated_at || row.created_at,
+    download_name: notes.download_name || `room-boundary-replay-bid-artifact-${row.id}.json`,
+    source_ref: row.source_ref,
+    source_replay_packet: {
+      source_evidence_id: notes.source_evidence_id,
+      source_review_evidence_id: notes.source_review_evidence_id,
+      marked_up_plan_ref: notes.marked_up_plan_ref,
+      corrected_room_polygon_count: notes.corrected_room_polygon_count,
+    },
+    bid_summary: notes.bid_summary || {
+      total_area_sqft: notes.total_area_sqft,
+      total_head_count: notes.total_head_count,
+    },
+    blocked_claims: Array.isArray(notes.blocked_claims) ? notes.blocked_claims : [],
+    claim_gate_effect: notes.claim_gate_effect || 'no_claims_cleared',
+    limitations: Array.isArray(notes.limitations) ? notes.limitations : [
+      'This replay artifact is internal-alpha evidence only and does not clear regulated claims.',
+    ],
+  });
+});
+
 app.post('/api/projects/:name/evidence', authMiddleware, requireRole('admin'), (req, res) => {
   const rejected = Object.keys(req.body).filter((key) => !EVIDENCE_INSERT_FIELDS.has(key));
   if (rejected.length) return res.status(400).json({ error: `Unsupported fields: ${rejected.join(', ')}` });
@@ -1806,6 +1850,10 @@ function runSprinklerPipeline(req, prebuilt = null) {
     const evidenceNotes = replayInput
       ? JSON.stringify({
         kind: 'best_effort_ai_layout_replay',
+        artifact_type: 'room_boundary_replay_bid_artifact',
+        artifact_status: 'best_effort_internal_alpha',
+        replay_generated_at: new Date().toISOString(),
+        download_name: `room-boundary-replay-bid-artifact-${replayInput.source_evidence_id}-${replayInput.source_review_evidence_id}.json`,
         generated_by: bid.generatedBy,
         source_evidence_id: replayInput.source_evidence_id,
         source_review_evidence_id: replayInput.source_review_evidence_id,
@@ -1814,6 +1862,12 @@ function runSprinklerPipeline(req, prebuilt = null) {
         corrected_room_polygon_count: replayInput.corrected_room_polygon_count,
         total_head_count: bid.totalHeadCount,
         total_area_sqft: bid.totalAreaSqFt,
+        bid_summary: {
+          total_area_sqft: bid.totalAreaSqFt,
+          total_head_count: bid.totalHeadCount,
+          pricing_total: bid.pricing?.total ?? null,
+          markup_pct: bid.pricing?.markupPct ?? null,
+        },
         blocked_claims: replayInput.blocked_claims,
         claim_gate_effect: 'no_claims_cleared',
         summary: `claim_gate_effect=no_claims_cleared source_review_evidence_id=${replayInput.source_review_evidence_id}`,
