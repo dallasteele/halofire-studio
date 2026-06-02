@@ -1919,6 +1919,7 @@ describe('OpenClaw SAM31 bridge status API', () => {
     expect(replayFollowupPacketReviewQueueRes.status).toBe(200);
     const replayFollowupPacketReviewQueue = await replayFollowupPacketReviewQueueRes.json();
     expect(replayFollowupPacketReviewQueue.summary.sam31_sprinkler_packet_reviews_recorded).toBeGreaterThanOrEqual(1);
+    expect(replayFollowupPacketReviewQueue.summary.sam31_approval_upload_resolver_rows).toBeGreaterThanOrEqual(3);
     const replayFollowupPacketReviewQueueItem = replayFollowupPacketReviewQueue.items.find((row) => row.evidence_id === boundary.id);
     const replayFollowupPacketReviewRows = replayFollowupPacketReviewQueueItem.sam31_sprinkler_preliminary_replay_queue_items || [];
     const replayFollowupPacketReviewRow = replayFollowupPacketReviewRows.find((row) => row.source_halofire_sam31_sprinkler_review_decision_evidence_id === sprinklerReview.id);
@@ -1936,6 +1937,42 @@ describe('OpenClaw SAM31 bridge status API', () => {
         claim_gate_effect: 'no_claims_cleared',
       }),
     ]));
+    const packetReviewQueueItem = replayFollowupPacketReviewRow.packet_queue_items.find((packet) => packet.latest_packet_review_decision?.evidence_id === replayFollowupPacketReview.id);
+    expect(packetReviewQueueItem.approval_upload_resolver_rows).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        artifact_type: 'halofire.sam31_approval_upload_resolver_row.v1',
+        code: 'HALOFIRE_SAM31_PROFESSIONAL_APPROVAL_UPLOAD_MISSING',
+        target_approval_lane: 'professional_approval',
+        required_evidence_type: 'licensed_professional_signed_review',
+        next_action: expect.stringContaining('Upload'),
+        acceptable_evidence: expect.arrayContaining(['PE or licensed sprinkler professional signed review packet']),
+        ai_fallback: expect.stringContaining('SAM31'),
+        blocked_claims: expect.arrayContaining(['professional_approval', 'permit_ready', 'fabrication_ready']),
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+      expect.objectContaining({
+        artifact_type: 'halofire.sam31_approval_upload_resolver_row.v1',
+        code: 'HALOFIRE_SAM31_AHJ_APPROVAL_UPLOAD_MISSING',
+        target_approval_lane: 'AHJ_approval',
+        required_evidence_type: 'AHJ_signed_approval_or_plan_check_record',
+        acceptable_evidence: expect.arrayContaining(['AHJ signed approval, plan-check response, or correction letter']),
+        blocked_claims: expect.arrayContaining(['AHJ_approval', 'permit_ready']),
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+      expect.objectContaining({
+        artifact_type: 'halofire.sam31_approval_upload_resolver_row.v1',
+        code: 'HALOFIRE_SAM31_MANUFACTURER_EVIDENCE_UPLOAD_MISSING',
+        target_approval_lane: 'manufacturer_exact',
+        required_evidence_type: 'manufacturer_catalog_or_model_proof',
+        acceptable_evidence: expect.arrayContaining(['manufacturer catalog page, cut sheet, BIM/STEP file, or source-linked model proof']),
+        blocked_claims: expect.arrayContaining(['manufacturer_exact', 'fabrication_ready']),
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    ]));
+    expect(packetReviewQueueItem.approval_upload_resolver_rows.every((row) => row.source_packet_review_decision_evidence_id === replayFollowupPacketReview.id)).toBe(true);
 
     const nameForgeAdapterRes = await request(`${COOPERATIVE_1881_PATH}/openclaw/sam31/product-owner-replacements`, {
       method: 'POST',

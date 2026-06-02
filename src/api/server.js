@@ -1331,6 +1331,12 @@ const HALOFIRE_SAM31_SLEEVE_FIRESTOP_PACKET_QUEUE_ITEM_TYPE = 'halofire.sam31_sl
 const HALOFIRE_SAM31_OBSTRUCTION_CLASH_PACKET_TYPE = 'halofire.sam31_obstruction_clash_packet.v1';
 const HALOFIRE_SAM31_SLEEVE_FIRESTOP_PACKET_TYPE = 'halofire.sam31_sleeve_firestop_packet.v1';
 const HALOFIRE_SAM31_SPRINKLER_FOLLOWUP_PACKET_REVIEW_DECISION_TYPE = 'halofire.sam31_sprinkler_followup_packet_review_decision.v1';
+const HALOFIRE_SAM31_APPROVAL_UPLOAD_RESOLVER_ROW_TYPE = 'halofire.sam31_approval_upload_resolver_row.v1';
+const HALOFIRE_SAM31_APPROVAL_UPLOAD_MISSING_CODES = Object.freeze({
+  professional: 'HALOFIRE_SAM31_PROFESSIONAL_APPROVAL_UPLOAD_MISSING',
+  ahj: 'HALOFIRE_SAM31_AHJ_APPROVAL_UPLOAD_MISSING',
+  manufacturer: 'HALOFIRE_SAM31_MANUFACTURER_EVIDENCE_UPLOAD_MISSING',
+});
 const SAM31_CONSUMER_QUEUE_TARGETS = Object.freeze(['landscout', 'nameforge']);
 const SAM31_CONSUMER_UNAVAILABLE_CODES = Object.freeze({
   landscout: 'OPENCLAW_SAM31_LANDSCOUT_QUEUE_UNAVAILABLE',
@@ -3300,6 +3306,107 @@ function halofireSam31SprinklerFollowupPacketReviewSummary(packetReviewEvidence)
   };
 }
 
+function halofireSam31ApprovalUploadResolverRows(packet, latestReview) {
+  if (!packet || !latestReview) return [];
+  const commonBlockedClaims = uniqueStrings([
+    ...(Array.isArray(packet.blocked_claims) ? packet.blocked_claims : []),
+    'permit_ready',
+    'AHJ_approval',
+    'AutoSprink_parity',
+    'fabrication_ready',
+    'professional_approval',
+    'manufacturer_exact',
+  ]);
+  const sourceRefs = uniqueByJson([
+    {
+      evidence_type: 'halofire_sam31_sprinkler_followup_packet_review_decision',
+      evidence_id: latestReview.evidence_id,
+      source_ref: latestReview.source_ref || latestReview.review_ref || null,
+      artifact_type: latestReview.artifact_type || HALOFIRE_SAM31_SPRINKLER_FOLLOWUP_PACKET_REVIEW_DECISION_TYPE,
+    },
+    {
+      evidence_type: 'halofire_sam31_sprinkler_preliminary_replay_followup_decision',
+      evidence_id: packet.source_followup_decision_evidence_id || latestReview.source_followup_decision_evidence_id || null,
+      artifact_type: packet.source_followup_decision_artifact_type || HALOFIRE_SAM31_SPRINKLER_PRELIMINARY_REPLAY_FOLLOWUP_DECISION_TYPE,
+    },
+    {
+      evidence_type: 'pdf_boundary_decision',
+      evidence_id: packet.source_pdf_boundary_evidence_id || null,
+    },
+  ]);
+  const base = {
+    artifact_type: HALOFIRE_SAM31_APPROVAL_UPLOAD_RESOLVER_ROW_TYPE,
+    status: 'missing_required_approval_upload',
+    source_runtime: 'sam-3.1+llm',
+    source_packet_queue_item_artifact_type: packet.artifact_type,
+    source_packet_review_decision_artifact_type: latestReview.artifact_type || HALOFIRE_SAM31_SPRINKLER_FOLLOWUP_PACKET_REVIEW_DECISION_TYPE,
+    source_packet_review_decision_evidence_id: latestReview.evidence_id,
+    source_packet_artifact_type: latestReview.source_packet_artifact_type || null,
+    source_followup_decision_evidence_id: packet.source_followup_decision_evidence_id || latestReview.source_followup_decision_evidence_id || null,
+    source_pdf_boundary_evidence_id: packet.source_pdf_boundary_evidence_id || null,
+    source_openclaw_sam31_consumer_review_evidence_id: packet.source_openclaw_sam31_consumer_review_evidence_id || null,
+    source_halofire_sam31_sprinkler_review_decision_evidence_id: packet.source_halofire_sam31_sprinkler_review_decision_evidence_id || null,
+    target_packet_lane: packet.target_packet_lane || null,
+    source_field: packet.source_field || null,
+    source_index: packet.source_index ?? null,
+    source_refs: sourceRefs,
+    use_for_claims: false,
+    claim_gate_effect: 'no_claims_cleared',
+    no_claim_gates_cleared: true,
+    limitations: [
+      'SAM31+LLM packet review is correction and routing evidence only.',
+      'This resolver row describes the exact approval upload still required; it cannot clear the claim by itself.',
+    ],
+  };
+  return [
+    {
+      ...base,
+      id: `${packet.id || 'sam31-packet'}:approval-upload:professional`,
+      code: HALOFIRE_SAM31_APPROVAL_UPLOAD_MISSING_CODES.professional,
+      target_approval_lane: 'professional_approval',
+      required_evidence_type: 'licensed_professional_signed_review',
+      next_action: 'Upload a PE or licensed sprinkler professional signed review packet tied to this SAM31 follow-up packet before claiming professional approval, permit readiness, or fabrication readiness.',
+      acceptable_evidence: [
+        'PE or licensed sprinkler professional signed review packet',
+        'signed/sealed plan markup referencing this obstruction/clash or sleeve/firestop packet',
+        'professional review letter with scope, date, reviewer identity, and source packet reference',
+      ],
+      ai_fallback: 'SAM31 may keep producing best-effort issue lists, vector overlays, and 3D candidates for review, but AI output remains temporary until a licensed reviewer uploads signed evidence.',
+      blocked_claims: uniqueStrings([...commonBlockedClaims, 'professional_approval', 'permit_ready', 'fabrication_ready']),
+    },
+    {
+      ...base,
+      id: `${packet.id || 'sam31-packet'}:approval-upload:ahj`,
+      code: HALOFIRE_SAM31_APPROVAL_UPLOAD_MISSING_CODES.ahj,
+      target_approval_lane: 'AHJ_approval',
+      required_evidence_type: 'AHJ_signed_approval_or_plan_check_record',
+      next_action: 'Upload the AHJ signed approval, plan-check response, correction letter, or permit review record tied to this packet before claiming AHJ approval or permit readiness.',
+      acceptable_evidence: [
+        'AHJ signed approval, plan-check response, or correction letter',
+        'permit review record with jurisdiction, date, reviewer, and drawing/packet reference',
+        'source-linked AHJ correspondence accepting or requiring corrections for this packet lane',
+      ],
+      ai_fallback: 'SAM31 may prepare correction packets and response drafts for AHJ review, but it cannot substitute for an AHJ approval record.',
+      blocked_claims: uniqueStrings([...commonBlockedClaims, 'AHJ_approval', 'permit_ready']),
+    },
+    {
+      ...base,
+      id: `${packet.id || 'sam31-packet'}:approval-upload:manufacturer`,
+      code: HALOFIRE_SAM31_APPROVAL_UPLOAD_MISSING_CODES.manufacturer,
+      target_approval_lane: 'manufacturer_exact',
+      required_evidence_type: 'manufacturer_catalog_or_model_proof',
+      next_action: 'Upload manufacturer catalog, cut sheet, licensed BIM/STEP model proof, or approved vendor source tied to the components in this packet before claiming manufacturer-exact or fabrication-ready output.',
+      acceptable_evidence: [
+        'manufacturer catalog page, cut sheet, BIM/STEP file, or source-linked model proof',
+        'license/terms and downloaded artifact hash for any CAD/BIM/STEP model',
+        'manufacturer or vendor approval note referencing the exact component family and packet source',
+      ],
+      ai_fallback: 'SAM31 can generate editable vector/model candidates and rank catalog matches, but HaloFire staff must upload real manufacturer/vendor proof before manufacturer-exact or fabrication claims.',
+      blocked_claims: uniqueStrings([...commonBlockedClaims, 'manufacturer_exact', 'fabrication_ready']),
+    },
+  ];
+}
+
 function halofireSam31SprinklerPreliminaryReplayFollowupSummary(followupEvidence, packetReviewDecisionEvidences = []) {
   if (!followupEvidence?.evidence || !followupEvidence?.followup) return null;
   const { evidence, followup } = followupEvidence;
@@ -3314,6 +3421,7 @@ function halofireSam31SprinklerPreliminaryReplayFollowupSummary(followupEvidence
       ...packet,
       status: latestReview ? 'internal_alpha_packet_review_recorded' : packet.status,
       latest_packet_review_decision: latestReview,
+      approval_upload_resolver_rows: halofireSam31ApprovalUploadResolverRows(packet, latestReview),
     };
   });
   return {
@@ -7273,6 +7381,7 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
       sam31_sprinkler_preliminary_replay_followups_recorded: visibleItems.reduce((acc, item) => acc + (Array.isArray(item.sam31_sprinkler_preliminary_replay_queue_items) ? item.sam31_sprinkler_preliminary_replay_queue_items.filter((row) => row.latest_sam31_sprinkler_preliminary_replay_followup_decision).length : 0), 0),
       sam31_sprinkler_packet_queue_items: visibleItems.reduce((acc, item) => acc + (Array.isArray(item.sam31_sprinkler_preliminary_replay_queue_items) ? item.sam31_sprinkler_preliminary_replay_queue_items.reduce((rowAcc, row) => rowAcc + (Array.isArray(row.packet_queue_items) ? row.packet_queue_items.length : 0), 0) : 0), 0),
       sam31_sprinkler_packet_reviews_recorded: visibleItems.reduce((acc, item) => acc + (Array.isArray(item.sam31_sprinkler_preliminary_replay_queue_items) ? item.sam31_sprinkler_preliminary_replay_queue_items.reduce((rowAcc, row) => rowAcc + (Array.isArray(row.packet_queue_items) ? row.packet_queue_items.filter((packet) => packet.latest_packet_review_decision).length : 0), 0) : 0), 0),
+      sam31_approval_upload_resolver_rows: visibleItems.reduce((acc, item) => acc + (Array.isArray(item.sam31_sprinkler_preliminary_replay_queue_items) ? item.sam31_sprinkler_preliminary_replay_queue_items.reduce((rowAcc, row) => rowAcc + (Array.isArray(row.packet_queue_items) ? row.packet_queue_items.reduce((packetAcc, packet) => packetAcc + (Array.isArray(packet.approval_upload_resolver_rows) ? packet.approval_upload_resolver_rows.length : 0), 0) : 0), 0) : 0), 0),
       catalog_source_needed: statusCounts.catalog_source_needed || 0,
       catalog_review_needed: statusCounts.catalog_review_needed || 0,
       catalog_evidence_recorded: statusCounts.catalog_evidence_recorded || 0,

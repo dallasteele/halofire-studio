@@ -307,6 +307,11 @@ describe('studio static origin handling', () => {
     expect(html).toContain('saveHalofireSam31SprinklerReplayFollowupPacketReview');
     expect(html).toContain('data-sam31-sprinkler-replay-followup-packet-review-evidence-id');
     expect(html).toContain('latest_packet_review_decision');
+    expect(html).toContain('approval_upload_resolver_rows');
+    expect(html).toContain('halofire.sam31_approval_upload_resolver_row.v1');
+    expect(html).toContain('HALOFIRE_SAM31_PROFESSIONAL_APPROVAL_UPLOAD_MISSING');
+    expect(html).toContain('HALOFIRE_SAM31_AHJ_APPROVAL_UPLOAD_MISSING');
+    expect(html).toContain('HALOFIRE_SAM31_MANUFACTURER_EVIDENCE_UPLOAD_MISSING');
     expect(html).toContain('/preliminary-replay/followup/');
     expect(html).toContain('/packet/');
     expect(html).toContain('/review');

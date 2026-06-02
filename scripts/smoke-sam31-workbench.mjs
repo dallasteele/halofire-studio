@@ -683,15 +683,33 @@ async function runBrowserSmoke(token, evidenceIds) {
     if ((replayFollowupPacketReviewQueue.summary?.sam31_sprinkler_packet_reviews_recorded || 0) < 1) {
       throw new Error(`SAM31 follow-up packet review was not recorded in resolver summary: ${JSON.stringify(replayFollowupPacketReviewQueue.summary)}`);
     }
+    if ((replayFollowupPacketReviewQueue.summary?.sam31_approval_upload_resolver_rows || 0) < 3) {
+      throw new Error(`SAM31 approval upload resolver rows were not recorded in resolver summary: ${JSON.stringify(replayFollowupPacketReviewQueue.summary)}`);
+    }
     const replayFollowupPacketReviewItem = replayFollowupPacketReviewQueue.items.find((item) => item.evidence_id === evidenceIds.boundaryEvidenceId);
     const replayFollowupPacketReviewRows = replayFollowupPacketReviewItem?.sam31_sprinkler_preliminary_replay_queue_items || [];
     const replayFollowupPacketReviewRow = replayFollowupPacketReviewRows.find((row) => row.source_halofire_sam31_sprinkler_review_decision_evidence_id === latestSprinklerDecision.evidence_id);
-    const replayFollowupPacketReview = replayFollowupPacketReviewRow?.packet_queue_items?.[0]?.latest_packet_review_decision || null;
+    const replayFollowupPacketReviewPacket = replayFollowupPacketReviewRow?.packet_queue_items?.[0] || null;
+    const replayFollowupPacketReview = replayFollowupPacketReviewPacket?.latest_packet_review_decision || null;
     if (!replayFollowupPacketReview) {
       throw new Error(`SAM31 follow-up packet review missing from queue row: ${JSON.stringify(replayFollowupPacketReviewRows)}`);
     }
     if (replayFollowupPacketReview.review_decision !== 'accepted_internal_alpha_packet' || replayFollowupPacketReview.claim_gate_effect !== 'no_claims_cleared') {
       throw new Error(`SAM31 follow-up packet review did not preserve no-claim state: ${JSON.stringify(replayFollowupPacketReview)}`);
+    }
+    const approvalRows = replayFollowupPacketReviewPacket?.approval_upload_resolver_rows || [];
+    const approvalCodes = new Set(approvalRows.map((row) => row.code));
+    for (const code of [
+      'HALOFIRE_SAM31_PROFESSIONAL_APPROVAL_UPLOAD_MISSING',
+      'HALOFIRE_SAM31_AHJ_APPROVAL_UPLOAD_MISSING',
+      'HALOFIRE_SAM31_MANUFACTURER_EVIDENCE_UPLOAD_MISSING',
+    ]) {
+      if (!approvalCodes.has(code)) {
+        throw new Error(`SAM31 approval upload resolver row ${code} missing: ${JSON.stringify(approvalRows)}`);
+      }
+    }
+    if (approvalRows.some((row) => row.use_for_claims !== false || row.claim_gate_effect !== 'no_claims_cleared')) {
+      throw new Error(`SAM31 approval upload resolver row cleared a claim gate: ${JSON.stringify(approvalRows)}`);
     }
     const unresolvedNameForge = await request(`${PROJECT_PATH}/resolver-queue?sam31ConsumerReview=unresolved&consumer=nameforge`, token);
     const unresolvedItem = unresolvedNameForge.items.find((item) => item.evidence_id === evidenceIds.boundaryEvidenceId);
