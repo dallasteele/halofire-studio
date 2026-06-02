@@ -314,6 +314,43 @@ async function runBrowserSmoke(token, evidenceIds) {
       throw new Error(`Unexpected SAM31 packet download ${suggestedName} (${downloadBytes} bytes)`);
     }
 
+    await page.waitForSelector('text=Run replay bid', { timeout: 8_000 });
+    const replayDownloadPromise = page.waitForEvent('download');
+    await page.getByRole('button', { name: 'Run replay bid' }).first().click();
+    const replayDownload = await replayDownloadPromise;
+    const replayDownloadPath = await replayDownload.path();
+    const replaySuggestedName = replayDownload.suggestedFilename();
+    const replayDownloadBytes = replayDownloadPath ? fs.statSync(replayDownloadPath).size : 0;
+    downloads.push({ suggestedName: replaySuggestedName, bytes: replayDownloadBytes });
+    if (!replaySuggestedName.includes('room-boundary-replay-bid-artifact') || replayDownloadBytes <= 0) {
+      throw new Error(`Unexpected replay bid artifact download ${replaySuggestedName} (${replayDownloadBytes} bytes)`);
+    }
+    const replayArtifact = JSON.parse(fs.readFileSync(replayDownloadPath, 'utf8'));
+    if (replayArtifact.artifact_type !== 'room_boundary_replay_bid_artifact') {
+      throw new Error(`Unexpected replay artifact type ${replayArtifact.artifact_type}`);
+    }
+    if (!Number.isSafeInteger(replayArtifact.source_sam31_replacement_evidence_id) || replayArtifact.source_sam31_replacement_evidence_id <= 0) {
+      throw new Error('Replay artifact is missing source_sam31_replacement_evidence_id');
+    }
+    if (replayArtifact.sam31_replacement_source !== 'latest_sam31_employee_replacement') {
+      throw new Error(`Replay artifact used wrong SAM31 replacement source ${replayArtifact.sam31_replacement_source}`);
+    }
+    if (replayArtifact.sam31_employee_replacement?.replacement_values?.semantic_label !== 'employee adjusted corridor') {
+      throw new Error('Replay artifact did not preserve the employee semantic label');
+    }
+    if (replayArtifact.sam31_employee_replacement?.replacement_values?.model_3d_candidate?.primitive !== 'employee_adjusted_extruded_polygon') {
+      throw new Error('Replay artifact did not preserve the employee 3D candidate replacement');
+    }
+    if (replayArtifact.roomBoundaryReplay?.source_sam31_replacement_evidence_id !== replayArtifact.source_sam31_replacement_evidence_id) {
+      throw new Error('Replay artifact roomBoundaryReplay does not point at the same SAM31 replacement evidence');
+    }
+    if (replayArtifact.bid?.totalAreaSqFt !== 224 || replayArtifact.bid?.rooms?.[0]?.name !== 'employee adjusted corridor') {
+      throw new Error('Replay artifact bid did not use the employee replacement polygon and label');
+    }
+    if (replayArtifact.claim_gate_effect !== 'no_claims_cleared') {
+      throw new Error(`Replay artifact cleared a claim gate: ${replayArtifact.claim_gate_effect}`);
+    }
+
     const screenshotPath = path.join(OUT_DIR, `halofire-sam31-workbench-${Date.now()}.png`);
     await page.screenshot({ path: screenshotPath, fullPage: true });
     const sha256 = crypto.createHash('sha256').update(fs.readFileSync(screenshotPath)).digest('hex');
@@ -324,6 +361,15 @@ async function runBrowserSmoke(token, evidenceIds) {
       screenshotSha256: `sha256:${sha256}`,
       evidenceIds,
       downloads,
+      replayArtifact: {
+        artifact_type: replayArtifact.artifact_type,
+        source_sam31_replacement_evidence_id: replayArtifact.source_sam31_replacement_evidence_id,
+        sam31_replacement_source: replayArtifact.sam31_replacement_source,
+        semantic_label: replayArtifact.sam31_employee_replacement.replacement_values.semantic_label,
+        model_3d_candidate: replayArtifact.sam31_employee_replacement.replacement_values.model_3d_candidate.primitive,
+        totalAreaSqFt: replayArtifact.bid.totalAreaSqFt,
+        claim_gate_effect: replayArtifact.claim_gate_effect,
+      },
       sam31ReplacementRouteSuffix: SAM31_REPLACEMENTS_ROUTE_SUFFIX,
       sam31ReplacementQueueStatus: SAM31_REPLACEMENTS_RECORDED_STATUS,
       claim_gate_effect: 'no_claims_cleared',
