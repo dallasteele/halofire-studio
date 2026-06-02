@@ -731,6 +731,58 @@ app.get('/api/projects/:name/evidence', authMiddleware, (req, res) => {
   res.json(evidence);
 });
 
+const COOPERATIVE_1881_PROPOSAL_FILE = 'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx';
+const COOPERATIVE_1881_ACTUAL_VALUE_FALLBACK_SOURCE_REFS = [
+  `${COOPERATIVE_1881_PROPOSAL_FILE}#Building (1)!G6`,
+  `${COOPERATIVE_1881_PROPOSAL_FILE}#Building (1)!B9`,
+  `${COOPERATIVE_1881_PROPOSAL_FILE}#Building (1)!G11`,
+];
+
+function cooperative1881ActualValueSourceRefs() {
+  try {
+    const bidPackage = readCooperative1881BidPackage();
+    const realTakeoff = readCooperative1881RealTakeoff();
+    return uniqueStrings([
+      ...(Array.isArray(bidPackage.sourceRefs) ? bidPackage.sourceRefs : []),
+      ...(Array.isArray(realTakeoff.sourceRefs) ? realTakeoff.sourceRefs : []),
+      ...COOPERATIVE_1881_ACTUAL_VALUE_FALLBACK_SOURCE_REFS,
+    ]);
+  } catch (err) {
+    log.warn?.(`Cooperative 1881 actual-value prefill source reader failed: ${err.message}`);
+    return [...COOPERATIVE_1881_ACTUAL_VALUE_FALLBACK_SOURCE_REFS];
+  }
+}
+
+function buildSam31ActualValueReplacementPrefill(projectName, item, evidence) {
+  const isCooperative1881 = projectName === COOPERATIVE_1881_PROJECT_NAME;
+  const suppliedSourceRefs = isCooperative1881 ? cooperative1881ActualValueSourceRefs() : [];
+  const sourceRefs = uniqueStrings([
+    ...suppliedSourceRefs,
+    item.replacement_values_source_ref,
+    item.replacement_ref,
+    item.persisted_review_packet_ref,
+    evidence?.source_ref,
+  ].filter(Boolean));
+  const preferred1881Ref = sourceRefs.find((ref) => String(ref).includes('#Building (1)!G6')) || sourceRefs[0] || null;
+  const sourceRef = (isCooperative1881 ? preferred1881Ref : null) || item.replacement_values_source_ref || item.replacement_ref || evidence?.source_ref || null;
+  const sourceFile = isCooperative1881
+    ? COOPERATIVE_1881_PROPOSAL_FILE
+    : (evidence?.source_file || item.source_file || null);
+  return {
+    artifact_type: 'halofire.sam31_actual_value_replacement_prefill.v1',
+    status: isCooperative1881 ? 'prefill_from_supplied_1881_source_refs' : 'prefill_from_review_values',
+    source_file: sourceFile,
+    source_ref: sourceRef,
+    replacement_values_source_ref: (isCooperative1881 ? sourceRef : null) || item.replacement_values_source_ref || sourceRef,
+    source_refs: sourceRefs,
+    acceptable_actual_evidence: Array.isArray(item.acceptable_actual_evidence) ? item.acceptable_actual_evidence : [],
+    notes_template: 'Record the exact workbook/sheet, reviewed vector overlay, reviewed 3D model candidate, screenshot, or console evidence that replaces this SAM31 best guess.',
+    use_for_claims: false,
+    claim_gate_effect: 'no_claims_cleared',
+    no_claim_gates_cleared: true,
+  };
+}
+
 function buildOpenClawSam31ActualValueWorkItemIndex(projectName) {
   const reviews = db
     .prepare(`SELECT * FROM project_evidence
@@ -751,7 +803,7 @@ function buildOpenClawSam31ActualValueWorkItemIndex(projectName) {
       : {};
     const countArray = (key) => (Array.isArray(replacementValues[key]) ? replacementValues[key].length : 0);
     const sourcePdfBoundaryEvidenceId = Number(review.source_pdf_boundary_evidence_id);
-    return {
+    const item = {
       artifact_type: 'openclaw.sam31.actual_value_work_item_packet.v1',
       status: 'requires_employee_actual_value_update',
       consumer: review.consumer || 'consumer',
@@ -789,6 +841,8 @@ function buildOpenClawSam31ActualValueWorkItemIndex(projectName) {
       claim_gate_effect: 'no_claims_cleared',
       no_claim_gates_cleared: true,
     };
+    item.actual_value_replacement_prefill = buildSam31ActualValueReplacementPrefill(projectName, item, evidence);
+    return item;
   });
   return {
     artifact_type: 'halofire.sam31_actual_value_work_item_index.v1',
@@ -908,6 +962,7 @@ function buildOpenClawSam31ActualValueResolverQueue(projectName, options = {}) {
         replacement_ref: item.replacement_ref || null,
         replacement_values_source_ref: item.replacement_values_source_ref || null,
         replacement_summary: item.replacement_summary || {},
+        actual_value_replacement_prefill: item.actual_value_replacement_prefill || null,
         acceptable_actual_evidence: Array.isArray(item.acceptable_actual_evidence) ? item.acceptable_actual_evidence : [],
         evidence_record_type: item.evidence_record_type || 'sam31_actual_value_replacement',
         evidence_record_next_action: item.evidence_record_next_action || 'Record the actual HaloFire documentation evidence that replaces this SAM31 best guess.',
