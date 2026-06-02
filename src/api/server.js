@@ -28,7 +28,7 @@ import { requiredPressureAtRiser, flagSchedule, remoteAreaDemand } from '../engi
 import { buildParityMatrix, parityAchieved } from '../engine/parity-matrix.js';
 import { AUTOSPRINK_PARITY_GATE, buildParityInventory, parityGateStatus, getComponent } from '../components/registry.js';
 import { buildPartManifest } from '../components/part-mesh.js';
-import { buildSourceAcquisitionLedger } from '../components/auto-source-runner.js';
+import { buildSourceAcquisitionLedger, probeBridge } from '../components/auto-source-runner.js';
 import { balanceNetwork } from '../engine/hydraulic-network.js';
 import { checkCompliance } from '../engine/nfpa-compliance.js';
 import { buildSubmittal, renderSubmittalPdf } from '../engine/submittal.js';
@@ -1241,6 +1241,48 @@ function openClawSam31BridgeStatus(env = process.env) {
     limitations: [
       'Bridge configuration or reachability is operational evidence only and does not clear geometry accuracy, AHJ, PE, AutoSprink, permit, fabrication, or manufacturer-exact claims.',
       'Unavailable or configured_unverified bridge status must fail closed to vector/SAM packet fallback and employee replacement workflows.',
+    ],
+  };
+}
+
+async function openClawSam31BridgeStatusWithProbe(env = process.env, fetchImpl = globalThis.fetch) {
+  const base = openClawSam31BridgeStatus(env);
+  if (!base.bridge_url_configured) {
+    return {
+      ...base,
+      bridge_reachable: false,
+      openclaw_status: null,
+      sam31_status: null,
+      probe_status_url: null,
+      observed_at: new Date().toISOString(),
+    };
+  }
+  const bridgeUrl = base.bridge_url;
+  const probe = probeBridge({
+    bridgeUrl,
+    fetchImpl,
+    timeoutMs: Number(env.HALOFIRE_SAM31_STATUS_TIMEOUT_MS || 3000),
+  });
+  const probed = await probe();
+  const raw = probed.raw && typeof probed.raw === 'object' ? probed.raw : null;
+  const sam31Status =
+    raw?.services?.sam31?.status != null ? String(raw.services.sam31.status) : null;
+  const bridgeReachable = !!probed.reachable;
+  return {
+    ...base,
+    status: bridgeReachable ? 'verified_reachable' : 'configured_unreachable',
+    bridge_reachable: bridgeReachable,
+    openclaw_status: probed.openclaw || null,
+    sam31_status: sam31Status,
+    probe_status_url: `${String(bridgeUrl).replace(/\/$/, '')}/status`,
+    observed_at: new Date().toISOString(),
+    raw_status: raw,
+    next_action: bridgeReachable
+      ? 'Bridge /status responded. Run a SAM31 pdfExtract:sam invocation smoke and attach screenshot/console evidence before relying on runtime output; regulated claims remain blocked.'
+      : 'Configured OPENCLAW_BRIDGE_URL did not answer /status. Start or fix the governed OpenClaw SAM31 bridge, then re-run this status check; use saved employee replacements as local fallback only.',
+    limitations: [
+      ...base.limitations,
+      'A reachable bridge proves only operational contact with the SAM31 bridge status route; it does not prove segmentation accuracy or clear professional/AHJ/manufacturer claims.',
     ],
   };
 }
@@ -3189,8 +3231,8 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
   });
 });
 
-app.get('/api/openclaw/sam31/status', authMiddleware, (req, res) => {
-  res.json(openClawSam31BridgeStatus());
+app.get('/api/openclaw/sam31/status', authMiddleware, async (req, res) => {
+  res.json(await openClawSam31BridgeStatusWithProbe());
 });
 
 app.post('/api/projects/:name/resolver-packets/official-flow/intake', authMiddleware, requireRole('admin'), (req, res) => {
