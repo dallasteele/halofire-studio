@@ -301,6 +301,22 @@ function resolverQueueDetail(item) {
       <p style="margin-top:8px">${actions.map((action) => `<a class="go" style="padding:7px 10px;font-size:11px;text-decoration:none;display:inline-block;margin-right:6px" href="${escapeHtml(action.href || '#')}">${escapeHtml(action.label || 'Open')}</a>`).join('')}</p>
     </div>`;
   }
+  if (item.kind === 'official_flow_intake') {
+    const refs = Array.isArray(defaults.source_refs) ? defaults.source_refs : [];
+    return `
+    <div class="gate warning" id="${escapeHtml(item.id)}">
+      <div class="code">${escapeHtml(item.kind)} - ${escapeHtml(item.status).toUpperCase()}</div>
+      <div class="na">${escapeHtml(item.next_action)}</div>
+      <div class="claims">Water: static ${escapeHtml(defaults.staticPsi || 'missing')} psi - residual ${escapeHtml(defaults.residualPsi || 'missing')} psi - flowing ${escapeHtml(defaults.flowingGpm || 'missing')} gpm</div>
+      <div class="claims">Source status: ${escapeHtml(defaults.source_status || 'missing')} - flow date ${escapeHtml(defaults.flowDataDate || 'missing')} - water model ${escapeHtml(defaults.waterModelRequired || 'missing')}</div>
+      <div class="claims">Project defaults: heads ${escapeHtml(defaults.project_head_count || 'missing')} - sqft ${escapeHtml(defaults.project_sqft || 'missing')}</div>
+      <div class="claims">Source refs: ${refs.length ? refs.map((ref) => `<span class="chip">${escapeHtml(ref)}</span>`).join('') : '<span class="chip">missing official flow source</span>'}</div>
+      <div class="claims">Accepts: ${acceptable.map((e) => `<span class="chip">${escapeHtml(e)}</span>`).join('')}</div>
+      <div class="claims">AI fallback: ${escapeHtml(item.ai_fallback || '')}</div>
+      <div class="claims">Blocks: ${claims.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('')}</div>
+      <p style="margin-top:8px">${actions.map((action) => `<a class="go" style="padding:7px 10px;font-size:11px;text-decoration:none;display:inline-block;margin-right:6px" href="${escapeHtml(action.href || '#')}">${escapeHtml(action.label || 'Open')}</a>`).join('')}</p>
+    </div>`;
+  }
   return `
     <div class="gate warning" id="${escapeHtml(item.id)}">
       <div class="code">${escapeHtml(item.kind)} · ${escapeHtml(item.status).toUpperCase()}</div>
@@ -448,7 +464,7 @@ async function refreshResolverQueue() {
   const queue = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/resolver-queue');
   document.getElementById('resolverQueue').innerHTML = queue.items && queue.items.length
     ? queue.items.map(resolverQueueDetail).join('')
-    : '<span class="muted">No resolver queue rows yet. Save a PDF boundary decision to create a room_boundary_visual_audit item or run catalog acquisition to create catalog_vendor_acquisition items.</span>';
+    : '<span class="muted">No resolver queue rows yet. Save a PDF boundary decision for room_boundary_visual_audit, record official_flow_intake, or run catalog acquisition for catalog_vendor_acquisition.</span>';
   document.querySelectorAll('[data-resolver-packet-evidence-id]').forEach((button) => {
     button.onclick = () => downloadResolverPacket(button.dataset.resolverPacketEvidenceId);
   });

@@ -34,8 +34,8 @@ import { checkCompliance } from '../engine/nfpa-compliance.js';
 import { buildSubmittal, renderSubmittalPdf } from '../engine/submittal.js';
 import { homeDepotRexburgFloorPlan, cooperative1881FloorPlan, COOPERATIVE_1881_PROJECT_NAME } from '../data/floorplans.js';
 import { HOME_DEPOT_PROJECT_NAME } from '../data/evidence-gates.js';
-import { readHomeDepotRealTakeoff } from '../data/home-depot-bid-package.js';
-import { readCooperative1881RealTakeoff } from '../data/cooperative-1881-bid-package.js';
+import { readHomeDepotBidPackage, readHomeDepotRealTakeoff } from '../data/home-depot-bid-package.js';
+import { readCooperative1881BidPackage, readCooperative1881RealTakeoff } from '../data/cooperative-1881-bid-package.js';
 import { buildSamInvoker } from './sam-invoker.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -1432,6 +1432,125 @@ function catalogResolverQueueItem(projectName, row, matchedEvidence = null) {
   };
 }
 
+const OFFICIAL_FLOW_BLOCKED_CLAIMS = [
+  'permit_ready',
+  'AHJ_approval',
+  'PE_review',
+  'AutoSprink_parity',
+  'engineering_grade',
+  'fabrication_ready',
+];
+
+function officialFlowFactsForProject(projectName) {
+  if (projectName === HOME_DEPOT_PROJECT_NAME) {
+    try {
+      const pkg = readHomeDepotBidPackage();
+      const water = pkg.water || {};
+      const hasDocumentedValues =
+        Number(water.staticPsi) > 0 &&
+        Number(water.residualPsi) > 0 &&
+        Number(water.flowingGpm) > 0;
+      return {
+        project: pkg.project,
+        sourceStatus: hasDocumentedValues ? 'documented_bid_package_values' : 'missing_official_flow_values',
+        staticPsi: Number(water.staticPsi) || null,
+        residualPsi: Number(water.residualPsi) || null,
+        flowingGpm: Number(water.flowingGpm) || null,
+        flowDataDate: water.flowDataDate || null,
+        waterModelRequired: water.waterModelRequired || null,
+        projectHeadCount: Number(pkg.headCount) || null,
+        projectSqft: Number(pkg.sqft) || null,
+        sourceRefs: Array.isArray(pkg.sourceRefs) ? pkg.sourceRefs : [],
+      };
+    } catch (err) {
+      log.warn(`official-flow Home Depot reader failed: ${err.message}`);
+    }
+  }
+  if (projectName === COOPERATIVE_1881_PROJECT_NAME) {
+    try {
+      const pkg = readCooperative1881BidPackage();
+      return {
+        project: pkg.project,
+        sourceStatus: 'missing_official_flow_values',
+        staticPsi: null,
+        residualPsi: null,
+        flowingGpm: null,
+        flowDataDate: null,
+        waterModelRequired: null,
+        projectHeadCount: Number(pkg.headCount) || null,
+        projectSqft: Number(pkg.sqft) || null,
+        sourceRefs: Array.isArray(pkg.sourceRefs) ? pkg.sourceRefs : [],
+      };
+    } catch (err) {
+      log.warn(`official-flow Cooperative 1881 reader failed: ${err.message}`);
+    }
+  }
+  return {
+    project: projectName,
+    sourceStatus: 'missing_official_flow_values',
+    staticPsi: null,
+    residualPsi: null,
+    flowingGpm: null,
+    flowDataDate: null,
+    waterModelRequired: null,
+    projectHeadCount: null,
+    projectSqft: null,
+    sourceRefs: [],
+  };
+}
+
+function officialFlowResolverQueueItem(projectName) {
+  const facts = officialFlowFactsForProject(projectName);
+  const hasDocumentedValues = facts.sourceStatus === 'documented_bid_package_values';
+  const status = hasDocumentedValues ? 'official_flow_available' : 'official_flow_needed';
+  const sourceRef = facts.sourceRefs.find((ref) => /Job Information!B3:B7/i.test(ref)) || facts.sourceRefs[0] || projectName;
+  return {
+    id: `resolver:official-flow:${slugForDownloadName(projectName)}`,
+    project_name: projectName,
+    kind: 'official_flow_intake',
+    title: 'Official flow intake and preliminary hydraulic replay',
+    status,
+    evidence_id: null,
+    source_evidence_type: 'official_flow_intake',
+    source_ref: sourceRef,
+    next_action: hasDocumentedValues
+      ? 'Use the documented bid-package water values as preliminary hydraulic replay defaults, then attach official flow test/professional hydraulic review evidence before any permit-ready or AHJ claim.'
+      : 'Attach official flow test or water supply data, enter static/residual/flowing values, and run a preliminary hydraulic replay; all regulated claims remain blocked.',
+    acceptable_evidence: [
+      'official flow test report or water supply data sheet',
+      'source-linked municipal or utility water supply record',
+      'licensed professional hydraulic calculation review',
+      'AHJ-reviewed hydraulic calculation package',
+      'AutoSprink or equivalent professional hydraulic model export for parity review',
+    ],
+    ai_fallback:
+      'Run preliminary hydraulic replay from available bid defaults and modeled demand to create issues and questions; AI can suggest candidate values/workflow gaps but cannot clear permit-ready, AHJ, PE, engineering, or AutoSprink parity claims.',
+    input_defaults: {
+      source_status: facts.sourceStatus,
+      staticPsi: facts.staticPsi,
+      residualPsi: facts.residualPsi,
+      flowingGpm: facts.flowingGpm,
+      flowDataDate: facts.flowDataDate,
+      waterModelRequired: facts.waterModelRequired,
+      project_head_count: facts.projectHeadCount,
+      project_sqft: facts.projectSqft,
+      source_refs: facts.sourceRefs,
+      use_for_claims: false,
+    },
+    blocked_claims: [...OFFICIAL_FLOW_BLOCKED_CLAIMS],
+    claim_gate_effect: 'no_claims_cleared',
+    latest_review: null,
+    limitations: [
+      'Documented or employee-entered flow values are preliminary intake evidence until official/professional review is attached.',
+      'This resolver item can seed hydraulic replay and issue lists, but it does not prove permit readiness, AHJ approval, PE review, engineering-grade results, AutoSprink parity, fabrication readiness, or manufacturer-exact models.',
+    ],
+    actions: [
+      { label: 'Open hydraulic replay in Studio', href: `/autosprink.html?project=${encodeURIComponent(projectName)}&resolver=official-flow` },
+      { label: 'Open evidence workbench', href: `/workbench.html?project=${encodeURIComponent(projectName)}#officialFlowIntake` },
+    ],
+  };
+}
+
 function slugForDownloadName(value) {
   return String(value || 'project')
     .toLowerCase()
@@ -1727,6 +1846,8 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
   const decision = decisionFromEvidence(evidence);
   const reviewEvidence = evidence ? latestPdfBoundaryReviewEvidence(projectName, evidence.id) : null;
   const items = [];
+  const officialFlowItem = officialFlowResolverQueueItem(projectName);
+  if (officialFlowItem) items.push(officialFlowItem);
   const boundaryItem = pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence);
   if (boundaryItem) items.push(boundaryItem);
   const catalogEvidence = matchingCatalogEvidenceByFamily(projectName);
@@ -1754,6 +1875,8 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
       catalog_source_needed: statusCounts.catalog_source_needed || 0,
       catalog_review_needed: statusCounts.catalog_review_needed || 0,
       catalog_evidence_recorded: statusCounts.catalog_evidence_recorded || 0,
+      official_flow_available: statusCounts.official_flow_available || 0,
+      official_flow_needed: statusCounts.official_flow_needed || 0,
     },
   });
 });

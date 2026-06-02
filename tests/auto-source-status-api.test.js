@@ -147,4 +147,56 @@ describe('S5 GET /api/auto-source/status', () => {
     expect(catalogItems[0].actions[0].href).toContain('/settings.html?');
     expect(catalogItems[0].actions[0].href).toContain('component=pipe_sch40');
   });
+
+  it('adds official-flow intake resolver items with documented defaults or exact intake blockers', async () => {
+    const homeDepotRes = await fetch(`${BASE}/api/projects/Home%20Depot%20-%20Rexburg%20ID/resolver-queue`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(homeDepotRes.status).toBe(200);
+    const homeDepotBody = await homeDepotRes.json();
+    const homeDepotItem = homeDepotBody.items.find((item) => item.kind === 'official_flow_intake');
+
+    expect(homeDepotItem).toEqual(expect.objectContaining({
+      status: 'official_flow_available',
+      source_evidence_type: 'official_flow_intake',
+      claim_gate_effect: 'no_claims_cleared',
+      next_action: expect.stringMatching(/preliminary hydraulic replay|professional hydraulic/i),
+      ai_fallback: expect.stringMatching(/preliminary hydraulic replay/i),
+    }));
+    expect(homeDepotItem.input_defaults).toEqual(expect.objectContaining({
+      staticPsi: 76,
+      residualPsi: 69,
+      flowingGpm: 1226,
+      source_status: 'documented_bid_package_values',
+    }));
+    expect(homeDepotItem.input_defaults.source_refs).toEqual(
+      expect.arrayContaining(['Proposal- Home Depot - Rexburg ID.xlsx#Job Information!B3:B7']),
+    );
+    expect(homeDepotItem.acceptable_evidence).toEqual(expect.arrayContaining([
+      'official flow test report or water supply data sheet',
+      'licensed professional hydraulic calculation review',
+    ]));
+    expect(homeDepotItem.blocked_claims).toEqual(
+      expect.arrayContaining(['permit_ready', 'AHJ_approval', 'PE_review', 'AutoSprink_parity', 'engineering_grade']),
+    );
+    expect(homeDepotBody.summary.official_flow_available).toBe(1);
+
+    const coopRes = await fetch(`${BASE}/api/projects/The%20Cooperative%201881%20-%20Salt%20Lake%20City%20UT/resolver-queue`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(coopRes.status).toBe(200);
+    const coopBody = await coopRes.json();
+    const coopItem = coopBody.items.find((item) => item.kind === 'official_flow_intake');
+    expect(coopItem).toEqual(expect.objectContaining({
+      status: 'official_flow_needed',
+      source_evidence_type: 'official_flow_intake',
+      next_action: expect.stringMatching(/Attach official flow test|water supply/i),
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(coopItem.input_defaults).toEqual(expect.objectContaining({
+      source_status: 'missing_official_flow_values',
+      project_head_count: 1420,
+    }));
+    expect(coopBody.summary.official_flow_needed).toBe(1);
+  });
 });
