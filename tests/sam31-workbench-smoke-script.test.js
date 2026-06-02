@@ -32,6 +32,11 @@ describe('SAM31 workbench browser smoke script', () => {
     expect(script).toContain('source_ref');
     expect(script).toContain('confidence');
     expect(script).toContain('data-sam31-replacement-action-field');
+    expect(script).toContain('data-sam31-bridge-smoke-evidence-id');
+    expect(script).toContain('runSam31BridgeSmokeArtifact');
+    expect(script).toContain('/openclaw/sam31/smoke-artifact');
+    expect(script).toContain('sam31BridgeSmokeStatus');
+    expect(script).toContain('openclaw_sam31_bridge_smoke_artifact');
     expect(script).toContain('/sam31-replacements');
     expect(script).toContain('Save employee replacements');
     expect(script).toContain('sam31EmployeeReplacementValues');

@@ -1344,7 +1344,7 @@ function sam31SmokeResultSummary(result) {
   };
 }
 
-function buildSam31BridgeSmokeArtifact(projectName, bridgeStatus, sam31Request, result, bridgeEndpoint) {
+function buildSam31BridgeSmokeArtifact(projectName, bridgeStatus, sam31Request, result, bridgeEndpoint, sourceContext = {}) {
   const resultSummary = sam31SmokeResultSummary(result);
   const blockedClaims = uniqueStrings([
     ...PDF_BOUNDARY_BLOCKED_CLAIMS,
@@ -1359,6 +1359,9 @@ function buildSam31BridgeSmokeArtifact(projectName, bridgeStatus, sam31Request, 
     status: 'sam31_invocation_verified',
     project_name: projectName,
     generated_at: new Date().toISOString(),
+    source_pdf_boundary_evidence_id: sourceContext.source_pdf_boundary_evidence_id || null,
+    source_ref: sourceContext.source_ref || sam31Request.pdfRef || null,
+    source_file: sourceContext.source_file || null,
     application: 'halo_fire',
     supported_applications: ['halo_fire', 'landscout', 'nameforge'],
     tool_ref: 'pdfExtract:sam',
@@ -1380,6 +1383,21 @@ function buildSam31BridgeSmokeArtifact(projectName, bridgeStatus, sam31Request, 
     status_refs: [
       bridgeStatus.probe_status_url,
       bridgeEndpoint,
+    ].filter(Boolean),
+    source_refs: [
+      sourceContext.source_pdf_boundary_evidence_id ? {
+        evidence_id: sourceContext.source_pdf_boundary_evidence_id,
+        evidence_type: 'pdf_boundary_decision',
+        source_file: sourceContext.source_file || null,
+        source_ref: sourceContext.source_ref || sam31Request.pdfRef || null,
+        status: sourceContext.source_status || 'best_effort',
+      } : null,
+      {
+        evidence_type: 'openclaw_sam31_bridge_status',
+        source_ref: bridgeStatus.probe_status_url || bridgeEndpoint,
+        status: bridgeStatus.status || 'configured_unverified',
+        claim_gate_effect: 'no_claims_cleared',
+      },
     ].filter(Boolean),
     acceptable_evidence: [
       'Bridge /status response captured in bridge_status.raw_status',
@@ -1685,6 +1703,35 @@ function latestSam31EmployeeReplacementEvidence(projectName, sourceEvidenceId) {
   return null;
 }
 
+function sam31BridgeSmokeArtifactFromEvidence(row) {
+  if (!row) return null;
+  try {
+    const parsed = JSON.parse(row.notes || '{}');
+    return parsed && parsed.kind === 'openclaw_sam31_bridge_smoke_artifact' && parsed.artifact
+      ? parsed.artifact
+      : null;
+  } catch {
+    return null;
+  }
+}
+
+function latestSam31BridgeSmokeArtifactEvidence(projectName, sourceEvidenceId = null) {
+  const rows = db
+    .prepare(`SELECT * FROM project_evidence
+              WHERE project_name = ? AND evidence_type = 'openclaw_sam31_bridge_smoke_artifact'
+              ORDER BY created_at DESC, id DESC`)
+    .all(projectName);
+  for (const row of rows) {
+    const artifact = sam31BridgeSmokeArtifactFromEvidence(row);
+    if (!artifact) continue;
+    if (sourceEvidenceId && Number(artifact.source_pdf_boundary_evidence_id) !== Number(sourceEvidenceId)) {
+      continue;
+    }
+    return { evidence: row, artifact };
+  }
+  return null;
+}
+
 function sam31EmployeeReplacementReplaySummary(sam31ReplacementEvidence) {
   if (!sam31ReplacementEvidence?.evidence || !sam31ReplacementEvidence?.replacement) return null;
   const { evidence, replacement } = sam31ReplacementEvidence;
@@ -1768,9 +1815,37 @@ app.post('/api/projects/:name/pdf-boundary-decision', authMiddleware, requireRol
   }
 });
 
-function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence = null, sam31Evidence = null, sam31ReplacementEvidence = null) {
+function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence = null, sam31Evidence = null, sam31ReplacementEvidence = null, sam31SmokeEvidence = null) {
   if (!evidence || !decision) return null;
   const candidate = decision.candidate || {};
+  const pdfRef = evidence.source_file || decision.sourceFile || evidence.source_ref || decision.sourceRef || `${projectName}:pdf-boundary:${evidence.id}`;
+  const bridgeStatus = openClawSam31BridgeStatus();
+  const bridgeSmokeHref = `/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/smoke-artifact`;
+  const sam31BridgeSmokeAction = {
+    label: 'Run OpenClaw SAM31 bridge smoke artifact',
+    method: 'POST',
+    href: bridgeSmokeHref,
+    status: bridgeStatus.status || 'unavailable',
+    tool_ref: 'pdfExtract:sam',
+    source_evidence_id: evidence.id,
+    source_evidence_type: 'pdf_boundary_decision',
+    request_body: {
+      source_pdf_boundary_evidence_id: evidence.id,
+      pdfRef,
+      pdfPageIndex: decision.pageIndex,
+      pdfScale: decision.scale,
+      targets: ['building_outline', 'walls', 'rooms', 'layers', 'sprinkler_obstructions'],
+    },
+    blocked_claims: uniqueStrings([
+      ...(Array.isArray(decision.blockedClaims) ? decision.blockedClaims : PDF_BOUNDARY_BLOCKED_CLAIMS),
+      'SAM31_runtime_verified',
+      'OpenClaw_runtime_verified',
+    ]),
+    claim_gate_effect: 'no_claims_cleared',
+    limitations: [
+      'This action records operational bridge invocation evidence only; it does not clear geometry or regulated claims.',
+    ],
+  };
   const latestReview = reviewEvidence && reviewEvidence.review ? {
     evidence_id: reviewEvidence.evidence.id,
     evidence_status: reviewEvidence.evidence.status,
@@ -1812,6 +1887,20 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
       : {},
     replaced_fields: Array.isArray(sam31ReplacementEvidence.replacement.replaced_fields) ? sam31ReplacementEvidence.replacement.replaced_fields : [],
     claim_gate_effect: sam31ReplacementEvidence.replacement.claim_gate_effect || 'no_claims_cleared',
+  } : null;
+  const latestSam31BridgeSmokeArtifact = sam31SmokeEvidence && sam31SmokeEvidence.artifact ? {
+    evidence_id: sam31SmokeEvidence.evidence.id,
+    evidence_status: sam31SmokeEvidence.evidence.status,
+    source_ref: sam31SmokeEvidence.evidence.source_ref,
+    status: sam31SmokeEvidence.artifact.status || 'sam31_invocation_verified',
+    source_pdf_boundary_evidence_id: sam31SmokeEvidence.artifact.source_pdf_boundary_evidence_id || null,
+    generated_at: sam31SmokeEvidence.artifact.generated_at || null,
+    bridge_status: sam31SmokeEvidence.artifact.bridge_status || null,
+    invocation: sam31SmokeEvidence.artifact.invocation || null,
+    result_summary: sam31SmokeEvidence.artifact.result_summary || null,
+    status_refs: Array.isArray(sam31SmokeEvidence.artifact.status_refs) ? sam31SmokeEvidence.artifact.status_refs : [],
+    claim_gate_effect: sam31SmokeEvidence.artifact.claim_gate_effect || 'no_claims_cleared',
+    blocked_claims: Array.isArray(sam31SmokeEvidence.artifact.blocked_claims) ? sam31SmokeEvidence.artifact.blocked_claims : [],
   } : null;
   let status = 'ready';
   let nextAction = 'Open the selected PDF sheet with these defaults, run a room-boundary visual audit packet, and attach employee review evidence before any geometry-accuracy claim.';
@@ -1865,7 +1954,9 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
     latest_review: latestReview,
     latest_sam31_visual_audit: latestSam31VisualAudit,
     latest_sam31_employee_replacement: latestSam31EmployeeReplacement,
-    openclaw_sam31_bridge_status: openClawSam31BridgeStatus(),
+    latest_openclaw_sam31_bridge_smoke_artifact: latestSam31BridgeSmokeArtifact,
+    openclaw_sam31_bridge_status: bridgeStatus,
+    sam31_bridge_smoke_action: sam31BridgeSmokeAction,
     limitations: [
       decision.limitation || 'Saved boundary choice is best-effort evidence only.',
       'This queue item does not prove geometry accuracy, AHJ approval, PE review, AutoSprink parity, permit readiness, fabrication readiness, or manufacturer-exact models.',
@@ -1873,6 +1964,7 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
     actions: [
       { label: 'Load defaults in Studio', href: `/autosprink.html?project=${encodeURIComponent(projectName)}&resolver=${encodeURIComponent(`pdf-boundary:${evidence.id}`)}` },
       { label: 'Download SAM 3.1 visual audit packet', href: `/api/projects/${encodeURIComponent(projectName)}/resolver-packets/pdf-boundary/${evidence.id}/sam31-visual-audit` },
+      { label: 'Run OpenClaw SAM31 bridge smoke artifact', href: bridgeSmokeHref, method: 'POST' },
       { label: 'View source evidence', href: `/workbench.html?project=${encodeURIComponent(projectName)}#evidence-${evidence.id}` },
     ],
   };
@@ -3296,6 +3388,7 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
   const reviewEvidence = evidence ? latestPdfBoundaryReviewEvidence(projectName, evidence.id) : null;
   const sam31Evidence = evidence ? latestSam31VisualAuditEvidence(projectName, evidence.id) : null;
   const sam31ReplacementEvidence = evidence ? latestSam31EmployeeReplacementEvidence(projectName, evidence.id) : null;
+  const sam31SmokeEvidence = evidence ? latestSam31BridgeSmokeArtifactEvidence(projectName, evidence.id) : null;
   const items = [];
   const officialFlowEvidence = latestOfficialFlowIntakeEvidence(projectName);
   const officialFlowItem = officialFlowResolverQueueItem(projectName, officialFlowEvidence);
@@ -3304,7 +3397,7 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
     const replayItem = officialFlowReplayReviewQueueItem(projectName, replayEvidence);
     if (replayItem) items.push(replayItem);
   }
-  const boundaryItem = pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence, sam31Evidence, sam31ReplacementEvidence);
+  const boundaryItem = pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence, sam31Evidence, sam31ReplacementEvidence, sam31SmokeEvidence);
   if (boundaryItem) items.push(boundaryItem);
   const catalogEvidence = matchingCatalogEvidenceByFamily(projectName);
   for (const row of currentSourceAcquisitionLedger()) {
@@ -3331,6 +3424,7 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
       sam31_correction_ready: statusCounts.sam31_correction_ready || 0,
       sam31_reviewed: statusCounts.sam31_reviewed || 0,
       sam31_replacements_recorded: statusCounts.sam31_replacements_recorded || 0,
+      sam31_bridge_smoke_recorded: items.filter((item) => item.latest_openclaw_sam31_bridge_smoke_artifact).length,
       catalog_source_needed: statusCounts.catalog_source_needed || 0,
       catalog_review_needed: statusCounts.catalog_review_needed || 0,
       catalog_evidence_recorded: statusCounts.catalog_evidence_recorded || 0,
@@ -3368,6 +3462,16 @@ app.post('/api/projects/:name/openclaw/sam31/smoke-artifact', authMiddleware, re
     }
 
     const sam31Request = normalizeSam31SmokeRequest(projectName, req.body);
+    const sourceBoundaryEvidenceId = Number(req.body?.source_pdf_boundary_evidence_id ?? req.body?.source_evidence_id);
+    const sourceBoundaryEvidence = Number.isSafeInteger(sourceBoundaryEvidenceId) && sourceBoundaryEvidenceId > 0
+      ? db
+        .prepare(`SELECT * FROM project_evidence
+                  WHERE id = ? AND project_name = ? AND evidence_type = 'pdf_boundary_decision'`)
+        .get(sourceBoundaryEvidenceId, projectName)
+      : null;
+    if (Number.isSafeInteger(sourceBoundaryEvidenceId) && sourceBoundaryEvidenceId > 0 && !sourceBoundaryEvidence) {
+      return res.status(404).json({ error: 'source_pdf_boundary_evidence_id must reference a saved PDF boundary decision for this project' });
+    }
     const bridgeBase = trimBridgeUrl(bridgeStatus.bridge_url);
     const bridgeEndpoint = `${bridgeBase}/codex-bridge/invoke`;
     const invoke = makeBridgeInvoker({
@@ -3403,7 +3507,12 @@ app.post('/api/projects/:name/openclaw/sam31/smoke-artifact', authMiddleware, re
       });
     }
 
-    const artifact = buildSam31BridgeSmokeArtifact(projectName, bridgeStatus, sam31Request, result, bridgeEndpoint);
+    const artifact = buildSam31BridgeSmokeArtifact(projectName, bridgeStatus, sam31Request, result, bridgeEndpoint, {
+      source_pdf_boundary_evidence_id: sourceBoundaryEvidence?.id || null,
+      source_ref: sourceBoundaryEvidence?.source_ref || sam31Request.pdfRef || null,
+      source_file: sourceBoundaryEvidence?.source_file || null,
+      source_status: sourceBoundaryEvidence?.status || null,
+    });
     const notes = {
       kind: 'openclaw_sam31_bridge_smoke_artifact',
       artifact,

@@ -14,6 +14,11 @@ const ROOT = path.resolve(__dirname, '..');
 const PORT = Number(process.env.HALOFIRE_SMOKE_PORT || 3371);
 const BASE = `http://127.0.0.1:${PORT}`;
 const PROJECT_PATH = `/api/projects/${encodeURIComponent(COOPERATIVE_1881_PROJECT_NAME)}`;
+const SAM31_BRIDGE_SMOKE_ROUTE_SUFFIX = '/openclaw/sam31/smoke-artifact';
+const SAM31_BRIDGE_SMOKE_SELECTOR = '[data-sam31-bridge-smoke-evidence-id]';
+const SAM31_BRIDGE_SMOKE_STATUS_PREFIX = 'sam31BridgeSmokeStatus';
+const SAM31_BRIDGE_SMOKE_WORKBENCH_HANDLER = 'runSam31BridgeSmokeArtifact';
+const SAM31_BRIDGE_SMOKE_EVIDENCE_TYPE = 'openclaw_sam31_bridge_smoke_artifact';
 const SAM31_REPLACEMENTS_ROUTE_SUFFIX = '/sam31-replacements';
 const SAM31_REPLACEMENTS_RECORDED_STATUS = 'sam31_replacements_recorded';
 const PASSWORD = 'sam31-workbench-smoke-pw';
@@ -269,6 +274,9 @@ async function runBrowserSmoke(token, evidenceIds) {
     await page.waitForSelector('text=sleeve_or_firestop_candidate_review', { timeout: 8_000 });
     await page.waitForSelector('text=acceptable_human_updates', { timeout: 8_000 });
     await page.waitForSelector('text=Replace temporary SAM31 values', { timeout: 8_000 });
+    await page.waitForSelector('text=OpenClaw SAM31 bridge smoke artifact', { timeout: 8_000 });
+    await page.waitForSelector(SAM31_BRIDGE_SMOKE_SELECTOR, { timeout: 8_000 });
+    await page.waitForSelector('[id^="sam31BridgeSmokeStatus-"]', { state: 'attached', timeout: 8_000 });
     await page.waitForSelector('[data-sam31-replacement-action-field="semantic_label"]', { timeout: 8_000 });
     await page.waitForSelector('[data-sam31-replacement-action-field="polygon"]', { timeout: 8_000 });
     await page.waitForSelector('[data-sam31-replacement-action-field="bbox"]', { timeout: 8_000 });
@@ -372,6 +380,11 @@ async function runBrowserSmoke(token, evidenceIds) {
       },
       sam31ReplacementRouteSuffix: SAM31_REPLACEMENTS_ROUTE_SUFFIX,
       sam31ReplacementQueueStatus: SAM31_REPLACEMENTS_RECORDED_STATUS,
+      sam31BridgeSmokeRouteSuffix: SAM31_BRIDGE_SMOKE_ROUTE_SUFFIX,
+      sam31BridgeSmokeSelector: SAM31_BRIDGE_SMOKE_SELECTOR,
+      sam31BridgeSmokeStatusPrefix: SAM31_BRIDGE_SMOKE_STATUS_PREFIX,
+      sam31BridgeSmokeWorkbenchHandler: SAM31_BRIDGE_SMOKE_WORKBENCH_HANDLER,
+      sam31BridgeSmokeEvidenceType: SAM31_BRIDGE_SMOKE_EVIDENCE_TYPE,
       claim_gate_effect: 'no_claims_cleared',
     };
   } finally {
