@@ -1066,6 +1066,12 @@ async function runBrowserSmoke(token, evidenceIds) {
     if (sprinklerReviewDecisionPacket.claim_gate_effect !== 'no_claims_cleared' || sprinklerReviewDecisionPacket.use_for_claims !== false) {
       throw new Error(`SAM31 sprinkler review decision packet cleared a claim gate: ${JSON.stringify(sprinklerReviewDecisionPacket)}`);
     }
+    if (sprinklerReviewDecisionPacket.source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id !== sectioningSprinklerReviewAdapterSummary.evidence_id
+      || sprinklerReviewDecisionPacket.preliminary_replay_inputs?.source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id !== sectioningSprinklerReviewAdapterSummary.evidence_id
+      || sprinklerReviewDecisionPacket.halofire_sam31_sectioning_sprinkler_review_adapter?.evidence_id !== sectioningSprinklerReviewAdapterSummary.evidence_id
+      || !sprinklerReviewDecisionPacket.source_refs?.some((ref) => ref.evidence_type === 'halofire_sam31_sectioning_sprinkler_review_adapter')) {
+      throw new Error(`SAM31 sprinkler review decision packet lost sectioning adapter source evidence: ${JSON.stringify(sprinklerReviewDecisionPacket)}`);
+    }
     const preliminaryReplayQueue = await request(`${PROJECT_PATH}/resolver-queue?sam31SprinklerReplay=ready&lane=obstruction_or_clash_review`, token);
     const preliminaryReplayItem = preliminaryReplayQueue.items.find((item) => item.evidence_id === evidenceIds.boundaryEvidenceId);
     const preliminaryReplayRows = preliminaryReplayItem?.sam31_sprinkler_preliminary_replay_queue_items || [];
@@ -1079,6 +1085,10 @@ async function runBrowserSmoke(token, evidenceIds) {
       || item.source_linked_vector_overlay_count < 1
       || item.source_linked_model_3d_candidate_count < 1)) {
       throw new Error(`SAM31 sprinkler preliminary replay queue lost visible vector/model source evidence: ${JSON.stringify(preliminaryReplayRows)}`);
+    }
+    if (preliminaryReplayRows.some((item) => item.source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id !== sectioningSprinklerReviewAdapterSummary.evidence_id
+      || item.halofire_sam31_sectioning_sprinkler_review_adapter?.evidence_id !== sectioningSprinklerReviewAdapterSummary.evidence_id)) {
+      throw new Error(`SAM31 sprinkler preliminary replay queue lost sectioning adapter source evidence: ${JSON.stringify(preliminaryReplayRows)}`);
     }
     await page.waitForSelector('text=SAM31 sprinkler preliminary replay queue', { timeout: 8_000 });
     await page.waitForSelector('text=Run SAM31 sprinkler preliminary replay', { timeout: 8_000 });
@@ -1101,6 +1111,11 @@ async function runBrowserSmoke(token, evidenceIds) {
     }
     if (sprinklerPreliminaryReplayArtifact.claim_gate_effect !== 'no_claims_cleared' || sprinklerPreliminaryReplayArtifact.use_for_claims !== false) {
       throw new Error(`SAM31 sprinkler preliminary replay artifact cleared a claim gate: ${JSON.stringify(sprinklerPreliminaryReplayArtifact)}`);
+    }
+    if (sprinklerPreliminaryReplayArtifact.source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id !== sectioningSprinklerReviewAdapterSummary.evidence_id
+      || sprinklerPreliminaryReplayArtifact.replay_inputs?.source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id !== sectioningSprinklerReviewAdapterSummary.evidence_id
+      || sprinklerPreliminaryReplayArtifact.replay_output?.source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id !== sectioningSprinklerReviewAdapterSummary.evidence_id) {
+      throw new Error(`SAM31 preliminary replay lost sectioning adapter source evidence: ${JSON.stringify(sprinklerPreliminaryReplayArtifact)}`);
     }
     if (sprinklerPreliminaryReplayArtifact.source_openclaw_sam31_vector_model_artifact_evidence_id !== sprinklerAdapterPacket.source_openclaw_sam31_vector_model_artifact_evidence_id
       || !Array.isArray(sprinklerPreliminaryReplayArtifact.source_linked_vector_overlays)
@@ -1152,6 +1167,11 @@ async function runBrowserSmoke(token, evidenceIds) {
       || item.source_linked_model_3d_candidate_count < 1)) {
       throw new Error(`SAM31 preliminary replay follow-up packet queue lost visible vector/model source evidence: ${JSON.stringify(replayFollowupRow.packet_queue_items)}`);
     }
+    if (replayFollowupRow.source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id !== sectioningSprinklerReviewAdapterSummary.evidence_id
+      || replayFollowupRow.latest_sam31_sprinkler_preliminary_replay_followup_decision?.source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id !== sectioningSprinklerReviewAdapterSummary.evidence_id
+      || replayFollowupRow.packet_queue_items.some((item) => item.source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id !== sectioningSprinklerReviewAdapterSummary.evidence_id)) {
+      throw new Error(`SAM31 preliminary replay follow-up lost sectioning adapter source evidence: ${JSON.stringify(replayFollowupRow)}`);
+    }
     await page.waitForSelector('text=Download SAM31 follow-up packet', { timeout: 8_000 });
     const replayFollowupPacketDownloadPromise = page.waitForEvent('download');
     await page.locator(`button[data-sam31-sprinkler-replay-followup-packet-evidence-id="${latestSprinklerDecision.evidence_id}"]`).first().click();
@@ -1172,6 +1192,11 @@ async function runBrowserSmoke(token, evidenceIds) {
     }
     if (replayFollowupPacket.use_for_claims !== false || replayFollowupPacket.claim_gate_effect !== 'no_claims_cleared') {
       throw new Error(`SAM31 follow-up packet cleared a claim gate: ${JSON.stringify(replayFollowupPacket)}`);
+    }
+    if (replayFollowupPacket.source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id !== sectioningSprinklerReviewAdapterSummary.evidence_id
+      || replayFollowupPacket.halofire_sam31_sectioning_sprinkler_review_adapter?.evidence_id !== sectioningSprinklerReviewAdapterSummary.evidence_id
+      || !replayFollowupPacket.source_refs?.some((ref) => ref.evidence_type === 'halofire_sam31_sectioning_sprinkler_review_adapter')) {
+      throw new Error(`SAM31 follow-up packet lost sectioning adapter source evidence: ${JSON.stringify(replayFollowupPacket)}`);
     }
     if (replayFollowupPacket.source_openclaw_sam31_vector_model_artifact_evidence_id !== sprinklerAdapterPacket.source_openclaw_sam31_vector_model_artifact_evidence_id
       || !Array.isArray(replayFollowupPacket.source_linked_vector_overlays)
@@ -1462,6 +1487,7 @@ async function runBrowserSmoke(token, evidenceIds) {
         artifact_type: sprinklerReviewDecisionPacket.artifact_type,
         suggestedName: sprinklerReviewPacketSuggestedName,
         source_halofire_sam31_sprinkler_review_decision_evidence_id: sprinklerReviewDecisionPacket.source_halofire_sam31_sprinkler_review_decision_evidence_id,
+        source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id: sprinklerReviewDecisionPacket.source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id,
         preliminary_replay_inputs_type: sprinklerReviewDecisionPacket.preliminary_replay_inputs?.artifact_type,
         supported_sprinkler_review_lane: sprinklerReviewDecisionPacket.supported_sprinkler_review_lane,
         claim_gate_effect: sprinklerReviewDecisionPacket.claim_gate_effect,
@@ -1470,6 +1496,7 @@ async function runBrowserSmoke(token, evidenceIds) {
         artifact_type: sprinklerPreliminaryReplayArtifact.artifact_type,
         suggestedName: preliminaryReplaySuggestedName,
         source_halofire_sam31_sprinkler_review_decision_evidence_id: sprinklerPreliminaryReplayArtifact.source_halofire_sam31_sprinkler_review_decision_evidence_id,
+        source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id: sprinklerPreliminaryReplayArtifact.source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id,
         replay_inputs_type: sprinklerPreliminaryReplayArtifact.replay_inputs?.artifact_type,
         replay_output_type: sprinklerPreliminaryReplayArtifact.replay_output?.artifact_type,
         claim_gate_effect: sprinklerPreliminaryReplayArtifact.claim_gate_effect,
@@ -1479,12 +1506,14 @@ async function runBrowserSmoke(token, evidenceIds) {
         evidence_id: replayFollowupRow.latest_sam31_sprinkler_preliminary_replay_followup_decision.evidence_id,
         followup_decision: replayFollowupRow.latest_sam31_sprinkler_preliminary_replay_followup_decision.followup_decision,
         packet_queue_item_type: replayFollowupRow.packet_queue_items[0]?.artifact_type,
+        source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id: replayFollowupRow.latest_sam31_sprinkler_preliminary_replay_followup_decision.source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id,
         claim_gate_effect: replayFollowupRow.latest_sam31_sprinkler_preliminary_replay_followup_decision.claim_gate_effect,
       },
       sprinklerPreliminaryReplayFollowupPacket: {
         artifact_type: replayFollowupPacket.artifact_type,
         suggestedName: replayFollowupPacketSuggestedName,
         source_followup_decision_evidence_id: replayFollowupPacket.source_followup_decision_evidence_id,
+        source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id: replayFollowupPacket.source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id,
         source_packet_queue_item_artifact_type: replayFollowupPacket.source_packet_queue_item_artifact_type,
         claim_gate_effect: replayFollowupPacket.claim_gate_effect,
       },

@@ -1498,6 +1498,48 @@ describe('OpenClaw SAM31 bridge status API', () => {
     expect(artifactRes.status).toBe(201);
     const extrapolation = await artifactRes.json();
 
+    const sectioningReviewRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/sectioning-pipeline-contract-review`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        source_openclaw_sam31_extrapolation_evidence_id: extrapolation.id,
+        review_decision: 'replaced',
+        reviewer_name: 'HaloFire estimator',
+        replacement_ref: '1881://employee-review/sam31/sectioning/downstream-sprinkler',
+        replacement_values: {
+          semantic_labels: [{ section_id: 'section-sprinkler-test', label: 'employee reviewed sprinkler review zone' }],
+          polygons: [{ section_id: 'section-sprinkler-test', polygon: [[10, 20], [510, 20], [510, 320], [10, 320]] }],
+          bboxes: [{ section_id: 'section-sprinkler-test', bbox: { x: 10, y: 20, width: 500, height: 300 } }],
+          vector_overlays: [{ id: 'vector:sprinkler-test-sectioning', svg_path: 'M 10 20 L 510 20 L 510 320 L 10 320 Z' }],
+          model_3d_candidates: [{ id: 'model3d:sprinkler-test-sectioning', primitive: 'extruded_polygon' }],
+        },
+        notes: 'Employee replacement values for downstream sprinkler replay carry-through.',
+      }),
+    });
+    expect(sectioningReviewRes.status).toBe(201);
+    const sectioningReview = await sectioningReviewRes.json();
+
+    const persistedSectioningDownstreamPacketRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/sectioning-downstream-resolvers`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(persistedSectioningDownstreamPacketRes.status).toBe(201);
+    const persistedSectioningDownstreamPacket = await persistedSectioningDownstreamPacketRes.json();
+    expect(persistedSectioningDownstreamPacket.source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id).toBe(sectioningReview.id);
+
+    const sectioningSprinklerAdapterRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/sectioning-downstream-resolvers/${persistedSectioningDownstreamPacket.id}/sprinkler-review-adapter`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(sectioningSprinklerAdapterRes.status).toBe(201);
+    const sectioningSprinklerAdapter = await sectioningSprinklerAdapterRes.json();
+    expect(sectioningSprinklerAdapter).toEqual(expect.objectContaining({
+      id: expect.any(Number),
+      evidence: expect.objectContaining({ evidence_type: 'halofire_sam31_sectioning_sprinkler_review_adapter' }),
+      source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id: persistedSectioningDownstreamPacket.id,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+
     const consumerRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/consumer-smoke`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` },
@@ -2059,6 +2101,7 @@ describe('OpenClaw SAM31 bridge status API', () => {
       source_pdf_boundary_evidence_id: boundary.id,
       source_openclaw_sam31_consumer_review_evidence_id: consumerReview.id,
       source_halofire_sam31_sprinkler_review_decision_evidence_id: sprinklerReview.id,
+      source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id: sectioningSprinklerAdapter.id,
       consumer: 'landscout',
       issue_type: 'sam31_consumer_reviewed_object_hypotheses',
       supported_sprinkler_review_lane: 'obstruction_or_clash_review',
@@ -2068,6 +2111,12 @@ describe('OpenClaw SAM31 bridge status API', () => {
       claim_gate_effect: 'no_claims_cleared',
       no_claim_gates_cleared: true,
     }));
+    expect(sprinklerReviewPacket.halofire_sam31_sectioning_sprinkler_review_adapter).toEqual(expect.objectContaining({
+      evidence_id: sectioningSprinklerAdapter.id,
+      adapter_source: 'halofire.sam31_sectioning_downstream_resolver_packet.v1',
+      source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id: persistedSectioningDownstreamPacket.id,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
     expect(sprinklerReviewPacket.reviewed_values).toEqual(expect.objectContaining({
       obstruction_candidates: [expect.objectContaining({ sprinkler_relevance: 'not_a_sprinkler_obstruction' })],
       confidence: 0.74,
@@ -2076,6 +2125,7 @@ describe('OpenClaw SAM31 bridge status API', () => {
       artifact_type: 'halofire.sam31_sprinkler_review_preliminary_replay_inputs.v1',
       status: 'requires_internal_alpha_replay',
       source_halofire_sam31_sprinkler_review_decision_evidence_id: sprinklerReview.id,
+      source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id: sectioningSprinklerAdapter.id,
       supported_sprinkler_review_lane: 'obstruction_or_clash_review',
       replay_scope: 'obstruction_clash_candidate_review',
       use_for_claims: false,
@@ -2088,6 +2138,7 @@ describe('OpenClaw SAM31 bridge status API', () => {
       expect.objectContaining({ evidence_id: boundary.id, evidence_type: 'pdf_boundary_decision' }),
       expect.objectContaining({ evidence_id: consumerReview.id, evidence_type: 'openclaw_sam31_consumer_review' }),
       expect.objectContaining({ evidence_id: sprinklerReview.id, evidence_type: 'halofire_sam31_sprinkler_review_decision' }),
+      expect.objectContaining({ evidence_id: sectioningSprinklerAdapter.id, evidence_type: 'halofire_sam31_sectioning_sprinkler_review_adapter' }),
     ]));
     expect(sprinklerReviewPacket.blocked_claims).toEqual(expect.arrayContaining([
       'permit_ready',
@@ -2118,6 +2169,7 @@ describe('OpenClaw SAM31 bridge status API', () => {
         source_pdf_boundary_evidence_id: boundary.id,
         source_openclaw_sam31_consumer_review_evidence_id: consumerReview.id,
         source_halofire_sam31_sprinkler_review_decision_evidence_id: sprinklerReview.id,
+        source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id: sectioningSprinklerAdapter.id,
         supported_sprinkler_review_lane: 'obstruction_or_clash_review',
         replay_scope: 'obstruction_clash_candidate_review',
         action_label: 'Run SAM31 sprinkler preliminary replay',
@@ -2139,6 +2191,7 @@ describe('OpenClaw SAM31 bridge status API', () => {
       source_pdf_boundary_evidence_id: boundary.id,
       source_openclaw_sam31_consumer_review_evidence_id: consumerReview.id,
       source_halofire_sam31_sprinkler_review_decision_evidence_id: sprinklerReview.id,
+      source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id: sectioningSprinklerAdapter.id,
       supported_sprinkler_review_lane: 'obstruction_or_clash_review',
       replay_scope: 'obstruction_clash_candidate_review',
       download_name: expect.stringContaining('sam31-sprinkler-preliminary-replay-landscout'),
@@ -2147,6 +2200,7 @@ describe('OpenClaw SAM31 bridge status API', () => {
     }));
     expect(preliminaryReplay.replay_inputs).toEqual(expect.objectContaining({
       artifact_type: 'halofire.sam31_sprinkler_review_preliminary_replay_inputs.v1',
+      source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id: sectioningSprinklerAdapter.id,
       reviewed_values: expect.objectContaining({
         obstruction_candidates: [expect.objectContaining({ sprinkler_relevance: 'not_a_sprinkler_obstruction' })],
       }),
@@ -2156,6 +2210,7 @@ describe('OpenClaw SAM31 bridge status API', () => {
     expect(preliminaryReplay.replay_output).toEqual(expect.objectContaining({
       artifact_type: 'halofire.sam31_sprinkler_preliminary_replay_output.v1',
       status: 'requires_employee_or_professional_followup',
+      source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id: sectioningSprinklerAdapter.id,
       use_for_claims: false,
       claim_gate_effect: 'no_claims_cleared',
     }));
@@ -2199,6 +2254,7 @@ describe('OpenClaw SAM31 bridge status API', () => {
       source_pdf_boundary_evidence_id: boundary.id,
       source_openclaw_sam31_consumer_review_evidence_id: consumerReview.id,
       source_halofire_sam31_sprinkler_review_decision_evidence_id: sprinklerReview.id,
+      source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id: sectioningSprinklerAdapter.id,
       supported_sprinkler_review_lane: 'obstruction_or_clash_review',
       replay_scope: 'obstruction_clash_candidate_review',
       followup_decision: 'confirmed_internal_obstruction_clash_packet',
@@ -2214,6 +2270,7 @@ describe('OpenClaw SAM31 bridge status API', () => {
         artifact_type: 'halofire.sam31_obstruction_clash_packet_queue_item.v1',
         status: 'ready_for_internal_alpha_packet',
         source_followup_decision_artifact_type: 'halofire.sam31_sprinkler_preliminary_replay_followup_decision.v1',
+        source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id: sectioningSprinklerAdapter.id,
         target_packet_lane: 'obstruction_or_clash_review',
         source_field: 'obstruction_candidates',
         source_index: 0,
@@ -2249,12 +2306,14 @@ describe('OpenClaw SAM31 bridge status API', () => {
         latest_sam31_sprinkler_preliminary_replay_followup_decision: expect.objectContaining({
           evidence_id: replayFollowup.id,
           followup_decision: 'confirmed_internal_obstruction_clash_packet',
+          source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id: sectioningSprinklerAdapter.id,
           claim_gate_effect: 'no_claims_cleared',
         }),
         packet_queue_items: expect.arrayContaining([
           expect.objectContaining({
             artifact_type: 'halofire.sam31_obstruction_clash_packet_queue_item.v1',
             target_packet_lane: 'obstruction_or_clash_review',
+            source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id: sectioningSprinklerAdapter.id,
             claim_gate_effect: 'no_claims_cleared',
           }),
         ]),
@@ -2276,6 +2335,7 @@ describe('OpenClaw SAM31 bridge status API', () => {
       source_pdf_boundary_evidence_id: boundary.id,
       source_openclaw_sam31_consumer_review_evidence_id: consumerReview.id,
       source_halofire_sam31_sprinkler_review_decision_evidence_id: sprinklerReview.id,
+      source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id: sectioningSprinklerAdapter.id,
       target_packet_lane: 'obstruction_or_clash_review',
       source_field: 'obstruction_candidates',
       packet_index: 0,

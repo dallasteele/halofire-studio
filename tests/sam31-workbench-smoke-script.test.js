@@ -80,6 +80,7 @@ describe('SAM31 workbench browser smoke script', () => {
     expect(script).toContain('sectioningSprinklerReviewAdapterPacket');
     expect(script).toContain('latest_halofire_sam31_sectioning_sprinkler_review_adapter');
     expect(script).toContain('source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id');
+    expect(script).toContain('source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id');
     expect(script).toContain('Download SAM31 vector/model artifact packet');
     expect(script).toContain('Record SAM31 vector/model artifacts');
     expect(script).toContain('openclaw.sam31_vector_model_artifact_packet.v1');
