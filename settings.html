@@ -103,6 +103,27 @@
         <label class="muted">Notes
           <textarea id="wizNotes" rows="4" placeholder="what this evidence proves and who provided it"></textarea>
         </label>
+        <div id="wizSignoff" class="note muted">
+          <b>Signed reviewer metadata</b>
+          <div style="margin-top:6px">Required for AHJ, PE/professional, manufacturer, and AutoSprink evidence before a regulated gate can clear. Employee signoff remains for non-regulated internal evidence.</div>
+          <div class="stack" style="margin-top:8px">
+            <label>Reviewer name
+              <input id="wizReviewerName" placeholder="reviewer_name" style="width:100%;margin-top:3px">
+            </label>
+            <label>Reviewer title
+              <input id="wizReviewerTitle" placeholder="reviewer_title" style="width:100%;margin-top:3px">
+            </label>
+            <label>Signed at
+              <input id="wizSignedAt" type="datetime-local" style="width:100%;margin-top:3px">
+            </label>
+            <label>Organization (optional)
+              <input id="wizOrganization" placeholder="organization" style="width:100%;margin-top:3px">
+            </label>
+            <label>License ID (optional)
+              <input id="wizLicenseId" placeholder="license_id" style="width:100%;margin-top:3px">
+            </label>
+          </div>
+        </div>
         <div class="muted" id="wizGateHelp">Choose a gate to see acceptable evidence.</div>
         <div style="display:flex;gap:10px;align-items:center">
           <button id="wizSubmit">Submit evidence</button>
@@ -222,11 +243,40 @@ function syncWizardGateForm() {
   const allowed = gate.allowed_evidence_types || [];
   typeEl.innerHTML = allowed.map((type) => `<option value="${type}">${type}</option>`).join('');
   if (!allowed.length) typeEl.innerHTML = '<option value="">no allowed type</option>';
+  syncWizardSignoff();
   actionEl.disabled = !gate.can_resolve || !wizardState.canWrite;
   if (!gate.can_resolve) actionEl.value = 'record';
   $('wizGateHelp').innerHTML =
     `<b>${escapeHtml(gate.code)}</b> — ${escapeHtml(gate.acceptable_evidence || gate.next_action || '')}`
     + (gate.blocked_claims?.length ? `<div style="margin-top:6px">Blocks: ${gate.blocked_claims.map((claim) => `<span class="pill missing">${escapeHtml(claim)}</span>`).join('')}</div>` : '');
+}
+
+function selectedEvidenceNeedsSignoff() {
+  const gate = wizardState.gateMap.get($('wizGate').value);
+  return Boolean(gate && (gate.requires_signoff_for || []).includes($('wizType').value));
+}
+
+function syncWizardSignoff() {
+  const needs = selectedEvidenceNeedsSignoff();
+  $('wizSignoff').style.borderColor = needs ? 'rgba(255,213,79,.5)' : 'var(--border)';
+  $('wizSignoff').style.opacity = needs ? '1' : '.72';
+  $('wizSignoff').querySelector('b').textContent = needs ? 'Signed reviewer metadata required' : 'Signed reviewer metadata';
+}
+
+function wizardSignoffPayload() {
+  if (!selectedEvidenceNeedsSignoff()) return null;
+  const reviewer_name = $('wizReviewerName').value.trim();
+  const reviewer_title = $('wizReviewerTitle').value.trim();
+  const signed_at = $('wizSignedAt').value.trim();
+  if (!reviewer_name || !reviewer_title || !signed_at) {
+    const err = new Error('regulated evidence requires reviewer_name, reviewer_title, and signed_at');
+    err.ui = true;
+    throw err;
+  }
+  const signoff = { reviewer_name, reviewer_title, signed_at };
+  const organization = $('wizOrganization').value.trim(); if (organization) signoff.organization = organization;
+  const license_id = $('wizLicenseId').value.trim(); if (license_id) signoff.license_id = license_id;
+  return signoff;
 }
 
 async function loadWizard(projectName) {
@@ -280,6 +330,7 @@ async function initWizard() {
 
 $('wizProject').addEventListener('change', () => loadWizard($('wizProject').value));
 $('wizGate').addEventListener('change', syncWizardGateForm);
+$('wizType').addEventListener('change', syncWizardSignoff);
 $('wizAction').addEventListener('change', syncWizardGateForm);
 $('wizSubmit').onclick = async () => {
   const msg = $('wizMsg'); msg.className = 'muted'; msg.textContent = '';
@@ -295,6 +346,8 @@ $('wizSubmit').onclick = async () => {
   const payload = { evidence_type, source_ref, ...(source_file ? { source_file } : {}), ...(notes ? { notes } : {}) };
   try {
     if ($('wizAction').value === 'resolve') {
+      const signoff = wizardSignoffPayload();
+      if (signoff) payload.signoff = signoff; // evidence.signoff is required for regulated gate clears.
       await api('/projects/' + encodeURIComponent(projectName) + '/claim-gates/' + encodeURIComponent(gateCode) + '/resolve', {
         method: 'POST',
         body: JSON.stringify({ evidence: payload }),
@@ -310,6 +363,11 @@ $('wizSubmit').onclick = async () => {
     $('wizSourceRef').value = '';
     $('wizSourceFile').value = '';
     $('wizNotes').value = '';
+    $('wizReviewerName').value = '';
+    $('wizReviewerTitle').value = '';
+    $('wizSignedAt').value = '';
+    $('wizOrganization').value = '';
+    $('wizLicenseId').value = '';
     await loadWizard(projectName);
   } catch (e) {
     msg.className = 'err';

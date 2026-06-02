@@ -136,11 +136,13 @@ describe('HaloFire evidence wizard slice', () => {
     const autosprink = body.gates.find((g) => g.code === 'AUTOSPRINK_EVIDENCE_MISSING');
     expect(autosprink.allowed_evidence_types).toEqual(['autosprink_packet']);
     expect(autosprink.can_resolve).toBe(true);
+    expect(autosprink.requires_signoff_for).toEqual(['autosprink_packet']);
     expect(autosprink.blocked_claims).toContain('AutoSprink parity');
 
     const sqft = body.gates.find((g) => g.code === 'BID_LOG_SQFT_DIFFERS_FROM_PROPOSAL');
     expect(sqft.allowed_evidence_types).toEqual(['employee_signoff']);
     expect(sqft.can_resolve).toBe(true);
+    expect(sqft.requires_signoff_for).toEqual([]);
   });
 
   it('rejects evidence that does not match the gate-specific allowed types', async () => {
@@ -168,5 +170,13 @@ describe('HaloFire evidence wizard slice', () => {
     expect(html).toMatch(/Evidence Wizard/i);
     expect(html).toMatch(/Resolve gate/i);
     expect(html).toMatch(/Record evidence only/i);
+    expect(html).toContain('id="wizSignoff"');
+    expect(html).toContain('id="wizReviewerName"');
+    expect(html).toContain('id="wizReviewerTitle"');
+    expect(html).toContain('id="wizSignedAt"');
+    expect(html).toContain('id="wizOrganization"');
+    expect(html).toContain('id="wizLicenseId"');
+    expect(html).toContain('requires_signoff_for');
+    expect(html).toContain('evidence.signoff');
   });
 });

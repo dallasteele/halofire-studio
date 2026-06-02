@@ -620,10 +620,12 @@ app.get('/api/projects/:name/evidence-wizard', authMiddleware, (req, res) => {
   const gateRows = gates.map((gate) => {
     const rule = gateEvidenceRule(gate.code);
     const matchingEvidence = rule.allowedEvidenceTypes.flatMap((type) => evidenceByType.get(type) || []);
+    const requiresSignoffFor = rule.allowedEvidenceTypes.filter((type) => SIGNED_REVIEW_EVIDENCE_TYPES.has(type));
     return {
       ...gate,
       blocked_claims: safeParseJsonArray(gate.blocked_claims),
       allowed_evidence_types: [...rule.allowedEvidenceTypes],
+      requires_signoff_for: requiresSignoffFor,
       can_resolve: rule.canResolve,
       matching_evidence_count: matchingEvidence.length,
       matching_evidence: matchingEvidence.slice(0, 5),
