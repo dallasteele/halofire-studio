@@ -1214,6 +1214,16 @@ const SAM31_EMPLOYEE_REPLACEMENT_FIELDS = Object.freeze([
   'confidence',
 ]);
 
+const SAM31_EXTRAPOLATION_REVIEW_FIELDS = Object.freeze([
+  'sections',
+  'object_hypotheses',
+  'vector_overlays',
+  'model_3d_candidates',
+  'semantic_labels',
+  'source_ref',
+  'confidence',
+]);
+
 const SAM31_EXTRAPOLATION_CONTRACT_REF = 'openclaw.sam31_extrapolation_contract';
 
 const SAM31_EXTRAPOLATION_CONTRACT = Object.freeze({
@@ -2082,6 +2092,35 @@ function latestOpenClawSam31ExtrapolationArtifactEvidence(projectName, sourceEvi
   return null;
 }
 
+function openClawSam31ExtrapolationReviewFromEvidence(row) {
+  if (!row) return null;
+  try {
+    const parsed = JSON.parse(row.notes || '{}');
+    return parsed && parsed.kind === 'openclaw_sam31_extrapolation_review' && parsed.review
+      ? parsed.review
+      : null;
+  } catch {
+    return null;
+  }
+}
+
+function latestOpenClawSam31ExtrapolationReviewEvidence(projectName, sourceEvidenceId = null) {
+  const rows = db
+    .prepare(`SELECT * FROM project_evidence
+              WHERE project_name = ? AND evidence_type = 'openclaw_sam31_extrapolation_review'
+              ORDER BY created_at DESC, id DESC`)
+    .all(projectName);
+  for (const row of rows) {
+    const review = openClawSam31ExtrapolationReviewFromEvidence(row);
+    if (!review) continue;
+    if (sourceEvidenceId && Number(review.source_pdf_boundary_evidence_id) !== Number(sourceEvidenceId)) {
+      continue;
+    }
+    return { evidence: row, review };
+  }
+  return null;
+}
+
 function openClawSam31ExtrapolationReplaySummary(extrapolationEvidence) {
   if (!extrapolationEvidence?.evidence || !extrapolationEvidence?.artifact) return null;
   const { evidence, artifact } = extrapolationEvidence;
@@ -2103,6 +2142,27 @@ function openClawSam31ExtrapolationReplaySummary(extrapolationEvidence) {
     claim_gate_effect: artifact.claim_gate_effect || 'no_claims_cleared',
     blocked_claims: Array.isArray(artifact.blocked_claims) ? [...artifact.blocked_claims] : [],
     limitations: Array.isArray(artifact.limitations) ? [...artifact.limitations] : [],
+  };
+}
+
+function openClawSam31ExtrapolationReviewSummary(reviewEvidence) {
+  if (!reviewEvidence?.evidence || !reviewEvidence?.review) return null;
+  const { evidence, review } = reviewEvidence;
+  return {
+    evidence_id: evidence.id,
+    evidence_type: evidence.evidence_type,
+    evidence_status: evidence.status,
+    source_ref: evidence.source_ref,
+    status: review.status || 'present',
+    review_decision: review.review_decision || 'replaced',
+    source_pdf_boundary_evidence_id: review.source_pdf_boundary_evidence_id || null,
+    source_openclaw_sam31_extrapolation_evidence_id: review.source_openclaw_sam31_extrapolation_evidence_id || null,
+    reviewer_name: review.reviewer_name || null,
+    replacement_ref: review.replacement_ref || null,
+    replaced_fields: Array.isArray(review.replaced_fields) ? [...review.replaced_fields] : [],
+    claim_gate_effect: review.claim_gate_effect || 'no_claims_cleared',
+    blocked_claims: Array.isArray(review.blocked_claims) ? [...review.blocked_claims] : [],
+    limitations: Array.isArray(review.limitations) ? [...review.limitations] : [],
   };
 }
 
@@ -2189,7 +2249,7 @@ app.post('/api/projects/:name/pdf-boundary-decision', authMiddleware, requireRol
   }
 });
 
-function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence = null, sam31Evidence = null, sam31ReplacementEvidence = null, sam31SmokeEvidence = null, sam31ExtrapolationEvidence = null) {
+function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence = null, sam31Evidence = null, sam31ReplacementEvidence = null, sam31SmokeEvidence = null, sam31ExtrapolationEvidence = null, sam31ExtrapolationReviewEvidence = null) {
   if (!evidence || !decision) return null;
   const candidate = decision.candidate || {};
   const pdfRef = evidence.source_file || decision.sourceFile || evidence.source_ref || decision.sourceRef || `${projectName}:pdf-boundary:${evidence.id}`;
@@ -2298,6 +2358,7 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
     blocked_claims: Array.isArray(sam31SmokeEvidence.artifact.blocked_claims) ? sam31SmokeEvidence.artifact.blocked_claims : [],
   } : null;
   const latestOpenClawSam31ExtrapolationArtifact = openClawSam31ExtrapolationReplaySummary(sam31ExtrapolationEvidence);
+  const latestOpenClawSam31ExtrapolationReview = openClawSam31ExtrapolationReviewSummary(sam31ExtrapolationReviewEvidence);
   let status = 'ready';
   let nextAction = 'Open the selected PDF sheet with these defaults, run a room-boundary visual audit packet, and attach employee review evidence before any geometry-accuracy claim.';
   if (latestReview?.review_decision === 'corrected') {
@@ -2352,6 +2413,7 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
     latest_sam31_employee_replacement: latestSam31EmployeeReplacement,
     latest_openclaw_sam31_bridge_smoke_artifact: latestSam31BridgeSmokeArtifact,
     latest_openclaw_sam31_extrapolation_artifact: latestOpenClawSam31ExtrapolationArtifact,
+    latest_openclaw_sam31_extrapolation_review: latestOpenClawSam31ExtrapolationReview,
     openclaw_sam31_bridge_status: bridgeStatus,
     sam31_bridge_smoke_action: sam31BridgeSmokeAction,
     openclaw_sam31_extrapolation_status: extrapolateStatus,
@@ -3417,6 +3479,133 @@ async function invokeOpenClawSam31Extrapolation(projectName, evidence, decision,
   return normalizeOpenClawSam31ExtrapolationArtifact(projectName, evidence, decision, visualPacket, request, body, endpoint);
 }
 
+function normalizeOpenClawSam31ExtrapolationReview(projectName, evidence, decision, extrapolationEvidence, extrapolationArtifact, body = {}, user = {}) {
+  if (!evidence || !decision) {
+    const e = new Error('PDF boundary decision evidence not found');
+    e.httpStatus = 404;
+    throw e;
+  }
+  if (!extrapolationEvidence || !extrapolationArtifact) {
+    const e = new Error('OpenClaw SAM31 extrapolation artifact evidence not found');
+    e.httpStatus = 404;
+    throw e;
+  }
+  if (Number(extrapolationArtifact.source_pdf_boundary_evidence_id) !== Number(evidence.id)) {
+    const e = new Error('source_openclaw_sam31_extrapolation_evidence_id does not belong to the requested PDF boundary evidence');
+    e.httpStatus = 409;
+    throw e;
+  }
+  const reviewDecision = String(body.review_decision || 'replaced').trim();
+  if (!['accepted', 'replaced', 'rejected'].includes(reviewDecision)) {
+    const e = new Error('review_decision must be one of: accepted, replaced, rejected');
+    e.httpStatus = 400;
+    throw e;
+  }
+  const replacementRef = String(body.replacement_ref || body.source_ref || '').trim();
+  if (!replacementRef) {
+    const e = new Error('replacement_ref is required for OpenClaw SAM31 extrapolation review evidence');
+    e.httpStatus = 400;
+    throw e;
+  }
+  const rawValues = body.replacement_values;
+  if (!rawValues || typeof rawValues !== 'object' || Array.isArray(rawValues)) {
+    const e = new Error('replacement_values must be an object');
+    e.httpStatus = 400;
+    throw e;
+  }
+  const unknownFields = Object.keys(rawValues).filter((field) => !SAM31_EXTRAPOLATION_REVIEW_FIELDS.includes(field));
+  if (unknownFields.length) {
+    const e = new Error(`Unsupported OpenClaw SAM31 extrapolation review fields: ${unknownFields.join(', ')}`);
+    e.httpStatus = 400;
+    throw e;
+  }
+  const replacementValues = {};
+  for (const field of SAM31_EXTRAPOLATION_REVIEW_FIELDS) {
+    if (Object.prototype.hasOwnProperty.call(rawValues, field)) {
+      replacementValues[field] = jsonClone(rawValues[field]);
+    }
+  }
+  for (const field of ['sections', 'object_hypotheses', 'vector_overlays', 'model_3d_candidates', 'semantic_labels']) {
+    if (Object.prototype.hasOwnProperty.call(replacementValues, field) && !Array.isArray(replacementValues[field])) {
+      const e = new Error(`replacement_values.${field} must be an array`);
+      e.httpStatus = 400;
+      throw e;
+    }
+  }
+  if (Object.prototype.hasOwnProperty.call(replacementValues, 'confidence')) {
+    const confidence = Number(replacementValues.confidence);
+    if (!Number.isFinite(confidence) || confidence < 0 || confidence > 1) {
+      const e = new Error('replacement_values.confidence must be a number between 0 and 1');
+      e.httpStatus = 400;
+      throw e;
+    }
+    replacementValues.confidence = confidence;
+  }
+  const replacedFields = Object.keys(replacementValues);
+  if (!replacedFields.length) {
+    const e = new Error('replacement_values must include at least one supported OpenClaw SAM31 extrapolation review field');
+    e.httpStatus = 400;
+    throw e;
+  }
+  const sourceRefs = [
+    {
+      evidence_id: evidence.id,
+      evidence_type: evidence.evidence_type,
+      source_file: evidence.source_file || decision.sourceFile || null,
+      source_ref: evidence.source_ref || decision.sourceRef || null,
+      status: evidence.status,
+    },
+    {
+      evidence_id: extrapolationEvidence.id,
+      evidence_type: extrapolationEvidence.evidence_type,
+      source_ref: extrapolationEvidence.source_ref || extrapolationArtifact.openclaw_endpoint || null,
+      status: extrapolationEvidence.status,
+      claim_gate_effect: 'no_claims_cleared',
+    },
+    {
+      evidence_type: 'employee_sam31_extrapolation_review_payload',
+      source_ref: replacementRef,
+      status: 'present',
+      claim_gate_effect: 'no_claims_cleared',
+    },
+  ];
+  return {
+    artifact_type: 'openclaw.sam31_extrapolation_product_review',
+    status: 'present',
+    project_name: projectName,
+    source_pdf_boundary_evidence_id: evidence.id,
+    source_evidence_type: evidence.evidence_type,
+    source_openclaw_sam31_extrapolation_evidence_id: extrapolationEvidence.id,
+    source_openclaw_sam31_extrapolation_ref: extrapolationEvidence.source_ref || extrapolationArtifact.openclaw_endpoint || null,
+    source_ref: evidence.source_ref || decision.sourceRef || null,
+    source_file: evidence.source_file || decision.sourceFile || null,
+    source_runtime: extrapolationArtifact.source_runtime || 'sam-3.1+llm',
+    review_decision: reviewDecision,
+    reviewer_name: String(body.reviewer_name || user.name || user.username || '').trim() || null,
+    reviewed_at: new Date().toISOString(),
+    replacement_ref: replacementRef,
+    replacement_values: replacementValues,
+    replaced_fields: replacedFields,
+    product_review_action: extrapolationArtifact.product_review_action && typeof extrapolationArtifact.product_review_action === 'object'
+      ? jsonClone(extrapolationArtifact.product_review_action)
+      : null,
+    notes: String(body.notes || '').trim() || null,
+    source_refs: sourceRefs,
+    blocked_claims: uniqueStrings([
+      ...(Array.isArray(extrapolationArtifact.blocked_claims) ? extrapolationArtifact.blocked_claims : []),
+      ...(Array.isArray(decision.blockedClaims) ? decision.blockedClaims : PDF_BOUNDARY_BLOCKED_CLAIMS),
+      'SAM31_runtime_verified',
+      'OpenClaw_runtime_verified',
+      ...PDF_BOUNDARY_BLOCKED_CLAIMS,
+    ]),
+    claim_gate_effect: 'no_claims_cleared',
+    limitations: [
+      'Employee SAM31 extrapolation reviews replace or accept temporary object, vector, and 3D candidate values for internal-alpha product review only.',
+      'They do not prove geometry accuracy, drawing scale, AHJ approval, PE review, AutoSprink parity, permit readiness, fabrication readiness, or manufacturer-exact models.',
+    ],
+  };
+}
+
 function normalizeSam31VisualAuditResult(projectName, evidence, decision, body = {}, user = {}) {
   if (!evidence || !decision) {
     const e = new Error('PDF boundary decision evidence not found');
@@ -4043,6 +4232,7 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
   const sam31ReplacementEvidence = evidence ? latestSam31EmployeeReplacementEvidence(projectName, evidence.id) : null;
   const sam31SmokeEvidence = evidence ? latestSam31BridgeSmokeArtifactEvidence(projectName, evidence.id) : null;
   const sam31ExtrapolationEvidence = evidence ? latestOpenClawSam31ExtrapolationArtifactEvidence(projectName, evidence.id) : null;
+  const sam31ExtrapolationReviewEvidence = evidence ? latestOpenClawSam31ExtrapolationReviewEvidence(projectName, evidence.id) : null;
   const items = [];
   const officialFlowEvidence = latestOfficialFlowIntakeEvidence(projectName);
   const officialFlowItem = officialFlowResolverQueueItem(projectName, officialFlowEvidence);
@@ -4051,7 +4241,7 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
     const replayItem = officialFlowReplayReviewQueueItem(projectName, replayEvidence);
     if (replayItem) items.push(replayItem);
   }
-  const boundaryItem = pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence, sam31Evidence, sam31ReplacementEvidence, sam31SmokeEvidence, sam31ExtrapolationEvidence);
+  const boundaryItem = pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence, sam31Evidence, sam31ReplacementEvidence, sam31SmokeEvidence, sam31ExtrapolationEvidence, sam31ExtrapolationReviewEvidence);
   if (boundaryItem) items.push(boundaryItem);
   const catalogEvidence = matchingCatalogEvidenceByFamily(projectName);
   for (const row of currentSourceAcquisitionLedger()) {
@@ -4080,6 +4270,7 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
       sam31_replacements_recorded: statusCounts.sam31_replacements_recorded || 0,
       sam31_bridge_smoke_recorded: items.filter((item) => item.latest_openclaw_sam31_bridge_smoke_artifact).length,
       sam31_extrapolation_recorded: items.filter((item) => item.latest_openclaw_sam31_extrapolation_artifact).length,
+      sam31_extrapolation_reviews_recorded: items.filter((item) => item.latest_openclaw_sam31_extrapolation_review).length,
       catalog_source_needed: statusCounts.catalog_source_needed || 0,
       catalog_review_needed: statusCounts.catalog_review_needed || 0,
       catalog_evidence_recorded: statusCounts.catalog_evidence_recorded || 0,
@@ -4238,6 +4429,61 @@ app.post('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/openclaw
       message: 'OpenClaw SAM31 extrapolation artifact saved as best-effort evidence; claims still blocked',
       evidence: evidenceRow,
       ...artifact,
+    });
+  } catch (err) {
+    return res.status(err.httpStatus || 400).json({ error: err.message });
+  }
+});
+
+app.post('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/openclaw/sam31/extrapolation-review', authMiddleware, requireRole('admin'), (req, res) => {
+  try {
+    const projectName = req.params.name;
+    const evidenceId = Number(req.params.evidenceId);
+    if (!Number.isSafeInteger(evidenceId) || evidenceId <= 0) {
+      return res.status(400).json({ error: 'A positive evidence id is required' });
+    }
+    const sourceExtrapolationEvidenceId = Number(req.body?.source_openclaw_sam31_extrapolation_evidence_id);
+    if (!Number.isSafeInteger(sourceExtrapolationEvidenceId) || sourceExtrapolationEvidenceId <= 0) {
+      return res.status(400).json({ error: 'source_openclaw_sam31_extrapolation_evidence_id is required for OpenClaw SAM31 extrapolation review evidence' });
+    }
+    const evidence = db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'pdf_boundary_decision'`)
+      .get(evidenceId, projectName);
+    const decision = decisionFromEvidence(evidence);
+    if (!evidence || !decision) {
+      return res.status(404).json({ error: 'PDF boundary decision evidence not found' });
+    }
+    const extrapolationEvidence = db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'openclaw_sam31_extrapolation_artifact'`)
+      .get(sourceExtrapolationEvidenceId, projectName);
+    const extrapolationArtifact = openClawSam31ExtrapolationArtifactFromEvidence(extrapolationEvidence);
+    const reviewPacket = normalizeOpenClawSam31ExtrapolationReview(projectName, evidence, decision, extrapolationEvidence, extrapolationArtifact, req.body, req.user);
+    const notes = {
+      kind: 'openclaw_sam31_extrapolation_review',
+      review: reviewPacket,
+      blocked_claims: reviewPacket.blocked_claims,
+      claim_gate_effect: reviewPacket.claim_gate_effect,
+      limitations: reviewPacket.limitations,
+    };
+    const result = db
+      .prepare(`INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+                VALUES (?, ?, ?, ?, ?, ?)`)
+      .run(
+        projectName,
+        'openclaw_sam31_extrapolation_review',
+        reviewPacket.source_file,
+        `pdf-boundary:${evidence.id}:openclaw-sam31-extrapolation-review:${extrapolationEvidence.id}`,
+        'present',
+        JSON.stringify(notes),
+      );
+    const evidenceRow = db.prepare('SELECT * FROM project_evidence WHERE id = ?').get(result.lastInsertRowid);
+    return res.status(201).json({
+      id: result.lastInsertRowid,
+      message: 'OpenClaw SAM31 extrapolation product review values recorded; claims still blocked',
+      evidence: evidenceRow,
+      ...reviewPacket,
     });
   } catch (err) {
     return res.status(err.httpStatus || 400).json({ error: err.message });

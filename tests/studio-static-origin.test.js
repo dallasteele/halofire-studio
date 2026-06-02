@@ -212,6 +212,15 @@ describe('studio static origin handling', () => {
     expect(html).toContain('runOpenClawSam31ExtrapolationArtifact');
     expect(html).toContain('/openclaw/sam31/extrapolation-artifact');
     expect(html).toContain('latest_openclaw_sam31_extrapolation_artifact');
+    expect(html).toContain('latest_openclaw_sam31_extrapolation_review');
+    expect(html).toContain('saveOpenClawSam31ExtrapolationReview');
+    expect(html).toContain('/openclaw/sam31/extrapolation-review');
+    expect(html).toContain('source_openclaw_sam31_extrapolation_evidence_id');
+    expect(html).toContain('data-sam31-extrapolation-review-save-evidence-id');
+    expect(html).toContain('Save employee SAM31 extrapolation review');
+    expect(html).toContain('object_hypotheses');
+    expect(html).toContain('vector_overlays');
+    expect(html).toContain('model_3d_candidates');
   });
 
   it('lets the workbench save employee room-boundary review decisions', async () => {

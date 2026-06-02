@@ -467,6 +467,87 @@ describe('OpenClaw SAM31 bridge status API', () => {
       claim_gate_effect: 'no_claims_cleared',
     }));
     expect(afterQueue.summary.sam31_extrapolation_recorded).toBeGreaterThanOrEqual(1);
+
+    const reviewRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/extrapolation-review`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        source_openclaw_sam31_extrapolation_evidence_id: artifact.id,
+        review_decision: 'replaced',
+        reviewer_name: 'HaloFire estimator',
+        replacement_ref: '1881://employee-review/sam31/extrapolation/room-101',
+        replacement_values: {
+          object_hypotheses: [
+            {
+              id: 'obj:door-reviewed',
+              label: 'rated corridor door',
+              segment_id: 'section-room-101',
+              confidence: 0.82,
+              source_ref: '1881://employee-review/sam31/extrapolation/door',
+            },
+          ],
+          vector_overlays: [
+            {
+              id: 'vector:room-101-reviewed',
+              kind: 'polygon_path',
+              svg_path: 'M 12 22 L 508 22 L 508 318 L 12 318 Z',
+              source_ref: '1881://employee-review/sam31/extrapolation/vector',
+            },
+          ],
+          model_3d_candidates: [
+            {
+              id: 'model3d:room-101-reviewed',
+              primitive: 'extruded_polygon',
+              height_ft: 11,
+              source_ref: '1881://employee-review/sam31/extrapolation/model3d',
+            },
+          ],
+          confidence: 0.81,
+        },
+        notes: 'Employee replacement values for temporary SAM31 extrapolation only.',
+      }),
+    });
+    expect(reviewRes.status).toBe(201);
+    const review = await reviewRes.json();
+    expect(review).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31_extrapolation_product_review',
+      status: 'present',
+      source_pdf_boundary_evidence_id: boundary.id,
+      source_openclaw_sam31_extrapolation_evidence_id: artifact.id,
+      review_decision: 'replaced',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(review.evidence).toEqual(expect.objectContaining({
+      evidence_type: 'openclaw_sam31_extrapolation_review',
+      status: 'present',
+    }));
+    expect(review.replacement_values).toEqual(expect.objectContaining({
+      object_hypotheses: expect.any(Array),
+      vector_overlays: expect.any(Array),
+      model_3d_candidates: expect.any(Array),
+      confidence: 0.81,
+    }));
+    expect(review.replaced_fields).toEqual(expect.arrayContaining([
+      'object_hypotheses',
+      'vector_overlays',
+      'model_3d_candidates',
+      'confidence',
+    ]));
+
+    const reviewedQueueRes = await request(`${COOPERATIVE_1881_PATH}/resolver-queue`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(reviewedQueueRes.status).toBe(200);
+    const reviewedQueue = await reviewedQueueRes.json();
+    const reviewedItem = reviewedQueue.items.find((row) => row.evidence_id === boundary.id);
+    expect(reviewedItem.latest_openclaw_sam31_extrapolation_review).toEqual(expect.objectContaining({
+      evidence_id: review.id,
+      evidence_status: 'present',
+      review_decision: 'replaced',
+      source_openclaw_sam31_extrapolation_evidence_id: artifact.id,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(reviewedQueue.summary.sam31_extrapolation_reviews_recorded).toBeGreaterThanOrEqual(1);
   });
 
   it('carries saved bridge smoke artifacts into SAM31 audit defaults and replay evidence without clearing claims', async () => {

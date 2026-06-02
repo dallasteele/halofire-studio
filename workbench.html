@@ -266,7 +266,7 @@ function renderSam31BridgeSmokeAction(item, action, latest) {
 
 const SAM31_EXTRAPOLATION_ROUTE_SUFFIX = '/openclaw/sam31/extrapolation-artifact';
 
-function renderOpenClawSam31ExtrapolationAction(item, action, latest) {
+function renderOpenClawSam31ExtrapolationAction(item, action, latest, latestReview) {
   if (!action || typeof action !== 'object') return '';
   const evidenceId = item.evidence_id;
   const blocked = Array.isArray(action.blocked_claims) ? action.blocked_claims : [];
@@ -275,7 +275,26 @@ function renderOpenClawSam31ExtrapolationAction(item, action, latest) {
     ? latest.product_review_action
     : null;
   const endpoint = action.openclaw_endpoint || action.endpoint || action.href || SAM31_EXTRAPOLATION_ROUTE_SUFFIX;
-  return `<div class="muted" style="font-size:11px;margin-top:5px;border:1px solid rgba(79,70,229,.34);border-radius:8px;padding:8px;background:rgba(79,70,229,.06)">OpenClaw SAM31 LLM extrapolation artifact<br>status ${escapeHtml(action.status || 'unavailable')} - method ${escapeHtml(action.method || 'POST')} - claim_gate_effect ${escapeHtml(action.claim_gate_effect || 'no_claims_cleared')}<br>endpoint ${escapeHtml(endpoint)} - source_evidence_id ${escapeHtml(evidenceId)}<br>${latest ? `Latest extrapolation: evidence #${escapeHtml(latest.evidence_id)} - ${escapeHtml(latest.status || 'best_effort')} - packet ${escapeHtml(latestPacket?.artifact_type || latest.artifact_type || 'openclaw.sam31_llm_extrapolation_artifact')} - sections ${escapeHtml(latest.section_count ?? latestPacket?.segment_count ?? 0)} - hypotheses ${escapeHtml(latest.object_hypothesis_count ?? latestPacket?.object_hypothesis_count ?? 0)} - ${escapeHtml(latest.claim_gate_effect || 'no_claims_cleared')}<br>` : ''}${productReviewAction ? `Product review: ${escapeHtml(productReviewAction.label || 'Review extrapolated objects, vectors, and 3D candidates')} - ${escapeHtml(productReviewAction.href || 'missing')}<br>` : ''}Blocks still active: ${blocked.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('') || '<span class="chip">claim gates remain blocked</span>'}<br><button class="go" type="button" style="padding:7px 10px;font-size:11px;margin-top:6px;background:#4f46e5" data-sam31-extrapolation-evidence-id="${escapeHtml(evidenceId)}">${escapeHtml(action.label || 'Run OpenClaw SAM31 extrapolation artifact')}</button><div class="muted" id="sam31ExtrapolationStatus-${escapeHtml(evidenceId)}" style="font-size:11px;margin-top:4px"></div></div>`;
+  const reviewSummary = latestReview && typeof latestReview === 'object'
+    ? `Latest employee extrapolation review: evidence #${escapeHtml(latestReview.evidence_id)} - ${escapeHtml(latestReview.review_decision || 'reviewed')} - fields ${(Array.isArray(latestReview.replaced_fields) ? latestReview.replaced_fields : []).map((field) => `<span class="chip">${escapeHtml(field)}</span>`).join('')} - ${escapeHtml(latestReview.claim_gate_effect || 'no_claims_cleared')}<br>`
+    : '';
+  const reviewForm = latest ? `<details style="margin-top:8px">
+      <summary class="muted" style="cursor:pointer">Review/replace extrapolated objects, vectors, and 3D candidates</summary>
+      <div style="display:grid;gap:6px;margin-top:8px">
+        <select id="sam31ExtrapolationReviewDecision-${escapeHtml(evidenceId)}" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
+          <option value="replaced">Replaced temporary values</option>
+          <option value="accepted">Accepted for internal product review</option>
+          <option value="rejected">Rejected extrapolation</option>
+        </select>
+        <input id="sam31ExtrapolationReviewer-${escapeHtml(evidenceId)}" placeholder="reviewer_name" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
+        <input id="sam31ExtrapolationReplacementRef-${escapeHtml(evidenceId)}" value="${escapeHtml(latestReview?.replacement_ref || '')}" placeholder="replacement_ref" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
+        <textarea id="sam31ExtrapolationReplacementValues-${escapeHtml(evidenceId)}" placeholder='replacement_values JSON object: {"object_hypotheses":[{"id":"obj:door","label":"rated door"}],"vector_overlays":[{"id":"vector:room","svg_path":"M 0 0 L 1 0 L 1 1 Z"}],"model_3d_candidates":[{"id":"model3d:room","primitive":"extruded_polygon","height_ft":10}],"confidence":0.8}' style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px;height:92px"></textarea>
+        <textarea id="sam31ExtrapolationReviewNotes-${escapeHtml(evidenceId)}" placeholder="notes" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px;height:44px"></textarea>
+        <button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#4f46e5" data-sam31-extrapolation-review-save-evidence-id="${escapeHtml(evidenceId)}" data-sam31-extrapolation-review-source-evidence-id="${escapeHtml(latest.evidence_id)}">Save employee SAM31 extrapolation review</button>
+        <div class="muted" id="sam31ExtrapolationReviewStatus-${escapeHtml(evidenceId)}" style="font-size:11px"></div>
+      </div>
+    </details>` : '';
+  return `<div class="muted" style="font-size:11px;margin-top:5px;border:1px solid rgba(79,70,229,.34);border-radius:8px;padding:8px;background:rgba(79,70,229,.06)">OpenClaw SAM31 LLM extrapolation artifact<br>status ${escapeHtml(action.status || 'unavailable')} - method ${escapeHtml(action.method || 'POST')} - claim_gate_effect ${escapeHtml(action.claim_gate_effect || 'no_claims_cleared')}<br>endpoint ${escapeHtml(endpoint)} - source_evidence_id ${escapeHtml(evidenceId)}<br>${latest ? `Latest extrapolation: evidence #${escapeHtml(latest.evidence_id)} - ${escapeHtml(latest.status || 'best_effort')} - packet ${escapeHtml(latestPacket?.artifact_type || latest.artifact_type || 'openclaw.sam31_llm_extrapolation_artifact')} - sections ${escapeHtml(latest.section_count ?? latestPacket?.segment_count ?? 0)} - hypotheses ${escapeHtml(latest.object_hypothesis_count ?? latestPacket?.object_hypothesis_count ?? 0)} - ${escapeHtml(latest.claim_gate_effect || 'no_claims_cleared')}<br>` : ''}${reviewSummary}${productReviewAction ? `Product review: ${escapeHtml(productReviewAction.label || 'Review extrapolated objects, vectors, and 3D candidates')} - ${escapeHtml(productReviewAction.href || 'missing')}<br>` : ''}Blocks still active: ${blocked.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('') || '<span class="chip">claim gates remain blocked</span>'}<br><button class="go" type="button" style="padding:7px 10px;font-size:11px;margin-top:6px;background:#4f46e5" data-sam31-extrapolation-evidence-id="${escapeHtml(evidenceId)}">${escapeHtml(action.label || 'Run OpenClaw SAM31 extrapolation artifact')}</button><div class="muted" id="sam31ExtrapolationStatus-${escapeHtml(evidenceId)}" style="font-size:11px;margin-top:4px"></div>${reviewForm}</div>`;
 }
 
 function evidenceDetail(row) {
@@ -288,6 +307,17 @@ function evidenceDetail(row) {
       return `<div class="muted" style="font-size:11px;margin-top:3px">openclaw.sam31_llm_extrapolation_artifact<br>source_evidence_id ${escapeHtml(artifact.source_pdf_boundary_evidence_id || artifact.source_evidence_id || 'missing')} - sections ${escapeHtml(artifact.section_count ?? perception.segment_count ?? 0)} - hypotheses ${escapeHtml(artifact.object_hypothesis_count ?? perception.object_hypothesis_count ?? 0)} - source_ref ${escapeHtml(row.source_ref || artifact.openclaw_endpoint || 'missing')}<br>product_review_action ${escapeHtml(artifact.product_review_action?.label || 'Review extrapolated objects, vectors, and 3D candidates')} - claim_gate_effect ${escapeHtml(packet.claim_gate_effect || artifact.claim_gate_effect || 'no_claims_cleared')}<br>Blocks still active: ${blocked.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('')}</div>`;
     } catch {
       return '<div class="muted" style="font-size:11px;margin-top:3px">OpenClaw SAM31 extrapolation artifact; detail unavailable</div>';
+    }
+  }
+  if (row.evidence_type === 'openclaw_sam31_extrapolation_review') {
+    try {
+      const packet = JSON.parse(row.notes || '{}');
+      const review = packet.review || {};
+      const blocked = Array.isArray(packet.blocked_claims) ? packet.blocked_claims : (Array.isArray(review.blocked_claims) ? review.blocked_claims : []);
+      const fields = Array.isArray(review.replaced_fields) ? review.replaced_fields : [];
+      return `<div class="muted" style="font-size:11px;margin-top:3px">openclaw.sam31_extrapolation_product_review<br>source_openclaw_sam31_extrapolation_evidence_id ${escapeHtml(review.source_openclaw_sam31_extrapolation_evidence_id || 'missing')} - review_decision ${escapeHtml(review.review_decision || 'missing')} - replacement_ref ${escapeHtml(review.replacement_ref || 'missing')}<br>Replaced fields: ${fields.map((field) => `<span class="chip">${escapeHtml(field)}</span>`).join('')} - claim_gate_effect ${escapeHtml(packet.claim_gate_effect || review.claim_gate_effect || 'no_claims_cleared')}<br>Blocks still active: ${blocked.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('')}</div>`;
+    } catch {
+      return '<div class="muted" style="font-size:11px;margin-top:3px">OpenClaw SAM31 extrapolation review; detail unavailable</div>';
     }
   }
   if (row.evidence_type === 'official_flow_hydraulic_replay_artifact') {
@@ -422,6 +452,7 @@ function resolverQueueDetail(item) {
   const latest_openclaw_sam31_bridge_smoke_artifact = item.latest_openclaw_sam31_bridge_smoke_artifact || null;
   const openclaw_sam31_extrapolation_action = item.openclaw_sam31_extrapolation_action || null;
   const latest_openclaw_sam31_extrapolation_artifact = item.latest_openclaw_sam31_extrapolation_artifact || null;
+  const latest_openclaw_sam31_extrapolation_review = item.latest_openclaw_sam31_extrapolation_review || null;
   const replay_review = latest_review || latest_sam31_visual_audit;
   const review_source = latest_review ? 'latest_employee_review_packet' : (latest_sam31_visual_audit ? 'latest_sam31_visual_audit' : null);
   const evidenceId = escapeHtml(item.evidence_id);
@@ -506,7 +537,7 @@ function resolverQueueDetail(item) {
       <div class="claims">Defaults: page ${escapeHtml(defaults.pdfPageIndex)} · scale ${escapeHtml(defaults.pdfScale)} ft/pt · ${escapeHtml(defaults.pdfExtract)}</div>
       ${renderOpenClawSam31BridgeStatus(openclaw_sam31_bridge_status)}
       ${renderSam31BridgeSmokeAction(item, sam31_bridge_smoke_action, latest_openclaw_sam31_bridge_smoke_artifact)}
-      ${renderOpenClawSam31ExtrapolationAction(item, openclaw_sam31_extrapolation_action, latest_openclaw_sam31_extrapolation_artifact)}
+      ${renderOpenClawSam31ExtrapolationAction(item, openclaw_sam31_extrapolation_action, latest_openclaw_sam31_extrapolation_artifact, latest_openclaw_sam31_extrapolation_review)}
       ${replay_review ? `<div class="claims">Review: ${escapeHtml(replay_review.review_decision)} by ${escapeHtml(replay_review.reviewer_name || 'unknown')} - source ${escapeHtml(review_source || 'missing')} - issues ${escapeHtml(replay_review.issue_count)} - corrected polygons ${escapeHtml(replay_review.corrected_room_polygon_count)} - ${escapeHtml(replay_review.marked_up_plan_ref || '')}</div>` : ''}
       ${latest_sam31_employee_replacement ? `<div class="claims">Employee SAM31 replacements: evidence #${escapeHtml(latest_sam31_employee_replacement.evidence_id)} - source_sam31_evidence_id ${escapeHtml(latest_sam31_employee_replacement.source_sam31_evidence_id)} - ${escapeHtml(latest_sam31_employee_replacement.replacement_ref || 'missing')} - ${escapeHtml(latest_sam31_employee_replacement.claim_gate_effect || 'no_claims_cleared')}<br>Replaced fields: ${(Array.isArray(latest_sam31_employee_replacement.replaced_fields) ? latest_sam31_employee_replacement.replaced_fields : []).map((field) => `<span class="chip">${escapeHtml(field)}</span>`).join('')}<br>Replacement value preview: ${escapeHtml(JSON.stringify(latest_sam31_employee_replacement.replacement_values || {}))}</div>` : ''}
       ${latest_sam31_visual_audit ? renderSam31PerceptionSummary(latest_sam31_visual_audit.openclaw_sam31_perception_packet, item.evidence_id) : ''}
@@ -868,6 +899,29 @@ async function saveSam31EmployeeReplacements(evidenceId, sourceSam31EvidenceId) 
   }
 }
 
+async function saveOpenClawSam31ExtrapolationReview(evidenceId, sourceExtrapolationEvidenceId) {
+  const status = document.getElementById('sam31ExtrapolationReviewStatus-' + evidenceId);
+  try {
+    const body = {
+      source_openclaw_sam31_extrapolation_evidence_id: Number(sourceExtrapolationEvidenceId),
+      review_decision: document.getElementById('sam31ExtrapolationReviewDecision-' + evidenceId).value,
+      reviewer_name: document.getElementById('sam31ExtrapolationReviewer-' + evidenceId).value.trim(),
+      replacement_ref: document.getElementById('sam31ExtrapolationReplacementRef-' + evidenceId).value.trim(),
+      replacement_values: jsonObjectFromField('sam31ExtrapolationReplacementValues-' + evidenceId),
+      notes: document.getElementById('sam31ExtrapolationReviewNotes-' + evidenceId).value.trim(),
+    };
+    const saved = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/resolver-packets/pdf-boundary/' + encodeURIComponent(evidenceId) + '/openclaw/sam31/extrapolation-review', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    });
+    if (status) status.textContent = 'Saved openclaw_sam31_extrapolation_review evidence #' + saved.id + ' - claims still blocked';
+    await refreshEvidence();
+    await refreshResolverQueue();
+  } catch (err) {
+    if (status) status.textContent = 'Error: ' + err.message;
+  }
+}
+
 async function saveOfficialFlowIntake() {
   const status = document.getElementById('officialFlowStatus');
   try {
@@ -927,6 +981,9 @@ async function refreshResolverQueue() {
   });
   document.querySelectorAll('[data-sam31-employee-replacement-save-evidence-id]').forEach((button) => {
     button.onclick = () => saveSam31EmployeeReplacements(button.dataset.sam31EmployeeReplacementSaveEvidenceId, button.dataset.sam31SourceEvidenceId);
+  });
+  document.querySelectorAll('[data-sam31-extrapolation-review-save-evidence-id]').forEach((button) => {
+    button.onclick = () => saveOpenClawSam31ExtrapolationReview(button.dataset.sam31ExtrapolationReviewSaveEvidenceId, button.dataset.sam31ExtrapolationReviewSourceEvidenceId);
   });
   document.querySelectorAll('[data-official-flow-save]').forEach((button) => {
     button.onclick = () => saveOfficialFlowIntake();
