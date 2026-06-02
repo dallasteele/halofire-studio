@@ -28,7 +28,7 @@ import { requiredPressureAtRiser, flagSchedule, remoteAreaDemand } from '../engi
 import { buildParityMatrix, parityAchieved } from '../engine/parity-matrix.js';
 import { AUTOSPRINK_PARITY_GATE, buildParityInventory, parityGateStatus, getComponent } from '../components/registry.js';
 import { buildPartManifest } from '../components/part-mesh.js';
-import { buildSourceAcquisitionLedger, probeBridge } from '../components/auto-source-runner.js';
+import { buildSourceAcquisitionLedger, makeBridgeInvoker, probeBridge } from '../components/auto-source-runner.js';
 import { balanceNetwork } from '../engine/hydraulic-network.js';
 import { checkCompliance } from '../engine/nfpa-compliance.js';
 import { buildSubmittal, renderSubmittalPdf } from '../engine/submittal.js';
@@ -37,6 +37,7 @@ import { HOME_DEPOT_PROJECT_NAME } from '../data/evidence-gates.js';
 import { readHomeDepotBidPackage, readHomeDepotRealTakeoff } from '../data/home-depot-bid-package.js';
 import { readCooperative1881BidPackage, readCooperative1881RealTakeoff } from '../data/cooperative-1881-bid-package.js';
 import { buildPlanSegmentationPayload } from '../components/sam-floorplan.js';
+import { SAM31_FLOORPLAN_TOOL } from '../sam31/bridge.js';
 import { buildSamInvoker } from './sam-invoker.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -1283,6 +1284,116 @@ async function openClawSam31BridgeStatusWithProbe(env = process.env, fetchImpl =
     limitations: [
       ...base.limitations,
       'A reachable bridge proves only operational contact with the SAM31 bridge status route; it does not prove segmentation accuracy or clear professional/AHJ/manufacturer claims.',
+    ],
+  };
+}
+
+function trimBridgeUrl(url) {
+  return String(url || '').trim().replace(/\/$/, '');
+}
+
+function normalizeSam31SmokeRequest(projectName, body = {}) {
+  const scale = Number(body.pdfScale ?? body.scale);
+  if (!Number.isFinite(scale) || scale <= 0) {
+    const e = new Error('A positive operator or drawing supplied pdfScale is required for SAM 3.1 smoke artifacts');
+    e.httpStatus = 400;
+    throw e;
+  }
+  const pageIndex = Number.isFinite(Number(body.pdfPageIndex ?? body.pageIndex))
+    ? Math.max(0, Math.trunc(Number(body.pdfPageIndex ?? body.pageIndex)))
+    : 0;
+  const targets = uniqueStrings(
+    Array.isArray(body.targets) && body.targets.length
+      ? body.targets
+      : ['building_outline', 'walls', 'rooms', 'layers'],
+  );
+  return buildPlanSegmentationPayload({
+    pdfRef: body.pdfRef || body.source_ref || `halo-fire:${projectName}:sam31-smoke`,
+    pageIndex,
+    scale,
+    targets,
+  });
+}
+
+function sam31SmokeResultSummary(result) {
+  const layers = result && result.layers && typeof result.layers === 'object' ? result.layers : {};
+  const layerKeys = Object.keys(layers);
+  const rooms = Array.isArray(layers.rooms) ? layers.rooms.length : 0;
+  const walls = Array.isArray(layers.walls) ? layers.walls.length : 0;
+  const outline = Array.isArray(layers.building_outline) ? layers.building_outline.length : 0;
+  return {
+    ok: !!(result && result.ok),
+    source: result?.source || null,
+    service: result?.service || null,
+    op: result?.op || null,
+    runtime: result?.runtime || null,
+    mode: result?.mode || null,
+    confidence: Number.isFinite(Number(result?.confidence)) ? Number(result.confidence) : null,
+    pageIndex: Number.isFinite(Number(result?.pageIndex)) ? Number(result.pageIndex) : null,
+    scale: Number.isFinite(Number(result?.scale)) ? Number(result.scale) : null,
+    imageSize: result?.imageSize && typeof result.imageSize === 'object' ? jsonClone(result.imageSize) : null,
+    layer_keys: layerKeys,
+    object_counts: {
+      building_outline_points: outline,
+      walls,
+      rooms,
+    },
+    claim_gate_effect: result?.claim_gate_effect || 'no_claims_cleared',
+    blocked_claims: uniqueStrings([...(Array.isArray(result?.blocked_claims) ? result.blocked_claims : []), ...PDF_BOUNDARY_BLOCKED_CLAIMS]),
+    limitations: Array.isArray(result?.limitations) ? result.limitations : [],
+  };
+}
+
+function buildSam31BridgeSmokeArtifact(projectName, bridgeStatus, sam31Request, result, bridgeEndpoint) {
+  const resultSummary = sam31SmokeResultSummary(result);
+  const blockedClaims = uniqueStrings([
+    ...PDF_BOUNDARY_BLOCKED_CLAIMS,
+    ...(Array.isArray(bridgeStatus.blocked_claims) ? bridgeStatus.blocked_claims : []),
+    ...(Array.isArray(resultSummary.blocked_claims) ? resultSummary.blocked_claims : []),
+    'SAM31_runtime_verified',
+    'OpenClaw_runtime_verified',
+    'professional_approval',
+  ]);
+  return {
+    artifact_type: 'openclaw.sam31_bridge_smoke_artifact',
+    status: 'sam31_invocation_verified',
+    project_name: projectName,
+    generated_at: new Date().toISOString(),
+    application: 'halo_fire',
+    supported_applications: ['halo_fire', 'landscout', 'nameforge'],
+    tool_ref: 'pdfExtract:sam',
+    source_runtime: 'openclaw.sam31',
+    source_runtime_ref: 'sam-3.1+llm-openclaw-bridge',
+    coordinate_frame_ref: 'rendered_pdf_page_pixels_scaled_to_feet_by_operator_pdfScale',
+    unit: 'feet',
+    bridge_status: {
+      ...bridgeStatus,
+      claim_gate_effect: 'no_claims_cleared',
+    },
+    invocation: {
+      tool: SAM31_FLOORPLAN_TOOL,
+      endpoint: bridgeEndpoint,
+      method: 'POST',
+    },
+    sam31_request: sam31Request,
+    result_summary: resultSummary,
+    status_refs: [
+      bridgeStatus.probe_status_url,
+      bridgeEndpoint,
+    ].filter(Boolean),
+    acceptable_evidence: [
+      'Bridge /status response captured in bridge_status.raw_status',
+      'Bridge /codex-bridge/invoke response summarized in result_summary',
+      'Employee review, screenshot, console transcript, and source drawing scale must be attached before using this beyond internal-alpha correction loops',
+    ],
+    blocked_claims: blockedClaims,
+    claim_gate_effect: 'no_claims_cleared',
+    no_claim_gates_cleared: true,
+    next_action: 'Attach screenshot/console evidence and employee-reviewed SAM31 replacements, then replay the room-boundary bid packet; do not promote approval-grade claims.',
+    limitations: [
+      'This artifact proves only that HaloFire reached a configured OpenClaw SAM31 bridge and received a best-effort segmentation response.',
+      'It does not prove segmentation accuracy, drawing scale correctness, AHJ approval, PE review, AutoSprink parity, permit readiness, fabrication readiness, or manufacturer-exact content.',
+      'Temporary shim results are allowed as internal-alpha fallback evidence until Halo Fire employees replace them with actual reviewed values.',
     ],
   };
 }
@@ -3233,6 +3344,94 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
 
 app.get('/api/openclaw/sam31/status', authMiddleware, async (req, res) => {
   res.json(await openClawSam31BridgeStatusWithProbe());
+});
+
+app.post('/api/projects/:name/openclaw/sam31/smoke-artifact', authMiddleware, requireRole('admin'), async (req, res) => {
+  try {
+    const projectName = req.params.name;
+    const bridgeStatus = await openClawSam31BridgeStatusWithProbe();
+    if (!bridgeStatus.bridge_url_configured || !bridgeStatus.bridge_reachable) {
+      return res.status(503).json({
+        artifact_type: 'openclaw.sam31_bridge_smoke_artifact',
+        status: bridgeStatus.bridge_url_configured ? 'bridge_unreachable' : 'bridge_unavailable',
+        project_name: projectName,
+        tool_ref: 'pdfExtract:sam',
+        bridge_status: bridgeStatus,
+        claim_gate_effect: 'no_claims_cleared',
+        blocked_claims: uniqueStrings([
+          ...PDF_BOUNDARY_BLOCKED_CLAIMS,
+          'SAM31_runtime_verified',
+          'OpenClaw_runtime_verified',
+        ]),
+        next_action: bridgeStatus.next_action,
+      });
+    }
+
+    const sam31Request = normalizeSam31SmokeRequest(projectName, req.body);
+    const bridgeBase = trimBridgeUrl(bridgeStatus.bridge_url);
+    const bridgeEndpoint = `${bridgeBase}/codex-bridge/invoke`;
+    const invoke = makeBridgeInvoker({
+      bridgeUrl: bridgeBase,
+      fetchImpl: globalThis.fetch,
+      timeoutMs: Number(process.env.HALOFIRE_SAM31_INVOKE_TIMEOUT_MS || 20000),
+    });
+
+    let result;
+    try {
+      result = await invoke(SAM31_FLOORPLAN_TOOL, sam31Request);
+    } catch (err) {
+      return res.status(502).json({
+        artifact_type: 'openclaw.sam31_bridge_smoke_artifact',
+        status: 'sam31_invocation_failed',
+        project_name: projectName,
+        tool_ref: 'pdfExtract:sam',
+        bridge_status: bridgeStatus,
+        invocation: {
+          tool: SAM31_FLOORPLAN_TOOL,
+          endpoint: bridgeEndpoint,
+          method: 'POST',
+        },
+        sam31_request: sam31Request,
+        error: err && err.message ? err.message : 'SAM31 bridge invocation failed',
+        claim_gate_effect: 'no_claims_cleared',
+        blocked_claims: uniqueStrings([
+          ...PDF_BOUNDARY_BLOCKED_CLAIMS,
+          'SAM31_runtime_verified',
+          'OpenClaw_runtime_verified',
+        ]),
+        next_action: 'Fix the OpenClaw SAM31 bridge invocation path, then rerun this smoke artifact; use employee replacement workflows as fallback.',
+      });
+    }
+
+    const artifact = buildSam31BridgeSmokeArtifact(projectName, bridgeStatus, sam31Request, result, bridgeEndpoint);
+    const notes = {
+      kind: 'openclaw_sam31_bridge_smoke_artifact',
+      artifact,
+      blocked_claims: artifact.blocked_claims,
+      claim_gate_effect: artifact.claim_gate_effect,
+      limitations: artifact.limitations,
+    };
+    const insert = db
+      .prepare(`INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+                VALUES (?, ?, ?, ?, ?, ?)`)
+      .run(
+        projectName,
+        'openclaw_sam31_bridge_smoke_artifact',
+        'OPENCLAW_BRIDGE_URL',
+        bridgeEndpoint,
+        'best_effort',
+        JSON.stringify(notes),
+      );
+    const evidence = db.prepare('SELECT * FROM project_evidence WHERE id = ?').get(insert.lastInsertRowid);
+    return res.status(201).json({
+      id: insert.lastInsertRowid,
+      message: 'OpenClaw SAM31 bridge smoke artifact saved as best-effort evidence; claims still blocked',
+      evidence,
+      ...artifact,
+    });
+  } catch (err) {
+    return res.status(err.httpStatus || 400).json({ error: err.message });
+  }
 });
 
 app.post('/api/projects/:name/resolver-packets/official-flow/intake', authMiddleware, requireRole('admin'), (req, res) => {
