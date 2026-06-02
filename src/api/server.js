@@ -1312,6 +1312,12 @@ const SAM31_EXTRAPOLATION_CONTRACT = Object.freeze({
 });
 
 const SAM31_PRODUCT_REVIEW_QUEUE_ITEM_TYPE = 'openclaw.sam31.product_review_queue_item.v1';
+const SAM31_CONSUMER_SMOKE_ARTIFACT_TYPE = 'openclaw.sam31.consumer_smoke_artifact.v1';
+const SAM31_CONSUMER_QUEUE_TARGETS = Object.freeze(['landscout', 'nameforge']);
+const SAM31_CONSUMER_UNAVAILABLE_CODES = Object.freeze({
+  landscout: 'OPENCLAW_SAM31_LANDSCOUT_QUEUE_UNAVAILABLE',
+  nameforge: 'OPENCLAW_SAM31_NAMEFORGE_QUEUE_UNAVAILABLE',
+});
 
 const SAM31_APPLICATION_CONTRACTS = Object.freeze({
   halo_fire: {
@@ -2611,6 +2617,308 @@ function buildOpenClawSam31ProductReviewQueueItemPacket(projectName, evidence, d
   };
 }
 
+function openClawSam31ConsumerBlockedRow(consumer, result = {}) {
+  const label = consumer === 'nameforge' ? 'NameForge' : 'LandScout';
+  return {
+    code: SAM31_CONSUMER_UNAVAILABLE_CODES[consumer] || `OPENCLAW_SAM31_${String(consumer || 'CONSUMER').toUpperCase()}_QUEUE_UNAVAILABLE`,
+    status: result.status || 'unavailable',
+    consumer,
+    evidence_lane: `${consumer}_sam31_product_review_queue`,
+    source_ref: result.endpoint || result.action_href || null,
+    observed: result.error || `Canonical ${label} SAM31 consumer queue was not reachable or not configured during this smoke.`,
+    expected: `Canonical ${label} SAM31 product review queue accepts ${SAM31_PRODUCT_REVIEW_QUEUE_ITEM_TYPE} handoffs.`,
+    next_action: `Start or configure the OpenClaw ${label} SAM31 consumer queue endpoint, then rerun this smoke; HaloFire may continue with its own internal-alpha review queue.`,
+    acceptable_evidence: [
+      `${label} SAM31 product review queue HTTP 2xx response`,
+      `${label} queue item id or persisted review packet ref`,
+      'OpenClaw/HAL console or screenshot evidence for the consumer queue intake',
+    ],
+    ai_fallback:
+      'Keep the HaloFire SAM31 queue item downloadable and reviewable locally; AI may summarize the missing consumer handoff but cannot clear downstream product, production, AHJ, PE, permit, AutoSprink, fabrication, or manufacturer claims.',
+    blocked_claims: uniqueStrings([
+      ...(consumer === 'nameforge' ? ['brand_ready', 'trademark_ready', 'production_ready'] : ['CEO_ready', 'production_ready']),
+      'OpenClaw_runtime_verified',
+      'SAM31_runtime_verified',
+    ]),
+    claim_gate_effect: 'no_claims_cleared',
+  };
+}
+
+function resolveOpenClawSam31ConsumerEndpoint(action, descriptorEndpoint) {
+  const href = String(action?.href || '').trim();
+  if (!href) return null;
+  try {
+    return new URL(href, descriptorEndpoint || undefined).toString();
+  } catch {
+    return href.startsWith('http://') || href.startsWith('https://') ? href : null;
+  }
+}
+
+async function readJsonResponseBody(response) {
+  const text = await response.text();
+  if (!text) return null;
+  try {
+    return JSON.parse(text);
+  } catch {
+    return { raw_text: text.slice(0, 500) };
+  }
+}
+
+async function postOpenClawSam31ConsumerQueue({
+  consumer,
+  action,
+  descriptorEndpoint,
+  payload,
+  fetchImpl = globalThis.fetch,
+  timeoutMs = Number(process.env.HALOFIRE_SAM31_CONSUMER_SMOKE_TIMEOUT_MS || 5000),
+}) {
+  const endpoint = resolveOpenClawSam31ConsumerEndpoint(action, descriptorEndpoint);
+  if (!action || !endpoint) {
+    const result = {
+      consumer,
+      status: action ? 'consumer_endpoint_unresolved' : 'consumer_action_missing',
+      method: action?.method || 'POST',
+      action_href: action?.href || null,
+      endpoint,
+      response_status: null,
+      response_body: null,
+      error: action ? 'Consumer action href could not be resolved' : 'Canonical descriptor did not advertise this consumer action',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    };
+    return { ...result, missing_evidence_row: openClawSam31ConsumerBlockedRow(consumer, result) };
+  }
+  const method = String(action.method || 'POST').toUpperCase();
+  if (method !== 'POST') {
+    const result = {
+      consumer,
+      status: 'unsupported_method',
+      method,
+      action_href: action.href || null,
+      endpoint,
+      response_status: null,
+      response_body: null,
+      error: `Unsupported consumer queue method ${method}`,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    };
+    return { ...result, missing_evidence_row: openClawSam31ConsumerBlockedRow(consumer, result) };
+  }
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const response = await fetchImpl(endpoint, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: controller.signal,
+    });
+    const responseBody = await readJsonResponseBody(response);
+    const result = {
+      consumer,
+      status: response.ok ? 'posted' : 'configured_unreachable',
+      method,
+      action_href: action.href || null,
+      endpoint,
+      response_status: response.status,
+      response_body: responseBody,
+      error: response.ok ? null : `HTTP ${response.status}`,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    };
+    return response.ok
+      ? result
+      : { ...result, missing_evidence_row: openClawSam31ConsumerBlockedRow(consumer, result) };
+  } catch (err) {
+    const result = {
+      consumer,
+      status: 'configured_unreachable',
+      method,
+      action_href: action.href || null,
+      endpoint,
+      response_status: null,
+      response_body: null,
+      error: err && err.name === 'AbortError' ? 'timeout' : String(err?.message || err),
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    };
+    return { ...result, missing_evidence_row: openClawSam31ConsumerBlockedRow(consumer, result) };
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+async function buildOpenClawSam31ConsumerSmokeArtifact(projectName, evidence, decision, extrapolationEvidence, extrapolationArtifact, fetchImpl = globalThis.fetch) {
+  const productReviewQueueItem = buildOpenClawSam31ProductReviewQueueItemPacket(
+    projectName,
+    evidence,
+    decision,
+    extrapolationEvidence,
+    extrapolationArtifact,
+  );
+  const descriptor = await fetchOpenClawSam31CanonicalToolDescriptor(process.env, fetchImpl);
+  const actions = descriptor.descriptor?.consumer_actions && typeof descriptor.descriptor.consumer_actions === 'object'
+    ? descriptor.descriptor.consumer_actions
+    : {};
+  const payload = {
+    artifact_type: 'openclaw.sam31.consumer_queue_handoff.v1',
+    source_application: 'halo_fire',
+    source_project_name: projectName,
+    source_pdf_boundary_evidence_id: evidence.id,
+    source_openclaw_sam31_extrapolation_evidence_id: extrapolationEvidence.evidence.id,
+    product_review_queue_item: productReviewQueueItem,
+    use_for_claims: false,
+    claim_gate_effect: 'no_claims_cleared',
+  };
+  const consumerResults = [];
+  if (!descriptor.reachable || !descriptor.descriptor) {
+    for (const consumer of SAM31_CONSUMER_QUEUE_TARGETS) {
+      const result = {
+        consumer,
+        status: descriptor.status || 'canonical_descriptor_unavailable',
+        method: 'POST',
+        action_href: null,
+        endpoint: null,
+        response_status: null,
+        response_body: null,
+        error: descriptor.error || 'Canonical OpenClaw SAM31 tool descriptor unavailable',
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      };
+      consumerResults.push({ ...result, missing_evidence_row: openClawSam31ConsumerBlockedRow(consumer, result) });
+    }
+  } else {
+    for (const consumer of SAM31_CONSUMER_QUEUE_TARGETS) {
+      consumerResults.push(await postOpenClawSam31ConsumerQueue({
+        consumer,
+        action: actions[consumer],
+        descriptorEndpoint: descriptor.endpoint,
+        payload,
+        fetchImpl,
+      }));
+    }
+  }
+  const missingEvidenceRows = consumerResults
+    .map((result) => result.missing_evidence_row)
+    .filter(Boolean);
+  const postedConsumerCount = consumerResults.filter((result) => result.status === 'posted').length;
+  const blockedConsumerCount = missingEvidenceRows.length;
+  return {
+    artifact_type: SAM31_CONSUMER_SMOKE_ARTIFACT_TYPE,
+    status: blockedConsumerCount === 0
+      ? 'consumer_smoke_recorded'
+      : (postedConsumerCount > 0 ? 'consumer_smoke_degraded' : 'consumer_smoke_blocked'),
+    project_name: projectName,
+    generated_at: new Date().toISOString(),
+    source_pdf_boundary_evidence_id: evidence.id,
+    source_openclaw_sam31_extrapolation_evidence_id: extrapolationEvidence.evidence.id,
+    canonical_tool_descriptor_url: descriptor.endpoint,
+    canonical_tool_descriptor_source_file: descriptor.source_file,
+    canonical_tool_descriptor_status: descriptor.status,
+    canonical_tool_descriptor_reachable: descriptor.reachable,
+    canonical_tool_descriptor_error: descriptor.error,
+    product_review_queue_item: productReviewQueueItem,
+    consumer_results: consumerResults.map((result) => {
+      const copy = { ...result };
+      delete copy.missing_evidence_row;
+      return copy;
+    }),
+    posted_consumer_count: postedConsumerCount,
+    blocked_consumer_count: blockedConsumerCount,
+    missing_evidence_rows: missingEvidenceRows,
+    source_refs: [
+      {
+        evidence_id: evidence.id,
+        evidence_type: evidence.evidence_type,
+        source_file: evidence.source_file || decision.sourceFile || null,
+        source_ref: evidence.source_ref || decision.sourceRef || null,
+        status: evidence.status,
+      },
+      {
+        evidence_id: extrapolationEvidence.evidence.id,
+        evidence_type: extrapolationEvidence.evidence.evidence_type,
+        source_file: extrapolationEvidence.evidence.source_file || null,
+        source_ref: extrapolationEvidence.evidence.source_ref || extrapolationArtifact.openclaw_endpoint || null,
+        status: extrapolationEvidence.evidence.status,
+      },
+      {
+        source_file: descriptor.source_file,
+        source_ref: descriptor.endpoint,
+        status: descriptor.status,
+        claim_gate_effect: 'no_claims_cleared',
+      },
+    ],
+    use_for_claims: false,
+    blocked_claims: uniqueStrings([
+      ...(Array.isArray(productReviewQueueItem.blocked_claims) ? productReviewQueueItem.blocked_claims : []),
+      'OpenClaw_runtime_verified',
+      'SAM31_runtime_verified',
+      'professional_approval',
+    ]),
+    claim_gate_effect: 'no_claims_cleared',
+    no_claim_gates_cleared: true,
+    next_action: blockedConsumerCount
+      ? 'Resolve the listed consumer queue missing-evidence rows, then rerun the LandScout/NameForge SAM31 queue smoke; HaloFire may continue internal-alpha review locally.'
+      : 'Consumer queues accepted the SAM31 handoff for product review. Continue product-specific human review; do not clear regulated claims from this smoke.',
+    limitations: [
+      'This smoke only proves that canonical consumer queue endpoints accepted or rejected a HaloFire SAM31 queue handoff.',
+      'It does not prove downstream reviewer acceptance, geometry accuracy, AHJ approval, PE review, AutoSprink parity, permit readiness, fabrication readiness, production readiness, trademark readiness, or manufacturer-exact models.',
+    ],
+  };
+}
+
+function openClawSam31ConsumerSmokeArtifactFromEvidence(row) {
+  if (!row) return null;
+  try {
+    const parsed = JSON.parse(row.notes || '{}');
+    return parsed && parsed.kind === 'openclaw_sam31_consumer_smoke_artifact' && parsed.artifact
+      ? parsed.artifact
+      : null;
+  } catch {
+    return null;
+  }
+}
+
+function latestOpenClawSam31ConsumerSmokeArtifactEvidence(projectName, sourceEvidenceId = null) {
+  const rows = db
+    .prepare(`SELECT * FROM project_evidence
+              WHERE project_name = ? AND evidence_type = 'openclaw_sam31_consumer_smoke_artifact'
+              ORDER BY created_at DESC, id DESC`)
+    .all(projectName);
+  for (const row of rows) {
+    const artifact = openClawSam31ConsumerSmokeArtifactFromEvidence(row);
+    if (!artifact) continue;
+    if (sourceEvidenceId && Number(artifact.source_pdf_boundary_evidence_id) !== Number(sourceEvidenceId)) {
+      continue;
+    }
+    return { evidence: row, artifact };
+  }
+  return null;
+}
+
+function openClawSam31ConsumerSmokeReplaySummary(consumerSmokeEvidence) {
+  if (!consumerSmokeEvidence?.evidence || !consumerSmokeEvidence?.artifact) return null;
+  const { evidence, artifact } = consumerSmokeEvidence;
+  return {
+    evidence_id: evidence.id,
+    evidence_type: evidence.evidence_type,
+    evidence_status: evidence.status,
+    source_ref: evidence.source_ref,
+    status: artifact.status || 'consumer_smoke_recorded',
+    source_pdf_boundary_evidence_id: artifact.source_pdf_boundary_evidence_id || null,
+    source_openclaw_sam31_extrapolation_evidence_id: artifact.source_openclaw_sam31_extrapolation_evidence_id || null,
+    canonical_tool_descriptor_url: artifact.canonical_tool_descriptor_url || null,
+    posted_consumer_count: Number.isFinite(Number(artifact.posted_consumer_count)) ? Number(artifact.posted_consumer_count) : 0,
+    blocked_consumer_count: Number.isFinite(Number(artifact.blocked_consumer_count)) ? Number(artifact.blocked_consumer_count) : 0,
+    consumer_results: Array.isArray(artifact.consumer_results) ? jsonClone(artifact.consumer_results) : [],
+    missing_evidence_rows: Array.isArray(artifact.missing_evidence_rows) ? jsonClone(artifact.missing_evidence_rows) : [],
+    use_for_claims: false,
+    claim_gate_effect: artifact.claim_gate_effect || 'no_claims_cleared',
+    blocked_claims: Array.isArray(artifact.blocked_claims) ? [...artifact.blocked_claims] : [],
+    limitations: Array.isArray(artifact.limitations) ? [...artifact.limitations] : [],
+  };
+}
+
 function buildOpenClawSam31ExtrapolationReviewPacket(projectName, evidence, decision, extrapolationEvidence, extrapolationArtifact, reviewEvidence, review) {
   if (!evidence || !decision) {
     const e = new Error('PDF boundary decision evidence not found');
@@ -2825,7 +3133,7 @@ app.post('/api/projects/:name/pdf-boundary-decision', authMiddleware, requireRol
   }
 });
 
-function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence = null, sam31Evidence = null, sam31ReplacementEvidence = null, sam31SmokeEvidence = null, sam31ExtrapolationEvidence = null, sam31ExtrapolationReviewEvidence = null) {
+function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence = null, sam31Evidence = null, sam31ReplacementEvidence = null, sam31SmokeEvidence = null, sam31ExtrapolationEvidence = null, sam31ExtrapolationReviewEvidence = null, sam31ConsumerSmokeEvidence = null) {
   if (!evidence || !decision) return null;
   const candidate = decision.candidate || {};
   const pdfRef = evidence.source_file || decision.sourceFile || evidence.source_ref || decision.sourceRef || `${projectName}:pdf-boundary:${evidence.id}`;
@@ -2833,6 +3141,7 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
   const extrapolateStatus = openClawSam31ExtrapolateStatus();
   const bridgeSmokeHref = `/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/smoke-artifact`;
   const extrapolateHref = `/api/projects/${encodeURIComponent(projectName)}/resolver-packets/pdf-boundary/${evidence.id}/openclaw/sam31/extrapolation-artifact`;
+  const consumerSmokeHref = `/api/projects/${encodeURIComponent(projectName)}/resolver-packets/pdf-boundary/${evidence.id}/openclaw/sam31/consumer-smoke`;
   const sam31BridgeSmokeAction = {
     label: 'Run OpenClaw SAM31 bridge smoke artifact',
     method: 'POST',
@@ -2875,6 +3184,33 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
     claim_gate_effect: 'no_claims_cleared',
     limitations: [
       'This action records OpenClaw SAM31+LLM extrapolation evidence only; it does not clear geometry or regulated claims.',
+    ],
+  };
+  const openclawSam31ConsumerSmokeAction = {
+    label: 'Run LandScout/NameForge SAM31 queue smoke',
+    method: 'POST',
+    href: consumerSmokeHref,
+    status: sam31ExtrapolationEvidence ? 'ready' : 'requires_sam31_extrapolation_artifact',
+    source_evidence_id: evidence.id,
+    source_evidence_type: 'pdf_boundary_decision',
+    source_openclaw_sam31_extrapolation_evidence_id: sam31ExtrapolationEvidence?.evidence?.id || null,
+    consumes: SAM31_PRODUCT_REVIEW_QUEUE_ITEM_TYPE,
+    produces: SAM31_CONSUMER_SMOKE_ARTIFACT_TYPE,
+    consumer_targets: [...SAM31_CONSUMER_QUEUE_TARGETS],
+    unavailable_evidence_rows: [
+      SAM31_CONSUMER_UNAVAILABLE_CODES.landscout,
+      SAM31_CONSUMER_UNAVAILABLE_CODES.nameforge,
+    ],
+    blocked_claims: uniqueStrings([
+      ...(Array.isArray(decision.blockedClaims) ? decision.blockedClaims : PDF_BOUNDARY_BLOCKED_CLAIMS),
+      'SAM31_runtime_verified',
+      'OpenClaw_runtime_verified',
+      'professional_approval',
+    ]),
+    claim_gate_effect: 'no_claims_cleared',
+    limitations: [
+      'This action records queue-handoff smoke evidence only; product-specific reviewers still have to accept or replace SAM31 values.',
+      'Unavailable consumer queues become missing-evidence rows instead of blocking HaloFire local review.',
     ],
   };
   const latestReview = reviewEvidence && reviewEvidence.review ? {
@@ -2935,6 +3271,7 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
   } : null;
   const latestOpenClawSam31ExtrapolationArtifact = openClawSam31ExtrapolationReplaySummary(sam31ExtrapolationEvidence);
   const latestOpenClawSam31ExtrapolationReview = openClawSam31ExtrapolationReviewSummary(sam31ExtrapolationReviewEvidence);
+  const latestOpenClawSam31ConsumerSmokeArtifact = openClawSam31ConsumerSmokeReplaySummary(sam31ConsumerSmokeEvidence);
   let status = 'ready';
   let nextAction = 'Open the selected PDF sheet with these defaults, run a room-boundary visual audit packet, and attach employee review evidence before any geometry-accuracy claim.';
   if (latestReview?.review_decision === 'corrected') {
@@ -2990,10 +3327,12 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
     latest_openclaw_sam31_bridge_smoke_artifact: latestSam31BridgeSmokeArtifact,
     latest_openclaw_sam31_extrapolation_artifact: latestOpenClawSam31ExtrapolationArtifact,
     latest_openclaw_sam31_extrapolation_review: latestOpenClawSam31ExtrapolationReview,
+    latest_openclaw_sam31_consumer_smoke_artifact: latestOpenClawSam31ConsumerSmokeArtifact,
     openclaw_sam31_bridge_status: bridgeStatus,
     sam31_bridge_smoke_action: sam31BridgeSmokeAction,
     openclaw_sam31_extrapolation_status: extrapolateStatus,
     openclaw_sam31_extrapolation_action: openclawSam31ExtrapolationAction,
+    openclaw_sam31_consumer_smoke_action: openclawSam31ConsumerSmokeAction,
     limitations: [
       decision.limitation || 'Saved boundary choice is best-effort evidence only.',
       'This queue item does not prove geometry accuracy, AHJ approval, PE review, AutoSprink parity, permit readiness, fabrication readiness, or manufacturer-exact models.',
@@ -3002,6 +3341,7 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
       { label: 'Load defaults in Studio', href: `/autosprink.html?project=${encodeURIComponent(projectName)}&resolver=${encodeURIComponent(`pdf-boundary:${evidence.id}`)}` },
       { label: 'Download SAM 3.1 visual audit packet', href: `/api/projects/${encodeURIComponent(projectName)}/resolver-packets/pdf-boundary/${evidence.id}/sam31-visual-audit` },
       { label: 'Run OpenClaw SAM31 extrapolation artifact', href: extrapolateHref, method: 'POST' },
+      { label: 'Run LandScout/NameForge SAM31 queue smoke', href: consumerSmokeHref, method: 'POST', artifact_type: SAM31_CONSUMER_SMOKE_ARTIFACT_TYPE },
       ...(latestOpenClawSam31ExtrapolationReview ? [{
         label: 'Download SAM31 product review packet',
         href: `/api/projects/${encodeURIComponent(projectName)}/resolver-packets/pdf-boundary/${evidence.id}/openclaw/sam31/extrapolation-review-packet`,
@@ -4967,6 +5307,7 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
   const sam31SmokeEvidence = evidence ? latestSam31BridgeSmokeArtifactEvidence(projectName, evidence.id) : null;
   const sam31ExtrapolationEvidence = evidence ? latestOpenClawSam31ExtrapolationArtifactEvidence(projectName, evidence.id) : null;
   const sam31ExtrapolationReviewEvidence = evidence ? latestOpenClawSam31ExtrapolationReviewEvidence(projectName, evidence.id) : null;
+  const sam31ConsumerSmokeEvidence = evidence ? latestOpenClawSam31ConsumerSmokeArtifactEvidence(projectName, evidence.id) : null;
   const items = [];
   const officialFlowEvidence = latestOfficialFlowIntakeEvidence(projectName);
   const officialFlowItem = officialFlowResolverQueueItem(projectName, officialFlowEvidence);
@@ -4975,7 +5316,7 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
     const replayItem = officialFlowReplayReviewQueueItem(projectName, replayEvidence);
     if (replayItem) items.push(replayItem);
   }
-  const boundaryItem = pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence, sam31Evidence, sam31ReplacementEvidence, sam31SmokeEvidence, sam31ExtrapolationEvidence, sam31ExtrapolationReviewEvidence);
+  const boundaryItem = pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence, sam31Evidence, sam31ReplacementEvidence, sam31SmokeEvidence, sam31ExtrapolationEvidence, sam31ExtrapolationReviewEvidence, sam31ConsumerSmokeEvidence);
   if (boundaryItem) items.push(boundaryItem);
   const catalogEvidence = matchingCatalogEvidenceByFamily(projectName);
   for (const row of currentSourceAcquisitionLedger()) {
@@ -5005,6 +5346,7 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
       sam31_bridge_smoke_recorded: items.filter((item) => item.latest_openclaw_sam31_bridge_smoke_artifact).length,
       sam31_extrapolation_recorded: items.filter((item) => item.latest_openclaw_sam31_extrapolation_artifact).length,
       sam31_extrapolation_reviews_recorded: items.filter((item) => item.latest_openclaw_sam31_extrapolation_review).length,
+      sam31_consumer_smoke_recorded: items.filter((item) => item.latest_openclaw_sam31_consumer_smoke_artifact).length,
       catalog_source_needed: statusCounts.catalog_source_needed || 0,
       catalog_review_needed: statusCounts.catalog_review_needed || 0,
       catalog_evidence_recorded: statusCounts.catalog_evidence_recorded || 0,
@@ -5278,6 +5620,60 @@ app.get('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/openclaw/
       extrapolationEvidence,
       extrapolationEvidence?.artifact || null,
     ));
+  } catch (err) {
+    return res.status(err.httpStatus || 400).json({ error: err.message });
+  }
+});
+
+app.post('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/openclaw/sam31/consumer-smoke', authMiddleware, requireRole('admin'), async (req, res) => {
+  try {
+    const projectName = req.params.name;
+    const evidenceId = Number(req.params.evidenceId);
+    if (!Number.isSafeInteger(evidenceId) || evidenceId <= 0) {
+      return res.status(400).json({ error: 'A positive evidence id is required' });
+    }
+    const evidence = db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'pdf_boundary_decision'`)
+      .get(evidenceId, projectName);
+    const decision = decisionFromEvidence(evidence);
+    if (!evidence || !decision) {
+      return res.status(404).json({ error: 'PDF boundary decision evidence not found' });
+    }
+    const extrapolationEvidence = latestOpenClawSam31ExtrapolationArtifactEvidence(projectName, evidence.id);
+    const artifact = await buildOpenClawSam31ConsumerSmokeArtifact(
+      projectName,
+      evidence,
+      decision,
+      extrapolationEvidence,
+      extrapolationEvidence?.artifact || null,
+    );
+    const notes = {
+      kind: 'openclaw_sam31_consumer_smoke_artifact',
+      artifact,
+      missing_evidence_rows: artifact.missing_evidence_rows,
+      blocked_claims: artifact.blocked_claims,
+      claim_gate_effect: artifact.claim_gate_effect,
+      limitations: artifact.limitations,
+    };
+    const result = db
+      .prepare(`INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+                VALUES (?, ?, ?, ?, ?, ?)`)
+      .run(
+        projectName,
+        'openclaw_sam31_consumer_smoke_artifact',
+        artifact.canonical_tool_descriptor_source_file || 'OPENCLAW_PERCEPTION_URL',
+        artifact.canonical_tool_descriptor_url || artifact.source_ref || 'openclaw.sam31.consumer_smoke',
+        'best_effort',
+        JSON.stringify(notes),
+      );
+    const evidenceRow = db.prepare('SELECT * FROM project_evidence WHERE id = ?').get(result.lastInsertRowid);
+    return res.status(201).json({
+      id: result.lastInsertRowid,
+      message: 'OpenClaw SAM31 consumer queue smoke saved as best-effort evidence; claims still blocked',
+      evidence: evidenceRow,
+      ...artifact,
+    });
   } catch (err) {
     return res.status(err.httpStatus || 400).json({ error: err.message });
   }

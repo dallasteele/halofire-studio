@@ -231,6 +231,14 @@ describe('studio static origin handling', () => {
     expect(html).toContain('Download SAM31 queue item');
     expect(html).toContain('data-sam31-product-review-queue-item-evidence-id');
     expect(html).toContain('openclaw.sam31.product_review_queue_item.v1 - extrapolation_index');
+    expect(html).toContain('/openclaw/sam31/consumer-smoke');
+    expect(html).toContain('Run LandScout/NameForge SAM31 queue smoke');
+    expect(html).toContain('data-sam31-consumer-smoke-evidence-id');
+    expect(html).toContain('runOpenClawSam31ConsumerSmoke');
+    expect(html).toContain('latest_openclaw_sam31_consumer_smoke_artifact');
+    expect(html).toContain('openclaw.sam31.consumer_smoke_artifact.v1');
+    expect(html).toContain('OPENCLAW_SAM31_LANDSCOUT_QUEUE_UNAVAILABLE');
+    expect(html).toContain('OPENCLAW_SAM31_NAMEFORGE_QUEUE_UNAVAILABLE');
     expect(html).toContain('extrapolation_index_count');
     expect(html).toContain('SAM31 1881 bid truth');
     expect(html).toContain('head_count');

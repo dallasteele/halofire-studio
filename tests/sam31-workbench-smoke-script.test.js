@@ -48,6 +48,14 @@ describe('SAM31 workbench browser smoke script', () => {
     expect(script).toContain('HALOFIRE_1881_PROFESSIONAL_AHJ_APPROVAL_MISSING');
     expect(script).toContain('Download SAM31 queue item');
     expect(script).toContain('sam31-product-review-queue-item');
+    expect(script).toContain('OpenClaw SAM31 consumer queue smoke');
+    expect(script).toContain('Run LandScout/NameForge SAM31 queue smoke');
+    expect(script).toContain('data-sam31-consumer-smoke-evidence-id');
+    expect(script).toContain('sam31ConsumerSmokeStatus');
+    expect(script).toContain('openclaw_sam31_consumer_smoke_artifact');
+    expect(script).toContain('posted_consumer_count');
+    expect(script).toContain('blocked_consumer_count');
+    expect(script).toContain('openclaw.sam31.consumer_smoke_artifact.v1');
     expect(script).toContain('localBridgeExtrapolationEvidenceId');
     expect(script).toContain('/sam31-replacements');
     expect(script).toContain('Save employee replacements');

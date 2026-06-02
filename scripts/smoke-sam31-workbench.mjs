@@ -348,6 +348,16 @@ async function runBrowserSmoke(token, evidenceIds) {
     if (queueItem.use_for_claims !== false || queueItem.claim_gate_effect !== 'no_claims_cleared') {
       throw new Error(`SAM31 queue item cleared a claim gate: ${queueItem.claim_gate_effect}`);
     }
+    await page.waitForSelector('text=OpenClaw SAM31 consumer queue smoke', { timeout: 8_000 });
+    await page.waitForSelector('[data-sam31-consumer-smoke-evidence-id]', { timeout: 8_000 });
+    await page.waitForSelector('[id^="sam31ConsumerSmokeStatus-"]', { state: 'attached', timeout: 8_000 });
+    await page.getByRole('button', { name: 'Run LandScout/NameForge SAM31 queue smoke' }).first().click();
+    await page.waitForSelector('text=openclaw_sam31_consumer_smoke_artifact evidence', { timeout: 8_000 });
+    await page.waitForSelector('text=Latest consumer smoke', { timeout: 8_000 });
+    await page.waitForSelector('text=posted_consumer_count', { timeout: 8_000 });
+    await page.waitForSelector('text=blocked_consumer_count', { timeout: 8_000 });
+    await page.waitForSelector('text=openclaw.sam31.consumer_smoke_artifact.v1', { timeout: 8_000 });
+    await page.waitForSelector('text=no_claims_cleared', { timeout: 8_000 });
     await page.waitForSelector('[data-sam31-replacement-action-field="semantic_label"]', { timeout: 8_000 });
     await page.waitForSelector('[data-sam31-replacement-action-field="polygon"]', { timeout: 8_000 });
     await page.waitForSelector('[data-sam31-replacement-action-field="bbox"]', { timeout: 8_000 });

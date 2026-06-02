@@ -20,6 +20,7 @@ let perceptionBaseUrl;
 let apiServer;
 let tempDir;
 let token;
+const consumerQueuePosts = [];
 
 function request(pathname, options = {}) {
   return fetch(`${BASE}${pathname}`, {
@@ -223,6 +224,24 @@ beforeAll(async () => {
       blocked_claims: ['permit_ready', 'AHJ_approval', 'AutoSprink_parity'],
       claim_gate_effect: 'no_claims_cleared',
       limitations: ['Mock OpenClaw SAM31 artifact for deterministic HaloFire API test only.'],
+    });
+  });
+  perceptionApp.post('/landscout/sam31/product-review-queue', (req, res) => {
+    consumerQueuePosts.push({ consumer: 'landscout', body: req.body });
+    res.status(202).json({
+      artifact_type: 'openclaw.sam31.consumer_review_queue.landscout.v1',
+      status: 'queued_for_product_review',
+      accepted: true,
+      claim_gate_effect: 'no_claims_cleared',
+    });
+  });
+  perceptionApp.post('/nameforge/sam31/product-review-queue', (req, res) => {
+    consumerQueuePosts.push({ consumer: 'nameforge', body: req.body });
+    res.status(202).json({
+      artifact_type: 'openclaw.sam31.consumer_review_queue.nameforge.v1',
+      status: 'queued_for_product_review',
+      accepted: true,
+      claim_gate_effect: 'no_claims_cleared',
     });
   });
   await new Promise((resolve) => {
@@ -992,6 +1011,116 @@ describe('OpenClaw SAM31 bridge status API', () => {
       source_openclaw_sam31_extrapolation_evidence_id: artifact.id,
       source_openclaw_sam31_extrapolation_review_evidence_id: review.id,
     }));
+  });
+
+  it('posts the SAM31 product review queue item to canonical consumer queues and saves no-claims smoke evidence', async () => {
+    consumerQueuePosts.length = 0;
+    const boundaryRes = await request(`${COOPERATIVE_1881_PATH}/pdf-boundary-decision`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        pdfPageIndex: 9,
+        pdfScale: 0.08,
+        pdfExtract: 'sam31-consumer-smoke-outline',
+        source_file: 'Proposal-Cooperative-1881-Salt-Lake-City-UT-9-18-25.pdf',
+        source_ref: '1881 plan PDF sheet 9 / SAM31 consumer queue smoke',
+        candidate: {
+          mode: 'outline',
+          label: 'SAM31 consumer queue outline',
+          status: 'candidate',
+          bbox: { x: 10, y: 20, width: 500, height: 300 },
+          segmentCount: 11,
+        },
+      }),
+    });
+    expect(boundaryRes.status).toBe(201);
+    const boundary = await boundaryRes.json();
+
+    const artifactRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/extrapolation-artifact`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(artifactRes.status).toBe(201);
+    const extrapolation = await artifactRes.json();
+
+    const consumerRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/consumer-smoke`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(consumerRes.status).toBe(201);
+    const consumerSmoke = await consumerRes.json();
+    expect(consumerSmoke).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.consumer_smoke_artifact.v1',
+      status: 'consumer_smoke_recorded',
+      project_name: COOPERATIVE_1881_PROJECT_NAME,
+      source_pdf_boundary_evidence_id: boundary.id,
+      source_openclaw_sam31_extrapolation_evidence_id: extrapolation.id,
+      canonical_tool_descriptor_url: `${perceptionBaseUrl}/vision/sam31/tool`,
+      posted_consumer_count: 2,
+      blocked_consumer_count: 0,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(consumerSmoke.product_review_queue_item).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.product_review_queue_item.v1',
+      source_openclaw_sam31_extrapolation_evidence_id: extrapolation.id,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(consumerSmoke.consumer_results).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        consumer: 'landscout',
+        status: 'posted',
+        endpoint: `${perceptionBaseUrl}/landscout/sam31/product-review-queue`,
+        response_status: 202,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+      expect.objectContaining({
+        consumer: 'nameforge',
+        status: 'posted',
+        endpoint: `${perceptionBaseUrl}/nameforge/sam31/product-review-queue`,
+        response_status: 202,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    ]));
+    expect(consumerSmoke.missing_evidence_rows).toEqual([]);
+    expect(consumerSmoke.evidence).toEqual(expect.objectContaining({
+      evidence_type: 'openclaw_sam31_consumer_smoke_artifact',
+      source_file: 'OPENCLAW_PERCEPTION_URL',
+      source_ref: `${perceptionBaseUrl}/vision/sam31/tool`,
+      status: 'best_effort',
+    }));
+    expect(consumerQueuePosts.map((post) => post.consumer).sort()).toEqual(['landscout', 'nameforge']);
+    for (const post of consumerQueuePosts) {
+      expect(post.body.product_review_queue_item).toEqual(expect.objectContaining({
+        artifact_type: 'openclaw.sam31.product_review_queue_item.v1',
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }));
+      expect(post.body.source_application).toBe('halo_fire');
+      expect(post.body.claim_gate_effect).toBe('no_claims_cleared');
+    }
+
+    const queueRes = await request(`${COOPERATIVE_1881_PATH}/resolver-queue`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(queueRes.status).toBe(200);
+    const queue = await queueRes.json();
+    const item = queue.items.find((row) => row.evidence_id === boundary.id);
+    expect(item.openclaw_sam31_consumer_smoke_action).toEqual(expect.objectContaining({
+      label: 'Run LandScout/NameForge SAM31 queue smoke',
+      method: 'POST',
+      href: `${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/consumer-smoke`,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(item.latest_openclaw_sam31_consumer_smoke_artifact).toEqual(expect.objectContaining({
+      evidence_id: consumerSmoke.id,
+      status: 'consumer_smoke_recorded',
+      posted_consumer_count: 2,
+      blocked_consumer_count: 0,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(queue.summary.sam31_consumer_smoke_recorded).toBeGreaterThanOrEqual(1);
   });
 
   it('carries saved bridge smoke artifacts into SAM31 audit defaults and replay evidence without clearing claims', async () => {
