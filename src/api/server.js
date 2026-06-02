@@ -890,13 +890,21 @@ function latestSam31ActualValueReplacementEvidenceByReview(projectName) {
       evidence_type: row.evidence_type,
       evidence_status: row.status,
       source_ref: row.source_ref,
-      source_file: row.source_file,
+      source_file: replacement.source_file || row.source_file,
       artifact_type: replacement.artifact_type || 'halofire.sam31_actual_value_replacement_evidence_note.v1',
       source_pdf_boundary_evidence_id: replacement.source_pdf_boundary_evidence_id || null,
       source_openclaw_sam31_consumer_review_evidence_id: reviewEvidenceId,
       source_openclaw_sam31_consumer_smoke_evidence_id: replacement.source_openclaw_sam31_consumer_smoke_evidence_id || null,
       consumer: replacement.consumer || null,
       replacement_values_source_ref: replacement.replacement_values_source_ref || row.source_ref || null,
+      source_refs: uniqueStrings([
+        ...(Array.isArray(replacement.source_refs) ? replacement.source_refs : []),
+        ...(Array.isArray(replacement.actual_value_replacement_prefill?.source_refs) ? replacement.actual_value_replacement_prefill.source_refs : []),
+        replacement.source_ref,
+        replacement.replacement_values_source_ref,
+        row.source_ref,
+      ].filter(Boolean)),
+      actual_value_replacement_prefill: replacement.actual_value_replacement_prefill || null,
       acceptable_actual_evidence: Array.isArray(replacement.acceptable_actual_evidence) ? replacement.acceptable_actual_evidence : [],
       use_for_claims: false,
       claim_gate_effect: replacement.claim_gate_effect || 'no_claims_cleared',
@@ -1039,8 +1047,84 @@ function buildOpenClawSam31ActualValueResolverQueueReadback(projectName, options
   };
 }
 
+function buildOpenClawSam31ActualValueReplacementReadback(projectName, options = {}) {
+  const requestedConsumer = String(options.consumer || '').trim().toLowerCase();
+  const queue = buildOpenClawSam31ActualValueResolverQueue(projectName, { consumer: requestedConsumer });
+  const items = queue.items.map((item) => {
+    const recordedEvidence = item.latest_actual_value_replacement_evidence || null;
+    const prefill = item.actual_value_replacement_prefill || null;
+    const sourceRefs = uniqueStrings([
+      ...(Array.isArray(recordedEvidence?.source_refs) ? recordedEvidence.source_refs : []),
+      ...(Array.isArray(prefill?.source_refs) ? prefill.source_refs : []),
+      recordedEvidence?.source_ref,
+      recordedEvidence?.replacement_values_source_ref,
+      item.replacement_values_source_ref,
+      item.replacement_ref,
+    ].filter(Boolean));
+    return {
+      artifact_type: 'openclaw.sam31.actual_value_replacement_detail.v1',
+      status: recordedEvidence ? 'actual_value_evidence_recorded' : 'requires_employee_actual_value_update',
+      project_name: projectName,
+      consumer: item.consumer,
+      source_runtime: item.source_runtime || 'sam-3.1+llm',
+      source_application: item.source_application || 'halo_fire',
+      source_pdf_boundary_evidence_id: item.source_pdf_boundary_evidence_id,
+      source_openclaw_sam31_consumer_review_evidence_id: item.source_openclaw_sam31_consumer_review_evidence_id,
+      source_openclaw_sam31_consumer_smoke_evidence_id: item.source_openclaw_sam31_consumer_smoke_evidence_id,
+      accepted_queue_id: item.accepted_queue_id || null,
+      persisted_review_packet_ref: item.persisted_review_packet_ref || null,
+      source_file: recordedEvidence?.source_file || prefill?.source_file || null,
+      source_ref: recordedEvidence?.source_ref || prefill?.source_ref || item.replacement_values_source_ref || null,
+      replacement_values_source_ref: recordedEvidence?.replacement_values_source_ref || prefill?.replacement_values_source_ref || item.replacement_values_source_ref || null,
+      source_refs: sourceRefs,
+      replacement_summary: item.replacement_summary || {},
+      acceptable_actual_evidence: Array.isArray(item.acceptable_actual_evidence) ? item.acceptable_actual_evidence : [],
+      actual_value_replacement_prefill: prefill,
+      recorded_actual_value_replacement_evidence: recordedEvidence,
+      next_action: recordedEvidence
+        ? 'Review this recorded sam31_actual_value_replacement detail before downstream use; regulated claims remain blocked.'
+        : 'Record exact source refs from the 1881 workbook, reviewed vector overlay, reviewed 3D model candidate, screenshot, or console evidence.',
+      use_for_claims: false,
+      blocked_claims: Array.isArray(item.blocked_claims) ? item.blocked_claims : [],
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+      limitations: [
+        'This detail readback reports source refs for temporary SAM31+LLM replacement evidence only.',
+        'Recorded details never clear permit-ready, fabrication-ready, AHJ-ready, engineering-grade, AutoSprink parity, professional approval, manufacturer-exact, brand-ready, or production-ready claims.',
+      ],
+    };
+  });
+  return {
+    artifact_type: 'openclaw.sam31.actual_value_replacement_readback.v1',
+    status: queue.status,
+    project_name: projectName,
+    requested_consumer: requestedConsumer || null,
+    generated_at: queue.generated_at,
+    source_queue_route: `/api/openclaw/sam31/actual-value-resolver-queue?projectName=${encodeURIComponent(projectName)}${requestedConsumer ? `&consumer=${encodeURIComponent(requestedConsumer)}` : ''}`,
+    supported_consumers: queue.supported_consumers,
+    item_count: queue.item_count,
+    pending_count: queue.pending_count,
+    recorded_count: queue.recorded_count,
+    acceptable_actual_evidence: queue.acceptable_actual_evidence,
+    items,
+    use_for_claims: false,
+    claim_gate_effect: 'no_claims_cleared',
+    no_claim_gates_cleared: true,
+    limitations: [
+      'This is a shared OpenClaw readback for HaloFire, LandScout, and NameForge actual-value replacement details.',
+      'SAM31+LLM object labels, vector overlays, and 3D candidates remain temporary values until replaced by actual HaloFire employee/source evidence.',
+    ],
+  };
+}
+
 app.get('/api/projects/:name/openclaw/sam31/actual-value-resolver-queue', authMiddleware, (req, res) => {
   res.json(buildOpenClawSam31ActualValueResolverQueue(req.params.name, {
+    consumer: req.query?.consumer,
+  }));
+});
+
+app.get('/api/projects/:name/openclaw/sam31/actual-value-replacements', authMiddleware, (req, res) => {
+  res.json(buildOpenClawSam31ActualValueReplacementReadback(req.params.name, {
     consumer: req.query?.consumer,
   }));
 });
@@ -2396,6 +2480,18 @@ function localOpenClawSam31ToolDescriptor(projectName = null) {
         produces: 'openclaw.sam31.actual_value_resolver_queue_readback.v1',
         queue_artifact_type: 'openclaw.sam31.actual_value_resolver_queue.v1',
         consumer_action: 'poll_actual_value_resolver_queue',
+        supported_consumers: ['halo_fire', 'landscout', 'nameforge'],
+        temporary_value_policy: 'best_guess_until_employee_replaced',
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      },
+      actual_value_replacement_readback: {
+        method: 'GET',
+        href_template: '/api/openclaw/sam31/actual-value-replacements?projectName={projectName}&consumer={consumer}',
+        project_route_template: '/api/projects/{projectName}/openclaw/sam31/actual-value-replacements?consumer={consumer}',
+        produces: 'openclaw.sam31.actual_value_replacement_readback.v1',
+        detail_artifact_type: 'openclaw.sam31.actual_value_replacement_detail.v1',
+        consumer_action: 'poll_actual_value_replacement_details',
         supported_consumers: ['halo_fire', 'landscout', 'nameforge'],
         temporary_value_policy: 'best_guess_until_employee_replaced',
         use_for_claims: false,
@@ -10473,6 +10569,16 @@ app.get('/api/openclaw/sam31/actual-value-resolver-queue', authMiddleware, (req,
     return res.status(400).json({ error: 'projectName is required for OpenClaw SAM31 actual-value resolver queue readback' });
   }
   res.json(buildOpenClawSam31ActualValueResolverQueueReadback(projectName, {
+    consumer: req.query?.consumer,
+  }));
+});
+
+app.get('/api/openclaw/sam31/actual-value-replacements', authMiddleware, (req, res) => {
+  const projectName = String(req.query?.projectName || req.query?.project_name || '').trim();
+  if (!projectName) {
+    return res.status(400).json({ error: 'projectName is required for OpenClaw SAM31 actual-value replacement readback' });
+  }
+  res.json(buildOpenClawSam31ActualValueReplacementReadback(projectName, {
     consumer: req.query?.consumer,
   }));
 });
