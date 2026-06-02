@@ -316,6 +316,80 @@ describe('HaloFire settings + documentation upload/link API', () => {
     ]));
   });
 
+  it('prefills SAM31 actual-value replacement evidence from Cooperative 1881 source refs without clearing claims', async () => {
+    const token = await tokenFor('settings-admin', 'actual-test-password');
+    const projectName = 'The Cooperative 1881 - Salt Lake City UT';
+    const db = new Database(dbPath);
+    db.prepare(
+      `INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+    ).run(
+      projectName,
+      'openclaw_sam31_consumer_review',
+      'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx',
+      'landscout://sam31/reviews/cooperative-1881/replacement.json',
+      'present',
+      JSON.stringify({
+        kind: 'openclaw_sam31_consumer_review',
+        review: {
+          artifact_type: 'openclaw.sam31.consumer_review_task_decision.v1',
+          source_application: 'halo_fire',
+          source_pdf_boundary_evidence_id: 144,
+          source_openclaw_sam31_consumer_smoke_evidence_id: 143,
+          consumer: 'landscout',
+          review_decision: 'replaced',
+          accepted_queue_id: 'cooperative-1881-sam31-landscout',
+          persisted_review_packet_ref: 'openclaw://landscout/sam31/product-review/cooperative-1881-sam31-landscout',
+          replacement_ref: 'landscout://sam31/reviews/cooperative-1881/replacement.json',
+          replacement_values: {
+            semantic_labels: ['employee reviewed residential footprint'],
+            object_hypotheses: [{ id: 'obj:residential-footprint' }],
+            vector_overlays: [{ id: 'vector:residential-footprint' }],
+            model_3d_candidates: [{ id: 'model:residential-footprint' }],
+          },
+          blocked_claims: ['permit_ready', 'fabrication_ready'],
+          use_for_claims: false,
+          no_claim_gates_cleared: true,
+          claim_gate_effect: 'no_claims_cleared',
+        },
+      }),
+    );
+    db.close();
+
+    const res = await request(`/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/actual-value-work-items`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(res.status).toBe(200);
+    const index = await res.json();
+    expect(index.items[0].actual_value_replacement_prefill).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.sam31_actual_value_replacement_prefill.v1',
+      status: 'prefill_from_supplied_1881_source_refs',
+      source_file: 'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx',
+      source_ref: 'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G6',
+      replacement_values_source_ref: 'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G6',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(index.items[0].actual_value_replacement_prefill.source_refs).toEqual(expect.arrayContaining([
+      'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G6',
+      'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!B9',
+      'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G11',
+    ]));
+
+    const queueRes = await request(`/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/actual-value-resolver-queue`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(queueRes.status).toBe(200);
+    const queue = await queueRes.json();
+    expect(queue.items[0].actual_value_replacement_prefill).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.sam31_actual_value_replacement_prefill.v1',
+      source_file: 'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx',
+      source_ref: 'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G6',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+  });
+
   it('builds a shared SAM31 actual-value resolver queue with intake status for HaloFire, LandScout, and NameForge', async () => {
     const token = await tokenFor('settings-admin', 'actual-test-password');
     const projectName = 'Shared SAM31 Actual Queue Project';

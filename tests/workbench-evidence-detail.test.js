@@ -145,6 +145,16 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toContain('latest_actual_value_replacement_evidence');
     expect(html).toContain('actual_value_evidence_recorded');
     expect(html).toContain('actual-value evidence');
+    expect(html).toContain('actual_value_replacement_prefill');
+    expect(html).toContain('halofire.sam31_actual_value_replacement_prefill.v1');
+    expect(html).toContain('renderSam31ActualValueReplacementPrefill');
+    expect(html).toContain('data-sam31-actual-value-prefill-source-ref');
+    expect(html).toContain('data-sam31-actual-value-prefill-source-file');
+    expect(html).toContain('sam31ActualValueSourceRef-');
+    expect(html).toContain('sam31ActualValueSourceFile-');
+    expect(html).toContain('sam31ActualValueReplacementValuesSourceRef-');
+    expect(html).toContain('sam31ActualValueSourceRefs-');
+    expect(html).toContain('source_refs');
     expect(html).toContain('evidence_status');
     expect(html).toContain('source_ref');
     expect(html).toContain('no_claim_gates_cleared');
