@@ -178,6 +178,10 @@ describe('studio static origin handling', () => {
     expect(html).toContain('Download selected approval packet');
     expect(html).toContain('catalog_approval_packet_rows');
     expect(html).toContain('catalog_approval_packet_ready');
+    expect(html).toContain('catalogApproval=ready');
+    expect(html).toContain('evidenceType=ahj_approval');
+    expect(html).toContain('AHJ approval packets');
+    expect(html).toContain('catalogApprovalQuickFilter');
     expect(html).toContain('renderCatalogApprovalPacketRows');
     expect(html).toContain('Ready approval packets');
     expect(html).toContain('ready_for_signed_evidence_upload');

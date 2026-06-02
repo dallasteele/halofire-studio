@@ -144,6 +144,7 @@ function api(path, options = {}) {
 document.getElementById('logout').onclick = () => { localStorage.removeItem('halofire_token'); location.href = '/'; };
 
 const usd = (n) => '$' + Number(n).toLocaleString('en-US', { maximumFractionDigits: 0 });
+let resolverQueueFilterQuery = '';
 function currentProjectName() {
   return document.getElementById('projectTarget') ? document.getElementById('projectTarget').value : HOME_DEPOT;
 }
@@ -930,6 +931,20 @@ function renderCatalogApprovalPacketRows(rows) {
         Blocks: ${blocked.map((claim) => `<span class="chip">${escapeHtml(claim)}</span>`).join('')}
       </div>`;
     }).join('')}
+  </div>`;
+}
+
+function catalogApprovalQuickFilter(summary, activeQuery) {
+  const ahjQuery = 'catalogApproval=ready&evidenceType=ahj_approval';
+  const isAhjActive = activeQuery === ahjQuery;
+  return `<div class="muted" style="font-size:11px;margin-bottom:8px">
+    catalogApprovalQuickFilter:
+    <button class="go" type="button" style="padding:6px 9px;font-size:10px;background:${isAhjActive ? '#b45309' : '#374151'}" data-resolver-queue-filter="${escapeHtml(ahjQuery)}">AHJ approval packets</button>
+    ${activeQuery ? '<button class="go" type="button" style="padding:6px 9px;font-size:10px;background:#374151" data-resolver-queue-filter="">Show all resolver rows</button>' : ''}
+    <span class="chip">catalogApproval=ready</span>
+    <span class="chip">evidenceType=ahj_approval</span>
+    <span class="chip">AHJ approval packets ${escapeHtml(summary.catalog_approval_ahj_packets || 0)}</span>
+    <span class="chip">claims cleared ${escapeHtml(summary.catalog_approval_claims_cleared || 0)}</span>
   </div>`;
 }
 
@@ -1746,7 +1761,8 @@ async function saveOfficialFlowIntake() {
 }
 
 async function refreshResolverQueue() {
-  const queue = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/resolver-queue');
+  const activeQuery = resolverQueueFilterQuery || '';
+  const queue = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/resolver-queue' + (activeQuery ? '?' + activeQuery : ''));
   const summary = queue.summary || {};
   const summaryHtml = `<div class="muted" style="font-size:11px;margin-bottom:8px">
     Resolver summary:
@@ -1754,11 +1770,17 @@ async function refreshResolverQueue() {
     <span class="chip">ready_for_signed_evidence_upload</span>
     <span class="chip">catalog_approval_claims_cleared ${escapeHtml(summary.catalog_approval_claims_cleared || 0)}</span>
     <span class="chip">no claim gates cleared</span>
-  </div>`;
+  </div>${catalogApprovalQuickFilter(summary, activeQuery)}`;
   document.getElementById('resolverQueue').innerHTML = queue.items && queue.items.length
     ? summaryHtml + queue.items.map(resolverQueueDetail).join('')
     : '<span class="muted">No resolver queue rows yet. Save a PDF boundary decision for room_boundary_visual_audit, record official_flow_intake, or run catalog acquisition for catalog_vendor_acquisition.</span>';
   bindCatalogSourceEvidenceButtons();
+  document.querySelectorAll('[data-resolver-queue-filter]').forEach((button) => {
+    button.onclick = async () => {
+      resolverQueueFilterQuery = button.dataset.resolverQueueFilter || '';
+      await refreshResolverQueue();
+    };
+  });
   document.querySelectorAll('[data-resolver-packet-evidence-id]').forEach((button) => {
     button.onclick = () => downloadResolverPacket(button.dataset.resolverPacketEvidenceId);
   });

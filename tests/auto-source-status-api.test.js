@@ -199,6 +199,44 @@ describe('S5 GET /api/auto-source/status', () => {
     }
   });
 
+  it('filters resolver queue to AHJ approval upload packets while keeping AHJ and permit claims blocked', async () => {
+    removeStatusFile();
+    const projectName = 'Home Depot - Rexburg ID';
+    const res = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-queue?catalogApproval=ready&evidenceType=ahj_approval`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    const catalogItems = body.items.filter((item) => item.kind === 'catalog_vendor_acquisition');
+
+    expect(body.filters.catalogApproval).toBe('ready');
+    expect(body.filters.evidenceType).toBe('ahj_approval');
+    expect(catalogItems).toHaveLength(3);
+    expect(body.summary.catalog_approval_packet_ready).toBe(3);
+    expect(body.summary.catalog_approval_ahj_packets).toBe(3);
+    expect(body.summary.catalog_approval_professional_packets).toBe(0);
+    expect(body.summary.catalog_approval_autosprink_packets).toBe(0);
+    expect(body.summary.catalog_approval_claims_cleared).toBe(0);
+
+    for (const item of catalogItems) {
+      expect(item.catalog_approval_packet_rows).toHaveLength(1);
+      const [row] = item.catalog_approval_packet_rows;
+      expect(row).toEqual(expect.objectContaining({
+        artifact_type: 'halofire.catalog_approval_resolver_packet.v1',
+        status: 'ready_for_signed_evidence_upload',
+        approval_ref_field: 'professional_or_ahj_review_ref',
+        target_gate_code: 'AHJ_APPROVAL_MISSING',
+        required_evidence_type: 'ahj_approval',
+        claim_gate_effect: 'no_claims_cleared',
+        use_for_claims: false,
+        no_claim_gates_cleared: true,
+        next_action: expect.stringMatching(/signed AHJ/i),
+      }));
+      expect(row.blocked_claims).toEqual(expect.arrayContaining(['permit_ready', 'AHJ_ready', 'AHJ_approval']));
+      expect(row.limitations.join(' ')).toMatch(/does not clear/i);
+    }
+  });
+
   it('downloads catalog source evidence packets and keeps manufacturer claims blocked after evidence is recorded', async () => {
     removeStatusFile();
     const projectName = 'Home Depot - Rexburg ID';

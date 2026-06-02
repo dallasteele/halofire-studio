@@ -327,6 +327,12 @@ async function runBrowserSmoke(token, evidenceIds) {
     await page.waitForSelector('text=Ready approval packets', { timeout: 8_000 });
     await page.waitForSelector('text=ready_for_signed_evidence_upload', { timeout: 8_000 });
     await page.waitForSelector('text=no claim gates cleared', { timeout: 8_000 });
+    await page.waitForSelector('text=AHJ approval packets', { timeout: 8_000 });
+    await page.locator('[data-resolver-queue-filter="catalogApproval=ready&evidenceType=ahj_approval"]').first().click();
+    await page.waitForSelector('text=catalog_approval_packet_ready 3', { timeout: 8_000 });
+    await page.waitForSelector('text=AHJ approval packets 3', { timeout: 8_000 });
+    await page.locator('[data-resolver-queue-filter=""]').first().click();
+    await page.waitForSelector('text=catalog_approval_packet_ready 12', { timeout: 8_000 });
     const catalogEvidenceQueue = await request(`${PROJECT_PATH}/resolver-queue`, token);
     if (catalogEvidenceQueue.summary?.catalog_approval_packet_ready !== 12
       || catalogEvidenceQueue.summary?.catalog_approval_professional_packets !== 3
@@ -334,6 +340,20 @@ async function runBrowserSmoke(token, evidenceIds) {
       || catalogEvidenceQueue.summary?.catalog_approval_autosprink_packets !== 3
       || catalogEvidenceQueue.summary?.catalog_approval_claims_cleared !== 0) {
       throw new Error(`Catalog approval packet readiness summary is not fail-closed: ${JSON.stringify(catalogEvidenceQueue.summary)}`);
+    }
+    const ahjCatalogApprovalQueue = await request(`${PROJECT_PATH}/resolver-queue?catalogApproval=ready&evidenceType=ahj_approval`, token);
+    if (ahjCatalogApprovalQueue.filters?.catalogApproval !== 'ready'
+      || ahjCatalogApprovalQueue.filters?.evidenceType !== 'ahj_approval'
+      || ahjCatalogApprovalQueue.summary?.catalog_approval_packet_ready !== 3
+      || ahjCatalogApprovalQueue.summary?.catalog_approval_ahj_packets !== 3
+      || ahjCatalogApprovalQueue.summary?.catalog_approval_professional_packets !== 0
+      || ahjCatalogApprovalQueue.summary?.catalog_approval_autosprink_packets !== 0
+      || ahjCatalogApprovalQueue.summary?.catalog_approval_claims_cleared !== 0
+      || ahjCatalogApprovalQueue.items.some((item) => !Array.isArray(item.catalog_approval_packet_rows)
+        || item.catalog_approval_packet_rows.length !== 1
+        || item.catalog_approval_packet_rows[0].target_gate_code !== 'AHJ_APPROVAL_MISSING'
+        || item.catalog_approval_packet_rows[0].claim_gate_effect !== 'no_claims_cleared')) {
+      throw new Error(`AHJ catalog approval packet filter is not fail-closed: ${JSON.stringify(ahjCatalogApprovalQueue)}`);
     }
     const pipeCatalogItem = catalogEvidenceQueue.items.find((item) => item.kind === 'catalog_vendor_acquisition'
       && item.input_defaults?.family_ref === 'family:pipe_steel_sch40_2p0in');

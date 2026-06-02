@@ -8015,6 +8015,9 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
     sam31SprinklerReplay: String(req.query?.sam31SprinklerReplay || '').trim().toLowerCase() || null,
     consumer: String(req.query?.consumer || '').trim().toLowerCase() || null,
     lane: String(req.query?.lane || '').trim().toLowerCase() || null,
+    catalogApproval: String(req.query?.catalogApproval || req.query?.catalog_approval || '').trim().toLowerCase() || null,
+    evidenceType: String(req.query?.evidenceType || req.query?.evidence_type || '').trim().toLowerCase() || null,
+    targetGate: String(req.query?.targetGate || req.query?.target_gate || '').trim().toUpperCase() || null,
   };
   const evidence = latestPdfBoundaryDecisionEvidence(projectName);
   const decision = decisionFromEvidence(evidence);
@@ -8082,6 +8085,19 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
             .filter((row) => !filters.lane || String(row.supported_sprinkler_review_lane || '').toLowerCase() === filters.lane)
           : [];
         return replayRows.length ? { ...item, sam31_sprinkler_preliminary_replay_queue_items: replayRows } : null;
+      })
+      .filter(Boolean);
+  }
+  if (filters.catalogApproval || filters.evidenceType || filters.targetGate) {
+    visibleItems = visibleItems
+      .map((item) => {
+        const approvalRows = Array.isArray(item.catalog_approval_packet_rows)
+          ? item.catalog_approval_packet_rows
+            .filter((row) => filters.catalogApproval !== 'ready' || row.status === 'ready_for_signed_evidence_upload')
+            .filter((row) => !filters.evidenceType || String(row.required_evidence_type || '').toLowerCase() === filters.evidenceType)
+            .filter((row) => !filters.targetGate || String(row.target_gate_code || '').toUpperCase() === filters.targetGate)
+          : [];
+        return approvalRows.length ? { ...item, catalog_approval_packet_rows: approvalRows } : null;
       })
       .filter(Boolean);
   }
