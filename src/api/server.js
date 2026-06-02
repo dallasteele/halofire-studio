@@ -3311,14 +3311,62 @@ function normalizePdfBoundaryDecision(projectName, body = {}) {
     ...(Array.isArray(candidate.blockedClaims) ? candidate.blockedClaims : []),
   ])];
   candidate.blockedClaims = blockedClaims;
+  const sourceFile = body.source_file || body.sourceFile || null;
+  const sourceRef = body.source_ref || body.sourceRef || `pdf-boundary:${projectName}:page-${pageIndex}:${extractMode}`;
+  const selectedSheetRef = String(body.selected_sheet_ref || body.selectedSheetRef || sourceRef || `pdf-boundary:${projectName}:sheet:${pageIndex}`).trim();
+  const selectedScaleRef = String(body.selected_scale_ref || body.selectedScaleRef || `operator-scale:${scale}`).trim();
+  const selectedBoundaryCandidateRef = String(
+    body.selected_boundary_candidate_ref
+      || body.selectedBoundaryCandidateRef
+      || candidate.id
+      || candidate.ref
+      || `pdf-boundary:${projectName}:page-${pageIndex}:${extractMode}:candidate`,
+  ).trim();
+  const sourceRefs = uniqueStrings([
+    ...(Array.isArray(body.source_refs) ? body.source_refs : []),
+    ...(Array.isArray(body.sourceRefs) ? body.sourceRefs : []),
+    sourceRef,
+    sourceFile,
+    selectedSheetRef,
+    selectedScaleRef,
+    selectedBoundaryCandidateRef,
+  ]);
+  const employeeDecision = {
+    artifact_type: 'halofire.pdf_boundary_employee_decision.v1',
+    status: 'employee_selected_internal_alpha',
+    project_name: projectName,
+    selected_sheet_ref: selectedSheetRef,
+    selected_scale_ref: selectedScaleRef,
+    selected_boundary_candidate_ref: selectedBoundaryCandidateRef,
+    source_document_ref: sourceFile || sourceRef,
+    source_ref: sourceRef,
+    source_refs: sourceRefs,
+    acceptable_evidence: [
+      '1881 source sheet reference',
+      'employee-selected operator scale reference',
+      'employee-selected boundary candidate reference',
+      'marked-up plan screenshot or review packet',
+    ],
+    ai_fallback: 'Use SAM 3.1+LLM/OpenClaw sectioning as best-effort correction evidence until HaloFire employees replace it with actual 1881 values.',
+    use_for_claims: false,
+    no_claim_gates_cleared: true,
+    claim_gate_effect: 'no_claims_cleared',
+    blocked_claims: blockedClaims,
+    limitations: [
+      'This employee decision preserves the selected sheet, scale, and boundary candidate for internal-alpha replay only.',
+      'It does not clear geometry accuracy, drawing scale, AHJ approval, PE review, AutoSprink parity, permit readiness, fabrication readiness, or manufacturer-exact claims.',
+    ],
+  };
   return {
     projectName,
     pageIndex,
     scale,
     extractMode,
     candidate,
-    sourceFile: body.source_file || body.sourceFile || null,
-    sourceRef: body.source_ref || body.sourceRef || `pdf-boundary:${projectName}:page-${pageIndex}:${extractMode}`,
+    sourceFile,
+    sourceRef,
+    sourceRefs,
+    employeeDecision,
     employeeNotes: body.notes || null,
     blockedClaims,
     limitation: 'Employee boundary selection is best-effort correction evidence only; regulated claims still blocked until real AHJ/PE/AutoSprink/manufacturer evidence is attached.',
@@ -7486,7 +7534,10 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
       pdfScale: decision.scale,
       pdfExtract: decision.extractMode,
       candidate,
+      employeeDecision: decision.employeeDecision || null,
+      source_refs: Array.isArray(decision.sourceRefs) ? decision.sourceRefs : [],
     },
+    employee_decision: decision.employeeDecision || null,
     blocked_claims: Array.isArray(decision.blockedClaims) ? decision.blockedClaims : [...PDF_BOUNDARY_BLOCKED_CLAIMS],
     latest_review: latestReview,
     latest_sam31_visual_audit: latestSam31VisualAudit,
@@ -8923,6 +8974,7 @@ function pdfBoundaryReviewPacket(projectName, evidence, decision) {
       wallSegmentCount: candidate.wallSegmentCount ?? null,
       networkSegmentCount: candidate.networkSegmentCount ?? null,
     },
+    employee_decision: decision.employeeDecision || null,
     source_refs: [
       {
         evidence_id: evidence.id,

@@ -210,6 +210,7 @@ describe('PDF page inspection API', () => {
 
   it('persists an employee-selected boundary decision as best-effort evidence for 1881 without clearing gates', async () => {
     const candidate = {
+      id: 'candidate:1881-sheet-7-outline',
       mode: 'outline',
       label: 'Wall-network outline',
       status: 'candidate',
@@ -238,6 +239,14 @@ describe('PDF page inspection API', () => {
         candidate,
         source_file: 'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx',
         source_ref: '1881 plan PDF sheet 7 / outline candidate',
+        selected_sheet_ref: '1881://proposal-cooperative/sheet-7',
+        selected_scale_ref: '1881://operator-scale/sheet-7/0.0833',
+        selected_boundary_candidate_ref: 'candidate:1881-sheet-7-outline',
+        source_refs: [
+          '1881://proposal-cooperative/sheet-7',
+          '1881://operator-scale/sheet-7/0.0833',
+          'candidate:1881-sheet-7-outline',
+        ],
         notes: 'Employee chose sheet 7 and outline extraction pending professional review.',
       }),
     });
@@ -251,12 +260,29 @@ describe('PDF page inspection API', () => {
     expect(body.decision.extractMode).toBe('outline');
     expect(body.decision.candidate.bbox.widthFt).toBe(120);
     expect(body.decision.blockedClaims).toEqual(expect.arrayContaining(['AutoSprink_parity', 'permit_ready']));
+    expect(body.decision.employeeDecision).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.pdf_boundary_employee_decision.v1',
+      status: 'employee_selected_internal_alpha',
+      selected_sheet_ref: '1881://proposal-cooperative/sheet-7',
+      selected_scale_ref: '1881://operator-scale/sheet-7/0.0833',
+      selected_boundary_candidate_ref: 'candidate:1881-sheet-7-outline',
+      source_document_ref: 'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx',
+      use_for_claims: false,
+      no_claim_gates_cleared: true,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(body.decision.employeeDecision.source_refs).toEqual(expect.arrayContaining([
+      '1881://proposal-cooperative/sheet-7',
+      '1881://operator-scale/sheet-7/0.0833',
+      'candidate:1881-sheet-7-outline',
+    ]));
 
     const latest = await (await request(`${COOPERATIVE_1881_PATH}/pdf-boundary-decision`, {
       headers: { Authorization: `Bearer ${token}` },
     })).json();
     expect(latest.decision.pageIndex).toBe(7);
     expect(latest.evidence.status).toBe('best_effort');
+    expect(latest.decision.employeeDecision.selected_boundary_candidate_ref).toBe('candidate:1881-sheet-7-outline');
 
     const evidence = await (await request(`${COOPERATIVE_1881_PATH}/evidence`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -265,6 +291,7 @@ describe('PDF page inspection API', () => {
     expect(row).toBeTruthy();
     expect(row.status).toBe('best_effort');
     expect(row.notes).toContain('claims still blocked');
+    expect(row.notes).toContain('halofire.pdf_boundary_employee_decision.v1');
 
     const queue = await (await request(`${COOPERATIVE_1881_PATH}/resolver-queue`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -277,6 +304,22 @@ describe('PDF page inspection API', () => {
     expect(item.input_defaults.pdfScale).toBe(0.0833);
     expect(item.input_defaults.pdfExtract).toBe('outline');
     expect(item.input_defaults.candidate.bbox.widthFt).toBe(120);
+    expect(item.input_defaults.employeeDecision).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.pdf_boundary_employee_decision.v1',
+      selected_sheet_ref: '1881://proposal-cooperative/sheet-7',
+      selected_scale_ref: '1881://operator-scale/sheet-7/0.0833',
+      selected_boundary_candidate_ref: 'candidate:1881-sheet-7-outline',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(item.input_defaults.source_refs).toEqual(expect.arrayContaining([
+      '1881://proposal-cooperative/sheet-7',
+      '1881://operator-scale/sheet-7/0.0833',
+      'candidate:1881-sheet-7-outline',
+    ]));
+    expect(item.employee_decision).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.pdf_boundary_employee_decision.v1',
+      selected_boundary_candidate_ref: 'candidate:1881-sheet-7-outline',
+    }));
     expect(item.blocked_claims).toEqual(expect.arrayContaining(['geometry_accuracy', 'AutoSprink_parity']));
     expect(item.next_action).toMatch(/room-boundary/i);
     expect(item.acceptable_evidence).toEqual(expect.arrayContaining(['employee room-boundary review packet']));
@@ -329,6 +372,12 @@ describe('PDF page inspection API', () => {
         source_ref: '1881 plan PDF sheet 7 / outline candidate',
       }),
     ]));
+    expect(packet.employee_decision).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.pdf_boundary_employee_decision.v1',
+      selected_sheet_ref: '1881://proposal-cooperative/sheet-7',
+      selected_boundary_candidate_ref: 'candidate:1881-sheet-7-outline',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
     expect(packet.review_steps.join(' ')).toMatch(/marked-up plan screenshot/i);
     expect(packet.employee_decision_fields).toEqual(expect.arrayContaining([
       'review_decision',
@@ -1057,6 +1106,28 @@ describe('PDF page inspection API', () => {
     }));
     expect(queueAfterReview.summary.correction_ready).toBe(1);
     expect(queueAfterReview.summary.ready).toBe(0);
+
+    const correctionQueueRes = await request(`${COOPERATIVE_1881_PATH}/resolver-queue?roomBoundarySource=employee_review&roomBoundaryState=correction_ready`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(correctionQueueRes.status).toBe(200);
+    const correctionQueue = await correctionQueueRes.json();
+    expect(correctionQueue.filters).toEqual(expect.objectContaining({
+      roomBoundarySource: 'employee_review',
+      roomBoundaryState: 'correction_ready',
+    }));
+    expect(correctionQueue.summary.correction_ready).toBe(1);
+    expect(correctionQueue.summary.ready).toBe(0);
+    expect(correctionQueue.items).toHaveLength(1);
+    expect(correctionQueue.items[0]).toEqual(expect.objectContaining({
+      kind: 'room_boundary_visual_audit',
+      status: 'correction_ready',
+      evidence_id: body.evidence.id,
+      latest_review: expect.objectContaining({
+        evidence_id: reviewBody.evidence.id,
+        review_decision: 'corrected',
+      }),
+    }));
 
     const replayRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${body.evidence.id}/replay-input`, {
       headers: { Authorization: `Bearer ${token}` },

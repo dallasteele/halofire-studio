@@ -450,6 +450,10 @@ describe('studio static origin handling', () => {
     expect(html).toContain('data-resolver-replay-bid-evidence-id');
     expect(html).toContain('marked_up_plan_ref');
     expect(html).toContain('latest_review');
+    expect(html).toContain('employee_decision');
+    expect(html).toContain('selected_sheet_ref');
+    expect(html).toContain('selected_scale_ref');
+    expect(html).toContain('selected_boundary_candidate_ref');
     expect(html).toContain('latest_sam31_visual_audit');
     expect(html).toContain('review_source');
     expect(html).toContain('source_sam31_evidence_id');

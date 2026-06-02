@@ -1633,6 +1633,7 @@ function renderSuppliedDocumentBidTruth(item, defaults, acceptable, claims, acti
 
 function resolverQueueDetail(item) {
   const defaults = item.input_defaults || {};
+  const employee_decision = item.employee_decision || defaults.employeeDecision || null;
   const claims = Array.isArray(item.blocked_claims) ? item.blocked_claims : [];
   const acceptable = Array.isArray(item.acceptable_evidence) ? item.acceptable_evidence : [];
   const latest_review = item.latest_review || null;
@@ -1748,6 +1749,7 @@ function resolverQueueDetail(item) {
       <div class="code">${escapeHtml(item.kind)} · ${escapeHtml(item.status).toUpperCase()}</div>
       <div class="na">${escapeHtml(item.next_action)}</div>
       <div class="claims">Defaults: page ${escapeHtml(defaults.pdfPageIndex)} · scale ${escapeHtml(defaults.pdfScale)} ft/pt · ${escapeHtml(defaults.pdfExtract)}</div>
+      ${employee_decision ? `<div class="claims">employee_decision <span class="chip">${escapeHtml(employee_decision.artifact_type || 'halofire.pdf_boundary_employee_decision.v1')}</span> <span class="chip">selected_sheet_ref ${escapeHtml(employee_decision.selected_sheet_ref || 'missing')}</span> <span class="chip">selected_scale_ref ${escapeHtml(employee_decision.selected_scale_ref || 'missing')}</span> <span class="chip">selected_boundary_candidate_ref ${escapeHtml(employee_decision.selected_boundary_candidate_ref || 'missing')}</span><br><span class="muted" style="font-size:10px">source_refs ${(Array.isArray(employee_decision.source_refs) ? employee_decision.source_refs : []).map((ref) => `<span class="chip">${escapeHtml(ref)}</span>`).join('') || '<span class="chip">source refs missing</span>'} - use_for_claims false - claim_gate_effect ${escapeHtml(employee_decision.claim_gate_effect || 'no_claims_cleared')}</span></div>` : ''}
       ${renderOpenClawSam31BridgeStatus(openclaw_sam31_bridge_status)}
       ${renderSam31BridgeSmokeAction(item, sam31_bridge_smoke_action, latest_openclaw_sam31_bridge_smoke_artifact)}
       ${renderOpenClawSam31ExtrapolationAction(item, openclaw_sam31_extrapolation_action, latest_openclaw_sam31_extrapolation_artifact, latest_openclaw_sam31_extrapolation_review)}
