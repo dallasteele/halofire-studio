@@ -137,6 +137,15 @@ describe('studio static origin handling', () => {
     expect(html).toContain('supplied_document_bid_truth_review_needed');
     expect(html).toContain('Supplied document bid truth');
     expect(html).toContain('best_guess_until_employee_replaced');
+    expect(html).toContain('/resolver-packets/supplied-document-bid-truth/review-packet');
+    expect(html).toContain('/resolver-packets/supplied-document-bid-truth/replacements');
+    expect(html).toContain('downloadSuppliedDocumentBidTruthReviewPacket');
+    expect(html).toContain('saveSuppliedDocumentBidTruthReplacement');
+    expect(html).toContain('data-supplied-document-bid-truth-packet');
+    expect(html).toContain('data-supplied-document-bid-truth-save');
+    expect(html).toContain('supplied_document_bid_truth_replacements_recorded');
+    expect(html).toContain('latest_supplied_document_bid_truth_replacement');
+    expect(html).toContain('replacement_values');
   });
 
   it('surfaces catalog source-acquisition ledger rows in the workbench with settings handoff actions', async () => {

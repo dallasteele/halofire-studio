@@ -742,6 +742,116 @@ describe('S5 GET /api/auto-source/status', () => {
     expect(body.summary.supplied_document_bid_truth_claims_cleared).toBe(0);
   });
 
+  it('downloads and records supplied document bid-truth employee replacements without clearing claims', async () => {
+    const projectName = 'The Cooperative 1881 - Salt Lake City UT';
+    const packetRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-packets/supplied-document-bid-truth/review-packet`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(packetRes.status).toBe(200);
+    const packet = await packetRes.json();
+    expect(packet).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.supplied_document_bid_truth_review_packet.v1',
+      status: 'ready_for_employee_review',
+      project_name: projectName,
+      source_evidence_type: 'supplied_document_bid_truth',
+      temporary_value_policy: 'best_guess_until_employee_replaced',
+      use_for_claims: false,
+      no_claim_gates_cleared: true,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(packet.download_name).toMatch(/supplied-bid-truth-employee-review-packet/);
+    expect(packet.employee_decision_fields).toEqual(expect.arrayContaining([
+      'reviewer_name',
+      'review_decision',
+      'replacement_ref',
+      'replacement_values',
+      'source_refs',
+      'notes',
+    ]));
+    expect(packet.project_truth).toEqual(expect.objectContaining({
+      source_file: 'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx',
+      square_feet: 170654,
+      total_man_hours: 3301.5,
+      flow_data_available: false,
+    }));
+    expect(packet.blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'AHJ_approval',
+      'AutoSprink_parity',
+      'engineering_grade',
+      'fabrication_ready',
+      'manufacturer_exact',
+    ]));
+
+    const saveRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-packets/supplied-document-bid-truth/replacements`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        reviewer_name: 'HaloFire estimator',
+        review_decision: 'replaced_temporary_values',
+        replacement_ref: '1881://employee-bid-truth/review-001',
+        source_file: 'employee-bid-truth-review.json',
+        source_refs: [
+          'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G6',
+          'employee://notes/1881-bid-truth',
+        ],
+        replacement_values: {
+          square_feet: 170654,
+          total_man_hours: 3301.5,
+          construction_days: 108,
+          flow_data_available: false,
+          notes: 'Flow remains missing; do not clear hydraulic claims.',
+        },
+        notes: 'Employee reviewed bid-truth defaults for internal alpha only.',
+      }),
+    });
+    expect(saveRes.status).toBe(201);
+    const saved = await saveRes.json();
+    expect(saved.evidence).toEqual(expect.objectContaining({
+      evidence_type: 'supplied_document_bid_truth_replacement',
+      status: 'best_effort',
+      source_ref: '1881://employee-bid-truth/review-001',
+    }));
+    expect(saved.replacement).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.supplied_document_bid_truth_replacement.v1',
+      review_decision: 'replaced_temporary_values',
+      replacement_ref: '1881://employee-bid-truth/review-001',
+      use_for_claims: false,
+      no_claim_gates_cleared: true,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(saved.replacement.replaced_fields).toEqual(expect.arrayContaining([
+      'square_feet',
+      'total_man_hours',
+      'construction_days',
+      'flow_data_available',
+    ]));
+    expect(saved.replacement.blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'AHJ_approval',
+      'AutoSprink_parity',
+    ]));
+
+    const queueRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-queue`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(queueRes.status).toBe(200);
+    const queue = await queueRes.json();
+    const item = queue.items.find((row) => row.kind === 'supplied_document_bid_truth');
+    expect(item).toEqual(expect.objectContaining({
+      status: 'employee_replacement_recorded',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(item.latest_supplied_document_bid_truth_replacement).toEqual(expect.objectContaining({
+      evidence_id: saved.evidence.id,
+      replacement_ref: '1881://employee-bid-truth/review-001',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(queue.summary.supplied_document_bid_truth_review_needed).toBe(0);
+    expect(queue.summary.supplied_document_bid_truth_replacements_recorded).toBe(1);
+    expect(queue.summary.supplied_document_bid_truth_claims_cleared).toBe(0);
+  });
+
   it('records official-flow intake evidence and updates the resolver queue without clearing claims', async () => {
     const projectName = 'The Cooperative 1881 - Salt Lake City UT';
     const createRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-packets/official-flow/intake`, {

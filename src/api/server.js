@@ -5896,16 +5896,146 @@ function currentSourceAcquisitionLedger() {
   return buildSourceAcquisitionLedger({}, new Date(0).toISOString());
 }
 
+function suppliedDocumentBidTruthReplacementFromEvidence(row) {
+  if (!row) return null;
+  const notes = safeParseJsonObject(row.notes) || {};
+  const replacement = notes.replacement || notes;
+  if (!replacement || typeof replacement !== 'object') return null;
+  return {
+    evidence_id: row.id,
+    evidence_status: row.status,
+    source_file: row.source_file || replacement.source_file || null,
+    source_ref: row.source_ref || replacement.replacement_ref || replacement.source_ref || null,
+    ...replacement,
+    claim_gate_effect: replacement.claim_gate_effect || notes.claim_gate_effect || 'no_claims_cleared',
+    blocked_claims: Array.isArray(replacement.blocked_claims)
+      ? replacement.blocked_claims
+      : (Array.isArray(notes.blocked_claims) ? notes.blocked_claims : []),
+  };
+}
+
+function latestSuppliedDocumentBidTruthReplacementEvidence(projectName) {
+  const row = db
+    .prepare(`SELECT * FROM project_evidence
+              WHERE project_name = ? AND evidence_type = 'supplied_document_bid_truth_replacement'
+              ORDER BY created_at DESC, id DESC
+              LIMIT 1`)
+    .get(projectName);
+  return row ? { evidence: row, replacement: suppliedDocumentBidTruthReplacementFromEvidence(row) } : null;
+}
+
+function suppliedDocumentBidTruthReviewPacket(projectName) {
+  const status = buildSuppliedDocumentBidTruthStatus(path.resolve(__dirname, '../..'), projectName);
+  const blockedClaims = Array.isArray(status.blocked_claims) ? status.blocked_claims : [];
+  return {
+    artifact_type: 'halofire.supplied_document_bid_truth_review_packet.v1',
+    status: 'ready_for_employee_review',
+    project_name: projectName,
+    generated_at: new Date().toISOString(),
+    download_name: `${slugForDownloadName(projectName)}-supplied-bid-truth-employee-review-packet.json`,
+    source_evidence_type: 'supplied_document_bid_truth',
+    source_status_artifact_type: status.artifact_type,
+    source_ref: status.project_truth?.source_file || 'supplied-halo-fire-documents',
+    project_truth: status.project_truth || null,
+    cross_project_truth: Array.isArray(status.cross_project_truth) ? status.cross_project_truth : [],
+    pricebook_sources: Array.isArray(status.pricebook_sources) ? status.pricebook_sources : [],
+    source_document_counts: status.source_document_counts || {},
+    acceptable_evidence: Array.isArray(status.acceptable_evidence) ? status.acceptable_evidence : [],
+    employee_next_actions: Array.isArray(status.employee_next_actions) ? status.employee_next_actions : [],
+    employee_decision_fields: [
+      'reviewer_name',
+      'review_decision',
+      'replacement_ref',
+      'replacement_values',
+      'source_refs',
+      'notes',
+    ],
+    employee_replaceable_fields: Array.isArray(status.project_truth?.employee_replaceable_fields)
+      ? status.project_truth.employee_replaceable_fields
+      : [],
+    temporary_value_policy: status.temporary_value_policy || 'best_guess_until_employee_replaced',
+    use_for_claims: false,
+    no_claim_gates_cleared: true,
+    claim_gate_effect: 'no_claims_cleared',
+    blocked_claims: blockedClaims,
+    limitations: Array.isArray(status.limitations) ? status.limitations : [],
+  };
+}
+
+function normalizeSuppliedDocumentBidTruthReplacement(projectName, body = {}, user = {}) {
+  const packet = suppliedDocumentBidTruthReviewPacket(projectName);
+  const reviewDecision = String(body.review_decision || body.reviewDecision || '').trim();
+  const allowedDecisions = ['accepted_supplied_defaults', 'replaced_temporary_values', 'needs_more_info'];
+  if (!allowedDecisions.includes(reviewDecision)) {
+    const e = new Error(`review_decision must be one of: ${allowedDecisions.join(', ')}`);
+    e.httpStatus = 400;
+    throw e;
+  }
+  const reviewerName = String(body.reviewer_name || body.reviewerName || user.username || '').trim();
+  if (!reviewerName) {
+    const e = new Error('reviewer_name is required');
+    e.httpStatus = 400;
+    throw e;
+  }
+  const replacementRef = String(body.replacement_ref || body.replacementRef || body.source_ref || '').trim();
+  if (!replacementRef) {
+    const e = new Error('replacement_ref is required');
+    e.httpStatus = 400;
+    throw e;
+  }
+  const replacementValues = body.replacement_values && typeof body.replacement_values === 'object' && !Array.isArray(body.replacement_values)
+    ? jsonClone(body.replacement_values)
+    : {};
+  if (!Object.keys(replacementValues).length) {
+    const e = new Error('replacement_values must be a non-empty object');
+    e.httpStatus = 400;
+    throw e;
+  }
+  const sourceRefs = Array.isArray(body.source_refs)
+    ? body.source_refs.map((ref) => String(ref || '').trim()).filter(Boolean)
+    : [];
+  const replacedFields = Object.keys(replacementValues).filter((field) => field !== 'notes');
+  return {
+    artifact_type: 'halofire.supplied_document_bid_truth_replacement.v1',
+    project_name: projectName,
+    source_evidence_type: 'supplied_document_bid_truth',
+    source_packet_ref: packet.download_name,
+    source_ref: replacementRef,
+    source_file: String(body.source_file || body.sourceFile || packet.project_truth?.source_file || 'supplied-document-bid-truth-review.json').trim(),
+    review_decision: reviewDecision,
+    reviewer_name: reviewerName,
+    reviewed_at: body.reviewed_at || body.reviewedAt || new Date().toISOString(),
+    replacement_ref: replacementRef,
+    replacement_values: replacementValues,
+    replaced_fields: replacedFields,
+    source_refs: sourceRefs,
+    notes: body.notes || null,
+    acceptable_evidence: packet.acceptable_evidence,
+    temporary_value_policy: packet.temporary_value_policy,
+    use_for_claims: false,
+    no_claim_gates_cleared: true,
+    claim_gate_effect: 'no_claims_cleared',
+    blocked_claims: packet.blocked_claims,
+    limitations: [
+      'Employee supplied-bid-truth replacements are internal-alpha value corrections only.',
+      'This evidence does not clear professional, AHJ, manufacturer, engineering-grade, AutoSprink parity, permit-ready, or fabrication-ready claims.',
+    ],
+  };
+}
+
 function suppliedDocumentBidTruthResolverQueueItem(projectName) {
   const status = buildSuppliedDocumentBidTruthStatus(path.resolve(__dirname, '../..'), projectName);
   const projectTruth = status.project_truth || null;
+  const latestReplacement = latestSuppliedDocumentBidTruthReplacementEvidence(projectName);
+  const replacementSummary = latestReplacement?.replacement || null;
+  const rowStatus = replacementSummary ? 'employee_replacement_recorded' : status.status;
   return {
     id: `resolver:supplied-document-bid-truth:${slugForDownloadName(projectName)}`,
     project_name: projectName,
     kind: 'supplied_document_bid_truth',
     title: 'Supplied document bid-truth defaults for SAM31/LLM review',
     artifact_type: status.artifact_type,
-    status: status.status,
+    status: rowStatus,
     source_evidence_type: 'supplied_document_bid_truth',
     source_ref: projectTruth?.source_file || 'supplied-halo-fire-documents',
     next_action:
@@ -5921,6 +6051,7 @@ function suppliedDocumentBidTruthResolverQueueItem(projectName) {
       source_document_counts: status.source_document_counts || {},
       employee_next_actions: Array.isArray(status.employee_next_actions) ? status.employee_next_actions : [],
     },
+    latest_supplied_document_bid_truth_replacement: replacementSummary,
     temporary_value_policy: status.temporary_value_policy || 'best_guess_until_employee_replaced',
     use_for_claims: false,
     no_claim_gates_cleared: true,
@@ -5929,6 +6060,7 @@ function suppliedDocumentBidTruthResolverQueueItem(projectName) {
     limitations: Array.isArray(status.limitations) ? status.limitations : [],
     actions: [
       { label: 'Review supplied bid-truth defaults', href: `/workbench.html?project=${encodeURIComponent(projectName)}#supplied-document-bid-truth` },
+      { label: 'Download supplied bid-truth review packet', href: `/api/projects/${encodeURIComponent(projectName)}/resolver-packets/supplied-document-bid-truth/review-packet`, artifact_type: 'halofire.supplied_document_bid_truth_review_packet.v1' },
       { label: 'Download SAM31 tool contract', href: `/api/projects/${encodeURIComponent(projectName)}/resolver-packets/openclaw/sam31/tool-contract`, artifact_type: 'openclaw.sam31_llm_extrapolation_tool_contract_packet.v1' },
       { label: 'Open source documents settings', href: '/settings.html#settingsCatalogSourceAcquisition' },
     ],
@@ -8668,6 +8800,7 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
       catalog_approval_autosprink_packets: visibleItems.reduce((acc, item) => acc + (Array.isArray(item.catalog_approval_packet_rows) ? item.catalog_approval_packet_rows.filter((row) => row.required_evidence_type === 'autosprink_packet').length : 0), 0),
       catalog_approval_claims_cleared: visibleItems.reduce((acc, item) => acc + (Array.isArray(item.catalog_approval_packet_rows) ? item.catalog_approval_packet_rows.filter((row) => row.claim_gate_effect !== 'no_claims_cleared').length : 0), 0),
       supplied_document_bid_truth_review_needed: visibleItems.filter((item) => item.kind === 'supplied_document_bid_truth' && item.status === 'employee_review_needed').length,
+      supplied_document_bid_truth_replacements_recorded: visibleItems.filter((item) => item.kind === 'supplied_document_bid_truth' && item.status === 'employee_replacement_recorded').length,
       supplied_document_bid_truth_claims_cleared: visibleItems.filter((item) => item.kind === 'supplied_document_bid_truth' && item.claim_gate_effect !== 'no_claims_cleared').length,
       official_flow_available: statusCounts.official_flow_available || 0,
       official_flow_needed: statusCounts.official_flow_needed || 0,
@@ -10019,6 +10152,48 @@ app.post('/api/projects/:name/resolver-packets/catalog-source/:familyRef/approva
   try {
     const result = validateCatalogSourceApproval(req.params.name, req.params.familyRef, req.body, req.user);
     return res.status(200).json(result);
+  } catch (err) {
+    return res.status(err.httpStatus || 400).json({ error: err.message });
+  }
+});
+
+app.get('/api/projects/:name/resolver-packets/supplied-document-bid-truth/review-packet', authMiddleware, (req, res) => {
+  try {
+    return res.json(suppliedDocumentBidTruthReviewPacket(req.params.name));
+  } catch (err) {
+    return res.status(err.httpStatus || 400).json({ error: err.message });
+  }
+});
+
+app.post('/api/projects/:name/resolver-packets/supplied-document-bid-truth/replacements', authMiddleware, requireRole('admin'), (req, res) => {
+  try {
+    const projectName = req.params.name;
+    const replacement = normalizeSuppliedDocumentBidTruthReplacement(projectName, req.body, req.user);
+    const notes = {
+      kind: 'supplied_document_bid_truth_replacement',
+      replacement,
+      blocked_claims: replacement.blocked_claims,
+      claim_gate_effect: replacement.claim_gate_effect,
+      limitations: replacement.limitations,
+    };
+    const result = db
+      .prepare(`INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+                VALUES (?, ?, ?, ?, ?, ?)`)
+      .run(
+        projectName,
+        'supplied_document_bid_truth_replacement',
+        replacement.source_file,
+        replacement.replacement_ref,
+        'best_effort',
+        JSON.stringify(notes),
+      );
+    const evidenceRow = db.prepare('SELECT * FROM project_evidence WHERE id = ?').get(result.lastInsertRowid);
+    return res.status(201).json({
+      id: result.lastInsertRowid,
+      message: 'Supplied document bid-truth replacement recorded as best-effort evidence; claims still blocked',
+      evidence: evidenceRow,
+      replacement,
+    });
   } catch (err) {
     return res.status(err.httpStatus || 400).json({ error: err.message });
   }

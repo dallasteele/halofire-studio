@@ -622,6 +622,16 @@ function evidenceDetail(row) {
       return '<div class="muted" style="font-size:11px;margin-top:3px">official-flow intake evidence; detail unavailable</div>';
     }
   }
+  if (row.evidence_type === 'supplied_document_bid_truth_replacement') {
+    try {
+      const packet = JSON.parse(row.notes || '{}');
+      const replacement = packet.replacement || {};
+      const blocked = Array.isArray(replacement.blocked_claims) ? replacement.blocked_claims : [];
+      return `<div class="muted" style="font-size:11px;margin-top:3px">supplied_document_bid_truth_replacement<br>${escapeHtml(replacement.review_decision || 'review')} by ${escapeHtml(replacement.reviewer_name || 'unknown')} - replacement_ref ${escapeHtml(replacement.replacement_ref || row.source_ref || 'missing')}<br>replaced_fields ${(Array.isArray(replacement.replaced_fields) ? replacement.replaced_fields : []).map((field) => `<span class="chip">${escapeHtml(field)}</span>`).join('')}<br>claim_gate_effect ${escapeHtml(replacement.claim_gate_effect || packet.claim_gate_effect || 'no_claims_cleared')} - source_file ${escapeHtml(replacement.source_file || row.source_file || 'missing')}<br>Blocks still active: ${blocked.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('')}</div>`;
+    } catch {
+      return '<div class="muted" style="font-size:11px;margin-top:3px">supplied document bid-truth replacement evidence; detail unavailable</div>';
+    }
+  }
   try {
     const packet = JSON.parse(row.notes || '{}');
     if (packet.kind === 'catalog_source_approval_validation') {
@@ -999,6 +1009,8 @@ function renderSuppliedDocumentBidTruth(item, defaults, acceptable, claims, acti
   const pricebookSources = Array.isArray(defaults.pricebook_sources) ? defaults.pricebook_sources : [];
   const employeeNextActions = Array.isArray(defaults.employee_next_actions) ? defaults.employee_next_actions : [];
   const sourceRefs = Array.isArray(truth.source_refs) ? truth.source_refs : [];
+  const latestReplacement = item.latest_supplied_document_bid_truth_replacement || null;
+  const replacementValues = latestReplacement && latestReplacement.replacement_values ? latestReplacement.replacement_values : {};
   return `
     <div class="gate warning" id="supplied-document-bid-truth">
       <div class="code">supplied_document_bid_truth - ${escapeHtml(item.status).toUpperCase()}</div>
@@ -1015,7 +1027,34 @@ function renderSuppliedDocumentBidTruth(item, defaults, acceptable, claims, acti
       <div class="claims">Accepts: ${acceptable.map((e) => `<span class="chip">${escapeHtml(e)}</span>`).join('')}</div>
       <div class="claims">AI fallback: ${escapeHtml(item.ai_fallback || '')}</div>
       <div class="claims">Blocks: ${claims.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('')}</div>
-      <p style="margin-top:8px">${actions.map((action) => `<a class="go" style="padding:7px 10px;font-size:11px;text-decoration:none;display:inline-block;margin-right:6px" href="${escapeHtml(action.href || '#')}">${escapeHtml(action.label || 'Open')}</a>`).join('')}</p>
+      ${latestReplacement ? `<div class="claims">latest_supplied_document_bid_truth_replacement: evidence #${escapeHtml(latestReplacement.evidence_id || 'missing')} - ${escapeHtml(latestReplacement.replacement_ref || latestReplacement.source_ref || 'missing')} - ${escapeHtml(latestReplacement.claim_gate_effect || 'no_claims_cleared')}<br>replacement_values ${escapeHtml(JSON.stringify(replacementValues))}</div>` : '<div class="claims">latest_supplied_document_bid_truth_replacement: none recorded</div>'}
+      <p style="margin-top:8px"><button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#0f766e" data-supplied-document-bid-truth-packet="1">Download supplied bid-truth review packet</button>${actions.filter((action) => !String(action.href || '').includes('/resolver-packets/supplied-document-bid-truth/')).map((action) => `<a class="go" style="padding:7px 10px;font-size:11px;text-decoration:none;display:inline-block;margin-left:6px" href="${escapeHtml(action.href || '#')}">${escapeHtml(action.label || 'Open')}</a>`).join('')}</p>
+      <details style="margin-top:8px">
+        <summary class="muted" style="cursor:pointer">Record employee bid-truth replacement</summary>
+        <div class="claims" style="margin-top:8px">
+          <label>reviewer_name <input id="suppliedBidTruthReviewer" value="HaloFire employee" style="width:100%;margin:3px 0 6px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:5px"></label>
+          <label>review_decision
+            <select id="suppliedBidTruthDecision" style="width:100%;margin:3px 0 6px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:5px">
+              <option value="replaced_temporary_values">replaced_temporary_values</option>
+              <option value="accepted_supplied_defaults">accepted_supplied_defaults</option>
+              <option value="needs_more_info">needs_more_info</option>
+            </select>
+          </label>
+          <label>replacement_ref <input id="suppliedBidTruthReplacementRef" placeholder="1881://employee-bid-truth/review-001" style="width:100%;margin:3px 0 6px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:5px"></label>
+          <label>source_file <input id="suppliedBidTruthSourceFile" value="${escapeHtml(truth.source_file || 'employee-bid-truth-review.json')}" style="width:100%;margin:3px 0 6px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:5px"></label>
+          <label>source_refs JSON array <textarea id="suppliedBidTruthSourceRefs" style="width:100%;height:54px;margin:3px 0 6px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:5px;font-family:var(--mono);font-size:11px">${escapeHtml(JSON.stringify(sourceRefs.slice(0, 3), null, 2))}</textarea></label>
+          <label>replacement_values JSON object <textarea id="suppliedBidTruthReplacementValues" style="width:100%;height:92px;margin:3px 0 6px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:5px;font-family:var(--mono);font-size:11px">${escapeHtml(JSON.stringify({
+            square_feet: truth.square_feet ?? null,
+            head_count: truth.head_count ?? null,
+            total_man_hours: truth.total_man_hours ?? null,
+            construction_days: truth.construction_days ?? null,
+            flow_data_available: truth.flow_data_available === true,
+          }, null, 2))}</textarea></label>
+          <label>notes <textarea id="suppliedBidTruthNotes" style="width:100%;height:48px;margin:3px 0 6px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:5px">Internal-alpha employee review only; no claim gates cleared.</textarea></label>
+          <button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#b45309" data-supplied-document-bid-truth-save="1">Save supplied bid-truth replacement</button>
+          <div class="muted" id="suppliedBidTruthStatus" style="font-size:11px;margin-top:5px"></div>
+        </div>
+      </details>
     </div>`;
 }
 
@@ -1367,6 +1406,40 @@ async function downloadOfficialFlowReplayReviewPacket(evidenceId) {
   a.download = packet.download_name || 'official-flow-professional-ahj-review-packet.json';
   a.click();
   URL.revokeObjectURL(a.href);
+}
+
+async function downloadSuppliedDocumentBidTruthReviewPacket() {
+  const packet = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/resolver-packets/supplied-document-bid-truth/review-packet');
+  const blob = new Blob([JSON.stringify(packet, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = packet.download_name || 'supplied-bid-truth-employee-review-packet.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+async function saveSuppliedDocumentBidTruthReplacement() {
+  const status = document.getElementById('suppliedBidTruthStatus');
+  try {
+    const body = {
+      reviewer_name: document.getElementById('suppliedBidTruthReviewer').value.trim(),
+      review_decision: document.getElementById('suppliedBidTruthDecision').value,
+      replacement_ref: document.getElementById('suppliedBidTruthReplacementRef').value.trim(),
+      source_file: document.getElementById('suppliedBidTruthSourceFile').value.trim(),
+      source_refs: jsonArrayFromField('suppliedBidTruthSourceRefs'),
+      replacement_values: jsonObjectFromField('suppliedBidTruthReplacementValues'),
+      notes: document.getElementById('suppliedBidTruthNotes').value.trim(),
+    };
+    const saved = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/resolver-packets/supplied-document-bid-truth/replacements', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    });
+    if (status) status.textContent = 'Saved supplied_document_bid_truth_replacement evidence #' + saved.id + '; claims still blocked.';
+    await refreshEvidence();
+    await refreshResolverQueue();
+  } catch (err) {
+    if (status) status.textContent = 'Error: ' + err.message;
+  }
 }
 
 async function downloadOpenClawSam31ToolContract() {
@@ -1885,6 +1958,7 @@ async function refreshResolverQueue() {
   const summaryHtml = `<div class="muted" style="font-size:11px;margin-bottom:8px">
     Resolver summary:
     <span class="chip">supplied_document_bid_truth_review_needed ${escapeHtml(summary.supplied_document_bid_truth_review_needed || 0)}</span>
+    <span class="chip">supplied_document_bid_truth_replacements_recorded ${escapeHtml(summary.supplied_document_bid_truth_replacements_recorded || 0)}</span>
     <span class="chip">sam31_vector_model_artifacts_recorded ${escapeHtml(summary.sam31_vector_model_artifacts_recorded || 0)}</span>
     <span class="chip">catalog_approval_packet_ready ${escapeHtml(summary.catalog_approval_packet_ready || 0)}</span>
     <span class="chip">ready_for_signed_evidence_upload</span>
@@ -1900,6 +1974,12 @@ async function refreshResolverQueue() {
       resolverQueueFilterQuery = button.dataset.resolverQueueFilter || '';
       await refreshResolverQueue();
     };
+  });
+  document.querySelectorAll('[data-supplied-document-bid-truth-packet]').forEach((button) => {
+    button.onclick = () => downloadSuppliedDocumentBidTruthReviewPacket();
+  });
+  document.querySelectorAll('[data-supplied-document-bid-truth-save]').forEach((button) => {
+    button.onclick = () => saveSuppliedDocumentBidTruthReplacement();
   });
   document.querySelectorAll('[data-resolver-packet-evidence-id]').forEach((button) => {
     button.onclick = () => downloadResolverPacket(button.dataset.resolverPacketEvidenceId);
