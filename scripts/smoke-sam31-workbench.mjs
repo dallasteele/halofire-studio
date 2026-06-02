@@ -486,6 +486,29 @@ async function runBrowserSmoke(token, evidenceIds) {
     }
     await page.waitForSelector('text=SAM31 sprinkler review queue', { timeout: 8_000 });
     await page.waitForSelector('text=sam31SprinklerReview=queued', { timeout: 8_000 });
+    await page.waitForSelector('text=Save SAM31 sprinkler review decision', { timeout: 8_000 });
+    const sprinklerReviewReviewerSelector = `#sam31SprinklerReviewReviewer-${evidenceIds.boundaryEvidenceId}-${consumerReview.evidence_id}-sam31_consumer_reviewed_object_hypotheses`;
+    await page.locator(sprinklerReviewReviewerSelector).evaluate((element) => {
+      const details = element.closest('details');
+      if (details) details.open = true;
+    });
+    await page.locator(sprinklerReviewReviewerSelector).fill('Smoke sprinkler reviewer');
+    await page.locator(`#sam31SprinklerReviewRef-${evidenceIds.boundaryEvidenceId}-${consumerReview.evidence_id}-sam31_consumer_reviewed_object_hypotheses`).fill('halofire://sam31/smoke/sprinkler-review/object-hypothesis.json');
+    await page.locator(`#sam31SprinklerReviewScreenshotRef-${evidenceIds.boundaryEvidenceId}-${consumerReview.evidence_id}-sam31_consumer_reviewed_object_hypotheses`).fill('halofire://sam31/smoke/sprinkler-review/object-hypothesis.png');
+    await page.locator(`#sam31SprinklerReviewValues-${evidenceIds.boundaryEvidenceId}-${consumerReview.evidence_id}-sam31_consumer_reviewed_object_hypotheses`).fill(JSON.stringify({
+      obstruction_candidates: [{ id: 'landscout-object-smoke', sprinkler_relevance: 'needs_employee_followup' }],
+      confidence: 0.76,
+    }));
+    await page.locator(`#sam31SprinklerReviewNotes-${evidenceIds.boundaryEvidenceId}-${consumerReview.evidence_id}-sam31_consumer_reviewed_object_hypotheses`).fill('Smoke sprinkler review decision for SAM31 object hypothesis.');
+    await page.locator(`button[data-sam31-sprinkler-review-save-issue-type="sam31_consumer_reviewed_object_hypotheses"]`).click();
+    await page.waitForSelector('text=halofire_sam31_sprinkler_review_decision evidence', { timeout: 8_000 });
+    await page.waitForSelector('text=employee_sprinkler_review_recorded', { timeout: 8_000 });
+    const reviewedObstructionQueue = await request(`${PROJECT_PATH}/resolver-queue?sam31SprinklerReview=queued&lane=obstruction_or_clash_review`, token);
+    const reviewedObstructionItem = reviewedObstructionQueue.items.find((item) => item.evidence_id === evidenceIds.boundaryEvidenceId);
+    const reviewedObstructionRows = reviewedObstructionItem?.sam31_sprinkler_review_queue_items || [];
+    if (!reviewedObstructionRows.some((item) => item.latest_sam31_sprinkler_review_decision?.review_decision === 'replaced')) {
+      throw new Error(`SAM31 sprinkler review decision did not persist to resolver queue: ${JSON.stringify(reviewedObstructionQueue)}`);
+    }
     await page.waitForSelector('text=Download SAM31 consumer review decision', { timeout: 8_000 });
     const consumerReviewDownloadPromise = page.waitForEvent('download');
     await page.locator(`button[data-sam31-consumer-review-packet-evidence-id="${consumerReview.evidence_id}"]`).click();

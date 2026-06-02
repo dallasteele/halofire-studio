@@ -276,6 +276,11 @@ describe('studio static origin handling', () => {
     expect(html).toContain('SAM31 sprinkler review queue');
     expect(html).toContain('supported_sprinkler_review_lane');
     expect(html).toContain('sam31SprinklerReview=queued');
+    expect(html).toContain('Save SAM31 sprinkler review decision');
+    expect(html).toContain('saveHalofireSam31SprinklerReviewDecision');
+    expect(html).toContain('/openclaw/sam31/sprinkler-review/');
+    expect(html).toContain('halofire.sam31_sprinkler_review_decision.v1');
+    expect(html).toContain('latest_sam31_sprinkler_review_decision');
     expect(html).toContain('supported_applications');
     expect(html).toContain('latest_openclaw_sam31_consumer_reviews');
     expect(html).toContain('consumer_queue_statuses');

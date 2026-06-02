@@ -1532,6 +1532,88 @@ describe('OpenClaw SAM31 bridge status API', () => {
     ]));
     expect(sprinklerLaneItem.sam31_sprinkler_review_queue_items.some((row) => row.supported_sprinkler_review_lane !== 'obstruction_or_clash_review')).toBe(false);
 
+    const sprinklerReviewRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/sprinkler-review/${consumerReview.id}`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        issue_type: 'sam31_consumer_reviewed_object_hypotheses',
+        supported_sprinkler_review_lane: 'obstruction_or_clash_review',
+        review_decision: 'replaced',
+        reviewer_name: 'HaloFire sprinkler reviewer',
+        review_ref: 'halofire://sam31/sprinkler-review/sam31-landscout-testqueue/object-hypothesis.json',
+        screenshot_ref: 'halofire://sam31/sprinkler-review/sam31-landscout-testqueue/object-hypothesis.png',
+        reviewed_values: {
+          obstruction_candidates: [{ id: 'obj:parcel-edge', sprinkler_relevance: 'not_a_sprinkler_obstruction' }],
+          sleeve_or_firestop_candidates: [],
+          notes: 'LandScout parcel edge hypothesis is not a sprinkler obstruction on the 1881 sheet.',
+          confidence: 0.74,
+        },
+        notes: 'Temporary employee sprinkler review decision; keep regulated claims blocked.',
+      }),
+    });
+    expect(sprinklerReviewRes.status).toBe(201);
+    const sprinklerReview = await sprinklerReviewRes.json();
+    expect(sprinklerReview).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.sam31_sprinkler_review_decision.v1',
+      status: 'present',
+      source_queue_item_artifact_type: 'halofire.sam31_sprinkler_review_queue_item.v1',
+      source_pdf_boundary_evidence_id: boundary.id,
+      source_openclaw_sam31_consumer_review_evidence_id: consumerReview.id,
+      consumer: 'landscout',
+      issue_type: 'sam31_consumer_reviewed_object_hypotheses',
+      supported_sprinkler_review_lane: 'obstruction_or_clash_review',
+      review_decision: 'replaced',
+      reviewer_name: 'HaloFire sprinkler reviewer',
+      review_ref: 'halofire://sam31/sprinkler-review/sam31-landscout-testqueue/object-hypothesis.json',
+      screenshot_ref: 'halofire://sam31/sprinkler-review/sam31-landscout-testqueue/object-hypothesis.png',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(sprinklerReview.reviewed_values).toEqual(expect.objectContaining({
+      obstruction_candidates: [expect.objectContaining({ sprinkler_relevance: 'not_a_sprinkler_obstruction' })],
+      confidence: 0.74,
+    }));
+    expect(sprinklerReview.acceptable_evidence).toEqual(expect.arrayContaining([
+      'HaloFire employee sprinkler review note',
+      'marked-up 1881 sheet screenshot',
+      'source-linked sleeve/firestop/obstruction/clash decision',
+    ]));
+    expect(sprinklerReview.blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'AHJ_approval',
+      'AutoSprink_parity',
+      'fabrication_ready',
+      'professional_approval',
+      'manufacturer_exact',
+    ]));
+    expect(sprinklerReview.evidence).toEqual(expect.objectContaining({
+      evidence_type: 'halofire_sam31_sprinkler_review_decision',
+      status: 'present',
+      source_ref: 'halofire://sam31/sprinkler-review/sam31-landscout-testqueue/object-hypothesis.json',
+    }));
+
+    const reviewedSprinklerLaneRes = await request(`${COOPERATIVE_1881_PATH}/resolver-queue?sam31SprinklerReview=queued&lane=obstruction_or_clash_review`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(reviewedSprinklerLaneRes.status).toBe(200);
+    const reviewedSprinklerLane = await reviewedSprinklerLaneRes.json();
+    const reviewedSprinklerLaneItem = reviewedSprinklerLane.items.find((row) => row.evidence_id === boundary.id);
+    expect(reviewedSprinklerLaneItem.sam31_sprinkler_review_queue_items).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        issue_type: 'sam31_consumer_reviewed_object_hypotheses',
+        status: 'employee_sprinkler_review_recorded',
+        latest_sam31_sprinkler_review_decision: expect.objectContaining({
+          evidence_id: sprinklerReview.id,
+          review_decision: 'replaced',
+          claim_gate_effect: 'no_claims_cleared',
+        }),
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    ]));
+    expect(reviewedSprinklerLane.summary.sam31_sprinkler_review_decisions_recorded).toBeGreaterThanOrEqual(1);
+
     const nameForgeAdapterRes = await request(`${COOPERATIVE_1881_PATH}/openclaw/sam31/product-owner-replacements`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` },
