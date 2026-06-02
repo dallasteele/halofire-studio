@@ -157,6 +157,8 @@ describe('studio static origin handling', () => {
     expect(html).toContain('Download replay input');
     expect(html).toContain('Run replay bid');
     expect(html).toContain('room_boundary_replay_bid_artifact');
+    expect(html).toContain('Replay evidence:');
+    expect(html).toContain('best_effort_ai_layout_replay');
     expect(html).toContain('data-resolver-replay-bid-evidence-id');
     expect(html).toContain('marked_up_plan_ref');
     expect(html).toContain('latest_review');
