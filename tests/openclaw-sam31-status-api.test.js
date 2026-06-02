@@ -265,6 +265,8 @@ beforeAll(async () => {
       HALOFIRE_CORS_ORIGINS: 'http://allowed.test',
       OPENCLAW_BRIDGE_URL: bridgeBaseUrl,
       OPENCLAW_PERCEPTION_URL: perceptionBaseUrl,
+      OPENCLAW_SAM31_LANDSCOUT_QUEUE_URL: `${perceptionBaseUrl}/landscout/sam31/product-review-queue`,
+      OPENCLAW_SAM31_NAMEFORGE_QUEUE_URL: `${perceptionBaseUrl}/nameforge/sam31/product-review-queue`,
     },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
@@ -337,6 +339,24 @@ describe('OpenClaw SAM31 bridge status API', () => {
       href: '/landscout/sam31/product-review-queue',
       claim_gate_effect: 'no_claims_cleared',
     }));
+    expect(body.consumer_queue_statuses).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        consumer: 'landscout',
+        status: 'configured_unverified',
+        endpoint_configured: true,
+        endpoint: `${perceptionBaseUrl}/landscout/sam31/product-review-queue`,
+        endpoint_source_file: 'OPENCLAW_SAM31_LANDSCOUT_QUEUE_URL',
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+      expect.objectContaining({
+        consumer: 'nameforge',
+        status: 'configured_unverified',
+        endpoint_configured: true,
+        endpoint: `${perceptionBaseUrl}/nameforge/sam31/product-review-queue`,
+        endpoint_source_file: 'OPENCLAW_SAM31_NAMEFORGE_QUEUE_URL',
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    ]));
     expect(body.canonical_tool_descriptor.product_review_queue_contract).toEqual(expect.objectContaining({
       artifact_type: 'openclaw.sam31.product_review_queue_contract.v1',
       use_for_claims: false,
@@ -1072,6 +1092,7 @@ describe('OpenClaw SAM31 bridge status API', () => {
         consumer: 'landscout',
         status: 'posted',
         endpoint: `${perceptionBaseUrl}/landscout/sam31/product-review-queue`,
+        endpoint_source_file: 'OPENCLAW_SAM31_LANDSCOUT_QUEUE_URL',
         response_status: 202,
         claim_gate_effect: 'no_claims_cleared',
       }),
@@ -1079,6 +1100,7 @@ describe('OpenClaw SAM31 bridge status API', () => {
         consumer: 'nameforge',
         status: 'posted',
         endpoint: `${perceptionBaseUrl}/nameforge/sam31/product-review-queue`,
+        endpoint_source_file: 'OPENCLAW_SAM31_NAMEFORGE_QUEUE_URL',
         response_status: 202,
         claim_gate_effect: 'no_claims_cleared',
       }),

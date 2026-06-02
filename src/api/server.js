@@ -1318,6 +1318,10 @@ const SAM31_CONSUMER_UNAVAILABLE_CODES = Object.freeze({
   landscout: 'OPENCLAW_SAM31_LANDSCOUT_QUEUE_UNAVAILABLE',
   nameforge: 'OPENCLAW_SAM31_NAMEFORGE_QUEUE_UNAVAILABLE',
 });
+const SAM31_CONSUMER_QUEUE_URL_ENV = Object.freeze({
+  landscout: 'OPENCLAW_SAM31_LANDSCOUT_QUEUE_URL',
+  nameforge: 'OPENCLAW_SAM31_NAMEFORGE_QUEUE_URL',
+});
 
 const SAM31_APPLICATION_CONTRACTS = Object.freeze({
   halo_fire: {
@@ -1474,6 +1478,7 @@ function openClawSam31BridgeStatus(env = process.env) {
     canonical_tool_descriptor_reachable: false,
     canonical_tool_descriptor: null,
     canonical_tool_descriptor_error: toolEndpointConfig.endpoint ? null : 'No OpenClaw/HAL SAM31 tool descriptor endpoint configured',
+    consumer_queue_statuses: openClawSam31ConsumerQueueStatuses(null, toolEndpointConfig.endpoint, env),
     supported_applications: ['halo_fire', 'landscout', 'nameforge'],
     supported_evidence_lanes: [
       'room_boundary_visual_audit',
@@ -1523,6 +1528,11 @@ async function openClawSam31BridgeStatusWithProbe(env = process.env, fetchImpl =
     raw?.services?.sam31?.status != null ? String(raw.services.sam31.status) : null;
   const bridgeReachable = !!probed.reachable;
   const toolDescriptor = await fetchOpenClawSam31CanonicalToolDescriptor(env, fetchImpl);
+  const consumerQueueStatuses = openClawSam31ConsumerQueueStatuses(
+    toolDescriptor.descriptor,
+    toolDescriptor.endpoint,
+    env,
+  );
   return {
     ...base,
     status: bridgeReachable ? 'verified_reachable' : 'configured_unreachable',
@@ -1538,6 +1548,7 @@ async function openClawSam31BridgeStatusWithProbe(env = process.env, fetchImpl =
     canonical_tool_descriptor_reachable: toolDescriptor.reachable,
     canonical_tool_descriptor: toolDescriptor.descriptor,
     canonical_tool_descriptor_error: toolDescriptor.error,
+    consumer_queue_statuses: consumerQueueStatuses,
     next_action: bridgeReachable
       ? 'Bridge /status responded. Run a SAM31 pdfExtract:sam invocation smoke and attach screenshot/console evidence before relying on runtime output; regulated claims remain blocked.'
       : 'Configured OPENCLAW_BRIDGE_URL did not answer /status. Start or fix the governed OpenClaw SAM31 bridge, then re-run this status check; use saved employee replacements as local fallback only.',
@@ -2654,6 +2665,70 @@ function resolveOpenClawSam31ConsumerEndpoint(action, descriptorEndpoint) {
   }
 }
 
+function openClawSam31ConsumerQueueEndpointConfig(consumer, action = null, descriptorEndpoint = null, env = process.env) {
+  const envKey = SAM31_CONSUMER_QUEUE_URL_ENV[consumer] || null;
+  const envEndpoint = envKey ? String(env[envKey] || '').trim() : '';
+  if (envEndpoint) {
+    return {
+      consumer,
+      status: 'configured_unverified',
+      method: 'POST',
+      action_href: action?.href || null,
+      endpoint: envEndpoint,
+      endpoint_configured: true,
+      endpoint_source_file: envKey,
+      consumes: action?.consumes || SAM31_PRODUCT_REVIEW_QUEUE_ITEM_TYPE,
+      artifact_type: action?.artifact_type || `openclaw.sam31.consumer_review_queue.${consumer}.v1`,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      next_action: `Run the ${consumer} SAM31 consumer queue smoke and attach queue id or HTTP 2xx evidence; no claims clear from configuration alone.`,
+    };
+  }
+  const descriptorResolvedEndpoint = resolveOpenClawSam31ConsumerEndpoint(action, descriptorEndpoint);
+  if (action && descriptorResolvedEndpoint) {
+    return {
+      consumer,
+      status: 'descriptor_configured_unverified',
+      method: String(action.method || 'POST').toUpperCase(),
+      action_href: action.href || null,
+      endpoint: descriptorResolvedEndpoint,
+      endpoint_configured: true,
+      endpoint_source_file: `canonical_tool_descriptor.consumer_actions.${consumer}.href`,
+      consumes: action.consumes || SAM31_PRODUCT_REVIEW_QUEUE_ITEM_TYPE,
+      artifact_type: action.artifact_type || `openclaw.sam31.consumer_review_queue.${consumer}.v1`,
+      use_for_claims: false,
+      claim_gate_effect: action.claim_gate_effect || 'no_claims_cleared',
+      next_action: `Promote ${consumer} queue URL into ${envKey || 'a product-specific env var'} for live deployment, then rerun consumer queue smoke.`,
+    };
+  }
+  return {
+    consumer,
+    status: action ? 'consumer_endpoint_unresolved' : 'consumer_action_missing',
+    method: action?.method || 'POST',
+    action_href: action?.href || null,
+    endpoint: null,
+    endpoint_configured: false,
+    endpoint_source_file: envKey || null,
+    consumes: action?.consumes || SAM31_PRODUCT_REVIEW_QUEUE_ITEM_TYPE,
+    artifact_type: action?.artifact_type || `openclaw.sam31.consumer_review_queue.${consumer}.v1`,
+    use_for_claims: false,
+    claim_gate_effect: 'no_claims_cleared',
+    next_action: `Set ${envKey || `OPENCLAW_SAM31_${String(consumer).toUpperCase()}_QUEUE_URL`} to the live OpenClaw ${consumer} SAM31 product review queue endpoint or advertise it in the canonical tool descriptor.`,
+  };
+}
+
+function openClawSam31ConsumerQueueStatuses(descriptor = null, descriptorEndpoint = null, env = process.env) {
+  const actions = descriptor?.consumer_actions && typeof descriptor.consumer_actions === 'object'
+    ? descriptor.consumer_actions
+    : {};
+  return SAM31_CONSUMER_QUEUE_TARGETS.map((consumer) => openClawSam31ConsumerQueueEndpointConfig(
+    consumer,
+    actions[consumer],
+    descriptorEndpoint,
+    env,
+  ));
+}
+
 async function readJsonResponseBody(response) {
   const text = await response.text();
   if (!text) return null;
@@ -2670,32 +2745,38 @@ async function postOpenClawSam31ConsumerQueue({
   descriptorEndpoint,
   payload,
   fetchImpl = globalThis.fetch,
+  env = process.env,
   timeoutMs = Number(process.env.HALOFIRE_SAM31_CONSUMER_SMOKE_TIMEOUT_MS || 5000),
 }) {
-  const endpoint = resolveOpenClawSam31ConsumerEndpoint(action, descriptorEndpoint);
-  if (!action || !endpoint) {
+  const config = openClawSam31ConsumerQueueEndpointConfig(consumer, action, descriptorEndpoint, env);
+  const endpoint = config.endpoint;
+  if (!endpoint) {
     const result = {
       consumer,
-      status: action ? 'consumer_endpoint_unresolved' : 'consumer_action_missing',
-      method: action?.method || 'POST',
-      action_href: action?.href || null,
+      status: config.status,
+      method: config.method || 'POST',
+      action_href: config.action_href || null,
       endpoint,
+      endpoint_source_file: config.endpoint_source_file || null,
       response_status: null,
       response_body: null,
-      error: action ? 'Consumer action href could not be resolved' : 'Canonical descriptor did not advertise this consumer action',
+      error: config.status === 'consumer_endpoint_unresolved'
+        ? 'Consumer action href could not be resolved'
+        : 'Canonical descriptor did not advertise this consumer action and no env URL is configured',
       use_for_claims: false,
       claim_gate_effect: 'no_claims_cleared',
     };
     return { ...result, missing_evidence_row: openClawSam31ConsumerBlockedRow(consumer, result) };
   }
-  const method = String(action.method || 'POST').toUpperCase();
+  const method = String(config.method || 'POST').toUpperCase();
   if (method !== 'POST') {
     const result = {
       consumer,
       status: 'unsupported_method',
       method,
-      action_href: action.href || null,
+      action_href: config.action_href || null,
       endpoint,
+      endpoint_source_file: config.endpoint_source_file || null,
       response_status: null,
       response_body: null,
       error: `Unsupported consumer queue method ${method}`,
@@ -2718,8 +2799,9 @@ async function postOpenClawSam31ConsumerQueue({
       consumer,
       status: response.ok ? 'posted' : 'configured_unreachable',
       method,
-      action_href: action.href || null,
+      action_href: config.action_href || null,
       endpoint,
+      endpoint_source_file: config.endpoint_source_file || null,
       response_status: response.status,
       response_body: responseBody,
       error: response.ok ? null : `HTTP ${response.status}`,
@@ -2734,8 +2816,9 @@ async function postOpenClawSam31ConsumerQueue({
       consumer,
       status: 'configured_unreachable',
       method,
-      action_href: action.href || null,
+      action_href: config.action_href || null,
       endpoint,
+      endpoint_source_file: config.endpoint_source_file || null,
       response_status: null,
       response_body: null,
       error: err && err.name === 'AbortError' ? 'timeout' : String(err?.message || err),
@@ -2760,6 +2843,11 @@ async function buildOpenClawSam31ConsumerSmokeArtifact(projectName, evidence, de
   const actions = descriptor.descriptor?.consumer_actions && typeof descriptor.descriptor.consumer_actions === 'object'
     ? descriptor.descriptor.consumer_actions
     : {};
+  const consumerQueueStatuses = openClawSam31ConsumerQueueStatuses(
+    descriptor.descriptor,
+    descriptor.endpoint,
+    process.env,
+  );
   const payload = {
     artifact_type: 'openclaw.sam31.consumer_queue_handoff.v1',
     source_application: 'halo_fire',
@@ -2817,6 +2905,7 @@ async function buildOpenClawSam31ConsumerSmokeArtifact(projectName, evidence, de
     canonical_tool_descriptor_status: descriptor.status,
     canonical_tool_descriptor_reachable: descriptor.reachable,
     canonical_tool_descriptor_error: descriptor.error,
+    consumer_queue_statuses: consumerQueueStatuses,
     product_review_queue_item: productReviewQueueItem,
     consumer_results: consumerResults.map((result) => {
       const copy = { ...result };
