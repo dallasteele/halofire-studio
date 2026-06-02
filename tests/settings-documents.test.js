@@ -224,4 +224,95 @@ describe('HaloFire settings + documentation upload/link API', () => {
     expect(deps).toHaveProperty('sam_gateway');
     expect(deps).toHaveProperty('autosprink_reference');
   });
+
+  it('indexes SAM31 actual-value work items for employee evidence follow-up without clearing claims', async () => {
+    const token = await tokenFor('settings-admin', 'actual-test-password');
+    const projectName = 'Settings Project';
+    const db = new Database(dbPath);
+    db.prepare(
+      `INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+    ).run(
+      projectName,
+      'openclaw_sam31_consumer_review',
+      '1881-sheet-7.png',
+      'landscout://sam31/reviews/settings-test/replacement.json',
+      'present',
+      JSON.stringify({
+        kind: 'openclaw_sam31_consumer_review',
+        review: {
+          artifact_type: 'openclaw.sam31.consumer_review_task_decision.v1',
+          source_application: 'halo_fire',
+          source_pdf_boundary_evidence_id: 44,
+          source_openclaw_sam31_consumer_smoke_evidence_id: 43,
+          consumer: 'landscout',
+          review_decision: 'replaced',
+          accepted_queue_id: 'settings-sam31-landscout',
+          persisted_review_packet_ref: 'openclaw://landscout/sam31/product-review/settings-sam31-landscout',
+          replacement_ref: 'landscout://sam31/reviews/settings-test/replacement.json',
+          replacement_values: {
+            semantic_labels: ['employee reviewed riser room'],
+            object_hypotheses: [{ id: 'obj:riser-room', semantic_label: 'reviewed riser room' }],
+            vector_overlays: [{ id: 'vector:riser-room', svg_path: 'M 0 0 L 12 0 L 12 8 Z' }],
+            model_3d_candidates: [{ id: 'model:riser-room', primitive: 'extruded_room_candidate' }],
+            source_ref: '1881://sheet-7/riser-room',
+            confidence: 0.81,
+          },
+          blocked_claims: ['permit_ready', 'fabrication_ready', 'AHJ_approval'],
+          use_for_claims: false,
+          no_claim_gates_cleared: true,
+          claim_gate_effect: 'no_claims_cleared',
+        },
+      }),
+    );
+    db.close();
+
+    const res = await request(`/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/actual-value-work-items`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(res.status).toBe(200);
+    const index = await res.json();
+    expect(index).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.sam31_actual_value_work_item_index.v1',
+      status: 'requires_employee_actual_value_update',
+      project_name: projectName,
+      item_count: 1,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(index.items[0]).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.actual_value_work_item_packet.v1',
+      status: 'requires_employee_actual_value_update',
+      consumer: 'landscout',
+      source_pdf_boundary_evidence_id: 44,
+      source_openclaw_sam31_consumer_review_evidence_id: expect.any(Number),
+      source_openclaw_sam31_consumer_smoke_evidence_id: 43,
+      replacement_values_source_ref: '1881://sheet-7/riser-room',
+      employee_actual_value_next_action: expect.stringContaining('Replace SAM31 best guesses with actual HaloFire documentation values'),
+      download_href: expect.stringContaining('/actual-value-work-item'),
+      evidence_record_type: 'sam31_actual_value_replacement',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(index.items[0].replacement_summary).toEqual(expect.objectContaining({
+      semantic_label_count: 1,
+      object_hypothesis_count: 1,
+      vector_overlay_count: 1,
+      model_3d_candidate_count: 1,
+    }));
+    expect(index.items[0].acceptable_actual_evidence).toEqual(expect.arrayContaining([
+      '1881 proposal workbook row or sheet reference',
+      'reviewed vector overlay SVG or marked-up plan ref',
+      'reviewed 3D model candidate ref or model note',
+    ]));
+    expect(index.items[0].blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'fabrication_ready',
+      'AHJ_approval',
+      'professional_approval',
+      'manufacturer_exact',
+      'AutoSprink_parity',
+    ]));
+  });
 });

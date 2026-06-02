@@ -731,6 +731,82 @@ app.get('/api/projects/:name/evidence', authMiddleware, (req, res) => {
   res.json(evidence);
 });
 
+function buildOpenClawSam31ActualValueWorkItemIndex(projectName) {
+  const reviews = db
+    .prepare(`SELECT * FROM project_evidence
+              WHERE project_name = ? AND evidence_type = 'openclaw_sam31_consumer_review'
+              ORDER BY created_at DESC, id DESC`)
+    .all(projectName)
+    .map((evidence) => ({ evidence, review: openClawSam31ConsumerReviewFromEvidence(evidence) }))
+    .filter((item) => item.review);
+  const acceptableActualEvidence = [
+    '1881 proposal workbook row or sheet reference',
+    'reviewed vector overlay SVG or marked-up plan ref',
+    'reviewed 3D model candidate ref or model note',
+    'screenshot or console evidence for the reviewed SAM31 section',
+  ];
+  const items = reviews.map(({ evidence, review }) => {
+    const replacementValues = review.replacement_values && typeof review.replacement_values === 'object' && !Array.isArray(review.replacement_values)
+      ? review.replacement_values
+      : {};
+    const countArray = (key) => (Array.isArray(replacementValues[key]) ? replacementValues[key].length : 0);
+    const sourcePdfBoundaryEvidenceId = Number(review.source_pdf_boundary_evidence_id);
+    return {
+      artifact_type: 'openclaw.sam31.actual_value_work_item_packet.v1',
+      status: 'requires_employee_actual_value_update',
+      consumer: review.consumer || 'consumer',
+      source_application: review.source_application || 'halo_fire',
+      source_pdf_boundary_evidence_id: Number.isSafeInteger(sourcePdfBoundaryEvidenceId) ? sourcePdfBoundaryEvidenceId : null,
+      source_openclaw_sam31_consumer_review_evidence_id: evidence.id,
+      source_openclaw_sam31_consumer_smoke_evidence_id: review.source_openclaw_sam31_consumer_smoke_evidence_id || null,
+      accepted_queue_id: review.accepted_queue_id || null,
+      persisted_review_packet_ref: review.persisted_review_packet_ref || null,
+      replacement_ref: review.replacement_ref || evidence.source_ref || null,
+      replacement_values_source_ref: replacementValues.source_ref || review.replacement_ref || evidence.source_ref || null,
+      replacement_summary: {
+        semantic_label_count: countArray('semantic_labels'),
+        object_hypothesis_count: countArray('object_hypotheses'),
+        vector_overlay_count: countArray('vector_overlays'),
+        model_3d_candidate_count: countArray('model_3d_candidates'),
+      },
+      employee_actual_value_next_action: 'Replace SAM31 best guesses with actual HaloFire documentation values before using these observations in bid/export decisions.',
+      acceptable_actual_evidence: acceptableActualEvidence,
+      evidence_record_type: 'sam31_actual_value_replacement',
+      evidence_record_next_action: 'Record the workbook/sheet, marked-up vector overlay, reviewed 3D model candidate, or screenshot evidence that replaces this SAM31 best guess.',
+      download_href: Number.isSafeInteger(sourcePdfBoundaryEvidenceId) && sourcePdfBoundaryEvidenceId > 0
+        ? `/projects/${encodeURIComponent(projectName)}/resolver-packets/pdf-boundary/${sourcePdfBoundaryEvidenceId}/openclaw/sam31/consumer-review/${evidence.id}/actual-value-work-item`
+        : null,
+      use_for_claims: false,
+      blocked_claims: uniqueStrings([
+        ...(Array.isArray(review.blocked_claims) ? review.blocked_claims : []),
+        'permit_ready',
+        'fabrication_ready',
+        'AHJ_approval',
+        'professional_approval',
+        'manufacturer_exact',
+        'AutoSprink_parity',
+      ]),
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    };
+  });
+  return {
+    artifact_type: 'halofire.sam31_actual_value_work_item_index.v1',
+    status: items.length ? 'requires_employee_actual_value_update' : 'no_sam31_actual_value_work_items',
+    project_name: projectName,
+    item_count: items.length,
+    generated_at: new Date().toISOString(),
+    items,
+    use_for_claims: false,
+    claim_gate_effect: 'no_claims_cleared',
+    no_claim_gates_cleared: true,
+  };
+}
+
+app.get('/api/projects/:name/openclaw/sam31/actual-value-work-items', authMiddleware, (req, res) => {
+  res.json(buildOpenClawSam31ActualValueWorkItemIndex(req.params.name));
+});
+
 app.get('/api/projects/:name/evidence/:evidenceId/replay-bid-artifact', authMiddleware, (req, res) => {
   const row = db
     .prepare('SELECT * FROM project_evidence WHERE project_name = ? AND id = ?')

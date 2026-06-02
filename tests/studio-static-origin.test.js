@@ -536,6 +536,24 @@ describe('studio static origin handling', () => {
     expect(html).toContain('matching_evidence');
   });
 
+  it('surfaces SAM31 actual-value work items in Settings for employee evidence follow-up', async () => {
+    const shell = await fetch(`${BASE}/settings.html`, { headers: { Origin: BASE } });
+    expect(shell.status).toBe(200);
+    const html = await shell.text();
+    expect(html).toContain('SAM31 Actual-Value Work Items');
+    expect(html).toContain('settingsSam31ActualValueWorkItems');
+    expect(html).toContain('/openclaw/sam31/actual-value-work-items');
+    expect(html).toContain('loadSettingsSam31ActualValueWorkItems');
+    expect(html).toContain('Download actual-value packet');
+    expect(html).toContain('Record SAM31 actual-value evidence note');
+    expect(html).toContain('data-sam31-actual-value-work-item-download-index');
+    expect(html).toContain('data-sam31-actual-value-work-item-record-index');
+    expect(html).toContain('sam31_actual_value_replacement');
+    expect(html).toContain('employee_actual_value_next_action');
+    expect(html).toContain('acceptable_actual_evidence');
+    expect(html).toContain('claim_gate_effect no_claims_cleared');
+  });
+
   it('lets the workbench download official-flow hydraulic replay artifacts', async () => {
     const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
     expect(shell.status).toBe(200);

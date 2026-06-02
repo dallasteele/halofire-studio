@@ -81,6 +81,16 @@
   </div>
 
   <div class="card wide">
+    <h2>SAM31 Actual-Value Work Items</h2>
+    <p class="muted" style="margin-bottom:8px">
+      Saved SAM31+LLM best guesses that still need HaloFire employee replacement with actual 1881 workbook/sheet, vector, 3D model, screenshot, or console evidence.
+      These rows are evidence work items only; claim_gate_effect no_claims_cleared.
+    </p>
+    <div id="settingsSam31ActualValueWorkItems"><span class="muted">loading SAM31 actual-value work items...</span></div>
+    <div id="sam31ActualValueMsg" class="muted" style="margin-top:8px"></div>
+  </div>
+
+  <div class="card wide">
     <h2>Evidence Wizard</h2>
     <p class="muted" style="margin-bottom:8px">Pick a project gate, attach the exact acceptable evidence, then either resolve the gate or record evidence only. This stays fail-closed: the wizard never clears a gate with the wrong evidence type.</p>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
@@ -204,6 +214,7 @@ function api(path, opts={}) {
 const stClass = (s) => String(s).toLowerCase().replace(/[^a-z]/g,'');
 let wizardState = { projects: [], gateMap: new Map(), selectedProject: '', canWrite: false };
 let settingsCatalogLedgerRows = [];
+let settingsSam31ActualValueRows = [];
 const SETTINGS_CATALOG_LEDGER_FAMILIES = [
   'family:pipe_steel_sch40_2p0in',
   'family:fitting_tee_2p0in',
@@ -388,7 +399,11 @@ async function initWizard() {
   }
 }
 
-$('wizProject').addEventListener('change', () => loadWizard($('wizProject').value));
+$('wizProject').addEventListener('change', async () => {
+  const projectName = $('wizProject').value;
+  await loadWizard(projectName);
+  await loadSettingsSam31ActualValueWorkItems(projectName);
+});
 $('wizGate').addEventListener('change', syncWizardGateForm);
 $('wizType').addEventListener('change', syncWizardSignoff);
 $('wizAction').addEventListener('change', syncWizardGateForm);
@@ -589,6 +604,123 @@ async function loadSettingsCatalogSourceAcquisition() {
   }
 }
 
+function sam31ActualValueEvidencePayload(row) {
+  const sourceRef = row.replacement_values_source_ref || row.replacement_ref || row.persisted_review_packet_ref || `openclaw_sam31_consumer_review:${row.source_openclaw_sam31_consumer_review_evidence_id}`;
+  return {
+    evidence_type: 'sam31_actual_value_replacement',
+    status: 'present',
+    source_ref: sourceRef,
+    source_file: `openclaw_sam31_consumer_review:${row.source_openclaw_sam31_consumer_review_evidence_id || 'missing'}`,
+    notes: JSON.stringify({
+      kind: 'sam31ActualValueReplacement',
+      artifact_type: 'halofire.sam31_actual_value_replacement_evidence_note.v1',
+      source_pdf_boundary_evidence_id: row.source_pdf_boundary_evidence_id || null,
+      source_openclaw_sam31_consumer_review_evidence_id: row.source_openclaw_sam31_consumer_review_evidence_id || null,
+      source_openclaw_sam31_consumer_smoke_evidence_id: row.source_openclaw_sam31_consumer_smoke_evidence_id || null,
+      consumer: row.consumer || null,
+      accepted_queue_id: row.accepted_queue_id || null,
+      persisted_review_packet_ref: row.persisted_review_packet_ref || null,
+      replacement_ref: row.replacement_ref || null,
+      replacement_values_source_ref: row.replacement_values_source_ref || null,
+      replacement_summary: row.replacement_summary || {},
+      acceptable_actual_evidence: Array.isArray(row.acceptable_actual_evidence) ? row.acceptable_actual_evidence : [],
+      employee_actual_value_next_action: row.employee_actual_value_next_action || null,
+      blocked_claims: Array.isArray(row.blocked_claims) ? row.blocked_claims : [],
+      use_for_claims: false,
+      claim_gate_effect: row.claim_gate_effect || 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }),
+  };
+}
+
+async function downloadSettingsSam31ActualValueWorkItem(index) {
+  const row = settingsSam31ActualValueRows[Number(index)];
+  const msg = $('sam31ActualValueMsg');
+  if (!row || !row.download_href) {
+    msg.className = 'err';
+    msg.textContent = 'SAM31 actual-value work item download link missing';
+    return;
+  }
+  try {
+    const packet = await api(row.download_href);
+    if (packet.artifact_type !== 'openclaw.sam31.actual_value_work_item_packet.v1') {
+      throw new Error('Unexpected SAM31 actual-value work item packet type');
+    }
+    const blob = new Blob([JSON.stringify(packet, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = packet.download_name || 'sam31-actual-value-work-item.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+    msg.className = 'muted';
+    msg.textContent = 'downloaded SAM31 actual-value packet; claim gates remain blocked';
+  } catch(e) {
+    msg.className = 'err';
+    msg.textContent = e.message;
+  }
+}
+
+async function recordSettingsSam31ActualValueEvidence(index) {
+  const row = settingsSam31ActualValueRows[Number(index)];
+  const msg = $('sam31ActualValueMsg');
+  if (!row) {
+    msg.className = 'err';
+    msg.textContent = 'SAM31 actual-value work item not found';
+    return;
+  }
+  const projectName = catalogEvidenceProjectName();
+  msg.className = 'muted';
+  msg.textContent = 'recording SAM31 actual-value evidence note...';
+  try {
+    const created = await api('/projects/' + encodeURIComponent(projectName) + '/evidence', {
+      method: 'POST',
+      body: JSON.stringify(sam31ActualValueEvidencePayload(row)),
+    });
+    msg.innerHTML = `recorded sam31_actual_value_replacement evidence row <b>${escapeHtml(created.id)}</b> for ${escapeHtml(projectName)}; no claim gates cleared.`;
+    await loadWizard(projectName);
+    await loadSettingsSam31ActualValueWorkItems(projectName);
+  } catch(e) {
+    msg.className = 'err';
+    msg.textContent = e.message;
+  }
+}
+
+async function loadSettingsSam31ActualValueWorkItems(projectName = catalogEvidenceProjectName()) {
+  const target = $('settingsSam31ActualValueWorkItems');
+  try {
+    const index = await api('/projects/' + encodeURIComponent(projectName) + '/openclaw/sam31/actual-value-work-items');
+    const rows = Array.isArray(index.items) ? index.items : [];
+    settingsSam31ActualValueRows = rows;
+    target.innerHTML = rows.map((row, itemIndex) => {
+      const summary = row.replacement_summary || {};
+      const blocked = Array.isArray(row.blocked_claims) ? row.blocked_claims : [];
+      const acceptable = Array.isArray(row.acceptable_actual_evidence) ? row.acceptable_actual_evidence : [];
+      return `<div class="note" style="margin-bottom:10px">
+        <div class="row" style="padding-top:0"><span>${escapeHtml(row.consumer || 'consumer')} actual values</span><span class="st partial">${escapeHtml(row.status || 'requires_employee_actual_value_update')}</span></div>
+        <div class="muted" style="margin-top:6px">openclaw.sam31.actual_value_work_item_packet.v1 · evidence #${escapeHtml(row.source_openclaw_sam31_consumer_review_evidence_id || 'missing')} · source_pdf_boundary_evidence_id ${escapeHtml(row.source_pdf_boundary_evidence_id || 'missing')}</div>
+        <div class="muted" style="margin-top:6px">replacement_values_source_ref: ${escapeHtml(row.replacement_values_source_ref || row.replacement_ref || 'missing')}</div>
+        <div class="muted" style="margin-top:6px">replacement_summary: <span class="pill">semantic_label_count ${escapeHtml(summary.semantic_label_count || 0)}</span><span class="pill">object_hypothesis_count ${escapeHtml(summary.object_hypothesis_count || 0)}</span><span class="pill">vector_overlay_count ${escapeHtml(summary.vector_overlay_count || 0)}</span><span class="pill">model_3d_candidate_count ${escapeHtml(summary.model_3d_candidate_count || 0)}</span></div>
+        <div class="muted" style="margin-top:6px">employee_actual_value_next_action: ${escapeHtml(row.employee_actual_value_next_action || 'Replace SAM31 best guesses with actual HaloFire documentation values before bid/export use.')}</div>
+        <div class="muted" style="margin-top:6px">acceptable_actual_evidence: ${acceptable.map((item) => `<span class="pill present">${escapeHtml(item)}</span>`).join('') || '<span class="pill missing">actual evidence missing</span>'}</div>
+        <div class="muted" style="margin-top:6px">blocked_claims: ${blocked.map((claim) => `<span class="pill missing">${escapeHtml(claim)}</span>`).join('') || '<span class="pill">claim gates remain blocked</span>'}</div>
+        <div class="muted" style="margin-top:6px">sam31_actual_value_replacement · use_for_claims false · claim_gate_effect no_claims_cleared</div>
+        <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+          <button type="button" data-sam31-actual-value-work-item-download-index="${itemIndex}" ${row.download_href ? '' : 'disabled'}>Download actual-value packet</button>
+          <button type="button" data-sam31-actual-value-work-item-record-index="${itemIndex}">Record SAM31 actual-value evidence note</button>
+        </div>
+      </div>`;
+    }).join('') || `<span class="muted">No SAM31 actual-value work items for ${escapeHtml(projectName)}. Status: ${escapeHtml(index.status || 'no_sam31_actual_value_work_items')} · claim_gate_effect no_claims_cleared</span>`;
+    target.querySelectorAll('[data-sam31-actual-value-work-item-download-index]').forEach((btn) => {
+      btn.addEventListener('click', () => downloadSettingsSam31ActualValueWorkItem(btn.getAttribute('data-sam31-actual-value-work-item-download-index')));
+    });
+    target.querySelectorAll('[data-sam31-actual-value-work-item-record-index]').forEach((btn) => {
+      btn.addEventListener('click', () => recordSettingsSam31ActualValueEvidence(btn.getAttribute('data-sam31-actual-value-work-item-record-index')));
+    });
+  } catch(e) {
+    target.innerHTML = '<span class="err">SAM31 actual-value work items unavailable: '+escapeHtml(e.message)+'</span>';
+  }
+}
+
 // Swap the ref input label + placeholder between catalog URL (link) and filename (upload).
 function syncAttMode() {
   const mode = $('attMode').value;
@@ -641,7 +773,7 @@ $('attSubmit').onclick = async () => {
   } catch(e){ msg.className = 'err'; msg.textContent = e.message; }
 };
 
-loadParity(); loadDocs(); loadDeps(); initWizard(); loadLibrary(); loadSettingsCatalogSourceAcquisition();
+loadParity(); loadDocs(); loadDeps(); initWizard(); loadLibrary(); loadSettingsCatalogSourceAcquisition(); loadSettingsSam31ActualValueWorkItems();
 </script>
 </body>
 </html>
