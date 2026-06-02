@@ -954,6 +954,75 @@ describe('OpenClaw SAM31 bridge status API', () => {
       }),
     }));
 
+    const sectioningSprinklerAdapterRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/sectioning-downstream-resolvers/${persistedSectioningDownstreamPacket.id}/sprinkler-review-adapter`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(sectioningSprinklerAdapterRes.status).toBe(201);
+    const sectioningSprinklerAdapter = await sectioningSprinklerAdapterRes.json();
+    expect(sectioningSprinklerAdapter).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31_to_sprinkler_review_adapter.v1',
+      status: 'ready_for_internal_alpha_sprinkler_review',
+      adapter_source: 'halofire.sam31_sectioning_downstream_resolver_packet.v1',
+      source_pdf_boundary_evidence_id: boundary.id,
+      source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id: persistedSectioningDownstreamPacket.id,
+      source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id: sectioningReview.id,
+      source_openclaw_sam31_extrapolation_evidence_id: artifact.id,
+      supported_applications: ['halo_fire', 'landscout', 'nameforge'],
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+      evidence: expect.objectContaining({
+        evidence_type: 'halofire_sam31_sectioning_sprinkler_review_adapter',
+        status: 'best_effort',
+        source_ref: expect.stringContaining('sam31-sectioning-sprinkler-review-adapter'),
+      }),
+    }));
+    expect(sectioningSprinklerAdapter.supported_sprinkler_review_lanes).toEqual(expect.arrayContaining([
+      'room_boundary_visual_audit',
+      'obstruction_or_clash_review',
+      'vector_overlay_generation',
+      'model_3d_candidate_generation',
+    ]));
+    expect(sectioningSprinklerAdapter.source_linked_vector_overlays).toEqual(expect.arrayContaining([
+      expect.objectContaining({ id: 'vector:room-101-reviewed-sectioning' }),
+    ]));
+    expect(sectioningSprinklerAdapter.source_linked_model_3d_candidates).toEqual(expect.arrayContaining([
+      expect.objectContaining({ id: 'model3d:room-101-reviewed-sectioning' }),
+    ]));
+    expect(sectioningSprinklerAdapter.sprinkler_review_packet).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.sam31_sprinkler_review_packet.v1',
+      source: 'openclaw.sam31_to_sprinkler_review_adapter.v1',
+      adapter_source: 'halofire.sam31_sectioning_downstream_resolver_packet.v1',
+      status: 'requires_employee_sprinkler_review',
+      source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id: persistedSectioningDownstreamPacket.id,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(sectioningSprinklerAdapter.sprinkler_review_packet.issue_seeds).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        issue_type: 'sam31_sectioning_reviewed_room_boundary',
+        supported_sprinkler_review_lane: 'room_boundary_visual_audit',
+      }),
+      expect.objectContaining({
+        issue_type: 'sam31_sectioning_reviewed_vector_model_candidates',
+        supported_sprinkler_review_lane: 'obstruction_or_clash_review',
+      }),
+    ]));
+    expect(sectioningSprinklerAdapter.source_refs).toEqual(expect.arrayContaining([
+      expect.objectContaining({ evidence_id: boundary.id, evidence_type: 'pdf_boundary_decision' }),
+      expect.objectContaining({ evidence_id: sectioningReview.id, evidence_type: 'openclaw_sam31_sectioning_pipeline_contract_review' }),
+      expect.objectContaining({ evidence_id: persistedSectioningDownstreamPacket.id, evidence_type: 'halofire_sam31_sectioning_downstream_resolver_packet' }),
+    ]));
+    expect(sectioningSprinklerAdapter.blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'AHJ_approval',
+      'AutoSprink_parity',
+      'fabrication_ready',
+      'professional_approval',
+      'manufacturer_exact',
+    ]));
+
     const persistedSectioningQueueRes = await request(`${COOPERATIVE_1881_PATH}/resolver-queue`, {
       headers: { Authorization: `Bearer ${token}` },
     });
