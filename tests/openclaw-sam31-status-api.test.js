@@ -1974,6 +1974,90 @@ describe('OpenClaw SAM31 bridge status API', () => {
     ]));
     expect(packetReviewQueueItem.approval_upload_resolver_rows.every((row) => row.source_packet_review_decision_evidence_id === replayFollowupPacketReview.id)).toBe(true);
 
+    const professionalApprovalUploadRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/sprinkler-review/${consumerReview.id}/decision/${sprinklerReview.id}/preliminary-replay/followup/${replayFollowup.id}/packet/0/review/${replayFollowupPacketReview.id}/approval-upload`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        code: 'HALOFIRE_SAM31_PROFESSIONAL_APPROVAL_UPLOAD_MISSING',
+        target_approval_lane: 'professional_approval',
+        evidence_type: 'professional_review',
+        source_ref: 'halofire://sam31/obstruction-clash/sam31-landscout-testqueue/professional-review.pdf',
+        source_file: 'sam31-obstruction-professional-review.pdf',
+        notes: 'Uploaded signed professional review evidence for later gate validation only.',
+        signoff: {
+          reviewer_name: 'Pat Licensed',
+          reviewer_title: 'Licensed Fire Protection Engineer',
+          signed_at: '2026-06-02T16:30:00.000Z',
+          organization: 'Halo Fire',
+          license_id: 'PE-SAM31-1881',
+        },
+      }),
+    });
+    expect(professionalApprovalUploadRes.status).toBe(201);
+    const professionalApprovalUpload = await professionalApprovalUploadRes.json();
+    expect(professionalApprovalUpload).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.sam31_approval_upload_intake.v1',
+      status: 'uploaded_pending_gate_validation',
+      evidence_type: 'professional_review',
+      source_packet_review_decision_evidence_id: replayFollowupPacketReview.id,
+      source_followup_decision_evidence_id: replayFollowup.id,
+      code: 'HALOFIRE_SAM31_PROFESSIONAL_APPROVAL_UPLOAD_MISSING',
+      target_approval_lane: 'professional_approval',
+      required_evidence_type: 'licensed_professional_signed_review',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(professionalApprovalUpload.signoff).toEqual(expect.objectContaining({
+      reviewer_name: 'Pat Licensed',
+      reviewer_title: 'Licensed Fire Protection Engineer',
+      signed_at: '2026-06-02T16:30:00.000Z',
+      organization: 'Halo Fire',
+      license_id: 'PE-SAM31-1881',
+    }));
+    expect(professionalApprovalUpload.evidence).toEqual(expect.objectContaining({
+      evidence_type: 'professional_review',
+      status: 'present',
+      source_ref: 'halofire://sam31/obstruction-clash/sam31-landscout-testqueue/professional-review.pdf',
+    }));
+    const professionalUploadNotes = JSON.parse(professionalApprovalUpload.evidence.notes);
+    expect(professionalUploadNotes).toEqual(expect.objectContaining({
+      kind: 'halofire_sam31_approval_upload_intake',
+      artifact_type: 'halofire.sam31_approval_upload_intake.v1',
+      claim_gate_effect: 'no_claims_cleared',
+      use_for_claims: false,
+    }));
+
+    const replayFollowupApprovalUploadQueueRes = await request(`${COOPERATIVE_1881_PATH}/resolver-queue?sam31SprinklerReplay=ready&lane=obstruction_or_clash_review`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(replayFollowupApprovalUploadQueueRes.status).toBe(200);
+    const replayFollowupApprovalUploadQueue = await replayFollowupApprovalUploadQueueRes.json();
+    expect(replayFollowupApprovalUploadQueue.summary.sam31_approval_uploads_recorded).toBeGreaterThanOrEqual(1);
+    const replayFollowupApprovalUploadQueueItem = replayFollowupApprovalUploadQueue.items.find((row) => row.evidence_id === boundary.id);
+    const replayFollowupApprovalUploadRows = replayFollowupApprovalUploadQueueItem.sam31_sprinkler_preliminary_replay_queue_items || [];
+    const replayFollowupApprovalUploadRow = replayFollowupApprovalUploadRows.find((row) => row.source_halofire_sam31_sprinkler_review_decision_evidence_id === sprinklerReview.id);
+    const packetWithApprovalUpload = replayFollowupApprovalUploadRow.packet_queue_items.find((packet) => packet.latest_packet_review_decision?.evidence_id === replayFollowupPacketReview.id);
+    const professionalApprovalRow = packetWithApprovalUpload.approval_upload_resolver_rows.find((row) => row.code === 'HALOFIRE_SAM31_PROFESSIONAL_APPROVAL_UPLOAD_MISSING');
+    expect(professionalApprovalRow).toEqual(expect.objectContaining({
+      status: 'approval_upload_recorded_pending_gate_validation',
+      latest_approval_upload_intake: expect.objectContaining({
+        evidence_id: professionalApprovalUpload.id,
+        artifact_type: 'halofire.sam31_approval_upload_intake.v1',
+        evidence_type: 'professional_review',
+        target_approval_lane: 'professional_approval',
+        source_packet_review_decision_evidence_id: replayFollowupPacketReview.id,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    const professionalGateAfterUpload = await request(`${COOPERATIVE_1881_PATH}/claim-gates`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const professionalGates = await professionalGateAfterUpload.json();
+    expect(professionalGates.find((gate) => gate.code === 'PROFESSIONAL_REVIEW_MISSING')?.status).toBe('blocked');
+
     const nameForgeAdapterRes = await request(`${COOPERATIVE_1881_PATH}/openclaw/sam31/product-owner-replacements`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` },

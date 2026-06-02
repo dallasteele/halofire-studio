@@ -438,7 +438,19 @@ function renderHalofireSam31SprinklerReviewQueue(rows, sourcePdfBoundaryEvidence
 
 function renderHalofireSam31ApprovalUploadResolverRows(rows) {
   if (!Array.isArray(rows) || !rows.length) return '';
-  return `<div class="muted" style="font-size:10px;margin-top:5px;border:1px solid rgba(239,68,68,.24);border-radius:7px;padding:6px;background:rgba(127,29,29,.10)">approval_upload_resolver_rows <span class="chip">halofire.sam31_approval_upload_resolver_row.v1</span> <span class="chip">HALOFIRE_SAM31_PROFESSIONAL_APPROVAL_UPLOAD_MISSING</span> <span class="chip">HALOFIRE_SAM31_AHJ_APPROVAL_UPLOAD_MISSING</span> <span class="chip">HALOFIRE_SAM31_MANUFACTURER_EVIDENCE_UPLOAD_MISSING</span><br>${rows.map((row) => `<span class="chip">${escapeHtml(row.code || 'approval_upload_missing')} ${escapeHtml(row.target_approval_lane || 'lane_missing')} ${escapeHtml(row.claim_gate_effect || 'no_claims_cleared')}</span> ${escapeHtml(row.next_action || 'Upload required signed evidence before clearing this claim.')}<br>acceptable_evidence ${(Array.isArray(row.acceptable_evidence) ? row.acceptable_evidence : []).map((item) => `<span class="chip">${escapeHtml(item)}</span>`).join('')}<br>`).join('')}<span class="muted">AI fallback remains temporary SAM31+LLM correction/vector/3D candidate evidence only; use_for_claims false.</span></div>`;
+  return `<div class="muted" style="font-size:10px;margin-top:5px;border:1px solid rgba(239,68,68,.24);border-radius:7px;padding:6px;background:rgba(127,29,29,.10)">approval_upload_resolver_rows <span class="chip">halofire.sam31_approval_upload_resolver_row.v1</span> <span class="chip">halofire.sam31_approval_upload_intake.v1</span> <span class="chip">HALOFIRE_SAM31_PROFESSIONAL_APPROVAL_UPLOAD_MISSING</span> <span class="chip">HALOFIRE_SAM31_AHJ_APPROVAL_UPLOAD_MISSING</span> <span class="chip">HALOFIRE_SAM31_MANUFACTURER_EVIDENCE_UPLOAD_MISSING</span><br>${rows.map((row) => {
+    const rowKey = [
+      row.source_pdf_boundary_evidence_id || 'boundary',
+      row.source_openclaw_sam31_consumer_review_evidence_id || 'consumer',
+      row.source_halofire_sam31_sprinkler_review_decision_evidence_id || 'sprinkler',
+      row.source_followup_decision_evidence_id || 'followup',
+      row.packet_index ?? 0,
+      row.source_packet_review_decision_evidence_id || 'packetreview',
+      row.code || 'approval_upload_missing',
+    ].join('-');
+    const signoff = row.latest_approval_upload_intake?.signoff || {};
+    return `<div style="margin-top:5px;border-top:1px solid rgba(255,255,255,.08);padding-top:5px"><span class="chip">${escapeHtml(row.code || 'approval_upload_missing')} ${escapeHtml(row.target_approval_lane || 'lane_missing')} ${escapeHtml(row.claim_gate_effect || 'no_claims_cleared')}</span> ${escapeHtml(row.next_action || 'Upload required signed evidence before clearing this claim.')}<br>acceptable_evidence ${(Array.isArray(row.acceptable_evidence) ? row.acceptable_evidence : []).map((item) => `<span class="chip">${escapeHtml(item)}</span>`).join('')}<br>${row.latest_approval_upload_intake ? `latest_approval_upload_intake evidence #${escapeHtml(row.latest_approval_upload_intake.evidence_id)} - ${escapeHtml(row.latest_approval_upload_intake.status || 'uploaded_pending_gate_validation')} - ${escapeHtml(row.latest_approval_upload_intake.claim_gate_effect || 'no_claims_cleared')}<br>` : ''}<details style="margin-top:5px"><summary class="muted" style="cursor:pointer">Save SAM31 approval upload</summary><div style="display:grid;gap:6px;margin-top:7px"><input id="sam31ApprovalUploadSourceRef-${escapeHtml(rowKey)}" placeholder="source_ref" value="${escapeHtml(row.latest_approval_upload_intake?.source_ref || '')}" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px"><input id="sam31ApprovalUploadSourceFile-${escapeHtml(rowKey)}" placeholder="source_file" value="${escapeHtml(row.latest_approval_upload_intake?.source_file || '')}" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px"><input id="sam31ApprovalUploadReviewerName-${escapeHtml(rowKey)}" placeholder="reviewer_name" value="${escapeHtml(signoff.reviewer_name || '')}" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px"><input id="sam31ApprovalUploadReviewerTitle-${escapeHtml(rowKey)}" placeholder="reviewer_title" value="${escapeHtml(signoff.reviewer_title || '')}" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px"><input id="sam31ApprovalUploadSignedAt-${escapeHtml(rowKey)}" placeholder="signed_at ISO8601" value="${escapeHtml(signoff.signed_at || '')}" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px"><input id="sam31ApprovalUploadOrganization-${escapeHtml(rowKey)}" placeholder="organization (optional)" value="${escapeHtml(signoff.organization || '')}" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px"><input id="sam31ApprovalUploadLicenseId-${escapeHtml(rowKey)}" placeholder="license_id (optional)" value="${escapeHtml(signoff.license_id || '')}" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px"><textarea id="sam31ApprovalUploadNotes-${escapeHtml(rowKey)}" placeholder="notes" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px;height:46px">${escapeHtml(row.latest_approval_upload_intake?.notes || '')}</textarea><button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#7c2d12" data-sam31-approval-upload-code="${escapeHtml(row.code || '')}" data-sam31-approval-upload-boundary-evidence-id="${escapeHtml(row.source_pdf_boundary_evidence_id || '')}" data-sam31-approval-upload-consumer-review-evidence-id="${escapeHtml(row.source_openclaw_sam31_consumer_review_evidence_id || '')}" data-sam31-approval-upload-sprinkler-review-evidence-id="${escapeHtml(row.source_halofire_sam31_sprinkler_review_decision_evidence_id || '')}" data-sam31-approval-upload-followup-evidence-id="${escapeHtml(row.source_followup_decision_evidence_id || '')}" data-sam31-approval-upload-packet-index="${escapeHtml(row.packet_index ?? 0)}" data-sam31-approval-upload-packet-review-evidence-id="${escapeHtml(row.source_packet_review_decision_evidence_id || '')}" data-sam31-approval-upload-target-approval-lane="${escapeHtml(row.target_approval_lane || '')}" data-sam31-approval-upload-evidence-type="${escapeHtml(row.gate_evidence_type || '')}">Save SAM31 approval upload</button><div class="muted" id="sam31ApprovalUploadStatus-${escapeHtml(rowKey)}" style="font-size:11px"></div></div></details></div>`;
+  }).join('')}<span class="muted">AI fallback remains temporary SAM31+LLM correction/vector/3D candidate evidence only; use_for_claims false.</span></div>`;
 }
 
 function renderHalofireSam31SprinklerPreliminaryReplayQueue(rows, sourcePdfBoundaryEvidenceId) {
@@ -1115,6 +1127,45 @@ async function saveHalofireSam31SprinklerReplayFollowupPacketReview(boundaryEvid
   }
 }
 
+async function saveHalofireSam31ApprovalUpload(boundaryEvidenceId, reviewEvidenceId, sprinklerReviewEvidenceId, followupEvidenceId, packetIndex, packetReviewEvidenceId, code, targetApprovalLane, evidenceType) {
+  const rowKey = [
+    boundaryEvidenceId || 'boundary',
+    reviewEvidenceId || 'consumer',
+    sprinklerReviewEvidenceId || 'sprinkler',
+    followupEvidenceId || 'followup',
+    packetIndex || 0,
+    packetReviewEvidenceId || 'packetreview',
+    code || 'approval_upload_missing',
+  ].join('-');
+  const status = document.getElementById('sam31ApprovalUploadStatus-' + rowKey);
+  try {
+    const body = {
+      code,
+      target_approval_lane: targetApprovalLane,
+      evidence_type: evidenceType,
+      source_ref: document.getElementById('sam31ApprovalUploadSourceRef-' + rowKey).value.trim(),
+      source_file: document.getElementById('sam31ApprovalUploadSourceFile-' + rowKey).value.trim(),
+      notes: document.getElementById('sam31ApprovalUploadNotes-' + rowKey).value.trim(),
+      signoff: {
+        reviewer_name: document.getElementById('sam31ApprovalUploadReviewerName-' + rowKey).value.trim(),
+        reviewer_title: document.getElementById('sam31ApprovalUploadReviewerTitle-' + rowKey).value.trim(),
+        signed_at: document.getElementById('sam31ApprovalUploadSignedAt-' + rowKey).value.trim(),
+        organization: document.getElementById('sam31ApprovalUploadOrganization-' + rowKey).value.trim() || undefined,
+        license_id: document.getElementById('sam31ApprovalUploadLicenseId-' + rowKey).value.trim() || undefined,
+      },
+    };
+    const saved = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/resolver-packets/pdf-boundary/' + encodeURIComponent(boundaryEvidenceId) + '/openclaw/sam31/sprinkler-review/' + encodeURIComponent(reviewEvidenceId) + '/decision/' + encodeURIComponent(sprinklerReviewEvidenceId) + '/preliminary-replay/followup/' + encodeURIComponent(followupEvidenceId) + '/packet/' + encodeURIComponent(packetIndex || 0) + '/review/' + encodeURIComponent(packetReviewEvidenceId) + '/approval-upload', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    });
+    if (status) status.textContent = 'Saved halofire.sam31_approval_upload_intake.v1 evidence #' + saved.id + ' - claims still blocked';
+    await refreshEvidence();
+    await refreshResolverQueue();
+  } catch (err) {
+    if (status) status.textContent = 'Error: ' + err.message;
+  }
+}
+
 async function runResolverReplayBid(evidenceId) {
   const status = document.getElementById('replayBidStatus-' + evidenceId);
   try {
@@ -1500,6 +1551,19 @@ async function refreshResolverQueue() {
       button.dataset.sam31SprinklerReplayFollowupPacketReviewEvidenceId,
       button.dataset.sam31SprinklerReplayFollowupPacketReviewFollowupEvidenceId,
       button.dataset.sam31SprinklerReplayFollowupPacketReviewIndex,
+    );
+  });
+  document.querySelectorAll('[data-sam31-approval-upload-code]').forEach((button) => {
+    button.onclick = () => saveHalofireSam31ApprovalUpload(
+      button.dataset.sam31ApprovalUploadBoundaryEvidenceId,
+      button.dataset.sam31ApprovalUploadConsumerReviewEvidenceId,
+      button.dataset.sam31ApprovalUploadSprinklerReviewEvidenceId,
+      button.dataset.sam31ApprovalUploadFollowupEvidenceId,
+      button.dataset.sam31ApprovalUploadPacketIndex,
+      button.dataset.sam31ApprovalUploadPacketReviewEvidenceId,
+      button.dataset.sam31ApprovalUploadCode,
+      button.dataset.sam31ApprovalUploadTargetApprovalLane,
+      button.dataset.sam31ApprovalUploadEvidenceType,
     );
   });
   document.querySelectorAll('[data-sam31-consumer-review-save-evidence-id]').forEach((button) => {

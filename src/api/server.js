@@ -603,7 +603,7 @@ function hasStructuredSignedReviewerNotes(row) {
     const parsed = JSON.parse(row.notes);
     return Boolean(
       parsed
-      && parsed.kind === 'signed_reviewer_evidence'
+      && (parsed.kind === 'signed_reviewer_evidence' || parsed.kind === 'halofire_sam31_approval_upload_intake')
       && parsed.signoff
       && parsed.signoff.reviewer_name
       && parsed.signoff.reviewer_title
@@ -614,7 +614,66 @@ function hasStructuredSignedReviewerNotes(row) {
   }
 }
 
+const DEFAULT_PROJECT_CLAIM_GATES = Object.freeze([
+  Object.freeze({
+    code: 'AUTOSPRINK_EVIDENCE_MISSING',
+    severity: 'blocking',
+    missing_artifact: 'AutoSprink model/export evidence',
+    acceptable_evidence: 'An AutoSprink file, export, report, or signed comparison packet tied to this bid.',
+    blocked_claims: ['AutoSprink parity', 'design export ready', 'fabrication-ready layout'],
+    next_action: 'Attach the actual AutoSprink evidence packet or keep AutoSprink parity and fabrication-ready claims blocked.',
+  }),
+  Object.freeze({
+    code: 'AHJ_APPROVAL_MISSING',
+    severity: 'blocking',
+    missing_artifact: 'AHJ approval record',
+    acceptable_evidence: 'AHJ approval document, email, stamp, or review record for this bid.',
+    blocked_claims: ['AHJ-approved', 'permit-ready', 'approved for submission'],
+    next_action: 'Record the AHJ approval artifact before showing any AHJ-approved or permit-ready status.',
+  }),
+  Object.freeze({
+    code: 'PROFESSIONAL_REVIEW_MISSING',
+    severity: 'blocking',
+    missing_artifact: 'Licensed professional review/signoff',
+    acceptable_evidence: 'Named licensed professional review, PE signoff, or employee approval record for this bid package.',
+    blocked_claims: ['professionally reviewed', 'engineering-grade', 'PE-approved'],
+    next_action: 'Attach a named professional review/signoff before claiming the package is professionally reviewed or engineering-grade.',
+  }),
+  Object.freeze({
+    code: 'MANUFACTURER_MODEL_APPROVAL_MISSING',
+    severity: 'blocking',
+    missing_artifact: 'Manufacturer model approval evidence',
+    acceptable_evidence: 'Manufacturer submittal, compatibility approval, or model approval artifact tied to selected materials.',
+    blocked_claims: ['manufacturer-approved model', 'manufacturer-approved materials', 'submittal-ready selections'],
+    next_action: 'Attach manufacturer approval evidence before claiming selected models or materials are manufacturer-approved.',
+  }),
+]);
+
+function ensureProjectClaimGates(projectName) {
+  const existingCount = db
+    .prepare('SELECT COUNT(*) AS c FROM claim_gates WHERE project_name = ?')
+    .get(projectName)?.c || 0;
+  if (existingCount > 0) return;
+  const insertGate = db.prepare(
+    `INSERT INTO claim_gates
+      (project_name, code, severity, missing_artifact, acceptable_evidence, blocked_claims, next_action, status)
+     VALUES (?, ?, ?, ?, ?, ?, ?, 'blocked')`,
+  );
+  for (const gate of DEFAULT_PROJECT_CLAIM_GATES) {
+    insertGate.run(
+      projectName,
+      gate.code,
+      gate.severity,
+      gate.missing_artifact,
+      gate.acceptable_evidence,
+      JSON.stringify(gate.blocked_claims),
+      gate.next_action,
+    );
+  }
+}
+
 app.get('/api/projects/:name/claim-gates', authMiddleware, (req, res) => {
+  ensureProjectClaimGates(req.params.name);
   const gates = db
     .prepare('SELECT * FROM claim_gates WHERE project_name = ? ORDER BY severity DESC, code')
     .all(req.params.name);
@@ -626,6 +685,7 @@ app.get('/api/projects/:name/claim-gates', authMiddleware, (req, res) => {
 
 app.get('/api/projects/:name/evidence-wizard', authMiddleware, (req, res) => {
   const projectName = req.params.name;
+  ensureProjectClaimGates(projectName);
   const gates = db
     .prepare('SELECT * FROM claim_gates WHERE project_name = ? ORDER BY severity DESC, code')
     .all(projectName);
@@ -796,6 +856,7 @@ app.post('/api/projects/:name/evidence', authMiddleware, requireRole('admin'), (
 app.post('/api/projects/:name/claim-gates/:code/resolve', authMiddleware, requireRole('admin'), (req, res) => {
   const projectName = req.params.name;
   const code = req.params.code;
+  ensureProjectClaimGates(projectName);
   const existing = db
     .prepare('SELECT * FROM claim_gates WHERE project_name = ? AND code = ?')
     .get(projectName, code);
@@ -1332,10 +1393,28 @@ const HALOFIRE_SAM31_OBSTRUCTION_CLASH_PACKET_TYPE = 'halofire.sam31_obstruction
 const HALOFIRE_SAM31_SLEEVE_FIRESTOP_PACKET_TYPE = 'halofire.sam31_sleeve_firestop_packet.v1';
 const HALOFIRE_SAM31_SPRINKLER_FOLLOWUP_PACKET_REVIEW_DECISION_TYPE = 'halofire.sam31_sprinkler_followup_packet_review_decision.v1';
 const HALOFIRE_SAM31_APPROVAL_UPLOAD_RESOLVER_ROW_TYPE = 'halofire.sam31_approval_upload_resolver_row.v1';
+const HALOFIRE_SAM31_APPROVAL_UPLOAD_INTAKE_TYPE = 'halofire.sam31_approval_upload_intake.v1';
 const HALOFIRE_SAM31_APPROVAL_UPLOAD_MISSING_CODES = Object.freeze({
   professional: 'HALOFIRE_SAM31_PROFESSIONAL_APPROVAL_UPLOAD_MISSING',
   ahj: 'HALOFIRE_SAM31_AHJ_APPROVAL_UPLOAD_MISSING',
   manufacturer: 'HALOFIRE_SAM31_MANUFACTURER_EVIDENCE_UPLOAD_MISSING',
+});
+const HALOFIRE_SAM31_APPROVAL_UPLOAD_RULES = Object.freeze({
+  [HALOFIRE_SAM31_APPROVAL_UPLOAD_MISSING_CODES.professional]: Object.freeze({
+    target_approval_lane: 'professional_approval',
+    evidence_type: 'professional_review',
+    required_evidence_type: 'licensed_professional_signed_review',
+  }),
+  [HALOFIRE_SAM31_APPROVAL_UPLOAD_MISSING_CODES.ahj]: Object.freeze({
+    target_approval_lane: 'AHJ_approval',
+    evidence_type: 'ahj_approval',
+    required_evidence_type: 'AHJ_signed_approval_or_plan_check_record',
+  }),
+  [HALOFIRE_SAM31_APPROVAL_UPLOAD_MISSING_CODES.manufacturer]: Object.freeze({
+    target_approval_lane: 'manufacturer_exact',
+    evidence_type: 'manufacturer_approval',
+    required_evidence_type: 'manufacturer_catalog_or_model_proof',
+  }),
 });
 const SAM31_CONSUMER_QUEUE_TARGETS = Object.freeze(['landscout', 'nameforge']);
 const SAM31_CONSUMER_UNAVAILABLE_CODES = Object.freeze({
@@ -1831,7 +1910,7 @@ function polygonToSvgPath(polygon) {
     .filter((point) => point && point.every(Number.isFinite));
   if (!points.length) return '';
   const [first, ...rest] = points;
-  return [
+  const rows = [
     `M ${first[0]} ${first[1]}`,
     ...rest.map((point) => `L ${point[0]} ${point[1]}`),
     'Z',
@@ -3306,8 +3385,135 @@ function halofireSam31SprinklerFollowupPacketReviewSummary(packetReviewEvidence)
   };
 }
 
-function halofireSam31ApprovalUploadResolverRows(packet, latestReview) {
+function halofireSam31ApprovalUploadRule(code) {
+  return HALOFIRE_SAM31_APPROVAL_UPLOAD_RULES[String(code || '').trim()] || null;
+}
+
+function halofireSam31ApprovalUploadGateCode(targetApprovalLane) {
+  switch (String(targetApprovalLane || '').trim()) {
+    case 'professional_approval':
+      return 'PROFESSIONAL_REVIEW_MISSING';
+    case 'AHJ_approval':
+      return 'AHJ_APPROVAL_MISSING';
+    case 'manufacturer_exact':
+      return 'MANUFACTURER_MODEL_APPROVAL_MISSING';
+    default:
+      return null;
+  }
+}
+
+function ensureHalofireSam31ApprovalUploadGate(projectName, gateCode, rule) {
+  if (!gateCode || !rule) return null;
+  const existing = db
+    .prepare('SELECT * FROM claim_gates WHERE project_name = ? AND code = ?')
+    .get(projectName, gateCode);
+  if (existing) return existing;
+  const laneLabel = rule.target_approval_lane === 'professional_approval'
+    ? 'Licensed professional review/signoff'
+    : rule.target_approval_lane === 'AHJ_approval'
+      ? 'AHJ approval record'
+      : 'Manufacturer model/source approval evidence';
+  const blockedClaims = rule.target_approval_lane === 'professional_approval'
+    ? ['professionally reviewed', 'engineering-grade', 'PE-approved', 'permit-ready', 'fabrication-ready']
+    : rule.target_approval_lane === 'AHJ_approval'
+      ? ['AHJ-approved', 'permit-ready', 'approved for submission']
+      : ['manufacturer-approved model', 'manufacturer-approved materials', 'fabrication-ready selections'];
+  const nextAction = rule.target_approval_lane === 'professional_approval'
+    ? 'Validate the uploaded signed professional review through the claim gate resolver before claiming professional, permit-ready, or fabrication-ready status.'
+    : rule.target_approval_lane === 'AHJ_approval'
+      ? 'Validate the uploaded AHJ approval or plan-check record through the claim gate resolver before claiming AHJ approval or permit readiness.'
+      : 'Validate the uploaded manufacturer catalog/model proof through the claim gate resolver before claiming manufacturer-exact or fabrication-ready output.';
+  db.prepare(`INSERT INTO claim_gates (project_name, code, severity, missing_artifact, acceptable_evidence, blocked_claims, next_action, status)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?)`)
+    .run(
+      projectName,
+      gateCode,
+      'blocking',
+      laneLabel,
+      rule.required_evidence_type,
+      JSON.stringify(blockedClaims),
+      nextAction,
+      'blocked',
+    );
+  return db
+    .prepare('SELECT * FROM claim_gates WHERE project_name = ? AND code = ?')
+    .get(projectName, gateCode);
+}
+
+function halofireSam31ApprovalUploadIntakeFromEvidence(row) {
+  if (!row) return null;
+  try {
+    const parsed = JSON.parse(row.notes || '{}');
+    return parsed && parsed.kind === 'halofire_sam31_approval_upload_intake' && parsed.intake
+      ? parsed.intake
+      : null;
+  } catch {
+    return null;
+  }
+}
+
+function latestHalofireSam31ApprovalUploadIntakeEvidence(projectName, sourceEvidenceId = null) {
+  const rows = db
+    .prepare(`SELECT * FROM project_evidence
+              WHERE project_name = ?
+              ORDER BY created_at DESC, id DESC`)
+    .all(projectName);
+  const latestByPacketReviewAndCode = new Map();
+  for (const row of rows) {
+    const intake = halofireSam31ApprovalUploadIntakeFromEvidence(row);
+    if (!intake) continue;
+    if (sourceEvidenceId && Number(intake.source_pdf_boundary_evidence_id) !== Number(sourceEvidenceId)) {
+      continue;
+    }
+    const key = `${intake.source_packet_review_decision_evidence_id || ''}:${intake.code || ''}`;
+    if (key !== ':' && !latestByPacketReviewAndCode.has(key)) {
+      latestByPacketReviewAndCode.set(key, { evidence: row, intake });
+    }
+  }
+  return [...latestByPacketReviewAndCode.values()];
+}
+
+function halofireSam31ApprovalUploadIntakeSummary(uploadEvidence) {
+  if (!uploadEvidence?.evidence || !uploadEvidence?.intake) return null;
+  const { evidence, intake } = uploadEvidence;
+  return {
+    evidence_id: evidence.id,
+    evidence_status: evidence.status,
+    evidence_type: evidence.evidence_type,
+    source_ref: evidence.source_ref,
+    source_file: evidence.source_file,
+    artifact_type: intake.artifact_type || HALOFIRE_SAM31_APPROVAL_UPLOAD_INTAKE_TYPE,
+    status: intake.status || 'uploaded_pending_gate_validation',
+    code: intake.code,
+    target_approval_lane: intake.target_approval_lane,
+    required_evidence_type: intake.required_evidence_type,
+    source_packet_review_decision_evidence_id: intake.source_packet_review_decision_evidence_id,
+    source_followup_decision_evidence_id: intake.source_followup_decision_evidence_id,
+    packet_index: intake.packet_index,
+    uploaded_by: intake.uploaded_by,
+    uploaded_at: intake.uploaded_at,
+    signoff: intake.signoff || null,
+    gate_validation_action: intake.gate_validation_action || null,
+    use_for_claims: false,
+    claim_gate_effect: intake.claim_gate_effect || 'no_claims_cleared',
+  };
+}
+
+function halofireSam31ApprovalUploadResolverRows(packet, latestReview, approvalUploadEvidences = []) {
   if (!packet || !latestReview) return [];
+  const latestUploadsByCode = new Map(
+    (Array.isArray(approvalUploadEvidences) ? approvalUploadEvidences : [])
+      .filter((item) => item?.evidence && item?.intake && Number(item.intake.source_packet_review_decision_evidence_id) === Number(latestReview.evidence_id))
+      .map((item) => [String(item.intake.code || ''), item]),
+  );
+  const latestUploadsByFollowupPacketAndCode = new Map(
+    (Array.isArray(approvalUploadEvidences) ? approvalUploadEvidences : [])
+      .filter((item) => item?.evidence && item?.intake)
+      .map((item) => [
+        `${item.intake.source_followup_decision_evidence_id || ''}:${Number(item.intake.packet_index) || 0}:${String(item.intake.code || '')}`,
+        item,
+      ]),
+  );
   const commonBlockedClaims = uniqueStrings([
     ...(Array.isArray(packet.blocked_claims) ? packet.blocked_claims : []),
     'permit_ready',
@@ -3349,6 +3555,7 @@ function halofireSam31ApprovalUploadResolverRows(packet, latestReview) {
     target_packet_lane: packet.target_packet_lane || null,
     source_field: packet.source_field || null,
     source_index: packet.source_index ?? null,
+    packet_index: latestReview.packet_index ?? packet.packet_index ?? 0,
     source_refs: sourceRefs,
     use_for_claims: false,
     claim_gate_effect: 'no_claims_cleared',
@@ -3358,7 +3565,7 @@ function halofireSam31ApprovalUploadResolverRows(packet, latestReview) {
       'This resolver row describes the exact approval upload still required; it cannot clear the claim by itself.',
     ],
   };
-  return [
+  const rows = [
     {
       ...base,
       id: `${packet.id || 'sam31-packet'}:approval-upload:professional`,
@@ -3405,9 +3612,22 @@ function halofireSam31ApprovalUploadResolverRows(packet, latestReview) {
       blocked_claims: uniqueStrings([...commonBlockedClaims, 'manufacturer_exact', 'fabrication_ready']),
     },
   ];
+  return rows.map((row) => {
+    const uploadSummary = halofireSam31ApprovalUploadIntakeSummary(
+      latestUploadsByCode.get(row.code)
+      || latestUploadsByFollowupPacketAndCode.get(`${row.source_followup_decision_evidence_id || ''}:${Number(row.packet_index) || 0}:${row.code}`),
+    );
+    const rule = halofireSam31ApprovalUploadRule(row.code);
+    return {
+      ...row,
+      gate_evidence_type: rule?.evidence_type || null,
+      status: uploadSummary ? 'approval_upload_recorded_pending_gate_validation' : row.status,
+      latest_approval_upload_intake: uploadSummary,
+    };
+  });
 }
 
-function halofireSam31SprinklerPreliminaryReplayFollowupSummary(followupEvidence, packetReviewDecisionEvidences = []) {
+function halofireSam31SprinklerPreliminaryReplayFollowupSummary(followupEvidence, packetReviewDecisionEvidences = [], approvalUploadEvidences = []) {
   if (!followupEvidence?.evidence || !followupEvidence?.followup) return null;
   const { evidence, followup } = followupEvidence;
   const latestPacketReviewsByIndex = new Map(
@@ -3421,7 +3641,7 @@ function halofireSam31SprinklerPreliminaryReplayFollowupSummary(followupEvidence
       ...packet,
       status: latestReview ? 'internal_alpha_packet_review_recorded' : packet.status,
       latest_packet_review_decision: latestReview,
-      approval_upload_resolver_rows: halofireSam31ApprovalUploadResolverRows(packet, latestReview),
+      approval_upload_resolver_rows: halofireSam31ApprovalUploadResolverRows(packet, latestReview, approvalUploadEvidences),
     };
   });
   return {
@@ -4320,6 +4540,106 @@ function normalizeHalofireSam31SprinklerFollowupPacketReviewDecision(projectName
   };
 }
 
+function normalizeHalofireSam31ApprovalUploadIntake(projectName, sourcePacket, packetReview, body = {}, user = {}) {
+  const code = String(body.code || '').trim();
+  const rule = halofireSam31ApprovalUploadRule(code);
+  if (!rule) {
+    const e = new Error(`code must be one of: ${Object.values(HALOFIRE_SAM31_APPROVAL_UPLOAD_MISSING_CODES).join(', ')}`);
+    e.httpStatus = 400;
+    throw e;
+  }
+  const targetApprovalLane = String(body.target_approval_lane || rule.target_approval_lane).trim();
+  if (targetApprovalLane !== rule.target_approval_lane) {
+    const e = new Error(`target_approval_lane must be ${rule.target_approval_lane} for ${code}`);
+    e.httpStatus = 400;
+    throw e;
+  }
+  const evidenceType = String(body.evidence_type || rule.evidence_type).trim();
+  if (evidenceType !== rule.evidence_type) {
+    const e = new Error(`evidence_type must be ${rule.evidence_type} for ${code}`);
+    e.httpStatus = 400;
+    throw e;
+  }
+  const sourceRef = String(body.source_ref || '').trim();
+  if (!sourceRef) {
+    const e = new Error('source_ref is required for SAM31 approval upload intake evidence');
+    e.httpStatus = 400;
+    throw e;
+  }
+  const rowStatus = String(body.status || 'present').trim().toLowerCase();
+  if (rowStatus !== 'present') {
+    const e = new Error("SAM31 approval upload intake evidence must be recorded with status 'present'");
+    e.httpStatus = 400;
+    throw e;
+  }
+  const signoff = normalizeSignedReviewerSignoff(evidenceType, body.signoff);
+  const gateCode = halofireSam31ApprovalUploadGateCode(rule.target_approval_lane);
+  return {
+    artifact_type: HALOFIRE_SAM31_APPROVAL_UPLOAD_INTAKE_TYPE,
+    status: 'uploaded_pending_gate_validation',
+    project_name: projectName,
+    code,
+    target_approval_lane: rule.target_approval_lane,
+    evidence_type: evidenceType,
+    required_evidence_type: rule.required_evidence_type,
+    gate_code: gateCode,
+    source_packet_review_decision_artifact_type: packetReview.artifact_type || HALOFIRE_SAM31_SPRINKLER_FOLLOWUP_PACKET_REVIEW_DECISION_TYPE,
+    source_packet_review_decision_evidence_id: packetReview.evidence_id,
+    source_packet_artifact_type: packetReview.source_packet_artifact_type || sourcePacket.artifact_type,
+    source_packet_queue_item_artifact_type: sourcePacket.source_packet_queue_item_artifact_type,
+    source_followup_decision_evidence_id: sourcePacket.source_followup_decision_evidence_id,
+    source_pdf_boundary_evidence_id: sourcePacket.source_pdf_boundary_evidence_id,
+    source_openclaw_sam31_consumer_review_evidence_id: sourcePacket.source_openclaw_sam31_consumer_review_evidence_id,
+    source_halofire_sam31_sprinkler_review_decision_evidence_id: sourcePacket.source_halofire_sam31_sprinkler_review_decision_evidence_id,
+    packet_index: sourcePacket.packet_index,
+    target_packet_lane: sourcePacket.target_packet_lane,
+    source_field: sourcePacket.source_field,
+    source_index: sourcePacket.source_index,
+    source_ref: sourceRef,
+    source_file: String(body.source_file || body.sourceFile || '').trim() || null,
+    signoff,
+    uploaded_by: user.username || user.name || 'unknown',
+    uploaded_at: new Date().toISOString(),
+    notes: String(body.notes || '').trim() || null,
+    gate_validation_action: gateCode ? {
+      method: 'POST',
+      href: `/api/projects/${encodeURIComponent(projectName)}/claim-gates/${encodeURIComponent(gateCode)}/resolve`,
+      request_body: { evidence_id: null },
+    } : null,
+    source_refs: uniqueByJson([
+      ...(Array.isArray(sourcePacket.source_refs) ? sourcePacket.source_refs : []),
+      ...(Array.isArray(packetReview.source_refs) ? packetReview.source_refs : []),
+      {
+        evidence_type: evidenceType,
+        source_ref: sourceRef,
+        source_file: String(body.source_file || body.sourceFile || '').trim() || null,
+        status: 'present',
+        claim_gate_effect: 'no_claims_cleared',
+      },
+      {
+        evidence_type: HALOFIRE_SAM31_SPRINKLER_FOLLOWUP_PACKET_REVIEW_DECISION_TYPE,
+        evidence_id: packetReview.evidence_id,
+        source_ref: packetReview.source_ref || packetReview.review_ref || null,
+        status: 'present',
+        claim_gate_effect: 'no_claims_cleared',
+      },
+    ].filter(Boolean)),
+    blocked_claims: uniqueStrings([
+      ...(Array.isArray(sourcePacket.blocked_claims) ? sourcePacket.blocked_claims : []),
+      ...(rule.target_approval_lane === 'professional_approval' ? ['professional_approval', 'permit_ready', 'fabrication_ready'] : []),
+      ...(rule.target_approval_lane === 'AHJ_approval' ? ['AHJ_approval', 'permit_ready'] : []),
+      ...(rule.target_approval_lane === 'manufacturer_exact' ? ['manufacturer_exact', 'fabrication_ready'] : []),
+    ]),
+    use_for_claims: false,
+    claim_gate_effect: 'no_claims_cleared',
+    no_claim_gates_cleared: true,
+    limitations: [
+      'This upload intake records signed evidence for later claim-gate validation only.',
+      'It does not clear professional, AHJ, manufacturer, permit-ready, fabrication-ready, AutoSprink parity, or engineering-grade claims by itself.',
+    ],
+  };
+}
+
 function buildHalofireSam31SprinklerPreliminaryReplayArtifact(projectName, evidence, decision, reviewEvidence, review, sprinklerReviewEvidence, sprinklerReview) {
   const packet = buildHalofireSam31SprinklerReviewDecisionPacket(
     projectName,
@@ -4479,7 +4799,7 @@ function normalizeHalofireSam31SprinklerPreliminaryReplayFollowupDecision(projec
   return followup;
 }
 
-function halofireSam31SprinklerPreliminaryReplayQueueItems(projectName, evidence, decision, reviewEvidences, sprinklerReviewDecisionEvidences = [], preliminaryReplayFollowupDecisionEvidences = [], followupPacketReviewDecisionEvidences = []) {
+function halofireSam31SprinklerPreliminaryReplayQueueItems(projectName, evidence, decision, reviewEvidences, sprinklerReviewDecisionEvidences = [], preliminaryReplayFollowupDecisionEvidences = [], followupPacketReviewDecisionEvidences = [], approvalUploadIntakeEvidences = []) {
   if (!evidence || !decision) return [];
   const reviewsByEvidenceId = new Map(
     (Array.isArray(reviewEvidences) ? reviewEvidences : [])
@@ -4507,7 +4827,7 @@ function halofireSam31SprinklerPreliminaryReplayQueueItems(projectName, evidence
       );
       const replayInputs = packet.preliminary_replay_inputs || {};
       const latestFollowup = followupsBySprinklerReviewEvidenceId.get(Number(sprinklerReviewEvidence.id)) || null;
-      const latestFollowupSummary = halofireSam31SprinklerPreliminaryReplayFollowupSummary(latestFollowup, followupPacketReviewDecisionEvidences);
+      const latestFollowupSummary = halofireSam31SprinklerPreliminaryReplayFollowupSummary(latestFollowup, followupPacketReviewDecisionEvidences, approvalUploadIntakeEvidences);
       return {
         artifact_type: HALOFIRE_SAM31_SPRINKLER_PRELIMINARY_REPLAY_QUEUE_ITEM_TYPE,
         id: `sam31-sprinkler-preliminary-replay:${evidence.id}:${sourceReview.evidence.id}:${sprinklerReviewEvidence.id}`,
@@ -4837,7 +5157,7 @@ app.post('/api/projects/:name/pdf-boundary-decision', authMiddleware, requireRol
   }
 });
 
-function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence = null, sam31Evidence = null, sam31ReplacementEvidence = null, sam31SmokeEvidence = null, sam31ExtrapolationEvidence = null, sam31ExtrapolationReviewEvidence = null, sam31ConsumerSmokeEvidence = null, sam31ConsumerReviewEvidences = [], sam31SprinklerReviewDecisionEvidences = [], sam31SprinklerPreliminaryReplayFollowupDecisionEvidences = [], sam31SprinklerFollowupPacketReviewDecisionEvidences = []) {
+function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence = null, sam31Evidence = null, sam31ReplacementEvidence = null, sam31SmokeEvidence = null, sam31ExtrapolationEvidence = null, sam31ExtrapolationReviewEvidence = null, sam31ConsumerSmokeEvidence = null, sam31ConsumerReviewEvidences = [], sam31SprinklerReviewDecisionEvidences = [], sam31SprinklerPreliminaryReplayFollowupDecisionEvidences = [], sam31SprinklerFollowupPacketReviewDecisionEvidences = [], sam31ApprovalUploadIntakeEvidences = []) {
   if (!evidence || !decision) return null;
   const candidate = decision.candidate || {};
   const pdfRef = evidence.source_file || decision.sourceFile || evidence.source_ref || decision.sourceRef || `${projectName}:pdf-boundary:${evidence.id}`;
@@ -4982,7 +5302,7 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
     latestOpenClawSam31ConsumerReviews,
   );
   const sam31SprinklerReviewQueueItems = openClawSam31SprinklerReviewQueueItems(projectName, evidence, decision, sam31ConsumerReviewEvidences, sam31SprinklerReviewDecisionEvidences);
-  const sam31SprinklerPreliminaryReplayQueueItems = halofireSam31SprinklerPreliminaryReplayQueueItems(projectName, evidence, decision, sam31ConsumerReviewEvidences, sam31SprinklerReviewDecisionEvidences, sam31SprinklerPreliminaryReplayFollowupDecisionEvidences, sam31SprinklerFollowupPacketReviewDecisionEvidences);
+  const sam31SprinklerPreliminaryReplayQueueItems = halofireSam31SprinklerPreliminaryReplayQueueItems(projectName, evidence, decision, sam31ConsumerReviewEvidences, sam31SprinklerReviewDecisionEvidences, sam31SprinklerPreliminaryReplayFollowupDecisionEvidences, sam31SprinklerFollowupPacketReviewDecisionEvidences, sam31ApprovalUploadIntakeEvidences);
   let status = 'ready';
   let nextAction = 'Open the selected PDF sheet with these defaults, run a room-boundary visual audit packet, and attach employee review evidence before any geometry-accuracy claim.';
   if (latestReview?.review_decision === 'corrected') {
@@ -7298,6 +7618,7 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
   const sam31SprinklerReviewDecisionEvidences = evidence ? latestHalofireSam31SprinklerReviewDecisionEvidence(projectName, evidence.id) : [];
   const sam31SprinklerPreliminaryReplayFollowupDecisionEvidences = evidence ? latestHalofireSam31SprinklerPreliminaryReplayFollowupDecisionEvidence(projectName, evidence.id) : [];
   const sam31SprinklerFollowupPacketReviewDecisionEvidences = evidence ? latestHalofireSam31SprinklerFollowupPacketReviewDecisionEvidence(projectName, evidence.id) : [];
+  const sam31ApprovalUploadIntakeEvidences = evidence ? latestHalofireSam31ApprovalUploadIntakeEvidence(projectName, evidence.id) : [];
   const items = [];
   const officialFlowEvidence = latestOfficialFlowIntakeEvidence(projectName);
   const officialFlowItem = officialFlowResolverQueueItem(projectName, officialFlowEvidence);
@@ -7306,7 +7627,7 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
     const replayItem = officialFlowReplayReviewQueueItem(projectName, replayEvidence);
     if (replayItem) items.push(replayItem);
   }
-  const boundaryItem = pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence, sam31Evidence, sam31ReplacementEvidence, sam31SmokeEvidence, sam31ExtrapolationEvidence, sam31ExtrapolationReviewEvidence, sam31ConsumerSmokeEvidence, sam31ConsumerReviewEvidences, sam31SprinklerReviewDecisionEvidences, sam31SprinklerPreliminaryReplayFollowupDecisionEvidences, sam31SprinklerFollowupPacketReviewDecisionEvidences);
+  const boundaryItem = pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence, sam31Evidence, sam31ReplacementEvidence, sam31SmokeEvidence, sam31ExtrapolationEvidence, sam31ExtrapolationReviewEvidence, sam31ConsumerSmokeEvidence, sam31ConsumerReviewEvidences, sam31SprinklerReviewDecisionEvidences, sam31SprinklerPreliminaryReplayFollowupDecisionEvidences, sam31SprinklerFollowupPacketReviewDecisionEvidences, sam31ApprovalUploadIntakeEvidences);
   if (boundaryItem) items.push(boundaryItem);
   const catalogEvidence = matchingCatalogEvidenceByFamily(projectName);
   for (const row of currentSourceAcquisitionLedger()) {
@@ -7382,6 +7703,7 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
       sam31_sprinkler_packet_queue_items: visibleItems.reduce((acc, item) => acc + (Array.isArray(item.sam31_sprinkler_preliminary_replay_queue_items) ? item.sam31_sprinkler_preliminary_replay_queue_items.reduce((rowAcc, row) => rowAcc + (Array.isArray(row.packet_queue_items) ? row.packet_queue_items.length : 0), 0) : 0), 0),
       sam31_sprinkler_packet_reviews_recorded: visibleItems.reduce((acc, item) => acc + (Array.isArray(item.sam31_sprinkler_preliminary_replay_queue_items) ? item.sam31_sprinkler_preliminary_replay_queue_items.reduce((rowAcc, row) => rowAcc + (Array.isArray(row.packet_queue_items) ? row.packet_queue_items.filter((packet) => packet.latest_packet_review_decision).length : 0), 0) : 0), 0),
       sam31_approval_upload_resolver_rows: visibleItems.reduce((acc, item) => acc + (Array.isArray(item.sam31_sprinkler_preliminary_replay_queue_items) ? item.sam31_sprinkler_preliminary_replay_queue_items.reduce((rowAcc, row) => rowAcc + (Array.isArray(row.packet_queue_items) ? row.packet_queue_items.reduce((packetAcc, packet) => packetAcc + (Array.isArray(packet.approval_upload_resolver_rows) ? packet.approval_upload_resolver_rows.length : 0), 0) : 0), 0) : 0), 0),
+      sam31_approval_uploads_recorded: visibleItems.reduce((acc, item) => acc + (Array.isArray(item.sam31_sprinkler_preliminary_replay_queue_items) ? item.sam31_sprinkler_preliminary_replay_queue_items.reduce((rowAcc, row) => rowAcc + (Array.isArray(row.packet_queue_items) ? row.packet_queue_items.reduce((packetAcc, packet) => packetAcc + (Array.isArray(packet.approval_upload_resolver_rows) ? packet.approval_upload_resolver_rows.filter((uploadRow) => uploadRow.latest_approval_upload_intake).length : 0), 0) : 0), 0) : 0), 0),
       catalog_source_needed: statusCounts.catalog_source_needed || 0,
       catalog_review_needed: statusCounts.catalog_review_needed || 0,
       catalog_evidence_recorded: statusCounts.catalog_evidence_recorded || 0,
@@ -8229,6 +8551,141 @@ app.post('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/openclaw
       message: 'SAM31 follow-up packet review decision recorded; claims still blocked',
       evidence: evidenceRow,
       ...reviewDecision,
+    });
+  } catch (err) {
+    return res.status(err.httpStatus || 400).json({ error: err.message });
+  }
+});
+
+app.post('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/openclaw/sam31/sprinkler-review/:reviewEvidenceId/decision/:sprinklerReviewEvidenceId/preliminary-replay/followup/:followupEvidenceId/packet/:packetIndex/review/:packetReviewEvidenceId/approval-upload', authMiddleware, requireRole('admin'), (req, res) => {
+  try {
+    const projectName = req.params.name;
+    const evidenceId = Number(req.params.evidenceId);
+    const reviewEvidenceId = Number(req.params.reviewEvidenceId);
+    const sprinklerReviewEvidenceId = Number(req.params.sprinklerReviewEvidenceId);
+    const followupEvidenceId = Number(req.params.followupEvidenceId);
+    const packetIndex = Number(req.params.packetIndex);
+    const packetReviewEvidenceId = Number(req.params.packetReviewEvidenceId);
+    if (!Number.isSafeInteger(evidenceId) || evidenceId <= 0) {
+      return res.status(400).json({ error: 'A positive evidence id is required' });
+    }
+    if (!Number.isSafeInteger(reviewEvidenceId) || reviewEvidenceId <= 0) {
+      return res.status(400).json({ error: 'A positive SAM31 consumer review evidence id is required' });
+    }
+    if (!Number.isSafeInteger(sprinklerReviewEvidenceId) || sprinklerReviewEvidenceId <= 0) {
+      return res.status(400).json({ error: 'A positive SAM31 sprinkler review decision evidence id is required' });
+    }
+    if (!Number.isSafeInteger(followupEvidenceId) || followupEvidenceId <= 0) {
+      return res.status(400).json({ error: 'A positive SAM31 preliminary replay follow-up evidence id is required' });
+    }
+    if (!Number.isSafeInteger(packetIndex) || packetIndex < 0) {
+      return res.status(400).json({ error: 'A non-negative SAM31 follow-up packet index is required' });
+    }
+    if (!Number.isSafeInteger(packetReviewEvidenceId) || packetReviewEvidenceId <= 0) {
+      return res.status(400).json({ error: 'A positive SAM31 follow-up packet review evidence id is required' });
+    }
+    const evidence = db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'pdf_boundary_decision'`)
+      .get(evidenceId, projectName);
+    const decision = decisionFromEvidence(evidence);
+    if (!evidence || !decision) {
+      return res.status(404).json({ error: 'PDF boundary decision evidence not found' });
+    }
+    const reviewEvidence = db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'openclaw_sam31_consumer_review'`)
+      .get(reviewEvidenceId, projectName);
+    const review = openClawSam31ConsumerReviewFromEvidence(reviewEvidence);
+    if (!reviewEvidence || !review) {
+      return res.status(404).json({ error: 'SAM31 consumer review evidence not found' });
+    }
+    const sprinklerReviewEvidence = db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'halofire_sam31_sprinkler_review_decision'`)
+      .get(sprinklerReviewEvidenceId, projectName);
+    const sprinklerReview = halofireSam31SprinklerReviewDecisionFromEvidence(sprinklerReviewEvidence);
+    if (!sprinklerReviewEvidence || !sprinklerReview) {
+      return res.status(404).json({ error: 'HaloFire SAM31 sprinkler review decision evidence not found' });
+    }
+    const followupEvidence = db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'halofire_sam31_sprinkler_preliminary_replay_followup_decision'`)
+      .get(followupEvidenceId, projectName);
+    const followup = halofireSam31SprinklerPreliminaryReplayFollowupDecisionFromEvidence(followupEvidence);
+    if (!followupEvidence || !followup) {
+      return res.status(404).json({ error: 'SAM31 sprinkler preliminary replay follow-up evidence not found' });
+    }
+    if (Number(followup.source_pdf_boundary_evidence_id) !== evidenceId
+      || Number(followup.source_openclaw_sam31_consumer_review_evidence_id) !== reviewEvidenceId
+      || Number(followup.source_halofire_sam31_sprinkler_review_decision_evidence_id) !== sprinklerReviewEvidenceId) {
+      return res.status(409).json({ error: 'SAM31 sprinkler preliminary replay follow-up evidence does not match the requested source chain' });
+    }
+    const packetReviewEvidence = db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'halofire_sam31_sprinkler_followup_packet_review_decision'`)
+      .get(packetReviewEvidenceId, projectName);
+    const packetReview = halofireSam31SprinklerFollowupPacketReviewDecisionFromEvidence(packetReviewEvidence);
+    if (!packetReviewEvidence || !packetReview) {
+      return res.status(404).json({ error: 'SAM31 follow-up packet review evidence not found' });
+    }
+    if (Number(packetReview.source_pdf_boundary_evidence_id) !== evidenceId
+      || Number(packetReview.source_openclaw_sam31_consumer_review_evidence_id) !== reviewEvidenceId
+      || Number(packetReview.source_halofire_sam31_sprinkler_review_decision_evidence_id) !== sprinklerReviewEvidenceId
+      || Number(packetReview.source_followup_decision_evidence_id) !== followupEvidenceId
+      || Number(packetReview.packet_index) !== packetIndex) {
+      return res.status(409).json({ error: 'SAM31 follow-up packet review evidence does not match the requested source chain' });
+    }
+    const sourcePacket = buildHalofireSam31SprinklerReplayFollowupPacket(
+      projectName,
+      evidence,
+      reviewEvidence,
+      sprinklerReviewEvidence,
+      followupEvidence,
+      followup,
+      packetIndex,
+    );
+    const packetReviewWithEvidenceId = {
+      ...packetReview,
+      evidence_id: packetReviewEvidence.id,
+      source_ref: packetReviewEvidence.source_ref,
+    };
+    const intake = normalizeHalofireSam31ApprovalUploadIntake(projectName, sourcePacket, packetReviewWithEvidenceId, req.body || {}, req.user || {});
+    ensureHalofireSam31ApprovalUploadGate(projectName, intake.gate_code, halofireSam31ApprovalUploadRule(intake.code));
+    const notes = {
+      kind: 'halofire_sam31_approval_upload_intake',
+      artifact_type: HALOFIRE_SAM31_APPROVAL_UPLOAD_INTAKE_TYPE,
+      intake,
+      signoff: intake.signoff,
+      blocked_claims: intake.blocked_claims,
+      claim_gate_effect: intake.claim_gate_effect,
+      use_for_claims: false,
+      limitations: intake.limitations,
+    };
+    const result = db
+      .prepare(`INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+                VALUES (?, ?, ?, ?, ?, ?)`)
+      .run(
+        projectName,
+        intake.evidence_type,
+        intake.source_file || sourcePacket.download_name || sourcePacket.artifact_type,
+        intake.source_ref,
+        'present',
+        JSON.stringify(notes),
+      );
+    const evidenceRow = db.prepare('SELECT * FROM project_evidence WHERE id = ?').get(result.lastInsertRowid);
+    const responseIntake = {
+      ...intake,
+      gate_validation_action: intake.gate_validation_action ? {
+        ...intake.gate_validation_action,
+        request_body: { evidence_id: result.lastInsertRowid },
+      } : null,
+    };
+    return res.status(201).json({
+      id: result.lastInsertRowid,
+      message: 'SAM31 approval upload intake recorded for later gate validation; claims still blocked',
+      evidence: evidenceRow,
+      ...responseIntake,
     });
   } catch (err) {
     return res.status(err.httpStatus || 400).json({ error: err.message });

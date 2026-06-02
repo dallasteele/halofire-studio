@@ -312,6 +312,11 @@ describe('studio static origin handling', () => {
     expect(html).toContain('HALOFIRE_SAM31_PROFESSIONAL_APPROVAL_UPLOAD_MISSING');
     expect(html).toContain('HALOFIRE_SAM31_AHJ_APPROVAL_UPLOAD_MISSING');
     expect(html).toContain('HALOFIRE_SAM31_MANUFACTURER_EVIDENCE_UPLOAD_MISSING');
+    expect(html).toContain('halofire.sam31_approval_upload_intake.v1');
+    expect(html).toContain('Save SAM31 approval upload');
+    expect(html).toContain('saveHalofireSam31ApprovalUpload');
+    expect(html).toContain('data-sam31-approval-upload-code');
+    expect(html).toContain('/approval-upload');
     expect(html).toContain('/preliminary-replay/followup/');
     expect(html).toContain('/packet/');
     expect(html).toContain('/review');
