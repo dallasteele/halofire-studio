@@ -489,6 +489,30 @@ async function runBrowserSmoke(token, evidenceIds) {
     if (consumerReviewPacket.claim_gate_effect !== 'no_claims_cleared') {
       throw new Error(`SAM31 consumer review packet cleared a claim gate: ${consumerReviewPacket.claim_gate_effect}`);
     }
+    await page.waitForSelector('text=Download SAM31 sprinkler review adapter', { timeout: 8_000 });
+    const sprinklerAdapterDownloadPromise = page.waitForEvent('download');
+    await page.locator(`button[data-sam31-sprinkler-review-adapter-evidence-id="${consumerReview.evidence_id}"]`).click();
+    const sprinklerAdapterDownload = await sprinklerAdapterDownloadPromise;
+    const sprinklerAdapterPath = await sprinklerAdapterDownload.path();
+    const sprinklerAdapterSuggestedName = sprinklerAdapterDownload.suggestedFilename();
+    const sprinklerAdapterDownloadBytes = sprinklerAdapterPath ? fs.statSync(sprinklerAdapterPath).size : 0;
+    downloads.push({ suggestedName: sprinklerAdapterSuggestedName, bytes: sprinklerAdapterDownloadBytes });
+    if (!sprinklerAdapterSuggestedName.includes('sam31-to-sprinkler-review') || sprinklerAdapterDownloadBytes <= 0) {
+      throw new Error(`Unexpected SAM31 sprinkler review adapter download ${sprinklerAdapterSuggestedName} (${sprinklerAdapterDownloadBytes} bytes)`);
+    }
+    const sprinklerAdapterPacket = JSON.parse(fs.readFileSync(sprinklerAdapterPath, 'utf8'));
+    if (sprinklerAdapterPacket.artifact_type !== 'openclaw.sam31_to_sprinkler_review_adapter.v1') {
+      throw new Error(`Unexpected SAM31 sprinkler review adapter type ${sprinklerAdapterPacket.artifact_type}`);
+    }
+    if (sprinklerAdapterPacket.sprinkler_review_packet?.artifact_type !== 'halofire.sam31_sprinkler_review_packet.v1') {
+      throw new Error(`Unexpected HaloFire sprinkler review packet type ${sprinklerAdapterPacket.sprinkler_review_packet?.artifact_type}`);
+    }
+    if (sprinklerAdapterPacket.claim_gate_effect !== 'no_claims_cleared' || sprinklerAdapterPacket.use_for_claims !== false) {
+      throw new Error(`SAM31 sprinkler review adapter cleared a claim gate: ${JSON.stringify(sprinklerAdapterPacket)}`);
+    }
+    if (!Array.isArray(sprinklerAdapterPacket.supported_sprinkler_review_lanes) || !sprinklerAdapterPacket.supported_sprinkler_review_lanes.includes('obstruction_or_clash_review')) {
+      throw new Error(`SAM31 sprinkler review adapter missing sprinkler review lanes: ${JSON.stringify(sprinklerAdapterPacket.supported_sprinkler_review_lanes)}`);
+    }
     const unresolvedNameForge = await request(`${PROJECT_PATH}/resolver-queue?sam31ConsumerReview=unresolved&consumer=nameforge`, token);
     const unresolvedItem = unresolvedNameForge.items.find((item) => item.evidence_id === evidenceIds.boundaryEvidenceId);
     const unresolvedNameForgeReviews = unresolvedItem?.sam31_unresolved_consumer_reviews || [];
@@ -637,6 +661,14 @@ async function runBrowserSmoke(token, evidenceIds) {
         accepted_queue_id: consumerReviewPacket.accepted_queue_id,
         source_openclaw_sam31_consumer_review_evidence_id: consumerReviewPacket.source_openclaw_sam31_consumer_review_evidence_id,
         claim_gate_effect: consumerReviewPacket.claim_gate_effect,
+      },
+      sprinklerReviewAdapterPacket: {
+        artifact_type: sprinklerAdapterPacket.artifact_type,
+        suggestedName: sprinklerAdapterSuggestedName,
+        source_openclaw_sam31_consumer_review_evidence_id: sprinklerAdapterPacket.source_openclaw_sam31_consumer_review_evidence_id,
+        sprinkler_review_packet_type: sprinklerAdapterPacket.sprinkler_review_packet?.artifact_type,
+        supported_sprinkler_review_lanes: sprinklerAdapterPacket.supported_sprinkler_review_lanes,
+        claim_gate_effect: sprinklerAdapterPacket.claim_gate_effect,
       },
       unresolvedNameForgeReview: {
         filter: 'sam31ConsumerReview=unresolved',

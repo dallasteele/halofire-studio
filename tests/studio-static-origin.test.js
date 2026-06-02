@@ -264,6 +264,13 @@ describe('studio static origin handling', () => {
     expect(html).toContain('openclaw.sam31.product_owner_replacement_intake.v1');
     expect(html).toContain('product_owner_replacement_intake');
     expect(html).toContain('/openclaw/sam31/product-owner-replacements');
+    expect(html).toContain('Download SAM31 sprinkler review adapter');
+    expect(html).toContain('downloadOpenClawSam31SprinklerReviewAdapter');
+    expect(html).toContain('data-sam31-sprinkler-review-adapter-evidence-id');
+    expect(html).toContain('/openclaw/sam31/sprinkler-review-adapter/');
+    expect(html).toContain('openclaw.sam31_to_sprinkler_review_adapter.v1');
+    expect(html).toContain('halofire.sam31_sprinkler_review_packet.v1');
+    expect(html).toContain('supported_sprinkler_review_lanes');
     expect(html).toContain('supported_applications');
     expect(html).toContain('latest_openclaw_sam31_consumer_reviews');
     expect(html).toContain('consumer_queue_statuses');
