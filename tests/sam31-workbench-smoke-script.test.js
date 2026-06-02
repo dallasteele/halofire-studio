@@ -50,6 +50,14 @@ describe('SAM31 workbench browser smoke script', () => {
     expect(script).toContain('openclaw-sam31-tool-contract');
     expect(script).toContain('openclaw.sam31_llm_extrapolation_tool_contract_packet.v1');
     expect(script).toContain('halofire-api-local-contract');
+    expect(script).toContain('requiredSectioningPipelineStages');
+    expect(script).toContain('sectioning_pipeline_contract');
+    expect(script).toContain('openclaw.sam31.sectioning_pipeline_contract.v1');
+    expect(script).toContain('sam31_sectioning');
+    expect(script).toContain('llm_object_identification');
+    expect(script).toContain('vector_overlay_generation');
+    expect(script).toContain('model_3d_candidate_generation');
+    expect(script).toContain('product_review_queue');
     expect(script).toContain('cross_product_handoff_rows');
     expect(script).toContain('Download SAM31 vector/model artifact packet');
     expect(script).toContain('Record SAM31 vector/model artifacts');

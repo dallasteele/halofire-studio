@@ -22,6 +22,13 @@ const SAM31_BRIDGE_SMOKE_WORKBENCH_HANDLER = 'runSam31BridgeSmokeArtifact';
 const SAM31_BRIDGE_SMOKE_EVIDENCE_TYPE = 'openclaw_sam31_bridge_smoke_artifact';
 const SAM31_REPLACEMENTS_ROUTE_SUFFIX = '/sam31-replacements';
 const SAM31_REPLACEMENTS_RECORDED_STATUS = 'sam31_replacements_recorded';
+const requiredSectioningPipelineStages = [
+  'sam31_sectioning',
+  'llm_object_identification',
+  'vector_overlay_generation',
+  'model_3d_candidate_generation',
+  'product_review_queue',
+];
 const PASSWORD = 'sam31-workbench-smoke-pw';
 const OUT_DIR_REL = 'output/playwright';
 const OUT_DIR = path.join(ROOT, ...OUT_DIR_REL.split('/'));
@@ -341,6 +348,21 @@ async function runBrowserSmoke(token, evidenceIds) {
       || toolContract.use_for_claims !== false
       || toolContract.claim_gate_effect !== 'no_claims_cleared') {
       throw new Error(`SAM31 tool contract cleared a claim gate or lost source truth: ${JSON.stringify(toolContract)}`);
+    }
+    const sectioningContract = toolContract.sectioning_pipeline_contract;
+    if (!sectioningContract
+      || sectioningContract.artifact_type !== 'openclaw.sam31.sectioning_pipeline_contract.v1'
+      || sectioningContract.use_for_claims !== false
+      || sectioningContract.claim_gate_effect !== 'no_claims_cleared') {
+      throw new Error(`SAM31 tool contract lost fail-closed sectioning pipeline contract: ${JSON.stringify(sectioningContract)}`);
+    }
+    const sectioningStageNames = Array.isArray(sectioningContract.stages)
+      ? new Set(sectioningContract.stages.map((stage) => stage.stage))
+      : new Set();
+    for (const stageName of requiredSectioningPipelineStages) {
+      if (!sectioningStageNames.has(stageName)) {
+        throw new Error(`SAM31 tool contract lost sectioning pipeline stage ${stageName}: ${JSON.stringify(sectioningContract.stages)}`);
+      }
     }
     const toolContractConsumers = Array.isArray(toolContract.cross_product_handoff_rows)
       ? toolContract.cross_product_handoff_rows.map((row) => row.consumer)
