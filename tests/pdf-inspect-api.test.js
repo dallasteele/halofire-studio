@@ -454,6 +454,22 @@ describe('PDF page inspection API', () => {
           ],
           blocked_claims: ['geometry_accuracy', 'permit_ready', 'AutoSprink_parity'],
           claim_gate_effect: 'no_claims_cleared',
+          perception_summary: {
+            artifact_type: 'openclaw.sam31_perception_summary',
+            status: 'best_effort_perception_ready',
+            project_ref: 'halo-fire:1881',
+            application: 'halo_fire',
+            source_runtime: 'sam-3.1+llm',
+            claim_gate_effect: 'no_claims_cleared',
+            perception_lanes: ['segmentation', 'object_identification', 'vector_overlay', 'model_3d_candidate', 'spatial_observation'],
+            segment_count: 1,
+            object_hypothesis_count: 1,
+            vector_overlay_count: 1,
+            model_3d_candidate_count: 1,
+            spatial_observation_count: 0,
+            blocked_claims: ['geometry_accuracy', 'permit_ready', 'AutoSprink_parity'],
+            next_action: 'Use this summary to queue HaloFire room-boundary replay; do not promote blocked claims.',
+          },
         },
         notes: 'SAM 3.1 result persisted for internal-alpha correction only.',
       }),
@@ -478,6 +494,19 @@ describe('PDF page inspection API', () => {
     expect(samResult.result.openclaw_sam31_perception_packet).toEqual(expect.objectContaining({
       artifact_type: 'openclaw.sam31_perception_packet',
       status: 'best_effort_perception_ready',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(samResult.result.openclaw_sam31_perception_packet.perception_summary).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31_perception_summary',
+      project_ref: 'halo-fire:1881',
+      application: 'halo_fire',
+      source_runtime: 'sam-3.1+llm',
+      segment_count: 1,
+      object_hypothesis_count: 1,
+      vector_overlay_count: 1,
+      model_3d_candidate_count: 1,
+      spatial_observation_count: 0,
+      next_action: 'Use this summary to queue HaloFire room-boundary replay; do not promote blocked claims.',
       claim_gate_effect: 'no_claims_cleared',
     }));
     expect(samResult.result.openclaw_sam31_perception_packet.object_hypotheses[0]).toEqual(expect.objectContaining({
@@ -520,12 +549,15 @@ describe('PDF page inspection API', () => {
       claim_gate_effect: 'no_claims_cleared',
     }));
     expect(samReviewedItem.latest_sam31_visual_audit.openclaw_sam31_perception_packet).toEqual(expect.objectContaining({
-      artifact_type: 'openclaw.sam31_perception_packet',
+      artifact_type: 'openclaw.sam31_perception_summary',
       status: 'best_effort_perception_ready',
+      project_ref: 'halo-fire:1881',
       segment_count: 1,
       object_hypothesis_count: 1,
       vector_overlay_count: 1,
       model_3d_candidate_count: 1,
+      spatial_observation_count: 0,
+      next_action: 'Use this summary to queue HaloFire room-boundary replay; do not promote blocked claims.',
       claim_gate_effect: 'no_claims_cleared',
     }));
     expect(queueAfterSamResult.summary.sam31_correction_ready).toBe(1);
@@ -555,14 +587,19 @@ describe('PDF page inspection API', () => {
       use_for_claims: false,
     }));
     expect(samReplayPacket.openclaw_sam31_perception_packet).toEqual(expect.objectContaining({
-      artifact_type: 'openclaw.sam31_perception_packet',
+      artifact_type: 'openclaw.sam31_perception_summary',
+      project_ref: 'halo-fire:1881',
       object_hypothesis_count: 1,
       vector_overlay_count: 1,
       model_3d_candidate_count: 1,
+      spatial_observation_count: 0,
+      next_action: 'Use this summary to queue HaloFire room-boundary replay; do not promote blocked claims.',
       claim_gate_effect: 'no_claims_cleared',
     }));
     expect(samReplayPacket.sprinkler_bid_request.openclaw_sam31_perception_packet).toEqual(expect.objectContaining({
-      artifact_type: 'openclaw.sam31_perception_packet',
+      artifact_type: 'openclaw.sam31_perception_summary',
+      project_ref: 'halo-fire:1881',
+      next_action: 'Use this summary to queue HaloFire room-boundary replay; do not promote blocked claims.',
       claim_gate_effect: 'no_claims_cleared',
     }));
     expect(samReplayPacket.source_refs).toEqual(expect.arrayContaining([
@@ -595,10 +632,13 @@ describe('PDF page inspection API', () => {
       claim_gate_effect: 'no_claims_cleared',
     }));
     expect(samReplayBid.roomBoundaryReplay.openclaw_sam31_perception_packet).toEqual(expect.objectContaining({
-      artifact_type: 'openclaw.sam31_perception_packet',
+      artifact_type: 'openclaw.sam31_perception_summary',
+      project_ref: 'halo-fire:1881',
       object_hypothesis_count: 1,
       vector_overlay_count: 1,
       model_3d_candidate_count: 1,
+      spatial_observation_count: 0,
+      next_action: 'Use this summary to queue HaloFire room-boundary replay; do not promote blocked claims.',
       claim_gate_effect: 'no_claims_cleared',
     }));
     expect(samReplayBid.bid.totalAreaSqFt).toBe(300);

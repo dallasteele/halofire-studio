@@ -1303,23 +1303,38 @@ function normalizeOpenClawSam31PerceptionPacket(body = {}) {
     ...(Array.isArray(packet.limitations) ? packet.limitations : []),
     'OpenClaw/SAM31+LLM perception is internal-alpha correction evidence only and clears no regulated claim gate.',
   ];
+  packet.perception_summary = sam31PerceptionPacketSummary(packet);
   return packet;
 }
 
 function sam31PerceptionPacketSummary(packet) {
   if (!packet || typeof packet !== 'object') return null;
+  const upstream = packet.perception_summary && typeof packet.perception_summary === 'object' && !Array.isArray(packet.perception_summary)
+    ? packet.perception_summary
+    : {};
+  const blockedClaims = uniqueStrings([
+    ...(Array.isArray(upstream.blocked_claims) ? upstream.blocked_claims : []),
+    ...(Array.isArray(packet.blocked_claims) ? packet.blocked_claims : []),
+    ...PDF_BOUNDARY_BLOCKED_CLAIMS,
+  ]);
   return {
-    artifact_type: 'openclaw.sam31_perception_packet',
-    status: packet.status || 'best_effort_perception_ready',
-    application: packet.application || 'halo_fire',
-    source_runtime: packet.source_runtime || 'sam-3.1+llm',
-    source_ref: packet.source_ref || null,
-    segment_count: Array.isArray(packet.segments) ? packet.segments.length : 0,
-    object_hypothesis_count: Array.isArray(packet.object_hypotheses) ? packet.object_hypotheses.length : 0,
-    vector_overlay_count: Array.isArray(packet.vector_overlays) ? packet.vector_overlays.length : 0,
-    model_3d_candidate_count: Array.isArray(packet.model_3d_candidates) ? packet.model_3d_candidates.length : 0,
-    blocked_claims: Array.isArray(packet.blocked_claims) ? packet.blocked_claims : [...PDF_BOUNDARY_BLOCKED_CLAIMS],
+    artifact_type: 'openclaw.sam31_perception_summary',
+    status: upstream.status || packet.status || 'best_effort_perception_ready',
+    project_ref: upstream.project_ref || packet.project_ref || 'halo-fire:unknown',
+    application: upstream.application || packet.application || 'halo_fire',
+    source_runtime: upstream.source_runtime || packet.source_runtime || 'sam-3.1+llm',
+    source_ref: upstream.source_ref || packet.source_ref || null,
+    perception_lanes: Array.isArray(upstream.perception_lanes)
+      ? upstream.perception_lanes
+      : (Array.isArray(packet.perception_lanes) ? packet.perception_lanes : [...SAM31_PERCEPTION_LANES]),
+    segment_count: Number.isFinite(Number(upstream.segment_count)) ? Number(upstream.segment_count) : (Array.isArray(packet.segments) ? packet.segments.length : 0),
+    object_hypothesis_count: Number.isFinite(Number(upstream.object_hypothesis_count)) ? Number(upstream.object_hypothesis_count) : (Array.isArray(packet.object_hypotheses) ? packet.object_hypotheses.length : 0),
+    vector_overlay_count: Number.isFinite(Number(upstream.vector_overlay_count)) ? Number(upstream.vector_overlay_count) : (Array.isArray(packet.vector_overlays) ? packet.vector_overlays.length : 0),
+    model_3d_candidate_count: Number.isFinite(Number(upstream.model_3d_candidate_count)) ? Number(upstream.model_3d_candidate_count) : (Array.isArray(packet.model_3d_candidates) ? packet.model_3d_candidates.length : 0),
+    spatial_observation_count: Number.isFinite(Number(upstream.spatial_observation_count)) ? Number(upstream.spatial_observation_count) : 0,
+    blocked_claims: blockedClaims,
     claim_gate_effect: 'no_claims_cleared',
+    next_action: upstream.next_action || 'Use this summary to queue HaloFire room-boundary replay; do not promote blocked claims.',
     limitations: [
       'Summary of best-effort OpenClaw/SAM31+LLM perception evidence; it clears no regulated gate.',
     ],
