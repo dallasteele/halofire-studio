@@ -198,7 +198,28 @@ function sam31ApplicationLabel(application) {
   })[application] || String(application || 'HaloFire');
 }
 
-function renderSam31ApplicationContract(packet) {
+const SAM31_REPLACEMENT_FIELDS = [
+  'semantic_label',
+  'polygon',
+  'bbox',
+  'object_hypothesis',
+  'vector_overlay',
+  'model_3d_candidate',
+  'source_ref',
+  'confidence',
+];
+
+function renderSam31ReplacementActions(updates, sourceBoundaryEvidenceId) {
+  const fields = updates.length ? updates : SAM31_REPLACEMENT_FIELDS;
+  return `<div style="margin-top:7px;border-top:1px solid rgba(255,213,79,.18);padding-top:7px">
+    <b style="color:var(--gold)">Replace temporary SAM31 values</b><br>
+    <span>Employee updates are accepted as replacement evidence only; claim_gate_effect remains <span class="chip">no_claims_cleared</span>.</span><br>
+    ${fields.map((field) => `<span class="chip" data-sam31-replacement-action-field="${escapeHtml(field)}">${escapeHtml(field)}</span>`).join('')}
+    ${sourceBoundaryEvidenceId ? `<br><button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#b45309" data-sam31-replacement-action-evidence-id="${escapeHtml(sourceBoundaryEvidenceId)}">Record employee replacements</button>` : ''}
+  </div>`;
+}
+
+function renderSam31ApplicationContract(packet, sourceBoundaryEvidenceId) {
   if (!packet || typeof packet !== 'object') return '';
   const contracts = packet.application_contracts || {};
   const application = packet.application || 'halo_fire';
@@ -208,7 +229,7 @@ function renderSam31ApplicationContract(packet) {
   const updates = Array.isArray(contract.acceptable_human_updates) ? contract.acceptable_human_updates : [];
   const blocked = Array.isArray(contract.blocked_claims) ? contract.blocked_claims : [];
   const extrapolation = packet.extrapolation_contract && typeof packet.extrapolation_contract === 'object' ? packet.extrapolation_contract : {};
-  return `<div class="muted" style="font-size:11px;margin-top:6px;border:1px solid rgba(255,213,79,.22);border-radius:8px;padding:8px;background:rgba(255,213,79,.05)">SAM31 ${escapeHtml(sam31ApplicationLabel(application))} application contract<br>contract_ref ${escapeHtml(contract.contract_ref || 'missing')} - temporary_value_policy ${escapeHtml(contract.temporary_value_policy || extrapolation.temporary_value_policy || 'best_guess_until_employee_replaced')} - claim_gate_effect ${escapeHtml(contract.claim_gate_effect || packet.claim_gate_effect || 'no_claims_cleared')}<br>acceptable_human_updates: ${updates.length ? updates.map((field) => `<span class="chip">${escapeHtml(field)}</span>`).join('') : '<span class="chip">reviewer update fields missing</span>'}<br>Supported evidence lanes: ${lanes.length ? lanes.map((lane) => `<span class="chip">${escapeHtml(lane)}</span>`).join('') : '<span class="chip">application lanes missing</span>'}<br>Blocks still active: ${blocked.length ? blocked.map((claim) => `<span class="chip">${escapeHtml(claim)}</span>`).join('') : '<span class="chip">claim gates remain blocked</span>'}</div>`;
+  return `<div class="muted" style="font-size:11px;margin-top:6px;border:1px solid rgba(255,213,79,.22);border-radius:8px;padding:8px;background:rgba(255,213,79,.05)">SAM31 ${escapeHtml(sam31ApplicationLabel(application))} application contract<br>contract_ref ${escapeHtml(contract.contract_ref || 'missing')} - temporary_value_policy ${escapeHtml(contract.temporary_value_policy || extrapolation.temporary_value_policy || 'best_guess_until_employee_replaced')} - claim_gate_effect ${escapeHtml(contract.claim_gate_effect || packet.claim_gate_effect || 'no_claims_cleared')}<br>acceptable_human_updates: ${updates.length ? updates.map((field) => `<span class="chip">${escapeHtml(field)}</span>`).join('') : '<span class="chip">reviewer update fields missing</span>'}<br>Supported evidence lanes: ${lanes.length ? lanes.map((lane) => `<span class="chip">${escapeHtml(lane)}</span>`).join('') : '<span class="chip">application lanes missing</span>'}<br>Blocks still active: ${blocked.length ? blocked.map((claim) => `<span class="chip">${escapeHtml(claim)}</span>`).join('') : '<span class="chip">claim gates remain blocked</span>'}${renderSam31ReplacementActions(updates, sourceBoundaryEvidenceId)}</div>`;
 }
 
 function renderSam31PerceptionSummary(packetOrSummary, sourceBoundaryEvidenceId) {
@@ -224,7 +245,7 @@ function renderSam31PerceptionSummary(packetOrSummary, sourceBoundaryEvidenceId)
     'model_3d_candidate_count',
     'spatial_observation_count',
   ];
-  return `<div class="muted" style="font-size:11px;margin-top:5px;border:1px solid var(--border);border-radius:8px;padding:8px;background:rgba(77,208,225,.05)">SAM31 perception summary<br>artifact_type ${escapeHtml(summary.artifact_type || 'openclaw.sam31_perception_summary')} - project_ref ${escapeHtml(summary.project_ref || 'missing')} - claim_gate_effect ${escapeHtml(summary.claim_gate_effect || 'no_claims_cleared')}<br>${countFields.map((field) => `${field} ${escapeHtml(summary[field] ?? 0)}`).join(' - ')}<br>next_action ${escapeHtml(summary.next_action || 'Use this summary to queue product review; do not promote blocked claims.')}<br>Blocks still active: ${blocked.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('') || '<span class="chip">claim gates remain blocked</span>'}${renderSam31ApplicationContract(packetOrSummary)}${sourceBoundaryEvidenceId ? `<br><button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0f766e" data-sam31-visual-audit-evidence-id="${escapeHtml(sourceBoundaryEvidenceId)}">Download full SAM31 packet</button>` : ''}</div>`;
+  return `<div class="muted" style="font-size:11px;margin-top:5px;border:1px solid var(--border);border-radius:8px;padding:8px;background:rgba(77,208,225,.05)">SAM31 perception summary<br>artifact_type ${escapeHtml(summary.artifact_type || 'openclaw.sam31_perception_summary')} - project_ref ${escapeHtml(summary.project_ref || 'missing')} - claim_gate_effect ${escapeHtml(summary.claim_gate_effect || 'no_claims_cleared')}<br>${countFields.map((field) => `${field} ${escapeHtml(summary[field] ?? 0)}`).join(' - ')}<br>next_action ${escapeHtml(summary.next_action || 'Use this summary to queue product review; do not promote blocked claims.')}<br>Blocks still active: ${blocked.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('') || '<span class="chip">claim gates remain blocked</span>'}${renderSam31ApplicationContract(packetOrSummary, sourceBoundaryEvidenceId)}${sourceBoundaryEvidenceId ? `<br><button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0f766e" data-sam31-visual-audit-evidence-id="${escapeHtml(sourceBoundaryEvidenceId)}">Download full SAM31 packet</button>` : ''}</div>`;
 }
 
 function evidenceDetail(row) {
@@ -500,6 +521,17 @@ async function downloadSam31VisualAuditPacket(evidenceId) {
   URL.revokeObjectURL(a.href);
 }
 
+function focusSam31ReplacementForm(evidenceId) {
+  const target = document.getElementById('sam31ResultRef-' + evidenceId)
+    || document.getElementById('sam31CorrectedRoomPolygons-' + evidenceId)
+    || document.getElementById('sam31Notes-' + evidenceId);
+  if (!target) return;
+  const details = target.closest('details');
+  if (details) details.open = true;
+  target.focus();
+  target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
 async function downloadResolverReplayInput(evidenceId) {
   const packet = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/resolver-packets/pdf-boundary/' + encodeURIComponent(evidenceId) + '/replay-input');
   const blob = new Blob([JSON.stringify(packet, null, 2)], { type: 'application/json' });
@@ -716,6 +748,9 @@ async function refreshResolverQueue() {
   });
   document.querySelectorAll('[data-sam31-visual-audit-evidence-id]').forEach((button) => {
     button.onclick = () => downloadSam31VisualAuditPacket(button.dataset.sam31VisualAuditEvidenceId);
+  });
+  document.querySelectorAll('[data-sam31-replacement-action-evidence-id]').forEach((button) => {
+    button.onclick = () => focusSam31ReplacementForm(button.dataset.sam31ReplacementActionEvidenceId);
   });
   document.querySelectorAll('[data-resolver-replay-evidence-id]').forEach((button) => {
     button.onclick = () => downloadResolverReplayInput(button.dataset.resolverReplayEvidenceId);

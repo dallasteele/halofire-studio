@@ -266,6 +266,18 @@ async function runBrowserSmoke(token, evidenceIds) {
     await page.waitForSelector('text=openclaw.sam31.application_contract.halo_fire.v1', { timeout: 8_000 });
     await page.waitForSelector('text=sleeve_or_firestop_candidate_review', { timeout: 8_000 });
     await page.waitForSelector('text=acceptable_human_updates', { timeout: 8_000 });
+    await page.waitForSelector('text=Replace temporary SAM31 values', { timeout: 8_000 });
+    await page.waitForSelector('[data-sam31-replacement-action-field="semantic_label"]', { timeout: 8_000 });
+    await page.waitForSelector('[data-sam31-replacement-action-field="polygon"]', { timeout: 8_000 });
+    await page.waitForSelector('[data-sam31-replacement-action-field="bbox"]', { timeout: 8_000 });
+    await page.waitForSelector('[data-sam31-replacement-action-field="object_hypothesis"]', { timeout: 8_000 });
+    await page.waitForSelector('[data-sam31-replacement-action-field="vector_overlay"]', { timeout: 8_000 });
+    await page.waitForSelector('[data-sam31-replacement-action-field="model_3d_candidate"]', { timeout: 8_000 });
+    await page.waitForSelector('[data-sam31-replacement-action-field="source_ref"]', { timeout: 8_000 });
+    await page.waitForSelector('[data-sam31-replacement-action-field="confidence"]', { timeout: 8_000 });
+    await page.waitForSelector('[data-sam31-replacement-action-evidence-id]', { timeout: 8_000 });
+    await page.getByRole('button', { name: 'Record employee replacements' }).first().click();
+    await page.waitForSelector('[id^="sam31ResultRef-"]:focus', { timeout: 8_000 });
     await page.waitForSelector('text=best_guess_until_employee_replaced', { timeout: 8_000 });
     await page.waitForSelector('text=no_claims_cleared', { timeout: 8_000 });
     await page.waitForSelector('text=Download full SAM31 packet', { timeout: 8_000 });

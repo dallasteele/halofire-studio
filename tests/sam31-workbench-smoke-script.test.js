@@ -22,6 +22,16 @@ describe('SAM31 workbench browser smoke script', () => {
     expect(script).toContain('openclaw.sam31.application_contract.halo_fire.v1');
     expect(script).toContain('sleeve_or_firestop_candidate_review');
     expect(script).toContain('acceptable_human_updates');
+    expect(script).toContain('Replace temporary SAM31 values');
+    expect(script).toContain('semantic_label');
+    expect(script).toContain('polygon');
+    expect(script).toContain('bbox');
+    expect(script).toContain('object_hypothesis');
+    expect(script).toContain('vector_overlay');
+    expect(script).toContain('model_3d_candidate');
+    expect(script).toContain('source_ref');
+    expect(script).toContain('confidence');
+    expect(script).toContain('data-sam31-replacement-action-field');
     expect(script).toContain('best_guess_until_employee_replaced');
     expect(script).toContain('Download full SAM31 packet');
     expect(script).toContain('no_claims_cleared');
