@@ -335,6 +335,27 @@ async function runBrowserSmoke(token, evidenceIds) {
     if (manufacturerGate?.status !== 'blocked') {
       throw new Error(`Catalog source evidence cleared manufacturer gate unexpectedly: ${JSON.stringify(manufacturerGate)}`);
     }
+    await page.waitForSelector('text=Download catalog source packet', { timeout: 8_000 });
+    const catalogPacketDownloadPromise = page.waitForEvent('download');
+    await page.locator('[data-catalog-source-packet-family-ref="family:pipe_steel_sch40_2p0in"]').first().click();
+    const catalogPacketDownload = await catalogPacketDownloadPromise;
+    const catalogPacketPath = await catalogPacketDownload.path();
+    const catalogPacketSuggestedName = catalogPacketDownload.suggestedFilename();
+    const catalogPacketBytes = catalogPacketPath ? fs.statSync(catalogPacketPath).size : 0;
+    downloads.push({ suggestedName: catalogPacketSuggestedName, bytes: catalogPacketBytes });
+    if (!catalogPacketSuggestedName.includes('catalog-source-evidence-packet') || catalogPacketBytes <= 0) {
+      throw new Error(`Unexpected catalog source packet download ${catalogPacketSuggestedName} (${catalogPacketBytes} bytes)`);
+    }
+    const catalogPacket = JSON.parse(fs.readFileSync(catalogPacketPath, 'utf8'));
+    if (catalogPacket.artifact_type !== 'halofire.catalog_source_evidence_packet.v1') {
+      throw new Error(`Unexpected catalog source packet type ${catalogPacket.artifact_type}`);
+    }
+    if (catalogPacket.family_ref !== 'family:pipe_steel_sch40_2p0in'
+      || catalogPacket.claim_gate_effect !== 'no_claims_cleared'
+      || catalogPacket.manufacturer_exact !== false
+      || catalogPacket.latest_catalog_source_acquisition?.claim_gate_effect !== 'no_claims_cleared') {
+      throw new Error(`Catalog source packet cleared claims or lost family evidence: ${JSON.stringify(catalogPacket)}`);
+    }
 
     const queueDownloadPromise = page.waitForEvent('download');
     await page.getByRole('button', { name: 'Download SAM31 queue item' }).first().click();

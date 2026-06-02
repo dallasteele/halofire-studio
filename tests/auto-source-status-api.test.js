@@ -148,6 +148,109 @@ describe('S5 GET /api/auto-source/status', () => {
     expect(catalogItems[0].actions[0].href).toContain('component=pipe_sch40');
   });
 
+  it('downloads catalog source evidence packets and keeps manufacturer claims blocked after evidence is recorded', async () => {
+    removeStatusFile();
+    const projectName = 'Home Depot - Rexburg ID';
+    const familyRef = 'family:pipe_steel_sch40_2p0in';
+    const packetUrl = `${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-packets/catalog-source/${encodeURIComponent(familyRef)}/review-packet`;
+
+    const initialPacketRes = await fetch(packetUrl, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(initialPacketRes.status).toBe(200);
+    const initialPacket = await initialPacketRes.json();
+    expect(initialPacket).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.catalog_source_evidence_packet.v1',
+      status: 'ready_for_employee_review',
+      project_name: projectName,
+      family_ref: familyRef,
+      component_key: 'pipe_sch40',
+      source_evidence_type: 'catalog_source_acquisition',
+      manufacturer_exact: false,
+      claim_gate_effect: 'no_claims_cleared',
+      claim_gate_effect_description: expect.stringMatching(/review artifact only/i),
+      latest_catalog_source_acquisition: null,
+    }));
+    expect(initialPacket.download_name).toMatch(/catalog-source-evidence-packet/);
+    expect(initialPacket.acceptable_evidence).toEqual(expect.arrayContaining([
+      'manufacturer catalog page or vendor product page URL',
+      'downloaded artifact hash tied to the exact component family',
+    ]));
+    expect(initialPacket.blocked_claims).toEqual(
+      expect.arrayContaining(['manufacturer_exact', 'AutoSprink_parity', 'fabrication_ready', 'AHJ_approval', 'PE_review']),
+    );
+    expect(initialPacket.employee_decision_fields).toEqual(expect.arrayContaining([
+      'reviewer_name',
+      'verified_source_url',
+      'downloaded_artifact_hash',
+      'manufacturer_model_approval_ref',
+      'review_decision',
+    ]));
+
+    const evidenceRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/evidence`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        evidence_type: 'catalog_source_acquisition',
+        status: 'present',
+        source_ref: familyRef,
+        source_file: 'pipe_sch40',
+        notes: JSON.stringify({
+          kind: 'sourceAcquisitionLedger',
+          schema: 'halofire.catalog_source_acquisition_ledger_row.v1',
+          family_ref: familyRef,
+          component_key: 'pipe_sch40',
+          nominal_size_in: 2,
+          source_url: 'https://vendor.example/catalog/pipe-sch40-2in',
+          license: 'internal-alpha review placeholder',
+          downloaded_artifact_hash: 'sha256:placeholder-pipe-sch40-2in',
+          status_tier: 'candidate_vendor_source',
+          manufacturer_exact: false,
+          blocked_claims: ['manufacturer_exact', 'AutoSprink_parity', 'fabrication_ready', 'permit_ready', 'AHJ_approval', 'PE_review'],
+          claim_gate_effect: 'no_claims_cleared',
+          no_claim_gates_cleared: true,
+        }),
+      }),
+    });
+    expect(evidenceRes.status).toBe(201);
+    const created = await evidenceRes.json();
+
+    const recordedPacketRes = await fetch(packetUrl, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(recordedPacketRes.status).toBe(200);
+    const recordedPacket = await recordedPacketRes.json();
+    expect(recordedPacket).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.catalog_source_evidence_packet.v1',
+      family_ref: familyRef,
+      manufacturer_exact: false,
+      claim_gate_effect: 'no_claims_cleared',
+      latest_catalog_source_acquisition: expect.objectContaining({
+        evidence_id: created.id,
+        evidence_status: 'present',
+        source_ref: familyRef,
+        source_url: 'https://vendor.example/catalog/pipe-sch40-2in',
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    }));
+    expect(recordedPacket.source_refs).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        evidence_id: created.id,
+        evidence_type: 'catalog_source_acquisition',
+        status: 'present',
+      }),
+    ]));
+
+    const gatesRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/claim-gates`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(gatesRes.status).toBe(200);
+    const gates = await gatesRes.json();
+    expect(gates.find((gate) => gate.code === 'MANUFACTURER_MODEL_APPROVAL_MISSING')).toEqual(
+      expect.objectContaining({ status: 'blocked' }),
+    );
+  });
+
   it('adds official-flow intake resolver items with documented defaults or exact intake blockers', async () => {
     const homeDepotRes = await fetch(`${BASE}/api/projects/Home%20Depot%20-%20Rexburg%20ID/resolver-queue`, {
       headers: { Authorization: `Bearer ${token}` },

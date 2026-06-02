@@ -5487,7 +5487,122 @@ function catalogResolverQueueItem(projectName, row, matchedEvidence = null) {
     ],
     actions: [
       { label: hasEvidence ? 'Review recorded evidence' : 'Record source evidence in Settings', href: `/settings.html?${settingsParams.toString()}#settingsCatalogSourceAcquisition` },
+      { label: 'Download catalog source evidence packet', href: `/api/projects/${encodeURIComponent(projectName)}/resolver-packets/catalog-source/${encodeURIComponent(row.family_ref)}/review-packet`, artifact_type: 'halofire.catalog_source_evidence_packet.v1' },
       { label: 'Open evidence workbench', href: `/workbench.html?project=${encodeURIComponent(projectName)}#catalogSourceAcquisition` },
+    ],
+  };
+}
+
+function catalogSourceEvidencePacket(projectName, familyRef) {
+  const row = currentSourceAcquisitionLedger().find((entry) => entry && entry.family_ref === familyRef);
+  if (!row) return null;
+  const matchedEvidence = matchingCatalogEvidenceByFamily(projectName).get(familyRef) || null;
+  const notes = matchedEvidence?.notes || {};
+  const evidenceRow = matchedEvidence?.evidence || null;
+  const queueItem = catalogResolverQueueItem(projectName, row, matchedEvidence);
+  const sourceRefs = [];
+  if (evidenceRow) {
+    sourceRefs.push({
+      evidence_id: evidenceRow.id,
+      evidence_type: evidenceRow.evidence_type,
+      source_ref: evidenceRow.source_ref || null,
+      source_file: evidenceRow.source_file || null,
+      status: evidenceRow.status || null,
+    });
+  }
+  const sourceUrl = notes.source_url || row.source_url || null;
+  const downloadedArtifactHash = notes.downloaded_artifact_hash || row.downloaded_artifact_hash || null;
+  const license = notes.license || row.license || null;
+  const statusTier = notes.status_tier || row.status_tier || 'missing_catalog_source';
+  const blockedClaims = Array.isArray(row.blocked_claims) && row.blocked_claims.length
+    ? row.blocked_claims
+    : ['manufacturer_exact', 'AutoSprink_parity', 'fabrication_ready', 'permit_ready', 'AHJ_approval', 'PE_review'];
+  return {
+    artifact_type: 'halofire.catalog_source_evidence_packet.v1',
+    status: 'ready_for_employee_review',
+    project_name: projectName,
+    family_ref: row.family_ref,
+    component_key: row.component_key || null,
+    description: row.description || null,
+    nominal_size_in: row.nominal_size_in ?? null,
+    source_evidence_type: 'catalog_source_acquisition',
+    source_ref: sourceUrl || row.family_ref,
+    generated_at: new Date().toISOString(),
+    download_name: `${slugForDownloadName(projectName)}-catalog-source-evidence-packet-${slugForDownloadName(row.family_ref)}.json`,
+    source_url: sourceUrl,
+    license,
+    downloaded_artifact_hash: downloadedArtifactHash,
+    rejected_candidates: Array.isArray(row.rejected_candidates) ? row.rejected_candidates : [],
+    status_tier: statusTier,
+    manufacturer_exact: false,
+    use_for_claims: false,
+    claim_gate_effect: 'no_claims_cleared',
+    claim_gate_effect_description: 'This is a review artifact only; recording or downloading it clears no manufacturer, AHJ, PE, AutoSprink, permit-ready, fabrication-ready, or engineering-grade claim.',
+    latest_catalog_source_acquisition: evidenceRow ? {
+      evidence_id: evidenceRow.id,
+      evidence_status: evidenceRow.status,
+      source_ref: evidenceRow.source_ref || null,
+      source_file: evidenceRow.source_file || null,
+      family_ref: notes.family_ref || row.family_ref,
+      component_key: notes.component_key || row.component_key || null,
+      nominal_size_in: notes.nominal_size_in ?? row.nominal_size_in ?? null,
+      source_url: notes.source_url || sourceUrl,
+      license: notes.license || license,
+      downloaded_artifact_hash: notes.downloaded_artifact_hash || downloadedArtifactHash,
+      status_tier: notes.status_tier || statusTier,
+      manufacturer_exact: false,
+      claim_gate_effect: notes.claim_gate_effect || 'no_claims_cleared',
+      no_claim_gates_cleared: notes.no_claim_gates_cleared !== false,
+    } : null,
+    source_refs: sourceRefs,
+    acceptable_evidence: queueItem?.acceptable_evidence || [
+      'manufacturer catalog page or vendor product page URL',
+      'license or terms for downloaded CAD/BIM/STEP artifact',
+      'downloaded artifact hash tied to the exact component family',
+      'HaloFire employee review note for internal-alpha use',
+      'manufacturer/professional approval before manufacturer-exact or fabrication claims',
+    ],
+    employee_decision_fields: [
+      'reviewer_name',
+      'verified_source_url',
+      'verified_license_or_terms_ref',
+      'downloaded_artifact_hash',
+      'rejected_candidate_notes',
+      'manufacturer_model_approval_ref',
+      'professional_or_ahj_review_ref',
+      'autosprink_or_equivalent_export_ref',
+      'review_decision',
+      'notes',
+    ],
+    evidence_attachment_fields: [
+      {
+        field: 'manufacturer_model_approval_ref',
+        acceptable_evidence_type: 'manufacturer_model_approval_or_exact_catalog_part_match',
+        blocked_claims_relieved_only_after_employee_verification: ['manufacturer_exact', 'fabrication_ready'],
+      },
+      {
+        field: 'professional_or_ahj_review_ref',
+        acceptable_evidence_type: 'licensed_professional_or_AHJ_review',
+        blocked_claims_relieved_only_after_employee_verification: ['PE_review', 'AHJ_approval', 'permit_ready', 'engineering_grade'],
+      },
+      {
+        field: 'autosprink_or_equivalent_export_ref',
+        acceptable_evidence_type: 'AutoSprink_or_equivalent_professional_model_export',
+        blocked_claims_relieved_only_after_employee_verification: ['AutoSprink_parity'],
+      },
+    ],
+    review_steps: [
+      'Open the vendor/manufacturer/catalog source URL and confirm it describes the exact component family.',
+      'Verify license or terms and record a downloaded artifact hash when CAD/BIM/STEP content is used.',
+      'Reject unrelated or generated-only candidates with a source-linked reason.',
+      'Attach manufacturer, professional, AHJ, or AutoSprink/equivalent evidence through the correct resolver before any regulated claim is unblocked.',
+    ],
+    ai_fallback: queueItem?.ai_fallback ||
+      'Use OpenClaw web search, vendor catalog search, and step.parts-style acquisition to find candidates; AI may rank/reject candidates but cannot clear manufacturer/AHJ/PE/AutoSprink claims.',
+    blocked_claims: blockedClaims,
+    limitations: [
+      row.limitations || 'Catalog/source acquisition rows are evidence collection work items only.',
+      'The packet can organize candidate source facts and employee review defaults, but it does not prove manufacturer-exact geometry, AHJ approval, PE review, AutoSprink parity, permit readiness, fabrication readiness, or engineering-grade results.',
     ],
   };
 }
@@ -8944,6 +9059,20 @@ app.get('/api/projects/:name/resolver-packets/official-flow-replay/:evidenceId/r
     res.json(packet);
   } catch (err) {
     res.status(err.httpStatus || 400).json({ error: err.message });
+  }
+});
+
+app.get('/api/projects/:name/resolver-packets/catalog-source/:familyRef/review-packet', authMiddleware, (req, res) => {
+  try {
+    const projectName = req.params.name;
+    const familyRef = req.params.familyRef;
+    const packet = catalogSourceEvidencePacket(projectName, familyRef);
+    if (!packet) {
+      return res.status(404).json({ error: 'Catalog source acquisition row not found' });
+    }
+    return res.json(packet);
+  } catch (err) {
+    return res.status(err.httpStatus || 400).json({ error: err.message });
   }
 });
 

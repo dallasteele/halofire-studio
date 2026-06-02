@@ -149,6 +149,10 @@ describe('studio static origin handling', () => {
     expect(html).toContain('claim_gate_effect');
     expect(html).toContain('manufacturer_exact');
     expect(html).toContain('Attach catalog evidence');
+    expect(html).toContain('Download catalog source packet');
+    expect(html).toContain('downloadCatalogSourceEvidencePacket');
+    expect(html).toContain('/resolver-packets/catalog-source/');
+    expect(html).toContain('data-catalog-source-packet-family-ref');
     expect(html).toContain('Record catalog source evidence');
     expect(html).toContain('recordCatalogSourceEvidenceFromWorkbench');
     expect(html).toContain('data-catalog-source-record-family-ref');
