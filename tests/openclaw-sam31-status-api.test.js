@@ -1,5 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { spawn } from 'node:child_process';
+import express from 'express';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -14,6 +15,8 @@ const COOPERATIVE_1881_PATH = `/api/projects/${encodeURIComponent(COOPERATIVE_18
 
 let bridgeServer;
 let bridgeBaseUrl;
+let perceptionServer;
+let perceptionBaseUrl;
 let apiServer;
 let tempDir;
 let token;
@@ -50,6 +53,91 @@ beforeAll(async () => {
   const bridgeAddress = bridgeServer.address();
   bridgeBaseUrl = `http://127.0.0.1:${bridgeAddress.port}`;
 
+  const perceptionApp = express();
+  perceptionApp.use(express.json({ limit: '2mb' }));
+  perceptionApp.post('/vision/sam31/extrapolate', (req, res) => {
+    const body = req.body || {};
+    const sections = Array.isArray(body.sections) ? body.sections : [];
+    const objectHypotheses = Array.isArray(body.object_hypotheses) ? body.object_hypotheses : [];
+    res.json({
+      artifact_type: 'openclaw.sam31_llm_extrapolation_artifact',
+      status: 'best_effort_extrapolation_ready',
+      source_runtime: 'sam-3.1+llm',
+      tool: {
+        artifact_type: 'openclaw.sam31_llm_extrapolation_tool',
+        action: {
+          method: 'POST',
+          href: '/vision/sam31/extrapolate',
+          contract_ref: 'openclaw.sam31_extrapolation_contract',
+        },
+        claim_gate_effect: 'no_claims_cleared',
+      },
+      project_ref: body.project_ref,
+      application: body.application || 'halo_fire',
+      source_ref: body.source_ref,
+      image_ref: body.image_ref,
+      section_count: sections.length,
+      object_hypothesis_count: objectHypotheses.length,
+      source_refs: [
+        {
+          source_ref: body.source_ref,
+          image_ref: body.image_ref,
+          runtime: 'sam-3.1+llm',
+        },
+      ],
+      product_review_action: {
+        application: body.application || 'halo_fire',
+        contract_ref: 'openclaw.sam31.application_contract.halo_fire.v1',
+        status: 'ready_for_product_review_queue',
+        next_action: 'Queue HaloFire room-boundary or sleeve/firestop review with SAM31 vector/3D best guesses; keep permit, AHJ, AutoSprink, fabrication, and manufacturer claims blocked.',
+        claim_gate_effect: 'no_claims_cleared',
+      },
+      perception_packet: {
+        artifact_type: 'openclaw.sam31_perception_packet',
+        status: 'best_effort_perception_ready',
+        project_ref: body.project_ref,
+        application: body.application || 'halo_fire',
+        source_runtime: 'sam-3.1+llm',
+        source_ref: body.source_ref,
+        image_ref: body.image_ref,
+        perception_lanes: ['segmentation', 'object_identification', 'vector_overlay', 'model_3d_candidate', 'spatial_observation'],
+        segments: sections,
+        object_hypotheses: objectHypotheses,
+        vector_overlays: [
+          {
+            id: 'vector:section-room-101',
+            segment_id: sections[0]?.id || 'section-room-101',
+            kind: 'polygon_path',
+            svg_path: 'M 10 20 L 510 20 L 510 320 L 10 320 Z',
+            confidence: 0.52,
+            source: 'mock-openclaw-sam31',
+          },
+        ],
+        model_3d_candidates: [
+          {
+            id: 'model3d:section-room-101',
+            segment_id: sections[0]?.id || 'section-room-101',
+            primitive: 'extruded_polygon',
+            height_ft: 10,
+            confidence: 0.33,
+            source: 'mock-openclaw-sam31',
+            limitations: ['Mock OpenClaw SAM31 artifact for deterministic HaloFire API test only.'],
+          },
+        ],
+        blocked_claims: ['permit_ready', 'AHJ_approval', 'AutoSprink_parity'],
+        claim_gate_effect: 'no_claims_cleared',
+      },
+      blocked_claims: ['permit_ready', 'AHJ_approval', 'AutoSprink_parity'],
+      claim_gate_effect: 'no_claims_cleared',
+      limitations: ['Mock OpenClaw SAM31 artifact for deterministic HaloFire API test only.'],
+    });
+  });
+  await new Promise((resolve) => {
+    perceptionServer = perceptionApp.listen(0, '127.0.0.1', resolve);
+  });
+  const perceptionAddress = perceptionServer.address();
+  perceptionBaseUrl = `http://127.0.0.1:${perceptionAddress.port}`;
+
   tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'halofire-sam31-status-'));
   apiServer = spawn(process.execPath, ['src/api/server.js'], {
     cwd: ROOT,
@@ -64,6 +152,7 @@ beforeAll(async () => {
       HALOFIRE_ALLOW_DEV_DEFAULTS: '0',
       HALOFIRE_CORS_ORIGINS: 'http://allowed.test',
       OPENCLAW_BRIDGE_URL: bridgeBaseUrl,
+      OPENCLAW_PERCEPTION_URL: perceptionBaseUrl,
     },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
@@ -81,6 +170,9 @@ afterAll(async () => {
   }
   if (bridgeServer) {
     await new Promise((resolve) => bridgeServer.close(resolve));
+  }
+  if (perceptionServer) {
+    await new Promise((resolve) => perceptionServer.close(resolve));
   }
   if (tempDir) fs.rmSync(tempDir, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
 });
@@ -272,6 +364,109 @@ describe('OpenClaw SAM31 bridge status API', () => {
       runtime: 'halofire-local-sam31-bridge',
     }));
     expect(afterQueue.summary.sam31_bridge_smoke_recorded).toBeGreaterThanOrEqual(1);
+  });
+
+  it('posts the visual-audit packet to OpenClaw SAM31 extrapolate and persists product-review evidence', async () => {
+    const boundaryRes = await request(`${COOPERATIVE_1881_PATH}/pdf-boundary-decision`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        pdfPageIndex: 8,
+        pdfScale: 0.08,
+        pdfExtract: 'sam31-extrapolate-outline',
+        source_file: 'Proposal-Cooperative-1881-Salt-Lake-City-UT-9-18-25.pdf',
+        source_ref: '1881 plan PDF sheet 8 / SAM31 extrapolate queue action',
+        candidate: {
+          mode: 'outline',
+          label: 'SAM31 extrapolate outline',
+          status: 'candidate',
+          bbox: { x: 10, y: 20, width: 500, height: 300 },
+          segmentCount: 11,
+        },
+      }),
+    });
+    expect(boundaryRes.status).toBe(201);
+    const boundary = await boundaryRes.json();
+
+    const queueRes = await request(`${COOPERATIVE_1881_PATH}/resolver-queue`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(queueRes.status).toBe(200);
+    const queue = await queueRes.json();
+    const item = queue.items.find((row) => row.evidence_id === boundary.id);
+    expect(item.openclaw_sam31_extrapolation_action).toEqual(expect.objectContaining({
+      label: 'Run OpenClaw SAM31 extrapolation artifact',
+      method: 'POST',
+      href: `${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/extrapolation-artifact`,
+      status: 'configured_unverified',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(item.actions).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        label: 'Run OpenClaw SAM31 extrapolation artifact',
+        method: 'POST',
+      }),
+    ]));
+
+    const artifactRes = await request(item.openclaw_sam31_extrapolation_action.href, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(artifactRes.status).toBe(201);
+    const artifact = await artifactRes.json();
+    expect(artifact).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31_llm_extrapolation_artifact',
+      status: 'best_effort_extrapolation_ready',
+      project_name: COOPERATIVE_1881_PROJECT_NAME,
+      source_pdf_boundary_evidence_id: boundary.id,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(artifact.openclaw_endpoint).toBe(`${perceptionBaseUrl}/vision/sam31/extrapolate`);
+    expect(artifact.request.sections[0]).toEqual(expect.objectContaining({
+      id: 'candidate:pdf-boundary',
+      semantic_label: 'room_boundary_candidate',
+    }));
+    expect(artifact.perception_packet).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31_perception_packet',
+      project_ref: `halo_fire:${COOPERATIVE_1881_PROJECT_NAME}`,
+      application: 'halo_fire',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(artifact.product_review_action).toEqual(expect.objectContaining({
+      status: 'ready_for_product_review_queue',
+      contract_ref: 'openclaw.sam31.application_contract.halo_fire.v1',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(artifact.evidence).toEqual(expect.objectContaining({
+      evidence_type: 'openclaw_sam31_extrapolation_artifact',
+      source_file: 'OPENCLAW_PERCEPTION_URL',
+      source_ref: `${perceptionBaseUrl}/vision/sam31/extrapolate`,
+      status: 'best_effort',
+    }));
+    const notes = JSON.parse(artifact.evidence.notes);
+    expect(notes).toEqual(expect.objectContaining({
+      kind: 'openclaw_sam31_extrapolation_artifact',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+
+    const afterQueueRes = await request(`${COOPERATIVE_1881_PATH}/resolver-queue`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(afterQueueRes.status).toBe(200);
+    const afterQueue = await afterQueueRes.json();
+    const afterItem = afterQueue.items.find((row) => row.evidence_id === boundary.id);
+    expect(afterItem.latest_openclaw_sam31_extrapolation_artifact).toEqual(expect.objectContaining({
+      evidence_id: artifact.id,
+      evidence_status: 'best_effort',
+      status: 'best_effort_extrapolation_ready',
+      source_pdf_boundary_evidence_id: boundary.id,
+      product_review_action: expect.objectContaining({
+        status: 'ready_for_product_review_queue',
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(afterQueue.summary.sam31_extrapolation_recorded).toBeGreaterThanOrEqual(1);
   });
 
   it('carries saved bridge smoke artifacts into SAM31 audit defaults and replay evidence without clearing claims', async () => {

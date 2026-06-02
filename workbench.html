@@ -264,7 +264,32 @@ function renderSam31BridgeSmokeAction(item, action, latest) {
   return `<div class="muted" style="font-size:11px;margin-top:5px;border:1px solid rgba(77,208,225,.28);border-radius:8px;padding:8px;background:rgba(77,208,225,.05)">OpenClaw SAM31 bridge smoke artifact<br>status ${escapeHtml(action.status || 'unavailable')} - method ${escapeHtml(action.method || 'POST')} - claim_gate_effect ${escapeHtml(action.claim_gate_effect || 'no_claims_cleared')}<br>request pdfRef ${escapeHtml(action.request_body?.pdfRef || 'missing')} - page ${escapeHtml(action.request_body?.pdfPageIndex ?? 'missing')} - scale ${escapeHtml(action.request_body?.pdfScale ?? 'missing')}<br>${latest ? `Latest smoke: evidence #${escapeHtml(latest.evidence_id)} - ${escapeHtml(latest.status || 'missing')} - source ${escapeHtml(summary?.source || 'missing')} - runtime ${escapeHtml(summary?.runtime || 'missing')} - ${escapeHtml(latest.claim_gate_effect || 'no_claims_cleared')}<br>` : ''}Blocks still active: ${blocked.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('') || '<span class="chip">claim gates remain blocked</span>'}<br><button class="go" type="button" style="padding:7px 10px;font-size:11px;margin-top:6px;background:#0f766e" data-sam31-bridge-smoke-evidence-id="${escapeHtml(evidenceId)}">${escapeHtml(action.label || 'Run OpenClaw SAM31 bridge smoke artifact')}</button><div class="muted" id="sam31BridgeSmokeStatus-${escapeHtml(evidenceId)}" style="font-size:11px;margin-top:4px"></div></div>`;
 }
 
+const SAM31_EXTRAPOLATION_ROUTE_SUFFIX = '/openclaw/sam31/extrapolation-artifact';
+
+function renderOpenClawSam31ExtrapolationAction(item, action, latest) {
+  if (!action || typeof action !== 'object') return '';
+  const evidenceId = item.evidence_id;
+  const blocked = Array.isArray(action.blocked_claims) ? action.blocked_claims : [];
+  const latestPacket = latest && latest.perception_packet && typeof latest.perception_packet === 'object' ? latest.perception_packet : null;
+  const productReviewAction = latest && latest.product_review_action && typeof latest.product_review_action === 'object'
+    ? latest.product_review_action
+    : null;
+  const endpoint = action.openclaw_endpoint || action.endpoint || action.href || SAM31_EXTRAPOLATION_ROUTE_SUFFIX;
+  return `<div class="muted" style="font-size:11px;margin-top:5px;border:1px solid rgba(79,70,229,.34);border-radius:8px;padding:8px;background:rgba(79,70,229,.06)">OpenClaw SAM31 LLM extrapolation artifact<br>status ${escapeHtml(action.status || 'unavailable')} - method ${escapeHtml(action.method || 'POST')} - claim_gate_effect ${escapeHtml(action.claim_gate_effect || 'no_claims_cleared')}<br>endpoint ${escapeHtml(endpoint)} - source_evidence_id ${escapeHtml(evidenceId)}<br>${latest ? `Latest extrapolation: evidence #${escapeHtml(latest.evidence_id)} - ${escapeHtml(latest.status || 'best_effort')} - packet ${escapeHtml(latestPacket?.artifact_type || latest.artifact_type || 'openclaw.sam31_llm_extrapolation_artifact')} - sections ${escapeHtml(latest.section_count ?? latestPacket?.segment_count ?? 0)} - hypotheses ${escapeHtml(latest.object_hypothesis_count ?? latestPacket?.object_hypothesis_count ?? 0)} - ${escapeHtml(latest.claim_gate_effect || 'no_claims_cleared')}<br>` : ''}${productReviewAction ? `Product review: ${escapeHtml(productReviewAction.label || 'Review extrapolated objects, vectors, and 3D candidates')} - ${escapeHtml(productReviewAction.href || 'missing')}<br>` : ''}Blocks still active: ${blocked.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('') || '<span class="chip">claim gates remain blocked</span>'}<br><button class="go" type="button" style="padding:7px 10px;font-size:11px;margin-top:6px;background:#4f46e5" data-sam31-extrapolation-evidence-id="${escapeHtml(evidenceId)}">${escapeHtml(action.label || 'Run OpenClaw SAM31 extrapolation artifact')}</button><div class="muted" id="sam31ExtrapolationStatus-${escapeHtml(evidenceId)}" style="font-size:11px;margin-top:4px"></div></div>`;
+}
+
 function evidenceDetail(row) {
+  if (row.evidence_type === 'openclaw_sam31_extrapolation_artifact') {
+    try {
+      const packet = JSON.parse(row.notes || '{}');
+      const artifact = packet.artifact || {};
+      const perception = artifact.perception_packet || {};
+      const blocked = Array.isArray(packet.blocked_claims) ? packet.blocked_claims : (Array.isArray(artifact.blocked_claims) ? artifact.blocked_claims : []);
+      return `<div class="muted" style="font-size:11px;margin-top:3px">openclaw.sam31_llm_extrapolation_artifact<br>source_evidence_id ${escapeHtml(artifact.source_pdf_boundary_evidence_id || artifact.source_evidence_id || 'missing')} - sections ${escapeHtml(artifact.section_count ?? perception.segment_count ?? 0)} - hypotheses ${escapeHtml(artifact.object_hypothesis_count ?? perception.object_hypothesis_count ?? 0)} - source_ref ${escapeHtml(row.source_ref || artifact.openclaw_endpoint || 'missing')}<br>product_review_action ${escapeHtml(artifact.product_review_action?.label || 'Review extrapolated objects, vectors, and 3D candidates')} - claim_gate_effect ${escapeHtml(packet.claim_gate_effect || artifact.claim_gate_effect || 'no_claims_cleared')}<br>Blocks still active: ${blocked.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('')}</div>`;
+    } catch {
+      return '<div class="muted" style="font-size:11px;margin-top:3px">OpenClaw SAM31 extrapolation artifact; detail unavailable</div>';
+    }
+  }
   if (row.evidence_type === 'official_flow_hydraulic_replay_artifact') {
     try {
       const packet = JSON.parse(row.notes || '{}');
@@ -395,6 +420,8 @@ function resolverQueueDetail(item) {
   const openclaw_sam31_bridge_status = item.openclaw_sam31_bridge_status || null;
   const sam31_bridge_smoke_action = item.sam31_bridge_smoke_action || null;
   const latest_openclaw_sam31_bridge_smoke_artifact = item.latest_openclaw_sam31_bridge_smoke_artifact || null;
+  const openclaw_sam31_extrapolation_action = item.openclaw_sam31_extrapolation_action || null;
+  const latest_openclaw_sam31_extrapolation_artifact = item.latest_openclaw_sam31_extrapolation_artifact || null;
   const replay_review = latest_review || latest_sam31_visual_audit;
   const review_source = latest_review ? 'latest_employee_review_packet' : (latest_sam31_visual_audit ? 'latest_sam31_visual_audit' : null);
   const evidenceId = escapeHtml(item.evidence_id);
@@ -479,6 +506,7 @@ function resolverQueueDetail(item) {
       <div class="claims">Defaults: page ${escapeHtml(defaults.pdfPageIndex)} · scale ${escapeHtml(defaults.pdfScale)} ft/pt · ${escapeHtml(defaults.pdfExtract)}</div>
       ${renderOpenClawSam31BridgeStatus(openclaw_sam31_bridge_status)}
       ${renderSam31BridgeSmokeAction(item, sam31_bridge_smoke_action, latest_openclaw_sam31_bridge_smoke_artifact)}
+      ${renderOpenClawSam31ExtrapolationAction(item, openclaw_sam31_extrapolation_action, latest_openclaw_sam31_extrapolation_artifact)}
       ${replay_review ? `<div class="claims">Review: ${escapeHtml(replay_review.review_decision)} by ${escapeHtml(replay_review.reviewer_name || 'unknown')} - source ${escapeHtml(review_source || 'missing')} - issues ${escapeHtml(replay_review.issue_count)} - corrected polygons ${escapeHtml(replay_review.corrected_room_polygon_count)} - ${escapeHtml(replay_review.marked_up_plan_ref || '')}</div>` : ''}
       ${latest_sam31_employee_replacement ? `<div class="claims">Employee SAM31 replacements: evidence #${escapeHtml(latest_sam31_employee_replacement.evidence_id)} - source_sam31_evidence_id ${escapeHtml(latest_sam31_employee_replacement.source_sam31_evidence_id)} - ${escapeHtml(latest_sam31_employee_replacement.replacement_ref || 'missing')} - ${escapeHtml(latest_sam31_employee_replacement.claim_gate_effect || 'no_claims_cleared')}<br>Replaced fields: ${(Array.isArray(latest_sam31_employee_replacement.replaced_fields) ? latest_sam31_employee_replacement.replaced_fields : []).map((field) => `<span class="chip">${escapeHtml(field)}</span>`).join('')}<br>Replacement value preview: ${escapeHtml(JSON.stringify(latest_sam31_employee_replacement.replacement_values || {}))}</div>` : ''}
       ${latest_sam31_visual_audit ? renderSam31PerceptionSummary(latest_sam31_visual_audit.openclaw_sam31_perception_packet, item.evidence_id) : ''}
@@ -588,6 +616,30 @@ async function runSam31BridgeSmokeArtifact(evidenceId) {
       body: JSON.stringify(action.request_body),
     });
     if (status) status.textContent = 'Saved openclaw_sam31_bridge_smoke_artifact evidence #' + saved.id + '; claims still blocked.';
+    await refreshEvidence();
+    await refreshResolverQueue();
+  } catch (err) {
+    if (status) status.textContent = 'Error: ' + err.message;
+  } finally {
+    if (button) button.disabled = false;
+  }
+}
+
+async function runOpenClawSam31ExtrapolationArtifact(evidenceId) {
+  const status = document.getElementById('sam31ExtrapolationStatus-' + evidenceId);
+  const button = document.querySelector('[data-sam31-extrapolation-evidence-id="' + CSS.escape(String(evidenceId)) + '"]');
+  if (status) status.textContent = 'Running OpenClaw SAM31 extrapolation artifact...';
+  if (button) button.disabled = true;
+  try {
+    const queue = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/resolver-queue');
+    const item = (queue.items || []).find((row) => String(row.evidence_id) === String(evidenceId));
+    const action = item && item.openclaw_sam31_extrapolation_action;
+    if (!action || !action.href) throw new Error('OpenClaw SAM31 extrapolation action is not available for this resolver row');
+    const saved = await api(action.href.replace(/^\/api/, ''), {
+      method: action.method || 'POST',
+    });
+    const artifactType = saved.evidence?.evidence_type || saved.artifact_type || 'openclaw_sam31_extrapolation_artifact';
+    if (status) status.textContent = 'Saved ' + artifactType + ' evidence #' + saved.id + '; claims still blocked.';
     await refreshEvidence();
     await refreshResolverQueue();
   } catch (err) {
@@ -857,6 +909,9 @@ async function refreshResolverQueue() {
   });
   document.querySelectorAll('[data-sam31-bridge-smoke-evidence-id]').forEach((button) => {
     button.onclick = () => runSam31BridgeSmokeArtifact(button.dataset.sam31BridgeSmokeEvidenceId);
+  });
+  document.querySelectorAll('[data-sam31-extrapolation-evidence-id]').forEach((button) => {
+    button.onclick = () => runOpenClawSam31ExtrapolationArtifact(button.dataset.sam31ExtrapolationEvidenceId);
   });
   document.querySelectorAll('[data-resolver-replay-evidence-id]').forEach((button) => {
     button.onclick = () => downloadResolverReplayInput(button.dataset.resolverReplayEvidenceId);

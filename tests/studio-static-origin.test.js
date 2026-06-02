@@ -205,6 +205,13 @@ describe('studio static origin handling', () => {
     expect(html).toContain('openclaw-sam31-smoke-artifact:');
     expect(html).toContain('source_openclaw_sam31_bridge_smoke_evidence_id');
     expect(html).toContain('data-sam31-bridge-smoke-source-evidence-id');
+    expect(html).toContain('renderOpenClawSam31ExtrapolationAction');
+    expect(html).toContain('openclaw_sam31_extrapolation_action');
+    expect(html).toContain('Run OpenClaw SAM31 extrapolation artifact');
+    expect(html).toContain('data-sam31-extrapolation-evidence-id');
+    expect(html).toContain('runOpenClawSam31ExtrapolationArtifact');
+    expect(html).toContain('/openclaw/sam31/extrapolation-artifact');
+    expect(html).toContain('latest_openclaw_sam31_extrapolation_artifact');
   });
 
   it('lets the workbench save employee room-boundary review decisions', async () => {
