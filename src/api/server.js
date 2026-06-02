@@ -1441,16 +1441,8 @@ function trimBridgeUrl(url) {
   return String(url || '').trim().replace(/\/$/, '');
 }
 
-function normalizeOpenClawSam31ExtrapolateEndpoint(env = process.env) {
-  const direct = String(
-    env.OPENCLAW_SAM31_EXTRAPOLATE_URL ||
-    env.OPENCLAW_PERCEPTION_URL ||
-    env.OPENCLAW_API_URL ||
-    env.HAL_API_URL ||
-    '',
-  ).trim();
-  if (!direct) return null;
-  const trimmed = trimBridgeUrl(direct);
+function normalizeOpenClawSam31ExtrapolatePath(url) {
+  const trimmed = trimBridgeUrl(url);
   if (trimmed.endsWith('/vision/sam31/extrapolate')) return trimmed;
   if (trimmed.endsWith('/vision/sam31/perception')) {
     return `${trimmed.slice(0, -'/vision/sam31/perception'.length)}/vision/sam31/extrapolate`;
@@ -1458,13 +1450,38 @@ function normalizeOpenClawSam31ExtrapolateEndpoint(env = process.env) {
   return `${trimmed}/vision/sam31/extrapolate`;
 }
 
+function openClawSam31ExtrapolateEndpointConfig(env = process.env) {
+  const candidates = [
+    ['OPENCLAW_SAM31_EXTRAPOLATE_URL', env.OPENCLAW_SAM31_EXTRAPOLATE_URL],
+    ['OPENCLAW_PERCEPTION_URL', env.OPENCLAW_PERCEPTION_URL],
+    ['OPENCLAW_API_URL', env.OPENCLAW_API_URL],
+    ['HAL_API_URL', env.HAL_API_URL],
+    ['OPENCLAW_BRIDGE_URL', env.OPENCLAW_BRIDGE_URL],
+  ];
+  for (const [sourceFile, rawUrl] of candidates) {
+    const direct = String(rawUrl || '').trim();
+    if (!direct) continue;
+    return {
+      endpoint: normalizeOpenClawSam31ExtrapolatePath(direct),
+      source_file: sourceFile,
+    };
+  }
+  return { endpoint: null, source_file: null };
+}
+
+function normalizeOpenClawSam31ExtrapolateEndpoint(env = process.env) {
+  return openClawSam31ExtrapolateEndpointConfig(env).endpoint;
+}
+
 function openClawSam31ExtrapolateStatus(env = process.env) {
-  const endpoint = normalizeOpenClawSam31ExtrapolateEndpoint(env);
+  const endpointConfig = openClawSam31ExtrapolateEndpointConfig(env);
+  const endpoint = endpointConfig.endpoint;
   return {
     artifact_type: 'openclaw.sam31_extrapolation_endpoint_status',
     status: endpoint ? 'configured_unverified' : 'unavailable',
     endpoint_configured: !!endpoint,
     endpoint,
+    endpoint_source_file: endpointConfig.source_file,
     source_runtime: 'sam-3.1+llm',
     supported_applications: [...SAM31_SUPPORTED_APPLICATIONS],
     supported_evidence_lanes: [
@@ -1483,7 +1500,7 @@ function openClawSam31ExtrapolateStatus(env = process.env) {
     claim_gate_effect: 'no_claims_cleared',
     next_action: endpoint
       ? 'Run OpenClaw SAM31 extrapolation against the visual-audit request and save the artifact as best-effort product-review evidence; regulated claims remain blocked.'
-      : 'Set OPENCLAW_SAM31_EXTRAPOLATE_URL, OPENCLAW_PERCEPTION_URL, OPENCLAW_API_URL, or HAL_API_URL to an OpenClaw/HAL service exposing /vision/sam31/extrapolate.',
+      : 'Set OPENCLAW_SAM31_EXTRAPOLATE_URL, OPENCLAW_PERCEPTION_URL, OPENCLAW_API_URL, HAL_API_URL, or OPENCLAW_BRIDGE_URL to an OpenClaw/HAL service exposing /vision/sam31/extrapolate.',
     limitations: [
       'Configured endpoint status is operational evidence only and does not clear geometry accuracy, AHJ, PE, AutoSprink, permit, fabrication, or manufacturer-exact claims.',
     ],
@@ -2351,6 +2368,11 @@ function openClawSam31ExtrapolationReplaySummary(extrapolationEvidence) {
     : (Array.isArray(artifact.product_review_queue_item?.extrapolation_index)
       ? jsonClone(artifact.product_review_queue_item.extrapolation_index)
       : []);
+  const missingEvidenceRows = Array.isArray(artifact.missing_evidence_rows)
+    ? jsonClone(artifact.missing_evidence_rows)
+    : (Array.isArray(artifact.product_review_queue_item?.missing_evidence_rows)
+      ? jsonClone(artifact.product_review_queue_item.missing_evidence_rows)
+      : []);
   return {
     evidence_id: evidence.id,
     evidence_type: evidence.evidence_type,
@@ -2368,6 +2390,11 @@ function openClawSam31ExtrapolationReplaySummary(extrapolationEvidence) {
     product_review_queue_item: artifact.product_review_queue_item && typeof artifact.product_review_queue_item === 'object'
       ? jsonClone(artifact.product_review_queue_item)
       : null,
+    bid_truth: artifact.bid_truth && typeof artifact.bid_truth === 'object'
+      ? jsonClone(artifact.bid_truth)
+      : null,
+    missing_evidence_rows: missingEvidenceRows,
+    missing_evidence_row_count: missingEvidenceRows.length,
     extrapolation_index: extrapolationIndex,
     extrapolation_index_count: extrapolationIndex.length,
     perception_summary: sam31PerceptionPacketSummary(artifact.perception_packet),
@@ -3799,7 +3826,8 @@ function openClawSam31ExtrapolateRequestFromVisualAudit(packet) {
   };
 }
 
-function normalizeOpenClawSam31ExtrapolationArtifact(projectName, evidence, decision, visualPacket, request, responseBody, endpoint) {
+function normalizeOpenClawSam31ExtrapolationArtifact(projectName, evidence, decision, visualPacket, request, responseBody, endpointConfig) {
+  const endpoint = endpointConfig?.endpoint || null;
   const rawArtifact = responseBody && typeof responseBody === 'object' && !Array.isArray(responseBody)
     ? jsonClone(responseBody)
     : {};
@@ -3869,6 +3897,10 @@ function normalizeOpenClawSam31ExtrapolationArtifact(projectName, evidence, deci
     source_file: evidence.source_file || decision.sourceFile || request.image_ref || null,
     source_runtime: rawArtifact.source_runtime || 'sam-3.1+llm',
     openclaw_endpoint: endpoint,
+    openclaw_endpoint_source_file: endpointConfig?.source_file || null,
+    bid_truth: rawArtifact.bid_truth && typeof rawArtifact.bid_truth === 'object' && !Array.isArray(rawArtifact.bid_truth)
+      ? jsonClone(rawArtifact.bid_truth)
+      : null,
     request,
     tool: rawArtifact.tool && typeof rawArtifact.tool === 'object'
       ? { ...jsonClone(rawArtifact.tool), claim_gate_effect: 'no_claims_cleared' }
@@ -3899,6 +3931,11 @@ function normalizeOpenClawSam31ExtrapolationArtifact(projectName, evidence, deci
     product_review_action: productReviewAction,
     product_review_queue_item: productReviewQueueItem,
     extrapolation_index: extrapolationIndex,
+    missing_evidence_rows: Array.isArray(rawArtifact.missing_evidence_rows)
+      ? jsonClone(rawArtifact.missing_evidence_rows)
+      : (Array.isArray(productReviewQueueItem.missing_evidence_rows)
+        ? jsonClone(productReviewQueueItem.missing_evidence_rows)
+        : []),
     visual_audit_packet_ref: visualPacket.download_name || null,
     acceptable_evidence: [
       'OpenClaw /vision/sam31/extrapolate response captured in perception_packet',
@@ -3918,7 +3955,8 @@ function normalizeOpenClawSam31ExtrapolationArtifact(projectName, evidence, deci
 }
 
 async function invokeOpenClawSam31Extrapolation(projectName, evidence, decision, fetchImpl = globalThis.fetch) {
-  const endpoint = normalizeOpenClawSam31ExtrapolateEndpoint();
+  const endpointConfig = openClawSam31ExtrapolateEndpointConfig();
+  const endpoint = endpointConfig.endpoint;
   if (!endpoint) {
     const e = new Error('OpenClaw SAM31 extrapolate endpoint is not configured');
     e.httpStatus = 503;
@@ -3946,7 +3984,7 @@ async function invokeOpenClawSam31Extrapolation(projectName, evidence, decision,
     throw e;
   }
   const body = await response.json();
-  return normalizeOpenClawSam31ExtrapolationArtifact(projectName, evidence, decision, visualPacket, request, body, endpoint);
+  return normalizeOpenClawSam31ExtrapolationArtifact(projectName, evidence, decision, visualPacket, request, body, endpointConfig);
 }
 
 function normalizeOpenClawSam31ExtrapolationReview(projectName, evidence, decision, extrapolationEvidence, extrapolationArtifact, body = {}, user = {}) {
@@ -5009,7 +5047,7 @@ app.post('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/openclaw
       .run(
         projectName,
         'openclaw_sam31_extrapolation_artifact',
-        'OPENCLAW_PERCEPTION_URL',
+        artifact.openclaw_endpoint_source_file || 'OPENCLAW_PERCEPTION_URL',
         artifact.openclaw_endpoint,
         'best_effort',
         JSON.stringify(notes),
