@@ -1194,6 +1194,17 @@ const SAM31_PERCEPTION_LANES = Object.freeze([
   'spatial_observation',
 ]);
 
+const SAM31_EMPLOYEE_REPLACEMENT_FIELDS = Object.freeze([
+  'semantic_label',
+  'polygon',
+  'bbox',
+  'object_hypothesis',
+  'vector_overlay',
+  'model_3d_candidate',
+  'source_ref',
+  'confidence',
+]);
+
 function uniqueStrings(values) {
   return [...new Set((values || []).map((v) => String(v || '').trim()).filter(Boolean))];
 }
@@ -1460,6 +1471,31 @@ function latestSam31VisualAuditEvidence(projectName, sourceEvidenceId) {
   return null;
 }
 
+function sam31EmployeeReplacementFromEvidence(row) {
+  if (!row) return null;
+  try {
+    const parsed = JSON.parse(row.notes || '{}');
+    return parsed && parsed.kind === 'sam31_employee_replacement' ? parsed.replacement : null;
+  } catch {
+    return null;
+  }
+}
+
+function latestSam31EmployeeReplacementEvidence(projectName, sourceEvidenceId) {
+  const rows = db
+    .prepare(`SELECT * FROM project_evidence
+              WHERE project_name = ? AND evidence_type = 'sam31_employee_replacement'
+              ORDER BY created_at DESC, id DESC`)
+    .all(projectName);
+  for (const row of rows) {
+    const replacement = sam31EmployeeReplacementFromEvidence(row);
+    if (replacement && Number(replacement.source_evidence_id) === Number(sourceEvidenceId)) {
+      return { evidence: row, replacement };
+    }
+  }
+  return null;
+}
+
 app.get('/api/projects/:name/pdf-boundary-decision', authMiddleware, (req, res) => {
   const evidence = latestPdfBoundaryDecisionEvidence(req.params.name);
   res.json({ evidence: evidence || null, decision: decisionFromEvidence(evidence) });
@@ -1499,7 +1535,7 @@ app.post('/api/projects/:name/pdf-boundary-decision', authMiddleware, requireRol
   }
 });
 
-function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence = null, sam31Evidence = null) {
+function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence = null, sam31Evidence = null, sam31ReplacementEvidence = null) {
   if (!evidence || !decision) return null;
   const candidate = decision.candidate || {};
   const latestReview = reviewEvidence && reviewEvidence.review ? {
@@ -1530,6 +1566,20 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
     openclaw_sam31_perception_packet: sam31PerceptionPacketSummary(sam31Evidence.result.openclaw_sam31_perception_packet),
     claim_gate_effect: sam31Evidence.result.claim_gate_effect || 'no_claims_cleared',
   } : null;
+  const latestSam31EmployeeReplacement = sam31ReplacementEvidence && sam31ReplacementEvidence.replacement ? {
+    evidence_id: sam31ReplacementEvidence.evidence.id,
+    evidence_status: sam31ReplacementEvidence.evidence.status,
+    source_ref: sam31ReplacementEvidence.evidence.source_ref,
+    source_sam31_evidence_id: sam31ReplacementEvidence.replacement.source_sam31_evidence_id,
+    reviewer_name: sam31ReplacementEvidence.replacement.reviewer_name,
+    replaced_at: sam31ReplacementEvidence.replacement.replaced_at,
+    replacement_ref: sam31ReplacementEvidence.replacement.replacement_ref,
+    replacement_values: sam31ReplacementEvidence.replacement.replacement_values && typeof sam31ReplacementEvidence.replacement.replacement_values === 'object'
+      ? jsonClone(sam31ReplacementEvidence.replacement.replacement_values)
+      : {},
+    replaced_fields: Array.isArray(sam31ReplacementEvidence.replacement.replaced_fields) ? sam31ReplacementEvidence.replacement.replaced_fields : [],
+    claim_gate_effect: sam31ReplacementEvidence.replacement.claim_gate_effect || 'no_claims_cleared',
+  } : null;
   let status = 'ready';
   let nextAction = 'Open the selected PDF sheet with these defaults, run a room-boundary visual audit packet, and attach employee review evidence before any geometry-accuracy claim.';
   if (latestReview?.review_decision === 'corrected') {
@@ -1541,6 +1591,9 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
   } else if (latestReview?.review_decision === 'rejected') {
     status = 'blocked';
     nextAction = 'The latest employee review rejected this boundary. Save a new boundary decision or corrected review packet before replay.';
+  } else if (latestSam31EmployeeReplacement) {
+    status = 'sam31_replacements_recorded';
+    nextAction = 'Use the employee replacement payload for the temporary SAM 3.1 fields in internal-alpha replay; regulated claims remain blocked.';
   } else if (latestSam31VisualAudit?.review_decision === 'corrected') {
     status = 'sam31_correction_ready';
     nextAction = 'Replay the best-effort layout with the corrected room polygons from the latest SAM 3.1 visual audit result; regulated claims remain blocked.';
@@ -1578,6 +1631,7 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
     blocked_claims: Array.isArray(decision.blockedClaims) ? decision.blockedClaims : [...PDF_BOUNDARY_BLOCKED_CLAIMS],
     latest_review: latestReview,
     latest_sam31_visual_audit: latestSam31VisualAudit,
+    latest_sam31_employee_replacement: latestSam31EmployeeReplacement,
     limitations: [
       decision.limitation || 'Saved boundary choice is best-effort evidence only.',
       'This queue item does not prove geometry accuracy, AHJ approval, PE review, AutoSprink parity, permit readiness, fabrication readiness, or manufacturer-exact models.',
@@ -2539,6 +2593,119 @@ function normalizeSam31VisualAuditResult(projectName, evidence, decision, body =
   };
 }
 
+function normalizeSam31EmployeeReplacement(projectName, evidence, decision, sam31Evidence, sam31Result, body = {}, user = {}) {
+  if (!evidence || !decision) {
+    const e = new Error('PDF boundary decision evidence not found');
+    e.httpStatus = 404;
+    throw e;
+  }
+  if (!sam31Evidence || !sam31Result) {
+    const e = new Error('source_sam31_evidence_id must reference a SAM 3.1 visual audit result for this boundary');
+    e.httpStatus = 404;
+    throw e;
+  }
+  const sourceSam31EvidenceId = Number(body.source_sam31_evidence_id);
+  if (!Number.isSafeInteger(sourceSam31EvidenceId) || sourceSam31EvidenceId <= 0) {
+    const e = new Error('source_sam31_evidence_id is required for SAM 3.1 employee replacement evidence');
+    e.httpStatus = 400;
+    throw e;
+  }
+  if (Number(sam31Result.source_evidence_id) !== Number(evidence.id)) {
+    const e = new Error('source_sam31_evidence_id does not belong to the requested PDF boundary evidence');
+    e.httpStatus = 409;
+    throw e;
+  }
+  const replacementRef = String(body.replacement_ref || body.source_ref || '').trim();
+  if (!replacementRef) {
+    const e = new Error('replacement_ref is required for SAM 3.1 employee replacement evidence');
+    e.httpStatus = 400;
+    throw e;
+  }
+  const rawValues = body.replacement_values;
+  if (!rawValues || typeof rawValues !== 'object' || Array.isArray(rawValues)) {
+    const e = new Error('replacement_values must be an object');
+    e.httpStatus = 400;
+    throw e;
+  }
+  const unknownFields = Object.keys(rawValues).filter((field) => !SAM31_EMPLOYEE_REPLACEMENT_FIELDS.includes(field));
+  if (unknownFields.length) {
+    const e = new Error(`Unsupported SAM31 replacement fields: ${unknownFields.join(', ')}`);
+    e.httpStatus = 400;
+    throw e;
+  }
+  const replacementValues = {};
+  for (const field of SAM31_EMPLOYEE_REPLACEMENT_FIELDS) {
+    if (Object.prototype.hasOwnProperty.call(rawValues, field)) {
+      replacementValues[field] = jsonClone(rawValues[field]);
+    }
+  }
+  const replacedFields = Object.keys(replacementValues);
+  if (!replacedFields.length) {
+    const e = new Error('replacement_values must include at least one supported SAM31 replacement field');
+    e.httpStatus = 400;
+    throw e;
+  }
+  if (Object.prototype.hasOwnProperty.call(replacementValues, 'confidence')) {
+    const confidence = Number(replacementValues.confidence);
+    if (!Number.isFinite(confidence) || confidence < 0 || confidence > 1) {
+      const e = new Error('replacement_values.confidence must be a number between 0 and 1');
+      e.httpStatus = 400;
+      throw e;
+    }
+    replacementValues.confidence = confidence;
+  }
+  const sourceRefs = [
+    {
+      evidence_id: evidence.id,
+      evidence_type: evidence.evidence_type,
+      source_file: evidence.source_file || decision.sourceFile || null,
+      source_ref: evidence.source_ref || decision.sourceRef || null,
+      status: evidence.status,
+    },
+    {
+      evidence_id: sam31Evidence.id,
+      evidence_type: sam31Evidence.evidence_type,
+      source_ref: sam31Evidence.source_ref,
+      status: sam31Evidence.status,
+      claim_gate_effect: 'no_claims_cleared',
+    },
+    {
+      evidence_type: 'employee_replacement_payload',
+      source_ref: replacementRef,
+      status: 'present',
+      claim_gate_effect: 'no_claims_cleared',
+    },
+  ];
+  return {
+    artifact_type: 'sam31_employee_replacement',
+    project_name: projectName,
+    source_evidence_id: evidence.id,
+    source_evidence_type: evidence.evidence_type,
+    source_sam31_evidence_id: sam31Evidence.id,
+    source_sam31_result_ref: sam31Result.sam31_result_ref || null,
+    source_ref: evidence.source_ref || decision.sourceRef || null,
+    source_file: evidence.source_file || decision.sourceFile || null,
+    source_runtime: sam31Result.source_runtime || 'sam-3.1+llm',
+    reviewer_name: String(body.reviewer_name || user.name || user.username || '').trim() || null,
+    replaced_at: new Date().toISOString(),
+    replacement_ref: replacementRef,
+    replacement_values: replacementValues,
+    replaced_fields: replacedFields,
+    notes: String(body.notes || '').trim() || null,
+    source_refs: sourceRefs,
+    blocked_claims: uniqueStrings([
+      ...(Array.isArray(decision.blockedClaims) ? decision.blockedClaims : PDF_BOUNDARY_BLOCKED_CLAIMS),
+      ...(Array.isArray(sam31Result.blocked_claims) ? sam31Result.blocked_claims : []),
+      ...PDF_BOUNDARY_BLOCKED_CLAIMS,
+    ]),
+    claim_gate_effect: 'no_claims_cleared',
+    limitations: [
+      'Employee SAM31 replacement payloads replace temporary AI values for internal-alpha replay only.',
+      'They do not prove geometry accuracy, drawing scale, AHJ approval, PE review, AutoSprink parity, permit readiness, fabrication readiness, or manufacturer-exact models.',
+    ],
+  };
+}
+
 function pdfBoundaryReplayInputPacket(projectName, evidence, decision, reviewEvidence, sam31Evidence = null) {
   if (!evidence || !decision) return null;
   const review = reviewEvidence?.review || sam31Evidence?.result || null;
@@ -2828,6 +2995,7 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
   const decision = decisionFromEvidence(evidence);
   const reviewEvidence = evidence ? latestPdfBoundaryReviewEvidence(projectName, evidence.id) : null;
   const sam31Evidence = evidence ? latestSam31VisualAuditEvidence(projectName, evidence.id) : null;
+  const sam31ReplacementEvidence = evidence ? latestSam31EmployeeReplacementEvidence(projectName, evidence.id) : null;
   const items = [];
   const officialFlowEvidence = latestOfficialFlowIntakeEvidence(projectName);
   const officialFlowItem = officialFlowResolverQueueItem(projectName, officialFlowEvidence);
@@ -2836,7 +3004,7 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
     const replayItem = officialFlowReplayReviewQueueItem(projectName, replayEvidence);
     if (replayItem) items.push(replayItem);
   }
-  const boundaryItem = pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence, sam31Evidence);
+  const boundaryItem = pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence, sam31Evidence, sam31ReplacementEvidence);
   if (boundaryItem) items.push(boundaryItem);
   const catalogEvidence = matchingCatalogEvidenceByFamily(projectName);
   for (const row of currentSourceAcquisitionLedger()) {
@@ -2862,6 +3030,7 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
       reviewed: statusCounts.reviewed || 0,
       sam31_correction_ready: statusCounts.sam31_correction_ready || 0,
       sam31_reviewed: statusCounts.sam31_reviewed || 0,
+      sam31_replacements_recorded: statusCounts.sam31_replacements_recorded || 0,
       catalog_source_needed: statusCounts.catalog_source_needed || 0,
       catalog_review_needed: statusCounts.catalog_review_needed || 0,
       catalog_evidence_recorded: statusCounts.catalog_evidence_recorded || 0,
@@ -3063,6 +3232,58 @@ app.post('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/sam31-vi
       message: 'SAM 3.1 visual audit result recorded as best-effort evidence; claims still blocked',
       evidence: evidenceRow,
       result: resultPacket,
+    });
+  } catch (err) {
+    res.status(err.httpStatus || 400).json({ error: err.message });
+  }
+});
+
+app.post('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/sam31-replacements', authMiddleware, requireRole('admin'), (req, res) => {
+  try {
+    const projectName = req.params.name;
+    const evidenceId = Number(req.params.evidenceId);
+    if (!Number.isSafeInteger(evidenceId) || evidenceId <= 0) {
+      return res.status(400).json({ error: 'A positive evidence id is required' });
+    }
+    const sourceSam31EvidenceId = Number(req.body?.source_sam31_evidence_id);
+    if (!Number.isSafeInteger(sourceSam31EvidenceId) || sourceSam31EvidenceId <= 0) {
+      return res.status(400).json({ error: 'source_sam31_evidence_id is required for SAM 3.1 employee replacement evidence' });
+    }
+    const evidence = db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'pdf_boundary_decision'`)
+      .get(evidenceId, projectName);
+    const decision = decisionFromEvidence(evidence);
+    const sam31Evidence = db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'sam31_room_boundary_visual_audit'`)
+      .get(sourceSam31EvidenceId, projectName);
+    const sam31Result = sam31VisualAuditResultFromEvidence(sam31Evidence);
+    const replacementPacket = normalizeSam31EmployeeReplacement(projectName, evidence, decision, sam31Evidence, sam31Result, req.body, req.user);
+    const notes = {
+      kind: 'sam31_employee_replacement',
+      replacement: replacementPacket,
+      blocked_claims: replacementPacket.blocked_claims,
+      claim_gate_effect: replacementPacket.claim_gate_effect,
+      limitations: replacementPacket.limitations,
+    };
+    const result = db
+      .prepare(`INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+                VALUES (?, ?, ?, ?, ?, ?)`)
+      .run(
+        projectName,
+        'sam31_employee_replacement',
+        replacementPacket.source_file,
+        `pdf-boundary:${evidence.id}:sam31-replacement:${sam31Evidence.id}`,
+        'present',
+        JSON.stringify(notes),
+      );
+    const evidenceRow = db.prepare('SELECT * FROM project_evidence WHERE id = ?').get(result.lastInsertRowid);
+    res.status(201).json({
+      id: result.lastInsertRowid,
+      message: 'SAM 3.1 employee replacement values recorded; claims still blocked',
+      evidence: evidenceRow,
+      replacement: replacementPacket,
     });
   } catch (err) {
     res.status(err.httpStatus || 400).json({ error: err.message });

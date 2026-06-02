@@ -32,6 +32,11 @@ describe('SAM31 workbench browser smoke script', () => {
     expect(script).toContain('source_ref');
     expect(script).toContain('confidence');
     expect(script).toContain('data-sam31-replacement-action-field');
+    expect(script).toContain('/sam31-replacements');
+    expect(script).toContain('Save employee replacements');
+    expect(script).toContain('sam31EmployeeReplacementValues');
+    expect(script).toContain('sam31ReplacementStatus');
+    expect(script).toContain('sam31_replacements_recorded');
     expect(script).toContain('best_guess_until_employee_replaced');
     expect(script).toContain('Download full SAM31 packet');
     expect(script).toContain('no_claims_cleared');

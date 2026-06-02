@@ -375,6 +375,7 @@ function resolverQueueDetail(item) {
   const acceptable = Array.isArray(item.acceptable_evidence) ? item.acceptable_evidence : [];
   const latest_review = item.latest_review || null;
   const latest_sam31_visual_audit = item.latest_sam31_visual_audit || null;
+  const latest_sam31_employee_replacement = item.latest_sam31_employee_replacement || null;
   const replay_review = latest_review || latest_sam31_visual_audit;
   const review_source = latest_review ? 'latest_employee_review_packet' : (latest_sam31_visual_audit ? 'latest_sam31_visual_audit' : null);
   const evidenceId = escapeHtml(item.evidence_id);
@@ -453,6 +454,7 @@ function resolverQueueDetail(item) {
       <div class="na">${escapeHtml(item.next_action)}</div>
       <div class="claims">Defaults: page ${escapeHtml(defaults.pdfPageIndex)} · scale ${escapeHtml(defaults.pdfScale)} ft/pt · ${escapeHtml(defaults.pdfExtract)}</div>
       ${replay_review ? `<div class="claims">Review: ${escapeHtml(replay_review.review_decision)} by ${escapeHtml(replay_review.reviewer_name || 'unknown')} - source ${escapeHtml(review_source || 'missing')} - issues ${escapeHtml(replay_review.issue_count)} - corrected polygons ${escapeHtml(replay_review.corrected_room_polygon_count)} - ${escapeHtml(replay_review.marked_up_plan_ref || '')}</div>` : ''}
+      ${latest_sam31_employee_replacement ? `<div class="claims">Employee SAM31 replacements: evidence #${escapeHtml(latest_sam31_employee_replacement.evidence_id)} - source_sam31_evidence_id ${escapeHtml(latest_sam31_employee_replacement.source_sam31_evidence_id)} - ${escapeHtml(latest_sam31_employee_replacement.replacement_ref || 'missing')} - ${escapeHtml(latest_sam31_employee_replacement.claim_gate_effect || 'no_claims_cleared')}<br>Replaced fields: ${(Array.isArray(latest_sam31_employee_replacement.replaced_fields) ? latest_sam31_employee_replacement.replaced_fields : []).map((field) => `<span class="chip">${escapeHtml(field)}</span>`).join('')}<br>Replacement value preview: ${escapeHtml(JSON.stringify(latest_sam31_employee_replacement.replacement_values || {}))}</div>` : ''}
       ${latest_sam31_visual_audit ? renderSam31PerceptionSummary(latest_sam31_visual_audit.openclaw_sam31_perception_packet, item.evidence_id) : ''}
       <div class="claims">Accepts: ${acceptable.map((e) => `<span class="chip">${escapeHtml(e)}</span>`).join('')}</div>
       <div class="claims">AI fallback: ${escapeHtml(item.ai_fallback || '')}</div>
@@ -479,6 +481,17 @@ function resolverQueueDetail(item) {
           <div class="muted" id="sam31AuditStatus-${evidenceId}" style="font-size:11px"></div>
         </div>
       </details>
+      ${latest_sam31_visual_audit ? `<details style="margin-top:8px" id="sam31ReplacementPanel-${evidenceId}">
+        <summary class="muted" style="cursor:pointer">Save employee replacements for temporary SAM31 values</summary>
+        <div style="display:grid;gap:6px;margin-top:8px">
+          <input id="sam31EmployeeReplacementReviewer-${evidenceId}" placeholder="reviewer_name" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
+          <input id="sam31EmployeeReplacementRef-${evidenceId}" value="${escapeHtml(latest_sam31_employee_replacement?.replacement_ref || '')}" placeholder="replacement_ref" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
+          <textarea id="sam31EmployeeReplacementValues-${evidenceId}" placeholder='replacement_values JSON object: {"semantic_label":"main corridor","polygon":[[0,0],[1,0],[1,1],[0,1]],"bbox":{"minX":0,"minY":0,"maxX":1,"maxY":1},"object_hypothesis":{},"vector_overlay":{},"model_3d_candidate":{},"source_ref":"1881://employee-notes","confidence":0.8}' style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px;height:82px"></textarea>
+          <textarea id="sam31EmployeeReplacementNotes-${evidenceId}" placeholder="notes" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px;height:44px"></textarea>
+          <button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#b45309" data-sam31-employee-replacement-save-evidence-id="${evidenceId}" data-sam31-source-evidence-id="${escapeHtml(latest_sam31_visual_audit.evidence_id)}">Save employee replacements</button>
+          <div class="muted" id="sam31ReplacementStatus-${evidenceId}" style="font-size:11px"></div>
+        </div>
+      </details>` : ''}
       ${replay_review && item.status !== 'blocked' ? `<p style="margin-top:8px"><button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#3b82f6" data-resolver-replay-evidence-id="${escapeHtml(item.evidence_id)}">Download replay input</button></p>` : ''}
       ${replay_review && item.status !== 'blocked' ? `<p style="margin-top:8px"><button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#4f46e5" data-resolver-replay-bid-evidence-id="${escapeHtml(item.evidence_id)}">Run replay bid</button></p><div class="muted" id="replayBidStatus-${evidenceId}" style="font-size:11px"></div>` : ''}
       <details style="margin-top:8px">
@@ -522,7 +535,9 @@ async function downloadSam31VisualAuditPacket(evidenceId) {
 }
 
 function focusSam31ReplacementForm(evidenceId) {
-  const target = document.getElementById('sam31ResultRef-' + evidenceId)
+  const target = document.getElementById('sam31EmployeeReplacementValues-' + evidenceId)
+    || document.getElementById('sam31EmployeeReplacementRef-' + evidenceId)
+    || document.getElementById('sam31ResultRef-' + evidenceId)
     || document.getElementById('sam31CorrectedRoomPolygons-' + evidenceId)
     || document.getElementById('sam31Notes-' + evidenceId);
   if (!target) return;
@@ -664,6 +679,14 @@ function jsonArrayFromField(id) {
   return parsed;
 }
 
+function jsonObjectFromField(id) {
+  const text = document.getElementById(id)?.value.trim();
+  if (!text) return {};
+  const parsed = JSON.parse(text);
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error(id + ' must be a JSON object');
+  return parsed;
+}
+
 async function saveResolverPacketReview(evidenceId) {
   const status = document.getElementById('reviewStatus-' + evidenceId);
   try {
@@ -706,6 +729,28 @@ async function saveSam31VisualAuditResult(evidenceId) {
       body: JSON.stringify(body),
     });
     status.textContent = 'Saved sam31_room_boundary_visual_audit evidence #' + saved.id + ' - claims still blocked';
+    await refreshEvidence();
+    await refreshResolverQueue();
+  } catch (err) {
+    if (status) status.textContent = 'Error: ' + err.message;
+  }
+}
+
+async function saveSam31EmployeeReplacements(evidenceId, sourceSam31EvidenceId) {
+  const status = document.getElementById('sam31ReplacementStatus-' + evidenceId);
+  try {
+    const body = {
+      source_sam31_evidence_id: Number(sourceSam31EvidenceId),
+      reviewer_name: document.getElementById('sam31EmployeeReplacementReviewer-' + evidenceId).value.trim(),
+      replacement_ref: document.getElementById('sam31EmployeeReplacementRef-' + evidenceId).value.trim(),
+      replacement_values: jsonObjectFromField('sam31EmployeeReplacementValues-' + evidenceId),
+      notes: document.getElementById('sam31EmployeeReplacementNotes-' + evidenceId).value.trim(),
+    };
+    const saved = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/resolver-packets/pdf-boundary/' + encodeURIComponent(evidenceId) + '/sam31-replacements', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    });
+    if (status) status.textContent = 'Saved sam31_employee_replacement evidence #' + saved.id + ' - claims still blocked';
     await refreshEvidence();
     await refreshResolverQueue();
   } catch (err) {
@@ -763,6 +808,9 @@ async function refreshResolverQueue() {
   });
   document.querySelectorAll('[data-sam31-visual-audit-save-evidence-id]').forEach((button) => {
     button.onclick = () => saveSam31VisualAuditResult(button.dataset.sam31VisualAuditSaveEvidenceId);
+  });
+  document.querySelectorAll('[data-sam31-employee-replacement-save-evidence-id]').forEach((button) => {
+    button.onclick = () => saveSam31EmployeeReplacements(button.dataset.sam31EmployeeReplacementSaveEvidenceId, button.dataset.sam31SourceEvidenceId);
   });
   document.querySelectorAll('[data-official-flow-save]').forEach((button) => {
     button.onclick = () => saveOfficialFlowIntake();

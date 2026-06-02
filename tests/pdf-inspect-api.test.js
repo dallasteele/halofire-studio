@@ -533,11 +533,70 @@ describe('PDF page inspection API', () => {
     expect(samResultRow.notes).toContain('openclaw.sam31_perception_packet');
     expect(samResultRow.notes).toContain('no_claims_cleared');
 
+    const replacementRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${body.evidence.id}/sam31-replacements`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        source_sam31_evidence_id: samResult.evidence.id,
+        reviewer_name: 'Halo Fire estimator',
+        replacement_ref: '1881://employee-replacements/sheet-7-sam31-values.json',
+        replacement_values: {
+          semantic_label: 'main corridor',
+          polygon: [[1, 1], [29, 1], [29, 9], [1, 9]],
+          bbox: { minX: 1, minY: 1, maxX: 29, maxY: 9 },
+          object_hypothesis: { id: 'obj-sleeve-1', semantic_label: 'field-verified sleeve candidate' },
+          vector_overlay: { id: 'vector:employee:seg-room-1', svg_path: 'M 1 1 L 29 1 L 29 9 L 1 9 Z' },
+          model_3d_candidate: { id: 'model3d:employee:seg-room-1', primitive: 'field_adjusted_extruded_polygon' },
+          source_ref: '1881://employee-field-notes/sheet-7',
+          confidence: 0.88,
+        },
+        notes: 'Employee replaced temporary SAM31 values for internal replay only.',
+      }),
+    });
+    expect(replacementRes.status).toBe(201);
+    const replacement = await replacementRes.json();
+    expect(replacement.evidence.evidence_type).toBe('sam31_employee_replacement');
+    expect(replacement.evidence.status).toBe('present');
+    expect(replacement.replacement).toEqual(expect.objectContaining({
+      source_evidence_id: body.evidence.id,
+      source_sam31_evidence_id: samResult.evidence.id,
+      reviewer_name: 'Halo Fire estimator',
+      replacement_ref: '1881://employee-replacements/sheet-7-sam31-values.json',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(replacement.replacement.replacement_values).toEqual(expect.objectContaining({
+      semantic_label: 'main corridor',
+      source_ref: '1881://employee-field-notes/sheet-7',
+      confidence: 0.88,
+    }));
+    expect(replacement.replacement.replaced_fields).toEqual(expect.arrayContaining([
+      'semantic_label',
+      'polygon',
+      'bbox',
+      'object_hypothesis',
+      'vector_overlay',
+      'model_3d_candidate',
+      'source_ref',
+      'confidence',
+    ]));
+    expect(replacement.replacement.blocked_claims).toEqual(expect.arrayContaining(['permit_ready', 'AHJ_approval', 'AutoSprink_parity']));
+    expect(replacement.message).toMatch(/claims still blocked/i);
+
+    const evidenceAfterReplacement = await (await request(`${COOPERATIVE_1881_PATH}/evidence`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })).json();
+    const replacementRow = evidenceAfterReplacement.find((e) => e.id === replacement.evidence.id);
+    expect(replacementRow).toBeTruthy();
+    expect(replacementRow.source_ref).toContain(`pdf-boundary:${body.evidence.id}:sam31-replacement:${samResult.evidence.id}`);
+    expect(replacementRow.notes).toContain('sam31_employee_replacement');
+    expect(replacementRow.notes).toContain('field_adjusted_extruded_polygon');
+    expect(replacementRow.notes).toContain('no_claims_cleared');
+
     const queueAfterSamResult = await (await request(`${COOPERATIVE_1881_PATH}/resolver-queue`, {
       headers: { Authorization: `Bearer ${token}` },
     })).json();
     const samReviewedItem = queueAfterSamResult.items.find((q) => q.evidence_id === body.evidence.id);
-    expect(samReviewedItem.status).toBe('sam31_correction_ready');
+    expect(samReviewedItem.status).toBe('sam31_replacements_recorded');
     expect(samReviewedItem.next_action).toMatch(/SAM 3\.1/i);
     expect(samReviewedItem.latest_sam31_visual_audit).toEqual(expect.objectContaining({
       evidence_id: samResult.evidence.id,
@@ -546,6 +605,14 @@ describe('PDF page inspection API', () => {
       sam31_result_ref: '1881://sam31/sheet-7-segmentation.json',
       corrected_room_polygon_count: 1,
       issue_count: 1,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(samReviewedItem.latest_sam31_employee_replacement).toEqual(expect.objectContaining({
+      evidence_id: replacement.evidence.id,
+      source_sam31_evidence_id: samResult.evidence.id,
+      reviewer_name: 'Halo Fire estimator',
+      replacement_ref: '1881://employee-replacements/sheet-7-sam31-values.json',
+      replaced_fields: expect.arrayContaining(['semantic_label', 'polygon', 'bbox', 'model_3d_candidate', 'confidence']),
       claim_gate_effect: 'no_claims_cleared',
     }));
     expect(samReviewedItem.latest_sam31_visual_audit.openclaw_sam31_perception_packet).toEqual(expect.objectContaining({
@@ -560,7 +627,7 @@ describe('PDF page inspection API', () => {
       next_action: 'Use this summary to queue HaloFire room-boundary replay; do not promote blocked claims.',
       claim_gate_effect: 'no_claims_cleared',
     }));
-    expect(queueAfterSamResult.summary.sam31_correction_ready).toBe(1);
+    expect(queueAfterSamResult.summary.sam31_replacements_recorded).toBe(1);
 
     const samReplayRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${body.evidence.id}/replay-input`, {
       headers: { Authorization: `Bearer ${token}` },

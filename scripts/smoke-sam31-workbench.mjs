@@ -14,6 +14,8 @@ const ROOT = path.resolve(__dirname, '..');
 const PORT = Number(process.env.HALOFIRE_SMOKE_PORT || 3371);
 const BASE = `http://127.0.0.1:${PORT}`;
 const PROJECT_PATH = `/api/projects/${encodeURIComponent(COOPERATIVE_1881_PROJECT_NAME)}`;
+const SAM31_REPLACEMENTS_ROUTE_SUFFIX = '/sam31-replacements';
+const SAM31_REPLACEMENTS_RECORDED_STATUS = 'sam31_replacements_recorded';
 const PASSWORD = 'sam31-workbench-smoke-pw';
 const OUT_DIR_REL = 'output/playwright';
 const OUT_DIR = path.join(ROOT, ...OUT_DIR_REL.split('/'));
@@ -277,7 +279,26 @@ async function runBrowserSmoke(token, evidenceIds) {
     await page.waitForSelector('[data-sam31-replacement-action-field="confidence"]', { timeout: 8_000 });
     await page.waitForSelector('[data-sam31-replacement-action-evidence-id]', { timeout: 8_000 });
     await page.getByRole('button', { name: 'Record employee replacements' }).first().click();
-    await page.waitForSelector('[id^="sam31ResultRef-"]:focus', { timeout: 8_000 });
+    await page.waitForSelector('[id^="sam31EmployeeReplacementValues-"]:focus', { timeout: 8_000 });
+    await page.locator('[id^="sam31EmployeeReplacementReviewer-"]').first().fill('Halo Fire employee smoke');
+    await page.locator('[id^="sam31EmployeeReplacementRef-"]').first().fill('1881://employee-replacements/smoke-sheet-7-sam31-values.json');
+    await page.locator('[id^="sam31EmployeeReplacementValues-"]').first().fill(JSON.stringify({
+      semantic_label: 'employee adjusted corridor',
+      polygon: [[1, 1], [29, 1], [29, 9], [1, 9]],
+      bbox: { minX: 1, minY: 1, maxX: 29, maxY: 9 },
+      object_hypothesis: { id: 'obj-smoke-sleeve', semantic_label: 'employee field sleeve candidate' },
+      vector_overlay: { id: 'vector:employee:seg-smoke-room', svg_path: 'M 1 1 L 29 1 L 29 9 L 1 9 Z' },
+      model_3d_candidate: { id: 'model3d:employee:seg-smoke-room', primitive: 'employee_adjusted_extruded_polygon' },
+      source_ref: '1881://employee-field-notes/smoke-sheet-7',
+      confidence: 0.86,
+    }));
+    await page.locator('[id^="sam31EmployeeReplacementNotes-"]').first().fill('Smoke saved employee replacements for temporary SAM31 values.');
+    await page.waitForSelector('[id^="sam31ReplacementStatus-"]', { state: 'attached', timeout: 8_000 });
+    await page.getByRole('button', { name: 'Save employee replacements' }).first().click();
+    await page.waitForSelector('text=sam31_employee_replacement evidence', { timeout: 8_000 });
+    await page.waitForSelector('text=SAM31_REPLACEMENTS_RECORDED', { timeout: 8_000 });
+    await page.waitForSelector('text=Employee SAM31 replacements', { timeout: 8_000 });
+    await page.waitForSelector('text=employee_adjusted_extruded_polygon', { timeout: 8_000 });
     await page.waitForSelector('text=best_guess_until_employee_replaced', { timeout: 8_000 });
     await page.waitForSelector('text=no_claims_cleared', { timeout: 8_000 });
     await page.waitForSelector('text=Download full SAM31 packet', { timeout: 8_000 });
@@ -303,6 +324,8 @@ async function runBrowserSmoke(token, evidenceIds) {
       screenshotSha256: `sha256:${sha256}`,
       evidenceIds,
       downloads,
+      sam31ReplacementRouteSuffix: SAM31_REPLACEMENTS_ROUTE_SUFFIX,
+      sam31ReplacementQueueStatus: SAM31_REPLACEMENTS_RECORDED_STATUS,
       claim_gate_effect: 'no_claims_cleared',
     };
   } finally {
