@@ -473,6 +473,112 @@ async function runBrowserSmoke(token, evidenceIds) {
       || sectioningContractReview.use_for_claims !== false) {
       throw new Error(`SAM31 sectioning contract review did not persist fail-closed source truth: ${JSON.stringify(sectioningContractReview)}`);
     }
+
+    await page.waitForSelector('text=Download SAM31 sectioning downstream resolver packet', { timeout: 8_000 });
+    await page.waitForSelector('text=Save SAM31 sectioning downstream resolver packet', { timeout: 8_000 });
+    const sectioningDownstreamDownloadPromise = page.waitForEvent('download');
+    await page.locator('[data-sam31-sectioning-downstream-resolver-evidence-id]').first().click();
+    const sectioningDownstreamDownload = await sectioningDownstreamDownloadPromise;
+    const sectioningDownstreamPath = await sectioningDownstreamDownload.path();
+    const sectioningDownstreamSuggestedName = sectioningDownstreamDownload.suggestedFilename();
+    const sectioningDownstreamBytes = sectioningDownstreamPath ? fs.statSync(sectioningDownstreamPath).size : 0;
+    downloads.push({ suggestedName: sectioningDownstreamSuggestedName, bytes: sectioningDownstreamBytes });
+    if (!sectioningDownstreamSuggestedName.includes('sam31-sectioning-downstream-resolvers') || sectioningDownstreamBytes <= 0) {
+      throw new Error(`Unexpected SAM31 sectioning downstream resolver download ${sectioningDownstreamSuggestedName} (${sectioningDownstreamBytes} bytes)`);
+    }
+    const sectioningDownstreamResolverPacket = JSON.parse(fs.readFileSync(sectioningDownstreamPath, 'utf8'));
+    if (sectioningDownstreamResolverPacket.artifact_type !== 'halofire.sam31_sectioning_downstream_resolver_packet.v1') {
+      throw new Error(`Unexpected SAM31 sectioning downstream resolver packet type ${sectioningDownstreamResolverPacket.artifact_type}`);
+    }
+    if (sectioningDownstreamResolverPacket.source_pdf_boundary_evidence_id !== evidenceIds.boundaryEvidenceId
+      || sectioningDownstreamResolverPacket.source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id !== sectioningContractReview.evidence_id
+      || sectioningDownstreamResolverPacket.source_openclaw_sam31_extrapolation_evidence_id !== evidenceIds.localBridgeExtrapolationEvidenceId
+      || sectioningDownstreamResolverPacket.use_for_claims !== false
+      || sectioningDownstreamResolverPacket.claim_gate_effect !== 'no_claims_cleared'
+      || sectioningDownstreamResolverPacket.no_claim_gates_cleared !== true) {
+      throw new Error(`SAM31 sectioning downstream resolver packet lost fail-closed source truth: ${JSON.stringify(sectioningDownstreamResolverPacket)}`);
+    }
+    if (!Array.isArray(sectioningDownstreamResolverPacket.downstream_resolver_queue_items)
+      || sectioningDownstreamResolverPacket.downstream_resolver_queue_items.length < 2
+      || !sectioningDownstreamResolverPacket.downstream_resolver_lanes?.includes('room_boundary_visual_audit')
+      || !sectioningDownstreamResolverPacket.downstream_resolver_lanes?.includes('obstruction_or_clash_review')) {
+      throw new Error(`SAM31 sectioning downstream resolver packet lost executable resolver lanes: ${JSON.stringify(sectioningDownstreamResolverPacket.downstream_resolver_lanes)}`);
+    }
+    await page.locator('[data-sam31-sectioning-downstream-resolver-save-evidence-id]').first().click();
+    await page.waitForSelector('text=halofire_sam31_sectioning_downstream_resolver_packet', { timeout: 8_000 });
+    await page.waitForSelector('text=sam31_sectioning_downstream_resolver_packets_recorded 1', { timeout: 8_000 });
+    const sectioningDownstreamQueue = await request(`${PROJECT_PATH}/resolver-queue`, token);
+    if (sectioningDownstreamQueue.summary?.sam31_sectioning_downstream_resolver_packets_recorded !== 1) {
+      throw new Error(`SAM31 sectioning downstream resolver queue summary missing saved packet: ${JSON.stringify(sectioningDownstreamQueue.summary)}`);
+    }
+    const sectioningDownstreamResolverSummary = sectioningDownstreamQueue.items
+      .find((item) => item.evidence_id === evidenceIds.boundaryEvidenceId)
+      ?.latest_halofire_sam31_sectioning_downstream_resolver_packet;
+    if (!sectioningDownstreamResolverSummary
+      || sectioningDownstreamResolverSummary.source_pdf_boundary_evidence_id !== evidenceIds.boundaryEvidenceId
+      || sectioningDownstreamResolverSummary.source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id !== sectioningContractReview.evidence_id
+      || sectioningDownstreamResolverSummary.source_openclaw_sam31_extrapolation_evidence_id !== evidenceIds.localBridgeExtrapolationEvidenceId
+      || sectioningDownstreamResolverSummary.claim_gate_effect !== 'no_claims_cleared') {
+      throw new Error(`SAM31 sectioning downstream resolver queue summary lost source truth: ${JSON.stringify(sectioningDownstreamResolverSummary)}`);
+    }
+
+    await page.waitForSelector('text=Download SAM31 sectioning sprinkler review adapter', { timeout: 8_000 });
+    await page.waitForSelector('text=Save SAM31 sectioning sprinkler review adapter', { timeout: 8_000 });
+    const sectioningSprinklerAdapterDownloadPromise = page.waitForEvent('download');
+    await page.locator(`[data-sam31-sectioning-sprinkler-review-adapter-packet-evidence-id="${sectioningDownstreamResolverSummary.evidence_id}"]`).first().click();
+    const sectioningSprinklerAdapterDownload = await sectioningSprinklerAdapterDownloadPromise;
+    const sectioningSprinklerAdapterPath = await sectioningSprinklerAdapterDownload.path();
+    const sectioningSprinklerAdapterSuggestedName = sectioningSprinklerAdapterDownload.suggestedFilename();
+    const sectioningSprinklerAdapterBytes = sectioningSprinklerAdapterPath ? fs.statSync(sectioningSprinklerAdapterPath).size : 0;
+    downloads.push({ suggestedName: sectioningSprinklerAdapterSuggestedName, bytes: sectioningSprinklerAdapterBytes });
+    if (!sectioningSprinklerAdapterSuggestedName.includes('sam31-sectioning-sprinkler-review-adapter') || sectioningSprinklerAdapterBytes <= 0) {
+      throw new Error(`Unexpected SAM31 sectioning sprinkler review adapter download ${sectioningSprinklerAdapterSuggestedName} (${sectioningSprinklerAdapterBytes} bytes)`);
+    }
+    const sectioningSprinklerReviewAdapterPacket = JSON.parse(fs.readFileSync(sectioningSprinklerAdapterPath, 'utf8'));
+    if (sectioningSprinklerReviewAdapterPacket.artifact_type !== 'openclaw.sam31_to_sprinkler_review_adapter.v1'
+      || sectioningSprinklerReviewAdapterPacket.adapter_source !== 'halofire.sam31_sectioning_downstream_resolver_packet.v1'
+      || sectioningSprinklerReviewAdapterPacket.sprinkler_review_packet?.artifact_type !== 'halofire.sam31_sprinkler_review_packet.v1') {
+      throw new Error(`Unexpected SAM31 sectioning sprinkler review adapter packet: ${JSON.stringify(sectioningSprinklerReviewAdapterPacket)}`);
+    }
+    if (sectioningSprinklerReviewAdapterPacket.source_pdf_boundary_evidence_id !== evidenceIds.boundaryEvidenceId
+      || sectioningSprinklerReviewAdapterPacket.source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id !== sectioningDownstreamResolverSummary.evidence_id
+      || sectioningSprinklerReviewAdapterPacket.source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id !== sectioningContractReview.evidence_id
+      || sectioningSprinklerReviewAdapterPacket.source_openclaw_sam31_extrapolation_evidence_id !== evidenceIds.localBridgeExtrapolationEvidenceId
+      || sectioningSprinklerReviewAdapterPacket.use_for_claims !== false
+      || sectioningSprinklerReviewAdapterPacket.claim_gate_effect !== 'no_claims_cleared'
+      || sectioningSprinklerReviewAdapterPacket.no_claim_gates_cleared !== true) {
+      throw new Error(`SAM31 sectioning sprinkler review adapter lost fail-closed source truth: ${JSON.stringify(sectioningSprinklerReviewAdapterPacket)}`);
+    }
+    if (!Array.isArray(sectioningSprinklerReviewAdapterPacket.supported_sprinkler_review_lanes)
+      || !sectioningSprinklerReviewAdapterPacket.supported_sprinkler_review_lanes.includes('room_boundary_visual_audit')
+      || !sectioningSprinklerReviewAdapterPacket.supported_sprinkler_review_lanes.includes('obstruction_or_clash_review')
+      || !Array.isArray(sectioningSprinklerReviewAdapterPacket.source_linked_vector_overlays)
+      || sectioningSprinklerReviewAdapterPacket.source_linked_vector_overlays.length < 1
+      || !Array.isArray(sectioningSprinklerReviewAdapterPacket.source_linked_model_3d_candidates)
+      || sectioningSprinklerReviewAdapterPacket.source_linked_model_3d_candidates.length < 1
+      || !Array.isArray(sectioningSprinklerReviewAdapterPacket.sprinkler_review_packet?.issue_seeds)
+      || sectioningSprinklerReviewAdapterPacket.sprinkler_review_packet.issue_seeds.length < 2) {
+      throw new Error(`SAM31 sectioning sprinkler review adapter lost review lanes, vectors, models, or issue seeds: ${JSON.stringify(sectioningSprinklerReviewAdapterPacket)}`);
+    }
+    await page.locator(`[data-sam31-sectioning-sprinkler-review-adapter-save-packet-evidence-id="${sectioningDownstreamResolverSummary.evidence_id}"]`).first().click();
+    await page.waitForSelector('text=halofire_sam31_sectioning_sprinkler_review_adapter', { timeout: 8_000 });
+    await page.waitForSelector('text=Saved SAM31 sectioning sprinkler review adapter', { timeout: 8_000 });
+    await page.waitForSelector('text=sam31_sectioning_sprinkler_review_adapters_recorded 1', { timeout: 8_000 });
+    const sectioningSprinklerAdapterQueue = await request(`${PROJECT_PATH}/resolver-queue`, token);
+    if (sectioningSprinklerAdapterQueue.summary?.sam31_sectioning_sprinkler_review_adapters_recorded !== 1) {
+      throw new Error(`SAM31 sectioning sprinkler adapter queue summary missing saved adapter: ${JSON.stringify(sectioningSprinklerAdapterQueue.summary)}`);
+    }
+    const sectioningSprinklerReviewAdapterSummary = sectioningSprinklerAdapterQueue.items
+      .find((item) => item.evidence_id === evidenceIds.boundaryEvidenceId)
+      ?.latest_halofire_sam31_sectioning_sprinkler_review_adapter;
+    if (!sectioningSprinklerReviewAdapterSummary
+      || sectioningSprinklerReviewAdapterSummary.source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id !== sectioningDownstreamResolverSummary.evidence_id
+      || sectioningSprinklerReviewAdapterSummary.adapter_source !== 'halofire.sam31_sectioning_downstream_resolver_packet.v1'
+      || sectioningSprinklerReviewAdapterSummary.sprinkler_review_issue_seed_count < 2
+      || sectioningSprinklerReviewAdapterSummary.claim_gate_effect !== 'no_claims_cleared') {
+      throw new Error(`SAM31 sectioning sprinkler adapter queue summary lost source truth: ${JSON.stringify(sectioningSprinklerReviewAdapterSummary)}`);
+    }
+
     await page.waitForSelector('text=SAM31 vector/model artifact packet', { timeout: 8_000 });
     await page.waitForSelector('text=Download SAM31 vector/model artifact packet', { timeout: 8_000 });
     await page.waitForSelector('text=Record SAM31 vector/model artifacts', { timeout: 8_000 });
@@ -1279,6 +1385,29 @@ async function runBrowserSmoke(token, evidenceIds) {
         source_openclaw_sam31_extrapolation_evidence_id: sectioningContractReview.source_openclaw_sam31_extrapolation_evidence_id,
         source_sectioning_pipeline_contract_artifact_type: sectioningContractReview.source_sectioning_pipeline_contract_artifact_type,
         claim_gate_effect: sectioningContractReview.claim_gate_effect,
+      },
+      sectioningDownstreamResolverPacket: {
+        artifact_type: sectioningDownstreamResolverPacket.artifact_type,
+        suggestedName: sectioningDownstreamSuggestedName,
+        source_pdf_boundary_evidence_id: sectioningDownstreamResolverPacket.source_pdf_boundary_evidence_id,
+        source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id: sectioningDownstreamResolverPacket.source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id,
+        downstream_resolver_queue_item_count: sectioningDownstreamResolverPacket.downstream_resolver_queue_item_count,
+        downstream_resolver_lanes: sectioningDownstreamResolverPacket.downstream_resolver_lanes,
+        persisted_evidence_id: sectioningDownstreamResolverSummary.evidence_id,
+        claim_gate_effect: sectioningDownstreamResolverPacket.claim_gate_effect,
+      },
+      sectioningSprinklerReviewAdapterPacket: {
+        artifact_type: sectioningSprinklerReviewAdapterPacket.artifact_type,
+        suggestedName: sectioningSprinklerAdapterSuggestedName,
+        adapter_source: sectioningSprinklerReviewAdapterPacket.adapter_source,
+        source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id: sectioningSprinklerReviewAdapterPacket.source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id,
+        sprinkler_review_packet_type: sectioningSprinklerReviewAdapterPacket.sprinkler_review_packet?.artifact_type,
+        sprinkler_review_issue_seed_count: Array.isArray(sectioningSprinklerReviewAdapterPacket.sprinkler_review_packet?.issue_seeds)
+          ? sectioningSprinklerReviewAdapterPacket.sprinkler_review_packet.issue_seeds.length
+          : 0,
+        supported_sprinkler_review_lanes: sectioningSprinklerReviewAdapterPacket.supported_sprinkler_review_lanes,
+        persisted_evidence_id: sectioningSprinklerReviewAdapterSummary.evidence_id,
+        claim_gate_effect: sectioningSprinklerReviewAdapterPacket.claim_gate_effect,
       },
       consumerSmokeArtifact: {
         artifact_type: consumerSmokeArtifact.artifact_type,

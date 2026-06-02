@@ -68,6 +68,18 @@ describe('SAM31 workbench browser smoke script', () => {
     expect(script).toContain('sectioningContractReview');
     expect(script).toContain('sam31_sectioning_contract_reviews_recorded');
     expect(script).toContain('Saved SAM31 sectioning contract review evidence detail');
+    expect(script).toContain('Download SAM31 sectioning downstream resolver packet');
+    expect(script).toContain('Save SAM31 sectioning downstream resolver packet');
+    expect(script).toContain('halofire_sam31_sectioning_downstream_resolver_packet');
+    expect(script).toContain('sam31_sectioning_downstream_resolver_packets_recorded');
+    expect(script).toContain('sectioningDownstreamResolverPacket');
+    expect(script).toContain('Download SAM31 sectioning sprinkler review adapter');
+    expect(script).toContain('Save SAM31 sectioning sprinkler review adapter');
+    expect(script).toContain('halofire_sam31_sectioning_sprinkler_review_adapter');
+    expect(script).toContain('sam31_sectioning_sprinkler_review_adapters_recorded');
+    expect(script).toContain('sectioningSprinklerReviewAdapterPacket');
+    expect(script).toContain('latest_halofire_sam31_sectioning_sprinkler_review_adapter');
+    expect(script).toContain('source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id');
     expect(script).toContain('Download SAM31 vector/model artifact packet');
     expect(script).toContain('Record SAM31 vector/model artifacts');
     expect(script).toContain('openclaw.sam31_vector_model_artifact_packet.v1');
