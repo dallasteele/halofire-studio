@@ -492,6 +492,17 @@ describe('OpenClaw SAM31 bridge status API', () => {
       'vector_overlay_generation',
       'model_3d_candidate_generation',
     ]));
+    expect(artifact.extrapolation_index).toEqual([
+      expect.objectContaining({
+        artifact_type: 'openclaw.sam31.extrapolation_index_item.v1',
+        section_id: 'candidate:pdf-boundary',
+        semantic_label: 'room_boundary_candidate',
+        vector_overlay_ids: expect.arrayContaining(['vector:section-room-101']),
+        model_3d_candidate_ids: expect.arrayContaining(['model3d:section-room-101']),
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    ]);
     expect(artifact.evidence).toEqual(expect.objectContaining({
       evidence_type: 'openclaw_sam31_extrapolation_artifact',
       source_file: 'OPENCLAW_PERCEPTION_URL',
@@ -524,6 +535,14 @@ describe('OpenClaw SAM31 bridge status API', () => {
         use_for_claims: false,
         claim_gate_effect: 'no_claims_cleared',
       }),
+      extrapolation_index: [
+        expect.objectContaining({
+          section_id: 'candidate:pdf-boundary',
+          use_for_claims: false,
+          claim_gate_effect: 'no_claims_cleared',
+        }),
+      ],
+      extrapolation_index_count: 1,
       claim_gate_effect: 'no_claims_cleared',
     }));
     expect(afterQueue.summary.sam31_extrapolation_recorded).toBeGreaterThanOrEqual(1);
@@ -548,6 +567,28 @@ describe('OpenClaw SAM31 bridge status API', () => {
       'room_boundary_visual_audit',
       'vector_overlay_generation',
       'model_3d_candidate_generation',
+    ]));
+    expect(queueItemPacket.extrapolation_index).toEqual([
+      expect.objectContaining({
+        artifact_type: 'openclaw.sam31.extrapolation_index_item.v1',
+        section_id: 'candidate:pdf-boundary',
+        semantic_label: 'room_boundary_candidate',
+        vector_overlay_ids: expect.arrayContaining(['vector:section-room-101']),
+        model_3d_candidate_ids: expect.arrayContaining(['model3d:section-room-101']),
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    ]);
+    expect(queueItemPacket.extrapolation_index[0].source_refs).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        source_ref: expect.stringContaining('SAM31 extrapolate'),
+        runtime: 'sam-3.1+llm',
+      }),
+    ]));
+    expect(queueItemPacket.extrapolation_index[0].blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'AHJ_approval',
+      'AutoSprink_parity',
     ]));
     expect(queueItemPacket.source_refs).toEqual(expect.arrayContaining([
       expect.objectContaining({ evidence_id: boundary.id, evidence_type: 'pdf_boundary_decision' }),

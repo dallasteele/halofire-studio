@@ -1235,7 +1235,7 @@ const SAM31_EXTRAPOLATION_CONTRACT = Object.freeze({
   status: 'best_effort_extrapolation_ready',
   source_runtime: 'sam-3.1+llm',
   consumes: ['segments', 'object_hypotheses'],
-  produces: ['llm_observations', 'vector_overlays', 'model_3d_candidates'],
+  produces: ['llm_observations', 'vector_overlays', 'model_3d_candidates', 'extrapolation_index'],
   supported_applications: [...SAM31_SUPPORTED_APPLICATIONS],
   temporary_value_policy: 'Generated object labels, vector overlays, and 3D candidates are editable best guesses until HaloFire employees or owning product reviewers replace them with actual values.',
   claim_gate_effect: 'no_claims_cleared',
@@ -1681,6 +1681,13 @@ function buildOpenClawSam31ProductReviewQueueItem({
       image_ref: request.image_ref || perceptionPacket.image_ref || null,
       runtime: 'sam-3.1+llm',
     }];
+  const extrapolationIndex = sam31ExtrapolationIndex({
+    request,
+    perceptionPacket,
+    applicationContract: contract,
+    sourceRefs,
+    blockedClaims: uniqueStrings([...blockedClaims, ...contract.blocked_claims]),
+  });
   return {
     artifact_type: SAM31_PRODUCT_REVIEW_QUEUE_ITEM_TYPE,
     status: 'ready_for_human_replacement_or_acceptance',
@@ -1698,6 +1705,7 @@ function buildOpenClawSam31ProductReviewQueueItem({
     object_hypothesis_count: objectHypotheses.length,
     vector_overlay_count: vectorOverlays.length,
     model_3d_candidate_count: modelCandidates.length,
+    extrapolation_index: extrapolationIndex,
     source_refs: sourceRefs,
     next_action: productReviewAction.next_action || SAM31_APPLICATION_NEXT_ACTIONS[normalizedApplication],
     use_for_claims: false,
@@ -1716,12 +1724,78 @@ function normalizeOpenClawSam31ProductReviewQueueItem(rawQueueItem, fallbackQueu
     ...raw,
     artifact_type: raw.artifact_type || SAM31_PRODUCT_REVIEW_QUEUE_ITEM_TYPE,
     use_for_claims: false,
+    extrapolation_index: Array.isArray(raw.extrapolation_index)
+      ? jsonClone(raw.extrapolation_index).map((item) => ({
+        ...item,
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }))
+      : fallbackQueueItem.extrapolation_index,
     blocked_claims: uniqueStrings([
       ...(Array.isArray(fallbackQueueItem.blocked_claims) ? fallbackQueueItem.blocked_claims : []),
       ...(Array.isArray(raw.blocked_claims) ? raw.blocked_claims : []),
     ]),
     claim_gate_effect: 'no_claims_cleared',
   };
+}
+
+function sam31ExtrapolationIndex({
+  request = {},
+  perceptionPacket = {},
+  applicationContract = SAM31_APPLICATION_CONTRACTS.halo_fire,
+  sourceRefs = [],
+  blockedClaims = [],
+}) {
+  if (Array.isArray(perceptionPacket.extrapolation_index)) {
+    return jsonClone(perceptionPacket.extrapolation_index).map((item) => ({
+      ...item,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+  }
+  const sections = Array.isArray(request.sections)
+    ? request.sections
+    : (Array.isArray(perceptionPacket.segments) ? perceptionPacket.segments : []);
+  const objectHypotheses = Array.isArray(perceptionPacket.object_hypotheses)
+    ? perceptionPacket.object_hypotheses
+    : (Array.isArray(request.object_hypotheses) ? request.object_hypotheses : []);
+  const vectorOverlays = Array.isArray(perceptionPacket.vector_overlays)
+    ? perceptionPacket.vector_overlays
+    : (Array.isArray(request.vector_overlays) ? request.vector_overlays : []);
+  const modelCandidates = Array.isArray(perceptionPacket.model_3d_candidates)
+    ? perceptionPacket.model_3d_candidates
+    : (Array.isArray(request.model_3d_candidates) ? request.model_3d_candidates : []);
+
+  return sections.map((section) => {
+    const sectionId = section && typeof section === 'object' ? section.id : null;
+    return {
+      artifact_type: 'openclaw.sam31.extrapolation_index_item.v1',
+      section_id: sectionId,
+      semantic_label: section?.semantic_label || null,
+      object_hypothesis_ids: objectHypotheses
+        .filter((item) => item?.segment_id === sectionId)
+        .map((item) => item.id)
+        .filter(Boolean),
+      vector_overlay_ids: vectorOverlays
+        .filter((item) => item?.segment_id === sectionId)
+        .map((item) => item.id)
+        .filter(Boolean),
+      model_3d_candidate_ids: modelCandidates
+        .filter((item) => item?.segment_id === sectionId)
+        .map((item) => item.id)
+        .filter(Boolean),
+      source_refs: jsonClone(sourceRefs),
+      acceptable_human_updates: [...SAM31_EMPLOYEE_REPLACEMENT_FIELDS],
+      supported_evidence_lanes: [...(applicationContract.supported_evidence_lanes || [])],
+      use_for_claims: false,
+      blocked_claims: uniqueStrings([
+        ...blockedClaims,
+        ...(applicationContract.blocked_claims || []),
+        ...PDF_BOUNDARY_BLOCKED_CLAIMS,
+      ]),
+      claim_gate_effect: 'no_claims_cleared',
+    };
+  });
 }
 
 function sam31PerceptionSummaryFromParts(packet, vectorOverlays, modelCandidates, applicationAdapter) {
@@ -2202,6 +2276,11 @@ function latestOpenClawSam31ExtrapolationReviewEvidence(projectName, sourceEvide
 function openClawSam31ExtrapolationReplaySummary(extrapolationEvidence) {
   if (!extrapolationEvidence?.evidence || !extrapolationEvidence?.artifact) return null;
   const { evidence, artifact } = extrapolationEvidence;
+  const extrapolationIndex = Array.isArray(artifact.extrapolation_index)
+    ? jsonClone(artifact.extrapolation_index)
+    : (Array.isArray(artifact.product_review_queue_item?.extrapolation_index)
+      ? jsonClone(artifact.product_review_queue_item.extrapolation_index)
+      : []);
   return {
     evidence_id: evidence.id,
     evidence_type: evidence.evidence_type,
@@ -2219,6 +2298,8 @@ function openClawSam31ExtrapolationReplaySummary(extrapolationEvidence) {
     product_review_queue_item: artifact.product_review_queue_item && typeof artifact.product_review_queue_item === 'object'
       ? jsonClone(artifact.product_review_queue_item)
       : null,
+    extrapolation_index: extrapolationIndex,
+    extrapolation_index_count: extrapolationIndex.length,
     perception_summary: sam31PerceptionPacketSummary(artifact.perception_packet),
     claim_gate_effect: artifact.claim_gate_effect || 'no_claims_cleared',
     blocked_claims: Array.isArray(artifact.blocked_claims) ? [...artifact.blocked_claims] : [],
@@ -3698,6 +3779,13 @@ function normalizeOpenClawSam31ExtrapolationArtifact(projectName, evidence, deci
     rawArtifact.product_review_queue_item,
     fallbackQueueItem,
   );
+  const extrapolationIndex = Array.isArray(rawArtifact.extrapolation_index)
+    ? jsonClone(rawArtifact.extrapolation_index).map((item) => ({
+      ...item,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }))
+    : jsonClone(productReviewQueueItem.extrapolation_index || []);
   return {
     artifact_type: 'openclaw.sam31_llm_extrapolation_artifact',
     status: rawArtifact.status || 'best_effort_extrapolation_ready',
@@ -3740,6 +3828,7 @@ function normalizeOpenClawSam31ExtrapolationArtifact(projectName, evidence, deci
     ],
     product_review_action: productReviewAction,
     product_review_queue_item: productReviewQueueItem,
+    extrapolation_index: extrapolationIndex,
     visual_audit_packet_ref: visualPacket.download_name || null,
     acceptable_evidence: [
       'OpenClaw /vision/sam31/extrapolate response captured in perception_packet',
