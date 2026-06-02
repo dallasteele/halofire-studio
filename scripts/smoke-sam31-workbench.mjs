@@ -356,6 +356,8 @@ async function runBrowserSmoke(token, evidenceIds) {
     await page.waitForSelector('text=Latest consumer smoke', { timeout: 8_000 });
     await page.waitForSelector('text=posted_consumer_count', { timeout: 8_000 });
     await page.waitForSelector('text=blocked_consumer_count', { timeout: 8_000 });
+    await page.waitForSelector('text=posted_consumer_count 2', { timeout: 8_000 });
+    await page.waitForSelector('text=blocked_consumer_count 0', { timeout: 8_000 });
     await page.waitForSelector('text=openclaw.sam31.consumer_smoke_artifact.v1', { timeout: 8_000 });
     await page.waitForSelector('text=consumer_result', { timeout: 8_000 });
     await page.waitForSelector('text=no_claims_cleared', { timeout: 8_000 });
@@ -369,6 +371,28 @@ async function runBrowserSmoke(token, evidenceIds) {
     downloads.push({ suggestedName: consumerSmokeSuggestedName, bytes: consumerSmokeDownloadBytes });
     if (!consumerSmokeSuggestedName.includes('sam31-consumer-smoke-artifact') || consumerSmokeDownloadBytes <= 0) {
       throw new Error(`Unexpected SAM31 consumer smoke download ${consumerSmokeSuggestedName} (${consumerSmokeDownloadBytes} bytes)`);
+    }
+    const consumerSmokeArtifact = JSON.parse(fs.readFileSync(consumerSmokePath, 'utf8'));
+    if (consumerSmokeArtifact.artifact_type !== 'openclaw.sam31.consumer_smoke_artifact.v1') {
+      throw new Error(`Unexpected SAM31 consumer smoke artifact type ${consumerSmokeArtifact.artifact_type}`);
+    }
+    if (consumerSmokeArtifact.posted_consumer_count !== 2) {
+      throw new Error(`Expected posted_consumer_count 2, got ${consumerSmokeArtifact.posted_consumer_count}`);
+    }
+    if (consumerSmokeArtifact.blocked_consumer_count !== 0) {
+      throw new Error(`Expected blocked_consumer_count 0, got ${consumerSmokeArtifact.blocked_consumer_count}`);
+    }
+    if (consumerSmokeArtifact.use_for_claims !== false || consumerSmokeArtifact.claim_gate_effect !== 'no_claims_cleared') {
+      throw new Error(`SAM31 consumer smoke cleared a claim gate: ${consumerSmokeArtifact.claim_gate_effect}`);
+    }
+    const consumerSmokeResults = Array.isArray(consumerSmokeArtifact.consumer_results)
+      ? consumerSmokeArtifact.consumer_results
+      : [];
+    for (const consumer of ['landscout', 'nameforge']) {
+      const result = consumerSmokeResults.find((item) => item.consumer === consumer);
+      if (!result || result.status !== 'posted' || result.response_status !== 202) {
+        throw new Error(`SAM31 consumer smoke did not post ${consumer}: ${JSON.stringify(result)}`);
+      }
     }
     await page.waitForSelector('[data-sam31-replacement-action-field="semantic_label"]', { timeout: 8_000 });
     await page.waitForSelector('[data-sam31-replacement-action-field="polygon"]', { timeout: 8_000 });
@@ -468,6 +492,19 @@ async function runBrowserSmoke(token, evidenceIds) {
         missing_evidence_codes: missingEvidenceCodes,
         use_for_claims: queueItem.use_for_claims,
         claim_gate_effect: queueItem.claim_gate_effect,
+      },
+      consumerSmokeArtifact: {
+        artifact_type: consumerSmokeArtifact.artifact_type,
+        suggestedName: consumerSmokeSuggestedName,
+        posted_consumer_count: consumerSmokeArtifact.posted_consumer_count,
+        blocked_consumer_count: consumerSmokeArtifact.blocked_consumer_count,
+        consumer_results: consumerSmokeResults.map((result) => ({
+          consumer: result.consumer,
+          status: result.status,
+          response_status: result.response_status,
+        })),
+        use_for_claims: consumerSmokeArtifact.use_for_claims,
+        claim_gate_effect: consumerSmokeArtifact.claim_gate_effect,
       },
       replayArtifact: {
         artifact_type: replayArtifact.artifact_type,

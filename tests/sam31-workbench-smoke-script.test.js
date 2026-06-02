@@ -56,6 +56,10 @@ describe('SAM31 workbench browser smoke script', () => {
     expect(script).toContain('openclaw_sam31_consumer_smoke_artifact');
     expect(script).toContain('posted_consumer_count');
     expect(script).toContain('blocked_consumer_count');
+    expect(script).toContain('posted_consumer_count 2');
+    expect(script).toContain('blocked_consumer_count 0');
+    expect(script).toContain('consumerSmokeArtifact.posted_consumer_count !== 2');
+    expect(script).toContain('consumerSmokeArtifact.blocked_consumer_count !== 0');
     expect(script).toContain('openclaw.sam31.consumer_smoke_artifact.v1');
     expect(script).toContain('sam31-consumer-smoke-artifact');
     expect(script).toContain('consumer_result');
