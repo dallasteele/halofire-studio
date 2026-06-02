@@ -261,6 +261,10 @@ describe('studio static origin handling', () => {
     expect(html).toContain('sam31-consumer-review-decision');
     expect(html).toContain('sam31_unresolved_consumer_reviews');
     expect(html).toContain('sam31ConsumerReview=unresolved');
+    expect(html).toContain('openclaw.sam31.product_owner_replacement_intake.v1');
+    expect(html).toContain('product_owner_replacement_intake');
+    expect(html).toContain('/openclaw/sam31/product-owner-replacements');
+    expect(html).toContain('supported_applications');
     expect(html).toContain('latest_openclaw_sam31_consumer_reviews');
     expect(html).toContain('consumer_queue_statuses');
     expect(html).toContain('OPENCLAW_SAM31_LANDSCOUT_QUEUE_URL');

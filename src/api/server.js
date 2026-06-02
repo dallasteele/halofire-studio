@@ -1315,6 +1315,7 @@ const SAM31_PRODUCT_REVIEW_QUEUE_ITEM_TYPE = 'openclaw.sam31.product_review_queu
 const SAM31_CONSUMER_SMOKE_ARTIFACT_TYPE = 'openclaw.sam31.consumer_smoke_artifact.v1';
 const SAM31_CONSUMER_REVIEW_TASK_TYPE = 'openclaw.sam31.consumer_review_task.v1';
 const SAM31_CONSUMER_REVIEW_DECISION_TYPE = 'openclaw.sam31.consumer_review_task_decision.v1';
+const SAM31_PRODUCT_OWNER_REPLACEMENT_INTAKE_TYPE = 'openclaw.sam31.product_owner_replacement_intake.v1';
 const SAM31_CONSUMER_QUEUE_TARGETS = Object.freeze(['landscout', 'nameforge']);
 const SAM31_CONSUMER_UNAVAILABLE_CODES = Object.freeze({
   landscout: 'OPENCLAW_SAM31_LANDSCOUT_QUEUE_UNAVAILABLE',
@@ -4996,6 +4997,12 @@ function normalizeOpenClawSam31ConsumerReview(projectName, evidence, decision, c
     e.httpStatus = 400;
     throw e;
   }
+  const sourceApplication = String(body.source_application || 'halo_fire').trim().toLowerCase();
+  if (!SAM31_SUPPORTED_APPLICATIONS.includes(sourceApplication)) {
+    const e = new Error(`source_application must be one of: ${SAM31_SUPPORTED_APPLICATIONS.join(', ')}`);
+    e.httpStatus = 400;
+    throw e;
+  }
   const acceptedQueueId = String(body.accepted_queue_id || '').trim();
   if (!acceptedQueueId) {
     const e = new Error('accepted_queue_id is required for SAM31 consumer review evidence');
@@ -5125,7 +5132,7 @@ function normalizeOpenClawSam31ConsumerReview(projectName, evidence, decision, c
     artifact_type: SAM31_CONSUMER_REVIEW_DECISION_TYPE,
     status: 'present',
     project_name: projectName,
-    source_application: 'halo_fire',
+    source_application: sourceApplication,
     source_pdf_boundary_evidence_id: evidence.id,
     source_evidence_type: evidence.evidence_type,
     source_openclaw_sam31_consumer_smoke_evidence_id: consumerSmokeEvidence.id,
@@ -5166,6 +5173,69 @@ function normalizeOpenClawSam31ConsumerReview(projectName, evidence, decision, c
       'This review records a product-owner or employee decision against a SAM31 consumer review task for internal-alpha use only.',
       'It can accept or replace temporary SAM31 semantic labels, object hypotheses, vector overlays, and 3D candidates, but it does not clear regulated or product-readiness claims.',
     ],
+  };
+}
+
+function openClawSam31ProductOwnerReplacementIntakeContract(projectName) {
+  return {
+    artifact_type: SAM31_PRODUCT_OWNER_REPLACEMENT_INTAKE_TYPE,
+    method: 'POST',
+    href: `/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/product-owner-replacements`,
+    consumes: SAM31_CONSUMER_REVIEW_TASK_TYPE,
+    produces: SAM31_CONSUMER_REVIEW_DECISION_TYPE,
+    supported_applications: [...SAM31_SUPPORTED_APPLICATIONS],
+    required_fields: [
+      'source_pdf_boundary_evidence_id',
+      'source_openclaw_sam31_consumer_smoke_evidence_id',
+      'source_application',
+      'consumer',
+      'accepted_queue_id',
+      'persisted_review_packet_ref',
+      'review_decision',
+      'replacement_ref',
+      'screenshot_ref_or_console_log_ref',
+      'replacement_values',
+    ],
+    replacement_value_fields: [...SAM31_CONSUMER_REVIEW_FIELDS],
+    use_for_claims: false,
+    claim_gate_effect: 'no_claims_cleared',
+  };
+}
+
+function buildOpenClawSam31ProductOwnerReplacementIntake(projectName, reviewPacket, evidenceRow) {
+  const contract = openClawSam31ProductOwnerReplacementIntakeContract(projectName);
+  return {
+    artifact_type: SAM31_PRODUCT_OWNER_REPLACEMENT_INTAKE_TYPE,
+    status: 'accepted_for_internal_alpha_review',
+    project_name: projectName,
+    generated_at: new Date().toISOString(),
+    source_application: reviewPacket.source_application || 'halo_fire',
+    consumer: reviewPacket.consumer,
+    source_pdf_boundary_evidence_id: reviewPacket.source_pdf_boundary_evidence_id,
+    source_openclaw_sam31_consumer_smoke_evidence_id: reviewPacket.source_openclaw_sam31_consumer_smoke_evidence_id,
+    source_openclaw_sam31_consumer_review_evidence_id: evidenceRow?.id || null,
+    accepted_queue_id: reviewPacket.accepted_queue_id,
+    persisted_review_packet_ref: reviewPacket.persisted_review_packet_ref,
+    supported_applications: [...SAM31_SUPPORTED_APPLICATIONS],
+    intake_contract: contract,
+    product_owner_replacement: jsonClone(reviewPacket),
+    evidence: evidenceRow || null,
+    use_for_claims: false,
+    claim_gate_effect: 'no_claims_cleared',
+    no_claim_gates_cleared: true,
+    blocked_claims: uniqueStrings([
+      ...(Array.isArray(reviewPacket.blocked_claims) ? reviewPacket.blocked_claims : []),
+      'professional_approval',
+      'AHJ_approval',
+      'AutoSprink_parity',
+      'fabrication_ready',
+      'manufacturer_exact',
+    ]),
+    limitations: uniqueStrings([
+      'This shared OpenClaw SAM31 intake adapter records product-owner replacement evidence for HaloFire, LandScout, and NameForge only.',
+      'It does not clear product acceptance, production readiness, AHJ approval, PE review, AutoSprink parity, fabrication readiness, or manufacturer-exact model claims.',
+      ...(Array.isArray(reviewPacket.limitations) ? reviewPacket.limitations : []),
+    ]),
   };
 }
 
@@ -6384,6 +6454,71 @@ app.post('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/openclaw
       message: 'SAM31 consumer product-review decision recorded; claims still blocked',
       evidence: evidenceRow,
       ...reviewPacket,
+    });
+  } catch (err) {
+    return res.status(err.httpStatus || 400).json({ error: err.message });
+  }
+});
+
+app.post('/api/projects/:name/openclaw/sam31/product-owner-replacements', authMiddleware, requireRole('admin'), (req, res) => {
+  try {
+    const projectName = req.params.name;
+    const evidenceId = Number(req.body?.source_pdf_boundary_evidence_id);
+    if (!Number.isSafeInteger(evidenceId) || evidenceId <= 0) {
+      return res.status(400).json({ error: 'source_pdf_boundary_evidence_id is required for the shared OpenClaw SAM31 product-owner replacement intake' });
+    }
+    const sourceConsumerSmokeEvidenceId = Number(req.body?.source_openclaw_sam31_consumer_smoke_evidence_id);
+    if (!Number.isSafeInteger(sourceConsumerSmokeEvidenceId) || sourceConsumerSmokeEvidenceId <= 0) {
+      return res.status(400).json({ error: 'source_openclaw_sam31_consumer_smoke_evidence_id is required for the shared OpenClaw SAM31 product-owner replacement intake' });
+    }
+    const evidence = db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'pdf_boundary_decision'`)
+      .get(evidenceId, projectName);
+    const decision = decisionFromEvidence(evidence);
+    if (!evidence || !decision) {
+      return res.status(404).json({ error: 'PDF boundary decision evidence not found' });
+    }
+    const consumerSmokeEvidence = db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'openclaw_sam31_consumer_smoke_artifact'`)
+      .get(sourceConsumerSmokeEvidenceId, projectName);
+    const consumerSmokeArtifact = openClawSam31ConsumerSmokeArtifactFromEvidence(consumerSmokeEvidence);
+    const reviewPacket = normalizeOpenClawSam31ConsumerReview(projectName, evidence, decision, consumerSmokeEvidence, consumerSmokeArtifact, req.body, req.user);
+    const adapterPreview = buildOpenClawSam31ProductOwnerReplacementIntake(projectName, reviewPacket, null);
+    const notes = {
+      kind: 'openclaw_sam31_consumer_review',
+      intake_kind: 'product_owner_replacement_intake',
+      intake_adapter: {
+        artifact_type: adapterPreview.artifact_type,
+        status: adapterPreview.status,
+        source_application: adapterPreview.source_application,
+        consumer: adapterPreview.consumer,
+        supported_applications: adapterPreview.supported_applications,
+        intake_contract: adapterPreview.intake_contract,
+        claim_gate_effect: adapterPreview.claim_gate_effect,
+      },
+      review: reviewPacket,
+      blocked_claims: reviewPacket.blocked_claims,
+      claim_gate_effect: reviewPacket.claim_gate_effect,
+      limitations: reviewPacket.limitations,
+    };
+    const result = db
+      .prepare(`INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+                VALUES (?, ?, ?, ?, ?, ?)`)
+      .run(
+        projectName,
+        'openclaw_sam31_consumer_review',
+        reviewPacket.source_file,
+        reviewPacket.replacement_ref,
+        'present',
+        JSON.stringify(notes),
+      );
+    const evidenceRow = db.prepare('SELECT * FROM project_evidence WHERE id = ?').get(result.lastInsertRowid);
+    return res.status(201).json({
+      id: result.lastInsertRowid,
+      message: 'Shared OpenClaw SAM31 product-owner replacement intake recorded; claims still blocked',
+      ...buildOpenClawSam31ProductOwnerReplacementIntake(projectName, reviewPacket, evidenceRow),
     });
   } catch (err) {
     return res.status(err.httpStatus || 400).json({ error: err.message });

@@ -1421,6 +1421,72 @@ describe('OpenClaw SAM31 bridge status API', () => {
       ]),
     }));
     expect(unresolvedItem.sam31_unresolved_consumer_reviews.some((review) => review.consumer === 'landscout')).toBe(false);
+
+    const nameForgeAdapterRes = await request(`${COOPERATIVE_1881_PATH}/openclaw/sam31/product-owner-replacements`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        source_pdf_boundary_evidence_id: boundary.id,
+        source_openclaw_sam31_consumer_smoke_evidence_id: consumerSmoke.id,
+        source_application: 'nameforge',
+        consumer: 'nameforge',
+        accepted_queue_id: 'sam31-nameforge-testqueue',
+        persisted_review_packet_ref: 'openclaw://nameforge/sam31/product-review/sam31-nameforge-testqueue',
+        review_decision: 'accepted',
+        reviewer_name: 'NameForge product owner',
+        replacement_ref: 'nameforge://sam31/reviews/sam31-nameforge-testqueue/replacement.json',
+        screenshot_ref: 'nameforge://sam31/reviews/sam31-nameforge-testqueue/screenshot.png',
+        console_log_ref: 'nameforge://sam31/reviews/sam31-nameforge-testqueue/console.log',
+        replacement_values: {
+          semantic_labels: ['reviewed monument sign zone'],
+          object_hypotheses: [{ id: 'obj:sign-zone', semantic_label: 'reviewed sign placement zone' }],
+          vector_overlays: [{ id: 'vector:sign-zone', svg_path: 'M 0 0 L 8 0 L 8 4 Z' }],
+          model_3d_candidates: [{ id: 'model3d:sign-zone', primitive: 'extruded_brand_zone' }],
+          source_ref: 'nameforge://creative-review/sam31-nameforge-testqueue',
+          confidence: 0.79,
+        },
+        notes: 'NameForge accepted the shared OpenClaw SAM31 product-owner replacement intake.',
+      }),
+    });
+    expect(nameForgeAdapterRes.status).toBe(201);
+    const nameForgeAdapter = await nameForgeAdapterRes.json();
+    expect(nameForgeAdapter).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.product_owner_replacement_intake.v1',
+      status: 'accepted_for_internal_alpha_review',
+      source_application: 'nameforge',
+      consumer: 'nameforge',
+      source_pdf_boundary_evidence_id: boundary.id,
+      source_openclaw_sam31_consumer_smoke_evidence_id: consumerSmoke.id,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(nameForgeAdapter.supported_applications).toEqual(['halo_fire', 'landscout', 'nameforge']);
+    expect(nameForgeAdapter.intake_contract).toEqual(expect.objectContaining({
+      method: 'POST',
+      href: `${COOPERATIVE_1881_PATH}/openclaw/sam31/product-owner-replacements`,
+      artifact_type: 'openclaw.sam31.product_owner_replacement_intake.v1',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(nameForgeAdapter.product_owner_replacement).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.consumer_review_task_decision.v1',
+      consumer: 'nameforge',
+      review_decision: 'accepted',
+      accepted_queue_id: 'sam31-nameforge-testqueue',
+      replacement_ref: 'nameforge://sam31/reviews/sam31-nameforge-testqueue/replacement.json',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(nameForgeAdapter.evidence).toEqual(expect.objectContaining({
+      evidence_type: 'openclaw_sam31_consumer_review',
+      status: 'present',
+      source_ref: 'nameforge://sam31/reviews/sam31-nameforge-testqueue/replacement.json',
+    }));
+
+    const resolvedNameForgeRes = await request(`${COOPERATIVE_1881_PATH}/resolver-queue?sam31ConsumerReview=unresolved&consumer=nameforge`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(resolvedNameForgeRes.status).toBe(200);
+    const resolvedNameForge = await resolvedNameForgeRes.json();
+    expect(resolvedNameForge.items.find((row) => row.evidence_id === boundary.id)).toBeUndefined();
   });
 
   it('carries saved bridge smoke artifacts into SAM31 audit defaults and replay evidence without clearing claims', async () => {
