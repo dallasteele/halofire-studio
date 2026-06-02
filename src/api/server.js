@@ -1378,6 +1378,88 @@ function pdfBoundaryReplayInputPacket(projectName, evidence, decision, reviewEvi
   };
 }
 
+function resolveRoomBoundaryReplayFloorPlan(req, projectName) {
+  if (req.body?.room_boundary_source !== 'latest_employee_review_packet') return null;
+  const sourceEvidenceId = Number(req.body.source_evidence_id);
+  const sourceReviewEvidenceId = Number(req.body.source_review_evidence_id);
+  if (!Number.isSafeInteger(sourceEvidenceId) || sourceEvidenceId <= 0) {
+    const e = new Error('source_evidence_id is required for room-boundary replay input');
+    e.httpStatus = 400;
+    throw e;
+  }
+  if (!Number.isSafeInteger(sourceReviewEvidenceId) || sourceReviewEvidenceId <= 0) {
+    const e = new Error('source_review_evidence_id is required for room-boundary replay input');
+    e.httpStatus = 400;
+    throw e;
+  }
+  const correctedRoomPolygons = Array.isArray(req.body.corrected_room_polygons)
+    ? req.body.corrected_room_polygons
+    : [];
+  if (!correctedRoomPolygons.length) {
+    const e = new Error('corrected_room_polygons is required for room-boundary replay input');
+    e.httpStatus = 400;
+    throw e;
+  }
+  const sourceEvidence = db
+    .prepare(`SELECT * FROM project_evidence
+              WHERE id = ? AND project_name = ? AND evidence_type = 'pdf_boundary_decision'`)
+    .get(sourceEvidenceId, projectName);
+  const sourceReviewEvidence = db
+    .prepare(`SELECT * FROM project_evidence
+              WHERE id = ? AND project_name = ? AND evidence_type = 'room_boundary_review_packet'`)
+    .get(sourceReviewEvidenceId, projectName);
+  const sourceReview = reviewFromEvidence(sourceReviewEvidence);
+  if (!sourceEvidence || !sourceReview || Number(sourceReview.source_evidence_id) !== sourceEvidenceId) {
+    const e = new Error('Replay input source evidence does not match a saved room-boundary review packet');
+    e.httpStatus = 409;
+    throw e;
+  }
+  if (sourceReview.review_decision === 'rejected') {
+    const e = new Error('Latest room-boundary review rejected this boundary; replay input is blocked');
+    e.httpStatus = 409;
+    throw e;
+  }
+  const rooms = correctedRoomPolygons.map((entry, index) => ({
+    name: entry.room_id || entry.name || `Reviewed Room ${index + 1}`,
+    polygon: entry.polygon,
+    hazard: entry.hazard || req.body.hazard || 'ordinary',
+    ...(entry.ceilingHeightFt ? { ceilingHeightFt: entry.ceilingHeightFt } : {}),
+  }));
+  const floorPlan = normalizeFloorPlan({
+    name: `${projectName} - reviewed room-boundary replay`,
+    units: 'ft',
+    rooms,
+  });
+  return {
+    floorPlan,
+    replayInput: {
+      room_boundary_source: 'latest_employee_review_packet',
+      source_evidence_id: sourceEvidenceId,
+      source_review_evidence_id: sourceReviewEvidenceId,
+      source_ref: sourceEvidence.source_ref || sourceReview.source_ref || null,
+      marked_up_plan_ref: sourceReview.marked_up_plan_ref || null,
+      corrected_room_polygon_count: correctedRoomPolygons.length,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      blocked_claims: Array.isArray(sourceReview.blocked_claims) ? sourceReview.blocked_claims : [...PDF_BOUNDARY_BLOCKED_CLAIMS],
+      source_refs: [
+        {
+          evidence_id: sourceEvidence.id,
+          evidence_type: sourceEvidence.evidence_type,
+          source_ref: sourceEvidence.source_ref || null,
+          status: sourceEvidence.status,
+        },
+        {
+          evidence_id: sourceReviewEvidence.id,
+          evidence_type: sourceReviewEvidence.evidence_type,
+          source_ref: sourceReviewEvidence.source_ref || null,
+          status: sourceReviewEvidence.status,
+        },
+      ],
+    },
+  };
+}
+
 function normalizePdfBoundaryReview(projectName, evidence, decision, body = {}, user = {}) {
   const packet = pdfBoundaryReviewPacket(projectName, evidence, decision);
   if (!packet) {
@@ -1548,8 +1630,13 @@ function runSprinklerPipeline(req, prebuilt = null) {
   const projectName = req.params.name;
   let floorPlan = (prebuilt && prebuilt.floorPlan) || null;
   let building = null;
+  let replayInput = null;
   if (floorPlan) {
     // A PDF (or other async) source was resolved upstream; skip source selection.
+  } else if (req.body?.room_boundary_source === 'latest_employee_review_packet') {
+    const replay = resolveRoomBoundaryReplayFloorPlan(req, projectName);
+    floorPlan = replay.floorPlan;
+    replayInput = replay.replayInput;
   } else if (req.body && typeof req.body.buildingSvg === 'string' && req.body.buildingSvg.trim()) {
     // Accurate multi-space building drawing (walls/spaces/doors/columns by layer/attr).
     building = buildingFromSvg(req.body.buildingSvg, { name: projectName, unitsPerPx: Number(req.body.unitsPerPx) || 1 });
@@ -1658,14 +1745,37 @@ function runSprinklerPipeline(req, prebuilt = null) {
 
   // Record that a best-effort layout was generated — as evidence, not a clearance.
   if (normalizeRole(req.user?.role) === 'admin') {
+    const evidenceSourceRef = replayInput
+      ? `pdf-boundary:${replayInput.source_evidence_id}:room-boundary-replay:${replayInput.source_review_evidence_id}`
+      : `engine ${bid.generatedBy}`;
+    const evidenceNotes = replayInput
+      ? JSON.stringify({
+        kind: 'best_effort_ai_layout_replay',
+        generated_by: bid.generatedBy,
+        source_evidence_id: replayInput.source_evidence_id,
+        source_review_evidence_id: replayInput.source_review_evidence_id,
+        source_ref: replayInput.source_ref,
+        marked_up_plan_ref: replayInput.marked_up_plan_ref,
+        corrected_room_polygon_count: replayInput.corrected_room_polygon_count,
+        total_head_count: bid.totalHeadCount,
+        total_area_sqft: bid.totalAreaSqFt,
+        blocked_claims: replayInput.blocked_claims,
+        claim_gate_effect: 'no_claims_cleared',
+        summary: `claim_gate_effect=no_claims_cleared source_review_evidence_id=${replayInput.source_review_evidence_id}`,
+        limitations: [
+          'Generated from employee-reviewed room-boundary correction evidence for internal-alpha replay only.',
+          bid.disclaimer,
+        ],
+      })
+      : `Generated ${bid.totalHeadCount} heads over ${bid.totalAreaSqFt} sqft. ${bid.disclaimer}`;
     db.prepare(`INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
                 VALUES (?, ?, ?, ?, ?, ?)`).run(
       projectName,
       'best_effort_ai_layout',
       null,
-      `engine ${bid.generatedBy}`,
+      evidenceSourceRef,
       'best_effort',
-      `Generated ${bid.totalHeadCount} heads over ${bid.totalAreaSqFt} sqft. ${bid.disclaimer}`,
+      evidenceNotes,
     );
   }
 
@@ -1873,7 +1983,7 @@ function runSprinklerPipeline(req, prebuilt = null) {
     fullScopeBid = { error: e.message };
   }
 
-  return { projectName, floorPlan, building, bid, scene, cadModel, hydraulics, hydraulicNetwork, compliance, fullScopeBid };
+  return { projectName, floorPlan, building, replayInput, bid, scene, cadModel, hydraulics, hydraulicNetwork, compliance, fullScopeBid };
 }
 
 function round2(n) {
@@ -1887,8 +1997,8 @@ app.post('/api/projects/:name/sprinkler-bid', authMiddleware, async (req, res) =
     const prebuilt = await resolvePdfFloorPlan(req);
     const out = runSprinklerPipeline(req, prebuilt);
     if (out.httpError) return res.status(out.httpError.status).json({ error: out.httpError.error });
-    const { bid, scene, cadModel, hydraulics, hydraulicNetwork, compliance, fullScopeBid, building } = out;
-    res.json({ bid, scene, cadModel, hydraulics, hydraulicNetwork, compliance, fullScopeBid, isBuilding: !!building, ...(prebuilt && prebuilt.pdfMeta ? { pdfMeta: prebuilt.pdfMeta } : {}) });
+    const { bid, scene, cadModel, hydraulics, hydraulicNetwork, compliance, fullScopeBid, building, replayInput } = out;
+    res.json({ bid, scene, cadModel, hydraulics, hydraulicNetwork, compliance, fullScopeBid, isBuilding: !!building, ...(replayInput ? { replayInput, roomBoundaryReplay: replayInput } : {}), ...(prebuilt && prebuilt.pdfMeta ? { pdfMeta: prebuilt.pdfMeta } : {}) });
   } catch (err) {
     res.status(err.httpStatus || 400).json({ error: err.message });
   }

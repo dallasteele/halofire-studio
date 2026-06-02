@@ -393,6 +393,40 @@ describe('PDF page inspection API', () => {
     expect(replayPacket.sprinkler_bid_request.corrected_room_polygons).toHaveLength(1);
     expect(replayPacket.blocked_claims).toEqual(expect.arrayContaining(['geometry_accuracy', 'AutoSprink_parity', 'permit_ready']));
     expect(replayPacket.claim_gate_effect).toBe('no_claims_cleared');
+
+    const replayBidRes = await request(`${COOPERATIVE_1881_PATH}/sprinkler-bid`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify(replayPacket.sprinkler_bid_request),
+    });
+    expect(replayBidRes.status).toBe(200);
+    const replayBid = await replayBidRes.json();
+    expect(replayBid.replayInput).toEqual(expect.objectContaining({
+      room_boundary_source: 'latest_employee_review_packet',
+      source_review_evidence_id: reviewBody.evidence.id,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(replayBid.bid.totalAreaSqFt).toBe(480);
+    expect(replayBid.bid.rooms[0]).toEqual(expect.objectContaining({
+      name: 'level-1-corridor-a',
+      areaSqFt: 480,
+    }));
+
+    const evidenceAfterReplay = await (await request(`${COOPERATIVE_1881_PATH}/evidence`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })).json();
+    const replayRow = evidenceAfterReplay.find((e) => (
+      e.evidence_type === 'best_effort_ai_layout'
+      && e.source_ref === `pdf-boundary:${body.evidence.id}:room-boundary-replay:${reviewBody.evidence.id}`
+    ));
+    expect(replayRow).toBeTruthy();
+    const replayNotes = JSON.parse(replayRow.notes);
+    expect(replayNotes.kind).toBe('best_effort_ai_layout_replay');
+    expect(replayNotes.source_evidence_id).toBe(body.evidence.id);
+    expect(replayNotes.source_review_evidence_id).toBe(reviewBody.evidence.id);
+    expect(replayNotes.corrected_room_polygon_count).toBe(1);
+    expect(replayNotes.claim_gate_effect).toBe('no_claims_cleared');
+    expect(replayNotes.blocked_claims).toEqual(expect.arrayContaining(['geometry_accuracy', 'AutoSprink_parity', 'permit_ready']));
   }, 30000);
 
   it('rejects a persisted boundary decision without a positive operator scale', async () => {
@@ -434,4 +468,93 @@ describe('PDF page inspection API', () => {
     const body = await res.json();
     expect(body.error).toMatch(/marked_up_plan_ref/);
   });
+
+  it('replays corrected room-boundary packets through /sprinkler-bid as internal-alpha overrides with source refs recorded', async () => {
+    const candidate = {
+      mode: 'outline',
+      bbox: { minX: 0, minY: 0, maxX: 10, maxY: 10, widthFt: 10, heightFt: 10 },
+      segmentCount: 4,
+    };
+    const saved = await (await request(`${COOPERATIVE_1881_PATH}/pdf-boundary-decision`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        pdfPageIndex: 1,
+        pdfScale: 0.1,
+        pdfExtract: 'outline',
+        candidate,
+        source_ref: '1881://sheet-7',
+      }),
+    })).json();
+    const reviewBody = await (await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${saved.evidence.id}/reviews`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        review_decision: 'corrected',
+        reviewer_name: 'Halo Fire estimator',
+        marked_up_plan_ref: '1881://marked-up/sheet-7-room-boundary.png',
+        corrected_room_polygons: [
+          {
+            room_id: 'level-1-corridor-a',
+            polygon: [[0, 0], [40, 0], [40, 12], [0, 12]],
+          },
+        ],
+        issue_list: [
+          {
+            issue_type: 'room_boundary_mismatch',
+            severity: 'blocking',
+            source_ref: '1881://sheet-7',
+            observed: 'Sheet-wide footprint captured extra geometry.',
+            expected: 'Replay only the reviewed corridor boundary.',
+            required_action: 'Use the corrected corridor polygon for internal-alpha replay only.',
+          },
+        ],
+      }),
+    })).json();
+    const replayPacket = await (await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${saved.evidence.id}/replay-input`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })).json();
+
+    const replayRes = await request(`${COOPERATIVE_1881_PATH}/sprinkler-bid`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        markupPct: 30,
+        ...replayPacket.sprinkler_bid_request,
+      }),
+    });
+    expect(replayRes.status).toBe(200);
+    const replayBody = await replayRes.json();
+    expect(replayBody.roomBoundaryReplay).toEqual(expect.objectContaining({
+      room_boundary_source: 'latest_employee_review_packet',
+      source_evidence_id: saved.evidence.id,
+      source_review_evidence_id: reviewBody.evidence.id,
+      corrected_room_polygon_count: 1,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(replayBody.roomBoundaryReplay.source_refs).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        evidence_id: saved.evidence.id,
+        source_ref: '1881://sheet-7',
+      }),
+      expect.objectContaining({
+        evidence_id: reviewBody.evidence.id,
+      }),
+    ]));
+    expect(replayBody.bid.totalAreaSqFt).toBe(480);
+    expect(replayBody.bid.rooms).toHaveLength(1);
+    expect(replayBody.bid.rooms[0].name).toBe('level-1-corridor-a');
+    expect(replayBody.bid.blockedClaims).toEqual(expect.arrayContaining(['AutoSprink parity', 'permit-ready']));
+
+    const evidenceRows = await (await request(`${COOPERATIVE_1881_PATH}/evidence`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })).json();
+    const replayEvidence = evidenceRows.find((row) => row.evidence_type === 'best_effort_ai_layout' && String(row.source_ref || '').includes(String(reviewBody.evidence.id)));
+    expect(replayEvidence).toBeTruthy();
+    const replayNotes = JSON.parse(replayEvidence.notes);
+    expect(replayNotes.kind).toBe('best_effort_ai_layout_replay');
+    expect(replayNotes.claim_gate_effect).toBe('no_claims_cleared');
+    expect(replayNotes.source_review_evidence_id).toBe(reviewBody.evidence.id);
+  }, 30000);
 });
