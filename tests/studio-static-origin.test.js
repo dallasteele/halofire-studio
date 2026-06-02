@@ -170,6 +170,10 @@ describe('studio static origin handling', () => {
     expect(html).toContain('loadSettingsCatalogSourceAcquisition');
     expect(html).toContain('sourceAcquisitionLedger');
     expect(html).toContain('prefillCatalogEvidenceFromLedger');
+    expect(html).toContain('recordCatalogLedgerEvidence');
+    expect(html).toContain('catalog_source_acquisition');
+    expect(html).toContain('/projects/');
+    expect(html).toContain('/evidence');
     expect(html).toContain('family:pipe_steel_sch40_2p0in');
     expect(html).toContain('family:fitting_tee_2p0in');
     expect(html).toContain('family:valve_check_2p5in');
