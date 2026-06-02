@@ -308,10 +308,18 @@ describe('studio static origin handling', () => {
     expect(html).toContain('openclaw_sam31_consumer_review');
     expect(html).toContain('requires_product_review');
     expect(html).toContain('acceptable_evidence');
+    expect(html).toContain('renderSam31RequiredSourceProvenanceFields');
+    expect(html).toContain('required_source_provenance_fields');
+    expect(html).toContain('source_openclaw_sam31_vector_model_artifact_evidence_id');
+    expect(html).toContain('source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id');
     expect(html).toContain('product owner review note tied to accepted queue id');
     expect(html).toContain('Save SAM31 consumer review decision');
     expect(html).toContain('saveOpenClawSam31ConsumerReview');
     expect(html).toContain('/openclaw/sam31/consumer-review');
+    expect(html).toContain('Open product-owner replacement intake');
+    expect(html).toContain('openOpenClawSam31ProductOwnerReplacementIntake');
+    expect(html).toContain('data-sam31-product-owner-replacement-intake-evidence-id');
+    expect(html).toContain('data-sam31-product-owner-replacement-intake-consumer');
     expect(html).toContain('Download SAM31 consumer review decision');
     expect(html).toContain('downloadOpenClawSam31ConsumerReviewPacket');
     expect(html).toContain('data-sam31-consumer-review-packet-evidence-id');

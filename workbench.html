@@ -457,6 +457,30 @@ function renderOpenClawSam31VectorModelArtifactAction(item, action, latest) {
   return `<div class="muted" style="font-size:11px;margin-top:5px;border:1px solid rgba(14,165,233,.28);border-radius:8px;padding:8px;background:rgba(14,165,233,.05)">SAM31 vector/model artifact packet<br>artifact_type ${escapeHtml(action.artifact_type || 'openclaw.sam31_vector_model_artifact_packet.v1')} - status ${escapeHtml(action.status || 'requires_sam31_visual_audit')} - source_runtime ${escapeHtml(action.source_runtime || 'sam-3.1+llm')}<br>source_pdf_boundary_evidence_id ${escapeHtml(evidenceId)} - source_sam31_visual_audit_evidence_id ${escapeHtml(action.source_sam31_visual_audit_evidence_id || 'missing')} - use_for_claims ${escapeHtml(action.use_for_claims === true ? 'true' : 'false')} - claim_gate_effect ${escapeHtml(action.claim_gate_effect || 'no_claims_cleared')}<br>${latestText}Supported evidence lanes: ${lanes.map((lane) => `<span class="chip">${escapeHtml(lane)}</span>`).join('') || '<span class="chip">vector/model lanes missing</span>'}<br>Blocks still active: ${blocked.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('') || '<span class="chip">claim gates remain blocked</span>'}<br><button class="go" type="button" style="padding:7px 10px;font-size:11px;margin-top:6px;background:#0369a1" data-sam31-vector-model-artifact-evidence-id="${escapeHtml(evidenceId)}">Download SAM31 vector/model artifact packet</button> <button class="go" type="button" style="padding:7px 10px;font-size:11px;margin-top:6px;background:#0f766e" data-sam31-vector-model-artifact-save-evidence-id="${escapeHtml(evidenceId)}">Record SAM31 vector/model artifacts</button><div class="muted" id="sam31VectorModelArtifactStatus-${escapeHtml(evidenceId)}" style="font-size:11px;margin-top:4px"></div></div>`;
 }
 
+function renderSam31RequiredSourceProvenanceFields(task) {
+  const fields = Array.isArray(task?.required_source_provenance_fields)
+    ? task.required_source_provenance_fields
+    : [];
+  const artifacts = Array.isArray(task?.supported_provenance_artifacts)
+    ? task.supported_provenance_artifacts
+    : [];
+  if (!fields.length && !artifacts.length) return '';
+  return `<span class="muted" style="font-size:10px">required_source_provenance_fields ${fields.length ? fields.map((field) => `<span class="chip">${escapeHtml(field)}</span>`).join('') : '<span class="chip">provenance fields missing</span>'}${artifacts.length ? `<br>supported_provenance_artifacts ${artifacts.map((artifact) => `<span class="chip">${escapeHtml(artifact)}</span>`).join('')}` : ''}<br>product_owner_replacement_intake requires reviewed or temporary replacement values - use_for_claims false - claim_gate_effect no_claims_cleared</span><br>`;
+}
+
+function renderSam31ProductOwnerReplacementIntakeAction(task, sourceConsumerSmokeEvidenceId, sourcePdfBoundaryEvidenceId) {
+  const consumer = task?.consumer || 'consumer';
+  const boundaryEvidenceId = sourcePdfBoundaryEvidenceId || task?.source_pdf_boundary_evidence_id || '';
+  const consumerSmokeEvidenceId = sourceConsumerSmokeEvidenceId || task?.source_openclaw_sam31_consumer_smoke_evidence_id || '';
+  const acceptedQueueId = task?.accepted_queue_id || '';
+  const persistedReviewPacketRef = task?.persisted_review_packet_ref || '';
+  const disabled = !(boundaryEvidenceId && consumerSmokeEvidenceId && acceptedQueueId && persistedReviewPacketRef);
+  const reason = disabled
+    ? 'requires source_pdf_boundary_evidence_id, source_openclaw_sam31_consumer_smoke_evidence_id, accepted_queue_id, and persisted_review_packet_ref before posting'
+    : 'posts reviewed or temporary replacement values to the shared OpenClaw SAM31 intake';
+  return `<button class="go" type="button" style="padding:7px 10px;font-size:11px;margin-top:5px;background:#7c3aed" ${disabled ? 'disabled' : ''} data-sam31-product-owner-replacement-intake-evidence-id="${escapeHtml(boundaryEvidenceId)}" data-sam31-product-owner-replacement-intake-consumer="${escapeHtml(consumer)}" data-sam31-product-owner-replacement-intake-smoke-evidence-id="${escapeHtml(consumerSmokeEvidenceId)}" data-sam31-product-owner-replacement-intake-accepted-queue-id="${escapeHtml(acceptedQueueId)}" data-sam31-product-owner-replacement-intake-persisted-review-packet-ref="${escapeHtml(persistedReviewPacketRef)}">Open product-owner replacement intake</button><br><span class="muted" style="font-size:10px">/openclaw/sam31/product-owner-replacements - ${escapeHtml(reason)} - claim_gate_effect no_claims_cleared</span><div class="muted" id="sam31ProductOwnerReplacementIntakeStatus-${escapeHtml(boundaryEvidenceId)}-${escapeHtml(consumer)}" style="font-size:11px;margin-top:4px"></div>`;
+}
+
 function renderOpenClawSam31ConsumerReviewTasks(tasks, sourceConsumerSmokeEvidenceId, sourcePdfBoundaryEvidenceId, latestReviews = []) {
   if (!Array.isArray(tasks) || !tasks.length) return '';
   const fallbackAcceptableEvidence = [
@@ -469,7 +493,7 @@ function renderOpenClawSam31ConsumerReviewTasks(tasks, sourceConsumerSmokeEviden
     const consumer = task.consumer || 'consumer';
     const latestDownload = latest ? `<button class="go" type="button" style="padding:7px 10px;font-size:11px;margin-top:5px;background:#155e75" data-sam31-consumer-review-packet-evidence-id="${escapeHtml(latest.evidence_id)}" data-sam31-consumer-review-packet-boundary-evidence-id="${escapeHtml(sourcePdfBoundaryEvidenceId)}">Download SAM31 consumer review decision</button><br><span class="muted" style="font-size:10px">openclaw.sam31.consumer_review_decision_packet.v1 - sam31-consumer-review-decision - claim_gate_effect no_claims_cleared</span><br>` : '';
     const sprinklerAdapterDownload = latest ? `<button class="go" type="button" style="padding:7px 10px;font-size:11px;margin-top:5px;background:#0f766e" data-sam31-sprinkler-review-adapter-evidence-id="${escapeHtml(latest.evidence_id)}" data-sam31-sprinkler-review-adapter-boundary-evidence-id="${escapeHtml(sourcePdfBoundaryEvidenceId)}">Download SAM31 sprinkler review adapter</button><br><span class="muted" style="font-size:10px">openclaw.sam31_to_sprinkler_review_adapter.v1 - halofire.sam31_sprinkler_review_packet.v1 - supported_sprinkler_review_lanes - claim_gate_effect no_claims_cleared</span><br>` : '';
-    return `<div style="margin-top:6px;border-top:1px solid rgba(14,165,233,.18);padding-top:6px"><span class="chip">${escapeHtml(task.artifact_type || 'openclaw.sam31.consumer_review_task.v1')} ${escapeHtml(consumer)}:${escapeHtml(task.status || 'requires_product_review')} accepted_queue_id ${escapeHtml(task.accepted_queue_id || 'missing')} persisted_review_packet_ref ${escapeHtml(task.persisted_review_packet_ref || 'missing')} acceptable_evidence ${(Array.isArray(task.acceptable_evidence) && task.acceptable_evidence.length ? task.acceptable_evidence : fallbackAcceptableEvidence).map((item) => escapeHtml(item)).join(' | ')}</span><br>${latest ? `Latest ${escapeHtml(consumer)} review: openclaw.sam31.consumer_review_task_decision.v1 evidence #${escapeHtml(latest.evidence_id)} - ${escapeHtml(latest.review_decision || 'reviewed')} - accepted_queue_id ${escapeHtml(latest.accepted_queue_id || 'missing')} - persisted_review_packet_ref ${escapeHtml(latest.persisted_review_packet_ref || 'missing')} - ${escapeHtml(latest.claim_gate_effect || 'no_claims_cleared')}<br>` : ''}${latestDownload}${sprinklerAdapterDownload}<details style="margin-top:5px"><summary class="muted" style="cursor:pointer">Save SAM31 consumer review decision</summary><div style="display:grid;gap:6px;margin-top:7px"><select id="sam31ConsumerReviewDecision-${escapeHtml(sourcePdfBoundaryEvidenceId)}-${escapeHtml(consumer)}" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px"><option value="replaced">Replaced temporary values</option><option value="accepted">Accepted for product review</option><option value="rejected">Rejected consumer task</option></select><input id="sam31ConsumerReviewReviewer-${escapeHtml(sourcePdfBoundaryEvidenceId)}-${escapeHtml(consumer)}" placeholder="reviewer_name" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px"><input id="sam31ConsumerReviewReplacementRef-${escapeHtml(sourcePdfBoundaryEvidenceId)}-${escapeHtml(consumer)}" placeholder="replacement_ref" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px"><input id="sam31ConsumerReviewScreenshotRef-${escapeHtml(sourcePdfBoundaryEvidenceId)}-${escapeHtml(consumer)}" placeholder="screenshot_ref" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px"><input id="sam31ConsumerReviewConsoleLogRef-${escapeHtml(sourcePdfBoundaryEvidenceId)}-${escapeHtml(consumer)}" placeholder="console_log_ref" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px"><textarea id="sam31ConsumerReviewReplacementValues-${escapeHtml(sourcePdfBoundaryEvidenceId)}-${escapeHtml(consumer)}" placeholder='replacement_values JSON object: {"semantic_labels":["reviewed object"],"object_hypotheses":[],"vector_overlays":[],"model_3d_candidates":[],"source_ref":"review://source","confidence":0.8}' style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px;height:82px"></textarea><textarea id="sam31ConsumerReviewNotes-${escapeHtml(sourcePdfBoundaryEvidenceId)}-${escapeHtml(consumer)}" placeholder="notes" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px;height:40px"></textarea><button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#0e7490" data-sam31-consumer-review-save-evidence-id="${escapeHtml(sourcePdfBoundaryEvidenceId)}" data-sam31-consumer="${escapeHtml(consumer)}" data-sam31-consumer-smoke-evidence-id="${escapeHtml(sourceConsumerSmokeEvidenceId || '')}" data-sam31-consumer-accepted-queue-id="${escapeHtml(task.accepted_queue_id || '')}" data-sam31-consumer-persisted-review-packet-ref="${escapeHtml(task.persisted_review_packet_ref || '')}">Save SAM31 consumer review decision</button><div class="muted" id="sam31ConsumerReviewStatus-${escapeHtml(sourcePdfBoundaryEvidenceId)}-${escapeHtml(consumer)}" style="font-size:11px"></div></div></details></div>`;
+    return `<div style="margin-top:6px;border-top:1px solid rgba(14,165,233,.18);padding-top:6px"><span class="chip">${escapeHtml(task.artifact_type || 'openclaw.sam31.consumer_review_task.v1')} ${escapeHtml(consumer)}:${escapeHtml(task.status || 'requires_product_review')} accepted_queue_id ${escapeHtml(task.accepted_queue_id || 'missing')} persisted_review_packet_ref ${escapeHtml(task.persisted_review_packet_ref || 'missing')} acceptable_evidence ${(Array.isArray(task.acceptable_evidence) && task.acceptable_evidence.length ? task.acceptable_evidence : fallbackAcceptableEvidence).map((item) => escapeHtml(item)).join(' | ')}</span><br>${renderSam31RequiredSourceProvenanceFields(task)}${renderSam31ProductOwnerReplacementIntakeAction(task, sourceConsumerSmokeEvidenceId, sourcePdfBoundaryEvidenceId)}${latest ? `Latest ${escapeHtml(consumer)} review: openclaw.sam31.consumer_review_task_decision.v1 evidence #${escapeHtml(latest.evidence_id)} - ${escapeHtml(latest.review_decision || 'reviewed')} - accepted_queue_id ${escapeHtml(latest.accepted_queue_id || 'missing')} - persisted_review_packet_ref ${escapeHtml(latest.persisted_review_packet_ref || 'missing')} - ${escapeHtml(latest.claim_gate_effect || 'no_claims_cleared')}<br>` : ''}${latestDownload}${sprinklerAdapterDownload}<details style="margin-top:5px"><summary class="muted" style="cursor:pointer">Save SAM31 consumer review decision</summary><div style="display:grid;gap:6px;margin-top:7px"><select id="sam31ConsumerReviewDecision-${escapeHtml(sourcePdfBoundaryEvidenceId)}-${escapeHtml(consumer)}" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px"><option value="replaced">Replaced temporary values</option><option value="accepted">Accepted for product review</option><option value="rejected">Rejected consumer task</option></select><input id="sam31ConsumerReviewReviewer-${escapeHtml(sourcePdfBoundaryEvidenceId)}-${escapeHtml(consumer)}" placeholder="reviewer_name" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px"><input id="sam31ConsumerReviewReplacementRef-${escapeHtml(sourcePdfBoundaryEvidenceId)}-${escapeHtml(consumer)}" placeholder="replacement_ref" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px"><input id="sam31ConsumerReviewScreenshotRef-${escapeHtml(sourcePdfBoundaryEvidenceId)}-${escapeHtml(consumer)}" placeholder="screenshot_ref" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px"><input id="sam31ConsumerReviewConsoleLogRef-${escapeHtml(sourcePdfBoundaryEvidenceId)}-${escapeHtml(consumer)}" placeholder="console_log_ref" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px"><textarea id="sam31ConsumerReviewReplacementValues-${escapeHtml(sourcePdfBoundaryEvidenceId)}-${escapeHtml(consumer)}" placeholder='replacement_values JSON object: {"semantic_labels":["reviewed object"],"object_hypotheses":[],"vector_overlays":[],"model_3d_candidates":[],"source_ref":"review://source","confidence":0.8}' style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px;height:82px"></textarea><textarea id="sam31ConsumerReviewNotes-${escapeHtml(sourcePdfBoundaryEvidenceId)}-${escapeHtml(consumer)}" placeholder="notes" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px;height:40px"></textarea><button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#0e7490" data-sam31-consumer-review-save-evidence-id="${escapeHtml(sourcePdfBoundaryEvidenceId)}" data-sam31-consumer="${escapeHtml(consumer)}" data-sam31-consumer-smoke-evidence-id="${escapeHtml(sourceConsumerSmokeEvidenceId || '')}" data-sam31-consumer-accepted-queue-id="${escapeHtml(task.accepted_queue_id || '')}" data-sam31-consumer-persisted-review-packet-ref="${escapeHtml(task.persisted_review_packet_ref || '')}">Save SAM31 consumer review decision</button><div class="muted" id="sam31ConsumerReviewStatus-${escapeHtml(sourcePdfBoundaryEvidenceId)}-${escapeHtml(consumer)}" style="font-size:11px"></div></div></details></div>`;
   }).join('')}<br>`;
 }
 
@@ -2194,6 +2218,56 @@ async function saveOpenClawSam31ConsumerReview(evidenceId, consumer, sourceConsu
   }
 }
 
+async function openOpenClawSam31ProductOwnerReplacementIntake(evidenceId, consumer, sourceConsumerSmokeEvidenceId, acceptedQueueId, persistedReviewPacketRef) {
+  const status = document.getElementById('sam31ProductOwnerReplacementIntakeStatus-' + evidenceId + '-' + consumer);
+  try {
+    const fieldSuffix = evidenceId + '-' + consumer;
+    const replacementRefField = document.getElementById('sam31ConsumerReviewReplacementRef-' + fieldSuffix);
+    const screenshotRefField = document.getElementById('sam31ConsumerReviewScreenshotRef-' + fieldSuffix);
+    const consoleLogRefField = document.getElementById('sam31ConsumerReviewConsoleLogRef-' + fieldSuffix);
+    const notesField = document.getElementById('sam31ConsumerReviewNotes-' + fieldSuffix);
+    const defaultSourceRef = `${consumer}://sam31/product-owner-replacements/${acceptedQueueId || 'temporary'}/temporary-values.json`;
+    let replacementValues = jsonObjectFromField('sam31ConsumerReviewReplacementValues-' + fieldSuffix);
+    if (!Object.keys(replacementValues).length) {
+      replacementValues = {
+        semantic_labels: [`temporary ${consumer} SAM31 object review pending employee replacement`],
+        object_hypotheses: [],
+        vector_overlays: [],
+        model_3d_candidates: [],
+        source_ref: defaultSourceRef,
+        confidence: 0.5,
+      };
+    }
+    const body = {
+      source_pdf_boundary_evidence_id: Number(evidenceId),
+      source_openclaw_sam31_consumer_smoke_evidence_id: Number(sourceConsumerSmokeEvidenceId),
+      source_application: consumer,
+      consumer,
+      accepted_queue_id: acceptedQueueId,
+      persisted_review_packet_ref: persistedReviewPacketRef,
+      review_decision: document.getElementById('sam31ConsumerReviewDecision-' + fieldSuffix)?.value || 'replaced',
+      reviewer_name: document.getElementById('sam31ConsumerReviewReviewer-' + fieldSuffix)?.value.trim() || `${consumer} temporary product-owner intake`,
+      replacement_ref: replacementRefField?.value.trim() || defaultSourceRef,
+      screenshot_ref: screenshotRefField?.value.trim() || `${consumer}://sam31/product-owner-replacements/${acceptedQueueId || 'temporary'}/screenshot-pending.png`,
+      console_log_ref: consoleLogRefField?.value.trim() || `${consumer}://sam31/product-owner-replacements/${acceptedQueueId || 'temporary'}/console-pending.log`,
+      replacement_values: replacementValues,
+      notes: notesField?.value.trim() || 'Temporary SAM31 product-owner replacement intake created from the workbench; HaloFire/LandScout/NameForge employees must replace with actual source evidence before any regulated or production-readiness claim.',
+    };
+    const saved = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/openclaw/sam31/product-owner-replacements', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    });
+    await refreshEvidence();
+    await refreshResolverQueue();
+    const refreshedStatus = document.getElementById('sam31ProductOwnerReplacementIntakeStatus-' + evidenceId + '-' + consumer);
+    if (refreshedStatus || status) {
+      (refreshedStatus || status).textContent = 'Opened product_owner_replacement_intake evidence #' + saved.id + ' - claims still blocked';
+    }
+  } catch (err) {
+    if (status) status.textContent = 'Error: ' + err.message;
+  }
+}
+
 async function saveHalofireSam31SprinklerReviewDecision(evidenceId, reviewEvidenceId, issueType, lane) {
   const status = document.getElementById('sam31SprinklerReviewStatus-' + evidenceId + '-' + reviewEvidenceId + '-' + issueType);
   try {
@@ -2462,6 +2536,15 @@ async function refreshResolverQueue() {
       button.dataset.sam31ConsumerSmokeEvidenceId,
       button.dataset.sam31ConsumerAcceptedQueueId,
       button.dataset.sam31ConsumerPersistedReviewPacketRef,
+    );
+  });
+  document.querySelectorAll('[data-sam31-product-owner-replacement-intake-evidence-id]').forEach((button) => {
+    button.onclick = () => openOpenClawSam31ProductOwnerReplacementIntake(
+      button.dataset.sam31ProductOwnerReplacementIntakeEvidenceId,
+      button.dataset.sam31ProductOwnerReplacementIntakeConsumer,
+      button.dataset.sam31ProductOwnerReplacementIntakeSmokeEvidenceId,
+      button.dataset.sam31ProductOwnerReplacementIntakeAcceptedQueueId,
+      button.dataset.sam31ProductOwnerReplacementIntakePersistedReviewPacketRef,
     );
   });
   document.querySelectorAll('[data-sam31-sprinkler-review-save-evidence-id]').forEach((button) => {

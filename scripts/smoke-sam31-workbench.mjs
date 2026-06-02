@@ -835,6 +835,10 @@ async function runBrowserSmoke(token, evidenceIds) {
     await page.waitForSelector('text=openclaw.sam31.consumer_review_task.v1', { timeout: 8_000 });
     await page.waitForSelector('text=requires_product_review', { timeout: 8_000 });
     await page.waitForSelector('text=acceptable_evidence', { timeout: 8_000 });
+    await page.waitForSelector('text=required_source_provenance_fields', { timeout: 8_000 });
+    await page.waitForSelector('text=source_openclaw_sam31_vector_model_artifact_evidence_id', { timeout: 8_000 });
+    await page.waitForSelector('text=source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id', { timeout: 8_000 });
+    await page.waitForSelector('text=Open product-owner replacement intake', { timeout: 8_000 });
     await page.waitForSelector('text=no_claims_cleared', { timeout: 8_000 });
     await page.waitForSelector('[data-sam31-consumer-smoke-packet-evidence-id]', { timeout: 8_000 });
     const consumerSmokeDownloadPromise = page.waitForEvent('download');
@@ -929,8 +933,14 @@ async function runBrowserSmoke(token, evidenceIds) {
       confidence: 0.82,
     }));
     await page.locator(`#sam31ConsumerReviewNotes-${evidenceIds.boundaryEvidenceId}-landscout`).fill('Smoke saved product owner review note tied to accepted queue id.');
-    await page.locator(consumerReviewButtonSelector).click();
-    await page.waitForSelector('text=openclaw_sam31_consumer_review evidence', { timeout: 8_000 });
+    const productOwnerIntakeButtonSelector = `button[data-sam31-product-owner-replacement-intake-evidence-id="${evidenceIds.boundaryEvidenceId}"][data-sam31-product-owner-replacement-intake-consumer="landscout"]:not([disabled])`;
+    await page.waitForSelector(productOwnerIntakeButtonSelector, { timeout: 8_000 });
+    const productOwnerIntakeCount = await page.locator(productOwnerIntakeButtonSelector).count();
+    if (productOwnerIntakeCount < 1) {
+      throw new Error('LandScout product-owner replacement intake button is disabled despite source provenance fields');
+    }
+    await page.locator(productOwnerIntakeButtonSelector).first().click();
+    await page.waitForSelector('text=Opened product_owner_replacement_intake evidence', { timeout: 8_000 });
     await page.waitForSelector('text=openclaw.sam31.consumer_review_task_decision.v1', { timeout: 8_000 });
     await page.waitForSelector('text=Latest landscout review', { timeout: 8_000 });
     await page.waitForSelector('text=no_claims_cleared', { timeout: 8_000 });
