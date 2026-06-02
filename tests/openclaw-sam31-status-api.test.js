@@ -1737,6 +1737,101 @@ describe('OpenClaw SAM31 bridge status API', () => {
       'manufacturer_exact',
     ]));
 
+    const replayFollowupRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/sprinkler-review/${consumerReview.id}/decision/${sprinklerReview.id}/preliminary-replay/followup`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        followup_decision: 'confirmed_internal_obstruction_clash_packet',
+        reviewer_name: 'HaloFire replay reviewer',
+        review_ref: 'halofire://sam31/sprinkler-preliminary-replay/sam31-landscout-testqueue/followup.json',
+        screenshot_ref: 'halofire://sam31/sprinkler-preliminary-replay/sam31-landscout-testqueue/followup.png',
+        packet_ref: 'halofire://sam31/obstruction-clash/sam31-landscout-testqueue/packet.json',
+        issue_decisions: [
+          {
+            source_field: 'obstruction_candidates',
+            source_index: 0,
+            decision: 'not_a_sprinkler_obstruction',
+            target_packet_lane: 'obstruction_or_clash_review',
+            notes: 'Parcel-edge object is not a sprinkler obstruction on the 1881 sheet.',
+          },
+        ],
+        notes: 'Internal-alpha replay follow-up only; keep all regulated claims blocked.',
+      }),
+    });
+    expect(replayFollowupRes.status).toBe(201);
+    const replayFollowup = await replayFollowupRes.json();
+    expect(replayFollowup).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.sam31_sprinkler_preliminary_replay_followup_decision.v1',
+      status: 'present',
+      source_preliminary_replay_artifact_type: 'halofire.sam31_sprinkler_preliminary_replay_artifact.v1',
+      source_preliminary_replay_output_artifact_type: 'halofire.sam31_sprinkler_preliminary_replay_output.v1',
+      source_pdf_boundary_evidence_id: boundary.id,
+      source_openclaw_sam31_consumer_review_evidence_id: consumerReview.id,
+      source_halofire_sam31_sprinkler_review_decision_evidence_id: sprinklerReview.id,
+      supported_sprinkler_review_lane: 'obstruction_or_clash_review',
+      replay_scope: 'obstruction_clash_candidate_review',
+      followup_decision: 'confirmed_internal_obstruction_clash_packet',
+      reviewer_name: 'HaloFire replay reviewer',
+      review_ref: 'halofire://sam31/sprinkler-preliminary-replay/sam31-landscout-testqueue/followup.json',
+      packet_ref: 'halofire://sam31/obstruction-clash/sam31-landscout-testqueue/packet.json',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(replayFollowup.packet_queue_items).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        artifact_type: 'halofire.sam31_obstruction_clash_packet_queue_item.v1',
+        status: 'ready_for_internal_alpha_packet',
+        source_followup_decision_artifact_type: 'halofire.sam31_sprinkler_preliminary_replay_followup_decision.v1',
+        target_packet_lane: 'obstruction_or_clash_review',
+        source_field: 'obstruction_candidates',
+        source_index: 0,
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    ]));
+    expect(replayFollowup.evidence).toEqual(expect.objectContaining({
+      evidence_type: 'halofire_sam31_sprinkler_preliminary_replay_followup_decision',
+      status: 'present',
+      source_ref: 'halofire://sam31/sprinkler-preliminary-replay/sam31-landscout-testqueue/followup.json',
+    }));
+    expect(replayFollowup.blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'AHJ_approval',
+      'AutoSprink_parity',
+      'fabrication_ready',
+      'professional_approval',
+      'manufacturer_exact',
+    ]));
+
+    const replayFollowupQueueRes = await request(`${COOPERATIVE_1881_PATH}/resolver-queue?sam31SprinklerReplay=ready&lane=obstruction_or_clash_review`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(replayFollowupQueueRes.status).toBe(200);
+    const replayFollowupQueue = await replayFollowupQueueRes.json();
+    expect(replayFollowupQueue.summary.sam31_sprinkler_preliminary_replay_followups_recorded).toBeGreaterThanOrEqual(1);
+    expect(replayFollowupQueue.summary.sam31_sprinkler_packet_queue_items).toBeGreaterThanOrEqual(1);
+    const replayFollowupQueueItem = replayFollowupQueue.items.find((row) => row.evidence_id === boundary.id);
+    expect(replayFollowupQueueItem.sam31_sprinkler_preliminary_replay_queue_items).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        status: 'preliminary_replay_followup_recorded',
+        latest_sam31_sprinkler_preliminary_replay_followup_decision: expect.objectContaining({
+          evidence_id: replayFollowup.id,
+          followup_decision: 'confirmed_internal_obstruction_clash_packet',
+          claim_gate_effect: 'no_claims_cleared',
+        }),
+        packet_queue_items: expect.arrayContaining([
+          expect.objectContaining({
+            artifact_type: 'halofire.sam31_obstruction_clash_packet_queue_item.v1',
+            target_packet_lane: 'obstruction_or_clash_review',
+            claim_gate_effect: 'no_claims_cleared',
+          }),
+        ]),
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    ]));
+
     const nameForgeAdapterRes = await request(`${COOPERATIVE_1881_PATH}/openclaw/sam31/product-owner-replacements`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` },

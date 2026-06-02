@@ -352,10 +352,11 @@ async function runBrowserSmoke(token, evidenceIds) {
     await page.waitForSelector('[data-sam31-consumer-smoke-evidence-id]', { timeout: 8_000 });
     await page.waitForSelector('[id^="sam31ConsumerSmokeStatus-"]', { state: 'attached', timeout: 8_000 });
     await page.getByRole('button', { name: 'Run LandScout/NameForge SAM31 queue smoke' }).first().click();
-    await page.waitForSelector('text=openclaw_sam31_consumer_smoke_artifact evidence', { timeout: 8_000 });
-    await page.waitForSelector('text=Latest consumer smoke', { timeout: 8_000 });
-    await page.waitForSelector('text=posted_consumer_count', { timeout: 8_000 });
-    await page.waitForSelector('text=blocked_consumer_count', { timeout: 8_000 });
+    const consumerSmokeActionTimeoutMs = 20_000;
+    await page.waitForSelector('text=openclaw_sam31_consumer_smoke_artifact evidence', { timeout: consumerSmokeActionTimeoutMs });
+    await page.waitForSelector('text=Latest consumer smoke', { timeout: consumerSmokeActionTimeoutMs });
+    await page.waitForSelector('text=posted_consumer_count', { timeout: consumerSmokeActionTimeoutMs });
+    await page.waitForSelector('text=blocked_consumer_count', { timeout: consumerSmokeActionTimeoutMs });
     await page.waitForSelector('text=posted_consumer_count 2', { timeout: 8_000 });
     await page.waitForSelector('text=blocked_consumer_count 0', { timeout: 8_000 });
     await page.waitForSelector('text=openclaw.sam31.consumer_smoke_artifact.v1', { timeout: 8_000 });
@@ -610,6 +611,44 @@ async function runBrowserSmoke(token, evidenceIds) {
     if (sprinklerPreliminaryReplayArtifact.claim_gate_effect !== 'no_claims_cleared' || sprinklerPreliminaryReplayArtifact.use_for_claims !== false) {
       throw new Error(`SAM31 sprinkler preliminary replay artifact cleared a claim gate: ${JSON.stringify(sprinklerPreliminaryReplayArtifact)}`);
     }
+    await page.waitForSelector('text=Save SAM31 preliminary replay follow-up', { timeout: 8_000 });
+    const replayFollowupKey = `${evidenceIds.boundaryEvidenceId}-${consumerReview.evidence_id}-${latestSprinklerDecision.evidence_id}`;
+    await page.getByText('Save SAM31 preliminary replay follow-up').first().click();
+    await page.locator(`#sam31SprinklerReplayFollowupReviewer-${replayFollowupKey}`).fill('HaloFire replay smoke reviewer');
+    await page.locator(`#sam31SprinklerReplayFollowupRef-${replayFollowupKey}`).fill('halofire://sam31/smoke/preliminary-replay/followup.json');
+    await page.locator(`#sam31SprinklerReplayFollowupScreenshotRef-${replayFollowupKey}`).fill('halofire://sam31/smoke/preliminary-replay/followup.png');
+    await page.locator(`#sam31SprinklerReplayFollowupPacketRef-${replayFollowupKey}`).fill('halofire://sam31/smoke/obstruction-clash/packet.json');
+    await page.locator(`#sam31SprinklerReplayFollowupIssueDecisions-${replayFollowupKey}`).fill(JSON.stringify([
+      {
+        source_field: 'obstruction_candidates',
+        source_index: 0,
+        decision: 'not_a_sprinkler_obstruction',
+        target_packet_lane: 'obstruction_or_clash_review',
+        notes: 'Smoke replay follow-up keeps parcel-edge hypothesis out of sprinkler obstruction claims.',
+      },
+    ]));
+    await page.locator(`#sam31SprinklerReplayFollowupNotes-${replayFollowupKey}`).fill('Smoke replay follow-up only; claims remain blocked.');
+    await page.locator(`button[data-sam31-sprinkler-preliminary-replay-followup-evidence-id="${latestSprinklerDecision.evidence_id}"]`).click();
+    await page.waitForSelector(`text=Saved halofire_sam31_sprinkler_preliminary_replay_followup_decision`, { timeout: 8_000 });
+    const replayFollowupQueue = await request(`${PROJECT_PATH}/resolver-queue?sam31SprinklerReplay=ready&lane=obstruction_or_clash_review`, token);
+    if ((replayFollowupQueue.summary?.sam31_sprinkler_preliminary_replay_followups_recorded || 0) < 1) {
+      throw new Error(`SAM31 preliminary replay follow-up was not recorded in resolver summary: ${JSON.stringify(replayFollowupQueue.summary)}`);
+    }
+    if ((replayFollowupQueue.summary?.sam31_sprinkler_packet_queue_items || 0) < 1) {
+      throw new Error(`SAM31 preliminary replay follow-up did not create a packet queue item: ${JSON.stringify(replayFollowupQueue.summary)}`);
+    }
+    const replayFollowupItem = replayFollowupQueue.items.find((item) => item.evidence_id === evidenceIds.boundaryEvidenceId);
+    const replayFollowupRows = replayFollowupItem?.sam31_sprinkler_preliminary_replay_queue_items || [];
+    const replayFollowupRow = replayFollowupRows.find((row) => row.source_halofire_sam31_sprinkler_review_decision_evidence_id === latestSprinklerDecision.evidence_id);
+    if (!replayFollowupRow?.latest_sam31_sprinkler_preliminary_replay_followup_decision) {
+      throw new Error(`SAM31 preliminary replay follow-up missing from queue row: ${JSON.stringify(replayFollowupRows)}`);
+    }
+    if (!replayFollowupRow.packet_queue_items?.some((item) => item.artifact_type === 'halofire.sam31_obstruction_clash_packet_queue_item.v1')) {
+      throw new Error(`SAM31 preliminary replay follow-up packet queue item missing: ${JSON.stringify(replayFollowupRow)}`);
+    }
+    if (replayFollowupRow.packet_queue_items.some((item) => item.use_for_claims !== false || item.claim_gate_effect !== 'no_claims_cleared')) {
+      throw new Error(`SAM31 preliminary replay follow-up packet queue cleared a claim gate: ${JSON.stringify(replayFollowupRow.packet_queue_items)}`);
+    }
     const unresolvedNameForge = await request(`${PROJECT_PATH}/resolver-queue?sam31ConsumerReview=unresolved&consumer=nameforge`, token);
     const unresolvedItem = unresolvedNameForge.items.find((item) => item.evidence_id === evidenceIds.boundaryEvidenceId);
     const unresolvedNameForgeReviews = unresolvedItem?.sam31_unresolved_consumer_reviews || [];
@@ -782,6 +821,13 @@ async function runBrowserSmoke(token, evidenceIds) {
         replay_inputs_type: sprinklerPreliminaryReplayArtifact.replay_inputs?.artifact_type,
         replay_output_type: sprinklerPreliminaryReplayArtifact.replay_output?.artifact_type,
         claim_gate_effect: sprinklerPreliminaryReplayArtifact.claim_gate_effect,
+      },
+      sprinklerPreliminaryReplayFollowup: {
+        artifact_type: replayFollowupRow.latest_sam31_sprinkler_preliminary_replay_followup_decision.artifact_type,
+        evidence_id: replayFollowupRow.latest_sam31_sprinkler_preliminary_replay_followup_decision.evidence_id,
+        followup_decision: replayFollowupRow.latest_sam31_sprinkler_preliminary_replay_followup_decision.followup_decision,
+        packet_queue_item_type: replayFollowupRow.packet_queue_items[0]?.artifact_type,
+        claim_gate_effect: replayFollowupRow.latest_sam31_sprinkler_preliminary_replay_followup_decision.claim_gate_effect,
       },
       unresolvedNameForgeReview: {
         filter: 'sam31ConsumerReview=unresolved',

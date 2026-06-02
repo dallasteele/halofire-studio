@@ -1325,6 +1325,9 @@ const HALOFIRE_SAM31_SPRINKLER_REVIEW_PRELIMINARY_REPLAY_INPUTS_TYPE = 'halofire
 const HALOFIRE_SAM31_SPRINKLER_PRELIMINARY_REPLAY_QUEUE_ITEM_TYPE = 'halofire.sam31_sprinkler_preliminary_replay_queue_item.v1';
 const HALOFIRE_SAM31_SPRINKLER_PRELIMINARY_REPLAY_ARTIFACT_TYPE = 'halofire.sam31_sprinkler_preliminary_replay_artifact.v1';
 const HALOFIRE_SAM31_SPRINKLER_PRELIMINARY_REPLAY_OUTPUT_TYPE = 'halofire.sam31_sprinkler_preliminary_replay_output.v1';
+const HALOFIRE_SAM31_SPRINKLER_PRELIMINARY_REPLAY_FOLLOWUP_DECISION_TYPE = 'halofire.sam31_sprinkler_preliminary_replay_followup_decision.v1';
+const HALOFIRE_SAM31_OBSTRUCTION_CLASH_PACKET_QUEUE_ITEM_TYPE = 'halofire.sam31_obstruction_clash_packet_queue_item.v1';
+const HALOFIRE_SAM31_SLEEVE_FIRESTOP_PACKET_QUEUE_ITEM_TYPE = 'halofire.sam31_sleeve_firestop_packet_queue_item.v1';
 const SAM31_CONSUMER_QUEUE_TARGETS = Object.freeze(['landscout', 'nameforge']);
 const SAM31_CONSUMER_UNAVAILABLE_CODES = Object.freeze({
   landscout: 'OPENCLAW_SAM31_LANDSCOUT_QUEUE_UNAVAILABLE',
@@ -3207,6 +3210,57 @@ function halofireSam31SprinklerReviewDecisionSummary(decisionEvidence) {
   };
 }
 
+function halofireSam31SprinklerPreliminaryReplayFollowupDecisionFromEvidence(row) {
+  if (!row) return null;
+  try {
+    const parsed = JSON.parse(row.notes || '{}');
+    return parsed && parsed.kind === 'halofire_sam31_sprinkler_preliminary_replay_followup_decision' && parsed.followup
+      ? parsed.followup
+      : null;
+  } catch {
+    return null;
+  }
+}
+
+function latestHalofireSam31SprinklerPreliminaryReplayFollowupDecisionEvidence(projectName, sourceEvidenceId = null) {
+  const rows = db
+    .prepare(`SELECT * FROM project_evidence
+              WHERE project_name = ? AND evidence_type = 'halofire_sam31_sprinkler_preliminary_replay_followup_decision'
+              ORDER BY created_at DESC, id DESC`)
+    .all(projectName);
+  const latestBySprinklerReviewEvidenceId = new Map();
+  for (const row of rows) {
+    const followup = halofireSam31SprinklerPreliminaryReplayFollowupDecisionFromEvidence(row);
+    if (!followup) continue;
+    if (sourceEvidenceId && Number(followup.source_pdf_boundary_evidence_id) !== Number(sourceEvidenceId)) {
+      continue;
+    }
+    const key = String(followup.source_halofire_sam31_sprinkler_review_decision_evidence_id || '');
+    if (key && !latestBySprinklerReviewEvidenceId.has(key)) {
+      latestBySprinklerReviewEvidenceId.set(key, { evidence: row, followup });
+    }
+  }
+  return [...latestBySprinklerReviewEvidenceId.values()];
+}
+
+function halofireSam31SprinklerPreliminaryReplayFollowupSummary(followupEvidence) {
+  if (!followupEvidence?.evidence || !followupEvidence?.followup) return null;
+  const { evidence, followup } = followupEvidence;
+  return {
+    evidence_id: evidence.id,
+    evidence_status: evidence.status,
+    source_ref: evidence.source_ref,
+    artifact_type: followup.artifact_type || HALOFIRE_SAM31_SPRINKLER_PRELIMINARY_REPLAY_FOLLOWUP_DECISION_TYPE,
+    followup_decision: followup.followup_decision,
+    reviewer_name: followup.reviewer_name,
+    reviewed_at: followup.reviewed_at,
+    review_ref: followup.review_ref,
+    packet_ref: followup.packet_ref,
+    packet_queue_items: Array.isArray(followup.packet_queue_items) ? jsonClone(followup.packet_queue_items) : [],
+    claim_gate_effect: followup.claim_gate_effect || 'no_claims_cleared',
+  };
+}
+
 function openClawSam31UnresolvedConsumerReviewSummaries(consumerSmokeSummary, consumerReviewSummaries) {
   const tasks = Array.isArray(consumerSmokeSummary?.consumer_review_tasks)
     ? consumerSmokeSummary.consumer_review_tasks
@@ -3849,6 +3903,53 @@ function halofireSam31SprinklerReplayIssueCandidates(reviewedValues) {
   });
 }
 
+function halofireSam31SprinklerPacketQueueItemType(lane, sourceField = '') {
+  const normalizedLane = String(lane || '').toLowerCase();
+  const normalizedField = String(sourceField || '').toLowerCase();
+  if (normalizedLane === 'sleeve_or_firestop_candidate_review' || normalizedField.includes('sleeve') || normalizedField.includes('firestop')) {
+    return HALOFIRE_SAM31_SLEEVE_FIRESTOP_PACKET_QUEUE_ITEM_TYPE;
+  }
+  return HALOFIRE_SAM31_OBSTRUCTION_CLASH_PACKET_QUEUE_ITEM_TYPE;
+}
+
+function halofireSam31SprinklerPreliminaryReplayPacketQueueItems(followup, followupEvidenceId = null) {
+  if (!followup || !Array.isArray(followup.issue_decisions)) return [];
+  return followup.issue_decisions.map((decision, index) => {
+    const targetLane = String(decision.target_packet_lane || followup.supported_sprinkler_review_lane || 'obstruction_or_clash_review').trim();
+    const sourceField = String(decision.source_field || '').trim();
+    return {
+      artifact_type: halofireSam31SprinklerPacketQueueItemType(targetLane, sourceField),
+      id: `sam31-sprinkler-packet:${followup.source_halofire_sam31_sprinkler_review_decision_evidence_id || 'pending'}:${index}`,
+      project_name: followup.project_name,
+      status: 'ready_for_internal_alpha_packet',
+      source_followup_decision_artifact_type: HALOFIRE_SAM31_SPRINKLER_PRELIMINARY_REPLAY_FOLLOWUP_DECISION_TYPE,
+      source_followup_decision_evidence_id: followupEvidenceId || null,
+      source_preliminary_replay_artifact_type: HALOFIRE_SAM31_SPRINKLER_PRELIMINARY_REPLAY_ARTIFACT_TYPE,
+      source_preliminary_replay_output_artifact_type: HALOFIRE_SAM31_SPRINKLER_PRELIMINARY_REPLAY_OUTPUT_TYPE,
+      source_pdf_boundary_evidence_id: followup.source_pdf_boundary_evidence_id,
+      source_openclaw_sam31_consumer_review_evidence_id: followup.source_openclaw_sam31_consumer_review_evidence_id,
+      source_halofire_sam31_sprinkler_review_decision_evidence_id: followup.source_halofire_sam31_sprinkler_review_decision_evidence_id,
+      target_packet_lane: targetLane,
+      source_field: sourceField,
+      source_index: Number.isSafeInteger(Number(decision.source_index)) ? Number(decision.source_index) : index,
+      decision: String(decision.decision || followup.followup_decision || 'requires_followup').trim(),
+      packet_ref: decision.packet_ref || followup.packet_ref || null,
+      notes: decision.notes || null,
+      next_action: 'Create or download the source-linked obstruction/clash or sleeve/firestop packet for employee/professional review; keep regulated claims blocked until official evidence exists.',
+      acceptable_evidence: [
+        'HaloFire employee packet review',
+        'marked-up obstruction/clash or sleeve/firestop screenshot',
+        'source-linked packet JSON',
+        'professional/AHJ/manufacturer evidence for any regulated claim',
+      ],
+      blocked_claims: Array.isArray(followup.blocked_claims) ? [...followup.blocked_claims] : [],
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    };
+  });
+}
+
 function buildHalofireSam31SprinklerPreliminaryReplayArtifact(projectName, evidence, decision, reviewEvidence, review, sprinklerReviewEvidence, sprinklerReview) {
   const packet = buildHalofireSam31SprinklerReviewDecisionPacket(
     projectName,
@@ -3911,12 +4012,114 @@ function buildHalofireSam31SprinklerPreliminaryReplayArtifact(projectName, evide
   };
 }
 
-function halofireSam31SprinklerPreliminaryReplayQueueItems(projectName, evidence, decision, reviewEvidences, sprinklerReviewDecisionEvidences = []) {
+function normalizeHalofireSam31SprinklerPreliminaryReplayFollowupDecision(projectName, evidence, decision, reviewEvidence, review, sprinklerReviewEvidence, sprinklerReview, body = {}, user = {}) {
+  const replayArtifact = buildHalofireSam31SprinklerPreliminaryReplayArtifact(projectName, evidence, decision, reviewEvidence, review, sprinklerReviewEvidence, sprinklerReview);
+  const followupDecision = String(body.followup_decision || 'confirmed_internal_obstruction_clash_packet').trim().toLowerCase();
+  const allowedDecisions = [
+    'confirmed_internal_obstruction_clash_packet',
+    'confirmed_internal_sleeve_firestop_packet',
+    'needs_more_evidence',
+    'rejected_preliminary_replay',
+  ];
+  if (!allowedDecisions.includes(followupDecision)) {
+    const e = new Error(`followup_decision must be one of: ${allowedDecisions.join(', ')}`);
+    e.httpStatus = 400;
+    throw e;
+  }
+  const reviewRef = String(body.review_ref || body.source_ref || '').trim();
+  if (!reviewRef) {
+    const e = new Error('review_ref is required for SAM31 sprinkler preliminary replay follow-up evidence');
+    e.httpStatus = 400;
+    throw e;
+  }
+  const issueDecisions = Array.isArray(body.issue_decisions) ? body.issue_decisions : [];
+  if (!issueDecisions.length) {
+    const e = new Error('issue_decisions must include at least one preliminary replay issue decision');
+    e.httpStatus = 400;
+    throw e;
+  }
+  const normalizedIssueDecisions = issueDecisions.map((item, index) => {
+    if (!item || typeof item !== 'object') {
+      const e = new Error('Each issue_decisions entry must be an object');
+      e.httpStatus = 400;
+      throw e;
+    }
+    return {
+      source_field: String(item.source_field || '').trim(),
+      source_index: Number.isSafeInteger(Number(item.source_index)) ? Number(item.source_index) : index,
+      decision: String(item.decision || followupDecision).trim(),
+      target_packet_lane: String(item.target_packet_lane || replayArtifact.supported_sprinkler_review_lane || 'obstruction_or_clash_review').trim(),
+      packet_ref: item.packet_ref ? String(item.packet_ref).trim() : null,
+      notes: item.notes ? String(item.notes).trim() : null,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    };
+  });
+  const followup = {
+    artifact_type: HALOFIRE_SAM31_SPRINKLER_PRELIMINARY_REPLAY_FOLLOWUP_DECISION_TYPE,
+    status: 'present',
+    project_name: projectName,
+    source_preliminary_replay_artifact_type: HALOFIRE_SAM31_SPRINKLER_PRELIMINARY_REPLAY_ARTIFACT_TYPE,
+    source_preliminary_replay_output_artifact_type: HALOFIRE_SAM31_SPRINKLER_PRELIMINARY_REPLAY_OUTPUT_TYPE,
+    source_pdf_boundary_evidence_id: evidence.id,
+    source_openclaw_sam31_consumer_review_evidence_id: reviewEvidence.id,
+    source_halofire_sam31_sprinkler_review_decision_evidence_id: sprinklerReviewEvidence.id,
+    source_application: replayArtifact.source_application,
+    consumer: replayArtifact.consumer,
+    accepted_queue_id: replayArtifact.accepted_queue_id,
+    persisted_review_packet_ref: replayArtifact.persisted_review_packet_ref,
+    issue_type: replayArtifact.issue_type,
+    supported_sprinkler_review_lane: replayArtifact.supported_sprinkler_review_lane,
+    replay_scope: replayArtifact.replay_scope,
+    followup_decision: followupDecision,
+    reviewer_name: String(body.reviewer_name || user.name || user.username || '').trim() || null,
+    reviewed_at: new Date().toISOString(),
+    review_ref: reviewRef,
+    screenshot_ref: String(body.screenshot_ref || '').trim() || null,
+    console_log_ref: String(body.console_log_ref || '').trim() || null,
+    packet_ref: String(body.packet_ref || '').trim() || null,
+    issue_decisions: normalizedIssueDecisions,
+    notes: String(body.notes || '').trim() || null,
+    replay_output: replayArtifact.replay_output,
+    source_refs: uniqueByJson([
+      ...(Array.isArray(replayArtifact.source_refs) ? replayArtifact.source_refs : []),
+      {
+        evidence_type: HALOFIRE_SAM31_SPRINKLER_PRELIMINARY_REPLAY_ARTIFACT_TYPE,
+        source_ref: replayArtifact.download_name,
+        status: replayArtifact.status,
+        claim_gate_effect: 'no_claims_cleared',
+      },
+      {
+        evidence_type: 'sam31_sprinkler_preliminary_replay_followup_payload',
+        source_ref: reviewRef,
+        status: 'present',
+        claim_gate_effect: 'no_claims_cleared',
+      },
+    ]),
+    blocked_claims: Array.isArray(replayArtifact.blocked_claims) ? [...replayArtifact.blocked_claims] : [],
+    use_for_claims: false,
+    claim_gate_effect: 'no_claims_cleared',
+    no_claim_gates_cleared: true,
+    limitations: uniqueStrings([
+      ...(Array.isArray(replayArtifact.limitations) ? replayArtifact.limitations : []),
+      'This follow-up decision can queue obstruction/clash or sleeve/firestop packet work, but it does not clear any regulated claim.',
+    ]),
+  };
+  followup.packet_queue_items = halofireSam31SprinklerPreliminaryReplayPacketQueueItems(followup);
+  return followup;
+}
+
+function halofireSam31SprinklerPreliminaryReplayQueueItems(projectName, evidence, decision, reviewEvidences, sprinklerReviewDecisionEvidences = [], preliminaryReplayFollowupDecisionEvidences = []) {
   if (!evidence || !decision) return [];
   const reviewsByEvidenceId = new Map(
     (Array.isArray(reviewEvidences) ? reviewEvidences : [])
       .filter((item) => item?.evidence && item?.review)
       .map((item) => [Number(item.evidence.id), item]),
+  );
+  const followupsBySprinklerReviewEvidenceId = new Map(
+    (Array.isArray(preliminaryReplayFollowupDecisionEvidences) ? preliminaryReplayFollowupDecisionEvidences : [])
+      .filter((item) => item?.evidence && item?.followup)
+      .map((item) => [Number(item.followup.source_halofire_sam31_sprinkler_review_decision_evidence_id), item]),
   );
   return (Array.isArray(sprinklerReviewDecisionEvidences) ? sprinklerReviewDecisionEvidences : [])
     .filter((item) => item?.evidence && item?.review)
@@ -3933,11 +4136,13 @@ function halofireSam31SprinklerPreliminaryReplayQueueItems(projectName, evidence
         sprinklerReview,
       );
       const replayInputs = packet.preliminary_replay_inputs || {};
+      const latestFollowup = followupsBySprinklerReviewEvidenceId.get(Number(sprinklerReviewEvidence.id)) || null;
+      const latestFollowupSummary = halofireSam31SprinklerPreliminaryReplayFollowupSummary(latestFollowup);
       return {
         artifact_type: HALOFIRE_SAM31_SPRINKLER_PRELIMINARY_REPLAY_QUEUE_ITEM_TYPE,
         id: `sam31-sprinkler-preliminary-replay:${evidence.id}:${sourceReview.evidence.id}:${sprinklerReviewEvidence.id}`,
         project_name: projectName,
-        status: 'ready_for_preliminary_replay',
+        status: latestFollowupSummary ? 'preliminary_replay_followup_recorded' : 'ready_for_preliminary_replay',
         source_decision_packet_artifact_type: HALOFIRE_SAM31_SPRINKLER_REVIEW_DECISION_PACKET_TYPE,
         source_preliminary_replay_inputs_artifact_type: HALOFIRE_SAM31_SPRINKLER_REVIEW_PRELIMINARY_REPLAY_INPUTS_TYPE,
         source_pdf_boundary_evidence_id: evidence.id,
@@ -3953,6 +4158,8 @@ function halofireSam31SprinklerPreliminaryReplayQueueItems(projectName, evidence
         action_label: 'Run SAM31 sprinkler preliminary replay',
         action_href: `/api/projects/${encodeURIComponent(projectName)}/resolver-packets/pdf-boundary/${evidence.id}/openclaw/sam31/sprinkler-review/${sourceReview.evidence.id}/decision/${sprinklerReviewEvidence.id}/preliminary-replay`,
         preliminary_replay_inputs: replayInputs,
+        latest_sam31_sprinkler_preliminary_replay_followup_decision: latestFollowupSummary,
+        packet_queue_items: latestFollowupSummary?.packet_queue_items || [],
         next_action: 'Run the preliminary replay artifact, review candidate obstruction/clash/sleeve/firestop/vector/3D rows, and attach official evidence before any regulated claim.',
         acceptable_evidence: [
           'HaloFire employee preliminary replay review',
@@ -4260,7 +4467,7 @@ app.post('/api/projects/:name/pdf-boundary-decision', authMiddleware, requireRol
   }
 });
 
-function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence = null, sam31Evidence = null, sam31ReplacementEvidence = null, sam31SmokeEvidence = null, sam31ExtrapolationEvidence = null, sam31ExtrapolationReviewEvidence = null, sam31ConsumerSmokeEvidence = null, sam31ConsumerReviewEvidences = [], sam31SprinklerReviewDecisionEvidences = []) {
+function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence = null, sam31Evidence = null, sam31ReplacementEvidence = null, sam31SmokeEvidence = null, sam31ExtrapolationEvidence = null, sam31ExtrapolationReviewEvidence = null, sam31ConsumerSmokeEvidence = null, sam31ConsumerReviewEvidences = [], sam31SprinklerReviewDecisionEvidences = [], sam31SprinklerPreliminaryReplayFollowupDecisionEvidences = []) {
   if (!evidence || !decision) return null;
   const candidate = decision.candidate || {};
   const pdfRef = evidence.source_file || decision.sourceFile || evidence.source_ref || decision.sourceRef || `${projectName}:pdf-boundary:${evidence.id}`;
@@ -4405,7 +4612,7 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
     latestOpenClawSam31ConsumerReviews,
   );
   const sam31SprinklerReviewQueueItems = openClawSam31SprinklerReviewQueueItems(projectName, evidence, decision, sam31ConsumerReviewEvidences, sam31SprinklerReviewDecisionEvidences);
-  const sam31SprinklerPreliminaryReplayQueueItems = halofireSam31SprinklerPreliminaryReplayQueueItems(projectName, evidence, decision, sam31ConsumerReviewEvidences, sam31SprinklerReviewDecisionEvidences);
+  const sam31SprinklerPreliminaryReplayQueueItems = halofireSam31SprinklerPreliminaryReplayQueueItems(projectName, evidence, decision, sam31ConsumerReviewEvidences, sam31SprinklerReviewDecisionEvidences, sam31SprinklerPreliminaryReplayFollowupDecisionEvidences);
   let status = 'ready';
   let nextAction = 'Open the selected PDF sheet with these defaults, run a room-boundary visual audit packet, and attach employee review evidence before any geometry-accuracy claim.';
   if (latestReview?.review_decision === 'corrected') {
@@ -6719,6 +6926,7 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
   const sam31ConsumerSmokeEvidence = evidence ? latestOpenClawSam31ConsumerSmokeArtifactEvidence(projectName, evidence.id) : null;
   const sam31ConsumerReviewEvidences = evidence ? latestOpenClawSam31ConsumerReviewEvidence(projectName, evidence.id) : [];
   const sam31SprinklerReviewDecisionEvidences = evidence ? latestHalofireSam31SprinklerReviewDecisionEvidence(projectName, evidence.id) : [];
+  const sam31SprinklerPreliminaryReplayFollowupDecisionEvidences = evidence ? latestHalofireSam31SprinklerPreliminaryReplayFollowupDecisionEvidence(projectName, evidence.id) : [];
   const items = [];
   const officialFlowEvidence = latestOfficialFlowIntakeEvidence(projectName);
   const officialFlowItem = officialFlowResolverQueueItem(projectName, officialFlowEvidence);
@@ -6727,7 +6935,7 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
     const replayItem = officialFlowReplayReviewQueueItem(projectName, replayEvidence);
     if (replayItem) items.push(replayItem);
   }
-  const boundaryItem = pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence, sam31Evidence, sam31ReplacementEvidence, sam31SmokeEvidence, sam31ExtrapolationEvidence, sam31ExtrapolationReviewEvidence, sam31ConsumerSmokeEvidence, sam31ConsumerReviewEvidences, sam31SprinklerReviewDecisionEvidences);
+  const boundaryItem = pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence, sam31Evidence, sam31ReplacementEvidence, sam31SmokeEvidence, sam31ExtrapolationEvidence, sam31ExtrapolationReviewEvidence, sam31ConsumerSmokeEvidence, sam31ConsumerReviewEvidences, sam31SprinklerReviewDecisionEvidences, sam31SprinklerPreliminaryReplayFollowupDecisionEvidences);
   if (boundaryItem) items.push(boundaryItem);
   const catalogEvidence = matchingCatalogEvidenceByFamily(projectName);
   for (const row of currentSourceAcquisitionLedger()) {
@@ -6799,6 +7007,8 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
       sam31_sprinkler_review_queue_items: visibleItems.reduce((acc, item) => acc + (Array.isArray(item.sam31_sprinkler_review_queue_items) ? item.sam31_sprinkler_review_queue_items.length : 0), 0),
       sam31_sprinkler_review_decisions_recorded: visibleItems.reduce((acc, item) => acc + (Array.isArray(item.sam31_sprinkler_review_queue_items) ? item.sam31_sprinkler_review_queue_items.filter((row) => row.latest_sam31_sprinkler_review_decision).length : 0), 0),
       sam31_sprinkler_preliminary_replay_queue_items: visibleItems.reduce((acc, item) => acc + (Array.isArray(item.sam31_sprinkler_preliminary_replay_queue_items) ? item.sam31_sprinkler_preliminary_replay_queue_items.length : 0), 0),
+      sam31_sprinkler_preliminary_replay_followups_recorded: visibleItems.reduce((acc, item) => acc + (Array.isArray(item.sam31_sprinkler_preliminary_replay_queue_items) ? item.sam31_sprinkler_preliminary_replay_queue_items.filter((row) => row.latest_sam31_sprinkler_preliminary_replay_followup_decision).length : 0), 0),
+      sam31_sprinkler_packet_queue_items: visibleItems.reduce((acc, item) => acc + (Array.isArray(item.sam31_sprinkler_preliminary_replay_queue_items) ? item.sam31_sprinkler_preliminary_replay_queue_items.reduce((rowAcc, row) => rowAcc + (Array.isArray(row.packet_queue_items) ? row.packet_queue_items.length : 0), 0) : 0), 0),
       catalog_source_needed: statusCounts.catalog_source_needed || 0,
       catalog_review_needed: statusCounts.catalog_review_needed || 0,
       catalog_evidence_recorded: statusCounts.catalog_evidence_recorded || 0,
@@ -7473,6 +7683,86 @@ app.get('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/openclaw/
       sprinklerReviewEvidence,
       sprinklerReview,
     ));
+  } catch (err) {
+    return res.status(err.httpStatus || 400).json({ error: err.message });
+  }
+});
+
+app.post('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/openclaw/sam31/sprinkler-review/:reviewEvidenceId/decision/:sprinklerReviewEvidenceId/preliminary-replay/followup', authMiddleware, requireRole('admin'), (req, res) => {
+  try {
+    const projectName = req.params.name;
+    const evidenceId = Number(req.params.evidenceId);
+    const reviewEvidenceId = Number(req.params.reviewEvidenceId);
+    const sprinklerReviewEvidenceId = Number(req.params.sprinklerReviewEvidenceId);
+    if (!Number.isSafeInteger(evidenceId) || evidenceId <= 0) {
+      return res.status(400).json({ error: 'A positive evidence id is required' });
+    }
+    if (!Number.isSafeInteger(reviewEvidenceId) || reviewEvidenceId <= 0) {
+      return res.status(400).json({ error: 'A positive SAM31 consumer review evidence id is required' });
+    }
+    if (!Number.isSafeInteger(sprinklerReviewEvidenceId) || sprinklerReviewEvidenceId <= 0) {
+      return res.status(400).json({ error: 'A positive SAM31 sprinkler review decision evidence id is required' });
+    }
+    const evidence = db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'pdf_boundary_decision'`)
+      .get(evidenceId, projectName);
+    const decision = decisionFromEvidence(evidence);
+    if (!evidence || !decision) {
+      return res.status(404).json({ error: 'PDF boundary decision evidence not found' });
+    }
+    const reviewEvidence = db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'openclaw_sam31_consumer_review'`)
+      .get(reviewEvidenceId, projectName);
+    const review = openClawSam31ConsumerReviewFromEvidence(reviewEvidence);
+    if (!reviewEvidence || !review) {
+      return res.status(404).json({ error: 'SAM31 consumer review evidence not found' });
+    }
+    const sprinklerReviewEvidence = db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'halofire_sam31_sprinkler_review_decision'`)
+      .get(sprinklerReviewEvidenceId, projectName);
+    const sprinklerReview = halofireSam31SprinklerReviewDecisionFromEvidence(sprinklerReviewEvidence);
+    if (!sprinklerReviewEvidence || !sprinklerReview) {
+      return res.status(404).json({ error: 'HaloFire SAM31 sprinkler review decision evidence not found' });
+    }
+    const followup = normalizeHalofireSam31SprinklerPreliminaryReplayFollowupDecision(
+      projectName,
+      evidence,
+      decision,
+      reviewEvidence,
+      review,
+      sprinklerReviewEvidence,
+      sprinklerReview,
+      req.body,
+      req.user,
+    );
+    const notes = {
+      kind: 'halofire_sam31_sprinkler_preliminary_replay_followup_decision',
+      followup,
+      blocked_claims: followup.blocked_claims,
+      claim_gate_effect: followup.claim_gate_effect,
+      limitations: followup.limitations,
+    };
+    const result = db
+      .prepare(`INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+                VALUES (?, ?, ?, ?, ?, ?)`)
+      .run(
+        projectName,
+        'halofire_sam31_sprinkler_preliminary_replay_followup_decision',
+        evidence.source_file || decision.sourceFile || null,
+        followup.review_ref,
+        'present',
+        JSON.stringify(notes),
+      );
+    const evidenceRow = db.prepare('SELECT * FROM project_evidence WHERE id = ?').get(result.lastInsertRowid);
+    return res.status(201).json({
+      id: result.lastInsertRowid,
+      message: 'HaloFire SAM31 preliminary replay follow-up recorded; claims still blocked',
+      evidence: evidenceRow,
+      ...followup,
+    });
   } catch (err) {
     return res.status(err.httpStatus || 400).json({ error: err.message });
   }

@@ -294,6 +294,13 @@ describe('studio static origin handling', () => {
     expect(html).toContain('/preliminary-replay');
     expect(html).toContain('sam31SprinklerReplay=ready');
     expect(html).toContain('halofire.sam31_sprinkler_preliminary_replay_artifact.v1');
+    expect(html).toContain('halofire.sam31_sprinkler_preliminary_replay_followup_decision.v1');
+    expect(html).toContain('halofire.sam31_obstruction_clash_packet_queue_item.v1');
+    expect(html).toContain('halofire.sam31_sleeve_firestop_packet_queue_item.v1');
+    expect(html).toContain('Save SAM31 preliminary replay follow-up');
+    expect(html).toContain('saveHalofireSam31SprinklerPreliminaryReplayFollowup');
+    expect(html).toContain('data-sam31-sprinkler-preliminary-replay-followup-evidence-id');
+    expect(html).toContain('/preliminary-replay/followup');
     expect(html).toContain('halofire.sam31_sprinkler_review_decision.v1');
     expect(html).toContain('latest_sam31_sprinkler_review_decision');
     expect(html).toContain('supported_applications');
