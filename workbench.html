@@ -729,6 +729,21 @@ async function downloadCatalogSourceEvidencePacket(familyRef) {
   URL.revokeObjectURL(a.href);
 }
 
+async function downloadCatalogApprovalResolverPacket(button) {
+  const familyRef = button.dataset.catalogSourceApprovalPacketFamilyRef || '';
+  const rowKey = button.dataset.catalogSourceApprovalPacketRowKey || '';
+  const refField = document.getElementById('catalogApprovalRefField-' + rowKey)?.value || 'manufacturer_model_approval_ref';
+  const targetGate = document.getElementById('catalogApprovalTargetGate-' + rowKey)?.value || 'MANUFACTURER_MODEL_APPROVAL_MISSING';
+  const query = new URLSearchParams({ approval_ref_field: refField, target_gate_code: targetGate });
+  const packet = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/resolver-packets/catalog-source/' + encodeURIComponent(familyRef) + '/approval-packet?' + query.toString());
+  const blob = new Blob([JSON.stringify(packet, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = packet.download_name || 'catalog-approval-resolver-packet.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
 const CATALOG_APPROVAL_GATE_OPTIONS = [
   {
     approval_ref_field: 'manufacturer_model_approval_ref',
@@ -820,6 +835,7 @@ ${renderCatalogApprovalGateOptions()}
       <input id="catalogApprovalOrganization-${rowKey}" placeholder="organization (optional)" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
       <input id="catalogApprovalLicenseId-${rowKey}" placeholder="license_id (optional)" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
       <textarea id="catalogApprovalNotes-${rowKey}" placeholder="notes" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px;height:44px"></textarea>
+      <button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#0f766e" data-catalog-source-approval-packet-family-ref="${escapeHtml(defaults.family_ref || '')}" data-catalog-source-approval-packet-row-key="${rowKey}">Download selected approval packet</button>
       <button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#15803d" data-catalog-source-approval-family-ref="${escapeHtml(defaults.family_ref || '')}" data-catalog-source-approval-row-key="${rowKey}" data-catalog-source-approval-action="Upload signed manufacturer model approval">Upload signed manufacturer model approval</button>
       <div class="muted" id="catalogApprovalValidationStatus-${rowKey}" style="font-size:11px"></div>
     </div>
@@ -864,6 +880,9 @@ function bindCatalogSourceEvidenceButtons() {
   });
   document.querySelectorAll('[data-catalog-source-packet-family-ref]').forEach((button) => {
     button.onclick = () => downloadCatalogSourceEvidencePacket(button.dataset.catalogSourcePacketFamilyRef);
+  });
+  document.querySelectorAll('[data-catalog-source-approval-packet-family-ref]').forEach((button) => {
+    button.onclick = () => downloadCatalogApprovalResolverPacket(button);
   });
   document.querySelectorAll('[id^="catalogApprovalRefField-"]').forEach((select) => {
     const rowKey = select.id.replace('catalogApprovalRefField-', '');

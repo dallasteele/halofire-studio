@@ -362,6 +362,7 @@ async function runBrowserSmoke(token, evidenceIds) {
     });
     const catalogRowKey = 'family:pipe_steel_sch40_2p0in';
     await page.waitForSelector('text=Next action: Upload signed manufacturer model approval', { timeout: 8_000 });
+    await page.waitForSelector('text=Download selected approval packet', { timeout: 8_000 });
     await page.locator(`[id="catalogApprovalRefField-${catalogRowKey}"]`).selectOption('professional_or_ahj_review_ref');
     await page.waitForFunction((rowKey) => {
       const gate = document.getElementById('catalogApprovalTargetGate-' + rowKey);
@@ -373,6 +374,23 @@ async function runBrowserSmoke(token, evidenceIds) {
         && disabledManufacturerGate
         && button?.textContent.includes('Upload signed professional review');
     }, catalogRowKey, { timeout: 8_000 });
+    const professionalApprovalPacketPromise = page.waitForEvent('download');
+    await page.locator('[data-catalog-source-approval-packet-family-ref="family:pipe_steel_sch40_2p0in"]').first().click();
+    const professionalApprovalPacketDownload = await professionalApprovalPacketPromise;
+    const professionalApprovalPacketPath = await professionalApprovalPacketDownload.path();
+    const professionalApprovalPacketSuggestedName = professionalApprovalPacketDownload.suggestedFilename();
+    const professionalApprovalPacketBytes = professionalApprovalPacketPath ? fs.statSync(professionalApprovalPacketPath).size : 0;
+    downloads.push({ suggestedName: professionalApprovalPacketSuggestedName, bytes: professionalApprovalPacketBytes });
+    if (!professionalApprovalPacketSuggestedName.includes('catalog-approval-professional-review-packet') || professionalApprovalPacketBytes <= 0) {
+      throw new Error(`Unexpected professional catalog approval packet download ${professionalApprovalPacketSuggestedName} (${professionalApprovalPacketBytes} bytes)`);
+    }
+    const professionalApprovalPacket = JSON.parse(fs.readFileSync(professionalApprovalPacketPath, 'utf8'));
+    if (professionalApprovalPacket.artifact_type !== 'halofire.catalog_approval_resolver_packet.v1'
+      || professionalApprovalPacket.approval_ref_field !== 'professional_or_ahj_review_ref'
+      || professionalApprovalPacket.target_gate_code !== 'PROFESSIONAL_REVIEW_MISSING'
+      || professionalApprovalPacket.claim_gate_effect !== 'no_claims_cleared') {
+      throw new Error(`Professional catalog approval packet lost fail-closed resolver truth: ${JSON.stringify(professionalApprovalPacket)}`);
+    }
     await page.locator(`[id="catalogApprovalTargetGate-${catalogRowKey}"]`).selectOption('AHJ_APPROVAL_MISSING');
     await page.waitForSelector('text=Next action: Upload signed AHJ approval', { timeout: 8_000 });
     await page.locator(`[id="catalogApprovalRefField-${catalogRowKey}"]`).selectOption('autosprink_or_equivalent_export_ref');
@@ -383,6 +401,23 @@ async function runBrowserSmoke(token, evidenceIds) {
         && gate.value === 'AUTOSPRINK_EVIDENCE_MISSING'
         && button?.textContent.includes('Upload signed AutoSprink/equivalent export');
     }, catalogRowKey, { timeout: 8_000 });
+    const autosprinkApprovalPacketPromise = page.waitForEvent('download');
+    await page.locator('[data-catalog-source-approval-packet-family-ref="family:pipe_steel_sch40_2p0in"]').first().click();
+    const autosprinkApprovalPacketDownload = await autosprinkApprovalPacketPromise;
+    const autosprinkApprovalPacketPath = await autosprinkApprovalPacketDownload.path();
+    const autosprinkApprovalPacketSuggestedName = autosprinkApprovalPacketDownload.suggestedFilename();
+    const autosprinkApprovalPacketBytes = autosprinkApprovalPacketPath ? fs.statSync(autosprinkApprovalPacketPath).size : 0;
+    downloads.push({ suggestedName: autosprinkApprovalPacketSuggestedName, bytes: autosprinkApprovalPacketBytes });
+    if (!autosprinkApprovalPacketSuggestedName.includes('catalog-approval-autosprink-packet') || autosprinkApprovalPacketBytes <= 0) {
+      throw new Error(`Unexpected AutoSprink catalog approval packet download ${autosprinkApprovalPacketSuggestedName} (${autosprinkApprovalPacketBytes} bytes)`);
+    }
+    const autosprinkApprovalPacket = JSON.parse(fs.readFileSync(autosprinkApprovalPacketPath, 'utf8'));
+    if (autosprinkApprovalPacket.artifact_type !== 'halofire.catalog_approval_resolver_packet.v1'
+      || autosprinkApprovalPacket.approval_ref_field !== 'autosprink_or_equivalent_export_ref'
+      || autosprinkApprovalPacket.target_gate_code !== 'AUTOSPRINK_EVIDENCE_MISSING'
+      || autosprinkApprovalPacket.claim_gate_effect !== 'no_claims_cleared') {
+      throw new Error(`AutoSprink catalog approval packet lost fail-closed resolver truth: ${JSON.stringify(autosprinkApprovalPacket)}`);
+    }
     await page.locator(`[id="catalogApprovalRefField-${catalogRowKey}"]`).selectOption('manufacturer_model_approval_ref');
     await page.waitForFunction((rowKey) => {
       const gate = document.getElementById('catalogApprovalTargetGate-' + rowKey);

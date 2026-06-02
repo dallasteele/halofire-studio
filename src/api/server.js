@@ -5626,6 +5626,49 @@ const CATALOG_APPROVAL_VALIDATION_RULES = Object.freeze({
   }),
 });
 
+const CATALOG_APPROVAL_PACKET_DETAILS = Object.freeze({
+  manufacturer_approval: Object.freeze({
+    slug: 'manufacturer-model',
+    acceptableEvidence: Object.freeze([
+      'signed manufacturer model approval',
+      'manufacturer catalog page or exact part/model approval reference',
+      'reviewer license or authority reference when available',
+    ]),
+    blockedClaims: Object.freeze(['manufacturer_exact', 'fabrication_ready']),
+    nextAction: 'Upload signed manufacturer model approval evidence for this exact catalog family.',
+  }),
+  professional_review: Object.freeze({
+    slug: 'professional-review',
+    acceptableEvidence: Object.freeze([
+      'signed licensed professional review package',
+      'reviewer license or authority reference when available',
+      'source-linked calculation/export packet',
+    ]),
+    blockedClaims: Object.freeze(['permit_ready', 'engineering_grade', 'professionally_approved', 'PE_review']),
+    nextAction: 'Upload signed professional review evidence before claiming engineering-grade, professional, permit, or fabrication readiness.',
+  }),
+  ahj_approval: Object.freeze({
+    slug: 'ahj-approval',
+    acceptableEvidence: Object.freeze([
+      'signed AHJ approval or review response',
+      'AHJ jurisdiction/contact reference',
+      'source-linked submittal or response packet',
+    ]),
+    blockedClaims: Object.freeze(['permit_ready', 'AHJ_ready', 'AHJ_approval']),
+    nextAction: 'Upload signed AHJ approval or review response before claiming AHJ-ready or permit-ready status.',
+  }),
+  autosprink_packet: Object.freeze({
+    slug: 'autosprink',
+    acceptableEvidence: Object.freeze([
+      'AutoSprink or equivalent model export',
+      'source-linked calculation/export packet',
+      'reviewer signoff tying the export to this HaloFire catalog family',
+    ]),
+    blockedClaims: Object.freeze(['AutoSprink_parity']),
+    nextAction: 'Upload signed AutoSprink/equivalent export evidence before claiming AutoSprink parity.',
+  }),
+});
+
 function catalogApprovalValidationSpec(body) {
   const approvalRefField = String(body?.approval_ref_field || '').trim();
   const rule = CATALOG_APPROVAL_VALIDATION_RULES[approvalRefField];
@@ -5643,6 +5686,100 @@ function catalogApprovalValidationSpec(body) {
     throw e;
   }
   return { approvalRefField, targetGateCode: requestedGateCode, evidenceType };
+}
+
+function catalogApprovalResolverPacket(projectName, familyRef, body) {
+  const row = currentSourceAcquisitionLedger().find((entry) => entry && entry.family_ref === familyRef);
+  if (!row) {
+    const e = new Error('Catalog source acquisition row not found');
+    e.httpStatus = 404;
+    throw e;
+  }
+  const { approvalRefField, targetGateCode, evidenceType } = catalogApprovalValidationSpec(body);
+  ensureProjectClaimGates(projectName);
+  const gate = db
+    .prepare('SELECT * FROM claim_gates WHERE project_name = ? AND code = ?')
+    .get(projectName, targetGateCode);
+  if (!gate) {
+    const e = new Error(`Claim gate ${targetGateCode} is not configured for ${projectName}`);
+    e.httpStatus = 404;
+    throw e;
+  }
+  const matchedEvidence = matchingCatalogEvidenceByFamily(projectName).get(familyRef) || null;
+  const sourcePacket = catalogSourceEvidencePacket(projectName, familyRef);
+  const detail = CATALOG_APPROVAL_PACKET_DETAILS[evidenceType] || CATALOG_APPROVAL_PACKET_DETAILS.manufacturer_approval;
+  const sourceRefs = [];
+  if (sourcePacket) {
+    sourceRefs.push({
+      artifact_type: sourcePacket.artifact_type,
+      source_ref: sourcePacket.source_ref,
+      claim_gate_effect: sourcePacket.claim_gate_effect,
+    });
+  }
+  if (matchedEvidence?.evidence) {
+    sourceRefs.push({
+      evidence_id: matchedEvidence.evidence.id,
+      evidence_type: matchedEvidence.evidence.evidence_type,
+      source_ref: matchedEvidence.evidence.source_ref || null,
+      status: matchedEvidence.evidence.status || null,
+    });
+  }
+  return {
+    artifact_type: 'halofire.catalog_approval_resolver_packet.v1',
+    status: 'ready_for_signed_evidence_upload',
+    project_name: projectName,
+    family_ref: row.family_ref,
+    component_key: row.component_key || null,
+    description: row.description || null,
+    generated_at: new Date().toISOString(),
+    download_name: `${slugForDownloadName(projectName)}-catalog-approval-${detail.slug}-packet-${slugForDownloadName(row.family_ref)}.json`,
+    approval_ref_field: approvalRefField,
+    target_gate_code: targetGateCode,
+    required_evidence_type: evidenceType,
+    upload_route: `/api/projects/${encodeURIComponent(projectName)}/resolver-packets/catalog-source/${encodeURIComponent(familyRef)}/approval-validation`,
+    required_upload_body: {
+      approval_ref_field: approvalRefField,
+      target_gate_code: targetGateCode,
+      source_ref: '<signed evidence source ref>',
+      source_file: '<signed evidence file or URL>',
+      signoff: {
+        reviewer_name: '<required>',
+        reviewer_title: '<required>',
+        signed_at: '<ISO-8601 required>',
+        organization: '<optional>',
+        license_id: '<optional but preferred>',
+      },
+    },
+    required_signoff_fields: ['reviewer_name', 'reviewer_title', 'signed_at'],
+    optional_signoff_fields: ['organization', 'license_id'],
+    acceptable_evidence: [...detail.acceptableEvidence],
+    source_refs: sourceRefs,
+    source_catalog_packet: sourcePacket ? {
+      artifact_type: sourcePacket.artifact_type,
+      family_ref: sourcePacket.family_ref,
+      source_ref: sourcePacket.source_ref,
+      latest_catalog_source_acquisition: sourcePacket.latest_catalog_source_acquisition,
+      claim_gate_effect: sourcePacket.claim_gate_effect,
+    } : null,
+    claim_gate: {
+      code: gate.code,
+      status: gate.status,
+      missing_artifact: gate.missing_artifact,
+      acceptable_evidence: gate.acceptable_evidence,
+      blocked_claims: safeParseJsonArray(gate.blocked_claims),
+      next_action: gate.next_action,
+    },
+    next_action: detail.nextAction,
+    use_for_claims: false,
+    claim_gate_effect: 'no_claims_cleared',
+    no_claim_gates_cleared: true,
+    blocked_claims: uniqueStrings([...detail.blockedClaims, ...safeParseJsonArray(gate.blocked_claims)]),
+    limitations: [
+      'This packet organizes the exact signed-evidence upload lane only; downloading it does not clear any claim gate.',
+      'SAM/OpenClaw observations, catalog evidence, and AI extrapolations remain review support until the required signed evidence is uploaded and validated.',
+      'Do not claim permit-ready, fabrication-ready, AHJ-ready, engineering-grade, professionally approved, or AutoSprink parity from this packet alone.',
+    ],
+  };
 }
 
 function validateCatalogSourceApproval(projectName, familyRef, body, user) {
@@ -9182,6 +9319,15 @@ app.get('/api/projects/:name/resolver-packets/catalog-source/:familyRef/review-p
     if (!packet) {
       return res.status(404).json({ error: 'Catalog source acquisition row not found' });
     }
+    return res.json(packet);
+  } catch (err) {
+    return res.status(err.httpStatus || 400).json({ error: err.message });
+  }
+});
+
+app.get('/api/projects/:name/resolver-packets/catalog-source/:familyRef/approval-packet', authMiddleware, (req, res) => {
+  try {
+    const packet = catalogApprovalResolverPacket(req.params.name, req.params.familyRef, req.query);
     return res.json(packet);
   } catch (err) {
     return res.status(err.httpStatus || 400).json({ error: err.message });

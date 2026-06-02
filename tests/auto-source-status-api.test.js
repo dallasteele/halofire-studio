@@ -374,6 +374,83 @@ describe('S5 GET /api/auto-source/status', () => {
     }
   });
 
+  it('downloads catalog approval resolver packets for professional/AHJ and AutoSprink evidence without clearing claims', async () => {
+    removeStatusFile();
+    const projectName = 'Home Depot - Rexburg ID';
+    const familyRef = 'family:pipe_steel_sch40_2p0in';
+    const packetUrl = `${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-packets/catalog-source/${encodeURIComponent(familyRef)}/approval-packet`;
+
+    const professionalPacketRes = await fetch(`${packetUrl}?approval_ref_field=professional_or_ahj_review_ref&target_gate_code=PROFESSIONAL_REVIEW_MISSING`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(professionalPacketRes.status).toBe(200);
+    const professionalPacket = await professionalPacketRes.json();
+    expect(professionalPacket).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.catalog_approval_resolver_packet.v1',
+      project_name: projectName,
+      family_ref: familyRef,
+      approval_ref_field: 'professional_or_ahj_review_ref',
+      target_gate_code: 'PROFESSIONAL_REVIEW_MISSING',
+      required_evidence_type: 'professional_review',
+      claim_gate_effect: 'no_claims_cleared',
+      use_for_claims: false,
+      upload_route: `/api/projects/${encodeURIComponent(projectName)}/resolver-packets/catalog-source/${encodeURIComponent(familyRef)}/approval-validation`,
+    }));
+    expect(professionalPacket.download_name).toMatch(/catalog-approval-professional-review-packet/);
+    expect(professionalPacket.required_signoff_fields).toEqual(expect.arrayContaining([
+      'reviewer_name',
+      'reviewer_title',
+      'signed_at',
+    ]));
+    expect(professionalPacket.acceptable_evidence).toEqual(expect.arrayContaining([
+      'signed licensed professional review package',
+      'reviewer license or authority reference when available',
+    ]));
+    expect(professionalPacket.blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'engineering_grade',
+      'professionally_approved',
+    ]));
+
+    const ahjPacketRes = await fetch(`${packetUrl}?approval_ref_field=professional_or_ahj_review_ref&target_gate_code=AHJ_APPROVAL_MISSING`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(ahjPacketRes.status).toBe(200);
+    const ahjPacket = await ahjPacketRes.json();
+    expect(ahjPacket).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.catalog_approval_resolver_packet.v1',
+      approval_ref_field: 'professional_or_ahj_review_ref',
+      target_gate_code: 'AHJ_APPROVAL_MISSING',
+      required_evidence_type: 'ahj_approval',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(ahjPacket.download_name).toMatch(/catalog-approval-ahj-approval-packet/);
+    expect(ahjPacket.acceptable_evidence).toEqual(expect.arrayContaining([
+      'signed AHJ approval or review response',
+      'AHJ jurisdiction/contact reference',
+    ]));
+
+    const autosprinkPacketRes = await fetch(`${packetUrl}?approval_ref_field=autosprink_or_equivalent_export_ref&target_gate_code=AUTOSPRINK_EVIDENCE_MISSING`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(autosprinkPacketRes.status).toBe(200);
+    const autosprinkPacket = await autosprinkPacketRes.json();
+    expect(autosprinkPacket).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.catalog_approval_resolver_packet.v1',
+      approval_ref_field: 'autosprink_or_equivalent_export_ref',
+      target_gate_code: 'AUTOSPRINK_EVIDENCE_MISSING',
+      required_evidence_type: 'autosprink_packet',
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(autosprinkPacket.download_name).toMatch(/catalog-approval-autosprink-packet/);
+    expect(autosprinkPacket.acceptable_evidence).toEqual(expect.arrayContaining([
+      'AutoSprink or equivalent model export',
+      'source-linked calculation/export packet',
+    ]));
+    expect(autosprinkPacket.limitations.join(' ')).toMatch(/does not clear/i);
+  });
+
   it('adds official-flow intake resolver items with documented defaults or exact intake blockers', async () => {
     const homeDepotRes = await fetch(`${BASE}/api/projects/Home%20Depot%20-%20Rexburg%20ID/resolver-queue`, {
       headers: { Authorization: `Bearer ${token}` },

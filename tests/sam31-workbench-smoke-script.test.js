@@ -107,5 +107,9 @@ describe('SAM31 workbench browser smoke script', () => {
     expect(script).toContain('Upload signed AutoSprink/equivalent export');
     expect(script).toContain('disabledManufacturerGate');
     expect(script).toContain('catalogApprovalTargetGate');
+    expect(script).toContain('catalog-approval-professional-review-packet');
+    expect(script).toContain('catalog-approval-autosprink-packet');
+    expect(script).toContain('halofire.catalog_approval_resolver_packet.v1');
+    expect(script).toContain('Download selected approval packet');
   });
 });

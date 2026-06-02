@@ -172,6 +172,10 @@ describe('studio static origin handling', () => {
     expect(html).toContain('Upload signed AHJ approval');
     expect(html).toContain('Upload signed AutoSprink/equivalent export');
     expect(html).toContain('catalogApprovalNextAction');
+    expect(html).toContain('downloadCatalogApprovalResolverPacket');
+    expect(html).toContain('/approval-packet');
+    expect(html).toContain('data-catalog-source-approval-packet-family-ref');
+    expect(html).toContain('Download selected approval packet');
     expect(html).toContain('data-catalog-source-approval-family-ref');
     expect(html).toContain('catalogApprovalReviewerName');
     expect(html).toContain('catalogApprovalSignedAt');
