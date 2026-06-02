@@ -1,3 +1,4 @@
+import crypto from 'node:crypto';
 import express from 'express';
 import { z } from 'zod';
 import { readCooperative1881BidPackage } from '../data/cooperative-1881-bid-package.js';
@@ -65,6 +66,19 @@ const ExtrapolatePayloadSchema = z.object({
   object_hypotheses: z.array(z.record(z.unknown())).default([]),
 }).passthrough();
 
+const ConsumerQueueHandoffSchema = z.object({
+  artifact_type: z.literal('openclaw.sam31.consumer_queue_handoff.v1'),
+  source_application: z.string().min(1).default('halo_fire'),
+  source_project_name: z.string().min(1).optional(),
+  source_pdf_boundary_evidence_id: z.union([z.number().int().positive(), z.string().min(1)]).optional(),
+  source_openclaw_sam31_extrapolation_evidence_id: z.union([z.number().int().positive(), z.string().min(1)]).optional(),
+  product_review_queue_item: z.object({
+    artifact_type: z.literal('openclaw.sam31.product_review_queue_item.v1'),
+  }).passthrough(),
+  use_for_claims: z.boolean().optional().default(false),
+  claim_gate_effect: z.string().min(1).default(CLAIM_GATE_EFFECT),
+}).passthrough();
+
 function errorResponse(status, code, message, refs = []) {
   return {
     status,
@@ -113,6 +127,21 @@ function normalizeImageSize(payload) {
 
 function round(n) {
   return Math.round((Number(n) + Number.EPSILON) * 1e6) / 1e6;
+}
+
+function stableJson(value) {
+  if (Array.isArray(value)) return `[${value.map((item) => stableJson(item)).join(',')}]`;
+  if (value && typeof value === 'object') {
+    return `{${Object.keys(value)
+      .sort()
+      .map((key) => `${JSON.stringify(key)}:${stableJson(value[key])}`)
+      .join(',')}}`;
+  }
+  return JSON.stringify(value);
+}
+
+function shortHash(value) {
+  return crypto.createHash('sha256').update(stableJson(value)).digest('hex').slice(0, 16);
 }
 
 function rectPolygon(w, h, leftRatio, topRatio, rightRatio, bottomRatio) {
@@ -532,6 +561,126 @@ function invokeExtrapolate(args) {
   };
 }
 
+export function sam31ToolDescriptorBody() {
+  return {
+    artifact_type: 'openclaw.sam31_llm_extrapolation_tool',
+    status: 'ready',
+    source_runtime: 'halofire-local-sam31-bridge',
+    input_lanes: ['image_ref', 'sections', 'object_hypotheses', 'prompt'],
+    output_lanes: ['llm_observations', 'vector_overlays', 'model_3d_candidates', 'extrapolation_index'],
+    supported_applications: ['halo_fire', 'landscout', 'nameforge'],
+    perception_lanes: ['segmentation', 'object_identification', 'vector_overlay', 'model_3d_candidate', 'spatial_observation'],
+    action: {
+      method: 'POST',
+      href: '/vision/sam31/extrapolate',
+      contract_ref: 'openclaw.sam31_extrapolation_contract',
+      claim_gate_effect: CLAIM_GATE_EFFECT,
+    },
+    product_review_queue_contract: {
+      artifact_type: 'openclaw.sam31.product_review_queue_contract.v1',
+      status: 'ready',
+      source_runtime: 'halofire-local-sam31-bridge',
+      supported_applications: ['halo_fire', 'landscout', 'nameforge'],
+      requires_review_before_claims: true,
+      use_for_claims: false,
+      claim_gate_effect: CLAIM_GATE_EFFECT,
+    },
+    consumer_actions: {
+      landscout: {
+        method: 'POST',
+        href: '/landscout/sam31/product-review-queue',
+        consumes: 'openclaw.sam31.product_review_queue_item.v1',
+        artifact_type: 'openclaw.sam31.consumer_review_queue.landscout.v1',
+        claim_gate_effect: CLAIM_GATE_EFFECT,
+      },
+      nameforge: {
+        method: 'POST',
+        href: '/nameforge/sam31/product-review-queue',
+        consumes: 'openclaw.sam31.product_review_queue_item.v1',
+        artifact_type: 'openclaw.sam31.consumer_review_queue.nameforge.v1',
+        claim_gate_effect: CLAIM_GATE_EFFECT,
+      },
+    },
+    application_contracts: {
+      halo_fire: {
+        contract_ref: 'openclaw.sam31.application_contract.halo_fire.v1',
+      },
+      landscout: {
+        contract_ref: 'openclaw.sam31.application_contract.landscout.v1',
+      },
+      nameforge: {
+        contract_ref: 'openclaw.sam31.application_contract.nameforge.v1',
+      },
+    },
+    temporary_value_policy: 'best_guess_until_employee_replaced',
+    acceptable_human_updates: ['semantic_label', 'polygon', 'bbox', 'object_hypothesis', 'vector_overlay', 'model_3d_candidate', 'source_ref', 'confidence'],
+    blocked_claims: BLOCKED_CLAIMS.slice(),
+    limitations: LIMITATIONS.slice(),
+    use_for_claims: false,
+    claim_gate_effect: CLAIM_GATE_EFFECT,
+  };
+}
+
+function acceptConsumerQueueHandoff(consumer, body) {
+  const parsed = ConsumerQueueHandoffSchema.safeParse(body);
+  if (!parsed.success) {
+    return errorResponse(
+      400,
+      `SAM31_${String(consumer).toUpperCase()}_QUEUE_BAD_HANDOFF`,
+      `Expected ${consumer} SAM31 queue handoff artifact openclaw.sam31.consumer_queue_handoff.v1 with product_review_queue_item.`,
+      ['artifact_type', 'product_review_queue_item'],
+    );
+  }
+  const handoff = parsed.data;
+  if (handoff.use_for_claims !== false || handoff.claim_gate_effect !== CLAIM_GATE_EFFECT) {
+    return errorResponse(
+      400,
+      `SAM31_${String(consumer).toUpperCase()}_QUEUE_CLAIM_GATE_VIOLATION`,
+      'SAM31 consumer queue handoffs must be use_for_claims=false and claim_gate_effect=no_claims_cleared.',
+      ['use_for_claims', 'claim_gate_effect'],
+    );
+  }
+  const queueId = `sam31-${consumer}-${shortHash({
+    consumer,
+    source_application: handoff.source_application,
+    source_project_name: handoff.source_project_name || handoff.product_review_queue_item.project_ref || null,
+    source_pdf_boundary_evidence_id: handoff.source_pdf_boundary_evidence_id || null,
+    source_openclaw_sam31_extrapolation_evidence_id: handoff.source_openclaw_sam31_extrapolation_evidence_id || null,
+    product_review_queue_item: handoff.product_review_queue_item,
+  })}`;
+  return {
+    status: 202,
+    body: {
+      artifact_type: `openclaw.sam31.consumer_review_queue.${consumer}.v1`,
+      status: 'queued_for_product_review',
+      consumer,
+      accepted: true,
+      queue_id: queueId,
+      persisted_review_packet_ref: `openclaw://${consumer}/sam31/product-review/${queueId}`,
+      source_application: handoff.source_application,
+      source_project_name: handoff.source_project_name || null,
+      source_pdf_boundary_evidence_id: handoff.source_pdf_boundary_evidence_id || null,
+      source_openclaw_sam31_extrapolation_evidence_id: handoff.source_openclaw_sam31_extrapolation_evidence_id || null,
+      product_review_queue_item_ref: handoff.product_review_queue_item.source_ref || handoff.product_review_queue_item.project_ref || null,
+      product_review_queue_item_artifact_type: handoff.product_review_queue_item.artifact_type,
+      extrapolation_index_count: Array.isArray(handoff.product_review_queue_item.extrapolation_index)
+        ? handoff.product_review_queue_item.extrapolation_index.length
+        : 0,
+      missing_evidence_row_count: Array.isArray(handoff.product_review_queue_item.missing_evidence_rows)
+        ? handoff.product_review_queue_item.missing_evidence_rows.length
+        : 0,
+      next_action: `${consumer} reviewer replaces or accepts SAM31 object/vector/3D best guesses before any product claim is promoted.`,
+      use_for_claims: false,
+      blocked_claims: BLOCKED_CLAIMS.slice(),
+      limitations: [
+        ...LIMITATIONS,
+        'This local queue intake proves only that the handoff was accepted for product review; it does not clear downstream product, professional, AHJ, production, survey, brand, trademark, or manufacturer claims.',
+      ],
+      claim_gate_effect: CLAIM_GATE_EFFECT,
+    },
+  };
+}
+
 /**
  * Handle one OpenClaw bridge invocation. Expected failures are returned as typed
  * response data so callers fail soft instead of fabricating evidence.
@@ -573,9 +722,19 @@ export function sam31StatusBody() {
       },
     },
     tools: [SAM31_FLOORPLAN_TOOL, 'sam-3.1-direct-payload'],
-    endpoints: ['/vision/sam31/extrapolate'],
+    endpoints: [
+      '/vision/sam31/tool',
+      '/vision/sam31/extrapolate',
+      '/landscout/sam31/product-review-queue',
+      '/nameforge/sam31/product-review-queue',
+    ],
+    consumer_queue_endpoints: {
+      landscout: '/landscout/sam31/product-review-queue',
+      nameforge: '/nameforge/sam31/product-review-queue',
+    },
     limitations: LIMITATIONS.slice(),
     blocked_claims: BLOCKED_CLAIMS.slice(),
+    claim_gate_effect: CLAIM_GATE_EFFECT,
   };
 }
 
@@ -591,6 +750,10 @@ export function createSam31BridgeApp() {
     res.json(sam31StatusBody());
   });
 
+  app.get('/vision/sam31/tool', (_req, res) => {
+    res.json(sam31ToolDescriptorBody());
+  });
+
   app.post('/codex-bridge/invoke', async (req, res) => {
     const out = await handleSam31BridgeInvoke(req.body);
     res.status(out.status).json(out.body);
@@ -598,6 +761,16 @@ export function createSam31BridgeApp() {
 
   app.post('/vision/sam31/extrapolate', async (req, res) => {
     const out = invokeExtrapolate(req.body);
+    res.status(out.status).json(out.body);
+  });
+
+  app.post('/landscout/sam31/product-review-queue', async (req, res) => {
+    const out = acceptConsumerQueueHandoff('landscout', req.body);
+    res.status(out.status).json(out.body);
+  });
+
+  app.post('/nameforge/sam31/product-review-queue', async (req, res) => {
+    const out = acceptConsumerQueueHandoff('nameforge', req.body);
     res.status(out.status).json(out.body);
   });
 

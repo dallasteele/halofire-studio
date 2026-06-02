@@ -122,6 +122,11 @@ describe('SAM 3.1 local bridge contract', () => {
     const statusBody = await status.json();
     expect(statusBody.services.openclaw.status).toBe('local-shim');
     expect(statusBody.services.sam31.status).toBe('online');
+    expect(statusBody.endpoints).toEqual(expect.arrayContaining([
+      '/vision/sam31/tool',
+      '/landscout/sam31/product-review-queue',
+      '/nameforge/sam31/product-review-queue',
+    ]));
 
     const invoke = await fetch(`${baseUrl}/codex-bridge/invoke`, {
       method: 'POST',
@@ -132,6 +137,86 @@ describe('SAM 3.1 local bridge contract', () => {
     const body = await invoke.json();
     expect(body.result.layers.building_outline).toHaveLength(4);
     expect(body.result.claim_gate_effect).toBe('no_claims_cleared');
+  });
+
+  it('advertises and accepts LandScout and NameForge SAM31 product review queue handoffs', async () => {
+    const tool = await fetch(`${baseUrl}/vision/sam31/tool`);
+    expect(tool.status).toBe(200);
+    const descriptor = await tool.json();
+    expect(descriptor).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31_llm_extrapolation_tool',
+      status: 'ready',
+      source_runtime: 'halofire-local-sam31-bridge',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(descriptor.consumer_actions.landscout).toEqual(expect.objectContaining({
+      method: 'POST',
+      href: '/landscout/sam31/product-review-queue',
+      consumes: 'openclaw.sam31.product_review_queue_item.v1',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(descriptor.consumer_actions.nameforge).toEqual(expect.objectContaining({
+      method: 'POST',
+      href: '/nameforge/sam31/product-review-queue',
+      consumes: 'openclaw.sam31.product_review_queue_item.v1',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+
+    const handoff = {
+      artifact_type: 'openclaw.sam31.consumer_queue_handoff.v1',
+      source_application: 'halo_fire',
+      source_project_name: 'The Cooperative 1881 - Salt Lake City UT',
+      source_pdf_boundary_evidence_id: 101,
+      source_openclaw_sam31_extrapolation_evidence_id: 202,
+      product_review_queue_item: {
+        artifact_type: 'openclaw.sam31.product_review_queue_item.v1',
+        application: 'halo_fire',
+        project_ref: 'halo_fire:The Cooperative 1881 - Salt Lake City UT',
+        source_ref: '1881://sam31/consumer-intake-test',
+        extrapolation_index: [
+          {
+            section_id: 'section-1881-test',
+            semantic_label: 'sleeve_or_firestop_candidate',
+            use_for_claims: false,
+            claim_gate_effect: 'no_claims_cleared',
+          },
+        ],
+        missing_evidence_rows: [
+          { code: 'HALOFIRE_1881_ROOM_BOUNDARY_EMPLOYEE_REVIEW_MISSING' },
+        ],
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      },
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    };
+
+    for (const [consumer, route] of [
+      ['landscout', '/landscout/sam31/product-review-queue'],
+      ['nameforge', '/nameforge/sam31/product-review-queue'],
+    ]) {
+      const response = await fetch(`${baseUrl}${route}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(handoff),
+      });
+      expect(response.status).toBe(202);
+      const body = await response.json();
+      expect(body).toEqual(expect.objectContaining({
+        artifact_type: `openclaw.sam31.consumer_review_queue.${consumer}.v1`,
+        status: 'queued_for_product_review',
+        consumer,
+        accepted: true,
+        source_application: 'halo_fire',
+        source_project_name: 'The Cooperative 1881 - Salt Lake City UT',
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }));
+      expect(body.queue_id).toMatch(new RegExp(`^sam31-${consumer}-[a-f0-9]{16}$`));
+      expect(body.persisted_review_packet_ref).toBe(`openclaw://${consumer}/sam31/product-review/${body.queue_id}`);
+      expect(body.blocked_claims).toEqual(expect.arrayContaining(['permit_ready', 'AHJ_approval', 'AutoSprink_parity']));
+      expect(body.limitations.join(' ')).toMatch(/does not clear/i);
+    }
   });
 
   it('serves /vision/sam31/extrapolate as a HaloFire 1881 object/vector/3D review packet', async () => {
