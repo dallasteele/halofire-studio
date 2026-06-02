@@ -218,6 +218,17 @@ describe('studio static origin handling', () => {
     expect(html).toContain('Review:');
   });
 
+  it('lets the workbench download official-flow hydraulic replay artifacts', async () => {
+    const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
+    expect(shell.status).toBe(200);
+    const html = await shell.text();
+    expect(html).toContain('downloadOfficialFlowHydraulicReplay');
+    expect(html).toContain('/resolver-packets/official-flow/');
+    expect(html).toContain('/replay-artifact');
+    expect(html).toContain('Download hydraulic replay artifact');
+    expect(html).toContain('data-official-flow-replay-evidence-id');
+  });
+
   it('lets the studio load the latest saved PDF boundary decision as import defaults', async () => {
     const shell = await fetch(`${BASE}/autosprink.html`, { headers: { Origin: BASE } });
     expect(shell.status).toBe(200);

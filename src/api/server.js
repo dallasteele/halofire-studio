@@ -1580,6 +1580,112 @@ function normalizeOfficialFlowIntake(projectName, body = {}, user = {}) {
   };
 }
 
+function buildOfficialFlowHydraulicReplayArtifact(projectName, evidence, intake, user = {}) {
+  const pipelineReq = {
+    params: { name: projectName },
+    body: { markupPct: 25 },
+    user: { ...user, role: 'user' },
+  };
+  const out = runSprinklerPipeline(pipelineReq, null);
+  if (out.httpError) {
+    const e = new Error(out.httpError.error || 'Unable to run preliminary hydraulic replay');
+    e.httpStatus = out.httpError.status || 400;
+    throw e;
+  }
+  const hazard = out.bid?.rooms?.[0]?.hazard || 'ordinary';
+  const demand = out.hydraulicNetwork?.totalDemandGpm
+    ?? out.hydraulics?.requiredFlowGpm
+    ?? remoteAreaDemand(hazard).requiredFlowGpm;
+  const requiredSourcePsi = out.hydraulicNetwork?.requiredSourcePsi
+    ?? out.hydraulics?.requiredPressurePsi
+    ?? null;
+  const residualPsi = Number(intake.residualPsi);
+  const flowingGpm = Number(intake.flowingGpm);
+  const issueList = [
+    {
+      code: 'PROFESSIONAL_HYDRAULIC_REVIEW_MISSING',
+      severity: 'blocking',
+      source_ref: intake.source_ref,
+      observed: 'Only internal-alpha preliminary hydraulic replay evidence is present.',
+      expected: 'Licensed professional hydraulic calculation review/signoff.',
+      required_action: 'Attach PE/professional hydraulic review before any engineering-grade, permit-ready, or AHJ-ready claim.',
+    },
+    {
+      code: 'AHJ_HYDRAULIC_APPROVAL_MISSING',
+      severity: 'blocking',
+      source_ref: intake.source_ref,
+      observed: 'No AHJ-reviewed hydraulic calculation package is attached.',
+      expected: 'AHJ-reviewed hydraulic calculation package or official approval record.',
+      required_action: 'Attach AHJ review/approval evidence before any AHJ-ready or permit-ready claim.',
+    },
+  ];
+  if (typeof requiredSourcePsi === 'number') {
+    issueList.push({
+      code: residualPsi >= requiredSourcePsi ? 'PRELIMINARY_SOURCE_PRESSURE_MARGIN' : 'PRELIMINARY_SOURCE_PRESSURE_SHORTFALL',
+      severity: residualPsi >= requiredSourcePsi ? 'warning' : 'blocking',
+      source_ref: intake.source_ref,
+      observed: `${round2(residualPsi)} psi residual vs ${round2(requiredSourcePsi)} psi preliminary required source pressure`,
+      expected: 'Positive pressure margin verified by professional hydraulic calculation.',
+      required_action: 'Use this only as a replay issue until professional hydraulic review confirms or corrects the model.',
+    });
+  }
+  if (typeof demand === 'number') {
+    issueList.push({
+      code: flowingGpm >= demand ? 'PRELIMINARY_FLOW_GPM_MARGIN' : 'PRELIMINARY_FLOW_GPM_SHORTFALL',
+      severity: flowingGpm >= demand ? 'warning' : 'blocking',
+      source_ref: intake.source_ref,
+      observed: `${round2(flowingGpm)} gpm available vs ${round2(demand)} gpm preliminary demand`,
+      expected: 'Flow margin verified by official flow test and professional hydraulic calculation.',
+      required_action: 'Use this only as a replay issue until official/professional evidence confirms or corrects the values.',
+    });
+  }
+  return {
+    artifact_type: 'official_flow_hydraulic_replay_artifact',
+    status: 'best_effort_internal_alpha',
+    project_name: projectName,
+    source_evidence_id: evidence.id,
+    source_evidence_type: evidence.evidence_type,
+    generated_at: new Date().toISOString(),
+    download_name: `${slugForDownloadName(projectName)}-official-flow-hydraulic-replay-${evidence.id}.json`,
+    official_flow_input: {
+      staticPsi: intake.staticPsi,
+      residualPsi: intake.residualPsi,
+      flowingGpm: intake.flowingGpm,
+      flowDataDate: intake.flowDataDate || null,
+      waterModelRequired: intake.waterModelRequired || null,
+      source_file: intake.source_file || evidence.source_file || null,
+      source_ref: intake.source_ref || evidence.source_ref || null,
+      reviewer_name: intake.reviewer_name || null,
+    },
+    hydraulic_summary: {
+      estimate: true,
+      sourcePsiBasis: 'residualPsi',
+      sourcePsi: residualPsi,
+      requiredSourcePsi,
+      sourceMarginPsi: typeof requiredSourcePsi === 'number' ? round2(residualPsi - requiredSourcePsi) : null,
+      totalDemandGpm: typeof demand === 'number' ? round2(demand) : null,
+      flowMarginGpm: typeof demand === 'number' ? round2(flowingGpm - demand) : null,
+      hazard,
+      singlePath: out.hydraulics || null,
+      network: out.hydraulicNetwork || null,
+      disclaimer: 'best-effort official-flow hydraulic replay artifact — NOT PE-reviewed, NOT AHJ-approved, NOT AutoSprink parity, and NOT permit-ready.',
+    },
+    bid_summary: {
+      total_area_sqft: out.bid?.totalAreaSqFt ?? null,
+      total_head_count: out.bid?.totalHeadCount ?? null,
+      pricing_total: out.bid?.pricing?.total ?? null,
+      markup_pct: out.bid?.pricing?.markupPct ?? null,
+    },
+    issue_list: issueList,
+    blocked_claims: [...OFFICIAL_FLOW_BLOCKED_CLAIMS],
+    claim_gate_effect: 'no_claims_cleared',
+    limitations: [
+      'This artifact is generated from recorded official-flow intake and the internal-alpha hydraulic replay model.',
+      'It creates review issues and questions only; it does not clear permit-ready, AHJ approval, PE review, engineering-grade, fabrication-ready, manufacturer-exact, or AutoSprink parity claims.',
+    ],
+  };
+}
+
 function officialFlowResolverQueueItem(projectName, matchedEvidence = null) {
   const intake = matchedEvidence?.intake || null;
   const facts = intake ? {
@@ -2017,6 +2123,27 @@ app.post('/api/projects/:name/resolver-packets/official-flow/intake', authMiddle
       evidence: evidenceRow,
       intake,
     });
+  } catch (err) {
+    res.status(err.httpStatus || 400).json({ error: err.message });
+  }
+});
+
+app.get('/api/projects/:name/resolver-packets/official-flow/:evidenceId/replay-artifact', authMiddleware, (req, res) => {
+  try {
+    const projectName = req.params.name;
+    const evidenceId = Number(req.params.evidenceId);
+    if (!Number.isSafeInteger(evidenceId) || evidenceId <= 0) {
+      return res.status(400).json({ error: 'A positive evidence id is required' });
+    }
+    const evidence = db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'official_flow_intake'`)
+      .get(evidenceId, projectName);
+    const intake = officialFlowIntakeFromEvidence(evidence);
+    if (!evidence || !intake) {
+      return res.status(404).json({ error: 'Official-flow intake evidence not found' });
+    }
+    res.json(buildOfficialFlowHydraulicReplayArtifact(projectName, evidence, intake, req.user));
   } catch (err) {
     res.status(err.httpStatus || 400).json({ error: err.message });
   }

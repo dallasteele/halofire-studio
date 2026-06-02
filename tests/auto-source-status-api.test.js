@@ -250,5 +250,38 @@ describe('S5 GET /api/auto-source/status', () => {
       flowingGpm: 980,
     }));
     expect(queue.summary.official_flow_evidence_recorded).toBe(1);
+
+    const artifactRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-packets/official-flow/${created.id}/replay-artifact`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(artifactRes.status).toBe(200);
+    const artifact = await artifactRes.json();
+    expect(artifact).toEqual(expect.objectContaining({
+      artifact_type: 'official_flow_hydraulic_replay_artifact',
+      status: 'best_effort_internal_alpha',
+      source_evidence_id: created.id,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(artifact.official_flow_input).toEqual(expect.objectContaining({
+      staticPsi: 72,
+      residualPsi: 61,
+      flowingGpm: 980,
+      source_ref: 'field-flow-report.pdf#page=1',
+    }));
+    expect(artifact.hydraulic_summary).toEqual(expect.objectContaining({
+      estimate: true,
+      sourcePsiBasis: 'residualPsi',
+    }));
+    expect(typeof artifact.hydraulic_summary.requiredSourcePsi).toBe('number');
+    expect(Array.isArray(artifact.issue_list)).toBe(true);
+    expect(artifact.issue_list).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        code: 'PROFESSIONAL_HYDRAULIC_REVIEW_MISSING',
+        severity: 'blocking',
+      }),
+    ]));
+    expect(artifact.blocked_claims).toEqual(
+      expect.arrayContaining(['permit_ready', 'AHJ_approval', 'PE_review', 'AutoSprink_parity']),
+    );
   });
 });

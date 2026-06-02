@@ -325,6 +325,7 @@ function resolverQueueDetail(item) {
       <div class="claims">AI fallback: ${escapeHtml(item.ai_fallback || '')}</div>
       <div class="claims">Blocks: ${claims.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('')}</div>
       <p style="margin-top:8px">${actions.map((action) => `<a class="go" style="padding:7px 10px;font-size:11px;text-decoration:none;display:inline-block;margin-right:6px" href="${escapeHtml(action.href || '#')}">${escapeHtml(action.label || 'Open')}</a>`).join('')}</p>
+      ${item.evidence_id ? `<p style="margin-top:8px"><button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#4f46e5" data-official-flow-replay-evidence-id="${escapeHtml(item.evidence_id)}">Download hydraulic replay artifact</button></p>` : ''}
       <details style="margin-top:8px" id="officialFlowIntake">
         <summary class="muted" style="cursor:pointer">Record/update official flow intake</summary>
         <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:8px">
@@ -399,6 +400,16 @@ async function downloadReplayBidEvidenceArtifact(evidenceId) {
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = artifact.download_name || 'room-boundary-replay-bid-artifact.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+async function downloadOfficialFlowHydraulicReplay(evidenceId) {
+  const artifact = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/resolver-packets/official-flow/' + encodeURIComponent(evidenceId) + '/replay-artifact');
+  const blob = new Blob([JSON.stringify(artifact, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = artifact.download_name || 'official-flow-hydraulic-replay-artifact.json';
   a.click();
   URL.revokeObjectURL(a.href);
 }
@@ -528,6 +539,9 @@ async function refreshResolverQueue() {
   });
   document.querySelectorAll('[data-official-flow-save]').forEach((button) => {
     button.onclick = () => saveOfficialFlowIntake();
+  });
+  document.querySelectorAll('[data-official-flow-replay-evidence-id]').forEach((button) => {
+    button.onclick = () => downloadOfficialFlowHydraulicReplay(button.dataset.officialFlowReplayEvidenceId);
   });
 }
 
