@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
 
 import { COOPERATIVE_1881_PROJECT_NAME } from '../src/data/floorplans.js';
+import { createSam31BridgeApp } from '../src/sam31/bridge.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -64,7 +65,7 @@ async function waitForHealth() {
   throw new Error('HaloFire API did not become healthy within 10s');
 }
 
-function startServer(tempDir) {
+function startServer(tempDir, bridgeBaseUrl) {
   return spawn(process.execPath, ['src/api/server.js'], {
     cwd: ROOT,
     env: {
@@ -77,9 +78,42 @@ function startServer(tempDir) {
       HALOFIRE_ADMIN_PASSWORD: PASSWORD,
       HALOFIRE_ALLOW_DEV_DEFAULTS: '0',
       HALOFIRE_CORS_ORIGINS: 'http://allowed.test',
-      OPENCLAW_BRIDGE_URL: '',
+      OPENCLAW_BRIDGE_URL: bridgeBaseUrl,
     },
     stdio: ['ignore', 'pipe', 'pipe'],
+  });
+}
+
+async function startSam31Bridge() {
+  const app = createSam31BridgeApp();
+  let server;
+  await new Promise((resolve) => {
+    server = app.listen(0, '127.0.0.1', resolve);
+  });
+  const address = server.address();
+  if (!address || typeof address === 'string') {
+    throw new Error('SAM31 bridge did not expose a TCP address');
+  }
+  return {
+    server,
+    bridgeBaseUrl: `http://127.0.0.1:${address.port}`,
+  };
+}
+
+async function closeHttpServer(server) {
+  if (!server) return;
+  await new Promise((resolve, reject) => {
+    server.close((error) => {
+      if (error) reject(error);
+      else resolve();
+    });
+  });
+}
+
+async function seedOpenClawSam31LocalBridgeExtrapolation(token, boundaryEvidenceId) {
+  return request(`${PROJECT_PATH}/resolver-packets/pdf-boundary/${boundaryEvidenceId}/openclaw/sam31/extrapolation-artifact`, token, {
+    method: 'POST',
+    body: JSON.stringify({}),
   });
 }
 
@@ -243,7 +277,9 @@ async function seedSam31ReplayEvidence(token) {
     }),
   });
 
-  return { boundary, samResult };
+  const localBridgeExtrapolation = await seedOpenClawSam31LocalBridgeExtrapolation(token, boundary.evidence.id);
+
+  return { boundary, samResult, localBridgeExtrapolation };
 }
 
 async function runBrowserSmoke(token, evidenceIds) {
@@ -277,6 +313,41 @@ async function runBrowserSmoke(token, evidenceIds) {
     await page.waitForSelector('text=OpenClaw SAM31 bridge smoke artifact', { timeout: 8_000 });
     await page.waitForSelector(SAM31_BRIDGE_SMOKE_SELECTOR, { timeout: 8_000 });
     await page.waitForSelector('[id^="sam31BridgeSmokeStatus-"]', { state: 'attached', timeout: 8_000 });
+    await page.waitForSelector('text=SAM31 1881 bid truth', { timeout: 8_000 });
+    await page.waitForSelector('text=head_count 1420', { timeout: 8_000 });
+    await page.waitForSelector('text=square_feet 170654', { timeout: 8_000 });
+    await page.waitForSelector('text=bid_total 538792.35', { timeout: 8_000 });
+    await page.waitForSelector('text=SAM31 missing evidence rows', { timeout: 8_000 });
+    await page.waitForSelector('text=HALOFIRE_1881_ROOM_BOUNDARY_EMPLOYEE_REVIEW_MISSING', { timeout: 8_000 });
+    await page.waitForSelector('text=HALOFIRE_1881_PROFESSIONAL_AHJ_APPROVAL_MISSING', { timeout: 8_000 });
+    await page.waitForSelector('text=Download SAM31 queue item', { timeout: 8_000 });
+
+    const queueDownloadPromise = page.waitForEvent('download');
+    await page.getByRole('button', { name: 'Download SAM31 queue item' }).first().click();
+    const queueDownload = await queueDownloadPromise;
+    const queueDownloadPath = await queueDownload.path();
+    const queueSuggestedName = queueDownload.suggestedFilename();
+    const queueDownloadBytes = queueDownloadPath ? fs.statSync(queueDownloadPath).size : 0;
+    downloads.push({ suggestedName: queueSuggestedName, bytes: queueDownloadBytes });
+    if (!queueSuggestedName.includes('sam31-product-review-queue-item') || queueDownloadBytes <= 0) {
+      throw new Error(`Unexpected SAM31 queue item download ${queueSuggestedName} (${queueDownloadBytes} bytes)`);
+    }
+    const queueItem = JSON.parse(fs.readFileSync(queueDownloadPath, 'utf8'));
+    if (queueItem.artifact_type !== 'openclaw.sam31.product_review_queue_item.v1') {
+      throw new Error(`Unexpected SAM31 queue item artifact type ${queueItem.artifact_type}`);
+    }
+    const missingEvidenceCodes = Array.isArray(queueItem.missing_evidence_rows)
+      ? queueItem.missing_evidence_rows.map((row) => row.code)
+      : [];
+    if (!missingEvidenceCodes.includes('HALOFIRE_1881_ROOM_BOUNDARY_EMPLOYEE_REVIEW_MISSING')) {
+      throw new Error('SAM31 queue item is missing the room-boundary employee review evidence row');
+    }
+    if (!missingEvidenceCodes.includes('HALOFIRE_1881_PROFESSIONAL_AHJ_APPROVAL_MISSING')) {
+      throw new Error('SAM31 queue item is missing the professional/AHJ approval evidence row');
+    }
+    if (queueItem.use_for_claims !== false || queueItem.claim_gate_effect !== 'no_claims_cleared') {
+      throw new Error(`SAM31 queue item cleared a claim gate: ${queueItem.claim_gate_effect}`);
+    }
     await page.waitForSelector('[data-sam31-replacement-action-field="semantic_label"]', { timeout: 8_000 });
     await page.waitForSelector('[data-sam31-replacement-action-field="polygon"]', { timeout: 8_000 });
     await page.waitForSelector('[data-sam31-replacement-action-field="bbox"]', { timeout: 8_000 });
@@ -369,6 +440,13 @@ async function runBrowserSmoke(token, evidenceIds) {
       screenshotSha256: `sha256:${sha256}`,
       evidenceIds,
       downloads,
+      queueItemDownload: {
+        artifact_type: queueItem.artifact_type,
+        suggestedName: queueSuggestedName,
+        missing_evidence_codes: missingEvidenceCodes,
+        use_for_claims: queueItem.use_for_claims,
+        claim_gate_effect: queueItem.claim_gate_effect,
+      },
       replayArtifact: {
         artifact_type: replayArtifact.artifact_type,
         source_sam31_replacement_evidence_id: replayArtifact.source_sam31_replacement_evidence_id,
@@ -396,12 +474,15 @@ async function runBrowserSmoke(token, evidenceIds) {
 
 async function main() {
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'halofire-sam31-workbench-smoke-'));
-  const server = startServer(tempDir);
+  let bridge;
+  let server;
   let stdout = '';
   let stderr = '';
-  server.stdout.on('data', (chunk) => { stdout += chunk.toString(); });
-  server.stderr.on('data', (chunk) => { stderr += chunk.toString(); });
   try {
+    bridge = await startSam31Bridge();
+    server = startServer(tempDir, bridge.bridgeBaseUrl);
+    server.stdout.on('data', (chunk) => { stdout += chunk.toString(); });
+    server.stderr.on('data', (chunk) => { stderr += chunk.toString(); });
     await waitForHealth();
     const login = await request('/api/auth/login', null, {
       method: 'POST',
@@ -412,12 +493,16 @@ async function main() {
     const smoke = await runBrowserSmoke(token, {
       boundaryEvidenceId: seeded.boundary.evidence.id,
       sam31EvidenceId: seeded.samResult.evidence.id,
+      localBridgeExtrapolationEvidenceId: seeded.localBridgeExtrapolation.evidence.id,
     });
     log(JSON.stringify(smoke, null, 2));
   } finally {
-    if (!server.killed) {
+    if (server && !server.killed) {
       server.kill();
       await new Promise((resolve) => server.once('exit', resolve));
+    }
+    if (bridge?.server) {
+      await closeHttpServer(bridge.server);
     }
     fs.rmSync(tempDir, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
     if (stderr.trim()) log(`server stderr tail: ${stderr.trim().split('\n').slice(-6).join('\n')}`);

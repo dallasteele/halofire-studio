@@ -37,6 +37,18 @@ describe('SAM31 workbench browser smoke script', () => {
     expect(script).toContain('/openclaw/sam31/smoke-artifact');
     expect(script).toContain('sam31BridgeSmokeStatus');
     expect(script).toContain('openclaw_sam31_bridge_smoke_artifact');
+    expect(script).toContain('createSam31BridgeApp');
+    expect(script).toContain('startSam31Bridge');
+    expect(script).toContain('OPENCLAW_BRIDGE_URL: bridgeBaseUrl');
+    expect(script).toContain('/openclaw/sam31/extrapolation-artifact');
+    expect(script).toContain('SAM31 1881 bid truth');
+    expect(script).toContain('head_count 1420');
+    expect(script).toContain('SAM31 missing evidence rows');
+    expect(script).toContain('HALOFIRE_1881_ROOM_BOUNDARY_EMPLOYEE_REVIEW_MISSING');
+    expect(script).toContain('HALOFIRE_1881_PROFESSIONAL_AHJ_APPROVAL_MISSING');
+    expect(script).toContain('Download SAM31 queue item');
+    expect(script).toContain('sam31-product-review-queue-item');
+    expect(script).toContain('localBridgeExtrapolationEvidenceId');
     expect(script).toContain('/sam31-replacements');
     expect(script).toContain('Save employee replacements');
     expect(script).toContain('sam31EmployeeReplacementValues');
