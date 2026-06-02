@@ -29,6 +29,7 @@ describe('S1 makeCatalogSourcer (web-found CAD)', () => {
       data: 'STEP-BYTES',
       license: 'CC-BY-4.0',
       manufacturer: 'Generic',
+      rejectedCandidates: [{ url: 'https://www.traceparts.com/wrong.step', reason: 'wrong size' }],
     }));
     const sourcer = makeCatalogSourcer({ invoker });
     const model = await sourcer({ key: 'valve_check', name: 'Check valve', category: 'valves', params: {} });
@@ -41,6 +42,7 @@ describe('S1 makeCatalogSourcer (web-found CAD)', () => {
     expect(model.provenance.url).toBe('https://www.traceparts.com/some-model.step');
     expect(model.provenance.manufacturer).toBe('Generic');
     expect(model.license).toBe('CC-BY-4.0');
+    expect(model.rejectedCandidates).toEqual([{ url: 'https://www.traceparts.com/wrong.step', reason: 'wrong size' }]);
     expect(invoker).toHaveBeenCalledTimes(1);
   });
 

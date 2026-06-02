@@ -1,3 +1,5 @@
+import crypto from 'node:crypto';
+
 /**
  * S5 — VPS <-> OpenClaw bridge wiring for the autonomous part-sourcing run.
  *
@@ -21,6 +23,111 @@
 const AUTO_SOURCE_STATUS_NOTE =
   'Best-effort autonomous sourcing; OpenClaw-found/created parts are NOT ' +
   'manufacturer-exact and never clear the AUTOSPRINK parity gate.';
+
+const TARGET_SOURCE_FAMILIES = Object.freeze([
+  Object.freeze({
+    family_ref: 'family:pipe_steel_sch40_2p0in',
+    component_key: 'pipe_sch40',
+    nominal_size_in: 2,
+    description: '2 in Schedule 40 steel pipe',
+  }),
+  Object.freeze({
+    family_ref: 'family:fitting_tee_2p0in',
+    component_key: 'fitting_tee',
+    nominal_size_in: 2,
+    description: '2 in tee fitting',
+  }),
+  Object.freeze({
+    family_ref: 'family:valve_check_2p5in',
+    component_key: 'valve_check',
+    nominal_size_in: 2.5,
+    description: '2.5 in check valve',
+  }),
+]);
+
+const SOURCE_LEDGER_BLOCKED_CLAIMS = Object.freeze([
+  'manufacturer_exact',
+  'AutoSprink_parity',
+  'fabrication_ready',
+  'permit_ready',
+  'AHJ_approval',
+  'PE_review',
+]);
+
+function isNonEmptyString(value) {
+  return typeof value === 'string' && value.trim() !== '';
+}
+
+function stableArray(value) {
+  return Array.isArray(value) ? value : [];
+}
+
+function modelArtifactHash(result, model) {
+  if (!result || result.source !== 'catalog') return null;
+  if (!model || typeof model !== 'object') return null;
+  if (!isNonEmptyString(model.data)) return null;
+  if (model.provenance && model.data === model.provenance.url) return null;
+  return `sha256:${crypto.createHash('sha256').update(model.data).digest('hex')}`;
+}
+
+function statusTierFor(result, artifactHash) {
+  if (!result || result.status !== 'present') return 'missing_catalog_source';
+  if (result.source === 'catalog') {
+    return artifactHash ? 'candidate_downloaded_unverified' : 'candidate_link_unverified';
+  }
+  return 'generated_fallback_not_catalog';
+}
+
+function resultByKey(results) {
+  const map = new Map();
+  for (const result of stableArray(results)) {
+    if (result && result.key) map.set(String(result.key), result);
+  }
+  return map;
+}
+
+/**
+ * Build the Stream F vendor/catalog acquisition ledger for the three currently
+ * blocked engineering families. It records source facts only; it never upgrades
+ * any model to manufacturer-exact and never clears regulated claims.
+ *
+ * @param {{results?:Array<object>}} runResult
+ * @param {string} captureDate
+ * @returns {Array<object>}
+ */
+export function buildSourceAcquisitionLedger(runResult = {}, captureDate) {
+  const byKey = resultByKey(runResult.results);
+  return TARGET_SOURCE_FAMILIES.map((target) => {
+    const result = byKey.get(target.component_key) || null;
+    const model = result && result.model && typeof result.model === 'object' ? result.model : null;
+    const sourceUrl =
+      model && model.provenance && isNonEmptyString(model.provenance.url)
+        ? model.provenance.url
+        : null;
+    const artifactHash = modelArtifactHash(result, model);
+
+    return {
+      schema: 'halofire.catalog_source_acquisition_ledger_row.v1',
+      family_ref: target.family_ref,
+      component_key: target.component_key,
+      description: target.description,
+      nominal_size_in: target.nominal_size_in,
+      source_url: sourceUrl,
+      capture_date: captureDate,
+      license: model && model.license != null ? String(model.license) : null,
+      downloaded_artifact_hash: artifactHash,
+      rejected_candidates: stableArray(model && model.rejectedCandidates),
+      status_tier: statusTierFor(result, artifactHash),
+      manufacturer_exact: false,
+      acceptable_evidence:
+        'Real manufacturer catalog/model approval, license/terms, downloaded artifact hash, and HaloFire employee/professional review tied to this family.',
+      claim_gate_effect: 'no_claims_cleared',
+      blocked_claims: [...SOURCE_LEDGER_BLOCKED_CLAIMS],
+      limitations:
+        'Machine-found or generated geometry is internal-alpha evidence only; it cannot establish manufacturer-exact, AutoSprink parity, permit-ready, fabrication-ready, AHJ, or PE claims.',
+    };
+  });
+}
 
 /** Trim a trailing slash so we can append a fixed path cleanly. */
 function trimTrailingSlash(url) {
@@ -156,9 +263,10 @@ export function buildAutoSourceStatus({ runResult, bridge, startedAtMs, finished
   const run = runResult || {};
   const br = bridge || {};
   const report = run.report || {};
+  const lastRunAt = new Date(finishedAtMs).toISOString();
 
   return {
-    lastRunAt: new Date(finishedAtMs).toISOString(),
+    lastRunAt,
     durationMs: finishedAtMs - startedAtMs,
     bridgeUrl: br.bridgeUrl || null,
     openclawReachable: !!br.reachable,
@@ -174,6 +282,7 @@ export function buildAutoSourceStatus({ runResult, bridge, startedAtMs, finished
     // FORCED — auto-sourced models are never manufacturer-exact and never clear parity.
     manufacturerExactCount: 0,
     parityGateStatus: 'blocked',
+    sourceAcquisitionLedger: buildSourceAcquisitionLedger(run, lastRunAt),
     disclaimer: run.disclaimer,
     note: AUTO_SOURCE_STATUS_NOTE,
   };

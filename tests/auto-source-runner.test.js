@@ -72,6 +72,77 @@ describe('S5 buildAutoSourceStatus — fail-closed honesty', () => {
     expect(status.manufacturerExactCount).toBe(0);
     expect(status.durationMs).toBe(50);
   });
+
+  it('adds a Stream F source acquisition ledger for target catalog families without clearing gates', () => {
+    const status = buildAutoSourceStatus({
+      runResult: {
+        results: [
+          {
+            key: 'pipe_sch40',
+            status: 'present',
+            source: 'catalog',
+            model: {
+              data: 'PIPE-STEP-BYTES',
+              format: 'step',
+              provenance: { url: 'https://vendor.example/pipe-2in.step', manufacturer: 'Vendor Pipe Co' },
+              license: 'vendor-download-terms',
+              rejectedCandidates: [
+                { url: 'https://vendor.example/pipe-1in.step', reason: 'wrong nominal size' },
+              ],
+            },
+          },
+          {
+            key: 'fitting_tee',
+            status: 'present',
+            source: 'generated_openscad',
+            model: { data: 'TEE-STL', format: 'stl' },
+          },
+          {
+            key: 'valve_check',
+            status: 'missing',
+            source: 'placeholder',
+            model: null,
+          },
+        ],
+        report: { foundCount: 1, createdCount: 0, generatedCount: 1, missingCount: 1 },
+        functionalCoverage: { present: 2, total: 3, complete: false },
+        disclaimer: 'best-effort',
+      },
+      bridge: { bridgeUrl: 'http://127.0.0.1:15000', reachable: true, openclaw: 'online' },
+      startedAtMs: Date.parse('2026-06-02T00:00:00.000Z'),
+      finishedAtMs: Date.parse('2026-06-02T00:01:00.000Z'),
+    });
+
+    expect(status.parityGateStatus).toBe('blocked');
+    expect(status.manufacturerExactCount).toBe(0);
+    expect(status.sourceAcquisitionLedger).toHaveLength(3);
+
+    const pipe = status.sourceAcquisitionLedger.find((row) => row.family_ref === 'family:pipe_steel_sch40_2p0in');
+    expect(pipe).toMatchObject({
+      component_key: 'pipe_sch40',
+      nominal_size_in: 2,
+      source_url: 'https://vendor.example/pipe-2in.step',
+      capture_date: '2026-06-02T00:01:00.000Z',
+      license: 'vendor-download-terms',
+      status_tier: 'candidate_downloaded_unverified',
+      manufacturer_exact: false,
+      claim_gate_effect: 'no_claims_cleared',
+      blocked_claims: expect.arrayContaining(['manufacturer_exact', 'AutoSprink_parity', 'fabrication_ready']),
+    });
+    expect(pipe.downloaded_artifact_hash).toMatch(/^sha256:[0-9a-f]{64}$/);
+    expect(pipe.rejected_candidates).toEqual([
+      { url: 'https://vendor.example/pipe-1in.step', reason: 'wrong nominal size' },
+    ]);
+
+    const tee = status.sourceAcquisitionLedger.find((row) => row.family_ref === 'family:fitting_tee_2p0in');
+    expect(tee.status_tier).toBe('generated_fallback_not_catalog');
+    expect(tee.source_url).toBeNull();
+    expect(tee.downloaded_artifact_hash).toBeNull();
+
+    const valve = status.sourceAcquisitionLedger.find((row) => row.family_ref === 'family:valve_check_2p5in');
+    expect(valve.status_tier).toBe('missing_catalog_source');
+    expect(valve.acceptable_evidence).toContain('manufacturer');
+  });
 });
 
 describe('S5 makeBridgeInvoker — fail-soft is a THROW, never a fabricated model', () => {

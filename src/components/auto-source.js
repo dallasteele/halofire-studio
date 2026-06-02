@@ -140,6 +140,7 @@ export function makeCatalogSourcer(opts = {}) {
         manufacturer: result.manufacturer != null ? String(result.manufacturer) : null,
       },
       license: result.license != null ? String(result.license) : null,
+      rejectedCandidates: Array.isArray(result.rejectedCandidates) ? result.rejectedCandidates : [],
       // Machine-found provenance is UNVERIFIED — never manufacturer-exact.
       manufacturerExact: false,
     };

@@ -74,6 +74,12 @@ describe('S5 GET /api/auto-source/status', () => {
     expect(body.parityGateStatus).toBe('blocked');
     expect(body.manufacturerExactCount).toBe(0);
     expect(typeof body.note).toBe('string');
+    expect(body.sourceAcquisitionLedger.map((row) => row.family_ref)).toEqual([
+      'family:pipe_steel_sch40_2p0in',
+      'family:fitting_tee_2p0in',
+      'family:valve_check_2p5in',
+    ]);
+    expect(body.sourceAcquisitionLedger.every((row) => row.status_tier === 'missing_catalog_source')).toBe(true);
   });
 
   it('RE-FORCES parityGateStatus blocked + manufacturerExactCount 0 from a tampered file', async () => {

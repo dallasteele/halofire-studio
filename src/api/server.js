@@ -28,6 +28,7 @@ import { requiredPressureAtRiser, flagSchedule, remoteAreaDemand } from '../engi
 import { buildParityMatrix, parityAchieved } from '../engine/parity-matrix.js';
 import { AUTOSPRINK_PARITY_GATE, buildParityInventory, parityGateStatus, getComponent } from '../components/registry.js';
 import { buildPartManifest } from '../components/part-mesh.js';
+import { buildSourceAcquisitionLedger } from '../components/auto-source-runner.js';
 import { balanceNetwork } from '../engine/hydraulic-network.js';
 import { checkCompliance } from '../engine/nfpa-compliance.js';
 import { buildSubmittal, renderSubmittalPdf } from '../engine/submittal.js';
@@ -2552,6 +2553,7 @@ app.get('/api/auto-source/status', authMiddleware, (req, res) => {
     status: 'never-run',
     parityGateStatus: 'blocked',
     manufacturerExactCount: 0,
+    sourceAcquisitionLedger: buildSourceAcquisitionLedger({}, new Date(0).toISOString()),
     note: 'Auto-source loop has not run yet.',
   });
 });
