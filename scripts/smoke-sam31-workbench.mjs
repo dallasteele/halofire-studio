@@ -468,6 +468,24 @@ async function runBrowserSmoke(token, evidenceIds) {
     if (consumerReview.claim_gate_effect !== 'no_claims_cleared') {
       throw new Error(`SAM31 LandScout review cleared a claim gate: ${JSON.stringify(consumerReview)}`);
     }
+    const sprinklerReviewQueueItems = reviewedQueueItem?.sam31_sprinkler_review_queue_items || [];
+    if (!sprinklerReviewQueueItems.some((item) => item.artifact_type === 'halofire.sam31_sprinkler_review_queue_item.v1')) {
+      throw new Error(`SAM31 sprinkler review queue items missing: ${JSON.stringify(reviewedQueueItem)}`);
+    }
+    if (!sprinklerReviewQueueItems.some((item) => item.supported_sprinkler_review_lane === 'obstruction_or_clash_review')) {
+      throw new Error(`SAM31 sprinkler review queue missing obstruction lane: ${JSON.stringify(sprinklerReviewQueueItems)}`);
+    }
+    if (sprinklerReviewQueueItems.some((item) => item.use_for_claims !== false || item.claim_gate_effect !== 'no_claims_cleared')) {
+      throw new Error(`SAM31 sprinkler review queue cleared a claim gate: ${JSON.stringify(sprinklerReviewQueueItems)}`);
+    }
+    const obstructionQueue = await request(`${PROJECT_PATH}/resolver-queue?sam31SprinklerReview=queued&lane=obstruction_or_clash_review`, token);
+    const obstructionQueueItem = obstructionQueue.items.find((item) => item.evidence_id === evidenceIds.boundaryEvidenceId);
+    const obstructionRows = obstructionQueueItem?.sam31_sprinkler_review_queue_items || [];
+    if (!obstructionRows.length || obstructionRows.some((item) => item.supported_sprinkler_review_lane !== 'obstruction_or_clash_review')) {
+      throw new Error(`SAM31 sprinkler review lane filter failed: ${JSON.stringify(obstructionQueue)}`);
+    }
+    await page.waitForSelector('text=SAM31 sprinkler review queue', { timeout: 8_000 });
+    await page.waitForSelector('text=sam31SprinklerReview=queued', { timeout: 8_000 });
     await page.waitForSelector('text=Download SAM31 consumer review decision', { timeout: 8_000 });
     const consumerReviewDownloadPromise = page.waitForEvent('download');
     await page.locator(`button[data-sam31-consumer-review-packet-evidence-id="${consumerReview.evidence_id}"]`).click();
