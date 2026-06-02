@@ -1391,6 +1391,7 @@ const SAM31_CONSUMER_REVIEW_TASK_TYPE = 'openclaw.sam31.consumer_review_task.v1'
 const SAM31_CONSUMER_REVIEW_DECISION_TYPE = 'openclaw.sam31.consumer_review_task_decision.v1';
 const SAM31_PRODUCT_OWNER_REPLACEMENT_INTAKE_TYPE = 'openclaw.sam31.product_owner_replacement_intake.v1';
 const SAM31_TO_SPRINKLER_REVIEW_ADAPTER_TYPE = 'openclaw.sam31_to_sprinkler_review_adapter.v1';
+const HALOFIRE_SAM31_SECTIONING_DOWNSTREAM_RESOLVER_QUEUE_ITEM_TYPE = 'halofire.sam31_sectioning_downstream_resolver_queue_item.v1';
 const HALOFIRE_SAM31_SPRINKLER_REVIEW_PACKET_TYPE = 'halofire.sam31_sprinkler_review_packet.v1';
 const HALOFIRE_SAM31_SPRINKLER_REVIEW_QUEUE_ITEM_TYPE = 'halofire.sam31_sprinkler_review_queue_item.v1';
 const HALOFIRE_SAM31_SPRINKLER_REVIEW_DECISION_TYPE = 'halofire.sam31_sprinkler_review_decision.v1';
@@ -3232,6 +3233,125 @@ function openClawSam31SectioningPipelineContractReviewSummary(reviewEvidence) {
     blocked_claims: Array.isArray(review.blocked_claims) ? [...review.blocked_claims] : [],
     limitations: Array.isArray(review.limitations) ? [...review.limitations] : [],
   };
+}
+
+function openClawSam31SectioningDownstreamResolverQueueItems(projectName, evidence, decision, reviewEvidence) {
+  if (!evidence || !decision || !reviewEvidence?.evidence || !reviewEvidence?.review) return [];
+  const { evidence: sectioningReviewEvidence, review } = reviewEvidence;
+  if (review.review_decision === 'rejected') return [];
+  const values = review.replacement_values && typeof review.replacement_values === 'object'
+    ? review.replacement_values
+    : {};
+  const semanticLabels = Array.isArray(values.semantic_labels) ? values.semantic_labels : [];
+  const polygons = Array.isArray(values.polygons) ? values.polygons : [];
+  const bboxes = Array.isArray(values.bboxes) ? values.bboxes : [];
+  const objectHypotheses = Array.isArray(values.object_hypotheses) ? values.object_hypotheses : [];
+  const vectorOverlays = Array.isArray(values.vector_overlays) ? values.vector_overlays : [];
+  const model3dCandidates = Array.isArray(values.model_3d_candidates) ? values.model_3d_candidates : [];
+  const commonBlockedClaims = uniqueStrings([
+    ...(Array.isArray(review.blocked_claims) ? review.blocked_claims : []),
+    ...(Array.isArray(decision.blockedClaims) ? decision.blockedClaims : PDF_BOUNDARY_BLOCKED_CLAIMS),
+    'permit_ready',
+    'professional_approval',
+    'AHJ_approval',
+    'AutoSprink_parity',
+    'fabrication_ready',
+    'manufacturer_exact',
+  ]);
+  const sourceRefs = uniqueByJson([
+    {
+      evidence_id: evidence.id,
+      evidence_type: evidence.evidence_type,
+      source_file: evidence.source_file || decision.sourceFile || null,
+      source_ref: evidence.source_ref || decision.sourceRef || null,
+      claim_gate_effect: 'no_claims_cleared',
+    },
+    {
+      evidence_id: review.source_openclaw_sam31_extrapolation_evidence_id || null,
+      evidence_type: 'openclaw_sam31_extrapolation_artifact',
+      source_ref: review.source_openclaw_sam31_extrapolation_ref || null,
+      claim_gate_effect: 'no_claims_cleared',
+    },
+    {
+      evidence_id: sectioningReviewEvidence.id,
+      evidence_type: sectioningReviewEvidence.evidence_type,
+      source_ref: sectioningReviewEvidence.source_ref || review.replacement_ref || null,
+      artifact_type: review.artifact_type || 'openclaw.sam31.sectioning_pipeline_contract_review.v1',
+      claim_gate_effect: 'no_claims_cleared',
+    },
+  ]);
+  const base = {
+    artifact_type: HALOFIRE_SAM31_SECTIONING_DOWNSTREAM_RESOLVER_QUEUE_ITEM_TYPE,
+    status: 'ready_for_downstream_resolver',
+    project_name: projectName,
+    source_runtime: review.source_runtime || 'sam-3.1+llm',
+    source_pdf_boundary_evidence_id: evidence.id,
+    source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id: sectioningReviewEvidence.id,
+    source_openclaw_sam31_extrapolation_evidence_id: review.source_openclaw_sam31_extrapolation_evidence_id || null,
+    source_sectioning_pipeline_contract_artifact_type: review.source_sectioning_pipeline_contract_artifact_type || 'openclaw.sam31.sectioning_pipeline_contract.v1',
+    replacement_ref: review.replacement_ref || sectioningReviewEvidence.source_ref || null,
+    reviewed_semantic_label_count: semanticLabels.length,
+    reviewed_polygon_count: polygons.length,
+    reviewed_bbox_count: bboxes.length,
+    reviewed_object_hypothesis_count: objectHypotheses.length,
+    reviewed_vector_overlay_count: vectorOverlays.length,
+    reviewed_model_3d_candidate_count: model3dCandidates.length,
+    source_refs: sourceRefs,
+    blocked_claims: commonBlockedClaims,
+    temporary_value_policy: review.temporary_value_policy || 'best_guess_until_employee_replaced',
+    use_for_claims: false,
+    no_claim_gates_cleared: true,
+    claim_gate_effect: 'no_claims_cleared',
+    limitations: [
+      'This resolver row turns reviewed SAM31 sectioning values into executable internal-alpha follow-up work only.',
+      'It does not prove geometry accuracy, drawing scale, AHJ approval, PE review, AutoSprink parity, permit readiness, fabrication readiness, or manufacturer-exact models.',
+    ],
+  };
+  const rows = [];
+  if (semanticLabels.length || polygons.length || bboxes.length) {
+    rows.push({
+      ...base,
+      id: `sam31-sectioning-downstream:${evidence.id}:${sectioningReviewEvidence.id}:room-boundary`,
+      downstream_resolver_lane: 'room_boundary_visual_audit',
+      supported_evidence_lanes: ['sam31_sectioning', 'room_boundary_visual_audit'],
+      issue_type: 'sam31_sectioning_reviewed_room_boundary',
+      next_action: 'Use the reviewed SAM31 semantic labels, polygons, and bboxes to run a room-boundary replay packet; attach employee/AHJ/professional evidence before any regulated claim.',
+      acceptable_evidence: [
+        'employee reviewed room-boundary replay packet',
+        'marked-up 1881 sheet screenshot tied to reviewed SAM31 sectioning values',
+        'licensed professional or AHJ signoff for regulated claims',
+      ],
+      executable_action: {
+        label: 'Download room-boundary replay input',
+        method: 'GET',
+        href: `/api/projects/${encodeURIComponent(projectName)}/resolver-packets/pdf-boundary/${evidence.id}/replay-input`,
+        claim_gate_effect: 'no_claims_cleared',
+      },
+    });
+  }
+  if (objectHypotheses.length || vectorOverlays.length || model3dCandidates.length) {
+    rows.push({
+      ...base,
+      id: `sam31-sectioning-downstream:${evidence.id}:${sectioningReviewEvidence.id}:sprinkler-obstruction`,
+      downstream_resolver_lane: 'obstruction_or_clash_review',
+      supported_evidence_lanes: ['llm_object_identification', 'vector_overlay_generation', 'model_3d_candidate_generation', 'obstruction_or_clash_review'],
+      issue_type: 'sam31_sectioning_reviewed_vector_model_candidates',
+      next_action: 'Use the reviewed SAM31 object/vector/3D candidates to queue obstruction, clash, sleeve, or firestop review; attach signed approval evidence before any regulated claim.',
+      acceptable_evidence: [
+        'HaloFire employee obstruction/clash review note',
+        'source-linked vector overlay or 3D model candidate reference',
+        'marked-up 1881 sheet screenshot',
+        'professional/AHJ/manufacturer evidence for any regulated claim',
+      ],
+      executable_action: {
+        label: 'Download SAM31 vector/model artifact packet',
+        method: 'GET',
+        href: `/api/projects/${encodeURIComponent(projectName)}/resolver-packets/pdf-boundary/${evidence.id}/openclaw/sam31/vector-model-artifacts`,
+        claim_gate_effect: 'no_claims_cleared',
+      },
+    });
+  }
+  return rows;
 }
 
 function buildOpenClawSam31ProductReviewQueueItemPacket(projectName, evidence, decision, extrapolationEvidence, extrapolationArtifact) {
@@ -5940,6 +6060,7 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
     latestOpenClawSam31ConsumerSmokeArtifact,
     latestOpenClawSam31ConsumerReviews,
   );
+  const sam31SectioningDownstreamResolverQueueItems = openClawSam31SectioningDownstreamResolverQueueItems(projectName, evidence, decision, sam31SectioningContractReviewEvidence);
   const sam31SprinklerReviewQueueItems = openClawSam31SprinklerReviewQueueItems(projectName, evidence, decision, sam31ConsumerReviewEvidences, sam31SprinklerReviewDecisionEvidences);
   const sam31SprinklerPreliminaryReplayQueueItems = halofireSam31SprinklerPreliminaryReplayQueueItems(projectName, evidence, decision, sam31ConsumerReviewEvidences, sam31SprinklerReviewDecisionEvidences, sam31SprinklerPreliminaryReplayFollowupDecisionEvidences, sam31SprinklerFollowupPacketReviewDecisionEvidences, sam31ApprovalUploadIntakeEvidences);
   const openclawSam31VectorModelArtifactAction = {
@@ -6066,6 +6187,7 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
     latest_openclaw_sam31_consumer_smoke_artifact: latestOpenClawSam31ConsumerSmokeArtifact,
     latest_openclaw_sam31_consumer_reviews: latestOpenClawSam31ConsumerReviews,
     sam31_unresolved_consumer_reviews: sam31UnresolvedConsumerReviews,
+    sam31_sectioning_downstream_resolver_queue_items: sam31SectioningDownstreamResolverQueueItems,
     sam31_sprinkler_review_queue_items: sam31SprinklerReviewQueueItems,
     sam31_sprinkler_preliminary_replay_queue_items: sam31SprinklerPreliminaryReplayQueueItems,
     openclaw_sam31_bridge_status: bridgeStatus,
@@ -9161,6 +9283,7 @@ function normalizePdfBoundaryReview(projectName, evidence, decision, body = {}, 
 app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
   const projectName = req.params.name;
   const filters = {
+    sam31SectioningReview: String(req.query?.sam31SectioningReview || req.query?.sam31_sectioning_review || '').trim().toLowerCase() || null,
     sam31ConsumerReview: String(req.query?.sam31ConsumerReview || '').trim().toLowerCase() || null,
     sam31SprinklerReview: String(req.query?.sam31SprinklerReview || '').trim().toLowerCase() || null,
     sam31SprinklerReplay: String(req.query?.sam31SprinklerReplay || '').trim().toLowerCase() || null,
@@ -9208,6 +9331,17 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
     if (catalogItem) items.push(catalogItem);
   }
   let visibleItems = items;
+  if (filters.sam31SectioningReview === 'ready') {
+    visibleItems = visibleItems
+      .map((item) => {
+        const downstreamRows = Array.isArray(item.sam31_sectioning_downstream_resolver_queue_items)
+          ? item.sam31_sectioning_downstream_resolver_queue_items
+            .filter((row) => !filters.lane || String(row.downstream_resolver_lane || '').toLowerCase() === filters.lane)
+          : [];
+        return downstreamRows.length ? { ...item, sam31_sectioning_downstream_resolver_queue_items: downstreamRows } : null;
+      })
+      .filter(Boolean);
+  }
   if (filters.sam31ConsumerReview === 'unresolved') {
     visibleItems = items
       .map((item) => {
@@ -9275,6 +9409,7 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
       sam31_extrapolation_recorded: visibleItems.filter((item) => item.latest_openclaw_sam31_extrapolation_artifact).length,
       sam31_extrapolation_reviews_recorded: visibleItems.filter((item) => item.latest_openclaw_sam31_extrapolation_review).length,
       sam31_sectioning_contract_reviews_recorded: visibleItems.filter((item) => item.latest_openclaw_sam31_sectioning_pipeline_contract_review).length,
+      sam31_sectioning_downstream_resolver_queue_items: visibleItems.reduce((acc, item) => acc + (Array.isArray(item.sam31_sectioning_downstream_resolver_queue_items) ? item.sam31_sectioning_downstream_resolver_queue_items.length : 0), 0),
       sam31_vector_model_artifacts_recorded: visibleItems.filter((item) => item.latest_openclaw_sam31_vector_model_artifact).length,
       sam31_consumer_smoke_recorded: visibleItems.filter((item) => item.latest_openclaw_sam31_consumer_smoke_artifact).length,
       sam31_consumer_reviews_recorded: visibleItems.reduce((acc, item) => acc + (Array.isArray(item.latest_openclaw_sam31_consumer_reviews) ? item.latest_openclaw_sam31_consumer_reviews.length : 0), 0),

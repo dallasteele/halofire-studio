@@ -835,7 +835,59 @@ describe('OpenClaw SAM31 bridge status API', () => {
       source_sectioning_pipeline_contract_artifact_type: 'openclaw.sam31.sectioning_pipeline_contract.v1',
       claim_gate_effect: 'no_claims_cleared',
     }));
+    expect(sectioningReviewedItem.sam31_sectioning_downstream_resolver_queue_items).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        artifact_type: 'halofire.sam31_sectioning_downstream_resolver_queue_item.v1',
+        status: 'ready_for_downstream_resolver',
+        downstream_resolver_lane: 'room_boundary_visual_audit',
+        source_pdf_boundary_evidence_id: boundary.id,
+        source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id: sectioningReview.id,
+        source_openclaw_sam31_extrapolation_evidence_id: artifact.id,
+        reviewed_semantic_label_count: 1,
+        reviewed_polygon_count: 1,
+        reviewed_bbox_count: 1,
+        use_for_claims: false,
+        no_claim_gates_cleared: true,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+      expect.objectContaining({
+        artifact_type: 'halofire.sam31_sectioning_downstream_resolver_queue_item.v1',
+        status: 'ready_for_downstream_resolver',
+        downstream_resolver_lane: 'obstruction_or_clash_review',
+        source_pdf_boundary_evidence_id: boundary.id,
+        source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id: sectioningReview.id,
+        source_openclaw_sam31_extrapolation_evidence_id: artifact.id,
+        reviewed_vector_overlay_count: 1,
+        reviewed_model_3d_candidate_count: 1,
+        use_for_claims: false,
+        no_claim_gates_cleared: true,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    ]));
+    expect(sectioningReviewedItem.sam31_sectioning_downstream_resolver_queue_items[0].blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'AHJ_approval',
+      'AutoSprink_parity',
+      'fabrication_ready',
+    ]));
+    expect(sectioningReviewedQueue.summary.sam31_sectioning_downstream_resolver_queue_items).toBeGreaterThanOrEqual(2);
     expect(sectioningReviewedQueue.summary.sam31_sectioning_contract_reviews_recorded).toBeGreaterThanOrEqual(1);
+
+    const sectioningDownstreamQueueRes = await request(`${COOPERATIVE_1881_PATH}/resolver-queue?sam31SectioningReview=ready&lane=obstruction_or_clash_review`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(sectioningDownstreamQueueRes.status).toBe(200);
+    const sectioningDownstreamQueue = await sectioningDownstreamQueueRes.json();
+    expect(sectioningDownstreamQueue.filters.sam31SectioningReview).toBe('ready');
+    expect(sectioningDownstreamQueue.summary.sam31_sectioning_downstream_resolver_queue_items).toBe(1);
+    const sectioningDownstreamItem = sectioningDownstreamQueue.items.find((row) => row.evidence_id === boundary.id);
+    expect(sectioningDownstreamItem.sam31_sectioning_downstream_resolver_queue_items).toEqual([
+      expect.objectContaining({
+        downstream_resolver_lane: 'obstruction_or_clash_review',
+        source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id: sectioningReview.id,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    ]);
 
     const queueItemRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/product-review-queue-item`, {
       headers: { Authorization: `Bearer ${token}` },

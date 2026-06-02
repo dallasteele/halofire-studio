@@ -505,6 +505,15 @@ function renderSam31VectorModelSourceSummary(row) {
   return `<span class="muted" style="font-size:10px">SAM31 vector/model source evidence #${escapeHtml(evidenceId)} - vectors ${escapeHtml(vectorCount)} - models ${escapeHtml(modelCount)} - ${escapeHtml(artifactType)} - use_for_claims false - claim_gate_effect ${escapeHtml(claimGateEffect)}</span><br>`;
 }
 
+function renderHalofireSam31SectioningDownstreamResolverQueue(rows, sourcePdfBoundaryEvidenceId) {
+  if (!Array.isArray(rows) || !rows.length) return '';
+  return `<div class="claims">SAM31 sectioning downstream resolver queue: <span class="chip">sam31_sectioning_downstream_resolver_queue_items ${escapeHtml(rows.length)}</span> <span class="chip">halofire.sam31_sectioning_downstream_resolver_queue_item.v1</span> <span class="chip">Download room-boundary replay input</span> <span class="chip">Download SAM31 vector/model artifact packet</span><br>${rows.map((row) => {
+    const action = row.executable_action && typeof row.executable_action === 'object' ? row.executable_action : {};
+    const lanes = Array.isArray(row.supported_evidence_lanes) ? row.supported_evidence_lanes : [];
+    return `<div style="margin-top:6px;border-top:1px solid rgba(99,102,241,.18);padding-top:6px"><span class="chip">${escapeHtml(row.downstream_resolver_lane || 'downstream_resolver_lane_missing')} ${escapeHtml(row.status || 'ready_for_downstream_resolver')} ${escapeHtml(row.claim_gate_effect || 'no_claims_cleared')}</span><br><span class="muted" style="font-size:10px">source_pdf_boundary_evidence_id ${escapeHtml(row.source_pdf_boundary_evidence_id || sourcePdfBoundaryEvidenceId || 'missing')} - source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id ${escapeHtml(row.source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id || 'missing')} - source_openclaw_sam31_extrapolation_evidence_id ${escapeHtml(row.source_openclaw_sam31_extrapolation_evidence_id || 'missing')}</span><br><span class="muted" style="font-size:10px">reviewed counts: semantic_labels ${escapeHtml(row.reviewed_semantic_label_count || 0)} - polygons ${escapeHtml(row.reviewed_polygon_count || 0)} - bboxes ${escapeHtml(row.reviewed_bbox_count || 0)} - object_hypotheses ${escapeHtml(row.reviewed_object_hypothesis_count || 0)} - vector_overlays ${escapeHtml(row.reviewed_vector_overlay_count || 0)} - model_3d_candidates ${escapeHtml(row.reviewed_model_3d_candidate_count || 0)}</span><br>Supported lanes: ${lanes.map((lane) => `<span class="chip">${escapeHtml(lane)}</span>`).join('') || '<span class="chip">sectioning downstream lane missing</span>'}<br><span class="muted" style="font-size:10px">${escapeHtml(row.next_action || 'Use reviewed sectioning values for the next resolver step; no claim gates cleared.')}</span><br>${action.href ? `<span class="muted" style="font-size:10px">${escapeHtml(action.label || 'Open downstream action')} - ${escapeHtml(action.href)} - claim_gate_effect ${escapeHtml(action.claim_gate_effect || row.claim_gate_effect || 'no_claims_cleared')}</span>` : '<span class="muted" style="font-size:10px">executable_action missing</span>'}</div>`;
+  }).join('')}<span class="muted" style="font-size:10px">Filter API: /resolver-queue?sam31SectioningReview=ready&lane=obstruction_or_clash_review - all rows keep use_for_claims false</span></div>`;
+}
+
 function renderHalofireSam31SprinklerReviewQueue(rows, sourcePdfBoundaryEvidenceId) {
   if (!Array.isArray(rows) || !rows.length) return '';
   return `<div class="claims">SAM31 sprinkler review queue: <span class="chip">sam31_sprinkler_review_queue_items ${escapeHtml(rows.length)}</span> <span class="chip">halofire.sam31_sprinkler_review_queue_item.v1</span> <span class="chip">halofire.sam31_sprinkler_review_decision.v1</span><br>${rows.map((row) => {
@@ -1071,6 +1080,7 @@ function catalogApprovalQuickFilter(summary, activeQuery) {
   </div>`;
 }
 
+
 function renderSuppliedDocumentBidTruth(item, defaults, acceptable, claims, actions) {
   const truth = defaults.project_truth || {};
   const crossProjectTruth = Array.isArray(defaults.cross_project_truth) ? defaults.cross_project_truth : [];
@@ -1147,6 +1157,7 @@ function resolverQueueDetail(item) {
   const openclaw_sam31_consumer_smoke_action = item.openclaw_sam31_consumer_smoke_action || null;
   const latest_openclaw_sam31_consumer_smoke_artifact = item.latest_openclaw_sam31_consumer_smoke_artifact || null;
   const sam31_unresolved_consumer_reviews = Array.isArray(item.sam31_unresolved_consumer_reviews) ? item.sam31_unresolved_consumer_reviews : [];
+  const sam31_sectioning_downstream_resolver_queue_items = Array.isArray(item.sam31_sectioning_downstream_resolver_queue_items) ? item.sam31_sectioning_downstream_resolver_queue_items : [];
   const sam31_sprinkler_review_queue_items = Array.isArray(item.sam31_sprinkler_review_queue_items) ? item.sam31_sprinkler_review_queue_items : [];
   const sam31_sprinkler_preliminary_replay_queue_items = Array.isArray(item.sam31_sprinkler_preliminary_replay_queue_items) ? item.sam31_sprinkler_preliminary_replay_queue_items : [];
   const replay_review = latest_review || latest_sam31_visual_audit;
@@ -1246,6 +1257,7 @@ function resolverQueueDetail(item) {
       ${renderOpenClawSam31VectorModelArtifactAction(item, openclaw_sam31_vector_model_artifact_action, latest_openclaw_sam31_vector_model_artifact)}
       ${renderOpenClawSam31ConsumerSmokeAction(item, openclaw_sam31_consumer_smoke_action, latest_openclaw_sam31_consumer_smoke_artifact)}
       ${sam31_unresolved_consumer_reviews.length ? `<div class="claims">sam31_unresolved_consumer_reviews: ${sam31_unresolved_consumer_reviews.map((review) => `<span class="chip">${escapeHtml(review.consumer)}:${escapeHtml(review.status || 'requires_product_review')} accepted_queue_id ${escapeHtml(review.accepted_queue_id || 'missing')}</span>`).join('')}<br><span class="muted" style="font-size:10px">Filter API: /resolver-queue?sam31ConsumerReview=unresolved&consumer=nameforge</span></div>` : ''}
+      ${renderHalofireSam31SectioningDownstreamResolverQueue(sam31_sectioning_downstream_resolver_queue_items, item.evidence_id)}
       ${renderHalofireSam31SprinklerReviewQueue(sam31_sprinkler_review_queue_items, item.evidence_id)}
       ${renderHalofireSam31SprinklerPreliminaryReplayQueue(sam31_sprinkler_preliminary_replay_queue_items, item.evidence_id)}
       ${replay_review ? `<div class="claims">Review: ${escapeHtml(replay_review.review_decision)} by ${escapeHtml(replay_review.reviewer_name || 'unknown')} - source ${escapeHtml(review_source || 'missing')} - issues ${escapeHtml(replay_review.issue_count)} - corrected polygons ${escapeHtml(replay_review.corrected_room_polygon_count)} - ${escapeHtml(replay_review.marked_up_plan_ref || '')}</div>` : ''}
@@ -2123,6 +2135,7 @@ async function refreshResolverQueue() {
     <span class="chip">supplied_document_bid_truth_review_needed ${escapeHtml(summary.supplied_document_bid_truth_review_needed || 0)}</span>
     <span class="chip">supplied_document_bid_truth_replacements_recorded ${escapeHtml(summary.supplied_document_bid_truth_replacements_recorded || 0)}</span>
     <span class="chip">sam31_sectioning_contract_reviews_recorded ${escapeHtml(summary.sam31_sectioning_contract_reviews_recorded || 0)}</span>
+    <span class="chip">sam31_sectioning_downstream_resolver_queue_items ${escapeHtml(summary.sam31_sectioning_downstream_resolver_queue_items || 0)}</span>
     <span class="chip">sam31_vector_model_artifacts_recorded ${escapeHtml(summary.sam31_vector_model_artifacts_recorded || 0)}</span>
     <span class="chip">catalog_approval_packet_ready ${escapeHtml(summary.catalog_approval_packet_ready || 0)}</span>
     <span class="chip">ready_for_signed_evidence_upload</span>

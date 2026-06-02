@@ -101,4 +101,20 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toContain('claim_gate_effect');
     expect(html).toContain('no_claims_cleared');
   });
+
+  it('surfaces SAM31 sectioning downstream resolver rows and filter links in the workbench', async () => {
+    const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
+    expect(shell.status).toBe(200);
+    const html = await shell.text();
+    expect(html).toContain('renderHalofireSam31SectioningDownstreamResolverQueue');
+    expect(html).toContain('SAM31 sectioning downstream resolver queue');
+    expect(html).toContain('sam31_sectioning_downstream_resolver_queue_items');
+    expect(html).toContain('halofire.sam31_sectioning_downstream_resolver_queue_item.v1');
+    expect(html).toContain('sam31SectioningReview=ready&lane=obstruction_or_clash_review');
+    expect(html).toContain('source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id');
+    expect(html).toContain('Download room-boundary replay input');
+    expect(html).toContain('Download SAM31 vector/model artifact packet');
+    expect(html).toContain('no_claims_cleared');
+  });
+
 });
