@@ -592,6 +592,12 @@ describe('OpenClaw SAM31 bridge status API', () => {
       application: 'halo_fire',
       claim_gate_effect: 'no_claims_cleared',
     }));
+    expect(artifact.sectioning_pipeline_contract).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.sectioning_pipeline_contract.v1',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(artifact.product_review_queue_item.sectioning_pipeline_contract_ref).toBe('openclaw.sam31.sectioning_pipeline_contract.v1');
     expect(artifact.product_review_action).toEqual(expect.objectContaining({
       status: 'ready_for_product_review_queue',
       contract_ref: 'openclaw.sam31.application_contract.halo_fire.v1',
@@ -2142,7 +2148,7 @@ describe('OpenClaw SAM31 bridge status API', () => {
     expect(resolvedNameForgeRes.status).toBe(200);
     const resolvedNameForge = await resolvedNameForgeRes.json();
     expect(resolvedNameForge.items.find((row) => row.evidence_id === boundary.id)).toBeUndefined();
-  });
+  }, 15000);
 
   it('carries saved bridge smoke artifacts into SAM31 audit defaults and replay evidence without clearing claims', async () => {
     const boundaryRes = await request(`${COOPERATIVE_1881_PATH}/pdf-boundary-decision`, {

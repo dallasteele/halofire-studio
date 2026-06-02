@@ -98,6 +98,37 @@ describe('SAM 3.1 local bridge contract', () => {
 
     expect(out.status).toBe(200);
     expect(out.body.product_review_queue_item.artifact_type).toBe('openclaw.sam31.product_review_queue_item.v1');
+    expect(out.body.sectioning_pipeline_contract).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.sectioning_pipeline_contract.v1',
+      status: 'internal_alpha_ready',
+      source_runtime: 'halofire-local-sam31-bridge',
+      claim_gate_effect: 'no_claims_cleared',
+      use_for_claims: false,
+    }));
+    expect(out.body.sectioning_pipeline_contract.stages).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        stage: 'sam31_sectioning',
+        consumes: expect.arrayContaining(['image_ref', 'sections']),
+        produces: expect.arrayContaining(['segments']),
+      }),
+      expect.objectContaining({
+        stage: 'llm_object_identification',
+        consumes: expect.arrayContaining(['segments', 'object_hypotheses']),
+        produces: expect.arrayContaining(['llm_observations', 'object_hypotheses']),
+      }),
+      expect.objectContaining({
+        stage: 'vector_overlay_generation',
+        consumes: expect.arrayContaining(['segments']),
+        produces: expect.arrayContaining(['vector_overlays']),
+      }),
+      expect.objectContaining({
+        stage: 'model_3d_candidate_generation',
+        consumes: expect.arrayContaining(['segments', 'vector_overlays']),
+        produces: expect.arrayContaining(['model_3d_candidates']),
+      }),
+    ]));
+    expect(out.body.perception_packet.sectioning_pipeline_contract.artifact_type).toBe('openclaw.sam31.sectioning_pipeline_contract.v1');
+    expect(out.body.product_review_queue_item.sectioning_pipeline_contract_ref).toBe('openclaw.sam31.sectioning_pipeline_contract.v1');
     expect(out.body.product_review_queue_item.extrapolation_index[0]).toEqual(expect.objectContaining({
       section_id: 'section-direct-1881',
       claim_gate_effect: 'no_claims_cleared',
@@ -149,6 +180,15 @@ describe('SAM 3.1 local bridge contract', () => {
       source_runtime: 'halofire-local-sam31-bridge',
       claim_gate_effect: 'no_claims_cleared',
     }));
+    expect(descriptor.sectioning_pipeline_contract).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.sectioning_pipeline_contract.v1',
+      status: 'internal_alpha_ready',
+      source_runtime: 'halofire-local-sam31-bridge',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(descriptor.sectioning_pipeline_contract.supported_applications).toEqual(['halo_fire', 'landscout', 'nameforge']);
+    expect(descriptor.sectioning_pipeline_contract.final_claim_gate_policy).toMatch(/does not clear/i);
     expect(descriptor.consumer_actions.landscout).toEqual(expect.objectContaining({
       method: 'POST',
       href: '/landscout/sam31/product-review-queue',

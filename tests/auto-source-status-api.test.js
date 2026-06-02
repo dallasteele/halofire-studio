@@ -259,6 +259,31 @@ describe('S5 GET /api/auto-source/status', () => {
       'model_3d_candidates',
       'extrapolation_index',
     ]));
+    expect(descriptor.sectioning_pipeline_contract).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.sectioning_pipeline_contract.v1',
+      status: 'internal_alpha_ready',
+      source_runtime: 'halofire-api-local-contract',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(descriptor.sectioning_pipeline_contract.stages).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        stage: 'sam31_sectioning',
+        produces: expect.arrayContaining(['segments']),
+      }),
+      expect.objectContaining({
+        stage: 'llm_object_identification',
+        produces: expect.arrayContaining(['llm_observations', 'object_hypotheses']),
+      }),
+      expect.objectContaining({
+        stage: 'vector_overlay_generation',
+        produces: expect.arrayContaining(['vector_overlays']),
+      }),
+      expect.objectContaining({
+        stage: 'model_3d_candidate_generation',
+        produces: expect.arrayContaining(['model_3d_candidates']),
+      }),
+    ]));
     expect(descriptor.supported_applications).toEqual(['halo_fire', 'landscout', 'nameforge']);
     expect(descriptor.application_contracts.halo_fire.supported_evidence_lanes).toEqual(expect.arrayContaining([
       'room_boundary_visual_audit',
@@ -295,6 +320,13 @@ describe('S5 GET /api/auto-source/status', () => {
     expect(packet.canonical_tool_descriptor).toEqual(expect.objectContaining({
       artifact_type: 'openclaw.sam31_llm_extrapolation_tool',
       local_tool_descriptor_source: 'halofire-api-local-contract',
+    }));
+    expect(packet.sectioning_pipeline_contract).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.sectioning_pipeline_contract.v1',
+      status: 'internal_alpha_ready',
+      source_runtime: 'halofire-api-local-contract',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
     }));
     expect(packet.cross_product_handoff_rows).toEqual(expect.arrayContaining([
       expect.objectContaining({

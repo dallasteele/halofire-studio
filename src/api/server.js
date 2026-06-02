@@ -38,7 +38,7 @@ import { readHomeDepotBidPackage, readHomeDepotRealTakeoff } from '../data/home-
 import { readCooperative1881BidPackage, readCooperative1881RealTakeoff } from '../data/cooperative-1881-bid-package.js';
 import { buildSuppliedDocumentBidTruthStatus } from '../data/supplied-document-bid-truth.js';
 import { buildPlanSegmentationPayload } from '../components/sam-floorplan.js';
-import { SAM31_FLOORPLAN_TOOL, sam31ToolDescriptorBody } from '../sam31/bridge.js';
+import { SAM31_FLOORPLAN_TOOL, sam31SectioningPipelineContract, sam31ToolDescriptorBody } from '../sam31/bridge.js';
 import { buildSamInvoker } from './sam-invoker.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -1971,6 +1971,13 @@ function sam31ApplicationContracts() {
 
 function localOpenClawSam31ToolDescriptor(projectName = null) {
   const bridgeDescriptor = sam31ToolDescriptorBody();
+  const sectioningPipelineContract = {
+    ...jsonClone(bridgeDescriptor.sectioning_pipeline_contract || sam31SectioningPipelineContract()),
+    source_runtime: 'halofire-api-local-contract',
+    use_for_claims: false,
+    no_claim_gates_cleared: true,
+    claim_gate_effect: 'no_claims_cleared',
+  };
   const applicationContracts = sam31ApplicationContracts();
   const consumerActions = {};
   for (const consumer of SAM31_CONSUMER_QUEUE_TARGETS) {
@@ -2001,6 +2008,7 @@ function localOpenClawSam31ToolDescriptor(projectName = null) {
     supported_applications: [...SAM31_SUPPORTED_APPLICATIONS],
     application_contracts: applicationContracts,
     extrapolation_contract: jsonClone(SAM31_EXTRAPOLATION_CONTRACT),
+    sectioning_pipeline_contract: sectioningPipelineContract,
     product_review_queue_contract: {
       ...jsonClone(bridgeDescriptor.product_review_queue_contract || {}),
       artifact_type: 'openclaw.sam31.product_review_queue_contract.v1',
@@ -2093,6 +2101,7 @@ function buildOpenClawSam31ToolContractPacket(projectName) {
     download_name: `${slugForDownloadName(projectName)}-openclaw-sam31-tool-contract.json`,
     source_runtime: 'halofire-api-local-contract',
     canonical_tool_descriptor: descriptor,
+    sectioning_pipeline_contract: descriptor.sectioning_pipeline_contract,
     product_review_queue_contract: descriptor.product_review_queue_contract,
     cross_product_handoff_rows: crossProductHandoffRows,
     temporary_value_policy: 'best_guess_until_employee_replaced',
@@ -2176,6 +2185,9 @@ function buildOpenClawSam31ProductReviewQueueItem({
     sourceRefs,
     blockedClaims: uniqueStrings([...blockedClaims, ...contract.blocked_claims]),
   });
+  const sectioningPipelineContract = perceptionPacket.sectioning_pipeline_contract && typeof perceptionPacket.sectioning_pipeline_contract === 'object'
+    ? perceptionPacket.sectioning_pipeline_contract
+    : sam31SectioningPipelineContract(perceptionPacket.source_runtime || request.source_runtime || 'sam-3.1+llm');
   return {
     artifact_type: SAM31_PRODUCT_REVIEW_QUEUE_ITEM_TYPE,
     status: 'ready_for_human_replacement_or_acceptance',
@@ -2184,6 +2196,7 @@ function buildOpenClawSam31ProductReviewQueueItem({
     source_runtime: 'sam-3.1+llm',
     source_packet_ref: perceptionPacket.artifact_type || 'openclaw.sam31_perception_packet',
     contract_ref: productReviewAction.contract_ref || contract.contract_ref,
+    sectioning_pipeline_contract_ref: sectioningPipelineContract.artifact_type,
     supported_evidence_lanes: Array.isArray(productReviewAction.supported_evidence_lanes)
       ? jsonClone(productReviewAction.supported_evidence_lanes)
       : [...contract.supported_evidence_lanes],
@@ -2288,6 +2301,9 @@ function sam31ExtrapolationIndex({
 
 function sam31PerceptionSummaryFromParts(packet, vectorOverlays, modelCandidates, applicationAdapter) {
   const applicationContracts = packet.application_contracts || sam31ApplicationContracts();
+  const sectioningPipelineContract = packet.sectioning_pipeline_contract && typeof packet.sectioning_pipeline_contract === 'object'
+    ? packet.sectioning_pipeline_contract
+    : sam31SectioningPipelineContract(packet.source_runtime || 'sam-3.1+llm');
   return {
     artifact_type: 'openclaw.sam31_perception_summary',
     status: packet.status || 'best_effort_perception_ready',
@@ -2304,6 +2320,7 @@ function sam31PerceptionSummaryFromParts(packet, vectorOverlays, modelCandidates
     spatial_observation_count: Array.isArray(packet.spatial_observations) ? packet.spatial_observations.length : 0,
     blocked_claims: uniqueStrings([...(Array.isArray(packet.blocked_claims) ? packet.blocked_claims : []), ...SAM31_BLOCKED_CLAIMS]),
     extrapolation_contract_ref: SAM31_EXTRAPOLATION_CONTRACT_REF,
+    sectioning_pipeline_contract_ref: sectioningPipelineContract.artifact_type,
     application_contract_refs: SAM31_SUPPORTED_APPLICATIONS.map((application) => applicationContracts[application]?.contract_ref).filter(Boolean),
     active_application_contract_ref: applicationAdapter?.contract_ref || applicationContracts.halo_fire?.contract_ref || null,
     application_adapter_ref: applicationAdapter?.artifact_type || null,
@@ -2357,6 +2374,7 @@ function buildOpenClawSam31PerceptionRequest(projectName, evidence, decision, ca
   const model3dCandidates = sam31GeneratedModel3dCandidates(segments);
   const applicationContracts = sam31ApplicationContracts();
   const applicationAdapter = sam31ApplicationAdapter('halo_fire', projectRef, sourceRef, applicationContracts);
+  const sectioningPipelineContract = sam31SectioningPipelineContract('sam-3.1+llm');
   const request = {
     artifact_type: 'openclaw.sam31_perception_request',
     project_ref: projectRef,
@@ -2382,6 +2400,7 @@ function buildOpenClawSam31PerceptionRequest(projectName, evidence, decision, ca
       observation: `${entry.semantic_label} inferred from SAM 3.1 segment ${entry.id}`,
     })),
     extrapolation_contract: jsonClone(SAM31_EXTRAPOLATION_CONTRACT),
+    sectioning_pipeline_contract: sectioningPipelineContract,
     application_contracts: applicationContracts,
     application_adapter: applicationAdapter,
     requested_outputs: ['segmentation_masks', 'semantic_labels', 'vector_overlays', 'model_3d_candidates', 'spatial_observation_packet'],
@@ -2430,6 +2449,15 @@ function normalizeOpenClawSam31PerceptionPacket(body = {}) {
   packet.extrapolation_contract = packet.extrapolation_contract && typeof packet.extrapolation_contract === 'object'
     ? { ...jsonClone(SAM31_EXTRAPOLATION_CONTRACT), ...jsonClone(packet.extrapolation_contract), claim_gate_effect: 'no_claims_cleared' }
     : jsonClone(SAM31_EXTRAPOLATION_CONTRACT);
+  packet.sectioning_pipeline_contract = packet.sectioning_pipeline_contract && typeof packet.sectioning_pipeline_contract === 'object' && !Array.isArray(packet.sectioning_pipeline_contract)
+    ? {
+      ...jsonClone(sam31SectioningPipelineContract(packet.source_runtime || 'sam-3.1+llm')),
+      ...jsonClone(packet.sectioning_pipeline_contract),
+      use_for_claims: false,
+      no_claim_gates_cleared: true,
+      claim_gate_effect: 'no_claims_cleared',
+    }
+    : sam31SectioningPipelineContract(packet.source_runtime || 'sam-3.1+llm');
   const applicationContracts = sam31ApplicationContracts();
   if (packet.application_contracts && typeof packet.application_contracts === 'object' && !Array.isArray(packet.application_contracts)) {
     const suppliedContracts = jsonClone(packet.application_contracts);
@@ -7559,6 +7587,7 @@ function normalizeOpenClawSam31ExtrapolationArtifact(projectName, evidence, deci
         claim_gate_effect: 'no_claims_cleared',
       },
     perception_packet: perceptionPacket,
+    sectioning_pipeline_contract: perceptionPacket.sectioning_pipeline_contract,
     section_count: Number.isFinite(Number(rawArtifact.section_count)) ? Number(rawArtifact.section_count) : request.sections.length,
     object_hypothesis_count: Number.isFinite(Number(rawArtifact.object_hypothesis_count)) ? Number(rawArtifact.object_hypothesis_count) : request.object_hypotheses.length,
     source_refs: [

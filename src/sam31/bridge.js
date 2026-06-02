@@ -338,6 +338,7 @@ function cooperative1881Truth() {
 
 function buildSam31ExtrapolationArtifact(payload) {
   const bidTruth = cooperative1881Truth();
+  const sectioningPipelineContract = sam31SectioningPipelineContract();
   const sections = (payload.sections.length ? payload.sections : [{}])
     .map((section, index) => normalizedSection(section, index, bidTruth));
   const objectHypotheses = normalizedObjectHypotheses(payload.object_hypotheses, sections);
@@ -443,6 +444,7 @@ function buildSam31ExtrapolationArtifact(payload) {
     vector_overlays: vectorOverlays,
     model_3d_candidates: model3dCandidates,
     spatial_observations: spatialObservations,
+    sectioning_pipeline_contract: sectioningPipelineContract,
     bid_truth: bidTruth,
     blocked_claims: BLOCKED_CLAIMS.slice(),
     limitations: LIMITATIONS.slice(),
@@ -458,6 +460,7 @@ function buildSam31ExtrapolationArtifact(payload) {
     source_runtime: 'halofire-local-sam31-bridge',
     source_packet_ref: perceptionPacket.artifact_type,
     contract_ref: 'openclaw.sam31.application_contract.halo_fire.v1',
+    sectioning_pipeline_contract_ref: sectioningPipelineContract.artifact_type,
     supported_evidence_lanes: ['room_boundary_visual_audit', 'sleeve_or_firestop_candidate_review', 'obstruction_or_clash_review', 'vector_overlay_generation', 'model_3d_candidate_generation'],
     acceptable_human_updates: ['semantic_label', 'polygon', 'bbox', 'object_hypothesis', 'vector_overlay', 'model_3d_candidate', 'source_ref', 'confidence'],
     temporary_value_policy: 'best_guess_until_employee_replaced',
@@ -480,6 +483,7 @@ function buildSam31ExtrapolationArtifact(payload) {
     source_ref: payload.source_ref || null,
     image_ref: payload.image_ref || null,
     source_runtime: 'halofire-local-sam31-bridge',
+    sectioning_pipeline_contract: sectioningPipelineContract,
     bid_truth: bidTruth,
     perception_packet: perceptionPacket,
     product_review_queue_item: productReviewQueueItem,
@@ -561,6 +565,68 @@ function invokeExtrapolate(args) {
   };
 }
 
+export function sam31SectioningPipelineContract(sourceRuntime = 'halofire-local-sam31-bridge') {
+  const stages = [
+    {
+      stage: 'sam31_sectioning',
+      consumes: ['image_ref', 'sections', 'coordinate_frame_ref', 'unit'],
+      produces: ['segments', 'bbox', 'polygon'],
+      evidence_role: 'measurement_or_correction_evidence',
+    },
+    {
+      stage: 'llm_object_identification',
+      consumes: ['segments', 'object_hypotheses', 'prompt'],
+      produces: ['llm_observations', 'object_hypotheses', 'semantic_labels'],
+      evidence_role: 'semantic_candidate_evidence',
+    },
+    {
+      stage: 'vector_overlay_generation',
+      consumes: ['segments', 'polygon', 'bbox'],
+      produces: ['vector_overlays', 'svg_path'],
+      evidence_role: 'source_linked_vector_draft',
+    },
+    {
+      stage: 'model_3d_candidate_generation',
+      consumes: ['segments', 'vector_overlays', 'unit'],
+      produces: ['model_3d_candidates', 'spatial_observations'],
+      evidence_role: 'best_effort_3d_candidate',
+    },
+    {
+      stage: 'product_review_queue',
+      consumes: ['perception_packet', 'extrapolation_index'],
+      produces: ['product_review_queue_item', 'missing_evidence_rows'],
+      evidence_role: 'human_replacement_queue',
+    },
+  ];
+  return {
+    artifact_type: 'openclaw.sam31.sectioning_pipeline_contract.v1',
+    status: 'internal_alpha_ready',
+    source_runtime: sourceRuntime,
+    supported_applications: ['halo_fire', 'landscout', 'nameforge'],
+    stages: stages.map((stage) => ({
+      ...stage,
+      temporary_value_policy: 'best_guess_until_employee_replaced',
+      use_for_claims: false,
+      no_claim_gates_cleared: true,
+      claim_gate_effect: CLAIM_GATE_EFFECT,
+    })),
+    replacement_required_before_claims: true,
+    acceptable_replacement_evidence: [
+      'employee or product-owner reviewed semantic label',
+      'source-linked corrected polygon or bbox',
+      'source-linked corrected vector overlay',
+      'source-linked corrected 3D model candidate',
+      'screenshot or console evidence for reviewed sectioning',
+    ],
+    blocked_claims: BLOCKED_CLAIMS.slice(),
+    final_claim_gate_policy: 'This contract does not clear regulated or owning-product claims; SAM31 sectioning, LLM observations, vector overlays, and 3D candidates require actual replacement or approval evidence.',
+    use_for_claims: false,
+    no_claim_gates_cleared: true,
+    claim_gate_effect: CLAIM_GATE_EFFECT,
+    limitations: LIMITATIONS.slice(),
+  };
+}
+
 export function sam31ToolDescriptorBody() {
   return {
     artifact_type: 'openclaw.sam31_llm_extrapolation_tool',
@@ -570,6 +636,7 @@ export function sam31ToolDescriptorBody() {
     output_lanes: ['llm_observations', 'vector_overlays', 'model_3d_candidates', 'extrapolation_index'],
     supported_applications: ['halo_fire', 'landscout', 'nameforge'],
     perception_lanes: ['segmentation', 'object_identification', 'vector_overlay', 'model_3d_candidate', 'spatial_observation'],
+    sectioning_pipeline_contract: sam31SectioningPipelineContract(),
     action: {
       method: 'POST',
       href: '/vision/sam31/extrapolate',
