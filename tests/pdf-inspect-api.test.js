@@ -413,6 +413,82 @@ describe('PDF page inspection API', () => {
     expect(samResultRow.notes).toContain('sam31_room_boundary_visual_audit_result');
     expect(samResultRow.notes).toContain('no_claims_cleared');
 
+    const queueAfterSamResult = await (await request(`${COOPERATIVE_1881_PATH}/resolver-queue`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })).json();
+    const samReviewedItem = queueAfterSamResult.items.find((q) => q.evidence_id === body.evidence.id);
+    expect(samReviewedItem.status).toBe('sam31_correction_ready');
+    expect(samReviewedItem.next_action).toMatch(/SAM 3\.1/i);
+    expect(samReviewedItem.latest_sam31_visual_audit).toEqual(expect.objectContaining({
+      evidence_id: samResult.evidence.id,
+      review_decision: 'corrected',
+      reviewer_name: 'Halo Fire SAM reviewer',
+      sam31_result_ref: '1881://sam31/sheet-7-segmentation.json',
+      corrected_room_polygon_count: 1,
+      issue_count: 1,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(queueAfterSamResult.summary.sam31_correction_ready).toBe(1);
+
+    const samReplayRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${body.evidence.id}/replay-input`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(samReplayRes.status).toBe(200);
+    const samReplayPacket = await samReplayRes.json();
+    expect(samReplayPacket).toEqual(expect.objectContaining({
+      artifact_type: 'room_boundary_replay_input_packet',
+      status: 'ready_for_internal_alpha_replay',
+      source_evidence_id: body.evidence.id,
+      source_sam31_evidence_id: samResult.evidence.id,
+      review_decision: 'corrected',
+      review_source: 'latest_sam31_visual_audit',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(samReplayPacket.corrected_room_polygons[0]).toEqual(expect.objectContaining({
+      room_id: 'sam31-corridor-a',
+      polygon: [[0, 0], [30, 0], [30, 10], [0, 10]],
+    }));
+    expect(samReplayPacket.sprinkler_bid_request).toEqual(expect.objectContaining({
+      room_boundary_source: 'latest_sam31_visual_audit',
+      source_evidence_id: body.evidence.id,
+      source_sam31_evidence_id: samResult.evidence.id,
+      use_for_claims: false,
+    }));
+    expect(samReplayPacket.source_refs).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        evidence_id: body.evidence.id,
+        evidence_type: 'pdf_boundary_decision',
+      }),
+      expect.objectContaining({
+        evidence_id: samResult.evidence.id,
+        evidence_type: 'sam31_room_boundary_visual_audit',
+      }),
+    ]));
+    expect(samReplayPacket.blocked_claims).toEqual(expect.arrayContaining(['geometry_accuracy', 'permit_ready', 'AutoSprink_parity']));
+
+    const samReplayBidRes = await request(`${COOPERATIVE_1881_PATH}/sprinkler-bid`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        markupPct: 25,
+        ...samReplayPacket.sprinkler_bid_request,
+      }),
+    });
+    expect(samReplayBidRes.status).toBe(200);
+    const samReplayBid = await samReplayBidRes.json();
+    expect(samReplayBid.roomBoundaryReplay).toEqual(expect.objectContaining({
+      room_boundary_source: 'latest_sam31_visual_audit',
+      source_sam31_evidence_id: samResult.evidence.id,
+      corrected_room_polygon_count: 1,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(samReplayBid.bid.totalAreaSqFt).toBe(300);
+    expect(samReplayBid.bid.rooms[0]).toEqual(expect.objectContaining({
+      name: 'sam31-corridor-a',
+      areaSqFt: 300,
+    }));
+
     const reviewRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${body.evidence.id}/reviews`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` },

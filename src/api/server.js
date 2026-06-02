@@ -681,7 +681,11 @@ app.get('/api/projects/:name/evidence/:evidenceId/replay-bid-artifact', authMidd
     source_replay_packet: {
       source_evidence_id: notes.source_evidence_id,
       source_review_evidence_id: notes.source_review_evidence_id,
+      source_sam31_evidence_id: notes.source_sam31_evidence_id,
       marked_up_plan_ref: notes.marked_up_plan_ref,
+      sam31_result_ref: notes.sam31_result_ref,
+      screenshot_ref: notes.screenshot_ref,
+      console_log_ref: notes.console_log_ref,
       corrected_room_polygon_count: notes.corrected_room_polygon_count,
     },
     bid_summary: notes.bid_summary || {
@@ -1264,6 +1268,31 @@ function latestPdfBoundaryReviewEvidence(projectName, sourceEvidenceId) {
   return null;
 }
 
+function sam31VisualAuditResultFromEvidence(row) {
+  if (!row) return null;
+  try {
+    const parsed = JSON.parse(row.notes || '{}');
+    return parsed && parsed.kind === 'sam31_room_boundary_visual_audit_result' ? parsed.result : null;
+  } catch {
+    return null;
+  }
+}
+
+function latestSam31VisualAuditEvidence(projectName, sourceEvidenceId) {
+  const rows = db
+    .prepare(`SELECT * FROM project_evidence
+              WHERE project_name = ? AND evidence_type = 'sam31_room_boundary_visual_audit'
+              ORDER BY created_at DESC, id DESC`)
+    .all(projectName);
+  for (const row of rows) {
+    const result = sam31VisualAuditResultFromEvidence(row);
+    if (result && Number(result.source_evidence_id) === Number(sourceEvidenceId)) {
+      return { evidence: row, result };
+    }
+  }
+  return null;
+}
+
 app.get('/api/projects/:name/pdf-boundary-decision', authMiddleware, (req, res) => {
   const evidence = latestPdfBoundaryDecisionEvidence(req.params.name);
   res.json({ evidence: evidence || null, decision: decisionFromEvidence(evidence) });
@@ -1303,7 +1332,7 @@ app.post('/api/projects/:name/pdf-boundary-decision', authMiddleware, requireRol
   }
 });
 
-function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence = null) {
+function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence = null, sam31Evidence = null) {
   if (!evidence || !decision) return null;
   const candidate = decision.candidate || {};
   const latestReview = reviewEvidence && reviewEvidence.review ? {
@@ -1318,6 +1347,21 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
     corrected_room_polygon_count: Array.isArray(reviewEvidence.review.corrected_room_polygons) ? reviewEvidence.review.corrected_room_polygons.length : 0,
     claim_gate_effect: reviewEvidence.review.claim_gate_effect || 'no_claims_cleared',
   } : null;
+  const latestSam31VisualAudit = sam31Evidence && sam31Evidence.result ? {
+    evidence_id: sam31Evidence.evidence.id,
+    evidence_status: sam31Evidence.evidence.status,
+    source_ref: sam31Evidence.evidence.source_ref,
+    review_decision: sam31Evidence.result.review_decision,
+    reviewer_name: sam31Evidence.result.reviewer_name,
+    reviewed_at: sam31Evidence.result.reviewed_at,
+    sam31_result_ref: sam31Evidence.result.sam31_result_ref,
+    screenshot_ref: sam31Evidence.result.screenshot_ref,
+    console_log_ref: sam31Evidence.result.console_log_ref,
+    marked_up_plan_ref: sam31Evidence.result.marked_up_plan_ref,
+    issue_count: Array.isArray(sam31Evidence.result.issue_list) ? sam31Evidence.result.issue_list.length : 0,
+    corrected_room_polygon_count: Array.isArray(sam31Evidence.result.corrected_room_polygons) ? sam31Evidence.result.corrected_room_polygons.length : 0,
+    claim_gate_effect: sam31Evidence.result.claim_gate_effect || 'no_claims_cleared',
+  } : null;
   let status = 'ready';
   let nextAction = 'Open the selected PDF sheet with these defaults, run a room-boundary visual audit packet, and attach employee review evidence before any geometry-accuracy claim.';
   if (latestReview?.review_decision === 'corrected') {
@@ -1329,6 +1373,15 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
   } else if (latestReview?.review_decision === 'rejected') {
     status = 'blocked';
     nextAction = 'The latest employee review rejected this boundary. Save a new boundary decision or corrected review packet before replay.';
+  } else if (latestSam31VisualAudit?.review_decision === 'corrected') {
+    status = 'sam31_correction_ready';
+    nextAction = 'Replay the best-effort layout with the corrected room polygons from the latest SAM 3.1 visual audit result; regulated claims remain blocked.';
+  } else if (latestSam31VisualAudit?.review_decision === 'accepted') {
+    status = 'sam31_reviewed';
+    nextAction = 'Use the accepted SAM 3.1 visual audit result for internal-alpha replay; attach licensed/AHJ/AutoSprink/manufacturer evidence before any regulated claim.';
+  } else if (latestSam31VisualAudit?.review_decision === 'rejected') {
+    status = 'blocked';
+    nextAction = 'The latest SAM 3.1 visual audit rejected this boundary. Save a new boundary decision, SAM result, or corrected review packet before replay.';
   }
   return {
     id: `resolver:pdf-boundary:${evidence.id}`,
@@ -1355,6 +1408,7 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
     },
     blocked_claims: Array.isArray(decision.blockedClaims) ? decision.blockedClaims : [...PDF_BOUNDARY_BLOCKED_CLAIMS],
     latest_review: latestReview,
+    latest_sam31_visual_audit: latestSam31VisualAudit,
     limitations: [
       decision.limitation || 'Saved boundary choice is best-effort evidence only.',
       'This queue item does not prove geometry accuracy, AHJ approval, PE review, AutoSprink parity, permit readiness, fabrication readiness, or manufacturer-exact models.',
@@ -2299,59 +2353,82 @@ function normalizeSam31VisualAuditResult(projectName, evidence, decision, body =
   };
 }
 
-function pdfBoundaryReplayInputPacket(projectName, evidence, decision, reviewEvidence) {
-  if (!evidence || !decision || !reviewEvidence?.review) return null;
-  const review = reviewEvidence.review;
+function pdfBoundaryReplayInputPacket(projectName, evidence, decision, reviewEvidence, sam31Evidence = null) {
+  if (!evidence || !decision) return null;
+  const review = reviewEvidence?.review || sam31Evidence?.result || null;
+  if (!review) return null;
+  const reviewSource = reviewEvidence?.review ? 'latest_employee_review_packet' : 'latest_sam31_visual_audit';
+  const reviewRow = reviewEvidence?.review ? reviewEvidence.evidence : sam31Evidence.evidence;
   if (review.review_decision === 'rejected') {
-    const e = new Error('Latest room-boundary review rejected this boundary; replay input is blocked');
+    const e = new Error(
+      reviewSource === 'latest_sam31_visual_audit'
+        ? 'Latest SAM 3.1 visual audit rejected this boundary; replay input is blocked'
+        : 'Latest room-boundary review rejected this boundary; replay input is blocked',
+    );
     e.httpStatus = 409;
     throw e;
   }
   const correctedRoomPolygons = Array.isArray(review.corrected_room_polygons)
     ? jsonClone(review.corrected_room_polygons)
     : [];
-  const queueItem = pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence);
+  const queueItem = pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence, sam31Evidence);
+  const sourceRefs = [
+    {
+      evidence_id: evidence.id,
+      evidence_type: evidence.evidence_type,
+      source_ref: evidence.source_ref || decision.sourceRef || null,
+      status: evidence.status,
+    },
+    {
+      evidence_id: reviewRow.id,
+      evidence_type: reviewRow.evidence_type,
+      source_ref: reviewRow.source_ref,
+      status: reviewRow.status,
+    },
+  ];
+  const sprinklerBidRequest = {
+    room_boundary_source: reviewSource,
+    source_evidence_id: evidence.id,
+    pdfPageIndex: decision.pageIndex,
+    pdfScale: decision.scale,
+    pdfExtract: decision.extractMode,
+    corrected_room_polygons: correctedRoomPolygons,
+    use_for_claims: false,
+  };
+  if (reviewSource === 'latest_employee_review_packet') {
+    sprinklerBidRequest.source_review_evidence_id = reviewRow.id;
+  } else {
+    sprinklerBidRequest.source_sam31_evidence_id = reviewRow.id;
+  }
   return {
     artifact_type: 'room_boundary_replay_input_packet',
     status: 'ready_for_internal_alpha_replay',
     project_name: projectName,
     source_evidence_id: evidence.id,
-    source_review_evidence_id: reviewEvidence.evidence.id,
+    ...(reviewSource === 'latest_employee_review_packet'
+      ? { source_review_evidence_id: reviewRow.id }
+      : { source_sam31_evidence_id: reviewRow.id }),
     source_ref: evidence.source_ref || decision.sourceRef || null,
     source_file: evidence.source_file || decision.sourceFile || null,
     download_name: `${slugForDownloadName(projectName)}-room-boundary-replay-input-${evidence.id}.json`,
     generated_at: new Date().toISOString(),
+    review_source: reviewSource,
     review_decision: review.review_decision,
     reviewer_name: review.reviewer_name,
     reviewed_at: review.reviewed_at,
     marked_up_plan_ref: review.marked_up_plan_ref,
+    ...(reviewSource === 'latest_sam31_visual_audit'
+      ? {
+        sam31_result_ref: review.sam31_result_ref || null,
+        screenshot_ref: review.screenshot_ref || null,
+        console_log_ref: review.console_log_ref || null,
+      }
+      : {}),
     issue_list: Array.isArray(review.issue_list) ? jsonClone(review.issue_list) : [],
     corrected_room_polygons: correctedRoomPolygons,
     input_defaults: queueItem.input_defaults,
-    sprinkler_bid_request: {
-      room_boundary_source: 'latest_employee_review_packet',
-      source_evidence_id: evidence.id,
-      source_review_evidence_id: reviewEvidence.evidence.id,
-      pdfPageIndex: decision.pageIndex,
-      pdfScale: decision.scale,
-      pdfExtract: decision.extractMode,
-      corrected_room_polygons: correctedRoomPolygons,
-      use_for_claims: false,
-    },
-    source_refs: [
-      {
-        evidence_id: evidence.id,
-        evidence_type: evidence.evidence_type,
-        source_ref: evidence.source_ref || decision.sourceRef || null,
-        status: evidence.status,
-      },
-      {
-        evidence_id: reviewEvidence.evidence.id,
-        evidence_type: reviewEvidence.evidence.evidence_type,
-        source_ref: reviewEvidence.evidence.source_ref,
-        status: reviewEvidence.evidence.status,
-      },
-    ],
+    sprinkler_bid_request: sprinklerBidRequest,
+    source_refs: sourceRefs,
     blocked_claims: queueItem.blocked_claims,
     claim_gate_effect: 'no_claims_cleared',
     limitations: [
@@ -2362,16 +2439,23 @@ function pdfBoundaryReplayInputPacket(projectName, evidence, decision, reviewEvi
 }
 
 function resolveRoomBoundaryReplayFloorPlan(req, projectName) {
-  if (req.body?.room_boundary_source !== 'latest_employee_review_packet') return null;
+  const replaySource = String(req.body?.room_boundary_source || '').trim();
+  if (!['latest_employee_review_packet', 'latest_sam31_visual_audit'].includes(replaySource)) return null;
   const sourceEvidenceId = Number(req.body.source_evidence_id);
   const sourceReviewEvidenceId = Number(req.body.source_review_evidence_id);
+  const sourceSam31EvidenceId = Number(req.body.source_sam31_evidence_id);
   if (!Number.isSafeInteger(sourceEvidenceId) || sourceEvidenceId <= 0) {
     const e = new Error('source_evidence_id is required for room-boundary replay input');
     e.httpStatus = 400;
     throw e;
   }
-  if (!Number.isSafeInteger(sourceReviewEvidenceId) || sourceReviewEvidenceId <= 0) {
+  if (replaySource === 'latest_employee_review_packet' && (!Number.isSafeInteger(sourceReviewEvidenceId) || sourceReviewEvidenceId <= 0)) {
     const e = new Error('source_review_evidence_id is required for room-boundary replay input');
+    e.httpStatus = 400;
+    throw e;
+  }
+  if (replaySource === 'latest_sam31_visual_audit' && (!Number.isSafeInteger(sourceSam31EvidenceId) || sourceSam31EvidenceId <= 0)) {
+    const e = new Error('source_sam31_evidence_id is required for SAM 3.1 room-boundary replay input');
     e.httpStatus = 400;
     throw e;
   }
@@ -2387,18 +2471,33 @@ function resolveRoomBoundaryReplayFloorPlan(req, projectName) {
     .prepare(`SELECT * FROM project_evidence
               WHERE id = ? AND project_name = ? AND evidence_type = 'pdf_boundary_decision'`)
     .get(sourceEvidenceId, projectName);
-  const sourceReviewEvidence = db
-    .prepare(`SELECT * FROM project_evidence
-              WHERE id = ? AND project_name = ? AND evidence_type = 'room_boundary_review_packet'`)
-    .get(sourceReviewEvidenceId, projectName);
-  const sourceReview = reviewFromEvidence(sourceReviewEvidence);
+  const sourceReviewEvidence = replaySource === 'latest_employee_review_packet'
+    ? db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'room_boundary_review_packet'`)
+      .get(sourceReviewEvidenceId, projectName)
+    : db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'sam31_room_boundary_visual_audit'`)
+      .get(sourceSam31EvidenceId, projectName);
+  const sourceReview = replaySource === 'latest_employee_review_packet'
+    ? reviewFromEvidence(sourceReviewEvidence)
+    : sam31VisualAuditResultFromEvidence(sourceReviewEvidence);
   if (!sourceEvidence || !sourceReview || Number(sourceReview.source_evidence_id) !== sourceEvidenceId) {
-    const e = new Error('Replay input source evidence does not match a saved room-boundary review packet');
+    const e = new Error(
+      replaySource === 'latest_sam31_visual_audit'
+        ? 'Replay input source evidence does not match a saved SAM 3.1 visual audit result'
+        : 'Replay input source evidence does not match a saved room-boundary review packet',
+    );
     e.httpStatus = 409;
     throw e;
   }
   if (sourceReview.review_decision === 'rejected') {
-    const e = new Error('Latest room-boundary review rejected this boundary; replay input is blocked');
+    const e = new Error(
+      replaySource === 'latest_sam31_visual_audit'
+        ? 'Latest SAM 3.1 visual audit rejected this boundary; replay input is blocked'
+        : 'Latest room-boundary review rejected this boundary; replay input is blocked',
+    );
     e.httpStatus = 409;
     throw e;
   }
@@ -2416,11 +2515,20 @@ function resolveRoomBoundaryReplayFloorPlan(req, projectName) {
   return {
     floorPlan,
     replayInput: {
-      room_boundary_source: 'latest_employee_review_packet',
+      room_boundary_source: replaySource,
       source_evidence_id: sourceEvidenceId,
-      source_review_evidence_id: sourceReviewEvidenceId,
+      ...(replaySource === 'latest_employee_review_packet'
+        ? { source_review_evidence_id: sourceReviewEvidenceId }
+        : { source_sam31_evidence_id: sourceSam31EvidenceId }),
       source_ref: sourceEvidence.source_ref || sourceReview.source_ref || null,
       marked_up_plan_ref: sourceReview.marked_up_plan_ref || null,
+      ...(replaySource === 'latest_sam31_visual_audit'
+        ? {
+          sam31_result_ref: sourceReview.sam31_result_ref || null,
+          screenshot_ref: sourceReview.screenshot_ref || null,
+          console_log_ref: sourceReview.console_log_ref || null,
+        }
+        : {}),
       corrected_room_polygon_count: correctedRoomPolygons.length,
       use_for_claims: false,
       claim_gate_effect: 'no_claims_cleared',
@@ -2505,6 +2613,7 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
   const evidence = latestPdfBoundaryDecisionEvidence(projectName);
   const decision = decisionFromEvidence(evidence);
   const reviewEvidence = evidence ? latestPdfBoundaryReviewEvidence(projectName, evidence.id) : null;
+  const sam31Evidence = evidence ? latestSam31VisualAuditEvidence(projectName, evidence.id) : null;
   const items = [];
   const officialFlowEvidence = latestOfficialFlowIntakeEvidence(projectName);
   const officialFlowItem = officialFlowResolverQueueItem(projectName, officialFlowEvidence);
@@ -2513,7 +2622,7 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
     const replayItem = officialFlowReplayReviewQueueItem(projectName, replayEvidence);
     if (replayItem) items.push(replayItem);
   }
-  const boundaryItem = pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence);
+  const boundaryItem = pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence, sam31Evidence);
   if (boundaryItem) items.push(boundaryItem);
   const catalogEvidence = matchingCatalogEvidenceByFamily(projectName);
   for (const row of currentSourceAcquisitionLedger()) {
@@ -2537,6 +2646,8 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
       blocked: statusCounts.blocked || 0,
       correction_ready: statusCounts.correction_ready || 0,
       reviewed: statusCounts.reviewed || 0,
+      sam31_correction_ready: statusCounts.sam31_correction_ready || 0,
+      sam31_reviewed: statusCounts.sam31_reviewed || 0,
       catalog_source_needed: statusCounts.catalog_source_needed || 0,
       catalog_review_needed: statusCounts.catalog_review_needed || 0,
       catalog_evidence_recorded: statusCounts.catalog_evidence_recorded || 0,
@@ -2757,9 +2868,10 @@ app.get('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/replay-in
       .get(evidenceId, projectName);
     const decision = decisionFromEvidence(evidence);
     const reviewEvidence = evidence ? latestPdfBoundaryReviewEvidence(projectName, evidence.id) : null;
-    const packet = pdfBoundaryReplayInputPacket(projectName, evidence, decision, reviewEvidence);
+    const sam31Evidence = evidence ? latestSam31VisualAuditEvidence(projectName, evidence.id) : null;
+    const packet = pdfBoundaryReplayInputPacket(projectName, evidence, decision, reviewEvidence, sam31Evidence);
     if (!packet) {
-      return res.status(409).json({ error: 'No employee room-boundary review packet is available for replay input' });
+      return res.status(409).json({ error: 'No employee or SAM 3.1 room-boundary review packet is available for replay input' });
     }
     res.json(packet);
   } catch (err) {
@@ -2818,7 +2930,7 @@ function runSprinklerPipeline(req, prebuilt = null) {
   let replayInput = null;
   if (floorPlan) {
     // A PDF (or other async) source was resolved upstream; skip source selection.
-  } else if (req.body?.room_boundary_source === 'latest_employee_review_packet') {
+  } else if (['latest_employee_review_packet', 'latest_sam31_visual_audit'].includes(req.body?.room_boundary_source)) {
     const replay = resolveRoomBoundaryReplayFloorPlan(req, projectName);
     floorPlan = replay.floorPlan;
     replayInput = replay.replayInput;
@@ -2930,8 +3042,12 @@ function runSprinklerPipeline(req, prebuilt = null) {
 
   // Record that a best-effort layout was generated — as evidence, not a clearance.
   if (normalizeRole(req.user?.role) === 'admin') {
+    const replayEvidenceToken = replayInput?.source_sam31_evidence_id || replayInput?.source_review_evidence_id;
+    const replayEvidenceKind = replayInput?.room_boundary_source === 'latest_sam31_visual_audit'
+      ? 'sam31-room-boundary-replay'
+      : 'room-boundary-replay';
     const evidenceSourceRef = replayInput
-      ? `pdf-boundary:${replayInput.source_evidence_id}:room-boundary-replay:${replayInput.source_review_evidence_id}`
+      ? `pdf-boundary:${replayInput.source_evidence_id}:${replayEvidenceKind}:${replayEvidenceToken}`
       : `engine ${bid.generatedBy}`;
     const evidenceNotes = replayInput
       ? JSON.stringify({
@@ -2939,12 +3055,17 @@ function runSprinklerPipeline(req, prebuilt = null) {
         artifact_type: 'room_boundary_replay_bid_artifact',
         artifact_status: 'best_effort_internal_alpha',
         replay_generated_at: new Date().toISOString(),
-        download_name: `room-boundary-replay-bid-artifact-${replayInput.source_evidence_id}-${replayInput.source_review_evidence_id}.json`,
+        download_name: `room-boundary-replay-bid-artifact-${replayInput.source_evidence_id}-${replayEvidenceToken}.json`,
         generated_by: bid.generatedBy,
+        room_boundary_source: replayInput.room_boundary_source,
         source_evidence_id: replayInput.source_evidence_id,
         source_review_evidence_id: replayInput.source_review_evidence_id,
+        source_sam31_evidence_id: replayInput.source_sam31_evidence_id,
         source_ref: replayInput.source_ref,
         marked_up_plan_ref: replayInput.marked_up_plan_ref,
+        sam31_result_ref: replayInput.sam31_result_ref,
+        screenshot_ref: replayInput.screenshot_ref,
+        console_log_ref: replayInput.console_log_ref,
         corrected_room_polygon_count: replayInput.corrected_room_polygon_count,
         total_head_count: bid.totalHeadCount,
         total_area_sqft: bid.totalAreaSqFt,
@@ -2956,9 +3077,11 @@ function runSprinklerPipeline(req, prebuilt = null) {
         },
         blocked_claims: replayInput.blocked_claims,
         claim_gate_effect: 'no_claims_cleared',
-        summary: `claim_gate_effect=no_claims_cleared source_review_evidence_id=${replayInput.source_review_evidence_id}`,
+        summary: `claim_gate_effect=no_claims_cleared room_boundary_source=${replayInput.room_boundary_source} replay_evidence_id=${replayEvidenceToken}`,
         limitations: [
-          'Generated from employee-reviewed room-boundary correction evidence for internal-alpha replay only.',
+          replayInput.room_boundary_source === 'latest_sam31_visual_audit'
+            ? 'Generated from SAM 3.1 visual-audit correction evidence for internal-alpha replay only.'
+            : 'Generated from employee-reviewed room-boundary correction evidence for internal-alpha replay only.',
           bid.disclaimer,
         ],
       })
