@@ -614,6 +614,18 @@ function evidenceDetail(row) {
       return '<div class="muted" style="font-size:11px;margin-top:3px">OpenClaw SAM31 consumer review evidence; detail unavailable</div>';
     }
   }
+  if (row.evidence_type === 'openclaw_sam31_sectioning_pipeline_contract_review') {
+    try {
+      const packet = JSON.parse(row.notes || '{}');
+      const review = packet.review || {};
+      const blocked = Array.isArray(packet.blocked_claims) ? packet.blocked_claims : (Array.isArray(review.blocked_claims) ? review.blocked_claims : []);
+      const fields = Array.isArray(review.replaced_fields) ? review.replaced_fields : [];
+      const summary = review.replacement_summary && typeof review.replacement_summary === 'object' ? review.replacement_summary : {};
+      return `<div class="muted" style="font-size:11px;margin-top:3px">Saved SAM31 sectioning contract review evidence detail: ${escapeHtml(review.artifact_type || 'openclaw.sam31.sectioning_pipeline_contract_review.v1')}<br>source_pdf_boundary_evidence_id ${escapeHtml(review.source_pdf_boundary_evidence_id || 'missing')} - source_openclaw_sam31_extrapolation_evidence_id ${escapeHtml(review.source_openclaw_sam31_extrapolation_evidence_id || 'missing')} - source_sectioning_pipeline_contract_artifact_type ${escapeHtml(review.source_sectioning_pipeline_contract_artifact_type || 'openclaw.sam31.sectioning_pipeline_contract.v1')}<br>review_decision ${escapeHtml(review.review_decision || 'missing')} - replacement_ref ${escapeHtml(review.replacement_ref || row.source_ref || 'missing')} - reviewer ${escapeHtml(review.reviewer_name || 'unknown')}<br>Replaced sectioning fields: ${fields.map((field) => `<span class="chip">${escapeHtml(field)}</span>`).join('') || '<span class="chip">none recorded</span>'}<br>semantic_labels ${escapeHtml(summary.semantic_labels ?? 0)} - polygons ${escapeHtml(summary.polygons ?? 0)} - bboxes ${escapeHtml(summary.bboxes ?? 0)} - vector_overlays ${escapeHtml(summary.vector_overlays ?? 0)} - model_3d_candidates ${escapeHtml(summary.model_3d_candidates ?? 0)}<br>temporary_value_policy ${escapeHtml(review.temporary_value_policy || 'best_guess_until_employee_replaced')} - claim_gate_effect ${escapeHtml(packet.claim_gate_effect || review.claim_gate_effect || 'no_claims_cleared')}<br>Blocks still active: ${blocked.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('') || '<span class="chip">claim gates remain blocked</span>'}</div>`;
+    } catch {
+      return '<div class="muted" style="font-size:11px;margin-top:3px">OpenClaw SAM31 sectioning contract review evidence; detail unavailable</div>';
+    }
+  }
   if (row.evidence_type === 'openclaw_sam31_vector_model_artifact_packet') {
     try {
       const packet = JSON.parse(row.notes || '{}');

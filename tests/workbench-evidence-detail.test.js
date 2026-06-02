@@ -83,4 +83,22 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toContain('supplied_document_bid_truth_replacement');
     expect(html).toContain('no_claims_cleared');
   });
+
+  it('surfaces saved SAM31 sectioning contract review evidence details without clearing claims', async () => {
+    const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
+    expect(shell.status).toBe(200);
+    const html = await shell.text();
+    expect(html).toContain("row.evidence_type === 'openclaw_sam31_sectioning_pipeline_contract_review'");
+    expect(html).toContain('Saved SAM31 sectioning contract review evidence detail');
+    expect(html).toContain('openclaw.sam31.sectioning_pipeline_contract_review.v1');
+    expect(html).toContain('source_openclaw_sam31_extrapolation_evidence_id');
+    expect(html).toContain('source_sectioning_pipeline_contract_artifact_type');
+    expect(html).toContain('replacement_ref');
+    expect(html).toContain('Replaced sectioning fields');
+    expect(html).toContain('semantic_labels');
+    expect(html).toContain('vector_overlays');
+    expect(html).toContain('model_3d_candidates');
+    expect(html).toContain('claim_gate_effect');
+    expect(html).toContain('no_claims_cleared');
+  });
 });

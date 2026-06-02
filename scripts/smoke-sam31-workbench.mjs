@@ -457,6 +457,7 @@ async function runBrowserSmoke(token, evidenceIds) {
     await page.locator(`[id="sam31SectioningContractReviewNotes-${evidenceIds.boundaryEvidenceId}"]`).fill('Smoke employee review for SAM31 sectioning contract replacement values.');
     await sectioningContractReviewButton.click();
     await page.waitForSelector('text=openclaw_sam31_sectioning_pipeline_contract_review evidence', { timeout: 8_000 });
+    await page.waitForSelector('text=Saved SAM31 sectioning contract review evidence detail', { timeout: 8_000 });
     await page.waitForSelector('text=sam31_sectioning_contract_reviews_recorded 1', { timeout: 8_000 });
     const sectioningReviewQueue = await request(`${PROJECT_PATH}/resolver-queue`, token);
     if (sectioningReviewQueue.summary?.sam31_sectioning_contract_reviews_recorded !== 1) {
