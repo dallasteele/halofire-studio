@@ -711,6 +711,48 @@ async function runBrowserSmoke(token, evidenceIds) {
     if (approvalRows.some((row) => row.use_for_claims !== false || row.claim_gate_effect !== 'no_claims_cleared')) {
       throw new Error(`SAM31 approval upload resolver row cleared a claim gate: ${JSON.stringify(approvalRows)}`);
     }
+    const professionalApprovalCode = 'HALOFIRE_SAM31_PROFESSIONAL_APPROVAL_UPLOAD_MISSING';
+    await page.locator(`details:has([data-sam31-approval-upload-code="${professionalApprovalCode}"]) summary`).first().click();
+    const professionalApprovalButton = page.locator(`[data-sam31-approval-upload-code="${professionalApprovalCode}"]`).first();
+    const approvalDataset = await professionalApprovalButton.evaluate((button) => ({ ...button.dataset }));
+    const approvalRowKey = [
+      approvalDataset.sam31ApprovalUploadBoundaryEvidenceId || 'boundary',
+      approvalDataset.sam31ApprovalUploadConsumerReviewEvidenceId || 'consumer',
+      approvalDataset.sam31ApprovalUploadSprinklerReviewEvidenceId || 'sprinkler',
+      approvalDataset.sam31ApprovalUploadFollowupEvidenceId || 'followup',
+      approvalDataset.sam31ApprovalUploadPacketIndex || 0,
+      approvalDataset.sam31ApprovalUploadPacketReviewEvidenceId || 'packetreview',
+      approvalDataset.sam31ApprovalUploadCode || 'approval_upload_missing',
+    ].join('-');
+    await page.locator(`[id="sam31ApprovalUploadSourceRef-${approvalRowKey}"]`).fill('1881://sam31/professional-review/smoke-signed-review.pdf');
+    await page.locator(`[id="sam31ApprovalUploadSourceFile-${approvalRowKey}"]`).fill('sam31-smoke-professional-review.pdf');
+    await page.locator(`[id="sam31ApprovalUploadReviewerName-${approvalRowKey}"]`).fill('Smoke Licensed Reviewer');
+    await page.locator(`[id="sam31ApprovalUploadReviewerTitle-${approvalRowKey}"]`).fill('Licensed Fire Protection Engineer');
+    await page.locator(`[id="sam31ApprovalUploadSignedAt-${approvalRowKey}"]`).fill('2026-06-02T16:30:00.000Z');
+    await page.locator(`[id="sam31ApprovalUploadOrganization-${approvalRowKey}"]`).fill('Halo Fire');
+    await page.locator(`[id="sam31ApprovalUploadLicenseId-${approvalRowKey}"]`).fill('PE-SMOKE-SAM31');
+    await page.locator(`[id="sam31ApprovalUploadNotes-${approvalRowKey}"]`).fill('Smoke uploaded signed professional review evidence for later gate validation only.');
+    await professionalApprovalButton.click();
+    await page.waitForSelector('text=Saved halofire.sam31_approval_upload_intake.v1 evidence', { timeout: 8_000 });
+    const replayFollowupApprovalUploadQueue = await request(`${PROJECT_PATH}/resolver-queue?sam31SprinklerReplay=ready&lane=obstruction_or_clash_review`, token);
+    if ((replayFollowupApprovalUploadQueue.summary?.sam31_approval_uploads_recorded || 0) < 1) {
+      throw new Error(`SAM31 approval upload was not recorded in resolver summary: ${JSON.stringify(replayFollowupApprovalUploadQueue.summary)}`);
+    }
+    const replayFollowupApprovalUploadItem = replayFollowupApprovalUploadQueue.items.find((item) => item.evidence_id === evidenceIds.boundaryEvidenceId);
+    const replayFollowupApprovalUploadRows = replayFollowupApprovalUploadItem?.sam31_sprinkler_preliminary_replay_queue_items || [];
+    const replayFollowupApprovalUploadRow = replayFollowupApprovalUploadRows.find((row) => row.source_halofire_sam31_sprinkler_review_decision_evidence_id === latestSprinklerDecision.evidence_id);
+    const packetWithApprovalUpload = replayFollowupApprovalUploadRow?.packet_queue_items?.[0] || null;
+    const professionalApprovalRow = (packetWithApprovalUpload?.approval_upload_resolver_rows || []).find((row) => row.code === professionalApprovalCode);
+    if (professionalApprovalRow?.status !== 'approval_upload_recorded_pending_gate_validation'
+      || professionalApprovalRow?.latest_approval_upload_intake?.claim_gate_effect !== 'no_claims_cleared'
+      || professionalApprovalRow?.use_for_claims !== false) {
+      throw new Error(`SAM31 approval upload resolver row did not remain pending/no-claim: ${JSON.stringify(professionalApprovalRow)}`);
+    }
+    const gatesAfterApprovalUpload = await request(`${PROJECT_PATH}/claim-gates`, token);
+    const professionalGate = gatesAfterApprovalUpload.find((gate) => gate.code === 'PROFESSIONAL_REVIEW_MISSING');
+    if (professionalGate?.status !== 'blocked') {
+      throw new Error(`SAM31 approval upload cleared or failed to create blocked professional gate: ${JSON.stringify(professionalGate)}`);
+    }
     const unresolvedNameForge = await request(`${PROJECT_PATH}/resolver-queue?sam31ConsumerReview=unresolved&consumer=nameforge`, token);
     const unresolvedItem = unresolvedNameForge.items.find((item) => item.evidence_id === evidenceIds.boundaryEvidenceId);
     const unresolvedNameForgeReviews = unresolvedItem?.sam31_unresolved_consumer_reviews || [];
