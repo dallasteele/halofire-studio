@@ -253,8 +253,22 @@ describe('HaloFire settings + documentation upload/link API', () => {
           replacement_values: {
             semantic_labels: ['employee reviewed riser room'],
             object_hypotheses: [{ id: 'obj:riser-room', semantic_label: 'reviewed riser room' }],
-            vector_overlays: [{ id: 'vector:riser-room', svg_path: 'M 0 0 L 12 0 L 12 8 Z' }],
-            model_3d_candidates: [{ id: 'model:riser-room', primitive: 'extruded_room_candidate' }],
+            llm_observations: [{
+              id: 'llm:obj:riser-room',
+              segment_id: 'section:riser-room',
+              semantic_label: 'reviewed riser room',
+              prompt_ref: 'openclaw.sam31.prompt.identify_objects_vector_3d.v1',
+            }],
+            vector_overlays: [{
+              id: 'vector:riser-room',
+              svg_path: 'M 0 0 L 12 0 L 12 8 Z',
+              source_llm_observation_ids: ['llm:obj:riser-room'],
+            }],
+            model_3d_candidates: [{
+              id: 'model:riser-room',
+              primitive: 'extruded_room_candidate',
+              source_llm_observation_ids: ['llm:obj:riser-room'],
+            }],
             source_ref: '1881://sheet-7/riser-room',
             confidence: 0.81,
           },
@@ -298,8 +312,14 @@ describe('HaloFire settings + documentation upload/link API', () => {
     expect(index.items[0].replacement_summary).toEqual(expect.objectContaining({
       semantic_label_count: 1,
       object_hypothesis_count: 1,
+      llm_observation_count: 1,
       vector_overlay_count: 1,
       model_3d_candidate_count: 1,
+    }));
+    expect(index.items[0]).toEqual(expect.objectContaining({
+      llm_observation_count: 1,
+      llm_observation_ids: ['llm:obj:riser-room'],
+      source_llm_observation_ids: ['llm:obj:riser-room'],
     }));
     expect(index.items[0].acceptable_actual_evidence).toEqual(expect.arrayContaining([
       '1881 proposal workbook row or sheet reference',
@@ -344,8 +364,9 @@ describe('HaloFire settings + documentation upload/link API', () => {
           replacement_values: {
             semantic_labels: ['employee reviewed residential footprint'],
             object_hypotheses: [{ id: 'obj:residential-footprint' }],
-            vector_overlays: [{ id: 'vector:residential-footprint' }],
-            model_3d_candidates: [{ id: 'model:residential-footprint' }],
+            llm_observations: [{ id: 'llm:obj:residential-footprint' }],
+            vector_overlays: [{ id: 'vector:residential-footprint', source_llm_observation_ids: ['llm:obj:residential-footprint'] }],
+            model_3d_candidates: [{ id: 'model:residential-footprint', source_llm_observation_ids: ['llm:obj:residential-footprint'] }],
           },
           blocked_claims: ['permit_ready', 'fabrication_ready'],
           use_for_claims: false,
@@ -376,6 +397,11 @@ describe('HaloFire settings + documentation upload/link API', () => {
       'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!B9',
       'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G11',
     ]));
+    expect(index.items[0]).toEqual(expect.objectContaining({
+      llm_observation_count: 1,
+      llm_observation_ids: ['llm:obj:residential-footprint'],
+      source_llm_observation_ids: ['llm:obj:residential-footprint'],
+    }));
 
     const queueRes = await request(`/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/actual-value-resolver-queue`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -419,8 +445,9 @@ describe('HaloFire settings + documentation upload/link API', () => {
           replacement_values: {
             semantic_labels: ['employee reviewed riser room'],
             object_hypotheses: [{ id: 'obj:riser-room' }],
-            vector_overlays: [{ id: 'vector:riser-room' }],
-            model_3d_candidates: [{ id: 'model:riser-room' }],
+            llm_observations: [{ id: 'llm:obj:riser-room' }],
+            vector_overlays: [{ id: 'vector:riser-room', source_llm_observation_ids: ['llm:obj:riser-room'] }],
+            model_3d_candidates: [{ id: 'model:riser-room', source_llm_observation_ids: ['llm:obj:riser-room'] }],
             source_ref: '1881://sheet-7/riser-room',
           },
           blocked_claims: ['permit_ready', 'fabrication_ready'],
@@ -520,9 +547,12 @@ describe('HaloFire settings + documentation upload/link API', () => {
       source_openclaw_sam31_consumer_review_evidence_id: Number(landscoutReview.lastInsertRowid),
       evidence_record_type: 'sam31_actual_value_replacement',
       intake_status: 'recorded',
+      llm_observation_count: 1,
       use_for_claims: false,
       claim_gate_effect: 'no_claims_cleared',
     }));
+    expect(landscout.llm_observation_ids).toEqual(['llm:obj:riser-room']);
+    expect(landscout.source_llm_observation_ids).toEqual(['llm:obj:riser-room']);
     expect(landscout.latest_actual_value_replacement_evidence).toEqual(expect.objectContaining({
       evidence_type: 'sam31_actual_value_replacement',
       evidence_id: expect.any(Number),

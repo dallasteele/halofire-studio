@@ -797,11 +797,31 @@ function buildOpenClawSam31ActualValueWorkItemIndex(projectName) {
     'reviewed 3D model candidate ref or model note',
     'screenshot or console evidence for the reviewed SAM31 section',
   ];
+  const arrayItemIds = (items) => uniqueStrings((Array.isArray(items) ? items : []).map((item) => (
+    item && typeof item === 'object' ? item.id : null
+  )));
+  const deriveSourceLlmObservationIds = (replacementValues) => {
+    const sourceLinkedRows = [
+      ...(Array.isArray(replacementValues.object_hypotheses) ? replacementValues.object_hypotheses : []),
+      ...(Array.isArray(replacementValues.vector_overlays) ? replacementValues.vector_overlays : []),
+      ...(Array.isArray(replacementValues.model_3d_candidates) ? replacementValues.model_3d_candidates : []),
+    ];
+    return uniqueStrings([
+      ...arrayItemIds(replacementValues.llm_observations),
+      ...sourceLinkedRows.flatMap((row) => (
+        row && typeof row === 'object' && Array.isArray(row.source_llm_observation_ids)
+          ? row.source_llm_observation_ids
+          : []
+      )),
+    ]);
+  };
   const items = reviews.map(({ evidence, review }) => {
     const replacementValues = review.replacement_values && typeof review.replacement_values === 'object' && !Array.isArray(review.replacement_values)
       ? review.replacement_values
       : {};
     const countArray = (key) => (Array.isArray(replacementValues[key]) ? replacementValues[key].length : 0);
+    const llmObservationIds = arrayItemIds(replacementValues.llm_observations);
+    const sourceLlmObservationIds = deriveSourceLlmObservationIds(replacementValues);
     const sourcePdfBoundaryEvidenceId = Number(review.source_pdf_boundary_evidence_id);
     const item = {
       artifact_type: 'openclaw.sam31.actual_value_work_item_packet.v1',
@@ -815,9 +835,13 @@ function buildOpenClawSam31ActualValueWorkItemIndex(projectName) {
       persisted_review_packet_ref: review.persisted_review_packet_ref || null,
       replacement_ref: review.replacement_ref || evidence.source_ref || null,
       replacement_values_source_ref: replacementValues.source_ref || review.replacement_ref || evidence.source_ref || null,
+      llm_observation_count: llmObservationIds.length,
+      llm_observation_ids: llmObservationIds,
+      source_llm_observation_ids: sourceLlmObservationIds,
       replacement_summary: {
         semantic_label_count: countArray('semantic_labels'),
         object_hypothesis_count: countArray('object_hypotheses'),
+        llm_observation_count: countArray('llm_observations'),
         vector_overlay_count: countArray('vector_overlays'),
         model_3d_candidate_count: countArray('model_3d_candidates'),
       },
@@ -906,6 +930,9 @@ function latestSam31ActualValueReplacementEvidenceByReview(projectName) {
       ].filter(Boolean)),
       actual_value_replacement_prefill: replacement.actual_value_replacement_prefill || null,
       acceptable_actual_evidence: Array.isArray(replacement.acceptable_actual_evidence) ? replacement.acceptable_actual_evidence : [],
+      llm_observation_count: Number(replacement.llm_observation_count || replacement.replacement_summary?.llm_observation_count || 0) || 0,
+      llm_observation_ids: Array.isArray(replacement.llm_observation_ids) ? replacement.llm_observation_ids : [],
+      source_llm_observation_ids: Array.isArray(replacement.source_llm_observation_ids) ? replacement.source_llm_observation_ids : [],
       use_for_claims: false,
       claim_gate_effect: replacement.claim_gate_effect || 'no_claims_cleared',
       no_claim_gates_cleared: true,
@@ -979,9 +1006,18 @@ function normalizeSam31ActualValueReplacementIntake(projectName, body, reviewRow
     replacement_ref: body?.replacement_ref || item?.replacement_ref || review.replacement_ref || null,
     source_file: sourceFile || null,
     source_ref: sourceRef,
-    replacement_values_source_ref: replacementValuesSourceRef || sourceRef,
-    source_refs: sourceRefs,
-    actual_value_replacement_prefill: {
+      replacement_values_source_ref: replacementValuesSourceRef || sourceRef,
+      source_refs: sourceRefs,
+      llm_observation_count: Number(body?.llm_observation_count ?? item?.llm_observation_count ?? 0) || 0,
+      llm_observation_ids: uniqueStrings([
+        ...(Array.isArray(body?.llm_observation_ids) ? body.llm_observation_ids : []),
+        ...(Array.isArray(item?.llm_observation_ids) ? item.llm_observation_ids : []),
+      ]),
+      source_llm_observation_ids: uniqueStrings([
+        ...(Array.isArray(body?.source_llm_observation_ids) ? body.source_llm_observation_ids : []),
+        ...(Array.isArray(item?.source_llm_observation_ids) ? item.source_llm_observation_ids : []),
+      ]),
+      actual_value_replacement_prefill: {
       ...prefill,
       source_file: prefill.source_file || sourceFile || null,
       source_ref: prefill.source_ref || sourceRef,
@@ -991,7 +1027,17 @@ function normalizeSam31ActualValueReplacementIntake(projectName, body, reviewRow
       claim_gate_effect: 'no_claims_cleared',
       no_claim_gates_cleared: true,
     },
-    replacement_summary: body?.replacement_summary || item?.replacement_summary || {},
+    replacement_summary: {
+      ...(item?.replacement_summary || {}),
+      ...(body?.replacement_summary || {}),
+      llm_observation_count: Number(
+        body?.replacement_summary?.llm_observation_count
+          ?? item?.replacement_summary?.llm_observation_count
+          ?? body?.llm_observation_count
+          ?? item?.llm_observation_count
+          ?? 0,
+      ) || 0,
+    },
     acceptable_actual_evidence: Array.isArray(body?.acceptable_actual_evidence)
       ? body.acceptable_actual_evidence
       : (Array.isArray(item?.acceptable_actual_evidence) ? item.acceptable_actual_evidence : []),
@@ -1077,6 +1123,9 @@ function buildOpenClawSam31ActualValueResolverQueue(projectName, options = {}) {
         persisted_review_packet_ref: item.persisted_review_packet_ref || null,
         replacement_ref: item.replacement_ref || null,
         replacement_values_source_ref: item.replacement_values_source_ref || null,
+        llm_observation_count: item.llm_observation_count || 0,
+        llm_observation_ids: Array.isArray(item.llm_observation_ids) ? item.llm_observation_ids : [],
+        source_llm_observation_ids: Array.isArray(item.source_llm_observation_ids) ? item.source_llm_observation_ids : [],
         replacement_summary: item.replacement_summary || {},
         actual_value_replacement_prefill: item.actual_value_replacement_prefill || null,
         acceptable_actual_evidence: Array.isArray(item.acceptable_actual_evidence) ? item.acceptable_actual_evidence : [],
@@ -1185,6 +1234,15 @@ function buildOpenClawSam31ActualValueReplacementReadback(projectName, options =
       source_ref: recordedEvidence?.source_ref || prefill?.source_ref || item.replacement_values_source_ref || null,
       replacement_values_source_ref: recordedEvidence?.replacement_values_source_ref || prefill?.replacement_values_source_ref || item.replacement_values_source_ref || null,
       source_refs: sourceRefs,
+      llm_observation_count: item.llm_observation_count || recordedEvidence?.llm_observation_count || 0,
+      llm_observation_ids: uniqueStrings([
+        ...(Array.isArray(item.llm_observation_ids) ? item.llm_observation_ids : []),
+        ...(Array.isArray(recordedEvidence?.llm_observation_ids) ? recordedEvidence.llm_observation_ids : []),
+      ]),
+      source_llm_observation_ids: uniqueStrings([
+        ...(Array.isArray(item.source_llm_observation_ids) ? item.source_llm_observation_ids : []),
+        ...(Array.isArray(recordedEvidence?.source_llm_observation_ids) ? recordedEvidence.source_llm_observation_ids : []),
+      ]),
       replacement_summary: item.replacement_summary || {},
       acceptable_actual_evidence: Array.isArray(item.acceptable_actual_evidence) ? item.acceptable_actual_evidence : [],
       actual_value_replacement_prefill: prefill,
@@ -2010,6 +2068,7 @@ const SAM31_CONSUMER_QUEUE_URL_ENV = Object.freeze({
 const SAM31_CONSUMER_REVIEW_FIELDS = Object.freeze([
   'semantic_labels',
   'object_hypotheses',
+  'llm_observations',
   'vector_overlays',
   'model_3d_candidates',
   'source_ref',
@@ -9565,7 +9624,7 @@ function normalizeOpenClawSam31ConsumerReview(projectName, evidence, decision, c
       replacementValues[field] = jsonClone(rawValues[field]);
     }
   }
-  for (const field of ['semantic_labels', 'object_hypotheses', 'vector_overlays', 'model_3d_candidates']) {
+  for (const field of ['semantic_labels', 'object_hypotheses', 'llm_observations', 'vector_overlays', 'model_3d_candidates']) {
     if (Object.prototype.hasOwnProperty.call(replacementValues, field) && !Array.isArray(replacementValues[field])) {
       const e = new Error(`replacement_values.${field} must be an array`);
       e.httpStatus = 400;

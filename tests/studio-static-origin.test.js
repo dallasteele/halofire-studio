@@ -508,6 +508,9 @@ describe('studio static origin handling', () => {
     expect(html).toContain('NameForge queue');
     expect(html).toContain('pdfExtract:sam');
     expect(html).toContain('object_hypothesis_count');
+    expect(html).toContain('llm_observation_count');
+    expect(html).toContain('llm_observation_ids');
+    expect(html).toContain('source_llm_observation_ids');
     expect(html).toContain('model_3d_candidate_count');
     expect(html).toContain('Download full SAM31 packet');
     expect(html).toContain('Review:');
@@ -561,6 +564,8 @@ describe('studio static origin handling', () => {
     expect(html).toContain('settingsSam31ActualValueSourceRefs-');
     expect(html).toContain('settingsSam31ActualValueFieldValue');
     expect(html).toContain('settings.sam31_actual_value_queue');
+    expect(html).toContain('llm_observation_count');
+    expect(html).toContain('source_llm_observation_ids');
     expect(html).toContain('acceptable_actual_evidence');
     expect(html).toContain('claim_gate_effect no_claims_cleared');
   });

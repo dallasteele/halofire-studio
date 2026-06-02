@@ -636,6 +636,9 @@ function sam31ActualValueEvidencePayload(row, index = '') {
     source_ref: sourceRef,
     replacement_values_source_ref: replacementValuesSourceRef || sourceRef,
     source_refs: sourceRefs,
+    llm_observation_count: row.llm_observation_count || row.replacement_summary?.llm_observation_count || 0,
+    llm_observation_ids: Array.isArray(row.llm_observation_ids) ? row.llm_observation_ids : [],
+    source_llm_observation_ids: Array.isArray(row.source_llm_observation_ids) ? row.source_llm_observation_ids : [],
     actual_value_replacement_prefill: row.actual_value_replacement_prefill || null,
     replacement_summary: row.replacement_summary || {},
     acceptable_actual_evidence: Array.isArray(row.acceptable_actual_evidence) ? row.acceptable_actual_evidence : [],
@@ -747,6 +750,8 @@ async function loadSettingsSam31ActualValueWorkItems(projectName = catalogEviden
       const summary = row.replacement_summary || {};
       const blocked = Array.isArray(row.blocked_claims) ? row.blocked_claims : [];
       const acceptable = Array.isArray(row.acceptable_actual_evidence) ? row.acceptable_actual_evidence : [];
+      const llmObservationIds = Array.isArray(row.llm_observation_ids) ? row.llm_observation_ids : [];
+      const sourceLlmObservationIds = Array.isArray(row.source_llm_observation_ids) ? row.source_llm_observation_ids : [];
       const prefill = row.actual_value_replacement_prefill && typeof row.actual_value_replacement_prefill === 'object'
         ? row.actual_value_replacement_prefill
         : {};
@@ -757,7 +762,8 @@ async function loadSettingsSam31ActualValueWorkItems(projectName = catalogEviden
         <div class="row" style="padding-top:0"><span>${escapeHtml(row.consumer || 'consumer')} actual values</span><span class="st partial">${escapeHtml(row.status || 'requires_employee_actual_value_update')}</span></div>
         <div class="muted" style="margin-top:6px">openclaw.sam31.actual_value_work_item_packet.v1 · evidence #${escapeHtml(row.source_openclaw_sam31_consumer_review_evidence_id || 'missing')} · source_pdf_boundary_evidence_id ${escapeHtml(row.source_pdf_boundary_evidence_id || 'missing')}</div>
         <div class="muted" style="margin-top:6px">replacement_values_source_ref: ${escapeHtml(row.replacement_values_source_ref || row.replacement_ref || 'missing')}</div>
-        <div class="muted" style="margin-top:6px">replacement_summary: <span class="pill">semantic_label_count ${escapeHtml(summary.semantic_label_count || 0)}</span><span class="pill">object_hypothesis_count ${escapeHtml(summary.object_hypothesis_count || 0)}</span><span class="pill">vector_overlay_count ${escapeHtml(summary.vector_overlay_count || 0)}</span><span class="pill">model_3d_candidate_count ${escapeHtml(summary.model_3d_candidate_count || 0)}</span></div>
+        <div class="muted" style="margin-top:6px">replacement_summary: <span class="pill">semantic_label_count ${escapeHtml(summary.semantic_label_count || 0)}</span><span class="pill">object_hypothesis_count ${escapeHtml(summary.object_hypothesis_count || 0)}</span><span class="pill">llm_observation_count ${escapeHtml(summary.llm_observation_count ?? row.llm_observation_count ?? 0)}</span><span class="pill">vector_overlay_count ${escapeHtml(summary.vector_overlay_count || 0)}</span><span class="pill">model_3d_candidate_count ${escapeHtml(summary.model_3d_candidate_count || 0)}</span></div>
+        <div class="muted" style="margin-top:6px">llm_observation_ids ${escapeHtml(llmObservationIds.join(' | ') || 'missing')} Â· source_llm_observation_ids ${escapeHtml(sourceLlmObservationIds.join(' | ') || 'missing')}</div>
         <div class="muted" style="margin-top:6px">employee_actual_value_next_action: ${escapeHtml(row.employee_actual_value_next_action || 'Replace SAM31 best guesses with actual HaloFire documentation values before bid/export use.')}</div>
         <div class="muted" style="margin-top:6px">acceptable_actual_evidence: ${acceptable.map((item) => `<span class="pill present">${escapeHtml(item)}</span>`).join('') || '<span class="pill missing">actual evidence missing</span>'}</div>
         <div class="muted" style="margin-top:6px">blocked_claims: ${blocked.map((claim) => `<span class="pill missing">${escapeHtml(claim)}</span>`).join('') || '<span class="pill">claim gates remain blocked</span>'}</div>

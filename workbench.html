@@ -510,13 +510,32 @@ function renderSam31ConsumerReviewReplacementSummary(review) {
   const counts = [
     ['semantic_label_count', countFrom('semantic_label_count', 'semantic_labels')],
     ['object_hypothesis_count', countFrom('object_hypothesis_count', 'object_hypotheses')],
+    ['llm_observation_count', countFrom('llm_observation_count', 'llm_observations')],
     ['vector_overlay_count', countFrom('vector_overlay_count', 'vector_overlays')],
     ['model_3d_candidate_count', countFrom('model_3d_candidate_count', 'model_3d_candidates')],
   ];
+  const idsFrom = (items, key = 'id') => Array.from(new Set((Array.isArray(items) ? items : [])
+    .map((item) => (item && typeof item === 'object' ? item[key] : null))
+    .filter(Boolean)));
+  const llmObservationIds = Array.from(new Set([
+    ...(Array.isArray(review.llm_observation_ids) ? review.llm_observation_ids : []),
+    ...idsFrom(values.llm_observations),
+  ]));
+  const sourceLlmObservationIds = Array.from(new Set([
+    ...(Array.isArray(review.source_llm_observation_ids) ? review.source_llm_observation_ids : []),
+    ...llmObservationIds,
+    ...[values.object_hypotheses, values.vector_overlays, values.model_3d_candidates].flatMap((items) => (
+      (Array.isArray(items) ? items : []).flatMap((item) => (
+        item && typeof item === 'object' && Array.isArray(item.source_llm_observation_ids)
+          ? item.source_llm_observation_ids
+          : []
+      ))
+    )),
+  ].filter(Boolean)));
   const sourceRef = values.source_ref || review.replacement_ref || review.source_ref || '';
   const hasReplacementEvidence = counts.some(([, count]) => Number(count) > 0) || sourceRef;
   if (!hasReplacementEvidence) return '';
-  return `<span class="muted" style="font-size:10px">replacement_summary ${counts.map(([label, count]) => `<span class="chip">${escapeHtml(label)} ${escapeHtml(count)}</span>`).join('')}${sourceRef ? `<br>replacement_values_source_ref ${escapeHtml(sourceRef)}` : ''}<br>replacement_values are saved product-owner evidence for internal-alpha routing - use_for_claims false - claim_gate_effect ${escapeHtml(review.claim_gate_effect || 'no_claims_cleared')}</span><br>`;
+  return `<span class="muted" style="font-size:10px">replacement_summary ${counts.map(([label, count]) => `<span class="chip">${escapeHtml(label)} ${escapeHtml(count)}</span>`).join('')}${sourceRef ? `<br>replacement_values_source_ref ${escapeHtml(sourceRef)}` : ''}<br>llm_observation_ids ${escapeHtml(llmObservationIds.join(' | ') || 'missing')}<br>source_llm_observation_ids ${escapeHtml(sourceLlmObservationIds.join(' | ') || 'missing')}<br>replacement_values are saved product-owner evidence for internal-alpha routing - use_for_claims false - claim_gate_effect ${escapeHtml(review.claim_gate_effect || 'no_claims_cleared')}</span><br>`;
 }
 
 function renderSam31ConsumerActualValueWorkItem(review, blockedClaims = [], sourceBoundaryEvidenceId = '', reviewEvidenceId = '') {
@@ -536,9 +555,28 @@ function renderSam31ConsumerActualValueWorkItem(review, blockedClaims = [], sour
   const counts = [
     ['semantic_label_count', count('semantic_label_count', 'semantic_labels')],
     ['object_hypothesis_count', count('object_hypothesis_count', 'object_hypotheses')],
+    ['llm_observation_count', count('llm_observation_count', 'llm_observations')],
     ['vector_overlay_count', count('vector_overlay_count', 'vector_overlays')],
     ['model_3d_candidate_count', count('model_3d_candidate_count', 'model_3d_candidates')],
   ];
+  const idsFrom = (items, key = 'id') => Array.from(new Set((Array.isArray(items) ? items : [])
+    .map((item) => (item && typeof item === 'object' ? item[key] : null))
+    .filter(Boolean)));
+  const llmObservationIds = Array.from(new Set([
+    ...(Array.isArray(review.llm_observation_ids) ? review.llm_observation_ids : []),
+    ...idsFrom(values.llm_observations),
+  ]));
+  const sourceLlmObservationIds = Array.from(new Set([
+    ...(Array.isArray(review.source_llm_observation_ids) ? review.source_llm_observation_ids : []),
+    ...llmObservationIds,
+    ...[values.object_hypotheses, values.vector_overlays, values.model_3d_candidates].flatMap((items) => (
+      (Array.isArray(items) ? items : []).flatMap((item) => (
+        item && typeof item === 'object' && Array.isArray(item.source_llm_observation_ids)
+          ? item.source_llm_observation_ids
+          : []
+      ))
+    )),
+  ].filter(Boolean)));
   const sourceRef = values.source_ref || review.replacement_ref || review.source_ref || '';
   const acceptableActualEvidence = [
     '1881 proposal workbook row or sheet reference',
@@ -558,7 +596,7 @@ function renderSam31ConsumerActualValueWorkItem(review, blockedClaims = [], sour
   const downloadButton = sourceBoundaryEvidenceId && reviewEvidenceId
     ? `<br><button class="go" type="button" style="padding:7px 10px;font-size:11px;margin-top:6px;background:#92400e" data-sam31-consumer-actual-value-work-item-evidence-id="${escapeHtml(reviewEvidenceId)}" data-sam31-consumer-actual-value-work-item-boundary-evidence-id="${escapeHtml(sourceBoundaryEvidenceId)}">Download SAM31 actual-value work item</button><br><span class="muted" style="font-size:10px">openclaw.sam31.actual_value_work_item_packet.v1 - sam31-actual-value-work-item - /openclaw/sam31/consumer-review/${escapeHtml(reviewEvidenceId)}/actual-value-work-item - use_for_claims false - claim_gate_effect no_claims_cleared</span>`
     : '';
-  return `<div class="muted" style="font-size:11px;margin-top:5px;border:1px solid rgba(255,213,79,.24);border-radius:8px;padding:8px;background:rgba(255,213,79,.05)">SAM31 consumer replacement summary<br>${counts.map(([label, value]) => `<span class="chip">${escapeHtml(label)} ${escapeHtml(value)}</span>`).join('')}${sourceRef ? `<br>replacement_values_source_ref ${escapeHtml(sourceRef)}` : ''}<br>employee_actual_value_next_action Replace SAM31 best guesses with actual HaloFire documentation values before using these observations in bid/export decisions.<br>acceptable_actual_evidence ${acceptableActualEvidence.map((item) => `<span class="chip">${escapeHtml(item)}</span>`).join('')}<br>Blocks still active: ${blocked.map((claim) => `<span class="chip">${escapeHtml(claim)}</span>`).join('') || '<span class="chip">claim gates remain blocked</span>'}<br>use_for_claims false - claim_gate_effect ${escapeHtml(review.claim_gate_effect || 'no_claims_cleared')}${downloadButton}</div>`;
+  return `<div class="muted" style="font-size:11px;margin-top:5px;border:1px solid rgba(255,213,79,.24);border-radius:8px;padding:8px;background:rgba(255,213,79,.05)">SAM31 consumer replacement summary<br>${counts.map(([label, value]) => `<span class="chip">${escapeHtml(label)} ${escapeHtml(value)}</span>`).join('')}${sourceRef ? `<br>replacement_values_source_ref ${escapeHtml(sourceRef)}` : ''}<br>llm_observation_ids ${escapeHtml(llmObservationIds.join(' | ') || 'missing')}<br>source_llm_observation_ids ${escapeHtml(sourceLlmObservationIds.join(' | ') || 'missing')}<br>employee_actual_value_next_action Replace SAM31 best guesses with actual HaloFire documentation values before using these observations in bid/export decisions.<br>acceptable_actual_evidence ${acceptableActualEvidence.map((item) => `<span class="chip">${escapeHtml(item)}</span>`).join('')}<br>Blocks still active: ${blocked.map((claim) => `<span class="chip">${escapeHtml(claim)}</span>`).join('') || '<span class="chip">claim gates remain blocked</span>'}<br>use_for_claims false - claim_gate_effect ${escapeHtml(review.claim_gate_effect || 'no_claims_cleared')}${downloadButton}</div>`;
 }
 
 function renderOpenClawSam31ConsumerReviewTasks(tasks, sourceConsumerSmokeEvidenceId, sourcePdfBoundaryEvidenceId, latestReviews = []) {
@@ -607,9 +645,14 @@ function renderSam31VectorModelSourceSummary(row) {
   if (!evidenceId) return '';
   const vectorCount = row?.source_linked_vector_overlay_count ?? artifact.vector_overlay_count ?? 0;
   const modelCount = row?.source_linked_model_3d_candidate_count ?? artifact.model_3d_candidate_count ?? 0;
+  const llmObservationCount = row?.llm_observation_count ?? artifact.llm_observation_count ?? 0;
+  const sourceLlmObservationIds = Array.from(new Set([
+    ...(Array.isArray(row?.source_llm_observation_ids) ? row.source_llm_observation_ids : []),
+    ...(Array.isArray(artifact.source_llm_observation_ids) ? artifact.source_llm_observation_ids : []),
+  ].filter(Boolean)));
   const artifactType = artifact.artifact_type || 'openclaw.sam31_vector_model_artifact_packet.v1';
   const claimGateEffect = artifact.claim_gate_effect || row?.claim_gate_effect || 'no_claims_cleared';
-  return `<span class="muted" style="font-size:10px">SAM31 vector/model source evidence #${escapeHtml(evidenceId)} - vectors ${escapeHtml(vectorCount)} - models ${escapeHtml(modelCount)} - ${escapeHtml(artifactType)} - use_for_claims false - claim_gate_effect ${escapeHtml(claimGateEffect)}</span><br>`;
+  return `<span class="muted" style="font-size:10px">SAM31 vector/model source evidence #${escapeHtml(evidenceId)} - vectors ${escapeHtml(vectorCount)} - models ${escapeHtml(modelCount)} - llm_observation_count ${escapeHtml(llmObservationCount)} - source_llm_observation_ids ${escapeHtml(sourceLlmObservationIds.join(' | ') || 'missing')} - ${escapeHtml(artifactType)} - use_for_claims false - claim_gate_effect ${escapeHtml(claimGateEffect)}</span><br>`;
 }
 
 function renderSam31SectioningAdapterSourceSummary(row) {
@@ -995,6 +1038,9 @@ function sam31ActualValueQueueEvidencePayload(row, index = '') {
     source_ref: sourceRef,
     replacement_values_source_ref: replacementValuesSourceRef || null,
     source_refs: sourceRefs,
+    llm_observation_count: row.llm_observation_count || row.replacement_summary?.llm_observation_count || 0,
+    llm_observation_ids: Array.isArray(row.llm_observation_ids) ? row.llm_observation_ids : [],
+    source_llm_observation_ids: Array.isArray(row.source_llm_observation_ids) ? row.source_llm_observation_ids : [],
     replacement_summary: row.replacement_summary || {},
     acceptable_actual_evidence: Array.isArray(row.acceptable_actual_evidence) ? row.acceptable_actual_evidence : [],
     employee_actual_value_next_action: row.employee_actual_value_next_action || null,
@@ -1080,12 +1126,15 @@ function renderSam31ActualValueQueueItem(row, index) {
   const summary = row.replacement_summary || {};
   const blocked = Array.isArray(row.blocked_claims) ? row.blocked_claims : [];
   const acceptable = Array.isArray(row.acceptable_actual_evidence) ? row.acceptable_actual_evidence : [];
+  const llmObservationIds = Array.isArray(row.llm_observation_ids) ? row.llm_observation_ids : [];
+  const sourceLlmObservationIds = Array.isArray(row.source_llm_observation_ids) ? row.source_llm_observation_ids : [];
   return `<div class="gate warning">
     <div class="code">${escapeHtml(row.consumer || 'consumer')} · ${escapeHtml(row.status || 'requires_employee_actual_value_update')}</div>
     <div class="na">halofire.sam31_actual_value_work_item_index.v1 · openclaw.sam31.actual_value_work_item_packet.v1 · evidence #${escapeHtml(row.source_openclaw_sam31_consumer_review_evidence_id || 'missing')}</div>
     <div class="claims">source_pdf_boundary_evidence_id ${escapeHtml(row.source_pdf_boundary_evidence_id || 'missing')} · source_openclaw_sam31_consumer_smoke_evidence_id ${escapeHtml(row.source_openclaw_sam31_consumer_smoke_evidence_id || 'missing')}</div>
     <div class="claims">replacement_values_source_ref: ${escapeHtml(row.replacement_values_source_ref || row.replacement_ref || 'missing')}</div>
-    <div class="claims">replacement_summary: <span class="chip">semantic_label_count ${escapeHtml(summary.semantic_label_count || 0)}</span><span class="chip">object_hypothesis_count ${escapeHtml(summary.object_hypothesis_count || 0)}</span><span class="chip">vector_overlay_count ${escapeHtml(summary.vector_overlay_count || 0)}</span><span class="chip">model_3d_candidate_count ${escapeHtml(summary.model_3d_candidate_count || 0)}</span></div>
+    <div class="claims">replacement_summary: <span class="chip">semantic_label_count ${escapeHtml(summary.semantic_label_count || 0)}</span><span class="chip">object_hypothesis_count ${escapeHtml(summary.object_hypothesis_count || 0)}</span><span class="chip">llm_observation_count ${escapeHtml(summary.llm_observation_count ?? row.llm_observation_count ?? 0)}</span><span class="chip">vector_overlay_count ${escapeHtml(summary.vector_overlay_count || 0)}</span><span class="chip">model_3d_candidate_count ${escapeHtml(summary.model_3d_candidate_count || 0)}</span></div>
+    <div class="claims">llm_observation_ids ${escapeHtml(llmObservationIds.join(' | ') || 'missing')} Â· source_llm_observation_ids ${escapeHtml(sourceLlmObservationIds.join(' | ') || 'missing')}</div>
     <div class="claims">employee_actual_value_next_action: ${escapeHtml(row.employee_actual_value_next_action || 'Replace SAM31 best guesses with actual HaloFire documentation values before bid/export use.')}</div>
     <div class="claims">acceptable_actual_evidence: ${acceptable.map((item) => `<span class="chip">${escapeHtml(item)}</span>`).join('') || '<span class="chip">actual evidence missing</span>'}</div>
     ${renderSam31ActualValueReplacementDetail(row)}

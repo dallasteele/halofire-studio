@@ -109,6 +109,9 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toContain("row.evidence_type === 'openclaw_sam31_consumer_review'");
     expect(html).toContain('SAM31 consumer replacement summary');
     expect(html).toContain('semantic_label_count');
+    expect(html).toContain('llm_observation_count');
+    expect(html).toContain('llm_observation_ids');
+    expect(html).toContain('source_llm_observation_ids');
     expect(html).toContain('object_hypothesis_count');
     expect(html).toContain('vector_overlay_count');
     expect(html).toContain('model_3d_candidate_count');
@@ -187,6 +190,8 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toContain('employee_actual_value_next_action');
     expect(html).toContain('acceptable_actual_evidence');
     expect(html).toContain('semantic_label_count');
+    expect(html).toContain('llm_observation_count');
+    expect(html).toContain('source_llm_observation_ids');
     expect(html).toContain('model_3d_candidate_count');
     expect(html).toContain('use_for_claims false');
     expect(html).toContain('claim_gate_effect no_claims_cleared');
