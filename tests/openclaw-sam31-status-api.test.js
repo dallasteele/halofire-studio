@@ -2058,6 +2058,25 @@ describe('OpenClaw SAM31 bridge status API', () => {
     const professionalGates = await professionalGateAfterUpload.json();
     expect(professionalGates.find((gate) => gate.code === 'PROFESSIONAL_REVIEW_MISSING')?.status).toBe('blocked');
 
+    const professionalGateResolveRes = await request(`${COOPERATIVE_1881_PATH}/claim-gates/PROFESSIONAL_REVIEW_MISSING/resolve`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ evidence_id: professionalApprovalUpload.id }),
+    });
+    expect(professionalGateResolveRes.status).toBe(200);
+    const professionalGateResolve = await professionalGateResolveRes.json();
+    expect(professionalGateResolve).toEqual(expect.objectContaining({
+      cleared: true,
+      code: 'PROFESSIONAL_REVIEW_MISSING',
+      resolved_evidence_id: professionalApprovalUpload.id,
+      resolved_evidence_ref: 'halofire://sam31/obstruction-clash/sam31-landscout-testqueue/professional-review.pdf',
+    }));
+    const professionalGateAfterExplicitResolve = await request(`${COOPERATIVE_1881_PATH}/claim-gates`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const professionalGatesAfterExplicitResolve = await professionalGateAfterExplicitResolve.json();
+    expect(professionalGatesAfterExplicitResolve.find((gate) => gate.code === 'PROFESSIONAL_REVIEW_MISSING')?.status).toBe('cleared');
+
     const nameForgeAdapterRes = await request(`${COOPERATIVE_1881_PATH}/openclaw/sam31/product-owner-replacements`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` },

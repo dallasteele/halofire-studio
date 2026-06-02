@@ -317,6 +317,10 @@ describe('studio static origin handling', () => {
     expect(html).toContain('saveHalofireSam31ApprovalUpload');
     expect(html).toContain('data-sam31-approval-upload-code');
     expect(html).toContain('/approval-upload');
+    expect(html).toContain('Validate SAM31 approval upload gate');
+    expect(html).toContain('resolveHalofireSam31ApprovalUploadGate');
+    expect(html).toContain('data-sam31-approval-upload-resolve-gate-code');
+    expect(html).toContain('/claim-gates/');
     expect(html).toContain('/preliminary-replay/followup/');
     expect(html).toContain('/packet/');
     expect(html).toContain('/review');

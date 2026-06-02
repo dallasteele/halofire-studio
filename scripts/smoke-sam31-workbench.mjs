@@ -753,6 +753,13 @@ async function runBrowserSmoke(token, evidenceIds) {
     if (professionalGate?.status !== 'blocked') {
       throw new Error(`SAM31 approval upload cleared or failed to create blocked professional gate: ${JSON.stringify(professionalGate)}`);
     }
+    await page.locator('[data-sam31-approval-upload-resolve-gate-code="PROFESSIONAL_REVIEW_MISSING"]').first().click();
+    await page.waitForSelector('text=Validated SAM31 approval upload gate PROFESSIONAL_REVIEW_MISSING', { timeout: 8_000 });
+    const gatesAfterExplicitApprovalValidation = await request(`${PROJECT_PATH}/claim-gates`, token);
+    const professionalGateAfterExplicitValidation = gatesAfterExplicitApprovalValidation.find((gate) => gate.code === 'PROFESSIONAL_REVIEW_MISSING');
+    if (professionalGateAfterExplicitValidation?.status !== 'cleared') {
+      throw new Error(`SAM31 explicit approval upload validation did not clear professional gate: ${JSON.stringify(professionalGateAfterExplicitValidation)}`);
+    }
     const unresolvedNameForge = await request(`${PROJECT_PATH}/resolver-queue?sam31ConsumerReview=unresolved&consumer=nameforge`, token);
     const unresolvedItem = unresolvedNameForge.items.find((item) => item.evidence_id === evidenceIds.boundaryEvidenceId);
     const unresolvedNameForgeReviews = unresolvedItem?.sam31_unresolved_consumer_reviews || [];
