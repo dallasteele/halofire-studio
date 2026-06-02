@@ -228,6 +228,9 @@ describe('studio static origin handling', () => {
     expect(html).toContain('marked_up_plan_ref');
     expect(html).toContain('latest_review');
     expect(html).toContain('latest_sam31_visual_audit');
+    expect(html).toContain('review_source');
+    expect(html).toContain('source_sam31_evidence_id');
+    expect(html).toContain('openclaw_sam31_perception_packet');
     expect(html).toContain('Review:');
   });
 
