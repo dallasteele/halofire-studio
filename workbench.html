@@ -313,6 +313,7 @@ function renderSam31BridgeSmokeAction(item, action, latest) {
 
 const SAM31_EXTRAPOLATION_ROUTE_SUFFIX = '/openclaw/sam31/extrapolation-artifact';
 const SAM31_SECTIONING_PIPELINE_CONTRACT_ROUTE_SUFFIX = '/openclaw/sam31/sectioning-pipeline-contract';
+const SAM31_SECTIONING_DOWNSTREAM_RESOLVER_ROUTE_SUFFIX = '/openclaw/sam31/sectioning-downstream-resolvers';
 const SAM31_VECTOR_MODEL_ARTIFACT_ROUTE_SUFFIX = '/openclaw/sam31/vector-model-artifacts';
 const SAM31_CONSUMER_SMOKE_ROUTE_SUFFIX = '/openclaw/sam31/consumer-smoke';
 const SAM31_CONSUMER_SMOKE_PACKET_ROUTE_SUFFIX = '/openclaw/sam31/consumer-smoke-packet';
@@ -507,7 +508,7 @@ function renderSam31VectorModelSourceSummary(row) {
 
 function renderHalofireSam31SectioningDownstreamResolverQueue(rows, sourcePdfBoundaryEvidenceId) {
   if (!Array.isArray(rows) || !rows.length) return '';
-  return `<div class="claims">SAM31 sectioning downstream resolver queue: <span class="chip">sam31_sectioning_downstream_resolver_queue_items ${escapeHtml(rows.length)}</span> <span class="chip">halofire.sam31_sectioning_downstream_resolver_queue_item.v1</span> <span class="chip">Download room-boundary replay input</span> <span class="chip">Download SAM31 vector/model artifact packet</span><br>${rows.map((row) => {
+  return `<div class="claims">SAM31 sectioning downstream resolver queue: <span class="chip">sam31_sectioning_downstream_resolver_queue_items ${escapeHtml(rows.length)}</span> <span class="chip">halofire.sam31_sectioning_downstream_resolver_queue_item.v1</span> <span class="chip">Download room-boundary replay input</span> <span class="chip">Download SAM31 vector/model artifact packet</span><br><button class="go" type="button" style="padding:7px 10px;font-size:11px;margin-top:6px;background:#312e81" data-sam31-sectioning-downstream-resolver-evidence-id="${escapeHtml(sourcePdfBoundaryEvidenceId || '')}">Download SAM31 sectioning downstream resolver packet</button><br><span class="muted" style="font-size:10px">halofire.sam31_sectioning_downstream_resolver_packet.v1 - sectioning-downstream-resolvers - claim_gate_effect no_claims_cleared</span><br>${rows.map((row) => {
     const action = row.executable_action && typeof row.executable_action === 'object' ? row.executable_action : {};
     const lanes = Array.isArray(row.supported_evidence_lanes) ? row.supported_evidence_lanes : [];
     return `<div style="margin-top:6px;border-top:1px solid rgba(99,102,241,.18);padding-top:6px"><span class="chip">${escapeHtml(row.downstream_resolver_lane || 'downstream_resolver_lane_missing')} ${escapeHtml(row.status || 'ready_for_downstream_resolver')} ${escapeHtml(row.claim_gate_effect || 'no_claims_cleared')}</span><br><span class="muted" style="font-size:10px">source_pdf_boundary_evidence_id ${escapeHtml(row.source_pdf_boundary_evidence_id || sourcePdfBoundaryEvidenceId || 'missing')} - source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id ${escapeHtml(row.source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id || 'missing')} - source_openclaw_sam31_extrapolation_evidence_id ${escapeHtml(row.source_openclaw_sam31_extrapolation_evidence_id || 'missing')}</span><br><span class="muted" style="font-size:10px">reviewed counts: semantic_labels ${escapeHtml(row.reviewed_semantic_label_count || 0)} - polygons ${escapeHtml(row.reviewed_polygon_count || 0)} - bboxes ${escapeHtml(row.reviewed_bbox_count || 0)} - object_hypotheses ${escapeHtml(row.reviewed_object_hypothesis_count || 0)} - vector_overlays ${escapeHtml(row.reviewed_vector_overlay_count || 0)} - model_3d_candidates ${escapeHtml(row.reviewed_model_3d_candidate_count || 0)}</span><br>Supported lanes: ${lanes.map((lane) => `<span class="chip">${escapeHtml(lane)}</span>`).join('') || '<span class="chip">sectioning downstream lane missing</span>'}<br><span class="muted" style="font-size:10px">${escapeHtml(row.next_action || 'Use reviewed sectioning values for the next resolver step; no claim gates cleared.')}</span><br>${action.href ? `<span class="muted" style="font-size:10px">${escapeHtml(action.label || 'Open downstream action')} - ${escapeHtml(action.href)} - claim_gate_effect ${escapeHtml(action.claim_gate_effect || row.claim_gate_effect || 'no_claims_cleared')}</span>` : '<span class="muted" style="font-size:10px">executable_action missing</span>'}</div>`;
@@ -746,6 +747,9 @@ async function refreshEvidence() {
       button.dataset.sam31SectioningContractReviewSaveEvidenceId,
       button.dataset.sam31SectioningContractReviewSourceEvidenceId,
     );
+  });
+  document.querySelectorAll('[data-sam31-sectioning-downstream-resolver-evidence-id]').forEach((button) => {
+    button.onclick = () => downloadHalofireSam31SectioningDownstreamResolverPacket(button.dataset.sam31SectioningDownstreamResolverEvidenceId);
   });
   document.querySelectorAll('[data-sam31-vector-model-artifact-evidence-id]').forEach((button) => {
     button.onclick = () => downloadOpenClawSam31VectorModelArtifactPacket(button.dataset.sam31VectorModelArtifactEvidenceId);
@@ -1606,6 +1610,19 @@ async function downloadOpenClawSam31SectioningPipelineContract(evidenceId) {
   URL.revokeObjectURL(a.href);
 }
 
+async function downloadHalofireSam31SectioningDownstreamResolverPacket(evidenceId) {
+  const packet = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/resolver-packets/pdf-boundary/' + encodeURIComponent(evidenceId) + SAM31_SECTIONING_DOWNSTREAM_RESOLVER_ROUTE_SUFFIX);
+  if (packet.artifact_type !== 'halofire.sam31_sectioning_downstream_resolver_packet.v1') {
+    throw new Error('Unexpected SAM31 sectioning downstream resolver packet type');
+  }
+  const blob = new Blob([JSON.stringify(packet, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = packet.download_name || 'sam31-sectioning-downstream-resolvers.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
 async function saveOpenClawSam31SectioningPipelineContractReview(evidenceId, sourceExtrapolationEvidenceId) {
   const status = document.getElementById('sam31SectioningContractReviewStatus-' + evidenceId);
   if (status) status.textContent = 'Saving SAM31 sectioning contract review as replacement evidence...';
@@ -2211,6 +2228,9 @@ async function refreshResolverQueue() {
       button.dataset.sam31SectioningContractReviewSaveEvidenceId,
       button.dataset.sam31SectioningContractReviewSourceEvidenceId,
     );
+  });
+  document.querySelectorAll('[data-sam31-sectioning-downstream-resolver-evidence-id]').forEach((button) => {
+    button.onclick = () => downloadHalofireSam31SectioningDownstreamResolverPacket(button.dataset.sam31SectioningDownstreamResolverEvidenceId);
   });
   document.querySelectorAll('[data-sam31-vector-model-artifact-evidence-id]').forEach((button) => {
     button.onclick = () => downloadOpenClawSam31VectorModelArtifactPacket(button.dataset.sam31VectorModelArtifactEvidenceId);

@@ -114,6 +114,10 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toContain('source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id');
     expect(html).toContain('Download room-boundary replay input');
     expect(html).toContain('Download SAM31 vector/model artifact packet');
+    expect(html).toContain('Download SAM31 sectioning downstream resolver packet');
+    expect(html).toContain('sectioning-downstream-resolvers');
+    expect(html).toContain('downloadHalofireSam31SectioningDownstreamResolverPacket');
+    expect(html).toContain('data-sam31-sectioning-downstream-resolver-evidence-id');
     expect(html).toContain('no_claims_cleared');
   });
 

@@ -1392,6 +1392,7 @@ const SAM31_CONSUMER_REVIEW_DECISION_TYPE = 'openclaw.sam31.consumer_review_task
 const SAM31_PRODUCT_OWNER_REPLACEMENT_INTAKE_TYPE = 'openclaw.sam31.product_owner_replacement_intake.v1';
 const SAM31_TO_SPRINKLER_REVIEW_ADAPTER_TYPE = 'openclaw.sam31_to_sprinkler_review_adapter.v1';
 const HALOFIRE_SAM31_SECTIONING_DOWNSTREAM_RESOLVER_QUEUE_ITEM_TYPE = 'halofire.sam31_sectioning_downstream_resolver_queue_item.v1';
+const HALOFIRE_SAM31_SECTIONING_DOWNSTREAM_RESOLVER_PACKET_TYPE = 'halofire.sam31_sectioning_downstream_resolver_packet.v1';
 const HALOFIRE_SAM31_SPRINKLER_REVIEW_PACKET_TYPE = 'halofire.sam31_sprinkler_review_packet.v1';
 const HALOFIRE_SAM31_SPRINKLER_REVIEW_QUEUE_ITEM_TYPE = 'halofire.sam31_sprinkler_review_queue_item.v1';
 const HALOFIRE_SAM31_SPRINKLER_REVIEW_DECISION_TYPE = 'halofire.sam31_sprinkler_review_decision.v1';
@@ -3352,6 +3353,93 @@ function openClawSam31SectioningDownstreamResolverQueueItems(projectName, eviden
     });
   }
   return rows;
+}
+
+function buildHalofireSam31SectioningDownstreamResolverPacket(projectName, evidence, decision, reviewEvidence) {
+  if (!evidence || !decision) {
+    const e = new Error('PDF boundary decision evidence not found');
+    e.httpStatus = 404;
+    throw e;
+  }
+  if (!reviewEvidence?.evidence || !reviewEvidence?.review) {
+    const e = new Error('OpenClaw SAM31 sectioning contract review evidence is required before downstream resolver rows can be downloaded');
+    e.httpStatus = 409;
+    throw e;
+  }
+  const rows = openClawSam31SectioningDownstreamResolverQueueItems(projectName, evidence, decision, reviewEvidence);
+  if (!rows.length) {
+    const e = new Error('Reviewed SAM31 sectioning values did not produce downstream resolver queue rows');
+    e.httpStatus = 409;
+    throw e;
+  }
+  const { evidence: sectioningReviewEvidence, review } = reviewEvidence;
+  const reviewedValues = review.replacement_values && typeof review.replacement_values === 'object'
+    ? jsonClone(review.replacement_values)
+    : {};
+  const sourceRefs = uniqueByJson([
+    {
+      evidence_id: evidence.id,
+      evidence_type: evidence.evidence_type,
+      source_file: evidence.source_file || decision.sourceFile || null,
+      source_ref: evidence.source_ref || decision.sourceRef || null,
+      claim_gate_effect: 'no_claims_cleared',
+    },
+    {
+      evidence_id: sectioningReviewEvidence.id,
+      evidence_type: sectioningReviewEvidence.evidence_type,
+      source_file: sectioningReviewEvidence.source_file || null,
+      source_ref: sectioningReviewEvidence.source_ref || review.replacement_ref || null,
+      claim_gate_effect: 'no_claims_cleared',
+    },
+    {
+      evidence_id: review.source_openclaw_sam31_extrapolation_evidence_id || null,
+      evidence_type: 'openclaw_sam31_extrapolation_artifact',
+      source_ref: review.source_openclaw_sam31_extrapolation_ref || null,
+      claim_gate_effect: 'no_claims_cleared',
+    },
+    ...(Array.isArray(review.source_refs) ? jsonClone(review.source_refs) : []),
+  ]);
+  return {
+    artifact_type: HALOFIRE_SAM31_SECTIONING_DOWNSTREAM_RESOLVER_PACKET_TYPE,
+    status: 'ready_for_downstream_resolver',
+    project_name: projectName,
+    generated_at: new Date().toISOString(),
+    download_name: `${slugForDownloadName(projectName)}-sam31-sectioning-downstream-resolvers-${evidence.id}.json`,
+    source_pdf_boundary_evidence_id: evidence.id,
+    source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id: sectioningReviewEvidence.id,
+    source_openclaw_sam31_extrapolation_evidence_id: review.source_openclaw_sam31_extrapolation_evidence_id || null,
+    source_runtime: review.source_runtime || 'sam-3.1+llm',
+    source_sectioning_pipeline_contract_artifact_type: review.source_sectioning_pipeline_contract_artifact_type || 'openclaw.sam31.sectioning_pipeline_contract.v1',
+    downstream_resolver_queue_item_count: rows.length,
+    downstream_resolver_lanes: uniqueStrings(rows.map((row) => row.downstream_resolver_lane).filter(Boolean)),
+    downstream_resolver_queue_items: rows,
+    reviewed_sectioning_values: reviewedValues,
+    source_refs: sourceRefs,
+    supported_applications: [...SAM31_SUPPORTED_APPLICATIONS],
+    supported_evidence_lanes: uniqueStrings(rows.flatMap((row) => Array.isArray(row.supported_evidence_lanes) ? row.supported_evidence_lanes : [])),
+    temporary_value_policy: review.temporary_value_policy || 'best_guess_until_employee_replaced',
+    acceptable_evidence: uniqueStrings(rows.flatMap((row) => Array.isArray(row.acceptable_evidence) ? row.acceptable_evidence : [])),
+    next_action: 'Download this packet to drive the next room-boundary replay, obstruction/clash, sleeve, firestop, or sprinkler-review adapter step; attach employee/professional/AHJ/manufacturer evidence before any regulated claim.',
+    use_for_claims: false,
+    no_claim_gates_cleared: true,
+    claim_gate_effect: 'no_claims_cleared',
+    blocked_claims: uniqueStrings([
+      ...(Array.isArray(review.blocked_claims) ? review.blocked_claims : []),
+      ...(Array.isArray(decision.blockedClaims) ? decision.blockedClaims : PDF_BOUNDARY_BLOCKED_CLAIMS),
+      ...rows.flatMap((row) => Array.isArray(row.blocked_claims) ? row.blocked_claims : []),
+      'permit_ready',
+      'professional_approval',
+      'AHJ_approval',
+      'AutoSprink_parity',
+      'fabrication_ready',
+      'manufacturer_exact',
+    ]),
+    limitations: [
+      'This packet makes reviewed SAM31 sectioning values executable as internal-alpha resolver work only.',
+      'It does not prove geometry accuracy, drawing scale, professional approval, AHJ approval, AutoSprink parity, permit readiness, fabrication readiness, or manufacturer-exact models.',
+      'All generated labels, vectors, and 3D candidates remain temporary best guesses until HaloFire employees or owning approvers replace them with actual evidence.',
+    ],
+  };
 }
 
 function buildOpenClawSam31ProductReviewQueueItemPacket(projectName, evidence, decision, extrapolationEvidence, extrapolationArtifact) {
@@ -9764,6 +9852,28 @@ app.post('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/openclaw
       evidence: evidenceRow,
       ...reviewPacket,
     });
+  } catch (err) {
+    return res.status(err.httpStatus || 400).json({ error: err.message });
+  }
+});
+
+app.get('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/openclaw/sam31/sectioning-downstream-resolvers', authMiddleware, (req, res) => {
+  try {
+    const projectName = req.params.name;
+    const evidenceId = Number(req.params.evidenceId);
+    if (!Number.isSafeInteger(evidenceId) || evidenceId <= 0) {
+      return res.status(400).json({ error: 'A positive evidence id is required' });
+    }
+    const evidence = db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'pdf_boundary_decision'`)
+      .get(evidenceId, projectName);
+    const decision = decisionFromEvidence(evidence);
+    if (!evidence || !decision) {
+      return res.status(404).json({ error: 'PDF boundary decision evidence not found' });
+    }
+    const reviewEvidence = latestOpenClawSam31SectioningPipelineContractReviewEvidence(projectName, evidence.id);
+    return res.json(buildHalofireSam31SectioningDownstreamResolverPacket(projectName, evidence, decision, reviewEvidence));
   } catch (err) {
     return res.status(err.httpStatus || 400).json({ error: err.message });
   }

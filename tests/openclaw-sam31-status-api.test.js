@@ -889,6 +889,48 @@ describe('OpenClaw SAM31 bridge status API', () => {
       }),
     ]);
 
+    const sectioningDownstreamPacketRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/sectioning-downstream-resolvers`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(sectioningDownstreamPacketRes.status).toBe(200);
+    const sectioningDownstreamPacket = await sectioningDownstreamPacketRes.json();
+    expect(sectioningDownstreamPacket).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.sam31_sectioning_downstream_resolver_packet.v1',
+      status: 'ready_for_downstream_resolver',
+      source_pdf_boundary_evidence_id: boundary.id,
+      source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id: sectioningReview.id,
+      source_openclaw_sam31_extrapolation_evidence_id: artifact.id,
+      downstream_resolver_queue_item_count: 2,
+      use_for_claims: false,
+      no_claim_gates_cleared: true,
+      claim_gate_effect: 'no_claims_cleared',
+      download_name: expect.stringContaining('sam31-sectioning-downstream-resolvers'),
+    }));
+    expect(sectioningDownstreamPacket.downstream_resolver_queue_items).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        artifact_type: 'halofire.sam31_sectioning_downstream_resolver_queue_item.v1',
+        downstream_resolver_lane: 'room_boundary_visual_audit',
+        executable_action: expect.objectContaining({
+          label: 'Download room-boundary replay input',
+          claim_gate_effect: 'no_claims_cleared',
+        }),
+      }),
+      expect.objectContaining({
+        artifact_type: 'halofire.sam31_sectioning_downstream_resolver_queue_item.v1',
+        downstream_resolver_lane: 'obstruction_or_clash_review',
+        executable_action: expect.objectContaining({
+          label: 'Download SAM31 vector/model artifact packet',
+          claim_gate_effect: 'no_claims_cleared',
+        }),
+      }),
+    ]));
+    expect(sectioningDownstreamPacket.blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'AHJ_approval',
+      'AutoSprink_parity',
+      'fabrication_ready',
+    ]));
+
     const queueItemRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/product-review-queue-item`, {
       headers: { Authorization: `Bearer ${token}` },
     });
