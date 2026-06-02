@@ -321,6 +321,20 @@ async function runBrowserSmoke(token, evidenceIds) {
     await page.waitForSelector('text=HALOFIRE_1881_ROOM_BOUNDARY_EMPLOYEE_REVIEW_MISSING', { timeout: 8_000 });
     await page.waitForSelector('text=HALOFIRE_1881_PROFESSIONAL_AHJ_APPROVAL_MISSING', { timeout: 8_000 });
     await page.waitForSelector('text=Download SAM31 queue item', { timeout: 8_000 });
+    await page.locator('[data-catalog-source-record-family-ref="family:pipe_steel_sch40_2p0in"]').first().click();
+    await page.waitForSelector('text=Recorded evidence:', { timeout: 8_000 });
+    const catalogEvidenceQueue = await request(`${PROJECT_PATH}/resolver-queue`, token);
+    const pipeCatalogItem = catalogEvidenceQueue.items.find((item) => item.kind === 'catalog_vendor_acquisition'
+      && item.input_defaults?.family_ref === 'family:pipe_steel_sch40_2p0in');
+    if (pipeCatalogItem?.status !== 'catalog_evidence_recorded'
+      || pipeCatalogItem?.latest_review?.claim_gate_effect !== 'no_claims_cleared') {
+      throw new Error(`Catalog source evidence was not recorded fail-closed from the workbench: ${JSON.stringify(pipeCatalogItem)}`);
+    }
+    const catalogGates = await request(`${PROJECT_PATH}/claim-gates`, token);
+    const manufacturerGate = catalogGates.find((gate) => gate.code === 'MANUFACTURER_MODEL_APPROVAL_MISSING');
+    if (manufacturerGate?.status !== 'blocked') {
+      throw new Error(`Catalog source evidence cleared manufacturer gate unexpectedly: ${JSON.stringify(manufacturerGate)}`);
+    }
 
     const queueDownloadPromise = page.waitForEvent('download');
     await page.getByRole('button', { name: 'Download SAM31 queue item' }).first().click();

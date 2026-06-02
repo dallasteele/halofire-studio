@@ -149,6 +149,10 @@ describe('studio static origin handling', () => {
     expect(html).toContain('claim_gate_effect');
     expect(html).toContain('manufacturer_exact');
     expect(html).toContain('Attach catalog evidence');
+    expect(html).toContain('Record catalog source evidence');
+    expect(html).toContain('recordCatalogSourceEvidenceFromWorkbench');
+    expect(html).toContain('data-catalog-source-record-family-ref');
+    expect(html).toContain('halofire.catalog_source_acquisition_ledger_row.v1');
     const catalogResolverBranch = html.match(/if \(item\.kind === 'catalog_vendor_acquisition'\) \{([\s\S]*?)if \(item\.kind === 'official_flow_hydraulic_replay_review'\) \{/);
     expect(catalogResolverBranch?.[1]).toBeDefined();
     expect(catalogResolverBranch?.[1]).not.toContain('data-official-flow-replay-artifact-evidence-id');

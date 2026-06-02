@@ -641,16 +641,21 @@ function catalogSourceRowDetail(row) {
   const claims = Array.isArray(row.blocked_claims) ? row.blocked_claims : [];
   const rejected = Array.isArray(row.rejected_candidates) ? row.rejected_candidates : [];
   const sourceUrl = row.source_url || '';
+  const familyRef = row.family_ref || '';
+  const componentKey = row.component_key || '';
+  const nominalSizeIn = row.nominal_size_in ?? '';
+  const statusId = `catalogSourceRecordStatus-${escapeHtml(familyRef || componentKey || 'unknown')}`;
   return `
     <div class="gate warning">
       <div class="code">${escapeHtml(row.family_ref)} Â· ${escapeHtml(row.status_tier || 'missing_catalog_source')}</div>
-      <div class="na">${escapeHtml(row.description || row.component_key)} Â· component ${escapeHtml(row.component_key)} Â· nominal ${escapeHtml(row.nominal_size_in)} in</div>
+      <div class="na">${escapeHtml(row.description || row.component_key)} Â· component ${escapeHtml(componentKey)} Â· nominal ${escapeHtml(nominalSizeIn)} in</div>
       <div class="claims">acceptable_evidence: ${escapeHtml(row.acceptable_evidence || 'manufacturer catalog/model approval with license and review')}</div>
       <div class="claims">source_url: ${sourceUrl ? `<a href="${escapeHtml(sourceUrl)}" style="color:var(--cyan)" target="_blank" rel="noreferrer">${escapeHtml(sourceUrl)}</a>` : 'missing'} Â· license: ${escapeHtml(row.license || 'missing')} Â· downloaded_artifact_hash: ${escapeHtml(row.downloaded_artifact_hash || 'missing')}</div>
       <div class="claims">claim_gate_effect: ${escapeHtml(row.claim_gate_effect || 'no_claims_cleared')} Â· manufacturer_exact: ${escapeHtml(row.manufacturer_exact === true ? 'true' : 'false')}</div>
       <div class="claims">Rejected candidates: ${rejected.length ? rejected.map((candidate) => `<span class="chip">${escapeHtml(candidate.url || 'candidate')} - ${escapeHtml(candidate.reason || 'rejected')}</span>`).join('') : '<span class="chip">none recorded</span>'}</div>
       <div class="claims">Blocks: ${claims.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('')}</div>
-      <p style="margin-top:8px"><button class="go" type="button" style="padding:7px 10px;font-size:11px" data-catalog-source-component="${escapeHtml(row.component_key)}" data-catalog-source-url="${escapeHtml(sourceUrl)}">Attach catalog evidence</button></p>
+      <p style="margin-top:8px"><button class="go" type="button" style="padding:7px 10px;font-size:11px" data-catalog-source-component="${escapeHtml(componentKey)}" data-catalog-source-url="${escapeHtml(sourceUrl)}">Attach catalog evidence</button> <button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#b45309" data-catalog-source-record-family-ref="${escapeHtml(familyRef)}" data-catalog-source-record-component-key="${escapeHtml(componentKey)}" data-catalog-source-record-nominal-size-in="${escapeHtml(nominalSizeIn)}" data-catalog-source-record-source-url="${escapeHtml(sourceUrl)}" data-catalog-source-record-license="${escapeHtml(row.license || '')}" data-catalog-source-record-artifact-hash="${escapeHtml(row.downloaded_artifact_hash || '')}" data-catalog-source-record-status-tier="${escapeHtml(row.status_tier || 'missing_catalog_source')}" data-catalog-source-record-status-id="${statusId}">Record catalog source evidence</button></p>
+      <div class="muted" id="${statusId}" style="font-size:11px"></div>
     </div>`;
 }
 
@@ -659,6 +664,61 @@ function openCatalogEvidenceAction(componentKey, sourceUrl = '') {
   params.set('component', componentKey);
   if (sourceUrl) params.set('catalogUrl', sourceUrl);
   location.href = '/settings.html?' + params.toString() + '#attachCatalogPart';
+}
+
+function catalogSourceEvidencePayloadFromWorkbench(dataset) {
+  const familyRef = dataset.catalogSourceRecordFamilyRef || '';
+  const componentKey = dataset.catalogSourceRecordComponentKey || '';
+  const sourceUrl = dataset.catalogSourceRecordSourceUrl || '';
+  const license = dataset.catalogSourceRecordLicense || '';
+  const downloadedArtifactHash = dataset.catalogSourceRecordArtifactHash || '';
+  const statusTier = dataset.catalogSourceRecordStatusTier || 'missing_catalog_source';
+  const nominalSizeIn = dataset.catalogSourceRecordNominalSizeIn === ''
+    ? null
+    : Number(dataset.catalogSourceRecordNominalSizeIn);
+  return {
+    evidence_type: 'catalog_source_acquisition',
+    status: 'present',
+    source_ref: sourceUrl || familyRef || componentKey || 'catalog_source_acquisition',
+    source_file: componentKey || familyRef || null,
+    notes: JSON.stringify({
+      kind: 'sourceAcquisitionLedger',
+      schema: 'halofire.catalog_source_acquisition_ledger_row.v1',
+      family_ref: familyRef || null,
+      component_key: componentKey || null,
+      nominal_size_in: Number.isFinite(nominalSizeIn) ? nominalSizeIn : null,
+      source_url: sourceUrl || null,
+      license: license || null,
+      downloaded_artifact_hash: downloadedArtifactHash || null,
+      status_tier: statusTier,
+      manufacturer_exact: false,
+      blocked_claims: ['manufacturer_exact', 'AutoSprink_parity', 'fabrication_ready', 'permit_ready', 'AHJ_approval', 'PE_review'],
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+      recorded_from: 'workbench.catalog_vendor_acquisition',
+    }),
+  };
+}
+
+async function recordCatalogSourceEvidenceFromWorkbench(button) {
+  const status = document.getElementById(button.dataset.catalogSourceRecordStatusId || '');
+  try {
+    const created = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/evidence', {
+      method: 'POST',
+      body: JSON.stringify(catalogSourceEvidencePayloadFromWorkbench(button.dataset)),
+    });
+    if (status) status.textContent = 'Recorded catalog_source_acquisition evidence #' + created.id + '; claim gates still blocked.';
+    await refreshEvidence();
+    await refreshResolverQueue();
+  } catch (err) {
+    if (status) status.textContent = 'Error: ' + err.message;
+  }
+}
+
+function bindCatalogSourceEvidenceButtons() {
+  document.querySelectorAll('[data-catalog-source-record-family-ref]').forEach((button) => {
+    button.onclick = () => recordCatalogSourceEvidenceFromWorkbench(button);
+  });
 }
 
 async function refreshCatalogSourceAcquisition() {
@@ -672,6 +732,7 @@ async function refreshCatalogSourceAcquisition() {
   target.querySelectorAll('[data-catalog-source-component]').forEach((button) => {
     button.onclick = () => openCatalogEvidenceAction(button.dataset.catalogSourceComponent, button.dataset.catalogSourceUrl || '');
   });
+  bindCatalogSourceEvidenceButtons();
 }
 
 function resolverQueueDetail(item) {
@@ -702,6 +763,7 @@ function resolverQueueDetail(item) {
     : '';
   const actions = Array.isArray(item.actions) ? item.actions : [];
   if (item.kind === 'catalog_vendor_acquisition') {
+    const catalogStatusId = `catalogResolverRecordStatus-${escapeHtml(defaults.family_ref || defaults.component_key || 'unknown')}`;
     return `
     <div class="gate warning" id="${escapeHtml(item.id)}">
       <div class="code">${escapeHtml(item.kind)} Â· ${escapeHtml(item.status).toUpperCase()}</div>
@@ -712,7 +774,8 @@ function resolverQueueDetail(item) {
       <div class="claims">Accepts: ${acceptable.map((e) => `<span class="chip">${escapeHtml(e)}</span>`).join('')}</div>
       <div class="claims">AI fallback: ${escapeHtml(item.ai_fallback || '')}</div>
       <div class="claims">Blocks: ${claims.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('')}</div>
-      <p style="margin-top:8px">${actions.map((action) => `<a class="go" style="padding:7px 10px;font-size:11px;text-decoration:none;display:inline-block;margin-right:6px" href="${escapeHtml(action.href || '#')}">${escapeHtml(action.label || 'Open')}</a>`).join('')}</p>
+      <p style="margin-top:8px">${actions.map((action) => `<a class="go" style="padding:7px 10px;font-size:11px;text-decoration:none;display:inline-block;margin-right:6px" href="${escapeHtml(action.href || '#')}">${escapeHtml(action.label || 'Open')}</a>`).join('')}<button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#b45309" data-catalog-source-record-family-ref="${escapeHtml(defaults.family_ref || '')}" data-catalog-source-record-component-key="${escapeHtml(defaults.component_key || '')}" data-catalog-source-record-nominal-size-in="${escapeHtml(defaults.nominal_size_in ?? '')}" data-catalog-source-record-source-url="${escapeHtml(defaults.source_url || '')}" data-catalog-source-record-license="${escapeHtml(defaults.license || '')}" data-catalog-source-record-artifact-hash="${escapeHtml(defaults.downloaded_artifact_hash || '')}" data-catalog-source-record-status-tier="${escapeHtml(defaults.status_tier || 'missing_catalog_source')}" data-catalog-source-record-status-id="${catalogStatusId}">Record catalog source evidence</button></p>
+      <div class="muted" id="${catalogStatusId}" style="font-size:11px"></div>
     </div>`;
   }
   if (item.kind === 'official_flow_hydraulic_replay_review') {
@@ -1486,6 +1549,7 @@ async function refreshResolverQueue() {
   document.getElementById('resolverQueue').innerHTML = queue.items && queue.items.length
     ? queue.items.map(resolverQueueDetail).join('')
     : '<span class="muted">No resolver queue rows yet. Save a PDF boundary decision for room_boundary_visual_audit, record official_flow_intake, or run catalog acquisition for catalog_vendor_acquisition.</span>';
+  bindCatalogSourceEvidenceButtons();
   document.querySelectorAll('[data-resolver-packet-evidence-id]').forEach((button) => {
     button.onclick = () => downloadResolverPacket(button.dataset.resolverPacketEvidenceId);
   });
