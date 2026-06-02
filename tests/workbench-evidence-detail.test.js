@@ -130,6 +130,30 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toContain('no_claims_cleared');
   });
 
+  it('surfaces the SAM31 actual-value queue in the signed workbench portal', async () => {
+    const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
+    expect(shell.status).toBe(200);
+    const html = await shell.text();
+    expect(html).toContain('SAM31 Actual-Value Queue');
+    expect(html).toContain('id="sam31ActualValueQueue"');
+    expect(html).toContain('/openclaw/sam31/actual-value-work-items');
+    expect(html).toContain('refreshSam31ActualValueQueue');
+    expect(html).toContain('renderSam31ActualValueQueueItem');
+    expect(html).toContain('downloadSam31ActualValueQueuePacket');
+    expect(html).toContain('recordSam31ActualValueQueueEvidence');
+    expect(html).toContain('data-sam31-actual-value-queue-download-index');
+    expect(html).toContain('data-sam31-actual-value-queue-record-index');
+    expect(html).toContain('openclaw.sam31.actual_value_work_item_packet.v1');
+    expect(html).toContain('halofire.sam31_actual_value_work_item_index.v1');
+    expect(html).toContain('sam31_actual_value_replacement');
+    expect(html).toContain('employee_actual_value_next_action');
+    expect(html).toContain('acceptable_actual_evidence');
+    expect(html).toContain('semantic_label_count');
+    expect(html).toContain('model_3d_candidate_count');
+    expect(html).toContain('use_for_claims false');
+    expect(html).toContain('claim_gate_effect no_claims_cleared');
+  });
+
   it('surfaces SAM31 sectioning downstream resolver rows and filter links in the workbench', async () => {
     const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
     expect(shell.status).toBe(200);

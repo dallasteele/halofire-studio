@@ -84,6 +84,12 @@
     <p class="muted" style="margin-bottom:8px">Vendor/model evidence rows for the blocked catalog families. These are next actions for HaloFire employees; they do not clear manufacturer, AutoSprink, AHJ, PE, permit, or fabrication claims.</p>
     <div id="catalogSourceAcquisition"><span class="muted">Loading...</span></div>
   </div>
+  <div class="card wide">
+    <h2>SAM31 Actual-Value Queue</h2>
+    <p class="muted" style="margin-bottom:8px">OpenClaw SAM31+LLM sectioning can identify objects, semantic labels, vector overlays, and 3D model candidates. These are employee actual-value work items only until HaloFire replaces the best guesses with 1881/source evidence.</p>
+    <div id="sam31ActualValueQueue"><span class="muted">Loading SAM31 actual-value work items...</span></div>
+    <div id="sam31ActualValueQueueStatus" class="muted" style="font-size:11px;margin-top:8px"></div>
+  </div>
   <div class="card">
     <h2>Auto Layout &amp; Auto Bid</h2>
     <p class="muted">Generate a deterministic best-effort sprinkler layout from the floor plan, priced from imported vendor pricebooks.</p>
@@ -145,6 +151,7 @@ document.getElementById('logout').onclick = () => { localStorage.removeItem('hal
 
 const usd = (n) => '$' + Number(n).toLocaleString('en-US', { maximumFractionDigits: 0 });
 let resolverQueueFilterQuery = '';
+let sam31ActualValueQueueRows = [];
 function currentProjectName() {
   return document.getElementById('projectTarget') ? document.getElementById('projectTarget').value : HOME_DEPOT;
 }
@@ -187,6 +194,7 @@ async function load() {
   await refreshEvidence();
   await refreshResolverQueue();
   await refreshCatalogSourceAcquisition();
+  await refreshSam31ActualValueQueue();
 }
 
 function escapeHtml(value) {
@@ -933,11 +941,107 @@ async function refreshEvidence() {
   });
 }
 
-// ── 3D rendering via the OpenGeometry CAD kernel (Rust/WASM) ──
-// Building shell, sized piping (riser->main->branch->drop), and pendent heads
-// are all built from OpenGeometry primitives (Cuboid/Cylinder), not raw Three
-// geometry. cad-model coords are [planX, planY, elevZ]; the scene is Y-up so we
-// map cad (x,y,z) -> world (x, z, y).
+function sam31ActualValueQueueEvidencePayload(row) {
+  const sourceRef = row.replacement_values_source_ref || row.replacement_ref || row.persisted_review_packet_ref || `openclaw_sam31_consumer_review:${row.source_openclaw_sam31_consumer_review_evidence_id}`;
+  return {
+    evidence_type: 'sam31_actual_value_replacement',
+    status: 'present',
+    source_ref: sourceRef,
+    source_file: `openclaw_sam31_consumer_review:${row.source_openclaw_sam31_consumer_review_evidence_id || 'missing'}`,
+    notes: JSON.stringify({
+      kind: 'sam31ActualValueReplacement',
+      artifact_type: 'halofire.sam31_actual_value_replacement_evidence_note.v1',
+      source_pdf_boundary_evidence_id: row.source_pdf_boundary_evidence_id || null,
+      source_openclaw_sam31_consumer_review_evidence_id: row.source_openclaw_sam31_consumer_review_evidence_id || null,
+      source_openclaw_sam31_consumer_smoke_evidence_id: row.source_openclaw_sam31_consumer_smoke_evidence_id || null,
+      consumer: row.consumer || null,
+      accepted_queue_id: row.accepted_queue_id || null,
+      persisted_review_packet_ref: row.persisted_review_packet_ref || null,
+      replacement_ref: row.replacement_ref || null,
+      replacement_values_source_ref: row.replacement_values_source_ref || null,
+      replacement_summary: row.replacement_summary || {},
+      acceptable_actual_evidence: Array.isArray(row.acceptable_actual_evidence) ? row.acceptable_actual_evidence : [],
+      employee_actual_value_next_action: row.employee_actual_value_next_action || null,
+      blocked_claims: Array.isArray(row.blocked_claims) ? row.blocked_claims : [],
+      use_for_claims: false,
+      claim_gate_effect: row.claim_gate_effect || 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+      recorded_from: 'workbench.sam31_actual_value_queue',
+    }),
+  };
+}
+
+function renderSam31ActualValueQueueItem(row, index) {
+  const summary = row.replacement_summary || {};
+  const blocked = Array.isArray(row.blocked_claims) ? row.blocked_claims : [];
+  const acceptable = Array.isArray(row.acceptable_actual_evidence) ? row.acceptable_actual_evidence : [];
+  return `<div class="gate warning">
+    <div class="code">${escapeHtml(row.consumer || 'consumer')} · ${escapeHtml(row.status || 'requires_employee_actual_value_update')}</div>
+    <div class="na">halofire.sam31_actual_value_work_item_index.v1 · openclaw.sam31.actual_value_work_item_packet.v1 · evidence #${escapeHtml(row.source_openclaw_sam31_consumer_review_evidence_id || 'missing')}</div>
+    <div class="claims">source_pdf_boundary_evidence_id ${escapeHtml(row.source_pdf_boundary_evidence_id || 'missing')} · source_openclaw_sam31_consumer_smoke_evidence_id ${escapeHtml(row.source_openclaw_sam31_consumer_smoke_evidence_id || 'missing')}</div>
+    <div class="claims">replacement_values_source_ref: ${escapeHtml(row.replacement_values_source_ref || row.replacement_ref || 'missing')}</div>
+    <div class="claims">replacement_summary: <span class="chip">semantic_label_count ${escapeHtml(summary.semantic_label_count || 0)}</span><span class="chip">object_hypothesis_count ${escapeHtml(summary.object_hypothesis_count || 0)}</span><span class="chip">vector_overlay_count ${escapeHtml(summary.vector_overlay_count || 0)}</span><span class="chip">model_3d_candidate_count ${escapeHtml(summary.model_3d_candidate_count || 0)}</span></div>
+    <div class="claims">employee_actual_value_next_action: ${escapeHtml(row.employee_actual_value_next_action || 'Replace SAM31 best guesses with actual HaloFire documentation values before bid/export use.')}</div>
+    <div class="claims">acceptable_actual_evidence: ${acceptable.map((item) => `<span class="chip">${escapeHtml(item)}</span>`).join('') || '<span class="chip">actual evidence missing</span>'}</div>
+    <div class="claims">Blocks: ${blocked.map((claim) => `<span class="chip">${escapeHtml(claim)}</span>`).join('') || '<span class="chip">claim gates remain blocked</span>'}</div>
+    <div class="claims">evidence_record_type ${escapeHtml(row.evidence_record_type || 'sam31_actual_value_replacement')} · use_for_claims false · claim_gate_effect no_claims_cleared</div>
+    <p style="margin-top:8px"><button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#92400e" data-sam31-actual-value-queue-download-index="${escapeHtml(index)}" ${row.download_href ? '' : 'disabled'}>Download actual-value packet</button> <button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#b45309" data-sam31-actual-value-queue-record-index="${escapeHtml(index)}">Record actual-value evidence</button></p>
+  </div>`;
+}
+
+async function downloadSam31ActualValueQueuePacket(index) {
+  const row = sam31ActualValueQueueRows[Number(index)];
+  const status = document.getElementById('sam31ActualValueQueueStatus');
+  if (!row || !row.download_href) {
+    status.textContent = 'SAM31 actual-value queue download link missing.';
+    return;
+  }
+  const packet = await api(row.download_href);
+  if (packet.artifact_type !== 'openclaw.sam31.actual_value_work_item_packet.v1') {
+    throw new Error('Unexpected SAM31 actual-value work item packet type');
+  }
+  const blob = new Blob([JSON.stringify(packet, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = packet.download_name || 'sam31-actual-value-work-item.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  status.textContent = 'Downloaded SAM31 actual-value work item; claim gates remain blocked.';
+}
+
+async function recordSam31ActualValueQueueEvidence(index) {
+  const row = sam31ActualValueQueueRows[Number(index)];
+  const status = document.getElementById('sam31ActualValueQueueStatus');
+  if (!row) {
+    status.textContent = 'SAM31 actual-value queue row missing.';
+    return;
+  }
+  const created = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/evidence', {
+    method: 'POST',
+    body: JSON.stringify(sam31ActualValueQueueEvidencePayload(row)),
+  });
+  status.textContent = 'Recorded sam31_actual_value_replacement evidence #' + created.id + '; no claim gates cleared.';
+  await refreshEvidence();
+  await refreshResolverQueue();
+  await refreshSam31ActualValueQueue();
+}
+
+async function refreshSam31ActualValueQueue() {
+  const target = document.getElementById('sam31ActualValueQueue');
+  const index = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/openclaw/sam31/actual-value-work-items');
+  const rows = Array.isArray(index.items) ? index.items : [];
+  sam31ActualValueQueueRows = rows;
+  target.innerHTML = rows.length
+    ? rows.map(renderSam31ActualValueQueueItem).join('')
+    : `<span class="muted">No SAM31 actual-value queue rows for ${escapeHtml(currentProjectName())}. halofire.sam31_actual_value_work_item_index.v1 · status ${escapeHtml(index.status || 'no_sam31_actual_value_work_items')} · use_for_claims false · claim_gate_effect no_claims_cleared</span>`;
+  document.querySelectorAll('[data-sam31-actual-value-queue-download-index]').forEach((button) => {
+    button.onclick = () => downloadSam31ActualValueQueuePacket(button.dataset.sam31ActualValueQueueDownloadIndex);
+  });
+  document.querySelectorAll('[data-sam31-actual-value-queue-record-index]').forEach((button) => {
+    button.onclick = () => recordSam31ActualValueQueueEvidence(button.dataset.sam31ActualValueQueueRecordIndex);
+  });
+}
+
 const TARGET_CATALOG_SOURCE_FAMILIES = [
   'family:pipe_steel_sch40_2p0in',
   'family:fitting_tee_2p0in',
@@ -2663,6 +2767,11 @@ async function refreshResolverQueue() {
   });
 }
 
+// ── 3D rendering via the OpenGeometry CAD kernel (Rust/WASM) ──
+// Building shell, sized piping (riser->main->branch->drop), and pendent heads
+// are all built from OpenGeometry primitives (Cuboid/Cylinder), not raw Three
+// geometry. cad-model coords are [planX, planY, elevZ]; the scene is Y-up so we
+// map cad (x,y,z) -> world (x, z, y).
 let renderer, scene3, camera, controls, ogReady = false, cadGroup;
 const COLORS = { wall: 0x6b7280, floor: 0x1b1b22, main: 0xE53935, branch: 0x3b82f6, drop: 0x22d3ee, riser: 0xFFD54F, head: 0xff3b30 };
 const PIPE_VIZ_SCALE = 6; // exaggerate pipe radius for visibility at building scale
