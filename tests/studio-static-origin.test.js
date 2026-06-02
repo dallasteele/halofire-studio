@@ -147,9 +147,12 @@ describe('studio static origin handling', () => {
     expect(shell.status).toBe(200);
     const html = await shell.text();
     expect(html).toContain('saveResolverPacketReview');
+    expect(html).toContain('downloadResolverReplayInput');
     expect(html).toContain('/resolver-packets/pdf-boundary/');
+    expect(html).toContain('/replay-input');
     expect(html).toContain('/reviews');
     expect(html).toContain('Record review decision');
+    expect(html).toContain('Download replay input');
     expect(html).toContain('marked_up_plan_ref');
     expect(html).toContain('latest_review');
     expect(html).toContain('Review:');

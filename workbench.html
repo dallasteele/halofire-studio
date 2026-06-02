@@ -232,6 +232,7 @@ function resolverQueueDetail(item) {
       <div class="claims">AI fallback: ${escapeHtml(item.ai_fallback || '')}</div>
       <div class="claims">Blocks: ${claims.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('')}</div>
       <p style="margin-top:8px"><button class="go" type="button" style="padding:7px 10px;font-size:11px" data-resolver-packet-evidence-id="${escapeHtml(item.evidence_id)}">Download review packet</button></p>
+      ${latest_review && item.status !== 'blocked' ? `<p style="margin-top:8px"><button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#3b82f6" data-resolver-replay-evidence-id="${escapeHtml(item.evidence_id)}">Download replay input</button></p>` : ''}
       <details style="margin-top:8px">
         <summary class="muted" style="cursor:pointer">Record review decision</summary>
         <div style="display:grid;gap:6px;margin-top:8px">
@@ -258,6 +259,16 @@ async function downloadResolverPacket(evidenceId) {
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = packet.download_name || 'room-boundary-review-packet.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+async function downloadResolverReplayInput(evidenceId) {
+  const packet = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/resolver-packets/pdf-boundary/' + encodeURIComponent(evidenceId) + '/replay-input');
+  const blob = new Blob([JSON.stringify(packet, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = packet.download_name || 'room-boundary-replay-input.json';
   a.click();
   URL.revokeObjectURL(a.href);
 }
@@ -300,6 +311,9 @@ async function refreshResolverQueue() {
     : '<span class="muted">No resolver queue rows yet. Save a PDF boundary decision from Studio to create a room_boundary_visual_audit item.</span>';
   document.querySelectorAll('[data-resolver-packet-evidence-id]').forEach((button) => {
     button.onclick = () => downloadResolverPacket(button.dataset.resolverPacketEvidenceId);
+  });
+  document.querySelectorAll('[data-resolver-replay-evidence-id]').forEach((button) => {
+    button.onclick = () => downloadResolverReplayInput(button.dataset.resolverReplayEvidenceId);
   });
   document.querySelectorAll('[data-resolver-review-evidence-id]').forEach((button) => {
     button.onclick = () => saveResolverPacketReview(button.dataset.resolverReviewEvidenceId);

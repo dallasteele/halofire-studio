@@ -375,6 +375,24 @@ describe('PDF page inspection API', () => {
     }));
     expect(queueAfterReview.summary.correction_ready).toBe(1);
     expect(queueAfterReview.summary.ready).toBe(0);
+
+    const replayRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${body.evidence.id}/replay-input`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(replayRes.status).toBe(200);
+    const replayPacket = await replayRes.json();
+    expect(replayPacket.artifact_type).toBe('room_boundary_replay_input_packet');
+    expect(replayPacket.status).toBe('ready_for_internal_alpha_replay');
+    expect(replayPacket.source_review_evidence_id).toBe(reviewBody.evidence.id);
+    expect(replayPacket.review_decision).toBe('corrected');
+    expect(replayPacket.corrected_room_polygons[0]).toEqual(expect.objectContaining({
+      room_id: 'level-1-corridor-a',
+      polygon: [[0, 0], [40, 0], [40, 12], [0, 12]],
+    }));
+    expect(replayPacket.sprinkler_bid_request.room_boundary_source).toBe('latest_employee_review_packet');
+    expect(replayPacket.sprinkler_bid_request.corrected_room_polygons).toHaveLength(1);
+    expect(replayPacket.blocked_claims).toEqual(expect.arrayContaining(['geometry_accuracy', 'AutoSprink_parity', 'permit_ready']));
+    expect(replayPacket.claim_gate_effect).toBe('no_claims_cleared');
   }, 30000);
 
   it('rejects a persisted boundary decision without a positive operator scale', async () => {

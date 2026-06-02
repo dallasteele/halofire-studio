@@ -1316,6 +1316,68 @@ function pdfBoundaryReviewPacket(projectName, evidence, decision) {
   };
 }
 
+function pdfBoundaryReplayInputPacket(projectName, evidence, decision, reviewEvidence) {
+  if (!evidence || !decision || !reviewEvidence?.review) return null;
+  const review = reviewEvidence.review;
+  if (review.review_decision === 'rejected') {
+    const e = new Error('Latest room-boundary review rejected this boundary; replay input is blocked');
+    e.httpStatus = 409;
+    throw e;
+  }
+  const correctedRoomPolygons = Array.isArray(review.corrected_room_polygons)
+    ? jsonClone(review.corrected_room_polygons)
+    : [];
+  const queueItem = pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence);
+  return {
+    artifact_type: 'room_boundary_replay_input_packet',
+    status: 'ready_for_internal_alpha_replay',
+    project_name: projectName,
+    source_evidence_id: evidence.id,
+    source_review_evidence_id: reviewEvidence.evidence.id,
+    source_ref: evidence.source_ref || decision.sourceRef || null,
+    source_file: evidence.source_file || decision.sourceFile || null,
+    download_name: `${slugForDownloadName(projectName)}-room-boundary-replay-input-${evidence.id}.json`,
+    generated_at: new Date().toISOString(),
+    review_decision: review.review_decision,
+    reviewer_name: review.reviewer_name,
+    reviewed_at: review.reviewed_at,
+    marked_up_plan_ref: review.marked_up_plan_ref,
+    issue_list: Array.isArray(review.issue_list) ? jsonClone(review.issue_list) : [],
+    corrected_room_polygons: correctedRoomPolygons,
+    input_defaults: queueItem.input_defaults,
+    sprinkler_bid_request: {
+      room_boundary_source: 'latest_employee_review_packet',
+      source_evidence_id: evidence.id,
+      source_review_evidence_id: reviewEvidence.evidence.id,
+      pdfPageIndex: decision.pageIndex,
+      pdfScale: decision.scale,
+      pdfExtract: decision.extractMode,
+      corrected_room_polygons: correctedRoomPolygons,
+      use_for_claims: false,
+    },
+    source_refs: [
+      {
+        evidence_id: evidence.id,
+        evidence_type: evidence.evidence_type,
+        source_ref: evidence.source_ref || decision.sourceRef || null,
+        status: evidence.status,
+      },
+      {
+        evidence_id: reviewEvidence.evidence.id,
+        evidence_type: reviewEvidence.evidence.evidence_type,
+        source_ref: reviewEvidence.evidence.source_ref,
+        status: reviewEvidence.evidence.status,
+      },
+    ],
+    blocked_claims: queueItem.blocked_claims,
+    claim_gate_effect: 'no_claims_cleared',
+    limitations: [
+      'This replay input is internal-alpha correction evidence only.',
+      'It may seed a best-effort layout replay, but it does not prove geometry accuracy, drawing scale, AHJ approval, PE review, AutoSprink parity, permit readiness, fabrication readiness, or manufacturer-exact models.',
+    ],
+  };
+}
+
 function normalizePdfBoundaryReview(projectName, evidence, decision, body = {}, user = {}) {
   const packet = pdfBoundaryReviewPacket(projectName, evidence, decision);
   if (!packet) {
@@ -1413,6 +1475,29 @@ app.get('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId', authMid
     return res.status(404).json({ error: 'PDF boundary decision evidence not found' });
   }
   res.json(packet);
+});
+
+app.get('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/replay-input', authMiddleware, (req, res) => {
+  try {
+    const projectName = req.params.name;
+    const evidenceId = Number(req.params.evidenceId);
+    if (!Number.isSafeInteger(evidenceId) || evidenceId <= 0) {
+      return res.status(400).json({ error: 'A positive evidence id is required' });
+    }
+    const evidence = db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'pdf_boundary_decision'`)
+      .get(evidenceId, projectName);
+    const decision = decisionFromEvidence(evidence);
+    const reviewEvidence = evidence ? latestPdfBoundaryReviewEvidence(projectName, evidence.id) : null;
+    const packet = pdfBoundaryReplayInputPacket(projectName, evidence, decision, reviewEvidence);
+    if (!packet) {
+      return res.status(409).json({ error: 'No employee room-boundary review packet is available for replay input' });
+    }
+    res.json(packet);
+  } catch (err) {
+    res.status(err.httpStatus || 400).json({ error: err.message });
+  }
 });
 
 app.post('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/reviews', authMiddleware, requireRole('admin'), (req, res) => {
