@@ -1321,14 +1321,52 @@ async function runBrowserSmoke(token, evidenceIds) {
     if (professionalGateAfterExplicitValidation?.status !== 'cleared') {
       throw new Error(`SAM31 explicit approval upload validation did not clear professional gate: ${JSON.stringify(professionalGateAfterExplicitValidation)}`);
     }
-    const unresolvedNameForge = await request(`${PROJECT_PATH}/resolver-queue?sam31ConsumerReview=unresolved&consumer=nameforge`, token);
-    const unresolvedItem = unresolvedNameForge.items.find((item) => item.evidence_id === evidenceIds.boundaryEvidenceId);
-    const unresolvedNameForgeReviews = unresolvedItem?.sam31_unresolved_consumer_reviews || [];
-    if (!unresolvedNameForgeReviews.some((review) => review.consumer === 'nameforge')) {
-      throw new Error(`SAM31 unresolved NameForge review filter did not return NameForge: ${JSON.stringify(unresolvedNameForge)}`);
+    const nameForgeReviewTask = consumerReviewTasks.find((task) => task.consumer === 'nameforge');
+    if (!nameForgeReviewTask) {
+      throw new Error('SAM31 consumer smoke did not expose a NameForge consumer review task');
     }
-    if (unresolvedNameForgeReviews.some((review) => review.consumer === 'landscout')) {
-      throw new Error(`SAM31 unresolved NameForge review filter leaked LandScout: ${JSON.stringify(unresolvedNameForgeReviews)}`);
+    const nameForgeReviewButtonSelector = `button[data-sam31-consumer-review-save-evidence-id="${evidenceIds.boundaryEvidenceId}"][data-sam31-consumer="nameforge"]`;
+    await page.locator(nameForgeReviewButtonSelector).evaluate((button) => {
+      button.closest('details')?.setAttribute('open', '');
+    });
+    await page.locator(`#sam31ConsumerReviewReviewer-${evidenceIds.boundaryEvidenceId}-nameforge`).fill('NameForge product-owner replacement intake smoke');
+    await page.locator(`#sam31ConsumerReviewReplacementRef-${evidenceIds.boundaryEvidenceId}-nameforge`).fill('nameforge://sam31/reviews/smoke-nameforge/replacement.json');
+    await page.locator(`#sam31ConsumerReviewScreenshotRef-${evidenceIds.boundaryEvidenceId}-nameforge`).fill('nameforge://sam31/reviews/smoke-nameforge/screenshot.png');
+    await page.locator(`#sam31ConsumerReviewConsoleLogRef-${evidenceIds.boundaryEvidenceId}-nameforge`).fill('nameforge://sam31/reviews/smoke-nameforge/console.log');
+    await page.locator(`#sam31ConsumerReviewReplacementValues-${evidenceIds.boundaryEvidenceId}-nameforge`).fill(JSON.stringify({
+      semantic_labels: ['reviewed monument sign zone'],
+      object_hypotheses: [{ id: 'nameforge-object-smoke', semantic_label: 'reviewed sign placement zone', confidence: 0.77 }],
+      vector_overlays: [{ id: 'nameforge-vector-smoke', kind: 'svg_path', svg_path: 'M 0 0 L 8 0 L 8 4 Z', source_ref: 'nameforge://sam31/reviews/smoke-nameforge/vector.svg' }],
+      model_3d_candidates: [{ id: 'nameforge-model-smoke', primitive: 'extruded_brand_zone', source_ref: 'nameforge://sam31/reviews/smoke-nameforge/model.glb' }],
+      source_ref: 'nameforge://sam31/reviews/smoke-nameforge/reviewer-values.json',
+      confidence: 0.79,
+    }));
+    await page.locator(`#sam31ConsumerReviewNotes-${evidenceIds.boundaryEvidenceId}-nameforge`).fill('NameForge product-owner replacement intake smoke note; claims stay blocked.');
+    const nameForgeProductOwnerIntakeButtonSelector = `button[data-sam31-product-owner-replacement-intake-evidence-id="${evidenceIds.boundaryEvidenceId}"][data-sam31-product-owner-replacement-intake-consumer="nameforge"]:not([disabled])`;
+    await page.waitForSelector(nameForgeProductOwnerIntakeButtonSelector, { timeout: 8_000 });
+    await page.locator(nameForgeProductOwnerIntakeButtonSelector).first().click();
+    await page.waitForSelector('text=Opened product_owner_replacement_intake evidence', { timeout: 8_000 });
+    await page.waitForSelector('text=Latest nameforge review', { timeout: 8_000 });
+    const resolvedNameForgeQueue = await request(`${PROJECT_PATH}/resolver-queue?sam31ConsumerReview=unresolved&consumer=nameforge`, token);
+    const resolvedNameForgeItem = resolvedNameForgeQueue.items.find((item) => item.evidence_id === evidenceIds.boundaryEvidenceId);
+    const unresolvedNameForgeReviews = resolvedNameForgeItem?.sam31_unresolved_consumer_reviews || [];
+    if (unresolvedNameForgeReviews.some((review) => review.consumer === 'nameforge')) {
+      throw new Error(`SAM31 unresolved NameForge review filter still returned NameForge after intake: ${JSON.stringify(resolvedNameForgeQueue)}`);
+    }
+    const queueAfterNameForgeReview = await request(`${PROJECT_PATH}/resolver-queue`, token);
+    const nameForgeReviewedQueueItem = queueAfterNameForgeReview.items.find((item) => item.evidence_id === evidenceIds.boundaryEvidenceId);
+    const nameForgeConsumerReview = nameForgeReviewedQueueItem?.latest_openclaw_sam31_consumer_reviews?.find((review) => review.consumer === 'nameforge');
+    if (!nameForgeConsumerReview || nameForgeConsumerReview.artifact_type !== 'openclaw.sam31.consumer_review_task_decision.v1') {
+      throw new Error(`SAM31 NameForge review decision was not persisted: ${JSON.stringify(nameForgeConsumerReview)}`);
+    }
+    if (nameForgeConsumerReview.accepted_queue_id !== nameForgeReviewTask.accepted_queue_id) {
+      throw new Error(`SAM31 NameForge review accepted_queue_id mismatch: ${JSON.stringify(nameForgeConsumerReview)}`);
+    }
+    if (nameForgeConsumerReview.replacement_values?.semantic_labels?.[0] !== 'reviewed monument sign zone') {
+      throw new Error(`SAM31 NameForge review summary did not preserve replacement values: ${JSON.stringify(nameForgeConsumerReview)}`);
+    }
+    if (nameForgeConsumerReview.claim_gate_effect !== 'no_claims_cleared') {
+      throw new Error(`SAM31 NameForge review cleared a claim gate: ${JSON.stringify(nameForgeConsumerReview)}`);
     }
     await page.waitForSelector('[data-sam31-replacement-action-field="semantic_label"]', { timeout: 8_000 });
     await page.waitForSelector('[data-sam31-replacement-action-field="polygon"]', { timeout: 8_000 });

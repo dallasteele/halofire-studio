@@ -1924,6 +1924,19 @@ describe('OpenClaw SAM31 bridge status API', () => {
         claim_gate_effect: 'no_claims_cleared',
       }),
     ]));
+    const landScoutReviewSummary = item.latest_openclaw_sam31_consumer_reviews.find((review) => review.consumer === 'landscout');
+    expect(landScoutReviewSummary.replacement_values).toEqual(expect.objectContaining({
+      semantic_labels: ['employee reviewed parcel edge'],
+      source_ref: 'landscout://field-review/sam31-landscout-testqueue',
+      confidence: 0.82,
+    }));
+    expect(landScoutReviewSummary.replacement_summary).toEqual(expect.objectContaining({
+      semantic_label_count: 1,
+      object_hypothesis_count: 1,
+      vector_overlay_count: 1,
+      model_3d_candidate_count: 1,
+    }));
+    expect(landScoutReviewSummary.use_for_claims).toBe(false);
     expect(item.sam31_sprinkler_review_queue_items).toEqual(expect.arrayContaining([
       expect.objectContaining({
         artifact_type: 'halofire.sam31_sprinkler_review_queue_item.v1',
@@ -2634,6 +2647,25 @@ describe('OpenClaw SAM31 bridge status API', () => {
     expect(resolvedNameForgeRes.status).toBe(200);
     const resolvedNameForge = await resolvedNameForgeRes.json();
     expect(resolvedNameForge.items.find((row) => row.evidence_id === boundary.id)).toBeUndefined();
+    const resolvedQueueRes = await request(`${COOPERATIVE_1881_PATH}/resolver-queue`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(resolvedQueueRes.status).toBe(200);
+    const resolvedQueue = await resolvedQueueRes.json();
+    const resolvedBoundary = resolvedQueue.items.find((row) => row.evidence_id === boundary.id);
+    const nameForgeReviewSummary = resolvedBoundary.latest_openclaw_sam31_consumer_reviews.find((review) => review.consumer === 'nameforge');
+    expect(nameForgeReviewSummary.replacement_values).toEqual(expect.objectContaining({
+      semantic_labels: ['reviewed monument sign zone'],
+      source_ref: 'nameforge://creative-review/sam31-nameforge-testqueue',
+      confidence: 0.79,
+    }));
+    expect(nameForgeReviewSummary.replacement_summary).toEqual(expect.objectContaining({
+      semantic_label_count: 1,
+      object_hypothesis_count: 1,
+      vector_overlay_count: 1,
+      model_3d_candidate_count: 1,
+    }));
+    expect(nameForgeReviewSummary.use_for_claims).toBe(false);
   }, 15000);
 
   it('carries saved bridge smoke artifacts into SAM31 audit defaults and replay evidence without clearing claims', async () => {

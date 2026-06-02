@@ -4317,23 +4317,37 @@ function latestOpenClawSam31ConsumerReviewEvidence(projectName, sourceEvidenceId
 function openClawSam31ConsumerReviewSummaries(reviewEvidences) {
   return (Array.isArray(reviewEvidences) ? reviewEvidences : [])
     .filter((item) => item?.evidence && item?.review)
-    .map(({ evidence, review }) => ({
-      evidence_id: evidence.id,
-      evidence_status: evidence.status,
-      source_ref: evidence.source_ref,
-      artifact_type: review.artifact_type || SAM31_CONSUMER_REVIEW_DECISION_TYPE,
-      consumer: review.consumer,
-      review_decision: review.review_decision,
-      reviewer_name: review.reviewer_name,
-      reviewed_at: review.reviewed_at,
-      accepted_queue_id: review.accepted_queue_id,
-      persisted_review_packet_ref: review.persisted_review_packet_ref,
-      replacement_ref: review.replacement_ref,
-      screenshot_ref: review.screenshot_ref,
-      console_log_ref: review.console_log_ref,
-      replaced_fields: Array.isArray(review.replaced_fields) ? [...review.replaced_fields] : [],
-      claim_gate_effect: review.claim_gate_effect || 'no_claims_cleared',
-    }));
+    .map(({ evidence, review }) => {
+      const replacementValues = review.replacement_values && typeof review.replacement_values === 'object' && !Array.isArray(review.replacement_values)
+        ? jsonClone(review.replacement_values)
+        : {};
+      return {
+        evidence_id: evidence.id,
+        evidence_status: evidence.status,
+        source_ref: evidence.source_ref,
+        artifact_type: review.artifact_type || SAM31_CONSUMER_REVIEW_DECISION_TYPE,
+        consumer: review.consumer,
+        review_decision: review.review_decision,
+        reviewer_name: review.reviewer_name,
+        reviewed_at: review.reviewed_at,
+        accepted_queue_id: review.accepted_queue_id,
+        persisted_review_packet_ref: review.persisted_review_packet_ref,
+        replacement_ref: review.replacement_ref,
+        screenshot_ref: review.screenshot_ref,
+        console_log_ref: review.console_log_ref,
+        replacement_values: replacementValues,
+        replaced_fields: Array.isArray(review.replaced_fields) ? [...review.replaced_fields] : [],
+        replacement_summary: {
+          semantic_label_count: Array.isArray(replacementValues.semantic_labels) ? replacementValues.semantic_labels.length : 0,
+          object_hypothesis_count: Array.isArray(replacementValues.object_hypotheses) ? replacementValues.object_hypotheses.length : 0,
+          vector_overlay_count: Array.isArray(replacementValues.vector_overlays) ? replacementValues.vector_overlays.length : 0,
+          model_3d_candidate_count: Array.isArray(replacementValues.model_3d_candidates) ? replacementValues.model_3d_candidates.length : 0,
+        },
+        use_for_claims: review.use_for_claims === true,
+        no_claim_gates_cleared: review.no_claim_gates_cleared !== false,
+        claim_gate_effect: review.claim_gate_effect || 'no_claims_cleared',
+      };
+    });
 }
 
 function halofireSam31SprinklerReviewDecisionFromEvidence(row) {
