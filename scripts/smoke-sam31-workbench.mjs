@@ -1368,6 +1368,56 @@ async function runBrowserSmoke(token, evidenceIds) {
     if (nameForgeConsumerReview.claim_gate_effect !== 'no_claims_cleared') {
       throw new Error(`SAM31 NameForge review cleared a claim gate: ${JSON.stringify(nameForgeConsumerReview)}`);
     }
+    await page.waitForSelector('text=replacement_summary', { timeout: 8_000 });
+    await page.waitForSelector('text=semantic_label_count 1', { timeout: 8_000 });
+    await page.waitForSelector('text=object_hypothesis_count 1', { timeout: 8_000 });
+    await page.waitForSelector('text=vector_overlay_count 1', { timeout: 8_000 });
+    await page.waitForSelector('text=model_3d_candidate_count 1', { timeout: 8_000 });
+    await page.waitForSelector('text=replacement_values_source_ref', { timeout: 8_000 });
+
+    const nameForgeConsumerReviewPacketDownloadPromise = page.waitForEvent('download');
+    await page.locator(`button[data-sam31-consumer-review-packet-evidence-id="${nameForgeConsumerReview.evidence_id}"]`).first().click();
+    const nameForgeConsumerReviewPacketDownload = await nameForgeConsumerReviewPacketDownloadPromise;
+    const nameForgeConsumerReviewPacketPath = await nameForgeConsumerReviewPacketDownload.path();
+    const nameForgeConsumerReviewPacketSuggestedName = nameForgeConsumerReviewPacketDownload.suggestedFilename();
+    const nameForgeConsumerReviewPacketBytes = nameForgeConsumerReviewPacketPath ? fs.statSync(nameForgeConsumerReviewPacketPath).size : 0;
+    downloads.push({ suggestedName: nameForgeConsumerReviewPacketSuggestedName, bytes: nameForgeConsumerReviewPacketBytes });
+    if (!nameForgeConsumerReviewPacketSuggestedName.includes('sam31-consumer-review-decision-nameforge') || nameForgeConsumerReviewPacketBytes <= 0) {
+      throw new Error(`NameForge consumer review decision download was unexpected: ${nameForgeConsumerReviewPacketSuggestedName} (${nameForgeConsumerReviewPacketBytes} bytes)`);
+    }
+    const nameForgeConsumerReviewPacket = JSON.parse(fs.readFileSync(nameForgeConsumerReviewPacketPath, 'utf8'));
+    if (nameForgeConsumerReviewPacket.artifact_type !== 'openclaw.sam31.consumer_review_decision_packet.v1') {
+      throw new Error(`NameForge consumer review decision download returned wrong artifact type: ${nameForgeConsumerReviewPacket.artifact_type}`);
+    }
+    if (nameForgeConsumerReviewPacket.consumer !== 'nameforge'
+      || nameForgeConsumerReviewPacket.source_openclaw_sam31_consumer_review_evidence_id !== nameForgeConsumerReview.evidence_id
+      || nameForgeConsumerReviewPacket.replacement_values?.semantic_labels?.[0] !== 'reviewed monument sign zone'
+      || nameForgeConsumerReviewPacket.claim_gate_effect !== 'no_claims_cleared'
+      || nameForgeConsumerReviewPacket.use_for_claims !== false) {
+      throw new Error(`NameForge consumer review decision download lost persisted review truth: ${JSON.stringify(nameForgeConsumerReviewPacket)}`);
+    }
+
+    const nameForgeSprinklerAdapterDownloadPromise = page.waitForEvent('download');
+    await page.locator(`button[data-sam31-sprinkler-review-adapter-evidence-id="${nameForgeConsumerReview.evidence_id}"]`).first().click();
+    const nameForgeSprinklerAdapterDownload = await nameForgeSprinklerAdapterDownloadPromise;
+    const nameForgeSprinklerAdapterPath = await nameForgeSprinklerAdapterDownload.path();
+    const nameForgeSprinklerAdapterSuggestedName = nameForgeSprinklerAdapterDownload.suggestedFilename();
+    const nameForgeSprinklerAdapterBytes = nameForgeSprinklerAdapterPath ? fs.statSync(nameForgeSprinklerAdapterPath).size : 0;
+    downloads.push({ suggestedName: nameForgeSprinklerAdapterSuggestedName, bytes: nameForgeSprinklerAdapterBytes });
+    if (!nameForgeSprinklerAdapterSuggestedName.includes('sam31-to-sprinkler-review-nameforge') || nameForgeSprinklerAdapterBytes <= 0) {
+      throw new Error(`NameForge sprinkler review adapter download was unexpected: ${nameForgeSprinklerAdapterSuggestedName} (${nameForgeSprinklerAdapterBytes} bytes)`);
+    }
+    const nameForgeSprinklerAdapterPacket = JSON.parse(fs.readFileSync(nameForgeSprinklerAdapterPath, 'utf8'));
+    if (nameForgeSprinklerAdapterPacket.artifact_type !== 'openclaw.sam31_to_sprinkler_review_adapter.v1') {
+      throw new Error(`NameForge sprinkler review adapter download returned wrong artifact type: ${nameForgeSprinklerAdapterPacket.artifact_type}`);
+    }
+    if (nameForgeSprinklerAdapterPacket.consumer !== 'nameforge'
+      || nameForgeSprinklerAdapterPacket.source_openclaw_sam31_consumer_review_evidence_id !== nameForgeConsumerReview.evidence_id
+      || nameForgeSprinklerAdapterPacket.sprinkler_review_packet?.artifact_type !== 'halofire.sam31_sprinkler_review_packet.v1'
+      || nameForgeSprinklerAdapterPacket.claim_gate_effect !== 'no_claims_cleared'
+      || nameForgeSprinklerAdapterPacket.use_for_claims !== false) {
+      throw new Error(`NameForge sprinkler review adapter download lost source-linked truth gates: ${JSON.stringify(nameForgeSprinklerAdapterPacket)}`);
+    }
     await page.waitForSelector('[data-sam31-replacement-action-field="semantic_label"]', { timeout: 8_000 });
     await page.waitForSelector('[data-sam31-replacement-action-field="polygon"]', { timeout: 8_000 });
     await page.waitForSelector('[data-sam31-replacement-action-field="bbox"]', { timeout: 8_000 });
@@ -1538,6 +1588,14 @@ async function runBrowserSmoke(token, evidenceIds) {
         source_openclaw_sam31_consumer_review_evidence_id: consumerReviewPacket.source_openclaw_sam31_consumer_review_evidence_id,
         claim_gate_effect: consumerReviewPacket.claim_gate_effect,
       },
+      nameForgeConsumerReviewPacket: {
+        artifact_type: nameForgeConsumerReviewPacket.artifact_type,
+        suggestedName: nameForgeConsumerReviewPacketSuggestedName,
+        consumer: nameForgeConsumerReviewPacket.consumer,
+        source_openclaw_sam31_consumer_review_evidence_id: nameForgeConsumerReviewPacket.source_openclaw_sam31_consumer_review_evidence_id,
+        semantic_label: nameForgeConsumerReviewPacket.replacement_values?.semantic_labels?.[0],
+        claim_gate_effect: nameForgeConsumerReviewPacket.claim_gate_effect,
+      },
       sprinklerReviewAdapterPacket: {
         artifact_type: sprinklerAdapterPacket.artifact_type,
         suggestedName: sprinklerAdapterSuggestedName,
@@ -1545,6 +1603,14 @@ async function runBrowserSmoke(token, evidenceIds) {
         sprinkler_review_packet_type: sprinklerAdapterPacket.sprinkler_review_packet?.artifact_type,
         supported_sprinkler_review_lanes: sprinklerAdapterPacket.supported_sprinkler_review_lanes,
         claim_gate_effect: sprinklerAdapterPacket.claim_gate_effect,
+      },
+      nameForgeSprinklerAdapterPacket: {
+        artifact_type: nameForgeSprinklerAdapterPacket.artifact_type,
+        suggestedName: nameForgeSprinklerAdapterSuggestedName,
+        consumer: nameForgeSprinklerAdapterPacket.consumer,
+        source_openclaw_sam31_consumer_review_evidence_id: nameForgeSprinklerAdapterPacket.source_openclaw_sam31_consumer_review_evidence_id,
+        sprinkler_review_packet_type: nameForgeSprinklerAdapterPacket.sprinkler_review_packet?.artifact_type,
+        claim_gate_effect: nameForgeSprinklerAdapterPacket.claim_gate_effect,
       },
       sprinklerReviewDecisionPacket: {
         artifact_type: sprinklerReviewDecisionPacket.artifact_type,

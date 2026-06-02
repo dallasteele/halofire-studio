@@ -122,6 +122,10 @@ describe('SAM31 workbench browser smoke script', () => {
     expect(script).toContain('nameforge://sam31/reviews/smoke-nameforge/replacement.json');
     expect(script).toContain('reviewed monument sign zone');
     expect(script).toContain('SAM31 unresolved NameForge review filter still returned NameForge after intake');
+    expect(script).toContain('NameForge consumer review decision download');
+    expect(script).toContain('NameForge sprinkler review adapter download');
+    expect(script).toContain('nameForgeConsumerReviewPacket');
+    expect(script).toContain('nameForgeSprinklerAdapterPacket');
     expect(script).toContain('openclaw.sam31.consumer_review_task_decision.v1');
     expect(script).toContain('openclaw_sam31_consumer_review');
     expect(script).toContain('requires_product_review');

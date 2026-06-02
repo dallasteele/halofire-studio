@@ -312,6 +312,9 @@ describe('studio static origin handling', () => {
     expect(html).toContain('required_source_provenance_fields');
     expect(html).toContain('source_openclaw_sam31_vector_model_artifact_evidence_id');
     expect(html).toContain('source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id');
+    expect(html).toContain('renderSam31ConsumerReviewReplacementSummary');
+    expect(html).toContain('replacement_summary');
+    expect(html).toContain('replacement_values_source_ref');
     expect(html).toContain('product owner review note tied to accepted queue id');
     expect(html).toContain('Save SAM31 consumer review decision');
     expect(html).toContain('saveOpenClawSam31ConsumerReview');
