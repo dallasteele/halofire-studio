@@ -1090,6 +1090,30 @@ describe('OpenClaw SAM31 bridge status API', () => {
       source_ref: `${perceptionBaseUrl}/vision/sam31/tool`,
       status: 'best_effort',
     }));
+    const packetRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/consumer-smoke-packet`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(packetRes.status).toBe(200);
+    const packet = await packetRes.json();
+    expect(packet).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.consumer_smoke_artifact.v1',
+      download_name: expect.stringContaining('sam31-consumer-smoke-artifact'),
+      source_pdf_boundary_evidence_id: boundary.id,
+      source_openclaw_sam31_consumer_smoke_evidence_id: consumerSmoke.id,
+      posted_consumer_count: 2,
+      blocked_consumer_count: 0,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(packet.consumer_results).toEqual(expect.arrayContaining([
+      expect.objectContaining({ consumer: 'landscout', status: 'posted' }),
+      expect.objectContaining({ consumer: 'nameforge', status: 'posted' }),
+    ]));
+    expect(packet.product_review_queue_item).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.product_review_queue_item.v1',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
     expect(consumerQueuePosts.map((post) => post.consumer).sort()).toEqual(['landscout', 'nameforge']);
     for (const post of consumerQueuePosts) {
       expect(post.body.product_review_queue_item).toEqual(expect.objectContaining({

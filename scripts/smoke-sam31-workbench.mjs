@@ -357,7 +357,19 @@ async function runBrowserSmoke(token, evidenceIds) {
     await page.waitForSelector('text=posted_consumer_count', { timeout: 8_000 });
     await page.waitForSelector('text=blocked_consumer_count', { timeout: 8_000 });
     await page.waitForSelector('text=openclaw.sam31.consumer_smoke_artifact.v1', { timeout: 8_000 });
+    await page.waitForSelector('text=consumer_result', { timeout: 8_000 });
     await page.waitForSelector('text=no_claims_cleared', { timeout: 8_000 });
+    await page.waitForSelector('[data-sam31-consumer-smoke-packet-evidence-id]', { timeout: 8_000 });
+    const consumerSmokeDownloadPromise = page.waitForEvent('download');
+    await page.getByRole('button', { name: 'Download SAM31 consumer smoke packet' }).first().click();
+    const consumerSmokeDownload = await consumerSmokeDownloadPromise;
+    const consumerSmokePath = await consumerSmokeDownload.path();
+    const consumerSmokeSuggestedName = consumerSmokeDownload.suggestedFilename();
+    const consumerSmokeDownloadBytes = consumerSmokePath ? fs.statSync(consumerSmokePath).size : 0;
+    downloads.push({ suggestedName: consumerSmokeSuggestedName, bytes: consumerSmokeDownloadBytes });
+    if (!consumerSmokeSuggestedName.includes('sam31-consumer-smoke-artifact') || consumerSmokeDownloadBytes <= 0) {
+      throw new Error(`Unexpected SAM31 consumer smoke download ${consumerSmokeSuggestedName} (${consumerSmokeDownloadBytes} bytes)`);
+    }
     await page.waitForSelector('[data-sam31-replacement-action-field="semantic_label"]', { timeout: 8_000 });
     await page.waitForSelector('[data-sam31-replacement-action-field="polygon"]', { timeout: 8_000 });
     await page.waitForSelector('[data-sam31-replacement-action-field="bbox"]', { timeout: 8_000 });

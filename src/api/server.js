@@ -2919,6 +2919,42 @@ function openClawSam31ConsumerSmokeReplaySummary(consumerSmokeEvidence) {
   };
 }
 
+function buildOpenClawSam31ConsumerSmokeDownloadPacket(projectName, evidence, decision, consumerSmokeEvidence) {
+  if (!evidence || !decision) {
+    const e = new Error('PDF boundary decision evidence not found');
+    e.httpStatus = 404;
+    throw e;
+  }
+  if (!consumerSmokeEvidence?.evidence || !consumerSmokeEvidence?.artifact) {
+    const e = new Error('OpenClaw SAM31 consumer smoke evidence is required before downloading the consumer smoke packet');
+    e.httpStatus = 409;
+    throw e;
+  }
+  const { evidence: consumerEvidence, artifact } = consumerSmokeEvidence;
+  return {
+    ...jsonClone(artifact),
+    artifact_type: SAM31_CONSUMER_SMOKE_ARTIFACT_TYPE,
+    project_name: projectName,
+    generated_at: new Date().toISOString(),
+    source_pdf_boundary_evidence_id: evidence.id,
+    source_openclaw_sam31_consumer_smoke_evidence_id: consumerEvidence.id,
+    source_ref: evidence.source_ref || decision.sourceRef || artifact.source_ref || null,
+    source_file: evidence.source_file || decision.sourceFile || artifact.source_file || null,
+    download_name: `${slugForDownloadName(projectName)}-sam31-consumer-smoke-artifact-${evidence.id}.json`,
+    consumer_results: Array.isArray(artifact.consumer_results) ? jsonClone(artifact.consumer_results) : [],
+    missing_evidence_rows: Array.isArray(artifact.missing_evidence_rows) ? jsonClone(artifact.missing_evidence_rows) : [],
+    posted_consumer_count: Number.isFinite(Number(artifact.posted_consumer_count)) ? Number(artifact.posted_consumer_count) : 0,
+    blocked_consumer_count: Number.isFinite(Number(artifact.blocked_consumer_count)) ? Number(artifact.blocked_consumer_count) : 0,
+    use_for_claims: false,
+    claim_gate_effect: 'no_claims_cleared',
+    no_claim_gates_cleared: true,
+    limitations: uniqueStrings([
+      ...(Array.isArray(artifact.limitations) ? artifact.limitations : []),
+      'This downloadable packet is replay evidence for consumer queue handoff only; it does not prove consumer review acceptance or regulated readiness.',
+    ]),
+  };
+}
+
 function buildOpenClawSam31ExtrapolationReviewPacket(projectName, evidence, decision, extrapolationEvidence, extrapolationArtifact, reviewEvidence, review) {
   if (!evidence || !decision) {
     const e = new Error('PDF boundary decision evidence not found');
@@ -5619,6 +5655,33 @@ app.get('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/openclaw/
       decision,
       extrapolationEvidence,
       extrapolationEvidence?.artifact || null,
+    ));
+  } catch (err) {
+    return res.status(err.httpStatus || 400).json({ error: err.message });
+  }
+});
+
+app.get('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/openclaw/sam31/consumer-smoke-packet', authMiddleware, (req, res) => {
+  try {
+    const projectName = req.params.name;
+    const evidenceId = Number(req.params.evidenceId);
+    if (!Number.isSafeInteger(evidenceId) || evidenceId <= 0) {
+      return res.status(400).json({ error: 'A positive evidence id is required' });
+    }
+    const evidence = db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'pdf_boundary_decision'`)
+      .get(evidenceId, projectName);
+    const decision = decisionFromEvidence(evidence);
+    if (!evidence || !decision) {
+      return res.status(404).json({ error: 'PDF boundary decision evidence not found' });
+    }
+    const consumerSmokeEvidence = latestOpenClawSam31ConsumerSmokeArtifactEvidence(projectName, evidence.id);
+    return res.json(buildOpenClawSam31ConsumerSmokeDownloadPacket(
+      projectName,
+      evidence,
+      decision,
+      consumerSmokeEvidence,
     ));
   } catch (err) {
     return res.status(err.httpStatus || 400).json({ error: err.message });
