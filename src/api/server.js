@@ -1283,6 +1283,60 @@ function buildOpenClawSam31ActualValueReplacementReadback(projectName, options =
   };
 }
 
+function buildOpenClawSam31ActualValueResolverReplay(projectName, intake, evidenceId) {
+  const consumer = String(intake?.consumer || '').trim();
+  const queue = buildOpenClawSam31ActualValueResolverQueue(projectName, { consumer });
+  const sourceReviewEvidenceId = Number(intake?.source_openclaw_sam31_consumer_review_evidence_id);
+  const item = (Array.isArray(queue.items) ? queue.items : []).find((candidate) => (
+    Number(candidate.source_openclaw_sam31_consumer_review_evidence_id) === sourceReviewEvidenceId
+  )) || null;
+  const latestEvidenceId = Number(item?.latest_actual_value_replacement_evidence?.evidence_id || 0) || null;
+  return {
+    artifact_type: 'openclaw.sam31.actual_value_resolver_replay.v1',
+    source_route: `/api/openclaw/sam31/actual-value-resolver-queue?projectName=${encodeURIComponent(projectName)}${consumer ? `&consumer=${encodeURIComponent(consumer)}` : ''}`,
+    project_route: `/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/actual-value-resolver-queue${consumer ? `?consumer=${encodeURIComponent(consumer)}` : ''}`,
+    project_name: projectName,
+    consumer: consumer || null,
+    replay_status: item?.intake_status === 'recorded' && latestEvidenceId === Number(evidenceId)
+      ? 'recorded'
+      : 'not_recorded',
+    item_status: item?.status || 'missing_resolver_queue_item',
+    intake_status: item?.intake_status || 'missing',
+    latest_actual_value_replacement_evidence_id: latestEvidenceId,
+    source_openclaw_sam31_consumer_review_evidence_id: Number.isSafeInteger(sourceReviewEvidenceId)
+      ? sourceReviewEvidenceId
+      : null,
+    source_pdf_boundary_evidence_id: item?.source_pdf_boundary_evidence_id || intake?.source_pdf_boundary_evidence_id || null,
+    replacement_values_source_ref: item?.replacement_values_source_ref || intake?.replacement_values_source_ref || null,
+    llm_observation_count: item?.llm_observation_count || intake?.llm_observation_count || 0,
+    llm_observation_ids: uniqueStrings([
+      ...(Array.isArray(item?.llm_observation_ids) ? item.llm_observation_ids : []),
+      ...(Array.isArray(intake?.llm_observation_ids) ? intake.llm_observation_ids : []),
+    ]),
+    source_llm_observation_ids: uniqueStrings([
+      ...(Array.isArray(item?.source_llm_observation_ids) ? item.source_llm_observation_ids : []),
+      ...(Array.isArray(intake?.source_llm_observation_ids) ? intake.source_llm_observation_ids : []),
+    ]),
+    use_for_claims: false,
+    blocked_claims: uniqueStrings([
+      ...(Array.isArray(item?.blocked_claims) ? item.blocked_claims : []),
+      ...(Array.isArray(intake?.blocked_claims) ? intake.blocked_claims : []),
+      'permit_ready',
+      'fabrication_ready',
+      'AHJ_approval',
+      'professional_approval',
+      'manufacturer_exact',
+      'AutoSprink_parity',
+    ]),
+    claim_gate_effect: 'no_claims_cleared',
+    no_claim_gates_cleared: true,
+    limitations: [
+      'This replay proves the resolver queue observed the recorded SAM31 actual-value replacement evidence.',
+      'It does not clear permit-ready, fabrication-ready, AHJ-ready, engineering-grade, AutoSprink parity, professional approval, or manufacturer-exact claims.',
+    ],
+  };
+}
+
 app.get('/api/projects/:name/openclaw/sam31/actual-value-resolver-queue', authMiddleware, (req, res) => {
   res.json(buildOpenClawSam31ActualValueResolverQueue(req.params.name, {
     consumer: req.query?.consumer,
@@ -1332,6 +1386,7 @@ app.post('/api/projects/:name/openclaw/sam31/actual-value-replacements', authMid
       id: result.lastInsertRowid,
       message: 'SAM31 actual-value replacement intake recorded; claim gates remain blocked',
       evidence: evidenceRow,
+      actual_value_resolver_replay: buildOpenClawSam31ActualValueResolverReplay(projectName, intake, result.lastInsertRowid),
       evidence_type: 'sam31_actual_value_replacement',
       status: 'present',
       ...intake,

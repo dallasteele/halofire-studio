@@ -875,8 +875,9 @@ describe('HaloFire settings + documentation upload/link API', () => {
           replacement_values: {
             semantic_labels: ['temporary riser room label'],
             object_hypotheses: [{ id: 'obj:temporary-riser-room' }],
-            vector_overlays: [{ id: 'vector:temporary-riser-room' }],
-            model_3d_candidates: [{ id: 'model:temporary-riser-room' }],
+            llm_observations: [{ id: 'llm:temporary-riser-room', semantic_label: 'temporary riser room label' }],
+            vector_overlays: [{ id: 'vector:temporary-riser-room', source_llm_observation_ids: ['llm:temporary-riser-room'] }],
+            model_3d_candidates: [{ id: 'model:temporary-riser-room', source_llm_observation_ids: ['llm:temporary-riser-room'] }],
             source_ref: 'landscout://sam31/temporary/riser-room',
           },
           blocked_claims: ['permit_ready', 'fabrication_ready'],
@@ -935,6 +936,30 @@ describe('HaloFire settings + documentation upload/link API', () => {
       'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G6',
       'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!B9',
     ]));
+    expect(saved.actual_value_resolver_replay).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.actual_value_resolver_replay.v1',
+      source_route: expect.stringContaining('/openclaw/sam31/actual-value-resolver-queue'),
+      replay_status: 'recorded',
+      item_status: 'actual_value_evidence_recorded',
+      intake_status: 'recorded',
+      latest_actual_value_replacement_evidence_id: saved.id,
+      source_openclaw_sam31_consumer_review_evidence_id: reviewResult.lastInsertRowid,
+      consumer: 'landscout',
+      llm_observation_count: 1,
+      llm_observation_ids: ['llm:temporary-riser-room'],
+      source_llm_observation_ids: ['llm:temporary-riser-room'],
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(saved.actual_value_resolver_replay.blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'fabrication_ready',
+      'AHJ_approval',
+      'professional_approval',
+      'manufacturer_exact',
+      'AutoSprink_parity',
+    ]));
     expect(saved.evidence).toEqual(expect.objectContaining({
       evidence_type: 'sam31_actual_value_replacement',
       source_file: 'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx',
@@ -948,6 +973,23 @@ describe('HaloFire settings + documentation upload/link API', () => {
     expect(readbackRes.status).toBe(200);
     const readback = await readbackRes.json();
     expect(readback.recorded_count).toBe(1);
+    const queueRes = await request(`/api/openclaw/sam31/actual-value-resolver-queue?projectName=${encodeURIComponent(projectName)}&consumer=landscout`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(queueRes.status).toBe(200);
+    const queueReadback = await queueRes.json();
+    expect(queueReadback.queue.items[0]).toEqual(expect.objectContaining({
+      status: 'actual_value_evidence_recorded',
+      intake_status: 'recorded',
+      latest_actual_value_replacement_evidence: expect.objectContaining({
+        evidence_id: saved.id,
+        source_ref: 'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G6',
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
     expect(readback.items[0].recorded_actual_value_replacement_evidence).toEqual(expect.objectContaining({
       evidence_id: saved.id,
       artifact_type: 'halofire.sam31_actual_value_replacement_intake.v1',
