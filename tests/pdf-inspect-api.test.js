@@ -357,6 +357,62 @@ describe('PDF page inspection API', () => {
     );
     expect(samPacket.limitations.join(' ')).toMatch(/does not prove/i);
 
+    const samResultRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${body.evidence.id}/sam31-visual-audit/results`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        review_decision: 'corrected',
+        reviewer_name: 'Halo Fire SAM reviewer',
+        sam31_result_ref: '1881://sam31/sheet-7-segmentation.json',
+        screenshot_ref: '1881://sam31/sheet-7-overlay.png',
+        console_log_ref: '1881://sam31/sheet-7-console.log',
+        marked_up_plan_ref: '1881://marked-up/sheet-7-sam31-room-boundary.png',
+        corrected_room_polygons: [
+          {
+            room_id: 'sam31-corridor-a',
+            source_ref: '1881://sam31/sheet-7-segmentation.json',
+            polygon: [[0, 0], [30, 0], [30, 10], [0, 10]],
+          },
+        ],
+        issue_list: [
+          {
+            issue_type: 'sam31_visual_boundary_mismatch',
+            severity: 'blocking',
+            observed: 'SAM included the annotation border.',
+            expected: 'Only the corridor boundary.',
+            required_action: 'Use corrected SAM review polygon for replay.',
+          },
+        ],
+        notes: 'SAM 3.1 result persisted for internal-alpha correction only.',
+      }),
+    });
+    expect(samResultRes.status).toBe(201);
+    const samResult = await samResultRes.json();
+    expect(samResult.evidence.evidence_type).toBe('sam31_room_boundary_visual_audit');
+    expect(samResult.evidence.status).toBe('best_effort');
+    expect(samResult.result).toEqual(expect.objectContaining({
+      source_evidence_id: body.evidence.id,
+      review_decision: 'corrected',
+      reviewer_name: 'Halo Fire SAM reviewer',
+      sam31_result_ref: '1881://sam31/sheet-7-segmentation.json',
+      screenshot_ref: '1881://sam31/sheet-7-overlay.png',
+      console_log_ref: '1881://sam31/sheet-7-console.log',
+      marked_up_plan_ref: '1881://marked-up/sheet-7-sam31-room-boundary.png',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(samResult.result.corrected_room_polygons[0].room_id).toBe('sam31-corridor-a');
+    expect(samResult.result.issue_list[0].issue_type).toBe('sam31_visual_boundary_mismatch');
+    expect(samResult.result.blocked_claims).toEqual(expect.arrayContaining(['geometry_accuracy', 'permit_ready', 'AutoSprink_parity']));
+
+    const evidenceAfterSamResult = await (await request(`${COOPERATIVE_1881_PATH}/evidence`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })).json();
+    const samResultRow = evidenceAfterSamResult.find((e) => e.id === samResult.evidence.id);
+    expect(samResultRow).toBeTruthy();
+    expect(samResultRow.source_ref).toContain(`pdf-boundary:${body.evidence.id}:sam31-visual-audit`);
+    expect(samResultRow.notes).toContain('sam31_room_boundary_visual_audit_result');
+    expect(samResultRow.notes).toContain('no_claims_cleared');
+
     const reviewRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${body.evidence.id}/reviews`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` },

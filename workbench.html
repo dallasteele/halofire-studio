@@ -388,6 +388,26 @@ function resolverQueueDetail(item) {
       <div class="claims">Blocks: ${claims.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('')}</div>
       <p style="margin-top:8px"><button class="go" type="button" style="padding:7px 10px;font-size:11px" data-resolver-packet-evidence-id="${escapeHtml(item.evidence_id)}">Download review packet</button></p>
       <p style="margin-top:8px"><button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#0f766e" data-sam31-visual-audit-evidence-id="${escapeHtml(item.evidence_id)}">Download SAM 3.1 visual audit packet</button></p>
+      <details style="margin-top:8px">
+        <summary class="muted" style="cursor:pointer">Record SAM 3.1 visual audit result</summary>
+        <div style="display:grid;gap:6px;margin-top:8px">
+          <select id="sam31Decision-${evidenceId}" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
+            <option value="corrected">Corrected boundary</option>
+            <option value="accepted">Accepted for internal replay</option>
+            <option value="rejected">Rejected boundary</option>
+          </select>
+          <input id="sam31ReviewerName-${evidenceId}" placeholder="reviewer_name" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
+          <input id="sam31ResultRef-${evidenceId}" placeholder="sam31_result_ref" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
+          <input id="sam31ScreenshotRef-${evidenceId}" placeholder="screenshot_ref" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
+          <input id="sam31ConsoleLogRef-${evidenceId}" placeholder="console_log_ref" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
+          <input id="sam31MarkedUpPlanRef-${evidenceId}" placeholder="marked_up_plan_ref" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
+          <textarea id="sam31IssueList-${evidenceId}" placeholder='issue_list JSON array' style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px;height:54px"></textarea>
+          <textarea id="sam31CorrectedRoomPolygons-${evidenceId}" placeholder='corrected_room_polygons JSON array' style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px;height:54px"></textarea>
+          <textarea id="sam31Notes-${evidenceId}" placeholder="notes" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px;height:44px"></textarea>
+          <button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#0f766e" data-sam31-visual-audit-save-evidence-id="${evidenceId}">Save SAM 3.1 audit evidence</button>
+          <div class="muted" id="sam31AuditStatus-${evidenceId}" style="font-size:11px"></div>
+        </div>
+      </details>
       ${latest_review && item.status !== 'blocked' ? `<p style="margin-top:8px"><button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#3b82f6" data-resolver-replay-evidence-id="${escapeHtml(item.evidence_id)}">Download replay input</button></p>` : ''}
       ${latest_review && item.status !== 'blocked' ? `<p style="margin-top:8px"><button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#4f46e5" data-resolver-replay-bid-evidence-id="${escapeHtml(item.evidence_id)}">Run replay bid</button></p><div class="muted" id="replayBidStatus-${evidenceId}" style="font-size:11px"></div>` : ''}
       <details style="margin-top:8px">
@@ -576,6 +596,32 @@ async function saveResolverPacketReview(evidenceId) {
   }
 }
 
+async function saveSam31VisualAuditResult(evidenceId) {
+  const status = document.getElementById('sam31AuditStatus-' + evidenceId);
+  try {
+    const body = {
+      review_decision: document.getElementById('sam31Decision-' + evidenceId).value,
+      reviewer_name: document.getElementById('sam31ReviewerName-' + evidenceId).value.trim(),
+      sam31_result_ref: document.getElementById('sam31ResultRef-' + evidenceId).value.trim(),
+      screenshot_ref: document.getElementById('sam31ScreenshotRef-' + evidenceId).value.trim(),
+      console_log_ref: document.getElementById('sam31ConsoleLogRef-' + evidenceId).value.trim(),
+      marked_up_plan_ref: document.getElementById('sam31MarkedUpPlanRef-' + evidenceId).value.trim(),
+      issue_list: jsonArrayFromField('sam31IssueList-' + evidenceId),
+      corrected_room_polygons: jsonArrayFromField('sam31CorrectedRoomPolygons-' + evidenceId),
+      notes: document.getElementById('sam31Notes-' + evidenceId).value.trim(),
+    };
+    const saved = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/resolver-packets/pdf-boundary/' + encodeURIComponent(evidenceId) + '/sam31-visual-audit/results', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    });
+    status.textContent = 'Saved sam31_room_boundary_visual_audit evidence #' + saved.id + ' - claims still blocked';
+    await refreshEvidence();
+    await refreshResolverQueue();
+  } catch (err) {
+    if (status) status.textContent = 'Error: ' + err.message;
+  }
+}
+
 async function saveOfficialFlowIntake() {
   const status = document.getElementById('officialFlowStatus');
   try {
@@ -620,6 +666,9 @@ async function refreshResolverQueue() {
   });
   document.querySelectorAll('[data-resolver-review-evidence-id]').forEach((button) => {
     button.onclick = () => saveResolverPacketReview(button.dataset.resolverReviewEvidenceId);
+  });
+  document.querySelectorAll('[data-sam31-visual-audit-save-evidence-id]').forEach((button) => {
+    button.onclick = () => saveSam31VisualAuditResult(button.dataset.sam31VisualAuditSaveEvidenceId);
   });
   document.querySelectorAll('[data-official-flow-save]').forEach((button) => {
     button.onclick = () => saveOfficialFlowIntake();

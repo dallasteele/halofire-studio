@@ -2233,6 +2233,72 @@ function pdfBoundarySam31VisualAuditPacket(projectName, evidence, decision) {
   };
 }
 
+function normalizeSam31VisualAuditResult(projectName, evidence, decision, body = {}, user = {}) {
+  if (!evidence || !decision) {
+    const e = new Error('PDF boundary decision evidence not found');
+    e.httpStatus = 404;
+    throw e;
+  }
+  const reviewDecision = String(body.review_decision || 'corrected').trim().toLowerCase();
+  if (!['accepted', 'corrected', 'rejected'].includes(reviewDecision)) {
+    const e = new Error('review_decision must be accepted, corrected, or rejected');
+    e.httpStatus = 400;
+    throw e;
+  }
+  const sam31ResultRef = String(body.sam31_result_ref || '').trim();
+  if (!sam31ResultRef) {
+    const e = new Error('sam31_result_ref is required to persist a SAM 3.1 visual audit result');
+    e.httpStatus = 400;
+    throw e;
+  }
+  const screenshotRef = String(body.screenshot_ref || '').trim();
+  const markedUpPlanRef = String(body.marked_up_plan_ref || '').trim();
+  if (!screenshotRef && !markedUpPlanRef) {
+    const e = new Error('screenshot_ref or marked_up_plan_ref is required for SAM 3.1 visual audit evidence');
+    e.httpStatus = 400;
+    throw e;
+  }
+  return {
+    artifact_type: 'sam31_room_boundary_visual_audit_result',
+    project_name: projectName,
+    source_evidence_id: evidence.id,
+    source_evidence_type: evidence.evidence_type,
+    source_ref: evidence.source_ref || decision.sourceRef || null,
+    source_file: evidence.source_file || decision.sourceFile || null,
+    source_runtime: 'sam-3.1',
+    review_decision: reviewDecision,
+    reviewer_name: String(body.reviewer_name || user.name || user.username || '').trim() || null,
+    reviewed_at: new Date().toISOString(),
+    sam31_result_ref: sam31ResultRef,
+    screenshot_ref: screenshotRef || null,
+    console_log_ref: String(body.console_log_ref || '').trim() || null,
+    marked_up_plan_ref: markedUpPlanRef || null,
+    corrected_room_polygons: Array.isArray(body.corrected_room_polygons) ? jsonClone(body.corrected_room_polygons) : [],
+    issue_list: Array.isArray(body.issue_list) ? jsonClone(body.issue_list) : [],
+    notes: String(body.notes || '').trim() || null,
+    input_defaults: {
+      pdfPageIndex: decision.pageIndex,
+      pdfScale: decision.scale,
+      pdfExtract: decision.extractMode,
+    },
+    source_refs: [
+      {
+        evidence_id: evidence.id,
+        evidence_type: evidence.evidence_type,
+        source_file: evidence.source_file || decision.sourceFile || null,
+        source_ref: evidence.source_ref || decision.sourceRef || null,
+        status: evidence.status,
+      },
+    ],
+    blocked_claims: Array.isArray(decision.blockedClaims) ? decision.blockedClaims : [...PDF_BOUNDARY_BLOCKED_CLAIMS],
+    claim_gate_effect: 'no_claims_cleared',
+    limitations: [
+      'SAM 3.1 visual audit results are internal-alpha correction evidence only.',
+      'They may guide corrected room polygons, but they do not prove geometry accuracy, drawing scale, AHJ approval, PE review, AutoSprink parity, permit readiness, fabrication readiness, or manufacturer-exact models.',
+    ],
+  };
+}
+
 function pdfBoundaryReplayInputPacket(projectName, evidence, decision, reviewEvidence) {
   if (!evidence || !decision || !reviewEvidence?.review) return null;
   const review = reviewEvidence.review;
@@ -2633,6 +2699,49 @@ app.get('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/sam31-vis
     return res.status(404).json({ error: 'PDF boundary decision evidence not found' });
   }
   res.json(packet);
+});
+
+app.post('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/sam31-visual-audit/results', authMiddleware, requireRole('admin'), (req, res) => {
+  try {
+    const projectName = req.params.name;
+    const evidenceId = Number(req.params.evidenceId);
+    if (!Number.isSafeInteger(evidenceId) || evidenceId <= 0) {
+      return res.status(400).json({ error: 'A positive evidence id is required' });
+    }
+    const evidence = db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'pdf_boundary_decision'`)
+      .get(evidenceId, projectName);
+    const decision = decisionFromEvidence(evidence);
+    const resultPacket = normalizeSam31VisualAuditResult(projectName, evidence, decision, req.body, req.user);
+    const notes = {
+      kind: 'sam31_room_boundary_visual_audit_result',
+      result: resultPacket,
+      blocked_claims: resultPacket.blocked_claims,
+      claim_gate_effect: resultPacket.claim_gate_effect,
+      limitations: resultPacket.limitations,
+    };
+    const result = db
+      .prepare(`INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+                VALUES (?, ?, ?, ?, ?, ?)`)
+      .run(
+        projectName,
+        'sam31_room_boundary_visual_audit',
+        resultPacket.source_file,
+        `pdf-boundary:${evidence.id}:sam31-visual-audit:${resultPacket.review_decision}`,
+        'best_effort',
+        JSON.stringify(notes),
+      );
+    const evidenceRow = db.prepare('SELECT * FROM project_evidence WHERE id = ?').get(result.lastInsertRowid);
+    res.status(201).json({
+      id: result.lastInsertRowid,
+      message: 'SAM 3.1 visual audit result recorded as best-effort evidence; claims still blocked',
+      evidence: evidenceRow,
+      result: resultPacket,
+    });
+  } catch (err) {
+    res.status(err.httpStatus || 400).json({ error: err.message });
+  }
 });
 
 app.get('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/replay-input', authMiddleware, (req, res) => {
