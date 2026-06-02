@@ -1031,6 +1031,28 @@ async function runBrowserSmoke(token, evidenceIds) {
     if (consumerReviewPacket.claim_gate_effect !== 'no_claims_cleared') {
       throw new Error(`SAM31 consumer review packet cleared a claim gate: ${consumerReviewPacket.claim_gate_effect}`);
     }
+    await page.waitForSelector('text=Download SAM31 actual-value work item', { timeout: 8_000 });
+    const actualValueWorkItemDownloadPromise = page.waitForEvent('download');
+    await page.locator(`button[data-sam31-consumer-actual-value-work-item-evidence-id="${consumerReview.evidence_id}"]`).click();
+    const actualValueWorkItemDownload = await actualValueWorkItemDownloadPromise;
+    const actualValueWorkItemPath = await actualValueWorkItemDownload.path();
+    const actualValueWorkItemSuggestedName = actualValueWorkItemDownload.suggestedFilename();
+    const actualValueWorkItemDownloadBytes = actualValueWorkItemPath ? fs.statSync(actualValueWorkItemPath).size : 0;
+    downloads.push({ suggestedName: actualValueWorkItemSuggestedName, bytes: actualValueWorkItemDownloadBytes });
+    if (!actualValueWorkItemSuggestedName.includes('sam31-actual-value-work-item') || actualValueWorkItemDownloadBytes <= 0) {
+      throw new Error(`Unexpected SAM31 actual-value work item download ${actualValueWorkItemSuggestedName} (${actualValueWorkItemDownloadBytes} bytes)`);
+    }
+    const actualValueWorkItemPacket = JSON.parse(fs.readFileSync(actualValueWorkItemPath, 'utf8'));
+    if (actualValueWorkItemPacket.artifact_type !== 'openclaw.sam31.actual_value_work_item_packet.v1') {
+      throw new Error(`Unexpected SAM31 actual-value work item packet type ${actualValueWorkItemPacket.artifact_type}`);
+    }
+    if (actualValueWorkItemPacket.employee_actual_value_next_action !== 'Replace SAM31 best guesses with actual HaloFire documentation values before using these observations in bid/export decisions.'
+      || actualValueWorkItemPacket.source_openclaw_sam31_consumer_review_evidence_id !== consumerReview.evidence_id
+      || actualValueWorkItemPacket.replacement_summary?.semantic_label_count < 1
+      || actualValueWorkItemPacket.claim_gate_effect !== 'no_claims_cleared'
+      || actualValueWorkItemPacket.use_for_claims !== false) {
+      throw new Error(`SAM31 actual-value work item lost employee replacement truth gates: ${JSON.stringify(actualValueWorkItemPacket)}`);
+    }
     await page.waitForSelector('text=Download SAM31 sprinkler review adapter', { timeout: 8_000 });
     const sprinklerAdapterDownloadPromise = page.waitForEvent('download');
     await page.locator(`button[data-sam31-sprinkler-review-adapter-evidence-id="${consumerReview.evidence_id}"]`).click();

@@ -4951,6 +4951,112 @@ function buildOpenClawSam31ConsumerReviewDecisionPacket(projectName, evidence, d
   };
 }
 
+function buildOpenClawSam31ActualValueWorkItemPacket(projectName, evidence, decision, reviewEvidence, review, consumerSmokeEvidence) {
+  if (!evidence || !decision) {
+    const e = new Error('PDF boundary decision evidence not found');
+    e.httpStatus = 404;
+    throw e;
+  }
+  if (!reviewEvidence || !review) {
+    const e = new Error('SAM31 consumer review evidence is required before downloading the SAM31 actual-value work item packet');
+    e.httpStatus = 409;
+    throw e;
+  }
+  if (Number(review.source_pdf_boundary_evidence_id) !== Number(evidence.id)) {
+    const e = new Error('SAM31 consumer review evidence does not belong to the requested PDF boundary evidence');
+    e.httpStatus = 409;
+    throw e;
+  }
+  const replacementValues = review.replacement_values && typeof review.replacement_values === 'object' && !Array.isArray(review.replacement_values)
+    ? jsonClone(review.replacement_values)
+    : {};
+  const countArray = (key) => (Array.isArray(replacementValues[key]) ? replacementValues[key].length : 0);
+  const sourceRefs = [
+    {
+      evidence_id: evidence.id,
+      evidence_type: evidence.evidence_type,
+      source_file: evidence.source_file || decision.sourceFile || null,
+      source_ref: evidence.source_ref || decision.sourceRef || null,
+      status: evidence.status,
+    },
+    ...(consumerSmokeEvidence ? [{
+      evidence_id: consumerSmokeEvidence.id,
+      evidence_type: consumerSmokeEvidence.evidence_type,
+      source_file: consumerSmokeEvidence.source_file || null,
+      source_ref: consumerSmokeEvidence.source_ref || null,
+      status: consumerSmokeEvidence.status,
+      claim_gate_effect: 'no_claims_cleared',
+    }] : []),
+    {
+      evidence_id: reviewEvidence.id,
+      evidence_type: reviewEvidence.evidence_type,
+      source_file: reviewEvidence.source_file || null,
+      source_ref: reviewEvidence.source_ref || review.replacement_ref || null,
+      status: reviewEvidence.status,
+      claim_gate_effect: 'no_claims_cleared',
+    },
+    ...(Array.isArray(review.source_refs) ? jsonClone(review.source_refs) : []),
+  ];
+  const acceptableActualEvidence = [
+    '1881 proposal workbook row or sheet reference',
+    'reviewed vector overlay SVG or marked-up plan ref',
+    'reviewed 3D model candidate ref or model note',
+    'screenshot or console evidence for the reviewed SAM31 section',
+  ];
+  return {
+    artifact_type: 'openclaw.sam31.actual_value_work_item_packet.v1',
+    status: 'requires_employee_actual_value_update',
+    project_name: projectName,
+    generated_at: new Date().toISOString(),
+    consumer: review.consumer,
+    source_application: review.source_application || 'halo_fire',
+    source_pdf_boundary_evidence_id: evidence.id,
+    source_openclaw_sam31_consumer_review_evidence_id: reviewEvidence.id,
+    source_openclaw_sam31_consumer_smoke_evidence_id: review.source_openclaw_sam31_consumer_smoke_evidence_id || consumerSmokeEvidence?.id || null,
+    accepted_queue_id: review.accepted_queue_id,
+    persisted_review_packet_ref: review.persisted_review_packet_ref,
+    replacement_ref: review.replacement_ref,
+    screenshot_ref: review.screenshot_ref || null,
+    console_log_ref: review.console_log_ref || null,
+    download_name: `${slugForDownloadName(projectName)}-sam31-actual-value-work-item-${slugForDownloadName(review.consumer)}-${reviewEvidence.id}.json`,
+    employee_actual_value_next_action: 'Replace SAM31 best guesses with actual HaloFire documentation values before using these observations in bid/export decisions.',
+    acceptable_actual_evidence: acceptableActualEvidence,
+    update_fields: [
+      'semantic_labels',
+      'object_hypotheses',
+      'vector_overlays',
+      'model_3d_candidates',
+      'source_ref',
+      'confidence',
+    ],
+    replacement_values: replacementValues,
+    replacement_summary: {
+      semantic_label_count: countArray('semantic_labels'),
+      object_hypothesis_count: countArray('object_hypotheses'),
+      vector_overlay_count: countArray('vector_overlays'),
+      model_3d_candidate_count: countArray('model_3d_candidates'),
+    },
+    source_refs: uniqueByJson(sourceRefs),
+    use_for_claims: false,
+    blocked_claims: uniqueStrings([
+      ...(Array.isArray(review.blocked_claims) ? review.blocked_claims : []),
+      'permit_ready',
+      'fabrication_ready',
+      'AHJ_approval',
+      'professional_approval',
+      'manufacturer_exact',
+      'AutoSprink_parity',
+    ]),
+    claim_gate_effect: 'no_claims_cleared',
+    no_claim_gates_cleared: true,
+    limitations: uniqueStrings([
+      ...(Array.isArray(review.limitations) ? review.limitations : []),
+      'SAM31 plus LLM section understanding can identify likely objects, semantic labels, vector overlays, and 3D candidates, but these remain best guesses until replaced by actual HaloFire documentation values.',
+      'This actual-value work item packet does not clear permit-ready, fabrication-ready, AHJ-ready, engineering-grade, AutoSprink parity, professional approval, or manufacturer-exact claims.',
+    ]),
+  };
+}
+
 function openClawSam31SprinklerIssueSeeds(review) {
   const values = review?.replacement_values && typeof review.replacement_values === 'object'
     ? review.replacement_values
@@ -10865,6 +10971,53 @@ app.get('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/openclaw/
         .get(sourceConsumerSmokeEvidenceId, projectName)
       : null;
     return res.json(buildOpenClawSam31ConsumerReviewDecisionPacket(
+      projectName,
+      evidence,
+      decision,
+      reviewEvidence,
+      review,
+      consumerSmokeEvidence,
+    ));
+  } catch (err) {
+    return res.status(err.httpStatus || 400).json({ error: err.message });
+  }
+});
+
+app.get('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/openclaw/sam31/consumer-review/:reviewEvidenceId/actual-value-work-item', authMiddleware, (req, res) => {
+  try {
+    const projectName = req.params.name;
+    const evidenceId = Number(req.params.evidenceId);
+    const reviewEvidenceId = Number(req.params.reviewEvidenceId);
+    if (!Number.isSafeInteger(evidenceId) || evidenceId <= 0) {
+      return res.status(400).json({ error: 'A positive evidence id is required' });
+    }
+    if (!Number.isSafeInteger(reviewEvidenceId) || reviewEvidenceId <= 0) {
+      return res.status(400).json({ error: 'A positive SAM31 consumer review evidence id is required' });
+    }
+    const evidence = db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'pdf_boundary_decision'`)
+      .get(evidenceId, projectName);
+    const decision = decisionFromEvidence(evidence);
+    if (!evidence || !decision) {
+      return res.status(404).json({ error: 'PDF boundary decision evidence not found' });
+    }
+    const reviewEvidence = db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'openclaw_sam31_consumer_review'`)
+      .get(reviewEvidenceId, projectName);
+    const review = openClawSam31ConsumerReviewFromEvidence(reviewEvidence);
+    if (!reviewEvidence || !review) {
+      return res.status(404).json({ error: 'SAM31 consumer review evidence not found' });
+    }
+    const sourceConsumerSmokeEvidenceId = Number(review.source_openclaw_sam31_consumer_smoke_evidence_id);
+    const consumerSmokeEvidence = Number.isSafeInteger(sourceConsumerSmokeEvidenceId) && sourceConsumerSmokeEvidenceId > 0
+      ? db
+        .prepare(`SELECT * FROM project_evidence
+                  WHERE id = ? AND project_name = ? AND evidence_type = 'openclaw_sam31_consumer_smoke_artifact'`)
+        .get(sourceConsumerSmokeEvidenceId, projectName)
+      : null;
+    return res.json(buildOpenClawSam31ActualValueWorkItemPacket(
       projectName,
       evidence,
       decision,

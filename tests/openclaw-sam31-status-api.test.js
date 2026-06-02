@@ -1798,6 +1798,61 @@ describe('OpenClaw SAM31 bridge status API', () => {
       expect.objectContaining({ evidence_type: 'openclaw_sam31_consumer_smoke_artifact', evidence_id: consumerSmoke.id }),
       expect.objectContaining({ evidence_type: 'openclaw_sam31_consumer_review', evidence_id: consumerReview.id }),
     ]));
+    const actualValueWorkItemRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/consumer-review/${consumerReview.id}/actual-value-work-item`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(actualValueWorkItemRes.status).toBe(200);
+    const actualValueWorkItem = await actualValueWorkItemRes.json();
+    expect(actualValueWorkItem).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.actual_value_work_item_packet.v1',
+      status: 'requires_employee_actual_value_update',
+      consumer: 'landscout',
+      source_application: 'halo_fire',
+      source_pdf_boundary_evidence_id: boundary.id,
+      source_openclaw_sam31_consumer_review_evidence_id: consumerReview.id,
+      source_openclaw_sam31_consumer_smoke_evidence_id: consumerSmoke.id,
+      accepted_queue_id: 'sam31-landscout-testqueue',
+      persisted_review_packet_ref: 'openclaw://landscout/sam31/product-review/sam31-landscout-testqueue',
+      replacement_ref: 'landscout://sam31/reviews/sam31-landscout-testqueue/replacement.json',
+      download_name: expect.stringContaining('sam31-actual-value-work-item-landscout'),
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+      employee_actual_value_next_action: expect.stringContaining('Replace SAM31 best guesses with actual HaloFire documentation values'),
+    }));
+    expect(actualValueWorkItem.replacement_values).toEqual(expect.objectContaining({
+      semantic_labels: ['employee reviewed parcel edge'],
+      object_hypotheses: [{ id: 'obj:parcel-edge', semantic_label: 'reviewed parcel edge' }],
+      vector_overlays: [{ id: 'vector:parcel-edge', svg_path: 'M 0 0 L 10 0 L 10 5 Z' }],
+      model_3d_candidates: [{ id: 'model3d:parcel-edge', primitive: 'extruded_review_shape' }],
+      source_ref: 'landscout://field-review/sam31-landscout-testqueue',
+      confidence: 0.82,
+    }));
+    expect(actualValueWorkItem.replacement_summary).toEqual(expect.objectContaining({
+      semantic_label_count: 1,
+      object_hypothesis_count: 1,
+      vector_overlay_count: 1,
+      model_3d_candidate_count: 1,
+    }));
+    expect(actualValueWorkItem.acceptable_actual_evidence).toEqual(expect.arrayContaining([
+      '1881 proposal workbook row or sheet reference',
+      'reviewed vector overlay SVG or marked-up plan ref',
+      'reviewed 3D model candidate ref or model note',
+      'screenshot or console evidence for the reviewed SAM31 section',
+    ]));
+    expect(actualValueWorkItem.blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'fabrication_ready',
+      'AHJ_approval',
+      'professional_approval',
+      'manufacturer_exact',
+      'AutoSprink_parity',
+    ]));
+    expect(actualValueWorkItem.source_refs).toEqual(expect.arrayContaining([
+      expect.objectContaining({ evidence_type: 'pdf_boundary_decision', evidence_id: boundary.id }),
+      expect.objectContaining({ evidence_type: 'openclaw_sam31_consumer_smoke_artifact', evidence_id: consumerSmoke.id }),
+      expect.objectContaining({ evidence_type: 'openclaw_sam31_consumer_review', evidence_id: consumerReview.id }),
+    ]));
     const sprinklerAdapterRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/sprinkler-review-adapter/${consumerReview.id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });

@@ -116,6 +116,12 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toContain('employee_actual_value_next_action');
     expect(html).toContain('acceptable_actual_evidence');
     expect(html).toContain('Replace SAM31 best guesses with actual HaloFire documentation values');
+    expect(html).toContain('Download SAM31 actual-value work item');
+    expect(html).toContain('downloadOpenClawSam31ActualValueWorkItemPacket');
+    expect(html).toContain('data-sam31-consumer-actual-value-work-item-evidence-id');
+    expect(html).toContain('openclaw.sam31.actual_value_work_item_packet.v1');
+    expect(html).toContain('/openclaw/sam31/consumer-review/');
+    expect(html).toContain('/actual-value-work-item');
     expect(html).toContain('1881 proposal workbook row or sheet reference');
     expect(html).toContain('reviewed vector overlay SVG or marked-up plan ref');
     expect(html).toContain('reviewed 3D model candidate ref or model note');
