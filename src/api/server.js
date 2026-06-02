@@ -16,7 +16,7 @@ import Database from 'better-sqlite3';
 import rateLimit from 'express-rate-limit';
 import 'dotenv/config';
 import { createLogger } from '../core/logger.js';
-import { generateSprinklerBid, buildEsfrSystemScope, priceBid } from '../engine/sprinkler-layout.js';
+import { generateSprinklerBid, buildEsfrSystemScope, priceBid, polygonArea } from '../engine/sprinkler-layout.js';
 import { buildFullScopeBid } from '../engine/bid-scope.js';
 import { buildScene } from '../engine/geometry.js';
 import { buildResolverFromDb } from '../engine/pricebook-pricing.js';
@@ -5924,6 +5924,71 @@ function latestSuppliedDocumentBidTruthReplacementEvidence(projectName) {
   return row ? { evidence: row, replacement: suppliedDocumentBidTruthReplacementFromEvidence(row) } : null;
 }
 
+function suppliedDocumentBidTruthDownstreamDefaults(projectName) {
+  const status = buildSuppliedDocumentBidTruthStatus(path.resolve(__dirname, '../..'), projectName);
+  const latest = latestSuppliedDocumentBidTruthReplacementEvidence(projectName);
+  if (!latest?.replacement) return null;
+  const replacementValues = latest.replacement.replacement_values
+    && typeof latest.replacement.replacement_values === 'object'
+    && !Array.isArray(latest.replacement.replacement_values)
+    ? jsonClone(latest.replacement.replacement_values)
+    : {};
+  const replacedFields = Array.isArray(latest.replacement.replaced_fields)
+    ? latest.replacement.replaced_fields
+    : Object.keys(replacementValues);
+  return {
+    artifact_type: 'halofire.supplied_document_bid_truth_downstream_defaults.v1',
+    status: 'employee_replacement_applied',
+    project_name: projectName,
+    source_evidence_type: 'supplied_document_bid_truth_replacement',
+    source_replacement_evidence_id: latest.evidence.id,
+    replacement_ref: latest.replacement.replacement_ref || latest.replacement.source_ref || latest.evidence.source_ref,
+    source_file: latest.evidence.source_file || latest.replacement.source_file || null,
+    source_refs: Array.isArray(latest.replacement.source_refs) ? latest.replacement.source_refs : [],
+    replacement_values: replacementValues,
+    replaced_fields: replacedFields,
+    project_truth: {
+      ...(status.project_truth || {}),
+      ...replacementValues,
+      source_status: 'employee_replacement_recorded',
+    },
+    temporary_value_policy: status.temporary_value_policy || latest.replacement.temporary_value_policy || 'best_guess_until_employee_replaced',
+    use_for_claims: false,
+    no_claim_gates_cleared: true,
+    claim_gate_effect: 'no_claims_cleared',
+    blocked_claims: Array.isArray(latest.replacement.blocked_claims) && latest.replacement.blocked_claims.length
+      ? latest.replacement.blocked_claims
+      : (Array.isArray(status.blocked_claims) ? status.blocked_claims : []),
+    limitations: [
+      ...(Array.isArray(status.limitations) ? status.limitations : []),
+      'Employee supplied-document bid-truth replacements may update internal-alpha defaults only.',
+      'They do not clear permit-ready, AHJ, professional, manufacturer, engineering-grade, fabrication-ready, or AutoSprink parity claims.',
+    ],
+  };
+}
+
+function scaleFloorPlanAreaForSuppliedBidTruth(floorPlan, suppliedDocumentBidTruth) {
+  const targetSqFt = Number(suppliedDocumentBidTruth?.project_truth?.square_feet);
+  if (!(targetSqFt > 0) || !floorPlan?.rooms?.length) return floorPlan;
+  const currentSqFt = floorPlan.rooms.reduce((sum, room) => sum + polygonArea(room.polygon || []), 0);
+  if (!(currentSqFt > 0)) return floorPlan;
+  const scale = Math.sqrt(targetSqFt / currentSqFt);
+  return {
+    ...floorPlan,
+    source: [
+      floorPlan.source || 'built-in internal-alpha floor plan',
+      `supplied_document_bid_truth_replacement:${suppliedDocumentBidTruth.source_replacement_evidence_id}`,
+      `square_feet=${targetSqFt}`,
+      'claim_gate_effect=no_claims_cleared',
+    ].join('; '),
+    supplied_document_bid_truth_replacement_evidence_id: suppliedDocumentBidTruth.source_replacement_evidence_id,
+    rooms: floorPlan.rooms.map((room) => ({
+      ...room,
+      polygon: (room.polygon || []).map(([x, y]) => [x * scale, y * scale]),
+    })),
+  };
+}
+
 function suppliedDocumentBidTruthReviewPacket(projectName) {
   const status = buildSuppliedDocumentBidTruthStatus(path.resolve(__dirname, '../..'), projectName);
   const blockedClaims = Array.isArray(status.blocked_claims) ? status.blocked_claims : [];
@@ -10403,6 +10468,7 @@ app.post('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/reviews'
 
 function runSprinklerPipeline(req, prebuilt = null) {
   const projectName = req.params.name;
+  const suppliedDocumentBidTruth = suppliedDocumentBidTruthDownstreamDefaults(projectName);
   let floorPlan = (prebuilt && prebuilt.floorPlan) || null;
   let building = null;
   let replayInput = null;
@@ -10437,10 +10503,12 @@ function runSprinklerPipeline(req, prebuilt = null) {
     floorPlan = normalizeFloorPlan(req.body.floorPlan);
   } else if (projectName === HOME_DEPOT_PROJECT_NAME) {
     floorPlan = homeDepotRexburgFloorPlan();
+    floorPlan = scaleFloorPlanAreaForSuppliedBidTruth(floorPlan, suppliedDocumentBidTruth);
   } else if (projectName === COOPERATIVE_1881_PROJECT_NAME) {
     // Residential apartment job with no DXF — built-in plan uses the REAL
     // sprinklered area (170,654 sqft) with a placeholder footprint shape.
     floorPlan = cooperative1881FloorPlan();
+    floorPlan = scaleFloorPlanAreaForSuppliedBidTruth(floorPlan, suppliedDocumentBidTruth);
   }
   // A building drawing (SVG or DXF) -> synthesize a flat floor plan for bid/hydraulics/scene.
   if (building && !floorPlan) {
@@ -10574,6 +10642,32 @@ function runSprinklerPipeline(req, prebuilt = null) {
             : replayInput.room_boundary_source === 'latest_sam31_visual_audit'
             ? 'Generated from SAM 3.1 visual-audit correction evidence for internal-alpha replay only.'
             : 'Generated from employee-reviewed room-boundary correction evidence for internal-alpha replay only.',
+          bid.disclaimer,
+        ],
+      })
+      : suppliedDocumentBidTruth
+      ? JSON.stringify({
+        kind: 'best_effort_ai_layout',
+        artifact_type: 'halofire.best_effort_ai_layout.supplied_document_bid_truth_defaults.v1',
+        artifact_status: 'best_effort_internal_alpha',
+        generated_at: new Date().toISOString(),
+        generated_by: bid.generatedBy,
+        source_evidence_type: 'supplied_document_bid_truth_replacement',
+        source_supplied_document_bid_truth_replacement_evidence_id: suppliedDocumentBidTruth.source_replacement_evidence_id,
+        supplied_document_bid_truth: suppliedDocumentBidTruth,
+        total_head_count: bid.totalHeadCount,
+        total_area_sqft: bid.totalAreaSqFt,
+        bid_summary: {
+          total_area_sqft: bid.totalAreaSqFt,
+          total_head_count: bid.totalHeadCount,
+          pricing_total: bid.pricing?.total ?? null,
+          markup_pct: bid.pricing?.markupPct ?? null,
+        },
+        blocked_claims: suppliedDocumentBidTruth.blocked_claims,
+        claim_gate_effect: 'no_claims_cleared',
+        summary: `claim_gate_effect=no_claims_cleared source_evidence_type=supplied_document_bid_truth_replacement replacement_ref=${suppliedDocumentBidTruth.replacement_ref}`,
+        limitations: [
+          'Generated with employee supplied-document bid-truth replacements for internal-alpha defaults only.',
           bid.disclaimer,
         ],
       })
@@ -10793,7 +10887,7 @@ function runSprinklerPipeline(req, prebuilt = null) {
     fullScopeBid = { error: e.message };
   }
 
-  return { projectName, floorPlan, building, replayInput, bid, scene, cadModel, hydraulics, hydraulicNetwork, compliance, fullScopeBid };
+  return { projectName, floorPlan, building, replayInput, suppliedDocumentBidTruth, bid, scene, cadModel, hydraulics, hydraulicNetwork, compliance, fullScopeBid };
 }
 
 function round2(n) {
@@ -10807,8 +10901,21 @@ app.post('/api/projects/:name/sprinkler-bid', authMiddleware, async (req, res) =
     const prebuilt = await resolvePdfFloorPlan(req);
     const out = runSprinklerPipeline(req, prebuilt);
     if (out.httpError) return res.status(out.httpError.status).json({ error: out.httpError.error });
-    const { bid, scene, cadModel, hydraulics, hydraulicNetwork, compliance, fullScopeBid, building, replayInput } = out;
-    res.json({ bid, scene, cadModel, hydraulics, hydraulicNetwork, compliance, fullScopeBid, isBuilding: !!building, ...(replayInput ? { replayInput, roomBoundaryReplay: replayInput } : {}), ...(prebuilt && prebuilt.pdfMeta ? { pdfMeta: prebuilt.pdfMeta } : {}) });
+    const { bid, scene, cadModel, hydraulics, hydraulicNetwork, compliance, fullScopeBid, building, replayInput, floorPlan, suppliedDocumentBidTruth } = out;
+    res.json({
+      bid,
+      floorPlan,
+      suppliedDocumentBidTruth,
+      scene,
+      cadModel,
+      hydraulics,
+      hydraulicNetwork,
+      compliance,
+      fullScopeBid,
+      isBuilding: !!building,
+      ...(replayInput ? { replayInput, roomBoundaryReplay: replayInput } : {}),
+      ...(prebuilt && prebuilt.pdfMeta ? { pdfMeta: prebuilt.pdfMeta } : {}),
+    });
   } catch (err) {
     res.status(err.httpStatus || 400).json({ error: err.message });
   }

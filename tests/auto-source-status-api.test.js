@@ -852,6 +852,91 @@ describe('S5 GET /api/auto-source/status', () => {
     expect(queue.summary.supplied_document_bid_truth_claims_cleared).toBe(0);
   });
 
+  it('feeds supplied document bid-truth replacements into downstream sprinkler-bid defaults without clearing claims', async () => {
+    const projectName = 'The Cooperative 1881 - Salt Lake City UT';
+    const replacementRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-packets/supplied-document-bid-truth/replacements`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        reviewer_name: 'HaloFire estimator',
+        review_decision: 'replaced_temporary_values',
+        replacement_ref: '1881://employee-bid-truth/downstream-defaults-001',
+        source_file: 'employee-bid-truth-downstream-defaults.json',
+        source_refs: [
+          'employee://bid-truth/downstream-defaults-001',
+          'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G6',
+        ],
+        replacement_values: {
+          square_feet: 90000,
+          head_count: 777,
+          total_man_hours: 1881.25,
+          construction_days: 44,
+          flow_data_available: false,
+        },
+        notes: 'Temporary downstream defaults for internal-alpha replay/pricing only.',
+      }),
+    });
+    expect(replacementRes.status).toBe(201);
+    const replacement = await replacementRes.json();
+
+    const bidRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/sprinkler-bid`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ markupPct: 25 }),
+    });
+    expect(bidRes.status).toBe(200);
+    const body = await bidRes.json();
+
+    expect(body.bid.totalAreaSqFt).toBe(90000);
+    expect(body.floorPlan.source).toMatch(/supplied_document_bid_truth_replacement/);
+    expect(body.suppliedDocumentBidTruth).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.supplied_document_bid_truth_downstream_defaults.v1',
+      status: 'employee_replacement_applied',
+      source_evidence_type: 'supplied_document_bid_truth_replacement',
+      source_replacement_evidence_id: replacement.evidence.id,
+      replacement_ref: '1881://employee-bid-truth/downstream-defaults-001',
+      temporary_value_policy: 'best_guess_until_employee_replaced',
+      use_for_claims: false,
+      no_claim_gates_cleared: true,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(body.suppliedDocumentBidTruth.project_truth).toEqual(expect.objectContaining({
+      square_feet: 90000,
+      head_count: 777,
+      total_man_hours: 1881.25,
+      construction_days: 44,
+      flow_data_available: false,
+      source_status: 'employee_replacement_recorded',
+    }));
+    expect(body.suppliedDocumentBidTruth.replaced_fields).toEqual(expect.arrayContaining([
+      'square_feet',
+      'head_count',
+      'total_man_hours',
+      'construction_days',
+      'flow_data_available',
+    ]));
+    expect(body.suppliedDocumentBidTruth.blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'AHJ_approval',
+      'AutoSprink_parity',
+      'engineering_grade',
+      'fabrication_ready',
+      'manufacturer_exact',
+    ]));
+
+    const evidenceRows = await (await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/evidence`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })).json();
+    const layoutRow = evidenceRows.find((row) => (
+      row.evidence_type === 'best_effort_ai_layout'
+      && row.source_ref === `engine ${body.bid.generatedBy}`
+    ));
+    expect(layoutRow).toBeTruthy();
+    expect(layoutRow.notes).toContain('supplied_document_bid_truth_replacement');
+    expect(layoutRow.notes).toContain('downstream-defaults-001');
+    expect(layoutRow.notes).toContain('no_claims_cleared');
+  });
+
   it('records official-flow intake evidence and updates the resolver queue without clearing claims', async () => {
     const projectName = 'The Cooperative 1881 - Salt Lake City UT';
     const createRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-packets/official-flow/intake`, {
