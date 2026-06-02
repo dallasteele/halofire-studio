@@ -342,7 +342,7 @@ function resolverQueueDetail(item) {
       <div class="claims">Accepts: ${acceptable.map((e) => `<span class="chip">${escapeHtml(e)}</span>`).join('')}</div>
       <div class="claims">AI fallback: ${escapeHtml(item.ai_fallback || '')}</div>
       <div class="claims">Blocks: ${claims.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('')}</div>
-      <p style="margin-top:8px"><button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#4f46e5" data-official-flow-replay-artifact-evidence-id="${escapeHtml(item.evidence_id)}">Download saved replay artifact</button></p>
+      <p style="margin-top:8px"><button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#4f46e5" data-official-flow-replay-artifact-evidence-id="${escapeHtml(item.evidence_id)}">Download saved replay artifact</button> <button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#0f766e" data-official-flow-replay-review-packet-evidence-id="${escapeHtml(item.evidence_id)}">Download professional/AHJ review packet</button></p>
       <p style="margin-top:8px">${actions.map((action) => `<a class="go" style="padding:7px 10px;font-size:11px;text-decoration:none;display:inline-block;margin-right:6px" href="${escapeHtml(action.href || '#')}">${escapeHtml(action.label || 'Open')}</a>`).join('')}</p>
     </div>`;
   }
@@ -470,6 +470,16 @@ async function downloadOfficialFlowReplayEvidenceArtifact(evidenceId) {
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = artifact.download_name || 'official-flow-hydraulic-replay-artifact.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+async function downloadOfficialFlowReplayReviewPacket(evidenceId) {
+  const packet = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/resolver-packets/official-flow-replay/' + encodeURIComponent(evidenceId) + '/review-packet');
+  const blob = new Blob([JSON.stringify(packet, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = packet.download_name || 'official-flow-professional-ahj-review-packet.json';
   a.click();
   URL.revokeObjectURL(a.href);
 }
@@ -605,6 +615,9 @@ async function refreshResolverQueue() {
   });
   document.querySelectorAll('[data-official-flow-persist-evidence-id]').forEach((button) => {
     button.onclick = () => persistOfficialFlowHydraulicReplay(button.dataset.officialFlowPersistEvidenceId);
+  });
+  document.querySelectorAll('[data-official-flow-replay-review-packet-evidence-id]').forEach((button) => {
+    button.onclick = () => downloadOfficialFlowReplayReviewPacket(button.dataset.officialFlowReplayReviewPacketEvidenceId);
   });
 }
 

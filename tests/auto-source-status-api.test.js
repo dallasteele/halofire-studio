@@ -382,5 +382,58 @@ describe('S5 GET /api/auto-source/status', () => {
       }),
     ]));
     expect(issueQueue.summary.official_flow_replay_review_needed).toBeGreaterThanOrEqual(1);
+
+    const reviewPacketRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-packets/official-flow-replay/${persisted.id}/review-packet`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(reviewPacketRes.status).toBe(200);
+    const reviewPacket = await reviewPacketRes.json();
+    expect(reviewPacket).toEqual(expect.objectContaining({
+      artifact_type: 'official_flow_professional_ahj_review_packet',
+      status: 'ready_for_employee_review',
+      project_name: projectName,
+      source_evidence_id: persisted.id,
+      source_evidence_type: 'official_flow_hydraulic_replay_artifact',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(reviewPacket.download_name).toMatch(/official-flow-professional-ahj-review-packet/);
+    expect(reviewPacket.issue_actions).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        code: 'PROFESSIONAL_HYDRAULIC_REVIEW_MISSING',
+        evidence_lane: 'licensed_professional_hydraulic_review',
+      }),
+      expect.objectContaining({
+        code: 'AHJ_HYDRAULIC_APPROVAL_MISSING',
+        evidence_lane: 'AHJ_reviewed_hydraulic_calculation_package',
+      }),
+    ]));
+    expect(reviewPacket.employee_decision_fields).toEqual(expect.arrayContaining([
+      'reviewer_name',
+      'professional_review_ref',
+      'ahj_review_ref',
+      'autosprink_export_ref',
+      'official_flow_test_ref',
+      'review_decision',
+      'notes',
+    ]));
+    expect(reviewPacket.evidence_attachment_fields).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        field: 'professional_review_ref',
+        acceptable_evidence_type: 'licensed_professional_hydraulic_review',
+      }),
+      expect.objectContaining({
+        field: 'ahj_review_ref',
+        acceptable_evidence_type: 'AHJ_reviewed_hydraulic_calculation_package',
+      }),
+    ]));
+    expect(reviewPacket.source_refs).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        evidence_id: persisted.id,
+        evidence_type: 'official_flow_hydraulic_replay_artifact',
+      }),
+    ]));
+    expect(reviewPacket.blocked_claims).toEqual(
+      expect.arrayContaining(['permit_ready', 'AHJ_approval', 'PE_review', 'AutoSprink_parity']),
+    );
   });
 });
