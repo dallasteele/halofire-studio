@@ -1186,6 +1186,146 @@ function jsonClone(value) {
   return JSON.parse(JSON.stringify(value));
 }
 
+const SAM31_PERCEPTION_LANES = Object.freeze([
+  'segmentation',
+  'object_identification',
+  'vector_overlay',
+  'model_3d_candidate',
+  'spatial_observation',
+]);
+
+function uniqueStrings(values) {
+  return [...new Set((values || []).map((v) => String(v || '').trim()).filter(Boolean))];
+}
+
+function bboxToPolygon(bbox) {
+  if (!bbox) return null;
+  if (Array.isArray(bbox) && bbox.length >= 4) {
+    const [x0, y0, a, b] = bbox.map((v) => Number(v));
+    if (![x0, y0, a, b].every(Number.isFinite)) return null;
+    const x1 = a > x0 ? a : x0 + a;
+    const y1 = b > y0 ? b : y0 + b;
+    return [[x0, y0], [x1, y0], [x1, y1], [x0, y1]];
+  }
+  if (typeof bbox === 'object') {
+    const x = Number(bbox.x ?? bbox.left ?? bbox.x0 ?? bbox.minX);
+    const y = Number(bbox.y ?? bbox.top ?? bbox.y0 ?? bbox.minY);
+    const width = Number(bbox.width ?? bbox.w ?? ((bbox.x1 ?? bbox.maxX) - x));
+    const height = Number(bbox.height ?? bbox.h ?? ((bbox.y1 ?? bbox.maxY) - y));
+    if (![x, y, width, height].every(Number.isFinite)) return null;
+    return [[x, y], [x + width, y], [x + width, y + height], [x, y + height]];
+  }
+  return null;
+}
+
+function buildOpenClawSam31PerceptionRequest(projectName, evidence, decision, candidate = {}, pdfRef = null) {
+  const segment = {
+    id: 'candidate:pdf-boundary',
+    semantic_label: 'room_boundary_candidate',
+    confidence: Number.isFinite(Number(candidate.confidence)) ? Number(candidate.confidence) : 0.65,
+    bbox: candidate.bbox || null,
+    polygon: bboxToPolygon(candidate.bbox),
+    source_ref: evidence.source_ref || decision.sourceRef || pdfRef || null,
+    limitations: [
+      'Candidate geometry is a best-effort PDF extraction seed for SAM 3.1 and LLM review.',
+      'This segment does not prove drawing scale, geometry accuracy, or regulated readiness.',
+    ],
+  };
+  return {
+    artifact_type: 'openclaw.sam31_perception_request',
+    project_ref: `halo_fire:${projectName}`,
+    application: 'halo_fire',
+    source_runtime: 'sam-3.1+llm',
+    source_ref: evidence.source_ref || decision.sourceRef || null,
+    image_ref: evidence.source_file || decision.sourceFile || pdfRef || evidence.source_ref || decision.sourceRef || null,
+    coordinate_frame_ref: 'rendered_pdf_page_pixels_scaled_to_feet_by_pdfScale',
+    unit: 'feet',
+    llm_model: 'openclaw-local-llm-best-effort',
+    prompt: 'Use SAM 3.1 segmentation plus LLM review to identify room boundaries, walls, sleeve or penetration candidates, sprinkler obstruction candidates, vector overlays, and best-effort 3D model candidates from this floorplan evidence.',
+    perception_lanes: [...SAM31_PERCEPTION_LANES],
+    segments: [segment],
+    object_hypotheses: [
+      {
+        id: 'object:room-boundary',
+        segment_id: segment.id,
+        semantic_label: 'room_boundary',
+        confidence: 0.65,
+      },
+      {
+        id: 'object:wall-candidate',
+        segment_id: segment.id,
+        semantic_label: 'wall_candidate',
+        confidence: 0.55,
+      },
+      {
+        id: 'object:sleeve-or-penetration-candidate',
+        segment_id: segment.id,
+        semantic_label: 'sleeve_or_penetration_candidate',
+        confidence: 0.42,
+      },
+      {
+        id: 'object:sprinkler-obstruction-candidate',
+        segment_id: segment.id,
+        semantic_label: 'sprinkler_obstruction_candidate',
+        confidence: 0.42,
+      },
+    ],
+    requested_outputs: ['segmentation_masks', 'semantic_labels', 'vector_overlays', 'model_3d_candidates', 'spatial_observation_packet'],
+    blocked_claims: [...PDF_BOUNDARY_BLOCKED_CLAIMS],
+    claim_gate_effect: 'no_claims_cleared',
+    limitations: [
+      'SAM 3.1 plus LLM perception is measurement and correction evidence only.',
+      'It cannot clear geometry accuracy, AHJ approval, PE review, AutoSprink parity, permit readiness, fabrication readiness, or manufacturer-exact claims.',
+    ],
+  };
+}
+
+function normalizeOpenClawSam31PerceptionPacket(body = {}) {
+  const raw = body.openclaw_sam31_perception_packet || body.perception_packet || body.sam31_perception_packet || null;
+  if (raw === null || raw === undefined) return null;
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
+    const e = new Error('openclaw_sam31_perception_packet must be an object when provided');
+    e.httpStatus = 400;
+    throw e;
+  }
+  const packet = jsonClone(raw);
+  packet.artifact_type = 'openclaw.sam31_perception_packet';
+  packet.application = packet.application || 'halo_fire';
+  packet.source_runtime = packet.source_runtime || 'sam-3.1+llm';
+  packet.status = packet.status || 'best_effort_perception_ready';
+  packet.segments = Array.isArray(packet.segments) ? packet.segments : [];
+  packet.object_hypotheses = Array.isArray(packet.object_hypotheses) ? packet.object_hypotheses : [];
+  packet.vector_overlays = Array.isArray(packet.vector_overlays) ? packet.vector_overlays : [];
+  packet.model_3d_candidates = Array.isArray(packet.model_3d_candidates) ? packet.model_3d_candidates : [];
+  packet.blocked_claims = uniqueStrings([...(packet.blocked_claims || []), ...PDF_BOUNDARY_BLOCKED_CLAIMS]);
+  packet.claim_gate_effect = 'no_claims_cleared';
+  packet.limitations = [
+    ...(Array.isArray(packet.limitations) ? packet.limitations : []),
+    'OpenClaw/SAM31+LLM perception is internal-alpha correction evidence only and clears no regulated claim gate.',
+  ];
+  return packet;
+}
+
+function sam31PerceptionPacketSummary(packet) {
+  if (!packet || typeof packet !== 'object') return null;
+  return {
+    artifact_type: 'openclaw.sam31_perception_packet',
+    status: packet.status || 'best_effort_perception_ready',
+    application: packet.application || 'halo_fire',
+    source_runtime: packet.source_runtime || 'sam-3.1+llm',
+    source_ref: packet.source_ref || null,
+    segment_count: Array.isArray(packet.segments) ? packet.segments.length : 0,
+    object_hypothesis_count: Array.isArray(packet.object_hypotheses) ? packet.object_hypotheses.length : 0,
+    vector_overlay_count: Array.isArray(packet.vector_overlays) ? packet.vector_overlays.length : 0,
+    model_3d_candidate_count: Array.isArray(packet.model_3d_candidates) ? packet.model_3d_candidates.length : 0,
+    blocked_claims: Array.isArray(packet.blocked_claims) ? packet.blocked_claims : [...PDF_BOUNDARY_BLOCKED_CLAIMS],
+    claim_gate_effect: 'no_claims_cleared',
+    limitations: [
+      'Summary of best-effort OpenClaw/SAM31+LLM perception evidence; it clears no regulated gate.',
+    ],
+  };
+}
+
 function normalizePdfBoundaryDecision(projectName, body = {}) {
   const scale = Number(body.pdfScale);
   if (!Number.isFinite(scale) || scale <= 0) {
@@ -1360,6 +1500,7 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
     marked_up_plan_ref: sam31Evidence.result.marked_up_plan_ref,
     issue_count: Array.isArray(sam31Evidence.result.issue_list) ? sam31Evidence.result.issue_list.length : 0,
     corrected_room_polygon_count: Array.isArray(sam31Evidence.result.corrected_room_polygons) ? sam31Evidence.result.corrected_room_polygons.length : 0,
+    openclaw_sam31_perception_packet: sam31PerceptionPacketSummary(sam31Evidence.result.openclaw_sam31_perception_packet),
     claim_gate_effect: sam31Evidence.result.claim_gate_effect || 'no_claims_cleared',
   } : null;
   let status = 'ready';
@@ -1395,6 +1536,7 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
     next_action: nextAction,
     acceptable_evidence: [
       'employee room-boundary review packet',
+      'OpenClaw SAM31+LLM perception packet',
       'source-linked marked-up plan screenshot',
       'room polygon correction list',
       'licensed professional review/signoff for regulated claims',
@@ -2204,6 +2346,7 @@ function pdfBoundarySam31VisualAuditPacket(projectName, evidence, decision) {
       scale: decision.scale,
       targets: ['building_outline', 'walls', 'rooms', 'layers'],
     }),
+    openclaw_sam31_perception_request: buildOpenClawSam31PerceptionRequest(projectName, evidence, decision, candidate, pdfRef),
     bridge: {
       openclaw_bridge_url_configured: !!String(process.env.OPENCLAW_BRIDGE_URL || '').trim(),
       local_bridge_host: bridgeHost,
@@ -2228,6 +2371,7 @@ function pdfBoundarySam31VisualAuditPacket(projectName, evidence, decision) {
       'marked_up_plan_ref',
       'issue_list',
       'corrected_room_polygons',
+      'openclaw_sam31_perception_packet',
       'review_decision',
       'reviewer_name',
       'notes',
@@ -2235,6 +2379,9 @@ function pdfBoundarySam31VisualAuditPacket(projectName, evidence, decision) {
     supported_evidence_lanes: [
       'room_boundary_visual_audit',
       'spatial_observation_correction_loop',
+      'object_identification_review',
+      'vector_overlay_generation',
+      'model_3d_candidate_generation',
       'best_effort_ai_layout_replay',
     ],
     source_refs: [
@@ -2272,6 +2419,7 @@ function pdfBoundarySam31VisualAuditPacket(projectName, evidence, decision) {
     ],
     acceptable_evidence: [
       'SAM 3.1 segmentation result JSON',
+      'OpenClaw SAM31+LLM perception packet with object/vector/3D candidate evidence',
       'OpenClaw/SAM console or screenshot evidence',
       'source-linked marked-up plan screenshot',
       'employee corrected room polygon list',
@@ -2312,6 +2460,24 @@ function normalizeSam31VisualAuditResult(projectName, evidence, decision, body =
     e.httpStatus = 400;
     throw e;
   }
+  const openclawSam31PerceptionPacket = normalizeOpenClawSam31PerceptionPacket(body);
+  const sourceRefs = [
+    {
+      evidence_id: evidence.id,
+      evidence_type: evidence.evidence_type,
+      source_file: evidence.source_file || decision.sourceFile || null,
+      source_ref: evidence.source_ref || decision.sourceRef || null,
+      status: evidence.status,
+    },
+  ];
+  if (openclawSam31PerceptionPacket) {
+    sourceRefs.push({
+      evidence_type: 'openclaw.sam31_perception_packet',
+      source_ref: openclawSam31PerceptionPacket.source_ref || 'openclaw.sam31_perception_packet',
+      status: openclawSam31PerceptionPacket.status || 'best_effort_perception_ready',
+      claim_gate_effect: 'no_claims_cleared',
+    });
+  }
   return {
     artifact_type: 'sam31_room_boundary_visual_audit_result',
     project_name: projectName,
@@ -2319,7 +2485,7 @@ function normalizeSam31VisualAuditResult(projectName, evidence, decision, body =
     source_evidence_type: evidence.evidence_type,
     source_ref: evidence.source_ref || decision.sourceRef || null,
     source_file: evidence.source_file || decision.sourceFile || null,
-    source_runtime: 'sam-3.1',
+    source_runtime: openclawSam31PerceptionPacket ? 'sam-3.1+llm' : 'sam-3.1',
     review_decision: reviewDecision,
     reviewer_name: String(body.reviewer_name || user.name || user.username || '').trim() || null,
     reviewed_at: new Date().toISOString(),
@@ -2329,21 +2495,14 @@ function normalizeSam31VisualAuditResult(projectName, evidence, decision, body =
     marked_up_plan_ref: markedUpPlanRef || null,
     corrected_room_polygons: Array.isArray(body.corrected_room_polygons) ? jsonClone(body.corrected_room_polygons) : [],
     issue_list: Array.isArray(body.issue_list) ? jsonClone(body.issue_list) : [],
+    openclaw_sam31_perception_packet: openclawSam31PerceptionPacket,
     notes: String(body.notes || '').trim() || null,
     input_defaults: {
       pdfPageIndex: decision.pageIndex,
       pdfScale: decision.scale,
       pdfExtract: decision.extractMode,
     },
-    source_refs: [
-      {
-        evidence_id: evidence.id,
-        evidence_type: evidence.evidence_type,
-        source_file: evidence.source_file || decision.sourceFile || null,
-        source_ref: evidence.source_ref || decision.sourceRef || null,
-        status: evidence.status,
-      },
-    ],
+    source_refs: sourceRefs,
     blocked_claims: Array.isArray(decision.blockedClaims) ? decision.blockedClaims : [...PDF_BOUNDARY_BLOCKED_CLAIMS],
     claim_gate_effect: 'no_claims_cleared',
     limitations: [
@@ -2372,6 +2531,9 @@ function pdfBoundaryReplayInputPacket(projectName, evidence, decision, reviewEvi
     ? jsonClone(review.corrected_room_polygons)
     : [];
   const queueItem = pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence, sam31Evidence);
+  const openclawSam31PerceptionPacketSummary = reviewSource === 'latest_sam31_visual_audit'
+    ? sam31PerceptionPacketSummary(review.openclaw_sam31_perception_packet)
+    : null;
   const sourceRefs = [
     {
       evidence_id: evidence.id,
@@ -2386,6 +2548,14 @@ function pdfBoundaryReplayInputPacket(projectName, evidence, decision, reviewEvi
       status: reviewRow.status,
     },
   ];
+  if (openclawSam31PerceptionPacketSummary) {
+    sourceRefs.push({
+      evidence_type: 'openclaw.sam31_perception_packet',
+      source_ref: openclawSam31PerceptionPacketSummary.source_ref || 'openclaw.sam31_perception_packet',
+      status: openclawSam31PerceptionPacketSummary.status,
+      claim_gate_effect: 'no_claims_cleared',
+    });
+  }
   const sprinklerBidRequest = {
     room_boundary_source: reviewSource,
     source_evidence_id: evidence.id,
@@ -2399,6 +2569,9 @@ function pdfBoundaryReplayInputPacket(projectName, evidence, decision, reviewEvi
     sprinklerBidRequest.source_review_evidence_id = reviewRow.id;
   } else {
     sprinklerBidRequest.source_sam31_evidence_id = reviewRow.id;
+  }
+  if (openclawSam31PerceptionPacketSummary) {
+    sprinklerBidRequest.openclaw_sam31_perception_packet = openclawSam31PerceptionPacketSummary;
   }
   return {
     artifact_type: 'room_boundary_replay_input_packet',
@@ -2422,6 +2595,7 @@ function pdfBoundaryReplayInputPacket(projectName, evidence, decision, reviewEvi
         sam31_result_ref: review.sam31_result_ref || null,
         screenshot_ref: review.screenshot_ref || null,
         console_log_ref: review.console_log_ref || null,
+        openclaw_sam31_perception_packet: openclawSam31PerceptionPacketSummary,
       }
       : {}),
     issue_list: Array.isArray(review.issue_list) ? jsonClone(review.issue_list) : [],
@@ -2512,6 +2686,31 @@ function resolveRoomBoundaryReplayFloorPlan(req, projectName) {
     units: 'ft',
     rooms,
   });
+  const openclawSam31PerceptionPacketSummary = replaySource === 'latest_sam31_visual_audit'
+    ? sam31PerceptionPacketSummary(sourceReview.openclaw_sam31_perception_packet)
+    : null;
+  const sourceRefs = [
+    {
+      evidence_id: sourceEvidence.id,
+      evidence_type: sourceEvidence.evidence_type,
+      source_ref: sourceEvidence.source_ref || null,
+      status: sourceEvidence.status,
+    },
+    {
+      evidence_id: sourceReviewEvidence.id,
+      evidence_type: sourceReviewEvidence.evidence_type,
+      source_ref: sourceReviewEvidence.source_ref || null,
+      status: sourceReviewEvidence.status,
+    },
+  ];
+  if (openclawSam31PerceptionPacketSummary) {
+    sourceRefs.push({
+      evidence_type: 'openclaw.sam31_perception_packet',
+      source_ref: openclawSam31PerceptionPacketSummary.source_ref || 'openclaw.sam31_perception_packet',
+      status: openclawSam31PerceptionPacketSummary.status,
+      claim_gate_effect: 'no_claims_cleared',
+    });
+  }
   return {
     floorPlan,
     replayInput: {
@@ -2527,26 +2726,14 @@ function resolveRoomBoundaryReplayFloorPlan(req, projectName) {
           sam31_result_ref: sourceReview.sam31_result_ref || null,
           screenshot_ref: sourceReview.screenshot_ref || null,
           console_log_ref: sourceReview.console_log_ref || null,
+          openclaw_sam31_perception_packet: openclawSam31PerceptionPacketSummary,
         }
         : {}),
       corrected_room_polygon_count: correctedRoomPolygons.length,
       use_for_claims: false,
       claim_gate_effect: 'no_claims_cleared',
       blocked_claims: Array.isArray(sourceReview.blocked_claims) ? sourceReview.blocked_claims : [...PDF_BOUNDARY_BLOCKED_CLAIMS],
-      source_refs: [
-        {
-          evidence_id: sourceEvidence.id,
-          evidence_type: sourceEvidence.evidence_type,
-          source_ref: sourceEvidence.source_ref || null,
-          status: sourceEvidence.status,
-        },
-        {
-          evidence_id: sourceReviewEvidence.id,
-          evidence_type: sourceReviewEvidence.evidence_type,
-          source_ref: sourceReviewEvidence.source_ref || null,
-          status: sourceReviewEvidence.status,
-        },
-      ],
+      source_refs: sourceRefs,
     },
   };
 }
@@ -3066,6 +3253,7 @@ function runSprinklerPipeline(req, prebuilt = null) {
         sam31_result_ref: replayInput.sam31_result_ref,
         screenshot_ref: replayInput.screenshot_ref,
         console_log_ref: replayInput.console_log_ref,
+        openclaw_sam31_perception_packet: replayInput.openclaw_sam31_perception_packet || null,
         corrected_room_polygon_count: replayInput.corrected_room_polygon_count,
         total_head_count: bid.totalHeadCount,
         total_area_sqft: bid.totalAreaSqFt,

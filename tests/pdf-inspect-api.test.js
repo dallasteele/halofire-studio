@@ -330,6 +330,32 @@ describe('PDF page inspection API', () => {
       pdfRef: expect.any(String),
     }));
     expect(samPacket.sam31_request.targets).toEqual(expect.arrayContaining(['building_outline', 'walls', 'rooms', 'layers']));
+    expect(samPacket.openclaw_sam31_perception_request).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31_perception_request',
+      project_ref: `halo_fire:${COOPERATIVE_1881_PROJECT_NAME}`,
+      application: 'halo_fire',
+      source_runtime: 'sam-3.1+llm',
+      llm_model: 'openclaw-local-llm-best-effort',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(samPacket.openclaw_sam31_perception_request.perception_lanes).toEqual(expect.arrayContaining([
+      'segmentation',
+      'object_identification',
+      'vector_overlay',
+      'model_3d_candidate',
+      'spatial_observation',
+    ]));
+    expect(samPacket.openclaw_sam31_perception_request.segments[0]).toEqual(expect.objectContaining({
+      id: 'candidate:pdf-boundary',
+      semantic_label: 'room_boundary_candidate',
+      confidence: expect.any(Number),
+    }));
+    expect(samPacket.openclaw_sam31_perception_request.object_hypotheses).toEqual(expect.arrayContaining([
+      expect.objectContaining({ semantic_label: 'room_boundary' }),
+      expect.objectContaining({ semantic_label: 'wall_candidate' }),
+      expect.objectContaining({ semantic_label: 'sleeve_or_penetration_candidate' }),
+      expect.objectContaining({ semantic_label: 'sprinkler_obstruction_candidate' }),
+    ]));
     expect(samPacket.bridge).toEqual(expect.objectContaining({
       openclaw_bridge_url_configured: false,
       local_bridge_command: 'npm run sam31:bridge',
@@ -341,10 +367,14 @@ describe('PDF page inspection API', () => {
       'marked_up_plan_ref',
       'issue_list',
       'corrected_room_polygons',
+      'openclaw_sam31_perception_packet',
     ]));
     expect(samPacket.supported_evidence_lanes).toEqual(expect.arrayContaining([
       'room_boundary_visual_audit',
       'spatial_observation_correction_loop',
+      'object_identification_review',
+      'vector_overlay_generation',
+      'model_3d_candidate_generation',
     ]));
     expect(samPacket.source_refs).toEqual(expect.arrayContaining([
       expect.objectContaining({
@@ -383,6 +413,48 @@ describe('PDF page inspection API', () => {
             required_action: 'Use corrected SAM review polygon for replay.',
           },
         ],
+        openclaw_sam31_perception_packet: {
+          artifact_type: 'openclaw.sam31_perception_packet',
+          status: 'best_effort_perception_ready',
+          application: 'halo_fire',
+          source_runtime: 'sam-3.1+llm',
+          segments: [
+            {
+              id: 'seg-room-1',
+              semantic_label: 'corridor',
+              polygon: [[0, 0], [30, 0], [30, 10], [0, 10]],
+              confidence: 0.91,
+            },
+          ],
+          object_hypotheses: [
+            {
+              id: 'obj-sleeve-1',
+              segment_id: 'seg-room-1',
+              semantic_label: 'sleeve_or_penetration_candidate',
+              confidence: 0.62,
+            },
+          ],
+          vector_overlays: [
+            {
+              id: 'vector:seg-room-1',
+              segment_id: 'seg-room-1',
+              kind: 'polygon_path',
+              svg_path: 'M 0 0 L 30 0 L 30 10 L 0 10 Z',
+              confidence: 0.73,
+            },
+          ],
+          model_3d_candidates: [
+            {
+              id: 'model3d:seg-room-1',
+              segment_id: 'seg-room-1',
+              primitive: 'extruded_polygon',
+              height_ft: 10,
+              confidence: 0.46,
+            },
+          ],
+          blocked_claims: ['geometry_accuracy', 'permit_ready', 'AutoSprink_parity'],
+          claim_gate_effect: 'no_claims_cleared',
+        },
         notes: 'SAM 3.1 result persisted for internal-alpha correction only.',
       }),
     });
@@ -403,6 +475,24 @@ describe('PDF page inspection API', () => {
     expect(samResult.result.corrected_room_polygons[0].room_id).toBe('sam31-corridor-a');
     expect(samResult.result.issue_list[0].issue_type).toBe('sam31_visual_boundary_mismatch');
     expect(samResult.result.blocked_claims).toEqual(expect.arrayContaining(['geometry_accuracy', 'permit_ready', 'AutoSprink_parity']));
+    expect(samResult.result.openclaw_sam31_perception_packet).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31_perception_packet',
+      status: 'best_effort_perception_ready',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(samResult.result.openclaw_sam31_perception_packet.object_hypotheses[0]).toEqual(expect.objectContaining({
+      semantic_label: 'sleeve_or_penetration_candidate',
+    }));
+    expect(samResult.result.openclaw_sam31_perception_packet.vector_overlays[0].svg_path).toContain('M 0 0');
+    expect(samResult.result.openclaw_sam31_perception_packet.model_3d_candidates[0]).toEqual(expect.objectContaining({
+      primitive: 'extruded_polygon',
+    }));
+    expect(samResult.result.source_refs).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        evidence_type: 'openclaw.sam31_perception_packet',
+        source_ref: 'openclaw.sam31_perception_packet',
+      }),
+    ]));
 
     const evidenceAfterSamResult = await (await request(`${COOPERATIVE_1881_PATH}/evidence`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -411,6 +501,7 @@ describe('PDF page inspection API', () => {
     expect(samResultRow).toBeTruthy();
     expect(samResultRow.source_ref).toContain(`pdf-boundary:${body.evidence.id}:sam31-visual-audit`);
     expect(samResultRow.notes).toContain('sam31_room_boundary_visual_audit_result');
+    expect(samResultRow.notes).toContain('openclaw.sam31_perception_packet');
     expect(samResultRow.notes).toContain('no_claims_cleared');
 
     const queueAfterSamResult = await (await request(`${COOPERATIVE_1881_PATH}/resolver-queue`, {
@@ -426,6 +517,15 @@ describe('PDF page inspection API', () => {
       sam31_result_ref: '1881://sam31/sheet-7-segmentation.json',
       corrected_room_polygon_count: 1,
       issue_count: 1,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(samReviewedItem.latest_sam31_visual_audit.openclaw_sam31_perception_packet).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31_perception_packet',
+      status: 'best_effort_perception_ready',
+      segment_count: 1,
+      object_hypothesis_count: 1,
+      vector_overlay_count: 1,
+      model_3d_candidate_count: 1,
       claim_gate_effect: 'no_claims_cleared',
     }));
     expect(queueAfterSamResult.summary.sam31_correction_ready).toBe(1);
@@ -454,6 +554,17 @@ describe('PDF page inspection API', () => {
       source_sam31_evidence_id: samResult.evidence.id,
       use_for_claims: false,
     }));
+    expect(samReplayPacket.openclaw_sam31_perception_packet).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31_perception_packet',
+      object_hypothesis_count: 1,
+      vector_overlay_count: 1,
+      model_3d_candidate_count: 1,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(samReplayPacket.sprinkler_bid_request.openclaw_sam31_perception_packet).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31_perception_packet',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
     expect(samReplayPacket.source_refs).toEqual(expect.arrayContaining([
       expect.objectContaining({
         evidence_id: body.evidence.id,
@@ -481,6 +592,13 @@ describe('PDF page inspection API', () => {
       source_sam31_evidence_id: samResult.evidence.id,
       corrected_room_polygon_count: 1,
       use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(samReplayBid.roomBoundaryReplay.openclaw_sam31_perception_packet).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31_perception_packet',
+      object_hypothesis_count: 1,
+      vector_overlay_count: 1,
+      model_3d_candidate_count: 1,
       claim_gate_effect: 'no_claims_cleared',
     }));
     expect(samReplayBid.bid.totalAreaSqFt).toBe(300);
