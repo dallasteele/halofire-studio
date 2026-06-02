@@ -36,6 +36,7 @@ import { homeDepotRexburgFloorPlan, cooperative1881FloorPlan, COOPERATIVE_1881_P
 import { HOME_DEPOT_PROJECT_NAME } from '../data/evidence-gates.js';
 import { readHomeDepotBidPackage, readHomeDepotRealTakeoff } from '../data/home-depot-bid-package.js';
 import { readCooperative1881BidPackage, readCooperative1881RealTakeoff } from '../data/cooperative-1881-bid-package.js';
+import { buildSuppliedDocumentBidTruthStatus } from '../data/supplied-document-bid-truth.js';
 import { buildPlanSegmentationPayload } from '../components/sam-floorplan.js';
 import { SAM31_FLOORPLAN_TOOL, sam31ToolDescriptorBody } from '../sam31/bridge.js';
 import { buildSamInvoker } from './sam-invoker.js';
@@ -5895,6 +5896,45 @@ function currentSourceAcquisitionLedger() {
   return buildSourceAcquisitionLedger({}, new Date(0).toISOString());
 }
 
+function suppliedDocumentBidTruthResolverQueueItem(projectName) {
+  const status = buildSuppliedDocumentBidTruthStatus(path.resolve(__dirname, '../..'), projectName);
+  const projectTruth = status.project_truth || null;
+  return {
+    id: `resolver:supplied-document-bid-truth:${slugForDownloadName(projectName)}`,
+    project_name: projectName,
+    kind: 'supplied_document_bid_truth',
+    title: 'Supplied document bid-truth defaults for SAM31/LLM review',
+    artifact_type: status.artifact_type,
+    status: status.status,
+    source_evidence_type: 'supplied_document_bid_truth',
+    source_ref: projectTruth?.source_file || 'supplied-halo-fire-documents',
+    next_action:
+      'Review the supplied document bid-truth defaults, replace any best guesses with employee-confirmed source refs, and keep professional/AHJ/manufacturer/AutoSprink claims blocked until real evidence is uploaded.',
+    acceptable_evidence: Array.isArray(status.acceptable_evidence) ? status.acceptable_evidence : [],
+    ai_fallback:
+      'Use the SAM31+LLM OpenClaw tool to see, identify, vectorize, and extrapolate from source documents; AI may create review artifacts and temporary values but cannot clear regulated claims.',
+    input_defaults: {
+      artifact_type: status.artifact_type,
+      project_truth: projectTruth,
+      cross_project_truth: Array.isArray(status.cross_project_truth) ? status.cross_project_truth : [],
+      pricebook_sources: Array.isArray(status.pricebook_sources) ? status.pricebook_sources : [],
+      source_document_counts: status.source_document_counts || {},
+      employee_next_actions: Array.isArray(status.employee_next_actions) ? status.employee_next_actions : [],
+    },
+    temporary_value_policy: status.temporary_value_policy || 'best_guess_until_employee_replaced',
+    use_for_claims: false,
+    no_claim_gates_cleared: true,
+    claim_gate_effect: 'no_claims_cleared',
+    blocked_claims: Array.isArray(status.blocked_claims) ? status.blocked_claims : [],
+    limitations: Array.isArray(status.limitations) ? status.limitations : [],
+    actions: [
+      { label: 'Review supplied bid-truth defaults', href: `/workbench.html?project=${encodeURIComponent(projectName)}#supplied-document-bid-truth` },
+      { label: 'Download SAM31 tool contract', href: `/api/projects/${encodeURIComponent(projectName)}/resolver-packets/openclaw/sam31/tool-contract`, artifact_type: 'openclaw.sam31_llm_extrapolation_tool_contract_packet.v1' },
+      { label: 'Open source documents settings', href: '/settings.html#settingsCatalogSourceAcquisition' },
+    ],
+  };
+}
+
 function matchingCatalogEvidenceByFamily(projectName) {
   const rows = db
     .prepare(`SELECT * FROM project_evidence
@@ -8519,6 +8559,8 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
   const sam31SprinklerFollowupPacketReviewDecisionEvidences = evidence ? latestHalofireSam31SprinklerFollowupPacketReviewDecisionEvidence(projectName, evidence.id) : [];
   const sam31ApprovalUploadIntakeEvidences = evidence ? latestHalofireSam31ApprovalUploadIntakeEvidence(projectName, evidence.id) : [];
   const items = [];
+  const suppliedDocumentBidTruthItem = suppliedDocumentBidTruthResolverQueueItem(projectName);
+  if (suppliedDocumentBidTruthItem) items.push(suppliedDocumentBidTruthItem);
   const officialFlowEvidence = latestOfficialFlowIntakeEvidence(projectName);
   const officialFlowItem = officialFlowResolverQueueItem(projectName, officialFlowEvidence);
   if (officialFlowItem) items.push(officialFlowItem);
@@ -8625,6 +8667,8 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
       catalog_approval_ahj_packets: visibleItems.reduce((acc, item) => acc + (Array.isArray(item.catalog_approval_packet_rows) ? item.catalog_approval_packet_rows.filter((row) => row.required_evidence_type === 'ahj_approval').length : 0), 0),
       catalog_approval_autosprink_packets: visibleItems.reduce((acc, item) => acc + (Array.isArray(item.catalog_approval_packet_rows) ? item.catalog_approval_packet_rows.filter((row) => row.required_evidence_type === 'autosprink_packet').length : 0), 0),
       catalog_approval_claims_cleared: visibleItems.reduce((acc, item) => acc + (Array.isArray(item.catalog_approval_packet_rows) ? item.catalog_approval_packet_rows.filter((row) => row.claim_gate_effect !== 'no_claims_cleared').length : 0), 0),
+      supplied_document_bid_truth_review_needed: visibleItems.filter((item) => item.kind === 'supplied_document_bid_truth' && item.status === 'employee_review_needed').length,
+      supplied_document_bid_truth_claims_cleared: visibleItems.filter((item) => item.kind === 'supplied_document_bid_truth' && item.claim_gate_effect !== 'no_claims_cleared').length,
       official_flow_available: statusCounts.official_flow_available || 0,
       official_flow_needed: statusCounts.official_flow_needed || 0,
       official_flow_evidence_recorded: statusCounts.official_flow_evidence_recorded || 0,

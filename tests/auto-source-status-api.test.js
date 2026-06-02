@@ -669,6 +669,79 @@ describe('S5 GET /api/auto-source/status', () => {
     expect(coopBody.summary.official_flow_needed).toBe(1);
   });
 
+  it('adds supplied document bid-truth rows from real workbooks without clearing claims', async () => {
+    const res = await fetch(`${BASE}/api/projects/The%20Cooperative%201881%20-%20Salt%20Lake%20City%20UT/resolver-queue`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    const item = body.items.find((row) => row.kind === 'supplied_document_bid_truth');
+
+    expect(item).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.supplied_document_bid_truth_status.v1',
+      status: 'employee_review_needed',
+      source_evidence_type: 'supplied_document_bid_truth',
+      temporary_value_policy: 'best_guess_until_employee_replaced',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      next_action: expect.stringMatching(/review.*supplied document/i),
+    }));
+    expect(item.input_defaults.project_truth).toEqual(expect.objectContaining({
+      project_name: 'The Cooperative 1881 - Salt Lake City UT',
+      source_file: 'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx',
+      source_status: 'available_on_disk',
+      customer: 'Kier Construction',
+      project_address: '1881 West North Temple',
+      city: 'Salt Lake City',
+      state: 'Utah',
+      square_feet: 170654,
+      head_count: 1420,
+      total_man_hours: 3301.5,
+      construction_days: 108,
+      flow_data_available: false,
+    }));
+    expect(item.input_defaults.cross_project_truth).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        project_name: 'Home Depot - Rexburg ID',
+        source_file: 'Proposal- Home Depot - Rexburg ID.xlsx',
+        source_status: 'available_on_disk',
+        static_psi: 76,
+        residual_psi: 69,
+        flowing_gpm: 1226,
+        flow_data_available: true,
+      }),
+    ]));
+    expect(item.input_defaults.pricebook_sources).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        source_file: 'Halo FIre Pricebook ARGCO 2026.xlsx',
+        source_status: 'available_on_disk',
+        source_runtime: 'xlsx',
+      }),
+      expect.objectContaining({
+        source_file: 'Halo Fire Pricebook FFF 2026.xlsx',
+        source_status: 'available_on_disk',
+      }),
+      expect.objectContaining({
+        source_file: 'Halo Fire Pricebook Victaulic 2026.xlsx',
+        source_status: 'available_on_disk',
+      }),
+    ]));
+    expect(item.acceptable_evidence).toEqual(expect.arrayContaining([
+      'HaloFire employee reviewed supplied workbook values',
+      'source workbook cell references for every accepted temporary value',
+    ]));
+    expect(item.blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'AHJ_approval',
+      'AutoSprink_parity',
+      'engineering_grade',
+      'fabrication_ready',
+      'manufacturer_exact',
+    ]));
+    expect(body.summary.supplied_document_bid_truth_review_needed).toBe(1);
+    expect(body.summary.supplied_document_bid_truth_claims_cleared).toBe(0);
+  });
+
   it('records official-flow intake evidence and updates the resolver queue without clearing claims', async () => {
     const projectName = 'The Cooperative 1881 - Salt Lake City UT';
     const createRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-packets/official-flow/intake`, {

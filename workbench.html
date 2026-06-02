@@ -993,6 +993,32 @@ function catalogApprovalQuickFilter(summary, activeQuery) {
   </div>`;
 }
 
+function renderSuppliedDocumentBidTruth(item, defaults, acceptable, claims, actions) {
+  const truth = defaults.project_truth || {};
+  const crossProjectTruth = Array.isArray(defaults.cross_project_truth) ? defaults.cross_project_truth : [];
+  const pricebookSources = Array.isArray(defaults.pricebook_sources) ? defaults.pricebook_sources : [];
+  const employeeNextActions = Array.isArray(defaults.employee_next_actions) ? defaults.employee_next_actions : [];
+  const sourceRefs = Array.isArray(truth.source_refs) ? truth.source_refs : [];
+  return `
+    <div class="gate warning" id="supplied-document-bid-truth">
+      <div class="code">supplied_document_bid_truth - ${escapeHtml(item.status).toUpperCase()}</div>
+      <div class="na">Supplied document bid truth - ${escapeHtml(item.artifact_type || 'halofire.supplied_document_bid_truth_status.v1')} - ${escapeHtml(item.temporary_value_policy || 'best_guess_until_employee_replaced')}</div>
+      <div class="na">${escapeHtml(item.next_action)}</div>
+      <div class="claims">Active workbook: ${escapeHtml(truth.source_file || 'missing')} - source_status ${escapeHtml(truth.source_status || 'missing')} - use_for_claims ${escapeHtml(item.use_for_claims === true ? 'true' : 'false')} - claim_gate_effect ${escapeHtml(item.claim_gate_effect || 'no_claims_cleared')}</div>
+      <div class="claims">Project defaults: customer ${escapeHtml(truth.customer || 'missing')} - address ${escapeHtml(truth.project_address || 'missing')} - ${escapeHtml(truth.city || 'missing')}, ${escapeHtml(truth.state || 'missing')}</div>
+      <div class="claims">Bid defaults: square_feet ${escapeHtml(truth.square_feet ?? 'missing')} - head_count ${escapeHtml(truth.head_count ?? 'missing')} - total_man_hours ${escapeHtml(truth.total_man_hours ?? 'missing')} - construction_days ${escapeHtml(truth.construction_days ?? 'missing')}</div>
+      <div class="claims">Flow defaults: static_psi ${escapeHtml(truth.static_psi ?? 'missing')} - residual_psi ${escapeHtml(truth.residual_psi ?? 'missing')} - flowing_gpm ${escapeHtml(truth.flowing_gpm ?? 'missing')} - flow_data_available ${escapeHtml(truth.flow_data_available === true ? 'true' : 'false')}</div>
+      <div class="claims">Source refs: ${sourceRefs.length ? sourceRefs.map((ref) => `<span class="chip">${escapeHtml(ref)}</span>`).join('') : '<span class="chip">source refs missing</span>'}</div>
+      <div class="claims">Cross-project supplied truth: ${crossProjectTruth.length ? crossProjectTruth.map((row) => `<span class="chip">${escapeHtml(row.project_name || 'project')} - ${escapeHtml(row.source_status || 'missing')} - flow ${escapeHtml(row.flow_data_available === true ? 'available' : 'missing')}</span>`).join('') : '<span class="chip">none</span>'}</div>
+      <div class="claims">Pricebooks: ${pricebookSources.length ? pricebookSources.map((row) => `<span class="chip">${escapeHtml(row.supplier || row.source_file)} - ${escapeHtml(row.source_status || 'missing')} - ${escapeHtml(row.source_runtime || 'xlsx')}</span>`).join('') : '<span class="chip">pricebooks missing</span>'}</div>
+      <div class="claims">Employee next actions: ${employeeNextActions.length ? employeeNextActions.map((action) => `<span class="chip">${escapeHtml(action)}</span>`).join('') : '<span class="chip">review supplied document defaults</span>'}</div>
+      <div class="claims">Accepts: ${acceptable.map((e) => `<span class="chip">${escapeHtml(e)}</span>`).join('')}</div>
+      <div class="claims">AI fallback: ${escapeHtml(item.ai_fallback || '')}</div>
+      <div class="claims">Blocks: ${claims.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('')}</div>
+      <p style="margin-top:8px">${actions.map((action) => `<a class="go" style="padding:7px 10px;font-size:11px;text-decoration:none;display:inline-block;margin-right:6px" href="${escapeHtml(action.href || '#')}">${escapeHtml(action.label || 'Open')}</a>`).join('')}</p>
+    </div>`;
+}
+
 function resolverQueueDetail(item) {
   const defaults = item.input_defaults || {};
   const claims = Array.isArray(item.blocked_claims) ? item.blocked_claims : [];
@@ -1022,6 +1048,9 @@ function resolverQueueDetail(item) {
     ? latest_openclaw_sam31_bridge_smoke_artifact.status_refs.join(' | ')
     : '';
   const actions = Array.isArray(item.actions) ? item.actions : [];
+  if (item.kind === 'supplied_document_bid_truth') {
+    return renderSuppliedDocumentBidTruth(item, defaults, acceptable, claims, actions);
+  }
   if (item.kind === 'catalog_vendor_acquisition') {
     const catalogStatusId = `catalogResolverRecordStatus-${escapeHtml(defaults.family_ref || defaults.component_key || 'unknown')}`;
     const visibleActions = actions.filter((action) => !String(action.href || '').includes('/resolver-packets/catalog-source/'));
@@ -1855,6 +1884,7 @@ async function refreshResolverQueue() {
   const summary = queue.summary || {};
   const summaryHtml = `<div class="muted" style="font-size:11px;margin-bottom:8px">
     Resolver summary:
+    <span class="chip">supplied_document_bid_truth_review_needed ${escapeHtml(summary.supplied_document_bid_truth_review_needed || 0)}</span>
     <span class="chip">sam31_vector_model_artifacts_recorded ${escapeHtml(summary.sam31_vector_model_artifacts_recorded || 0)}</span>
     <span class="chip">catalog_approval_packet_ready ${escapeHtml(summary.catalog_approval_packet_ready || 0)}</span>
     <span class="chip">ready_for_signed_evidence_upload</span>

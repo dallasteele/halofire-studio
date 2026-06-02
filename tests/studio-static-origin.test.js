@@ -132,6 +132,11 @@ describe('studio static origin handling', () => {
     expect(html).toContain('refreshResolverQueue');
     expect(html).toContain('room_boundary_visual_audit');
     expect(html).toContain('catalog_vendor_acquisition');
+    expect(html).toContain('supplied_document_bid_truth');
+    expect(html).toContain('halofire.supplied_document_bid_truth_status.v1');
+    expect(html).toContain('supplied_document_bid_truth_review_needed');
+    expect(html).toContain('Supplied document bid truth');
+    expect(html).toContain('best_guess_until_employee_replaced');
   });
 
   it('surfaces catalog source-acquisition ledger rows in the workbench with settings handoff actions', async () => {
