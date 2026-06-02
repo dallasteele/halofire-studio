@@ -3442,6 +3442,54 @@ function buildHalofireSam31SectioningDownstreamResolverPacket(projectName, evide
   };
 }
 
+function halofireSam31SectioningDownstreamResolverPacketFromEvidence(row) {
+  if (!row) return null;
+  try {
+    const parsed = JSON.parse(row.notes || '{}');
+    return parsed && parsed.kind === 'halofire_sam31_sectioning_downstream_resolver_packet' && parsed.packet
+      ? parsed.packet
+      : null;
+  } catch {
+    return null;
+  }
+}
+
+function latestHalofireSam31SectioningDownstreamResolverPacketEvidence(projectName, sourceEvidenceId = null) {
+  const rows = db
+    .prepare(`SELECT * FROM project_evidence
+              WHERE project_name = ? AND evidence_type = 'halofire_sam31_sectioning_downstream_resolver_packet'
+              ORDER BY created_at DESC, id DESC`)
+    .all(projectName);
+  for (const row of rows) {
+    const packet = halofireSam31SectioningDownstreamResolverPacketFromEvidence(row);
+    if (!packet) continue;
+    if (sourceEvidenceId && Number(packet.source_pdf_boundary_evidence_id) !== Number(sourceEvidenceId)) continue;
+    return { evidence: row, packet };
+  }
+  return null;
+}
+
+function halofireSam31SectioningDownstreamResolverPacketSummary(packetEvidence) {
+  if (!packetEvidence?.evidence || !packetEvidence?.packet) return null;
+  const { evidence, packet } = packetEvidence;
+  return {
+    evidence_id: evidence.id,
+    evidence_type: evidence.evidence_type,
+    evidence_status: evidence.status,
+    artifact_type: packet.artifact_type || HALOFIRE_SAM31_SECTIONING_DOWNSTREAM_RESOLVER_PACKET_TYPE,
+    status: packet.status || 'ready_for_downstream_resolver',
+    source_ref: evidence.source_ref,
+    source_pdf_boundary_evidence_id: packet.source_pdf_boundary_evidence_id || null,
+    source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id: packet.source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id || null,
+    source_openclaw_sam31_extrapolation_evidence_id: packet.source_openclaw_sam31_extrapolation_evidence_id || null,
+    downstream_resolver_queue_item_count: Number(packet.downstream_resolver_queue_item_count) || 0,
+    downstream_resolver_lanes: Array.isArray(packet.downstream_resolver_lanes) ? [...packet.downstream_resolver_lanes] : [],
+    claim_gate_effect: packet.claim_gate_effect || 'no_claims_cleared',
+    blocked_claims: Array.isArray(packet.blocked_claims) ? [...packet.blocked_claims] : [],
+    limitations: Array.isArray(packet.limitations) ? [...packet.limitations] : [],
+  };
+}
+
 function buildOpenClawSam31ProductReviewQueueItemPacket(projectName, evidence, decision, extrapolationEvidence, extrapolationArtifact) {
   if (!evidence || !decision) {
     const e = new Error('PDF boundary decision evidence not found');
@@ -5982,7 +6030,7 @@ app.post('/api/projects/:name/pdf-boundary-decision', authMiddleware, requireRol
   }
 });
 
-function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence = null, sam31Evidence = null, sam31ReplacementEvidence = null, sam31SmokeEvidence = null, sam31ExtrapolationEvidence = null, sam31ExtrapolationReviewEvidence = null, sam31SectioningContractReviewEvidence = null, sam31ConsumerSmokeEvidence = null, sam31ConsumerReviewEvidences = [], sam31SprinklerReviewDecisionEvidences = [], sam31SprinklerPreliminaryReplayFollowupDecisionEvidences = [], sam31SprinklerFollowupPacketReviewDecisionEvidences = [], sam31ApprovalUploadIntakeEvidences = []) {
+function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence = null, sam31Evidence = null, sam31ReplacementEvidence = null, sam31SmokeEvidence = null, sam31ExtrapolationEvidence = null, sam31ExtrapolationReviewEvidence = null, sam31SectioningContractReviewEvidence = null, sam31SectioningDownstreamPacketEvidence = null, sam31ConsumerSmokeEvidence = null, sam31ConsumerReviewEvidences = [], sam31SprinklerReviewDecisionEvidences = [], sam31SprinklerPreliminaryReplayFollowupDecisionEvidences = [], sam31SprinklerFollowupPacketReviewDecisionEvidences = [], sam31ApprovalUploadIntakeEvidences = []) {
   if (!evidence || !decision) return null;
   const candidate = decision.candidate || {};
   const pdfRef = evidence.source_file || decision.sourceFile || evidence.source_ref || decision.sourceRef || `${projectName}:pdf-boundary:${evidence.id}`;
@@ -6141,6 +6189,7 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
   const latestOpenClawSam31ExtrapolationArtifact = openClawSam31ExtrapolationReplaySummary(sam31ExtrapolationEvidence);
   const latestOpenClawSam31ExtrapolationReview = openClawSam31ExtrapolationReviewSummary(sam31ExtrapolationReviewEvidence);
   const latestOpenClawSam31SectioningPipelineContractReview = openClawSam31SectioningPipelineContractReviewSummary(sam31SectioningContractReviewEvidence);
+  const latestHalofireSam31SectioningDownstreamResolverPacket = halofireSam31SectioningDownstreamResolverPacketSummary(sam31SectioningDownstreamPacketEvidence);
   const latestOpenClawSam31VectorModelArtifact = openClawSam31VectorModelArtifactSummary(latestOpenClawSam31VectorModelArtifactEvidence(projectName, evidence.id));
   const latestOpenClawSam31ConsumerSmokeArtifact = openClawSam31ConsumerSmokeReplaySummary(sam31ConsumerSmokeEvidence);
   const latestOpenClawSam31ConsumerReviews = openClawSam31ConsumerReviewSummaries(sam31ConsumerReviewEvidences);
@@ -6271,6 +6320,8 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
     latest_openclaw_sam31_extrapolation_artifact: latestOpenClawSam31ExtrapolationArtifact,
     latest_openclaw_sam31_extrapolation_review: latestOpenClawSam31ExtrapolationReview,
     latest_openclaw_sam31_sectioning_pipeline_contract_review: latestOpenClawSam31SectioningPipelineContractReview,
+    latest_halofire_sam31_sectioning_downstream_resolver_packet: latestHalofireSam31SectioningDownstreamResolverPacket,
+    latest_halofire_sam31_sectioning_downstream_resolver_packet: latestHalofireSam31SectioningDownstreamResolverPacket,
     latest_openclaw_sam31_vector_model_artifact: latestOpenClawSam31VectorModelArtifact,
     latest_openclaw_sam31_consumer_smoke_artifact: latestOpenClawSam31ConsumerSmokeArtifact,
     latest_openclaw_sam31_consumer_reviews: latestOpenClawSam31ConsumerReviews,
@@ -9371,6 +9422,8 @@ function normalizePdfBoundaryReview(projectName, evidence, decision, body = {}, 
 app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
   const projectName = req.params.name;
   const filters = {
+    roomBoundarySource: String(req.query?.roomBoundarySource || req.query?.room_boundary_source || '').trim().toLowerCase() || null,
+    roomBoundaryState: String(req.query?.roomBoundaryState || req.query?.room_boundary_state || '').trim().toLowerCase() || null,
     sam31SectioningReview: String(req.query?.sam31SectioningReview || req.query?.sam31_sectioning_review || '').trim().toLowerCase() || null,
     sam31ConsumerReview: String(req.query?.sam31ConsumerReview || '').trim().toLowerCase() || null,
     sam31SprinklerReview: String(req.query?.sam31SprinklerReview || '').trim().toLowerCase() || null,
@@ -9390,6 +9443,7 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
   const sam31ExtrapolationEvidence = evidence ? latestOpenClawSam31ExtrapolationArtifactEvidence(projectName, evidence.id) : null;
   const sam31ExtrapolationReviewEvidence = evidence ? latestOpenClawSam31ExtrapolationReviewEvidence(projectName, evidence.id) : null;
   const sam31SectioningContractReviewEvidence = evidence ? latestOpenClawSam31SectioningPipelineContractReviewEvidence(projectName, evidence.id) : null;
+  const sam31SectioningDownstreamPacketEvidence = evidence ? latestHalofireSam31SectioningDownstreamResolverPacketEvidence(projectName, evidence.id) : null;
   const sam31ConsumerSmokeEvidence = evidence ? latestOpenClawSam31ConsumerSmokeArtifactEvidence(projectName, evidence.id) : null;
   const sam31ConsumerReviewEvidences = evidence ? latestOpenClawSam31ConsumerReviewEvidence(projectName, evidence.id) : [];
   const sam31SprinklerReviewDecisionEvidences = evidence ? latestHalofireSam31SprinklerReviewDecisionEvidence(projectName, evidence.id) : [];
@@ -9406,7 +9460,7 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
     const replayItem = officialFlowReplayReviewQueueItem(projectName, replayEvidence);
     if (replayItem) items.push(replayItem);
   }
-  const boundaryItem = pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence, sam31Evidence, sam31ReplacementEvidence, sam31SmokeEvidence, sam31ExtrapolationEvidence, sam31ExtrapolationReviewEvidence, sam31SectioningContractReviewEvidence, sam31ConsumerSmokeEvidence, sam31ConsumerReviewEvidences, sam31SprinklerReviewDecisionEvidences, sam31SprinklerPreliminaryReplayFollowupDecisionEvidences, sam31SprinklerFollowupPacketReviewDecisionEvidences, sam31ApprovalUploadIntakeEvidences);
+  const boundaryItem = pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence, sam31Evidence, sam31ReplacementEvidence, sam31SmokeEvidence, sam31ExtrapolationEvidence, sam31ExtrapolationReviewEvidence, sam31SectioningContractReviewEvidence, sam31SectioningDownstreamPacketEvidence, sam31ConsumerSmokeEvidence, sam31ConsumerReviewEvidences, sam31SprinklerReviewDecisionEvidences, sam31SprinklerPreliminaryReplayFollowupDecisionEvidences, sam31SprinklerFollowupPacketReviewDecisionEvidences, sam31ApprovalUploadIntakeEvidences);
   if (boundaryItem) items.push(boundaryItem);
   const catalogEvidence = matchingCatalogEvidenceByFamily(projectName);
   for (const row of currentSourceAcquisitionLedger()) {
@@ -9419,6 +9473,15 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
     if (catalogItem) items.push(catalogItem);
   }
   let visibleItems = items;
+  if (filters.roomBoundarySource || filters.roomBoundaryState) {
+    visibleItems = visibleItems.filter((item) => {
+      if (item.kind !== 'room_boundary_visual_audit') return false;
+      if (filters.roomBoundarySource === 'employee_review' && !item.latest_review) return false;
+      if (filters.roomBoundarySource === 'sam31_visual_audit' && !item.latest_sam31_visual_audit) return false;
+      if (filters.roomBoundaryState && String(item.status || '').toLowerCase() !== filters.roomBoundaryState) return false;
+      return true;
+    });
+  }
   if (filters.sam31SectioningReview === 'ready') {
     visibleItems = visibleItems
       .map((item) => {
@@ -9498,6 +9561,7 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
       sam31_extrapolation_reviews_recorded: visibleItems.filter((item) => item.latest_openclaw_sam31_extrapolation_review).length,
       sam31_sectioning_contract_reviews_recorded: visibleItems.filter((item) => item.latest_openclaw_sam31_sectioning_pipeline_contract_review).length,
       sam31_sectioning_downstream_resolver_queue_items: visibleItems.reduce((acc, item) => acc + (Array.isArray(item.sam31_sectioning_downstream_resolver_queue_items) ? item.sam31_sectioning_downstream_resolver_queue_items.length : 0), 0),
+      sam31_sectioning_downstream_resolver_packets_recorded: visibleItems.filter((item) => item.latest_halofire_sam31_sectioning_downstream_resolver_packet).length,
       sam31_vector_model_artifacts_recorded: visibleItems.filter((item) => item.latest_openclaw_sam31_vector_model_artifact).length,
       sam31_consumer_smoke_recorded: visibleItems.filter((item) => item.latest_openclaw_sam31_consumer_smoke_artifact).length,
       sam31_consumer_reviews_recorded: visibleItems.reduce((acc, item) => acc + (Array.isArray(item.latest_openclaw_sam31_consumer_reviews) ? item.latest_openclaw_sam31_consumer_reviews.length : 0), 0),
@@ -9518,6 +9582,7 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
       catalog_approval_ahj_packets: visibleItems.reduce((acc, item) => acc + (Array.isArray(item.catalog_approval_packet_rows) ? item.catalog_approval_packet_rows.filter((row) => row.required_evidence_type === 'ahj_approval').length : 0), 0),
       catalog_approval_autosprink_packets: visibleItems.reduce((acc, item) => acc + (Array.isArray(item.catalog_approval_packet_rows) ? item.catalog_approval_packet_rows.filter((row) => row.required_evidence_type === 'autosprink_packet').length : 0), 0),
       catalog_approval_claims_cleared: visibleItems.reduce((acc, item) => acc + (Array.isArray(item.catalog_approval_packet_rows) ? item.catalog_approval_packet_rows.filter((row) => row.claim_gate_effect !== 'no_claims_cleared').length : 0), 0),
+      employee_room_boundary_correction_ready: visibleItems.filter((item) => item.kind === 'room_boundary_visual_audit' && item.latest_review && item.status === 'correction_ready').length,
       supplied_document_bid_truth_review_needed: visibleItems.filter((item) => item.kind === 'supplied_document_bid_truth' && item.status === 'employee_review_needed').length,
       supplied_document_bid_truth_replacements_recorded: visibleItems.filter((item) => item.kind === 'supplied_document_bid_truth' && item.status === 'employee_replacement_recorded').length,
       supplied_document_bid_truth_claims_cleared: visibleItems.filter((item) => item.kind === 'supplied_document_bid_truth' && item.claim_gate_effect !== 'no_claims_cleared').length,
@@ -9874,6 +9939,109 @@ app.get('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/openclaw/
     }
     const reviewEvidence = latestOpenClawSam31SectioningPipelineContractReviewEvidence(projectName, evidence.id);
     return res.json(buildHalofireSam31SectioningDownstreamResolverPacket(projectName, evidence, decision, reviewEvidence));
+  } catch (err) {
+    return res.status(err.httpStatus || 400).json({ error: err.message });
+  }
+});
+
+app.post('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/openclaw/sam31/sectioning-downstream-resolvers', authMiddleware, requireRole('admin'), (req, res) => {
+  try {
+    const projectName = req.params.name;
+    const evidenceId = Number(req.params.evidenceId);
+    if (!Number.isSafeInteger(evidenceId) || evidenceId <= 0) {
+      return res.status(400).json({ error: 'A positive evidence id is required' });
+    }
+    const evidence = db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'pdf_boundary_decision'`)
+      .get(evidenceId, projectName);
+    const decision = decisionFromEvidence(evidence);
+    if (!evidence || !decision) {
+      return res.status(404).json({ error: 'PDF boundary decision evidence not found' });
+    }
+    const reviewEvidence = latestOpenClawSam31SectioningPipelineContractReviewEvidence(projectName, evidence.id);
+    const artifact = buildHalofireSam31SectioningDownstreamResolverPacket(projectName, evidence, decision, reviewEvidence);
+    const review = reviewEvidence?.review || {};
+    const notes = {
+      kind: 'halofire_sam31_sectioning_downstream_resolver_packet',
+      packet: artifact,
+      source_pdf_boundary_evidence_id: evidence.id,
+      source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id: artifact.source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id,
+      source_openclaw_sam31_extrapolation_evidence_id: artifact.source_openclaw_sam31_extrapolation_evidence_id,
+      blocked_claims: artifact.blocked_claims,
+      claim_gate_effect: artifact.claim_gate_effect,
+      limitations: artifact.limitations,
+      source_refs: artifact.source_refs,
+      replacement_ref: review.replacement_ref || null,
+    };
+    const result = db
+      .prepare(`INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+                VALUES (?, ?, ?, ?, ?, ?)`)
+      .run(
+        projectName,
+        'halofire_sam31_sectioning_downstream_resolver_packet',
+        evidence.source_file || decision.sourceFile || null,
+        `pdf-boundary:${evidence.id}:sam31-sectioning-downstream-resolvers:${artifact.source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id}`,
+        'best_effort',
+        JSON.stringify(notes),
+      );
+    const evidenceRow = db.prepare('SELECT * FROM project_evidence WHERE id = ?').get(result.lastInsertRowid);
+    return res.status(201).json({
+      id: result.lastInsertRowid,
+      message: 'HaloFire SAM31 sectioning downstream resolver packet saved as best-effort evidence; claims still blocked',
+      evidence: evidenceRow,
+      ...artifact,
+    });
+  } catch (err) {
+    return res.status(err.httpStatus || 400).json({ error: err.message });
+  }
+});
+
+app.post('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/openclaw/sam31/sectioning-downstream-resolvers', authMiddleware, requireRole('admin'), (req, res) => {
+  try {
+    const projectName = req.params.name;
+    const evidenceId = Number(req.params.evidenceId);
+    if (!Number.isSafeInteger(evidenceId) || evidenceId <= 0) {
+      return res.status(400).json({ error: 'A positive evidence id is required' });
+    }
+    const evidence = db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'pdf_boundary_decision'`)
+      .get(evidenceId, projectName);
+    const decision = decisionFromEvidence(evidence);
+    if (!evidence || !decision) {
+      return res.status(404).json({ error: 'PDF boundary decision evidence not found' });
+    }
+    const reviewEvidence = latestOpenClawSam31SectioningPipelineContractReviewEvidence(projectName, evidence.id);
+    const packet = buildHalofireSam31SectioningDownstreamResolverPacket(projectName, evidence, decision, reviewEvidence);
+    const notes = {
+      kind: 'halofire_sam31_sectioning_downstream_resolver_packet',
+      packet,
+      source_pdf_boundary_evidence_id: evidence.id,
+      source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id: reviewEvidence.evidence.id,
+      source_openclaw_sam31_extrapolation_evidence_id: packet.source_openclaw_sam31_extrapolation_evidence_id,
+      blocked_claims: packet.blocked_claims,
+      claim_gate_effect: packet.claim_gate_effect,
+      limitations: packet.limitations,
+    };
+    const result = db
+      .prepare(`INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+                VALUES (?, ?, ?, ?, ?, ?)`)
+      .run(
+        projectName,
+        'halofire_sam31_sectioning_downstream_resolver_packet',
+        evidence.source_file || decision.sourceFile || null,
+        `pdf-boundary:${evidence.id}:sam31-sectioning-downstream-resolvers:${reviewEvidence.evidence.id}`,
+        'best_effort',
+        JSON.stringify(notes),
+      );
+    const evidenceRow = db.prepare('SELECT * FROM project_evidence WHERE id = ?').get(result.lastInsertRowid);
+    return res.status(201).json({
+      id: result.lastInsertRowid,
+      message: 'HaloFire SAM31 sectioning downstream resolver packet saved as best-effort evidence; claims still blocked',
+      evidence: evidenceRow,
+      ...packet,
+    });
   } catch (err) {
     return res.status(err.httpStatus || 400).json({ error: err.message });
   }

@@ -931,6 +931,43 @@ describe('OpenClaw SAM31 bridge status API', () => {
       'fabrication_ready',
     ]));
 
+    const persistedSectioningDownstreamPacketRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/sectioning-downstream-resolvers`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(persistedSectioningDownstreamPacketRes.status).toBe(201);
+    const persistedSectioningDownstreamPacket = await persistedSectioningDownstreamPacketRes.json();
+    expect(persistedSectioningDownstreamPacket).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.sam31_sectioning_downstream_resolver_packet.v1',
+      id: expect.any(Number),
+      message: expect.stringContaining('claims still blocked'),
+      source_pdf_boundary_evidence_id: boundary.id,
+      source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id: sectioningReview.id,
+      downstream_resolver_queue_item_count: 2,
+      use_for_claims: false,
+      no_claim_gates_cleared: true,
+      claim_gate_effect: 'no_claims_cleared',
+      evidence: expect.objectContaining({
+        evidence_type: 'halofire_sam31_sectioning_downstream_resolver_packet',
+        status: 'best_effort',
+        source_ref: expect.stringContaining('sam31-sectioning-downstream-resolvers'),
+      }),
+    }));
+
+    const persistedSectioningQueueRes = await request(`${COOPERATIVE_1881_PATH}/resolver-queue`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(persistedSectioningQueueRes.status).toBe(200);
+    const persistedSectioningQueue = await persistedSectioningQueueRes.json();
+    const persistedSectioningItem = persistedSectioningQueue.items.find((row) => row.evidence_id === boundary.id);
+    expect(persistedSectioningQueue.summary.sam31_sectioning_downstream_resolver_packets_recorded).toBeGreaterThanOrEqual(1);
+    expect(persistedSectioningItem.latest_halofire_sam31_sectioning_downstream_resolver_packet).toEqual(expect.objectContaining({
+      evidence_id: persistedSectioningDownstreamPacket.id,
+      artifact_type: 'halofire.sam31_sectioning_downstream_resolver_packet.v1',
+      downstream_resolver_queue_item_count: 2,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+
     const queueItemRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/product-review-queue-item`, {
       headers: { Authorization: `Bearer ${token}` },
     });

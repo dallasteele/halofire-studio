@@ -115,10 +115,22 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toContain('Download room-boundary replay input');
     expect(html).toContain('Download SAM31 vector/model artifact packet');
     expect(html).toContain('Download SAM31 sectioning downstream resolver packet');
+    expect(html).toContain('Save SAM31 sectioning downstream resolver packet');
     expect(html).toContain('sectioning-downstream-resolvers');
     expect(html).toContain('downloadHalofireSam31SectioningDownstreamResolverPacket');
+    expect(html).toContain('persistHalofireSam31SectioningDownstreamResolverPacket');
     expect(html).toContain('data-sam31-sectioning-downstream-resolver-evidence-id');
+    expect(html).toContain('data-sam31-sectioning-downstream-resolver-save-evidence-id');
+    expect(html).toContain('latest_halofire_sam31_sectioning_downstream_resolver_packet');
     expect(html).toContain('no_claims_cleared');
   });
 
+  it('exposes a quick filter for employee room-boundary correction rows', async () => {
+    const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
+    expect(shell.status).toBe(200);
+    const html = await shell.text();
+    expect(html).toContain('roomBoundarySource=employee_review&roomBoundaryState=correction_ready');
+    expect(html).toContain('Employee correction rows');
+    expect(html).toContain('employee correction ready');
+  });
 });
