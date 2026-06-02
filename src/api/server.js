@@ -1328,6 +1328,110 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
   };
 }
 
+function safeParseJsonObject(value) {
+  if (!value || typeof value !== 'string') return null;
+  try {
+    const parsed = JSON.parse(value);
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+function currentSourceAcquisitionLedger() {
+  try {
+    if (fs.existsSync(AUTO_SOURCE_STATUS_PATH)) {
+      const status = JSON.parse(fs.readFileSync(AUTO_SOURCE_STATUS_PATH, 'utf8'));
+      if (Array.isArray(status.sourceAcquisitionLedger)) return status.sourceAcquisitionLedger;
+    }
+  } catch (err) {
+    log.warn(`auto-source status read failed for resolver queue: ${err.message}`);
+  }
+  return buildSourceAcquisitionLedger({}, new Date(0).toISOString());
+}
+
+function matchingCatalogEvidenceByFamily(projectName) {
+  const rows = db
+    .prepare(`SELECT * FROM project_evidence
+              WHERE project_name = ? AND evidence_type = 'catalog_source_acquisition'
+              ORDER BY created_at DESC, id DESC`)
+    .all(projectName);
+  const byFamily = new Map();
+  for (const row of rows) {
+    const notes = safeParseJsonObject(row.notes) || {};
+    const familyRef = notes.family_ref || row.source_ref || row.source_file;
+    if (familyRef && !byFamily.has(String(familyRef))) {
+      byFamily.set(String(familyRef), { evidence: row, notes });
+    }
+  }
+  return byFamily;
+}
+
+function catalogResolverQueueItem(projectName, row, matchedEvidence = null) {
+  if (!row || !row.family_ref) return null;
+  const hasCandidate = !!(row.source_url || row.downloaded_artifact_hash);
+  const hasEvidence = !!matchedEvidence;
+  const status = hasEvidence
+    ? 'catalog_evidence_recorded'
+    : (hasCandidate ? 'catalog_review_needed' : 'catalog_source_needed');
+  const nextAction = hasEvidence
+    ? 'Review the recorded catalog_source_acquisition evidence row, then attach real manufacturer/AHJ/PE/AutoSprink approval evidence through the proper gate resolver before clearing any regulated claim.'
+    : (hasCandidate
+      ? 'Review the candidate vendor/catalog source, verify license and downloaded artifact hash, then record catalog_source_acquisition evidence in Settings; no claim gates clear.'
+      : 'Acquire a manufacturer or vendor catalog/STEP/BIM source for this family, record license/hash/source URL in Settings, and keep all regulated claims blocked.');
+  const componentKey = row.component_key || null;
+  const catalogUrl = row.source_url || '';
+  const settingsParams = new URLSearchParams();
+  if (componentKey) settingsParams.set('component', componentKey);
+  if (catalogUrl) settingsParams.set('catalogUrl', catalogUrl);
+  return {
+    id: `resolver:catalog-source:${row.family_ref}`,
+    project_name: projectName,
+    kind: 'catalog_vendor_acquisition',
+    title: `Catalog/vendor source acquisition for ${row.family_ref}`,
+    status,
+    evidence_id: matchedEvidence?.evidence?.id || null,
+    source_evidence_type: 'catalog_source_acquisition',
+    source_ref: row.source_url || row.family_ref,
+    next_action: nextAction,
+    acceptable_evidence: [
+      'manufacturer catalog page or vendor product page URL',
+      'license or terms for downloaded CAD/BIM/STEP artifact',
+      'downloaded artifact hash tied to the exact component family',
+      'HaloFire employee review note for internal-alpha use',
+      'manufacturer/professional approval before manufacturer-exact or fabrication claims',
+    ],
+    ai_fallback:
+      'Use OpenClaw web search, vendor catalog search, and step.parts-style acquisition to find candidates; AI may rank/reject candidates but cannot clear manufacturer/AHJ/PE/AutoSprink claims.',
+    input_defaults: {
+      family_ref: row.family_ref,
+      component_key: componentKey,
+      nominal_size_in: row.nominal_size_in ?? null,
+      source_url: row.source_url || null,
+      license: row.license || null,
+      downloaded_artifact_hash: row.downloaded_artifact_hash || null,
+      status_tier: row.status_tier || 'missing_catalog_source',
+      rejected_candidates: Array.isArray(row.rejected_candidates) ? row.rejected_candidates : [],
+    },
+    blocked_claims: Array.isArray(row.blocked_claims) ? row.blocked_claims : [],
+    claim_gate_effect: row.claim_gate_effect || 'no_claims_cleared',
+    latest_review: matchedEvidence ? {
+      evidence_id: matchedEvidence.evidence.id,
+      evidence_status: matchedEvidence.evidence.status,
+      source_ref: matchedEvidence.evidence.source_ref,
+      claim_gate_effect: matchedEvidence.notes.claim_gate_effect || 'no_claims_cleared',
+    } : null,
+    limitations: [
+      row.limitations || 'Catalog/source acquisition rows are evidence collection work items only.',
+      'This queue item does not prove manufacturer-exact geometry, AHJ approval, PE review, AutoSprink parity, permit readiness, or fabrication readiness.',
+    ],
+    actions: [
+      { label: hasEvidence ? 'Review recorded evidence' : 'Record source evidence in Settings', href: `/settings.html?${settingsParams.toString()}#settingsCatalogSourceAcquisition` },
+      { label: 'Open evidence workbench', href: `/workbench.html?project=${encodeURIComponent(projectName)}#catalogSourceAcquisition` },
+    ],
+  };
+}
+
 function slugForDownloadName(value) {
   return String(value || 'project')
     .toLowerCase()
@@ -1625,6 +1729,16 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
   const items = [];
   const boundaryItem = pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence);
   if (boundaryItem) items.push(boundaryItem);
+  const catalogEvidence = matchingCatalogEvidenceByFamily(projectName);
+  for (const row of currentSourceAcquisitionLedger()) {
+    const matchedEvidence =
+      catalogEvidence.get(String(row.family_ref)) ||
+      catalogEvidence.get(String(row.source_url || '')) ||
+      catalogEvidence.get(String(row.component_key || '')) ||
+      null;
+    const catalogItem = catalogResolverQueueItem(projectName, row, matchedEvidence);
+    if (catalogItem) items.push(catalogItem);
+  }
   const statusCounts = items.reduce((acc, item) => {
     acc[item.status] = (acc[item.status] || 0) + 1;
     return acc;
@@ -1637,6 +1751,9 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
       blocked: statusCounts.blocked || 0,
       correction_ready: statusCounts.correction_ready || 0,
       reviewed: statusCounts.reviewed || 0,
+      catalog_source_needed: statusCounts.catalog_source_needed || 0,
+      catalog_review_needed: statusCounts.catalog_review_needed || 0,
+      catalog_evidence_recorded: statusCounts.catalog_evidence_recorded || 0,
     },
   });
 });

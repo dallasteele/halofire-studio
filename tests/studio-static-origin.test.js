@@ -131,6 +131,7 @@ describe('studio static origin handling', () => {
     expect(html).toContain('/resolver-queue');
     expect(html).toContain('refreshResolverQueue');
     expect(html).toContain('room_boundary_visual_audit');
+    expect(html).toContain('catalog_vendor_acquisition');
   });
 
   it('surfaces catalog source-acquisition ledger rows in the workbench with settings handoff actions', async () => {

@@ -286,6 +286,21 @@ function resolverQueueDetail(item) {
   const acceptable = Array.isArray(item.acceptable_evidence) ? item.acceptable_evidence : [];
   const latest_review = item.latest_review || null;
   const evidenceId = escapeHtml(item.evidence_id);
+  const actions = Array.isArray(item.actions) ? item.actions : [];
+  if (item.kind === 'catalog_vendor_acquisition') {
+    return `
+    <div class="gate warning" id="${escapeHtml(item.id)}">
+      <div class="code">${escapeHtml(item.kind)} Â· ${escapeHtml(item.status).toUpperCase()}</div>
+      <div class="na">${escapeHtml(item.next_action)}</div>
+      <div class="claims">Family: ${escapeHtml(defaults.family_ref)} Â· component ${escapeHtml(defaults.component_key || 'missing')} Â· nominal ${escapeHtml(defaults.nominal_size_in || 'missing')} in</div>
+      <div class="claims">Source: ${defaults.source_url ? `<a href="${escapeHtml(defaults.source_url)}" style="color:var(--cyan)" target="_blank" rel="noreferrer">${escapeHtml(defaults.source_url)}</a>` : 'missing'} Â· license ${escapeHtml(defaults.license || 'missing')} Â· hash ${escapeHtml(defaults.downloaded_artifact_hash || 'missing')}</div>
+      ${latest_review ? `<div class="claims">Recorded evidence: #${escapeHtml(latest_review.evidence_id)} Â· ${escapeHtml(latest_review.source_ref || '')} Â· ${escapeHtml(latest_review.claim_gate_effect || 'no_claims_cleared')}</div>` : ''}
+      <div class="claims">Accepts: ${acceptable.map((e) => `<span class="chip">${escapeHtml(e)}</span>`).join('')}</div>
+      <div class="claims">AI fallback: ${escapeHtml(item.ai_fallback || '')}</div>
+      <div class="claims">Blocks: ${claims.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('')}</div>
+      <p style="margin-top:8px">${actions.map((action) => `<a class="go" style="padding:7px 10px;font-size:11px;text-decoration:none;display:inline-block;margin-right:6px" href="${escapeHtml(action.href || '#')}">${escapeHtml(action.label || 'Open')}</a>`).join('')}</p>
+    </div>`;
+  }
   return `
     <div class="gate warning" id="${escapeHtml(item.id)}">
       <div class="code">${escapeHtml(item.kind)} · ${escapeHtml(item.status).toUpperCase()}</div>
@@ -433,7 +448,7 @@ async function refreshResolverQueue() {
   const queue = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/resolver-queue');
   document.getElementById('resolverQueue').innerHTML = queue.items && queue.items.length
     ? queue.items.map(resolverQueueDetail).join('')
-    : '<span class="muted">No resolver queue rows yet. Save a PDF boundary decision from Studio to create a room_boundary_visual_audit item.</span>';
+    : '<span class="muted">No resolver queue rows yet. Save a PDF boundary decision to create a room_boundary_visual_audit item or run catalog acquisition to create catalog_vendor_acquisition items.</span>';
   document.querySelectorAll('[data-resolver-packet-evidence-id]').forEach((button) => {
     button.onclick = () => downloadResolverPacket(button.dataset.resolverPacketEvidenceId);
   });

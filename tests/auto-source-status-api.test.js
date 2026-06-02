@@ -112,4 +112,39 @@ describe('S5 GET /api/auto-source/status', () => {
     expect(body.openclawReachable).toBe(true);
     expect(body.lastRunAt).toBe('2026-05-29T00:00:00.000Z');
   });
+
+  it('adds catalog vendor/source acquisition items to the project resolver queue without clearing claims', async () => {
+    removeStatusFile();
+    const res = await fetch(`${BASE}/api/projects/Home%20Depot%20-%20Rexburg%20ID/resolver-queue`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    const catalogItems = body.items.filter((item) => item.kind === 'catalog_vendor_acquisition');
+
+    expect(catalogItems).toHaveLength(3);
+    expect(body.summary.catalog_source_needed).toBe(3);
+    expect(body.summary.catalog_review_needed).toBe(0);
+    expect(catalogItems.map((item) => item.input_defaults.family_ref)).toEqual([
+      'family:pipe_steel_sch40_2p0in',
+      'family:fitting_tee_2p0in',
+      'family:valve_check_2p5in',
+    ]);
+    expect(catalogItems[0]).toEqual(expect.objectContaining({
+      status: 'catalog_source_needed',
+      source_evidence_type: 'catalog_source_acquisition',
+      claim_gate_effect: 'no_claims_cleared',
+      next_action: expect.stringMatching(/manufacturer|vendor|catalog/i),
+      ai_fallback: expect.stringMatching(/OpenClaw|step\.parts|vendor/i),
+    }));
+    expect(catalogItems[0].acceptable_evidence).toEqual(expect.arrayContaining([
+      'manufacturer catalog page or vendor product page URL',
+      'license or terms for downloaded CAD/BIM/STEP artifact',
+    ]));
+    expect(catalogItems[0].blocked_claims).toEqual(
+      expect.arrayContaining(['manufacturer_exact', 'AutoSprink_parity', 'fabrication_ready']),
+    );
+    expect(catalogItems[0].actions[0].href).toContain('/settings.html?');
+    expect(catalogItems[0].actions[0].href).toContain('component=pipe_sch40');
+  });
 });
