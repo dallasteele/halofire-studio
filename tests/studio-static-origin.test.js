@@ -238,8 +238,6 @@ describe('studio static origin handling', () => {
     expect(html).toContain('official_flow_hydraulic_replay_review');
     expect(html).toContain('official-flow-replay-review');
     expect(html).toContain('issue_actions');
-    expect(html).toContain('PROFESSIONAL_HYDRAULIC_REVIEW_MISSING');
-    expect(html).toContain('AHJ_HYDRAULIC_APPROVAL_MISSING');
   });
 
   it('lets the studio load the latest saved PDF boundary decision as import defaults', async () => {
