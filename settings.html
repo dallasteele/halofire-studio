@@ -116,6 +116,7 @@
         <div id="wizSignoff" class="note muted">
           <b>Signed reviewer metadata</b>
           <div style="margin-top:6px">Required for AHJ, PE/professional, manufacturer, and AutoSprink evidence before a regulated gate can clear. Employee signoff remains for non-regulated internal evidence.</div>
+          <div style="margin-top:6px"><code>evidence.signoff</code> is preserved on both resolve and record-only submissions when reviewer metadata is supplied.</div>
           <div class="stack" style="margin-top:8px">
             <label>Reviewer name
               <input id="wizReviewerName" placeholder="reviewer_name" style="width:100%;margin-top:3px">
@@ -361,9 +362,9 @@ $('wizSubmit').onclick = async () => {
   const projectName = $('wizProject').value;
   const payload = { evidence_type, source_ref, ...(source_file ? { source_file } : {}), ...(notes ? { notes } : {}) };
   try {
+    const signoff = selectedEvidenceNeedsSignoff() ? wizardSignoffPayload() : null;
+    if (signoff) payload.signoff = signoff; // Preserve reviewer metadata even when recording evidence only.
     if ($('wizAction').value === 'resolve') {
-      const signoff = wizardSignoffPayload();
-      if (signoff) payload.signoff = signoff; // evidence.signoff is required for regulated gate clears.
       await api('/projects/' + encodeURIComponent(projectName) + '/claim-gates/' + encodeURIComponent(gateCode) + '/resolve', {
         method: 'POST',
         body: JSON.stringify({ evidence: payload }),

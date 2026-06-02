@@ -398,6 +398,15 @@ function evidenceDetail(row) {
       return '<div class="muted" style="font-size:11px;margin-top:3px">official-flow intake evidence; detail unavailable</div>';
     }
   }
+  try {
+    const packet = JSON.parse(row.notes || '{}');
+    if (packet.kind === 'signed_reviewer_evidence') {
+      const signoff = packet.signoff || {};
+      return `<div class="muted" style="font-size:11px;margin-top:3px">signed reviewer evidence · ${escapeHtml(signoff.reviewer_name || 'unknown reviewer')} · ${escapeHtml(signoff.reviewer_title || 'title missing')}<br>signed_at ${escapeHtml(signoff.signed_at || 'missing')} · organization ${escapeHtml(signoff.organization || 'missing')} · license ${escapeHtml(signoff.license_id || 'missing')}<br>claim_gate_effect ${escapeHtml(packet.claim_gate_effect || 'no_claims_cleared')} · ${escapeHtml(packet.user_notes || 'review metadata recorded only; no claim gates cleared')}</div>`;
+    }
+  } catch {
+    // Fall through to type-specific rendering when notes are not structured reviewer evidence.
+  }
   if (row.evidence_type !== 'pdf_boundary_decision') return row.source_file ? ' · ' + escapeHtml(row.source_file) : '';
   try {
     const packet = JSON.parse(row.notes || '{}');

@@ -282,6 +282,15 @@ describe('studio static origin handling', () => {
     expect(html).toContain('Review:');
   });
 
+  it('surfaces signed reviewer evidence summaries in the workbench evidence lane', async () => {
+    const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
+    expect(shell.status).toBe(200);
+    const html = await shell.text();
+    expect(html).toContain('signed reviewer evidence');
+    expect(html).toContain('review metadata recorded only; no claim gates cleared');
+    expect(html).toContain('claim_gate_effect');
+  });
+
   it('lets the workbench download official-flow hydraulic replay artifacts', async () => {
     const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
     expect(shell.status).toBe(200);

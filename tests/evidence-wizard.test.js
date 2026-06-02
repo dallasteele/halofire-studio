@@ -179,4 +179,53 @@ describe('HaloFire evidence wizard slice', () => {
     expect(html).toContain('requires_signoff_for');
     expect(html).toContain('evidence.signoff');
   });
+
+  it('records signed reviewer metadata on evidence-only submissions without clearing the gate', async () => {
+    const token = await tokenFor('wizard-admin', 'actual-test-password');
+    expect((await gate(token, 'PROFESSIONAL_REVIEW_MISSING')).status).toBe('blocked');
+
+    const res = await request(`${PROJECT_PATH}/evidence`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        evidence_type: 'professional_review',
+        source_ref: 'Signed reviewer packet PR-1881-001',
+        source_file: 'professional-review-packet.pdf',
+        status: 'present',
+        notes: 'Recorded for later gate resolution.',
+        signoff: {
+          reviewer_name: 'Alex Rivera',
+          reviewer_title: 'Fire Protection Engineer',
+          signed_at: '2026-06-02T14:30:00.000Z',
+          organization: 'Halo Fire',
+          license_id: 'PE-2048',
+        },
+      }),
+    });
+    expect(res.status).toBe(201);
+
+    const evidence = await (await request(`${PROJECT_PATH}/evidence`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })).json();
+    const row = evidence.find((item) => item.source_ref === 'Signed reviewer packet PR-1881-001');
+    expect(row).toBeTruthy();
+    expect(row.evidence_type).toBe('professional_review');
+    expect(row.status).toBe('present');
+    const storedNotes = JSON.parse(row.notes);
+    expect(storedNotes).toEqual(expect.objectContaining({
+      kind: 'signed_reviewer_evidence',
+      evidence_type: 'professional_review',
+      source_ref: 'Signed reviewer packet PR-1881-001',
+      claim_gate_effect: 'no_claims_cleared',
+      user_notes: 'Recorded for later gate resolution.',
+    }));
+    expect(storedNotes.signoff).toEqual(expect.objectContaining({
+      reviewer_name: 'Alex Rivera',
+      reviewer_title: 'Fire Protection Engineer',
+      signed_at: '2026-06-02T14:30:00.000Z',
+      organization: 'Halo Fire',
+      license_id: 'PE-2048',
+    }));
+    expect((await gate(token, 'PROFESSIONAL_REVIEW_MISSING')).status).toBe('blocked');
+  });
 });

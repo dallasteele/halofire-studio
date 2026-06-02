@@ -520,7 +520,7 @@ app.get('/api/analytics/summary', authMiddleware, (req, res) => {
 // fail-closed: adding best-effort/AI evidence never flips a blocking gate to
 // cleared. Only a recorded human/professional/AHJ artifact can do that, and
 // that resolution path is intentionally not exposed as a casual write here.
-const EVIDENCE_INSERT_FIELDS = new Set(['evidence_type', 'source_file', 'source_ref', 'status', 'notes']);
+const EVIDENCE_INSERT_FIELDS = new Set(['evidence_type', 'source_file', 'source_ref', 'status', 'notes', 'signoff']);
 
 // Only these real-world artifact types may clear a fail-closed claim gate.
 // AI/best-effort output is intentionally excluded — it can never clear a gate.
@@ -745,14 +745,30 @@ app.get('/api/projects/:name/evidence/:evidenceId/official-flow-hydraulic-replay
 app.post('/api/projects/:name/evidence', authMiddleware, requireRole('admin'), (req, res) => {
   const rejected = Object.keys(req.body).filter((key) => !EVIDENCE_INSERT_FIELDS.has(key));
   if (rejected.length) return res.status(400).json({ error: `Unsupported fields: ${rejected.join(', ')}` });
-  const { evidence_type, source_file = null, source_ref = null, status, notes = null } = req.body;
+  const { evidence_type, source_file = null, source_ref = null, status, notes = null, signoff } = req.body;
   if (!evidence_type || !status) {
     return res.status(400).json({ error: 'evidence_type and status are required' });
+  }
+  let storedNotes = notes;
+  try {
+    const normalizedSignoff = normalizeSignedReviewerSignoff(evidence_type, signoff);
+    if (normalizedSignoff) {
+      storedNotes = JSON.stringify({
+        kind: 'signed_reviewer_evidence',
+        evidence_type,
+        source_ref,
+        signoff: normalizedSignoff,
+        user_notes: notes,
+        claim_gate_effect: 'no_claims_cleared',
+      });
+    }
+  } catch (err) {
+    return res.status(err.httpStatus || 400).json({ error: err.message });
   }
   const result = db
     .prepare(`INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
               VALUES (?, ?, ?, ?, ?, ?)`)
-    .run(req.params.name, evidence_type, source_file, source_ref, status, notes);
+    .run(req.params.name, evidence_type, source_file, source_ref, status, storedNotes);
   res.status(201).json({ id: result.lastInsertRowid, message: 'Evidence recorded' });
 });
 
