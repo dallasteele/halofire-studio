@@ -314,20 +314,44 @@ describe('SAM 3.1 local bridge contract', () => {
       semantic_label: 'sprinkler_room_boundary_candidate',
     }));
     expect(body.perception_packet.object_hypotheses[0].semantic_label).toBe('sleeve_or_firestop_candidate');
+    expect(body.perception_packet.llm_observations[0]).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.llm_observation.v1',
+      segment_id: 'section-room-boundary-1881-level-1',
+      semantic_label: 'sleeve_or_firestop_candidate',
+      source_runtime: 'halofire-local-sam31-bridge',
+      llm_runtime: 'openclaw-local-llm-best-effort',
+      prompt_ref: 'openclaw.sam31.prompt.identify_objects_vector_3d.v1',
+      supported_applications: ['halo_fire', 'landscout', 'nameforge'],
+      produces: expect.arrayContaining(['semantic_labels', 'vector_overlays', 'model_3d_candidates']),
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(body.perception_packet.llm_observations[0].source_refs).toEqual(expect.arrayContaining([
+      'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)',
+      '1881 drawings employee-selected page',
+    ]));
     expect(body.perception_packet.vector_overlays[0]).toEqual(expect.objectContaining({
       artifact_type: 'openclaw.sam31.vector_overlay.v1',
       segment_id: 'section-room-boundary-1881-level-1',
       kind: 'polygon_path',
+      artifact_format: 'svg',
+      source_runtime: 'halofire-local-sam31-bridge',
+      source_llm_observation_ids: ['llm:object:sleeve-candidate-1881-1'],
     }));
     expect(body.perception_packet.model_3d_candidates[0]).toEqual(expect.objectContaining({
       artifact_type: 'openclaw.sam31.model_3d_candidate.v1',
       segment_id: 'section-room-boundary-1881-level-1',
       primitive: 'extruded_polygon',
+      generation_method: 'extrude_sam31_section_polygon',
+      source_runtime: 'halofire-local-sam31-bridge',
+      source_llm_observation_ids: ['llm:object:sleeve-candidate-1881-1'],
     }));
     expect(body.product_review_queue_item).toEqual(expect.objectContaining({
       artifact_type: 'openclaw.sam31.product_review_queue_item.v1',
       application: 'halo_fire',
       project_ref: 'halo_fire:The Cooperative 1881 - Salt Lake City UT',
+      llm_observation_count: 1,
+      llm_observation_ids: ['llm:object:sleeve-candidate-1881-1'],
       use_for_claims: false,
       claim_gate_effect: 'no_claims_cleared',
     }));

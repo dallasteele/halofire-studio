@@ -7,6 +7,8 @@ export const SAM31_FLOORPLAN_TOOL = 'sam_segment_floorplan';
 
 const DEFAULT_IMAGE_SIZE = Object.freeze({ w: 800, h: 600 });
 const DEFAULT_TARGETS = Object.freeze(['building_outline', 'walls', 'rooms', 'layers']);
+const DEFAULT_LLM_RUNTIME = 'openclaw-local-llm-best-effort';
+const DEFAULT_LLM_PROMPT_REF = 'openclaw.sam31.prompt.identify_objects_vector_3d.v1';
 const CLAIM_GATE_EFFECT = 'no_claims_cleared';
 const BLOCKED_CLAIMS = Object.freeze([
   'permit_ready',
@@ -62,8 +64,13 @@ const ExtrapolatePayloadSchema = z.object({
   image_ref: z.string().min(1).optional(),
   coordinate_frame_ref: z.string().min(1).optional(),
   unit: z.string().min(1).default('ft'),
+  llm_runtime: z.string().min(1).default(DEFAULT_LLM_RUNTIME),
+  prompt_ref: z.string().min(1).default(DEFAULT_LLM_PROMPT_REF),
+  prompt: z.string().min(1).optional(),
   sections: z.array(z.record(z.unknown())).default([]),
   object_hypotheses: z.array(z.record(z.unknown())).default([]),
+  llm_observations: z.array(z.record(z.unknown())).default([]),
+  source_refs: z.array(z.unknown()).default([]),
 }).passthrough();
 
 const ConsumerQueueHandoffSchema = z.object({
@@ -138,6 +145,10 @@ function stableJson(value) {
       .join(',')}}`;
   }
   return JSON.stringify(value);
+}
+
+function jsonClone(value) {
+  return JSON.parse(JSON.stringify(value));
 }
 
 function shortHash(value) {
@@ -324,6 +335,87 @@ function normalizedObjectHypotheses(rawHypotheses, segments) {
   });
 }
 
+function payloadSourceRefs(payload, bidTruth) {
+  return [
+    payload.source_ref,
+    payload.image_ref,
+    ...payload.source_refs,
+    ...bidTruth.source_refs,
+  ].filter(Boolean);
+}
+
+function normalizedLlmObservations(rawObservations, objectHypotheses, segments, payload, sourceRefs) {
+  const supplied = Array.isArray(rawObservations) ? rawObservations : [];
+  const source = supplied.length
+    ? supplied
+    : objectHypotheses.map((hypothesis) => {
+      const segment = segments.find((entry) => entry.id === hypothesis.segment_id) || segments[0] || {};
+      return {
+        id: `llm:${hypothesis.id}`,
+        segment_id: hypothesis.segment_id || segment.id || 'section-1881-boundary-1',
+        object_hypothesis_id: hypothesis.id,
+        semantic_label: hypothesis.semantic_label || segment.semantic_label || 'sprinkler_review_candidate',
+        confidence: Math.min(0.62, hypothesis.confidence ?? segment.confidence ?? 0.35),
+        observation: `${hypothesis.semantic_label || 'sprinkler_review_candidate'} inferred from SAM31 section ${hypothesis.segment_id || segment.id || 'section-1881-boundary-1'} for vector and 3D candidate generation.`,
+      };
+    });
+  return source.map((observation, index) => {
+    const segmentId = typeof observation.segment_id === 'string' && observation.segment_id
+      ? observation.segment_id
+      : objectHypotheses[index]?.segment_id || segments[index]?.id || segments[0]?.id || 'section-1881-boundary-1';
+    const objectHypothesisId = typeof observation.object_hypothesis_id === 'string' && observation.object_hypothesis_id
+      ? observation.object_hypothesis_id
+      : objectHypotheses.find((hypothesis) => hypothesis.segment_id === segmentId)?.id || null;
+    return {
+      ...observation,
+      artifact_type: 'openclaw.sam31.llm_observation.v1',
+      id: typeof observation.id === 'string' && observation.id
+        ? observation.id
+        : (objectHypothesisId ? `llm:${objectHypothesisId}` : `llm:${segmentId}:${index + 1}`),
+      segment_id: segmentId,
+      object_hypothesis_id: objectHypothesisId,
+      semantic_label: typeof observation.semantic_label === 'string' && observation.semantic_label
+        ? observation.semantic_label
+        : 'sprinkler_review_candidate',
+      confidence: Number.isFinite(Number(observation.confidence))
+        ? Math.max(0, Math.min(1, Number(observation.confidence)))
+        : 0.35,
+      source_runtime: 'halofire-local-sam31-bridge',
+      llm_runtime: typeof observation.llm_runtime === 'string' && observation.llm_runtime
+        ? observation.llm_runtime
+        : payload.llm_runtime,
+      prompt_ref: typeof observation.prompt_ref === 'string' && observation.prompt_ref
+        ? observation.prompt_ref
+        : payload.prompt_ref,
+      prompt: typeof observation.prompt === 'string' && observation.prompt
+        ? observation.prompt
+        : (payload.prompt || 'Identify objects, semantic labels, vector overlays, and best-effort 3D model candidates from SAM31 sections.'),
+      coordinate_frame_ref: payload.coordinate_frame_ref || 'halofire-1881-employee-selected-frame',
+      unit: payload.unit,
+      source_refs: Array.isArray(observation.source_refs) && observation.source_refs.length
+        ? jsonClone(observation.source_refs)
+        : jsonClone(sourceRefs),
+      supported_applications: ['halo_fire', 'landscout', 'nameforge'],
+      supported_evidence_lanes: ['object_identification_review', 'vector_overlay_generation', 'model_3d_candidate_generation', 'spatial_observation_correction_loop'],
+      produces: ['semantic_labels', 'object_hypotheses', 'vector_overlays', 'model_3d_candidates'],
+      use_for_claims: false,
+      blocked_claims: BLOCKED_CLAIMS.slice(),
+      limitations: [
+        ...(Array.isArray(observation.limitations) ? observation.limitations : []),
+        'LLM observation is best-effort semantic evidence only; replace with employee/product-owner/professional evidence before claims.',
+      ],
+      claim_gate_effect: CLAIM_GATE_EFFECT,
+    };
+  });
+}
+
+function llmObservationIdsForSegment(llmObservations, segmentId) {
+  return llmObservations
+    .filter((observation) => observation.segment_id === segmentId)
+    .map((observation) => observation.id)
+    .filter(Boolean);
+}
+
 function cooperative1881Truth() {
   const pkg = readCooperative1881BidPackage();
   return {
@@ -342,15 +434,29 @@ function buildSam31ExtrapolationArtifact(payload) {
   const sections = (payload.sections.length ? payload.sections : [{}])
     .map((section, index) => normalizedSection(section, index, bidTruth));
   const objectHypotheses = normalizedObjectHypotheses(payload.object_hypotheses, sections);
+  const sourceRefs = payloadSourceRefs(payload, bidTruth);
+  const llmObservations = normalizedLlmObservations(
+    payload.llm_observations,
+    objectHypotheses,
+    sections,
+    payload,
+    sourceRefs,
+  );
   const vectorOverlays = sections.map((section) => ({
     artifact_type: 'openclaw.sam31.vector_overlay.v1',
     id: `vector:${section.id}`,
     segment_id: section.id,
     kind: 'polygon_path',
+    artifact_format: 'svg',
     svg_path: polygonPath(section.polygon),
     bbox: section.bbox,
     confidence: Math.min(0.62, section.confidence ?? 0.35),
     source: 'halofire-local-sam31-bridge',
+    source_runtime: 'halofire-local-sam31-bridge',
+    coordinate_frame_ref: payload.coordinate_frame_ref || 'halofire-1881-employee-selected-frame',
+    unit: payload.unit,
+    source_llm_observation_ids: llmObservationIdsForSegment(llmObservations, section.id),
+    source_refs: jsonClone(sourceRefs),
     limitations: ['Best-effort vector overlay; not geometry-accuracy, permit, AHJ, PE, fabrication, or AutoSprink parity evidence.'],
   }));
   const model3dCandidates = sections.map((section) => ({
@@ -358,12 +464,19 @@ function buildSam31ExtrapolationArtifact(payload) {
     id: `model3d:${section.id}`,
     segment_id: section.id,
     primitive: 'extruded_polygon',
+    generation_method: 'extrude_sam31_section_polygon',
+    output_formats: ['glb_candidate_record', 'obj_candidate_record', 'stl_candidate_record'],
     dimensions: {
       height_ft_best_guess: 10,
       source: 'temporary_default_until_employee_or_professional_review',
     },
     confidence: Math.min(0.45, section.confidence ?? 0.35),
     source: 'halofire-local-sam31-bridge',
+    source_runtime: 'halofire-local-sam31-bridge',
+    coordinate_frame_ref: payload.coordinate_frame_ref || 'halofire-1881-employee-selected-frame',
+    unit: payload.unit,
+    source_llm_observation_ids: llmObservationIdsForSegment(llmObservations, section.id),
+    source_refs: jsonClone(sourceRefs),
     limitations: ['Best-effort 3D candidate; not manufacturer, fabrication, permit, AHJ, PE, or engineering evidence.'],
   }));
   const spatialObservations = sections.map((section) => ({
@@ -377,7 +490,7 @@ function buildSam31ExtrapolationArtifact(payload) {
     bbox: section.bbox,
     confidence: Math.min(0.45, section.confidence ?? 0.35),
     capture_ref: payload.image_ref || payload.source_ref || 'halofire-1881-local-sam31-extrapolate',
-    source_refs: [payload.source_ref, payload.image_ref, ...bidTruth.source_refs].filter(Boolean),
+    source_refs: jsonClone(sourceRefs),
     supported_evidence_lanes: ['room_boundary_visual_audit', 'sleeve_or_firestop_candidate_review', 'obstruction_or_clash_review'],
     blocked_claims: BLOCKED_CLAIMS.slice(),
     limitations: LIMITATIONS.slice(),
@@ -440,6 +553,7 @@ function buildSam31ExtrapolationArtifact(payload) {
     unit: payload.unit,
     perception_lanes: ['segmentation', 'object_identification', 'vector_overlay', 'model_3d_candidate', 'spatial_observation'],
     segments: sections,
+    llm_observations: llmObservations,
     object_hypotheses: objectHypotheses,
     vector_overlays: vectorOverlays,
     model_3d_candidates: model3dCandidates,
@@ -461,13 +575,15 @@ function buildSam31ExtrapolationArtifact(payload) {
     source_packet_ref: perceptionPacket.artifact_type,
     contract_ref: 'openclaw.sam31.application_contract.halo_fire.v1',
     sectioning_pipeline_contract_ref: sectioningPipelineContract.artifact_type,
+    llm_observation_count: llmObservations.length,
+    llm_observation_ids: llmObservations.map((observation) => observation.id).filter(Boolean),
     supported_evidence_lanes: ['room_boundary_visual_audit', 'sleeve_or_firestop_candidate_review', 'obstruction_or_clash_review', 'vector_overlay_generation', 'model_3d_candidate_generation'],
     acceptable_human_updates: ['semantic_label', 'polygon', 'bbox', 'object_hypothesis', 'vector_overlay', 'model_3d_candidate', 'source_ref', 'confidence'],
     temporary_value_policy: 'best_guess_until_employee_replaced',
     extrapolation_index_count: extrapolationIndex.length,
     extrapolation_index: extrapolationIndex,
     missing_evidence_rows: missingEvidenceRows,
-    source_refs: [payload.source_ref, payload.image_ref, ...bidTruth.source_refs].filter(Boolean),
+    source_refs: jsonClone(sourceRefs),
     next_action: 'Queue HaloFire employee room-boundary, sleeve/firestop, obstruction, vector, and 3D review; regulated claims remain blocked.',
     use_for_claims: false,
     blocked_claims: BLOCKED_CLAIMS.slice(),
