@@ -865,7 +865,7 @@ function evidenceDetail(row) {
         const employeeDecision = packet.employee_decision && typeof packet.employee_decision === 'object' ? packet.employee_decision : null;
         const replaySourceRefs = Array.isArray(packet.source_refs) ? packet.source_refs : [];
         const downstreamReview = renderOpenClawSam31DownstreamReviewSummary(packet.openclaw_sam31_extrapolation_product_review_packet, packet.sam31_downstream_review_metadata);
-        return `<div class="muted" style="font-size:11px;margin-top:3px">Replay evidence: best_effort_ai_layout_replay<br>review_source ${escapeHtml(packet.review_source || 'latest_employee_review_packet')} - source_evidence_id ${escapeHtml(packet.source_evidence_id || 'missing')} - source_review_evidence_id ${escapeHtml(packet.source_review_evidence_id || 'missing')} - source_sam31_evidence_id ${escapeHtml(packet.source_sam31_evidence_id || 'missing')}<br>Replay employee_decision ${employeeDecision ? `<span class="chip">${escapeHtml(employeeDecision.artifact_type || 'halofire.pdf_boundary_employee_decision.v1')}</span> <span class="chip">selected_sheet_ref ${escapeHtml(employeeDecision.selected_sheet_ref || 'missing')}</span> <span class="chip">selected_scale_ref ${escapeHtml(employeeDecision.selected_scale_ref || 'missing')}</span> <span class="chip">selected_boundary_candidate_ref ${escapeHtml(employeeDecision.selected_boundary_candidate_ref || 'missing')}</span>` : '<span class="chip">missing</span>'}<br>Replay source_refs ${replaySourceRefs.length ? replaySourceRefs.map((ref) => `<span class="chip">${escapeHtml(ref.evidence_type || ref.source_ref || JSON.stringify(ref).slice(0, 80))}</span>`).join('') : '<span class="chip">missing</span>'}<br>marked_up_plan_ref ${escapeHtml(packet.marked_up_plan_ref || 'missing')} - corrected_room_polygon_count ${escapeHtml(packet.corrected_room_polygon_count || 0)} - heads ${escapeHtml(packet.total_head_count || 0)} - area ${escapeHtml(packet.total_area_sqft || 0)} sqft<br>openclaw_sam31_perception_packet ${escapeHtml(packet.openclaw_sam31_perception_packet?.artifact_type || 'missing')} - claim_gate_effect ${escapeHtml(packet.claim_gate_effect || 'no_claims_cleared')}${renderSam31PerceptionSummary(packet.openclaw_sam31_perception_packet, packet.source_evidence_id)}${downstreamReview}<br>Download: ${escapeHtml(packet.download_name || 'room-boundary-replay-bid-artifact.json')}<br><button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#4f46e5" data-replay-bid-artifact-evidence-id="${escapeHtml(row.id)}">Download replay artifact</button> <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#92400e" data-replay-sam31-actual-value-handoff-evidence-id="${escapeHtml(row.id)}">Download replay SAM31 actual-value handoff</button><br><span class="muted" style="font-size:10px">openclaw.sam31.actual_value_handoff_packet.v1 - /openclaw/sam31/actual-value-handoff - use_for_claims false - claim_gate_effect no_claims_cleared</span><br>Blocks still active: ${blocked.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('')}</div>`;
+        return `<div class="muted" style="font-size:11px;margin-top:3px">Replay evidence: best_effort_ai_layout_replay<br>review_source ${escapeHtml(packet.review_source || 'latest_employee_review_packet')} - source_evidence_id ${escapeHtml(packet.source_evidence_id || 'missing')} - source_review_evidence_id ${escapeHtml(packet.source_review_evidence_id || 'missing')} - source_sam31_evidence_id ${escapeHtml(packet.source_sam31_evidence_id || 'missing')}<br>Replay employee_decision ${employeeDecision ? `<span class="chip">${escapeHtml(employeeDecision.artifact_type || 'halofire.pdf_boundary_employee_decision.v1')}</span> <span class="chip">selected_sheet_ref ${escapeHtml(employeeDecision.selected_sheet_ref || 'missing')}</span> <span class="chip">selected_scale_ref ${escapeHtml(employeeDecision.selected_scale_ref || 'missing')}</span> <span class="chip">selected_boundary_candidate_ref ${escapeHtml(employeeDecision.selected_boundary_candidate_ref || 'missing')}</span>` : '<span class="chip">missing</span>'}<br>Replay source_refs ${replaySourceRefs.length ? replaySourceRefs.map((ref) => `<span class="chip">${escapeHtml(ref.evidence_type || ref.source_ref || JSON.stringify(ref).slice(0, 80))}</span>`).join('') : '<span class="chip">missing</span>'}<br>marked_up_plan_ref ${escapeHtml(packet.marked_up_plan_ref || 'missing')} - corrected_room_polygon_count ${escapeHtml(packet.corrected_room_polygon_count || 0)} - heads ${escapeHtml(packet.total_head_count || 0)} - area ${escapeHtml(packet.total_area_sqft || 0)} sqft<br>openclaw_sam31_perception_packet ${escapeHtml(packet.openclaw_sam31_perception_packet?.artifact_type || 'missing')} - claim_gate_effect ${escapeHtml(packet.claim_gate_effect || 'no_claims_cleared')}${renderSam31PerceptionSummary(packet.openclaw_sam31_perception_packet, packet.source_evidence_id)}${downstreamReview}<br>Download: ${escapeHtml(packet.download_name || 'room-boundary-replay-bid-artifact.json')}<br><button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#4f46e5" data-replay-bid-artifact-evidence-id="${escapeHtml(row.id)}">Download replay artifact</button> <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#92400e" data-replay-sam31-actual-value-handoff-evidence-id="${escapeHtml(row.id)}">Download replay SAM31 actual-value handoff</button> <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#b45309" data-replay-sam31-actual-value-replacement-evidence-id="${escapeHtml(row.id)}">Save replay SAM31 actual-value replacement</button><br><span class="muted" style="font-size:10px">openclaw.sam31.actual_value_handoff_packet.v1 - halofire.sam31_replay_actual_value_replacement_intake.v1 - /openclaw/sam31/actual-value-handoff/replacements - use_for_claims false - claim_gate_effect no_claims_cleared</span><div class="muted" id="replaySam31ActualValueReplacementStatus-${escapeHtml(row.id)}" style="font-size:11px;margin-top:4px"></div>Blocks still active: ${blocked.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('')}</div>`;
       }
     } catch {
       return '<div class="muted" style="font-size:11px;margin-top:3px">best-effort layout evidence; detail unavailable</div>';
@@ -940,6 +940,9 @@ async function refreshEvidence() {
   });
   document.querySelectorAll('[data-replay-sam31-actual-value-handoff-evidence-id]').forEach((button) => {
     button.onclick = () => downloadReplaySam31ActualValueHandoff(button.dataset.replaySam31ActualValueHandoffEvidenceId);
+  });
+  document.querySelectorAll('[data-replay-sam31-actual-value-replacement-evidence-id]').forEach((button) => {
+    button.onclick = () => saveReplaySam31ActualValueReplacement(button.dataset.replaySam31ActualValueReplacementEvidenceId);
   });
   document.querySelectorAll('[data-sam31-tool-contract]').forEach((button) => {
     button.onclick = () => downloadOpenClawSam31ToolContract();
@@ -1965,6 +1968,62 @@ async function downloadReplaySam31ActualValueHandoff(evidenceId) {
   a.download = packet.download_name || 'sam31-actual-value-handoff.json';
   a.click();
   URL.revokeObjectURL(a.href);
+}
+
+async function saveReplaySam31ActualValueReplacement(evidenceId) {
+  const status = document.getElementById('replaySam31ActualValueReplacementStatus-' + evidenceId);
+  const button = document.querySelector('[data-replay-sam31-actual-value-replacement-evidence-id="' + CSS.escape(String(evidenceId)) + '"]');
+  if (status) status.textContent = 'Saving replay SAM31 actual-value replacement scaffold...';
+  if (button) button.disabled = true;
+  try {
+    const packet = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/evidence/' + encodeURIComponent(evidenceId) + '/openclaw/sam31/actual-value-handoff');
+    if (packet.artifact_type !== 'openclaw.sam31.actual_value_handoff_packet.v1') {
+      throw new Error('Unexpected SAM31 actual-value handoff packet type');
+    }
+    const sourceRef = 'sam31-replay-handoff:' + evidenceId + ':employee-actual-values';
+    const packetSourceRefs = Array.isArray(packet.source_refs)
+      ? packet.source_refs.map((ref) => {
+        if (!ref || typeof ref !== 'object') return String(ref || '');
+        return ref.source_ref || ref.evidence_type || JSON.stringify(ref).slice(0, 120);
+      })
+      : [];
+    const decisionSourceRefs = packet.employee_decision && Array.isArray(packet.employee_decision.source_refs)
+      ? packet.employee_decision.source_refs
+      : [];
+    const sourceRefs = Array.from(new Set([
+      sourceRef,
+      packet.source_replay_ref,
+      ...packetSourceRefs,
+      ...decisionSourceRefs,
+    ].filter(Boolean).map((ref) => String(ref))));
+    const fieldsPending = Array.isArray(packet.employee_replacement_fields)
+      ? packet.employee_replacement_fields.map((field) => field && (field.field || field)).filter(Boolean)
+      : [];
+    const saved = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/evidence/' + encodeURIComponent(evidenceId) + '/openclaw/sam31/actual-value-handoff/replacements', {
+      method: 'POST',
+      body: JSON.stringify({
+        reviewer_name: 'HaloFire employee',
+        source_file: packet.source_replay_ref || 'sam31-replay-actual-value-handoff.json',
+        source_ref: sourceRef,
+        source_refs: sourceRefs,
+        replacement_values: {
+          semantic_label: 'actual_value_pending',
+          source_ref: sourceRef,
+          confidence: null,
+          fields_pending_employee_actual_values: fieldsPending,
+        },
+        notes: 'Workbench one-click scaffold for employee actual-value replacement; no claim gates cleared.',
+        recorded_from: 'workbench.replay_sam31_actual_value_replacement',
+      }),
+    });
+    if (status) status.textContent = 'Recorded sam31_actual_value_replacement evidence #' + saved.id + '; claim gates remain blocked.';
+    await refreshEvidence();
+    await refreshResolverQueue();
+  } catch (err) {
+    if (status) status.textContent = 'Error: ' + err.message;
+  } finally {
+    if (button) button.disabled = false;
+  }
 }
 
 async function downloadOfficialFlowHydraulicReplay(evidenceId) {

@@ -1437,6 +1437,87 @@ function buildOpenClawSam31ReplayActualValueHandoffPacket(projectName, replayEvi
   };
 }
 
+function normalizeReplaySam31ActualValueReplacementIntake(projectName, replayEvidenceRow, replayNotes, body = {}, user = null) {
+  const handoff = buildOpenClawSam31ReplayActualValueHandoffPacket(projectName, replayEvidenceRow, replayNotes);
+  const sourceRef = String(body?.source_ref || '').trim();
+  if (!sourceRef) {
+    const err = new Error('source_ref is required for replay SAM31 actual-value replacement intake');
+    err.httpStatus = 400;
+    throw err;
+  }
+  const sourceFile = String(
+    body?.source_file
+      || replayEvidenceRow.source_file
+      || `sam31-replay-actual-value-handoff:${replayEvidenceRow.id}`,
+  ).trim();
+  const replacementValues = body?.replacement_values && typeof body.replacement_values === 'object' && !Array.isArray(body.replacement_values)
+    ? jsonClone(body.replacement_values)
+    : {};
+  const replacementFields = uniqueStrings([
+    ...Object.keys(replacementValues),
+    ...(Array.isArray(handoff.employee_replacement_fields)
+      ? handoff.employee_replacement_fields.map((field) => field.field)
+      : []),
+  ]);
+  const sourceRefs = uniqueStrings([
+    ...(Array.isArray(body?.source_refs) ? body.source_refs : []),
+    sourceRef,
+    handoff.source_replay_ref,
+    ...(Array.isArray(handoff.employee_decision?.source_refs) ? handoff.employee_decision.source_refs : []),
+  ].filter(Boolean));
+  return {
+    kind: 'sam31ReplayActualValueReplacement',
+    artifact_type: 'halofire.sam31_replay_actual_value_replacement_intake.v1',
+    evidence_type: 'sam31_actual_value_replacement',
+    evidence_record_type: 'sam31_actual_value_replacement',
+    status: 'present',
+    project_name: projectName,
+    source_runtime: 'sam-3.1+llm',
+    source_replay_evidence_id: replayEvidenceRow.id,
+    source_replay_artifact_type: handoff.source_replay_artifact_type,
+    source_actual_value_handoff_artifact_type: handoff.artifact_type,
+    source_actual_value_handoff: handoff,
+    source_file: sourceFile || null,
+    source_ref: sourceRef,
+    source_refs: sourceRefs,
+    reviewer_name: String(body?.reviewer_name || user?.name || user?.username || '').trim() || null,
+    replacement_values: replacementValues,
+    replacement_summary: {
+      replaced_field_count: replacementFields.length,
+      replaced_fields: replacementFields,
+      has_semantic_label: Boolean(replacementValues.semantic_label || replacementValues.semantic_labels),
+      has_polygon: Boolean(replacementValues.polygon || replacementValues.polygons),
+      has_bbox: Boolean(replacementValues.bbox || replacementValues.bboxes),
+      has_vector_overlay: Boolean(replacementValues.vector_overlay || replacementValues.vector_overlays),
+      has_model_3d_candidate: Boolean(replacementValues.model_3d_candidate || replacementValues.model_3d_candidates),
+    },
+    acceptable_actual_evidence: Array.isArray(handoff.acceptable_actual_evidence) ? handoff.acceptable_actual_evidence : [],
+    employee_actual_value_next_action: 'Review this replay-scoped SAM31 actual-value replacement before downstream bid/export use; regulated claims remain blocked.',
+    notes: String(body?.notes || '').trim() || null,
+    recorded_from: body?.recorded_from || 'api.openclaw.sam31.actual_value_handoff.replacements',
+    recorded_by: user?.username || user?.name || null,
+    recorded_at: new Date().toISOString(),
+    use_for_claims: false,
+    blocked_claims: uniqueStrings([
+      ...(Array.isArray(body?.blocked_claims) ? body.blocked_claims : []),
+      ...(Array.isArray(handoff.blocked_claims) ? handoff.blocked_claims : []),
+      'permit_ready',
+      'fabrication_ready',
+      'AHJ_approval',
+      'professional_approval',
+      'manufacturer_exact',
+      'AutoSprink_parity',
+    ]),
+    claim_gate_effect: 'no_claims_cleared',
+    no_claim_gates_cleared: true,
+    limitations: uniqueStrings([
+      ...(Array.isArray(handoff.limitations) ? handoff.limitations : []),
+      'Replay actual-value replacement evidence is an internal-alpha correction artifact only.',
+      'It does not clear permit-ready, fabrication-ready, AHJ-ready, engineering-grade, AutoSprink parity, professional approval, or manufacturer-exact claims.',
+    ]),
+  };
+}
+
 app.get('/api/projects/:name/openclaw/sam31/actual-value-resolver-queue', authMiddleware, (req, res) => {
   res.json(buildOpenClawSam31ActualValueResolverQueue(req.params.name, {
     consumer: req.query?.consumer,
@@ -1568,6 +1649,48 @@ app.get('/api/projects/:name/evidence/:evidenceId/openclaw/sam31/actual-value-ha
     return res.status(400).json({ error: 'Evidence row is not a room-boundary replay artifact' });
   }
   return res.json(buildOpenClawSam31ReplayActualValueHandoffPacket(req.params.name, row, notes));
+});
+
+app.post('/api/projects/:name/evidence/:evidenceId/openclaw/sam31/actual-value-handoff/replacements', authMiddleware, requireRole('admin'), (req, res) => {
+  try {
+    const row = db
+      .prepare('SELECT * FROM project_evidence WHERE project_name = ? AND id = ?')
+      .get(req.params.name, Number(req.params.evidenceId));
+    if (!row) return res.status(404).json({ error: 'Evidence row not found' });
+    if (row.evidence_type !== 'best_effort_ai_layout') {
+      return res.status(400).json({ error: 'Evidence row is not a replay bid artifact' });
+    }
+    let notes;
+    try {
+      notes = JSON.parse(row.notes || '{}');
+    } catch {
+      return res.status(400).json({ error: 'Evidence row does not contain structured replay artifact notes' });
+    }
+    if (notes.kind !== 'best_effort_ai_layout_replay') {
+      return res.status(400).json({ error: 'Evidence row is not a room-boundary replay artifact' });
+    }
+    const intake = normalizeReplaySam31ActualValueReplacementIntake(req.params.name, row, notes, req.body || {}, req.user);
+    const result = db
+      .prepare(`INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+                VALUES (?, ?, ?, ?, ?, ?)`)
+      .run(
+        req.params.name,
+        intake.evidence_type,
+        intake.source_file,
+        intake.source_ref,
+        'present',
+        JSON.stringify(intake),
+      );
+    const evidenceRow = db.prepare('SELECT * FROM project_evidence WHERE id = ?').get(result.lastInsertRowid);
+    return res.status(201).json({
+      id: result.lastInsertRowid,
+      message: 'Replay SAM31 actual-value replacement intake recorded; claim gates remain blocked',
+      evidence: evidenceRow,
+      ...intake,
+    });
+  } catch (err) {
+    return res.status(err.httpStatus || 400).json({ error: err.message });
+  }
 });
 
 app.get('/api/projects/:name/evidence/:evidenceId/official-flow-hydraulic-replay-artifact', authMiddleware, (req, res) => {

@@ -1448,5 +1448,87 @@ describe('PDF page inspection API', () => {
       'fabrication_ready',
       'manufacturer_exact',
     ]));
+
+    const replacementRes = await request(`${COOPERATIVE_1881_PATH}/evidence/${replayEvidence.id}/openclaw/sam31/actual-value-handoff/replacements`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        reviewer_name: 'Halo Fire estimator',
+        source_file: 'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx',
+        source_ref: '1881://employee-actual-values/replay-handoff/sheet-7',
+        source_refs: [
+          '1881://proposal-cooperative/sheet-7',
+          '1881://employee-actual-values/replay-handoff/sheet-7',
+        ],
+        replacement_values: {
+          semantic_label: 'reviewed corridor boundary',
+          polygon: [[0, 0], [40, 0], [40, 12], [0, 12]],
+          bbox: { minX: 0, minY: 0, maxX: 40, maxY: 12, widthFt: 40, heightFt: 12 },
+          vector_overlay: { id: 'vector:employee-reviewed-corridor-a', source_ref: '1881://employee-vector/corridor-a.svg' },
+          model_3d_candidate: { id: 'model3d:employee-reviewed-corridor-a', status: 'not_applicable_for_2d_boundary' },
+          source_ref: '1881://employee-actual-values/replay-handoff/sheet-7',
+          confidence: 0.91,
+        },
+        notes: 'Employee replaced replay handoff temporary values for internal-alpha use only.',
+      }),
+    });
+    expect(replacementRes.status).toBe(201);
+    const replacement = await replacementRes.json();
+    expect(replacement).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.sam31_replay_actual_value_replacement_intake.v1',
+      evidence_type: 'sam31_actual_value_replacement',
+      status: 'present',
+      source_replay_evidence_id: replayEvidence.id,
+      source_actual_value_handoff_artifact_type: 'openclaw.sam31.actual_value_handoff_packet.v1',
+      source_file: 'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx',
+      source_ref: '1881://employee-actual-values/replay-handoff/sheet-7',
+      reviewer_name: 'Halo Fire estimator',
+      claim_gate_effect: 'no_claims_cleared',
+      use_for_claims: false,
+      no_claim_gates_cleared: true,
+    }));
+    expect(replacement.replacement_values).toEqual(expect.objectContaining({
+      semantic_label: 'reviewed corridor boundary',
+      source_ref: '1881://employee-actual-values/replay-handoff/sheet-7',
+      confidence: 0.91,
+    }));
+    expect(replacement.replacement_summary).toEqual(expect.objectContaining({
+      replaced_field_count: expect.any(Number),
+      has_polygon: true,
+      has_bbox: true,
+      has_vector_overlay: true,
+      has_model_3d_candidate: true,
+    }));
+    expect(replacement.source_actual_value_handoff).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.actual_value_handoff_packet.v1',
+      source_replay_evidence_id: replayEvidence.id,
+    }));
+    expect(replacement.source_refs).toEqual(expect.arrayContaining([
+      '1881://proposal-cooperative/sheet-7',
+      '1881://employee-actual-values/replay-handoff/sheet-7',
+    ]));
+    expect(replacement.blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'AHJ_approval',
+      'professional_approval',
+      'AutoSprink_parity',
+      'fabrication_ready',
+      'manufacturer_exact',
+    ]));
+
+    const replacementEvidenceRows = await (await request(`${COOPERATIVE_1881_PATH}/evidence`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })).json();
+    const replacementEvidence = replacementEvidenceRows.find((row) => row.id === replacement.id);
+    expect(replacementEvidence).toEqual(expect.objectContaining({
+      evidence_type: 'sam31_actual_value_replacement',
+      status: 'present',
+      source_ref: '1881://employee-actual-values/replay-handoff/sheet-7',
+    }));
+    const replacementNotes = JSON.parse(replacementEvidence.notes);
+    expect(replacementNotes.kind).toBe('sam31ReplayActualValueReplacement');
+    expect(replacementNotes.source_replay_evidence_id).toBe(replayEvidence.id);
+    expect(replacementNotes.source_actual_value_handoff_artifact_type).toBe('openclaw.sam31.actual_value_handoff_packet.v1');
+    expect(replacementNotes.claim_gate_effect).toBe('no_claims_cleared');
   }, 30000);
 });
