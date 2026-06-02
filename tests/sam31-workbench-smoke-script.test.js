@@ -142,6 +142,12 @@ describe('SAM31 workbench browser smoke script', () => {
     expect(script).toContain('sam31-actual-value-work-item');
     expect(script).toContain('openclaw.sam31.actual_value_work_item_packet.v1');
     expect(script).toContain('actualValueWorkItemPacket.employee_actual_value_next_action');
+    expect(script).toContain('data-sam31-actual-value-queue-record-index');
+    expect(script).toContain('/openclaw/sam31/actual-value-replacements?projectName=');
+    expect(script).toContain('halofire.sam31_actual_value_replacement_intake.v1');
+    expect(script).toContain('recordedActualValueReplacement');
+    expect(script).toContain('actualValueReplacementReadback');
+    expect(script).toContain('poll_actual_value_replacement_details');
     expect(script).toContain('sam31ConsumerReview=unresolved');
     expect(script).toContain('openclaw.sam31.consumer_smoke_artifact.v1');
     expect(script).toContain('sam31-consumer-smoke-artifact');

@@ -190,6 +190,8 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toContain('model_3d_candidate_count');
     expect(html).toContain('use_for_claims false');
     expect(html).toContain('claim_gate_effect no_claims_cleared');
+    expect(html).toMatch(/Saved openclaw_sam31_consumer_review evidence[\s\S]*await refreshResolverQueue\(\);\s*await refreshSam31ActualValueQueue\(\);/);
+    expect(html).toMatch(/openOpenClawSam31ProductOwnerReplacementIntake[\s\S]*await refreshResolverQueue\(\);\s*await refreshSam31ActualValueQueue\(\);[\s\S]*Opened product_owner_replacement_intake evidence/);
   });
 
   it('surfaces SAM31 sectioning downstream resolver rows and filter links in the workbench', async () => {

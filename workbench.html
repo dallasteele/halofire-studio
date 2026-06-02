@@ -2546,6 +2546,7 @@ async function saveOpenClawSam31ConsumerReview(evidenceId, consumer, sourceConsu
     if (status) status.textContent = 'Saved openclaw_sam31_consumer_review evidence #' + saved.id + ' - claims still blocked';
     await refreshEvidence();
     await refreshResolverQueue();
+    await refreshSam31ActualValueQueue();
   } catch (err) {
     if (status) status.textContent = 'Error: ' + err.message;
   }
@@ -2592,6 +2593,7 @@ async function openOpenClawSam31ProductOwnerReplacementIntake(evidenceId, consum
     });
     await refreshEvidence();
     await refreshResolverQueue();
+    await refreshSam31ActualValueQueue();
     const refreshedStatus = document.getElementById('sam31ProductOwnerReplacementIntakeStatus-' + evidenceId + '-' + consumer);
     if (refreshedStatus || status) {
       (refreshedStatus || status).textContent = 'Opened product_owner_replacement_intake evidence #' + saved.id + ' - claims still blocked';

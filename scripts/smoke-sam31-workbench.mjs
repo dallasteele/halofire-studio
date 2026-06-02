@@ -1053,6 +1053,68 @@ async function runBrowserSmoke(token, evidenceIds) {
       || actualValueWorkItemPacket.use_for_claims !== false) {
       throw new Error(`SAM31 actual-value work item lost employee replacement truth gates: ${JSON.stringify(actualValueWorkItemPacket)}`);
     }
+    await page.waitForSelector('text=SAM31 Actual-Value Queue', { timeout: 8_000 });
+    await page.waitForSelector('[data-sam31-actual-value-queue-record-index]', { state: 'attached', timeout: 8_000 });
+    const actualValueRecordButton = page.locator('[data-sam31-actual-value-queue-record-index]').first();
+    const actualValueQueueIndex = await actualValueRecordButton.getAttribute('data-sam31-actual-value-queue-record-index');
+    if (actualValueQueueIndex === null) {
+      throw new Error('SAM31 actual-value queue record index was missing');
+    }
+    const actualValueSourceRef = 'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G6';
+    const actualValueSourceRefs = [
+      actualValueSourceRef,
+      'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!B9',
+      'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G11',
+    ];
+    await page.locator(`#sam31ActualValueSourceRef-${actualValueQueueIndex}`).evaluate((element) => {
+      const details = element.closest('details');
+      if (details) details.open = true;
+    });
+    await page.locator(`#sam31ActualValueSourceRef-${actualValueQueueIndex}`).fill(actualValueSourceRef);
+    await page.locator(`#sam31ActualValueSourceFile-${actualValueQueueIndex}`).fill('Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx');
+    await page.locator(`#sam31ActualValueReplacementValuesSourceRef-${actualValueQueueIndex}`).fill(actualValueSourceRef);
+    await page.locator(`#sam31ActualValueSourceRefs-${actualValueQueueIndex}`).fill(actualValueSourceRefs.join('\n'));
+    await actualValueRecordButton.click();
+    await page.waitForSelector('text=Recorded sam31_actual_value_replacement evidence #', { timeout: 8_000 });
+    const actualValueReplacementReadbackRoute = `/api/openclaw/sam31/actual-value-replacements?projectName=${encodeURIComponent(COOPERATIVE_1881_PROJECT_NAME)}&consumer=${encodeURIComponent(consumerReview.consumer)}`;
+    const actualValueReplacementReadback = await request(actualValueReplacementReadbackRoute, token);
+    if (actualValueReplacementReadback.artifact_type !== 'openclaw.sam31.actual_value_replacement_readback.v1') {
+      throw new Error(`Unexpected SAM31 actual-value replacement readback type ${actualValueReplacementReadback.artifact_type}`);
+    }
+    if (actualValueReplacementReadback.recorded_count < 1) {
+      throw new Error(`SAM31 actual-value replacement readback did not record a replacement: ${JSON.stringify(actualValueReplacementReadback)}`);
+    }
+    const actualValueReplacementDetail = actualValueReplacementReadback.items
+      ?.find((item) => item.source_openclaw_sam31_consumer_review_evidence_id === consumerReview.evidence_id);
+    const recordedActualValueReplacement = actualValueReplacementDetail?.recorded_actual_value_replacement_evidence;
+    if (!actualValueReplacementDetail
+      || actualValueReplacementDetail.status !== 'actual_value_evidence_recorded'
+      || recordedActualValueReplacement?.artifact_type !== 'halofire.sam31_actual_value_replacement_intake.v1'
+      || recordedActualValueReplacement.source_ref !== actualValueSourceRef
+      || !actualValueSourceRefs.every((ref) => recordedActualValueReplacement.source_refs?.includes(ref))
+      || recordedActualValueReplacement.claim_gate_effect !== 'no_claims_cleared'
+      || recordedActualValueReplacement.use_for_claims !== false) {
+      throw new Error(`SAM31 actual-value replacement readback lost typed source truth: ${JSON.stringify(actualValueReplacementDetail)}`);
+    }
+    await page.waitForSelector('text=poll_actual_value_replacement_details', { timeout: 8_000 });
+    const actualValueReplacementReadbackDownloadPromise = page.waitForEvent('download');
+    await page.locator(`button[data-sam31-actual-value-replacement-readback-consumer="${consumerReview.consumer}"]`).first().click();
+    const actualValueReplacementReadbackDownload = await actualValueReplacementReadbackDownloadPromise;
+    const actualValueReplacementReadbackPath = await actualValueReplacementReadbackDownload.path();
+    const actualValueReplacementReadbackSuggestedName = actualValueReplacementReadbackDownload.suggestedFilename();
+    const actualValueReplacementReadbackBytes = actualValueReplacementReadbackPath ? fs.statSync(actualValueReplacementReadbackPath).size : 0;
+    downloads.push({ suggestedName: actualValueReplacementReadbackSuggestedName, bytes: actualValueReplacementReadbackBytes });
+    if (!actualValueReplacementReadbackSuggestedName.includes(`sam31-actual-value-replacement-readback-${consumerReview.consumer}`)
+      || actualValueReplacementReadbackBytes <= 0) {
+      throw new Error(`Unexpected SAM31 actual-value replacement readback download ${actualValueReplacementReadbackSuggestedName} (${actualValueReplacementReadbackBytes} bytes)`);
+    }
+    const actualValueReplacementReadbackDownloadPacket = JSON.parse(fs.readFileSync(actualValueReplacementReadbackPath, 'utf8'));
+    if (actualValueReplacementReadbackDownloadPacket.artifact_type !== 'openclaw.sam31.actual_value_replacement_readback.v1'
+      || actualValueReplacementReadbackDownloadPacket.recorded_count < 1
+      || actualValueReplacementReadbackDownloadPacket.items?.[0]?.recorded_actual_value_replacement_evidence?.artifact_type !== 'halofire.sam31_actual_value_replacement_intake.v1'
+      || actualValueReplacementReadbackDownloadPacket.claim_gate_effect !== 'no_claims_cleared') {
+      throw new Error(`SAM31 actual-value replacement readback download lost typed source truth: ${JSON.stringify(actualValueReplacementReadbackDownloadPacket)}`);
+    }
     await page.waitForSelector('text=Download SAM31 sprinkler review adapter', { timeout: 8_000 });
     const sprinklerAdapterDownloadPromise = page.waitForEvent('download');
     await page.locator(`button[data-sam31-sprinkler-review-adapter-evidence-id="${consumerReview.evidence_id}"]`).click();
@@ -1609,6 +1671,18 @@ async function runBrowserSmoke(token, evidenceIds) {
         accepted_queue_id: consumerReviewPacket.accepted_queue_id,
         source_openclaw_sam31_consumer_review_evidence_id: consumerReviewPacket.source_openclaw_sam31_consumer_review_evidence_id,
         claim_gate_effect: consumerReviewPacket.claim_gate_effect,
+      },
+      actualValueReplacementReadback: {
+        artifact_type: actualValueReplacementReadback.artifact_type,
+        requested_consumer: actualValueReplacementReadback.requested_consumer,
+        recorded_count: actualValueReplacementReadback.recorded_count,
+        pending_count: actualValueReplacementReadback.pending_count,
+        detail_artifact_type: actualValueReplacementDetail.artifact_type,
+        recorded_artifact_type: recordedActualValueReplacement.artifact_type,
+        source_ref: recordedActualValueReplacement.source_ref,
+        source_refs: recordedActualValueReplacement.source_refs,
+        claim_gate_effect: recordedActualValueReplacement.claim_gate_effect,
+        downloaded_artifact_type: actualValueReplacementReadbackDownloadPacket.artifact_type,
       },
       nameForgeConsumerReviewPacket: {
         artifact_type: nameForgeConsumerReviewPacket.artifact_type,
