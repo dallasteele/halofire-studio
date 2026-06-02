@@ -386,6 +386,12 @@ async function runBrowserSmoke(token, evidenceIds) {
         && item.latest_openclaw_sam31_vector_model_artifact.claim_gate_effect !== 'no_claims_cleared')) {
       throw new Error(`SAM31 vector/model artifact queue summary is not fail-closed: ${JSON.stringify(vectorModelQueue.summary)}`);
     }
+    const vectorModelArtifactEvidenceId = vectorModelQueue.items
+      .find((item) => item.evidence_id === evidenceIds.boundaryEvidenceId)
+      ?.latest_openclaw_sam31_vector_model_artifact?.evidence_id;
+    if (!vectorModelArtifactEvidenceId) {
+      throw new Error(`SAM31 vector/model artifact evidence id missing from queue: ${JSON.stringify(vectorModelQueue.items)}`);
+    }
     await page.waitForSelector('text=Download SAM31 queue item', { timeout: 8_000 });
     await page.locator('[data-catalog-source-record-family-ref="family:pipe_steel_sch40_2p0in"]').first().click();
     await page.waitForSelector('text=Recorded evidence:', { timeout: 8_000 });
@@ -701,6 +707,11 @@ async function runBrowserSmoke(token, evidenceIds) {
     if (sprinklerReviewQueueItems.some((item) => item.use_for_claims !== false || item.claim_gate_effect !== 'no_claims_cleared')) {
       throw new Error(`SAM31 sprinkler review queue cleared a claim gate: ${JSON.stringify(sprinklerReviewQueueItems)}`);
     }
+    if (sprinklerReviewQueueItems.some((item) => item.source_openclaw_sam31_vector_model_artifact_evidence_id !== vectorModelArtifactEvidenceId
+      || item.source_linked_vector_overlay_count < 1
+      || item.source_linked_model_3d_candidate_count < 1)) {
+      throw new Error(`SAM31 sprinkler review queue lost visible vector/model source evidence: ${JSON.stringify(sprinklerReviewQueueItems)}`);
+    }
     const obstructionQueue = await request(`${PROJECT_PATH}/resolver-queue?sam31SprinklerReview=queued&lane=obstruction_or_clash_review`, token);
     const obstructionQueueItem = obstructionQueue.items.find((item) => item.evidence_id === evidenceIds.boundaryEvidenceId);
     const obstructionRows = obstructionQueueItem?.sam31_sprinkler_review_queue_items || [];
@@ -708,6 +719,7 @@ async function runBrowserSmoke(token, evidenceIds) {
       throw new Error(`SAM31 sprinkler review lane filter failed: ${JSON.stringify(obstructionQueue)}`);
     }
     await page.waitForSelector('text=SAM31 sprinkler review queue', { timeout: 8_000 });
+    await page.waitForSelector(`text=SAM31 vector/model source evidence #${vectorModelArtifactEvidenceId}`, { timeout: 8_000 });
     await page.waitForSelector('text=sam31SprinklerReview=queued', { timeout: 8_000 });
     await page.waitForSelector('text=Save SAM31 sprinkler review decision', { timeout: 8_000 });
     const sprinklerReviewReviewerSelector = `#sam31SprinklerReviewReviewer-${evidenceIds.boundaryEvidenceId}-${consumerReview.evidence_id}-sam31_consumer_reviewed_object_hypotheses`;
@@ -823,6 +835,11 @@ async function runBrowserSmoke(token, evidenceIds) {
     if (preliminaryReplayRows.some((item) => item.use_for_claims !== false || item.claim_gate_effect !== 'no_claims_cleared')) {
       throw new Error(`SAM31 sprinkler preliminary replay queue cleared a claim gate: ${JSON.stringify(preliminaryReplayRows)}`);
     }
+    if (preliminaryReplayRows.some((item) => item.source_openclaw_sam31_vector_model_artifact_evidence_id !== vectorModelArtifactEvidenceId
+      || item.source_linked_vector_overlay_count < 1
+      || item.source_linked_model_3d_candidate_count < 1)) {
+      throw new Error(`SAM31 sprinkler preliminary replay queue lost visible vector/model source evidence: ${JSON.stringify(preliminaryReplayRows)}`);
+    }
     await page.waitForSelector('text=SAM31 sprinkler preliminary replay queue', { timeout: 8_000 });
     await page.waitForSelector('text=Run SAM31 sprinkler preliminary replay', { timeout: 8_000 });
     const preliminaryReplayDownloadPromise = page.waitForEvent('download');
@@ -889,6 +906,11 @@ async function runBrowserSmoke(token, evidenceIds) {
     }
     if (replayFollowupRow.packet_queue_items.some((item) => item.use_for_claims !== false || item.claim_gate_effect !== 'no_claims_cleared')) {
       throw new Error(`SAM31 preliminary replay follow-up packet queue cleared a claim gate: ${JSON.stringify(replayFollowupRow.packet_queue_items)}`);
+    }
+    if (replayFollowupRow.packet_queue_items.some((item) => item.source_openclaw_sam31_vector_model_artifact_evidence_id !== vectorModelArtifactEvidenceId
+      || item.source_linked_vector_overlay_count < 1
+      || item.source_linked_model_3d_candidate_count < 1)) {
+      throw new Error(`SAM31 preliminary replay follow-up packet queue lost visible vector/model source evidence: ${JSON.stringify(replayFollowupRow.packet_queue_items)}`);
     }
     await page.waitForSelector('text=Download SAM31 follow-up packet', { timeout: 8_000 });
     const replayFollowupPacketDownloadPromise = page.waitForEvent('download');

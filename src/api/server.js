@@ -4264,6 +4264,7 @@ function openClawSam31SprinklerIssueSeeds(review) {
 
 function openClawSam31SprinklerReviewQueueItems(projectName, evidence, decision, reviewEvidences, sprinklerReviewDecisionEvidences = []) {
   if (!evidence || !decision) return [];
+  const vectorModelContext = openClawSam31VectorModelArtifactReviewContext(projectName, evidence.id);
   const latestDecisionsByKey = new Map(
     (Array.isArray(sprinklerReviewDecisionEvidences) ? sprinklerReviewDecisionEvidences : [])
       .filter((item) => item?.evidence && item?.review)
@@ -4296,6 +4297,10 @@ function openClawSam31SprinklerReviewQueueItems(projectName, evidence, decision,
           source_pdf_boundary_evidence_id: evidence.id,
           source_openclaw_sam31_consumer_review_evidence_id: reviewEvidence.id,
           source_openclaw_sam31_consumer_smoke_evidence_id: review.source_openclaw_sam31_consumer_smoke_evidence_id || null,
+          source_openclaw_sam31_vector_model_artifact_evidence_id: vectorModelContext.source_openclaw_sam31_vector_model_artifact_evidence_id,
+          source_linked_vector_overlay_count: vectorModelContext.source_linked_vector_overlays.length,
+          source_linked_model_3d_candidate_count: vectorModelContext.source_linked_model_3d_candidates.length,
+          openclaw_sam31_vector_model_artifact: vectorModelContext.openclaw_sam31_vector_model_artifact,
           source_application: review.source_application || 'halo_fire',
           consumer: review.consumer,
           accepted_queue_id: review.accepted_queue_id || null,
@@ -4686,6 +4691,8 @@ function halofireSam31SprinklerPacketQueueItemType(lane, sourceField = '') {
 
 function halofireSam31SprinklerPreliminaryReplayPacketQueueItems(followup, followupEvidenceId = null) {
   if (!followup || !Array.isArray(followup.issue_decisions)) return [];
+  const vectorOverlays = Array.isArray(followup.source_linked_vector_overlays) ? followup.source_linked_vector_overlays : [];
+  const model3dCandidates = Array.isArray(followup.source_linked_model_3d_candidates) ? followup.source_linked_model_3d_candidates : [];
   return followup.issue_decisions.map((decision, index) => {
     const targetLane = String(decision.target_packet_lane || followup.supported_sprinkler_review_lane || 'obstruction_or_clash_review').trim();
     const sourceField = String(decision.source_field || '').trim();
@@ -4701,6 +4708,10 @@ function halofireSam31SprinklerPreliminaryReplayPacketQueueItems(followup, follo
       source_pdf_boundary_evidence_id: followup.source_pdf_boundary_evidence_id,
       source_openclaw_sam31_consumer_review_evidence_id: followup.source_openclaw_sam31_consumer_review_evidence_id,
       source_halofire_sam31_sprinkler_review_decision_evidence_id: followup.source_halofire_sam31_sprinkler_review_decision_evidence_id,
+      source_openclaw_sam31_vector_model_artifact_evidence_id: followup.source_openclaw_sam31_vector_model_artifact_evidence_id || followup.openclaw_sam31_vector_model_artifact?.evidence_id || null,
+      source_linked_vector_overlay_count: vectorOverlays.length,
+      source_linked_model_3d_candidate_count: model3dCandidates.length,
+      openclaw_sam31_vector_model_artifact: followup.openclaw_sam31_vector_model_artifact || null,
       target_packet_lane: targetLane,
       source_field: sourceField,
       source_index: Number.isSafeInteger(Number(decision.source_index)) ? Number(decision.source_index) : index,
@@ -5229,6 +5240,10 @@ function halofireSam31SprinklerPreliminaryReplayQueueItems(projectName, evidence
         source_pdf_boundary_evidence_id: evidence.id,
         source_openclaw_sam31_consumer_review_evidence_id: sourceReview.evidence.id,
         source_halofire_sam31_sprinkler_review_decision_evidence_id: sprinklerReviewEvidence.id,
+        source_openclaw_sam31_vector_model_artifact_evidence_id: packet.source_openclaw_sam31_vector_model_artifact_evidence_id || null,
+        source_linked_vector_overlay_count: Array.isArray(packet.source_linked_vector_overlays) ? packet.source_linked_vector_overlays.length : 0,
+        source_linked_model_3d_candidate_count: Array.isArray(packet.source_linked_model_3d_candidates) ? packet.source_linked_model_3d_candidates.length : 0,
+        openclaw_sam31_vector_model_artifact: packet.openclaw_sam31_vector_model_artifact || null,
         source_application: packet.source_application,
         consumer: packet.consumer,
         accepted_queue_id: packet.accepted_queue_id,
