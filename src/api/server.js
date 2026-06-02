@@ -2816,6 +2816,71 @@ function openClawSam31VectorModelArtifactSummary(vectorModelEvidence) {
   };
 }
 
+function openClawSam31VectorModelArtifactReviewContext(projectName, sourceEvidenceId) {
+  const summary = openClawSam31VectorModelArtifactSummary(
+    latestOpenClawSam31VectorModelArtifactEvidence(projectName, sourceEvidenceId),
+  );
+  if (!summary) {
+    return {
+      source_openclaw_sam31_vector_model_artifact_evidence_id: null,
+      openclaw_sam31_vector_model_artifact: null,
+      source_linked_vector_overlays: [],
+      source_linked_model_3d_candidates: [],
+      source_refs: [],
+    };
+  }
+  const artifactRef = {
+    artifact_type: summary.artifact_type || SAM31_VECTOR_MODEL_ARTIFACT_PACKET_TYPE,
+    evidence_id: summary.evidence_id,
+    evidence_type: summary.evidence_type,
+    evidence_status: summary.evidence_status,
+    status: summary.status || 'ready_for_internal_alpha_review',
+    source_ref: summary.source_ref || null,
+    source_pdf_boundary_evidence_id: summary.source_pdf_boundary_evidence_id || null,
+    source_sam31_visual_audit_evidence_id: summary.source_sam31_visual_audit_evidence_id || null,
+    source_runtime: summary.source_runtime || 'sam-3.1+llm',
+    vector_overlay_count: summary.vector_overlay_count || 0,
+    model_3d_candidate_count: summary.model_3d_candidate_count || 0,
+    use_for_claims: false,
+    no_claim_gates_cleared: true,
+    claim_gate_effect: 'no_claims_cleared',
+    blocked_claims: Array.isArray(summary.blocked_claims) ? [...summary.blocked_claims] : [],
+    limitations: Array.isArray(summary.limitations) ? [...summary.limitations] : [],
+  };
+  const enrichLinkedRow = (row, lane) => ({
+    ...(row && typeof row === 'object' ? jsonClone(row) : {}),
+    source_openclaw_sam31_vector_model_artifact_evidence_id: summary.evidence_id,
+    source_pdf_boundary_evidence_id: summary.source_pdf_boundary_evidence_id || sourceEvidenceId || null,
+    source_sam31_visual_audit_evidence_id: summary.source_sam31_visual_audit_evidence_id || null,
+    source_runtime: summary.source_runtime || 'sam-3.1+llm',
+    source_evidence_lane: lane,
+    temporary_value_policy: 'best_guess_until_employee_replaced',
+    use_for_claims: false,
+    no_claim_gates_cleared: true,
+    claim_gate_effect: 'no_claims_cleared',
+  });
+  return {
+    source_openclaw_sam31_vector_model_artifact_evidence_id: summary.evidence_id,
+    openclaw_sam31_vector_model_artifact: artifactRef,
+    source_linked_vector_overlays: (Array.isArray(summary.vector_overlays) ? summary.vector_overlays : [])
+      .map((row) => enrichLinkedRow(row, 'vector_overlay_generation')),
+    source_linked_model_3d_candidates: (Array.isArray(summary.model_3d_candidates) ? summary.model_3d_candidates : [])
+      .map((row) => enrichLinkedRow(row, 'model_3d_candidate_generation')),
+    source_refs: [
+      {
+        evidence_id: summary.evidence_id,
+        evidence_type: 'openclaw_sam31_vector_model_artifact_packet',
+        artifact_type: summary.artifact_type || SAM31_VECTOR_MODEL_ARTIFACT_PACKET_TYPE,
+        source_ref: summary.source_ref || null,
+        status: summary.evidence_status || summary.status || 'best_effort',
+        source_pdf_boundary_evidence_id: summary.source_pdf_boundary_evidence_id || sourceEvidenceId || null,
+        source_sam31_visual_audit_evidence_id: summary.source_sam31_visual_audit_evidence_id || null,
+        claim_gate_effect: 'no_claims_cleared',
+      },
+    ],
+  };
+}
+
 function buildOpenClawSam31VectorModelArtifactPacket(projectName, evidence, decision, sam31Evidence) {
   if (!evidence || !decision) {
     const e = new Error('PDF boundary decision evidence not found');
@@ -4467,6 +4532,7 @@ function buildHalofireSam31SprinklerReviewDecisionPacket(projectName, evidence, 
   const reviewedValues = sprinklerReview.reviewed_values && typeof sprinklerReview.reviewed_values === 'object'
     ? jsonClone(sprinklerReview.reviewed_values)
     : {};
+  const vectorModelContext = openClawSam31VectorModelArtifactReviewContext(projectName, evidence.id);
   const blockedClaims = uniqueStrings([
     ...(Array.isArray(sprinklerReview.blocked_claims) ? sprinklerReview.blocked_claims : []),
     ...(Array.isArray(review.blocked_claims) ? review.blocked_claims : []),
@@ -4506,6 +4572,7 @@ function buildHalofireSam31SprinklerReviewDecisionPacket(projectName, evidence, 
       claim_gate_effect: 'no_claims_cleared',
     },
     ...(Array.isArray(sprinklerReview.source_refs) ? jsonClone(sprinklerReview.source_refs) : []),
+    ...vectorModelContext.source_refs,
   ]);
   const preliminaryReplayInputs = {
     artifact_type: HALOFIRE_SAM31_SPRINKLER_REVIEW_PRELIMINARY_REPLAY_INPUTS_TYPE,
@@ -4516,12 +4583,16 @@ function buildHalofireSam31SprinklerReviewDecisionPacket(projectName, evidence, 
     source_pdf_boundary_evidence_id: evidence.id,
     source_openclaw_sam31_consumer_review_evidence_id: reviewEvidence.id,
     source_halofire_sam31_sprinkler_review_decision_evidence_id: sprinklerReviewEvidence.id,
+    source_openclaw_sam31_vector_model_artifact_evidence_id: vectorModelContext.source_openclaw_sam31_vector_model_artifact_evidence_id,
     source_queue_item_id: sprinklerReview.source_queue_item_id || null,
     issue_type: sprinklerReview.issue_type || null,
     supported_sprinkler_review_lane: lane,
     evidence_lanes: uniqueStrings([lane]),
     replay_scope: halofireSam31SprinklerReplayScope(lane),
     reviewed_values: reviewedValues,
+    openclaw_sam31_vector_model_artifact: vectorModelContext.openclaw_sam31_vector_model_artifact,
+    source_linked_vector_overlays: vectorModelContext.source_linked_vector_overlays,
+    source_linked_model_3d_candidates: vectorModelContext.source_linked_model_3d_candidates,
     source_refs: sourceRefs,
     next_action: 'Replay these employee-reviewed SAM31 values as internal-alpha sprinkler review inputs, then attach official/professional/manufacturer evidence before clearing any regulated claim.',
     use_for_claims: false,
@@ -4546,6 +4617,7 @@ function buildHalofireSam31SprinklerReviewDecisionPacket(projectName, evidence, 
     source_openclaw_sam31_consumer_review_evidence_id: reviewEvidence.id,
     source_halofire_sam31_sprinkler_review_decision_evidence_id: sprinklerReviewEvidence.id,
     source_openclaw_sam31_consumer_smoke_evidence_id: sprinklerReview.source_openclaw_sam31_consumer_smoke_evidence_id || review.source_openclaw_sam31_consumer_smoke_evidence_id || null,
+    source_openclaw_sam31_vector_model_artifact_evidence_id: vectorModelContext.source_openclaw_sam31_vector_model_artifact_evidence_id,
     source_application: sprinklerReview.source_application || review.source_application || 'halo_fire',
     consumer: sprinklerReview.consumer || review.consumer || null,
     accepted_queue_id: sprinklerReview.accepted_queue_id || review.accepted_queue_id || null,
@@ -4561,6 +4633,9 @@ function buildHalofireSam31SprinklerReviewDecisionPacket(projectName, evidence, 
     console_log_ref: sprinklerReview.console_log_ref || null,
     download_name: `${slugForDownloadName(projectName)}-sam31-sprinkler-review-decision-${slugForDownloadName(sprinklerReview.consumer || review.consumer || 'consumer')}-${sprinklerReviewEvidence.id}.json`,
     reviewed_values: reviewedValues,
+    openclaw_sam31_vector_model_artifact: vectorModelContext.openclaw_sam31_vector_model_artifact,
+    source_linked_vector_overlays: vectorModelContext.source_linked_vector_overlays,
+    source_linked_model_3d_candidates: vectorModelContext.source_linked_model_3d_candidates,
     consumer_review_decision: jsonClone(review),
     sprinkler_review_decision: jsonClone(sprinklerReview),
     preliminary_replay_inputs: preliminaryReplayInputs,
@@ -4660,6 +4735,7 @@ function halofireSam31SprinklerReplayFollowupPacketDownloadSlug(packetQueueItem)
 }
 
 function buildHalofireSam31SprinklerReplayFollowupPacket(projectName, evidence, reviewEvidence, sprinklerReviewEvidence, followupEvidence, followup, packetIndex = 0) {
+  const vectorModelContext = openClawSam31VectorModelArtifactReviewContext(projectName, evidence.id);
   const packetQueueItems = halofireSam31SprinklerPreliminaryReplayPacketQueueItems(followup, followupEvidence.id);
   const queueItem = packetQueueItems[packetIndex];
   const issueDecision = Array.isArray(followup.issue_decisions) ? followup.issue_decisions[packetIndex] : null;
@@ -4690,6 +4766,7 @@ function buildHalofireSam31SprinklerReplayFollowupPacket(projectName, evidence, 
     source_pdf_boundary_evidence_id: evidence.id,
     source_openclaw_sam31_consumer_review_evidence_id: reviewEvidence.id,
     source_halofire_sam31_sprinkler_review_decision_evidence_id: sprinklerReviewEvidence.id,
+    source_openclaw_sam31_vector_model_artifact_evidence_id: vectorModelContext.source_openclaw_sam31_vector_model_artifact_evidence_id,
     source_application: followup.source_application || null,
     consumer: followup.consumer || null,
     accepted_queue_id: followup.accepted_queue_id || null,
@@ -4708,6 +4785,9 @@ function buildHalofireSam31SprinklerReplayFollowupPacket(projectName, evidence, 
     },
     packet_queue_item: queueItem,
     replay_output: followup.replay_output || null,
+    openclaw_sam31_vector_model_artifact: vectorModelContext.openclaw_sam31_vector_model_artifact,
+    source_linked_vector_overlays: vectorModelContext.source_linked_vector_overlays,
+    source_linked_model_3d_candidates: vectorModelContext.source_linked_model_3d_candidates,
     review_ref: followup.review_ref || null,
     screenshot_ref: followup.screenshot_ref || null,
     console_log_ref: followup.console_log_ref || null,
@@ -4742,6 +4822,7 @@ function buildHalofireSam31SprinklerReplayFollowupPacket(projectName, evidence, 
         source_ref: followupEvidence.source_ref || followup.review_ref || null,
         status: followupEvidence.status,
       },
+      ...vectorModelContext.source_refs,
       followup.packet_ref ? {
         evidence_type: artifactType,
         source_ref: followup.packet_ref,
@@ -4963,6 +5044,7 @@ function buildHalofireSam31SprinklerPreliminaryReplayArtifact(projectName, evide
     source_pdf_boundary_evidence_id: evidence.id,
     source_openclaw_sam31_consumer_review_evidence_id: reviewEvidence.id,
     source_halofire_sam31_sprinkler_review_decision_evidence_id: sprinklerReviewEvidence.id,
+    source_openclaw_sam31_vector_model_artifact_evidence_id: packet.source_openclaw_sam31_vector_model_artifact_evidence_id || null,
     source_queue_item_id: sprinklerReview.source_queue_item_id || null,
     source_application: packet.source_application,
     consumer: packet.consumer,
@@ -4973,15 +5055,21 @@ function buildHalofireSam31SprinklerPreliminaryReplayArtifact(projectName, evide
     replay_scope: replayInputs.replay_scope || packet.preliminary_replay_inputs?.replay_scope || halofireSam31SprinklerReplayScope(packet.supported_sprinkler_review_lane),
     download_name: `${slugForDownloadName(projectName)}-sam31-sprinkler-preliminary-replay-${slugForDownloadName(packet.consumer || 'consumer')}-${sprinklerReviewEvidence.id}.json`,
     replay_inputs: replayInputs,
+    openclaw_sam31_vector_model_artifact: packet.openclaw_sam31_vector_model_artifact || null,
+    source_linked_vector_overlays: Array.isArray(packet.source_linked_vector_overlays) ? jsonClone(packet.source_linked_vector_overlays) : [],
+    source_linked_model_3d_candidates: Array.isArray(packet.source_linked_model_3d_candidates) ? jsonClone(packet.source_linked_model_3d_candidates) : [],
     replay_output: {
       artifact_type: HALOFIRE_SAM31_SPRINKLER_PRELIMINARY_REPLAY_OUTPUT_TYPE,
       status: 'requires_employee_or_professional_followup',
       project_name: projectName,
       source_halofire_sam31_sprinkler_review_decision_evidence_id: sprinklerReviewEvidence.id,
+      source_openclaw_sam31_vector_model_artifact_evidence_id: packet.source_openclaw_sam31_vector_model_artifact_evidence_id || null,
       supported_sprinkler_review_lane: packet.supported_sprinkler_review_lane,
       replay_scope: replayInputs.replay_scope || halofireSam31SprinklerReplayScope(packet.supported_sprinkler_review_lane),
       issue_candidates: issueCandidates,
       issue_candidate_count: issueCandidates.length,
+      source_linked_vector_overlays: Array.isArray(packet.source_linked_vector_overlays) ? jsonClone(packet.source_linked_vector_overlays) : [],
+      source_linked_model_3d_candidates: Array.isArray(packet.source_linked_model_3d_candidates) ? jsonClone(packet.source_linked_model_3d_candidates) : [],
       next_action: 'Review replayed obstruction, clash, sleeve/firestop, vector, or 3D-candidate rows against the 1881 sheet and official evidence before clearing any regulated claim.',
       use_for_claims: false,
       blocked_claims: Array.isArray(packet.blocked_claims) ? [...packet.blocked_claims] : [],
@@ -5053,6 +5141,7 @@ function normalizeHalofireSam31SprinklerPreliminaryReplayFollowupDecision(projec
     source_pdf_boundary_evidence_id: evidence.id,
     source_openclaw_sam31_consumer_review_evidence_id: reviewEvidence.id,
     source_halofire_sam31_sprinkler_review_decision_evidence_id: sprinklerReviewEvidence.id,
+    source_openclaw_sam31_vector_model_artifact_evidence_id: replayArtifact.source_openclaw_sam31_vector_model_artifact_evidence_id || null,
     source_application: replayArtifact.source_application,
     consumer: replayArtifact.consumer,
     accepted_queue_id: replayArtifact.accepted_queue_id,
@@ -5070,6 +5159,9 @@ function normalizeHalofireSam31SprinklerPreliminaryReplayFollowupDecision(projec
     issue_decisions: normalizedIssueDecisions,
     notes: String(body.notes || '').trim() || null,
     replay_output: replayArtifact.replay_output,
+    openclaw_sam31_vector_model_artifact: replayArtifact.openclaw_sam31_vector_model_artifact || null,
+    source_linked_vector_overlays: Array.isArray(replayArtifact.source_linked_vector_overlays) ? jsonClone(replayArtifact.source_linked_vector_overlays) : [],
+    source_linked_model_3d_candidates: Array.isArray(replayArtifact.source_linked_model_3d_candidates) ? jsonClone(replayArtifact.source_linked_model_3d_candidates) : [],
     source_refs: uniqueByJson([
       ...(Array.isArray(replayArtifact.source_refs) ? replayArtifact.source_refs : []),
       {
@@ -5186,6 +5278,7 @@ function buildOpenClawSam31ToSprinklerReviewAdapter(projectName, evidence, decis
   const reviewedValues = review.replacement_values && typeof review.replacement_values === 'object'
     ? jsonClone(review.replacement_values)
     : {};
+  const vectorModelContext = openClawSam31VectorModelArtifactReviewContext(projectName, evidence.id);
   const issueSeeds = openClawSam31SprinklerIssueSeeds(review);
   const blockedClaims = uniqueStrings([
     ...(Array.isArray(decisionPacket.blocked_claims) ? decisionPacket.blocked_claims : []),
@@ -5204,6 +5297,7 @@ function buildOpenClawSam31ToSprinklerReviewAdapter(projectName, evidence, decis
     source_pdf_boundary_evidence_id: evidence.id,
     source_openclaw_sam31_consumer_review_evidence_id: reviewEvidence.id,
     source_openclaw_sam31_consumer_smoke_evidence_id: decisionPacket.source_openclaw_sam31_consumer_smoke_evidence_id || null,
+    source_openclaw_sam31_vector_model_artifact_evidence_id: vectorModelContext.source_openclaw_sam31_vector_model_artifact_evidence_id,
     source_application: review.source_application || 'halo_fire',
     consumer: review.consumer,
     accepted_queue_id: review.accepted_queue_id,
@@ -5214,6 +5308,9 @@ function buildOpenClawSam31ToSprinklerReviewAdapter(projectName, evidence, decis
     download_name: `${slugForDownloadName(projectName)}-sam31-to-sprinkler-review-${slugForDownloadName(review.consumer)}-${reviewEvidence.id}.json`,
     supported_sprinkler_review_lanes: supportedSprinklerReviewLanes,
     reviewed_sam31_values: reviewedValues,
+    openclaw_sam31_vector_model_artifact: vectorModelContext.openclaw_sam31_vector_model_artifact,
+    source_linked_vector_overlays: vectorModelContext.source_linked_vector_overlays,
+    source_linked_model_3d_candidates: vectorModelContext.source_linked_model_3d_candidates,
     consumer_review_decision_packet: decisionPacket,
     sprinkler_review_packet: {
       artifact_type: HALOFIRE_SAM31_SPRINKLER_REVIEW_PACKET_TYPE,
@@ -5222,14 +5319,21 @@ function buildOpenClawSam31ToSprinklerReviewAdapter(projectName, evidence, decis
       project_name: projectName,
       source_pdf_boundary_evidence_id: evidence.id,
       source_openclaw_sam31_consumer_review_evidence_id: reviewEvidence.id,
+      source_openclaw_sam31_vector_model_artifact_evidence_id: vectorModelContext.source_openclaw_sam31_vector_model_artifact_evidence_id,
       consumer: review.consumer,
       supported_sprinkler_review_lanes: supportedSprinklerReviewLanes,
       issue_seeds: issueSeeds,
+      openclaw_sam31_vector_model_artifact: vectorModelContext.openclaw_sam31_vector_model_artifact,
+      source_linked_vector_overlays: vectorModelContext.source_linked_vector_overlays,
+      source_linked_model_3d_candidates: vectorModelContext.source_linked_model_3d_candidates,
       next_action: 'Use these reviewed SAM31 values to prepare room-boundary, obstruction/clash, sleeve/firestop, vector-overlay, and 3D-candidate review tasks; keep regulated claims blocked.',
       use_for_claims: false,
       claim_gate_effect: 'no_claims_cleared',
     },
-    source_refs: decisionPacket.source_refs,
+    source_refs: uniqueByJson([
+      ...(Array.isArray(decisionPacket.source_refs) ? decisionPacket.source_refs : []),
+      ...vectorModelContext.source_refs,
+    ]),
     blocked_claims: blockedClaims,
     use_for_claims: false,
     claim_gate_effect: 'no_claims_cleared',

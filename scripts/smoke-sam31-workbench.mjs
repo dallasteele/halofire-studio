@@ -781,6 +781,18 @@ async function runBrowserSmoke(token, evidenceIds) {
     if (!Array.isArray(sprinklerAdapterPacket.supported_sprinkler_review_lanes) || !sprinklerAdapterPacket.supported_sprinkler_review_lanes.includes('obstruction_or_clash_review')) {
       throw new Error(`SAM31 sprinkler review adapter missing sprinkler review lanes: ${JSON.stringify(sprinklerAdapterPacket.supported_sprinkler_review_lanes)}`);
     }
+    if (sprinklerAdapterPacket.source_openclaw_sam31_vector_model_artifact_evidence_id !== vectorModelQueue.items
+      .find((item) => item.evidence_id === evidenceIds.boundaryEvidenceId)
+      ?.latest_openclaw_sam31_vector_model_artifact?.evidence_id
+      || sprinklerAdapterPacket.openclaw_sam31_vector_model_artifact?.artifact_type !== 'openclaw.sam31_vector_model_artifact_packet.v1'
+      || !Array.isArray(sprinklerAdapterPacket.sprinkler_review_packet?.source_linked_vector_overlays)
+      || sprinklerAdapterPacket.sprinkler_review_packet.source_linked_vector_overlays.length < 1
+      || !Array.isArray(sprinklerAdapterPacket.sprinkler_review_packet?.source_linked_model_3d_candidates)
+      || sprinklerAdapterPacket.sprinkler_review_packet.source_linked_model_3d_candidates.length < 1
+      || sprinklerAdapterPacket.openclaw_sam31_vector_model_artifact?.use_for_claims !== false
+      || sprinklerAdapterPacket.openclaw_sam31_vector_model_artifact?.claim_gate_effect !== 'no_claims_cleared') {
+      throw new Error(`SAM31 sprinkler adapter lost source-linked vector/model evidence: ${JSON.stringify(sprinklerAdapterPacket)}`);
+    }
     await page.waitForSelector('text=Download SAM31 sprinkler review decision packet', { timeout: 8_000 });
     const sprinklerReviewPacketDownloadPromise = page.waitForEvent('download');
     await page.locator(`button[data-sam31-sprinkler-review-packet-evidence-id="${latestSprinklerDecision.evidence_id}"]`).click();
@@ -832,6 +844,13 @@ async function runBrowserSmoke(token, evidenceIds) {
     }
     if (sprinklerPreliminaryReplayArtifact.claim_gate_effect !== 'no_claims_cleared' || sprinklerPreliminaryReplayArtifact.use_for_claims !== false) {
       throw new Error(`SAM31 sprinkler preliminary replay artifact cleared a claim gate: ${JSON.stringify(sprinklerPreliminaryReplayArtifact)}`);
+    }
+    if (sprinklerPreliminaryReplayArtifact.source_openclaw_sam31_vector_model_artifact_evidence_id !== sprinklerAdapterPacket.source_openclaw_sam31_vector_model_artifact_evidence_id
+      || !Array.isArray(sprinklerPreliminaryReplayArtifact.source_linked_vector_overlays)
+      || sprinklerPreliminaryReplayArtifact.source_linked_vector_overlays.length < 1
+      || !Array.isArray(sprinklerPreliminaryReplayArtifact.source_linked_model_3d_candidates)
+      || sprinklerPreliminaryReplayArtifact.source_linked_model_3d_candidates.length < 1) {
+      throw new Error(`SAM31 preliminary replay lost source-linked vector/model evidence: ${JSON.stringify(sprinklerPreliminaryReplayArtifact)}`);
     }
     await page.waitForSelector('text=Save SAM31 preliminary replay follow-up', { timeout: 8_000 });
     const replayFollowupKey = `${evidenceIds.boundaryEvidenceId}-${consumerReview.evidence_id}-${latestSprinklerDecision.evidence_id}`;
@@ -891,6 +910,14 @@ async function runBrowserSmoke(token, evidenceIds) {
     }
     if (replayFollowupPacket.use_for_claims !== false || replayFollowupPacket.claim_gate_effect !== 'no_claims_cleared') {
       throw new Error(`SAM31 follow-up packet cleared a claim gate: ${JSON.stringify(replayFollowupPacket)}`);
+    }
+    if (replayFollowupPacket.source_openclaw_sam31_vector_model_artifact_evidence_id !== sprinklerAdapterPacket.source_openclaw_sam31_vector_model_artifact_evidence_id
+      || !Array.isArray(replayFollowupPacket.source_linked_vector_overlays)
+      || replayFollowupPacket.source_linked_vector_overlays.length < 1
+      || !Array.isArray(replayFollowupPacket.source_linked_model_3d_candidates)
+      || replayFollowupPacket.source_linked_model_3d_candidates.length < 1
+      || !replayFollowupPacket.source_refs?.some((ref) => ref.evidence_type === 'openclaw_sam31_vector_model_artifact_packet')) {
+      throw new Error(`SAM31 follow-up packet lost source-linked vector/model evidence: ${JSON.stringify(replayFollowupPacket)}`);
     }
     const replayFollowupPacketReviewKey = `${evidenceIds.boundaryEvidenceId}-${consumerReview.evidence_id}-${latestSprinklerDecision.evidence_id}-${replayFollowupRow.latest_sam31_sprinkler_preliminary_replay_followup_decision.evidence_id}-0`;
     await page.getByText('Save SAM31 follow-up packet review').first().click();
