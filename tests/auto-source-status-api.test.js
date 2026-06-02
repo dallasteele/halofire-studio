@@ -199,4 +199,56 @@ describe('S5 GET /api/auto-source/status', () => {
     }));
     expect(coopBody.summary.official_flow_needed).toBe(1);
   });
+
+  it('records official-flow intake evidence and updates the resolver queue without clearing claims', async () => {
+    const projectName = 'The Cooperative 1881 - Salt Lake City UT';
+    const createRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-packets/official-flow/intake`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        staticPsi: 72,
+        residualPsi: 61,
+        flowingGpm: 980,
+        flowDataDate: '2026-05-30',
+        waterModelRequired: 'employee-entered placeholder until official water model is attached',
+        source_file: 'field-flow-report.pdf',
+        source_ref: 'field-flow-report.pdf#page=1',
+        reviewer_name: 'HaloFire Estimator',
+        notes: 'Temporary employee-entered values for internal-alpha hydraulic replay only.',
+      }),
+    });
+    expect(createRes.status).toBe(201);
+    const created = await createRes.json();
+    expect(created.evidence.evidence_type).toBe('official_flow_intake');
+    expect(created.evidence.status).toBe('present');
+    expect(created.intake).toEqual(expect.objectContaining({
+      staticPsi: 72,
+      residualPsi: 61,
+      flowingGpm: 980,
+      source_ref: 'field-flow-report.pdf#page=1',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(created.intake.blocked_claims).toEqual(
+      expect.arrayContaining(['permit_ready', 'AHJ_approval', 'PE_review', 'AutoSprink_parity']),
+    );
+
+    const queueRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-queue`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(queueRes.status).toBe(200);
+    const queue = await queueRes.json();
+    const item = queue.items.find((row) => row.kind === 'official_flow_intake');
+    expect(item).toEqual(expect.objectContaining({
+      status: 'official_flow_evidence_recorded',
+      evidence_id: created.id,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(item.input_defaults).toEqual(expect.objectContaining({
+      source_status: 'employee_recorded_official_flow_intake',
+      staticPsi: 72,
+      residualPsi: 61,
+      flowingGpm: 980,
+    }));
+    expect(queue.summary.official_flow_evidence_recorded).toBe(1);
+  });
 });

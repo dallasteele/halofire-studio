@@ -208,6 +208,16 @@ function evidenceDetail(row) {
       return '<div class="muted" style="font-size:11px;margin-top:3px">room-boundary review packet; detail unavailable</div>';
     }
   }
+  if (row.evidence_type === 'official_flow_intake') {
+    try {
+      const packet = JSON.parse(row.notes || '{}');
+      const intake = packet.intake || {};
+      const blocked = Array.isArray(intake.blocked_claims) ? intake.blocked_claims : [];
+      return `<div class="muted" style="font-size:11px;margin-top:3px">Official flow: static ${escapeHtml(intake.staticPsi || 'missing')} psi - residual ${escapeHtml(intake.residualPsi || 'missing')} psi - flowing ${escapeHtml(intake.flowingGpm || 'missing')} gpm<br>source_ref ${escapeHtml(intake.source_ref || row.source_ref || 'missing')} - claim_gate_effect ${escapeHtml(intake.claim_gate_effect || 'no_claims_cleared')}<br>Blocks still active: ${blocked.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('')}</div>`;
+    } catch {
+      return '<div class="muted" style="font-size:11px;margin-top:3px">official-flow intake evidence; detail unavailable</div>';
+    }
+  }
   if (row.evidence_type !== 'pdf_boundary_decision') return row.source_file ? ' · ' + escapeHtml(row.source_file) : '';
   try {
     const packet = JSON.parse(row.notes || '{}');
@@ -315,6 +325,20 @@ function resolverQueueDetail(item) {
       <div class="claims">AI fallback: ${escapeHtml(item.ai_fallback || '')}</div>
       <div class="claims">Blocks: ${claims.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('')}</div>
       <p style="margin-top:8px">${actions.map((action) => `<a class="go" style="padding:7px 10px;font-size:11px;text-decoration:none;display:inline-block;margin-right:6px" href="${escapeHtml(action.href || '#')}">${escapeHtml(action.label || 'Open')}</a>`).join('')}</p>
+      <details style="margin-top:8px" id="officialFlowIntake">
+        <summary class="muted" style="cursor:pointer">Record/update official flow intake</summary>
+        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:8px">
+          <input id="officialFlowStaticPsi" type="number" min="0.01" step="0.01" value="${escapeHtml(defaults.staticPsi || '')}" placeholder="static psi" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
+          <input id="officialFlowResidualPsi" type="number" min="0.01" step="0.01" value="${escapeHtml(defaults.residualPsi || '')}" placeholder="residual psi" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
+          <input id="officialFlowFlowingGpm" type="number" min="0.01" step="0.01" value="${escapeHtml(defaults.flowingGpm || '')}" placeholder="flowing gpm" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
+          <input id="officialFlowDate" type="date" value="${escapeHtml(defaults.flowDataDate || '')}" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
+          <input id="officialFlowSourceFile" placeholder="source_file" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
+          <input id="officialFlowSourceRef" value="${escapeHtml(item.source_ref || '')}" placeholder="source_ref" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
+        </div>
+        <textarea id="officialFlowNotes" placeholder="notes / water model requirement" style="width:100%;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px;height:48px;margin-top:6px"></textarea>
+        <p style="margin-top:8px"><button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#3b82f6" data-official-flow-save="1">Save official flow evidence</button></p>
+        <div class="muted" id="officialFlowStatus" style="font-size:11px"></div>
+      </details>
     </div>`;
   }
   return `
@@ -460,6 +484,31 @@ async function saveResolverPacketReview(evidenceId) {
   }
 }
 
+async function saveOfficialFlowIntake() {
+  const status = document.getElementById('officialFlowStatus');
+  try {
+    const body = {
+      staticPsi: Number(document.getElementById('officialFlowStaticPsi').value),
+      residualPsi: Number(document.getElementById('officialFlowResidualPsi').value),
+      flowingGpm: Number(document.getElementById('officialFlowFlowingGpm').value),
+      flowDataDate: document.getElementById('officialFlowDate').value || null,
+      source_file: document.getElementById('officialFlowSourceFile').value.trim(),
+      source_ref: document.getElementById('officialFlowSourceRef').value.trim(),
+      waterModelRequired: document.getElementById('officialFlowNotes').value.trim(),
+      notes: document.getElementById('officialFlowNotes').value.trim(),
+    };
+    const saved = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/resolver-packets/official-flow/intake', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    });
+    if (status) status.textContent = 'Saved official_flow_intake evidence #' + saved.id + '; claims still blocked.';
+    await refreshEvidence();
+    await refreshResolverQueue();
+  } catch (err) {
+    if (status) status.textContent = 'Error: ' + err.message;
+  }
+}
+
 async function refreshResolverQueue() {
   const queue = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/resolver-queue');
   document.getElementById('resolverQueue').innerHTML = queue.items && queue.items.length
@@ -476,6 +525,9 @@ async function refreshResolverQueue() {
   });
   document.querySelectorAll('[data-resolver-review-evidence-id]').forEach((button) => {
     button.onclick = () => saveResolverPacketReview(button.dataset.resolverReviewEvidenceId);
+  });
+  document.querySelectorAll('[data-official-flow-save]').forEach((button) => {
+    button.onclick = () => saveOfficialFlowIntake();
   });
 }
 

@@ -1499,10 +1499,106 @@ function officialFlowFactsForProject(projectName) {
   };
 }
 
-function officialFlowResolverQueueItem(projectName) {
-  const facts = officialFlowFactsForProject(projectName);
+function officialFlowIntakeFromEvidence(row) {
+  if (!row) return null;
+  try {
+    const parsed = JSON.parse(row.notes || '{}');
+    return parsed && parsed.kind === 'official_flow_intake_record' ? parsed.intake : null;
+  } catch {
+    return null;
+  }
+}
+
+function latestOfficialFlowIntakeEvidence(projectName) {
+  const rows = db
+    .prepare(`SELECT * FROM project_evidence
+              WHERE project_name = ? AND evidence_type = 'official_flow_intake'
+              ORDER BY created_at DESC, id DESC`)
+    .all(projectName);
+  for (const row of rows) {
+    const intake = officialFlowIntakeFromEvidence(row);
+    if (intake) return { evidence: row, intake };
+  }
+  return null;
+}
+
+function normalizeOfficialFlowIntake(projectName, body = {}, user = {}) {
+  const staticPsi = Number(body.staticPsi ?? body.static_psi);
+  const residualPsi = Number(body.residualPsi ?? body.residual_psi);
+  const flowingGpm = Number(body.flowingGpm ?? body.flowing_gpm);
+  for (const [field, value] of [
+    ['staticPsi', staticPsi],
+    ['residualPsi', residualPsi],
+    ['flowingGpm', flowingGpm],
+  ]) {
+    if (!Number.isFinite(value) || value <= 0) {
+      const e = new Error(`${field} must be a positive number`);
+      e.httpStatus = 400;
+      throw e;
+    }
+  }
+  if (residualPsi > staticPsi) {
+    const e = new Error('residualPsi must be less than or equal to staticPsi');
+    e.httpStatus = 400;
+    throw e;
+  }
+  const sourceRef = String(body.source_ref || body.sourceRef || '').trim();
+  if (!sourceRef) {
+    const e = new Error('source_ref is required for official-flow intake evidence');
+    e.httpStatus = 400;
+    throw e;
+  }
+  const sourceFile = String(body.source_file || body.sourceFile || '').trim() || null;
+  const reviewerName = String(body.reviewer_name || body.reviewerName || user.username || '').trim() || null;
+  return {
+    kind: 'official_flow_intake_record',
+    project_name: projectName,
+    staticPsi,
+    residualPsi,
+    flowingGpm,
+    flowDataDate: body.flowDataDate || body.flow_data_date || null,
+    waterModelRequired: body.waterModelRequired || body.water_model_required || null,
+    source_file: sourceFile,
+    source_ref: sourceRef,
+    reviewer_name: reviewerName,
+    recorded_at: body.recorded_at || body.recordedAt || new Date().toISOString(),
+    notes: body.notes || null,
+    source_status: 'employee_recorded_official_flow_intake',
+    acceptable_evidence: [
+      'official flow test report or water supply data sheet',
+      'source-linked municipal or utility water supply record',
+      'licensed professional hydraulic calculation review',
+      'AHJ-reviewed hydraulic calculation package',
+      'AutoSprink or equivalent professional hydraulic model export for parity review',
+    ],
+    blocked_claims: [...OFFICIAL_FLOW_BLOCKED_CLAIMS],
+    claim_gate_effect: 'no_claims_cleared',
+    limitations: [
+      'Employee-recorded flow values are preliminary intake evidence until official/professional review is attached.',
+      'This intake can seed hydraulic replay and issue lists, but it does not prove permit readiness, AHJ approval, PE review, engineering-grade results, AutoSprink parity, fabrication readiness, or manufacturer-exact models.',
+    ],
+  };
+}
+
+function officialFlowResolverQueueItem(projectName, matchedEvidence = null) {
+  const intake = matchedEvidence?.intake || null;
+  const facts = intake ? {
+    project: projectName,
+    sourceStatus: 'employee_recorded_official_flow_intake',
+    staticPsi: intake.staticPsi,
+    residualPsi: intake.residualPsi,
+    flowingGpm: intake.flowingGpm,
+    flowDataDate: intake.flowDataDate || null,
+    waterModelRequired: intake.waterModelRequired || null,
+    projectHeadCount: officialFlowFactsForProject(projectName).projectHeadCount,
+    projectSqft: officialFlowFactsForProject(projectName).projectSqft,
+    sourceRefs: [intake.source_ref],
+  } : officialFlowFactsForProject(projectName);
   const hasDocumentedValues = facts.sourceStatus === 'documented_bid_package_values';
-  const status = hasDocumentedValues ? 'official_flow_available' : 'official_flow_needed';
+  const hasRecordedEvidence = !!intake;
+  const status = hasRecordedEvidence
+    ? 'official_flow_evidence_recorded'
+    : (hasDocumentedValues ? 'official_flow_available' : 'official_flow_needed');
   const sourceRef = facts.sourceRefs.find((ref) => /Job Information!B3:B7/i.test(ref)) || facts.sourceRefs[0] || projectName;
   return {
     id: `resolver:official-flow:${slugForDownloadName(projectName)}`,
@@ -1510,12 +1606,14 @@ function officialFlowResolverQueueItem(projectName) {
     kind: 'official_flow_intake',
     title: 'Official flow intake and preliminary hydraulic replay',
     status,
-    evidence_id: null,
+    evidence_id: matchedEvidence?.evidence?.id || null,
     source_evidence_type: 'official_flow_intake',
     source_ref: sourceRef,
-    next_action: hasDocumentedValues
-      ? 'Use the documented bid-package water values as preliminary hydraulic replay defaults, then attach official flow test/professional hydraulic review evidence before any permit-ready or AHJ claim.'
-      : 'Attach official flow test or water supply data, enter static/residual/flowing values, and run a preliminary hydraulic replay; all regulated claims remain blocked.',
+    next_action: hasRecordedEvidence
+      ? 'Review the recorded official-flow intake evidence, run preliminary hydraulic replay for issues/questions, and attach professional/AHJ/AutoSprink evidence before any regulated claim.'
+      : (hasDocumentedValues
+        ? 'Use the documented bid-package water values as preliminary hydraulic replay defaults, then attach official flow test/professional hydraulic review evidence before any permit-ready or AHJ claim.'
+        : 'Attach official flow test or water supply data, enter static/residual/flowing values, and run a preliminary hydraulic replay; all regulated claims remain blocked.'),
     acceptable_evidence: [
       'official flow test report or water supply data sheet',
       'source-linked municipal or utility water supply record',
@@ -1539,7 +1637,14 @@ function officialFlowResolverQueueItem(projectName) {
     },
     blocked_claims: [...OFFICIAL_FLOW_BLOCKED_CLAIMS],
     claim_gate_effect: 'no_claims_cleared',
-    latest_review: null,
+    latest_review: matchedEvidence ? {
+      evidence_id: matchedEvidence.evidence.id,
+      evidence_status: matchedEvidence.evidence.status,
+      source_ref: matchedEvidence.evidence.source_ref,
+      reviewer_name: intake.reviewer_name || null,
+      recorded_at: intake.recorded_at || null,
+      claim_gate_effect: intake.claim_gate_effect || 'no_claims_cleared',
+    } : null,
     limitations: [
       'Documented or employee-entered flow values are preliminary intake evidence until official/professional review is attached.',
       'This resolver item can seed hydraulic replay and issue lists, but it does not prove permit readiness, AHJ approval, PE review, engineering-grade results, AutoSprink parity, fabrication readiness, or manufacturer-exact models.',
@@ -1846,7 +1951,8 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
   const decision = decisionFromEvidence(evidence);
   const reviewEvidence = evidence ? latestPdfBoundaryReviewEvidence(projectName, evidence.id) : null;
   const items = [];
-  const officialFlowItem = officialFlowResolverQueueItem(projectName);
+  const officialFlowEvidence = latestOfficialFlowIntakeEvidence(projectName);
+  const officialFlowItem = officialFlowResolverQueueItem(projectName, officialFlowEvidence);
   if (officialFlowItem) items.push(officialFlowItem);
   const boundaryItem = pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence);
   if (boundaryItem) items.push(boundaryItem);
@@ -1877,8 +1983,43 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
       catalog_evidence_recorded: statusCounts.catalog_evidence_recorded || 0,
       official_flow_available: statusCounts.official_flow_available || 0,
       official_flow_needed: statusCounts.official_flow_needed || 0,
+      official_flow_evidence_recorded: statusCounts.official_flow_evidence_recorded || 0,
     },
   });
+});
+
+app.post('/api/projects/:name/resolver-packets/official-flow/intake', authMiddleware, requireRole('admin'), (req, res) => {
+  try {
+    const projectName = req.params.name;
+    const intake = normalizeOfficialFlowIntake(projectName, req.body, req.user);
+    const packet = {
+      kind: 'official_flow_intake_record',
+      project_name: projectName,
+      intake,
+      stored_at: new Date().toISOString(),
+      no_claim_gates_cleared: true,
+    };
+    const result = db
+      .prepare(`INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+                VALUES (?, ?, ?, ?, ?, ?)`)
+      .run(
+        projectName,
+        'official_flow_intake',
+        intake.source_file,
+        intake.source_ref,
+        'present',
+        JSON.stringify(packet),
+      );
+    const evidenceRow = db.prepare('SELECT * FROM project_evidence WHERE id = ?').get(result.lastInsertRowid);
+    res.status(201).json({
+      id: result.lastInsertRowid,
+      message: 'Official-flow intake evidence recorded for preliminary hydraulic replay; claims still blocked',
+      evidence: evidenceRow,
+      intake,
+    });
+  } catch (err) {
+    res.status(err.httpStatus || 400).json({ error: err.message });
+  }
 });
 
 app.get('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId', authMiddleware, (req, res) => {
