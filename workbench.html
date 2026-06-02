@@ -1418,6 +1418,67 @@ async function downloadSuppliedDocumentBidTruthReviewPacket() {
   URL.revokeObjectURL(a.href);
 }
 
+let lastSuppliedBidTruthDownstreamDefaults = null;
+
+function renderSuppliedBidTruthDownstreamDefaults(defaults, bid, floorPlan) {
+  if (!defaults || typeof defaults !== 'object') return '';
+  const truth = defaults.project_truth || {};
+  const blocked = Array.isArray(defaults.blocked_claims) ? defaults.blocked_claims : [];
+  const replaced = Array.isArray(defaults.replaced_fields) ? defaults.replaced_fields : [];
+  return `<div class="gate warning" id="bidTruthDefaultsCard" style="margin-top:10px">
+    <div class="code">supplied bid-truth downstream defaults - ${escapeHtml(defaults.status || 'employee_replacement_applied')}</div>
+    <div class="na">${escapeHtml(defaults.artifact_type || 'halofire.supplied_document_bid_truth_downstream_defaults.v1')} - ${escapeHtml(defaults.temporary_value_policy || 'best_guess_until_employee_replaced')}</div>
+    <div class="claims">source_evidence_type ${escapeHtml(defaults.source_evidence_type || 'supplied_document_bid_truth_replacement')} - source_supplied_document_bid_truth_replacement_evidence_id ${escapeHtml(defaults.source_replacement_evidence_id || 'missing')} - claim_gate_effect ${escapeHtml(defaults.claim_gate_effect || 'no_claims_cleared')}</div>
+    <div class="claims">Applied defaults: square_feet ${escapeHtml(truth.square_feet ?? bid?.totalAreaSqFt ?? 'missing')} - head_count ${escapeHtml(truth.head_count ?? 'metadata_only')} - total_man_hours ${escapeHtml(truth.total_man_hours ?? 'missing')} - construction_days ${escapeHtml(truth.construction_days ?? 'missing')}</div>
+    <div class="claims">Engine result: totalAreaSqFt ${escapeHtml(bid?.totalAreaSqFt ?? 'missing')} - totalHeadCount ${escapeHtml(bid?.totalHeadCount ?? 'missing')} - floorPlan.source ${escapeHtml(floorPlan?.source || 'missing')}</div>
+    <div class="claims">Replaced fields: ${replaced.length ? replaced.map((field) => `<span class="chip">${escapeHtml(field)}</span>`).join('') : '<span class="chip">none listed</span>'}</div>
+    <div class="claims">Blocks: ${blocked.length ? blocked.map((claim) => `<span class="chip">${escapeHtml(claim)}</span>`).join('') : '<span class="chip">claim gates remain blocked</span>'}</div>
+    <p style="margin-top:8px">
+      <button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#0f766e" data-supplied-bid-truth-downstream-download="1">Download downstream defaults evidence</button>
+      <button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#b45309" data-supplied-document-bid-truth-focus-replacement="1">Update employee replacement values</button>
+    </p>
+    <div class="est">This is internal-alpha bid replay support only; no_claims_cleared remains active.</div>
+  </div>`;
+}
+
+function downloadSuppliedBidTruthDownstreamDefaults() {
+  if (!lastSuppliedBidTruthDownstreamDefaults) return;
+  const packet = {
+    ...lastSuppliedBidTruthDownstreamDefaults,
+    source_supplied_document_bid_truth_replacement_evidence_id: lastSuppliedBidTruthDownstreamDefaults.source_replacement_evidence_id || null,
+    downloaded_from: 'halofire-workbench-sprinkler-bid-result',
+    use_for_claims: false,
+    no_claim_gates_cleared: true,
+    claim_gate_effect: 'no_claims_cleared',
+  };
+  const blob = new Blob([JSON.stringify(packet, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${currentProjectName().replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '').toLowerCase()}-supplied-bid-truth-downstream-defaults.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function focusSuppliedBidTruthReplacementForm() {
+  const target = document.getElementById('suppliedBidTruthReplacementValues')
+    || document.getElementById('suppliedBidTruthReplacementRef')
+    || document.getElementById('suppliedBidTruthReviewer');
+  if (!target) return;
+  const details = target.closest('details');
+  if (details) details.open = true;
+  target.focus();
+  target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function bindSuppliedBidTruthDownstreamButtons() {
+  document.querySelectorAll('[data-supplied-bid-truth-downstream-download]').forEach((button) => {
+    button.onclick = () => downloadSuppliedBidTruthDownstreamDefaults();
+  });
+  document.querySelectorAll('[data-supplied-document-bid-truth-focus-replacement]').forEach((button) => {
+    button.onclick = () => focusSuppliedBidTruthReplacementForm();
+  });
+}
+
 async function saveSuppliedDocumentBidTruthReplacement() {
   const status = document.getElementById('suppliedBidTruthStatus');
   try {
@@ -2236,9 +2297,10 @@ async function runBid(extraBody, btn) {
   const orig = btn.textContent; btn.disabled = true; btn.textContent = 'Generating…';
   try {
     lastBody = { markupPct: 25, ...extraBody };
-    const { bid, scene: sceneData, cadModel } = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/sprinkler-bid', {
+    const { bid, floorPlan, suppliedDocumentBidTruth, scene: sceneData, cadModel } = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/sprinkler-bid', {
       method: 'POST', body: JSON.stringify(lastBody),
     });
+    lastSuppliedBidTruthDownstreamDefaults = suppliedDocumentBidTruth || null;
     const r = bid.rooms[0];
     document.getElementById('bidSummary').innerHTML = `
       <div class="kv"><span>Total area</span><b>${bid.totalAreaSqFt.toLocaleString()} sqft</b></div>
@@ -2247,7 +2309,9 @@ async function runBid(extraBody, btn) {
       <div class="kv"><span>Material</span><b>${usd(bid.pricing.materialCost)}</b></div>
       <div class="kv"><span>Labor</span><b>${usd(bid.pricing.laborCost)}</b></div>
       <div class="kv"><span>Best-effort total (+${bid.pricing.markupPct}%)</span><b>${usd(bid.pricing.total)}</b></div>
-      ${bid.pricing.anyEstimated ? '<div class="est">⚠ some unit costs are fallback estimates (no pricebook match)</div>' : ''}`;
+      ${bid.pricing.anyEstimated ? '<div class="est">⚠ some unit costs are fallback estimates (no pricebook match)</div>' : ''}
+      ${renderSuppliedBidTruthDownstreamDefaults(suppliedDocumentBidTruth, bid, floorPlan)}`;
+    bindSuppliedBidTruthDownstreamButtons();
 
     document.getElementById('bomCard').style.display = '';
     document.getElementById('bom').innerHTML = `<table>
@@ -2272,6 +2336,7 @@ async function runBid(extraBody, btn) {
 let lastBody = { markupPct: 25 };
 document.getElementById('projectTarget').onchange = () => {
   lastBody = { markupPct: 25 };
+  lastSuppliedBidTruthDownstreamDefaults = null;
   document.getElementById('bidSummary').innerHTML = '';
   document.getElementById('bomCard').style.display = 'none';
   load();

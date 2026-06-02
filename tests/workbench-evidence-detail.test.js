@@ -69,4 +69,17 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toContain('source_ref');
     expect(html).toContain('employee_notes');
   });
+
+  it('surfaces supplied bid-truth downstream defaults on sprinkler bid results without clearing claims', async () => {
+    const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
+    expect(shell.status).toBe(200);
+    const html = await shell.text();
+    expect(html).toContain('renderSuppliedBidTruthDownstreamDefaults');
+    expect(html).toContain('bidTruthDefaultsCard');
+    expect(html).toContain('data-supplied-bid-truth-downstream-download');
+    expect(html).toContain('source_supplied_document_bid_truth_replacement_evidence_id');
+    expect(html).toContain('employee_replacement_applied');
+    expect(html).toContain('supplied_document_bid_truth_replacement');
+    expect(html).toContain('no_claims_cleared');
+  });
 });
