@@ -587,6 +587,10 @@ function evidenceDetail(row) {
   }
   try {
     const packet = JSON.parse(row.notes || '{}');
+    if (packet.kind === 'catalog_source_approval_validation') {
+      const signoff = packet.signoff || {};
+      return `<div class="muted" style="font-size:11px;margin-top:3px">catalog approval validation · family ${escapeHtml(packet.family_ref || 'missing')} · component ${escapeHtml(packet.component_key || 'missing')}<br>approval_ref_field ${escapeHtml(packet.approval_ref_field || 'missing')} · target_gate_code ${escapeHtml(packet.target_gate_code || 'missing')} · source_catalog_ref ${escapeHtml(packet.source_catalog_ref || 'missing')}<br>${escapeHtml(signoff.reviewer_name || 'unknown reviewer')} · ${escapeHtml(signoff.reviewer_title || 'title missing')} · signed_at ${escapeHtml(signoff.signed_at || 'missing')} · license ${escapeHtml(signoff.license_id || 'missing')}<br>claim_gate_effect ${escapeHtml(packet.claim_gate_effect || 'no_claims_cleared')} · ${escapeHtml(packet.user_notes || 'signed catalog approval evidence recorded')}</div>`;
+    }
     if (packet.kind === 'signed_reviewer_evidence') {
       const signoff = packet.signoff || {};
       return `<div class="muted" style="font-size:11px;margin-top:3px">signed reviewer evidence · ${escapeHtml(signoff.reviewer_name || 'unknown reviewer')} · ${escapeHtml(signoff.reviewer_title || 'title missing')}<br>signed_at ${escapeHtml(signoff.signed_at || 'missing')} · organization ${escapeHtml(signoff.organization || 'missing')} · license ${escapeHtml(signoff.license_id || 'missing')}<br>claim_gate_effect ${escapeHtml(packet.claim_gate_effect || 'no_claims_cleared')} · ${escapeHtml(packet.user_notes || 'review metadata recorded only; no claim gates cleared')}</div>`;
@@ -725,6 +729,71 @@ async function downloadCatalogSourceEvidencePacket(familyRef) {
   URL.revokeObjectURL(a.href);
 }
 
+const CATALOG_APPROVAL_GATE_OPTIONS = [
+  {
+    approval_ref_field: 'manufacturer_model_approval_ref',
+    gate_code: 'MANUFACTURER_MODEL_APPROVAL_MISSING',
+    evidence_type: 'manufacturer_approval',
+    label: 'MANUFACTURER_MODEL_APPROVAL_MISSING - manufacturer_approval',
+    action_label: 'Upload signed manufacturer model approval',
+  },
+  {
+    approval_ref_field: 'professional_or_ahj_review_ref',
+    gate_code: 'PROFESSIONAL_REVIEW_MISSING',
+    evidence_type: 'professional_review',
+    label: 'PROFESSIONAL_REVIEW_MISSING - professional_review',
+    action_label: 'Upload signed professional review',
+  },
+  {
+    approval_ref_field: 'professional_or_ahj_review_ref',
+    gate_code: 'AHJ_APPROVAL_MISSING',
+    evidence_type: 'ahj_approval',
+    label: 'AHJ_APPROVAL_MISSING - ahj_approval',
+    action_label: 'Upload signed AHJ approval',
+  },
+  {
+    approval_ref_field: 'autosprink_or_equivalent_export_ref',
+    gate_code: 'AUTOSPRINK_EVIDENCE_MISSING',
+    evidence_type: 'autosprink_packet',
+    label: 'AUTOSPRINK_EVIDENCE_MISSING - autosprink_packet',
+    action_label: 'Upload signed AutoSprink/equivalent export',
+  },
+];
+
+function renderCatalogApprovalGateOptions() {
+  return CATALOG_APPROVAL_GATE_OPTIONS.map((option) => `
+        <option value="${escapeHtml(option.gate_code)}" data-approval-ref-field="${escapeHtml(option.approval_ref_field)}" data-evidence-type="${escapeHtml(option.evidence_type)}" data-action-label="${escapeHtml(option.action_label)}">${escapeHtml(option.label)}</option>`).join('');
+}
+
+function syncCatalogApprovalGateOptions(rowKey) {
+  const refSelect = document.getElementById('catalogApprovalRefField-' + rowKey);
+  const gateSelect = document.getElementById('catalogApprovalTargetGate-' + rowKey);
+  const nextAction = document.getElementById('catalogApprovalNextAction-' + rowKey);
+  const button = document.querySelector('[data-catalog-source-approval-row-key="' + CSS.escape(String(rowKey)) + '"]');
+  if (!refSelect || !gateSelect) return;
+  const selectedField = refSelect.value;
+  let firstAllowed = null;
+  Array.from(gateSelect.options).forEach((option) => {
+    const allowed = option.dataset.approvalRefField === selectedField;
+    option.disabled = !allowed;
+    option.hidden = !allowed;
+    if (allowed && !firstAllowed) firstAllowed = option;
+  });
+  if (!gateSelect.selectedOptions.length || gateSelect.selectedOptions[0].disabled) {
+    gateSelect.value = firstAllowed ? firstAllowed.value : '';
+  }
+  const selectedGate = gateSelect.selectedOptions[0] || firstAllowed;
+  const actionLabel = selectedGate?.dataset.actionLabel || 'Upload signed catalog approval evidence';
+  const evidenceType = selectedGate?.dataset.evidenceType || 'signed evidence';
+  if (nextAction) {
+    nextAction.textContent = 'Next action: ' + actionLabel + ' (' + evidenceType + ')';
+  }
+  if (button) {
+    button.textContent = actionLabel;
+    button.dataset.catalogSourceApprovalAction = actionLabel;
+  }
+}
+
 function renderCatalogSourceApprovalValidation(defaults) {
   const rowKey = escapeHtml(defaults.family_ref || defaults.component_key || 'unknown');
   return `<details style="margin-top:8px">
@@ -736,11 +805,9 @@ function renderCatalogSourceApprovalValidation(defaults) {
         <option value="autosprink_or_equivalent_export_ref">autosprink_or_equivalent_export_ref</option>
       </select>
       <select id="catalogApprovalTargetGate-${rowKey}" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
-        <option value="MANUFACTURER_MODEL_APPROVAL_MISSING">MANUFACTURER_MODEL_APPROVAL_MISSING</option>
-        <option value="PROFESSIONAL_REVIEW_MISSING">PROFESSIONAL_REVIEW_MISSING</option>
-        <option value="AHJ_APPROVAL_MISSING">AHJ_APPROVAL_MISSING</option>
-        <option value="AUTOSPRINK_EVIDENCE_MISSING">AUTOSPRINK_EVIDENCE_MISSING</option>
+${renderCatalogApprovalGateOptions()}
       </select>
+      <div class="muted" id="catalogApprovalNextAction-${rowKey}" style="font-size:11px">Next action: Upload signed manufacturer model approval (manufacturer_approval)</div>
       <input id="catalogApprovalSourceRef-${rowKey}" placeholder="approval source_ref" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
       <input id="catalogApprovalSourceFile-${rowKey}" placeholder="approval source_file" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
       <input id="catalogApprovalReviewerName-${rowKey}" placeholder="reviewer_name" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
@@ -749,7 +816,7 @@ function renderCatalogSourceApprovalValidation(defaults) {
       <input id="catalogApprovalOrganization-${rowKey}" placeholder="organization (optional)" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
       <input id="catalogApprovalLicenseId-${rowKey}" placeholder="license_id (optional)" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
       <textarea id="catalogApprovalNotes-${rowKey}" placeholder="notes" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px;height:44px"></textarea>
-      <button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#15803d" data-catalog-source-approval-family-ref="${escapeHtml(defaults.family_ref || '')}" data-catalog-source-approval-row-key="${rowKey}">Validate catalog approval gate</button>
+      <button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#15803d" data-catalog-source-approval-family-ref="${escapeHtml(defaults.family_ref || '')}" data-catalog-source-approval-row-key="${rowKey}" data-catalog-source-approval-action="Upload signed manufacturer model approval">Upload signed manufacturer model approval</button>
       <div class="muted" id="catalogApprovalValidationStatus-${rowKey}" style="font-size:11px"></div>
     </div>
   </details>`;
@@ -793,6 +860,13 @@ function bindCatalogSourceEvidenceButtons() {
   });
   document.querySelectorAll('[data-catalog-source-packet-family-ref]').forEach((button) => {
     button.onclick = () => downloadCatalogSourceEvidencePacket(button.dataset.catalogSourcePacketFamilyRef);
+  });
+  document.querySelectorAll('[id^="catalogApprovalRefField-"]').forEach((select) => {
+    const rowKey = select.id.replace('catalogApprovalRefField-', '');
+    select.onchange = () => syncCatalogApprovalGateOptions(rowKey);
+    const gateSelect = document.getElementById('catalogApprovalTargetGate-' + rowKey);
+    if (gateSelect) gateSelect.onchange = () => syncCatalogApprovalGateOptions(rowKey);
+    syncCatalogApprovalGateOptions(rowKey);
   });
   document.querySelectorAll('[data-catalog-source-approval-family-ref]').forEach((button) => {
     button.onclick = () => validateCatalogSourceApproval(button);
