@@ -307,6 +307,8 @@ function resolverQueueDetail(item) {
   const claims = Array.isArray(item.blocked_claims) ? item.blocked_claims : [];
   const acceptable = Array.isArray(item.acceptable_evidence) ? item.acceptable_evidence : [];
   const latest_review = item.latest_review || null;
+  const latest_sam31_visual_audit = item.latest_sam31_visual_audit || null;
+  const replay_review = latest_review || latest_sam31_visual_audit;
   const evidenceId = escapeHtml(item.evidence_id);
   const actions = Array.isArray(item.actions) ? item.actions : [];
   if (item.kind === 'catalog_vendor_acquisition') {
@@ -382,7 +384,7 @@ function resolverQueueDetail(item) {
       <div class="code">${escapeHtml(item.kind)} · ${escapeHtml(item.status).toUpperCase()}</div>
       <div class="na">${escapeHtml(item.next_action)}</div>
       <div class="claims">Defaults: page ${escapeHtml(defaults.pdfPageIndex)} · scale ${escapeHtml(defaults.pdfScale)} ft/pt · ${escapeHtml(defaults.pdfExtract)}</div>
-      ${latest_review ? `<div class="claims">Review: ${escapeHtml(latest_review.review_decision)} by ${escapeHtml(latest_review.reviewer_name || 'unknown')} - issues ${escapeHtml(latest_review.issue_count)} - corrected polygons ${escapeHtml(latest_review.corrected_room_polygon_count)} - ${escapeHtml(latest_review.marked_up_plan_ref || '')}</div>` : ''}
+      ${replay_review ? `<div class="claims">Review: ${escapeHtml(replay_review.review_decision)} by ${escapeHtml(replay_review.reviewer_name || 'unknown')} - issues ${escapeHtml(replay_review.issue_count)} - corrected polygons ${escapeHtml(replay_review.corrected_room_polygon_count)} - ${escapeHtml(replay_review.marked_up_plan_ref || '')}</div>` : ''}
       <div class="claims">Accepts: ${acceptable.map((e) => `<span class="chip">${escapeHtml(e)}</span>`).join('')}</div>
       <div class="claims">AI fallback: ${escapeHtml(item.ai_fallback || '')}</div>
       <div class="claims">Blocks: ${claims.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('')}</div>
@@ -408,8 +410,8 @@ function resolverQueueDetail(item) {
           <div class="muted" id="sam31AuditStatus-${evidenceId}" style="font-size:11px"></div>
         </div>
       </details>
-      ${latest_review && item.status !== 'blocked' ? `<p style="margin-top:8px"><button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#3b82f6" data-resolver-replay-evidence-id="${escapeHtml(item.evidence_id)}">Download replay input</button></p>` : ''}
-      ${latest_review && item.status !== 'blocked' ? `<p style="margin-top:8px"><button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#4f46e5" data-resolver-replay-bid-evidence-id="${escapeHtml(item.evidence_id)}">Run replay bid</button></p><div class="muted" id="replayBidStatus-${evidenceId}" style="font-size:11px"></div>` : ''}
+      ${replay_review && item.status !== 'blocked' ? `<p style="margin-top:8px"><button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#3b82f6" data-resolver-replay-evidence-id="${escapeHtml(item.evidence_id)}">Download replay input</button></p>` : ''}
+      ${replay_review && item.status !== 'blocked' ? `<p style="margin-top:8px"><button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#4f46e5" data-resolver-replay-bid-evidence-id="${escapeHtml(item.evidence_id)}">Run replay bid</button></p><div class="muted" id="replayBidStatus-${evidenceId}" style="font-size:11px"></div>` : ''}
       <details style="margin-top:8px">
         <summary class="muted" style="cursor:pointer">Record review decision</summary>
         <div style="display:grid;gap:6px;margin-top:8px">

@@ -227,6 +227,7 @@ describe('studio static origin handling', () => {
     expect(html).toContain('data-resolver-replay-bid-evidence-id');
     expect(html).toContain('marked_up_plan_ref');
     expect(html).toContain('latest_review');
+    expect(html).toContain('latest_sam31_visual_audit');
     expect(html).toContain('Review:');
   });
 
