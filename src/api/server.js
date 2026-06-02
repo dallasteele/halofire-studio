@@ -36,6 +36,7 @@ import { homeDepotRexburgFloorPlan, cooperative1881FloorPlan, COOPERATIVE_1881_P
 import { HOME_DEPOT_PROJECT_NAME } from '../data/evidence-gates.js';
 import { readHomeDepotBidPackage, readHomeDepotRealTakeoff } from '../data/home-depot-bid-package.js';
 import { readCooperative1881BidPackage, readCooperative1881RealTakeoff } from '../data/cooperative-1881-bid-package.js';
+import { buildPlanSegmentationPayload } from '../components/sam-floorplan.js';
 import { buildSamInvoker } from './sam-invoker.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -1360,6 +1361,7 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
     ],
     actions: [
       { label: 'Load defaults in Studio', href: `/autosprink.html?project=${encodeURIComponent(projectName)}&resolver=${encodeURIComponent(`pdf-boundary:${evidence.id}`)}` },
+      { label: 'Download SAM 3.1 visual audit packet', href: `/api/projects/${encodeURIComponent(projectName)}/resolver-packets/pdf-boundary/${evidence.id}/sam31-visual-audit` },
       { label: 'View source evidence', href: `/workbench.html?project=${encodeURIComponent(projectName)}#evidence-${evidence.id}` },
     ],
   };
@@ -2121,6 +2123,116 @@ function pdfBoundaryReviewPacket(projectName, evidence, decision) {
   };
 }
 
+function pdfBoundarySam31VisualAuditPacket(projectName, evidence, decision) {
+  const queueItem = pdfBoundaryResolverQueueItem(projectName, evidence, decision);
+  if (!queueItem) return null;
+  const candidate = decision.candidate || {};
+  const pdfRef = evidence.source_file || decision.sourceFile || evidence.source_ref || decision.sourceRef || `${projectName}:pdf-boundary:${evidence.id}`;
+  const bridgeHost = process.env.HALOFIRE_SAM31_BRIDGE_HOST || '127.0.0.1';
+  const bridgePort = Number(process.env.HALOFIRE_SAM31_BRIDGE_PORT || 15000);
+  return {
+    artifact_type: 'sam31_room_boundary_visual_audit_packet',
+    status: 'ready_for_sam31_visual_audit',
+    project_name: projectName,
+    source_evidence_id: evidence.id,
+    source_evidence_type: 'pdf_boundary_decision',
+    source_ref: evidence.source_ref || decision.sourceRef || null,
+    source_file: evidence.source_file || decision.sourceFile || null,
+    source_runtime: 'sam-3.1',
+    coordinate_frame_ref: 'rendered_pdf_page_pixels_scaled_to_feet_by_pdfScale',
+    unit: 'feet',
+    semantic_label: 'room_boundary_visual_audit',
+    generated_at: new Date().toISOString(),
+    download_name: `${slugForDownloadName(projectName)}-sam31-room-boundary-visual-audit-packet-${evidence.id}.json`,
+    sam31_request: buildPlanSegmentationPayload({
+      pdfRef,
+      pageIndex: decision.pageIndex,
+      scale: decision.scale,
+      targets: ['building_outline', 'walls', 'rooms', 'layers'],
+    }),
+    bridge: {
+      openclaw_bridge_url_configured: !!String(process.env.OPENCLAW_BRIDGE_URL || '').trim(),
+      local_bridge_host: bridgeHost,
+      local_bridge_port: Number.isSafeInteger(bridgePort) ? bridgePort : 15000,
+      local_bridge_status_url: `http://${bridgeHost}:${Number.isSafeInteger(bridgePort) ? bridgePort : 15000}/status`,
+      local_bridge_invoke_url: `http://${bridgeHost}:${Number.isSafeInteger(bridgePort) ? bridgePort : 15000}/codex-bridge/invoke`,
+      local_bridge_command: 'npm run sam31:bridge',
+    },
+    input_defaults: queueItem.input_defaults,
+    candidate_summary: {
+      mode: candidate.mode || decision.extractMode,
+      label: candidate.label || candidate.mode || decision.extractMode,
+      status: candidate.status || 'candidate',
+      bbox: candidate.bbox || null,
+      segmentCount: candidate.segmentCount ?? null,
+      method: candidate.method || null,
+    },
+    employee_capture_fields: [
+      'sam31_result_ref',
+      'screenshot_ref',
+      'console_log_ref',
+      'marked_up_plan_ref',
+      'issue_list',
+      'corrected_room_polygons',
+      'review_decision',
+      'reviewer_name',
+      'notes',
+    ],
+    supported_evidence_lanes: [
+      'room_boundary_visual_audit',
+      'spatial_observation_correction_loop',
+      'best_effort_ai_layout_replay',
+    ],
+    source_refs: [
+      {
+        evidence_id: evidence.id,
+        evidence_type: evidence.evidence_type,
+        source_file: evidence.source_file || decision.sourceFile || null,
+        source_ref: evidence.source_ref || decision.sourceRef || null,
+        status: evidence.status,
+      },
+    ],
+    review_steps: [
+      'Start or connect the SAM 3.1 bridge, then run sam31_request through the OpenClaw/SAM bridge envelope.',
+      'Attach the raw SAM 3.1 result, screenshot, and console/log evidence refs before using the visual audit for correction.',
+      'Compare SAM building_outline, walls, and rooms against the selected PDF sheet and record every mismatch.',
+      'Save corrected room polygons as employee review evidence before replaying the sprinkler bid.',
+    ],
+    issue_list_template: [
+      {
+        issue_type: 'sam31_visual_boundary_mismatch',
+        severity: 'blocking',
+        source_ref: evidence.source_ref || decision.sourceRef || null,
+        observed: '',
+        expected: '',
+        required_action: 'Mark up the visual mismatch and provide corrected room polygons before replay.',
+      },
+      {
+        issue_type: 'sam31_runtime_or_scale_uncertainty',
+        severity: 'blocking',
+        source_ref: evidence.source_ref || decision.sourceRef || null,
+        observed: '',
+        expected: '',
+        required_action: 'Confirm the SAM 3.1 runtime, selected sheet, and operator scale before relying on the segmentation for correction.',
+      },
+    ],
+    acceptable_evidence: [
+      'SAM 3.1 segmentation result JSON',
+      'OpenClaw/SAM console or screenshot evidence',
+      'source-linked marked-up plan screenshot',
+      'employee corrected room polygon list',
+      'licensed professional review/signoff for regulated claims',
+    ],
+    blocked_claims: queueItem.blocked_claims,
+    claim_gate_effect: 'no_claims_cleared',
+    limitations: [
+      'This packet prepares a SAM 3.1 visual audit/correction run from saved PDF boundary evidence.',
+      'SAM/OpenClaw observations are measurement and correction evidence only.',
+      'This packet does not prove geometry accuracy, drawing scale, AHJ approval, PE review, AutoSprink parity, permit readiness, fabrication readiness, or manufacturer-exact models.',
+    ],
+  };
+}
+
 function pdfBoundaryReplayInputPacket(projectName, evidence, decision, reviewEvidence) {
   if (!evidence || !decision || !reviewEvidence?.review) return null;
   const review = reviewEvidence.review;
@@ -2499,6 +2611,24 @@ app.get('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId', authMid
     .get(evidenceId, projectName);
   const decision = decisionFromEvidence(evidence);
   const packet = pdfBoundaryReviewPacket(projectName, evidence, decision);
+  if (!packet) {
+    return res.status(404).json({ error: 'PDF boundary decision evidence not found' });
+  }
+  res.json(packet);
+});
+
+app.get('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/sam31-visual-audit', authMiddleware, (req, res) => {
+  const projectName = req.params.name;
+  const evidenceId = Number(req.params.evidenceId);
+  if (!Number.isSafeInteger(evidenceId) || evidenceId <= 0) {
+    return res.status(400).json({ error: 'A positive evidence id is required' });
+  }
+  const evidence = db
+    .prepare(`SELECT * FROM project_evidence
+              WHERE id = ? AND project_name = ? AND evidence_type = 'pdf_boundary_decision'`)
+    .get(evidenceId, projectName);
+  const decision = decisionFromEvidence(evidence);
+  const packet = pdfBoundarySam31VisualAuditPacket(projectName, evidence, decision);
   if (!packet) {
     return res.status(404).json({ error: 'PDF boundary decision evidence not found' });
   }

@@ -387,6 +387,7 @@ function resolverQueueDetail(item) {
       <div class="claims">AI fallback: ${escapeHtml(item.ai_fallback || '')}</div>
       <div class="claims">Blocks: ${claims.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('')}</div>
       <p style="margin-top:8px"><button class="go" type="button" style="padding:7px 10px;font-size:11px" data-resolver-packet-evidence-id="${escapeHtml(item.evidence_id)}">Download review packet</button></p>
+      <p style="margin-top:8px"><button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#0f766e" data-sam31-visual-audit-evidence-id="${escapeHtml(item.evidence_id)}">Download SAM 3.1 visual audit packet</button></p>
       ${latest_review && item.status !== 'blocked' ? `<p style="margin-top:8px"><button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#3b82f6" data-resolver-replay-evidence-id="${escapeHtml(item.evidence_id)}">Download replay input</button></p>` : ''}
       ${latest_review && item.status !== 'blocked' ? `<p style="margin-top:8px"><button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#4f46e5" data-resolver-replay-bid-evidence-id="${escapeHtml(item.evidence_id)}">Run replay bid</button></p><div class="muted" id="replayBidStatus-${evidenceId}" style="font-size:11px"></div>` : ''}
       <details style="margin-top:8px">
@@ -415,6 +416,16 @@ async function downloadResolverPacket(evidenceId) {
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = packet.download_name || 'room-boundary-review-packet.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+async function downloadSam31VisualAuditPacket(evidenceId) {
+  const packet = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/resolver-packets/pdf-boundary/' + encodeURIComponent(evidenceId) + '/sam31-visual-audit');
+  const blob = new Blob([JSON.stringify(packet, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = packet.download_name || 'sam31-room-boundary-visual-audit-packet.json';
   a.click();
   URL.revokeObjectURL(a.href);
 }
@@ -597,6 +608,9 @@ async function refreshResolverQueue() {
     : '<span class="muted">No resolver queue rows yet. Save a PDF boundary decision for room_boundary_visual_audit, record official_flow_intake, or run catalog acquisition for catalog_vendor_acquisition.</span>';
   document.querySelectorAll('[data-resolver-packet-evidence-id]').forEach((button) => {
     button.onclick = () => downloadResolverPacket(button.dataset.resolverPacketEvidenceId);
+  });
+  document.querySelectorAll('[data-sam31-visual-audit-evidence-id]').forEach((button) => {
+    button.onclick = () => downloadSam31VisualAuditPacket(button.dataset.sam31VisualAuditEvidenceId);
   });
   document.querySelectorAll('[data-resolver-replay-evidence-id]').forEach((button) => {
     button.onclick = () => downloadResolverReplayInput(button.dataset.resolverReplayEvidenceId);

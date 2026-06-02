@@ -193,6 +193,10 @@ describe('studio static origin handling', () => {
     expect(html).toContain('downloadResolverPacket');
     expect(html).toContain('/resolver-packets/pdf-boundary/');
     expect(html).toContain('Download review packet');
+    expect(html).toContain('downloadSam31VisualAuditPacket');
+    expect(html).toContain('/sam31-visual-audit');
+    expect(html).toContain('Download SAM 3.1 visual audit packet');
+    expect(html).toContain('data-sam31-visual-audit-evidence-id');
   });
 
   it('lets the workbench save employee room-boundary review decisions', async () => {

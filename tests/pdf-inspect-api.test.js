@@ -85,6 +85,7 @@ beforeAll(async () => {
       HALOFIRE_ADMIN_PASSWORD: 'pdf-inspect-test-pw',
       HALOFIRE_ALLOW_DEV_DEFAULTS: '0',
       HALOFIRE_CORS_ORIGINS: 'http://allowed.test',
+      OPENCLAW_BRIDGE_URL: '',
     },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
@@ -305,6 +306,56 @@ describe('PDF page inspection API', () => {
     expect(packet.blocked_claims).toEqual(expect.arrayContaining(['geometry_accuracy', 'AutoSprink_parity', 'permit_ready']));
     expect(packet.claim_gate_effect).toBe('no_claims_cleared');
     expect(packet.limitations.join(' ')).toMatch(/does not prove/i);
+
+    const samPacketRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${body.evidence.id}/sam31-visual-audit`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(samPacketRes.status).toBe(200);
+    const samPacket = await samPacketRes.json();
+    expect(samPacket).toEqual(expect.objectContaining({
+      artifact_type: 'sam31_room_boundary_visual_audit_packet',
+      status: 'ready_for_sam31_visual_audit',
+      project_name: COOPERATIVE_1881_PROJECT_NAME,
+      source_evidence_id: body.evidence.id,
+      source_evidence_type: 'pdf_boundary_decision',
+      source_runtime: 'sam-3.1',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(samPacket.download_name).toContain('sam31-room-boundary-visual-audit-packet');
+    expect(samPacket.sam31_request).toEqual(expect.objectContaining({
+      service: 'sam-3.1',
+      op: 'segment_floorplan',
+      pageIndex: 7,
+      scale: 0.0833,
+      pdfRef: expect.any(String),
+    }));
+    expect(samPacket.sam31_request.targets).toEqual(expect.arrayContaining(['building_outline', 'walls', 'rooms', 'layers']));
+    expect(samPacket.bridge).toEqual(expect.objectContaining({
+      openclaw_bridge_url_configured: false,
+      local_bridge_command: 'npm run sam31:bridge',
+    }));
+    expect(samPacket.employee_capture_fields).toEqual(expect.arrayContaining([
+      'sam31_result_ref',
+      'screenshot_ref',
+      'console_log_ref',
+      'marked_up_plan_ref',
+      'issue_list',
+      'corrected_room_polygons',
+    ]));
+    expect(samPacket.supported_evidence_lanes).toEqual(expect.arrayContaining([
+      'room_boundary_visual_audit',
+      'spatial_observation_correction_loop',
+    ]));
+    expect(samPacket.source_refs).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        evidence_id: body.evidence.id,
+        evidence_type: 'pdf_boundary_decision',
+      }),
+    ]));
+    expect(samPacket.blocked_claims).toEqual(
+      expect.arrayContaining(['geometry_accuracy', 'permit_ready', 'AHJ_approval', 'PE_review', 'AutoSprink_parity']),
+    );
+    expect(samPacket.limitations.join(' ')).toMatch(/does not prove/i);
 
     const reviewRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${body.evidence.id}/reviews`, {
       method: 'POST',
