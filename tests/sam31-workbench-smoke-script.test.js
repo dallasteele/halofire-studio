@@ -101,5 +101,11 @@ describe('SAM31 workbench browser smoke script', () => {
     expect(script).toContain('best_guess_until_employee_replaced');
     expect(script).toContain('Download full SAM31 packet');
     expect(script).toContain('no_claims_cleared');
+    expect(script).toContain('Next action: Upload signed manufacturer model approval');
+    expect(script).toContain('Upload signed professional review');
+    expect(script).toContain('Upload signed AHJ approval');
+    expect(script).toContain('Upload signed AutoSprink/equivalent export');
+    expect(script).toContain('disabledManufacturerGate');
+    expect(script).toContain('catalogApprovalTargetGate');
   });
 });

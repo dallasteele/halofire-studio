@@ -361,6 +361,36 @@ async function runBrowserSmoke(token, evidenceIds) {
       button.closest('details')?.setAttribute('open', '');
     });
     const catalogRowKey = 'family:pipe_steel_sch40_2p0in';
+    await page.waitForSelector('text=Next action: Upload signed manufacturer model approval', { timeout: 8_000 });
+    await page.locator(`[id="catalogApprovalRefField-${catalogRowKey}"]`).selectOption('professional_or_ahj_review_ref');
+    await page.waitForFunction((rowKey) => {
+      const gate = document.getElementById('catalogApprovalTargetGate-' + rowKey);
+      const button = document.querySelector('[data-catalog-source-approval-family-ref="family:pipe_steel_sch40_2p0in"]');
+      const disabledManufacturerGate = Array.from(gate?.options || [])
+        .find((option) => option.value === 'MANUFACTURER_MODEL_APPROVAL_MISSING')?.disabled === true;
+      return gate
+        && gate.value === 'PROFESSIONAL_REVIEW_MISSING'
+        && disabledManufacturerGate
+        && button?.textContent.includes('Upload signed professional review');
+    }, catalogRowKey, { timeout: 8_000 });
+    await page.locator(`[id="catalogApprovalTargetGate-${catalogRowKey}"]`).selectOption('AHJ_APPROVAL_MISSING');
+    await page.waitForSelector('text=Next action: Upload signed AHJ approval', { timeout: 8_000 });
+    await page.locator(`[id="catalogApprovalRefField-${catalogRowKey}"]`).selectOption('autosprink_or_equivalent_export_ref');
+    await page.waitForFunction((rowKey) => {
+      const gate = document.getElementById('catalogApprovalTargetGate-' + rowKey);
+      const button = document.querySelector('[data-catalog-source-approval-family-ref="family:pipe_steel_sch40_2p0in"]');
+      return gate
+        && gate.value === 'AUTOSPRINK_EVIDENCE_MISSING'
+        && button?.textContent.includes('Upload signed AutoSprink/equivalent export');
+    }, catalogRowKey, { timeout: 8_000 });
+    await page.locator(`[id="catalogApprovalRefField-${catalogRowKey}"]`).selectOption('manufacturer_model_approval_ref');
+    await page.waitForFunction((rowKey) => {
+      const gate = document.getElementById('catalogApprovalTargetGate-' + rowKey);
+      const button = document.querySelector('[data-catalog-source-approval-family-ref="family:pipe_steel_sch40_2p0in"]');
+      return gate
+        && gate.value === 'MANUFACTURER_MODEL_APPROVAL_MISSING'
+        && button?.textContent.includes('Upload signed manufacturer model approval');
+    }, catalogRowKey, { timeout: 8_000 });
     await page.locator(`[id="catalogApprovalSourceRef-${catalogRowKey}"]`).fill('manufacturer://smoke/pipe-sch40-2in-approval');
     await page.locator(`[id="catalogApprovalSourceFile-${catalogRowKey}"]`).fill('catalog-manufacturer-approval-smoke.pdf');
     await page.locator(`[id="catalogApprovalReviewerName-${catalogRowKey}"]`).fill('Smoke Manufacturer Reviewer');

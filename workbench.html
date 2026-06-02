@@ -761,15 +761,19 @@ const CATALOG_APPROVAL_GATE_OPTIONS = [
 ];
 
 function renderCatalogApprovalGateOptions() {
-  return CATALOG_APPROVAL_GATE_OPTIONS.map((option) => `
-        <option value="${escapeHtml(option.gate_code)}" data-approval-ref-field="${escapeHtml(option.approval_ref_field)}" data-evidence-type="${escapeHtml(option.evidence_type)}" data-action-label="${escapeHtml(option.action_label)}">${escapeHtml(option.label)}</option>`).join('');
+  return `
+        <option value="MANUFACTURER_MODEL_APPROVAL_MISSING" data-approval-ref-field="manufacturer_model_approval_ref" data-evidence-type="manufacturer_approval" data-action-label="Upload signed manufacturer model approval">MANUFACTURER_MODEL_APPROVAL_MISSING - manufacturer_approval</option>
+        <option value="PROFESSIONAL_REVIEW_MISSING" data-approval-ref-field="professional_or_ahj_review_ref" data-evidence-type="professional_review" data-action-label="Upload signed professional review">PROFESSIONAL_REVIEW_MISSING - professional_review</option>
+        <option value="AHJ_APPROVAL_MISSING" data-approval-ref-field="professional_or_ahj_review_ref" data-evidence-type="ahj_approval" data-action-label="Upload signed AHJ approval">AHJ_APPROVAL_MISSING - ahj_approval</option>
+        <option value="AUTOSPRINK_EVIDENCE_MISSING" data-approval-ref-field="autosprink_or_equivalent_export_ref" data-evidence-type="autosprink_packet" data-action-label="Upload signed AutoSprink/equivalent export">AUTOSPRINK_EVIDENCE_MISSING - autosprink_packet</option>`;
 }
 
 function syncCatalogApprovalGateOptions(rowKey) {
   const refSelect = document.getElementById('catalogApprovalRefField-' + rowKey);
   const gateSelect = document.getElementById('catalogApprovalTargetGate-' + rowKey);
   const nextAction = document.getElementById('catalogApprovalNextAction-' + rowKey);
-  const button = document.querySelector('[data-catalog-source-approval-row-key="' + CSS.escape(String(rowKey)) + '"]');
+  const button = Array.from(document.querySelectorAll('[data-catalog-source-approval-row-key]'))
+    .find((candidate) => candidate.dataset.catalogSourceApprovalRowKey === String(rowKey));
   if (!refSelect || !gateSelect) return;
   const selectedField = refSelect.value;
   let firstAllowed = null;
