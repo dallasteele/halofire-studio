@@ -399,11 +399,16 @@ describe('PDF page inspection API', () => {
       status: 'best_effort_extrapolation_ready',
       source_runtime: 'sam-3.1+llm',
       consumes: ['segments', 'object_hypotheses'],
-      produces: ['llm_observations', 'vector_overlays', 'model_3d_candidates'],
       supported_applications: ['halo_fire', 'landscout', 'nameforge'],
       temporary_value_policy: expect.stringContaining('editable best guesses'),
       claim_gate_effect: 'no_claims_cleared',
     }));
+    expect(samPacket.openclaw_sam31_perception_request.extrapolation_contract.produces).toEqual(expect.arrayContaining([
+      'llm_observations',
+      'vector_overlays',
+      'model_3d_candidates',
+      'extrapolation_index',
+    ]));
     expect(Object.keys(samPacket.openclaw_sam31_perception_request.application_contracts)).toEqual([
       'halo_fire',
       'landscout',
