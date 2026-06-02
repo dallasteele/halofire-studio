@@ -312,6 +312,7 @@ function renderSam31BridgeSmokeAction(item, action, latest) {
 }
 
 const SAM31_EXTRAPOLATION_ROUTE_SUFFIX = '/openclaw/sam31/extrapolation-artifact';
+const SAM31_SECTIONING_PIPELINE_CONTRACT_ROUTE_SUFFIX = '/openclaw/sam31/sectioning-pipeline-contract';
 const SAM31_VECTOR_MODEL_ARTIFACT_ROUTE_SUFFIX = '/openclaw/sam31/vector-model-artifacts';
 const SAM31_CONSUMER_SMOKE_ROUTE_SUFFIX = '/openclaw/sam31/consumer-smoke';
 const SAM31_CONSUMER_SMOKE_PACKET_ROUTE_SUFFIX = '/openclaw/sam31/consumer-smoke-packet';
@@ -395,6 +396,16 @@ function renderOpenClawSam31ExtrapolationAction(item, action, latest, latestRevi
       </div>
     </details>` : '';
   return `<div class="muted" style="font-size:11px;margin-top:5px;border:1px solid rgba(79,70,229,.34);border-radius:8px;padding:8px;background:rgba(79,70,229,.06)">OpenClaw SAM31 LLM extrapolation artifact<br>status ${escapeHtml(action.status || 'unavailable')} - method ${escapeHtml(action.method || 'POST')} - claim_gate_effect ${escapeHtml(action.claim_gate_effect || 'no_claims_cleared')}<br>endpoint ${escapeHtml(endpoint)} - source_evidence_id ${escapeHtml(evidenceId)}<br>${latest ? `Latest extrapolation: evidence #${escapeHtml(latest.evidence_id)} - ${escapeHtml(latest.status || 'best_effort')} - packet ${escapeHtml(latestPacket?.artifact_type || latest.artifact_type || 'openclaw.sam31_llm_extrapolation_artifact')} - sections ${escapeHtml(latest.section_count ?? latestPacket?.segment_count ?? 0)} - hypotheses ${escapeHtml(latest.object_hypothesis_count ?? latestPacket?.object_hypothesis_count ?? 0)} - extrapolation_index ${escapeHtml(latestExtrapolationIndexCount)} - ${escapeHtml(latest.claim_gate_effect || 'no_claims_cleared')}<br>` : ''}${latest ? renderSam31BidTruth(latest) + renderSam31MissingEvidenceRows(latest) : ''}${reviewSummary}${queueItemAction}${reviewPacketAction}${productReviewAction ? `Product review: ${escapeHtml(productReviewAction.label || 'Review extrapolated objects, vectors, and 3D candidates')} - ${escapeHtml(productReviewAction.href || 'missing')}<br>` : ''}Blocks still active: ${blocked.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('') || '<span class="chip">claim gates remain blocked</span>'}<br><button class="go" type="button" style="padding:7px 10px;font-size:11px;margin-top:6px;background:#4f46e5" data-sam31-extrapolation-evidence-id="${escapeHtml(evidenceId)}">${escapeHtml(action.label || 'Run OpenClaw SAM31 extrapolation artifact')}</button><div class="muted" id="sam31ExtrapolationStatus-${escapeHtml(evidenceId)}" style="font-size:11px;margin-top:4px"></div>${reviewForm}</div>`;
+}
+
+function renderOpenClawSam31SectioningPipelineContractAction(item, action, latest) {
+  if (!action || typeof action !== 'object') return '';
+  const evidenceId = action.source_pdf_boundary_evidence_id || item.evidence_id;
+  const blocked = Array.isArray(action.blocked_claims) ? action.blocked_claims : [];
+  const latestText = latest
+    ? `Latest extrapolation evidence #${escapeHtml(latest.evidence_id)} - sectioning_pipeline_contract ${escapeHtml(latest.sectioning_pipeline_contract?.artifact_type || 'openclaw.sam31.sectioning_pipeline_contract.v1')} - ${escapeHtml(latest.claim_gate_effect || 'no_claims_cleared')}<br>`
+    : '';
+  return `<div class="muted" style="font-size:11px;margin-top:5px;border:1px solid rgba(99,102,241,.28);border-radius:8px;padding:8px;background:rgba(99,102,241,.05)">SAM31 sectioning pipeline contract packet<br>artifact_type ${escapeHtml(action.artifact_type || 'openclaw.sam31.sectioning_pipeline_contract_packet.v1')} - status ${escapeHtml(action.status || 'requires_sam31_extrapolation_artifact')} - source_runtime ${escapeHtml(action.source_runtime || 'halofire-api-local-contract')}<br>source_pdf_boundary_evidence_id ${escapeHtml(evidenceId)} - source_openclaw_sam31_extrapolation_evidence_id ${escapeHtml(action.source_openclaw_sam31_extrapolation_evidence_id || 'missing')} - use_for_claims ${escapeHtml(action.use_for_claims === true ? 'true' : 'false')} - claim_gate_effect ${escapeHtml(action.claim_gate_effect || 'no_claims_cleared')}<br>${latestText}Blocks still active: ${blocked.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('') || '<span class="chip">claim gates remain blocked</span>'}<br><button class="go" type="button" style="padding:7px 10px;font-size:11px;margin-top:6px;background:#4f46e5" data-sam31-sectioning-contract-evidence-id="${escapeHtml(evidenceId)}">Download SAM31 sectioning pipeline contract</button></div>`;
 }
 
 function renderOpenClawSam31VectorModelArtifactAction(item, action, latest) {
@@ -669,6 +680,9 @@ async function refreshEvidence() {
   });
   document.querySelectorAll('[data-sam31-tool-contract]').forEach((button) => {
     button.onclick = () => downloadOpenClawSam31ToolContract();
+  });
+  document.querySelectorAll('[data-sam31-sectioning-contract-evidence-id]').forEach((button) => {
+    button.onclick = () => downloadOpenClawSam31SectioningPipelineContract(button.dataset.sam31SectioningContractEvidenceId);
   });
   document.querySelectorAll('[data-sam31-vector-model-artifact-evidence-id]').forEach((button) => {
     button.onclick = () => downloadOpenClawSam31VectorModelArtifactPacket(button.dataset.sam31VectorModelArtifactEvidenceId);
@@ -1071,6 +1085,7 @@ function resolverQueueDetail(item) {
   const openclaw_sam31_extrapolation_action = item.openclaw_sam31_extrapolation_action || null;
   const latest_openclaw_sam31_extrapolation_artifact = item.latest_openclaw_sam31_extrapolation_artifact || null;
   const latest_openclaw_sam31_extrapolation_review = item.latest_openclaw_sam31_extrapolation_review || null;
+  const openclaw_sam31_sectioning_pipeline_contract_action = item.openclaw_sam31_sectioning_pipeline_contract_action || null;
   const openclaw_sam31_vector_model_artifact_action = item.openclaw_sam31_vector_model_artifact_action || null;
   const latest_openclaw_sam31_vector_model_artifact = item.latest_openclaw_sam31_vector_model_artifact || null;
   const openclaw_sam31_consumer_smoke_action = item.openclaw_sam31_consumer_smoke_action || null;
@@ -1171,6 +1186,7 @@ function resolverQueueDetail(item) {
       ${renderOpenClawSam31BridgeStatus(openclaw_sam31_bridge_status)}
       ${renderSam31BridgeSmokeAction(item, sam31_bridge_smoke_action, latest_openclaw_sam31_bridge_smoke_artifact)}
       ${renderOpenClawSam31ExtrapolationAction(item, openclaw_sam31_extrapolation_action, latest_openclaw_sam31_extrapolation_artifact, latest_openclaw_sam31_extrapolation_review)}
+      ${renderOpenClawSam31SectioningPipelineContractAction(item, openclaw_sam31_sectioning_pipeline_contract_action, latest_openclaw_sam31_extrapolation_artifact)}
       ${renderOpenClawSam31VectorModelArtifactAction(item, openclaw_sam31_vector_model_artifact_action, latest_openclaw_sam31_vector_model_artifact)}
       ${renderOpenClawSam31ConsumerSmokeAction(item, openclaw_sam31_consumer_smoke_action, latest_openclaw_sam31_consumer_smoke_artifact)}
       ${sam31_unresolved_consumer_reviews.length ? `<div class="claims">sam31_unresolved_consumer_reviews: ${sam31_unresolved_consumer_reviews.map((review) => `<span class="chip">${escapeHtml(review.consumer)}:${escapeHtml(review.status || 'requires_product_review')} accepted_queue_id ${escapeHtml(review.accepted_queue_id || 'missing')}</span>`).join('')}<br><span class="muted" style="font-size:10px">Filter API: /resolver-queue?sam31ConsumerReview=unresolved&consumer=nameforge</span></div>` : ''}
@@ -1505,6 +1521,19 @@ async function downloadOpenClawSam31ToolContract() {
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = packet.download_name || 'openclaw-sam31-tool-contract.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+async function downloadOpenClawSam31SectioningPipelineContract(evidenceId) {
+  const packet = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/resolver-packets/pdf-boundary/' + encodeURIComponent(evidenceId) + SAM31_SECTIONING_PIPELINE_CONTRACT_ROUTE_SUFFIX);
+  if (packet.artifact_type !== 'openclaw.sam31.sectioning_pipeline_contract_packet.v1') {
+    throw new Error('Unexpected SAM31 sectioning pipeline contract packet type');
+  }
+  const blob = new Blob([JSON.stringify(packet, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = packet.download_name || 'sam31-sectioning-pipeline-contract.json';
   a.click();
   URL.revokeObjectURL(a.href);
 }
@@ -2079,6 +2108,9 @@ async function refreshResolverQueue() {
   });
   document.querySelectorAll('[data-sam31-tool-contract]').forEach((button) => {
     button.onclick = () => downloadOpenClawSam31ToolContract();
+  });
+  document.querySelectorAll('[data-sam31-sectioning-contract-evidence-id]').forEach((button) => {
+    button.onclick = () => downloadOpenClawSam31SectioningPipelineContract(button.dataset.sam31SectioningContractEvidenceId);
   });
   document.querySelectorAll('[data-sam31-vector-model-artifact-evidence-id]').forEach((button) => {
     button.onclick = () => downloadOpenClawSam31VectorModelArtifactPacket(button.dataset.sam31VectorModelArtifactEvidenceId);

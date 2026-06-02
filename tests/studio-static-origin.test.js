@@ -452,6 +452,12 @@ describe('studio static origin handling', () => {
     expect(html).toContain('/resolver-packets/openclaw/sam31/tool-contract');
     expect(html).toContain('Download SAM31 tool contract');
     expect(html).toContain('data-sam31-tool-contract');
+    expect(html).toContain('renderOpenClawSam31SectioningPipelineContractAction');
+    expect(html).toContain('downloadOpenClawSam31SectioningPipelineContract');
+    expect(html).toContain('/openclaw/sam31/sectioning-pipeline-contract');
+    expect(html).toContain('Download SAM31 sectioning pipeline contract');
+    expect(html).toContain('data-sam31-sectioning-contract-evidence-id');
+    expect(html).toContain('openclaw.sam31.sectioning_pipeline_contract_packet.v1');
     expect(html).toContain('renderOpenClawSam31VectorModelArtifactAction');
     expect(html).toContain('downloadOpenClawSam31VectorModelArtifactPacket');
     expect(html).toContain('persistOpenClawSam31VectorModelArtifactPacket');

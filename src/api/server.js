@@ -2910,6 +2910,92 @@ function openClawSam31VectorModelArtifactReviewContext(projectName, sourceEviden
   };
 }
 
+function buildOpenClawSam31SectioningPipelineContractPacket(projectName, evidence, decision, extrapolationEvidence = null) {
+  if (!evidence || !decision) {
+    const e = new Error('PDF boundary decision evidence not found');
+    e.httpStatus = 404;
+    throw e;
+  }
+  const extrapolationArtifact = extrapolationEvidence?.artifact || null;
+  const sectioningPipelineContract = extrapolationArtifact?.sectioning_pipeline_contract && typeof extrapolationArtifact.sectioning_pipeline_contract === 'object'
+    ? {
+      ...jsonClone(sam31SectioningPipelineContract(extrapolationArtifact.source_runtime || 'sam-3.1+llm')),
+      ...jsonClone(extrapolationArtifact.sectioning_pipeline_contract),
+      use_for_claims: false,
+      no_claim_gates_cleared: true,
+      claim_gate_effect: 'no_claims_cleared',
+    }
+    : {
+      ...jsonClone(localOpenClawSam31ToolDescriptor(projectName).sectioning_pipeline_contract),
+      use_for_claims: false,
+      no_claim_gates_cleared: true,
+      claim_gate_effect: 'no_claims_cleared',
+    };
+  const sourceRefs = [
+    {
+      evidence_id: evidence.id,
+      evidence_type: evidence.evidence_type,
+      source_file: evidence.source_file || decision.sourceFile || null,
+      source_ref: evidence.source_ref || decision.sourceRef || null,
+      status: evidence.status,
+      claim_gate_effect: 'no_claims_cleared',
+    },
+  ];
+  if (extrapolationEvidence?.evidence) {
+    sourceRefs.push({
+      evidence_id: extrapolationEvidence.evidence.id,
+      evidence_type: extrapolationEvidence.evidence.evidence_type,
+      source_file: extrapolationEvidence.evidence.source_file || null,
+      source_ref: extrapolationEvidence.evidence.source_ref || extrapolationArtifact?.openclaw_endpoint || null,
+      status: extrapolationEvidence.evidence.status,
+      claim_gate_effect: 'no_claims_cleared',
+    });
+  }
+  return {
+    artifact_type: 'openclaw.sam31.sectioning_pipeline_contract_packet.v1',
+    status: 'ready_for_internal_alpha_review',
+    project_name: projectName,
+    generated_at: new Date().toISOString(),
+    download_name: `${slugForDownloadName(projectName)}-sam31-sectioning-pipeline-contract-${evidence.id}.json`,
+    source_pdf_boundary_evidence_id: evidence.id,
+    source_openclaw_sam31_extrapolation_evidence_id: extrapolationEvidence?.evidence?.id || null,
+    source_runtime: sectioningPipelineContract.source_runtime || 'halofire-api-local-contract',
+    sectioning_pipeline_contract: sectioningPipelineContract,
+    source_refs: sourceRefs,
+    supported_applications: [...SAM31_SUPPORTED_APPLICATIONS],
+    supported_evidence_lanes: [
+      'room_boundary_visual_audit',
+      'object_identification_review',
+      'vector_overlay_generation',
+      'model_3d_candidate_generation',
+      'product_review_queue',
+    ],
+    temporary_value_policy: 'best_guess_until_employee_replaced',
+    acceptable_evidence: [
+      'employee or product-owner reviewed semantic label',
+      'source-linked corrected polygon or bbox',
+      'source-linked corrected vector overlay',
+      'source-linked corrected 3D model candidate',
+      'screenshot or console evidence for reviewed sectioning',
+    ],
+    next_action: 'Use this sectioning pipeline contract to review or replace SAM31/LLM sections, object labels, vector overlays, and 3D candidates; no claim gates clear until actual approval evidence is attached.',
+    use_for_claims: false,
+    no_claim_gates_cleared: true,
+    claim_gate_effect: 'no_claims_cleared',
+    blocked_claims: uniqueStrings([
+      ...(Array.isArray(decision.blockedClaims) ? decision.blockedClaims : PDF_BOUNDARY_BLOCKED_CLAIMS),
+      ...SAM31_BLOCKED_CLAIMS,
+      'SAM31_runtime_verified',
+      'OpenClaw_runtime_verified',
+    ]),
+    limitations: [
+      'This packet is a source-linked review/download affordance for SAM31+LLM sectioning semantics only.',
+      'It does not prove geometry accuracy, drawing scale, professional approval, AHJ approval, AutoSprink parity, fabrication readiness, manufacturer exactness, or product readiness.',
+      'Generated sectioning, object labels, vector overlays, and 3D candidates remain best-effort temporary values until employee or owning-product evidence replaces them.',
+    ],
+  };
+}
+
 function buildOpenClawSam31VectorModelArtifactPacket(projectName, evidence, decision, sam31Evidence) {
   if (!evidence || !decision) {
     const e = new Error('PDF boundary decision evidence not found');
@@ -5627,6 +5713,7 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
   const extrapolateHref = `/api/projects/${encodeURIComponent(projectName)}/resolver-packets/pdf-boundary/${evidence.id}/openclaw/sam31/extrapolation-artifact`;
   const consumerSmokeHref = `/api/projects/${encodeURIComponent(projectName)}/resolver-packets/pdf-boundary/${evidence.id}/openclaw/sam31/consumer-smoke`;
   const toolContractHref = `/api/projects/${encodeURIComponent(projectName)}/resolver-packets/openclaw/sam31/tool-contract`;
+  const sectioningPipelineContractHref = `/api/projects/${encodeURIComponent(projectName)}/resolver-packets/pdf-boundary/${evidence.id}/openclaw/sam31/sectioning-pipeline-contract`;
   const vectorModelArtifactHref = `/api/projects/${encodeURIComponent(projectName)}/resolver-packets/pdf-boundary/${evidence.id}/openclaw/sam31/vector-model-artifacts`;
   const sam31BridgeSmokeAction = {
     label: 'Run OpenClaw SAM31 bridge smoke artifact',
@@ -5812,6 +5899,23 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
       'This action downloads or records source-linked vector/model best guesses only; no approval or accuracy claim is cleared.',
     ],
   };
+  const openclawSam31SectioningPipelineContractAction = {
+    label: 'Download SAM31 sectioning pipeline contract',
+    method: 'GET',
+    href: sectioningPipelineContractHref,
+    status: latestOpenClawSam31ExtrapolationArtifact ? 'ready' : 'requires_sam31_extrapolation_artifact',
+    artifact_type: 'openclaw.sam31.sectioning_pipeline_contract_packet.v1',
+    source_pdf_boundary_evidence_id: evidence.id,
+    source_openclaw_sam31_extrapolation_evidence_id: sam31ExtrapolationEvidence?.evidence?.id || null,
+    source_runtime: sam31ExtrapolationEvidence?.artifact?.sectioning_pipeline_contract?.source_runtime || 'halofire-api-local-contract',
+    supported_applications: [...SAM31_SUPPORTED_APPLICATIONS],
+    use_for_claims: false,
+    no_claim_gates_cleared: true,
+    claim_gate_effect: 'no_claims_cleared',
+    limitations: [
+      'This action downloads the source-linked SAM31 sectioning pipeline contract for product review; it does not clear geometry or regulated claims.',
+    ],
+  };
   let status = 'ready';
   let nextAction = 'Open the selected PDF sheet with these defaults, run a room-boundary visual audit packet, and attach employee review evidence before any geometry-accuracy claim.';
   if (latestReview?.review_decision === 'corrected') {
@@ -5876,6 +5980,7 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
     openclaw_sam31_bridge_status: bridgeStatus,
     sam31_bridge_smoke_action: sam31BridgeSmokeAction,
     openclaw_sam31_tool_contract_action: openclawSam31ToolContractAction,
+    openclaw_sam31_sectioning_pipeline_contract_action: openclawSam31SectioningPipelineContractAction,
     openclaw_sam31_vector_model_artifact_action: openclawSam31VectorModelArtifactAction,
     openclaw_sam31_extrapolation_status: extrapolateStatus,
     openclaw_sam31_extrapolation_action: openclawSam31ExtrapolationAction,
@@ -5888,6 +5993,7 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
       { label: 'Load defaults in Studio', href: `/autosprink.html?project=${encodeURIComponent(projectName)}&resolver=${encodeURIComponent(`pdf-boundary:${evidence.id}`)}` },
       { label: 'Download SAM 3.1 visual audit packet', href: `/api/projects/${encodeURIComponent(projectName)}/resolver-packets/pdf-boundary/${evidence.id}/sam31-visual-audit` },
       { label: 'Download SAM31 tool contract', href: toolContractHref, method: 'GET', artifact_type: 'openclaw.sam31_llm_extrapolation_tool_contract_packet.v1' },
+      { label: 'Download SAM31 sectioning pipeline contract', href: sectioningPipelineContractHref, method: 'GET', artifact_type: 'openclaw.sam31.sectioning_pipeline_contract_packet.v1' },
       { label: 'Download SAM31 vector/model artifact packet', href: vectorModelArtifactHref, method: 'GET', artifact_type: SAM31_VECTOR_MODEL_ARTIFACT_PACKET_TYPE },
       { label: 'Run OpenClaw SAM31 extrapolation artifact', href: extrapolateHref, method: 'POST' },
       { label: 'Run LandScout/NameForge SAM31 queue smoke', href: consumerSmokeHref, method: 'POST', artifact_type: SAM31_CONSUMER_SMOKE_ARTIFACT_TYPE },
@@ -9186,6 +9292,28 @@ app.get('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/openclaw/
 app.get('/api/projects/:name/resolver-packets/openclaw/sam31/tool-contract', authMiddleware, (req, res) => {
   try {
     res.json(buildOpenClawSam31ToolContractPacket(req.params.name));
+  } catch (err) {
+    return res.status(err.httpStatus || 400).json({ error: err.message });
+  }
+});
+
+app.get('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/openclaw/sam31/sectioning-pipeline-contract', authMiddleware, (req, res) => {
+  try {
+    const projectName = req.params.name;
+    const evidenceId = Number(req.params.evidenceId);
+    if (!Number.isSafeInteger(evidenceId) || evidenceId <= 0) {
+      return res.status(400).json({ error: 'A positive evidence id is required' });
+    }
+    const evidence = db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'pdf_boundary_decision'`)
+      .get(evidenceId, projectName);
+    const decision = decisionFromEvidence(evidence);
+    if (!evidence || !decision) {
+      return res.status(404).json({ error: 'PDF boundary decision evidence not found' });
+    }
+    const extrapolationEvidence = latestOpenClawSam31ExtrapolationArtifactEvidence(projectName, evidence.id);
+    return res.json(buildOpenClawSam31SectioningPipelineContractPacket(projectName, evidence, decision, extrapolationEvidence));
   } catch (err) {
     return res.status(err.httpStatus || 400).json({ error: err.message });
   }

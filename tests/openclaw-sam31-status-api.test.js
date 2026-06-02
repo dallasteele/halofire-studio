@@ -669,7 +669,63 @@ describe('OpenClaw SAM31 bridge status API', () => {
       extrapolation_index_count: 1,
       claim_gate_effect: 'no_claims_cleared',
     }));
+    expect(afterItem.openclaw_sam31_sectioning_pipeline_contract_action).toEqual(expect.objectContaining({
+      label: 'Download SAM31 sectioning pipeline contract',
+      method: 'GET',
+      href: `${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/sectioning-pipeline-contract`,
+      artifact_type: 'openclaw.sam31.sectioning_pipeline_contract_packet.v1',
+      source_openclaw_sam31_extrapolation_evidence_id: artifact.id,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(afterItem.actions).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        label: 'Download SAM31 sectioning pipeline contract',
+        href: `${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/sectioning-pipeline-contract`,
+        artifact_type: 'openclaw.sam31.sectioning_pipeline_contract_packet.v1',
+      }),
+    ]));
     expect(afterQueue.summary.sam31_extrapolation_recorded).toBeGreaterThanOrEqual(1);
+
+    const sectioningContractRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/sectioning-pipeline-contract`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(sectioningContractRes.status).toBe(200);
+    const sectioningContractPacket = await sectioningContractRes.json();
+    expect(sectioningContractPacket).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.sectioning_pipeline_contract_packet.v1',
+      status: 'ready_for_internal_alpha_review',
+      project_name: COOPERATIVE_1881_PROJECT_NAME,
+      source_pdf_boundary_evidence_id: boundary.id,
+      source_openclaw_sam31_extrapolation_evidence_id: artifact.id,
+      download_name: expect.stringContaining('sam31-sectioning-pipeline-contract'),
+      use_for_claims: false,
+      no_claim_gates_cleared: true,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(sectioningContractPacket.sectioning_pipeline_contract).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.sectioning_pipeline_contract.v1',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(sectioningContractPacket.sectioning_pipeline_contract.stages.map((stage) => stage.stage)).toEqual([
+      'sam31_sectioning',
+      'llm_object_identification',
+      'vector_overlay_generation',
+      'model_3d_candidate_generation',
+      'product_review_queue',
+    ]);
+    expect(sectioningContractPacket.source_refs).toEqual(expect.arrayContaining([
+      expect.objectContaining({ evidence_id: boundary.id, evidence_type: 'pdf_boundary_decision' }),
+      expect.objectContaining({ evidence_id: artifact.id, evidence_type: 'openclaw_sam31_extrapolation_artifact' }),
+    ]));
+    expect(sectioningContractPacket.blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'AHJ_approval',
+      'AutoSprink_parity',
+      'SAM31_runtime_verified',
+      'OpenClaw_runtime_verified',
+    ]));
 
     const queueItemRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/product-review-queue-item`, {
       headers: { Authorization: `Bearer ${token}` },

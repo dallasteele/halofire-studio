@@ -59,6 +59,10 @@ describe('SAM31 workbench browser smoke script', () => {
     expect(script).toContain('model_3d_candidate_generation');
     expect(script).toContain('product_review_queue');
     expect(script).toContain('cross_product_handoff_rows');
+    expect(script).toContain('Download SAM31 sectioning pipeline contract');
+    expect(script).toContain('sam31-sectioning-pipeline-contract');
+    expect(script).toContain('openclaw.sam31.sectioning_pipeline_contract_packet.v1');
+    expect(script).toContain('sectioningContractPacket');
     expect(script).toContain('Download SAM31 vector/model artifact packet');
     expect(script).toContain('Record SAM31 vector/model artifacts');
     expect(script).toContain('openclaw.sam31_vector_model_artifact_packet.v1');

@@ -370,6 +370,43 @@ async function runBrowserSmoke(token, evidenceIds) {
     if (!toolContractConsumers.includes('landscout') || !toolContractConsumers.includes('nameforge')) {
       throw new Error(`SAM31 tool contract lost cross-product handoff rows: ${JSON.stringify(toolContract.cross_product_handoff_rows)}`);
     }
+    await page.waitForSelector('text=Download SAM31 sectioning pipeline contract', { timeout: 8_000 });
+    const sectioningContractDownloadPromise = page.waitForEvent('download');
+    await page.getByRole('button', { name: 'Download SAM31 sectioning pipeline contract' }).first().click();
+    const sectioningContractDownload = await sectioningContractDownloadPromise;
+    const sectioningContractPath = await sectioningContractDownload.path();
+    const sectioningContractSuggestedName = sectioningContractDownload.suggestedFilename();
+    const sectioningContractBytes = sectioningContractPath ? fs.statSync(sectioningContractPath).size : 0;
+    downloads.push({ suggestedName: sectioningContractSuggestedName, bytes: sectioningContractBytes });
+    if (!sectioningContractSuggestedName.includes('sam31-sectioning-pipeline-contract') || sectioningContractBytes <= 0) {
+      throw new Error(`Unexpected SAM31 sectioning pipeline contract download ${sectioningContractSuggestedName} (${sectioningContractBytes} bytes)`);
+    }
+    const sectioningContractPacket = JSON.parse(fs.readFileSync(sectioningContractPath, 'utf8'));
+    if (sectioningContractPacket.artifact_type !== 'openclaw.sam31.sectioning_pipeline_contract_packet.v1') {
+      throw new Error(`Unexpected SAM31 sectioning pipeline contract packet type ${sectioningContractPacket.artifact_type}`);
+    }
+    if (sectioningContractPacket.source_pdf_boundary_evidence_id !== evidenceIds.boundaryEvidenceId
+      || sectioningContractPacket.source_openclaw_sam31_extrapolation_evidence_id !== evidenceIds.localBridgeExtrapolationEvidenceId
+      || sectioningContractPacket.use_for_claims !== false
+      || sectioningContractPacket.claim_gate_effect !== 'no_claims_cleared'
+      || sectioningContractPacket.no_claim_gates_cleared !== true) {
+      throw new Error(`SAM31 sectioning pipeline contract cleared a claim gate or lost source truth: ${JSON.stringify(sectioningContractPacket)}`);
+    }
+    const downloadedSectioningContract = sectioningContractPacket.sectioning_pipeline_contract;
+    if (!downloadedSectioningContract
+      || downloadedSectioningContract.artifact_type !== 'openclaw.sam31.sectioning_pipeline_contract.v1'
+      || downloadedSectioningContract.use_for_claims !== false
+      || downloadedSectioningContract.claim_gate_effect !== 'no_claims_cleared') {
+      throw new Error(`SAM31 sectioning pipeline contract lost fail-closed payload: ${JSON.stringify(downloadedSectioningContract)}`);
+    }
+    const downloadedSectioningStageNames = Array.isArray(downloadedSectioningContract.stages)
+      ? new Set(downloadedSectioningContract.stages.map((stage) => stage.stage))
+      : new Set();
+    for (const stageName of requiredSectioningPipelineStages) {
+      if (!downloadedSectioningStageNames.has(stageName)) {
+        throw new Error(`Downloaded SAM31 sectioning pipeline contract lost stage ${stageName}: ${JSON.stringify(downloadedSectioningContract.stages)}`);
+      }
+    }
     await page.waitForSelector('text=SAM31 vector/model artifact packet', { timeout: 8_000 });
     await page.waitForSelector('text=Download SAM31 vector/model artifact packet', { timeout: 8_000 });
     await page.waitForSelector('text=Record SAM31 vector/model artifacts', { timeout: 8_000 });
