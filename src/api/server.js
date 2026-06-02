@@ -1496,6 +1496,50 @@ function latestSam31EmployeeReplacementEvidence(projectName, sourceEvidenceId) {
   return null;
 }
 
+function sam31EmployeeReplacementReplaySummary(sam31ReplacementEvidence) {
+  if (!sam31ReplacementEvidence?.evidence || !sam31ReplacementEvidence?.replacement) return null;
+  const { evidence, replacement } = sam31ReplacementEvidence;
+  return {
+    evidence_id: evidence.id,
+    evidence_status: evidence.status,
+    source_ref: evidence.source_ref,
+    source_sam31_evidence_id: replacement.source_sam31_evidence_id,
+    reviewer_name: replacement.reviewer_name,
+    replaced_at: replacement.replaced_at,
+    replacement_ref: replacement.replacement_ref,
+    replacement_values: replacement.replacement_values && typeof replacement.replacement_values === 'object'
+      ? jsonClone(replacement.replacement_values)
+      : {},
+    replaced_fields: Array.isArray(replacement.replaced_fields) ? [...replacement.replaced_fields] : [],
+    claim_gate_effect: replacement.claim_gate_effect || 'no_claims_cleared',
+  };
+}
+
+function applySam31EmployeeReplacementToPolygons(correctedRoomPolygons, sam31ReplacementSummary) {
+  const polygons = Array.isArray(correctedRoomPolygons) ? jsonClone(correctedRoomPolygons) : [];
+  if (!sam31ReplacementSummary) return polygons;
+  const values = sam31ReplacementSummary.replacement_values || {};
+  const first = polygons[0] && typeof polygons[0] === 'object' ? { ...polygons[0] } : {};
+  if (Object.prototype.hasOwnProperty.call(values, 'semantic_label')) {
+    const label = String(values.semantic_label || '').trim();
+    if (label) first.room_id = label;
+  }
+  if (Array.isArray(values.polygon)) first.polygon = jsonClone(values.polygon);
+  if (values.bbox && typeof values.bbox === 'object' && !Array.isArray(values.bbox)) first.bbox = jsonClone(values.bbox);
+  if (Object.prototype.hasOwnProperty.call(values, 'source_ref')) {
+    const sourceRef = String(values.source_ref || '').trim();
+    if (sourceRef) first.source_ref = sourceRef;
+  }
+  if (values.object_hypothesis && typeof values.object_hypothesis === 'object') first.object_hypothesis = jsonClone(values.object_hypothesis);
+  if (values.vector_overlay && typeof values.vector_overlay === 'object') first.vector_overlay = jsonClone(values.vector_overlay);
+  if (values.model_3d_candidate && typeof values.model_3d_candidate === 'object') first.model_3d_candidate = jsonClone(values.model_3d_candidate);
+  if (Object.prototype.hasOwnProperty.call(values, 'confidence')) first.confidence = Number(values.confidence);
+  first.sam31_employee_replacement_evidence_id = sam31ReplacementSummary.evidence_id;
+  first.sam31_replacement_ref = sam31ReplacementSummary.replacement_ref || null;
+  first.sam31_replaced_fields = Array.isArray(sam31ReplacementSummary.replaced_fields) ? [...sam31ReplacementSummary.replaced_fields] : [];
+  return [first, ...polygons.slice(1)];
+}
+
 app.get('/api/projects/:name/pdf-boundary-decision', authMiddleware, (req, res) => {
   const evidence = latestPdfBoundaryDecisionEvidence(req.params.name);
   res.json({ evidence: evidence || null, decision: decisionFromEvidence(evidence) });
@@ -2706,7 +2750,7 @@ function normalizeSam31EmployeeReplacement(projectName, evidence, decision, sam3
   };
 }
 
-function pdfBoundaryReplayInputPacket(projectName, evidence, decision, reviewEvidence, sam31Evidence = null) {
+function pdfBoundaryReplayInputPacket(projectName, evidence, decision, reviewEvidence, sam31Evidence = null, sam31ReplacementEvidence = null) {
   if (!evidence || !decision) return null;
   const review = reviewEvidence?.review || sam31Evidence?.result || null;
   if (!review) return null;
@@ -2724,7 +2768,11 @@ function pdfBoundaryReplayInputPacket(projectName, evidence, decision, reviewEvi
   const correctedRoomPolygons = Array.isArray(review.corrected_room_polygons)
     ? jsonClone(review.corrected_room_polygons)
     : [];
-  const queueItem = pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence, sam31Evidence);
+  const sam31ReplacementSummary = reviewSource === 'latest_sam31_visual_audit'
+    ? sam31EmployeeReplacementReplaySummary(sam31ReplacementEvidence)
+    : null;
+  const replayRoomPolygons = applySam31EmployeeReplacementToPolygons(correctedRoomPolygons, sam31ReplacementSummary);
+  const queueItem = pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence, sam31Evidence, sam31ReplacementEvidence);
   const openclawSam31PerceptionPacketSummary = reviewSource === 'latest_sam31_visual_audit'
     ? sam31PerceptionPacketSummary(review.openclaw_sam31_perception_packet)
     : null;
@@ -2750,19 +2798,33 @@ function pdfBoundaryReplayInputPacket(projectName, evidence, decision, reviewEvi
       claim_gate_effect: 'no_claims_cleared',
     });
   }
+  if (sam31ReplacementSummary) {
+    sourceRefs.push({
+      evidence_id: sam31ReplacementSummary.evidence_id,
+      evidence_type: 'sam31_employee_replacement',
+      source_ref: sam31ReplacementSummary.source_ref || sam31ReplacementSummary.replacement_ref || null,
+      status: sam31ReplacementSummary.evidence_status,
+      claim_gate_effect: sam31ReplacementSummary.claim_gate_effect || 'no_claims_cleared',
+    });
+  }
   const sprinklerBidRequest = {
     room_boundary_source: reviewSource,
     source_evidence_id: evidence.id,
     pdfPageIndex: decision.pageIndex,
     pdfScale: decision.scale,
     pdfExtract: decision.extractMode,
-    corrected_room_polygons: correctedRoomPolygons,
+    corrected_room_polygons: replayRoomPolygons,
     use_for_claims: false,
   };
   if (reviewSource === 'latest_employee_review_packet') {
     sprinklerBidRequest.source_review_evidence_id = reviewRow.id;
   } else {
     sprinklerBidRequest.source_sam31_evidence_id = reviewRow.id;
+  }
+  if (sam31ReplacementSummary) {
+    sprinklerBidRequest.source_sam31_replacement_evidence_id = sam31ReplacementSummary.evidence_id;
+    sprinklerBidRequest.sam31_replacement_source = 'latest_sam31_employee_replacement';
+    sprinklerBidRequest.sam31_employee_replacement = sam31ReplacementSummary;
   }
   if (openclawSam31PerceptionPacketSummary) {
     sprinklerBidRequest.openclaw_sam31_perception_packet = openclawSam31PerceptionPacketSummary;
@@ -2775,6 +2837,13 @@ function pdfBoundaryReplayInputPacket(projectName, evidence, decision, reviewEvi
     ...(reviewSource === 'latest_employee_review_packet'
       ? { source_review_evidence_id: reviewRow.id }
       : { source_sam31_evidence_id: reviewRow.id }),
+    ...(sam31ReplacementSummary
+      ? {
+        source_sam31_replacement_evidence_id: sam31ReplacementSummary.evidence_id,
+        sam31_replacement_source: 'latest_sam31_employee_replacement',
+        latest_sam31_employee_replacement: sam31ReplacementSummary,
+      }
+      : {}),
     source_ref: evidence.source_ref || decision.sourceRef || null,
     source_file: evidence.source_file || decision.sourceFile || null,
     download_name: `${slugForDownloadName(projectName)}-room-boundary-replay-input-${evidence.id}.json`,
@@ -2793,7 +2862,7 @@ function pdfBoundaryReplayInputPacket(projectName, evidence, decision, reviewEvi
       }
       : {}),
     issue_list: Array.isArray(review.issue_list) ? jsonClone(review.issue_list) : [],
-    corrected_room_polygons: correctedRoomPolygons,
+    corrected_room_polygons: replayRoomPolygons,
     input_defaults: queueItem.input_defaults,
     sprinkler_bid_request: sprinklerBidRequest,
     source_refs: sourceRefs,
@@ -2812,6 +2881,7 @@ function resolveRoomBoundaryReplayFloorPlan(req, projectName) {
   const sourceEvidenceId = Number(req.body.source_evidence_id);
   const sourceReviewEvidenceId = Number(req.body.source_review_evidence_id);
   const sourceSam31EvidenceId = Number(req.body.source_sam31_evidence_id);
+  const sourceSam31ReplacementEvidenceId = Number(req.body.source_sam31_replacement_evidence_id);
   if (!Number.isSafeInteger(sourceEvidenceId) || sourceEvidenceId <= 0) {
     const e = new Error('source_evidence_id is required for room-boundary replay input');
     e.httpStatus = 400;
@@ -2848,9 +2918,18 @@ function resolveRoomBoundaryReplayFloorPlan(req, projectName) {
       .prepare(`SELECT * FROM project_evidence
                 WHERE id = ? AND project_name = ? AND evidence_type = 'sam31_room_boundary_visual_audit'`)
       .get(sourceSam31EvidenceId, projectName);
+  const sourceSam31ReplacementEvidence = replaySource === 'latest_sam31_visual_audit'
+    && Number.isSafeInteger(sourceSam31ReplacementEvidenceId)
+    && sourceSam31ReplacementEvidenceId > 0
+    ? db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'sam31_employee_replacement'`)
+      .get(sourceSam31ReplacementEvidenceId, projectName)
+    : null;
   const sourceReview = replaySource === 'latest_employee_review_packet'
     ? reviewFromEvidence(sourceReviewEvidence)
     : sam31VisualAuditResultFromEvidence(sourceReviewEvidence);
+  const sourceSam31Replacement = sam31EmployeeReplacementFromEvidence(sourceSam31ReplacementEvidence);
   if (!sourceEvidence || !sourceReview || Number(sourceReview.source_evidence_id) !== sourceEvidenceId) {
     const e = new Error(
       replaySource === 'latest_sam31_visual_audit'
@@ -2859,6 +2938,17 @@ function resolveRoomBoundaryReplayFloorPlan(req, projectName) {
     );
     e.httpStatus = 409;
     throw e;
+  }
+  if (Number.isSafeInteger(sourceSam31ReplacementEvidenceId) && sourceSam31ReplacementEvidenceId > 0) {
+    if (
+      !sourceSam31Replacement ||
+      Number(sourceSam31Replacement.source_evidence_id) !== Number(sourceEvidenceId) ||
+      Number(sourceSam31Replacement.source_sam31_evidence_id) !== Number(sourceSam31EvidenceId)
+    ) {
+      const e = new Error('Replay input source evidence does not match a saved SAM 3.1 employee replacement payload');
+      e.httpStatus = 409;
+      throw e;
+    }
   }
   if (sourceReview.review_decision === 'rejected') {
     const e = new Error(
@@ -2905,6 +2995,18 @@ function resolveRoomBoundaryReplayFloorPlan(req, projectName) {
       claim_gate_effect: 'no_claims_cleared',
     });
   }
+  const sam31ReplacementSummary = sourceSam31Replacement
+    ? sam31EmployeeReplacementReplaySummary({ evidence: sourceSam31ReplacementEvidence, replacement: sourceSam31Replacement })
+    : null;
+  if (sam31ReplacementSummary) {
+    sourceRefs.push({
+      evidence_id: sam31ReplacementSummary.evidence_id,
+      evidence_type: 'sam31_employee_replacement',
+      source_ref: sam31ReplacementSummary.source_ref || sam31ReplacementSummary.replacement_ref || null,
+      status: sam31ReplacementSummary.evidence_status,
+      claim_gate_effect: sam31ReplacementSummary.claim_gate_effect || 'no_claims_cleared',
+    });
+  }
   return {
     floorPlan,
     replayInput: {
@@ -2913,6 +3015,13 @@ function resolveRoomBoundaryReplayFloorPlan(req, projectName) {
       ...(replaySource === 'latest_employee_review_packet'
         ? { source_review_evidence_id: sourceReviewEvidenceId }
         : { source_sam31_evidence_id: sourceSam31EvidenceId }),
+      ...(sam31ReplacementSummary
+        ? {
+          source_sam31_replacement_evidence_id: sam31ReplacementSummary.evidence_id,
+          sam31_replacement_source: 'latest_sam31_employee_replacement',
+          sam31_employee_replacement: sam31ReplacementSummary,
+        }
+        : {}),
       source_ref: sourceEvidence.source_ref || sourceReview.source_ref || null,
       marked_up_plan_ref: sourceReview.marked_up_plan_ref || null,
       ...(replaySource === 'latest_sam31_visual_audit'
@@ -3304,7 +3413,8 @@ app.get('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/replay-in
     const decision = decisionFromEvidence(evidence);
     const reviewEvidence = evidence ? latestPdfBoundaryReviewEvidence(projectName, evidence.id) : null;
     const sam31Evidence = evidence ? latestSam31VisualAuditEvidence(projectName, evidence.id) : null;
-    const packet = pdfBoundaryReplayInputPacket(projectName, evidence, decision, reviewEvidence, sam31Evidence);
+    const sam31ReplacementEvidence = evidence ? latestSam31EmployeeReplacementEvidence(projectName, evidence.id) : null;
+    const packet = pdfBoundaryReplayInputPacket(projectName, evidence, decision, reviewEvidence, sam31Evidence, sam31ReplacementEvidence);
     if (!packet) {
       return res.status(409).json({ error: 'No employee or SAM 3.1 room-boundary review packet is available for replay input' });
     }
@@ -3477,10 +3587,14 @@ function runSprinklerPipeline(req, prebuilt = null) {
 
   // Record that a best-effort layout was generated — as evidence, not a clearance.
   if (normalizeRole(req.user?.role) === 'admin') {
-    const replayEvidenceToken = replayInput?.source_sam31_evidence_id || replayInput?.source_review_evidence_id;
-    const replayEvidenceKind = replayInput?.room_boundary_source === 'latest_sam31_visual_audit'
-      ? 'sam31-room-boundary-replay'
-      : 'room-boundary-replay';
+    const replayEvidenceToken = replayInput?.source_sam31_replacement_evidence_id
+      || replayInput?.source_sam31_evidence_id
+      || replayInput?.source_review_evidence_id;
+    const replayEvidenceKind = replayInput?.source_sam31_replacement_evidence_id
+      ? 'sam31-employee-replacement-replay'
+      : (replayInput?.room_boundary_source === 'latest_sam31_visual_audit'
+        ? 'sam31-room-boundary-replay'
+        : 'room-boundary-replay');
     const evidenceSourceRef = replayInput
       ? `pdf-boundary:${replayInput.source_evidence_id}:${replayEvidenceKind}:${replayEvidenceToken}`
       : `engine ${bid.generatedBy}`;
@@ -3496,6 +3610,9 @@ function runSprinklerPipeline(req, prebuilt = null) {
         source_evidence_id: replayInput.source_evidence_id,
         source_review_evidence_id: replayInput.source_review_evidence_id,
         source_sam31_evidence_id: replayInput.source_sam31_evidence_id,
+        source_sam31_replacement_evidence_id: replayInput.source_sam31_replacement_evidence_id,
+        sam31_replacement_source: replayInput.sam31_replacement_source,
+        sam31_employee_replacement: replayInput.sam31_employee_replacement || null,
         source_ref: replayInput.source_ref,
         marked_up_plan_ref: replayInput.marked_up_plan_ref,
         sam31_result_ref: replayInput.sam31_result_ref,
@@ -3515,7 +3632,9 @@ function runSprinklerPipeline(req, prebuilt = null) {
         claim_gate_effect: 'no_claims_cleared',
         summary: `claim_gate_effect=no_claims_cleared room_boundary_source=${replayInput.room_boundary_source} replay_evidence_id=${replayEvidenceToken}`,
         limitations: [
-          replayInput.room_boundary_source === 'latest_sam31_visual_audit'
+          replayInput.source_sam31_replacement_evidence_id
+            ? 'Generated from employee replacement payload over SAM 3.1 visual-audit correction evidence for internal-alpha replay only.'
+            : replayInput.room_boundary_source === 'latest_sam31_visual_audit'
             ? 'Generated from SAM 3.1 visual-audit correction evidence for internal-alpha replay only.'
             : 'Generated from employee-reviewed room-boundary correction evidence for internal-alpha replay only.',
           bid.disclaimer,

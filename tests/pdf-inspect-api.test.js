@@ -639,19 +639,38 @@ describe('PDF page inspection API', () => {
       status: 'ready_for_internal_alpha_replay',
       source_evidence_id: body.evidence.id,
       source_sam31_evidence_id: samResult.evidence.id,
+      source_sam31_replacement_evidence_id: replacement.evidence.id,
       review_decision: 'corrected',
       review_source: 'latest_sam31_visual_audit',
+      sam31_replacement_source: 'latest_sam31_employee_replacement',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(samReplayPacket.latest_sam31_employee_replacement).toEqual(expect.objectContaining({
+      evidence_id: replacement.evidence.id,
+      replacement_ref: '1881://employee-replacements/sheet-7-sam31-values.json',
       claim_gate_effect: 'no_claims_cleared',
     }));
     expect(samReplayPacket.corrected_room_polygons[0]).toEqual(expect.objectContaining({
-      room_id: 'sam31-corridor-a',
-      polygon: [[0, 0], [30, 0], [30, 10], [0, 10]],
+      room_id: 'main corridor',
+      polygon: [[1, 1], [29, 1], [29, 9], [1, 9]],
+      source_ref: '1881://employee-field-notes/sheet-7',
+      sam31_employee_replacement_evidence_id: replacement.evidence.id,
     }));
     expect(samReplayPacket.sprinkler_bid_request).toEqual(expect.objectContaining({
       room_boundary_source: 'latest_sam31_visual_audit',
       source_evidence_id: body.evidence.id,
       source_sam31_evidence_id: samResult.evidence.id,
+      source_sam31_replacement_evidence_id: replacement.evidence.id,
+      sam31_replacement_source: 'latest_sam31_employee_replacement',
       use_for_claims: false,
+    }));
+    expect(samReplayPacket.sprinkler_bid_request.sam31_employee_replacement).toEqual(expect.objectContaining({
+      evidence_id: replacement.evidence.id,
+      replacement_values: expect.objectContaining({
+        semantic_label: 'main corridor',
+        source_ref: '1881://employee-field-notes/sheet-7',
+      }),
+      claim_gate_effect: 'no_claims_cleared',
     }));
     expect(samReplayPacket.openclaw_sam31_perception_packet).toEqual(expect.objectContaining({
       artifact_type: 'openclaw.sam31_perception_summary',
@@ -694,8 +713,15 @@ describe('PDF page inspection API', () => {
     expect(samReplayBid.roomBoundaryReplay).toEqual(expect.objectContaining({
       room_boundary_source: 'latest_sam31_visual_audit',
       source_sam31_evidence_id: samResult.evidence.id,
+      source_sam31_replacement_evidence_id: replacement.evidence.id,
       corrected_room_polygon_count: 1,
+      sam31_replacement_source: 'latest_sam31_employee_replacement',
       use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(samReplayBid.roomBoundaryReplay.sam31_employee_replacement).toEqual(expect.objectContaining({
+      evidence_id: replacement.evidence.id,
+      replacement_ref: '1881://employee-replacements/sheet-7-sam31-values.json',
       claim_gate_effect: 'no_claims_cleared',
     }));
     expect(samReplayBid.roomBoundaryReplay.openclaw_sam31_perception_packet).toEqual(expect.objectContaining({
@@ -708,10 +734,10 @@ describe('PDF page inspection API', () => {
       next_action: 'Use this summary to queue HaloFire room-boundary replay; do not promote blocked claims.',
       claim_gate_effect: 'no_claims_cleared',
     }));
-    expect(samReplayBid.bid.totalAreaSqFt).toBe(300);
+    expect(samReplayBid.bid.totalAreaSqFt).toBe(224);
     expect(samReplayBid.bid.rooms[0]).toEqual(expect.objectContaining({
-      name: 'sam31-corridor-a',
-      areaSqFt: 300,
+      name: 'main corridor',
+      areaSqFt: 224,
     }));
 
     const reviewRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${body.evidence.id}/reviews`, {
