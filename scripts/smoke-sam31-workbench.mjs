@@ -1033,7 +1033,7 @@ async function runBrowserSmoke(token, evidenceIds) {
     }
     await page.waitForSelector('text=Download SAM31 actual-value work item', { timeout: 8_000 });
     const actualValueWorkItemDownloadPromise = page.waitForEvent('download');
-    await page.locator(`button[data-sam31-consumer-actual-value-work-item-evidence-id="${consumerReview.evidence_id}"]`).click();
+    await page.locator(`button[data-sam31-consumer-actual-value-work-item-evidence-id="${consumerReview.evidence_id}"]`).first().click();
     const actualValueWorkItemDownload = await actualValueWorkItemDownloadPromise;
     const actualValueWorkItemPath = await actualValueWorkItemDownload.path();
     const actualValueWorkItemSuggestedName = actualValueWorkItemDownload.suggestedFilename();
