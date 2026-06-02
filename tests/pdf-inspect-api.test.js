@@ -1507,6 +1507,42 @@ describe('PDF page inspection API', () => {
       '1881://proposal-cooperative/sheet-7',
       '1881://employee-actual-values/replay-handoff/sheet-7',
     ]));
+    expect(replacement.supported_applications).toEqual(expect.arrayContaining([
+      'halo_fire',
+      'landscout',
+      'nameforge',
+    ]));
+    expect(replacement.openclaw_sam31_shared_consumer_contract).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.shared_consumer_actual_value_replacement_contract.v1',
+      source_runtime: 'sam-3.1+llm',
+      claim_gate_effect: 'no_claims_cleared',
+      use_for_claims: false,
+    }));
+    expect(replacement.openclaw_sam31_shared_consumer_contract.produces).toEqual(expect.arrayContaining([
+      'semantic_labels',
+      'segmentation_polygons',
+      'vector_overlays',
+      'model_3d_candidates',
+      'source_refs',
+      'blocked_claims',
+    ]));
+    expect(Object.keys(replacement.openclaw_sam31_shared_consumer_contract.product_lanes)).toEqual([
+      'halo_fire',
+      'landscout',
+      'nameforge',
+    ]);
+    expect(replacement.openclaw_sam31_shared_consumer_contract.product_lanes.halo_fire).toEqual(expect.objectContaining({
+      status: 'replacement_intake_ready',
+      acceptable_use: 'sprinkler_bid_review',
+    }));
+    expect(replacement.openclaw_sam31_shared_consumer_contract.product_lanes.landscout).toEqual(expect.objectContaining({
+      status: 'portable_contract_ready',
+      acceptable_use: 'site_visual_measurement_review',
+    }));
+    expect(replacement.openclaw_sam31_shared_consumer_contract.product_lanes.nameforge).toEqual(expect.objectContaining({
+      status: 'portable_contract_ready',
+      acceptable_use: 'brand_asset_visual_extrapolation_review',
+    }));
     expect(replacement.blocked_claims).toEqual(expect.arrayContaining([
       'permit_ready',
       'AHJ_approval',
@@ -1530,5 +1566,6 @@ describe('PDF page inspection API', () => {
     expect(replacementNotes.source_replay_evidence_id).toBe(replayEvidence.id);
     expect(replacementNotes.source_actual_value_handoff_artifact_type).toBe('openclaw.sam31.actual_value_handoff_packet.v1');
     expect(replacementNotes.claim_gate_effect).toBe('no_claims_cleared');
+    expect(replacementNotes.openclaw_sam31_shared_consumer_contract.artifact_type).toBe('openclaw.sam31.shared_consumer_actual_value_replacement_contract.v1');
   }, 30000);
 });

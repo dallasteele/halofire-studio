@@ -1480,6 +1480,44 @@ function normalizeReplaySam31ActualValueReplacementIntake(projectName, replayEvi
     source_file: sourceFile || null,
     source_ref: sourceRef,
     source_refs: sourceRefs,
+    supported_applications: [...SAM31_SUPPORTED_APPLICATIONS],
+    openclaw_sam31_shared_consumer_contract: {
+      artifact_type: 'openclaw.sam31.shared_consumer_actual_value_replacement_contract.v1',
+      source_runtime: 'sam-3.1+llm',
+      source_replay_evidence_id: replayEvidenceRow.id,
+      source_actual_value_handoff_artifact_type: handoff.artifact_type,
+      supported_applications: [...SAM31_SUPPORTED_APPLICATIONS],
+      produces: [
+        'semantic_labels',
+        'segmentation_polygons',
+        'vector_overlays',
+        'model_3d_candidates',
+        'source_refs',
+        'blocked_claims',
+      ],
+      product_lanes: {
+        halo_fire: {
+          status: 'replacement_intake_ready',
+          acceptable_use: 'sprinkler_bid_review',
+          next_action: 'Use employee/source-reviewed replacement values for internal-alpha sprinkler review packets; regulated claims remain blocked.',
+        },
+        landscout: {
+          status: 'portable_contract_ready',
+          acceptable_use: 'site_visual_measurement_review',
+          next_action: 'Map the same SAM31 sectioning evidence shape into LandScout site observation review queues before any survey-grade claim.',
+        },
+        nameforge: {
+          status: 'portable_contract_ready',
+          acceptable_use: 'brand_asset_visual_extrapolation_review',
+          next_action: 'Map the same SAM31 sectioning evidence shape into NameForge visual asset/vector/model review queues before any brand-ready or trademark-ready claim.',
+        },
+      },
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      limitations: [
+        'Shared SAM31 replacement intake is a portable see-understand-extrapolate contract, not a professional, AHJ, survey-grade, brand-ready, trademark-ready, or production-ready approval.',
+      ],
+    },
     reviewer_name: String(body?.reviewer_name || user?.name || user?.username || '').trim() || null,
     replacement_values: replacementValues,
     replacement_summary: {
