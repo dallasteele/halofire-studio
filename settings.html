@@ -606,30 +606,37 @@ async function loadSettingsCatalogSourceAcquisition() {
 
 function sam31ActualValueEvidencePayload(row) {
   const sourceRef = row.replacement_values_source_ref || row.replacement_ref || row.persisted_review_packet_ref || `openclaw_sam31_consumer_review:${row.source_openclaw_sam31_consumer_review_evidence_id}`;
+  const note = {
+    kind: 'sam31ActualValueReplacement',
+    artifact_type: 'halofire.sam31_actual_value_replacement_intake.v1',
+    source_pdf_boundary_evidence_id: row.source_pdf_boundary_evidence_id || null,
+    source_openclaw_sam31_consumer_review_evidence_id: row.source_openclaw_sam31_consumer_review_evidence_id || null,
+    source_openclaw_sam31_consumer_smoke_evidence_id: row.source_openclaw_sam31_consumer_smoke_evidence_id || null,
+    consumer: row.consumer || null,
+    accepted_queue_id: row.accepted_queue_id || null,
+    persisted_review_packet_ref: row.persisted_review_packet_ref || null,
+    replacement_ref: row.replacement_ref || null,
+    source_file: `openclaw_sam31_consumer_review:${row.source_openclaw_sam31_consumer_review_evidence_id || 'missing'}`,
+    source_ref: sourceRef,
+    replacement_values_source_ref: row.replacement_values_source_ref || sourceRef,
+    source_refs: Array.isArray(row.actual_value_replacement_prefill?.source_refs) ? row.actual_value_replacement_prefill.source_refs : [sourceRef].filter(Boolean),
+    actual_value_replacement_prefill: row.actual_value_replacement_prefill || null,
+    replacement_summary: row.replacement_summary || {},
+    acceptable_actual_evidence: Array.isArray(row.acceptable_actual_evidence) ? row.acceptable_actual_evidence : [],
+    employee_actual_value_next_action: row.employee_actual_value_next_action || null,
+    blocked_claims: Array.isArray(row.blocked_claims) ? row.blocked_claims : [],
+    recorded_from: 'settings.sam31_actual_value_queue',
+    use_for_claims: false,
+    claim_gate_effect: row.claim_gate_effect || 'no_claims_cleared',
+    no_claim_gates_cleared: true,
+  };
   return {
     evidence_type: 'sam31_actual_value_replacement',
     status: 'present',
     source_ref: sourceRef,
-    source_file: `openclaw_sam31_consumer_review:${row.source_openclaw_sam31_consumer_review_evidence_id || 'missing'}`,
-    notes: JSON.stringify({
-      kind: 'sam31ActualValueReplacement',
-      artifact_type: 'halofire.sam31_actual_value_replacement_evidence_note.v1',
-      source_pdf_boundary_evidence_id: row.source_pdf_boundary_evidence_id || null,
-      source_openclaw_sam31_consumer_review_evidence_id: row.source_openclaw_sam31_consumer_review_evidence_id || null,
-      source_openclaw_sam31_consumer_smoke_evidence_id: row.source_openclaw_sam31_consumer_smoke_evidence_id || null,
-      consumer: row.consumer || null,
-      accepted_queue_id: row.accepted_queue_id || null,
-      persisted_review_packet_ref: row.persisted_review_packet_ref || null,
-      replacement_ref: row.replacement_ref || null,
-      replacement_values_source_ref: row.replacement_values_source_ref || null,
-      replacement_summary: row.replacement_summary || {},
-      acceptable_actual_evidence: Array.isArray(row.acceptable_actual_evidence) ? row.acceptable_actual_evidence : [],
-      employee_actual_value_next_action: row.employee_actual_value_next_action || null,
-      blocked_claims: Array.isArray(row.blocked_claims) ? row.blocked_claims : [],
-      use_for_claims: false,
-      claim_gate_effect: row.claim_gate_effect || 'no_claims_cleared',
-      no_claim_gates_cleared: true,
-    }),
+    source_file: note.source_file,
+    notes: JSON.stringify(note),
+    ...note,
   };
 }
 
@@ -701,7 +708,7 @@ async function recordSettingsSam31ActualValueEvidence(index) {
   msg.className = 'muted';
   msg.textContent = 'recording SAM31 actual-value evidence note...';
   try {
-    const created = await api('/projects/' + encodeURIComponent(projectName) + '/evidence', {
+    const created = await api('/projects/' + encodeURIComponent(projectName) + '/openclaw/sam31/actual-value-replacements', {
       method: 'POST',
       body: JSON.stringify(sam31ActualValueEvidencePayload(row)),
     });

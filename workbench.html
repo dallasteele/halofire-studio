@@ -980,33 +980,37 @@ function sam31ActualValueQueueEvidencePayload(row, index = '') {
   const replacementValuesSourceRef = sam31ActualValueFieldValue(`sam31ActualValueReplacementValuesSourceRef-${index}`, prefill.replacement_values_source_ref || sourceRef);
   const sourceRefsText = sam31ActualValueFieldValue(`sam31ActualValueSourceRefs-${index}`, prefill.source_refs.join('\n'));
   const sourceRefs = sourceRefsText.split(/\r?\n/).map((ref) => ref.trim()).filter(Boolean);
+  const note = {
+    kind: 'sam31ActualValueReplacement',
+    artifact_type: 'halofire.sam31_actual_value_replacement_intake.v1',
+    actual_value_replacement_prefill: prefill,
+    source_pdf_boundary_evidence_id: row.source_pdf_boundary_evidence_id || null,
+    source_openclaw_sam31_consumer_review_evidence_id: row.source_openclaw_sam31_consumer_review_evidence_id || null,
+    source_openclaw_sam31_consumer_smoke_evidence_id: row.source_openclaw_sam31_consumer_smoke_evidence_id || null,
+    consumer: row.consumer || null,
+    accepted_queue_id: row.accepted_queue_id || null,
+    persisted_review_packet_ref: row.persisted_review_packet_ref || null,
+    replacement_ref: row.replacement_ref || null,
+    source_file: sourceFile,
+    source_ref: sourceRef,
+    replacement_values_source_ref: replacementValuesSourceRef || null,
+    source_refs: sourceRefs,
+    replacement_summary: row.replacement_summary || {},
+    acceptable_actual_evidence: Array.isArray(row.acceptable_actual_evidence) ? row.acceptable_actual_evidence : [],
+    employee_actual_value_next_action: row.employee_actual_value_next_action || null,
+    blocked_claims: Array.isArray(row.blocked_claims) ? row.blocked_claims : [],
+    use_for_claims: false,
+    claim_gate_effect: row.claim_gate_effect || 'no_claims_cleared',
+    no_claim_gates_cleared: true,
+    recorded_from: 'workbench.sam31_actual_value_queue',
+  };
   return {
     evidence_type: 'sam31_actual_value_replacement',
     status: 'present',
     source_ref: sourceRef,
     source_file: sourceFile,
-    notes: JSON.stringify({
-      kind: 'sam31ActualValueReplacement',
-      artifact_type: 'halofire.sam31_actual_value_replacement_evidence_note.v1',
-      actual_value_replacement_prefill: prefill,
-      source_pdf_boundary_evidence_id: row.source_pdf_boundary_evidence_id || null,
-      source_openclaw_sam31_consumer_review_evidence_id: row.source_openclaw_sam31_consumer_review_evidence_id || null,
-      source_openclaw_sam31_consumer_smoke_evidence_id: row.source_openclaw_sam31_consumer_smoke_evidence_id || null,
-      consumer: row.consumer || null,
-      accepted_queue_id: row.accepted_queue_id || null,
-      persisted_review_packet_ref: row.persisted_review_packet_ref || null,
-      replacement_ref: row.replacement_ref || null,
-      replacement_values_source_ref: replacementValuesSourceRef || null,
-      source_refs: sourceRefs,
-      replacement_summary: row.replacement_summary || {},
-      acceptable_actual_evidence: Array.isArray(row.acceptable_actual_evidence) ? row.acceptable_actual_evidence : [],
-      employee_actual_value_next_action: row.employee_actual_value_next_action || null,
-      blocked_claims: Array.isArray(row.blocked_claims) ? row.blocked_claims : [],
-      use_for_claims: false,
-      claim_gate_effect: row.claim_gate_effect || 'no_claims_cleared',
-      no_claim_gates_cleared: true,
-      recorded_from: 'workbench.sam31_actual_value_queue',
-    }),
+    notes: JSON.stringify(note),
+    ...note,
   };
 }
 
@@ -1119,7 +1123,7 @@ async function recordSam31ActualValueQueueEvidence(index) {
     status.textContent = 'SAM31 actual-value queue row missing.';
     return;
   }
-  const created = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/evidence', {
+  const created = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/openclaw/sam31/actual-value-replacements', {
     method: 'POST',
     body: JSON.stringify(sam31ActualValueQueueEvidencePayload(row, index)),
   });

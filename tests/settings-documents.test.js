@@ -816,4 +816,126 @@ describe('HaloFire settings + documentation upload/link API', () => {
       claim_gate_effect: 'no_claims_cleared',
     }));
   });
+
+  it('records SAM31 actual-value replacements through a typed OpenClaw intake route', async () => {
+    const token = await tokenFor('settings-admin', 'actual-test-password');
+    const projectName = 'Typed SAM31 Actual Replacement Project';
+    const db = new Database(dbPath);
+    const reviewResult = db.prepare(
+      `INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+    ).run(
+      projectName,
+      'openclaw_sam31_consumer_review',
+      'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx',
+      'landscout://sam31/reviews/typed-intake/replacement.json',
+      'present',
+      JSON.stringify({
+        kind: 'openclaw_sam31_consumer_review',
+        review: {
+          artifact_type: 'openclaw.sam31.consumer_review_task_decision.v1',
+          source_application: 'halo_fire',
+          source_pdf_boundary_evidence_id: 374,
+          source_openclaw_sam31_consumer_smoke_evidence_id: 373,
+          consumer: 'landscout',
+          review_decision: 'replaced',
+          accepted_queue_id: 'typed-sam31-landscout',
+          persisted_review_packet_ref: 'openclaw://landscout/sam31/product-review/typed-sam31-landscout',
+          replacement_ref: 'landscout://sam31/reviews/typed-intake/replacement.json',
+          replacement_values: {
+            semantic_labels: ['temporary riser room label'],
+            object_hypotheses: [{ id: 'obj:temporary-riser-room' }],
+            vector_overlays: [{ id: 'vector:temporary-riser-room' }],
+            model_3d_candidates: [{ id: 'model:temporary-riser-room' }],
+            source_ref: 'landscout://sam31/temporary/riser-room',
+          },
+          blocked_claims: ['permit_ready', 'fabrication_ready'],
+          use_for_claims: false,
+          no_claim_gates_cleared: true,
+          claim_gate_effect: 'no_claims_cleared',
+        },
+      }),
+    );
+    db.close();
+
+    const res = await request(`/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/actual-value-replacements`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        source_openclaw_sam31_consumer_review_evidence_id: reviewResult.lastInsertRowid,
+        source_pdf_boundary_evidence_id: 374,
+        source_openclaw_sam31_consumer_smoke_evidence_id: 373,
+        consumer: 'landscout',
+        source_file: 'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx',
+        source_ref: 'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G6',
+        replacement_values_source_ref: 'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G6',
+        source_refs: [
+          'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G6',
+          'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!B9',
+        ],
+        actual_value_replacement_prefill: {
+          artifact_type: 'halofire.sam31_actual_value_replacement_prefill.v1',
+          source_file: 'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx',
+          source_ref: 'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G6',
+          source_refs: [
+            'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G6',
+          ],
+          use_for_claims: false,
+          claim_gate_effect: 'no_claims_cleared',
+          no_claim_gates_cleared: true,
+        },
+      }),
+    });
+    expect(res.status).toBe(201);
+    const saved = await res.json();
+    expect(saved).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.sam31_actual_value_replacement_intake.v1',
+      evidence_type: 'sam31_actual_value_replacement',
+      evidence_record_type: 'sam31_actual_value_replacement',
+      status: 'present',
+      consumer: 'landscout',
+      source_file: 'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx',
+      source_ref: 'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G6',
+      replacement_values_source_ref: 'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G6',
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+      use_for_claims: false,
+    }));
+    expect(saved.source_refs).toEqual(expect.arrayContaining([
+      'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G6',
+      'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!B9',
+    ]));
+    expect(saved.evidence).toEqual(expect.objectContaining({
+      evidence_type: 'sam31_actual_value_replacement',
+      source_file: 'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx',
+      source_ref: 'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G6',
+      status: 'present',
+    }));
+
+    const readbackRes = await request(`/api/openclaw/sam31/actual-value-replacements?projectName=${encodeURIComponent(projectName)}&consumer=landscout`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(readbackRes.status).toBe(200);
+    const readback = await readbackRes.json();
+    expect(readback.recorded_count).toBe(1);
+    expect(readback.items[0].recorded_actual_value_replacement_evidence).toEqual(expect.objectContaining({
+      evidence_id: saved.id,
+      artifact_type: 'halofire.sam31_actual_value_replacement_intake.v1',
+      source_ref: 'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G6',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+
+    const tool = await (await request('/api/openclaw/sam31/tool', {
+      headers: { Authorization: `Bearer ${token}` },
+    })).json();
+    expect(tool.halofire_api_actions.actual_value_replacement_intake).toEqual(expect.objectContaining({
+      method: 'POST',
+      href_template: '/api/projects/{projectName}/openclaw/sam31/actual-value-replacements',
+      consumes: 'openclaw.sam31.actual_value_resolver_queue_item.v1',
+      produces: 'halofire.sam31_actual_value_replacement_intake.v1',
+      evidence_record_type: 'sam31_actual_value_replacement',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+  });
 });

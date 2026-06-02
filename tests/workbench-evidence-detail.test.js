@@ -179,6 +179,8 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toContain('recordSam31ActualValueQueueEvidence');
     expect(html).toContain('data-sam31-actual-value-queue-download-index');
     expect(html).toContain('data-sam31-actual-value-queue-record-index');
+    expect(html).toContain("/openclaw/sam31/actual-value-replacements', {");
+    expect(html).toContain('halofire.sam31_actual_value_replacement_intake.v1');
     expect(html).toContain('openclaw.sam31.actual_value_work_item_packet.v1');
     expect(html).toContain('halofire.sam31_actual_value_work_item_index.v1');
     expect(html).toContain('sam31_actual_value_replacement');

@@ -914,6 +914,114 @@ function latestSam31ActualValueReplacementEvidenceByReview(projectName) {
   return latestByReviewEvidenceId;
 }
 
+function normalizeSam31ActualValueReplacementIntake(projectName, body, reviewRow, item = null, user = null) {
+  const review = openClawSam31ConsumerReviewFromEvidence(reviewRow);
+  if (!review) {
+    const err = new Error('source_openclaw_sam31_consumer_review_evidence_id must reference a SAM31 consumer review evidence row');
+    err.httpStatus = 404;
+    throw err;
+  }
+  const sourceReviewEvidenceId = Number(reviewRow.id);
+  const prefill = body?.actual_value_replacement_prefill && typeof body.actual_value_replacement_prefill === 'object' && !Array.isArray(body.actual_value_replacement_prefill)
+    ? body.actual_value_replacement_prefill
+    : (item?.actual_value_replacement_prefill || buildSam31ActualValueReplacementPrefill(projectName, item || {}, reviewRow));
+  const replacementValuesSourceRef = String(
+    body?.replacement_values_source_ref
+      || prefill.replacement_values_source_ref
+      || body?.source_ref
+      || prefill.source_ref
+      || item?.replacement_values_source_ref
+      || review.replacement_ref
+      || reviewRow.source_ref
+      || '',
+  ).trim();
+  const sourceRef = String(
+    body?.source_ref
+      || replacementValuesSourceRef
+      || prefill.source_ref
+      || item?.replacement_ref
+      || reviewRow.source_ref
+      || '',
+  ).trim();
+  if (!sourceRef) {
+    const err = new Error('source_ref or replacement_values_source_ref is required for SAM31 actual-value replacement intake');
+    err.httpStatus = 400;
+    throw err;
+  }
+  const sourceFile = String(
+    body?.source_file
+      || prefill.source_file
+      || reviewRow.source_file
+      || `openclaw_sam31_consumer_review:${sourceReviewEvidenceId}`,
+  ).trim();
+  const sourceRefs = uniqueStrings([
+    ...(Array.isArray(body?.source_refs) ? body.source_refs : []),
+    ...(Array.isArray(prefill.source_refs) ? prefill.source_refs : []),
+    sourceRef,
+    replacementValuesSourceRef,
+    item?.replacement_ref,
+    item?.persisted_review_packet_ref,
+    review.replacement_ref,
+    reviewRow.source_ref,
+  ].filter(Boolean));
+  return {
+    kind: 'sam31ActualValueReplacement',
+    artifact_type: 'halofire.sam31_actual_value_replacement_intake.v1',
+    evidence_record_type: 'sam31_actual_value_replacement',
+    project_name: projectName,
+    source_application: review.source_application || item?.source_application || 'halo_fire',
+    consumer: body?.consumer || item?.consumer || review.consumer || null,
+    source_pdf_boundary_evidence_id: body?.source_pdf_boundary_evidence_id || item?.source_pdf_boundary_evidence_id || review.source_pdf_boundary_evidence_id || null,
+    source_openclaw_sam31_consumer_review_evidence_id: sourceReviewEvidenceId,
+    source_openclaw_sam31_consumer_smoke_evidence_id: body?.source_openclaw_sam31_consumer_smoke_evidence_id || item?.source_openclaw_sam31_consumer_smoke_evidence_id || review.source_openclaw_sam31_consumer_smoke_evidence_id || null,
+    accepted_queue_id: body?.accepted_queue_id || item?.accepted_queue_id || review.accepted_queue_id || null,
+    persisted_review_packet_ref: body?.persisted_review_packet_ref || item?.persisted_review_packet_ref || review.persisted_review_packet_ref || null,
+    replacement_ref: body?.replacement_ref || item?.replacement_ref || review.replacement_ref || null,
+    source_file: sourceFile || null,
+    source_ref: sourceRef,
+    replacement_values_source_ref: replacementValuesSourceRef || sourceRef,
+    source_refs: sourceRefs,
+    actual_value_replacement_prefill: {
+      ...prefill,
+      source_file: prefill.source_file || sourceFile || null,
+      source_ref: prefill.source_ref || sourceRef,
+      replacement_values_source_ref: prefill.replacement_values_source_ref || replacementValuesSourceRef || sourceRef,
+      source_refs: uniqueStrings([...(Array.isArray(prefill.source_refs) ? prefill.source_refs : []), ...sourceRefs]),
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    },
+    replacement_summary: body?.replacement_summary || item?.replacement_summary || {},
+    acceptable_actual_evidence: Array.isArray(body?.acceptable_actual_evidence)
+      ? body.acceptable_actual_evidence
+      : (Array.isArray(item?.acceptable_actual_evidence) ? item.acceptable_actual_evidence : []),
+    employee_actual_value_next_action: body?.employee_actual_value_next_action
+      || item?.employee_actual_value_next_action
+      || 'Review this typed SAM31 actual-value replacement before downstream bid/export use.',
+    blocked_claims: uniqueStrings([
+      ...(Array.isArray(body?.blocked_claims) ? body.blocked_claims : []),
+      ...(Array.isArray(item?.blocked_claims) ? item.blocked_claims : []),
+      ...(Array.isArray(review.blocked_claims) ? review.blocked_claims : []),
+      'permit_ready',
+      'fabrication_ready',
+      'AHJ_approval',
+      'professional_approval',
+      'manufacturer_exact',
+      'AutoSprink_parity',
+    ]),
+    recorded_from: body?.recorded_from || 'api.openclaw.sam31.actual_value_replacements',
+    recorded_by: user?.username || user?.name || null,
+    recorded_at: new Date().toISOString(),
+    use_for_claims: false,
+    claim_gate_effect: 'no_claims_cleared',
+    no_claim_gates_cleared: true,
+    limitations: [
+      'This intake records actual-value replacement evidence for SAM31+LLM temporary observations only.',
+      'It does not clear permit-ready, fabrication-ready, AHJ-ready, engineering-grade, AutoSprink parity, professional approval, or manufacturer-exact claims.',
+    ],
+  };
+}
+
 function openClawSam31ActualValueResolverConsumerActions(projectName, item) {
   return ['halo_fire', 'landscout', 'nameforge'].map((consumer) => ({
     consumer,
@@ -1127,6 +1235,52 @@ app.get('/api/projects/:name/openclaw/sam31/actual-value-replacements', authMidd
   res.json(buildOpenClawSam31ActualValueReplacementReadback(req.params.name, {
     consumer: req.query?.consumer,
   }));
+});
+
+app.post('/api/projects/:name/openclaw/sam31/actual-value-replacements', authMiddleware, requireRole('admin'), (req, res) => {
+  try {
+    const projectName = req.params.name;
+    const sourceReviewEvidenceId = Number(req.body?.source_openclaw_sam31_consumer_review_evidence_id);
+    if (!Number.isSafeInteger(sourceReviewEvidenceId) || sourceReviewEvidenceId <= 0) {
+      return res.status(400).json({ error: 'source_openclaw_sam31_consumer_review_evidence_id is required for SAM31 actual-value replacement intake' });
+    }
+    const reviewRow = db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'openclaw_sam31_consumer_review'`)
+      .get(sourceReviewEvidenceId, projectName);
+    if (!reviewRow) {
+      return res.status(404).json({ error: 'SAM31 consumer review evidence not found' });
+    }
+    const item = buildOpenClawSam31ActualValueWorkItemIndex(projectName).items
+      .find((candidate) => Number(candidate.source_openclaw_sam31_consumer_review_evidence_id) === sourceReviewEvidenceId) || null;
+    const intake = normalizeSam31ActualValueReplacementIntake(projectName, req.body || {}, reviewRow, item, req.user);
+    const notes = {
+      kind: 'sam31ActualValueReplacement',
+      ...intake,
+    };
+    const result = db
+      .prepare(`INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+                VALUES (?, ?, ?, ?, ?, ?)`)
+      .run(
+        projectName,
+        'sam31_actual_value_replacement',
+        intake.source_file,
+        intake.source_ref,
+        'present',
+        JSON.stringify(notes),
+      );
+    const evidenceRow = db.prepare('SELECT * FROM project_evidence WHERE id = ?').get(result.lastInsertRowid);
+    return res.status(201).json({
+      id: result.lastInsertRowid,
+      message: 'SAM31 actual-value replacement intake recorded; claim gates remain blocked',
+      evidence: evidenceRow,
+      evidence_type: 'sam31_actual_value_replacement',
+      status: 'present',
+      ...intake,
+    });
+  } catch (err) {
+    return res.status(err.httpStatus || 400).json({ error: err.message });
+  }
 });
 
 app.get('/api/projects/:name/evidence/:evidenceId/replay-bid-artifact', authMiddleware, (req, res) => {
@@ -2492,6 +2646,21 @@ function localOpenClawSam31ToolDescriptor(projectName = null) {
         produces: 'openclaw.sam31.actual_value_replacement_readback.v1',
         detail_artifact_type: 'openclaw.sam31.actual_value_replacement_detail.v1',
         consumer_action: 'poll_actual_value_replacement_details',
+        supported_consumers: ['halo_fire', 'landscout', 'nameforge'],
+        temporary_value_policy: 'best_guess_until_employee_replaced',
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      },
+      actual_value_replacement_intake: {
+        method: 'POST',
+        href_template: '/api/projects/{projectName}/openclaw/sam31/actual-value-replacements',
+        consumes: 'openclaw.sam31.actual_value_resolver_queue_item.v1',
+        produces: 'halofire.sam31_actual_value_replacement_intake.v1',
+        evidence_record_type: 'sam31_actual_value_replacement',
+        required_fields: [
+          'source_openclaw_sam31_consumer_review_evidence_id',
+          'source_ref',
+        ],
         supported_consumers: ['halo_fire', 'landscout', 'nameforge'],
         temporary_value_policy: 'best_guess_until_employee_replaced',
         use_for_claims: false,
