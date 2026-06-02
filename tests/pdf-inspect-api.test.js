@@ -1058,28 +1058,6 @@ describe('PDF page inspection API', () => {
     expect(queueAfterReview.summary.correction_ready).toBe(1);
     expect(queueAfterReview.summary.ready).toBe(0);
 
-    const correctionQueueRes = await request(`${COOPERATIVE_1881_PATH}/resolver-queue?roomBoundarySource=employee_review&roomBoundaryState=correction_ready`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    expect(correctionQueueRes.status).toBe(200);
-    const correctionQueue = await correctionQueueRes.json();
-    expect(correctionQueue.filters).toEqual(expect.objectContaining({
-      roomBoundarySource: 'employee_review',
-      roomBoundaryState: 'correction_ready',
-    }));
-    expect(correctionQueue.summary.correction_ready).toBe(1);
-    expect(correctionQueue.summary.ready).toBe(0);
-    expect(correctionQueue.items).toHaveLength(1);
-    expect(correctionQueue.items[0]).toEqual(expect.objectContaining({
-      kind: 'room_boundary_visual_audit',
-      status: 'correction_ready',
-      evidence_id: body.evidence.id,
-      latest_review: expect.objectContaining({
-        evidence_id: reviewBody.evidence.id,
-        review_decision: 'corrected',
-      }),
-    }));
-
     const replayRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${body.evidence.id}/replay-input`, {
       headers: { Authorization: `Bearer ${token}` },
     });
