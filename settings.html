@@ -215,6 +215,7 @@ const stClass = (s) => String(s).toLowerCase().replace(/[^a-z]/g,'');
 let wizardState = { projects: [], gateMap: new Map(), selectedProject: '', canWrite: false };
 let settingsCatalogLedgerRows = [];
 let settingsSam31ActualValueRows = [];
+let lastSettingsSam31ActualValueResolverReplay = null;
 const SETTINGS_CATALOG_LEDGER_FAMILIES = [
   'family:pipe_steel_sch40_2p0in',
   'family:fitting_tee_2p0in',
@@ -715,6 +716,24 @@ async function downloadSettingsSam31ActualValueReplacementReadback(index) {
   }
 }
 
+function downloadSettingsSam31ActualValueResolverReplay() {
+  const msg = $('sam31ActualValueMsg');
+  if (!lastSettingsSam31ActualValueResolverReplay) {
+    msg.className = 'err';
+    msg.textContent = 'SAM31 actual_value_resolver_replay is not available yet';
+    return;
+  }
+  const projectName = catalogEvidenceProjectName();
+  const blob = new Blob([JSON.stringify(lastSettingsSam31ActualValueResolverReplay, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${projectName.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-sam31-actual-value-resolver-replay.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  msg.className = 'muted';
+  msg.textContent = 'downloaded openclaw.sam31.actual_value_resolver_replay.v1; claim gates remain blocked';
+}
+
 async function recordSettingsSam31ActualValueEvidence(index) {
   const row = settingsSam31ActualValueRows[Number(index)];
   const msg = $('sam31ActualValueMsg');
@@ -731,7 +750,11 @@ async function recordSettingsSam31ActualValueEvidence(index) {
       method: 'POST',
       body: JSON.stringify(sam31ActualValueEvidencePayload(row, index)),
     });
-    msg.innerHTML = `recorded sam31_actual_value_replacement evidence row <b>${escapeHtml(created.id)}</b> for ${escapeHtml(projectName)}; no claim gates cleared.`;
+    lastSettingsSam31ActualValueResolverReplay = created.actual_value_resolver_replay || null;
+    const replay = lastSettingsSam31ActualValueResolverReplay;
+    msg.innerHTML = `recorded sam31_actual_value_replacement evidence row <b>${escapeHtml(created.id)}</b> for ${escapeHtml(projectName)}; no claim gates cleared.${replay ? `<br><span class="pill present">${escapeHtml(replay.artifact_type || 'openclaw.sam31.actual_value_resolver_replay.v1')}</span> replay_status ${escapeHtml(replay.replay_status || 'unknown')} intake_status ${escapeHtml(replay.intake_status || 'unknown')} claim_gate_effect ${escapeHtml(replay.claim_gate_effect || 'no_claims_cleared')} <button type="button" data-settings-sam31-actual-value-resolver-replay-download="true">Download actual-value resolver replay</button>` : ''}`;
+    const replayButton = msg.querySelector('[data-settings-sam31-actual-value-resolver-replay-download]');
+    if (replayButton) replayButton.addEventListener('click', () => downloadSettingsSam31ActualValueResolverReplay());
     await loadWizard(projectName);
     await loadSettingsSam31ActualValueWorkItems(projectName);
   } catch(e) {

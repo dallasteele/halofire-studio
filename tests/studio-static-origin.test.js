@@ -552,6 +552,11 @@ describe('studio static origin handling', () => {
     expect(html).toContain('/openclaw/sam31/actual-value-replacements');
     expect(html).toContain('openclaw.sam31.actual_value_replacement_readback.v1');
     expect(html).toContain('downloadSettingsSam31ActualValueReplacementReadback');
+    expect(html).toContain('openclaw.sam31.actual_value_resolver_replay.v1');
+    expect(html).toContain('actual_value_resolver_replay');
+    expect(html).toContain('downloadSettingsSam31ActualValueResolverReplay');
+    expect(html).toContain('lastSettingsSam31ActualValueResolverReplay');
+    expect(html).toContain('data-settings-sam31-actual-value-resolver-replay-download');
     expect(html).toContain('data-sam31-actual-value-replacement-readback-index');
     expect(html).toContain('Record SAM31 actual-value evidence note');
     expect(html).toContain('data-sam31-actual-value-work-item-download-index');
