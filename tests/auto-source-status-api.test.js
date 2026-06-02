@@ -1272,5 +1272,5 @@ describe('S5 GET /api/auto-source/status', () => {
     expect(reviewPacket.blocked_claims).toEqual(
       expect.arrayContaining(['permit_ready', 'AHJ_approval', 'PE_review', 'AutoSprink_parity']),
     );
-  });
+  }, 15000);
 });

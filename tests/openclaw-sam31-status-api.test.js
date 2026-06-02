@@ -727,6 +727,116 @@ describe('OpenClaw SAM31 bridge status API', () => {
       'OpenClaw_runtime_verified',
     ]));
 
+    const sectioningReviewRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/sectioning-pipeline-contract-review`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        source_openclaw_sam31_extrapolation_evidence_id: artifact.id,
+        review_decision: 'replaced',
+        reviewer_name: 'HaloFire estimator',
+        replacement_ref: '1881://employee-review/sam31/sectioning/room-101',
+        replacement_values: {
+          semantic_labels: [
+            {
+              section_id: 'section-room-101',
+              label: 'employee reviewed corridor boundary',
+              source_ref: '1881://employee-review/sam31/sectioning/semantic-label',
+            },
+          ],
+          polygons: [
+            {
+              section_id: 'section-room-101',
+              polygon: [[12, 22], [508, 22], [508, 318], [12, 318]],
+              source_ref: '1881://employee-review/sam31/sectioning/polygon',
+            },
+          ],
+          bboxes: [
+            {
+              section_id: 'section-room-101',
+              bbox: { x: 12, y: 22, width: 496, height: 296 },
+              source_ref: '1881://employee-review/sam31/sectioning/bbox',
+            },
+          ],
+          vector_overlays: [
+            {
+              id: 'vector:room-101-reviewed-sectioning',
+              source_vector_overlay_id: 'vector:section-room-101',
+              svg_path: 'M 12 22 L 508 22 L 508 318 L 12 318 Z',
+              source_ref: '1881://employee-review/sam31/sectioning/vector',
+            },
+          ],
+          model_3d_candidates: [
+            {
+              id: 'model3d:room-101-reviewed-sectioning',
+              source_model_3d_candidate_id: 'model3d:section-room-101',
+              primitive: 'extruded_polygon',
+              source_ref: '1881://employee-review/sam31/sectioning/model3d',
+            },
+          ],
+        },
+        notes: 'Employee replacement values for the SAM31 sectioning pipeline contract only.',
+      }),
+    });
+    expect(sectioningReviewRes.status).toBe(201);
+    const sectioningReview = await sectioningReviewRes.json();
+    expect(sectioningReview).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.sectioning_pipeline_contract_review.v1',
+      status: 'present',
+      source_pdf_boundary_evidence_id: boundary.id,
+      source_openclaw_sam31_extrapolation_evidence_id: artifact.id,
+      source_sectioning_pipeline_contract_artifact_type: 'openclaw.sam31.sectioning_pipeline_contract.v1',
+      review_decision: 'replaced',
+      replacement_ref: '1881://employee-review/sam31/sectioning/room-101',
+      use_for_claims: false,
+      no_claim_gates_cleared: true,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(sectioningReview.evidence).toEqual(expect.objectContaining({
+      evidence_type: 'openclaw_sam31_sectioning_pipeline_contract_review',
+      status: 'present',
+    }));
+    expect(sectioningReview.replacement_values).toEqual(expect.objectContaining({
+      semantic_labels: expect.any(Array),
+      polygons: expect.any(Array),
+      bboxes: expect.any(Array),
+      vector_overlays: expect.any(Array),
+      model_3d_candidates: expect.any(Array),
+    }));
+    expect(sectioningReview.replaced_fields).toEqual(expect.arrayContaining([
+      'semantic_labels',
+      'polygons',
+      'bboxes',
+      'vector_overlays',
+      'model_3d_candidates',
+    ]));
+    expect(sectioningReview.source_refs).toEqual(expect.arrayContaining([
+      expect.objectContaining({ evidence_id: boundary.id, evidence_type: 'pdf_boundary_decision' }),
+      expect.objectContaining({ evidence_id: artifact.id, evidence_type: 'openclaw_sam31_extrapolation_artifact' }),
+    ]));
+    expect(sectioningReview.blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'AHJ_approval',
+      'AutoSprink_parity',
+      'SAM31_runtime_verified',
+      'OpenClaw_runtime_verified',
+    ]));
+
+    const sectioningReviewedQueueRes = await request(`${COOPERATIVE_1881_PATH}/resolver-queue`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(sectioningReviewedQueueRes.status).toBe(200);
+    const sectioningReviewedQueue = await sectioningReviewedQueueRes.json();
+    const sectioningReviewedItem = sectioningReviewedQueue.items.find((row) => row.evidence_id === boundary.id);
+    expect(sectioningReviewedItem.latest_openclaw_sam31_sectioning_pipeline_contract_review).toEqual(expect.objectContaining({
+      evidence_id: sectioningReview.id,
+      evidence_status: 'present',
+      review_decision: 'replaced',
+      source_openclaw_sam31_extrapolation_evidence_id: artifact.id,
+      source_sectioning_pipeline_contract_artifact_type: 'openclaw.sam31.sectioning_pipeline_contract.v1',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(sectioningReviewedQueue.summary.sam31_sectioning_contract_reviews_recorded).toBeGreaterThanOrEqual(1);
+
     const queueItemRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/product-review-queue-item`, {
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -1097,7 +1207,7 @@ describe('OpenClaw SAM31 bridge status API', () => {
       source_openclaw_sam31_extrapolation_evidence_id: artifact.id,
       source_openclaw_sam31_extrapolation_review_evidence_id: review.id,
     }));
-  });
+  }, 15000);
 
   it('posts the SAM31 product review queue item to canonical consumer queues and saves no-claims smoke evidence', async () => {
     consumerQueuePosts.length = 0;

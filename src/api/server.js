@@ -1360,6 +1360,17 @@ const SAM31_EXTRAPOLATION_REVIEW_FIELDS = Object.freeze([
   'confidence',
 ]);
 
+const SAM31_SECTIONING_PIPELINE_CONTRACT_REVIEW_FIELDS = Object.freeze([
+  'semantic_labels',
+  'polygons',
+  'bboxes',
+  'object_hypotheses',
+  'vector_overlays',
+  'model_3d_candidates',
+  'source_ref',
+  'confidence',
+]);
+
 const SAM31_EXTRAPOLATION_CONTRACT_REF = 'openclaw.sam31_extrapolation_contract';
 
 const SAM31_EXTRAPOLATION_CONTRACT = Object.freeze({
@@ -2789,6 +2800,35 @@ function latestOpenClawSam31ExtrapolationReviewEvidence(projectName, sourceEvide
   return null;
 }
 
+function openClawSam31SectioningPipelineContractReviewFromEvidence(row) {
+  if (!row) return null;
+  try {
+    const parsed = JSON.parse(row.notes || '{}');
+    return parsed && parsed.kind === 'openclaw_sam31_sectioning_pipeline_contract_review' && parsed.review
+      ? parsed.review
+      : null;
+  } catch {
+    return null;
+  }
+}
+
+function latestOpenClawSam31SectioningPipelineContractReviewEvidence(projectName, sourceEvidenceId = null) {
+  const rows = db
+    .prepare(`SELECT * FROM project_evidence
+              WHERE project_name = ? AND evidence_type = 'openclaw_sam31_sectioning_pipeline_contract_review'
+              ORDER BY created_at DESC, id DESC`)
+    .all(projectName);
+  for (const row of rows) {
+    const review = openClawSam31SectioningPipelineContractReviewFromEvidence(row);
+    if (!review) continue;
+    if (sourceEvidenceId && Number(review.source_pdf_boundary_evidence_id) !== Number(sourceEvidenceId)) {
+      continue;
+    }
+    return { evidence: row, review };
+  }
+  return null;
+}
+
 function openClawSam31VectorModelArtifactFromEvidence(row) {
   if (!row) return null;
   try {
@@ -3157,6 +3197,37 @@ function openClawSam31ExtrapolationReviewSummary(reviewEvidence) {
     reviewer_name: review.reviewer_name || null,
     replacement_ref: review.replacement_ref || null,
     replaced_fields: Array.isArray(review.replaced_fields) ? [...review.replaced_fields] : [],
+    claim_gate_effect: review.claim_gate_effect || 'no_claims_cleared',
+    blocked_claims: Array.isArray(review.blocked_claims) ? [...review.blocked_claims] : [],
+    limitations: Array.isArray(review.limitations) ? [...review.limitations] : [],
+  };
+}
+
+function openClawSam31SectioningPipelineContractReviewSummary(reviewEvidence) {
+  if (!reviewEvidence?.evidence || !reviewEvidence?.review) return null;
+  const { evidence, review } = reviewEvidence;
+  return {
+    evidence_id: evidence.id,
+    evidence_type: evidence.evidence_type,
+    evidence_status: evidence.status,
+    source_ref: evidence.source_ref,
+    status: review.status || 'present',
+    review_decision: review.review_decision || 'replaced',
+    source_pdf_boundary_evidence_id: review.source_pdf_boundary_evidence_id || null,
+    source_openclaw_sam31_extrapolation_evidence_id: review.source_openclaw_sam31_extrapolation_evidence_id || null,
+    source_sectioning_pipeline_contract_artifact_type: review.source_sectioning_pipeline_contract_artifact_type || null,
+    reviewer_name: review.reviewer_name || null,
+    replacement_ref: review.replacement_ref || null,
+    replaced_fields: Array.isArray(review.replaced_fields) ? [...review.replaced_fields] : [],
+    replacement_summary: {
+      semantic_label_count: Array.isArray(review.replacement_values?.semantic_labels) ? review.replacement_values.semantic_labels.length : 0,
+      polygon_count: Array.isArray(review.replacement_values?.polygons) ? review.replacement_values.polygons.length : 0,
+      bbox_count: Array.isArray(review.replacement_values?.bboxes) ? review.replacement_values.bboxes.length : 0,
+      vector_overlay_count: Array.isArray(review.replacement_values?.vector_overlays) ? review.replacement_values.vector_overlays.length : 0,
+      model_3d_candidate_count: Array.isArray(review.replacement_values?.model_3d_candidates) ? review.replacement_values.model_3d_candidates.length : 0,
+    },
+    use_for_claims: review.use_for_claims === true,
+    no_claim_gates_cleared: review.no_claim_gates_cleared !== false,
     claim_gate_effect: review.claim_gate_effect || 'no_claims_cleared',
     blocked_claims: Array.isArray(review.blocked_claims) ? [...review.blocked_claims] : [],
     limitations: Array.isArray(review.limitations) ? [...review.limitations] : [],
@@ -5703,7 +5774,7 @@ app.post('/api/projects/:name/pdf-boundary-decision', authMiddleware, requireRol
   }
 });
 
-function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence = null, sam31Evidence = null, sam31ReplacementEvidence = null, sam31SmokeEvidence = null, sam31ExtrapolationEvidence = null, sam31ExtrapolationReviewEvidence = null, sam31ConsumerSmokeEvidence = null, sam31ConsumerReviewEvidences = [], sam31SprinklerReviewDecisionEvidences = [], sam31SprinklerPreliminaryReplayFollowupDecisionEvidences = [], sam31SprinklerFollowupPacketReviewDecisionEvidences = [], sam31ApprovalUploadIntakeEvidences = []) {
+function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence = null, sam31Evidence = null, sam31ReplacementEvidence = null, sam31SmokeEvidence = null, sam31ExtrapolationEvidence = null, sam31ExtrapolationReviewEvidence = null, sam31SectioningContractReviewEvidence = null, sam31ConsumerSmokeEvidence = null, sam31ConsumerReviewEvidences = [], sam31SprinklerReviewDecisionEvidences = [], sam31SprinklerPreliminaryReplayFollowupDecisionEvidences = [], sam31SprinklerFollowupPacketReviewDecisionEvidences = [], sam31ApprovalUploadIntakeEvidences = []) {
   if (!evidence || !decision) return null;
   const candidate = decision.candidate || {};
   const pdfRef = evidence.source_file || decision.sourceFile || evidence.source_ref || decision.sourceRef || `${projectName}:pdf-boundary:${evidence.id}`;
@@ -5714,6 +5785,7 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
   const consumerSmokeHref = `/api/projects/${encodeURIComponent(projectName)}/resolver-packets/pdf-boundary/${evidence.id}/openclaw/sam31/consumer-smoke`;
   const toolContractHref = `/api/projects/${encodeURIComponent(projectName)}/resolver-packets/openclaw/sam31/tool-contract`;
   const sectioningPipelineContractHref = `/api/projects/${encodeURIComponent(projectName)}/resolver-packets/pdf-boundary/${evidence.id}/openclaw/sam31/sectioning-pipeline-contract`;
+  const sectioningPipelineContractReviewHref = `/api/projects/${encodeURIComponent(projectName)}/resolver-packets/pdf-boundary/${evidence.id}/openclaw/sam31/sectioning-pipeline-contract-review`;
   const vectorModelArtifactHref = `/api/projects/${encodeURIComponent(projectName)}/resolver-packets/pdf-boundary/${evidence.id}/openclaw/sam31/vector-model-artifacts`;
   const sam31BridgeSmokeAction = {
     label: 'Run OpenClaw SAM31 bridge smoke artifact',
@@ -5860,6 +5932,7 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
   } : null;
   const latestOpenClawSam31ExtrapolationArtifact = openClawSam31ExtrapolationReplaySummary(sam31ExtrapolationEvidence);
   const latestOpenClawSam31ExtrapolationReview = openClawSam31ExtrapolationReviewSummary(sam31ExtrapolationReviewEvidence);
+  const latestOpenClawSam31SectioningPipelineContractReview = openClawSam31SectioningPipelineContractReviewSummary(sam31SectioningContractReviewEvidence);
   const latestOpenClawSam31VectorModelArtifact = openClawSam31VectorModelArtifactSummary(latestOpenClawSam31VectorModelArtifactEvidence(projectName, evidence.id));
   const latestOpenClawSam31ConsumerSmokeArtifact = openClawSam31ConsumerSmokeReplaySummary(sam31ConsumerSmokeEvidence);
   const latestOpenClawSam31ConsumerReviews = openClawSam31ConsumerReviewSummaries(sam31ConsumerReviewEvidences);
@@ -5914,6 +5987,23 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
     claim_gate_effect: 'no_claims_cleared',
     limitations: [
       'This action downloads the source-linked SAM31 sectioning pipeline contract for product review; it does not clear geometry or regulated claims.',
+    ],
+  };
+  const openclawSam31SectioningPipelineContractReviewAction = {
+    label: 'Save SAM31 sectioning contract review',
+    method: 'POST',
+    href: sectioningPipelineContractReviewHref,
+    status: latestOpenClawSam31ExtrapolationArtifact ? 'ready_for_employee_replacement' : 'requires_sam31_extrapolation_artifact',
+    artifact_type: 'openclaw.sam31.sectioning_pipeline_contract_review.v1',
+    source_pdf_boundary_evidence_id: evidence.id,
+    source_openclaw_sam31_extrapolation_evidence_id: sam31ExtrapolationEvidence?.evidence?.id || null,
+    source_sectioning_pipeline_contract_artifact_type: sam31ExtrapolationEvidence?.artifact?.sectioning_pipeline_contract?.artifact_type || 'openclaw.sam31.sectioning_pipeline_contract.v1',
+    acceptable_replacement_fields: [...SAM31_SECTIONING_PIPELINE_CONTRACT_REVIEW_FIELDS],
+    use_for_claims: false,
+    no_claim_gates_cleared: true,
+    claim_gate_effect: 'no_claims_cleared',
+    limitations: [
+      'This action records employee/product-owner replacement values for SAM31 sectioning outputs only; it does not clear geometry or regulated claims.',
     ],
   };
   let status = 'ready';
@@ -5971,6 +6061,7 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
     latest_openclaw_sam31_bridge_smoke_artifact: latestSam31BridgeSmokeArtifact,
     latest_openclaw_sam31_extrapolation_artifact: latestOpenClawSam31ExtrapolationArtifact,
     latest_openclaw_sam31_extrapolation_review: latestOpenClawSam31ExtrapolationReview,
+    latest_openclaw_sam31_sectioning_pipeline_contract_review: latestOpenClawSam31SectioningPipelineContractReview,
     latest_openclaw_sam31_vector_model_artifact: latestOpenClawSam31VectorModelArtifact,
     latest_openclaw_sam31_consumer_smoke_artifact: latestOpenClawSam31ConsumerSmokeArtifact,
     latest_openclaw_sam31_consumer_reviews: latestOpenClawSam31ConsumerReviews,
@@ -5981,6 +6072,7 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
     sam31_bridge_smoke_action: sam31BridgeSmokeAction,
     openclaw_sam31_tool_contract_action: openclawSam31ToolContractAction,
     openclaw_sam31_sectioning_pipeline_contract_action: openclawSam31SectioningPipelineContractAction,
+    openclaw_sam31_sectioning_pipeline_contract_review_action: openclawSam31SectioningPipelineContractReviewAction,
     openclaw_sam31_vector_model_artifact_action: openclawSam31VectorModelArtifactAction,
     openclaw_sam31_extrapolation_status: extrapolateStatus,
     openclaw_sam31_extrapolation_action: openclawSam31ExtrapolationAction,
@@ -5994,6 +6086,7 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
       { label: 'Download SAM 3.1 visual audit packet', href: `/api/projects/${encodeURIComponent(projectName)}/resolver-packets/pdf-boundary/${evidence.id}/sam31-visual-audit` },
       { label: 'Download SAM31 tool contract', href: toolContractHref, method: 'GET', artifact_type: 'openclaw.sam31_llm_extrapolation_tool_contract_packet.v1' },
       { label: 'Download SAM31 sectioning pipeline contract', href: sectioningPipelineContractHref, method: 'GET', artifact_type: 'openclaw.sam31.sectioning_pipeline_contract_packet.v1' },
+      { label: 'Save SAM31 sectioning contract review', href: sectioningPipelineContractReviewHref, method: 'POST', artifact_type: 'openclaw.sam31.sectioning_pipeline_contract_review.v1' },
       { label: 'Download SAM31 vector/model artifact packet', href: vectorModelArtifactHref, method: 'GET', artifact_type: SAM31_VECTOR_MODEL_ARTIFACT_PACKET_TYPE },
       { label: 'Run OpenClaw SAM31 extrapolation artifact', href: extrapolateHref, method: 'POST' },
       { label: 'Run LandScout/NameForge SAM31 queue smoke', href: consumerSmokeHref, method: 'POST', artifact_type: SAM31_CONSUMER_SMOKE_ARTIFACT_TYPE },
@@ -7898,6 +7991,171 @@ function normalizeOpenClawSam31ExtrapolationReview(projectName, evidence, decisi
   };
 }
 
+function normalizeOpenClawSam31SectioningPipelineContractReview(projectName, evidence, decision, extrapolationEvidence, extrapolationArtifact, body = {}, user = {}) {
+  if (!evidence || !decision) {
+    const e = new Error('PDF boundary decision evidence not found');
+    e.httpStatus = 404;
+    throw e;
+  }
+  if (!extrapolationEvidence || !extrapolationArtifact) {
+    const e = new Error('OpenClaw SAM31 extrapolation artifact evidence not found');
+    e.httpStatus = 404;
+    throw e;
+  }
+  if (Number(extrapolationArtifact.source_pdf_boundary_evidence_id) !== Number(evidence.id)) {
+    const e = new Error('source_openclaw_sam31_extrapolation_evidence_id does not belong to the requested PDF boundary evidence');
+    e.httpStatus = 409;
+    throw e;
+  }
+  const sectioningPipelineContract = extrapolationArtifact.sectioning_pipeline_contract && typeof extrapolationArtifact.sectioning_pipeline_contract === 'object'
+    ? {
+      ...jsonClone(sam31SectioningPipelineContract(extrapolationArtifact.source_runtime || 'sam-3.1+llm')),
+      ...jsonClone(extrapolationArtifact.sectioning_pipeline_contract),
+      use_for_claims: false,
+      no_claim_gates_cleared: true,
+      claim_gate_effect: 'no_claims_cleared',
+    }
+    : {
+      ...jsonClone(localOpenClawSam31ToolDescriptor(projectName).sectioning_pipeline_contract),
+      use_for_claims: false,
+      no_claim_gates_cleared: true,
+      claim_gate_effect: 'no_claims_cleared',
+    };
+  const reviewDecision = String(body.review_decision || 'replaced').trim();
+  if (!['accepted', 'replaced', 'rejected'].includes(reviewDecision)) {
+    const e = new Error('review_decision must be one of: accepted, replaced, rejected');
+    e.httpStatus = 400;
+    throw e;
+  }
+  const replacementRef = String(body.replacement_ref || body.source_ref || '').trim();
+  if (!replacementRef) {
+    const e = new Error('replacement_ref is required for OpenClaw SAM31 sectioning contract review evidence');
+    e.httpStatus = 400;
+    throw e;
+  }
+  const rawValues = body.replacement_values;
+  if (!rawValues || typeof rawValues !== 'object' || Array.isArray(rawValues)) {
+    const e = new Error('replacement_values must be an object');
+    e.httpStatus = 400;
+    throw e;
+  }
+  const unknownFields = Object.keys(rawValues).filter((field) => !SAM31_SECTIONING_PIPELINE_CONTRACT_REVIEW_FIELDS.includes(field));
+  if (unknownFields.length) {
+    const e = new Error(`Unsupported OpenClaw SAM31 sectioning contract review fields: ${unknownFields.join(', ')}`);
+    e.httpStatus = 400;
+    throw e;
+  }
+  const replacementValues = {};
+  for (const field of SAM31_SECTIONING_PIPELINE_CONTRACT_REVIEW_FIELDS) {
+    if (Object.prototype.hasOwnProperty.call(rawValues, field)) {
+      replacementValues[field] = jsonClone(rawValues[field]);
+    }
+  }
+  for (const field of ['semantic_labels', 'polygons', 'bboxes', 'object_hypotheses', 'vector_overlays', 'model_3d_candidates']) {
+    if (Object.prototype.hasOwnProperty.call(replacementValues, field) && !Array.isArray(replacementValues[field])) {
+      const e = new Error(`replacement_values.${field} must be an array`);
+      e.httpStatus = 400;
+      throw e;
+    }
+  }
+  if (Object.prototype.hasOwnProperty.call(replacementValues, 'confidence')) {
+    const confidence = Number(replacementValues.confidence);
+    if (!Number.isFinite(confidence) || confidence < 0 || confidence > 1) {
+      const e = new Error('replacement_values.confidence must be a number between 0 and 1');
+      e.httpStatus = 400;
+      throw e;
+    }
+    replacementValues.confidence = confidence;
+  }
+  const replacedFields = Object.keys(replacementValues);
+  if (!replacedFields.length) {
+    const e = new Error('replacement_values must include at least one supported OpenClaw SAM31 sectioning contract review field');
+    e.httpStatus = 400;
+    throw e;
+  }
+  const sourceRefs = [
+    {
+      evidence_id: evidence.id,
+      evidence_type: evidence.evidence_type,
+      source_file: evidence.source_file || decision.sourceFile || null,
+      source_ref: evidence.source_ref || decision.sourceRef || null,
+      status: evidence.status,
+      claim_gate_effect: 'no_claims_cleared',
+    },
+    {
+      evidence_id: extrapolationEvidence.id,
+      evidence_type: extrapolationEvidence.evidence_type,
+      source_ref: extrapolationEvidence.source_ref || extrapolationArtifact.openclaw_endpoint || null,
+      status: extrapolationEvidence.status,
+      claim_gate_effect: 'no_claims_cleared',
+    },
+    {
+      evidence_type: 'openclaw.sam31.sectioning_pipeline_contract.v1',
+      source_ref: sectioningPipelineContract.contract_ref || 'openclaw.sam31.sectioning_pipeline_contract.v1',
+      status: sectioningPipelineContract.status || 'best_effort_contract_ready',
+      claim_gate_effect: 'no_claims_cleared',
+    },
+    {
+      evidence_type: 'employee_sam31_sectioning_contract_review_payload',
+      source_ref: replacementRef,
+      status: 'present',
+      claim_gate_effect: 'no_claims_cleared',
+    },
+  ];
+  return {
+    artifact_type: 'openclaw.sam31.sectioning_pipeline_contract_review.v1',
+    status: 'present',
+    project_name: projectName,
+    source_pdf_boundary_evidence_id: evidence.id,
+    source_evidence_type: evidence.evidence_type,
+    source_openclaw_sam31_extrapolation_evidence_id: extrapolationEvidence.id,
+    source_openclaw_sam31_extrapolation_ref: extrapolationEvidence.source_ref || extrapolationArtifact.openclaw_endpoint || null,
+    source_sectioning_pipeline_contract_artifact_type: sectioningPipelineContract.artifact_type || 'openclaw.sam31.sectioning_pipeline_contract.v1',
+    source_sectioning_pipeline_contract: sectioningPipelineContract,
+    source_ref: evidence.source_ref || decision.sourceRef || null,
+    source_file: evidence.source_file || decision.sourceFile || null,
+    source_runtime: sectioningPipelineContract.source_runtime || extrapolationArtifact.source_runtime || 'sam-3.1+llm',
+    review_decision: reviewDecision,
+    reviewer_name: String(body.reviewer_name || user.name || user.username || '').trim() || null,
+    reviewed_at: new Date().toISOString(),
+    replacement_ref: replacementRef,
+    replacement_values: replacementValues,
+    replaced_fields: replacedFields,
+    notes: String(body.notes || '').trim() || null,
+    source_refs: sourceRefs,
+    supported_applications: [...SAM31_SUPPORTED_APPLICATIONS],
+    supported_evidence_lanes: [
+      'sam31_sectioning',
+      'llm_object_identification',
+      'vector_overlay_generation',
+      'model_3d_candidate_generation',
+      'product_review_queue',
+    ],
+    temporary_value_policy: 'best_guess_until_employee_replaced',
+    acceptable_evidence: [
+      'employee reviewed semantic label replacements',
+      'employee reviewed polygon or bbox replacements',
+      'employee reviewed vector overlay replacements',
+      'employee reviewed 3D candidate references',
+      'source-linked screenshot or console evidence for reviewed sectioning',
+    ],
+    blocked_claims: uniqueStrings([
+      ...(Array.isArray(extrapolationArtifact.blocked_claims) ? extrapolationArtifact.blocked_claims : []),
+      ...(Array.isArray(decision.blockedClaims) ? decision.blockedClaims : PDF_BOUNDARY_BLOCKED_CLAIMS),
+      ...SAM31_BLOCKED_CLAIMS,
+      'SAM31_runtime_verified',
+      'OpenClaw_runtime_verified',
+    ]),
+    use_for_claims: false,
+    no_claim_gates_cleared: true,
+    claim_gate_effect: 'no_claims_cleared',
+    limitations: [
+      'Employee SAM31 sectioning contract reviews replace temporary sectioning outputs for internal-alpha product review only.',
+      'They do not prove geometry accuracy, drawing scale, AHJ approval, PE review, AutoSprink parity, permit readiness, fabrication readiness, or manufacturer-exact models.',
+    ],
+  };
+}
+
 function normalizeOpenClawSam31ConsumerReview(projectName, evidence, decision, consumerSmokeEvidence, consumerSmokeArtifact, body = {}, user = {}) {
   if (!evidence || !decision) {
     const e = new Error('PDF boundary decision evidence not found');
@@ -8920,6 +9178,7 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
   const sam31SmokeEvidence = evidence ? latestSam31BridgeSmokeArtifactEvidence(projectName, evidence.id) : null;
   const sam31ExtrapolationEvidence = evidence ? latestOpenClawSam31ExtrapolationArtifactEvidence(projectName, evidence.id) : null;
   const sam31ExtrapolationReviewEvidence = evidence ? latestOpenClawSam31ExtrapolationReviewEvidence(projectName, evidence.id) : null;
+  const sam31SectioningContractReviewEvidence = evidence ? latestOpenClawSam31SectioningPipelineContractReviewEvidence(projectName, evidence.id) : null;
   const sam31ConsumerSmokeEvidence = evidence ? latestOpenClawSam31ConsumerSmokeArtifactEvidence(projectName, evidence.id) : null;
   const sam31ConsumerReviewEvidences = evidence ? latestOpenClawSam31ConsumerReviewEvidence(projectName, evidence.id) : [];
   const sam31SprinklerReviewDecisionEvidences = evidence ? latestHalofireSam31SprinklerReviewDecisionEvidence(projectName, evidence.id) : [];
@@ -8936,7 +9195,7 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
     const replayItem = officialFlowReplayReviewQueueItem(projectName, replayEvidence);
     if (replayItem) items.push(replayItem);
   }
-  const boundaryItem = pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence, sam31Evidence, sam31ReplacementEvidence, sam31SmokeEvidence, sam31ExtrapolationEvidence, sam31ExtrapolationReviewEvidence, sam31ConsumerSmokeEvidence, sam31ConsumerReviewEvidences, sam31SprinklerReviewDecisionEvidences, sam31SprinklerPreliminaryReplayFollowupDecisionEvidences, sam31SprinklerFollowupPacketReviewDecisionEvidences, sam31ApprovalUploadIntakeEvidences);
+  const boundaryItem = pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence, sam31Evidence, sam31ReplacementEvidence, sam31SmokeEvidence, sam31ExtrapolationEvidence, sam31ExtrapolationReviewEvidence, sam31SectioningContractReviewEvidence, sam31ConsumerSmokeEvidence, sam31ConsumerReviewEvidences, sam31SprinklerReviewDecisionEvidences, sam31SprinklerPreliminaryReplayFollowupDecisionEvidences, sam31SprinklerFollowupPacketReviewDecisionEvidences, sam31ApprovalUploadIntakeEvidences);
   if (boundaryItem) items.push(boundaryItem);
   const catalogEvidence = matchingCatalogEvidenceByFamily(projectName);
   for (const row of currentSourceAcquisitionLedger()) {
@@ -9015,6 +9274,7 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
       sam31_bridge_smoke_recorded: visibleItems.filter((item) => item.latest_openclaw_sam31_bridge_smoke_artifact).length,
       sam31_extrapolation_recorded: visibleItems.filter((item) => item.latest_openclaw_sam31_extrapolation_artifact).length,
       sam31_extrapolation_reviews_recorded: visibleItems.filter((item) => item.latest_openclaw_sam31_extrapolation_review).length,
+      sam31_sectioning_contract_reviews_recorded: visibleItems.filter((item) => item.latest_openclaw_sam31_sectioning_pipeline_contract_review).length,
       sam31_vector_model_artifacts_recorded: visibleItems.filter((item) => item.latest_openclaw_sam31_vector_model_artifact).length,
       sam31_consumer_smoke_recorded: visibleItems.filter((item) => item.latest_openclaw_sam31_consumer_smoke_artifact).length,
       sam31_consumer_reviews_recorded: visibleItems.reduce((acc, item) => acc + (Array.isArray(item.latest_openclaw_sam31_consumer_reviews) ? item.latest_openclaw_sam31_consumer_reviews.length : 0), 0),
@@ -9314,6 +9574,61 @@ app.get('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/openclaw/
     }
     const extrapolationEvidence = latestOpenClawSam31ExtrapolationArtifactEvidence(projectName, evidence.id);
     return res.json(buildOpenClawSam31SectioningPipelineContractPacket(projectName, evidence, decision, extrapolationEvidence));
+  } catch (err) {
+    return res.status(err.httpStatus || 400).json({ error: err.message });
+  }
+});
+
+app.post('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/openclaw/sam31/sectioning-pipeline-contract-review', authMiddleware, requireRole('admin'), (req, res) => {
+  try {
+    const projectName = req.params.name;
+    const evidenceId = Number(req.params.evidenceId);
+    if (!Number.isSafeInteger(evidenceId) || evidenceId <= 0) {
+      return res.status(400).json({ error: 'A positive evidence id is required' });
+    }
+    const sourceExtrapolationEvidenceId = Number(req.body?.source_openclaw_sam31_extrapolation_evidence_id);
+    if (!Number.isSafeInteger(sourceExtrapolationEvidenceId) || sourceExtrapolationEvidenceId <= 0) {
+      return res.status(400).json({ error: 'source_openclaw_sam31_extrapolation_evidence_id is required for OpenClaw SAM31 sectioning contract review evidence' });
+    }
+    const evidence = db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'pdf_boundary_decision'`)
+      .get(evidenceId, projectName);
+    const decision = decisionFromEvidence(evidence);
+    if (!evidence || !decision) {
+      return res.status(404).json({ error: 'PDF boundary decision evidence not found' });
+    }
+    const extrapolationEvidence = db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'openclaw_sam31_extrapolation_artifact'`)
+      .get(sourceExtrapolationEvidenceId, projectName);
+    const extrapolationArtifact = openClawSam31ExtrapolationArtifactFromEvidence(extrapolationEvidence);
+    const reviewPacket = normalizeOpenClawSam31SectioningPipelineContractReview(projectName, evidence, decision, extrapolationEvidence, extrapolationArtifact, req.body, req.user);
+    const notes = {
+      kind: 'openclaw_sam31_sectioning_pipeline_contract_review',
+      review: reviewPacket,
+      blocked_claims: reviewPacket.blocked_claims,
+      claim_gate_effect: reviewPacket.claim_gate_effect,
+      limitations: reviewPacket.limitations,
+    };
+    const result = db
+      .prepare(`INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+                VALUES (?, ?, ?, ?, ?, ?)`)
+      .run(
+        projectName,
+        'openclaw_sam31_sectioning_pipeline_contract_review',
+        reviewPacket.source_file,
+        reviewPacket.replacement_ref,
+        'present',
+        JSON.stringify(notes),
+      );
+    const evidenceRow = db.prepare('SELECT * FROM project_evidence WHERE id = ?').get(result.lastInsertRowid);
+    return res.status(201).json({
+      id: result.lastInsertRowid,
+      message: 'OpenClaw SAM31 sectioning contract review values recorded; claims still blocked',
+      evidence: evidenceRow,
+      ...reviewPacket,
+    });
   } catch (err) {
     return res.status(err.httpStatus || 400).json({ error: err.message });
   }

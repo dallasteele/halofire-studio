@@ -407,6 +407,71 @@ async function runBrowserSmoke(token, evidenceIds) {
         throw new Error(`Downloaded SAM31 sectioning pipeline contract lost stage ${stageName}: ${JSON.stringify(downloadedSectioningContract.stages)}`);
       }
     }
+    await page.waitForSelector('[data-sam31-sectioning-contract-review-save-evidence-id]', { state: 'attached', timeout: 8_000 });
+    const sectioningContractReviewButton = page.locator('[data-sam31-sectioning-contract-review-save-evidence-id]').first();
+    await sectioningContractReviewButton.evaluate((button) => {
+      button.closest('details')?.setAttribute('open', '');
+    });
+    await page.waitForSelector('text=Save SAM31 sectioning contract review', { timeout: 8_000 });
+    await page.locator(`[id="sam31SectioningContractReviewer-${evidenceIds.boundaryEvidenceId}"]`).fill('Halo Fire sectioning smoke');
+    await page.locator(`[id="sam31SectioningContractReplacementRef-${evidenceIds.boundaryEvidenceId}"]`).fill('1881://employee-review/sam31/sectioning/smoke-sectioning-contract.json');
+    await page.locator(`[id="sam31SectioningContractReplacementValues-${evidenceIds.boundaryEvidenceId}"]`).fill(JSON.stringify({
+      semantic_labels: [
+        {
+          section_id: 'section-room-101',
+          label: 'smoke reviewed corridor section',
+          source_ref: '1881://employee-review/sam31/sectioning/semantic-label',
+        },
+      ],
+      polygons: [
+        {
+          section_id: 'section-room-101',
+          polygon: [[12, 22], [508, 22], [508, 318], [12, 318]],
+          source_ref: '1881://employee-review/sam31/sectioning/polygon',
+        },
+      ],
+      bboxes: [
+        {
+          section_id: 'section-room-101',
+          bbox: { x: 12, y: 22, width: 496, height: 296 },
+          source_ref: '1881://employee-review/sam31/sectioning/bbox',
+        },
+      ],
+      vector_overlays: [
+        {
+          id: 'vector:room-101-smoke-sectioning',
+          source_vector_overlay_id: 'vector:section-room-101',
+          svg_path: 'M 12 22 L 508 22 L 508 318 L 12 318 Z',
+          source_ref: '1881://employee-review/sam31/sectioning/vector',
+        },
+      ],
+      model_3d_candidates: [
+        {
+          id: 'model3d:room-101-smoke-sectioning',
+          source_model_3d_candidate_id: 'model3d:section-room-101',
+          primitive: 'extruded_polygon',
+          source_ref: '1881://employee-review/sam31/sectioning/model3d',
+        },
+      ],
+    }));
+    await page.locator(`[id="sam31SectioningContractReviewNotes-${evidenceIds.boundaryEvidenceId}"]`).fill('Smoke employee review for SAM31 sectioning contract replacement values.');
+    await sectioningContractReviewButton.click();
+    await page.waitForSelector('text=openclaw_sam31_sectioning_pipeline_contract_review evidence', { timeout: 8_000 });
+    await page.waitForSelector('text=sam31_sectioning_contract_reviews_recorded 1', { timeout: 8_000 });
+    const sectioningReviewQueue = await request(`${PROJECT_PATH}/resolver-queue`, token);
+    if (sectioningReviewQueue.summary?.sam31_sectioning_contract_reviews_recorded !== 1) {
+      throw new Error(`SAM31 sectioning contract review queue summary missing review evidence: ${JSON.stringify(sectioningReviewQueue.summary)}`);
+    }
+    const sectioningContractReview = sectioningReviewQueue.items
+      .find((item) => item.evidence_id === evidenceIds.boundaryEvidenceId)
+      ?.latest_openclaw_sam31_sectioning_pipeline_contract_review;
+    if (!sectioningContractReview
+      || sectioningContractReview.source_openclaw_sam31_extrapolation_evidence_id !== evidenceIds.localBridgeExtrapolationEvidenceId
+      || sectioningContractReview.source_sectioning_pipeline_contract_artifact_type !== 'openclaw.sam31.sectioning_pipeline_contract.v1'
+      || sectioningContractReview.claim_gate_effect !== 'no_claims_cleared'
+      || sectioningContractReview.use_for_claims !== false) {
+      throw new Error(`SAM31 sectioning contract review did not persist fail-closed source truth: ${JSON.stringify(sectioningContractReview)}`);
+    }
     await page.waitForSelector('text=SAM31 vector/model artifact packet', { timeout: 8_000 });
     await page.waitForSelector('text=Download SAM31 vector/model artifact packet', { timeout: 8_000 });
     await page.waitForSelector('text=Record SAM31 vector/model artifacts', { timeout: 8_000 });
@@ -1206,6 +1271,13 @@ async function runBrowserSmoke(token, evidenceIds) {
         missing_evidence_codes: missingEvidenceCodes,
         use_for_claims: queueItem.use_for_claims,
         claim_gate_effect: queueItem.claim_gate_effect,
+      },
+      sectioningContractReview: {
+        evidence_id: sectioningContractReview.evidence_id,
+        review_decision: sectioningContractReview.review_decision,
+        source_openclaw_sam31_extrapolation_evidence_id: sectioningContractReview.source_openclaw_sam31_extrapolation_evidence_id,
+        source_sectioning_pipeline_contract_artifact_type: sectioningContractReview.source_sectioning_pipeline_contract_artifact_type,
+        claim_gate_effect: sectioningContractReview.claim_gate_effect,
       },
       consumerSmokeArtifact: {
         artifact_type: consumerSmokeArtifact.artifact_type,
