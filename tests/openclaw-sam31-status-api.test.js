@@ -1214,6 +1214,78 @@ describe('OpenClaw SAM31 bridge status API', () => {
       use_for_claims: false,
       claim_gate_effect: 'no_claims_cleared',
     }));
+    const consumerReviewRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/consumer-review`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        source_openclaw_sam31_consumer_smoke_evidence_id: consumerSmoke.id,
+        consumer: 'landscout',
+        accepted_queue_id: 'sam31-landscout-testqueue',
+        persisted_review_packet_ref: 'openclaw://landscout/sam31/product-review/sam31-landscout-testqueue',
+        review_decision: 'replaced',
+        reviewer_name: 'LandScout product owner',
+        replacement_ref: 'landscout://sam31/reviews/sam31-landscout-testqueue/replacement.json',
+        screenshot_ref: 'landscout://sam31/reviews/sam31-landscout-testqueue/screenshot.png',
+        console_log_ref: 'landscout://sam31/reviews/sam31-landscout-testqueue/console.log',
+        replacement_values: {
+          semantic_labels: ['employee reviewed parcel edge'],
+          object_hypotheses: [{ id: 'obj:parcel-edge', semantic_label: 'reviewed parcel edge' }],
+          vector_overlays: [{ id: 'vector:parcel-edge', svg_path: 'M 0 0 L 10 0 L 10 5 Z' }],
+          model_3d_candidates: [{ id: 'model3d:parcel-edge', primitive: 'extruded_review_shape' }],
+          source_ref: 'landscout://field-review/sam31-landscout-testqueue',
+          confidence: 0.82,
+        },
+        notes: 'Product owner replaced the SAM31 temporary values for LandScout review.',
+      }),
+    });
+    expect(consumerReviewRes.status).toBe(201);
+    const consumerReview = await consumerReviewRes.json();
+    expect(consumerReview).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.consumer_review_task_decision.v1',
+      status: 'present',
+      consumer: 'landscout',
+      source_application: 'halo_fire',
+      source_pdf_boundary_evidence_id: boundary.id,
+      source_openclaw_sam31_consumer_smoke_evidence_id: consumerSmoke.id,
+      accepted_queue_id: 'sam31-landscout-testqueue',
+      persisted_review_packet_ref: 'openclaw://landscout/sam31/product-review/sam31-landscout-testqueue',
+      review_decision: 'replaced',
+      reviewer_name: 'LandScout product owner',
+      replacement_ref: 'landscout://sam31/reviews/sam31-landscout-testqueue/replacement.json',
+      screenshot_ref: 'landscout://sam31/reviews/sam31-landscout-testqueue/screenshot.png',
+      console_log_ref: 'landscout://sam31/reviews/sam31-landscout-testqueue/console.log',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(consumerReview.replacement_values).toEqual(expect.objectContaining({
+      semantic_labels: ['employee reviewed parcel edge'],
+      confidence: 0.82,
+    }));
+    expect(consumerReview.replaced_fields).toEqual(expect.arrayContaining([
+      'semantic_labels',
+      'object_hypotheses',
+      'vector_overlays',
+      'model_3d_candidates',
+      'source_ref',
+      'confidence',
+    ]));
+    expect(consumerReview.acceptable_evidence).toEqual(expect.arrayContaining([
+      'product owner review note tied to accepted queue id',
+      'employee accepted or replaced SAM31 semantic label/object/vector/3D candidate',
+      'source screenshot or console evidence for reviewed sectioning',
+    ]));
+    expect(consumerReview.blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'AHJ_approval',
+      'AutoSprink_parity',
+      'fabrication_ready',
+      'manufacturer_exact',
+    ]));
+    expect(consumerReview.evidence).toEqual(expect.objectContaining({
+      evidence_type: 'openclaw_sam31_consumer_review',
+      status: 'present',
+      source_ref: 'landscout://sam31/reviews/sam31-landscout-testqueue/replacement.json',
+    }));
     expect(consumerQueuePosts.map((post) => post.consumer).sort()).toEqual(['landscout', 'nameforge']);
     for (const post of consumerQueuePosts) {
       expect(post.body.product_review_queue_item).toEqual(expect.objectContaining({
@@ -1268,6 +1340,19 @@ describe('OpenClaw SAM31 bridge status API', () => {
         status: 'requires_product_review',
         accepted_queue_id: 'sam31-nameforge-testqueue',
         persisted_review_packet_ref: 'openclaw://nameforge/sam31/product-review/sam31-nameforge-testqueue',
+      }),
+    ]));
+    expect(item.latest_openclaw_sam31_consumer_reviews).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        evidence_id: consumerReview.id,
+        consumer: 'landscout',
+        review_decision: 'replaced',
+        accepted_queue_id: 'sam31-landscout-testqueue',
+        persisted_review_packet_ref: 'openclaw://landscout/sam31/product-review/sam31-landscout-testqueue',
+        replacement_ref: 'landscout://sam31/reviews/sam31-landscout-testqueue/replacement.json',
+        screenshot_ref: 'landscout://sam31/reviews/sam31-landscout-testqueue/screenshot.png',
+        console_log_ref: 'landscout://sam31/reviews/sam31-landscout-testqueue/console.log',
+        claim_gate_effect: 'no_claims_cleared',
       }),
     ]));
     expect(queue.summary.sam31_consumer_smoke_recorded).toBeGreaterThanOrEqual(1);

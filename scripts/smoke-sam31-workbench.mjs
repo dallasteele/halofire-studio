@@ -425,6 +425,49 @@ async function runBrowserSmoke(token, evidenceIds) {
         throw new Error(`SAM31 consumer task ${consumer} cleared a claim gate: ${JSON.stringify(task)}`);
       }
     }
+    const consumerReviewTask = consumerReviewTasks.find((task) => task.consumer === 'landscout');
+    if (!consumerReviewTask) {
+      throw new Error('SAM31 consumer smoke did not expose a LandScout consumer review task');
+    }
+    await page.waitForSelector('text=Save SAM31 consumer review decision', { timeout: 8_000 });
+    const consumerReviewButtonSelector = `button[data-sam31-consumer-review-save-evidence-id="${evidenceIds.boundaryEvidenceId}"][data-sam31-consumer="landscout"]`;
+    await page.locator(consumerReviewButtonSelector).evaluate((button) => {
+      button.closest('details')?.setAttribute('open', '');
+    });
+    await page.waitForSelector('[id^="sam31ConsumerReviewStatus-"]', { state: 'attached', timeout: 8_000 });
+    await page.locator(`#sam31ConsumerReviewReviewer-${evidenceIds.boundaryEvidenceId}-landscout`).fill('LandScout product owner smoke');
+    await page.locator(`#sam31ConsumerReviewReplacementRef-${evidenceIds.boundaryEvidenceId}-landscout`).fill('landscout://sam31/reviews/smoke-landscout/replacement.json');
+    await page.locator(`#sam31ConsumerReviewScreenshotRef-${evidenceIds.boundaryEvidenceId}-landscout`).fill('landscout://sam31/reviews/smoke-landscout/screenshot.png');
+    await page.locator(`#sam31ConsumerReviewConsoleLogRef-${evidenceIds.boundaryEvidenceId}-landscout`).fill('landscout://sam31/reviews/smoke-landscout/console.log');
+    await page.locator(`#sam31ConsumerReviewReplacementValues-${evidenceIds.boundaryEvidenceId}-landscout`).fill(JSON.stringify({
+      semantic_labels: ['reviewed parcel frontage', 'reviewed access lane'],
+      object_hypotheses: [{ id: 'landscout-object-smoke', semantic_label: 'parcel_access_candidate', confidence: 0.78 }],
+      vector_overlays: [{ id: 'landscout-vector-smoke', kind: 'polyline', source_ref: 'landscout://sam31/reviews/smoke-landscout/vector.svg' }],
+      model_3d_candidates: [{ id: 'landscout-model-smoke', primitive: 'extruded_site_area', source_ref: 'landscout://sam31/reviews/smoke-landscout/model.glb' }],
+      source_ref: 'landscout://sam31/reviews/smoke-landscout/reviewer-values.json',
+      confidence: 0.82,
+    }));
+    await page.locator(`#sam31ConsumerReviewNotes-${evidenceIds.boundaryEvidenceId}-landscout`).fill('Smoke saved product owner review note tied to accepted queue id.');
+    await page.locator(consumerReviewButtonSelector).click();
+    await page.waitForSelector('text=openclaw_sam31_consumer_review evidence', { timeout: 8_000 });
+    await page.waitForSelector('text=openclaw.sam31.consumer_review_task_decision.v1', { timeout: 8_000 });
+    await page.waitForSelector('text=Latest landscout review', { timeout: 8_000 });
+    await page.waitForSelector('text=no_claims_cleared', { timeout: 8_000 });
+    const queueAfterConsumerReview = await request(`${PROJECT_PATH}/resolver-queue`, token);
+    const reviewedQueueItem = queueAfterConsumerReview.items.find((item) => item.evidence_id === evidenceIds.boundaryEvidenceId);
+    const consumerReview = reviewedQueueItem?.latest_openclaw_sam31_consumer_reviews?.find((review) => review.consumer === 'landscout');
+    if (!consumerReview || consumerReview.artifact_type !== 'openclaw.sam31.consumer_review_task_decision.v1') {
+      throw new Error(`SAM31 LandScout review decision was not persisted: ${JSON.stringify(consumerReview)}`);
+    }
+    if (consumerReview.accepted_queue_id !== consumerReviewTask.accepted_queue_id) {
+      throw new Error(`SAM31 LandScout review accepted_queue_id mismatch: ${JSON.stringify(consumerReview)}`);
+    }
+    if (consumerReview.persisted_review_packet_ref !== consumerReviewTask.persisted_review_packet_ref) {
+      throw new Error(`SAM31 LandScout review packet ref mismatch: ${JSON.stringify(consumerReview)}`);
+    }
+    if (consumerReview.claim_gate_effect !== 'no_claims_cleared') {
+      throw new Error(`SAM31 LandScout review cleared a claim gate: ${JSON.stringify(consumerReview)}`);
+    }
     await page.waitForSelector('[data-sam31-replacement-action-field="semantic_label"]', { timeout: 8_000 });
     await page.waitForSelector('[data-sam31-replacement-action-field="polygon"]', { timeout: 8_000 });
     await page.waitForSelector('[data-sam31-replacement-action-field="bbox"]', { timeout: 8_000 });
@@ -548,6 +591,15 @@ async function runBrowserSmoke(token, evidenceIds) {
         })),
         use_for_claims: consumerSmokeArtifact.use_for_claims,
         claim_gate_effect: consumerSmokeArtifact.claim_gate_effect,
+      },
+      consumerReviewDecision: {
+        artifact_type: 'openclaw.sam31.consumer_review_task_decision.v1',
+        evidence_type: 'openclaw_sam31_consumer_review',
+        consumer: consumerReview.consumer,
+        review_decision: consumerReview.review_decision,
+        accepted_queue_id: consumerReview.accepted_queue_id,
+        persisted_review_packet_ref: consumerReview.persisted_review_packet_ref,
+        claim_gate_effect: consumerReview.claim_gate_effect,
       },
       replayArtifact: {
         artifact_type: replayArtifact.artifact_type,

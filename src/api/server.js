@@ -1314,6 +1314,7 @@ const SAM31_EXTRAPOLATION_CONTRACT = Object.freeze({
 const SAM31_PRODUCT_REVIEW_QUEUE_ITEM_TYPE = 'openclaw.sam31.product_review_queue_item.v1';
 const SAM31_CONSUMER_SMOKE_ARTIFACT_TYPE = 'openclaw.sam31.consumer_smoke_artifact.v1';
 const SAM31_CONSUMER_REVIEW_TASK_TYPE = 'openclaw.sam31.consumer_review_task.v1';
+const SAM31_CONSUMER_REVIEW_DECISION_TYPE = 'openclaw.sam31.consumer_review_task_decision.v1';
 const SAM31_CONSUMER_QUEUE_TARGETS = Object.freeze(['landscout', 'nameforge']);
 const SAM31_CONSUMER_UNAVAILABLE_CODES = Object.freeze({
   landscout: 'OPENCLAW_SAM31_LANDSCOUT_QUEUE_UNAVAILABLE',
@@ -1323,6 +1324,14 @@ const SAM31_CONSUMER_QUEUE_URL_ENV = Object.freeze({
   landscout: 'OPENCLAW_SAM31_LANDSCOUT_QUEUE_URL',
   nameforge: 'OPENCLAW_SAM31_NAMEFORGE_QUEUE_URL',
 });
+const SAM31_CONSUMER_REVIEW_FIELDS = Object.freeze([
+  'semantic_labels',
+  'object_hypotheses',
+  'vector_overlays',
+  'model_3d_candidates',
+  'source_ref',
+  'confidence',
+]);
 
 const SAM31_APPLICATION_CONTRACTS = Object.freeze({
   halo_fire: {
@@ -3067,6 +3076,61 @@ function latestOpenClawSam31ConsumerSmokeArtifactEvidence(projectName, sourceEvi
   return null;
 }
 
+function openClawSam31ConsumerReviewFromEvidence(row) {
+  if (!row) return null;
+  try {
+    const parsed = JSON.parse(row.notes || '{}');
+    return parsed && parsed.kind === 'openclaw_sam31_consumer_review' && parsed.review
+      ? parsed.review
+      : null;
+  } catch {
+    return null;
+  }
+}
+
+function latestOpenClawSam31ConsumerReviewEvidence(projectName, sourceEvidenceId = null) {
+  const rows = db
+    .prepare(`SELECT * FROM project_evidence
+              WHERE project_name = ? AND evidence_type = 'openclaw_sam31_consumer_review'
+              ORDER BY created_at DESC, id DESC`)
+    .all(projectName);
+  const latestByConsumer = new Map();
+  for (const row of rows) {
+    const review = openClawSam31ConsumerReviewFromEvidence(row);
+    if (!review) continue;
+    if (sourceEvidenceId && Number(review.source_pdf_boundary_evidence_id) !== Number(sourceEvidenceId)) {
+      continue;
+    }
+    const key = String(review.consumer || '').trim();
+    if (key && !latestByConsumer.has(key)) {
+      latestByConsumer.set(key, { evidence: row, review });
+    }
+  }
+  return [...latestByConsumer.values()];
+}
+
+function openClawSam31ConsumerReviewSummaries(reviewEvidences) {
+  return (Array.isArray(reviewEvidences) ? reviewEvidences : [])
+    .filter((item) => item?.evidence && item?.review)
+    .map(({ evidence, review }) => ({
+      evidence_id: evidence.id,
+      evidence_status: evidence.status,
+      source_ref: evidence.source_ref,
+      artifact_type: review.artifact_type || SAM31_CONSUMER_REVIEW_DECISION_TYPE,
+      consumer: review.consumer,
+      review_decision: review.review_decision,
+      reviewer_name: review.reviewer_name,
+      reviewed_at: review.reviewed_at,
+      accepted_queue_id: review.accepted_queue_id,
+      persisted_review_packet_ref: review.persisted_review_packet_ref,
+      replacement_ref: review.replacement_ref,
+      screenshot_ref: review.screenshot_ref,
+      console_log_ref: review.console_log_ref,
+      replaced_fields: Array.isArray(review.replaced_fields) ? [...review.replaced_fields] : [],
+      claim_gate_effect: review.claim_gate_effect || 'no_claims_cleared',
+    }));
+}
+
 function openClawSam31ConsumerSmokeReplaySummary(consumerSmokeEvidence) {
   if (!consumerSmokeEvidence?.evidence || !consumerSmokeEvidence?.artifact) return null;
   const { evidence, artifact } = consumerSmokeEvidence;
@@ -3347,7 +3411,7 @@ app.post('/api/projects/:name/pdf-boundary-decision', authMiddleware, requireRol
   }
 });
 
-function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence = null, sam31Evidence = null, sam31ReplacementEvidence = null, sam31SmokeEvidence = null, sam31ExtrapolationEvidence = null, sam31ExtrapolationReviewEvidence = null, sam31ConsumerSmokeEvidence = null) {
+function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence = null, sam31Evidence = null, sam31ReplacementEvidence = null, sam31SmokeEvidence = null, sam31ExtrapolationEvidence = null, sam31ExtrapolationReviewEvidence = null, sam31ConsumerSmokeEvidence = null, sam31ConsumerReviewEvidences = []) {
   if (!evidence || !decision) return null;
   const candidate = decision.candidate || {};
   const pdfRef = evidence.source_file || decision.sourceFile || evidence.source_ref || decision.sourceRef || `${projectName}:pdf-boundary:${evidence.id}`;
@@ -3486,6 +3550,7 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
   const latestOpenClawSam31ExtrapolationArtifact = openClawSam31ExtrapolationReplaySummary(sam31ExtrapolationEvidence);
   const latestOpenClawSam31ExtrapolationReview = openClawSam31ExtrapolationReviewSummary(sam31ExtrapolationReviewEvidence);
   const latestOpenClawSam31ConsumerSmokeArtifact = openClawSam31ConsumerSmokeReplaySummary(sam31ConsumerSmokeEvidence);
+  const latestOpenClawSam31ConsumerReviews = openClawSam31ConsumerReviewSummaries(sam31ConsumerReviewEvidences);
   let status = 'ready';
   let nextAction = 'Open the selected PDF sheet with these defaults, run a room-boundary visual audit packet, and attach employee review evidence before any geometry-accuracy claim.';
   if (latestReview?.review_decision === 'corrected') {
@@ -3542,6 +3607,7 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
     latest_openclaw_sam31_extrapolation_artifact: latestOpenClawSam31ExtrapolationArtifact,
     latest_openclaw_sam31_extrapolation_review: latestOpenClawSam31ExtrapolationReview,
     latest_openclaw_sam31_consumer_smoke_artifact: latestOpenClawSam31ConsumerSmokeArtifact,
+    latest_openclaw_sam31_consumer_reviews: latestOpenClawSam31ConsumerReviews,
     openclaw_sam31_bridge_status: bridgeStatus,
     sam31_bridge_smoke_action: sam31BridgeSmokeAction,
     openclaw_sam31_extrapolation_status: extrapolateStatus,
@@ -4773,6 +4839,201 @@ function normalizeOpenClawSam31ExtrapolationReview(projectName, evidence, decisi
   };
 }
 
+function normalizeOpenClawSam31ConsumerReview(projectName, evidence, decision, consumerSmokeEvidence, consumerSmokeArtifact, body = {}, user = {}) {
+  if (!evidence || !decision) {
+    const e = new Error('PDF boundary decision evidence not found');
+    e.httpStatus = 404;
+    throw e;
+  }
+  if (!consumerSmokeEvidence || !consumerSmokeArtifact) {
+    const e = new Error('OpenClaw SAM31 consumer smoke artifact evidence not found');
+    e.httpStatus = 404;
+    throw e;
+  }
+  if (Number(consumerSmokeArtifact.source_pdf_boundary_evidence_id) !== Number(evidence.id)) {
+    const e = new Error('source_openclaw_sam31_consumer_smoke_evidence_id does not belong to the requested PDF boundary evidence');
+    e.httpStatus = 409;
+    throw e;
+  }
+  const consumer = String(body.consumer || '').trim().toLowerCase();
+  if (!SAM31_CONSUMER_QUEUE_TARGETS.includes(consumer)) {
+    const e = new Error(`consumer must be one of: ${SAM31_CONSUMER_QUEUE_TARGETS.join(', ')}`);
+    e.httpStatus = 400;
+    throw e;
+  }
+  const acceptedQueueId = String(body.accepted_queue_id || '').trim();
+  if (!acceptedQueueId) {
+    const e = new Error('accepted_queue_id is required for SAM31 consumer review evidence');
+    e.httpStatus = 400;
+    throw e;
+  }
+  const persistedReviewPacketRef = String(body.persisted_review_packet_ref || '').trim();
+  if (!persistedReviewPacketRef) {
+    const e = new Error('persisted_review_packet_ref is required for SAM31 consumer review evidence');
+    e.httpStatus = 400;
+    throw e;
+  }
+  const task = (Array.isArray(consumerSmokeArtifact.consumer_review_tasks) ? consumerSmokeArtifact.consumer_review_tasks : [])
+    .find((item) => item.consumer === consumer
+      && item.accepted_queue_id === acceptedQueueId
+      && item.persisted_review_packet_ref === persistedReviewPacketRef);
+  if (!task) {
+    const e = new Error('accepted_queue_id and persisted_review_packet_ref must match a saved SAM31 consumer review task');
+    e.httpStatus = 409;
+    throw e;
+  }
+  const reviewDecision = String(body.review_decision || 'replaced').trim().toLowerCase();
+  if (!['accepted', 'replaced', 'rejected'].includes(reviewDecision)) {
+    const e = new Error('review_decision must be one of: accepted, replaced, rejected');
+    e.httpStatus = 400;
+    throw e;
+  }
+  const replacementRef = String(body.replacement_ref || body.source_ref || '').trim();
+  if (!replacementRef) {
+    const e = new Error('replacement_ref is required for SAM31 consumer review evidence');
+    e.httpStatus = 400;
+    throw e;
+  }
+  const screenshotRef = String(body.screenshot_ref || '').trim();
+  const consoleLogRef = String(body.console_log_ref || '').trim();
+  if (!screenshotRef && !consoleLogRef) {
+    const e = new Error('screenshot_ref or console_log_ref is required for SAM31 consumer review evidence');
+    e.httpStatus = 400;
+    throw e;
+  }
+  const rawValues = body.replacement_values;
+  if (!rawValues || typeof rawValues !== 'object' || Array.isArray(rawValues)) {
+    const e = new Error('replacement_values must be an object');
+    e.httpStatus = 400;
+    throw e;
+  }
+  const unknownFields = Object.keys(rawValues).filter((field) => !SAM31_CONSUMER_REVIEW_FIELDS.includes(field));
+  if (unknownFields.length) {
+    const e = new Error(`Unsupported SAM31 consumer review fields: ${unknownFields.join(', ')}`);
+    e.httpStatus = 400;
+    throw e;
+  }
+  const replacementValues = {};
+  for (const field of SAM31_CONSUMER_REVIEW_FIELDS) {
+    if (Object.prototype.hasOwnProperty.call(rawValues, field)) {
+      replacementValues[field] = jsonClone(rawValues[field]);
+    }
+  }
+  for (const field of ['semantic_labels', 'object_hypotheses', 'vector_overlays', 'model_3d_candidates']) {
+    if (Object.prototype.hasOwnProperty.call(replacementValues, field) && !Array.isArray(replacementValues[field])) {
+      const e = new Error(`replacement_values.${field} must be an array`);
+      e.httpStatus = 400;
+      throw e;
+    }
+  }
+  if (Object.prototype.hasOwnProperty.call(replacementValues, 'confidence')) {
+    const confidence = Number(replacementValues.confidence);
+    if (!Number.isFinite(confidence) || confidence < 0 || confidence > 1) {
+      const e = new Error('replacement_values.confidence must be a number between 0 and 1');
+      e.httpStatus = 400;
+      throw e;
+    }
+    replacementValues.confidence = confidence;
+  }
+  const replacedFields = Object.keys(replacementValues);
+  if (!replacedFields.length) {
+    const e = new Error('replacement_values must include at least one supported SAM31 consumer review field');
+    e.httpStatus = 400;
+    throw e;
+  }
+  const sourceRefs = [
+    {
+      evidence_id: evidence.id,
+      evidence_type: evidence.evidence_type,
+      source_file: evidence.source_file || decision.sourceFile || null,
+      source_ref: evidence.source_ref || decision.sourceRef || null,
+      status: evidence.status,
+    },
+    {
+      evidence_id: consumerSmokeEvidence.id,
+      evidence_type: consumerSmokeEvidence.evidence_type,
+      source_ref: consumerSmokeEvidence.source_ref || consumerSmokeArtifact.canonical_tool_descriptor_url || null,
+      status: consumerSmokeEvidence.status,
+      claim_gate_effect: 'no_claims_cleared',
+    },
+    {
+      evidence_type: SAM31_CONSUMER_REVIEW_TASK_TYPE,
+      source_ref: persistedReviewPacketRef,
+      status: task.status || 'requires_product_review',
+      accepted_queue_id: acceptedQueueId,
+      claim_gate_effect: 'no_claims_cleared',
+    },
+    {
+      evidence_type: 'employee_sam31_consumer_review_payload',
+      source_ref: replacementRef,
+      status: 'present',
+      claim_gate_effect: 'no_claims_cleared',
+    },
+  ];
+  if (screenshotRef) {
+    sourceRefs.push({
+      evidence_type: 'consumer_review_screenshot',
+      source_ref: screenshotRef,
+      status: 'present',
+      claim_gate_effect: 'no_claims_cleared',
+    });
+  }
+  if (consoleLogRef) {
+    sourceRefs.push({
+      evidence_type: 'consumer_review_console_log',
+      source_ref: consoleLogRef,
+      status: 'present',
+      claim_gate_effect: 'no_claims_cleared',
+    });
+  }
+  return {
+    artifact_type: SAM31_CONSUMER_REVIEW_DECISION_TYPE,
+    status: 'present',
+    project_name: projectName,
+    source_application: 'halo_fire',
+    source_pdf_boundary_evidence_id: evidence.id,
+    source_evidence_type: evidence.evidence_type,
+    source_openclaw_sam31_consumer_smoke_evidence_id: consumerSmokeEvidence.id,
+    source_ref: evidence.source_ref || decision.sourceRef || null,
+    source_file: evidence.source_file || decision.sourceFile || null,
+    source_runtime: consumerSmokeArtifact.source_runtime || 'sam-3.1+llm',
+    consumer,
+    accepted_queue_id: acceptedQueueId,
+    persisted_review_packet_ref: persistedReviewPacketRef,
+    consumer_review_task: jsonClone(task),
+    review_decision: reviewDecision,
+    reviewer_name: String(body.reviewer_name || user.name || user.username || '').trim() || null,
+    reviewed_at: new Date().toISOString(),
+    replacement_ref: replacementRef,
+    screenshot_ref: screenshotRef || null,
+    console_log_ref: consoleLogRef || null,
+    replacement_values: replacementValues,
+    replaced_fields: replacedFields,
+    acceptable_evidence: Array.isArray(task.acceptable_evidence) ? [...task.acceptable_evidence] : [
+      'product owner review note tied to accepted queue id',
+      'employee accepted or replaced SAM31 semantic label/object/vector/3D candidate',
+      'source screenshot or console evidence for reviewed sectioning',
+    ],
+    notes: String(body.notes || '').trim() || null,
+    source_refs: sourceRefs,
+    blocked_claims: uniqueStrings([
+      ...(Array.isArray(task.blocked_claims) ? task.blocked_claims : []),
+      ...(Array.isArray(consumerSmokeArtifact.blocked_claims) ? consumerSmokeArtifact.blocked_claims : []),
+      ...(Array.isArray(decision.blockedClaims) ? decision.blockedClaims : PDF_BOUNDARY_BLOCKED_CLAIMS),
+      'professional_approval',
+      'SAM31_runtime_verified',
+      'OpenClaw_runtime_verified',
+    ]),
+    use_for_claims: false,
+    claim_gate_effect: 'no_claims_cleared',
+    no_claim_gates_cleared: true,
+    limitations: [
+      'This review records a product-owner or employee decision against a SAM31 consumer review task for internal-alpha use only.',
+      'It can accept or replace temporary SAM31 semantic labels, object hypotheses, vector overlays, and 3D candidates, but it does not clear regulated or product-readiness claims.',
+    ],
+  };
+}
+
 function normalizeSam31VisualAuditResult(projectName, evidence, decision, body = {}, user = {}) {
   if (!evidence || !decision) {
     const e = new Error('PDF boundary decision evidence not found');
@@ -5522,6 +5783,7 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
   const sam31ExtrapolationEvidence = evidence ? latestOpenClawSam31ExtrapolationArtifactEvidence(projectName, evidence.id) : null;
   const sam31ExtrapolationReviewEvidence = evidence ? latestOpenClawSam31ExtrapolationReviewEvidence(projectName, evidence.id) : null;
   const sam31ConsumerSmokeEvidence = evidence ? latestOpenClawSam31ConsumerSmokeArtifactEvidence(projectName, evidence.id) : null;
+  const sam31ConsumerReviewEvidences = evidence ? latestOpenClawSam31ConsumerReviewEvidence(projectName, evidence.id) : [];
   const items = [];
   const officialFlowEvidence = latestOfficialFlowIntakeEvidence(projectName);
   const officialFlowItem = officialFlowResolverQueueItem(projectName, officialFlowEvidence);
@@ -5530,7 +5792,7 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
     const replayItem = officialFlowReplayReviewQueueItem(projectName, replayEvidence);
     if (replayItem) items.push(replayItem);
   }
-  const boundaryItem = pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence, sam31Evidence, sam31ReplacementEvidence, sam31SmokeEvidence, sam31ExtrapolationEvidence, sam31ExtrapolationReviewEvidence, sam31ConsumerSmokeEvidence);
+  const boundaryItem = pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence, sam31Evidence, sam31ReplacementEvidence, sam31SmokeEvidence, sam31ExtrapolationEvidence, sam31ExtrapolationReviewEvidence, sam31ConsumerSmokeEvidence, sam31ConsumerReviewEvidences);
   if (boundaryItem) items.push(boundaryItem);
   const catalogEvidence = matchingCatalogEvidenceByFamily(projectName);
   for (const row of currentSourceAcquisitionLedger()) {
@@ -5914,6 +6176,61 @@ app.post('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/openclaw
       message: 'OpenClaw SAM31 consumer queue smoke saved as best-effort evidence; claims still blocked',
       evidence: evidenceRow,
       ...artifact,
+    });
+  } catch (err) {
+    return res.status(err.httpStatus || 400).json({ error: err.message });
+  }
+});
+
+app.post('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/openclaw/sam31/consumer-review', authMiddleware, requireRole('admin'), (req, res) => {
+  try {
+    const projectName = req.params.name;
+    const evidenceId = Number(req.params.evidenceId);
+    if (!Number.isSafeInteger(evidenceId) || evidenceId <= 0) {
+      return res.status(400).json({ error: 'A positive evidence id is required' });
+    }
+    const sourceConsumerSmokeEvidenceId = Number(req.body?.source_openclaw_sam31_consumer_smoke_evidence_id);
+    if (!Number.isSafeInteger(sourceConsumerSmokeEvidenceId) || sourceConsumerSmokeEvidenceId <= 0) {
+      return res.status(400).json({ error: 'source_openclaw_sam31_consumer_smoke_evidence_id is required for SAM31 consumer review evidence' });
+    }
+    const evidence = db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'pdf_boundary_decision'`)
+      .get(evidenceId, projectName);
+    const decision = decisionFromEvidence(evidence);
+    if (!evidence || !decision) {
+      return res.status(404).json({ error: 'PDF boundary decision evidence not found' });
+    }
+    const consumerSmokeEvidence = db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'openclaw_sam31_consumer_smoke_artifact'`)
+      .get(sourceConsumerSmokeEvidenceId, projectName);
+    const consumerSmokeArtifact = openClawSam31ConsumerSmokeArtifactFromEvidence(consumerSmokeEvidence);
+    const reviewPacket = normalizeOpenClawSam31ConsumerReview(projectName, evidence, decision, consumerSmokeEvidence, consumerSmokeArtifact, req.body, req.user);
+    const notes = {
+      kind: 'openclaw_sam31_consumer_review',
+      review: reviewPacket,
+      blocked_claims: reviewPacket.blocked_claims,
+      claim_gate_effect: reviewPacket.claim_gate_effect,
+      limitations: reviewPacket.limitations,
+    };
+    const result = db
+      .prepare(`INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+                VALUES (?, ?, ?, ?, ?, ?)`)
+      .run(
+        projectName,
+        'openclaw_sam31_consumer_review',
+        reviewPacket.source_file,
+        reviewPacket.replacement_ref,
+        'present',
+        JSON.stringify(notes),
+      );
+    const evidenceRow = db.prepare('SELECT * FROM project_evidence WHERE id = ?').get(result.lastInsertRowid);
+    return res.status(201).json({
+      id: result.lastInsertRowid,
+      message: 'SAM31 consumer product-review decision recorded; claims still blocked',
+      evidence: evidenceRow,
+      ...reviewPacket,
     });
   } catch (err) {
     return res.status(err.httpStatus || 400).json({ error: err.message });
