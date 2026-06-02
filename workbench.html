@@ -507,6 +507,45 @@ function renderSam31ConsumerReviewReplacementSummary(review) {
   return `<span class="muted" style="font-size:10px">replacement_summary ${counts.map(([label, count]) => `<span class="chip">${escapeHtml(label)} ${escapeHtml(count)}</span>`).join('')}${sourceRef ? `<br>replacement_values_source_ref ${escapeHtml(sourceRef)}` : ''}<br>replacement_values are saved product-owner evidence for internal-alpha routing - use_for_claims false - claim_gate_effect ${escapeHtml(review.claim_gate_effect || 'no_claims_cleared')}</span><br>`;
 }
 
+function renderSam31ConsumerActualValueWorkItem(review, blockedClaims = []) {
+  if (!review || typeof review !== 'object') return '';
+  const values = review.replacement_values && typeof review.replacement_values === 'object' && !Array.isArray(review.replacement_values)
+    ? review.replacement_values
+    : {};
+  const summary = review.replacement_summary && typeof review.replacement_summary === 'object'
+    ? review.replacement_summary
+    : {};
+  const count = (summaryKey, valuesKey) => {
+    const fromSummary = Number(summary[summaryKey]);
+    if (Number.isFinite(fromSummary)) return fromSummary;
+    const fromValues = values[valuesKey];
+    return Array.isArray(fromValues) ? fromValues.length : 0;
+  };
+  const counts = [
+    ['semantic_label_count', count('semantic_label_count', 'semantic_labels')],
+    ['object_hypothesis_count', count('object_hypothesis_count', 'object_hypotheses')],
+    ['vector_overlay_count', count('vector_overlay_count', 'vector_overlays')],
+    ['model_3d_candidate_count', count('model_3d_candidate_count', 'model_3d_candidates')],
+  ];
+  const sourceRef = values.source_ref || review.replacement_ref || review.source_ref || '';
+  const acceptableActualEvidence = [
+    '1881 proposal workbook row or sheet reference',
+    'reviewed vector overlay SVG or marked-up plan ref',
+    'reviewed 3D model candidate ref or model note',
+    'screenshot or console evidence for the reviewed SAM31 section',
+  ];
+  const blocked = Array.from(new Set([
+    ...(Array.isArray(blockedClaims) ? blockedClaims : []),
+    ...(Array.isArray(review.blocked_claims) ? review.blocked_claims : []),
+    'permit_ready',
+    'fabrication_ready',
+    'AHJ_approval',
+    'professional_approval',
+    'manufacturer_exact',
+  ]));
+  return `<div class="muted" style="font-size:11px;margin-top:5px;border:1px solid rgba(255,213,79,.24);border-radius:8px;padding:8px;background:rgba(255,213,79,.05)">SAM31 consumer replacement summary<br>${counts.map(([label, value]) => `<span class="chip">${escapeHtml(label)} ${escapeHtml(value)}</span>`).join('')}${sourceRef ? `<br>replacement_values_source_ref ${escapeHtml(sourceRef)}` : ''}<br>employee_actual_value_next_action Replace SAM31 best guesses with actual HaloFire documentation values before using these observations in bid/export decisions.<br>acceptable_actual_evidence ${acceptableActualEvidence.map((item) => `<span class="chip">${escapeHtml(item)}</span>`).join('')}<br>Blocks still active: ${blocked.map((claim) => `<span class="chip">${escapeHtml(claim)}</span>`).join('') || '<span class="chip">claim gates remain blocked</span>'}<br>use_for_claims false - claim_gate_effect ${escapeHtml(review.claim_gate_effect || 'no_claims_cleared')}</div>`;
+}
+
 function renderOpenClawSam31ConsumerReviewTasks(tasks, sourceConsumerSmokeEvidenceId, sourcePdfBoundaryEvidenceId, latestReviews = []) {
   if (!Array.isArray(tasks) || !tasks.length) return '';
   const fallbackAcceptableEvidence = [
@@ -707,7 +746,7 @@ function evidenceDetail(row) {
       const review = packet.review || {};
       const blocked = Array.isArray(packet.blocked_claims) ? packet.blocked_claims : (Array.isArray(review.blocked_claims) ? review.blocked_claims : []);
       const fields = Array.isArray(review.replaced_fields) ? review.replaced_fields : [];
-      return `<div class="muted" style="font-size:11px;margin-top:3px">openclaw_sam31_consumer_review: openclaw.sam31.consumer_review_task_decision.v1<br>consumer ${escapeHtml(review.consumer || 'missing')} - review_decision ${escapeHtml(review.review_decision || 'missing')} - accepted_queue_id ${escapeHtml(review.accepted_queue_id || 'missing')} - persisted_review_packet_ref ${escapeHtml(review.persisted_review_packet_ref || 'missing')}<br>replacement_ref ${escapeHtml(review.replacement_ref || 'missing')} - screenshot_ref ${escapeHtml(review.screenshot_ref || 'missing')} - console_log_ref ${escapeHtml(review.console_log_ref || 'missing')} - claim_gate_effect ${escapeHtml(packet.claim_gate_effect || review.claim_gate_effect || 'no_claims_cleared')}<br>Replaced fields: ${fields.map((field) => `<span class="chip">${escapeHtml(field)}</span>`).join('')}<br>Blocks still active: ${blocked.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('') || '<span class="chip">claim gates remain blocked</span>'}</div>`;
+      return `<div class="muted" style="font-size:11px;margin-top:3px">openclaw_sam31_consumer_review: openclaw.sam31.consumer_review_task_decision.v1<br>consumer ${escapeHtml(review.consumer || 'missing')} - review_decision ${escapeHtml(review.review_decision || 'missing')} - accepted_queue_id ${escapeHtml(review.accepted_queue_id || 'missing')} - persisted_review_packet_ref ${escapeHtml(review.persisted_review_packet_ref || 'missing')}<br>replacement_ref ${escapeHtml(review.replacement_ref || 'missing')} - screenshot_ref ${escapeHtml(review.screenshot_ref || 'missing')} - console_log_ref ${escapeHtml(review.console_log_ref || 'missing')} - claim_gate_effect ${escapeHtml(packet.claim_gate_effect || review.claim_gate_effect || 'no_claims_cleared')}<br>Replaced fields: ${fields.map((field) => `<span class="chip">${escapeHtml(field)}</span>`).join('')}<br>${renderSam31ConsumerActualValueWorkItem(review, blocked)}<br>Blocks still active: ${blocked.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('') || '<span class="chip">claim gates remain blocked</span>'}</div>`;
     } catch {
       return '<div class="muted" style="font-size:11px;margin-top:3px">OpenClaw SAM31 consumer review evidence; detail unavailable</div>';
     }

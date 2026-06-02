@@ -515,6 +515,9 @@ describe('studio static origin handling', () => {
     expect(html).toContain('signed reviewer evidence');
     expect(html).toContain('review metadata recorded only; no claim gates cleared');
     expect(html).toContain('claim_gate_effect');
+    expect(html).toContain('SAM31 consumer replacement summary');
+    expect(html).toContain('employee_actual_value_next_action');
+    expect(html).toContain('acceptable_actual_evidence');
   });
 
   it('lets Settings resolve a gate from recorded matching evidence rows', async () => {

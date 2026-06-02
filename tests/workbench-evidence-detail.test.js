@@ -102,6 +102,28 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toContain('no_claims_cleared');
   });
 
+  it('surfaces saved SAM31 consumer replacement summaries as employee actual-value work items', async () => {
+    const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
+    expect(shell.status).toBe(200);
+    const html = await shell.text();
+    expect(html).toContain("row.evidence_type === 'openclaw_sam31_consumer_review'");
+    expect(html).toContain('SAM31 consumer replacement summary');
+    expect(html).toContain('semantic_label_count');
+    expect(html).toContain('object_hypothesis_count');
+    expect(html).toContain('vector_overlay_count');
+    expect(html).toContain('model_3d_candidate_count');
+    expect(html).toContain('replacement_values_source_ref');
+    expect(html).toContain('employee_actual_value_next_action');
+    expect(html).toContain('acceptable_actual_evidence');
+    expect(html).toContain('Replace SAM31 best guesses with actual HaloFire documentation values');
+    expect(html).toContain('1881 proposal workbook row or sheet reference');
+    expect(html).toContain('reviewed vector overlay SVG or marked-up plan ref');
+    expect(html).toContain('reviewed 3D model candidate ref or model note');
+    expect(html).toContain('permit_ready');
+    expect(html).toContain('fabrication_ready');
+    expect(html).toContain('no_claims_cleared');
+  });
+
   it('surfaces SAM31 sectioning downstream resolver rows and filter links in the workbench', async () => {
     const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
     expect(shell.status).toBe(200);
