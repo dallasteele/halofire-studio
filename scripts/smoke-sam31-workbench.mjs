@@ -356,6 +356,27 @@ async function runBrowserSmoke(token, evidenceIds) {
       || catalogPacket.latest_catalog_source_acquisition?.claim_gate_effect !== 'no_claims_cleared') {
       throw new Error(`Catalog source packet cleared claims or lost family evidence: ${JSON.stringify(catalogPacket)}`);
     }
+    const catalogApprovalButton = page.locator('[data-catalog-source-approval-family-ref="family:pipe_steel_sch40_2p0in"]').first();
+    await catalogApprovalButton.evaluate((button) => {
+      button.closest('details')?.setAttribute('open', '');
+    });
+    const catalogRowKey = 'family:pipe_steel_sch40_2p0in';
+    await page.locator(`[id="catalogApprovalSourceRef-${catalogRowKey}"]`).fill('manufacturer://smoke/pipe-sch40-2in-approval');
+    await page.locator(`[id="catalogApprovalSourceFile-${catalogRowKey}"]`).fill('catalog-manufacturer-approval-smoke.pdf');
+    await page.locator(`[id="catalogApprovalReviewerName-${catalogRowKey}"]`).fill('Smoke Manufacturer Reviewer');
+    await page.locator(`[id="catalogApprovalReviewerTitle-${catalogRowKey}"]`).fill('HaloFire Manufacturer Review Lead');
+    await page.locator(`[id="catalogApprovalSignedAt-${catalogRowKey}"]`).fill('2026-06-02T15:10:00.000Z');
+    await page.locator(`[id="catalogApprovalOrganization-${catalogRowKey}"]`).fill('Halo Fire');
+    await page.locator(`[id="catalogApprovalLicenseId-${catalogRowKey}"]`).fill('HF-MFG-SMOKE');
+    await page.locator(`[id="catalogApprovalNotes-${catalogRowKey}"]`).fill('Smoke signed manufacturer approval validation for catalog packet ladder.');
+    await catalogApprovalButton.click();
+    await page.waitForSelector('text=Validated catalog approval gate MANUFACTURER_MODEL_APPROVAL_MISSING', { timeout: 8_000 });
+    const catalogValidatedGates = await request(`${PROJECT_PATH}/claim-gates`, token);
+    const validatedManufacturerGate = catalogValidatedGates.find((gate) => gate.code === 'MANUFACTURER_MODEL_APPROVAL_MISSING');
+    if (validatedManufacturerGate?.status !== 'cleared'
+      || validatedManufacturerGate?.resolved_evidence_ref !== 'manufacturer://smoke/pipe-sch40-2in-approval') {
+      throw new Error(`Catalog approval validation did not clear manufacturer gate with signed evidence: ${JSON.stringify(validatedManufacturerGate)}`);
+    }
 
     const queueDownloadPromise = page.waitForEvent('download');
     await page.getByRole('button', { name: 'Download SAM31 queue item' }).first().click();
@@ -388,7 +409,6 @@ async function runBrowserSmoke(token, evidenceIds) {
     await page.waitForSelector('[id^="sam31ConsumerSmokeStatus-"]', { state: 'attached', timeout: 8_000 });
     await page.getByRole('button', { name: 'Run LandScout/NameForge SAM31 queue smoke' }).first().click();
     const consumerSmokeActionTimeoutMs = 20_000;
-    await page.waitForSelector('text=openclaw_sam31_consumer_smoke_artifact evidence', { timeout: consumerSmokeActionTimeoutMs });
     await page.waitForSelector('text=Latest consumer smoke', { timeout: consumerSmokeActionTimeoutMs });
     await page.waitForSelector('text=posted_consumer_count', { timeout: consumerSmokeActionTimeoutMs });
     await page.waitForSelector('text=blocked_consumer_count', { timeout: consumerSmokeActionTimeoutMs });

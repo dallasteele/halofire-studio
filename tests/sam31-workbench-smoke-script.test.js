@@ -53,7 +53,11 @@ describe('SAM31 workbench browser smoke script', () => {
     expect(script).toContain('data-sam31-consumer-smoke-evidence-id');
     expect(script).toContain('data-sam31-consumer-smoke-packet-evidence-id');
     expect(script).toContain('sam31ConsumerSmokeStatus');
-    expect(script).toContain('openclaw_sam31_consumer_smoke_artifact');
+    expect(script).toContain('openclaw.sam31.consumer_smoke_artifact.v1');
+    expect(script).not.toContain("waitForSelector('text=openclaw_sam31_consumer_smoke_artifact evidence'");
+    expect(script.indexOf("waitForSelector('text=Latest consumer smoke'")).toBeLessThan(
+      script.indexOf("waitForSelector('text=posted_consumer_count'"),
+    );
     expect(script).toContain('posted_consumer_count');
     expect(script).toContain('blocked_consumer_count');
     expect(script).toContain('posted_consumer_count 2');

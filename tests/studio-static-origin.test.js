@@ -153,6 +153,15 @@ describe('studio static origin handling', () => {
     expect(html).toContain('downloadCatalogSourceEvidencePacket');
     expect(html).toContain('/resolver-packets/catalog-source/');
     expect(html).toContain('data-catalog-source-packet-family-ref');
+    expect(html).toContain('Validate catalog approval refs');
+    expect(html).toContain('validateCatalogSourceApproval');
+    expect(html).toContain('/approval-validation');
+    expect(html).toContain('manufacturer_model_approval_ref');
+    expect(html).toContain('professional_or_ahj_review_ref');
+    expect(html).toContain('autosprink_or_equivalent_export_ref');
+    expect(html).toContain('data-catalog-source-approval-family-ref');
+    expect(html).toContain('catalogApprovalReviewerName');
+    expect(html).toContain('catalogApprovalSignedAt');
     expect(html).toContain('Record catalog source evidence');
     expect(html).toContain('recordCatalogSourceEvidenceFromWorkbench');
     expect(html).toContain('data-catalog-source-record-family-ref');

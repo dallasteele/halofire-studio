@@ -5607,6 +5607,118 @@ function catalogSourceEvidencePacket(projectName, familyRef) {
   };
 }
 
+const CATALOG_APPROVAL_VALIDATION_RULES = Object.freeze({
+  manufacturer_model_approval_ref: Object.freeze({
+    targetGates: Object.freeze({
+      MANUFACTURER_MODEL_APPROVAL_MISSING: 'manufacturer_approval',
+    }),
+  }),
+  professional_or_ahj_review_ref: Object.freeze({
+    targetGates: Object.freeze({
+      PROFESSIONAL_REVIEW_MISSING: 'professional_review',
+      AHJ_APPROVAL_MISSING: 'ahj_approval',
+    }),
+  }),
+  autosprink_or_equivalent_export_ref: Object.freeze({
+    targetGates: Object.freeze({
+      AUTOSPRINK_EVIDENCE_MISSING: 'autosprink_packet',
+    }),
+  }),
+});
+
+function catalogApprovalValidationSpec(body) {
+  const approvalRefField = String(body?.approval_ref_field || '').trim();
+  const rule = CATALOG_APPROVAL_VALIDATION_RULES[approvalRefField];
+  if (!rule) {
+    const e = new Error('approval_ref_field must be one of manufacturer_model_approval_ref, professional_or_ahj_review_ref, autosprink_or_equivalent_export_ref');
+    e.httpStatus = 400;
+    throw e;
+  }
+  const allowedGateCodes = Object.keys(rule.targetGates);
+  const requestedGateCode = String(body?.target_gate_code || allowedGateCodes[0] || '').trim();
+  const evidenceType = rule.targetGates[requestedGateCode];
+  if (!evidenceType) {
+    const e = new Error(`approval_ref_field ${approvalRefField} only supports target_gate_code: ${allowedGateCodes.join(', ')}`);
+    e.httpStatus = 400;
+    throw e;
+  }
+  return { approvalRefField, targetGateCode: requestedGateCode, evidenceType };
+}
+
+function validateCatalogSourceApproval(projectName, familyRef, body, user) {
+  const row = currentSourceAcquisitionLedger().find((entry) => entry && entry.family_ref === familyRef);
+  if (!row) {
+    const e = new Error('Catalog source acquisition row not found');
+    e.httpStatus = 404;
+    throw e;
+  }
+  const { approvalRefField, targetGateCode, evidenceType } = catalogApprovalValidationSpec(body);
+  ensureProjectClaimGates(projectName);
+  const gate = db
+    .prepare('SELECT * FROM claim_gates WHERE project_name = ? AND code = ?')
+    .get(projectName, targetGateCode);
+  if (!gate) {
+    const e = new Error('Claim gate not found');
+    e.httpStatus = 404;
+    throw e;
+  }
+  const gateRule = gateEvidenceRule(targetGateCode);
+  if (!gateRule.canResolve || !gateRule.allowedEvidenceTypes.includes(evidenceType)) {
+    const e = new Error(`Gate ${targetGateCode} only accepts allowed evidence types: ${gateRule.allowedEvidenceTypes.join(', ')}`);
+    e.httpStatus = 400;
+    throw e;
+  }
+  const sourceRef = String(body?.source_ref || '').trim();
+  if (!sourceRef) {
+    const e = new Error('source_ref is required for catalog approval validation');
+    e.httpStatus = 400;
+    throw e;
+  }
+  const signoff = normalizeSignedReviewerSignoff(evidenceType, body?.signoff);
+  const sourceFile = body?.source_file == null ? null : String(body.source_file);
+  const resolvedAt = new Date().toISOString();
+  const evidenceNotes = {
+    kind: 'catalog_source_approval_validation',
+    evidence_type: evidenceType,
+    family_ref: row.family_ref,
+    component_key: row.component_key || null,
+    nominal_size_in: row.nominal_size_in ?? null,
+    approval_ref_field: approvalRefField,
+    target_gate_code: targetGateCode,
+    source_ref: sourceRef,
+    source_catalog_ref: body?.source_catalog_ref || row.source_url || row.family_ref,
+    signoff,
+    user_notes: body?.notes || null,
+    claim_gate_effect: 'gate_cleared_after_explicit_signed_validation',
+  };
+  const tx = db.transaction(() => {
+    const insert = db
+      .prepare(`INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+                VALUES (?, ?, ?, ?, 'present', ?)`)
+      .run(projectName, evidenceType, sourceFile, sourceRef, JSON.stringify(evidenceNotes));
+    db.prepare(`UPDATE claim_gates
+                SET status = 'cleared', resolved_by = ?, resolved_at = ?, resolved_evidence_ref = ?
+                WHERE project_name = ? AND code = ?`)
+      .run(user?.username || 'unknown', resolvedAt, sourceRef, projectName, targetGateCode);
+    return insert.lastInsertRowid;
+  });
+  const evidenceId = tx();
+  const evidence = db.prepare('SELECT * FROM project_evidence WHERE id = ?').get(evidenceId);
+  return {
+    cleared: true,
+    code: targetGateCode,
+    approval_ref_field: approvalRefField,
+    family_ref: row.family_ref,
+    component_key: row.component_key || null,
+    resolved_by: user?.username || 'unknown',
+    resolved_at: resolvedAt,
+    resolved_evidence_id: evidenceId,
+    resolved_evidence_ref: sourceRef,
+    evidence,
+    evidence_notes: evidenceNotes,
+  };
+}
+
 const OFFICIAL_FLOW_BLOCKED_CLAIMS = [
   'permit_ready',
   'AHJ_approval',
@@ -9071,6 +9183,15 @@ app.get('/api/projects/:name/resolver-packets/catalog-source/:familyRef/review-p
       return res.status(404).json({ error: 'Catalog source acquisition row not found' });
     }
     return res.json(packet);
+  } catch (err) {
+    return res.status(err.httpStatus || 400).json({ error: err.message });
+  }
+});
+
+app.post('/api/projects/:name/resolver-packets/catalog-source/:familyRef/approval-validation', authMiddleware, requireRole('admin'), (req, res) => {
+  try {
+    const result = validateCatalogSourceApproval(req.params.name, req.params.familyRef, req.body, req.user);
+    return res.status(200).json(result);
   } catch (err) {
     return res.status(err.httpStatus || 400).json({ error: err.message });
   }

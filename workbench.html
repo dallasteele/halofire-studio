@@ -725,12 +725,77 @@ async function downloadCatalogSourceEvidencePacket(familyRef) {
   URL.revokeObjectURL(a.href);
 }
 
+function renderCatalogSourceApprovalValidation(defaults) {
+  const rowKey = escapeHtml(defaults.family_ref || defaults.component_key || 'unknown');
+  return `<details style="margin-top:8px">
+    <summary class="muted" style="cursor:pointer">Validate catalog approval refs</summary>
+    <div style="display:grid;gap:6px;margin-top:8px">
+      <select id="catalogApprovalRefField-${rowKey}" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
+        <option value="manufacturer_model_approval_ref">manufacturer_model_approval_ref</option>
+        <option value="professional_or_ahj_review_ref">professional_or_ahj_review_ref</option>
+        <option value="autosprink_or_equivalent_export_ref">autosprink_or_equivalent_export_ref</option>
+      </select>
+      <select id="catalogApprovalTargetGate-${rowKey}" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
+        <option value="MANUFACTURER_MODEL_APPROVAL_MISSING">MANUFACTURER_MODEL_APPROVAL_MISSING</option>
+        <option value="PROFESSIONAL_REVIEW_MISSING">PROFESSIONAL_REVIEW_MISSING</option>
+        <option value="AHJ_APPROVAL_MISSING">AHJ_APPROVAL_MISSING</option>
+        <option value="AUTOSPRINK_EVIDENCE_MISSING">AUTOSPRINK_EVIDENCE_MISSING</option>
+      </select>
+      <input id="catalogApprovalSourceRef-${rowKey}" placeholder="approval source_ref" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
+      <input id="catalogApprovalSourceFile-${rowKey}" placeholder="approval source_file" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
+      <input id="catalogApprovalReviewerName-${rowKey}" placeholder="reviewer_name" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
+      <input id="catalogApprovalReviewerTitle-${rowKey}" placeholder="reviewer_title" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
+      <input id="catalogApprovalSignedAt-${rowKey}" placeholder="signed_at ISO8601" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
+      <input id="catalogApprovalOrganization-${rowKey}" placeholder="organization (optional)" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
+      <input id="catalogApprovalLicenseId-${rowKey}" placeholder="license_id (optional)" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
+      <textarea id="catalogApprovalNotes-${rowKey}" placeholder="notes" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px;height:44px"></textarea>
+      <button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#15803d" data-catalog-source-approval-family-ref="${escapeHtml(defaults.family_ref || '')}" data-catalog-source-approval-row-key="${rowKey}">Validate catalog approval gate</button>
+      <div class="muted" id="catalogApprovalValidationStatus-${rowKey}" style="font-size:11px"></div>
+    </div>
+  </details>`;
+}
+
+async function validateCatalogSourceApproval(button) {
+  const familyRef = button.dataset.catalogSourceApprovalFamilyRef || '';
+  const rowKey = button.dataset.catalogSourceApprovalRowKey || '';
+  const status = document.getElementById('catalogApprovalValidationStatus-' + rowKey);
+  try {
+    const body = {
+      approval_ref_field: document.getElementById('catalogApprovalRefField-' + rowKey).value,
+      target_gate_code: document.getElementById('catalogApprovalTargetGate-' + rowKey).value,
+      source_ref: document.getElementById('catalogApprovalSourceRef-' + rowKey).value.trim(),
+      source_file: document.getElementById('catalogApprovalSourceFile-' + rowKey).value.trim() || undefined,
+      notes: document.getElementById('catalogApprovalNotes-' + rowKey).value.trim() || undefined,
+      signoff: {
+        reviewer_name: document.getElementById('catalogApprovalReviewerName-' + rowKey).value.trim(),
+        reviewer_title: document.getElementById('catalogApprovalReviewerTitle-' + rowKey).value.trim(),
+        signed_at: document.getElementById('catalogApprovalSignedAt-' + rowKey).value.trim(),
+        organization: document.getElementById('catalogApprovalOrganization-' + rowKey).value.trim() || undefined,
+        license_id: document.getElementById('catalogApprovalLicenseId-' + rowKey).value.trim() || undefined,
+      },
+    };
+    const saved = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/resolver-packets/catalog-source/' + encodeURIComponent(familyRef) + '/approval-validation', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    });
+    if (status) status.textContent = 'Validated catalog approval gate ' + saved.code + ' with evidence #' + saved.resolved_evidence_id + '.';
+    await refreshClaimGates();
+    await refreshEvidence();
+    await refreshResolverQueue();
+  } catch (err) {
+    if (status) status.textContent = 'Error: ' + err.message;
+  }
+}
+
 function bindCatalogSourceEvidenceButtons() {
   document.querySelectorAll('[data-catalog-source-record-family-ref]').forEach((button) => {
     button.onclick = () => recordCatalogSourceEvidenceFromWorkbench(button);
   });
   document.querySelectorAll('[data-catalog-source-packet-family-ref]').forEach((button) => {
     button.onclick = () => downloadCatalogSourceEvidencePacket(button.dataset.catalogSourcePacketFamilyRef);
+  });
+  document.querySelectorAll('[data-catalog-source-approval-family-ref]').forEach((button) => {
+    button.onclick = () => validateCatalogSourceApproval(button);
   });
 }
 
@@ -789,6 +854,7 @@ function resolverQueueDetail(item) {
       <div class="claims">AI fallback: ${escapeHtml(item.ai_fallback || '')}</div>
       <div class="claims">Blocks: ${claims.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('')}</div>
       <p style="margin-top:8px"><button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#0f766e" data-catalog-source-packet-family-ref="${escapeHtml(defaults.family_ref || '')}">Download catalog source packet</button> ${visibleActions.map((action) => `<a class="go" style="padding:7px 10px;font-size:11px;text-decoration:none;display:inline-block;margin-right:6px" href="${escapeHtml(action.href || '#')}">${escapeHtml(action.label || 'Open')}</a>`).join('')}<button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#b45309" data-catalog-source-record-family-ref="${escapeHtml(defaults.family_ref || '')}" data-catalog-source-record-component-key="${escapeHtml(defaults.component_key || '')}" data-catalog-source-record-nominal-size-in="${escapeHtml(defaults.nominal_size_in ?? '')}" data-catalog-source-record-source-url="${escapeHtml(defaults.source_url || '')}" data-catalog-source-record-license="${escapeHtml(defaults.license || '')}" data-catalog-source-record-artifact-hash="${escapeHtml(defaults.downloaded_artifact_hash || '')}" data-catalog-source-record-status-tier="${escapeHtml(defaults.status_tier || 'missing_catalog_source')}" data-catalog-source-record-status-id="${catalogStatusId}">Record catalog source evidence</button></p>
+      ${renderCatalogSourceApprovalValidation(defaults)}
       <div class="muted" id="${catalogStatusId}" style="font-size:11px"></div>
     </div>`;
   }

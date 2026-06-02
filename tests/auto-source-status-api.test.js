@@ -251,6 +251,129 @@ describe('S5 GET /api/auto-source/status', () => {
     );
   });
 
+  it('validates catalog packet approval refs only with signed gate-specific evidence', async () => {
+    removeStatusFile();
+    const projectName = 'Home Depot - Rexburg ID';
+    const familyRef = 'family:pipe_steel_sch40_2p0in';
+    const validationUrl = `${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-packets/catalog-source/${encodeURIComponent(familyRef)}/approval-validation`;
+
+    const catalogEvidenceRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/evidence`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        evidence_type: 'catalog_source_acquisition',
+        status: 'present',
+        source_ref: familyRef,
+        source_file: 'pipe_sch40',
+        notes: JSON.stringify({
+          family_ref: familyRef,
+          component_key: 'pipe_sch40',
+          claim_gate_effect: 'no_claims_cleared',
+        }),
+      }),
+    });
+    expect(catalogEvidenceRes.status).toBe(201);
+    const catalogEvidence = await catalogEvidenceRes.json();
+
+    const directResolveRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/claim-gates/MANUFACTURER_MODEL_APPROVAL_MISSING/resolve`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ evidence_id: catalogEvidence.id }),
+    });
+    expect(directResolveRes.status).toBe(400);
+
+    const unsignedValidationRes = await fetch(validationUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        approval_ref_field: 'manufacturer_model_approval_ref',
+        source_ref: 'manufacturer://approval/MFG-PIPE-2IN',
+      }),
+    });
+    expect(unsignedValidationRes.status).toBe(400);
+    expect((await unsignedValidationRes.json()).error).toMatch(/signoff/i);
+
+    const validations = [
+      {
+        approval_ref_field: 'manufacturer_model_approval_ref',
+        target_gate_code: 'MANUFACTURER_MODEL_APPROVAL_MISSING',
+        source_ref: 'manufacturer://approval/MFG-PIPE-2IN',
+        expected_evidence_type: 'manufacturer_approval',
+      },
+      {
+        approval_ref_field: 'professional_or_ahj_review_ref',
+        target_gate_code: 'PROFESSIONAL_REVIEW_MISSING',
+        source_ref: 'professional://review/PE-PIPE-2IN',
+        expected_evidence_type: 'professional_review',
+      },
+      {
+        approval_ref_field: 'professional_or_ahj_review_ref',
+        target_gate_code: 'AHJ_APPROVAL_MISSING',
+        source_ref: 'ahj://approval/AHJ-PIPE-2IN',
+        expected_evidence_type: 'ahj_approval',
+      },
+      {
+        approval_ref_field: 'autosprink_or_equivalent_export_ref',
+        target_gate_code: 'AUTOSPRINK_EVIDENCE_MISSING',
+        source_ref: 'autosprink://export/AS-PIPE-2IN',
+        expected_evidence_type: 'autosprink_packet',
+      },
+    ];
+
+    for (const [index, validation] of validations.entries()) {
+      const res = await fetch(validationUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          ...validation,
+          source_file: `catalog-approval-${index}.pdf`,
+          notes: `Signed catalog approval validation ${index}`,
+          signoff: {
+            reviewer_name: `Catalog Reviewer ${index}`,
+            reviewer_title: index === 1 ? 'Fire Protection Engineer' : 'HaloFire Approval Reviewer',
+            signed_at: `2026-06-02T15:0${index}:00.000Z`,
+            organization: 'Halo Fire',
+            license_id: `HF-CAT-${index}`,
+          },
+        }),
+      });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body).toEqual(expect.objectContaining({
+        cleared: true,
+        code: validation.target_gate_code,
+        approval_ref_field: validation.approval_ref_field,
+        family_ref: familyRef,
+        evidence: expect.objectContaining({
+          evidence_type: validation.expected_evidence_type,
+          status: 'present',
+          source_ref: validation.source_ref,
+        }),
+      }));
+      expect(body.evidence_notes).toEqual(expect.objectContaining({
+        kind: 'catalog_source_approval_validation',
+        family_ref: familyRef,
+        approval_ref_field: validation.approval_ref_field,
+        target_gate_code: validation.target_gate_code,
+        claim_gate_effect: 'gate_cleared_after_explicit_signed_validation',
+      }));
+    }
+
+    const gatesRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/claim-gates`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(gatesRes.status).toBe(200);
+    const gates = await gatesRes.json();
+    for (const validation of validations) {
+      expect(gates.find((gate) => gate.code === validation.target_gate_code)).toEqual(
+        expect.objectContaining({
+          status: 'cleared',
+          resolved_evidence_ref: validation.source_ref,
+        }),
+      );
+    }
+  });
+
   it('adds official-flow intake resolver items with documented defaults or exact intake blockers', async () => {
     const homeDepotRes = await fetch(`${BASE}/api/projects/Home%20Depot%20-%20Rexburg%20ID/resolver-queue`, {
       headers: { Authorization: `Bearer ${token}` },
