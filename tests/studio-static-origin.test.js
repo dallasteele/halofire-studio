@@ -226,6 +226,11 @@ describe('studio static origin handling', () => {
     expect(html).toContain('Download SAM31 product review packet');
     expect(html).toContain('data-sam31-extrapolation-review-packet-evidence-id');
     expect(html).toContain('openclaw.sam31_extrapolation_product_review_packet');
+    expect(html).toContain('downloadOpenClawSam31ProductReviewQueueItem');
+    expect(html).toContain('/openclaw/sam31/product-review-queue-item');
+    expect(html).toContain('Download SAM31 queue item');
+    expect(html).toContain('data-sam31-product-review-queue-item-evidence-id');
+    expect(html).toContain('openclaw.sam31.product_review_queue_item.v1 - use_for_claims false');
   });
 
   it('lets the workbench save employee room-boundary review decisions', async () => {

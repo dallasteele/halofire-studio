@@ -297,6 +297,9 @@ function renderOpenClawSam31ExtrapolationAction(item, action, latest, latestRevi
   const reviewPacketAction = latestReview && typeof latestReview === 'object'
     ? `<button class="go" type="button" style="padding:7px 10px;font-size:11px;margin-top:6px;background:#4338ca" data-sam31-extrapolation-review-packet-evidence-id="${escapeHtml(evidenceId)}">Download SAM31 product review packet</button><br><span class="muted" style="font-size:10px">openclaw.sam31_extrapolation_product_review_packet - claim_gate_effect no_claims_cleared</span><br>`
     : '';
+  const queueItemAction = latest && typeof latest === 'object'
+    ? `<button class="go" type="button" style="padding:7px 10px;font-size:11px;margin-top:6px;background:#3730a3" data-sam31-product-review-queue-item-evidence-id="${escapeHtml(evidenceId)}">Download SAM31 queue item</button><br><span class="muted" style="font-size:10px">openclaw.sam31.product_review_queue_item.v1 - use_for_claims false</span><br>`
+    : '';
   const reviewForm = latest ? `<details style="margin-top:8px">
       <summary class="muted" style="cursor:pointer">Review/replace extrapolated objects, vectors, and 3D candidates</summary>
       <div style="display:grid;gap:6px;margin-top:8px">
@@ -313,7 +316,7 @@ function renderOpenClawSam31ExtrapolationAction(item, action, latest, latestRevi
         <div class="muted" id="sam31ExtrapolationReviewStatus-${escapeHtml(evidenceId)}" style="font-size:11px"></div>
       </div>
     </details>` : '';
-  return `<div class="muted" style="font-size:11px;margin-top:5px;border:1px solid rgba(79,70,229,.34);border-radius:8px;padding:8px;background:rgba(79,70,229,.06)">OpenClaw SAM31 LLM extrapolation artifact<br>status ${escapeHtml(action.status || 'unavailable')} - method ${escapeHtml(action.method || 'POST')} - claim_gate_effect ${escapeHtml(action.claim_gate_effect || 'no_claims_cleared')}<br>endpoint ${escapeHtml(endpoint)} - source_evidence_id ${escapeHtml(evidenceId)}<br>${latest ? `Latest extrapolation: evidence #${escapeHtml(latest.evidence_id)} - ${escapeHtml(latest.status || 'best_effort')} - packet ${escapeHtml(latestPacket?.artifact_type || latest.artifact_type || 'openclaw.sam31_llm_extrapolation_artifact')} - sections ${escapeHtml(latest.section_count ?? latestPacket?.segment_count ?? 0)} - hypotheses ${escapeHtml(latest.object_hypothesis_count ?? latestPacket?.object_hypothesis_count ?? 0)} - ${escapeHtml(latest.claim_gate_effect || 'no_claims_cleared')}<br>` : ''}${reviewSummary}${reviewPacketAction}${productReviewAction ? `Product review: ${escapeHtml(productReviewAction.label || 'Review extrapolated objects, vectors, and 3D candidates')} - ${escapeHtml(productReviewAction.href || 'missing')}<br>` : ''}Blocks still active: ${blocked.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('') || '<span class="chip">claim gates remain blocked</span>'}<br><button class="go" type="button" style="padding:7px 10px;font-size:11px;margin-top:6px;background:#4f46e5" data-sam31-extrapolation-evidence-id="${escapeHtml(evidenceId)}">${escapeHtml(action.label || 'Run OpenClaw SAM31 extrapolation artifact')}</button><div class="muted" id="sam31ExtrapolationStatus-${escapeHtml(evidenceId)}" style="font-size:11px;margin-top:4px"></div>${reviewForm}</div>`;
+  return `<div class="muted" style="font-size:11px;margin-top:5px;border:1px solid rgba(79,70,229,.34);border-radius:8px;padding:8px;background:rgba(79,70,229,.06)">OpenClaw SAM31 LLM extrapolation artifact<br>status ${escapeHtml(action.status || 'unavailable')} - method ${escapeHtml(action.method || 'POST')} - claim_gate_effect ${escapeHtml(action.claim_gate_effect || 'no_claims_cleared')}<br>endpoint ${escapeHtml(endpoint)} - source_evidence_id ${escapeHtml(evidenceId)}<br>${latest ? `Latest extrapolation: evidence #${escapeHtml(latest.evidence_id)} - ${escapeHtml(latest.status || 'best_effort')} - packet ${escapeHtml(latestPacket?.artifact_type || latest.artifact_type || 'openclaw.sam31_llm_extrapolation_artifact')} - sections ${escapeHtml(latest.section_count ?? latestPacket?.segment_count ?? 0)} - hypotheses ${escapeHtml(latest.object_hypothesis_count ?? latestPacket?.object_hypothesis_count ?? 0)} - ${escapeHtml(latest.claim_gate_effect || 'no_claims_cleared')}<br>` : ''}${reviewSummary}${queueItemAction}${reviewPacketAction}${productReviewAction ? `Product review: ${escapeHtml(productReviewAction.label || 'Review extrapolated objects, vectors, and 3D candidates')} - ${escapeHtml(productReviewAction.href || 'missing')}<br>` : ''}Blocks still active: ${blocked.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('') || '<span class="chip">claim gates remain blocked</span>'}<br><button class="go" type="button" style="padding:7px 10px;font-size:11px;margin-top:6px;background:#4f46e5" data-sam31-extrapolation-evidence-id="${escapeHtml(evidenceId)}">${escapeHtml(action.label || 'Run OpenClaw SAM31 extrapolation artifact')}</button><div class="muted" id="sam31ExtrapolationStatus-${escapeHtml(evidenceId)}" style="font-size:11px;margin-top:4px"></div>${reviewForm}</div>`;
 }
 
 function evidenceDetail(row) {
@@ -779,6 +782,19 @@ async function downloadOpenClawSam31ExtrapolationReviewPacket(evidenceId) {
   URL.revokeObjectURL(a.href);
 }
 
+async function downloadOpenClawSam31ProductReviewQueueItem(evidenceId) {
+  const packet = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/resolver-packets/pdf-boundary/' + encodeURIComponent(evidenceId) + '/openclaw/sam31/product-review-queue-item');
+  if (packet.artifact_type !== 'openclaw.sam31.product_review_queue_item.v1') {
+    throw new Error('Unexpected SAM31 product review queue item type');
+  }
+  const blob = new Blob([JSON.stringify(packet, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = packet.download_name || 'sam31-product-review-queue-item.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
 async function runResolverReplayBid(evidenceId) {
   const status = document.getElementById('replayBidStatus-' + evidenceId);
   try {
@@ -1027,6 +1043,9 @@ async function refreshResolverQueue() {
   });
   document.querySelectorAll('[data-sam31-extrapolation-review-packet-evidence-id]').forEach((button) => {
     button.onclick = () => downloadOpenClawSam31ExtrapolationReviewPacket(button.dataset.sam31ExtrapolationReviewPacketEvidenceId);
+  });
+  document.querySelectorAll('[data-sam31-product-review-queue-item-evidence-id]').forEach((button) => {
+    button.onclick = () => downloadOpenClawSam31ProductReviewQueueItem(button.dataset.sam31ProductReviewQueueItemEvidenceId);
   });
   document.querySelectorAll('[data-official-flow-save]').forEach((button) => {
     button.onclick = () => saveOfficialFlowIntake();

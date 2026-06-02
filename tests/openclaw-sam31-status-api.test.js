@@ -528,6 +528,39 @@ describe('OpenClaw SAM31 bridge status API', () => {
     }));
     expect(afterQueue.summary.sam31_extrapolation_recorded).toBeGreaterThanOrEqual(1);
 
+    const queueItemRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/product-review-queue-item`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(queueItemRes.status).toBe(200);
+    const queueItemPacket = await queueItemRes.json();
+    expect(queueItemPacket).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.product_review_queue_item.v1',
+      application: 'halo_fire',
+      project_ref: `halo_fire:${COOPERATIVE_1881_PROJECT_NAME}`,
+      source_pdf_boundary_evidence_id: boundary.id,
+      source_openclaw_sam31_extrapolation_evidence_id: artifact.id,
+      source_packet_ref: 'openclaw.sam31_perception_packet',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      download_name: expect.stringContaining('sam31-product-review-queue-item'),
+    }));
+    expect(queueItemPacket.supported_evidence_lanes).toEqual(expect.arrayContaining([
+      'room_boundary_visual_audit',
+      'vector_overlay_generation',
+      'model_3d_candidate_generation',
+    ]));
+    expect(queueItemPacket.source_refs).toEqual(expect.arrayContaining([
+      expect.objectContaining({ evidence_id: boundary.id, evidence_type: 'pdf_boundary_decision' }),
+      expect.objectContaining({ evidence_id: artifact.id, evidence_type: 'openclaw_sam31_extrapolation_artifact' }),
+    ]));
+    expect(queueItemPacket.blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'AHJ_approval',
+      'AutoSprink_parity',
+      'SAM31_runtime_verified',
+      'OpenClaw_runtime_verified',
+    ]));
+
     const reviewRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/extrapolation-review`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` },

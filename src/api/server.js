@@ -2247,6 +2247,87 @@ function openClawSam31ExtrapolationReviewSummary(reviewEvidence) {
   };
 }
 
+function buildOpenClawSam31ProductReviewQueueItemPacket(projectName, evidence, decision, extrapolationEvidence, extrapolationArtifact) {
+  if (!evidence || !decision) {
+    const e = new Error('PDF boundary decision evidence not found');
+    e.httpStatus = 404;
+    throw e;
+  }
+  if (!extrapolationEvidence?.evidence || !extrapolationArtifact) {
+    const e = new Error('OpenClaw SAM31 extrapolation artifact evidence is required before downloading the product review queue item');
+    e.httpStatus = 409;
+    throw e;
+  }
+  const fallbackQueueItem = buildOpenClawSam31ProductReviewQueueItem({
+    application: extrapolationArtifact.application || 'halo_fire',
+    projectRef: extrapolationArtifact.project_ref || `halo_fire:${projectName}`,
+    request: extrapolationArtifact.request || {},
+    perceptionPacket: extrapolationArtifact.perception_packet || {},
+    productReviewAction: extrapolationArtifact.product_review_action || {},
+    blockedClaims: [
+      ...(Array.isArray(extrapolationArtifact.blocked_claims) ? extrapolationArtifact.blocked_claims : []),
+      ...(Array.isArray(decision.blockedClaims) ? decision.blockedClaims : PDF_BOUNDARY_BLOCKED_CLAIMS),
+      'SAM31_runtime_verified',
+      'OpenClaw_runtime_verified',
+    ],
+  });
+  const queueItem = normalizeOpenClawSam31ProductReviewQueueItem(
+    extrapolationArtifact.product_review_queue_item,
+    fallbackQueueItem,
+  );
+  const sourceRefs = [
+    {
+      evidence_id: evidence.id,
+      evidence_type: evidence.evidence_type,
+      source_file: evidence.source_file || decision.sourceFile || null,
+      source_ref: evidence.source_ref || decision.sourceRef || null,
+      status: evidence.status,
+    },
+    {
+      evidence_id: extrapolationEvidence.evidence.id,
+      evidence_type: extrapolationEvidence.evidence.evidence_type,
+      source_file: extrapolationEvidence.evidence.source_file || null,
+      source_ref: extrapolationEvidence.evidence.source_ref || extrapolationArtifact.openclaw_endpoint || null,
+      status: extrapolationEvidence.evidence.status,
+      claim_gate_effect: 'no_claims_cleared',
+    },
+    ...(Array.isArray(queueItem.source_refs) ? jsonClone(queueItem.source_refs) : []),
+  ];
+  return {
+    ...queueItem,
+    artifact_type: SAM31_PRODUCT_REVIEW_QUEUE_ITEM_TYPE,
+    status: queueItem.status || 'ready_for_human_replacement_or_acceptance',
+    application: queueItem.application || 'halo_fire',
+    project_name: projectName,
+    generated_at: new Date().toISOString(),
+    source_pdf_boundary_evidence_id: evidence.id,
+    source_openclaw_sam31_extrapolation_evidence_id: extrapolationEvidence.evidence.id,
+    source_ref: evidence.source_ref || decision.sourceRef || extrapolationArtifact.source_ref || null,
+    source_file: evidence.source_file || decision.sourceFile || extrapolationArtifact.source_file || null,
+    download_name: `${slugForDownloadName(projectName)}-sam31-product-review-queue-item-${evidence.id}.json`,
+    source_refs: sourceRefs,
+    supported_evidence_lanes: Array.isArray(queueItem.supported_evidence_lanes)
+      ? uniqueStrings(queueItem.supported_evidence_lanes)
+      : [...SAM31_APPLICATION_CONTRACTS.halo_fire.supported_evidence_lanes],
+    use_for_claims: false,
+    blocked_claims: uniqueStrings([
+      ...(Array.isArray(queueItem.blocked_claims) ? queueItem.blocked_claims : []),
+      ...(Array.isArray(extrapolationArtifact.blocked_claims) ? extrapolationArtifact.blocked_claims : []),
+      ...(Array.isArray(decision.blockedClaims) ? decision.blockedClaims : PDF_BOUNDARY_BLOCKED_CLAIMS),
+      'professional_approval',
+      'SAM31_runtime_verified',
+      'OpenClaw_runtime_verified',
+    ]),
+    claim_gate_effect: 'no_claims_cleared',
+    no_claim_gates_cleared: true,
+    limitations: [
+      ...(Array.isArray(extrapolationArtifact.limitations) ? extrapolationArtifact.limitations : []),
+      'This OpenClaw SAM31 queue item is a best-effort internal-alpha product review handoff for objects, vector overlays, and 3D model candidates.',
+      'It does not prove geometry accuracy, drawing scale, AHJ approval, PE review, AutoSprink parity, permit readiness, fabrication readiness, or manufacturer-exact models.',
+    ],
+  };
+}
+
 function buildOpenClawSam31ExtrapolationReviewPacket(projectName, evidence, decision, extrapolationEvidence, extrapolationArtifact, reviewEvidence, review) {
   if (!evidence || !decision) {
     const e = new Error('PDF boundary decision evidence not found');
@@ -4866,6 +4947,34 @@ app.get('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/openclaw/
       extrapolationEvidence?.artifact || null,
       reviewEvidence,
       reviewEvidence?.review || null,
+    ));
+  } catch (err) {
+    return res.status(err.httpStatus || 400).json({ error: err.message });
+  }
+});
+
+app.get('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/openclaw/sam31/product-review-queue-item', authMiddleware, (req, res) => {
+  try {
+    const projectName = req.params.name;
+    const evidenceId = Number(req.params.evidenceId);
+    if (!Number.isSafeInteger(evidenceId) || evidenceId <= 0) {
+      return res.status(400).json({ error: 'A positive evidence id is required' });
+    }
+    const evidence = db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'pdf_boundary_decision'`)
+      .get(evidenceId, projectName);
+    const decision = decisionFromEvidence(evidence);
+    if (!evidence || !decision) {
+      return res.status(404).json({ error: 'PDF boundary decision evidence not found' });
+    }
+    const extrapolationEvidence = latestOpenClawSam31ExtrapolationArtifactEvidence(projectName, evidence.id);
+    return res.json(buildOpenClawSam31ProductReviewQueueItemPacket(
+      projectName,
+      evidence,
+      decision,
+      extrapolationEvidence,
+      extrapolationEvidence?.artifact || null,
     ));
   } catch (err) {
     return res.status(err.httpStatus || 400).json({ error: err.message });
