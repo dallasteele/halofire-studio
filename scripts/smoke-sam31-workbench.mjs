@@ -670,6 +670,29 @@ async function runBrowserSmoke(token, evidenceIds) {
     if (replayFollowupPacket.use_for_claims !== false || replayFollowupPacket.claim_gate_effect !== 'no_claims_cleared') {
       throw new Error(`SAM31 follow-up packet cleared a claim gate: ${JSON.stringify(replayFollowupPacket)}`);
     }
+    const replayFollowupPacketReviewKey = `${evidenceIds.boundaryEvidenceId}-${consumerReview.evidence_id}-${latestSprinklerDecision.evidence_id}-${replayFollowupRow.latest_sam31_sprinkler_preliminary_replay_followup_decision.evidence_id}-0`;
+    await page.getByText('Save SAM31 follow-up packet review').first().click();
+    await page.locator(`#sam31SprinklerReplayPacketReviewReviewer-${replayFollowupPacketReviewKey}`).fill('HaloFire obstruction smoke reviewer');
+    await page.locator(`#sam31SprinklerReplayPacketReviewRef-${replayFollowupPacketReviewKey}`).fill('halofire://sam31/smoke/obstruction-clash/review.json');
+    await page.locator(`#sam31SprinklerReplayPacketReviewSignedPacketRef-${replayFollowupPacketReviewKey}`).fill('halofire://sam31/smoke/obstruction-clash/signed-packet.json');
+    await page.locator(`#sam31SprinklerReplayPacketReviewMarkedUpScreenshotRef-${replayFollowupPacketReviewKey}`).fill('halofire://sam31/smoke/obstruction-clash/markup.png');
+    await page.locator(`#sam31SprinklerReplayPacketReviewNotes-${replayFollowupPacketReviewKey}`).fill('Smoke packet review only; claims remain blocked.');
+    await page.locator(`button[data-sam31-sprinkler-replay-followup-packet-review-evidence-id="${latestSprinklerDecision.evidence_id}"]`).first().click();
+    await page.waitForSelector(`text=Saved halofire_sam31_sprinkler_followup_packet_review_decision`, { timeout: 8_000 });
+    const replayFollowupPacketReviewQueue = await request(`${PROJECT_PATH}/resolver-queue?sam31SprinklerReplay=ready&lane=obstruction_or_clash_review`, token);
+    if ((replayFollowupPacketReviewQueue.summary?.sam31_sprinkler_packet_reviews_recorded || 0) < 1) {
+      throw new Error(`SAM31 follow-up packet review was not recorded in resolver summary: ${JSON.stringify(replayFollowupPacketReviewQueue.summary)}`);
+    }
+    const replayFollowupPacketReviewItem = replayFollowupPacketReviewQueue.items.find((item) => item.evidence_id === evidenceIds.boundaryEvidenceId);
+    const replayFollowupPacketReviewRows = replayFollowupPacketReviewItem?.sam31_sprinkler_preliminary_replay_queue_items || [];
+    const replayFollowupPacketReviewRow = replayFollowupPacketReviewRows.find((row) => row.source_halofire_sam31_sprinkler_review_decision_evidence_id === latestSprinklerDecision.evidence_id);
+    const replayFollowupPacketReview = replayFollowupPacketReviewRow?.packet_queue_items?.[0]?.latest_packet_review_decision || null;
+    if (!replayFollowupPacketReview) {
+      throw new Error(`SAM31 follow-up packet review missing from queue row: ${JSON.stringify(replayFollowupPacketReviewRows)}`);
+    }
+    if (replayFollowupPacketReview.review_decision !== 'accepted_internal_alpha_packet' || replayFollowupPacketReview.claim_gate_effect !== 'no_claims_cleared') {
+      throw new Error(`SAM31 follow-up packet review did not preserve no-claim state: ${JSON.stringify(replayFollowupPacketReview)}`);
+    }
     const unresolvedNameForge = await request(`${PROJECT_PATH}/resolver-queue?sam31ConsumerReview=unresolved&consumer=nameforge`, token);
     const unresolvedItem = unresolvedNameForge.items.find((item) => item.evidence_id === evidenceIds.boundaryEvidenceId);
     const unresolvedNameForgeReviews = unresolvedItem?.sam31_unresolved_consumer_reviews || [];
@@ -856,6 +879,13 @@ async function runBrowserSmoke(token, evidenceIds) {
         source_followup_decision_evidence_id: replayFollowupPacket.source_followup_decision_evidence_id,
         source_packet_queue_item_artifact_type: replayFollowupPacket.source_packet_queue_item_artifact_type,
         claim_gate_effect: replayFollowupPacket.claim_gate_effect,
+      },
+      sprinklerPreliminaryReplayFollowupPacketReview: {
+        artifact_type: replayFollowupPacketReview.artifact_type,
+        evidence_id: replayFollowupPacketReview.evidence_id,
+        review_decision: replayFollowupPacketReview.review_decision,
+        source_packet_artifact_type: replayFollowupPacketReview.source_packet_artifact_type,
+        claim_gate_effect: replayFollowupPacketReview.claim_gate_effect,
       },
       unresolvedNameForgeReview: {
         filter: 'sam31ConsumerReview=unresolved',

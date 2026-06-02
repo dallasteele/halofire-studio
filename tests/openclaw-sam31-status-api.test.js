@@ -1878,6 +1878,65 @@ describe('OpenClaw SAM31 bridge status API', () => {
       'manufacturer_exact',
     ]));
 
+    const replayFollowupPacketReviewRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/sprinkler-review/${consumerReview.id}/decision/${sprinklerReview.id}/preliminary-replay/followup/${replayFollowup.id}/packet/0/review`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        review_decision: 'accepted_internal_alpha_packet',
+        reviewer_name: 'HaloFire obstruction reviewer',
+        review_ref: 'halofire://sam31/obstruction-clash/sam31-landscout-testqueue/review.json',
+        signed_packet_ref: 'halofire://sam31/obstruction-clash/sam31-landscout-testqueue/signed-packet.json',
+        marked_up_screenshot_ref: 'halofire://sam31/obstruction-clash/sam31-landscout-testqueue/markup.png',
+        notes: 'Employee reviewed the obstruction packet for internal-alpha routing only.',
+      }),
+    });
+    expect(replayFollowupPacketReviewRes.status).toBe(201);
+    const replayFollowupPacketReview = await replayFollowupPacketReviewRes.json();
+    expect(replayFollowupPacketReview).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.sam31_sprinkler_followup_packet_review_decision.v1',
+      status: 'present',
+      source_packet_artifact_type: 'halofire.sam31_obstruction_clash_packet.v1',
+      source_followup_decision_evidence_id: replayFollowup.id,
+      packet_index: 0,
+      review_decision: 'accepted_internal_alpha_packet',
+      reviewer_name: 'HaloFire obstruction reviewer',
+      review_ref: 'halofire://sam31/obstruction-clash/sam31-landscout-testqueue/review.json',
+      signed_packet_ref: 'halofire://sam31/obstruction-clash/sam31-landscout-testqueue/signed-packet.json',
+      marked_up_screenshot_ref: 'halofire://sam31/obstruction-clash/sam31-landscout-testqueue/markup.png',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(replayFollowupPacketReview.evidence).toEqual(expect.objectContaining({
+      evidence_type: 'halofire_sam31_sprinkler_followup_packet_review_decision',
+      status: 'present',
+      source_ref: 'halofire://sam31/obstruction-clash/sam31-landscout-testqueue/review.json',
+    }));
+
+    const replayFollowupPacketReviewQueueRes = await request(`${COOPERATIVE_1881_PATH}/resolver-queue?sam31SprinklerReplay=ready&lane=obstruction_or_clash_review`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(replayFollowupPacketReviewQueueRes.status).toBe(200);
+    const replayFollowupPacketReviewQueue = await replayFollowupPacketReviewQueueRes.json();
+    expect(replayFollowupPacketReviewQueue.summary.sam31_sprinkler_packet_reviews_recorded).toBeGreaterThanOrEqual(1);
+    const replayFollowupPacketReviewQueueItem = replayFollowupPacketReviewQueue.items.find((row) => row.evidence_id === boundary.id);
+    const replayFollowupPacketReviewRows = replayFollowupPacketReviewQueueItem.sam31_sprinkler_preliminary_replay_queue_items || [];
+    const replayFollowupPacketReviewRow = replayFollowupPacketReviewRows.find((row) => row.source_halofire_sam31_sprinkler_review_decision_evidence_id === sprinklerReview.id);
+    expect(replayFollowupPacketReviewRow.packet_queue_items).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        artifact_type: 'halofire.sam31_obstruction_clash_packet_queue_item.v1',
+        status: 'internal_alpha_packet_review_recorded',
+        latest_packet_review_decision: expect.objectContaining({
+          evidence_id: replayFollowupPacketReview.id,
+          artifact_type: 'halofire.sam31_sprinkler_followup_packet_review_decision.v1',
+          review_decision: 'accepted_internal_alpha_packet',
+          claim_gate_effect: 'no_claims_cleared',
+        }),
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    ]));
+
     const nameForgeAdapterRes = await request(`${COOPERATIVE_1881_PATH}/openclaw/sam31/product-owner-replacements`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` },
