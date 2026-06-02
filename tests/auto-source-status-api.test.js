@@ -299,6 +299,18 @@ describe('S5 GET /api/auto-source/status', () => {
       use_for_claims: false,
       claim_gate_effect: 'no_claims_cleared',
     }));
+    expect(descriptor.product_review_queue_contract.required_source_provenance_fields).toEqual(expect.arrayContaining([
+      'source_pdf_boundary_evidence_id',
+      'source_openclaw_sam31_extrapolation_evidence_id',
+      'source_openclaw_sam31_vector_model_artifact_evidence_id',
+      'source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id',
+      'source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id',
+    ]));
+    expect(descriptor.product_review_queue_contract.supported_provenance_artifacts).toEqual(expect.arrayContaining([
+      'openclaw.sam31_llm_extrapolation_artifact',
+      'openclaw.sam31_vector_model_artifact_packet.v1',
+      'halofire_sam31_sectioning_sprinkler_review_adapter',
+    ]));
 
     const projectName = 'Home Depot - Rexburg ID';
     const packetRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-packets/openclaw/sam31/tool-contract`, {
@@ -333,12 +345,22 @@ describe('S5 GET /api/auto-source/status', () => {
         consumer: 'landscout',
         artifact_type: 'openclaw.sam31.consumer_review_queue.landscout.v1',
         required_payload_type: 'openclaw.sam31.product_review_queue_item.v1',
+        required_source_provenance_fields: expect.arrayContaining([
+          'source_openclaw_sam31_extrapolation_evidence_id',
+          'source_openclaw_sam31_vector_model_artifact_evidence_id',
+          'source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id',
+        ]),
         claim_gate_effect: 'no_claims_cleared',
       }),
       expect.objectContaining({
         consumer: 'nameforge',
         artifact_type: 'openclaw.sam31.consumer_review_queue.nameforge.v1',
         required_payload_type: 'openclaw.sam31.product_review_queue_item.v1',
+        required_source_provenance_fields: expect.arrayContaining([
+          'source_openclaw_sam31_extrapolation_evidence_id',
+          'source_openclaw_sam31_vector_model_artifact_evidence_id',
+          'source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id',
+        ]),
         claim_gate_effect: 'no_claims_cleared',
       }),
     ]));

@@ -1393,6 +1393,19 @@ const SAM31_CONSUMER_REVIEW_TASK_TYPE = 'openclaw.sam31.consumer_review_task.v1'
 const SAM31_CONSUMER_REVIEW_DECISION_TYPE = 'openclaw.sam31.consumer_review_task_decision.v1';
 const SAM31_PRODUCT_OWNER_REPLACEMENT_INTAKE_TYPE = 'openclaw.sam31.product_owner_replacement_intake.v1';
 const SAM31_TO_SPRINKLER_REVIEW_ADAPTER_TYPE = 'openclaw.sam31_to_sprinkler_review_adapter.v1';
+const SAM31_REQUIRED_SOURCE_PROVENANCE_FIELDS = Object.freeze([
+  'source_pdf_boundary_evidence_id',
+  'source_openclaw_sam31_extrapolation_evidence_id',
+  'source_openclaw_sam31_vector_model_artifact_evidence_id',
+  'source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id',
+  'source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id',
+]);
+const SAM31_SUPPORTED_PROVENANCE_ARTIFACTS = Object.freeze([
+  'openclaw.sam31_llm_extrapolation_artifact',
+  SAM31_VECTOR_MODEL_ARTIFACT_PACKET_TYPE,
+  'halofire_sam31_sectioning_sprinkler_review_adapter',
+  'halofire.sam31_sectioning_downstream_resolver_packet.v1',
+]);
 const HALOFIRE_SAM31_SECTIONING_DOWNSTREAM_RESOLVER_QUEUE_ITEM_TYPE = 'halofire.sam31_sectioning_downstream_resolver_queue_item.v1';
 const HALOFIRE_SAM31_SECTIONING_DOWNSTREAM_RESOLVER_PACKET_TYPE = 'halofire.sam31_sectioning_downstream_resolver_packet.v1';
 const HALOFIRE_SAM31_SPRINKLER_REVIEW_PACKET_TYPE = 'halofire.sam31_sprinkler_review_packet.v1';
@@ -2003,6 +2016,8 @@ function localOpenClawSam31ToolDescriptor(projectName = null) {
       artifact_type: action.artifact_type || `openclaw.sam31.consumer_review_queue.${consumer}.v1`,
       consumes: action.consumes || SAM31_PRODUCT_REVIEW_QUEUE_ITEM_TYPE,
       required_payload_type: SAM31_PRODUCT_REVIEW_QUEUE_ITEM_TYPE,
+      required_source_provenance_fields: [...SAM31_REQUIRED_SOURCE_PROVENANCE_FIELDS],
+      supported_provenance_artifacts: [...SAM31_SUPPORTED_PROVENANCE_ARTIFACTS],
       local_smoke_route: {
         method: 'POST',
         href_template: '/api/projects/{projectName}/resolver-packets/pdf-boundary/{evidenceId}/openclaw/sam31/consumer-smoke',
@@ -2031,6 +2046,8 @@ function localOpenClawSam31ToolDescriptor(projectName = null) {
       source_runtime: 'halofire-api-local-contract',
       supported_applications: [...SAM31_SUPPORTED_APPLICATIONS],
       required_payload_type: SAM31_PRODUCT_REVIEW_QUEUE_ITEM_TYPE,
+      required_source_provenance_fields: [...SAM31_REQUIRED_SOURCE_PROVENANCE_FIELDS],
+      supported_provenance_artifacts: [...SAM31_SUPPORTED_PROVENANCE_ARTIFACTS],
       requires_review_before_claims: true,
       temporary_value_policy: 'best_guess_until_employee_replaced',
       use_for_claims: false,
@@ -2094,6 +2111,8 @@ function buildOpenClawSam31ToolContractPacket(projectName) {
       source_application: 'halo_fire',
       project_name: projectName,
       required_payload_type: SAM31_PRODUCT_REVIEW_QUEUE_ITEM_TYPE,
+      required_source_provenance_fields: [...SAM31_REQUIRED_SOURCE_PROVENANCE_FIELDS],
+      supported_provenance_artifacts: [...SAM31_SUPPORTED_PROVENANCE_ARTIFACTS],
       endpoint: action.href || null,
       local_smoke_route_template: descriptor.halofire_api_actions.consumer_smoke.href_template,
       acceptable_evidence: [
@@ -4199,6 +4218,8 @@ function buildOpenClawSam31ConsumerReviewTasks({
         persisted_review_packet_ref: result.persisted_review_packet_ref,
         product_review_queue_item_artifact_type: productReviewQueueItem.artifact_type || SAM31_PRODUCT_REVIEW_QUEUE_ITEM_TYPE,
         product_review_queue_item_ref: productReviewQueueItem.source_ref || productReviewQueueItem.project_ref || null,
+        required_source_provenance_fields: [...SAM31_REQUIRED_SOURCE_PROVENANCE_FIELDS],
+        supported_provenance_artifacts: [...SAM31_SUPPORTED_PROVENANCE_ARTIFACTS],
         next_action: `${label} reviewer must accept or replace SAM31 semantic labels, object hypotheses, vector overlays, 3D candidates, and source refs before product claims move forward; regulated claims remain blocked.`,
         acceptable_evidence: [
           'product owner review note tied to accepted queue id',

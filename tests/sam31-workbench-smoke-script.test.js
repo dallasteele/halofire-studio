@@ -112,6 +112,7 @@ describe('SAM31 workbench browser smoke script', () => {
     expect(script).toContain('result.persisted_review_packet_ref');
     expect(script).toContain('consumer_review_tasks');
     expect(script).toContain('openclaw.sam31.consumer_review_task.v1');
+    expect(script).toContain('required_source_provenance_fields');
     expect(script).toContain('openclaw.sam31.consumer_review_task_decision.v1');
     expect(script).toContain('openclaw_sam31_consumer_review');
     expect(script).toContain('requires_product_review');

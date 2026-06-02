@@ -890,6 +890,18 @@ async function runBrowserSmoke(token, evidenceIds) {
       if (!Array.isArray(task.acceptable_evidence) || task.acceptable_evidence.length < 3) {
         throw new Error(`SAM31 consumer task ${consumer} lacks acceptable_evidence: ${JSON.stringify(task)}`);
       }
+      const requiredProvenance = Array.isArray(task.required_source_provenance_fields)
+        ? task.required_source_provenance_fields
+        : [];
+      for (const field of [
+        'source_openclaw_sam31_extrapolation_evidence_id',
+        'source_openclaw_sam31_vector_model_artifact_evidence_id',
+        'source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id',
+      ]) {
+        if (!requiredProvenance.includes(field)) {
+          throw new Error(`SAM31 consumer task ${consumer} lacks required provenance field ${field}: ${JSON.stringify(task)}`);
+        }
+      }
       if (task.use_for_claims !== false || task.claim_gate_effect !== 'no_claims_cleared') {
         throw new Error(`SAM31 consumer task ${consumer} cleared a claim gate: ${JSON.stringify(task)}`);
       }
