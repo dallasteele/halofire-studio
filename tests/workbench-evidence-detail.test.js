@@ -60,4 +60,13 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toContain('target_gate_code');
     expect(html).toContain('source_catalog_ref');
   });
+
+  it('anchors saved PDF boundary evidence rows for resolver handoff readback', async () => {
+    const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
+    expect(shell.status).toBe(200);
+    const html = await shell.text();
+    expect(html).toContain('id="evidence-${escapeHtml(e.id)}"');
+    expect(html).toContain('source_ref');
+    expect(html).toContain('employee_notes');
+  });
 });

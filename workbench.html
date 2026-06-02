@@ -641,7 +641,7 @@ function evidenceDetail(row) {
     const decision = packet.decision || {};
     const candidate = decision.candidate || {};
     const blocked = Array.isArray(decision.blockedClaims) ? decision.blockedClaims : [];
-    return `<div class="muted" style="font-size:11px;margin-top:3px">sheet ${escapeHtml(decision.pageIndex)} · scale ${escapeHtml(decision.scale)} ft/pt · ${escapeHtml(decision.extractMode)} · ${escapeHtml(candidate.label || candidate.mode || 'candidate')}<br>Blocks still active: ${blocked.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('')}</div>`;
+    return `<div class="muted" style="font-size:11px;margin-top:3px">sheet ${escapeHtml(decision.pageIndex)} · scale ${escapeHtml(decision.scale)} ft/pt · ${escapeHtml(decision.extractMode)} · ${escapeHtml(candidate.label || candidate.mode || 'candidate')}<br>source_ref ${escapeHtml(decision.sourceRef || row.source_ref || 'missing')} · employee_notes ${escapeHtml(decision.employeeNotes || 'none recorded')}<br>Blocks still active: ${blocked.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('')}</div>`;
   } catch {
     return '<div class="muted" style="font-size:11px;margin-top:3px">saved boundary decision; detail packet unavailable</div>';
   }
@@ -650,7 +650,7 @@ function evidenceDetail(row) {
 async function refreshEvidence() {
   const evidence = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/evidence');
   document.getElementById('evidence').innerHTML = evidence.length ? evidence.map((e) => `
-    <div class="ev">
+    <div class="ev" id="evidence-${escapeHtml(e.id)}" style="scroll-margin-top:96px">
       <span>${escapeHtml(e.evidence_type)}${evidenceDetail(e)}</span>
       <span class="st ${escapeHtml(e.status)}">${escapeHtml(e.status)}</span>
     </div>`).join('') : '<span class="muted">No evidence rows.</span>';
