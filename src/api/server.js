@@ -695,6 +695,43 @@ app.get('/api/projects/:name/evidence/:evidenceId/replay-bid-artifact', authMidd
   });
 });
 
+app.get('/api/projects/:name/evidence/:evidenceId/official-flow-hydraulic-replay-artifact', authMiddleware, (req, res) => {
+  const row = db
+    .prepare('SELECT * FROM project_evidence WHERE project_name = ? AND id = ?')
+    .get(req.params.name, Number(req.params.evidenceId));
+  if (!row) return res.status(404).json({ error: 'Evidence row not found' });
+  if (row.evidence_type !== 'official_flow_hydraulic_replay_artifact') {
+    return res.status(400).json({ error: 'Evidence row is not an official-flow hydraulic replay artifact' });
+  }
+  let notes;
+  try {
+    notes = JSON.parse(row.notes || '{}');
+  } catch {
+    return res.status(400).json({ error: 'Evidence row does not contain structured official-flow replay notes' });
+  }
+  if (notes.kind !== 'official_flow_hydraulic_replay_artifact') {
+    return res.status(400).json({ error: 'Evidence row is not an official-flow hydraulic replay artifact' });
+  }
+  const artifact = notes.artifact || {};
+  res.json({
+    ...artifact,
+    artifact_type: artifact.artifact_type || notes.artifact_type || 'official_flow_hydraulic_replay_artifact',
+    status: artifact.status || notes.artifact_status || 'best_effort_internal_alpha',
+    project_name: row.project_name,
+    evidence_id: row.id,
+    evidence_type: row.evidence_type,
+    source_ref: row.source_ref,
+    source_evidence_id: artifact.source_evidence_id || notes.source_evidence_id,
+    generated_at: artifact.generated_at || notes.replay_generated_at || row.created_at,
+    download_name: artifact.download_name || notes.download_name || `official-flow-hydraulic-replay-artifact-${row.id}.json`,
+    blocked_claims: Array.isArray(artifact.blocked_claims) ? artifact.blocked_claims : (Array.isArray(notes.blocked_claims) ? notes.blocked_claims : []),
+    claim_gate_effect: artifact.claim_gate_effect || notes.claim_gate_effect || 'no_claims_cleared',
+    limitations: Array.isArray(artifact.limitations) ? artifact.limitations : [
+      'This persisted replay artifact is internal-alpha evidence only and does not clear regulated claims.',
+    ],
+  });
+});
+
 app.post('/api/projects/:name/evidence', authMiddleware, requireRole('admin'), (req, res) => {
   const rejected = Object.keys(req.body).filter((key) => !EVIDENCE_INSERT_FIELDS.has(key));
   if (rejected.length) return res.status(400).json({ error: `Unsupported fields: ${rejected.join(', ')}` });
@@ -1686,6 +1723,26 @@ function buildOfficialFlowHydraulicReplayArtifact(projectName, evidence, intake,
   };
 }
 
+function officialFlowReplayArtifactEvidenceNotes(artifact) {
+  return {
+    kind: 'official_flow_hydraulic_replay_artifact',
+    artifact_type: artifact.artifact_type,
+    artifact_status: artifact.status,
+    source_evidence_id: artifact.source_evidence_id,
+    replay_generated_at: artifact.generated_at,
+    download_name: artifact.download_name,
+    official_flow_input: artifact.official_flow_input,
+    hydraulic_summary: artifact.hydraulic_summary,
+    bid_summary: artifact.bid_summary,
+    issue_count: Array.isArray(artifact.issue_list) ? artifact.issue_list.length : 0,
+    issue_codes: Array.isArray(artifact.issue_list) ? artifact.issue_list.map((issue) => issue.code).filter(Boolean) : [],
+    blocked_claims: Array.isArray(artifact.blocked_claims) ? artifact.blocked_claims : [],
+    claim_gate_effect: artifact.claim_gate_effect || 'no_claims_cleared',
+    limitations: Array.isArray(artifact.limitations) ? artifact.limitations : [],
+    artifact,
+  };
+}
+
 function officialFlowResolverQueueItem(projectName, matchedEvidence = null) {
   const intake = matchedEvidence?.intake || null;
   const facts = intake ? {
@@ -2144,6 +2201,46 @@ app.get('/api/projects/:name/resolver-packets/official-flow/:evidenceId/replay-a
       return res.status(404).json({ error: 'Official-flow intake evidence not found' });
     }
     res.json(buildOfficialFlowHydraulicReplayArtifact(projectName, evidence, intake, req.user));
+  } catch (err) {
+    res.status(err.httpStatus || 400).json({ error: err.message });
+  }
+});
+
+app.post('/api/projects/:name/resolver-packets/official-flow/:evidenceId/replay-artifact', authMiddleware, requireRole('admin'), (req, res) => {
+  try {
+    const projectName = req.params.name;
+    const evidenceId = Number(req.params.evidenceId);
+    if (!Number.isSafeInteger(evidenceId) || evidenceId <= 0) {
+      return res.status(400).json({ error: 'A positive evidence id is required' });
+    }
+    const evidence = db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'official_flow_intake'`)
+      .get(evidenceId, projectName);
+    const intake = officialFlowIntakeFromEvidence(evidence);
+    if (!evidence || !intake) {
+      return res.status(404).json({ error: 'Official-flow intake evidence not found' });
+    }
+    const artifact = buildOfficialFlowHydraulicReplayArtifact(projectName, evidence, intake, req.user);
+    const notes = officialFlowReplayArtifactEvidenceNotes(artifact);
+    const result = db
+      .prepare(`INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+                VALUES (?, ?, ?, ?, ?, ?)`)
+      .run(
+        projectName,
+        'official_flow_hydraulic_replay_artifact',
+        artifact.official_flow_input?.source_file || null,
+        `official-flow:${evidence.id}:hydraulic-replay`,
+        'best_effort',
+        JSON.stringify(notes),
+      );
+    const evidenceRow = db.prepare('SELECT * FROM project_evidence WHERE id = ?').get(result.lastInsertRowid);
+    res.status(201).json({
+      id: result.lastInsertRowid,
+      message: 'Official-flow hydraulic replay artifact saved as best-effort evidence; claims still blocked',
+      evidence: evidenceRow,
+      artifact,
+    });
   } catch (err) {
     res.status(err.httpStatus || 400).json({ error: err.message });
   }

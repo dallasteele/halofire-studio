@@ -185,6 +185,16 @@ function escapeHtml(value) {
 }
 
 function evidenceDetail(row) {
+  if (row.evidence_type === 'official_flow_hydraulic_replay_artifact') {
+    try {
+      const packet = JSON.parse(row.notes || '{}');
+      const summary = packet.hydraulic_summary || {};
+      const blocked = Array.isArray(packet.blocked_claims) ? packet.blocked_claims : [];
+      return `<div class="muted" style="font-size:11px;margin-top:3px">official_flow_hydraulic_replay_artifact<br>source_evidence_id ${escapeHtml(packet.source_evidence_id || 'missing')} - requiredSourcePsi ${escapeHtml(summary.requiredSourcePsi ?? 'missing')} - sourceMarginPsi ${escapeHtml(summary.sourceMarginPsi ?? 'missing')} - issues ${escapeHtml(packet.issue_count || 0)}<br>source_ref ${escapeHtml(row.source_ref || 'missing')} - claim_gate_effect ${escapeHtml(packet.claim_gate_effect || 'no_claims_cleared')}<br><button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#4f46e5" data-official-flow-replay-artifact-evidence-id="${escapeHtml(row.id)}">Download saved hydraulic replay artifact</button><br>Blocks still active: ${blocked.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('')}</div>`;
+    } catch {
+      return '<div class="muted" style="font-size:11px;margin-top:3px">official-flow hydraulic replay artifact; detail unavailable</div>';
+    }
+  }
   if (row.evidence_type === 'best_effort_ai_layout') {
     try {
       const packet = JSON.parse(row.notes || '{}');
@@ -239,6 +249,9 @@ async function refreshEvidence() {
     </div>`).join('') : '<span class="muted">No evidence rows.</span>';
   document.querySelectorAll('[data-replay-bid-artifact-evidence-id]').forEach((button) => {
     button.onclick = () => downloadReplayBidEvidenceArtifact(button.dataset.replayBidArtifactEvidenceId);
+  });
+  document.querySelectorAll('[data-official-flow-replay-artifact-evidence-id]').forEach((button) => {
+    button.onclick = () => downloadOfficialFlowReplayEvidenceArtifact(button.dataset.officialFlowReplayArtifactEvidenceId);
   });
 }
 
@@ -325,7 +338,7 @@ function resolverQueueDetail(item) {
       <div class="claims">AI fallback: ${escapeHtml(item.ai_fallback || '')}</div>
       <div class="claims">Blocks: ${claims.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('')}</div>
       <p style="margin-top:8px">${actions.map((action) => `<a class="go" style="padding:7px 10px;font-size:11px;text-decoration:none;display:inline-block;margin-right:6px" href="${escapeHtml(action.href || '#')}">${escapeHtml(action.label || 'Open')}</a>`).join('')}</p>
-      ${item.evidence_id ? `<p style="margin-top:8px"><button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#4f46e5" data-official-flow-replay-evidence-id="${escapeHtml(item.evidence_id)}">Download hydraulic replay artifact</button></p>` : ''}
+      ${item.evidence_id ? `<p style="margin-top:8px"><button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#4f46e5" data-official-flow-replay-evidence-id="${escapeHtml(item.evidence_id)}">Download hydraulic replay artifact</button> <button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#0f766e" data-official-flow-persist-evidence-id="${escapeHtml(item.evidence_id)}">Save replay evidence</button></p><div class="muted" id="officialFlowReplayStatus-${escapeHtml(item.evidence_id)}" style="font-size:11px"></div>` : ''}
       <details style="margin-top:8px" id="officialFlowIntake">
         <summary class="muted" style="cursor:pointer">Record/update official flow intake</summary>
         <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:8px">
@@ -406,6 +419,31 @@ async function downloadReplayBidEvidenceArtifact(evidenceId) {
 
 async function downloadOfficialFlowHydraulicReplay(evidenceId) {
   const artifact = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/resolver-packets/official-flow/' + encodeURIComponent(evidenceId) + '/replay-artifact');
+  const blob = new Blob([JSON.stringify(artifact, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = artifact.download_name || 'official-flow-hydraulic-replay-artifact.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+async function persistOfficialFlowHydraulicReplay(evidenceId) {
+  const status = document.getElementById('officialFlowReplayStatus-' + evidenceId);
+  if (status) status.textContent = 'Saving hydraulic replay artifact as best-effort evidence...';
+  try {
+    const saved = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/resolver-packets/official-flow/' + encodeURIComponent(evidenceId) + '/replay-artifact', {
+      method: 'POST',
+    });
+    if (status) status.textContent = 'Saved official_flow_hydraulic_replay_artifact evidence #' + saved.id + '; claims still blocked.';
+    await refreshEvidence();
+    await refreshResolverQueue();
+  } catch (err) {
+    if (status) status.textContent = 'Error: ' + err.message;
+  }
+}
+
+async function downloadOfficialFlowReplayEvidenceArtifact(evidenceId) {
+  const artifact = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/evidence/' + encodeURIComponent(evidenceId) + '/official-flow-hydraulic-replay-artifact');
   const blob = new Blob([JSON.stringify(artifact, null, 2)], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
@@ -542,6 +580,9 @@ async function refreshResolverQueue() {
   });
   document.querySelectorAll('[data-official-flow-replay-evidence-id]').forEach((button) => {
     button.onclick = () => downloadOfficialFlowHydraulicReplay(button.dataset.officialFlowReplayEvidenceId);
+  });
+  document.querySelectorAll('[data-official-flow-persist-evidence-id]').forEach((button) => {
+    button.onclick = () => persistOfficialFlowHydraulicReplay(button.dataset.officialFlowPersistEvidenceId);
   });
 }
 

@@ -283,5 +283,61 @@ describe('S5 GET /api/auto-source/status', () => {
     expect(artifact.blocked_claims).toEqual(
       expect.arrayContaining(['permit_ready', 'AHJ_approval', 'PE_review', 'AutoSprink_parity']),
     );
+
+    const persistRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-packets/official-flow/${created.id}/replay-artifact`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(persistRes.status).toBe(201);
+    const persisted = await persistRes.json();
+    expect(persisted).toEqual(expect.objectContaining({
+      message: expect.stringMatching(/claims still blocked/i),
+      artifact: expect.objectContaining({
+        artifact_type: 'official_flow_hydraulic_replay_artifact',
+        source_evidence_id: created.id,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+      evidence: expect.objectContaining({
+        evidence_type: 'official_flow_hydraulic_replay_artifact',
+        status: 'best_effort',
+        source_ref: `official-flow:${created.id}:hydraulic-replay`,
+      }),
+    }));
+    const notes = JSON.parse(persisted.evidence.notes);
+    expect(notes).toEqual(expect.objectContaining({
+      kind: 'official_flow_hydraulic_replay_artifact',
+      source_evidence_id: created.id,
+      artifact_type: 'official_flow_hydraulic_replay_artifact',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(notes.blocked_claims).toEqual(
+      expect.arrayContaining(['permit_ready', 'AHJ_approval', 'PE_review', 'AutoSprink_parity']),
+    );
+
+    const evidenceRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/evidence`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(evidenceRes.status).toBe(200);
+    const evidenceRows = await evidenceRes.json();
+    expect(evidenceRows).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        id: persisted.id,
+        evidence_type: 'official_flow_hydraulic_replay_artifact',
+        status: 'best_effort',
+      }),
+    ]));
+
+    const persistedArtifactRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/evidence/${persisted.id}/official-flow-hydraulic-replay-artifact`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(persistedArtifactRes.status).toBe(200);
+    const persistedArtifact = await persistedArtifactRes.json();
+    expect(persistedArtifact).toEqual(expect.objectContaining({
+      artifact_type: 'official_flow_hydraulic_replay_artifact',
+      status: 'best_effort_internal_alpha',
+      evidence_id: persisted.id,
+      source_evidence_id: created.id,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
   });
 });

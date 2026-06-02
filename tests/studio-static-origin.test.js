@@ -227,6 +227,11 @@ describe('studio static origin handling', () => {
     expect(html).toContain('/replay-artifact');
     expect(html).toContain('Download hydraulic replay artifact');
     expect(html).toContain('data-official-flow-replay-evidence-id');
+    expect(html).toContain('persistOfficialFlowHydraulicReplay');
+    expect(html).toContain('data-official-flow-persist-evidence-id');
+    expect(html).toContain('downloadOfficialFlowReplayEvidenceArtifact');
+    expect(html).toContain('/official-flow-hydraulic-replay-artifact');
+    expect(html).toContain('official_flow_hydraulic_replay_artifact');
   });
 
   it('lets the studio load the latest saved PDF boundary decision as import defaults', async () => {
