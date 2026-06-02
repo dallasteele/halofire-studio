@@ -1254,6 +1254,14 @@ describe('PDF page inspection API', () => {
         pdfExtract: 'outline',
         candidate,
         source_ref: '1881://sheet-7',
+        selected_sheet_ref: '1881://proposal-cooperative/sheet-7',
+        selected_scale_ref: '1881://operator-scale/sheet-7/0.1',
+        selected_boundary_candidate_ref: 'candidate:1881-replay-outline',
+        source_refs: [
+          '1881://proposal-cooperative/sheet-7',
+          '1881://operator-scale/sheet-7/0.1',
+          'candidate:1881-replay-outline',
+        ],
       }),
     })).json();
     const reviewBody = await (await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${saved.evidence.id}/reviews`, {
@@ -1284,6 +1292,32 @@ describe('PDF page inspection API', () => {
     const replayPacket = await (await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${saved.evidence.id}/replay-input`, {
       headers: { Authorization: `Bearer ${token}` },
     })).json();
+    expect(replayPacket.employee_decision).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.pdf_boundary_employee_decision.v1',
+      selected_sheet_ref: '1881://proposal-cooperative/sheet-7',
+      selected_scale_ref: '1881://operator-scale/sheet-7/0.1',
+      selected_boundary_candidate_ref: 'candidate:1881-replay-outline',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(replayPacket.source_refs).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        evidence_type: 'halofire.pdf_boundary_employee_decision.v1',
+        selected_sheet_ref: '1881://proposal-cooperative/sheet-7',
+        selected_scale_ref: '1881://operator-scale/sheet-7/0.1',
+        selected_boundary_candidate_ref: 'candidate:1881-replay-outline',
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    ]));
+    expect(replayPacket.sprinkler_bid_request.employee_decision).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.pdf_boundary_employee_decision.v1',
+      selected_boundary_candidate_ref: 'candidate:1881-replay-outline',
+    }));
+    expect(replayPacket.sprinkler_bid_request.source_refs).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        evidence_type: 'halofire.pdf_boundary_employee_decision.v1',
+        selected_boundary_candidate_ref: 'candidate:1881-replay-outline',
+      }),
+    ]));
 
     const replayRes = await request(`${COOPERATIVE_1881_PATH}/sprinkler-bid`, {
       method: 'POST',
@@ -1303,10 +1337,22 @@ describe('PDF page inspection API', () => {
       use_for_claims: false,
       claim_gate_effect: 'no_claims_cleared',
     }));
+    expect(replayBody.roomBoundaryReplay.employee_decision).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.pdf_boundary_employee_decision.v1',
+      selected_boundary_candidate_ref: 'candidate:1881-replay-outline',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
     expect(replayBody.roomBoundaryReplay.source_refs).toEqual(expect.arrayContaining([
       expect.objectContaining({
         evidence_id: saved.evidence.id,
         source_ref: '1881://sheet-7',
+      }),
+      expect.objectContaining({
+        evidence_type: 'halofire.pdf_boundary_employee_decision.v1',
+        selected_sheet_ref: '1881://proposal-cooperative/sheet-7',
+        selected_scale_ref: '1881://operator-scale/sheet-7/0.1',
+        selected_boundary_candidate_ref: 'candidate:1881-replay-outline',
+        claim_gate_effect: 'no_claims_cleared',
       }),
       expect.objectContaining({
         evidence_id: reviewBody.evidence.id,
@@ -1326,5 +1372,15 @@ describe('PDF page inspection API', () => {
     expect(replayNotes.kind).toBe('best_effort_ai_layout_replay');
     expect(replayNotes.claim_gate_effect).toBe('no_claims_cleared');
     expect(replayNotes.source_review_evidence_id).toBe(reviewBody.evidence.id);
+    expect(replayNotes.employee_decision).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.pdf_boundary_employee_decision.v1',
+      selected_boundary_candidate_ref: 'candidate:1881-replay-outline',
+    }));
+    expect(replayNotes.source_refs).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        evidence_type: 'halofire.pdf_boundary_employee_decision.v1',
+        selected_boundary_candidate_ref: 'candidate:1881-replay-outline',
+      }),
+    ]));
   }, 30000);
 });

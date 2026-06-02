@@ -10135,6 +10135,9 @@ function normalizeSam31EmployeeReplacement(projectName, evidence, decision, sam3
 
 function pdfBoundaryReplayInputPacket(projectName, evidence, decision, reviewEvidence, sam31Evidence = null, sam31ReplacementEvidence = null, sam31ExtrapolationEvidence = null, sam31ExtrapolationReviewEvidence = null, sam31SectioningDownstreamPacketEvidence = null) {
   if (!evidence || !decision) return null;
+  const employeeDecision = decision.employeeDecision && typeof decision.employeeDecision === 'object'
+    ? jsonClone(decision.employeeDecision)
+    : null;
   const review = reviewEvidence?.review || sam31Evidence?.result || null;
   if (!review) return null;
   const reviewSource = reviewEvidence?.review ? 'latest_employee_review_packet' : 'latest_sam31_visual_audit';
@@ -10191,6 +10194,20 @@ function pdfBoundaryReplayInputPacket(projectName, evidence, decision, reviewEvi
       status: reviewRow.status,
     },
   ];
+  if (employeeDecision) {
+    sourceRefs.push({
+      evidence_id: evidence.id,
+      evidence_type: employeeDecision.artifact_type || 'halofire.pdf_boundary_employee_decision.v1',
+      selected_sheet_ref: employeeDecision.selected_sheet_ref || null,
+      selected_scale_ref: employeeDecision.selected_scale_ref || null,
+      selected_boundary_candidate_ref: employeeDecision.selected_boundary_candidate_ref || null,
+      source_ref: employeeDecision.source_ref || evidence.source_ref || decision.sourceRef || null,
+      source_refs: Array.isArray(employeeDecision.source_refs) ? [...employeeDecision.source_refs] : [],
+      status: employeeDecision.status || 'employee_selected_internal_alpha',
+      claim_gate_effect: employeeDecision.claim_gate_effect || 'no_claims_cleared',
+      use_for_claims: false,
+    });
+  }
   if (openclawSam31PerceptionPacketSummary) {
     sourceRefs.push({
       evidence_type: 'openclaw.sam31_perception_packet',
@@ -10257,6 +10274,8 @@ function pdfBoundaryReplayInputPacket(projectName, evidence, decision, reviewEvi
     pdfScale: decision.scale,
     pdfExtract: decision.extractMode,
     corrected_room_polygons: replayRoomPolygons,
+    employee_decision: employeeDecision,
+    source_refs: sourceRefs,
     use_for_claims: false,
   };
   if (reviewSource === 'latest_employee_review_packet') {
@@ -10323,6 +10342,7 @@ function pdfBoundaryReplayInputPacket(projectName, evidence, decision, reviewEvi
       : {}),
     source_ref: evidence.source_ref || decision.sourceRef || null,
     source_file: evidence.source_file || decision.sourceFile || null,
+    employee_decision: employeeDecision,
     download_name: `${slugForDownloadName(projectName)}-room-boundary-replay-input-${evidence.id}.json`,
     generated_at: new Date().toISOString(),
     review_source: reviewSource,
@@ -10430,6 +10450,12 @@ function resolveRoomBoundaryReplayFloorPlan(req, projectName) {
   const sourceReview = replaySource === 'latest_employee_review_packet'
     ? reviewFromEvidence(sourceReviewEvidence)
     : sam31VisualAuditResultFromEvidence(sourceReviewEvidence);
+  const sourceDecision = decisionFromEvidence(sourceEvidence);
+  const employeeDecision = sourceDecision?.employeeDecision && typeof sourceDecision.employeeDecision === 'object'
+    ? jsonClone(sourceDecision.employeeDecision)
+    : (req.body.employee_decision && typeof req.body.employee_decision === 'object' && !Array.isArray(req.body.employee_decision)
+      ? jsonClone(req.body.employee_decision)
+      : null);
   const sourceSam31Replacement = sam31EmployeeReplacementFromEvidence(sourceSam31ReplacementEvidence);
   const sourceSam31ExtrapolationArtifact = openClawSam31ExtrapolationArtifactFromEvidence(sourceSam31ExtrapolationEvidence);
   const sourceSam31ExtrapolationReview = openClawSam31ExtrapolationReviewFromEvidence(sourceSam31ExtrapolationReviewEvidence);
@@ -10527,6 +10553,20 @@ function resolveRoomBoundaryReplayFloorPlan(req, projectName) {
       status: sourceReviewEvidence.status,
     },
   ];
+  if (employeeDecision) {
+    sourceRefs.push({
+      evidence_id: sourceEvidence.id,
+      evidence_type: employeeDecision.artifact_type || 'halofire.pdf_boundary_employee_decision.v1',
+      selected_sheet_ref: employeeDecision.selected_sheet_ref || null,
+      selected_scale_ref: employeeDecision.selected_scale_ref || null,
+      selected_boundary_candidate_ref: employeeDecision.selected_boundary_candidate_ref || null,
+      source_ref: employeeDecision.source_ref || sourceEvidence.source_ref || null,
+      source_refs: Array.isArray(employeeDecision.source_refs) ? [...employeeDecision.source_refs] : [],
+      status: employeeDecision.status || 'employee_selected_internal_alpha',
+      claim_gate_effect: employeeDecision.claim_gate_effect || 'no_claims_cleared',
+      use_for_claims: false,
+    });
+  }
   if (openclawSam31PerceptionPacketSummary) {
     sourceRefs.push({
       evidence_type: 'openclaw.sam31_perception_packet',
@@ -10560,7 +10600,7 @@ function resolveRoomBoundaryReplayFloorPlan(req, projectName) {
     ? buildOpenClawSam31ExtrapolationReviewPacket(
       projectName,
       sourceEvidence,
-      decisionFromEvidence(sourceEvidence),
+      sourceDecision,
       { evidence: sourceSam31ExtrapolationEvidence, artifact: sourceSam31ExtrapolationArtifact },
       sourceSam31ExtrapolationArtifact,
       { evidence: sourceSam31ExtrapolationReviewEvidence, review: sourceSam31ExtrapolationReview },
@@ -10633,6 +10673,7 @@ function resolveRoomBoundaryReplayFloorPlan(req, projectName) {
         : {}),
       source_ref: sourceEvidence.source_ref || sourceReview.source_ref || null,
       marked_up_plan_ref: sourceReview.marked_up_plan_ref || null,
+      employee_decision: employeeDecision,
       ...(replaySource === 'latest_sam31_visual_audit'
         ? {
           sam31_result_ref: sourceReview.sam31_result_ref || null,
@@ -12964,6 +13005,8 @@ function runSprinklerPipeline(req, prebuilt = null) {
         sam31_downstream_review_metadata: replayInput.sam31_downstream_review_metadata || null,
         halofire_sam31_sectioning_downstream_resolver_packet: replayInput.halofire_sam31_sectioning_downstream_resolver_packet || null,
         source_ref: replayInput.source_ref,
+        employee_decision: replayInput.employee_decision || null,
+        source_refs: Array.isArray(replayInput.source_refs) ? replayInput.source_refs : [],
         marked_up_plan_ref: replayInput.marked_up_plan_ref,
         sam31_result_ref: replayInput.sam31_result_ref,
         screenshot_ref: replayInput.screenshot_ref,

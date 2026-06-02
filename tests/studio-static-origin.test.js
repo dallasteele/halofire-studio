@@ -443,6 +443,8 @@ describe('studio static origin handling', () => {
     expect(html).toContain('Run replay bid');
     expect(html).toContain('room_boundary_replay_bid_artifact');
     expect(html).toContain('Replay evidence:');
+    expect(html).toContain('Replay employee_decision');
+    expect(html).toContain('Replay source_refs');
     expect(html).toContain('downloadReplayBidEvidenceArtifact');
     expect(html).toContain('data-replay-bid-artifact-evidence-id');
     expect(html).toContain('best_effort_ai_layout_replay');
