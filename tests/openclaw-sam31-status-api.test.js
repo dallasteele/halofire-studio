@@ -1198,6 +1198,17 @@ describe('OpenClaw SAM31 bridge status API', () => {
       source_review_evidence_id: boundaryReview.id,
       source_openclaw_sam31_extrapolation_evidence_id: artifact.id,
       source_openclaw_sam31_extrapolation_review_evidence_id: review.id,
+      source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id: persistedSectioningDownstreamPacket.id,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(replay.halofire_sam31_sectioning_downstream_resolver_packet).toEqual(expect.objectContaining({
+      evidence_id: persistedSectioningDownstreamPacket.id,
+      artifact_type: 'halofire.sam31_sectioning_downstream_resolver_packet.v1',
+      downstream_resolver_queue_item_count: 2,
+      downstream_resolver_lanes: expect.arrayContaining([
+        'room_boundary_visual_audit',
+        'obstruction_or_clash_review',
+      ]),
       claim_gate_effect: 'no_claims_cleared',
     }));
     expect(replay.openclaw_sam31_extrapolation_product_review_packet).toEqual(expect.objectContaining({
@@ -1239,6 +1250,13 @@ describe('OpenClaw SAM31 bridge status API', () => {
       model_3d_candidate_count: 1,
       claim_gate_effect: 'no_claims_cleared',
     }));
+    expect(replay.sprinkler_bid_request.halofire_sam31_sectioning_downstream_resolver_packet).toEqual(expect.objectContaining({
+      evidence_id: persistedSectioningDownstreamPacket.id,
+      artifact_type: 'halofire.sam31_sectioning_downstream_resolver_packet.v1',
+      source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id: sectioningReview.id,
+      downstream_resolver_queue_item_count: 2,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
     expect(replay.source_refs).toEqual(expect.arrayContaining([
       expect.objectContaining({
         evidence_id: artifact.id,
@@ -1248,6 +1266,12 @@ describe('OpenClaw SAM31 bridge status API', () => {
       expect.objectContaining({
         evidence_id: review.id,
         evidence_type: 'openclaw_sam31_extrapolation_review',
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+      expect.objectContaining({
+        evidence_id: persistedSectioningDownstreamPacket.id,
+        evidence_type: 'halofire_sam31_sectioning_downstream_resolver_packet',
+        artifact_type: 'halofire.sam31_sectioning_downstream_resolver_packet.v1',
         claim_gate_effect: 'no_claims_cleared',
       }),
     ]));
@@ -1274,7 +1298,14 @@ describe('OpenClaw SAM31 bridge status API', () => {
       room_boundary_source: 'latest_employee_review_packet',
       source_openclaw_sam31_extrapolation_evidence_id: artifact.id,
       source_openclaw_sam31_extrapolation_review_evidence_id: review.id,
+      source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id: persistedSectioningDownstreamPacket.id,
       use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(replayBid.roomBoundaryReplay.halofire_sam31_sectioning_downstream_resolver_packet).toEqual(expect.objectContaining({
+      evidence_id: persistedSectioningDownstreamPacket.id,
+      artifact_type: 'halofire.sam31_sectioning_downstream_resolver_packet.v1',
+      downstream_resolver_queue_item_count: 2,
       claim_gate_effect: 'no_claims_cleared',
     }));
     expect(replayBid.roomBoundaryReplay.openclaw_sam31_extrapolation_product_review_packet).toEqual(expect.objectContaining({
@@ -1334,9 +1365,16 @@ describe('OpenClaw SAM31 bridge status API', () => {
       model_3d_candidate_count: 1,
       claim_gate_effect: 'no_claims_cleared',
     }));
+    expect(replayArtifact.halofire_sam31_sectioning_downstream_resolver_packet).toEqual(expect.objectContaining({
+      evidence_id: persistedSectioningDownstreamPacket.id,
+      artifact_type: 'halofire.sam31_sectioning_downstream_resolver_packet.v1',
+      downstream_resolver_queue_item_count: 2,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
     expect(replayArtifact.source_replay_packet).toEqual(expect.objectContaining({
       source_openclaw_sam31_extrapolation_evidence_id: artifact.id,
       source_openclaw_sam31_extrapolation_review_evidence_id: review.id,
+      source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id: persistedSectioningDownstreamPacket.id,
     }));
   }, 15000);
 

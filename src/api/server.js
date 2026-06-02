@@ -763,6 +763,7 @@ app.get('/api/projects/:name/evidence/:evidenceId/replay-bid-artifact', authMidd
       source_sam31_evidence_id: notes.source_sam31_evidence_id,
       source_openclaw_sam31_extrapolation_evidence_id: notes.source_openclaw_sam31_extrapolation_evidence_id,
       source_openclaw_sam31_extrapolation_review_evidence_id: notes.source_openclaw_sam31_extrapolation_review_evidence_id,
+      source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id: notes.source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id,
       marked_up_plan_ref: notes.marked_up_plan_ref,
       sam31_result_ref: notes.sam31_result_ref,
       screenshot_ref: notes.screenshot_ref,
@@ -775,6 +776,7 @@ app.get('/api/projects/:name/evidence/:evidenceId/replay-bid-artifact', authMidd
     },
     openclaw_sam31_extrapolation_product_review_packet: notes.openclaw_sam31_extrapolation_product_review_packet || null,
     sam31_downstream_review_metadata: notes.sam31_downstream_review_metadata || null,
+    halofire_sam31_sectioning_downstream_resolver_packet: notes.halofire_sam31_sectioning_downstream_resolver_packet || null,
     blocked_claims: Array.isArray(notes.blocked_claims) ? notes.blocked_claims : [],
     claim_gate_effect: notes.claim_gate_effect || 'no_claims_cleared',
     limitations: Array.isArray(notes.limitations) ? notes.limitations : [
@@ -8904,7 +8906,7 @@ function normalizeSam31EmployeeReplacement(projectName, evidence, decision, sam3
   };
 }
 
-function pdfBoundaryReplayInputPacket(projectName, evidence, decision, reviewEvidence, sam31Evidence = null, sam31ReplacementEvidence = null, sam31ExtrapolationEvidence = null, sam31ExtrapolationReviewEvidence = null) {
+function pdfBoundaryReplayInputPacket(projectName, evidence, decision, reviewEvidence, sam31Evidence = null, sam31ReplacementEvidence = null, sam31ExtrapolationEvidence = null, sam31ExtrapolationReviewEvidence = null, sam31SectioningDownstreamPacketEvidence = null) {
   if (!evidence || !decision) return null;
   const review = reviewEvidence?.review || sam31Evidence?.result || null;
   if (!review) return null;
@@ -8947,6 +8949,7 @@ function pdfBoundaryReplayInputPacket(projectName, evidence, decision, reviewEvi
     )
     : null;
   const openclawSam31ExtrapolationProductReviewMetadata = openClawSam31ExtrapolationReviewPacketMetadata(openclawSam31ExtrapolationProductReviewPacket);
+  const halofireSam31SectioningDownstreamResolverPacket = halofireSam31SectioningDownstreamResolverPacketSummary(sam31SectioningDownstreamPacketEvidence);
   const sourceRefs = [
     {
       evidence_id: evidence.id,
@@ -9003,11 +9006,22 @@ function pdfBoundaryReplayInputPacket(projectName, evidence, decision, reviewEvi
       claim_gate_effect: 'no_claims_cleared',
     });
   }
+  if (halofireSam31SectioningDownstreamResolverPacket) {
+    sourceRefs.push({
+      evidence_id: halofireSam31SectioningDownstreamResolverPacket.evidence_id,
+      evidence_type: 'halofire_sam31_sectioning_downstream_resolver_packet',
+      artifact_type: halofireSam31SectioningDownstreamResolverPacket.artifact_type,
+      source_ref: halofireSam31SectioningDownstreamResolverPacket.source_ref || null,
+      status: halofireSam31SectioningDownstreamResolverPacket.evidence_status || 'best_effort',
+      claim_gate_effect: halofireSam31SectioningDownstreamResolverPacket.claim_gate_effect || 'no_claims_cleared',
+    });
+  }
   const replayBlockedClaims = uniqueStrings([
     ...(Array.isArray(queueItem.blocked_claims) ? queueItem.blocked_claims : []),
     ...(Array.isArray(review.blocked_claims) ? review.blocked_claims : []),
     ...(Array.isArray(openclawSam31BridgeSmokeSummary?.blocked_claims) ? openclawSam31BridgeSmokeSummary.blocked_claims : []),
     ...(Array.isArray(openclawSam31ExtrapolationProductReviewMetadata?.blocked_claims) ? openclawSam31ExtrapolationProductReviewMetadata.blocked_claims : []),
+    ...(Array.isArray(halofireSam31SectioningDownstreamResolverPacket?.blocked_claims) ? halofireSam31SectioningDownstreamResolverPacket.blocked_claims : []),
   ]);
   const sprinklerBidRequest = {
     room_boundary_source: reviewSource,
@@ -9041,6 +9055,10 @@ function pdfBoundaryReplayInputPacket(projectName, evidence, decision, reviewEvi
     sprinklerBidRequest.openclaw_sam31_extrapolation_product_review_packet = openclawSam31ExtrapolationProductReviewPacket;
     sprinklerBidRequest.sam31_downstream_review_metadata = openclawSam31ExtrapolationProductReviewMetadata;
   }
+  if (halofireSam31SectioningDownstreamResolverPacket) {
+    sprinklerBidRequest.source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id = halofireSam31SectioningDownstreamResolverPacket.evidence_id;
+    sprinklerBidRequest.halofire_sam31_sectioning_downstream_resolver_packet = halofireSam31SectioningDownstreamResolverPacket;
+  }
   return {
     artifact_type: 'room_boundary_replay_input_packet',
     status: 'ready_for_internal_alpha_replay',
@@ -9068,6 +9086,12 @@ function pdfBoundaryReplayInputPacket(projectName, evidence, decision, reviewEvi
         source_openclaw_sam31_extrapolation_review_evidence_id: openclawSam31ExtrapolationProductReviewPacket.source_openclaw_sam31_extrapolation_review_evidence_id,
         openclaw_sam31_extrapolation_product_review_packet: openclawSam31ExtrapolationProductReviewPacket,
         sam31_downstream_review_metadata: openclawSam31ExtrapolationProductReviewMetadata,
+      }
+      : {}),
+    ...(halofireSam31SectioningDownstreamResolverPacket
+      ? {
+        source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id: halofireSam31SectioningDownstreamResolverPacket.evidence_id,
+        halofire_sam31_sectioning_downstream_resolver_packet: halofireSam31SectioningDownstreamResolverPacket,
       }
       : {}),
     source_ref: evidence.source_ref || decision.sourceRef || null,
@@ -9110,6 +9134,7 @@ function resolveRoomBoundaryReplayFloorPlan(req, projectName) {
   const sourceSam31ReplacementEvidenceId = Number(req.body.source_sam31_replacement_evidence_id);
   const sourceSam31ExtrapolationEvidenceId = Number(req.body.source_openclaw_sam31_extrapolation_evidence_id);
   const sourceSam31ExtrapolationReviewEvidenceId = Number(req.body.source_openclaw_sam31_extrapolation_review_evidence_id);
+  const sourceHalofireSam31SectioningDownstreamPacketEvidenceId = Number(req.body.source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id);
   if (!Number.isSafeInteger(sourceEvidenceId) || sourceEvidenceId <= 0) {
     const e = new Error('source_evidence_id is required for room-boundary replay input');
     e.httpStatus = 400;
@@ -9168,12 +9193,20 @@ function resolveRoomBoundaryReplayFloorPlan(req, projectName) {
                 WHERE id = ? AND project_name = ? AND evidence_type = 'openclaw_sam31_extrapolation_review'`)
       .get(sourceSam31ExtrapolationReviewEvidenceId, projectName)
     : null;
+  const sourceHalofireSam31SectioningDownstreamPacketEvidence = Number.isSafeInteger(sourceHalofireSam31SectioningDownstreamPacketEvidenceId)
+    && sourceHalofireSam31SectioningDownstreamPacketEvidenceId > 0
+    ? db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'halofire_sam31_sectioning_downstream_resolver_packet'`)
+      .get(sourceHalofireSam31SectioningDownstreamPacketEvidenceId, projectName)
+    : null;
   const sourceReview = replaySource === 'latest_employee_review_packet'
     ? reviewFromEvidence(sourceReviewEvidence)
     : sam31VisualAuditResultFromEvidence(sourceReviewEvidence);
   const sourceSam31Replacement = sam31EmployeeReplacementFromEvidence(sourceSam31ReplacementEvidence);
   const sourceSam31ExtrapolationArtifact = openClawSam31ExtrapolationArtifactFromEvidence(sourceSam31ExtrapolationEvidence);
   const sourceSam31ExtrapolationReview = openClawSam31ExtrapolationReviewFromEvidence(sourceSam31ExtrapolationReviewEvidence);
+  const sourceHalofireSam31SectioningDownstreamPacket = halofireSam31SectioningDownstreamResolverPacketFromEvidence(sourceHalofireSam31SectioningDownstreamPacketEvidence);
   if (!sourceEvidence || !sourceReview || Number(sourceReview.source_evidence_id) !== sourceEvidenceId) {
     const e = new Error(
       replaySource === 'latest_sam31_visual_audit'
@@ -9211,6 +9244,16 @@ function resolveRoomBoundaryReplayFloorPlan(req, projectName) {
       Number(sourceSam31ExtrapolationReview.source_openclaw_sam31_extrapolation_evidence_id) !== Number(sourceSam31ExtrapolationEvidenceId)
     ) {
       const e = new Error('Replay input source evidence does not match a saved OpenClaw SAM31 extrapolation review');
+      e.httpStatus = 409;
+      throw e;
+    }
+  }
+  if (Number.isSafeInteger(sourceHalofireSam31SectioningDownstreamPacketEvidenceId) && sourceHalofireSam31SectioningDownstreamPacketEvidenceId > 0) {
+    if (
+      !sourceHalofireSam31SectioningDownstreamPacket ||
+      Number(sourceHalofireSam31SectioningDownstreamPacket.source_pdf_boundary_evidence_id) !== Number(sourceEvidenceId)
+    ) {
+      const e = new Error('Replay input source evidence does not match a saved HaloFire SAM31 sectioning downstream resolver packet');
       e.httpStatus = 409;
       throw e;
     }
@@ -9298,6 +9341,14 @@ function resolveRoomBoundaryReplayFloorPlan(req, projectName) {
     )
     : null;
   const openclawSam31ExtrapolationProductReviewMetadata = openClawSam31ExtrapolationReviewPacketMetadata(openclawSam31ExtrapolationProductReviewPacket);
+  const halofireSam31SectioningDownstreamResolverPacket = halofireSam31SectioningDownstreamResolverPacketSummary(
+    sourceHalofireSam31SectioningDownstreamPacketEvidence && sourceHalofireSam31SectioningDownstreamPacket
+      ? {
+        evidence: sourceHalofireSam31SectioningDownstreamPacketEvidence,
+        packet: sourceHalofireSam31SectioningDownstreamPacket,
+      }
+      : null,
+  );
   if (openclawSam31ExtrapolationProductReviewPacket) {
     sourceRefs.push({
       evidence_id: openclawSam31ExtrapolationProductReviewPacket.source_openclaw_sam31_extrapolation_evidence_id,
@@ -9312,6 +9363,16 @@ function resolveRoomBoundaryReplayFloorPlan(req, projectName) {
       source_ref: openclawSam31ExtrapolationProductReviewPacket.product_review?.replacement_ref || null,
       status: sourceSam31ExtrapolationReviewEvidence.status,
       claim_gate_effect: 'no_claims_cleared',
+    });
+  }
+  if (halofireSam31SectioningDownstreamResolverPacket) {
+    sourceRefs.push({
+      evidence_id: halofireSam31SectioningDownstreamResolverPacket.evidence_id,
+      evidence_type: 'halofire_sam31_sectioning_downstream_resolver_packet',
+      artifact_type: halofireSam31SectioningDownstreamResolverPacket.artifact_type,
+      source_ref: halofireSam31SectioningDownstreamResolverPacket.source_ref || null,
+      status: halofireSam31SectioningDownstreamResolverPacket.evidence_status || 'best_effort',
+      claim_gate_effect: halofireSam31SectioningDownstreamResolverPacket.claim_gate_effect || 'no_claims_cleared',
     });
   }
   return {
@@ -9337,6 +9398,12 @@ function resolveRoomBoundaryReplayFloorPlan(req, projectName) {
           sam31_downstream_review_metadata: openclawSam31ExtrapolationProductReviewMetadata,
         }
         : {}),
+      ...(halofireSam31SectioningDownstreamResolverPacket
+        ? {
+          source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id: halofireSam31SectioningDownstreamResolverPacket.evidence_id,
+          halofire_sam31_sectioning_downstream_resolver_packet: halofireSam31SectioningDownstreamResolverPacket,
+        }
+        : {}),
       source_ref: sourceEvidence.source_ref || sourceReview.source_ref || null,
       marked_up_plan_ref: sourceReview.marked_up_plan_ref || null,
       ...(replaySource === 'latest_sam31_visual_audit'
@@ -9355,6 +9422,7 @@ function resolveRoomBoundaryReplayFloorPlan(req, projectName) {
       blocked_claims: uniqueStrings([
         ...(Array.isArray(sourceReview.blocked_claims) ? sourceReview.blocked_claims : PDF_BOUNDARY_BLOCKED_CLAIMS),
         ...(Array.isArray(openclawSam31ExtrapolationProductReviewMetadata?.blocked_claims) ? openclawSam31ExtrapolationProductReviewMetadata.blocked_claims : []),
+        ...(Array.isArray(halofireSam31SectioningDownstreamResolverPacket?.blocked_claims) ? halofireSam31SectioningDownstreamResolverPacket.blocked_claims : []),
       ]),
       source_refs: sourceRefs,
     },
@@ -11290,7 +11358,8 @@ app.get('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/replay-in
     const sam31ReplacementEvidence = evidence ? latestSam31EmployeeReplacementEvidence(projectName, evidence.id) : null;
     const sam31ExtrapolationEvidence = evidence ? latestOpenClawSam31ExtrapolationArtifactEvidence(projectName, evidence.id) : null;
     const sam31ExtrapolationReviewEvidence = evidence ? latestOpenClawSam31ExtrapolationReviewEvidence(projectName, evidence.id) : null;
-    const packet = pdfBoundaryReplayInputPacket(projectName, evidence, decision, reviewEvidence, sam31Evidence, sam31ReplacementEvidence, sam31ExtrapolationEvidence, sam31ExtrapolationReviewEvidence);
+    const sam31SectioningDownstreamPacketEvidence = evidence ? latestHalofireSam31SectioningDownstreamResolverPacketEvidence(projectName, evidence.id) : null;
+    const packet = pdfBoundaryReplayInputPacket(projectName, evidence, decision, reviewEvidence, sam31Evidence, sam31ReplacementEvidence, sam31ExtrapolationEvidence, sam31ExtrapolationReviewEvidence, sam31SectioningDownstreamPacketEvidence);
     if (!packet) {
       return res.status(409).json({ error: 'No employee or SAM 3.1 room-boundary review packet is available for replay input' });
     }
@@ -11494,8 +11563,10 @@ function runSprinklerPipeline(req, prebuilt = null) {
         sam31_employee_replacement: replayInput.sam31_employee_replacement || null,
         source_openclaw_sam31_extrapolation_evidence_id: replayInput.source_openclaw_sam31_extrapolation_evidence_id,
         source_openclaw_sam31_extrapolation_review_evidence_id: replayInput.source_openclaw_sam31_extrapolation_review_evidence_id,
+        source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id: replayInput.source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id,
         openclaw_sam31_extrapolation_product_review_packet: replayInput.openclaw_sam31_extrapolation_product_review_packet || null,
         sam31_downstream_review_metadata: replayInput.sam31_downstream_review_metadata || null,
+        halofire_sam31_sectioning_downstream_resolver_packet: replayInput.halofire_sam31_sectioning_downstream_resolver_packet || null,
         source_ref: replayInput.source_ref,
         marked_up_plan_ref: replayInput.marked_up_plan_ref,
         sam31_result_ref: replayInput.sam31_result_ref,
