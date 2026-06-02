@@ -149,6 +149,9 @@ describe('studio static origin handling', () => {
     expect(html).toContain('claim_gate_effect');
     expect(html).toContain('manufacturer_exact');
     expect(html).toContain('Attach catalog evidence');
+    const catalogResolverBranch = html.match(/if \(item\.kind === 'catalog_vendor_acquisition'\) \{([\s\S]*?)if \(item\.kind === 'official_flow_hydraulic_replay_review'\) \{/);
+    expect(catalogResolverBranch?.[1]).toBeDefined();
+    expect(catalogResolverBranch?.[1]).not.toContain('data-official-flow-replay-artifact-evidence-id');
   });
 
   it('lets Settings receive a catalog source-acquisition handoff for part override evidence', async () => {
@@ -232,6 +235,11 @@ describe('studio static origin handling', () => {
     expect(html).toContain('downloadOfficialFlowReplayEvidenceArtifact');
     expect(html).toContain('/official-flow-hydraulic-replay-artifact');
     expect(html).toContain('official_flow_hydraulic_replay_artifact');
+    expect(html).toContain('official_flow_hydraulic_replay_review');
+    expect(html).toContain('official-flow-replay-review');
+    expect(html).toContain('issue_actions');
+    expect(html).toContain('PROFESSIONAL_HYDRAULIC_REVIEW_MISSING');
+    expect(html).toContain('AHJ_HYDRAULIC_APPROVAL_MISSING');
   });
 
   it('lets the studio load the latest saved PDF boundary decision as import defaults', async () => {

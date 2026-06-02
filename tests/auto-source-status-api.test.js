@@ -339,5 +339,48 @@ describe('S5 GET /api/auto-source/status', () => {
       source_evidence_id: created.id,
       claim_gate_effect: 'no_claims_cleared',
     }));
+
+    const issueQueueRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-queue`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(issueQueueRes.status).toBe(200);
+    const issueQueue = await issueQueueRes.json();
+    const replayItem = issueQueue.items.find((row) => row.kind === 'official_flow_hydraulic_replay_review');
+    expect(replayItem).toEqual(expect.objectContaining({
+      status: 'official_flow_replay_review_needed',
+      evidence_id: persisted.id,
+      source_evidence_type: 'official_flow_hydraulic_replay_artifact',
+      claim_gate_effect: 'no_claims_cleared',
+      next_action: expect.stringMatching(/professional hydraulic review|AHJ/i),
+    }));
+    expect(replayItem.input_defaults).toEqual(expect.objectContaining({
+      source_evidence_id: created.id,
+      issue_count: expect.any(Number),
+      requiredSourcePsi: expect.any(Number),
+      sourceMarginPsi: expect.any(Number),
+    }));
+    expect(replayItem.issue_actions).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        code: 'PROFESSIONAL_HYDRAULIC_REVIEW_MISSING',
+        evidence_lane: 'licensed_professional_hydraulic_review',
+        blocked_claims: expect.arrayContaining(['permit_ready', 'PE_review', 'engineering_grade']),
+      }),
+      expect.objectContaining({
+        code: 'AHJ_HYDRAULIC_APPROVAL_MISSING',
+        evidence_lane: 'AHJ_reviewed_hydraulic_calculation_package',
+        blocked_claims: expect.arrayContaining(['permit_ready', 'AHJ_approval']),
+      }),
+    ]));
+    expect(replayItem.actions).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        label: 'Download saved replay artifact',
+        href: expect.stringContaining('/official-flow-hydraulic-replay-artifact'),
+      }),
+      expect.objectContaining({
+        label: 'Open evidence workbench',
+        href: expect.stringContaining('#official-flow-replay-review'),
+      }),
+    ]));
+    expect(issueQueue.summary.official_flow_replay_review_needed).toBeGreaterThanOrEqual(1);
   });
 });

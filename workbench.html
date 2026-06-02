@@ -265,7 +265,6 @@ const TARGET_CATALOG_SOURCE_FAMILIES = [
   'family:fitting_tee_2p0in',
   'family:valve_check_2p5in',
 ];
-
 function catalogSourceRowDetail(row) {
   const claims = Array.isArray(row.blocked_claims) ? row.blocked_claims : [];
   const rejected = Array.isArray(row.rejected_candidates) ? row.rejected_candidates : [];
@@ -321,6 +320,29 @@ function resolverQueueDetail(item) {
       <div class="claims">Accepts: ${acceptable.map((e) => `<span class="chip">${escapeHtml(e)}</span>`).join('')}</div>
       <div class="claims">AI fallback: ${escapeHtml(item.ai_fallback || '')}</div>
       <div class="claims">Blocks: ${claims.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('')}</div>
+      <p style="margin-top:8px">${actions.map((action) => `<a class="go" style="padding:7px 10px;font-size:11px;text-decoration:none;display:inline-block;margin-right:6px" href="${escapeHtml(action.href || '#')}">${escapeHtml(action.label || 'Open')}</a>`).join('')}</p>
+    </div>`;
+  }
+  if (item.kind === 'official_flow_hydraulic_replay_review') {
+    const issue_actions = Array.isArray(item.issue_actions) ? item.issue_actions : [];
+    return `
+    <div class="gate warning" id="official-flow-replay-review">
+      <div class="code">${escapeHtml(item.kind)} - ${escapeHtml(item.status).toUpperCase()}</div>
+      <div class="na">${escapeHtml(item.next_action)}</div>
+      <div class="claims">Replay artifact evidence #${escapeHtml(item.evidence_id)} - source evidence #${escapeHtml(defaults.source_evidence_id || 'missing')} - source_ref ${escapeHtml(defaults.source_ref || item.source_ref || 'missing')}</div>
+      <div class="claims">Hydraulic replay: requiredSourcePsi ${escapeHtml(defaults.requiredSourcePsi ?? 'missing')} - sourceMarginPsi ${escapeHtml(defaults.sourceMarginPsi ?? 'missing')} - totalDemandGpm ${escapeHtml(defaults.totalDemandGpm ?? 'missing')} - flowMarginGpm ${escapeHtml(defaults.flowMarginGpm ?? 'missing')}</div>
+      <div class="claims">issue_actions: ${issue_actions.length ? issue_actions.map((action) => `<span class="chip">${escapeHtml(action.code || 'issue')} - ${escapeHtml(action.evidence_lane || 'evidence')}</span>`).join('') : '<span class="chip">missing replay issues</span>'}</div>
+      ${issue_actions.map((action) => `
+        <div class="claims">
+          <b>${escapeHtml(action.code || 'issue')}</b> - ${escapeHtml(action.severity || 'review')} - ${escapeHtml(action.next_action || '')}<br>
+          evidence_lane ${escapeHtml(action.evidence_lane || 'missing')} - source_ref ${escapeHtml(action.source_ref || item.source_ref || 'missing')}<br>
+          Accepts: ${(Array.isArray(action.acceptable_evidence) ? action.acceptable_evidence : []).map((e) => `<span class="chip">${escapeHtml(e)}</span>`).join('')}
+          Blocks: ${(Array.isArray(action.blocked_claims) ? action.blocked_claims : []).map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('')}
+        </div>`).join('')}
+      <div class="claims">Accepts: ${acceptable.map((e) => `<span class="chip">${escapeHtml(e)}</span>`).join('')}</div>
+      <div class="claims">AI fallback: ${escapeHtml(item.ai_fallback || '')}</div>
+      <div class="claims">Blocks: ${claims.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('')}</div>
+      <p style="margin-top:8px"><button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#4f46e5" data-official-flow-replay-artifact-evidence-id="${escapeHtml(item.evidence_id)}">Download saved replay artifact</button></p>
       <p style="margin-top:8px">${actions.map((action) => `<a class="go" style="padding:7px 10px;font-size:11px;text-decoration:none;display:inline-block;margin-right:6px" href="${escapeHtml(action.href || '#')}">${escapeHtml(action.label || 'Open')}</a>`).join('')}</p>
     </div>`;
   }

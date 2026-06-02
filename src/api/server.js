@@ -1743,6 +1743,137 @@ function officialFlowReplayArtifactEvidenceNotes(artifact) {
   };
 }
 
+function officialFlowReplayArtifactFromEvidence(row) {
+  if (!row || row.evidence_type !== 'official_flow_hydraulic_replay_artifact') return null;
+  const notes = safeParseJsonObject(row.notes);
+  if (!notes || notes.kind !== 'official_flow_hydraulic_replay_artifact') return null;
+  const artifact = notes.artifact && typeof notes.artifact === 'object' ? notes.artifact : {
+    artifact_type: notes.artifact_type || 'official_flow_hydraulic_replay_artifact',
+    status: notes.artifact_status || 'best_effort_internal_alpha',
+    source_evidence_id: notes.source_evidence_id,
+    official_flow_input: notes.official_flow_input || null,
+    hydraulic_summary: notes.hydraulic_summary || null,
+    bid_summary: notes.bid_summary || null,
+    issue_list: [],
+    blocked_claims: notes.blocked_claims || [],
+    claim_gate_effect: notes.claim_gate_effect || 'no_claims_cleared',
+    limitations: notes.limitations || [],
+  };
+  return { evidence: row, notes, artifact };
+}
+
+function officialFlowReplayArtifactEvidenceRows(projectName) {
+  return db
+    .prepare(`SELECT * FROM project_evidence
+              WHERE project_name = ? AND evidence_type = 'official_flow_hydraulic_replay_artifact'
+              ORDER BY created_at DESC, id DESC`)
+    .all(projectName)
+    .map(officialFlowReplayArtifactFromEvidence)
+    .filter(Boolean);
+}
+
+function officialFlowReplayIssueAction(issue = {}, fallbackSourceRef = null) {
+  const code = issue.code || issue.issue_type || 'OFFICIAL_FLOW_REPLAY_REVIEW_NEEDED';
+  const professionalClaims = ['permit_ready', 'PE_review', 'engineering_grade'];
+  const ahjClaims = ['permit_ready', 'AHJ_approval'];
+  const preliminaryClaims = ['permit_ready', 'PE_review', 'engineering_grade', 'AutoSprink_parity'];
+  if (code === 'PROFESSIONAL_HYDRAULIC_REVIEW_MISSING') {
+    return {
+      code,
+      severity: issue.severity || 'blocking',
+      evidence_lane: 'licensed_professional_hydraulic_review',
+      next_action: 'Attach licensed professional hydraulic calculation review/signoff before any engineering-grade, permit-ready, or PE-reviewed claim.',
+      acceptable_evidence: ['licensed professional hydraulic calculation review', 'sealed hydraulic calculation package', 'professional correction note tied to this replay artifact'],
+      blocked_claims: professionalClaims,
+      source_ref: issue.source_ref || fallbackSourceRef,
+      observed: issue.observed || null,
+      expected: issue.expected || null,
+    };
+  }
+  if (code === 'AHJ_HYDRAULIC_APPROVAL_MISSING') {
+    return {
+      code,
+      severity: issue.severity || 'blocking',
+      evidence_lane: 'AHJ_reviewed_hydraulic_calculation_package',
+      next_action: 'Attach AHJ-reviewed hydraulic calculation package or official approval record before any AHJ-ready or permit-ready claim.',
+      acceptable_evidence: ['AHJ-reviewed hydraulic calculation package', 'AHJ approval record', 'official permit-review comment clearing the hydraulic calculation'],
+      blocked_claims: ahjClaims,
+      source_ref: issue.source_ref || fallbackSourceRef,
+      observed: issue.observed || null,
+      expected: issue.expected || null,
+    };
+  }
+  const isFlow = /FLOW_GPM/i.test(code);
+  return {
+    code,
+    severity: issue.severity || (/SHORTFALL/i.test(code) ? 'blocking' : 'warning'),
+    evidence_lane: isFlow ? 'preliminary_flow_margin_review' : 'preliminary_pressure_margin_review',
+    next_action: issue.required_action || 'Review this preliminary margin with official flow/professional hydraulic evidence; do not clear regulated claims from this artifact alone.',
+    acceptable_evidence: isFlow
+      ? ['official flow test report', 'professional hydraulic demand review', 'AutoSprink/equivalent model export for parity review']
+      : ['professional hydraulic pressure calculation review', 'official water supply data sheet', 'AutoSprink/equivalent model export for parity review'],
+    blocked_claims: preliminaryClaims,
+    source_ref: issue.source_ref || fallbackSourceRef,
+    observed: issue.observed || null,
+    expected: issue.expected || null,
+  };
+}
+
+function officialFlowReplayReviewQueueItem(projectName, replayEvidence) {
+  if (!replayEvidence?.evidence || !replayEvidence.artifact) return null;
+  const artifact = replayEvidence.artifact;
+  const issueList = Array.isArray(artifact.issue_list) ? artifact.issue_list : [];
+  const sourceRef = artifact.official_flow_input?.source_ref || replayEvidence.evidence.source_ref || null;
+  const issueActions = issueList.map((issue) => officialFlowReplayIssueAction(issue, sourceRef));
+  return {
+    id: `resolver:official-flow-replay-review:${replayEvidence.evidence.id}`,
+    project_name: projectName,
+    kind: 'official_flow_hydraulic_replay_review',
+    title: 'Official-flow hydraulic replay issue actions',
+    status: 'official_flow_replay_review_needed',
+    evidence_id: replayEvidence.evidence.id,
+    source_evidence_type: 'official_flow_hydraulic_replay_artifact',
+    source_ref: replayEvidence.evidence.source_ref || sourceRef,
+    next_action: 'Resolve the replay issue actions with professional hydraulic review, AHJ review, and official flow/model evidence before any regulated claim.',
+    acceptable_evidence: [
+      'licensed professional hydraulic calculation review',
+      'AHJ-reviewed hydraulic calculation package',
+      'official flow test report or water supply data sheet',
+      'AutoSprink or equivalent professional hydraulic model export for parity review',
+    ],
+    ai_fallback:
+      'AI may summarize preliminary pressure/flow margin issues and assemble review packets, but it cannot clear PE, AHJ, permit-ready, engineering-grade, fabrication-ready, or AutoSprink parity claims.',
+    input_defaults: {
+      source_evidence_id: artifact.source_evidence_id || replayEvidence.notes.source_evidence_id || null,
+      issue_count: issueList.length,
+      issue_codes: issueActions.map((issue) => issue.code),
+      requiredSourcePsi: artifact.hydraulic_summary?.requiredSourcePsi ?? null,
+      sourceMarginPsi: artifact.hydraulic_summary?.sourceMarginPsi ?? null,
+      totalDemandGpm: artifact.hydraulic_summary?.totalDemandGpm ?? null,
+      flowMarginGpm: artifact.hydraulic_summary?.flowMarginGpm ?? null,
+      source_ref: sourceRef,
+    },
+    issue_actions: issueActions,
+    blocked_claims: Array.isArray(artifact.blocked_claims) ? artifact.blocked_claims : [...OFFICIAL_FLOW_BLOCKED_CLAIMS],
+    claim_gate_effect: artifact.claim_gate_effect || replayEvidence.notes.claim_gate_effect || 'no_claims_cleared',
+    latest_review: {
+      evidence_id: replayEvidence.evidence.id,
+      evidence_status: replayEvidence.evidence.status,
+      source_ref: replayEvidence.evidence.source_ref,
+      issue_count: issueList.length,
+      claim_gate_effect: artifact.claim_gate_effect || 'no_claims_cleared',
+    },
+    limitations: [
+      'This resolver item is generated from a best-effort internal-alpha replay artifact.',
+      'It creates review actions only; it does not clear permit-ready, AHJ approval, PE review, engineering-grade, fabrication-ready, manufacturer-exact, or AutoSprink parity claims.',
+    ],
+    actions: [
+      { label: 'Download saved replay artifact', href: `/api/projects/${encodeURIComponent(projectName)}/evidence/${replayEvidence.evidence.id}/official-flow-hydraulic-replay-artifact` },
+      { label: 'Open evidence workbench', href: `/workbench.html?project=${encodeURIComponent(projectName)}#official-flow-replay-review` },
+    ],
+  };
+}
+
 function officialFlowResolverQueueItem(projectName, matchedEvidence = null) {
   const intake = matchedEvidence?.intake || null;
   const facts = intake ? {
@@ -2117,6 +2248,10 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
   const officialFlowEvidence = latestOfficialFlowIntakeEvidence(projectName);
   const officialFlowItem = officialFlowResolverQueueItem(projectName, officialFlowEvidence);
   if (officialFlowItem) items.push(officialFlowItem);
+  for (const replayEvidence of officialFlowReplayArtifactEvidenceRows(projectName)) {
+    const replayItem = officialFlowReplayReviewQueueItem(projectName, replayEvidence);
+    if (replayItem) items.push(replayItem);
+  }
   const boundaryItem = pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence);
   if (boundaryItem) items.push(boundaryItem);
   const catalogEvidence = matchingCatalogEvidenceByFamily(projectName);
@@ -2147,6 +2282,7 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
       official_flow_available: statusCounts.official_flow_available || 0,
       official_flow_needed: statusCounts.official_flow_needed || 0,
       official_flow_evidence_recorded: statusCounts.official_flow_evidence_recorded || 0,
+      official_flow_replay_review_needed: statusCounts.official_flow_replay_review_needed || 0,
     },
   });
 });
