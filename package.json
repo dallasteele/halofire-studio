@@ -11,6 +11,7 @@
     "build": "vite build",
     "build:parts": "node scripts/build-parts.mjs",
     "auto-source": "node scripts/auto-source-run.mjs",
+    "sam31:bridge": "node scripts/sam31-bridge.mjs",
     "start": "node src/api/server.js",
     "cron": "node src/cron/scheduler.js",
     "skill:list": "node src/core/skill-runner.js --list",
