@@ -92,6 +92,48 @@ beforeAll(async () => {
         next_action: 'Queue HaloFire room-boundary or sleeve/firestop review with SAM31 vector/3D best guesses; keep permit, AHJ, AutoSprink, fabrication, and manufacturer claims blocked.',
         claim_gate_effect: 'no_claims_cleared',
       },
+      product_review_queue_item: {
+        artifact_type: 'openclaw.sam31.product_review_queue_item.v1',
+        status: 'ready_for_human_replacement_or_acceptance',
+        application: body.application || 'halo_fire',
+        project_ref: body.project_ref,
+        source_runtime: 'sam-3.1+llm',
+        source_packet_ref: 'openclaw.sam31_perception_packet',
+        contract_ref: 'openclaw.sam31.application_contract.halo_fire.v1',
+        supported_evidence_lanes: [
+          'room_boundary_visual_audit',
+          'sleeve_or_firestop_candidate_review',
+          'obstruction_or_clash_review',
+          'vector_overlay_generation',
+          'model_3d_candidate_generation',
+        ],
+        acceptable_human_updates: [
+          'semantic_label',
+          'polygon',
+          'bbox',
+          'object_hypothesis',
+          'vector_overlay',
+          'model_3d_candidate',
+          'source_ref',
+          'confidence',
+        ],
+        temporary_value_policy: 'best_guess_until_employee_replaced',
+        section_count: sections.length,
+        object_hypothesis_count: objectHypotheses.length,
+        vector_overlay_count: 1,
+        model_3d_candidate_count: 1,
+        source_refs: [
+          {
+            source_ref: body.source_ref,
+            image_ref: body.image_ref,
+            runtime: 'sam-3.1+llm',
+          },
+        ],
+        next_action: 'Queue HaloFire room-boundary or sleeve/firestop review with SAM31 vector/3D best guesses; keep permit, AHJ, AutoSprink, fabrication, and manufacturer claims blocked.',
+        use_for_claims: false,
+        blocked_claims: ['permit_ready', 'AHJ_approval', 'AutoSprink_parity'],
+        claim_gate_effect: 'no_claims_cleared',
+      },
       perception_packet: {
         artifact_type: 'openclaw.sam31_perception_packet',
         status: 'best_effort_perception_ready',
@@ -437,6 +479,19 @@ describe('OpenClaw SAM31 bridge status API', () => {
       contract_ref: 'openclaw.sam31.application_contract.halo_fire.v1',
       claim_gate_effect: 'no_claims_cleared',
     }));
+    expect(artifact.product_review_queue_item).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.product_review_queue_item.v1',
+      application: 'halo_fire',
+      project_ref: `halo_fire:${COOPERATIVE_1881_PROJECT_NAME}`,
+      source_packet_ref: 'openclaw.sam31_perception_packet',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(artifact.product_review_queue_item.supported_evidence_lanes).toEqual(expect.arrayContaining([
+      'room_boundary_visual_audit',
+      'vector_overlay_generation',
+      'model_3d_candidate_generation',
+    ]));
     expect(artifact.evidence).toEqual(expect.objectContaining({
       evidence_type: 'openclaw_sam31_extrapolation_artifact',
       source_file: 'OPENCLAW_PERCEPTION_URL',
@@ -462,6 +517,11 @@ describe('OpenClaw SAM31 bridge status API', () => {
       source_pdf_boundary_evidence_id: boundary.id,
       product_review_action: expect.objectContaining({
         status: 'ready_for_product_review_queue',
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+      product_review_queue_item: expect.objectContaining({
+        artifact_type: 'openclaw.sam31.product_review_queue_item.v1',
+        use_for_claims: false,
         claim_gate_effect: 'no_claims_cleared',
       }),
       claim_gate_effect: 'no_claims_cleared',
@@ -564,6 +624,13 @@ describe('OpenClaw SAM31 bridge status API', () => {
       claim_gate_effect: 'no_claims_cleared',
       download_name: expect.stringContaining('sam31-extrapolation-product-review-packet'),
     }));
+    expect(packet.openclaw_sam31_product_review_queue_item).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.product_review_queue_item.v1',
+      application: 'halo_fire',
+      source_packet_ref: 'openclaw.sam31_perception_packet',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
     expect(packet.reviewed_values).toEqual(expect.objectContaining({
       object_hypotheses: expect.arrayContaining([
         expect.objectContaining({ id: 'obj:door-reviewed', label: 'rated corridor door' }),
@@ -657,6 +724,11 @@ describe('OpenClaw SAM31 bridge status API', () => {
     }));
     expect(replay.sprinkler_bid_request.openclaw_sam31_extrapolation_product_review_packet).toEqual(expect.objectContaining({
       artifact_type: 'openclaw.sam31_extrapolation_product_review_packet',
+      openclaw_sam31_product_review_queue_item: expect.objectContaining({
+        artifact_type: 'openclaw.sam31.product_review_queue_item.v1',
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
       downstream_review_lanes: expect.arrayContaining([
         'sprinkler_obstruction_review',
         'cad_vector_overlay_review',
@@ -747,6 +819,11 @@ describe('OpenClaw SAM31 bridge status API', () => {
       artifact_type: 'openclaw.sam31_extrapolation_product_review_packet',
       source_openclaw_sam31_extrapolation_evidence_id: artifact.id,
       source_openclaw_sam31_extrapolation_review_evidence_id: review.id,
+      openclaw_sam31_product_review_queue_item: expect.objectContaining({
+        artifact_type: 'openclaw.sam31.product_review_queue_item.v1',
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
       reviewed_values: expect.objectContaining({
         object_hypotheses: expect.any(Array),
         vector_overlays: expect.any(Array),

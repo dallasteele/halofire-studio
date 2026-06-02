@@ -257,6 +257,9 @@ describe('studio static origin handling', () => {
     expect(html).toContain('openclaw_sam31_perception_packet');
     expect(html).toContain('openclaw_sam31_extrapolation_product_review_packet');
     expect(html).toContain('sam31_downstream_review_metadata');
+    expect(html).toContain('product_review_queue_item');
+    expect(html).toContain('openclaw.sam31.product_review_queue_item.v1');
+    expect(html).toContain('use_for_claims');
     expect(html).toContain('SAM31 downstream product review');
     expect(html).toContain('object_hypothesis_count');
     expect(html).toContain('vector_overlay_count');

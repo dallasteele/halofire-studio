@@ -1241,6 +1241,8 @@ const SAM31_EXTRAPOLATION_CONTRACT = Object.freeze({
   claim_gate_effect: 'no_claims_cleared',
 });
 
+const SAM31_PRODUCT_REVIEW_QUEUE_ITEM_TYPE = 'openclaw.sam31.product_review_queue_item.v1';
+
 const SAM31_APPLICATION_CONTRACTS = Object.freeze({
   halo_fire: {
     contract_ref: 'openclaw.sam31.application_contract.halo_fire.v1',
@@ -1647,6 +1649,78 @@ function sam31ApplicationAdapter(application, projectRef, sourceRef, contracts =
     blocked_claims: [...contract.blocked_claims],
     claim_gate_effect: 'no_claims_cleared',
     next_action: SAM31_APPLICATION_NEXT_ACTIONS[normalizedApplication],
+  };
+}
+
+function buildOpenClawSam31ProductReviewQueueItem({
+  application = 'halo_fire',
+  projectRef,
+  request = {},
+  perceptionPacket = {},
+  productReviewAction = {},
+  blockedClaims = [],
+}) {
+  const normalizedApplication = SAM31_SUPPORTED_APPLICATIONS.includes(application) ? application : 'halo_fire';
+  const contract = SAM31_APPLICATION_CONTRACTS[normalizedApplication] || SAM31_APPLICATION_CONTRACTS.halo_fire;
+  const sections = Array.isArray(request.sections)
+    ? request.sections
+    : (Array.isArray(perceptionPacket.segments) ? perceptionPacket.segments : []);
+  const objectHypotheses = Array.isArray(perceptionPacket.object_hypotheses)
+    ? perceptionPacket.object_hypotheses
+    : (Array.isArray(request.object_hypotheses) ? request.object_hypotheses : []);
+  const vectorOverlays = Array.isArray(perceptionPacket.vector_overlays)
+    ? perceptionPacket.vector_overlays
+    : (Array.isArray(request.vector_overlays) ? request.vector_overlays : []);
+  const modelCandidates = Array.isArray(perceptionPacket.model_3d_candidates)
+    ? perceptionPacket.model_3d_candidates
+    : (Array.isArray(request.model_3d_candidates) ? request.model_3d_candidates : []);
+  const sourceRefs = Array.isArray(perceptionPacket.source_refs)
+    ? jsonClone(perceptionPacket.source_refs)
+    : [{
+      source_ref: request.source_ref || perceptionPacket.source_ref || null,
+      image_ref: request.image_ref || perceptionPacket.image_ref || null,
+      runtime: 'sam-3.1+llm',
+    }];
+  return {
+    artifact_type: SAM31_PRODUCT_REVIEW_QUEUE_ITEM_TYPE,
+    status: 'ready_for_human_replacement_or_acceptance',
+    application: normalizedApplication,
+    project_ref: projectRef || request.project_ref || perceptionPacket.project_ref || null,
+    source_runtime: 'sam-3.1+llm',
+    source_packet_ref: perceptionPacket.artifact_type || 'openclaw.sam31_perception_packet',
+    contract_ref: productReviewAction.contract_ref || contract.contract_ref,
+    supported_evidence_lanes: Array.isArray(productReviewAction.supported_evidence_lanes)
+      ? jsonClone(productReviewAction.supported_evidence_lanes)
+      : [...contract.supported_evidence_lanes],
+    acceptable_human_updates: [...SAM31_EMPLOYEE_REPLACEMENT_FIELDS],
+    temporary_value_policy: 'best_guess_until_employee_replaced',
+    section_count: sections.length,
+    object_hypothesis_count: objectHypotheses.length,
+    vector_overlay_count: vectorOverlays.length,
+    model_3d_candidate_count: modelCandidates.length,
+    source_refs: sourceRefs,
+    next_action: productReviewAction.next_action || SAM31_APPLICATION_NEXT_ACTIONS[normalizedApplication],
+    use_for_claims: false,
+    blocked_claims: uniqueStrings([...blockedClaims, ...contract.blocked_claims]),
+    claim_gate_effect: 'no_claims_cleared',
+  };
+}
+
+function normalizeOpenClawSam31ProductReviewQueueItem(rawQueueItem, fallbackQueueItem) {
+  if (!rawQueueItem || typeof rawQueueItem !== 'object' || Array.isArray(rawQueueItem)) {
+    return fallbackQueueItem;
+  }
+  const raw = jsonClone(rawQueueItem);
+  return {
+    ...fallbackQueueItem,
+    ...raw,
+    artifact_type: raw.artifact_type || SAM31_PRODUCT_REVIEW_QUEUE_ITEM_TYPE,
+    use_for_claims: false,
+    blocked_claims: uniqueStrings([
+      ...(Array.isArray(fallbackQueueItem.blocked_claims) ? fallbackQueueItem.blocked_claims : []),
+      ...(Array.isArray(raw.blocked_claims) ? raw.blocked_claims : []),
+    ]),
+    claim_gate_effect: 'no_claims_cleared',
   };
 }
 
@@ -2142,6 +2216,9 @@ function openClawSam31ExtrapolationReplaySummary(extrapolationEvidence) {
     product_review_action: artifact.product_review_action && typeof artifact.product_review_action === 'object'
       ? jsonClone(artifact.product_review_action)
       : null,
+    product_review_queue_item: artifact.product_review_queue_item && typeof artifact.product_review_queue_item === 'object'
+      ? jsonClone(artifact.product_review_queue_item)
+      : null,
     perception_summary: sam31PerceptionPacketSummary(artifact.perception_packet),
     claim_gate_effect: artifact.claim_gate_effect || 'no_claims_cleared',
     blocked_claims: Array.isArray(artifact.blocked_claims) ? [...artifact.blocked_claims] : [],
@@ -2255,6 +2332,13 @@ function buildOpenClawSam31ExtrapolationReviewPacket(projectName, evidence, deci
       ? jsonClone(review.replacement_values)
       : {},
     product_review: jsonClone(review),
+    openclaw_sam31_product_review_queue_item: extrapolationArtifact.product_review_queue_item && typeof extrapolationArtifact.product_review_queue_item === 'object'
+      ? {
+        ...jsonClone(extrapolationArtifact.product_review_queue_item),
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }
+      : null,
     openclaw_sam31_extrapolation_artifact: jsonClone(extrapolationArtifact),
     source_refs: sourceRefs,
     blocked_claims: uniqueStrings([
@@ -3521,6 +3605,18 @@ function normalizeOpenClawSam31ExtrapolationArtifact(projectName, evidence, deci
     'SAM31_runtime_verified',
     'OpenClaw_runtime_verified',
   ]);
+  const fallbackQueueItem = buildOpenClawSam31ProductReviewQueueItem({
+    application: request.application || perceptionPacket.application || 'halo_fire',
+    projectRef: request.project_ref || perceptionPacket.project_ref || `halo_fire:${projectName}`,
+    request,
+    perceptionPacket,
+    productReviewAction,
+    blockedClaims,
+  });
+  const productReviewQueueItem = normalizeOpenClawSam31ProductReviewQueueItem(
+    rawArtifact.product_review_queue_item,
+    fallbackQueueItem,
+  );
   return {
     artifact_type: 'openclaw.sam31_llm_extrapolation_artifact',
     status: rawArtifact.status || 'best_effort_extrapolation_ready',
@@ -3562,6 +3658,7 @@ function normalizeOpenClawSam31ExtrapolationArtifact(projectName, evidence, deci
       },
     ],
     product_review_action: productReviewAction,
+    product_review_queue_item: productReviewQueueItem,
     visual_audit_packet_ref: visualPacket.download_name || null,
     acceptable_evidence: [
       'OpenClaw /vision/sam31/extrapolate response captured in perception_packet',
