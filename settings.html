@@ -660,6 +660,35 @@ async function downloadSettingsSam31ActualValueWorkItem(index) {
   }
 }
 
+async function downloadSettingsSam31ActualValueReplacementReadback(index) {
+  const row = settingsSam31ActualValueRows[Number(index)];
+  const msg = $('sam31ActualValueMsg');
+  if (!row) {
+    msg.className = 'err';
+    msg.textContent = 'SAM31 actual-value work item not found';
+    return;
+  }
+  const projectName = catalogEvidenceProjectName();
+  const consumer = String(row.consumer || '').trim();
+  try {
+    const readback = await api('/openclaw/sam31/actual-value-replacements?projectName=' + encodeURIComponent(projectName) + (consumer ? '&consumer=' + encodeURIComponent(consumer) : ''));
+    if (readback.artifact_type !== 'openclaw.sam31.actual_value_replacement_readback.v1') {
+      throw new Error('Unexpected SAM31 actual-value replacement readback type');
+    }
+    const blob = new Blob([JSON.stringify(readback, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `${projectName.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-sam31-actual-value-replacement-readback${consumer ? '-' + consumer : ''}.json`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    msg.className = 'muted';
+    msg.textContent = 'downloaded openclaw.sam31.actual_value_replacement_readback.v1; claim gates remain blocked';
+  } catch(e) {
+    msg.className = 'err';
+    msg.textContent = e.message;
+  }
+}
+
 async function recordSettingsSam31ActualValueEvidence(index) {
   const row = settingsSam31ActualValueRows[Number(index)];
   const msg = $('sam31ActualValueMsg');
@@ -706,12 +735,16 @@ async function loadSettingsSam31ActualValueWorkItems(projectName = catalogEviden
         <div class="muted" style="margin-top:6px">sam31_actual_value_replacement · use_for_claims false · claim_gate_effect no_claims_cleared</div>
         <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
           <button type="button" data-sam31-actual-value-work-item-download-index="${itemIndex}" ${row.download_href ? '' : 'disabled'}>Download actual-value packet</button>
+          <button type="button" data-sam31-actual-value-replacement-readback-index="${itemIndex}">Download replacement readback</button>
           <button type="button" data-sam31-actual-value-work-item-record-index="${itemIndex}">Record SAM31 actual-value evidence note</button>
         </div>
       </div>`;
     }).join('') || `<span class="muted">No SAM31 actual-value work items for ${escapeHtml(projectName)}. Status: ${escapeHtml(index.status || 'no_sam31_actual_value_work_items')} · claim_gate_effect no_claims_cleared</span>`;
     target.querySelectorAll('[data-sam31-actual-value-work-item-download-index]').forEach((btn) => {
       btn.addEventListener('click', () => downloadSettingsSam31ActualValueWorkItem(btn.getAttribute('data-sam31-actual-value-work-item-download-index')));
+    });
+    target.querySelectorAll('[data-sam31-actual-value-replacement-readback-index]').forEach((btn) => {
+      btn.addEventListener('click', () => downloadSettingsSam31ActualValueReplacementReadback(btn.getAttribute('data-sam31-actual-value-replacement-readback-index')));
     });
     target.querySelectorAll('[data-sam31-actual-value-work-item-record-index]').forEach((btn) => {
       btn.addEventListener('click', () => recordSettingsSam31ActualValueEvidence(btn.getAttribute('data-sam31-actual-value-work-item-record-index')));

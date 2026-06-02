@@ -155,6 +155,7 @@ let resolverQueueFilterQuery = '';
 let sam31ActualValueQueueRows = [];
 let sam31ActualValueQueueConsumerFilter = '';
 const SAM31_ACTUAL_VALUE_GLOBAL_READBACK_ROUTE = '/api/openclaw/sam31/actual-value-resolver-queue?projectName=';
+const SAM31_ACTUAL_VALUE_REPLACEMENT_READBACK_ROUTE = '/api/openclaw/sam31/actual-value-replacements?projectName=';
 function currentProjectName() {
   return document.getElementById('projectTarget') ? document.getElementById('projectTarget').value : HOME_DEPOT;
 }
@@ -1056,11 +1057,16 @@ function renderSam31ActualValueQueueSummary(readback) {
     const active = sam31ActualValueQueueConsumerFilter === consumer ? ' active' : '';
     return `<button class="go" type="button" style="padding:5px 8px;font-size:10px;margin:2px;background:#0f766e" data-sam31-actual-value-consumer-filter="${escapeHtml(consumer)}" data-sam31-actual-value-consumer-href="${escapeHtml(endpointHref)}">${escapeHtml(consumer)} ${escapeHtml(endpoint.action || 'poll_actual_value_resolver_queue')}${active}</button>`;
   }).join('');
+  const replacementReadbackRows = consumers.map((consumer) => {
+    const href = `${SAM31_ACTUAL_VALUE_REPLACEMENT_READBACK_ROUTE}${encodeURIComponent(currentProjectName())}&consumer=${encodeURIComponent(consumer)}`;
+    return `<button class="go" type="button" style="padding:5px 8px;font-size:10px;margin:2px;background:#1d4ed8" data-sam31-actual-value-replacement-readback-consumer="${escapeHtml(consumer)}" data-sam31-actual-value-replacement-readback-href="${escapeHtml(href)}">${escapeHtml(consumer)} poll_actual_value_replacement_details</button>`;
+  }).join('');
   return `<div id="sam31ActualValueQueueSummary" class="gate warning">
     <div class="code">openclaw.sam31.actual_value_resolver_queue.v1 Â· ${escapeHtml(queue.status || 'actual_value_replacements_pending')}</div>
     <div class="na">global_readback ${escapeHtml(SAM31_ACTUAL_VALUE_GLOBAL_READBACK_ROUTE)} Â· source_project_route ${escapeHtml(readback?.source_project_route || '/api/projects/{projectName}/openclaw/sam31/actual-value-resolver-queue')}</div>
     <div class="claims">item_count ${escapeHtml(queue.item_count ?? 0)} Â· pending_count ${escapeHtml(queue.pending_count ?? 0)} Â· recorded_count ${escapeHtml(queue.recorded_count ?? 0)} Â· use_for_claims false Â· claim_gate_effect no_claims_cleared</div>
     <div class="claims">Consumer pull: ${endpointRows} <button class="go" type="button" style="padding:5px 8px;font-size:10px;margin:2px;background:#52525b" data-sam31-actual-value-clear-filter="true">all consumers</button></div>
+    <div class="claims">Replacement readback: <span class="chip">openclaw.sam31.actual_value_replacement_readback.v1</span> ${replacementReadbackRows}</div>
     <div class="claims">Supported filter keys: consumer=halo_fire consumer=landscout consumer=nameforge</div>
     <div class="claims">SAM31+LLM sectioning/object/vector/3D outputs are temporary values until replaced with actual evidence.</div>
   </div>`;
@@ -1123,6 +1129,22 @@ async function recordSam31ActualValueQueueEvidence(index) {
   await refreshSam31ActualValueQueue();
 }
 
+async function downloadSam31ActualValueReplacementReadback(consumer = '') {
+  const status = document.getElementById('sam31ActualValueQueueStatus');
+  const consumerParam = String(consumer || '').trim();
+  const readback = await api('/openclaw/sam31/actual-value-replacements?projectName=' + encodeURIComponent(currentProjectName()) + (consumerParam ? '&consumer=' + encodeURIComponent(consumerParam) : ''));
+  if (readback.artifact_type !== 'openclaw.sam31.actual_value_replacement_readback.v1') {
+    throw new Error('Unexpected SAM31 actual-value replacement readback type');
+  }
+  const blob = new Blob([JSON.stringify(readback, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${currentProjectName().toLowerCase().replace(/[^a-z0-9]+/g, '-')}-sam31-actual-value-replacement-readback${consumerParam ? '-' + consumerParam : ''}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  status.textContent = 'Downloaded SAM31 actual-value replacement readback; claim gates remain blocked.';
+}
+
 async function filterSam31ActualValueQueueByConsumer(consumer = '') {
   sam31ActualValueQueueConsumerFilter = String(consumer || '').trim();
   await refreshSam31ActualValueQueue();
@@ -1151,6 +1173,9 @@ async function refreshSam31ActualValueQueue() {
   });
   document.querySelectorAll('[data-sam31-actual-value-clear-filter]').forEach((button) => {
     button.onclick = () => filterSam31ActualValueQueueByConsumer('');
+  });
+  document.querySelectorAll('[data-sam31-actual-value-replacement-readback-consumer]').forEach((button) => {
+    button.onclick = () => downloadSam31ActualValueReplacementReadback(button.dataset.sam31ActualValueReplacementReadbackConsumer);
   });
 }
 
