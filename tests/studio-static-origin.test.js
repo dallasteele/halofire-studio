@@ -434,6 +434,11 @@ describe('studio static origin handling', () => {
     expect(html).toContain('Canonical OpenClaw SAM31 tool');
     expect(html).toContain('canonical_tool_descriptor');
     expect(html).toContain('openclaw.sam31_llm_extrapolation_tool');
+    expect(html).toContain('downloadOpenClawSam31ToolContract');
+    expect(html).toContain('/resolver-packets/openclaw/sam31/tool-contract');
+    expect(html).toContain('Download SAM31 tool contract');
+    expect(html).toContain('data-sam31-tool-contract');
+    expect(html).toContain('halofire-api-local-contract');
     expect(html).toContain('openclaw.sam31.product_review_queue_contract.v1');
     expect(html).toContain('LandScout queue');
     expect(html).toContain('NameForge queue');

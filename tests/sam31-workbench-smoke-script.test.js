@@ -46,6 +46,11 @@ describe('SAM31 workbench browser smoke script', () => {
     expect(script).toContain('SAM31 missing evidence rows');
     expect(script).toContain('HALOFIRE_1881_ROOM_BOUNDARY_EMPLOYEE_REVIEW_MISSING');
     expect(script).toContain('HALOFIRE_1881_PROFESSIONAL_AHJ_APPROVAL_MISSING');
+    expect(script).toContain('Download SAM31 tool contract');
+    expect(script).toContain('openclaw-sam31-tool-contract');
+    expect(script).toContain('openclaw.sam31_llm_extrapolation_tool_contract_packet.v1');
+    expect(script).toContain('halofire-api-local-contract');
+    expect(script).toContain('cross_product_handoff_rows');
     expect(script).toContain('Download SAM31 queue item');
     expect(script).toContain('sam31-product-review-queue-item');
     expect(script).toContain('OpenClaw SAM31 consumer queue smoke');

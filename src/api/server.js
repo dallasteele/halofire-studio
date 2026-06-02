@@ -37,7 +37,7 @@ import { HOME_DEPOT_PROJECT_NAME } from '../data/evidence-gates.js';
 import { readHomeDepotBidPackage, readHomeDepotRealTakeoff } from '../data/home-depot-bid-package.js';
 import { readCooperative1881BidPackage, readCooperative1881RealTakeoff } from '../data/cooperative-1881-bid-package.js';
 import { buildPlanSegmentationPayload } from '../components/sam-floorplan.js';
-import { SAM31_FLOORPLAN_TOOL } from '../sam31/bridge.js';
+import { SAM31_FLOORPLAN_TOOL, sam31ToolDescriptorBody } from '../sam31/bridge.js';
 import { buildSamInvoker } from './sam-invoker.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -1588,6 +1588,7 @@ function openClawSam31BridgeStatus(env = process.env) {
   const bridgeUrl = String(env.OPENCLAW_BRIDGE_URL || '').trim();
   const configured = !!bridgeUrl;
   const toolEndpointConfig = openClawSam31ToolDescriptorEndpointConfig(env);
+  const localToolDescriptor = toolEndpointConfig.endpoint ? null : localOpenClawSam31ToolDescriptor();
   return {
     artifact_type: 'openclaw.sam31_bridge_status',
     status: configured ? 'configured_unverified' : 'unavailable',
@@ -1596,12 +1597,12 @@ function openClawSam31BridgeStatus(env = process.env) {
     source_runtime_ref: 'sam-3.1+llm-openclaw-bridge',
     bridge_url_configured: configured,
     bridge_url: configured ? bridgeUrl : null,
-    canonical_tool_descriptor_url: toolEndpointConfig.endpoint,
-    canonical_tool_descriptor_source_file: toolEndpointConfig.source_file,
-    canonical_tool_descriptor_status: toolEndpointConfig.endpoint ? 'configured_unverified' : 'unavailable',
-    canonical_tool_descriptor_reachable: false,
-    canonical_tool_descriptor: null,
-    canonical_tool_descriptor_error: toolEndpointConfig.endpoint ? null : 'No OpenClaw/HAL SAM31 tool descriptor endpoint configured',
+    canonical_tool_descriptor_url: toolEndpointConfig.endpoint || '/api/openclaw/sam31/tool',
+    canonical_tool_descriptor_source_file: toolEndpointConfig.source_file || 'halofire-api-local-contract',
+    canonical_tool_descriptor_status: toolEndpointConfig.endpoint ? 'configured_unverified' : 'internal_alpha_ready',
+    canonical_tool_descriptor_reachable: !toolEndpointConfig.endpoint,
+    canonical_tool_descriptor: localToolDescriptor,
+    canonical_tool_descriptor_error: toolEndpointConfig.endpoint ? null : null,
     consumer_queue_statuses: openClawSam31ConsumerQueueStatuses(null, toolEndpointConfig.endpoint, env),
     supported_applications: ['halo_fire', 'landscout', 'nameforge'],
     supported_evidence_lanes: [
@@ -1915,6 +1916,7 @@ function polygonToSvgPath(polygon) {
     ...rest.map((point) => `L ${point[0]} ${point[1]}`),
     'Z',
   ].join(' ');
+  return rows;
 }
 
 function sam31GeneratedVectorOverlays(segments, supplied = []) {
@@ -1963,6 +1965,157 @@ function sam31ApplicationContracts() {
     };
   }
   return contracts;
+}
+
+function localOpenClawSam31ToolDescriptor(projectName = null) {
+  const bridgeDescriptor = sam31ToolDescriptorBody();
+  const applicationContracts = sam31ApplicationContracts();
+  const consumerActions = {};
+  for (const consumer of SAM31_CONSUMER_QUEUE_TARGETS) {
+    const action = bridgeDescriptor.consumer_actions?.[consumer] || {};
+    consumerActions[consumer] = {
+      ...jsonClone(action),
+      method: action.method || 'POST',
+      artifact_type: action.artifact_type || `openclaw.sam31.consumer_review_queue.${consumer}.v1`,
+      consumes: action.consumes || SAM31_PRODUCT_REVIEW_QUEUE_ITEM_TYPE,
+      required_payload_type: SAM31_PRODUCT_REVIEW_QUEUE_ITEM_TYPE,
+      local_smoke_route: {
+        method: 'POST',
+        href_template: '/api/projects/{projectName}/resolver-packets/pdf-boundary/{evidenceId}/openclaw/sam31/consumer-smoke',
+        produces: SAM31_CONSUMER_SMOKE_ARTIFACT_TYPE,
+        claim_gate_effect: 'no_claims_cleared',
+      },
+      temporary_value_policy: 'best_guess_until_employee_replaced',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    };
+  }
+  const descriptor = {
+    ...jsonClone(bridgeDescriptor),
+    status: 'internal_alpha_ready',
+    source_runtime: 'halofire-api-local-contract',
+    local_tool_descriptor_source: 'halofire-api-local-contract',
+    local_descriptor_route: '/api/openclaw/sam31/tool',
+    supported_applications: [...SAM31_SUPPORTED_APPLICATIONS],
+    application_contracts: applicationContracts,
+    extrapolation_contract: jsonClone(SAM31_EXTRAPOLATION_CONTRACT),
+    product_review_queue_contract: {
+      ...jsonClone(bridgeDescriptor.product_review_queue_contract || {}),
+      artifact_type: 'openclaw.sam31.product_review_queue_contract.v1',
+      status: 'internal_alpha_ready',
+      source_runtime: 'halofire-api-local-contract',
+      supported_applications: [...SAM31_SUPPORTED_APPLICATIONS],
+      required_payload_type: SAM31_PRODUCT_REVIEW_QUEUE_ITEM_TYPE,
+      requires_review_before_claims: true,
+      temporary_value_policy: 'best_guess_until_employee_replaced',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    },
+    halofire_api_actions: {
+      extrapolation_artifact: {
+        method: 'POST',
+        href_template: '/api/projects/{projectName}/resolver-packets/pdf-boundary/{evidenceId}/openclaw/sam31/extrapolation-artifact',
+        consumes: 'pdf_boundary_decision + openclaw.sam31_perception_packet',
+        produces: 'openclaw.sam31_llm_extrapolation_artifact',
+        claim_gate_effect: 'no_claims_cleared',
+      },
+      consumer_smoke: {
+        method: 'POST',
+        href_template: '/api/projects/{projectName}/resolver-packets/pdf-boundary/{evidenceId}/openclaw/sam31/consumer-smoke',
+        consumes: SAM31_PRODUCT_REVIEW_QUEUE_ITEM_TYPE,
+        produces: SAM31_CONSUMER_SMOKE_ARTIFACT_TYPE,
+        targets: [...SAM31_CONSUMER_QUEUE_TARGETS],
+        claim_gate_effect: 'no_claims_cleared',
+      },
+      tool_contract_packet: {
+        method: 'GET',
+        href_template: '/api/projects/{projectName}/resolver-packets/openclaw/sam31/tool-contract',
+        produces: 'openclaw.sam31_llm_extrapolation_tool_contract_packet.v1',
+        claim_gate_effect: 'no_claims_cleared',
+      },
+    },
+    consumer_actions: consumerActions,
+    temporary_value_policy: 'best_guess_until_employee_replaced',
+    acceptable_human_updates: [...SAM31_EMPLOYEE_REPLACEMENT_FIELDS],
+    blocked_claims: uniqueStrings([
+      ...SAM31_BLOCKED_CLAIMS,
+      'CEO_ready',
+      'brand_ready',
+      'trademark_ready',
+      'production_ready',
+    ]),
+    limitations: uniqueStrings([
+      ...(Array.isArray(bridgeDescriptor.limitations) ? bridgeDescriptor.limitations : []),
+      'Local HaloFire descriptor is executable internal-alpha contract truth for SAM31+LLM correction workflows across HaloFire, LandScout, and NameForge.',
+      'Generated sectioning, object labels, vector overlays, and 3D candidates are best-effort temporary values until employees or owning product reviewers replace them with actual evidence.',
+      'This descriptor does not clear permit-ready, AHJ-ready, engineering-grade, AutoSprink parity, fabrication-ready, manufacturer-exact, CEO-ready, brand-ready, trademark-ready, or production-ready claims.',
+    ]),
+    use_for_claims: false,
+    claim_gate_effect: 'no_claims_cleared',
+  };
+  if (projectName) descriptor.project_name = projectName;
+  return descriptor;
+}
+
+function buildOpenClawSam31ToolContractPacket(projectName) {
+  const descriptor = localOpenClawSam31ToolDescriptor(projectName);
+  const crossProductHandoffRows = SAM31_CONSUMER_QUEUE_TARGETS.map((consumer) => {
+    const action = descriptor.consumer_actions[consumer] || {};
+    const contract = SAM31_APPLICATION_CONTRACTS[consumer] || {};
+    return {
+      artifact_type: action.artifact_type || `openclaw.sam31.consumer_review_queue.${consumer}.v1`,
+      status: 'ready_for_product_review_handoff',
+      consumer,
+      source_application: 'halo_fire',
+      project_name: projectName,
+      required_payload_type: SAM31_PRODUCT_REVIEW_QUEUE_ITEM_TYPE,
+      endpoint: action.href || null,
+      local_smoke_route_template: descriptor.halofire_api_actions.consumer_smoke.href_template,
+      acceptable_evidence: [
+        'openclaw.sam31.product_review_queue_item.v1',
+        'product_owner_replacement_intake',
+        'screenshot_or_console_evidence',
+      ],
+      next_action: SAM31_APPLICATION_NEXT_ACTIONS[consumer],
+      temporary_value_policy: 'best_guess_until_employee_replaced',
+      use_for_claims: false,
+      blocked_claims: uniqueStrings([...(Array.isArray(contract.blocked_claims) ? contract.blocked_claims : []), ...SAM31_BLOCKED_CLAIMS]),
+      claim_gate_effect: 'no_claims_cleared',
+    };
+  });
+  return {
+    artifact_type: 'openclaw.sam31_llm_extrapolation_tool_contract_packet.v1',
+    status: 'ready_for_internal_alpha_use',
+    project_name: projectName,
+    generated_at: new Date().toISOString(),
+    download_name: `${slugForDownloadName(projectName)}-openclaw-sam31-tool-contract.json`,
+    source_runtime: 'halofire-api-local-contract',
+    canonical_tool_descriptor: descriptor,
+    product_review_queue_contract: descriptor.product_review_queue_contract,
+    cross_product_handoff_rows: crossProductHandoffRows,
+    temporary_value_policy: 'best_guess_until_employee_replaced',
+    acceptable_evidence: [
+      'SAM31 segmentation masks or section packets',
+      'LLM object identification observations',
+      'source-linked vector overlays',
+      'best-effort 3D model candidate records',
+      'employee/product-owner replacement intake',
+      'screenshot or console evidence for runtime observations',
+    ],
+    blocked_claims: uniqueStrings([
+      ...descriptor.blocked_claims,
+      ...crossProductHandoffRows.flatMap((row) => row.blocked_claims),
+      'production_ready',
+    ]),
+    limitations: [
+      'This contract packet makes the SAM31+LLM see-understand-extrapolate workflow executable for internal alpha review queues only.',
+      'It does not clear regulated or owning-product claims; humans must replace temporary values with actual Halo Fire, LandScout, or NameForge evidence.',
+      'OpenClaw/GX10 runtime reachability, segmentation accuracy, and downstream queue acceptance still require separate screenshot, console, or signed evidence.',
+    ],
+    use_for_claims: false,
+    no_claim_gates_cleared: true,
+    claim_gate_effect: 'no_claims_cleared',
+  };
 }
 
 function sam31ApplicationAdapter(application, projectRef, sourceRef, contracts = sam31ApplicationContracts()) {
@@ -8151,6 +8304,10 @@ app.get('/api/openclaw/sam31/status', authMiddleware, async (req, res) => {
   res.json(await openClawSam31BridgeStatusWithProbe());
 });
 
+app.get('/api/openclaw/sam31/tool', authMiddleware, (req, res) => {
+  res.json(localOpenClawSam31ToolDescriptor());
+});
+
 app.post('/api/projects/:name/openclaw/sam31/smoke-artifact', authMiddleware, requireRole('admin'), async (req, res) => {
   try {
     const projectName = req.params.name;
@@ -8381,6 +8538,14 @@ app.get('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/openclaw/
       reviewEvidence,
       reviewEvidence?.review || null,
     ));
+  } catch (err) {
+    return res.status(err.httpStatus || 400).json({ error: err.message });
+  }
+});
+
+app.get('/api/projects/:name/resolver-packets/openclaw/sam31/tool-contract', authMiddleware, (req, res) => {
+  try {
+    res.json(buildOpenClawSam31ToolContractPacket(req.params.name));
   } catch (err) {
     return res.status(err.httpStatus || 400).json({ error: err.message });
   }

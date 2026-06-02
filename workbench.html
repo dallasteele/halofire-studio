@@ -300,7 +300,7 @@ function renderCanonicalOpenClawSam31Tool(status) {
     : {};
   const landscoutQueue = consumerActions.landscout && typeof consumerActions.landscout === 'object' ? consumerActions.landscout : {};
   const nameforgeQueue = consumerActions.nameforge && typeof consumerActions.nameforge === 'object' ? consumerActions.nameforge : {};
-  return `<div class="muted" style="font-size:11px;margin-top:7px;border:1px solid rgba(79,70,229,.34);border-radius:8px;padding:8px;background:rgba(79,70,229,.06)">Canonical OpenClaw SAM31 tool<br>canonical_tool_descriptor ${escapeHtml(descriptor.artifact_type || 'openclaw.sam31_llm_extrapolation_tool')} - status ${escapeHtml(status.canonical_tool_descriptor_status || descriptor.status || 'unavailable')} - source ${escapeHtml(status.canonical_tool_descriptor_source_file || 'missing')} - reachable ${escapeHtml(status.canonical_tool_descriptor_reachable ? 'true' : 'false')}<br>descriptor_url ${escapeHtml(status.canonical_tool_descriptor_url || 'not configured')}<br>Outputs: ${outputLanes.map((lane) => `<span class="chip">${escapeHtml(lane)}</span>`).join('') || '<span class="chip">llm_observations</span><span class="chip">vector_overlays</span><span class="chip">model_3d_candidates</span><span class="chip">extrapolation_index</span>'}<br>Applications: ${apps.map((app) => `<span class="chip">${escapeHtml(app)}</span>`).join('') || '<span class="chip">halo_fire</span><span class="chip">landscout</span><span class="chip">nameforge</span>'}<br>product_review_queue_contract ${escapeHtml(queueContract.artifact_type || 'openclaw.sam31.product_review_queue_contract.v1')} - use_for_claims ${escapeHtml(queueContract.use_for_claims === true ? 'true' : 'false')} - claim_gate_effect ${escapeHtml(queueContract.claim_gate_effect || descriptor.claim_gate_effect || 'no_claims_cleared')}<br>LandScout queue ${escapeHtml(landscoutQueue.href || '/landscout/sam31/product-review-queue')} - NameForge queue ${escapeHtml(nameforgeQueue.href || '/nameforge/sam31/product-review-queue')}<br>${status.canonical_tool_descriptor_error ? `descriptor_error ${escapeHtml(status.canonical_tool_descriptor_error)}<br>` : ''}This descriptor is capability/source truth only; generated sectioning, vectors, and 3D candidates remain best-effort until employee/product review evidence replaces them.</div>`;
+  return `<div class="muted" style="font-size:11px;margin-top:7px;border:1px solid rgba(79,70,229,.34);border-radius:8px;padding:8px;background:rgba(79,70,229,.06)">Canonical OpenClaw SAM31 tool<br>canonical_tool_descriptor ${escapeHtml(descriptor.artifact_type || 'openclaw.sam31_llm_extrapolation_tool')} - status ${escapeHtml(status.canonical_tool_descriptor_status || descriptor.status || 'unavailable')} - source ${escapeHtml(status.canonical_tool_descriptor_source_file || descriptor.local_tool_descriptor_source || 'halofire-api-local-contract')} - reachable ${escapeHtml(status.canonical_tool_descriptor_reachable ? 'true' : 'false')}<br>descriptor_url ${escapeHtml(status.canonical_tool_descriptor_url || '/api/openclaw/sam31/tool')}<br>local_contract_source halofire-api-local-contract<br>Outputs: ${outputLanes.map((lane) => `<span class="chip">${escapeHtml(lane)}</span>`).join('') || '<span class="chip">llm_observations</span><span class="chip">vector_overlays</span><span class="chip">model_3d_candidates</span><span class="chip">extrapolation_index</span>'}<br>Applications: ${apps.map((app) => `<span class="chip">${escapeHtml(app)}</span>`).join('') || '<span class="chip">halo_fire</span><span class="chip">landscout</span><span class="chip">nameforge</span>'}<br>product_review_queue_contract ${escapeHtml(queueContract.artifact_type || 'openclaw.sam31.product_review_queue_contract.v1')} - use_for_claims ${escapeHtml(queueContract.use_for_claims === true ? 'true' : 'false')} - claim_gate_effect ${escapeHtml(queueContract.claim_gate_effect || descriptor.claim_gate_effect || 'no_claims_cleared')}<br>LandScout queue ${escapeHtml(landscoutQueue.href || '/landscout/sam31/product-review-queue')} - NameForge queue ${escapeHtml(nameforgeQueue.href || '/nameforge/sam31/product-review-queue')}<br><button class="go" type="button" style="padding:7px 10px;font-size:11px;margin-top:6px;background:#4f46e5" data-sam31-tool-contract>Download SAM31 tool contract</button><br>${status.canonical_tool_descriptor_error ? `descriptor_error ${escapeHtml(status.canonical_tool_descriptor_error)}<br>` : ''}This descriptor is capability/source truth only; generated sectioning, vectors, and 3D candidates remain best-effort until employee/product review evidence replaces them.</div>`;
 }
 
 function renderSam31BridgeSmokeAction(item, action, latest) {
@@ -620,6 +620,9 @@ async function refreshEvidence() {
     </div>`).join('') : '<span class="muted">No evidence rows.</span>';
   document.querySelectorAll('[data-replay-bid-artifact-evidence-id]').forEach((button) => {
     button.onclick = () => downloadReplayBidEvidenceArtifact(button.dataset.replayBidArtifactEvidenceId);
+  });
+  document.querySelectorAll('[data-sam31-tool-contract]').forEach((button) => {
+    button.onclick = () => downloadOpenClawSam31ToolContract();
   });
   document.querySelectorAll('[data-sam31-consumer-smoke-packet-evidence-id]').forEach((button) => {
     button.onclick = () => downloadOpenClawSam31ConsumerSmokePacket(button.dataset.sam31ConsumerSmokePacketEvidenceId);
@@ -1292,6 +1295,19 @@ async function downloadOfficialFlowReplayReviewPacket(evidenceId) {
   URL.revokeObjectURL(a.href);
 }
 
+async function downloadOpenClawSam31ToolContract() {
+  const packet = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/resolver-packets/openclaw/sam31/tool-contract');
+  if (packet.artifact_type !== 'openclaw.sam31_llm_extrapolation_tool_contract_packet.v1') {
+    throw new Error('Unexpected SAM31 tool contract packet type');
+  }
+  const blob = new Blob([JSON.stringify(packet, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = packet.download_name || 'openclaw-sam31-tool-contract.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
 async function downloadOpenClawSam31ExtrapolationReviewPacket(evidenceId) {
   const packet = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/resolver-packets/pdf-boundary/' + encodeURIComponent(evidenceId) + '/openclaw/sam31/extrapolation-review-packet');
   if (packet.artifact_type !== 'openclaw.sam31_extrapolation_product_review_packet') {
@@ -1822,6 +1838,9 @@ async function refreshResolverQueue() {
   });
   document.querySelectorAll('[data-sam31-product-review-queue-item-evidence-id]').forEach((button) => {
     button.onclick = () => downloadOpenClawSam31ProductReviewQueueItem(button.dataset.sam31ProductReviewQueueItemEvidenceId);
+  });
+  document.querySelectorAll('[data-sam31-tool-contract]').forEach((button) => {
+    button.onclick = () => downloadOpenClawSam31ToolContract();
   });
   document.querySelectorAll('[data-sam31-consumer-smoke-packet-evidence-id]').forEach((button) => {
     button.onclick = () => downloadOpenClawSam31ConsumerSmokePacket(button.dataset.sam31ConsumerSmokePacketEvidenceId);

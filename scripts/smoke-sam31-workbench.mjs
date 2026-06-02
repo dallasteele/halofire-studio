@@ -320,6 +320,34 @@ async function runBrowserSmoke(token, evidenceIds) {
     await page.waitForSelector('text=SAM31 missing evidence rows', { timeout: 8_000 });
     await page.waitForSelector('text=HALOFIRE_1881_ROOM_BOUNDARY_EMPLOYEE_REVIEW_MISSING', { timeout: 8_000 });
     await page.waitForSelector('text=HALOFIRE_1881_PROFESSIONAL_AHJ_APPROVAL_MISSING', { timeout: 8_000 });
+    await page.waitForSelector('text=Canonical OpenClaw SAM31 tool', { timeout: 8_000 });
+    await page.waitForSelector('text=Download SAM31 tool contract', { timeout: 8_000 });
+    await page.waitForSelector('text=halofire-api-local-contract', { timeout: 8_000 });
+    const toolContractDownloadPromise = page.waitForEvent('download');
+    await page.getByRole('button', { name: 'Download SAM31 tool contract' }).first().click();
+    const toolContractDownload = await toolContractDownloadPromise;
+    const toolContractPath = await toolContractDownload.path();
+    const toolContractSuggestedName = toolContractDownload.suggestedFilename();
+    const toolContractBytes = toolContractPath ? fs.statSync(toolContractPath).size : 0;
+    downloads.push({ suggestedName: toolContractSuggestedName, bytes: toolContractBytes });
+    if (!toolContractSuggestedName.includes('openclaw-sam31-tool-contract') || toolContractBytes <= 0) {
+      throw new Error(`Unexpected SAM31 tool contract download ${toolContractSuggestedName} (${toolContractBytes} bytes)`);
+    }
+    const toolContract = JSON.parse(fs.readFileSync(toolContractPath, 'utf8'));
+    if (toolContract.artifact_type !== 'openclaw.sam31_llm_extrapolation_tool_contract_packet.v1') {
+      throw new Error(`Unexpected SAM31 tool contract packet type ${toolContract.artifact_type}`);
+    }
+    if (toolContract.source_runtime !== 'halofire-api-local-contract'
+      || toolContract.use_for_claims !== false
+      || toolContract.claim_gate_effect !== 'no_claims_cleared') {
+      throw new Error(`SAM31 tool contract cleared a claim gate or lost source truth: ${JSON.stringify(toolContract)}`);
+    }
+    const toolContractConsumers = Array.isArray(toolContract.cross_product_handoff_rows)
+      ? toolContract.cross_product_handoff_rows.map((row) => row.consumer)
+      : [];
+    if (!toolContractConsumers.includes('landscout') || !toolContractConsumers.includes('nameforge')) {
+      throw new Error(`SAM31 tool contract lost cross-product handoff rows: ${JSON.stringify(toolContract.cross_product_handoff_rows)}`);
+    }
     await page.waitForSelector('text=Download SAM31 queue item', { timeout: 8_000 });
     await page.locator('[data-catalog-source-record-family-ref="family:pipe_steel_sch40_2p0in"]').first().click();
     await page.waitForSelector('text=Recorded evidence:', { timeout: 8_000 });

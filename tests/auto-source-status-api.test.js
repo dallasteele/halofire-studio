@@ -237,6 +237,83 @@ describe('S5 GET /api/auto-source/status', () => {
     }
   });
 
+  it('serves a local executable OpenClaw SAM31+LLM tool contract for HaloFire, LandScout, and NameForge without clearing claims', async () => {
+    const descriptorRes = await fetch(`${BASE}/api/openclaw/sam31/tool`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(descriptorRes.status).toBe(200);
+    const descriptor = await descriptorRes.json();
+
+    expect(descriptor).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31_llm_extrapolation_tool',
+      status: 'internal_alpha_ready',
+      source_runtime: 'halofire-api-local-contract',
+      local_tool_descriptor_source: 'halofire-api-local-contract',
+      temporary_value_policy: 'best_guess_until_employee_replaced',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(descriptor.output_lanes).toEqual(expect.arrayContaining([
+      'llm_observations',
+      'vector_overlays',
+      'model_3d_candidates',
+      'extrapolation_index',
+    ]));
+    expect(descriptor.supported_applications).toEqual(['halo_fire', 'landscout', 'nameforge']);
+    expect(descriptor.application_contracts.halo_fire.supported_evidence_lanes).toEqual(expect.arrayContaining([
+      'room_boundary_visual_audit',
+      'sleeve_or_firestop_candidate_review',
+      'obstruction_or_clash_review',
+    ]));
+    expect(descriptor.application_contracts.landscout.blocked_claims).toEqual(expect.arrayContaining(['CEO_ready', 'production_ready']));
+    expect(descriptor.application_contracts.nameforge.blocked_claims).toEqual(expect.arrayContaining(['brand_ready', 'trademark_ready']));
+    expect(descriptor.halofire_api_actions.extrapolation_artifact.href_template).toContain('/openclaw/sam31/extrapolation-artifact');
+    expect(descriptor.halofire_api_actions.consumer_smoke.href_template).toContain('/openclaw/sam31/consumer-smoke');
+    expect(descriptor.product_review_queue_contract).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.product_review_queue_contract.v1',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+
+    const projectName = 'Home Depot - Rexburg ID';
+    const packetRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-packets/openclaw/sam31/tool-contract`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(packetRes.status).toBe(200);
+    const packet = await packetRes.json();
+    expect(packet).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31_llm_extrapolation_tool_contract_packet.v1',
+      status: 'ready_for_internal_alpha_use',
+      project_name: projectName,
+      source_runtime: 'halofire-api-local-contract',
+      temporary_value_policy: 'best_guess_until_employee_replaced',
+      use_for_claims: false,
+      no_claim_gates_cleared: true,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(packet.download_name).toContain('openclaw-sam31-tool-contract');
+    expect(packet.canonical_tool_descriptor).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31_llm_extrapolation_tool',
+      local_tool_descriptor_source: 'halofire-api-local-contract',
+    }));
+    expect(packet.cross_product_handoff_rows).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        consumer: 'landscout',
+        artifact_type: 'openclaw.sam31.consumer_review_queue.landscout.v1',
+        required_payload_type: 'openclaw.sam31.product_review_queue_item.v1',
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+      expect.objectContaining({
+        consumer: 'nameforge',
+        artifact_type: 'openclaw.sam31.consumer_review_queue.nameforge.v1',
+        required_payload_type: 'openclaw.sam31.product_review_queue_item.v1',
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    ]));
+    expect(packet.blocked_claims).toEqual(expect.arrayContaining(['permit_ready', 'AHJ_approval', 'AutoSprink_parity', 'production_ready']));
+    expect(packet.limitations.join(' ')).toMatch(/does not clear/i);
+  });
+
   it('downloads catalog source evidence packets and keeps manufacturer claims blocked after evidence is recorded', async () => {
     removeStatusFile();
     const projectName = 'Home Depot - Rexburg ID';
