@@ -377,8 +377,17 @@ async function runBrowserSmoke(token, evidenceIds) {
       || vectorModelPacket.model_3d_candidates.length !== 1) {
       throw new Error(`SAM31 vector/model artifact lost generated geometry rows: ${JSON.stringify(vectorModelPacket)}`);
     }
+    if (vectorModelPacket.operator_audit_summary?.source_pdf_boundary_evidence_id !== evidenceIds.boundaryEvidenceId
+      || vectorModelPacket.operator_audit_summary?.source_sam31_visual_audit_evidence_id !== evidenceIds.sam31EvidenceId
+      || vectorModelPacket.operator_audit_summary?.vector_overlay_count !== 1
+      || vectorModelPacket.operator_audit_summary?.model_3d_candidate_count !== 1
+      || vectorModelPacket.operator_audit_summary?.temporary_value_policy !== 'best_guess_until_employee_replaced'
+      || vectorModelPacket.operator_audit_summary?.claim_gate_effect !== 'no_claims_cleared') {
+      throw new Error(`SAM31 vector/model artifact lost operator audit summary: ${JSON.stringify(vectorModelPacket.operator_audit_summary)}`);
+    }
     await page.locator('[data-sam31-vector-model-artifact-save-evidence-id]').first().click();
     await page.waitForSelector('text=Saved openclaw_sam31_vector_model_artifact_packet evidence', { timeout: 8_000 });
+    await page.waitForSelector('text=Saved SAM31 vector/model evidence detail', { timeout: 8_000 });
     await page.waitForSelector('text=sam31_vector_model_artifacts_recorded 1', { timeout: 8_000 });
     const vectorModelQueue = await request(`${PROJECT_PATH}/resolver-queue`, token);
     if (vectorModelQueue.summary?.sam31_vector_model_artifacts_recorded !== 1

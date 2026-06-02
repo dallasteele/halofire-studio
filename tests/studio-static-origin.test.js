@@ -444,9 +444,11 @@ describe('studio static origin handling', () => {
     expect(html).toContain('/openclaw/sam31/vector-model-artifacts');
     expect(html).toContain('Download SAM31 vector/model artifact packet');
     expect(html).toContain('Record SAM31 vector/model artifacts');
+    expect(html).toContain('Saved SAM31 vector/model evidence detail');
     expect(html).toContain('data-sam31-vector-model-artifact-evidence-id');
     expect(html).toContain('data-sam31-vector-model-artifact-save-evidence-id');
     expect(html).toContain('openclaw.sam31_vector_model_artifact_packet.v1');
+    expect(html).toContain('openclaw.sam31_vector_model_operator_audit_summary.v1');
     expect(html).toContain('source_sam31_visual_audit_evidence_id');
     expect(html).toContain('latest_openclaw_sam31_vector_model_artifact');
     expect(html).toContain('sam31_vector_model_artifacts_recorded');

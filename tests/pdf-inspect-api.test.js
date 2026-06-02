@@ -802,6 +802,17 @@ describe('PDF page inspection API', () => {
       no_claim_gates_cleared: true,
       claim_gate_effect: 'no_claims_cleared',
     }));
+    expect(vectorModelPacket.operator_audit_summary).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31_vector_model_operator_audit_summary.v1',
+      source_pdf_boundary_evidence_id: body.evidence.id,
+      source_sam31_visual_audit_evidence_id: samResult.evidence.id,
+      vector_overlay_count: 1,
+      model_3d_candidate_count: 1,
+      temporary_value_policy: 'best_guess_until_employee_replaced',
+      use_for_claims: false,
+      no_claim_gates_cleared: true,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
     expect(vectorModelPacket.vector_overlays[0]).toEqual(expect.objectContaining({
       id: 'vector:seg-room-1',
       svg_path: 'M 0 0 L 30 0 L 30 10 L 0 10 Z',

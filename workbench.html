@@ -567,6 +567,17 @@ function evidenceDetail(row) {
       return '<div class="muted" style="font-size:11px;margin-top:3px">OpenClaw SAM31 consumer review evidence; detail unavailable</div>';
     }
   }
+  if (row.evidence_type === 'openclaw_sam31_vector_model_artifact_packet') {
+    try {
+      const packet = JSON.parse(row.notes || '{}');
+      const artifact = packet.artifact || {};
+      const audit = artifact.operator_audit_summary || {};
+      const blocked = Array.isArray(packet.blocked_claims) ? packet.blocked_claims : (Array.isArray(artifact.blocked_claims) ? artifact.blocked_claims : []);
+      return `<div class="muted" style="font-size:11px;margin-top:3px">Saved SAM31 vector/model evidence detail: ${escapeHtml(artifact.artifact_type || 'openclaw.sam31_vector_model_artifact_packet.v1')}<br>operator_audit_summary ${escapeHtml(audit.artifact_type || 'openclaw.sam31_vector_model_operator_audit_summary.v1')}<br>source_pdf_boundary_evidence_id ${escapeHtml(audit.source_pdf_boundary_evidence_id || artifact.source_pdf_boundary_evidence_id || 'missing')} - source_sam31_visual_audit_evidence_id ${escapeHtml(audit.source_sam31_visual_audit_evidence_id || artifact.source_sam31_visual_audit_evidence_id || 'missing')} - vectors ${escapeHtml(audit.vector_overlay_count ?? artifact.vector_overlays?.length ?? 0)} - models ${escapeHtml(audit.model_3d_candidate_count ?? artifact.model_3d_candidates?.length ?? 0)}<br>temporary_value_policy ${escapeHtml(audit.temporary_value_policy || artifact.temporary_value_policy || 'best_guess_until_employee_replaced')} - source_runtime ${escapeHtml(audit.source_runtime || artifact.source_runtime || 'sam-3.1+llm')} - claim_gate_effect ${escapeHtml(audit.claim_gate_effect || packet.claim_gate_effect || artifact.claim_gate_effect || 'no_claims_cleared')}<br>Blocks still active: ${blocked.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('') || '<span class="chip">claim gates remain blocked</span>'}</div>`;
+    } catch {
+      return '<div class="muted" style="font-size:11px;margin-top:3px">OpenClaw SAM31 vector/model evidence detail unavailable</div>';
+    }
+  }
   if (row.evidence_type === 'official_flow_hydraulic_replay_artifact') {
     try {
       const packet = JSON.parse(row.notes || '{}');
