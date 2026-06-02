@@ -1091,6 +1091,8 @@ async function runBrowserSmoke(token, evidenceIds) {
       throw new Error(`SAM31 sprinkler preliminary replay queue lost sectioning adapter source evidence: ${JSON.stringify(preliminaryReplayRows)}`);
     }
     await page.waitForSelector('text=SAM31 sprinkler preliminary replay queue', { timeout: 8_000 });
+    await page.waitForSelector('text=SAM31 sectioning adapter source evidence', { timeout: 8_000 });
+    await page.waitForSelector('text=source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id', { timeout: 8_000 });
     await page.waitForSelector('text=Run SAM31 sprinkler preliminary replay', { timeout: 8_000 });
     const preliminaryReplayDownloadPromise = page.waitForEvent('download');
     await page.locator(`button[data-sam31-sprinkler-preliminary-replay-evidence-id="${latestSprinklerDecision.evidence_id}"]`).click();
@@ -1172,6 +1174,7 @@ async function runBrowserSmoke(token, evidenceIds) {
       || replayFollowupRow.packet_queue_items.some((item) => item.source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id !== sectioningSprinklerReviewAdapterSummary.evidence_id)) {
       throw new Error(`SAM31 preliminary replay follow-up lost sectioning adapter source evidence: ${JSON.stringify(replayFollowupRow)}`);
     }
+    await page.waitForSelector('text=halofire_sam31_sectioning_sprinkler_review_adapter', { timeout: 8_000 });
     await page.waitForSelector('text=Download SAM31 follow-up packet', { timeout: 8_000 });
     const replayFollowupPacketDownloadPromise = page.waitForEvent('download');
     await page.locator(`button[data-sam31-sprinkler-replay-followup-packet-evidence-id="${latestSprinklerDecision.evidence_id}"]`).first().click();
