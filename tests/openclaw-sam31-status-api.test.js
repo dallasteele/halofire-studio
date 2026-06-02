@@ -1667,6 +1667,76 @@ describe('OpenClaw SAM31 bridge status API', () => {
       'manufacturer_exact',
     ]));
 
+    const preliminaryReplayQueueRes = await request(`${COOPERATIVE_1881_PATH}/resolver-queue?sam31SprinklerReplay=ready&lane=obstruction_or_clash_review`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(preliminaryReplayQueueRes.status).toBe(200);
+    const preliminaryReplayQueue = await preliminaryReplayQueueRes.json();
+    expect(preliminaryReplayQueue.filters).toEqual(expect.objectContaining({
+      sam31SprinklerReplay: 'ready',
+      lane: 'obstruction_or_clash_review',
+    }));
+    expect(preliminaryReplayQueue.summary.sam31_sprinkler_preliminary_replay_queue_items).toBeGreaterThanOrEqual(1);
+    const preliminaryReplayQueueItem = preliminaryReplayQueue.items.find((row) => row.evidence_id === boundary.id);
+    expect(preliminaryReplayQueueItem.sam31_sprinkler_preliminary_replay_queue_items).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        artifact_type: 'halofire.sam31_sprinkler_preliminary_replay_queue_item.v1',
+        status: 'ready_for_preliminary_replay',
+        source_decision_packet_artifact_type: 'halofire.sam31_sprinkler_review_decision_packet.v1',
+        source_preliminary_replay_inputs_artifact_type: 'halofire.sam31_sprinkler_review_preliminary_replay_inputs.v1',
+        source_pdf_boundary_evidence_id: boundary.id,
+        source_openclaw_sam31_consumer_review_evidence_id: consumerReview.id,
+        source_halofire_sam31_sprinkler_review_decision_evidence_id: sprinklerReview.id,
+        supported_sprinkler_review_lane: 'obstruction_or_clash_review',
+        replay_scope: 'obstruction_clash_candidate_review',
+        action_label: 'Run SAM31 sprinkler preliminary replay',
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    ]));
+
+    const preliminaryReplayRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/sprinkler-review/${consumerReview.id}/decision/${sprinklerReview.id}/preliminary-replay`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(preliminaryReplayRes.status).toBe(200);
+    const preliminaryReplay = await preliminaryReplayRes.json();
+    expect(preliminaryReplay).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.sam31_sprinkler_preliminary_replay_artifact.v1',
+      status: 'preliminary_replay_ready_for_internal_alpha_review',
+      source: 'halofire.sam31_sprinkler_review_preliminary_replay_inputs.v1',
+      source_decision_packet_artifact_type: 'halofire.sam31_sprinkler_review_decision_packet.v1',
+      source_pdf_boundary_evidence_id: boundary.id,
+      source_openclaw_sam31_consumer_review_evidence_id: consumerReview.id,
+      source_halofire_sam31_sprinkler_review_decision_evidence_id: sprinklerReview.id,
+      supported_sprinkler_review_lane: 'obstruction_or_clash_review',
+      replay_scope: 'obstruction_clash_candidate_review',
+      download_name: expect.stringContaining('sam31-sprinkler-preliminary-replay-landscout'),
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(preliminaryReplay.replay_inputs).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.sam31_sprinkler_review_preliminary_replay_inputs.v1',
+      reviewed_values: expect.objectContaining({
+        obstruction_candidates: [expect.objectContaining({ sprinkler_relevance: 'not_a_sprinkler_obstruction' })],
+      }),
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(preliminaryReplay.replay_output).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.sam31_sprinkler_preliminary_replay_output.v1',
+      status: 'requires_employee_or_professional_followup',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(preliminaryReplay.blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'AHJ_approval',
+      'AutoSprink_parity',
+      'fabrication_ready',
+      'professional_approval',
+      'manufacturer_exact',
+    ]));
+
     const nameForgeAdapterRes = await request(`${COOPERATIVE_1881_PATH}/openclaw/sam31/product-owner-replacements`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` },
