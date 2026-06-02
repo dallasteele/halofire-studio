@@ -1113,6 +1113,48 @@ describe('OpenClaw SAM31 bridge status API', () => {
         claim_gate_effect: 'no_claims_cleared',
       }),
     ]));
+    expect(consumerSmoke.consumer_review_tasks).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        artifact_type: 'openclaw.sam31.consumer_review_task.v1',
+        consumer: 'landscout',
+        status: 'requires_product_review',
+        source_application: 'halo_fire',
+        source_pdf_boundary_evidence_id: boundary.id,
+        source_openclaw_sam31_extrapolation_evidence_id: extrapolation.id,
+        accepted_queue_id: 'sam31-landscout-testqueue',
+        persisted_review_packet_ref: 'openclaw://landscout/sam31/product-review/sam31-landscout-testqueue',
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+      expect.objectContaining({
+        artifact_type: 'openclaw.sam31.consumer_review_task.v1',
+        consumer: 'nameforge',
+        status: 'requires_product_review',
+        source_application: 'halo_fire',
+        source_pdf_boundary_evidence_id: boundary.id,
+        source_openclaw_sam31_extrapolation_evidence_id: extrapolation.id,
+        accepted_queue_id: 'sam31-nameforge-testqueue',
+        persisted_review_packet_ref: 'openclaw://nameforge/sam31/product-review/sam31-nameforge-testqueue',
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    ]));
+    for (const task of consumerSmoke.consumer_review_tasks) {
+      expect(task.next_action).toContain('accept or replace SAM31');
+      expect(task.next_action).toContain('regulated claims remain blocked');
+      expect(task.acceptable_evidence).toEqual(expect.arrayContaining([
+        'product owner review note tied to accepted queue id',
+        'employee accepted or replaced SAM31 semantic label/object/vector/3D candidate',
+        'source screenshot or console evidence for reviewed sectioning',
+      ]));
+      expect(task.blocked_claims).toEqual(expect.arrayContaining([
+        'permit_ready',
+        'AHJ_approval',
+        'AutoSprink_parity',
+        'fabrication_ready',
+        'manufacturer_exact',
+      ]));
+    }
     expect(consumerSmoke.missing_evidence_rows).toEqual([]);
     expect(consumerSmoke.evidence).toEqual(expect.objectContaining({
       evidence_type: 'openclaw_sam31_consumer_smoke_artifact',
@@ -1147,6 +1189,24 @@ describe('OpenClaw SAM31 bridge status API', () => {
         status: 'posted',
         accepted_queue_id: 'sam31-nameforge-testqueue',
         persisted_review_packet_ref: 'openclaw://nameforge/sam31/product-review/sam31-nameforge-testqueue',
+      }),
+    ]));
+    expect(packet.consumer_review_tasks).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        consumer: 'landscout',
+        status: 'requires_product_review',
+        accepted_queue_id: 'sam31-landscout-testqueue',
+        persisted_review_packet_ref: 'openclaw://landscout/sam31/product-review/sam31-landscout-testqueue',
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+      expect.objectContaining({
+        consumer: 'nameforge',
+        status: 'requires_product_review',
+        accepted_queue_id: 'sam31-nameforge-testqueue',
+        persisted_review_packet_ref: 'openclaw://nameforge/sam31/product-review/sam31-nameforge-testqueue',
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
       }),
     ]));
     expect(packet.product_review_queue_item).toEqual(expect.objectContaining({
@@ -1192,6 +1252,20 @@ describe('OpenClaw SAM31 bridge status API', () => {
       }),
       expect.objectContaining({
         consumer: 'nameforge',
+        accepted_queue_id: 'sam31-nameforge-testqueue',
+        persisted_review_packet_ref: 'openclaw://nameforge/sam31/product-review/sam31-nameforge-testqueue',
+      }),
+    ]));
+    expect(item.latest_openclaw_sam31_consumer_smoke_artifact.consumer_review_tasks).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        consumer: 'landscout',
+        status: 'requires_product_review',
+        accepted_queue_id: 'sam31-landscout-testqueue',
+        persisted_review_packet_ref: 'openclaw://landscout/sam31/product-review/sam31-landscout-testqueue',
+      }),
+      expect.objectContaining({
+        consumer: 'nameforge',
+        status: 'requires_product_review',
         accepted_queue_id: 'sam31-nameforge-testqueue',
         persisted_review_packet_ref: 'openclaw://nameforge/sam31/product-review/sam31-nameforge-testqueue',
       }),

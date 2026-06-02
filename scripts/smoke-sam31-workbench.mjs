@@ -362,6 +362,10 @@ async function runBrowserSmoke(token, evidenceIds) {
     await page.waitForSelector('text=consumer_result', { timeout: 8_000 });
     await page.waitForSelector('text=accepted_queue_id', { timeout: 8_000 });
     await page.waitForSelector('text=persisted_review_packet_ref', { timeout: 8_000 });
+    await page.waitForSelector('text=consumer_review_tasks', { timeout: 8_000 });
+    await page.waitForSelector('text=openclaw.sam31.consumer_review_task.v1', { timeout: 8_000 });
+    await page.waitForSelector('text=requires_product_review', { timeout: 8_000 });
+    await page.waitForSelector('text=acceptable_evidence', { timeout: 8_000 });
     await page.waitForSelector('text=no_claims_cleared', { timeout: 8_000 });
     await page.waitForSelector('[data-sam31-consumer-smoke-packet-evidence-id]', { timeout: 8_000 });
     const consumerSmokeDownloadPromise = page.waitForEvent('download');
@@ -390,6 +394,9 @@ async function runBrowserSmoke(token, evidenceIds) {
     const consumerSmokeResults = Array.isArray(consumerSmokeArtifact.consumer_results)
       ? consumerSmokeArtifact.consumer_results
       : [];
+    const consumerReviewTasks = Array.isArray(consumerSmokeArtifact.consumer_review_tasks)
+      ? consumerSmokeArtifact.consumer_review_tasks
+      : [];
     for (const consumer of ['landscout', 'nameforge']) {
       const result = consumerSmokeResults.find((item) => item.consumer === consumer);
       if (!result || result.status !== 'posted' || result.response_status !== 202) {
@@ -400,6 +407,22 @@ async function runBrowserSmoke(token, evidenceIds) {
       }
       if (!result.persisted_review_packet_ref || !String(result.persisted_review_packet_ref).startsWith(`openclaw://${consumer}/sam31/product-review/`)) {
         throw new Error(`SAM31 consumer smoke ${consumer} is missing persisted_review_packet_ref: ${JSON.stringify(result)}`);
+      }
+      const task = consumerReviewTasks.find((item) => item.consumer === consumer);
+      if (!task || task.artifact_type !== 'openclaw.sam31.consumer_review_task.v1' || task.status !== 'requires_product_review') {
+        throw new Error(`SAM31 consumer smoke ${consumer} is missing consumer_review_task: ${JSON.stringify(task)}`);
+      }
+      if (task.accepted_queue_id !== result.accepted_queue_id) {
+        throw new Error(`SAM31 consumer task ${consumer} accepted_queue_id mismatch: ${JSON.stringify(task)}`);
+      }
+      if (task.persisted_review_packet_ref !== result.persisted_review_packet_ref) {
+        throw new Error(`SAM31 consumer task ${consumer} persisted_review_packet_ref mismatch: ${JSON.stringify(task)}`);
+      }
+      if (!Array.isArray(task.acceptable_evidence) || task.acceptable_evidence.length < 3) {
+        throw new Error(`SAM31 consumer task ${consumer} lacks acceptable_evidence: ${JSON.stringify(task)}`);
+      }
+      if (task.use_for_claims !== false || task.claim_gate_effect !== 'no_claims_cleared') {
+        throw new Error(`SAM31 consumer task ${consumer} cleared a claim gate: ${JSON.stringify(task)}`);
       }
     }
     await page.waitForSelector('[data-sam31-replacement-action-field="semantic_label"]', { timeout: 8_000 });
@@ -512,6 +535,16 @@ async function runBrowserSmoke(token, evidenceIds) {
           response_status: result.response_status,
           accepted_queue_id: result.accepted_queue_id,
           persisted_review_packet_ref: result.persisted_review_packet_ref,
+        })),
+        consumer_review_tasks: consumerReviewTasks.map((task) => ({
+          artifact_type: task.artifact_type,
+          consumer: task.consumer,
+          status: task.status,
+          accepted_queue_id: task.accepted_queue_id,
+          persisted_review_packet_ref: task.persisted_review_packet_ref,
+          acceptable_evidence_count: Array.isArray(task.acceptable_evidence) ? task.acceptable_evidence.length : 0,
+          use_for_claims: task.use_for_claims,
+          claim_gate_effect: task.claim_gate_effect,
         })),
         use_for_claims: consumerSmokeArtifact.use_for_claims,
         claim_gate_effect: consumerSmokeArtifact.claim_gate_effect,

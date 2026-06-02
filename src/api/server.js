@@ -1313,6 +1313,7 @@ const SAM31_EXTRAPOLATION_CONTRACT = Object.freeze({
 
 const SAM31_PRODUCT_REVIEW_QUEUE_ITEM_TYPE = 'openclaw.sam31.product_review_queue_item.v1';
 const SAM31_CONSUMER_SMOKE_ARTIFACT_TYPE = 'openclaw.sam31.consumer_smoke_artifact.v1';
+const SAM31_CONSUMER_REVIEW_TASK_TYPE = 'openclaw.sam31.consumer_review_task.v1';
 const SAM31_CONSUMER_QUEUE_TARGETS = Object.freeze(['landscout', 'nameforge']);
 const SAM31_CONSUMER_UNAVAILABLE_CODES = Object.freeze({
   landscout: 'OPENCLAW_SAM31_LANDSCOUT_QUEUE_UNAVAILABLE',
@@ -2901,6 +2902,19 @@ async function buildOpenClawSam31ConsumerSmokeArtifact(projectName, evidence, de
     .filter(Boolean);
   const postedConsumerCount = consumerResults.filter((result) => result.status === 'posted').length;
   const blockedConsumerCount = missingEvidenceRows.length;
+  const consumerResultArtifacts = consumerResults.map((result) => {
+    const copy = { ...result };
+    delete copy.missing_evidence_row;
+    return copy;
+  });
+  const consumerReviewTasks = buildOpenClawSam31ConsumerReviewTasks({
+    projectName,
+    evidence,
+    decision,
+    extrapolationEvidence,
+    productReviewQueueItem,
+    consumerResults: consumerResultArtifacts,
+  });
   return {
     artifact_type: SAM31_CONSUMER_SMOKE_ARTIFACT_TYPE,
     status: blockedConsumerCount === 0
@@ -2917,11 +2931,8 @@ async function buildOpenClawSam31ConsumerSmokeArtifact(projectName, evidence, de
     canonical_tool_descriptor_error: descriptor.error,
     consumer_queue_statuses: consumerQueueStatuses,
     product_review_queue_item: productReviewQueueItem,
-    consumer_results: consumerResults.map((result) => {
-      const copy = { ...result };
-      delete copy.missing_evidence_row;
-      return copy;
-    }),
+    consumer_results: consumerResultArtifacts,
+    consumer_review_tasks: consumerReviewTasks,
     posted_consumer_count: postedConsumerCount,
     blocked_consumer_count: blockedConsumerCount,
     missing_evidence_rows: missingEvidenceRows,
@@ -2964,6 +2975,67 @@ async function buildOpenClawSam31ConsumerSmokeArtifact(projectName, evidence, de
       'It does not prove downstream reviewer acceptance, geometry accuracy, AHJ approval, PE review, AutoSprink parity, permit readiness, fabrication readiness, production readiness, trademark readiness, or manufacturer-exact models.',
     ],
   };
+}
+
+function buildOpenClawSam31ConsumerReviewTasks({
+  projectName,
+  evidence,
+  decision,
+  extrapolationEvidence,
+  productReviewQueueItem,
+  consumerResults,
+}) {
+  return (Array.isArray(consumerResults) ? consumerResults : [])
+    .filter((result) => result.status === 'posted' && result.accepted_queue_id && result.persisted_review_packet_ref)
+    .map((result) => {
+      const consumer = String(result.consumer || '').trim();
+      const label = consumer === 'nameforge' ? 'NameForge' : 'LandScout';
+      const contract = SAM31_APPLICATION_CONTRACTS[consumer] || {};
+      return {
+        artifact_type: SAM31_CONSUMER_REVIEW_TASK_TYPE,
+        consumer,
+        status: 'requires_product_review',
+        source_application: 'halo_fire',
+        source_project_name: projectName,
+        source_pdf_boundary_evidence_id: evidence.id,
+        source_openclaw_sam31_extrapolation_evidence_id: extrapolationEvidence.evidence.id,
+        source_openclaw_sam31_consumer_smoke_evidence_id: null,
+        source_ref: evidence.source_ref || decision.sourceRef || productReviewQueueItem.source_ref || null,
+        source_file: evidence.source_file || decision.sourceFile || productReviewQueueItem.source_file || null,
+        accepted_queue_id: result.accepted_queue_id,
+        persisted_review_packet_ref: result.persisted_review_packet_ref,
+        product_review_queue_item_artifact_type: productReviewQueueItem.artifact_type || SAM31_PRODUCT_REVIEW_QUEUE_ITEM_TYPE,
+        product_review_queue_item_ref: productReviewQueueItem.source_ref || productReviewQueueItem.project_ref || null,
+        next_action: `${label} reviewer must accept or replace SAM31 semantic labels, object hypotheses, vector overlays, 3D candidates, and source refs before product claims move forward; regulated claims remain blocked.`,
+        acceptable_evidence: [
+          'product owner review note tied to accepted queue id',
+          'employee accepted or replaced SAM31 semantic label/object/vector/3D candidate',
+          'source screenshot or console evidence for reviewed sectioning',
+          `${label} persisted review packet linked to the accepted queue id`,
+        ],
+        supported_evidence_lanes: Array.isArray(contract.supported_evidence_lanes)
+          ? [...contract.supported_evidence_lanes]
+          : [],
+        blocked_claims: uniqueStrings([
+          ...(Array.isArray(productReviewQueueItem.blocked_claims) ? productReviewQueueItem.blocked_claims : []),
+          ...(Array.isArray(contract.blocked_claims) ? contract.blocked_claims : []),
+          'permit_ready',
+          'AHJ_approval',
+          'AutoSprink_parity',
+          'fabrication_ready',
+          'manufacturer_exact',
+          'professional_approval',
+        ]),
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+        no_claim_gates_cleared: true,
+        limitations: [
+          'This task records that a product queue accepted a SAM31 best-effort handoff; it is not proof that the product reviewer accepted the values.',
+          'The reviewer may use temporary SAM31 object labels, vector overlays, and 3D candidates as a starting point, but must replace or explicitly accept them before product-specific claims move forward.',
+          'This task never clears AHJ, PE, permit, fabrication, AutoSprink parity, manufacturer-exact, production, trademark, or professional approval claims by itself.',
+        ],
+      };
+    });
 }
 
 function openClawSam31ConsumerSmokeArtifactFromEvidence(row) {
@@ -3010,6 +3082,7 @@ function openClawSam31ConsumerSmokeReplaySummary(consumerSmokeEvidence) {
     posted_consumer_count: Number.isFinite(Number(artifact.posted_consumer_count)) ? Number(artifact.posted_consumer_count) : 0,
     blocked_consumer_count: Number.isFinite(Number(artifact.blocked_consumer_count)) ? Number(artifact.blocked_consumer_count) : 0,
     consumer_results: Array.isArray(artifact.consumer_results) ? jsonClone(artifact.consumer_results) : [],
+    consumer_review_tasks: Array.isArray(artifact.consumer_review_tasks) ? jsonClone(artifact.consumer_review_tasks) : [],
     missing_evidence_rows: Array.isArray(artifact.missing_evidence_rows) ? jsonClone(artifact.missing_evidence_rows) : [],
     use_for_claims: false,
     claim_gate_effect: artifact.claim_gate_effect || 'no_claims_cleared',
@@ -3041,6 +3114,12 @@ function buildOpenClawSam31ConsumerSmokeDownloadPacket(projectName, evidence, de
     source_file: evidence.source_file || decision.sourceFile || artifact.source_file || null,
     download_name: `${slugForDownloadName(projectName)}-sam31-consumer-smoke-artifact-${evidence.id}.json`,
     consumer_results: Array.isArray(artifact.consumer_results) ? jsonClone(artifact.consumer_results) : [],
+    consumer_review_tasks: Array.isArray(artifact.consumer_review_tasks)
+      ? jsonClone(artifact.consumer_review_tasks).map((task) => ({
+        ...task,
+        source_openclaw_sam31_consumer_smoke_evidence_id: consumerEvidence.id,
+      }))
+      : [],
     missing_evidence_rows: Array.isArray(artifact.missing_evidence_rows) ? jsonClone(artifact.missing_evidence_rows) : [],
     posted_consumer_count: Number.isFinite(Number(artifact.posted_consumer_count)) ? Number(artifact.posted_consumer_count) : 0,
     blocked_consumer_count: Number.isFinite(Number(artifact.blocked_consumer_count)) ? Number(artifact.blocked_consumer_count) : 0,

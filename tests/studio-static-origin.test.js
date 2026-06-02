@@ -244,6 +244,11 @@ describe('studio static origin handling', () => {
     expect(html).toContain('consumer_result');
     expect(html).toContain('accepted_queue_id');
     expect(html).toContain('persisted_review_packet_ref');
+    expect(html).toContain('consumer_review_tasks');
+    expect(html).toContain('openclaw.sam31.consumer_review_task.v1');
+    expect(html).toContain('requires_product_review');
+    expect(html).toContain('acceptable_evidence');
+    expect(html).toContain('product owner review note tied to accepted queue id');
     expect(html).toContain('consumer_queue_statuses');
     expect(html).toContain('OPENCLAW_SAM31_LANDSCOUT_QUEUE_URL');
     expect(html).toContain('OPENCLAW_SAM31_NAMEFORGE_QUEUE_URL');
