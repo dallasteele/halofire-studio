@@ -357,6 +357,24 @@ describe('PDF page inspection API', () => {
       headers: { Authorization: `Bearer ${token}` },
     })).json();
     expect(gatesAfterReview.some((g) => g.status === 'cleared')).toBe(false);
+
+    const queueAfterReview = await (await request(`${COOPERATIVE_1881_PATH}/resolver-queue`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })).json();
+    const reviewedItem = queueAfterReview.items.find((q) => q.evidence_id === body.evidence.id);
+    expect(reviewedItem.status).toBe('correction_ready');
+    expect(reviewedItem.next_action).toMatch(/Replay/i);
+    expect(reviewedItem.latest_review).toEqual(expect.objectContaining({
+      evidence_id: reviewBody.evidence.id,
+      review_decision: 'corrected',
+      reviewer_name: 'Halo Fire estimator',
+      marked_up_plan_ref: '1881://marked-up/sheet-7-room-boundary.png',
+      issue_count: 1,
+      corrected_room_polygon_count: 1,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(queueAfterReview.summary.correction_ready).toBe(1);
+    expect(queueAfterReview.summary.ready).toBe(0);
   }, 30000);
 
   it('rejects a persisted boundary decision without a positive operator scale', async () => {

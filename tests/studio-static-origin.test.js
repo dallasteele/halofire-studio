@@ -151,6 +151,8 @@ describe('studio static origin handling', () => {
     expect(html).toContain('/reviews');
     expect(html).toContain('Record review decision');
     expect(html).toContain('marked_up_plan_ref');
+    expect(html).toContain('latest_review');
+    expect(html).toContain('Review:');
   });
 
   it('lets the studio load the latest saved PDF boundary decision as import defaults', async () => {

@@ -1101,6 +1101,31 @@ function latestPdfBoundaryDecisionEvidence(projectName) {
     .get(projectName);
 }
 
+function reviewFromEvidence(row) {
+  if (!row) return null;
+  try {
+    const parsed = JSON.parse(row.notes || '{}');
+    return parsed && parsed.kind === 'room_boundary_review_packet_decision' ? parsed.review : null;
+  } catch {
+    return null;
+  }
+}
+
+function latestPdfBoundaryReviewEvidence(projectName, sourceEvidenceId) {
+  const rows = db
+    .prepare(`SELECT * FROM project_evidence
+              WHERE project_name = ? AND evidence_type = 'room_boundary_review_packet'
+              ORDER BY created_at DESC, id DESC`)
+    .all(projectName);
+  for (const row of rows) {
+    const review = reviewFromEvidence(row);
+    if (review && Number(review.source_evidence_id) === Number(sourceEvidenceId)) {
+      return { evidence: row, review };
+    }
+  }
+  return null;
+}
+
 app.get('/api/projects/:name/pdf-boundary-decision', authMiddleware, (req, res) => {
   const evidence = latestPdfBoundaryDecisionEvidence(req.params.name);
   res.json({ evidence: evidence || null, decision: decisionFromEvidence(evidence) });
@@ -1140,19 +1165,43 @@ app.post('/api/projects/:name/pdf-boundary-decision', authMiddleware, requireRol
   }
 });
 
-function pdfBoundaryResolverQueueItem(projectName, evidence, decision) {
+function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence = null) {
   if (!evidence || !decision) return null;
   const candidate = decision.candidate || {};
+  const latestReview = reviewEvidence && reviewEvidence.review ? {
+    evidence_id: reviewEvidence.evidence.id,
+    evidence_status: reviewEvidence.evidence.status,
+    source_ref: reviewEvidence.evidence.source_ref,
+    review_decision: reviewEvidence.review.review_decision,
+    reviewer_name: reviewEvidence.review.reviewer_name,
+    reviewed_at: reviewEvidence.review.reviewed_at,
+    marked_up_plan_ref: reviewEvidence.review.marked_up_plan_ref,
+    issue_count: Array.isArray(reviewEvidence.review.issue_list) ? reviewEvidence.review.issue_list.length : 0,
+    corrected_room_polygon_count: Array.isArray(reviewEvidence.review.corrected_room_polygons) ? reviewEvidence.review.corrected_room_polygons.length : 0,
+    claim_gate_effect: reviewEvidence.review.claim_gate_effect || 'no_claims_cleared',
+  } : null;
+  let status = 'ready';
+  let nextAction = 'Open the selected PDF sheet with these defaults, run a room-boundary visual audit packet, and attach employee review evidence before any geometry-accuracy claim.';
+  if (latestReview?.review_decision === 'corrected') {
+    status = 'correction_ready';
+    nextAction = 'Replay the best-effort layout with the corrected room polygons from the latest employee review packet; regulated claims remain blocked.';
+  } else if (latestReview?.review_decision === 'accepted') {
+    status = 'reviewed';
+    nextAction = 'Use the accepted employee-reviewed boundary for internal-alpha replay; attach licensed/AHJ/AutoSprink/manufacturer evidence before any regulated claim.';
+  } else if (latestReview?.review_decision === 'rejected') {
+    status = 'blocked';
+    nextAction = 'The latest employee review rejected this boundary. Save a new boundary decision or corrected review packet before replay.';
+  }
   return {
     id: `resolver:pdf-boundary:${evidence.id}`,
     project_name: projectName,
     kind: 'room_boundary_visual_audit',
     title: 'Room-boundary visual audit from saved PDF boundary decision',
-    status: 'ready',
+    status,
     evidence_id: evidence.id,
     source_evidence_type: 'pdf_boundary_decision',
     source_ref: evidence.source_ref || decision.sourceRef || null,
-    next_action: 'Open the selected PDF sheet with these defaults, run a room-boundary visual audit packet, and attach employee review evidence before any geometry-accuracy claim.',
+    next_action: nextAction,
     acceptable_evidence: [
       'employee room-boundary review packet',
       'source-linked marked-up plan screenshot',
@@ -1167,6 +1216,7 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision) {
       candidate,
     },
     blocked_claims: Array.isArray(decision.blockedClaims) ? decision.blockedClaims : [...PDF_BOUNDARY_BLOCKED_CLAIMS],
+    latest_review: latestReview,
     limitations: [
       decision.limitation || 'Saved boundary choice is best-effort evidence only.',
       'This queue item does not prove geometry accuracy, AHJ approval, PE review, AutoSprink parity, permit readiness, fabrication readiness, or manufacturer-exact models.',
@@ -1327,15 +1377,22 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
   const projectName = req.params.name;
   const evidence = latestPdfBoundaryDecisionEvidence(projectName);
   const decision = decisionFromEvidence(evidence);
+  const reviewEvidence = evidence ? latestPdfBoundaryReviewEvidence(projectName, evidence.id) : null;
   const items = [];
-  const boundaryItem = pdfBoundaryResolverQueueItem(projectName, evidence, decision);
+  const boundaryItem = pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence);
   if (boundaryItem) items.push(boundaryItem);
+  const statusCounts = items.reduce((acc, item) => {
+    acc[item.status] = (acc[item.status] || 0) + 1;
+    return acc;
+  }, {});
   res.json({
     project_name: projectName,
     items,
     summary: {
-      ready: items.filter((item) => item.status === 'ready').length,
-      blocked: items.filter((item) => item.status === 'blocked').length,
+      ready: statusCounts.ready || 0,
+      blocked: statusCounts.blocked || 0,
+      correction_ready: statusCounts.correction_ready || 0,
+      reviewed: statusCounts.reviewed || 0,
     },
   });
 });
