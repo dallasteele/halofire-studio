@@ -750,7 +750,121 @@ describe('PDF page inspection API', () => {
       next_action: 'Use this summary to queue HaloFire room-boundary replay; do not promote blocked claims.',
       claim_gate_effect: 'no_claims_cleared',
     }));
+    expect(samReviewedItem.openclaw_sam31_tool_contract_action).toEqual(expect.objectContaining({
+      label: 'Download SAM31 tool contract',
+      method: 'GET',
+      href: expect.stringContaining('/resolver-packets/openclaw/sam31/tool-contract'),
+      artifact_type: 'openclaw.sam31_llm_extrapolation_tool_contract_packet.v1',
+      source_runtime: 'halofire-api-local-contract',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(samReviewedItem.openclaw_sam31_vector_model_artifact_action).toEqual(expect.objectContaining({
+      label: 'Download SAM31 vector/model artifact packet',
+      method: 'GET',
+      href: expect.stringContaining(`/resolver-packets/pdf-boundary/${body.evidence.id}/openclaw/sam31/vector-model-artifacts`),
+      artifact_type: 'openclaw.sam31_vector_model_artifact_packet.v1',
+      status: 'ready',
+      source_pdf_boundary_evidence_id: body.evidence.id,
+      source_sam31_visual_audit_evidence_id: samResult.evidence.id,
+      source_runtime: 'sam-3.1+llm',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(samReviewedItem.actions).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        label: 'Download SAM31 tool contract',
+        href: expect.stringContaining('/resolver-packets/openclaw/sam31/tool-contract'),
+        artifact_type: 'openclaw.sam31_llm_extrapolation_tool_contract_packet.v1',
+      }),
+      expect.objectContaining({
+        label: 'Download SAM31 vector/model artifact packet',
+        href: expect.stringContaining('/openclaw/sam31/vector-model-artifacts'),
+        artifact_type: 'openclaw.sam31_vector_model_artifact_packet.v1',
+      }),
+    ]));
     expect(queueAfterSamResult.summary.sam31_replacements_recorded).toBe(1);
+
+    const vectorModelPacketRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${body.evidence.id}/openclaw/sam31/vector-model-artifacts`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(vectorModelPacketRes.status).toBe(200);
+    const vectorModelPacket = await vectorModelPacketRes.json();
+    expect(vectorModelPacket).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31_vector_model_artifact_packet.v1',
+      status: 'ready_for_internal_alpha_review',
+      project_name: 'The Cooperative 1881 - Salt Lake City UT',
+      source_pdf_boundary_evidence_id: body.evidence.id,
+      source_sam31_visual_audit_evidence_id: samResult.evidence.id,
+      source_runtime: 'sam-3.1+llm',
+      temporary_value_policy: 'best_guess_until_employee_replaced',
+      use_for_claims: false,
+      no_claim_gates_cleared: true,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(vectorModelPacket.vector_overlays[0]).toEqual(expect.objectContaining({
+      id: 'vector:seg-room-1',
+      svg_path: 'M 0 0 L 30 0 L 30 10 L 0 10 Z',
+      source_pdf_boundary_evidence_id: body.evidence.id,
+      source_sam31_visual_audit_evidence_id: samResult.evidence.id,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(vectorModelPacket.model_3d_candidates[0]).toEqual(expect.objectContaining({
+      id: 'model3d:seg-room-1',
+      primitive: 'extruded_polygon',
+      source_pdf_boundary_evidence_id: body.evidence.id,
+      source_sam31_visual_audit_evidence_id: samResult.evidence.id,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(vectorModelPacket.source_refs).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        evidence_id: body.evidence.id,
+        evidence_type: 'pdf_boundary_decision',
+      }),
+      expect.objectContaining({
+        evidence_id: samResult.evidence.id,
+        evidence_type: 'sam31_room_boundary_visual_audit',
+      }),
+    ]));
+    expect(vectorModelPacket.supported_evidence_lanes).toEqual(expect.arrayContaining([
+      'vector_overlay_generation',
+      'model_3d_candidate_generation',
+    ]));
+    expect(vectorModelPacket.blocked_claims).toEqual(expect.arrayContaining([
+      'geometry_accuracy',
+      'permit_ready',
+      'AHJ_approval',
+      'AutoSprink_parity',
+      'manufacturer_exact',
+    ]));
+
+    const vectorModelPersistRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${body.evidence.id}/openclaw/sam31/vector-model-artifacts`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(vectorModelPersistRes.status).toBe(201);
+    const vectorModelPersisted = await vectorModelPersistRes.json();
+    expect(vectorModelPersisted.evidence.evidence_type).toBe('openclaw_sam31_vector_model_artifact_packet');
+    expect(vectorModelPersisted.evidence.status).toBe('best_effort');
+    expect(vectorModelPersisted.message).toMatch(/claims still blocked/i);
+    expect(vectorModelPersisted.artifact_type).toBe('openclaw.sam31_vector_model_artifact_packet.v1');
+    expect(vectorModelPersisted.claim_gate_effect).toBe('no_claims_cleared');
+
+    const queueAfterVectorModel = await (await request(`${COOPERATIVE_1881_PATH}/resolver-queue`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })).json();
+    const vectorModelItem = queueAfterVectorModel.items.find((q) => q.evidence_id === body.evidence.id);
+    expect(vectorModelItem.latest_openclaw_sam31_vector_model_artifact).toEqual(expect.objectContaining({
+      evidence_id: vectorModelPersisted.evidence.id,
+      artifact_type: 'openclaw.sam31_vector_model_artifact_packet.v1',
+      vector_overlay_count: 1,
+      model_3d_candidate_count: 1,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(queueAfterVectorModel.summary.sam31_vector_model_artifacts_recorded).toBe(1);
 
     const samReplayRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${body.evidence.id}/replay-input`, {
       headers: { Authorization: `Bearer ${token}` },

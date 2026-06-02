@@ -348,6 +348,44 @@ async function runBrowserSmoke(token, evidenceIds) {
     if (!toolContractConsumers.includes('landscout') || !toolContractConsumers.includes('nameforge')) {
       throw new Error(`SAM31 tool contract lost cross-product handoff rows: ${JSON.stringify(toolContract.cross_product_handoff_rows)}`);
     }
+    await page.waitForSelector('text=SAM31 vector/model artifact packet', { timeout: 8_000 });
+    await page.waitForSelector('text=Download SAM31 vector/model artifact packet', { timeout: 8_000 });
+    await page.waitForSelector('text=Record SAM31 vector/model artifacts', { timeout: 8_000 });
+    await page.waitForSelector('text=openclaw.sam31_vector_model_artifact_packet.v1', { timeout: 8_000 });
+    const vectorModelDownloadPromise = page.waitForEvent('download');
+    await page.locator('[data-sam31-vector-model-artifact-evidence-id]').first().click();
+    const vectorModelDownload = await vectorModelDownloadPromise;
+    const vectorModelPath = await vectorModelDownload.path();
+    const vectorModelSuggestedName = vectorModelDownload.suggestedFilename();
+    const vectorModelDownloadBytes = vectorModelPath ? fs.statSync(vectorModelPath).size : 0;
+    downloads.push({ suggestedName: vectorModelSuggestedName, bytes: vectorModelDownloadBytes });
+    if (!vectorModelSuggestedName.includes('sam31-vector-model-artifacts') || vectorModelDownloadBytes <= 0) {
+      throw new Error(`Unexpected SAM31 vector/model artifact download ${vectorModelSuggestedName} (${vectorModelDownloadBytes} bytes)`);
+    }
+    const vectorModelPacket = JSON.parse(fs.readFileSync(vectorModelPath, 'utf8'));
+    if (vectorModelPacket.artifact_type !== 'openclaw.sam31_vector_model_artifact_packet.v1') {
+      throw new Error(`Unexpected SAM31 vector/model artifact packet type ${vectorModelPacket.artifact_type}`);
+    }
+    if (vectorModelPacket.use_for_claims !== false
+      || vectorModelPacket.claim_gate_effect !== 'no_claims_cleared'
+      || vectorModelPacket.no_claim_gates_cleared !== true) {
+      throw new Error(`SAM31 vector/model artifact cleared a claim gate: ${JSON.stringify(vectorModelPacket)}`);
+    }
+    if (!Array.isArray(vectorModelPacket.vector_overlays)
+      || vectorModelPacket.vector_overlays.length !== 1
+      || !Array.isArray(vectorModelPacket.model_3d_candidates)
+      || vectorModelPacket.model_3d_candidates.length !== 1) {
+      throw new Error(`SAM31 vector/model artifact lost generated geometry rows: ${JSON.stringify(vectorModelPacket)}`);
+    }
+    await page.locator('[data-sam31-vector-model-artifact-save-evidence-id]').first().click();
+    await page.waitForSelector('text=Saved openclaw_sam31_vector_model_artifact_packet evidence', { timeout: 8_000 });
+    await page.waitForSelector('text=sam31_vector_model_artifacts_recorded 1', { timeout: 8_000 });
+    const vectorModelQueue = await request(`${PROJECT_PATH}/resolver-queue`, token);
+    if (vectorModelQueue.summary?.sam31_vector_model_artifacts_recorded !== 1
+      || vectorModelQueue.items.some((item) => item.latest_openclaw_sam31_vector_model_artifact
+        && item.latest_openclaw_sam31_vector_model_artifact.claim_gate_effect !== 'no_claims_cleared')) {
+      throw new Error(`SAM31 vector/model artifact queue summary is not fail-closed: ${JSON.stringify(vectorModelQueue.summary)}`);
+    }
     await page.waitForSelector('text=Download SAM31 queue item', { timeout: 8_000 });
     await page.locator('[data-catalog-source-record-family-ref="family:pipe_steel_sch40_2p0in"]').first().click();
     await page.waitForSelector('text=Recorded evidence:', { timeout: 8_000 });

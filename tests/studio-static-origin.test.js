@@ -438,6 +438,18 @@ describe('studio static origin handling', () => {
     expect(html).toContain('/resolver-packets/openclaw/sam31/tool-contract');
     expect(html).toContain('Download SAM31 tool contract');
     expect(html).toContain('data-sam31-tool-contract');
+    expect(html).toContain('renderOpenClawSam31VectorModelArtifactAction');
+    expect(html).toContain('downloadOpenClawSam31VectorModelArtifactPacket');
+    expect(html).toContain('persistOpenClawSam31VectorModelArtifactPacket');
+    expect(html).toContain('/openclaw/sam31/vector-model-artifacts');
+    expect(html).toContain('Download SAM31 vector/model artifact packet');
+    expect(html).toContain('Record SAM31 vector/model artifacts');
+    expect(html).toContain('data-sam31-vector-model-artifact-evidence-id');
+    expect(html).toContain('data-sam31-vector-model-artifact-save-evidence-id');
+    expect(html).toContain('openclaw.sam31_vector_model_artifact_packet.v1');
+    expect(html).toContain('source_sam31_visual_audit_evidence_id');
+    expect(html).toContain('latest_openclaw_sam31_vector_model_artifact');
+    expect(html).toContain('sam31_vector_model_artifacts_recorded');
     expect(html).toContain('halofire-api-local-contract');
     expect(html).toContain('openclaw.sam31.product_review_queue_contract.v1');
     expect(html).toContain('LandScout queue');

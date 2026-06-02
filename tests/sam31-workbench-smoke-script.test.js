@@ -51,6 +51,12 @@ describe('SAM31 workbench browser smoke script', () => {
     expect(script).toContain('openclaw.sam31_llm_extrapolation_tool_contract_packet.v1');
     expect(script).toContain('halofire-api-local-contract');
     expect(script).toContain('cross_product_handoff_rows');
+    expect(script).toContain('Download SAM31 vector/model artifact packet');
+    expect(script).toContain('Record SAM31 vector/model artifacts');
+    expect(script).toContain('openclaw.sam31_vector_model_artifact_packet.v1');
+    expect(script).toContain('sam31-vector-model-artifacts');
+    expect(script).toContain('sam31_vector_model_artifacts_recorded 1');
+    expect(script).toContain('latest_openclaw_sam31_vector_model_artifact');
     expect(script).toContain('Download SAM31 queue item');
     expect(script).toContain('sam31-product-review-queue-item');
     expect(script).toContain('OpenClaw SAM31 consumer queue smoke');

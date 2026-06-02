@@ -1373,6 +1373,7 @@ const SAM31_EXTRAPOLATION_CONTRACT = Object.freeze({
 });
 
 const SAM31_PRODUCT_REVIEW_QUEUE_ITEM_TYPE = 'openclaw.sam31.product_review_queue_item.v1';
+const SAM31_VECTOR_MODEL_ARTIFACT_PACKET_TYPE = 'openclaw.sam31_vector_model_artifact_packet.v1';
 const SAM31_CONSUMER_SMOKE_ARTIFACT_TYPE = 'openclaw.sam31.consumer_smoke_artifact.v1';
 const SAM31_CONSUMER_REVIEW_TASK_TYPE = 'openclaw.sam31.consumer_review_task.v1';
 const SAM31_CONSUMER_REVIEW_DECISION_TYPE = 'openclaw.sam31.consumer_review_task_decision.v1';
@@ -2757,6 +2758,151 @@ function latestOpenClawSam31ExtrapolationReviewEvidence(projectName, sourceEvide
     return { evidence: row, review };
   }
   return null;
+}
+
+function openClawSam31VectorModelArtifactFromEvidence(row) {
+  if (!row) return null;
+  try {
+    const parsed = JSON.parse(row.notes || '{}');
+    return parsed && parsed.kind === 'openclaw_sam31_vector_model_artifact_packet' && parsed.artifact
+      ? parsed.artifact
+      : null;
+  } catch {
+    return null;
+  }
+}
+
+function latestOpenClawSam31VectorModelArtifactEvidence(projectName, sourceEvidenceId = null) {
+  const rows = db
+    .prepare(`SELECT * FROM project_evidence
+              WHERE project_name = ? AND evidence_type = 'openclaw_sam31_vector_model_artifact_packet'
+              ORDER BY created_at DESC, id DESC`)
+    .all(projectName);
+  for (const row of rows) {
+    const artifact = openClawSam31VectorModelArtifactFromEvidence(row);
+    if (!artifact) continue;
+    if (sourceEvidenceId && Number(artifact.source_pdf_boundary_evidence_id) !== Number(sourceEvidenceId)) {
+      continue;
+    }
+    return { evidence: row, artifact };
+  }
+  return null;
+}
+
+function openClawSam31VectorModelArtifactSummary(vectorModelEvidence) {
+  if (!vectorModelEvidence?.evidence || !vectorModelEvidence?.artifact) return null;
+  const { evidence, artifact } = vectorModelEvidence;
+  const vectorOverlays = Array.isArray(artifact.vector_overlays) ? artifact.vector_overlays : [];
+  const model3dCandidates = Array.isArray(artifact.model_3d_candidates) ? artifact.model_3d_candidates : [];
+  return {
+    evidence_id: evidence.id,
+    evidence_type: evidence.evidence_type,
+    evidence_status: evidence.status,
+    artifact_type: artifact.artifact_type || SAM31_VECTOR_MODEL_ARTIFACT_PACKET_TYPE,
+    status: artifact.status || 'ready_for_internal_alpha_review',
+    source_ref: evidence.source_ref,
+    source_pdf_boundary_evidence_id: artifact.source_pdf_boundary_evidence_id || null,
+    source_sam31_visual_audit_evidence_id: artifact.source_sam31_visual_audit_evidence_id || null,
+    source_runtime: artifact.source_runtime || 'sam-3.1+llm',
+    vector_overlay_count: vectorOverlays.length,
+    model_3d_candidate_count: model3dCandidates.length,
+    vector_overlays: jsonClone(vectorOverlays),
+    model_3d_candidates: jsonClone(model3dCandidates),
+    use_for_claims: artifact.use_for_claims === true ? true : false,
+    no_claim_gates_cleared: artifact.no_claim_gates_cleared !== false,
+    claim_gate_effect: artifact.claim_gate_effect || 'no_claims_cleared',
+    blocked_claims: Array.isArray(artifact.blocked_claims) ? [...artifact.blocked_claims] : [],
+    limitations: Array.isArray(artifact.limitations) ? [...artifact.limitations] : [],
+  };
+}
+
+function buildOpenClawSam31VectorModelArtifactPacket(projectName, evidence, decision, sam31Evidence) {
+  if (!evidence || !decision) {
+    const e = new Error('PDF boundary decision evidence not found');
+    e.httpStatus = 404;
+    throw e;
+  }
+  if (!sam31Evidence?.evidence || !sam31Evidence?.result?.openclaw_sam31_perception_packet) {
+    const e = new Error('SAM31 visual audit evidence with an OpenClaw SAM31 perception packet is required before vector/model artifacts can be persisted');
+    e.httpStatus = 409;
+    throw e;
+  }
+  const perceptionPacket = sam31Evidence.result.openclaw_sam31_perception_packet;
+  const vectorOverlays = Array.isArray(perceptionPacket.vector_overlays) ? perceptionPacket.vector_overlays : [];
+  const model3dCandidates = Array.isArray(perceptionPacket.model_3d_candidates) ? perceptionPacket.model_3d_candidates : [];
+  const sourceRefs = [
+    {
+      evidence_id: evidence.id,
+      evidence_type: evidence.evidence_type,
+      source_file: evidence.source_file || decision.sourceFile || null,
+      source_ref: evidence.source_ref || decision.sourceRef || null,
+      status: evidence.status,
+      claim_gate_effect: 'no_claims_cleared',
+    },
+    {
+      evidence_id: sam31Evidence.evidence.id,
+      evidence_type: sam31Evidence.evidence.evidence_type,
+      source_file: sam31Evidence.evidence.source_file || null,
+      source_ref: sam31Evidence.evidence.source_ref || sam31Evidence.result.sam31_result_ref || null,
+      status: sam31Evidence.evidence.status,
+      claim_gate_effect: 'no_claims_cleared',
+    },
+    ...(Array.isArray(perceptionPacket.source_refs) ? jsonClone(perceptionPacket.source_refs) : []),
+  ];
+  const enrichArtifactRow = (row) => ({
+    ...(row && typeof row === 'object' ? jsonClone(row) : {}),
+    source_pdf_boundary_evidence_id: evidence.id,
+    source_sam31_visual_audit_evidence_id: sam31Evidence.evidence.id,
+    source_ref: row?.source_ref || sam31Evidence.result.sam31_result_ref || sam31Evidence.evidence.source_ref || evidence.source_ref || decision.sourceRef || null,
+    source_runtime: perceptionPacket.source_runtime || 'sam-3.1+llm',
+    temporary_value_policy: 'best_guess_until_employee_replaced',
+    use_for_claims: false,
+    no_claim_gates_cleared: true,
+    claim_gate_effect: 'no_claims_cleared',
+  });
+  return {
+    artifact_type: SAM31_VECTOR_MODEL_ARTIFACT_PACKET_TYPE,
+    status: 'ready_for_internal_alpha_review',
+    project_name: projectName,
+    generated_at: new Date().toISOString(),
+    download_name: `${slugForDownloadName(projectName)}-sam31-vector-model-artifacts-${evidence.id}.json`,
+    source_pdf_boundary_evidence_id: evidence.id,
+    source_sam31_visual_audit_evidence_id: sam31Evidence.evidence.id,
+    source_runtime: perceptionPacket.source_runtime || 'sam-3.1+llm',
+    application: perceptionPacket.application || 'halo_fire',
+    source_ref: sam31Evidence.result.sam31_result_ref || sam31Evidence.evidence.source_ref || evidence.source_ref || decision.sourceRef || null,
+    source_file: evidence.source_file || decision.sourceFile || null,
+    source_refs: sourceRefs,
+    vector_overlays: vectorOverlays.map(enrichArtifactRow),
+    model_3d_candidates: model3dCandidates.map(enrichArtifactRow),
+    perception_summary: sam31PerceptionPacketSummary(perceptionPacket),
+    supported_evidence_lanes: uniqueStrings([
+      ...(SAM31_APPLICATION_CONTRACTS.halo_fire.supported_evidence_lanes || []),
+      'vector_overlay_generation',
+      'model_3d_candidate_generation',
+    ]),
+    temporary_value_policy: 'best_guess_until_employee_replaced',
+    acceptable_human_updates: [...SAM31_EMPLOYEE_REPLACEMENT_FIELDS],
+    use_for_claims: false,
+    no_claim_gates_cleared: true,
+    blocked_claims: uniqueStrings([
+      ...(Array.isArray(perceptionPacket.blocked_claims) ? perceptionPacket.blocked_claims : []),
+      ...(Array.isArray(decision.blockedClaims) ? decision.blockedClaims : PDF_BOUNDARY_BLOCKED_CLAIMS),
+      ...SAM31_BLOCKED_CLAIMS,
+      'geometry_accuracy',
+      'permit_ready',
+      'AHJ_approval',
+      'AutoSprink_parity',
+      'manufacturer_exact',
+    ]),
+    claim_gate_effect: 'no_claims_cleared',
+    limitations: [
+      'SAM31 vector overlays and 3D candidates are best-effort internal-alpha extrapolations only.',
+      'Halo Fire employees may use this packet to replace temporary values, but it does not clear geometry accuracy, permit, AHJ, PE, AutoSprink, fabrication, or manufacturer-exact claims.',
+      'Source-linked SAM31 artifacts support review and replay workflows only until actual employee/professional/AHJ/manufacturer evidence is recorded.',
+    ],
+    next_action: 'Halo Fire employee reviews the source-linked vector overlays and 3D candidates, then accepts or replaces temporary values before replay; regulated claims remain blocked.',
+  };
 }
 
 function openClawSam31ExtrapolationReplaySummary(extrapolationEvidence) {
@@ -5319,6 +5465,8 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
   const bridgeSmokeHref = `/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/smoke-artifact`;
   const extrapolateHref = `/api/projects/${encodeURIComponent(projectName)}/resolver-packets/pdf-boundary/${evidence.id}/openclaw/sam31/extrapolation-artifact`;
   const consumerSmokeHref = `/api/projects/${encodeURIComponent(projectName)}/resolver-packets/pdf-boundary/${evidence.id}/openclaw/sam31/consumer-smoke`;
+  const toolContractHref = `/api/projects/${encodeURIComponent(projectName)}/resolver-packets/openclaw/sam31/tool-contract`;
+  const vectorModelArtifactHref = `/api/projects/${encodeURIComponent(projectName)}/resolver-packets/pdf-boundary/${evidence.id}/openclaw/sam31/vector-model-artifacts`;
   const sam31BridgeSmokeAction = {
     label: 'Run OpenClaw SAM31 bridge smoke artifact',
     method: 'POST',
@@ -5390,6 +5538,22 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
       'Unavailable consumer queues become missing-evidence rows instead of blocking HaloFire local review.',
     ],
   };
+  const openclawSam31ToolContractAction = {
+    label: 'Download SAM31 tool contract',
+    method: 'GET',
+    href: toolContractHref,
+    status: 'ready',
+    artifact_type: 'openclaw.sam31_llm_extrapolation_tool_contract_packet.v1',
+    source_runtime: 'halofire-api-local-contract',
+    source_evidence_id: evidence.id,
+    supported_applications: [...SAM31_SUPPORTED_APPLICATIONS],
+    use_for_claims: false,
+    no_claim_gates_cleared: true,
+    claim_gate_effect: 'no_claims_cleared',
+    limitations: [
+      'The local SAM31 tool contract makes the see/understand/extrapolate workflow executable; it does not prove runtime capture or regulated claims.',
+    ],
+  };
   const latestReview = reviewEvidence && reviewEvidence.review ? {
     evidence_id: reviewEvidence.evidence.id,
     evidence_status: reviewEvidence.evidence.status,
@@ -5448,6 +5612,7 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
   } : null;
   const latestOpenClawSam31ExtrapolationArtifact = openClawSam31ExtrapolationReplaySummary(sam31ExtrapolationEvidence);
   const latestOpenClawSam31ExtrapolationReview = openClawSam31ExtrapolationReviewSummary(sam31ExtrapolationReviewEvidence);
+  const latestOpenClawSam31VectorModelArtifact = openClawSam31VectorModelArtifactSummary(latestOpenClawSam31VectorModelArtifactEvidence(projectName, evidence.id));
   const latestOpenClawSam31ConsumerSmokeArtifact = openClawSam31ConsumerSmokeReplaySummary(sam31ConsumerSmokeEvidence);
   const latestOpenClawSam31ConsumerReviews = openClawSam31ConsumerReviewSummaries(sam31ConsumerReviewEvidences);
   const sam31UnresolvedConsumerReviews = openClawSam31UnresolvedConsumerReviewSummaries(
@@ -5456,6 +5621,36 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
   );
   const sam31SprinklerReviewQueueItems = openClawSam31SprinklerReviewQueueItems(projectName, evidence, decision, sam31ConsumerReviewEvidences, sam31SprinklerReviewDecisionEvidences);
   const sam31SprinklerPreliminaryReplayQueueItems = halofireSam31SprinklerPreliminaryReplayQueueItems(projectName, evidence, decision, sam31ConsumerReviewEvidences, sam31SprinklerReviewDecisionEvidences, sam31SprinklerPreliminaryReplayFollowupDecisionEvidences, sam31SprinklerFollowupPacketReviewDecisionEvidences, sam31ApprovalUploadIntakeEvidences);
+  const openclawSam31VectorModelArtifactAction = {
+    label: 'Download SAM31 vector/model artifact packet',
+    method: 'GET',
+    href: vectorModelArtifactHref,
+    status: latestSam31VisualAudit?.openclaw_sam31_perception_packet ? 'ready' : 'requires_sam31_visual_audit',
+    artifact_type: SAM31_VECTOR_MODEL_ARTIFACT_PACKET_TYPE,
+    source_pdf_boundary_evidence_id: evidence.id,
+    source_sam31_visual_audit_evidence_id: latestSam31VisualAudit?.evidence_id || null,
+    source_runtime: 'sam-3.1+llm',
+    supported_evidence_lanes: [
+      'vector_overlay_generation',
+      'model_3d_candidate_generation',
+    ],
+    temporary_value_policy: 'best_guess_until_employee_replaced',
+    use_for_claims: false,
+    no_claim_gates_cleared: true,
+    claim_gate_effect: 'no_claims_cleared',
+    blocked_claims: uniqueStrings([
+      ...(Array.isArray(decision.blockedClaims) ? decision.blockedClaims : PDF_BOUNDARY_BLOCKED_CLAIMS),
+      ...SAM31_BLOCKED_CLAIMS,
+      'geometry_accuracy',
+      'permit_ready',
+      'AHJ_approval',
+      'AutoSprink_parity',
+      'manufacturer_exact',
+    ]),
+    limitations: [
+      'This action downloads or records source-linked vector/model best guesses only; no approval or accuracy claim is cleared.',
+    ],
+  };
   let status = 'ready';
   let nextAction = 'Open the selected PDF sheet with these defaults, run a room-boundary visual audit packet, and attach employee review evidence before any geometry-accuracy claim.';
   if (latestReview?.review_decision === 'corrected') {
@@ -5511,6 +5706,7 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
     latest_openclaw_sam31_bridge_smoke_artifact: latestSam31BridgeSmokeArtifact,
     latest_openclaw_sam31_extrapolation_artifact: latestOpenClawSam31ExtrapolationArtifact,
     latest_openclaw_sam31_extrapolation_review: latestOpenClawSam31ExtrapolationReview,
+    latest_openclaw_sam31_vector_model_artifact: latestOpenClawSam31VectorModelArtifact,
     latest_openclaw_sam31_consumer_smoke_artifact: latestOpenClawSam31ConsumerSmokeArtifact,
     latest_openclaw_sam31_consumer_reviews: latestOpenClawSam31ConsumerReviews,
     sam31_unresolved_consumer_reviews: sam31UnresolvedConsumerReviews,
@@ -5518,6 +5714,8 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
     sam31_sprinkler_preliminary_replay_queue_items: sam31SprinklerPreliminaryReplayQueueItems,
     openclaw_sam31_bridge_status: bridgeStatus,
     sam31_bridge_smoke_action: sam31BridgeSmokeAction,
+    openclaw_sam31_tool_contract_action: openclawSam31ToolContractAction,
+    openclaw_sam31_vector_model_artifact_action: openclawSam31VectorModelArtifactAction,
     openclaw_sam31_extrapolation_status: extrapolateStatus,
     openclaw_sam31_extrapolation_action: openclawSam31ExtrapolationAction,
     openclaw_sam31_consumer_smoke_action: openclawSam31ConsumerSmokeAction,
@@ -5528,6 +5726,8 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
     actions: [
       { label: 'Load defaults in Studio', href: `/autosprink.html?project=${encodeURIComponent(projectName)}&resolver=${encodeURIComponent(`pdf-boundary:${evidence.id}`)}` },
       { label: 'Download SAM 3.1 visual audit packet', href: `/api/projects/${encodeURIComponent(projectName)}/resolver-packets/pdf-boundary/${evidence.id}/sam31-visual-audit` },
+      { label: 'Download SAM31 tool contract', href: toolContractHref, method: 'GET', artifact_type: 'openclaw.sam31_llm_extrapolation_tool_contract_packet.v1' },
+      { label: 'Download SAM31 vector/model artifact packet', href: vectorModelArtifactHref, method: 'GET', artifact_type: SAM31_VECTOR_MODEL_ARTIFACT_PACKET_TYPE },
       { label: 'Run OpenClaw SAM31 extrapolation artifact', href: extrapolateHref, method: 'POST' },
       { label: 'Run LandScout/NameForge SAM31 queue smoke', href: consumerSmokeHref, method: 'POST', artifact_type: SAM31_CONSUMER_SMOKE_ARTIFACT_TYPE },
       ...(latestOpenClawSam31ExtrapolationReview ? [{
@@ -8273,6 +8473,7 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
       sam31_bridge_smoke_recorded: visibleItems.filter((item) => item.latest_openclaw_sam31_bridge_smoke_artifact).length,
       sam31_extrapolation_recorded: visibleItems.filter((item) => item.latest_openclaw_sam31_extrapolation_artifact).length,
       sam31_extrapolation_reviews_recorded: visibleItems.filter((item) => item.latest_openclaw_sam31_extrapolation_review).length,
+      sam31_vector_model_artifacts_recorded: visibleItems.filter((item) => item.latest_openclaw_sam31_vector_model_artifact).length,
       sam31_consumer_smoke_recorded: visibleItems.filter((item) => item.latest_openclaw_sam31_consumer_smoke_artifact).length,
       sam31_consumer_reviews_recorded: visibleItems.reduce((acc, item) => acc + (Array.isArray(item.latest_openclaw_sam31_consumer_reviews) ? item.latest_openclaw_sam31_consumer_reviews.length : 0), 0),
       sam31_consumer_reviews_unresolved: visibleItems.reduce((acc, item) => acc + (Array.isArray(item.sam31_unresolved_consumer_reviews) ? item.sam31_unresolved_consumer_reviews.length : 0), 0),
@@ -8546,6 +8747,77 @@ app.get('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/openclaw/
 app.get('/api/projects/:name/resolver-packets/openclaw/sam31/tool-contract', authMiddleware, (req, res) => {
   try {
     res.json(buildOpenClawSam31ToolContractPacket(req.params.name));
+  } catch (err) {
+    return res.status(err.httpStatus || 400).json({ error: err.message });
+  }
+});
+
+app.get('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/openclaw/sam31/vector-model-artifacts', authMiddleware, (req, res) => {
+  try {
+    const projectName = req.params.name;
+    const evidenceId = Number(req.params.evidenceId);
+    if (!Number.isSafeInteger(evidenceId) || evidenceId <= 0) {
+      return res.status(400).json({ error: 'A positive evidence id is required' });
+    }
+    const evidence = db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'pdf_boundary_decision'`)
+      .get(evidenceId, projectName);
+    const decision = decisionFromEvidence(evidence);
+    if (!evidence || !decision) {
+      return res.status(404).json({ error: 'PDF boundary decision evidence not found' });
+    }
+    const sam31Evidence = latestSam31VisualAuditEvidence(projectName, evidence.id);
+    return res.json(buildOpenClawSam31VectorModelArtifactPacket(projectName, evidence, decision, sam31Evidence));
+  } catch (err) {
+    return res.status(err.httpStatus || 400).json({ error: err.message });
+  }
+});
+
+app.post('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/openclaw/sam31/vector-model-artifacts', authMiddleware, requireRole('admin'), (req, res) => {
+  try {
+    const projectName = req.params.name;
+    const evidenceId = Number(req.params.evidenceId);
+    if (!Number.isSafeInteger(evidenceId) || evidenceId <= 0) {
+      return res.status(400).json({ error: 'A positive evidence id is required' });
+    }
+    const evidence = db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'pdf_boundary_decision'`)
+      .get(evidenceId, projectName);
+    const decision = decisionFromEvidence(evidence);
+    if (!evidence || !decision) {
+      return res.status(404).json({ error: 'PDF boundary decision evidence not found' });
+    }
+    const sam31Evidence = latestSam31VisualAuditEvidence(projectName, evidence.id);
+    const artifact = buildOpenClawSam31VectorModelArtifactPacket(projectName, evidence, decision, sam31Evidence);
+    const notes = {
+      kind: 'openclaw_sam31_vector_model_artifact_packet',
+      artifact,
+      source_pdf_boundary_evidence_id: evidence.id,
+      source_sam31_visual_audit_evidence_id: sam31Evidence.evidence.id,
+      blocked_claims: artifact.blocked_claims,
+      claim_gate_effect: artifact.claim_gate_effect,
+      limitations: artifact.limitations,
+    };
+    const result = db
+      .prepare(`INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+                VALUES (?, ?, ?, ?, ?, ?)`)
+      .run(
+        projectName,
+        'openclaw_sam31_vector_model_artifact_packet',
+        artifact.source_file || evidence.source_file || decision.sourceFile || null,
+        `pdf-boundary:${evidence.id}:sam31-vector-model-artifacts:${sam31Evidence.evidence.id}`,
+        'best_effort',
+        JSON.stringify(notes),
+      );
+    const evidenceRow = db.prepare('SELECT * FROM project_evidence WHERE id = ?').get(result.lastInsertRowid);
+    return res.status(201).json({
+      id: result.lastInsertRowid,
+      message: 'OpenClaw SAM31 vector/model artifact packet saved as best-effort evidence; claims still blocked',
+      evidence: evidenceRow,
+      ...artifact,
+    });
   } catch (err) {
     return res.status(err.httpStatus || 400).json({ error: err.message });
   }
