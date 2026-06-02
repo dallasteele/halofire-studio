@@ -281,6 +281,12 @@ describe('studio static origin handling', () => {
     expect(html).toContain('renderOpenClawSam31BridgeStatus');
     expect(html).toContain('openclaw_sam31_bridge_status');
     expect(html).toContain('OpenClaw SAM31 bridge');
+    expect(html).toContain('Canonical OpenClaw SAM31 tool');
+    expect(html).toContain('canonical_tool_descriptor');
+    expect(html).toContain('openclaw.sam31_llm_extrapolation_tool');
+    expect(html).toContain('openclaw.sam31.product_review_queue_contract.v1');
+    expect(html).toContain('LandScout queue');
+    expect(html).toContain('NameForge queue');
     expect(html).toContain('pdfExtract:sam');
     expect(html).toContain('object_hypothesis_count');
     expect(html).toContain('model_3d_candidate_count');

@@ -55,6 +55,57 @@ beforeAll(async () => {
 
   const perceptionApp = express();
   perceptionApp.use(express.json({ limit: '2mb' }));
+  perceptionApp.get('/vision/sam31/tool', (_req, res) => {
+    res.json({
+      artifact_type: 'openclaw.sam31_llm_extrapolation_tool',
+      status: 'ready',
+      source_runtime: 'sam-3.1+llm',
+      input_lanes: ['image_ref', 'sections', 'object_hypotheses', 'prompt'],
+      output_lanes: ['llm_observations', 'vector_overlays', 'model_3d_candidates', 'extrapolation_index'],
+      supported_applications: ['halo_fire', 'landscout', 'nameforge'],
+      perception_lanes: ['segmentation', 'object_identification', 'vector_overlay', 'model_3d_candidate', 'spatial_observation'],
+      action: {
+        method: 'POST',
+        href: '/vision/sam31/extrapolate',
+        contract_ref: 'openclaw.sam31_extrapolation_contract',
+      },
+      product_review_queue_contract: {
+        artifact_type: 'openclaw.sam31.product_review_queue_contract.v1',
+        status: 'ready',
+        source_runtime: 'sam-3.1+llm',
+        supported_applications: ['halo_fire', 'landscout', 'nameforge'],
+        requires_review_before_claims: true,
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      },
+      consumer_actions: {
+        landscout: {
+          method: 'POST',
+          href: '/landscout/sam31/product-review-queue',
+          consumes: 'openclaw.sam31.product_review_queue_item.v1',
+          artifact_type: 'openclaw.sam31.consumer_review_queue.landscout.v1',
+          claim_gate_effect: 'no_claims_cleared',
+        },
+        nameforge: {
+          method: 'POST',
+          href: '/nameforge/sam31/product-review-queue',
+          consumes: 'openclaw.sam31.product_review_queue_item.v1',
+          artifact_type: 'openclaw.sam31.consumer_review_queue.nameforge.v1',
+          claim_gate_effect: 'no_claims_cleared',
+        },
+      },
+      application_contracts: {
+        halo_fire: { contract_ref: 'openclaw.sam31.application_contract.halo_fire.v1' },
+        landscout: { contract_ref: 'openclaw.sam31.application_contract.landscout.v1' },
+        nameforge: { contract_ref: 'openclaw.sam31.application_contract.nameforge.v1' },
+      },
+      temporary_value_policy: 'best_guess_until_employee_replaced',
+      acceptable_human_updates: ['semantic_label', 'polygon', 'bbox', 'object_hypothesis', 'vector_overlay', 'model_3d_candidate', 'source_ref', 'confidence'],
+      blocked_claims: ['permit_ready', 'AHJ_approval', 'AutoSprink_parity'],
+      claim_gate_effect: 'no_claims_cleared',
+      limitations: ['Canonical OpenClaw SAM31 tool descriptor fixture.'],
+    });
+  });
   perceptionApp.post('/vision/sam31/extrapolate', (req, res) => {
     const body = req.body || {};
     const sections = Array.isArray(body.sections) ? body.sections : [];
@@ -247,6 +298,30 @@ describe('OpenClaw SAM31 bridge status API', () => {
       services: expect.objectContaining({
         sam31: expect.objectContaining({ status: 'online' }),
       }),
+    }));
+    expect(body.canonical_tool_descriptor_status).toBe('ready');
+    expect(body.canonical_tool_descriptor_url).toBe(`${perceptionBaseUrl}/vision/sam31/tool`);
+    expect(body.canonical_tool_descriptor).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31_llm_extrapolation_tool',
+      status: 'ready',
+      source_runtime: 'sam-3.1+llm',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(body.canonical_tool_descriptor.supported_applications).toEqual(['halo_fire', 'landscout', 'nameforge']);
+    expect(body.canonical_tool_descriptor.output_lanes).toEqual(expect.arrayContaining([
+      'llm_observations',
+      'vector_overlays',
+      'model_3d_candidates',
+      'extrapolation_index',
+    ]));
+    expect(body.canonical_tool_descriptor.consumer_actions.landscout).toEqual(expect.objectContaining({
+      href: '/landscout/sam31/product-review-queue',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(body.canonical_tool_descriptor.product_review_queue_contract).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.product_review_queue_contract.v1',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
     }));
   });
 

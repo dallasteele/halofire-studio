@@ -1359,9 +1359,101 @@ function uniqueStrings(values) {
   return [...new Set((values || []).map((v) => String(v || '').trim()).filter(Boolean))];
 }
 
+function normalizeOpenClawSam31ToolDescriptorPath(url) {
+  const trimmed = String(url || '').trim().replace(/\/$/, '');
+  if (!trimmed) return null;
+  if (trimmed.endsWith('/vision/sam31/tool')) return trimmed;
+  if (trimmed.endsWith('/vision/sam31/extrapolate')) {
+    return `${trimmed.slice(0, -'/vision/sam31/extrapolate'.length)}/vision/sam31/tool`;
+  }
+  if (trimmed.endsWith('/vision/sam31/perception')) {
+    return `${trimmed.slice(0, -'/vision/sam31/perception'.length)}/vision/sam31/tool`;
+  }
+  return `${trimmed}/vision/sam31/tool`;
+}
+
+function openClawSam31ToolDescriptorEndpointConfig(env = process.env) {
+  const candidates = [
+    ['OPENCLAW_SAM31_TOOL_URL', env.OPENCLAW_SAM31_TOOL_URL],
+    ['OPENCLAW_SAM31_EXTRAPOLATE_URL', env.OPENCLAW_SAM31_EXTRAPOLATE_URL],
+    ['OPENCLAW_PERCEPTION_URL', env.OPENCLAW_PERCEPTION_URL],
+    ['OPENCLAW_API_URL', env.OPENCLAW_API_URL],
+    ['HAL_API_URL', env.HAL_API_URL],
+    ['OPENCLAW_BRIDGE_URL', env.OPENCLAW_BRIDGE_URL],
+  ];
+  for (const [sourceFile, rawUrl] of candidates) {
+    const endpoint = normalizeOpenClawSam31ToolDescriptorPath(rawUrl);
+    if (!endpoint) continue;
+    return {
+      endpoint,
+      source_file: sourceFile,
+    };
+  }
+  return { endpoint: null, source_file: null };
+}
+
+async function fetchOpenClawSam31CanonicalToolDescriptor(env = process.env, fetchImpl = globalThis.fetch) {
+  const endpointConfig = openClawSam31ToolDescriptorEndpointConfig(env);
+  if (!endpointConfig.endpoint) {
+    return {
+      endpoint: null,
+      source_file: null,
+      reachable: false,
+      status: 'unavailable',
+      descriptor: null,
+      error: 'No OpenClaw/HAL SAM31 tool descriptor endpoint configured',
+    };
+  }
+  const controller = new AbortController();
+  const timeout = setTimeout(
+    () => controller.abort(),
+    Number(env.HALOFIRE_SAM31_TOOL_DESCRIPTOR_TIMEOUT_MS || env.HALOFIRE_SAM31_STATUS_TIMEOUT_MS || 3000),
+  );
+  try {
+    const response = await fetchImpl(endpointConfig.endpoint, { signal: controller.signal });
+    if (!response.ok) {
+      return {
+        ...endpointConfig,
+        reachable: false,
+        status: 'configured_unreachable',
+        descriptor: null,
+        error: `HTTP ${response.status}`,
+      };
+    }
+    const descriptor = await response.json();
+    if (!descriptor || typeof descriptor !== 'object') {
+      return {
+        ...endpointConfig,
+        reachable: false,
+        status: 'invalid_descriptor',
+        descriptor: null,
+        error: 'Descriptor response was not an object',
+      };
+    }
+    return {
+      ...endpointConfig,
+      reachable: true,
+      status: descriptor.status || 'ready',
+      descriptor,
+      error: null,
+    };
+  } catch (err) {
+    return {
+      ...endpointConfig,
+      reachable: false,
+      status: 'configured_unreachable',
+      descriptor: null,
+      error: err && err.name === 'AbortError' ? 'timeout' : String(err?.message || err),
+    };
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 function openClawSam31BridgeStatus(env = process.env) {
   const bridgeUrl = String(env.OPENCLAW_BRIDGE_URL || '').trim();
   const configured = !!bridgeUrl;
+  const toolEndpointConfig = openClawSam31ToolDescriptorEndpointConfig(env);
   return {
     artifact_type: 'openclaw.sam31_bridge_status',
     status: configured ? 'configured_unverified' : 'unavailable',
@@ -1370,6 +1462,12 @@ function openClawSam31BridgeStatus(env = process.env) {
     source_runtime_ref: 'sam-3.1+llm-openclaw-bridge',
     bridge_url_configured: configured,
     bridge_url: configured ? bridgeUrl : null,
+    canonical_tool_descriptor_url: toolEndpointConfig.endpoint,
+    canonical_tool_descriptor_source_file: toolEndpointConfig.source_file,
+    canonical_tool_descriptor_status: toolEndpointConfig.endpoint ? 'configured_unverified' : 'unavailable',
+    canonical_tool_descriptor_reachable: false,
+    canonical_tool_descriptor: null,
+    canonical_tool_descriptor_error: toolEndpointConfig.endpoint ? null : 'No OpenClaw/HAL SAM31 tool descriptor endpoint configured',
     supported_applications: ['halo_fire', 'landscout', 'nameforge'],
     supported_evidence_lanes: [
       'room_boundary_visual_audit',
@@ -1418,6 +1516,7 @@ async function openClawSam31BridgeStatusWithProbe(env = process.env, fetchImpl =
   const sam31Status =
     raw?.services?.sam31?.status != null ? String(raw.services.sam31.status) : null;
   const bridgeReachable = !!probed.reachable;
+  const toolDescriptor = await fetchOpenClawSam31CanonicalToolDescriptor(env, fetchImpl);
   return {
     ...base,
     status: bridgeReachable ? 'verified_reachable' : 'configured_unreachable',
@@ -1427,6 +1526,12 @@ async function openClawSam31BridgeStatusWithProbe(env = process.env, fetchImpl =
     probe_status_url: `${String(bridgeUrl).replace(/\/$/, '')}/status`,
     observed_at: new Date().toISOString(),
     raw_status: raw,
+    canonical_tool_descriptor_url: toolDescriptor.endpoint,
+    canonical_tool_descriptor_source_file: toolDescriptor.source_file,
+    canonical_tool_descriptor_status: toolDescriptor.status,
+    canonical_tool_descriptor_reachable: toolDescriptor.reachable,
+    canonical_tool_descriptor: toolDescriptor.descriptor,
+    canonical_tool_descriptor_error: toolDescriptor.error,
     next_action: bridgeReachable
       ? 'Bridge /status responded. Run a SAM31 pdfExtract:sam invocation smoke and attach screenshot/console evidence before relying on runtime output; regulated claims remain blocked.'
       : 'Configured OPENCLAW_BRIDGE_URL did not answer /status. Start or fix the governed OpenClaw SAM31 bridge, then re-run this status check; use saved employee replacements as local fallback only.',
