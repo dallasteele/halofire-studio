@@ -273,4 +273,152 @@ describe('OpenClaw SAM31 bridge status API', () => {
     }));
     expect(afterQueue.summary.sam31_bridge_smoke_recorded).toBeGreaterThanOrEqual(1);
   });
+
+  it('carries saved bridge smoke artifacts into SAM31 audit defaults and replay evidence without clearing claims', async () => {
+    const boundaryRes = await request(`${COOPERATIVE_1881_PATH}/pdf-boundary-decision`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        pdfPageIndex: 6,
+        pdfScale: 0.0625,
+        pdfExtract: 'sam31-smoke-default-outline',
+        source_file: 'Proposal-Cooperative-1881-Salt-Lake-City-UT-9-18-25.pdf',
+        source_ref: '1881 plan PDF sheet 6 / SAM31 smoke-to-review default',
+        candidate: {
+          mode: 'outline',
+          label: 'SAM31 smoke default outline',
+          status: 'candidate',
+          bbox: { x: 40, y: 50, width: 620, height: 340 },
+          segmentCount: 14,
+        },
+      }),
+    });
+    expect(boundaryRes.status).toBe(201);
+    const boundary = await boundaryRes.json();
+
+    const queueRes = await request(`${COOPERATIVE_1881_PATH}/resolver-queue`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(queueRes.status).toBe(200);
+    const queue = await queueRes.json();
+    const item = queue.items.find((row) => row.evidence_id === boundary.id);
+    expect(item.sam31_bridge_smoke_action.request_body.source_pdf_boundary_evidence_id).toBe(boundary.id);
+
+    const smokeRes = await request(item.sam31_bridge_smoke_action.href, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify(item.sam31_bridge_smoke_action.request_body),
+    });
+    expect(smokeRes.status).toBe(201);
+    const smoke = await smokeRes.json();
+
+    const packetRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/sam31-visual-audit`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(packetRes.status).toBe(200);
+    const packet = await packetRes.json();
+    expect(packet.latest_openclaw_sam31_bridge_smoke_artifact).toEqual(expect.objectContaining({
+      evidence_id: smoke.id,
+      evidence_status: 'best_effort',
+      status: 'sam31_invocation_verified',
+      source_pdf_boundary_evidence_id: boundary.id,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(packet.employee_capture_defaults).toEqual(expect.objectContaining({
+      source_openclaw_sam31_bridge_smoke_evidence_id: smoke.id,
+      sam31_result_ref: `openclaw-sam31-smoke-artifact:${smoke.id}`,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(packet.employee_capture_defaults.console_log_ref).toContain('/codex-bridge/invoke');
+    expect(packet.source_refs).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        evidence_id: smoke.id,
+        evidence_type: 'openclaw_sam31_bridge_smoke_artifact',
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    ]));
+
+    const auditRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/sam31-visual-audit/results`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        review_decision: 'corrected',
+        reviewer_name: 'Halo Fire SAM bridge reviewer',
+        source_openclaw_sam31_bridge_smoke_evidence_id: packet.employee_capture_defaults.source_openclaw_sam31_bridge_smoke_evidence_id,
+        sam31_result_ref: packet.employee_capture_defaults.sam31_result_ref,
+        screenshot_ref: 'employee://sam31/sheet-6-after-smoke-review.png',
+        console_log_ref: packet.employee_capture_defaults.console_log_ref,
+        marked_up_plan_ref: 'employee://sam31/sheet-6-marked-up-boundary.png',
+        corrected_room_polygons: [
+          {
+            room_id: 'sam31-smoke-reviewed-room',
+            source_ref: packet.employee_capture_defaults.sam31_result_ref,
+            polygon: [[0, 0], [42, 0], [42, 12], [0, 12]],
+          },
+        ],
+        issue_list: [
+          {
+            issue_type: 'sam31_bridge_smoke_review_required',
+            severity: 'blocking',
+            observed: 'Bridge smoke produced best-effort segmentation only.',
+            expected: 'Employee reviewed boundary before replay.',
+            required_action: 'Keep regulated claims blocked until professional/AHJ evidence exists.',
+          },
+        ],
+      }),
+    });
+    expect(auditRes.status).toBe(201);
+    const audit = await auditRes.json();
+    expect(audit.result).toEqual(expect.objectContaining({
+      source_openclaw_sam31_bridge_smoke_evidence_id: smoke.id,
+      sam31_result_ref: `openclaw-sam31-smoke-artifact:${smoke.id}`,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(audit.result.openclaw_sam31_bridge_smoke_artifact).toEqual(expect.objectContaining({
+      evidence_id: smoke.id,
+      status: 'sam31_invocation_verified',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(audit.result.source_refs).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        evidence_id: smoke.id,
+        evidence_type: 'openclaw_sam31_bridge_smoke_artifact',
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    ]));
+
+    const replayRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/replay-input`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(replayRes.status).toBe(200);
+    const replay = await replayRes.json();
+    expect(replay).toEqual(expect.objectContaining({
+      review_source: 'latest_sam31_visual_audit',
+      source_openclaw_sam31_bridge_smoke_evidence_id: smoke.id,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(replay.openclaw_sam31_bridge_smoke_artifact).toEqual(expect.objectContaining({
+      evidence_id: smoke.id,
+      source_pdf_boundary_evidence_id: boundary.id,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(replay.sprinkler_bid_request).toEqual(expect.objectContaining({
+      source_openclaw_sam31_bridge_smoke_evidence_id: smoke.id,
+      use_for_claims: false,
+    }));
+    expect(replay.source_refs).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        evidence_id: smoke.id,
+        evidence_type: 'openclaw_sam31_bridge_smoke_artifact',
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    ]));
+    expect(replay.blocked_claims).toEqual(expect.arrayContaining([
+      'geometry_accuracy',
+      'permit_ready',
+      'AutoSprink_parity',
+      'SAM31_runtime_verified',
+      'OpenClaw_runtime_verified',
+    ]));
+  });
 });

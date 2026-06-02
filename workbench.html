@@ -398,6 +398,11 @@ function resolverQueueDetail(item) {
   const replay_review = latest_review || latest_sam31_visual_audit;
   const review_source = latest_review ? 'latest_employee_review_packet' : (latest_sam31_visual_audit ? 'latest_sam31_visual_audit' : null);
   const evidenceId = escapeHtml(item.evidence_id);
+  const sam31BridgeSmokeEvidenceId = latest_openclaw_sam31_bridge_smoke_artifact?.evidence_id || '';
+  const sam31BridgeSmokeResultRef = sam31BridgeSmokeEvidenceId ? `openclaw-sam31-smoke-artifact:${sam31BridgeSmokeEvidenceId}` : '';
+  const sam31BridgeSmokeConsoleRef = Array.isArray(latest_openclaw_sam31_bridge_smoke_artifact?.status_refs)
+    ? latest_openclaw_sam31_bridge_smoke_artifact.status_refs.join(' | ')
+    : '';
   const actions = Array.isArray(item.actions) ? item.actions : [];
   if (item.kind === 'catalog_vendor_acquisition') {
     return `
@@ -491,14 +496,14 @@ function resolverQueueDetail(item) {
             <option value="rejected">Rejected boundary</option>
           </select>
           <input id="sam31ReviewerName-${evidenceId}" placeholder="reviewer_name" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
-          <input id="sam31ResultRef-${evidenceId}" placeholder="sam31_result_ref" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
+          <input id="sam31ResultRef-${evidenceId}" value="${escapeHtml(sam31BridgeSmokeResultRef)}" placeholder="sam31_result_ref" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
           <input id="sam31ScreenshotRef-${evidenceId}" placeholder="screenshot_ref" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
-          <input id="sam31ConsoleLogRef-${evidenceId}" placeholder="console_log_ref" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
+          <input id="sam31ConsoleLogRef-${evidenceId}" value="${escapeHtml(sam31BridgeSmokeConsoleRef)}" placeholder="console_log_ref" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
           <input id="sam31MarkedUpPlanRef-${evidenceId}" placeholder="marked_up_plan_ref" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
           <textarea id="sam31IssueList-${evidenceId}" placeholder='issue_list JSON array' style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px;height:54px"></textarea>
           <textarea id="sam31CorrectedRoomPolygons-${evidenceId}" placeholder='corrected_room_polygons JSON array' style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px;height:54px"></textarea>
           <textarea id="sam31Notes-${evidenceId}" placeholder="notes" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px;height:44px"></textarea>
-          <button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#0f766e" data-sam31-visual-audit-save-evidence-id="${evidenceId}">Save SAM 3.1 audit evidence</button>
+          <button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#0f766e" data-sam31-visual-audit-save-evidence-id="${evidenceId}" data-sam31-bridge-smoke-source-evidence-id="${escapeHtml(sam31BridgeSmokeEvidenceId)}">Save SAM 3.1 audit evidence</button>
           <div class="muted" id="sam31AuditStatus-${evidenceId}" style="font-size:11px"></div>
         </div>
       </details>
@@ -760,7 +765,7 @@ async function saveResolverPacketReview(evidenceId) {
   }
 }
 
-async function saveSam31VisualAuditResult(evidenceId) {
+async function saveSam31VisualAuditResult(evidenceId, sourceBridgeSmokeEvidenceId = '') {
   const status = document.getElementById('sam31AuditStatus-' + evidenceId);
   try {
     const body = {
@@ -774,6 +779,9 @@ async function saveSam31VisualAuditResult(evidenceId) {
       corrected_room_polygons: jsonArrayFromField('sam31CorrectedRoomPolygons-' + evidenceId),
       notes: document.getElementById('sam31Notes-' + evidenceId).value.trim(),
     };
+    if (sourceBridgeSmokeEvidenceId) {
+      body.source_openclaw_sam31_bridge_smoke_evidence_id = Number(sourceBridgeSmokeEvidenceId);
+    }
     const saved = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/resolver-packets/pdf-boundary/' + encodeURIComponent(evidenceId) + '/sam31-visual-audit/results', {
       method: 'POST',
       body: JSON.stringify(body),
@@ -860,7 +868,7 @@ async function refreshResolverQueue() {
     button.onclick = () => saveResolverPacketReview(button.dataset.resolverReviewEvidenceId);
   });
   document.querySelectorAll('[data-sam31-visual-audit-save-evidence-id]').forEach((button) => {
-    button.onclick = () => saveSam31VisualAuditResult(button.dataset.sam31VisualAuditSaveEvidenceId);
+    button.onclick = () => saveSam31VisualAuditResult(button.dataset.sam31VisualAuditSaveEvidenceId, button.dataset.sam31BridgeSmokeSourceEvidenceId || '');
   });
   document.querySelectorAll('[data-sam31-employee-replacement-save-evidence-id]').forEach((button) => {
     button.onclick = () => saveSam31EmployeeReplacements(button.dataset.sam31EmployeeReplacementSaveEvidenceId, button.dataset.sam31SourceEvidenceId);

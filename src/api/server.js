@@ -1732,6 +1732,29 @@ function latestSam31BridgeSmokeArtifactEvidence(projectName, sourceEvidenceId = 
   return null;
 }
 
+function sam31BridgeSmokeReplaySummary(sam31SmokeEvidence) {
+  if (!sam31SmokeEvidence?.evidence || !sam31SmokeEvidence?.artifact) return null;
+  const { evidence, artifact } = sam31SmokeEvidence;
+  return {
+    evidence_id: evidence.id,
+    evidence_type: evidence.evidence_type,
+    evidence_status: evidence.status,
+    source_ref: evidence.source_ref,
+    status: artifact.status || 'sam31_invocation_verified',
+    source_pdf_boundary_evidence_id: artifact.source_pdf_boundary_evidence_id || null,
+    generated_at: artifact.generated_at || null,
+    bridge_status: artifact.bridge_status || null,
+    invocation: artifact.invocation || null,
+    result_summary: artifact.result_summary && typeof artifact.result_summary === 'object'
+      ? jsonClone(artifact.result_summary)
+      : null,
+    status_refs: Array.isArray(artifact.status_refs) ? [...artifact.status_refs] : [],
+    claim_gate_effect: artifact.claim_gate_effect || 'no_claims_cleared',
+    blocked_claims: Array.isArray(artifact.blocked_claims) ? [...artifact.blocked_claims] : [],
+    limitations: Array.isArray(artifact.limitations) ? [...artifact.limitations] : [],
+  };
+}
+
 function sam31EmployeeReplacementReplaySummary(sam31ReplacementEvidence) {
   if (!sam31ReplacementEvidence?.evidence || !sam31ReplacementEvidence?.replacement) return null;
   const { evidence, replacement } = sam31ReplacementEvidence;
@@ -2733,6 +2756,13 @@ function pdfBoundarySam31VisualAuditPacket(projectName, evidence, decision) {
   const pdfRef = evidence.source_file || decision.sourceFile || evidence.source_ref || decision.sourceRef || `${projectName}:pdf-boundary:${evidence.id}`;
   const bridgeHost = process.env.HALOFIRE_SAM31_BRIDGE_HOST || '127.0.0.1';
   const bridgePort = Number(process.env.HALOFIRE_SAM31_BRIDGE_PORT || 15000);
+  const latestSmokeSummary = sam31BridgeSmokeReplaySummary(latestSam31BridgeSmokeArtifactEvidence(projectName, evidence.id));
+  const smokeStatusRefs = latestSmokeSummary?.status_refs?.length
+    ? latestSmokeSummary.status_refs
+    : [
+      `http://${bridgeHost}:${Number.isSafeInteger(bridgePort) ? bridgePort : 15000}/status`,
+      `http://${bridgeHost}:${Number.isSafeInteger(bridgePort) ? bridgePort : 15000}/codex-bridge/invoke`,
+    ];
   return {
     artifact_type: 'sam31_room_boundary_visual_audit_packet',
     status: 'ready_for_sam31_visual_audit',
@@ -2764,6 +2794,14 @@ function pdfBoundarySam31VisualAuditPacket(projectName, evidence, decision) {
       local_bridge_command: 'npm run sam31:bridge',
     },
     input_defaults: queueItem.input_defaults,
+    employee_capture_defaults: {
+      source_openclaw_sam31_bridge_smoke_evidence_id: latestSmokeSummary?.evidence_id || null,
+      sam31_result_ref: latestSmokeSummary ? `openclaw-sam31-smoke-artifact:${latestSmokeSummary.evidence_id}` : null,
+      console_log_ref: latestSmokeSummary ? smokeStatusRefs.join(' | ') : null,
+      openclaw_sam31_bridge_smoke_artifact: latestSmokeSummary,
+      claim_gate_effect: 'no_claims_cleared',
+    },
+    latest_openclaw_sam31_bridge_smoke_artifact: latestSmokeSummary,
     candidate_summary: {
       mode: candidate.mode || decision.extractMode,
       label: candidate.label || candidate.mode || decision.extractMode,
@@ -2800,6 +2838,15 @@ function pdfBoundarySam31VisualAuditPacket(projectName, evidence, decision) {
         source_ref: evidence.source_ref || decision.sourceRef || null,
         status: evidence.status,
       },
+      ...(latestSmokeSummary
+        ? [{
+          evidence_id: latestSmokeSummary.evidence_id,
+          evidence_type: 'openclaw_sam31_bridge_smoke_artifact',
+          source_ref: latestSmokeSummary.source_ref,
+          status: latestSmokeSummary.evidence_status,
+          claim_gate_effect: latestSmokeSummary.claim_gate_effect || 'no_claims_cleared',
+        }]
+        : []),
     ],
     review_steps: [
       'Start or connect the SAM 3.1 bridge, then run sam31_request through the OpenClaw/SAM bridge envelope.',
@@ -2869,6 +2916,26 @@ function normalizeSam31VisualAuditResult(projectName, evidence, decision, body =
     throw e;
   }
   const openclawSam31PerceptionPacket = normalizeOpenClawSam31PerceptionPacket(body);
+  const sourceSmokeEvidenceId = Number(body.source_openclaw_sam31_bridge_smoke_evidence_id);
+  let sourceSmokeSummary = null;
+  if (Number.isSafeInteger(sourceSmokeEvidenceId) && sourceSmokeEvidenceId > 0) {
+    const sourceSmokeEvidence = db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'openclaw_sam31_bridge_smoke_artifact'`)
+      .get(sourceSmokeEvidenceId, projectName);
+    const sourceSmokeArtifact = sam31BridgeSmokeArtifactFromEvidence(sourceSmokeEvidence);
+    if (!sourceSmokeEvidence || !sourceSmokeArtifact) {
+      const e = new Error('source_openclaw_sam31_bridge_smoke_evidence_id must reference a saved OpenClaw SAM31 bridge smoke artifact');
+      e.httpStatus = 404;
+      throw e;
+    }
+    if (Number(sourceSmokeArtifact.source_pdf_boundary_evidence_id) !== Number(evidence.id)) {
+      const e = new Error('source_openclaw_sam31_bridge_smoke_evidence_id does not belong to the requested PDF boundary evidence');
+      e.httpStatus = 409;
+      throw e;
+    }
+    sourceSmokeSummary = sam31BridgeSmokeReplaySummary({ evidence: sourceSmokeEvidence, artifact: sourceSmokeArtifact });
+  }
   const sourceRefs = [
     {
       evidence_id: evidence.id,
@@ -2884,6 +2951,15 @@ function normalizeSam31VisualAuditResult(projectName, evidence, decision, body =
       source_ref: openclawSam31PerceptionPacket.source_ref || 'openclaw.sam31_perception_packet',
       status: openclawSam31PerceptionPacket.status || 'best_effort_perception_ready',
       claim_gate_effect: 'no_claims_cleared',
+    });
+  }
+  if (sourceSmokeSummary) {
+    sourceRefs.push({
+      evidence_id: sourceSmokeSummary.evidence_id,
+      evidence_type: 'openclaw_sam31_bridge_smoke_artifact',
+      source_ref: sourceSmokeSummary.source_ref,
+      status: sourceSmokeSummary.evidence_status,
+      claim_gate_effect: sourceSmokeSummary.claim_gate_effect || 'no_claims_cleared',
     });
   }
   return {
@@ -2904,6 +2980,8 @@ function normalizeSam31VisualAuditResult(projectName, evidence, decision, body =
     corrected_room_polygons: Array.isArray(body.corrected_room_polygons) ? jsonClone(body.corrected_room_polygons) : [],
     issue_list: Array.isArray(body.issue_list) ? jsonClone(body.issue_list) : [],
     openclaw_sam31_perception_packet: openclawSam31PerceptionPacket,
+    source_openclaw_sam31_bridge_smoke_evidence_id: sourceSmokeSummary?.evidence_id || null,
+    openclaw_sam31_bridge_smoke_artifact: sourceSmokeSummary,
     notes: String(body.notes || '').trim() || null,
     input_defaults: {
       pdfPageIndex: decision.pageIndex,
@@ -2911,7 +2989,10 @@ function normalizeSam31VisualAuditResult(projectName, evidence, decision, body =
       pdfExtract: decision.extractMode,
     },
     source_refs: sourceRefs,
-    blocked_claims: Array.isArray(decision.blockedClaims) ? decision.blockedClaims : [...PDF_BOUNDARY_BLOCKED_CLAIMS],
+    blocked_claims: uniqueStrings([
+      ...(Array.isArray(decision.blockedClaims) ? decision.blockedClaims : PDF_BOUNDARY_BLOCKED_CLAIMS),
+      ...(Array.isArray(sourceSmokeSummary?.blocked_claims) ? sourceSmokeSummary.blocked_claims : []),
+    ]),
     claim_gate_effect: 'no_claims_cleared',
     limitations: [
       'SAM 3.1 visual audit results are internal-alpha correction evidence only.',
@@ -3059,6 +3140,11 @@ function pdfBoundaryReplayInputPacket(projectName, evidence, decision, reviewEvi
   const openclawSam31PerceptionPacketSummary = reviewSource === 'latest_sam31_visual_audit'
     ? sam31PerceptionPacketSummary(review.openclaw_sam31_perception_packet)
     : null;
+  const openclawSam31BridgeSmokeSummary = reviewSource === 'latest_sam31_visual_audit'
+    && review.openclaw_sam31_bridge_smoke_artifact
+    && typeof review.openclaw_sam31_bridge_smoke_artifact === 'object'
+    ? jsonClone(review.openclaw_sam31_bridge_smoke_artifact)
+    : null;
   const sourceRefs = [
     {
       evidence_id: evidence.id,
@@ -3081,6 +3167,15 @@ function pdfBoundaryReplayInputPacket(projectName, evidence, decision, reviewEvi
       claim_gate_effect: 'no_claims_cleared',
     });
   }
+  if (openclawSam31BridgeSmokeSummary) {
+    sourceRefs.push({
+      evidence_id: openclawSam31BridgeSmokeSummary.evidence_id,
+      evidence_type: 'openclaw_sam31_bridge_smoke_artifact',
+      source_ref: openclawSam31BridgeSmokeSummary.source_ref || null,
+      status: openclawSam31BridgeSmokeSummary.evidence_status || openclawSam31BridgeSmokeSummary.status || 'best_effort',
+      claim_gate_effect: openclawSam31BridgeSmokeSummary.claim_gate_effect || 'no_claims_cleared',
+    });
+  }
   if (sam31ReplacementSummary) {
     sourceRefs.push({
       evidence_id: sam31ReplacementSummary.evidence_id,
@@ -3090,6 +3185,11 @@ function pdfBoundaryReplayInputPacket(projectName, evidence, decision, reviewEvi
       claim_gate_effect: sam31ReplacementSummary.claim_gate_effect || 'no_claims_cleared',
     });
   }
+  const replayBlockedClaims = uniqueStrings([
+    ...(Array.isArray(queueItem.blocked_claims) ? queueItem.blocked_claims : []),
+    ...(Array.isArray(review.blocked_claims) ? review.blocked_claims : []),
+    ...(Array.isArray(openclawSam31BridgeSmokeSummary?.blocked_claims) ? openclawSam31BridgeSmokeSummary.blocked_claims : []),
+  ]);
   const sprinklerBidRequest = {
     room_boundary_source: reviewSource,
     source_evidence_id: evidence.id,
@@ -3112,6 +3212,10 @@ function pdfBoundaryReplayInputPacket(projectName, evidence, decision, reviewEvi
   if (openclawSam31PerceptionPacketSummary) {
     sprinklerBidRequest.openclaw_sam31_perception_packet = openclawSam31PerceptionPacketSummary;
   }
+  if (openclawSam31BridgeSmokeSummary) {
+    sprinklerBidRequest.source_openclaw_sam31_bridge_smoke_evidence_id = openclawSam31BridgeSmokeSummary.evidence_id;
+    sprinklerBidRequest.openclaw_sam31_bridge_smoke_artifact = openclawSam31BridgeSmokeSummary;
+  }
   return {
     artifact_type: 'room_boundary_replay_input_packet',
     status: 'ready_for_internal_alpha_replay',
@@ -3125,6 +3229,12 @@ function pdfBoundaryReplayInputPacket(projectName, evidence, decision, reviewEvi
         source_sam31_replacement_evidence_id: sam31ReplacementSummary.evidence_id,
         sam31_replacement_source: 'latest_sam31_employee_replacement',
         latest_sam31_employee_replacement: sam31ReplacementSummary,
+      }
+      : {}),
+    ...(openclawSam31BridgeSmokeSummary
+      ? {
+        source_openclaw_sam31_bridge_smoke_evidence_id: openclawSam31BridgeSmokeSummary.evidence_id,
+        openclaw_sam31_bridge_smoke_artifact: openclawSam31BridgeSmokeSummary,
       }
       : {}),
     source_ref: evidence.source_ref || decision.sourceRef || null,
@@ -3149,7 +3259,7 @@ function pdfBoundaryReplayInputPacket(projectName, evidence, decision, reviewEvi
     input_defaults: queueItem.input_defaults,
     sprinkler_bid_request: sprinklerBidRequest,
     source_refs: sourceRefs,
-    blocked_claims: queueItem.blocked_claims,
+    blocked_claims: replayBlockedClaims,
     claim_gate_effect: 'no_claims_cleared',
     limitations: [
       'This replay input is internal-alpha correction evidence only.',
@@ -3256,6 +3366,11 @@ function resolveRoomBoundaryReplayFloorPlan(req, projectName) {
   const openclawSam31PerceptionPacketSummary = replaySource === 'latest_sam31_visual_audit'
     ? sam31PerceptionPacketSummary(sourceReview.openclaw_sam31_perception_packet)
     : null;
+  const openclawSam31BridgeSmokeSummary = replaySource === 'latest_sam31_visual_audit'
+    && sourceReview.openclaw_sam31_bridge_smoke_artifact
+    && typeof sourceReview.openclaw_sam31_bridge_smoke_artifact === 'object'
+    ? jsonClone(sourceReview.openclaw_sam31_bridge_smoke_artifact)
+    : null;
   const sourceRefs = [
     {
       evidence_id: sourceEvidence.id,
@@ -3276,6 +3391,15 @@ function resolveRoomBoundaryReplayFloorPlan(req, projectName) {
       source_ref: openclawSam31PerceptionPacketSummary.source_ref || 'openclaw.sam31_perception_packet',
       status: openclawSam31PerceptionPacketSummary.status,
       claim_gate_effect: 'no_claims_cleared',
+    });
+  }
+  if (openclawSam31BridgeSmokeSummary) {
+    sourceRefs.push({
+      evidence_id: openclawSam31BridgeSmokeSummary.evidence_id,
+      evidence_type: 'openclaw_sam31_bridge_smoke_artifact',
+      source_ref: openclawSam31BridgeSmokeSummary.source_ref || null,
+      status: openclawSam31BridgeSmokeSummary.evidence_status || openclawSam31BridgeSmokeSummary.status || 'best_effort',
+      claim_gate_effect: openclawSam31BridgeSmokeSummary.claim_gate_effect || 'no_claims_cleared',
     });
   }
   const sam31ReplacementSummary = sourceSam31Replacement
@@ -3313,6 +3437,8 @@ function resolveRoomBoundaryReplayFloorPlan(req, projectName) {
           screenshot_ref: sourceReview.screenshot_ref || null,
           console_log_ref: sourceReview.console_log_ref || null,
           openclaw_sam31_perception_packet: openclawSam31PerceptionPacketSummary,
+          source_openclaw_sam31_bridge_smoke_evidence_id: openclawSam31BridgeSmokeSummary?.evidence_id || null,
+          openclaw_sam31_bridge_smoke_artifact: openclawSam31BridgeSmokeSummary,
         }
         : {}),
       corrected_room_polygon_count: correctedRoomPolygons.length,

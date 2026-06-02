@@ -202,6 +202,9 @@ describe('studio static origin handling', () => {
     expect(html).toContain('Record SAM 3.1 visual audit result');
     expect(html).toContain('sam31_result_ref');
     expect(html).toContain('data-sam31-visual-audit-save-evidence-id');
+    expect(html).toContain('openclaw-sam31-smoke-artifact:');
+    expect(html).toContain('source_openclaw_sam31_bridge_smoke_evidence_id');
+    expect(html).toContain('data-sam31-bridge-smoke-source-evidence-id');
   });
 
   it('lets the workbench save employee room-boundary review decisions', async () => {
