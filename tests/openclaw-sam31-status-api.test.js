@@ -595,6 +595,138 @@ describe('OpenClaw SAM31 bridge status API', () => {
       'SAM31_runtime_verified',
       'OpenClaw_runtime_verified',
     ]));
+
+    const boundaryReviewRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/reviews`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        review_decision: 'corrected',
+        reviewer_name: 'HaloFire estimator',
+        marked_up_plan_ref: '1881://employee-review/sam31/extrapolation/room-boundary-markup',
+        corrected_room_polygons: [
+          {
+            room_id: 'reviewed corridor',
+            polygon: [[0, 0], [28, 0], [28, 8], [0, 8]],
+            hazard: 'ordinary',
+            source_ref: '1881://employee-review/sam31/extrapolation/room-boundary',
+          },
+        ],
+        issue_list: [
+          {
+            issue_type: 'sam31_extrapolation_product_review_required',
+            severity: 'warning',
+            observed: 'SAM31+LLM identified reviewed door/vector/model candidates.',
+            expected: 'Carry reviewed values into CAD/sprinkler review metadata only.',
+            required_action: 'Review obstruction, vector overlay, and model candidates before export or regulated claims.',
+          },
+        ],
+      }),
+    });
+    expect(boundaryReviewRes.status).toBe(201);
+    const boundaryReview = await boundaryReviewRes.json();
+
+    const replayRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/replay-input`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(replayRes.status).toBe(200);
+    const replay = await replayRes.json();
+    expect(replay).toEqual(expect.objectContaining({
+      artifact_type: 'room_boundary_replay_input_packet',
+      review_source: 'latest_employee_review_packet',
+      source_review_evidence_id: boundaryReview.id,
+      source_openclaw_sam31_extrapolation_evidence_id: artifact.id,
+      source_openclaw_sam31_extrapolation_review_evidence_id: review.id,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(replay.openclaw_sam31_extrapolation_product_review_packet).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31_extrapolation_product_review_packet',
+      source_openclaw_sam31_extrapolation_evidence_id: artifact.id,
+      source_openclaw_sam31_extrapolation_review_evidence_id: review.id,
+      reviewed_values: expect.objectContaining({
+        object_hypotheses: expect.arrayContaining([
+          expect.objectContaining({ id: 'obj:door-reviewed' }),
+        ]),
+        vector_overlays: expect.arrayContaining([
+          expect.objectContaining({ id: 'vector:room-101-reviewed' }),
+        ]),
+        model_3d_candidates: expect.arrayContaining([
+          expect.objectContaining({ id: 'model3d:room-101-reviewed' }),
+        ]),
+      }),
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(replay.sprinkler_bid_request.openclaw_sam31_extrapolation_product_review_packet).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31_extrapolation_product_review_packet',
+      downstream_review_lanes: expect.arrayContaining([
+        'sprinkler_obstruction_review',
+        'cad_vector_overlay_review',
+        'model_3d_candidate_review',
+      ]),
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(replay.sprinkler_bid_request.sam31_downstream_review_metadata).toEqual(expect.objectContaining({
+      source: 'openclaw.sam31_extrapolation_product_review_packet',
+      use_for_claims: false,
+      object_hypothesis_count: 1,
+      vector_overlay_count: 1,
+      model_3d_candidate_count: 1,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(replay.source_refs).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        evidence_id: artifact.id,
+        evidence_type: 'openclaw_sam31_extrapolation_artifact',
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+      expect.objectContaining({
+        evidence_id: review.id,
+        evidence_type: 'openclaw_sam31_extrapolation_review',
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    ]));
+    expect(replay.blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'AHJ_approval',
+      'AutoSprink_parity',
+      'professional_approval',
+      'SAM31_runtime_verified',
+      'OpenClaw_runtime_verified',
+    ]));
+
+    const replayBidRes = await request(`${COOPERATIVE_1881_PATH}/sprinkler-bid`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        markupPct: 25,
+        ...replay.sprinkler_bid_request,
+      }),
+    });
+    expect(replayBidRes.status).toBe(200);
+    const replayBid = await replayBidRes.json();
+    expect(replayBid.roomBoundaryReplay).toEqual(expect.objectContaining({
+      room_boundary_source: 'latest_employee_review_packet',
+      source_openclaw_sam31_extrapolation_evidence_id: artifact.id,
+      source_openclaw_sam31_extrapolation_review_evidence_id: review.id,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(replayBid.roomBoundaryReplay.openclaw_sam31_extrapolation_product_review_packet).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31_extrapolation_product_review_packet',
+      reviewed_values: expect.objectContaining({
+        vector_overlays: expect.arrayContaining([
+          expect.objectContaining({ id: 'vector:room-101-reviewed' }),
+        ]),
+        model_3d_candidates: expect.arrayContaining([
+          expect.objectContaining({ id: 'model3d:room-101-reviewed' }),
+        ]),
+      }),
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(replayBid.roomBoundaryReplay.sam31_downstream_review_metadata).toEqual(expect.objectContaining({
+      source: 'openclaw.sam31_extrapolation_product_review_packet',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
   });
 
   it('carries saved bridge smoke artifacts into SAM31 audit defaults and replay evidence without clearing claims', async () => {
