@@ -178,7 +178,7 @@ function renderClaimGates(gates) {
       acceptable_evidence ${(Array.isArray(gate.allowed_evidence_types) ? gate.allowed_evidence_types : []).map((type) => `<span class="chip">${escapeHtml(type)}</span>`).join('') || '<span class="chip">no direct evidence workflow</span>'}<br>
       requires_signoff_for ${requiresSignoffFor.map((type) => `<span class="chip">${escapeHtml(type)}</span>`).join('')}<br>
       review_packet_href ${escapeHtml(gate.review_packet_href)} · review_packet_artifact_type ${escapeHtml(gate.review_packet_artifact_type || 'halofire.claim_gate_review_packet.v1')}<br>
-      <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0f766e" onclick="openSignedReviewerWorkflow(${JSON.stringify(currentProjectName())}, ${JSON.stringify(gate.code || '')})">Open signed reviewer workflow from blocked gate</button>
+      <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0f766e" data-claim-gate-signed-reviewer-workflow="${escapeHtml(gate.code || '')}" data-claim-gate-signed-reviewer-workflow-project="${escapeHtml(currentProjectName())}" onclick="openSignedReviewerWorkflow(${JSON.stringify(currentProjectName())}, ${JSON.stringify(gate.code || '')})">Open signed reviewer workflow from blocked gate</button>
     </div>`;
   }
   document.getElementById('gates').innerHTML = gates.length ? gates.map((g) => `
@@ -258,6 +258,15 @@ async function downloadSignedReviewerResolveAuditPacket(href, gateCode = '', evi
 }
 
 document.addEventListener('click', (event) => {
+  const blockedGateWorkflowButton = event.target.closest('[data-claim-gate-signed-reviewer-workflow]');
+  if (blockedGateWorkflowButton) {
+    event.preventDefault();
+    openSignedReviewerWorkflow(
+      blockedGateWorkflowButton.getAttribute('data-claim-gate-signed-reviewer-workflow-project') || currentProjectName(),
+      blockedGateWorkflowButton.getAttribute('data-claim-gate-signed-reviewer-workflow') || '',
+    );
+    return;
+  }
   const workflowButton = event.target.closest('[data-signed-reviewer-workflow-evidence-id]');
   if (workflowButton) {
     event.preventDefault();

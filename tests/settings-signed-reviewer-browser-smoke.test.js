@@ -82,6 +82,45 @@ afterAll(async () => {
 });
 
 describe('Settings signed reviewer browser smoke', () => {
+  it('opens the blocked claim-gate workflow from Workbench and keeps resolve-audit fail-closed', async () => {
+    const token = await adminToken();
+    const page = await browser.newPage();
+    page.setDefaultTimeout(8000);
+    await page.addInitScript((authToken) => {
+      localStorage.setItem('halofire_token', authToken);
+    }, token);
+    try {
+      await page.goto(`${BASE}/workbench.html`, { waitUntil: 'domcontentloaded' });
+      const blockedGateButton = page.locator('[data-claim-gate-signed-reviewer-workflow="PROFESSIONAL_REVIEW_MISSING"]').first();
+      await blockedGateButton.waitFor();
+      await blockedGateButton.click();
+      await page.waitForURL(/settings\.html\?/);
+      await page.locator('#wizGate').waitFor();
+      await page.waitForFunction(
+        (gateCode) => document.getElementById('wizGate')?.value === gateCode,
+        'PROFESSIONAL_REVIEW_MISSING',
+      );
+      expect(await page.locator('#wizGate').inputValue()).toBe('PROFESSIONAL_REVIEW_MISSING');
+      expect(await page.locator('#wizExistingEvidence').inputValue()).toBe('');
+      await page.waitForFunction(() => {
+        const text = document.getElementById('wizPacketStatus')?.textContent || '';
+        return text.includes('available after explicit gate resolve');
+      });
+      expect(await page.locator('#wizPacketStatus').innerText()).toContain('available after explicit gate resolve');
+      expect(await page.locator('#wizResolveAudit').isDisabled()).toBe(true);
+
+      await page.locator('#wizReviewPacket').click();
+      await page.waitForFunction(() => {
+        const text = document.getElementById('wizPacketStatus')?.textContent || '';
+        return text.includes('Downloaded halofire.claim_gate_review_packet.v1');
+      });
+      expect(await page.locator('#wizPacketStatus').innerText()).toContain('claim_gate_effect no_claims_cleared');
+      expect(await page.locator('#wizResolveAudit').isDisabled()).toBe(true);
+    } finally {
+      await page.close();
+    }
+  }, 30_000);
+
   it('opens from Workbench and proves prefilled packet downloads stay source-linked', async () => {
     const token = await adminToken();
     const recorded = await api(`${PROJECT_PATH}/evidence`, token, {

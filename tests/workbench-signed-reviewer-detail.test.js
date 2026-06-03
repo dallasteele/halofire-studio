@@ -79,6 +79,8 @@ describe('workbench signed reviewer evidence detail rendering', () => {
     const html = await shell.text();
     expect(html).toContain('Open signed reviewer workflow from blocked gate');
     expect(html).toContain('renderClaimGateWorkflowActions');
+    expect(html).toContain('data-claim-gate-signed-reviewer-workflow');
+    expect(html).toContain('data-claim-gate-signed-reviewer-workflow-project');
     expect(html).toContain('review_packet_href');
     expect(html).toContain('requires_signoff_for');
   });
