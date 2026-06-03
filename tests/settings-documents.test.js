@@ -3288,7 +3288,47 @@ describe('HaloFire settings + documentation upload/link API', () => {
         href: expect.stringContaining('/claim-gates/PROFESSIONAL_REVIEW_MISSING/resolve'),
         request_body: { evidence_id: expect.any(Number) },
       }),
+      gate_validation_packet_action: expect.objectContaining({
+        method: 'GET',
+        href: expect.stringContaining(`/evidence/${smokeApprovalUpload.id}/openclaw/sam31/approval-upload/gate-validation-packet`),
+        artifact_type: 'halofire.sam31_approval_upload_gate_validation_packet.v1',
+        claim_gate_effect: 'no_claims_cleared',
+      }),
     }));
+
+    const smokeApprovalGatePacketRes = await request(smokeApprovalUpload.gate_validation_packet_action.href, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(smokeApprovalGatePacketRes.status).toBe(200);
+    const smokeApprovalGatePacket = await smokeApprovalGatePacketRes.json();
+    expect(smokeApprovalGatePacket).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.sam31_approval_upload_gate_validation_packet.v1',
+      status: 'uploaded_pending_gate_validation',
+      approval_upload_evidence_id: smokeApprovalUpload.id,
+      source_section_to_artifacts_consumer_intake_smoke_evidence_id: consumerIntakeSmokes.nameforge.evidence_id,
+      source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id: followupReview.id,
+      source_packet_review_decision_evidence_id: smokePacketReview.id,
+      gate_code: 'PROFESSIONAL_REVIEW_MISSING',
+      resolve_route: expect.stringContaining('/claim-gates/PROFESSIONAL_REVIEW_MISSING/resolve'),
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(smokeApprovalGatePacket.source_refs).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        evidence_type: 'openclaw_sam31_section_to_artifacts_consumer_intake_smoke',
+        evidence_id: consumerIntakeSmokes.nameforge.evidence_id,
+      }),
+      expect.objectContaining({
+        evidence_type: 'professional_review',
+        source_ref: 'professional-review://nameforge/smoke-packet/obstruction',
+      }),
+    ]));
+    expect(smokeApprovalGatePacket.validation_steps).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        code: 'explicit_claim_gate_resolve_required',
+        action: expect.stringContaining('/claim-gates/PROFESSIONAL_REVIEW_MISSING/resolve'),
+      }),
+    ]));
 
     const uploadedSmokePacketReadbackRes = await request(`/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/section-to-artifacts-consumer-intake-smoke/${consumerIntakeSmokes.nameforge.evidence_id}/sprinkler-review-packet`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -3313,6 +3353,10 @@ describe('HaloFire settings + documentation upload/link API', () => {
                     source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id: followupReview.id,
                     gate_validation_action: expect.objectContaining({
                       href: expect.stringContaining('/claim-gates/PROFESSIONAL_REVIEW_MISSING/resolve'),
+                    }),
+                    gate_validation_packet_action: expect.objectContaining({
+                      href: expect.stringContaining(`/evidence/${smokeApprovalUpload.id}/openclaw/sam31/approval-upload/gate-validation-packet`),
+                      artifact_type: 'halofire.sam31_approval_upload_gate_validation_packet.v1',
                     }),
                     claim_gate_effect: 'no_claims_cleared',
                   }),

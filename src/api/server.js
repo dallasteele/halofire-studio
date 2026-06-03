@@ -4777,6 +4777,7 @@ app.post('/api/projects/:name/openclaw/sam31/section-to-artifacts-consumer-intak
         ...intake.gate_validation_action,
         request_body: { evidence_id: result.lastInsertRowid },
       } : null,
+      gate_validation_packet_action: halofireSam31ApprovalUploadGateValidationPacketAction(projectName, result.lastInsertRowid),
     };
     return res.status(201).json({
       id: result.lastInsertRowid,
@@ -4841,6 +4842,14 @@ app.get('/api/projects/:name/evidence/:evidenceId/replay-bid-artifact', authMidd
       'This replay artifact is internal-alpha evidence only and does not clear regulated claims.',
     ],
   });
+});
+
+app.get('/api/projects/:name/evidence/:evidenceId/openclaw/sam31/approval-upload/gate-validation-packet', authMiddleware, (req, res) => {
+  try {
+    return res.json(buildHalofireSam31ApprovalUploadGateValidationPacket(req.params.name, req.params.evidenceId));
+  } catch (err) {
+    return res.status(err.httpStatus || 400).json({ error: err.message });
+  }
 });
 
 app.get('/api/projects/:name/evidence/:evidenceId/openclaw/sam31/actual-value-handoff', authMiddleware, (req, res) => {
@@ -5546,6 +5555,7 @@ const HALOFIRE_SAM31_CONSUMER_INTAKE_SMOKE_FOLLOWUP_REVIEW_DECISION_TYPE = 'halo
 const HALOFIRE_SAM31_CONSUMER_INTAKE_SMOKE_FOLLOWUP_RESOLVER_QUEUE_ITEM_TYPE = 'halofire.sam31_consumer_intake_smoke_followup_resolver_queue_item.v1';
 const HALOFIRE_SAM31_APPROVAL_UPLOAD_RESOLVER_ROW_TYPE = 'halofire.sam31_approval_upload_resolver_row.v1';
 const HALOFIRE_SAM31_APPROVAL_UPLOAD_INTAKE_TYPE = 'halofire.sam31_approval_upload_intake.v1';
+const HALOFIRE_SAM31_APPROVAL_UPLOAD_GATE_VALIDATION_PACKET_TYPE = 'halofire.sam31_approval_upload_gate_validation_packet.v1';
 const HALOFIRE_SAM31_APPROVAL_UPLOAD_MISSING_CODES = Object.freeze({
   professional: 'HALOFIRE_SAM31_PROFESSIONAL_APPROVAL_UPLOAD_MISSING',
   ahj: 'HALOFIRE_SAM31_AHJ_APPROVAL_UPLOAD_MISSING',
@@ -9015,6 +9025,16 @@ function latestHalofireSam31ApprovalUploadIntakeEvidence(projectName, sourceEvid
   return [...latestByPacketReviewAndCode.values()];
 }
 
+function halofireSam31ApprovalUploadGateValidationPacketAction(projectName, evidenceId) {
+  if (!Number.isFinite(Number(evidenceId)) || Number(evidenceId) <= 0) return null;
+  return {
+    method: 'GET',
+    href: `/api/projects/${encodeURIComponent(projectName)}/evidence/${encodeURIComponent(evidenceId)}/openclaw/sam31/approval-upload/gate-validation-packet`,
+    artifact_type: HALOFIRE_SAM31_APPROVAL_UPLOAD_GATE_VALIDATION_PACKET_TYPE,
+    claim_gate_effect: 'no_claims_cleared',
+  };
+}
+
 function halofireSam31ApprovalUploadIntakeSummary(uploadEvidence) {
   if (!uploadEvidence?.evidence || !uploadEvidence?.intake) return null;
   const { evidence, intake } = uploadEvidence;
@@ -9040,8 +9060,126 @@ function halofireSam31ApprovalUploadIntakeSummary(uploadEvidence) {
     uploaded_at: intake.uploaded_at,
     signoff: intake.signoff || null,
     gate_validation_action: intake.gate_validation_action || null,
+    gate_validation_packet_action: halofireSam31ApprovalUploadGateValidationPacketAction(evidence.project_name, evidence.id),
     use_for_claims: false,
     claim_gate_effect: intake.claim_gate_effect || 'no_claims_cleared',
+  };
+}
+
+function buildHalofireSam31ApprovalUploadGateValidationPacket(projectName, evidenceId) {
+  const uploadEvidenceId = Number(evidenceId);
+  if (!Number.isSafeInteger(uploadEvidenceId) || uploadEvidenceId <= 0) {
+    const e = new Error('A positive SAM31 approval upload evidence id is required');
+    e.httpStatus = 400;
+    throw e;
+  }
+  const evidence = db
+    .prepare('SELECT * FROM project_evidence WHERE id = ? AND project_name = ?')
+    .get(uploadEvidenceId, projectName);
+  const intake = halofireSam31ApprovalUploadIntakeFromEvidence(evidence);
+  if (!evidence || !intake) {
+    const e = new Error('SAM31 approval upload intake evidence not found');
+    e.httpStatus = 404;
+    throw e;
+  }
+  const gateCode = intake.gate_code || halofireSam31ApprovalUploadGateCode(intake.target_approval_lane);
+  const gate = gateCode
+    ? db.prepare('SELECT * FROM claim_gates WHERE project_name = ? AND code = ?').get(projectName, gateCode)
+    : null;
+  const resolveRoute = gateCode
+    ? `/api/projects/${encodeURIComponent(projectName)}/claim-gates/${encodeURIComponent(gateCode)}/resolve`
+    : null;
+  const signoff = intake.signoff || {};
+  const hasStructuredSignoff = Boolean(signoff.reviewer_name && signoff.reviewer_title && signoff.signed_at);
+  const sourceRefs = uniqueByJson([
+    ...(Array.isArray(intake.source_refs) ? intake.source_refs : []),
+    {
+      evidence_type: evidence.evidence_type,
+      evidence_id: evidence.id,
+      source_ref: evidence.source_ref,
+      source_file: evidence.source_file,
+      status: evidence.status,
+      claim_gate_effect: 'no_claims_cleared',
+    },
+    intake.source_section_to_artifacts_consumer_intake_smoke_evidence_id ? {
+      evidence_type: 'openclaw_sam31_section_to_artifacts_consumer_intake_smoke',
+      evidence_id: intake.source_section_to_artifacts_consumer_intake_smoke_evidence_id,
+    } : null,
+    intake.source_packet_review_decision_evidence_id ? {
+      evidence_type: 'halofire_sam31_sprinkler_followup_packet_review_decision',
+      evidence_id: intake.source_packet_review_decision_evidence_id,
+    } : null,
+  ].filter(Boolean));
+  return {
+    artifact_type: HALOFIRE_SAM31_APPROVAL_UPLOAD_GATE_VALIDATION_PACKET_TYPE,
+    status: intake.status || 'uploaded_pending_gate_validation',
+    project_name: projectName,
+    generated_at: new Date().toISOString(),
+    download_name: `${slugForDownloadName(projectName)}-sam31-approval-upload-${uploadEvidenceId}-gate-validation-packet.json`,
+    approval_upload_evidence_id: evidence.id,
+    approval_upload_artifact_type: intake.artifact_type || HALOFIRE_SAM31_APPROVAL_UPLOAD_INTAKE_TYPE,
+    evidence_type: evidence.evidence_type,
+    evidence_status: evidence.status,
+    source_ref: evidence.source_ref,
+    source_file: evidence.source_file,
+    code: intake.code,
+    target_approval_lane: intake.target_approval_lane,
+    required_evidence_type: intake.required_evidence_type,
+    gate_code: gateCode,
+    gate_status: gate?.status || 'blocked',
+    resolve_route: resolveRoute,
+    resolve_action: resolveRoute ? {
+      method: 'POST',
+      href: resolveRoute,
+      request_body: { evidence_id: evidence.id },
+    } : null,
+    source_packet_review_decision_evidence_id: intake.source_packet_review_decision_evidence_id,
+    source_followup_decision_evidence_id: intake.source_followup_decision_evidence_id,
+    source_pdf_boundary_evidence_id: intake.source_pdf_boundary_evidence_id || null,
+    source_section_to_artifacts_consumer_intake_smoke_evidence_id: intake.source_section_to_artifacts_consumer_intake_smoke_evidence_id || null,
+    source_openclaw_sam31_consumer_review_evidence_id: intake.source_openclaw_sam31_consumer_review_evidence_id || null,
+    source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id: intake.source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id || null,
+    source_halofire_sam31_sprinkler_review_decision_evidence_id: intake.source_halofire_sam31_sprinkler_review_decision_evidence_id || null,
+    packet_index: intake.packet_index,
+    target_packet_lane: intake.target_packet_lane || null,
+    source_refs: sourceRefs,
+    signoff: intake.signoff || null,
+    validation_steps: [
+      {
+        code: 'approval_upload_evidence_present',
+        status: evidence.status === 'present' ? 'satisfied' : 'blocked',
+        evidence_id: evidence.id,
+      },
+      {
+        code: 'signed_reviewer_metadata_present',
+        status: hasStructuredSignoff ? 'satisfied' : 'blocked',
+        required_fields: ['reviewer_name', 'reviewer_title', 'signed_at'],
+      },
+      {
+        code: 'explicit_claim_gate_resolve_required',
+        status: gate?.status === 'cleared' ? 'resolved' : 'pending',
+        action: resolveRoute,
+        request_body: { evidence_id: evidence.id },
+      },
+    ],
+    blocked_claims: uniqueStrings([
+      ...(Array.isArray(intake.blocked_claims) ? intake.blocked_claims : []),
+      'permit_ready',
+      'fabrication_ready',
+      'AHJ_approval',
+      'professional_approval',
+      'manufacturer_exact',
+      'AutoSprink_parity',
+      'engineering_grade',
+    ]),
+    use_for_claims: false,
+    claim_gate_effect: 'no_claims_cleared',
+    no_claim_gates_cleared: true,
+    limitations: uniqueStrings([
+      ...(Array.isArray(intake.limitations) ? intake.limitations : []),
+      'This packet validates that uploaded evidence is eligible for an explicit claim-gate resolve action.',
+      'Reading this packet, or uploading evidence, does not clear any regulated claim by itself.',
+    ]),
   };
 }
 
@@ -16259,6 +16397,7 @@ app.post('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/openclaw
         ...intake.gate_validation_action,
         request_body: { evidence_id: result.lastInsertRowid },
       } : null,
+      gate_validation_packet_action: halofireSam31ApprovalUploadGateValidationPacketAction(projectName, result.lastInsertRowid),
     };
     return res.status(201).json({
       id: result.lastInsertRowid,

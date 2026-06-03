@@ -255,6 +255,11 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toContain('sam31_approval_upload_resolver_rows');
     expect(html).toContain('sam31_approval_uploads_recorded');
     expect(html).toContain('approval uploads recorded pending gate validation');
+    expect(html).toContain('gate_validation_packet_action');
+    expect(html).toContain('Download SAM31 approval gate validation packet');
+    expect(html).toContain('downloadHalofireSam31ApprovalUploadGateValidationPacket');
+    expect(html).toContain('data-sam31-approval-upload-gate-validation-packet-href');
+    expect(html).toContain('halofire.sam31_approval_upload_gate_validation_packet.v1');
     expect(html).toContain('halofire.sam31_obstruction_clash_packet.v1');
     expect(html).toContain('halofire.sam31_sleeve_firestop_packet.v1');
     expect(html).toContain('halofire.sam31_sprinkler_followup_packet_review_decision.v1');
