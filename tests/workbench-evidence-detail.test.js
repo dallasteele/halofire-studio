@@ -496,5 +496,10 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toContain('floor_plan_override_action');
     expect(html).toContain('Run replay bid with floor-plan override');
     expect(html).toContain('halofire.room_boundary_floor_plan_override.v1');
+    expect(html).toContain('/floor-plan-override-action');
+    expect(html).toContain('Download floor-plan override action');
+    expect(html).toContain('downloadRoomBoundaryFloorPlanOverrideAction');
+    expect(html).toContain('data-floor-plan-override-action-evidence-id');
+    expect(html).toContain('halofire.room_boundary_floor_plan_override_action_packet.v1');
   });
 });

@@ -1348,6 +1348,60 @@ describe('PDF page inspection API', () => {
       }),
     ]));
 
+    const overrideActionRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${saved.evidence.id}/floor-plan-override-action`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(overrideActionRes.status).toBe(200);
+    const overrideActionPacket = await overrideActionRes.json();
+    expect(overrideActionPacket).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.room_boundary_floor_plan_override_action_packet.v1',
+      status: 'ready_for_internal_alpha_replay',
+      method: 'POST',
+      action_href: `/api/projects/${encodeURIComponent(COOPERATIVE_1881_PROJECT_NAME)}/sprinkler-bid`,
+      source_evidence_id: saved.evidence.id,
+      source_review_evidence_id: reviewBody.evidence.id,
+      floor_plan_override_source: 'latest_employee_review_packet',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(overrideActionPacket.download_name).toContain('floor-plan-override-action');
+    expect(overrideActionPacket.floor_plan_override).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.room_boundary_floor_plan_override.v1',
+      status: 'internal_alpha_floor_plan_override',
+      source_evidence_id: saved.evidence.id,
+      source_review_evidence_id: reviewBody.evidence.id,
+      corrected_room_polygon_count: 1,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(overrideActionPacket.request_body).toEqual(expect.objectContaining({
+      room_boundary_source: 'latest_employee_review_packet',
+      source_evidence_id: saved.evidence.id,
+      source_review_evidence_id: reviewBody.evidence.id,
+      floor_plan_override: expect.objectContaining({
+        artifact_type: 'halofire.room_boundary_floor_plan_override.v1',
+      }),
+      corrected_room_polygons: expect.arrayContaining([
+        expect.objectContaining({
+          room_id: 'level-1-corridor-a',
+          floor_plan_override_source: 'latest_employee_review_packet',
+          use_for_claims: false,
+          claim_gate_effect: 'no_claims_cleared',
+        }),
+      ]),
+    }));
+    expect(overrideActionPacket.blocked_claims).toEqual(expect.arrayContaining([
+      'geometry_accuracy',
+      'drawing_scale_verified',
+      'permit_ready',
+      'fabrication_ready',
+      'AHJ_approval',
+      'professional_approval',
+      'AutoSprink_parity',
+      'engineering_grade',
+    ]));
+
     const replayPacket = await (await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${saved.evidence.id}/replay-input`, {
       headers: { Authorization: `Bearer ${token}` },
     })).json();

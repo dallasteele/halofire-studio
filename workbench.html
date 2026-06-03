@@ -3061,7 +3061,7 @@ function resolverQueueDetail(item, index = '') {
       ${renderHalofireSam31SectioningDownstreamResolverQueue(sam31_sectioning_downstream_resolver_queue_items, item.evidence_id, latest_halofire_sam31_sectioning_downstream_resolver_packet)}
       ${renderHalofireSam31SprinklerReviewQueue(sam31_sprinkler_review_queue_items, item.evidence_id)}
       ${renderHalofireSam31SprinklerPreliminaryReplayQueue(sam31_sprinkler_preliminary_replay_queue_items, item.evidence_id)}
-      ${floor_plan_override_action ? `<div class="claims">floor_plan_override_status ${escapeHtml(item.floor_plan_override_status || floor_plan_override_action.floor_plan_override_status || 'internal_alpha_floor_plan_override_ready')} - floor_plan_override_source ${escapeHtml(item.floor_plan_override_source || floor_plan_override_action.room_boundary_source || 'latest_employee_review_packet')} - floor_plan_override_action ${escapeHtml(floor_plan_override_action.label || 'Run replay bid with floor-plan override')}<br><span class="chip">${escapeHtml(floor_plan_override_action.artifact_type || floor_plan_override?.artifact_type || 'halofire.room_boundary_floor_plan_override.v1')}</span><span class="chip">source_evidence_id ${escapeHtml(floor_plan_override_action.source_evidence_id || item.evidence_id || 'missing')}</span><span class="chip">source_review_evidence_id ${escapeHtml(floor_plan_override_action.source_review_evidence_id || 'missing')}</span><span class="chip">source_sam31_evidence_id ${escapeHtml(floor_plan_override_action.source_sam31_evidence_id || 'missing')}</span><span class="chip">corrected_room_polygon_count ${escapeHtml(floor_plan_override_action.corrected_room_polygon_count ?? item.corrected_room_polygon_count ?? 0)}</span><br><span class="muted" style="font-size:10px">use_for_claims false - claim_gate_effect ${escapeHtml(floor_plan_override_action.claim_gate_effect || 'no_claims_cleared')} - no_claim_gates_cleared ${escapeHtml(floor_plan_override_action.no_claim_gates_cleared === false ? 'false' : 'true')} - geometry_accuracy/drawing_scale_verified/permit_ready/fabrication_ready remain blocked</span></div>` : ''}
+      ${floor_plan_override_action ? `<div class="claims">floor_plan_override_status ${escapeHtml(item.floor_plan_override_status || floor_plan_override_action.floor_plan_override_status || 'internal_alpha_floor_plan_override_ready')} - floor_plan_override_source ${escapeHtml(item.floor_plan_override_source || floor_plan_override_action.room_boundary_source || 'latest_employee_review_packet')} - floor_plan_override_action ${escapeHtml(floor_plan_override_action.label || 'Run replay bid with floor-plan override')}<br><span class="chip">${escapeHtml(floor_plan_override_action.artifact_type || floor_plan_override?.artifact_type || 'halofire.room_boundary_floor_plan_override.v1')}</span><span class="chip">source_evidence_id ${escapeHtml(floor_plan_override_action.source_evidence_id || item.evidence_id || 'missing')}</span><span class="chip">source_review_evidence_id ${escapeHtml(floor_plan_override_action.source_review_evidence_id || 'missing')}</span><span class="chip">source_sam31_evidence_id ${escapeHtml(floor_plan_override_action.source_sam31_evidence_id || 'missing')}</span><span class="chip">corrected_room_polygon_count ${escapeHtml(floor_plan_override_action.corrected_room_polygon_count ?? item.corrected_room_polygon_count ?? 0)}</span><br><button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0f766e" data-floor-plan-override-action-evidence-id="${escapeHtml(item.evidence_id)}">Download floor-plan override action</button><br><span class="muted" style="font-size:10px">halofire.room_boundary_floor_plan_override_action_packet.v1 - /floor-plan-override-action - use_for_claims false - claim_gate_effect ${escapeHtml(floor_plan_override_action.claim_gate_effect || 'no_claims_cleared')} - no_claim_gates_cleared ${escapeHtml(floor_plan_override_action.no_claim_gates_cleared === false ? 'false' : 'true')} - geometry_accuracy/drawing_scale_verified/permit_ready/fabrication_ready remain blocked</span></div>` : ''}
       ${replay_review ? `<div class="claims">Review: ${escapeHtml(replay_review.review_decision)} by ${escapeHtml(replay_review.reviewer_name || 'unknown')} - source ${escapeHtml(review_source || 'missing')} - issues ${escapeHtml(replay_review.issue_count)} - corrected polygons ${escapeHtml(replay_review.corrected_room_polygon_count)} - ${escapeHtml(replay_review.marked_up_plan_ref || '')}</div>` : ''}
       ${latest_sam31_employee_replacement ? `<div class="claims">Employee SAM31 replacements: evidence #${escapeHtml(latest_sam31_employee_replacement.evidence_id)} - source_sam31_evidence_id ${escapeHtml(latest_sam31_employee_replacement.source_sam31_evidence_id)} - ${escapeHtml(latest_sam31_employee_replacement.replacement_ref || 'missing')} - ${escapeHtml(latest_sam31_employee_replacement.claim_gate_effect || 'no_claims_cleared')}<br>Replaced fields: ${(Array.isArray(latest_sam31_employee_replacement.replaced_fields) ? latest_sam31_employee_replacement.replaced_fields : []).map((field) => `<span class="chip">${escapeHtml(field)}</span>`).join('')}<br>Replacement value preview: ${escapeHtml(JSON.stringify(latest_sam31_employee_replacement.replacement_values || {}))}</div>` : ''}
       ${latest_sam31_visual_audit ? renderSam31PerceptionSummary(latest_sam31_visual_audit.openclaw_sam31_perception_packet, item.evidence_id) : ''}
@@ -3235,6 +3235,16 @@ async function downloadResolverReplayInput(evidenceId) {
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = packet.download_name || 'room-boundary-replay-input.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+async function downloadRoomBoundaryFloorPlanOverrideAction(evidenceId) {
+  const packet = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/resolver-packets/pdf-boundary/' + encodeURIComponent(evidenceId) + '/floor-plan-override-action');
+  const blob = new Blob([JSON.stringify(packet, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = packet.download_name || 'room-boundary-floor-plan-override-action.json';
   a.click();
   URL.revokeObjectURL(a.href);
 }
@@ -4205,6 +4215,9 @@ async function refreshResolverQueue() {
   });
   document.querySelectorAll('[data-resolver-replay-evidence-id]').forEach((button) => {
     button.onclick = () => downloadResolverReplayInput(button.dataset.resolverReplayEvidenceId);
+  });
+  document.querySelectorAll('[data-floor-plan-override-action-evidence-id]').forEach((button) => {
+    button.onclick = () => downloadRoomBoundaryFloorPlanOverrideAction(button.dataset.floorPlanOverrideActionEvidenceId);
   });
   document.querySelectorAll('[data-resolver-replay-bid-evidence-id]').forEach((button) => {
     button.onclick = () => runResolverReplayBid(button.dataset.resolverReplayBidEvidenceId);
