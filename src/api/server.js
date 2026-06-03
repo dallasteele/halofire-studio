@@ -1561,8 +1561,8 @@ function openClawSam31ActualValueServiceDescriptorAction(projectName, consumer, 
   };
 }
 
-function openClawSam31ActualValueResolverConsumerActions(projectName, item, contractEvidence = null, serviceDescriptorEvidence = null) {
-  return ['halo_fire', 'landscout', 'nameforge'].map((consumer) => ({
+function openClawSam31ActualValueResolverConsumerActions(projectName, item, contractEvidence = null, serviceDescriptorEvidence = null, sectionToArtifactsHandoff = null) {
+  const pollActions = ['halo_fire', 'landscout', 'nameforge'].map((consumer) => ({
     consumer,
     action: 'poll_actual_value_resolver_queue',
     method: 'GET',
@@ -1581,6 +1581,23 @@ function openClawSam31ActualValueResolverConsumerActions(projectName, item, cont
     use_for_claims: false,
     claim_gate_effect: 'no_claims_cleared',
   }));
+  if (!sectionToArtifactsHandoff) return pollActions;
+  const handoffActions = ['halo_fire', 'landscout', 'nameforge'].map((consumer) => ({
+    consumer,
+    action: 'post_section_to_artifacts_consumer_handoff',
+    method: 'POST',
+    href: `/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/section-to-artifacts-consumer-intake-smoke`,
+    consumes: 'openclaw.sam31.section_to_artifacts_consumer_handoff.v1',
+    produces: 'openclaw.sam31.section_to_artifacts_consumer_intake_smoke.v1',
+    source_openclaw_sam31_consumer_review_evidence_id: sectionToArtifactsHandoff.source_openclaw_sam31_consumer_review_evidence_id || item.source_openclaw_sam31_consumer_review_evidence_id,
+    source_sam31_actual_value_replacement_evidence_id: sectionToArtifactsHandoff.source_sam31_actual_value_replacement_evidence_id || null,
+    source_openclaw_sam31_section_to_artifacts_ref: sectionToArtifactsHandoff.source_openclaw_sam31_section_to_artifacts_ref || null,
+    observed_vector_overlay_count: Number(sectionToArtifactsHandoff.vector_overlay_count || 0) || 0,
+    observed_model_3d_candidate_count: Number(sectionToArtifactsHandoff.model_3d_candidate_count || 0) || 0,
+    use_for_claims: false,
+    claim_gate_effect: 'no_claims_cleared',
+  }));
+  return [...pollActions, ...handoffActions];
 }
 
 function openClawSam31ActualValueResolverConsumerPullEndpoints(projectName) {
@@ -1692,6 +1709,15 @@ function openClawSam31ActualValueServiceEndpoint(projectName, consumer) {
       consumes: 'halofire.sam31_actual_value_replacement_intake.v1',
       produces: 'halofire.sam31_actual_value_replacement_intake.v1',
       evidence_record_type: 'sam31_actual_value_replacement',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    },
+    section_to_artifacts_consumer_intake_smoke: {
+      method: 'POST',
+      href: `/api/projects/${encodedProjectName}/openclaw/sam31/section-to-artifacts-consumer-intake-smoke`,
+      consumes: 'openclaw.sam31.section_to_artifacts_consumer_handoff.v1',
+      produces: 'openclaw.sam31.section_to_artifacts_consumer_intake_smoke.v1',
+      evidence_record_type: 'openclaw_sam31_section_to_artifacts_consumer_intake_smoke',
       use_for_claims: false,
       claim_gate_effect: 'no_claims_cleared',
     },
@@ -1938,7 +1964,13 @@ function buildOpenClawSam31ActualValueResolverQueue(projectName, options = {}) {
         openclaw_sam31_section_to_artifacts_summary: latestReplacement?.openclaw_sam31_section_to_artifacts_summary || null,
         source_openclaw_sam31_section_to_artifacts_ref: latestReplacement?.openclaw_sam31_section_to_artifacts_summary?.section_to_artifacts_contract_ref || null,
         section_to_artifacts_consumer_handoff: sectionToArtifactsHandoff,
-        consumer_actions: openClawSam31ActualValueResolverConsumerActions(projectName, item, latestContractEvidence, itemServiceDescriptorEvidence),
+        consumer_actions: openClawSam31ActualValueResolverConsumerActions(
+          projectName,
+          item,
+          latestContractEvidence,
+          itemServiceDescriptorEvidence,
+          sectionToArtifactsHandoff,
+        ),
         use_for_claims: false,
         blocked_claims: Array.isArray(item.blocked_claims) ? item.blocked_claims : [],
         claim_gate_effect: 'no_claims_cleared',
@@ -2025,6 +2057,93 @@ function openClawSam31SectionToArtifactsConsumerHandoff(item, replacementEvidenc
     limitations: [
       'This handoff lets HaloFire, LandScout, and NameForge consume replacement-derived SAM31 vectors/models as review evidence.',
       'It does not clear regulated, survey-grade, brand-ready, production-ready, AHJ, professional, manufacturer, or AutoSprink claims.',
+    ],
+  };
+}
+
+function buildOpenClawSam31SectionToArtifactsConsumerIntakeSmoke(projectName, intake = {}, user = null) {
+  const consumer = String(intake.consumer || '').trim().toLowerCase();
+  const supportedConsumers = ['halo_fire', 'landscout', 'nameforge'];
+  if (!supportedConsumers.includes(consumer)) {
+    const err = new Error('consumer must be one of halo_fire, landscout, or nameforge');
+    err.httpStatus = 400;
+    throw err;
+  }
+  const sourceReplacementEvidenceId = Number(
+    intake.source_sam31_actual_value_replacement_evidence_id
+    || intake.source_actual_value_replacement_evidence_id
+    || intake.source_sam31_replacement_evidence_id
+    || 0,
+  ) || null;
+  const sourceReviewEvidenceId = Number(intake.source_openclaw_sam31_consumer_review_evidence_id || 0) || null;
+  if (!sourceReplacementEvidenceId && !sourceReviewEvidenceId) {
+    const err = new Error('source_sam31_actual_value_replacement_evidence_id or source_openclaw_sam31_consumer_review_evidence_id is required');
+    err.httpStatus = 400;
+    throw err;
+  }
+  const queue = buildOpenClawSam31ActualValueResolverQueue(projectName, { consumer });
+  const item = (Array.isArray(queue.items) ? queue.items : []).find((candidate) => {
+    const handoff = candidate.section_to_artifacts_consumer_handoff || null;
+    if (!handoff) return false;
+    if (sourceReplacementEvidenceId && Number(handoff.source_sam31_actual_value_replacement_evidence_id) !== sourceReplacementEvidenceId) return false;
+    if (sourceReviewEvidenceId && Number(handoff.source_openclaw_sam31_consumer_review_evidence_id) !== sourceReviewEvidenceId) return false;
+    return true;
+  }) || null;
+  if (!item) {
+    const err = new Error('SAM31 section-to-artifacts handoff was not found for the requested consumer/source evidence');
+    err.httpStatus = 404;
+    throw err;
+  }
+  const handoff = item.section_to_artifacts_consumer_handoff || null;
+  if (!handoff) {
+    const err = new Error('SAM31 section-to-artifacts handoff is missing for the requested resolver queue item');
+    err.httpStatus = 400;
+    throw err;
+  }
+  const evidenceSuffix = handoff.source_sam31_actual_value_replacement_evidence_id
+    || handoff.source_openclaw_sam31_consumer_review_evidence_id
+    || 'unknown';
+  const slug = projectName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'halofire-project';
+  return {
+    artifact_type: 'openclaw.sam31.section_to_artifacts_consumer_intake_smoke.v1',
+    status: 'consumer_handoff_observed',
+    project_name: projectName,
+    consumer,
+    consumer_adapter: `openclaw.sam31.consumer_review_queue.${consumer}.v1`,
+    source_runtime: 'sam-3.1+llm',
+    source_queue_item_id: item.id || null,
+    source_openclaw_sam31_consumer_review_evidence_id: handoff.source_openclaw_sam31_consumer_review_evidence_id || null,
+    source_sam31_actual_value_replacement_evidence_id: handoff.source_sam31_actual_value_replacement_evidence_id || null,
+    source_openclaw_sam31_section_to_artifacts_ref: handoff.source_openclaw_sam31_section_to_artifacts_ref || null,
+    source_ref: `openclaw://sam31/section-to-artifacts-consumer-intake-smoke/${consumer}/${evidenceSuffix}`,
+    source_file: `${slug}-sam31-section-to-artifacts-consumer-intake-smoke-${consumer}-${evidenceSuffix}.json`,
+    posted_handoff: jsonClone(handoff),
+    observed_vector_overlay_count: Number(handoff.vector_overlay_count || 0) || 0,
+    observed_model_3d_candidate_count: Number(handoff.model_3d_candidate_count || 0) || 0,
+    observed_segment_count: Number(handoff.segment_count || 0) || 0,
+    observed_object_hypothesis_count: Number(handoff.object_hypothesis_count || 0) || 0,
+    supported_consumers: Array.isArray(handoff.supported_consumers) ? [...handoff.supported_consumers] : supportedConsumers,
+    supported_applications: Array.isArray(handoff.supported_applications) ? [...handoff.supported_applications] : [...SAM31_SUPPORTED_APPLICATIONS],
+    recorded_by: user?.username || user?.name || null,
+    recorded_at: new Date().toISOString(),
+    use_for_claims: false,
+    claim_gate_effect: 'no_claims_cleared',
+    no_claim_gates_cleared: true,
+    blocked_claims: uniqueStrings([
+      ...(Array.isArray(handoff.blocked_claims) ? handoff.blocked_claims : []),
+      'permit_ready',
+      'fabrication_ready',
+      'AHJ_approval',
+      'professional_approval',
+      'manufacturer_exact',
+      'AutoSprink_parity',
+      'survey_grade',
+      'brand_ready',
+      'production_ready',
+    ]),
+    limitations: [
+      'This smoke proves a downstream consumer adapter can read replacement-derived SAM31 section/vector/model counts.',
+      'It is not professional, AHJ, manufacturer, AutoSprink, permit, fabrication, survey-grade, brand, or production approval evidence.',
     ],
   };
 }
@@ -3009,6 +3128,39 @@ app.post('/api/projects/:name/openclaw/sam31/actual-value-replacements', authMid
       evidence_type: 'sam31_actual_value_replacement',
       status: 'present',
       ...intake,
+    });
+  } catch (err) {
+    return res.status(err.httpStatus || 400).json({ error: err.message });
+  }
+});
+
+app.post('/api/projects/:name/openclaw/sam31/section-to-artifacts-consumer-intake-smoke', authMiddleware, requireRole('admin'), (req, res) => {
+  try {
+    const projectName = req.params.name;
+    const smoke = buildOpenClawSam31SectionToArtifactsConsumerIntakeSmoke(projectName, req.body || {}, req.user);
+    const notes = {
+      kind: 'openclaw_sam31_section_to_artifacts_consumer_intake_smoke',
+      ...smoke,
+    };
+    const result = db
+      .prepare(`INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+                VALUES (?, ?, ?, ?, ?, ?)`)
+      .run(
+        projectName,
+        'openclaw_sam31_section_to_artifacts_consumer_intake_smoke',
+        smoke.source_file,
+        smoke.source_ref,
+        'present',
+        JSON.stringify(notes),
+      );
+    const evidenceRow = db.prepare('SELECT * FROM project_evidence WHERE id = ?').get(result.lastInsertRowid);
+    return res.status(201).json({
+      id: result.lastInsertRowid,
+      evidence_id: result.lastInsertRowid,
+      evidence_type: 'openclaw_sam31_section_to_artifacts_consumer_intake_smoke',
+      message: 'SAM31 section-to-artifacts consumer intake smoke recorded; claim gates remain blocked',
+      evidence: evidenceRow,
+      ...smoke,
     });
   } catch (err) {
     return res.status(err.httpStatus || 400).json({ error: err.message });
@@ -4501,6 +4653,17 @@ function localOpenClawSam31ToolDescriptor(projectName = null) {
           'source_openclaw_sam31_consumer_review_evidence_id',
           'source_ref',
         ],
+        supported_consumers: ['halo_fire', 'landscout', 'nameforge'],
+        temporary_value_policy: 'best_guess_until_employee_replaced',
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      },
+      section_to_artifacts_consumer_intake_smoke: {
+        method: 'POST',
+        href_template: '/api/projects/{projectName}/openclaw/sam31/section-to-artifacts-consumer-intake-smoke',
+        consumes: 'openclaw.sam31.section_to_artifacts_consumer_handoff.v1',
+        produces: 'openclaw.sam31.section_to_artifacts_consumer_intake_smoke.v1',
+        evidence_record_type: 'openclaw_sam31_section_to_artifacts_consumer_intake_smoke',
         supported_consumers: ['halo_fire', 'landscout', 'nameforge'],
         temporary_value_policy: 'best_guess_until_employee_replaced',
         use_for_claims: false,

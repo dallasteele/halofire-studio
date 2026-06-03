@@ -2347,4 +2347,185 @@ describe('HaloFire settings + documentation upload/link API', () => {
       claim_gate_effect: 'no_claims_cleared',
     }));
   });
+
+  it('posts replacement-derived SAM31 section artifacts into LandScout and NameForge consumer intake smokes', async () => {
+    const token = await tokenFor('settings-admin', 'actual-test-password');
+    const projectName = 'Shared SAM31 Consumer Intake Smoke Project';
+
+    function insertConsumerReview(consumer, evidenceId) {
+      const db = new Database(dbPath);
+      const result = db.prepare(
+        `INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+      ).run(
+        projectName,
+        'openclaw_sam31_consumer_review',
+        'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx',
+        `${consumer}://sam31/reviews/shared-section-artifacts.json`,
+        'present',
+        JSON.stringify({
+          kind: 'openclaw_sam31_consumer_review',
+          review: {
+            artifact_type: 'openclaw.sam31.consumer_review_task_decision.v1',
+            source_application: 'halo_fire',
+            source_pdf_boundary_evidence_id: evidenceId + 100,
+            source_openclaw_sam31_consumer_smoke_evidence_id: evidenceId + 200,
+            consumer,
+            review_decision: 'replaced',
+            accepted_queue_id: `section-artifacts-${consumer}`,
+            persisted_review_packet_ref: `openclaw://${consumer}/sam31/product-review/shared-section-artifacts`,
+            replacement_ref: `${consumer}://sam31/reviews/shared-section-artifacts.json`,
+            replacement_values: {
+              sections: [{ id: `section-${consumer}`, semantic_label: `temporary_${consumer}_zone` }],
+              object_hypotheses: [{ id: `object:${consumer}`, segment_id: `section-${consumer}` }],
+              vector_overlays: [{ id: `vector:${consumer}` }],
+              model_3d_candidates: [{ id: `model3d:${consumer}` }],
+              source_ref: `${consumer}://sam31/temporary/shared-section-artifacts`,
+            },
+            blocked_claims: consumer === 'landscout' ? ['survey_grade', 'production_ready'] : ['brand_ready', 'production_ready'],
+            use_for_claims: false,
+            no_claim_gates_cleared: true,
+            claim_gate_effect: 'no_claims_cleared',
+          },
+        }),
+      );
+      db.close();
+      return Number(result.lastInsertRowid);
+    }
+
+    async function postReplacement(consumer, reviewEvidenceId) {
+      const res = await request(`/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/actual-value-replacements`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          source_openclaw_sam31_consumer_review_evidence_id: reviewEvidenceId,
+          source_pdf_boundary_evidence_id: reviewEvidenceId + 100,
+          source_openclaw_sam31_consumer_smoke_evidence_id: reviewEvidenceId + 200,
+          consumer,
+          source_file: 'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx',
+          source_ref: `Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#${consumer}!A1`,
+          replacement_values_source_ref: `Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#${consumer}!A1`,
+          source_refs: [
+            `Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#${consumer}!A1`,
+            `${consumer}://employee/reviewed/shared-section.png`,
+          ],
+          replacement_values: {
+            sections: [{
+              id: `section-${consumer}`,
+              semantic_label: `reviewed_${consumer}_zone`,
+              polygon: [[0, 0], [10, 0], [10, 8], [0, 8], [0, 0]],
+              confidence: 0.76,
+            }],
+            object_hypotheses: [{
+              id: `object:${consumer}`,
+              segment_id: `section-${consumer}`,
+              semantic_label: `reviewed_${consumer}_asset`,
+              confidence: 0.73,
+            }],
+            llm_observations: [{
+              id: `llm:${consumer}`,
+              segment_id: `section-${consumer}`,
+              object_hypothesis_id: `object:${consumer}`,
+              semantic_label: `reviewed_${consumer}_asset`,
+              confidence: 0.7,
+            }],
+            vector_overlays: [{
+              id: `vector:${consumer}`,
+              segment_id: `section-${consumer}`,
+              svg_path: 'M 0 0 L 10 0 L 10 8 L 0 8 Z',
+              source_refs: [`${consumer}://employee/vector/shared-section.svg`],
+            }],
+            model_3d_candidates: [{
+              id: `model3d:${consumer}`,
+              segment_id: `section-${consumer}`,
+              primitive: `reviewed_${consumer}_extrusion`,
+              source_refs: [`${consumer}://employee/model/shared-section.glb`],
+            }],
+          },
+        }),
+      });
+      expect(res.status).toBe(201);
+      return res.json();
+    }
+
+    const consumers = ['landscout', 'nameforge'];
+    const replacements = {};
+    for (const [index, consumer] of consumers.entries()) {
+      const reviewEvidenceId = insertConsumerReview(consumer, index + 700);
+      replacements[consumer] = await postReplacement(consumer, reviewEvidenceId);
+    }
+
+    for (const consumer of consumers) {
+      const queueRes = await request(`/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/actual-value-resolver-queue?consumer=${consumer}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      expect(queueRes.status).toBe(200);
+      const queue = await queueRes.json();
+      expect(queue.items).toHaveLength(1);
+      const item = queue.items[0];
+      expect(item.section_to_artifacts_consumer_handoff).toEqual(expect.objectContaining({
+        artifact_type: 'openclaw.sam31.section_to_artifacts_consumer_handoff.v1',
+        source_sam31_actual_value_replacement_evidence_id: replacements[consumer].evidence_id,
+        vector_overlay_count: 1,
+        model_3d_candidate_count: 1,
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }));
+      expect(item.consumer_actions).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          consumer,
+          action: 'post_section_to_artifacts_consumer_handoff',
+          method: 'POST',
+          href: `/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/section-to-artifacts-consumer-intake-smoke`,
+          consumes: 'openclaw.sam31.section_to_artifacts_consumer_handoff.v1',
+          produces: 'openclaw.sam31.section_to_artifacts_consumer_intake_smoke.v1',
+          source_sam31_actual_value_replacement_evidence_id: replacements[consumer].evidence_id,
+          use_for_claims: false,
+          claim_gate_effect: 'no_claims_cleared',
+        }),
+      ]));
+
+      const smokeRes = await request(`/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/section-to-artifacts-consumer-intake-smoke`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          consumer,
+          source_sam31_actual_value_replacement_evidence_id: replacements[consumer].evidence_id,
+        }),
+      });
+      expect(smokeRes.status).toBe(201);
+      const smoke = await smokeRes.json();
+      expect(smoke).toEqual(expect.objectContaining({
+        evidence_type: 'openclaw_sam31_section_to_artifacts_consumer_intake_smoke',
+        artifact_type: 'openclaw.sam31.section_to_artifacts_consumer_intake_smoke.v1',
+        consumer,
+        consumer_adapter: `openclaw.sam31.consumer_review_queue.${consumer}.v1`,
+        observed_vector_overlay_count: 1,
+        observed_model_3d_candidate_count: 1,
+        observed_segment_count: 1,
+        observed_object_hypothesis_count: 1,
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+        no_claim_gates_cleared: true,
+      }));
+      expect(smoke.posted_handoff.supported_consumers).toEqual(expect.arrayContaining([
+        'halo_fire',
+        'landscout',
+        'nameforge',
+      ]));
+    }
+
+    const tool = await (await request('/api/openclaw/sam31/tool', {
+      headers: { Authorization: `Bearer ${token}` },
+    })).json();
+    expect(tool.halofire_api_actions.section_to_artifacts_consumer_intake_smoke).toEqual(expect.objectContaining({
+      method: 'POST',
+      href_template: '/api/projects/{projectName}/openclaw/sam31/section-to-artifacts-consumer-intake-smoke',
+      consumes: 'openclaw.sam31.section_to_artifacts_consumer_handoff.v1',
+      produces: 'openclaw.sam31.section_to_artifacts_consumer_intake_smoke.v1',
+      evidence_record_type: 'openclaw_sam31_section_to_artifacts_consumer_intake_smoke',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+  });
 });
