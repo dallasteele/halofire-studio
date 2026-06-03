@@ -71,6 +71,13 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toContain('selected_sheet_ref');
     expect(html).toContain('selected_scale_ref');
     expect(html).toContain('selected_boundary_candidate_ref');
+    expect(html).toContain('Save employee PDF boundary decision');
+    expect(html).toContain('data-pdf-boundary-decision-save-evidence-id');
+    expect(html).toContain('savePdfBoundaryEmployeeDecision');
+    expect(html).toContain('/pdf-boundary-decision');
+    expect(html).toContain('selectedSheetRef-');
+    expect(html).toContain('selectedScaleRef-');
+    expect(html).toContain('selectedBoundaryCandidateRef-');
   });
 
   it('surfaces supplied bid-truth downstream defaults on sprinkler bid results without clearing claims', async () => {

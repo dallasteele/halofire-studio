@@ -2955,6 +2955,16 @@ function renderSuppliedDocumentBidTruth(item, defaults, acceptable, claims, acti
     </div>`;
 }
 
+function renderPdfBoundaryEmployeeDecisionSavePanel(item, defaults, employeeDecision) {
+  if (!item?.evidence_id) return '';
+  const evidenceId = escapeHtml(item.evidence_id);
+  const candidate = defaults.candidate && typeof defaults.candidate === 'object' ? defaults.candidate : {};
+  const selectedSheetRef = employeeDecision?.selected_sheet_ref || defaults.source_ref || item.source_ref || '';
+  const selectedScaleRef = employeeDecision?.selected_scale_ref || `operator-scale:${defaults.pdfScale || ''}`;
+  const selectedBoundaryCandidateRef = employeeDecision?.selected_boundary_candidate_ref || candidate.id || candidate.ref || '';
+  return `<details style="margin-top:7px"><summary class="muted" style="cursor:pointer">Save employee PDF boundary decision</summary><div style="display:grid;gap:6px;margin-top:7px"><input id="selectedSheetRef-${evidenceId}" value="${escapeHtml(selectedSheetRef)}" placeholder="selected_sheet_ref" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px"><input id="selectedScaleRef-${evidenceId}" value="${escapeHtml(selectedScaleRef)}" placeholder="selected_scale_ref" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px"><input id="selectedBoundaryCandidateRef-${evidenceId}" value="${escapeHtml(selectedBoundaryCandidateRef)}" placeholder="selected_boundary_candidate_ref" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px"><textarea id="pdfBoundaryDecisionNotes-${evidenceId}" placeholder="employee decision notes" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px;height:44px"></textarea><button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#4338ca" data-pdf-boundary-decision-save-evidence-id="${evidenceId}">Save employee PDF boundary decision</button><div class="muted" id="pdfBoundaryDecisionStatus-${evidenceId}" style="font-size:11px"></div><span class="muted" style="font-size:10px">POST /pdf-boundary-decision - halofire.pdf_boundary_employee_decision.v1 - use_for_claims false - claim_gate_effect no_claims_cleared</span></div></details>`;
+}
+
 function resolverQueueDetail(item, index = '') {
   const defaults = item.input_defaults || {};
   const employee_decision = item.employee_decision || defaults.employeeDecision || null;
@@ -3092,6 +3102,7 @@ function resolverQueueDetail(item, index = '') {
       <div class="na">${escapeHtml(item.next_action)}</div>
       <div class="claims">Defaults: page ${escapeHtml(defaults.pdfPageIndex)} · scale ${escapeHtml(defaults.pdfScale)} ft/pt · ${escapeHtml(defaults.pdfExtract)}</div>
       ${employee_decision ? `<div class="claims">employee_decision <span class="chip">${escapeHtml(employee_decision.artifact_type || 'halofire.pdf_boundary_employee_decision.v1')}</span> <span class="chip">selected_sheet_ref ${escapeHtml(employee_decision.selected_sheet_ref || 'missing')}</span> <span class="chip">selected_scale_ref ${escapeHtml(employee_decision.selected_scale_ref || 'missing')}</span> <span class="chip">selected_boundary_candidate_ref ${escapeHtml(employee_decision.selected_boundary_candidate_ref || 'missing')}</span><br><span class="muted" style="font-size:10px">source_refs ${(Array.isArray(employee_decision.source_refs) ? employee_decision.source_refs : []).map((ref) => `<span class="chip">${escapeHtml(ref)}</span>`).join('') || '<span class="chip">source refs missing</span>'} - use_for_claims false - claim_gate_effect ${escapeHtml(employee_decision.claim_gate_effect || 'no_claims_cleared')}</span></div>` : ''}
+      ${renderPdfBoundaryEmployeeDecisionSavePanel(item, defaults, employee_decision)}
       ${renderOpenClawSam31BridgeStatus(openclaw_sam31_bridge_status)}
       ${renderSam31BridgeSmokeAction(item, sam31_bridge_smoke_action, latest_openclaw_sam31_bridge_smoke_artifact)}
       ${renderOpenClawSam31ExtrapolationAction(item, openclaw_sam31_extrapolation_action, latest_openclaw_sam31_extrapolation_artifact, latest_openclaw_sam31_extrapolation_review)}
@@ -3942,6 +3953,47 @@ function jsonObjectFromField(id) {
   return parsed;
 }
 
+async function savePdfBoundaryEmployeeDecision(evidenceId) {
+  const status = document.getElementById('pdfBoundaryDecisionStatus-' + evidenceId);
+  try {
+    const row = currentEvidenceRows.find((e) => String(e.id) === String(evidenceId));
+    if (!row) throw new Error('source PDF boundary evidence row not found');
+    const packet = row.decision && typeof row.decision === 'object'
+      ? { decision: row.decision }
+      : JSON.parse(row.notes || '{}');
+    const decision = packet.decision || {};
+    const candidate = decision.candidate && typeof decision.candidate === 'object' ? decision.candidate : null;
+    const body = {
+      pdfPageIndex: decision.pageIndex ?? 0,
+      pdfScale: decision.scale,
+      pdfExtract: decision.extractMode || candidate?.mode || 'outline',
+      candidate,
+      source_file: decision.sourceFile || row.source_file || null,
+      source_ref: decision.sourceRef || row.source_ref || '',
+      selected_sheet_ref: document.getElementById('selectedSheetRef-' + evidenceId)?.value.trim() || row.selected_sheet_ref || decision.sourceRef || row.source_ref || '',
+      selected_scale_ref: document.getElementById('selectedScaleRef-' + evidenceId)?.value.trim() || row.selected_scale_ref || `operator-scale:${decision.scale || ''}`,
+      selected_boundary_candidate_ref: document.getElementById('selectedBoundaryCandidateRef-' + evidenceId)?.value.trim() || row.selected_boundary_candidate_ref || candidate?.id || candidate?.ref || '',
+      source_refs: [
+        decision.sourceRef || row.source_ref || '',
+        document.getElementById('selectedSheetRef-' + evidenceId)?.value.trim() || row.selected_sheet_ref || '',
+        document.getElementById('selectedScaleRef-' + evidenceId)?.value.trim() || row.selected_scale_ref || '',
+        document.getElementById('selectedBoundaryCandidateRef-' + evidenceId)?.value.trim() || row.selected_boundary_candidate_ref || '',
+      ].filter(Boolean),
+      notes: document.getElementById('pdfBoundaryDecisionNotes-' + evidenceId)?.value.trim()
+        || 'Employee updated PDF boundary decision from workbench; claim gates remain blocked.',
+    };
+    const saved = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/pdf-boundary-decision', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    });
+    if (status) status.textContent = 'Saved employee PDF boundary decision evidence #' + saved.id + '; claims still blocked.';
+    await refreshEvidence();
+    await refreshResolverQueue();
+  } catch (err) {
+    if (status) status.textContent = 'Error: ' + err.message;
+  }
+}
+
 async function saveResolverPacketReview(evidenceId) {
   const status = document.getElementById('reviewStatus-' + evidenceId);
   try {
@@ -4267,6 +4319,9 @@ async function refreshResolverQueue() {
   });
   document.querySelectorAll('[data-resolver-review-evidence-id]').forEach((button) => {
     button.onclick = () => saveResolverPacketReview(button.dataset.resolverReviewEvidenceId);
+  });
+  document.querySelectorAll('[data-pdf-boundary-decision-save-evidence-id]').forEach((button) => {
+    button.onclick = () => savePdfBoundaryEmployeeDecision(button.dataset.pdfBoundaryDecisionSaveEvidenceId);
   });
   document.querySelectorAll('[data-sam31-visual-audit-save-evidence-id]').forEach((button) => {
     button.onclick = () => saveSam31VisualAuditResult(button.dataset.sam31VisualAuditSaveEvidenceId, button.dataset.sam31BridgeSmokeSourceEvidenceId || '');
