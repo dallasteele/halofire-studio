@@ -492,4 +492,90 @@ describe('HaloFire evidence wizard slice', () => {
     }));
     expect((await gate(token, 'PROFESSIONAL_REVIEW_MISSING')).status).toBe('cleared');
   });
+
+  it('keeps the resolved signed reviewer packet context reusable through the evidence-wizard payload and packet downloads', async () => {
+    const token = await tokenFor('wizard-admin', 'actual-test-password');
+
+    const recorded = await request(`${PROJECT_PATH}/evidence`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        evidence_type: 'ahj_approval',
+        target_gate_code: 'AHJ_APPROVAL_MISSING',
+        source_ref: 'Signed reviewer packet AHJ-1881-005',
+        source_file: 'ahj-approval-packet-5.pdf',
+        status: 'present',
+        notes: 'Reusable signed reviewer packet for Settings prefill.',
+        signoff: {
+          reviewer_name: 'Riley Stone',
+          reviewer_title: 'Fire Marshal',
+          signed_at: '2026-06-03T17:15:00.000Z',
+          organization: 'Salt Lake City',
+        },
+      }),
+    });
+    expect(recorded.status).toBe(201);
+    const recordedBody = await recorded.json();
+
+    const resolve = await request(`${PROJECT_PATH}/claim-gates/AHJ_APPROVAL_MISSING/resolve`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        evidence_id: recordedBody.id,
+      }),
+    });
+    expect(resolve.status).toBe(200);
+    const resolvedBody = await resolve.json();
+
+    const wizardRes = await request(`${PROJECT_PATH}/evidence-wizard`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(wizardRes.status).toBe(200);
+    const wizard = await wizardRes.json();
+    const gateRow = wizard.gates.find((item) => item.code === 'AHJ_APPROVAL_MISSING');
+    expect(gateRow).toBeTruthy();
+    const matchingRow = gateRow.matching_evidence.find((item) => item.id === recordedBody.id);
+    expect(matchingRow).toEqual(expect.objectContaining({
+      id: recordedBody.id,
+      target_gate_code: 'AHJ_APPROVAL_MISSING',
+      required_evidence_type: 'ahj_approval',
+      review_packet_href: `${PROJECT_PATH}/claim-gates/AHJ_APPROVAL_MISSING/review-packet`,
+      review_packet_artifact_type: 'halofire.claim_gate_review_packet.v1',
+      resolve_audit_packet_href: resolvedBody.resolve_audit_packet_href,
+      resolve_audit_packet_artifact_type: resolvedBody.resolve_audit_packet_artifact_type,
+      claim_gate_effect: 'gate_cleared',
+      user_notes: 'Reusable signed reviewer packet for Settings prefill.',
+      signoff: expect.objectContaining({
+        reviewer_name: 'Riley Stone',
+        reviewer_title: 'Fire Marshal',
+        signed_at: '2026-06-03T17:15:00.000Z',
+      }),
+    }));
+
+    const reviewPacketRes = await request(matchingRow.review_packet_href, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(reviewPacketRes.status).toBe(200);
+    const reviewPacket = await reviewPacketRes.json();
+    expect(reviewPacket).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.claim_gate_review_packet.v1',
+      project_name: HOME_DEPOT_PROJECT_NAME,
+      review_packet_href: matchingRow.review_packet_href,
+      required_evidence_type: matchingRow.required_evidence_type,
+    }));
+
+    const resolveAuditRes = await request(matchingRow.resolve_audit_packet_href, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(resolveAuditRes.status).toBe(200);
+    const resolveAudit = await resolveAuditRes.json();
+    expect(resolveAudit).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.claim_gate_resolve_audit_packet.v1',
+      gate_code: 'AHJ_APPROVAL_MISSING',
+      project_name: HOME_DEPOT_PROJECT_NAME,
+      resolved_evidence_id: recordedBody.id,
+      resolved_evidence_ref: 'Signed reviewer packet AHJ-1881-005',
+      claim_gate_effect: 'gate_cleared_after_explicit_signed_validation',
+    }));
+  });
 });
