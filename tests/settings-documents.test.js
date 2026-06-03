@@ -3192,6 +3192,42 @@ describe('HaloFire settings + documentation upload/link API', () => {
       no_claim_gates_cleared: true,
     }));
 
+    const reviewedSmokePacketReadbackRes = await request(`/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/section-to-artifacts-consumer-intake-smoke/${consumerIntakeSmokes.nameforge.evidence_id}/sprinkler-review-packet`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(reviewedSmokePacketReadbackRes.status).toBe(200);
+    const reviewedSmokePacketReadback = await reviewedSmokePacketReadbackRes.json();
+    expect(reviewedSmokePacketReadback.issue_seeds).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        issue_type: 'sam31_consumer_intake_obstruction_clash_review',
+        supported_sprinkler_review_lane: 'obstruction_or_clash_review',
+        source_section_to_artifacts_consumer_intake_smoke_evidence_id: consumerIntakeSmokes.nameforge.evidence_id,
+        latest_sam31_sprinkler_preliminary_replay_followup_decision: expect.objectContaining({
+          evidence_id: smokeReplayFollowup.id,
+          packet_queue_items: expect.arrayContaining([
+            expect.objectContaining({
+              artifact_type: 'halofire.sam31_obstruction_clash_packet_queue_item.v1',
+              status: 'internal_alpha_packet_review_recorded',
+              source_section_to_artifacts_consumer_intake_smoke_evidence_id: consumerIntakeSmokes.nameforge.evidence_id,
+              latest_packet_review_decision: expect.objectContaining({
+                evidence_id: smokePacketReview.id,
+                artifact_type: 'halofire.sam31_sprinkler_followup_packet_review_decision.v1',
+                source_packet_artifact_type: 'halofire.sam31_obstruction_clash_packet.v1',
+                source_followup_decision_evidence_id: smokeReplayFollowup.id,
+                source_section_to_artifacts_consumer_intake_smoke_evidence_id: consumerIntakeSmokes.nameforge.evidence_id,
+                source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id: followupReview.id,
+                source_halofire_sam31_sprinkler_review_decision_evidence_id: smokeSprinklerDecision.id,
+                packet_index: 0,
+                review_decision: 'accepted_internal_alpha_packet',
+                claim_gate_effect: 'no_claims_cleared',
+              }),
+            }),
+          ]),
+          claim_gate_effect: 'no_claims_cleared',
+        }),
+      }),
+    ]));
+
     const tool = await (await request('/api/openclaw/sam31/tool', {
       headers: { Authorization: `Bearer ${token}` },
     })).json();

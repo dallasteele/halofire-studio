@@ -2737,6 +2737,10 @@ function buildHalofireSam31ConsumerIntakeSmokeSprinklerReviewPacket(projectName,
       item,
     );
   }
+  const latestPacketReviewDecisionEvidences = latestHalofireSam31SprinklerFollowupPacketReviewDecisionEvidence(
+    projectName,
+    smokeEvidence.evidence_id,
+  );
   const issueSeeds = resolverRows.map((row, index) => ({
     artifact_type: HALOFIRE_SAM31_SPRINKLER_REVIEW_QUEUE_ITEM_TYPE,
     id: `${row.id || `consumer-smoke-followup:${reviewEvidence.evidence.id}`}:sprinkler:${index}`,
@@ -2775,6 +2779,7 @@ function buildHalofireSam31ConsumerIntakeSmokeSprinklerReviewPacket(projectName,
       latestPreliminaryReplayFollowupBySprinklerReviewEvidenceId.get(
         Number(latestDecisionByQueueKey.get(`${row.issue_type || ''}::${row.supported_sprinkler_review_lane || ''}`)?.evidence?.id),
       ),
+      latestPacketReviewDecisionEvidences,
     ),
     limitations: [
       'This sprinkler review queue item is sourced from employee-reviewed SAM31 consumer intake smoke follow-up rows.',
@@ -8766,7 +8771,11 @@ function latestHalofireSam31SprinklerFollowupPacketReviewDecisionEvidence(projec
   for (const row of rows) {
     const review = halofireSam31SprinklerFollowupPacketReviewDecisionFromEvidence(row);
     if (!review) continue;
-    if (sourceEvidenceId && Number(review.source_pdf_boundary_evidence_id) !== Number(sourceEvidenceId)) {
+    if (
+      sourceEvidenceId
+      && Number(review.source_pdf_boundary_evidence_id) !== Number(sourceEvidenceId)
+      && Number(review.source_section_to_artifacts_consumer_intake_smoke_evidence_id) !== Number(sourceEvidenceId)
+    ) {
       continue;
     }
     const key = `${review.source_followup_decision_evidence_id || ''}:${Number(review.packet_index) || 0}`;
@@ -8787,6 +8796,10 @@ function halofireSam31SprinklerFollowupPacketReviewSummary(packetReviewEvidence)
     artifact_type: review.artifact_type || HALOFIRE_SAM31_SPRINKLER_FOLLOWUP_PACKET_REVIEW_DECISION_TYPE,
     source_packet_artifact_type: review.source_packet_artifact_type,
     source_followup_decision_evidence_id: review.source_followup_decision_evidence_id,
+    source_pdf_boundary_evidence_id: review.source_pdf_boundary_evidence_id || null,
+    source_section_to_artifacts_consumer_intake_smoke_evidence_id: review.source_section_to_artifacts_consumer_intake_smoke_evidence_id || null,
+    source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id: review.source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id || null,
+    source_halofire_sam31_sprinkler_review_decision_evidence_id: review.source_halofire_sam31_sprinkler_review_decision_evidence_id || null,
     packet_index: review.packet_index,
     review_decision: review.review_decision,
     reviewer_name: review.reviewer_name,
