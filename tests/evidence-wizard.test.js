@@ -178,6 +178,9 @@ describe('HaloFire evidence wizard slice', () => {
     expect(html).toContain('id="wizLicenseId"');
     expect(html).toContain('requires_signoff_for');
     expect(html).toContain('evidence.signoff');
+    expect(html).toContain('Download resolve audit');
+    expect(html).toContain('downloadClaimGateResolveAuditPacket');
+    expect(html).toContain('halofire.claim_gate_resolve_audit_packet.v1');
   });
 
   it('records signed reviewer metadata on evidence-only submissions without clearing the gate', async () => {
@@ -322,6 +325,41 @@ describe('HaloFire evidence wizard slice', () => {
     expect(resolvedBody.cleared).toBe(true);
     expect(resolvedBody.resolved_evidence_id).toBe(recordedBody.id);
     expect(resolvedBody.resolved_evidence_ref).toBe('Signed reviewer packet PR-1881-002');
+    expect(resolvedBody.resolve_audit_packet_href).toBe(`${PROJECT_PATH}/claim-gates/PROFESSIONAL_REVIEW_MISSING/resolve-audit-packet`);
+    expect(resolvedBody.resolve_audit_packet_artifact_type).toBe('halofire.claim_gate_resolve_audit_packet.v1');
+
+    const auditRes = await request(`${PROJECT_PATH}/claim-gates/PROFESSIONAL_REVIEW_MISSING/resolve-audit-packet`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(auditRes.status).toBe(200);
+    const audit = await auditRes.json();
+    expect(audit).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.claim_gate_resolve_audit_packet.v1',
+      status: 'gate_cleared_with_explicit_signed_evidence',
+      project_name: HOME_DEPOT_PROJECT_NAME,
+      gate_code: 'PROFESSIONAL_REVIEW_MISSING',
+      resolved_evidence_id: recordedBody.id,
+      resolved_evidence_ref: 'Signed reviewer packet PR-1881-002',
+      resolved_by: 'wizard-admin',
+      claim_gate_effect: 'gate_cleared_after_explicit_signed_validation',
+    }));
+    expect(audit.claim_gate).toEqual(expect.objectContaining({
+      code: 'PROFESSIONAL_REVIEW_MISSING',
+      status: 'cleared',
+    }));
+    expect(audit.resolved_evidence).toEqual(expect.objectContaining({
+      id: recordedBody.id,
+      evidence_type: 'professional_review',
+      has_signed_reviewer_metadata: true,
+    }));
+    expect(audit.validation_steps).toEqual(expect.arrayContaining([
+      expect.objectContaining({ code: 'GATE_ALLOWED_EVIDENCE_TYPE_CONFIRMED', status: 'passed' }),
+      expect.objectContaining({ code: 'EVIDENCE_STATUS_PRESENT_CONFIRMED', status: 'passed' }),
+      expect.objectContaining({ code: 'SIGNED_REVIEWER_METADATA_CONFIRMED', status: 'passed' }),
+    ]));
+    expect(audit.limitations).toEqual(expect.arrayContaining([
+      expect.stringMatching(/does not clear unrelated/i),
+    ]));
 
     const afterRows = await (await request(`${PROJECT_PATH}/evidence`, {
       headers: { Authorization: `Bearer ${token}` },

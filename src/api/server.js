@@ -263,6 +263,7 @@ function initDatabase() {
   ensureColumn('claim_gates', 'resolved_by', 'TEXT');
   ensureColumn('claim_gates', 'resolved_at', 'DATETIME');
   ensureColumn('claim_gates', 'resolved_evidence_ref', 'TEXT');
+  ensureColumn('claim_gates', 'resolved_evidence_id', 'INTEGER');
 
   // Settings document upload/link records (T19).
   ensureColumn('settings_documents', 'mode', 'TEXT');
@@ -691,6 +692,125 @@ function buildClaimGateReviewPacket(projectName, gateCode) {
   };
 }
 
+function claimGateResolveAuditPacketHref(projectName, gateCode) {
+  return `/api/projects/${encodeURIComponent(projectName)}/claim-gates/${encodeURIComponent(gateCode)}/resolve-audit-packet`;
+}
+
+function claimGateResolveAuditPacketAction(projectName, gateCode) {
+  return {
+    artifact_type: 'halofire.claim_gate_resolve_audit_packet.v1',
+    href: claimGateResolveAuditPacketHref(projectName, gateCode),
+    download_name: `${slugForDownloadName(projectName)}-${String(gateCode || 'claim-gate').toLowerCase()}-resolve-audit-packet.json`,
+  };
+}
+
+function buildClaimGateResolveAuditPacket(projectName, gateCode) {
+  ensureProjectClaimGates(projectName);
+  const gate = db
+    .prepare('SELECT * FROM claim_gates WHERE project_name = ? AND code = ?')
+    .get(projectName, gateCode);
+  if (!gate) {
+    const e = new Error('Claim gate not found');
+    e.httpStatus = 404;
+    throw e;
+  }
+  if (gate.status !== 'cleared') {
+    const e = new Error('Claim gate has not been resolved yet');
+    e.httpStatus = 404;
+    throw e;
+  }
+  const resolvedEvidenceId = Number(gate.resolved_evidence_id || 0) || null;
+  const evidence = resolvedEvidenceId
+    ? db.prepare('SELECT * FROM project_evidence WHERE project_name = ? AND id = ?').get(projectName, resolvedEvidenceId)
+    : db.prepare(`SELECT * FROM project_evidence
+                  WHERE project_name = ? AND source_ref = ?
+                  ORDER BY created_at DESC, id DESC`)
+      .get(projectName, gate.resolved_evidence_ref || '');
+  if (!evidence) {
+    const e = new Error('Resolved evidence row not found for this gate');
+    e.httpStatus = 404;
+    throw e;
+  }
+  const rule = gateEvidenceRule(gateCode);
+  let parsedNotes = null;
+  try {
+    parsedNotes = evidence.notes ? JSON.parse(evidence.notes) : null;
+  } catch {
+    parsedNotes = null;
+  }
+  const requiresSignedReview = SIGNED_REVIEW_EVIDENCE_TYPES.has(evidence.evidence_type);
+  const hasSignedReview = hasStructuredSignedReviewerNotes(evidence);
+  const packetAction = claimGateResolveAuditPacketAction(projectName, gateCode);
+  return {
+    artifact_type: packetAction.artifact_type,
+    status: requiresSignedReview ? 'gate_cleared_with_explicit_signed_evidence' : 'gate_cleared_with_explicit_evidence',
+    project_name: projectName,
+    gate_code: gate.code,
+    generated_at: new Date().toISOString(),
+    download_name: packetAction.download_name,
+    claim_gate: {
+      code: gate.code,
+      status: gate.status,
+      severity: gate.severity,
+      missing_artifact: gate.missing_artifact,
+      acceptable_evidence: gate.acceptable_evidence,
+      blocked_claims: safeParseJsonArray(gate.blocked_claims),
+      next_action: gate.next_action,
+      resolved_by: gate.resolved_by || null,
+      resolved_at: gate.resolved_at || null,
+      resolved_evidence_id: evidence.id,
+      resolved_evidence_ref: gate.resolved_evidence_ref || evidence.source_ref || null,
+    },
+    resolved_by: gate.resolved_by || null,
+    resolved_at: gate.resolved_at || null,
+    resolved_evidence_id: evidence.id,
+    resolved_evidence_ref: gate.resolved_evidence_ref || evidence.source_ref || null,
+    resolved_evidence: {
+      id: evidence.id,
+      evidence_type: evidence.evidence_type,
+      source_file: evidence.source_file,
+      source_ref: evidence.source_ref,
+      status: evidence.status,
+      created_at: evidence.created_at,
+      has_signed_reviewer_metadata: hasSignedReview,
+      signoff: parsedNotes?.signoff || null,
+    },
+    validation_steps: [
+      {
+        code: 'GATE_ALLOWED_EVIDENCE_TYPE_CONFIRMED',
+        status: rule.allowedEvidenceTypes.includes(evidence.evidence_type) ? 'passed' : 'failed',
+        evidence_type: evidence.evidence_type,
+        allowed_evidence_types: [...rule.allowedEvidenceTypes],
+      },
+      {
+        code: 'EVIDENCE_STATUS_PRESENT_CONFIRMED',
+        status: evidence.status === 'present' ? 'passed' : 'failed',
+        evidence_status: evidence.status,
+      },
+      {
+        code: 'SIGNED_REVIEWER_METADATA_CONFIRMED',
+        status: requiresSignedReview ? (hasSignedReview ? 'passed' : 'failed') : 'not_required',
+        required: requiresSignedReview,
+      },
+    ],
+    source_refs: [
+      {
+        evidence_id: evidence.id,
+        evidence_type: evidence.evidence_type,
+        source_file: evidence.source_file,
+        source_ref: evidence.source_ref,
+      },
+    ],
+    claim_gate_effect: 'gate_cleared_after_explicit_signed_validation',
+    no_unrelated_claims_cleared: true,
+    limitations: [
+      'This packet proves only the explicit claim gate listed here was resolved.',
+      'It does not clear unrelated professional, AHJ, manufacturer, AutoSprink, permit-ready, fabrication-ready, or engineering-grade claims.',
+      'If the evidence is later found invalid, the gate must be re-blocked with a new audit record.',
+    ],
+  };
+}
+
 const DEFAULT_PROJECT_CLAIM_GATES = Object.freeze([
   Object.freeze({
     code: 'AUTOSPRINK_EVIDENCE_MISSING',
@@ -815,6 +935,14 @@ app.get('/api/projects/:name/evidence-wizard', authMiddleware, (req, res) => {
 app.get('/api/projects/:name/claim-gates/:code/review-packet', authMiddleware, (req, res) => {
   try {
     return res.json(buildClaimGateReviewPacket(req.params.name, req.params.code));
+  } catch (err) {
+    return res.status(err.httpStatus || 400).json({ error: err.message });
+  }
+});
+
+app.get('/api/projects/:name/claim-gates/:code/resolve-audit-packet', authMiddleware, (req, res) => {
+  try {
+    return res.json(buildClaimGateResolveAuditPacket(req.params.name, req.params.code));
   } catch (err) {
     return res.status(err.httpStatus || 400).json({ error: err.message });
   }
@@ -5026,9 +5154,10 @@ app.post('/api/projects/:name/claim-gates/:code/resolve', authMiddleware, requir
       return res.status(400).json({ error: 'existing evidence row is missing signed reviewer metadata required for this gate' });
     }
     db.prepare(`UPDATE claim_gates
-                SET status = 'cleared', resolved_by = ?, resolved_at = ?, resolved_evidence_ref = ?
+                SET status = 'cleared', resolved_by = ?, resolved_at = ?, resolved_evidence_ref = ?, resolved_evidence_id = ?
                 WHERE project_name = ? AND code = ?`)
-      .run(req.user.username, resolvedAt, existingEvidence.source_ref, projectName, code);
+      .run(req.user.username, resolvedAt, existingEvidence.source_ref, existingEvidence.id, projectName, code);
+    const auditAction = claimGateResolveAuditPacketAction(projectName, code);
     return res.status(200).json({
       cleared: true,
       code,
@@ -5036,6 +5165,8 @@ app.post('/api/projects/:name/claim-gates/:code/resolve', authMiddleware, requir
       resolved_at: resolvedAt,
       resolved_evidence_id: existingEvidence.id,
       resolved_evidence_ref: existingEvidence.source_ref,
+      resolve_audit_packet_href: auditAction.href,
+      resolve_audit_packet_artifact_type: auditAction.artifact_type,
     });
   }
 
@@ -5082,22 +5213,27 @@ app.post('/api/projects/:name/claim-gates/:code/resolve', authMiddleware, requir
   }
 
   const tx = db.transaction(() => {
-    db.prepare(`INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+    const inserted = db.prepare(`INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
                 VALUES (?, ?, ?, ?, ?, ?)`)
       .run(projectName, evidence_type, source_file, source_ref, 'present', storedNotes);
     db.prepare(`UPDATE claim_gates
-                SET status = 'cleared', resolved_by = ?, resolved_at = ?, resolved_evidence_ref = ?
+                SET status = 'cleared', resolved_by = ?, resolved_at = ?, resolved_evidence_ref = ?, resolved_evidence_id = ?
                 WHERE project_name = ? AND code = ?`)
-      .run(req.user.username, resolvedAt, source_ref, projectName, code);
+      .run(req.user.username, resolvedAt, source_ref, inserted.lastInsertRowid, projectName, code);
+    return inserted.lastInsertRowid;
   });
-  tx();
+  const resolvedEvidenceId = tx();
+  const auditAction = claimGateResolveAuditPacketAction(projectName, code);
 
   res.status(200).json({
     cleared: true,
     code,
     resolved_by: req.user.username,
     resolved_at: resolvedAt,
+    resolved_evidence_id: resolvedEvidenceId,
     resolved_evidence_ref: source_ref,
+    resolve_audit_packet_href: auditAction.href,
+    resolve_audit_packet_artifact_type: auditAction.artifact_type,
   });
 });
 

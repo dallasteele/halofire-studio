@@ -151,6 +151,7 @@
         <div class="muted" id="wizGateHelp">Choose a gate to see acceptable evidence.</div>
         <div style="display:flex;gap:10px;align-items:center">
           <button id="wizReviewPacket" type="button">Download review packet</button>
+          <button id="wizResolveAudit" type="button">Download resolve audit</button>
           <button id="wizUseExisting" type="button">Use recorded evidence</button>
           <button id="wizSubmit">Submit evidence</button>
           <span id="wizMsg" class="muted"></span>
@@ -272,11 +273,13 @@ function syncWizardGateForm() {
   const existingEl = $('wizExistingEvidence');
   const actionEl = $('wizAction');
   const packetButton = $('wizReviewPacket');
+  const auditButton = $('wizResolveAudit');
   if (!gate) {
     typeEl.innerHTML = '';
     existingEl.innerHTML = '<option value="">no recorded evidence</option>';
     $('wizUseExisting').disabled = true;
     packetButton.disabled = true;
+    auditButton.disabled = true;
     $('wizPacketStatus').textContent = 'Choose a gate to download the exact review packet for that evidence lane.';
     $('wizGateHelp').textContent = 'Choose a gate to see acceptable evidence.';
     return;
@@ -304,9 +307,11 @@ function syncWizardGateForm() {
   if (!gate.can_resolve) actionEl.value = 'record';
   $('wizUseExisting').disabled = !wizardState.canWrite || !gate.can_resolve || !matchingEvidence.length;
   packetButton.disabled = false;
+  auditButton.disabled = gate.status !== 'cleared';
   $('wizPacketStatus').textContent =
     `Review packet: ${gate.review_packet_artifact_type || 'halofire.claim_gate_review_packet.v1'}`
-    + ` · route ${gate.review_packet_href || 'missing'}`;
+    + ` · route ${gate.review_packet_href || 'missing'}`
+    + ` · resolve audit ${gate.status === 'cleared' ? 'halofire.claim_gate_resolve_audit_packet.v1 ready' : 'available after explicit gate resolve'}`;
   $('wizGateHelp').innerHTML =
     `<b>${escapeHtml(gate.code)}</b> — ${escapeHtml(gate.acceptable_evidence || gate.next_action || '')}`
     + (gate.blocked_claims?.length ? `<div style="margin-top:6px">Blocks: ${gate.blocked_claims.map((claim) => `<span class="pill missing">${escapeHtml(claim)}</span>`).join('')}</div>` : '');
@@ -418,6 +423,34 @@ async function downloadClaimGateReviewPacket() {
   }
 }
 
+async function downloadClaimGateResolveAuditPacket() {
+  const msg = $('wizMsg');
+  const packetStatus = $('wizPacketStatus');
+  const gateCode = $('wizGate').value;
+  if (!gateCode) {
+    packetStatus.textContent = 'Choose a gate before downloading a resolve audit packet.';
+    return;
+  }
+  const projectName = $('wizProject').value;
+  msg.className = 'muted';
+  msg.textContent = '';
+  packetStatus.textContent = 'Downloading resolve audit packet...';
+  try {
+    const packet = await api('/projects/' + encodeURIComponent(projectName) + '/claim-gates/' + encodeURIComponent(gateCode) + '/resolve-audit-packet');
+    const blob = new Blob([JSON.stringify(packet, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = packet.download_name || `${projectName.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${gateCode.toLowerCase()}-resolve-audit-packet.json`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    packetStatus.textContent =
+      `Downloaded ${packet.artifact_type || 'halofire.claim_gate_resolve_audit_packet.v1'}`
+      + ` · claim_gate_effect ${packet.claim_gate_effect || 'gate_cleared_after_explicit_signed_validation'}`;
+  } catch (e) {
+    packetStatus.textContent = e.message;
+  }
+}
+
 async function initWizard() {
   try {
     const me = await api('/auth/me');
@@ -446,6 +479,7 @@ $('wizGate').addEventListener('change', syncWizardGateForm);
 $('wizType').addEventListener('change', syncWizardSignoff);
 $('wizAction').addEventListener('change', syncWizardGateForm);
 $('wizReviewPacket').addEventListener('click', downloadClaimGateReviewPacket);
+$('wizResolveAudit').addEventListener('click', downloadClaimGateResolveAuditPacket);
 $('wizUseExisting').addEventListener('click', resolveWizardWithExistingEvidence);
 $('wizSubmit').onclick = async () => {
   const msg = $('wizMsg'); msg.className = 'muted'; msg.textContent = '';
