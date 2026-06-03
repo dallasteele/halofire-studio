@@ -217,6 +217,13 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toContain('downloadHalofireSam31ConsumerIntakeSmokeFollowupPacket');
     expect(html).toContain('data-sam31-consumer-intake-smoke-followup-packet');
     expect(html).toContain('halofire.sam31_consumer_intake_smoke_followup_packet.v1');
+    expect(html).toContain('Save HaloFire smoke follow-up review');
+    expect(html).toContain('saveHalofireSam31ConsumerIntakeSmokeFollowupReview');
+    expect(html).toContain('data-sam31-consumer-intake-smoke-followup-review');
+    expect(html).toContain('halofire.sam31_consumer_intake_smoke_followup_review_decision.v1');
+    expect(html).toContain('halofire.sam31_consumer_intake_smoke_followup_resolver_queue_item.v1');
+    expect(html).toContain('latest_halofire_sam31_consumer_intake_smoke_followup_review_decision');
+    expect(html).toContain('sam31_consumer_intake_smoke_followup_resolver_queue_items');
     expect(html).toContain('permit_ready');
     expect(html).toContain('AutoSprink_parity');
     expect(html).toContain('brand_ready');
