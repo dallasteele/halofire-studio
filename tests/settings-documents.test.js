@@ -2450,6 +2450,7 @@ describe('HaloFire settings + documentation upload/link API', () => {
 
     const consumers = ['landscout', 'nameforge'];
     const replacements = {};
+    const consumerIntakeSmokes = {};
     for (const [index, consumer] of consumers.entries()) {
       const reviewEvidenceId = insertConsumerReview(consumer, index + 700);
       replacements[consumer] = await postReplacement(consumer, reviewEvidenceId);
@@ -2513,7 +2514,87 @@ describe('HaloFire settings + documentation upload/link API', () => {
         'landscout',
         'nameforge',
       ]));
+      consumerIntakeSmokes[consumer] = smoke;
     }
+
+    const savedSmokeScopedQueueRes = await request(`/api/openclaw/sam31/actual-value-resolver-queue?projectName=${encodeURIComponent(projectName)}&consumerIntakeSmokeEvidenceId=${consumerIntakeSmokes.nameforge.evidence_id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(savedSmokeScopedQueueRes.status).toBe(200);
+    const savedSmokeScopedQueue = await savedSmokeScopedQueueRes.json();
+    expect(savedSmokeScopedQueue).toEqual(expect.objectContaining({
+      requested_consumer: 'nameforge',
+      consumer_intake_smoke_evidence_filter_id: consumerIntakeSmokes.nameforge.evidence_id,
+      latest_section_to_artifacts_consumer_intake_smoke_evidence_id: consumerIntakeSmokes.nameforge.evidence_id,
+      saved_section_to_artifacts_consumer_intake_smoke_count: 1,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(savedSmokeScopedQueue.queue_href).toContain(`consumerIntakeSmokeEvidenceId=${consumerIntakeSmokes.nameforge.evidence_id}`);
+    expect(savedSmokeScopedQueue.source_project_route).toContain(`consumerIntakeSmokeEvidenceId=${consumerIntakeSmokes.nameforge.evidence_id}`);
+    expect(savedSmokeScopedQueue.queue).toEqual(expect.objectContaining({
+      requested_consumer: 'nameforge',
+      consumer_intake_smoke_evidence_filter_id: consumerIntakeSmokes.nameforge.evidence_id,
+      latest_section_to_artifacts_consumer_intake_smoke_evidence_id: consumerIntakeSmokes.nameforge.evidence_id,
+      saved_section_to_artifacts_consumer_intake_smoke_count: 1,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(savedSmokeScopedQueue.latest_section_to_artifacts_consumer_intake_smoke_evidence).toEqual(expect.objectContaining({
+      evidence_id: consumerIntakeSmokes.nameforge.evidence_id,
+      evidence_type: 'openclaw_sam31_section_to_artifacts_consumer_intake_smoke',
+      artifact_type: 'openclaw.sam31.section_to_artifacts_consumer_intake_smoke.v1',
+      consumer: 'nameforge',
+      consumer_adapter: 'openclaw.sam31.consumer_review_queue.nameforge.v1',
+      observed_vector_overlay_count: 1,
+      observed_model_3d_candidate_count: 1,
+      observed_segment_count: 1,
+      observed_object_hypothesis_count: 1,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(savedSmokeScopedQueue.queue.items).toHaveLength(1);
+    expect(savedSmokeScopedQueue.queue.items[0]).toEqual(expect.objectContaining({
+      consumer: 'nameforge',
+      source_section_to_artifacts_consumer_intake_smoke_evidence_id: consumerIntakeSmokes.nameforge.evidence_id,
+      latest_section_to_artifacts_consumer_intake_smoke_evidence: expect.objectContaining({
+        evidence_id: consumerIntakeSmokes.nameforge.evidence_id,
+        consumer: 'nameforge',
+      }),
+      next_action: expect.stringContaining('Open the saved SAM31 section-to-artifacts consumer intake smoke evidence'),
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(savedSmokeScopedQueue.queue.items[0].consumer_actions).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        consumer: 'nameforge',
+        action: 'download_saved_section_to_artifacts_consumer_intake_smoke',
+        method: 'GET',
+        href: expect.stringContaining(`consumerIntakeSmokeEvidenceId=${consumerIntakeSmokes.nameforge.evidence_id}`),
+        produces: 'openclaw.sam31.section_to_artifacts_consumer_intake_smoke.v1',
+        source_section_to_artifacts_consumer_intake_smoke_evidence_id: consumerIntakeSmokes.nameforge.evidence_id,
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    ]));
+    expect(savedSmokeScopedQueue.download_artifacts).toEqual(expect.objectContaining({
+      saved_section_to_artifacts_consumer_intake_smoke_evidence: expect.objectContaining({
+        artifact_type: 'openclaw.sam31.section_to_artifacts_consumer_intake_smoke.v1',
+        evidence_id: consumerIntakeSmokes.nameforge.evidence_id,
+        source_ref: expect.stringContaining('nameforge'),
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+      filtered_queue_readback: expect.objectContaining({
+        href: expect.stringContaining(`consumerIntakeSmokeEvidenceId=${consumerIntakeSmokes.nameforge.evidence_id}`),
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    }));
 
     const tool = await (await request('/api/openclaw/sam31/tool', {
       headers: { Authorization: `Bearer ${token}` },
