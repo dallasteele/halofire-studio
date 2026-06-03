@@ -94,7 +94,7 @@ function insertConsumerReview(consumer) {
   return Number(result.lastInsertRowid);
 }
 
-async function seedSavedConsumerIntakeSmoke(token) {
+async function seedSavedConsumerIntakeSmoke(token, { withFollowupReview = true } = {}) {
   const consumer = 'nameforge';
   const reviewEvidenceId = insertConsumerReview(consumer);
   const replacement = await api(`${PROJECT_PATH}/openclaw/sam31/actual-value-replacements`, token, {
@@ -146,28 +146,30 @@ async function seedSavedConsumerIntakeSmoke(token) {
       source_sam31_actual_value_replacement_evidence_id: replacement.evidence_id,
     }),
   });
-  await api(`${PROJECT_PATH}/openclaw/sam31/section-to-artifacts-consumer-intake-smoke/${smoke.evidence_id}/followup-packet/review`, token, {
-    method: 'POST',
-    body: JSON.stringify({
-      review_decision: 'accepted_internal_alpha_followup',
-      reviewer_name: 'HaloFire Browser Smoke',
-      review_ref: 'halofire://sam31/consumer-intake-smoke/nameforge/browser-smoke-followup-review.json',
-      marked_up_screenshot_ref: 'halofire://sam31/consumer-intake-smoke/nameforge/browser-smoke-followup.png',
-      issue_decisions: [
-        {
-          issue_type: 'sam31_consumer_intake_room_boundary_visual_audit',
-          supported_sprinkler_review_lane: 'room_boundary_visual_audit',
-          decision: 'accepted_for_internal_alpha_room_boundary_review',
-          reviewed_values: {
-            corrected_room_polygons: [
-              { room: 'Browser Smoke Area', polygon: [[0, 0], [10, 0], [10, 8], [0, 8]] },
-            ],
+  if (withFollowupReview) {
+    await api(`${PROJECT_PATH}/openclaw/sam31/section-to-artifacts-consumer-intake-smoke/${smoke.evidence_id}/followup-packet/review`, token, {
+      method: 'POST',
+      body: JSON.stringify({
+        review_decision: 'accepted_internal_alpha_followup',
+        reviewer_name: 'HaloFire Browser Smoke',
+        review_ref: 'halofire://sam31/consumer-intake-smoke/nameforge/browser-smoke-followup-review.json',
+        marked_up_screenshot_ref: 'halofire://sam31/consumer-intake-smoke/nameforge/browser-smoke-followup.png',
+        issue_decisions: [
+          {
+            issue_type: 'sam31_consumer_intake_room_boundary_visual_audit',
+            supported_sprinkler_review_lane: 'room_boundary_visual_audit',
+            decision: 'accepted_for_internal_alpha_room_boundary_review',
+            reviewed_values: {
+              corrected_room_polygons: [
+                { room: 'Browser Smoke Area', polygon: [[0, 0], [10, 0], [10, 8], [0, 8]] },
+              ],
+            },
           },
-        },
-      ],
-      notes: 'Browser smoke prerequisite for source-linked sprinkler review packet download.',
-    }),
-  });
+        ],
+        notes: 'Browser smoke prerequisite for source-linked sprinkler review packet download.',
+      }),
+    });
+  }
   return smoke;
 }
 
@@ -254,6 +256,32 @@ describe('Workbench SAM31 saved consumer intake smoke browser controls', () => {
       );
       await sprinkler.click();
       await page.waitForFunction(() => document.getElementById('sam31ActualValueQueueStatus')?.textContent?.includes('Downloaded HaloFire SAM31 consumer intake smoke sprinkler review packet'));
+    } finally {
+      await page.close();
+    }
+  }, 35_000);
+
+  it('explains the saved follow-up review prerequisite before sprinkler review packets', async () => {
+    const token = await adminToken();
+    const smoke = await seedSavedConsumerIntakeSmoke(token, { withFollowupReview: false });
+
+    const page = await browser.newPage();
+    page.setDefaultTimeout(10_000);
+    await page.addInitScript((authToken) => {
+      localStorage.setItem('halofire_token', authToken);
+    }, token);
+    try {
+      await page.goto(`${BASE}/workbench.html`, { waitUntil: 'domcontentloaded' });
+      await page.selectOption('#projectTarget', PROJECT_NAME);
+      await page.locator(`#evidence-${smoke.evidence_id}`).waitFor();
+
+      const sprinkler = page.locator(`[data-sam31-consumer-intake-smoke-sprinkler-review-packet="${smoke.evidence_id}"]`).first();
+      expect(await sprinkler.getAttribute('data-sam31-consumer-intake-smoke-sprinkler-review-prerequisite')).toBe('halofire_sam31_consumer_intake_smoke_followup_review_decision');
+      await sprinkler.click();
+      await page.waitForFunction(() => document.getElementById('sam31ActualValueQueueStatus')?.textContent?.includes('Save a HaloFire smoke follow-up review first'));
+      const statusText = await page.locator('#sam31ActualValueQueueStatus').innerText();
+      expect(statusText).toContain('halofire.sam31_consumer_intake_smoke_followup_review_decision.v1');
+      expect(statusText).toContain('claim gates remain blocked');
     } finally {
       await page.close();
     }
