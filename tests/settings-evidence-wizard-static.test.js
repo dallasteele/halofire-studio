@@ -44,6 +44,19 @@ describe('HaloFire Settings evidence wizard signed reviewer workflow', () => {
     expect(html).toContain("auditButton.disabled = !selectedPacketContext.resolveAuditHref && gate.status !== 'cleared'");
   });
 
+  it('surfaces resolved signed-reviewer gates and audit packet downloads in Settings', () => {
+    const html = fs.readFileSync(SETTINGS_HTML, 'utf8');
+    expect(html).toContain('Resolved Signed-Reviewer Gates');
+    expect(html).toContain('id="settingsResolvedSignedReviewerGates"');
+    expect(html).toContain('loadSettingsResolvedSignedReviewerGates');
+    expect(html).toContain("claimGateAudit=cleared");
+    expect(html).toContain('claim_gate_resolve_audit');
+    expect(html).toContain('data-settings-resolved-gate-audit-download');
+    expect(html).toContain('Download resolved-gate audit');
+    expect(html).toContain('gate_cleared_after_explicit_signed_validation');
+    expect(html).toContain('no_unrelated_claims_cleared');
+  });
+
   it('surfaces room-boundary floor-plan override actions in the signed settings portal', () => {
     const html = fs.readFileSync(SETTINGS_HTML, 'utf8');
     expect(html).toContain('Room-Boundary Floor-Plan Overrides');

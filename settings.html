@@ -172,6 +172,15 @@
   </div>
 
   <div class="card wide">
+    <h2>Resolved Signed-Reviewer Gates</h2>
+    <p class="muted" style="margin-bottom:8px">
+      Cleared gate readback rows from signed reviewer evidence. Download the exact resolve-audit packet before relying on the cleared gate; unrelated regulated claims remain blocked.
+    </p>
+    <div id="settingsResolvedSignedReviewerGates"><span class="muted">loading resolved signed-reviewer gates...</span></div>
+    <div id="settingsResolvedSignedReviewerGatesMsg" class="muted" style="margin-top:8px"></div>
+  </div>
+
+  <div class="card wide">
     <h2 id="attachCatalogPart">Attach catalog part (admin)</h2>
     <p class="muted" style="margin-bottom:8px">
       Attach a real catalog model to one component so the demo renders the ACTUAL part instead of the generated shape.
@@ -229,6 +238,7 @@ let wizardState = { projects: [], gateMap: new Map(), selectedProject: '', canWr
 let settingsCatalogLedgerRows = [];
 let settingsSam31ActualValueRows = [];
 let settingsRoomBoundaryFloorPlanOverrideRows = [];
+let settingsResolvedSignedReviewerGateRows = [];
 let lastSettingsSam31ActualValueResolverReplay = null;
 const wizardUrlPrefill = prefillEvidenceWizardFromUrl();
 const SETTINGS_CATALOG_LEDGER_FAMILIES = [
@@ -504,6 +514,7 @@ async function resolveWizardWithExistingEvidence() {
     });
     msg.textContent = 'gate resolved with recorded evidence';
     await loadWizard(projectName);
+    await loadSettingsResolvedSignedReviewerGates(projectName);
   } catch (e) {
     msg.className = 'err';
     msg.textContent = e.message;
@@ -598,6 +609,7 @@ async function initWizard() {
 $('wizProject').addEventListener('change', async () => {
   const projectName = $('wizProject').value;
   await loadWizard(projectName);
+  await loadSettingsResolvedSignedReviewerGates(projectName);
   await loadSettingsSam31ActualValueWorkItems(projectName);
   await loadSettingsRoomBoundaryFloorPlanOverrides(projectName);
 });
@@ -645,6 +657,7 @@ $('wizSubmit').onclick = async () => {
     $('wizOrganization').value = '';
     $('wizLicenseId').value = '';
     await loadWizard(projectName);
+    await loadSettingsResolvedSignedReviewerGates(projectName);
   } catch (e) {
     msg.className = 'err';
     msg.textContent = e.message;
@@ -1061,6 +1074,65 @@ async function loadSettingsSam31ActualValueWorkItems(projectName = catalogEviden
   }
 }
 
+async function downloadSettingsResolvedGateAudit(index) {
+  const row = settingsResolvedSignedReviewerGateRows[Number(index)];
+  const msg = $('settingsResolvedSignedReviewerGatesMsg');
+  const href = row?.download_href || row?.audit_packet_action?.href;
+  if (!row || !href) {
+    msg.className = 'err';
+    msg.textContent = 'resolved-gate audit packet link missing';
+    return;
+  }
+  try {
+    msg.className = 'muted';
+    msg.textContent = 'downloading resolved-gate audit packet...';
+    const packet = await api(href);
+    if (packet.artifact_type !== 'halofire.claim_gate_resolve_audit_packet.v1') {
+      throw new Error('Unexpected resolved-gate audit packet type');
+    }
+    const blob = new Blob([JSON.stringify(packet, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = packet.download_name || row.download_name || 'resolved-gate-audit-packet.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+    msg.textContent = `downloaded halofire.claim_gate_resolve_audit_packet.v1 for ${row.code || packet.gate_code || 'claim gate'}; claim_gate_effect ${packet.claim_gate_effect || row.claim_gate_effect || 'gate_cleared_after_explicit_signed_validation'}`;
+  } catch(e) {
+    msg.className = 'err';
+    msg.textContent = e.message;
+  }
+}
+
+async function loadSettingsResolvedSignedReviewerGates(projectName = catalogEvidenceProjectName()) {
+  const target = $('settingsResolvedSignedReviewerGates');
+  try {
+    const queue = await api('/projects/' + encodeURIComponent(projectName) + '/resolver-queue?claimGateAudit=cleared');
+    const items = Array.isArray(queue.items) ? queue.items : (Array.isArray(queue) ? queue : []);
+    const rows = items.filter((item) => item.kind === 'claim_gate_resolve_audit');
+    settingsResolvedSignedReviewerGateRows = rows;
+    target.innerHTML = rows.map((row, index) => {
+      const blocked = Array.isArray(row.blocked_claims) ? row.blocked_claims : [];
+      const limitations = Array.isArray(row.limitations) ? row.limitations : [];
+      return `<div class="note" style="margin-bottom:10px">
+        <div class="row" style="padding-top:0"><span>${escapeHtml(row.code || 'claim_gate_resolve_audit')}</span><span class="st present">${escapeHtml(row.status || 'cleared')}</span></div>
+        <div class="muted" style="margin-top:6px">artifact_type ${escapeHtml(row.artifact_type || 'halofire.claim_gate_resolve_audit_queue_item.v1')} - kind ${escapeHtml(row.kind || 'claim_gate_resolve_audit')}</div>
+        <div class="muted" style="margin-top:6px">resolved_evidence_id ${escapeHtml(row.resolved_evidence_id || 'missing')} - resolved_evidence_ref ${escapeHtml(row.resolved_evidence_ref || 'missing')} - resolved_evidence_type ${escapeHtml(row.resolved_evidence_type || 'missing')}</div>
+        <div class="muted" style="margin-top:6px">resolved_by ${escapeHtml(row.resolved_by || 'missing')} - resolved_at ${escapeHtml(row.resolved_at || 'missing')}</div>
+        <div class="muted" style="margin-top:6px">audit_packet ${escapeHtml(row.audit_packet_action?.artifact_type || 'halofire.claim_gate_resolve_audit_packet.v1')} - route ${escapeHtml(row.download_href || row.audit_packet_action?.href || 'missing')}</div>
+        <div class="muted" style="margin-top:6px">claim_gate_effect ${escapeHtml(row.claim_gate_effect || 'gate_cleared_after_explicit_signed_validation')} - no_unrelated_claims_cleared ${escapeHtml(row.no_unrelated_claims_cleared === false ? 'false' : 'true')}</div>
+        <div class="muted" style="margin-top:6px">blocked_claims still requiring separate evidence: ${blocked.map((claim) => `<span class="pill missing">${escapeHtml(claim)}</span>`).join('') || '<span class="pill missing">unrelated regulated claims remain blocked</span>'}</div>
+        <div class="muted" style="margin-top:6px">limitations: ${limitations.map((item) => `<span class="pill">${escapeHtml(item)}</span>`).join('') || '<span class="pill">review exact audit packet before relying on this lane</span>'}</div>
+        <button type="button" style="margin-top:8px" data-settings-resolved-gate-audit-download="${index}">Download resolved-gate audit</button>
+      </div>`;
+    }).join('') || `<span class="muted">No resolved signed-reviewer gates for ${escapeHtml(projectName)}. Resolve a matching signed evidence row first; regulated claims remain fail-closed.</span>`;
+    target.querySelectorAll('[data-settings-resolved-gate-audit-download]').forEach((btn) => {
+      btn.addEventListener('click', () => downloadSettingsResolvedGateAudit(btn.getAttribute('data-settings-resolved-gate-audit-download')));
+    });
+  } catch(e) {
+    target.innerHTML = '<span class="err">resolved signed-reviewer gates unavailable: '+escapeHtml(e.message)+'</span>';
+  }
+}
+
 async function downloadSettingsRoomBoundaryFloorPlanOverrideAction(index) {
   const row = settingsRoomBoundaryFloorPlanOverrideRows[Number(index)];
   const msg = $('roomBoundaryFloorPlanOverrideMsg');
@@ -1226,7 +1298,7 @@ $('attSubmit').onclick = async () => {
   } catch(e){ msg.className = 'err'; msg.textContent = e.message; }
 };
 
-loadParity(); loadDocs(); loadDeps(); initWizard(); loadLibrary(); loadSettingsCatalogSourceAcquisition(); loadSettingsSam31ActualValueWorkItems(); loadSettingsRoomBoundaryFloorPlanOverrides();
+loadParity(); loadDocs(); loadDeps(); initWizard(); loadLibrary(); loadSettingsCatalogSourceAcquisition(); loadSettingsResolvedSignedReviewerGates(); loadSettingsSam31ActualValueWorkItems(); loadSettingsRoomBoundaryFloorPlanOverrides();
 </script>
 </body>
 </html>
