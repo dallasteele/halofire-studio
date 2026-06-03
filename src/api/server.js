@@ -698,9 +698,18 @@ app.get('/api/projects/:name/evidence-wizard', authMiddleware, (req, res) => {
     if (!evidenceByType.has(row.evidence_type)) evidenceByType.set(row.evidence_type, []);
     evidenceByType.get(row.evidence_type).push(row);
   }
+  const canExistingEvidenceClearGate = (rule, row) => {
+    if (!row || !rule.allowedEvidenceTypes.includes(row.evidence_type)) return false;
+    if (!GATE_CLEARING_EVIDENCE_TYPES.has(row.evidence_type)) return false;
+    if (String(row.status) !== 'present') return false;
+    if (SIGNED_REVIEW_EVIDENCE_TYPES.has(row.evidence_type) && !hasStructuredSignedReviewerNotes(row)) return false;
+    return true;
+  };
   const gateRows = gates.map((gate) => {
     const rule = gateEvidenceRule(gate.code);
-    const matchingEvidence = rule.allowedEvidenceTypes.flatMap((type) => evidenceByType.get(type) || []);
+    const matchingEvidence = rule.allowedEvidenceTypes
+      .flatMap((type) => evidenceByType.get(type) || [])
+      .filter((row) => canExistingEvidenceClearGate(rule, row));
     const requiresSignoffFor = rule.allowedEvidenceTypes.filter((type) => SIGNED_REVIEW_EVIDENCE_TYPES.has(type));
     return {
       ...gate,
@@ -941,6 +950,74 @@ function latestSam31ActualValueReplacementEvidenceByReview(projectName) {
   return latestByReviewEvidenceId;
 }
 
+function listSam31ReplayActualValueReplacementDetails(projectName, options = {}) {
+  const consumerFilter = String(options.consumer || '').trim().toLowerCase();
+  const rows = db
+    .prepare(`SELECT * FROM project_evidence
+              WHERE project_name = ? AND evidence_type = 'sam31_actual_value_replacement'
+              ORDER BY created_at DESC, id DESC`)
+    .all(projectName);
+  const details = [];
+  for (const row of rows) {
+    let replacement;
+    try {
+      replacement = JSON.parse(row.notes || '{}');
+    } catch {
+      continue;
+    }
+    if (!replacement || replacement.kind !== 'sam31ReplayActualValueReplacement') continue;
+    const contract = replacement.openclaw_sam31_shared_consumer_contract || {};
+    const supportedApplications = uniqueStrings([
+      ...(Array.isArray(replacement.supported_applications) ? replacement.supported_applications : []),
+      ...(Array.isArray(contract.supported_applications) ? contract.supported_applications : []),
+      'halo_fire',
+    ]).map((value) => String(value).trim().toLowerCase()).filter(Boolean);
+    if (consumerFilter && !supportedApplications.includes(consumerFilter)) continue;
+    const productLanes = contract.product_lanes && typeof contract.product_lanes === 'object' && !Array.isArray(contract.product_lanes)
+      ? contract.product_lanes
+      : {};
+    details.push({
+      artifact_type: 'openclaw.sam31.replay_actual_value_replacement_detail.v1',
+      evidence_id: row.id,
+      evidence_type: row.evidence_type,
+      evidence_status: row.status,
+      status: 'actual_value_evidence_recorded',
+      intake_status: 'recorded',
+      project_name: projectName,
+      consumer: consumerFilter || null,
+      source_runtime: replacement.source_runtime || contract.source_runtime || 'sam-3.1+llm',
+      source_replay_evidence_id: replacement.source_replay_evidence_id || null,
+      source_replay_artifact_type: replacement.source_replay_artifact_type || null,
+      source_actual_value_handoff_artifact_type: replacement.source_actual_value_handoff_artifact_type || null,
+      source_file: replacement.source_file || row.source_file || null,
+      source_ref: replacement.source_ref || row.source_ref || null,
+      source_refs: uniqueStrings([
+        ...(Array.isArray(replacement.source_refs) ? replacement.source_refs : []),
+        replacement.source_ref,
+        row.source_ref,
+      ].filter(Boolean)),
+      replacement_values: replacement.replacement_values || {},
+      replacement_summary: replacement.replacement_summary || {},
+      supported_applications: supportedApplications,
+      openclaw_sam31_shared_consumer_contract: contract,
+      product_lanes: productLanes,
+      product_lane: consumerFilter ? (productLanes[consumerFilter] || null) : null,
+      acceptable_actual_evidence: Array.isArray(replacement.acceptable_actual_evidence) ? replacement.acceptable_actual_evidence : [],
+      next_action: consumerFilter
+        ? `Review replay-scoped SAM31 actual-value evidence for ${consumerFilter}; regulated claims remain blocked.`
+        : 'Review replay-scoped SAM31 actual-value evidence before downstream product use; regulated claims remain blocked.',
+      blocked_claims: Array.isArray(replacement.blocked_claims) ? replacement.blocked_claims : [],
+      use_for_claims: false,
+      claim_gate_effect: replacement.claim_gate_effect || 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+      limitations: Array.isArray(replacement.limitations) ? replacement.limitations : [
+        'Replay-scoped SAM31 actual-value replacements are internal-alpha evidence only.',
+      ],
+    });
+  }
+  return details;
+}
+
 function normalizeSam31ActualValueReplacementIntake(projectName, body, reviewRow, item = null, user = null) {
   const review = openClawSam31ConsumerReviewFromEvidence(reviewRow);
   if (!review) {
@@ -1102,6 +1179,38 @@ function buildOpenClawSam31ActualValueResolverQueue(projectName, options = {}) {
   const consumerFilter = String(options.consumer || '').trim().toLowerCase();
   const index = buildOpenClawSam31ActualValueWorkItemIndex(projectName);
   const latestReplacementByReview = latestSam31ActualValueReplacementEvidenceByReview(projectName);
+  const replayReplacementItems = listSam31ReplayActualValueReplacementDetails(projectName, { consumer: consumerFilter })
+    .map((detail) => ({
+      artifact_type: 'openclaw.sam31.replay_actual_value_replacement_queue_item.v1',
+      id: `sam31-replay-actual-value:${projectName}:${detail.evidence_id}:${consumerFilter || 'all'}`,
+      evidence_id: detail.evidence_id,
+      evidence_type: detail.evidence_type,
+      project_name: projectName,
+      consumer: consumerFilter || null,
+      status: detail.status,
+      intake_status: detail.intake_status,
+      source_runtime: detail.source_runtime,
+      source_replay_evidence_id: detail.source_replay_evidence_id,
+      source_actual_value_handoff_artifact_type: detail.source_actual_value_handoff_artifact_type,
+      source_file: detail.source_file,
+      source_ref: detail.source_ref,
+      source_refs: detail.source_refs,
+      supported_applications: detail.supported_applications,
+      product_lane: detail.product_lane,
+      product_lanes: detail.product_lanes,
+      replacement_summary: detail.replacement_summary,
+      openclaw_sam31_shared_consumer_contract: detail.openclaw_sam31_shared_consumer_contract,
+      acceptable_actual_evidence: detail.acceptable_actual_evidence,
+      next_action: detail.next_action,
+      use_for_claims: false,
+      blocked_claims: detail.blocked_claims,
+      claim_gate_effect: detail.claim_gate_effect || 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+      limitations: [
+        'Replay replacement queue items expose saved SAM31+LLM actual-value evidence to shared product consumers.',
+        'They do not clear regulated, survey-grade, brand-ready, production-ready, or manufacturer-exact claims.',
+      ],
+    }));
   const items = index.items
     .filter((item) => !consumerFilter || String(item.consumer || '').toLowerCase() === consumerFilter)
     .map((item) => {
@@ -1155,12 +1264,15 @@ function buildOpenClawSam31ActualValueResolverQueue(projectName, options = {}) {
       ? (pendingCount ? 'actual_value_replacements_pending' : 'actual_value_replacements_recorded')
       : 'no_sam31_actual_value_work_items',
     project_name: projectName,
+    requested_consumer: consumerFilter || null,
     generated_at: new Date().toISOString(),
     supported_consumers: ['halo_fire', 'landscout', 'nameforge'],
     source_index_artifact_type: index.artifact_type,
     item_count: items.length,
     pending_count: pendingCount,
     recorded_count: recordedCount,
+    replay_replacement_count: replayReplacementItems.length,
+    replay_replacement_items: replayReplacementItems,
     acceptable_actual_evidence: [
       '1881 proposal workbook row or sheet reference',
       'reviewed vector overlay SVG or marked-up plan ref',
@@ -1207,6 +1319,7 @@ function buildOpenClawSam31ActualValueResolverQueueReadback(projectName, options
 function buildOpenClawSam31ActualValueReplacementReadback(projectName, options = {}) {
   const requestedConsumer = String(options.consumer || '').trim().toLowerCase();
   const queue = buildOpenClawSam31ActualValueResolverQueue(projectName, { consumer: requestedConsumer });
+  const replayReplacementDetails = listSam31ReplayActualValueReplacementDetails(projectName, { consumer: requestedConsumer });
   const items = queue.items.map((item) => {
     const recordedEvidence = item.latest_actual_value_replacement_evidence || null;
     const prefill = item.actual_value_replacement_prefill || null;
@@ -1271,6 +1384,8 @@ function buildOpenClawSam31ActualValueReplacementReadback(projectName, options =
     item_count: queue.item_count,
     pending_count: queue.pending_count,
     recorded_count: queue.recorded_count,
+    replay_replacement_count: replayReplacementDetails.length,
+    replay_replacement_details: replayReplacementDetails,
     acceptable_actual_evidence: queue.acceptable_actual_evidence,
     items,
     use_for_claims: false,

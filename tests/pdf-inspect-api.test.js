@@ -1567,5 +1567,58 @@ describe('PDF page inspection API', () => {
     expect(replacementNotes.source_actual_value_handoff_artifact_type).toBe('openclaw.sam31.actual_value_handoff_packet.v1');
     expect(replacementNotes.claim_gate_effect).toBe('no_claims_cleared');
     expect(replacementNotes.openclaw_sam31_shared_consumer_contract.artifact_type).toBe('openclaw.sam31.shared_consumer_actual_value_replacement_contract.v1');
+
+    const replacementReadbackRes = await request(`${COOPERATIVE_1881_PATH}/openclaw/sam31/actual-value-replacements`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(replacementReadbackRes.status).toBe(200);
+    const replacementReadback = await replacementReadbackRes.json();
+    expect(replacementReadback).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.actual_value_replacement_readback.v1',
+      replay_replacement_count: 1,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(replacementReadback.replay_replacement_details).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        artifact_type: 'openclaw.sam31.replay_actual_value_replacement_detail.v1',
+        evidence_id: replacement.id,
+        source_replay_evidence_id: replayEvidence.id,
+        source_actual_value_handoff_artifact_type: 'openclaw.sam31.actual_value_handoff_packet.v1',
+        source_ref: '1881://employee-actual-values/replay-handoff/sheet-7',
+        claim_gate_effect: 'no_claims_cleared',
+        use_for_claims: false,
+      }),
+    ]));
+    expect(replacementReadback.replay_replacement_details[0].supported_applications).toEqual(expect.arrayContaining([
+      'halo_fire',
+      'landscout',
+      'nameforge',
+    ]));
+
+    const landscoutQueueRes = await request(`${COOPERATIVE_1881_PATH}/openclaw/sam31/actual-value-resolver-queue?consumer=landscout`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(landscoutQueueRes.status).toBe(200);
+    const landscoutQueue = await landscoutQueueRes.json();
+    expect(landscoutQueue).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.actual_value_resolver_queue.v1',
+      requested_consumer: 'landscout',
+      replay_replacement_count: 1,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(landscoutQueue.replay_replacement_items).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        artifact_type: 'openclaw.sam31.replay_actual_value_replacement_queue_item.v1',
+        evidence_id: replacement.id,
+        consumer: 'landscout',
+        source_replay_evidence_id: replayEvidence.id,
+        status: 'actual_value_evidence_recorded',
+        intake_status: 'recorded',
+      }),
+    ]));
+    expect(landscoutQueue.replay_replacement_items[0].product_lane).toEqual(expect.objectContaining({
+      acceptable_use: 'site_visual_measurement_review',
+      status: 'portable_contract_ready',
+    }));
   }, 30000);
 });
