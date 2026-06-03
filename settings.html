@@ -150,10 +150,12 @@
         </div>
         <div class="muted" id="wizGateHelp">Choose a gate to see acceptable evidence.</div>
         <div style="display:flex;gap:10px;align-items:center">
+          <button id="wizReviewPacket" type="button">Download review packet</button>
           <button id="wizUseExisting" type="button">Use recorded evidence</button>
           <button id="wizSubmit">Submit evidence</button>
           <span id="wizMsg" class="muted"></span>
         </div>
+        <div class="muted" id="wizPacketStatus">Choose a gate to download the exact review packet for that evidence lane.</div>
       </div>
     </div>
   </div>
@@ -269,10 +271,13 @@ function syncWizardGateForm() {
   const typeEl = $('wizType');
   const existingEl = $('wizExistingEvidence');
   const actionEl = $('wizAction');
+  const packetButton = $('wizReviewPacket');
   if (!gate) {
     typeEl.innerHTML = '';
     existingEl.innerHTML = '<option value="">no recorded evidence</option>';
     $('wizUseExisting').disabled = true;
+    packetButton.disabled = true;
+    $('wizPacketStatus').textContent = 'Choose a gate to download the exact review packet for that evidence lane.';
     $('wizGateHelp').textContent = 'Choose a gate to see acceptable evidence.';
     return;
   }
@@ -298,6 +303,10 @@ function syncWizardGateForm() {
   actionEl.disabled = !gate.can_resolve || !wizardState.canWrite;
   if (!gate.can_resolve) actionEl.value = 'record';
   $('wizUseExisting').disabled = !wizardState.canWrite || !gate.can_resolve || !matchingEvidence.length;
+  packetButton.disabled = false;
+  $('wizPacketStatus').textContent =
+    `Review packet: ${gate.review_packet_artifact_type || 'halofire.claim_gate_review_packet.v1'}`
+    + ` · route ${gate.review_packet_href || 'missing'}`;
   $('wizGateHelp').innerHTML =
     `<b>${escapeHtml(gate.code)}</b> — ${escapeHtml(gate.acceptable_evidence || gate.next_action || '')}`
     + (gate.blocked_claims?.length ? `<div style="margin-top:6px">Blocks: ${gate.blocked_claims.map((claim) => `<span class="pill missing">${escapeHtml(claim)}</span>`).join('')}</div>` : '');
@@ -381,6 +390,34 @@ async function resolveWizardWithExistingEvidence() {
   }
 }
 
+async function downloadClaimGateReviewPacket() {
+  const msg = $('wizMsg');
+  const packetStatus = $('wizPacketStatus');
+  const gateCode = $('wizGate').value;
+  if (!gateCode) {
+    packetStatus.textContent = 'Choose a gate before downloading a review packet.';
+    return;
+  }
+  const projectName = $('wizProject').value;
+  msg.className = 'muted';
+  msg.textContent = '';
+  packetStatus.textContent = 'Downloading review packet...';
+  try {
+    const packet = await api('/projects/' + encodeURIComponent(projectName) + '/claim-gates/' + encodeURIComponent(gateCode) + '/review-packet');
+    const blob = new Blob([JSON.stringify(packet, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = packet.download_name || `${projectName.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${gateCode.toLowerCase()}-review-packet.json`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    packetStatus.textContent =
+      `Downloaded ${packet.artifact_type || 'halofire.claim_gate_review_packet.v1'}`
+      + ` · claim_gate_effect ${packet.claim_gate_effect || 'no_claims_cleared'}`;
+  } catch (e) {
+    packetStatus.textContent = e.message;
+  }
+}
+
 async function initWizard() {
   try {
     const me = await api('/auth/me');
@@ -408,6 +445,7 @@ $('wizProject').addEventListener('change', async () => {
 $('wizGate').addEventListener('change', syncWizardGateForm);
 $('wizType').addEventListener('change', syncWizardSignoff);
 $('wizAction').addEventListener('change', syncWizardGateForm);
+$('wizReviewPacket').addEventListener('click', downloadClaimGateReviewPacket);
 $('wizUseExisting').addEventListener('click', resolveWizardWithExistingEvidence);
 $('wizSubmit').onclick = async () => {
   const msg = $('wizMsg'); msg.className = 'muted'; msg.textContent = '';
