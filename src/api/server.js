@@ -1175,10 +1175,57 @@ function openClawSam31ActualValueResolverConsumerPullEndpoints(projectName) {
   ]));
 }
 
+function openClawSam31ActualValueResolverExtrapolationContract(projectName = null) {
+  const descriptor = localOpenClawSam31ToolDescriptor(projectName);
+  const extrapolation = descriptor.extrapolation_contract || SAM31_EXTRAPOLATION_CONTRACT;
+  return {
+    artifact_type: 'openclaw.sam31.actual_value_resolver_extrapolation_contract.v1',
+    status: 'ready_for_consumer_actual_value_polling',
+    source_tool_descriptor_ref: descriptor.artifact_type || 'openclaw.sam31_llm_extrapolation_tool',
+    source_tool_contract_ref: extrapolation.artifact_type || SAM31_EXTRAPOLATION_CONTRACT_REF,
+    source_runtime: extrapolation.source_runtime || descriptor.source_runtime || 'sam-3.1+llm',
+    project_name: projectName || null,
+    consumes: Array.isArray(extrapolation.consumes) ? [...extrapolation.consumes] : ['segments', 'object_hypotheses'],
+    produces: Array.isArray(extrapolation.produces) ? [...extrapolation.produces] : ['llm_observations', 'vector_overlays', 'model_3d_candidates', 'extrapolation_index'],
+    perception_lanes: [...SAM31_PERCEPTION_LANES],
+    supported_applications: [...SAM31_SUPPORTED_APPLICATIONS],
+    application_contracts: sam31ApplicationContracts(),
+    product_review_queue_contract: descriptor.product_review_queue_contract || null,
+    supports_object_identification: true,
+    supports_vector_overlays: true,
+    supports_model_3d_candidates: true,
+    supports_spatial_observations: true,
+    required_actual_value_replacement_fields: [...SAM31_CONSUMER_REVIEW_FIELDS],
+    acceptable_actual_evidence: [
+      '1881 proposal workbook row or sheet reference',
+      'reviewed vector overlay SVG or marked-up plan ref',
+      'reviewed 3D model candidate ref or model note',
+      'screenshot or console evidence for the reviewed SAM31 section',
+    ],
+    temporary_value_policy: 'best_guess_until_employee_replaced',
+    blocked_claims: uniqueStrings([
+      ...(Array.isArray(descriptor.blocked_claims) ? descriptor.blocked_claims : []),
+      ...SAM31_BLOCKED_CLAIMS,
+      'CEO_ready',
+      'brand_ready',
+      'trademark_ready',
+      'production_ready',
+    ]),
+    limitations: [
+      'SAM31+LLM object identification, vector overlays, and 3D model candidates are best-effort temporary perception artifacts.',
+      'This queue contract helps HaloFire, LandScout, and NameForge poll for actual-value replacement work; it does not clear regulated or product-readiness claims.',
+    ],
+    use_for_claims: false,
+    claim_gate_effect: 'no_claims_cleared',
+    no_claim_gates_cleared: true,
+  };
+}
+
 function buildOpenClawSam31ActualValueResolverQueue(projectName, options = {}) {
   const consumerFilter = String(options.consumer || '').trim().toLowerCase();
   const index = buildOpenClawSam31ActualValueWorkItemIndex(projectName);
   const latestReplacementByReview = latestSam31ActualValueReplacementEvidenceByReview(projectName);
+  const sam31LlmExtrapolationContract = openClawSam31ActualValueResolverExtrapolationContract(projectName);
   const replayReplacementItems = listSam31ReplayActualValueReplacementDetails(projectName, { consumer: consumerFilter })
     .map((detail) => ({
       artifact_type: 'openclaw.sam31.replay_actual_value_replacement_queue_item.v1',
@@ -1267,6 +1314,7 @@ function buildOpenClawSam31ActualValueResolverQueue(projectName, options = {}) {
     requested_consumer: consumerFilter || null,
     generated_at: new Date().toISOString(),
     supported_consumers: ['halo_fire', 'landscout', 'nameforge'],
+    sam31_llm_extrapolation_contract: sam31LlmExtrapolationContract,
     source_index_artifact_type: index.artifact_type,
     item_count: items.length,
     pending_count: pendingCount,
@@ -1300,6 +1348,7 @@ function buildOpenClawSam31ActualValueResolverQueueReadback(projectName, options
     queue_href: `/api/openclaw/sam31/actual-value-resolver-queue?projectName=${encodeURIComponent(projectName)}${requestedConsumer ? `&consumer=${encodeURIComponent(requestedConsumer)}` : ''}`,
     supported_consumers: queue.supported_consumers,
     consumer_pull_endpoints: openClawSam31ActualValueResolverConsumerPullEndpoints(projectName),
+    sam31_llm_extrapolation_contract: queue.sam31_llm_extrapolation_contract,
     item_count: queue.item_count,
     pending_count: queue.pending_count,
     recorded_count: queue.recorded_count,

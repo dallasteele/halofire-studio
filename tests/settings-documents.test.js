@@ -690,6 +690,43 @@ describe('HaloFire settings + documentation upload/link API', () => {
       'reviewed vector overlay SVG or marked-up plan ref',
       'reviewed 3D model candidate ref or model note',
     ]));
+    expect(readback.sam31_llm_extrapolation_contract).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.actual_value_resolver_extrapolation_contract.v1',
+      source_tool_contract_ref: 'openclaw.sam31_extrapolation_contract',
+      source_runtime: 'sam-3.1+llm',
+      supports_object_identification: true,
+      supports_vector_overlays: true,
+      supports_model_3d_candidates: true,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(readback.sam31_llm_extrapolation_contract.produces).toEqual(expect.arrayContaining([
+      'llm_observations',
+      'vector_overlays',
+      'model_3d_candidates',
+      'extrapolation_index',
+    ]));
+    expect(readback.sam31_llm_extrapolation_contract.perception_lanes).toEqual(expect.arrayContaining([
+      'object_identification',
+      'vector_overlay',
+      'model_3d_candidate',
+      'spatial_observation',
+    ]));
+    expect(readback.sam31_llm_extrapolation_contract.supported_applications).toEqual(['halo_fire', 'landscout', 'nameforge']);
+    expect(readback.sam31_llm_extrapolation_contract.application_contracts.landscout.blocked_claims).toEqual(expect.arrayContaining([
+      'CEO_ready',
+      'production_ready',
+    ]));
+    expect(readback.sam31_llm_extrapolation_contract.application_contracts.nameforge.blocked_claims).toEqual(expect.arrayContaining([
+      'brand_ready',
+      'trademark_ready',
+    ]));
+    expect(readback.queue.sam31_llm_extrapolation_contract).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.actual_value_resolver_extrapolation_contract.v1',
+      source_tool_contract_ref: 'openclaw.sam31_extrapolation_contract',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
 
     const tool = await (await request('/api/openclaw/sam31/tool', {
       headers: { Authorization: `Bearer ${token}` },
