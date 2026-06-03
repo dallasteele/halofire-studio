@@ -172,6 +172,14 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toContain('source_ref');
     expect(html).toContain('no_claim_gates_cleared');
     expect(html).toContain('openclaw.sam31.actual_value_resolver_queue.v1');
+    expect(html).toContain('renderSam31ActualValueResolverExtrapolationContract');
+    expect(html).toContain('sam31_llm_extrapolation_contract');
+    expect(html).toContain('openclaw.sam31.actual_value_resolver_extrapolation_contract.v1');
+    expect(html).toContain('supports_object_identification');
+    expect(html).toContain('supports_vector_overlays');
+    expect(html).toContain('supports_model_3d_candidates');
+    expect(html).toContain('object_identification');
+    expect(html).toContain('model_3d_candidate');
     expect(html).toContain('actual_value_replacements_pending');
     expect(html).toContain('pending_count');
     expect(html).toContain('recorded_count');

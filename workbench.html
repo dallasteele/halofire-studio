@@ -1100,6 +1100,26 @@ function renderSam31ActualValueReplacementPrefill(row, index) {
   </details>`;
 }
 
+function renderSam31ActualValueResolverExtrapolationContract(readback) {
+  const contract = readback?.sam31_llm_extrapolation_contract
+    || readback?.queue?.sam31_llm_extrapolation_contract
+    || null;
+  if (!contract || typeof contract !== 'object') return '';
+  const lanes = Array.isArray(contract.perception_lanes) ? contract.perception_lanes : [];
+  const produces = Array.isArray(contract.produces) ? contract.produces : [];
+  const apps = Array.isArray(contract.supported_applications) ? contract.supported_applications : [];
+  const blocked = Array.isArray(contract.blocked_claims) ? contract.blocked_claims : [];
+  return `<div class="claims" style="margin-top:7px;border-top:1px solid rgba(79,70,229,.24);padding-top:7px">
+    sam31_llm_extrapolation_contract <span class="chip">${escapeHtml(contract.artifact_type || 'openclaw.sam31.actual_value_resolver_extrapolation_contract.v1')}</span> source_tool_contract_ref ${escapeHtml(contract.source_tool_contract_ref || 'openclaw.sam31_extrapolation_contract')} source_runtime ${escapeHtml(contract.source_runtime || 'sam-3.1+llm')}<br>
+    supports_object_identification ${escapeHtml(contract.supports_object_identification === false ? 'false' : 'true')} - supports_vector_overlays ${escapeHtml(contract.supports_vector_overlays === false ? 'false' : 'true')} - supports_model_3d_candidates ${escapeHtml(contract.supports_model_3d_candidates === false ? 'false' : 'true')} - supports_spatial_observations ${escapeHtml(contract.supports_spatial_observations === false ? 'false' : 'true')}<br>
+    perception_lanes: ${lanes.map((lane) => `<span class="chip">${escapeHtml(lane)}</span>`).join('') || '<span class="chip">object_identification</span><span class="chip">vector_overlay</span><span class="chip">model_3d_candidate</span>'}<br>
+    produces: ${produces.map((field) => `<span class="chip">${escapeHtml(field)}</span>`).join('') || '<span class="chip">llm_observations</span><span class="chip">vector_overlays</span><span class="chip">model_3d_candidates</span>'}<br>
+    supported_applications: ${apps.map((app) => `<span class="chip">${escapeHtml(app)}</span>`).join('') || '<span class="chip">halo_fire</span><span class="chip">landscout</span><span class="chip">nameforge</span>'}<br>
+    blocked_claims: ${blocked.map((claim) => `<span class="chip">${escapeHtml(claim)}</span>`).join('') || '<span class="chip">claim gates remain blocked</span>'}<br>
+    use_for_claims false - claim_gate_effect ${escapeHtml(contract.claim_gate_effect || 'no_claims_cleared')}
+  </div>`;
+}
+
 function renderSam31ActualValueQueueSummary(readback) {
   const queue = readback && readback.queue && typeof readback.queue === 'object' ? readback.queue : readback;
   if (!queue || typeof queue !== 'object') return '';
@@ -1127,6 +1147,7 @@ function renderSam31ActualValueQueueSummary(readback) {
     <div class="claims">Consumer pull: ${endpointRows} <button class="go" type="button" style="padding:5px 8px;font-size:10px;margin:2px;background:#52525b" data-sam31-actual-value-clear-filter="true">all consumers</button></div>
     <div class="claims">Replacement readback: <span class="chip">openclaw.sam31.actual_value_replacement_readback.v1</span> ${replacementReadbackRows}</div>
     <div class="claims">Supported filter keys: consumer=halo_fire consumer=landscout consumer=nameforge</div>
+    ${renderSam31ActualValueResolverExtrapolationContract(readback)}
     <div class="claims">SAM31+LLM sectioning/object/vector/3D outputs are temporary values until replaced with actual evidence.</div>
   </div>`;
 }
