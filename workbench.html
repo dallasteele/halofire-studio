@@ -154,6 +154,8 @@ const usd = (n) => '$' + Number(n).toLocaleString('en-US', { maximumFractionDigi
 let resolverQueueFilterQuery = '';
 let sam31ActualValueQueueRows = [];
 let sam31ActualValueQueueConsumerFilter = '';
+let currentEvidenceRows = [];
+let latestSam31ActualValueReplacementReadbackEvidence = null;
 let lastSam31ActualValueResolverReplay = null;
 const SAM31_ACTUAL_VALUE_GLOBAL_READBACK_ROUTE = '/api/openclaw/sam31/actual-value-resolver-queue?projectName=';
 const SAM31_ACTUAL_VALUE_REPLACEMENT_READBACK_ROUTE = '/api/openclaw/sam31/actual-value-replacements?projectName=';
@@ -757,7 +759,22 @@ function renderHalofireSam31SprinklerPreliminaryReplayQueue(rows, sourcePdfBound
   }).join('')}<span class="muted" style="font-size:10px">Filter API: /resolver-queue?sam31SprinklerReplay=ready&lane=obstruction_or_clash_review - /preliminary-replay - all rows keep use_for_claims false</span></div>`;
 }
 
+function renderSam31ActualValueReplacementReadbackEvidenceDetail(row) {
+  try {
+    const packet = JSON.parse(row.notes || '{}');
+    const readback = packet.replacement_readback && typeof packet.replacement_readback === 'object' ? packet.replacement_readback : {};
+    const blocked = Array.isArray(packet.blocked_claims) ? packet.blocked_claims : [];
+    const limitations = Array.isArray(packet.limitations) ? packet.limitations : [];
+    return `<div class="muted" style="font-size:11px;margin-top:3px">Saved SAM31 actual-value replacement readback evidence detail: ${escapeHtml(packet.artifact_type || readback.artifact_type || 'openclaw.sam31.actual_value_replacement_readback.v1')}<br>requested_consumer ${escapeHtml(packet.requested_consumer || readback.requested_consumer || 'all-consumers')} - item_count ${escapeHtml(readback.item_count ?? 0)} - pending_count ${escapeHtml(readback.pending_count ?? 0)} - recorded_count ${escapeHtml(readback.recorded_count ?? 0)}<br>source_openclaw_sam31_actual_value_resolver_contract_evidence_id ${escapeHtml(packet.source_openclaw_sam31_actual_value_resolver_contract_evidence_id || readback.source_openclaw_sam31_actual_value_resolver_contract_evidence_id || 'missing')} - source_queue_route ${escapeHtml(packet.source_queue_route || readback.source_queue_route || 'missing')}<br>source_ref ${escapeHtml(row.source_ref || 'missing')} - source_file ${escapeHtml(row.source_file || 'missing')} - claim_gate_effect ${escapeHtml(packet.claim_gate_effect || readback.claim_gate_effect || 'no_claims_cleared')} - no_claim_gates_cleared true<br>Blocks still active: ${blocked.map((claim) => `<span class="chip">${escapeHtml(claim)}</span>`).join('') || '<span class="chip">claim gates remain blocked</span>'}<br>Limitations: ${limitations.map((item) => `<span class="chip">${escapeHtml(item)}</span>`).join('') || '<span class="chip">best-effort readback only</span>'}<br><button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0369a1" data-sam31-actual-value-saved-replacement-readback-download="${escapeHtml(row.id)}">Download saved replacement readback evidence</button></div>`;
+  } catch {
+    return '<div class="muted" style="font-size:11px;margin-top:3px">Saved SAM31 actual-value replacement readback evidence detail unavailable</div>';
+  }
+}
+
 function evidenceDetail(row) {
+  if (row.evidence_type === 'openclaw_sam31_actual_value_replacement_readback') {
+    return renderSam31ActualValueReplacementReadbackEvidenceDetail(row);
+  }
   if (row.evidence_type === 'openclaw_sam31_extrapolation_artifact') {
     try {
       const packet = JSON.parse(row.notes || '{}');
@@ -931,6 +948,7 @@ function evidenceDetail(row) {
 
 async function refreshEvidence() {
   const evidence = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/evidence');
+  currentEvidenceRows = Array.isArray(evidence) ? evidence : [];
   document.getElementById('evidence').innerHTML = evidence.length ? evidence.map((e) => `
     <div class="ev" id="evidence-${escapeHtml(e.id)}" style="scroll-margin-top:96px">
       <span>${escapeHtml(e.evidence_type)}${evidenceDetail(e)}</span>
@@ -995,6 +1013,9 @@ async function refreshEvidence() {
   });
   document.querySelectorAll('[data-sam31-visual-audit-evidence-id]').forEach((button) => {
     button.onclick = () => downloadSam31VisualAuditPacket(button.dataset.sam31VisualAuditEvidenceId);
+  });
+  document.querySelectorAll('[data-sam31-actual-value-saved-replacement-readback-download]').forEach((button) => {
+    button.onclick = () => downloadSavedSam31ActualValueReplacementReadbackEvidence(button.dataset.sam31ActualValueSavedReplacementReadbackDownload);
   });
 }
 
@@ -1129,6 +1150,12 @@ function renderSam31ActualValueQueueSummary(readback) {
   const latestContractEvidence = readback?.latest_actual_value_resolver_contract_evidence
     || queue.latest_actual_value_resolver_contract_evidence
     || null;
+  const latestReplacementReadbackEvidence = readback?.latest_actual_value_replacement_readback_evidence
+    || queue.latest_actual_value_replacement_readback_evidence
+    || null;
+  const savedReplacementReadbackCount = readback?.saved_actual_value_replacement_readback_count
+    ?? queue.saved_actual_value_replacement_readback_count
+    ?? 0;
   const contractEvidenceId = readback?.source_openclaw_sam31_actual_value_resolver_contract_evidence_id
     || queue.source_openclaw_sam31_actual_value_resolver_contract_evidence_id
     || latestContractEvidence?.evidence_id
@@ -1156,12 +1183,16 @@ function renderSam31ActualValueQueueSummary(readback) {
     const href = `${SAM31_ACTUAL_VALUE_REPLACEMENT_READBACK_ROUTE}${encodeURIComponent(currentProjectName())}&consumer=${encodeURIComponent(consumer)}`;
     return `<button class="go" type="button" style="padding:5px 8px;font-size:10px;margin:2px;background:#1d4ed8" data-sam31-actual-value-replacement-readback-consumer="${escapeHtml(consumer)}" data-sam31-actual-value-replacement-readback-href="${escapeHtml(href)}">${escapeHtml(consumer)} poll_actual_value_replacement_details</button>`;
   }).join('');
+  const savedReplacementReadbackLine = latestReplacementReadbackEvidence
+    ? `latest_actual_value_replacement_readback_evidence #${escapeHtml(latestReplacementReadbackEvidence.evidence_id || latestReplacementReadbackEvidence.id || 'missing')} - latest_actual_value_replacement_readback_evidence_id ${escapeHtml(readback?.latest_actual_value_replacement_readback_evidence_id || queue.latest_actual_value_replacement_readback_evidence_id || latestReplacementReadbackEvidence.evidence_id || 'missing')} - saved_actual_value_replacement_readback_count ${escapeHtml(savedReplacementReadbackCount)} - source_queue_route ${escapeHtml(latestReplacementReadbackEvidence.source_queue_route || 'missing')} <button class="go" type="button" style="padding:5px 8px;font-size:10px;margin:2px;background:#0369a1" data-sam31-actual-value-saved-replacement-readback-download="${escapeHtml(latestReplacementReadbackEvidence.evidence_id || latestReplacementReadbackEvidence.id || '')}">Download saved replacement readback evidence</button>`
+    : `latest_actual_value_replacement_readback_evidence missing - latest_actual_value_replacement_readback_evidence_id missing - saved_actual_value_replacement_readback_count ${escapeHtml(savedReplacementReadbackCount)}`;
   return `<div id="sam31ActualValueQueueSummary" class="gate warning">
     <div class="code">openclaw.sam31.actual_value_resolver_queue.v1 Â· ${escapeHtml(queue.status || 'actual_value_replacements_pending')}</div>
     <div class="na">global_readback ${escapeHtml(SAM31_ACTUAL_VALUE_GLOBAL_READBACK_ROUTE)} Â· source_project_route ${escapeHtml(readback?.source_project_route || '/api/projects/{projectName}/openclaw/sam31/actual-value-resolver-queue')}</div>
     <div class="claims">item_count ${escapeHtml(queue.item_count ?? 0)} Â· pending_count ${escapeHtml(queue.pending_count ?? 0)} Â· recorded_count ${escapeHtml(queue.recorded_count ?? 0)} Â· use_for_claims false Â· claim_gate_effect no_claims_cleared</div>
     <div class="claims">source_openclaw_sam31_actual_value_resolver_contract_evidence_id ${escapeHtml(readback?.source_openclaw_sam31_actual_value_resolver_contract_evidence_id || queue.source_openclaw_sam31_actual_value_resolver_contract_evidence_id || 'missing')} - latest_actual_value_resolver_contract_evidence ${latestContractEvidence ? `#${escapeHtml(latestContractEvidence.evidence_id || 'missing')} ${escapeHtml(latestContractEvidence.requested_consumer || 'all-consumers')} ${escapeHtml(latestContractEvidence.claim_gate_effect || 'no_claims_cleared')}` : 'missing'}</div>
     <div class="claims">${contractEvidenceLine} ${contractEvidenceReadbackAction}</div>
+    <div class="claims">${savedReplacementReadbackLine}</div>
     <div class="claims">Consumer pull: ${endpointRows} <button class="go" type="button" style="padding:5px 8px;font-size:10px;margin:2px;background:#52525b" data-sam31-actual-value-clear-filter="true">all consumers</button></div>
     <div class="claims">Replacement readback: <span class="chip">openclaw.sam31.actual_value_replacement_readback.v1</span> ${replacementReadbackRows}</div>
     <div class="claims">Supported filter keys: consumer=halo_fire consumer=landscout consumer=nameforge</div>
@@ -1304,6 +1335,47 @@ async function saveSam31ActualValueContractReplacementReadbackEvidence(contractE
   await refreshSam31ActualValueQueue();
 }
 
+async function downloadSavedSam31ActualValueReplacementReadbackEvidence(evidenceId = '') {
+  const status = document.getElementById('sam31ActualValueQueueStatus') || document.getElementById('evidence');
+  const targetId = Number(evidenceId);
+  let evidence = latestSam31ActualValueReplacementReadbackEvidence
+    && Number(latestSam31ActualValueReplacementReadbackEvidence.evidence_id || latestSam31ActualValueReplacementReadbackEvidence.id) === targetId
+    ? latestSam31ActualValueReplacementReadbackEvidence
+    : null;
+  if (!evidence) {
+    evidence = currentEvidenceRows.find((row) => Number(row.id || row.evidence_id) === targetId) || null;
+  }
+  if (!evidence) {
+    const rows = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/evidence');
+    currentEvidenceRows = Array.isArray(rows) ? rows : [];
+    evidence = currentEvidenceRows.find((row) => Number(row.id || row.evidence_id) === targetId) || null;
+  }
+  if (!evidence) {
+    if (status) status.textContent = 'Saved SAM31 actual-value replacement readback evidence is not available.';
+    return;
+  }
+  let packet = evidence.replacement_readback || null;
+  if (!packet && evidence.notes) {
+    try {
+      const parsed = JSON.parse(evidence.notes || '{}');
+      packet = parsed.replacement_readback || parsed;
+    } catch {
+      packet = null;
+    }
+  }
+  if (!packet || packet.artifact_type !== 'openclaw.sam31.actual_value_replacement_readback.v1') {
+    if (status) status.textContent = 'Saved evidence does not contain openclaw.sam31.actual_value_replacement_readback.v1.';
+    return;
+  }
+  const blob = new Blob([JSON.stringify(packet, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = evidence.download_name || evidence.source_file || `${currentProjectName().toLowerCase().replace(/[^a-z0-9]+/g, '-')}-saved-sam31-actual-value-replacement-readback.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  if (status) status.textContent = 'Downloaded saved openclaw.sam31.actual_value_replacement_readback.v1 evidence; claim gates remain blocked.';
+}
+
 async function downloadSam31ActualValueResolverContractPacket(consumer = '') {
   const status = document.getElementById('sam31ActualValueQueueStatus');
   const consumerParam = String(consumer || '').trim();
@@ -1345,6 +1417,9 @@ async function refreshSam31ActualValueQueue() {
   const index = queue;
   const rows = Array.isArray(queue.items) ? queue.items : [];
   sam31ActualValueQueueRows = rows;
+  latestSam31ActualValueReplacementReadbackEvidence = readback.latest_actual_value_replacement_readback_evidence
+    || queue.latest_actual_value_replacement_readback_evidence
+    || null;
   target.innerHTML = rows.length
     ? rows.map(renderSam31ActualValueQueueItem).join('')
     : `<span class="muted">No SAM31 actual-value queue rows for ${escapeHtml(currentProjectName())}. halofire.sam31_actual_value_work_item_index.v1 · status ${escapeHtml(index.status || 'no_sam31_actual_value_work_items')} · use_for_claims false · claim_gate_effect no_claims_cleared</span>`;
@@ -1381,6 +1456,9 @@ async function refreshSam31ActualValueQueue() {
   });
   document.querySelectorAll('[data-sam31-actual-value-resolver-contract-save]').forEach((button) => {
     button.onclick = () => saveSam31ActualValueResolverContractEvidence(button.dataset.sam31ActualValueResolverContractSave);
+  });
+  document.querySelectorAll('[data-sam31-actual-value-saved-replacement-readback-download]').forEach((button) => {
+    button.onclick = () => downloadSavedSam31ActualValueReplacementReadbackEvidence(button.dataset.sam31ActualValueSavedReplacementReadbackDownload);
   });
 }
 

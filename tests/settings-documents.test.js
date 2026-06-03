@@ -1215,6 +1215,34 @@ describe('HaloFire settings + documentation upload/link API', () => {
       use_for_claims: false,
       claim_gate_effect: 'no_claims_cleared',
     }));
+
+    const queueReadbackRes = await request(`/api/openclaw/sam31/actual-value-resolver-queue?projectName=${encodeURIComponent(projectName)}&contractEvidenceId=${contractEvidence.lastInsertRowid}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(queueReadbackRes.status).toBe(200);
+    const queueReadback = await queueReadbackRes.json();
+    expect(queueReadback).toEqual(expect.objectContaining({
+      latest_actual_value_replacement_readback_evidence_id: saved.evidence_id,
+      saved_actual_value_replacement_readback_count: 1,
+    }));
+    expect(queueReadback.latest_actual_value_replacement_readback_evidence).toEqual(expect.objectContaining({
+      evidence_id: saved.evidence_id,
+      evidence_type: 'openclaw_sam31_actual_value_replacement_readback',
+      artifact_type: 'openclaw.sam31.actual_value_replacement_readback.v1',
+      requested_consumer: 'nameforge',
+      source_openclaw_sam31_actual_value_resolver_contract_evidence_id: Number(contractEvidence.lastInsertRowid),
+      item_count: 1,
+      download_name: expect.stringContaining('sam31-actual-value-replacement-readback'),
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(queueReadback.latest_actual_value_replacement_readback_evidence.replacement_readback).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.actual_value_replacement_readback.v1',
+      requested_consumer: 'nameforge',
+      item_count: 1,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
   });
 
   it('records SAM31 actual-value replacements through a typed OpenClaw intake route', async () => {

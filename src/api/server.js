@@ -1012,6 +1012,63 @@ function latestOpenClawSam31ActualValueResolverContractEvidence(projectName, con
     || null;
 }
 
+function openClawSam31ActualValueReplacementReadbackEvidenceFromRow(row) {
+  if (!row) return null;
+  try {
+    const parsed = JSON.parse(row.notes || '{}');
+    if (!parsed || parsed.kind !== 'openclaw_sam31_actual_value_replacement_readback') return null;
+    const readback = parsed.replacement_readback && typeof parsed.replacement_readback === 'object' && !Array.isArray(parsed.replacement_readback)
+      ? parsed.replacement_readback
+      : {};
+    const requestedConsumer = String(parsed.requested_consumer || readback.requested_consumer || '').trim().toLowerCase() || null;
+    const contractEvidenceId = Number(
+      parsed.source_openclaw_sam31_actual_value_resolver_contract_evidence_id
+      || readback.source_openclaw_sam31_actual_value_resolver_contract_evidence_id
+      || 0,
+    ) || null;
+    return {
+      evidence_id: row.id,
+      evidence_type: row.evidence_type,
+      evidence_status: row.status,
+      source_file: row.source_file || null,
+      source_ref: row.source_ref || null,
+      download_name: row.source_file || 'sam31-actual-value-replacement-readback.json',
+      artifact_type: parsed.artifact_type || readback.artifact_type || 'openclaw.sam31.actual_value_replacement_readback.v1',
+      requested_consumer: requestedConsumer,
+      source_queue_route: parsed.source_queue_route || readback.source_queue_route || null,
+      source_openclaw_sam31_actual_value_resolver_contract_evidence_id: contractEvidenceId,
+      supported_consumers: Array.isArray(parsed.supported_consumers) ? parsed.supported_consumers : (Array.isArray(readback.supported_consumers) ? readback.supported_consumers : []),
+      acceptable_actual_evidence: Array.isArray(parsed.acceptable_actual_evidence) ? parsed.acceptable_actual_evidence : (Array.isArray(readback.acceptable_actual_evidence) ? readback.acceptable_actual_evidence : []),
+      item_count: Number(readback.item_count || 0) || 0,
+      pending_count: Number(readback.pending_count || 0) || 0,
+      recorded_count: Number(readback.recorded_count || 0) || 0,
+      blocked_claims: Array.isArray(parsed.blocked_claims) ? parsed.blocked_claims : [],
+      limitations: Array.isArray(parsed.limitations) ? parsed.limitations : [],
+      replacement_readback: readback,
+      use_for_claims: false,
+      claim_gate_effect: parsed.claim_gate_effect || readback.claim_gate_effect || 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    };
+  } catch {
+    return null;
+  }
+}
+
+function listOpenClawSam31ActualValueReplacementReadbackEvidence(projectName, options = {}) {
+  const requestedConsumer = String(options.consumer || '').trim().toLowerCase();
+  const contractEvidenceId = Number(options.contractEvidenceId || options.contract_evidence_id || 0) || null;
+  const rows = db
+    .prepare(`SELECT * FROM project_evidence
+              WHERE project_name = ? AND evidence_type = 'openclaw_sam31_actual_value_replacement_readback'
+              ORDER BY created_at DESC, id DESC`)
+    .all(projectName);
+  return rows
+    .map(openClawSam31ActualValueReplacementReadbackEvidenceFromRow)
+    .filter(Boolean)
+    .filter((row) => !requestedConsumer || row.requested_consumer === requestedConsumer)
+    .filter((row) => !contractEvidenceId || row.source_openclaw_sam31_actual_value_resolver_contract_evidence_id === contractEvidenceId);
+}
+
 function listSam31ReplayActualValueReplacementDetails(projectName, options = {}) {
   const consumerFilter = String(options.consumer || '').trim().toLowerCase();
   const rows = db
@@ -1293,6 +1350,11 @@ function buildOpenClawSam31ActualValueResolverQueue(projectName, options = {}) {
   const index = buildOpenClawSam31ActualValueWorkItemIndex(projectName);
   const latestReplacementByReview = latestSam31ActualValueReplacementEvidenceByReview(projectName);
   const latestContractEvidence = requestedContractEvidence || latestOpenClawSam31ActualValueResolverContractEvidence(projectName, consumerFilter);
+  const savedReplacementReadbackEvidenceRows = listOpenClawSam31ActualValueReplacementReadbackEvidence(projectName, {
+    consumer: consumerFilter,
+    contractEvidenceId: requestedContractEvidence?.evidence_id || null,
+  });
+  const latestReplacementReadbackEvidence = savedReplacementReadbackEvidenceRows[0] || null;
   const sam31LlmExtrapolationContract = openClawSam31ActualValueResolverExtrapolationContract(projectName);
   const replayReplacementItems = listSam31ReplayActualValueReplacementDetails(projectName, { consumer: consumerFilter })
     .map((detail) => ({
@@ -1394,6 +1456,9 @@ function buildOpenClawSam31ActualValueResolverQueue(projectName, options = {}) {
     recorded_count: recordedCount,
     replay_replacement_count: replayReplacementItems.length,
     replay_replacement_items: replayReplacementItems,
+    saved_actual_value_replacement_readback_count: savedReplacementReadbackEvidenceRows.length,
+    latest_actual_value_replacement_readback_evidence_id: latestReplacementReadbackEvidence?.evidence_id || null,
+    latest_actual_value_replacement_readback_evidence: latestReplacementReadbackEvidence,
     acceptable_actual_evidence: [
       '1881 proposal workbook row or sheet reference',
       'reviewed vector overlay SVG or marked-up plan ref',
@@ -1439,6 +1504,9 @@ function buildOpenClawSam31ActualValueResolverQueueReadback(projectName, options
     contract_evidence_filter_id: contractEvidenceFilterId,
     source_openclaw_sam31_actual_value_resolver_contract_evidence_id: queue.source_openclaw_sam31_actual_value_resolver_contract_evidence_id || null,
     latest_actual_value_resolver_contract_evidence: queue.latest_actual_value_resolver_contract_evidence || null,
+    latest_actual_value_replacement_readback_evidence_id: queue.latest_actual_value_replacement_readback_evidence_id || null,
+    latest_actual_value_replacement_readback_evidence: queue.latest_actual_value_replacement_readback_evidence || null,
+    saved_actual_value_replacement_readback_count: queue.saved_actual_value_replacement_readback_count || 0,
     item_count: queue.item_count,
     pending_count: queue.pending_count,
     recorded_count: queue.recorded_count,
