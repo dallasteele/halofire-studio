@@ -578,6 +578,11 @@ describe('studio static origin handling', () => {
     expect(html).toContain('data-sam31-actual-value-work-item-download-index');
     expect(html).toContain('data-sam31-actual-value-work-item-record-index');
     expect(html).toContain('sam31_actual_value_replacement');
+    expect(html).toContain('replay_replacement_count');
+    expect(html).toContain('replay_replacement_details');
+    expect(html).toContain('renderSam31ReplayActualValueReplacementItems');
+    expect(html).toContain('openclaw.sam31.replay_actual_value_replacement_queue_item.v1');
+    expect(html).toContain('openclaw.sam31.replay_actual_value_replacement_detail.v1');
     expect(html).toContain('employee_actual_value_next_action');
     expect(html).toContain('settingsSam31ActualValueSourceRef-');
     expect(html).toContain('settingsSam31ActualValueSourceFile-');

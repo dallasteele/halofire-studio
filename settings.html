@@ -763,13 +763,52 @@ async function recordSettingsSam31ActualValueEvidence(index) {
   }
 }
 
+function renderSam31ReplayActualValueReplacementItems(readback = {}, projectName = catalogEvidenceProjectName()) {
+  const details = Array.isArray(readback.replay_replacement_details) ? readback.replay_replacement_details : [];
+  const count = Number(readback.replay_replacement_count ?? details.length) || 0;
+  const status = readback.replay_replacement_status || (count ? 'replay_actual_value_replacements_recorded' : 'no_replay_actual_value_replacements_recorded');
+  const rows = details.map((detail, detailIndex) => {
+    const supported = Array.isArray(detail.supported_product_lanes) ? detail.supported_product_lanes : [];
+    const blocked = Array.isArray(detail.blocked_claims) ? detail.blocked_claims : [];
+    const sourceRefs = Array.isArray(detail.source_refs) ? detail.source_refs : [];
+    const summary = detail.replacement_summary || {};
+    return `<div class="note" style="margin-top:8px;margin-bottom:8px">
+      <div class="row" style="padding-top:0"><span>Replay replacement ${escapeHtml(detailIndex + 1)} ${escapeHtml(detail.consumer || detail.product_lane || 'shared consumer')}</span><span class="st partial">${escapeHtml(detail.status || 'review_required')}</span></div>
+      <div class="muted" style="margin-top:6px">openclaw.sam31.replay_actual_value_replacement_detail.v1 - evidence #${escapeHtml(detail.evidence_id || detail.source_evidence_id || 'missing')} - source_ref ${escapeHtml(detail.source_ref || 'missing')}</div>
+      <div class="muted" style="margin-top:6px">product_lane ${escapeHtml(detail.product_lane || detail.consumer || 'unknown')} - supported_product_lanes ${supported.map((lane) => `<span class="pill present">${escapeHtml(lane)}</span>`).join('') || '<span class="pill">not declared</span>'}</div>
+      <div class="muted" style="margin-top:6px">source_refs: ${sourceRefs.map((ref) => `<span class="pill">${escapeHtml(ref)}</span>`).join('') || '<span class="pill missing">missing source refs</span>'}</div>
+      <div class="muted" style="margin-top:6px">replacement_summary: <span class="pill">semantic_label_count ${escapeHtml(summary.semantic_label_count || 0)}</span><span class="pill">object_hypothesis_count ${escapeHtml(summary.object_hypothesis_count || 0)}</span><span class="pill">vector_overlay_count ${escapeHtml(summary.vector_overlay_count || 0)}</span><span class="pill">model_3d_candidate_count ${escapeHtml(summary.model_3d_candidate_count || 0)}</span></div>
+      <div class="muted" style="margin-top:6px">next_action: ${escapeHtml(detail.next_action || detail.employee_actual_value_next_action || 'Review this replay replacement against actual HaloFire source values before downstream use.')}</div>
+      <div class="muted" style="margin-top:6px">blocked_claims: ${blocked.map((claim) => `<span class="pill missing">${escapeHtml(claim)}</span>`).join('') || '<span class="pill">claim gates remain blocked</span>'}</div>
+      <div class="muted" style="margin-top:6px">use_for_claims false - claim_gate_effect ${escapeHtml(detail.claim_gate_effect || 'no_claims_cleared')}</div>
+    </div>`;
+  }).join('');
+  return `<div class="note" style="margin-bottom:10px">
+    <div class="row" style="padding-top:0"><span>Replay SAM31 actual-value replacements for ${escapeHtml(projectName)}</span><span class="st partial">${escapeHtml(status)}</span></div>
+    <div class="muted" style="margin-top:6px">replay_replacement_count ${escapeHtml(count)} - replay_replacement_details ${escapeHtml(details.length)} - openclaw.sam31.replay_actual_value_replacement_queue_item.v1 - openclaw.sam31.replay_actual_value_replacement_detail.v1</div>
+    <div class="muted" style="margin-top:6px">These rows are readback for OpenClaw/SAM31+LLM actual-value replay. They can guide HaloFire employee correction work, but use_for_claims false and claim_gate_effect no_claims_cleared remain in force.</div>
+    ${rows || '<div class="muted" style="margin-top:8px">No replay replacement rows recorded yet. Record a SAM31 actual-value evidence note after checking actual 1881 workbook/sheet, vector, 3D model, screenshot, or console source values.</div>'}
+  </div>`;
+}
+
 async function loadSettingsSam31ActualValueWorkItems(projectName = catalogEvidenceProjectName()) {
   const target = $('settingsSam31ActualValueWorkItems');
   try {
     const index = await api('/projects/' + encodeURIComponent(projectName) + '/openclaw/sam31/actual-value-work-items');
+    let replacementReadback = {
+      artifact_type: 'openclaw.sam31.actual_value_replacement_readback.v1',
+      replay_replacement_count: 0,
+      replay_replacement_details: [],
+      replay_replacement_status: 'replay_replacement_readback_unavailable',
+    };
+    try {
+      replacementReadback = await api('/openclaw/sam31/actual-value-replacements?projectName=' + encodeURIComponent(projectName));
+    } catch (readbackError) {
+      replacementReadback.replay_replacement_status = 'replay_replacement_readback_unavailable: ' + readbackError.message;
+    }
     const rows = Array.isArray(index.items) ? index.items : [];
     settingsSam31ActualValueRows = rows;
-    target.innerHTML = rows.map((row, itemIndex) => {
+    const workItemHtml = rows.map((row, itemIndex) => {
       const summary = row.replacement_summary || {};
       const blocked = Array.isArray(row.blocked_claims) ? row.blocked_claims : [];
       const acceptable = Array.isArray(row.acceptable_actual_evidence) ? row.acceptable_actual_evidence : [];
@@ -808,6 +847,7 @@ async function loadSettingsSam31ActualValueWorkItems(projectName = catalogEviden
         </div>
       </div>`;
     }).join('') || `<span class="muted">No SAM31 actual-value work items for ${escapeHtml(projectName)}. Status: ${escapeHtml(index.status || 'no_sam31_actual_value_work_items')} · claim_gate_effect no_claims_cleared</span>`;
+    target.innerHTML = renderSam31ReplayActualValueReplacementItems(replacementReadback, projectName) + workItemHtml;
     target.querySelectorAll('[data-sam31-actual-value-work-item-download-index]').forEach((btn) => {
       btn.addEventListener('click', () => downloadSettingsSam31ActualValueWorkItem(btn.getAttribute('data-sam31-actual-value-work-item-download-index')));
     });
