@@ -11,4 +11,14 @@ describe('HaloFire Settings evidence wizard signed reviewer workflow', () => {
     expect(html).toContain('id="wizPacketStatus"');
     expect(html).toContain('downloadClaimGateReviewPacket');
   });
+
+  it('surfaces room-boundary floor-plan override actions in the signed settings portal', () => {
+    const html = fs.readFileSync(SETTINGS_HTML, 'utf8');
+    expect(html).toContain('Room-Boundary Floor-Plan Overrides');
+    expect(html).toContain('id="settingsRoomBoundaryFloorPlanOverrides"');
+    expect(html).toContain('loadSettingsRoomBoundaryFloorPlanOverrides');
+    expect(html).toContain('Download floor-plan override action');
+    expect(html).toContain('halofire.room_boundary_floor_plan_override_action_packet.v1');
+    expect(html).toContain('claim_gate_effect no_claims_cleared');
+  });
 });

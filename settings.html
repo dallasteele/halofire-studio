@@ -91,6 +91,16 @@
   </div>
 
   <div class="card wide">
+    <h2>Room-Boundary Floor-Plan Overrides</h2>
+    <p class="muted" style="margin-bottom:8px">
+      Employee-reviewed room-boundary packets that can be replayed as internal-alpha floor-plan overrides for best-effort bidding.
+      These actions preserve source refs and corrected_room_polygons, but claim_gate_effect no_claims_cleared remains in force.
+    </p>
+    <div id="settingsRoomBoundaryFloorPlanOverrides"><span class="muted">loading room-boundary floor-plan overrides...</span></div>
+    <div id="roomBoundaryFloorPlanOverrideMsg" class="muted" style="margin-top:8px"></div>
+  </div>
+
+  <div class="card wide">
     <h2>Evidence Wizard</h2>
     <p class="muted" style="margin-bottom:8px">Pick a project gate, attach the exact acceptable evidence, then either resolve the gate or record evidence only. This stays fail-closed: the wizard never clears a gate with the wrong evidence type.</p>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
@@ -218,6 +228,7 @@ const stClass = (s) => String(s).toLowerCase().replace(/[^a-z]/g,'');
 let wizardState = { projects: [], gateMap: new Map(), selectedProject: '', canWrite: false };
 let settingsCatalogLedgerRows = [];
 let settingsSam31ActualValueRows = [];
+let settingsRoomBoundaryFloorPlanOverrideRows = [];
 let lastSettingsSam31ActualValueResolverReplay = null;
 const SETTINGS_CATALOG_LEDGER_FAMILIES = [
   'family:pipe_steel_sch40_2p0in',
@@ -474,6 +485,7 @@ $('wizProject').addEventListener('change', async () => {
   const projectName = $('wizProject').value;
   await loadWizard(projectName);
   await loadSettingsSam31ActualValueWorkItems(projectName);
+  await loadSettingsRoomBoundaryFloorPlanOverrides(projectName);
 });
 $('wizGate').addEventListener('change', syncWizardGateForm);
 $('wizType').addEventListener('change', syncWizardSignoff);
@@ -934,6 +946,64 @@ async function loadSettingsSam31ActualValueWorkItems(projectName = catalogEviden
   }
 }
 
+async function downloadSettingsRoomBoundaryFloorPlanOverrideAction(index) {
+  const row = settingsRoomBoundaryFloorPlanOverrideRows[Number(index)];
+  const msg = $('roomBoundaryFloorPlanOverrideMsg');
+  if (!row || !row.floor_plan_override_action?.download_href) {
+    msg.className = 'err';
+    msg.textContent = 'room-boundary floor-plan override action link missing';
+    return;
+  }
+  try {
+    const packet = await api(row.floor_plan_override_action.download_href);
+    if (packet.artifact_type !== 'halofire.room_boundary_floor_plan_override_action_packet.v1') {
+      throw new Error('Unexpected room-boundary floor-plan override action packet type');
+    }
+    const blob = new Blob([JSON.stringify(packet, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = packet.download_name || 'room-boundary-floor-plan-override-action.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+    msg.className = 'muted';
+    msg.textContent = 'downloaded halofire.room_boundary_floor_plan_override_action_packet.v1; claim gates remain blocked';
+  } catch(e) {
+    msg.className = 'err';
+    msg.textContent = e.message;
+  }
+}
+
+async function loadSettingsRoomBoundaryFloorPlanOverrides(projectName = catalogEvidenceProjectName()) {
+  const target = $('settingsRoomBoundaryFloorPlanOverrides');
+  try {
+    const queue = await api('/projects/' + encodeURIComponent(projectName) + '/resolver-queue');
+    const items = Array.isArray(queue.items) ? queue.items : (Array.isArray(queue) ? queue : []);
+    const rows = items.filter((item) => item.kind === 'room_boundary_visual_audit' && item.floor_plan_override_action);
+    settingsRoomBoundaryFloorPlanOverrideRows = rows;
+    target.innerHTML = rows.map((row, index) => {
+      const action = row.floor_plan_override_action || {};
+      const override = row.floor_plan_override || {};
+      const blocked = Array.isArray(row.blocked_claims) ? row.blocked_claims : [];
+      return `<div class="note" style="margin-bottom:10px">
+        <div class="row" style="padding-top:0"><span>Room-boundary override ${escapeHtml(row.evidence_id || action.source_evidence_id || index + 1)}</span><span class="st partial">${escapeHtml(row.floor_plan_override_status || 'internal_alpha_floor_plan_override_ready')}</span></div>
+        <div class="muted" style="margin-top:6px">halofire.room_boundary_floor_plan_override_action_packet.v1 - source_evidence_id ${escapeHtml(action.source_evidence_id || row.evidence_id || 'missing')} - source_review_evidence_id ${escapeHtml(action.source_review_evidence_id || 'missing')} - source_sam31_evidence_id ${escapeHtml(action.source_sam31_evidence_id || 'missing')}</div>
+        <div class="muted" style="margin-top:6px">floor_plan_override_source ${escapeHtml(row.floor_plan_override_source || action.room_boundary_source || override.room_boundary_source || 'latest_employee_review_packet')} - corrected_room_polygon_count ${escapeHtml(action.corrected_room_polygon_count ?? row.corrected_room_polygon_count ?? override.corrected_room_polygon_count ?? 0)}</div>
+        <div class="muted" style="margin-top:6px">next_action: ${escapeHtml(action.next_action || 'Download action packet, replay POST /sprinkler-bid internally, then attach professional/AHJ/manufacturer evidence before regulated claims.')}</div>
+        <div class="muted" style="margin-top:6px">blocked_claims: ${blocked.map((claim) => `<span class="pill missing">${escapeHtml(claim)}</span>`).join('') || '<span class="pill missing">regulated claims remain blocked</span>'}</div>
+        <div class="muted" style="margin-top:6px">use_for_claims false - claim_gate_effect no_claims_cleared - no_claim_gates_cleared true</div>
+        <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+          <button type="button" data-room-boundary-floor-plan-override-action-index="${index}">Download floor-plan override action</button>
+        </div>
+      </div>`;
+    }).join('') || `<span class="muted">No room-boundary floor-plan override actions for ${escapeHtml(projectName)}. Review a room-boundary packet first; regulated claims remain blocked.</span>`;
+    target.querySelectorAll('[data-room-boundary-floor-plan-override-action-index]').forEach((btn) => {
+      btn.addEventListener('click', () => downloadSettingsRoomBoundaryFloorPlanOverrideAction(btn.getAttribute('data-room-boundary-floor-plan-override-action-index')));
+    });
+  } catch(e) {
+    target.innerHTML = '<span class="err">room-boundary floor-plan override actions unavailable: '+escapeHtml(e.message)+'</span>';
+  }
+}
+
 // Swap the ref input label + placeholder between catalog URL (link) and filename (upload).
 function syncAttMode() {
   const mode = $('attMode').value;
@@ -986,7 +1056,7 @@ $('attSubmit').onclick = async () => {
   } catch(e){ msg.className = 'err'; msg.textContent = e.message; }
 };
 
-loadParity(); loadDocs(); loadDeps(); initWizard(); loadLibrary(); loadSettingsCatalogSourceAcquisition(); loadSettingsSam31ActualValueWorkItems();
+loadParity(); loadDocs(); loadDeps(); initWizard(); loadLibrary(); loadSettingsCatalogSourceAcquisition(); loadSettingsSam31ActualValueWorkItems(); loadSettingsRoomBoundaryFloorPlanOverrides();
 </script>
 </body>
 </html>
