@@ -22,6 +22,18 @@ describe('HaloFire Settings evidence wizard signed reviewer workflow', () => {
     expect(html).toContain('wizExistingEvidence');
   });
 
+  it('hydrates the signed reviewer form from matching evidence rows', () => {
+    const html = fs.readFileSync(SETTINGS_HTML, 'utf8');
+    expect(html).toContain('hydrateWizardFromExistingEvidence');
+    expect(html).toContain("$('wizExistingEvidence').addEventListener('change'");
+    expect(html).toContain("$('wizSourceRef').value = row.source_ref || ''");
+    expect(html).toContain("$('wizReviewerName').value = signoff.reviewer_name || ''");
+    expect(html).toContain("$('wizReviewerTitle').value = signoff.reviewer_title || ''");
+    expect(html).toContain("$('wizSignedAt').value = formatWizardDateTimeLocal(signoff.signed_at)");
+    expect(html).toContain("$('wizOrganization').value = signoff.organization || ''");
+    expect(html).toContain("$('wizLicenseId').value = signoff.license_id || ''");
+  });
+
   it('surfaces room-boundary floor-plan override actions in the signed settings portal', () => {
     const html = fs.readFileSync(SETTINGS_HTML, 'utf8');
     expect(html).toContain('Room-Boundary Floor-Plan Overrides');

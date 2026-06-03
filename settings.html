@@ -286,6 +286,7 @@ function syncWizardGateForm() {
   const actionEl = $('wizAction');
   const packetButton = $('wizReviewPacket');
   const auditButton = $('wizResolveAudit');
+  const selectedEvidenceId = existingEl.value;
   if (!gate) {
     typeEl.innerHTML = '';
     existingEl.innerHTML = '<option value="">no recorded evidence</option>';
@@ -314,6 +315,9 @@ function syncWizardGateForm() {
       return `<option value="${row.id}">${escapeHtml(row.evidence_type)} · ${escapeHtml(sourceRef)}${escapeHtml(signoff)}</option>`;
     })].join('')
     : '<option value="">no recorded evidence</option>';
+  if (selectedEvidenceId && Array.from(existingEl.options || []).some((entry) => entry.value === selectedEvidenceId)) {
+    existingEl.value = selectedEvidenceId;
+  }
   syncWizardSignoff();
   actionEl.disabled = !gate.can_resolve || !wizardState.canWrite;
   if (!gate.can_resolve) actionEl.value = 'record';
@@ -327,6 +331,7 @@ function syncWizardGateForm() {
   $('wizGateHelp').innerHTML =
     `<b>${escapeHtml(gate.code)}</b> — ${escapeHtml(gate.acceptable_evidence || gate.next_action || '')}`
     + (gate.blocked_claims?.length ? `<div style="margin-top:6px">Blocks: ${gate.blocked_claims.map((claim) => `<span class="pill missing">${escapeHtml(claim)}</span>`).join('')}</div>` : '');
+  hydrateWizardFromExistingEvidence();
 }
 
 function selectedEvidenceNeedsSignoff() {
@@ -352,9 +357,46 @@ function applyWizardUrlPrefill() {
     const option = Array.from($('wizExistingEvidence').options || []).find((entry) => entry.value === wizardUrlPrefill.evidenceId);
     if (option) {
       $('wizExistingEvidence').value = wizardUrlPrefill.evidenceId;
-      $('wizPacketStatus').textContent = `Prefilled from Workbench for evidence #${wizardUrlPrefill.evidenceId}. Resolve the gate or download the packet for this signed reviewer lane.`;
+      hydrateWizardFromExistingEvidence();
     }
   }
+}
+
+function hydrateWizardFromExistingEvidence() {
+  const gate = wizardState.gateMap.get($('wizGate').value);
+  const selectedEvidenceId = $('wizExistingEvidence').value;
+  const packetStatus = $('wizPacketStatus');
+  if (!gate || !selectedEvidenceId) return;
+  const row = (Array.isArray(gate.matching_evidence) ? gate.matching_evidence : []).find((entry) => String(entry.id) === String(selectedEvidenceId));
+  if (!row) return;
+  $('wizType').value = row.evidence_type || '';
+  $('wizSourceRef').value = row.source_ref || '';
+  $('wizSourceFile').value = row.source_file || '';
+  let signoff = {};
+  let userNotes = '';
+  try {
+    const parsed = JSON.parse(row.notes || '{}');
+    signoff = parsed.signoff || {};
+    userNotes = parsed.user_notes || parsed.notes || '';
+  } catch {
+    userNotes = row.notes || '';
+  }
+  $('wizNotes').value = userNotes;
+  $('wizReviewerName').value = signoff.reviewer_name || '';
+  $('wizReviewerTitle').value = signoff.reviewer_title || '';
+  $('wizSignedAt').value = formatWizardDateTimeLocal(signoff.signed_at);
+  $('wizOrganization').value = signoff.organization || '';
+  $('wizLicenseId').value = signoff.license_id || '';
+  packetStatus.textContent = `Prefilled from Workbench for evidence #${selectedEvidenceId}. Resolve the gate or download the packet for this signed reviewer lane.`;
+  syncWizardSignoff();
+}
+
+function formatWizardDateTimeLocal(value) {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return String(value);
+  const pad = (part) => String(part).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
 function syncWizardSignoff() {
@@ -514,6 +556,7 @@ $('wizProject').addEventListener('change', async () => {
   await loadSettingsRoomBoundaryFloorPlanOverrides(projectName);
 });
 $('wizGate').addEventListener('change', syncWizardGateForm);
+$('wizExistingEvidence').addEventListener('change', hydrateWizardFromExistingEvidence);
 $('wizType').addEventListener('change', syncWizardSignoff);
 $('wizAction').addEventListener('change', syncWizardGateForm);
 $('wizReviewPacket').addEventListener('click', downloadClaimGateReviewPacket);
