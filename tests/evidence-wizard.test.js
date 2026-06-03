@@ -312,6 +312,18 @@ describe('HaloFire evidence wizard slice', () => {
     expect(matchingIds).toContain(signedBody.id);
     expect(matchingIds).not.toContain(unsignedEvidenceId);
     expect(gateRow.matching_evidence.some((item) => item.source_ref === 'Signed reviewer packet PR-1881-004')).toBe(true);
+    const signedRow = gateRow.matching_evidence.find((item) => item.id === signedBody.id);
+    expect(signedRow).toBeTruthy();
+    const signedNotes = JSON.parse(signedRow.notes);
+    expect(signedNotes).toEqual(expect.objectContaining({
+      kind: 'signed_reviewer_evidence',
+      claim_gate_effect: 'no_claims_cleared',
+      signoff: expect.objectContaining({
+        reviewer_name: 'Taylor Brooks',
+        reviewer_title: 'Fire Protection Engineer',
+        signed_at: '2026-06-02T16:00:00.000Z',
+      }),
+    }));
   });
 
   it('resolves a regulated gate from an already-recorded signed evidence row without duplicating it', async () => {
@@ -423,6 +435,14 @@ describe('HaloFire evidence wizard slice', () => {
     const resolvedRow = afterRows.find((item) => item.id === recordedBody.id);
     expect(resolvedRow).toBeTruthy();
     const resolvedNotes = JSON.parse(resolvedRow.notes);
+    expect(resolvedNotes).toEqual(expect.objectContaining({
+      kind: 'signed_reviewer_evidence',
+      target_gate_code: 'PROFESSIONAL_REVIEW_MISSING',
+      review_packet_href: `${PROJECT_PATH}/claim-gates/PROFESSIONAL_REVIEW_MISSING/review-packet`,
+      resolve_audit_packet_href: `${PROJECT_PATH}/claim-gates/PROFESSIONAL_REVIEW_MISSING/resolve-audit-packet`,
+      resolve_audit_packet_artifact_type: 'halofire.claim_gate_resolve_audit_packet.v1',
+      claim_gate_effect: 'gate_cleared',
+    }));
     expect(resolvedNotes.signoff).toEqual(expect.objectContaining({
       reviewer_name: 'Jamie Chen',
       reviewer_title: 'Fire Protection Engineer',

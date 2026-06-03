@@ -621,6 +621,15 @@ function hasStructuredSignedReviewerNotes(row) {
   }
 }
 
+function parseStructuredSignedReviewerNotes(row) {
+  if (!hasStructuredSignedReviewerNotes(row)) return null;
+  try {
+    return JSON.parse(row.notes);
+  } catch {
+    return null;
+  }
+}
+
 function buildSignedReviewerEvidenceNotes(
   projectName,
   evidenceType,
@@ -5207,10 +5216,27 @@ app.post('/api/projects/:name/claim-gates/:code/resolve', authMiddleware, requir
     if (SIGNED_REVIEW_EVIDENCE_TYPES.has(evidenceType) && !hasStructuredSignedReviewerNotes(existingEvidence)) {
       return res.status(400).json({ error: 'existing evidence row is missing signed reviewer metadata required for this gate' });
     }
-    db.prepare(`UPDATE claim_gates
-                SET status = 'cleared', resolved_by = ?, resolved_at = ?, resolved_evidence_ref = ?, resolved_evidence_id = ?
-                WHERE project_name = ? AND code = ?`)
-      .run(req.user.username, resolvedAt, existingEvidence.source_ref, existingEvidence.id, projectName, code);
+    const tx = db.transaction(() => {
+      if (SIGNED_REVIEW_EVIDENCE_TYPES.has(evidenceType)) {
+        const parsedNotes = parseStructuredSignedReviewerNotes(existingEvidence);
+        const upgradedNotes = buildSignedReviewerEvidenceNotes(
+          projectName,
+          evidenceType,
+          existingEvidence.source_ref,
+          parsedNotes?.user_notes || existingEvidence.notes,
+          parsedNotes?.signoff,
+          code,
+          { claimGateEffect: 'gate_cleared' },
+        );
+        db.prepare('UPDATE project_evidence SET notes = ? WHERE project_name = ? AND id = ?')
+          .run(upgradedNotes, projectName, existingEvidence.id);
+      }
+      db.prepare(`UPDATE claim_gates
+                  SET status = 'cleared', resolved_by = ?, resolved_at = ?, resolved_evidence_ref = ?, resolved_evidence_id = ?
+                  WHERE project_name = ? AND code = ?`)
+        .run(req.user.username, resolvedAt, existingEvidence.source_ref, existingEvidence.id, projectName, code);
+    });
+    tx();
     const auditAction = claimGateResolveAuditPacketAction(projectName, code);
     return res.status(200).json({
       cleared: true,
