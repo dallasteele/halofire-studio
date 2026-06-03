@@ -21,4 +21,13 @@ describe('HaloFire Settings evidence wizard signed reviewer workflow', () => {
     expect(html).toContain('halofire.room_boundary_floor_plan_override_action_packet.v1');
     expect(html).toContain('claim_gate_effect no_claims_cleared');
   });
+
+  it('can record a floor-plan override action acknowledgement without clearing claims', () => {
+    const html = fs.readFileSync(SETTINGS_HTML, 'utf8');
+    expect(html).toContain('recordSettingsRoomBoundaryFloorPlanOverrideAcknowledgement');
+    expect(html).toContain('room_boundary_floor_plan_override_action_acknowledgement');
+    expect(html).toContain('Record override action acknowledgement');
+    expect(html).toContain("recorded_from: 'settings.room_boundary_floor_plan_override_action'");
+    expect(html).toContain('no_claim_gates_cleared: true');
+  });
 });

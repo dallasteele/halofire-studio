@@ -973,6 +973,57 @@ async function downloadSettingsRoomBoundaryFloorPlanOverrideAction(index) {
   }
 }
 
+async function recordSettingsRoomBoundaryFloorPlanOverrideAcknowledgement(index) {
+  const row = settingsRoomBoundaryFloorPlanOverrideRows[Number(index)];
+  const msg = $('roomBoundaryFloorPlanOverrideMsg');
+  if (!row || !row.floor_plan_override_action) {
+    msg.className = 'err';
+    msg.textContent = 'room-boundary floor-plan override action not found';
+    return;
+  }
+  const projectName = catalogEvidenceProjectName();
+  const action = row.floor_plan_override_action || {};
+  const sourceRef = action.download_href || action.href || `room-boundary-floor-plan-override:${row.evidence_id || action.source_evidence_id || 'missing'}`;
+  const note = {
+    kind: 'room_boundary_floor_plan_override_action_acknowledgement',
+    artifact_type: 'halofire.room_boundary_floor_plan_override_action_acknowledgement.v1',
+    source_evidence_id: action.source_evidence_id || row.evidence_id || null,
+    source_review_evidence_id: action.source_review_evidence_id || null,
+    source_sam31_evidence_id: action.source_sam31_evidence_id || null,
+    floor_plan_override_source: row.floor_plan_override_source || action.room_boundary_source || row.floor_plan_override?.room_boundary_source || 'latest_employee_review_packet',
+    floor_plan_override_artifact_type: row.floor_plan_override?.artifact_type || 'halofire.room_boundary_floor_plan_override.v1',
+    action_packet_artifact_type: 'halofire.room_boundary_floor_plan_override_action_packet.v1',
+    action_href: action.action_href || `/api/projects/${encodeURIComponent(projectName)}/sprinkler-bid`,
+    download_href: action.download_href || null,
+    corrected_room_polygon_count: action.corrected_room_polygon_count ?? row.corrected_room_polygon_count ?? 0,
+    blocked_claims: Array.isArray(row.blocked_claims) ? row.blocked_claims : [],
+    recorded_from: 'settings.room_boundary_floor_plan_override_action',
+    use_for_claims: false,
+    claim_gate_effect: 'no_claims_cleared',
+    no_claim_gates_cleared: true,
+  };
+  msg.className = 'muted';
+  msg.textContent = 'recording room-boundary floor-plan override acknowledgement...';
+  try {
+    const created = await api('/projects/' + encodeURIComponent(projectName) + '/evidence', {
+      method: 'POST',
+      body: JSON.stringify({
+        evidence_type: 'room_boundary_floor_plan_override_action_acknowledgement',
+        status: 'present',
+        source_ref: sourceRef,
+        source_file: row.source_file || null,
+        notes: JSON.stringify(note),
+      }),
+    });
+    msg.innerHTML = `recorded room_boundary_floor_plan_override_action_acknowledgement evidence row <b>${escapeHtml(created.id)}</b> for ${escapeHtml(projectName)}; no claim gates cleared.`;
+    await loadWizard(projectName);
+    await loadSettingsRoomBoundaryFloorPlanOverrides(projectName);
+  } catch(e) {
+    msg.className = 'err';
+    msg.textContent = e.message;
+  }
+}
+
 async function loadSettingsRoomBoundaryFloorPlanOverrides(projectName = catalogEvidenceProjectName()) {
   const target = $('settingsRoomBoundaryFloorPlanOverrides');
   try {
@@ -993,11 +1044,15 @@ async function loadSettingsRoomBoundaryFloorPlanOverrides(projectName = catalogE
         <div class="muted" style="margin-top:6px">use_for_claims false - claim_gate_effect no_claims_cleared - no_claim_gates_cleared true</div>
         <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
           <button type="button" data-room-boundary-floor-plan-override-action-index="${index}">Download floor-plan override action</button>
+          <button type="button" data-room-boundary-floor-plan-override-ack-index="${index}">Record override action acknowledgement</button>
         </div>
       </div>`;
     }).join('') || `<span class="muted">No room-boundary floor-plan override actions for ${escapeHtml(projectName)}. Review a room-boundary packet first; regulated claims remain blocked.</span>`;
     target.querySelectorAll('[data-room-boundary-floor-plan-override-action-index]').forEach((btn) => {
       btn.addEventListener('click', () => downloadSettingsRoomBoundaryFloorPlanOverrideAction(btn.getAttribute('data-room-boundary-floor-plan-override-action-index')));
+    });
+    target.querySelectorAll('[data-room-boundary-floor-plan-override-ack-index]').forEach((btn) => {
+      btn.addEventListener('click', () => recordSettingsRoomBoundaryFloorPlanOverrideAcknowledgement(btn.getAttribute('data-room-boundary-floor-plan-override-ack-index')));
     });
   } catch(e) {
     target.innerHTML = '<span class="err">room-boundary floor-plan override actions unavailable: '+escapeHtml(e.message)+'</span>';
