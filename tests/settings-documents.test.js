@@ -1348,6 +1348,141 @@ describe('HaloFire settings + documentation upload/link API', () => {
     }));
   });
 
+  it('filters SAM31 actual-value replacement readback by saved service descriptor evidence', async () => {
+    const token = await tokenFor('settings-admin', 'actual-test-password');
+    const projectName = 'Shared SAM31 Service Descriptor Replacement Readback Filter Project';
+    const db = new Database(dbPath);
+    const insertReview = db.prepare(
+      `INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+    );
+    insertReview.run(
+      projectName,
+      'openclaw_sam31_consumer_review',
+      '1881-sheet-landscout-readback.png',
+      'landscout://sam31/reviews/service-descriptor-readback/replacement.json',
+      'present',
+      JSON.stringify({
+        kind: 'openclaw_sam31_consumer_review',
+        review: {
+          artifact_type: 'openclaw.sam31.consumer_review_task_decision.v1',
+          source_application: 'halo_fire',
+          source_pdf_boundary_evidence_id: 944,
+          source_openclaw_sam31_consumer_smoke_evidence_id: 943,
+          consumer: 'landscout',
+          review_decision: 'needs_actual_value_replacement',
+          replacement_values: { semantic_labels: ['reviewed parcel'], source_ref: '1881://sheet-landscout/readback' },
+          use_for_claims: false,
+          claim_gate_effect: 'no_claims_cleared',
+          no_claim_gates_cleared: true,
+        },
+      }),
+    );
+    const nameforgeReview = insertReview.run(
+      projectName,
+      'openclaw_sam31_consumer_review',
+      '1881-sheet-nameforge-readback.png',
+      'nameforge://sam31/reviews/service-descriptor-readback/replacement.json',
+      'present',
+      JSON.stringify({
+        kind: 'openclaw_sam31_consumer_review',
+        review: {
+          artifact_type: 'openclaw.sam31.consumer_review_task_decision.v1',
+          source_application: 'halo_fire',
+          source_pdf_boundary_evidence_id: 954,
+          source_openclaw_sam31_consumer_smoke_evidence_id: 953,
+          consumer: 'nameforge',
+          review_decision: 'needs_actual_value_replacement',
+          replacement_values: {
+            semantic_labels: ['reviewed tenant sign'],
+            source_ref: '1881://sheet-nameforge/readback',
+            llm_observations: [{ id: 'llm:readback-sign' }],
+          },
+          use_for_claims: false,
+          claim_gate_effect: 'no_claims_cleared',
+          no_claim_gates_cleared: true,
+        },
+      }),
+    );
+    db.close();
+
+    const saveDescriptorRes = await request(`/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/actual-value-service/evidence`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ consumer: 'nameforge' }),
+    });
+    expect(saveDescriptorRes.status).toBe(201);
+    const savedDescriptor = await saveDescriptorRes.json();
+
+    const queueReadback = await (await request(`/api/openclaw/sam31/actual-value-resolver-queue?projectName=${encodeURIComponent(projectName)}&serviceDescriptorEvidenceId=${savedDescriptor.evidence_id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })).json();
+    expect(queueReadback.queue.items).toHaveLength(1);
+    const queueItem = queueReadback.queue.items[0];
+    expect(queueItem.source_openclaw_sam31_consumer_review_evidence_id).toBe(Number(nameforgeReview.lastInsertRowid));
+
+    const recordRes = await request(`/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/actual-value-replacements`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        source_openclaw_sam31_consumer_review_evidence_id: queueItem.source_openclaw_sam31_consumer_review_evidence_id,
+        source_openclaw_sam31_actual_value_service_descriptor_evidence_id: queueItem.source_openclaw_sam31_actual_value_service_descriptor_evidence_id,
+        actual_value_service_descriptor_action: queueItem.actual_value_service_descriptor_action,
+        actual_value_replacement_prefill: queueItem.actual_value_replacement_prefill,
+        consumer: queueItem.consumer,
+        source_file: 'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx',
+        source_ref: 'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G6',
+        replacement_values_source_ref: 'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G6',
+        source_refs: ['Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G6'],
+      }),
+    });
+    expect(recordRes.status).toBe(201);
+    const saved = await recordRes.json();
+
+    const readbackRes = await request(`/api/openclaw/sam31/actual-value-replacements?projectName=${encodeURIComponent(projectName)}&serviceDescriptorEvidenceId=${savedDescriptor.evidence_id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(readbackRes.status).toBe(200);
+    const readback = await readbackRes.json();
+    expect(readback).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.actual_value_replacement_readback.v1',
+      requested_consumer: 'nameforge',
+      service_descriptor_evidence_filter_id: savedDescriptor.evidence_id,
+      latest_actual_value_service_descriptor_evidence_id: savedDescriptor.evidence_id,
+      saved_actual_value_service_descriptor_count: 1,
+      item_count: 1,
+      recorded_count: 1,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(readback.source_queue_route).toContain(`serviceDescriptorEvidenceId=${savedDescriptor.evidence_id}`);
+    expect(readback.replacement_readback_href).toContain(`serviceDescriptorEvidenceId=${savedDescriptor.evidence_id}`);
+    expect(readback.download_artifacts.filtered_replacement_readback.href).toContain(`serviceDescriptorEvidenceId=${savedDescriptor.evidence_id}`);
+    expect(readback.download_artifacts.saved_service_descriptor_evidence).toEqual(expect.objectContaining({
+      evidence_id: savedDescriptor.evidence_id,
+      source_ref: 'openclaw://sam31/actual-value-service/nameforge',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(readback.latest_actual_value_service_descriptor_evidence).toEqual(expect.objectContaining({
+      evidence_id: savedDescriptor.evidence_id,
+      requested_consumer: 'nameforge',
+    }));
+    expect(readback.items).toHaveLength(1);
+    expect(readback.items[0]).toEqual(expect.objectContaining({
+      consumer: 'nameforge',
+      source_openclaw_sam31_consumer_review_evidence_id: Number(nameforgeReview.lastInsertRowid),
+      source_openclaw_sam31_actual_value_service_descriptor_evidence_id: savedDescriptor.evidence_id,
+      recorded_actual_value_replacement_evidence: expect.objectContaining({
+        evidence_id: saved.id,
+        source_openclaw_sam31_actual_value_service_descriptor_evidence_id: savedDescriptor.evidence_id,
+      }),
+      actual_value_service_descriptor_action: expect.objectContaining({
+        source_openclaw_sam31_actual_value_service_descriptor_evidence_id: savedDescriptor.evidence_id,
+      }),
+    }));
+  });
+
   it('records the SAM31 actual-value resolver contract packet as attachable no-claims evidence', async () => {
     const token = await tokenFor('settings-admin', 'actual-test-password');
     const projectName = 'Shared SAM31 Contract Evidence Project';
