@@ -11781,6 +11781,48 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
     status = 'blocked';
     nextAction = 'The latest SAM 3.1 visual audit rejected this boundary. Save a new boundary decision, SAM result, or corrected review packet before replay.';
   }
+  const replayReviewEvidence = latestReview ? reviewEvidence?.evidence : (latestSam31VisualAudit ? sam31Evidence?.evidence : null);
+  const replayReviewPayload = latestReview ? reviewEvidence?.review : (latestSam31VisualAudit ? sam31Evidence?.result : null);
+  const replayReviewSource = latestReview ? 'latest_employee_review_packet' : (latestSam31VisualAudit ? 'latest_sam31_visual_audit' : null);
+  const replayCorrectedRoomPolygons = Array.isArray(replayReviewPayload?.corrected_room_polygons)
+    ? replayReviewPayload.corrected_room_polygons
+    : [];
+  const floorPlanOverride = replayReviewEvidence && replayReviewSource && status !== 'blocked'
+    ? buildRoomBoundaryFloorPlanOverride(
+      projectName,
+      replayReviewSource,
+      evidence,
+      replayReviewEvidence,
+      replayCorrectedRoomPolygons,
+      [
+        {
+          evidence_id: replayReviewEvidence.id,
+          evidence_type: replayReviewEvidence.evidence_type,
+          source_ref: replayReviewEvidence.source_ref || null,
+        },
+        ...(Array.isArray(decision.sourceRefs) ? decision.sourceRefs : []),
+      ],
+    )
+    : null;
+  const floorPlanOverrideAction = floorPlanOverride ? {
+    label: 'Run replay bid with floor-plan override',
+    method: 'POST',
+    href: `/api/projects/${encodeURIComponent(projectName)}/sprinkler-bid`,
+    artifact_type: floorPlanOverride.artifact_type,
+    status: 'ready_for_internal_alpha_replay',
+    floor_plan_override_status: 'internal_alpha_floor_plan_override_ready',
+    room_boundary_source: floorPlanOverride.room_boundary_source,
+    source_evidence_id: floorPlanOverride.source_evidence_id,
+    source_review_evidence_id: floorPlanOverride.source_review_evidence_id || null,
+    source_sam31_evidence_id: floorPlanOverride.source_sam31_evidence_id || null,
+    corrected_room_polygon_count: floorPlanOverride.corrected_room_polygon_count,
+    source_refs: floorPlanOverride.source_refs,
+    use_for_claims: false,
+    claim_gate_effect: 'no_claims_cleared',
+    no_claim_gates_cleared: true,
+    blocked_claims: floorPlanOverride.blocked_claims,
+    limitations: floorPlanOverride.limitations,
+  } : null;
   return {
     id: `resolver:pdf-boundary:${evidence.id}`,
     project_name: projectName,
@@ -11791,6 +11833,19 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
     source_evidence_type: 'pdf_boundary_decision',
     source_ref: evidence.source_ref || decision.sourceRef || null,
     next_action: nextAction,
+    ...(floorPlanOverride ? {
+      floor_plan_override_status: 'internal_alpha_floor_plan_override_ready',
+      floor_plan_override_source: floorPlanOverride.room_boundary_source,
+      floor_plan_override_artifact_type: floorPlanOverride.artifact_type,
+      floor_plan_override: floorPlanOverride,
+      floor_plan_override_action: floorPlanOverrideAction,
+      source_review_evidence_id: floorPlanOverride.source_review_evidence_id || null,
+      source_sam31_evidence_id: floorPlanOverride.source_sam31_evidence_id || null,
+      corrected_room_polygon_count: floorPlanOverride.corrected_room_polygon_count,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    } : {}),
     acceptable_evidence: [
       'employee room-boundary review packet',
       'OpenClaw SAM31+LLM perception packet',
@@ -11848,6 +11903,7 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
       { label: 'Download SAM31 vector/model artifact packet', href: vectorModelArtifactHref, method: 'GET', artifact_type: SAM31_VECTOR_MODEL_ARTIFACT_PACKET_TYPE },
       { label: 'Run OpenClaw SAM31 extrapolation artifact', href: extrapolateHref, method: 'POST' },
       { label: 'Run LandScout/NameForge SAM31 queue smoke', href: consumerSmokeHref, method: 'POST', artifact_type: SAM31_CONSUMER_SMOKE_ARTIFACT_TYPE },
+      ...(floorPlanOverrideAction ? [floorPlanOverrideAction] : []),
       ...(latestOpenClawSam31ExtrapolationReview ? [{
         label: 'Download SAM31 product review packet',
         href: `/api/projects/${encodeURIComponent(projectName)}/resolver-packets/pdf-boundary/${evidence.id}/openclaw/sam31/extrapolation-review-packet`,

@@ -1304,6 +1304,50 @@ describe('PDF page inspection API', () => {
         ],
       }),
     })).json();
+    const queueRes = await request(`${COOPERATIVE_1881_PATH}/resolver-queue?roomBoundarySource=employee_review&roomBoundaryState=correction_ready`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(queueRes.status).toBe(200);
+    const queue = await queueRes.json();
+    const overrideItem = queue.items.find((q) => q.evidence_id === saved.evidence.id);
+    expect(overrideItem).toEqual(expect.objectContaining({
+      kind: 'room_boundary_visual_audit',
+      status: 'correction_ready',
+      floor_plan_override_status: 'internal_alpha_floor_plan_override_ready',
+      floor_plan_override_source: 'latest_employee_review_packet',
+      source_review_evidence_id: reviewBody.evidence.id,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(overrideItem.floor_plan_override_action).toEqual(expect.objectContaining({
+      label: 'Run replay bid with floor-plan override',
+      method: 'POST',
+      room_boundary_source: 'latest_employee_review_packet',
+      source_evidence_id: saved.evidence.id,
+      source_review_evidence_id: reviewBody.evidence.id,
+      artifact_type: 'halofire.room_boundary_floor_plan_override.v1',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(overrideItem.floor_plan_override_action.blocked_claims).toEqual(expect.arrayContaining([
+      'geometry_accuracy',
+      'drawing_scale_verified',
+      'permit_ready',
+      'fabrication_ready',
+      'AHJ_approval',
+      'professional_approval',
+      'AutoSprink_parity',
+      'engineering_grade',
+    ]));
+    expect(overrideItem.floor_plan_override_action.corrected_room_polygon_count).toBe(1);
+    expect(overrideItem.actions).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        label: 'Run replay bid with floor-plan override',
+        artifact_type: 'halofire.room_boundary_floor_plan_override.v1',
+      }),
+    ]));
+
     const replayPacket = await (await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${saved.evidence.id}/replay-input`, {
       headers: { Authorization: `Bearer ${token}` },
     })).json();

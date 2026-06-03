@@ -491,5 +491,10 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toContain('roomBoundarySource=employee_review&roomBoundaryState=correction_ready');
     expect(html).toContain('Employee correction rows');
     expect(html).toContain('employee correction ready');
+    expect(html).toContain('floor_plan_override_status');
+    expect(html).toContain('internal_alpha_floor_plan_override_ready');
+    expect(html).toContain('floor_plan_override_action');
+    expect(html).toContain('Run replay bid with floor-plan override');
+    expect(html).toContain('halofire.room_boundary_floor_plan_override.v1');
   });
 });
