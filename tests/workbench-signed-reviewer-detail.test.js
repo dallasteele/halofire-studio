@@ -65,4 +65,14 @@ describe('workbench signed reviewer evidence detail rendering', () => {
     expect(html).toContain('openSignedReviewerWorkflow');
     expect(html).toContain('evidenceId');
   });
+
+  it('surfaces a blocked-claim-gate signed reviewer launch action in the workbench shell', async () => {
+    const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
+    expect(shell.status).toBe(200);
+    const html = await shell.text();
+    expect(html).toContain('Open signed reviewer workflow from blocked gate');
+    expect(html).toContain('renderClaimGateWorkflowActions');
+    expect(html).toContain('review_packet_href');
+    expect(html).toContain('requires_signoff_for');
+  });
 });

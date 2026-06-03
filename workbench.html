@@ -171,12 +171,23 @@ function currentProjectName() {
 }
 
 function renderClaimGates(gates) {
+  function renderClaimGateWorkflowActions(gate) {
+    const requiresSignoffFor = Array.isArray(gate.requires_signoff_for) ? gate.requires_signoff_for : [];
+    if (gate.status !== 'blocked' || !requiresSignoffFor.length || !gate.review_packet_href) return '';
+    return `<div class="claims" style="margin-top:8px">
+      acceptable_evidence ${(Array.isArray(gate.allowed_evidence_types) ? gate.allowed_evidence_types : []).map((type) => `<span class="chip">${escapeHtml(type)}</span>`).join('') || '<span class="chip">no direct evidence workflow</span>'}<br>
+      requires_signoff_for ${requiresSignoffFor.map((type) => `<span class="chip">${escapeHtml(type)}</span>`).join('')}<br>
+      review_packet_href ${escapeHtml(gate.review_packet_href)} · review_packet_artifact_type ${escapeHtml(gate.review_packet_artifact_type || 'halofire.claim_gate_review_packet.v1')}<br>
+      <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0f766e" onclick="openSignedReviewerWorkflow(${JSON.stringify(currentProjectName())}, ${JSON.stringify(gate.code || '')})">Open signed reviewer workflow from blocked gate</button>
+    </div>`;
+  }
   document.getElementById('gates').innerHTML = gates.length ? gates.map((g) => `
-    <div class="gate ${g.severity === 'warning' ? 'warning' : ''}">
-      <div class="code">${g.code} · ${g.status.toUpperCase()}</div>
-      <div class="na">${g.next_action}</div>
-      <div class="claims">Blocks: ${(g.blocked_claims || []).map((c) => `<span class="chip">${c}</span>`).join('')}</div>
-    </div>`).join('') : '<span class="muted">No gates.</span>';
+      <div class="gate ${g.severity === 'warning' ? 'warning' : ''}">
+        <div class="code">${g.code} · ${g.status.toUpperCase()}</div>
+        <div class="na">${g.next_action}</div>
+        <div class="claims">Blocks: ${(g.blocked_claims || []).map((c) => `<span class="chip">${c}</span>`).join('')}</div>
+        ${renderClaimGateWorkflowActions(g)}
+      </div>`).join('') : '<span class="muted">No gates.</span>';
 }
 
 async function refreshClaimGates() {

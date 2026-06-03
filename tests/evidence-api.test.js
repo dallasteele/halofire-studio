@@ -152,6 +152,11 @@ describe('HaloFire evidence and claim-gate API', () => {
     const autosprink = gates.find((g) => g.code === 'AUTOSPRINK_EVIDENCE_MISSING');
     expect(autosprink.status).toBe('blocked');
     expect(autosprink.blocked_claims).toContain('AutoSprink parity');
+    expect(autosprink.can_resolve).toBe(true);
+    expect(autosprink.review_packet_href).toBe(`${PROJECT_PATH}/claim-gates/AUTOSPRINK_EVIDENCE_MISSING/review-packet`);
+    expect(autosprink.review_packet_artifact_type).toBe('halofire.claim_gate_review_packet.v1');
+    expect(autosprink.allowed_evidence_types).toContain('autosprink_packet');
+    expect(autosprink.requires_signoff_for).toContain('autosprink_packet');
   });
 
   it('returns present source evidence rows', async () => {

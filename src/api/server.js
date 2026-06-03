@@ -911,14 +911,24 @@ function ensureProjectClaimGates(projectName) {
 }
 
 app.get('/api/projects/:name/claim-gates', authMiddleware, (req, res) => {
-  ensureProjectClaimGates(req.params.name);
+  const projectName = req.params.name;
+  ensureProjectClaimGates(projectName);
   const gates = db
     .prepare('SELECT * FROM claim_gates WHERE project_name = ? ORDER BY severity DESC, code')
-    .all(req.params.name);
-  res.json(gates.map((gate) => ({
-    ...gate,
-    blocked_claims: safeParseJsonArray(gate.blocked_claims),
-  })));
+    .all(projectName);
+  res.json(gates.map((gate) => {
+    const rule = gateEvidenceRule(gate.code);
+    const requiresSignoffFor = rule.allowedEvidenceTypes.filter((type) => SIGNED_REVIEW_EVIDENCE_TYPES.has(type));
+    return {
+      ...gate,
+      blocked_claims: safeParseJsonArray(gate.blocked_claims),
+      allowed_evidence_types: [...rule.allowedEvidenceTypes],
+      requires_signoff_for: requiresSignoffFor,
+      can_resolve: rule.canResolve,
+      review_packet_href: `/api/projects/${encodeURIComponent(projectName)}/claim-gates/${encodeURIComponent(gate.code)}/review-packet`,
+      review_packet_artifact_type: 'halofire.claim_gate_review_packet.v1',
+    };
+  }));
 });
 
 app.get('/api/projects/:name/evidence-wizard', authMiddleware, (req, res) => {
