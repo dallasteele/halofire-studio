@@ -233,6 +233,11 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toContain('sprinkler_review_decision_evidence_id');
     expect(html).toContain('/preliminary-replay-inputs');
     expect(html).toContain('halofire.sam31_sprinkler_review_preliminary_replay_inputs.v1');
+    expect(html).toContain('Run HaloFire smoke preliminary replay');
+    expect(html).toContain('runHalofireSam31ConsumerIntakeSmokePreliminaryReplay');
+    expect(html).toContain('data-sam31-consumer-intake-smoke-preliminary-replay');
+    expect(html).toContain('/preliminary-replay');
+    expect(html).toContain('halofire.sam31_sprinkler_preliminary_replay_artifact.v1');
     expect(html).toContain('Save HaloFire smoke follow-up review');
     expect(html).toContain('saveHalofireSam31ConsumerIntakeSmokeFollowupReview');
     expect(html).toContain('data-sam31-consumer-intake-smoke-followup-review');
