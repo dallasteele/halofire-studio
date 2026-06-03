@@ -620,7 +620,7 @@ describe('HaloFire settings + documentation upload/link API', () => {
         },
       }),
     );
-    insertReview.run(
+    const nameforgeReview = insertReview.run(
       projectName,
       'openclaw_sam31_consumer_review',
       '1881-sheet-8.png',
@@ -652,6 +652,34 @@ describe('HaloFire settings + documentation upload/link API', () => {
         },
       }),
     );
+    const contractEvidence = db.prepare(
+      `INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+    ).run(
+      projectName,
+      'openclaw_sam31_actual_value_resolver_contract',
+      'shared-sam31-global-queue-project-sam31-actual-value-resolver-contract-nameforge.json',
+      'openclaw://sam31/actual-value-resolver-contract/nameforge',
+      'present',
+      JSON.stringify({
+        kind: 'openclaw_sam31_actual_value_resolver_contract',
+        artifact_type: 'openclaw.sam31.actual_value_resolver_contract_packet.v1',
+        contract_packet: {
+          artifact_type: 'openclaw.sam31.actual_value_resolver_contract_packet.v1',
+          project_name: projectName,
+          requested_consumer: 'nameforge',
+          queue_artifact_type: 'openclaw.sam31.actual_value_resolver_queue.v1',
+          readback_artifact_type: 'openclaw.sam31.actual_value_resolver_queue_readback.v1',
+          use_for_claims: false,
+          claim_gate_effect: 'no_claims_cleared',
+          no_claim_gates_cleared: true,
+        },
+        supported_consumers: ['halo_fire', 'landscout', 'nameforge'],
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+        no_claim_gates_cleared: true,
+      }),
+    );
     db.close();
 
     const res = await request(`/api/openclaw/sam31/actual-value-resolver-queue?projectName=${encodeURIComponent(projectName)}&consumer=nameforge`, {
@@ -667,9 +695,18 @@ describe('HaloFire settings + documentation upload/link API', () => {
       item_count: 1,
       pending_count: 1,
       recorded_count: 0,
+      source_openclaw_sam31_actual_value_resolver_contract_evidence_id: Number(contractEvidence.lastInsertRowid),
       use_for_claims: false,
       claim_gate_effect: 'no_claims_cleared',
       no_claim_gates_cleared: true,
+    }));
+    expect(readback.latest_actual_value_resolver_contract_evidence).toEqual(expect.objectContaining({
+      evidence_id: Number(contractEvidence.lastInsertRowid),
+      evidence_type: 'openclaw_sam31_actual_value_resolver_contract',
+      source_ref: 'openclaw://sam31/actual-value-resolver-contract/nameforge',
+      requested_consumer: 'nameforge',
+      artifact_type: 'openclaw.sam31.actual_value_resolver_contract_packet.v1',
+      claim_gate_effect: 'no_claims_cleared',
     }));
     expect(readback.source_project_route).toContain('/api/projects/');
     expect(readback.source_project_route).toContain('/openclaw/sam31/actual-value-resolver-queue');
@@ -679,6 +716,13 @@ describe('HaloFire settings + documentation upload/link API', () => {
       consumer: 'nameforge',
       intake_status: 'missing',
       source_pdf_boundary_evidence_id: 184,
+      source_openclaw_sam31_consumer_review_evidence_id: Number(nameforgeReview.lastInsertRowid),
+      source_openclaw_sam31_actual_value_resolver_contract_evidence_id: Number(contractEvidence.lastInsertRowid),
+    }));
+    expect(readback.queue.items[0].latest_actual_value_resolver_contract_evidence).toEqual(expect.objectContaining({
+      evidence_id: Number(contractEvidence.lastInsertRowid),
+      requested_consumer: 'nameforge',
+      claim_gate_effect: 'no_claims_cleared',
     }));
     expect(readback.consumer_pull_endpoints).toEqual(expect.objectContaining({
       halo_fire: expect.objectContaining({ method: 'GET', consumes: 'openclaw.sam31.actual_value_resolver_queue.v1' }),

@@ -1126,6 +1126,16 @@ function renderSam31ActualValueResolverExtrapolationContract(readback) {
 function renderSam31ActualValueQueueSummary(readback) {
   const queue = readback && readback.queue && typeof readback.queue === 'object' ? readback.queue : readback;
   if (!queue || typeof queue !== 'object') return '';
+  const latestContractEvidence = readback?.latest_actual_value_resolver_contract_evidence
+    || queue.latest_actual_value_resolver_contract_evidence
+    || null;
+  const contractEvidenceId = readback?.source_openclaw_sam31_actual_value_resolver_contract_evidence_id
+    || queue.source_openclaw_sam31_actual_value_resolver_contract_evidence_id
+    || latestContractEvidence?.evidence_id
+    || null;
+  const contractEvidenceLine = contractEvidenceId
+    ? `latest_actual_value_resolver_contract_evidence evidence #${escapeHtml(contractEvidenceId)} - source_openclaw_sam31_actual_value_resolver_contract_evidence_id ${escapeHtml(contractEvidenceId)} - source_ref ${escapeHtml(latestContractEvidence?.source_ref || 'missing')}`
+    : 'latest_actual_value_resolver_contract_evidence missing - source_openclaw_sam31_actual_value_resolver_contract_evidence_id missing';
   const consumers = Array.isArray(queue.supported_consumers) ? queue.supported_consumers : ['halo_fire', 'landscout', 'nameforge'];
   const endpoints = readback && readback.consumer_pull_endpoints && typeof readback.consumer_pull_endpoints === 'object'
     ? readback.consumer_pull_endpoints
@@ -1147,6 +1157,8 @@ function renderSam31ActualValueQueueSummary(readback) {
     <div class="code">openclaw.sam31.actual_value_resolver_queue.v1 Â· ${escapeHtml(queue.status || 'actual_value_replacements_pending')}</div>
     <div class="na">global_readback ${escapeHtml(SAM31_ACTUAL_VALUE_GLOBAL_READBACK_ROUTE)} Â· source_project_route ${escapeHtml(readback?.source_project_route || '/api/projects/{projectName}/openclaw/sam31/actual-value-resolver-queue')}</div>
     <div class="claims">item_count ${escapeHtml(queue.item_count ?? 0)} Â· pending_count ${escapeHtml(queue.pending_count ?? 0)} Â· recorded_count ${escapeHtml(queue.recorded_count ?? 0)} Â· use_for_claims false Â· claim_gate_effect no_claims_cleared</div>
+    <div class="claims">source_openclaw_sam31_actual_value_resolver_contract_evidence_id ${escapeHtml(readback?.source_openclaw_sam31_actual_value_resolver_contract_evidence_id || queue.source_openclaw_sam31_actual_value_resolver_contract_evidence_id || 'missing')} - latest_actual_value_resolver_contract_evidence ${latestContractEvidence ? `#${escapeHtml(latestContractEvidence.evidence_id || 'missing')} ${escapeHtml(latestContractEvidence.requested_consumer || 'all-consumers')} ${escapeHtml(latestContractEvidence.claim_gate_effect || 'no_claims_cleared')}` : 'missing'}</div>
+    <div class="claims">${contractEvidenceLine}</div>
     <div class="claims">Consumer pull: ${endpointRows} <button class="go" type="button" style="padding:5px 8px;font-size:10px;margin:2px;background:#52525b" data-sam31-actual-value-clear-filter="true">all consumers</button></div>
     <div class="claims">Replacement readback: <span class="chip">openclaw.sam31.actual_value_replacement_readback.v1</span> ${replacementReadbackRows}</div>
     <div class="claims">Supported filter keys: consumer=halo_fire consumer=landscout consumer=nameforge</div>
@@ -1161,10 +1173,14 @@ function renderSam31ActualValueQueueItem(row, index) {
   const acceptable = Array.isArray(row.acceptable_actual_evidence) ? row.acceptable_actual_evidence : [];
   const llmObservationIds = Array.isArray(row.llm_observation_ids) ? row.llm_observation_ids : [];
   const sourceLlmObservationIds = Array.isArray(row.source_llm_observation_ids) ? row.source_llm_observation_ids : [];
+  const latestContractEvidence = row.latest_actual_value_resolver_contract_evidence && typeof row.latest_actual_value_resolver_contract_evidence === 'object'
+    ? row.latest_actual_value_resolver_contract_evidence
+    : null;
   return `<div class="gate warning">
     <div class="code">${escapeHtml(row.consumer || 'consumer')} · ${escapeHtml(row.status || 'requires_employee_actual_value_update')}</div>
     <div class="na">halofire.sam31_actual_value_work_item_index.v1 · openclaw.sam31.actual_value_work_item_packet.v1 · evidence #${escapeHtml(row.source_openclaw_sam31_consumer_review_evidence_id || 'missing')}</div>
     <div class="claims">source_pdf_boundary_evidence_id ${escapeHtml(row.source_pdf_boundary_evidence_id || 'missing')} · source_openclaw_sam31_consumer_smoke_evidence_id ${escapeHtml(row.source_openclaw_sam31_consumer_smoke_evidence_id || 'missing')}</div>
+    <div class="claims">source_openclaw_sam31_actual_value_resolver_contract_evidence_id ${escapeHtml(row.source_openclaw_sam31_actual_value_resolver_contract_evidence_id || 'missing')} - latest_actual_value_resolver_contract_evidence ${latestContractEvidence ? `#${escapeHtml(latestContractEvidence.evidence_id || 'missing')} ${escapeHtml(latestContractEvidence.requested_consumer || 'all-consumers')} ${escapeHtml(latestContractEvidence.claim_gate_effect || 'no_claims_cleared')}` : 'missing'}</div>
     <div class="claims">replacement_values_source_ref: ${escapeHtml(row.replacement_values_source_ref || row.replacement_ref || 'missing')}</div>
     <div class="claims">replacement_summary: <span class="chip">semantic_label_count ${escapeHtml(summary.semantic_label_count || 0)}</span><span class="chip">object_hypothesis_count ${escapeHtml(summary.object_hypothesis_count || 0)}</span><span class="chip">llm_observation_count ${escapeHtml(summary.llm_observation_count ?? row.llm_observation_count ?? 0)}</span><span class="chip">vector_overlay_count ${escapeHtml(summary.vector_overlay_count || 0)}</span><span class="chip">model_3d_candidate_count ${escapeHtml(summary.model_3d_candidate_count || 0)}</span></div>
     <div class="claims">llm_observation_ids ${escapeHtml(llmObservationIds.join(' | ') || 'missing')} Â· source_llm_observation_ids ${escapeHtml(sourceLlmObservationIds.join(' | ') || 'missing')}</div>

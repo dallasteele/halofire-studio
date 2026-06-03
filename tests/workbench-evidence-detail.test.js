@@ -183,6 +183,8 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toContain('saveSam31ActualValueResolverContractEvidence');
     expect(html).toContain('data-sam31-actual-value-resolver-contract-save');
     expect(html).toContain('Saved openclaw_sam31_actual_value_resolver_contract evidence');
+    expect(html).toContain('latest_actual_value_resolver_contract_evidence');
+    expect(html).toContain('source_openclaw_sam31_actual_value_resolver_contract_evidence_id');
     expect(html).toContain('supports_object_identification');
     expect(html).toContain('supports_vector_overlays');
     expect(html).toContain('supports_model_3d_candidates');
