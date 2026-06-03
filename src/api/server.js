@@ -1364,6 +1364,12 @@ function halofireSam31ConsumerIntakeSmokeFollowupReviewSummary(packetReviewEvide
   };
 }
 
+function latestHalofireSam31ConsumerIntakeSmokeFollowupReviewDecisionEvidence(projectName, smokeEvidenceId) {
+  return listHalofireSam31ConsumerIntakeSmokeFollowupReviewDecisionEvidence(projectName, {
+    sourceSectionToArtifactsConsumerIntakeSmokeEvidenceId: smokeEvidenceId,
+  })[0] || null;
+}
+
 function listSam31ReplayActualValueReplacementDetails(projectName, options = {}) {
   const consumerFilter = String(options.consumer || '').trim().toLowerCase();
   const rows = db
@@ -1707,7 +1713,15 @@ function openClawSam31ActualValueServiceDescriptorAction(projectName, consumer, 
   };
 }
 
-function openClawSam31ActualValueResolverConsumerActions(projectName, item, contractEvidence = null, serviceDescriptorEvidence = null, sectionToArtifactsHandoff = null, consumerIntakeSmokeEvidence = null) {
+function openClawSam31ActualValueResolverConsumerActions(
+  projectName,
+  item,
+  contractEvidence = null,
+  serviceDescriptorEvidence = null,
+  sectionToArtifactsHandoff = null,
+  consumerIntakeSmokeEvidence = null,
+  latestConsumerIntakeSmokeFollowupReviewSummary = null,
+) {
   const pollActions = ['halo_fire', 'landscout', 'nameforge'].map((consumer) => ({
     consumer,
     action: 'poll_actual_value_resolver_queue',
@@ -1727,6 +1741,24 @@ function openClawSam31ActualValueResolverConsumerActions(projectName, item, cont
     use_for_claims: false,
     claim_gate_effect: 'no_claims_cleared',
   }));
+  const smokeSprinklerPacketAction = consumerIntakeSmokeEvidence && latestConsumerIntakeSmokeFollowupReviewSummary ? [{
+    consumer: consumerIntakeSmokeEvidence.consumer || item.consumer || null,
+    action: 'download_halofire_consumer_intake_smoke_sprinkler_review_packet',
+    method: 'GET',
+    href: `/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/section-to-artifacts-consumer-intake-smoke/${encodeURIComponent(consumerIntakeSmokeEvidence.evidence_id)}/sprinkler-review-packet`,
+    consumes: HALOFIRE_SAM31_CONSUMER_INTAKE_SMOKE_FOLLOWUP_RESOLVER_QUEUE_ITEM_TYPE,
+    produces: HALOFIRE_SAM31_SPRINKLER_REVIEW_PACKET_TYPE,
+    source_section_to_artifacts_consumer_intake_smoke_evidence_id: consumerIntakeSmokeEvidence.evidence_id || null,
+    source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id: latestConsumerIntakeSmokeFollowupReviewSummary.evidence_id || null,
+    source_sam31_actual_value_replacement_evidence_id: consumerIntakeSmokeEvidence.source_sam31_actual_value_replacement_evidence_id || null,
+    source_openclaw_sam31_consumer_review_evidence_id: consumerIntakeSmokeEvidence.source_openclaw_sam31_consumer_review_evidence_id || item.source_openclaw_sam31_consumer_review_evidence_id,
+    supported_sprinkler_review_lanes: [
+      'room_boundary_visual_audit',
+      'obstruction_or_clash_review',
+    ],
+    use_for_claims: false,
+    claim_gate_effect: 'no_claims_cleared',
+  }] : [];
   const savedSmokeAction = consumerIntakeSmokeEvidence ? [{
     consumer: consumerIntakeSmokeEvidence.consumer || item.consumer || null,
     action: 'download_saved_section_to_artifacts_consumer_intake_smoke',
@@ -1759,7 +1791,7 @@ function openClawSam31ActualValueResolverConsumerActions(projectName, item, cont
     ],
     use_for_claims: false,
     claim_gate_effect: 'no_claims_cleared',
-  }] : [];
+  }, ...smokeSprinklerPacketAction] : [];
   if (!sectionToArtifactsHandoff) return [...pollActions, ...savedSmokeAction];
   const handoffActions = ['halo_fire', 'landscout', 'nameforge'].map((consumer) => ({
     consumer,
@@ -2194,6 +2226,7 @@ function buildOpenClawSam31ActualValueResolverQueue(projectName, options = {}) {
           itemServiceDescriptorEvidence,
           sectionToArtifactsHandoff,
           consumerIntakeSmokeEvidence,
+          latestConsumerIntakeSmokeFollowupReviewSummary,
         ),
         use_for_claims: false,
         blocked_claims: Array.isArray(item.blocked_claims) ? item.blocked_claims : [],
@@ -2572,6 +2605,132 @@ function buildHalofireSam31ConsumerIntakeSmokeFollowupResolverRows(projectName, 
       ],
     };
   });
+}
+
+function buildHalofireSam31ConsumerIntakeSmokeSprinklerReviewPacket(projectName, smokeEvidence, reviewEvidence) {
+  if (!smokeEvidence) {
+    const err = new Error('Saved SAM31 section-to-artifacts consumer intake smoke evidence not found');
+    err.httpStatus = 404;
+    throw err;
+  }
+  if (!reviewEvidence?.evidence || !reviewEvidence?.review) {
+    const err = new Error('Saved HaloFire SAM31 consumer intake smoke follow-up review evidence is required before downloading the sprinkler review packet');
+    err.httpStatus = 409;
+    throw err;
+  }
+  const review = reviewEvidence.review;
+  const resolverRows = Array.isArray(review.resolver_queue_rows) ? review.resolver_queue_rows : [];
+  if (!resolverRows.length) {
+    const err = new Error('Saved HaloFire SAM31 consumer intake smoke follow-up resolver rows are required before downloading the sprinkler review packet');
+    err.httpStatus = 409;
+    throw err;
+  }
+  const slug = projectName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'halofire-project';
+  const sourceConsumer = smokeEvidence.consumer || review.source_consumer || 'unknown';
+  const supportedSprinklerReviewLanes = uniqueStrings([
+    ...resolverRows.map((row) => row.supported_sprinkler_review_lane).filter(Boolean),
+    'room_boundary_visual_audit',
+    'obstruction_or_clash_review',
+  ]);
+  const issueSeeds = resolverRows.map((row, index) => ({
+    artifact_type: HALOFIRE_SAM31_SPRINKLER_REVIEW_QUEUE_ITEM_TYPE,
+    id: `${row.id || `consumer-smoke-followup:${reviewEvidence.evidence.id}`}:sprinkler:${index}`,
+    status: row.status === 'ready_for_internal_alpha_sprinkler_review'
+      ? 'requires_employee_sprinkler_review'
+      : (row.status || 'requires_employee_sprinkler_review'),
+    project_name: projectName,
+    source_runtime: row.source_runtime || 'sam-3.1+llm',
+    source: HALOFIRE_SAM31_CONSUMER_INTAKE_SMOKE_FOLLOWUP_RESOLVER_QUEUE_ITEM_TYPE,
+    source_followup_resolver_queue_item_id: row.id || null,
+    source_followup_resolver_queue_item_artifact_type: row.artifact_type || HALOFIRE_SAM31_CONSUMER_INTAKE_SMOKE_FOLLOWUP_RESOLVER_QUEUE_ITEM_TYPE,
+    source_halofire_sam31_consumer_intake_smoke_followup_review_artifact_type: review.artifact_type || HALOFIRE_SAM31_CONSUMER_INTAKE_SMOKE_FOLLOWUP_REVIEW_DECISION_TYPE,
+    source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id: reviewEvidence.evidence.id,
+    source_section_to_artifacts_consumer_intake_smoke_evidence_id: smokeEvidence.evidence_id || row.source_section_to_artifacts_consumer_intake_smoke_evidence_id || null,
+    source_sam31_actual_value_replacement_evidence_id: smokeEvidence.source_sam31_actual_value_replacement_evidence_id || row.source_sam31_actual_value_replacement_evidence_id || null,
+    source_openclaw_sam31_consumer_review_evidence_id: smokeEvidence.source_openclaw_sam31_consumer_review_evidence_id || row.source_openclaw_sam31_consumer_review_evidence_id || null,
+    source_openclaw_sam31_section_to_artifacts_ref: smokeEvidence.source_openclaw_sam31_section_to_artifacts_ref || row.source_openclaw_sam31_section_to_artifacts_ref || null,
+    consumer: sourceConsumer,
+    issue_type: row.issue_type || null,
+    supported_sprinkler_review_lane: row.supported_sprinkler_review_lane || null,
+    observed: row.observed || null,
+    expected: row.expected || null,
+    reviewed_values: row.reviewed_values && typeof row.reviewed_values === 'object' ? jsonClone(row.reviewed_values) : {},
+    required_action: row.required_action || 'Employee sprinkler reviewer verifies this SAM31-derived row before it affects bid/CAD/export decisions.',
+    next_action: 'Use this source-linked internal-alpha row for room-boundary or obstruction/clash review only; keep regulated claims blocked.',
+    acceptable_evidence: Array.isArray(row.acceptable_evidence) ? [...row.acceptable_evidence] : [],
+    source_refs: Array.isArray(row.source_refs) ? jsonClone(row.source_refs) : [],
+    blocked_claims: Array.isArray(row.blocked_claims) ? [...row.blocked_claims] : [],
+    use_for_claims: false,
+    claim_gate_effect: 'no_claims_cleared',
+    no_claim_gates_cleared: true,
+    limitations: [
+      'This sprinkler review queue item is sourced from employee-reviewed SAM31 consumer intake smoke follow-up rows.',
+      'It cannot clear professional, AHJ, manufacturer, AutoSprink, permit, fabrication, or engineering-grade claims.',
+    ],
+  }));
+  const sourceRefs = uniqueByJson([
+    ...(Array.isArray(smokeEvidence.source_refs) ? smokeEvidence.source_refs : []),
+    {
+      evidence_id: smokeEvidence.evidence_id || null,
+      evidence_type: 'openclaw_sam31_section_to_artifacts_consumer_intake_smoke',
+      artifact_type: smokeEvidence.artifact_type || 'openclaw.sam31.section_to_artifacts_consumer_intake_smoke.v1',
+      source_ref: smokeEvidence.source_ref || null,
+      source_file: smokeEvidence.source_file || null,
+    },
+    {
+      evidence_id: reviewEvidence.evidence.id,
+      evidence_type: reviewEvidence.evidence.evidence_type,
+      artifact_type: review.artifact_type || HALOFIRE_SAM31_CONSUMER_INTAKE_SMOKE_FOLLOWUP_REVIEW_DECISION_TYPE,
+      source_ref: reviewEvidence.evidence.source_ref || review.review_ref || null,
+      source_file: reviewEvidence.evidence.source_file || null,
+    },
+    ...resolverRows.flatMap((row) => (Array.isArray(row.source_refs) ? row.source_refs : [])),
+  ]);
+  const blockedClaims = uniqueStrings([
+    ...(Array.isArray(smokeEvidence.blocked_claims) ? smokeEvidence.blocked_claims : []),
+    ...(Array.isArray(review.blocked_claims) ? review.blocked_claims : []),
+    ...resolverRows.flatMap((row) => (Array.isArray(row.blocked_claims) ? row.blocked_claims : [])),
+    'permit_ready',
+    'fabrication_ready',
+    'AHJ_approval',
+    'professional_approval',
+    'manufacturer_exact',
+    'AutoSprink_parity',
+    'engineering_grade',
+  ]);
+  return {
+    artifact_type: HALOFIRE_SAM31_SPRINKLER_REVIEW_PACKET_TYPE,
+    source: HALOFIRE_SAM31_CONSUMER_INTAKE_SMOKE_FOLLOWUP_RESOLVER_QUEUE_ITEM_TYPE,
+    status: 'requires_employee_sprinkler_review',
+    project_name: projectName,
+    generated_at: new Date().toISOString(),
+    source_consumer: sourceConsumer,
+    target_application: 'halo_fire',
+    source_section_to_artifacts_consumer_intake_smoke_evidence_id: smokeEvidence.evidence_id || null,
+    source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id: reviewEvidence.evidence.id,
+    source_sam31_actual_value_replacement_evidence_id: smokeEvidence.source_sam31_actual_value_replacement_evidence_id || null,
+    source_openclaw_sam31_consumer_review_evidence_id: smokeEvidence.source_openclaw_sam31_consumer_review_evidence_id || null,
+    source_openclaw_sam31_section_to_artifacts_ref: smokeEvidence.source_openclaw_sam31_section_to_artifacts_ref || null,
+    supported_sprinkler_review_lanes: supportedSprinklerReviewLanes,
+    issue_seeds: issueSeeds,
+    source_refs: sourceRefs,
+    download_name: `${slug}-sam31-consumer-intake-smoke-sprinkler-review-${sourceConsumer}-${smokeEvidence.evidence_id || 'evidence'}.json`,
+    next_action: 'HaloFire employee reviews room-boundary and obstruction/clash seeds before using them as internal-alpha sprinkler inputs; regulated exports and claims remain blocked.',
+    acceptable_evidence: [
+      '1881 floor-plan/proposal workbook row or sheet reference tied to the reviewed area',
+      'corrected employee room-boundary packet or marked-up plan reference',
+      'reviewed vector overlay SVG/CAD layer reference',
+      'reviewed 3D model candidate, screenshot, console evidence, or obstruction/clash notes',
+    ],
+    blocked_claims: blockedClaims,
+    limitations: [
+      'This packet converts saved SAM31 consumer intake smoke follow-up resolver rows into HaloFire sprinkler review seeds only.',
+      'It does not clear permit-ready, fabrication-ready, AHJ-ready, professional approval, manufacturer-exact, engineering-grade, or AutoSprink parity claims.',
+    ],
+    use_for_claims: false,
+    claim_gate_effect: 'no_claims_cleared',
+    no_claim_gates_cleared: true,
+  };
 }
 
 function buildOpenClawSam31ActualValueResolverQueueReadback(projectName, options = {}) {
@@ -3708,6 +3867,21 @@ app.post('/api/projects/:name/openclaw/sam31/section-to-artifacts-consumer-intak
       evidence: evidenceRow,
       ...reviewWithRows,
     });
+  } catch (err) {
+    return res.status(err.httpStatus || 400).json({ error: err.message });
+  }
+});
+
+app.get('/api/projects/:name/openclaw/sam31/section-to-artifacts-consumer-intake-smoke/:evidenceId/sprinkler-review-packet', authMiddleware, (req, res) => {
+  try {
+    const projectName = req.params.name;
+    const evidenceId = Number(req.params.evidenceId);
+    if (!Number.isSafeInteger(evidenceId) || evidenceId <= 0) {
+      return res.status(400).json({ error: 'A positive SAM31 consumer intake smoke evidence id is required' });
+    }
+    const smokeEvidence = openClawSam31SectionToArtifactsConsumerIntakeSmokeEvidenceById(projectName, evidenceId);
+    const latestReview = latestHalofireSam31ConsumerIntakeSmokeFollowupReviewDecisionEvidence(projectName, evidenceId);
+    return res.json(buildHalofireSam31ConsumerIntakeSmokeSprinklerReviewPacket(projectName, smokeEvidence, latestReview));
   } catch (err) {
     return res.status(err.httpStatus || 400).json({ error: err.message });
   }
@@ -5238,6 +5412,19 @@ function localOpenClawSam31ToolDescriptor(projectName = null) {
         consumes: 'halofire.sam31_consumer_intake_smoke_followup_packet.v1',
         produces: HALOFIRE_SAM31_CONSUMER_INTAKE_SMOKE_FOLLOWUP_REVIEW_DECISION_TYPE,
         downstream_resolver_artifact_type: HALOFIRE_SAM31_CONSUMER_INTAKE_SMOKE_FOLLOWUP_RESOLVER_QUEUE_ITEM_TYPE,
+        target_application: 'halo_fire',
+        supported_sprinkler_review_lanes: [
+          'room_boundary_visual_audit',
+          'obstruction_or_clash_review',
+        ],
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      },
+      consumer_intake_smoke_sprinkler_review_packet: {
+        method: 'GET',
+        href_template: '/api/projects/{projectName}/openclaw/sam31/section-to-artifacts-consumer-intake-smoke/{evidenceId}/sprinkler-review-packet',
+        consumes: HALOFIRE_SAM31_CONSUMER_INTAKE_SMOKE_FOLLOWUP_RESOLVER_QUEUE_ITEM_TYPE,
+        produces: HALOFIRE_SAM31_SPRINKLER_REVIEW_PACKET_TYPE,
         target_application: 'halo_fire',
         supported_sprinkler_review_lanes: [
           'room_boundary_visual_audit',
