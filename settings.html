@@ -505,7 +505,7 @@ $('wizSubmit').onclick = async () => {
     } else {
       await api('/projects/' + encodeURIComponent(projectName) + '/evidence', {
         method: 'POST',
-        body: JSON.stringify({ ...payload, status: 'present' }),
+        body: JSON.stringify({ ...payload, status: 'present', target_gate_code: gateCode }),
       });
       msg.textContent = 'evidence recorded only';
     }

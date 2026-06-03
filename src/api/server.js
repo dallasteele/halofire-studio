@@ -527,7 +527,7 @@ app.get('/api/analytics/summary', authMiddleware, (req, res) => {
 // fail-closed: adding best-effort/AI evidence never flips a blocking gate to
 // cleared. Only a recorded human/professional/AHJ artifact can do that, and
 // that resolution path is intentionally not exposed as a casual write here.
-const EVIDENCE_INSERT_FIELDS = new Set(['evidence_type', 'source_file', 'source_ref', 'status', 'notes', 'signoff']);
+const EVIDENCE_INSERT_FIELDS = new Set(['evidence_type', 'source_file', 'source_ref', 'status', 'notes', 'signoff', 'target_gate_code']);
 
 // Only these real-world artifact types may clear a fail-closed claim gate.
 // AI/best-effort output is intentionally excluded — it can never clear a gate.
@@ -619,6 +619,34 @@ function hasStructuredSignedReviewerNotes(row) {
   } catch {
     return false;
   }
+}
+
+function buildSignedReviewerEvidenceNotes(projectName, evidenceType, sourceRef, notes, signoff, targetGateCode = null) {
+  const normalizedGateCode = String(targetGateCode || '').trim().toUpperCase() || null;
+  let gatePacket = null;
+  if (normalizedGateCode) {
+    const rule = gateEvidenceRule(normalizedGateCode);
+    if (!rule.allowedEvidenceTypes.includes(evidenceType)) {
+      const e = new Error(`Gate ${normalizedGateCode} only accepts allowed evidence types: ${rule.allowedEvidenceTypes.join(', ')}`);
+      e.httpStatus = 400;
+      throw e;
+    }
+    gatePacket = buildClaimGateReviewPacket(projectName, normalizedGateCode);
+  }
+  return JSON.stringify({
+    kind: 'signed_reviewer_evidence',
+    evidence_type: evidenceType,
+    source_ref: sourceRef,
+    signoff,
+    ...(gatePacket ? {
+      target_gate_code: normalizedGateCode,
+      required_evidence_type: gatePacket.required_evidence_type || evidenceType,
+      review_packet_href: gatePacket.review_packet_href,
+      review_packet_artifact_type: gatePacket.review_packet_artifact_type,
+    } : {}),
+    user_notes: notes,
+    claim_gate_effect: 'no_claims_cleared',
+  });
 }
 
 function buildClaimGateReviewPacket(projectName, gateCode) {
@@ -5082,7 +5110,7 @@ app.get('/api/projects/:name/evidence/:evidenceId/official-flow-hydraulic-replay
 app.post('/api/projects/:name/evidence', authMiddleware, requireRole('admin'), (req, res) => {
   const rejected = Object.keys(req.body).filter((key) => !EVIDENCE_INSERT_FIELDS.has(key));
   if (rejected.length) return res.status(400).json({ error: `Unsupported fields: ${rejected.join(', ')}` });
-  const { evidence_type, source_file = null, source_ref = null, status, notes = null, signoff } = req.body;
+  const { evidence_type, source_file = null, source_ref = null, status, notes = null, signoff, target_gate_code = null } = req.body;
   if (!evidence_type || !status) {
     return res.status(400).json({ error: 'evidence_type and status are required' });
   }
@@ -5090,14 +5118,14 @@ app.post('/api/projects/:name/evidence', authMiddleware, requireRole('admin'), (
   try {
     const normalizedSignoff = normalizeSignedReviewerSignoff(evidence_type, signoff);
     if (normalizedSignoff) {
-      storedNotes = JSON.stringify({
-        kind: 'signed_reviewer_evidence',
+      storedNotes = buildSignedReviewerEvidenceNotes(
+        req.params.name,
         evidence_type,
         source_ref,
-        signoff: normalizedSignoff,
-        user_notes: notes,
-        claim_gate_effect: 'no_claims_cleared',
-      });
+        notes,
+        normalizedSignoff,
+        target_gate_code,
+      );
     }
   } catch (err) {
     return res.status(err.httpStatus || 400).json({ error: err.message });
@@ -14712,6 +14740,48 @@ function pdfBoundaryReplayInputPacket(projectName, evidence, decision, reviewEvi
   };
 }
 
+function pdfBoundaryFloorPlanOverrideActionPacket(projectName, replayPacket) {
+  if (!replayPacket || !replayPacket.floor_plan_override || !replayPacket.sprinkler_bid_request) {
+    return null;
+  }
+  const sourceEvidenceId = replayPacket.source_evidence_id || replayPacket.floor_plan_override.source_evidence_id || null;
+  return {
+    artifact_type: 'halofire.room_boundary_floor_plan_override_action_packet.v1',
+    status: 'ready_for_internal_alpha_replay',
+    project_name: projectName,
+    generated_at: new Date().toISOString(),
+    method: 'POST',
+    action_href: `/api/projects/${encodeURIComponent(projectName)}/sprinkler-bid`,
+    download_name: `${slugForDownloadName(projectName)}-floor-plan-override-action-${sourceEvidenceId || 'boundary'}.json`,
+    source_evidence_id: sourceEvidenceId,
+    source_review_evidence_id: replayPacket.source_review_evidence_id || replayPacket.floor_plan_override.source_review_evidence_id || null,
+    source_sam31_evidence_id: replayPacket.source_sam31_evidence_id || replayPacket.floor_plan_override.source_sam31_evidence_id || null,
+    floor_plan_override_source: replayPacket.floor_plan_override.room_boundary_source || replayPacket.review_source || null,
+    floor_plan_override: replayPacket.floor_plan_override,
+    request_body: {
+      markupPct: 25,
+      ...jsonClone(replayPacket.sprinkler_bid_request),
+    },
+    source_refs: Array.isArray(replayPacket.source_refs) ? jsonClone(replayPacket.source_refs) : [],
+    blocked_claims: Array.isArray(replayPacket.blocked_claims)
+      ? jsonClone(replayPacket.blocked_claims)
+      : jsonClone(replayPacket.floor_plan_override.blocked_claims || []),
+    acceptable_evidence: [
+      'employee room-boundary review packet',
+      'OpenClaw SAM31+LLM visual audit evidence',
+      'source-linked corrected room polygon list',
+      'licensed professional/AHJ/manufacturer/AutoSprink evidence for regulated claims',
+    ],
+    use_for_claims: false,
+    claim_gate_effect: 'no_claims_cleared',
+    no_claim_gates_cleared: true,
+    limitations: [
+      'This action packet is a readback of the internal-alpha replay POST body only.',
+      'It does not clear geometry accuracy, drawing scale, AHJ approval, professional approval, AutoSprink parity, permit readiness, fabrication readiness, or engineering-grade output.',
+    ],
+  };
+}
+
 function resolveRoomBoundaryReplayFloorPlan(req, projectName) {
   const replaySource = String(req.body?.room_boundary_source || '').trim();
   if (!['latest_employee_review_packet', 'latest_sam31_visual_audit'].includes(replaySource)) return null;
@@ -17431,6 +17501,35 @@ app.get('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/replay-in
       return res.status(409).json({ error: 'No employee or SAM 3.1 room-boundary review packet is available for replay input' });
     }
     res.json(packet);
+  } catch (err) {
+    res.status(err.httpStatus || 400).json({ error: err.message });
+  }
+});
+
+app.get('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/floor-plan-override-action', authMiddleware, (req, res) => {
+  try {
+    const projectName = req.params.name;
+    const evidenceId = Number(req.params.evidenceId);
+    if (!Number.isSafeInteger(evidenceId) || evidenceId <= 0) {
+      return res.status(400).json({ error: 'A positive evidence id is required' });
+    }
+    const evidence = db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'pdf_boundary_decision'`)
+      .get(evidenceId, projectName);
+    const decision = decisionFromEvidence(evidence);
+    const reviewEvidence = evidence ? latestPdfBoundaryReviewEvidence(projectName, evidence.id) : null;
+    const sam31Evidence = evidence ? latestSam31VisualAuditEvidence(projectName, evidence.id) : null;
+    const sam31ReplacementEvidence = evidence ? latestSam31EmployeeReplacementEvidence(projectName, evidence.id) : null;
+    const sam31ExtrapolationEvidence = evidence ? latestOpenClawSam31ExtrapolationArtifactEvidence(projectName, evidence.id) : null;
+    const sam31ExtrapolationReviewEvidence = evidence ? latestOpenClawSam31ExtrapolationReviewEvidence(projectName, evidence.id) : null;
+    const sam31SectioningDownstreamPacketEvidence = evidence ? latestHalofireSam31SectioningDownstreamResolverPacketEvidence(projectName, evidence.id) : null;
+    const replayPacket = pdfBoundaryReplayInputPacket(projectName, evidence, decision, reviewEvidence, sam31Evidence, sam31ReplacementEvidence, sam31ExtrapolationEvidence, sam31ExtrapolationReviewEvidence, sam31SectioningDownstreamPacketEvidence);
+    const actionPacket = pdfBoundaryFloorPlanOverrideActionPacket(projectName, replayPacket);
+    if (!actionPacket) {
+      return res.status(409).json({ error: 'No floor-plan override action is available until employee or SAM 3.1 review evidence exists' });
+    }
+    res.json(actionPacket);
   } catch (err) {
     res.status(err.httpStatus || 400).json({ error: err.message });
   }

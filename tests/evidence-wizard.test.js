@@ -192,6 +192,7 @@ describe('HaloFire evidence wizard slice', () => {
       headers: { Authorization: `Bearer ${token}` },
       body: JSON.stringify({
         evidence_type: 'professional_review',
+        target_gate_code: 'PROFESSIONAL_REVIEW_MISSING',
         source_ref: 'Signed reviewer packet PR-1881-001',
         source_file: 'professional-review-packet.pdf',
         status: 'present',
@@ -219,6 +220,10 @@ describe('HaloFire evidence wizard slice', () => {
       kind: 'signed_reviewer_evidence',
       evidence_type: 'professional_review',
       source_ref: 'Signed reviewer packet PR-1881-001',
+      target_gate_code: 'PROFESSIONAL_REVIEW_MISSING',
+      required_evidence_type: 'professional_review',
+      review_packet_href: `${PROJECT_PATH}/claim-gates/PROFESSIONAL_REVIEW_MISSING/review-packet`,
+      review_packet_artifact_type: 'halofire.claim_gate_review_packet.v1',
       claim_gate_effect: 'no_claims_cleared',
       user_notes: 'Recorded for later gate resolution.',
     }));
@@ -230,6 +235,31 @@ describe('HaloFire evidence wizard slice', () => {
       license_id: 'PE-2048',
     }));
     expect((await gate(token, 'PROFESSIONAL_REVIEW_MISSING')).status).toBe('blocked');
+  });
+
+  it('rejects signed reviewer evidence when the requested gate does not accept that evidence type', async () => {
+    const token = await tokenFor('wizard-admin', 'actual-test-password');
+
+    const res = await request(`${PROJECT_PATH}/evidence`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        evidence_type: 'professional_review',
+        target_gate_code: 'AUTOSPRINK_EVIDENCE_MISSING',
+        source_ref: 'Mismatched signed reviewer packet',
+        status: 'present',
+        notes: 'Should fail closed.',
+        signoff: {
+          reviewer_name: 'Jordan Vale',
+          reviewer_title: 'Fire Protection Engineer',
+          signed_at: '2026-06-03T09:15:00.000Z',
+        },
+      }),
+    });
+
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.error).toMatch(/only accepts allowed evidence types/i);
   });
 
   it('only offers gate-clearable recorded evidence rows in matching_evidence', async () => {
