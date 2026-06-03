@@ -411,6 +411,10 @@ function hydrateWizardFromExistingEvidence() {
   $('wizSignedAt').value = formatWizardDateTimeLocal(signoff.signed_at);
   $('wizOrganization').value = signoff.organization || '';
   $('wizLicenseId').value = signoff.license_id || '';
+  packetStatus.dataset.signedReviewerPrefillEvidenceId = String(selectedEvidenceId);
+  packetStatus.dataset.signedReviewerPrefillGate = packetContext.targetGateCode || gate.code || '';
+  packetStatus.dataset.signedReviewerReviewPacketHref = packetContext.reviewPacketHref || gate.review_packet_href || '';
+  packetStatus.dataset.signedReviewerResolveAuditHref = packetContext.resolveAuditHref || '';
   packetStatus.textContent = `Prefilled from Workbench for evidence #${selectedEvidenceId}.`
     + (packetContext.targetGateCode ? ` target_gate_code ${packetContext.targetGateCode}.` : '')
     + (packetContext.reviewPacketHref ? ` Review packet route ${packetContext.reviewPacketHref}.` : ' Resolve the gate or download the packet for this signed reviewer lane.')
@@ -452,6 +456,10 @@ function selectedSignedReviewerPacketContext() {
   } catch {
     return {};
   }
+}
+
+function apiPathFromHref(href) {
+  return String(href || '').startsWith('/api/') ? String(href).slice(4) : href;
 }
 
 function wizardSignoffPayload() {
@@ -536,7 +544,7 @@ async function downloadClaimGateReviewPacket() {
   packetStatus.textContent = 'Downloading review packet...';
   try {
     const packet = await api(
-      selectedPacketContext.reviewPacketHref
+      apiPathFromHref(selectedPacketContext.reviewPacketHref)
         || ('/projects/' + encodeURIComponent(projectName) + '/claim-gates/' + encodeURIComponent(gateCode) + '/review-packet'),
     );
     const blob = new Blob([JSON.stringify(packet, null, 2)], { type: 'application/json' });
@@ -568,7 +576,7 @@ async function downloadClaimGateResolveAuditPacket() {
   packetStatus.textContent = 'Downloading resolve audit packet...';
   try {
     const packet = await api(
-      selectedPacketContext.resolveAuditHref
+      apiPathFromHref(selectedPacketContext.resolveAuditHref)
         || ('/projects/' + encodeURIComponent(projectName) + '/claim-gates/' + encodeURIComponent(gateCode) + '/resolve-audit-packet'),
     );
     const blob = new Blob([JSON.stringify(packet, null, 2)], { type: 'application/json' });
@@ -590,7 +598,9 @@ async function initWizard() {
     const me = await api('/auth/me');
     wizardState.canWrite = me.role === 'admin';
     const projects = await api('/projects');
-    wizardState.projects = projects || [];
+    wizardState.projects = (projects || []).length
+      ? projects
+      : (wizardUrlPrefill.project ? [{ name: wizardUrlPrefill.project }] : []);
     $('wizProject').innerHTML = wizardState.projects.map((p) => `<option value="${p.name}">${p.name}</option>`).join('');
     const defaultProject = wizardState.projects.find((p) => p.name === wizardUrlPrefill.project)
       || wizardState.projects.find((p) => p.name === 'Home Depot - Rexburg ID')

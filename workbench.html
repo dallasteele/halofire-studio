@@ -257,6 +257,28 @@ async function downloadSignedReviewerResolveAuditPacket(href, gateCode = '', evi
   }
 }
 
+document.addEventListener('click', (event) => {
+  const workflowButton = event.target.closest('[data-signed-reviewer-workflow-evidence-id]');
+  if (workflowButton) {
+    event.preventDefault();
+    openSignedReviewerWorkflow(
+      currentProjectName(),
+      workflowButton.getAttribute('data-signed-reviewer-workflow-gate-code') || '',
+      workflowButton.getAttribute('data-signed-reviewer-workflow-evidence-id') || '',
+    );
+    return;
+  }
+  const auditButton = event.target.closest('[data-signed-reviewer-resolve-audit-href]');
+  if (auditButton) {
+    event.preventDefault();
+    downloadSignedReviewerResolveAuditPacket(
+      auditButton.getAttribute('data-signed-reviewer-resolve-audit-href') || '',
+      auditButton.getAttribute('data-signed-reviewer-resolve-audit-gate-code') || '',
+      auditButton.getAttribute('data-signed-reviewer-resolve-audit-evidence-id') || '',
+    );
+  }
+});
+
 function replaySourceLabel(reviewSource) {
   return reviewSource === 'latest_sam31_visual_audit'
     ? 'latest SAM 3.1 visual audit'
@@ -1053,7 +1075,7 @@ function evidenceDetail(row) {
     if (packet.kind === 'signed_reviewer_evidence') {
       const signoff = packet.signoff || {};
       const resolveAuditHref = packet.resolve_audit_packet_href || '';
-      return `<div class="muted" style="font-size:11px;margin-top:3px">signed reviewer evidence Â· ${escapeHtml(signoff.reviewer_name || 'unknown reviewer')} Â· ${escapeHtml(signoff.reviewer_title || 'title missing')}<br>signed_at ${escapeHtml(signoff.signed_at || 'missing')} Â· organization ${escapeHtml(signoff.organization || 'missing')} Â· license ${escapeHtml(signoff.license_id || 'missing')}<br>target_gate_code ${escapeHtml(packet.target_gate_code || 'not linked')} Â· required_evidence_type ${escapeHtml(packet.required_evidence_type || packet.evidence_type || row.evidence_type || 'missing')}<br>review_packet_href ${escapeHtml(packet.review_packet_href || 'missing')} Â· review_packet_artifact_type ${escapeHtml(packet.review_packet_artifact_type || 'halofire.claim_gate_review_packet.v1')}<br>resolve_audit_packet_href ${escapeHtml(resolveAuditHref || 'available after explicit gate resolve')} Â· resolve_audit_packet_artifact_type ${escapeHtml(packet.resolve_audit_packet_artifact_type || 'halofire.claim_gate_resolve_audit_packet.v1')}<br>claim_gate_effect ${escapeHtml(packet.claim_gate_effect || 'no_claims_cleared')} Â· ${escapeHtml(packet.user_notes || 'review metadata recorded only; no claim gates cleared')}<br><button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0f766e" onclick="openSignedReviewerWorkflow(${JSON.stringify(currentProjectName())}, ${JSON.stringify(packet.target_gate_code || '')}, ${JSON.stringify(String(row.id || ''))})">Open signed reviewer workflow</button> <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0369a1" data-signed-reviewer-resolve-audit-href="${escapeHtml(resolveAuditHref)}" onclick="downloadSignedReviewerResolveAuditPacket(${JSON.stringify(resolveAuditHref)}, ${JSON.stringify(packet.target_gate_code || '')}, ${JSON.stringify(String(row.id || ''))})">Download resolve audit packet</button><div class="muted" id="signedReviewerResolveAuditStatus-${escapeHtml(row.id)}" style="font-size:11px;margin-top:4px"></div></div>`;
+      return `<div class="muted" style="font-size:11px;margin-top:3px">signed reviewer evidence Â· ${escapeHtml(signoff.reviewer_name || 'unknown reviewer')} Â· ${escapeHtml(signoff.reviewer_title || 'title missing')}<br>signed_at ${escapeHtml(signoff.signed_at || 'missing')} Â· organization ${escapeHtml(signoff.organization || 'missing')} Â· license ${escapeHtml(signoff.license_id || 'missing')}<br>target_gate_code ${escapeHtml(packet.target_gate_code || 'not linked')} Â· required_evidence_type ${escapeHtml(packet.required_evidence_type || packet.evidence_type || row.evidence_type || 'missing')}<br>review_packet_href ${escapeHtml(packet.review_packet_href || 'missing')} Â· review_packet_artifact_type ${escapeHtml(packet.review_packet_artifact_type || 'halofire.claim_gate_review_packet.v1')}<br>resolve_audit_packet_href ${escapeHtml(resolveAuditHref || 'available after explicit gate resolve')} Â· resolve_audit_packet_artifact_type ${escapeHtml(packet.resolve_audit_packet_artifact_type || 'halofire.claim_gate_resolve_audit_packet.v1')}<br>claim_gate_effect ${escapeHtml(packet.claim_gate_effect || 'no_claims_cleared')} Â· ${escapeHtml(packet.user_notes || 'review metadata recorded only; no claim gates cleared')}<br><button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0f766e" data-signed-reviewer-workflow-evidence-id="${escapeHtml(String(row.id || ''))}" data-signed-reviewer-workflow-gate-code="${escapeHtml(packet.target_gate_code || '')}" data-signed-reviewer-workflow-review-packet-href="${escapeHtml(packet.review_packet_href || '')}" onclick="openSignedReviewerWorkflow(${JSON.stringify(currentProjectName())}, ${JSON.stringify(packet.target_gate_code || '')}, ${JSON.stringify(String(row.id || ''))})">Open signed reviewer workflow</button> <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0369a1" data-signed-reviewer-resolve-audit-href="${escapeHtml(resolveAuditHref)}" data-signed-reviewer-resolve-audit-gate-code="${escapeHtml(packet.target_gate_code || '')}" data-signed-reviewer-resolve-audit-evidence-id="${escapeHtml(String(row.id || ''))}" onclick="downloadSignedReviewerResolveAuditPacket(${JSON.stringify(resolveAuditHref)}, ${JSON.stringify(packet.target_gate_code || '')}, ${JSON.stringify(String(row.id || ''))})">Download resolve audit packet</button><div class="muted" id="signedReviewerResolveAuditStatus-${escapeHtml(row.id)}" style="font-size:11px;margin-top:4px"></div></div>`;
     }
   } catch {
     // Fall through to type-specific rendering when notes are not structured reviewer evidence.
