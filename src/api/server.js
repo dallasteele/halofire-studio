@@ -15082,6 +15082,44 @@ function claimGateResolveAuditQueueItems(projectName) {
   });
 }
 
+function sam31ActualValueResolverQueueItems(projectName) {
+  const queue = buildOpenClawSam31ActualValueResolverQueue(projectName);
+  const rows = Array.isArray(queue.items) ? queue.items : [];
+  return rows.map((row) => {
+    const prefill = row.actual_value_replacement_prefill && typeof row.actual_value_replacement_prefill === 'object'
+      ? row.actual_value_replacement_prefill
+      : null;
+    const sourceRefs = uniqueStrings([
+      ...(Array.isArray(prefill?.source_refs) ? prefill.source_refs : []),
+      row.replacement_values_source_ref,
+      row.replacement_ref,
+      row.persisted_review_packet_ref,
+    ].filter(Boolean));
+    return {
+      ...row,
+      kind: 'sam31_actual_value_replacement',
+      resolver_artifact_type: 'halofire.sam31_actual_value_resolver_queue_item.v1',
+      project_name: projectName,
+      source_refs: sourceRefs,
+      acceptable_evidence: Array.isArray(row.acceptable_actual_evidence)
+        ? [...row.acceptable_actual_evidence]
+        : [
+          '1881 proposal workbook row or sheet reference',
+          'reviewed vector overlay SVG or marked-up plan ref',
+          'reviewed 3D model candidate ref or model note',
+          'screenshot or console evidence for the reviewed SAM31 section',
+        ],
+      ai_fallback: 'Use SAM31+LLM object, vector, and 3D candidates only as temporary internal-alpha values until HaloFire employee evidence replaces them.',
+      shared_queue_href: `/api/openclaw/sam31/actual-value-resolver-queue?projectName=${encodeURIComponent(projectName)}${row.consumer ? `&consumer=${encodeURIComponent(row.consumer)}` : ''}`,
+      source_project_queue_href: `/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/actual-value-resolver-queue${row.consumer ? `?consumer=${encodeURIComponent(row.consumer)}` : ''}`,
+      next_action: row.next_action || 'Record sam31_actual_value_replacement evidence from the 1881 workbook/sheet, reviewed vector overlay, reviewed 3D model candidate, screenshot, or console evidence.',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    };
+  });
+}
+
 app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
   const projectName = req.params.name;
   const filters = {
@@ -15092,6 +15130,7 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
     sam31SprinklerReview: String(req.query?.sam31SprinklerReview || '').trim().toLowerCase() || null,
     sam31SprinklerReplay: String(req.query?.sam31SprinklerReplay || '').trim().toLowerCase() || null,
     sam31ApprovalValidation: String(req.query?.sam31ApprovalValidation || req.query?.sam31_approval_validation || '').trim().toLowerCase() || null,
+    sam31ActualValue: String(req.query?.sam31ActualValue || req.query?.sam31_actual_value || '').trim().toLowerCase() || null,
     consumer: String(req.query?.consumer || '').trim().toLowerCase() || null,
     lane: String(req.query?.lane || '').trim().toLowerCase() || null,
     catalogApproval: String(req.query?.catalogApproval || req.query?.catalog_approval || '').trim().toLowerCase() || null,
@@ -15121,6 +15160,9 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
   for (const claimGateAuditItem of claimGateResolveAuditQueueItems(projectName)) {
     items.push(claimGateAuditItem);
   }
+  for (const actualValueItem of sam31ActualValueResolverQueueItems(projectName)) {
+    items.push(actualValueItem);
+  }
   const suppliedDocumentBidTruthItem = suppliedDocumentBidTruthResolverQueueItem(projectName);
   if (suppliedDocumentBidTruthItem) items.push(suppliedDocumentBidTruthItem);
   const officialFlowEvidence = latestOfficialFlowIntakeEvidence(projectName);
@@ -15143,6 +15185,19 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
     if (catalogItem) items.push(catalogItem);
   }
   let visibleItems = items;
+  if (filters.sam31ActualValue) {
+    visibleItems = visibleItems.filter((item) => {
+      if (item.kind !== 'sam31_actual_value_replacement') return false;
+      if (filters.consumer && String(item.consumer || '').toLowerCase() !== filters.consumer) return false;
+      if (filters.sam31ActualValue === 'pending' && item.intake_status === 'recorded') return false;
+      if (filters.sam31ActualValue === 'recorded' && item.intake_status !== 'recorded') return false;
+      if (filters.sam31ActualValue === 'prefilled_1881') {
+        const prefillStatus = String(item.actual_value_replacement_prefill?.status || '').toLowerCase();
+        if (prefillStatus !== 'prefill_from_supplied_1881_source_refs') return false;
+      }
+      return true;
+    });
+  }
   if (filters.roomBoundarySource || filters.roomBoundaryState) {
     visibleItems = visibleItems.filter((item) => {
       if (item.kind !== 'room_boundary_visual_audit') return false;
@@ -15226,6 +15281,7 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
     return acc;
   }, {});
   const sam31ApprovalValidationRows = sam31ApprovalUploadValidationRowsFromItems(visibleItems, approvalGateStatusByCode);
+  const sam31ActualValueRows = visibleItems.filter((item) => item.kind === 'sam31_actual_value_replacement');
   res.json({
     project_name: projectName,
     filters,
@@ -15260,6 +15316,9 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
       sam31_approval_validation_pending: sam31ApprovalValidationRows.filter((row) => row.latest_approval_upload_intake && row.gate_status !== 'cleared').length,
       sam31_approval_validation_ready_for_gate_resolve: sam31ApprovalValidationRows.filter((row) => row.latest_approval_upload_intake && row.gate_status !== 'cleared' && row.latest_approval_upload_intake.gate_validation_packet_action).length,
       sam31_approval_validation_cleared: sam31ApprovalValidationRows.filter((row) => row.latest_approval_upload_intake && row.gate_status === 'cleared').length,
+      sam31_actual_value_replacement_pending: sam31ActualValueRows.filter((row) => row.intake_status !== 'recorded').length,
+      sam31_actual_value_prefilled_1881: sam31ActualValueRows.filter((row) => String(row.actual_value_replacement_prefill?.status || '').toLowerCase() === 'prefill_from_supplied_1881_source_refs').length,
+      sam31_actual_value_replacements_recorded: sam31ActualValueRows.filter((row) => row.intake_status === 'recorded').length,
       claim_gate_resolve_audit_cleared: visibleItems.filter((item) => item.kind === 'claim_gate_resolve_audit' && item.status === 'cleared').length,
       claim_gate_resolve_audit_ready_for_download: visibleItems.filter((item) => item.kind === 'claim_gate_resolve_audit' && item.audit_packet_action?.href).length,
       catalog_source_needed: statusCounts.catalog_source_needed || 0,

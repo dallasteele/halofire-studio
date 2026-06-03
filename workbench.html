@@ -2749,6 +2749,22 @@ function claimGateAuditQuickFilter(summary, activeQuery) {
   </div>`;
 }
 
+function sam31ActualValueQuickFilter(summary, activeQuery) {
+  const pendingQuery = 'sam31ActualValue=pending';
+  const isPendingActive = activeQuery === pendingQuery;
+  return `<div class="muted" style="font-size:11px;margin-bottom:8px">
+    sam31ActualValueQuickFilter:
+    <button class="go" type="button" style="padding:6px 9px;font-size:10px;background:${isPendingActive ? '#92400e' : '#374151'}" data-resolver-queue-filter="${escapeHtml(pendingQuery)}">Pending SAM31 actual-value replacements</button>
+    ${activeQuery && !isPendingActive ? '<button class="go" type="button" style="padding:6px 9px;font-size:10px;background:#374151" data-resolver-queue-filter="">Show all resolver rows</button>' : ''}
+    <span class="chip">sam31ActualValue=pending</span>
+    <span class="chip">sam31_actual_value_replacement_pending ${escapeHtml(summary.sam31_actual_value_replacement_pending || 0)}</span>
+    <span class="chip">sam31_actual_value_prefilled_1881 ${escapeHtml(summary.sam31_actual_value_prefilled_1881 || 0)}</span>
+    <span class="chip">sam31_actual_value_replacements_recorded ${escapeHtml(summary.sam31_actual_value_replacements_recorded || 0)}</span>
+    <span class="chip">halofire.sam31_actual_value_resolver_queue_item.v1</span>
+    <span class="chip">claim_gate_effect no_claims_cleared</span>
+  </div>`;
+}
+
 function roomBoundaryQuickFilter(summary, activeQuery) {
   const employeeCorrectionQuery = 'roomBoundarySource=employee_review&roomBoundaryState=correction_ready';
   const isEmployeeCorrectionActive = activeQuery === employeeCorrectionQuery;
@@ -2760,6 +2776,34 @@ function roomBoundaryQuickFilter(summary, activeQuery) {
     <span class="chip">roomBoundaryState=correction_ready</span>
     <span class="chip">employee correction ready ${escapeHtml(summary.employee_room_boundary_correction_ready || 0)}</span>
   </div>`;
+}
+
+function renderResolverSam31ActualValueReplacement(item, acceptable, claims) {
+  const prefill = item.actual_value_replacement_prefill && typeof item.actual_value_replacement_prefill === 'object'
+    ? item.actual_value_replacement_prefill
+    : null;
+  const sourceRefs = Array.isArray(item.source_refs) ? item.source_refs : [];
+  const summary = item.replacement_summary || {};
+  return `
+    <div class="gate warning" id="${escapeHtml(item.id || 'sam31-actual-value-replacement')}">
+      <div class="code">${escapeHtml(item.kind || 'sam31_actual_value_replacement')} - ${escapeHtml(item.status || 'requires_employee_actual_value_update')}</div>
+      <div class="na">${escapeHtml(item.resolver_artifact_type || 'halofire.sam31_actual_value_resolver_queue_item.v1')} - ${escapeHtml(item.artifact_type || 'openclaw.sam31.actual_value_resolver_queue_item.v1')} - consumer ${escapeHtml(item.consumer || 'all')}</div>
+      <div class="claims">source_pdf_boundary_evidence_id ${escapeHtml(item.source_pdf_boundary_evidence_id || 'missing')} - source_openclaw_sam31_consumer_review_evidence_id ${escapeHtml(item.source_openclaw_sam31_consumer_review_evidence_id || 'missing')} - source_runtime ${escapeHtml(item.source_runtime || 'sam-3.1+llm')}</div>
+      <div class="claims">intake_status ${escapeHtml(item.intake_status || 'missing')} - evidence_record_type ${escapeHtml(item.evidence_record_type || 'sam31_actual_value_replacement')} - claim_gate_effect ${escapeHtml(item.claim_gate_effect || 'no_claims_cleared')}</div>
+      <div class="claims">replacement_values_source_ref ${escapeHtml(item.replacement_values_source_ref || item.replacement_ref || 'missing')}</div>
+      <div class="claims">source_refs ${sourceRefs.length ? sourceRefs.map((ref) => `<span class="chip">${escapeHtml(ref)}</span>`).join('') : '<span class="chip">source refs missing</span>'}</div>
+      <div class="claims">replacement_summary <span class="chip">semantic_label_count ${escapeHtml(summary.semantic_label_count || 0)}</span><span class="chip">llm_observation_count ${escapeHtml(summary.llm_observation_count ?? item.llm_observation_count ?? 0)}</span><span class="chip">vector_overlay_count ${escapeHtml(summary.vector_overlay_count || 0)}</span><span class="chip">model_3d_candidate_count ${escapeHtml(summary.model_3d_candidate_count || 0)}</span></div>
+      <div class="claims">actual_value_replacement_prefill ${escapeHtml(prefill?.artifact_type || 'halofire.sam31_actual_value_replacement_prefill.v1')} - status ${escapeHtml(prefill?.status || 'missing')} - source_ref ${escapeHtml(prefill?.source_ref || 'missing')} - source_file ${escapeHtml(prefill?.source_file || 'missing')}</div>
+      <div class="claims">next_action ${escapeHtml(item.next_action || 'Record sam31_actual_value_replacement evidence from source documentation before downstream bid/export use.')}</div>
+      <div class="claims">Accepts: ${acceptable.map((e) => `<span class="chip">${escapeHtml(e)}</span>`).join('')}</div>
+      <div class="claims">AI fallback: ${escapeHtml(item.ai_fallback || 'SAM31+LLM outputs remain temporary internal-alpha values until employee evidence replaces them.')}</div>
+      <div class="claims">Blocks: ${claims.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('') || '<span class="chip">regulated claims remain blocked</span>'}</div>
+      <p style="margin-top:8px">
+        ${item.shared_queue_href ? `<a class="go" style="padding:7px 10px;font-size:11px;text-decoration:none;display:inline-block;margin-right:6px;background:#92400e" href="${escapeHtml(item.shared_queue_href)}">Open shared SAM31 actual-value queue</a>` : ''}
+        ${item.download_href ? `<a class="go" style="padding:7px 10px;font-size:11px;text-decoration:none;display:inline-block;background:#0f766e" href="${escapeHtml(item.download_href)}">Download actual-value work item</a>` : ''}
+      </p>
+      <span class="muted" style="font-size:10px">sam31ActualValue=pending - use_for_claims false - no_claim_gates_cleared ${escapeHtml(item.no_claim_gates_cleared === false ? 'false' : 'true')}</span>
+    </div>`;
 }
 
 function renderSuppliedDocumentBidTruth(item, defaults, acceptable, claims, actions) {
@@ -2856,6 +2900,9 @@ function resolverQueueDetail(item) {
   const actions = Array.isArray(item.actions) ? item.actions : [];
   if (item.kind === 'supplied_document_bid_truth') {
     return renderSuppliedDocumentBidTruth(item, defaults, acceptable, claims, actions);
+  }
+  if (item.kind === 'sam31_actual_value_replacement') {
+    return renderResolverSam31ActualValueReplacement(item, acceptable, claims);
   }
   if (item.kind === 'claim_gate_resolve_audit') {
     const action = item.audit_packet_action || {};
@@ -4052,11 +4099,14 @@ async function refreshResolverQueue() {
     <span class="chip">sam31_approval_upload_resolver_rows ${escapeHtml(summary.sam31_approval_upload_resolver_rows || 0)}</span>
     <span class="chip">sam31_approval_uploads_recorded ${escapeHtml(summary.sam31_approval_uploads_recorded || 0)}</span>
     <span class="chip">approval uploads recorded pending gate validation</span>
+    <span class="chip">sam31_actual_value_replacement_pending ${escapeHtml(summary.sam31_actual_value_replacement_pending || 0)}</span>
+    <span class="chip">sam31_actual_value_prefilled_1881 ${escapeHtml(summary.sam31_actual_value_prefilled_1881 || 0)}</span>
+    <span class="chip">sam31_actual_value_replacements_recorded ${escapeHtml(summary.sam31_actual_value_replacements_recorded || 0)}</span>
     <span class="chip">catalog_approval_packet_ready ${escapeHtml(summary.catalog_approval_packet_ready || 0)}</span>
     <span class="chip">ready_for_signed_evidence_upload</span>
     <span class="chip">catalog_approval_claims_cleared ${escapeHtml(summary.catalog_approval_claims_cleared || 0)}</span>
     <span class="chip">no claim gates cleared</span>
-  </div>${roomBoundaryQuickFilter(summary, activeQuery)}${sam31ApprovalValidationQuickFilter(summary, activeQuery)}${claimGateAuditQuickFilter(summary, activeQuery)}${catalogApprovalQuickFilter(summary, activeQuery)}`;
+  </div>${roomBoundaryQuickFilter(summary, activeQuery)}${sam31ActualValueQuickFilter(summary, activeQuery)}${sam31ApprovalValidationQuickFilter(summary, activeQuery)}${claimGateAuditQuickFilter(summary, activeQuery)}${catalogApprovalQuickFilter(summary, activeQuery)}`;
   document.getElementById('resolverQueue').innerHTML = queue.items && queue.items.length
     ? summaryHtml + queue.items.map(resolverQueueDetail).join('')
     : '<span class="muted">No resolver queue rows yet. Save a PDF boundary decision for room_boundary_visual_audit, record official_flow_intake, or run catalog acquisition for catalog_vendor_acquisition.</span>';

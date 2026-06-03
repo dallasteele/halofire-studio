@@ -580,6 +580,96 @@ describe('HaloFire settings + documentation upload/link API', () => {
     ]));
   });
 
+  it('surfaces pending SAM31 actual-value replacement rows in the main resolver queue without clearing claims', async () => {
+    const token = await tokenFor('settings-admin', 'actual-test-password');
+    const projectName = 'Main Resolver SAM31 Actual Queue Project';
+    const db = new Database(dbPath);
+    const reviewResult = db.prepare(
+      `INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+    ).run(
+      projectName,
+      'openclaw_sam31_consumer_review',
+      '1881-sheet-main-resolver.png',
+      'landscout://sam31/reviews/main-resolver/replacement.json',
+      'present',
+      JSON.stringify({
+        kind: 'openclaw_sam31_consumer_review',
+        review: {
+          artifact_type: 'openclaw.sam31.consumer_review_task_decision.v1',
+          source_application: 'halo_fire',
+          source_pdf_boundary_evidence_id: 204,
+          source_openclaw_sam31_consumer_smoke_evidence_id: 203,
+          consumer: 'landscout',
+          review_decision: 'needs_actual_value_replacement',
+          accepted_queue_id: 'main-resolver-sam31-landscout',
+          persisted_review_packet_ref: 'openclaw://landscout/sam31/product-review/main-resolver-sam31-landscout',
+          replacement_ref: 'landscout://sam31/reviews/main-resolver/replacement.json',
+          replacement_values: {
+            semantic_labels: ['employee reviewed riser area'],
+            llm_observations: [{ id: 'llm:main-resolver-riser-area' }],
+            source_ref: '1881://sheet-main-resolver/riser-area',
+          },
+          blocked_claims: ['permit_ready', 'fabrication_ready'],
+          use_for_claims: false,
+          no_claim_gates_cleared: true,
+          claim_gate_effect: 'no_claims_cleared',
+        },
+      }),
+    );
+    db.close();
+
+    const res = await request(`/api/projects/${encodeURIComponent(projectName)}/resolver-queue?sam31ActualValue=pending&consumer=landscout`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(res.status).toBe(200);
+    const queue = await res.json();
+    expect(queue.filters).toEqual(expect.objectContaining({
+      sam31ActualValue: 'pending',
+      consumer: 'landscout',
+    }));
+    expect(queue.summary).toEqual(expect.objectContaining({
+      sam31_actual_value_replacement_pending: 1,
+      sam31_actual_value_prefilled_1881: 0,
+      sam31_actual_value_replacements_recorded: 0,
+    }));
+    expect(queue.items).toHaveLength(1);
+    expect(queue.items[0]).toEqual(expect.objectContaining({
+      kind: 'sam31_actual_value_replacement',
+      resolver_artifact_type: 'halofire.sam31_actual_value_resolver_queue_item.v1',
+      artifact_type: 'openclaw.sam31.actual_value_resolver_queue_item.v1',
+      status: 'requires_employee_actual_value_update',
+      intake_status: 'missing',
+      consumer: 'landscout',
+      source_pdf_boundary_evidence_id: 204,
+      source_openclaw_sam31_consumer_review_evidence_id: Number(reviewResult.lastInsertRowid),
+      source_runtime: 'sam-3.1+llm',
+      evidence_record_type: 'sam31_actual_value_replacement',
+      next_action: expect.stringContaining('Record sam31_actual_value_replacement evidence'),
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(queue.items[0].acceptable_actual_evidence).toEqual(expect.arrayContaining([
+      '1881 proposal workbook row or sheet reference',
+      'reviewed vector overlay SVG or marked-up plan ref',
+      'reviewed 3D model candidate ref or model note',
+    ]));
+    expect(queue.items[0].actual_value_replacement_prefill).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.sam31_actual_value_replacement_prefill.v1',
+      claim_gate_effect: 'no_claims_cleared',
+      use_for_claims: false,
+    }));
+    expect(queue.items[0].blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'fabrication_ready',
+      'AHJ_approval',
+      'professional_approval',
+      'manufacturer_exact',
+      'AutoSprink_parity',
+    ]));
+  });
+
   it('exposes a global OpenClaw SAM31 actual-value resolver queue readback for consumer polling', async () => {
     const token = await tokenFor('settings-admin', 'actual-test-password');
     const projectName = 'Shared SAM31 Global Queue Project';

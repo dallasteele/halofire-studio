@@ -266,6 +266,15 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toContain('claim_gate_resolve_audit_cleared');
     expect(html).toContain('claim_gate_resolve_audit_ready_for_download');
     expect(html).toContain('halofire.claim_gate_resolve_audit_packet.v1');
+    expect(html).toContain('sam31ActualValueQuickFilter');
+    expect(html).toContain('sam31ActualValue=pending');
+    expect(html).toContain('Pending SAM31 actual-value replacements');
+    expect(html).toContain('sam31_actual_value_replacement_pending');
+    expect(html).toContain('sam31_actual_value_prefilled_1881');
+    expect(html).toContain('sam31_actual_value_replacements_recorded');
+    expect(html).toContain('halofire.sam31_actual_value_resolver_queue_item.v1');
+    expect(html).toContain('renderResolverSam31ActualValueReplacement');
+    expect(html).toContain('Open shared SAM31 actual-value queue');
     expect(html).toContain('gate_validation_packet_action');
     expect(html).toContain('Download SAM31 approval gate validation packet');
     expect(html).toContain('downloadHalofireSam31ApprovalUploadGateValidationPacket');
