@@ -222,6 +222,11 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toContain('data-sam31-consumer-intake-smoke-sprinkler-review-packet');
     expect(html).toContain('halofire.sam31_sprinkler_review_packet.v1');
     expect(html).toContain('source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id');
+    expect(html).toContain('Save HaloFire smoke sprinkler review decision');
+    expect(html).toContain('saveHalofireSam31ConsumerIntakeSmokeSprinklerReviewDecision');
+    expect(html).toContain('data-sam31-consumer-intake-smoke-sprinkler-review-decision');
+    expect(html).toContain('/sprinkler-review-packet/decision');
+    expect(html).toContain('employee_sam31_smoke_sprinkler_review_payload');
     expect(html).toContain('Save HaloFire smoke follow-up review');
     expect(html).toContain('saveHalofireSam31ConsumerIntakeSmokeFollowupReview');
     expect(html).toContain('data-sam31-consumer-intake-smoke-followup-review');
