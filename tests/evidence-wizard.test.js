@@ -229,6 +229,58 @@ describe('HaloFire evidence wizard slice', () => {
     expect((await gate(token, 'PROFESSIONAL_REVIEW_MISSING')).status).toBe('blocked');
   });
 
+  it('only offers gate-clearable recorded evidence rows in matching_evidence', async () => {
+    const token = await tokenFor('wizard-admin', 'actual-test-password');
+    const db = new Database(dbPath);
+    const unsignedInsert = db
+      .prepare(`INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+                VALUES (?, ?, ?, ?, ?, ?)`)
+      .run(
+        HOME_DEPOT_PROJECT_NAME,
+        'professional_review',
+        'professional-review-packet-3.pdf',
+        'Legacy unsigned reviewer packet PR-1881-003',
+        'present',
+        'Legacy row without signed reviewer metadata.',
+      );
+    db.close();
+    const unsignedEvidenceId = Number(unsignedInsert.lastInsertRowid);
+
+    const signed = await request(`${PROJECT_PATH}/evidence`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        evidence_type: 'professional_review',
+        source_ref: 'Signed reviewer packet PR-1881-004',
+        source_file: 'professional-review-packet-4.pdf',
+        status: 'present',
+        notes: 'Signed reviewer metadata should make this row reusable.',
+        signoff: {
+          reviewer_name: 'Taylor Brooks',
+          reviewer_title: 'Fire Protection Engineer',
+          signed_at: '2026-06-02T16:00:00.000Z',
+          organization: 'Halo Fire',
+          license_id: 'PE-8192',
+        },
+      }),
+    });
+    expect(signed.status).toBe(201);
+    const signedBody = await signed.json();
+
+    const res = await request(`${PROJECT_PATH}/evidence-wizard`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    const gateRow = body.gates.find((g) => g.code === 'PROFESSIONAL_REVIEW_MISSING');
+    expect(gateRow).toBeTruthy();
+    expect(gateRow.matching_evidence_count).toBeGreaterThanOrEqual(1);
+    const matchingIds = gateRow.matching_evidence.map((item) => item.id);
+    expect(matchingIds).toContain(signedBody.id);
+    expect(matchingIds).not.toContain(unsignedEvidenceId);
+    expect(gateRow.matching_evidence.some((item) => item.source_ref === 'Signed reviewer packet PR-1881-004')).toBe(true);
+  });
+
   it('resolves a regulated gate from an already-recorded signed evidence row without duplicating it', async () => {
     const token = await tokenFor('wizard-admin', 'actual-test-password');
 
