@@ -290,6 +290,21 @@ describe('PDF page inspection API', () => {
     const row = evidence.find((e) => e.id === body.evidence.id);
     expect(row).toBeTruthy();
     expect(row.status).toBe('best_effort');
+    expect(row.selected_sheet_ref).toBe('1881://proposal-cooperative/sheet-7');
+    expect(row.selected_scale_ref).toBe('1881://operator-scale/sheet-7/0.0833');
+    expect(row.selected_boundary_candidate_ref).toBe('candidate:1881-sheet-7-outline');
+    expect(row.employee_decision).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.pdf_boundary_employee_decision.v1',
+      selected_sheet_ref: '1881://proposal-cooperative/sheet-7',
+      selected_scale_ref: '1881://operator-scale/sheet-7/0.0833',
+      selected_boundary_candidate_ref: 'candidate:1881-sheet-7-outline',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(row.source_refs).toEqual(expect.arrayContaining([
+      '1881://proposal-cooperative/sheet-7',
+      '1881://operator-scale/sheet-7/0.0833',
+      'candidate:1881-sheet-7-outline',
+    ]));
     expect(row.notes).toContain('claims still blocked');
     expect(row.notes).toContain('halofire.pdf_boundary_employee_decision.v1');
 

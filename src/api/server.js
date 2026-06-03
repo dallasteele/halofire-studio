@@ -742,7 +742,22 @@ app.get('/api/projects/:name/evidence', authMiddleware, (req, res) => {
   const evidence = db
     .prepare('SELECT * FROM project_evidence WHERE project_name = ? ORDER BY created_at DESC, id DESC')
     .all(req.params.name);
-  res.json(evidence);
+  res.json(evidence.map((row) => {
+    if (row.evidence_type !== 'pdf_boundary_decision') return row;
+    const decision = decisionFromEvidence(row);
+    const employeeDecision = decision?.employeeDecision && typeof decision.employeeDecision === 'object'
+      ? jsonClone(decision.employeeDecision)
+      : null;
+    return {
+      ...row,
+      decision: decision ? jsonClone(decision) : null,
+      employee_decision: employeeDecision,
+      selected_sheet_ref: employeeDecision?.selected_sheet_ref || null,
+      selected_scale_ref: employeeDecision?.selected_scale_ref || null,
+      selected_boundary_candidate_ref: employeeDecision?.selected_boundary_candidate_ref || null,
+      source_refs: Array.isArray(employeeDecision?.source_refs) ? [...employeeDecision.source_refs] : [],
+    };
+  }));
 });
 
 const COOPERATIVE_1881_PROPOSAL_FILE = 'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx';

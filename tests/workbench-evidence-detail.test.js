@@ -68,6 +68,9 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toContain('id="evidence-${escapeHtml(e.id)}"');
     expect(html).toContain('source_ref');
     expect(html).toContain('employee_notes');
+    expect(html).toContain('selected_sheet_ref');
+    expect(html).toContain('selected_scale_ref');
+    expect(html).toContain('selected_boundary_candidate_ref');
   });
 
   it('surfaces supplied bid-truth downstream defaults on sprinkler bid results without clearing claims', async () => {
@@ -194,6 +197,22 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toContain('Download SAM31 consumer intake smoke evidence');
     expect(html).toContain('downloadSavedSam31SectionToArtifactsConsumerIntakeSmokeEvidence');
     expect(html).toContain('data-sam31-section-to-artifacts-consumer-intake-smoke-download');
+    expect(html).toContain('Open filtered queue from consumer intake smoke');
+    expect(html).toContain('filterSam31ActualValueQueueBySavedConsumerIntakeSmokeEvidence');
+    expect(html).toContain('data-sam31-section-to-artifacts-consumer-intake-smoke-open-queue');
+    expect(html).toContain('sam31ActualValueConsumerIntakeSmokeEvidenceFilter');
+    expect(html).toContain('consumerIntakeSmokeEvidenceId=');
+    expect(html).toContain('consumer_intake_smoke_evidence_filter_id');
+    expect(html).toContain('latest_section_to_artifacts_consumer_intake_smoke_evidence');
+    expect(html).toContain('latest_section_to_artifacts_consumer_intake_smoke_evidence_id');
+    expect(html).toContain('saved_section_to_artifacts_consumer_intake_smoke_count');
+    expect(html).toContain('saved_section_to_artifacts_consumer_intake_smoke_evidence');
+    expect(html).toContain('source_section_to_artifacts_consumer_intake_smoke_evidence_id');
+    expect(html).toContain('download_saved_section_to_artifacts_consumer_intake_smoke');
+    expect(html).toContain('Download filtered consumer intake smoke evidence');
+    expect(html).toContain('downloadSam31ActualValueFilteredConsumerIntakeSmokeEvidence');
+    expect(html).toContain('data-sam31-actual-value-filtered-consumer-intake-smoke-download');
+    expect(html).toContain('data-sam31-actual-value-clear-consumer-intake-smoke-filter');
     expect(html).toContain('permit_ready');
     expect(html).toContain('AutoSprink_parity');
     expect(html).toContain('brand_ready');

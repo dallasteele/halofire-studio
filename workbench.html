@@ -156,6 +156,7 @@ let sam31ActualValueQueueRows = [];
 let sam31ActualValueQueueConsumerFilter = '';
 let sam31ActualValueReplacementReadbackEvidenceFilter = '';
 let sam31ActualValueServiceDescriptorEvidenceFilter = '';
+let sam31ActualValueConsumerIntakeSmokeEvidenceFilter = '';
 let currentEvidenceRows = [];
 let latestSam31ActualValueReplacementReadbackEvidence = null;
 let latestSam31ActualValueResolverQueueReadback = null;
@@ -797,7 +798,7 @@ function renderSam31SectionToArtifactsConsumerIntakeSmokeEvidenceDetail(row) {
     const consumers = Array.isArray(smoke.supported_consumers) && smoke.supported_consumers.length
       ? smoke.supported_consumers
       : (Array.isArray(handoff.supported_consumers) && handoff.supported_consumers.length ? handoff.supported_consumers : ['halo_fire', 'landscout', 'nameforge']);
-    return `<div class="muted" style="font-size:11px;margin-top:3px">Saved SAM31 section-to-artifacts consumer intake smoke evidence detail: ${escapeHtml(smoke.artifact_type || 'openclaw.sam31.section_to_artifacts_consumer_intake_smoke.v1')}<br>consumer ${escapeHtml(smoke.consumer || 'missing')} - consumer_adapter ${escapeHtml(smoke.consumer_adapter || 'missing')} - status ${escapeHtml(smoke.status || row.status || 'present')}<br>source_sam31_actual_value_replacement_evidence_id ${escapeHtml(smoke.source_sam31_actual_value_replacement_evidence_id || 'missing')} - source_openclaw_sam31_consumer_review_evidence_id ${escapeHtml(smoke.source_openclaw_sam31_consumer_review_evidence_id || 'missing')} - source_openclaw_sam31_section_to_artifacts_ref ${escapeHtml(smoke.source_openclaw_sam31_section_to_artifacts_ref || handoff.source_openclaw_sam31_section_to_artifacts_ref || 'missing')}<br>observed_vector_overlay_count ${escapeHtml(smoke.observed_vector_overlay_count ?? handoff.vector_overlay_count ?? 0)} - observed_model_3d_candidate_count ${escapeHtml(smoke.observed_model_3d_candidate_count ?? handoff.model_3d_candidate_count ?? 0)} - observed_segment_count ${escapeHtml(smoke.observed_segment_count ?? handoff.segment_count ?? 0)} - observed_object_hypothesis_count ${escapeHtml(smoke.observed_object_hypothesis_count ?? handoff.object_hypothesis_count ?? 0)}<br>posted_handoff ${escapeHtml(handoff.artifact_type || 'openclaw.sam31.section_to_artifacts_consumer_handoff.v1')} - source_ref ${escapeHtml(row.source_ref || smoke.source_ref || 'missing')} - source_file ${escapeHtml(row.source_file || smoke.source_file || 'missing')}<br>supported_consumers: ${consumers.map((consumer) => `<span class="chip">${escapeHtml(consumer)}</span>`).join('')}<br>use_for_claims false - claim_gate_effect ${escapeHtml(smoke.claim_gate_effect || handoff.claim_gate_effect || 'no_claims_cleared')} - no_claim_gates_cleared true<br>Blocks still active: ${blocked.map((claim) => `<span class="chip">${escapeHtml(claim)}</span>`).join('')}<br>Limitations: ${limitations.map((item) => `<span class="chip">${escapeHtml(item)}</span>`).join('') || '<span class="chip">consumer intake smoke only</span>'}<br><button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#155e75" data-sam31-section-to-artifacts-consumer-intake-smoke-download="${escapeHtml(row.id)}">Download SAM31 consumer intake smoke evidence</button></div>`;
+    return `<div class="muted" style="font-size:11px;margin-top:3px">Saved SAM31 section-to-artifacts consumer intake smoke evidence detail: ${escapeHtml(smoke.artifact_type || 'openclaw.sam31.section_to_artifacts_consumer_intake_smoke.v1')}<br>consumer ${escapeHtml(smoke.consumer || 'missing')} - consumer_adapter ${escapeHtml(smoke.consumer_adapter || 'missing')} - status ${escapeHtml(smoke.status || row.status || 'present')}<br>source_sam31_actual_value_replacement_evidence_id ${escapeHtml(smoke.source_sam31_actual_value_replacement_evidence_id || 'missing')} - source_openclaw_sam31_consumer_review_evidence_id ${escapeHtml(smoke.source_openclaw_sam31_consumer_review_evidence_id || 'missing')} - source_openclaw_sam31_section_to_artifacts_ref ${escapeHtml(smoke.source_openclaw_sam31_section_to_artifacts_ref || handoff.source_openclaw_sam31_section_to_artifacts_ref || 'missing')}<br>observed_vector_overlay_count ${escapeHtml(smoke.observed_vector_overlay_count ?? handoff.vector_overlay_count ?? 0)} - observed_model_3d_candidate_count ${escapeHtml(smoke.observed_model_3d_candidate_count ?? handoff.model_3d_candidate_count ?? 0)} - observed_segment_count ${escapeHtml(smoke.observed_segment_count ?? handoff.segment_count ?? 0)} - observed_object_hypothesis_count ${escapeHtml(smoke.observed_object_hypothesis_count ?? handoff.object_hypothesis_count ?? 0)}<br>posted_handoff ${escapeHtml(handoff.artifact_type || 'openclaw.sam31.section_to_artifacts_consumer_handoff.v1')} - source_ref ${escapeHtml(row.source_ref || smoke.source_ref || 'missing')} - source_file ${escapeHtml(row.source_file || smoke.source_file || 'missing')}<br>supported_consumers: ${consumers.map((consumer) => `<span class="chip">${escapeHtml(consumer)}</span>`).join('')}<br>use_for_claims false - claim_gate_effect ${escapeHtml(smoke.claim_gate_effect || handoff.claim_gate_effect || 'no_claims_cleared')} - no_claim_gates_cleared true<br>Blocks still active: ${blocked.map((claim) => `<span class="chip">${escapeHtml(claim)}</span>`).join('')}<br>Limitations: ${limitations.map((item) => `<span class="chip">${escapeHtml(item)}</span>`).join('') || '<span class="chip">consumer intake smoke only</span>'}<br><button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#155e75" data-sam31-section-to-artifacts-consumer-intake-smoke-download="${escapeHtml(row.id)}">Download SAM31 consumer intake smoke evidence</button> <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0f766e" data-sam31-section-to-artifacts-consumer-intake-smoke-open-queue="${escapeHtml(row.id)}" data-sam31-section-to-artifacts-consumer-intake-smoke-open-queue-consumer="${escapeHtml(smoke.consumer || '')}">Open filtered queue from consumer intake smoke</button></div>`;
   } catch {
     return '<div class="muted" style="font-size:11px;margin-top:3px">SAM31 section-to-artifacts consumer intake smoke evidence detail unavailable</div>';
   }
@@ -990,11 +991,16 @@ function evidenceDetail(row) {
   }
   if (row.evidence_type !== 'pdf_boundary_decision') return row.source_file ? ' · ' + escapeHtml(row.source_file) : '';
   try {
-    const packet = JSON.parse(row.notes || '{}');
+    const packet = row.decision && typeof row.decision === 'object'
+      ? { decision: row.decision }
+      : JSON.parse(row.notes || '{}');
     const decision = packet.decision || {};
     const candidate = decision.candidate || {};
+    const employeeDecision = row.employee_decision && typeof row.employee_decision === 'object'
+      ? row.employee_decision
+      : (decision.employeeDecision && typeof decision.employeeDecision === 'object' ? decision.employeeDecision : {});
     const blocked = Array.isArray(decision.blockedClaims) ? decision.blockedClaims : [];
-    return `<div class="muted" style="font-size:11px;margin-top:3px">sheet ${escapeHtml(decision.pageIndex)} · scale ${escapeHtml(decision.scale)} ft/pt · ${escapeHtml(decision.extractMode)} · ${escapeHtml(candidate.label || candidate.mode || 'candidate')}<br>source_ref ${escapeHtml(decision.sourceRef || row.source_ref || 'missing')} · employee_notes ${escapeHtml(decision.employeeNotes || 'none recorded')}<br>Blocks still active: ${blocked.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('')}</div>`;
+    return `<div class="muted" style="font-size:11px;margin-top:3px">sheet ${escapeHtml(decision.pageIndex)} · scale ${escapeHtml(decision.scale)} ft/pt · ${escapeHtml(decision.extractMode)} · ${escapeHtml(candidate.label || candidate.mode || 'candidate')}<br>source_ref ${escapeHtml(decision.sourceRef || row.source_ref || 'missing')} · employee_notes ${escapeHtml(decision.employeeNotes || 'none recorded')}<br>selected_sheet_ref ${escapeHtml(row.selected_sheet_ref || employeeDecision.selected_sheet_ref || 'missing')} · selected_scale_ref ${escapeHtml(row.selected_scale_ref || employeeDecision.selected_scale_ref || 'missing')}<br>selected_boundary_candidate_ref ${escapeHtml(row.selected_boundary_candidate_ref || employeeDecision.selected_boundary_candidate_ref || 'missing')}<br>Blocks still active: ${blocked.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('')}</div>`;
   } catch {
     return '<div class="muted" style="font-size:11px;margin-top:3px">saved boundary decision; detail packet unavailable</div>';
   }
@@ -1073,6 +1079,12 @@ async function refreshEvidence() {
   });
   document.querySelectorAll('[data-sam31-section-to-artifacts-consumer-intake-smoke-download]').forEach((button) => {
     button.onclick = () => downloadSavedSam31SectionToArtifactsConsumerIntakeSmokeEvidence(button.dataset.sam31SectionToArtifactsConsumerIntakeSmokeDownload);
+  });
+  document.querySelectorAll('[data-sam31-section-to-artifacts-consumer-intake-smoke-open-queue]').forEach((button) => {
+    button.onclick = () => filterSam31ActualValueQueueBySavedConsumerIntakeSmokeEvidence(
+      button.dataset.sam31SectionToArtifactsConsumerIntakeSmokeOpenQueue,
+      button.dataset.sam31SectionToArtifactsConsumerIntakeSmokeOpenQueueConsumer,
+    );
   });
   document.querySelectorAll('[data-sam31-actual-value-saved-service-descriptor-download]').forEach((button) => {
     button.onclick = () => downloadSavedSam31ActualValueServiceDescriptorEvidence(button.dataset.sam31ActualValueSavedServiceDescriptorDownload);
@@ -1318,6 +1330,12 @@ function renderSam31ActualValueQueueSummary(readback) {
   const savedReplacementReadbackCount = readback?.saved_actual_value_replacement_readback_count
     ?? queue.saved_actual_value_replacement_readback_count
     ?? 0;
+  const latestConsumerIntakeSmokeEvidence = readback?.latest_section_to_artifacts_consumer_intake_smoke_evidence
+    || queue.latest_section_to_artifacts_consumer_intake_smoke_evidence
+    || null;
+  const savedConsumerIntakeSmokeCount = readback?.saved_section_to_artifacts_consumer_intake_smoke_count
+    ?? queue.saved_section_to_artifacts_consumer_intake_smoke_count
+    ?? 0;
   const replacementReadbackEvidenceFilterId = readback?.replacement_readback_evidence_filter_id
     || queue.replacement_readback_evidence_filter_id
     || sam31ActualValueReplacementReadbackEvidenceFilter
@@ -1325,6 +1343,10 @@ function renderSam31ActualValueQueueSummary(readback) {
   const serviceDescriptorEvidenceFilterId = readback?.service_descriptor_evidence_filter_id
     || queue.service_descriptor_evidence_filter_id
     || sam31ActualValueServiceDescriptorEvidenceFilter
+    || '';
+  const consumerIntakeSmokeEvidenceFilterId = readback?.consumer_intake_smoke_evidence_filter_id
+    || queue.consumer_intake_smoke_evidence_filter_id
+    || sam31ActualValueConsumerIntakeSmokeEvidenceFilter
     || '';
   const contractEvidenceId = readback?.source_openclaw_sam31_actual_value_resolver_contract_evidence_id
     || queue.source_openclaw_sam31_actual_value_resolver_contract_evidence_id
@@ -1359,16 +1381,23 @@ function renderSam31ActualValueQueueSummary(readback) {
   const savedReplacementReadbackLine = latestReplacementReadbackEvidence
     ? `latest_actual_value_replacement_readback_evidence #${escapeHtml(latestReplacementReadbackEvidence.evidence_id || latestReplacementReadbackEvidence.id || 'missing')} - latest_actual_value_replacement_readback_evidence_id ${escapeHtml(readback?.latest_actual_value_replacement_readback_evidence_id || queue.latest_actual_value_replacement_readback_evidence_id || latestReplacementReadbackEvidence.evidence_id || 'missing')} - saved_actual_value_replacement_readback_count ${escapeHtml(savedReplacementReadbackCount)} - source_queue_route ${escapeHtml(latestReplacementReadbackEvidence.source_queue_route || 'missing')} <button class="go" type="button" style="padding:5px 8px;font-size:10px;margin:2px;background:#0369a1" data-sam31-actual-value-saved-replacement-readback-download="${escapeHtml(latestReplacementReadbackEvidence.evidence_id || latestReplacementReadbackEvidence.id || '')}">Download saved replacement readback evidence</button><button class="go" type="button" style="padding:5px 8px;font-size:10px;margin:2px;background:#0f766e" data-sam31-actual-value-open-saved-replacement-readback="${escapeHtml(latestReplacementReadbackEvidence.evidence_id || latestReplacementReadbackEvidence.id || '')}">Open queue from saved readback evidence</button>`
     : `latest_actual_value_replacement_readback_evidence missing - latest_actual_value_replacement_readback_evidence_id missing - saved_actual_value_replacement_readback_count ${escapeHtml(savedReplacementReadbackCount)}`;
+  const savedConsumerIntakeSmokeLine = latestConsumerIntakeSmokeEvidence
+    ? `latest_section_to_artifacts_consumer_intake_smoke_evidence #${escapeHtml(latestConsumerIntakeSmokeEvidence.evidence_id || latestConsumerIntakeSmokeEvidence.id || 'missing')} - latest_section_to_artifacts_consumer_intake_smoke_evidence_id ${escapeHtml(readback?.latest_section_to_artifacts_consumer_intake_smoke_evidence_id || queue.latest_section_to_artifacts_consumer_intake_smoke_evidence_id || latestConsumerIntakeSmokeEvidence.evidence_id || 'missing')} - saved_section_to_artifacts_consumer_intake_smoke_count ${escapeHtml(savedConsumerIntakeSmokeCount)} - source_section_to_artifacts_consumer_intake_smoke_evidence_id ${escapeHtml(latestConsumerIntakeSmokeEvidence.evidence_id || latestConsumerIntakeSmokeEvidence.id || 'missing')} - source_ref ${escapeHtml(latestConsumerIntakeSmokeEvidence.source_ref || 'openclaw://sam31/section-to-artifacts-consumer-intake-smoke')} - action download_saved_section_to_artifacts_consumer_intake_smoke <button class="go" type="button" style="padding:5px 8px;font-size:10px;margin:2px;background:#155e75" data-sam31-actual-value-filtered-consumer-intake-smoke-download="true">Download filtered consumer intake smoke evidence</button>`
+    : `latest_section_to_artifacts_consumer_intake_smoke_evidence missing - latest_section_to_artifacts_consumer_intake_smoke_evidence_id missing - saved_section_to_artifacts_consumer_intake_smoke_count ${escapeHtml(savedConsumerIntakeSmokeCount)} - source_section_to_artifacts_consumer_intake_smoke_evidence_id missing`;
   const replacementReadbackFilterLine = replacementReadbackEvidenceFilterId
     ? `replacement_readback_evidence_filter_id ${escapeHtml(replacementReadbackEvidenceFilterId)} <button class="go" type="button" style="padding:5px 8px;font-size:10px;margin:2px;background:#52525b" data-sam31-actual-value-clear-readback-filter="true">clear saved readback filter</button>`
     : 'replacement_readback_evidence_filter_id none';
   const serviceDescriptorFilterLine = serviceDescriptorEvidenceFilterId
     ? `service_descriptor_evidence_filter_id ${escapeHtml(serviceDescriptorEvidenceFilterId)} <button class="go" type="button" style="padding:5px 8px;font-size:10px;margin:2px;background:#52525b" data-sam31-actual-value-clear-service-descriptor-filter="true">clear saved service descriptor filter</button>`
     : 'service_descriptor_evidence_filter_id none';
+  const consumerIntakeSmokeFilterLine = consumerIntakeSmokeEvidenceFilterId
+    ? `consumer_intake_smoke_evidence_filter_id ${escapeHtml(consumerIntakeSmokeEvidenceFilterId)} <button class="go" type="button" style="padding:5px 8px;font-size:10px;margin:2px;background:#52525b" data-sam31-actual-value-clear-consumer-intake-smoke-filter="true">clear consumer intake smoke filter</button>`
+    : 'consumer_intake_smoke_evidence_filter_id none';
   const downloadArtifacts = readback?.download_artifacts || queue.download_artifacts || {};
   const sourceContractPacket = downloadArtifacts.source_contract_packet || null;
   const sourceReplacementReadback = downloadArtifacts.source_replacement_readback || null;
-  const filteredArtifactButtons = `<button class="go" type="button" style="padding:5px 8px;font-size:10px;margin:2px;background:#7c3aed" data-sam31-actual-value-filtered-queue-download="true">Download filtered queue readback</button>${sourceContractPacket ? `<button class="go" type="button" style="padding:5px 8px;font-size:10px;margin:2px;background:#4f46e5" data-sam31-actual-value-filtered-contract-download="${escapeHtml(sourceContractPacket.href || '')}">Download filtered source contract packet</button>` : ''}${sourceReplacementReadback ? `<button class="go" type="button" style="padding:5px 8px;font-size:10px;margin:2px;background:#1d4ed8" data-sam31-actual-value-filtered-replacement-readback-download="${escapeHtml(sourceReplacementReadback.href || '')}">Download filtered source replacement readback</button>` : ''}`;
+  const savedConsumerIntakeSmokeArtifact = downloadArtifacts.saved_section_to_artifacts_consumer_intake_smoke_evidence || null;
+  const filteredArtifactButtons = `<button class="go" type="button" style="padding:5px 8px;font-size:10px;margin:2px;background:#7c3aed" data-sam31-actual-value-filtered-queue-download="true">Download filtered queue readback</button>${sourceContractPacket ? `<button class="go" type="button" style="padding:5px 8px;font-size:10px;margin:2px;background:#4f46e5" data-sam31-actual-value-filtered-contract-download="${escapeHtml(sourceContractPacket.href || '')}">Download filtered source contract packet</button>` : ''}${sourceReplacementReadback ? `<button class="go" type="button" style="padding:5px 8px;font-size:10px;margin:2px;background:#1d4ed8" data-sam31-actual-value-filtered-replacement-readback-download="${escapeHtml(sourceReplacementReadback.href || '')}">Download filtered source replacement readback</button>` : ''}${savedConsumerIntakeSmokeArtifact ? `<button class="go" type="button" style="padding:5px 8px;font-size:10px;margin:2px;background:#155e75" data-sam31-actual-value-filtered-consumer-intake-smoke-download="true">Download filtered consumer intake smoke evidence</button>` : ''}`;
   return `<div id="sam31ActualValueQueueSummary" class="gate warning">
     <div class="code">openclaw.sam31.actual_value_resolver_queue.v1 Â· ${escapeHtml(queue.status || 'actual_value_replacements_pending')}</div>
     <div class="na">global_readback ${escapeHtml(SAM31_ACTUAL_VALUE_GLOBAL_READBACK_ROUTE)} Â· source_project_route ${escapeHtml(readback?.source_project_route || '/api/projects/{projectName}/openclaw/sam31/actual-value-resolver-queue')}</div>
@@ -1377,12 +1406,14 @@ function renderSam31ActualValueQueueSummary(readback) {
     <div class="claims">${serviceDescriptorEvidenceLine}</div>
     <div class="claims">${contractEvidenceLine} ${contractEvidenceReadbackAction}</div>
     <div class="claims">${savedReplacementReadbackLine}</div>
+    <div class="claims">${savedConsumerIntakeSmokeLine}</div>
     <div class="claims">${replacementReadbackFilterLine}</div>
     <div class="claims">${serviceDescriptorFilterLine}</div>
+    <div class="claims">${consumerIntakeSmokeFilterLine}</div>
     <div class="claims">Consumer pull: ${endpointRows} <button class="go" type="button" style="padding:5px 8px;font-size:10px;margin:2px;background:#52525b" data-sam31-actual-value-clear-filter="true">all consumers</button></div>
     <div class="claims">Replacement readback: <span class="chip">openclaw.sam31.actual_value_replacement_readback.v1</span> ${replacementReadbackRows}</div>
-    <div class="claims">Supported filter keys: consumer=halo_fire consumer=landscout consumer=nameforge replacementReadbackEvidenceId= serviceDescriptorEvidenceId=</div>
-    <div class="claims">download_artifacts <span class="chip">filtered_queue_readback</span> <span class="chip">saved_replacement_readback_evidence</span> <span class="chip">saved_service_descriptor_evidence</span> <span class="chip">source_contract_packet</span> <span class="chip">source_replacement_readback</span> <span class="chip">filtered_replacement_readback</span> ${filteredArtifactButtons}</div>
+    <div class="claims">Supported filter keys: consumer=halo_fire consumer=landscout consumer=nameforge replacementReadbackEvidenceId= serviceDescriptorEvidenceId= consumerIntakeSmokeEvidenceId=</div>
+    <div class="claims">download_artifacts <span class="chip">filtered_queue_readback</span> <span class="chip">saved_replacement_readback_evidence</span> <span class="chip">saved_service_descriptor_evidence</span> <span class="chip">saved_section_to_artifacts_consumer_intake_smoke_evidence</span> <span class="chip">source_contract_packet</span> <span class="chip">source_replacement_readback</span> <span class="chip">filtered_replacement_readback</span> ${filteredArtifactButtons}</div>
     ${renderSam31ActualValueResolverExtrapolationContract(readback)}
     <div class="claims">SAM31+LLM sectioning/object/vector/3D outputs are temporary values until replaced with actual evidence.</div>
   </div>`;
@@ -1572,6 +1603,24 @@ async function downloadSam31ActualValueFilteredReplacementReadback(href = '') {
     packet,
     artifact.download_name || `${currentProjectName().toLowerCase().replace(/[^a-z0-9]+/g, '-')}-sam31-filtered-source-replacement-readback.json`,
     'Downloaded filtered SAM31 source replacement readback; claim gates remain blocked.',
+  );
+}
+
+function downloadSam31ActualValueFilteredConsumerIntakeSmokeEvidence() {
+  const status = document.getElementById('sam31ActualValueQueueStatus');
+  const readback = latestSam31ActualValueResolverQueueReadback;
+  const packet = readback?.latest_section_to_artifacts_consumer_intake_smoke_evidence
+    || readback?.queue?.latest_section_to_artifacts_consumer_intake_smoke_evidence
+    || null;
+  if (!packet || packet.artifact_type !== 'openclaw.sam31.section_to_artifacts_consumer_intake_smoke.v1') {
+    if (status) status.textContent = 'Filtered SAM31 consumer intake smoke evidence is not available yet.';
+    return;
+  }
+  const artifact = readback.download_artifacts?.saved_section_to_artifacts_consumer_intake_smoke_evidence || {};
+  downloadJsonPacket(
+    packet,
+    artifact.download_name || packet.download_name || packet.source_file || `${currentProjectName().toLowerCase().replace(/[^a-z0-9]+/g, '-')}-saved-sam31-consumer-intake-smoke-${packet.evidence_id || 'evidence'}.json`,
+    'Downloaded filtered SAM31 consumer intake smoke evidence; claim gates remain blocked.',
   );
 }
 
@@ -1888,17 +1937,20 @@ async function saveSam31ActualValueResolverContractEvidence(consumer = '') {
 
 async function filterSam31ActualValueQueueByConsumer(consumer = '') {
   sam31ActualValueQueueConsumerFilter = String(consumer || '').trim();
+  sam31ActualValueConsumerIntakeSmokeEvidenceFilter = '';
   sam31ActualValueServiceDescriptorEvidenceFilter = '';
   await refreshSam31ActualValueQueue();
 }
 
 async function filterSam31ActualValueQueueBySavedReplacementReadbackEvidence(evidenceId = '') {
   sam31ActualValueReplacementReadbackEvidenceFilter = String(evidenceId || '').trim();
+  sam31ActualValueConsumerIntakeSmokeEvidenceFilter = '';
   await refreshSam31ActualValueQueue();
 }
 
 async function filterSam31ActualValueQueueBySavedServiceDescriptorEvidence(evidenceId = '', consumer = '') {
   sam31ActualValueServiceDescriptorEvidenceFilter = String(evidenceId || '').trim();
+  sam31ActualValueConsumerIntakeSmokeEvidenceFilter = '';
   const requestedConsumer = String(consumer || '').trim();
   sam31ActualValueQueueConsumerFilter = requestedConsumer && requestedConsumer !== 'all-consumers'
     ? requestedConsumer
@@ -1906,12 +1958,27 @@ async function filterSam31ActualValueQueueBySavedServiceDescriptorEvidence(evide
   await refreshSam31ActualValueQueue();
 }
 
+async function filterSam31ActualValueQueueBySavedConsumerIntakeSmokeEvidence(evidenceId = '', consumer = '') {
+  sam31ActualValueConsumerIntakeSmokeEvidenceFilter = String(evidenceId || '').trim();
+  sam31ActualValueReplacementReadbackEvidenceFilter = '';
+  sam31ActualValueServiceDescriptorEvidenceFilter = '';
+  const requestedConsumer = String(consumer || '').trim();
+  sam31ActualValueQueueConsumerFilter = requestedConsumer && requestedConsumer !== 'all-consumers'
+    ? requestedConsumer
+    : '';
+  await refreshSam31ActualValueQueue();
+  document.getElementById('sam31ActualValueQueue')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  const status = document.getElementById('sam31ActualValueQueueStatus');
+  if (status) status.textContent = 'Opened SAM31 queue from saved consumer intake smoke evidence; claim gates remain blocked.';
+}
+
 async function refreshSam31ActualValueQueue() {
   const target = document.getElementById('sam31ActualValueQueue');
   const consumerParam = sam31ActualValueQueueConsumerFilter ? '&consumer=' + encodeURIComponent(sam31ActualValueQueueConsumerFilter) : '';
   const replacementReadbackParam = sam31ActualValueReplacementReadbackEvidenceFilter ? '&replacementReadbackEvidenceId=' + encodeURIComponent(sam31ActualValueReplacementReadbackEvidenceFilter) : '';
   const serviceDescriptorParam = sam31ActualValueServiceDescriptorEvidenceFilter ? '&serviceDescriptorEvidenceId=' + encodeURIComponent(sam31ActualValueServiceDescriptorEvidenceFilter) : '';
-  const readback = await api('/openclaw/sam31/actual-value-resolver-queue?projectName=' + encodeURIComponent(currentProjectName()) + consumerParam + replacementReadbackParam + serviceDescriptorParam);
+  const consumerIntakeSmokeParam = sam31ActualValueConsumerIntakeSmokeEvidenceFilter ? '&consumerIntakeSmokeEvidenceId=' + encodeURIComponent(sam31ActualValueConsumerIntakeSmokeEvidenceFilter) : '';
+  const readback = await api('/openclaw/sam31/actual-value-resolver-queue?projectName=' + encodeURIComponent(currentProjectName()) + consumerParam + replacementReadbackParam + serviceDescriptorParam + consumerIntakeSmokeParam);
   const queue = readback.queue && typeof readback.queue === 'object' ? readback.queue : readback;
   const index = queue;
   const rows = Array.isArray(queue.items) ? queue.items : [];
@@ -1951,6 +2018,9 @@ async function refreshSam31ActualValueQueue() {
   document.querySelectorAll('[data-sam31-actual-value-clear-service-descriptor-filter]').forEach((button) => {
     button.onclick = () => filterSam31ActualValueQueueBySavedServiceDescriptorEvidence('', '');
   });
+  document.querySelectorAll('[data-sam31-actual-value-clear-consumer-intake-smoke-filter]').forEach((button) => {
+    button.onclick = () => filterSam31ActualValueQueueBySavedConsumerIntakeSmokeEvidence('', '');
+  });
   document.querySelectorAll('[data-sam31-actual-value-filtered-queue-download]').forEach((button) => {
     button.onclick = () => downloadSam31ActualValueFilteredQueueReadback();
   });
@@ -1959,6 +2029,9 @@ async function refreshSam31ActualValueQueue() {
   });
   document.querySelectorAll('[data-sam31-actual-value-filtered-replacement-readback-download]').forEach((button) => {
     button.onclick = () => downloadSam31ActualValueFilteredReplacementReadback(button.dataset.sam31ActualValueFilteredReplacementReadbackDownload);
+  });
+  document.querySelectorAll('[data-sam31-actual-value-filtered-consumer-intake-smoke-download]').forEach((button) => {
+    button.onclick = () => downloadSam31ActualValueFilteredConsumerIntakeSmokeEvidence();
   });
   document.querySelectorAll('[data-sam31-actual-value-service-descriptor-download]').forEach((button) => {
     button.onclick = () => downloadSam31ActualValueServiceDescriptor(button.dataset.sam31ActualValueServiceDescriptorDownload);
@@ -3959,6 +4032,7 @@ document.getElementById('projectTarget').onchange = () => {
   sam31ActualValueQueueConsumerFilter = '';
   sam31ActualValueReplacementReadbackEvidenceFilter = '';
   sam31ActualValueServiceDescriptorEvidenceFilter = '';
+  sam31ActualValueConsumerIntakeSmokeEvidenceFilter = '';
   latestSam31ActualValueResolverQueueReadback = null;
   document.getElementById('bidSummary').innerHTML = '';
   document.getElementById('bomCard').style.display = 'none';
