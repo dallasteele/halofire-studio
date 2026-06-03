@@ -873,6 +873,115 @@ describe('HaloFire settings + documentation upload/link API', () => {
     }));
   });
 
+  it('exposes a shared OpenClaw SAM31 actual-value service descriptor for HaloFire, LandScout, and NameForge', async () => {
+    const token = await tokenFor('settings-admin', 'actual-test-password');
+    const projectName = 'Shared SAM31 Service Descriptor Project';
+    const res = await request(`/api/openclaw/sam31/actual-value-service?projectName=${encodeURIComponent(projectName)}&consumer=nameforge`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(res.status).toBe(200);
+    const descriptor = await res.json();
+    expect(descriptor).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.actual_value_service_descriptor.v1',
+      status: 'ready_for_shared_consumer_polling',
+      project_name: projectName,
+      requested_consumer: 'nameforge',
+      source_runtime: 'sam-3.1+llm',
+      temporary_value_policy: 'best_guess_until_employee_replaced',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(descriptor.supported_consumers).toEqual(['halo_fire', 'landscout', 'nameforge']);
+    expect(descriptor.supported_applications).toEqual(['halo_fire', 'landscout', 'nameforge']);
+    expect(descriptor.consumer_service_endpoints.nameforge).toEqual(expect.objectContaining({
+      consumer: 'nameforge',
+      service_descriptor: expect.objectContaining({
+        method: 'GET',
+        href: expect.stringContaining('/api/openclaw/sam31/actual-value-service'),
+        produces: 'openclaw.sam31.actual_value_service_descriptor.v1',
+      }),
+      resolver_queue: expect.objectContaining({
+        action: 'poll_actual_value_resolver_queue',
+        href: expect.stringContaining('/api/openclaw/sam31/actual-value-resolver-queue'),
+        produces: 'openclaw.sam31.actual_value_resolver_queue_readback.v1',
+      }),
+      replacement_readback: expect.objectContaining({
+        action: 'poll_actual_value_replacement_details',
+        href: expect.stringContaining('/api/openclaw/sam31/actual-value-replacements'),
+        produces: 'openclaw.sam31.actual_value_replacement_readback.v1',
+      }),
+      replacement_intake: expect.objectContaining({
+        method: 'POST',
+        consumes: 'halofire.sam31_actual_value_replacement_intake.v1',
+        produces: 'halofire.sam31_actual_value_replacement_intake.v1',
+      }),
+    }));
+    expect(descriptor.shared_see_label_extrapolate_contract).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.see_label_extrapolate_contract.v1',
+      source_runtime: 'sam-3.1+llm',
+      supports_object_identification: true,
+      supports_semantic_labels: true,
+      supports_vector_overlays: true,
+      supports_model_3d_candidates: true,
+      supports_spatial_observations: true,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(descriptor.shared_see_label_extrapolate_contract.produces).toEqual(expect.arrayContaining([
+      'object_hypotheses',
+      'semantic_labels',
+      'vector_overlays',
+      'model_3d_candidates',
+      'spatial_observations',
+      'source_refs',
+    ]));
+    expect(descriptor.shared_see_label_extrapolate_contract.object_hypothesis_contract.required_fields).toEqual(expect.arrayContaining([
+      'id',
+      'semantic_label',
+      'confidence',
+      'source_refs',
+    ]));
+    expect(descriptor.shared_see_label_extrapolate_contract.vector_overlay_contract.required_fields).toEqual(expect.arrayContaining([
+      'id',
+      'svg_path_or_vector_ref',
+      'source_object_hypothesis_ids',
+      'source_refs',
+    ]));
+    expect(descriptor.shared_see_label_extrapolate_contract.model_3d_candidate_contract.required_fields).toEqual(expect.arrayContaining([
+      'id',
+      'model_ref_or_primitive',
+      'source_object_hypothesis_ids',
+      'source_refs',
+    ]));
+    expect(descriptor.actual_value_replacement_contract.acceptable_actual_evidence).toEqual(expect.arrayContaining([
+      '1881 proposal workbook row or sheet reference',
+      'reviewed vector overlay SVG or marked-up plan ref',
+      'reviewed 3D model candidate ref or model note',
+      'screenshot or console evidence for the reviewed SAM31 section',
+    ]));
+    expect(descriptor.blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'fabrication_ready',
+      'AutoSprink_parity',
+      'brand_ready',
+      'production_ready',
+    ]));
+
+    const projectRes = await request(`/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/actual-value-service?consumer=landscout`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(projectRes.status).toBe(200);
+    const projectDescriptor = await projectRes.json();
+    expect(projectDescriptor).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.actual_value_service_descriptor.v1',
+      project_name: projectName,
+      requested_consumer: 'landscout',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(projectDescriptor.consumer_service_endpoints.landscout.resolver_queue.href).toContain('consumer=landscout');
+  });
+
   it('records the SAM31 actual-value resolver contract packet as attachable no-claims evidence', async () => {
     const token = await tokenFor('settings-admin', 'actual-test-password');
     const projectName = 'Shared SAM31 Contract Evidence Project';

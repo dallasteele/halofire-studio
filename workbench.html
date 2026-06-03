@@ -87,7 +87,7 @@
   <div class="card wide">
     <h2>SAM31 Actual-Value Queue</h2>
     <p class="muted" style="margin-bottom:8px">OpenClaw SAM31+LLM sectioning can identify objects, semantic labels, vector overlays, and 3D model candidates. These are employee actual-value work items only until HaloFire replaces the best guesses with 1881/source evidence.</p>
-    <p class="muted" style="margin-bottom:8px;font-family:var(--mono);font-size:10px">source index /openclaw/sam31/actual-value-work-items · shared resolver queue /openclaw/sam31/actual-value-resolver-queue</p>
+    <p class="muted" style="margin-bottom:8px;font-family:var(--mono);font-size:10px">source index /openclaw/sam31/actual-value-work-items · shared service /openclaw/sam31/actual-value-service · shared resolver queue /openclaw/sam31/actual-value-resolver-queue</p>
     <div id="sam31ActualValueQueue"><span class="muted">Loading SAM31 actual-value work items...</span></div>
     <div id="sam31ActualValueQueueStatus" class="muted" style="font-size:11px;margin-top:8px"></div>
   </div>
@@ -160,6 +160,7 @@ let latestSam31ActualValueReplacementReadbackEvidence = null;
 let latestSam31ActualValueResolverQueueReadback = null;
 let lastSam31ActualValueResolverReplay = null;
 const SAM31_ACTUAL_VALUE_GLOBAL_READBACK_ROUTE = '/api/openclaw/sam31/actual-value-resolver-queue?projectName=';
+const SAM31_ACTUAL_VALUE_SERVICE_DESCRIPTOR_ROUTE = '/api/openclaw/sam31/actual-value-service?projectName=';
 const SAM31_ACTUAL_VALUE_REPLACEMENT_READBACK_ROUTE = '/api/openclaw/sam31/actual-value-replacements?projectName=';
 const SAM31_ACTUAL_VALUE_RESOLVER_CONTRACT_ROUTE = '/api/openclaw/sam31/actual-value-resolver-contract?projectName=';
 function currentProjectName() {
@@ -1145,8 +1146,10 @@ function renderSam31ActualValueResolverExtrapolationContract(readback) {
     perception_lanes: ${lanes.map((lane) => `<span class="chip">${escapeHtml(lane)}</span>`).join('') || '<span class="chip">object_identification</span><span class="chip">vector_overlay</span><span class="chip">model_3d_candidate</span>'}<br>
     produces: ${produces.map((field) => `<span class="chip">${escapeHtml(field)}</span>`).join('') || '<span class="chip">llm_observations</span><span class="chip">vector_overlays</span><span class="chip">model_3d_candidates</span>'}<br>
     supported_applications: ${apps.map((app) => `<span class="chip">${escapeHtml(app)}</span>`).join('') || '<span class="chip">halo_fire</span><span class="chip">landscout</span><span class="chip">nameforge</span>'}<br>
+    shared_service_descriptor <span class="chip">openclaw.sam31.actual_value_service_descriptor.v1</span> see_label_extrapolate_contract <span class="chip">openclaw.sam31.see_label_extrapolate_contract.v1</span><br>
     blocked_claims: ${blocked.map((claim) => `<span class="chip">${escapeHtml(claim)}</span>`).join('') || '<span class="chip">claim gates remain blocked</span>'}<br>
     use_for_claims false - claim_gate_effect ${escapeHtml(contract.claim_gate_effect || 'no_claims_cleared')}<br>
+    <button class="go" type="button" style="padding:5px 8px;font-size:10px;margin-top:5px;background:#7c3aed" data-sam31-actual-value-service-descriptor-download="${escapeHtml(sam31ActualValueQueueConsumerFilter || '')}">Download shared SAM31 service descriptor</button>
     <button class="go" type="button" style="padding:5px 8px;font-size:10px;margin-top:5px;background:#4f46e5" data-sam31-actual-value-resolver-contract-download="${escapeHtml(sam31ActualValueQueueConsumerFilter || '')}">Download resolver contract packet</button>
     <button class="go" type="button" style="padding:5px 8px;font-size:10px;margin-top:5px;background:#b45309" data-sam31-actual-value-resolver-contract-save="${escapeHtml(sam31ActualValueQueueConsumerFilter || '')}">Save contract evidence</button>
   </div>`;
@@ -1371,6 +1374,21 @@ async function downloadSam31ActualValueFilteredReplacementReadback(href = '') {
     artifact.download_name || `${currentProjectName().toLowerCase().replace(/[^a-z0-9]+/g, '-')}-sam31-filtered-source-replacement-readback.json`,
     'Downloaded filtered SAM31 source replacement readback; claim gates remain blocked.',
   );
+}
+
+async function downloadSam31ActualValueServiceDescriptor(consumer = '') {
+  const status = document.getElementById('sam31ActualValueQueueStatus');
+  const consumerParam = String(consumer || '').trim();
+  const descriptor = await api('/openclaw/sam31/actual-value-service?projectName=' + encodeURIComponent(currentProjectName()) + (consumerParam ? '&consumer=' + encodeURIComponent(consumerParam) : ''));
+  if (descriptor.artifact_type !== 'openclaw.sam31.actual_value_service_descriptor.v1') {
+    throw new Error('Unexpected SAM31 actual-value service descriptor type');
+  }
+  downloadJsonPacket(
+    descriptor,
+    `${currentProjectName().toLowerCase().replace(/[^a-z0-9]+/g, '-')}-sam31-actual-value-service-descriptor${consumerParam ? '-' + consumerParam : ''}.json`,
+    'Downloaded openclaw.sam31.actual_value_service_descriptor.v1; claim gates remain blocked.',
+  );
+  if (status) status.textContent = 'Downloaded shared SAM31 service descriptor for see-label-extrapolate polling; claim gates remain blocked.';
 }
 
 async function downloadSam31ActualValueReplacementReadback(consumer = '') {
@@ -1610,6 +1628,9 @@ async function refreshSam31ActualValueQueue() {
   });
   document.querySelectorAll('[data-sam31-actual-value-filtered-replacement-readback-download]').forEach((button) => {
     button.onclick = () => downloadSam31ActualValueFilteredReplacementReadback(button.dataset.sam31ActualValueFilteredReplacementReadbackDownload);
+  });
+  document.querySelectorAll('[data-sam31-actual-value-service-descriptor-download]').forEach((button) => {
+    button.onclick = () => downloadSam31ActualValueServiceDescriptor(button.dataset.sam31ActualValueServiceDescriptorDownload);
   });
   document.querySelectorAll('[data-sam31-actual-value-replacement-readback-consumer]').forEach((button) => {
     button.onclick = () => downloadSam31ActualValueReplacementReadback(button.dataset.sam31ActualValueReplacementReadbackConsumer);
