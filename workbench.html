@@ -775,6 +775,34 @@ function renderSam31ActualValueReplacementReadbackEvidenceDetail(row) {
   }
 }
 
+function renderSam31SectionToArtifactsConsumerIntakeSmokeEvidenceDetail(row) {
+  try {
+    const packet = JSON.parse(row.notes || '{}');
+    const smoke = packet && typeof packet === 'object' ? packet : {};
+    const handoff = smoke.posted_handoff && typeof smoke.posted_handoff === 'object' ? smoke.posted_handoff : {};
+    const blocked = Array.isArray(smoke.blocked_claims) && smoke.blocked_claims.length
+      ? smoke.blocked_claims
+      : (Array.isArray(handoff.blocked_claims) && handoff.blocked_claims.length ? handoff.blocked_claims : [
+        'permit_ready',
+        'fabrication_ready',
+        'AHJ_approval',
+        'professional_approval',
+        'manufacturer_exact',
+        'AutoSprink_parity',
+        'survey_grade',
+        'brand_ready',
+        'production_ready',
+      ]);
+    const limitations = Array.isArray(smoke.limitations) ? smoke.limitations : [];
+    const consumers = Array.isArray(smoke.supported_consumers) && smoke.supported_consumers.length
+      ? smoke.supported_consumers
+      : (Array.isArray(handoff.supported_consumers) && handoff.supported_consumers.length ? handoff.supported_consumers : ['halo_fire', 'landscout', 'nameforge']);
+    return `<div class="muted" style="font-size:11px;margin-top:3px">Saved SAM31 section-to-artifacts consumer intake smoke evidence detail: ${escapeHtml(smoke.artifact_type || 'openclaw.sam31.section_to_artifacts_consumer_intake_smoke.v1')}<br>consumer ${escapeHtml(smoke.consumer || 'missing')} - consumer_adapter ${escapeHtml(smoke.consumer_adapter || 'missing')} - status ${escapeHtml(smoke.status || row.status || 'present')}<br>source_sam31_actual_value_replacement_evidence_id ${escapeHtml(smoke.source_sam31_actual_value_replacement_evidence_id || 'missing')} - source_openclaw_sam31_consumer_review_evidence_id ${escapeHtml(smoke.source_openclaw_sam31_consumer_review_evidence_id || 'missing')} - source_openclaw_sam31_section_to_artifacts_ref ${escapeHtml(smoke.source_openclaw_sam31_section_to_artifacts_ref || handoff.source_openclaw_sam31_section_to_artifacts_ref || 'missing')}<br>observed_vector_overlay_count ${escapeHtml(smoke.observed_vector_overlay_count ?? handoff.vector_overlay_count ?? 0)} - observed_model_3d_candidate_count ${escapeHtml(smoke.observed_model_3d_candidate_count ?? handoff.model_3d_candidate_count ?? 0)} - observed_segment_count ${escapeHtml(smoke.observed_segment_count ?? handoff.segment_count ?? 0)} - observed_object_hypothesis_count ${escapeHtml(smoke.observed_object_hypothesis_count ?? handoff.object_hypothesis_count ?? 0)}<br>posted_handoff ${escapeHtml(handoff.artifact_type || 'openclaw.sam31.section_to_artifacts_consumer_handoff.v1')} - source_ref ${escapeHtml(row.source_ref || smoke.source_ref || 'missing')} - source_file ${escapeHtml(row.source_file || smoke.source_file || 'missing')}<br>supported_consumers: ${consumers.map((consumer) => `<span class="chip">${escapeHtml(consumer)}</span>`).join('')}<br>use_for_claims false - claim_gate_effect ${escapeHtml(smoke.claim_gate_effect || handoff.claim_gate_effect || 'no_claims_cleared')} - no_claim_gates_cleared true<br>Blocks still active: ${blocked.map((claim) => `<span class="chip">${escapeHtml(claim)}</span>`).join('')}<br>Limitations: ${limitations.map((item) => `<span class="chip">${escapeHtml(item)}</span>`).join('') || '<span class="chip">consumer intake smoke only</span>'}<br><button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#155e75" data-sam31-section-to-artifacts-consumer-intake-smoke-download="${escapeHtml(row.id)}">Download SAM31 consumer intake smoke evidence</button></div>`;
+  } catch {
+    return '<div class="muted" style="font-size:11px;margin-top:3px">SAM31 section-to-artifacts consumer intake smoke evidence detail unavailable</div>';
+  }
+}
+
 function renderSam31ActualValueServiceDescriptorEvidenceDetail(row) {
   try {
     const packet = JSON.parse(row.notes || '{}');
@@ -797,6 +825,9 @@ function evidenceDetail(row) {
   }
   if (row.evidence_type === 'openclaw_sam31_actual_value_replacement_readback') {
     return renderSam31ActualValueReplacementReadbackEvidenceDetail(row);
+  }
+  if (row.evidence_type === 'openclaw_sam31_section_to_artifacts_consumer_intake_smoke') {
+    return renderSam31SectionToArtifactsConsumerIntakeSmokeEvidenceDetail(row);
   }
   if (row.evidence_type === 'openclaw_sam31_extrapolation_artifact') {
     try {
@@ -1039,6 +1070,9 @@ async function refreshEvidence() {
   });
   document.querySelectorAll('[data-sam31-actual-value-saved-replacement-readback-download]').forEach((button) => {
     button.onclick = () => downloadSavedSam31ActualValueReplacementReadbackEvidence(button.dataset.sam31ActualValueSavedReplacementReadbackDownload);
+  });
+  document.querySelectorAll('[data-sam31-section-to-artifacts-consumer-intake-smoke-download]').forEach((button) => {
+    button.onclick = () => downloadSavedSam31SectionToArtifactsConsumerIntakeSmokeEvidence(button.dataset.sam31SectionToArtifactsConsumerIntakeSmokeDownload);
   });
   document.querySelectorAll('[data-sam31-actual-value-saved-service-descriptor-download]').forEach((button) => {
     button.onclick = () => downloadSavedSam31ActualValueServiceDescriptorEvidence(button.dataset.sam31ActualValueSavedServiceDescriptorDownload);
@@ -1726,6 +1760,38 @@ async function downloadSavedSam31ActualValueReplacementReadbackEvidence(evidence
   a.click();
   URL.revokeObjectURL(a.href);
   if (status) status.textContent = 'Downloaded saved openclaw.sam31.actual_value_replacement_readback.v1 evidence; claim gates remain blocked.';
+}
+
+async function downloadSavedSam31SectionToArtifactsConsumerIntakeSmokeEvidence(evidenceId = '') {
+  const status = document.getElementById('sam31ActualValueQueueStatus') || document.getElementById('evidence');
+  const targetId = Number(evidenceId);
+  let evidence = currentEvidenceRows.find((row) => Number(row.id || row.evidence_id) === targetId) || null;
+  if (!evidence) {
+    const rows = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/evidence');
+    currentEvidenceRows = Array.isArray(rows) ? rows : [];
+    evidence = currentEvidenceRows.find((row) => Number(row.id || row.evidence_id) === targetId) || null;
+  }
+  if (!evidence) {
+    if (status) status.textContent = 'Saved SAM31 consumer intake smoke evidence is not available.';
+    return;
+  }
+  let packet = null;
+  if (evidence.notes) {
+    try {
+      packet = JSON.parse(evidence.notes || '{}');
+    } catch {
+      packet = null;
+    }
+  }
+  if (!packet || packet.artifact_type !== 'openclaw.sam31.section_to_artifacts_consumer_intake_smoke.v1') {
+    if (status) status.textContent = 'Saved evidence does not contain openclaw.sam31.section_to_artifacts_consumer_intake_smoke.v1.';
+    return;
+  }
+  downloadJsonPacket(
+    packet,
+    evidence.source_file || `${currentProjectName().toLowerCase().replace(/[^a-z0-9]+/g, '-')}-saved-sam31-consumer-intake-smoke-${targetId || 'evidence'}.json`,
+    'Downloaded saved openclaw.sam31.section_to_artifacts_consumer_intake_smoke.v1 evidence; claim gates remain blocked.',
+  );
 }
 
 async function downloadSam31ActualValueReadbackEvidenceBundle(evidenceId = '') {
