@@ -3001,18 +3001,6 @@ async function downloadSam31VisualAuditPacket(evidenceId) {
   URL.revokeObjectURL(a.href);
 }
 
-async function downloadHalofireSam31ApprovalUploadGateValidationPacket(href = '') {
-  const packetHref = sam31ApiPathFromHref(href);
-  if (!packetHref) throw new Error('SAM31 approval gate validation packet route is missing');
-  const packet = await api(packetHref);
-  const blob = new Blob([JSON.stringify(packet, null, 2)], { type: 'application/json' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = packet.download_name || 'sam31-approval-gate-validation-packet.json';
-  a.click();
-  URL.revokeObjectURL(a.href);
-}
-
 function focusSam31ReplacementForm(evidenceId) {
   const target = document.getElementById('sam31EmployeeReplacementValues-' + evidenceId)
     || document.getElementById('sam31EmployeeReplacementRef-' + evidenceId)
