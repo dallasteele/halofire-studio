@@ -318,16 +318,21 @@ function syncWizardGateForm() {
   if (selectedEvidenceId && Array.from(existingEl.options || []).some((entry) => entry.value === selectedEvidenceId)) {
     existingEl.value = selectedEvidenceId;
   }
+  const selectedPacketContext = selectedSignedReviewerPacketContext();
   syncWizardSignoff();
   actionEl.disabled = !gate.can_resolve || !wizardState.canWrite;
   if (!gate.can_resolve) actionEl.value = 'record';
   $('wizUseExisting').disabled = !wizardState.canWrite || !gate.can_resolve || !matchingEvidence.length;
   packetButton.disabled = false;
-  auditButton.disabled = gate.status !== 'cleared';
+  auditButton.disabled = !selectedPacketContext.resolveAuditHref && gate.status !== 'cleared';
   $('wizPacketStatus').textContent =
-    `Review packet: ${gate.review_packet_artifact_type || 'halofire.claim_gate_review_packet.v1'}`
-    + ` · route ${gate.review_packet_href || 'missing'}`
-    + ` · resolve audit ${gate.status === 'cleared' ? 'halofire.claim_gate_resolve_audit_packet.v1 ready' : 'available after explicit gate resolve'}`;
+    `Review packet: ${selectedPacketContext.reviewPacketArtifactType || gate.review_packet_artifact_type || 'halofire.claim_gate_review_packet.v1'}`
+    + ` · route ${selectedPacketContext.reviewPacketHref || gate.review_packet_href || 'missing'}`
+    + ` · resolve audit ${
+      selectedPacketContext.resolveAuditHref
+        ? `${selectedPacketContext.resolveAuditArtifactType || 'halofire.claim_gate_resolve_audit_packet.v1'} ready`
+        : (gate.status === 'cleared' ? 'halofire.claim_gate_resolve_audit_packet.v1 ready' : 'available after explicit gate resolve')
+    }`;
   $('wizGateHelp').innerHTML =
     `<b>${escapeHtml(gate.code)}</b> — ${escapeHtml(gate.acceptable_evidence || gate.next_action || '')}`
     + (gate.blocked_claims?.length ? `<div style="margin-top:6px">Blocks: ${gate.blocked_claims.map((claim) => `<span class="pill missing">${escapeHtml(claim)}</span>`).join('')}</div>` : '');
@@ -374,10 +379,19 @@ function hydrateWizardFromExistingEvidence() {
   $('wizSourceFile').value = row.source_file || '';
   let signoff = {};
   let userNotes = '';
+  let packetContext = {};
   try {
     const parsed = JSON.parse(row.notes || '{}');
     signoff = parsed.signoff || {};
     userNotes = parsed.user_notes || parsed.notes || '';
+    packetContext = {
+      targetGateCode: parsed.target_gate_code || '',
+      reviewPacketHref: parsed.review_packet_href || '',
+      reviewPacketArtifactType: parsed.review_packet_artifact_type || '',
+      resolveAuditHref: parsed.resolve_audit_packet_href || '',
+      resolveAuditArtifactType: parsed.resolve_audit_packet_artifact_type || '',
+      claimGateEffect: parsed.claim_gate_effect || '',
+    };
   } catch {
     userNotes = row.notes || '';
   }
@@ -387,7 +401,10 @@ function hydrateWizardFromExistingEvidence() {
   $('wizSignedAt').value = formatWizardDateTimeLocal(signoff.signed_at);
   $('wizOrganization').value = signoff.organization || '';
   $('wizLicenseId').value = signoff.license_id || '';
-  packetStatus.textContent = `Prefilled from Workbench for evidence #${selectedEvidenceId}. Resolve the gate or download the packet for this signed reviewer lane.`;
+  packetStatus.textContent = `Prefilled from Workbench for evidence #${selectedEvidenceId}.`
+    + (packetContext.targetGateCode ? ` target_gate_code ${packetContext.targetGateCode}.` : '')
+    + (packetContext.reviewPacketHref ? ` Review packet route ${packetContext.reviewPacketHref}.` : ' Resolve the gate or download the packet for this signed reviewer lane.')
+    + (packetContext.resolveAuditHref ? ` Resolve audit route ${packetContext.resolveAuditHref}.` : '');
   syncWizardSignoff();
 }
 
@@ -404,6 +421,27 @@ function syncWizardSignoff() {
   $('wizSignoff').style.borderColor = needs ? 'rgba(255,213,79,.5)' : 'var(--border)';
   $('wizSignoff').style.opacity = needs ? '1' : '.72';
   $('wizSignoff').querySelector('b').textContent = needs ? 'Signed reviewer metadata required' : 'Signed reviewer metadata';
+}
+
+function selectedSignedReviewerPacketContext() {
+  const gate = wizardState.gateMap.get($('wizGate').value);
+  const selectedEvidenceId = $('wizExistingEvidence').value;
+  if (!gate || !selectedEvidenceId) return {};
+  const row = (Array.isArray(gate.matching_evidence) ? gate.matching_evidence : []).find((entry) => String(entry.id) === String(selectedEvidenceId));
+  if (!row?.notes) return {};
+  try {
+    const parsed = JSON.parse(row.notes || '{}');
+    return {
+      targetGateCode: parsed.target_gate_code || '',
+      reviewPacketHref: parsed.review_packet_href || '',
+      reviewPacketArtifactType: parsed.review_packet_artifact_type || '',
+      resolveAuditHref: parsed.resolve_audit_packet_href || '',
+      resolveAuditArtifactType: parsed.resolve_audit_packet_artifact_type || '',
+      claimGateEffect: parsed.claim_gate_effect || '',
+    };
+  } catch {
+    return {};
+  }
 }
 
 function wizardSignoffPayload() {
@@ -481,11 +519,15 @@ async function downloadClaimGateReviewPacket() {
     return;
   }
   const projectName = $('wizProject').value;
+  const selectedPacketContext = selectedSignedReviewerPacketContext();
   msg.className = 'muted';
   msg.textContent = '';
   packetStatus.textContent = 'Downloading review packet...';
   try {
-    const packet = await api('/projects/' + encodeURIComponent(projectName) + '/claim-gates/' + encodeURIComponent(gateCode) + '/review-packet');
+    const packet = await api(
+      selectedPacketContext.reviewPacketHref
+        || ('/projects/' + encodeURIComponent(projectName) + '/claim-gates/' + encodeURIComponent(gateCode) + '/review-packet'),
+    );
     const blob = new Blob([JSON.stringify(packet, null, 2)], { type: 'application/json' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
@@ -509,11 +551,15 @@ async function downloadClaimGateResolveAuditPacket() {
     return;
   }
   const projectName = $('wizProject').value;
+  const selectedPacketContext = selectedSignedReviewerPacketContext();
   msg.className = 'muted';
   msg.textContent = '';
   packetStatus.textContent = 'Downloading resolve audit packet...';
   try {
-    const packet = await api('/projects/' + encodeURIComponent(projectName) + '/claim-gates/' + encodeURIComponent(gateCode) + '/resolve-audit-packet');
+    const packet = await api(
+      selectedPacketContext.resolveAuditHref
+        || ('/projects/' + encodeURIComponent(projectName) + '/claim-gates/' + encodeURIComponent(gateCode) + '/resolve-audit-packet'),
+    );
     const blob = new Blob([JSON.stringify(packet, null, 2)], { type: 'application/json' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);

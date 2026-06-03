@@ -34,6 +34,16 @@ describe('HaloFire Settings evidence wizard signed reviewer workflow', () => {
     expect(html).toContain("$('wizLicenseId').value = signoff.license_id || ''");
   });
 
+  it('surfaces saved review packet and resolve audit context from matching signed reviewer evidence', () => {
+    const html = fs.readFileSync(SETTINGS_HTML, 'utf8');
+    expect(html).toContain('packetContext');
+    expect(html).toContain('parsed.target_gate_code');
+    expect(html).toContain('parsed.review_packet_href');
+    expect(html).toContain('parsed.resolve_audit_packet_href');
+    expect(html).toContain('packetStatus.textContent = `Prefilled from Workbench for evidence #${selectedEvidenceId}.');
+    expect(html).toContain("auditButton.disabled = !selectedPacketContext.resolveAuditHref && gate.status !== 'cleared'");
+  });
+
   it('surfaces room-boundary floor-plan override actions in the signed settings portal', () => {
     const html = fs.readFileSync(SETTINGS_HTML, 'utf8');
     expect(html).toContain('Room-Boundary Floor-Plan Overrides');
