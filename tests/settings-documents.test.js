@@ -1079,6 +1079,144 @@ describe('HaloFire settings + documentation upload/link API', () => {
     }));
   });
 
+  it('persists a contract-scoped SAM31 actual-value replacement readback as attachable no-claims evidence', async () => {
+    const token = await tokenFor('settings-admin', 'actual-test-password');
+    const projectName = 'Contract Scoped Replacement Readback Evidence Project';
+    const db = new Database(dbPath);
+    db.prepare(
+      `INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+    ).run(
+      projectName,
+      'openclaw_sam31_consumer_review',
+      '1881-sheet-9.png',
+      'nameforge://sam31/reviews/readback-evidence/replacement.json',
+      'present',
+      JSON.stringify({
+        kind: 'openclaw_sam31_consumer_review',
+        review: {
+          artifact_type: 'openclaw.sam31.consumer_review_task_decision.v1',
+          source_application: 'halo_fire',
+          source_pdf_boundary_evidence_id: 484,
+          source_openclaw_sam31_consumer_smoke_evidence_id: 483,
+          consumer: 'nameforge',
+          review_decision: 'replaced',
+          accepted_queue_id: 'readback-evidence-nameforge',
+          persisted_review_packet_ref: 'openclaw://nameforge/sam31/product-review/readback-evidence-nameforge',
+          replacement_ref: 'nameforge://sam31/reviews/readback-evidence/replacement.json',
+          replacement_values: {
+            semantic_labels: ['reviewed storefront sign zone'],
+            object_hypotheses: [{ id: 'obj:storefront-sign' }],
+            vector_overlays: [{ id: 'vector:storefront-sign' }],
+            model_3d_candidates: [{ id: 'model:storefront-sign' }],
+            source_ref: '1881://sheet-9/storefront-sign',
+          },
+          blocked_claims: ['permit_ready', 'brand_ready'],
+          use_for_claims: false,
+          no_claim_gates_cleared: true,
+          claim_gate_effect: 'no_claims_cleared',
+        },
+      }),
+    );
+    const contractEvidence = db.prepare(
+      `INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+    ).run(
+      projectName,
+      'openclaw_sam31_actual_value_resolver_contract',
+      'contract-scoped-readback-sam31-actual-value-resolver-contract-nameforge.json',
+      'openclaw://sam31/actual-value-resolver-contract/nameforge',
+      'present',
+      JSON.stringify({
+        kind: 'openclaw_sam31_actual_value_resolver_contract',
+        artifact_type: 'openclaw.sam31.actual_value_resolver_contract_packet.v1',
+        contract_packet: {
+          artifact_type: 'openclaw.sam31.actual_value_resolver_contract_packet.v1',
+          project_name: projectName,
+          requested_consumer: 'nameforge',
+          queue_artifact_type: 'openclaw.sam31.actual_value_resolver_queue.v1',
+          readback_artifact_type: 'openclaw.sam31.actual_value_resolver_queue_readback.v1',
+          use_for_claims: false,
+          claim_gate_effect: 'no_claims_cleared',
+          no_claim_gates_cleared: true,
+        },
+        supported_consumers: ['halo_fire', 'landscout', 'nameforge'],
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+        no_claim_gates_cleared: true,
+      }),
+    );
+    db.close();
+
+    const res = await request(`/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/actual-value-replacements/evidence`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ contractEvidenceId: Number(contractEvidence.lastInsertRowid) }),
+    });
+    expect(res.status).toBe(201);
+    const saved = await res.json();
+    expect(saved).toEqual(expect.objectContaining({
+      evidence_type: 'openclaw_sam31_actual_value_replacement_readback',
+      status: 'present',
+      source_ref: `openclaw://sam31/actual-value-replacements/nameforge/contract-evidence/${contractEvidence.lastInsertRowid}`,
+      source_openclaw_sam31_actual_value_resolver_contract_evidence_id: Number(contractEvidence.lastInsertRowid),
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(saved.replacement_readback).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.actual_value_replacement_readback.v1',
+      requested_consumer: 'nameforge',
+      source_openclaw_sam31_actual_value_resolver_contract_evidence_id: Number(contractEvidence.lastInsertRowid),
+      item_count: 1,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+
+    const verifyDb = new Database(dbPath);
+    const row = verifyDb.prepare('SELECT * FROM project_evidence WHERE id = ?').get(saved.evidence_id);
+    verifyDb.close();
+    expect(row).toEqual(expect.objectContaining({
+      evidence_type: 'openclaw_sam31_actual_value_replacement_readback',
+      status: 'present',
+      source_ref: `openclaw://sam31/actual-value-replacements/nameforge/contract-evidence/${contractEvidence.lastInsertRowid}`,
+    }));
+    const notes = JSON.parse(row.notes);
+    expect(notes).toEqual(expect.objectContaining({
+      kind: 'openclaw_sam31_actual_value_replacement_readback',
+      artifact_type: 'openclaw.sam31.actual_value_replacement_readback.v1',
+      source_openclaw_sam31_actual_value_resolver_contract_evidence_id: Number(contractEvidence.lastInsertRowid),
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(notes.replacement_readback.items[0]).toEqual(expect.objectContaining({
+      consumer: 'nameforge',
+      source_openclaw_sam31_actual_value_resolver_contract_evidence_id: Number(contractEvidence.lastInsertRowid),
+    }));
+    expect(notes.blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'AHJ_approval',
+      'professional_approval',
+      'AutoSprink_parity',
+      'brand_ready',
+      'production_ready',
+    ]));
+
+    const tool = await (await request('/api/openclaw/sam31/tool', {
+      headers: { Authorization: `Bearer ${token}` },
+    })).json();
+    expect(tool.halofire_api_actions.actual_value_replacement_readback_evidence).toEqual(expect.objectContaining({
+      method: 'POST',
+      href_template: '/api/projects/{projectName}/openclaw/sam31/actual-value-replacements/evidence',
+      consumes: 'openclaw.sam31.actual_value_replacement_readback.v1',
+      produces: 'openclaw_sam31_actual_value_replacement_readback',
+      evidence_record_type: 'openclaw_sam31_actual_value_replacement_readback',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+  });
+
   it('records SAM31 actual-value replacements through a typed OpenClaw intake route', async () => {
     const token = await tokenFor('settings-admin', 'actual-test-password');
     const projectName = 'Typed SAM31 Actual Replacement Project';

@@ -1137,7 +1137,7 @@ function renderSam31ActualValueQueueSummary(readback) {
     ? `latest_actual_value_resolver_contract_evidence evidence #${escapeHtml(contractEvidenceId)} - source_openclaw_sam31_actual_value_resolver_contract_evidence_id ${escapeHtml(contractEvidenceId)} - source_ref ${escapeHtml(latestContractEvidence?.source_ref || 'missing')}`
     : 'latest_actual_value_resolver_contract_evidence missing - source_openclaw_sam31_actual_value_resolver_contract_evidence_id missing';
   const contractEvidenceReadbackAction = contractEvidenceId
-    ? `<button class="go" type="button" style="padding:5px 8px;font-size:10px;margin:2px;background:#0369a1" data-sam31-actual-value-contract-replacement-readback="${escapeHtml(contractEvidenceId)}" data-sam31-actual-value-contract-replacement-readback-consumer="${escapeHtml(latestContractEvidence?.requested_consumer || sam31ActualValueQueueConsumerFilter || '')}">Download replacement readback for contract evidence</button>`
+    ? `<button class="go" type="button" style="padding:5px 8px;font-size:10px;margin:2px;background:#0369a1" data-sam31-actual-value-contract-replacement-readback="${escapeHtml(contractEvidenceId)}" data-sam31-actual-value-contract-replacement-readback-consumer="${escapeHtml(latestContractEvidence?.requested_consumer || sam31ActualValueQueueConsumerFilter || '')}">Download replacement readback for contract evidence</button><button class="go" type="button" style="padding:5px 8px;font-size:10px;margin:2px;background:#b45309" data-sam31-actual-value-contract-replacement-readback-save="${escapeHtml(contractEvidenceId)}" data-sam31-actual-value-contract-replacement-readback-save-consumer="${escapeHtml(latestContractEvidence?.requested_consumer || sam31ActualValueQueueConsumerFilter || '')}">Save replacement readback evidence</button>`
     : '';
   const consumers = Array.isArray(queue.supported_consumers) ? queue.supported_consumers : ['halo_fire', 'landscout', 'nameforge'];
   const endpoints = readback && readback.consumer_pull_endpoints && typeof readback.consumer_pull_endpoints === 'object'
@@ -1288,6 +1288,22 @@ async function downloadSam31ActualValueContractReplacementReadback(contractEvide
   status.textContent = 'Downloaded SAM31 actual-value replacement readback for contractEvidenceId=' + (evidenceParam || 'latest') + '; claim gates remain blocked.';
 }
 
+async function saveSam31ActualValueContractReplacementReadbackEvidence(contractEvidenceId = '', consumer = '') {
+  const status = document.getElementById('sam31ActualValueQueueStatus');
+  const evidenceParam = String(contractEvidenceId || '').trim();
+  const consumerParam = String(consumer || '').trim();
+  const saved = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/openclaw/sam31/actual-value-replacements/evidence', {
+    method: 'POST',
+    body: JSON.stringify({
+      contractEvidenceId: evidenceParam ? Number(evidenceParam) : null,
+      consumer: consumerParam,
+    }),
+  });
+  status.textContent = 'Saved openclaw_sam31_actual_value_replacement_readback evidence #' + saved.evidence_id + '; claim gates remain blocked.';
+  await refreshEvidence();
+  await refreshSam31ActualValueQueue();
+}
+
 async function downloadSam31ActualValueResolverContractPacket(consumer = '') {
   const status = document.getElementById('sam31ActualValueQueueStatus');
   const consumerParam = String(consumer || '').trim();
@@ -1352,6 +1368,12 @@ async function refreshSam31ActualValueQueue() {
     button.onclick = () => downloadSam31ActualValueContractReplacementReadback(
       button.dataset.sam31ActualValueContractReplacementReadback,
       button.dataset.sam31ActualValueContractReplacementReadbackConsumer,
+    );
+  });
+  document.querySelectorAll('[data-sam31-actual-value-contract-replacement-readback-save]').forEach((button) => {
+    button.onclick = () => saveSam31ActualValueContractReplacementReadbackEvidence(
+      button.dataset.sam31ActualValueContractReplacementReadbackSave,
+      button.dataset.sam31ActualValueContractReplacementReadbackSaveConsumer,
     );
   });
   document.querySelectorAll('[data-sam31-actual-value-resolver-contract-download]').forEach((button) => {

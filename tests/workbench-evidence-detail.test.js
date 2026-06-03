@@ -188,6 +188,10 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toContain('downloadSam31ActualValueContractReplacementReadback');
     expect(html).toContain('data-sam31-actual-value-contract-replacement-readback');
     expect(html).toContain('contractEvidenceId=');
+    expect(html).toContain('saveSam31ActualValueContractReplacementReadbackEvidence');
+    expect(html).toContain('data-sam31-actual-value-contract-replacement-readback-save');
+    expect(html).toContain('/openclaw/sam31/actual-value-replacements/evidence');
+    expect(html).toContain('Saved openclaw_sam31_actual_value_replacement_readback evidence');
     expect(html).toContain('supports_object_identification');
     expect(html).toContain('supports_vector_overlays');
     expect(html).toContain('supports_model_3d_candidates');

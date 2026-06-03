@@ -1947,6 +1947,84 @@ app.post('/api/projects/:name/openclaw/sam31/actual-value-resolver-contract/evid
   }
 });
 
+app.post('/api/projects/:name/openclaw/sam31/actual-value-replacements/evidence', authMiddleware, requireRole('admin'), (req, res) => {
+  try {
+    const projectName = req.params.name;
+    const requestedConsumer = String(req.body?.consumer || req.query?.consumer || '').trim().toLowerCase();
+    const contractEvidenceId = req.body?.contractEvidenceId || req.body?.contract_evidence_id || req.query?.contractEvidenceId || req.query?.contract_evidence_id;
+    const replacementReadback = buildOpenClawSam31ActualValueReplacementReadback(projectName, {
+      consumer: requestedConsumer,
+      contractEvidenceId,
+    });
+    const contractId = replacementReadback.source_openclaw_sam31_actual_value_resolver_contract_evidence_id || null;
+    const sourceConsumer = replacementReadback.requested_consumer || requestedConsumer || 'all-consumers';
+    const sourceRef = contractId
+      ? `openclaw://sam31/actual-value-replacements/${sourceConsumer}/contract-evidence/${contractId}`
+      : `openclaw://sam31/actual-value-replacements/${sourceConsumer}`;
+    const slug = projectName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'halofire-project';
+    const sourceFile = `${slug}-sam31-actual-value-replacement-readback-${sourceConsumer}${contractId ? `-contract-${contractId}` : ''}.json`;
+    const notes = {
+      kind: 'openclaw_sam31_actual_value_replacement_readback',
+      artifact_type: replacementReadback.artifact_type,
+      replacement_readback: replacementReadback,
+      source_openclaw_sam31_actual_value_resolver_contract_evidence_id: contractId,
+      requested_consumer: replacementReadback.requested_consumer,
+      source_queue_route: replacementReadback.source_queue_route,
+      supported_consumers: replacementReadback.supported_consumers,
+      acceptable_actual_evidence: replacementReadback.acceptable_actual_evidence,
+      blocked_claims: uniqueStrings([
+        ...(Array.isArray(replacementReadback.items) ? replacementReadback.items.flatMap((item) => Array.isArray(item.blocked_claims) ? item.blocked_claims : []) : []),
+        'permit_ready',
+        'fabrication_ready',
+        'AHJ_approval',
+        'professional_approval',
+        'manufacturer_exact',
+        'AutoSprink_parity',
+        'brand_ready',
+        'production_ready',
+      ]),
+      limitations: uniqueStrings([
+        ...(Array.isArray(replacementReadback.limitations) ? replacementReadback.limitations : []),
+        'This evidence row preserves a SAM31 actual-value replacement readback packet for HaloFire, LandScout, and NameForge handoffs.',
+        'It does not prove actual values and does not clear professional, AHJ, manufacturer, AutoSprink, permit, fabrication, engineering-grade, brand, or production claims.',
+      ]),
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    };
+    const result = db
+      .prepare(`INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+                VALUES (?, ?, ?, ?, ?, ?)`)
+      .run(
+        projectName,
+        'openclaw_sam31_actual_value_replacement_readback',
+        sourceFile,
+        sourceRef,
+        'present',
+        JSON.stringify(notes),
+      );
+    const evidenceRow = db.prepare('SELECT * FROM project_evidence WHERE id = ?').get(result.lastInsertRowid);
+    return res.status(201).json({
+      id: result.lastInsertRowid,
+      evidence_id: result.lastInsertRowid,
+      evidence_type: 'openclaw_sam31_actual_value_replacement_readback',
+      status: 'present',
+      source_file: sourceFile,
+      source_ref: sourceRef,
+      source_openclaw_sam31_actual_value_resolver_contract_evidence_id: contractId,
+      message: 'SAM31 actual-value replacement readback saved as attachable evidence; claims still blocked',
+      evidence: evidenceRow,
+      replacement_readback: replacementReadback,
+      blocked_claims: notes.blocked_claims,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    });
+  } catch (err) {
+    return res.status(err.httpStatus || 400).json({ error: err.message });
+  }
+});
+
 app.post('/api/projects/:name/openclaw/sam31/actual-value-replacements', authMiddleware, requireRole('admin'), (req, res) => {
   try {
     const projectName = req.params.name;
@@ -3431,6 +3509,17 @@ function localOpenClawSam31ToolDescriptor(projectName = null) {
         produces: 'openclaw.sam31.actual_value_replacement_readback.v1',
         detail_artifact_type: 'openclaw.sam31.actual_value_replacement_detail.v1',
         consumer_action: 'poll_actual_value_replacement_details',
+        supported_consumers: ['halo_fire', 'landscout', 'nameforge'],
+        temporary_value_policy: 'best_guess_until_employee_replaced',
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      },
+      actual_value_replacement_readback_evidence: {
+        method: 'POST',
+        href_template: '/api/projects/{projectName}/openclaw/sam31/actual-value-replacements/evidence',
+        consumes: 'openclaw.sam31.actual_value_replacement_readback.v1',
+        produces: 'openclaw_sam31_actual_value_replacement_readback',
+        evidence_record_type: 'openclaw_sam31_actual_value_replacement_readback',
         supported_consumers: ['halo_fire', 'landscout', 'nameforge'],
         temporary_value_policy: 'best_guess_until_employee_replaced',
         use_for_claims: false,
