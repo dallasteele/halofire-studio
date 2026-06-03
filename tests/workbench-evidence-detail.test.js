@@ -87,6 +87,22 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toContain('no_claims_cleared');
   });
 
+  it('surfaces room-boundary floor-plan override provenance in replay evidence detail', async () => {
+    const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
+    expect(shell.status).toBe(200);
+    const html = await shell.text();
+    expect(html).toContain('floor_plan_override');
+    expect(html).toContain('halofire.room_boundary_floor_plan_override.v1');
+    expect(html).toContain('internal_alpha_floor_plan_override');
+    expect(html).toContain('floor_plan_override_source');
+    expect(html).toContain('source_review_evidence_id');
+    expect(html).toContain('source_sam31_evidence_id');
+    expect(html).toContain('corrected_room_polygons');
+    expect(html).toContain('drawing_scale_verified');
+    expect(html).toContain('geometry_accuracy');
+    expect(html).toContain('claim_gate_effect no_claims_cleared');
+  });
+
   it('surfaces saved SAM31 sectioning contract review evidence details without clearing claims', async () => {
     const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
     expect(shell.status).toBe(200);
