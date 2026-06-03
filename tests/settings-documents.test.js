@@ -724,6 +724,42 @@ describe('HaloFire settings + documentation upload/link API', () => {
       requested_consumer: 'nameforge',
       claim_gate_effect: 'no_claims_cleared',
     }));
+    const contractScopedRes = await request(`/api/openclaw/sam31/actual-value-resolver-queue?projectName=${encodeURIComponent(projectName)}&contractEvidenceId=${contractEvidence.lastInsertRowid}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(contractScopedRes.status).toBe(200);
+    const contractScopedReadback = await contractScopedRes.json();
+    expect(contractScopedReadback).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.actual_value_resolver_queue_readback.v1',
+      requested_consumer: 'nameforge',
+      source_openclaw_sam31_actual_value_resolver_contract_evidence_id: Number(contractEvidence.lastInsertRowid),
+      item_count: 1,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(contractScopedReadback.queue_href).toContain(`contractEvidenceId=${contractEvidence.lastInsertRowid}`);
+    expect(contractScopedReadback.queue.items[0]).toEqual(expect.objectContaining({
+      consumer: 'nameforge',
+      source_openclaw_sam31_actual_value_resolver_contract_evidence_id: Number(contractEvidence.lastInsertRowid),
+    }));
+    const replacementScopedRes = await request(`/api/openclaw/sam31/actual-value-replacements?projectName=${encodeURIComponent(projectName)}&contractEvidenceId=${contractEvidence.lastInsertRowid}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(replacementScopedRes.status).toBe(200);
+    const replacementScopedReadback = await replacementScopedRes.json();
+    expect(replacementScopedReadback).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.actual_value_replacement_readback.v1',
+      requested_consumer: 'nameforge',
+      source_openclaw_sam31_actual_value_resolver_contract_evidence_id: Number(contractEvidence.lastInsertRowid),
+      item_count: 1,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(replacementScopedReadback.source_queue_route).toContain(`contractEvidenceId=${contractEvidence.lastInsertRowid}`);
+    expect(replacementScopedReadback.items[0]).toEqual(expect.objectContaining({
+      consumer: 'nameforge',
+      source_openclaw_sam31_actual_value_resolver_contract_evidence_id: Number(contractEvidence.lastInsertRowid),
+    }));
     expect(readback.consumer_pull_endpoints).toEqual(expect.objectContaining({
       halo_fire: expect.objectContaining({ method: 'GET', consumes: 'openclaw.sam31.actual_value_resolver_queue.v1' }),
       landscout: expect.objectContaining({ href: expect.stringContaining('consumer=landscout') }),
@@ -1083,6 +1119,34 @@ describe('HaloFire settings + documentation upload/link API', () => {
         },
       }),
     );
+    const contractEvidence = db.prepare(
+      `INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+    ).run(
+      projectName,
+      'openclaw_sam31_actual_value_resolver_contract',
+      'typed-sam31-actual-value-resolver-contract-landscout.json',
+      'openclaw://sam31/actual-value-resolver-contract/landscout/typed-intake',
+      'present',
+      JSON.stringify({
+        kind: 'openclaw_sam31_actual_value_resolver_contract',
+        artifact_type: 'openclaw.sam31.actual_value_resolver_contract_packet.v1',
+        contract_packet: {
+          artifact_type: 'openclaw.sam31.actual_value_resolver_contract_packet.v1',
+          project_name: projectName,
+          requested_consumer: 'landscout',
+          queue_artifact_type: 'openclaw.sam31.actual_value_resolver_queue.v1',
+          readback_artifact_type: 'openclaw.sam31.actual_value_resolver_queue_readback.v1',
+          use_for_claims: false,
+          claim_gate_effect: 'no_claims_cleared',
+          no_claim_gates_cleared: true,
+        },
+        supported_consumers: ['halo_fire', 'landscout', 'nameforge'],
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+        no_claim_gates_cleared: true,
+      }),
+    );
     db.close();
 
     const res = await request(`/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/actual-value-replacements`, {
@@ -1140,6 +1204,7 @@ describe('HaloFire settings + documentation upload/link API', () => {
       intake_status: 'recorded',
       latest_actual_value_replacement_evidence_id: saved.id,
       source_openclaw_sam31_consumer_review_evidence_id: reviewResult.lastInsertRowid,
+      source_openclaw_sam31_actual_value_resolver_contract_evidence_id: Number(contractEvidence.lastInsertRowid),
       consumer: 'landscout',
       llm_observation_count: 1,
       llm_observation_ids: ['llm:temporary-riser-room'],
@@ -1147,6 +1212,13 @@ describe('HaloFire settings + documentation upload/link API', () => {
       use_for_claims: false,
       claim_gate_effect: 'no_claims_cleared',
       no_claim_gates_cleared: true,
+    }));
+    expect(saved.actual_value_resolver_replay.latest_actual_value_resolver_contract_evidence).toEqual(expect.objectContaining({
+      evidence_id: Number(contractEvidence.lastInsertRowid),
+      evidence_type: 'openclaw_sam31_actual_value_resolver_contract',
+      requested_consumer: 'landscout',
+      source_ref: 'openclaw://sam31/actual-value-resolver-contract/landscout/typed-intake',
+      claim_gate_effect: 'no_claims_cleared',
     }));
     expect(saved.actual_value_resolver_replay.blocked_claims).toEqual(expect.arrayContaining([
       'permit_ready',

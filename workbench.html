@@ -1136,6 +1136,9 @@ function renderSam31ActualValueQueueSummary(readback) {
   const contractEvidenceLine = contractEvidenceId
     ? `latest_actual_value_resolver_contract_evidence evidence #${escapeHtml(contractEvidenceId)} - source_openclaw_sam31_actual_value_resolver_contract_evidence_id ${escapeHtml(contractEvidenceId)} - source_ref ${escapeHtml(latestContractEvidence?.source_ref || 'missing')}`
     : 'latest_actual_value_resolver_contract_evidence missing - source_openclaw_sam31_actual_value_resolver_contract_evidence_id missing';
+  const contractEvidenceReadbackAction = contractEvidenceId
+    ? `<button class="go" type="button" style="padding:5px 8px;font-size:10px;margin:2px;background:#0369a1" data-sam31-actual-value-contract-replacement-readback="${escapeHtml(contractEvidenceId)}" data-sam31-actual-value-contract-replacement-readback-consumer="${escapeHtml(latestContractEvidence?.requested_consumer || sam31ActualValueQueueConsumerFilter || '')}">Download replacement readback for contract evidence</button>`
+    : '';
   const consumers = Array.isArray(queue.supported_consumers) ? queue.supported_consumers : ['halo_fire', 'landscout', 'nameforge'];
   const endpoints = readback && readback.consumer_pull_endpoints && typeof readback.consumer_pull_endpoints === 'object'
     ? readback.consumer_pull_endpoints
@@ -1158,7 +1161,7 @@ function renderSam31ActualValueQueueSummary(readback) {
     <div class="na">global_readback ${escapeHtml(SAM31_ACTUAL_VALUE_GLOBAL_READBACK_ROUTE)} Â· source_project_route ${escapeHtml(readback?.source_project_route || '/api/projects/{projectName}/openclaw/sam31/actual-value-resolver-queue')}</div>
     <div class="claims">item_count ${escapeHtml(queue.item_count ?? 0)} Â· pending_count ${escapeHtml(queue.pending_count ?? 0)} Â· recorded_count ${escapeHtml(queue.recorded_count ?? 0)} Â· use_for_claims false Â· claim_gate_effect no_claims_cleared</div>
     <div class="claims">source_openclaw_sam31_actual_value_resolver_contract_evidence_id ${escapeHtml(readback?.source_openclaw_sam31_actual_value_resolver_contract_evidence_id || queue.source_openclaw_sam31_actual_value_resolver_contract_evidence_id || 'missing')} - latest_actual_value_resolver_contract_evidence ${latestContractEvidence ? `#${escapeHtml(latestContractEvidence.evidence_id || 'missing')} ${escapeHtml(latestContractEvidence.requested_consumer || 'all-consumers')} ${escapeHtml(latestContractEvidence.claim_gate_effect || 'no_claims_cleared')}` : 'missing'}</div>
-    <div class="claims">${contractEvidenceLine}</div>
+    <div class="claims">${contractEvidenceLine} ${contractEvidenceReadbackAction}</div>
     <div class="claims">Consumer pull: ${endpointRows} <button class="go" type="button" style="padding:5px 8px;font-size:10px;margin:2px;background:#52525b" data-sam31-actual-value-clear-filter="true">all consumers</button></div>
     <div class="claims">Replacement readback: <span class="chip">openclaw.sam31.actual_value_replacement_readback.v1</span> ${replacementReadbackRows}</div>
     <div class="claims">Supported filter keys: consumer=halo_fire consumer=landscout consumer=nameforge</div>
@@ -1266,6 +1269,25 @@ async function downloadSam31ActualValueReplacementReadback(consumer = '') {
   status.textContent = 'Downloaded SAM31 actual-value replacement readback; claim gates remain blocked.';
 }
 
+async function downloadSam31ActualValueContractReplacementReadback(contractEvidenceId = '', consumer = '') {
+  const status = document.getElementById('sam31ActualValueQueueStatus');
+  const evidenceParam = String(contractEvidenceId || '').trim();
+  const consumerParam = String(consumer || '').trim();
+  const readback = await api('/openclaw/sam31/actual-value-replacements?projectName=' + encodeURIComponent(currentProjectName())
+    + (consumerParam ? '&consumer=' + encodeURIComponent(consumerParam) : '')
+    + (evidenceParam ? '&contractEvidenceId=' + encodeURIComponent(evidenceParam) : ''));
+  if (readback.artifact_type !== 'openclaw.sam31.actual_value_replacement_readback.v1') {
+    throw new Error('Unexpected SAM31 contract-scoped actual-value replacement readback type');
+  }
+  const blob = new Blob([JSON.stringify(readback, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${currentProjectName().toLowerCase().replace(/[^a-z0-9]+/g, '-')}-sam31-contract-${evidenceParam || 'latest'}-actual-value-replacement-readback.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  status.textContent = 'Downloaded SAM31 actual-value replacement readback for contractEvidenceId=' + (evidenceParam || 'latest') + '; claim gates remain blocked.';
+}
+
 async function downloadSam31ActualValueResolverContractPacket(consumer = '') {
   const status = document.getElementById('sam31ActualValueQueueStatus');
   const consumerParam = String(consumer || '').trim();
@@ -1325,6 +1347,12 @@ async function refreshSam31ActualValueQueue() {
   });
   document.querySelectorAll('[data-sam31-actual-value-replacement-readback-consumer]').forEach((button) => {
     button.onclick = () => downloadSam31ActualValueReplacementReadback(button.dataset.sam31ActualValueReplacementReadbackConsumer);
+  });
+  document.querySelectorAll('[data-sam31-actual-value-contract-replacement-readback]').forEach((button) => {
+    button.onclick = () => downloadSam31ActualValueContractReplacementReadback(
+      button.dataset.sam31ActualValueContractReplacementReadback,
+      button.dataset.sam31ActualValueContractReplacementReadbackConsumer,
+    );
   });
   document.querySelectorAll('[data-sam31-actual-value-resolver-contract-download]').forEach((button) => {
     button.onclick = () => downloadSam31ActualValueResolverContractPacket(button.dataset.sam31ActualValueResolverContractDownload);
