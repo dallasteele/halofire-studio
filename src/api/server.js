@@ -11403,6 +11403,69 @@ function applySam31EmployeeReplacementToPolygons(correctedRoomPolygons, sam31Rep
   return [first, ...polygons.slice(1)];
 }
 
+function buildRoomBoundaryFloorPlanOverride(projectName, replaySource, sourceEvidence, sourceReviewEvidence, correctedRoomPolygons, sourceRefs) {
+  const reviewEvidenceKey = replaySource === 'latest_employee_review_packet'
+    ? 'source_review_evidence_id'
+    : 'source_sam31_evidence_id';
+  return {
+    artifact_type: 'halofire.room_boundary_floor_plan_override.v1',
+    status: 'internal_alpha_floor_plan_override',
+    project_name: projectName,
+    room_boundary_source: replaySource,
+    source_evidence_id: sourceEvidence?.id || null,
+    [reviewEvidenceKey]: sourceReviewEvidence?.id || null,
+    source_file: sourceEvidence?.source_file || null,
+    source_ref: sourceEvidence?.source_ref || sourceReviewEvidence?.source_ref || null,
+    corrected_room_polygon_count: Array.isArray(correctedRoomPolygons) ? correctedRoomPolygons.length : 0,
+    source_refs: uniqueByJson(sourceRefs),
+    use_for_claims: false,
+    claim_gate_effect: 'no_claims_cleared',
+    no_claim_gates_cleared: true,
+    blocked_claims: [
+      'geometry_accuracy',
+      'drawing_scale_verified',
+      'permit_ready',
+      'fabrication_ready',
+      'AHJ_approval',
+      'professional_approval',
+      'AutoSprink_parity',
+      'engineering_grade',
+    ],
+    limitations: [
+      'This override lets employee-reviewed room polygons drive an internal-alpha best-effort sprinkler bid replay.',
+      'It does not prove geometry accuracy, drawing scale, AHJ approval, professional approval, AutoSprink parity, permit readiness, fabrication readiness, or engineering-grade output.',
+    ],
+  };
+}
+
+function annotateRoomBoundaryFloorPlanOverridePolygons(correctedRoomPolygons, floorPlanOverride) {
+  const polygons = Array.isArray(correctedRoomPolygons) ? correctedRoomPolygons : [];
+  return polygons.map((entry) => {
+    const polygon = entry && typeof entry === 'object' && !Array.isArray(entry)
+      ? jsonClone(entry)
+      : { polygon: entry };
+    return {
+      ...polygon,
+      floor_plan_override_source: floorPlanOverride.room_boundary_source,
+      source_evidence_id: floorPlanOverride.source_evidence_id,
+      ...(floorPlanOverride.source_review_evidence_id
+        ? { source_review_evidence_id: floorPlanOverride.source_review_evidence_id }
+        : {}),
+      ...(floorPlanOverride.source_sam31_evidence_id
+        ? { source_sam31_evidence_id: floorPlanOverride.source_sam31_evidence_id }
+        : {}),
+      floor_plan_override_artifact_type: floorPlanOverride.artifact_type,
+      source_refs: uniqueByJson([
+        ...(Array.isArray(polygon.source_refs) ? polygon.source_refs : []),
+        ...(Array.isArray(floorPlanOverride.source_refs) ? floorPlanOverride.source_refs : []),
+      ]),
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    };
+  });
+}
+
 app.get('/api/projects/:name/pdf-boundary-decision', authMiddleware, (req, res) => {
   const evidence = latestPdfBoundaryDecisionEvidence(req.params.name);
   res.json({ evidence: evidence || null, decision: decisionFromEvidence(evidence) });
@@ -14467,9 +14530,19 @@ function pdfBoundaryReplayInputPacket(projectName, evidence, decision, reviewEvi
       claim_gate_effect: halofireSam31SectioningDownstreamResolverPacket.claim_gate_effect || 'no_claims_cleared',
     });
   }
+  const floorPlanOverride = buildRoomBoundaryFloorPlanOverride(
+    projectName,
+    reviewSource,
+    evidence,
+    reviewRow,
+    replayRoomPolygons,
+    sourceRefs,
+  );
+  const replayOverrideRoomPolygons = annotateRoomBoundaryFloorPlanOverridePolygons(replayRoomPolygons, floorPlanOverride);
   const replayBlockedClaims = uniqueStrings([
     ...(Array.isArray(queueItem.blocked_claims) ? queueItem.blocked_claims : []),
     ...(Array.isArray(review.blocked_claims) ? review.blocked_claims : []),
+    ...(Array.isArray(floorPlanOverride.blocked_claims) ? floorPlanOverride.blocked_claims : []),
     ...(Array.isArray(openclawSam31BridgeSmokeSummary?.blocked_claims) ? openclawSam31BridgeSmokeSummary.blocked_claims : []),
     ...(Array.isArray(openclawSam31ExtrapolationProductReviewMetadata?.blocked_claims) ? openclawSam31ExtrapolationProductReviewMetadata.blocked_claims : []),
     ...(Array.isArray(halofireSam31SectioningDownstreamResolverPacket?.blocked_claims) ? halofireSam31SectioningDownstreamResolverPacket.blocked_claims : []),
@@ -14480,10 +14553,13 @@ function pdfBoundaryReplayInputPacket(projectName, evidence, decision, reviewEvi
     pdfPageIndex: decision.pageIndex,
     pdfScale: decision.scale,
     pdfExtract: decision.extractMode,
-    corrected_room_polygons: replayRoomPolygons,
+    corrected_room_polygons: replayOverrideRoomPolygons,
+    floor_plan_override: floorPlanOverride,
     employee_decision: employeeDecision,
     source_refs: sourceRefs,
     use_for_claims: false,
+    claim_gate_effect: 'no_claims_cleared',
+    no_claim_gates_cleared: true,
   };
   if (reviewSource === 'latest_employee_review_packet') {
     sprinklerBidRequest.source_review_evidence_id = reviewRow.id;
@@ -14566,7 +14642,8 @@ function pdfBoundaryReplayInputPacket(projectName, evidence, decision, reviewEvi
       }
       : {}),
     issue_list: Array.isArray(review.issue_list) ? jsonClone(review.issue_list) : [],
-    corrected_room_polygons: replayRoomPolygons,
+    corrected_room_polygons: replayOverrideRoomPolygons,
+    floor_plan_override: floorPlanOverride,
     input_defaults: queueItem.input_defaults,
     sprinkler_bid_request: sprinklerBidRequest,
     source_refs: sourceRefs,
@@ -14849,6 +14926,15 @@ function resolveRoomBoundaryReplayFloorPlan(req, projectName) {
       claim_gate_effect: halofireSam31SectioningDownstreamResolverPacket.claim_gate_effect || 'no_claims_cleared',
     });
   }
+  const floorPlanOverride = buildRoomBoundaryFloorPlanOverride(
+    projectName,
+    replaySource,
+    sourceEvidence,
+    sourceReviewEvidence,
+    correctedRoomPolygons,
+    sourceRefs,
+  );
+  const replayOverrideRoomPolygons = annotateRoomBoundaryFloorPlanOverridePolygons(correctedRoomPolygons, floorPlanOverride);
   return {
     floorPlan,
     replayInput: {
@@ -14881,6 +14967,8 @@ function resolveRoomBoundaryReplayFloorPlan(req, projectName) {
       source_ref: sourceEvidence.source_ref || sourceReview.source_ref || null,
       marked_up_plan_ref: sourceReview.marked_up_plan_ref || null,
       employee_decision: employeeDecision,
+      corrected_room_polygons: replayOverrideRoomPolygons,
+      floor_plan_override: floorPlanOverride,
       ...(replaySource === 'latest_sam31_visual_audit'
         ? {
           sam31_result_ref: sourceReview.sam31_result_ref || null,
@@ -14896,6 +14984,7 @@ function resolveRoomBoundaryReplayFloorPlan(req, projectName) {
       claim_gate_effect: 'no_claims_cleared',
       blocked_claims: uniqueStrings([
         ...(Array.isArray(sourceReview.blocked_claims) ? sourceReview.blocked_claims : PDF_BOUNDARY_BLOCKED_CLAIMS),
+        ...(Array.isArray(floorPlanOverride.blocked_claims) ? floorPlanOverride.blocked_claims : []),
         ...(Array.isArray(openclawSam31ExtrapolationProductReviewMetadata?.blocked_claims) ? openclawSam31ExtrapolationProductReviewMetadata.blocked_claims : []),
         ...(Array.isArray(halofireSam31SectioningDownstreamResolverPacket?.blocked_claims) ? halofireSam31SectioningDownstreamResolverPacket.blocked_claims : []),
       ]),
@@ -17498,11 +17587,13 @@ function runSprinklerPipeline(req, prebuilt = null) {
         source_ref: replayInput.source_ref,
         employee_decision: replayInput.employee_decision || null,
         source_refs: Array.isArray(replayInput.source_refs) ? replayInput.source_refs : [],
+        floor_plan_override: replayInput.floor_plan_override || null,
         marked_up_plan_ref: replayInput.marked_up_plan_ref,
         sam31_result_ref: replayInput.sam31_result_ref,
         screenshot_ref: replayInput.screenshot_ref,
         console_log_ref: replayInput.console_log_ref,
         openclaw_sam31_perception_packet: replayInput.openclaw_sam31_perception_packet || null,
+        corrected_room_polygons: Array.isArray(replayInput.corrected_room_polygons) ? replayInput.corrected_room_polygons : [],
         corrected_room_polygon_count: replayInput.corrected_room_polygon_count,
         total_head_count: bid.totalHeadCount,
         total_area_sqft: bid.totalAreaSqFt,

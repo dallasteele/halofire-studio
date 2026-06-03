@@ -1340,6 +1340,31 @@ describe('OpenClaw SAM31 bridge status API', () => {
       model_3d_candidate_count: 1,
       claim_gate_effect: 'no_claims_cleared',
     }));
+    expect(replay.sprinkler_bid_request.floor_plan_override).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.room_boundary_floor_plan_override.v1',
+      status: 'internal_alpha_floor_plan_override',
+      room_boundary_source: 'latest_employee_review_packet',
+      source_evidence_id: boundary.id,
+      source_review_evidence_id: boundaryReview.id,
+      corrected_room_polygon_count: 1,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(replay.sprinkler_bid_request.corrected_room_polygons[0]).toEqual(expect.objectContaining({
+      floor_plan_override_source: 'latest_employee_review_packet',
+      source_evidence_id: boundary.id,
+      source_review_evidence_id: boundaryReview.id,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(replay.sprinkler_bid_request.corrected_room_polygons[0].source_refs).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        evidence_id: boundaryReview.id,
+        evidence_type: 'room_boundary_review_packet',
+      }),
+    ]));
     expect(replay.sprinkler_bid_request.halofire_sam31_sectioning_downstream_resolver_packet).toEqual(expect.objectContaining({
       evidence_id: persistedSectioningDownstreamPacket.id,
       artifact_type: 'halofire.sam31_sectioning_downstream_resolver_packet.v1',
@@ -1413,6 +1438,23 @@ describe('OpenClaw SAM31 bridge status API', () => {
     expect(replayBid.roomBoundaryReplay.sam31_downstream_review_metadata).toEqual(expect.objectContaining({
       source: 'openclaw.sam31_extrapolation_product_review_packet',
       use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(replayBid.floorPlan.rooms[0]).toEqual(expect.objectContaining({
+      name: 'reviewed corridor',
+      polygon: [[0, 0], [28, 0], [28, 8], [0, 8]],
+      hazard: 'ordinary',
+    }));
+    expect(replayBid.roomBoundaryReplay.floor_plan_override).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.room_boundary_floor_plan_override.v1',
+      room_boundary_source: 'latest_employee_review_packet',
+      source_review_evidence_id: boundaryReview.id,
+      corrected_room_polygon_count: 1,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(replayBid.roomBoundaryReplay.corrected_room_polygons[0]).toEqual(expect.objectContaining({
+      floor_plan_override_source: 'latest_employee_review_packet',
+      source_review_evidence_id: boundaryReview.id,
       claim_gate_effect: 'no_claims_cleared',
     }));
 
