@@ -620,6 +620,77 @@ function hasStructuredSignedReviewerNotes(row) {
   }
 }
 
+function buildClaimGateReviewPacket(projectName, gateCode) {
+  ensureProjectClaimGates(projectName);
+  const gate = db
+    .prepare('SELECT * FROM claim_gates WHERE project_name = ? AND code = ?')
+    .get(projectName, gateCode);
+  if (!gate) {
+    const e = new Error('Claim gate not found');
+    e.httpStatus = 404;
+    throw e;
+  }
+  const rule = gateEvidenceRule(gateCode);
+  const allowedEvidenceTypes = [...rule.allowedEvidenceTypes];
+  const signedTypes = allowedEvidenceTypes.filter((type) => SIGNED_REVIEW_EVIDENCE_TYPES.has(type));
+  const matchingEvidence = allowedEvidenceTypes.length
+    ? db.prepare(
+      `SELECT * FROM project_evidence
+       WHERE project_name = ?
+         AND evidence_type IN (${allowedEvidenceTypes.map(() => '?').join(', ')})
+       ORDER BY created_at DESC, id DESC`,
+    ).all(projectName, ...allowedEvidenceTypes)
+    : [];
+  const reviewPacketHref = `/api/projects/${encodeURIComponent(projectName)}/claim-gates/${encodeURIComponent(gateCode)}/review-packet`;
+  const requiresStructuredSignoff = signedTypes.length > 0;
+  return {
+    artifact_type: 'halofire.claim_gate_review_packet.v1',
+    status: 'ready_for_review',
+    project_name: projectName,
+    generated_at: new Date().toISOString(),
+    download_name: `${slugForDownloadName(projectName)}-${String(gateCode || 'claim-gate').toLowerCase()}-review-packet.json`,
+    blocked_claims: safeParseJsonArray(gate.blocked_claims),
+    claim_gate: {
+      code: gate.code,
+      status: gate.status,
+      severity: gate.severity,
+      missing_artifact: gate.missing_artifact,
+      acceptable_evidence: gate.acceptable_evidence,
+      blocked_claims: safeParseJsonArray(gate.blocked_claims),
+      next_action: gate.next_action,
+      resolved_by: gate.resolved_by || null,
+      resolved_at: gate.resolved_at || null,
+      resolved_evidence_ref: gate.resolved_evidence_ref || null,
+    },
+    allowed_evidence_types: allowedEvidenceTypes,
+    required_evidence_type: allowedEvidenceTypes.length === 1 ? allowedEvidenceTypes[0] : null,
+    review_packet_href: reviewPacketHref,
+    review_packet_artifact_type: 'halofire.claim_gate_review_packet.v1',
+    record_evidence_route: `/api/projects/${encodeURIComponent(projectName)}/evidence`,
+    resolve_route: `/api/projects/${encodeURIComponent(projectName)}/claim-gates/${encodeURIComponent(gateCode)}/resolve`,
+    required_review_fields: ['source_ref', 'notes'],
+    required_signoff_fields: requiresStructuredSignoff ? ['reviewer_name', 'reviewer_title', 'signed_at'] : [],
+    optional_signoff_fields: requiresStructuredSignoff ? ['organization', 'license_id'] : [],
+    requires_signoff_for: signedTypes,
+    matching_evidence_count: matchingEvidence.length,
+    matching_evidence: matchingEvidence.slice(0, 5).map((row) => ({
+      id: row.id,
+      evidence_type: row.evidence_type,
+      source_ref: row.source_ref,
+      source_file: row.source_file,
+      status: row.status,
+      has_signed_reviewer_metadata: hasStructuredSignedReviewerNotes(row),
+    })),
+    claim_gate_effect: 'no_claims_cleared',
+    use_for_claims: false,
+    no_claim_gates_cleared: true,
+    limitations: [
+      'This packet organizes the exact signed reviewer lane for one claim gate.',
+      'Downloading or reading this packet does not clear any AHJ, professional, manufacturer, AutoSprink, permit-ready, fabrication-ready, or engineering-grade claim.',
+    ],
+  };
+}
+
 const DEFAULT_PROJECT_CLAIM_GATES = Object.freeze([
   Object.freeze({
     code: 'AUTOSPRINK_EVIDENCE_MISSING',
@@ -716,12 +787,15 @@ app.get('/api/projects/:name/evidence-wizard', authMiddleware, (req, res) => {
       .flatMap((type) => evidenceByType.get(type) || [])
       .filter((row) => canExistingEvidenceClearGate(rule, row));
     const requiresSignoffFor = rule.allowedEvidenceTypes.filter((type) => SIGNED_REVIEW_EVIDENCE_TYPES.has(type));
+    const reviewPacketHref = `/api/projects/${encodeURIComponent(projectName)}/claim-gates/${encodeURIComponent(gate.code)}/review-packet`;
     return {
       ...gate,
       blocked_claims: safeParseJsonArray(gate.blocked_claims),
       allowed_evidence_types: [...rule.allowedEvidenceTypes],
       requires_signoff_for: requiresSignoffFor,
       can_resolve: rule.canResolve,
+      review_packet_href: reviewPacketHref,
+      review_packet_artifact_type: 'halofire.claim_gate_review_packet.v1',
       matching_evidence_count: matchingEvidence.length,
       matching_evidence: matchingEvidence.slice(0, 5),
     };
@@ -738,6 +812,13 @@ app.get('/api/projects/:name/evidence-wizard', authMiddleware, (req, res) => {
   });
 });
 
+app.get('/api/projects/:name/claim-gates/:code/review-packet', authMiddleware, (req, res) => {
+  try {
+    return res.json(buildClaimGateReviewPacket(req.params.name, req.params.code));
+  } catch (err) {
+    return res.status(err.httpStatus || 400).json({ error: err.message });
+  }
+});
 
 app.get('/api/projects/:name/evidence', authMiddleware, (req, res) => {
   const evidence = db
