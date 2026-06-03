@@ -2721,6 +2721,20 @@ function catalogApprovalQuickFilter(summary, activeQuery) {
   </div>`;
 }
 
+function sam31ApprovalValidationQuickFilter(summary, activeQuery) {
+  const pendingQuery = 'sam31ApprovalValidation=pending';
+  const isPendingActive = activeQuery === pendingQuery;
+  return `<div class="muted" style="font-size:11px;margin-bottom:8px">
+    sam31ApprovalValidationQuickFilter:
+    <button class="go" type="button" style="padding:6px 9px;font-size:10px;background:${isPendingActive ? '#4338ca' : '#374151'}" data-resolver-queue-filter="${escapeHtml(pendingQuery)}">Pending SAM31 approval validations</button>
+    ${activeQuery && !isPendingActive ? '<button class="go" type="button" style="padding:6px 9px;font-size:10px;background:#374151" data-resolver-queue-filter="">Show all resolver rows</button>' : ''}
+    <span class="chip">sam31ApprovalValidation=pending</span>
+    <span class="chip">sam31_approval_validation_pending ${escapeHtml(summary.sam31_approval_validation_pending || 0)}</span>
+    <span class="chip">sam31_approval_validation_ready_for_gate_resolve ${escapeHtml(summary.sam31_approval_validation_ready_for_gate_resolve || 0)}</span>
+    <span class="chip">claim_gate_effect no_claims_cleared</span>
+  </div>`;
+}
+
 function roomBoundaryQuickFilter(summary, activeQuery) {
   const employeeCorrectionQuery = 'roomBoundarySource=employee_review&roomBoundaryState=correction_ready';
   const isEmployeeCorrectionActive = activeQuery === employeeCorrectionQuery;
@@ -4015,7 +4029,7 @@ async function refreshResolverQueue() {
     <span class="chip">ready_for_signed_evidence_upload</span>
     <span class="chip">catalog_approval_claims_cleared ${escapeHtml(summary.catalog_approval_claims_cleared || 0)}</span>
     <span class="chip">no claim gates cleared</span>
-  </div>${roomBoundaryQuickFilter(summary, activeQuery)}${catalogApprovalQuickFilter(summary, activeQuery)}`;
+  </div>${roomBoundaryQuickFilter(summary, activeQuery)}${sam31ApprovalValidationQuickFilter(summary, activeQuery)}${catalogApprovalQuickFilter(summary, activeQuery)}`;
   document.getElementById('resolverQueue').innerHTML = queue.items && queue.items.length
     ? summaryHtml + queue.items.map(resolverQueueDetail).join('')
     : '<span class="muted">No resolver queue rows yet. Save a PDF boundary decision for room_boundary_visual_audit, record official_flow_intake, or run catalog acquisition for catalog_vendor_acquisition.</span>';

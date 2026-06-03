@@ -2618,6 +2618,36 @@ describe('OpenClaw SAM31 bridge status API', () => {
     const professionalGates = await professionalGateAfterUpload.json();
     expect(professionalGates.find((gate) => gate.code === 'PROFESSIONAL_REVIEW_MISSING')?.status).toBe('blocked');
 
+    const pendingApprovalValidationRes = await request(`${COOPERATIVE_1881_PATH}/resolver-queue?sam31ApprovalValidation=pending&targetGate=PROFESSIONAL_REVIEW_MISSING`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(pendingApprovalValidationRes.status).toBe(200);
+    const pendingApprovalValidationQueue = await pendingApprovalValidationRes.json();
+    expect(pendingApprovalValidationQueue.filters).toEqual(expect.objectContaining({
+      sam31ApprovalValidation: 'pending',
+      targetGate: 'PROFESSIONAL_REVIEW_MISSING',
+    }));
+    expect(pendingApprovalValidationQueue.summary.sam31_approval_validation_pending).toBeGreaterThanOrEqual(1);
+    expect(pendingApprovalValidationQueue.summary.sam31_approval_validation_ready_for_gate_resolve).toBeGreaterThanOrEqual(1);
+    const pendingApprovalValidationItem = pendingApprovalValidationQueue.items.find((row) => row.evidence_id === boundary.id);
+    const pendingApprovalValidationRows = pendingApprovalValidationItem.sam31_sprinkler_preliminary_replay_queue_items || [];
+    const pendingApprovalValidationRow = pendingApprovalValidationRows.find((row) => row.source_halofire_sam31_sprinkler_review_decision_evidence_id === sprinklerReview.id);
+    const pendingApprovalValidationPacket = pendingApprovalValidationRow.packet_queue_items.find((packet) => packet.latest_packet_review_decision?.evidence_id === replayFollowupPacketReview.id);
+    expect(pendingApprovalValidationPacket.approval_upload_resolver_rows).toEqual([
+      expect.objectContaining({
+        code: 'HALOFIRE_SAM31_PROFESSIONAL_APPROVAL_UPLOAD_MISSING',
+        target_gate_code: 'PROFESSIONAL_REVIEW_MISSING',
+        gate_validation_status: 'pending_gate_validation',
+        latest_approval_upload_intake: expect.objectContaining({
+          evidence_id: professionalApprovalUpload.id,
+          gate_validation_packet_action: expect.objectContaining({
+            artifact_type: 'halofire.sam31_approval_upload_gate_validation_packet.v1',
+          }),
+        }),
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    ]);
+
     const professionalGateResolveRes = await request(`${COOPERATIVE_1881_PATH}/claim-gates/PROFESSIONAL_REVIEW_MISSING/resolve`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` },
