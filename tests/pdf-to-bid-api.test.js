@@ -218,4 +218,55 @@ describe('T30 PDF plan source wired end-to-end into sprinkler-bid', () => {
     expect(body.pdfMeta.areaSqft).toBeGreaterThan(0);
     expect(body.pdfMeta.samSkipped).toBeUndefined();
   }, 30000);
+
+  it('(f) preserves loaded PDF boundary-decision provenance on a normal pdf sprinkler-bid run', async () => {
+    const pdf = makeTinyVectorPdf().toString('base64');
+    const employeeDecision = {
+      artifact_type: 'halofire.pdf_boundary_employee_decision.v1',
+      status: 'employee_selected_internal_alpha',
+      selected_sheet_ref: '1881://proposal-cooperative/sheet-7',
+      selected_scale_ref: '1881://operator-scale/sheet-7/0.05',
+      selected_boundary_candidate_ref: 'candidate:1881-sheet-7-outline',
+      source_ref: '1881://proposal-cooperative/sheet-7',
+      source_refs: [
+        '1881://proposal-cooperative/sheet-7',
+        '1881://operator-scale/sheet-7/0.05',
+        'candidate:1881-sheet-7-outline',
+      ],
+      claim_gate_effect: 'no_claims_cleared',
+    };
+    const sourceRefs = [
+      '1881://proposal-cooperative/sheet-7',
+      '1881://operator-scale/sheet-7/0.05',
+      'candidate:1881-sheet-7-outline',
+    ];
+    const res = await post({
+      pdf,
+      pdfPageIndex: 0,
+      pdfScale: 0.05,
+      pdfExtract: 'outline',
+      hazard: 'ordinary',
+      employee_decision: employeeDecision,
+      source_refs: sourceRefs,
+    });
+    expect(res.status).toBe(200);
+
+    const evidenceRes = await fetch(`${BASE}${PROJ}/evidence`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(evidenceRes.status).toBe(200);
+    const evidenceRows = await evidenceRes.json();
+    const latest = evidenceRows.find((row) => row.evidence_type === 'best_effort_ai_layout');
+    expect(latest).toBeTruthy();
+    const notes = JSON.parse(latest.notes);
+    expect(notes.employee_decision).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.pdf_boundary_employee_decision.v1',
+      selected_sheet_ref: '1881://proposal-cooperative/sheet-7',
+      selected_scale_ref: '1881://operator-scale/sheet-7/0.05',
+      selected_boundary_candidate_ref: 'candidate:1881-sheet-7-outline',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(notes.source_refs).toEqual(expect.arrayContaining(sourceRefs));
+    expect(notes.claim_gate_effect).toBe('no_claims_cleared');
+  }, 30000);
 });

@@ -894,6 +894,12 @@ app.get('/api/projects/:name/openclaw/sam31/actual-value-work-items', authMiddle
   res.json(buildOpenClawSam31ActualValueWorkItemIndex(req.params.name));
 });
 
+app.get('/api/projects/:name/openclaw/sam31/actual-value-service', authMiddleware, (req, res) => {
+  res.json(buildOpenClawSam31ActualValueServiceDescriptor(req.params.name, {
+    consumer: req.query?.consumer,
+  }));
+});
+
 function sam31ActualValueReplacementFromEvidence(row) {
   if (!row) return null;
   try {
@@ -1344,6 +1350,160 @@ function openClawSam31ActualValueResolverExtrapolationContract(projectName = nul
     limitations: [
       'SAM31+LLM object identification, vector overlays, and 3D model candidates are best-effort temporary perception artifacts.',
       'This queue contract helps HaloFire, LandScout, and NameForge poll for actual-value replacement work; it does not clear regulated or product-readiness claims.',
+    ],
+    use_for_claims: false,
+    claim_gate_effect: 'no_claims_cleared',
+    no_claim_gates_cleared: true,
+  };
+}
+
+function openClawSam31ActualValueServiceEndpoint(projectName, consumer) {
+  const encodedProjectName = encodeURIComponent(projectName);
+  const encodedConsumer = encodeURIComponent(consumer);
+  return {
+    consumer,
+    service_descriptor: {
+      method: 'GET',
+      href: `/api/openclaw/sam31/actual-value-service?projectName=${encodedProjectName}&consumer=${encodedConsumer}`,
+      project_route_href: `/api/projects/${encodedProjectName}/openclaw/sam31/actual-value-service?consumer=${encodedConsumer}`,
+      produces: 'openclaw.sam31.actual_value_service_descriptor.v1',
+      action: 'poll_actual_value_service_descriptor',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    },
+    resolver_queue: {
+      method: 'GET',
+      action: 'poll_actual_value_resolver_queue',
+      href: `/api/openclaw/sam31/actual-value-resolver-queue?projectName=${encodedProjectName}&consumer=${encodedConsumer}`,
+      project_route_href: `/api/projects/${encodedProjectName}/openclaw/sam31/actual-value-resolver-queue?consumer=${encodedConsumer}`,
+      produces: 'openclaw.sam31.actual_value_resolver_queue_readback.v1',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    },
+    resolver_contract: {
+      method: 'GET',
+      action: 'download_actual_value_resolver_contract',
+      href: `/api/openclaw/sam31/actual-value-resolver-contract?projectName=${encodedProjectName}&consumer=${encodedConsumer}`,
+      produces: 'openclaw.sam31.actual_value_resolver_contract_packet.v1',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    },
+    replacement_readback: {
+      method: 'GET',
+      action: 'poll_actual_value_replacement_details',
+      href: `/api/openclaw/sam31/actual-value-replacements?projectName=${encodedProjectName}&consumer=${encodedConsumer}`,
+      project_route_href: `/api/projects/${encodedProjectName}/openclaw/sam31/actual-value-replacements?consumer=${encodedConsumer}`,
+      produces: 'openclaw.sam31.actual_value_replacement_readback.v1',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    },
+    replacement_intake: {
+      method: 'POST',
+      href: `/api/projects/${encodedProjectName}/openclaw/sam31/actual-value-replacements`,
+      consumes: 'halofire.sam31_actual_value_replacement_intake.v1',
+      produces: 'halofire.sam31_actual_value_replacement_intake.v1',
+      evidence_record_type: 'sam31_actual_value_replacement',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    },
+  };
+}
+
+function buildOpenClawSam31ActualValueServiceDescriptor(projectName, options = {}) {
+  const requestedConsumer = String(options.consumer || '').trim().toLowerCase();
+  const serviceConsumers = ['halo_fire', 'landscout', 'nameforge'];
+  const consumerServiceEndpoints = Object.fromEntries(serviceConsumers.map((consumer) => [
+    consumer,
+    openClawSam31ActualValueServiceEndpoint(projectName, consumer),
+  ]));
+  return {
+    artifact_type: 'openclaw.sam31.actual_value_service_descriptor.v1',
+    status: 'ready_for_shared_consumer_polling',
+    project_name: projectName,
+    requested_consumer: serviceConsumers.includes(requestedConsumer) ? requestedConsumer : null,
+    generated_at: new Date().toISOString(),
+    source_runtime: 'sam-3.1+llm',
+    source_tool_descriptor_ref: 'openclaw.sam31_llm_extrapolation_tool',
+    source_tool_contract_ref: SAM31_EXTRAPOLATION_CONTRACT_REF,
+    supported_consumers: serviceConsumers,
+    supported_applications: [...SAM31_SUPPORTED_APPLICATIONS],
+    consumer_service_endpoints: consumerServiceEndpoints,
+    shared_see_label_extrapolate_contract: {
+      artifact_type: 'openclaw.sam31.see_label_extrapolate_contract.v1',
+      source_runtime: 'sam-3.1+llm',
+      source_tool_contract_ref: SAM31_EXTRAPOLATION_CONTRACT_REF,
+      perception_lanes: [...SAM31_PERCEPTION_LANES],
+      produces: [
+        'segments',
+        'object_hypotheses',
+        'semantic_labels',
+        'llm_observations',
+        'vector_overlays',
+        'model_3d_candidates',
+        'spatial_observations',
+        'source_refs',
+        'screenshots',
+        'console_evidence',
+      ],
+      object_hypothesis_contract: {
+        artifact_type: 'openclaw.sam31.object_hypothesis_contract.v1',
+        required_fields: ['id', 'semantic_label', 'confidence', 'source_refs'],
+        optional_fields: ['bbox', 'polygon', 'dimensions', 'source_llm_observation_ids', 'limitations'],
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      },
+      vector_overlay_contract: {
+        artifact_type: 'openclaw.sam31.vector_overlay_contract.v1',
+        required_fields: ['id', 'svg_path_or_vector_ref', 'source_object_hypothesis_ids', 'source_refs'],
+        optional_fields: ['coordinate_frame_ref', 'unit', 'confidence', 'limitations'],
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      },
+      model_3d_candidate_contract: {
+        artifact_type: 'openclaw.sam31.model_3d_candidate_contract.v1',
+        required_fields: ['id', 'model_ref_or_primitive', 'source_object_hypothesis_ids', 'source_refs'],
+        optional_fields: ['coordinate_frame_ref', 'unit', 'dimensions', 'confidence', 'limitations'],
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      },
+      supports_object_identification: true,
+      supports_semantic_labels: true,
+      supports_vector_overlays: true,
+      supports_model_3d_candidates: true,
+      supports_spatial_observations: true,
+      temporary_value_policy: 'best_guess_until_employee_replaced',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    },
+    actual_value_replacement_contract: {
+      artifact_type: 'halofire.sam31_actual_value_replacement_intake_contract.v1',
+      consumes: 'openclaw.sam31.actual_value_resolver_queue_item.v1',
+      produces: 'halofire.sam31_actual_value_replacement_intake.v1',
+      required_fields: ['source_openclaw_sam31_consumer_review_evidence_id', 'source_ref'],
+      replacement_value_fields: [...SAM31_CONSUMER_REVIEW_FIELDS],
+      acceptable_actual_evidence: [
+        '1881 proposal workbook row or sheet reference',
+        'reviewed vector overlay SVG or marked-up plan ref',
+        'reviewed 3D model candidate ref or model note',
+        'screenshot or console evidence for the reviewed SAM31 section',
+      ],
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    },
+    temporary_value_policy: 'best_guess_until_employee_replaced',
+    blocked_claims: uniqueStrings([
+      ...SAM31_BLOCKED_CLAIMS,
+      'CEO_ready',
+      'brand_ready',
+      'trademark_ready',
+      'production_ready',
+    ]),
+    limitations: [
+      'This descriptor lets HaloFire, LandScout, and NameForge poll one shared OpenClaw SAM31+LLM actual-value service contract.',
+      'SAM31 object hypotheses, semantic labels, vector overlays, 3D model candidates, screenshots, and console evidence are temporary review artifacts until replaced by owner-reviewed actual evidence.',
+      'This descriptor does not clear permit-ready, fabrication-ready, AHJ-ready, engineering-grade, AutoSprink parity, professional approval, manufacturer-exact, brand-ready, trademark-ready, CEO-ready, or production-ready claims.',
     ],
     use_for_claims: false,
     claim_gate_effect: 'no_claims_cleared',
@@ -3678,6 +3838,18 @@ function localOpenClawSam31ToolDescriptor(projectName = null) {
         method: 'GET',
         href_template: '/api/projects/{projectName}/resolver-packets/openclaw/sam31/tool-contract',
         produces: 'openclaw.sam31_llm_extrapolation_tool_contract_packet.v1',
+        claim_gate_effect: 'no_claims_cleared',
+      },
+      actual_value_service_descriptor: {
+        method: 'GET',
+        href_template: '/api/openclaw/sam31/actual-value-service?projectName={projectName}&consumer={consumer}',
+        project_route_template: '/api/projects/{projectName}/openclaw/sam31/actual-value-service?consumer={consumer}',
+        produces: 'openclaw.sam31.actual_value_service_descriptor.v1',
+        shared_contract_artifact_type: 'openclaw.sam31.see_label_extrapolate_contract.v1',
+        consumer_action: 'poll_actual_value_service_descriptor',
+        supported_consumers: ['halo_fire', 'landscout', 'nameforge'],
+        temporary_value_policy: 'best_guess_until_employee_replaced',
+        use_for_claims: false,
         claim_gate_effect: 'no_claims_cleared',
       },
       actual_value_resolver_queue: {
@@ -11900,6 +12072,16 @@ app.get('/api/openclaw/sam31/tool', authMiddleware, (req, res) => {
   res.json(localOpenClawSam31ToolDescriptor());
 });
 
+app.get('/api/openclaw/sam31/actual-value-service', authMiddleware, (req, res) => {
+  const projectName = String(req.query?.projectName || req.query?.project_name || '').trim();
+  if (!projectName) {
+    return res.status(400).json({ error: 'projectName is required for OpenClaw SAM31 actual-value service descriptor' });
+  }
+  res.json(buildOpenClawSam31ActualValueServiceDescriptor(projectName, {
+    consumer: req.query?.consumer,
+  }));
+});
+
 app.get('/api/openclaw/sam31/actual-value-resolver-contract', authMiddleware, (req, res) => {
   const projectName = String(req.query?.projectName || req.query?.project_name || '').trim();
   if (!projectName) {
@@ -13829,6 +14011,12 @@ app.post('/api/projects/:name/resolver-packets/pdf-boundary/:evidenceId/reviews'
 function runSprinklerPipeline(req, prebuilt = null) {
   const projectName = req.params.name;
   const suppliedDocumentBidTruth = suppliedDocumentBidTruthDownstreamDefaults(projectName);
+  const requestEmployeeDecision = req.body?.employee_decision && typeof req.body.employee_decision === 'object' && !Array.isArray(req.body.employee_decision)
+    ? jsonClone(req.body.employee_decision)
+    : null;
+  const requestSourceRefs = Array.isArray(req.body?.source_refs)
+    ? uniqueStrings(req.body.source_refs.map((ref) => String(ref || '').trim()).filter(Boolean))
+    : [];
   let floorPlan = (prebuilt && prebuilt.floorPlan) || null;
   let building = null;
   let replayInput = null;
@@ -14032,6 +14220,31 @@ function runSprinklerPipeline(req, prebuilt = null) {
         summary: `claim_gate_effect=no_claims_cleared source_evidence_type=supplied_document_bid_truth_replacement replacement_ref=${suppliedDocumentBidTruth.replacement_ref}`,
         limitations: [
           'Generated with employee supplied-document bid-truth replacements for internal-alpha defaults only.',
+          bid.disclaimer,
+        ],
+      })
+      : requestEmployeeDecision || requestSourceRefs.length
+      ? JSON.stringify({
+        kind: 'best_effort_ai_layout',
+        artifact_type: 'halofire.best_effort_ai_layout.loaded_pdf_boundary_defaults.v1',
+        artifact_status: 'best_effort_internal_alpha',
+        generated_at: new Date().toISOString(),
+        generated_by: bid.generatedBy,
+        employee_decision: requestEmployeeDecision,
+        source_refs: requestSourceRefs,
+        total_head_count: bid.totalHeadCount,
+        total_area_sqft: bid.totalAreaSqFt,
+        bid_summary: {
+          total_area_sqft: bid.totalAreaSqFt,
+          total_head_count: bid.totalHeadCount,
+          pricing_total: bid.pricing?.total ?? null,
+          markup_pct: bid.pricing?.markupPct ?? null,
+        },
+        blocked_claims: Array.isArray(requestEmployeeDecision?.blocked_claims) ? requestEmployeeDecision.blocked_claims : [],
+        claim_gate_effect: 'no_claims_cleared',
+        no_claim_gates_cleared: true,
+        limitations: [
+          'Generated from a loaded employee-selected PDF boundary decision for internal-alpha correction loops only.',
           bid.disclaimer,
         ],
       })

@@ -656,6 +656,11 @@ function currentBody() {
     body.pdfScale = Number($('pdfScale').value); // operator-supplied; server throws if absent/<=0
     const pdfExtract = $('pdfExtract') ? $('pdfExtract').value : 'vector';
     if (pdfExtract && pdfExtract !== 'vector') body.pdfExtract = pdfExtract;
+    const loadedDecisionPayload = currentLoadedPdfBoundaryDecisionPayload();
+    if (loadedDecisionPayload) {
+      body.employee_decision = loadedDecisionPayload.employee_decision;
+      body.source_refs = loadedDecisionPayload.source_refs;
+    }
   }
   return body;
 }
@@ -665,6 +670,7 @@ let pdfBase64 = '';
 let pdfObjectUrl = '';
 let lastPdfBoundaryMeta = null;
 let selectedPdfBoundaryCandidate = null;
+let loadedPdfBoundaryDecision = null;
 function readPdfFile(file) {
   return new Promise((resolve, reject) => {
     const fr = new FileReader();
@@ -687,6 +693,30 @@ function setPdfPageFromInspection(index) {
   document.querySelectorAll('[data-pdf-page-index]').forEach((btn) => {
     btn.classList.toggle('on', Number(btn.dataset.pdfPageIndex) === pageIndex);
   });
+}
+
+function currentLoadedPdfBoundaryDecisionPayload() {
+  if (!loadedPdfBoundaryDecision || $('planSource').value !== 'pdf') return null;
+  const decision = loadedPdfBoundaryDecision;
+  const currentPageIndex = Number($('pdfPageIndex').value) || 0;
+  const currentScale = Number($('pdfScale').value);
+  const currentExtract = $('pdfExtract') ? $('pdfExtract').value : 'vector';
+  const currentCandidateMode = selectedPdfBoundaryCandidate && selectedPdfBoundaryCandidate.mode
+    ? selectedPdfBoundaryCandidate.mode
+    : currentExtract;
+  if (Number(decision.pageIndex ?? 0) !== currentPageIndex) return null;
+  if (Number(decision.scale ?? NaN) !== currentScale) return null;
+  if ((decision.extractMode || (decision.candidate && decision.candidate.mode) || 'vector') !== currentExtract) return null;
+  if ((decision.candidate && decision.candidate.mode ? decision.candidate.mode : currentExtract) !== currentCandidateMode) return null;
+  const employeeDecision = decision.employeeDecision && typeof decision.employeeDecision === 'object'
+    ? decision.employeeDecision
+    : null;
+  if (!employeeDecision) return null;
+  const sourceRefs = Array.isArray(employeeDecision.source_refs) ? employeeDecision.source_refs : (Array.isArray(decision.sourceRefs) ? decision.sourceRefs : []);
+  return {
+    employee_decision: employeeDecision,
+    source_refs: sourceRefs,
+  };
 }
 
 function renderPdfPageInspection(meta) {
@@ -770,6 +800,7 @@ async function savePdfBoundaryDecision() {
         notes: 'Employee selected PDF boundary candidate from HaloFire Studio. This is correction evidence only; regulated claims remain blocked.',
       }),
     });
+    loadedPdfBoundaryDecision = saved.decision || null;
     $('pdfDecisionStatus').textContent = `Saved evidence #${saved.id}: ${candidate.label || candidate.mode}. Claims still blocked.`;
     $('status').textContent = 'boundary decision saved as best-effort evidence';
   } catch (err) {
@@ -792,6 +823,7 @@ async function loadPdfBoundaryDecision() {
       return;
     }
     const decision = latest.decision;
+    loadedPdfBoundaryDecision = decision;
     $('planSource').value = 'pdf';
     $('planSource').dispatchEvent(new Event('change'));
     $('pdfPageIndex').value = String(decision.pageIndex ?? 0);

@@ -627,5 +627,7 @@ describe('studio static origin handling', () => {
     expect(html).toContain('id="pdfDecisionLoadBtn"');
     expect(html).toContain('loadPdfBoundaryDecision');
     expect(html).toContain('/pdf-boundary-decision');
+    expect(html).toContain('employee_decision');
+    expect(html).toContain('source_refs');
   });
 });
