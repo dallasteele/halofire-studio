@@ -234,6 +234,19 @@ describe('HaloFire evidence wizard slice', () => {
       organization: 'Halo Fire',
       license_id: 'PE-2048',
     }));
+    expect(row).toEqual(expect.objectContaining({
+      signoff: expect.objectContaining({
+        reviewer_name: 'Alex Rivera',
+        reviewer_title: 'Fire Protection Engineer',
+        signed_at: '2026-06-02T14:30:00.000Z',
+      }),
+      target_gate_code: 'PROFESSIONAL_REVIEW_MISSING',
+      required_evidence_type: 'professional_review',
+      review_packet_href: `${PROJECT_PATH}/claim-gates/PROFESSIONAL_REVIEW_MISSING/review-packet`,
+      review_packet_artifact_type: 'halofire.claim_gate_review_packet.v1',
+      claim_gate_effect: 'no_claims_cleared',
+      user_notes: 'Recorded for later gate resolution.',
+    }));
     expect((await gate(token, 'PROFESSIONAL_REVIEW_MISSING')).status).toBe('blocked');
   });
 

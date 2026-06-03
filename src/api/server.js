@@ -1038,17 +1038,19 @@ app.get('/api/projects/:name/claim-gates/:code/resolve-audit-packet', authMiddle
 });
 
 app.get('/api/projects/:name/evidence', authMiddleware, (req, res) => {
+  const projectName = req.params.name;
   const evidence = db
     .prepare('SELECT * FROM project_evidence WHERE project_name = ? ORDER BY created_at DESC, id DESC')
-    .all(req.params.name);
+    .all(projectName);
   res.json(evidence.map((row) => {
-    if (row.evidence_type !== 'pdf_boundary_decision') return row;
+    const hydratedRow = hydrateSignedReviewerEvidenceRow(row, { projectName });
+    if (row.evidence_type !== 'pdf_boundary_decision') return hydratedRow;
     const decision = decisionFromEvidence(row);
     const employeeDecision = decision?.employeeDecision && typeof decision.employeeDecision === 'object'
       ? jsonClone(decision.employeeDecision)
       : null;
     return {
-      ...row,
+      ...hydratedRow,
       decision: decision ? jsonClone(decision) : null,
       employee_decision: employeeDecision,
       selected_sheet_ref: employeeDecision?.selected_sheet_ref || null,
