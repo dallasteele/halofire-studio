@@ -166,6 +166,12 @@ describe('HaloFire resolve-gate API (evidence-gated)', () => {
     expect(row).toBeTruthy();
     const notes = JSON.parse(row.notes);
     expect(notes.kind).toBe('signed_reviewer_evidence');
+    expect(notes.target_gate_code).toBe('AUTOSPRINK_EVIDENCE_MISSING');
+    expect(notes.required_evidence_type).toBe('autosprink_packet');
+    expect(notes.review_packet_href).toBe(`${PROJECT_PATH}/claim-gates/AUTOSPRINK_EVIDENCE_MISSING/review-packet`);
+    expect(notes.review_packet_artifact_type).toBe('halofire.claim_gate_review_packet.v1');
+    expect(notes.resolve_audit_packet_href).toBe(`${PROJECT_PATH}/claim-gates/AUTOSPRINK_EVIDENCE_MISSING/resolve-audit-packet`);
+    expect(notes.resolve_audit_packet_artifact_type).toBe('halofire.claim_gate_resolve_audit_packet.v1');
     expect(notes.claim_gate_effect).toBe('gate_cleared');
     expect(notes.signoff).toEqual(expect.objectContaining({
       reviewer_name: 'Dana Ortiz',

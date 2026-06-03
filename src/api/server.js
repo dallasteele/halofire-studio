@@ -621,8 +621,17 @@ function hasStructuredSignedReviewerNotes(row) {
   }
 }
 
-function buildSignedReviewerEvidenceNotes(projectName, evidenceType, sourceRef, notes, signoff, targetGateCode = null) {
+function buildSignedReviewerEvidenceNotes(
+  projectName,
+  evidenceType,
+  sourceRef,
+  notes,
+  signoff,
+  targetGateCode = null,
+  options = {},
+) {
   const normalizedGateCode = String(targetGateCode || '').trim().toUpperCase() || null;
+  const claimGateEffect = String(options.claimGateEffect || 'no_claims_cleared');
   let gatePacket = null;
   if (normalizedGateCode) {
     const rule = gateEvidenceRule(normalizedGateCode);
@@ -643,9 +652,13 @@ function buildSignedReviewerEvidenceNotes(projectName, evidenceType, sourceRef, 
       required_evidence_type: gatePacket.required_evidence_type || evidenceType,
       review_packet_href: gatePacket.review_packet_href,
       review_packet_artifact_type: gatePacket.review_packet_artifact_type,
+      ...(claimGateEffect === 'gate_cleared' ? {
+        resolve_audit_packet_href: claimGateResolveAuditPacketHref(projectName, normalizedGateCode),
+        resolve_audit_packet_artifact_type: 'halofire.claim_gate_resolve_audit_packet.v1',
+      } : {}),
     } : {}),
     user_notes: notes,
-    claim_gate_effect: 'no_claims_cleared',
+    claim_gate_effect: claimGateEffect,
   });
 }
 
@@ -5227,14 +5240,15 @@ app.post('/api/projects/:name/claim-gates/:code/resolve', authMiddleware, requir
   try {
     const signoff = normalizeSignedReviewerSignoff(evidence_type, evidence.signoff);
     if (signoff) {
-      storedNotes = JSON.stringify({
-        kind: 'signed_reviewer_evidence',
+      storedNotes = buildSignedReviewerEvidenceNotes(
+        projectName,
         evidence_type,
         source_ref,
+        notes,
         signoff,
-        user_notes: notes,
-        claim_gate_effect: 'gate_cleared',
-      });
+        code,
+        { claimGateEffect: 'gate_cleared' },
+      );
     }
   } catch (err) {
     return res.status(err.httpStatus || 400).json({ error: err.message });

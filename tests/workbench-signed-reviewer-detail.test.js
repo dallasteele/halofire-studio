@@ -59,5 +59,7 @@ describe('workbench signed reviewer evidence detail rendering', () => {
     expect(html).toContain('required_evidence_type');
     expect(html).toContain('review_packet_href');
     expect(html).toContain('review_packet_artifact_type');
+    expect(html).toContain('resolve_audit_packet_href');
+    expect(html).toContain('resolve_audit_packet_artifact_type');
   });
 });
