@@ -216,6 +216,9 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toContain('Open filtered queue from consumer intake smoke');
     expect(html).toContain('filterSam31ActualValueQueueBySavedConsumerIntakeSmokeEvidence');
     expect(html).toContain('data-sam31-section-to-artifacts-consumer-intake-smoke-open-queue');
+    expect(html).toContain('Download filtered queue readback from saved smoke');
+    expect(html).toContain('downloadSam31ActualValueQueueReadbackFromSavedConsumerIntakeSmokeEvidence');
+    expect(html).toContain('data-sam31-section-to-artifacts-consumer-intake-smoke-queue-readback-download');
     expect(html).toContain('sam31ActualValueConsumerIntakeSmokeEvidenceFilter');
     expect(html).toContain('consumerIntakeSmokeEvidenceId=');
     expect(html).toContain('consumer_intake_smoke_evidence_filter_id');
