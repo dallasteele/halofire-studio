@@ -975,6 +975,7 @@ function latestSam31ActualValueReplacementEvidenceByReview(projectName) {
       consumer: replacement.consumer || null,
       replacement_values_source_ref: replacement.replacement_values_source_ref || row.source_ref || null,
       replacement_values: replacement.replacement_values || {},
+      openclaw_sam31_section_to_artifacts: replacement.openclaw_sam31_section_to_artifacts || null,
       openclaw_sam31_section_to_artifacts_summary: replacement.openclaw_sam31_section_to_artifacts_summary || null,
       source_refs: uniqueStrings([
         ...(Array.isArray(replacement.source_refs) ? replacement.source_refs : []),
@@ -1898,6 +1899,7 @@ function buildOpenClawSam31ActualValueResolverQueue(projectName, options = {}) {
         itemServiceDescriptorAction,
       );
       const status = latestReplacement ? 'actual_value_evidence_recorded' : 'requires_employee_actual_value_update';
+      const sectionToArtifactsHandoff = openClawSam31SectionToArtifactsConsumerHandoff(item, latestReplacement);
       return {
         artifact_type: 'openclaw.sam31.actual_value_resolver_queue_item.v1',
         id: `sam31-actual-value:${projectName}:${item.source_openclaw_sam31_consumer_review_evidence_id}`,
@@ -1932,6 +1934,10 @@ function buildOpenClawSam31ActualValueResolverQueue(projectName, options = {}) {
           : 'Record sam31_actual_value_replacement evidence from the 1881 workbook/sheet, reviewed vector overlay, reviewed 3D model candidate, screenshot, or console evidence.',
         download_href: item.download_href,
         latest_actual_value_replacement_evidence: latestReplacement,
+        openclaw_sam31_section_to_artifacts: latestReplacement?.openclaw_sam31_section_to_artifacts || null,
+        openclaw_sam31_section_to_artifacts_summary: latestReplacement?.openclaw_sam31_section_to_artifacts_summary || null,
+        source_openclaw_sam31_section_to_artifacts_ref: latestReplacement?.openclaw_sam31_section_to_artifacts_summary?.section_to_artifacts_contract_ref || null,
+        section_to_artifacts_consumer_handoff: sectionToArtifactsHandoff,
         consumer_actions: openClawSam31ActualValueResolverConsumerActions(projectName, item, latestContractEvidence, itemServiceDescriptorEvidence),
         use_for_claims: false,
         blocked_claims: Array.isArray(item.blocked_claims) ? item.blocked_claims : [],
@@ -1982,6 +1988,44 @@ function buildOpenClawSam31ActualValueResolverQueue(projectName, options = {}) {
     use_for_claims: false,
     claim_gate_effect: 'no_claims_cleared',
     no_claim_gates_cleared: true,
+  };
+}
+
+function openClawSam31SectionToArtifactsConsumerHandoff(item, replacementEvidence) {
+  const summary = replacementEvidence?.openclaw_sam31_section_to_artifacts_summary || null;
+  if (!summary || typeof summary !== 'object') return null;
+  return {
+    artifact_type: 'openclaw.sam31.section_to_artifacts_consumer_handoff.v1',
+    status: 'ready_for_consumer_review',
+    source_runtime: 'sam-3.1+llm',
+    source_openclaw_sam31_consumer_review_evidence_id: item?.source_openclaw_sam31_consumer_review_evidence_id || null,
+    source_sam31_actual_value_replacement_evidence_id: replacementEvidence?.evidence_id || null,
+    source_openclaw_sam31_section_to_artifacts_ref: summary.section_to_artifacts_contract_ref || null,
+    supported_consumers: ['halo_fire', 'landscout', 'nameforge'],
+    supported_applications: ['halo_fire', 'landscout', 'nameforge'],
+    vector_overlay_count: Number(summary.vector_overlay_count || 0) || 0,
+    model_3d_candidate_count: Number(summary.model_3d_candidate_count || 0) || 0,
+    segment_count: Number(summary.segment_count || 0) || 0,
+    object_hypothesis_count: Number(summary.object_hypothesis_count || 0) || 0,
+    openclaw_sam31_section_to_artifacts_summary: summary,
+    use_for_claims: false,
+    claim_gate_effect: 'no_claims_cleared',
+    no_claim_gates_cleared: true,
+    blocked_claims: [
+      'permit_ready',
+      'fabrication_ready',
+      'AHJ_approval',
+      'professional_approval',
+      'manufacturer_exact',
+      'AutoSprink_parity',
+      'survey_grade',
+      'brand_ready',
+      'production_ready',
+    ],
+    limitations: [
+      'This handoff lets HaloFire, LandScout, and NameForge consume replacement-derived SAM31 vectors/models as review evidence.',
+      'It does not clear regulated, survey-grade, brand-ready, production-ready, AHJ, professional, manufacturer, or AutoSprink claims.',
+    ],
   };
 }
 
@@ -2240,6 +2284,8 @@ function buildOpenClawSam31ActualValueReplacementReadback(projectName, options =
   const replayReplacementDetails = listSam31ReplayActualValueReplacementDetails(projectName, { consumer: effectiveConsumer });
   const items = queue.items.map((item) => {
     const recordedEvidence = item.latest_actual_value_replacement_evidence || null;
+    const sectionToArtifactsHandoff = item.section_to_artifacts_consumer_handoff
+      || openClawSam31SectionToArtifactsConsumerHandoff(item, recordedEvidence);
     const prefill = item.actual_value_replacement_prefill || null;
     const sourceRefs = uniqueStrings([
       ...(Array.isArray(recordedEvidence?.source_refs) ? recordedEvidence.source_refs : []),
@@ -2304,6 +2350,12 @@ function buildOpenClawSam31ActualValueReplacementReadback(projectName, options =
       acceptable_actual_evidence: Array.isArray(item.acceptable_actual_evidence) ? item.acceptable_actual_evidence : [],
       actual_value_replacement_prefill: prefill,
       recorded_actual_value_replacement_evidence: recordedEvidence,
+      openclaw_sam31_section_to_artifacts: recordedEvidence?.openclaw_sam31_section_to_artifacts || item.openclaw_sam31_section_to_artifacts || null,
+      openclaw_sam31_section_to_artifacts_summary: recordedEvidence?.openclaw_sam31_section_to_artifacts_summary || item.openclaw_sam31_section_to_artifacts_summary || null,
+      source_openclaw_sam31_section_to_artifacts_ref: recordedEvidence?.openclaw_sam31_section_to_artifacts_summary?.section_to_artifacts_contract_ref
+        || item.source_openclaw_sam31_section_to_artifacts_ref
+        || null,
+      section_to_artifacts_consumer_handoff: sectionToArtifactsHandoff,
       next_action: recordedEvidence
         ? 'Review this recorded sam31_actual_value_replacement detail before downstream use; regulated claims remain blocked.'
         : 'Record exact source refs from the 1881 workbook, reviewed vector overlay, reviewed 3D model candidate, screenshot, or console evidence.',

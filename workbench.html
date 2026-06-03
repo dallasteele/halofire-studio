@@ -1187,6 +1187,30 @@ function renderSam31ActualValueReplacementDetail(row) {
   return `<div class="claims">actual-value evidence #${escapeHtml(evidence.id || evidence.evidence_id || 'recorded')} - evidence_status ${escapeHtml(evidenceStatus)} - source_ref ${escapeHtml(sourceRef)} - replacement_values_source_ref ${escapeHtml(replacementSourceRef)} - claim_gate_effect ${escapeHtml(claimGateEffect)} - no_claim_gates_cleared ${escapeHtml(evidence.no_claim_gates_cleared === false ? 'false' : 'true')}</div>`;
 }
 
+function renderSam31ActualValueSectionToArtifactsSummary(row, index) {
+  const evidence = row?.latest_actual_value_replacement_evidence
+    || row?.recorded_actual_value_replacement_evidence
+    || row
+    || {};
+  const summary = evidence.openclaw_sam31_section_to_artifacts_summary
+    || row?.openclaw_sam31_section_to_artifacts_summary
+    || null;
+  if (!summary || typeof summary !== 'object') return '';
+  const handoff = row?.section_to_artifacts_consumer_handoff
+    || evidence.section_to_artifacts_consumer_handoff
+    || null;
+  const contractRef = summary.section_to_artifacts_contract_ref || 'openclaw.sam31.section_to_artifacts_contract.v1';
+  const sourceRef = row?.source_openclaw_sam31_section_to_artifacts_ref || handoff?.source_openclaw_sam31_section_to_artifacts_ref || contractRef;
+  const consumers = Array.isArray(handoff?.supported_consumers) ? handoff.supported_consumers : ['halo_fire', 'landscout', 'nameforge'];
+  return `<div class="claims" style="margin-top:7px;border-top:1px solid rgba(77,208,225,.22);padding-top:7px">
+    openclaw_sam31_section_to_artifacts_summary <span class="chip">${escapeHtml(summary.artifact_type || 'openclaw.sam31_llm_extrapolation_artifact')}</span> source_openclaw_sam31_section_to_artifacts_ref ${escapeHtml(sourceRef)} section_to_artifacts_consumer_handoff <span class="chip">${escapeHtml(handoff?.artifact_type || 'openclaw.sam31.section_to_artifacts_consumer_handoff.v1')}</span><br>
+    section_to_artifacts_contract_ref ${escapeHtml(contractRef)} - segment_count ${escapeHtml(summary.segment_count || 0)} - object_hypothesis_count ${escapeHtml(summary.object_hypothesis_count || 0)} - vector_overlay_count ${escapeHtml(summary.vector_overlay_count || 0)} - model_3d_candidate_count ${escapeHtml(summary.model_3d_candidate_count || 0)}<br>
+    supported_consumers: ${consumers.map((consumer) => `<span class="chip">${escapeHtml(consumer)}</span>`).join('')}<br>
+    use_for_claims false - claim_gate_effect ${escapeHtml(summary.claim_gate_effect || handoff?.claim_gate_effect || 'no_claims_cleared')}<br>
+    <button class="go" type="button" style="padding:5px 8px;font-size:10px;margin-top:5px;background:#155e75" data-sam31-actual-value-section-artifacts-download="${escapeHtml(index)}">Download SAM31 section-to-artifacts packet</button>
+  </div>`;
+}
+
 function sam31ActualValueServiceDescriptorPrefillLine(prefill) {
   const evidenceId = prefill?.source_openclaw_sam31_actual_value_service_descriptor_evidence_id || '';
   const action = prefill?.actual_value_service_descriptor_action && typeof prefill.actual_value_service_descriptor_action === 'object'
@@ -1357,6 +1381,7 @@ function renderSam31ActualValueQueueItem(row, index) {
     <div class="claims">employee_actual_value_next_action: ${escapeHtml(row.employee_actual_value_next_action || 'Replace SAM31 best guesses with actual HaloFire documentation values before bid/export use.')}</div>
     <div class="claims">acceptable_actual_evidence: ${acceptable.map((item) => `<span class="chip">${escapeHtml(item)}</span>`).join('') || '<span class="chip">actual evidence missing</span>'}</div>
     ${renderSam31ActualValueReplacementDetail(row)}
+    ${renderSam31ActualValueSectionToArtifactsSummary(row, index)}
     ${renderSam31ActualValueReplacementPrefill(row, index)}
     <div class="claims">Blocks: ${blocked.map((claim) => `<span class="chip">${escapeHtml(claim)}</span>`).join('') || '<span class="chip">claim gates remain blocked</span>'}</div>
     <div class="claims">evidence_record_type ${escapeHtml(row.evidence_record_type || 'sam31_actual_value_replacement')} · use_for_claims false · claim_gate_effect no_claims_cleared</div>
@@ -1433,6 +1458,34 @@ function downloadJsonPacket(packet, downloadName, statusText) {
   URL.revokeObjectURL(a.href);
   const status = document.getElementById('sam31ActualValueQueueStatus');
   if (status) status.textContent = statusText;
+}
+
+function downloadSam31ActualValueSectionArtifactsFromReplacement(index = '') {
+  const row = sam31ActualValueQueueRows[Number(index)];
+  const status = document.getElementById('sam31ActualValueQueueStatus');
+  if (!row) {
+    if (status) status.textContent = 'SAM31 actual-value replacement row is not available.';
+    return;
+  }
+  const evidence = row.latest_actual_value_replacement_evidence
+    || row.recorded_actual_value_replacement_evidence
+    || row;
+  const packet = evidence.openclaw_sam31_section_to_artifacts
+    || row.openclaw_sam31_section_to_artifacts
+    || evidence.section_to_artifacts_consumer_handoff
+    || row.section_to_artifacts_consumer_handoff
+    || null;
+  if (!packet || typeof packet !== 'object') {
+    if (status) status.textContent = 'SAM31 section-to-artifacts packet is not available for this replacement.';
+    return;
+  }
+  const slug = currentProjectName().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'halofire-project';
+  const evidenceId = evidence.evidence_id || evidence.id || row.source_openclaw_sam31_consumer_review_evidence_id || index || 'recorded';
+  downloadJsonPacket(
+    packet,
+    `${slug}-sam31-section-to-artifacts-${evidenceId}.json`,
+    'Downloaded SAM31 section-to-artifacts packet; claim gates remain blocked.',
+  );
 }
 
 function downloadSam31ActualValueFilteredQueueReadback() {
@@ -1885,6 +1938,9 @@ async function refreshSam31ActualValueQueue() {
   });
   document.querySelectorAll('[data-sam31-actual-value-saved-replacement-readback-download]').forEach((button) => {
     button.onclick = () => downloadSavedSam31ActualValueReplacementReadbackEvidence(button.dataset.sam31ActualValueSavedReplacementReadbackDownload);
+  });
+  document.querySelectorAll('[data-sam31-actual-value-section-artifacts-download]').forEach((button) => {
+    button.onclick = () => downloadSam31ActualValueSectionArtifactsFromReplacement(button.dataset.sam31ActualValueSectionArtifactsDownload);
   });
 }
 

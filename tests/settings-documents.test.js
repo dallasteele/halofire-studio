@@ -2309,7 +2309,34 @@ describe('HaloFire settings + documentation upload/link API', () => {
         use_for_claims: false,
         claim_gate_effect: 'no_claims_cleared',
       }),
+      openclaw_sam31_section_to_artifacts: expect.objectContaining({
+        artifact_type: 'openclaw.sam31_llm_extrapolation_artifact',
+        application: 'nameforge',
+        claim_gate_effect: 'no_claims_cleared',
+      }),
     }));
+    expect(readback.items[0]).toEqual(expect.objectContaining({
+      openclaw_sam31_section_to_artifacts_summary: expect.objectContaining({
+        section_to_artifacts_contract_ref: 'openclaw.sam31.section_to_artifacts_contract.v1',
+        vector_overlay_count: 1,
+        model_3d_candidate_count: 1,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+      section_to_artifacts_consumer_handoff: expect.objectContaining({
+        artifact_type: 'openclaw.sam31.section_to_artifacts_consumer_handoff.v1',
+        source_sam31_actual_value_replacement_evidence_id: saved.id,
+        source_openclaw_sam31_section_to_artifacts_ref: 'openclaw.sam31.section_to_artifacts_contract.v1',
+        vector_overlay_count: 1,
+        model_3d_candidate_count: 1,
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    }));
+    expect(readback.items[0].section_to_artifacts_consumer_handoff.supported_consumers).toEqual(expect.arrayContaining([
+      'halo_fire',
+      'landscout',
+      'nameforge',
+    ]));
 
     const verifyDb = new Database(dbPath);
     const row = verifyDb.prepare('SELECT * FROM project_evidence WHERE id = ?').get(saved.evidence_id);

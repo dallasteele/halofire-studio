@@ -596,6 +596,21 @@ describe('studio static origin handling', () => {
     expect(html).toContain('claim_gate_effect no_claims_cleared');
   });
 
+  it('surfaces SAM31 section-to-artifacts replacement packets in the Workbench', async () => {
+    const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
+    expect(shell.status).toBe(200);
+    const html = await shell.text();
+    expect(html).toContain('renderSam31ActualValueSectionToArtifactsSummary');
+    expect(html).toContain('openclaw_sam31_section_to_artifacts_summary');
+    expect(html).toContain('openclaw.sam31.section_to_artifacts_contract.v1');
+    expect(html).toContain('source_openclaw_sam31_section_to_artifacts_ref');
+    expect(html).toContain('section_to_artifacts_consumer_handoff');
+    expect(html).toContain('data-sam31-actual-value-section-artifacts-download');
+    expect(html).toContain('downloadSam31ActualValueSectionArtifactsFromReplacement');
+    expect(html).toContain('Download SAM31 section-to-artifacts packet');
+    expect(html).toContain('openclaw.sam31_llm_extrapolation_artifact');
+  });
+
   it('lets the workbench download official-flow hydraulic replay artifacts', async () => {
     const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
     expect(shell.status).toBe(200);
