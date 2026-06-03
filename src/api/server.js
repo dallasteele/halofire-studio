@@ -742,6 +742,32 @@ function buildClaimGateReviewPacket(projectName, gateCode) {
   };
 }
 
+function hydrateSignedReviewerEvidenceRow(row, options = {}) {
+  if (!hasStructuredSignedReviewerNotes(row)) return row;
+  const parsedNotes = parseStructuredSignedReviewerNotes(row);
+  if (!parsedNotes) return row;
+  const targetGateCode = String(options.targetGateCode || parsedNotes.target_gate_code || '').trim().toUpperCase() || null;
+  const projectName = options.projectName || row.project_name || null;
+  const reviewPacketHref = parsedNotes.review_packet_href
+    || (projectName && targetGateCode ? `/api/projects/${encodeURIComponent(projectName)}/claim-gates/${encodeURIComponent(targetGateCode)}/review-packet` : null);
+  const resolveAuditPacketHref = parsedNotes.resolve_audit_packet_href
+    || (projectName && targetGateCode && parsedNotes.claim_gate_effect === 'gate_cleared'
+      ? claimGateResolveAuditPacketHref(projectName, targetGateCode)
+      : null);
+  return {
+    ...row,
+    signoff: parsedNotes.signoff || null,
+    target_gate_code: targetGateCode,
+    required_evidence_type: parsedNotes.required_evidence_type || parsedNotes.evidence_type || row.evidence_type,
+    review_packet_href: reviewPacketHref,
+    review_packet_artifact_type: parsedNotes.review_packet_artifact_type || (reviewPacketHref ? 'halofire.claim_gate_review_packet.v1' : null),
+    resolve_audit_packet_href: resolveAuditPacketHref,
+    resolve_audit_packet_artifact_type: parsedNotes.resolve_audit_packet_artifact_type || null,
+    claim_gate_effect: parsedNotes.claim_gate_effect || null,
+    user_notes: parsedNotes.user_notes || null,
+  };
+}
+
 function claimGateResolveAuditPacketHref(projectName, gateCode) {
   return `/api/projects/${encodeURIComponent(projectName)}/claim-gates/${encodeURIComponent(gateCode)}/resolve-audit-packet`;
 }
@@ -977,7 +1003,10 @@ app.get('/api/projects/:name/evidence-wizard', authMiddleware, (req, res) => {
       review_packet_href: reviewPacketHref,
       review_packet_artifact_type: 'halofire.claim_gate_review_packet.v1',
       matching_evidence_count: matchingEvidence.length,
-      matching_evidence: matchingEvidence.slice(0, 5),
+      matching_evidence: matchingEvidence.slice(0, 5).map((row) => hydrateSignedReviewerEvidenceRow(row, {
+        projectName,
+        targetGateCode: gate.code,
+      })),
     };
   });
   res.json({

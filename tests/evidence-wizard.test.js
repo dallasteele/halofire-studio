@@ -315,6 +315,12 @@ describe('HaloFire evidence wizard slice', () => {
     const signedRow = gateRow.matching_evidence.find((item) => item.id === signedBody.id);
     expect(signedRow).toBeTruthy();
     const signedNotes = JSON.parse(signedRow.notes);
+    expect(signedRow).toEqual(expect.objectContaining({
+      target_gate_code: 'PROFESSIONAL_REVIEW_MISSING',
+      required_evidence_type: 'professional_review',
+      review_packet_href: `${PROJECT_PATH}/claim-gates/PROFESSIONAL_REVIEW_MISSING/review-packet`,
+      review_packet_artifact_type: 'halofire.claim_gate_review_packet.v1',
+    }));
     expect(signedNotes).toEqual(expect.objectContaining({
       kind: 'signed_reviewer_evidence',
       claim_gate_effect: 'no_claims_cleared',
@@ -324,6 +330,17 @@ describe('HaloFire evidence wizard slice', () => {
         signed_at: '2026-06-02T16:00:00.000Z',
       }),
     }));
+    const packetRes = await request(signedRow.review_packet_href, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(packetRes.status).toBe(200);
+    const packet = await packetRes.json();
+    expect(packet).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.claim_gate_review_packet.v1',
+      project_name: HOME_DEPOT_PROJECT_NAME,
+      review_packet_href: signedRow.review_packet_href,
+    }));
+    expect(packet.allowed_evidence_types).toContain(signedRow.required_evidence_type);
   });
 
   it('resolves a regulated gate from an already-recorded signed evidence row without duplicating it', async () => {
