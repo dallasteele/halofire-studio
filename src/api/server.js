@@ -1070,6 +1070,17 @@ function listOpenClawSam31ActualValueServiceDescriptorEvidence(projectName, opti
     .filter((row) => !requestedConsumer || row.requested_consumer === requestedConsumer);
 }
 
+function openClawSam31ActualValueServiceDescriptorEvidenceById(projectName, evidenceId) {
+  const id = Number(evidenceId);
+  if (!Number.isSafeInteger(id) || id <= 0) return null;
+  const row = db
+    .prepare(`SELECT * FROM project_evidence
+              WHERE id = ? AND project_name = ? AND evidence_type = 'openclaw_sam31_actual_value_service_descriptor'
+              LIMIT 1`)
+    .get(id, projectName);
+  return openClawSam31ActualValueServiceDescriptorEvidenceFromRow(row);
+}
+
 function latestOpenClawSam31ActualValueServiceDescriptorEvidence(projectName, consumer = '') {
   const requestedConsumer = String(consumer || '').trim().toLowerCase();
   const candidates = listOpenClawSam31ActualValueServiceDescriptorEvidence(projectName);
@@ -1346,7 +1357,29 @@ function normalizeSam31ActualValueReplacementIntake(projectName, body, reviewRow
   };
 }
 
-function openClawSam31ActualValueResolverConsumerActions(projectName, item, contractEvidence = null) {
+function openClawSam31ActualValueServiceDescriptorAction(projectName, consumer, serviceDescriptorEvidence = null) {
+  const normalizedConsumer = String(consumer || '').trim().toLowerCase();
+  const serviceDescriptorEvidenceId = serviceDescriptorEvidence?.evidence_id || null;
+  const query = [
+    `projectName=${encodeURIComponent(projectName)}`,
+    normalizedConsumer ? `consumer=${encodeURIComponent(normalizedConsumer)}` : '',
+  ].filter(Boolean).join('&');
+  return {
+    artifact_type: 'openclaw.sam31.actual_value_service_descriptor_action.v1',
+    action: 'download_actual_value_service_descriptor',
+    method: 'GET',
+    href: `/api/openclaw/sam31/actual-value-service?${query}`,
+    project_route_href: `/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/actual-value-service${normalizedConsumer ? `?consumer=${encodeURIComponent(normalizedConsumer)}` : ''}`,
+    produces: 'openclaw.sam31.actual_value_service_descriptor.v1',
+    source_openclaw_sam31_actual_value_service_descriptor_evidence_id: serviceDescriptorEvidenceId,
+    evidence_source_ref: serviceDescriptorEvidence?.source_ref || null,
+    evidence_source_file: serviceDescriptorEvidence?.source_file || null,
+    use_for_claims: false,
+    claim_gate_effect: 'no_claims_cleared',
+  };
+}
+
+function openClawSam31ActualValueResolverConsumerActions(projectName, item, contractEvidence = null, serviceDescriptorEvidence = null) {
   return ['halo_fire', 'landscout', 'nameforge'].map((consumer) => ({
     consumer,
     action: 'poll_actual_value_resolver_queue',
@@ -1355,6 +1388,14 @@ function openClawSam31ActualValueResolverConsumerActions(projectName, item, cont
     consumes: 'openclaw.sam31.actual_value_resolver_queue_item.v1',
     source_openclaw_sam31_consumer_review_evidence_id: item.source_openclaw_sam31_consumer_review_evidence_id,
     source_openclaw_sam31_actual_value_resolver_contract_evidence_id: contractEvidence?.evidence_id || null,
+    source_openclaw_sam31_actual_value_service_descriptor_evidence_id: serviceDescriptorEvidence?.requested_consumer === consumer
+      ? serviceDescriptorEvidence.evidence_id
+      : null,
+    actual_value_service_descriptor_action: openClawSam31ActualValueServiceDescriptorAction(
+      projectName,
+      consumer,
+      serviceDescriptorEvidence?.requested_consumer === consumer ? serviceDescriptorEvidence : null,
+    ),
     use_for_claims: false,
     claim_gate_effect: 'no_claims_cleared',
   }));
@@ -1586,6 +1627,10 @@ function buildOpenClawSam31ActualValueServiceDescriptor(projectName, options = {
 }
 
 function buildOpenClawSam31ActualValueResolverQueue(projectName, options = {}) {
+  const requestedServiceDescriptorEvidence = openClawSam31ActualValueServiceDescriptorEvidenceById(
+    projectName,
+    options.serviceDescriptorEvidenceId || options.service_descriptor_evidence_id,
+  );
   const requestedReplacementReadbackEvidence = openClawSam31ActualValueReplacementReadbackEvidenceById(
     projectName,
     options.replacementReadbackEvidenceId || options.replacement_readback_evidence_id,
@@ -1600,12 +1645,20 @@ function buildOpenClawSam31ActualValueResolverQueue(projectName, options = {}) {
   const contractEvidenceConsumer = requestedContractEvidence?.requested_consumer && requestedContractEvidence.requested_consumer !== 'all-consumers'
     ? requestedContractEvidence.requested_consumer
     : '';
-  const consumerFilter = String(options.consumer || '').trim().toLowerCase() || replacementReadbackConsumer || contractEvidenceConsumer;
+  const serviceDescriptorEvidenceConsumer = requestedServiceDescriptorEvidence?.requested_consumer && requestedServiceDescriptorEvidence.requested_consumer !== 'all-consumers'
+    ? requestedServiceDescriptorEvidence.requested_consumer
+    : '';
+  const consumerFilter = String(options.consumer || '').trim().toLowerCase()
+    || serviceDescriptorEvidenceConsumer
+    || replacementReadbackConsumer
+    || contractEvidenceConsumer;
   const index = buildOpenClawSam31ActualValueWorkItemIndex(projectName);
   const latestReplacementByReview = latestSam31ActualValueReplacementEvidenceByReview(projectName);
   const latestContractEvidence = requestedContractEvidence || latestOpenClawSam31ActualValueResolverContractEvidence(projectName, consumerFilter);
-  const latestServiceDescriptorEvidence = latestOpenClawSam31ActualValueServiceDescriptorEvidence(projectName, consumerFilter);
-  const savedServiceDescriptorEvidenceRows = listOpenClawSam31ActualValueServiceDescriptorEvidence(projectName, {
+  const latestServiceDescriptorEvidence = requestedServiceDescriptorEvidence || latestOpenClawSam31ActualValueServiceDescriptorEvidence(projectName, consumerFilter);
+  const savedServiceDescriptorEvidenceRows = requestedServiceDescriptorEvidence ? [requestedServiceDescriptorEvidence].filter((row) => (
+    !consumerFilter || row.requested_consumer === consumerFilter
+  )) : listOpenClawSam31ActualValueServiceDescriptorEvidence(projectName, {
     consumer: consumerFilter,
   });
   const savedReplacementReadbackEvidenceRows = requestedReplacementReadbackEvidence
@@ -1655,6 +1708,8 @@ function buildOpenClawSam31ActualValueResolverQueue(projectName, options = {}) {
     .filter((item) => !consumerFilter || String(item.consumer || '').toLowerCase() === consumerFilter)
     .map((item) => {
       const latestReplacement = latestReplacementByReview.get(Number(item.source_openclaw_sam31_consumer_review_evidence_id)) || null;
+      const itemServiceDescriptorEvidence = requestedServiceDescriptorEvidence
+        || latestOpenClawSam31ActualValueServiceDescriptorEvidence(projectName, item.consumer);
       const status = latestReplacement ? 'actual_value_evidence_recorded' : 'requires_employee_actual_value_update';
       return {
         artifact_type: 'openclaw.sam31.actual_value_resolver_queue_item.v1',
@@ -1668,6 +1723,9 @@ function buildOpenClawSam31ActualValueResolverQueue(projectName, options = {}) {
         source_pdf_boundary_evidence_id: item.source_pdf_boundary_evidence_id,
         source_openclaw_sam31_consumer_review_evidence_id: item.source_openclaw_sam31_consumer_review_evidence_id,
         source_openclaw_sam31_consumer_smoke_evidence_id: item.source_openclaw_sam31_consumer_smoke_evidence_id,
+        source_openclaw_sam31_actual_value_service_descriptor_evidence_id: itemServiceDescriptorEvidence?.evidence_id || null,
+        latest_actual_value_service_descriptor_evidence: itemServiceDescriptorEvidence,
+        actual_value_service_descriptor_action: openClawSam31ActualValueServiceDescriptorAction(projectName, item.consumer, itemServiceDescriptorEvidence),
         source_openclaw_sam31_actual_value_resolver_contract_evidence_id: latestContractEvidence?.evidence_id || null,
         latest_actual_value_resolver_contract_evidence: latestContractEvidence,
         accepted_queue_id: item.accepted_queue_id || null,
@@ -1687,7 +1745,7 @@ function buildOpenClawSam31ActualValueResolverQueue(projectName, options = {}) {
           : 'Record sam31_actual_value_replacement evidence from the 1881 workbook/sheet, reviewed vector overlay, reviewed 3D model candidate, screenshot, or console evidence.',
         download_href: item.download_href,
         latest_actual_value_replacement_evidence: latestReplacement,
-        consumer_actions: openClawSam31ActualValueResolverConsumerActions(projectName, item, latestContractEvidence),
+        consumer_actions: openClawSam31ActualValueResolverConsumerActions(projectName, item, latestContractEvidence, itemServiceDescriptorEvidence),
         use_for_claims: false,
         blocked_claims: Array.isArray(item.blocked_claims) ? item.blocked_claims : [],
         claim_gate_effect: 'no_claims_cleared',
@@ -1712,6 +1770,7 @@ function buildOpenClawSam31ActualValueResolverQueue(projectName, options = {}) {
     generated_at: new Date().toISOString(),
     supported_consumers: ['halo_fire', 'landscout', 'nameforge'],
     sam31_llm_extrapolation_contract: sam31LlmExtrapolationContract,
+    service_descriptor_evidence_filter_id: requestedServiceDescriptorEvidence?.evidence_id || null,
     latest_actual_value_service_descriptor_evidence_id: latestServiceDescriptorEvidence?.evidence_id || null,
     latest_actual_value_service_descriptor_evidence: latestServiceDescriptorEvidence,
     saved_actual_value_service_descriptor_count: savedServiceDescriptorEvidenceRows.length,
@@ -1745,20 +1804,24 @@ function buildOpenClawSam31ActualValueResolverQueueReadback(projectName, options
     consumer: requestedConsumer,
     contractEvidenceId: options.contractEvidenceId || options.contract_evidence_id,
     replacementReadbackEvidenceId: options.replacementReadbackEvidenceId || options.replacement_readback_evidence_id,
+    serviceDescriptorEvidenceId: options.serviceDescriptorEvidenceId || options.service_descriptor_evidence_id,
   });
   const effectiveConsumer = queue.requested_consumer || requestedConsumer;
   const contractEvidenceFilterId = queue.contract_evidence_filter_id || null;
   const replacementReadbackEvidenceFilterId = queue.replacement_readback_evidence_filter_id || null;
+  const serviceDescriptorEvidenceFilterId = queue.service_descriptor_evidence_filter_id || null;
   const projectQuery = [
     effectiveConsumer ? `consumer=${encodeURIComponent(effectiveConsumer)}` : '',
     contractEvidenceFilterId ? `contractEvidenceId=${encodeURIComponent(contractEvidenceFilterId)}` : '',
     replacementReadbackEvidenceFilterId ? `replacementReadbackEvidenceId=${encodeURIComponent(replacementReadbackEvidenceFilterId)}` : '',
+    serviceDescriptorEvidenceFilterId ? `serviceDescriptorEvidenceId=${encodeURIComponent(serviceDescriptorEvidenceFilterId)}` : '',
   ].filter(Boolean).join('&');
   const globalQuery = [
     `projectName=${encodeURIComponent(projectName)}`,
     effectiveConsumer ? `consumer=${encodeURIComponent(effectiveConsumer)}` : '',
     contractEvidenceFilterId ? `contractEvidenceId=${encodeURIComponent(contractEvidenceFilterId)}` : '',
     replacementReadbackEvidenceFilterId ? `replacementReadbackEvidenceId=${encodeURIComponent(replacementReadbackEvidenceFilterId)}` : '',
+    serviceDescriptorEvidenceFilterId ? `serviceDescriptorEvidenceId=${encodeURIComponent(serviceDescriptorEvidenceFilterId)}` : '',
   ].filter(Boolean).join('&');
   const sourceProjectRoute = `/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/actual-value-resolver-queue${projectQuery ? `?${projectQuery}` : ''}`;
   const queueHref = `/api/openclaw/sam31/actual-value-resolver-queue?${globalQuery}`;
@@ -1783,7 +1846,7 @@ function buildOpenClawSam31ActualValueResolverQueueReadback(projectName, options
     filtered_queue_readback: {
       artifact_type: 'openclaw.sam31.actual_value_resolver_queue_readback.v1',
       href: queueHref,
-      download_name: `${slug}-sam31-actual-value-resolver-queue${replacementReadbackEvidenceFilterId ? `-saved-readback-${replacementReadbackEvidenceFilterId}` : ''}.json`,
+      download_name: `${slug}-sam31-actual-value-resolver-queue${replacementReadbackEvidenceFilterId ? `-saved-readback-${replacementReadbackEvidenceFilterId}` : ''}${serviceDescriptorEvidenceFilterId ? `-saved-service-descriptor-${serviceDescriptorEvidenceFilterId}` : ''}.json`,
       use_for_claims: false,
       claim_gate_effect: 'no_claims_cleared',
     },
@@ -1883,6 +1946,7 @@ function buildOpenClawSam31ActualValueResolverQueueReadback(projectName, options
     supported_consumers: queue.supported_consumers,
     consumer_pull_endpoints: openClawSam31ActualValueResolverConsumerPullEndpoints(projectName),
     sam31_llm_extrapolation_contract: queue.sam31_llm_extrapolation_contract,
+    service_descriptor_evidence_filter_id: serviceDescriptorEvidenceFilterId,
     latest_actual_value_service_descriptor_evidence_id: queue.latest_actual_value_service_descriptor_evidence_id || null,
     latest_actual_value_service_descriptor_evidence: latestServiceDescriptorEvidence,
     saved_actual_value_service_descriptor_count: queue.saved_actual_value_service_descriptor_count || 0,
@@ -2339,6 +2403,7 @@ app.get('/api/projects/:name/openclaw/sam31/actual-value-resolver-queue', authMi
     consumer: req.query?.consumer,
     contractEvidenceId: req.query?.contractEvidenceId || req.query?.contract_evidence_id,
     replacementReadbackEvidenceId: req.query?.replacementReadbackEvidenceId || req.query?.replacement_readback_evidence_id,
+    serviceDescriptorEvidenceId: req.query?.serviceDescriptorEvidenceId || req.query?.service_descriptor_evidence_id,
   }));
 });
 
@@ -12296,6 +12361,7 @@ app.get('/api/openclaw/sam31/actual-value-resolver-queue', authMiddleware, (req,
     consumer: req.query?.consumer,
     contractEvidenceId: req.query?.contractEvidenceId || req.query?.contract_evidence_id,
     replacementReadbackEvidenceId: req.query?.replacementReadbackEvidenceId || req.query?.replacement_readback_evidence_id,
+    serviceDescriptorEvidenceId: req.query?.serviceDescriptorEvidenceId || req.query?.service_descriptor_evidence_id,
   }));
 });
 

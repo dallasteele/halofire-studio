@@ -245,6 +245,16 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toContain('Download saved service descriptor evidence');
     expect(html).toContain('downloadSavedSam31ActualValueServiceDescriptorEvidence');
     expect(html).toContain('data-sam31-actual-value-saved-service-descriptor-download');
+    expect(html).toContain('sam31ActualValueServiceDescriptorEvidenceFilter');
+    expect(html).toContain('filterSam31ActualValueQueueBySavedServiceDescriptorEvidence');
+    expect(html).toContain('data-sam31-actual-value-open-saved-service-descriptor');
+    expect(html).toContain('data-sam31-actual-value-clear-service-descriptor-filter');
+    expect(html).toContain('serviceDescriptorEvidenceId=');
+    expect(html).toContain('service_descriptor_evidence_filter_id');
+    expect(html).toContain('Open queue from saved service descriptor evidence');
+    expect(html).toContain('source_openclaw_sam31_actual_value_service_descriptor_evidence_id');
+    expect(html).toContain('actual_value_service_descriptor_action');
+    expect(html).toContain('Download consumer service descriptor');
     expect(html).toContain('Saved SAM31 actual-value replacement readback evidence detail');
     expect(html).toContain('source_queue_route');
     expect(html).toContain('requested_consumer');
