@@ -38,7 +38,12 @@ import { readHomeDepotBidPackage, readHomeDepotRealTakeoff } from '../data/home-
 import { readCooperative1881BidPackage, readCooperative1881RealTakeoff } from '../data/cooperative-1881-bid-package.js';
 import { buildSuppliedDocumentBidTruthStatus } from '../data/supplied-document-bid-truth.js';
 import { buildPlanSegmentationPayload } from '../components/sam-floorplan.js';
-import { SAM31_FLOORPLAN_TOOL, sam31SectioningPipelineContract, sam31ToolDescriptorBody } from '../sam31/bridge.js';
+import {
+  SAM31_FLOORPLAN_TOOL,
+  buildSam31ExtrapolationArtifact,
+  sam31SectioningPipelineContract,
+  sam31ToolDescriptorBody,
+} from '../sam31/bridge.js';
 import { buildSamInvoker } from './sam-invoker.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -969,6 +974,8 @@ function latestSam31ActualValueReplacementEvidenceByReview(projectName) {
       source_openclaw_sam31_consumer_smoke_evidence_id: replacement.source_openclaw_sam31_consumer_smoke_evidence_id || null,
       consumer: replacement.consumer || null,
       replacement_values_source_ref: replacement.replacement_values_source_ref || row.source_ref || null,
+      replacement_values: replacement.replacement_values || {},
+      openclaw_sam31_section_to_artifacts_summary: replacement.openclaw_sam31_section_to_artifacts_summary || null,
       source_refs: uniqueStrings([
         ...(Array.isArray(replacement.source_refs) ? replacement.source_refs : []),
         ...(Array.isArray(replacement.actual_value_replacement_prefill?.source_refs) ? replacement.actual_value_replacement_prefill.source_refs : []),
@@ -1278,6 +1285,78 @@ function listSam31ReplayActualValueReplacementDetails(projectName, options = {})
   return details;
 }
 
+function sam31ActualValueSectionArtifactSummary(artifact) {
+  if (!artifact || typeof artifact !== 'object' || Array.isArray(artifact)) return null;
+  const perceptionPacket = artifact.perception_packet && typeof artifact.perception_packet === 'object'
+    ? artifact.perception_packet
+    : {};
+  return {
+    artifact_type: artifact.artifact_type || 'openclaw.sam31_llm_extrapolation_artifact',
+    status: artifact.status || 'best_effort_extrapolation_ready',
+    application: artifact.application || perceptionPacket.application || null,
+    project_ref: artifact.project_ref || perceptionPacket.project_ref || null,
+    section_to_artifacts_contract_ref: artifact.section_to_artifacts_contract?.artifact_type
+      || perceptionPacket.section_to_artifacts_contract_ref
+      || 'openclaw.sam31.section_to_artifacts_contract.v1',
+    segment_count: Array.isArray(perceptionPacket.segments) ? perceptionPacket.segments.length : 0,
+    object_hypothesis_count: Array.isArray(perceptionPacket.object_hypotheses) ? perceptionPacket.object_hypotheses.length : 0,
+    vector_overlay_count: Array.isArray(perceptionPacket.vector_overlays) ? perceptionPacket.vector_overlays.length : 0,
+    model_3d_candidate_count: Array.isArray(perceptionPacket.model_3d_candidates) ? perceptionPacket.model_3d_candidates.length : 0,
+    spatial_observation_count: Array.isArray(perceptionPacket.spatial_observations) ? perceptionPacket.spatial_observations.length : 0,
+    use_for_claims: false,
+    claim_gate_effect: artifact.claim_gate_effect || 'no_claims_cleared',
+    no_claim_gates_cleared: true,
+  };
+}
+
+function buildSam31ActualValueSectionToArtifacts(projectName, body, review, sourceRef, sourceRefs) {
+  const replacementValues = body?.replacement_values && typeof body.replacement_values === 'object' && !Array.isArray(body.replacement_values)
+    ? jsonClone(body.replacement_values)
+    : {};
+  const hasSectionArtifactInputs = [
+    'sections',
+    'object_hypotheses',
+    'llm_observations',
+    'vector_overlays',
+    'model_3d_candidates',
+  ].some((key) => Array.isArray(replacementValues[key]) && replacementValues[key].length);
+  if (!hasSectionArtifactInputs) return null;
+
+  const payload = {
+    project_ref: `${review.consumer || 'halo_fire'}:${projectName}`,
+    application: review.consumer || 'halo_fire',
+    source_ref: sourceRef,
+    image_ref: body?.image_ref || review.replacement_ref || body?.source_file || null,
+    coordinate_frame_ref: body?.coordinate_frame_ref || replacementValues.coordinate_frame_ref || 'halofire-actual-value-replacement-frame',
+    unit: body?.unit || replacementValues.unit || 'ft',
+    llm_runtime: body?.llm_runtime || replacementValues.llm_runtime || 'openclaw-local-llm-best-effort',
+    prompt_ref: body?.prompt_ref || replacementValues.prompt_ref || 'openclaw.sam31.prompt.identify_objects_vector_3d.v1',
+    sections: Array.isArray(replacementValues.sections) ? replacementValues.sections : [],
+    object_hypotheses: Array.isArray(replacementValues.object_hypotheses) ? replacementValues.object_hypotheses : [],
+    llm_observations: Array.isArray(replacementValues.llm_observations) ? replacementValues.llm_observations : [],
+    vector_overlays: Array.isArray(replacementValues.vector_overlays) ? replacementValues.vector_overlays : [],
+    model_3d_candidates: Array.isArray(replacementValues.model_3d_candidates) ? replacementValues.model_3d_candidates : [],
+    source_refs: uniqueStrings([
+      ...(Array.isArray(sourceRefs) ? sourceRefs : []),
+      ...(Array.isArray(replacementValues.source_refs) ? replacementValues.source_refs : []),
+      replacementValues.source_ref,
+      review.replacement_ref,
+    ].filter(Boolean)),
+  };
+  const artifact = buildSam31ExtrapolationArtifact(payload);
+  return {
+    ...artifact,
+    artifact_source: 'api.openclaw.sam31.actual_value_replacements',
+    source_actual_value_replacement_ref: sourceRef,
+    replacement_values_source_ref: body?.replacement_values_source_ref || replacementValues.source_ref || sourceRef,
+    section_to_artifacts_contract_ref: artifact.section_to_artifacts_contract?.artifact_type
+      || 'openclaw.sam31.section_to_artifacts_contract.v1',
+    use_for_claims: false,
+    claim_gate_effect: 'no_claims_cleared',
+    no_claim_gates_cleared: true,
+  };
+}
+
 function normalizeSam31ActualValueReplacementIntake(projectName, body, reviewRow, item = null, user = null) {
   const review = openClawSam31ConsumerReviewFromEvidence(reviewRow);
   if (!review) {
@@ -1353,6 +1432,17 @@ function normalizeSam31ActualValueReplacementIntake(projectName, body, reviewRow
     review.replacement_ref,
     reviewRow.source_ref,
   ].filter(Boolean));
+  const replacementValues = body?.replacement_values && typeof body.replacement_values === 'object' && !Array.isArray(body.replacement_values)
+    ? jsonClone(body.replacement_values)
+    : {};
+  const sectionToArtifacts = buildSam31ActualValueSectionToArtifacts(
+    projectName,
+    body || {},
+    review,
+    sourceRef,
+    sourceRefs,
+  );
+  const sectionToArtifactsSummary = sam31ActualValueSectionArtifactSummary(sectionToArtifacts);
   return {
     kind: 'sam31ActualValueReplacement',
     artifact_type: 'halofire.sam31_actual_value_replacement_intake.v1',
@@ -1372,18 +1462,19 @@ function normalizeSam31ActualValueReplacementIntake(projectName, body, reviewRow
     replacement_ref: body?.replacement_ref || item?.replacement_ref || review.replacement_ref || null,
     source_file: sourceFile || null,
     source_ref: sourceRef,
-      replacement_values_source_ref: replacementValuesSourceRef || sourceRef,
-      source_refs: sourceRefs,
-      llm_observation_count: Number(body?.llm_observation_count ?? item?.llm_observation_count ?? 0) || 0,
-      llm_observation_ids: uniqueStrings([
-        ...(Array.isArray(body?.llm_observation_ids) ? body.llm_observation_ids : []),
-        ...(Array.isArray(item?.llm_observation_ids) ? item.llm_observation_ids : []),
-      ]),
-      source_llm_observation_ids: uniqueStrings([
-        ...(Array.isArray(body?.source_llm_observation_ids) ? body.source_llm_observation_ids : []),
-        ...(Array.isArray(item?.source_llm_observation_ids) ? item.source_llm_observation_ids : []),
-      ]),
-      actual_value_replacement_prefill: {
+    replacement_values_source_ref: replacementValuesSourceRef || sourceRef,
+    source_refs: sourceRefs,
+    replacement_values: replacementValues,
+    llm_observation_count: Number(body?.llm_observation_count ?? item?.llm_observation_count ?? 0) || 0,
+    llm_observation_ids: uniqueStrings([
+      ...(Array.isArray(body?.llm_observation_ids) ? body.llm_observation_ids : []),
+      ...(Array.isArray(item?.llm_observation_ids) ? item.llm_observation_ids : []),
+    ]),
+    source_llm_observation_ids: uniqueStrings([
+      ...(Array.isArray(body?.source_llm_observation_ids) ? body.source_llm_observation_ids : []),
+      ...(Array.isArray(item?.source_llm_observation_ids) ? item.source_llm_observation_ids : []),
+    ]),
+    actual_value_replacement_prefill: {
       ...prefill,
       source_openclaw_sam31_actual_value_service_descriptor_evidence_id: serviceDescriptorEvidenceId,
       source_actual_value_service_descriptor_ref: serviceDescriptorRef,
@@ -1400,6 +1491,13 @@ function normalizeSam31ActualValueReplacementIntake(projectName, body, reviewRow
     replacement_summary: {
       ...(item?.replacement_summary || {}),
       ...(body?.replacement_summary || {}),
+      replaced_field_count: Object.keys(replacementValues).length,
+      replaced_fields: uniqueStrings(Object.keys(replacementValues)),
+      has_section_to_artifacts: Boolean(sectionToArtifactsSummary),
+      vector_overlay_count: sectionToArtifactsSummary?.vector_overlay_count
+        ?? (Array.isArray(replacementValues.vector_overlays) ? replacementValues.vector_overlays.length : 0),
+      model_3d_candidate_count: sectionToArtifactsSummary?.model_3d_candidate_count
+        ?? (Array.isArray(replacementValues.model_3d_candidates) ? replacementValues.model_3d_candidates.length : 0),
       llm_observation_count: Number(
         body?.replacement_summary?.llm_observation_count
           ?? item?.replacement_summary?.llm_observation_count
@@ -1408,6 +1506,8 @@ function normalizeSam31ActualValueReplacementIntake(projectName, body, reviewRow
           ?? 0,
       ) || 0,
     },
+    openclaw_sam31_section_to_artifacts: sectionToArtifacts,
+    openclaw_sam31_section_to_artifacts_summary: sectionToArtifactsSummary,
     acceptable_actual_evidence: Array.isArray(body?.acceptable_actual_evidence)
       ? body.acceptable_actual_evidence
       : (Array.isArray(item?.acceptable_actual_evidence) ? item.acceptable_actual_evidence : []),
@@ -2315,8 +2415,12 @@ function buildOpenClawSam31ActualValueResolverReplay(projectName, intake, eviden
       || null,
     actual_value_service_descriptor_action: serviceDescriptorAction,
     source_pdf_boundary_evidence_id: item?.source_pdf_boundary_evidence_id || intake?.source_pdf_boundary_evidence_id || null,
-    replacement_values_source_ref: item?.replacement_values_source_ref || intake?.replacement_values_source_ref || null,
-    llm_observation_count: item?.llm_observation_count || intake?.llm_observation_count || 0,
+      replacement_values_source_ref: item?.replacement_values_source_ref || intake?.replacement_values_source_ref || null,
+      source_openclaw_sam31_section_to_artifacts_ref: intake?.openclaw_sam31_section_to_artifacts_summary?.section_to_artifacts_contract_ref || null,
+      vector_overlay_count: intake?.openclaw_sam31_section_to_artifacts_summary?.vector_overlay_count || 0,
+      model_3d_candidate_count: intake?.openclaw_sam31_section_to_artifacts_summary?.model_3d_candidate_count || 0,
+      openclaw_sam31_section_to_artifacts_summary: intake?.openclaw_sam31_section_to_artifacts_summary || null,
+      llm_observation_count: item?.llm_observation_count || intake?.llm_observation_count || 0,
     llm_observation_ids: uniqueStrings([
       ...(Array.isArray(item?.llm_observation_ids) ? item.llm_observation_ids : []),
       ...(Array.isArray(intake?.llm_observation_ids) ? intake.llm_observation_ids : []),
@@ -2846,6 +2950,7 @@ app.post('/api/projects/:name/openclaw/sam31/actual-value-replacements', authMid
     const evidenceRow = db.prepare('SELECT * FROM project_evidence WHERE id = ?').get(result.lastInsertRowid);
     return res.status(201).json({
       id: result.lastInsertRowid,
+      evidence_id: result.lastInsertRowid,
       message: 'SAM31 actual-value replacement intake recorded; claim gates remain blocked',
       evidence: evidenceRow,
       actual_value_resolver_replay: buildOpenClawSam31ActualValueResolverReplay(projectName, intake, result.lastInsertRowid),

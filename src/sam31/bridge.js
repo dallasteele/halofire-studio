@@ -584,7 +584,7 @@ function cooperative1881Truth() {
   };
 }
 
-function buildSam31ExtrapolationArtifact(payload) {
+export function buildSam31ExtrapolationArtifact(payload) {
   const bidTruth = cooperative1881Truth();
   const sectioningPipelineContract = sam31SectioningPipelineContract();
   const sectionToArtifactsContract = sam31SectionToArtifactsContract();

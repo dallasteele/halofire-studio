@@ -2164,4 +2164,160 @@ describe('HaloFire settings + documentation upload/link API', () => {
       claim_gate_effect: 'no_claims_cleared',
     }));
   });
+
+  it('normalizes actual-value replacement vectors and models through the shared SAM31 section-to-artifacts contract', async () => {
+    const token = await tokenFor('settings-admin', 'actual-test-password');
+    const projectName = 'Shared SAM31 Section Artifact Replacement Project';
+    const db = new Database(dbPath);
+    const reviewResult = db.prepare(
+      `INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+    ).run(
+      projectName,
+      'openclaw_sam31_consumer_review',
+      'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx',
+      'nameforge://sam31/reviews/section-artifacts/replacement.json',
+      'present',
+      JSON.stringify({
+        kind: 'openclaw_sam31_consumer_review',
+        review: {
+          artifact_type: 'openclaw.sam31.consumer_review_task_decision.v1',
+          source_application: 'halo_fire',
+          source_pdf_boundary_evidence_id: 474,
+          source_openclaw_sam31_consumer_smoke_evidence_id: 473,
+          consumer: 'nameforge',
+          review_decision: 'replaced',
+          accepted_queue_id: 'section-artifacts-nameforge',
+          persisted_review_packet_ref: 'openclaw://nameforge/sam31/product-review/section-artifacts-nameforge',
+          replacement_ref: 'nameforge://sam31/reviews/section-artifacts/replacement.json',
+          replacement_values: {
+            sections: [{ id: 'section-storefront-sign', semantic_label: 'temporary_sign_zone' }],
+            object_hypotheses: [{ id: 'object:storefront-sign', segment_id: 'section-storefront-sign' }],
+            vector_overlays: [{ id: 'vector:storefront-sign' }],
+            model_3d_candidates: [{ id: 'model3d:storefront-sign' }],
+            source_ref: 'nameforge://sam31/temporary/storefront-sign',
+          },
+          blocked_claims: ['brand_ready', 'production_ready'],
+          use_for_claims: false,
+          no_claim_gates_cleared: true,
+          claim_gate_effect: 'no_claims_cleared',
+        },
+      }),
+    );
+    db.close();
+
+    const res = await request(`/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/actual-value-replacements`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        source_openclaw_sam31_consumer_review_evidence_id: reviewResult.lastInsertRowid,
+        source_pdf_boundary_evidence_id: 474,
+        source_openclaw_sam31_consumer_smoke_evidence_id: 473,
+        consumer: 'nameforge',
+        source_file: 'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx',
+        source_ref: 'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G6',
+        replacement_values_source_ref: 'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G6',
+        source_refs: [
+          'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G6',
+          'nameforge://employee/reviewed/storefront-sign.png',
+        ],
+        replacement_values: {
+          sections: [{
+            id: 'section-storefront-sign',
+            semantic_label: 'reviewed_storefront_sign_zone',
+            polygon: [[0, 0], [100, 0], [100, 32], [0, 32], [0, 0]],
+            confidence: 0.74,
+          }],
+          object_hypotheses: [{
+            id: 'object:storefront-sign',
+            segment_id: 'section-storefront-sign',
+            semantic_label: 'reviewed_storefront_sign',
+            confidence: 0.71,
+          }],
+          llm_observations: [{
+            id: 'llm:storefront-sign',
+            segment_id: 'section-storefront-sign',
+            object_hypothesis_id: 'object:storefront-sign',
+            semantic_label: 'reviewed_storefront_sign',
+            confidence: 0.69,
+          }],
+          vector_overlays: [{
+            id: 'vector:reviewed-storefront-sign',
+            segment_id: 'section-storefront-sign',
+            svg_path: 'M 0 0 L 100 0 L 100 32 L 0 32 Z',
+            source_refs: ['nameforge://employee/vector/storefront-sign.svg'],
+          }],
+          model_3d_candidates: [{
+            id: 'model3d:reviewed-storefront-sign',
+            segment_id: 'section-storefront-sign',
+            primitive: 'employee_reviewed_extruded_sign_panel',
+            source_refs: ['nameforge://employee/model/storefront-sign.glb'],
+          }],
+        },
+      }),
+    });
+
+    expect(res.status).toBe(201);
+    const saved = await res.json();
+    expect(saved.openclaw_sam31_section_to_artifacts).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31_llm_extrapolation_artifact',
+      application: 'nameforge',
+      section_to_artifacts_contract: expect.objectContaining({
+        artifact_type: 'openclaw.sam31.section_to_artifacts_contract.v1',
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(saved.openclaw_sam31_section_to_artifacts.perception_packet.vector_overlays[0]).toEqual(expect.objectContaining({
+      id: 'vector:reviewed-storefront-sign',
+      artifact_type: 'openclaw.sam31.vector_overlay.v1',
+      segment_id: 'section-storefront-sign',
+      source_llm_observation_ids: ['llm:storefront-sign'],
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(saved.openclaw_sam31_section_to_artifacts.perception_packet.model_3d_candidates[0]).toEqual(expect.objectContaining({
+      id: 'model3d:reviewed-storefront-sign',
+      artifact_type: 'openclaw.sam31.model_3d_candidate.v1',
+      primitive: 'employee_reviewed_extruded_sign_panel',
+      source_llm_observation_ids: ['llm:storefront-sign'],
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(saved.actual_value_resolver_replay).toEqual(expect.objectContaining({
+      source_openclaw_sam31_section_to_artifacts_ref: 'openclaw.sam31.section_to_artifacts_contract.v1',
+      vector_overlay_count: 1,
+      model_3d_candidate_count: 1,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+
+    const readbackRes = await request(`/api/openclaw/sam31/actual-value-replacements?projectName=${encodeURIComponent(projectName)}&consumer=nameforge`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(readbackRes.status).toBe(200);
+    const readback = await readbackRes.json();
+    expect(readback.items[0].recorded_actual_value_replacement_evidence).toEqual(expect.objectContaining({
+      evidence_id: saved.id,
+      openclaw_sam31_section_to_artifacts_summary: expect.objectContaining({
+        artifact_type: 'openclaw.sam31_llm_extrapolation_artifact',
+        section_to_artifacts_contract_ref: 'openclaw.sam31.section_to_artifacts_contract.v1',
+        vector_overlay_count: 1,
+        model_3d_candidate_count: 1,
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    }));
+
+    const verifyDb = new Database(dbPath);
+    const row = verifyDb.prepare('SELECT * FROM project_evidence WHERE id = ?').get(saved.evidence_id);
+    verifyDb.close();
+    const notes = JSON.parse(row.notes);
+    expect(notes.openclaw_sam31_section_to_artifacts).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31_llm_extrapolation_artifact',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+  });
 });
