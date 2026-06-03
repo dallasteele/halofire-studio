@@ -145,6 +145,50 @@ describe('HaloFire evidence wizard signed reviewer packets', () => {
     expect(body.blocked_claims).toEqual(expect.arrayContaining(['AHJ-approved', 'permit-ready']));
   });
 
+  it('hydrates matching signed reviewer evidence rows inside the review packet', async () => {
+    const token = await tokenFor('packet-admin', 'actual-test-password');
+    const createRes = await request(`${PROJECT_PATH}/evidence`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        evidence_type: 'ahj_approval',
+        target_gate_code: 'AHJ_APPROVAL_MISSING',
+        source_ref: 'AHJ packet AHJ-1881-001',
+        source_file: 'ahj-approval-packet.pdf',
+        status: 'present',
+        notes: 'Recorded for later gate resolution.',
+        signoff: {
+          reviewer_name: 'Riley Stone',
+          reviewer_title: 'Fire Marshal',
+          signed_at: '2026-06-03T17:00:00.000Z',
+          organization: 'Salt Lake City',
+        },
+      }),
+    });
+    expect(createRes.status).toBe(201);
+
+    const res = await request(`${PROJECT_PATH}/claim-gates/AHJ_APPROVAL_MISSING/review-packet`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    const matchingRow = body.matching_evidence.find((row) => row.source_ref === 'AHJ packet AHJ-1881-001');
+    expect(matchingRow).toBeTruthy();
+    expect(matchingRow).toEqual(expect.objectContaining({
+      target_gate_code: 'AHJ_APPROVAL_MISSING',
+      required_evidence_type: 'ahj_approval',
+      review_packet_href: `${PROJECT_PATH}/claim-gates/AHJ_APPROVAL_MISSING/review-packet`,
+      review_packet_artifact_type: 'halofire.claim_gate_review_packet.v1',
+      claim_gate_effect: 'no_claims_cleared',
+      signoff: expect.objectContaining({
+        reviewer_name: 'Riley Stone',
+        reviewer_title: 'Fire Marshal',
+        signed_at: '2026-06-03T17:00:00.000Z',
+      }),
+      user_notes: 'Recorded for later gate resolution.',
+    }));
+  });
+
   it('builds an employee-signoff packet for non-regulated internal review lanes', async () => {
     const token = await tokenFor('packet-admin', 'actual-test-password');
     const res = await request(`${PROJECT_PATH}/claim-gates/BID_LOG_SQFT_DIFFERS_FROM_PROPOSAL/review-packet`, {

@@ -724,13 +724,9 @@ function buildClaimGateReviewPacket(projectName, gateCode) {
     optional_signoff_fields: requiresStructuredSignoff ? ['organization', 'license_id'] : [],
     requires_signoff_for: signedTypes,
     matching_evidence_count: matchingEvidence.length,
-    matching_evidence: matchingEvidence.slice(0, 5).map((row) => ({
-      id: row.id,
-      evidence_type: row.evidence_type,
-      source_ref: row.source_ref,
-      source_file: row.source_file,
-      status: row.status,
-      has_signed_reviewer_metadata: hasStructuredSignedReviewerNotes(row),
+    matching_evidence: matchingEvidence.slice(0, 5).map((row) => hydrateSignedReviewerEvidenceRow(row, {
+      projectName,
+      targetGateCode: gateCode,
     })),
     claim_gate_effect: 'no_claims_cleared',
     use_for_claims: false,
