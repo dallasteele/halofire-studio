@@ -2580,12 +2580,30 @@ describe('HaloFire settings + documentation upload/link API', () => {
         use_for_claims: false,
         claim_gate_effect: 'no_claims_cleared',
       }),
+      expect.objectContaining({
+        consumer: 'nameforge',
+        action: 'download_halofire_consumer_intake_smoke_followup_packet',
+        method: 'GET',
+        href: expect.stringContaining(`/openclaw/sam31/section-to-artifacts-consumer-intake-smoke/${consumerIntakeSmokes.nameforge.evidence_id}/followup-packet`),
+        consumes: 'openclaw.sam31.section_to_artifacts_consumer_intake_smoke.v1',
+        produces: 'halofire.sam31_consumer_intake_smoke_followup_packet.v1',
+        source_section_to_artifacts_consumer_intake_smoke_evidence_id: consumerIntakeSmokes.nameforge.evidence_id,
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
     ]));
     expect(savedSmokeScopedQueue.download_artifacts).toEqual(expect.objectContaining({
       saved_section_to_artifacts_consumer_intake_smoke_evidence: expect.objectContaining({
         artifact_type: 'openclaw.sam31.section_to_artifacts_consumer_intake_smoke.v1',
         evidence_id: consumerIntakeSmokes.nameforge.evidence_id,
         source_ref: expect.stringContaining('nameforge'),
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+      halofire_consumer_intake_smoke_followup_packet: expect.objectContaining({
+        artifact_type: 'halofire.sam31_consumer_intake_smoke_followup_packet.v1',
+        evidence_id: consumerIntakeSmokes.nameforge.evidence_id,
+        href: expect.stringContaining(`/openclaw/sam31/section-to-artifacts-consumer-intake-smoke/${consumerIntakeSmokes.nameforge.evidence_id}/followup-packet`),
         use_for_claims: false,
         claim_gate_effect: 'no_claims_cleared',
       }),
@@ -2596,6 +2614,64 @@ describe('HaloFire settings + documentation upload/link API', () => {
       }),
     }));
 
+    const followupPacketRes = await request(`/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/section-to-artifacts-consumer-intake-smoke/${consumerIntakeSmokes.nameforge.evidence_id}/followup-packet`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(followupPacketRes.status).toBe(200);
+    const followupPacket = await followupPacketRes.json();
+    expect(followupPacket).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.sam31_consumer_intake_smoke_followup_packet.v1',
+      status: 'requires_employee_sprinkler_followup_review',
+      project_name: projectName,
+      source_consumer: 'nameforge',
+      target_application: 'halo_fire',
+      source_section_to_artifacts_consumer_intake_smoke_evidence_id: consumerIntakeSmokes.nameforge.evidence_id,
+      source_sam31_actual_value_replacement_evidence_id: replacements.nameforge.evidence_id,
+      observed_vector_overlay_count: 1,
+      observed_model_3d_candidate_count: 1,
+      observed_segment_count: 1,
+      observed_object_hypothesis_count: 1,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(followupPacket.supported_sprinkler_review_lanes).toEqual(expect.arrayContaining([
+      'room_boundary_visual_audit',
+      'obstruction_or_clash_review',
+      'vector_overlay_generation',
+      'model_3d_candidate_generation',
+    ]));
+    expect(followupPacket.issue_seeds).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        artifact_type: 'halofire.sam31_consumer_intake_smoke_followup_queue_item.v1',
+        issue_type: 'sam31_consumer_intake_room_boundary_visual_audit',
+        supported_sprinkler_review_lane: 'room_boundary_visual_audit',
+        source_section_to_artifacts_consumer_intake_smoke_evidence_id: consumerIntakeSmokes.nameforge.evidence_id,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+      expect.objectContaining({
+        artifact_type: 'halofire.sam31_consumer_intake_smoke_followup_queue_item.v1',
+        issue_type: 'sam31_consumer_intake_obstruction_clash_review',
+        supported_sprinkler_review_lane: 'obstruction_or_clash_review',
+        source_section_to_artifacts_consumer_intake_smoke_evidence_id: consumerIntakeSmokes.nameforge.evidence_id,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    ]));
+    expect(followupPacket.source_refs).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        evidence_id: consumerIntakeSmokes.nameforge.evidence_id,
+        evidence_type: 'openclaw_sam31_section_to_artifacts_consumer_intake_smoke',
+      }),
+    ]));
+    expect(followupPacket.blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'fabrication_ready',
+      'AHJ_approval',
+      'professional_approval',
+      'manufacturer_exact',
+      'AutoSprink_parity',
+    ]));
+
     const tool = await (await request('/api/openclaw/sam31/tool', {
       headers: { Authorization: `Bearer ${token}` },
     })).json();
@@ -2605,6 +2681,15 @@ describe('HaloFire settings + documentation upload/link API', () => {
       consumes: 'openclaw.sam31.section_to_artifacts_consumer_handoff.v1',
       produces: 'openclaw.sam31.section_to_artifacts_consumer_intake_smoke.v1',
       evidence_record_type: 'openclaw_sam31_section_to_artifacts_consumer_intake_smoke',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(tool.halofire_api_actions.consumer_intake_smoke_followup_packet).toEqual(expect.objectContaining({
+      method: 'GET',
+      href_template: '/api/projects/{projectName}/openclaw/sam31/section-to-artifacts-consumer-intake-smoke/{evidenceId}/followup-packet',
+      consumes: 'openclaw.sam31.section_to_artifacts_consumer_intake_smoke.v1',
+      produces: 'halofire.sam31_consumer_intake_smoke_followup_packet.v1',
+      target_application: 'halo_fire',
       use_for_claims: false,
       claim_gate_effect: 'no_claims_cleared',
     }));

@@ -213,6 +213,10 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toContain('downloadSam31ActualValueFilteredConsumerIntakeSmokeEvidence');
     expect(html).toContain('data-sam31-actual-value-filtered-consumer-intake-smoke-download');
     expect(html).toContain('data-sam31-actual-value-clear-consumer-intake-smoke-filter');
+    expect(html).toContain('Download HaloFire smoke follow-up packet');
+    expect(html).toContain('downloadHalofireSam31ConsumerIntakeSmokeFollowupPacket');
+    expect(html).toContain('data-sam31-consumer-intake-smoke-followup-packet');
+    expect(html).toContain('halofire.sam31_consumer_intake_smoke_followup_packet.v1');
     expect(html).toContain('permit_ready');
     expect(html).toContain('AutoSprink_parity');
     expect(html).toContain('brand_ready');
