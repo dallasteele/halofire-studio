@@ -3398,6 +3398,9 @@ function buildOpenClawSam31ActualValueResolverQueueReadback(projectName, options
   const sourceProjectRoute = `/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/actual-value-resolver-queue${projectQuery ? `?${projectQuery}` : ''}`;
   const queueHref = `/api/openclaw/sam31/actual-value-resolver-queue?${globalQuery}`;
   const slug = projectName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'halofire-project';
+  const queueReadbackSavedSmokeSuffix = consumerIntakeSmokeEvidenceFilterId
+    ? `-saved-smoke-${consumerIntakeSmokeEvidenceFilterId}`
+    : '';
   const sourceContractQuery = [
     `projectName=${encodeURIComponent(projectName)}`,
     effectiveConsumer ? `consumer=${encodeURIComponent(effectiveConsumer)}` : '',
@@ -3420,7 +3423,7 @@ function buildOpenClawSam31ActualValueResolverQueueReadback(projectName, options
     filtered_queue_readback: {
       artifact_type: 'openclaw.sam31.actual_value_resolver_queue_readback.v1',
       href: queueHref,
-      download_name: `${slug}-sam31-actual-value-resolver-queue${replacementReadbackEvidenceFilterId ? `-saved-readback-${replacementReadbackEvidenceFilterId}` : ''}${serviceDescriptorEvidenceFilterId ? `-saved-service-descriptor-${serviceDescriptorEvidenceFilterId}` : ''}.json`,
+      download_name: `${slug}-sam31-actual-value-resolver-queue${replacementReadbackEvidenceFilterId ? `-saved-readback-${replacementReadbackEvidenceFilterId}` : ''}${serviceDescriptorEvidenceFilterId ? `-saved-service-descriptor-${serviceDescriptorEvidenceFilterId}` : ''}${queueReadbackSavedSmokeSuffix}.json`,
       use_for_claims: false,
       claim_gate_effect: 'no_claims_cleared',
     },

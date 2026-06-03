@@ -2757,6 +2757,7 @@ describe('HaloFire settings + documentation upload/link API', () => {
       }),
       filtered_queue_readback: expect.objectContaining({
         href: expect.stringContaining(`consumerIntakeSmokeEvidenceId=${consumerIntakeSmokes.nameforge.evidence_id}`),
+        download_name: expect.stringContaining(`saved-smoke-${consumerIntakeSmokes.nameforge.evidence_id}`),
         use_for_claims: false,
         claim_gate_effect: 'no_claims_cleared',
       }),
