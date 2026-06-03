@@ -12,6 +12,16 @@ describe('HaloFire Settings evidence wizard signed reviewer workflow', () => {
     expect(html).toContain('downloadClaimGateReviewPacket');
   });
 
+  it('can prefill the signed reviewer workflow from Workbench query parameters', () => {
+    const html = fs.readFileSync(SETTINGS_HTML, 'utf8');
+    expect(html).toContain('prefillEvidenceWizardFromUrl');
+    expect(html).toContain('URLSearchParams');
+    expect(html).toContain("params.get('project')");
+    expect(html).toContain("params.get('gate')");
+    expect(html).toContain("params.get('evidenceId')");
+    expect(html).toContain('wizExistingEvidence');
+  });
+
   it('surfaces room-boundary floor-plan override actions in the signed settings portal', () => {
     const html = fs.readFileSync(SETTINGS_HTML, 'utf8');
     expect(html).toContain('Room-Boundary Floor-Plan Overrides');

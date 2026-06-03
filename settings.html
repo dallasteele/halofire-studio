@@ -230,6 +230,7 @@ let settingsCatalogLedgerRows = [];
 let settingsSam31ActualValueRows = [];
 let settingsRoomBoundaryFloorPlanOverrideRows = [];
 let lastSettingsSam31ActualValueResolverReplay = null;
+const wizardUrlPrefill = prefillEvidenceWizardFromUrl();
 const SETTINGS_CATALOG_LEDGER_FAMILIES = [
   'family:pipe_steel_sch40_2p0in',
   'family:fitting_tee_2p0in',
@@ -333,6 +334,29 @@ function selectedEvidenceNeedsSignoff() {
   return Boolean(gate && (gate.requires_signoff_for || []).includes($('wizType').value));
 }
 
+function prefillEvidenceWizardFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  return {
+    project: params.get('project'),
+    gate: params.get('gate'),
+    evidenceId: params.get('evidenceId'),
+  };
+}
+
+function applyWizardUrlPrefill() {
+  if (wizardUrlPrefill.gate && wizardState.gateMap.has(wizardUrlPrefill.gate)) {
+    $('wizGate').value = wizardUrlPrefill.gate;
+  }
+  syncWizardGateForm();
+  if (wizardUrlPrefill.evidenceId) {
+    const option = Array.from($('wizExistingEvidence').options || []).find((entry) => entry.value === wizardUrlPrefill.evidenceId);
+    if (option) {
+      $('wizExistingEvidence').value = wizardUrlPrefill.evidenceId;
+      $('wizPacketStatus').textContent = `Prefilled from Workbench for evidence #${wizardUrlPrefill.evidenceId}. Resolve the gate or download the packet for this signed reviewer lane.`;
+    }
+  }
+}
+
 function syncWizardSignoff() {
   const needs = selectedEvidenceNeedsSignoff();
   $('wizSignoff').style.borderColor = needs ? 'rgba(255,213,79,.5)' : 'var(--border)';
@@ -373,7 +397,7 @@ async function loadWizard(projectName) {
         <div style="margin-top:8px"><button data-gate-pick="${escapeHtml(gate.code)}">Use this gate</button></div>
       </div>`).join('') || '<span class="muted">no gates for this project</span>';
     $('wizGate').innerHTML = (data.gates || []).map((gate) => `<option value="${gate.code}">${gate.code}</option>`).join('');
-    syncWizardGateForm();
+    applyWizardUrlPrefill();
     $('wizSubmit').disabled = !wizardState.canWrite;
     $('wizGates').querySelectorAll('[data-gate-pick]').forEach((btn) => btn.addEventListener('click', () => {
       $('wizGate').value = btn.getAttribute('data-gate-pick');
@@ -469,7 +493,9 @@ async function initWizard() {
     const projects = await api('/projects');
     wizardState.projects = projects || [];
     $('wizProject').innerHTML = wizardState.projects.map((p) => `<option value="${p.name}">${p.name}</option>`).join('');
-    const defaultProject = wizardState.projects.find((p) => p.name === 'Home Depot - Rexburg ID') || wizardState.projects[0];
+    const defaultProject = wizardState.projects.find((p) => p.name === wizardUrlPrefill.project)
+      || wizardState.projects.find((p) => p.name === 'Home Depot - Rexburg ID')
+      || wizardState.projects[0];
     if (!defaultProject) {
       $('wizSummary').textContent = 'no projects available';
       return;
