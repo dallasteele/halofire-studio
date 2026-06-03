@@ -912,6 +912,39 @@ function sam31ActualValueReplacementFromEvidence(row) {
   }
 }
 
+function sam31ActualValueServiceDescriptorPrefillContext(serviceDescriptorEvidence = null, serviceDescriptorAction = null) {
+  const evidenceId = serviceDescriptorEvidence?.evidence_id
+    || serviceDescriptorAction?.source_openclaw_sam31_actual_value_service_descriptor_evidence_id
+    || null;
+  if (!evidenceId && !serviceDescriptorAction) return {};
+  return {
+    source_openclaw_sam31_actual_value_service_descriptor_evidence_id: evidenceId,
+    source_actual_value_service_descriptor_ref: serviceDescriptorEvidence?.source_ref || serviceDescriptorAction?.evidence_source_ref || null,
+    source_actual_value_service_descriptor_file: serviceDescriptorEvidence?.source_file || serviceDescriptorAction?.evidence_source_file || null,
+    actual_value_service_descriptor_action: serviceDescriptorAction || null,
+  };
+}
+
+function sam31ActualValueReplacementPrefillWithServiceDescriptor(prefill = {}, serviceDescriptorEvidence = null, serviceDescriptorAction = null) {
+  const descriptorContext = sam31ActualValueServiceDescriptorPrefillContext(serviceDescriptorEvidence, serviceDescriptorAction);
+  if (!descriptorContext.source_openclaw_sam31_actual_value_service_descriptor_evidence_id && !descriptorContext.actual_value_service_descriptor_action) {
+    return prefill || {};
+  }
+  return {
+    ...(prefill || {}),
+    ...descriptorContext,
+    source_refs: uniqueStrings([
+      ...(Array.isArray(prefill?.source_refs) ? prefill.source_refs : []),
+      descriptorContext.source_actual_value_service_descriptor_ref,
+      descriptorContext.source_actual_value_service_descriptor_file,
+      descriptorContext.actual_value_service_descriptor_action?.href,
+    ].filter(Boolean)),
+    use_for_claims: false,
+    claim_gate_effect: 'no_claims_cleared',
+    no_claim_gates_cleared: true,
+  };
+}
+
 function latestSam31ActualValueReplacementEvidenceByReview(projectName) {
   const rows = db
     .prepare(`SELECT * FROM project_evidence
@@ -941,8 +974,23 @@ function latestSam31ActualValueReplacementEvidenceByReview(projectName) {
         ...(Array.isArray(replacement.actual_value_replacement_prefill?.source_refs) ? replacement.actual_value_replacement_prefill.source_refs : []),
         replacement.source_ref,
         replacement.replacement_values_source_ref,
+        replacement.source_actual_value_service_descriptor_ref,
+        replacement.source_actual_value_service_descriptor_file,
+        replacement.actual_value_service_descriptor_action?.href,
         row.source_ref,
       ].filter(Boolean)),
+      source_openclaw_sam31_actual_value_service_descriptor_evidence_id: replacement.source_openclaw_sam31_actual_value_service_descriptor_evidence_id
+        || replacement.actual_value_replacement_prefill?.source_openclaw_sam31_actual_value_service_descriptor_evidence_id
+        || null,
+      source_actual_value_service_descriptor_ref: replacement.source_actual_value_service_descriptor_ref
+        || replacement.actual_value_replacement_prefill?.source_actual_value_service_descriptor_ref
+        || null,
+      source_actual_value_service_descriptor_file: replacement.source_actual_value_service_descriptor_file
+        || replacement.actual_value_replacement_prefill?.source_actual_value_service_descriptor_file
+        || null,
+      actual_value_service_descriptor_action: replacement.actual_value_service_descriptor_action
+        || replacement.actual_value_replacement_prefill?.actual_value_service_descriptor_action
+        || null,
       actual_value_replacement_prefill: replacement.actual_value_replacement_prefill || null,
       acceptable_actual_evidence: Array.isArray(replacement.acceptable_actual_evidence) ? replacement.acceptable_actual_evidence : [],
       llm_observation_count: Number(replacement.llm_observation_count || replacement.replacement_summary?.llm_observation_count || 0) || 0,
@@ -1241,6 +1289,28 @@ function normalizeSam31ActualValueReplacementIntake(projectName, body, reviewRow
   const prefill = body?.actual_value_replacement_prefill && typeof body.actual_value_replacement_prefill === 'object' && !Array.isArray(body.actual_value_replacement_prefill)
     ? body.actual_value_replacement_prefill
     : (item?.actual_value_replacement_prefill || buildSam31ActualValueReplacementPrefill(projectName, item || {}, reviewRow));
+  const actualValueServiceDescriptorAction = body?.actual_value_service_descriptor_action && typeof body.actual_value_service_descriptor_action === 'object' && !Array.isArray(body.actual_value_service_descriptor_action)
+    ? body.actual_value_service_descriptor_action
+    : (
+        prefill.actual_value_service_descriptor_action && typeof prefill.actual_value_service_descriptor_action === 'object' && !Array.isArray(prefill.actual_value_service_descriptor_action)
+          ? prefill.actual_value_service_descriptor_action
+          : (item?.actual_value_service_descriptor_action || null)
+      );
+  const serviceDescriptorEvidenceId = body?.source_openclaw_sam31_actual_value_service_descriptor_evidence_id
+    || prefill.source_openclaw_sam31_actual_value_service_descriptor_evidence_id
+    || item?.source_openclaw_sam31_actual_value_service_descriptor_evidence_id
+    || actualValueServiceDescriptorAction?.source_openclaw_sam31_actual_value_service_descriptor_evidence_id
+    || null;
+  const serviceDescriptorRef = body?.source_actual_value_service_descriptor_ref
+    || prefill.source_actual_value_service_descriptor_ref
+    || item?.latest_actual_value_service_descriptor_evidence?.source_ref
+    || actualValueServiceDescriptorAction?.evidence_source_ref
+    || null;
+  const serviceDescriptorFile = body?.source_actual_value_service_descriptor_file
+    || prefill.source_actual_value_service_descriptor_file
+    || item?.latest_actual_value_service_descriptor_evidence?.source_file
+    || actualValueServiceDescriptorAction?.evidence_source_file
+    || null;
   const replacementValuesSourceRef = String(
     body?.replacement_values_source_ref
       || prefill.replacement_values_source_ref
@@ -1275,6 +1345,9 @@ function normalizeSam31ActualValueReplacementIntake(projectName, body, reviewRow
     ...(Array.isArray(prefill.source_refs) ? prefill.source_refs : []),
     sourceRef,
     replacementValuesSourceRef,
+    serviceDescriptorRef,
+    serviceDescriptorFile,
+    actualValueServiceDescriptorAction?.href,
     item?.replacement_ref,
     item?.persisted_review_packet_ref,
     review.replacement_ref,
@@ -1290,6 +1363,10 @@ function normalizeSam31ActualValueReplacementIntake(projectName, body, reviewRow
     source_pdf_boundary_evidence_id: body?.source_pdf_boundary_evidence_id || item?.source_pdf_boundary_evidence_id || review.source_pdf_boundary_evidence_id || null,
     source_openclaw_sam31_consumer_review_evidence_id: sourceReviewEvidenceId,
     source_openclaw_sam31_consumer_smoke_evidence_id: body?.source_openclaw_sam31_consumer_smoke_evidence_id || item?.source_openclaw_sam31_consumer_smoke_evidence_id || review.source_openclaw_sam31_consumer_smoke_evidence_id || null,
+    source_openclaw_sam31_actual_value_service_descriptor_evidence_id: serviceDescriptorEvidenceId,
+    source_actual_value_service_descriptor_ref: serviceDescriptorRef,
+    source_actual_value_service_descriptor_file: serviceDescriptorFile,
+    actual_value_service_descriptor_action: actualValueServiceDescriptorAction,
     accepted_queue_id: body?.accepted_queue_id || item?.accepted_queue_id || review.accepted_queue_id || null,
     persisted_review_packet_ref: body?.persisted_review_packet_ref || item?.persisted_review_packet_ref || review.persisted_review_packet_ref || null,
     replacement_ref: body?.replacement_ref || item?.replacement_ref || review.replacement_ref || null,
@@ -1308,6 +1385,10 @@ function normalizeSam31ActualValueReplacementIntake(projectName, body, reviewRow
       ]),
       actual_value_replacement_prefill: {
       ...prefill,
+      source_openclaw_sam31_actual_value_service_descriptor_evidence_id: serviceDescriptorEvidenceId,
+      source_actual_value_service_descriptor_ref: serviceDescriptorRef,
+      source_actual_value_service_descriptor_file: serviceDescriptorFile,
+      actual_value_service_descriptor_action: actualValueServiceDescriptorAction,
       source_file: prefill.source_file || sourceFile || null,
       source_ref: prefill.source_ref || sourceRef,
       replacement_values_source_ref: prefill.replacement_values_source_ref || replacementValuesSourceRef || sourceRef,
@@ -1710,6 +1791,12 @@ function buildOpenClawSam31ActualValueResolverQueue(projectName, options = {}) {
       const latestReplacement = latestReplacementByReview.get(Number(item.source_openclaw_sam31_consumer_review_evidence_id)) || null;
       const itemServiceDescriptorEvidence = requestedServiceDescriptorEvidence
         || latestOpenClawSam31ActualValueServiceDescriptorEvidence(projectName, item.consumer);
+      const itemServiceDescriptorAction = openClawSam31ActualValueServiceDescriptorAction(projectName, item.consumer, itemServiceDescriptorEvidence);
+      const actualValueReplacementPrefill = sam31ActualValueReplacementPrefillWithServiceDescriptor(
+        item.actual_value_replacement_prefill || null,
+        itemServiceDescriptorEvidence,
+        itemServiceDescriptorAction,
+      );
       const status = latestReplacement ? 'actual_value_evidence_recorded' : 'requires_employee_actual_value_update';
       return {
         artifact_type: 'openclaw.sam31.actual_value_resolver_queue_item.v1',
@@ -1725,7 +1812,7 @@ function buildOpenClawSam31ActualValueResolverQueue(projectName, options = {}) {
         source_openclaw_sam31_consumer_smoke_evidence_id: item.source_openclaw_sam31_consumer_smoke_evidence_id,
         source_openclaw_sam31_actual_value_service_descriptor_evidence_id: itemServiceDescriptorEvidence?.evidence_id || null,
         latest_actual_value_service_descriptor_evidence: itemServiceDescriptorEvidence,
-        actual_value_service_descriptor_action: openClawSam31ActualValueServiceDescriptorAction(projectName, item.consumer, itemServiceDescriptorEvidence),
+        actual_value_service_descriptor_action: itemServiceDescriptorAction,
         source_openclaw_sam31_actual_value_resolver_contract_evidence_id: latestContractEvidence?.evidence_id || null,
         latest_actual_value_resolver_contract_evidence: latestContractEvidence,
         accepted_queue_id: item.accepted_queue_id || null,
@@ -1736,7 +1823,7 @@ function buildOpenClawSam31ActualValueResolverQueue(projectName, options = {}) {
         llm_observation_ids: Array.isArray(item.llm_observation_ids) ? item.llm_observation_ids : [],
         source_llm_observation_ids: Array.isArray(item.source_llm_observation_ids) ? item.source_llm_observation_ids : [],
         replacement_summary: item.replacement_summary || {},
-        actual_value_replacement_prefill: item.actual_value_replacement_prefill || null,
+        actual_value_replacement_prefill: actualValueReplacementPrefill,
         acceptable_actual_evidence: Array.isArray(item.acceptable_actual_evidence) ? item.acceptable_actual_evidence : [],
         evidence_record_type: item.evidence_record_type || 'sam31_actual_value_replacement',
         evidence_record_next_action: item.evidence_record_next_action || 'Record the actual HaloFire documentation evidence that replaces this SAM31 best guess.',
@@ -2047,7 +2134,21 @@ function buildOpenClawSam31ActualValueReplacementReadback(projectName, options =
       recordedEvidence?.replacement_values_source_ref,
       item.replacement_values_source_ref,
       item.replacement_ref,
+      recordedEvidence?.source_actual_value_service_descriptor_ref,
+      recordedEvidence?.source_actual_value_service_descriptor_file,
+      recordedEvidence?.actual_value_service_descriptor_action?.href,
+      prefill?.source_actual_value_service_descriptor_ref,
+      prefill?.source_actual_value_service_descriptor_file,
+      prefill?.actual_value_service_descriptor_action?.href,
     ].filter(Boolean));
+    const serviceDescriptorEvidenceId = recordedEvidence?.source_openclaw_sam31_actual_value_service_descriptor_evidence_id
+      || prefill?.source_openclaw_sam31_actual_value_service_descriptor_evidence_id
+      || item.source_openclaw_sam31_actual_value_service_descriptor_evidence_id
+      || null;
+    const serviceDescriptorAction = recordedEvidence?.actual_value_service_descriptor_action
+      || prefill?.actual_value_service_descriptor_action
+      || item.actual_value_service_descriptor_action
+      || null;
     return {
       artifact_type: 'openclaw.sam31.actual_value_replacement_detail.v1',
       status: recordedEvidence ? 'actual_value_evidence_recorded' : 'requires_employee_actual_value_update',
@@ -2060,6 +2161,16 @@ function buildOpenClawSam31ActualValueReplacementReadback(projectName, options =
       source_openclaw_sam31_consumer_smoke_evidence_id: item.source_openclaw_sam31_consumer_smoke_evidence_id,
       source_openclaw_sam31_actual_value_resolver_contract_evidence_id: item.source_openclaw_sam31_actual_value_resolver_contract_evidence_id || null,
       latest_actual_value_resolver_contract_evidence: item.latest_actual_value_resolver_contract_evidence || null,
+      source_openclaw_sam31_actual_value_service_descriptor_evidence_id: serviceDescriptorEvidenceId,
+      source_actual_value_service_descriptor_ref: recordedEvidence?.source_actual_value_service_descriptor_ref
+        || prefill?.source_actual_value_service_descriptor_ref
+        || item.latest_actual_value_service_descriptor_evidence?.source_ref
+        || null,
+      source_actual_value_service_descriptor_file: recordedEvidence?.source_actual_value_service_descriptor_file
+        || prefill?.source_actual_value_service_descriptor_file
+        || item.latest_actual_value_service_descriptor_evidence?.source_file
+        || null,
+      actual_value_service_descriptor_action: serviceDescriptorAction,
       accepted_queue_id: item.accepted_queue_id || null,
       persisted_review_packet_ref: item.persisted_review_packet_ref || null,
       source_file: recordedEvidence?.source_file || prefill?.source_file || null,
@@ -2129,6 +2240,14 @@ function buildOpenClawSam31ActualValueResolverReplay(projectName, intake, eviden
   )) || null;
   const latestEvidenceId = Number(item?.latest_actual_value_replacement_evidence?.evidence_id || 0) || null;
   const latestContractEvidence = item?.latest_actual_value_resolver_contract_evidence || queue.latest_actual_value_resolver_contract_evidence || null;
+  const serviceDescriptorEvidenceId = intake?.source_openclaw_sam31_actual_value_service_descriptor_evidence_id
+    || item?.source_openclaw_sam31_actual_value_service_descriptor_evidence_id
+    || intake?.actual_value_replacement_prefill?.source_openclaw_sam31_actual_value_service_descriptor_evidence_id
+    || null;
+  const serviceDescriptorAction = intake?.actual_value_service_descriptor_action
+    || intake?.actual_value_replacement_prefill?.actual_value_service_descriptor_action
+    || item?.actual_value_service_descriptor_action
+    || null;
   return {
     artifact_type: 'openclaw.sam31.actual_value_resolver_replay.v1',
     source_route: `/api/openclaw/sam31/actual-value-resolver-queue?projectName=${encodeURIComponent(projectName)}${consumer ? `&consumer=${encodeURIComponent(consumer)}` : ''}`,
@@ -2148,6 +2267,16 @@ function buildOpenClawSam31ActualValueResolverReplay(projectName, intake, eviden
       || queue.source_openclaw_sam31_actual_value_resolver_contract_evidence_id
       || null,
     latest_actual_value_resolver_contract_evidence: latestContractEvidence,
+    source_openclaw_sam31_actual_value_service_descriptor_evidence_id: serviceDescriptorEvidenceId,
+    source_actual_value_service_descriptor_ref: intake?.source_actual_value_service_descriptor_ref
+      || intake?.actual_value_replacement_prefill?.source_actual_value_service_descriptor_ref
+      || item?.latest_actual_value_service_descriptor_evidence?.source_ref
+      || null,
+    source_actual_value_service_descriptor_file: intake?.source_actual_value_service_descriptor_file
+      || intake?.actual_value_replacement_prefill?.source_actual_value_service_descriptor_file
+      || item?.latest_actual_value_service_descriptor_evidence?.source_file
+      || null,
+    actual_value_service_descriptor_action: serviceDescriptorAction,
     source_pdf_boundary_evidence_id: item?.source_pdf_boundary_evidence_id || intake?.source_pdf_boundary_evidence_id || null,
     replacement_values_source_ref: item?.replacement_values_source_ref || intake?.replacement_values_source_ref || null,
     llm_observation_count: item?.llm_observation_count || intake?.llm_observation_count || 0,

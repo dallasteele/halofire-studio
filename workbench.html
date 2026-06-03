@@ -1061,14 +1061,42 @@ function sam31ActualValueReplacementPrefill(row) {
   const prefill = row && row.actual_value_replacement_prefill && typeof row.actual_value_replacement_prefill === 'object'
     ? row.actual_value_replacement_prefill
     : {};
+  const serviceDescriptorEvidence = row.latest_actual_value_service_descriptor_evidence && typeof row.latest_actual_value_service_descriptor_evidence === 'object'
+    ? row.latest_actual_value_service_descriptor_evidence
+    : null;
+  const serviceDescriptorAction = row.actual_value_service_descriptor_action && typeof row.actual_value_service_descriptor_action === 'object'
+    ? row.actual_value_service_descriptor_action
+    : (prefill.actual_value_service_descriptor_action && typeof prefill.actual_value_service_descriptor_action === 'object' ? prefill.actual_value_service_descriptor_action : null);
+  const serviceDescriptorEvidenceId = prefill.source_openclaw_sam31_actual_value_service_descriptor_evidence_id
+    || row.source_openclaw_sam31_actual_value_service_descriptor_evidence_id
+    || serviceDescriptorAction?.source_openclaw_sam31_actual_value_service_descriptor_evidence_id
+    || serviceDescriptorEvidence?.evidence_id
+    || null;
+  const serviceDescriptorRef = prefill.source_actual_value_service_descriptor_ref
+    || serviceDescriptorEvidence?.source_ref
+    || serviceDescriptorAction?.evidence_source_ref
+    || null;
+  const serviceDescriptorFile = prefill.source_actual_value_service_descriptor_file
+    || serviceDescriptorEvidence?.source_file
+    || serviceDescriptorAction?.evidence_source_file
+    || null;
   const sourceRef = prefill.source_ref || row.replacement_values_source_ref || row.replacement_ref || row.persisted_review_packet_ref || `openclaw_sam31_consumer_review:${row.source_openclaw_sam31_consumer_review_evidence_id}`;
   const sourceFile = prefill.source_file || `openclaw_sam31_consumer_review:${row.source_openclaw_sam31_consumer_review_evidence_id || 'missing'}`;
-  const sourceRefs = Array.isArray(prefill.source_refs) && prefill.source_refs.length
+  const sourceRefs = Array.from(new Set([
+    ...((Array.isArray(prefill.source_refs) && prefill.source_refs.length)
     ? prefill.source_refs
-    : [sourceRef].filter(Boolean);
+    : [sourceRef].filter(Boolean)),
+    serviceDescriptorRef,
+    serviceDescriptorFile,
+    serviceDescriptorAction?.href,
+  ].filter(Boolean)));
   return {
     artifact_type: prefill.artifact_type || 'halofire.sam31_actual_value_replacement_prefill.v1',
     status: prefill.status || 'prefill_from_queue_row',
+    source_openclaw_sam31_actual_value_service_descriptor_evidence_id: serviceDescriptorEvidenceId,
+    source_actual_value_service_descriptor_ref: serviceDescriptorRef,
+    source_actual_value_service_descriptor_file: serviceDescriptorFile,
+    actual_value_service_descriptor_action: serviceDescriptorAction,
     source_file: sourceFile,
     source_ref: sourceRef,
     replacement_values_source_ref: prefill.replacement_values_source_ref || row.replacement_values_source_ref || sourceRef,
@@ -1099,6 +1127,10 @@ function sam31ActualValueQueueEvidencePayload(row, index = '') {
     source_pdf_boundary_evidence_id: row.source_pdf_boundary_evidence_id || null,
     source_openclaw_sam31_consumer_review_evidence_id: row.source_openclaw_sam31_consumer_review_evidence_id || null,
     source_openclaw_sam31_consumer_smoke_evidence_id: row.source_openclaw_sam31_consumer_smoke_evidence_id || null,
+    source_openclaw_sam31_actual_value_service_descriptor_evidence_id: prefill.source_openclaw_sam31_actual_value_service_descriptor_evidence_id || row.source_openclaw_sam31_actual_value_service_descriptor_evidence_id || null,
+    source_actual_value_service_descriptor_ref: prefill.source_actual_value_service_descriptor_ref || null,
+    source_actual_value_service_descriptor_file: prefill.source_actual_value_service_descriptor_file || null,
+    actual_value_service_descriptor_action: prefill.actual_value_service_descriptor_action || row.actual_value_service_descriptor_action || null,
     consumer: row.consumer || null,
     accepted_queue_id: row.accepted_queue_id || null,
     persisted_review_packet_ref: row.persisted_review_packet_ref || null,
@@ -1143,12 +1175,25 @@ function renderSam31ActualValueReplacementDetail(row) {
   return `<div class="claims">actual-value evidence #${escapeHtml(evidence.id || evidence.evidence_id || 'recorded')} - evidence_status ${escapeHtml(evidenceStatus)} - source_ref ${escapeHtml(sourceRef)} - replacement_values_source_ref ${escapeHtml(replacementSourceRef)} - claim_gate_effect ${escapeHtml(claimGateEffect)} - no_claim_gates_cleared ${escapeHtml(evidence.no_claim_gates_cleared === false ? 'false' : 'true')}</div>`;
 }
 
+function sam31ActualValueServiceDescriptorPrefillLine(prefill) {
+  const evidenceId = prefill?.source_openclaw_sam31_actual_value_service_descriptor_evidence_id || '';
+  const action = prefill?.actual_value_service_descriptor_action && typeof prefill.actual_value_service_descriptor_action === 'object'
+    ? prefill.actual_value_service_descriptor_action
+    : null;
+  if (!evidenceId && !action) {
+    return '<div class="claims">source_openclaw_sam31_actual_value_service_descriptor_evidence_id missing - source_actual_value_service_descriptor_ref missing - actual_value_service_descriptor_action missing</div>';
+  }
+  const serializedAction = action ? JSON.stringify(action) : '';
+  return `<div class="claims">source_openclaw_sam31_actual_value_service_descriptor_evidence_id ${escapeHtml(evidenceId || 'missing')} - source_actual_value_service_descriptor_ref ${escapeHtml(prefill.source_actual_value_service_descriptor_ref || 'missing')} - source_actual_value_service_descriptor_file ${escapeHtml(prefill.source_actual_value_service_descriptor_file || 'missing')} - actual_value_service_descriptor_action ${escapeHtml(action?.artifact_type || 'openclaw.sam31.actual_value_service_descriptor_action.v1')}<input type="hidden" data-sam31-actual-value-prefill-service-descriptor-evidence-id="${escapeHtml(evidenceId || '')}" value="${escapeHtml(evidenceId || '')}"><input type="hidden" data-sam31-actual-value-prefill-service-descriptor-action="${escapeHtml(serializedAction)}" value="${escapeHtml(serializedAction)}"></div>`;
+}
+
 function renderSam31ActualValueReplacementPrefill(row, index) {
   const prefill = sam31ActualValueReplacementPrefill(row);
   const sourceRefs = Array.isArray(prefill.source_refs) ? prefill.source_refs : [];
   return `<details style="margin-top:8px;border:1px solid rgba(255,213,79,.22);border-radius:8px;padding:8px;background:rgba(255,213,79,.05)">
     <summary class="muted" style="cursor:pointer">Record actual-value replacement from source refs</summary>
     <div class="claims" style="margin-top:6px">actual_value_replacement_prefill ${escapeHtml(prefill.artifact_type)} - ${escapeHtml(prefill.status)} - use_for_claims false - claim_gate_effect no_claims_cleared</div>
+    ${sam31ActualValueServiceDescriptorPrefillLine(prefill)}
     <div class="claims">source_refs: ${sourceRefs.map((ref) => `<span class="chip">${escapeHtml(ref)}</span>`).join('') || '<span class="chip">source refs missing</span>'}</div>
     <div style="display:grid;gap:6px;margin-top:8px">
       <input id="sam31ActualValueSourceRef-${escapeHtml(index)}" data-sam31-actual-value-prefill-source-ref="${escapeHtml(prefill.source_ref || '')}" value="${escapeHtml(prefill.source_ref || '')}" placeholder="source_ref, e.g. Proposal workbook sheet/cell" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
