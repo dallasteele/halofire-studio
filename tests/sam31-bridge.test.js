@@ -377,4 +377,123 @@ describe('SAM 3.1 local bridge contract', () => {
     expect(body.blocked_claims).toEqual(expect.arrayContaining(['permit_ready', 'AHJ_approval', 'PE_review', 'AutoSprink_parity']));
     expect(body.limitations.join(' ')).toMatch(/temporary/i);
   });
+
+  it('normalizes supplied section-derived vector and 3D artifacts for shared OpenClaw consumers', async () => {
+    const response = await fetch(`${baseUrl}/vision/sam31/extrapolate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        project_ref: 'nameforge:1881 exterior sign zone',
+        application: 'nameforge',
+        source_ref: 'nameforge://asset/1881-storefront-photo#sign-zone',
+        image_ref: 'nameforge://image/1881-storefront-photo.png',
+        coordinate_frame_ref: 'nameforge-2d-image-frame',
+        unit: 'px',
+        sections: [{
+          id: 'section-sign-zone-1881',
+          semantic_label: 'brand_signage_zone_candidate',
+          polygon: [[0, 0], [80, 0], [80, 40], [0, 40], [0, 0]],
+          confidence: 0.51,
+        }],
+        object_hypotheses: [{
+          id: 'object:sign-zone-1881',
+          segment_id: 'section-sign-zone-1881',
+          semantic_label: 'exterior_signage_candidate',
+          confidence: 0.48,
+        }],
+        vector_overlays: [{
+          id: 'vector:supplied-sign-zone-1881',
+          segment_id: 'section-sign-zone-1881',
+          svg_path: 'M 0 0 L 80 0 L 80 40 L 0 40 Z',
+          source_refs: ['nameforge://designer/vector-draft/1881-sign-zone'],
+        }],
+        model_3d_candidates: [{
+          id: 'model3d:supplied-sign-zone-1881',
+          segment_id: 'section-sign-zone-1881',
+          primitive: 'extruded_signage_panel',
+          source_refs: ['nameforge://designer/model-draft/1881-sign-zone'],
+        }],
+      }),
+    });
+
+    expect(response.status).toBe(200);
+    const body = await response.json();
+
+    expect(body.section_to_artifacts_contract).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.section_to_artifacts_contract.v1',
+      status: 'internal_alpha_ready',
+      source_runtime: 'halofire-local-sam31-bridge',
+      supported_applications: ['halo_fire', 'landscout', 'nameforge'],
+      consumes: expect.arrayContaining(['sections', 'llm_observations', 'object_hypotheses']),
+      produces: expect.arrayContaining(['object_hypotheses', 'vector_overlays', 'model_3d_candidates']),
+      temporary_value_policy: 'best_guess_until_employee_replaced',
+      use_for_claims: false,
+      no_claim_gates_cleared: true,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(body.perception_packet.section_to_artifacts_contract_ref).toBe('openclaw.sam31.section_to_artifacts_contract.v1');
+    expect(body.product_review_queue_item.section_to_artifacts_contract_ref).toBe('openclaw.sam31.section_to_artifacts_contract.v1');
+
+    expect(body.perception_packet.vector_overlays[0]).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.vector_overlay.v1',
+      id: 'vector:supplied-sign-zone-1881',
+      segment_id: 'section-sign-zone-1881',
+      artifact_format: 'svg',
+      source_runtime: 'halofire-local-sam31-bridge',
+      coordinate_frame_ref: 'nameforge-2d-image-frame',
+      unit: 'px',
+      source_llm_observation_ids: ['llm:object:sign-zone-1881'],
+      supported_applications: ['halo_fire', 'landscout', 'nameforge'],
+      supported_evidence_lanes: expect.arrayContaining([
+        'vector_overlay_generation',
+        'spatial_observation_correction_loop',
+      ]),
+      temporary_value_policy: 'best_guess_until_employee_replaced',
+      use_for_claims: false,
+      no_claim_gates_cleared: true,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(body.perception_packet.vector_overlays[0].source_refs).toEqual(expect.arrayContaining([
+      'nameforge://designer/vector-draft/1881-sign-zone',
+      'nameforge://asset/1881-storefront-photo#sign-zone',
+    ]));
+    expect(body.perception_packet.vector_overlays[0].blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'AutoSprink_parity',
+      'manufacturer_exact',
+    ]));
+
+    expect(body.perception_packet.model_3d_candidates[0]).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.model_3d_candidate.v1',
+      id: 'model3d:supplied-sign-zone-1881',
+      segment_id: 'section-sign-zone-1881',
+      primitive: 'extruded_signage_panel',
+      source_runtime: 'halofire-local-sam31-bridge',
+      coordinate_frame_ref: 'nameforge-2d-image-frame',
+      unit: 'px',
+      source_llm_observation_ids: ['llm:object:sign-zone-1881'],
+      supported_applications: ['halo_fire', 'landscout', 'nameforge'],
+      supported_evidence_lanes: expect.arrayContaining([
+        'model_3d_candidate_generation',
+        'spatial_observation_correction_loop',
+      ]),
+      temporary_value_policy: 'best_guess_until_employee_replaced',
+      use_for_claims: false,
+      no_claim_gates_cleared: true,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(body.perception_packet.model_3d_candidates[0].source_refs).toEqual(expect.arrayContaining([
+      'nameforge://designer/model-draft/1881-sign-zone',
+      'nameforge://asset/1881-storefront-photo#sign-zone',
+    ]));
+
+    expect(body.extrapolation_index[0]).toEqual(expect.objectContaining({
+      section_id: 'section-sign-zone-1881',
+      vector_overlay_ids: ['vector:supplied-sign-zone-1881'],
+      model_3d_candidate_ids: ['model3d:supplied-sign-zone-1881'],
+      section_to_artifacts_contract_ref: 'openclaw.sam31.section_to_artifacts_contract.v1',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+  });
 });
