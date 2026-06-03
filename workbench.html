@@ -1096,6 +1096,9 @@ async function refreshEvidence() {
   document.querySelectorAll('[data-sam31-consumer-intake-smoke-sprinkler-review-decision]').forEach((button) => {
     button.onclick = () => saveHalofireSam31ConsumerIntakeSmokeSprinklerReviewDecision(button.dataset.sam31ConsumerIntakeSmokeSprinklerReviewDecision);
   });
+  document.querySelectorAll('[data-sam31-consumer-intake-smoke-preliminary-replay-inputs]').forEach((button) => {
+    button.onclick = () => downloadHalofireSam31ConsumerIntakeSmokePreliminaryReplayInputs(button.dataset.sam31ConsumerIntakeSmokePreliminaryReplayInputs);
+  });
   document.querySelectorAll('[data-sam31-consumer-intake-smoke-followup-review]').forEach((button) => {
     button.onclick = () => saveHalofireSam31ConsumerIntakeSmokeFollowupReview(button.dataset.sam31ConsumerIntakeSmokeFollowupReview);
   });
@@ -1456,7 +1459,7 @@ function renderSam31ActualValueQueueItem(row, index) {
   const smokeSprinklerReviewTargetId = escapeHtml(row.source_section_to_artifacts_consumer_intake_smoke_evidence_id || '');
   const smokeSprinklerReviewId = `sam31ConsumerIntakeSmokeSprinklerReview-${smokeSprinklerReviewTargetId}`;
   const smokeSprinklerReviewControls = latestSmokeFollowupReview
-    ? `<details style="margin-top:5px"><summary class="muted" style="cursor:pointer">Save HaloFire smoke sprinkler review decision</summary><div style="display:grid;gap:6px;margin-top:7px"><select id="${smokeSprinklerReviewId}-issue" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px"><option value="sam31_consumer_intake_room_boundary_visual_audit|room_boundary_visual_audit">Room-boundary visual audit</option><option value="sam31_consumer_intake_obstruction_clash_review|obstruction_or_clash_review">Obstruction/clash review</option></select><select id="${smokeSprinklerReviewId}-decision" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px"><option value="replaced">Replaced temporary sprinkler values</option><option value="accepted">Accepted for internal-alpha sprinkler review</option><option value="rejected">Rejected smoke sprinkler row</option></select><input id="${smokeSprinklerReviewId}-reviewer" placeholder="reviewer_name" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px"><input id="${smokeSprinklerReviewId}-ref" placeholder="review_ref" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px"><input id="${smokeSprinklerReviewId}-screenshot" placeholder="screenshot_ref" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px"><input id="${smokeSprinklerReviewId}-console" placeholder="console_log_ref" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px"><textarea id="${smokeSprinklerReviewId}-values" placeholder='reviewed_values JSON object: {"obstruction_candidates":[],"sleeve_or_firestop_candidates":[],"confidence":0.66}' style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px;height:74px"></textarea><textarea id="${smokeSprinklerReviewId}-notes" placeholder="notes" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px;height:38px"></textarea><button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#0369a1" data-sam31-consumer-intake-smoke-sprinkler-review-decision="${smokeSprinklerReviewTargetId}">Save HaloFire smoke sprinkler review decision</button><div class="muted" id="${smokeSprinklerReviewId}-status" style="font-size:11px"></div><span class="muted" style="font-size:10px">/sprinkler-review-packet/decision - employee_sam31_smoke_sprinkler_review_payload - halofire.sam31_sprinkler_review_decision.v1 - use_for_claims false</span></div></details>`
+    ? `<details style="margin-top:5px"><summary class="muted" style="cursor:pointer">Save HaloFire smoke sprinkler review decision</summary><div style="display:grid;gap:6px;margin-top:7px"><select id="${smokeSprinklerReviewId}-issue" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px"><option value="sam31_consumer_intake_room_boundary_visual_audit|room_boundary_visual_audit">Room-boundary visual audit</option><option value="sam31_consumer_intake_obstruction_clash_review|obstruction_or_clash_review">Obstruction/clash review</option></select><select id="${smokeSprinklerReviewId}-decision" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px"><option value="replaced">Replaced temporary sprinkler values</option><option value="accepted">Accepted for internal-alpha sprinkler review</option><option value="rejected">Rejected smoke sprinkler row</option></select><input id="${smokeSprinklerReviewId}-reviewer" placeholder="reviewer_name" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px"><input id="${smokeSprinklerReviewId}-ref" placeholder="review_ref" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px"><input id="${smokeSprinklerReviewId}-screenshot" placeholder="screenshot_ref" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px"><input id="${smokeSprinklerReviewId}-console" placeholder="console_log_ref" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px"><textarea id="${smokeSprinklerReviewId}-values" placeholder='reviewed_values JSON object: {"obstruction_candidates":[],"sleeve_or_firestop_candidates":[],"confidence":0.66}' style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px;height:74px"></textarea><textarea id="${smokeSprinklerReviewId}-notes" placeholder="notes" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px;height:38px"></textarea><button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#0369a1" data-sam31-consumer-intake-smoke-sprinkler-review-decision="${smokeSprinklerReviewTargetId}">Save HaloFire smoke sprinkler review decision</button><input id="${smokeSprinklerReviewId}-decisionEvidenceId" placeholder="sprinkler_review_decision_evidence_id" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px"><button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#0f766e" data-sam31-consumer-intake-smoke-preliminary-replay-inputs="${smokeSprinklerReviewTargetId}">Download HaloFire smoke preliminary replay inputs</button><div class="muted" id="${smokeSprinklerReviewId}-status" style="font-size:11px"></div><span class="muted" style="font-size:10px">/sprinkler-review-packet/decision - /preliminary-replay-inputs - employee_sam31_smoke_sprinkler_review_payload - halofire.sam31_sprinkler_review_decision.v1 - halofire.sam31_sprinkler_review_preliminary_replay_inputs.v1 - use_for_claims false</span></div></details>`
     : '';
   const smokeFollowupResolverLine = latestSmokeFollowupReview
     ? `latest_halofire_sam31_consumer_intake_smoke_followup_review_decision #${escapeHtml(latestSmokeFollowupReview.evidence_id || 'missing')} ${escapeHtml(latestSmokeFollowupReview.review_decision || 'reviewed')} - source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id ${escapeHtml(latestSmokeFollowupReview.evidence_id || 'missing')} - sam31_consumer_intake_smoke_followup_resolver_queue_items ${escapeHtml(smokeFollowupResolverRows.length)} - ${smokeFollowupResolverRows.map((resolverRow) => `<span class="chip">${escapeHtml(resolverRow.supported_sprinkler_review_lane || resolverRow.issue_type || 'followup_resolver')} ${escapeHtml(resolverRow.status || 'ready_for_internal_alpha_sprinkler_review')}</span>`).join('')} <button class="go" type="button" style="padding:5px 8px;font-size:10px;margin:2px;background:#0369a1" data-sam31-consumer-intake-smoke-sprinkler-review-packet="${escapeHtml(row.source_section_to_artifacts_consumer_intake_smoke_evidence_id || '')}">Download HaloFire smoke sprinkler review packet</button> <span class="chip">halofire.sam31_sprinkler_review_packet.v1</span>${smokeSprinklerReviewControls}`
@@ -1710,10 +1713,38 @@ async function saveHalofireSam31ConsumerIntakeSmokeSprinklerReviewDecision(evide
         notes: document.getElementById(`${fieldPrefix}-notes`)?.value.trim() || '',
       }),
     });
+    const decisionEvidenceInput = document.getElementById(`${fieldPrefix}-decisionEvidenceId`);
+    if (decisionEvidenceInput) decisionEvidenceInput.value = saved.id || saved.evidence_id || '';
     if (status) status.textContent = 'Saved halofire_sam31_sprinkler_review_decision evidence #' + saved.id + ' from smoke sprinkler packet; claims still blocked.';
     await refreshEvidence();
     await refreshResolverQueue();
     await refreshSam31ActualValueQueue();
+    const refreshedDecisionEvidenceInput = document.getElementById(`${fieldPrefix}-decisionEvidenceId`);
+    if (refreshedDecisionEvidenceInput) refreshedDecisionEvidenceInput.value = saved.id || saved.evidence_id || '';
+    const refreshedStatus = document.getElementById(`${fieldPrefix}-status`) || document.getElementById('sam31ActualValueQueueStatus');
+    if (refreshedStatus) refreshedStatus.textContent = 'Saved halofire_sam31_sprinkler_review_decision evidence #' + saved.id + ' from smoke sprinkler packet; preliminary replay inputs are ready to download; claims still blocked.';
+  } catch (err) {
+    if (status) status.textContent = 'Error: ' + err.message;
+  }
+}
+
+async function downloadHalofireSam31ConsumerIntakeSmokePreliminaryReplayInputs(evidenceId = '') {
+  const targetId = String(evidenceId || '').trim();
+  const fieldPrefix = `sam31ConsumerIntakeSmokeSprinklerReview-${targetId}`;
+  const status = document.getElementById(`${fieldPrefix}-status`) || document.getElementById('sam31ActualValueQueueStatus') || document.getElementById('evidence');
+  try {
+    if (!targetId) throw new Error('Saved SAM31 consumer intake smoke evidence id is required.');
+    const decisionEvidenceId = String(document.getElementById(`${fieldPrefix}-decisionEvidenceId`)?.value || '').trim();
+    if (!decisionEvidenceId) throw new Error('sprinkler_review_decision_evidence_id is required for preliminary replay inputs.');
+    const packet = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/openclaw/sam31/section-to-artifacts-consumer-intake-smoke/' + encodeURIComponent(targetId) + '/sprinkler-review-packet/decision/' + encodeURIComponent(decisionEvidenceId) + '/preliminary-replay-inputs');
+    if (packet.artifact_type !== 'halofire.sam31_sprinkler_review_preliminary_replay_inputs.v1') {
+      throw new Error('Unexpected HaloFire smoke preliminary replay inputs artifact type');
+    }
+    downloadJsonPacket(
+      packet,
+      packet.download_name || `${currentProjectName().toLowerCase().replace(/[^a-z0-9]+/g, '-')}-sam31-consumer-intake-smoke-preliminary-replay-inputs-${targetId}-${decisionEvidenceId}.json`,
+      'Downloaded HaloFire smoke preliminary replay inputs; claim gates remain blocked.',
+    );
   } catch (err) {
     if (status) status.textContent = 'Error: ' + err.message;
   }
@@ -2165,6 +2196,9 @@ async function refreshSam31ActualValueQueue() {
   });
   document.querySelectorAll('[data-sam31-consumer-intake-smoke-sprinkler-review-decision]').forEach((button) => {
     button.onclick = () => saveHalofireSam31ConsumerIntakeSmokeSprinklerReviewDecision(button.dataset.sam31ConsumerIntakeSmokeSprinklerReviewDecision);
+  });
+  document.querySelectorAll('[data-sam31-consumer-intake-smoke-preliminary-replay-inputs]').forEach((button) => {
+    button.onclick = () => downloadHalofireSam31ConsumerIntakeSmokePreliminaryReplayInputs(button.dataset.sam31ConsumerIntakeSmokePreliminaryReplayInputs);
   });
   document.querySelectorAll('[data-sam31-consumer-intake-smoke-followup-review]').forEach((button) => {
     button.onclick = () => saveHalofireSam31ConsumerIntakeSmokeFollowupReview(button.dataset.sam31ConsumerIntakeSmokeFollowupReview);
