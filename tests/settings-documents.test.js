@@ -851,6 +851,16 @@ describe('HaloFire settings + documentation upload/link API', () => {
     const tool = await (await request('/api/openclaw/sam31/tool', {
       headers: { Authorization: `Bearer ${token}` },
     })).json();
+    expect(tool.halofire_api_actions.actual_value_service_descriptor_evidence).toEqual(expect.objectContaining({
+      method: 'POST',
+      href_template: '/api/projects/{projectName}/openclaw/sam31/actual-value-service/evidence',
+      consumes: 'openclaw.sam31.actual_value_service_descriptor.v1',
+      produces: 'openclaw_sam31_actual_value_service_descriptor',
+      evidence_record_type: 'openclaw_sam31_actual_value_service_descriptor',
+      supported_consumers: ['halo_fire', 'landscout', 'nameforge'],
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
     expect(tool.halofire_api_actions.actual_value_resolver_queue).toEqual(expect.objectContaining({
       method: 'GET',
       href_template: '/api/openclaw/sam31/actual-value-resolver-queue?projectName={projectName}&consumer={consumer}',
@@ -980,6 +990,94 @@ describe('HaloFire settings + documentation upload/link API', () => {
       claim_gate_effect: 'no_claims_cleared',
     }));
     expect(projectDescriptor.consumer_service_endpoints.landscout.resolver_queue.href).toContain('consumer=landscout');
+  });
+
+  it('records the SAM31 actual-value service descriptor as attachable no-claims evidence', async () => {
+    const token = await tokenFor('settings-admin', 'actual-test-password');
+    const projectName = 'Shared SAM31 Service Descriptor Evidence Project';
+
+    const res = await request(`/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/actual-value-service/evidence`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ consumer: 'nameforge' }),
+    });
+    expect(res.status).toBe(201);
+    const saved = await res.json();
+    expect(saved).toEqual(expect.objectContaining({
+      evidence_type: 'openclaw_sam31_actual_value_service_descriptor',
+      status: 'present',
+      source_ref: 'openclaw://sam31/actual-value-service/nameforge',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(saved.service_descriptor).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.actual_value_service_descriptor.v1',
+      project_name: projectName,
+      requested_consumer: 'nameforge',
+      shared_see_label_extrapolate_contract: expect.objectContaining({
+        artifact_type: 'openclaw.sam31.see_label_extrapolate_contract.v1',
+        supports_object_identification: true,
+        supports_vector_overlays: true,
+        supports_model_3d_candidates: true,
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+      actual_value_replacement_contract: expect.objectContaining({
+        artifact_type: 'halofire.sam31_actual_value_replacement_intake_contract.v1',
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    }));
+
+    const db = new Database(dbPath);
+    const row = db.prepare('SELECT * FROM project_evidence WHERE id = ?').get(saved.evidence_id);
+    db.close();
+    expect(row).toEqual(expect.objectContaining({
+      project_name: projectName,
+      evidence_type: 'openclaw_sam31_actual_value_service_descriptor',
+      status: 'present',
+      source_ref: 'openclaw://sam31/actual-value-service/nameforge',
+    }));
+    expect(row.source_file).toContain('sam31-actual-value-service-descriptor-nameforge.json');
+    const notes = JSON.parse(row.notes);
+    expect(notes).toEqual(expect.objectContaining({
+      kind: 'openclaw_sam31_actual_value_service_descriptor',
+      artifact_type: 'openclaw.sam31.actual_value_service_descriptor.v1',
+      requested_consumer: 'nameforge',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(notes.service_descriptor).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.actual_value_service_descriptor.v1',
+      requested_consumer: 'nameforge',
+    }));
+    expect(notes.blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'brand_ready',
+      'production_ready',
+    ]));
+    expect(notes.limitations.join(' ')).toContain('does not clear');
+
+    const readback = await request(`/api/openclaw/sam31/actual-value-service?projectName=${encodeURIComponent(projectName)}&consumer=nameforge`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(readback.status).toBe(200);
+    const descriptor = await readback.json();
+    expect(descriptor).toEqual(expect.objectContaining({
+      latest_actual_value_service_descriptor_evidence_id: saved.evidence_id,
+      saved_actual_value_service_descriptor_count: 1,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(descriptor.latest_actual_value_service_descriptor_evidence).toEqual(expect.objectContaining({
+      evidence_id: saved.evidence_id,
+      evidence_type: 'openclaw_sam31_actual_value_service_descriptor',
+      requested_consumer: 'nameforge',
+      source_ref: 'openclaw://sam31/actual-value-service/nameforge',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
   });
 
   it('records the SAM31 actual-value resolver contract packet as attachable no-claims evidence', async () => {

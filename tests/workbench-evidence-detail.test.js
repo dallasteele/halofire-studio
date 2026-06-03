@@ -146,6 +146,14 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toContain('downloadSam31ActualValueServiceDescriptor');
     expect(html).toContain('data-sam31-actual-value-service-descriptor-download');
     expect(html).toContain('Download shared SAM31 service descriptor');
+    expect(html).toContain('/openclaw/sam31/actual-value-service/evidence');
+    expect(html).toContain('saveSam31ActualValueServiceDescriptorEvidence');
+    expect(html).toContain('data-sam31-actual-value-service-descriptor-save');
+    expect(html).toContain('Save shared SAM31 service descriptor evidence');
+    expect(html).toContain('Saved openclaw_sam31_actual_value_service_descriptor evidence');
+    expect(html).toContain('latest_actual_value_service_descriptor_evidence');
+    expect(html).toContain('latest_actual_value_service_descriptor_evidence_id');
+    expect(html).toContain('saved_actual_value_service_descriptor_count');
     expect(html).toContain('/openclaw/sam31/actual-value-resolver-queue');
     expect(html).toContain('/api/openclaw/sam31/actual-value-resolver-queue?projectName=');
     expect(html).toContain('/api/openclaw/sam31/actual-value-replacements?projectName=');
@@ -230,6 +238,13 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toContain('downloadSam31ActualValueFilteredReplacementReadback');
     expect(html).toContain('data-sam31-actual-value-filtered-replacement-readback-download');
     expect(html).toContain("row.evidence_type === 'openclaw_sam31_actual_value_replacement_readback'");
+    expect(html).toContain("row.evidence_type === 'openclaw_sam31_actual_value_service_descriptor'");
+    expect(html).toContain('renderSam31ActualValueServiceDescriptorEvidenceDetail');
+    expect(html).toContain('Saved SAM31 actual-value service descriptor evidence detail');
+    expect(html).toContain('openclaw://sam31/actual-value-service');
+    expect(html).toContain('Download saved service descriptor evidence');
+    expect(html).toContain('downloadSavedSam31ActualValueServiceDescriptorEvidence');
+    expect(html).toContain('data-sam31-actual-value-saved-service-descriptor-download');
     expect(html).toContain('Saved SAM31 actual-value replacement readback evidence detail');
     expect(html).toContain('source_queue_route');
     expect(html).toContain('requested_consumer');

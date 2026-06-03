@@ -1018,6 +1018,72 @@ function latestOpenClawSam31ActualValueResolverContractEvidence(projectName, con
     || null;
 }
 
+function openClawSam31ActualValueServiceDescriptorEvidenceFromRow(row) {
+  if (!row) return null;
+  try {
+    const parsed = JSON.parse(row.notes || '{}');
+    if (!parsed || parsed.kind !== 'openclaw_sam31_actual_value_service_descriptor') return null;
+    const descriptor = parsed.service_descriptor && typeof parsed.service_descriptor === 'object' && !Array.isArray(parsed.service_descriptor)
+      ? parsed.service_descriptor
+      : {};
+    const sharedContract = parsed.shared_see_label_extrapolate_contract && typeof parsed.shared_see_label_extrapolate_contract === 'object'
+      ? parsed.shared_see_label_extrapolate_contract
+      : (descriptor.shared_see_label_extrapolate_contract || {});
+    const replacementContract = parsed.actual_value_replacement_contract && typeof parsed.actual_value_replacement_contract === 'object'
+      ? parsed.actual_value_replacement_contract
+      : (descriptor.actual_value_replacement_contract || {});
+    return {
+      evidence_id: row.id,
+      evidence_type: row.evidence_type,
+      evidence_status: row.status,
+      source_file: row.source_file || null,
+      source_ref: row.source_ref || null,
+      download_name: row.source_file || 'sam31-actual-value-service-descriptor.json',
+      artifact_type: parsed.artifact_type || descriptor.artifact_type || 'openclaw.sam31.actual_value_service_descriptor.v1',
+      requested_consumer: String(parsed.requested_consumer || descriptor.requested_consumer || '').trim().toLowerCase() || null,
+      supported_consumers: Array.isArray(parsed.supported_consumers) ? parsed.supported_consumers : (Array.isArray(descriptor.supported_consumers) ? descriptor.supported_consumers : []),
+      supported_applications: Array.isArray(parsed.supported_applications) ? parsed.supported_applications : (Array.isArray(descriptor.supported_applications) ? descriptor.supported_applications : []),
+      service_descriptor: descriptor,
+      shared_see_label_extrapolate_contract: sharedContract,
+      actual_value_replacement_contract: replacementContract,
+      blocked_claims: Array.isArray(parsed.blocked_claims) ? parsed.blocked_claims : (Array.isArray(descriptor.blocked_claims) ? descriptor.blocked_claims : []),
+      limitations: Array.isArray(parsed.limitations) ? parsed.limitations : (Array.isArray(descriptor.limitations) ? descriptor.limitations : []),
+      use_for_claims: false,
+      claim_gate_effect: parsed.claim_gate_effect || descriptor.claim_gate_effect || 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    };
+  } catch {
+    return null;
+  }
+}
+
+function listOpenClawSam31ActualValueServiceDescriptorEvidence(projectName, options = {}) {
+  const requestedConsumer = String(options.consumer || '').trim().toLowerCase();
+  const rows = db
+    .prepare(`SELECT * FROM project_evidence
+              WHERE project_name = ? AND evidence_type = 'openclaw_sam31_actual_value_service_descriptor'
+              ORDER BY created_at DESC, id DESC`)
+    .all(projectName);
+  return rows
+    .map(openClawSam31ActualValueServiceDescriptorEvidenceFromRow)
+    .filter(Boolean)
+    .filter((row) => !requestedConsumer || row.requested_consumer === requestedConsumer);
+}
+
+function latestOpenClawSam31ActualValueServiceDescriptorEvidence(projectName, consumer = '') {
+  const requestedConsumer = String(consumer || '').trim().toLowerCase();
+  const candidates = listOpenClawSam31ActualValueServiceDescriptorEvidence(projectName);
+  if (!candidates.length) return null;
+  if (requestedConsumer) {
+    return candidates.find((row) => row.requested_consumer === requestedConsumer)
+      || candidates.find((row) => row.requested_consumer === 'all-consumers' || !row.requested_consumer)
+      || null;
+  }
+  return candidates.find((row) => row.requested_consumer === 'all-consumers' || !row.requested_consumer)
+    || candidates[0]
+    || null;
+}
+
 function openClawSam31ActualValueReplacementReadbackEvidenceFromRow(row) {
   if (!row) return null;
   try {
@@ -1412,6 +1478,11 @@ function openClawSam31ActualValueServiceEndpoint(projectName, consumer) {
 function buildOpenClawSam31ActualValueServiceDescriptor(projectName, options = {}) {
   const requestedConsumer = String(options.consumer || '').trim().toLowerCase();
   const serviceConsumers = ['halo_fire', 'landscout', 'nameforge'];
+  const effectiveConsumer = serviceConsumers.includes(requestedConsumer) ? requestedConsumer : null;
+  const latestServiceDescriptorEvidence = latestOpenClawSam31ActualValueServiceDescriptorEvidence(projectName, effectiveConsumer || '');
+  const savedServiceDescriptorEvidenceRows = listOpenClawSam31ActualValueServiceDescriptorEvidence(projectName, {
+    consumer: effectiveConsumer || '',
+  });
   const consumerServiceEndpoints = Object.fromEntries(serviceConsumers.map((consumer) => [
     consumer,
     openClawSam31ActualValueServiceEndpoint(projectName, consumer),
@@ -1420,7 +1491,7 @@ function buildOpenClawSam31ActualValueServiceDescriptor(projectName, options = {
     artifact_type: 'openclaw.sam31.actual_value_service_descriptor.v1',
     status: 'ready_for_shared_consumer_polling',
     project_name: projectName,
-    requested_consumer: serviceConsumers.includes(requestedConsumer) ? requestedConsumer : null,
+    requested_consumer: effectiveConsumer,
     generated_at: new Date().toISOString(),
     source_runtime: 'sam-3.1+llm',
     source_tool_descriptor_ref: 'openclaw.sam31_llm_extrapolation_tool',
@@ -1493,6 +1564,9 @@ function buildOpenClawSam31ActualValueServiceDescriptor(projectName, options = {
       no_claim_gates_cleared: true,
     },
     temporary_value_policy: 'best_guess_until_employee_replaced',
+    latest_actual_value_service_descriptor_evidence_id: latestServiceDescriptorEvidence?.evidence_id || null,
+    latest_actual_value_service_descriptor_evidence: latestServiceDescriptorEvidence,
+    saved_actual_value_service_descriptor_count: savedServiceDescriptorEvidenceRows.length,
     blocked_claims: uniqueStrings([
       ...SAM31_BLOCKED_CLAIMS,
       'CEO_ready',
@@ -1530,6 +1604,10 @@ function buildOpenClawSam31ActualValueResolverQueue(projectName, options = {}) {
   const index = buildOpenClawSam31ActualValueWorkItemIndex(projectName);
   const latestReplacementByReview = latestSam31ActualValueReplacementEvidenceByReview(projectName);
   const latestContractEvidence = requestedContractEvidence || latestOpenClawSam31ActualValueResolverContractEvidence(projectName, consumerFilter);
+  const latestServiceDescriptorEvidence = latestOpenClawSam31ActualValueServiceDescriptorEvidence(projectName, consumerFilter);
+  const savedServiceDescriptorEvidenceRows = listOpenClawSam31ActualValueServiceDescriptorEvidence(projectName, {
+    consumer: consumerFilter,
+  });
   const savedReplacementReadbackEvidenceRows = requestedReplacementReadbackEvidence
     ? [requestedReplacementReadbackEvidence].filter((row) => (
       (!consumerFilter || row.requested_consumer === consumerFilter)
@@ -1634,6 +1712,9 @@ function buildOpenClawSam31ActualValueResolverQueue(projectName, options = {}) {
     generated_at: new Date().toISOString(),
     supported_consumers: ['halo_fire', 'landscout', 'nameforge'],
     sam31_llm_extrapolation_contract: sam31LlmExtrapolationContract,
+    latest_actual_value_service_descriptor_evidence_id: latestServiceDescriptorEvidence?.evidence_id || null,
+    latest_actual_value_service_descriptor_evidence: latestServiceDescriptorEvidence,
+    saved_actual_value_service_descriptor_count: savedServiceDescriptorEvidenceRows.length,
     source_openclaw_sam31_actual_value_resolver_contract_evidence_id: latestContractEvidence?.evidence_id || null,
     latest_actual_value_resolver_contract_evidence: latestContractEvidence,
     source_index_artifact_type: index.artifact_type,
@@ -1692,6 +1773,11 @@ function buildOpenClawSam31ActualValueResolverQueueReadback(projectName, options
     effectiveConsumer ? `consumer=${encodeURIComponent(effectiveConsumer)}` : '',
     contractEvidenceFilterId ? `contractEvidenceId=${encodeURIComponent(contractEvidenceFilterId)}` : '',
   ].filter(Boolean).join('&');
+  const sourceServiceDescriptorQuery = [
+    `projectName=${encodeURIComponent(projectName)}`,
+    effectiveConsumer ? `consumer=${encodeURIComponent(effectiveConsumer)}` : '',
+  ].filter(Boolean).join('&');
+  const latestServiceDescriptorEvidence = queue.latest_actual_value_service_descriptor_evidence || null;
   const latestReplacementReadbackEvidence = queue.latest_actual_value_replacement_readback_evidence || null;
   const downloadArtifacts = {
     filtered_queue_readback: {
@@ -1710,6 +1796,22 @@ function buildOpenClawSam31ActualValueResolverQueueReadback(projectName, options
       use_for_claims: false,
       claim_gate_effect: 'no_claims_cleared',
     } : null,
+    saved_service_descriptor_evidence: latestServiceDescriptorEvidence ? {
+      artifact_type: latestServiceDescriptorEvidence.artifact_type || 'openclaw.sam31.actual_value_service_descriptor.v1',
+      evidence_id: latestServiceDescriptorEvidence.evidence_id || null,
+      source_ref: latestServiceDescriptorEvidence.source_ref || null,
+      source_file: latestServiceDescriptorEvidence.source_file || null,
+      download_name: latestServiceDescriptorEvidence.download_name || latestServiceDescriptorEvidence.source_file || `${slug}-saved-sam31-actual-value-service-descriptor.json`,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    } : null,
+    source_service_descriptor: {
+      artifact_type: 'openclaw.sam31.actual_value_service_descriptor.v1',
+      href: `/api/openclaw/sam31/actual-value-service?${sourceServiceDescriptorQuery}`,
+      download_name: `${slug}-sam31-actual-value-service-descriptor-${effectiveConsumer || 'all-consumers'}.json`,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    },
     source_contract_packet: contractEvidenceFilterId ? {
       artifact_type: 'openclaw.sam31.actual_value_resolver_contract_packet.v1',
       evidence_id: contractEvidenceFilterId,
@@ -1781,6 +1883,9 @@ function buildOpenClawSam31ActualValueResolverQueueReadback(projectName, options
     supported_consumers: queue.supported_consumers,
     consumer_pull_endpoints: openClawSam31ActualValueResolverConsumerPullEndpoints(projectName),
     sam31_llm_extrapolation_contract: queue.sam31_llm_extrapolation_contract,
+    latest_actual_value_service_descriptor_evidence_id: queue.latest_actual_value_service_descriptor_evidence_id || null,
+    latest_actual_value_service_descriptor_evidence: latestServiceDescriptorEvidence,
+    saved_actual_value_service_descriptor_count: queue.saved_actual_value_service_descriptor_count || 0,
     contract_evidence_filter_id: contractEvidenceFilterId,
     replacement_readback_evidence_filter_id: replacementReadbackEvidenceFilterId,
     source_openclaw_sam31_actual_value_resolver_contract_evidence_id: queue.source_openclaw_sam31_actual_value_resolver_contract_evidence_id || null,
@@ -2242,6 +2347,83 @@ app.get('/api/projects/:name/openclaw/sam31/actual-value-replacements', authMidd
     consumer: req.query?.consumer,
     contractEvidenceId: req.query?.contractEvidenceId || req.query?.contract_evidence_id,
   }));
+});
+
+app.post('/api/projects/:name/openclaw/sam31/actual-value-service/evidence', authMiddleware, requireRole('admin'), (req, res) => {
+  try {
+    const projectName = req.params.name;
+    const requestedConsumer = String(req.body?.consumer || req.query?.consumer || '').trim().toLowerCase();
+    const serviceDescriptor = buildOpenClawSam31ActualValueServiceDescriptor(projectName, {
+      consumer: requestedConsumer,
+    });
+    const sourceRefConsumer = serviceDescriptor.requested_consumer || requestedConsumer || 'all-consumers';
+    const sourceRef = `openclaw://sam31/actual-value-service/${sourceRefConsumer}`;
+    const slug = slugForDownloadName(projectName);
+    const sourceFile = `${slug}-sam31-actual-value-service-descriptor-${sourceRefConsumer}.json`;
+    const notes = {
+      kind: 'openclaw_sam31_actual_value_service_descriptor',
+      artifact_type: serviceDescriptor.artifact_type,
+      requested_consumer: serviceDescriptor.requested_consumer || sourceRefConsumer,
+      service_descriptor: serviceDescriptor,
+      shared_see_label_extrapolate_contract: serviceDescriptor.shared_see_label_extrapolate_contract,
+      actual_value_replacement_contract: serviceDescriptor.actual_value_replacement_contract,
+      supported_consumers: serviceDescriptor.supported_consumers,
+      supported_applications: serviceDescriptor.supported_applications,
+      blocked_claims: uniqueStrings([
+        ...(Array.isArray(serviceDescriptor.blocked_claims) ? serviceDescriptor.blocked_claims : []),
+        'permit_ready',
+        'fabrication_ready',
+        'AHJ_approval',
+        'professional_approval',
+        'AutoSprink_parity',
+        'brand_ready',
+        'trademark_ready',
+        'CEO_ready',
+        'production_ready',
+      ]),
+      limitations: uniqueStrings([
+        ...(Array.isArray(serviceDescriptor.limitations) ? serviceDescriptor.limitations : []),
+        'This evidence row preserves the shared OpenClaw SAM31 service descriptor so HaloFire, LandScout, and NameForge can attach it to actual-value review work.',
+        'It does not clear permit-ready, fabrication-ready, AHJ-ready, engineering-grade, AutoSprink parity, professional approval, manufacturer-exact, brand-ready, trademark-ready, CEO-ready, or production-ready claims.',
+      ]),
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    };
+    const result = db
+      .prepare(`INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+                VALUES (?, ?, ?, ?, ?, ?)`)
+      .run(
+        projectName,
+        'openclaw_sam31_actual_value_service_descriptor',
+        sourceFile,
+        sourceRef,
+        'present',
+        JSON.stringify(notes),
+      );
+    const evidenceRow = db.prepare('SELECT * FROM project_evidence WHERE id = ?').get(result.lastInsertRowid);
+    return res.status(201).json({
+      id: result.lastInsertRowid,
+      evidence_id: result.lastInsertRowid,
+      evidence_type: 'openclaw_sam31_actual_value_service_descriptor',
+      status: 'present',
+      source_file: sourceFile,
+      source_ref: sourceRef,
+      requested_consumer: serviceDescriptor.requested_consumer || sourceRefConsumer,
+      message: 'SAM31 actual-value service descriptor saved as attachable evidence; claims still blocked',
+      evidence: evidenceRow,
+      service_descriptor: serviceDescriptor,
+      shared_see_label_extrapolate_contract: serviceDescriptor.shared_see_label_extrapolate_contract,
+      actual_value_replacement_contract: serviceDescriptor.actual_value_replacement_contract,
+      blocked_claims: notes.blocked_claims,
+      limitations: notes.limitations,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    });
+  } catch (err) {
+    return res.status(err.httpStatus || 400).json({ error: err.message });
+  }
 });
 
 app.post('/api/projects/:name/openclaw/sam31/actual-value-resolver-contract/evidence', authMiddleware, requireRole('admin'), (req, res) => {
@@ -3847,6 +4029,17 @@ function localOpenClawSam31ToolDescriptor(projectName = null) {
         produces: 'openclaw.sam31.actual_value_service_descriptor.v1',
         shared_contract_artifact_type: 'openclaw.sam31.see_label_extrapolate_contract.v1',
         consumer_action: 'poll_actual_value_service_descriptor',
+        supported_consumers: ['halo_fire', 'landscout', 'nameforge'],
+        temporary_value_policy: 'best_guess_until_employee_replaced',
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      },
+      actual_value_service_descriptor_evidence: {
+        method: 'POST',
+        href_template: '/api/projects/{projectName}/openclaw/sam31/actual-value-service/evidence',
+        consumes: 'openclaw.sam31.actual_value_service_descriptor.v1',
+        produces: 'openclaw_sam31_actual_value_service_descriptor',
+        evidence_record_type: 'openclaw_sam31_actual_value_service_descriptor',
         supported_consumers: ['halo_fire', 'landscout', 'nameforge'],
         temporary_value_policy: 'best_guess_until_employee_replaced',
         use_for_claims: false,
