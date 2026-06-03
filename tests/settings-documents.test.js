@@ -3221,9 +3221,106 @@ describe('HaloFire settings + documentation upload/link API', () => {
                 review_decision: 'accepted_internal_alpha_packet',
                 claim_gate_effect: 'no_claims_cleared',
               }),
+              approval_upload_resolver_rows: expect.arrayContaining([
+                expect.objectContaining({
+                  artifact_type: 'halofire.sam31_approval_upload_resolver_row.v1',
+                  code: 'HALOFIRE_SAM31_PROFESSIONAL_APPROVAL_UPLOAD_MISSING',
+                  status: 'missing_required_approval_upload',
+                  target_approval_lane: 'professional_approval',
+                  required_evidence_type: 'licensed_professional_signed_review',
+                  source_section_to_artifacts_consumer_intake_smoke_evidence_id: consumerIntakeSmokes.nameforge.evidence_id,
+                  source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id: followupReview.id,
+                  source_packet_review_decision_evidence_id: smokePacketReview.id,
+                  source_followup_decision_evidence_id: smokeReplayFollowup.id,
+                  packet_index: 0,
+                  latest_approval_upload_intake: null,
+                  claim_gate_effect: 'no_claims_cleared',
+                }),
+              ]),
             }),
           ]),
           claim_gate_effect: 'no_claims_cleared',
+        }),
+      }),
+    ]));
+
+    const smokeApprovalUploadRes = await request(`/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/section-to-artifacts-consumer-intake-smoke/${consumerIntakeSmokes.nameforge.evidence_id}/sprinkler-review-packet/decision/${smokeSprinklerDecision.id}/preliminary-replay/followup/${smokeReplayFollowup.id}/packet/0/review/${smokePacketReview.id}/approval-upload`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        code: 'HALOFIRE_SAM31_PROFESSIONAL_APPROVAL_UPLOAD_MISSING',
+        target_approval_lane: 'professional_approval',
+        evidence_type: 'professional_review',
+        source_ref: 'professional-review://nameforge/smoke-packet/obstruction',
+        source_file: 'nameforge-smoke-packet-professional-review.pdf',
+        signoff: {
+          reviewer_name: 'Licensed Sprinkler Reviewer',
+          reviewer_title: 'PE Fire Protection',
+          signed_at: '2026-06-03T10:00:00.000Z',
+          organization: 'HaloFire Test Review',
+          license_id: 'PE-TEST-1881',
+        },
+        notes: 'Professional upload intake recorded for later gate validation; claims remain blocked.',
+      }),
+    });
+    expect(smokeApprovalUploadRes.status).toBe(201);
+    const smokeApprovalUpload = await smokeApprovalUploadRes.json();
+    expect(smokeApprovalUpload).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.sam31_approval_upload_intake.v1',
+      status: 'uploaded_pending_gate_validation',
+      code: 'HALOFIRE_SAM31_PROFESSIONAL_APPROVAL_UPLOAD_MISSING',
+      target_approval_lane: 'professional_approval',
+      evidence_type: 'professional_review',
+      gate_code: 'PROFESSIONAL_REVIEW_MISSING',
+      source_section_to_artifacts_consumer_intake_smoke_evidence_id: consumerIntakeSmokes.nameforge.evidence_id,
+      source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id: followupReview.id,
+      source_packet_review_decision_evidence_id: smokePacketReview.id,
+      source_halofire_sam31_sprinkler_review_decision_evidence_id: smokeSprinklerDecision.id,
+      source_followup_decision_evidence_id: smokeReplayFollowup.id,
+      packet_index: 0,
+      source_ref: 'professional-review://nameforge/smoke-packet/obstruction',
+      source_file: 'nameforge-smoke-packet-professional-review.pdf',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+      gate_validation_action: expect.objectContaining({
+        method: 'POST',
+        href: expect.stringContaining('/claim-gates/PROFESSIONAL_REVIEW_MISSING/resolve'),
+        request_body: { evidence_id: expect.any(Number) },
+      }),
+    }));
+
+    const uploadedSmokePacketReadbackRes = await request(`/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/section-to-artifacts-consumer-intake-smoke/${consumerIntakeSmokes.nameforge.evidence_id}/sprinkler-review-packet`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(uploadedSmokePacketReadbackRes.status).toBe(200);
+    const uploadedSmokePacketReadback = await uploadedSmokePacketReadbackRes.json();
+    expect(uploadedSmokePacketReadback.issue_seeds).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        issue_type: 'sam31_consumer_intake_obstruction_clash_review',
+        latest_sam31_sprinkler_preliminary_replay_followup_decision: expect.objectContaining({
+          packet_queue_items: expect.arrayContaining([
+            expect.objectContaining({
+              artifact_type: 'halofire.sam31_obstruction_clash_packet_queue_item.v1',
+              approval_upload_resolver_rows: expect.arrayContaining([
+                expect.objectContaining({
+                  code: 'HALOFIRE_SAM31_PROFESSIONAL_APPROVAL_UPLOAD_MISSING',
+                  status: 'approval_upload_recorded_pending_gate_validation',
+                  latest_approval_upload_intake: expect.objectContaining({
+                    evidence_id: smokeApprovalUpload.id,
+                    source_packet_review_decision_evidence_id: smokePacketReview.id,
+                    source_section_to_artifacts_consumer_intake_smoke_evidence_id: consumerIntakeSmokes.nameforge.evidence_id,
+                    source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id: followupReview.id,
+                    gate_validation_action: expect.objectContaining({
+                      href: expect.stringContaining('/claim-gates/PROFESSIONAL_REVIEW_MISSING/resolve'),
+                    }),
+                    claim_gate_effect: 'no_claims_cleared',
+                  }),
+                  claim_gate_effect: 'no_claims_cleared',
+                }),
+              ]),
+            }),
+          ]),
         }),
       }),
     ]));

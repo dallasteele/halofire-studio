@@ -248,6 +248,10 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toContain('saveHalofireSam31ConsumerIntakeSmokeReplayFollowupPacketReview');
     expect(html).toContain('data-sam31-consumer-intake-smoke-replay-followup-packet');
     expect(html).toContain('data-sam31-consumer-intake-smoke-replay-followup-packet-review');
+    expect(html).toContain('data-sam31-approval-upload-smoke-evidence-id');
+    expect(html).toContain('saveHalofireSam31ApprovalUpload');
+    expect(html).toContain('section-to-artifacts-consumer-intake-smoke');
+    expect(html).toContain("encodeURIComponent(packetReviewEvidenceId) + '/approval-upload'");
     expect(html).toContain('halofire.sam31_obstruction_clash_packet.v1');
     expect(html).toContain('halofire.sam31_sleeve_firestop_packet.v1');
     expect(html).toContain('halofire.sam31_sprinkler_followup_packet_review_decision.v1');
