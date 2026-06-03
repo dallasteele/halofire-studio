@@ -15095,23 +15095,69 @@ function sam31ActualValueResolverQueueItems(projectName) {
       row.replacement_ref,
       row.persisted_review_packet_ref,
     ].filter(Boolean));
+    const sourceRef = prefill?.source_ref || row.replacement_values_source_ref || row.replacement_ref || row.persisted_review_packet_ref || null;
+    const sourceFile = prefill?.source_file || row.source_file || `openclaw_sam31_consumer_review:${row.source_openclaw_sam31_consumer_review_evidence_id || 'missing'}`;
+    const replacementValuesSourceRef = prefill?.replacement_values_source_ref || row.replacement_values_source_ref || sourceRef;
+    const acceptableActualEvidence = Array.isArray(row.acceptable_actual_evidence)
+      ? [...row.acceptable_actual_evidence]
+      : [
+        '1881 proposal workbook row or sheet reference',
+        'reviewed vector overlay SVG or marked-up plan ref',
+        'reviewed 3D model candidate ref or model note',
+        'screenshot or console evidence for the reviewed SAM31 section',
+      ];
+    const recordRequestBody = {
+      kind: 'sam31ActualValueReplacement',
+      artifact_type: 'halofire.sam31_actual_value_replacement_intake.v1',
+      source_pdf_boundary_evidence_id: row.source_pdf_boundary_evidence_id || null,
+      source_openclaw_sam31_consumer_review_evidence_id: row.source_openclaw_sam31_consumer_review_evidence_id || null,
+      source_openclaw_sam31_consumer_smoke_evidence_id: row.source_openclaw_sam31_consumer_smoke_evidence_id || null,
+      source_openclaw_sam31_actual_value_service_descriptor_evidence_id: row.source_openclaw_sam31_actual_value_service_descriptor_evidence_id || null,
+      actual_value_service_descriptor_action: row.actual_value_service_descriptor_action || null,
+      consumer: row.consumer || null,
+      accepted_queue_id: row.accepted_queue_id || null,
+      persisted_review_packet_ref: row.persisted_review_packet_ref || null,
+      replacement_ref: row.replacement_ref || null,
+      source_file: sourceFile,
+      source_ref: sourceRef,
+      replacement_values_source_ref: replacementValuesSourceRef,
+      source_refs: uniqueStrings([...sourceRefs, sourceRef, sourceFile].filter(Boolean)),
+      llm_observation_count: row.llm_observation_count || row.replacement_summary?.llm_observation_count || 0,
+      llm_observation_ids: Array.isArray(row.llm_observation_ids) ? [...row.llm_observation_ids] : [],
+      source_llm_observation_ids: Array.isArray(row.source_llm_observation_ids) ? [...row.source_llm_observation_ids] : [],
+      replacement_summary: row.replacement_summary || {},
+      acceptable_actual_evidence: acceptableActualEvidence,
+      actual_value_replacement_prefill: prefill,
+      employee_actual_value_next_action: row.employee_actual_value_next_action || null,
+      blocked_claims: Array.isArray(row.blocked_claims) ? [...row.blocked_claims] : [],
+      recorded_from: 'resolver_queue.sam31_actual_value_replacement',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    };
     return {
       ...row,
       kind: 'sam31_actual_value_replacement',
       resolver_artifact_type: 'halofire.sam31_actual_value_resolver_queue_item.v1',
       project_name: projectName,
       source_refs: sourceRefs,
-      acceptable_evidence: Array.isArray(row.acceptable_actual_evidence)
-        ? [...row.acceptable_actual_evidence]
-        : [
-          '1881 proposal workbook row or sheet reference',
-          'reviewed vector overlay SVG or marked-up plan ref',
-          'reviewed 3D model candidate ref or model note',
-          'screenshot or console evidence for the reviewed SAM31 section',
-        ],
+      acceptable_evidence: acceptableActualEvidence,
       ai_fallback: 'Use SAM31+LLM object, vector, and 3D candidates only as temporary internal-alpha values until HaloFire employee evidence replaces them.',
       shared_queue_href: `/api/openclaw/sam31/actual-value-resolver-queue?projectName=${encodeURIComponent(projectName)}${row.consumer ? `&consumer=${encodeURIComponent(row.consumer)}` : ''}`,
       source_project_queue_href: `/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/actual-value-resolver-queue${row.consumer ? `?consumer=${encodeURIComponent(row.consumer)}` : ''}`,
+      record_actual_value_replacement_action: {
+        artifact_type: 'halofire.sam31_actual_value_replacement_record_action.v1',
+        label: 'Record exact replacement evidence from resolver row',
+        method: 'POST',
+        href: `/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/actual-value-replacements`,
+        consumes: 'halofire.sam31_actual_value_replacement_intake.v1',
+        produces: 'halofire.sam31_actual_value_replacement_intake.v1',
+        evidence_record_type: 'sam31_actual_value_replacement',
+        request_body: recordRequestBody,
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+        no_claim_gates_cleared: true,
+      },
       next_action: row.next_action || 'Record sam31_actual_value_replacement evidence from the 1881 workbook/sheet, reviewed vector overlay, reviewed 3D model candidate, screenshot, or console evidence.',
       use_for_claims: false,
       claim_gate_effect: 'no_claims_cleared',

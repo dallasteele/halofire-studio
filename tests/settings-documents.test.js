@@ -660,6 +660,26 @@ describe('HaloFire settings + documentation upload/link API', () => {
       claim_gate_effect: 'no_claims_cleared',
       use_for_claims: false,
     }));
+    expect(queue.items[0].record_actual_value_replacement_action).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.sam31_actual_value_replacement_record_action.v1',
+      method: 'POST',
+      href: `/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/actual-value-replacements`,
+      evidence_record_type: 'sam31_actual_value_replacement',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      request_body: expect.objectContaining({
+        source_openclaw_sam31_consumer_review_evidence_id: Number(reviewResult.lastInsertRowid),
+        source_pdf_boundary_evidence_id: 204,
+        consumer: 'landscout',
+        source_file: '1881-sheet-main-resolver.png',
+        source_ref: '1881://sheet-main-resolver/riser-area',
+        replacement_values_source_ref: '1881://sheet-main-resolver/riser-area',
+        recorded_from: 'resolver_queue.sam31_actual_value_replacement',
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+        no_claim_gates_cleared: true,
+      }),
+    }));
     expect(queue.items[0].blocked_claims).toEqual(expect.arrayContaining([
       'permit_ready',
       'fabrication_ready',
@@ -668,6 +688,44 @@ describe('HaloFire settings + documentation upload/link API', () => {
       'manufacturer_exact',
       'AutoSprink_parity',
     ]));
+
+    const recordRes = await request(queue.items[0].record_actual_value_replacement_action.href, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify(queue.items[0].record_actual_value_replacement_action.request_body),
+    });
+    expect(recordRes.status).toBe(201);
+    const recorded = await recordRes.json();
+    expect(recorded).toEqual(expect.objectContaining({
+      evidence_type: 'sam31_actual_value_replacement',
+      status: 'present',
+      consumer: 'landscout',
+      source_ref: '1881://sheet-main-resolver/riser-area',
+      recorded_from: 'resolver_queue.sam31_actual_value_replacement',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+
+    const recordedQueueRes = await request(`/api/projects/${encodeURIComponent(projectName)}/resolver-queue?sam31ActualValue=recorded&consumer=landscout`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(recordedQueueRes.status).toBe(200);
+    const recordedQueue = await recordedQueueRes.json();
+    expect(recordedQueue.summary).toEqual(expect.objectContaining({
+      sam31_actual_value_replacement_pending: 0,
+      sam31_actual_value_replacements_recorded: 1,
+    }));
+    expect(recordedQueue.items[0]).toEqual(expect.objectContaining({
+      kind: 'sam31_actual_value_replacement',
+      status: 'actual_value_evidence_recorded',
+      intake_status: 'recorded',
+      latest_actual_value_replacement_evidence: expect.objectContaining({
+        evidence_id: recorded.evidence_id,
+        source_ref: '1881://sheet-main-resolver/riser-area',
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    }));
   });
 
   it('exposes a global OpenClaw SAM31 actual-value resolver queue readback for consumer polling', async () => {

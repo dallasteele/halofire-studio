@@ -275,6 +275,12 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toContain('halofire.sam31_actual_value_resolver_queue_item.v1');
     expect(html).toContain('renderResolverSam31ActualValueReplacement');
     expect(html).toContain('Open shared SAM31 actual-value queue');
+    expect(html).toContain('record_actual_value_replacement_action');
+    expect(html).toContain('Record from resolver row');
+    expect(html).toContain('recordResolverSam31ActualValueEvidence');
+    expect(html).toContain('data-resolver-sam31-actual-value-record-index');
+    expect(html).toContain('lastResolverQueueItems');
+    expect(html).toContain('resolver_queue.sam31_actual_value_replacement');
     expect(html).toContain('gate_validation_packet_action');
     expect(html).toContain('Download SAM31 approval gate validation packet');
     expect(html).toContain('downloadHalofireSam31ApprovalUploadGateValidationPacket');
