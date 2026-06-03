@@ -3023,6 +3023,99 @@ describe('HaloFire settings + documentation upload/link API', () => {
       }),
     ]));
 
+    const smokeReplayFollowupRes = await request(`/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/section-to-artifacts-consumer-intake-smoke/${consumerIntakeSmokes.nameforge.evidence_id}/sprinkler-review-packet/decision/${smokeSprinklerDecision.id}/preliminary-replay/followup`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        followup_decision: 'confirmed_internal_obstruction_clash_packet',
+        reviewer_name: 'Smoke Replay Reviewer',
+        review_ref: 'employee-review://nameforge/smoke-preliminary-replay/followup',
+        screenshot_ref: 'screenshot://nameforge/smoke-preliminary-replay/followup.png',
+        console_log_ref: 'console://nameforge/smoke-preliminary-replay/followup.log',
+        issue_decisions: [
+          {
+            source_field: 'obstruction_candidates',
+            source_index: 0,
+            decision: 'confirmed_internal_obstruction_clash_packet',
+            target_packet_lane: 'obstruction_or_clash_review',
+            packet_ref: 'packet://nameforge/obstruction-clash/obs-1',
+          },
+          {
+            source_field: 'sleeve_or_firestop_candidates',
+            source_index: 1,
+            decision: 'confirmed_internal_sleeve_firestop_packet',
+            target_packet_lane: 'sleeve_or_firestop_candidate_review',
+            packet_ref: 'packet://nameforge/sleeve-firestop/sleeve-1',
+          },
+        ],
+      }),
+    });
+    expect(smokeReplayFollowupRes.status).toBe(201);
+    const smokeReplayFollowup = await smokeReplayFollowupRes.json();
+    expect(smokeReplayFollowup).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.sam31_sprinkler_preliminary_replay_followup_decision.v1',
+      source_preliminary_replay_artifact_type: 'halofire.sam31_sprinkler_preliminary_replay_artifact.v1',
+      source_preliminary_replay_output_artifact_type: 'halofire.sam31_sprinkler_preliminary_replay_output.v1',
+      source_section_to_artifacts_consumer_intake_smoke_evidence_id: consumerIntakeSmokes.nameforge.evidence_id,
+      source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id: followupReview.id,
+      source_halofire_sam31_sprinkler_review_decision_evidence_id: smokeSprinklerDecision.id,
+      followup_decision: 'confirmed_internal_obstruction_clash_packet',
+      review_ref: 'employee-review://nameforge/smoke-preliminary-replay/followup',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(smokeReplayFollowup.packet_queue_items).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        artifact_type: 'halofire.sam31_obstruction_clash_packet_queue_item.v1',
+        source_section_to_artifacts_consumer_intake_smoke_evidence_id: consumerIntakeSmokes.nameforge.evidence_id,
+        source_halofire_sam31_sprinkler_review_decision_evidence_id: smokeSprinklerDecision.id,
+        source_field: 'obstruction_candidates',
+        target_packet_lane: 'obstruction_or_clash_review',
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+      expect.objectContaining({
+        artifact_type: 'halofire.sam31_sleeve_firestop_packet_queue_item.v1',
+        source_section_to_artifacts_consumer_intake_smoke_evidence_id: consumerIntakeSmokes.nameforge.evidence_id,
+        source_halofire_sam31_sprinkler_review_decision_evidence_id: smokeSprinklerDecision.id,
+        source_field: 'sleeve_or_firestop_candidates',
+        target_packet_lane: 'sleeve_or_firestop_candidate_review',
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    ]));
+    expect(smokeReplayFollowup.blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'fabrication_ready',
+      'AHJ_approval',
+      'professional_approval',
+      'manufacturer_exact',
+      'AutoSprink_parity',
+      'engineering_grade',
+    ]));
+    const followedUpSprinklerPacketRes = await request(`/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/section-to-artifacts-consumer-intake-smoke/${consumerIntakeSmokes.nameforge.evidence_id}/sprinkler-review-packet`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(followedUpSprinklerPacketRes.status).toBe(200);
+    const followedUpSprinklerPacket = await followedUpSprinklerPacketRes.json();
+    expect(followedUpSprinklerPacket.issue_seeds).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        source_section_to_artifacts_consumer_intake_smoke_evidence_id: consumerIntakeSmokes.nameforge.evidence_id,
+        latest_sam31_sprinkler_preliminary_replay_followup_decision: expect.objectContaining({
+          evidence_id: smokeReplayFollowup.id,
+          artifact_type: 'halofire.sam31_sprinkler_preliminary_replay_followup_decision.v1',
+          followup_decision: 'confirmed_internal_obstruction_clash_packet',
+          packet_queue_item_count: 2,
+          packet_queue_items: expect.arrayContaining([
+            expect.objectContaining({
+              artifact_type: 'halofire.sam31_obstruction_clash_packet_queue_item.v1',
+              source_section_to_artifacts_consumer_intake_smoke_evidence_id: consumerIntakeSmokes.nameforge.evidence_id,
+            }),
+          ]),
+          claim_gate_effect: 'no_claims_cleared',
+        }),
+      }),
+    ]));
+
     const tool = await (await request('/api/openclaw/sam31/tool', {
       headers: { Authorization: `Bearer ${token}` },
     })).json();
@@ -3076,6 +3169,19 @@ describe('HaloFire settings + documentation upload/link API', () => {
       href_template: '/api/projects/{projectName}/openclaw/sam31/section-to-artifacts-consumer-intake-smoke/{evidenceId}/sprinkler-review-packet/decision/{sprinklerReviewEvidenceId}/preliminary-replay',
       consumes: 'halofire.sam31_sprinkler_review_preliminary_replay_inputs.v1',
       produces: 'halofire.sam31_sprinkler_preliminary_replay_artifact.v1',
+      target_application: 'halo_fire',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(tool.halofire_api_actions.consumer_intake_smoke_preliminary_replay_followup).toEqual(expect.objectContaining({
+      method: 'POST',
+      href_template: '/api/projects/{projectName}/openclaw/sam31/section-to-artifacts-consumer-intake-smoke/{evidenceId}/sprinkler-review-packet/decision/{sprinklerReviewEvidenceId}/preliminary-replay/followup',
+      consumes: 'halofire.sam31_sprinkler_preliminary_replay_artifact.v1',
+      produces: 'halofire.sam31_sprinkler_preliminary_replay_followup_decision.v1',
+      downstream_resolver_artifact_types: expect.arrayContaining([
+        'halofire.sam31_obstruction_clash_packet_queue_item.v1',
+        'halofire.sam31_sleeve_firestop_packet_queue_item.v1',
+      ]),
       target_application: 'halo_fire',
       use_for_claims: false,
       claim_gate_effect: 'no_claims_cleared',
