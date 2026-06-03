@@ -61,6 +61,9 @@ describe('workbench signed reviewer evidence detail rendering', () => {
     expect(html).toContain('review_packet_artifact_type');
     expect(html).toContain('resolve_audit_packet_href');
     expect(html).toContain('resolve_audit_packet_artifact_type');
+    expect(html).toContain('Download resolve audit packet');
+    expect(html).toContain('data-signed-reviewer-resolve-audit-href');
+    expect(html).toContain('downloadSignedReviewerResolveAuditPacket');
     expect(html).toContain('Open signed reviewer workflow');
     expect(html).toContain('openSignedReviewerWorkflow');
     expect(html).toContain('evidenceId');
