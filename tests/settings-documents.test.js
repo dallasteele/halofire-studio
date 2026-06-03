@@ -781,6 +781,81 @@ describe('HaloFire settings + documentation upload/link API', () => {
       use_for_claims: false,
       claim_gate_effect: 'no_claims_cleared',
     }));
+    expect(tool.halofire_api_actions.actual_value_resolver_contract_evidence).toEqual(expect.objectContaining({
+      method: 'POST',
+      href_template: '/api/projects/{projectName}/openclaw/sam31/actual-value-resolver-contract/evidence',
+      consumes: 'openclaw.sam31.actual_value_resolver_contract_packet.v1',
+      produces: 'openclaw_sam31_actual_value_resolver_contract',
+      evidence_record_type: 'openclaw_sam31_actual_value_resolver_contract',
+      supported_consumers: ['halo_fire', 'landscout', 'nameforge'],
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+  });
+
+  it('records the SAM31 actual-value resolver contract packet as attachable no-claims evidence', async () => {
+    const token = await tokenFor('settings-admin', 'actual-test-password');
+    const projectName = 'Shared SAM31 Contract Evidence Project';
+
+    const res = await request(`/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/actual-value-resolver-contract/evidence`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ consumer: 'landscout' }),
+    });
+    expect(res.status).toBe(201);
+    const saved = await res.json();
+    expect(saved).toEqual(expect.objectContaining({
+      evidence_type: 'openclaw_sam31_actual_value_resolver_contract',
+      status: 'present',
+      source_ref: 'openclaw://sam31/actual-value-resolver-contract/landscout',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(saved.contract_packet).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.actual_value_resolver_contract_packet.v1',
+      project_name: projectName,
+      requested_consumer: 'landscout',
+      supported_applications: ['halo_fire', 'landscout', 'nameforge'],
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(saved.evidence).toEqual(expect.objectContaining({
+      evidence_type: 'openclaw_sam31_actual_value_resolver_contract',
+      status: 'present',
+      source_ref: 'openclaw://sam31/actual-value-resolver-contract/landscout',
+    }));
+
+    const db = new Database(dbPath);
+    const row = db.prepare('SELECT * FROM project_evidence WHERE id = ?').get(saved.evidence_id);
+    db.close();
+    expect(row).toEqual(expect.objectContaining({
+      project_name: projectName,
+      evidence_type: 'openclaw_sam31_actual_value_resolver_contract',
+      status: 'present',
+      source_ref: 'openclaw://sam31/actual-value-resolver-contract/landscout',
+    }));
+    const notes = JSON.parse(row.notes);
+    expect(notes).toEqual(expect.objectContaining({
+      kind: 'openclaw_sam31_actual_value_resolver_contract',
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(notes.contract_packet).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.actual_value_resolver_contract_packet.v1',
+      requested_consumer: 'landscout',
+      queue_artifact_type: 'openclaw.sam31.actual_value_resolver_queue.v1',
+    }));
+    expect(notes.blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'fabrication_ready',
+      'AHJ_approval',
+      'professional_approval',
+      'AutoSprink_parity',
+      'brand_ready',
+      'production_ready',
+    ]));
   });
 
   it('exposes SAM31 actual-value replacement details with recorded source refs by consumer', async () => {

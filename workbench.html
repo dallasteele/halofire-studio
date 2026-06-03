@@ -1119,6 +1119,7 @@ function renderSam31ActualValueResolverExtrapolationContract(readback) {
     blocked_claims: ${blocked.map((claim) => `<span class="chip">${escapeHtml(claim)}</span>`).join('') || '<span class="chip">claim gates remain blocked</span>'}<br>
     use_for_claims false - claim_gate_effect ${escapeHtml(contract.claim_gate_effect || 'no_claims_cleared')}<br>
     <button class="go" type="button" style="padding:5px 8px;font-size:10px;margin-top:5px;background:#4f46e5" data-sam31-actual-value-resolver-contract-download="${escapeHtml(sam31ActualValueQueueConsumerFilter || '')}">Download resolver contract packet</button>
+    <button class="go" type="button" style="padding:5px 8px;font-size:10px;margin-top:5px;background:#b45309" data-sam31-actual-value-resolver-contract-save="${escapeHtml(sam31ActualValueQueueConsumerFilter || '')}">Save contract evidence</button>
   </div>`;
 }
 
@@ -1265,6 +1266,18 @@ async function downloadSam31ActualValueResolverContractPacket(consumer = '') {
   status.textContent = 'Downloaded openclaw.sam31.actual_value_resolver_contract_packet.v1; claim gates remain blocked.';
 }
 
+async function saveSam31ActualValueResolverContractEvidence(consumer = '') {
+  const status = document.getElementById('sam31ActualValueQueueStatus');
+  const consumerParam = String(consumer || '').trim();
+  const saved = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/openclaw/sam31/actual-value-resolver-contract/evidence', {
+    method: 'POST',
+    body: JSON.stringify({ consumer: consumerParam }),
+  });
+  status.textContent = 'Saved openclaw_sam31_actual_value_resolver_contract evidence #' + saved.evidence_id + '; claim gates remain blocked.';
+  await refreshEvidence();
+  await refreshSam31ActualValueQueue();
+}
+
 async function filterSam31ActualValueQueueByConsumer(consumer = '') {
   sam31ActualValueQueueConsumerFilter = String(consumer || '').trim();
   await refreshSam31ActualValueQueue();
@@ -1299,6 +1312,9 @@ async function refreshSam31ActualValueQueue() {
   });
   document.querySelectorAll('[data-sam31-actual-value-resolver-contract-download]').forEach((button) => {
     button.onclick = () => downloadSam31ActualValueResolverContractPacket(button.dataset.sam31ActualValueResolverContractDownload);
+  });
+  document.querySelectorAll('[data-sam31-actual-value-resolver-contract-save]').forEach((button) => {
+    button.onclick = () => saveSam31ActualValueResolverContractEvidence(button.dataset.sam31ActualValueResolverContractSave);
   });
 }
 

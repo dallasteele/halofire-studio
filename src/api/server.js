@@ -1771,6 +1771,70 @@ app.get('/api/projects/:name/openclaw/sam31/actual-value-replacements', authMidd
   }));
 });
 
+app.post('/api/projects/:name/openclaw/sam31/actual-value-resolver-contract/evidence', authMiddleware, requireRole('admin'), (req, res) => {
+  try {
+    const projectName = req.params.name;
+    const requestedConsumer = String(req.body?.consumer || req.query?.consumer || '').trim().toLowerCase();
+    const contractPacket = buildOpenClawSam31ActualValueResolverContractPacket(projectName, {
+      consumer: requestedConsumer,
+    });
+    const sourceRefConsumer = requestedConsumer || 'all-consumers';
+    const notes = {
+      kind: 'openclaw_sam31_actual_value_resolver_contract',
+      artifact_type: contractPacket.artifact_type,
+      contract_packet: contractPacket,
+      supported_applications: contractPacket.supported_applications,
+      supported_consumers: contractPacket.supported_consumers,
+      blocked_claims: uniqueStrings([
+        ...(Array.isArray(contractPacket.blocked_claims) ? contractPacket.blocked_claims : []),
+        'permit_ready',
+        'fabrication_ready',
+        'AHJ_approval',
+        'professional_approval',
+        'AutoSprink_parity',
+        'brand_ready',
+        'production_ready',
+      ]),
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+      limitations: [
+        'This evidence row preserves the downloadable SAM31 actual-value resolver contract packet for review-packet attachment.',
+        'It is not approval evidence and does not clear professional, AHJ, manufacturer, AutoSprink, permit, fabrication, brand, trademark, CEO-ready, or production claims.',
+      ],
+    };
+    const sourceRef = `openclaw://sam31/actual-value-resolver-contract/${sourceRefConsumer}`;
+    const result = db
+      .prepare(`INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+                VALUES (?, ?, ?, ?, ?, ?)`)
+      .run(
+        projectName,
+        'openclaw_sam31_actual_value_resolver_contract',
+        contractPacket.download_name,
+        sourceRef,
+        'present',
+        JSON.stringify(notes),
+      );
+    const evidenceRow = db.prepare('SELECT * FROM project_evidence WHERE id = ?').get(result.lastInsertRowid);
+    return res.status(201).json({
+      id: result.lastInsertRowid,
+      evidence_id: result.lastInsertRowid,
+      evidence_type: 'openclaw_sam31_actual_value_resolver_contract',
+      status: 'present',
+      source_ref: sourceRef,
+      message: 'SAM31 actual-value resolver contract packet saved as attachable evidence; claims still blocked',
+      evidence: evidenceRow,
+      contract_packet: contractPacket,
+      blocked_claims: notes.blocked_claims,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    });
+  } catch (err) {
+    return res.status(err.httpStatus || 400).json({ error: err.message });
+  }
+});
+
 app.post('/api/projects/:name/openclaw/sam31/actual-value-replacements', authMiddleware, requireRole('admin'), (req, res) => {
   try {
     const projectName = req.params.name;
@@ -3232,6 +3296,17 @@ function localOpenClawSam31ToolDescriptor(projectName = null) {
         produces: 'openclaw.sam31.actual_value_resolver_queue_readback.v1',
         queue_artifact_type: 'openclaw.sam31.actual_value_resolver_queue.v1',
         consumer_action: 'poll_actual_value_resolver_queue',
+        supported_consumers: ['halo_fire', 'landscout', 'nameforge'],
+        temporary_value_policy: 'best_guess_until_employee_replaced',
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      },
+      actual_value_resolver_contract_evidence: {
+        method: 'POST',
+        href_template: '/api/projects/{projectName}/openclaw/sam31/actual-value-resolver-contract/evidence',
+        consumes: 'openclaw.sam31.actual_value_resolver_contract_packet.v1',
+        produces: 'openclaw_sam31_actual_value_resolver_contract',
+        evidence_record_type: 'openclaw_sam31_actual_value_resolver_contract',
         supported_consumers: ['halo_fire', 'landscout', 'nameforge'],
         temporary_value_policy: 'best_guess_until_employee_replaced',
         use_for_claims: false,
