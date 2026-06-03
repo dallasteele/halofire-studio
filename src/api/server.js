@@ -4510,6 +4510,168 @@ app.post('/api/projects/:name/openclaw/sam31/section-to-artifacts-consumer-intak
   }
 });
 
+function halofireSam31ConsumerIntakeSmokePreliminaryReplayFollowupRouteContext(projectName, evidenceId, sprinklerReviewEvidenceId, followupEvidenceId) {
+  const smokeEvidence = openClawSam31SectionToArtifactsConsumerIntakeSmokeEvidenceById(projectName, evidenceId);
+  if (!smokeEvidence) {
+    const e = new Error('Saved SAM31 section-to-artifacts consumer intake smoke evidence not found');
+    e.httpStatus = 404;
+    throw e;
+  }
+  const followupReviewEvidence = latestHalofireSam31ConsumerIntakeSmokeFollowupReviewDecisionEvidence(projectName, evidenceId);
+  const sprinklerReviewEvidence = db
+    .prepare(`SELECT * FROM project_evidence
+              WHERE project_name = ? AND id = ? AND evidence_type = 'halofire_sam31_sprinkler_review_decision'`)
+    .get(projectName, sprinklerReviewEvidenceId);
+  const sprinklerReview = halofireSam31SprinklerReviewDecisionFromEvidence(sprinklerReviewEvidence);
+  if (!sprinklerReviewEvidence || !sprinklerReview) {
+    const e = new Error('HaloFire SAM31 smoke sprinkler review decision evidence not found');
+    e.httpStatus = 404;
+    throw e;
+  }
+  const followupEvidence = db
+    .prepare(`SELECT * FROM project_evidence
+              WHERE id = ? AND project_name = ? AND evidence_type = 'halofire_sam31_sprinkler_preliminary_replay_followup_decision'`)
+    .get(followupEvidenceId, projectName);
+  const followup = halofireSam31SprinklerPreliminaryReplayFollowupDecisionFromEvidence(followupEvidence);
+  if (!followupEvidence || !followup) {
+    const e = new Error('SAM31 smoke preliminary replay follow-up evidence not found');
+    e.httpStatus = 404;
+    throw e;
+  }
+  if (Number(followup.source_section_to_artifacts_consumer_intake_smoke_evidence_id) !== Number(evidenceId)
+    || Number(followup.source_halofire_sam31_sprinkler_review_decision_evidence_id) !== Number(sprinklerReviewEvidenceId)) {
+    const e = new Error('SAM31 smoke preliminary replay follow-up evidence does not match the requested source chain');
+    e.httpStatus = 409;
+    throw e;
+  }
+  if (followupReviewEvidence?.evidence?.id
+    && Number(followup.source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id) !== Number(followupReviewEvidence.evidence.id)) {
+    const e = new Error('SAM31 smoke preliminary replay follow-up evidence does not match the latest smoke follow-up review evidence');
+    e.httpStatus = 409;
+    throw e;
+  }
+  return {
+    smokeEvidence,
+    followupReviewEvidence,
+    sprinklerReviewEvidence,
+    sprinklerReview,
+    followupEvidence,
+    followup,
+  };
+}
+
+app.get('/api/projects/:name/openclaw/sam31/section-to-artifacts-consumer-intake-smoke/:evidenceId/sprinkler-review-packet/decision/:sprinklerReviewEvidenceId/preliminary-replay/followup/:followupEvidenceId/packet/:packetIndex', authMiddleware, (req, res) => {
+  try {
+    const projectName = req.params.name;
+    const evidenceId = Number(req.params.evidenceId);
+    const sprinklerReviewEvidenceId = Number(req.params.sprinklerReviewEvidenceId);
+    const followupEvidenceId = Number(req.params.followupEvidenceId);
+    const packetIndex = Number(req.params.packetIndex);
+    if (!Number.isSafeInteger(evidenceId) || evidenceId <= 0) {
+      return res.status(400).json({ error: 'A positive SAM31 consumer intake smoke evidence id is required' });
+    }
+    if (!Number.isSafeInteger(sprinklerReviewEvidenceId) || sprinklerReviewEvidenceId <= 0) {
+      return res.status(400).json({ error: 'A positive SAM31 smoke sprinkler review decision evidence id is required' });
+    }
+    if (!Number.isSafeInteger(followupEvidenceId) || followupEvidenceId <= 0) {
+      return res.status(400).json({ error: 'A positive SAM31 smoke preliminary replay follow-up evidence id is required' });
+    }
+    if (!Number.isSafeInteger(packetIndex) || packetIndex < 0) {
+      return res.status(400).json({ error: 'A non-negative SAM31 smoke follow-up packet index is required' });
+    }
+    const context = halofireSam31ConsumerIntakeSmokePreliminaryReplayFollowupRouteContext(
+      projectName,
+      evidenceId,
+      sprinklerReviewEvidenceId,
+      followupEvidenceId,
+    );
+    return res.json(buildHalofireSam31SprinklerReplayFollowupPacket(
+      projectName,
+      null,
+      null,
+      context.sprinklerReviewEvidence,
+      context.followupEvidence,
+      context.followup,
+      packetIndex,
+      {
+        smokeEvidence: context.smokeEvidence,
+        followupReviewEvidence: context.followupReviewEvidence,
+      },
+    ));
+  } catch (err) {
+    return res.status(err.httpStatus || 400).json({ error: err.message });
+  }
+});
+
+app.post('/api/projects/:name/openclaw/sam31/section-to-artifacts-consumer-intake-smoke/:evidenceId/sprinkler-review-packet/decision/:sprinklerReviewEvidenceId/preliminary-replay/followup/:followupEvidenceId/packet/:packetIndex/review', authMiddleware, requireRole('admin'), (req, res) => {
+  try {
+    const projectName = req.params.name;
+    const evidenceId = Number(req.params.evidenceId);
+    const sprinklerReviewEvidenceId = Number(req.params.sprinklerReviewEvidenceId);
+    const followupEvidenceId = Number(req.params.followupEvidenceId);
+    const packetIndex = Number(req.params.packetIndex);
+    if (!Number.isSafeInteger(evidenceId) || evidenceId <= 0) {
+      return res.status(400).json({ error: 'A positive SAM31 consumer intake smoke evidence id is required' });
+    }
+    if (!Number.isSafeInteger(sprinklerReviewEvidenceId) || sprinklerReviewEvidenceId <= 0) {
+      return res.status(400).json({ error: 'A positive SAM31 smoke sprinkler review decision evidence id is required' });
+    }
+    if (!Number.isSafeInteger(followupEvidenceId) || followupEvidenceId <= 0) {
+      return res.status(400).json({ error: 'A positive SAM31 smoke preliminary replay follow-up evidence id is required' });
+    }
+    if (!Number.isSafeInteger(packetIndex) || packetIndex < 0) {
+      return res.status(400).json({ error: 'A non-negative SAM31 smoke follow-up packet index is required' });
+    }
+    const context = halofireSam31ConsumerIntakeSmokePreliminaryReplayFollowupRouteContext(
+      projectName,
+      evidenceId,
+      sprinklerReviewEvidenceId,
+      followupEvidenceId,
+    );
+    const sourcePacket = buildHalofireSam31SprinklerReplayFollowupPacket(
+      projectName,
+      null,
+      null,
+      context.sprinklerReviewEvidence,
+      context.followupEvidence,
+      context.followup,
+      packetIndex,
+      {
+        smokeEvidence: context.smokeEvidence,
+        followupReviewEvidence: context.followupReviewEvidence,
+      },
+    );
+    const reviewDecision = normalizeHalofireSam31SprinklerFollowupPacketReviewDecision(projectName, sourcePacket, req.body || {}, req.user || {});
+    const notes = {
+      kind: 'halofire_sam31_sprinkler_followup_packet_review_decision',
+      review: reviewDecision,
+      blocked_claims: reviewDecision.blocked_claims,
+      claim_gate_effect: reviewDecision.claim_gate_effect,
+      limitations: reviewDecision.limitations,
+    };
+    const result = db
+      .prepare(`INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+                VALUES (?, ?, ?, ?, ?, ?)`)
+      .run(
+        projectName,
+        'halofire_sam31_sprinkler_followup_packet_review_decision',
+        sourcePacket.download_name || sourcePacket.artifact_type,
+        reviewDecision.review_ref,
+        'present',
+        JSON.stringify(notes),
+      );
+    const evidenceRow = db.prepare('SELECT * FROM project_evidence WHERE id = ?').get(result.lastInsertRowid);
+    return res.status(201).json({
+      id: result.lastInsertRowid,
+      message: 'SAM31 smoke follow-up packet review decision recorded; claims still blocked',
+      evidence: evidenceRow,
+      ...reviewDecision,
+    });
+  } catch (err) {
+    return res.status(err.httpStatus || 400).json({ error: err.message });
+  }
+});
+
 app.get('/api/projects/:name/evidence/:evidenceId/replay-bid-artifact', authMiddleware, (req, res) => {
   const row = db
     .prepare('SELECT * FROM project_evidence WHERE project_name = ? AND id = ?')
@@ -6102,6 +6264,32 @@ function localOpenClawSam31ToolDescriptor(projectName = null) {
           HALOFIRE_SAM31_OBSTRUCTION_CLASH_PACKET_QUEUE_ITEM_TYPE,
           HALOFIRE_SAM31_SLEEVE_FIRESTOP_PACKET_QUEUE_ITEM_TYPE,
         ],
+        target_application: 'halo_fire',
+        source_packet_artifact_type: HALOFIRE_SAM31_SPRINKLER_REVIEW_PACKET_TYPE,
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      },
+      consumer_intake_smoke_preliminary_replay_followup_packet: {
+        method: 'GET',
+        href_template: '/api/projects/{projectName}/openclaw/sam31/section-to-artifacts-consumer-intake-smoke/{evidenceId}/sprinkler-review-packet/decision/{sprinklerReviewEvidenceId}/preliminary-replay/followup/{followupEvidenceId}/packet/{packetIndex}',
+        consumes: HALOFIRE_SAM31_SPRINKLER_PRELIMINARY_REPLAY_FOLLOWUP_DECISION_TYPE,
+        produces_any: [
+          HALOFIRE_SAM31_OBSTRUCTION_CLASH_PACKET_TYPE,
+          HALOFIRE_SAM31_SLEEVE_FIRESTOP_PACKET_TYPE,
+        ],
+        target_application: 'halo_fire',
+        source_packet_artifact_type: HALOFIRE_SAM31_SPRINKLER_REVIEW_PACKET_TYPE,
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      },
+      consumer_intake_smoke_preliminary_replay_followup_packet_review: {
+        method: 'POST',
+        href_template: '/api/projects/{projectName}/openclaw/sam31/section-to-artifacts-consumer-intake-smoke/{evidenceId}/sprinkler-review-packet/decision/{sprinklerReviewEvidenceId}/preliminary-replay/followup/{followupEvidenceId}/packet/{packetIndex}/review',
+        consumes_any: [
+          HALOFIRE_SAM31_OBSTRUCTION_CLASH_PACKET_TYPE,
+          HALOFIRE_SAM31_SLEEVE_FIRESTOP_PACKET_TYPE,
+        ],
+        produces: HALOFIRE_SAM31_SPRINKLER_FOLLOWUP_PACKET_REVIEW_DECISION_TYPE,
         target_application: 'halo_fire',
         source_packet_artifact_type: HALOFIRE_SAM31_SPRINKLER_REVIEW_PACKET_TYPE,
         use_for_claims: false,
@@ -9751,8 +9939,23 @@ function halofireSam31SprinklerReplayFollowupPacketDownloadSlug(packetQueueItem)
     : 'sam31-obstruction-clash-packet';
 }
 
-function buildHalofireSam31SprinklerReplayFollowupPacket(projectName, evidence, reviewEvidence, sprinklerReviewEvidence, followupEvidence, followup, packetIndex = 0) {
-  const vectorModelContext = openClawSam31VectorModelArtifactReviewContext(projectName, evidence.id);
+function emptyOpenClawSam31VectorModelArtifactReviewContext() {
+  return {
+    source_openclaw_sam31_vector_model_artifact_evidence_id: null,
+    openclaw_sam31_vector_model_artifact: null,
+    source_linked_vector_overlays: [],
+    source_linked_model_3d_candidates: [],
+    source_refs: [],
+  };
+}
+
+function buildHalofireSam31SprinklerReplayFollowupPacket(projectName, evidence, reviewEvidence, sprinklerReviewEvidence, followupEvidence, followup, packetIndex = 0, options = {}) {
+  const smokeEvidence = options.smokeEvidence || null;
+  const followupReviewEvidence = options.followupReviewEvidence || null;
+  const sourceBoundaryEvidenceId = evidence?.id || followup.source_pdf_boundary_evidence_id || null;
+  const vectorModelContext = sourceBoundaryEvidenceId
+    ? openClawSam31VectorModelArtifactReviewContext(projectName, sourceBoundaryEvidenceId)
+    : emptyOpenClawSam31VectorModelArtifactReviewContext();
   const packetQueueItems = halofireSam31SprinklerPreliminaryReplayPacketQueueItems(followup, followupEvidence.id);
   const queueItem = packetQueueItems[packetIndex];
   const issueDecision = Array.isArray(followup.issue_decisions) ? followup.issue_decisions[packetIndex] : null;
@@ -9780,14 +9983,16 @@ function buildHalofireSam31SprinklerReplayFollowupPacket(projectName, evidence, 
     source_followup_decision_evidence_id: followupEvidence.id,
     source_preliminary_replay_artifact_type: HALOFIRE_SAM31_SPRINKLER_PRELIMINARY_REPLAY_ARTIFACT_TYPE,
     source_preliminary_replay_output_artifact_type: HALOFIRE_SAM31_SPRINKLER_PRELIMINARY_REPLAY_OUTPUT_TYPE,
-      source_pdf_boundary_evidence_id: evidence.id,
-      source_openclaw_sam31_consumer_review_evidence_id: reviewEvidence.id,
-      source_halofire_sam31_sprinkler_review_decision_evidence_id: sprinklerReviewEvidence.id,
-      source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id: queueItem.source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id || followup.source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id || null,
-      source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id: queueItem.source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id || followup.source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id || null,
-      source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id: queueItem.source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id || followup.source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id || null,
-      source_openclaw_sam31_extrapolation_evidence_id: queueItem.source_openclaw_sam31_extrapolation_evidence_id || followup.source_openclaw_sam31_extrapolation_evidence_id || null,
-      source_openclaw_sam31_vector_model_artifact_evidence_id: vectorModelContext.source_openclaw_sam31_vector_model_artifact_evidence_id,
+    source_pdf_boundary_evidence_id: sourceBoundaryEvidenceId,
+    source_section_to_artifacts_consumer_intake_smoke_evidence_id: queueItem.source_section_to_artifacts_consumer_intake_smoke_evidence_id || followup.source_section_to_artifacts_consumer_intake_smoke_evidence_id || smokeEvidence?.evidence_id || null,
+    source_openclaw_sam31_consumer_review_evidence_id: reviewEvidence?.id || followup.source_openclaw_sam31_consumer_review_evidence_id || null,
+    source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id: queueItem.source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id || followup.source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id || followupReviewEvidence?.evidence?.id || null,
+    source_halofire_sam31_sprinkler_review_decision_evidence_id: sprinklerReviewEvidence.id,
+    source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id: queueItem.source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id || followup.source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id || null,
+    source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id: queueItem.source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id || followup.source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id || null,
+    source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id: queueItem.source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id || followup.source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id || null,
+    source_openclaw_sam31_extrapolation_evidence_id: queueItem.source_openclaw_sam31_extrapolation_evidence_id || followup.source_openclaw_sam31_extrapolation_evidence_id || null,
+    source_openclaw_sam31_vector_model_artifact_evidence_id: vectorModelContext.source_openclaw_sam31_vector_model_artifact_evidence_id,
     source_application: followup.source_application || null,
     consumer: followup.consumer || null,
     accepted_queue_id: followup.accepted_queue_id || null,
@@ -9820,18 +10025,35 @@ function buildHalofireSam31SprinklerReplayFollowupPacket(projectName, evidence, 
     acceptable_evidence: acceptableEvidence,
     source_refs: uniqueByJson([
       ...(Array.isArray(followup.source_refs) ? followup.source_refs : []),
-      {
+      evidence ? {
         evidence_type: 'pdf_boundary_decision',
         evidence_id: evidence.id,
         source_ref: evidence.source_ref || evidence.source_file || null,
         status: evidence.status,
-      },
-      {
+      } : null,
+      smokeEvidence ? {
+        evidence_type: 'openclaw_sam31_section_to_artifacts_consumer_intake_smoke',
+        evidence_id: smokeEvidence.evidence_id || null,
+        artifact_type: smokeEvidence.artifact_type || 'openclaw.sam31.section_to_artifacts_consumer_intake_smoke.v1',
+        source_ref: smokeEvidence.source_ref || null,
+        source_file: smokeEvidence.source_file || null,
+        status: smokeEvidence.status || 'present',
+        claim_gate_effect: 'no_claims_cleared',
+      } : null,
+      reviewEvidence ? {
         evidence_type: 'openclaw_sam31_consumer_review',
         evidence_id: reviewEvidence.id,
         source_ref: reviewEvidence.source_ref || null,
         status: reviewEvidence.status,
-      },
+      } : null,
+      followupReviewEvidence?.evidence ? {
+        evidence_type: followupReviewEvidence.evidence.evidence_type,
+        evidence_id: followupReviewEvidence.evidence.id,
+        artifact_type: followupReviewEvidence.review?.artifact_type || HALOFIRE_SAM31_CONSUMER_INTAKE_SMOKE_FOLLOWUP_REVIEW_DECISION_TYPE,
+        source_ref: followupReviewEvidence.evidence.source_ref || followupReviewEvidence.review?.review_ref || null,
+        status: followupReviewEvidence.evidence.status,
+        claim_gate_effect: 'no_claims_cleared',
+      } : null,
       {
         evidence_type: 'halofire_sam31_sprinkler_review_decision',
         evidence_id: sprinklerReviewEvidence.id,
@@ -9895,7 +10117,9 @@ function normalizeHalofireSam31SprinklerFollowupPacketReviewDecision(projectName
     source_followup_decision_artifact_type: HALOFIRE_SAM31_SPRINKLER_PRELIMINARY_REPLAY_FOLLOWUP_DECISION_TYPE,
     source_followup_decision_evidence_id: sourcePacket.source_followup_decision_evidence_id,
     source_pdf_boundary_evidence_id: sourcePacket.source_pdf_boundary_evidence_id,
+    source_section_to_artifacts_consumer_intake_smoke_evidence_id: sourcePacket.source_section_to_artifacts_consumer_intake_smoke_evidence_id || null,
     source_openclaw_sam31_consumer_review_evidence_id: sourcePacket.source_openclaw_sam31_consumer_review_evidence_id,
+    source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id: sourcePacket.source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id || null,
     source_halofire_sam31_sprinkler_review_decision_evidence_id: sourcePacket.source_halofire_sam31_sprinkler_review_decision_evidence_id,
     source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id: sourcePacket.source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id || null,
     source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id: sourcePacket.source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id || null,
