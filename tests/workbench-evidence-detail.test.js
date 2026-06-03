@@ -260,6 +260,12 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toContain('Pending SAM31 approval validations');
     expect(html).toContain('sam31_approval_validation_pending');
     expect(html).toContain('sam31_approval_validation_ready_for_gate_resolve');
+    expect(html).toContain('claimGateAuditQuickFilter');
+    expect(html).toContain('claimGateAudit=cleared');
+    expect(html).toContain('Cleared claim-gate audits');
+    expect(html).toContain('claim_gate_resolve_audit_cleared');
+    expect(html).toContain('claim_gate_resolve_audit_ready_for_download');
+    expect(html).toContain('halofire.claim_gate_resolve_audit_packet.v1');
     expect(html).toContain('gate_validation_packet_action');
     expect(html).toContain('Download SAM31 approval gate validation packet');
     expect(html).toContain('downloadHalofireSam31ApprovalUploadGateValidationPacket');

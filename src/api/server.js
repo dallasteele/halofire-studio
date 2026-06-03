@@ -15039,6 +15039,49 @@ function sam31ApprovalUploadValidationRowsFromItems(items, gateStatusByCode) {
   return rows;
 }
 
+function claimGateResolveAuditQueueItems(projectName) {
+  ensureProjectClaimGates(projectName);
+  const gates = db
+    .prepare(`SELECT * FROM claim_gates
+              WHERE project_name = ? AND status = 'cleared'
+              ORDER BY resolved_at DESC, code`)
+    .all(projectName);
+  return gates.map((gate) => {
+    const auditPacketAction = claimGateResolveAuditPacketAction(projectName, gate.code);
+    const evidenceId = Number(gate.resolved_evidence_id || 0) || null;
+    const evidence = evidenceId
+      ? db.prepare('SELECT * FROM project_evidence WHERE project_name = ? AND id = ?').get(projectName, evidenceId)
+      : null;
+    return {
+      id: `claim-gate-resolve-audit:${gate.code}`,
+      kind: 'claim_gate_resolve_audit',
+      artifact_type: 'halofire.claim_gate_resolve_audit_queue_item.v1',
+      project_name: projectName,
+      code: gate.code,
+      status: gate.status,
+      severity: gate.severity,
+      missing_artifact: gate.missing_artifact,
+      acceptable_evidence: [gate.acceptable_evidence],
+      blocked_claims: safeParseJsonArray(gate.blocked_claims),
+      next_action: 'Download and review the resolve audit packet before relying on this cleared gate; unrelated regulated claims remain blocked.',
+      resolved_by: gate.resolved_by || null,
+      resolved_at: gate.resolved_at || null,
+      resolved_evidence_id: evidence?.id || evidenceId,
+      resolved_evidence_ref: gate.resolved_evidence_ref || evidence?.source_ref || null,
+      resolved_evidence_type: evidence?.evidence_type || null,
+      audit_packet_action: auditPacketAction,
+      download_href: auditPacketAction.href,
+      download_name: auditPacketAction.download_name,
+      claim_gate_effect: 'gate_cleared_after_explicit_signed_validation',
+      no_unrelated_claims_cleared: true,
+      limitations: [
+        'This row indexes a previously resolved claim gate.',
+        'It does not clear unrelated professional, AHJ, manufacturer, AutoSprink, permit-ready, fabrication-ready, or engineering-grade claims.',
+      ],
+    };
+  });
+}
+
 app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
   const projectName = req.params.name;
   const filters = {
@@ -15052,6 +15095,7 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
     consumer: String(req.query?.consumer || '').trim().toLowerCase() || null,
     lane: String(req.query?.lane || '').trim().toLowerCase() || null,
     catalogApproval: String(req.query?.catalogApproval || req.query?.catalog_approval || '').trim().toLowerCase() || null,
+    claimGateAudit: String(req.query?.claimGateAudit || req.query?.claim_gate_audit || '').trim().toLowerCase() || null,
     evidenceType: String(req.query?.evidenceType || req.query?.evidence_type || '').trim().toLowerCase() || null,
     targetGate: String(req.query?.targetGate || req.query?.target_gate || '').trim().toUpperCase() || null,
   };
@@ -15074,6 +15118,9 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
   const sam31ApprovalUploadIntakeEvidences = evidence ? latestHalofireSam31ApprovalUploadIntakeEvidence(projectName, evidence.id) : [];
   const approvalGateStatusByCode = sam31ApprovalUploadGateStatusMap(projectName);
   const items = [];
+  for (const claimGateAuditItem of claimGateResolveAuditQueueItems(projectName)) {
+    items.push(claimGateAuditItem);
+  }
   const suppliedDocumentBidTruthItem = suppliedDocumentBidTruthResolverQueueItem(projectName);
   if (suppliedDocumentBidTruthItem) items.push(suppliedDocumentBidTruthItem);
   const officialFlowEvidence = latestOfficialFlowIntakeEvidence(projectName);
@@ -15153,7 +15200,15 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
   if (filters.sam31ApprovalValidation) {
     visibleItems = filterSam31ApprovalValidationItems(visibleItems, filters, approvalGateStatusByCode);
   }
-  if (filters.catalogApproval || filters.evidenceType || (filters.targetGate && !filters.sam31ApprovalValidation)) {
+  if (filters.claimGateAudit) {
+    visibleItems = visibleItems.filter((item) => {
+      if (item.kind !== 'claim_gate_resolve_audit') return false;
+      if (filters.claimGateAudit === 'cleared' && item.status !== 'cleared') return false;
+      if (filters.targetGate && String(item.code || '').toUpperCase() !== filters.targetGate) return false;
+      return true;
+    });
+  }
+  if (filters.catalogApproval || filters.evidenceType || (filters.targetGate && !filters.sam31ApprovalValidation && !filters.claimGateAudit)) {
     visibleItems = visibleItems
       .map((item) => {
         const approvalRows = Array.isArray(item.catalog_approval_packet_rows)
@@ -15205,6 +15260,8 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
       sam31_approval_validation_pending: sam31ApprovalValidationRows.filter((row) => row.latest_approval_upload_intake && row.gate_status !== 'cleared').length,
       sam31_approval_validation_ready_for_gate_resolve: sam31ApprovalValidationRows.filter((row) => row.latest_approval_upload_intake && row.gate_status !== 'cleared' && row.latest_approval_upload_intake.gate_validation_packet_action).length,
       sam31_approval_validation_cleared: sam31ApprovalValidationRows.filter((row) => row.latest_approval_upload_intake && row.gate_status === 'cleared').length,
+      claim_gate_resolve_audit_cleared: visibleItems.filter((item) => item.kind === 'claim_gate_resolve_audit' && item.status === 'cleared').length,
+      claim_gate_resolve_audit_ready_for_download: visibleItems.filter((item) => item.kind === 'claim_gate_resolve_audit' && item.audit_packet_action?.href).length,
       catalog_source_needed: statusCounts.catalog_source_needed || 0,
       catalog_review_needed: statusCounts.catalog_review_needed || 0,
       catalog_evidence_recorded: statusCounts.catalog_evidence_recorded || 0,

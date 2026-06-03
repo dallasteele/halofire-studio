@@ -2735,6 +2735,20 @@ function sam31ApprovalValidationQuickFilter(summary, activeQuery) {
   </div>`;
 }
 
+function claimGateAuditQuickFilter(summary, activeQuery) {
+  const clearedQuery = 'claimGateAudit=cleared';
+  const isClearedActive = activeQuery === clearedQuery;
+  return `<div class="muted" style="font-size:11px;margin-bottom:8px">
+    claimGateAuditQuickFilter:
+    <button class="go" type="button" style="padding:6px 9px;font-size:10px;background:${isClearedActive ? '#047857' : '#374151'}" data-resolver-queue-filter="${escapeHtml(clearedQuery)}">Cleared claim-gate audits</button>
+    ${activeQuery && !isClearedActive ? '<button class="go" type="button" style="padding:6px 9px;font-size:10px;background:#374151" data-resolver-queue-filter="">Show all resolver rows</button>' : ''}
+    <span class="chip">claimGateAudit=cleared</span>
+    <span class="chip">claim_gate_resolve_audit_cleared ${escapeHtml(summary.claim_gate_resolve_audit_cleared || 0)}</span>
+    <span class="chip">claim_gate_resolve_audit_ready_for_download ${escapeHtml(summary.claim_gate_resolve_audit_ready_for_download || 0)}</span>
+    <span class="chip">halofire.claim_gate_resolve_audit_packet.v1</span>
+  </div>`;
+}
+
 function roomBoundaryQuickFilter(summary, activeQuery) {
   const employeeCorrectionQuery = 'roomBoundarySource=employee_review&roomBoundaryState=correction_ready';
   const isEmployeeCorrectionActive = activeQuery === employeeCorrectionQuery;
@@ -2842,6 +2856,19 @@ function resolverQueueDetail(item) {
   const actions = Array.isArray(item.actions) ? item.actions : [];
   if (item.kind === 'supplied_document_bid_truth') {
     return renderSuppliedDocumentBidTruth(item, defaults, acceptable, claims, actions);
+  }
+  if (item.kind === 'claim_gate_resolve_audit') {
+    const action = item.audit_packet_action || {};
+    return `
+    <div class="gate warning" id="${escapeHtml(item.id || item.code)}">
+      <div class="code">${escapeHtml(item.kind)} - ${escapeHtml(item.status).toUpperCase()}</div>
+      <div class="na">${escapeHtml(item.code || 'claim gate')} resolved by ${escapeHtml(item.resolved_by || 'unknown')} at ${escapeHtml(item.resolved_at || 'missing')}</div>
+      <div class="claims">resolved_evidence_id ${escapeHtml(item.resolved_evidence_id || 'missing')} - resolved_evidence_ref ${escapeHtml(item.resolved_evidence_ref || 'missing')} - evidence_type ${escapeHtml(item.resolved_evidence_type || 'missing')}</div>
+      <div class="claims">claim_gate_effect ${escapeHtml(item.claim_gate_effect || 'gate_cleared_after_explicit_signed_validation')} - no_unrelated_claims_cleared ${escapeHtml(item.no_unrelated_claims_cleared === false ? 'false' : 'true')}</div>
+      <div class="claims">Blocks still active unless separately resolved: ${claims.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('') || '<span class="chip">unrelated regulated claims remain fail-closed</span>'}</div>
+      <p style="margin-top:8px">${action.href ? `<a class="go" style="padding:7px 10px;font-size:11px;text-decoration:none;display:inline-block;margin-right:6px;background:#047857" href="${escapeHtml(action.href)}">${escapeHtml(action.label || 'Download resolve audit packet')}</a>` : '<span class="muted">audit packet action missing</span>'}</p>
+      <span class="muted" style="font-size:10px">halofire.claim_gate_resolve_audit_packet.v1 - claimGateAudit=cleared - targetGate=${escapeHtml(item.code || '')}</span>
+    </div>`;
   }
   if (item.kind === 'catalog_vendor_acquisition') {
     const catalogStatusId = `catalogResolverRecordStatus-${escapeHtml(defaults.family_ref || defaults.component_key || 'unknown')}`;
@@ -4029,7 +4056,7 @@ async function refreshResolverQueue() {
     <span class="chip">ready_for_signed_evidence_upload</span>
     <span class="chip">catalog_approval_claims_cleared ${escapeHtml(summary.catalog_approval_claims_cleared || 0)}</span>
     <span class="chip">no claim gates cleared</span>
-  </div>${roomBoundaryQuickFilter(summary, activeQuery)}${sam31ApprovalValidationQuickFilter(summary, activeQuery)}${catalogApprovalQuickFilter(summary, activeQuery)}`;
+  </div>${roomBoundaryQuickFilter(summary, activeQuery)}${sam31ApprovalValidationQuickFilter(summary, activeQuery)}${claimGateAuditQuickFilter(summary, activeQuery)}${catalogApprovalQuickFilter(summary, activeQuery)}`;
   document.getElementById('resolverQueue').innerHTML = queue.items && queue.items.length
     ? summaryHtml + queue.items.map(resolverQueueDetail).join('')
     : '<span class="muted">No resolver queue rows yet. Save a PDF boundary decision for room_boundary_visual_audit, record official_flow_intake, or run catalog acquisition for catalog_vendor_acquisition.</span>';

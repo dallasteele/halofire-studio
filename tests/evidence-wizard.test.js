@@ -361,6 +361,31 @@ describe('HaloFire evidence wizard slice', () => {
       expect.stringMatching(/does not clear unrelated/i),
     ]));
 
+    const auditQueueRes = await request(`${PROJECT_PATH}/resolver-queue?claimGateAudit=cleared&targetGate=PROFESSIONAL_REVIEW_MISSING`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(auditQueueRes.status).toBe(200);
+    const auditQueue = await auditQueueRes.json();
+    expect(auditQueue.filters).toEqual(expect.objectContaining({
+      claimGateAudit: 'cleared',
+      targetGate: 'PROFESSIONAL_REVIEW_MISSING',
+    }));
+    expect(auditQueue.summary.claim_gate_resolve_audit_cleared).toBeGreaterThanOrEqual(1);
+    expect(auditQueue.summary.claim_gate_resolve_audit_ready_for_download).toBeGreaterThanOrEqual(1);
+    expect(auditQueue.items).toEqual([
+      expect.objectContaining({
+        kind: 'claim_gate_resolve_audit',
+        code: 'PROFESSIONAL_REVIEW_MISSING',
+        status: 'cleared',
+        resolved_evidence_id: recordedBody.id,
+        audit_packet_action: expect.objectContaining({
+          artifact_type: 'halofire.claim_gate_resolve_audit_packet.v1',
+          href: `${PROJECT_PATH}/claim-gates/PROFESSIONAL_REVIEW_MISSING/resolve-audit-packet`,
+        }),
+        claim_gate_effect: 'gate_cleared_after_explicit_signed_validation',
+      }),
+    ]);
+
     const afterRows = await (await request(`${PROJECT_PATH}/evidence`, {
       headers: { Authorization: `Bearer ${token}` },
     })).json();
