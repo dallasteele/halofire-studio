@@ -1113,7 +1113,8 @@ async function loadSettingsResolvedSignedReviewerGates(projectName = catalogEvid
     target.innerHTML = rows.map((row, index) => {
       const blocked = Array.isArray(row.blocked_claims) ? row.blocked_claims : [];
       const limitations = Array.isArray(row.limitations) ? row.limitations : [];
-      return `<div class="note" style="margin-bottom:10px">
+      const auditHref = row.download_href || row.audit_packet_action?.href || '';
+      return `<div class="note" style="margin-bottom:10px" data-settings-resolved-gate-row="${escapeHtml(index)}" data-settings-resolved-gate-code="${escapeHtml(row.code || '')}" data-settings-resolved-gate-audit-href="${escapeHtml(auditHref)}">
         <div class="row" style="padding-top:0"><span>${escapeHtml(row.code || 'claim_gate_resolve_audit')}</span><span class="st present">${escapeHtml(row.status || 'cleared')}</span></div>
         <div class="muted" style="margin-top:6px">artifact_type ${escapeHtml(row.artifact_type || 'halofire.claim_gate_resolve_audit_queue_item.v1')} - kind ${escapeHtml(row.kind || 'claim_gate_resolve_audit')}</div>
         <div class="muted" style="margin-top:6px">resolved_evidence_id ${escapeHtml(row.resolved_evidence_id || 'missing')} - resolved_evidence_ref ${escapeHtml(row.resolved_evidence_ref || 'missing')} - resolved_evidence_type ${escapeHtml(row.resolved_evidence_type || 'missing')}</div>
@@ -1122,7 +1123,7 @@ async function loadSettingsResolvedSignedReviewerGates(projectName = catalogEvid
         <div class="muted" style="margin-top:6px">claim_gate_effect ${escapeHtml(row.claim_gate_effect || 'gate_cleared_after_explicit_signed_validation')} - no_unrelated_claims_cleared ${escapeHtml(row.no_unrelated_claims_cleared === false ? 'false' : 'true')}</div>
         <div class="muted" style="margin-top:6px">blocked_claims still requiring separate evidence: ${blocked.map((claim) => `<span class="pill missing">${escapeHtml(claim)}</span>`).join('') || '<span class="pill missing">unrelated regulated claims remain blocked</span>'}</div>
         <div class="muted" style="margin-top:6px">limitations: ${limitations.map((item) => `<span class="pill">${escapeHtml(item)}</span>`).join('') || '<span class="pill">review exact audit packet before relying on this lane</span>'}</div>
-        <button type="button" style="margin-top:8px" data-settings-resolved-gate-audit-download="${index}">Download resolved-gate audit</button>
+        <button type="button" style="margin-top:8px" data-settings-resolved-gate-audit-download="${index}" data-settings-resolved-gate-audit-href="${escapeHtml(auditHref)}">Download resolved-gate audit</button>
       </div>`;
     }).join('') || `<span class="muted">No resolved signed-reviewer gates for ${escapeHtml(projectName)}. Resolve a matching signed evidence row first; regulated claims remain fail-closed.</span>`;
     target.querySelectorAll('[data-settings-resolved-gate-audit-download]').forEach((btn) => {

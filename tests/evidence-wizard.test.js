@@ -428,6 +428,18 @@ describe('HaloFire evidence wizard slice', () => {
       }),
     ]);
 
+    const settingsRes = await request('/settings.html');
+    expect(settingsRes.status).toBe(200);
+    const settingsHtml = await settingsRes.text();
+    expect(settingsHtml).toContain('Resolved Signed-Reviewer Gates');
+    expect(settingsHtml).toContain('loadSettingsResolvedSignedReviewerGates');
+    expect(settingsHtml).toContain('data-settings-resolved-gate-row');
+    expect(settingsHtml).toContain('data-settings-resolved-gate-code');
+    expect(settingsHtml).toContain('data-settings-resolved-gate-audit-href');
+    expect(settingsHtml).toContain('data-settings-resolved-gate-audit-download');
+    expect(settingsHtml).toContain('claimGateAudit=cleared');
+    expect(settingsHtml).toContain('gate_cleared_after_explicit_signed_validation');
+
     const afterRows = await (await request(`${PROJECT_PATH}/evidence`, {
       headers: { Authorization: `Bearer ${token}` },
     })).json();
