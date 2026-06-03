@@ -157,6 +157,7 @@ let sam31ActualValueQueueConsumerFilter = '';
 let sam31ActualValueReplacementReadbackEvidenceFilter = '';
 let currentEvidenceRows = [];
 let latestSam31ActualValueReplacementReadbackEvidence = null;
+let latestSam31ActualValueResolverQueueReadback = null;
 let lastSam31ActualValueResolverReplay = null;
 const SAM31_ACTUAL_VALUE_GLOBAL_READBACK_ROUTE = '/api/openclaw/sam31/actual-value-resolver-queue?projectName=';
 const SAM31_ACTUAL_VALUE_REPLACEMENT_READBACK_ROUTE = '/api/openclaw/sam31/actual-value-replacements?projectName=';
@@ -1194,6 +1195,10 @@ function renderSam31ActualValueQueueSummary(readback) {
   const replacementReadbackFilterLine = replacementReadbackEvidenceFilterId
     ? `replacement_readback_evidence_filter_id ${escapeHtml(replacementReadbackEvidenceFilterId)} <button class="go" type="button" style="padding:5px 8px;font-size:10px;margin:2px;background:#52525b" data-sam31-actual-value-clear-readback-filter="true">clear saved readback filter</button>`
     : 'replacement_readback_evidence_filter_id none';
+  const downloadArtifacts = readback?.download_artifacts || queue.download_artifacts || {};
+  const sourceContractPacket = downloadArtifacts.source_contract_packet || null;
+  const sourceReplacementReadback = downloadArtifacts.source_replacement_readback || null;
+  const filteredArtifactButtons = `<button class="go" type="button" style="padding:5px 8px;font-size:10px;margin:2px;background:#7c3aed" data-sam31-actual-value-filtered-queue-download="true">Download filtered queue readback</button>${sourceContractPacket ? `<button class="go" type="button" style="padding:5px 8px;font-size:10px;margin:2px;background:#4f46e5" data-sam31-actual-value-filtered-contract-download="${escapeHtml(sourceContractPacket.href || '')}">Download filtered source contract packet</button>` : ''}${sourceReplacementReadback ? `<button class="go" type="button" style="padding:5px 8px;font-size:10px;margin:2px;background:#1d4ed8" data-sam31-actual-value-filtered-replacement-readback-download="${escapeHtml(sourceReplacementReadback.href || '')}">Download filtered source replacement readback</button>` : ''}`;
   return `<div id="sam31ActualValueQueueSummary" class="gate warning">
     <div class="code">openclaw.sam31.actual_value_resolver_queue.v1 Â· ${escapeHtml(queue.status || 'actual_value_replacements_pending')}</div>
     <div class="na">global_readback ${escapeHtml(SAM31_ACTUAL_VALUE_GLOBAL_READBACK_ROUTE)} Â· source_project_route ${escapeHtml(readback?.source_project_route || '/api/projects/{projectName}/openclaw/sam31/actual-value-resolver-queue')}</div>
@@ -1205,6 +1210,7 @@ function renderSam31ActualValueQueueSummary(readback) {
     <div class="claims">Consumer pull: ${endpointRows} <button class="go" type="button" style="padding:5px 8px;font-size:10px;margin:2px;background:#52525b" data-sam31-actual-value-clear-filter="true">all consumers</button></div>
     <div class="claims">Replacement readback: <span class="chip">openclaw.sam31.actual_value_replacement_readback.v1</span> ${replacementReadbackRows}</div>
     <div class="claims">Supported filter keys: consumer=halo_fire consumer=landscout consumer=nameforge replacementReadbackEvidenceId=</div>
+    <div class="claims">download_artifacts <span class="chip">filtered_queue_readback</span> <span class="chip">saved_replacement_readback_evidence</span> <span class="chip">source_contract_packet</span> <span class="chip">source_replacement_readback</span> ${filteredArtifactButtons}</div>
     ${renderSam31ActualValueResolverExtrapolationContract(readback)}
     <div class="claims">SAM31+LLM sectioning/object/vector/3D outputs are temporary values until replaced with actual evidence.</div>
   </div>`;
@@ -1291,6 +1297,74 @@ function downloadSam31ActualValueResolverReplay() {
   a.click();
   URL.revokeObjectURL(a.href);
   status.textContent = 'Downloaded openclaw.sam31.actual_value_resolver_replay.v1; claim gates remain blocked.';
+}
+
+function sam31ApiPathFromHref(href = '') {
+  return String(href || '').replace(/^\/api/, '');
+}
+
+function downloadJsonPacket(packet, downloadName, statusText) {
+  const blob = new Blob([JSON.stringify(packet, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = downloadName;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  const status = document.getElementById('sam31ActualValueQueueStatus');
+  if (status) status.textContent = statusText;
+}
+
+function downloadSam31ActualValueFilteredQueueReadback() {
+  const status = document.getElementById('sam31ActualValueQueueStatus');
+  const readback = latestSam31ActualValueResolverQueueReadback;
+  if (!readback || readback.artifact_type !== 'openclaw.sam31.actual_value_resolver_queue_readback.v1') {
+    status.textContent = 'Filtered SAM31 actual-value resolver queue readback is not available yet.';
+    return;
+  }
+  const artifact = readback.download_artifacts?.filtered_queue_readback || {};
+  downloadJsonPacket(
+    readback,
+    artifact.download_name || `${currentProjectName().toLowerCase().replace(/[^a-z0-9]+/g, '-')}-sam31-filtered-actual-value-queue-readback.json`,
+    'Downloaded filtered SAM31 actual-value resolver queue readback; claim gates remain blocked.',
+  );
+}
+
+async function downloadSam31ActualValueFilteredContractPacket(href = '') {
+  const artifactHref = String(href || latestSam31ActualValueResolverQueueReadback?.download_artifacts?.source_contract_packet?.href || '').trim();
+  const status = document.getElementById('sam31ActualValueQueueStatus');
+  if (!artifactHref) {
+    status.textContent = 'Filtered SAM31 source contract packet link is not available.';
+    return;
+  }
+  const packet = await api(sam31ApiPathFromHref(artifactHref));
+  if (packet.artifact_type !== 'openclaw.sam31.actual_value_resolver_contract_packet.v1') {
+    throw new Error('Unexpected SAM31 filtered source contract packet type');
+  }
+  const artifact = latestSam31ActualValueResolverQueueReadback?.download_artifacts?.source_contract_packet || {};
+  downloadJsonPacket(
+    packet,
+    packet.download_name || artifact.download_name || `${currentProjectName().toLowerCase().replace(/[^a-z0-9]+/g, '-')}-sam31-filtered-source-contract-packet.json`,
+    'Downloaded filtered SAM31 source contract packet; claim gates remain blocked.',
+  );
+}
+
+async function downloadSam31ActualValueFilteredReplacementReadback(href = '') {
+  const artifactHref = String(href || latestSam31ActualValueResolverQueueReadback?.download_artifacts?.source_replacement_readback?.href || '').trim();
+  const status = document.getElementById('sam31ActualValueQueueStatus');
+  if (!artifactHref) {
+    status.textContent = 'Filtered SAM31 source replacement readback link is not available.';
+    return;
+  }
+  const packet = await api(sam31ApiPathFromHref(artifactHref));
+  if (packet.artifact_type !== 'openclaw.sam31.actual_value_replacement_readback.v1') {
+    throw new Error('Unexpected SAM31 filtered source replacement readback type');
+  }
+  const artifact = latestSam31ActualValueResolverQueueReadback?.download_artifacts?.source_replacement_readback || {};
+  downloadJsonPacket(
+    packet,
+    artifact.download_name || `${currentProjectName().toLowerCase().replace(/[^a-z0-9]+/g, '-')}-sam31-filtered-source-replacement-readback.json`,
+    'Downloaded filtered SAM31 source replacement readback; claim gates remain blocked.',
+  );
 }
 
 async function downloadSam31ActualValueReplacementReadback(consumer = '') {
@@ -1432,6 +1506,7 @@ async function refreshSam31ActualValueQueue() {
   const index = queue;
   const rows = Array.isArray(queue.items) ? queue.items : [];
   sam31ActualValueQueueRows = rows;
+  latestSam31ActualValueResolverQueueReadback = readback;
   latestSam31ActualValueReplacementReadbackEvidence = readback.latest_actual_value_replacement_readback_evidence
     || queue.latest_actual_value_replacement_readback_evidence
     || null;
@@ -1456,6 +1531,15 @@ async function refreshSam31ActualValueQueue() {
   });
   document.querySelectorAll('[data-sam31-actual-value-clear-readback-filter]').forEach((button) => {
     button.onclick = () => filterSam31ActualValueQueueBySavedReplacementReadbackEvidence('');
+  });
+  document.querySelectorAll('[data-sam31-actual-value-filtered-queue-download]').forEach((button) => {
+    button.onclick = () => downloadSam31ActualValueFilteredQueueReadback();
+  });
+  document.querySelectorAll('[data-sam31-actual-value-filtered-contract-download]').forEach((button) => {
+    button.onclick = () => downloadSam31ActualValueFilteredContractPacket(button.dataset.sam31ActualValueFilteredContractDownload);
+  });
+  document.querySelectorAll('[data-sam31-actual-value-filtered-replacement-readback-download]').forEach((button) => {
+    button.onclick = () => downloadSam31ActualValueFilteredReplacementReadback(button.dataset.sam31ActualValueFilteredReplacementReadbackDownload);
   });
   document.querySelectorAll('[data-sam31-actual-value-replacement-readback-consumer]').forEach((button) => {
     button.onclick = () => downloadSam31ActualValueReplacementReadback(button.dataset.sam31ActualValueReplacementReadbackConsumer);
@@ -3431,6 +3515,7 @@ document.getElementById('projectTarget').onchange = () => {
   lastSuppliedBidTruthDownstreamDefaults = null;
   sam31ActualValueQueueConsumerFilter = '';
   sam31ActualValueReplacementReadbackEvidenceFilter = '';
+  latestSam31ActualValueResolverQueueReadback = null;
   document.getElementById('bidSummary').innerHTML = '';
   document.getElementById('bomCard').style.display = 'none';
   load();

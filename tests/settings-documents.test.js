@@ -1278,6 +1278,48 @@ describe('HaloFire settings + documentation upload/link API', () => {
       claim_gate_effect: 'no_claims_cleared',
       no_claim_gates_cleared: true,
     }));
+    expect(savedScopedQueueReadback.download_artifacts).toEqual(expect.objectContaining({
+      filtered_queue_readback: expect.objectContaining({
+        artifact_type: 'openclaw.sam31.actual_value_resolver_queue_readback.v1',
+        href: expect.stringContaining(`replacementReadbackEvidenceId=${saved.evidence_id}`),
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+      saved_replacement_readback_evidence: expect.objectContaining({
+        artifact_type: 'openclaw.sam31.actual_value_replacement_readback.v1',
+        evidence_id: saved.evidence_id,
+        download_name: expect.stringContaining('sam31-actual-value-replacement-readback'),
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+      source_contract_packet: expect.objectContaining({
+        artifact_type: 'openclaw.sam31.actual_value_resolver_contract_packet.v1',
+        evidence_id: Number(contractEvidence.lastInsertRowid),
+        href: expect.stringContaining(`contractEvidenceId=${contractEvidence.lastInsertRowid}`),
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+      source_replacement_readback: expect.objectContaining({
+        artifact_type: 'openclaw.sam31.actual_value_replacement_readback.v1',
+        href: expect.stringContaining(`contractEvidenceId=${contractEvidence.lastInsertRowid}`),
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    }));
+
+    const filteredContractPacketRes = await request(`/api/openclaw/sam31/actual-value-resolver-contract?projectName=${encodeURIComponent(projectName)}&contractEvidenceId=${contractEvidence.lastInsertRowid}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(filteredContractPacketRes.status).toBe(200);
+    const filteredContractPacket = await filteredContractPacketRes.json();
+    expect(filteredContractPacket).toEqual(expect.objectContaining({
+      requested_consumer: 'nameforge',
+      contract_evidence_filter_id: Number(contractEvidence.lastInsertRowid),
+      queue_readback_href: expect.stringContaining(`contractEvidenceId=${contractEvidence.lastInsertRowid}`),
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
   });
 
   it('records SAM31 actual-value replacements through a typed OpenClaw intake route', async () => {

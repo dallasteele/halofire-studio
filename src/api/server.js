@@ -1520,6 +1520,52 @@ function buildOpenClawSam31ActualValueResolverQueueReadback(projectName, options
     replacementReadbackEvidenceFilterId ? `replacementReadbackEvidenceId=${encodeURIComponent(replacementReadbackEvidenceFilterId)}` : '',
   ].filter(Boolean).join('&');
   const sourceProjectRoute = `/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/actual-value-resolver-queue${projectQuery ? `?${projectQuery}` : ''}`;
+  const queueHref = `/api/openclaw/sam31/actual-value-resolver-queue?${globalQuery}`;
+  const slug = projectName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'halofire-project';
+  const sourceContractQuery = [
+    `projectName=${encodeURIComponent(projectName)}`,
+    effectiveConsumer ? `consumer=${encodeURIComponent(effectiveConsumer)}` : '',
+    contractEvidenceFilterId ? `contractEvidenceId=${encodeURIComponent(contractEvidenceFilterId)}` : '',
+  ].filter(Boolean).join('&');
+  const sourceReplacementQuery = [
+    `projectName=${encodeURIComponent(projectName)}`,
+    effectiveConsumer ? `consumer=${encodeURIComponent(effectiveConsumer)}` : '',
+    contractEvidenceFilterId ? `contractEvidenceId=${encodeURIComponent(contractEvidenceFilterId)}` : '',
+  ].filter(Boolean).join('&');
+  const latestReplacementReadbackEvidence = queue.latest_actual_value_replacement_readback_evidence || null;
+  const downloadArtifacts = {
+    filtered_queue_readback: {
+      artifact_type: 'openclaw.sam31.actual_value_resolver_queue_readback.v1',
+      href: queueHref,
+      download_name: `${slug}-sam31-actual-value-resolver-queue${replacementReadbackEvidenceFilterId ? `-saved-readback-${replacementReadbackEvidenceFilterId}` : ''}.json`,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    },
+    saved_replacement_readback_evidence: latestReplacementReadbackEvidence ? {
+      artifact_type: latestReplacementReadbackEvidence.artifact_type || 'openclaw.sam31.actual_value_replacement_readback.v1',
+      evidence_id: latestReplacementReadbackEvidence.evidence_id || null,
+      source_ref: latestReplacementReadbackEvidence.source_ref || null,
+      source_file: latestReplacementReadbackEvidence.source_file || null,
+      download_name: latestReplacementReadbackEvidence.download_name || latestReplacementReadbackEvidence.source_file || `${slug}-saved-sam31-actual-value-replacement-readback.json`,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    } : null,
+    source_contract_packet: contractEvidenceFilterId ? {
+      artifact_type: 'openclaw.sam31.actual_value_resolver_contract_packet.v1',
+      evidence_id: contractEvidenceFilterId,
+      href: `/api/openclaw/sam31/actual-value-resolver-contract?${sourceContractQuery}`,
+      download_name: `${slug}-sam31-actual-value-resolver-contract-${effectiveConsumer || 'all-consumers'}-evidence-${contractEvidenceFilterId}.json`,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    } : null,
+    source_replacement_readback: {
+      artifact_type: 'openclaw.sam31.actual_value_replacement_readback.v1',
+      href: `/api/openclaw/sam31/actual-value-replacements?${sourceReplacementQuery}`,
+      download_name: `${slug}-sam31-actual-value-replacement-readback-${effectiveConsumer || 'all-consumers'}${contractEvidenceFilterId ? `-contract-${contractEvidenceFilterId}` : ''}.json`,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    },
+  };
   return {
     artifact_type: 'openclaw.sam31.actual_value_resolver_queue_readback.v1',
     status: queue.status,
@@ -1527,7 +1573,7 @@ function buildOpenClawSam31ActualValueResolverQueueReadback(projectName, options
     requested_consumer: effectiveConsumer || null,
     generated_at: queue.generated_at,
     source_project_route: sourceProjectRoute,
-    queue_href: `/api/openclaw/sam31/actual-value-resolver-queue?${globalQuery}`,
+    queue_href: queueHref,
     supported_consumers: queue.supported_consumers,
     consumer_pull_endpoints: openClawSam31ActualValueResolverConsumerPullEndpoints(projectName),
     sam31_llm_extrapolation_contract: queue.sam31_llm_extrapolation_contract,
@@ -1542,6 +1588,7 @@ function buildOpenClawSam31ActualValueResolverQueueReadback(projectName, options
     pending_count: queue.pending_count,
     recorded_count: queue.recorded_count,
     acceptable_actual_evidence: queue.acceptable_actual_evidence,
+    download_artifacts: downloadArtifacts,
     queue,
     use_for_claims: false,
     claim_gate_effect: 'no_claims_cleared',
@@ -1556,25 +1603,32 @@ function buildOpenClawSam31ActualValueResolverQueueReadback(projectName, options
 
 function buildOpenClawSam31ActualValueResolverContractPacket(projectName, options = {}) {
   const requestedConsumer = String(options.consumer || '').trim().toLowerCase();
-  const queueReadback = buildOpenClawSam31ActualValueResolverQueueReadback(projectName, { consumer: requestedConsumer });
+  const queueReadback = buildOpenClawSam31ActualValueResolverQueueReadback(projectName, {
+    consumer: requestedConsumer,
+    contractEvidenceId: options.contractEvidenceId || options.contract_evidence_id,
+    replacementReadbackEvidenceId: options.replacementReadbackEvidenceId || options.replacement_readback_evidence_id,
+  });
+  const effectiveConsumer = queueReadback.requested_consumer || requestedConsumer;
   const contract = queueReadback.sam31_llm_extrapolation_contract
     || openClawSam31ActualValueResolverExtrapolationContract(projectName);
-  const consumerPullEndpoint = requestedConsumer
-    ? queueReadback.consumer_pull_endpoints?.[requestedConsumer] || null
+  const consumerPullEndpoint = effectiveConsumer
+    ? queueReadback.consumer_pull_endpoints?.[effectiveConsumer] || null
     : null;
   const slug = projectName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'halofire-project';
-  const consumerSuffix = requestedConsumer || 'all-consumers';
+  const consumerSuffix = effectiveConsumer || 'all-consumers';
   return {
     artifact_type: 'openclaw.sam31.actual_value_resolver_contract_packet.v1',
     status: 'ready_for_consumer_contract_download',
     project_name: projectName,
-    requested_consumer: requestedConsumer || null,
+    requested_consumer: effectiveConsumer || null,
     generated_at: queueReadback.generated_at,
     queue_artifact_type: queueReadback.queue?.artifact_type || 'openclaw.sam31.actual_value_resolver_queue.v1',
     readback_artifact_type: queueReadback.artifact_type,
     queue_readback_href: queueReadback.queue_href,
     source_project_route: queueReadback.source_project_route,
     download_name: `${slug}-sam31-actual-value-resolver-contract-${consumerSuffix}.json`,
+    contract_evidence_filter_id: queueReadback.contract_evidence_filter_id || null,
+    replacement_readback_evidence_filter_id: queueReadback.replacement_readback_evidence_filter_id || null,
     supported_consumers: queueReadback.supported_consumers,
     supported_applications: [...SAM31_SUPPORTED_APPLICATIONS],
     consumer_pull_endpoint: consumerPullEndpoint,
@@ -1582,6 +1636,7 @@ function buildOpenClawSam31ActualValueResolverContractPacket(projectName, option
     sam31_llm_extrapolation_contract: contract,
     application_contracts: contract.application_contracts || sam31ApplicationContracts(),
     acceptable_actual_evidence: queueReadback.acceptable_actual_evidence,
+    download_artifacts: queueReadback.download_artifacts || null,
     blocked_claims: contract.blocked_claims || [],
     limitations: [
       'This packet lets HaloFire, LandScout, and NameForge cache the shared SAM31+LLM actual-value resolver contract.',
@@ -11806,6 +11861,8 @@ app.get('/api/openclaw/sam31/actual-value-resolver-contract', authMiddleware, (r
   }
   res.json(buildOpenClawSam31ActualValueResolverContractPacket(projectName, {
     consumer: req.query?.consumer,
+    contractEvidenceId: req.query?.contractEvidenceId || req.query?.contract_evidence_id,
+    replacementReadbackEvidenceId: req.query?.replacementReadbackEvidenceId || req.query?.replacement_readback_evidence_id,
   }));
 });
 
