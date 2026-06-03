@@ -157,6 +157,7 @@ let sam31ActualValueQueueConsumerFilter = '';
 let lastSam31ActualValueResolverReplay = null;
 const SAM31_ACTUAL_VALUE_GLOBAL_READBACK_ROUTE = '/api/openclaw/sam31/actual-value-resolver-queue?projectName=';
 const SAM31_ACTUAL_VALUE_REPLACEMENT_READBACK_ROUTE = '/api/openclaw/sam31/actual-value-replacements?projectName=';
+const SAM31_ACTUAL_VALUE_RESOLVER_CONTRACT_ROUTE = '/api/openclaw/sam31/actual-value-resolver-contract?projectName=';
 function currentProjectName() {
   return document.getElementById('projectTarget') ? document.getElementById('projectTarget').value : HOME_DEPOT;
 }
@@ -1116,7 +1117,8 @@ function renderSam31ActualValueResolverExtrapolationContract(readback) {
     produces: ${produces.map((field) => `<span class="chip">${escapeHtml(field)}</span>`).join('') || '<span class="chip">llm_observations</span><span class="chip">vector_overlays</span><span class="chip">model_3d_candidates</span>'}<br>
     supported_applications: ${apps.map((app) => `<span class="chip">${escapeHtml(app)}</span>`).join('') || '<span class="chip">halo_fire</span><span class="chip">landscout</span><span class="chip">nameforge</span>'}<br>
     blocked_claims: ${blocked.map((claim) => `<span class="chip">${escapeHtml(claim)}</span>`).join('') || '<span class="chip">claim gates remain blocked</span>'}<br>
-    use_for_claims false - claim_gate_effect ${escapeHtml(contract.claim_gate_effect || 'no_claims_cleared')}
+    use_for_claims false - claim_gate_effect ${escapeHtml(contract.claim_gate_effect || 'no_claims_cleared')}<br>
+    <button class="go" type="button" style="padding:5px 8px;font-size:10px;margin-top:5px;background:#4f46e5" data-sam31-actual-value-resolver-contract-download="${escapeHtml(sam31ActualValueQueueConsumerFilter || '')}">Download resolver contract packet</button>
   </div>`;
 }
 
@@ -1247,6 +1249,22 @@ async function downloadSam31ActualValueReplacementReadback(consumer = '') {
   status.textContent = 'Downloaded SAM31 actual-value replacement readback; claim gates remain blocked.';
 }
 
+async function downloadSam31ActualValueResolverContractPacket(consumer = '') {
+  const status = document.getElementById('sam31ActualValueQueueStatus');
+  const consumerParam = String(consumer || '').trim();
+  const packet = await api('/openclaw/sam31/actual-value-resolver-contract?projectName=' + encodeURIComponent(currentProjectName()) + (consumerParam ? '&consumer=' + encodeURIComponent(consumerParam) : ''));
+  if (packet.artifact_type !== 'openclaw.sam31.actual_value_resolver_contract_packet.v1') {
+    throw new Error('Unexpected SAM31 actual-value resolver contract packet type');
+  }
+  const blob = new Blob([JSON.stringify(packet, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = packet.download_name || `${currentProjectName().toLowerCase().replace(/[^a-z0-9]+/g, '-')}-sam31-actual-value-resolver-contract${consumerParam ? '-' + consumerParam : ''}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  status.textContent = 'Downloaded openclaw.sam31.actual_value_resolver_contract_packet.v1; claim gates remain blocked.';
+}
+
 async function filterSam31ActualValueQueueByConsumer(consumer = '') {
   sam31ActualValueQueueConsumerFilter = String(consumer || '').trim();
   await refreshSam31ActualValueQueue();
@@ -1278,6 +1296,9 @@ async function refreshSam31ActualValueQueue() {
   });
   document.querySelectorAll('[data-sam31-actual-value-replacement-readback-consumer]').forEach((button) => {
     button.onclick = () => downloadSam31ActualValueReplacementReadback(button.dataset.sam31ActualValueReplacementReadbackConsumer);
+  });
+  document.querySelectorAll('[data-sam31-actual-value-resolver-contract-download]').forEach((button) => {
+    button.onclick = () => downloadSam31ActualValueResolverContractPacket(button.dataset.sam31ActualValueResolverContractDownload);
   });
 }
 

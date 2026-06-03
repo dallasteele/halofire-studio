@@ -175,6 +175,10 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toContain('renderSam31ActualValueResolverExtrapolationContract');
     expect(html).toContain('sam31_llm_extrapolation_contract');
     expect(html).toContain('openclaw.sam31.actual_value_resolver_extrapolation_contract.v1');
+    expect(html).toContain('/api/openclaw/sam31/actual-value-resolver-contract?projectName=');
+    expect(html).toContain('openclaw.sam31.actual_value_resolver_contract_packet.v1');
+    expect(html).toContain('downloadSam31ActualValueResolverContractPacket');
+    expect(html).toContain('data-sam31-actual-value-resolver-contract-download');
     expect(html).toContain('supports_object_identification');
     expect(html).toContain('supports_vector_overlays');
     expect(html).toContain('supports_model_3d_candidates');

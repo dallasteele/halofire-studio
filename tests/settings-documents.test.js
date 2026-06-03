@@ -728,6 +728,46 @@ describe('HaloFire settings + documentation upload/link API', () => {
       claim_gate_effect: 'no_claims_cleared',
     }));
 
+    const contractPacketRes = await request(`/api/openclaw/sam31/actual-value-resolver-contract?projectName=${encodeURIComponent(projectName)}&consumer=nameforge`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(contractPacketRes.status).toBe(200);
+    const contractPacket = await contractPacketRes.json();
+    expect(contractPacket).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.actual_value_resolver_contract_packet.v1',
+      status: 'ready_for_consumer_contract_download',
+      project_name: projectName,
+      requested_consumer: 'nameforge',
+      queue_artifact_type: 'openclaw.sam31.actual_value_resolver_queue.v1',
+      readback_artifact_type: 'openclaw.sam31.actual_value_resolver_queue_readback.v1',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(contractPacket.queue_readback_href).toContain('/api/openclaw/sam31/actual-value-resolver-queue');
+    expect(contractPacket.download_name).toContain('sam31-actual-value-resolver-contract-nameforge.json');
+    expect(contractPacket.sam31_llm_extrapolation_contract).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.actual_value_resolver_extrapolation_contract.v1',
+      supports_object_identification: true,
+      supports_vector_overlays: true,
+      supports_model_3d_candidates: true,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(contractPacket.consumer_pull_endpoint).toEqual(expect.objectContaining({
+      consumer: 'nameforge',
+      action: 'poll_actual_value_resolver_queue',
+      href: expect.stringContaining('consumer=nameforge'),
+      produces: 'openclaw.sam31.actual_value_resolver_queue_readback.v1',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(contractPacket.supported_applications).toEqual(['halo_fire', 'landscout', 'nameforge']);
+    expect(contractPacket.blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'brand_ready',
+      'trademark_ready',
+      'production_ready',
+    ]));
+
     const tool = await (await request('/api/openclaw/sam31/tool', {
       headers: { Authorization: `Bearer ${token}` },
     })).json();

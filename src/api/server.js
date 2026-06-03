@@ -1365,6 +1365,45 @@ function buildOpenClawSam31ActualValueResolverQueueReadback(projectName, options
   };
 }
 
+function buildOpenClawSam31ActualValueResolverContractPacket(projectName, options = {}) {
+  const requestedConsumer = String(options.consumer || '').trim().toLowerCase();
+  const queueReadback = buildOpenClawSam31ActualValueResolverQueueReadback(projectName, { consumer: requestedConsumer });
+  const contract = queueReadback.sam31_llm_extrapolation_contract
+    || openClawSam31ActualValueResolverExtrapolationContract(projectName);
+  const consumerPullEndpoint = requestedConsumer
+    ? queueReadback.consumer_pull_endpoints?.[requestedConsumer] || null
+    : null;
+  const slug = projectName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'halofire-project';
+  const consumerSuffix = requestedConsumer || 'all-consumers';
+  return {
+    artifact_type: 'openclaw.sam31.actual_value_resolver_contract_packet.v1',
+    status: 'ready_for_consumer_contract_download',
+    project_name: projectName,
+    requested_consumer: requestedConsumer || null,
+    generated_at: queueReadback.generated_at,
+    queue_artifact_type: queueReadback.queue?.artifact_type || 'openclaw.sam31.actual_value_resolver_queue.v1',
+    readback_artifact_type: queueReadback.artifact_type,
+    queue_readback_href: queueReadback.queue_href,
+    source_project_route: queueReadback.source_project_route,
+    download_name: `${slug}-sam31-actual-value-resolver-contract-${consumerSuffix}.json`,
+    supported_consumers: queueReadback.supported_consumers,
+    supported_applications: [...SAM31_SUPPORTED_APPLICATIONS],
+    consumer_pull_endpoint: consumerPullEndpoint,
+    consumer_pull_endpoints: queueReadback.consumer_pull_endpoints,
+    sam31_llm_extrapolation_contract: contract,
+    application_contracts: contract.application_contracts || sam31ApplicationContracts(),
+    acceptable_actual_evidence: queueReadback.acceptable_actual_evidence,
+    blocked_claims: contract.blocked_claims || [],
+    limitations: [
+      'This packet lets HaloFire, LandScout, and NameForge cache the shared SAM31+LLM actual-value resolver contract.',
+      'It is not approval evidence and does not clear professional, AHJ, manufacturer, AutoSprink, permit, fabrication, CEO-ready, brand-ready, trademark, or production claims.',
+    ],
+    use_for_claims: false,
+    claim_gate_effect: 'no_claims_cleared',
+    no_claim_gates_cleared: true,
+  };
+}
+
 function buildOpenClawSam31ActualValueReplacementReadback(projectName, options = {}) {
   const requestedConsumer = String(options.consumer || '').trim().toLowerCase();
   const queue = buildOpenClawSam31ActualValueResolverQueue(projectName, { consumer: requestedConsumer });
@@ -11382,6 +11421,16 @@ app.get('/api/openclaw/sam31/status', authMiddleware, async (req, res) => {
 
 app.get('/api/openclaw/sam31/tool', authMiddleware, (req, res) => {
   res.json(localOpenClawSam31ToolDescriptor());
+});
+
+app.get('/api/openclaw/sam31/actual-value-resolver-contract', authMiddleware, (req, res) => {
+  const projectName = String(req.query?.projectName || req.query?.project_name || '').trim();
+  if (!projectName) {
+    return res.status(400).json({ error: 'projectName is required for OpenClaw SAM31 actual-value resolver contract packet' });
+  }
+  res.json(buildOpenClawSam31ActualValueResolverContractPacket(projectName, {
+    consumer: req.query?.consumer,
+  }));
 });
 
 app.get('/api/openclaw/sam31/actual-value-resolver-queue', authMiddleware, (req, res) => {
