@@ -767,7 +767,7 @@ function renderSam31ActualValueReplacementReadbackEvidenceDetail(row) {
     const readback = packet.replacement_readback && typeof packet.replacement_readback === 'object' ? packet.replacement_readback : {};
     const blocked = Array.isArray(packet.blocked_claims) ? packet.blocked_claims : [];
     const limitations = Array.isArray(packet.limitations) ? packet.limitations : [];
-    return `<div class="muted" style="font-size:11px;margin-top:3px">Saved SAM31 actual-value replacement readback evidence detail: ${escapeHtml(packet.artifact_type || readback.artifact_type || 'openclaw.sam31.actual_value_replacement_readback.v1')}<br>requested_consumer ${escapeHtml(packet.requested_consumer || readback.requested_consumer || 'all-consumers')} - item_count ${escapeHtml(readback.item_count ?? 0)} - pending_count ${escapeHtml(readback.pending_count ?? 0)} - recorded_count ${escapeHtml(readback.recorded_count ?? 0)}<br>source_openclaw_sam31_actual_value_resolver_contract_evidence_id ${escapeHtml(packet.source_openclaw_sam31_actual_value_resolver_contract_evidence_id || readback.source_openclaw_sam31_actual_value_resolver_contract_evidence_id || 'missing')} - source_queue_route ${escapeHtml(packet.source_queue_route || readback.source_queue_route || 'missing')}<br>source_ref ${escapeHtml(row.source_ref || 'missing')} - source_file ${escapeHtml(row.source_file || 'missing')} - claim_gate_effect ${escapeHtml(packet.claim_gate_effect || readback.claim_gate_effect || 'no_claims_cleared')} - no_claim_gates_cleared true<br>Blocks still active: ${blocked.map((claim) => `<span class="chip">${escapeHtml(claim)}</span>`).join('') || '<span class="chip">claim gates remain blocked</span>'}<br>Limitations: ${limitations.map((item) => `<span class="chip">${escapeHtml(item)}</span>`).join('') || '<span class="chip">best-effort readback only</span>'}<br><button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0369a1" data-sam31-actual-value-saved-replacement-readback-download="${escapeHtml(row.id)}">Download saved replacement readback evidence</button> <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0f766e" data-sam31-actual-value-open-saved-replacement-readback="${escapeHtml(row.id)}">Open queue from saved readback evidence</button></div>`;
+    return `<div class="muted" style="font-size:11px;margin-top:3px">Saved SAM31 actual-value replacement readback evidence detail: ${escapeHtml(packet.artifact_type || readback.artifact_type || 'openclaw.sam31.actual_value_replacement_readback.v1')}<br>requested_consumer ${escapeHtml(packet.requested_consumer || readback.requested_consumer || 'all-consumers')} - item_count ${escapeHtml(readback.item_count ?? 0)} - pending_count ${escapeHtml(readback.pending_count ?? 0)} - recorded_count ${escapeHtml(readback.recorded_count ?? 0)}<br>source_openclaw_sam31_actual_value_resolver_contract_evidence_id ${escapeHtml(packet.source_openclaw_sam31_actual_value_resolver_contract_evidence_id || readback.source_openclaw_sam31_actual_value_resolver_contract_evidence_id || 'missing')} - source_queue_route ${escapeHtml(packet.source_queue_route || readback.source_queue_route || 'missing')}<br>source_ref ${escapeHtml(row.source_ref || 'missing')} - source_file ${escapeHtml(row.source_file || 'missing')} - claim_gate_effect ${escapeHtml(packet.claim_gate_effect || readback.claim_gate_effect || 'no_claims_cleared')} - no_claim_gates_cleared true<br>record_actual_value_replacement_action halofire.sam31_actual_value_replacement_intake.v1 - openclaw.sam31.saved_readback_artifact_bundle.v1<br>Blocks still active: ${blocked.map((claim) => `<span class="chip">${escapeHtml(claim)}</span>`).join('') || '<span class="chip">claim gates remain blocked</span>'}<br>Limitations: ${limitations.map((item) => `<span class="chip">${escapeHtml(item)}</span>`).join('') || '<span class="chip">best-effort readback only</span>'}<br><button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0369a1" data-sam31-actual-value-saved-replacement-readback-download="${escapeHtml(row.id)}">Download saved replacement readback evidence</button> <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#7c3aed" data-sam31-actual-value-evidence-bundle-download="${escapeHtml(row.id)}">Download saved readback artifact bundle</button> <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0f766e" data-sam31-actual-value-open-saved-replacement-readback="${escapeHtml(row.id)}">Open queue from saved readback evidence</button> <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#b45309" data-sam31-actual-value-evidence-record-context="${escapeHtml(row.id)}">Record exact replacement evidence from saved context</button></div>`;
   } catch {
     return '<div class="muted" style="font-size:11px;margin-top:3px">Saved SAM31 actual-value replacement readback evidence detail unavailable</div>';
   }
@@ -1018,6 +1018,12 @@ async function refreshEvidence() {
   });
   document.querySelectorAll('[data-sam31-actual-value-saved-replacement-readback-download]').forEach((button) => {
     button.onclick = () => downloadSavedSam31ActualValueReplacementReadbackEvidence(button.dataset.sam31ActualValueSavedReplacementReadbackDownload);
+  });
+  document.querySelectorAll('[data-sam31-actual-value-evidence-bundle-download]').forEach((button) => {
+    button.onclick = () => downloadSam31ActualValueReadbackEvidenceBundle(button.dataset.sam31ActualValueEvidenceBundleDownload);
+  });
+  document.querySelectorAll('[data-sam31-actual-value-evidence-record-context]').forEach((button) => {
+    button.onclick = () => openSam31ActualValueReplacementRecordFromSavedContext(button.dataset.sam31ActualValueEvidenceRecordContext);
   });
 }
 
@@ -1457,6 +1463,70 @@ async function downloadSavedSam31ActualValueReplacementReadbackEvidence(evidence
   a.click();
   URL.revokeObjectURL(a.href);
   if (status) status.textContent = 'Downloaded saved openclaw.sam31.actual_value_replacement_readback.v1 evidence; claim gates remain blocked.';
+}
+
+async function downloadSam31ActualValueReadbackEvidenceBundle(evidenceId = '') {
+  const status = document.getElementById('sam31ActualValueQueueStatus') || document.getElementById('evidence');
+  const targetId = String(evidenceId || '').trim();
+  if (!targetId) {
+    if (status) status.textContent = 'Saved SAM31 readback evidence id is required for bundle download.';
+    return;
+  }
+  const readback = await api('/openclaw/sam31/actual-value-resolver-queue?projectName=' + encodeURIComponent(currentProjectName()) + '&replacementReadbackEvidenceId=' + encodeURIComponent(targetId));
+  if (readback.artifact_type !== 'openclaw.sam31.actual_value_resolver_queue_readback.v1') {
+    throw new Error('Unexpected SAM31 saved readback artifact bundle source type');
+  }
+  const evidence = readback.latest_actual_value_replacement_readback_evidence || {};
+  const bundle = {
+    artifact_type: 'openclaw.sam31.saved_readback_artifact_bundle.v1',
+    project_name: readback.project_name || currentProjectName(),
+    source_openclaw_sam31_actual_value_replacement_readback_evidence_id: Number(targetId) || targetId,
+    source_openclaw_sam31_actual_value_resolver_contract_evidence_id: evidence.source_openclaw_sam31_actual_value_resolver_contract_evidence_id
+      || readback.source_openclaw_sam31_actual_value_resolver_contract_evidence_id
+      || null,
+    requested_consumer: readback.requested_consumer || evidence.requested_consumer || null,
+    queue_readback: readback,
+    download_artifacts: readback.download_artifacts || evidence.download_artifacts || {},
+    record_actual_value_replacement_action: evidence.record_actual_value_replacement_action || null,
+    acceptable_actual_evidence: readback.acceptable_actual_evidence || evidence.acceptable_actual_evidence || [],
+    blocked_claims: evidence.blocked_claims || [
+      'permit_ready',
+      'fabrication_ready',
+      'AHJ_approval',
+      'professional_approval',
+      'manufacturer_exact',
+      'AutoSprink_parity',
+    ],
+    limitations: [
+      'Saved SAM31+LLM object labels, vector overlays, and 3D model candidates are temporary values.',
+      'HaloFire employees must replace guesses with exact 1881 workbook, reviewed vector, reviewed 3D model, screenshot, or console evidence.',
+      'This bundle does not clear permit-ready, fabrication-ready, AHJ-ready, engineering-grade, AutoSprink parity, professional approval, manufacturer-exact, brand-ready, or production-ready claims.',
+    ],
+    use_for_claims: false,
+    claim_gate_effect: 'no_claims_cleared',
+    no_claim_gates_cleared: true,
+  };
+  const artifact = bundle.download_artifacts?.filtered_queue_readback || {};
+  downloadJsonPacket(
+    bundle,
+    artifact.download_name || `${currentProjectName().toLowerCase().replace(/[^a-z0-9]+/g, '-')}-sam31-saved-readback-artifact-bundle-${targetId}.json`,
+    'Downloaded openclaw.sam31.saved_readback_artifact_bundle.v1; claim gates remain blocked.',
+  );
+}
+
+async function openSam31ActualValueReplacementRecordFromSavedContext(evidenceId = '') {
+  const status = document.getElementById('sam31ActualValueQueueStatus') || document.getElementById('evidence');
+  const targetId = String(evidenceId || '').trim();
+  if (!targetId) {
+    if (status) status.textContent = 'Saved SAM31 readback evidence id is required to record exact replacement evidence.';
+    return;
+  }
+  sam31ActualValueReplacementReadbackEvidenceFilter = targetId;
+  await refreshSam31ActualValueQueue();
+  document.getElementById('sam31ActualValueQueue')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  if (status) {
+    status.textContent = 'Opened saved SAM31 readback context. Use the filtered row controls to record exact 1881/vector/3D/screenshot replacement evidence; claim gates remain blocked.';
+  }
 }
 
 async function downloadSam31ActualValueResolverContractPacket(consumer = '') {

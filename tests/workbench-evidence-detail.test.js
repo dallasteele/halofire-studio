@@ -209,6 +209,14 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toContain('download_artifacts');
     expect(html).toContain('source_contract_packet');
     expect(html).toContain('source_replacement_readback');
+    expect(html).toContain('openclaw.sam31.saved_readback_artifact_bundle.v1');
+    expect(html).toContain('record_actual_value_replacement_action');
+    expect(html).toContain('Download saved readback artifact bundle');
+    expect(html).toContain('Record exact replacement evidence from saved context');
+    expect(html).toContain('downloadSam31ActualValueReadbackEvidenceBundle');
+    expect(html).toContain('openSam31ActualValueReplacementRecordFromSavedContext');
+    expect(html).toContain('data-sam31-actual-value-evidence-bundle-download');
+    expect(html).toContain('data-sam31-actual-value-evidence-record-context');
     expect(html).toContain('downloadSam31ActualValueFilteredQueueReadback');
     expect(html).toContain('data-sam31-actual-value-filtered-queue-download');
     expect(html).toContain('downloadSam31ActualValueFilteredContractPacket');

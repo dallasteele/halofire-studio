@@ -1306,6 +1306,39 @@ describe('HaloFire settings + documentation upload/link API', () => {
         claim_gate_effect: 'no_claims_cleared',
       }),
     }));
+    expect(savedScopedQueueReadback.latest_actual_value_replacement_readback_evidence).toEqual(expect.objectContaining({
+      evidence_id: saved.evidence_id,
+      download_artifacts: expect.objectContaining({
+        filtered_queue_readback: expect.objectContaining({
+          href: expect.stringContaining(`replacementReadbackEvidenceId=${saved.evidence_id}`),
+          use_for_claims: false,
+          claim_gate_effect: 'no_claims_cleared',
+        }),
+        source_contract_packet: expect.objectContaining({
+          evidence_id: Number(contractEvidence.lastInsertRowid),
+          href: expect.stringContaining(`contractEvidenceId=${contractEvidence.lastInsertRowid}`),
+        }),
+      }),
+      record_actual_value_replacement_action: expect.objectContaining({
+        method: 'POST',
+        href: `/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/actual-value-replacements`,
+        consumes: 'halofire.sam31_actual_value_replacement_intake.v1',
+        produces: 'halofire.sam31_actual_value_replacement_intake.v1',
+        evidence_record_type: 'sam31_actual_value_replacement',
+        source_openclaw_sam31_actual_value_replacement_readback_evidence_id: saved.evidence_id,
+        source_openclaw_sam31_actual_value_resolver_contract_evidence_id: Number(contractEvidence.lastInsertRowid),
+        requested_consumer: 'nameforge',
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+        no_claim_gates_cleared: true,
+      }),
+    }));
+    expect(savedScopedQueueReadback.latest_actual_value_replacement_readback_evidence.record_actual_value_replacement_action.acceptable_actual_evidence).toEqual(expect.arrayContaining([
+      '1881 proposal workbook row or sheet reference',
+      'reviewed vector overlay SVG or marked-up plan ref',
+      'reviewed 3D model candidate ref or model note',
+      'screenshot or console evidence for the reviewed SAM31 section',
+    ]));
 
     const filteredContractPacketRes = await request(`/api/openclaw/sam31/actual-value-resolver-contract?projectName=${encodeURIComponent(projectName)}&contractEvidenceId=${contractEvidence.lastInsertRowid}`, {
       headers: { Authorization: `Bearer ${token}` },

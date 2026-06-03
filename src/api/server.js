@@ -1566,6 +1566,50 @@ function buildOpenClawSam31ActualValueResolverQueueReadback(projectName, options
       claim_gate_effect: 'no_claims_cleared',
     },
   };
+  const recordActualValueReplacementAction = latestReplacementReadbackEvidence ? {
+    artifact_type: 'openclaw.sam31.actual_value_replacement_record_action.v1',
+    label: 'Record exact replacement evidence from saved context',
+    method: 'POST',
+    href: `/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/actual-value-replacements`,
+    consumes: 'halofire.sam31_actual_value_replacement_intake.v1',
+    produces: 'halofire.sam31_actual_value_replacement_intake.v1',
+    evidence_record_type: 'sam31_actual_value_replacement',
+    source_openclaw_sam31_actual_value_replacement_readback_evidence_id: latestReplacementReadbackEvidence.evidence_id || null,
+    source_openclaw_sam31_actual_value_resolver_contract_evidence_id: contractEvidenceFilterId
+      || latestReplacementReadbackEvidence.source_openclaw_sam31_actual_value_resolver_contract_evidence_id
+      || null,
+    requested_consumer: latestReplacementReadbackEvidence.requested_consumer || effectiveConsumer || null,
+    acceptable_actual_evidence: queue.acceptable_actual_evidence || [
+      '1881 proposal workbook row or sheet reference',
+      'reviewed vector overlay SVG or marked-up plan ref',
+      'reviewed 3D model candidate ref or model note',
+      'screenshot or console evidence for the reviewed SAM31 section',
+    ],
+    actual_value_replacement_prefill: queue.items?.[0]?.actual_value_replacement_prefill || null,
+    input_fields: [
+      'source_ref',
+      'source_file',
+      'replacement_values_source_ref',
+      'source_refs',
+      'notes',
+    ],
+    blocked_claims: latestReplacementReadbackEvidence.blocked_claims || [
+      'permit_ready',
+      'fabrication_ready',
+      'AHJ_approval',
+      'professional_approval',
+      'manufacturer_exact',
+      'AutoSprink_parity',
+    ],
+    use_for_claims: false,
+    claim_gate_effect: 'no_claims_cleared',
+    no_claim_gates_cleared: true,
+  } : null;
+  const latestReplacementReadbackEvidenceWithActions = latestReplacementReadbackEvidence ? {
+    ...latestReplacementReadbackEvidence,
+    download_artifacts: downloadArtifacts,
+    record_actual_value_replacement_action: recordActualValueReplacementAction,
+  } : null;
   return {
     artifact_type: 'openclaw.sam31.actual_value_resolver_queue_readback.v1',
     status: queue.status,
@@ -1581,8 +1625,10 @@ function buildOpenClawSam31ActualValueResolverQueueReadback(projectName, options
     replacement_readback_evidence_filter_id: replacementReadbackEvidenceFilterId,
     source_openclaw_sam31_actual_value_resolver_contract_evidence_id: queue.source_openclaw_sam31_actual_value_resolver_contract_evidence_id || null,
     latest_actual_value_resolver_contract_evidence: queue.latest_actual_value_resolver_contract_evidence || null,
-    latest_actual_value_replacement_readback_evidence_id: queue.latest_actual_value_replacement_readback_evidence_id || null,
-    latest_actual_value_replacement_readback_evidence: queue.latest_actual_value_replacement_readback_evidence || null,
+    latest_actual_value_replacement_readback_evidence_id: latestReplacementReadbackEvidenceWithActions?.evidence_id
+      || queue.latest_actual_value_replacement_readback_evidence_id
+      || null,
+    latest_actual_value_replacement_readback_evidence: latestReplacementReadbackEvidenceWithActions,
     saved_actual_value_replacement_readback_count: queue.saved_actual_value_replacement_readback_count || 0,
     item_count: queue.item_count,
     pending_count: queue.pending_count,
