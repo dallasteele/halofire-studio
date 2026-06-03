@@ -1057,6 +1057,7 @@ function openClawSam31ActualValueReplacementReadbackEvidenceFromRow(row) {
 function listOpenClawSam31ActualValueReplacementReadbackEvidence(projectName, options = {}) {
   const requestedConsumer = String(options.consumer || '').trim().toLowerCase();
   const contractEvidenceId = Number(options.contractEvidenceId || options.contract_evidence_id || 0) || null;
+  const replacementReadbackEvidenceId = Number(options.replacementReadbackEvidenceId || options.replacement_readback_evidence_id || 0) || null;
   const rows = db
     .prepare(`SELECT * FROM project_evidence
               WHERE project_name = ? AND evidence_type = 'openclaw_sam31_actual_value_replacement_readback'
@@ -1065,8 +1066,17 @@ function listOpenClawSam31ActualValueReplacementReadbackEvidence(projectName, op
   return rows
     .map(openClawSam31ActualValueReplacementReadbackEvidenceFromRow)
     .filter(Boolean)
+    .filter((row) => !replacementReadbackEvidenceId || row.evidence_id === replacementReadbackEvidenceId)
     .filter((row) => !requestedConsumer || row.requested_consumer === requestedConsumer)
     .filter((row) => !contractEvidenceId || row.source_openclaw_sam31_actual_value_resolver_contract_evidence_id === contractEvidenceId);
+}
+
+function openClawSam31ActualValueReplacementReadbackEvidenceById(projectName, evidenceId) {
+  const targetId = Number(evidenceId || 0) || null;
+  if (!targetId) return null;
+  return listOpenClawSam31ActualValueReplacementReadbackEvidence(projectName, {
+    replacementReadbackEvidenceId: targetId,
+  })[0] || null;
 }
 
 function listSam31ReplayActualValueReplacementDetails(projectName, options = {}) {
@@ -1342,18 +1352,33 @@ function openClawSam31ActualValueResolverExtrapolationContract(projectName = nul
 }
 
 function buildOpenClawSam31ActualValueResolverQueue(projectName, options = {}) {
-  const requestedContractEvidence = openClawSam31ActualValueResolverContractEvidenceById(projectName, options.contractEvidenceId || options.contract_evidence_id);
+  const requestedReplacementReadbackEvidence = openClawSam31ActualValueReplacementReadbackEvidenceById(
+    projectName,
+    options.replacementReadbackEvidenceId || options.replacement_readback_evidence_id,
+  );
+  const requestedContractEvidence = openClawSam31ActualValueResolverContractEvidenceById(
+    projectName,
+    options.contractEvidenceId
+      || options.contract_evidence_id
+      || requestedReplacementReadbackEvidence?.source_openclaw_sam31_actual_value_resolver_contract_evidence_id,
+  );
+  const replacementReadbackConsumer = requestedReplacementReadbackEvidence?.requested_consumer || '';
   const contractEvidenceConsumer = requestedContractEvidence?.requested_consumer && requestedContractEvidence.requested_consumer !== 'all-consumers'
     ? requestedContractEvidence.requested_consumer
     : '';
-  const consumerFilter = String(options.consumer || '').trim().toLowerCase() || contractEvidenceConsumer;
+  const consumerFilter = String(options.consumer || '').trim().toLowerCase() || replacementReadbackConsumer || contractEvidenceConsumer;
   const index = buildOpenClawSam31ActualValueWorkItemIndex(projectName);
   const latestReplacementByReview = latestSam31ActualValueReplacementEvidenceByReview(projectName);
   const latestContractEvidence = requestedContractEvidence || latestOpenClawSam31ActualValueResolverContractEvidence(projectName, consumerFilter);
-  const savedReplacementReadbackEvidenceRows = listOpenClawSam31ActualValueReplacementReadbackEvidence(projectName, {
-    consumer: consumerFilter,
-    contractEvidenceId: requestedContractEvidence?.evidence_id || null,
-  });
+  const savedReplacementReadbackEvidenceRows = requestedReplacementReadbackEvidence
+    ? [requestedReplacementReadbackEvidence].filter((row) => (
+      (!consumerFilter || row.requested_consumer === consumerFilter)
+      && (!requestedContractEvidence?.evidence_id || row.source_openclaw_sam31_actual_value_resolver_contract_evidence_id === requestedContractEvidence.evidence_id)
+    ))
+    : listOpenClawSam31ActualValueReplacementReadbackEvidence(projectName, {
+      consumer: consumerFilter,
+      contractEvidenceId: requestedContractEvidence?.evidence_id || null,
+    });
   const latestReplacementReadbackEvidence = savedReplacementReadbackEvidenceRows[0] || null;
   const sam31LlmExtrapolationContract = openClawSam31ActualValueResolverExtrapolationContract(projectName);
   const replayReplacementItems = listSam31ReplayActualValueReplacementDetails(projectName, { consumer: consumerFilter })
@@ -1445,6 +1470,7 @@ function buildOpenClawSam31ActualValueResolverQueue(projectName, options = {}) {
     project_name: projectName,
     requested_consumer: consumerFilter || null,
     contract_evidence_filter_id: requestedContractEvidence?.evidence_id || null,
+    replacement_readback_evidence_filter_id: requestedReplacementReadbackEvidence?.evidence_id || null,
     generated_at: new Date().toISOString(),
     supported_consumers: ['halo_fire', 'landscout', 'nameforge'],
     sam31_llm_extrapolation_contract: sam31LlmExtrapolationContract,
@@ -1477,17 +1503,21 @@ function buildOpenClawSam31ActualValueResolverQueueReadback(projectName, options
   const queue = buildOpenClawSam31ActualValueResolverQueue(projectName, {
     consumer: requestedConsumer,
     contractEvidenceId: options.contractEvidenceId || options.contract_evidence_id,
+    replacementReadbackEvidenceId: options.replacementReadbackEvidenceId || options.replacement_readback_evidence_id,
   });
   const effectiveConsumer = queue.requested_consumer || requestedConsumer;
   const contractEvidenceFilterId = queue.contract_evidence_filter_id || null;
+  const replacementReadbackEvidenceFilterId = queue.replacement_readback_evidence_filter_id || null;
   const projectQuery = [
     effectiveConsumer ? `consumer=${encodeURIComponent(effectiveConsumer)}` : '',
     contractEvidenceFilterId ? `contractEvidenceId=${encodeURIComponent(contractEvidenceFilterId)}` : '',
+    replacementReadbackEvidenceFilterId ? `replacementReadbackEvidenceId=${encodeURIComponent(replacementReadbackEvidenceFilterId)}` : '',
   ].filter(Boolean).join('&');
   const globalQuery = [
     `projectName=${encodeURIComponent(projectName)}`,
     effectiveConsumer ? `consumer=${encodeURIComponent(effectiveConsumer)}` : '',
     contractEvidenceFilterId ? `contractEvidenceId=${encodeURIComponent(contractEvidenceFilterId)}` : '',
+    replacementReadbackEvidenceFilterId ? `replacementReadbackEvidenceId=${encodeURIComponent(replacementReadbackEvidenceFilterId)}` : '',
   ].filter(Boolean).join('&');
   const sourceProjectRoute = `/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/actual-value-resolver-queue${projectQuery ? `?${projectQuery}` : ''}`;
   return {
@@ -1502,6 +1532,7 @@ function buildOpenClawSam31ActualValueResolverQueueReadback(projectName, options
     consumer_pull_endpoints: openClawSam31ActualValueResolverConsumerPullEndpoints(projectName),
     sam31_llm_extrapolation_contract: queue.sam31_llm_extrapolation_contract,
     contract_evidence_filter_id: contractEvidenceFilterId,
+    replacement_readback_evidence_filter_id: replacementReadbackEvidenceFilterId,
     source_openclaw_sam31_actual_value_resolver_contract_evidence_id: queue.source_openclaw_sam31_actual_value_resolver_contract_evidence_id || null,
     latest_actual_value_resolver_contract_evidence: queue.latest_actual_value_resolver_contract_evidence || null,
     latest_actual_value_replacement_readback_evidence_id: queue.latest_actual_value_replacement_readback_evidence_id || null,
@@ -1941,6 +1972,7 @@ app.get('/api/projects/:name/openclaw/sam31/actual-value-resolver-queue', authMi
   res.json(buildOpenClawSam31ActualValueResolverQueue(req.params.name, {
     consumer: req.query?.consumer,
     contractEvidenceId: req.query?.contractEvidenceId || req.query?.contract_evidence_id,
+    replacementReadbackEvidenceId: req.query?.replacementReadbackEvidenceId || req.query?.replacement_readback_evidence_id,
   }));
 });
 
@@ -11785,6 +11817,7 @@ app.get('/api/openclaw/sam31/actual-value-resolver-queue', authMiddleware, (req,
   res.json(buildOpenClawSam31ActualValueResolverQueueReadback(projectName, {
     consumer: req.query?.consumer,
     contractEvidenceId: req.query?.contractEvidenceId || req.query?.contract_evidence_id,
+    replacementReadbackEvidenceId: req.query?.replacementReadbackEvidenceId || req.query?.replacement_readback_evidence_id,
   }));
 });
 

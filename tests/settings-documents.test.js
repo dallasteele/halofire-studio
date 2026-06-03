@@ -1243,6 +1243,41 @@ describe('HaloFire settings + documentation upload/link API', () => {
       use_for_claims: false,
       claim_gate_effect: 'no_claims_cleared',
     }));
+
+    const savedScopedQueueRes = await request(`/api/openclaw/sam31/actual-value-resolver-queue?projectName=${encodeURIComponent(projectName)}&replacementReadbackEvidenceId=${saved.evidence_id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(savedScopedQueueRes.status).toBe(200);
+    const savedScopedQueueReadback = await savedScopedQueueRes.json();
+    expect(savedScopedQueueReadback).toEqual(expect.objectContaining({
+      requested_consumer: 'nameforge',
+      replacement_readback_evidence_filter_id: saved.evidence_id,
+      contract_evidence_filter_id: Number(contractEvidence.lastInsertRowid),
+      source_openclaw_sam31_actual_value_resolver_contract_evidence_id: Number(contractEvidence.lastInsertRowid),
+      latest_actual_value_replacement_readback_evidence_id: saved.evidence_id,
+      saved_actual_value_replacement_readback_count: 1,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(savedScopedQueueReadback.queue_href).toContain(`replacementReadbackEvidenceId=${saved.evidence_id}`);
+    expect(savedScopedQueueReadback.source_project_route).toContain(`replacementReadbackEvidenceId=${saved.evidence_id}`);
+    expect(savedScopedQueueReadback.queue).toEqual(expect.objectContaining({
+      requested_consumer: 'nameforge',
+      replacement_readback_evidence_filter_id: saved.evidence_id,
+      latest_actual_value_replacement_readback_evidence_id: saved.evidence_id,
+      saved_actual_value_replacement_readback_count: 1,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(savedScopedQueueReadback.queue.items[0]).toEqual(expect.objectContaining({
+      consumer: 'nameforge',
+      source_openclaw_sam31_actual_value_resolver_contract_evidence_id: Number(contractEvidence.lastInsertRowid),
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
   });
 
   it('records SAM31 actual-value replacements through a typed OpenClaw intake route', async () => {
