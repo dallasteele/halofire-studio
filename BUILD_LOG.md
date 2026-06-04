@@ -78,6 +78,13 @@
 - Verified with `npx vitest run tests/workbench-evidence-detail.test.js tests/workbench-supplied-bid-truth-browser-smoke.test.js --reporter=verbose`, `C:/Python312/python.exe E:/ClaudeBot/scripts/verify_agentic_rules.py`, and `git diff --check`. This is `NO_FORMALIZABLE_CLAIM`; it is Workbench provenance/edit-baseline behavior, not a theorem-shaped invariant.
 - Still blocked: AutoSprink parity, AHJ approval, PE/professional review, permit readiness, fabrication readiness, manufacturer-exact models, brand readiness, production readiness, survey-grade claims, and engineering-grade claims.
 
+## 2026-06-04 - Supplied bid-truth downstream rerun sync
+
+- Changed [`workbench.html`](C:/Users/dalla/OneDrive/Documents/HaloFire/workbench.html) so saving a supplied document bid-truth replacement reruns the current sprinkler bid when the Workbench already has a generated request body, keeping the downstream-defaults card, BOM summary, and CAD readback aligned with the latest saved replacement.
+- Added focused browser coverage in [`tests/workbench-supplied-bid-truth-browser-smoke.test.js`](C:/Users/dalla/OneDrive/Documents/HaloFire/tests/workbench-supplied-bid-truth-browser-smoke.test.js) proving follow-up edits update the downstream-defaults card, preserve `claim_gate_effect: no_claims_cleared`, and keep resolver-queue/evidence readback synchronized.
+- Verified with `npx vitest run tests/workbench-supplied-bid-truth-browser-smoke.test.js`, `C:/Python312/python.exe E:/ClaudeBot/scripts/verify_agentic_rules.py`, and `git diff --check`. This is `NO_FORMALIZABLE_CLAIM`; the slice is UI/API rerender and provenance synchronization, not a theorem-shaped invariant.
+- Still blocked: AutoSprink parity, AHJ approval, PE/professional review, permit readiness, fabrication readiness, manufacturer-exact models, brand readiness, production readiness, survey-grade claims, and engineering-grade claims.
+
 ## 2026-06-03 - Settings floor-plan override action download fix
 
 - Fixed the Settings room-boundary override download lane in [`settings.html`](C:/Users/dalla/OneDrive/Documents/HaloFire/settings.html) to normalize stored local `/api/...` hrefs before calling the page API helper, matching the resolved-gate audit path and preventing local `/api/api/...` requests.

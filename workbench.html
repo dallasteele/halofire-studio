@@ -4336,6 +4336,9 @@ async function saveSuppliedDocumentBidTruthReplacement() {
     if (status) status.textContent = 'Saved supplied_document_bid_truth_replacement evidence #' + saved.id + '; claims still blocked.';
     await refreshEvidence();
     await refreshResolverQueue();
+    if (lastBody && Object.keys(lastBody).length) {
+      await rerunCurrentBid();
+    }
   } catch (err) {
     if (status) status.textContent = 'Error: ' + err.message;
   }
@@ -5619,28 +5622,23 @@ function renderCad(cadModel) {
   controls.target.set(cx, ceil / 2, cz); controls.update();
 }
 
-async function runBid(extraBody, btn) {
-  const orig = btn.textContent; btn.disabled = true; btn.textContent = 'Generating…';
-  try {
-    lastBody = { markupPct: 25, ...extraBody };
-    const { bid, floorPlan, suppliedDocumentBidTruth, scene: sceneData, cadModel } = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/sprinkler-bid', {
-      method: 'POST', body: JSON.stringify(lastBody),
-    });
-    lastSuppliedBidTruthDownstreamDefaults = suppliedDocumentBidTruth || null;
-    const r = bid.rooms[0];
-    document.getElementById('bidSummary').innerHTML = `
+function renderBidResult(result) {
+  const { bid, floorPlan, suppliedDocumentBidTruth, cadModel } = result;
+  lastSuppliedBidTruthDownstreamDefaults = suppliedDocumentBidTruth || null;
+  const r = bid.rooms[0];
+  document.getElementById('bidSummary').innerHTML = `
       <div class="kv"><span>Total area</span><b>${bid.totalAreaSqFt.toLocaleString()} sqft</b></div>
       <div class="kv"><span>Sprinkler heads</span><b>${bid.totalHeadCount}</b></div>
-      <div class="kv"><span>Head spacing</span><b>${r.spacingX} × ${r.spacingY} ft (cov ${r.coveragePerHeadSqFt})</b></div>
+      <div class="kv"><span>Head spacing</span><b>${r.spacingX} Ã— ${r.spacingY} ft (cov ${r.coveragePerHeadSqFt})</b></div>
       <div class="kv"><span>Material</span><b>${usd(bid.pricing.materialCost)}</b></div>
       <div class="kv"><span>Labor</span><b>${usd(bid.pricing.laborCost)}</b></div>
       <div class="kv"><span>Best-effort total (+${bid.pricing.markupPct}%)</span><b>${usd(bid.pricing.total)}</b></div>
-      ${bid.pricing.anyEstimated ? '<div class="est">⚠ some unit costs are fallback estimates (no pricebook match)</div>' : ''}
+      ${bid.pricing.anyEstimated ? '<div class="est">âš  some unit costs are fallback estimates (no pricebook match)</div>' : ''}
       ${renderSuppliedBidTruthDownstreamDefaults(suppliedDocumentBidTruth, bid, floorPlan)}`;
-    bindSuppliedBidTruthDownstreamButtons();
+  bindSuppliedBidTruthDownstreamButtons();
 
-    document.getElementById('bomCard').style.display = '';
-    document.getElementById('bom').innerHTML = `<table>
+  document.getElementById('bomCard').style.display = '';
+  document.getElementById('bom').innerHTML = `<table>
       <tr><th>Item</th><th>Qty</th><th>Unit</th><th>Unit cost</th><th>Line total</th><th>Source</th></tr>
       ${bid.pricing.lines.map((l) => `<tr>
         <td>${l.description}</td><td class="num">${l.quantity}</td><td>${l.unit}</td>
@@ -5648,10 +5646,24 @@ async function runBid(extraBody, btn) {
         <td class="${l.priceSource === 'pricebook' ? '' : 'est'}">${l.priceSource}</td></tr>`).join('')}
     </table>`;
 
-    const cm = cadModel ? ` · OpenGeometry: ${cadModel.counts.walls} walls, ${cadModel.counts.pipes} pipes, ${cadModel.counts.heads} heads` : '';
-    document.getElementById('sceneDisclaimer').textContent = cadModel.disclaimer + cm;
-    document.getElementById('dxfBtn').style.display = '';
-    renderCad(cadModel);
+  const cm = cadModel ? ` Â· OpenGeometry: ${cadModel.counts.walls} walls, ${cadModel.counts.pipes} pipes, ${cadModel.counts.heads} heads` : '';
+  document.getElementById('sceneDisclaimer').textContent = cadModel.disclaimer + cm;
+  document.getElementById('dxfBtn').style.display = '';
+  renderCad(cadModel);
+}
+
+async function rerunCurrentBid() {
+  const result = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/sprinkler-bid', {
+    method: 'POST', body: JSON.stringify(lastBody),
+  });
+  renderBidResult(result);
+}
+
+async function runBid(extraBody, btn) {
+  const orig = btn.textContent; btn.disabled = true; btn.textContent = 'Generating…';
+  try {
+    lastBody = { markupPct: 25, ...extraBody };
+    await rerunCurrentBid();
     await refreshEvidence(); // shows the best_effort evidence row the engine recorded
     await refreshResolverQueue();
   } catch (e) {

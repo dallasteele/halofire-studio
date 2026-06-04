@@ -269,4 +269,101 @@ describe('Workbench supplied bid-truth browser smoke', () => {
       await page.close();
     }
   }, 30_000);
+
+  it('re-saves downstream defaults follow-up edits and keeps the card and queue synchronized', async () => {
+    const token = await adminToken();
+    const replacement = await api(`${PROJECT_PATH}/resolver-packets/supplied-document-bid-truth/replacements`, token, {
+      method: 'POST',
+      body: JSON.stringify({
+        reviewer_name: 'HaloFire browser smoke sync reviewer',
+        review_decision: 'replaced_temporary_values',
+        replacement_ref: '1881://employee-bid-truth/downstream-sync-browser-smoke-001',
+        source_file: 'employee-bid-truth-downstream-sync-browser-smoke.json',
+        source_refs: [
+          'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G6',
+          'employee://bid-truth/downstream-sync-browser-smoke-001',
+        ],
+        replacement_values: {
+          square_feet: 88000,
+          head_count: 733,
+          total_man_hours: 1775.5,
+          construction_days: 41,
+          flow_data_available: false,
+        },
+        notes: 'Downstream sync browser smoke replacement.',
+      }),
+    });
+
+    const page = await browser.newPage({ acceptDownloads: true });
+    page.setDefaultTimeout(8000);
+    await page.addInitScript((authToken) => {
+      localStorage.setItem('halofire_token', authToken);
+    }, token);
+
+    try {
+      await page.goto(`${BASE}/workbench.html`, { waitUntil: 'domcontentloaded' });
+      await page.locator('#projectTarget').selectOption(PROJECT_NAME);
+      await page.locator('#genBtn').click();
+      await page.locator('#bidTruthDefaultsCard').waitFor();
+      expect(await page.locator('#bidTruthDefaultsCard').innerText()).toContain(
+        `source_supplied_document_bid_truth_replacement_evidence_id ${replacement.evidence.id}`,
+      );
+
+      await page.locator('[data-supplied-document-bid-truth-focus-replacement]').click();
+      await page.locator('#suppliedBidTruthReviewer').fill('HaloFire browser smoke sync reviewer updated');
+      await page.locator('#suppliedBidTruthReplacementRef').fill('1881://employee-bid-truth/downstream-sync-browser-smoke-002');
+      await page.locator('#suppliedBidTruthSourceFile').fill('employee-bid-truth-downstream-sync-browser-smoke-updated.json');
+      await page.locator('#suppliedBidTruthSourceRefs').fill(JSON.stringify([
+        'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G6',
+        'employee://bid-truth/downstream-sync-browser-smoke-002',
+      ], null, 2));
+      await page.locator('#suppliedBidTruthReplacementValues').fill(JSON.stringify({
+        square_feet: 91001,
+        head_count: 744,
+        total_man_hours: 1888.25,
+        construction_days: 47,
+        flow_data_available: false,
+      }, null, 2));
+      await page.locator('#suppliedBidTruthNotes').fill('Updated downstream sync browser smoke replacement; no claim gates cleared.');
+      await page.locator('[data-supplied-document-bid-truth-save]').click();
+
+      await page.waitForFunction(() => {
+        const text = document.getElementById('bidTruthDefaultsCard')?.textContent || '';
+        return text.includes('Applied defaults: square_feet 91001')
+          && text.includes('head_count 744')
+          && text.includes('construction_days 47')
+          && text.includes('Engine result: totalAreaSqFt 91001');
+      });
+
+      const cardText = await page.locator('#bidTruthDefaultsCard').innerText();
+      expect(cardText).toContain('Applied defaults: square_feet 91001');
+      expect(cardText).toContain('head_count 744');
+      expect(cardText).toContain('total_man_hours 1888.25');
+      expect(cardText).toContain('construction_days 47');
+      expect(cardText).toContain('Engine result: totalAreaSqFt 91001');
+
+      const queue = await api(`${PROJECT_PATH}/resolver-queue`, token);
+      const item = queue.items.find((row) => row.kind === 'supplied_document_bid_truth');
+      expect(item).toEqual(expect.objectContaining({
+        status: 'employee_replacement_recorded',
+        claim_gate_effect: 'no_claims_cleared',
+      }));
+      expect(item.latest_supplied_document_bid_truth_replacement).toEqual(expect.objectContaining({
+        replacement_ref: '1881://employee-bid-truth/downstream-sync-browser-smoke-002',
+        claim_gate_effect: 'no_claims_cleared',
+      }));
+      expect(item.latest_supplied_document_bid_truth_replacement?.source_file).toBe(
+        'employee-bid-truth-downstream-sync-browser-smoke-updated.json',
+      );
+
+      const evidence = await api(`${PROJECT_PATH}/evidence`, token);
+      const replacementRows = evidence.filter((row) => row.evidence_type === 'supplied_document_bid_truth_replacement');
+      expect(replacementRows.length).toBeGreaterThanOrEqual(2);
+      const latestRow = replacementRows.find((row) => row.source_ref === '1881://employee-bid-truth/downstream-sync-browser-smoke-002');
+      expect(latestRow).toBeTruthy();
+      expect(latestRow.status).toBe('best_effort');
+    } finally {
+      await page.close();
+    }
+  }, 30_000);
 });
