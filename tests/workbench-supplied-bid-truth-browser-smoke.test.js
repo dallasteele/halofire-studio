@@ -175,4 +175,98 @@ describe('Workbench supplied bid-truth browser smoke', () => {
       await page.close();
     }
   }, 30_000);
+
+  it('shows supplied bid-truth downstream defaults on generated bid results and downloads the packet', async () => {
+    const token = await adminToken();
+    const replacement = await api(`${PROJECT_PATH}/resolver-packets/supplied-document-bid-truth/replacements`, token, {
+      method: 'POST',
+      body: JSON.stringify({
+        reviewer_name: 'HaloFire browser smoke downstream reviewer',
+        review_decision: 'replaced_temporary_values',
+        replacement_ref: '1881://employee-bid-truth/downstream-browser-smoke-001',
+        source_file: 'employee-bid-truth-downstream-browser-smoke.json',
+        source_refs: [
+          'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G6',
+          'employee://bid-truth/downstream-browser-smoke-001',
+        ],
+        replacement_values: {
+          square_feet: 88000,
+          head_count: 733,
+          total_man_hours: 1775.5,
+          construction_days: 41,
+          flow_data_available: false,
+        },
+        notes: 'Downstream defaults browser smoke replacement.',
+      }),
+    });
+
+    const page = await browser.newPage({ acceptDownloads: true });
+    page.setDefaultTimeout(8000);
+    await page.addInitScript((authToken) => {
+      localStorage.setItem('halofire_token', authToken);
+    }, token);
+
+    try {
+      await page.goto(`${BASE}/workbench.html`, { waitUntil: 'domcontentloaded' });
+      await page.locator('#projectTarget').selectOption(PROJECT_NAME);
+      await page.locator('#genBtn').click();
+      await page.locator('#bidTruthDefaultsCard').waitFor();
+      const cardText = await page.locator('#bidTruthDefaultsCard').innerText();
+      expect(cardText).toContain('supplied bid-truth downstream defaults - employee_replacement_applied');
+      expect(cardText).toContain('source_evidence_type supplied_document_bid_truth_replacement');
+      expect(cardText).toContain(`source_supplied_document_bid_truth_replacement_evidence_id ${replacement.evidence.id}`);
+      expect(cardText).toContain('Applied defaults: square_feet 88000');
+      expect(cardText).toContain('head_count 733');
+      expect(cardText).toContain('construction_days 41');
+      expect(cardText).toContain('claim_gate_effect no_claims_cleared');
+      expect(cardText).toContain('Engine result: totalAreaSqFt 88000');
+
+      const [download] = await Promise.all([
+        page.waitForEvent('download'),
+        page.locator('[data-supplied-bid-truth-downstream-download]').click(),
+      ]);
+      const downloadPath = await download.path();
+      expect(download.suggestedFilename()).toContain('supplied-bid-truth-downstream-defaults');
+      expect(downloadPath).toBeTruthy();
+      const packet = JSON.parse(fs.readFileSync(downloadPath, 'utf8'));
+      expect(packet).toEqual(expect.objectContaining({
+        artifact_type: 'halofire.supplied_document_bid_truth_downstream_defaults_packet.v1',
+        project_name: PROJECT_NAME,
+        source_evidence_type: 'supplied_document_bid_truth_replacement',
+        source_replacement_evidence_id: replacement.evidence.id,
+        source_supplied_document_bid_truth_replacement_evidence_id: replacement.evidence.id,
+        replacement_ref: '1881://employee-bid-truth/downstream-browser-smoke-001',
+        claim_gate_effect: 'no_claims_cleared',
+        no_claim_gates_cleared: true,
+      }));
+      expect(packet.project_truth).toEqual(expect.objectContaining({
+        square_feet: 88000,
+        head_count: 733,
+        total_man_hours: 1775.5,
+        construction_days: 41,
+        source_status: 'employee_replacement_recorded',
+      }));
+
+      await page.locator('[data-supplied-document-bid-truth-focus-replacement]').click();
+      expect(await page.locator('#suppliedBidTruthReplacementRef').inputValue()).toBe(
+        '1881://employee-bid-truth/downstream-browser-smoke-001',
+      );
+      expect(await page.locator('#suppliedBidTruthSourceFile').inputValue()).toBe(
+        'employee-bid-truth-downstream-browser-smoke.json',
+      );
+      expect(JSON.parse(await page.locator('#suppliedBidTruthSourceRefs').inputValue())).toEqual([
+        'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G6',
+        'employee://bid-truth/downstream-browser-smoke-001',
+      ]);
+      expect(JSON.parse(await page.locator('#suppliedBidTruthReplacementValues').inputValue())).toEqual({
+        square_feet: 88000,
+        head_count: 733,
+        total_man_hours: 1775.5,
+        construction_days: 41,
+        flow_data_available: false,
+      });
+    } finally {
+      await page.close();
+    }
+  }, 30_000);
 });

@@ -39,6 +39,13 @@
 - Verified red-to-green with `npx vitest run tests/workbench-room-boundary-floor-plan-override-browser-smoke.test.js --reporter=verbose` and adjacent coverage with `npx vitest run tests/workbench-sam31-consumer-intake-smoke-browser.test.js --reporter=verbose`. This is `NO_FORMALIZABLE_CLAIM`; it is UI/provenance/packet routing, not approval evidence.
 - Still blocked: AutoSprink parity, AHJ approval, PE/professional review, permit readiness, fabrication readiness, manufacturer-exact models, brand readiness, production readiness, survey-grade claims, and engineering-grade claims.
 
+## 2026-06-04 - Supplied bid-truth downstream defaults reuse
+
+- Changed [`workbench.html`](C:/Users/dalla/OneDrive/Documents/HaloFire/workbench.html) so the supplied document bid-truth replacement form reuses the latest saved employee replacement as its edit baseline, including reviewer, review decision, replacement ref, source file/refs, replacement values, and notes.
+- Added focused browser coverage in [`tests/workbench-supplied-bid-truth-browser-smoke.test.js`](C:/Users/dalla/OneDrive/Documents/HaloFire/tests/workbench-supplied-bid-truth-browser-smoke.test.js) proving a generated sprinkler bid shows the downstream-defaults card, downloads the downstream-defaults packet, and reopens the replacement form with the saved employee replacement instead of stale workbook defaults.
+- Verified with `npx vitest run tests/workbench-evidence-detail.test.js tests/workbench-supplied-bid-truth-browser-smoke.test.js --reporter=verbose`, `C:/Python312/python.exe E:/ClaudeBot/scripts/verify_agentic_rules.py`, and `git diff --check`. This is `NO_FORMALIZABLE_CLAIM`; it is Workbench provenance/edit-baseline behavior, not a theorem-shaped invariant.
+- Still blocked: AutoSprink parity, AHJ approval, PE/professional review, permit readiness, fabrication readiness, manufacturer-exact models, brand readiness, production readiness, survey-grade claims, and engineering-grade claims.
+
 ## 2026-06-03 - Settings floor-plan override action download fix
 
 - Fixed the Settings room-boundary override download lane in [`settings.html`](C:/Users/dalla/OneDrive/Documents/HaloFire/settings.html) to normalize stored local `/api/...` hrefs before calling the page API helper, matching the resolved-gate audit path and preventing local `/api/api/...` requests.
