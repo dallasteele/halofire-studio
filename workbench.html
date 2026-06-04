@@ -4287,11 +4287,14 @@ function renderSuppliedBidTruthDownstreamDefaults(defaults, bid, floorPlan) {
   const truth = defaults.project_truth || {};
   const blocked = Array.isArray(defaults.blocked_claims) ? defaults.blocked_claims : [];
   const replaced = Array.isArray(defaults.replaced_fields) ? defaults.replaced_fields : [];
+  const sourceRefs = Array.isArray(defaults.source_refs) ? defaults.source_refs : [];
   return `<div class="gate warning" id="bidTruthDefaultsCard" style="margin-top:10px">
     <div class="code">supplied bid-truth downstream defaults - ${escapeHtml(defaults.status || 'employee_replacement_applied')}</div>
     <div class="na">${escapeHtml(defaults.artifact_type || 'halofire.supplied_document_bid_truth_downstream_defaults.v1')} - ${escapeHtml(defaults.temporary_value_policy || 'best_guess_until_employee_replaced')}</div>
     <div class="claims">source_evidence_type ${escapeHtml(defaults.source_evidence_type || 'supplied_document_bid_truth_replacement')} - source_supplied_document_bid_truth_replacement_evidence_id ${escapeHtml(defaults.source_replacement_evidence_id || 'missing')} - claim_gate_effect ${escapeHtml(defaults.claim_gate_effect || 'no_claims_cleared')}</div>
     <div class="claims">Applied defaults: square_feet ${escapeHtml(truth.square_feet ?? bid?.totalAreaSqFt ?? 'missing')} - head_count ${escapeHtml(truth.head_count ?? 'metadata_only')} - total_man_hours ${escapeHtml(truth.total_man_hours ?? 'missing')} - construction_days ${escapeHtml(truth.construction_days ?? 'missing')}</div>
+    <div class="claims">replacement_ref ${escapeHtml(defaults.replacement_ref || 'missing')} - source_file ${escapeHtml(defaults.source_file || 'missing')}</div>
+    <div class="claims">source_refs ${sourceRefs.length ? sourceRefs.map((ref) => `<span class="chip">${escapeHtml(ref)}</span>`).join('') : '<span class="chip">missing</span>'}</div>
     <div class="claims">Engine result: totalAreaSqFt ${escapeHtml(bid?.totalAreaSqFt ?? 'missing')} - totalHeadCount ${escapeHtml(bid?.totalHeadCount ?? 'missing')} - floorPlan.source ${escapeHtml(floorPlan?.source || 'missing')}</div>
     <div class="claims">Replaced fields: ${replaced.length ? replaced.map((field) => `<span class="chip">${escapeHtml(field)}</span>`).join('') : '<span class="chip">none listed</span>'}</div>
     <div class="claims">Blocks: ${blocked.length ? blocked.map((claim) => `<span class="chip">${escapeHtml(claim)}</span>`).join('') : '<span class="chip">claim gates remain blocked</span>'}</div>

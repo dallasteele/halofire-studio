@@ -218,6 +218,11 @@ describe('Workbench supplied bid-truth browser smoke', () => {
       expect(cardText).toContain('Applied defaults: square_feet 88000');
       expect(cardText).toContain('head_count 733');
       expect(cardText).toContain('construction_days 41');
+      expect(cardText).toContain('replacement_ref 1881://employee-bid-truth/downstream-browser-smoke-001');
+      expect(cardText).toContain('source_file employee-bid-truth-downstream-browser-smoke.json');
+      expect(cardText).toContain('source_refs');
+      expect(cardText).toContain('Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G6');
+      expect(cardText).toContain('employee://bid-truth/downstream-browser-smoke-001');
       expect(cardText).toContain('claim_gate_effect no_claims_cleared');
       expect(cardText).toContain('Engine result: totalAreaSqFt 88000');
 
@@ -340,6 +345,10 @@ describe('Workbench supplied bid-truth browser smoke', () => {
       expect(cardText).toContain('head_count 744');
       expect(cardText).toContain('total_man_hours 1888.25');
       expect(cardText).toContain('construction_days 47');
+      expect(cardText).toContain('replacement_ref 1881://employee-bid-truth/downstream-sync-browser-smoke-002');
+      expect(cardText).toContain('source_file employee-bid-truth-downstream-sync-browser-smoke-updated.json');
+      expect(cardText).toContain('Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G6');
+      expect(cardText).toContain('employee://bid-truth/downstream-sync-browser-smoke-002');
       expect(cardText).toContain('Engine result: totalAreaSqFt 91001');
 
       const queue = await api(`${PROJECT_PATH}/resolver-queue`, token);

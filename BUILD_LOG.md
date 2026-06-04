@@ -1,5 +1,12 @@
 # HaloFire Build Log
 
+## 2026-06-04 - Supplied bid-truth provenance on downstream defaults card
+
+- Surfaced `replacement_ref`, `source_file`, and `source_refs` on the Workbench downstream defaults card so employees can see which saved 1881 replacement and workbook refs are driving the internal-alpha rerun.
+- Added focused browser assertions proving the generated card preserves that provenance after the first replacement save and after a follow-up edit/rerun, while `claim_gate_effect: no_claims_cleared` remains fail-closed.
+- Verified red-to-green with `npx vitest run tests/workbench-supplied-bid-truth-browser-smoke.test.js --reporter=verbose`. This is `NO_FORMALIZABLE_CLAIM`; the slice is UI/provenance truthfulness, not a theorem-shaped invariant.
+- Still blocked: AutoSprink parity, AHJ approval, PE/professional review, permit readiness, fabrication readiness, manufacturer-exact models, brand readiness, production readiness, survey-grade claims, and engineering-grade claims.
+
 ## 2026-06-04 - SAM31 approval upload validation decisions
 
 - Added `halofire.sam31_approval_upload_validation_decision.v1` evidence rows so pending SAM31 approval-upload rows can be reviewed and saved before any claim-gate resolve attempt.
