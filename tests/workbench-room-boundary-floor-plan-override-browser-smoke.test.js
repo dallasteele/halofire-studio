@@ -387,6 +387,41 @@ describe('Workbench room-boundary floor-plan override browser smoke', () => {
       expect(await sprinkler.getAttribute('data-sam31-consumer-intake-smoke-sprinkler-review-packet-href')).toBe(
         `${PROJECT_PATH}/openclaw/sam31/section-to-artifacts-consumer-intake-smoke/${smokeEvidenceId}/sprinkler-review-packet`,
       );
+
+      const defaultFollowup = page.locator(`[data-replay-sam31-consumer-intake-smoke-default-followup-review="${smokeEvidenceId}"]`).first();
+      await defaultFollowup.waitFor({ state: 'attached' });
+      expect(await defaultFollowup.getAttribute('data-source-replay-evidence-id')).toBe(String(savedReplayEvidenceId));
+      expect(await defaultFollowup.getAttribute('data-source-sam31-actual-value-replacement-evidence-id')).toBe(String(replacementEvidenceId));
+      expect(await defaultFollowup.getAttribute('data-claim-gate-effect')).toBe('no_claims_cleared');
+      await defaultFollowup.click();
+      await page.waitForFunction((smokeId) => {
+        const status = document.getElementById(`sam31ConsumerIntakeSmokeFollowupReview-${smokeId}-status`);
+        return status?.dataset.halofireSam31ConsumerIntakeSmokeFollowupReviewEvidenceId
+          && status?.dataset.downloadedSprinklerReviewPacket === 'true';
+      }, String(smokeEvidenceId));
+
+      const defaultStatus = page.locator(`#sam31ConsumerIntakeSmokeFollowupReview-${smokeEvidenceId}-status`);
+      const followupReviewEvidenceId = String(await defaultStatus.getAttribute('data-halofire-sam31-consumer-intake-smoke-followup-review-evidence-id') || '');
+      expect(followupReviewEvidenceId).toMatch(/^\d+$/);
+      expect(await defaultStatus.getAttribute('data-source-replay-evidence-id')).toBe(String(savedReplayEvidenceId));
+      expect(await defaultStatus.getAttribute('data-source-sam31-actual-value-replacement-evidence-id')).toBe(String(replacementEvidenceId));
+      expect(await defaultStatus.getAttribute('data-sam31-consumer-intake-smoke-evidence-id')).toBe(String(smokeEvidenceId));
+      expect(await defaultStatus.getAttribute('data-downloaded-sprinkler-review-packet')).toBe('true');
+      expect(await defaultStatus.getAttribute('data-claim-gate-effect')).toBe('no_claims_cleared');
+
+      await page.locator(`#evidence-${followupReviewEvidenceId}`).waitFor({ state: 'attached' });
+      const followupReviewRow = await page.locator(`#evidence-${followupReviewEvidenceId}`).innerText();
+      expect(followupReviewRow).toContain('halofire_sam31_consumer_intake_smoke_followup_review_decision');
+      expect(followupReviewRow).toContain(`source_replay_evidence_id ${savedReplayEvidenceId}`);
+      expect(followupReviewRow).toContain(`source_sam31_actual_value_replacement_evidence_id ${replacementEvidenceId}`);
+      expect(followupReviewRow).toContain('claim_gate_effect no_claims_cleared');
+
+      await sprinkler.click();
+      await page.waitForFunction(() => document.getElementById('sam31ActualValueQueueStatus')?.textContent?.includes('Downloaded HaloFire SAM31 consumer intake smoke sprinkler review packet'));
+      expect(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-source-replay-evidence-id')).toBe(String(savedReplayEvidenceId));
+      expect(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-source-sam31-actual-value-replacement-evidence-id')).toBe(String(replacementEvidenceId));
+      expect(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-source-halofire-sam31-consumer-intake-smoke-followup-review-evidence-id')).toBe(String(followupReviewEvidenceId));
+      expect(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-claim-gate-effect')).toBe('no_claims_cleared');
     } finally {
       await page.close();
     }

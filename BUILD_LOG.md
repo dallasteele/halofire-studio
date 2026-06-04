@@ -1,5 +1,13 @@
 # HaloFire Build Log
 
+## 2026-06-04 - Replay smoke default follow-up review
+
+- Added a Workbench one-click default HaloFire follow-up review action for replay-scoped `openclaw_sam31_section_to_artifacts_consumer_intake_smoke` rows.
+- The action saves `halofire.sam31_consumer_intake_smoke_followup_review_decision.v1` from the existing follow-up packet issue seeds, immediately downloads the source-linked `halofire.sam31_sprinkler_review_packet.v1`, and preserves `source_replay_evidence_id`, `source_sam31_actual_value_replacement_evidence_id`, the saved smoke evidence id, and `claim_gate_effect: no_claims_cleared` in status metadata.
+- Added a Workbench evidence detail renderer for saved HaloFire smoke follow-up review decisions so employees can see replay/replacement provenance and resolver row counts before moving deeper into sprinkler review.
+- Verified red-to-green with `npx vitest run tests/workbench-room-boundary-floor-plan-override-browser-smoke.test.js --reporter=verbose`, plus adjacent `npx vitest run tests/workbench-sam31-consumer-intake-smoke-browser.test.js --reporter=verbose` and `npx vitest run tests/workbench-evidence-detail.test.js --reporter=verbose`. This is `NO_FORMALIZABLE_CLAIM`; it is UI/provenance/packet routing, not approval evidence.
+- Still blocked: AutoSprink parity, AHJ approval, PE/professional review, permit readiness, fabrication readiness, manufacturer-exact models, brand readiness, production readiness, survey-grade claims, and engineering-grade claims.
+
 ## 2026-06-04 - Workbench replay smoke follow-through
 
 - Added a Workbench one-click action on replay-scoped `sam31_actual_value_replacement` rows to save HaloFire `openclaw_sam31_section_to_artifacts_consumer_intake_smoke` evidence directly from the replay replacement.
