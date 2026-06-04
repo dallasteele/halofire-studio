@@ -1556,6 +1556,11 @@ function openClawSam31SectionToArtifactsConsumerIntakeSmokeEvidenceFromRow(row) 
         || handoff.source_openclaw_sam31_consumer_review_evidence_id
         || 0,
       ) || null,
+      source_replay_evidence_id: Number(
+        parsed.source_replay_evidence_id
+        || handoff.source_replay_evidence_id
+        || 0,
+      ) || null,
       source_sam31_actual_value_replacement_evidence_id: Number(
         parsed.source_sam31_actual_value_replacement_evidence_id
         || handoff.source_sam31_actual_value_replacement_evidence_id
@@ -1564,6 +1569,9 @@ function openClawSam31SectionToArtifactsConsumerIntakeSmokeEvidenceFromRow(row) 
       source_openclaw_sam31_section_to_artifacts_ref: parsed.source_openclaw_sam31_section_to_artifacts_ref
         || handoff.source_openclaw_sam31_section_to_artifacts_ref
         || null,
+      source_refs: Array.isArray(parsed.source_refs)
+        ? parsed.source_refs
+        : (Array.isArray(handoff.source_refs) ? handoff.source_refs : []),
       observed_vector_overlay_count: Number(parsed.observed_vector_overlay_count ?? handoff.vector_overlay_count ?? 0) || 0,
       observed_model_3d_candidate_count: Number(parsed.observed_model_3d_candidate_count ?? handoff.model_3d_candidate_count ?? 0) || 0,
       observed_segment_count: Number(parsed.observed_segment_count ?? handoff.segment_count ?? 0) || 0,
@@ -1717,6 +1725,9 @@ function listSam31ReplayActualValueReplacementDetails(projectName, options = {})
       ].filter(Boolean)),
       replacement_values: replacement.replacement_values || {},
       replacement_summary: replacement.replacement_summary || {},
+      openclaw_sam31_section_to_artifacts: replacement.openclaw_sam31_section_to_artifacts || null,
+      openclaw_sam31_section_to_artifacts_summary: replacement.openclaw_sam31_section_to_artifacts_summary || null,
+      source_openclaw_sam31_section_to_artifacts_ref: replacement.openclaw_sam31_section_to_artifacts_summary?.section_to_artifacts_contract_ref || null,
       supported_applications: supportedApplications,
       openclaw_sam31_shared_consumer_contract: contract,
       product_lanes: productLanes,
@@ -2425,37 +2436,57 @@ function buildOpenClawSam31ActualValueResolverQueue(projectName, options = {}) {
     consumer: consumerFilter,
     sourceReplayEvidenceId: sourceReplayEvidenceFilterId,
   })
-    .map((detail) => ({
-      artifact_type: 'openclaw.sam31.replay_actual_value_replacement_queue_item.v1',
-      id: `sam31-replay-actual-value:${projectName}:${detail.evidence_id}:${consumerFilter || 'all'}`,
-      evidence_id: detail.evidence_id,
-      evidence_type: detail.evidence_type,
-      project_name: projectName,
-      consumer: consumerFilter || null,
-      status: detail.status,
-      intake_status: detail.intake_status,
-      source_runtime: detail.source_runtime,
-      source_replay_evidence_id: detail.source_replay_evidence_id,
-      source_actual_value_handoff_artifact_type: detail.source_actual_value_handoff_artifact_type,
-      source_file: detail.source_file,
-      source_ref: detail.source_ref,
-      source_refs: detail.source_refs,
-      supported_applications: detail.supported_applications,
-      product_lane: detail.product_lane,
-      product_lanes: detail.product_lanes,
-      replacement_summary: detail.replacement_summary,
-      openclaw_sam31_shared_consumer_contract: detail.openclaw_sam31_shared_consumer_contract,
-      acceptable_actual_evidence: detail.acceptable_actual_evidence,
-      next_action: detail.next_action,
-      use_for_claims: false,
-      blocked_claims: detail.blocked_claims,
-      claim_gate_effect: detail.claim_gate_effect || 'no_claims_cleared',
-      no_claim_gates_cleared: true,
-      limitations: [
-        'Replay replacement queue items expose saved SAM31+LLM actual-value evidence to shared product consumers.',
-        'They do not clear regulated, survey-grade, brand-ready, production-ready, or manufacturer-exact claims.',
-      ],
-    }));
+    .map((detail) => {
+      const sectionToArtifactsHandoff = openClawSam31SectionToArtifactsConsumerHandoff(
+        {
+          source_openclaw_sam31_consumer_review_evidence_id: detail.source_openclaw_sam31_consumer_review_evidence_id || null,
+        },
+        {
+          evidence_id: detail.evidence_id,
+          source_replay_evidence_id: detail.source_replay_evidence_id,
+          source_ref: detail.source_ref,
+          source_refs: detail.source_refs,
+          openclaw_sam31_section_to_artifacts_summary: detail.openclaw_sam31_section_to_artifacts_summary,
+        },
+      );
+      return {
+        artifact_type: 'openclaw.sam31.replay_actual_value_replacement_queue_item.v1',
+        id: `sam31-replay-actual-value:${projectName}:${detail.evidence_id}:${consumerFilter || 'all'}`,
+        evidence_id: detail.evidence_id,
+        evidence_type: detail.evidence_type,
+        project_name: projectName,
+        consumer: consumerFilter || null,
+        status: detail.status,
+        intake_status: detail.intake_status,
+        source_runtime: detail.source_runtime,
+        source_replay_evidence_id: detail.source_replay_evidence_id,
+        source_actual_value_handoff_artifact_type: detail.source_actual_value_handoff_artifact_type,
+        source_file: detail.source_file,
+        source_ref: detail.source_ref,
+        source_refs: detail.source_refs,
+        supported_applications: detail.supported_applications,
+        product_lane: detail.product_lane,
+        product_lanes: detail.product_lanes,
+        replacement_summary: detail.replacement_summary,
+        openclaw_sam31_section_to_artifacts: detail.openclaw_sam31_section_to_artifacts,
+        openclaw_sam31_section_to_artifacts_summary: detail.openclaw_sam31_section_to_artifacts_summary,
+        source_openclaw_sam31_section_to_artifacts_ref: detail.source_openclaw_sam31_section_to_artifacts_ref,
+        section_to_artifacts_consumer_handoff: sectionToArtifactsHandoff,
+        openclaw_sam31_shared_consumer_contract: detail.openclaw_sam31_shared_consumer_contract,
+        acceptable_actual_evidence: detail.acceptable_actual_evidence,
+        next_action: sectionToArtifactsHandoff
+          ? 'Post this replay-scoped SAM31 section-to-artifacts handoff into the selected consumer intake smoke path; regulated claims remain blocked.'
+          : detail.next_action,
+        use_for_claims: false,
+        blocked_claims: detail.blocked_claims,
+        claim_gate_effect: detail.claim_gate_effect || 'no_claims_cleared',
+        no_claim_gates_cleared: true,
+        limitations: [
+          'Replay replacement queue items expose saved SAM31+LLM actual-value evidence to shared product consumers.',
+          'They do not clear regulated, survey-grade, brand-ready, production-ready, or manufacturer-exact claims.',
+        ],
+      };
+    });
   const items = index.items
     .filter((item) => !consumerFilter || String(item.consumer || '').toLowerCase() === consumerFilter)
     .map((item) => {
@@ -2614,8 +2645,15 @@ function openClawSam31SectionToArtifactsConsumerHandoff(item, replacementEvidenc
     status: 'ready_for_consumer_review',
     source_runtime: 'sam-3.1+llm',
     source_openclaw_sam31_consumer_review_evidence_id: item?.source_openclaw_sam31_consumer_review_evidence_id || null,
+    source_replay_evidence_id: replacementEvidence?.source_replay_evidence_id || null,
     source_sam31_actual_value_replacement_evidence_id: replacementEvidence?.evidence_id || null,
     source_openclaw_sam31_section_to_artifacts_ref: summary.section_to_artifacts_contract_ref || null,
+    source_refs: uniqueStrings([
+      ...(Array.isArray(replacementEvidence?.source_refs) ? replacementEvidence.source_refs : []),
+      replacementEvidence?.source_ref,
+      item?.source_ref,
+      item?.replacement_ref,
+    ].filter(Boolean)),
     supported_consumers: ['halo_fire', 'landscout', 'nameforge'],
     supported_applications: ['halo_fire', 'landscout', 'nameforge'],
     vector_overlay_count: Number(summary.vector_overlay_count || 0) || 0,
@@ -2665,7 +2703,11 @@ function buildOpenClawSam31SectionToArtifactsConsumerIntakeSmoke(projectName, in
     throw err;
   }
   const queue = buildOpenClawSam31ActualValueResolverQueue(projectName, { consumer });
-  const item = (Array.isArray(queue.items) ? queue.items : []).find((candidate) => {
+  const candidateItems = [
+    ...(Array.isArray(queue.items) ? queue.items : []),
+    ...(Array.isArray(queue.replay_replacement_items) ? queue.replay_replacement_items : []),
+  ];
+  const item = candidateItems.find((candidate) => {
     const handoff = candidate.section_to_artifacts_consumer_handoff || null;
     if (!handoff) return false;
     if (sourceReplacementEvidenceId && Number(handoff.source_sam31_actual_value_replacement_evidence_id) !== sourceReplacementEvidenceId) return false;
@@ -2696,8 +2738,14 @@ function buildOpenClawSam31SectionToArtifactsConsumerIntakeSmoke(projectName, in
     source_runtime: 'sam-3.1+llm',
     source_queue_item_id: item.id || null,
     source_openclaw_sam31_consumer_review_evidence_id: handoff.source_openclaw_sam31_consumer_review_evidence_id || null,
+    source_replay_evidence_id: handoff.source_replay_evidence_id || item.source_replay_evidence_id || null,
     source_sam31_actual_value_replacement_evidence_id: handoff.source_sam31_actual_value_replacement_evidence_id || null,
     source_openclaw_sam31_section_to_artifacts_ref: handoff.source_openclaw_sam31_section_to_artifacts_ref || null,
+    source_refs: uniqueStrings([
+      ...(Array.isArray(item.source_refs) ? item.source_refs : []),
+      ...(Array.isArray(handoff.source_refs) ? handoff.source_refs : []),
+      item.source_ref,
+    ].filter(Boolean)),
     source_ref: `openclaw://sam31/section-to-artifacts-consumer-intake-smoke/${consumer}/${evidenceSuffix}`,
     source_file: `${slug}-sam31-section-to-artifacts-consumer-intake-smoke-${consumer}-${evidenceSuffix}.json`,
     posted_handoff: jsonClone(handoff),
@@ -2747,6 +2795,7 @@ function buildHalofireSam31ConsumerIntakeSmokeFollowupPacket(projectName, smokeE
     'model_3d_candidate_generation',
   ];
   const sourceRefs = [
+    ...(Array.isArray(smokeEvidence.source_refs) ? smokeEvidence.source_refs : []),
     {
       evidence_id: smokeEvidence.evidence_id || null,
       evidence_type: 'openclaw_sam31_section_to_artifacts_consumer_intake_smoke',
@@ -2754,6 +2803,10 @@ function buildHalofireSam31ConsumerIntakeSmokeFollowupPacket(projectName, smokeE
       source_ref: smokeEvidence.source_ref || null,
       source_file: smokeEvidence.source_file || null,
     },
+    smokeEvidence.source_replay_evidence_id ? {
+      evidence_id: smokeEvidence.source_replay_evidence_id,
+      evidence_type: 'best_effort_ai_layout',
+    } : null,
     smokeEvidence.source_sam31_actual_value_replacement_evidence_id ? {
       evidence_id: smokeEvidence.source_sam31_actual_value_replacement_evidence_id,
       evidence_type: 'sam31_actual_value_replacement',
@@ -2770,6 +2823,7 @@ function buildHalofireSam31ConsumerIntakeSmokeFollowupPacket(projectName, smokeE
     source_consumer: sourceConsumer,
     target_application: 'halo_fire',
     source_section_to_artifacts_consumer_intake_smoke_evidence_id: smokeEvidence.evidence_id || null,
+    source_replay_evidence_id: smokeEvidence.source_replay_evidence_id || null,
     source_sam31_actual_value_replacement_evidence_id: smokeEvidence.source_sam31_actual_value_replacement_evidence_id || null,
     source_openclaw_sam31_consumer_review_evidence_id: smokeEvidence.source_openclaw_sam31_consumer_review_evidence_id || null,
     source_openclaw_sam31_section_to_artifacts_ref: smokeEvidence.source_openclaw_sam31_section_to_artifacts_ref || null,
@@ -2784,6 +2838,7 @@ function buildHalofireSam31ConsumerIntakeSmokeFollowupPacket(projectName, smokeE
     source_consumer: sourceConsumer,
     target_application: 'halo_fire',
     source_section_to_artifacts_consumer_intake_smoke_evidence_id: smokeEvidence.evidence_id || null,
+    source_replay_evidence_id: smokeEvidence.source_replay_evidence_id || null,
     source_sam31_actual_value_replacement_evidence_id: smokeEvidence.source_sam31_actual_value_replacement_evidence_id || null,
     source_openclaw_sam31_consumer_review_evidence_id: smokeEvidence.source_openclaw_sam31_consumer_review_evidence_id || null,
     source_openclaw_sam31_section_to_artifacts_ref: smokeEvidence.source_openclaw_sam31_section_to_artifacts_ref || null,
@@ -2871,6 +2926,7 @@ function buildHalofireSam31ConsumerIntakeSmokeFollowupResolverRows(projectName, 
       source_halofire_sam31_consumer_intake_smoke_followup_review_artifact_type: reviewDecision.artifact_type || HALOFIRE_SAM31_CONSUMER_INTAKE_SMOKE_FOLLOWUP_REVIEW_DECISION_TYPE,
       source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id: Number(reviewEvidenceId || reviewDecision.evidence_id || 0) || null,
       source_section_to_artifacts_consumer_intake_smoke_evidence_id: sourcePacket.source_section_to_artifacts_consumer_intake_smoke_evidence_id || null,
+      source_replay_evidence_id: sourcePacket.source_replay_evidence_id || null,
       source_sam31_actual_value_replacement_evidence_id: sourcePacket.source_sam31_actual_value_replacement_evidence_id || null,
       source_openclaw_sam31_consumer_review_evidence_id: sourcePacket.source_openclaw_sam31_consumer_review_evidence_id || null,
       source_openclaw_sam31_section_to_artifacts_ref: sourcePacket.source_openclaw_sam31_section_to_artifacts_ref || null,
@@ -2981,6 +3037,7 @@ function buildHalofireSam31ConsumerIntakeSmokeSprinklerReviewPacket(projectName,
     source_halofire_sam31_consumer_intake_smoke_followup_review_artifact_type: review.artifact_type || HALOFIRE_SAM31_CONSUMER_INTAKE_SMOKE_FOLLOWUP_REVIEW_DECISION_TYPE,
     source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id: reviewEvidence.evidence.id,
     source_section_to_artifacts_consumer_intake_smoke_evidence_id: smokeEvidence.evidence_id || row.source_section_to_artifacts_consumer_intake_smoke_evidence_id || null,
+    source_replay_evidence_id: smokeEvidence.source_replay_evidence_id || row.source_replay_evidence_id || null,
     source_sam31_actual_value_replacement_evidence_id: smokeEvidence.source_sam31_actual_value_replacement_evidence_id || row.source_sam31_actual_value_replacement_evidence_id || null,
     source_openclaw_sam31_consumer_review_evidence_id: smokeEvidence.source_openclaw_sam31_consumer_review_evidence_id || row.source_openclaw_sam31_consumer_review_evidence_id || null,
     source_openclaw_sam31_section_to_artifacts_ref: smokeEvidence.source_openclaw_sam31_section_to_artifacts_ref || row.source_openclaw_sam31_section_to_artifacts_ref || null,
@@ -3022,6 +3079,14 @@ function buildHalofireSam31ConsumerIntakeSmokeSprinklerReviewPacket(projectName,
       source_ref: smokeEvidence.source_ref || null,
       source_file: smokeEvidence.source_file || null,
     },
+    smokeEvidence.source_replay_evidence_id ? {
+      evidence_id: smokeEvidence.source_replay_evidence_id,
+      evidence_type: 'best_effort_ai_layout',
+    } : null,
+    smokeEvidence.source_sam31_actual_value_replacement_evidence_id ? {
+      evidence_id: smokeEvidence.source_sam31_actual_value_replacement_evidence_id,
+      evidence_type: 'sam31_actual_value_replacement',
+    } : null,
     {
       evidence_id: reviewEvidence.evidence.id,
       evidence_type: reviewEvidence.evidence.evidence_type,
@@ -3053,6 +3118,7 @@ function buildHalofireSam31ConsumerIntakeSmokeSprinklerReviewPacket(projectName,
     target_application: 'halo_fire',
     source_section_to_artifacts_consumer_intake_smoke_evidence_id: smokeEvidence.evidence_id || null,
     source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id: reviewEvidence.evidence.id,
+    source_replay_evidence_id: smokeEvidence.source_replay_evidence_id || review.source_replay_evidence_id || null,
     source_sam31_actual_value_replacement_evidence_id: smokeEvidence.source_sam31_actual_value_replacement_evidence_id || null,
     source_openclaw_sam31_consumer_review_evidence_id: smokeEvidence.source_openclaw_sam31_consumer_review_evidence_id || null,
     source_openclaw_sam31_section_to_artifacts_ref: smokeEvidence.source_openclaw_sam31_section_to_artifacts_ref || null,
@@ -3198,6 +3264,7 @@ function normalizeHalofireSam31ConsumerIntakeSmokeSprinklerReviewDecision(projec
     source_sprinkler_review_packet_ref: sprinklerPacket.source_ref || sprinklerPacket.download_name || null,
     source_section_to_artifacts_consumer_intake_smoke_evidence_id: smokeEvidence.evidence_id || null,
     source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id: followupReviewEvidence.evidence.id,
+    source_replay_evidence_id: smokeEvidence.source_replay_evidence_id || sprinklerPacket.source_replay_evidence_id || queueItem.source_replay_evidence_id || null,
     source_sam31_actual_value_replacement_evidence_id: smokeEvidence.source_sam31_actual_value_replacement_evidence_id || null,
     source_openclaw_sam31_consumer_review_evidence_id: smokeEvidence.source_openclaw_sam31_consumer_review_evidence_id || null,
     source_openclaw_sam31_section_to_artifacts_ref: smokeEvidence.source_openclaw_sam31_section_to_artifacts_ref || null,
@@ -4075,6 +4142,18 @@ function normalizeReplaySam31ActualValueReplacementIntake(projectName, replayEvi
     handoff.source_replay_ref,
     ...(Array.isArray(handoff.employee_decision?.source_refs) ? handoff.employee_decision.source_refs : []),
   ].filter(Boolean));
+  const sectionToArtifactsReview = {
+    consumer: 'halo_fire',
+    replacement_ref: handoff.source_replay_ref || sourceRef,
+  };
+  const sectionToArtifacts = buildSam31ActualValueSectionToArtifacts(
+    projectName,
+    body || {},
+    sectionToArtifactsReview,
+    sourceRef,
+    sourceRefs,
+  );
+  const sectionToArtifactsSummary = sam31ActualValueSectionArtifactSummary(sectionToArtifacts);
   return {
     kind: 'sam31ReplayActualValueReplacement',
     artifact_type: 'halofire.sam31_replay_actual_value_replacement_intake.v1',
@@ -4138,7 +4217,18 @@ function normalizeReplaySam31ActualValueReplacementIntake(projectName, replayEvi
       has_bbox: Boolean(replacementValues.bbox || replacementValues.bboxes),
       has_vector_overlay: Boolean(replacementValues.vector_overlay || replacementValues.vector_overlays),
       has_model_3d_candidate: Boolean(replacementValues.model_3d_candidate || replacementValues.model_3d_candidates),
+      has_section_to_artifacts: Boolean(sectionToArtifactsSummary),
+      vector_overlay_count: sectionToArtifactsSummary?.vector_overlay_count
+        ?? (Array.isArray(replacementValues.vector_overlays) ? replacementValues.vector_overlays.length : 0),
+      model_3d_candidate_count: sectionToArtifactsSummary?.model_3d_candidate_count
+        ?? (Array.isArray(replacementValues.model_3d_candidates) ? replacementValues.model_3d_candidates.length : 0),
+      segment_count: sectionToArtifactsSummary?.segment_count
+        ?? (Array.isArray(replacementValues.sections) ? replacementValues.sections.length : 0),
+      object_hypothesis_count: sectionToArtifactsSummary?.object_hypothesis_count
+        ?? (Array.isArray(replacementValues.object_hypotheses) ? replacementValues.object_hypotheses.length : 0),
     },
+    openclaw_sam31_section_to_artifacts: sectionToArtifacts,
+    openclaw_sam31_section_to_artifacts_summary: sectionToArtifactsSummary,
     acceptable_actual_evidence: Array.isArray(handoff.acceptable_actual_evidence) ? handoff.acceptable_actual_evidence : [],
     employee_actual_value_next_action: 'Review this replay-scoped SAM31 actual-value replacement before downstream bid/export use; regulated claims remain blocked.',
     notes: String(body?.notes || '').trim() || null,
@@ -10770,6 +10860,7 @@ function normalizeHalofireSam31ConsumerIntakeSmokeFollowupReviewDecision(project
     project_name: projectName,
     source_packet_artifact_type: sourcePacket.artifact_type,
     source_section_to_artifacts_consumer_intake_smoke_evidence_id: sourcePacket.source_section_to_artifacts_consumer_intake_smoke_evidence_id,
+    source_replay_evidence_id: sourcePacket.source_replay_evidence_id || null,
     source_sam31_actual_value_replacement_evidence_id: sourcePacket.source_sam31_actual_value_replacement_evidence_id || null,
     source_openclaw_sam31_consumer_review_evidence_id: sourcePacket.source_openclaw_sam31_consumer_review_evidence_id || null,
     source_openclaw_sam31_section_to_artifacts_ref: sourcePacket.source_openclaw_sam31_section_to_artifacts_ref || null,

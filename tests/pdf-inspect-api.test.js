@@ -1579,6 +1579,47 @@ describe('PDF page inspection API', () => {
           bbox: { minX: 0, minY: 0, maxX: 40, maxY: 12, widthFt: 40, heightFt: 12 },
           vector_overlay: { id: 'vector:employee-reviewed-corridor-a', source_ref: '1881://employee-vector/corridor-a.svg' },
           model_3d_candidate: { id: 'model3d:employee-reviewed-corridor-a', status: 'not_applicable_for_2d_boundary' },
+          sections: [
+            {
+              id: 'section:employee-reviewed-corridor-a',
+              semantic_label: 'reviewed corridor boundary',
+              polygon: [[0, 0], [40, 0], [40, 12], [0, 12], [0, 0]],
+              confidence: 0.91,
+            },
+          ],
+          object_hypotheses: [
+            {
+              id: 'object:employee-reviewed-corridor-a',
+              segment_id: 'section:employee-reviewed-corridor-a',
+              semantic_label: 'corridor boundary',
+              confidence: 0.9,
+            },
+          ],
+          llm_observations: [
+            {
+              id: 'llm:employee-reviewed-corridor-a',
+              segment_id: 'section:employee-reviewed-corridor-a',
+              object_hypothesis_id: 'object:employee-reviewed-corridor-a',
+              semantic_label: 'corridor boundary',
+              confidence: 0.86,
+            },
+          ],
+          vector_overlays: [
+            {
+              id: 'vector:employee-reviewed-corridor-a',
+              segment_id: 'section:employee-reviewed-corridor-a',
+              svg_path: 'M 0 0 L 40 0 L 40 12 L 0 12 Z',
+              source_refs: ['1881://employee-vector/corridor-a.svg'],
+            },
+          ],
+          model_3d_candidates: [
+            {
+              id: 'model3d:employee-reviewed-corridor-a',
+              segment_id: 'section:employee-reviewed-corridor-a',
+              primitive: 'corridor_boundary_extrusion',
+              source_refs: ['1881://employee-model/corridor-a.glb'],
+            },
+          ],
           source_ref: '1881://employee-actual-values/replay-handoff/sheet-7',
           confidence: 0.91,
         },
@@ -1611,6 +1652,16 @@ describe('PDF page inspection API', () => {
       has_bbox: true,
       has_vector_overlay: true,
       has_model_3d_candidate: true,
+      has_section_to_artifacts: true,
+    }));
+    expect(replacement.openclaw_sam31_section_to_artifacts_summary).toEqual(expect.objectContaining({
+      section_to_artifacts_contract_ref: 'openclaw.sam31.section_to_artifacts_contract.v1',
+      segment_count: 1,
+      object_hypothesis_count: 1,
+      vector_overlay_count: 1,
+      model_3d_candidate_count: 1,
+      claim_gate_effect: 'no_claims_cleared',
+      use_for_claims: false,
     }));
     expect(replacement.source_actual_value_handoff).toEqual(expect.objectContaining({
       artifact_type: 'openclaw.sam31.actual_value_handoff_packet.v1',
@@ -1680,6 +1731,12 @@ describe('PDF page inspection API', () => {
     expect(replacementNotes.source_actual_value_handoff_artifact_type).toBe('openclaw.sam31.actual_value_handoff_packet.v1');
     expect(replacementNotes.claim_gate_effect).toBe('no_claims_cleared');
     expect(replacementNotes.openclaw_sam31_shared_consumer_contract.artifact_type).toBe('openclaw.sam31.shared_consumer_actual_value_replacement_contract.v1');
+    expect(replacementNotes.openclaw_sam31_section_to_artifacts_summary).toEqual(expect.objectContaining({
+      segment_count: 1,
+      vector_overlay_count: 1,
+      model_3d_candidate_count: 1,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
 
     const replacementReadbackRes = await request(`${COOPERATIVE_1881_PATH}/openclaw/sam31/actual-value-replacements`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -1700,6 +1757,12 @@ describe('PDF page inspection API', () => {
         source_ref: '1881://employee-actual-values/replay-handoff/sheet-7',
         claim_gate_effect: 'no_claims_cleared',
         use_for_claims: false,
+        openclaw_sam31_section_to_artifacts_summary: expect.objectContaining({
+          segment_count: 1,
+          vector_overlay_count: 1,
+          model_3d_candidate_count: 1,
+          claim_gate_effect: 'no_claims_cleared',
+        }),
       }),
     ]));
     expect(replacementReadback.replay_replacement_details[0].supported_applications).toEqual(expect.arrayContaining([
@@ -1753,6 +1816,164 @@ describe('PDF page inspection API', () => {
       acceptable_use: 'site_visual_measurement_review',
       status: 'portable_contract_ready',
     }));
+
+    const haloFireQueueRes = await request(`${COOPERATIVE_1881_PATH}/openclaw/sam31/actual-value-resolver-queue?consumer=halo_fire&sourceReplayEvidenceId=${replayEvidence.id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(haloFireQueueRes.status).toBe(200);
+    const haloFireQueue = await haloFireQueueRes.json();
+    expect(haloFireQueue.replay_replacement_items).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        evidence_id: replacement.id,
+        source_replay_evidence_id: replayEvidence.id,
+        section_to_artifacts_consumer_handoff: expect.objectContaining({
+          source_replay_evidence_id: replayEvidence.id,
+          source_sam31_actual_value_replacement_evidence_id: replacement.id,
+          vector_overlay_count: 1,
+          model_3d_candidate_count: 1,
+          claim_gate_effect: 'no_claims_cleared',
+        }),
+      }),
+    ]));
+
+    const replaySmokeRes = await request(`${COOPERATIVE_1881_PATH}/openclaw/sam31/section-to-artifacts-consumer-intake-smoke`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        consumer: 'halo_fire',
+        source_sam31_actual_value_replacement_evidence_id: replacement.id,
+      }),
+    });
+    expect(replaySmokeRes.status).toBe(201);
+    const replaySmoke = await replaySmokeRes.json();
+    expect(replaySmoke).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.section_to_artifacts_consumer_intake_smoke.v1',
+      consumer: 'halo_fire',
+      source_replay_evidence_id: replayEvidence.id,
+      source_sam31_actual_value_replacement_evidence_id: replacement.id,
+      observed_vector_overlay_count: 1,
+      observed_model_3d_candidate_count: 1,
+      observed_segment_count: 1,
+      observed_object_hypothesis_count: 1,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+      use_for_claims: false,
+    }));
+    expect(replaySmoke.posted_handoff).toEqual(expect.objectContaining({
+      source_replay_evidence_id: replayEvidence.id,
+      source_sam31_actual_value_replacement_evidence_id: replacement.id,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(replaySmoke.source_refs).toEqual(expect.arrayContaining([
+      '1881://proposal-cooperative/sheet-7',
+      '1881://employee-actual-values/replay-handoff/sheet-7',
+    ]));
+
+    const replayFollowupPacketRes = await request(`${COOPERATIVE_1881_PATH}/openclaw/sam31/section-to-artifacts-consumer-intake-smoke/${replaySmoke.evidence_id}/followup-packet`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(replayFollowupPacketRes.status).toBe(200);
+    const replayFollowupPacket = await replayFollowupPacketRes.json();
+    expect(replayFollowupPacket).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.sam31_consumer_intake_smoke_followup_packet.v1',
+      source_replay_evidence_id: replayEvidence.id,
+      source_sam31_actual_value_replacement_evidence_id: replacement.id,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+      use_for_claims: false,
+    }));
+    expect(replayFollowupPacket.issue_seeds).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        source_replay_evidence_id: replayEvidence.id,
+        source_sam31_actual_value_replacement_evidence_id: replacement.id,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    ]));
+    expect(replayFollowupPacket.source_refs).toEqual(expect.arrayContaining([
+      '1881://proposal-cooperative/sheet-7',
+      '1881://employee-actual-values/replay-handoff/sheet-7',
+      expect.objectContaining({
+        evidence_id: replayEvidence.id,
+        evidence_type: 'best_effort_ai_layout',
+      }),
+      expect.objectContaining({
+        evidence_id: replacement.id,
+        evidence_type: 'sam31_actual_value_replacement',
+      }),
+    ]));
+
+    const replayFollowupReviewRes = await request(`${COOPERATIVE_1881_PATH}/openclaw/sam31/section-to-artifacts-consumer-intake-smoke/${replaySmoke.evidence_id}/followup-packet/review`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        review_decision: 'accepted_internal_alpha_followup',
+        reviewer_name: 'HaloFire replay reviewer',
+        review_ref: 'halofire://sam31/replay/corridor-a/followup-review.json',
+        marked_up_screenshot_ref: 'halofire://sam31/replay/corridor-a/marked-up.png',
+        issue_decisions: [
+          {
+            issue_type: 'sam31_consumer_intake_room_boundary_visual_audit',
+            supported_sprinkler_review_lane: 'room_boundary_visual_audit',
+            decision: 'accepted_for_internal_alpha_room_boundary_review',
+            reviewed_values: {
+              corrected_room_polygons: [
+                {
+                  id: 'room:employee-reviewed-corridor-a',
+                  polygon: [[0, 0], [40, 0], [40, 12], [0, 12], [0, 0]],
+                  source_ref: '1881://employee-reviewed-corridor-a/polygon',
+                },
+              ],
+            },
+          },
+        ],
+      }),
+    });
+    expect(replayFollowupReviewRes.status).toBe(201);
+    const replayFollowupReview = await replayFollowupReviewRes.json();
+    expect(replayFollowupReview).toEqual(expect.objectContaining({
+      source_replay_evidence_id: replayEvidence.id,
+      source_sam31_actual_value_replacement_evidence_id: replacement.id,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(replayFollowupReview.resolver_queue_rows).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        source_replay_evidence_id: replayEvidence.id,
+        source_sam31_actual_value_replacement_evidence_id: replacement.id,
+        status: 'ready_for_internal_alpha_sprinkler_review',
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    ]));
+
+    const replaySprinklerPacketRes = await request(`${COOPERATIVE_1881_PATH}/openclaw/sam31/section-to-artifacts-consumer-intake-smoke/${replaySmoke.evidence_id}/sprinkler-review-packet`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(replaySprinklerPacketRes.status).toBe(200);
+    const replaySprinklerPacket = await replaySprinklerPacketRes.json();
+    expect(replaySprinklerPacket).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.sam31_sprinkler_review_packet.v1',
+      source_replay_evidence_id: replayEvidence.id,
+      source_sam31_actual_value_replacement_evidence_id: replacement.id,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+      use_for_claims: false,
+    }));
+    expect(replaySprinklerPacket.issue_seeds).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        source_replay_evidence_id: replayEvidence.id,
+        source_sam31_actual_value_replacement_evidence_id: replacement.id,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    ]));
+    expect(replaySprinklerPacket.source_refs).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        evidence_id: replayEvidence.id,
+        evidence_type: 'best_effort_ai_layout',
+      }),
+      expect.objectContaining({
+        evidence_id: replacement.id,
+        evidence_type: 'sam31_actual_value_replacement',
+      }),
+    ]));
 
     const secondReplayNotes = {
       ...replayNotes,
