@@ -16027,6 +16027,9 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
   const sam31SprinklerPreliminaryReplayFollowupDecisionEvidences = evidence ? latestHalofireSam31SprinklerPreliminaryReplayFollowupDecisionEvidence(projectName, evidence.id) : [];
   const sam31SprinklerFollowupPacketReviewDecisionEvidences = evidence ? latestHalofireSam31SprinklerFollowupPacketReviewDecisionEvidence(projectName, evidence.id) : [];
   const sam31ApprovalUploadIntakeEvidences = evidence ? latestHalofireSam31ApprovalUploadIntakeEvidence(projectName, evidence.id) : [];
+  const standaloneSam31ApprovalUploadIntakeEvidences = filters.sam31ApprovalValidation
+    ? latestHalofireSam31ApprovalUploadIntakeEvidence(projectName, null)
+    : sam31ApprovalUploadIntakeEvidences;
   const approvalGateStatusByCode = sam31ApprovalUploadGateStatusMap(projectName);
   const items = [];
   for (const claimGateAuditItem of claimGateResolveAuditQueueItems(projectName)) {
@@ -16047,7 +16050,7 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
   const boundaryItem = pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence, sam31Evidence, sam31ReplacementEvidence, sam31SmokeEvidence, sam31ExtrapolationEvidence, sam31ExtrapolationReviewEvidence, sam31SectioningContractReviewEvidence, sam31SectioningDownstreamPacketEvidence, sam31SectioningSprinklerReviewAdapterEvidence, sam31ConsumerSmokeEvidence, sam31ConsumerReviewEvidences, sam31SprinklerReviewDecisionEvidences, sam31SprinklerPreliminaryReplayFollowupDecisionEvidences, sam31SprinklerFollowupPacketReviewDecisionEvidences, sam31ApprovalUploadIntakeEvidences);
   if (boundaryItem) items.push(boundaryItem);
   if (filters.sam31ApprovalValidation) {
-    for (const approvalValidationItem of sam31ApprovalUploadValidationStandaloneItems(projectName, sam31ApprovalUploadIntakeEvidences, approvalGateStatusByCode)) {
+    for (const approvalValidationItem of sam31ApprovalUploadValidationStandaloneItems(projectName, standaloneSam31ApprovalUploadIntakeEvidences, approvalGateStatusByCode)) {
       items.push(approvalValidationItem);
     }
   }

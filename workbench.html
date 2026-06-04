@@ -3542,12 +3542,20 @@ function catalogApprovalQuickFilter(summary, activeQuery) {
 
 function sam31ApprovalValidationQuickFilter(summary, activeQuery) {
   const pendingQuery = 'sam31ApprovalValidation=pending';
+  const readyQuery = 'sam31ApprovalValidation=ready_for_explicit_gate_resolve';
+  const placeholderQuery = 'sam31ApprovalValidation=placeholder_no_claims';
   const isPendingActive = activeQuery === pendingQuery;
+  const isReadyActive = activeQuery === readyQuery;
+  const isPlaceholderActive = activeQuery === placeholderQuery;
   return `<div class="muted" style="font-size:11px;margin-bottom:8px">
     sam31ApprovalValidationQuickFilter:
     <button class="go" type="button" style="padding:6px 9px;font-size:10px;background:${isPendingActive ? '#4338ca' : '#374151'}" data-resolver-queue-filter="${escapeHtml(pendingQuery)}">Pending SAM31 approval validations</button>
-    ${activeQuery && !isPendingActive ? '<button class="go" type="button" style="padding:6px 9px;font-size:10px;background:#374151" data-resolver-queue-filter="">Show all resolver rows</button>' : ''}
+    <button class="go" type="button" style="padding:6px 9px;font-size:10px;background:${isReadyActive ? '#15803d' : '#374151'}" data-resolver-queue-filter="${escapeHtml(readyQuery)}">Ready SAM31 approval validations</button>
+    <button class="go" type="button" style="padding:6px 9px;font-size:10px;background:${isPlaceholderActive ? '#92400e' : '#374151'}" data-resolver-queue-filter="${escapeHtml(placeholderQuery)}">Placeholder/no-claims validations</button>
+    ${activeQuery && !isPendingActive && !isReadyActive && !isPlaceholderActive ? '<button class="go" type="button" style="padding:6px 9px;font-size:10px;background:#374151" data-resolver-queue-filter="">Show all resolver rows</button>' : ''}
     <span class="chip">sam31ApprovalValidation=pending</span>
+    <span class="chip">sam31ApprovalValidation=ready_for_explicit_gate_resolve</span>
+    <span class="chip">sam31ApprovalValidation=placeholder_no_claims</span>
     <span class="chip">sam31_approval_validation_decisions_recorded ${escapeHtml(summary.sam31_approval_validation_decisions_recorded || 0)}</span>
     <span class="chip">sam31_approval_validation_pending ${escapeHtml(summary.sam31_approval_validation_pending || 0)}</span>
     <span class="chip">sam31_approval_validation_placeholder_no_claims ${escapeHtml(summary.sam31_approval_validation_placeholder_no_claims || 0)}</span>
@@ -4908,15 +4916,47 @@ async function saveSam31ApprovalUploadValidationDecision(approvalUploadEvidenceI
 }
 
 async function resolveHalofireSam31ApprovalUploadGate(gateCode, evidenceId, statusId) {
-  const status = document.getElementById(statusId);
+  let status = document.getElementById(statusId);
+  const stampStatus = (target, saved, packet, href) => {
+    if (!target) return;
+    target.dataset.resolvedEvidenceId = String(saved?.resolved_evidence_id || evidenceId || '');
+    target.dataset.claimGateResolveAuditHref = String(href || saved?.resolve_audit_packet_href || '');
+    target.dataset.downloadedResolveAuditPacket = packet?.artifact_type === 'halofire.claim_gate_resolve_audit_packet.v1' ? 'true' : 'false';
+    target.dataset.filteredClaimGateAuditQueue = resolverQueueFilterQuery.includes('claimGateAudit=cleared') ? 'true' : 'false';
+    target.dataset.claimGateEffect = String(packet?.claim_gate_effect || 'gate_cleared_after_explicit_signed_validation');
+    target.dataset.noUnrelatedClaimsCleared = String(packet?.no_unrelated_claims_cleared !== false);
+    target.dataset.resolveAuditArtifactType = String(packet?.artifact_type || 'halofire.claim_gate_resolve_audit_packet.v1');
+    target.dataset.targetGateCode = String(gateCode || saved?.code || '');
+    target.textContent = `Resolved SAM31 approval gate ${saved?.code || gateCode} with evidence #${saved?.resolved_evidence_id || evidenceId}; downloaded ${packet?.artifact_type || 'halofire.claim_gate_resolve_audit_packet.v1'} and opened claimGateAudit=cleared.`;
+  };
   try {
     const saved = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/claim-gates/' + encodeURIComponent(gateCode) + '/resolve', {
       method: 'POST',
       body: JSON.stringify({ evidence_id: Number(evidenceId) }),
     });
-    if (status) status.textContent = 'Validated SAM31 approval upload gate ' + saved.code + ' with evidence #' + saved.resolved_evidence_id + '.';
+    const auditHref = saved.resolve_audit_packet_href || `/api/projects/${encodeURIComponent(currentProjectName())}/claim-gates/${encodeURIComponent(gateCode)}/resolve-audit-packet`;
+    const apiPath = String(auditHref).startsWith('/api/') ? String(auditHref).slice(4) : String(auditHref);
+    const auditPacket = await api(apiPath);
+    const blob = new Blob([JSON.stringify(auditPacket, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = auditPacket.download_name || `${currentProjectName().toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${String(gateCode || 'claim-gate').toLowerCase()}-resolve-audit-packet.json`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    resolverQueueFilterQuery = 'claimGateAudit=cleared' + (gateCode ? `&targetGate=${encodeURIComponent(gateCode)}` : '');
     await refreshClaimGates();
     await refreshEvidence();
+    await refreshResolverQueue();
+    status = document.getElementById(statusId);
+    if (!status) {
+      status = document.createElement('div');
+      status.id = statusId;
+      status.className = 'muted';
+      status.style.fontSize = '11px';
+      status.style.marginBottom = '8px';
+      document.getElementById('resolverQueue')?.prepend(status);
+    }
+    stampStatus(status, saved, auditPacket, auditHref);
   } catch (err) {
     if (status) status.textContent = 'Error: ' + err.message;
   }

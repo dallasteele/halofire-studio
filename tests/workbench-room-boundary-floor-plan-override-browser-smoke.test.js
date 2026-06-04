@@ -82,6 +82,144 @@ afterAll(async () => {
 });
 
 describe('Workbench room-boundary floor-plan override browser smoke', () => {
+  it('resolves a ready SAM31 approval validation decision and downloads the claim-gate audit packet', async () => {
+    const token = await adminToken();
+    const gateCode = 'AHJ_APPROVAL_MISSING';
+    const approvalUpload = await api(`${PROJECT_PATH}/evidence`, token, {
+      method: 'POST',
+      body: JSON.stringify({
+        evidence_type: 'halofire_sam31_approval_upload_intake',
+        source_ref: 'signed-ahj://1881/sam31/ahj-approval-real-001',
+        source_file: 'sam31-ahj-approval-real-001.pdf',
+        status: 'present',
+        notes: JSON.stringify({
+          kind: 'halofire_sam31_approval_upload_intake',
+          artifact_type: 'halofire.sam31_approval_upload_intake.v1',
+          intake: {
+            artifact_type: 'halofire.sam31_approval_upload_intake.v1',
+            status: 'uploaded_pending_gate_validation',
+            project_name: PROJECT_NAME,
+            code: 'HALOFIRE_SAM31_AHJ_APPROVAL_UPLOAD_MISSING',
+            target_approval_lane: 'AHJ_approval',
+            evidence_type: 'ahj_approval',
+            required_evidence_type: 'AHJ_signed_approval_or_plan_check_record',
+            gate_code: gateCode,
+            source_ref: 'signed-ahj://1881/sam31/ahj-approval-real-001',
+            source_file: 'sam31-ahj-approval-real-001.pdf',
+            source_packet_review_decision_evidence_id: 0,
+            source_followup_decision_evidence_id: 0,
+            source_pdf_boundary_evidence_id: null,
+            packet_index: 0,
+            signoff: {
+              reviewer_name: 'Pat Licensed',
+              reviewer_title: 'Fire Marshal',
+              signed_at: '2026-06-04T09:15:00.000Z',
+              organization: 'Salt Lake City',
+              license_id: 'AHJ-SAM31-1881',
+            },
+            gate_validation_action: {
+              method: 'POST',
+              href: `${PROJECT_PATH}/claim-gates/${gateCode}/resolve`,
+              request_body: { evidence_id: null },
+            },
+            source_refs: [
+              {
+                evidence_type: 'ahj_approval',
+                source_ref: 'signed-ahj://1881/sam31/ahj-approval-real-001',
+                source_file: 'sam31-ahj-approval-real-001.pdf',
+                status: 'present',
+                claim_gate_effect: 'no_claims_cleared',
+              },
+            ],
+            blocked_claims: ['AHJ_approval', 'permit_ready'],
+            use_for_claims: false,
+            claim_gate_effect: 'no_claims_cleared',
+            no_claim_gates_cleared: true,
+            limitations: [
+              'Seeded browser-smoke SAM31 approval upload intake for real validation follow-through.',
+              'This upload intake does not clear claims until a validation decision explicitly resolves the gate.',
+            ],
+          },
+          claim_gate_effect: 'no_claims_cleared',
+          use_for_claims: false,
+        }),
+      }),
+    });
+
+    const approvalValidationDecision = await api(`${PROJECT_PATH}/evidence/${approvalUpload.id}/openclaw/sam31/approval-upload/gate-validation-decision`, token, {
+      method: 'POST',
+      body: JSON.stringify({
+        validation_decision: 'real_signed_evidence_validated',
+        validation_ref: 'approval-validation://1881/sam31/ahj-approval-real-001',
+        reviewer_name: 'Pat Licensed',
+        reviewer_title: 'Fire Marshal',
+        signed_at: '2026-06-04T09:16:00.000Z',
+        organization: 'Salt Lake City',
+        license_id: 'AHJ-SAM31-1881',
+        notes: 'Browser smoke real signed evidence validation for one-click audit follow-through.',
+      }),
+    });
+    expect(approvalValidationDecision.claim_gate_effect).toBe('ready_for_explicit_gate_resolve');
+    const readyQueue = await api(`${PROJECT_PATH}/resolver-queue?sam31ApprovalValidation=ready_for_explicit_gate_resolve`, token);
+    expect(readyQueue.summary.sam31_approval_validation_ready_for_gate_resolve).toBeGreaterThanOrEqual(1);
+    expect(JSON.stringify(readyQueue.items)).toContain(`"evidence_id":${approvalValidationDecision.evidence_id}`);
+
+    const page = await browser.newPage({ acceptDownloads: true });
+    page.setDefaultTimeout(8000);
+    await page.addInitScript((authToken) => {
+      localStorage.setItem('halofire_token', authToken);
+    }, token);
+
+    try {
+      await page.goto(`${BASE}/workbench.html`, { waitUntil: 'domcontentloaded' });
+      await page.locator('#projectTarget').selectOption(PROJECT_NAME);
+      await page.locator('[data-resolver-queue-filter="sam31ApprovalValidation=ready_for_explicit_gate_resolve"]').click();
+      const resolveButton = page.locator(`[data-sam31-approval-upload-resolve-evidence-id="${approvalValidationDecision.evidence_id}"]`).first();
+      await resolveButton.waitFor({ state: 'attached' });
+      expect(await resolveButton.getAttribute('data-sam31-approval-upload-resolve-gate-code')).toBe(gateCode);
+      const statusId = await resolveButton.getAttribute('data-sam31-approval-upload-resolve-status-id');
+      expect(statusId).toMatch(/^sam31ApprovalUploadResolveStatus-/);
+
+      const [auditDownload] = await Promise.all([
+        page.waitForEvent('download'),
+        resolveButton.click(),
+      ]);
+      const auditDownloadPath = await auditDownload.path();
+      expect(auditDownload.suggestedFilename()).toContain('resolve-audit-packet');
+      expect(auditDownloadPath).toBeTruthy();
+      const auditPacket = JSON.parse(fs.readFileSync(auditDownloadPath, 'utf8'));
+      expect(auditPacket).toEqual(expect.objectContaining({
+        artifact_type: 'halofire.claim_gate_resolve_audit_packet.v1',
+        status: 'gate_cleared_with_explicit_signed_evidence',
+        project_name: PROJECT_NAME,
+        gate_code: gateCode,
+        resolved_evidence_id: approvalValidationDecision.evidence_id,
+        resolved_evidence_ref: 'approval-validation://1881/sam31/ahj-approval-real-001',
+        claim_gate_effect: 'gate_cleared_after_explicit_signed_validation',
+      }));
+
+      const resolveStatus = page.locator(`#${statusId}`);
+      await page.waitForFunction((targetId) => {
+        const status = document.getElementById(targetId);
+        return status?.dataset.downloadedResolveAuditPacket === 'true'
+          && status?.dataset.filteredClaimGateAuditQueue === 'true';
+      }, statusId);
+      expect(await resolveStatus.getAttribute('data-resolved-evidence-id')).toBe(String(approvalValidationDecision.evidence_id));
+      expect(await resolveStatus.getAttribute('data-claim-gate-resolve-audit-href')).toBe(`${PROJECT_PATH}/claim-gates/${gateCode}/resolve-audit-packet`);
+      expect(await resolveStatus.getAttribute('data-claim-gate-effect')).toBe('gate_cleared_after_explicit_signed_validation');
+
+      await page.waitForFunction((decisionEvidenceId) => {
+        const text = document.getElementById('resolverQueue')?.innerText || '';
+        return text.includes('claimGateAuditQuickFilter')
+          && text.includes('claimGateAudit=cleared')
+          && text.includes(`resolved_evidence_id ${decisionEvidenceId}`)
+          && text.includes('halofire.claim_gate_resolve_audit_packet.v1');
+      }, String(approvalValidationDecision.evidence_id));
+    } finally {
+      await page.close();
+    }
+  }, 30_000);
+
   it('downloads a persisted floor-plan override action packet from corrected 1881 review evidence', async () => {
     const token = await adminToken();
     const savedBoundary = await api(`${PROJECT_PATH}/pdf-boundary-decision`, token, {
