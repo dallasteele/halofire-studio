@@ -382,10 +382,176 @@ describe('Workbench room-boundary floor-plan override browser smoke', () => {
         .toBe(String(defaultReplacementEvidenceId));
       expect(await defaultReplacementSmoke.getAttribute('data-replay-sam31-consumer-intake-smoke-consumer'))
         .toBe('halo_fire');
+      expect(await defaultReplacementSmoke.getAttribute('data-selected-sheet-ref')).toBe('1881://proposal-cooperative/sheet-7');
+      expect(await defaultReplacementSmoke.getAttribute('data-selected-scale-ref')).toBe('1881://operator-scale/sheet-7/0.0833');
+      expect(await defaultReplacementSmoke.getAttribute('data-selected-boundary-candidate-ref')).toBe('candidate:1881-sheet-7-outline');
+      await defaultReplacementSmoke.click();
+      await page.waitForFunction((expected) => {
+        const status = document.getElementById('sam31ActualValueQueueStatus');
+        return status?.dataset.sam31ConsumerIntakeSmokeEvidenceId
+          && status?.dataset.sourceSam31ActualValueReplacementEvidenceId === expected.defaultReplacementEvidenceId
+          && status?.dataset.sourceOpenclawSam31ActualValueReplacementReadbackEvidenceId === expected.auditReadbackEvidenceId
+          && status?.dataset.selectedSheetRef === '1881://proposal-cooperative/sheet-7'
+          && status?.dataset.claimGateEffect === 'no_claims_cleared';
+      }, { defaultReplacementEvidenceId: String(defaultReplacementEvidenceId), auditReadbackEvidenceId: String(auditReadbackEvidenceId) });
+      const defaultSmokeEvidenceId = String(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-sam31-consumer-intake-smoke-evidence-id') || '');
+      expect(defaultSmokeEvidenceId).toMatch(/^\d+$/);
+      const defaultSmokeRows = await api(`${PROJECT_PATH}/evidence`, token);
+      const defaultSmokeRow = defaultSmokeRows.find((row) => row.id === Number(defaultSmokeEvidenceId));
+      expect(defaultSmokeRow).toBeTruthy();
+      const defaultSmokeNotes = JSON.parse(defaultSmokeRow.notes);
+      expect(defaultSmokeNotes).toEqual(expect.objectContaining({
+        source_sam31_actual_value_replacement_evidence_id: Number(defaultReplacementEvidenceId),
+        source_openclaw_sam31_actual_value_replacement_readback_evidence_id: Number(auditReadbackEvidenceId),
+        selected_sheet_ref: '1881://proposal-cooperative/sheet-7',
+        selected_scale_ref: '1881://operator-scale/sheet-7/0.0833',
+        selected_boundary_candidate_ref: 'candidate:1881-sheet-7-outline',
+        claim_gate_effect: 'no_claims_cleared',
+        no_claim_gates_cleared: true,
+      }));
+
+      const defaultSmokeFollowup = page.locator(`[data-replay-sam31-consumer-intake-smoke-default-followup-review="${defaultSmokeEvidenceId}"]`).first();
+      await defaultSmokeFollowup.waitFor({ state: 'attached' });
+      expect(await defaultSmokeFollowup.getAttribute('data-source-openclaw-sam31-actual-value-replacement-readback-evidence-id')).toBe(String(auditReadbackEvidenceId));
+      expect(await defaultSmokeFollowup.getAttribute('data-selected-sheet-ref')).toBe('1881://proposal-cooperative/sheet-7');
+      const [defaultSprinklerPacketDownload] = await Promise.all([
+        page.waitForEvent('download'),
+        defaultSmokeFollowup.click(),
+      ]);
+      expect(defaultSprinklerPacketDownload.suggestedFilename()).toContain('sprinkler-review');
+      await page.waitForFunction((smokeEvidenceId) => {
+        const status = document.getElementById(`sam31ConsumerIntakeSmokeFollowupReview-${smokeEvidenceId}-status`);
+        const nextAction = document.querySelector(`[data-replay-sam31-consumer-intake-smoke-default-sprinkler-review="${smokeEvidenceId}"]`);
+        return status?.dataset.halofireSam31ConsumerIntakeSmokeFollowupReviewEvidenceId
+          && nextAction
+          && status?.dataset.sourceOpenclawSam31ActualValueReplacementReadbackEvidenceId
+          && status?.dataset.selectedSheetRef === '1881://proposal-cooperative/sheet-7'
+          && status?.dataset.claimGateEffect === 'no_claims_cleared';
+      }, String(defaultSmokeEvidenceId));
+      const followupStatus = page.locator(`#sam31ConsumerIntakeSmokeFollowupReview-${defaultSmokeEvidenceId}-status`);
+      const defaultFollowupEvidenceId = String(await followupStatus.getAttribute('data-halofire-sam31-consumer-intake-smoke-followup-review-evidence-id') || '');
+      expect(defaultFollowupEvidenceId).toMatch(/^\d+$/);
+      expect(await followupStatus.getAttribute('data-selected-scale-ref')).toBe('1881://operator-scale/sheet-7/0.0833');
+      const followupRows = await api(`${PROJECT_PATH}/evidence`, token);
+      const followupRow = followupRows.find((row) => row.id === Number(defaultFollowupEvidenceId));
+      expect(followupRow).toBeTruthy();
+      const followupNotes = JSON.parse(followupRow.notes);
+      expect(followupNotes.review).toEqual(expect.objectContaining({
+        source_sam31_actual_value_replacement_evidence_id: Number(defaultReplacementEvidenceId),
+        source_openclaw_sam31_actual_value_replacement_readback_evidence_id: Number(auditReadbackEvidenceId),
+        selected_sheet_ref: '1881://proposal-cooperative/sheet-7',
+        selected_scale_ref: '1881://operator-scale/sheet-7/0.0833',
+        selected_boundary_candidate_ref: 'candidate:1881-sheet-7-outline',
+        claim_gate_effect: 'no_claims_cleared',
+        no_claim_gates_cleared: true,
+      }));
+
+      const defaultSprinkler = page.locator(`[data-replay-sam31-consumer-intake-smoke-default-sprinkler-review="${defaultSmokeEvidenceId}"]`).first();
+      await defaultSprinkler.waitFor({ state: 'attached' });
+      expect(await defaultSprinkler.getAttribute('data-source-halofire-sam31-consumer-intake-smoke-followup-review-evidence-id')).toBe(defaultFollowupEvidenceId);
+      expect(await defaultSprinkler.getAttribute('data-selected-boundary-candidate-ref')).toBe('candidate:1881-sheet-7-outline');
+      const [defaultReplayInputsDownload] = await Promise.all([
+        page.waitForEvent('download'),
+        defaultSprinkler.click(),
+      ]);
+      expect(defaultReplayInputsDownload.suggestedFilename()).toContain('preliminary-replay-inputs');
+      const defaultReplayInputsPath = await defaultReplayInputsDownload.path();
+      expect(defaultReplayInputsPath).toBeTruthy();
+      const defaultReplayInputs = JSON.parse(fs.readFileSync(defaultReplayInputsPath, 'utf8'));
+      expect(defaultReplayInputs).toEqual(expect.objectContaining({
+        source_section_to_artifacts_consumer_intake_smoke_evidence_id: Number(defaultSmokeEvidenceId),
+        source_sam31_actual_value_replacement_evidence_id: Number(defaultReplacementEvidenceId),
+        source_openclaw_sam31_actual_value_replacement_readback_evidence_id: Number(auditReadbackEvidenceId),
+        source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id: Number(defaultFollowupEvidenceId),
+        selected_sheet_ref: '1881://proposal-cooperative/sheet-7',
+        selected_scale_ref: '1881://operator-scale/sheet-7/0.0833',
+        selected_boundary_candidate_ref: 'candidate:1881-sheet-7-outline',
+        claim_gate_effect: 'no_claims_cleared',
+        no_claim_gates_cleared: true,
+      }));
+      await page.waitForFunction((smokeEvidenceId) => {
+        const status = document.getElementById(`sam31ConsumerIntakeSmokeSprinklerReview-${smokeEvidenceId}-status`);
+        const nextAction = document.querySelector(`[data-replay-sam31-consumer-intake-smoke-default-preliminary-replay-followup="${smokeEvidenceId}"]`);
+        return status?.dataset.halofireSam31SprinklerReviewDecisionEvidenceId
+          && nextAction
+          && status?.dataset.selectedSheetRef === '1881://proposal-cooperative/sheet-7'
+          && status?.dataset.claimGateEffect === 'no_claims_cleared';
+      }, String(defaultSmokeEvidenceId));
+      const defaultSprinklerEvidenceId = String(await page.locator(`#sam31ConsumerIntakeSmokeSprinklerReview-${defaultSmokeEvidenceId}-status`).getAttribute('data-halofire-sam31-sprinkler-review-decision-evidence-id') || '');
+      expect(defaultSprinklerEvidenceId).toMatch(/^\d+$/);
+
+      const defaultReplayFollowup = page.locator(`[data-replay-sam31-consumer-intake-smoke-default-preliminary-replay-followup="${defaultSmokeEvidenceId}"]`).first();
+      await defaultReplayFollowup.waitFor({ state: 'attached' });
+      expect(await defaultReplayFollowup.getAttribute('data-source-halofire-sam31-sprinkler-review-decision-evidence-id')).toBe(defaultSprinklerEvidenceId);
+      expect(await defaultReplayFollowup.getAttribute('data-selected-sheet-ref')).toBe('1881://proposal-cooperative/sheet-7');
+      const [defaultReplayArtifactDownload] = await Promise.all([
+        page.waitForEvent('download'),
+        defaultReplayFollowup.click(),
+      ]);
+      expect(defaultReplayArtifactDownload.suggestedFilename()).toContain('preliminary-replay');
+      await page.waitForFunction((smokeEvidenceId) => {
+        const status = document.getElementById(`sam31ConsumerIntakeSmokePreliminaryReplayFollowup-${smokeEvidenceId}-status`);
+        const nextAction = document.querySelector(`[data-replay-sam31-consumer-intake-smoke-default-packet-review="${smokeEvidenceId}"]`);
+        return status?.dataset.halofireSam31PreliminaryReplayFollowupEvidenceId
+          && nextAction
+          && status?.dataset.selectedSheetRef === '1881://proposal-cooperative/sheet-7'
+          && status?.dataset.claimGateEffect === 'no_claims_cleared';
+      }, String(defaultSmokeEvidenceId));
+      const replayFollowupStatus = page.locator(`#sam31ConsumerIntakeSmokePreliminaryReplayFollowup-${defaultSmokeEvidenceId}-status`);
+      const defaultReplayFollowupEvidenceId = String(await replayFollowupStatus.getAttribute('data-halofire-sam31-preliminary-replay-followup-evidence-id') || '');
+      expect(defaultReplayFollowupEvidenceId).toMatch(/^\d+$/);
+      expect(await replayFollowupStatus.getAttribute('data-selected-scale-ref')).toBe('1881://operator-scale/sheet-7/0.0833');
+      const replayFollowupRows = await api(`${PROJECT_PATH}/evidence`, token);
+      const replayFollowupRow = replayFollowupRows.find((row) => row.id === Number(defaultReplayFollowupEvidenceId));
+      expect(replayFollowupRow).toBeTruthy();
+      const replayFollowupNotes = JSON.parse(replayFollowupRow.notes);
+      expect(replayFollowupNotes.followup).toEqual(expect.objectContaining({
+        source_sam31_actual_value_replacement_evidence_id: Number(defaultReplacementEvidenceId),
+        source_openclaw_sam31_actual_value_replacement_readback_evidence_id: Number(auditReadbackEvidenceId),
+        source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id: Number(defaultFollowupEvidenceId),
+        source_halofire_sam31_sprinkler_review_decision_evidence_id: Number(defaultSprinklerEvidenceId),
+        selected_sheet_ref: '1881://proposal-cooperative/sheet-7',
+        selected_scale_ref: '1881://operator-scale/sheet-7/0.0833',
+        selected_boundary_candidate_ref: 'candidate:1881-sheet-7-outline',
+        claim_gate_effect: 'no_claims_cleared',
+        no_claim_gates_cleared: true,
+      }));
+
+      const defaultPacketReview = page.locator(`[data-replay-sam31-consumer-intake-smoke-default-packet-review="${defaultSmokeEvidenceId}"]`).first();
+      await defaultPacketReview.waitFor({ state: 'attached' });
+      expect(await defaultPacketReview.getAttribute('data-source-halofire-sam31-preliminary-replay-followup-evidence-id')).toBe(defaultReplayFollowupEvidenceId);
+      expect(await defaultPacketReview.getAttribute('data-selected-boundary-candidate-ref')).toBe('candidate:1881-sheet-7-outline');
+      const [defaultPacketDownload] = await Promise.all([
+        page.waitForEvent('download'),
+        defaultPacketReview.click(),
+      ]);
+      expect(defaultPacketDownload.suggestedFilename()).toContain('packet');
+      await page.waitForFunction((smokeEvidenceId) => {
+        const status = document.getElementById(`sam31ConsumerIntakeSmokeReplayFollowupPacketReview-${smokeEvidenceId}-status`);
+        return status?.dataset.halofireSam31FollowupPacketReviewEvidenceId
+          && status?.dataset.selectedSheetRef === '1881://proposal-cooperative/sheet-7'
+          && status?.dataset.claimGateEffect === 'no_claims_cleared';
+      }, String(defaultSmokeEvidenceId));
+      const defaultPacketReviewEvidenceId = String(await page.locator(`#sam31ConsumerIntakeSmokeReplayFollowupPacketReview-${defaultSmokeEvidenceId}-status`).getAttribute('data-halofire-sam31-followup-packet-review-evidence-id') || '');
+      expect(defaultPacketReviewEvidenceId).toMatch(/^\d+$/);
+      const packetReviewRows = await api(`${PROJECT_PATH}/evidence`, token);
+      const packetReviewRow = packetReviewRows.find((row) => row.id === Number(defaultPacketReviewEvidenceId));
+      expect(packetReviewRow).toBeTruthy();
+      const packetReviewNotes = JSON.parse(packetReviewRow.notes);
+      expect(packetReviewNotes.review).toEqual(expect.objectContaining({
+        source_sam31_actual_value_replacement_evidence_id: Number(defaultReplacementEvidenceId),
+        source_openclaw_sam31_actual_value_replacement_readback_evidence_id: Number(auditReadbackEvidenceId),
+        source_followup_decision_evidence_id: Number(defaultReplayFollowupEvidenceId),
+        selected_sheet_ref: '1881://proposal-cooperative/sheet-7',
+        selected_scale_ref: '1881://operator-scale/sheet-7/0.0833',
+        selected_boundary_candidate_ref: 'candidate:1881-sheet-7-outline',
+        claim_gate_effect: 'no_claims_cleared',
+        no_claim_gates_cleared: true,
+      }));
     } finally {
       await page.close();
     }
-  }, 30_000);
+  }, 45_000);
 
   it('downloads a persisted floor-plan override action packet from corrected 1881 review evidence', async () => {
     const token = await adminToken();

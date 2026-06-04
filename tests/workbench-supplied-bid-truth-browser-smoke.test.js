@@ -545,7 +545,9 @@ describe('Workbench supplied bid-truth browser smoke', () => {
       await defaultReadbackDefaultFollowup.click();
       await page.waitForFunction((smokeEvidenceId) => {
         const status = document.getElementById(`sam31ConsumerIntakeSmokeFollowupReview-${smokeEvidenceId}-status`);
+        const nextAction = document.querySelector(`[data-replay-sam31-consumer-intake-smoke-default-sprinkler-review="${smokeEvidenceId}"]`);
         return status?.dataset.halofireSam31ConsumerIntakeSmokeFollowupReviewEvidenceId
+          && nextAction
           && status?.dataset.downloadedSprinklerReviewPacket === 'true'
           && status?.dataset.sourceOpenclawSam31ActualValueReplacementReadbackEvidenceId
           && status?.dataset.claimGateEffect === 'no_claims_cleared';
@@ -679,7 +681,9 @@ describe('Workbench supplied bid-truth browser smoke', () => {
       await savedLayoutDefaultFollowup.click();
       await page.waitForFunction((smokeEvidenceId) => {
         const status = document.getElementById(`sam31ConsumerIntakeSmokeFollowupReview-${smokeEvidenceId}-status`);
+        const nextAction = document.querySelector(`[data-replay-sam31-consumer-intake-smoke-default-sprinkler-review="${smokeEvidenceId}"]`);
         return status?.dataset.halofireSam31ConsumerIntakeSmokeFollowupReviewEvidenceId
+          && nextAction
           && status?.dataset.downloadedSprinklerReviewPacket === 'true'
           && status?.dataset.claimGateEffect === 'no_claims_cleared';
       }, String(savedLayoutSmokeEvidenceId));

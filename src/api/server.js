@@ -11611,6 +11611,7 @@ function normalizeHalofireSam31SprinklerFollowupPacketReviewDecision(projectName
     throw e;
   }
   const auditProvenance = sam31ActualValueReplacementAuditProvenance(sourcePacket);
+  const pdfBoundaryProvenance = sam31PdfBoundaryDecisionProvenance(sourcePacket);
   return {
     artifact_type: HALOFIRE_SAM31_SPRINKLER_FOLLOWUP_PACKET_REVIEW_DECISION_TYPE,
     status: 'present',
@@ -11636,6 +11637,7 @@ function normalizeHalofireSam31SprinklerFollowupPacketReviewDecision(projectName
     source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id: sourcePacket.source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id || null,
     source_openclaw_sam31_extrapolation_evidence_id: sourcePacket.source_openclaw_sam31_extrapolation_evidence_id || null,
     ...auditProvenance,
+    ...pdfBoundaryProvenance,
     packet_index: sourcePacket.packet_index,
     target_packet_lane: sourcePacket.target_packet_lane,
     source_field: sourcePacket.source_field,
