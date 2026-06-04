@@ -641,7 +641,7 @@ describe('Workbench room-boundary floor-plan override browser smoke', () => {
         .toBe(`/api/openclaw/sam31/actual-value-resolver-queue?projectName=${encodeURIComponent(PROJECT_NAME)}&sourceReplayEvidenceId=${savedReplayEvidenceId}`);
       expect(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-source-replay-evidence-id')).toBe(String(savedReplayEvidenceId));
 
-      const replaySmokeButton = page.locator(`[data-replay-sam31-consumer-intake-smoke-source-replacement-evidence-id="${replacementEvidenceId}"]`);
+      const replaySmokeButton = page.locator(`[data-replay-sam31-consumer-intake-smoke-source-replacement-evidence-id="${replacementEvidenceId}"]`).first();
       await replaySmokeButton.waitFor({ state: 'attached' });
       expect(await replaySmokeButton.getAttribute('data-source-replay-evidence-id')).toBe(String(savedReplayEvidenceId));
       expect(await replaySmokeButton.getAttribute('data-source-sam31-actual-value-replacement-evidence-id')).toBe(String(replacementEvidenceId));

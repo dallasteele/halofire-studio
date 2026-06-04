@@ -1573,6 +1573,10 @@ function openClawSam31SectionToArtifactsConsumerIntakeSmokeEvidenceFromRow(row) 
         || handoff.source_sam31_actual_value_replacement_evidence_id
         || 0,
       ) || null,
+      ...sam31ActualValueReplacementAuditProvenance({
+        ...handoff,
+        ...parsed,
+      }),
       source_openclaw_sam31_section_to_artifacts_ref: parsed.source_openclaw_sam31_section_to_artifacts_ref
         || handoff.source_openclaw_sam31_section_to_artifacts_ref
         || null,
@@ -2647,6 +2651,7 @@ function buildOpenClawSam31ActualValueResolverQueue(projectName, options = {}) {
 function openClawSam31SectionToArtifactsConsumerHandoff(item, replacementEvidence) {
   const summary = replacementEvidence?.openclaw_sam31_section_to_artifacts_summary || null;
   if (!summary || typeof summary !== 'object') return null;
+  const auditProvenance = sam31ActualValueReplacementAuditProvenance(replacementEvidence);
   return {
     artifact_type: 'openclaw.sam31.section_to_artifacts_consumer_handoff.v1',
     status: 'ready_for_consumer_review',
@@ -2654,9 +2659,11 @@ function openClawSam31SectionToArtifactsConsumerHandoff(item, replacementEvidenc
     source_openclaw_sam31_consumer_review_evidence_id: item?.source_openclaw_sam31_consumer_review_evidence_id || null,
     source_replay_evidence_id: replacementEvidence?.source_replay_evidence_id || null,
     source_sam31_actual_value_replacement_evidence_id: replacementEvidence?.evidence_id || null,
+    ...auditProvenance,
     source_openclaw_sam31_section_to_artifacts_ref: summary.section_to_artifacts_contract_ref || null,
     source_refs: uniqueStrings([
       ...(Array.isArray(replacementEvidence?.source_refs) ? replacementEvidence.source_refs : []),
+      auditProvenance.source_resolved_evidence_ref,
       replacementEvidence?.source_ref,
       item?.source_ref,
       item?.replacement_ref,
@@ -2708,6 +2715,32 @@ function synthesizeSam31SectionToArtifactsSummary(replacementEvidence) {
   };
 }
 
+function sam31ActualValueReplacementAuditProvenance(source = {}) {
+  if (!source || typeof source !== 'object') return {};
+  const readbackEvidenceId = Number(source.source_openclaw_sam31_actual_value_replacement_readback_evidence_id || 0) || null;
+  const auditEvidenceId = Number(source.source_claim_gate_resolve_audit_evidence_id || 0) || null;
+  const resolvedEvidenceId = Number(source.source_resolved_evidence_id || 0) || null;
+  const resolvedEvidenceRef = String(source.source_resolved_evidence_ref || '').trim() || null;
+  const resolvedEvidenceType = String(source.source_resolved_evidence_type || '').trim() || null;
+  const sourceClaimGateEffect = String(source.source_claim_gate_effect || '').trim() || null;
+  const hasAuditContext = readbackEvidenceId
+    || auditEvidenceId
+    || resolvedEvidenceId
+    || resolvedEvidenceRef
+    || resolvedEvidenceType
+    || sourceClaimGateEffect;
+  if (!hasAuditContext) return {};
+  return {
+    source_openclaw_sam31_actual_value_replacement_readback_evidence_id: readbackEvidenceId,
+    source_claim_gate_resolve_audit_evidence_id: auditEvidenceId,
+    source_resolved_evidence_id: resolvedEvidenceId,
+    source_resolved_evidence_ref: resolvedEvidenceRef,
+    source_resolved_evidence_type: resolvedEvidenceType,
+    source_claim_gate_effect: sourceClaimGateEffect,
+    no_unrelated_claims_cleared: source.no_unrelated_claims_cleared !== false,
+  };
+}
+
 function buildOpenClawSam31SectionToArtifactsConsumerIntakeSmoke(projectName, intake = {}, user = null) {
   const consumer = String(intake.consumer || '').trim().toLowerCase();
   const supportedConsumers = ['halo_fire', 'landscout', 'nameforge'];
@@ -2750,16 +2783,19 @@ function buildOpenClawSam31SectionToArtifactsConsumerIntakeSmoke(projectName, in
     const replacementEvidence = sam31ActualValueReplacementFromEvidence(replacementRow);
     const synthesizedSummary = synthesizeSam31SectionToArtifactsSummary(replacementEvidence);
     if (replacementEvidence && synthesizedSummary) {
+      const auditProvenance = sam31ActualValueReplacementAuditProvenance(replacementEvidence);
       fallbackReplacementEvidence = {
         evidence_id: replacementRow.id,
         source_ref: replacementRow.source_ref || replacementEvidence.source_ref || null,
         source_refs: uniqueStrings([
           ...(Array.isArray(replacementEvidence.source_refs) ? replacementEvidence.source_refs : []),
+          auditProvenance.source_resolved_evidence_ref,
           replacementEvidence.source_ref,
           replacementRow.source_ref,
         ].filter(Boolean)),
         source_replay_evidence_id: replacementEvidence.source_replay_evidence_id || null,
         source_openclaw_sam31_consumer_review_evidence_id: replacementEvidence.source_openclaw_sam31_consumer_review_evidence_id || null,
+        ...auditProvenance,
         openclaw_sam31_section_to_artifacts_summary: synthesizedSummary,
       };
       fallbackItem = {
@@ -2784,6 +2820,7 @@ function buildOpenClawSam31SectionToArtifactsConsumerIntakeSmoke(projectName, in
     err.httpStatus = 400;
     throw err;
   }
+  const auditProvenance = sam31ActualValueReplacementAuditProvenance(handoff);
   const evidenceSuffix = handoff.source_sam31_actual_value_replacement_evidence_id
     || handoff.source_openclaw_sam31_consumer_review_evidence_id
     || 'unknown';
@@ -2799,10 +2836,12 @@ function buildOpenClawSam31SectionToArtifactsConsumerIntakeSmoke(projectName, in
     source_openclaw_sam31_consumer_review_evidence_id: handoff.source_openclaw_sam31_consumer_review_evidence_id || null,
     source_replay_evidence_id: handoff.source_replay_evidence_id || effectiveItem.source_replay_evidence_id || null,
     source_sam31_actual_value_replacement_evidence_id: handoff.source_sam31_actual_value_replacement_evidence_id || null,
+    ...auditProvenance,
     source_openclaw_sam31_section_to_artifacts_ref: handoff.source_openclaw_sam31_section_to_artifacts_ref || null,
     source_refs: uniqueStrings([
       ...(Array.isArray(effectiveItem.source_refs) ? effectiveItem.source_refs : []),
       ...(Array.isArray(handoff.source_refs) ? handoff.source_refs : []),
+      auditProvenance.source_resolved_evidence_ref,
       effectiveItem.source_ref,
     ].filter(Boolean)),
     source_ref: `openclaw://sam31/section-to-artifacts-consumer-intake-smoke/${consumer}/${evidenceSuffix}`,
@@ -2853,6 +2892,7 @@ function buildHalofireSam31ConsumerIntakeSmokeFollowupPacket(projectName, smokeE
     'vector_overlay_generation',
     'model_3d_candidate_generation',
   ];
+  const auditProvenance = sam31ActualValueReplacementAuditProvenance(smokeEvidence);
   const sourceRefs = [
     ...(Array.isArray(smokeEvidence.source_refs) ? smokeEvidence.source_refs : []),
     {
@@ -2870,6 +2910,19 @@ function buildHalofireSam31ConsumerIntakeSmokeFollowupPacket(projectName, smokeE
       evidence_id: smokeEvidence.source_sam31_actual_value_replacement_evidence_id,
       evidence_type: 'sam31_actual_value_replacement',
     } : null,
+    auditProvenance.source_openclaw_sam31_actual_value_replacement_readback_evidence_id ? {
+      evidence_id: auditProvenance.source_openclaw_sam31_actual_value_replacement_readback_evidence_id,
+      evidence_type: 'openclaw_sam31_actual_value_replacement_readback',
+      claim_gate_effect: 'no_claims_cleared',
+    } : null,
+    auditProvenance.source_claim_gate_resolve_audit_evidence_id ? {
+      evidence_id: auditProvenance.source_claim_gate_resolve_audit_evidence_id,
+      evidence_type: 'claim_gate_resolve_audit_packet',
+      source_resolved_evidence_id: auditProvenance.source_resolved_evidence_id || null,
+      source_claim_gate_effect: auditProvenance.source_claim_gate_effect || null,
+      no_unrelated_claims_cleared: auditProvenance.no_unrelated_claims_cleared !== false,
+      claim_gate_effect: 'no_claims_cleared',
+    } : null,
     smokeEvidence.source_openclaw_sam31_consumer_review_evidence_id ? {
       evidence_id: smokeEvidence.source_openclaw_sam31_consumer_review_evidence_id,
       evidence_type: 'openclaw_sam31_consumer_review',
@@ -2885,6 +2938,7 @@ function buildHalofireSam31ConsumerIntakeSmokeFollowupPacket(projectName, smokeE
     source_replay_evidence_id: smokeEvidence.source_replay_evidence_id || null,
     source_sam31_actual_value_replacement_evidence_id: smokeEvidence.source_sam31_actual_value_replacement_evidence_id || null,
     source_openclaw_sam31_consumer_review_evidence_id: smokeEvidence.source_openclaw_sam31_consumer_review_evidence_id || null,
+    ...auditProvenance,
     source_openclaw_sam31_section_to_artifacts_ref: smokeEvidence.source_openclaw_sam31_section_to_artifacts_ref || null,
     use_for_claims: false,
     claim_gate_effect: 'no_claims_cleared',
@@ -2900,6 +2954,7 @@ function buildHalofireSam31ConsumerIntakeSmokeFollowupPacket(projectName, smokeE
     source_replay_evidence_id: smokeEvidence.source_replay_evidence_id || null,
     source_sam31_actual_value_replacement_evidence_id: smokeEvidence.source_sam31_actual_value_replacement_evidence_id || null,
     source_openclaw_sam31_consumer_review_evidence_id: smokeEvidence.source_openclaw_sam31_consumer_review_evidence_id || null,
+    ...auditProvenance,
     source_openclaw_sam31_section_to_artifacts_ref: smokeEvidence.source_openclaw_sam31_section_to_artifacts_ref || null,
     source_ref: `halofire://sam31/consumer-intake-smoke-followup/${sourceConsumer}/${evidenceId}`,
     download_name: `${slug}-sam31-consumer-intake-smoke-followup-${sourceConsumer}-${evidenceId}.json`,
@@ -2957,6 +3012,10 @@ function buildHalofireSam31ConsumerIntakeSmokeFollowupPacket(projectName, smokeE
 function buildHalofireSam31ConsumerIntakeSmokeFollowupResolverRows(projectName, sourcePacket, reviewDecision, reviewEvidenceId) {
   const issueSeeds = Array.isArray(sourcePacket.issue_seeds) ? sourcePacket.issue_seeds : [];
   const issueDecisions = Array.isArray(reviewDecision.issue_decisions) ? reviewDecision.issue_decisions : [];
+  const auditProvenance = sam31ActualValueReplacementAuditProvenance({
+    ...sourcePacket,
+    ...reviewDecision,
+  });
   const decisionByIssue = new Map();
   const decisionByLane = new Map();
   for (const decision of issueDecisions) {
@@ -2988,6 +3047,7 @@ function buildHalofireSam31ConsumerIntakeSmokeFollowupResolverRows(projectName, 
       source_replay_evidence_id: sourcePacket.source_replay_evidence_id || null,
       source_sam31_actual_value_replacement_evidence_id: sourcePacket.source_sam31_actual_value_replacement_evidence_id || null,
       source_openclaw_sam31_consumer_review_evidence_id: sourcePacket.source_openclaw_sam31_consumer_review_evidence_id || null,
+      ...auditProvenance,
       source_openclaw_sam31_section_to_artifacts_ref: sourcePacket.source_openclaw_sam31_section_to_artifacts_ref || null,
       issue_type: seed.issue_type || issueDecision.issue_type || null,
       supported_sprinkler_review_lane: seed.supported_sprinkler_review_lane || issueDecision.supported_sprinkler_review_lane || null,
@@ -3046,6 +3106,10 @@ function buildHalofireSam31ConsumerIntakeSmokeSprinklerReviewPacket(projectName,
   }
   const slug = projectName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'halofire-project';
   const sourceConsumer = smokeEvidence.consumer || review.source_consumer || 'unknown';
+  const auditProvenance = sam31ActualValueReplacementAuditProvenance({
+    ...smokeEvidence,
+    ...review,
+  });
   const supportedSprinklerReviewLanes = uniqueStrings([
     ...resolverRows.map((row) => row.supported_sprinkler_review_lane).filter(Boolean),
     'room_boundary_visual_audit',
@@ -3099,6 +3163,7 @@ function buildHalofireSam31ConsumerIntakeSmokeSprinklerReviewPacket(projectName,
     source_replay_evidence_id: smokeEvidence.source_replay_evidence_id || row.source_replay_evidence_id || null,
     source_sam31_actual_value_replacement_evidence_id: smokeEvidence.source_sam31_actual_value_replacement_evidence_id || row.source_sam31_actual_value_replacement_evidence_id || null,
     source_openclaw_sam31_consumer_review_evidence_id: smokeEvidence.source_openclaw_sam31_consumer_review_evidence_id || row.source_openclaw_sam31_consumer_review_evidence_id || null,
+    ...auditProvenance,
     source_openclaw_sam31_section_to_artifacts_ref: smokeEvidence.source_openclaw_sam31_section_to_artifacts_ref || row.source_openclaw_sam31_section_to_artifacts_ref || null,
     consumer: sourceConsumer,
     issue_type: row.issue_type || null,
@@ -3146,6 +3211,19 @@ function buildHalofireSam31ConsumerIntakeSmokeSprinklerReviewPacket(projectName,
       evidence_id: smokeEvidence.source_sam31_actual_value_replacement_evidence_id,
       evidence_type: 'sam31_actual_value_replacement',
     } : null,
+    auditProvenance.source_openclaw_sam31_actual_value_replacement_readback_evidence_id ? {
+      evidence_id: auditProvenance.source_openclaw_sam31_actual_value_replacement_readback_evidence_id,
+      evidence_type: 'openclaw_sam31_actual_value_replacement_readback',
+      claim_gate_effect: 'no_claims_cleared',
+    } : null,
+    auditProvenance.source_claim_gate_resolve_audit_evidence_id ? {
+      evidence_id: auditProvenance.source_claim_gate_resolve_audit_evidence_id,
+      evidence_type: 'claim_gate_resolve_audit_packet',
+      source_resolved_evidence_id: auditProvenance.source_resolved_evidence_id || null,
+      source_claim_gate_effect: auditProvenance.source_claim_gate_effect || null,
+      no_unrelated_claims_cleared: auditProvenance.no_unrelated_claims_cleared !== false,
+      claim_gate_effect: 'no_claims_cleared',
+    } : null,
     {
       evidence_id: reviewEvidence.evidence.id,
       evidence_type: reviewEvidence.evidence.evidence_type,
@@ -3180,6 +3258,7 @@ function buildHalofireSam31ConsumerIntakeSmokeSprinklerReviewPacket(projectName,
     source_replay_evidence_id: smokeEvidence.source_replay_evidence_id || review.source_replay_evidence_id || null,
     source_sam31_actual_value_replacement_evidence_id: smokeEvidence.source_sam31_actual_value_replacement_evidence_id || null,
     source_openclaw_sam31_consumer_review_evidence_id: smokeEvidence.source_openclaw_sam31_consumer_review_evidence_id || null,
+    ...auditProvenance,
     source_openclaw_sam31_section_to_artifacts_ref: smokeEvidence.source_openclaw_sam31_section_to_artifacts_ref || null,
     supported_sprinkler_review_lanes: supportedSprinklerReviewLanes,
     issue_seeds: issueSeeds,
@@ -3263,6 +3342,11 @@ function normalizeHalofireSam31ConsumerIntakeSmokeSprinklerReviewDecision(projec
     }
     reviewedValues.confidence = confidence;
   }
+  const auditProvenance = sam31ActualValueReplacementAuditProvenance({
+    ...smokeEvidence,
+    ...(followupReviewEvidence.review || {}),
+    ...sprinklerPacket,
+  });
   const sourceRefs = [
     {
       evidence_id: smokeEvidence.evidence_id || null,
@@ -3296,6 +3380,19 @@ function normalizeHalofireSam31ConsumerIntakeSmokeSprinklerReviewDecision(projec
       status: 'present',
       claim_gate_effect: 'no_claims_cleared',
     },
+    auditProvenance.source_openclaw_sam31_actual_value_replacement_readback_evidence_id ? {
+      evidence_id: auditProvenance.source_openclaw_sam31_actual_value_replacement_readback_evidence_id,
+      evidence_type: 'openclaw_sam31_actual_value_replacement_readback',
+      claim_gate_effect: 'no_claims_cleared',
+    } : null,
+    auditProvenance.source_claim_gate_resolve_audit_evidence_id ? {
+      evidence_id: auditProvenance.source_claim_gate_resolve_audit_evidence_id,
+      evidence_type: 'claim_gate_resolve_audit_packet',
+      source_resolved_evidence_id: auditProvenance.source_resolved_evidence_id || null,
+      source_claim_gate_effect: auditProvenance.source_claim_gate_effect || null,
+      no_unrelated_claims_cleared: auditProvenance.no_unrelated_claims_cleared !== false,
+      claim_gate_effect: 'no_claims_cleared',
+    } : null,
   ];
   if (screenshotRef) {
     sourceRefs.push({
@@ -3326,6 +3423,7 @@ function normalizeHalofireSam31ConsumerIntakeSmokeSprinklerReviewDecision(projec
     source_replay_evidence_id: smokeEvidence.source_replay_evidence_id || sprinklerPacket.source_replay_evidence_id || queueItem.source_replay_evidence_id || null,
     source_sam31_actual_value_replacement_evidence_id: smokeEvidence.source_sam31_actual_value_replacement_evidence_id || null,
     source_openclaw_sam31_consumer_review_evidence_id: smokeEvidence.source_openclaw_sam31_consumer_review_evidence_id || null,
+    ...auditProvenance,
     source_openclaw_sam31_section_to_artifacts_ref: smokeEvidence.source_openclaw_sam31_section_to_artifacts_ref || null,
     source_application: 'halo_fire',
     consumer: smokeEvidence.consumer || sprinklerPacket.source_consumer || null,
@@ -3341,7 +3439,7 @@ function normalizeHalofireSam31ConsumerIntakeSmokeSprinklerReviewDecision(projec
     reviewed_values: reviewedValues,
     acceptable_evidence: Array.isArray(queueItem.acceptable_evidence) ? [...queueItem.acceptable_evidence] : [],
     notes: String(body.notes || '').trim() || null,
-    source_refs: uniqueByJson(sourceRefs),
+    source_refs: uniqueByJson(sourceRefs.filter(Boolean)),
     blocked_claims: uniqueStrings([
       ...(Array.isArray(queueItem.blocked_claims) ? queueItem.blocked_claims : []),
       ...(Array.isArray(sprinklerPacket.blocked_claims) ? sprinklerPacket.blocked_claims : []),
@@ -3394,6 +3492,11 @@ function buildHalofireSam31ConsumerIntakeSmokePreliminaryReplayInputs(projectNam
     : {};
   const issueCandidates = halofireSam31SprinklerReplayIssueCandidates(reviewedValues);
   const lane = sprinklerReview.supported_sprinkler_review_lane || 'sprinkler_employee_review';
+  const auditProvenance = sam31ActualValueReplacementAuditProvenance({
+    ...smokeEvidence,
+    ...(followupReviewEvidence.review || {}),
+    ...sprinklerReview,
+  });
   const sourceRefs = uniqueByJson([
     ...(Array.isArray(smokeEvidence.source_refs) ? smokeEvidence.source_refs : []),
     ...(Array.isArray(followupReviewEvidence.review.source_refs) ? followupReviewEvidence.review.source_refs : []),
@@ -3422,7 +3525,20 @@ function buildHalofireSam31ConsumerIntakeSmokePreliminaryReplayInputs(projectNam
       source_file: sprinklerReviewEvidence.source_file || null,
       claim_gate_effect: 'no_claims_cleared',
     },
-  ]);
+    auditProvenance.source_openclaw_sam31_actual_value_replacement_readback_evidence_id ? {
+      evidence_id: auditProvenance.source_openclaw_sam31_actual_value_replacement_readback_evidence_id,
+      evidence_type: 'openclaw_sam31_actual_value_replacement_readback',
+      claim_gate_effect: 'no_claims_cleared',
+    } : null,
+    auditProvenance.source_claim_gate_resolve_audit_evidence_id ? {
+      evidence_id: auditProvenance.source_claim_gate_resolve_audit_evidence_id,
+      evidence_type: 'claim_gate_resolve_audit_packet',
+      source_resolved_evidence_id: auditProvenance.source_resolved_evidence_id || null,
+      source_claim_gate_effect: auditProvenance.source_claim_gate_effect || null,
+      no_unrelated_claims_cleared: auditProvenance.no_unrelated_claims_cleared !== false,
+      claim_gate_effect: 'no_claims_cleared',
+    } : null,
+  ].filter(Boolean));
   const blockedClaims = uniqueStrings([
     ...(Array.isArray(smokeEvidence.blocked_claims) ? smokeEvidence.blocked_claims : []),
     ...(Array.isArray(followupReviewEvidence.review.blocked_claims) ? followupReviewEvidence.review.blocked_claims : []),
@@ -3449,6 +3565,7 @@ function buildHalofireSam31ConsumerIntakeSmokePreliminaryReplayInputs(projectNam
     source_halofire_sam31_sprinkler_review_decision_evidence_id: sprinklerReviewEvidence.id,
     source_sam31_actual_value_replacement_evidence_id: smokeEvidence.source_sam31_actual_value_replacement_evidence_id || sprinklerReview.source_sam31_actual_value_replacement_evidence_id || null,
     source_openclaw_sam31_consumer_review_evidence_id: smokeEvidence.source_openclaw_sam31_consumer_review_evidence_id || sprinklerReview.source_openclaw_sam31_consumer_review_evidence_id || null,
+    ...auditProvenance,
     source_openclaw_sam31_section_to_artifacts_ref: smokeEvidence.source_openclaw_sam31_section_to_artifacts_ref || sprinklerReview.source_openclaw_sam31_section_to_artifacts_ref || null,
     consumer: smokeEvidence.consumer || sprinklerReview.consumer || null,
     issue_type: sprinklerReview.issue_type || null,
@@ -3505,6 +3622,7 @@ function buildHalofireSam31ConsumerIntakeSmokePreliminaryReplayArtifact(projectN
     source_halofire_sam31_sprinkler_review_decision_evidence_id: replayInputs.source_halofire_sam31_sprinkler_review_decision_evidence_id,
     source_sam31_actual_value_replacement_evidence_id: replayInputs.source_sam31_actual_value_replacement_evidence_id,
     source_openclaw_sam31_consumer_review_evidence_id: replayInputs.source_openclaw_sam31_consumer_review_evidence_id,
+    ...sam31ActualValueReplacementAuditProvenance(replayInputs),
     source_openclaw_sam31_section_to_artifacts_ref: replayInputs.source_openclaw_sam31_section_to_artifacts_ref,
     consumer: replayInputs.consumer,
     issue_type: replayInputs.issue_type,
@@ -11237,6 +11355,7 @@ function normalizeHalofireSam31ConsumerIntakeSmokeFollowupReviewDecision(project
     source_replay_evidence_id: sourcePacket.source_replay_evidence_id || null,
     source_sam31_actual_value_replacement_evidence_id: sourcePacket.source_sam31_actual_value_replacement_evidence_id || null,
     source_openclaw_sam31_consumer_review_evidence_id: sourcePacket.source_openclaw_sam31_consumer_review_evidence_id || null,
+    ...sam31ActualValueReplacementAuditProvenance(sourcePacket),
     source_openclaw_sam31_section_to_artifacts_ref: sourcePacket.source_openclaw_sam31_section_to_artifacts_ref || null,
     source_consumer: sourcePacket.source_consumer || null,
     target_application: 'halo_fire',
