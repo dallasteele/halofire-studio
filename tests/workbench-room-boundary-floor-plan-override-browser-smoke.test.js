@@ -634,6 +634,28 @@ describe('Workbench room-boundary floor-plan override browser smoke', () => {
         claim_gate_effect: 'no_claims_cleared',
         no_claim_gates_cleared: true,
       }));
+      await page.waitForFunction((expected) => {
+        const text = document.getElementById('resolverQueue')?.innerText || '';
+        return text.includes(`latest_approval_upload_validation_decision evidence #${expected.decisionEvidenceId}`)
+          && text.includes('default_internal_alpha_placeholder_rejected')
+          && text.includes('sam31_approval_validation_placeholder_no_claims')
+          && text.includes(`source_openclaw_sam31_actual_value_replacement_readback_evidence_id ${expected.auditReadbackEvidenceId}`);
+      }, {
+        decisionEvidenceId: defaultValidationDecisionEvidenceId,
+        auditReadbackEvidenceId: String(auditReadbackEvidenceId),
+      });
+      const resolverQueueAfterDefaultValidationText = await page.locator('#resolverQueue').innerText();
+      expect(resolverQueueAfterDefaultValidationText).toContain('gate_validation_status validation_decision_no_claims_cleared');
+      expect(resolverQueueAfterDefaultValidationText).toContain('Gate resolve blocked until real_signed_evidence_validated validation decision');
+      expect(resolverQueueAfterDefaultValidationText).toContain(`source_openclaw_sam31_actual_value_replacement_readback_evidence_id ${auditReadbackEvidenceId}`);
+      expect(resolverQueueAfterDefaultValidationText).toContain('blocked_reason default/internal-alpha placeholder approval uploads cannot validate or clear regulated claims');
+      const placeholderReplacement = page.locator(`[data-sam31-approval-upload-placeholder-replacement-workflow="${defaultValidationDecisionEvidenceId}"]`).first();
+      await placeholderReplacement.waitFor({ state: 'attached' });
+      expect(await placeholderReplacement.getAttribute('data-signed-reviewer-workflow-gate-code')).toBe('PROFESSIONAL_REVIEW_MISSING');
+      expect(await placeholderReplacement.getAttribute('data-source-openclaw-sam31-actual-value-replacement-readback-evidence-id')).toBe(String(auditReadbackEvidenceId));
+      expect(await placeholderReplacement.getAttribute('data-selected-sheet-ref')).toBe('1881://proposal-cooperative/sheet-7');
+      expect(await placeholderReplacement.getAttribute('data-claim-gate-effect')).toBe('no_claims_cleared');
+      expect(await page.locator(`[data-sam31-approval-upload-resolve-evidence-id="${defaultValidationDecisionEvidenceId}"]`).count()).toBe(0);
     } finally {
       await page.close();
     }
@@ -1260,6 +1282,7 @@ describe('Workbench room-boundary floor-plan override browser smoke', () => {
       const resolverQueueAfterValidationDecisionText = await page.locator('#resolverQueue').innerText();
       expect(resolverQueueAfterValidationDecisionText).toContain('gate_validation_status validation_decision_no_claims_cleared');
       expect(resolverQueueAfterValidationDecisionText).toContain('Gate resolve blocked until real_signed_evidence_validated validation decision');
+      expect(await page.locator(`[data-sam31-approval-upload-resolve-evidence-id="${approvalValidationDecisionEvidenceId}"]`).count()).toBe(0);
 
       expect(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-source-halofire-sam31-approval-upload-evidence-id')).toBe(String(approvalUploadEvidenceId));
       expect(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-downloaded-gate-validation-packet')).toBe('true');

@@ -16330,12 +16330,16 @@ function decorateSam31ApprovalUploadValidationRow(row, gateStatusByCode) {
   } else if (hasUpload) {
     gateValidationStatus = 'pending_gate_validation';
   }
+  const placeholderValidationBlockedReason = gateValidationStatus === 'validation_decision_no_claims_cleared'
+    ? 'default/internal-alpha placeholder approval uploads cannot validate or clear regulated claims'
+    : null;
   return {
     ...row,
     target_gate_code: targetGateCode,
     gate_status: gateStatus,
     gate_validation_status: gateValidationStatus,
     latest_approval_upload_validation_decision: latestValidationDecision,
+    blocked_reason: placeholderValidationBlockedReason || row.blocked_reason || null,
     claim_gate_effect: latestValidationDecision?.claim_gate_effect || row.claim_gate_effect || 'no_claims_cleared',
   };
 }
@@ -16444,7 +16448,11 @@ function sam31ApprovalUploadValidationStandaloneItems(projectName, approvalUploa
         source_section_to_artifacts_consumer_intake_smoke_evidence_id: summary.source_section_to_artifacts_consumer_intake_smoke_evidence_id || null,
         source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id: summary.source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id || null,
         source_halofire_sam31_sprinkler_review_decision_evidence_id: summary.source_halofire_sam31_sprinkler_review_decision_evidence_id || null,
+        source_openclaw_sam31_actual_value_replacement_readback_evidence_id: summary.source_openclaw_sam31_actual_value_replacement_readback_evidence_id || null,
         packet_index: summary.packet_index ?? 0,
+        selected_sheet_ref: summary.selected_sheet_ref || null,
+        selected_scale_ref: summary.selected_scale_ref || null,
+        selected_boundary_candidate_ref: summary.selected_boundary_candidate_ref || null,
         latest_approval_upload_intake: summary,
         acceptable_evidence: [summary.required_evidence_type || rule?.required_evidence_type || summary.evidence_type].filter(Boolean),
         next_action: 'Review the uploaded approval evidence and validation packet before explicitly resolving the claim gate.',
