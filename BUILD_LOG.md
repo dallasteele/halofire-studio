@@ -1,5 +1,13 @@
 # HaloFire Build Log
 
+## 2026-06-04 - Replay smoke approval upload follow-through
+
+- Added a Workbench one-click default professional approval-upload intake from replay-scoped `halofire.sam31_sprinkler_followup_packet_review_decision.v1` evidence rows.
+- The action saves `halofire.sam31_approval_upload_intake.v1` as `professional_review`, downloads `halofire.sam31_approval_upload_gate_validation_packet.v1`, and preserves the smoke evidence id, sprinkler review decision id, preliminary replay follow-up id, packet review id, replay evidence id, SAM31 actual-value replacement id, and `claim_gate_effect: no_claims_cleared`.
+- Added Workbench evidence detail rendering for `halofire_sam31_approval_upload_intake` notes so employees can see pending validation status, source packet review evidence, packet index, and blocked claims before any explicit claim-gate resolve.
+- Verified red-to-green with `npx vitest run tests/workbench-room-boundary-floor-plan-override-browser-smoke.test.js --reporter=verbose`, plus adjacent `npx vitest run tests/workbench-sam31-consumer-intake-smoke-browser.test.js --reporter=verbose`, `npx vitest run tests/workbench-evidence-detail.test.js --reporter=verbose`, `npx vitest run tests/studio-static-origin.test.js --reporter=verbose`, `C:/Python312/python.exe E:/ClaudeBot/scripts/verify_agentic_rules.py`, `git diff --check`, `.only` scan, and GX10 prover health. This is `NO_FORMALIZABLE_CLAIM`; it proves Workbench packet routing and metadata preservation, not professional approval.
+- Still blocked: AutoSprink parity, AHJ approval, PE/professional review, permit readiness, fabrication readiness, manufacturer-exact models, brand readiness, production readiness, survey-grade claims, and engineering-grade claims.
+
 ## 2026-06-04 - Replay smoke packet review follow-through
 
 - Added a Workbench one-click default packet-review action for replay-scoped HaloFire SAM31 consumer-intake smoke rows after a saved preliminary replay follow-up queue exists.

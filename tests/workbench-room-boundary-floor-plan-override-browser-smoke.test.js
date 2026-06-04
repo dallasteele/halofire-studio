@@ -545,6 +545,43 @@ describe('Workbench room-boundary floor-plan override browser smoke', () => {
       expect(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-downloaded-replay-followup-packet')).toBe('true');
       expect(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-reviewed-replay-followup-packet')).toBe('true');
       expect(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-claim-gate-effect')).toBe('no_claims_cleared');
+
+      const defaultApprovalUpload = page.locator(`[data-replay-sam31-consumer-intake-smoke-default-approval-upload="${packetReviewEvidenceId}"]`).first();
+      await defaultApprovalUpload.waitFor({ state: 'attached' });
+      expect(await defaultApprovalUpload.getAttribute('data-sam31-approval-upload-smoke-evidence-id')).toBe(String(smokeEvidenceId));
+      expect(await defaultApprovalUpload.getAttribute('data-sam31-approval-upload-sprinkler-review-evidence-id')).toBe(String(sprinklerDecisionEvidenceId));
+      expect(await defaultApprovalUpload.getAttribute('data-sam31-approval-upload-followup-evidence-id')).toBe(String(replayFollowupEvidenceId));
+      expect(await defaultApprovalUpload.getAttribute('data-sam31-approval-upload-packet-index')).toBe('0');
+      expect(await defaultApprovalUpload.getAttribute('data-sam31-approval-upload-code')).toBe('HALOFIRE_SAM31_PROFESSIONAL_APPROVAL_UPLOAD_MISSING');
+      expect(await defaultApprovalUpload.getAttribute('data-claim-gate-effect')).toBe('no_claims_cleared');
+      await defaultApprovalUpload.click();
+      await page.waitForFunction((packetReviewId) => {
+        const status = document.getElementById(`sam31ApprovalUploadDefaultStatus-${packetReviewId}`);
+        return status?.dataset.sam31ApprovalUploadEvidenceId
+          && status?.dataset.downloadedGateValidationPacket === 'true'
+          && status?.dataset.claimGateEffect === 'no_claims_cleared';
+      }, String(packetReviewEvidenceId));
+
+      const approvalUploadStatus = page.locator(`#sam31ApprovalUploadDefaultStatus-${packetReviewEvidenceId}`);
+      const approvalUploadEvidenceId = String(await approvalUploadStatus.getAttribute('data-sam31-approval-upload-evidence-id') || '');
+      expect(approvalUploadEvidenceId).toMatch(/^\d+$/);
+      expect(await approvalUploadStatus.getAttribute('data-source-replay-evidence-id')).toBe(String(savedReplayEvidenceId));
+      expect(await approvalUploadStatus.getAttribute('data-source-sam31-actual-value-replacement-evidence-id')).toBe(String(replacementEvidenceId));
+      expect(await approvalUploadStatus.getAttribute('data-source-halofire-sam31-followup-packet-review-evidence-id')).toBe(String(packetReviewEvidenceId));
+      expect(await approvalUploadStatus.getAttribute('data-source-halofire-sam31-preliminary-replay-followup-evidence-id')).toBe(String(replayFollowupEvidenceId));
+      expect(await approvalUploadStatus.getAttribute('data-downloaded-gate-validation-packet')).toBe('true');
+      expect(await approvalUploadStatus.getAttribute('data-claim-gate-effect')).toBe('no_claims_cleared');
+
+      await page.locator(`#evidence-${approvalUploadEvidenceId}`).waitFor({ state: 'attached' });
+      const approvalUploadRow = await page.locator(`#evidence-${approvalUploadEvidenceId}`).innerText();
+      expect(approvalUploadRow).toContain('professional_review');
+      expect(approvalUploadRow).toContain(`source_packet_review_decision_evidence_id ${packetReviewEvidenceId}`);
+      expect(approvalUploadRow).toContain('uploaded_pending_gate_validation');
+      expect(approvalUploadRow).toContain('claim_gate_effect no_claims_cleared');
+
+      expect(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-source-halofire-sam31-approval-upload-evidence-id')).toBe(String(approvalUploadEvidenceId));
+      expect(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-downloaded-gate-validation-packet')).toBe('true');
+      expect(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-claim-gate-effect')).toBe('no_claims_cleared');
     } finally {
       await page.close();
     }
