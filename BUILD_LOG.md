@@ -1,5 +1,13 @@
 # HaloFire Build Log
 
+## 2026-06-04 - Approval validation queue review readback
+
+- Added a Workbench review/readback action on pending SAM31 approval-validation queue rows so uploaded approval evidence can be reviewed with its `halofire.sam31_approval_upload_gate_validation_packet.v1` before any explicit claim-gate resolve.
+- Targeted saved approval-upload evidence row follow-through to the exact pending gate filter, for example `sam31ApprovalValidation=pending&targetGate=PROFESSIONAL_REVIEW_MISSING`.
+- Added replay-scoped approval-validation fallback queue items so saved `halofire.sam31_approval_upload_intake.v1` rows remain visible even when the nested PDF-boundary packet chain cannot be reconstructed from a direct boundary id.
+- Verified red-to-green with `npx vitest run tests/workbench-room-boundary-floor-plan-override-browser-smoke.test.js --reporter=verbose`, plus `npx vitest run tests/workbench-evidence-detail.test.js --reporter=verbose`, `npx vitest run tests/studio-static-origin.test.js --reporter=verbose`, and `npx vitest run tests/openclaw-sam31-status-api.test.js --reporter=verbose`. This is `NO_FORMALIZABLE_CLAIM`; it proves queue/readback routing and metadata preservation, not approval or claim clearance.
+- Still blocked: AutoSprink parity, AHJ approval, PE/professional review, permit readiness, fabrication readiness, manufacturer-exact models, brand readiness, production readiness, survey-grade claims, and engineering-grade claims.
+
 ## 2026-06-04 - Replay smoke approval validation follow-through
 
 - Added a Workbench one-click validation follow-through on saved `halofire.sam31_approval_upload_intake.v1` evidence rows so employees can download the source-linked `halofire.sam31_approval_upload_gate_validation_packet.v1` and open the pending `sam31ApprovalValidation=pending` resolver queue without copying IDs.

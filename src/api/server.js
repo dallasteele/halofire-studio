@@ -9225,10 +9225,13 @@ function latestHalofireSam31SprinklerPreliminaryReplayFollowupDecisionEvidence(p
   for (const row of rows) {
     const followup = halofireSam31SprinklerPreliminaryReplayFollowupDecisionFromEvidence(row);
     if (!followup) continue;
+    const sourceBoundaryEvidenceId = Number(followup.source_pdf_boundary_evidence_id || 0);
+    const sourceSmokeEvidenceId = Number(followup.source_section_to_artifacts_consumer_intake_smoke_evidence_id || 0);
     if (
       sourceEvidenceId
-      && Number(followup.source_pdf_boundary_evidence_id) !== Number(sourceEvidenceId)
-      && Number(followup.source_section_to_artifacts_consumer_intake_smoke_evidence_id) !== Number(sourceEvidenceId)
+      && sourceBoundaryEvidenceId
+      && sourceBoundaryEvidenceId !== Number(sourceEvidenceId)
+      && sourceSmokeEvidenceId !== Number(sourceEvidenceId)
     ) {
       continue;
     }
@@ -9262,10 +9265,13 @@ function latestHalofireSam31SprinklerFollowupPacketReviewDecisionEvidence(projec
   for (const row of rows) {
     const review = halofireSam31SprinklerFollowupPacketReviewDecisionFromEvidence(row);
     if (!review) continue;
+    const sourceBoundaryEvidenceId = Number(review.source_pdf_boundary_evidence_id || 0);
+    const sourceSmokeEvidenceId = Number(review.source_section_to_artifacts_consumer_intake_smoke_evidence_id || 0);
     if (
       sourceEvidenceId
-      && Number(review.source_pdf_boundary_evidence_id) !== Number(sourceEvidenceId)
-      && Number(review.source_section_to_artifacts_consumer_intake_smoke_evidence_id) !== Number(sourceEvidenceId)
+      && sourceBoundaryEvidenceId
+      && sourceBoundaryEvidenceId !== Number(sourceEvidenceId)
+      && sourceSmokeEvidenceId !== Number(sourceEvidenceId)
     ) {
       continue;
     }
@@ -9379,10 +9385,13 @@ function latestHalofireSam31ApprovalUploadIntakeEvidence(projectName, sourceEvid
   for (const row of rows) {
     const intake = halofireSam31ApprovalUploadIntakeFromEvidence(row);
     if (!intake) continue;
+    const sourceBoundaryEvidenceId = Number(intake.source_pdf_boundary_evidence_id || 0);
+    const sourceSmokeEvidenceId = Number(intake.source_section_to_artifacts_consumer_intake_smoke_evidence_id || 0);
     if (
       sourceEvidenceId
-      && Number(intake.source_pdf_boundary_evidence_id) !== Number(sourceEvidenceId)
-      && Number(intake.source_section_to_artifacts_consumer_intake_smoke_evidence_id) !== Number(sourceEvidenceId)
+      && sourceBoundaryEvidenceId
+      && sourceBoundaryEvidenceId !== Number(sourceEvidenceId)
+      && sourceSmokeEvidenceId !== Number(sourceEvidenceId)
     ) {
       continue;
     }
@@ -9418,6 +9427,7 @@ function halofireSam31ApprovalUploadIntakeSummary(uploadEvidence) {
     code: intake.code,
     target_approval_lane: intake.target_approval_lane,
     required_evidence_type: intake.required_evidence_type,
+    gate_code: intake.gate_code || halofireSam31ApprovalUploadGateCode(intake.target_approval_lane),
     source_packet_review_decision_evidence_id: intake.source_packet_review_decision_evidence_id,
     source_followup_decision_evidence_id: intake.source_followup_decision_evidence_id,
     source_pdf_boundary_evidence_id: intake.source_pdf_boundary_evidence_id || null,
@@ -9432,6 +9442,7 @@ function halofireSam31ApprovalUploadIntakeSummary(uploadEvidence) {
     gate_validation_packet_action: halofireSam31ApprovalUploadGateValidationPacketAction(evidence.project_name, evidence.id),
     use_for_claims: false,
     claim_gate_effect: intake.claim_gate_effect || 'no_claims_cleared',
+    blocked_claims: Array.isArray(intake.blocked_claims) ? intake.blocked_claims : [],
   };
 }
 
@@ -15423,6 +15434,14 @@ function sam31ApprovalValidationRowMatches(row, filters) {
 function filterSam31ApprovalValidationItems(items, filters, gateStatusByCode) {
   return items
     .map((item) => {
+      if (item.kind === 'sam31_approval_upload_validation') {
+        const approvalRows = Array.isArray(item.approval_upload_resolver_rows)
+          ? item.approval_upload_resolver_rows
+            .map((row) => decorateSam31ApprovalUploadValidationRow(row, gateStatusByCode))
+            .filter((row) => sam31ApprovalValidationRowMatches(row, filters))
+          : [];
+        return approvalRows.length ? { ...item, approval_upload_resolver_rows: approvalRows } : null;
+      }
       const replayRows = Array.isArray(item.sam31_sprinkler_preliminary_replay_queue_items)
         ? item.sam31_sprinkler_preliminary_replay_queue_items
           .map((replayRow) => {
@@ -15450,6 +15469,9 @@ function filterSam31ApprovalValidationItems(items, filters, gateStatusByCode) {
 function sam31ApprovalUploadValidationRowsFromItems(items, gateStatusByCode) {
   const rows = [];
   for (const item of Array.isArray(items) ? items : []) {
+    for (const row of Array.isArray(item.approval_upload_resolver_rows) ? item.approval_upload_resolver_rows : []) {
+      rows.push(decorateSam31ApprovalUploadValidationRow(row, gateStatusByCode));
+    }
     for (const replayRow of Array.isArray(item.sam31_sprinkler_preliminary_replay_queue_items) ? item.sam31_sprinkler_preliminary_replay_queue_items : []) {
       for (const packet of Array.isArray(replayRow.packet_queue_items) ? replayRow.packet_queue_items : []) {
         for (const row of Array.isArray(packet.approval_upload_resolver_rows) ? packet.approval_upload_resolver_rows : []) {
@@ -15459,6 +15481,55 @@ function sam31ApprovalUploadValidationRowsFromItems(items, gateStatusByCode) {
     }
   }
   return rows;
+}
+
+function sam31ApprovalUploadValidationStandaloneItems(projectName, approvalUploadEvidences, gateStatusByCode) {
+  return (Array.isArray(approvalUploadEvidences) ? approvalUploadEvidences : [])
+    .map((uploadEvidence) => {
+      const summary = halofireSam31ApprovalUploadIntakeSummary(uploadEvidence);
+      if (!summary) return null;
+      const rule = halofireSam31ApprovalUploadRule(summary.code);
+      const row = decorateSam31ApprovalUploadValidationRow({
+        id: `approval-upload-validation:${summary.evidence_id}:${summary.code || 'approval'}`,
+        artifact_type: HALOFIRE_SAM31_APPROVAL_UPLOAD_RESOLVER_ROW_TYPE,
+        status: 'approval_upload_recorded_pending_gate_validation',
+        code: summary.code,
+        target_gate_code: summary.gate_code,
+        target_approval_lane: summary.target_approval_lane,
+        gate_evidence_type: summary.evidence_type,
+        required_evidence_type: summary.required_evidence_type || rule?.required_evidence_type || summary.evidence_type,
+        source_packet_review_decision_evidence_id: summary.source_packet_review_decision_evidence_id,
+        source_followup_decision_evidence_id: summary.source_followup_decision_evidence_id,
+        source_pdf_boundary_evidence_id: summary.source_pdf_boundary_evidence_id || null,
+        source_section_to_artifacts_consumer_intake_smoke_evidence_id: summary.source_section_to_artifacts_consumer_intake_smoke_evidence_id || null,
+        source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id: summary.source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id || null,
+        source_halofire_sam31_sprinkler_review_decision_evidence_id: summary.source_halofire_sam31_sprinkler_review_decision_evidence_id || null,
+        packet_index: summary.packet_index ?? 0,
+        latest_approval_upload_intake: summary,
+        acceptable_evidence: [summary.required_evidence_type || rule?.required_evidence_type || summary.evidence_type].filter(Boolean),
+        next_action: 'Review the uploaded approval evidence and validation packet before explicitly resolving the claim gate.',
+        blocked_claims: Array.isArray(summary.blocked_claims) ? summary.blocked_claims : [],
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+        no_claim_gates_cleared: true,
+      }, gateStatusByCode);
+      return {
+        id: `sam31-approval-upload-validation:${summary.evidence_id}`,
+        kind: 'sam31_approval_upload_validation',
+        artifact_type: 'halofire.sam31_approval_upload_validation_queue_item.v1',
+        status: row.gate_validation_status || 'pending_gate_validation',
+        project_name: projectName,
+        evidence_id: summary.evidence_id,
+        next_action: row.next_action,
+        acceptable_evidence: row.acceptable_evidence,
+        blocked_claims: row.blocked_claims,
+        approval_upload_resolver_rows: [row],
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+        no_claim_gates_cleared: true,
+      };
+    })
+    .filter(Boolean);
 }
 
 function claimGateResolveAuditQueueItems(projectName) {
@@ -15642,6 +15713,11 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
   }
   const boundaryItem = pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence, sam31Evidence, sam31ReplacementEvidence, sam31SmokeEvidence, sam31ExtrapolationEvidence, sam31ExtrapolationReviewEvidence, sam31SectioningContractReviewEvidence, sam31SectioningDownstreamPacketEvidence, sam31SectioningSprinklerReviewAdapterEvidence, sam31ConsumerSmokeEvidence, sam31ConsumerReviewEvidences, sam31SprinklerReviewDecisionEvidences, sam31SprinklerPreliminaryReplayFollowupDecisionEvidences, sam31SprinklerFollowupPacketReviewDecisionEvidences, sam31ApprovalUploadIntakeEvidences);
   if (boundaryItem) items.push(boundaryItem);
+  if (filters.sam31ApprovalValidation) {
+    for (const approvalValidationItem of sam31ApprovalUploadValidationStandaloneItems(projectName, sam31ApprovalUploadIntakeEvidences, approvalGateStatusByCode)) {
+      items.push(approvalValidationItem);
+    }
+  }
   const catalogEvidence = matchingCatalogEvidenceByFamily(projectName);
   for (const row of currentSourceAcquisitionLedger()) {
     const matchedEvidence =

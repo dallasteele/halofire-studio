@@ -585,7 +585,7 @@ describe('Workbench room-boundary floor-plan override browser smoke', () => {
       expect(await approvalValidation.getAttribute('data-sam31-approval-upload-evidence-id')).toBe(String(approvalUploadEvidenceId));
       expect(await approvalValidation.getAttribute('data-source-halofire-sam31-followup-packet-review-evidence-id')).toBe(String(packetReviewEvidenceId));
       expect(await approvalValidation.getAttribute('data-source-halofire-sam31-preliminary-replay-followup-evidence-id')).toBe(String(replayFollowupEvidenceId));
-      expect(await approvalValidation.getAttribute('data-sam31-approval-validation-filter-href')).toBe(approvalValidationQueueHref);
+      expect(await approvalValidation.getAttribute('data-sam31-approval-validation-filter-href')).toBe(`${approvalValidationQueueHref}&targetGate=PROFESSIONAL_REVIEW_MISSING`);
       expect(await approvalValidation.getAttribute('data-claim-gate-effect')).toBe('no_claims_cleared');
       await approvalValidation.click();
       await page.waitForFunction((approvalUploadId) => {
@@ -597,13 +597,32 @@ describe('Workbench room-boundary floor-plan override browser smoke', () => {
       }, approvalUploadEvidenceId);
 
       const approvalValidationStatus = page.locator(`#sam31ApprovalUploadValidationStatus-${approvalUploadEvidenceId}`);
-      expect(await approvalValidationStatus.getAttribute('data-sam31-approval-validation-filter-href')).toBe(approvalValidationQueueHref);
+      expect(await approvalValidationStatus.getAttribute('data-sam31-approval-validation-filter-href')).toBe(`${approvalValidationQueueHref}&targetGate=PROFESSIONAL_REVIEW_MISSING`);
       expect(await approvalValidationStatus.getAttribute('data-source-halofire-sam31-followup-packet-review-evidence-id')).toBe(String(packetReviewEvidenceId));
       expect(await approvalValidationStatus.getAttribute('data-source-halofire-sam31-preliminary-replay-followup-evidence-id')).toBe(String(replayFollowupEvidenceId));
       const resolverQueueText = await page.locator('#resolverQueue').innerText();
       expect(resolverQueueText).toContain('sam31ApprovalValidationQuickFilter');
       expect(resolverQueueText).toContain('sam31ApprovalValidation=pending');
       expect(resolverQueueText).toContain('sam31_approval_validation_pending');
+      expect(resolverQueueText).toContain(`latest_approval_upload_intake evidence #${approvalUploadEvidenceId}`);
+      expect(resolverQueueText).toContain('Review uploaded approval evidence');
+
+      const approvalUploadReview = page.locator(`[data-sam31-approval-upload-review-evidence-id="${approvalUploadEvidenceId}"]`).first();
+      await approvalUploadReview.waitFor({ state: 'attached' });
+      expect(await approvalUploadReview.getAttribute('data-sam31-approval-upload-review-gate-code')).toBe('PROFESSIONAL_REVIEW_MISSING');
+      expect(await approvalUploadReview.getAttribute('data-sam31-approval-upload-review-gate-validation-packet-href')).toContain(`/evidence/${approvalUploadEvidenceId}/openclaw/sam31/approval-upload/gate-validation-packet`);
+      expect(await approvalUploadReview.getAttribute('data-claim-gate-effect')).toBe('no_claims_cleared');
+      await approvalUploadReview.click();
+      await page.waitForFunction((approvalUploadId) => {
+        const status = document.getElementById(`sam31ApprovalUploadReviewStatus-${approvalUploadId}`);
+        return status?.dataset.sam31ApprovalUploadEvidenceId === approvalUploadId
+          && status?.dataset.downloadedGateValidationPacket === 'true'
+          && status?.dataset.reviewedUploadedApprovalEvidence === 'true'
+          && status?.dataset.claimGateEffect === 'no_claims_cleared';
+      }, approvalUploadEvidenceId);
+      const approvalUploadReviewStatus = page.locator(`#sam31ApprovalUploadReviewStatus-${approvalUploadEvidenceId}`);
+      expect(await approvalUploadReviewStatus.getAttribute('data-sam31-approval-upload-review-gate-code')).toBe('PROFESSIONAL_REVIEW_MISSING');
+      expect(await approvalUploadReviewStatus.getAttribute('data-sam31-approval-upload-review-resolve-href')).toContain('/claim-gates/PROFESSIONAL_REVIEW_MISSING/resolve');
 
       expect(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-source-halofire-sam31-approval-upload-evidence-id')).toBe(String(approvalUploadEvidenceId));
       expect(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-downloaded-gate-validation-packet')).toBe('true');
