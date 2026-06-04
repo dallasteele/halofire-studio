@@ -217,10 +217,14 @@ async function load() {
 
   await refreshClaimGates();
 
-  await refreshEvidence();
+  // Render the current resolver lane first so the workbench stays usable
+  // while heavier evidence/detail panels continue loading.
   await refreshResolverQueue();
-  await refreshCatalogSourceAcquisition();
-  await refreshSam31ActualValueQueue();
+  await Promise.all([
+    refreshEvidence(),
+    refreshCatalogSourceAcquisition(),
+    refreshSam31ActualValueQueue(),
+  ]);
 }
 
 function escapeHtml(value) {
@@ -1245,7 +1249,12 @@ function evidenceDetail(row) {
       const auditLine = packet.source_openclaw_sam31_actual_value_replacement_readback_evidence_id || packet.source_claim_gate_resolve_audit_evidence_id
         ? `source_openclaw_sam31_actual_value_replacement_readback_evidence_id ${escapeHtml(packet.source_openclaw_sam31_actual_value_replacement_readback_evidence_id || 'missing')} - source_claim_gate_resolve_audit_evidence_id ${escapeHtml(packet.source_claim_gate_resolve_audit_evidence_id || 'missing')} - source_resolved_evidence_id ${escapeHtml(packet.source_resolved_evidence_id || 'missing')} - source_claim_gate_effect ${escapeHtml(packet.source_claim_gate_effect || 'missing')} - no_unrelated_claims_cleared ${escapeHtml(packet.no_unrelated_claims_cleared === false ? 'false' : 'true')}<br>`
         : '';
-      return `<div class="muted" style="font-size:11px;margin-top:3px">Replay SAM31 actual-value replacement: ${escapeHtml(packet.artifact_type || 'halofire.sam31_replay_actual_value_replacement_intake.v1')}<br>${auditLine}source_replay_evidence_id ${escapeHtml(packet.source_replay_evidence_id || 'missing')} - source_actual_value_handoff_artifact_type ${escapeHtml(packet.source_actual_value_handoff_artifact_type || 'missing')} - source_supplied_document_bid_truth_replacement_evidence_id ${escapeHtml(packet.source_supplied_document_bid_truth_replacement_evidence_id || 'missing')} - source_ref ${escapeHtml(packet.source_ref || row.source_ref || 'missing')}<br>replacement_values_source_ref ${escapeHtml(packet.replacement_values?.source_ref || packet.source_ref || 'missing')} - replaced_field_count ${escapeHtml(packet.replacement_summary?.replaced_field_count ?? 0)} - claim_gate_effect ${escapeHtml(packet.claim_gate_effect || 'no_claims_cleared')} - no_claim_gates_cleared ${escapeHtml(packet.no_claim_gates_cleared === false ? 'false' : 'true')}<br>${hasSam31Selected1881Refs(packet) ? `${renderSam31Selected1881SourceRefs(packet)}` : ''}${projectTruth ? `project_truth square_feet ${escapeHtml(projectTruth.square_feet ?? 'missing')} - head_count ${escapeHtml(projectTruth.head_count ?? 'missing')} - total_man_hours ${escapeHtml(projectTruth.total_man_hours ?? 'missing')} - construction_days ${escapeHtml(projectTruth.construction_days ?? 'missing')} - source_status ${escapeHtml(projectTruth.source_status ?? 'missing')}<br>` : ''}source_refs ${sourceRefsText.map((ref) => `<span class="chip">${escapeHtml(ref)}</span>`).join('') || '<span class="chip">source refs missing</span>'}<br>Blocks still active: ${blocked.map((claim) => `<span class="chip">${escapeHtml(claim)}</span>`).join('') || '<span class="chip">claim gates remain blocked</span>'}${renderSam31ActualValueSectionToArtifactsSummary({ ...packet, evidence_id: row.id, id: row.id }, `evidence-${row.id}`)}</div>`;
+      const sourceReadbackEvidenceId = packet.source_openclaw_sam31_actual_value_replacement_readback_evidence_id || '';
+      const selected1881DataAttrs = sam31Selected1881DataAttrs(packet);
+      const readbackSmokeAction = sourceReadbackEvidenceId && packet.source_replay_evidence_id
+        ? `<br><button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#7c2d12" data-readback-sam31-consumer-intake-smoke-source-replacement-evidence-id="${escapeHtml(row.id)}" data-replay-sam31-consumer-intake-smoke-source-replacement-evidence-id="${escapeHtml(row.id)}" data-source-openclaw-sam31-actual-value-replacement-readback-evidence-id="${escapeHtml(sourceReadbackEvidenceId)}" data-source-replay-evidence-id="${escapeHtml(packet.source_replay_evidence_id || '')}" data-source-sam31-actual-value-replacement-evidence-id="${escapeHtml(row.id)}" data-source-supplied-document-bid-truth-replacement-evidence-id="${escapeHtml(packet.source_supplied_document_bid_truth_replacement_evidence_id || '')}" data-replay-sam31-consumer-intake-smoke-consumer="${escapeHtml(packet.consumer || 'halo_fire')}" data-claim-gate-effect="no_claims_cleared"${selected1881DataAttrs}>Save HaloFire smoke from saved readback replacement</button>`
+        : '';
+      return `<div class="muted" style="font-size:11px;margin-top:3px">Replay SAM31 actual-value replacement: ${escapeHtml(packet.artifact_type || 'halofire.sam31_replay_actual_value_replacement_intake.v1')}<br>${auditLine}source_replay_evidence_id ${escapeHtml(packet.source_replay_evidence_id || 'missing')} - source_actual_value_handoff_artifact_type ${escapeHtml(packet.source_actual_value_handoff_artifact_type || 'missing')} - source_supplied_document_bid_truth_replacement_evidence_id ${escapeHtml(packet.source_supplied_document_bid_truth_replacement_evidence_id || 'missing')} - source_ref ${escapeHtml(packet.source_ref || row.source_ref || 'missing')}<br>replacement_values_source_ref ${escapeHtml(packet.replacement_values?.source_ref || packet.source_ref || 'missing')} - replaced_field_count ${escapeHtml(packet.replacement_summary?.replaced_field_count ?? 0)} - claim_gate_effect ${escapeHtml(packet.claim_gate_effect || 'no_claims_cleared')} - no_claim_gates_cleared ${escapeHtml(packet.no_claim_gates_cleared === false ? 'false' : 'true')}<br>${hasSam31Selected1881Refs(packet) ? `${renderSam31Selected1881SourceRefs(packet)}` : ''}${projectTruth ? `project_truth square_feet ${escapeHtml(projectTruth.square_feet ?? 'missing')} - head_count ${escapeHtml(projectTruth.head_count ?? 'missing')} - total_man_hours ${escapeHtml(projectTruth.total_man_hours ?? 'missing')} - construction_days ${escapeHtml(projectTruth.construction_days ?? 'missing')} - source_status ${escapeHtml(projectTruth.source_status ?? 'missing')}<br>` : ''}source_refs ${sourceRefsText.map((ref) => `<span class="chip">${escapeHtml(ref)}</span>`).join('') || '<span class="chip">source refs missing</span>'}<br>Blocks still active: ${blocked.map((claim) => `<span class="chip">${escapeHtml(claim)}</span>`).join('') || '<span class="chip">claim gates remain blocked</span>'}${readbackSmokeAction}${renderSam31ActualValueSectionToArtifactsSummary({ ...packet, evidence_id: row.id, id: row.id }, `evidence-${row.id}`)}</div>`;
     } catch {
       return '<div class="muted" style="font-size:11px;margin-top:3px">SAM31 actual-value replacement evidence detail unavailable</div>';
     }
@@ -2447,20 +2456,47 @@ function downloadSam31ActualValueSectionArtifactsFromReplacement(index = '') {
 
 async function saveReplaySam31ConsumerIntakeSmoke(index = '', consumer = 'halo_fire', triggerElement = null) {
   const status = document.getElementById('sam31ActualValueQueueStatus');
-  const numericIndex = Number(index);
+  const numericIndex = String(index).trim() === '' ? Number.NaN : Number(index);
   const row = Number.isFinite(numericIndex) ? sam31ActualValueQueueRows[numericIndex] : null;
   const trigger = triggerElement || document.querySelector(`[data-replay-sam31-consumer-intake-smoke-index="${CSS.escape(String(index))}"]`);
   const handoff = row?.section_to_artifacts_consumer_handoff || null;
-  const replacementEvidenceId = handoff?.source_sam31_actual_value_replacement_evidence_id
-    || row?.evidence_id
-    || trigger?.dataset.sourceSam31ActualValueReplacementEvidenceId
+  const sourceReadbackEvidenceId = trigger?.dataset.sourceOpenclawSam31ActualValueReplacementReadbackEvidenceId
+    || handoff?.source_openclaw_sam31_actual_value_replacement_readback_evidence_id
+    || row?.source_openclaw_sam31_actual_value_replacement_readback_evidence_id
+    || '';
+  const replacementEvidenceId = trigger?.dataset.sourceSam31ActualValueReplacementEvidenceId
     || trigger?.dataset.replaySam31ConsumerIntakeSmokeSourceReplacementEvidenceId
+    || handoff?.source_sam31_actual_value_replacement_evidence_id
+    || row?.evidence_id
     || '';
   if (!replacementEvidenceId) {
     if (status) status.textContent = 'Replay SAM31 replacement evidence id is required for consumer intake smoke.';
     return;
   }
   const requestedConsumer = String(consumer || 'halo_fire').trim() || 'halo_fire';
+  const triggerSelected1881Refs = trigger ? {
+    selected_sheet_ref: trigger.dataset.selectedSheetRef || '',
+    selected_scale_ref: trigger.dataset.selectedScaleRef || '',
+    selected_boundary_candidate_ref: trigger.dataset.selectedBoundaryCandidateRef || '',
+  } : null;
+  const stampSmokeStatus = (targetStatus, savedSmoke) => {
+    if (!targetStatus) return;
+    const smokeEvidenceId = String(savedSmoke.evidence_id || savedSmoke.id || '');
+    const readbackEvidenceId = savedSmoke.source_openclaw_sam31_actual_value_replacement_readback_evidence_id || sourceReadbackEvidenceId || '';
+    const selected1881Refs = sam31Selected1881Refs(savedSmoke, triggerSelected1881Refs);
+    targetStatus.dataset.sam31ConsumerIntakeSmokeEvidenceId = smokeEvidenceId;
+    targetStatus.dataset.sourceReplayEvidenceId = String(savedSmoke.source_replay_evidence_id || row?.source_replay_evidence_id || trigger?.dataset.sourceReplayEvidenceId || '');
+    targetStatus.dataset.sourceSam31ActualValueReplacementEvidenceId = String(savedSmoke.source_sam31_actual_value_replacement_evidence_id || replacementEvidenceId);
+    targetStatus.dataset.sourceOpenclawSam31ActualValueReplacementReadbackEvidenceId = String(readbackEvidenceId);
+    targetStatus.dataset.sourceSuppliedDocumentBidTruthReplacementEvidenceId = String(savedSmoke.source_supplied_document_bid_truth_replacement_evidence_id || trigger?.dataset.sourceSuppliedDocumentBidTruthReplacementEvidenceId || '');
+    if (hasSam31Selected1881Refs(selected1881Refs)) {
+      targetStatus.dataset.selectedSheetRef = selected1881Refs.selected_sheet_ref;
+      targetStatus.dataset.selectedScaleRef = selected1881Refs.selected_scale_ref;
+      targetStatus.dataset.selectedBoundaryCandidateRef = selected1881Refs.selected_boundary_candidate_ref;
+    }
+    targetStatus.dataset.claimGateEffect = savedSmoke.claim_gate_effect || 'no_claims_cleared';
+    targetStatus.textContent = 'Saved openclaw_sam31_section_to_artifacts_consumer_intake_smoke evidence #' + smokeEvidenceId + ' from replay replacement #' + replacementEvidenceId + '; claim gates remain blocked.';
+  };
   if (status) status.textContent = 'Saving openclaw_sam31_section_to_artifacts_consumer_intake_smoke from replacement #' + replacementEvidenceId + '...';
   try {
     const saved = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/openclaw/sam31/section-to-artifacts-consumer-intake-smoke', {
@@ -2473,23 +2509,12 @@ async function saveReplaySam31ConsumerIntakeSmoke(index = '', consumer = 'halo_f
     sam31ActualValueQueueConsumerFilter = requestedConsumer;
     sam31ActualValueConsumerIntakeSmokeEvidenceFilter = String(saved.evidence_id || saved.id || '');
     sam31ActualValueSourceReplayEvidenceFilter = String(saved.source_replay_evidence_id || row?.source_replay_evidence_id || trigger?.dataset.sourceReplayEvidenceId || '');
-    if (status) {
-      status.dataset.sam31ConsumerIntakeSmokeEvidenceId = String(saved.evidence_id || saved.id || '');
-      status.dataset.sourceReplayEvidenceId = String(saved.source_replay_evidence_id || row?.source_replay_evidence_id || trigger?.dataset.sourceReplayEvidenceId || '');
-      status.dataset.sourceSam31ActualValueReplacementEvidenceId = String(saved.source_sam31_actual_value_replacement_evidence_id || replacementEvidenceId);
-      status.dataset.claimGateEffect = saved.claim_gate_effect || 'no_claims_cleared';
-      status.textContent = 'Saved openclaw_sam31_section_to_artifacts_consumer_intake_smoke evidence #' + (saved.evidence_id || saved.id) + ' from replacement #' + replacementEvidenceId + '; claim gates remain blocked.';
-    }
+    sam31ActualValueReplacementReadbackEvidenceFilter = String(saved.source_openclaw_sam31_actual_value_replacement_readback_evidence_id || sourceReadbackEvidenceId || sam31ActualValueReplacementReadbackEvidenceFilter || '');
+    stampSmokeStatus(status, saved);
     await refreshEvidence();
     await refreshSam31ActualValueQueue();
     const refreshedStatus = document.getElementById('sam31ActualValueQueueStatus');
-    if (refreshedStatus) {
-      refreshedStatus.dataset.sam31ConsumerIntakeSmokeEvidenceId = String(saved.evidence_id || saved.id || '');
-      refreshedStatus.dataset.sourceReplayEvidenceId = String(saved.source_replay_evidence_id || row?.source_replay_evidence_id || trigger?.dataset.sourceReplayEvidenceId || '');
-      refreshedStatus.dataset.sourceSam31ActualValueReplacementEvidenceId = String(saved.source_sam31_actual_value_replacement_evidence_id || replacementEvidenceId);
-      refreshedStatus.dataset.claimGateEffect = saved.claim_gate_effect || 'no_claims_cleared';
-      refreshedStatus.textContent = 'Saved openclaw_sam31_section_to_artifacts_consumer_intake_smoke evidence #' + (saved.evidence_id || saved.id) + ' from replay replacement #' + replacementEvidenceId + '; claim gates remain blocked.';
-    }
+    stampSmokeStatus(refreshedStatus, saved);
   } catch (err) {
     if (status) {
       status.dataset.claimGateEffect = 'no_claims_cleared';

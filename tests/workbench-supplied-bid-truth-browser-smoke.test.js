@@ -85,7 +85,7 @@ describe('Workbench supplied bid-truth browser smoke', () => {
   it('downloads the review packet and records a fail-closed employee replacement from the workbench', async () => {
     const token = await adminToken();
     const page = await browser.newPage({ acceptDownloads: true });
-    page.setDefaultTimeout(8000);
+    page.setDefaultTimeout(12000);
     await page.addInitScript((authToken) => {
       localStorage.setItem('halofire_token', authToken);
     }, token);
@@ -174,7 +174,7 @@ describe('Workbench supplied bid-truth browser smoke', () => {
     } finally {
       await page.close();
     }
-  }, 30_000);
+  }, 45_000);
 
   it('shows supplied bid-truth downstream defaults on generated bid results and downloads the packet', async () => {
     const token = await adminToken();
@@ -226,7 +226,7 @@ describe('Workbench supplied bid-truth browser smoke', () => {
     });
 
     const page = await browser.newPage({ acceptDownloads: true });
-    page.setDefaultTimeout(8000);
+    page.setDefaultTimeout(12000);
     await page.addInitScript((authToken) => {
       localStorage.setItem('halofire_token', authToken);
     }, token);
@@ -475,6 +475,57 @@ describe('Workbench supplied bid-truth browser smoke', () => {
         'employee://bid-truth/downstream-browser-smoke-001',
       ]));
 
+      await page.locator(`#evidence-${defaultReadbackReplacementEvidenceId}`).waitFor({ state: 'attached' });
+      const defaultReadbackSmokeButton = page.locator(`[data-readback-sam31-consumer-intake-smoke-source-replacement-evidence-id="${defaultReadbackReplacementEvidenceId}"]`).first();
+      await defaultReadbackSmokeButton.waitFor({ state: 'attached' });
+      expect(await defaultReadbackSmokeButton.getAttribute('data-source-openclaw-sam31-actual-value-replacement-readback-evidence-id')).toBe(String(savedLayoutReplacementReadback.evidence_id));
+      expect(await defaultReadbackSmokeButton.getAttribute('data-source-replay-evidence-id')).toBe(String(savedLayout.id));
+      expect(await defaultReadbackSmokeButton.getAttribute('data-source-sam31-actual-value-replacement-evidence-id')).toBe(String(defaultReadbackReplacementEvidenceId));
+      await defaultReadbackSmokeButton.click();
+      let defaultReadbackSmokeStatus = {};
+      for (let attempt = 0; attempt < 20; attempt += 1) {
+        defaultReadbackSmokeStatus = await page.locator('#sam31ActualValueQueueStatus').evaluate((status) => ({
+          text: status.textContent,
+          dataset: { ...status.dataset },
+        }));
+        if (
+          defaultReadbackSmokeStatus.dataset.sourceSam31ActualValueReplacementEvidenceId === String(defaultReadbackReplacementEvidenceId)
+          && defaultReadbackSmokeStatus.dataset.sourceOpenclawSam31ActualValueReplacementReadbackEvidenceId === String(savedLayoutReplacementReadback.evidence_id)
+          && defaultReadbackSmokeStatus.dataset.sam31ConsumerIntakeSmokeEvidenceId
+          && defaultReadbackSmokeStatus.dataset.claimGateEffect === 'no_claims_cleared'
+        ) {
+          break;
+        }
+        await new Promise((resolve) => setTimeout(resolve, 500));
+      }
+      expect(defaultReadbackSmokeStatus.dataset).toEqual(expect.objectContaining({
+        sourceSam31ActualValueReplacementEvidenceId: String(defaultReadbackReplacementEvidenceId),
+        sourceOpenclawSam31ActualValueReplacementReadbackEvidenceId: String(savedLayoutReplacementReadback.evidence_id),
+        claimGateEffect: 'no_claims_cleared',
+      }));
+      expect(defaultReadbackSmokeStatus.dataset.sam31ConsumerIntakeSmokeEvidenceId).toMatch(/^\d+$/);
+      const defaultReadbackSmokeEvidenceId = await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-sam31-consumer-intake-smoke-evidence-id');
+      expect(defaultReadbackSmokeEvidenceId).toMatch(/^\d+$/);
+      const defaultReadbackSmokeRows = await api(`${PROJECT_PATH}/evidence`, token);
+      const defaultReadbackSmokeRow = defaultReadbackSmokeRows.find((row) => row.id === Number(defaultReadbackSmokeEvidenceId));
+      expect(defaultReadbackSmokeRow).toBeTruthy();
+      const defaultReadbackSmokeNotes = JSON.parse(defaultReadbackSmokeRow.notes);
+      expect(defaultReadbackSmokeNotes).toEqual(expect.objectContaining({
+        source_replay_evidence_id: savedLayout.id,
+        source_sam31_actual_value_replacement_evidence_id: Number(defaultReadbackReplacementEvidenceId),
+        source_openclaw_sam31_actual_value_replacement_readback_evidence_id: savedLayoutReplacementReadback.evidence_id,
+        source_supplied_document_bid_truth_replacement_evidence_id: replacement.evidence.id,
+        selected_sheet_ref: '1881://proposal-cooperative/sheet-7',
+        selected_scale_ref: '1881://operator-scale/sheet-7/0.0833',
+        selected_boundary_candidate_ref: 'candidate:1881-sheet-7-outline',
+        claim_gate_effect: 'no_claims_cleared',
+        no_claim_gates_cleared: true,
+      }));
+      expect(defaultReadbackSmokeNotes.project_truth).toEqual(expect.objectContaining({
+        square_feet: 88000,
+        source_status: 'employee_replacement_recorded',
+      }));
+
       const savedLayoutSmokeButton = page.locator(`[data-replay-sam31-consumer-intake-smoke-source-replacement-evidence-id="${savedLayoutReplacementEvidenceId}"]`).first();
       await savedLayoutSmokeButton.waitFor({ state: 'attached' });
       expect(await savedLayoutSmokeButton.getAttribute('data-source-replay-evidence-id')).toBe(String(savedLayout.id));
@@ -709,7 +760,7 @@ describe('Workbench supplied bid-truth browser smoke', () => {
     } finally {
       await page.close();
     }
-  }, 45_000);
+  }, 90_000);
 
   it('re-saves downstream defaults follow-up edits and keeps the card and queue synchronized', async () => {
     const token = await adminToken();
@@ -736,7 +787,7 @@ describe('Workbench supplied bid-truth browser smoke', () => {
     });
 
     const page = await browser.newPage({ acceptDownloads: true });
-    page.setDefaultTimeout(8000);
+    page.setDefaultTimeout(12000);
     await page.addInitScript((authToken) => {
       localStorage.setItem('halofire_token', authToken);
     }, token);

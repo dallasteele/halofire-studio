@@ -2849,21 +2849,9 @@ function buildOpenClawSam31SectionToArtifactsConsumerIntakeSmoke(projectName, in
     err.httpStatus = 400;
     throw err;
   }
-  const queue = buildOpenClawSam31ActualValueResolverQueue(projectName, { consumer });
-  const candidateItems = [
-    ...(Array.isArray(queue.items) ? queue.items : []),
-    ...(Array.isArray(queue.replay_replacement_items) ? queue.replay_replacement_items : []),
-  ];
-  const item = candidateItems.find((candidate) => {
-    const handoff = candidate.section_to_artifacts_consumer_handoff || null;
-    if (!handoff) return false;
-    if (sourceReplacementEvidenceId && Number(handoff.source_sam31_actual_value_replacement_evidence_id) !== sourceReplacementEvidenceId) return false;
-    if (sourceReviewEvidenceId && Number(handoff.source_openclaw_sam31_consumer_review_evidence_id) !== sourceReviewEvidenceId) return false;
-    return true;
-  }) || null;
   let fallbackReplacementEvidence = null;
   let fallbackItem = null;
-  if (!item && sourceReplacementEvidenceId) {
+  if (sourceReplacementEvidenceId) {
     const replacementRow = db
       .prepare(`SELECT * FROM project_evidence
                 WHERE id = ? AND project_name = ? AND evidence_type = 'sam31_actual_value_replacement'`)
@@ -2906,6 +2894,21 @@ function buildOpenClawSam31SectionToArtifactsConsumerIntakeSmoke(projectName, in
         source_replay_evidence_id: replacementEvidence.source_replay_evidence_id || null,
       };
     }
+  }
+  let item = null;
+  if (!fallbackItem || sourceReviewEvidenceId) {
+    const queue = buildOpenClawSam31ActualValueResolverQueue(projectName, { consumer });
+    const candidateItems = [
+      ...(Array.isArray(queue.items) ? queue.items : []),
+      ...(Array.isArray(queue.replay_replacement_items) ? queue.replay_replacement_items : []),
+    ];
+    item = candidateItems.find((candidate) => {
+      const handoff = candidate.section_to_artifacts_consumer_handoff || null;
+      if (!handoff) return false;
+      if (sourceReplacementEvidenceId && Number(handoff.source_sam31_actual_value_replacement_evidence_id) !== sourceReplacementEvidenceId) return false;
+      if (sourceReviewEvidenceId && Number(handoff.source_openclaw_sam31_consumer_review_evidence_id) !== sourceReviewEvidenceId) return false;
+      return true;
+    }) || null;
   }
   const effectiveItem = item || fallbackItem;
   if (!effectiveItem) {
