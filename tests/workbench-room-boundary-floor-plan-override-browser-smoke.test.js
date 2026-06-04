@@ -342,6 +342,17 @@ describe('Workbench room-boundary floor-plan override browser smoke', () => {
       expect(defaultReplacementText).toContain('source_claim_gate_effect gate_cleared_after_explicit_signed_validation');
       expect(defaultReplacementText).toContain('no_unrelated_claims_cleared true');
       expect(defaultReplacementText).toContain('claim_gate_effect no_claims_cleared');
+      expect(defaultReplacementText).toContain('openclaw.sam31.section_to_artifacts_consumer_handoff.v1');
+      expect(defaultReplacementText).toContain('source_sam31_actual_value_replacement_evidence_id');
+
+      const defaultReplacementSmoke = page.locator(
+        `[data-replay-sam31-consumer-intake-smoke-source-replacement-evidence-id="${defaultReplacementEvidenceId}"]`,
+      ).first();
+      await defaultReplacementSmoke.waitFor({ state: 'attached' });
+      expect(await defaultReplacementSmoke.getAttribute('data-source-sam31-actual-value-replacement-evidence-id'))
+        .toBe(String(defaultReplacementEvidenceId));
+      expect(await defaultReplacementSmoke.getAttribute('data-replay-sam31-consumer-intake-smoke-consumer'))
+        .toBe('halo_fire');
     } finally {
       await page.close();
     }

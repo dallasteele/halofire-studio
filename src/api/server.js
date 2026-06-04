@@ -2689,6 +2689,25 @@ function openClawSam31SectionToArtifactsConsumerHandoff(item, replacementEvidenc
   };
 }
 
+function synthesizeSam31SectionToArtifactsSummary(replacementEvidence) {
+  if (!replacementEvidence || typeof replacementEvidence !== 'object') return null;
+  const existing = replacementEvidence.openclaw_sam31_section_to_artifacts_summary;
+  if (existing && typeof existing === 'object' && !Array.isArray(existing)) return existing;
+  const replacementSummary = replacementEvidence.replacement_summary;
+  if (!replacementSummary || typeof replacementSummary !== 'object' || Array.isArray(replacementSummary)) return null;
+  return {
+    artifact_type: 'openclaw.sam31_llm_extrapolation_artifact',
+    status: 'best_effort_extrapolation_ready',
+    section_to_artifacts_contract_ref: 'openclaw.sam31.section_to_artifacts_contract.v1',
+    vector_overlay_count: Number(replacementSummary.vector_overlay_count || 0) || 0,
+    model_3d_candidate_count: Number(replacementSummary.model_3d_candidate_count || 0) || 0,
+    object_hypothesis_count: Number(replacementSummary.object_hypothesis_count || 0) || 0,
+    segment_count: Number(replacementSummary.semantic_label_count || 0) || 0,
+    use_for_claims: false,
+    claim_gate_effect: 'no_claims_cleared',
+  };
+}
+
 function buildOpenClawSam31SectionToArtifactsConsumerIntakeSmoke(projectName, intake = {}, user = null) {
   const consumer = String(intake.consumer || '').trim().toLowerCase();
   const supportedConsumers = ['halo_fire', 'landscout', 'nameforge'];
@@ -2721,12 +2740,45 @@ function buildOpenClawSam31SectionToArtifactsConsumerIntakeSmoke(projectName, in
     if (sourceReviewEvidenceId && Number(handoff.source_openclaw_sam31_consumer_review_evidence_id) !== sourceReviewEvidenceId) return false;
     return true;
   }) || null;
-  if (!item) {
+  let fallbackReplacementEvidence = null;
+  let fallbackItem = null;
+  if (!item && sourceReplacementEvidenceId) {
+    const replacementRow = db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'sam31_actual_value_replacement'`)
+      .get(sourceReplacementEvidenceId, projectName);
+    const replacementEvidence = sam31ActualValueReplacementFromEvidence(replacementRow);
+    const synthesizedSummary = synthesizeSam31SectionToArtifactsSummary(replacementEvidence);
+    if (replacementEvidence && synthesizedSummary) {
+      fallbackReplacementEvidence = {
+        evidence_id: replacementRow.id,
+        source_ref: replacementRow.source_ref || replacementEvidence.source_ref || null,
+        source_refs: uniqueStrings([
+          ...(Array.isArray(replacementEvidence.source_refs) ? replacementEvidence.source_refs : []),
+          replacementEvidence.source_ref,
+          replacementRow.source_ref,
+        ].filter(Boolean)),
+        source_replay_evidence_id: replacementEvidence.source_replay_evidence_id || null,
+        source_openclaw_sam31_consumer_review_evidence_id: replacementEvidence.source_openclaw_sam31_consumer_review_evidence_id || null,
+        openclaw_sam31_section_to_artifacts_summary: synthesizedSummary,
+      };
+      fallbackItem = {
+        id: `sam31-actual-value-evidence:${projectName}:${replacementRow.id}`,
+        source_ref: fallbackReplacementEvidence.source_ref,
+        source_refs: fallbackReplacementEvidence.source_refs,
+        replacement_ref: replacementEvidence.replacement_ref || null,
+        source_openclaw_sam31_consumer_review_evidence_id: replacementEvidence.source_openclaw_sam31_consumer_review_evidence_id || null,
+        source_replay_evidence_id: replacementEvidence.source_replay_evidence_id || null,
+      };
+    }
+  }
+  const effectiveItem = item || fallbackItem;
+  if (!effectiveItem) {
     const err = new Error('SAM31 section-to-artifacts handoff was not found for the requested consumer/source evidence');
     err.httpStatus = 404;
     throw err;
   }
-  const handoff = item.section_to_artifacts_consumer_handoff || null;
+  const handoff = item?.section_to_artifacts_consumer_handoff || openClawSam31SectionToArtifactsConsumerHandoff(fallbackItem, fallbackReplacementEvidence);
   if (!handoff) {
     const err = new Error('SAM31 section-to-artifacts handoff is missing for the requested resolver queue item');
     err.httpStatus = 400;
@@ -2743,15 +2795,15 @@ function buildOpenClawSam31SectionToArtifactsConsumerIntakeSmoke(projectName, in
     consumer,
     consumer_adapter: `openclaw.sam31.consumer_review_queue.${consumer}.v1`,
     source_runtime: 'sam-3.1+llm',
-    source_queue_item_id: item.id || null,
+    source_queue_item_id: effectiveItem.id || null,
     source_openclaw_sam31_consumer_review_evidence_id: handoff.source_openclaw_sam31_consumer_review_evidence_id || null,
-    source_replay_evidence_id: handoff.source_replay_evidence_id || item.source_replay_evidence_id || null,
+    source_replay_evidence_id: handoff.source_replay_evidence_id || effectiveItem.source_replay_evidence_id || null,
     source_sam31_actual_value_replacement_evidence_id: handoff.source_sam31_actual_value_replacement_evidence_id || null,
     source_openclaw_sam31_section_to_artifacts_ref: handoff.source_openclaw_sam31_section_to_artifacts_ref || null,
     source_refs: uniqueStrings([
-      ...(Array.isArray(item.source_refs) ? item.source_refs : []),
+      ...(Array.isArray(effectiveItem.source_refs) ? effectiveItem.source_refs : []),
       ...(Array.isArray(handoff.source_refs) ? handoff.source_refs : []),
-      item.source_ref,
+      effectiveItem.source_ref,
     ].filter(Boolean)),
     source_ref: `openclaw://sam31/section-to-artifacts-consumer-intake-smoke/${consumer}/${evidenceSuffix}`,
     source_file: `${slug}-sam31-section-to-artifacts-consumer-intake-smoke-${consumer}-${evidenceSuffix}.json`,

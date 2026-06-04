@@ -3613,4 +3613,127 @@ describe('HaloFire settings + documentation upload/link API', () => {
       claim_gate_effect: 'no_claims_cleared',
     }));
   });
+
+  it('posts consumer intake smoke from a saved replacement evidence row with synthesized section summary', async () => {
+    const token = await tokenFor('settings-admin', 'actual-test-password');
+    const projectName = 'company-abc';
+
+    function insertConsumerReview(consumer, evidenceId) {
+      const db = new Database(dbPath);
+      const notes = {
+        kind: 'openclawSam31ConsumerReview',
+        consumer,
+        status: 'accepted_internal_alpha_review',
+        source_application: consumer,
+        source_pdf_boundary_evidence_id: 1881,
+        accepted_queue_id: `accepted:${consumer}:${evidenceId}`,
+        persisted_review_packet_ref: `${consumer}://review-packet/${evidenceId}`,
+        replacement_ref: `${consumer}://replacement/${evidenceId}`,
+        reviewed_at: '2026-06-04T12:00:00.000Z',
+        replacement_values: {
+          source_ref: `${consumer}://replacement/${evidenceId}`,
+        },
+      };
+      db.prepare(`INSERT INTO project_evidence (id, project_name, evidence_type, source_file, source_ref, status, notes)
+                  VALUES (?, ?, 'openclaw_sam31_consumer_review', ?, ?, 'present', ?)`)
+        .run(
+          evidenceId,
+          projectName,
+          `${consumer}-review-${evidenceId}.json`,
+          `${consumer}://consumer-review/${evidenceId}`,
+          JSON.stringify(notes),
+        );
+      db.close();
+      return evidenceId;
+    }
+
+    const reviewEvidenceId = insertConsumerReview('halo_fire', 990);
+    const savedReplacementRes = await request(`/api/projects/${encodeURIComponent(projectName)}/evidence`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        evidence_type: 'sam31_actual_value_replacement',
+        source_ref: 'halofire://sam31/default-actual-value-replacement-intake/test-synthesized-summary',
+        source_file: 'halofire-default-actual-value-intake-test.json',
+        status: 'present',
+        notes: JSON.stringify({
+          kind: 'sam31ActualValueReplacement',
+          artifact_type: 'halofire.sam31_actual_value_replacement_intake.v1',
+          project_name: projectName,
+          status: 'present',
+          intake_status: 'recorded',
+          source_application: 'halo_fire',
+          consumer: 'halo_fire',
+          source_openclaw_sam31_consumer_review_evidence_id: reviewEvidenceId,
+          source_openclaw_sam31_actual_value_replacement_readback_evidence_id: 777,
+          source_ref: 'halofire://sam31/default-actual-value-replacement-intake/test-synthesized-summary',
+          replacement_values_source_ref: 'halofire://sam31/default-actual-value-replacement-intake/test-synthesized-summary',
+          source_refs: [
+            'halofire://sam31/default-actual-value-replacement-intake/test-synthesized-summary',
+            'halo_fire://consumer-review/990',
+          ],
+          replacement_values: {
+            source_ref: 'halofire://sam31/default-actual-value-replacement-intake/test-synthesized-summary',
+            temporary_internal_alpha_placeholder: true,
+          },
+          replacement_summary: {
+            semantic_label_count: 1,
+            object_hypothesis_count: 1,
+            vector_overlay_count: 1,
+            model_3d_candidate_count: 1,
+            replaced_field_count: 0,
+            source_readback_only: true,
+          },
+          blocked_claims: [
+            'permit_ready',
+            'fabrication_ready',
+            'AHJ_approval',
+            'professional_approval',
+            'manufacturer_exact',
+            'AutoSprink_parity',
+          ],
+          use_for_claims: false,
+          claim_gate_effect: 'no_claims_cleared',
+          no_claim_gates_cleared: true,
+        }),
+      }),
+    });
+    expect(savedReplacementRes.status).toBe(201);
+    const savedReplacement = await savedReplacementRes.json();
+
+    const smokeRes = await request(`/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/section-to-artifacts-consumer-intake-smoke`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        consumer: 'halo_fire',
+        source_sam31_actual_value_replacement_evidence_id: savedReplacement.id,
+      }),
+    });
+    expect(smokeRes.status).toBe(201);
+    const smoke = await smokeRes.json();
+    expect(smoke).toEqual(expect.objectContaining({
+      evidence_type: 'openclaw_sam31_section_to_artifacts_consumer_intake_smoke',
+      artifact_type: 'openclaw.sam31.section_to_artifacts_consumer_intake_smoke.v1',
+      consumer: 'halo_fire',
+      source_sam31_actual_value_replacement_evidence_id: savedReplacement.id,
+      source_openclaw_sam31_consumer_review_evidence_id: reviewEvidenceId,
+      observed_vector_overlay_count: 1,
+      observed_model_3d_candidate_count: 1,
+      observed_object_hypothesis_count: 1,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(smoke.posted_handoff).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.section_to_artifacts_consumer_handoff.v1',
+      source_sam31_actual_value_replacement_evidence_id: savedReplacement.id,
+      source_openclaw_sam31_consumer_review_evidence_id: reviewEvidenceId,
+      source_openclaw_sam31_section_to_artifacts_ref: 'openclaw.sam31.section_to_artifacts_contract.v1',
+      vector_overlay_count: 1,
+      model_3d_candidate_count: 1,
+      object_hypothesis_count: 1,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+  });
 });
