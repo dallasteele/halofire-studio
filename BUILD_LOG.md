@@ -1,5 +1,13 @@
 # HaloFire Build Log
 
+## 2026-06-04 - Replay smoke default sprinkler review
+
+- Added a Workbench one-click default internal-alpha sprinkler review action for replay-scoped HaloFire SAM31 consumer-intake smoke rows after a saved follow-up review exists.
+- The action saves `halofire.sam31_sprinkler_review_decision.v1`, downloads `halofire.sam31_sprinkler_review_preliminary_replay_inputs.v1`, and preserves `source_replay_evidence_id`, `source_sam31_actual_value_replacement_evidence_id`, `source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id`, the saved smoke evidence id, and `claim_gate_effect: no_claims_cleared` in Workbench status metadata.
+- Surfaced the same one-click path from both saved smoke evidence rows and replay-scoped actual-value queue rows, so employees can continue the 1881 internal-alpha sprinkler review path without manually copying evidence ids.
+- Verified red-to-green with `npx vitest run tests/workbench-room-boundary-floor-plan-override-browser-smoke.test.js --reporter=verbose`, plus adjacent `npx vitest run tests/workbench-sam31-consumer-intake-smoke-browser.test.js --reporter=verbose`, `npx vitest run tests/workbench-evidence-detail.test.js --reporter=verbose`, `C:/Python312/python.exe E:/ClaudeBot/scripts/verify_agentic_rules.py`, `git diff --check`, `.only` scan, and GX10 prover health. This is `NO_FORMALIZABLE_CLAIM`; it proves Workbench packet routing and metadata preservation, not approval evidence.
+- Still blocked: AutoSprink parity, AHJ approval, PE/professional review, permit readiness, fabrication readiness, manufacturer-exact models, brand readiness, production readiness, survey-grade claims, and engineering-grade claims.
+
 ## 2026-06-04 - Workbench supplied bid-truth browser smoke
 
 - Added a focused Playwright smoke in [`tests/workbench-supplied-bid-truth-browser-smoke.test.js`](C:/Users/dalla/OneDrive/Documents/HaloFire/tests/workbench-supplied-bid-truth-browser-smoke.test.js) that opens the real Workbench supplied bid-truth lane for `The Cooperative 1881 - Salt Lake City UT`, downloads the exact `halofire.supplied_document_bid_truth_review_packet.v1`, saves an employee replacement, and proves the lane stays fail-closed with `claim_gate_effect: no_claims_cleared`.
