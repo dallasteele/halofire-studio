@@ -1753,5 +1753,93 @@ describe('PDF page inspection API', () => {
       acceptable_use: 'site_visual_measurement_review',
       status: 'portable_contract_ready',
     }));
+
+    const secondReplayNotes = {
+      ...replayNotes,
+      download_name: 'room-boundary-replay-bid-artifact-second-isolation-check.json',
+      source_ref: '1881://employee-actual-values/replay-handoff/sheet-9',
+      source_refs: [
+        ...(Array.isArray(replayNotes.source_refs) ? replayNotes.source_refs : []),
+        {
+          source_ref: '1881://employee-actual-values/replay-handoff/sheet-9',
+          evidence_type: 'halofire.pdf_boundary_employee_decision.v1',
+          claim_gate_effect: 'no_claims_cleared',
+        },
+      ],
+    };
+    const secondReplayEvidenceRes = await request(`${COOPERATIVE_1881_PATH}/evidence`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        evidence_type: 'best_effort_ai_layout',
+        source_file: 'room-boundary-replay-bid-artifact-second-isolation-check.json',
+        source_ref: '1881://employee-actual-values/replay-handoff/sheet-9',
+        status: 'present',
+        notes: JSON.stringify(secondReplayNotes),
+      }),
+    });
+    expect(secondReplayEvidenceRes.status).toBe(201);
+    const secondReplayEvidence = await secondReplayEvidenceRes.json();
+    expect(secondReplayEvidence.id).toBeGreaterThan(replayEvidence.id);
+
+    const secondReplacementRes = await request(`${COOPERATIVE_1881_PATH}/evidence/${secondReplayEvidence.id}/openclaw/sam31/actual-value-handoff/replacements`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        reviewer_name: 'Halo Fire estimator',
+        source_file: 'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx',
+        source_ref: '1881://employee-actual-values/replay-handoff/sheet-9',
+        source_refs: [
+          '1881://proposal-cooperative/sheet-9',
+          '1881://employee-actual-values/replay-handoff/sheet-9',
+        ],
+        replacement_values: {
+          semantic_label: 'reviewed back-of-house boundary',
+          polygon: [[0, 0], [22, 0], [22, 14], [0, 14]],
+          bbox: { minX: 0, minY: 0, maxX: 22, maxY: 14, widthFt: 22, heightFt: 14 },
+          vector_overlay: { id: 'vector:employee-reviewed-boh', source_ref: '1881://employee-vector/boh.svg' },
+          model_3d_candidate: { id: 'model3d:employee-reviewed-boh', status: 'not_applicable_for_2d_boundary' },
+          source_ref: '1881://employee-actual-values/replay-handoff/sheet-9',
+          confidence: 0.89,
+        },
+        notes: 'Second replay replacement proves sourceReplayEvidenceId queue isolation.',
+      }),
+    });
+    expect(secondReplacementRes.status).toBe(201);
+    const secondReplacement = await secondReplacementRes.json();
+    expect(secondReplacement.source_replay_evidence_id).toBe(secondReplayEvidence.id);
+
+    const replayScopedQueueRes = await request(`/api/openclaw/sam31/actual-value-resolver-queue?projectName=${encodeURIComponent(COOPERATIVE_1881_PROJECT_NAME)}&consumer=landscout&sourceReplayEvidenceId=${replayEvidence.id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(replayScopedQueueRes.status).toBe(200);
+    const replayScopedQueueReadback = await replayScopedQueueRes.json();
+    expect(replayScopedQueueReadback).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.actual_value_resolver_queue_readback.v1',
+      requested_consumer: 'landscout',
+      source_replay_evidence_filter_id: replayEvidence.id,
+      replay_replacement_count: 1,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(replayScopedQueueReadback.queue_href).toContain(`sourceReplayEvidenceId=${replayEvidence.id}`);
+    expect(replayScopedQueueReadback.download_artifacts.filtered_queue_readback.href).toContain(`sourceReplayEvidenceId=${replayEvidence.id}`);
+    expect(replayScopedQueueReadback.download_artifacts.filtered_replacement_readback.href).toContain(`sourceReplayEvidenceId=${replayEvidence.id}`);
+    expect(replayScopedQueueReadback.queue).toEqual(expect.objectContaining({
+      source_replay_evidence_filter_id: replayEvidence.id,
+      replay_replacement_count: 1,
+    }));
+    expect(replayScopedQueueReadback.queue.replay_replacement_items).toEqual([
+      expect.objectContaining({
+        evidence_id: replacement.id,
+        source_replay_evidence_id: replayEvidence.id,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    ]);
+    expect(replayScopedQueueReadback.queue.replay_replacement_items).not.toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        evidence_id: secondReplacement.id,
+        source_replay_evidence_id: secondReplayEvidence.id,
+      }),
+    ]));
   }, 30000);
 });

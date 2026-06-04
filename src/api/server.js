@@ -2345,6 +2345,7 @@ function buildOpenClawSam31ActualValueServiceDescriptor(projectName, options = {
 }
 
 function buildOpenClawSam31ActualValueResolverQueue(projectName, options = {}) {
+  const sourceReplayEvidenceFilterId = Number(options.sourceReplayEvidenceId || options.source_replay_evidence_id || 0) || null;
   const requestedServiceDescriptorEvidence = openClawSam31ActualValueServiceDescriptorEvidenceById(
     projectName,
     options.serviceDescriptorEvidenceId || options.service_descriptor_evidence_id,
@@ -2420,7 +2421,10 @@ function buildOpenClawSam31ActualValueResolverQueue(projectName, options = {}) {
     }
   }
   const sam31LlmExtrapolationContract = openClawSam31ActualValueResolverExtrapolationContract(projectName);
-  const replayReplacementItems = listSam31ReplayActualValueReplacementDetails(projectName, { consumer: consumerFilter })
+  const replayReplacementItems = listSam31ReplayActualValueReplacementDetails(projectName, {
+    consumer: consumerFilter,
+    sourceReplayEvidenceId: sourceReplayEvidenceFilterId,
+  })
     .map((detail) => ({
       artifact_type: 'openclaw.sam31.replay_actual_value_replacement_queue_item.v1',
       id: `sam31-replay-actual-value:${projectName}:${detail.evidence_id}:${consumerFilter || 'all'}`,
@@ -2560,6 +2564,7 @@ function buildOpenClawSam31ActualValueResolverQueue(projectName, options = {}) {
     sam31_llm_extrapolation_contract: sam31LlmExtrapolationContract,
     service_descriptor_evidence_filter_id: requestedServiceDescriptorEvidence?.evidence_id || null,
     consumer_intake_smoke_evidence_filter_id: requestedConsumerIntakeSmokeEvidence?.evidence_id || null,
+    source_replay_evidence_filter_id: sourceReplayEvidenceFilterId,
     latest_actual_value_service_descriptor_evidence_id: latestServiceDescriptorEvidence?.evidence_id || null,
     latest_actual_value_service_descriptor_evidence: latestServiceDescriptorEvidence,
     saved_actual_value_service_descriptor_count: savedServiceDescriptorEvidenceRows.length,
@@ -3423,6 +3428,7 @@ function buildOpenClawSam31ActualValueResolverQueueReadback(projectName, options
     replacementReadbackEvidenceId: options.replacementReadbackEvidenceId || options.replacement_readback_evidence_id,
     serviceDescriptorEvidenceId: options.serviceDescriptorEvidenceId || options.service_descriptor_evidence_id,
     consumerIntakeSmokeEvidenceId: options.consumerIntakeSmokeEvidenceId || options.consumer_intake_smoke_evidence_id,
+    sourceReplayEvidenceId: sourceReplayEvidenceFilterId,
   });
   const effectiveConsumer = queue.requested_consumer || requestedConsumer;
   const contractEvidenceFilterId = queue.contract_evidence_filter_id || null;
@@ -3462,6 +3468,7 @@ function buildOpenClawSam31ActualValueResolverQueueReadback(projectName, options
     effectiveConsumer ? `consumer=${encodeURIComponent(effectiveConsumer)}` : '',
     contractEvidenceFilterId ? `contractEvidenceId=${encodeURIComponent(contractEvidenceFilterId)}` : '',
     serviceDescriptorEvidenceFilterId ? `serviceDescriptorEvidenceId=${encodeURIComponent(serviceDescriptorEvidenceFilterId)}` : '',
+    sourceReplayEvidenceFilterId ? `sourceReplayEvidenceId=${encodeURIComponent(sourceReplayEvidenceFilterId)}` : '',
   ].filter(Boolean).join('&');
   const sourceServiceDescriptorQuery = [
     `projectName=${encodeURIComponent(projectName)}`,
@@ -3623,6 +3630,10 @@ function buildOpenClawSam31ActualValueResolverQueueReadback(projectName, options
     item_count: queue.item_count,
     pending_count: queue.pending_count,
     recorded_count: queue.recorded_count,
+    replay_replacement_count: queue.replay_replacement_count || 0,
+    replay_replacement_items: Array.isArray(queue.replay_replacement_items)
+      ? queue.replay_replacement_items
+      : [],
     acceptable_actual_evidence: queue.acceptable_actual_evidence,
     download_artifacts: downloadArtifacts,
     summary: {
@@ -4162,6 +4173,7 @@ app.get('/api/projects/:name/openclaw/sam31/actual-value-resolver-queue', authMi
     replacementReadbackEvidenceId: req.query?.replacementReadbackEvidenceId || req.query?.replacement_readback_evidence_id,
     serviceDescriptorEvidenceId: req.query?.serviceDescriptorEvidenceId || req.query?.service_descriptor_evidence_id,
     consumerIntakeSmokeEvidenceId: req.query?.consumerIntakeSmokeEvidenceId || req.query?.consumer_intake_smoke_evidence_id,
+    sourceReplayEvidenceId: req.query?.sourceReplayEvidenceId || req.query?.source_replay_evidence_id,
   }));
 });
 
