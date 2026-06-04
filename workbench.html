@@ -294,6 +294,52 @@ function replaySourceLabel(reviewSource) {
     : 'latest employee review';
 }
 
+function roomBoundaryReplayEvidenceSourceRef(replayPacket, result) {
+  const replayInput = result?.roomBoundaryReplay || result?.replayInput || {};
+  const sourceEvidenceId = replayPacket?.source_evidence_id || replayInput?.source_evidence_id;
+  const replayEvidenceToken = replayPacket?.source_sam31_replacement_evidence_id
+    || replayInput?.source_sam31_replacement_evidence_id
+    || replayPacket?.source_sam31_evidence_id
+    || replayInput?.source_sam31_evidence_id
+    || replayPacket?.source_review_evidence_id
+    || replayInput?.source_review_evidence_id;
+  if (!sourceEvidenceId || !replayEvidenceToken) return null;
+  const roomBoundarySource = replayPacket?.review_source
+    || replayPacket?.sprinkler_bid_request?.room_boundary_source
+    || replayInput?.room_boundary_source;
+  const replayEvidenceKind = (replayPacket?.source_sam31_replacement_evidence_id || replayInput?.source_sam31_replacement_evidence_id)
+    ? 'sam31-employee-replacement-replay'
+    : (roomBoundarySource === 'latest_sam31_visual_audit' ? 'sam31-room-boundary-replay' : 'room-boundary-replay');
+  return `pdf-boundary:${sourceEvidenceId}:${replayEvidenceKind}:${replayEvidenceToken}`;
+}
+
+function findSavedRoomBoundaryReplayEvidence(replayPacket, result) {
+  const expectedSourceRef = roomBoundaryReplayEvidenceSourceRef(replayPacket, result);
+  const replayInput = result?.roomBoundaryReplay || result?.replayInput || {};
+  const sourceEvidenceId = String(replayPacket?.source_evidence_id || replayInput?.source_evidence_id || '');
+  const reviewEvidenceId = String(
+    replayPacket?.source_review_evidence_id
+      || replayInput?.source_review_evidence_id
+      || replayPacket?.source_sam31_evidence_id
+      || replayInput?.source_sam31_evidence_id
+      || ''
+  );
+  return currentEvidenceRows
+    .filter((row) => row.evidence_type === 'best_effort_ai_layout')
+    .filter((row) => {
+      if (expectedSourceRef && row.source_ref === expectedSourceRef) return true;
+      try {
+        const notes = JSON.parse(row.notes || '{}');
+        return notes.kind === 'best_effort_ai_layout_replay'
+          && String(notes.source_evidence_id || '') === sourceEvidenceId
+          && (!reviewEvidenceId || String(notes.source_review_evidence_id || notes.source_sam31_evidence_id || '') === reviewEvidenceId);
+      } catch {
+        return false;
+      }
+    })
+    .sort((a, b) => Number(b.id || 0) - Number(a.id || 0))[0] || null;
+}
+
 function sam31ApplicationLabel(application) {
   return ({
     halo_fire: 'HaloFire',
@@ -4030,8 +4076,23 @@ async function runResolverReplayBid(evidenceId) {
       <div class="kv"><span>Sprinkler heads</span><b>${escapeHtml(result.bid?.totalHeadCount || 0)}</b></div>
       <div class="kv"><span>Best-effort total</span><b>${typeof total === 'number' ? usd(total) : 'n/a'}</b></div>
       <div class="est">room_boundary_replay_bid_artifact downloaded; claim_gate_effect=no_claims_cleared</div>`;
-    if (status) status.textContent = 'Replay bid artifact downloaded; claims still blocked.';
     await refreshEvidence();
+    const savedReplayEvidence = findSavedRoomBoundaryReplayEvidence(replayPacket, result);
+    if (status && savedReplayEvidence) {
+      const artifactHref = '/api/projects/'
+        + encodeURIComponent(currentProjectName())
+        + '/evidence/'
+        + encodeURIComponent(savedReplayEvidence.id)
+        + '/replay-bid-artifact';
+      status.dataset.roomBoundaryReplayEvidenceId = String(savedReplayEvidence.id);
+      status.dataset.roomBoundarySource = String(reviewSource);
+      status.dataset.sourceReviewEvidenceId = String(replayPacket.source_review_evidence_id || result.roomBoundaryReplay?.source_review_evidence_id || '');
+      status.dataset.sourceSam31EvidenceId = String(replayPacket.source_sam31_evidence_id || result.roomBoundaryReplay?.source_sam31_evidence_id || '');
+      status.dataset.replayBidArtifactHref = artifactHref;
+      status.textContent = 'Replay bid artifact downloaded and saved evidence #' + savedReplayEvidence.id + '; claims still blocked.';
+    } else if (status) {
+      status.textContent = 'Replay bid artifact downloaded; saved evidence row not found in refreshed ledger; claims still blocked.';
+    }
   } catch (err) {
     if (status) status.textContent = 'Error: ' + err.message;
   }

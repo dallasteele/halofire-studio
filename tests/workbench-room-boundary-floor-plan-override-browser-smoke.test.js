@@ -219,6 +219,73 @@ describe('Workbench room-boundary floor-plan override browser smoke', () => {
           selected_boundary_candidate_ref: 'candidate:1881-sheet-7-outline',
         }),
       ]));
+
+      const replayButton = page.locator(`[data-resolver-replay-bid-evidence-id="${savedBoundary.evidence.id}"]`);
+      await replayButton.waitFor({ state: 'attached' });
+
+      const [clientReplayDownload] = await Promise.all([
+        page.waitForEvent('download'),
+        replayButton.click(),
+      ]);
+      const clientReplayDownloadPath = await clientReplayDownload.path();
+      expect(clientReplayDownload.suggestedFilename()).toContain('replay-bid-artifact');
+      expect(clientReplayDownloadPath).toBeTruthy();
+      const clientReplayArtifact = JSON.parse(fs.readFileSync(clientReplayDownloadPath, 'utf8'));
+      expect(clientReplayArtifact.artifact_type).toBe('room_boundary_replay_bid_artifact');
+      expect(clientReplayArtifact.source_evidence_id).toBe(savedBoundary.evidence.id);
+      expect(clientReplayArtifact.source_review_evidence_id).toBe(review.id);
+      expect(clientReplayArtifact.floor_plan_override).toEqual(expect.objectContaining({
+        room_boundary_source: 'latest_employee_review_packet',
+        source_evidence_id: savedBoundary.evidence.id,
+        source_review_evidence_id: review.id,
+        corrected_room_polygon_count: 2,
+      }));
+      expect(clientReplayArtifact.claim_gate_effect).toBe('no_claims_cleared');
+      expect(clientReplayArtifact.blocked_claims).toEqual(expect.arrayContaining([
+        'geometry_accuracy',
+        'AutoSprink_parity',
+        'permit_ready',
+      ]));
+
+      await page.waitForFunction((boundaryEvidenceId) => {
+        const status = document.getElementById(`replayBidStatus-${boundaryEvidenceId}`);
+        return Boolean(status?.dataset.roomBoundaryReplayEvidenceId);
+      }, String(savedBoundary.evidence.id));
+
+      const replayStatus = page.locator(`#replayBidStatus-${savedBoundary.evidence.id}`);
+      const savedReplayEvidenceId = await replayStatus.getAttribute('data-room-boundary-replay-evidence-id');
+      expect(savedReplayEvidenceId).toMatch(/^\d+$/);
+      expect(await replayStatus.getAttribute('data-room-boundary-source')).toBe('latest_employee_review_packet');
+      expect(await replayStatus.getAttribute('data-source-review-evidence-id')).toBe(String(review.id));
+      expect(await replayStatus.getAttribute('data-replay-bid-artifact-href'))
+        .toBe(`${PROJECT_PATH}/evidence/${savedReplayEvidenceId}/replay-bid-artifact`);
+
+      const savedReplayArtifactButton = page.locator(`[data-replay-bid-artifact-evidence-id="${savedReplayEvidenceId}"]`);
+      await savedReplayArtifactButton.waitFor({ state: 'attached' });
+      const [savedReplayDownload] = await Promise.all([
+        page.waitForEvent('download'),
+        savedReplayArtifactButton.click(),
+      ]);
+      const savedReplayDownloadPath = await savedReplayDownload.path();
+      expect(savedReplayDownload.suggestedFilename()).toContain('replay-bid-artifact');
+      expect(savedReplayDownloadPath).toBeTruthy();
+      const savedReplayArtifact = JSON.parse(fs.readFileSync(savedReplayDownloadPath, 'utf8'));
+      expect(savedReplayArtifact.artifact_type).toBe('room_boundary_replay_bid_artifact');
+      expect(savedReplayArtifact.source_evidence_id).toBe(savedBoundary.evidence.id);
+      expect(savedReplayArtifact.source_review_evidence_id).toBe(review.id);
+      expect(savedReplayArtifact.floor_plan_override).toEqual(expect.objectContaining({
+        room_boundary_source: 'latest_employee_review_packet',
+        source_evidence_id: savedBoundary.evidence.id,
+        source_review_evidence_id: review.id,
+        corrected_room_polygon_count: 2,
+      }));
+      expect(savedReplayArtifact.corrected_room_polygon_count).toBe(2);
+      expect(savedReplayArtifact.claim_gate_effect).toBe('no_claims_cleared');
+      expect(savedReplayArtifact.blocked_claims).toEqual(expect.arrayContaining([
+        'geometry_accuracy',
+        'AutoSprink_parity',
+        'permit_ready',
+      ]));
     } finally {
       await page.close();
     }
