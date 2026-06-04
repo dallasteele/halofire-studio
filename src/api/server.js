@@ -4313,6 +4313,15 @@ function buildOpenClawSam31ReplayActualValueHandoffPacket(projectName, replayEvi
     'reviewed 3D model candidate ref or model note',
     'screenshot or console evidence for the reviewed SAM31 section',
   ];
+  const suppliedBidTruthDefaults = replayNotes.kind === 'best_effort_ai_layout'
+    && replayNotes.supplied_document_bid_truth
+    && typeof replayNotes.supplied_document_bid_truth === 'object'
+    && !Array.isArray(replayNotes.supplied_document_bid_truth)
+    ? replayNotes.supplied_document_bid_truth
+    : null;
+  const sourceReplayArtifactType = suppliedBidTruthDefaults
+    ? 'halofire.best_effort_ai_layout.saved_readback_bundle.v1'
+    : (replayNotes.artifact_type || 'room_boundary_replay_bid_artifact');
   const employeeDecision = replayNotes.employee_decision && typeof replayNotes.employee_decision === 'object'
     ? jsonClone(replayNotes.employee_decision)
     : null;
@@ -4323,10 +4332,11 @@ function buildOpenClawSam31ReplayActualValueHandoffPacket(projectName, replayEvi
       source_file: replayEvidenceRow.source_file || null,
       source_ref: replayEvidenceRow.source_ref || null,
       status: replayEvidenceRow.status,
-      artifact_type: replayNotes.artifact_type || 'room_boundary_replay_bid_artifact',
+      artifact_type: sourceReplayArtifactType,
       claim_gate_effect: replayNotes.claim_gate_effect || 'no_claims_cleared',
     },
     ...(Array.isArray(replayNotes.source_refs) ? jsonClone(replayNotes.source_refs) : []),
+    ...(Array.isArray(suppliedBidTruthDefaults?.source_refs) ? jsonClone(suppliedBidTruthDefaults.source_refs) : []),
   ]);
   const blockedClaims = uniqueStrings([
     ...(Array.isArray(replayNotes.blocked_claims) ? replayNotes.blocked_claims : []),
@@ -4344,7 +4354,7 @@ function buildOpenClawSam31ReplayActualValueHandoffPacket(projectName, replayEvi
     generated_at: new Date().toISOString(),
     source_runtime: 'sam-3.1+llm',
     source_replay_evidence_id: replayEvidenceRow.id,
-    source_replay_artifact_type: replayNotes.artifact_type || 'room_boundary_replay_bid_artifact',
+    source_replay_artifact_type: sourceReplayArtifactType,
     source_replay_ref: replayEvidenceRow.source_ref || null,
     source_replay_packet: {
       source_evidence_id: replayNotes.source_evidence_id || null,
@@ -4355,6 +4365,15 @@ function buildOpenClawSam31ReplayActualValueHandoffPacket(projectName, replayEvi
       source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id: replayNotes.source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id || null,
       marked_up_plan_ref: replayNotes.marked_up_plan_ref || null,
       corrected_room_polygon_count: replayNotes.corrected_room_polygon_count || 0,
+      source_artifact_type: sourceReplayArtifactType,
+      source_evidence_type: replayNotes.source_evidence_type || suppliedBidTruthDefaults?.source_evidence_type || null,
+      source_supplied_document_bid_truth_replacement_evidence_id: replayNotes.source_supplied_document_bid_truth_replacement_evidence_id || suppliedBidTruthDefaults?.source_replacement_evidence_id || null,
+      replacement_ref: suppliedBidTruthDefaults?.replacement_ref || null,
+      source_file: suppliedBidTruthDefaults?.source_file || replayEvidenceRow.source_file || null,
+      source_refs: Array.isArray(suppliedBidTruthDefaults?.source_refs) ? jsonClone(suppliedBidTruthDefaults.source_refs) : [],
+      project_truth: suppliedBidTruthDefaults?.project_truth && typeof suppliedBidTruthDefaults.project_truth === 'object' && !Array.isArray(suppliedBidTruthDefaults.project_truth)
+        ? jsonClone(suppliedBidTruthDefaults.project_truth)
+        : null,
     },
     employee_decision: employeeDecision,
     source_refs: sourceRefs,
@@ -5594,8 +5613,12 @@ app.get('/api/projects/:name/evidence/:evidenceId/openclaw/sam31/actual-value-ha
   } catch {
     return res.status(400).json({ error: 'Evidence row does not contain structured replay artifact notes' });
   }
-  if (notes.kind !== 'best_effort_ai_layout_replay') {
-    return res.status(400).json({ error: 'Evidence row is not a room-boundary replay artifact' });
+  const supportsSavedReadbackHandoff = notes.kind === 'best_effort_ai_layout'
+    && notes.supplied_document_bid_truth
+    && typeof notes.supplied_document_bid_truth === 'object'
+    && !Array.isArray(notes.supplied_document_bid_truth);
+  if (notes.kind !== 'best_effort_ai_layout_replay' && !supportsSavedReadbackHandoff) {
+    return res.status(400).json({ error: 'Evidence row is not a room-boundary replay or saved bid-truth readback artifact' });
   }
   return res.json(buildOpenClawSam31ReplayActualValueHandoffPacket(req.params.name, row, notes));
 });
@@ -5615,8 +5638,12 @@ app.post('/api/projects/:name/evidence/:evidenceId/openclaw/sam31/actual-value-h
     } catch {
       return res.status(400).json({ error: 'Evidence row does not contain structured replay artifact notes' });
     }
-    if (notes.kind !== 'best_effort_ai_layout_replay') {
-      return res.status(400).json({ error: 'Evidence row is not a room-boundary replay artifact' });
+    const supportsSavedReadbackHandoff = notes.kind === 'best_effort_ai_layout'
+      && notes.supplied_document_bid_truth
+      && typeof notes.supplied_document_bid_truth === 'object'
+      && !Array.isArray(notes.supplied_document_bid_truth);
+    if (notes.kind !== 'best_effort_ai_layout_replay' && !supportsSavedReadbackHandoff) {
+      return res.status(400).json({ error: 'Evidence row is not a room-boundary replay or saved bid-truth readback artifact' });
     }
     const intake = normalizeReplaySam31ActualValueReplacementIntake(req.params.name, row, notes, req.body || {}, req.user);
     const result = db

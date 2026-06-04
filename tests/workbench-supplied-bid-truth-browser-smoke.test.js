@@ -280,6 +280,64 @@ describe('Workbench supplied bid-truth browser smoke', () => {
         source_status: 'employee_replacement_recorded',
       }));
 
+      const savedLayoutHandoff = page.locator(`[data-replay-sam31-actual-value-handoff-evidence-id="${savedLayout.id}"]`).first();
+      await savedLayoutHandoff.waitFor({ state: 'attached' });
+      const [savedLayoutHandoffDownload] = await Promise.all([
+        page.waitForEvent('download'),
+        savedLayoutHandoff.click(),
+      ]);
+      const savedLayoutHandoffPath = await savedLayoutHandoffDownload.path();
+      expect(savedLayoutHandoffDownload.suggestedFilename()).toContain('actual-value-handoff');
+      expect(savedLayoutHandoffPath).toBeTruthy();
+      const savedLayoutHandoffPacket = JSON.parse(fs.readFileSync(savedLayoutHandoffPath, 'utf8'));
+      expect(savedLayoutHandoffPacket).toEqual(expect.objectContaining({
+        artifact_type: 'openclaw.sam31.actual_value_handoff_packet.v1',
+        source_replay_evidence_id: savedLayout.id,
+        source_replay_artifact_type: 'halofire.best_effort_ai_layout.saved_readback_bundle.v1',
+        claim_gate_effect: 'no_claims_cleared',
+        no_claim_gates_cleared: true,
+      }));
+      expect(savedLayoutHandoffPacket.source_replay_packet).toEqual(expect.objectContaining({
+        source_supplied_document_bid_truth_replacement_evidence_id: replacement.evidence.id,
+        replacement_ref: '1881://employee-bid-truth/downstream-browser-smoke-001',
+        source_file: 'employee-bid-truth-downstream-browser-smoke.json',
+      }));
+      expect(savedLayoutHandoffPacket.source_replay_packet.project_truth).toEqual(expect.objectContaining({
+        square_feet: 88000,
+        head_count: 733,
+        total_man_hours: 1775.5,
+        construction_days: 41,
+        source_status: 'employee_replacement_recorded',
+      }));
+      expect(savedLayoutHandoffPacket.source_refs).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          evidence_id: savedLayout.id,
+          evidence_type: 'best_effort_ai_layout',
+          artifact_type: 'halofire.best_effort_ai_layout.saved_readback_bundle.v1',
+          claim_gate_effect: 'no_claims_cleared',
+        }),
+        'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G6',
+        'employee://bid-truth/downstream-browser-smoke-001',
+      ]));
+
+      const savedLayoutReplacement = page.locator(`[data-replay-sam31-actual-value-replacement-evidence-id="${savedLayout.id}"]`).first();
+      await savedLayoutReplacement.waitFor({ state: 'attached' });
+      await savedLayoutReplacement.click();
+      await page.waitForFunction((layoutEvidenceId) => {
+        const status = document.getElementById(`replaySam31ActualValueReplacementStatus-${layoutEvidenceId}`);
+        return Boolean(status?.dataset.sam31ActualValueReplacementEvidenceId)
+          && status?.dataset.sourceReplayEvidenceId === layoutEvidenceId
+          && status?.dataset.claimGateEffect === 'no_claims_cleared';
+      }, String(savedLayout.id));
+      const savedLayoutReplacementEvidenceId = await page.locator(`#replaySam31ActualValueReplacementStatus-${savedLayout.id}`).getAttribute('data-sam31-actual-value-replacement-evidence-id');
+      expect(savedLayoutReplacementEvidenceId).toMatch(/^\d+$/);
+      await page.locator(`#evidence-${savedLayoutReplacementEvidenceId}`).waitFor({ state: 'attached' });
+      const savedLayoutReplacementText = await page.locator(`#evidence-${savedLayoutReplacementEvidenceId}`).innerText();
+      expect(savedLayoutReplacementText).toContain('sam31_actual_value_replacement');
+      expect(savedLayoutReplacementText).toContain(`source_replay_evidence_id ${savedLayout.id}`);
+      expect(savedLayoutReplacementText).toContain('employee://bid-truth/downstream-browser-smoke-001');
+      expect(savedLayoutReplacementText).toContain('claim_gate_effect no_claims_cleared');
+
       const [download] = await Promise.all([
         page.waitForEvent('download'),
         page.locator('[data-supplied-bid-truth-downstream-download]').click(),
