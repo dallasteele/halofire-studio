@@ -4324,6 +4324,8 @@ function buildOpenClawSam31ReplayActualValueHandoffPacket(projectName, replayEvi
     : (replayNotes.artifact_type || 'room_boundary_replay_bid_artifact');
   const employeeDecision = replayNotes.employee_decision && typeof replayNotes.employee_decision === 'object'
     ? jsonClone(replayNotes.employee_decision)
+    : suppliedBidTruthDefaults?.employee_decision && typeof suppliedBidTruthDefaults.employee_decision === 'object'
+      ? jsonClone(suppliedBidTruthDefaults.employee_decision)
     : null;
   const sourceRefs = uniqueByJson([
     {
@@ -4337,6 +4339,17 @@ function buildOpenClawSam31ReplayActualValueHandoffPacket(projectName, replayEvi
     },
     ...(Array.isArray(replayNotes.source_refs) ? jsonClone(replayNotes.source_refs) : []),
     ...(Array.isArray(suppliedBidTruthDefaults?.source_refs) ? jsonClone(suppliedBidTruthDefaults.source_refs) : []),
+    ...(employeeDecision ? [{
+      evidence_type: employeeDecision.artifact_type || 'halofire.pdf_boundary_employee_decision.v1',
+      selected_sheet_ref: employeeDecision.selected_sheet_ref || null,
+      selected_scale_ref: employeeDecision.selected_scale_ref || null,
+      selected_boundary_candidate_ref: employeeDecision.selected_boundary_candidate_ref || null,
+      source_ref: employeeDecision.source_ref || replayEvidenceRow.source_ref || null,
+      source_refs: Array.isArray(employeeDecision.source_refs) ? [...employeeDecision.source_refs] : [],
+      status: employeeDecision.status || 'employee_selected_internal_alpha',
+      claim_gate_effect: employeeDecision.claim_gate_effect || 'no_claims_cleared',
+      use_for_claims: false,
+    }] : []),
   ]);
   const blockedClaims = uniqueStrings([
     ...(Array.isArray(replayNotes.blocked_claims) ? replayNotes.blocked_claims : []),
@@ -4371,6 +4384,10 @@ function buildOpenClawSam31ReplayActualValueHandoffPacket(projectName, replayEvi
       replacement_ref: suppliedBidTruthDefaults?.replacement_ref || null,
       source_file: suppliedBidTruthDefaults?.source_file || replayEvidenceRow.source_file || null,
       source_refs: Array.isArray(suppliedBidTruthDefaults?.source_refs) ? jsonClone(suppliedBidTruthDefaults.source_refs) : [],
+      employee_decision: employeeDecision,
+      selected_sheet_ref: employeeDecision?.selected_sheet_ref || suppliedBidTruthDefaults?.selected_sheet_ref || null,
+      selected_scale_ref: employeeDecision?.selected_scale_ref || suppliedBidTruthDefaults?.selected_scale_ref || null,
+      selected_boundary_candidate_ref: employeeDecision?.selected_boundary_candidate_ref || suppliedBidTruthDefaults?.selected_boundary_candidate_ref || null,
       project_truth: suppliedBidTruthDefaults?.project_truth && typeof suppliedBidTruthDefaults.project_truth === 'object' && !Array.isArray(suppliedBidTruthDefaults.project_truth)
         ? jsonClone(suppliedBidTruthDefaults.project_truth)
         : null,
@@ -5468,6 +5485,10 @@ app.get('/api/projects/:name/evidence/:evidenceId/replay-bid-artifact', authMidd
       replacement_ref: defaults.replacement_ref || null,
       source_file: defaults.source_file || null,
       source_refs: Array.isArray(defaults.source_refs) ? defaults.source_refs : [],
+      employee_decision: defaults.employee_decision && typeof defaults.employee_decision === 'object' ? jsonClone(defaults.employee_decision) : null,
+      selected_sheet_ref: defaults.selected_sheet_ref || null,
+      selected_scale_ref: defaults.selected_scale_ref || null,
+      selected_boundary_candidate_ref: defaults.selected_boundary_candidate_ref || null,
       replacement_values: defaults.replacement_values && typeof defaults.replacement_values === 'object' && !Array.isArray(defaults.replacement_values)
         ? jsonClone(defaults.replacement_values)
         : {},
@@ -12909,6 +12930,11 @@ function suppliedDocumentBidTruthDownstreamDefaults(projectName) {
   const status = buildSuppliedDocumentBidTruthStatus(path.resolve(__dirname, '../..'), projectName);
   const latest = latestSuppliedDocumentBidTruthReplacementEvidence(projectName);
   if (!latest?.replacement) return null;
+  const boundaryEvidence = latestPdfBoundaryDecisionEvidence(projectName);
+  const boundaryDecision = decisionFromEvidence(boundaryEvidence);
+  const employeeDecision = boundaryDecision?.employeeDecision && typeof boundaryDecision.employeeDecision === 'object'
+    ? jsonClone(boundaryDecision.employeeDecision)
+    : null;
   const replacementValues = latest.replacement.replacement_values
     && typeof latest.replacement.replacement_values === 'object'
     && !Array.isArray(latest.replacement.replacement_values)
@@ -12926,6 +12952,10 @@ function suppliedDocumentBidTruthDownstreamDefaults(projectName) {
     replacement_ref: latest.replacement.replacement_ref || latest.replacement.source_ref || latest.evidence.source_ref,
     source_file: latest.evidence.source_file || latest.replacement.source_file || null,
     source_refs: Array.isArray(latest.replacement.source_refs) ? latest.replacement.source_refs : [],
+    employee_decision: employeeDecision,
+    selected_sheet_ref: employeeDecision?.selected_sheet_ref || null,
+    selected_scale_ref: employeeDecision?.selected_scale_ref || null,
+    selected_boundary_candidate_ref: employeeDecision?.selected_boundary_candidate_ref || null,
     replacement_values: replacementValues,
     replaced_fields: replacedFields,
     project_truth: {

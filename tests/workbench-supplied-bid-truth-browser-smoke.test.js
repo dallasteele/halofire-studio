@@ -178,6 +178,31 @@ describe('Workbench supplied bid-truth browser smoke', () => {
 
   it('shows supplied bid-truth downstream defaults on generated bid results and downloads the packet', async () => {
     const token = await adminToken();
+    await api(`${PROJECT_PATH}/pdf-boundary-decision`, token, {
+      method: 'POST',
+      body: JSON.stringify({
+        pdfPageIndex: 7,
+        pdfScale: 0.0833,
+        pdfExtract: 'outline',
+        candidate: {
+          id: 'candidate:1881-sheet-7-outline',
+          mode: 'outline',
+          bbox: { minX: 0, minY: 0, maxX: 120, maxY: 85, widthFt: 120, heightFt: 85, areaSqft: 10200 },
+          blockedClaims: ['geometry_accuracy', 'AutoSprink_parity'],
+        },
+        source_file: 'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx',
+        source_ref: '1881 supplied bid-truth downstream browser smoke boundary decision',
+        selected_sheet_ref: '1881://proposal-cooperative/sheet-7',
+        selected_scale_ref: '1881://operator-scale/sheet-7/0.0833',
+        selected_boundary_candidate_ref: 'candidate:1881-sheet-7-outline',
+        source_refs: [
+          '1881://proposal-cooperative/sheet-7',
+          '1881://operator-scale/sheet-7/0.0833',
+          'candidate:1881-sheet-7-outline',
+        ],
+        notes: 'Boundary decision saved for supplied bid-truth downstream browser smoke.',
+      }),
+    });
     const replacement = await api(`${PROJECT_PATH}/resolver-packets/supplied-document-bid-truth/replacements`, token, {
       method: 'POST',
       body: JSON.stringify({
@@ -226,26 +251,34 @@ describe('Workbench supplied bid-truth browser smoke', () => {
       expect(cardText).toContain('claim_gate_effect no_claims_cleared');
       expect(cardText).toContain('Engine result: totalAreaSqFt 88000');
 
-      await page.waitForFunction(() => {
-        const text = document.getElementById('evidence')?.textContent || '';
-        return text.includes('best_effort_ai_layout')
-          && text.includes('replacement_ref 1881://employee-bid-truth/downstream-browser-smoke-001')
-          && text.includes('source_file employee-bid-truth-downstream-browser-smoke.json')
-          && text.includes('employee://bid-truth/downstream-browser-smoke-001');
-      });
-      const evidenceText = await page.locator('#evidence').innerText();
+      let savedLayout = null;
+      const started = Date.now();
+      while (Date.now() - started < 8000) {
+        const evidenceRows = await api(`${PROJECT_PATH}/evidence`, token);
+        savedLayout = evidenceRows.find((row) => (
+          row.evidence_type === 'best_effort_ai_layout'
+          && row.notes.includes('1881://employee-bid-truth/downstream-browser-smoke-001')
+        ));
+        if (savedLayout) break;
+        await new Promise((resolve) => setTimeout(resolve, 150));
+      }
+      expect(savedLayout).toBeTruthy();
+      await page.reload({ waitUntil: 'domcontentloaded' });
+      await page.locator('#projectTarget').selectOption(PROJECT_NAME);
+      await page.locator(`#evidence-${savedLayout.id}`).waitFor({ state: 'attached' });
+      const evidenceText = await page.locator(`#evidence-${savedLayout.id}`).innerText();
       expect(evidenceText).toContain('best_effort_ai_layout');
       expect(evidenceText).toContain('replacement_ref 1881://employee-bid-truth/downstream-browser-smoke-001');
       expect(evidenceText).toContain('source_file employee-bid-truth-downstream-browser-smoke.json');
       expect(evidenceText).toContain('Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G6');
       expect(evidenceText).toContain('employee://bid-truth/downstream-browser-smoke-001');
+      expect(evidenceText).toContain('selected_1881_context');
+      expect(evidenceText).toContain('selected_sheet_ref 1881://proposal-cooperative/sheet-7');
+      expect(evidenceText).toContain('selected_scale_ref 1881://operator-scale/sheet-7/0.0833');
+      expect(evidenceText).toContain('selected_boundary_candidate_ref candidate:1881-sheet-7-outline');
+      await page.locator('#genBtn').click();
+      await page.locator('#bidTruthDefaultsCard').waitFor();
 
-      const evidenceRows = await api(`${PROJECT_PATH}/evidence`, token);
-      const savedLayout = evidenceRows.find((row) => (
-        row.evidence_type === 'best_effort_ai_layout'
-        && row.notes.includes('1881://employee-bid-truth/downstream-browser-smoke-001')
-      ));
-      expect(savedLayout).toBeTruthy();
       const savedLayoutDownload = page.locator(`[data-replay-bid-artifact-evidence-id="${savedLayout.id}"]`).first();
       await savedLayoutDownload.waitFor({ state: 'attached' });
       const [savedLayoutArtifactDownload] = await Promise.all([
@@ -265,6 +298,9 @@ describe('Workbench supplied bid-truth browser smoke', () => {
         source_supplied_document_bid_truth_replacement_evidence_id: replacement.evidence.id,
         replacement_ref: '1881://employee-bid-truth/downstream-browser-smoke-001',
         source_file: 'employee-bid-truth-downstream-browser-smoke.json',
+        selected_sheet_ref: '1881://proposal-cooperative/sheet-7',
+        selected_scale_ref: '1881://operator-scale/sheet-7/0.0833',
+        selected_boundary_candidate_ref: 'candidate:1881-sheet-7-outline',
         claim_gate_effect: 'no_claims_cleared',
         no_claim_gates_cleared: true,
       }));
@@ -272,6 +308,12 @@ describe('Workbench supplied bid-truth browser smoke', () => {
         'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G6',
         'employee://bid-truth/downstream-browser-smoke-001',
       ]);
+      expect(savedLayoutArtifact.employee_decision).toEqual(expect.objectContaining({
+        selected_sheet_ref: '1881://proposal-cooperative/sheet-7',
+        selected_scale_ref: '1881://operator-scale/sheet-7/0.0833',
+        selected_boundary_candidate_ref: 'candidate:1881-sheet-7-outline',
+        claim_gate_effect: 'no_claims_cleared',
+      }));
       expect(savedLayoutArtifact.project_truth).toEqual(expect.objectContaining({
         square_feet: 88000,
         head_count: 733,
@@ -301,6 +343,9 @@ describe('Workbench supplied bid-truth browser smoke', () => {
         source_supplied_document_bid_truth_replacement_evidence_id: replacement.evidence.id,
         replacement_ref: '1881://employee-bid-truth/downstream-browser-smoke-001',
         source_file: 'employee-bid-truth-downstream-browser-smoke.json',
+        selected_sheet_ref: '1881://proposal-cooperative/sheet-7',
+        selected_scale_ref: '1881://operator-scale/sheet-7/0.0833',
+        selected_boundary_candidate_ref: 'candidate:1881-sheet-7-outline',
       }));
       expect(savedLayoutHandoffPacket.source_replay_packet.project_truth).toEqual(expect.objectContaining({
         square_feet: 88000,
@@ -318,6 +363,15 @@ describe('Workbench supplied bid-truth browser smoke', () => {
         }),
         'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G6',
         'employee://bid-truth/downstream-browser-smoke-001',
+      ]));
+      expect(savedLayoutHandoffPacket.source_refs).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          evidence_type: 'halofire.pdf_boundary_employee_decision.v1',
+          selected_sheet_ref: '1881://proposal-cooperative/sheet-7',
+          selected_scale_ref: '1881://operator-scale/sheet-7/0.0833',
+          selected_boundary_candidate_ref: 'candidate:1881-sheet-7-outline',
+          claim_gate_effect: 'no_claims_cleared',
+        }),
       ]));
 
       const savedLayoutReplacement = page.locator(`[data-replay-sam31-actual-value-replacement-evidence-id="${savedLayout.id}"]`).first();
