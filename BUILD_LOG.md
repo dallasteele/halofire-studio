@@ -1,5 +1,13 @@
 # HaloFire Build Log
 
+## 2026-06-04 - Replay smoke packet review follow-through
+
+- Added a Workbench one-click default packet-review action for replay-scoped HaloFire SAM31 consumer-intake smoke rows after a saved preliminary replay follow-up queue exists.
+- The action downloads the first `halofire.sam31_obstruction_clash_packet.v1` or `halofire.sam31_sleeve_firestop_packet.v1`, saves `halofire.sam31_sprinkler_followup_packet_review_decision.v1`, and preserves `source_replay_evidence_id`, `source_sam31_actual_value_replacement_evidence_id`, `source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id`, `source_halofire_sam31_sprinkler_review_decision_evidence_id`, `source_halofire_sam31_preliminary_replay_followup_evidence_id`, packet index, and `claim_gate_effect: no_claims_cleared`.
+- Added Workbench evidence detail rendering for saved smoke follow-up packet review rows so employees can see packet lane, source ids, and blocked claims before approval upload or claim-gate validation.
+- Verified red-to-green with `npx vitest run tests/workbench-room-boundary-floor-plan-override-browser-smoke.test.js --reporter=verbose`, plus adjacent `npx vitest run tests/workbench-sam31-consumer-intake-smoke-browser.test.js --reporter=verbose`, `npx vitest run tests/workbench-evidence-detail.test.js --reporter=verbose`, `npx vitest run tests/studio-static-origin.test.js --reporter=verbose`, `C:/Python312/python.exe E:/ClaudeBot/scripts/verify_agentic_rules.py`, `git diff --check`, `.only` scan, and GX10 prover health. This is `NO_FORMALIZABLE_CLAIM`; it proves Workbench packet routing and metadata preservation, not approval evidence.
+- Still blocked: AutoSprink parity, AHJ approval, PE/professional review, permit readiness, fabrication readiness, manufacturer-exact models, brand readiness, production readiness, survey-grade claims, and engineering-grade claims.
+
 ## 2026-06-04 - Replay smoke preliminary replay follow-up
 
 - Added a Workbench one-click default preliminary replay follow-up action for replay-scoped HaloFire SAM31 consumer-intake smoke rows after the default sprinkler review decision exists.
