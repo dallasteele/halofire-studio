@@ -286,6 +286,66 @@ describe('Workbench room-boundary floor-plan override browser smoke', () => {
         'AutoSprink_parity',
         'permit_ready',
       ]));
+
+      const handoffButton = page.locator(`[data-replay-sam31-actual-value-handoff-evidence-id="${savedReplayEvidenceId}"]`);
+      await handoffButton.waitFor({ state: 'attached' });
+      const [handoffDownload] = await Promise.all([
+        page.waitForEvent('download'),
+        handoffButton.click(),
+      ]);
+      const handoffDownloadPath = await handoffDownload.path();
+      expect(handoffDownload.suggestedFilename()).toContain('actual-value-handoff');
+      expect(handoffDownloadPath).toBeTruthy();
+      const handoff = JSON.parse(fs.readFileSync(handoffDownloadPath, 'utf8'));
+      expect(handoff.artifact_type).toBe('openclaw.sam31.actual_value_handoff_packet.v1');
+      expect(handoff.source_replay_evidence_id).toBe(Number(savedReplayEvidenceId));
+      expect(handoff.source_replay_packet).toEqual(expect.objectContaining({
+        source_evidence_id: savedBoundary.evidence.id,
+        source_review_evidence_id: review.id,
+        corrected_room_polygon_count: 2,
+      }));
+      expect(handoff.source_refs).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          evidence_id: Number(savedReplayEvidenceId),
+          evidence_type: 'best_effort_ai_layout',
+          claim_gate_effect: 'no_claims_cleared',
+        }),
+        expect.objectContaining({
+          evidence_id: savedBoundary.evidence.id,
+          evidence_type: 'pdf_boundary_decision',
+        }),
+      ]));
+      expect(handoff.claim_gate_effect).toBe('no_claims_cleared');
+      expect(handoff.no_claim_gates_cleared).toBe(true);
+
+      const replacementButton = page.locator(`[data-replay-sam31-actual-value-replacement-evidence-id="${savedReplayEvidenceId}"]`);
+      await replacementButton.waitFor({ state: 'attached' });
+      await replacementButton.click();
+      await page.waitForFunction((replayEvidenceId) => {
+        const status = document.getElementById(`replaySam31ActualValueReplacementStatus-${replayEvidenceId}`);
+        return Boolean(status?.dataset.sam31ActualValueReplacementEvidenceId);
+      }, String(savedReplayEvidenceId));
+
+      const replacementStatus = page.locator(`#replaySam31ActualValueReplacementStatus-${savedReplayEvidenceId}`);
+      const replacementEvidenceId = await replacementStatus.getAttribute('data-sam31-actual-value-replacement-evidence-id');
+      expect(replacementEvidenceId).toMatch(/^\d+$/);
+      expect(await replacementStatus.getAttribute('data-source-replay-evidence-id')).toBe(String(savedReplayEvidenceId));
+      expect(await replacementStatus.getAttribute('data-claim-gate-effect')).toBe('no_claims_cleared');
+      expect(await replacementStatus.getAttribute('data-actual-value-handoff-href'))
+        .toBe(`${PROJECT_PATH}/evidence/${savedReplayEvidenceId}/openclaw/sam31/actual-value-handoff`);
+      expect(await replacementStatus.getAttribute('data-sam31-actual-value-replacement-readback-href'))
+        .toBe(`/api/openclaw/sam31/actual-value-replacements?projectName=${encodeURIComponent(PROJECT_NAME)}&sourceReplayEvidenceId=${savedReplayEvidenceId}`);
+
+      await page.locator(`#evidence-${replacementEvidenceId}`).waitFor({ state: 'attached' });
+      const replacementRow = await page.locator(`#evidence-${replacementEvidenceId}`).innerText();
+      expect(replacementRow).toContain('sam31_actual_value_replacement');
+      expect(replacementRow).toContain(`source_replay_evidence_id ${savedReplayEvidenceId}`);
+      expect(replacementRow).toContain('claim_gate_effect no_claims_cleared');
+
+      const queue = page.locator('#sam31ActualValueQueue');
+      expect(await queue.getAttribute('data-sam31-actual-value-replacement-readback-href'))
+        .toBe(`/api/openclaw/sam31/actual-value-replacements?projectName=${encodeURIComponent(PROJECT_NAME)}&sourceReplayEvidenceId=${savedReplayEvidenceId}`);
+      expect(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-source-replay-evidence-id')).toBe(String(savedReplayEvidenceId));
     } finally {
       await page.close();
     }

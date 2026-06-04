@@ -1708,6 +1708,26 @@ describe('PDF page inspection API', () => {
       'nameforge',
     ]));
 
+    const filteredReplacementReadbackRes = await request(`${COOPERATIVE_1881_PATH}/openclaw/sam31/actual-value-replacements?sourceReplayEvidenceId=${replayEvidence.id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(filteredReplacementReadbackRes.status).toBe(200);
+    const filteredReplacementReadback = await filteredReplacementReadbackRes.json();
+    expect(filteredReplacementReadback).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.actual_value_replacement_readback.v1',
+      source_replay_evidence_filter_id: replayEvidence.id,
+      replacement_readback_href: `/api/openclaw/sam31/actual-value-replacements?projectName=${encodeURIComponent(COOPERATIVE_1881_PROJECT_NAME)}&sourceReplayEvidenceId=${replayEvidence.id}`,
+      replay_replacement_count: 1,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(filteredReplacementReadback.replay_replacement_details).toEqual([
+      expect.objectContaining({
+        evidence_id: replacement.id,
+        source_replay_evidence_id: replayEvidence.id,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    ]);
+
     const landscoutQueueRes = await request(`${COOPERATIVE_1881_PATH}/openclaw/sam31/actual-value-resolver-queue?consumer=landscout`, {
       headers: { Authorization: `Bearer ${token}` },
     });

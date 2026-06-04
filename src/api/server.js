@@ -1669,6 +1669,7 @@ function latestHalofireSam31ConsumerIntakeSmokeFollowupReviewDecisionEvidence(pr
 
 function listSam31ReplayActualValueReplacementDetails(projectName, options = {}) {
   const consumerFilter = String(options.consumer || '').trim().toLowerCase();
+  const sourceReplayEvidenceId = Number(options.sourceReplayEvidenceId || options.source_replay_evidence_id || 0) || null;
   const rows = db
     .prepare(`SELECT * FROM project_evidence
               WHERE project_name = ? AND evidence_type = 'sam31_actual_value_replacement'
@@ -1683,6 +1684,7 @@ function listSam31ReplayActualValueReplacementDetails(projectName, options = {})
       continue;
     }
     if (!replacement || replacement.kind !== 'sam31ReplayActualValueReplacement') continue;
+    if (sourceReplayEvidenceId && Number(replacement.source_replay_evidence_id || 0) !== sourceReplayEvidenceId) continue;
     const contract = replacement.openclaw_sam31_shared_consumer_contract || {};
     const supportedApplications = uniqueStrings([
       ...(Array.isArray(replacement.supported_applications) ? replacement.supported_applications : []),
@@ -3687,6 +3689,7 @@ function buildOpenClawSam31ActualValueResolverContractPacket(projectName, option
 
 function buildOpenClawSam31ActualValueReplacementReadback(projectName, options = {}) {
   const requestedConsumer = String(options.consumer || '').trim().toLowerCase();
+  const sourceReplayEvidenceId = Number(options.sourceReplayEvidenceId || options.source_replay_evidence_id || 0) || null;
   const queue = buildOpenClawSam31ActualValueResolverQueue(projectName, {
     consumer: requestedConsumer,
     contractEvidenceId: options.contractEvidenceId || options.contract_evidence_id,
@@ -3701,10 +3704,14 @@ function buildOpenClawSam31ActualValueReplacementReadback(projectName, options =
     effectiveConsumer ? `consumer=${encodeURIComponent(effectiveConsumer)}` : '',
     contractEvidenceFilterId ? `contractEvidenceId=${encodeURIComponent(contractEvidenceFilterId)}` : '',
     serviceDescriptorEvidenceFilterId ? `serviceDescriptorEvidenceId=${encodeURIComponent(serviceDescriptorEvidenceFilterId)}` : '',
+    sourceReplayEvidenceId ? `sourceReplayEvidenceId=${encodeURIComponent(sourceReplayEvidenceId)}` : '',
   ].filter(Boolean).join('&');
   const replacementReadbackHref = `/api/openclaw/sam31/actual-value-replacements?${queueQuery}`;
   const slug = projectName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'halofire-project';
-  const replayReplacementDetails = listSam31ReplayActualValueReplacementDetails(projectName, { consumer: effectiveConsumer });
+  const replayReplacementDetails = listSam31ReplayActualValueReplacementDetails(projectName, {
+    consumer: effectiveConsumer,
+    sourceReplayEvidenceId,
+  });
   const items = queue.items.map((item) => {
     const recordedEvidence = item.latest_actual_value_replacement_evidence || null;
     const sectionToArtifactsHandoff = item.section_to_artifacts_consumer_handoff
@@ -3805,6 +3812,7 @@ function buildOpenClawSam31ActualValueReplacementReadback(projectName, options =
     source_openclaw_sam31_actual_value_resolver_contract_evidence_id: queue.source_openclaw_sam31_actual_value_resolver_contract_evidence_id || null,
     latest_actual_value_resolver_contract_evidence: queue.latest_actual_value_resolver_contract_evidence || null,
     service_descriptor_evidence_filter_id: serviceDescriptorEvidenceFilterId,
+    source_replay_evidence_filter_id: sourceReplayEvidenceId,
     latest_actual_value_service_descriptor_evidence_id: queue.latest_actual_value_service_descriptor_evidence_id || null,
     latest_actual_value_service_descriptor_evidence: latestServiceDescriptorEvidence,
     saved_actual_value_service_descriptor_count: queue.saved_actual_value_service_descriptor_count || 0,
@@ -4158,6 +4166,7 @@ app.get('/api/projects/:name/openclaw/sam31/actual-value-replacements', authMidd
     consumer: req.query?.consumer,
     contractEvidenceId: req.query?.contractEvidenceId || req.query?.contract_evidence_id,
     serviceDescriptorEvidenceId: req.query?.serviceDescriptorEvidenceId || req.query?.service_descriptor_evidence_id,
+    sourceReplayEvidenceId: req.query?.sourceReplayEvidenceId || req.query?.source_replay_evidence_id,
   }));
 });
 
@@ -15745,6 +15754,7 @@ app.get('/api/openclaw/sam31/actual-value-replacements', authMiddleware, (req, r
     consumer: req.query?.consumer,
     contractEvidenceId: req.query?.contractEvidenceId || req.query?.contract_evidence_id,
     serviceDescriptorEvidenceId: req.query?.serviceDescriptorEvidenceId || req.query?.service_descriptor_evidence_id,
+    sourceReplayEvidenceId: req.query?.sourceReplayEvidenceId || req.query?.source_replay_evidence_id,
   }));
 });
 
