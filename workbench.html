@@ -1273,6 +1273,14 @@ function evidenceDetail(row) {
       const blocked = Array.isArray(decision.blocked_claims) ? decision.blocked_claims : [];
       return `<div class="muted" style="font-size:11px;margin-top:3px">SAM31 approval upload validation decision: ${escapeHtml(decision.artifact_type || 'halofire.sam31_approval_upload_validation_decision.v1')}<br>validation_decision ${escapeHtml(decision.validation_decision || 'missing')} - target_gate_code ${escapeHtml(decision.target_gate_code || 'missing')} - source_halofire_sam31_approval_upload_evidence_id ${escapeHtml(decision.source_halofire_sam31_approval_upload_evidence_id || 'missing')}<br>validation_ref ${escapeHtml(decision.validation_ref || row.source_ref || 'missing')} - evidence_type ${escapeHtml(decision.evidence_type || row.evidence_type || 'missing')} - status ${escapeHtml(decision.status || row.status || 'missing')}<br>${escapeHtml(signoff.reviewer_name || 'unknown reviewer')} - ${escapeHtml(signoff.reviewer_title || 'title missing')} - signed_at ${escapeHtml(signoff.signed_at || 'missing')} - license ${escapeHtml(signoff.license_id || 'missing')}<br>claim_gate_effect ${escapeHtml(decision.claim_gate_effect || packet.claim_gate_effect || 'no_claims_cleared')} - no_claim_gates_cleared true - resolve_action ${escapeHtml(decision.resolve_action?.href || 'blocked until real signed evidence validation')}<br>Blocks still active: ${blocked.map((claim) => `<span class="chip">${escapeHtml(claim)}</span>`).join('') || '<span class="chip">claim gates remain blocked</span>'}</div>`;
     }
+    if (packet.kind === 'halofire_claim_gate_resolve_audit_readback') {
+      const audit = packet.resolve_audit_packet && typeof packet.resolve_audit_packet === 'object' ? packet.resolve_audit_packet : packet;
+      const gate = audit.claim_gate && typeof audit.claim_gate === 'object' ? audit.claim_gate : {};
+      const sourceRefs = Array.isArray(packet.source_refs) ? packet.source_refs : (Array.isArray(audit.source_refs) ? audit.source_refs : []);
+      const blocked = Array.isArray(packet.blocked_claims) ? packet.blocked_claims : (Array.isArray(gate.blocked_claims) ? gate.blocked_claims : []);
+      const limitations = Array.isArray(packet.limitations) ? packet.limitations : (Array.isArray(audit.limitations) ? audit.limitations : []);
+      return `<div class="muted" style="font-size:11px;margin-top:3px">Saved claim_gate_resolve_audit_packet readback: ${escapeHtml(audit.artifact_type || packet.artifact_type || 'halofire.claim_gate_resolve_audit_packet.v1')}<br>gate_code ${escapeHtml(audit.gate_code || packet.gate_code || gate.code || 'missing')} - resolved_evidence_id ${escapeHtml(audit.resolved_evidence_id || packet.resolved_evidence_id || 'missing')} - resolved_evidence_ref ${escapeHtml(audit.resolved_evidence_ref || packet.resolved_evidence_ref || row.source_ref || 'missing')}<br>resolved_evidence_type ${escapeHtml(audit.resolved_evidence?.evidence_type || packet.resolved_evidence_type || 'missing')} - claim_gate_effect ${escapeHtml(audit.claim_gate_effect || packet.claim_gate_effect || 'gate_cleared_after_explicit_signed_validation')} - no_unrelated_claims_cleared ${escapeHtml((audit.no_unrelated_claims_cleared === false || packet.no_unrelated_claims_cleared === false) ? 'false' : 'true')}<br>source_refs ${sourceRefs.map((ref) => `<span class="chip">${escapeHtml(ref.evidence_type || ref.source_ref || ref.evidence_id || JSON.stringify(ref).slice(0, 80))}</span>`).join('') || '<span class="chip">missing</span>'}<br>Blocks still active unless separately resolved: ${blocked.map((claim) => `<span class="chip">${escapeHtml(claim)}</span>`).join('') || '<span class="chip">unrelated regulated claims remain fail-closed</span>'}<br>Limitations: ${limitations.map((item) => `<span class="chip">${escapeHtml(item)}</span>`).join('') || '<span class="chip">audit readback only</span>'}</div>`;
+    }
     if (packet.kind === 'halofire_sam31_approval_upload_intake') {
       const intake = packet.intake && typeof packet.intake === 'object' ? packet.intake : packet;
       const signoff = intake.signoff || packet.signoff || {};
@@ -3771,7 +3779,8 @@ function resolverQueueDetail(item, index = '') {
       <div class="claims">resolved_evidence_id ${escapeHtml(item.resolved_evidence_id || 'missing')} - resolved_evidence_ref ${escapeHtml(item.resolved_evidence_ref || 'missing')} - evidence_type ${escapeHtml(item.resolved_evidence_type || 'missing')}</div>
       <div class="claims">claim_gate_effect ${escapeHtml(item.claim_gate_effect || 'gate_cleared_after_explicit_signed_validation')} - no_unrelated_claims_cleared ${escapeHtml(item.no_unrelated_claims_cleared === false ? 'false' : 'true')}</div>
       <div class="claims">Blocks still active unless separately resolved: ${claims.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('') || '<span class="chip">unrelated regulated claims remain fail-closed</span>'}</div>
-      <p style="margin-top:8px">${action.href ? `<a class="go" style="padding:7px 10px;font-size:11px;text-decoration:none;display:inline-block;margin-right:6px;background:#047857" href="${escapeHtml(action.href)}">${escapeHtml(action.label || 'Download resolve audit packet')}</a>` : '<span class="muted">audit packet action missing</span>'}</p>
+      <p style="margin-top:8px">${action.href ? `<a class="go" style="padding:7px 10px;font-size:11px;text-decoration:none;display:inline-block;margin-right:6px;background:#047857" href="${escapeHtml(action.href)}">${escapeHtml(action.label || 'Download resolve audit packet')}</a> <button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#0f766e" data-claim-gate-resolve-audit-save-evidence-id="${escapeHtml(item.resolved_evidence_id || '')}" data-claim-gate-resolve-audit-gate-code="${escapeHtml(item.code || '')}" data-claim-gate-resolve-audit-href="${escapeHtml(action.href || '')}" data-claim-gate-resolve-audit-resolved-ref="${escapeHtml(item.resolved_evidence_ref || '')}" data-claim-gate-resolve-audit-resolved-type="${escapeHtml(item.resolved_evidence_type || '')}">Save resolve audit evidence</button>` : '<span class="muted">audit packet action missing</span>'}</p>
+      <div class="muted" id="claimGateResolveAuditSaveStatus-${escapeHtml(item.resolved_evidence_id || item.code || '')}" style="font-size:11px;margin-top:4px"></div>
       <span class="muted" style="font-size:10px">halofire.claim_gate_resolve_audit_packet.v1 - claimGateAudit=cleared - targetGate=${escapeHtml(item.code || '')}</span>
     </div>`;
   }
@@ -4962,6 +4971,82 @@ async function resolveHalofireSam31ApprovalUploadGate(gateCode, evidenceId, stat
   }
 }
 
+async function saveClaimGateResolveAuditEvidence(resolvedEvidenceId = '', gateCode = '', href = '') {
+  const targetId = String(resolvedEvidenceId || '').trim();
+  const gate = String(gateCode || '').trim();
+  const trigger = targetId
+    ? document.querySelector(`[data-claim-gate-resolve-audit-save-evidence-id="${CSS.escape(targetId)}"]`)
+    : null;
+  const statusId = `claimGateResolveAuditSaveStatus-${targetId || gate}`;
+  const status = document.getElementById(statusId) || document.getElementById('resolverQueue') || document.getElementById('evidence');
+  const auditHref = String(href || trigger?.dataset.claimGateResolveAuditHref || '').trim();
+  const stampStatus = (target, saved, packet) => {
+    if (!target) return;
+    const savedId = String(saved?.id || saved?.evidence_id || '');
+    target.dataset.claimGateResolveAuditEvidenceId = savedId;
+    target.dataset.resolvedEvidenceId = String(packet?.resolved_evidence_id || targetId || '');
+    target.dataset.sourceResolvedEvidenceRef = String(packet?.resolved_evidence_ref || trigger?.dataset.claimGateResolveAuditResolvedRef || '');
+    target.dataset.claimGateEffect = String(packet?.claim_gate_effect || 'gate_cleared_after_explicit_signed_validation');
+    target.dataset.noUnrelatedClaimsCleared = String(packet?.no_unrelated_claims_cleared !== false);
+    target.dataset.resolveAuditArtifactType = String(packet?.artifact_type || 'halofire.claim_gate_resolve_audit_packet.v1');
+    target.dataset.targetGateCode = String(packet?.gate_code || gate || '');
+    target.textContent = `Saved ${packet?.artifact_type || 'halofire.claim_gate_resolve_audit_packet.v1'} evidence #${savedId} for ${packet?.gate_code || gate || 'claim gate'}; unrelated regulated claims remain fail-closed.`;
+  };
+  try {
+    if (!targetId) throw new Error('Resolved evidence id is required for the claim-gate resolve audit readback.');
+    if (!auditHref) throw new Error('Resolve audit packet href is required.');
+    const apiPath = auditHref.startsWith('/api/') ? auditHref.slice(4) : auditHref;
+    const packet = await api(apiPath);
+    if (packet.artifact_type !== 'halofire.claim_gate_resolve_audit_packet.v1') {
+      throw new Error('Unexpected claim-gate resolve audit packet artifact type');
+    }
+    const packetSourceRefs = Array.isArray(packet.source_refs) ? packet.source_refs : [];
+    const sourceRefs = [
+      ...packetSourceRefs,
+      {
+        evidence_id: packet.resolved_evidence_id || Number(targetId),
+        evidence_type: packet.resolved_evidence?.evidence_type || trigger?.dataset.claimGateResolveAuditResolvedType || '',
+        source_file: packet.resolved_evidence?.source_file || '',
+        source_ref: packet.resolved_evidence_ref || trigger?.dataset.claimGateResolveAuditResolvedRef || '',
+        claim_gate_effect: 'source_for_explicit_gate_resolve_audit',
+      },
+    ];
+    const saved = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/evidence', {
+      method: 'POST',
+      body: JSON.stringify({
+        evidence_type: 'claim_gate_resolve_audit_packet',
+        source_ref: packet.resolved_evidence_ref || trigger?.dataset.claimGateResolveAuditResolvedRef || `claim-gate-resolve-audit://${currentProjectName()}/${packet.gate_code || gate}/${targetId}`,
+        source_file: packet.download_name || `${currentProjectName().toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${String(packet.gate_code || gate || 'claim-gate').toLowerCase()}-resolve-audit-packet.json`,
+        status: 'present',
+        notes: JSON.stringify({
+          kind: 'halofire_claim_gate_resolve_audit_readback',
+          artifact_type: 'halofire.claim_gate_resolve_audit_packet.v1',
+          saved_from: 'workbench_claim_gate_audit_queue',
+          saved_at: new Date().toISOString(),
+          gate_code: packet.gate_code || gate,
+          resolved_evidence_id: packet.resolved_evidence_id || Number(targetId),
+          resolved_evidence_ref: packet.resolved_evidence_ref || trigger?.dataset.claimGateResolveAuditResolvedRef || null,
+          resolved_evidence_type: packet.resolved_evidence?.evidence_type || trigger?.dataset.claimGateResolveAuditResolvedType || null,
+          source_refs: sourceRefs,
+          resolve_audit_packet: packet,
+          claim_gate_effect: packet.claim_gate_effect || 'gate_cleared_after_explicit_signed_validation',
+          no_unrelated_claims_cleared: packet.no_unrelated_claims_cleared !== false,
+          use_for_claims: false,
+          blocked_claims: packet.claim_gate?.blocked_claims || [],
+          limitations: [
+            ...(Array.isArray(packet.limitations) ? packet.limitations : []),
+            'Saved Workbench readback only; this evidence row does not clear additional professional, AHJ, manufacturer, AutoSprink, permit-ready, fabrication-ready, brand-ready, production-ready, survey-grade, or engineering-grade claims.',
+          ],
+        }),
+      }),
+    });
+    await refreshEvidence();
+    stampStatus(document.getElementById(statusId) || status, saved, packet);
+  } catch (err) {
+    if (status) status.textContent = 'Error: ' + err.message;
+  }
+}
+
 async function runResolverReplayBid(evidenceId) {
   const status = document.getElementById('replayBidStatus-' + evidenceId);
   try {
@@ -5577,6 +5662,13 @@ async function refreshResolverQueue() {
       button.dataset.sam31ApprovalUploadResolveGateCode,
       button.dataset.sam31ApprovalUploadResolveEvidenceId,
       button.dataset.sam31ApprovalUploadResolveStatusId,
+    );
+  });
+  document.querySelectorAll('[data-claim-gate-resolve-audit-save-evidence-id]').forEach((button) => {
+    button.onclick = () => saveClaimGateResolveAuditEvidence(
+      button.dataset.claimGateResolveAuditSaveEvidenceId,
+      button.dataset.claimGateResolveAuditGateCode,
+      button.dataset.claimGateResolveAuditHref,
     );
   });
   document.querySelectorAll('[data-sam31-approval-upload-gate-validation-packet-href]').forEach((button) => {

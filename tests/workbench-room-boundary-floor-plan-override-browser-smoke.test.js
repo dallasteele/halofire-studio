@@ -215,6 +215,34 @@ describe('Workbench room-boundary floor-plan override browser smoke', () => {
           && text.includes(`resolved_evidence_id ${decisionEvidenceId}`)
           && text.includes('halofire.claim_gate_resolve_audit_packet.v1');
       }, String(approvalValidationDecision.evidence_id));
+
+      const saveAuditEvidence = page.locator(`[data-claim-gate-resolve-audit-save-evidence-id="${approvalValidationDecision.evidence_id}"]`).first();
+      await saveAuditEvidence.waitFor({ state: 'attached' });
+      expect(await saveAuditEvidence.getAttribute('data-claim-gate-resolve-audit-gate-code')).toBe(gateCode);
+      expect(await saveAuditEvidence.getAttribute('data-claim-gate-resolve-audit-href')).toBe(`${PROJECT_PATH}/claim-gates/${gateCode}/resolve-audit-packet`);
+
+      await saveAuditEvidence.click();
+      const auditSaveStatus = page.locator(`#claimGateResolveAuditSaveStatus-${approvalValidationDecision.evidence_id}`);
+      await page.waitForFunction((decisionEvidenceId) => {
+        const status = document.getElementById(`claimGateResolveAuditSaveStatus-${decisionEvidenceId}`);
+        return status?.dataset.claimGateResolveAuditEvidenceId
+          && status?.dataset.resolvedEvidenceId === decisionEvidenceId
+          && status?.dataset.noUnrelatedClaimsCleared === 'true';
+      }, String(approvalValidationDecision.evidence_id));
+      const savedAuditEvidenceId = await auditSaveStatus.getAttribute('data-claim-gate-resolve-audit-evidence-id');
+      expect(savedAuditEvidenceId).toBeTruthy();
+      expect(await auditSaveStatus.getAttribute('data-claim-gate-effect')).toBe('gate_cleared_after_explicit_signed_validation');
+      expect(await auditSaveStatus.getAttribute('data-source-resolved-evidence-ref')).toBe('approval-validation://1881/sam31/ahj-approval-real-001');
+
+      const savedAuditRow = page.locator(`#evidence-${savedAuditEvidenceId}`);
+      await savedAuditRow.waitFor({ state: 'attached' });
+      const savedAuditText = await savedAuditRow.innerText();
+      expect(savedAuditText).toContain('claim_gate_resolve_audit_packet');
+      expect(savedAuditText).toContain('halofire.claim_gate_resolve_audit_packet.v1');
+      expect(savedAuditText).toContain(`resolved_evidence_id ${approvalValidationDecision.evidence_id}`);
+      expect(savedAuditText).toContain('resolved_evidence_ref approval-validation://1881/sam31/ahj-approval-real-001');
+      expect(savedAuditText).toContain('claim_gate_effect gate_cleared_after_explicit_signed_validation');
+      expect(savedAuditText).toContain('no_unrelated_claims_cleared true');
     } finally {
       await page.close();
     }
