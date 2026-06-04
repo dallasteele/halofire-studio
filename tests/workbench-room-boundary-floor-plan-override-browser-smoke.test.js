@@ -624,6 +624,26 @@ describe('Workbench room-boundary floor-plan override browser smoke', () => {
       expect(await approvalUploadReviewStatus.getAttribute('data-sam31-approval-upload-review-gate-code')).toBe('PROFESSIONAL_REVIEW_MISSING');
       expect(await approvalUploadReviewStatus.getAttribute('data-sam31-approval-upload-review-resolve-href')).toContain('/claim-gates/PROFESSIONAL_REVIEW_MISSING/resolve');
 
+      const approvalValidationDecisionSave = page.locator(`[data-sam31-approval-upload-validation-decision-save-evidence-id="${approvalUploadEvidenceId}"]`).first();
+      await approvalValidationDecisionSave.waitFor({ state: 'attached' });
+      expect(await approvalValidationDecisionSave.getAttribute('data-sam31-approval-upload-validation-target-gate-code')).toBe('PROFESSIONAL_REVIEW_MISSING');
+      expect(await page.locator(`#sam31ApprovalValidationDecision-${approvalUploadEvidenceId}`).inputValue()).toBe('default_internal_alpha_placeholder_rejected');
+      await approvalValidationDecisionSave.click();
+      await page.waitForFunction((approvalUploadId) => {
+        const status = document.getElementById(`sam31ApprovalValidationDecisionStatus-${approvalUploadId}`);
+        return status?.dataset.sourceHalofireSam31ApprovalUploadEvidenceId === approvalUploadId
+          && status?.dataset.validationDecision === 'default_internal_alpha_placeholder_rejected'
+          && status?.dataset.claimGateEffect === 'no_claims_cleared'
+          && status?.dataset.noClaimGatesCleared === 'true';
+      }, approvalUploadEvidenceId);
+      const approvalValidationDecisionStatus = page.locator(`#sam31ApprovalValidationDecisionStatus-${approvalUploadEvidenceId}`);
+      const approvalValidationDecisionEvidenceId = String(await approvalValidationDecisionStatus.getAttribute('data-sam31-approval-upload-validation-decision-evidence-id') || '');
+      expect(approvalValidationDecisionEvidenceId).toMatch(/^\d+$/);
+      expect(await approvalValidationDecisionStatus.getAttribute('data-sam31-approval-upload-validation-target-gate-code')).toBe('PROFESSIONAL_REVIEW_MISSING');
+      expect(await approvalValidationDecisionStatus.getAttribute('data-resolve-action-href')).toBe('');
+      expect(await page.locator(`#evidence-${approvalValidationDecisionEvidenceId}`).innerText()).toContain('halofire.sam31_approval_upload_validation_decision.v1');
+      expect(await page.locator(`#evidence-${approvalValidationDecisionEvidenceId}`).innerText()).toContain('default_internal_alpha_placeholder_rejected');
+
       expect(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-source-halofire-sam31-approval-upload-evidence-id')).toBe(String(approvalUploadEvidenceId));
       expect(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-downloaded-gate-validation-packet')).toBe('true');
       expect(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-claim-gate-effect')).toBe('no_claims_cleared');

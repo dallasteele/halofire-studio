@@ -2690,18 +2690,61 @@ describe('OpenClaw SAM31 bridge status API', () => {
       }),
     ]);
 
-    const professionalGateResolveRes = await request(`${COOPERATIVE_1881_PATH}/claim-gates/PROFESSIONAL_REVIEW_MISSING/resolve`, {
+    const rawApprovalUploadResolveRes = await request(`${COOPERATIVE_1881_PATH}/claim-gates/PROFESSIONAL_REVIEW_MISSING/resolve`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` },
       body: JSON.stringify({ evidence_id: professionalApprovalUpload.id }),
+    });
+    expect(rawApprovalUploadResolveRes.status).toBe(400);
+    await expect(rawApprovalUploadResolveRes.json()).resolves.toEqual(expect.objectContaining({
+      error: expect.stringContaining('SAM31 approval upload intake must be validated'),
+    }));
+
+    const approvalValidationDecisionRes = await request(`${COOPERATIVE_1881_PATH}/evidence/${professionalApprovalUpload.id}/openclaw/sam31/approval-upload/gate-validation-decision`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        validation_decision: 'real_signed_evidence_validated',
+        validation_ref: 'approval-validation://sam31-landscout-testqueue/professional-review',
+        reviewer_name: 'Pat Licensed',
+        reviewer_title: 'Licensed Fire Protection Engineer',
+        signed_at: '2026-06-02T17:00:00.000Z',
+        organization: 'Halo Fire',
+        license_id: 'PE-SAM31-1881',
+        notes: 'Validated real signed professional evidence for explicit gate resolve.',
+      }),
+    });
+    expect(approvalValidationDecisionRes.status).toBe(201);
+    const approvalValidationDecision = await approvalValidationDecisionRes.json();
+    expect(approvalValidationDecision).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.sam31_approval_upload_validation_decision.v1',
+      validation_decision: 'real_signed_evidence_validated',
+      source_halofire_sam31_approval_upload_evidence_id: professionalApprovalUpload.id,
+      target_gate_code: 'PROFESSIONAL_REVIEW_MISSING',
+      evidence_type: 'professional_review',
+      status: 'present',
+      use_for_claims: true,
+      claim_gate_effect: 'ready_for_explicit_gate_resolve',
+      no_claim_gates_cleared: true,
+      resolve_action: expect.objectContaining({
+        method: 'POST',
+        href: expect.stringContaining('/claim-gates/PROFESSIONAL_REVIEW_MISSING/resolve'),
+        request_body: { evidence_id: expect.any(Number) },
+      }),
+    }));
+
+    const professionalGateResolveRes = await request(`${COOPERATIVE_1881_PATH}/claim-gates/PROFESSIONAL_REVIEW_MISSING/resolve`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ evidence_id: approvalValidationDecision.evidence_id }),
     });
     expect(professionalGateResolveRes.status).toBe(200);
     const professionalGateResolve = await professionalGateResolveRes.json();
     expect(professionalGateResolve).toEqual(expect.objectContaining({
       cleared: true,
       code: 'PROFESSIONAL_REVIEW_MISSING',
-      resolved_evidence_id: professionalApprovalUpload.id,
-      resolved_evidence_ref: 'halofire://sam31/obstruction-clash/sam31-landscout-testqueue/professional-review.pdf',
+      resolved_evidence_id: approvalValidationDecision.evidence_id,
+      resolved_evidence_ref: 'approval-validation://sam31-landscout-testqueue/professional-review',
     }));
     const professionalGateAfterExplicitResolve = await request(`${COOPERATIVE_1881_PATH}/claim-gates`, {
       headers: { Authorization: `Bearer ${token}` },

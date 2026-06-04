@@ -1,5 +1,13 @@
 # HaloFire Build Log
 
+## 2026-06-04 - SAM31 approval upload validation decisions
+
+- Added `halofire.sam31_approval_upload_validation_decision.v1` evidence rows so pending SAM31 approval-upload rows can be reviewed and saved before any claim-gate resolve attempt.
+- Changed claim-gate resolve to reject raw `halofire.sam31_approval_upload_intake.v1` rows; real signed evidence must first be saved as a validation decision, while default/internal-alpha placeholders remain `no_claims_cleared`.
+- Added Workbench controls on pending approval-validation rows to save validation decisions with source upload refs, reviewer metadata, target gate code, blocked claims, and explicit resolve readiness only for real signed evidence.
+- Verified red-to-green with `npx vitest run tests/openclaw-sam31-status-api.test.js --reporter=verbose` and `npx vitest run tests/workbench-room-boundary-floor-plan-override-browser-smoke.test.js --reporter=verbose`. This is `NO_FORMALIZABLE_CLAIM`; it proves fail-closed gate routing and evidence persistence, not professional/AHJ/manufacturer approval.
+- Still blocked: professional approval, AHJ approval, manufacturer approval, engineering-grade, AutoSprink parity, permit-ready, fabrication-ready, brand-ready, production-ready, and survey-grade claims until real uploaded evidence is validated and explicitly resolved.
+
 ## 2026-06-04 - Approval validation queue review readback
 
 - Added a Workbench review/readback action on pending SAM31 approval-validation queue rows so uploaded approval evidence can be reviewed with its `halofire.sam31_approval_upload_gate_validation_packet.v1` before any explicit claim-gate resolve.
