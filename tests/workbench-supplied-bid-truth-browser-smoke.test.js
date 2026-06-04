@@ -383,7 +383,7 @@ describe('Workbench supplied bid-truth browser smoke', () => {
           && status?.dataset.sourceReplayEvidenceId === layoutEvidenceId
           && status?.dataset.claimGateEffect === 'no_claims_cleared';
       }, String(savedLayout.id));
-      const savedLayoutReplacementEvidenceId = await page.locator(`#replaySam31ActualValueReplacementStatus-${savedLayout.id}`).getAttribute('data-sam31-actual-value-replacement-evidence-id');
+      const savedLayoutReplacementEvidenceId = String(await page.locator(`#replaySam31ActualValueReplacementStatus-${savedLayout.id}`).getAttribute('data-sam31-actual-value-replacement-evidence-id') || '');
       expect(savedLayoutReplacementEvidenceId).toMatch(/^\d+$/);
       await page.locator(`#evidence-${savedLayoutReplacementEvidenceId}`).waitFor({ state: 'attached' });
       const savedLayoutReplacementText = await page.locator(`#evidence-${savedLayoutReplacementEvidenceId}`).innerText();
@@ -444,7 +444,7 @@ describe('Workbench supplied bid-truth browser smoke', () => {
           && status?.dataset.sourceReplayEvidenceId
           && status?.dataset.claimGateEffect === 'no_claims_cleared';
       }, String(savedLayoutReplacementReadback.evidence_id));
-      const defaultReadbackReplacementEvidenceId = await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-sam31-actual-value-replacement-evidence-id');
+      const defaultReadbackReplacementEvidenceId = String(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-sam31-actual-value-replacement-evidence-id') || '');
       const defaultReadbackRows = await api(`${PROJECT_PATH}/evidence`, token);
       const defaultReadbackRow = defaultReadbackRows.find((row) => row.id === Number(defaultReadbackReplacementEvidenceId));
       expect(defaultReadbackRow).toBeTruthy();
@@ -504,7 +504,7 @@ describe('Workbench supplied bid-truth browser smoke', () => {
         claimGateEffect: 'no_claims_cleared',
       }));
       expect(defaultReadbackSmokeStatus.dataset.sam31ConsumerIntakeSmokeEvidenceId).toMatch(/^\d+$/);
-      const defaultReadbackSmokeEvidenceId = await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-sam31-consumer-intake-smoke-evidence-id');
+      const defaultReadbackSmokeEvidenceId = String(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-sam31-consumer-intake-smoke-evidence-id') || '');
       expect(defaultReadbackSmokeEvidenceId).toMatch(/^\d+$/);
       const defaultReadbackSmokeRows = await api(`${PROJECT_PATH}/evidence`, token);
       const defaultReadbackSmokeRow = defaultReadbackSmokeRows.find((row) => row.id === Number(defaultReadbackSmokeEvidenceId));
