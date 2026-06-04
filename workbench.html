@@ -4086,9 +4086,13 @@ async function savePdfBoundaryEmployeeDecision(evidenceId) {
       method: 'POST',
       body: JSON.stringify(body),
     });
-    if (status) status.textContent = 'Saved employee PDF boundary decision evidence #' + saved.id + '; claims still blocked.';
+    const savedEvidenceId = saved?.evidence?.id ?? saved?.id ?? 'unknown';
+    const successMessage = 'Saved employee PDF boundary decision evidence #' + savedEvidenceId + '; claims still blocked.';
+    if (status) status.textContent = successMessage;
     await refreshEvidence();
     await refreshResolverQueue();
+    const refreshedStatus = document.getElementById('pdfBoundaryDecisionStatus-' + evidenceId);
+    if (refreshedStatus) refreshedStatus.textContent = successMessage;
   } catch (err) {
     if (status) status.textContent = 'Error: ' + err.message;
   }
