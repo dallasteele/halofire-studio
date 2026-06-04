@@ -226,6 +226,20 @@ describe('Workbench supplied bid-truth browser smoke', () => {
       expect(cardText).toContain('claim_gate_effect no_claims_cleared');
       expect(cardText).toContain('Engine result: totalAreaSqFt 88000');
 
+      await page.waitForFunction(() => {
+        const text = document.getElementById('evidence')?.textContent || '';
+        return text.includes('best_effort_ai_layout')
+          && text.includes('replacement_ref 1881://employee-bid-truth/downstream-browser-smoke-001')
+          && text.includes('source_file employee-bid-truth-downstream-browser-smoke.json')
+          && text.includes('employee://bid-truth/downstream-browser-smoke-001');
+      });
+      const evidenceText = await page.locator('#evidence').innerText();
+      expect(evidenceText).toContain('best_effort_ai_layout');
+      expect(evidenceText).toContain('replacement_ref 1881://employee-bid-truth/downstream-browser-smoke-001');
+      expect(evidenceText).toContain('source_file employee-bid-truth-downstream-browser-smoke.json');
+      expect(evidenceText).toContain('Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G6');
+      expect(evidenceText).toContain('employee://bid-truth/downstream-browser-smoke-001');
+
       const [download] = await Promise.all([
         page.waitForEvent('download'),
         page.locator('[data-supplied-bid-truth-downstream-download]').click(),
