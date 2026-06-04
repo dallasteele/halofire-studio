@@ -463,6 +463,44 @@ describe('Workbench room-boundary floor-plan override browser smoke', () => {
       expect(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-source-halofire-sam31-sprinkler-review-decision-evidence-id')).toBe(String(sprinklerDecisionEvidenceId));
       expect(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-downloaded-preliminary-replay-inputs')).toBe('true');
       expect(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-claim-gate-effect')).toBe('no_claims_cleared');
+
+      const defaultReplayFollowup = page.locator(`[data-replay-sam31-consumer-intake-smoke-default-preliminary-replay-followup="${smokeEvidenceId}"]`).first();
+      await defaultReplayFollowup.waitFor({ state: 'attached' });
+      expect(await defaultReplayFollowup.getAttribute('data-source-replay-evidence-id')).toBe(String(savedReplayEvidenceId));
+      expect(await defaultReplayFollowup.getAttribute('data-source-sam31-actual-value-replacement-evidence-id')).toBe(String(replacementEvidenceId));
+      expect(await defaultReplayFollowup.getAttribute('data-source-halofire-sam31-consumer-intake-smoke-followup-review-evidence-id')).toBe(String(followupReviewEvidenceId));
+      expect(await defaultReplayFollowup.getAttribute('data-source-halofire-sam31-sprinkler-review-decision-evidence-id')).toBe(String(sprinklerDecisionEvidenceId));
+      expect(await defaultReplayFollowup.getAttribute('data-claim-gate-effect')).toBe('no_claims_cleared');
+      await defaultReplayFollowup.click();
+      await page.waitForFunction((smokeId) => {
+        const status = document.getElementById(`sam31ConsumerIntakeSmokePreliminaryReplayFollowup-${smokeId}-status`);
+        return status?.dataset.halofireSam31PreliminaryReplayFollowupEvidenceId
+          && status?.dataset.downloadedPreliminaryReplayArtifact === 'true'
+          && Number(status?.dataset.packetQueueItemCount || '0') >= 1;
+      }, String(smokeEvidenceId));
+
+      const replayFollowupStatus = page.locator(`#sam31ConsumerIntakeSmokePreliminaryReplayFollowup-${smokeEvidenceId}-status`);
+      const replayFollowupEvidenceId = String(await replayFollowupStatus.getAttribute('data-halofire-sam31-preliminary-replay-followup-evidence-id') || '');
+      expect(replayFollowupEvidenceId).toMatch(/^\d+$/);
+      expect(await replayFollowupStatus.getAttribute('data-source-replay-evidence-id')).toBe(String(savedReplayEvidenceId));
+      expect(await replayFollowupStatus.getAttribute('data-source-sam31-actual-value-replacement-evidence-id')).toBe(String(replacementEvidenceId));
+      expect(await replayFollowupStatus.getAttribute('data-source-halofire-sam31-consumer-intake-smoke-followup-review-evidence-id')).toBe(String(followupReviewEvidenceId));
+      expect(await replayFollowupStatus.getAttribute('data-source-halofire-sam31-sprinkler-review-decision-evidence-id')).toBe(String(sprinklerDecisionEvidenceId));
+      expect(await replayFollowupStatus.getAttribute('data-downloaded-preliminary-replay-artifact')).toBe('true');
+      expect(await replayFollowupStatus.getAttribute('data-claim-gate-effect')).toBe('no_claims_cleared');
+
+      await page.locator(`#evidence-${replayFollowupEvidenceId}`).waitFor({ state: 'attached' });
+      const replayFollowupRow = await page.locator(`#evidence-${replayFollowupEvidenceId}`).innerText();
+      expect(replayFollowupRow).toContain('halofire_sam31_sprinkler_preliminary_replay_followup_decision');
+      expect(replayFollowupRow).toContain(`source_replay_evidence_id ${savedReplayEvidenceId}`);
+      expect(replayFollowupRow).toContain(`source_sam31_actual_value_replacement_evidence_id ${replacementEvidenceId}`);
+      expect(replayFollowupRow).toContain('halofire.sam31_obstruction_clash_packet_queue_item.v1');
+      expect(replayFollowupRow).toContain('claim_gate_effect no_claims_cleared');
+
+      expect(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-source-halofire-sam31-preliminary-replay-followup-evidence-id')).toBe(String(replayFollowupEvidenceId));
+      expect(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-downloaded-preliminary-replay-artifact')).toBe('true');
+      expect(Number(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-packet-queue-item-count') || '0')).toBeGreaterThanOrEqual(1);
+      expect(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-claim-gate-effect')).toBe('no_claims_cleared');
     } finally {
       await page.close();
     }

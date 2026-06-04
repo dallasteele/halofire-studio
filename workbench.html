@@ -945,13 +945,28 @@ function renderSam31SectionToArtifactsConsumerIntakeSmokeEvidenceDetail(row) {
       }
     });
     const latestFollowupReviewEvidenceId = latestFollowupReviewRow?.id || latestFollowupReviewRow?.evidence_id || '';
+    const latestSprinklerReviewRow = currentEvidenceRows.find((evidenceRow) => {
+      if (!evidenceRow || evidenceRow.evidence_type !== 'halofire_sam31_sprinkler_review_decision') return false;
+      try {
+        const sprinklerPacket = JSON.parse(evidenceRow.notes || '{}');
+        const sprinklerReview = sprinklerPacket.review && typeof sprinklerPacket.review === 'object' ? sprinklerPacket.review : sprinklerPacket;
+        return String(sprinklerReview.source_section_to_artifacts_consumer_intake_smoke_evidence_id || '') === smokeId
+          && String(sprinklerReview.source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id || '') === String(latestFollowupReviewEvidenceId || '');
+      } catch {
+        return false;
+      }
+    });
+    const latestSprinklerReviewEvidenceId = latestSprinklerReviewRow?.id || latestSprinklerReviewRow?.evidence_id || '';
     const replayDefaultFollowupAction = sourceReplayEvidenceId && sourceSam31ReplacementEvidenceId
       ? `<button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#7c2d12" data-replay-sam31-consumer-intake-smoke-default-followup-review="${escapeHtml(row.id)}" data-source-replay-evidence-id="${escapeHtml(sourceReplayEvidenceId)}" data-source-sam31-actual-value-replacement-evidence-id="${escapeHtml(sourceSam31ReplacementEvidenceId)}" data-sam31-consumer-intake-smoke-evidence-id="${escapeHtml(row.id)}" data-claim-gate-effect="no_claims_cleared">Save default HaloFire follow-up review + download sprinkler packet</button>`
       : '';
     const replayDefaultSprinklerAction = sourceReplayEvidenceId && sourceSam31ReplacementEvidenceId && latestFollowupReviewEvidenceId
       ? `<button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0f766e" data-replay-sam31-consumer-intake-smoke-default-sprinkler-review="${escapeHtml(row.id)}" data-source-replay-evidence-id="${escapeHtml(sourceReplayEvidenceId)}" data-source-sam31-actual-value-replacement-evidence-id="${escapeHtml(sourceSam31ReplacementEvidenceId)}" data-source-halofire-sam31-consumer-intake-smoke-followup-review-evidence-id="${escapeHtml(latestFollowupReviewEvidenceId)}" data-claim-gate-effect="no_claims_cleared">Save default sprinkler review + download preliminary replay inputs</button><div class="muted" id="${sprinklerReviewId}-status" style="font-size:11px;margin-top:3px"></div>`
       : '';
-    return `<div class="muted" style="font-size:11px;margin-top:3px">Saved SAM31 section-to-artifacts consumer intake smoke evidence detail: ${escapeHtml(smoke.artifact_type || 'openclaw.sam31.section_to_artifacts_consumer_intake_smoke.v1')}<br>consumer ${escapeHtml(smoke.consumer || 'missing')} - consumer_adapter ${escapeHtml(smoke.consumer_adapter || 'missing')} - status ${escapeHtml(smoke.status || row.status || 'present')}<br>source_replay_evidence_id ${escapeHtml(smoke.source_replay_evidence_id || handoff.source_replay_evidence_id || 'missing')} - source_sam31_actual_value_replacement_evidence_id ${escapeHtml(smoke.source_sam31_actual_value_replacement_evidence_id || 'missing')} - source_openclaw_sam31_consumer_review_evidence_id ${escapeHtml(smoke.source_openclaw_sam31_consumer_review_evidence_id || 'missing')} - source_openclaw_sam31_section_to_artifacts_ref ${escapeHtml(smoke.source_openclaw_sam31_section_to_artifacts_ref || handoff.source_openclaw_sam31_section_to_artifacts_ref || 'missing')}<br>observed_vector_overlay_count ${escapeHtml(smoke.observed_vector_overlay_count ?? handoff.vector_overlay_count ?? 0)} - observed_model_3d_candidate_count ${escapeHtml(smoke.observed_model_3d_candidate_count ?? handoff.model_3d_candidate_count ?? 0)} - observed_segment_count ${escapeHtml(smoke.observed_segment_count ?? handoff.segment_count ?? 0)} - observed_object_hypothesis_count ${escapeHtml(smoke.observed_object_hypothesis_count ?? handoff.object_hypothesis_count ?? 0)}<br>posted_handoff ${escapeHtml(handoff.artifact_type || 'openclaw.sam31.section_to_artifacts_consumer_handoff.v1')} - source_ref ${escapeHtml(row.source_ref || smoke.source_ref || 'missing')} - source_file ${escapeHtml(row.source_file || smoke.source_file || 'missing')}<br>supported_consumers: ${consumers.map((consumer) => `<span class="chip">${escapeHtml(consumer)}</span>`).join('')}<br>use_for_claims false - claim_gate_effect ${escapeHtml(smoke.claim_gate_effect || handoff.claim_gate_effect || 'no_claims_cleared')} - no_claim_gates_cleared true<br>Blocks still active: ${blocked.map((claim) => `<span class="chip">${escapeHtml(claim)}</span>`).join('')}<br>Limitations: ${limitations.map((item) => `<span class="chip">${escapeHtml(item)}</span>`).join('') || '<span class="chip">consumer intake smoke only</span>'}<br><button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#155e75" data-sam31-section-to-artifacts-consumer-intake-smoke-download="${escapeHtml(row.id)}">Download SAM31 consumer intake smoke evidence</button> <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0f766e" data-sam31-section-to-artifacts-consumer-intake-smoke-open-queue="${escapeHtml(row.id)}" data-sam31-section-to-artifacts-consumer-intake-smoke-open-queue-consumer="${escapeHtml(smoke.consumer || '')}" data-sam31-section-to-artifacts-consumer-intake-smoke-open-queue-href="${escapeHtml(queueHref)}">Open filtered queue from consumer intake smoke</button> <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#7c3aed" data-sam31-section-to-artifacts-consumer-intake-smoke-queue-readback-download="${escapeHtml(row.id)}" data-sam31-section-to-artifacts-consumer-intake-smoke-queue-readback-download-consumer="${escapeHtml(smoke.consumer || '')}" data-sam31-section-to-artifacts-consumer-intake-smoke-queue-readback-href="${escapeHtml(queueHref)}">Download filtered queue readback from saved smoke</button> <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#92400e" data-sam31-consumer-intake-smoke-followup-packet="${escapeHtml(row.id)}" data-sam31-consumer-intake-smoke-followup-packet-href="${escapeHtml(followupHref)}">Download HaloFire smoke follow-up packet</button> <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0369a1" data-sam31-consumer-intake-smoke-sprinkler-review-packet="${escapeHtml(row.id)}" data-sam31-consumer-intake-smoke-sprinkler-review-packet-href="${escapeHtml(sprinklerReviewHref)}" data-sam31-consumer-intake-smoke-sprinkler-review-prerequisite="halofire_sam31_consumer_intake_smoke_followup_review_decision">Download HaloFire smoke sprinkler review packet</button> ${replayDefaultFollowupAction} ${replayDefaultSprinklerAction}<br><span class="muted" style="font-size:10px">openclaw.sam31.actual_value_resolver_queue_readback.v1 - consumerIntakeSmokeEvidenceId=${escapeHtml(smokeId)} - halofire.sam31_consumer_intake_smoke_followup_packet.v1 - halofire.sam31_sprinkler_review_packet.v1 - source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id - source-linked sprinkler review/obstruction handoff - prerequisite halofire.sam31_consumer_intake_smoke_followup_review_decision.v1 - claim_gate_effect no_claims_cleared</span><details style="margin-top:6px"><summary class="muted" style="cursor:pointer">Save HaloFire smoke follow-up review</summary><div style="display:grid;gap:6px;margin-top:7px"><select id="${reviewId}-decision" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px"><option value="accepted_internal_alpha_followup">Accepted internal-alpha follow-up</option><option value="rejected_internal_alpha_followup">Rejected internal-alpha follow-up</option><option value="needs_more_evidence">Needs more evidence</option></select><input id="${reviewId}-reviewer" placeholder="reviewer_name" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px"><input id="${reviewId}-ref" placeholder="review_ref" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px"><input id="${reviewId}-screenshot" placeholder="marked_up_screenshot_ref" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px"><textarea id="${reviewId}-issues" placeholder='issue_decisions JSON array for room_boundary_visual_audit / obstruction_or_clash_review' style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px;height:74px"></textarea><textarea id="${reviewId}-notes" placeholder="notes" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px;height:38px"></textarea><button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#7c2d12" data-sam31-consumer-intake-smoke-followup-review="${escapeHtml(row.id)}">Save HaloFire smoke follow-up review</button><div class="muted" id="${reviewId}-status" style="font-size:11px"></div></div></details><span class="muted" style="font-size:10px">halofire.sam31_consumer_intake_smoke_followup_review_decision.v1 - halofire.sam31_consumer_intake_smoke_followup_resolver_queue_item.v1 - latest_halofire_sam31_consumer_intake_smoke_followup_review_decision - sam31_consumer_intake_smoke_followup_resolver_queue_items - use_for_claims false</span></div>`;
+    const replayDefaultReplayFollowupAction = sourceReplayEvidenceId && sourceSam31ReplacementEvidenceId && latestFollowupReviewEvidenceId && latestSprinklerReviewEvidenceId
+      ? `<button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0e7490" data-replay-sam31-consumer-intake-smoke-default-preliminary-replay-followup="${escapeHtml(row.id)}" data-source-replay-evidence-id="${escapeHtml(sourceReplayEvidenceId)}" data-source-sam31-actual-value-replacement-evidence-id="${escapeHtml(sourceSam31ReplacementEvidenceId)}" data-source-halofire-sam31-consumer-intake-smoke-followup-review-evidence-id="${escapeHtml(latestFollowupReviewEvidenceId)}" data-source-halofire-sam31-sprinkler-review-decision-evidence-id="${escapeHtml(latestSprinklerReviewEvidenceId)}" data-claim-gate-effect="no_claims_cleared">Run default preliminary replay + save follow-up queue</button><div class="muted" id="sam31ConsumerIntakeSmokePreliminaryReplayFollowup-${escapeHtml(row.id)}-status" style="font-size:11px;margin-top:3px"></div>`
+      : '';
+    return `<div class="muted" style="font-size:11px;margin-top:3px">Saved SAM31 section-to-artifacts consumer intake smoke evidence detail: ${escapeHtml(smoke.artifact_type || 'openclaw.sam31.section_to_artifacts_consumer_intake_smoke.v1')}<br>consumer ${escapeHtml(smoke.consumer || 'missing')} - consumer_adapter ${escapeHtml(smoke.consumer_adapter || 'missing')} - status ${escapeHtml(smoke.status || row.status || 'present')}<br>source_replay_evidence_id ${escapeHtml(smoke.source_replay_evidence_id || handoff.source_replay_evidence_id || 'missing')} - source_sam31_actual_value_replacement_evidence_id ${escapeHtml(smoke.source_sam31_actual_value_replacement_evidence_id || 'missing')} - source_openclaw_sam31_consumer_review_evidence_id ${escapeHtml(smoke.source_openclaw_sam31_consumer_review_evidence_id || 'missing')} - source_openclaw_sam31_section_to_artifacts_ref ${escapeHtml(smoke.source_openclaw_sam31_section_to_artifacts_ref || handoff.source_openclaw_sam31_section_to_artifacts_ref || 'missing')}<br>observed_vector_overlay_count ${escapeHtml(smoke.observed_vector_overlay_count ?? handoff.vector_overlay_count ?? 0)} - observed_model_3d_candidate_count ${escapeHtml(smoke.observed_model_3d_candidate_count ?? handoff.model_3d_candidate_count ?? 0)} - observed_segment_count ${escapeHtml(smoke.observed_segment_count ?? handoff.segment_count ?? 0)} - observed_object_hypothesis_count ${escapeHtml(smoke.observed_object_hypothesis_count ?? handoff.object_hypothesis_count ?? 0)}<br>posted_handoff ${escapeHtml(handoff.artifact_type || 'openclaw.sam31.section_to_artifacts_consumer_handoff.v1')} - source_ref ${escapeHtml(row.source_ref || smoke.source_ref || 'missing')} - source_file ${escapeHtml(row.source_file || smoke.source_file || 'missing')}<br>supported_consumers: ${consumers.map((consumer) => `<span class="chip">${escapeHtml(consumer)}</span>`).join('')}<br>use_for_claims false - claim_gate_effect ${escapeHtml(smoke.claim_gate_effect || handoff.claim_gate_effect || 'no_claims_cleared')} - no_claim_gates_cleared true<br>Blocks still active: ${blocked.map((claim) => `<span class="chip">${escapeHtml(claim)}</span>`).join('')}<br>Limitations: ${limitations.map((item) => `<span class="chip">${escapeHtml(item)}</span>`).join('') || '<span class="chip">consumer intake smoke only</span>'}<br><button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#155e75" data-sam31-section-to-artifacts-consumer-intake-smoke-download="${escapeHtml(row.id)}">Download SAM31 consumer intake smoke evidence</button> <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0f766e" data-sam31-section-to-artifacts-consumer-intake-smoke-open-queue="${escapeHtml(row.id)}" data-sam31-section-to-artifacts-consumer-intake-smoke-open-queue-consumer="${escapeHtml(smoke.consumer || '')}" data-sam31-section-to-artifacts-consumer-intake-smoke-open-queue-href="${escapeHtml(queueHref)}">Open filtered queue from consumer intake smoke</button> <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#7c3aed" data-sam31-section-to-artifacts-consumer-intake-smoke-queue-readback-download="${escapeHtml(row.id)}" data-sam31-section-to-artifacts-consumer-intake-smoke-queue-readback-download-consumer="${escapeHtml(smoke.consumer || '')}" data-sam31-section-to-artifacts-consumer-intake-smoke-queue-readback-href="${escapeHtml(queueHref)}">Download filtered queue readback from saved smoke</button> <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#92400e" data-sam31-consumer-intake-smoke-followup-packet="${escapeHtml(row.id)}" data-sam31-consumer-intake-smoke-followup-packet-href="${escapeHtml(followupHref)}">Download HaloFire smoke follow-up packet</button> <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0369a1" data-sam31-consumer-intake-smoke-sprinkler-review-packet="${escapeHtml(row.id)}" data-sam31-consumer-intake-smoke-sprinkler-review-packet-href="${escapeHtml(sprinklerReviewHref)}" data-sam31-consumer-intake-smoke-sprinkler-review-prerequisite="halofire_sam31_consumer_intake_smoke_followup_review_decision">Download HaloFire smoke sprinkler review packet</button> ${replayDefaultFollowupAction} ${replayDefaultSprinklerAction} ${replayDefaultReplayFollowupAction}<br><span class="muted" style="font-size:10px">openclaw.sam31.actual_value_resolver_queue_readback.v1 - consumerIntakeSmokeEvidenceId=${escapeHtml(smokeId)} - halofire.sam31_consumer_intake_smoke_followup_packet.v1 - halofire.sam31_sprinkler_review_packet.v1 - source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id - source-linked sprinkler review/obstruction handoff - prerequisite halofire.sam31_consumer_intake_smoke_followup_review_decision.v1 - claim_gate_effect no_claims_cleared</span><details style="margin-top:6px"><summary class="muted" style="cursor:pointer">Save HaloFire smoke follow-up review</summary><div style="display:grid;gap:6px;margin-top:7px"><select id="${reviewId}-decision" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px"><option value="accepted_internal_alpha_followup">Accepted internal-alpha follow-up</option><option value="rejected_internal_alpha_followup">Rejected internal-alpha follow-up</option><option value="needs_more_evidence">Needs more evidence</option></select><input id="${reviewId}-reviewer" placeholder="reviewer_name" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px"><input id="${reviewId}-ref" placeholder="review_ref" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px"><input id="${reviewId}-screenshot" placeholder="marked_up_screenshot_ref" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px"><textarea id="${reviewId}-issues" placeholder='issue_decisions JSON array for room_boundary_visual_audit / obstruction_or_clash_review' style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px;height:74px"></textarea><textarea id="${reviewId}-notes" placeholder="notes" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px;height:38px"></textarea><button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#7c2d12" data-sam31-consumer-intake-smoke-followup-review="${escapeHtml(row.id)}">Save HaloFire smoke follow-up review</button><div class="muted" id="${reviewId}-status" style="font-size:11px"></div></div></details><span class="muted" style="font-size:10px">halofire.sam31_consumer_intake_smoke_followup_review_decision.v1 - halofire.sam31_consumer_intake_smoke_followup_resolver_queue_item.v1 - latest_halofire_sam31_consumer_intake_smoke_followup_review_decision - sam31_consumer_intake_smoke_followup_resolver_queue_items - use_for_claims false</span></div>`;
   } catch {
     return '<div class="muted" style="font-size:11px;margin-top:3px">SAM31 section-to-artifacts consumer intake smoke evidence detail unavailable</div>';
   }
@@ -985,6 +1000,21 @@ function renderHalofireSam31ConsumerIntakeSmokeFollowupReviewEvidenceDetail(row)
   }
 }
 
+function renderHalofireSam31ConsumerIntakeSmokePreliminaryReplayFollowupEvidenceDetail(row) {
+  try {
+    const packet = JSON.parse(row.notes || '{}');
+    const followup = packet.followup && typeof packet.followup === 'object' ? packet.followup : packet;
+    const packetQueueItems = Array.isArray(followup.packet_queue_items) ? followup.packet_queue_items : [];
+    const sourceRefs = Array.isArray(followup.source_refs) ? followup.source_refs : [];
+    const replayRef = sourceRefs.find((ref) => ref && typeof ref === 'object' && Number.isFinite(Number(ref.evidence_id)) && ref.evidence_type === 'best_effort_ai_layout');
+    const actualValueRef = sourceRefs.find((ref) => ref && typeof ref === 'object' && Number.isFinite(Number(ref.evidence_id)) && ref.evidence_type === 'sam31_actual_value_replacement');
+    const blocked = Array.isArray(followup.blocked_claims) ? followup.blocked_claims : [];
+    return `<div class="muted" style="font-size:11px;margin-top:3px">Saved HaloFire SAM31 smoke preliminary replay follow-up detail: ${escapeHtml(followup.artifact_type || 'halofire.sam31_sprinkler_preliminary_replay_followup_decision.v1')}<br>source_section_to_artifacts_consumer_intake_smoke_evidence_id ${escapeHtml(followup.source_section_to_artifacts_consumer_intake_smoke_evidence_id || 'missing')} - source_replay_evidence_id ${escapeHtml(followup.source_replay_evidence_id || replayRef?.evidence_id || 'missing')} - source_sam31_actual_value_replacement_evidence_id ${escapeHtml(followup.source_sam31_actual_value_replacement_evidence_id || actualValueRef?.evidence_id || 'missing')}<br>source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id ${escapeHtml(followup.source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id || 'missing')} - source_halofire_sam31_sprinkler_review_decision_evidence_id ${escapeHtml(followup.source_halofire_sam31_sprinkler_review_decision_evidence_id || 'missing')}<br>followup_decision ${escapeHtml(followup.followup_decision || 'missing')} - packet_queue_items ${escapeHtml(packetQueueItems.length)} - claim_gate_effect ${escapeHtml(followup.claim_gate_effect || 'no_claims_cleared')} - no_claim_gates_cleared true<br>${packetQueueItems.map((item) => `<span class="chip">${escapeHtml(item.artifact_type || 'packet_queue_item')} ${escapeHtml(item.target_packet_lane || item.source_field || 'lane_missing')}</span>`).join('') || '<span class="chip">packet queue missing</span>'}<br>Blocks still active: ${blocked.map((claim) => `<span class="chip">${escapeHtml(claim)}</span>`).join('') || '<span class="chip">claim gates remain blocked</span>'}</div>`;
+  } catch {
+    return '<div class="muted" style="font-size:11px;margin-top:3px">HaloFire SAM31 smoke preliminary replay follow-up detail unavailable</div>';
+  }
+}
+
 function renderRoomBoundaryFloorPlanOverride(packet) {
   const override = packet && packet.floor_plan_override && typeof packet.floor_plan_override === 'object'
     ? packet.floor_plan_override
@@ -1015,6 +1045,9 @@ function evidenceDetail(row) {
   }
   if (row.evidence_type === 'halofire_sam31_consumer_intake_smoke_followup_review_decision') {
     return renderHalofireSam31ConsumerIntakeSmokeFollowupReviewEvidenceDetail(row);
+  }
+  if (row.evidence_type === 'halofire_sam31_sprinkler_preliminary_replay_followup_decision') {
+    return renderHalofireSam31ConsumerIntakeSmokePreliminaryReplayFollowupEvidenceDetail(row);
   }
   if (row.evidence_type === 'sam31_actual_value_replacement') {
     try {
@@ -1321,6 +1354,9 @@ async function refreshEvidence() {
   });
   document.querySelectorAll('[data-replay-sam31-consumer-intake-smoke-default-sprinkler-review]').forEach((button) => {
     button.onclick = () => saveReplaySam31ConsumerIntakeSmokeDefaultSprinklerReview(button.dataset.replaySam31ConsumerIntakeSmokeDefaultSprinklerReview);
+  });
+  document.querySelectorAll('[data-replay-sam31-consumer-intake-smoke-default-preliminary-replay-followup]').forEach((button) => {
+    button.onclick = () => saveReplaySam31ConsumerIntakeSmokeDefaultPreliminaryReplayFollowup(button.dataset.replaySam31ConsumerIntakeSmokeDefaultPreliminaryReplayFollowup);
   });
   document.querySelectorAll('[data-sam31-actual-value-saved-service-descriptor-download]').forEach((button) => {
     button.onclick = () => downloadSavedSam31ActualValueServiceDescriptorEvidence(button.dataset.sam31ActualValueSavedServiceDescriptorDownload);
@@ -2165,6 +2201,98 @@ async function saveReplaySam31ConsumerIntakeSmokeDefaultSprinklerReview(evidence
   }
 }
 
+async function saveReplaySam31ConsumerIntakeSmokeDefaultPreliminaryReplayFollowup(evidenceId = '') {
+  const targetId = String(evidenceId || '').trim();
+  const fieldPrefix = `sam31ConsumerIntakeSmokePreliminaryReplayFollowup-${targetId}`;
+  const status = document.getElementById(`${fieldPrefix}-status`) || document.getElementById('sam31ActualValueQueueStatus');
+  const queueStatus = document.getElementById('sam31ActualValueQueueStatus');
+  const trigger = targetId
+    ? document.querySelector(`[data-replay-sam31-consumer-intake-smoke-default-preliminary-replay-followup="${CSS.escape(targetId)}"]`)
+    : null;
+  const sourceReplayEvidenceId = trigger?.dataset.sourceReplayEvidenceId || '';
+  const sourceSam31ReplacementEvidenceId = trigger?.dataset.sourceSam31ActualValueReplacementEvidenceId || '';
+  const sourceFollowupReviewEvidenceId = trigger?.dataset.sourceHalofireSam31ConsumerIntakeSmokeFollowupReviewEvidenceId || '';
+  const sprinklerReviewEvidenceId = trigger?.dataset.sourceHalofireSam31SprinklerReviewDecisionEvidenceId || '';
+  const stampStatus = (targetStatus, saved, replayArtifact) => {
+    if (!targetStatus) return;
+    const followupId = String(saved?.id || saved?.evidence_id || '');
+    const packetQueueCount = Array.isArray(saved?.packet_queue_items) ? saved.packet_queue_items.length : 0;
+    targetStatus.dataset.halofireSam31PreliminaryReplayFollowupEvidenceId = followupId;
+    targetStatus.dataset.sourceHalofireSam31PreliminaryReplayFollowupEvidenceId = followupId;
+    targetStatus.dataset.sam31ConsumerIntakeSmokeEvidenceId = String(targetId);
+    targetStatus.dataset.sourceReplayEvidenceId = String(sourceReplayEvidenceId);
+    targetStatus.dataset.sourceSam31ActualValueReplacementEvidenceId = String(sourceSam31ReplacementEvidenceId);
+    targetStatus.dataset.sourceHalofireSam31ConsumerIntakeSmokeFollowupReviewEvidenceId = String(sourceFollowupReviewEvidenceId || replayArtifact?.source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id || '');
+    targetStatus.dataset.sourceHalofireSam31SprinklerReviewDecisionEvidenceId = String(sprinklerReviewEvidenceId || replayArtifact?.source_halofire_sam31_sprinkler_review_decision_evidence_id || '');
+    targetStatus.dataset.downloadedPreliminaryReplayArtifact = 'true';
+    targetStatus.dataset.packetQueueItemCount = String(packetQueueCount);
+    targetStatus.dataset.claimGateEffect = 'no_claims_cleared';
+    targetStatus.textContent = 'Downloaded halofire.sam31_sprinkler_preliminary_replay_artifact.v1 and saved default follow-up evidence #' + followupId + ' with ' + packetQueueCount + ' packet queue rows; claim gates remain blocked.';
+  };
+  try {
+    if (!targetId) throw new Error('Saved SAM31 consumer intake smoke evidence id is required.');
+    if (!sprinklerReviewEvidenceId) throw new Error('source_halofire_sam31_sprinkler_review_decision_evidence_id is required.');
+    const replayArtifact = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/openclaw/sam31/section-to-artifacts-consumer-intake-smoke/' + encodeURIComponent(targetId) + '/sprinkler-review-packet/decision/' + encodeURIComponent(sprinklerReviewEvidenceId) + '/preliminary-replay');
+    if (replayArtifact.artifact_type !== 'halofire.sam31_sprinkler_preliminary_replay_artifact.v1') {
+      throw new Error('Unexpected HaloFire smoke preliminary replay artifact type');
+    }
+    const issueCandidates = Array.isArray(replayArtifact.replay_output?.issue_candidates) && replayArtifact.replay_output.issue_candidates.length
+      ? replayArtifact.replay_output.issue_candidates
+      : (Array.isArray(replayArtifact.issue_candidates) && replayArtifact.issue_candidates.length ? replayArtifact.issue_candidates : [{
+        source_field: replayArtifact.issue_type || 'semantic_labels',
+        source_index: 0,
+      }]);
+    const issueDecisions = issueCandidates.map((candidate, index) => {
+      const sourceField = String(candidate.source_field || 'semantic_labels');
+      const isSleeve = sourceField.toLowerCase().includes('sleeve') || sourceField.toLowerCase().includes('firestop');
+      return {
+        source_field: sourceField,
+        source_index: Number.isSafeInteger(Number(candidate.source_index)) ? Number(candidate.source_index) : index,
+        decision: isSleeve ? 'confirmed_internal_sleeve_firestop_packet' : 'confirmed_internal_obstruction_clash_packet',
+        target_packet_lane: isSleeve ? 'sleeve_or_firestop_candidate_review' : 'obstruction_or_clash_review',
+        packet_ref: `halofire://sam31/consumer-intake-smoke/${targetId}/preliminary-replay/default-packet-${index}`,
+        notes: 'Default Workbench preliminary replay follow-up from replay-scoped SAM31 smoke; replace with exact HaloFire employee values when available.',
+      };
+    });
+    downloadJsonPacket(
+      replayArtifact,
+      replayArtifact.download_name || `${currentProjectName().toLowerCase().replace(/[^a-z0-9]+/g, '-')}-sam31-consumer-intake-smoke-preliminary-replay-${targetId}-${sprinklerReviewEvidenceId}.json`,
+      'Downloaded HaloFire smoke preliminary replay artifact before default follow-up; claim gates remain blocked.',
+    );
+    const saved = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/openclaw/sam31/section-to-artifacts-consumer-intake-smoke/' + encodeURIComponent(targetId) + '/sprinkler-review-packet/decision/' + encodeURIComponent(sprinklerReviewEvidenceId) + '/preliminary-replay/followup', {
+      method: 'POST',
+      body: JSON.stringify({
+        followup_decision: issueDecisions[0]?.decision || 'confirmed_internal_obstruction_clash_packet',
+        reviewer_name: 'HaloFire default internal-alpha preliminary replay reviewer',
+        review_ref: `halofire://sam31/consumer-intake-smoke/${targetId}/default-preliminary-replay-followup`,
+        screenshot_ref: `halofire://sam31/consumer-intake-smoke/${targetId}/default-preliminary-replay-followup.png`,
+        console_log_ref: `halofire://sam31/consumer-intake-smoke/${targetId}/default-preliminary-replay-followup-console.log`,
+        issue_decisions: issueDecisions,
+        notes: 'Default Workbench preliminary replay follow-up from replay-scoped SAM31 smoke; packet queue rows are internal-alpha work items only. Claim gates remain blocked.',
+      }),
+    });
+    if (saved.artifact_type !== 'halofire.sam31_sprinkler_preliminary_replay_followup_decision.v1') {
+      throw new Error('Unexpected HaloFire smoke preliminary replay follow-up artifact type');
+    }
+    const replayPacketDecisionInput = document.getElementById(`sam31ConsumerIntakeSmokeReplayFollowupPacket-${targetId}-decisionEvidenceId`);
+    const replayPacketFollowupInput = document.getElementById(`sam31ConsumerIntakeSmokeReplayFollowupPacket-${targetId}-followupEvidenceId`);
+    if (replayPacketDecisionInput) replayPacketDecisionInput.value = sprinklerReviewEvidenceId;
+    if (replayPacketFollowupInput) replayPacketFollowupInput.value = saved.id || saved.evidence_id || '';
+    [status, queueStatus].filter(Boolean).forEach((targetStatus) => stampStatus(targetStatus, saved, replayArtifact));
+    await refreshEvidence();
+    await refreshResolverQueue();
+    await refreshSam31ActualValueQueue();
+    const refreshedReplayPacketDecisionInput = document.getElementById(`sam31ConsumerIntakeSmokeReplayFollowupPacket-${targetId}-decisionEvidenceId`);
+    const refreshedReplayPacketFollowupInput = document.getElementById(`sam31ConsumerIntakeSmokeReplayFollowupPacket-${targetId}-followupEvidenceId`);
+    if (refreshedReplayPacketDecisionInput) refreshedReplayPacketDecisionInput.value = sprinklerReviewEvidenceId;
+    if (refreshedReplayPacketFollowupInput) refreshedReplayPacketFollowupInput.value = saved.id || saved.evidence_id || '';
+    const refreshedStatus = document.getElementById(`${fieldPrefix}-status`) || document.getElementById('sam31ActualValueQueueStatus');
+    [refreshedStatus, document.getElementById('sam31ActualValueQueueStatus')].filter(Boolean).forEach((targetStatus) => stampStatus(targetStatus, saved, replayArtifact));
+  } catch (err) {
+    if (status) status.textContent = 'Error: ' + err.message;
+  }
+}
+
 async function saveHalofireSam31ConsumerIntakeSmokeSprinklerReviewDecision(evidenceId = '') {
   const targetId = String(evidenceId || '').trim();
   const fieldPrefix = `sam31ConsumerIntakeSmokeSprinklerReview-${targetId}`;
@@ -2872,6 +3000,9 @@ async function refreshSam31ActualValueQueue() {
   });
   document.querySelectorAll('[data-replay-sam31-consumer-intake-smoke-default-sprinkler-review]').forEach((button) => {
     button.onclick = () => saveReplaySam31ConsumerIntakeSmokeDefaultSprinklerReview(button.dataset.replaySam31ConsumerIntakeSmokeDefaultSprinklerReview);
+  });
+  document.querySelectorAll('[data-replay-sam31-consumer-intake-smoke-default-preliminary-replay-followup]').forEach((button) => {
+    button.onclick = () => saveReplaySam31ConsumerIntakeSmokeDefaultPreliminaryReplayFollowup(button.dataset.replaySam31ConsumerIntakeSmokeDefaultPreliminaryReplayFollowup);
   });
   document.querySelectorAll('[data-sam31-actual-value-service-descriptor-download]').forEach((button) => {
     button.onclick = () => downloadSam31ActualValueServiceDescriptor(button.dataset.sam31ActualValueServiceDescriptorDownload);
