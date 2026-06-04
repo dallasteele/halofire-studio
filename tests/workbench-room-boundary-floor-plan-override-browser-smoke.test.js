@@ -298,6 +298,50 @@ describe('Workbench room-boundary floor-plan override browser smoke', () => {
       expect(actualValueQueueText).toContain('source_claim_gate_effect gate_cleared_after_explicit_signed_validation');
       expect(actualValueQueueText).toContain('claim_gate_effect no_claims_cleared');
       expect(actualValueQueueText).toContain('no_unrelated_claims_cleared true');
+
+      const defaultReplacement = page.locator(`[data-sam31-actual-value-default-replacement-intake="${auditReadbackEvidenceId}"]`).first();
+      await defaultReplacement.waitFor({ state: 'attached' });
+      const [defaultReplayDownload] = await Promise.all([
+        page.waitForEvent('download'),
+        defaultReplacement.click(),
+      ]);
+      const defaultReplayPath = await defaultReplayDownload.path();
+      expect(defaultReplayDownload.suggestedFilename()).toContain('default-actual-value-replay');
+      expect(defaultReplayPath).toBeTruthy();
+      const defaultReplay = JSON.parse(fs.readFileSync(defaultReplayPath, 'utf8'));
+      expect(defaultReplay).toEqual(expect.objectContaining({
+        artifact_type: 'openclaw.sam31.actual_value_resolver_replay.v1',
+        replay_status: 'default_internal_alpha_intake_saved',
+        source_openclaw_sam31_actual_value_replacement_readback_evidence_id: Number(auditReadbackEvidenceId),
+        source_claim_gate_resolve_audit_evidence_id: Number(savedAuditEvidenceId),
+        claim_gate_effect: 'no_claims_cleared',
+        use_for_claims: false,
+      }));
+      await page.waitForFunction((expected) => {
+        const status = document.getElementById('sam31ActualValueQueueStatus');
+        return Boolean(status?.dataset.sam31ActualValueReplacementEvidenceId)
+          && status?.dataset.sourceOpenclawSam31ActualValueReplacementReadbackEvidenceId === expected.auditReadbackEvidenceId
+          && status?.dataset.sourceClaimGateResolveAuditEvidenceId === expected.savedAuditEvidenceId
+          && status?.dataset.sourceResolvedEvidenceId === expected.approvalValidationEvidenceId
+          && status?.dataset.sourceClaimGateEffect === 'gate_cleared_after_explicit_signed_validation'
+          && status?.dataset.claimGateEffect === 'no_claims_cleared'
+          && status?.dataset.noUnrelatedClaimsCleared === 'true';
+      }, {
+        auditReadbackEvidenceId,
+        savedAuditEvidenceId,
+        approvalValidationEvidenceId: String(approvalValidationDecision.evidence_id),
+      });
+      const defaultReplacementEvidenceId = await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-sam31-actual-value-replacement-evidence-id');
+      expect(defaultReplacementEvidenceId).toMatch(/^\d+$/);
+      await page.locator(`#evidence-${defaultReplacementEvidenceId}`).waitFor({ state: 'attached' });
+      const defaultReplacementText = await page.locator(`#evidence-${defaultReplacementEvidenceId}`).innerText();
+      expect(defaultReplacementText).toContain('sam31_actual_value_replacement');
+      expect(defaultReplacementText).toContain(`source_openclaw_sam31_actual_value_replacement_readback_evidence_id ${auditReadbackEvidenceId}`);
+      expect(defaultReplacementText).toContain(`source_claim_gate_resolve_audit_evidence_id ${savedAuditEvidenceId}`);
+      expect(defaultReplacementText).toContain(`source_resolved_evidence_id ${approvalValidationDecision.evidence_id}`);
+      expect(defaultReplacementText).toContain('source_claim_gate_effect gate_cleared_after_explicit_signed_validation');
+      expect(defaultReplacementText).toContain('no_unrelated_claims_cleared true');
+      expect(defaultReplacementText).toContain('claim_gate_effect no_claims_cleared');
     } finally {
       await page.close();
     }

@@ -395,6 +395,11 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toContain('applySam31ActualValueReadbackAuditContextDataset');
     expect(html).toContain('sourceClaimGateResolveAuditEvidenceId');
     expect(html).toContain('replacementReadbackEvidenceFilterId');
+    expect(html).toContain('Save default exact replacement intake + download replay');
+    expect(html).toContain('data-sam31-actual-value-default-replacement-intake');
+    expect(html).toContain('saveSam31ActualValueDefaultReplacementIntakeFromReadback');
+    expect(html).toContain('workbench.sam31_saved_readback_default_replacement_intake');
+    expect(html).toContain('default_internal_alpha_intake_saved');
     expect(html).toContain('data-sam31-actual-value-evidence-bundle-download');
     expect(html).toContain('data-sam31-actual-value-evidence-record-context');
     expect(html).toContain('downloadSam31ActualValueFilteredQueueReadback');
