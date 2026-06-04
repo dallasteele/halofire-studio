@@ -1593,6 +1593,10 @@ function openClawSam31SectionToArtifactsConsumerIntakeSmokeEvidenceFromRow(row) 
         ...handoff,
         ...parsed,
       }),
+      ...sam31PdfBoundaryDecisionProvenance({
+        ...handoff,
+        ...parsed,
+      }),
       source_openclaw_sam31_section_to_artifacts_ref: parsed.source_openclaw_sam31_section_to_artifacts_ref
         || handoff.source_openclaw_sam31_section_to_artifacts_ref
         || null,
@@ -1933,6 +1937,10 @@ function normalizeSam31ActualValueReplacementIntake(projectName, body, reviewRow
     sourceRefs,
   );
   const sectionToArtifactsSummary = sam31ActualValueSectionArtifactSummary(sectionToArtifacts);
+  const pdfBoundaryProvenance = sam31PdfBoundaryDecisionProvenance({
+    ...prefill,
+    ...body,
+  });
   return {
     kind: 'sam31ActualValueReplacement',
     artifact_type: 'halofire.sam31_actual_value_replacement_intake.v1',
@@ -1943,6 +1951,7 @@ function normalizeSam31ActualValueReplacementIntake(projectName, body, reviewRow
     source_pdf_boundary_evidence_id: body?.source_pdf_boundary_evidence_id || item?.source_pdf_boundary_evidence_id || review.source_pdf_boundary_evidence_id || null,
     source_openclaw_sam31_consumer_review_evidence_id: sourceReviewEvidenceId,
     source_openclaw_sam31_consumer_smoke_evidence_id: body?.source_openclaw_sam31_consumer_smoke_evidence_id || item?.source_openclaw_sam31_consumer_smoke_evidence_id || review.source_openclaw_sam31_consumer_smoke_evidence_id || null,
+    ...pdfBoundaryProvenance,
     source_openclaw_sam31_actual_value_service_descriptor_evidence_id: serviceDescriptorEvidenceId,
     source_actual_value_service_descriptor_ref: serviceDescriptorRef,
     source_actual_value_service_descriptor_file: serviceDescriptorFile,
@@ -2668,6 +2677,7 @@ function openClawSam31SectionToArtifactsConsumerHandoff(item, replacementEvidenc
   const summary = replacementEvidence?.openclaw_sam31_section_to_artifacts_summary || null;
   if (!summary || typeof summary !== 'object') return null;
   const auditProvenance = sam31ActualValueReplacementAuditProvenance(replacementEvidence);
+  const pdfBoundaryProvenance = sam31PdfBoundaryDecisionProvenance(replacementEvidence);
   return {
     artifact_type: 'openclaw.sam31.section_to_artifacts_consumer_handoff.v1',
     status: 'ready_for_consumer_review',
@@ -2676,6 +2686,7 @@ function openClawSam31SectionToArtifactsConsumerHandoff(item, replacementEvidenc
     source_replay_evidence_id: replacementEvidence?.source_replay_evidence_id || null,
     source_sam31_actual_value_replacement_evidence_id: replacementEvidence?.evidence_id || null,
     ...auditProvenance,
+    ...pdfBoundaryProvenance,
     source_openclaw_sam31_section_to_artifacts_ref: summary.section_to_artifacts_contract_ref || null,
     source_refs: uniqueStrings([
       ...(Array.isArray(replacementEvidence?.source_refs) ? replacementEvidence.source_refs : []),
@@ -2757,6 +2768,26 @@ function sam31ActualValueReplacementAuditProvenance(source = {}) {
   };
 }
 
+function sam31PdfBoundaryDecisionProvenance(source = {}) {
+  if (!source || typeof source !== 'object') return {};
+  const prefill = source.actual_value_replacement_prefill
+    && typeof source.actual_value_replacement_prefill === 'object'
+    && !Array.isArray(source.actual_value_replacement_prefill)
+    ? source.actual_value_replacement_prefill
+    : {};
+  const selectedSheetRef = String(source.selected_sheet_ref || prefill.selected_sheet_ref || '').trim() || null;
+  const selectedScaleRef = String(source.selected_scale_ref || prefill.selected_scale_ref || '').trim() || null;
+  const selectedBoundaryCandidateRef = String(
+    source.selected_boundary_candidate_ref || prefill.selected_boundary_candidate_ref || '',
+  ).trim() || null;
+  if (!selectedSheetRef && !selectedScaleRef && !selectedBoundaryCandidateRef) return {};
+  return {
+    selected_sheet_ref: selectedSheetRef,
+    selected_scale_ref: selectedScaleRef,
+    selected_boundary_candidate_ref: selectedBoundaryCandidateRef,
+  };
+}
+
 function buildOpenClawSam31SectionToArtifactsConsumerIntakeSmoke(projectName, intake = {}, user = null) {
   const consumer = String(intake.consumer || '').trim().toLowerCase();
   const supportedConsumers = ['halo_fire', 'landscout', 'nameforge'];
@@ -2800,6 +2831,7 @@ function buildOpenClawSam31SectionToArtifactsConsumerIntakeSmoke(projectName, in
     const synthesizedSummary = synthesizeSam31SectionToArtifactsSummary(replacementEvidence);
     if (replacementEvidence && synthesizedSummary) {
       const auditProvenance = sam31ActualValueReplacementAuditProvenance(replacementEvidence);
+      const pdfBoundaryProvenance = sam31PdfBoundaryDecisionProvenance(replacementEvidence);
       fallbackReplacementEvidence = {
         evidence_id: replacementRow.id,
         source_ref: replacementRow.source_ref || replacementEvidence.source_ref || null,
@@ -2812,6 +2844,7 @@ function buildOpenClawSam31SectionToArtifactsConsumerIntakeSmoke(projectName, in
         source_replay_evidence_id: replacementEvidence.source_replay_evidence_id || null,
         source_openclaw_sam31_consumer_review_evidence_id: replacementEvidence.source_openclaw_sam31_consumer_review_evidence_id || null,
         ...auditProvenance,
+        ...pdfBoundaryProvenance,
         openclaw_sam31_section_to_artifacts_summary: synthesizedSummary,
       };
       fallbackItem = {
@@ -2837,6 +2870,7 @@ function buildOpenClawSam31SectionToArtifactsConsumerIntakeSmoke(projectName, in
     throw err;
   }
   const auditProvenance = sam31ActualValueReplacementAuditProvenance(handoff);
+  const pdfBoundaryProvenance = sam31PdfBoundaryDecisionProvenance(handoff);
   const evidenceSuffix = handoff.source_sam31_actual_value_replacement_evidence_id
     || handoff.source_openclaw_sam31_consumer_review_evidence_id
     || 'unknown';
@@ -2853,6 +2887,7 @@ function buildOpenClawSam31SectionToArtifactsConsumerIntakeSmoke(projectName, in
     source_replay_evidence_id: handoff.source_replay_evidence_id || effectiveItem.source_replay_evidence_id || null,
     source_sam31_actual_value_replacement_evidence_id: handoff.source_sam31_actual_value_replacement_evidence_id || null,
     ...auditProvenance,
+    ...pdfBoundaryProvenance,
     source_openclaw_sam31_section_to_artifacts_ref: handoff.source_openclaw_sam31_section_to_artifacts_ref || null,
     source_refs: uniqueStrings([
       ...(Array.isArray(effectiveItem.source_refs) ? effectiveItem.source_refs : []),
@@ -2909,6 +2944,7 @@ function buildHalofireSam31ConsumerIntakeSmokeFollowupPacket(projectName, smokeE
     'model_3d_candidate_generation',
   ];
   const auditProvenance = sam31ActualValueReplacementAuditProvenance(smokeEvidence);
+  const pdfBoundaryProvenance = sam31PdfBoundaryDecisionProvenance(smokeEvidence);
   const sourceRefs = [
     ...(Array.isArray(smokeEvidence.source_refs) ? smokeEvidence.source_refs : []),
     {
@@ -2955,6 +2991,7 @@ function buildHalofireSam31ConsumerIntakeSmokeFollowupPacket(projectName, smokeE
     source_sam31_actual_value_replacement_evidence_id: smokeEvidence.source_sam31_actual_value_replacement_evidence_id || null,
     source_openclaw_sam31_consumer_review_evidence_id: smokeEvidence.source_openclaw_sam31_consumer_review_evidence_id || null,
     ...auditProvenance,
+    ...pdfBoundaryProvenance,
     source_openclaw_sam31_section_to_artifacts_ref: smokeEvidence.source_openclaw_sam31_section_to_artifacts_ref || null,
     use_for_claims: false,
     claim_gate_effect: 'no_claims_cleared',
@@ -2971,6 +3008,7 @@ function buildHalofireSam31ConsumerIntakeSmokeFollowupPacket(projectName, smokeE
     source_sam31_actual_value_replacement_evidence_id: smokeEvidence.source_sam31_actual_value_replacement_evidence_id || null,
     source_openclaw_sam31_consumer_review_evidence_id: smokeEvidence.source_openclaw_sam31_consumer_review_evidence_id || null,
     ...auditProvenance,
+    ...pdfBoundaryProvenance,
     source_openclaw_sam31_section_to_artifacts_ref: smokeEvidence.source_openclaw_sam31_section_to_artifacts_ref || null,
     source_ref: `halofire://sam31/consumer-intake-smoke-followup/${sourceConsumer}/${evidenceId}`,
     download_name: `${slug}-sam31-consumer-intake-smoke-followup-${sourceConsumer}-${evidenceId}.json`,
@@ -3032,6 +3070,10 @@ function buildHalofireSam31ConsumerIntakeSmokeFollowupResolverRows(projectName, 
     ...sourcePacket,
     ...reviewDecision,
   });
+  const pdfBoundaryProvenance = sam31PdfBoundaryDecisionProvenance({
+    ...sourcePacket,
+    ...reviewDecision,
+  });
   const decisionByIssue = new Map();
   const decisionByLane = new Map();
   for (const decision of issueDecisions) {
@@ -3064,6 +3106,7 @@ function buildHalofireSam31ConsumerIntakeSmokeFollowupResolverRows(projectName, 
       source_sam31_actual_value_replacement_evidence_id: sourcePacket.source_sam31_actual_value_replacement_evidence_id || null,
       source_openclaw_sam31_consumer_review_evidence_id: sourcePacket.source_openclaw_sam31_consumer_review_evidence_id || null,
       ...auditProvenance,
+      ...pdfBoundaryProvenance,
       source_openclaw_sam31_section_to_artifacts_ref: sourcePacket.source_openclaw_sam31_section_to_artifacts_ref || null,
       issue_type: seed.issue_type || issueDecision.issue_type || null,
       supported_sprinkler_review_lane: seed.supported_sprinkler_review_lane || issueDecision.supported_sprinkler_review_lane || null,
@@ -3126,6 +3169,10 @@ function buildHalofireSam31ConsumerIntakeSmokeSprinklerReviewPacket(projectName,
     ...smokeEvidence,
     ...review,
   });
+  const pdfBoundaryProvenance = sam31PdfBoundaryDecisionProvenance({
+    ...smokeEvidence,
+    ...review,
+  });
   const supportedSprinklerReviewLanes = uniqueStrings([
     ...resolverRows.map((row) => row.supported_sprinkler_review_lane).filter(Boolean),
     'room_boundary_visual_audit',
@@ -3180,6 +3227,7 @@ function buildHalofireSam31ConsumerIntakeSmokeSprinklerReviewPacket(projectName,
     source_sam31_actual_value_replacement_evidence_id: smokeEvidence.source_sam31_actual_value_replacement_evidence_id || row.source_sam31_actual_value_replacement_evidence_id || null,
     source_openclaw_sam31_consumer_review_evidence_id: smokeEvidence.source_openclaw_sam31_consumer_review_evidence_id || row.source_openclaw_sam31_consumer_review_evidence_id || null,
     ...auditProvenance,
+    ...pdfBoundaryProvenance,
     source_openclaw_sam31_section_to_artifacts_ref: smokeEvidence.source_openclaw_sam31_section_to_artifacts_ref || row.source_openclaw_sam31_section_to_artifacts_ref || null,
     consumer: sourceConsumer,
     issue_type: row.issue_type || null,
@@ -3275,6 +3323,7 @@ function buildHalofireSam31ConsumerIntakeSmokeSprinklerReviewPacket(projectName,
     source_sam31_actual_value_replacement_evidence_id: smokeEvidence.source_sam31_actual_value_replacement_evidence_id || null,
     source_openclaw_sam31_consumer_review_evidence_id: smokeEvidence.source_openclaw_sam31_consumer_review_evidence_id || null,
     ...auditProvenance,
+    ...pdfBoundaryProvenance,
     source_openclaw_sam31_section_to_artifacts_ref: smokeEvidence.source_openclaw_sam31_section_to_artifacts_ref || null,
     supported_sprinkler_review_lanes: supportedSprinklerReviewLanes,
     issue_seeds: issueSeeds,
@@ -3363,6 +3412,11 @@ function normalizeHalofireSam31ConsumerIntakeSmokeSprinklerReviewDecision(projec
     ...(followupReviewEvidence.review || {}),
     ...sprinklerPacket,
   });
+  const pdfBoundaryProvenance = sam31PdfBoundaryDecisionProvenance({
+    ...smokeEvidence,
+    ...(followupReviewEvidence.review || {}),
+    ...sprinklerPacket,
+  });
   const sourceRefs = [
     {
       evidence_id: smokeEvidence.evidence_id || null,
@@ -3440,6 +3494,7 @@ function normalizeHalofireSam31ConsumerIntakeSmokeSprinklerReviewDecision(projec
     source_sam31_actual_value_replacement_evidence_id: smokeEvidence.source_sam31_actual_value_replacement_evidence_id || null,
     source_openclaw_sam31_consumer_review_evidence_id: smokeEvidence.source_openclaw_sam31_consumer_review_evidence_id || null,
     ...auditProvenance,
+    ...pdfBoundaryProvenance,
     source_openclaw_sam31_section_to_artifacts_ref: smokeEvidence.source_openclaw_sam31_section_to_artifacts_ref || null,
     source_application: 'halo_fire',
     consumer: smokeEvidence.consumer || sprinklerPacket.source_consumer || null,
@@ -3513,6 +3568,11 @@ function buildHalofireSam31ConsumerIntakeSmokePreliminaryReplayInputs(projectNam
     ...(followupReviewEvidence.review || {}),
     ...sprinklerReview,
   });
+  const pdfBoundaryProvenance = sam31PdfBoundaryDecisionProvenance({
+    ...smokeEvidence,
+    ...(followupReviewEvidence.review || {}),
+    ...sprinklerReview,
+  });
   const sourceRefs = uniqueByJson([
     ...(Array.isArray(smokeEvidence.source_refs) ? smokeEvidence.source_refs : []),
     ...(Array.isArray(followupReviewEvidence.review.source_refs) ? followupReviewEvidence.review.source_refs : []),
@@ -3582,6 +3642,7 @@ function buildHalofireSam31ConsumerIntakeSmokePreliminaryReplayInputs(projectNam
     source_sam31_actual_value_replacement_evidence_id: smokeEvidence.source_sam31_actual_value_replacement_evidence_id || sprinklerReview.source_sam31_actual_value_replacement_evidence_id || null,
     source_openclaw_sam31_consumer_review_evidence_id: smokeEvidence.source_openclaw_sam31_consumer_review_evidence_id || sprinklerReview.source_openclaw_sam31_consumer_review_evidence_id || null,
     ...auditProvenance,
+    ...pdfBoundaryProvenance,
     source_openclaw_sam31_section_to_artifacts_ref: smokeEvidence.source_openclaw_sam31_section_to_artifacts_ref || sprinklerReview.source_openclaw_sam31_section_to_artifacts_ref || null,
     consumer: smokeEvidence.consumer || sprinklerReview.consumer || null,
     issue_type: sprinklerReview.issue_type || null,
@@ -3639,6 +3700,7 @@ function buildHalofireSam31ConsumerIntakeSmokePreliminaryReplayArtifact(projectN
     source_sam31_actual_value_replacement_evidence_id: replayInputs.source_sam31_actual_value_replacement_evidence_id,
     source_openclaw_sam31_consumer_review_evidence_id: replayInputs.source_openclaw_sam31_consumer_review_evidence_id,
     ...sam31ActualValueReplacementAuditProvenance(replayInputs),
+    ...sam31PdfBoundaryDecisionProvenance(replayInputs),
     source_openclaw_sam31_section_to_artifacts_ref: replayInputs.source_openclaw_sam31_section_to_artifacts_ref,
     consumer: replayInputs.consumer,
     issue_type: replayInputs.issue_type,
@@ -11352,6 +11414,7 @@ function normalizeHalofireSam31ConsumerIntakeSmokeFollowupReviewDecision(project
     e.httpStatus = 400;
     throw e;
   }
+  const pdfBoundaryProvenance = sam31PdfBoundaryDecisionProvenance(sourcePacket);
   const issueDecisions = Array.isArray(body.issue_decisions)
     ? body.issue_decisions
       .filter((decision) => decision && typeof decision === 'object')
@@ -11376,6 +11439,7 @@ function normalizeHalofireSam31ConsumerIntakeSmokeFollowupReviewDecision(project
     source_sam31_actual_value_replacement_evidence_id: sourcePacket.source_sam31_actual_value_replacement_evidence_id || null,
     source_openclaw_sam31_consumer_review_evidence_id: sourcePacket.source_openclaw_sam31_consumer_review_evidence_id || null,
     ...sam31ActualValueReplacementAuditProvenance(sourcePacket),
+    ...pdfBoundaryProvenance,
     source_openclaw_sam31_section_to_artifacts_ref: sourcePacket.source_openclaw_sam31_section_to_artifacts_ref || null,
     source_consumer: sourcePacket.source_consumer || null,
     target_application: 'halo_fire',
@@ -11721,6 +11785,7 @@ function normalizeHalofireSam31ConsumerIntakeSmokePreliminaryReplayFollowupDecis
     sprinklerReview,
   );
   const auditProvenance = sam31ActualValueReplacementAuditProvenance(replayArtifact);
+  const pdfBoundaryProvenance = sam31PdfBoundaryDecisionProvenance(replayArtifact);
   const followupDecision = String(body.followup_decision || 'confirmed_internal_obstruction_clash_packet').trim().toLowerCase();
   const allowedDecisions = [
     'confirmed_internal_obstruction_clash_packet',
@@ -11775,6 +11840,7 @@ function normalizeHalofireSam31ConsumerIntakeSmokePreliminaryReplayFollowupDecis
     source_sam31_actual_value_replacement_evidence_id: replayArtifact.source_sam31_actual_value_replacement_evidence_id || null,
     source_openclaw_sam31_section_to_artifacts_ref: replayArtifact.source_openclaw_sam31_section_to_artifacts_ref || null,
     ...auditProvenance,
+    ...pdfBoundaryProvenance,
     consumer: replayArtifact.consumer,
     issue_type: replayArtifact.issue_type,
     supported_sprinkler_review_lane: replayArtifact.supported_sprinkler_review_lane,

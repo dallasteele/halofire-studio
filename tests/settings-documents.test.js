@@ -471,6 +471,133 @@ describe('HaloFire settings + documentation upload/link API', () => {
       selected_scale_ref: '1881://operator-scale/sheet-7/0.0833',
       selected_boundary_candidate_ref: 'candidate:1881-sheet-7-outline',
     }));
+
+    const recordRes = await request(actualValueItem.record_actual_value_replacement_action.href, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify(actualValueItem.record_actual_value_replacement_action.request_body),
+    });
+    expect(recordRes.status).toBe(201);
+    const replacement = await recordRes.json();
+    expect(replacement).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.sam31_actual_value_replacement_intake.v1',
+      selected_sheet_ref: '1881://proposal-cooperative/sheet-7',
+      selected_scale_ref: '1881://operator-scale/sheet-7/0.0833',
+      selected_boundary_candidate_ref: 'candidate:1881-sheet-7-outline',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+
+    const smokeRes = await request(`/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/section-to-artifacts-consumer-intake-smoke`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        consumer: 'landscout',
+        source_sam31_actual_value_replacement_evidence_id: replacement.evidence_id,
+      }),
+    });
+    expect(smokeRes.status).toBe(201);
+    const smoke = await smokeRes.json();
+    expect(smoke).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.section_to_artifacts_consumer_intake_smoke.v1',
+      source_sam31_actual_value_replacement_evidence_id: replacement.evidence_id,
+      selected_sheet_ref: '1881://proposal-cooperative/sheet-7',
+      selected_scale_ref: '1881://operator-scale/sheet-7/0.0833',
+      selected_boundary_candidate_ref: 'candidate:1881-sheet-7-outline',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+
+    const followupPacketRes = await request(`/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/section-to-artifacts-consumer-intake-smoke/${smoke.evidence_id}/followup-packet`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(followupPacketRes.status).toBe(200);
+    const followupPacket = await followupPacketRes.json();
+    const followupIssueDecisions = followupPacket.issue_seeds.map((seed) => ({
+      issue_type: seed.issue_type,
+      supported_sprinkler_review_lane: seed.supported_sprinkler_review_lane,
+      decision: 'accepted_internal_alpha_followup',
+      reviewed_values: {
+        selected_sheet_ref: '1881://proposal-cooperative/sheet-7',
+        selected_scale_ref: '1881://operator-scale/sheet-7/0.0833',
+        selected_boundary_candidate_ref: 'candidate:1881-sheet-7-outline',
+      },
+    }));
+    const followupReviewRes = await request(`/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/section-to-artifacts-consumer-intake-smoke/${smoke.evidence_id}/followup-packet/review`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        review_decision: 'accepted_internal_alpha_followup',
+        reviewer_name: 'HaloFire Settings Smoke',
+        review_ref: 'halofire://sam31/1881/default-smoke-followup-review/settings-test',
+        marked_up_screenshot_ref: 'halofire://sam31/1881/default-smoke-followup-review/settings-test.png',
+        issue_decisions: followupIssueDecisions,
+      }),
+    });
+    expect(followupReviewRes.status).toBe(201);
+    const followupReview = await followupReviewRes.json();
+    expect(followupReview).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.sam31_consumer_intake_smoke_followup_review_decision.v1',
+      selected_sheet_ref: '1881://proposal-cooperative/sheet-7',
+      selected_scale_ref: '1881://operator-scale/sheet-7/0.0833',
+      selected_boundary_candidate_ref: 'candidate:1881-sheet-7-outline',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+
+    const sprinklerPacketRes = await request(`/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/section-to-artifacts-consumer-intake-smoke/${smoke.evidence_id}/sprinkler-review-packet`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(sprinklerPacketRes.status).toBe(200);
+    const sprinklerPacket = await sprinklerPacketRes.json();
+    const sprinklerIssue = sprinklerPacket.issue_seeds[0];
+    const sprinklerDecisionRes = await request(`/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/section-to-artifacts-consumer-intake-smoke/${smoke.evidence_id}/sprinkler-review-packet/decision`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        issue_type: sprinklerIssue.issue_type,
+        supported_sprinkler_review_lane: sprinklerIssue.supported_sprinkler_review_lane,
+        review_decision: 'accepted',
+        reviewer_name: 'HaloFire Settings Smoke',
+        review_ref: 'halofire://sam31/1881/default-smoke-sprinkler-review/settings-test',
+        screenshot_ref: 'halofire://sam31/1881/default-smoke-sprinkler-review/settings-test.png',
+        reviewed_values: {
+          selected_sheet_ref: '1881://proposal-cooperative/sheet-7',
+          selected_scale_ref: '1881://operator-scale/sheet-7/0.0833',
+          selected_boundary_candidate_ref: 'candidate:1881-sheet-7-outline',
+        },
+      }),
+    });
+    expect(sprinklerDecisionRes.status).toBe(201);
+    const sprinklerDecision = await sprinklerDecisionRes.json();
+
+    const replayFollowupRes = await request(`/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/section-to-artifacts-consumer-intake-smoke/${smoke.evidence_id}/sprinkler-review-packet/decision/${sprinklerDecision.evidence_id}/preliminary-replay/followup`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        followup_decision: 'confirmed_internal_obstruction_clash_packet',
+        reviewer_name: 'HaloFire Settings Smoke',
+        review_ref: 'halofire://sam31/1881/default-smoke-preliminary-replay-followup/settings-test',
+        screenshot_ref: 'halofire://sam31/1881/default-smoke-preliminary-replay-followup/settings-test.png',
+        console_log_ref: 'halofire://sam31/1881/default-smoke-preliminary-replay-followup/settings-test.log',
+        issue_decisions: [{
+          source_field: 'obstruction_candidates',
+          source_index: 0,
+          decision: 'confirmed_internal_obstruction_clash_packet',
+          target_packet_lane: 'obstruction_or_clash_review',
+          packet_ref: 'halofire://sam31/1881/default-smoke-preliminary-replay-followup/settings-test/packet-0',
+          notes: 'Internal-alpha replay follow-up stays anchored to the selected 1881 sheet and boundary candidate.',
+        }],
+      }),
+    });
+    expect(replayFollowupRes.status).toBe(201);
+    const replayFollowup = await replayFollowupRes.json();
+    expect(replayFollowup).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.sam31_sprinkler_preliminary_replay_followup_decision.v1',
+      selected_sheet_ref: '1881://proposal-cooperative/sheet-7',
+      selected_scale_ref: '1881://operator-scale/sheet-7/0.0833',
+      selected_boundary_candidate_ref: 'candidate:1881-sheet-7-outline',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
   });
 
   it('builds a shared SAM31 actual-value resolver queue with intake status for HaloFire, LandScout, and NameForge', async () => {
