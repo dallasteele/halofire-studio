@@ -272,6 +272,32 @@ describe('Workbench room-boundary floor-plan override browser smoke', () => {
       expect(auditReadbackText).toContain('source_claim_gate_effect gate_cleared_after_explicit_signed_validation');
       expect(auditReadbackText).toContain('claim_gate_effect no_claims_cleared');
       expect(auditReadbackText).toContain('no_unrelated_claims_cleared true');
+
+      const recordExactReplacement = page.locator(`[data-sam31-actual-value-evidence-record-context="${auditReadbackEvidenceId}"]`).first();
+      await recordExactReplacement.waitFor({ state: 'attached' });
+      await recordExactReplacement.click();
+      await page.waitForFunction((expected) => {
+        const status = document.getElementById('sam31ActualValueQueueStatus');
+        const queue = document.getElementById('sam31ActualValueQueue');
+        return status?.dataset.replacementReadbackEvidenceFilterId === expected.auditReadbackEvidenceId
+          && status?.dataset.sourceClaimGateResolveAuditEvidenceId === expected.savedAuditEvidenceId
+          && status?.dataset.sourceResolvedEvidenceId === expected.approvalValidationEvidenceId
+          && status?.dataset.sourceClaimGateEffect === 'gate_cleared_after_explicit_signed_validation'
+          && status?.dataset.claimGateEffect === 'no_claims_cleared'
+          && status?.dataset.noUnrelatedClaimsCleared === 'true'
+          && queue?.dataset.sourceClaimGateResolveAuditEvidenceId === expected.savedAuditEvidenceId;
+      }, {
+        auditReadbackEvidenceId,
+        savedAuditEvidenceId,
+        approvalValidationEvidenceId: String(approvalValidationDecision.evidence_id),
+      });
+      const actualValueQueueText = await page.locator('#sam31ActualValueQueue').innerText();
+      expect(actualValueQueueText).toContain(`replacement_readback_evidence_filter_id ${auditReadbackEvidenceId}`);
+      expect(actualValueQueueText).toContain(`source_claim_gate_resolve_audit_evidence_id ${savedAuditEvidenceId}`);
+      expect(actualValueQueueText).toContain(`source_resolved_evidence_id ${approvalValidationDecision.evidence_id}`);
+      expect(actualValueQueueText).toContain('source_claim_gate_effect gate_cleared_after_explicit_signed_validation');
+      expect(actualValueQueueText).toContain('claim_gate_effect no_claims_cleared');
+      expect(actualValueQueueText).toContain('no_unrelated_claims_cleared true');
     } finally {
       await page.close();
     }
