@@ -11104,6 +11104,7 @@ function buildHalofireSam31SprinklerReplayFollowupPacket(projectName, evidence, 
   }
   const artifactType = halofireSam31SprinklerReplayFollowupPacketArtifactType(queueItem);
   const downloadSlug = halofireSam31SprinklerReplayFollowupPacketDownloadSlug(queueItem);
+  const auditProvenance = sam31ActualValueReplacementAuditProvenance(followup);
   const acceptableEvidence = uniqueStrings([
     ...(Array.isArray(queueItem.acceptable_evidence) ? queueItem.acceptable_evidence : []),
     'source-linked packet JSON',
@@ -11131,6 +11132,7 @@ function buildHalofireSam31SprinklerReplayFollowupPacket(projectName, evidence, 
     source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id: queueItem.source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id || followup.source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id || null,
     source_openclaw_sam31_extrapolation_evidence_id: queueItem.source_openclaw_sam31_extrapolation_evidence_id || followup.source_openclaw_sam31_extrapolation_evidence_id || null,
     source_openclaw_sam31_vector_model_artifact_evidence_id: vectorModelContext.source_openclaw_sam31_vector_model_artifact_evidence_id,
+    ...auditProvenance,
     source_application: followup.source_application || null,
     consumer: followup.consumer || null,
     accepted_queue_id: followup.accepted_queue_id || null,
@@ -11246,6 +11248,7 @@ function normalizeHalofireSam31SprinklerFollowupPacketReviewDecision(projectName
     e.httpStatus = 400;
     throw e;
   }
+  const auditProvenance = sam31ActualValueReplacementAuditProvenance(sourcePacket);
   return {
     artifact_type: HALOFIRE_SAM31_SPRINKLER_FOLLOWUP_PACKET_REVIEW_DECISION_TYPE,
     status: 'present',
@@ -11263,6 +11266,7 @@ function normalizeHalofireSam31SprinklerFollowupPacketReviewDecision(projectName
     source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id: sourcePacket.source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id || null,
     source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id: sourcePacket.source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id || null,
     source_openclaw_sam31_extrapolation_evidence_id: sourcePacket.source_openclaw_sam31_extrapolation_evidence_id || null,
+    ...auditProvenance,
     packet_index: sourcePacket.packet_index,
     target_packet_lane: sourcePacket.target_packet_lane,
     source_field: sourcePacket.source_field,
@@ -11431,6 +11435,10 @@ function normalizeHalofireSam31ApprovalUploadIntake(projectName, sourcePacket, p
   }
   const signoff = normalizeSignedReviewerSignoff(evidenceType, body.signoff);
   const gateCode = halofireSam31ApprovalUploadGateCode(rule.target_approval_lane);
+  const auditProvenance = sam31ActualValueReplacementAuditProvenance({
+    ...sourcePacket,
+    ...packetReview,
+  });
   return {
     artifact_type: HALOFIRE_SAM31_APPROVAL_UPLOAD_INTAKE_TYPE,
     status: 'uploaded_pending_gate_validation',
@@ -11454,6 +11462,7 @@ function normalizeHalofireSam31ApprovalUploadIntake(projectName, sourcePacket, p
     source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id: sourcePacket.source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id || null,
     source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id: sourcePacket.source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id || null,
     source_openclaw_sam31_extrapolation_evidence_id: sourcePacket.source_openclaw_sam31_extrapolation_evidence_id || null,
+    ...auditProvenance,
     packet_index: sourcePacket.packet_index,
     target_packet_lane: sourcePacket.target_packet_lane,
     source_field: sourcePacket.source_field,
@@ -11695,6 +11704,7 @@ function normalizeHalofireSam31ConsumerIntakeSmokePreliminaryReplayFollowupDecis
     sprinklerReviewEvidence,
     sprinklerReview,
   );
+  const auditProvenance = sam31ActualValueReplacementAuditProvenance(replayArtifact);
   const followupDecision = String(body.followup_decision || 'confirmed_internal_obstruction_clash_packet').trim().toLowerCase();
   const allowedDecisions = [
     'confirmed_internal_obstruction_clash_packet',
@@ -11748,6 +11758,7 @@ function normalizeHalofireSam31ConsumerIntakeSmokePreliminaryReplayFollowupDecis
     source_halofire_sam31_sprinkler_review_decision_evidence_id: sprinklerReviewEvidence.id,
     source_sam31_actual_value_replacement_evidence_id: replayArtifact.source_sam31_actual_value_replacement_evidence_id || null,
     source_openclaw_sam31_section_to_artifacts_ref: replayArtifact.source_openclaw_sam31_section_to_artifacts_ref || null,
+    ...auditProvenance,
     consumer: replayArtifact.consumer,
     issue_type: replayArtifact.issue_type,
     supported_sprinkler_review_lane: replayArtifact.supported_sprinkler_review_lane,

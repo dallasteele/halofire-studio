@@ -3875,5 +3875,114 @@ describe('HaloFire settings + documentation upload/link API', () => {
       no_unrelated_claims_cleared: true,
       claim_gate_effect: 'no_claims_cleared',
     }));
+
+    const replayFollowupRes = await request(`/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/section-to-artifacts-consumer-intake-smoke/${smoke.evidence_id}/sprinkler-review-packet/decision/${sprinklerDecision.evidence_id}/preliminary-replay/followup`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        followup_decision: 'confirmed_internal_obstruction_clash_packet',
+        reviewer_name: 'HaloFire Settings Smoke',
+        review_ref: 'halofire://sam31/default-smoke-preliminary-replay-followup/settings-test',
+        screenshot_ref: 'halofire://sam31/default-smoke-preliminary-replay-followup/settings-test.png',
+        console_log_ref: 'halofire://sam31/default-smoke-preliminary-replay-followup/settings-test.log',
+        issue_decisions: [{
+          source_field: 'obstruction_candidates',
+          source_index: 0,
+          decision: 'confirmed_internal_obstruction_clash_packet',
+          target_packet_lane: 'obstruction_or_clash_review',
+          packet_ref: 'halofire://sam31/default-smoke-preliminary-replay-followup/settings-test/packet-0',
+          notes: 'Internal-alpha packet queue item preserves audit provenance for later employee replacement.',
+        }],
+      }),
+    });
+    expect(replayFollowupRes.status).toBe(201);
+    const replayFollowup = await replayFollowupRes.json();
+    expect(replayFollowup).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.sam31_sprinkler_preliminary_replay_followup_decision.v1',
+      source_openclaw_sam31_actual_value_replacement_readback_evidence_id: 777,
+      source_claim_gate_resolve_audit_evidence_id: 778,
+      source_resolved_evidence_id: 779,
+      source_resolved_evidence_ref: 'approval-validation://company-abc/sam31/validated-779',
+      source_resolved_evidence_type: 'halofire_sam31_approval_upload_gate_validation_decision',
+      source_claim_gate_effect: 'gate_cleared_after_explicit_signed_validation',
+      no_unrelated_claims_cleared: true,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+
+    const replayPacketRes = await request(`/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/section-to-artifacts-consumer-intake-smoke/${smoke.evidence_id}/sprinkler-review-packet/decision/${sprinklerDecision.evidence_id}/preliminary-replay/followup/${replayFollowup.evidence_id}/packet/0`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(replayPacketRes.status).toBe(200);
+    const replayPacket = await replayPacketRes.json();
+    expect(replayPacket).toEqual(expect.objectContaining({
+      source_openclaw_sam31_actual_value_replacement_readback_evidence_id: 777,
+      source_claim_gate_resolve_audit_evidence_id: 778,
+      source_resolved_evidence_id: 779,
+      source_resolved_evidence_ref: 'approval-validation://company-abc/sam31/validated-779',
+      source_resolved_evidence_type: 'halofire_sam31_approval_upload_gate_validation_decision',
+      source_claim_gate_effect: 'gate_cleared_after_explicit_signed_validation',
+      no_unrelated_claims_cleared: true,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+
+    const packetReviewRes = await request(`/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/section-to-artifacts-consumer-intake-smoke/${smoke.evidence_id}/sprinkler-review-packet/decision/${sprinklerDecision.evidence_id}/preliminary-replay/followup/${replayFollowup.evidence_id}/packet/0/review`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        review_decision: 'accepted_internal_alpha_packet',
+        reviewer_name: 'HaloFire Settings Smoke',
+        review_ref: 'halofire://sam31/default-smoke-replay-packet-review/settings-test',
+        signed_packet_ref: 'halofire://sam31/default-smoke-replay-packet-review/settings-test-signed-placeholder',
+        marked_up_screenshot_ref: 'halofire://sam31/default-smoke-replay-packet-review/settings-test.png',
+      }),
+    });
+    expect(packetReviewRes.status).toBe(201);
+    const packetReview = await packetReviewRes.json();
+    expect(packetReview).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.sam31_sprinkler_followup_packet_review_decision.v1',
+      source_openclaw_sam31_actual_value_replacement_readback_evidence_id: 777,
+      source_claim_gate_resolve_audit_evidence_id: 778,
+      source_resolved_evidence_id: 779,
+      source_resolved_evidence_ref: 'approval-validation://company-abc/sam31/validated-779',
+      source_resolved_evidence_type: 'halofire_sam31_approval_upload_gate_validation_decision',
+      source_claim_gate_effect: 'gate_cleared_after_explicit_signed_validation',
+      no_unrelated_claims_cleared: true,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+
+    const approvalUploadRes = await request(`/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/section-to-artifacts-consumer-intake-smoke/${smoke.evidence_id}/sprinkler-review-packet/decision/${sprinklerDecision.evidence_id}/preliminary-replay/followup/${replayFollowup.evidence_id}/packet/0/review/${packetReview.id}/approval-upload`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        code: 'HALOFIRE_SAM31_PROFESSIONAL_APPROVAL_UPLOAD_MISSING',
+        target_approval_lane: 'professional_approval',
+        evidence_type: 'professional_review',
+        source_ref: 'halofire://sam31/default-smoke-approval-upload/settings-test',
+        source_file: 'halofire-default-smoke-approval-upload-settings-test.json',
+        status: 'present',
+        signoff: {
+          reviewer_name: 'HaloFire Settings Smoke',
+          reviewer_title: 'Internal Alpha Reviewer',
+          signed_at: '2026-06-04T12:30:00.000Z',
+          organization: 'HaloFire Internal Alpha',
+        },
+      }),
+    });
+    expect(approvalUploadRes.status).toBe(201);
+    const approvalUpload = await approvalUploadRes.json();
+    expect(approvalUpload).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.sam31_approval_upload_intake.v1',
+      source_packet_review_decision_evidence_id: packetReview.id,
+      source_openclaw_sam31_actual_value_replacement_readback_evidence_id: 777,
+      source_claim_gate_resolve_audit_evidence_id: 778,
+      source_resolved_evidence_id: 779,
+      source_resolved_evidence_ref: 'approval-validation://company-abc/sam31/validated-779',
+      source_resolved_evidence_type: 'halofire_sam31_approval_upload_gate_validation_decision',
+      source_claim_gate_effect: 'gate_cleared_after_explicit_signed_validation',
+      no_unrelated_claims_cleared: true,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
   });
 });
