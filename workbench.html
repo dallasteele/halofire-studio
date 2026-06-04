@@ -2598,18 +2598,35 @@ async function saveReplaySam31ConsumerIntakeSmokeDefaultSprinklerReview(evidence
   const fieldPrefix = `sam31ConsumerIntakeSmokeSprinklerReview-${targetId}`;
   const status = document.getElementById(`${fieldPrefix}-status`) || document.getElementById('sam31ActualValueQueueStatus');
   const queueStatus = document.getElementById('sam31ActualValueQueueStatus');
+  const trigger = targetId
+    ? document.querySelector(`[data-replay-sam31-consumer-intake-smoke-default-sprinkler-review="${CSS.escape(targetId)}"]`)
+    : null;
+  const triggerSelected1881 = trigger ? {
+    selected_sheet_ref: trigger.dataset.selectedSheetRef || '',
+    selected_scale_ref: trigger.dataset.selectedScaleRef || '',
+    selected_boundary_candidate_ref: trigger.dataset.selectedBoundaryCandidateRef || '',
+  } : null;
   const stampStatus = (targetStatus, saved, inputs, sprinklerPacket) => {
     if (!targetStatus) return;
     const decisionId = String(saved?.id || saved?.evidence_id || '');
+    const selected1881 = sam31Selected1881Refs(inputs, saved?.review, sprinklerPacket, triggerSelected1881);
+    const selected1881StatusText = hasSam31Selected1881Refs(selected1881)
+      ? ` selected_1881_context selected_sheet_ref ${selected1881.selected_sheet_ref || 'missing'} - selected_scale_ref ${selected1881.selected_scale_ref || 'missing'} - selected_boundary_candidate_ref ${selected1881.selected_boundary_candidate_ref || 'missing'} - use_for_claims false - claim_gate_effect no_claims_cleared.`
+      : ' selected_1881_context missing; employee source refs still required before claim-sensitive review.';
     targetStatus.dataset.halofireSam31SprinklerReviewDecisionEvidenceId = decisionId;
     targetStatus.dataset.sourceHalofireSam31SprinklerReviewDecisionEvidenceId = decisionId;
     targetStatus.dataset.sam31ConsumerIntakeSmokeEvidenceId = String(targetId);
     targetStatus.dataset.sourceReplayEvidenceId = String(inputs?.source_replay_evidence_id || saved?.review?.source_replay_evidence_id || sprinklerPacket?.source_replay_evidence_id || '');
     targetStatus.dataset.sourceSam31ActualValueReplacementEvidenceId = String(inputs?.source_sam31_actual_value_replacement_evidence_id || saved?.review?.source_sam31_actual_value_replacement_evidence_id || sprinklerPacket?.source_sam31_actual_value_replacement_evidence_id || '');
     targetStatus.dataset.sourceHalofireSam31ConsumerIntakeSmokeFollowupReviewEvidenceId = String(inputs?.source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id || saved?.review?.source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id || sprinklerPacket?.source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id || '');
+    if (hasSam31Selected1881Refs(selected1881)) {
+      targetStatus.dataset.selectedSheetRef = selected1881.selected_sheet_ref;
+      targetStatus.dataset.selectedScaleRef = selected1881.selected_scale_ref;
+      targetStatus.dataset.selectedBoundaryCandidateRef = selected1881.selected_boundary_candidate_ref;
+    }
     targetStatus.dataset.downloadedPreliminaryReplayInputs = 'true';
     targetStatus.dataset.claimGateEffect = 'no_claims_cleared';
-    targetStatus.textContent = 'Saved default halofire.sam31_sprinkler_review_decision.v1 evidence #' + decisionId + ' and downloaded preliminary replay inputs; claim gates remain blocked.';
+    targetStatus.textContent = 'Saved default halofire.sam31_sprinkler_review_decision.v1 evidence #' + decisionId + ' and downloaded preliminary replay inputs; claim gates remain blocked.' + selected1881StatusText;
   };
   try {
     if (!targetId) throw new Error('Saved SAM31 consumer intake smoke evidence id is required.');

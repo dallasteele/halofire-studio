@@ -3595,10 +3595,24 @@ function buildHalofireSam31ConsumerIntakeSmokePreliminaryReplayInputs(projectNam
     ...(followupReviewEvidence.review || {}),
     ...sprinklerReview,
   });
+  const sourceReplayEvidenceId = smokeEvidence.source_replay_evidence_id
+    || sprinklerReview.source_replay_evidence_id
+    || reviewedValues.source_replay_evidence_id
+    || null;
+  const sourceSam31ReplacementEvidenceId = smokeEvidence.source_sam31_actual_value_replacement_evidence_id
+    || sprinklerReview.source_sam31_actual_value_replacement_evidence_id
+    || reviewedValues.source_sam31_actual_value_replacement_evidence_id
+    || null;
   const sourceRefs = uniqueByJson([
     ...(Array.isArray(smokeEvidence.source_refs) ? smokeEvidence.source_refs : []),
     ...(Array.isArray(followupReviewEvidence.review.source_refs) ? followupReviewEvidence.review.source_refs : []),
     ...(Array.isArray(sprinklerReview.source_refs) ? sprinklerReview.source_refs : []),
+    Object.keys(pdfBoundaryProvenance).length ? {
+      evidence_type: 'selected_1881_context',
+      ...pdfBoundaryProvenance,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    } : null,
     {
       evidence_id: smokeEvidence.evidence_id || null,
       evidence_type: 'openclaw_sam31_section_to_artifacts_consumer_intake_smoke',
@@ -3661,7 +3675,8 @@ function buildHalofireSam31ConsumerIntakeSmokePreliminaryReplayInputs(projectNam
     source_section_to_artifacts_consumer_intake_smoke_evidence_id: smokeEvidence.evidence_id || null,
     source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id: followupReviewEvidence.evidence.id,
     source_halofire_sam31_sprinkler_review_decision_evidence_id: sprinklerReviewEvidence.id,
-    source_sam31_actual_value_replacement_evidence_id: smokeEvidence.source_sam31_actual_value_replacement_evidence_id || sprinklerReview.source_sam31_actual_value_replacement_evidence_id || null,
+    source_replay_evidence_id: sourceReplayEvidenceId,
+    source_sam31_actual_value_replacement_evidence_id: sourceSam31ReplacementEvidenceId,
     source_openclaw_sam31_consumer_review_evidence_id: smokeEvidence.source_openclaw_sam31_consumer_review_evidence_id || sprinklerReview.source_openclaw_sam31_consumer_review_evidence_id || null,
     ...auditProvenance,
     ...pdfBoundaryProvenance,
