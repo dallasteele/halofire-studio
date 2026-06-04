@@ -1,5 +1,13 @@
 # HaloFire Build Log
 
+## 2026-06-04 - Replay smoke approval validation follow-through
+
+- Added a Workbench one-click validation follow-through on saved `halofire.sam31_approval_upload_intake.v1` evidence rows so employees can download the source-linked `halofire.sam31_approval_upload_gate_validation_packet.v1` and open the pending `sam31ApprovalValidation=pending` resolver queue without copying IDs.
+- The action preserves the approval upload evidence id, source follow-up packet review evidence id, preliminary replay follow-up evidence id, smoke evidence id, sprinkler review decision id, follow-up review id, and `claim_gate_effect: no_claims_cleared` in UI status/readback metadata.
+- Kept the resolver queue summary visible for active filters even when no rows match yet, so the pending validation queue readback is explicit instead of hiding the filter context.
+- Verified red-to-green with `npx vitest run tests/workbench-room-boundary-floor-plan-override-browser-smoke.test.js --reporter=verbose`, plus adjacent `npx vitest run tests/workbench-evidence-detail.test.js --reporter=verbose` and `npx vitest run tests/studio-static-origin.test.js --reporter=verbose`. This is `NO_FORMALIZABLE_CLAIM`; it proves Workbench packet routing and metadata preservation, not professional approval or claim clearance.
+- Still blocked: AutoSprink parity, AHJ approval, PE/professional review, permit readiness, fabrication readiness, manufacturer-exact models, brand readiness, production readiness, survey-grade claims, and engineering-grade claims.
+
 ## 2026-06-04 - Replay smoke approval upload follow-through
 
 - Added a Workbench one-click default professional approval-upload intake from replay-scoped `halofire.sam31_sprinkler_followup_packet_review_decision.v1` evidence rows.

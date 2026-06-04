@@ -579,6 +579,32 @@ describe('Workbench room-boundary floor-plan override browser smoke', () => {
       expect(approvalUploadRow).toContain('uploaded_pending_gate_validation');
       expect(approvalUploadRow).toContain('claim_gate_effect no_claims_cleared');
 
+      const approvalValidation = page.locator(`[data-sam31-approval-upload-default-validation-packet="${approvalUploadEvidenceId}"]`).first();
+      await approvalValidation.waitFor({ state: 'attached' });
+      const approvalValidationQueueHref = `/api/projects/${encodeURIComponent(PROJECT_NAME)}/resolver-queue?sam31ApprovalValidation=pending`;
+      expect(await approvalValidation.getAttribute('data-sam31-approval-upload-evidence-id')).toBe(String(approvalUploadEvidenceId));
+      expect(await approvalValidation.getAttribute('data-source-halofire-sam31-followup-packet-review-evidence-id')).toBe(String(packetReviewEvidenceId));
+      expect(await approvalValidation.getAttribute('data-source-halofire-sam31-preliminary-replay-followup-evidence-id')).toBe(String(replayFollowupEvidenceId));
+      expect(await approvalValidation.getAttribute('data-sam31-approval-validation-filter-href')).toBe(approvalValidationQueueHref);
+      expect(await approvalValidation.getAttribute('data-claim-gate-effect')).toBe('no_claims_cleared');
+      await approvalValidation.click();
+      await page.waitForFunction((approvalUploadId) => {
+        const status = document.getElementById(`sam31ApprovalUploadValidationStatus-${approvalUploadId}`);
+        return status?.dataset.sam31ApprovalUploadEvidenceId === approvalUploadId
+          && status?.dataset.downloadedGateValidationPacket === 'true'
+          && status?.dataset.filteredSam31ApprovalValidationQueue === 'true'
+          && status?.dataset.claimGateEffect === 'no_claims_cleared';
+      }, approvalUploadEvidenceId);
+
+      const approvalValidationStatus = page.locator(`#sam31ApprovalUploadValidationStatus-${approvalUploadEvidenceId}`);
+      expect(await approvalValidationStatus.getAttribute('data-sam31-approval-validation-filter-href')).toBe(approvalValidationQueueHref);
+      expect(await approvalValidationStatus.getAttribute('data-source-halofire-sam31-followup-packet-review-evidence-id')).toBe(String(packetReviewEvidenceId));
+      expect(await approvalValidationStatus.getAttribute('data-source-halofire-sam31-preliminary-replay-followup-evidence-id')).toBe(String(replayFollowupEvidenceId));
+      const resolverQueueText = await page.locator('#resolverQueue').innerText();
+      expect(resolverQueueText).toContain('sam31ApprovalValidationQuickFilter');
+      expect(resolverQueueText).toContain('sam31ApprovalValidation=pending');
+      expect(resolverQueueText).toContain('sam31_approval_validation_pending');
+
       expect(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-source-halofire-sam31-approval-upload-evidence-id')).toBe(String(approvalUploadEvidenceId));
       expect(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-downloaded-gate-validation-packet')).toBe('true');
       expect(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-claim-gate-effect')).toBe('no_claims_cleared');

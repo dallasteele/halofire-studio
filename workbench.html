@@ -1260,7 +1260,10 @@ function evidenceDetail(row) {
       const signoff = intake.signoff || packet.signoff || {};
       const gatePacket = intake.gate_validation_packet_action || {};
       const blocked = Array.isArray(intake.blocked_claims) ? intake.blocked_claims : [];
-      return `<div class="muted" style="font-size:11px;margin-top:3px">SAM31 approval upload intake: ${escapeHtml(intake.artifact_type || 'halofire.sam31_approval_upload_intake.v1')}<br>evidence_type ${escapeHtml(intake.evidence_type || row.evidence_type || 'missing')} - status ${escapeHtml(intake.status || row.status || 'uploaded_pending_gate_validation')} - code ${escapeHtml(intake.code || 'missing')}<br>source_packet_review_decision_evidence_id ${escapeHtml(intake.source_packet_review_decision_evidence_id || 'missing')} - source_followup_decision_evidence_id ${escapeHtml(intake.source_followup_decision_evidence_id || 'missing')} - packet_index ${escapeHtml(intake.packet_index ?? 0)}<br>source_section_to_artifacts_consumer_intake_smoke_evidence_id ${escapeHtml(intake.source_section_to_artifacts_consumer_intake_smoke_evidence_id || 'missing')} - source_halofire_sam31_sprinkler_review_decision_evidence_id ${escapeHtml(intake.source_halofire_sam31_sprinkler_review_decision_evidence_id || 'missing')}<br>${escapeHtml(signoff.reviewer_name || 'unknown reviewer')} - ${escapeHtml(signoff.reviewer_title || 'title missing')} - signed_at ${escapeHtml(signoff.signed_at || 'missing')}<br>gate_validation_packet ${escapeHtml(gatePacket.artifact_type || 'halofire.sam31_approval_upload_gate_validation_packet.v1')} - claim_gate_effect ${escapeHtml(intake.claim_gate_effect || packet.claim_gate_effect || 'no_claims_cleared')} - no_claim_gates_cleared true<br>Blocks still active: ${blocked.map((claim) => `<span class="chip">${escapeHtml(claim)}</span>`).join('') || '<span class="chip">claim gates remain blocked</span>'}</div>`;
+      const approvalUploadEvidenceId = String(row.id || '');
+      const gatePacketHref = gatePacket.href || `/api/projects/${encodeURIComponent(currentProjectName())}/evidence/${encodeURIComponent(approvalUploadEvidenceId)}/openclaw/sam31/approval-upload/gate-validation-packet`;
+      const validationQueueHref = `/api/projects/${encodeURIComponent(currentProjectName())}/resolver-queue?sam31ApprovalValidation=pending`;
+      return `<div class="muted" style="font-size:11px;margin-top:3px">SAM31 approval upload intake: ${escapeHtml(intake.artifact_type || 'halofire.sam31_approval_upload_intake.v1')}<br>evidence_type ${escapeHtml(intake.evidence_type || row.evidence_type || 'missing')} - status ${escapeHtml(intake.status || row.status || 'uploaded_pending_gate_validation')} - code ${escapeHtml(intake.code || 'missing')}<br>source_packet_review_decision_evidence_id ${escapeHtml(intake.source_packet_review_decision_evidence_id || 'missing')} - source_followup_decision_evidence_id ${escapeHtml(intake.source_followup_decision_evidence_id || 'missing')} - packet_index ${escapeHtml(intake.packet_index ?? 0)}<br>source_section_to_artifacts_consumer_intake_smoke_evidence_id ${escapeHtml(intake.source_section_to_artifacts_consumer_intake_smoke_evidence_id || 'missing')} - source_halofire_sam31_sprinkler_review_decision_evidence_id ${escapeHtml(intake.source_halofire_sam31_sprinkler_review_decision_evidence_id || 'missing')}<br>${escapeHtml(signoff.reviewer_name || 'unknown reviewer')} - ${escapeHtml(signoff.reviewer_title || 'title missing')} - signed_at ${escapeHtml(signoff.signed_at || 'missing')}<br>gate_validation_packet ${escapeHtml(gatePacket.artifact_type || 'halofire.sam31_approval_upload_gate_validation_packet.v1')} - claim_gate_effect ${escapeHtml(intake.claim_gate_effect || packet.claim_gate_effect || 'no_claims_cleared')} - no_claim_gates_cleared true<br>Blocks still active: ${blocked.map((claim) => `<span class="chip">${escapeHtml(claim)}</span>`).join('') || '<span class="chip">claim gates remain blocked</span>'}<br><button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#4338ca" data-sam31-approval-upload-default-validation-packet="${escapeHtml(approvalUploadEvidenceId)}" data-sam31-approval-upload-evidence-id="${escapeHtml(approvalUploadEvidenceId)}" data-sam31-approval-upload-gate-validation-packet-href="${escapeHtml(gatePacketHref)}" data-sam31-approval-validation-filter-href="${escapeHtml(validationQueueHref)}" data-source-halofire-sam31-followup-packet-review-evidence-id="${escapeHtml(intake.source_packet_review_decision_evidence_id || '')}" data-source-halofire-sam31-preliminary-replay-followup-evidence-id="${escapeHtml(intake.source_followup_decision_evidence_id || '')}" data-sam31-consumer-intake-smoke-evidence-id="${escapeHtml(intake.source_section_to_artifacts_consumer_intake_smoke_evidence_id || '')}" data-source-halofire-sam31-sprinkler-review-decision-evidence-id="${escapeHtml(intake.source_halofire_sam31_sprinkler_review_decision_evidence_id || '')}" data-source-halofire-sam31-consumer-intake-smoke-followup-review-evidence-id="${escapeHtml(intake.source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id || '')}" data-claim-gate-effect="no_claims_cleared">Download validation packet + open pending queue</button><div class="muted" id="sam31ApprovalUploadValidationStatus-${escapeHtml(approvalUploadEvidenceId)}" style="font-size:11px;margin-top:3px"></div></div>`;
     }
     if (packet.kind === 'signed_reviewer_evidence') {
       const signoff = packet.signoff || {};
@@ -4731,6 +4734,50 @@ async function downloadHalofireSam31ApprovalUploadGateValidationPacket(href) {
   URL.revokeObjectURL(a.href);
 }
 
+async function openSam31ApprovalUploadDefaultValidationPacket(approvalUploadEvidenceId = '') {
+  const targetId = String(approvalUploadEvidenceId || '').trim();
+  const trigger = targetId
+    ? document.querySelector(`[data-sam31-approval-upload-default-validation-packet="${CSS.escape(targetId)}"]`)
+    : null;
+  const status = document.getElementById(`sam31ApprovalUploadValidationStatus-${targetId}`) || document.getElementById('resolverQueue') || document.getElementById('evidence');
+  const gateHref = trigger?.dataset.sam31ApprovalUploadGateValidationPacketHref || '';
+  const validationQueueHref = trigger?.dataset.sam31ApprovalValidationFilterHref || `/api/projects/${encodeURIComponent(currentProjectName())}/resolver-queue?sam31ApprovalValidation=pending`;
+  const packetReviewEvidenceId = trigger?.dataset.sourceHalofireSam31FollowupPacketReviewEvidenceId || '';
+  const replayFollowupEvidenceId = trigger?.dataset.sourceHalofireSam31PreliminaryReplayFollowupEvidenceId || '';
+  const stampStatus = (targetStatus, gatePacket) => {
+    if (!targetStatus) return;
+    targetStatus.dataset.sam31ApprovalUploadEvidenceId = targetId;
+    targetStatus.dataset.sam31ApprovalValidationFilterHref = validationQueueHref;
+    targetStatus.dataset.sourceHalofireSam31FollowupPacketReviewEvidenceId = packetReviewEvidenceId;
+    targetStatus.dataset.sourceHalofireSam31PreliminaryReplayFollowupEvidenceId = replayFollowupEvidenceId;
+    targetStatus.dataset.sam31ConsumerIntakeSmokeEvidenceId = trigger?.dataset.sam31ConsumerIntakeSmokeEvidenceId || '';
+    targetStatus.dataset.sourceHalofireSam31SprinklerReviewDecisionEvidenceId = trigger?.dataset.sourceHalofireSam31SprinklerReviewDecisionEvidenceId || '';
+    targetStatus.dataset.sourceHalofireSam31ConsumerIntakeSmokeFollowupReviewEvidenceId = trigger?.dataset.sourceHalofireSam31ConsumerIntakeSmokeFollowupReviewEvidenceId || '';
+    targetStatus.dataset.downloadedGateValidationPacket = gatePacket?.artifact_type === 'halofire.sam31_approval_upload_gate_validation_packet.v1' ? 'true' : 'false';
+    targetStatus.dataset.filteredSam31ApprovalValidationQueue = resolverQueueFilterQuery === 'sam31ApprovalValidation=pending' ? 'true' : 'false';
+    targetStatus.dataset.claimGateEffect = 'no_claims_cleared';
+    targetStatus.textContent = `Downloaded SAM31 approval upload gate-validation packet for evidence #${targetId} and opened pending validation queue; claim gates remain blocked.`;
+  };
+  try {
+    if (!targetId) throw new Error('SAM31 approval upload evidence id is required.');
+    if (!gateHref) throw new Error('SAM31 approval upload gate-validation packet href is required.');
+    const gatePacket = await api(String(gateHref).replace(/^\/api/, ''));
+    if (gatePacket.artifact_type !== 'halofire.sam31_approval_upload_gate_validation_packet.v1') {
+      throw new Error('Unexpected SAM31 approval upload gate-validation packet artifact type');
+    }
+    downloadJsonPacket(
+      gatePacket,
+      gatePacket.download_name || `${currentProjectName().toLowerCase().replace(/[^a-z0-9]+/g, '-')}-sam31-approval-upload-${targetId}-gate-validation-packet.json`,
+      'Downloaded SAM31 approval upload gate validation packet; claim gates remain blocked until explicit validation.',
+    );
+    resolverQueueFilterQuery = 'sam31ApprovalValidation=pending';
+    await refreshResolverQueue();
+    stampStatus(document.getElementById(`sam31ApprovalUploadValidationStatus-${targetId}`) || status, gatePacket);
+  } catch (err) {
+    if (status) status.textContent = 'Error: ' + err.message;
+  }
+}
+
 async function resolveHalofireSam31ApprovalUploadGate(gateCode, evidenceId, statusId) {
   const status = document.getElementById(statusId);
   try {
@@ -5179,7 +5226,9 @@ async function refreshResolverQueue() {
   </div>${roomBoundaryQuickFilter(summary, activeQuery)}${sam31ActualValueQuickFilter(summary, activeQuery)}${sam31ApprovalValidationQuickFilter(summary, activeQuery)}${claimGateAuditQuickFilter(summary, activeQuery)}${catalogApprovalQuickFilter(summary, activeQuery)}`;
   document.getElementById('resolverQueue').innerHTML = queue.items && queue.items.length
     ? summaryHtml + queue.items.map((item, index) => resolverQueueDetail(item, index)).join('')
-    : '<span class="muted">No resolver queue rows yet. Save a PDF boundary decision for room_boundary_visual_audit, record official_flow_intake, or run catalog acquisition for catalog_vendor_acquisition.</span>';
+    : (activeQuery
+      ? summaryHtml + '<span class="muted">No resolver queue rows match this filter yet. Claim gates remain blocked until matching evidence is validated.</span>'
+      : '<span class="muted">No resolver queue rows yet. Save a PDF boundary decision for room_boundary_visual_audit, record official_flow_intake, or run catalog acquisition for catalog_vendor_acquisition.</span>');
   bindCatalogSourceEvidenceButtons();
   document.querySelectorAll('[data-resolver-queue-filter]').forEach((button) => {
     button.onclick = async () => {
@@ -5364,6 +5413,11 @@ async function refreshResolverQueue() {
   document.querySelectorAll('[data-sam31-approval-upload-gate-validation-packet-href]').forEach((button) => {
     button.onclick = () => downloadHalofireSam31ApprovalUploadGateValidationPacket(
       button.dataset.sam31ApprovalUploadGateValidationPacketHref,
+    );
+  });
+  document.querySelectorAll('[data-sam31-approval-upload-default-validation-packet]').forEach((button) => {
+    button.onclick = () => openSam31ApprovalUploadDefaultValidationPacket(
+      button.dataset.sam31ApprovalUploadDefaultValidationPacket,
     );
   });
   document.querySelectorAll('[data-sam31-consumer-review-save-evidence-id]').forEach((button) => {
