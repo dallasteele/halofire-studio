@@ -478,6 +478,24 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toMatch(/openOpenClawSam31ProductOwnerReplacementIntake[\s\S]*await refreshResolverQueue\(\);\s*await refreshSam31ActualValueQueue\(\);[\s\S]*Opened product_owner_replacement_intake evidence/);
   });
 
+  it('surfaces selected 1881 refs on replay-scoped smoke and sprinkler evidence readbacks', async () => {
+    const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
+    expect(shell.status).toBe(200);
+    const html = await shell.text();
+    expect(html).toContain('renderSam31Selected1881SourceRefs');
+    expect(html).toContain('selected_1881_context');
+    expect(html).toContain('data-selected-sheet-ref');
+    expect(html).toContain('data-selected-scale-ref');
+    expect(html).toContain('data-selected-boundary-candidate-ref');
+    expect(html).toMatch(/renderSam31SectionToArtifactsConsumerIntakeSmokeEvidenceDetail[\s\S]*renderSam31Selected1881SourceRefs/);
+    expect(html).toMatch(/renderHalofireSam31ConsumerIntakeSmokeFollowupReviewEvidenceDetail[\s\S]*renderSam31Selected1881SourceRefs/);
+    expect(html).toMatch(/renderHalofireSam31ConsumerIntakeSmokePreliminaryReplayFollowupEvidenceDetail[\s\S]*renderSam31Selected1881SourceRefs/);
+    expect(html).toMatch(/renderHalofireSam31ConsumerIntakeSmokeFollowupPacketReviewEvidenceDetail[\s\S]*renderSam31Selected1881SourceRefs/);
+    expect(html).toMatch(/data-replay-sam31-consumer-intake-smoke-default-sprinkler-review[\s\S]*\$\{selected1881DataAttrs\}/);
+    expect(html).toMatch(/data-replay-sam31-consumer-intake-smoke-default-preliminary-replay-followup[\s\S]*\$\{selected1881DataAttrs\}/);
+    expect(html).toContain('no_claims_cleared');
+  });
+
   it('surfaces SAM31 sectioning downstream resolver rows and filter links in the workbench', async () => {
     const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
     expect(shell.status).toBe(200);
