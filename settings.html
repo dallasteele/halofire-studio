@@ -1096,7 +1096,7 @@ async function downloadSettingsResolvedGateAudit(index) {
   try {
     msg.className = 'muted';
     msg.textContent = 'downloading resolved-gate audit packet...';
-    const packet = await api(href);
+    const packet = await api(apiPathFromHref(href));
     if (packet.artifact_type !== 'halofire.claim_gate_resolve_audit_packet.v1') {
       throw new Error('Unexpected resolved-gate audit packet type');
     }

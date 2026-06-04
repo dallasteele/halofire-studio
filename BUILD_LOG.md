@@ -1,5 +1,12 @@
 # HaloFire Build Log
 
+## 2026-06-03 - Settings resolved-gate audit download fix
+
+- Fixed the Settings resolved signed-reviewer audit download path to normalize stored `/api/...` hrefs before calling the local API helper, so the page no longer requests a broken `/api/api/...` route when downloading cleared-gate audit packets.
+- Added a focused Playwright browser smoke that resolves a signed AHJ evidence row, opens [`settings.html`](C:/Users/dalla/OneDrive/Documents/HaloFire/settings.html), proves the resolved-gate row renders, and verifies the audit-packet download status updates with `claim_gate_effect gate_cleared_after_explicit_signed_validation`.
+- Verified with `npx vitest run tests/settings-evidence-wizard-static.test.js tests/settings-signed-reviewer-browser-smoke.test.js`, `C:/Python312/python.exe E:/ClaudeBot/scripts/verify_agentic_rules.py`, and `git diff --check`.
+- Still blocked: AutoSprink parity, AHJ approval beyond explicit signed evidence for one gate lane, PE/professional review, permit readiness, fabrication readiness, manufacturer-exact models, brand readiness, production readiness, survey-grade claims, and engineering-grade claims.
+
 ## 2026-06-03 - Replay-scoped SAM31 queue isolation
 
 - Changed `openclaw.sam31.actual_value_resolver_queue` and readback packets so `sourceReplayEvidenceId` filters replay replacement queue items, exposes `source_replay_evidence_filter_id`, and preserves the same scope in filtered replacement-readback download hrefs.

@@ -183,4 +183,60 @@ describe('Settings signed reviewer browser smoke', () => {
       await page.close();
     }
   }, 30_000);
+
+  it('renders resolved signed-reviewer gates in Settings and downloads the resolved-gate audit packet', async () => {
+    const token = await adminToken();
+    const recorded = await api(`${PROJECT_PATH}/evidence`, token, {
+      method: 'POST',
+      body: JSON.stringify({
+        evidence_type: 'ahj_approval',
+        target_gate_code: 'AHJ_APPROVAL_MISSING',
+        source_ref: 'Resolved signed reviewer packet AHJ-1881-900',
+        source_file: 'resolved-signed-reviewer-ahj.pdf',
+        status: 'present',
+        notes: 'Resolved signed reviewer browser smoke packet.',
+        signoff: {
+          reviewer_name: 'Jordan Lee',
+          reviewer_title: 'Fire Marshal',
+          signed_at: '2026-06-03T22:10:00.000Z',
+          organization: 'Salt Lake City',
+        },
+      }),
+    });
+    await api(`${PROJECT_PATH}/claim-gates/AHJ_APPROVAL_MISSING/resolve`, token, {
+      method: 'POST',
+      body: JSON.stringify({ evidence_id: recorded.id }),
+    });
+
+    const page = await browser.newPage();
+    page.setDefaultTimeout(8000);
+    await page.addInitScript((authToken) => {
+      localStorage.setItem('halofire_token', authToken);
+    }, token);
+
+    try {
+      await page.goto(`${BASE}/settings.html`, { waitUntil: 'domcontentloaded' });
+      const gateRow = page.locator('[data-settings-resolved-gate-code="AHJ_APPROVAL_MISSING"]').first();
+      await gateRow.waitFor();
+      const gateRowText = await gateRow.innerText();
+      expect(gateRowText).toContain('Resolved signed reviewer packet AHJ-1881-900');
+      expect(gateRowText).toContain('gate_cleared_after_explicit_signed_validation');
+      expect(gateRowText).toContain('no_unrelated_claims_cleared true');
+      expect(gateRowText).toContain('halofire.claim_gate_resolve_audit_packet.v1');
+      expect(await gateRow.getAttribute('data-settings-resolved-gate-audit-href')).toBe(
+        `${PROJECT_PATH}/claim-gates/AHJ_APPROVAL_MISSING/resolve-audit-packet`,
+      );
+
+      await gateRow.locator('[data-settings-resolved-gate-audit-download]').click();
+      await page.waitForFunction(() => {
+        const text = document.getElementById('settingsResolvedSignedReviewerGatesMsg')?.textContent || '';
+        return text.includes('downloaded halofire.claim_gate_resolve_audit_packet.v1');
+      });
+      expect(await page.locator('#settingsResolvedSignedReviewerGatesMsg').innerText()).toContain(
+        'claim_gate_effect gate_cleared_after_explicit_signed_validation',
+      );
+    } finally {
+      await page.close();
+    }
+  }, 30_000);
 });
