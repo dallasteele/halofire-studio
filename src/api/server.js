@@ -4834,26 +4834,62 @@ app.post('/api/projects/:name/openclaw/sam31/actual-value-replacements/evidence'
       || req.body?.source_openclaw_sam31_actual_value_service_descriptor_evidence_id
       || req.query?.serviceDescriptorEvidenceId
       || req.query?.service_descriptor_evidence_id;
+    const sourceReplayEvidenceId = Number(req.body?.sourceReplayEvidenceId
+      || req.body?.source_replay_evidence_id
+      || req.query?.sourceReplayEvidenceId
+      || req.query?.source_replay_evidence_id
+      || 0) || null;
     const replacementReadback = buildOpenClawSam31ActualValueReplacementReadback(projectName, {
       consumer: requestedConsumer,
       contractEvidenceId,
       serviceDescriptorEvidenceId,
+      sourceReplayEvidenceId,
     });
+    const replayReplacementDetails = Array.isArray(replacementReadback.replay_replacement_details)
+      ? replacementReadback.replay_replacement_details
+      : [];
+    const sourceReplayDetail = sourceReplayEvidenceId
+      ? replayReplacementDetails.find((detail) => Number(detail?.source_replay_evidence_id || 0) === sourceReplayEvidenceId) || replayReplacementDetails[0] || null
+      : replayReplacementDetails[0] || null;
+    const sourceReplayPacket = sourceReplayDetail?.source_actual_value_handoff?.source_replay_packet
+      && typeof sourceReplayDetail.source_actual_value_handoff.source_replay_packet === 'object'
+      ? sourceReplayDetail.source_actual_value_handoff.source_replay_packet
+      : {};
+    const projectTruth = sourceReplayDetail?.project_truth && typeof sourceReplayDetail.project_truth === 'object'
+      ? jsonClone(sourceReplayDetail.project_truth)
+      : (sourceReplayPacket.project_truth && typeof sourceReplayPacket.project_truth === 'object' ? jsonClone(sourceReplayPacket.project_truth) : null);
+    const selectedSheetRef = sourceReplayDetail?.selected_sheet_ref || sourceReplayPacket.selected_sheet_ref || null;
+    const selectedScaleRef = sourceReplayDetail?.selected_scale_ref || sourceReplayPacket.selected_scale_ref || null;
+    const selectedBoundaryCandidateRef = sourceReplayDetail?.selected_boundary_candidate_ref || sourceReplayPacket.selected_boundary_candidate_ref || null;
     const contractId = replacementReadback.source_openclaw_sam31_actual_value_resolver_contract_evidence_id || null;
     const descriptorId = replacementReadback.service_descriptor_evidence_filter_id || null;
     const sourceConsumer = replacementReadback.requested_consumer || requestedConsumer || 'all-consumers';
     const sourceRefParts = [`openclaw://sam31/actual-value-replacements/${sourceConsumer}`];
+    if (sourceReplayEvidenceId) sourceRefParts.push(`source-replay-evidence/${sourceReplayEvidenceId}`);
     if (descriptorId) sourceRefParts.push(`service-descriptor-evidence/${descriptorId}`);
     if (contractId) sourceRefParts.push(`contract-evidence/${contractId}`);
     const sourceRef = sourceRefParts.join('/');
     const slug = projectName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'halofire-project';
-    const sourceFile = `${slug}-sam31-actual-value-replacement-readback-${sourceConsumer}${descriptorId ? `-service-descriptor-${descriptorId}` : ''}${contractId ? `-contract-${contractId}` : ''}.json`;
+    const sourceFile = `${slug}-sam31-actual-value-replacement-readback-${sourceConsumer}${sourceReplayEvidenceId ? `-source-replay-${sourceReplayEvidenceId}` : ''}${descriptorId ? `-service-descriptor-${descriptorId}` : ''}${contractId ? `-contract-${contractId}` : ''}.json`;
+    const sourceRefs = uniqueByJson([
+      ...(Array.isArray(sourceReplayDetail?.source_refs) ? jsonClone(sourceReplayDetail.source_refs) : []),
+      ...(Array.isArray(sourceReplayDetail?.source_actual_value_handoff?.source_refs) ? jsonClone(sourceReplayDetail.source_actual_value_handoff.source_refs) : []),
+      ...(Array.isArray(sourceReplayDetail?.source_actual_value_handoff?.source_replay_packet?.source_refs) ? jsonClone(sourceReplayDetail.source_actual_value_handoff.source_replay_packet.source_refs) : []),
+    ]);
     const notes = {
       kind: 'openclaw_sam31_actual_value_replacement_readback',
       artifact_type: replacementReadback.artifact_type,
       replacement_readback: replacementReadback,
       source_openclaw_sam31_actual_value_resolver_contract_evidence_id: contractId,
       source_openclaw_sam31_actual_value_service_descriptor_evidence_id: descriptorId,
+      source_replay_evidence_filter_id: replacementReadback.source_replay_evidence_filter_id || sourceReplayEvidenceId,
+      source_replay_evidence_id: sourceReplayDetail?.source_replay_evidence_id || sourceReplayEvidenceId,
+      source_supplied_document_bid_truth_replacement_evidence_id: sourceReplayDetail?.source_supplied_document_bid_truth_replacement_evidence_id || null,
+      selected_sheet_ref: selectedSheetRef,
+      selected_scale_ref: selectedScaleRef,
+      selected_boundary_candidate_ref: selectedBoundaryCandidateRef,
+      project_truth: projectTruth,
+      source_refs: sourceRefs,
       latest_actual_value_service_descriptor_evidence: replacementReadback.latest_actual_value_service_descriptor_evidence || null,
       requested_consumer: replacementReadback.requested_consumer,
       source_queue_route: replacementReadback.source_queue_route,
@@ -4900,6 +4936,14 @@ app.post('/api/projects/:name/openclaw/sam31/actual-value-replacements/evidence'
       source_ref: sourceRef,
       source_openclaw_sam31_actual_value_resolver_contract_evidence_id: contractId,
       source_openclaw_sam31_actual_value_service_descriptor_evidence_id: descriptorId,
+      source_replay_evidence_filter_id: replacementReadback.source_replay_evidence_filter_id || sourceReplayEvidenceId,
+      source_replay_evidence_id: sourceReplayDetail?.source_replay_evidence_id || sourceReplayEvidenceId,
+      source_supplied_document_bid_truth_replacement_evidence_id: sourceReplayDetail?.source_supplied_document_bid_truth_replacement_evidence_id || null,
+      selected_sheet_ref: selectedSheetRef,
+      selected_scale_ref: selectedScaleRef,
+      selected_boundary_candidate_ref: selectedBoundaryCandidateRef,
+      project_truth: projectTruth,
+      source_refs: sourceRefs,
       message: 'SAM31 actual-value replacement readback saved as attachable evidence; claims still blocked',
       evidence: evidenceRow,
       replacement_readback: replacementReadback,

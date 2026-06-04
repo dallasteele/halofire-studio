@@ -399,6 +399,82 @@ describe('Workbench supplied bid-truth browser smoke', () => {
       expect(savedLayoutReplacementText).toContain('source_status employee_replacement_recorded');
       expect(savedLayoutReplacementText).toContain('claim_gate_effect no_claims_cleared');
 
+      const savedLayoutReplacementReadback = await api(`${PROJECT_PATH}/openclaw/sam31/actual-value-replacements/evidence`, token, {
+        method: 'POST',
+        body: JSON.stringify({
+          consumer: 'halo_fire',
+          sourceReplayEvidenceId: savedLayout.id,
+        }),
+      });
+      expect(savedLayoutReplacementReadback).toEqual(expect.objectContaining({
+        evidence_type: 'openclaw_sam31_actual_value_replacement_readback',
+        source_replay_evidence_filter_id: savedLayout.id,
+        source_replay_evidence_id: savedLayout.id,
+        source_supplied_document_bid_truth_replacement_evidence_id: replacement.evidence.id,
+        selected_sheet_ref: '1881://proposal-cooperative/sheet-7',
+        selected_scale_ref: '1881://operator-scale/sheet-7/0.0833',
+        selected_boundary_candidate_ref: 'candidate:1881-sheet-7-outline',
+        claim_gate_effect: 'no_claims_cleared',
+      }));
+      expect(savedLayoutReplacementReadback.project_truth).toEqual(expect.objectContaining({
+        square_feet: 88000,
+        head_count: 733,
+        total_man_hours: 1775.5,
+        construction_days: 41,
+        source_status: 'employee_replacement_recorded',
+      }));
+      await page.goto(`${BASE}/workbench.html`, { waitUntil: 'domcontentloaded' });
+      await page.locator('#projectTarget').selectOption(PROJECT_NAME);
+      await page.locator(`#evidence-${savedLayoutReplacementReadback.evidence_id}`).waitFor({ state: 'attached' });
+      const savedLayoutReplacementReadbackText = await page.locator(`#evidence-${savedLayoutReplacementReadback.evidence_id}`).innerText();
+      expect(savedLayoutReplacementReadbackText).toContain(`source_replay_evidence_filter_id ${savedLayout.id}`);
+      expect(savedLayoutReplacementReadbackText).toContain(`source_supplied_document_bid_truth_replacement_evidence_id ${replacement.evidence.id}`);
+      expect(savedLayoutReplacementReadbackText).toContain('selected_1881_context');
+      expect(savedLayoutReplacementReadbackText).toContain('selected_sheet_ref 1881://proposal-cooperative/sheet-7');
+      expect(savedLayoutReplacementReadbackText).toContain('selected_scale_ref 1881://operator-scale/sheet-7/0.0833');
+      expect(savedLayoutReplacementReadbackText).toContain('selected_boundary_candidate_ref candidate:1881-sheet-7-outline');
+      expect(savedLayoutReplacementReadbackText).toContain('project_truth square_feet 88000');
+      const defaultReadbackReplacement = page.locator(`[data-sam31-actual-value-default-replacement-intake="${savedLayoutReplacementReadback.evidence_id}"]`).first();
+      await defaultReadbackReplacement.waitFor({ state: 'attached' });
+      await defaultReadbackReplacement.click();
+      await page.waitForFunction((readbackEvidenceId) => {
+        const status = document.getElementById('sam31ActualValueQueueStatus');
+        return status?.dataset.sourceOpenclawSam31ActualValueReplacementReadbackEvidenceId === readbackEvidenceId
+          && Boolean(status?.dataset.sam31ActualValueReplacementEvidenceId)
+          && status?.dataset.sourceReplayEvidenceId
+          && status?.dataset.claimGateEffect === 'no_claims_cleared';
+      }, String(savedLayoutReplacementReadback.evidence_id));
+      const defaultReadbackReplacementEvidenceId = await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-sam31-actual-value-replacement-evidence-id');
+      const defaultReadbackRows = await api(`${PROJECT_PATH}/evidence`, token);
+      const defaultReadbackRow = defaultReadbackRows.find((row) => row.id === Number(defaultReadbackReplacementEvidenceId));
+      expect(defaultReadbackRow).toBeTruthy();
+      const defaultReadbackNotes = JSON.parse(defaultReadbackRow.notes);
+      expect(defaultReadbackNotes).toEqual(expect.objectContaining({
+        source_replay_evidence_id: savedLayout.id,
+        source_openclaw_sam31_actual_value_replacement_readback_evidence_id: savedLayoutReplacementReadback.evidence_id,
+        source_supplied_document_bid_truth_replacement_evidence_id: replacement.evidence.id,
+        selected_sheet_ref: '1881://proposal-cooperative/sheet-7',
+        selected_scale_ref: '1881://operator-scale/sheet-7/0.0833',
+        selected_boundary_candidate_ref: 'candidate:1881-sheet-7-outline',
+        claim_gate_effect: 'no_claims_cleared',
+        no_claim_gates_cleared: true,
+      }));
+      expect(defaultReadbackNotes.project_truth).toEqual(expect.objectContaining({
+        square_feet: 88000,
+        head_count: 733,
+        total_man_hours: 1775.5,
+        construction_days: 41,
+        source_status: 'employee_replacement_recorded',
+      }));
+      expect(defaultReadbackNotes.actual_value_replacement_prefill.project_truth).toEqual(expect.objectContaining({
+        square_feet: 88000,
+        source_status: 'employee_replacement_recorded',
+      }));
+      expect(defaultReadbackNotes.source_refs).toEqual(expect.arrayContaining([
+        'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G6',
+        'employee://bid-truth/downstream-browser-smoke-001',
+      ]));
+
       const savedLayoutSmokeButton = page.locator(`[data-replay-sam31-consumer-intake-smoke-source-replacement-evidence-id="${savedLayoutReplacementEvidenceId}"]`).first();
       await savedLayoutSmokeButton.waitFor({ state: 'attached' });
       expect(await savedLayoutSmokeButton.getAttribute('data-source-replay-evidence-id')).toBe(String(savedLayout.id));
@@ -584,6 +660,8 @@ describe('Workbench supplied bid-truth browser smoke', () => {
         source_status: 'employee_replacement_recorded',
       }));
 
+      await page.locator('#genBtn').click();
+      await page.locator('#bidTruthDefaultsCard').waitFor();
       const [download] = await Promise.all([
         page.waitForEvent('download'),
         page.locator('[data-supplied-bid-truth-downstream-download]').click(),

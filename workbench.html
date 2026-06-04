@@ -999,12 +999,34 @@ function renderSam31ActualValueReplacementReadbackEvidenceDetail(row) {
   try {
     const packet = JSON.parse(row.notes || '{}');
     const readback = packet.replacement_readback && typeof packet.replacement_readback === 'object' ? packet.replacement_readback : {};
+    const replayDetails = Array.isArray(readback.replay_replacement_details)
+      ? readback.replay_replacement_details.filter((detail) => detail && typeof detail === 'object')
+      : [];
+    const sourceReplayEvidenceId = packet.source_replay_evidence_id || readback.source_replay_evidence_filter_id || '';
+    const replayDetail = (sourceReplayEvidenceId
+      ? replayDetails.find((detail) => String(detail.source_replay_evidence_id || '') === String(sourceReplayEvidenceId)) || replayDetails[0]
+      : replayDetails[0]) || {};
+    const replayHandoff = replayDetail.source_actual_value_handoff && typeof replayDetail.source_actual_value_handoff === 'object'
+      ? replayDetail.source_actual_value_handoff
+      : {};
+    const replayPacket = replayHandoff.source_replay_packet && typeof replayHandoff.source_replay_packet === 'object'
+      ? replayHandoff.source_replay_packet
+      : {};
+    const projectTruth = packet.project_truth && typeof packet.project_truth === 'object'
+      ? packet.project_truth
+      : (replayDetail.project_truth && typeof replayDetail.project_truth === 'object'
+        ? replayDetail.project_truth
+        : (replayPacket.project_truth && typeof replayPacket.project_truth === 'object' ? replayPacket.project_truth : null));
+    const selected1881Line = renderSam31Selected1881SourceRefs(packet, readback, replayDetail, replayHandoff, replayPacket);
+    const projectTruthLine = projectTruth
+      ? `project_truth square_feet ${escapeHtml(projectTruth.square_feet ?? 'missing')} - head_count ${escapeHtml(projectTruth.head_count ?? 'missing')} - total_man_hours ${escapeHtml(projectTruth.total_man_hours ?? 'missing')} - construction_days ${escapeHtml(projectTruth.construction_days ?? 'missing')} - source_status ${escapeHtml(projectTruth.source_status ?? 'missing')}<br>`
+      : '';
     const blocked = Array.isArray(packet.blocked_claims) ? packet.blocked_claims : [];
     const limitations = Array.isArray(packet.limitations) ? packet.limitations : [];
     const auditContext = packet.source_claim_gate_resolve_audit_evidence_id
       ? `source_claim_gate_resolve_audit_evidence_id ${escapeHtml(packet.source_claim_gate_resolve_audit_evidence_id)} - source_resolved_evidence_id ${escapeHtml(packet.source_resolved_evidence_id || 'missing')} - source_claim_gate_effect ${escapeHtml(packet.source_claim_gate_effect || 'missing')} - no_unrelated_claims_cleared ${escapeHtml(packet.no_unrelated_claims_cleared === false ? 'false' : 'true')}<br>`
       : '';
-    return `<div class="muted" style="font-size:11px;margin-top:3px">Saved SAM31 actual-value replacement readback evidence detail: ${escapeHtml(packet.artifact_type || readback.artifact_type || 'openclaw.sam31.actual_value_replacement_readback.v1')}<br>requested_consumer ${escapeHtml(packet.requested_consumer || readback.requested_consumer || 'all-consumers')} - item_count ${escapeHtml(readback.item_count ?? 0)} - pending_count ${escapeHtml(readback.pending_count ?? 0)} - recorded_count ${escapeHtml(readback.recorded_count ?? 0)}<br>${auditContext}source_openclaw_sam31_actual_value_resolver_contract_evidence_id ${escapeHtml(packet.source_openclaw_sam31_actual_value_resolver_contract_evidence_id || readback.source_openclaw_sam31_actual_value_resolver_contract_evidence_id || 'missing')} - source_queue_route ${escapeHtml(packet.source_queue_route || readback.source_queue_route || 'missing')}<br>source_ref ${escapeHtml(row.source_ref || 'missing')} - source_file ${escapeHtml(row.source_file || 'missing')} - claim_gate_effect ${escapeHtml(packet.claim_gate_effect || readback.claim_gate_effect || 'no_claims_cleared')} - no_claim_gates_cleared true<br>record_actual_value_replacement_action halofire.sam31_actual_value_replacement_intake.v1 - openclaw.sam31.saved_readback_artifact_bundle.v1 - default_internal_alpha_replay_download openclaw.sam31.actual_value_resolver_replay.v1<br>Blocks still active: ${blocked.map((claim) => `<span class="chip">${escapeHtml(claim)}</span>`).join('') || '<span class="chip">claim gates remain blocked</span>'}<br>Limitations: ${limitations.map((item) => `<span class="chip">${escapeHtml(item)}</span>`).join('') || '<span class="chip">best-effort readback only</span>'}<br><button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0369a1" data-sam31-actual-value-saved-replacement-readback-download="${escapeHtml(row.id)}">Download saved replacement readback evidence</button> <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#7c3aed" data-sam31-actual-value-evidence-bundle-download="${escapeHtml(row.id)}">Download saved readback artifact bundle</button> <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0f766e" data-sam31-actual-value-open-saved-replacement-readback="${escapeHtml(row.id)}">Open queue from saved readback evidence</button> <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#b45309" data-sam31-actual-value-evidence-record-context="${escapeHtml(row.id)}">Record exact replacement evidence from saved context</button> <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#7c2d12" data-sam31-actual-value-default-replacement-intake="${escapeHtml(row.id)}">Save default exact replacement intake + download replay</button></div>`;
+    return `<div class="muted" style="font-size:11px;margin-top:3px">Saved SAM31 actual-value replacement readback evidence detail: ${escapeHtml(packet.artifact_type || readback.artifact_type || 'openclaw.sam31.actual_value_replacement_readback.v1')}<br>requested_consumer ${escapeHtml(packet.requested_consumer || readback.requested_consumer || 'all-consumers')} - item_count ${escapeHtml(readback.item_count ?? 0)} - pending_count ${escapeHtml(readback.pending_count ?? 0)} - recorded_count ${escapeHtml(readback.recorded_count ?? 0)} - replay_replacement_count ${escapeHtml(readback.replay_replacement_count ?? replayDetails.length ?? 0)}<br>${auditContext}source_replay_evidence_filter_id ${escapeHtml(packet.source_replay_evidence_filter_id || readback.source_replay_evidence_filter_id || 'missing')} - source_replay_evidence_id ${escapeHtml(packet.source_replay_evidence_id || replayDetail.source_replay_evidence_id || 'missing')} - source_supplied_document_bid_truth_replacement_evidence_id ${escapeHtml(packet.source_supplied_document_bid_truth_replacement_evidence_id || replayDetail.source_supplied_document_bid_truth_replacement_evidence_id || 'missing')}<br>${selected1881Line}${projectTruthLine}source_openclaw_sam31_actual_value_resolver_contract_evidence_id ${escapeHtml(packet.source_openclaw_sam31_actual_value_resolver_contract_evidence_id || readback.source_openclaw_sam31_actual_value_resolver_contract_evidence_id || 'missing')} - source_queue_route ${escapeHtml(packet.source_queue_route || readback.source_queue_route || 'missing')}<br>source_ref ${escapeHtml(row.source_ref || 'missing')} - source_file ${escapeHtml(row.source_file || 'missing')} - claim_gate_effect ${escapeHtml(packet.claim_gate_effect || readback.claim_gate_effect || 'no_claims_cleared')} - no_claim_gates_cleared true<br>record_actual_value_replacement_action halofire.sam31_actual_value_replacement_intake.v1 - openclaw.sam31.saved_readback_artifact_bundle.v1 - default_internal_alpha_replay_download openclaw.sam31.actual_value_resolver_replay.v1<br>Blocks still active: ${blocked.map((claim) => `<span class="chip">${escapeHtml(claim)}</span>`).join('') || '<span class="chip">claim gates remain blocked</span>'}<br>Limitations: ${limitations.map((item) => `<span class="chip">${escapeHtml(item)}</span>`).join('') || '<span class="chip">best-effort readback only</span>'}<br><button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0369a1" data-sam31-actual-value-saved-replacement-readback-download="${escapeHtml(row.id)}">Download saved replacement readback evidence</button> <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#7c3aed" data-sam31-actual-value-evidence-bundle-download="${escapeHtml(row.id)}">Download saved readback artifact bundle</button> <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0f766e" data-sam31-actual-value-open-saved-replacement-readback="${escapeHtml(row.id)}">Open queue from saved readback evidence</button> <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#b45309" data-sam31-actual-value-evidence-record-context="${escapeHtml(row.id)}">Record exact replacement evidence from saved context</button> <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#7c2d12" data-sam31-actual-value-default-replacement-intake="${escapeHtml(row.id)}">Save default exact replacement intake + download replay</button></div>`;
   } catch {
     return '<div class="muted" style="font-size:11px;margin-top:3px">Saved SAM31 actual-value replacement readback evidence detail unavailable</div>';
   }
@@ -2120,6 +2142,30 @@ async function saveSam31ActualValueDefaultReplacementIntakeFromReadback(evidence
     ? packet.replacement_readback
     : {};
   const readbackItems = Array.isArray(readback.items) ? readback.items.filter((item) => item && typeof item === 'object') : [];
+  const replayReplacementDetails = Array.isArray(readback.replay_replacement_details)
+    ? readback.replay_replacement_details.filter((detail) => detail && typeof detail === 'object')
+    : [];
+  const replayReplacementDetail = replayReplacementDetails.find((detail) => (
+    String(detail.source_replay_evidence_id || '') === String(packet.source_replay_evidence_id || readback.source_replay_evidence_filter_id || '')
+  )) || replayReplacementDetails[0] || null;
+  const replayReplacementHandoff = replayReplacementDetail?.source_actual_value_handoff && typeof replayReplacementDetail.source_actual_value_handoff === 'object'
+    ? replayReplacementDetail.source_actual_value_handoff
+    : {};
+  const replayReplacementPacket = replayReplacementHandoff.source_replay_packet && typeof replayReplacementHandoff.source_replay_packet === 'object'
+    ? replayReplacementHandoff.source_replay_packet
+    : {};
+  const projectTruth = packet.project_truth && typeof packet.project_truth === 'object'
+    ? packet.project_truth
+    : (replayReplacementDetail?.project_truth && typeof replayReplacementDetail.project_truth === 'object'
+      ? replayReplacementDetail.project_truth
+      : (replayReplacementPacket.project_truth && typeof replayReplacementPacket.project_truth === 'object' ? replayReplacementPacket.project_truth : null));
+  const selected1881Refs = sam31Selected1881Refs(packet, readback, replayReplacementDetail, replayReplacementHandoff, replayReplacementPacket);
+  const sourceSuppliedBidTruthReplacementEvidenceId = Number(
+    packet.source_supplied_document_bid_truth_replacement_evidence_id
+    || replayReplacementDetail?.source_supplied_document_bid_truth_replacement_evidence_id
+    || replayReplacementPacket.source_supplied_document_bid_truth_replacement_evidence_id
+    || 0,
+  ) || null;
   const queueSourceItem = Array.isArray(sam31ActualValueQueueRows)
     ? sam31ActualValueQueueRows.find((item) => (
       item
@@ -2150,7 +2196,11 @@ async function saveSam31ActualValueDefaultReplacementIntakeFromReadback(evidence
     || 0,
   ) || null;
   const sourceReplayEvidenceId = Number(
-    sourceItem?.source_replay_evidence_id
+    packet.source_replay_evidence_id
+    || readback.source_replay_evidence_filter_id
+    || replayReplacementDetail?.source_replay_evidence_id
+    || replayReplacementPacket.source_replay_evidence_id
+    || sourceItem?.source_replay_evidence_id
     || sourceItem?.section_to_artifacts_consumer_handoff?.source_replay_evidence_id
     || sourceItem?.recorded_actual_value_replacement_evidence?.source_replay_evidence_id
     || 0,
@@ -2203,6 +2253,8 @@ async function saveSam31ActualValueDefaultReplacementIntakeFromReadback(evidence
       claim_gate_effect: 'source_saved_replacement_readback',
     },
     ...(Array.isArray(packet.source_refs) ? packet.source_refs : []),
+    ...(Array.isArray(replayReplacementDetail?.source_refs) ? replayReplacementDetail.source_refs : []),
+    ...(Array.isArray(replayReplacementPacket.source_refs) ? replayReplacementPacket.source_refs : []),
   ];
   const note = {
     kind: 'sam31ActualValueReplacement',
@@ -2215,6 +2267,11 @@ async function saveSam31ActualValueDefaultReplacementIntakeFromReadback(evidence
     consumer: sourceConsumer,
     source_openclaw_sam31_consumer_review_evidence_id: sourceConsumerReviewEvidenceId || resolvedSourceConsumerReviewEvidenceId,
     source_replay_evidence_id: sourceReplayEvidenceId,
+    source_supplied_document_bid_truth_replacement_evidence_id: sourceSuppliedBidTruthReplacementEvidenceId,
+    selected_sheet_ref: selected1881Refs.selected_sheet_ref || null,
+    selected_scale_ref: selected1881Refs.selected_scale_ref || null,
+    selected_boundary_candidate_ref: selected1881Refs.selected_boundary_candidate_ref || null,
+    project_truth: projectTruth,
     source_openclaw_sam31_actual_value_replacement_readback_evidence_id: Number(targetId) || targetId,
     source_claim_gate_resolve_audit_evidence_id: auditContext?.source_claim_gate_resolve_audit_evidence_id ? Number(auditContext.source_claim_gate_resolve_audit_evidence_id) || auditContext.source_claim_gate_resolve_audit_evidence_id : null,
     source_resolved_evidence_id: auditContext?.source_resolved_evidence_id ? Number(auditContext.source_resolved_evidence_id) || auditContext.source_resolved_evidence_id : null,
@@ -2232,6 +2289,12 @@ async function saveSam31ActualValueDefaultReplacementIntakeFromReadback(evidence
       source_ref: `halofire://sam31/default-actual-value-replacement-intake/${targetId}`,
       source_file: evidence.source_file || null,
       source_refs: sourceRefs,
+      source_replay_evidence_id: sourceReplayEvidenceId,
+      source_supplied_document_bid_truth_replacement_evidence_id: sourceSuppliedBidTruthReplacementEvidenceId,
+      selected_sheet_ref: selected1881Refs.selected_sheet_ref || null,
+      selected_scale_ref: selected1881Refs.selected_scale_ref || null,
+      selected_boundary_candidate_ref: selected1881Refs.selected_boundary_candidate_ref || null,
+      project_truth: projectTruth,
       use_for_claims: false,
       claim_gate_effect: 'no_claims_cleared',
       no_claim_gates_cleared: true,
@@ -2239,6 +2302,12 @@ async function saveSam31ActualValueDefaultReplacementIntakeFromReadback(evidence
     replacement_values: {
       source_ref: `halofire://sam31/default-actual-value-replacement-intake/${targetId}`,
       source_saved_replacement_readback_evidence_id: Number(targetId) || targetId,
+      source_replay_evidence_id: sourceReplayEvidenceId,
+      source_supplied_document_bid_truth_replacement_evidence_id: sourceSuppliedBidTruthReplacementEvidenceId,
+      selected_sheet_ref: selected1881Refs.selected_sheet_ref || null,
+      selected_scale_ref: selected1881Refs.selected_scale_ref || null,
+      selected_boundary_candidate_ref: selected1881Refs.selected_boundary_candidate_ref || null,
+      project_truth: projectTruth,
       temporary_internal_alpha_placeholder: true,
     },
     openclaw_sam31_section_to_artifacts: sourceSectionToArtifacts,
@@ -2294,6 +2363,12 @@ async function saveSam31ActualValueDefaultReplacementIntakeFromReadback(evidence
     intake_status: 'recorded',
     project_name: currentProjectName(),
     source_openclaw_sam31_actual_value_replacement_readback_evidence_id: Number(targetId) || targetId,
+    source_replay_evidence_id: sourceReplayEvidenceId,
+    source_supplied_document_bid_truth_replacement_evidence_id: sourceSuppliedBidTruthReplacementEvidenceId,
+    selected_sheet_ref: selected1881Refs.selected_sheet_ref || null,
+    selected_scale_ref: selected1881Refs.selected_scale_ref || null,
+    selected_boundary_candidate_ref: selected1881Refs.selected_boundary_candidate_ref || null,
+    project_truth: projectTruth,
     source_claim_gate_resolve_audit_evidence_id: note.source_claim_gate_resolve_audit_evidence_id,
     source_resolved_evidence_id: note.source_resolved_evidence_id,
     source_refs: sourceRefs,
@@ -2307,6 +2382,11 @@ async function saveSam31ActualValueDefaultReplacementIntakeFromReadback(evidence
   if (status) {
     status.dataset.sam31ActualValueReplacementEvidenceId = savedId;
     status.dataset.sourceOpenclawSam31ActualValueReplacementReadbackEvidenceId = targetId;
+    status.dataset.sourceReplayEvidenceId = String(sourceReplayEvidenceId || '');
+    status.dataset.sourceSuppliedDocumentBidTruthReplacementEvidenceId = String(sourceSuppliedBidTruthReplacementEvidenceId || '');
+    status.dataset.selectedSheetRef = String(selected1881Refs.selected_sheet_ref || '');
+    status.dataset.selectedScaleRef = String(selected1881Refs.selected_scale_ref || '');
+    status.dataset.selectedBoundaryCandidateRef = String(selected1881Refs.selected_boundary_candidate_ref || '');
     status.dataset.sourceClaimGateResolveAuditEvidenceId = String(note.source_claim_gate_resolve_audit_evidence_id || '');
     status.dataset.sourceResolvedEvidenceId = String(note.source_resolved_evidence_id || '');
     status.dataset.sourceResolvedEvidenceRef = String(note.source_resolved_evidence_ref || '');
