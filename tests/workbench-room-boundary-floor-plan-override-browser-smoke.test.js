@@ -548,6 +548,50 @@ describe('Workbench room-boundary floor-plan override browser smoke', () => {
         claim_gate_effect: 'no_claims_cleared',
         no_claim_gates_cleared: true,
       }));
+
+      const defaultApprovalUpload = page.locator(`[data-replay-sam31-consumer-intake-smoke-default-approval-upload="${defaultPacketReviewEvidenceId}"]`).first();
+      await defaultApprovalUpload.waitFor({ state: 'attached' });
+      expect(await defaultApprovalUpload.getAttribute('data-source-openclaw-sam31-actual-value-replacement-readback-evidence-id')).toBe(String(auditReadbackEvidenceId));
+      expect(await defaultApprovalUpload.getAttribute('data-source-sam31-actual-value-replacement-evidence-id')).toBe(String(defaultReplacementEvidenceId));
+      expect(await defaultApprovalUpload.getAttribute('data-source-halofire-sam31-followup-packet-review-evidence-id')).toBe(String(defaultPacketReviewEvidenceId));
+      expect(await defaultApprovalUpload.getAttribute('data-selected-sheet-ref')).toBe('1881://proposal-cooperative/sheet-7');
+      expect(await defaultApprovalUpload.getAttribute('data-selected-scale-ref')).toBe('1881://operator-scale/sheet-7/0.0833');
+      expect(await defaultApprovalUpload.getAttribute('data-selected-boundary-candidate-ref')).toBe('candidate:1881-sheet-7-outline');
+      await defaultApprovalUpload.click();
+      await page.waitForFunction((expected) => {
+        const status = document.getElementById(`sam31ApprovalUploadDefaultStatus-${expected.packetReviewEvidenceId}`);
+        return status?.dataset.sam31ApprovalUploadEvidenceId
+          && status?.dataset.sourceOpenclawSam31ActualValueReplacementReadbackEvidenceId === expected.auditReadbackEvidenceId
+          && status?.dataset.selectedSheetRef === '1881://proposal-cooperative/sheet-7'
+          && status?.dataset.downloadedGateValidationPacket === 'true'
+          && status?.dataset.claimGateEffect === 'no_claims_cleared';
+      }, {
+        packetReviewEvidenceId: String(defaultPacketReviewEvidenceId),
+        auditReadbackEvidenceId: String(auditReadbackEvidenceId),
+      });
+      const approvalUploadStatus = page.locator(`#sam31ApprovalUploadDefaultStatus-${defaultPacketReviewEvidenceId}`);
+      const defaultApprovalUploadEvidenceId = String(await approvalUploadStatus.getAttribute('data-sam31-approval-upload-evidence-id') || '');
+      expect(defaultApprovalUploadEvidenceId).toMatch(/^\d+$/);
+      expect(await approvalUploadStatus.getAttribute('data-source-sam31-actual-value-replacement-evidence-id')).toBe(String(defaultReplacementEvidenceId));
+      expect(await approvalUploadStatus.getAttribute('data-source-openclaw-sam31-actual-value-replacement-readback-evidence-id')).toBe(String(auditReadbackEvidenceId));
+      expect(await approvalUploadStatus.getAttribute('data-source-halofire-sam31-followup-packet-review-evidence-id')).toBe(String(defaultPacketReviewEvidenceId));
+      expect(await approvalUploadStatus.getAttribute('data-selected-scale-ref')).toBe('1881://operator-scale/sheet-7/0.0833');
+      expect(await approvalUploadStatus.getAttribute('data-selected-boundary-candidate-ref')).toBe('candidate:1881-sheet-7-outline');
+      const approvalRows = await api(`${PROJECT_PATH}/evidence`, token);
+      const approvalRow = approvalRows.find((row) => row.id === Number(defaultApprovalUploadEvidenceId));
+      expect(approvalRow).toBeTruthy();
+      const approvalNotes = JSON.parse(approvalRow.notes);
+      expect(approvalNotes.intake).toEqual(expect.objectContaining({
+        source_packet_review_decision_evidence_id: Number(defaultPacketReviewEvidenceId),
+        source_sam31_actual_value_replacement_evidence_id: Number(defaultReplacementEvidenceId),
+        source_openclaw_sam31_actual_value_replacement_readback_evidence_id: Number(auditReadbackEvidenceId),
+        source_followup_decision_evidence_id: Number(defaultReplayFollowupEvidenceId),
+        selected_sheet_ref: '1881://proposal-cooperative/sheet-7',
+        selected_scale_ref: '1881://operator-scale/sheet-7/0.0833',
+        selected_boundary_candidate_ref: 'candidate:1881-sheet-7-outline',
+        claim_gate_effect: 'no_claims_cleared',
+        no_claim_gates_cleared: true,
+      }));
     } finally {
       await page.close();
     }
