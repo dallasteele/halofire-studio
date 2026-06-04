@@ -2500,7 +2500,7 @@ async function refreshSam31ActualValueQueue() {
   const serviceDescriptorParam = sam31ActualValueServiceDescriptorEvidenceFilter ? '&serviceDescriptorEvidenceId=' + encodeURIComponent(sam31ActualValueServiceDescriptorEvidenceFilter) : '';
   const consumerIntakeSmokeParam = sam31ActualValueConsumerIntakeSmokeEvidenceFilter ? '&consumerIntakeSmokeEvidenceId=' + encodeURIComponent(sam31ActualValueConsumerIntakeSmokeEvidenceFilter) : '';
   const sourceReplayParam = sam31ActualValueSourceReplayEvidenceFilter ? '&sourceReplayEvidenceId=' + encodeURIComponent(sam31ActualValueSourceReplayEvidenceFilter) : '';
-  const readback = await api('/openclaw/sam31/actual-value-resolver-queue?projectName=' + encodeURIComponent(currentProjectName()) + consumerParam + replacementReadbackParam + serviceDescriptorParam + consumerIntakeSmokeParam);
+  const readback = await api('/openclaw/sam31/actual-value-resolver-queue?projectName=' + encodeURIComponent(currentProjectName()) + consumerParam + replacementReadbackParam + serviceDescriptorParam + consumerIntakeSmokeParam + sourceReplayParam);
   const queue = readback.queue && typeof readback.queue === 'object' ? readback.queue : readback;
   const index = queue;
   const rows = Array.isArray(queue.items) ? queue.items : [];
@@ -2515,7 +2515,7 @@ async function refreshSam31ActualValueQueue() {
     || '';
   const activeQueueHref = readback.queue_href
     || readback.source_project_route
-    || ('/api/openclaw/sam31/actual-value-resolver-queue?projectName=' + encodeURIComponent(currentProjectName()) + consumerParam + replacementReadbackParam + serviceDescriptorParam + consumerIntakeSmokeParam);
+    || ('/api/openclaw/sam31/actual-value-resolver-queue?projectName=' + encodeURIComponent(currentProjectName()) + consumerParam + replacementReadbackParam + serviceDescriptorParam + consumerIntakeSmokeParam + sourceReplayParam);
   const activeReplacementReadbackHref = '/api/openclaw/sam31/actual-value-replacements?projectName='
     + encodeURIComponent(currentProjectName())
     + consumerParam

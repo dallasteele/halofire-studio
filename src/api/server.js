@@ -3416,6 +3416,7 @@ function buildHalofireSam31ConsumerIntakeSmokePreliminaryReplayArtifact(projectN
 
 function buildOpenClawSam31ActualValueResolverQueueReadback(projectName, options = {}) {
   const requestedConsumer = String(options.consumer || '').trim().toLowerCase();
+  const sourceReplayEvidenceFilterId = Number(options.sourceReplayEvidenceId || options.source_replay_evidence_id || 0) || null;
   const queue = buildOpenClawSam31ActualValueResolverQueue(projectName, {
     consumer: requestedConsumer,
     contractEvidenceId: options.contractEvidenceId || options.contract_evidence_id,
@@ -3434,6 +3435,7 @@ function buildOpenClawSam31ActualValueResolverQueueReadback(projectName, options
     replacementReadbackEvidenceFilterId ? `replacementReadbackEvidenceId=${encodeURIComponent(replacementReadbackEvidenceFilterId)}` : '',
     serviceDescriptorEvidenceFilterId ? `serviceDescriptorEvidenceId=${encodeURIComponent(serviceDescriptorEvidenceFilterId)}` : '',
     consumerIntakeSmokeEvidenceFilterId ? `consumerIntakeSmokeEvidenceId=${encodeURIComponent(consumerIntakeSmokeEvidenceFilterId)}` : '',
+    sourceReplayEvidenceFilterId ? `sourceReplayEvidenceId=${encodeURIComponent(sourceReplayEvidenceFilterId)}` : '',
   ].filter(Boolean).join('&');
   const globalQuery = [
     `projectName=${encodeURIComponent(projectName)}`,
@@ -3442,6 +3444,7 @@ function buildOpenClawSam31ActualValueResolverQueueReadback(projectName, options
     replacementReadbackEvidenceFilterId ? `replacementReadbackEvidenceId=${encodeURIComponent(replacementReadbackEvidenceFilterId)}` : '',
     serviceDescriptorEvidenceFilterId ? `serviceDescriptorEvidenceId=${encodeURIComponent(serviceDescriptorEvidenceFilterId)}` : '',
     consumerIntakeSmokeEvidenceFilterId ? `consumerIntakeSmokeEvidenceId=${encodeURIComponent(consumerIntakeSmokeEvidenceFilterId)}` : '',
+    sourceReplayEvidenceFilterId ? `sourceReplayEvidenceId=${encodeURIComponent(sourceReplayEvidenceFilterId)}` : '',
   ].filter(Boolean).join('&');
   const sourceProjectRoute = `/api/projects/${encodeURIComponent(projectName)}/openclaw/sam31/actual-value-resolver-queue${projectQuery ? `?${projectQuery}` : ''}`;
   const queueHref = `/api/openclaw/sam31/actual-value-resolver-queue?${globalQuery}`;
@@ -3599,6 +3602,7 @@ function buildOpenClawSam31ActualValueResolverQueueReadback(projectName, options
     sam31_llm_extrapolation_contract: queue.sam31_llm_extrapolation_contract,
     service_descriptor_evidence_filter_id: serviceDescriptorEvidenceFilterId,
     consumer_intake_smoke_evidence_filter_id: consumerIntakeSmokeEvidenceFilterId,
+    source_replay_evidence_filter_id: sourceReplayEvidenceFilterId,
     latest_actual_value_service_descriptor_evidence_id: queue.latest_actual_value_service_descriptor_evidence_id || null,
     latest_actual_value_service_descriptor_evidence: latestServiceDescriptorEvidence,
     saved_actual_value_service_descriptor_count: queue.saved_actual_value_service_descriptor_count || 0,
@@ -15742,6 +15746,7 @@ app.get('/api/openclaw/sam31/actual-value-resolver-queue', authMiddleware, (req,
     replacementReadbackEvidenceId: req.query?.replacementReadbackEvidenceId || req.query?.replacement_readback_evidence_id,
     serviceDescriptorEvidenceId: req.query?.serviceDescriptorEvidenceId || req.query?.service_descriptor_evidence_id,
     consumerIntakeSmokeEvidenceId: req.query?.consumerIntakeSmokeEvidenceId || req.query?.consumer_intake_smoke_evidence_id,
+    sourceReplayEvidenceId: req.query?.sourceReplayEvidenceId || req.query?.source_replay_evidence_id,
   }));
 });
 

@@ -343,8 +343,12 @@ describe('Workbench room-boundary floor-plan override browser smoke', () => {
       expect(replacementRow).toContain('claim_gate_effect no_claims_cleared');
 
       const queue = page.locator('#sam31ActualValueQueue');
+      expect(await queue.getAttribute('data-sam31-actual-value-resolver-queue-href'))
+        .toBe(`/api/openclaw/sam31/actual-value-resolver-queue?projectName=${encodeURIComponent(PROJECT_NAME)}&sourceReplayEvidenceId=${savedReplayEvidenceId}`);
       expect(await queue.getAttribute('data-sam31-actual-value-replacement-readback-href'))
         .toBe(`/api/openclaw/sam31/actual-value-replacements?projectName=${encodeURIComponent(PROJECT_NAME)}&sourceReplayEvidenceId=${savedReplayEvidenceId}`);
+      expect(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-sam31-actual-value-resolver-queue-href'))
+        .toBe(`/api/openclaw/sam31/actual-value-resolver-queue?projectName=${encodeURIComponent(PROJECT_NAME)}&sourceReplayEvidenceId=${savedReplayEvidenceId}`);
       expect(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-source-replay-evidence-id')).toBe(String(savedReplayEvidenceId));
     } finally {
       await page.close();
