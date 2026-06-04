@@ -239,4 +239,120 @@ describe('Settings signed reviewer browser smoke', () => {
       await page.close();
     }
   }, 30_000);
+
+  it('renders room-boundary override actions in Settings and downloads the override packet', async () => {
+    const token = await adminToken();
+    const boundary = await api(`${PROJECT_PATH}/pdf-boundary-decision`, token, {
+      method: 'POST',
+      body: JSON.stringify({
+        pdfPageIndex: 7,
+        pdfScale: 0.0833,
+        pdfExtract: 'outline',
+        candidate: {
+          id: 'candidate:settings-1881-sheet-7-outline',
+          mode: 'outline',
+          bbox: { minX: 0, minY: 0, maxX: 120, maxY: 85, widthFt: 120, heightFt: 85, areaSqft: 10200 },
+          blockedClaims: ['geometry_accuracy', 'AutoSprink_parity'],
+        },
+        source_file: 'Proposal- Home Depot - Rexburg ID.xlsx',
+        source_ref: 'Home Depot settings browser-smoke boundary decision for floor-plan override',
+        selected_sheet_ref: 'home-depot://sheet-7',
+        selected_scale_ref: 'home-depot://operator-scale/sheet-7/0.0833',
+        selected_boundary_candidate_ref: 'candidate:settings-1881-sheet-7-outline',
+        source_refs: [
+          'home-depot://sheet-7',
+          'home-depot://operator-scale/sheet-7/0.0833',
+          'candidate:settings-1881-sheet-7-outline',
+        ],
+        notes: 'Settings browser-smoke boundary decision for floor-plan override.',
+      }),
+    });
+    const review = await api(`${PROJECT_PATH}/resolver-packets/pdf-boundary/${boundary.evidence.id}/reviews`, token, {
+      method: 'POST',
+      body: JSON.stringify({
+        review_decision: 'corrected',
+        reviewer_name: 'Settings Boundary Browser Smoke Reviewer',
+        marked_up_plan_ref: 'home-depot://markup/settings-sheet-7-room-boundary-correction',
+        corrected_room_polygons: [
+          {
+            id: 'room:settings-1881-lobby',
+            label: 'Lobby',
+            polygon: [[0, 0], [28, 0], [28, 18], [0, 18]],
+            source_refs: ['home-depot://markup/settings-sheet-7-room-boundary-correction'],
+          },
+        ],
+        issue_list: [
+          {
+            issue_type: 'room_boundary_mismatch',
+            severity: 'blocking',
+            source_ref: 'home-depot://sheet-7',
+            observed: 'Original outline overcaptured the corridor wall band.',
+            expected: 'Replay should use the corrected employee-reviewed room polygon only.',
+            required_action: 'Use the corrected room polygon for internal-alpha replay only.',
+          },
+        ],
+        notes: 'Corrected settings browser-smoke room-boundary review packet for override download.',
+      }),
+    });
+
+    const projectPath = PROJECT_PATH;
+    const page = await browser.newPage({ acceptDownloads: true });
+    page.setDefaultTimeout(8000);
+    await page.addInitScript((authToken) => {
+      localStorage.setItem('halofire_token', authToken);
+    }, token);
+
+    try {
+      await page.goto(`${BASE}/settings.html`, { waitUntil: 'domcontentloaded' });
+      const overrideNote = page.locator('#settingsRoomBoundaryFloorPlanOverrides .note')
+        .filter({ hasText: `source_review_evidence_id ${review.id}` })
+        .first();
+      await overrideNote.waitFor();
+      const overrideRow = overrideNote.locator('[data-room-boundary-floor-plan-override-action-index]').first();
+      await page.evaluate(() => {
+        const originalCreateObjectURL = URL.createObjectURL.bind(URL);
+        const originalRevokeObjectURL = URL.revokeObjectURL.bind(URL);
+        window.__lastRoomBoundaryOverrideBlobText = null;
+        URL.createObjectURL = (blob) => {
+          blob.text().then((text) => {
+            window.__lastRoomBoundaryOverrideBlobText = text;
+          });
+          return originalCreateObjectURL(blob);
+        };
+        URL.revokeObjectURL = (href) => originalRevokeObjectURL(href);
+      });
+
+      await overrideRow.click();
+      await page.waitForTimeout(1000);
+      const statusText = await page.locator('#roomBoundaryFloorPlanOverrideMsg').innerText();
+      expect(statusText).toContain('downloaded halofire.room_boundary_floor_plan_override_action_packet.v1');
+      const packet = JSON.parse(await page.evaluate(async () => {
+        const started = Date.now();
+        while (!window.__lastRoomBoundaryOverrideBlobText) {
+          if (Date.now() - started > 5000) throw new Error('override blob text not captured');
+          await new Promise((resolve) => setTimeout(resolve, 50));
+        }
+        return window.__lastRoomBoundaryOverrideBlobText;
+      }));
+
+      expect(packet.artifact_type).toBe('halofire.room_boundary_floor_plan_override_action_packet.v1');
+      expect(packet.source_evidence_id).toBe(boundary.evidence.id);
+      expect(packet.source_review_evidence_id).toBe(review.id);
+      expect(packet.floor_plan_override_source).toBe('latest_employee_review_packet');
+      expect(packet.request_body).toEqual(expect.objectContaining({
+        room_boundary_source: 'latest_employee_review_packet',
+        source_evidence_id: boundary.evidence.id,
+        source_review_evidence_id: review.id,
+      }));
+      expect(statusText).toContain('claim gates remain blocked');
+      expect(packet.floor_plan_override).toEqual(expect.objectContaining({
+        source_evidence_id: boundary.evidence.id,
+        source_review_evidence_id: review.id,
+        corrected_room_polygon_count: 1,
+      }));
+      expect(packet.action_href).toBe(`${projectPath}/sprinkler-bid`);
+    } finally {
+      await page.close();
+    }
+  }, 30_000);
 });

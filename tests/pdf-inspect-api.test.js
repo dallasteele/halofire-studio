@@ -1322,6 +1322,8 @@ describe('PDF page inspection API', () => {
     expect(overrideItem.floor_plan_override_action).toEqual(expect.objectContaining({
       label: 'Run replay bid with floor-plan override',
       method: 'POST',
+      href: `/api/projects/${encodeURIComponent(COOPERATIVE_1881_PROJECT_NAME)}/sprinkler-bid`,
+      download_href: `${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${saved.evidence.id}/floor-plan-override-action`,
       room_boundary_source: 'latest_employee_review_packet',
       source_evidence_id: saved.evidence.id,
       source_review_evidence_id: reviewBody.evidence.id,

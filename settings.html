@@ -1153,7 +1153,7 @@ async function downloadSettingsRoomBoundaryFloorPlanOverrideAction(index) {
     return;
   }
   try {
-    const packet = await api(row.floor_plan_override_action.download_href);
+    const packet = await api(apiPathFromHref(row.floor_plan_override_action.download_href));
     if (packet.artifact_type !== 'halofire.room_boundary_floor_plan_override_action_packet.v1') {
       throw new Error('Unexpected room-boundary floor-plan override action packet type');
     }

@@ -1,5 +1,13 @@
 # HaloFire Build Log
 
+## 2026-06-03 - Settings floor-plan override action download fix
+
+- Fixed the Settings room-boundary override download lane in [`settings.html`](C:/Users/dalla/OneDrive/Documents/HaloFire/settings.html) to normalize stored local `/api/...` hrefs before calling the page API helper, matching the resolved-gate audit path and preventing local `/api/api/...` requests.
+- Filled the resolver-queue contract gap in [`src/api/server.js`](C:/Users/dalla/OneDrive/Documents/HaloFire/src/api/server.js) by adding `floor_plan_override_action.download_href`, so Settings can fetch the exact `halofire.room_boundary_floor_plan_override_action_packet.v1` packet for the selected room-boundary review row.
+- Added focused coverage in [`tests/settings-signed-reviewer-browser-smoke.test.js`](C:/Users/dalla/OneDrive/Documents/HaloFire/tests/settings-signed-reviewer-browser-smoke.test.js) and [`tests/pdf-inspect-api.test.js`](C:/Users/dalla/OneDrive/Documents/HaloFire/tests/pdf-inspect-api.test.js) proving the Settings row renders, downloads the override packet, and exposes the source-linked packet href through the resolver queue.
+- Verified with `npx vitest run tests/settings-evidence-wizard-static.test.js tests/settings-signed-reviewer-browser-smoke.test.js tests/pdf-inspect-api.test.js`, `C:/Python312/python.exe E:/ClaudeBot/scripts/verify_agentic_rules.py`, and `git diff --check`. `NO_FORMALIZABLE_CLAIM`: this slice is UI/API packet routing, not a theorem-shaped invariant.
+- Still blocked: AutoSprink parity, AHJ approval beyond explicit signed evidence for one gate lane, PE/professional review, permit readiness, fabrication readiness, manufacturer-exact models, brand readiness, production readiness, survey-grade claims, and engineering-grade claims.
+
 ## 2026-06-03 - Settings resolved-gate audit download fix
 
 - Fixed the Settings resolved signed-reviewer audit download path to normalize stored `/api/...` hrefs before calling the local API helper, so the page no longer requests a broken `/api/api/...` route when downloading cleared-gate audit packets.

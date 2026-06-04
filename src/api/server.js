@@ -12042,6 +12042,7 @@ function pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvi
     label: 'Run replay bid with floor-plan override',
     method: 'POST',
     href: `/api/projects/${encodeURIComponent(projectName)}/sprinkler-bid`,
+    download_href: `/api/projects/${encodeURIComponent(projectName)}/resolver-packets/pdf-boundary/${evidence.id}/floor-plan-override-action`,
     artifact_type: floorPlanOverride.artifact_type,
     status: 'ready_for_internal_alpha_replay',
     floor_plan_override_status: 'internal_alpha_floor_plan_override_ready',
