@@ -909,7 +909,10 @@ function renderSam31ActualValueReplacementReadbackEvidenceDetail(row) {
     const readback = packet.replacement_readback && typeof packet.replacement_readback === 'object' ? packet.replacement_readback : {};
     const blocked = Array.isArray(packet.blocked_claims) ? packet.blocked_claims : [];
     const limitations = Array.isArray(packet.limitations) ? packet.limitations : [];
-    return `<div class="muted" style="font-size:11px;margin-top:3px">Saved SAM31 actual-value replacement readback evidence detail: ${escapeHtml(packet.artifact_type || readback.artifact_type || 'openclaw.sam31.actual_value_replacement_readback.v1')}<br>requested_consumer ${escapeHtml(packet.requested_consumer || readback.requested_consumer || 'all-consumers')} - item_count ${escapeHtml(readback.item_count ?? 0)} - pending_count ${escapeHtml(readback.pending_count ?? 0)} - recorded_count ${escapeHtml(readback.recorded_count ?? 0)}<br>source_openclaw_sam31_actual_value_resolver_contract_evidence_id ${escapeHtml(packet.source_openclaw_sam31_actual_value_resolver_contract_evidence_id || readback.source_openclaw_sam31_actual_value_resolver_contract_evidence_id || 'missing')} - source_queue_route ${escapeHtml(packet.source_queue_route || readback.source_queue_route || 'missing')}<br>source_ref ${escapeHtml(row.source_ref || 'missing')} - source_file ${escapeHtml(row.source_file || 'missing')} - claim_gate_effect ${escapeHtml(packet.claim_gate_effect || readback.claim_gate_effect || 'no_claims_cleared')} - no_claim_gates_cleared true<br>record_actual_value_replacement_action halofire.sam31_actual_value_replacement_intake.v1 - openclaw.sam31.saved_readback_artifact_bundle.v1<br>Blocks still active: ${blocked.map((claim) => `<span class="chip">${escapeHtml(claim)}</span>`).join('') || '<span class="chip">claim gates remain blocked</span>'}<br>Limitations: ${limitations.map((item) => `<span class="chip">${escapeHtml(item)}</span>`).join('') || '<span class="chip">best-effort readback only</span>'}<br><button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0369a1" data-sam31-actual-value-saved-replacement-readback-download="${escapeHtml(row.id)}">Download saved replacement readback evidence</button> <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#7c3aed" data-sam31-actual-value-evidence-bundle-download="${escapeHtml(row.id)}">Download saved readback artifact bundle</button> <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0f766e" data-sam31-actual-value-open-saved-replacement-readback="${escapeHtml(row.id)}">Open queue from saved readback evidence</button> <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#b45309" data-sam31-actual-value-evidence-record-context="${escapeHtml(row.id)}">Record exact replacement evidence from saved context</button></div>`;
+    const auditContext = packet.source_claim_gate_resolve_audit_evidence_id
+      ? `source_claim_gate_resolve_audit_evidence_id ${escapeHtml(packet.source_claim_gate_resolve_audit_evidence_id)} - source_resolved_evidence_id ${escapeHtml(packet.source_resolved_evidence_id || 'missing')} - source_claim_gate_effect ${escapeHtml(packet.source_claim_gate_effect || 'missing')} - no_unrelated_claims_cleared ${escapeHtml(packet.no_unrelated_claims_cleared === false ? 'false' : 'true')}<br>`
+      : '';
+    return `<div class="muted" style="font-size:11px;margin-top:3px">Saved SAM31 actual-value replacement readback evidence detail: ${escapeHtml(packet.artifact_type || readback.artifact_type || 'openclaw.sam31.actual_value_replacement_readback.v1')}<br>requested_consumer ${escapeHtml(packet.requested_consumer || readback.requested_consumer || 'all-consumers')} - item_count ${escapeHtml(readback.item_count ?? 0)} - pending_count ${escapeHtml(readback.pending_count ?? 0)} - recorded_count ${escapeHtml(readback.recorded_count ?? 0)}<br>${auditContext}source_openclaw_sam31_actual_value_resolver_contract_evidence_id ${escapeHtml(packet.source_openclaw_sam31_actual_value_resolver_contract_evidence_id || readback.source_openclaw_sam31_actual_value_resolver_contract_evidence_id || 'missing')} - source_queue_route ${escapeHtml(packet.source_queue_route || readback.source_queue_route || 'missing')}<br>source_ref ${escapeHtml(row.source_ref || 'missing')} - source_file ${escapeHtml(row.source_file || 'missing')} - claim_gate_effect ${escapeHtml(packet.claim_gate_effect || readback.claim_gate_effect || 'no_claims_cleared')} - no_claim_gates_cleared true<br>record_actual_value_replacement_action halofire.sam31_actual_value_replacement_intake.v1 - openclaw.sam31.saved_readback_artifact_bundle.v1<br>Blocks still active: ${blocked.map((claim) => `<span class="chip">${escapeHtml(claim)}</span>`).join('') || '<span class="chip">claim gates remain blocked</span>'}<br>Limitations: ${limitations.map((item) => `<span class="chip">${escapeHtml(item)}</span>`).join('') || '<span class="chip">best-effort readback only</span>'}<br><button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0369a1" data-sam31-actual-value-saved-replacement-readback-download="${escapeHtml(row.id)}">Download saved replacement readback evidence</button> <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#7c3aed" data-sam31-actual-value-evidence-bundle-download="${escapeHtml(row.id)}">Download saved readback artifact bundle</button> <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0f766e" data-sam31-actual-value-open-saved-replacement-readback="${escapeHtml(row.id)}">Open queue from saved readback evidence</button> <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#b45309" data-sam31-actual-value-evidence-record-context="${escapeHtml(row.id)}">Record exact replacement evidence from saved context</button></div>`;
   } catch {
     return '<div class="muted" style="font-size:11px;margin-top:3px">Saved SAM31 actual-value replacement readback evidence detail unavailable</div>';
   }
@@ -1279,7 +1282,7 @@ function evidenceDetail(row) {
       const sourceRefs = Array.isArray(packet.source_refs) ? packet.source_refs : (Array.isArray(audit.source_refs) ? audit.source_refs : []);
       const blocked = Array.isArray(packet.blocked_claims) ? packet.blocked_claims : (Array.isArray(gate.blocked_claims) ? gate.blocked_claims : []);
       const limitations = Array.isArray(packet.limitations) ? packet.limitations : (Array.isArray(audit.limitations) ? audit.limitations : []);
-      return `<div class="muted" style="font-size:11px;margin-top:3px">Saved claim_gate_resolve_audit_packet readback: ${escapeHtml(audit.artifact_type || packet.artifact_type || 'halofire.claim_gate_resolve_audit_packet.v1')}<br>gate_code ${escapeHtml(audit.gate_code || packet.gate_code || gate.code || 'missing')} - resolved_evidence_id ${escapeHtml(audit.resolved_evidence_id || packet.resolved_evidence_id || 'missing')} - resolved_evidence_ref ${escapeHtml(audit.resolved_evidence_ref || packet.resolved_evidence_ref || row.source_ref || 'missing')}<br>resolved_evidence_type ${escapeHtml(audit.resolved_evidence?.evidence_type || packet.resolved_evidence_type || 'missing')} - claim_gate_effect ${escapeHtml(audit.claim_gate_effect || packet.claim_gate_effect || 'gate_cleared_after_explicit_signed_validation')} - no_unrelated_claims_cleared ${escapeHtml((audit.no_unrelated_claims_cleared === false || packet.no_unrelated_claims_cleared === false) ? 'false' : 'true')}<br>source_refs ${sourceRefs.map((ref) => `<span class="chip">${escapeHtml(ref.evidence_type || ref.source_ref || ref.evidence_id || JSON.stringify(ref).slice(0, 80))}</span>`).join('') || '<span class="chip">missing</span>'}<br>Blocks still active unless separately resolved: ${blocked.map((claim) => `<span class="chip">${escapeHtml(claim)}</span>`).join('') || '<span class="chip">unrelated regulated claims remain fail-closed</span>'}<br>Limitations: ${limitations.map((item) => `<span class="chip">${escapeHtml(item)}</span>`).join('') || '<span class="chip">audit readback only</span>'}</div>`;
+      return `<div class="muted" style="font-size:11px;margin-top:3px">Saved claim_gate_resolve_audit_packet readback: ${escapeHtml(audit.artifact_type || packet.artifact_type || 'halofire.claim_gate_resolve_audit_packet.v1')}<br>gate_code ${escapeHtml(audit.gate_code || packet.gate_code || gate.code || 'missing')} - resolved_evidence_id ${escapeHtml(audit.resolved_evidence_id || packet.resolved_evidence_id || 'missing')} - resolved_evidence_ref ${escapeHtml(audit.resolved_evidence_ref || packet.resolved_evidence_ref || row.source_ref || 'missing')}<br>resolved_evidence_type ${escapeHtml(audit.resolved_evidence?.evidence_type || packet.resolved_evidence_type || 'missing')} - claim_gate_effect ${escapeHtml(audit.claim_gate_effect || packet.claim_gate_effect || 'gate_cleared_after_explicit_signed_validation')} - no_unrelated_claims_cleared ${escapeHtml((audit.no_unrelated_claims_cleared === false || packet.no_unrelated_claims_cleared === false) ? 'false' : 'true')}<br>source_refs ${sourceRefs.map((ref) => `<span class="chip">${escapeHtml(ref.evidence_type || ref.source_ref || ref.evidence_id || JSON.stringify(ref).slice(0, 80))}</span>`).join('') || '<span class="chip">missing</span>'}<br>Blocks still active unless separately resolved: ${blocked.map((claim) => `<span class="chip">${escapeHtml(claim)}</span>`).join('') || '<span class="chip">unrelated regulated claims remain fail-closed</span>'}<br>Limitations: ${limitations.map((item) => `<span class="chip">${escapeHtml(item)}</span>`).join('') || '<span class="chip">audit readback only</span>'}<br><button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0f766e" data-claim-gate-audit-actual-value-readback-evidence-id="${escapeHtml(row.id)}" data-source-resolved-evidence-id="${escapeHtml(audit.resolved_evidence_id || packet.resolved_evidence_id || '')}" data-source-claim-gate-effect="${escapeHtml(audit.claim_gate_effect || packet.claim_gate_effect || 'gate_cleared_after_explicit_signed_validation')}" data-no-unrelated-claims-cleared="${escapeHtml((audit.no_unrelated_claims_cleared === false || packet.no_unrelated_claims_cleared === false) ? 'false' : 'true')}">Save downstream actual-value readback</button><div class="muted" id="claimGateAuditActualValueStatus-${escapeHtml(row.id)}" style="font-size:11px;margin-top:4px"></div></div>`;
     }
     if (packet.kind === 'halofire_sam31_approval_upload_intake') {
       const intake = packet.intake && typeof packet.intake === 'object' ? packet.intake : packet;
@@ -1333,6 +1336,9 @@ async function refreshEvidence() {
   });
   document.querySelectorAll('[data-replay-sam31-actual-value-replacement-evidence-id]').forEach((button) => {
     button.onclick = () => saveReplaySam31ActualValueReplacement(button.dataset.replaySam31ActualValueReplacementEvidenceId);
+  });
+  document.querySelectorAll('[data-claim-gate-audit-actual-value-readback-evidence-id]').forEach((button) => {
+    button.onclick = () => saveClaimGateAuditActualValueReadback(button.dataset.claimGateAuditActualValueReadbackEvidenceId);
   });
   document.querySelectorAll('[data-sam31-tool-contract]').forEach((button) => {
     button.onclick = () => downloadOpenClawSam31ToolContract();
@@ -5042,6 +5048,104 @@ async function saveClaimGateResolveAuditEvidence(resolvedEvidenceId = '', gateCo
     });
     await refreshEvidence();
     stampStatus(document.getElementById(statusId) || status, saved, packet);
+  } catch (err) {
+    if (status) status.textContent = 'Error: ' + err.message;
+  }
+}
+
+async function saveClaimGateAuditActualValueReadback(evidenceId = '') {
+  const targetId = String(evidenceId || '').trim();
+  const statusId = `claimGateAuditActualValueStatus-${targetId}`;
+  const status = document.getElementById(statusId) || document.getElementById('evidence') || document.getElementById('sam31ActualValueQueueStatus');
+  const stampStatus = (target, saved, packet, readback) => {
+    if (!target) return;
+    const savedId = String(saved?.id || saved?.evidence_id || '');
+    target.dataset.sam31ActualValueReplacementReadbackEvidenceId = savedId;
+    target.dataset.sourceClaimGateResolveAuditEvidenceId = targetId;
+    target.dataset.sourceResolvedEvidenceId = String(packet?.resolved_evidence_id || '');
+    target.dataset.sourceClaimGateEffect = String(packet?.claim_gate_effect || 'gate_cleared_after_explicit_signed_validation');
+    target.dataset.claimGateEffect = 'no_claims_cleared';
+    target.dataset.noUnrelatedClaimsCleared = String(packet?.no_unrelated_claims_cleared !== false);
+    target.dataset.actualValueReplacementReadbackHref = String(readback?.replacement_readback_href || readback?.source_project_route || '');
+    target.textContent = `Saved openclaw.sam31.actual_value_replacement_readback.v1 evidence #${savedId} from claim-gate audit evidence #${targetId}; no unrelated claims cleared.`;
+  };
+  try {
+    if (!targetId) throw new Error('Saved claim-gate resolve audit evidence id is required.');
+    let auditEvidence = currentEvidenceRows.find((row) => String(row.id || row.evidence_id || '') === targetId) || null;
+    if (!auditEvidence) {
+      const rows = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/evidence');
+      currentEvidenceRows = Array.isArray(rows) ? rows : [];
+      auditEvidence = currentEvidenceRows.find((row) => String(row.id || row.evidence_id || '') === targetId) || null;
+    }
+    if (!auditEvidence) throw new Error('Saved claim-gate resolve audit evidence row was not found.');
+    const parsed = JSON.parse(auditEvidence.notes || '{}');
+    if (parsed.kind !== 'halofire_claim_gate_resolve_audit_readback') {
+      throw new Error('Saved evidence row is not a claim-gate resolve audit readback.');
+    }
+    const auditPacket = parsed.resolve_audit_packet && typeof parsed.resolve_audit_packet === 'object'
+      ? parsed.resolve_audit_packet
+      : parsed;
+    const readback = await api('/openclaw/sam31/actual-value-replacements?projectName=' + encodeURIComponent(currentProjectName()));
+    if (readback.artifact_type !== 'openclaw.sam31.actual_value_replacement_readback.v1') {
+      throw new Error('Unexpected SAM31 actual-value replacement readback type');
+    }
+    const auditSourceRefs = Array.isArray(parsed.source_refs)
+      ? parsed.source_refs
+      : (Array.isArray(auditPacket.source_refs) ? auditPacket.source_refs : []);
+    const sourceRefs = [
+      {
+        evidence_id: Number(targetId),
+        evidence_type: auditEvidence.evidence_type || 'claim_gate_resolve_audit_packet',
+        source_file: auditEvidence.source_file || null,
+        source_ref: auditEvidence.source_ref || null,
+        claim_gate_effect: 'source_claim_gate_audit_readback',
+      },
+      ...auditSourceRefs,
+    ];
+    const saved = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/evidence', {
+      method: 'POST',
+      body: JSON.stringify({
+        evidence_type: 'openclaw_sam31_actual_value_replacement_readback',
+        source_ref: `openclaw://sam31/actual-value-replacements/claim-gate-audit/${targetId}`,
+        source_file: `${currentProjectName().toLowerCase().replace(/[^a-z0-9]+/g, '-')}-claim-gate-audit-${targetId}-actual-value-readback.json`,
+        status: 'present',
+        notes: JSON.stringify({
+          kind: 'openclaw_sam31_actual_value_replacement_readback',
+          artifact_type: 'openclaw.sam31.actual_value_replacement_readback.v1',
+          saved_from: 'workbench_claim_gate_resolve_audit_readback',
+          saved_at: new Date().toISOString(),
+          source_claim_gate_resolve_audit_evidence_id: Number(targetId),
+          source_resolved_evidence_id: auditPacket.resolved_evidence_id || parsed.resolved_evidence_id || null,
+          source_resolved_evidence_ref: auditPacket.resolved_evidence_ref || parsed.resolved_evidence_ref || null,
+          source_resolved_evidence_type: auditPacket.resolved_evidence?.evidence_type || parsed.resolved_evidence_type || null,
+          source_claim_gate_effect: auditPacket.claim_gate_effect || parsed.claim_gate_effect || 'gate_cleared_after_explicit_signed_validation',
+          no_unrelated_claims_cleared: auditPacket.no_unrelated_claims_cleared !== false && parsed.no_unrelated_claims_cleared !== false,
+          source_refs: sourceRefs,
+          source_queue_route: readback.replacement_readback_href || readback.source_project_route || `/api/openclaw/sam31/actual-value-replacements?projectName=${encodeURIComponent(currentProjectName())}`,
+          replacement_readback: readback,
+          requested_consumer: readback.requested_consumer || 'all-consumers',
+          claim_gate_effect: 'no_claims_cleared',
+          no_claim_gates_cleared: true,
+          use_for_claims: false,
+          blocked_claims: [
+            'professional_review',
+            'AHJ_approval',
+            'manufacturer_approval',
+            'AutoSprink_parity',
+            'permit_ready',
+            'fabrication_ready',
+            'engineering_grade',
+          ],
+          limitations: [
+            'Actual-value replacement readback generated from a saved claim-gate audit readback for downstream review only.',
+            'The source audit may document one resolved gate, but this downstream readback clears no additional professional, AHJ, manufacturer, AutoSprink, permit-ready, fabrication-ready, brand-ready, production-ready, survey-grade, or engineering-grade claims.',
+          ],
+        }),
+      }),
+    });
+    await refreshEvidence();
+    await refreshSam31ActualValueQueue();
+    stampStatus(document.getElementById(statusId) || status, saved, auditPacket, readback);
   } catch (err) {
     if (status) status.textContent = 'Error: ' + err.message;
   }

@@ -243,6 +243,35 @@ describe('Workbench room-boundary floor-plan override browser smoke', () => {
       expect(savedAuditText).toContain('resolved_evidence_ref approval-validation://1881/sam31/ahj-approval-real-001');
       expect(savedAuditText).toContain('claim_gate_effect gate_cleared_after_explicit_signed_validation');
       expect(savedAuditText).toContain('no_unrelated_claims_cleared true');
+
+      const saveAuditActualValue = page.locator(`[data-claim-gate-audit-actual-value-readback-evidence-id="${savedAuditEvidenceId}"]`).first();
+      await saveAuditActualValue.waitFor({ state: 'attached' });
+      expect(await saveAuditActualValue.getAttribute('data-source-resolved-evidence-id')).toBe(String(approvalValidationDecision.evidence_id));
+      expect(await saveAuditActualValue.getAttribute('data-no-unrelated-claims-cleared')).toBe('true');
+
+      await saveAuditActualValue.click();
+      const auditActualValueStatus = page.locator(`#claimGateAuditActualValueStatus-${savedAuditEvidenceId}`);
+      await page.waitForFunction((auditEvidenceId) => {
+        const status = document.getElementById(`claimGateAuditActualValueStatus-${auditEvidenceId}`);
+        return status?.dataset.sam31ActualValueReplacementReadbackEvidenceId
+          && status?.dataset.sourceClaimGateResolveAuditEvidenceId === auditEvidenceId
+          && status?.dataset.claimGateEffect === 'no_claims_cleared'
+          && status?.dataset.noUnrelatedClaimsCleared === 'true';
+      }, String(savedAuditEvidenceId));
+      const auditReadbackEvidenceId = await auditActualValueStatus.getAttribute('data-sam31-actual-value-replacement-readback-evidence-id');
+      expect(auditReadbackEvidenceId).toMatch(/^\d+$/);
+      expect(await auditActualValueStatus.getAttribute('data-source-resolved-evidence-id')).toBe(String(approvalValidationDecision.evidence_id));
+      expect(await auditActualValueStatus.getAttribute('data-source-claim-gate-effect')).toBe('gate_cleared_after_explicit_signed_validation');
+
+      const auditReadbackRow = page.locator(`#evidence-${auditReadbackEvidenceId}`);
+      await auditReadbackRow.waitFor({ state: 'attached' });
+      const auditReadbackText = await auditReadbackRow.innerText();
+      expect(auditReadbackText).toContain('openclaw_sam31_actual_value_replacement_readback');
+      expect(auditReadbackText).toContain(`source_claim_gate_resolve_audit_evidence_id ${savedAuditEvidenceId}`);
+      expect(auditReadbackText).toContain(`source_resolved_evidence_id ${approvalValidationDecision.evidence_id}`);
+      expect(auditReadbackText).toContain('source_claim_gate_effect gate_cleared_after_explicit_signed_validation');
+      expect(auditReadbackText).toContain('claim_gate_effect no_claims_cleared');
+      expect(auditReadbackText).toContain('no_unrelated_claims_cleared true');
     } finally {
       await page.close();
     }

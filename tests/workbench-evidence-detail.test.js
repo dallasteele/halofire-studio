@@ -296,6 +296,10 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toContain('saveClaimGateResolveAuditEvidence');
     expect(html).toContain('halofire_claim_gate_resolve_audit_readback');
     expect(html).toContain('no_unrelated_claims_cleared');
+    expect(html).toContain('data-claim-gate-audit-actual-value-readback-evidence-id');
+    expect(html).toContain('saveClaimGateAuditActualValueReadback');
+    expect(html).toContain('source_claim_gate_resolve_audit_evidence_id');
+    expect(html).toContain('source_claim_gate_effect');
     expect(html).toContain('sam31ActualValueQuickFilter');
     expect(html).toContain('sam31ActualValue=pending');
     expect(html).toContain('Pending SAM31 actual-value replacements');
