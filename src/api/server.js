@@ -2792,7 +2792,7 @@ function sam31PdfBoundaryDecisionProvenance(source = {}) {
     source.selected_scale_ref
     || prefill.selected_scale_ref
     || objectSourceRefs.find((ref) => ref.selected_scale_ref)?.selected_scale_ref
-    || stringSourceRefs.find((ref) => ref.startsWith('scale:'))
+    || stringSourceRefs.find((ref) => ref.startsWith('scale:') || /:\/\/operator-scale\//i.test(ref))
     || '',
   ).trim() || null;
   const selectedBoundaryCandidateRef = String(

@@ -888,17 +888,29 @@ describe('Workbench room-boundary floor-plan override browser smoke', () => {
       expect(await approvalUploadReview.getAttribute('data-sam31-approval-upload-review-gate-code')).toBe('PROFESSIONAL_REVIEW_MISSING');
       expect(await approvalUploadReview.getAttribute('data-sam31-approval-upload-review-gate-validation-packet-href')).toContain(`/evidence/${approvalUploadEvidenceId}/openclaw/sam31/approval-upload/gate-validation-packet`);
       expect(await approvalUploadReview.getAttribute('data-claim-gate-effect')).toBe('no_claims_cleared');
+      expect(await approvalUploadReview.getAttribute('data-selected-sheet-ref')).toBe('1881://proposal-cooperative/sheet-7');
+      expect(await approvalUploadReview.getAttribute('data-selected-scale-ref')).toBe('1881://operator-scale/sheet-7/0.0833');
+      expect(await approvalUploadReview.getAttribute('data-selected-boundary-candidate-ref')).toBe('candidate:1881-sheet-7-outline');
       await approvalUploadReview.click();
       await page.waitForFunction((approvalUploadId) => {
         const status = document.getElementById(`sam31ApprovalUploadReviewStatus-${approvalUploadId}`);
         return status?.dataset.sam31ApprovalUploadEvidenceId === approvalUploadId
           && status?.dataset.downloadedGateValidationPacket === 'true'
           && status?.dataset.reviewedUploadedApprovalEvidence === 'true'
+          && status?.dataset.selectedSheetRef === '1881://proposal-cooperative/sheet-7'
+          && status?.dataset.selectedScaleRef === '1881://operator-scale/sheet-7/0.0833'
+          && status?.dataset.selectedBoundaryCandidateRef === 'candidate:1881-sheet-7-outline'
           && status?.dataset.claimGateEffect === 'no_claims_cleared';
       }, approvalUploadEvidenceId);
       const approvalUploadReviewStatus = page.locator(`#sam31ApprovalUploadReviewStatus-${approvalUploadEvidenceId}`);
       expect(await approvalUploadReviewStatus.getAttribute('data-sam31-approval-upload-review-gate-code')).toBe('PROFESSIONAL_REVIEW_MISSING');
       expect(await approvalUploadReviewStatus.getAttribute('data-sam31-approval-upload-review-resolve-href')).toContain('/claim-gates/PROFESSIONAL_REVIEW_MISSING/resolve');
+      expect(await approvalUploadReviewStatus.getAttribute('data-selected-sheet-ref')).toBe('1881://proposal-cooperative/sheet-7');
+      expect(await approvalUploadReviewStatus.getAttribute('data-selected-scale-ref')).toBe('1881://operator-scale/sheet-7/0.0833');
+      expect(await approvalUploadReviewStatus.getAttribute('data-selected-boundary-candidate-ref')).toBe('candidate:1881-sheet-7-outline');
+      const approvalUploadReviewStatusText = await approvalUploadReviewStatus.innerText();
+      expect(approvalUploadReviewStatusText).toContain('selected_1881_context');
+      expect(approvalUploadReviewStatusText).toContain('1881://proposal-cooperative/sheet-7');
 
       const approvalValidationDecisionSave = page.locator(`[data-sam31-approval-upload-validation-decision-save-evidence-id="${approvalUploadEvidenceId}"]`).first();
       await approvalValidationDecisionSave.waitFor({ state: 'attached' });

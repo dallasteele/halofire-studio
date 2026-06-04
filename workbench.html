@@ -266,6 +266,10 @@ function sam31Selected1881DataAttrs(...sources) {
   return ` data-selected-sheet-ref="${escapeHtml(refs.selected_sheet_ref)}" data-selected-scale-ref="${escapeHtml(refs.selected_scale_ref)}" data-selected-boundary-candidate-ref="${escapeHtml(refs.selected_boundary_candidate_ref)}"`;
 }
 
+function renderSam31Selected1881DataAttrs(...sources) {
+  return sam31Selected1881DataAttrs(...sources);
+}
+
 function sam31ActualValueReadbackAuditContext(evidence = null) {
   if (!evidence || typeof evidence !== 'object') return null;
   let packet = evidence;
@@ -956,8 +960,10 @@ function renderHalofireSam31ApprovalUploadResolverRows(rows) {
     const validationPacketButton = gateValidationPacketHref
       ? `<button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#4338ca" data-sam31-approval-upload-gate-validation-packet-href="${escapeHtml(gateValidationPacketHref)}">Download SAM31 approval gate validation packet</button><br><span class="muted" style="font-size:10px">${escapeHtml(gateValidationPacketAction?.artifact_type || 'halofire.sam31_approval_upload_gate_validation_packet.v1')} - ${escapeHtml(gateValidationPacketHref)} - claim_gate_effect no_claims_cleared</span><br>`
       : '';
+    const selected1881Line = renderSam31Selected1881SourceRefs(row.latest_approval_upload_intake, latestValidationDecision, row);
+    const selected1881DataAttrs = renderSam31Selected1881DataAttrs(row.latest_approval_upload_intake, latestValidationDecision, row);
     const reviewButton = row.latest_approval_upload_intake && gateValidationPacketHref
-      ? `<button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0f766e" data-sam31-approval-upload-review-evidence-id="${escapeHtml(row.latest_approval_upload_intake.evidence_id || '')}" data-sam31-approval-upload-review-gate-code="${escapeHtml(resolveGateCode)}" data-sam31-approval-upload-review-gate-validation-packet-href="${escapeHtml(gateValidationPacketHref)}" data-sam31-approval-upload-review-resolve-href="${escapeHtml(gateHref)}" data-claim-gate-effect="no_claims_cleared">Review uploaded approval evidence</button><div class="muted" id="sam31ApprovalUploadReviewStatus-${escapeHtml(row.latest_approval_upload_intake.evidence_id || '')}" style="font-size:11px"></div>`
+      ? `<button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0f766e" data-sam31-approval-upload-review-evidence-id="${escapeHtml(row.latest_approval_upload_intake.evidence_id || '')}" data-sam31-approval-upload-review-gate-code="${escapeHtml(resolveGateCode)}" data-sam31-approval-upload-review-gate-validation-packet-href="${escapeHtml(gateValidationPacketHref)}" data-sam31-approval-upload-review-resolve-href="${escapeHtml(gateHref)}" data-claim-gate-effect="no_claims_cleared"${selected1881DataAttrs}>Review uploaded approval evidence</button><div class="muted" id="sam31ApprovalUploadReviewStatus-${escapeHtml(row.latest_approval_upload_intake.evidence_id || '')}" style="font-size:11px"></div>`
       : '';
     const approvalUploadEvidenceId = row.latest_approval_upload_intake?.evidence_id || '';
     const validationDecisionControls = approvalUploadEvidenceId
@@ -966,8 +972,6 @@ function renderHalofireSam31ApprovalUploadResolverRows(rows) {
     const latestValidationDecisionText = latestValidationDecision
       ? `latest_approval_upload_validation_decision evidence #${escapeHtml(latestValidationDecision.evidence_id)} - ${escapeHtml(latestValidationDecision.validation_decision || 'validation_decision_missing')} - ${escapeHtml(latestValidationDecision.claim_gate_effect || 'no_claims_cleared')}<br>`
       : '';
-    const selected1881Line = renderSam31Selected1881SourceRefs(row.latest_approval_upload_intake || latestValidationDecision || row);
-    const selected1881DataAttrs = renderSam31Selected1881DataAttrs(row.latest_approval_upload_intake || latestValidationDecision || row);
     return `<div style="margin-top:5px;border-top:1px solid rgba(255,255,255,.08);padding-top:5px"><span class="chip">${escapeHtml(row.code || 'approval_upload_missing')} ${escapeHtml(row.target_approval_lane || 'lane_missing')} ${escapeHtml(row.claim_gate_effect || 'no_claims_cleared')}</span> <span class="chip">gate_validation_status ${escapeHtml(row.gate_validation_status || 'pending_gate_validation')}</span> ${escapeHtml(row.next_action || 'Upload required signed evidence before clearing this claim.')}<br>acceptable_evidence ${(Array.isArray(row.acceptable_evidence) ? row.acceptable_evidence : []).map((item) => `<span class="chip">${escapeHtml(item)}</span>`).join('')}<br>${selected1881Line}${row.latest_approval_upload_intake ? `latest_approval_upload_intake evidence #${escapeHtml(row.latest_approval_upload_intake.evidence_id)} - ${escapeHtml(row.latest_approval_upload_intake.status || 'uploaded_pending_gate_validation')} - ${escapeHtml(row.latest_approval_upload_intake.claim_gate_effect || 'no_claims_cleared')}<br>` : ''}${latestValidationDecisionText}${validationPacketButton}${reviewButton}${validationDecisionControls}${resolveButton}<details style="margin-top:5px"><summary class="muted" style="cursor:pointer">Save SAM31 approval upload</summary><div style="display:grid;gap:6px;margin-top:7px"><input id="sam31ApprovalUploadSourceRef-${escapeHtml(rowKey)}" placeholder="source_ref" value="${escapeHtml(row.latest_approval_upload_intake?.source_ref || '')}" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px"><input id="sam31ApprovalUploadSourceFile-${escapeHtml(rowKey)}" placeholder="source_file" value="${escapeHtml(row.latest_approval_upload_intake?.source_file || '')}" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px"><input id="sam31ApprovalUploadReviewerName-${escapeHtml(rowKey)}" placeholder="reviewer_name" value="${escapeHtml(signoff.reviewer_name || '')}" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px"><input id="sam31ApprovalUploadReviewerTitle-${escapeHtml(rowKey)}" placeholder="reviewer_title" value="${escapeHtml(signoff.reviewer_title || '')}" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px"><input id="sam31ApprovalUploadSignedAt-${escapeHtml(rowKey)}" placeholder="signed_at ISO8601" value="${escapeHtml(signoff.signed_at || '')}" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px"><input id="sam31ApprovalUploadOrganization-${escapeHtml(rowKey)}" placeholder="organization (optional)" value="${escapeHtml(signoff.organization || '')}" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px"><input id="sam31ApprovalUploadLicenseId-${escapeHtml(rowKey)}" placeholder="license_id (optional)" value="${escapeHtml(signoff.license_id || '')}" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px"><textarea id="sam31ApprovalUploadNotes-${escapeHtml(rowKey)}" placeholder="notes" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px;height:46px">${escapeHtml(row.latest_approval_upload_intake?.notes || '')}</textarea><button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#7c2d12" data-sam31-approval-upload-code="${escapeHtml(row.code || '')}" data-sam31-approval-upload-boundary-evidence-id="${escapeHtml(row.source_pdf_boundary_evidence_id || '')}" data-sam31-approval-upload-smoke-evidence-id="${escapeHtml(row.source_section_to_artifacts_consumer_intake_smoke_evidence_id || '')}" data-sam31-approval-upload-consumer-review-evidence-id="${escapeHtml(row.source_openclaw_sam31_consumer_review_evidence_id || '')}" data-sam31-approval-upload-sprinkler-review-evidence-id="${escapeHtml(row.source_halofire_sam31_sprinkler_review_decision_evidence_id || '')}" data-sam31-approval-upload-followup-evidence-id="${escapeHtml(row.source_followup_decision_evidence_id || '')}" data-sam31-approval-upload-packet-index="${escapeHtml(row.packet_index ?? 0)}" data-sam31-approval-upload-packet-review-evidence-id="${escapeHtml(row.source_packet_review_decision_evidence_id || '')}" data-sam31-approval-upload-target-approval-lane="${escapeHtml(row.target_approval_lane || '')}" data-sam31-approval-upload-evidence-type="${escapeHtml(row.gate_evidence_type || '')}"${selected1881DataAttrs}>Save SAM31 approval upload</button><div class="muted" id="sam31ApprovalUploadStatus-${escapeHtml(rowKey)}" style="font-size:11px"></div></div></details></div>`;
   }).join('')}<span class="muted">AI fallback remains temporary SAM31+LLM correction/vector/3D candidate evidence only; use_for_claims false.</span></div>`;
 }
@@ -5220,6 +5224,11 @@ async function reviewSam31ApprovalUploadEvidence(approvalUploadEvidenceId = '') 
   const gateCode = trigger?.dataset.sam31ApprovalUploadReviewGateCode || '';
   const gateHref = trigger?.dataset.sam31ApprovalUploadReviewResolveHref || '';
   const gateValidationPacketHref = trigger?.dataset.sam31ApprovalUploadReviewGateValidationPacketHref || '';
+  const triggerSelected1881 = trigger ? {
+    selected_sheet_ref: trigger.dataset.selectedSheetRef || '',
+    selected_scale_ref: trigger.dataset.selectedScaleRef || '',
+    selected_boundary_candidate_ref: trigger.dataset.selectedBoundaryCandidateRef || '',
+  } : null;
   try {
     if (!targetId) throw new Error('SAM31 approval upload evidence id is required.');
     if (!gateValidationPacketHref) throw new Error('SAM31 approval upload gate-validation packet href is required for review.');
@@ -5234,15 +5243,24 @@ async function reviewSam31ApprovalUploadEvidence(approvalUploadEvidenceId = '') 
     );
     const evidenceRow = document.getElementById(`evidence-${targetId}`);
     if (evidenceRow) evidenceRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const selected1881 = sam31Selected1881Refs(gatePacket, triggerSelected1881);
+    const selected1881StatusText = hasSam31Selected1881Refs(selected1881)
+      ? ` selected_1881_context selected_sheet_ref ${selected1881.selected_sheet_ref || 'missing'} - selected_scale_ref ${selected1881.selected_scale_ref || 'missing'} - selected_boundary_candidate_ref ${selected1881.selected_boundary_candidate_ref || 'missing'} - use_for_claims false - claim_gate_effect no_claims_cleared.`
+      : ' selected_1881_context missing; source PDF boundary decision remains required before claim-sensitive review.';
     if (status) {
       status.dataset.sam31ApprovalUploadEvidenceId = targetId;
       status.dataset.sam31ApprovalUploadReviewGateCode = gateCode;
       status.dataset.sam31ApprovalUploadReviewResolveHref = gateHref;
       status.dataset.sam31ApprovalUploadReviewGateValidationPacketHref = gateValidationPacketHref;
+      if (hasSam31Selected1881Refs(selected1881)) {
+        status.dataset.selectedSheetRef = selected1881.selected_sheet_ref;
+        status.dataset.selectedScaleRef = selected1881.selected_scale_ref;
+        status.dataset.selectedBoundaryCandidateRef = selected1881.selected_boundary_candidate_ref;
+      }
       status.dataset.downloadedGateValidationPacket = 'true';
       status.dataset.reviewedUploadedApprovalEvidence = 'true';
       status.dataset.claimGateEffect = 'no_claims_cleared';
-      status.textContent = `Reviewed uploaded approval evidence #${targetId}; validation packet downloaded and claim gate remains blocked until explicit resolve.`;
+      status.textContent = `Reviewed uploaded approval evidence #${targetId}; validation packet downloaded and claim gate remains blocked until explicit resolve.${selected1881StatusText}`;
     }
   } catch (err) {
     if (status) status.textContent = 'Error: ' + err.message;
