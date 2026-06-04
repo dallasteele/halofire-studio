@@ -2775,10 +2775,32 @@ function sam31PdfBoundaryDecisionProvenance(source = {}) {
     && !Array.isArray(source.actual_value_replacement_prefill)
     ? source.actual_value_replacement_prefill
     : {};
-  const selectedSheetRef = String(source.selected_sheet_ref || prefill.selected_sheet_ref || '').trim() || null;
-  const selectedScaleRef = String(source.selected_scale_ref || prefill.selected_scale_ref || '').trim() || null;
+  const sourceRefs = Array.isArray(source.source_refs) ? source.source_refs : [];
+  const objectSourceRefs = sourceRefs.filter((ref) => ref && typeof ref === 'object' && !Array.isArray(ref));
+  const stringSourceRefs = sourceRefs
+    .filter((ref) => typeof ref === 'string')
+    .map((ref) => String(ref).trim())
+    .filter(Boolean);
+  const selectedSheetRef = String(
+    source.selected_sheet_ref
+    || prefill.selected_sheet_ref
+    || objectSourceRefs.find((ref) => ref.selected_sheet_ref)?.selected_sheet_ref
+    || stringSourceRefs.find((ref) => ref.includes('://') && /\/sheet-\d+$/i.test(ref))
+    || '',
+  ).trim() || null;
+  const selectedScaleRef = String(
+    source.selected_scale_ref
+    || prefill.selected_scale_ref
+    || objectSourceRefs.find((ref) => ref.selected_scale_ref)?.selected_scale_ref
+    || stringSourceRefs.find((ref) => ref.startsWith('scale:'))
+    || '',
+  ).trim() || null;
   const selectedBoundaryCandidateRef = String(
-    source.selected_boundary_candidate_ref || prefill.selected_boundary_candidate_ref || '',
+    source.selected_boundary_candidate_ref
+    || prefill.selected_boundary_candidate_ref
+    || objectSourceRefs.find((ref) => ref.selected_boundary_candidate_ref)?.selected_boundary_candidate_ref
+    || stringSourceRefs.find((ref) => ref.startsWith('candidate:'))
+    || '',
   ).trim() || null;
   if (!selectedSheetRef && !selectedScaleRef && !selectedBoundaryCandidateRef) return {};
   return {
@@ -9822,6 +9844,7 @@ function buildHalofireSam31ApprovalUploadValidationDecision(projectName, uploadE
   const resolveRoute = isRealValidation && gateCode
     ? `/api/projects/${encodeURIComponent(projectName)}/claim-gates/${encodeURIComponent(gateCode)}/resolve`
     : null;
+  const pdfBoundaryProvenance = sam31PdfBoundaryDecisionProvenance(intake);
   return {
     artifact_type: HALOFIRE_SAM31_APPROVAL_UPLOAD_VALIDATION_DECISION_TYPE,
     status: isRealValidation ? 'present' : 'blocked_pending_real_signed_evidence',
@@ -9843,6 +9866,7 @@ function buildHalofireSam31ApprovalUploadValidationDecision(projectName, uploadE
     source_section_to_artifacts_consumer_intake_smoke_evidence_id: intake.source_section_to_artifacts_consumer_intake_smoke_evidence_id || null,
     source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id: intake.source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id || null,
     source_halofire_sam31_sprinkler_review_decision_evidence_id: intake.source_halofire_sam31_sprinkler_review_decision_evidence_id || null,
+    ...pdfBoundaryProvenance,
     validation_ref: validationRef,
     source_file: String(body.source_file || body.sourceFile || evidence.source_file || '').trim() || null,
     signoff,
@@ -9954,6 +9978,9 @@ function halofireSam31ApprovalUploadValidationDecisionSummary(validationEvidence
     evidence_type_required: decision.evidence_type,
     required_evidence_type: decision.required_evidence_type,
     source_halofire_sam31_approval_upload_evidence_id: decision.source_halofire_sam31_approval_upload_evidence_id,
+    selected_sheet_ref: decision.selected_sheet_ref || null,
+    selected_scale_ref: decision.selected_scale_ref || null,
+    selected_boundary_candidate_ref: decision.selected_boundary_candidate_ref || null,
     validation_ref: decision.validation_ref,
     reviewed_by: decision.reviewed_by,
     reviewed_at: decision.reviewed_at,
@@ -9993,6 +10020,9 @@ function halofireSam31ApprovalUploadIntakeSummary(uploadEvidence) {
     source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id: intake.source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id || null,
     source_halofire_sam31_sprinkler_review_decision_evidence_id: intake.source_halofire_sam31_sprinkler_review_decision_evidence_id || null,
     packet_index: intake.packet_index,
+    selected_sheet_ref: intake.selected_sheet_ref || null,
+    selected_scale_ref: intake.selected_scale_ref || null,
+    selected_boundary_candidate_ref: intake.selected_boundary_candidate_ref || null,
     uploaded_by: intake.uploaded_by,
     uploaded_at: intake.uploaded_at,
     signoff: intake.signoff || null,
@@ -10030,6 +10060,7 @@ function buildHalofireSam31ApprovalUploadGateValidationPacket(projectName, evide
     : null;
   const signoff = intake.signoff || {};
   const hasStructuredSignoff = Boolean(signoff.reviewer_name && signoff.reviewer_title && signoff.signed_at);
+  const pdfBoundaryProvenance = sam31PdfBoundaryDecisionProvenance(intake);
   const sourceRefs = uniqueByJson([
     ...(Array.isArray(intake.source_refs) ? intake.source_refs : []),
     {
@@ -10079,6 +10110,7 @@ function buildHalofireSam31ApprovalUploadGateValidationPacket(projectName, evide
     source_openclaw_sam31_consumer_review_evidence_id: intake.source_openclaw_sam31_consumer_review_evidence_id || null,
     source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id: intake.source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id || null,
     source_halofire_sam31_sprinkler_review_decision_evidence_id: intake.source_halofire_sam31_sprinkler_review_decision_evidence_id || null,
+    ...pdfBoundaryProvenance,
     packet_index: intake.packet_index,
     target_packet_lane: intake.target_packet_lane || null,
     source_refs: sourceRefs,
@@ -11519,6 +11551,10 @@ function normalizeHalofireSam31ApprovalUploadIntake(projectName, sourcePacket, p
     ...sourcePacket,
     ...packetReview,
   });
+  const pdfBoundaryProvenance = sam31PdfBoundaryDecisionProvenance({
+    ...sourcePacket,
+    ...packetReview,
+  });
   return {
     artifact_type: HALOFIRE_SAM31_APPROVAL_UPLOAD_INTAKE_TYPE,
     status: 'uploaded_pending_gate_validation',
@@ -11543,6 +11579,7 @@ function normalizeHalofireSam31ApprovalUploadIntake(projectName, sourcePacket, p
     source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id: sourcePacket.source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id || null,
     source_openclaw_sam31_extrapolation_evidence_id: sourcePacket.source_openclaw_sam31_extrapolation_evidence_id || null,
     ...auditProvenance,
+    ...pdfBoundaryProvenance,
     packet_index: sourcePacket.packet_index,
     target_packet_lane: sourcePacket.target_packet_lane,
     source_field: sourcePacket.source_field,

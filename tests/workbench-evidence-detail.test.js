@@ -496,6 +496,19 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toContain('no_claims_cleared');
   });
 
+  it('surfaces selected 1881 refs on SAM31 approval-upload readbacks and validation controls', async () => {
+    const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
+    expect(shell.status).toBe(200);
+    const html = await shell.text();
+    expect(html).toMatch(/packet.kind === 'halofire_sam31_approval_upload_validation_decision'[\s\S]*renderSam31Selected1881SourceRefs/);
+    expect(html).toMatch(/packet.kind === 'halofire_sam31_approval_upload_intake'[\s\S]*renderSam31Selected1881SourceRefs/);
+    expect(html).toMatch(/renderHalofireSam31ApprovalUploadResolverRows[\s\S]*renderSam31Selected1881SourceRefs/);
+    expect(html).toContain('selected_1881_context');
+    expect(html).toContain('data-selected-sheet-ref');
+    expect(html).toContain('data-selected-scale-ref');
+    expect(html).toContain('data-selected-boundary-candidate-ref');
+  });
+
   it('surfaces SAM31 sectioning downstream resolver rows and filter links in the workbench', async () => {
     const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
     expect(shell.status).toBe(200);
