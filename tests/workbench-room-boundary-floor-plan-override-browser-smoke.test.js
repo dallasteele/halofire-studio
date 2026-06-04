@@ -592,6 +592,48 @@ describe('Workbench room-boundary floor-plan override browser smoke', () => {
         claim_gate_effect: 'no_claims_cleared',
         no_claim_gates_cleared: true,
       }));
+
+      const defaultValidationDecisionSave = page.locator(`[data-sam31-approval-upload-validation-decision-save-evidence-id="${defaultApprovalUploadEvidenceId}"]`).first();
+      await defaultValidationDecisionSave.waitFor({ state: 'attached' });
+      expect(await defaultValidationDecisionSave.getAttribute('data-source-openclaw-sam31-actual-value-replacement-readback-evidence-id')).toBe(String(auditReadbackEvidenceId));
+      expect(await defaultValidationDecisionSave.getAttribute('data-source-halofire-sam31-followup-packet-review-evidence-id')).toBe(String(defaultPacketReviewEvidenceId));
+      expect(await defaultValidationDecisionSave.getAttribute('data-selected-sheet-ref')).toBe('1881://proposal-cooperative/sheet-7');
+      expect(await defaultValidationDecisionSave.getAttribute('data-selected-scale-ref')).toBe('1881://operator-scale/sheet-7/0.0833');
+      const validationDecisionStatusId = String(await defaultValidationDecisionSave.getAttribute('data-sam31-approval-upload-validation-decision-status-id') || `sam31ApprovalValidationDecisionStatus-${defaultApprovalUploadEvidenceId}`);
+      await defaultValidationDecisionSave.click();
+      await page.waitForFunction((expected) => {
+        const status = document.getElementById(expected.statusId);
+        return status?.dataset.sam31ApprovalUploadValidationDecisionEvidenceId
+          && status?.dataset.sourceOpenclawSam31ActualValueReplacementReadbackEvidenceId === expected.auditReadbackEvidenceId
+          && status?.dataset.selectedSheetRef === '1881://proposal-cooperative/sheet-7'
+          && status?.dataset.claimGateEffect === 'no_claims_cleared'
+          && status?.dataset.noClaimGatesCleared === 'true';
+      }, {
+        approvalUploadEvidenceId: String(defaultApprovalUploadEvidenceId),
+        auditReadbackEvidenceId: String(auditReadbackEvidenceId),
+        statusId: validationDecisionStatusId,
+      });
+      const validationDecisionStatus = page.locator(`#${validationDecisionStatusId}`);
+      const defaultValidationDecisionEvidenceId = String(await validationDecisionStatus.getAttribute('data-sam31-approval-upload-validation-decision-evidence-id') || '');
+      expect(defaultValidationDecisionEvidenceId).toMatch(/^\d+$/);
+      expect(await validationDecisionStatus.getAttribute('data-source-halofire-sam31-followup-packet-review-evidence-id')).toBe(String(defaultPacketReviewEvidenceId));
+      expect(await validationDecisionStatus.getAttribute('data-selected-boundary-candidate-ref')).toBe('candidate:1881-sheet-7-outline');
+      expect(await validationDecisionStatus.getAttribute('data-resolve-action-href')).toBe('');
+      const validationRows = await api(`${PROJECT_PATH}/evidence`, token);
+      const validationRow = validationRows.find((row) => row.id === Number(defaultValidationDecisionEvidenceId));
+      expect(validationRow).toBeTruthy();
+      const validationNotes = JSON.parse(validationRow.notes);
+      expect(validationNotes.validation_decision).toEqual(expect.objectContaining({
+        source_halofire_sam31_approval_upload_evidence_id: Number(defaultApprovalUploadEvidenceId),
+        source_packet_review_decision_evidence_id: Number(defaultPacketReviewEvidenceId),
+        source_openclaw_sam31_actual_value_replacement_readback_evidence_id: Number(auditReadbackEvidenceId),
+        selected_sheet_ref: '1881://proposal-cooperative/sheet-7',
+        selected_scale_ref: '1881://operator-scale/sheet-7/0.0833',
+        selected_boundary_candidate_ref: 'candidate:1881-sheet-7-outline',
+        validation_decision: 'default_internal_alpha_placeholder_rejected',
+        claim_gate_effect: 'no_claims_cleared',
+        no_claim_gates_cleared: true,
+      }));
     } finally {
       await page.close();
     }

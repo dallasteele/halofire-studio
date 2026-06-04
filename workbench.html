@@ -1456,7 +1456,10 @@ function evidenceDetail(row) {
       const validationQueueHref = `/api/projects/${encodeURIComponent(currentProjectName())}/resolver-queue?sam31ApprovalValidation=pending${targetGateQuery}`;
       const selected1881Line = renderSam31Selected1881SourceRefs(intake);
       const selected1881DataAttrs = renderSam31Selected1881DataAttrs(intake);
-      return `<div class="muted" style="font-size:11px;margin-top:3px">SAM31 approval upload intake: ${escapeHtml(intake.artifact_type || 'halofire.sam31_approval_upload_intake.v1')}<br>evidence_type ${escapeHtml(intake.evidence_type || row.evidence_type || 'missing')} - status ${escapeHtml(intake.status || row.status || 'uploaded_pending_gate_validation')} - code ${escapeHtml(intake.code || 'missing')}<br>source_packet_review_decision_evidence_id ${escapeHtml(intake.source_packet_review_decision_evidence_id || 'missing')} - source_followup_decision_evidence_id ${escapeHtml(intake.source_followup_decision_evidence_id || 'missing')} - packet_index ${escapeHtml(intake.packet_index ?? 0)}<br>${selected1881Line}source_section_to_artifacts_consumer_intake_smoke_evidence_id ${escapeHtml(intake.source_section_to_artifacts_consumer_intake_smoke_evidence_id || 'missing')} - source_halofire_sam31_sprinkler_review_decision_evidence_id ${escapeHtml(intake.source_halofire_sam31_sprinkler_review_decision_evidence_id || 'missing')}<br>${escapeHtml(signoff.reviewer_name || 'unknown reviewer')} - ${escapeHtml(signoff.reviewer_title || 'title missing')} - signed_at ${escapeHtml(signoff.signed_at || 'missing')}<br>gate_validation_packet ${escapeHtml(gatePacket.artifact_type || 'halofire.sam31_approval_upload_gate_validation_packet.v1')} - claim_gate_effect ${escapeHtml(intake.claim_gate_effect || packet.claim_gate_effect || 'no_claims_cleared')} - no_claim_gates_cleared true<br>Blocks still active: ${blocked.map((claim) => `<span class="chip">${escapeHtml(claim)}</span>`).join('') || '<span class="chip">claim gates remain blocked</span>'}<br><button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#4338ca" data-sam31-approval-upload-default-validation-packet="${escapeHtml(approvalUploadEvidenceId)}" data-sam31-approval-upload-evidence-id="${escapeHtml(approvalUploadEvidenceId)}" data-sam31-approval-upload-gate-validation-packet-href="${escapeHtml(gatePacketHref)}" data-sam31-approval-validation-filter-href="${escapeHtml(validationQueueHref)}" data-source-halofire-sam31-followup-packet-review-evidence-id="${escapeHtml(intake.source_packet_review_decision_evidence_id || '')}" data-source-halofire-sam31-preliminary-replay-followup-evidence-id="${escapeHtml(intake.source_followup_decision_evidence_id || '')}" data-sam31-consumer-intake-smoke-evidence-id="${escapeHtml(intake.source_section_to_artifacts_consumer_intake_smoke_evidence_id || '')}" data-source-halofire-sam31-sprinkler-review-decision-evidence-id="${escapeHtml(intake.source_halofire_sam31_sprinkler_review_decision_evidence_id || '')}" data-source-halofire-sam31-consumer-intake-smoke-followup-review-evidence-id="${escapeHtml(intake.source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id || '')}" data-claim-gate-effect="no_claims_cleared"${selected1881DataAttrs}>Download validation packet + open pending queue</button><div class="muted" id="sam31ApprovalUploadValidationStatus-${escapeHtml(approvalUploadEvidenceId)}" style="font-size:11px;margin-top:3px"></div></div>`;
+      const sourceReadbackEvidenceId = intake.source_openclaw_sam31_actual_value_replacement_readback_evidence_id || '';
+      const sourceChainAttrs = ` data-source-openclaw-sam31-actual-value-replacement-readback-evidence-id="${escapeHtml(sourceReadbackEvidenceId)}" data-source-halofire-sam31-followup-packet-review-evidence-id="${escapeHtml(intake.source_packet_review_decision_evidence_id || '')}" data-source-halofire-sam31-preliminary-replay-followup-evidence-id="${escapeHtml(intake.source_followup_decision_evidence_id || '')}" data-sam31-consumer-intake-smoke-evidence-id="${escapeHtml(intake.source_section_to_artifacts_consumer_intake_smoke_evidence_id || '')}" data-source-halofire-sam31-sprinkler-review-decision-evidence-id="${escapeHtml(intake.source_halofire_sam31_sprinkler_review_decision_evidence_id || '')}" data-source-halofire-sam31-consumer-intake-smoke-followup-review-evidence-id="${escapeHtml(intake.source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id || '')}"`;
+      const validationDecisionStatusId = `sam31ApprovalValidationDecisionStatusUpload-${approvalUploadEvidenceId}`;
+      return `<div class="muted" style="font-size:11px;margin-top:3px">SAM31 approval upload intake: ${escapeHtml(intake.artifact_type || 'halofire.sam31_approval_upload_intake.v1')}<br>evidence_type ${escapeHtml(intake.evidence_type || row.evidence_type || 'missing')} - status ${escapeHtml(intake.status || row.status || 'uploaded_pending_gate_validation')} - code ${escapeHtml(intake.code || 'missing')}<br>source_packet_review_decision_evidence_id ${escapeHtml(intake.source_packet_review_decision_evidence_id || 'missing')} - source_followup_decision_evidence_id ${escapeHtml(intake.source_followup_decision_evidence_id || 'missing')} - packet_index ${escapeHtml(intake.packet_index ?? 0)}<br>${selected1881Line}source_section_to_artifacts_consumer_intake_smoke_evidence_id ${escapeHtml(intake.source_section_to_artifacts_consumer_intake_smoke_evidence_id || 'missing')} - source_halofire_sam31_sprinkler_review_decision_evidence_id ${escapeHtml(intake.source_halofire_sam31_sprinkler_review_decision_evidence_id || 'missing')}<br>${escapeHtml(signoff.reviewer_name || 'unknown reviewer')} - ${escapeHtml(signoff.reviewer_title || 'title missing')} - signed_at ${escapeHtml(signoff.signed_at || 'missing')}<br>gate_validation_packet ${escapeHtml(gatePacket.artifact_type || 'halofire.sam31_approval_upload_gate_validation_packet.v1')} - claim_gate_effect ${escapeHtml(intake.claim_gate_effect || packet.claim_gate_effect || 'no_claims_cleared')} - no_claim_gates_cleared true<br>Blocks still active: ${blocked.map((claim) => `<span class="chip">${escapeHtml(claim)}</span>`).join('') || '<span class="chip">claim gates remain blocked</span>'}<br><button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#4338ca" data-sam31-approval-upload-default-validation-packet="${escapeHtml(approvalUploadEvidenceId)}" data-sam31-approval-upload-evidence-id="${escapeHtml(approvalUploadEvidenceId)}" data-sam31-approval-upload-gate-validation-packet-href="${escapeHtml(gatePacketHref)}" data-sam31-approval-validation-filter-href="${escapeHtml(validationQueueHref)}"${sourceChainAttrs} data-claim-gate-effect="no_claims_cleared"${selected1881DataAttrs}>Download validation packet + open pending queue</button> <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0f766e" data-sam31-approval-upload-validation-decision-save-evidence-id="${escapeHtml(approvalUploadEvidenceId)}" data-sam31-approval-upload-validation-decision-status-id="${escapeHtml(validationDecisionStatusId)}" data-sam31-approval-upload-validation-target-gate-code="${escapeHtml(intake.gate_code || '')}" data-sam31-approval-upload-validation-resolve-href="${escapeHtml(intake.gate_validation_action?.href || '')}"${sourceChainAttrs} data-claim-gate-effect="no_claims_cleared"${selected1881DataAttrs}>Save default placeholder validation decision</button><div class="muted" id="sam31ApprovalUploadValidationStatus-${escapeHtml(approvalUploadEvidenceId)}" style="font-size:11px;margin-top:3px"></div><div class="muted" id="${escapeHtml(validationDecisionStatusId)}" style="font-size:11px;margin-top:3px"></div></div>`;
     }
     if (packet.kind === 'signed_reviewer_evidence') {
       const signoff = packet.signoff || {};
@@ -5540,18 +5543,34 @@ async function saveSam31ApprovalUploadValidationDecision(approvalUploadEvidenceI
   const trigger = targetId
     ? document.querySelector(`[data-sam31-approval-upload-validation-decision-save-evidence-id="${CSS.escape(targetId)}"]`)
     : null;
-  const status = document.getElementById(`sam31ApprovalValidationDecisionStatus-${targetId}`) || document.getElementById('resolverQueue') || document.getElementById('evidence');
+  const explicitStatusId = trigger?.dataset.sam31ApprovalUploadValidationDecisionStatusId || '';
+  const status = (explicitStatusId ? document.getElementById(explicitStatusId) : null) || document.getElementById(`sam31ApprovalValidationDecisionStatus-${targetId}`) || document.getElementById('resolverQueue') || document.getElementById('evidence');
   const valueOf = (id) => document.getElementById(`${id}-${targetId}`)?.value?.trim() || '';
+  const triggerSelected1881 = trigger ? {
+    selected_sheet_ref: trigger.dataset.selectedSheetRef || '',
+    selected_scale_ref: trigger.dataset.selectedScaleRef || '',
+    selected_boundary_candidate_ref: trigger.dataset.selectedBoundaryCandidateRef || '',
+  } : null;
+  const sourceReadbackEvidenceId = trigger?.dataset.sourceOpenclawSam31ActualValueReplacementReadbackEvidenceId || '';
+  const sourcePacketReviewEvidenceId = trigger?.dataset.sourceHalofireSam31FollowupPacketReviewEvidenceId || '';
   const stampStatus = (targetStatus, saved) => {
     if (!targetStatus) return;
     const savedId = String(saved?.evidence_id || saved?.id || '');
+    const selected1881 = sam31Selected1881Refs(saved, triggerSelected1881);
     targetStatus.dataset.sam31ApprovalUploadValidationDecisionEvidenceId = savedId;
     targetStatus.dataset.sourceHalofireSam31ApprovalUploadEvidenceId = String(saved?.source_halofire_sam31_approval_upload_evidence_id || targetId);
+    targetStatus.dataset.sourceHalofireSam31FollowupPacketReviewEvidenceId = String(saved?.source_packet_review_decision_evidence_id || sourcePacketReviewEvidenceId || '');
+    targetStatus.dataset.sourceOpenclawSam31ActualValueReplacementReadbackEvidenceId = String(saved?.source_openclaw_sam31_actual_value_replacement_readback_evidence_id || sourceReadbackEvidenceId || '');
     targetStatus.dataset.sam31ApprovalUploadValidationTargetGateCode = String(saved?.target_gate_code || trigger?.dataset.sam31ApprovalUploadValidationTargetGateCode || '');
     targetStatus.dataset.validationDecision = String(saved?.validation_decision || '');
     targetStatus.dataset.claimGateEffect = String(saved?.claim_gate_effect || 'no_claims_cleared');
     targetStatus.dataset.noClaimGatesCleared = String(saved?.no_claim_gates_cleared !== false);
     targetStatus.dataset.resolveActionHref = String(saved?.resolve_action?.href || '');
+    if (hasSam31Selected1881Refs(selected1881)) {
+      targetStatus.dataset.selectedSheetRef = selected1881.selected_sheet_ref;
+      targetStatus.dataset.selectedScaleRef = selected1881.selected_scale_ref;
+      targetStatus.dataset.selectedBoundaryCandidateRef = selected1881.selected_boundary_candidate_ref;
+    }
     targetStatus.textContent = `Saved ${saved?.artifact_type || 'halofire.sam31_approval_upload_validation_decision.v1'} evidence #${savedId}; claim_gate_effect ${saved?.claim_gate_effect || 'no_claims_cleared'}.`;
   };
   try {
@@ -5567,6 +5586,10 @@ async function saveSam31ApprovalUploadValidationDecision(approvalUploadEvidenceI
         organization: valueOf('sam31ApprovalValidationOrganization'),
         license_id: valueOf('sam31ApprovalValidationLicenseId'),
         notes: valueOf('sam31ApprovalValidationNotes'),
+        source_openclaw_sam31_actual_value_replacement_readback_evidence_id: Number(sourceReadbackEvidenceId) || sourceReadbackEvidenceId || null,
+        selected_sheet_ref: triggerSelected1881?.selected_sheet_ref || '',
+        selected_scale_ref: triggerSelected1881?.selected_scale_ref || '',
+        selected_boundary_candidate_ref: triggerSelected1881?.selected_boundary_candidate_ref || '',
       }),
     });
     if (saved.artifact_type !== 'halofire.sam31_approval_upload_validation_decision.v1') {
@@ -5579,7 +5602,10 @@ async function saveSam31ApprovalUploadValidationDecision(approvalUploadEvidenceI
     resolverQueueFilterQuery = validationFilter + (targetGate ? `&targetGate=${encodeURIComponent(targetGate)}` : '');
     await refreshEvidence();
     await refreshResolverQueue();
-    const statusNodes = [...document.querySelectorAll(`#sam31ApprovalValidationDecisionStatus-${CSS.escape(targetId)}`)];
+    const statusNodes = [
+      explicitStatusId ? document.getElementById(explicitStatusId) : null,
+      ...document.querySelectorAll(`#sam31ApprovalValidationDecisionStatus-${CSS.escape(targetId)}`),
+    ].filter((node, index, nodes) => node && nodes.indexOf(node) === index);
     if (!statusNodes.length && status) statusNodes.push(status);
     statusNodes.forEach((targetStatus) => stampStatus(targetStatus, saved));
   } catch (err) {

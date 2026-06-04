@@ -10090,6 +10090,11 @@ function buildHalofireSam31ApprovalUploadValidationDecision(projectName, uploadE
     ? `/api/projects/${encodeURIComponent(projectName)}/claim-gates/${encodeURIComponent(gateCode)}/resolve`
     : null;
   const pdfBoundaryProvenance = sam31PdfBoundaryDecisionProvenance(intake);
+  const readbackEvidenceId = Number(
+    body.source_openclaw_sam31_actual_value_replacement_readback_evidence_id
+    || intake.source_openclaw_sam31_actual_value_replacement_readback_evidence_id
+    || 0,
+  ) || null;
   return {
     artifact_type: HALOFIRE_SAM31_APPROVAL_UPLOAD_VALIDATION_DECISION_TYPE,
     status: isRealValidation ? 'present' : 'blocked_pending_real_signed_evidence',
@@ -10111,7 +10116,11 @@ function buildHalofireSam31ApprovalUploadValidationDecision(projectName, uploadE
     source_section_to_artifacts_consumer_intake_smoke_evidence_id: intake.source_section_to_artifacts_consumer_intake_smoke_evidence_id || null,
     source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id: intake.source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id || null,
     source_halofire_sam31_sprinkler_review_decision_evidence_id: intake.source_halofire_sam31_sprinkler_review_decision_evidence_id || null,
+    source_openclaw_sam31_actual_value_replacement_readback_evidence_id: readbackEvidenceId,
     ...pdfBoundaryProvenance,
+    selected_sheet_ref: body.selected_sheet_ref || pdfBoundaryProvenance.selected_sheet_ref || null,
+    selected_scale_ref: body.selected_scale_ref || pdfBoundaryProvenance.selected_scale_ref || null,
+    selected_boundary_candidate_ref: body.selected_boundary_candidate_ref || pdfBoundaryProvenance.selected_boundary_candidate_ref || null,
     validation_ref: validationRef,
     source_file: String(body.source_file || body.sourceFile || evidence.source_file || '').trim() || null,
     signoff,
@@ -10131,6 +10140,11 @@ function buildHalofireSam31ApprovalUploadValidationDecision(projectName, uploadE
         status: evidence.status,
         claim_gate_effect: 'no_claims_cleared',
       },
+      readbackEvidenceId ? {
+        evidence_type: 'openclaw_sam31_actual_value_replacement_readback',
+        evidence_id: readbackEvidenceId,
+        claim_gate_effect: 'no_claims_cleared',
+      } : null,
       {
         evidence_type: `${evidenceType}_validation_decision`,
         source_ref: validationRef,
@@ -10223,6 +10237,7 @@ function halofireSam31ApprovalUploadValidationDecisionSummary(validationEvidence
     evidence_type_required: decision.evidence_type,
     required_evidence_type: decision.required_evidence_type,
     source_halofire_sam31_approval_upload_evidence_id: decision.source_halofire_sam31_approval_upload_evidence_id,
+    source_openclaw_sam31_actual_value_replacement_readback_evidence_id: decision.source_openclaw_sam31_actual_value_replacement_readback_evidence_id || null,
     selected_sheet_ref: decision.selected_sheet_ref || null,
     selected_scale_ref: decision.selected_scale_ref || null,
     selected_boundary_candidate_ref: decision.selected_boundary_candidate_ref || null,
@@ -10264,6 +10279,7 @@ function halofireSam31ApprovalUploadIntakeSummary(uploadEvidence) {
     source_section_to_artifacts_consumer_intake_smoke_evidence_id: intake.source_section_to_artifacts_consumer_intake_smoke_evidence_id || null,
     source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id: intake.source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id || null,
     source_halofire_sam31_sprinkler_review_decision_evidence_id: intake.source_halofire_sam31_sprinkler_review_decision_evidence_id || null,
+    source_openclaw_sam31_actual_value_replacement_readback_evidence_id: intake.source_openclaw_sam31_actual_value_replacement_readback_evidence_id || null,
     packet_index: intake.packet_index,
     selected_sheet_ref: intake.selected_sheet_ref || null,
     selected_scale_ref: intake.selected_scale_ref || null,
