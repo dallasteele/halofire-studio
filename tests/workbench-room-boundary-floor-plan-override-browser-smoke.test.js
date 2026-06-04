@@ -643,6 +643,15 @@ describe('Workbench room-boundary floor-plan override browser smoke', () => {
       expect(await approvalValidationDecisionStatus.getAttribute('data-resolve-action-href')).toBe('');
       expect(await page.locator(`#evidence-${approvalValidationDecisionEvidenceId}`).innerText()).toContain('halofire.sam31_approval_upload_validation_decision.v1');
       expect(await page.locator(`#evidence-${approvalValidationDecisionEvidenceId}`).innerText()).toContain('default_internal_alpha_placeholder_rejected');
+      await page.waitForFunction((decisionEvidenceId) => {
+        const text = document.getElementById('resolverQueue')?.innerText || '';
+        return text.includes(`latest_approval_upload_validation_decision evidence #${decisionEvidenceId}`)
+          && text.includes('default_internal_alpha_placeholder_rejected')
+          && text.includes('sam31_approval_validation_placeholder_no_claims');
+      }, approvalValidationDecisionEvidenceId);
+      const resolverQueueAfterValidationDecisionText = await page.locator('#resolverQueue').innerText();
+      expect(resolverQueueAfterValidationDecisionText).toContain('gate_validation_status validation_decision_no_claims_cleared');
+      expect(resolverQueueAfterValidationDecisionText).toContain('Gate resolve blocked until real_signed_evidence_validated validation decision');
 
       expect(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-source-halofire-sam31-approval-upload-evidence-id')).toBe(String(approvalUploadEvidenceId));
       expect(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-downloaded-gate-validation-packet')).toBe('true');

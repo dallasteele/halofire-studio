@@ -2670,7 +2670,9 @@ describe('OpenClaw SAM31 bridge status API', () => {
       targetGate: 'PROFESSIONAL_REVIEW_MISSING',
     }));
     expect(pendingApprovalValidationQueue.summary.sam31_approval_validation_pending).toBeGreaterThanOrEqual(1);
-    expect(pendingApprovalValidationQueue.summary.sam31_approval_validation_ready_for_gate_resolve).toBeGreaterThanOrEqual(1);
+    expect(pendingApprovalValidationQueue.summary.sam31_approval_validation_decisions_recorded || 0).toBe(0);
+    expect(pendingApprovalValidationQueue.summary.sam31_approval_validation_placeholder_no_claims || 0).toBe(0);
+    expect(pendingApprovalValidationQueue.summary.sam31_approval_validation_ready_for_gate_resolve || 0).toBe(0);
     const pendingApprovalValidationItem = pendingApprovalValidationQueue.items.find((row) => row.evidence_id === boundary.id);
     const pendingApprovalValidationRows = pendingApprovalValidationItem.sam31_sprinkler_preliminary_replay_queue_items || [];
     const pendingApprovalValidationRow = pendingApprovalValidationRows.find((row) => row.source_halofire_sam31_sprinkler_review_decision_evidence_id === sprinklerReview.id);
@@ -2686,6 +2688,7 @@ describe('OpenClaw SAM31 bridge status API', () => {
             artifact_type: 'halofire.sam31_approval_upload_gate_validation_packet.v1',
           }),
         }),
+        latest_approval_upload_validation_decision: null,
         claim_gate_effect: 'no_claims_cleared',
       }),
     ]);
@@ -2732,6 +2735,39 @@ describe('OpenClaw SAM31 bridge status API', () => {
         request_body: { evidence_id: expect.any(Number) },
       }),
     }));
+
+    const readyApprovalValidationRes = await request(`${COOPERATIVE_1881_PATH}/resolver-queue?sam31ApprovalValidation=ready_for_explicit_gate_resolve&targetGate=PROFESSIONAL_REVIEW_MISSING`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(readyApprovalValidationRes.status).toBe(200);
+    const readyApprovalValidationQueue = await readyApprovalValidationRes.json();
+    expect(readyApprovalValidationQueue.summary.sam31_approval_validation_pending || 0).toBe(0);
+    expect(readyApprovalValidationQueue.summary.sam31_approval_validation_decisions_recorded).toBeGreaterThanOrEqual(1);
+    expect(readyApprovalValidationQueue.summary.sam31_approval_validation_ready_for_gate_resolve).toBeGreaterThanOrEqual(1);
+    const readyApprovalValidationItem = readyApprovalValidationQueue.items.find((row) => row.evidence_id === boundary.id);
+    const readyApprovalValidationRows = readyApprovalValidationItem.sam31_sprinkler_preliminary_replay_queue_items || [];
+    const readyApprovalValidationRow = readyApprovalValidationRows.find((row) => row.source_halofire_sam31_sprinkler_review_decision_evidence_id === sprinklerReview.id);
+    const readyApprovalValidationPacket = readyApprovalValidationRow.packet_queue_items.find((packet) => packet.latest_packet_review_decision?.evidence_id === replayFollowupPacketReview.id);
+    expect(readyApprovalValidationPacket.approval_upload_resolver_rows).toEqual([
+      expect.objectContaining({
+        code: 'HALOFIRE_SAM31_PROFESSIONAL_APPROVAL_UPLOAD_MISSING',
+        target_gate_code: 'PROFESSIONAL_REVIEW_MISSING',
+        gate_validation_status: 'ready_for_explicit_gate_resolve',
+        latest_approval_upload_intake: expect.objectContaining({
+          evidence_id: professionalApprovalUpload.id,
+        }),
+        latest_approval_upload_validation_decision: expect.objectContaining({
+          evidence_id: approvalValidationDecision.evidence_id,
+          validation_decision: 'real_signed_evidence_validated',
+          claim_gate_effect: 'ready_for_explicit_gate_resolve',
+          resolve_action: expect.objectContaining({
+            href: expect.stringContaining('/claim-gates/PROFESSIONAL_REVIEW_MISSING/resolve'),
+            request_body: { evidence_id: approvalValidationDecision.evidence_id },
+          }),
+        }),
+        claim_gate_effect: 'ready_for_explicit_gate_resolve',
+      }),
+    ]);
 
     const professionalGateResolveRes = await request(`${COOPERATIVE_1881_PATH}/claim-gates/PROFESSIONAL_REVIEW_MISSING/resolve`, {
       method: 'POST',
@@ -2836,7 +2872,7 @@ describe('OpenClaw SAM31 bridge status API', () => {
       model_3d_candidate_count: 1,
     }));
     expect(nameForgeReviewSummary.use_for_claims).toBe(false);
-  }, 15000);
+  }, 25000);
 
   it('carries saved bridge smoke artifacts into SAM31 audit defaults and replay evidence without clearing claims', async () => {
     const boundaryRes = await request(`${COOPERATIVE_1881_PATH}/pdf-boundary-decision`, {

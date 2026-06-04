@@ -408,7 +408,8 @@ describe('studio static origin handling', () => {
     expect(html).toContain('saveHalofireSam31ApprovalUpload');
     expect(html).toContain('data-sam31-approval-upload-code');
     expect(html).toContain('/approval-upload');
-    expect(html).toContain('Validate SAM31 approval upload gate');
+    expect(html).toContain('Resolve validated SAM31 approval gate');
+    expect(html).toContain('Gate resolve blocked until real_signed_evidence_validated validation decision');
     expect(html).toContain('resolveHalofireSam31ApprovalUploadGate');
     expect(html).toContain('data-sam31-approval-upload-resolve-gate-code');
     expect(html).toContain('/claim-gates/');
