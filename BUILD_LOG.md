@@ -1,5 +1,13 @@
 # HaloFire Build Log
 
+## 2026-06-04 - Workbench replay smoke follow-through
+
+- Added a Workbench one-click action on replay-scoped `sam31_actual_value_replacement` rows to save HaloFire `openclaw_sam31_section_to_artifacts_consumer_intake_smoke` evidence directly from the replay replacement.
+- Preserved visible `source_replay_evidence_id`, `source_sam31_actual_value_replacement_evidence_id`, source refs, and `claim_gate_effect: no_claims_cleared` in the Workbench row/status metadata and follow-up/sprinkler packet links.
+- Made the replay replacement scaffold carry employee-reviewed room polygons into SAM31 sections, object hypotheses, LLM observations, vector overlays, and internal-alpha 3D model candidates before saving the replacement.
+- Verified red-to-green with `npx vitest run tests/workbench-room-boundary-floor-plan-override-browser-smoke.test.js --reporter=verbose` and adjacent coverage with `npx vitest run tests/workbench-sam31-consumer-intake-smoke-browser.test.js --reporter=verbose`. This is `NO_FORMALIZABLE_CLAIM`; it is UI/provenance/packet routing, not approval evidence.
+- Still blocked: AutoSprink parity, AHJ approval, PE/professional review, permit readiness, fabrication readiness, manufacturer-exact models, brand readiness, production readiness, survey-grade claims, and engineering-grade claims.
+
 ## 2026-06-03 - Settings floor-plan override action download fix
 
 - Fixed the Settings room-boundary override download lane in [`settings.html`](C:/Users/dalla/OneDrive/Documents/HaloFire/settings.html) to normalize stored local `/api/...` hrefs before calling the page API helper, matching the resolved-gate audit path and preventing local `/api/api/...` requests.

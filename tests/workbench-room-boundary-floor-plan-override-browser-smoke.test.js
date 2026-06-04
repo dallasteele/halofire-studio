@@ -327,7 +327,7 @@ describe('Workbench room-boundary floor-plan override browser smoke', () => {
       }, String(savedReplayEvidenceId));
 
       const replacementStatus = page.locator(`#replaySam31ActualValueReplacementStatus-${savedReplayEvidenceId}`);
-      const replacementEvidenceId = await replacementStatus.getAttribute('data-sam31-actual-value-replacement-evidence-id');
+      const replacementEvidenceId = String(await replacementStatus.getAttribute('data-sam31-actual-value-replacement-evidence-id') || '');
       expect(replacementEvidenceId).toMatch(/^\d+$/);
       expect(await replacementStatus.getAttribute('data-source-replay-evidence-id')).toBe(String(savedReplayEvidenceId));
       expect(await replacementStatus.getAttribute('data-claim-gate-effect')).toBe('no_claims_cleared');
@@ -350,6 +350,43 @@ describe('Workbench room-boundary floor-plan override browser smoke', () => {
       expect(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-sam31-actual-value-resolver-queue-href'))
         .toBe(`/api/openclaw/sam31/actual-value-resolver-queue?projectName=${encodeURIComponent(PROJECT_NAME)}&sourceReplayEvidenceId=${savedReplayEvidenceId}`);
       expect(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-source-replay-evidence-id')).toBe(String(savedReplayEvidenceId));
+
+      const replaySmokeButton = page.locator(`[data-replay-sam31-consumer-intake-smoke-source-replacement-evidence-id="${replacementEvidenceId}"]`);
+      await replaySmokeButton.waitFor({ state: 'attached' });
+      expect(await replaySmokeButton.getAttribute('data-source-replay-evidence-id')).toBe(String(savedReplayEvidenceId));
+      expect(await replaySmokeButton.getAttribute('data-source-sam31-actual-value-replacement-evidence-id')).toBe(String(replacementEvidenceId));
+      expect(await replaySmokeButton.getAttribute('data-replay-sam31-consumer-intake-smoke-consumer')).toBe('halo_fire');
+      await replaySmokeButton.click();
+      await page.waitForFunction((replacementId) => {
+        const status = document.getElementById('sam31ActualValueQueueStatus');
+        return status?.dataset.sourceSam31ActualValueReplacementEvidenceId === replacementId
+          && Boolean(status?.dataset.sam31ConsumerIntakeSmokeEvidenceId);
+      }, String(replacementEvidenceId));
+
+      const smokeEvidenceId = String(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-sam31-consumer-intake-smoke-evidence-id') || '');
+      expect(smokeEvidenceId).toMatch(/^\d+$/);
+      expect(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-source-replay-evidence-id')).toBe(String(savedReplayEvidenceId));
+      expect(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-source-sam31-actual-value-replacement-evidence-id')).toBe(String(replacementEvidenceId));
+      expect(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-claim-gate-effect')).toBe('no_claims_cleared');
+
+      await page.locator(`#evidence-${smokeEvidenceId}`).waitFor({ state: 'attached' });
+      const smokeRow = await page.locator(`#evidence-${smokeEvidenceId}`).innerText();
+      expect(smokeRow).toContain('openclaw_sam31_section_to_artifacts_consumer_intake_smoke');
+      expect(smokeRow).toContain(`source_replay_evidence_id ${savedReplayEvidenceId}`);
+      expect(smokeRow).toContain(`source_sam31_actual_value_replacement_evidence_id ${replacementEvidenceId}`);
+      expect(smokeRow).toContain('claim_gate_effect no_claims_cleared');
+
+      const followup = page.locator(`[data-sam31-consumer-intake-smoke-followup-packet="${smokeEvidenceId}"]`).first();
+      await followup.waitFor({ state: 'attached' });
+      expect(await followup.getAttribute('data-sam31-consumer-intake-smoke-followup-packet-href')).toBe(
+        `${PROJECT_PATH}/openclaw/sam31/section-to-artifacts-consumer-intake-smoke/${smokeEvidenceId}/followup-packet`,
+      );
+
+      const sprinkler = page.locator(`[data-sam31-consumer-intake-smoke-sprinkler-review-packet="${smokeEvidenceId}"]`).first();
+      await sprinkler.waitFor({ state: 'attached' });
+      expect(await sprinkler.getAttribute('data-sam31-consumer-intake-smoke-sprinkler-review-packet-href')).toBe(
+        `${PROJECT_PATH}/openclaw/sam31/section-to-artifacts-consumer-intake-smoke/${smokeEvidenceId}/sprinkler-review-packet`,
+      );
     } finally {
       await page.close();
     }
