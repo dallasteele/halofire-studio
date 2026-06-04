@@ -1014,7 +1014,13 @@ describe('Workbench room-boundary floor-plan override browser smoke', () => {
       expect(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-source-replay-evidence-id')).toBe(String(savedReplayEvidenceId));
       expect(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-source-sam31-actual-value-replacement-evidence-id')).toBe(String(replacementEvidenceId));
       expect(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-source-halofire-sam31-consumer-intake-smoke-followup-review-evidence-id')).toBe(String(followupReviewEvidenceId));
+      expect(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-selected-sheet-ref')).toBe('1881://proposal-cooperative/sheet-7');
+      expect(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-selected-scale-ref')).toBe('1881://operator-scale/sheet-7/0.0833');
+      expect(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-selected-boundary-candidate-ref')).toBe('candidate:1881-sheet-7-outline');
       expect(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-claim-gate-effect')).toBe('no_claims_cleared');
+      const sprinklerPacketStatusText = await page.locator('#sam31ActualValueQueueStatus').innerText();
+      expect(sprinklerPacketStatusText).toContain('selected_1881_context');
+      expect(sprinklerPacketStatusText).toContain('1881://proposal-cooperative/sheet-7');
 
       const defaultSprinkler = page.locator(`[data-replay-sam31-consumer-intake-smoke-default-sprinkler-review="${smokeEvidenceId}"]`).first();
       await defaultSprinkler.waitFor({ state: 'attached' });

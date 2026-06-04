@@ -2697,12 +2697,22 @@ async function downloadHalofireSam31ConsumerIntakeSmokeSprinklerReviewPacket(evi
     'Downloaded HaloFire SAM31 consumer intake smoke sprinkler review packet; claim gates remain blocked.',
   );
   if (status) {
+    const selected1881 = sam31Selected1881Refs(packet);
     status.dataset.sam31ConsumerIntakeSmokeEvidenceId = String(packet.source_section_to_artifacts_consumer_intake_smoke_evidence_id || targetId);
     status.dataset.sourceReplayEvidenceId = String(packet.source_replay_evidence_id || '');
     status.dataset.sourceSam31ActualValueReplacementEvidenceId = String(packet.source_sam31_actual_value_replacement_evidence_id || '');
+    status.dataset.sourceOpenclawSam31ActualValueReplacementReadbackEvidenceId = String(packet.source_openclaw_sam31_actual_value_replacement_readback_evidence_id || '');
     status.dataset.sourceHalofireSam31ConsumerIntakeSmokeFollowupReviewEvidenceId = String(packet.source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id || '');
+    if (hasSam31Selected1881Refs(selected1881)) {
+      status.dataset.selectedSheetRef = selected1881.selected_sheet_ref;
+      status.dataset.selectedScaleRef = selected1881.selected_scale_ref;
+      status.dataset.selectedBoundaryCandidateRef = selected1881.selected_boundary_candidate_ref;
+    }
     status.dataset.claimGateEffect = packet.claim_gate_effect || 'no_claims_cleared';
-    status.textContent = 'Downloaded HaloFire SAM31 consumer intake smoke sprinkler review packet; claim gates remain blocked.';
+    const selected1881Text = hasSam31Selected1881Refs(selected1881)
+      ? ` selected_1881_context selected_sheet_ref ${selected1881.selected_sheet_ref || 'missing'} - selected_scale_ref ${selected1881.selected_scale_ref || 'missing'} - selected_boundary_candidate_ref ${selected1881.selected_boundary_candidate_ref || 'missing'} - use_for_claims false - claim_gate_effect no_claims_cleared.`
+      : '';
+    status.textContent = 'Downloaded HaloFire SAM31 consumer intake smoke sprinkler review packet; claim gates remain blocked.' + selected1881Text;
   }
 }
 
