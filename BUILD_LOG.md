@@ -7,6 +7,14 @@
 - Verified red-to-green with `npx vitest run tests/workbench-supplied-bid-truth-browser-smoke.test.js --reporter=verbose`. This is `NO_FORMALIZABLE_CLAIM`; the slice is UI/provenance truthfulness, not a theorem-shaped invariant.
 - Still blocked: AutoSprink parity, AHJ approval, PE/professional review, permit readiness, fabrication readiness, manufacturer-exact models, brand readiness, production readiness, survey-grade claims, and engineering-grade claims.
 
+## 2026-06-04 - Claim-gate audit 1881 provenance carry-through
+
+- Changed [`src/api/server.js`](C:/Users/dalla/OneDrive/Documents/HaloFire/src/api/server.js) so `buildClaimGateResolveAuditPacket(...)` rehydrates `selected_sheet_ref`, `selected_scale_ref`, and `selected_boundary_candidate_ref` from SAM31 approval-upload validation decision notes and includes a `selected_1881_context` source ref on the explicit gate-clear audit packet.
+- Updated [`workbench.html`](C:/Users/dalla/OneDrive/Documents/HaloFire/workbench.html) so the resolved SAM31 approval status, saved claim-gate audit readback, and downstream actual-value audit handoff keep showing `selected_1881_context` after the audit packet is downloaded or saved.
+- Added focused coverage in [`tests/workbench-room-boundary-floor-plan-override-browser-smoke.test.js`](C:/Users/dalla/OneDrive/Documents/HaloFire/tests/workbench-room-boundary-floor-plan-override-browser-smoke.test.js) and [`tests/workbench-evidence-detail.test.js`](C:/Users/dalla/OneDrive/Documents/HaloFire/tests/workbench-evidence-detail.test.js) proving the explicit gate-resolve audit lane preserves the selected 1881 sheet/scale/candidate refs without implying new claim clearance.
+- Verified with `npx vitest run tests/workbench-room-boundary-floor-plan-override-browser-smoke.test.js --reporter=verbose`, `npx vitest run tests/workbench-evidence-detail.test.js --reporter=verbose`, `C:/Python312/python.exe E:/ClaudeBot/scripts/verify_agentic_rules.py`, and `git diff --check`. This is `NO_FORMALIZABLE_CLAIM`; the slice preserves review provenance across audit/readback UI and packet plumbing, not a theorem-shaped invariant.
+- Still blocked: AutoSprink parity, AHJ approval beyond this explicitly validated gate lane, PE/professional review, permit readiness, fabrication readiness, manufacturer-exact models, brand readiness, production readiness, survey-grade claims, and engineering-grade claims.
+
 ## 2026-06-04 - SAM31 approval upload validation decisions
 
 - Added `halofire.sam31_approval_upload_validation_decision.v1` evidence rows so pending SAM31 approval-upload rows can be reviewed and saved before any claim-gate resolve attempt.

@@ -109,6 +109,9 @@ describe('Workbench room-boundary floor-plan override browser smoke', () => {
             source_packet_review_decision_evidence_id: 0,
             source_followup_decision_evidence_id: 0,
             source_pdf_boundary_evidence_id: null,
+            selected_sheet_ref: '1881://proposal-cooperative/sheet-7',
+            selected_scale_ref: '1881://operator-scale/sheet-7/0.0833',
+            selected_boundary_candidate_ref: 'candidate:1881-sheet-7-outline',
             packet_index: 0,
             signoff: {
               reviewer_name: 'Pat Licensed',
@@ -128,6 +131,13 @@ describe('Workbench room-boundary floor-plan override browser smoke', () => {
                 source_ref: 'signed-ahj://1881/sam31/ahj-approval-real-001',
                 source_file: 'sam31-ahj-approval-real-001.pdf',
                 status: 'present',
+                claim_gate_effect: 'no_claims_cleared',
+              },
+              {
+                evidence_type: 'selected_1881_context',
+                selected_sheet_ref: '1881://proposal-cooperative/sheet-7',
+                selected_scale_ref: '1881://operator-scale/sheet-7/0.0833',
+                selected_boundary_candidate_ref: 'candidate:1881-sheet-7-outline',
                 claim_gate_effect: 'no_claims_cleared',
               },
             ],
@@ -195,8 +205,19 @@ describe('Workbench room-boundary floor-plan override browser smoke', () => {
         gate_code: gateCode,
         resolved_evidence_id: approvalValidationDecision.evidence_id,
         resolved_evidence_ref: 'approval-validation://1881/sam31/ahj-approval-real-001',
+        selected_sheet_ref: '1881://proposal-cooperative/sheet-7',
+        selected_scale_ref: '1881://operator-scale/sheet-7/0.0833',
+        selected_boundary_candidate_ref: 'candidate:1881-sheet-7-outline',
         claim_gate_effect: 'gate_cleared_after_explicit_signed_validation',
       }));
+      expect(auditPacket.source_refs).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          evidence_type: 'selected_1881_context',
+          selected_sheet_ref: '1881://proposal-cooperative/sheet-7',
+          selected_scale_ref: '1881://operator-scale/sheet-7/0.0833',
+          selected_boundary_candidate_ref: 'candidate:1881-sheet-7-outline',
+        }),
+      ]));
 
       const resolveStatus = page.locator(`#${statusId}`);
       await page.waitForFunction((targetId) => {
@@ -207,6 +228,9 @@ describe('Workbench room-boundary floor-plan override browser smoke', () => {
       expect(await resolveStatus.getAttribute('data-resolved-evidence-id')).toBe(String(approvalValidationDecision.evidence_id));
       expect(await resolveStatus.getAttribute('data-claim-gate-resolve-audit-href')).toBe(`${PROJECT_PATH}/claim-gates/${gateCode}/resolve-audit-packet`);
       expect(await resolveStatus.getAttribute('data-claim-gate-effect')).toBe('gate_cleared_after_explicit_signed_validation');
+      const resolveStatusText = await resolveStatus.innerText();
+      expect(resolveStatusText).toContain('selected_1881_context');
+      expect(resolveStatusText).toContain('1881://proposal-cooperative/sheet-7');
 
       await page.waitForFunction((decisionEvidenceId) => {
         const text = document.getElementById('resolverQueue')?.innerText || '';

@@ -294,6 +294,7 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toContain('halofire.claim_gate_resolve_audit_packet.v1');
     expect(html).toContain('data-claim-gate-resolve-audit-save-evidence-id');
     expect(html).toContain('saveClaimGateResolveAuditEvidence');
+    expect(html).toMatch(/halofire_claim_gate_resolve_audit_readback[\s\S]*renderSam31Selected1881SourceRefs/);
     expect(html).toContain('halofire_claim_gate_resolve_audit_readback');
     expect(html).toContain('no_unrelated_claims_cleared');
     expect(html).toContain('data-claim-gate-audit-actual-value-readback-evidence-id');

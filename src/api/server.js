@@ -813,6 +813,16 @@ function buildClaimGateResolveAuditPacket(projectName, gateCode) {
   const requiresSignedReview = SIGNED_REVIEW_EVIDENCE_TYPES.has(evidence.evidence_type);
   const hasSignedReview = hasStructuredSignedReviewerNotes(evidence);
   const packetAction = claimGateResolveAuditPacketAction(projectName, gateCode);
+  const pdfBoundaryProvenance = sam31PdfBoundaryDecisionProvenance(
+    parsedNotes?.validation_decision && typeof parsedNotes.validation_decision === 'object'
+      ? parsedNotes.validation_decision
+      : parsedNotes,
+  );
+  const hasPdfBoundaryProvenance = Boolean(
+    pdfBoundaryProvenance.selected_sheet_ref
+    || pdfBoundaryProvenance.selected_scale_ref
+    || pdfBoundaryProvenance.selected_boundary_candidate_ref,
+  );
   return {
     artifact_type: packetAction.artifact_type,
     status: requiresSignedReview ? 'gate_cleared_with_explicit_signed_evidence' : 'gate_cleared_with_explicit_evidence',
@@ -847,6 +857,7 @@ function buildClaimGateResolveAuditPacket(projectName, gateCode) {
       has_signed_reviewer_metadata: hasSignedReview,
       signoff: parsedNotes?.signoff || null,
     },
+    ...pdfBoundaryProvenance,
     validation_steps: [
       {
         code: 'GATE_ALLOWED_EVIDENCE_TYPE_CONFIRMED',
@@ -866,13 +877,18 @@ function buildClaimGateResolveAuditPacket(projectName, gateCode) {
       },
     ],
     source_refs: [
+      hasPdfBoundaryProvenance ? {
+        evidence_type: 'selected_1881_context',
+        ...pdfBoundaryProvenance,
+        claim_gate_effect: 'no_claims_cleared',
+      } : null,
       {
         evidence_id: evidence.id,
         evidence_type: evidence.evidence_type,
         source_file: evidence.source_file,
         source_ref: evidence.source_ref,
       },
-    ],
+    ].filter(Boolean),
     claim_gate_effect: 'gate_cleared_after_explicit_signed_validation',
     no_unrelated_claims_cleared: true,
     limitations: [
