@@ -240,6 +240,46 @@ describe('Workbench supplied bid-truth browser smoke', () => {
       expect(evidenceText).toContain('Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G6');
       expect(evidenceText).toContain('employee://bid-truth/downstream-browser-smoke-001');
 
+      const evidenceRows = await api(`${PROJECT_PATH}/evidence`, token);
+      const savedLayout = evidenceRows.find((row) => (
+        row.evidence_type === 'best_effort_ai_layout'
+        && row.notes.includes('1881://employee-bid-truth/downstream-browser-smoke-001')
+      ));
+      expect(savedLayout).toBeTruthy();
+      const savedLayoutDownload = page.locator(`[data-replay-bid-artifact-evidence-id="${savedLayout.id}"]`).first();
+      await savedLayoutDownload.waitFor({ state: 'attached' });
+      const [savedLayoutArtifactDownload] = await Promise.all([
+        page.waitForEvent('download'),
+        savedLayoutDownload.click(),
+      ]);
+      const savedLayoutArtifactPath = await savedLayoutArtifactDownload.path();
+      expect(savedLayoutArtifactDownload.suggestedFilename()).toContain('saved-layout-readback');
+      expect(savedLayoutArtifactPath).toBeTruthy();
+      const savedLayoutArtifact = JSON.parse(fs.readFileSync(savedLayoutArtifactPath, 'utf8'));
+      expect(savedLayoutArtifact).toEqual(expect.objectContaining({
+        artifact_type: 'halofire.best_effort_ai_layout.saved_readback_bundle.v1',
+        source_artifact_type: 'halofire.best_effort_ai_layout.supplied_document_bid_truth_defaults.v1',
+        project_name: PROJECT_NAME,
+        evidence_id: savedLayout.id,
+        source_evidence_type: 'supplied_document_bid_truth_replacement',
+        source_supplied_document_bid_truth_replacement_evidence_id: replacement.evidence.id,
+        replacement_ref: '1881://employee-bid-truth/downstream-browser-smoke-001',
+        source_file: 'employee-bid-truth-downstream-browser-smoke.json',
+        claim_gate_effect: 'no_claims_cleared',
+        no_claim_gates_cleared: true,
+      }));
+      expect(savedLayoutArtifact.source_refs).toEqual([
+        'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G6',
+        'employee://bid-truth/downstream-browser-smoke-001',
+      ]);
+      expect(savedLayoutArtifact.project_truth).toEqual(expect.objectContaining({
+        square_feet: 88000,
+        head_count: 733,
+        total_man_hours: 1775.5,
+        construction_days: 41,
+        source_status: 'employee_replacement_recorded',
+      }));
+
       const [download] = await Promise.all([
         page.waitForEvent('download'),
         page.locator('[data-supplied-bid-truth-downstream-download]').click(),

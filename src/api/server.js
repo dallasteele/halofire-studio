@@ -5429,6 +5429,46 @@ app.get('/api/projects/:name/evidence/:evidenceId/replay-bid-artifact', authMidd
   } catch {
     return res.status(400).json({ error: 'Evidence row does not contain structured replay artifact notes' });
   }
+  if (notes.kind === 'best_effort_ai_layout' && notes.supplied_document_bid_truth && typeof notes.supplied_document_bid_truth === 'object') {
+    const defaults = notes.supplied_document_bid_truth;
+    const projectTruth = defaults.project_truth && typeof defaults.project_truth === 'object' && !Array.isArray(defaults.project_truth)
+      ? jsonClone(defaults.project_truth)
+      : {};
+    return res.json({
+      artifact_type: 'halofire.best_effort_ai_layout.saved_readback_bundle.v1',
+      source_artifact_type: notes.artifact_type || 'halofire.best_effort_ai_layout.supplied_document_bid_truth_defaults.v1',
+      status: notes.artifact_status || 'best_effort_internal_alpha',
+      project_name: row.project_name,
+      evidence_id: row.id,
+      evidence_type: row.evidence_type,
+      generated_at: notes.generated_at || row.created_at,
+      download_name: `${slugForDownloadName(row.project_name)}-saved-layout-readback-${row.id}.json`,
+      source_ref: row.source_ref,
+      source_evidence_type: notes.source_evidence_type || defaults.source_evidence_type || 'supplied_document_bid_truth_replacement',
+      source_supplied_document_bid_truth_replacement_evidence_id: notes.source_supplied_document_bid_truth_replacement_evidence_id || defaults.source_replacement_evidence_id || null,
+      replacement_ref: defaults.replacement_ref || null,
+      source_file: defaults.source_file || null,
+      source_refs: Array.isArray(defaults.source_refs) ? defaults.source_refs : [],
+      replacement_values: defaults.replacement_values && typeof defaults.replacement_values === 'object' && !Array.isArray(defaults.replacement_values)
+        ? jsonClone(defaults.replacement_values)
+        : {},
+      replaced_fields: Array.isArray(defaults.replaced_fields) ? defaults.replaced_fields : [],
+      project_truth: projectTruth,
+      bid_summary: notes.bid_summary || {
+        total_area_sqft: notes.total_area_sqft,
+        total_head_count: notes.total_head_count,
+      },
+      total_head_count: notes.total_head_count,
+      total_area_sqft: notes.total_area_sqft,
+      blocked_claims: Array.isArray(notes.blocked_claims) ? notes.blocked_claims : [],
+      use_for_claims: false,
+      no_claim_gates_cleared: true,
+      claim_gate_effect: notes.claim_gate_effect || defaults.claim_gate_effect || 'no_claims_cleared',
+      limitations: Array.isArray(notes.limitations) ? notes.limitations : [
+        'This saved readback bundle is internal-alpha evidence only and does not clear regulated claims.',
+      ],
+    });
+  }
   if (notes.kind !== 'best_effort_ai_layout_replay') {
     return res.status(400).json({ error: 'Evidence row is not a room-boundary replay artifact' });
   }
