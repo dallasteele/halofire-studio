@@ -593,6 +593,42 @@ describe('Workbench supplied bid-truth browser smoke', () => {
         source_status: 'employee_replacement_recorded',
       }));
 
+      const defaultReadbackDefaultReplayFollowup = page.locator(`[data-replay-sam31-consumer-intake-smoke-default-preliminary-replay-followup="${defaultReadbackSmokeEvidenceId}"]`).first();
+      await defaultReadbackDefaultReplayFollowup.waitFor({ state: 'attached' });
+      expect(await defaultReadbackDefaultReplayFollowup.getAttribute('data-source-replay-evidence-id')).toBe(String(savedLayout.id));
+      expect(await defaultReadbackDefaultReplayFollowup.getAttribute('data-source-sam31-actual-value-replacement-evidence-id')).toBe(String(defaultReadbackReplacementEvidenceId));
+      expect(await defaultReadbackDefaultReplayFollowup.getAttribute('data-source-openclaw-sam31-actual-value-replacement-readback-evidence-id')).toBe(String(savedLayoutReplacementReadback.evidence_id));
+      expect(await defaultReadbackDefaultReplayFollowup.getAttribute('data-source-halofire-sam31-consumer-intake-smoke-followup-review-evidence-id')).toBe(defaultReadbackFollowupReviewEvidenceId);
+      await defaultReadbackDefaultReplayFollowup.click();
+      await page.waitForFunction((smokeEvidenceId) => {
+        const status = document.getElementById(`sam31ConsumerIntakeSmokePreliminaryReplayFollowup-${smokeEvidenceId}-status`);
+        return status?.dataset.halofireSam31PreliminaryReplayFollowupEvidenceId
+          && status?.dataset.downloadedPreliminaryReplayArtifact === 'true'
+          && status?.dataset.sourceOpenclawSam31ActualValueReplacementReadbackEvidenceId
+          && status?.dataset.claimGateEffect === 'no_claims_cleared';
+      }, String(defaultReadbackSmokeEvidenceId));
+      const defaultReadbackReplayFollowupEvidenceId = String(await page.locator(`#sam31ConsumerIntakeSmokePreliminaryReplayFollowup-${defaultReadbackSmokeEvidenceId}-status`).getAttribute('data-halofire-sam31-preliminary-replay-followup-evidence-id') || '');
+      expect(defaultReadbackReplayFollowupEvidenceId).toMatch(/^\d+$/);
+      expect(await page.locator(`#sam31ConsumerIntakeSmokePreliminaryReplayFollowup-${defaultReadbackSmokeEvidenceId}-status`).getAttribute('data-source-openclaw-sam31-actual-value-replacement-readback-evidence-id')).toBe(String(savedLayoutReplacementReadback.evidence_id));
+      const defaultReadbackReplayFollowupRows = await api(`${PROJECT_PATH}/evidence`, token);
+      const defaultReadbackReplayFollowupRow = defaultReadbackReplayFollowupRows.find((row) => row.id === Number(defaultReadbackReplayFollowupEvidenceId));
+      expect(defaultReadbackReplayFollowupRow).toBeTruthy();
+      const defaultReadbackReplayFollowupNotes = JSON.parse(defaultReadbackReplayFollowupRow.notes);
+      expect(defaultReadbackReplayFollowupNotes.followup).toEqual(expect.objectContaining({
+        source_replay_evidence_id: savedLayout.id,
+        source_sam31_actual_value_replacement_evidence_id: Number(defaultReadbackReplacementEvidenceId),
+        source_openclaw_sam31_actual_value_replacement_readback_evidence_id: savedLayoutReplacementReadback.evidence_id,
+        source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id: Number(defaultReadbackFollowupReviewEvidenceId),
+        source_halofire_sam31_sprinkler_review_decision_evidence_id: Number(await page.locator(`#sam31ConsumerIntakeSmokePreliminaryReplayFollowup-${defaultReadbackSmokeEvidenceId}-status`).getAttribute('data-source-halofire-sam31-sprinkler-review-decision-evidence-id') || 0),
+        source_supplied_document_bid_truth_replacement_evidence_id: replacement.evidence.id,
+        claim_gate_effect: 'no_claims_cleared',
+        no_claim_gates_cleared: true,
+      }));
+      expect(defaultReadbackReplayFollowupNotes.followup.project_truth).toEqual(expect.objectContaining({
+        square_feet: 88000,
+        source_status: 'employee_replacement_recorded',
+      }));
+
       const savedLayoutSmokeButton = page.locator(`[data-replay-sam31-consumer-intake-smoke-source-replacement-evidence-id="${savedLayoutReplacementEvidenceId}"]`).first();
       await savedLayoutSmokeButton.waitFor({ state: 'attached' });
       expect(await savedLayoutSmokeButton.getAttribute('data-source-replay-evidence-id')).toBe(String(savedLayout.id));

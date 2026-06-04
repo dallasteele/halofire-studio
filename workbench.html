@@ -2838,6 +2838,7 @@ async function saveReplaySam31ConsumerIntakeSmokeDefaultPreliminaryReplayFollowu
     : null;
   const sourceReplayEvidenceId = trigger?.dataset.sourceReplayEvidenceId || '';
   const sourceSam31ReplacementEvidenceId = trigger?.dataset.sourceSam31ActualValueReplacementEvidenceId || '';
+  const sourceReadbackEvidenceId = trigger?.dataset.sourceOpenclawSam31ActualValueReplacementReadbackEvidenceId || '';
   const sourceFollowupReviewEvidenceId = trigger?.dataset.sourceHalofireSam31ConsumerIntakeSmokeFollowupReviewEvidenceId || '';
   const sprinklerReviewEvidenceId = trigger?.dataset.sourceHalofireSam31SprinklerReviewDecisionEvidenceId || '';
   const stampStatus = (targetStatus, saved, replayArtifact) => {
@@ -2849,6 +2850,7 @@ async function saveReplaySam31ConsumerIntakeSmokeDefaultPreliminaryReplayFollowu
     targetStatus.dataset.sam31ConsumerIntakeSmokeEvidenceId = String(targetId);
     targetStatus.dataset.sourceReplayEvidenceId = String(sourceReplayEvidenceId);
     targetStatus.dataset.sourceSam31ActualValueReplacementEvidenceId = String(sourceSam31ReplacementEvidenceId);
+    targetStatus.dataset.sourceOpenclawSam31ActualValueReplacementReadbackEvidenceId = String(saved?.source_openclaw_sam31_actual_value_replacement_readback_evidence_id || replayArtifact?.source_openclaw_sam31_actual_value_replacement_readback_evidence_id || sourceReadbackEvidenceId || '');
     targetStatus.dataset.sourceHalofireSam31ConsumerIntakeSmokeFollowupReviewEvidenceId = String(sourceFollowupReviewEvidenceId || replayArtifact?.source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id || '');
     targetStatus.dataset.sourceHalofireSam31SprinklerReviewDecisionEvidenceId = String(sprinklerReviewEvidenceId || replayArtifact?.source_halofire_sam31_sprinkler_review_decision_evidence_id || '');
     targetStatus.dataset.downloadedPreliminaryReplayArtifact = 'true';
