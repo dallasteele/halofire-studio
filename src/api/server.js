@@ -1237,7 +1237,7 @@ function sam31ActualValueReplacementFromEvidence(row) {
   if (!row) return null;
   try {
     const parsed = JSON.parse(row.notes || '{}');
-    return parsed && parsed.kind === 'sam31ActualValueReplacement'
+    return parsed && (parsed.kind === 'sam31ActualValueReplacement' || parsed.kind === 'sam31ReplayActualValueReplacement')
       ? parsed
       : null;
   } catch {
@@ -1589,6 +1589,11 @@ function openClawSam31SectionToArtifactsConsumerIntakeSmokeEvidenceFromRow(row) 
         || handoff.source_sam31_actual_value_replacement_evidence_id
         || 0,
       ) || null,
+      source_replay_artifact_type: parsed.source_replay_artifact_type || handoff.source_replay_artifact_type || null,
+      source_supplied_document_bid_truth_replacement_evidence_id: parsed.source_supplied_document_bid_truth_replacement_evidence_id || handoff.source_supplied_document_bid_truth_replacement_evidence_id || null,
+      project_truth: parsed.project_truth && typeof parsed.project_truth === 'object' && !Array.isArray(parsed.project_truth)
+        ? jsonClone(parsed.project_truth)
+        : (handoff.project_truth && typeof handoff.project_truth === 'object' && !Array.isArray(handoff.project_truth) ? jsonClone(handoff.project_truth) : null),
       ...sam31ActualValueReplacementAuditProvenance({
         ...handoff,
         ...parsed,
@@ -1746,11 +1751,17 @@ function listSam31ReplayActualValueReplacementDetails(projectName, options = {})
       source_runtime: replacement.source_runtime || contract.source_runtime || 'sam-3.1+llm',
       source_replay_evidence_id: replacement.source_replay_evidence_id || null,
       source_replay_artifact_type: replacement.source_replay_artifact_type || null,
+      source_supplied_document_bid_truth_replacement_evidence_id: replacement.source_supplied_document_bid_truth_replacement_evidence_id || null,
+      project_truth: replacement.project_truth && typeof replacement.project_truth === 'object' && !Array.isArray(replacement.project_truth)
+        ? jsonClone(replacement.project_truth)
+        : null,
       source_actual_value_handoff_artifact_type: replacement.source_actual_value_handoff_artifact_type || null,
+      source_actual_value_handoff: replacement.source_actual_value_handoff || null,
       source_file: replacement.source_file || row.source_file || null,
       source_ref: replacement.source_ref || row.source_ref || null,
       source_refs: uniqueStrings([
         ...(Array.isArray(replacement.source_refs) ? replacement.source_refs : []),
+        ...(Array.isArray(replacement.source_actual_value_handoff?.source_replay_packet?.source_refs) ? replacement.source_actual_value_handoff.source_replay_packet.source_refs : []),
         replacement.source_ref,
         row.source_ref,
       ].filter(Boolean)),
@@ -2685,11 +2696,19 @@ function openClawSam31SectionToArtifactsConsumerHandoff(item, replacementEvidenc
     source_openclaw_sam31_consumer_review_evidence_id: item?.source_openclaw_sam31_consumer_review_evidence_id || null,
     source_replay_evidence_id: replacementEvidence?.source_replay_evidence_id || null,
     source_sam31_actual_value_replacement_evidence_id: replacementEvidence?.evidence_id || null,
+    source_supplied_document_bid_truth_replacement_evidence_id: replacementEvidence?.source_supplied_document_bid_truth_replacement_evidence_id || replacementEvidence?.source_actual_value_handoff?.source_replay_packet?.source_supplied_document_bid_truth_replacement_evidence_id || null,
+    source_replay_artifact_type: replacementEvidence?.source_replay_artifact_type || replacementEvidence?.source_actual_value_handoff?.source_replay_artifact_type || null,
+    project_truth: replacementEvidence?.project_truth && typeof replacementEvidence.project_truth === 'object' && !Array.isArray(replacementEvidence.project_truth)
+      ? jsonClone(replacementEvidence.project_truth)
+      : (replacementEvidence?.source_actual_value_handoff?.source_replay_packet?.project_truth && typeof replacementEvidence.source_actual_value_handoff.source_replay_packet.project_truth === 'object' && !Array.isArray(replacementEvidence.source_actual_value_handoff.source_replay_packet.project_truth)
+        ? jsonClone(replacementEvidence.source_actual_value_handoff.source_replay_packet.project_truth)
+        : null),
     ...auditProvenance,
     ...pdfBoundaryProvenance,
     source_openclaw_sam31_section_to_artifacts_ref: summary.section_to_artifacts_contract_ref || null,
     source_refs: uniqueStrings([
       ...(Array.isArray(replacementEvidence?.source_refs) ? replacementEvidence.source_refs : []),
+      ...(Array.isArray(replacementEvidence?.source_actual_value_handoff?.source_replay_packet?.source_refs) ? replacementEvidence.source_actual_value_handoff.source_replay_packet.source_refs : []),
       auditProvenance.source_resolved_evidence_ref,
       replacementEvidence?.source_ref,
       item?.source_ref,
@@ -2859,11 +2878,20 @@ function buildOpenClawSam31SectionToArtifactsConsumerIntakeSmoke(projectName, in
         source_ref: replacementRow.source_ref || replacementEvidence.source_ref || null,
         source_refs: uniqueStrings([
           ...(Array.isArray(replacementEvidence.source_refs) ? replacementEvidence.source_refs : []),
+          ...(Array.isArray(replacementEvidence.source_actual_value_handoff?.source_replay_packet?.source_refs) ? replacementEvidence.source_actual_value_handoff.source_replay_packet.source_refs : []),
           auditProvenance.source_resolved_evidence_ref,
           replacementEvidence.source_ref,
           replacementRow.source_ref,
         ].filter(Boolean)),
         source_replay_evidence_id: replacementEvidence.source_replay_evidence_id || null,
+        source_replay_artifact_type: replacementEvidence.source_replay_artifact_type || null,
+        source_supplied_document_bid_truth_replacement_evidence_id: replacementEvidence.source_supplied_document_bid_truth_replacement_evidence_id || replacementEvidence.source_actual_value_handoff?.source_replay_packet?.source_supplied_document_bid_truth_replacement_evidence_id || null,
+        project_truth: replacementEvidence.project_truth && typeof replacementEvidence.project_truth === 'object' && !Array.isArray(replacementEvidence.project_truth)
+          ? jsonClone(replacementEvidence.project_truth)
+          : (replacementEvidence.source_actual_value_handoff?.source_replay_packet?.project_truth && typeof replacementEvidence.source_actual_value_handoff.source_replay_packet.project_truth === 'object' && !Array.isArray(replacementEvidence.source_actual_value_handoff.source_replay_packet.project_truth)
+            ? jsonClone(replacementEvidence.source_actual_value_handoff.source_replay_packet.project_truth)
+            : null),
+        source_actual_value_handoff: replacementEvidence.source_actual_value_handoff || null,
         source_openclaw_sam31_consumer_review_evidence_id: replacementEvidence.source_openclaw_sam31_consumer_review_evidence_id || null,
         ...auditProvenance,
         ...pdfBoundaryProvenance,
@@ -2907,7 +2935,14 @@ function buildOpenClawSam31SectionToArtifactsConsumerIntakeSmoke(projectName, in
     source_queue_item_id: effectiveItem.id || null,
     source_openclaw_sam31_consumer_review_evidence_id: handoff.source_openclaw_sam31_consumer_review_evidence_id || null,
     source_replay_evidence_id: handoff.source_replay_evidence_id || effectiveItem.source_replay_evidence_id || null,
+    source_replay_artifact_type: handoff.source_replay_artifact_type || fallbackReplacementEvidence?.source_replay_artifact_type || null,
     source_sam31_actual_value_replacement_evidence_id: handoff.source_sam31_actual_value_replacement_evidence_id || null,
+    source_supplied_document_bid_truth_replacement_evidence_id: handoff.source_supplied_document_bid_truth_replacement_evidence_id || fallbackReplacementEvidence?.source_supplied_document_bid_truth_replacement_evidence_id || null,
+    project_truth: handoff.project_truth && typeof handoff.project_truth === 'object' && !Array.isArray(handoff.project_truth)
+      ? jsonClone(handoff.project_truth)
+      : (fallbackReplacementEvidence?.project_truth && typeof fallbackReplacementEvidence.project_truth === 'object' && !Array.isArray(fallbackReplacementEvidence.project_truth)
+        ? jsonClone(fallbackReplacementEvidence.project_truth)
+        : null),
     ...auditProvenance,
     ...pdfBoundaryProvenance,
     source_openclaw_sam31_section_to_artifacts_ref: handoff.source_openclaw_sam31_section_to_artifacts_ref || null,
@@ -3010,7 +3045,12 @@ function buildHalofireSam31ConsumerIntakeSmokeFollowupPacket(projectName, smokeE
     target_application: 'halo_fire',
     source_section_to_artifacts_consumer_intake_smoke_evidence_id: smokeEvidence.evidence_id || null,
     source_replay_evidence_id: smokeEvidence.source_replay_evidence_id || null,
+    source_replay_artifact_type: smokeEvidence.source_replay_artifact_type || null,
     source_sam31_actual_value_replacement_evidence_id: smokeEvidence.source_sam31_actual_value_replacement_evidence_id || null,
+    source_supplied_document_bid_truth_replacement_evidence_id: smokeEvidence.source_supplied_document_bid_truth_replacement_evidence_id || null,
+    project_truth: smokeEvidence.project_truth && typeof smokeEvidence.project_truth === 'object' && !Array.isArray(smokeEvidence.project_truth)
+      ? jsonClone(smokeEvidence.project_truth)
+      : null,
     source_openclaw_sam31_consumer_review_evidence_id: smokeEvidence.source_openclaw_sam31_consumer_review_evidence_id || null,
     ...auditProvenance,
     ...pdfBoundaryProvenance,
@@ -3027,7 +3067,12 @@ function buildHalofireSam31ConsumerIntakeSmokeFollowupPacket(projectName, smokeE
     target_application: 'halo_fire',
     source_section_to_artifacts_consumer_intake_smoke_evidence_id: smokeEvidence.evidence_id || null,
     source_replay_evidence_id: smokeEvidence.source_replay_evidence_id || null,
+    source_replay_artifact_type: smokeEvidence.source_replay_artifact_type || null,
     source_sam31_actual_value_replacement_evidence_id: smokeEvidence.source_sam31_actual_value_replacement_evidence_id || null,
+    source_supplied_document_bid_truth_replacement_evidence_id: smokeEvidence.source_supplied_document_bid_truth_replacement_evidence_id || null,
+    project_truth: smokeEvidence.project_truth && typeof smokeEvidence.project_truth === 'object' && !Array.isArray(smokeEvidence.project_truth)
+      ? jsonClone(smokeEvidence.project_truth)
+      : null,
     source_openclaw_sam31_consumer_review_evidence_id: smokeEvidence.source_openclaw_sam31_consumer_review_evidence_id || null,
     ...auditProvenance,
     ...pdfBoundaryProvenance,
@@ -3603,6 +3648,15 @@ function buildHalofireSam31ConsumerIntakeSmokePreliminaryReplayInputs(projectNam
     || sprinklerReview.source_sam31_actual_value_replacement_evidence_id
     || reviewedValues.source_sam31_actual_value_replacement_evidence_id
     || null;
+  const sourceSuppliedBidTruthReplacementEvidenceId = smokeEvidence.source_supplied_document_bid_truth_replacement_evidence_id
+    || sprinklerReview.source_supplied_document_bid_truth_replacement_evidence_id
+    || reviewedValues.source_supplied_document_bid_truth_replacement_evidence_id
+    || null;
+  const projectTruth = smokeEvidence.project_truth && typeof smokeEvidence.project_truth === 'object' && !Array.isArray(smokeEvidence.project_truth)
+    ? jsonClone(smokeEvidence.project_truth)
+    : (sprinklerReview.project_truth && typeof sprinklerReview.project_truth === 'object' && !Array.isArray(sprinklerReview.project_truth)
+      ? jsonClone(sprinklerReview.project_truth)
+      : null);
   const sourceRefs = uniqueByJson([
     ...(Array.isArray(smokeEvidence.source_refs) ? smokeEvidence.source_refs : []),
     ...(Array.isArray(followupReviewEvidence.review.source_refs) ? followupReviewEvidence.review.source_refs : []),
@@ -3677,6 +3731,9 @@ function buildHalofireSam31ConsumerIntakeSmokePreliminaryReplayInputs(projectNam
     source_halofire_sam31_sprinkler_review_decision_evidence_id: sprinklerReviewEvidence.id,
     source_replay_evidence_id: sourceReplayEvidenceId,
     source_sam31_actual_value_replacement_evidence_id: sourceSam31ReplacementEvidenceId,
+    source_supplied_document_bid_truth_replacement_evidence_id: sourceSuppliedBidTruthReplacementEvidenceId,
+    source_replay_artifact_type: smokeEvidence.source_replay_artifact_type || sprinklerReview.source_replay_artifact_type || null,
+    project_truth: projectTruth,
     source_openclaw_sam31_consumer_review_evidence_id: smokeEvidence.source_openclaw_sam31_consumer_review_evidence_id || sprinklerReview.source_openclaw_sam31_consumer_review_evidence_id || null,
     ...auditProvenance,
     ...pdfBoundaryProvenance,
@@ -4444,6 +4501,9 @@ function buildOpenClawSam31ReplayActualValueHandoffPacket(projectName, replayEvi
 
 function normalizeReplaySam31ActualValueReplacementIntake(projectName, replayEvidenceRow, replayNotes, body = {}, user = null) {
   const handoff = buildOpenClawSam31ReplayActualValueHandoffPacket(projectName, replayEvidenceRow, replayNotes);
+  const sourceReplayPacket = handoff.source_replay_packet && typeof handoff.source_replay_packet === 'object' && !Array.isArray(handoff.source_replay_packet)
+    ? handoff.source_replay_packet
+    : {};
   const sourceRef = String(body?.source_ref || '').trim();
   if (!sourceRef) {
     const err = new Error('source_ref is required for replay SAM31 actual-value replacement intake');
@@ -4492,6 +4552,13 @@ function normalizeReplaySam31ActualValueReplacementIntake(projectName, replayEvi
     source_runtime: 'sam-3.1+llm',
     source_replay_evidence_id: replayEvidenceRow.id,
     source_replay_artifact_type: handoff.source_replay_artifact_type,
+    source_supplied_document_bid_truth_replacement_evidence_id: sourceReplayPacket.source_supplied_document_bid_truth_replacement_evidence_id || null,
+    project_truth: sourceReplayPacket.project_truth && typeof sourceReplayPacket.project_truth === 'object' && !Array.isArray(sourceReplayPacket.project_truth)
+      ? jsonClone(sourceReplayPacket.project_truth)
+      : null,
+    selected_sheet_ref: sourceReplayPacket.selected_sheet_ref || null,
+    selected_scale_ref: sourceReplayPacket.selected_scale_ref || null,
+    selected_boundary_candidate_ref: sourceReplayPacket.selected_boundary_candidate_ref || null,
     source_actual_value_handoff_artifact_type: handoff.artifact_type,
     source_actual_value_handoff: handoff,
     source_file: sourceFile || null,

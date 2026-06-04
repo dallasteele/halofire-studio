@@ -392,6 +392,91 @@ describe('Workbench supplied bid-truth browser smoke', () => {
       expect(savedLayoutReplacementText).toContain('employee://bid-truth/downstream-browser-smoke-001');
       expect(savedLayoutReplacementText).toContain('claim_gate_effect no_claims_cleared');
 
+      const savedLayoutSmokeButton = page.locator(`[data-replay-sam31-consumer-intake-smoke-source-replacement-evidence-id="${savedLayoutReplacementEvidenceId}"]`).first();
+      await savedLayoutSmokeButton.waitFor({ state: 'attached' });
+      expect(await savedLayoutSmokeButton.getAttribute('data-source-replay-evidence-id')).toBe(String(savedLayout.id));
+      expect(await savedLayoutSmokeButton.getAttribute('data-source-sam31-actual-value-replacement-evidence-id')).toBe(String(savedLayoutReplacementEvidenceId));
+      await savedLayoutSmokeButton.click();
+      await page.waitForFunction((replacementEvidenceId) => {
+        const status = document.getElementById('sam31ActualValueQueueStatus');
+        return status?.dataset.sourceSam31ActualValueReplacementEvidenceId === replacementEvidenceId
+          && Boolean(status?.dataset.sam31ConsumerIntakeSmokeEvidenceId)
+          && status?.dataset.claimGateEffect === 'no_claims_cleared';
+      }, String(savedLayoutReplacementEvidenceId));
+      const savedLayoutSmokeEvidenceId = String(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-sam31-consumer-intake-smoke-evidence-id') || '');
+      expect(savedLayoutSmokeEvidenceId).toMatch(/^\d+$/);
+      expect(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-source-replay-evidence-id')).toBe(String(savedLayout.id));
+      await page.locator(`#evidence-${savedLayoutSmokeEvidenceId}`).waitFor({ state: 'attached' });
+      const savedLayoutSmokeText = await page.locator(`#evidence-${savedLayoutSmokeEvidenceId}`).innerText();
+      expect(savedLayoutSmokeText).toContain('openclaw_sam31_section_to_artifacts_consumer_intake_smoke');
+      expect(savedLayoutSmokeText).toContain(`source_replay_evidence_id ${savedLayout.id}`);
+      expect(savedLayoutSmokeText).toContain(`source_sam31_actual_value_replacement_evidence_id ${savedLayoutReplacementEvidenceId}`);
+      expect(savedLayoutSmokeText).toContain('selected_1881_context');
+      const savedLayoutSmokeRows = await api(`${PROJECT_PATH}/evidence`, token);
+      const savedLayoutSmokeRow = savedLayoutSmokeRows.find((row) => row.id === Number(savedLayoutSmokeEvidenceId));
+      expect(savedLayoutSmokeRow).toBeTruthy();
+      const savedLayoutSmokeNotes = JSON.parse(savedLayoutSmokeRow.notes);
+      expect(savedLayoutSmokeNotes).toEqual(expect.objectContaining({
+        source_replay_evidence_id: savedLayout.id,
+        source_sam31_actual_value_replacement_evidence_id: Number(savedLayoutReplacementEvidenceId),
+        source_supplied_document_bid_truth_replacement_evidence_id: replacement.evidence.id,
+        claim_gate_effect: 'no_claims_cleared',
+        no_claim_gates_cleared: true,
+      }));
+      expect(savedLayoutSmokeNotes.source_refs).toEqual(expect.arrayContaining([
+        'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G6',
+        'employee://bid-truth/downstream-browser-smoke-001',
+      ]));
+      expect(savedLayoutSmokeNotes.project_truth).toEqual(expect.objectContaining({
+        square_feet: 88000,
+        head_count: 733,
+        total_man_hours: 1775.5,
+        construction_days: 41,
+        source_status: 'employee_replacement_recorded',
+      }));
+
+      const savedLayoutDefaultFollowup = page.locator(`[data-replay-sam31-consumer-intake-smoke-default-followup-review="${savedLayoutSmokeEvidenceId}"]`).first();
+      await savedLayoutDefaultFollowup.waitFor({ state: 'attached' });
+      expect(await savedLayoutDefaultFollowup.getAttribute('data-source-replay-evidence-id')).toBe(String(savedLayout.id));
+      expect(await savedLayoutDefaultFollowup.getAttribute('data-source-sam31-actual-value-replacement-evidence-id')).toBe(String(savedLayoutReplacementEvidenceId));
+      await savedLayoutDefaultFollowup.click();
+      await page.waitForFunction((smokeEvidenceId) => {
+        const status = document.getElementById(`sam31ConsumerIntakeSmokeFollowupReview-${smokeEvidenceId}-status`);
+        return status?.dataset.halofireSam31ConsumerIntakeSmokeFollowupReviewEvidenceId
+          && status?.dataset.downloadedSprinklerReviewPacket === 'true'
+          && status?.dataset.claimGateEffect === 'no_claims_cleared';
+      }, String(savedLayoutSmokeEvidenceId));
+      const savedLayoutFollowupReviewEvidenceId = String(await page.locator(`#sam31ConsumerIntakeSmokeFollowupReview-${savedLayoutSmokeEvidenceId}-status`).getAttribute('data-halofire-sam31-consumer-intake-smoke-followup-review-evidence-id') || '');
+      expect(savedLayoutFollowupReviewEvidenceId).toMatch(/^\d+$/);
+
+      const savedLayoutDefaultSprinkler = page.locator(`[data-replay-sam31-consumer-intake-smoke-default-sprinkler-review="${savedLayoutSmokeEvidenceId}"]`).first();
+      await savedLayoutDefaultSprinkler.waitFor({ state: 'attached' });
+      expect(await savedLayoutDefaultSprinkler.getAttribute('data-source-replay-evidence-id')).toBe(String(savedLayout.id));
+      expect(await savedLayoutDefaultSprinkler.getAttribute('data-source-sam31-actual-value-replacement-evidence-id')).toBe(String(savedLayoutReplacementEvidenceId));
+      expect(await savedLayoutDefaultSprinkler.getAttribute('data-source-halofire-sam31-consumer-intake-smoke-followup-review-evidence-id')).toBe(String(savedLayoutFollowupReviewEvidenceId));
+      const [savedLayoutReplayInputsDownload] = await Promise.all([
+        page.waitForEvent('download'),
+        savedLayoutDefaultSprinkler.click(),
+      ]);
+      const savedLayoutReplayInputsPath = await savedLayoutReplayInputsDownload.path();
+      expect(savedLayoutReplayInputsDownload.suggestedFilename()).toContain('preliminary-replay-inputs');
+      expect(savedLayoutReplayInputsPath).toBeTruthy();
+      const savedLayoutReplayInputs = JSON.parse(fs.readFileSync(savedLayoutReplayInputsPath, 'utf8'));
+      expect(savedLayoutReplayInputs).toEqual(expect.objectContaining({
+        artifact_type: 'halofire.sam31_sprinkler_review_preliminary_replay_inputs.v1',
+        source_section_to_artifacts_consumer_intake_smoke_evidence_id: Number(savedLayoutSmokeEvidenceId),
+        source_replay_evidence_id: savedLayout.id,
+        source_sam31_actual_value_replacement_evidence_id: Number(savedLayoutReplacementEvidenceId),
+        source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id: Number(savedLayoutFollowupReviewEvidenceId),
+        source_supplied_document_bid_truth_replacement_evidence_id: replacement.evidence.id,
+        claim_gate_effect: 'no_claims_cleared',
+        no_claim_gates_cleared: true,
+      }));
+      expect(savedLayoutReplayInputs.source_refs).toEqual(expect.arrayContaining([
+        'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G6',
+        'employee://bid-truth/downstream-browser-smoke-001',
+      ]));
+
       const [download] = await Promise.all([
         page.waitForEvent('download'),
         page.locator('[data-supplied-bid-truth-downstream-download]').click(),
@@ -439,7 +524,7 @@ describe('Workbench supplied bid-truth browser smoke', () => {
     } finally {
       await page.close();
     }
-  }, 30_000);
+  }, 45_000);
 
   it('re-saves downstream defaults follow-up edits and keeps the card and queue synchronized', async () => {
     const token = await adminToken();

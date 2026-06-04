@@ -1457,6 +1457,13 @@ async function refreshEvidence() {
   document.querySelectorAll('[data-replay-sam31-actual-value-replacement-evidence-id]').forEach((button) => {
     button.onclick = () => saveReplaySam31ActualValueReplacement(button.dataset.replaySam31ActualValueReplacementEvidenceId);
   });
+  document.querySelectorAll('[data-replay-sam31-consumer-intake-smoke-source-replacement-evidence-id]').forEach((button) => {
+    button.onclick = () => saveReplaySam31ConsumerIntakeSmoke(
+      button.dataset.replaySam31ConsumerIntakeSmokeIndex,
+      button.dataset.replaySam31ConsumerIntakeSmokeConsumer,
+      button,
+    );
+  });
   document.querySelectorAll('[data-claim-gate-audit-actual-value-readback-evidence-id]').forEach((button) => {
     button.onclick = () => saveClaimGateAuditActualValueReadback(button.dataset.claimGateAuditActualValueReadbackEvidenceId);
   });
@@ -2355,11 +2362,11 @@ function downloadSam31ActualValueSectionArtifactsFromReplacement(index = '') {
   );
 }
 
-async function saveReplaySam31ConsumerIntakeSmoke(index = '', consumer = 'halo_fire') {
+async function saveReplaySam31ConsumerIntakeSmoke(index = '', consumer = 'halo_fire', triggerElement = null) {
   const status = document.getElementById('sam31ActualValueQueueStatus');
   const numericIndex = Number(index);
   const row = Number.isFinite(numericIndex) ? sam31ActualValueQueueRows[numericIndex] : null;
-  const trigger = document.querySelector(`[data-replay-sam31-consumer-intake-smoke-index="${CSS.escape(String(index))}"]`);
+  const trigger = triggerElement || document.querySelector(`[data-replay-sam31-consumer-intake-smoke-index="${CSS.escape(String(index))}"]`);
   const handoff = row?.section_to_artifacts_consumer_handoff || null;
   const replacementEvidenceId = handoff?.source_sam31_actual_value_replacement_evidence_id
     || row?.evidence_id
@@ -2371,32 +2378,40 @@ async function saveReplaySam31ConsumerIntakeSmoke(index = '', consumer = 'halo_f
     return;
   }
   const requestedConsumer = String(consumer || 'halo_fire').trim() || 'halo_fire';
-  const saved = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/openclaw/sam31/section-to-artifacts-consumer-intake-smoke', {
-    method: 'POST',
-    body: JSON.stringify({
-      consumer: requestedConsumer,
-      source_sam31_actual_value_replacement_evidence_id: Number(replacementEvidenceId),
-    }),
-  });
-  sam31ActualValueQueueConsumerFilter = requestedConsumer;
-  sam31ActualValueConsumerIntakeSmokeEvidenceFilter = String(saved.evidence_id || saved.id || '');
-  sam31ActualValueSourceReplayEvidenceFilter = String(saved.source_replay_evidence_id || row?.source_replay_evidence_id || trigger?.dataset.sourceReplayEvidenceId || '');
-  if (status) {
-    status.dataset.sam31ConsumerIntakeSmokeEvidenceId = String(saved.evidence_id || saved.id || '');
-    status.dataset.sourceReplayEvidenceId = String(saved.source_replay_evidence_id || row?.source_replay_evidence_id || trigger?.dataset.sourceReplayEvidenceId || '');
-    status.dataset.sourceSam31ActualValueReplacementEvidenceId = String(saved.source_sam31_actual_value_replacement_evidence_id || replacementEvidenceId);
-    status.dataset.claimGateEffect = saved.claim_gate_effect || 'no_claims_cleared';
-    status.textContent = 'Saved openclaw_sam31_section_to_artifacts_consumer_intake_smoke evidence #' + (saved.evidence_id || saved.id) + ' from replacement #' + replacementEvidenceId + '; claim gates remain blocked.';
-  }
-  await refreshEvidence();
-  await refreshSam31ActualValueQueue();
-  const refreshedStatus = document.getElementById('sam31ActualValueQueueStatus');
-  if (refreshedStatus) {
-    refreshedStatus.dataset.sam31ConsumerIntakeSmokeEvidenceId = String(saved.evidence_id || saved.id || '');
-    refreshedStatus.dataset.sourceReplayEvidenceId = String(saved.source_replay_evidence_id || row?.source_replay_evidence_id || trigger?.dataset.sourceReplayEvidenceId || '');
-    refreshedStatus.dataset.sourceSam31ActualValueReplacementEvidenceId = String(saved.source_sam31_actual_value_replacement_evidence_id || replacementEvidenceId);
-    refreshedStatus.dataset.claimGateEffect = saved.claim_gate_effect || 'no_claims_cleared';
-    refreshedStatus.textContent = 'Saved openclaw_sam31_section_to_artifacts_consumer_intake_smoke evidence #' + (saved.evidence_id || saved.id) + ' from replay replacement #' + replacementEvidenceId + '; claim gates remain blocked.';
+  if (status) status.textContent = 'Saving openclaw_sam31_section_to_artifacts_consumer_intake_smoke from replacement #' + replacementEvidenceId + '...';
+  try {
+    const saved = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/openclaw/sam31/section-to-artifacts-consumer-intake-smoke', {
+      method: 'POST',
+      body: JSON.stringify({
+        consumer: requestedConsumer,
+        source_sam31_actual_value_replacement_evidence_id: Number(replacementEvidenceId),
+      }),
+    });
+    sam31ActualValueQueueConsumerFilter = requestedConsumer;
+    sam31ActualValueConsumerIntakeSmokeEvidenceFilter = String(saved.evidence_id || saved.id || '');
+    sam31ActualValueSourceReplayEvidenceFilter = String(saved.source_replay_evidence_id || row?.source_replay_evidence_id || trigger?.dataset.sourceReplayEvidenceId || '');
+    if (status) {
+      status.dataset.sam31ConsumerIntakeSmokeEvidenceId = String(saved.evidence_id || saved.id || '');
+      status.dataset.sourceReplayEvidenceId = String(saved.source_replay_evidence_id || row?.source_replay_evidence_id || trigger?.dataset.sourceReplayEvidenceId || '');
+      status.dataset.sourceSam31ActualValueReplacementEvidenceId = String(saved.source_sam31_actual_value_replacement_evidence_id || replacementEvidenceId);
+      status.dataset.claimGateEffect = saved.claim_gate_effect || 'no_claims_cleared';
+      status.textContent = 'Saved openclaw_sam31_section_to_artifacts_consumer_intake_smoke evidence #' + (saved.evidence_id || saved.id) + ' from replacement #' + replacementEvidenceId + '; claim gates remain blocked.';
+    }
+    await refreshEvidence();
+    await refreshSam31ActualValueQueue();
+    const refreshedStatus = document.getElementById('sam31ActualValueQueueStatus');
+    if (refreshedStatus) {
+      refreshedStatus.dataset.sam31ConsumerIntakeSmokeEvidenceId = String(saved.evidence_id || saved.id || '');
+      refreshedStatus.dataset.sourceReplayEvidenceId = String(saved.source_replay_evidence_id || row?.source_replay_evidence_id || trigger?.dataset.sourceReplayEvidenceId || '');
+      refreshedStatus.dataset.sourceSam31ActualValueReplacementEvidenceId = String(saved.source_sam31_actual_value_replacement_evidence_id || replacementEvidenceId);
+      refreshedStatus.dataset.claimGateEffect = saved.claim_gate_effect || 'no_claims_cleared';
+      refreshedStatus.textContent = 'Saved openclaw_sam31_section_to_artifacts_consumer_intake_smoke evidence #' + (saved.evidence_id || saved.id) + ' from replay replacement #' + replacementEvidenceId + '; claim gates remain blocked.';
+    }
+  } catch (err) {
+    if (status) {
+      status.dataset.claimGateEffect = 'no_claims_cleared';
+      status.textContent = 'Could not save SAM31 consumer-intake smoke from replacement #' + replacementEvidenceId + ': ' + (err?.message || err);
+    }
   }
 }
 
@@ -3641,6 +3656,7 @@ async function refreshSam31ActualValueQueue() {
     button.onclick = () => saveReplaySam31ConsumerIntakeSmoke(
       button.dataset.replaySam31ConsumerIntakeSmokeIndex,
       button.dataset.replaySam31ConsumerIntakeSmokeConsumer,
+      button,
     );
   });
 }
