@@ -1081,12 +1081,25 @@ function cooperative1881ActualValueSourceRefs() {
 
 function buildSam31ActualValueReplacementPrefill(projectName, item, evidence) {
   const isCooperative1881 = projectName === COOPERATIVE_1881_PROJECT_NAME;
+  const sourcePdfBoundaryEvidenceId = Number(item?.source_pdf_boundary_evidence_id || 0) || null;
+  const pdfBoundaryEvidence = sourcePdfBoundaryEvidenceId
+    ? db.prepare('SELECT * FROM project_evidence WHERE project_name = ? AND id = ? AND evidence_type = ?')
+      .get(projectName, sourcePdfBoundaryEvidenceId, 'pdf_boundary_decision')
+    : null;
+  const pdfBoundaryDecision = decisionFromEvidence(pdfBoundaryEvidence);
+  const employeeDecision = pdfBoundaryDecision?.employeeDecision && typeof pdfBoundaryDecision.employeeDecision === 'object'
+    ? pdfBoundaryDecision.employeeDecision
+    : null;
   const suppliedSourceRefs = isCooperative1881 ? cooperative1881ActualValueSourceRefs() : [];
   const sourceRefs = uniqueStrings([
     ...suppliedSourceRefs,
     item.replacement_values_source_ref,
     item.replacement_ref,
     item.persisted_review_packet_ref,
+    ...(Array.isArray(employeeDecision?.source_refs) ? employeeDecision.source_refs : []),
+    employeeDecision?.selected_sheet_ref,
+    employeeDecision?.selected_scale_ref,
+    employeeDecision?.selected_boundary_candidate_ref,
     evidence?.source_ref,
   ].filter(Boolean));
   const preferred1881Ref = sourceRefs.find((ref) => String(ref).includes('#Building (1)!G6')) || sourceRefs[0] || null;
@@ -1101,6 +1114,9 @@ function buildSam31ActualValueReplacementPrefill(projectName, item, evidence) {
     source_ref: sourceRef,
     replacement_values_source_ref: (isCooperative1881 ? sourceRef : null) || item.replacement_values_source_ref || sourceRef,
     source_refs: sourceRefs,
+    selected_sheet_ref: employeeDecision?.selected_sheet_ref || null,
+    selected_scale_ref: employeeDecision?.selected_scale_ref || null,
+    selected_boundary_candidate_ref: employeeDecision?.selected_boundary_candidate_ref || null,
     acceptable_actual_evidence: Array.isArray(item.acceptable_actual_evidence) ? item.acceptable_actual_evidence : [],
     notes_template: 'Record the exact workbook/sheet, reviewed vector overlay, reviewed 3D model candidate, screenshot, or console evidence that replaces this SAM31 best guess.',
     use_for_claims: false,
@@ -16137,6 +16153,9 @@ function sam31ActualValueResolverQueueItems(projectName) {
       source_ref: sourceRef,
       replacement_values_source_ref: replacementValuesSourceRef,
       source_refs: uniqueStrings([...sourceRefs, sourceRef, sourceFile].filter(Boolean)),
+      selected_sheet_ref: prefill?.selected_sheet_ref || null,
+      selected_scale_ref: prefill?.selected_scale_ref || null,
+      selected_boundary_candidate_ref: prefill?.selected_boundary_candidate_ref || null,
       llm_observation_count: row.llm_observation_count || row.replacement_summary?.llm_observation_count || 0,
       llm_observation_ids: Array.isArray(row.llm_observation_ids) ? [...row.llm_observation_ids] : [],
       source_llm_observation_ids: Array.isArray(row.source_llm_observation_ids) ? [...row.source_llm_observation_ids] : [],

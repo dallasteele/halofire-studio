@@ -340,6 +340,41 @@ describe('HaloFire settings + documentation upload/link API', () => {
     const token = await tokenFor('settings-admin', 'actual-test-password');
     const projectName = 'The Cooperative 1881 - Salt Lake City UT';
     const db = new Database(dbPath);
+    const boundaryDecision = db.prepare(
+      `INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+    ).run(
+      projectName,
+      'pdf_boundary_decision',
+      '1881 - Architecturals.pdf',
+      '1881 plan PDF sheet 7 / outline candidate',
+      'best_effort',
+      JSON.stringify({
+        kind: 'pdf_boundary_decision',
+        decision: {
+          pageIndex: 7,
+          scale: 0.0833,
+          extractMode: 'outline',
+          sourceFile: '1881 - Architecturals.pdf',
+          sourceRef: '1881 plan PDF sheet 7 / outline candidate',
+          candidate: {
+            id: 'candidate:1881-sheet-7-outline',
+            mode: 'outline',
+          },
+          employeeDecision: {
+            artifact_type: 'halofire.pdf_boundary_employee_decision.v1',
+            selected_sheet_ref: '1881://proposal-cooperative/sheet-7',
+            selected_scale_ref: '1881://operator-scale/sheet-7/0.0833',
+            selected_boundary_candidate_ref: 'candidate:1881-sheet-7-outline',
+            source_refs: [
+              '1881://proposal-cooperative/sheet-7',
+              '1881://operator-scale/sheet-7/0.0833',
+              'candidate:1881-sheet-7-outline',
+            ],
+          },
+        },
+      }),
+    );
     db.prepare(
       `INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
        VALUES (?, ?, ?, ?, ?, ?)`,
@@ -354,7 +389,7 @@ describe('HaloFire settings + documentation upload/link API', () => {
         review: {
           artifact_type: 'openclaw.sam31.consumer_review_task_decision.v1',
           source_application: 'halo_fire',
-          source_pdf_boundary_evidence_id: 144,
+          source_pdf_boundary_evidence_id: Number(boundaryDecision.lastInsertRowid),
           source_openclaw_sam31_consumer_smoke_evidence_id: 143,
           consumer: 'landscout',
           review_decision: 'replaced',
@@ -388,6 +423,9 @@ describe('HaloFire settings + documentation upload/link API', () => {
       source_file: 'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx',
       source_ref: 'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G6',
       replacement_values_source_ref: 'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G6',
+      selected_sheet_ref: '1881://proposal-cooperative/sheet-7',
+      selected_scale_ref: '1881://operator-scale/sheet-7/0.0833',
+      selected_boundary_candidate_ref: 'candidate:1881-sheet-7-outline',
       use_for_claims: false,
       claim_gate_effect: 'no_claims_cleared',
       no_claim_gates_cleared: true,
@@ -396,6 +434,9 @@ describe('HaloFire settings + documentation upload/link API', () => {
       'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G6',
       'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!B9',
       'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G11',
+      '1881://proposal-cooperative/sheet-7',
+      '1881://operator-scale/sheet-7/0.0833',
+      'candidate:1881-sheet-7-outline',
     ]));
     expect(index.items[0]).toEqual(expect.objectContaining({
       llm_observation_count: 1,
@@ -412,7 +453,23 @@ describe('HaloFire settings + documentation upload/link API', () => {
       artifact_type: 'halofire.sam31_actual_value_replacement_prefill.v1',
       source_file: 'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx',
       source_ref: 'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G6',
+      selected_sheet_ref: '1881://proposal-cooperative/sheet-7',
+      selected_scale_ref: '1881://operator-scale/sheet-7/0.0833',
+      selected_boundary_candidate_ref: 'candidate:1881-sheet-7-outline',
       claim_gate_effect: 'no_claims_cleared',
+    }));
+
+    const resolverQueueRes = await request(`/api/projects/${encodeURIComponent(projectName)}/resolver-queue?sam31ActualValue=all`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(resolverQueueRes.status).toBe(200);
+    const resolverQueue = await resolverQueueRes.json();
+    const actualValueItem = resolverQueue.items.find((item) => item.kind === 'sam31_actual_value_replacement');
+    expect(actualValueItem).toBeTruthy();
+    expect(actualValueItem.record_actual_value_replacement_action.request_body).toEqual(expect.objectContaining({
+      selected_sheet_ref: '1881://proposal-cooperative/sheet-7',
+      selected_scale_ref: '1881://operator-scale/sheet-7/0.0833',
+      selected_boundary_candidate_ref: 'candidate:1881-sheet-7-outline',
     }));
   });
 
