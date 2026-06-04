@@ -1,5 +1,12 @@
 # HaloFire Build Log
 
+## 2026-06-04 - Workbench supplied bid-truth browser smoke
+
+- Added a focused Playwright smoke in [`tests/workbench-supplied-bid-truth-browser-smoke.test.js`](C:/Users/dalla/OneDrive/Documents/HaloFire/tests/workbench-supplied-bid-truth-browser-smoke.test.js) that opens the real Workbench supplied bid-truth lane for `The Cooperative 1881 - Salt Lake City UT`, downloads the exact `halofire.supplied_document_bid_truth_review_packet.v1`, saves an employee replacement, and proves the lane stays fail-closed with `claim_gate_effect: no_claims_cleared`.
+- The smoke also verifies queue/evidence readback after the page action, so the browser flow and server contract agree on `employee_replacement_recorded`, the saved `replacement_ref`, and zero cleared regulated claims.
+- Verified with `npx vitest run tests/workbench-supplied-bid-truth-browser-smoke.test.js --reporter=verbose` and `C:/Python312/python.exe E:/ClaudeBot/scripts/verify_agentic_rules.py`. This is `NO_FORMALIZABLE_CLAIM`; it proves a browser/UI/API review path, not a theorem-shaped invariant.
+- Still blocked: AutoSprink parity, AHJ approval, PE/professional review, permit readiness, fabrication readiness, manufacturer-exact models, brand readiness, production readiness, survey-grade claims, and engineering-grade claims.
+
 ## 2026-06-04 - Replay smoke default follow-up review
 
 - Added a Workbench one-click default HaloFire follow-up review action for replay-scoped `openclaw_sam31_section_to_artifacts_consumer_intake_smoke` rows.
