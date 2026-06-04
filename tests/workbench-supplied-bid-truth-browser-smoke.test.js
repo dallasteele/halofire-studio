@@ -437,13 +437,24 @@ describe('Workbench supplied bid-truth browser smoke', () => {
       const defaultReadbackReplacement = page.locator(`[data-sam31-actual-value-default-replacement-intake="${savedLayoutReplacementReadback.evidence_id}"]`).first();
       await defaultReadbackReplacement.waitFor({ state: 'attached' });
       await defaultReadbackReplacement.click();
-      await page.waitForFunction((readbackEvidenceId) => {
-        const status = document.getElementById('sam31ActualValueQueueStatus');
-        return status?.dataset.sourceOpenclawSam31ActualValueReplacementReadbackEvidenceId === readbackEvidenceId
-          && Boolean(status?.dataset.sam31ActualValueReplacementEvidenceId)
-          && status?.dataset.sourceReplayEvidenceId
-          && status?.dataset.claimGateEffect === 'no_claims_cleared';
-      }, String(savedLayoutReplacementReadback.evidence_id));
+      let defaultReadbackReplacementStatus = {};
+      for (let attempt = 0; attempt < 24; attempt += 1) {
+        defaultReadbackReplacementStatus = await page.locator('#sam31ActualValueQueueStatus').evaluate((status) => ({
+          text: status.textContent,
+          dataset: { ...status.dataset },
+        }));
+        if (
+          defaultReadbackReplacementStatus.dataset.sourceOpenclawSam31ActualValueReplacementReadbackEvidenceId === String(savedLayoutReplacementReadback.evidence_id)
+          && defaultReadbackReplacementStatus.dataset.sam31ActualValueReplacementEvidenceId
+        ) {
+          break;
+        }
+        await new Promise((resolve) => setTimeout(resolve, 500));
+      }
+      expect(defaultReadbackReplacementStatus.dataset).toEqual(expect.objectContaining({
+        sourceOpenclawSam31ActualValueReplacementReadbackEvidenceId: String(savedLayoutReplacementReadback.evidence_id),
+      }));
+      expect(defaultReadbackReplacementStatus.dataset.sam31ActualValueReplacementEvidenceId).toMatch(/^\d+$/);
       const defaultReadbackReplacementEvidenceId = String(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-sam31-actual-value-replacement-evidence-id') || '');
       const defaultReadbackRows = await api(`${PROJECT_PATH}/evidence`, token);
       const defaultReadbackRow = defaultReadbackRows.find((row) => row.id === Number(defaultReadbackReplacementEvidenceId));
@@ -522,6 +533,62 @@ describe('Workbench supplied bid-truth browser smoke', () => {
         no_claim_gates_cleared: true,
       }));
       expect(defaultReadbackSmokeNotes.project_truth).toEqual(expect.objectContaining({
+        square_feet: 88000,
+        source_status: 'employee_replacement_recorded',
+      }));
+
+      const defaultReadbackDefaultFollowup = page.locator(`[data-replay-sam31-consumer-intake-smoke-default-followup-review="${defaultReadbackSmokeEvidenceId}"]`).first();
+      await defaultReadbackDefaultFollowup.waitFor({ state: 'attached' });
+      expect(await defaultReadbackDefaultFollowup.getAttribute('data-source-replay-evidence-id')).toBe(String(savedLayout.id));
+      expect(await defaultReadbackDefaultFollowup.getAttribute('data-source-sam31-actual-value-replacement-evidence-id')).toBe(String(defaultReadbackReplacementEvidenceId));
+      expect(await defaultReadbackDefaultFollowup.getAttribute('data-source-openclaw-sam31-actual-value-replacement-readback-evidence-id')).toBe(String(savedLayoutReplacementReadback.evidence_id));
+      await defaultReadbackDefaultFollowup.click();
+      await page.waitForFunction((smokeEvidenceId) => {
+        const status = document.getElementById(`sam31ConsumerIntakeSmokeFollowupReview-${smokeEvidenceId}-status`);
+        return status?.dataset.halofireSam31ConsumerIntakeSmokeFollowupReviewEvidenceId
+          && status?.dataset.downloadedSprinklerReviewPacket === 'true'
+          && status?.dataset.sourceOpenclawSam31ActualValueReplacementReadbackEvidenceId
+          && status?.dataset.claimGateEffect === 'no_claims_cleared';
+      }, String(defaultReadbackSmokeEvidenceId));
+      const defaultReadbackFollowupReviewEvidenceId = String(await page.locator(`#sam31ConsumerIntakeSmokeFollowupReview-${defaultReadbackSmokeEvidenceId}-status`).getAttribute('data-halofire-sam31-consumer-intake-smoke-followup-review-evidence-id') || '');
+      expect(defaultReadbackFollowupReviewEvidenceId).toMatch(/^\d+$/);
+      expect(await page.locator(`#sam31ConsumerIntakeSmokeFollowupReview-${defaultReadbackSmokeEvidenceId}-status`).getAttribute('data-source-openclaw-sam31-actual-value-replacement-readback-evidence-id')).toBe(String(savedLayoutReplacementReadback.evidence_id));
+      const defaultReadbackFollowupRows = await api(`${PROJECT_PATH}/evidence`, token);
+      const defaultReadbackFollowupRow = defaultReadbackFollowupRows.find((row) => row.id === Number(defaultReadbackFollowupReviewEvidenceId));
+      expect(defaultReadbackFollowupRow).toBeTruthy();
+      const defaultReadbackFollowupNotes = JSON.parse(defaultReadbackFollowupRow.notes);
+      expect(defaultReadbackFollowupNotes.review).toEqual(expect.objectContaining({
+        source_replay_evidence_id: savedLayout.id,
+        source_sam31_actual_value_replacement_evidence_id: Number(defaultReadbackReplacementEvidenceId),
+        source_openclaw_sam31_actual_value_replacement_readback_evidence_id: savedLayoutReplacementReadback.evidence_id,
+        claim_gate_effect: 'no_claims_cleared',
+        no_claim_gates_cleared: true,
+      }));
+
+      const defaultReadbackDefaultSprinkler = page.locator(`[data-replay-sam31-consumer-intake-smoke-default-sprinkler-review="${defaultReadbackSmokeEvidenceId}"]`).first();
+      await defaultReadbackDefaultSprinkler.waitFor({ state: 'attached' });
+      expect(await defaultReadbackDefaultSprinkler.getAttribute('data-source-openclaw-sam31-actual-value-replacement-readback-evidence-id')).toBe(String(savedLayoutReplacementReadback.evidence_id));
+      expect(await defaultReadbackDefaultSprinkler.getAttribute('data-source-halofire-sam31-consumer-intake-smoke-followup-review-evidence-id')).toBe(defaultReadbackFollowupReviewEvidenceId);
+      const [defaultReadbackReplayInputsDownload] = await Promise.all([
+        page.waitForEvent('download'),
+        defaultReadbackDefaultSprinkler.click(),
+      ]);
+      const defaultReadbackReplayInputsPath = await defaultReadbackReplayInputsDownload.path();
+      expect(defaultReadbackReplayInputsDownload.suggestedFilename()).toContain('preliminary-replay-inputs');
+      expect(defaultReadbackReplayInputsPath).toBeTruthy();
+      const defaultReadbackReplayInputs = JSON.parse(fs.readFileSync(defaultReadbackReplayInputsPath, 'utf8'));
+      expect(defaultReadbackReplayInputs).toEqual(expect.objectContaining({
+        artifact_type: 'halofire.sam31_sprinkler_review_preliminary_replay_inputs.v1',
+        source_section_to_artifacts_consumer_intake_smoke_evidence_id: Number(defaultReadbackSmokeEvidenceId),
+        source_replay_evidence_id: savedLayout.id,
+        source_sam31_actual_value_replacement_evidence_id: Number(defaultReadbackReplacementEvidenceId),
+        source_openclaw_sam31_actual_value_replacement_readback_evidence_id: savedLayoutReplacementReadback.evidence_id,
+        source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id: Number(defaultReadbackFollowupReviewEvidenceId),
+        source_supplied_document_bid_truth_replacement_evidence_id: replacement.evidence.id,
+        claim_gate_effect: 'no_claims_cleared',
+        no_claim_gates_cleared: true,
+      }));
+      expect(defaultReadbackReplayInputs.project_truth).toEqual(expect.objectContaining({
         square_feet: 88000,
         source_status: 'employee_replacement_recorded',
       }));
