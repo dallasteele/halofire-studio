@@ -477,6 +477,106 @@ describe('Workbench supplied bid-truth browser smoke', () => {
         'employee://bid-truth/downstream-browser-smoke-001',
       ]));
 
+      const savedLayoutDefaultReplayFollowup = page.locator(`[data-replay-sam31-consumer-intake-smoke-default-preliminary-replay-followup="${savedLayoutSmokeEvidenceId}"]`).first();
+      await savedLayoutDefaultReplayFollowup.waitFor({ state: 'attached' });
+      expect(await savedLayoutDefaultReplayFollowup.getAttribute('data-source-replay-evidence-id')).toBe(String(savedLayout.id));
+      expect(await savedLayoutDefaultReplayFollowup.getAttribute('data-source-sam31-actual-value-replacement-evidence-id')).toBe(String(savedLayoutReplacementEvidenceId));
+      expect(await savedLayoutDefaultReplayFollowup.getAttribute('data-source-halofire-sam31-consumer-intake-smoke-followup-review-evidence-id')).toBe(String(savedLayoutFollowupReviewEvidenceId));
+      await savedLayoutDefaultReplayFollowup.click();
+      await page.waitForFunction((smokeEvidenceId) => {
+        const status = document.getElementById(`sam31ConsumerIntakeSmokePreliminaryReplayFollowup-${smokeEvidenceId}-status`);
+        return status?.dataset.halofireSam31PreliminaryReplayFollowupEvidenceId
+          && status?.dataset.downloadedPreliminaryReplayArtifact === 'true'
+          && status?.dataset.claimGateEffect === 'no_claims_cleared';
+      }, String(savedLayoutSmokeEvidenceId));
+      const savedLayoutReplayFollowupEvidenceId = String(await page.locator(`#sam31ConsumerIntakeSmokePreliminaryReplayFollowup-${savedLayoutSmokeEvidenceId}-status`).getAttribute('data-halofire-sam31-preliminary-replay-followup-evidence-id') || '');
+      expect(savedLayoutReplayFollowupEvidenceId).toMatch(/^\d+$/);
+      const replayFollowupRows = await api(`${PROJECT_PATH}/evidence`, token);
+      const savedLayoutReplayFollowupRow = replayFollowupRows.find((row) => row.id === Number(savedLayoutReplayFollowupEvidenceId));
+      expect(savedLayoutReplayFollowupRow).toBeTruthy();
+      const savedLayoutReplayFollowupNotes = JSON.parse(savedLayoutReplayFollowupRow.notes);
+      expect(savedLayoutReplayFollowupNotes.followup).toEqual(expect.objectContaining({
+        source_replay_evidence_id: savedLayout.id,
+        source_sam31_actual_value_replacement_evidence_id: Number(savedLayoutReplacementEvidenceId),
+        source_supplied_document_bid_truth_replacement_evidence_id: replacement.evidence.id,
+        claim_gate_effect: 'no_claims_cleared',
+        no_claim_gates_cleared: true,
+      }));
+      expect(savedLayoutReplayFollowupNotes.followup.project_truth).toEqual(expect.objectContaining({
+        square_feet: 88000,
+        head_count: 733,
+        total_man_hours: 1775.5,
+        construction_days: 41,
+        source_status: 'employee_replacement_recorded',
+      }));
+
+      const savedLayoutDefaultPacketReview = page.locator(`[data-replay-sam31-consumer-intake-smoke-default-packet-review="${savedLayoutSmokeEvidenceId}"]`).first();
+      await savedLayoutDefaultPacketReview.waitFor({ state: 'attached' });
+      expect(await savedLayoutDefaultPacketReview.getAttribute('data-source-halofire-sam31-preliminary-replay-followup-evidence-id')).toBe(savedLayoutReplayFollowupEvidenceId);
+      await savedLayoutDefaultPacketReview.click();
+      await page.waitForFunction((smokeEvidenceId) => {
+        const status = document.getElementById(`sam31ConsumerIntakeSmokeReplayFollowupPacketReview-${smokeEvidenceId}-status`);
+        return status?.dataset.halofireSam31FollowupPacketReviewEvidenceId
+          && status?.dataset.downloadedReplayFollowupPacket === 'true'
+          && status?.dataset.reviewedReplayFollowupPacket === 'true'
+          && status?.dataset.claimGateEffect === 'no_claims_cleared';
+      }, String(savedLayoutSmokeEvidenceId));
+      const savedLayoutPacketReviewEvidenceId = String(await page.locator(`#sam31ConsumerIntakeSmokeReplayFollowupPacketReview-${savedLayoutSmokeEvidenceId}-status`).getAttribute('data-halofire-sam31-followup-packet-review-evidence-id') || '');
+      expect(savedLayoutPacketReviewEvidenceId).toMatch(/^\d+$/);
+      const packetReviewRows = await api(`${PROJECT_PATH}/evidence`, token);
+      const savedLayoutPacketReviewRow = packetReviewRows.find((row) => row.id === Number(savedLayoutPacketReviewEvidenceId));
+      expect(savedLayoutPacketReviewRow).toBeTruthy();
+      const savedLayoutPacketReviewNotes = JSON.parse(savedLayoutPacketReviewRow.notes);
+      expect(savedLayoutPacketReviewNotes.review).toEqual(expect.objectContaining({
+        source_replay_evidence_id: savedLayout.id,
+        source_sam31_actual_value_replacement_evidence_id: Number(savedLayoutReplacementEvidenceId),
+        source_supplied_document_bid_truth_replacement_evidence_id: replacement.evidence.id,
+        source_followup_decision_evidence_id: Number(savedLayoutReplayFollowupEvidenceId),
+        claim_gate_effect: 'no_claims_cleared',
+        no_claim_gates_cleared: true,
+      }));
+      expect(savedLayoutPacketReviewNotes.review.project_truth).toEqual(expect.objectContaining({
+        square_feet: 88000,
+        head_count: 733,
+        total_man_hours: 1775.5,
+        construction_days: 41,
+        source_status: 'employee_replacement_recorded',
+      }));
+
+      const savedLayoutDefaultApprovalUpload = page.locator(`[data-replay-sam31-consumer-intake-smoke-default-approval-upload="${savedLayoutPacketReviewEvidenceId}"]`).first();
+      await savedLayoutDefaultApprovalUpload.waitFor({ state: 'attached' });
+      expect(await savedLayoutDefaultApprovalUpload.getAttribute('data-source-replay-evidence-id')).toBe(String(savedLayout.id));
+      expect(await savedLayoutDefaultApprovalUpload.getAttribute('data-source-sam31-actual-value-replacement-evidence-id')).toBe(String(savedLayoutReplacementEvidenceId));
+      expect(await savedLayoutDefaultApprovalUpload.getAttribute('data-source-halofire-sam31-followup-packet-review-evidence-id')).toBe(savedLayoutPacketReviewEvidenceId);
+      await savedLayoutDefaultApprovalUpload.click();
+      await page.waitForFunction((packetReviewEvidenceId) => {
+        const status = document.getElementById(`sam31ApprovalUploadDefaultStatus-${packetReviewEvidenceId}`);
+        return status?.dataset.sam31ApprovalUploadEvidenceId
+          && status?.dataset.downloadedGateValidationPacket === 'true'
+          && status?.dataset.claimGateEffect === 'no_claims_cleared';
+      }, String(savedLayoutPacketReviewEvidenceId));
+      const savedLayoutApprovalUploadEvidenceId = String(await page.locator(`#sam31ApprovalUploadDefaultStatus-${savedLayoutPacketReviewEvidenceId}`).getAttribute('data-sam31-approval-upload-evidence-id') || '');
+      expect(savedLayoutApprovalUploadEvidenceId).toMatch(/^\d+$/);
+      const approvalUploadRows = await api(`${PROJECT_PATH}/evidence`, token);
+      const savedLayoutApprovalUploadRow = approvalUploadRows.find((row) => row.id === Number(savedLayoutApprovalUploadEvidenceId));
+      expect(savedLayoutApprovalUploadRow).toBeTruthy();
+      const savedLayoutApprovalUploadNotes = JSON.parse(savedLayoutApprovalUploadRow.notes);
+      expect(savedLayoutApprovalUploadNotes.intake).toEqual(expect.objectContaining({
+        source_replay_evidence_id: savedLayout.id,
+        source_sam31_actual_value_replacement_evidence_id: Number(savedLayoutReplacementEvidenceId),
+        source_supplied_document_bid_truth_replacement_evidence_id: replacement.evidence.id,
+        source_packet_review_decision_evidence_id: Number(savedLayoutPacketReviewEvidenceId),
+        claim_gate_effect: 'no_claims_cleared',
+        no_claim_gates_cleared: true,
+      }));
+      expect(savedLayoutApprovalUploadNotes.intake.project_truth).toEqual(expect.objectContaining({
+        square_feet: 88000,
+        head_count: 733,
+        total_man_hours: 1775.5,
+        construction_days: 41,
+        source_status: 'employee_replacement_recorded',
+      }));
+
       const [download] = await Promise.all([
         page.waitForEvent('download'),
         page.locator('[data-supplied-bid-truth-downstream-download]').click(),

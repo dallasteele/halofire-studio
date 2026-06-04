@@ -3791,7 +3791,13 @@ function buildHalofireSam31ConsumerIntakeSmokePreliminaryReplayArtifact(projectN
     source_section_to_artifacts_consumer_intake_smoke_evidence_id: replayInputs.source_section_to_artifacts_consumer_intake_smoke_evidence_id,
     source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id: replayInputs.source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id,
     source_halofire_sam31_sprinkler_review_decision_evidence_id: replayInputs.source_halofire_sam31_sprinkler_review_decision_evidence_id,
+    source_replay_evidence_id: replayInputs.source_replay_evidence_id || null,
     source_sam31_actual_value_replacement_evidence_id: replayInputs.source_sam31_actual_value_replacement_evidence_id,
+    source_supplied_document_bid_truth_replacement_evidence_id: replayInputs.source_supplied_document_bid_truth_replacement_evidence_id || null,
+    source_replay_artifact_type: replayInputs.source_replay_artifact_type || null,
+    project_truth: replayInputs.project_truth && typeof replayInputs.project_truth === 'object' && !Array.isArray(replayInputs.project_truth)
+      ? jsonClone(replayInputs.project_truth)
+      : null,
     source_openclaw_sam31_consumer_review_evidence_id: replayInputs.source_openclaw_sam31_consumer_review_evidence_id,
     ...sam31ActualValueReplacementAuditProvenance(replayInputs),
     ...sam31PdfBoundaryDecisionProvenance(replayInputs),
@@ -3811,7 +3817,13 @@ function buildHalofireSam31ConsumerIntakeSmokePreliminaryReplayArtifact(projectN
       project_name: projectName,
       source_preliminary_replay_inputs_artifact_type: HALOFIRE_SAM31_SPRINKLER_REVIEW_PRELIMINARY_REPLAY_INPUTS_TYPE,
       source_section_to_artifacts_consumer_intake_smoke_evidence_id: replayInputs.source_section_to_artifacts_consumer_intake_smoke_evidence_id,
+      source_replay_evidence_id: replayInputs.source_replay_evidence_id || null,
+      source_sam31_actual_value_replacement_evidence_id: replayInputs.source_sam31_actual_value_replacement_evidence_id || null,
+      source_supplied_document_bid_truth_replacement_evidence_id: replayInputs.source_supplied_document_bid_truth_replacement_evidence_id || null,
       source_halofire_sam31_sprinkler_review_decision_evidence_id: replayInputs.source_halofire_sam31_sprinkler_review_decision_evidence_id,
+      project_truth: replayInputs.project_truth && typeof replayInputs.project_truth === 'object' && !Array.isArray(replayInputs.project_truth)
+        ? jsonClone(replayInputs.project_truth)
+        : null,
       supported_sprinkler_review_lane: replayInputs.supported_sprinkler_review_lane,
       replay_scope: replayInputs.replay_scope,
       issue_candidates: issueCandidates,
@@ -11407,6 +11419,13 @@ function buildHalofireSam31SprinklerReplayFollowupPacket(projectName, evidence, 
     source_openclaw_sam31_consumer_review_evidence_id: reviewEvidence?.id || followup.source_openclaw_sam31_consumer_review_evidence_id || null,
     source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id: queueItem.source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id || followup.source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id || followupReviewEvidence?.evidence?.id || null,
     source_halofire_sam31_sprinkler_review_decision_evidence_id: sprinklerReviewEvidence.id,
+    source_replay_evidence_id: followup.source_replay_evidence_id || queueItem.source_replay_evidence_id || null,
+    source_sam31_actual_value_replacement_evidence_id: followup.source_sam31_actual_value_replacement_evidence_id || queueItem.source_sam31_actual_value_replacement_evidence_id || null,
+    source_supplied_document_bid_truth_replacement_evidence_id: followup.source_supplied_document_bid_truth_replacement_evidence_id || queueItem.source_supplied_document_bid_truth_replacement_evidence_id || null,
+    source_replay_artifact_type: followup.source_replay_artifact_type || queueItem.source_replay_artifact_type || null,
+    project_truth: followup.project_truth && typeof followup.project_truth === 'object' && !Array.isArray(followup.project_truth)
+      ? jsonClone(followup.project_truth)
+      : (queueItem.project_truth && typeof queueItem.project_truth === 'object' && !Array.isArray(queueItem.project_truth) ? jsonClone(queueItem.project_truth) : null),
     source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id: queueItem.source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id || followup.source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id || null,
     source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id: queueItem.source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id || followup.source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id || null,
     source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id: queueItem.source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id || followup.source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id || null,
@@ -11542,6 +11561,13 @@ function normalizeHalofireSam31SprinklerFollowupPacketReviewDecision(projectName
     source_openclaw_sam31_consumer_review_evidence_id: sourcePacket.source_openclaw_sam31_consumer_review_evidence_id,
     source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id: sourcePacket.source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id || null,
     source_halofire_sam31_sprinkler_review_decision_evidence_id: sourcePacket.source_halofire_sam31_sprinkler_review_decision_evidence_id,
+    source_replay_evidence_id: sourcePacket.source_replay_evidence_id || null,
+    source_sam31_actual_value_replacement_evidence_id: sourcePacket.source_sam31_actual_value_replacement_evidence_id || null,
+    source_supplied_document_bid_truth_replacement_evidence_id: sourcePacket.source_supplied_document_bid_truth_replacement_evidence_id || null,
+    source_replay_artifact_type: sourcePacket.source_replay_artifact_type || null,
+    project_truth: sourcePacket.project_truth && typeof sourcePacket.project_truth === 'object' && !Array.isArray(sourcePacket.project_truth)
+      ? jsonClone(sourcePacket.project_truth)
+      : null,
     source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id: sourcePacket.source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id || null,
     source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id: sourcePacket.source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id || null,
     source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id: sourcePacket.source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id || null,
@@ -11744,6 +11770,13 @@ function normalizeHalofireSam31ApprovalUploadIntake(projectName, sourcePacket, p
     source_openclaw_sam31_consumer_review_evidence_id: sourcePacket.source_openclaw_sam31_consumer_review_evidence_id,
     source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id: sourcePacket.source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id || null,
     source_halofire_sam31_sprinkler_review_decision_evidence_id: sourcePacket.source_halofire_sam31_sprinkler_review_decision_evidence_id,
+    source_replay_evidence_id: sourcePacket.source_replay_evidence_id || packetReview.source_replay_evidence_id || null,
+    source_sam31_actual_value_replacement_evidence_id: sourcePacket.source_sam31_actual_value_replacement_evidence_id || packetReview.source_sam31_actual_value_replacement_evidence_id || null,
+    source_supplied_document_bid_truth_replacement_evidence_id: sourcePacket.source_supplied_document_bid_truth_replacement_evidence_id || packetReview.source_supplied_document_bid_truth_replacement_evidence_id || null,
+    source_replay_artifact_type: sourcePacket.source_replay_artifact_type || packetReview.source_replay_artifact_type || null,
+    project_truth: sourcePacket.project_truth && typeof sourcePacket.project_truth === 'object' && !Array.isArray(sourcePacket.project_truth)
+      ? jsonClone(sourcePacket.project_truth)
+      : (packetReview.project_truth && typeof packetReview.project_truth === 'object' && !Array.isArray(packetReview.project_truth) ? jsonClone(packetReview.project_truth) : null),
     source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id: sourcePacket.source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id || null,
     source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id: sourcePacket.source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id || null,
     source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id: sourcePacket.source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id || null,
@@ -12044,7 +12077,13 @@ function normalizeHalofireSam31ConsumerIntakeSmokePreliminaryReplayFollowupDecis
     source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id: replayArtifact.source_halofire_sam31_consumer_intake_smoke_followup_review_evidence_id,
     source_openclaw_sam31_consumer_review_evidence_id: replayArtifact.source_openclaw_sam31_consumer_review_evidence_id || null,
     source_halofire_sam31_sprinkler_review_decision_evidence_id: sprinklerReviewEvidence.id,
+    source_replay_evidence_id: replayArtifact.source_replay_evidence_id || null,
     source_sam31_actual_value_replacement_evidence_id: replayArtifact.source_sam31_actual_value_replacement_evidence_id || null,
+    source_supplied_document_bid_truth_replacement_evidence_id: replayArtifact.source_supplied_document_bid_truth_replacement_evidence_id || null,
+    source_replay_artifact_type: replayArtifact.source_replay_artifact_type || null,
+    project_truth: replayArtifact.project_truth && typeof replayArtifact.project_truth === 'object' && !Array.isArray(replayArtifact.project_truth)
+      ? jsonClone(replayArtifact.project_truth)
+      : null,
     source_openclaw_sam31_section_to_artifacts_ref: replayArtifact.source_openclaw_sam31_section_to_artifacts_ref || null,
     ...auditProvenance,
     ...pdfBoundaryProvenance,
