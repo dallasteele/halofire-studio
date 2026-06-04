@@ -5637,7 +5637,16 @@ async function saveClaimGateAuditActualValueReadback(evidenceId = '') {
     target.dataset.claimGateEffect = 'no_claims_cleared';
     target.dataset.noUnrelatedClaimsCleared = String(packet?.no_unrelated_claims_cleared !== false);
     target.dataset.actualValueReplacementReadbackHref = String(readback?.replacement_readback_href || readback?.source_project_route || '');
-    target.textContent = `Saved openclaw.sam31.actual_value_replacement_readback.v1 evidence #${savedId} from claim-gate audit evidence #${targetId}; no unrelated claims cleared.`;
+    const selected1881 = sam31Selected1881Refs(saved, packet, readback);
+    const selected1881StatusText = hasSam31Selected1881Refs(selected1881)
+      ? ` selected_1881_context selected_sheet_ref ${selected1881.selected_sheet_ref || 'missing'} - selected_scale_ref ${selected1881.selected_scale_ref || 'missing'} - selected_boundary_candidate_ref ${selected1881.selected_boundary_candidate_ref || 'missing'}.`
+      : '';
+    if (hasSam31Selected1881Refs(selected1881)) {
+      target.dataset.selectedSheetRef = selected1881.selected_sheet_ref;
+      target.dataset.selectedScaleRef = selected1881.selected_scale_ref;
+      target.dataset.selectedBoundaryCandidateRef = selected1881.selected_boundary_candidate_ref;
+    }
+    target.textContent = `Saved openclaw.sam31.actual_value_replacement_readback.v1 evidence #${savedId} from claim-gate audit evidence #${targetId}; no unrelated claims cleared.${selected1881StatusText}`;
   };
   try {
     if (!targetId) throw new Error('Saved claim-gate resolve audit evidence id is required.');
@@ -5672,6 +5681,7 @@ async function saveClaimGateAuditActualValueReadback(evidenceId = '') {
       },
       ...auditSourceRefs,
     ];
+    const selected1881 = sam31Selected1881Refs(parsed, auditPacket, ...sourceRefs);
     const saved = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/evidence', {
       method: 'POST',
       body: JSON.stringify({
@@ -5690,6 +5700,9 @@ async function saveClaimGateAuditActualValueReadback(evidenceId = '') {
           source_resolved_evidence_type: auditPacket.resolved_evidence?.evidence_type || parsed.resolved_evidence_type || null,
           source_claim_gate_effect: auditPacket.claim_gate_effect || parsed.claim_gate_effect || 'gate_cleared_after_explicit_signed_validation',
           no_unrelated_claims_cleared: auditPacket.no_unrelated_claims_cleared !== false && parsed.no_unrelated_claims_cleared !== false,
+          selected_sheet_ref: selected1881.selected_sheet_ref || null,
+          selected_scale_ref: selected1881.selected_scale_ref || null,
+          selected_boundary_candidate_ref: selected1881.selected_boundary_candidate_ref || null,
           source_refs: sourceRefs,
           source_queue_route: readback.replacement_readback_href || readback.source_project_route || `/api/openclaw/sam31/actual-value-replacements?projectName=${encodeURIComponent(currentProjectName())}`,
           replacement_readback: readback,
@@ -5715,7 +5728,7 @@ async function saveClaimGateAuditActualValueReadback(evidenceId = '') {
     });
     await refreshEvidence();
     await refreshSam31ActualValueQueue();
-    stampStatus(document.getElementById(statusId) || status, saved, auditPacket, readback);
+    stampStatus(document.getElementById(statusId) || status, { ...saved, ...selected1881 }, { ...auditPacket, ...selected1881 }, readback);
   } catch (err) {
     if (status) status.textContent = 'Error: ' + err.message;
   }

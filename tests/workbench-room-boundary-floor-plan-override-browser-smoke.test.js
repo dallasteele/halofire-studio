@@ -286,6 +286,9 @@ describe('Workbench room-boundary floor-plan override browser smoke', () => {
       expect(auditReadbackEvidenceId).toMatch(/^\d+$/);
       expect(await auditActualValueStatus.getAttribute('data-source-resolved-evidence-id')).toBe(String(approvalValidationDecision.evidence_id));
       expect(await auditActualValueStatus.getAttribute('data-source-claim-gate-effect')).toBe('gate_cleared_after_explicit_signed_validation');
+      expect(await auditActualValueStatus.getAttribute('data-selected-sheet-ref')).toBe('1881://proposal-cooperative/sheet-7');
+      expect(await auditActualValueStatus.getAttribute('data-selected-scale-ref')).toBe('1881://operator-scale/sheet-7/0.0833');
+      expect(await auditActualValueStatus.getAttribute('data-selected-boundary-candidate-ref')).toBe('candidate:1881-sheet-7-outline');
 
       const auditReadbackRow = page.locator(`#evidence-${auditReadbackEvidenceId}`);
       await auditReadbackRow.waitFor({ state: 'attached' });
@@ -296,6 +299,8 @@ describe('Workbench room-boundary floor-plan override browser smoke', () => {
       expect(auditReadbackText).toContain('source_claim_gate_effect gate_cleared_after_explicit_signed_validation');
       expect(auditReadbackText).toContain('claim_gate_effect no_claims_cleared');
       expect(auditReadbackText).toContain('no_unrelated_claims_cleared true');
+      expect(auditReadbackText).toContain('selected_1881_context');
+      expect(auditReadbackText).toContain('selected_sheet_ref 1881://proposal-cooperative/sheet-7');
 
       const recordExactReplacement = page.locator(`[data-sam31-actual-value-evidence-record-context="${auditReadbackEvidenceId}"]`).first();
       await recordExactReplacement.waitFor({ state: 'attached' });
