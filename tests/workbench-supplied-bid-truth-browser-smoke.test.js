@@ -389,7 +389,14 @@ describe('Workbench supplied bid-truth browser smoke', () => {
       const savedLayoutReplacementText = await page.locator(`#evidence-${savedLayoutReplacementEvidenceId}`).innerText();
       expect(savedLayoutReplacementText).toContain('sam31_actual_value_replacement');
       expect(savedLayoutReplacementText).toContain(`source_replay_evidence_id ${savedLayout.id}`);
+      expect(savedLayoutReplacementText).toContain(`source_supplied_document_bid_truth_replacement_evidence_id ${replacement.evidence.id}`);
       expect(savedLayoutReplacementText).toContain('employee://bid-truth/downstream-browser-smoke-001');
+      expect(savedLayoutReplacementText).toContain('selected_1881_context');
+      expect(savedLayoutReplacementText).toContain('selected_sheet_ref 1881://proposal-cooperative/sheet-7');
+      expect(savedLayoutReplacementText).toContain('selected_scale_ref 1881://operator-scale/sheet-7/0.0833');
+      expect(savedLayoutReplacementText).toContain('selected_boundary_candidate_ref candidate:1881-sheet-7-outline');
+      expect(savedLayoutReplacementText).toContain('project_truth square_feet 88000');
+      expect(savedLayoutReplacementText).toContain('source_status employee_replacement_recorded');
       expect(savedLayoutReplacementText).toContain('claim_gate_effect no_claims_cleared');
 
       const savedLayoutSmokeButton = page.locator(`[data-replay-sam31-consumer-intake-smoke-source-replacement-evidence-id="${savedLayoutReplacementEvidenceId}"]`).first();
