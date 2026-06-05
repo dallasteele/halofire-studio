@@ -510,6 +510,21 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toContain('<div class="muted" id="${sprinklerReviewId}-status"${latestSprinklerReviewStatusAttrs}');
   });
 
+  it('prehydrates replay-scoped approval validation readiness from saved packet reviews', async () => {
+    const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
+    expect(shell.status).toBe(200);
+    const html = await shell.text();
+
+    expect(html).toContain('latestApprovalUploadGateValidationHref');
+    expect(html).toContain('latestApprovalUploadValidationQueueHref');
+    expect(html).toContain('data-sam31-approval-upload-gate-validation-packet-href');
+    expect(html).toContain('data-sam31-approval-validation-filter-href');
+    expect(html).toContain('data-approval-validation-packet-ready="true"');
+    expect(html).toContain('Saved default professional approval upload');
+    expect(html).toContain('approval validation packet ready');
+    expect(html).toContain('<div class="muted" id="sam31ApprovalUploadDefaultStatus-${escapeHtml(row.id)}"${latestApprovalUploadStatusAttrs}');
+  });
+
   it('surfaces selected 1881 refs on replay-scoped smoke and sprinkler evidence readbacks', async () => {
     const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
     expect(shell.status).toBe(200);
