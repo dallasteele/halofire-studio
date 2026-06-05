@@ -203,6 +203,7 @@ let latestSam31ActualValueResolverQueueReadback = null;
 let lastSam31ActualValueResolverReplay = null;
 let catalogSourceRecordResults = {};
 let catalogApprovalValidationResults = {};
+let officialFlowReviewDecisionResults = {};
 const SAM31_ACTUAL_VALUE_GLOBAL_READBACK_ROUTE = '/api/openclaw/sam31/actual-value-resolver-queue?projectName=';
 const SAM31_ACTUAL_VALUE_SERVICE_DESCRIPTOR_ROUTE = '/api/openclaw/sam31/actual-value-service?projectName=';
 const SAM31_ACTUAL_VALUE_REPLACEMENT_READBACK_ROUTE = '/api/openclaw/sam31/actual-value-replacements?projectName=';
@@ -416,6 +417,35 @@ function officialFlowSignedReviewerValidationQueueQuery(gateCode = '', evidenceT
   if (gateCode) params.set('targetGate', gateCode);
   if (evidenceType) params.set('evidenceType', evidenceType);
   return params.toString();
+}
+
+function officialFlowReviewDecisionResultKey(projectName, replayEvidenceId) {
+  return [projectName || currentProjectName(), replayEvidenceId || ''].join('::');
+}
+
+function officialFlowSignedReviewerQueueHref(gateCode, evidenceType, decisionEvidenceId) {
+  return `/api/projects/${encodeURIComponent(currentProjectName())}/resolver-queue?${officialFlowSignedReviewerValidationQueueQuery(gateCode, evidenceType, decisionEvidenceId)}`;
+}
+
+function officialFlowReviewDecisionResultsMarkup() {
+  const rows = Object.values(officialFlowReviewDecisionResults)
+    .filter((record) => record.projectName === currentProjectName());
+  if (!rows.length) return '<div id="officialFlowReviewDecisionResults"></div>';
+  return `<div id="officialFlowReviewDecisionResults" class="claims">${rows.map((record) => {
+    const professionalHref = officialFlowSignedReviewerQueueHref('PROFESSIONAL_REVIEW_MISSING', 'professional_review', record.evidenceId);
+    const ahjHref = officialFlowSignedReviewerQueueHref('AHJ_APPROVAL_MISSING', 'ahj_approval', record.evidenceId);
+    const manufacturerHref = officialFlowSignedReviewerQueueHref('MANUFACTURER_MODEL_APPROVAL_MISSING', 'manufacturer_approval', record.evidenceId);
+    const autosprinkHref = officialFlowSignedReviewerQueueHref('AUTOSPRINK_EVIDENCE_MISSING', 'autosprink_packet', record.evidenceId);
+    return `<div class="muted" style="font-size:11px;margin-top:4px"
+      data-official-flow-review-decision-evidence-id="${escapeHtml(String(record.evidenceId || ''))}"
+      data-source-official-flow-replay-evidence-id="${escapeHtml(String(record.replayEvidenceId || ''))}"
+      data-professional-signed-reviewer-href="${escapeHtml(professionalHref)}"
+      data-ahj-signed-reviewer-href="${escapeHtml(ahjHref)}"
+      data-manufacturer-signed-reviewer-href="${escapeHtml(manufacturerHref)}"
+      data-autosprink-signed-reviewer-href="${escapeHtml(autosprinkHref)}"
+      data-claim-gate-effect="${escapeHtml(record.claimGateEffect || 'no_claims_cleared')}"
+      data-no-claim-gates-cleared="${escapeHtml(record.noClaimGatesCleared === false ? 'false' : 'true')}">Saved official_flow_professional_ahj_review_decision evidence #${escapeHtml(String(record.evidenceId || ''))}; signed-reviewer queues are ready and claim gates remain blocked. <span class="chip">professional</span> <span class="chip">AHJ</span> <span class="chip">manufacturer</span> <span class="chip">AutoSprink</span></div>`;
+  }).join('')}</div>`;
 }
 
 async function openOfficialFlowSignedReviewerValidationQueue(gateCode = '', evidenceType = '', sourceEvidenceId = '', statusId = '') {
@@ -4574,21 +4604,30 @@ function catalogApprovalQuickFilter(summary, activeQuery) {
 function officialFlowSignedReviewerQuickFilter(summary, activeQuery) {
   const professionalQuery = 'officialFlowSignedReviewer=pending&targetGate=PROFESSIONAL_REVIEW_MISSING&evidenceType=professional_review';
   const ahjQuery = 'officialFlowSignedReviewer=pending&targetGate=AHJ_APPROVAL_MISSING&evidenceType=ahj_approval';
+  const manufacturerQuery = 'officialFlowSignedReviewer=pending&targetGate=MANUFACTURER_MODEL_APPROVAL_MISSING&evidenceType=manufacturer_approval';
   const autosprinkQuery = 'officialFlowSignedReviewer=pending&targetGate=AUTOSPRINK_EVIDENCE_MISSING&evidenceType=autosprink_packet';
   const isProfessionalActive = activeQuery === professionalQuery;
   const isAhjActive = activeQuery === ahjQuery;
+  const isManufacturerActive = activeQuery === manufacturerQuery;
   const isAutosprinkActive = activeQuery === autosprinkQuery;
   return `<div class="muted" style="font-size:11px;margin-bottom:8px">
     officialFlowSignedReviewerQuickFilter:
     <button class="go" type="button" style="padding:6px 9px;font-size:10px;background:${isProfessionalActive ? '#0f766e' : '#374151'}" data-resolver-queue-filter="${escapeHtml(professionalQuery)}">Official-flow professional signed-reviewer</button>
     <button class="go" type="button" style="padding:6px 9px;font-size:10px;background:${isAhjActive ? '#b45309' : '#374151'}" data-resolver-queue-filter="${escapeHtml(ahjQuery)}">Official-flow AHJ signed-reviewer</button>
+    <button class="go" type="button" style="padding:6px 9px;font-size:10px;background:${isManufacturerActive ? '#92400e' : '#374151'}" data-resolver-queue-filter="${escapeHtml(manufacturerQuery)}">Official-flow manufacturer signed-reviewer</button>
     <button class="go" type="button" style="padding:6px 9px;font-size:10px;background:${isAutosprinkActive ? '#4338ca' : '#374151'}" data-resolver-queue-filter="${escapeHtml(autosprinkQuery)}">Official-flow AutoSprink signed-reviewer</button>
-    ${activeQuery && !isProfessionalActive && !isAhjActive && !isAutosprinkActive ? '<button class="go" type="button" style="padding:6px 9px;font-size:10px;background:#374151" data-resolver-queue-filter="">Show all resolver rows</button>' : ''}
+    ${activeQuery && !isProfessionalActive && !isAhjActive && !isManufacturerActive && !isAutosprinkActive ? '<button class="go" type="button" style="padding:6px 9px;font-size:10px;background:#374151" data-resolver-queue-filter="">Show all resolver rows</button>' : ''}
+    <span class="chip">Open professional signed reviewer workflow</span>
+    <span class="chip">Open AHJ signed reviewer workflow</span>
+    <span class="chip">Open manufacturer signed reviewer workflow</span>
+    <span class="chip">Open AutoSprink signed reviewer workflow</span>
     <span class="chip">officialFlowSignedReviewer=pending&targetGate=PROFESSIONAL_REVIEW_MISSING&evidenceType=professional_review</span>
     <span class="chip">officialFlowSignedReviewer=pending&targetGate=AHJ_APPROVAL_MISSING&evidenceType=ahj_approval</span>
+    <span class="chip">officialFlowSignedReviewer=pending&targetGate=MANUFACTURER_MODEL_APPROVAL_MISSING&evidenceType=manufacturer_approval</span>
     <span class="chip">officialFlowSignedReviewer=pending&targetGate=AUTOSPRINK_EVIDENCE_MISSING&evidenceType=autosprink_packet</span>
     <span class="chip">official_flow_signed_reviewer_professional_rows ${escapeHtml(summary.official_flow_signed_reviewer_professional_rows || 0)}</span>
     <span class="chip">official_flow_signed_reviewer_ahj_rows ${escapeHtml(summary.official_flow_signed_reviewer_ahj_rows || 0)}</span>
+    <span class="chip">official_flow_signed_reviewer_manufacturer_rows ${escapeHtml(summary.official_flow_signed_reviewer_manufacturer_rows || 0)}</span>
     <span class="chip">official_flow_signed_reviewer_autosprink_rows ${escapeHtml(summary.official_flow_signed_reviewer_autosprink_rows || 0)}</span>
     <span class="chip">claim_gate_effect no_claims_cleared</span>
   </div>`;
@@ -5402,6 +5441,7 @@ async function saveOfficialFlowReviewDecision(evidenceId) {
         professional_review_ref: document.getElementById('officialFlowProfessionalReviewRef-' + evidenceId)?.value || '',
         ahj_review_ref: document.getElementById('officialFlowAhjReviewRef-' + evidenceId)?.value || '',
         autosprink_export_ref: document.getElementById('officialFlowAutosprinkExportRef-' + evidenceId)?.value || '',
+        manufacturer_model_approval_ref: document.getElementById('officialFlowManufacturerApprovalRef-' + evidenceId)?.value || '',
         official_flow_test_ref: document.getElementById('officialFlowOfficialFlowTestRef-' + evidenceId)?.value || '',
         notes: document.getElementById(fieldPrefix + '-notes')?.value || 'Official-flow review refs recorded from Workbench; no claim gates cleared.',
       }),
@@ -5413,10 +5453,18 @@ async function saveOfficialFlowReviewDecision(evidenceId) {
     a.download = packet.download_name || 'official-flow-claim-gate-evaluation-audit-packet.json';
     a.click();
     URL.revokeObjectURL(a.href);
+    officialFlowReviewDecisionResults[officialFlowReviewDecisionResultKey(currentProjectName(), evidenceId)] = {
+      projectName: currentProjectName(),
+      replayEvidenceId: String(evidenceId || ''),
+      evidenceId: String(saved.id || ''),
+      claimGateEffect: saved.claim_gate_effect || 'no_claims_cleared',
+      noClaimGatesCleared: saved.no_claim_gates_cleared !== false,
+    };
     if (status) {
       status.textContent = 'Saved official_flow_professional_ahj_review_decision evidence #' + saved.id + ' and downloaded fail-closed claim-gate audit packet; no claims cleared.';
       status.dataset.officialFlowReviewDecisionEvidenceId = String(saved.id || '');
       status.dataset.claimGateEffect = saved.claim_gate_effect || 'no_claims_cleared';
+      status.dataset.noClaimGatesCleared = saved.no_claim_gates_cleared === false ? 'false' : 'true';
     }
     await refreshEvidence();
     await refreshResolverQueue();
@@ -6896,7 +6944,7 @@ async function refreshResolverQueue() {
     <span class="chip">ready_for_signed_evidence_upload</span>
     <span class="chip">catalog_approval_claims_cleared ${escapeHtml(summary.catalog_approval_claims_cleared || 0)}</span>
     <span class="chip">no claim gates cleared</span>
-  </div>${roomBoundaryQuickFilter(summary, activeQuery)}${sam31ActualValueQuickFilter(summary, activeQuery)}${officialFlowSignedReviewerQuickFilter(summary, activeQuery)}${sam31ApprovalValidationQuickFilter(summary, activeQuery)}${claimGateAuditQuickFilter(summary, activeQuery)}${catalogApprovalQuickFilter(summary, activeQuery)}`;
+  </div>${officialFlowReviewDecisionResultsMarkup()}${roomBoundaryQuickFilter(summary, activeQuery)}${sam31ActualValueQuickFilter(summary, activeQuery)}${officialFlowSignedReviewerQuickFilter(summary, activeQuery)}${sam31ApprovalValidationQuickFilter(summary, activeQuery)}${claimGateAuditQuickFilter(summary, activeQuery)}${catalogApprovalQuickFilter(summary, activeQuery)}`;
   document.getElementById('resolverQueue').innerHTML = queue.items && queue.items.length
     ? summaryHtml + queue.items.map((item, index) => resolverQueueDetail(item, index)).join('')
     : (activeQuery

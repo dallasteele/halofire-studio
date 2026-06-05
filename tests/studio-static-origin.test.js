@@ -332,10 +332,12 @@ describe('studio static origin handling', () => {
     expect(html).toContain('halofire.official_flow_signed_reviewer_validation_queue_item.v1');
     expect(html).toContain('Open professional signed reviewer workflow');
     expect(html).toContain('Open AHJ signed reviewer workflow');
+    expect(html).toContain('Open manufacturer signed reviewer workflow');
     expect(html).toContain('Open AutoSprink signed reviewer workflow');
     expect(html).toContain('data-signed-reviewer-workflow-evidence-id');
     expect(html).toContain('PROFESSIONAL_REVIEW_MISSING');
     expect(html).toContain('AHJ_APPROVAL_MISSING');
+    expect(html).toContain('MANUFACTURER_MODEL_APPROVAL_MISSING');
     expect(html).toContain('AUTOSPRINK_EVIDENCE_MISSING');
     expect(html).toContain('Download SAM31 actual-value work item');
     expect(html).toContain('downloadOpenClawSam31ActualValueWorkItemPacket');

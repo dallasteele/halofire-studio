@@ -1,5 +1,22 @@
 # HaloFire Build Log
 
+## 2026-06-05 - Official-flow manufacturer signed-reviewer handoff
+
+- Updated [`src/api/server.js`](C:/Users/dalla/OneDrive/Documents/HaloFire/src/api/server.js) so saved official-flow review decisions now emit a fourth signed-reviewer validation row for `MANUFACTURER_MODEL_APPROVAL_MISSING`, carry `manufacturer_model_approval_ref` when present, and include a manufacturer row count in resolver-queue summary data.
+- Updated [`workbench.html`](C:/Users/dalla/OneDrive/Documents/HaloFire/workbench.html) so official-flow review decision readbacks expose a manufacturer signed-reviewer queue href, the official-flow review-decision form records `manufacturer_model_approval_ref`, and the signed-reviewer quick filter surfaces the manufacturer lane beside professional/AHJ/AutoSprink.
+- Updated [`settings.html`](C:/Users/dalla/OneDrive/Documents/HaloFire/settings.html) so the signed-reviewer wizard can prefill `manufacturer_approval` evidence from an official-flow review-decision context instead of falling back to a generic source ref.
+- Extended [`tests/workbench-official-flow-browser-smoke.test.js`](C:/Users/dalla/OneDrive/Documents/HaloFire/tests/workbench-official-flow-browser-smoke.test.js) and [`tests/studio-static-origin.test.js`](C:/Users/dalla/OneDrive/Documents/HaloFire/tests/studio-static-origin.test.js) to prove the manufacturer lane is rendered and remains fail-closed alongside the existing professional/AHJ/AutoSprink handoffs.
+- Verified with `npx vitest run tests/workbench-official-flow-browser-smoke.test.js --reporter=verbose`, `npx vitest run tests/studio-static-origin.test.js --reporter=verbose`, `npx vitest run tests/settings-signed-reviewer-browser-smoke.test.js --reporter=verbose`, `C:/Python312/python.exe E:/ClaudeBot/scripts/verify_agentic_rules.py`, and `git diff --check`. This slice is `NO_FORMALIZABLE_CLAIM`; it is signed-reviewer workflow routing/prefill plumbing, not a theorem-shaped invariant.
+- Still blocked: AutoSprink parity, AHJ approval, PE/professional review, manufacturer-exact approval, permit readiness, fabrication readiness, brand readiness, production readiness, survey-grade claims, and engineering-grade claims until real signed evidence is explicitly validated.
+
+## 2026-06-05 - Official-flow review decision Workbench readback
+
+- Updated [`workbench.html`](C:/Users/dalla/OneDrive/Documents/HaloFire/workbench.html) so saving an official-flow professional/AHJ review decision keeps a durable Workbench readback after evidence and resolver-queue refresh.
+- The readback exposes the saved `official_flow_professional_ahj_review_decision` evidence id, source replay evidence id, professional/AHJ/AutoSprink signed-reviewer queue hrefs, `claim_gate_effect: no_claims_cleared`, and `no_claim_gates_cleared: true`.
+- Added [`tests/workbench-official-flow-browser-smoke.test.js`](C:/Users/dalla/OneDrive/Documents/HaloFire/tests/workbench-official-flow-browser-smoke.test.js) with a browser-backed red-to-green smoke that seeds official-flow intake/replay evidence, saves the review decision through the Workbench UI, verifies signed-reviewer next actions, and confirms professional/AHJ/AutoSprink claim gates remain blocked.
+- Verified with `node ./node_modules/vitest/vitest.mjs run tests/workbench-official-flow-browser-smoke.test.js --reporter=verbose`. This is `NO_FORMALIZABLE_CLAIM`; the slice is UI/readback and next-action routing, not professional/AHJ/AutoSprink approval.
+- Still blocked: AutoSprink parity, AHJ approval, PE/professional review, permit readiness, fabrication readiness, manufacturer-exact models, brand readiness, production readiness, survey-grade claims, and engineering-grade claims until real signed evidence is explicitly validated.
+
 ## 2026-06-05 - URL disposable project safety for Workbench smokes
 
 - Updated [`workbench.html`](C:/Users/dalla/OneDrive/Documents/HaloFire/workbench.html) so a non-empty `project=` query value is added to the Workbench project selector and selected before initial load, instead of silently falling back to the hard-coded project options.

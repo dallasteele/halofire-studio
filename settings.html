@@ -451,6 +451,11 @@ function officialFlowSignedReviewerPrefillConfig(gateCode, context = {}, row = {
       sourceRef: decision.ahj_review_ref || context.ahj_review_ref || sourceRefFallback,
       label: 'AHJ signed reviewer',
     },
+    MANUFACTURER_MODEL_APPROVAL_MISSING: {
+      evidenceType: 'manufacturer_approval',
+      sourceRef: decision.manufacturer_model_approval_ref || context.manufacturer_model_approval_ref || sourceRefFallback,
+      label: 'manufacturer signed reviewer',
+    },
     AUTOSPRINK_EVIDENCE_MISSING: {
       evidenceType: 'autosprink_packet',
       sourceRef: decision.autosprink_export_ref || context.autosprink_export_ref || sourceRefFallback,
