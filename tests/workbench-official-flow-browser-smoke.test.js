@@ -295,6 +295,36 @@ describe('Workbench official-flow browser smoke', () => {
       expect(decisionRowText).toContain(`source_attachment_intake_packet_evidence_id ${packetEvidenceId}`);
       expect(decisionRowText).toContain('source_attachment_intake_row_index 0');
       expect(decisionRowText).toContain('official_flow_signed_reviewer_validation rows');
+      expect(decisionRowText).toContain('Download signed evidence upload packet');
+
+      const uploadPacketDownload = page.waitForEvent('download');
+      await decisionRow.locator('[data-official-flow-signed-evidence-upload-packet-gate-code="AHJ_APPROVAL_MISSING"]').first().click();
+      const uploadPacketDownloadFile = await uploadPacketDownload;
+      const uploadPacket = JSON.parse((await fs.promises.readFile(await uploadPacketDownloadFile.path())).toString('utf8'));
+      expect(uploadPacket).toEqual(expect.objectContaining({
+        artifact_type: 'halofire.official_flow_signed_evidence_upload_packet.v1',
+        status: 'requires_real_signed_evidence',
+        source_review_decision_evidence_id: decisionEvidenceId,
+        source_replay_evidence_id: replayEvidenceId,
+        source_attachment_intake_packet_evidence_id: packetEvidenceId,
+        source_attachment_intake_row_index: 0,
+        target_gate_code: 'AHJ_APPROVAL_MISSING',
+        required_evidence_type: 'ahj_approval',
+        claim_gate_effect: 'requires_real_signed_evidence',
+        no_claim_gates_cleared: true,
+        claims_cleared_count: 0,
+      }));
+      expect(uploadPacket.required_upload_fields).toEqual(expect.arrayContaining([
+        'signoff.reviewer_name',
+        'signoff.reviewer_title',
+        'signoff.signed_at',
+      ]));
+      expect(uploadPacket.provenance).toEqual(expect.objectContaining({
+        source_review_decision_evidence_id: decisionEvidenceId,
+        source_replay_evidence_id: replayEvidenceId,
+        source_attachment_intake_packet_evidence_id: packetEvidenceId,
+        source_attachment_intake_row_index: 0,
+      }));
 
       await page.reload({ waitUntil: 'domcontentloaded' });
       const decisionRowAfterRefresh = page.locator(`#evidence-${decisionEvidenceId}`).first();
@@ -302,6 +332,7 @@ describe('Workbench official-flow browser smoke', () => {
       const decisionRowAfterRefreshText = await decisionRowAfterRefresh.innerText();
       expect(decisionRowAfterRefreshText).toContain(`source_attachment_intake_packet_evidence_id ${packetEvidenceId}`);
       expect(decisionRowAfterRefreshText).toContain('source_attachment_intake_row_index 0');
+      expect(decisionRowAfterRefreshText).toContain('Download signed evidence upload packet');
     } finally {
       await page.close();
     }

@@ -14831,6 +14831,141 @@ function officialFlowReviewDecisionEvidenceRows(projectName) {
     .filter(Boolean);
 }
 
+const OFFICIAL_FLOW_SIGNED_REVIEWER_VALIDATION_CONFIGS = Object.freeze([
+  Object.freeze({
+    target_gate_code: 'PROFESSIONAL_REVIEW_MISSING',
+    target_approval_lane: 'licensed_professional_hydraulic_review',
+    required_evidence_type: 'professional_review',
+    source_ref_field: 'professional_review_ref',
+    acceptable_evidence: ['professional_review', 'pe_signoff'],
+    blocked_claims: ['PE_review', 'engineering_grade', 'permit_ready'],
+    label: 'Open professional signed reviewer workflow',
+    next_action: 'Upload or link licensed professional hydraulic review evidence in the signed reviewer workflow before clearing PE or engineering-grade claims.',
+  }),
+  Object.freeze({
+    target_gate_code: 'AHJ_APPROVAL_MISSING',
+    target_approval_lane: 'AHJ_reviewed_hydraulic_calculation_package',
+    required_evidence_type: 'ahj_approval',
+    source_ref_field: 'ahj_review_ref',
+    acceptable_evidence: ['ahj_approval'],
+    blocked_claims: ['AHJ_approval', 'permit_ready'],
+    label: 'Open AHJ signed reviewer workflow',
+    next_action: 'Upload or link AHJ approval evidence in the signed reviewer workflow before clearing AHJ or permit-ready claims.',
+  }),
+  Object.freeze({
+    target_gate_code: 'MANUFACTURER_MODEL_APPROVAL_MISSING',
+    target_approval_lane: 'manufacturer_exact_model_or_catalog_approval',
+    required_evidence_type: 'manufacturer_approval',
+    source_ref_field: 'manufacturer_model_approval_ref',
+    acceptable_evidence: ['manufacturer_approval'],
+    blocked_claims: ['manufacturer_exact', 'fabrication_ready', 'permit_ready'],
+    label: 'Open manufacturer signed reviewer workflow',
+    next_action: 'Upload or link signed manufacturer model/catalog approval evidence in the signed reviewer workflow before clearing manufacturer-exact or fabrication-ready claims.',
+  }),
+  Object.freeze({
+    target_gate_code: 'AUTOSPRINK_EVIDENCE_MISSING',
+    target_approval_lane: 'AutoSprink_or_equivalent_professional_model_export',
+    required_evidence_type: 'autosprink_packet',
+    source_ref_field: 'autosprink_export_ref',
+    acceptable_evidence: ['autosprink_packet'],
+    blocked_claims: ['AutoSprink_parity', 'engineering_grade'],
+    label: 'Open AutoSprink signed reviewer workflow',
+    next_action: 'Upload or link AutoSprink/equivalent professional model evidence in the signed reviewer workflow before clearing parity claims.',
+  }),
+]);
+
+function officialFlowSignedReviewerValidationConfig(targetGateCode, evidenceType = '') {
+  const normalizedGateCode = String(targetGateCode || '').trim().toUpperCase();
+  const normalizedEvidenceType = String(evidenceType || '').trim();
+  return OFFICIAL_FLOW_SIGNED_REVIEWER_VALIDATION_CONFIGS.find((config) => (
+    config.target_gate_code === normalizedGateCode
+    && (!normalizedEvidenceType || config.required_evidence_type === normalizedEvidenceType)
+  )) || null;
+}
+
+function officialFlowSignedEvidenceUploadPacket(projectName, reviewDecision, targetGateCode, evidenceType = '') {
+  if (!reviewDecision?.evidence || !reviewDecision.decision) return null;
+  const config = officialFlowSignedReviewerValidationConfig(targetGateCode, evidenceType);
+  if (!config) {
+    const e = new Error('Unsupported official-flow signed reviewer target gate or evidence type');
+    e.httpStatus = 400;
+    throw e;
+  }
+  const row = officialFlowSignedReviewerValidationRow(projectName, reviewDecision, config);
+  const decision = reviewDecision.decision;
+  const evidenceId = reviewDecision.evidence.id;
+  const sourceSuppliedRef = decision[config.source_ref_field] || row.source_supplied_ref || null;
+  const prefillNotes = [
+    'official_flow_signed_reviewer_context',
+    `source_official_flow_review_decision_evidence_id ${evidenceId}`,
+    decision.source_replay_evidence_id ? `source_replay_evidence_id ${decision.source_replay_evidence_id}` : '',
+    decision.source_attachment_intake_packet_evidence_id ? `source_attachment_intake_packet_evidence_id ${decision.source_attachment_intake_packet_evidence_id}` : '',
+    Number.isInteger(decision.source_attachment_intake_row_index) ? `source_attachment_intake_row_index ${decision.source_attachment_intake_row_index}` : '',
+    `target_gate_code ${config.target_gate_code}`,
+    `required_evidence_type ${config.required_evidence_type}`,
+    'claim_gate_effect requires_real_signed_evidence',
+    'real signed evidence is required before any claim gate can clear',
+  ].filter(Boolean).join('\n');
+  return {
+    artifact_type: 'halofire.official_flow_signed_evidence_upload_packet.v1',
+    status: 'requires_real_signed_evidence',
+    project_name: projectName,
+    generated_at: new Date().toISOString(),
+    download_name: `${slugForDownloadName(projectName)}-official-flow-signed-evidence-upload-${String(config.target_gate_code).toLowerCase()}-${evidenceId}.json`,
+    source_review_decision_evidence_id: evidenceId,
+    source_replay_evidence_id: decision.source_replay_evidence_id || null,
+    source_original_official_flow_evidence_id: decision.source_original_official_flow_evidence_id || null,
+    source_attachment_intake_packet_evidence_id: decision.source_attachment_intake_packet_evidence_id || null,
+    source_attachment_intake_row_index: Number.isInteger(decision.source_attachment_intake_row_index) ? decision.source_attachment_intake_row_index : null,
+    target_gate_code: config.target_gate_code,
+    target_approval_lane: config.target_approval_lane,
+    required_evidence_type: config.required_evidence_type,
+    acceptable_evidence: config.acceptable_evidence,
+    source_supplied_ref: sourceSuppliedRef,
+    record_evidence_route: `/api/projects/${encodeURIComponent(projectName)}/evidence`,
+    resolve_route: row.signed_evidence_resolve_action.resolve_route,
+    settings_prefill_href: row.signed_evidence_resolve_action.href,
+    queue_readback_href: row.queue_action.href,
+    signed_evidence_resolve_action: row.signed_evidence_resolve_action,
+    signed_evidence_queue_action: row.queue_action,
+    prefill: {
+      evidence_type: config.required_evidence_type,
+      source_ref: sourceSuppliedRef || `official-flow-review-decision:${evidenceId}:${config.target_gate_code}`,
+      source_file: reviewDecision.evidence.source_file || null,
+      target_gate_code: config.target_gate_code,
+      status: 'present',
+      notes: prefillNotes,
+    },
+    required_upload_fields: [
+      'evidence_type',
+      'source_ref',
+      'status=present',
+      'signoff.reviewer_name',
+      'signoff.reviewer_title',
+      'signoff.signed_at',
+    ],
+    optional_upload_fields: ['source_file', 'signoff.organization', 'signoff.license_id', 'notes'],
+    provenance: {
+      source_review_decision_evidence_id: evidenceId,
+      source_replay_evidence_id: decision.source_replay_evidence_id || null,
+      source_original_official_flow_evidence_id: decision.source_original_official_flow_evidence_id || null,
+      source_attachment_intake_packet_evidence_id: decision.source_attachment_intake_packet_evidence_id || null,
+      source_attachment_intake_row_index: Number.isInteger(decision.source_attachment_intake_row_index) ? decision.source_attachment_intake_row_index : null,
+      source_refs: Array.isArray(decision.source_refs) ? decision.source_refs : [],
+    },
+    blocked_claims: config.blocked_claims,
+    claim_gate_effect: 'requires_real_signed_evidence',
+    no_claim_gates_cleared: true,
+    claims_cleared_count: 0,
+    use_for_claims: false,
+    limitations: [
+      'This packet prepares the employee upload path only; it is not signed evidence.',
+      'It cannot clear professional, AHJ, manufacturer, AutoSprink, permit-ready, fabrication-ready, or engineering-grade claims.',
+      'The target gate can clear only through the explicit signed evidence resolve route after real reviewer metadata and acceptable evidence are submitted.',
+    ],
+  };
+}
+
 function officialFlowSignedReviewerValidationRow(projectName, reviewDecision, config) {
   const decision = reviewDecision.decision || {};
   const evidenceId = reviewDecision.evidence.id;
@@ -14852,6 +14987,7 @@ function officialFlowSignedReviewerValidationRow(projectName, reviewDecision, co
   });
   const queueHref = `/api/projects/${encodeURIComponent(projectName)}/resolver-queue?${queueParams.toString()}`;
   const resolveRoute = `/api/projects/${encodeURIComponent(projectName)}/claim-gates/${encodeURIComponent(targetGateCode)}/resolve`;
+  const uploadPacketHref = `/api/projects/${encodeURIComponent(projectName)}/resolver-packets/official-flow-review-decision/${encodeURIComponent(evidenceId)}/signed-evidence-upload-packet?${queueParams.toString()}`;
   return {
     artifact_type: 'halofire.official_flow_signed_reviewer_validation_row.v1',
     status: 'ready_for_signed_reviewer_workflow',
@@ -14906,6 +15042,21 @@ function officialFlowSignedReviewerValidationRow(projectName, reviewDecision, co
         'the submitted evidence type matches the target gate requirements',
       ],
     },
+    signed_evidence_upload_packet_action: {
+      label: `Download signed evidence upload packet for ${targetGateCode}`,
+      method: 'GET',
+      href: uploadPacketHref,
+      artifact_type: 'halofire.official_flow_signed_evidence_upload_packet.v1',
+      target_gate_code: targetGateCode,
+      required_evidence_type: config.required_evidence_type,
+      source_review_decision_evidence_id: evidenceId,
+      source_replay_evidence_id: decision.source_replay_evidence_id || null,
+      source_attachment_intake_packet_evidence_id: decision.source_attachment_intake_packet_evidence_id || null,
+      source_attachment_intake_row_index: Number.isInteger(decision.source_attachment_intake_row_index) ? decision.source_attachment_intake_row_index : null,
+      claim_gate_effect: 'requires_real_signed_evidence',
+      no_claim_gates_cleared: true,
+      claims_cleared_count: 0,
+    },
     queue_action: {
       label: `Open pending ${config.required_evidence_type} signed-reviewer queue`,
       method: 'GET',
@@ -14928,49 +15079,7 @@ function officialFlowSignedReviewerValidationRow(projectName, reviewDecision, co
 function officialFlowReviewDecisionSignedReviewerQueueItem(projectName, reviewDecision) {
   if (!reviewDecision?.evidence || !reviewDecision.decision) return null;
   const decision = reviewDecision.decision;
-  const validationConfigs = [
-    {
-      target_gate_code: 'PROFESSIONAL_REVIEW_MISSING',
-      target_approval_lane: 'licensed_professional_hydraulic_review',
-      required_evidence_type: 'professional_review',
-      source_ref_field: 'professional_review_ref',
-      acceptable_evidence: ['professional_review', 'pe_signoff'],
-      blocked_claims: ['PE_review', 'engineering_grade', 'permit_ready'],
-      label: 'Open professional signed reviewer workflow',
-      next_action: 'Upload or link licensed professional hydraulic review evidence in the signed reviewer workflow before clearing PE or engineering-grade claims.',
-    },
-    {
-      target_gate_code: 'AHJ_APPROVAL_MISSING',
-      target_approval_lane: 'AHJ_reviewed_hydraulic_calculation_package',
-      required_evidence_type: 'ahj_approval',
-      source_ref_field: 'ahj_review_ref',
-      acceptable_evidence: ['ahj_approval'],
-      blocked_claims: ['AHJ_approval', 'permit_ready'],
-      label: 'Open AHJ signed reviewer workflow',
-      next_action: 'Upload or link AHJ approval evidence in the signed reviewer workflow before clearing AHJ or permit-ready claims.',
-    },
-    {
-      target_gate_code: 'MANUFACTURER_MODEL_APPROVAL_MISSING',
-      target_approval_lane: 'manufacturer_exact_model_or_catalog_approval',
-      required_evidence_type: 'manufacturer_approval',
-      source_ref_field: 'manufacturer_model_approval_ref',
-      acceptable_evidence: ['manufacturer_approval'],
-      blocked_claims: ['manufacturer_exact', 'fabrication_ready', 'permit_ready'],
-      label: 'Open manufacturer signed reviewer workflow',
-      next_action: 'Upload or link signed manufacturer model/catalog approval evidence in the signed reviewer workflow before clearing manufacturer-exact or fabrication-ready claims.',
-    },
-    {
-      target_gate_code: 'AUTOSPRINK_EVIDENCE_MISSING',
-      target_approval_lane: 'AutoSprink_or_equivalent_professional_model_export',
-      required_evidence_type: 'autosprink_packet',
-      source_ref_field: 'autosprink_export_ref',
-      acceptable_evidence: ['autosprink_packet'],
-      blocked_claims: ['AutoSprink_parity', 'engineering_grade'],
-      label: 'Open AutoSprink signed reviewer workflow',
-      next_action: 'Upload or link AutoSprink/equivalent professional model evidence in the signed reviewer workflow before clearing parity claims.',
-    },
-  ];
-  const validationRows = validationConfigs.map((config) => officialFlowSignedReviewerValidationRow(projectName, reviewDecision, config));
+  const validationRows = OFFICIAL_FLOW_SIGNED_REVIEWER_VALIDATION_CONFIGS.map((config) => officialFlowSignedReviewerValidationRow(projectName, reviewDecision, config));
   return {
     id: `resolver:official-flow-signed-reviewer-validation:${reviewDecision.evidence.id}`,
     project_name: projectName,
@@ -19269,6 +19378,33 @@ app.post('/api/projects/:name/resolver-packets/official-flow-replay/:evidenceId/
       evidence: evidenceRow,
       message: 'Official-flow professional/AHJ review decision saved fail-closed; no claim gates were cleared',
     });
+  } catch (err) {
+    return res.status(err.httpStatus || 400).json({ error: err.message });
+  }
+});
+
+app.get('/api/projects/:name/resolver-packets/official-flow-review-decision/:evidenceId/signed-evidence-upload-packet', authMiddleware, (req, res) => {
+  try {
+    const projectName = req.params.name;
+    const evidenceId = Number(req.params.evidenceId);
+    if (!Number.isSafeInteger(evidenceId) || evidenceId <= 0) {
+      return res.status(400).json({ error: 'A positive official-flow review decision evidence id is required' });
+    }
+    const evidence = db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'official_flow_professional_ahj_review_decision'`)
+      .get(evidenceId, projectName);
+    const reviewDecision = officialFlowReviewDecisionFromEvidence(evidence);
+    if (!reviewDecision) {
+      return res.status(404).json({ error: 'Official-flow professional/AHJ review decision evidence not found' });
+    }
+    const packet = officialFlowSignedEvidenceUploadPacket(
+      projectName,
+      reviewDecision,
+      req.query?.targetGate || req.query?.target_gate || '',
+      req.query?.evidenceType || req.query?.evidence_type || '',
+    );
+    return res.json(packet);
   } catch (err) {
     return res.status(err.httpStatus || 400).json({ error: err.message });
   }

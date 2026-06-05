@@ -1855,6 +1855,15 @@ async function refreshEvidence() {
   document.querySelectorAll('[data-official-flow-review-decision-evidence-id]').forEach((button) => {
     button.onclick = () => saveOfficialFlowReviewDecision(button.dataset.officialFlowReviewDecisionEvidenceId);
   });
+  document.querySelectorAll('[data-official-flow-signed-evidence-upload-packet]').forEach((button) => {
+    button.onclick = () => downloadOfficialFlowSignedEvidenceUploadPacket(
+      button.dataset.officialFlowSignedEvidenceUploadPacketSourceEvidenceId,
+      button.dataset.officialFlowSignedEvidenceUploadPacketGateCode,
+      button.dataset.officialFlowSignedEvidenceUploadPacketEvidenceType,
+      button.dataset.officialFlowSignedEvidenceUploadPacketStatusId,
+      button.dataset.officialFlowSignedEvidenceUploadPacketHref,
+    );
+  });
   document.querySelectorAll('[data-sam31-visual-audit-evidence-id]').forEach((button) => {
     button.onclick = () => downloadSam31VisualAuditPacket(button.dataset.sam31VisualAuditEvidenceId);
   });
@@ -4553,10 +4562,12 @@ function renderOfficialFlowSignedReviewerValidationRows(rows, sourceEvidenceId =
   return `<div class="claims">official_flow_signed_reviewer_validation rows <span class="chip">halofire.official_flow_signed_reviewer_validation_queue_item.v1</span><br>${validationRows.map((row) => {
     const action = row.action || {};
     const resolveAction = row.signed_evidence_resolve_action || {};
+    const uploadPacketAction = row.signed_evidence_upload_packet_action || {};
     const evidenceId = String(row.source_review_decision_evidence_id || sourceEvidenceId || '');
     const gateCode = row.target_gate_code || '';
     const requiredEvidenceType = row.required_evidence_type || '';
     const queueStatusId = `officialFlowSignedReviewerQueueStatus-${evidenceId}-${gateCode || 'target_gate_missing'}`;
+    const uploadPacketStatusId = `officialFlowSignedEvidenceUploadPacketStatus-${evidenceId}-${gateCode || 'target_gate_missing'}`;
     return `<div style="margin-top:6px;border-top:1px solid rgba(255,213,79,.16);padding-top:6px">
       <span class="chip">${escapeHtml(gateCode || 'target gate missing')}</span> <span class="chip">${escapeHtml(requiredEvidenceType || 'required evidence missing')}</span> <span class="chip">${escapeHtml(row.status || 'ready_for_signed_reviewer_workflow')}</span><br>
       ${escapeHtml(row.next_action || 'Open signed reviewer workflow; no claims are cleared by this handoff.')}<br>
@@ -4567,7 +4578,9 @@ function renderOfficialFlowSignedReviewerValidationRows(rows, sourceEvidenceId =
       Blocks: ${(Array.isArray(row.blocked_claims) ? row.blocked_claims : []).map((claim) => `<span class="chip">${escapeHtml(claim)}</span>`).join('') || '<span class="chip">regulated claims remain blocked</span>'}<br>
       <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0f766e" data-signed-reviewer-workflow-evidence-id="${escapeHtml(evidenceId)}" data-signed-reviewer-workflow-gate-code="${escapeHtml(gateCode)}" data-signed-reviewer-workflow-review-packet-href="${escapeHtml(action.href || '')}" onclick="openSignedReviewerWorkflow(${JSON.stringify(currentProjectName())}, ${JSON.stringify(gateCode)}, ${JSON.stringify(evidenceId)})">${escapeHtml(action.label || 'Open signed reviewer workflow')}</button>
       <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#b45309" data-official-flow-signed-reviewer-resolve-workflow="1" data-official-flow-signed-reviewer-resolve-gate-code="${escapeHtml(gateCode)}" data-official-flow-signed-reviewer-resolve-evidence-type="${escapeHtml(requiredEvidenceType)}" data-official-flow-signed-reviewer-resolve-source-evidence-id="${escapeHtml(evidenceId)}" data-official-flow-signed-reviewer-resolve-href="${escapeHtml(resolveAction.href || '')}" data-official-flow-signed-reviewer-resolve-route="${escapeHtml(resolveAction.resolve_route || '')}" onclick="openSignedReviewerWorkflow(${JSON.stringify(currentProjectName())}, ${JSON.stringify(gateCode)}, ${JSON.stringify(evidenceId)}, 'resolve')">${escapeHtml(resolveAction.label || 'Upload real signed evidence & resolve gate')}</button>
+      <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0369a1" data-official-flow-signed-evidence-upload-packet="1" data-official-flow-signed-evidence-upload-packet-source-evidence-id="${escapeHtml(evidenceId)}" data-official-flow-signed-evidence-upload-packet-gate-code="${escapeHtml(gateCode)}" data-official-flow-signed-evidence-upload-packet-evidence-type="${escapeHtml(requiredEvidenceType)}" data-official-flow-signed-evidence-upload-packet-href="${escapeHtml(uploadPacketAction.href || '')}" data-official-flow-signed-evidence-upload-packet-status-id="${escapeHtml(uploadPacketStatusId)}">${escapeHtml(uploadPacketAction.label || 'Download signed evidence upload packet')}</button>
       <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#4338ca" data-official-flow-signed-reviewer-validation-queue="1" data-official-flow-signed-reviewer-validation-gate-code="${escapeHtml(gateCode)}" data-official-flow-signed-reviewer-validation-evidence-type="${escapeHtml(requiredEvidenceType)}" data-official-flow-signed-reviewer-validation-source-evidence-id="${escapeHtml(evidenceId)}" data-official-flow-signed-reviewer-validation-status-id="${escapeHtml(queueStatusId)}" onclick="openOfficialFlowSignedReviewerValidationQueue(${JSON.stringify(gateCode)}, ${JSON.stringify(requiredEvidenceType)}, ${JSON.stringify(evidenceId)}, ${JSON.stringify(queueStatusId)})">${escapeHtml(row.queue_action?.label || 'Open pending signed-reviewer queue')}</button>
+      <div class="muted" id="${escapeHtml(uploadPacketStatusId)}" style="font-size:11px;margin-top:4px">signed evidence upload packet preserves official-flow provenance and still requires real signed evidence; no claims cleared</div>
       <div class="muted" id="${escapeHtml(queueStatusId)}" style="font-size:11px;margin-top:4px">officialFlowReviewDecisionEvidenceId ${escapeHtml(evidenceId || 'missing')} - source_attachment_intake_packet_evidence_id ${escapeHtml(row.source_attachment_intake_packet_evidence_id || 'missing')} - source_attachment_intake_row_index ${escapeHtml(row.source_attachment_intake_row_index ?? 'missing')} - signed_evidence_resolve_action requires real signed evidence; action=resolve opens the explicit gate resolve path; no claims cleared by this queue readback</div>
     </div>`;
   }).join('')}<span class="muted" style="font-size:10px">Filter API: /resolver-queue?officialFlowReviewDecisionEvidenceId=:id&targetGate=PROFESSIONAL_REVIEW_MISSING or evidenceType=ahj_approval - source official_flow_professional_ahj_review_decision - claim_gate_effect no_claims_cleared</span></div>`;
@@ -5436,6 +5449,37 @@ async function downloadOfficialFlowReplayReviewPacket(evidenceId) {
   a.download = packet.download_name || 'official-flow-professional-ahj-review-packet.json';
   a.click();
   URL.revokeObjectURL(a.href);
+}
+
+async function downloadOfficialFlowSignedEvidenceUploadPacket(evidenceId, gateCode = '', evidenceType = '', statusId = '', href = '') {
+  const status = statusId ? document.getElementById(statusId) : null;
+  if (status) status.textContent = 'Downloading signed evidence upload packet; claim gates remain blocked...';
+  try {
+    const fallbackQuery = new URLSearchParams({
+      targetGate: gateCode || '',
+      evidenceType: evidenceType || '',
+    });
+    const packet = await api(
+      (href ? normalizeApiPath(href) : '')
+      || ('/projects/' + encodeURIComponent(currentProjectName()) + '/resolver-packets/official-flow-review-decision/' + encodeURIComponent(evidenceId) + '/signed-evidence-upload-packet?' + fallbackQuery.toString()),
+    );
+    const blob = new Blob([JSON.stringify(packet, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = packet.download_name || 'official-flow-signed-evidence-upload-packet.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+    if (status) {
+      status.textContent = `Downloaded ${packet.artifact_type || 'halofire.official_flow_signed_evidence_upload_packet.v1'} - target_gate_code ${packet.target_gate_code || gateCode || 'missing'} - required_evidence_type ${packet.required_evidence_type || evidenceType || 'missing'} - claim_gate_effect ${packet.claim_gate_effect || 'requires_real_signed_evidence'} - no claims cleared.`;
+      status.dataset.officialFlowReviewDecisionEvidenceId = String(evidenceId || '');
+      status.dataset.targetGateCode = packet.target_gate_code || gateCode || '';
+      status.dataset.requiredEvidenceType = packet.required_evidence_type || evidenceType || '';
+      status.dataset.claimGateEffect = packet.claim_gate_effect || 'requires_real_signed_evidence';
+      status.dataset.noClaimGatesCleared = packet.no_claim_gates_cleared === false ? 'false' : 'true';
+    }
+  } catch (err) {
+    if (status) status.textContent = 'Error: ' + err.message;
+  }
 }
 
 async function saveOfficialFlowReviewDecision(evidenceId) {
@@ -7246,6 +7290,15 @@ async function refreshResolverQueue() {
   });
   document.querySelectorAll('[data-official-flow-replay-review-packet-evidence-id]').forEach((button) => {
     button.onclick = () => downloadOfficialFlowReplayReviewPacket(button.dataset.officialFlowReplayReviewPacketEvidenceId);
+  });
+  document.querySelectorAll('[data-official-flow-signed-evidence-upload-packet]').forEach((button) => {
+    button.onclick = () => downloadOfficialFlowSignedEvidenceUploadPacket(
+      button.dataset.officialFlowSignedEvidenceUploadPacketSourceEvidenceId,
+      button.dataset.officialFlowSignedEvidenceUploadPacketGateCode,
+      button.dataset.officialFlowSignedEvidenceUploadPacketEvidenceType,
+      button.dataset.officialFlowSignedEvidenceUploadPacketStatusId,
+      button.dataset.officialFlowSignedEvidenceUploadPacketHref,
+    );
   });
   document.querySelectorAll('[data-official-flow-review-decision-evidence-id]').forEach((button) => {
     button.onclick = () => saveOfficialFlowReviewDecision(button.dataset.officialFlowReviewDecisionEvidenceId);

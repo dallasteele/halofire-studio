@@ -1467,7 +1467,63 @@ describe('S5 GET /api/auto-source/status', () => {
       expect(row.signed_evidence_resolve_action.resolve_route).toContain(`/api/projects/${encodeURIComponent(projectName)}/claim-gates/${encodeURIComponent(row.target_gate_code)}/resolve`);
       expect(row.signed_evidence_resolve_action.after_success_queue_filter).toContain('claimGateAudit=cleared');
       expect(row.signed_evidence_resolve_action.after_success_queue_filter).toContain(`targetGate=${encodeURIComponent(row.target_gate_code)}`);
+      expect(row.signed_evidence_upload_packet_action).toEqual(expect.objectContaining({
+        label: expect.stringContaining('Download signed evidence upload packet'),
+        method: 'GET',
+        artifact_type: 'halofire.official_flow_signed_evidence_upload_packet.v1',
+        source_review_decision_evidence_id: decision.id,
+        source_replay_evidence_id: persisted.id,
+        target_gate_code: row.target_gate_code,
+        required_evidence_type: row.required_evidence_type,
+        claim_gate_effect: 'requires_real_signed_evidence',
+        no_claim_gates_cleared: true,
+        claims_cleared_count: 0,
+      }));
+      expect(row.signed_evidence_upload_packet_action.href).toContain(`/api/projects/${encodeURIComponent(projectName)}/resolver-packets/official-flow-review-decision/${decision.id}/signed-evidence-upload-packet`);
+      expect(row.signed_evidence_upload_packet_action.href).toContain(`targetGate=${encodeURIComponent(row.target_gate_code)}`);
+      expect(row.signed_evidence_upload_packet_action.href).toContain(`evidenceType=${encodeURIComponent(row.required_evidence_type)}`);
     }
+    const ahjUploadPacketRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-packets/official-flow-review-decision/${decision.id}/signed-evidence-upload-packet?targetGate=AHJ_APPROVAL_MISSING&evidenceType=ahj_approval`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(ahjUploadPacketRes.status).toBe(200);
+    const ahjUploadPacket = await ahjUploadPacketRes.json();
+    expect(ahjUploadPacket).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.official_flow_signed_evidence_upload_packet.v1',
+      status: 'requires_real_signed_evidence',
+      project_name: projectName,
+      source_review_decision_evidence_id: decision.id,
+      source_replay_evidence_id: persisted.id,
+      source_original_official_flow_evidence_id: created.id,
+      target_gate_code: 'AHJ_APPROVAL_MISSING',
+      required_evidence_type: 'ahj_approval',
+      claim_gate_effect: 'requires_real_signed_evidence',
+      no_claim_gates_cleared: true,
+      claims_cleared_count: 0,
+    }));
+    expect(ahjUploadPacket.required_upload_fields).toEqual(expect.arrayContaining([
+      'evidence_type',
+      'source_ref',
+      'status=present',
+      'signoff.reviewer_name',
+      'signoff.reviewer_title',
+      'signoff.signed_at',
+    ]));
+    expect(ahjUploadPacket.prefill).toEqual(expect.objectContaining({
+      evidence_type: 'ahj_approval',
+      source_ref: 'ahj://pending-official-flow-review',
+      target_gate_code: 'AHJ_APPROVAL_MISSING',
+    }));
+    expect(ahjUploadPacket.provenance).toEqual(expect.objectContaining({
+      source_review_decision_evidence_id: decision.id,
+      source_replay_evidence_id: persisted.id,
+      source_original_official_flow_evidence_id: created.id,
+      source_attachment_intake_packet_evidence_id: null,
+      source_attachment_intake_row_index: null,
+    }));
+    expect(ahjUploadPacket.resolve_route).toBe(`/api/projects/${encodeURIComponent(projectName)}/claim-gates/AHJ_APPROVAL_MISSING/resolve`);
+    expect(ahjUploadPacket.record_evidence_route).toBe(`/api/projects/${encodeURIComponent(projectName)}/evidence`);
+    expect(ahjUploadPacket.blocked_claims).toEqual(expect.arrayContaining(['AHJ_approval', 'permit_ready']));
     const scopedSignedQueueRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-queue?officialFlowReviewDecisionEvidenceId=${decision.id}&targetGate=AHJ_APPROVAL_MISSING&evidenceType=ahj_approval`, {
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -1779,7 +1835,36 @@ describe('S5 GET /api/auto-source/status', () => {
         source_attachment_intake_row_index: 0,
         claim_gate_effect: 'requires_real_signed_evidence',
       }));
+      expect(row.signed_evidence_upload_packet_action).toEqual(expect.objectContaining({
+        source_attachment_intake_packet_evidence_id: imported.packet_evidence_id,
+        source_attachment_intake_row_index: 0,
+        claim_gate_effect: 'requires_real_signed_evidence',
+      }));
     }
+    const ahjUploadPacketRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-packets/official-flow-review-decision/${decision.id}/signed-evidence-upload-packet?targetGate=AHJ_APPROVAL_MISSING&evidenceType=ahj_approval`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(ahjUploadPacketRes.status).toBe(200);
+    const ahjUploadPacket = await ahjUploadPacketRes.json();
+    expect(ahjUploadPacket).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.official_flow_signed_evidence_upload_packet.v1',
+      status: 'requires_real_signed_evidence',
+      source_review_decision_evidence_id: decision.id,
+      source_replay_evidence_id: replay.id,
+      source_attachment_intake_packet_evidence_id: imported.packet_evidence_id,
+      source_attachment_intake_row_index: 0,
+      target_gate_code: 'AHJ_APPROVAL_MISSING',
+      required_evidence_type: 'ahj_approval',
+      claim_gate_effect: 'requires_real_signed_evidence',
+      no_claim_gates_cleared: true,
+      claims_cleared_count: 0,
+    }));
+    expect(ahjUploadPacket.provenance).toEqual(expect.objectContaining({
+      source_review_decision_evidence_id: decision.id,
+      source_replay_evidence_id: replay.id,
+      source_attachment_intake_packet_evidence_id: imported.packet_evidence_id,
+      source_attachment_intake_row_index: 0,
+    }));
   }, 15000);
 
   it('builds and imports Cooperative 1881 default official-flow attachment intake without clearing claims', async () => {
