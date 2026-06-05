@@ -1118,6 +1118,8 @@ describe('Workbench room-boundary floor-plan override browser smoke', () => {
       expect(replayFollowupRow).toContain('halofire_sam31_sprinkler_preliminary_replay_followup_decision');
       expect(replayFollowupRow).toContain(`source_replay_evidence_id ${savedReplayEvidenceId}`);
       expect(replayFollowupRow).toContain(`source_sam31_actual_value_replacement_evidence_id ${replacementEvidenceId}`);
+      expect(replayFollowupRow).toContain('source_refs');
+      expect(replayFollowupRow).toContain('selected_1881_context');
       expect(replayFollowupRow).toContain('halofire.sam31_obstruction_clash_packet_queue_item.v1');
       expect(replayFollowupRow).toContain('claim_gate_effect no_claims_cleared');
 
@@ -1162,6 +1164,8 @@ describe('Workbench room-boundary floor-plan override browser smoke', () => {
       expect(packetReviewRow).toContain(`source_replay_evidence_id ${savedReplayEvidenceId}`);
       expect(packetReviewRow).toContain(`source_sam31_actual_value_replacement_evidence_id ${replacementEvidenceId}`);
       expect(packetReviewRow).toContain(`source_halofire_sam31_preliminary_replay_followup_evidence_id ${replayFollowupEvidenceId}`);
+      expect(packetReviewRow).toContain('source_refs');
+      expect(packetReviewRow).toContain('selected_1881_context');
       expect(packetReviewRow).toContain('packet_index 0');
       expect(packetReviewRow).toContain('claim_gate_effect no_claims_cleared');
 

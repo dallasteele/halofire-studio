@@ -1,5 +1,12 @@
 # HaloFire Build Log
 
+## 2026-06-04 - Sprinkler-review source ref readback
+
+- Updated [`workbench.html`](C:/Users/dalla/OneDrive/Documents/HaloFire/workbench.html) so saved HaloFire SAM31 smoke preliminary replay follow-up rows and saved smoke follow-up packet review rows now render the persisted `source_refs` chips alongside the existing selected 1881 context instead of hiding that provenance behind packet downloads/status-only UI.
+- Extended [`tests/workbench-room-boundary-floor-plan-override-browser-smoke.test.js`](C:/Users/dalla/OneDrive/Documents/HaloFire/tests/workbench-room-boundary-floor-plan-override-browser-smoke.test.js) first to fail unless those saved evidence rows expose both `source_refs` and `selected_1881_context`, then proved the UI green.
+- Verified with `npx vitest run tests/workbench-room-boundary-floor-plan-override-browser-smoke.test.js --reporter=verbose`, `C:/Python312/python.exe E:/ClaudeBot/scripts/verify_agentic_rules.py`, and `git diff --check`. This is `NO_FORMALIZABLE_CLAIM`; the slice is provenance/readback rendering, not a theorem-shaped invariant.
+- Still blocked: AutoSprink parity, AHJ approval, PE/professional review, permit readiness, fabrication readiness, manufacturer-exact models, brand readiness, production readiness, survey-grade claims, and engineering-grade claims.
+
 ## 2026-06-04 - Supplied bid-truth provenance on downstream defaults card
 
 - Surfaced `replacement_ref`, `source_file`, and `source_refs` on the Workbench downstream defaults card so employees can see which saved 1881 replacement and workbook refs are driving the internal-alpha rerun.
