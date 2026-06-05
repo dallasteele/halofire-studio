@@ -4716,20 +4716,6 @@ function resolverQueueDetail(item, index = '') {
       <span class="muted" style="font-size:10px">official_flow_professional_ahj_review_decision - signed reviewer validation only - no approval claim gates cleared</span>
     </div>`;
   }
-  if (item.kind === 'official_flow_signed_reviewer_validation') {
-    return `
-    <div class="gate warning" id="${escapeHtml(item.id || 'official-flow-signed-reviewer-validation')}">
-      <div class="code">${escapeHtml(item.kind)} - ${escapeHtml(item.status || 'signed_reviewer_validation_needed').toUpperCase()}</div>
-      <div class="na">${escapeHtml(item.next_action || 'Open the signed reviewer workflow for the saved official-flow decision context.')}</div>
-      <div class="claims">Review decision evidence #${escapeHtml(item.source_review_decision_evidence_id || item.evidence_id || 'missing')} - replay evidence #${escapeHtml(item.source_replay_evidence_id || 'missing')} - official flow evidence #${escapeHtml(item.source_original_official_flow_evidence_id || 'missing')}</div>
-      <div class="claims">Attachment intake packet #${escapeHtml(item.source_attachment_intake_packet_evidence_id || 'missing')} - reviewer ${escapeHtml(item.reviewer_name || 'missing')} - decision ${escapeHtml(item.review_decision || 'missing')}</div>
-      <div class="claims">Source refs: ${(Array.isArray(item.source_refs) ? item.source_refs : []).map((ref) => `<span class="chip">${escapeHtml(ref)}</span>`).join('') || '<span class="chip">missing official flow source refs</span>'}</div>
-      <div class="claims">Accepts: ${acceptable.map((e) => `<span class="chip">${escapeHtml(e)}</span>`).join('')}</div>
-      <div class="claims">AI fallback: ${escapeHtml(item.ai_fallback || '')}</div>
-      <div class="claims">Blocks: ${claims.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('')}</div>
-      ${renderOfficialFlowSignedReviewerValidationRows(item.validation_rows, item.source_review_decision_evidence_id || item.evidence_id || '')}
-    </div>`;
-  }
   if (item.kind === 'official_flow_hydraulic_replay_review') {
     const issue_actions = Array.isArray(item.issue_actions) ? item.issue_actions : [];
     const reviewDecisionId = `officialFlowReviewDecision-${escapeHtml(item.evidence_id || 'missing')}`;
