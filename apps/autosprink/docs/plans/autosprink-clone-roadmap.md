@@ -721,12 +721,31 @@ so AI placeholders are never mistaken for engineering-accurate CAD.
 - The Blender-MCP local image→3D path exists but an API key was NOT verified configured.
 
 ### Task Queue additions (3D-CAD engine — T41–T50)
-- [ ] **T41 — R3F viewer foundation (GX10-INDEPENDENT; highest leverage, do FIRST).**
-      Convert `packages/viewer` to React Three Fiber + `@react-three/drei`: render the
-      existing `parts/*.stl` via useLoader(STLLoader)/`<primitive>`, `<Bounds>` auto-fit,
-      OrbitControls, and a plan/3D `MapControls` toggle. DoD: loads all current part
-      meshes in-browser, screenshot-verified in the preview window. Pure frontend — no
-      OpenClaw/GX10/GPU.
+- [x] **T41 — R3F viewer foundation (GX10-INDEPENDENT; highest leverage, do FIRST).**
+      DONE 2026-06-05 (ultra workflow w3m5i8g2d for the implement+verify, then hands-on
+      browser debug). Built as a NEW federated `apps/studio` (Vite + React 19 + R3F 9 +
+      drei 10 + three 0.184) — `packages/viewer` turned out to already BE React-Three-Fiber
+      (`@pascal-app/viewer`, a published library, not a runnable surface), so the runnable
+      HaloFire studio foundation lives in `apps/studio` (reusable bits promoted to
+      packages/viewer later in T49/T50). Renders the 22 real generated `parts/*.stl`
+      (pulled from the VPS build; sprinkler heads/fittings/valves/pipe/hanger/escutcheon)
+      in a 6-col grid with ambient+directional lights, a drei `<Grid>` floor, OrbitControls
+      (3D) ⇄ MapControls (top-down Plan) via a toolbar toggle, and a permanent provenance
+      banner ("source: generated · NOT manufacturer-exact · not dimensionally-accurate /
+      AHJ / fabrication-ready"). PURE LOGIC TDD: `src/lib/parts-manifest.ts`
+      (normalizeManifest → 34 records / 22 present, stlUrl mapping, manufacturerExact never
+      coerced) + `src/lib/view-mode.ts` (perspective/plan camera+controls) covered by
+      `test/*.test.ts` — vitest 21/21 green; `tsc -b` exit 0; `vite build` exit 0.
+      VERIFIED IN REAL CHROME (screenshots): all 22 meshes render in 3D AND in top-down
+      Plan; scene probe confirmed 22 part meshes + 2 lights in-scene, camera framed.
+      KEY FIX: R3F `useLoader`+`Suspense` did not resolve under React 19 here (parts stayed
+      suspended → blank); switched to imperative `STLLoader.load` + state (center +
+      computeVertexNormals + baked normalize-scale). `frameloop='demand'` deferred to T49
+      (it rendered zero frames in this env); StrictMode omitted (double-invoke broke
+      useLoader). HONESTY: these are pre-existing OpenSCAD `source="generated"` meshes
+      surfaced truthfully as NOT manufacturer-exact; NO 3D-model generation run was
+      performed or claimed; no claim gate touched. Preview: `apps/studio` `npm run dev`
+      (3220) / `vite preview` (static). Pure frontend — no OpenClaw/GX10/GPU.
 - [ ] **T42 — Part-provenance + accuracy-badge model (GX10-independent).** Add to
       `packages/halofire-catalog` + the viewer inspector: every part record carries
       `source` ('manufacturer-step' | 'build123d' | 'step.parts' | 'ai-placeholder') and

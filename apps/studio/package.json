@@ -1,0 +1,29 @@
+{
+  "name": "halofire-studio-web",
+  "private": true,
+  "type": "module",
+  "version": "0.0.0",
+  "description": "HaloFire R3F studio — React Three Fiber part/plan viewer (federated app; foundation for T41-T50).",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "three": "^0.184.0",
+    "@react-three/fiber": "^9.5.0",
+    "@react-three/drei": "^10.7.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@types/three": "^0.184.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.9.3",
+    "vite": "^6.0.7",
+    "vitest": "^2.1.8"
+  }
+}
