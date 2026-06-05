@@ -463,6 +463,48 @@ describe('Workbench official-flow browser smoke', () => {
       expect(await page.locator('#wizNotes').inputValue()).toContain(`source_halofire_sam31_approval_upload_validation_decision_evidence_id ${validation.id}`);
       expect(await page.locator('#wizNotes').inputValue()).toContain('claim_gate_effect no_claims_cleared');
       expect(await packetStatus.innerText()).toContain('Replace the default/internal-alpha placeholder with real signed evidence');
+
+      await page.locator('#wizSourceRef').fill('pe-review://official-flow/real-signed-placeholder-replacement');
+      await page.locator('#wizSourceFile').fill('real-signed-placeholder-replacement.pdf');
+      await page.locator('#wizReviewerName').fill('Maya Reviewer');
+      await page.locator('#wizReviewerTitle').fill('Licensed Professional Reviewer');
+      await page.locator('#wizSignedAt').fill('2026-06-05T08:45');
+      await page.locator('#wizOrganization').fill('Halo Fire Protection');
+      await page.locator('#wizLicenseId').fill('PE-PLACEHOLDER-REPLACEMENT-1');
+      await page.locator('#wizSubmit').click();
+      await page.waitForFunction(() => document.querySelector('#wizMsg')?.textContent === 'evidence recorded only');
+
+      const evidenceRows = await api(`${PROJECT_PATH}/evidence`, token);
+      const savedReplacement = evidenceRows.find((row) => row.source_ref === 'pe-review://official-flow/real-signed-placeholder-replacement');
+      expect(savedReplacement).toEqual(expect.objectContaining({
+        evidence_type: 'professional_review',
+        status: 'present',
+        source_file: 'real-signed-placeholder-replacement.pdf',
+      }));
+      const savedNotes = JSON.parse(savedReplacement.notes);
+      expect(savedNotes).toEqual(expect.objectContaining({
+        kind: 'signed_reviewer_evidence',
+        target_gate_code: 'PROFESSIONAL_REVIEW_MISSING',
+        claim_gate_effect: 'no_claims_cleared',
+        placeholder_replacement: 'official_flow_sam31_approval_upload',
+        source_official_flow_review_decision_evidence_id: decision.id,
+        source_halofire_sam31_approval_upload_evidence_id: upload.id,
+        source_halofire_sam31_approval_upload_validation_decision_evidence_id: validation.id,
+        selected_sheet_ref: '1881://proposal-cooperative/sheet-7',
+        selected_scale_ref: '1881://operator-scale/sheet-7/0.0833',
+        selected_boundary_candidate_ref: 'candidate:1881-official-flow-placeholder-settings',
+        no_claim_gates_cleared: true,
+      }));
+      expect(savedNotes.signoff).toEqual(expect.objectContaining({
+        reviewer_name: 'Maya Reviewer',
+        reviewer_title: 'Licensed Professional Reviewer',
+        organization: 'Halo Fire Protection',
+        license_id: 'PE-PLACEHOLDER-REPLACEMENT-1',
+      }));
+      const gatesAfterRecord = await api(`${PROJECT_PATH}/claim-gates`, token);
+      expect(gatesAfterRecord.find((gate) => gate.code === 'PROFESSIONAL_REVIEW_MISSING')).toEqual(
+        expect.objectContaining({ status: 'blocked' }),
+      );
     } finally {
       await page.close();
     }

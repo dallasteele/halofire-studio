@@ -556,7 +556,26 @@ app.get('/api/analytics/summary', authMiddleware, (req, res) => {
 // fail-closed: adding best-effort/AI evidence never flips a blocking gate to
 // cleared. Only a recorded human/professional/AHJ artifact can do that, and
 // that resolution path is intentionally not exposed as a casual write here.
-const EVIDENCE_INSERT_FIELDS = new Set(['evidence_type', 'source_file', 'source_ref', 'status', 'notes', 'signoff', 'target_gate_code', 'settings_prefill_href']);
+const EVIDENCE_INSERT_FIELDS = new Set([
+  'evidence_type',
+  'source_file',
+  'source_ref',
+  'status',
+  'notes',
+  'signoff',
+  'target_gate_code',
+  'settings_prefill_href',
+  'placeholder_replacement',
+  'source_official_flow_review_decision_evidence_id',
+  'source_halofire_sam31_approval_upload_evidence_id',
+  'source_halofire_sam31_approval_upload_validation_decision_evidence_id',
+  'source_openclaw_sam31_actual_value_replacement_readback_evidence_id',
+  'selected_sheet_ref',
+  'selected_scale_ref',
+  'selected_boundary_candidate_ref',
+  'claim_gate_effect',
+  'no_claim_gates_cleared',
+]);
 
 // Only these real-world artifact types may clear a fail-closed claim gate.
 // AI/best-effort output is intentionally excluded — it can never clear a gate.
@@ -727,6 +746,10 @@ function buildSignedReviewerEvidenceNotes(
   const normalizedGateCode = String(targetGateCode || '').trim().toUpperCase() || null;
   const claimGateEffect = String(options.claimGateEffect || 'no_claims_cleared');
   const settingsPrefillHref = String(options.settingsPrefillHref || '').trim() || null;
+  const evidenceIdOption = (key) => {
+    const value = Number(options[key] || 0);
+    return Number.isSafeInteger(value) && value > 0 ? value : null;
+  };
   let gatePacket = null;
   if (normalizedGateCode) {
     const rule = gateEvidenceRule(normalizedGateCode);
@@ -743,6 +766,14 @@ function buildSignedReviewerEvidenceNotes(
     source_ref: sourceRef,
     signoff,
     ...(settingsPrefillHref ? { settings_prefill_href: settingsPrefillHref } : {}),
+    ...(options.placeholderReplacement ? { placeholder_replacement: String(options.placeholderReplacement) } : {}),
+    ...(evidenceIdOption('sourceOfficialFlowReviewDecisionEvidenceId') ? { source_official_flow_review_decision_evidence_id: evidenceIdOption('sourceOfficialFlowReviewDecisionEvidenceId') } : {}),
+    ...(evidenceIdOption('sourceHalofireSam31ApprovalUploadEvidenceId') ? { source_halofire_sam31_approval_upload_evidence_id: evidenceIdOption('sourceHalofireSam31ApprovalUploadEvidenceId') } : {}),
+    ...(evidenceIdOption('sourceHalofireSam31ApprovalUploadValidationDecisionEvidenceId') ? { source_halofire_sam31_approval_upload_validation_decision_evidence_id: evidenceIdOption('sourceHalofireSam31ApprovalUploadValidationDecisionEvidenceId') } : {}),
+    ...(evidenceIdOption('sourceOpenclawSam31ActualValueReplacementReadbackEvidenceId') ? { source_openclaw_sam31_actual_value_replacement_readback_evidence_id: evidenceIdOption('sourceOpenclawSam31ActualValueReplacementReadbackEvidenceId') } : {}),
+    ...(options.selectedSheetRef ? { selected_sheet_ref: String(options.selectedSheetRef) } : {}),
+    ...(options.selectedScaleRef ? { selected_scale_ref: String(options.selectedScaleRef) } : {}),
+    ...(options.selectedBoundaryCandidateRef ? { selected_boundary_candidate_ref: String(options.selectedBoundaryCandidateRef) } : {}),
     ...(gatePacket ? {
       target_gate_code: normalizedGateCode,
       required_evidence_type: gatePacket.required_evidence_type || evidenceType,
@@ -755,6 +786,7 @@ function buildSignedReviewerEvidenceNotes(
     } : {}),
     user_notes: notes,
     claim_gate_effect: claimGateEffect,
+    no_claim_gates_cleared: options.noClaimGatesCleared === false ? false : true,
   });
 }
 
@@ -5970,6 +6002,16 @@ app.post('/api/projects/:name/evidence', authMiddleware, requireRole('admin'), (
     signoff,
     target_gate_code = null,
     settings_prefill_href = null,
+    placeholder_replacement = null,
+    source_official_flow_review_decision_evidence_id = null,
+    source_halofire_sam31_approval_upload_evidence_id = null,
+    source_halofire_sam31_approval_upload_validation_decision_evidence_id = null,
+    source_openclaw_sam31_actual_value_replacement_readback_evidence_id = null,
+    selected_sheet_ref = null,
+    selected_scale_ref = null,
+    selected_boundary_candidate_ref = null,
+    claim_gate_effect = null,
+    no_claim_gates_cleared = true,
   } = req.body;
   if (!evidence_type || !status) {
     return res.status(400).json({ error: 'evidence_type and status are required' });
@@ -5985,7 +6027,19 @@ app.post('/api/projects/:name/evidence', authMiddleware, requireRole('admin'), (
         notes,
         normalizedSignoff,
         target_gate_code,
-        { settingsPrefillHref: settings_prefill_href },
+        {
+          settingsPrefillHref: settings_prefill_href,
+          placeholderReplacement: placeholder_replacement,
+          sourceOfficialFlowReviewDecisionEvidenceId: source_official_flow_review_decision_evidence_id,
+          sourceHalofireSam31ApprovalUploadEvidenceId: source_halofire_sam31_approval_upload_evidence_id,
+          sourceHalofireSam31ApprovalUploadValidationDecisionEvidenceId: source_halofire_sam31_approval_upload_validation_decision_evidence_id,
+          sourceOpenclawSam31ActualValueReplacementReadbackEvidenceId: source_openclaw_sam31_actual_value_replacement_readback_evidence_id,
+          selectedSheetRef: selected_sheet_ref,
+          selectedScaleRef: selected_scale_ref,
+          selectedBoundaryCandidateRef: selected_boundary_candidate_ref,
+          claimGateEffect: claim_gate_effect,
+          noClaimGatesCleared: no_claim_gates_cleared,
+        },
       );
     }
   } catch (err) {

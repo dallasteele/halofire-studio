@@ -941,6 +941,20 @@ $('wizSubmit').onclick = async () => {
   const projectName = $('wizProject').value;
   const payload = { evidence_type, source_ref, ...(source_file ? { source_file } : {}), ...(notes ? { notes } : {}) };
   if (wizardUrlPrefill.uploadPacketHref) payload.settings_prefill_href = currentSettingsPrefillHref();
+  const packetStatus = $('wizPacketStatus');
+  if (packetStatus.dataset.placeholderReplacement) {
+    payload.settings_prefill_href = currentSettingsPrefillHref();
+    payload.placeholder_replacement = packetStatus.dataset.placeholderReplacement;
+    payload.source_official_flow_review_decision_evidence_id = packetStatus.dataset.sourceOfficialFlowReviewDecisionEvidenceId || '';
+    payload.source_halofire_sam31_approval_upload_evidence_id = packetStatus.dataset.sourceHalofireSam31ApprovalUploadEvidenceId || '';
+    payload.source_halofire_sam31_approval_upload_validation_decision_evidence_id = packetStatus.dataset.sourceHalofireSam31ApprovalUploadValidationDecisionEvidenceId || '';
+    payload.source_openclaw_sam31_actual_value_replacement_readback_evidence_id = packetStatus.dataset.sourceOpenclawSam31ActualValueReplacementReadbackEvidenceId || '';
+    payload.selected_sheet_ref = packetStatus.dataset.selectedSheetRef || '';
+    payload.selected_scale_ref = packetStatus.dataset.selectedScaleRef || '';
+    payload.selected_boundary_candidate_ref = packetStatus.dataset.selectedBoundaryCandidateRef || '';
+    payload.claim_gate_effect = packetStatus.dataset.claimGateEffect || 'no_claims_cleared';
+    payload.no_claim_gates_cleared = true;
+  }
   try {
     const signoff = selectedEvidenceNeedsSignoff() ? wizardSignoffPayload() : null;
     if (signoff) payload.signoff = signoff; // Preserve reviewer metadata even when recording evidence only.
