@@ -209,4 +209,65 @@ describe('Workbench official-flow browser smoke', () => {
       await page.close();
     }
   }, 40_000);
+
+  it('keeps default 1881 replay provenance and review-packet follow-through visible after refresh', async () => {
+    const token = await adminToken();
+    const page = await browser.newPage({ acceptDownloads: true });
+    page.setDefaultTimeout(10_000);
+    await page.addInitScript((authToken) => {
+      localStorage.setItem('halofire_token', authToken);
+    }, token);
+
+    try {
+      await page.goto(`${BASE}/workbench.html?project=${encodeURIComponent(PROJECT_NAME)}#officialFlowAttachmentIntake`, {
+        waitUntil: 'domcontentloaded',
+      });
+      const intakeDetails = page.locator('#officialFlowAttachmentIntake').first();
+      await intakeDetails.waitFor();
+      await intakeDetails.evaluate((node) => { node.open = true; });
+      await page.locator('[data-official-flow-default-attachment-intake-import="1"]').first().click();
+
+      const intakeStatus = page.locator('#officialFlowAttachmentIntakeStatus');
+      await page.waitForFunction(() => {
+        const node = document.querySelector('#officialFlowAttachmentIntakeStatus');
+        return Number(node?.dataset.defaultOfficialFlowPacketEvidenceId || 0) > 0
+          && Number(node?.dataset.defaultOfficialFlowIntakeEvidenceId || 0) > 0;
+      });
+
+      const packetEvidenceId = Number(await intakeStatus.getAttribute('data-default-official-flow-packet-evidence-id'));
+      const intakeEvidenceId = Number(await intakeStatus.getAttribute('data-default-official-flow-intake-evidence-id'));
+      expect(packetEvidenceId).toBeGreaterThan(0);
+      expect(intakeEvidenceId).toBeGreaterThan(0);
+
+      const persistButton = page.locator(`[data-official-flow-persist-review-packet-evidence-id="${intakeEvidenceId}"]`).first();
+      await persistButton.waitFor();
+      await persistButton.click();
+
+      const replayStatus = page.locator(`#officialFlowReplayStatus-${intakeEvidenceId}`);
+      await page.waitForFunction((id) => {
+        const node = document.querySelector(`#officialFlowReplayStatus-${id}`);
+        return Boolean(node?.textContent?.includes('Saved official_flow_hydraulic_replay_artifact evidence #'));
+      }, intakeEvidenceId);
+      const replayStatusText = await replayStatus.innerText();
+      const replayEvidenceId = Number((replayStatusText.match(/evidence #(\d+)/) || [])[1]);
+      expect(replayEvidenceId).toBeGreaterThan(0);
+
+      const replayRow = page.locator(`#evidence-${replayEvidenceId}`).first();
+      await replayRow.waitFor();
+      const replayRowText = await replayRow.innerText();
+      expect(replayRowText).toContain(`source_attachment_intake_packet_evidence_id ${packetEvidenceId}`);
+      expect(replayRowText).toContain('source_attachment_intake_row_index 0');
+      expect(replayRowText).toContain('Download professional/AHJ review packet');
+
+      await page.reload({ waitUntil: 'domcontentloaded' });
+      const replayRowAfterRefresh = page.locator(`#evidence-${replayEvidenceId}`).first();
+      await replayRowAfterRefresh.waitFor();
+      const replayRowAfterRefreshText = await replayRowAfterRefresh.innerText();
+      expect(replayRowAfterRefreshText).toContain(`source_attachment_intake_packet_evidence_id ${packetEvidenceId}`);
+      expect(replayRowAfterRefreshText).toContain('source_attachment_intake_row_index 0');
+      expect(replayRowAfterRefreshText).toContain('Download professional/AHJ review packet');
+    } finally {
+      await page.close();
+    }
+  }, 40_000);
 });
