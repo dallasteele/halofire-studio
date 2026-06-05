@@ -1683,7 +1683,7 @@ function evidenceDetail(row) {
       const limitations = Array.isArray(packet.limitations) ? packet.limitations : (Array.isArray(audit.limitations) ? audit.limitations : []);
       const selected1881Line = hasSam31Selected1881Refs(audit) ? renderSam31Selected1881SourceRefs(audit) : '';
       const selected1881DataAttrs = sam31Selected1881DataAttrs(audit);
-      return `<div class="muted" style="font-size:11px;margin-top:3px">Saved claim_gate_resolve_audit_packet readback: ${escapeHtml(audit.artifact_type || packet.artifact_type || 'halofire.claim_gate_resolve_audit_packet.v1')}<br>gate_code ${escapeHtml(audit.gate_code || packet.gate_code || gate.code || 'missing')} - resolved_evidence_id ${escapeHtml(audit.resolved_evidence_id || packet.resolved_evidence_id || 'missing')} - resolved_evidence_ref ${escapeHtml(audit.resolved_evidence_ref || packet.resolved_evidence_ref || row.source_ref || 'missing')}<br>resolved_evidence_type ${escapeHtml(audit.resolved_evidence?.evidence_type || packet.resolved_evidence_type || 'missing')} - claim_gate_effect ${escapeHtml(audit.claim_gate_effect || packet.claim_gate_effect || 'gate_cleared_after_explicit_signed_validation')} - no_unrelated_claims_cleared ${escapeHtml((audit.no_unrelated_claims_cleared === false || packet.no_unrelated_claims_cleared === false) ? 'false' : 'true')}<br>${selected1881Line}source_refs ${sourceRefs.map((ref) => `<span class="chip">${escapeHtml(ref.evidence_type || ref.source_ref || ref.evidence_id || JSON.stringify(ref).slice(0, 80))}</span>`).join('') || '<span class="chip">missing</span>'}<br>Blocks still active unless separately resolved: ${blocked.map((claim) => `<span class="chip">${escapeHtml(claim)}</span>`).join('') || '<span class="chip">unrelated regulated claims remain fail-closed</span>'}<br>Limitations: ${limitations.map((item) => `<span class="chip">${escapeHtml(item)}</span>`).join('') || '<span class="chip">audit readback only</span>'}<br><button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0f766e" data-claim-gate-audit-actual-value-readback-evidence-id="${escapeHtml(row.id)}" data-source-resolved-evidence-id="${escapeHtml(audit.resolved_evidence_id || packet.resolved_evidence_id || '')}" data-source-claim-gate-effect="${escapeHtml(audit.claim_gate_effect || packet.claim_gate_effect || 'gate_cleared_after_explicit_signed_validation')}" data-no-unrelated-claims-cleared="${escapeHtml((audit.no_unrelated_claims_cleared === false || packet.no_unrelated_claims_cleared === false) ? 'false' : 'true')}"${selected1881DataAttrs}>Save downstream actual-value readback</button><div class="muted" id="claimGateAuditActualValueStatus-${escapeHtml(row.id)}" style="font-size:11px;margin-top:4px"></div></div>`;
+      return `<div class="muted" style="font-size:11px;margin-top:3px">Saved claim_gate_resolve_audit_packet readback: ${escapeHtml(audit.artifact_type || packet.artifact_type || 'halofire.claim_gate_resolve_audit_packet.v1')}<br>gate_code ${escapeHtml(audit.gate_code || packet.gate_code || gate.code || 'missing')} - resolved_evidence_id ${escapeHtml(audit.resolved_evidence_id || packet.resolved_evidence_id || 'missing')} - resolved_evidence_ref ${escapeHtml(audit.resolved_evidence_ref || packet.resolved_evidence_ref || row.source_ref || 'missing')}<br>resolved_evidence_type ${escapeHtml(audit.resolved_evidence?.evidence_type || packet.resolved_evidence_type || 'missing')} - claim_gate_effect ${escapeHtml(audit.claim_gate_effect || packet.claim_gate_effect || 'gate_cleared_after_explicit_signed_validation')} - no_unrelated_claims_cleared ${escapeHtml((audit.no_unrelated_claims_cleared === false || packet.no_unrelated_claims_cleared === false) ? 'false' : 'true')}<br>${selected1881Line}source_refs ${sourceRefs.map((ref) => `<span class="chip">${escapeHtml(ref.evidence_type || ref.source_ref || ref.evidence_id || JSON.stringify(ref).slice(0, 80))}</span>`).join('') || '<span class="chip">missing</span>'}<br>Blocks still active unless separately resolved: ${blocked.map((claim) => `<span class="chip">${escapeHtml(claim)}</span>`).join('') || '<span class="chip">unrelated regulated claims remain fail-closed</span>'}<br>Limitations: ${limitations.map((item) => `<span class="chip">${escapeHtml(item)}</span>`).join('') || '<span class="chip">audit readback only</span>'}<br><button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0f766e" data-claim-gate-audit-actual-value-readback-evidence-id="${escapeHtml(row.id)}" data-source-resolved-evidence-id="${escapeHtml(audit.resolved_evidence_id || packet.resolved_evidence_id || '')}" data-source-claim-gate-effect="${escapeHtml(audit.claim_gate_effect || packet.claim_gate_effect || 'gate_cleared_after_explicit_signed_validation')}" data-no-unrelated-claims-cleared="${escapeHtml((audit.no_unrelated_claims_cleared === false || packet.no_unrelated_claims_cleared === false) ? 'false' : 'true')}"${selected1881DataAttrs}>Save downstream actual-value readback</button> <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0369a1" data-claim-gate-audit-default-sprinkler-followthrough-evidence-id="${escapeHtml(row.id)}" data-source-resolved-evidence-id="${escapeHtml(audit.resolved_evidence_id || packet.resolved_evidence_id || '')}" data-source-claim-gate-effect="${escapeHtml(audit.claim_gate_effect || packet.claim_gate_effect || 'gate_cleared_after_explicit_signed_validation')}" data-no-unrelated-claims-cleared="${escapeHtml((audit.no_unrelated_claims_cleared === false || packet.no_unrelated_claims_cleared === false) ? 'false' : 'true')}"${selected1881DataAttrs}>Save default HaloFire sprinkler follow-through</button><br><span class="muted" style="font-size:10px">default path writes halofire.sam31_sprinkler_review_decision.v1 then downloads halofire.sam31_sprinkler_review_preliminary_replay_inputs.v1; claim_gate_effect no_claims_cleared</span><div class="muted" id="claimGateAuditActualValueStatus-${escapeHtml(row.id)}" style="font-size:11px;margin-top:4px"></div><div class="muted" id="claimGateAuditDefaultSprinklerFollowthroughStatus-${escapeHtml(row.id)}" style="font-size:11px;margin-top:4px"></div></div>`;
     }
     if (packet.kind === 'halofire_sam31_approval_upload_intake') {
       const intake = packet.intake && typeof packet.intake === 'object' ? packet.intake : packet;
@@ -1752,6 +1752,11 @@ async function refreshEvidence() {
   });
   document.querySelectorAll('[data-claim-gate-audit-actual-value-readback-evidence-id]').forEach((button) => {
     button.onclick = () => saveClaimGateAuditActualValueReadback(button.dataset.claimGateAuditActualValueReadbackEvidenceId);
+  });
+  document.querySelectorAll('[data-claim-gate-audit-default-sprinkler-followthrough-evidence-id]').forEach((button) => {
+    button.onclick = () => saveClaimGateAuditDefaultSprinklerFollowthrough(
+      button.dataset.claimGateAuditDefaultSprinklerFollowthroughEvidenceId,
+    );
   });
   document.querySelectorAll('[data-sam31-tool-contract]').forEach((button) => {
     button.onclick = () => downloadOpenClawSam31ToolContract();
@@ -2707,6 +2712,7 @@ async function saveSam31ActualValueDefaultReplacementIntakeFromReadback(evidence
     `${currentProjectName().toLowerCase().replace(/[^a-z0-9]+/g, '-')}-sam31-default-actual-value-replay-${savedId || targetId}.json`,
     `Saved default sam31_actual_value_replacement evidence #${savedId} from readback #${targetId} and downloaded replay; claim gates remain blocked.`,
   );
+  return saved;
 }
 
 function sam31ApiPathFromHref(href = '') {
@@ -3068,8 +3074,10 @@ async function saveReplaySam31ConsumerIntakeSmokeDefaultFollowupReview(evidenceI
         : '';
       targetStatus.textContent = 'Saved default halofire.sam31_consumer_intake_smoke_followup_review_decision.v1 evidence #' + (saved.id || saved.evidence_id) + ' and downloaded sprinkler review packet; claim gates remain blocked.' + selected1881Text;
     });
+    return saved;
   } catch (err) {
     if (status) status.textContent = 'Error: ' + err.message;
+    return null;
   }
 }
 
@@ -3158,8 +3166,10 @@ async function saveReplaySam31ConsumerIntakeSmokeDefaultSprinklerReview(evidence
     if (refreshedDecisionEvidenceInput) refreshedDecisionEvidenceInput.value = decisionId;
     const refreshedStatus = document.getElementById(`${fieldPrefix}-status`) || document.getElementById('sam31ActualValueQueueStatus');
     [refreshedStatus, document.getElementById('sam31ActualValueQueueStatus')].filter(Boolean).forEach((targetStatus) => stampStatus(targetStatus, saved, replayInputs, sprinklerPacket));
+    return saved;
   } catch (err) {
     if (status) status.textContent = 'Error: ' + err.message;
+    return null;
   }
 }
 
@@ -6279,8 +6289,84 @@ async function saveClaimGateAuditActualValueReadback(evidenceId = '') {
     await refreshEvidence();
     await refreshSam31ActualValueQueue();
     stampStatus(document.getElementById(statusId) || status, { ...saved, ...selected1881 }, { ...auditPacket, ...selected1881 }, readback);
+    return saved;
   } catch (err) {
     if (status) status.textContent = 'Error: ' + err.message;
+    return null;
+  }
+}
+
+async function saveClaimGateAuditDefaultSprinklerFollowthrough(evidenceId = '') {
+  const targetId = String(evidenceId || '').trim();
+  const status = document.getElementById(`claimGateAuditDefaultSprinklerFollowthroughStatus-${targetId}`)
+    || document.getElementById(`claimGateAuditActualValueStatus-${targetId}`)
+    || document.getElementById('sam31ActualValueQueueStatus')
+    || document.getElementById('evidence');
+  const stampStatus = (target, data = {}) => {
+    if (!target) return;
+    Object.entries({
+      sourceClaimGateResolveAuditEvidenceId: targetId,
+      sam31ActualValueReplacementReadbackEvidenceId: data.readbackId || '',
+      sam31ActualValueReplacementEvidenceId: data.replacementId || '',
+      sam31ConsumerIntakeSmokeEvidenceId: data.smokeId || '',
+      halofireSam31ConsumerIntakeSmokeFollowupReviewEvidenceId: data.followupId || '',
+      halofireSam31SprinklerReviewDecisionEvidenceId: data.sprinklerDecisionId || '',
+      sourceResolvedEvidenceId: data.sourceResolvedEvidenceId || '',
+      sourceClaimGateEffect: 'gate_cleared_after_explicit_signed_validation',
+      claimGateEffect: 'no_claims_cleared',
+      noUnrelatedClaimsCleared: 'true',
+      downloadedPreliminaryReplayInputs: data.sprinklerDecisionId ? 'true' : '',
+    }).forEach(([key, value]) => {
+      if (value !== '') target.dataset[key] = String(value);
+    });
+    target.textContent = data.sprinklerDecisionId
+      ? `Saved default HaloFire sprinkler follow-through from claim-gate audit #${targetId}: readback #${data.readbackId}, replacement #${data.replacementId}, smoke #${data.smokeId}, follow-up #${data.followupId}, sprinkler decision #${data.sprinklerDecisionId}; downloaded halofire.sam31_sprinkler_review_preliminary_replay_inputs.v1; claim gates remain blocked.`
+      : `Preparing default HaloFire sprinkler follow-through from claim-gate audit #${targetId}; claim gates remain blocked.`;
+  };
+  try {
+    if (!targetId) throw new Error('Saved claim-gate resolve audit evidence id is required.');
+    stampStatus(status);
+    const readbackSaved = await saveClaimGateAuditActualValueReadback(targetId);
+    const readbackId = String(readbackSaved?.id || readbackSaved?.evidence_id || status?.dataset.sam31ActualValueReplacementReadbackEvidenceId || '').trim();
+    if (!readbackId) throw new Error('Could not create downstream SAM31 actual-value readback from claim-gate audit.');
+    const replacementSaved = await saveSam31ActualValueDefaultReplacementIntakeFromReadback(readbackId);
+    const replacementId = String(replacementSaved?.id || replacementSaved?.evidence_id || document.getElementById('sam31ActualValueQueueStatus')?.dataset.sam31ActualValueReplacementEvidenceId || '').trim();
+    if (!replacementId) throw new Error('Could not save default SAM31 actual-value replacement intake.');
+    const smokeSaved = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/openclaw/sam31/section-to-artifacts-consumer-intake-smoke', {
+      method: 'POST',
+      body: JSON.stringify({
+        consumer: 'halo_fire',
+        source_sam31_actual_value_replacement_evidence_id: Number(replacementId) || replacementId,
+      }),
+    });
+    const smokeId = String(smokeSaved.evidence_id || smokeSaved.id || '').trim();
+    if (!smokeId) throw new Error('Could not save HaloFire SAM31 consumer-intake smoke evidence.');
+    await refreshEvidence();
+    await refreshSam31ActualValueQueue();
+    const followupSaved = await saveReplaySam31ConsumerIntakeSmokeDefaultFollowupReview(smokeId);
+    const followupId = String(followupSaved?.id || followupSaved?.evidence_id || document.getElementById('sam31ActualValueQueueStatus')?.dataset.halofireSam31ConsumerIntakeSmokeFollowupReviewEvidenceId || '').trim();
+    if (!followupId) throw new Error('Could not save default HaloFire smoke follow-up review.');
+    const sprinklerSaved = await saveReplaySam31ConsumerIntakeSmokeDefaultSprinklerReview(smokeId);
+    const sprinklerDecisionId = String(sprinklerSaved?.id || sprinklerSaved?.evidence_id || document.getElementById('sam31ActualValueQueueStatus')?.dataset.halofireSam31SprinklerReviewDecisionEvidenceId || '').trim();
+    if (!sprinklerDecisionId) throw new Error('Could not save default HaloFire sprinkler review decision.');
+    const sourceResolvedEvidenceId = readbackSaved?.source_resolved_evidence_id
+      || (() => {
+        try { return JSON.parse(readbackSaved?.notes || '{}').source_resolved_evidence_id || ''; } catch { return ''; }
+      })();
+    stampStatus(document.getElementById(`claimGateAuditDefaultSprinklerFollowthroughStatus-${targetId}`) || status, {
+      readbackId,
+      replacementId,
+      smokeId,
+      followupId,
+      sprinklerDecisionId,
+      sourceResolvedEvidenceId,
+    });
+  } catch (err) {
+    if (status) {
+      status.dataset.claimGateEffect = 'no_claims_cleared';
+      status.dataset.noUnrelatedClaimsCleared = 'true';
+      status.textContent = 'Error: ' + err.message;
+    }
   }
 }
 

@@ -309,6 +309,11 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toContain('no_unrelated_claims_cleared');
     expect(html).toContain('data-claim-gate-audit-actual-value-readback-evidence-id');
     expect(html).toContain('saveClaimGateAuditActualValueReadback');
+    expect(html).toContain('data-claim-gate-audit-default-sprinkler-followthrough-evidence-id');
+    expect(html).toContain('saveClaimGateAuditDefaultSprinklerFollowthrough');
+    expect(html).toContain('Save default HaloFire sprinkler follow-through');
+    expect(html).toContain('halofire.sam31_sprinkler_review_decision.v1');
+    expect(html).toContain('halofire.sam31_sprinkler_review_preliminary_replay_inputs.v1');
     expect(html).toContain('source_claim_gate_resolve_audit_evidence_id');
     expect(html).toContain('source_claim_gate_effect');
     expect(html).toContain('sam31ActualValueQuickFilter');
