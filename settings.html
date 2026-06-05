@@ -306,6 +306,7 @@ function clearWizardOfficialFlowContext() {
   packetStatus.removeAttribute('data-official-flow-upload-packet-source-attachment-intake-row-index');
   packetStatus.removeAttribute('data-placeholder-replacement');
   packetStatus.removeAttribute('data-placeholder-replacement-explicit-resolve-evidence-id');
+  packetStatus.removeAttribute('data-placeholder-replacement-resolve-blocked');
   packetStatus.removeAttribute('data-source-official-flow-review-decision-evidence-id');
   packetStatus.removeAttribute('data-source-halofire-sam31-approval-upload-evidence-id');
   packetStatus.removeAttribute('data-source-halofire-sam31-approval-upload-validation-decision-evidence-id');
@@ -517,6 +518,11 @@ function hydrateWizardFromExistingEvidence() {
     + (packetContext.placeholderReplacement ? ` placeholder_replacement ${packetContext.placeholderReplacement}; explicit resolve preview for saved replacement evidence; no claims are cleared by this preview.` : '');
   if (packetContext.placeholderReplacement && wizardUrlPrefill.action === 'resolve') {
     packetStatus.dataset.placeholderReplacementExplicitResolveEvidenceId = String(selectedEvidenceId);
+    if ((packetContext.claimGateEffect || 'no_claims_cleared') === 'no_claims_cleared') {
+      packetStatus.dataset.placeholderReplacementResolveBlocked = 'true';
+      $('wizUseExisting').disabled = true;
+      packetStatus.textContent += ' Use recorded evidence is disabled because this saved placeholder-replacement row is record-only/no_claims_cleared; upload real signed evidence through the explicit resolve form before any claim gate can clear.';
+    }
   }
   if (wizardUrlPrefill.action === 'inspect') {
     packetStatus.dataset.signedReviewerReadonlyEvidenceId = String(selectedEvidenceId);

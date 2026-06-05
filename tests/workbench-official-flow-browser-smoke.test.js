@@ -549,8 +549,11 @@ describe('Workbench official-flow browser smoke', () => {
       expect(await page.locator('#wizAction').inputValue()).toBe('resolve');
       expect(await packetStatus.getAttribute('data-placeholder-replacement')).toBe('official_flow_sam31_approval_upload');
       expect(await packetStatus.getAttribute('data-claim-gate-effect')).toBe('no_claims_cleared');
+      expect(await packetStatus.getAttribute('data-placeholder-replacement-resolve-blocked')).toBe('true');
       expect(await packetStatus.innerText()).toContain('explicit resolve preview');
       expect(await packetStatus.innerText()).toContain('no claims are cleared by this preview');
+      expect(await packetStatus.innerText()).toContain('Use recorded evidence is disabled');
+      expect(await page.locator('#wizUseExisting').isEnabled()).toBe(false);
     } finally {
       await page.close();
     }
