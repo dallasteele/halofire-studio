@@ -4,8 +4,9 @@
 
 - Updated [`src/api/server.js`](C:/Users/dalla/OneDrive/Documents/HaloFire/src/api/server.js) so `POST /resolver-packets/official-flow/{evidenceId}/replay-artifact` accepts a posted `floorPlan` for disposable/internal-alpha projects instead of requiring a built-in 1881/Home Depot project name.
 - Preserved the built-in 1881 behavior while enabling live smoke tests and employee temporary-value workflows to use best-effort geometry without polluting the real bid ledger.
+- Corrected [`workbench.html`](C:/Users/dalla/OneDrive/Documents/HaloFire/workbench.html) so the official-flow review decision form actually renders `manufacturer_model_approval_ref`; the browser smoke now fills that field and verifies the manufacturer signed-reviewer queue href remains fail-closed.
 - Extended [`tests/auto-source-status-api.test.js`](C:/Users/dalla/OneDrive/Documents/HaloFire/tests/auto-source-status-api.test.js) with focused coverage proving disposable official-flow intake plus posted `floorPlan` persists a best-effort replay artifact, source refs, bid summary, blocked claims, and `claim_gate_effect: no_claims_cleared`.
-- Verification: `node ./node_modules/vitest/vitest.mjs run tests/auto-source-status-api.test.js -t "posted floorPlan overrides" --reporter=verbose`.
+- Verification: `node ./node_modules/vitest/vitest.mjs run tests/auto-source-status-api.test.js -t "posted floorPlan overrides" --reporter=verbose` and `node ./node_modules/vitest/vitest.mjs run tests/workbench-official-flow-browser-smoke.test.js --reporter=verbose`.
 - Still blocked: AutoSprink parity, AHJ approval, PE/professional review, manufacturer-exact approval, permit readiness, fabrication readiness, brand readiness, production readiness, survey-grade claims, and engineering-grade claims until real signed evidence is explicitly validated.
 
 ## 2026-06-05 - Official-flow manufacturer signed-reviewer handoff

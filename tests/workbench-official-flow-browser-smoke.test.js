@@ -116,6 +116,7 @@ describe('Workbench official-flow browser smoke', () => {
       await details.evaluate((node) => { node.open = true; });
       await page.locator(`#officialFlowProfessionalReviewRef-${replayEvidenceId}`).fill('pe-review://official-flow/browser-smoke');
       await page.locator(`#officialFlowAhjReviewRef-${replayEvidenceId}`).fill('ahj://official-flow/browser-smoke');
+      await page.locator(`#officialFlowManufacturerApprovalRef-${replayEvidenceId}`).fill('manufacturer://official-flow/browser-smoke');
       await page.locator(`#officialFlowAutosprinkExportRef-${replayEvidenceId}`).fill('autosprink://official-flow/browser-smoke');
       await page.locator(`#officialFlowReviewDecision-${replayEvidenceId}-reviewer`).fill('HaloFire Employee');
 
@@ -134,6 +135,7 @@ describe('Workbench official-flow browser smoke', () => {
       expect(await readback.getAttribute('data-no-claim-gates-cleared')).toBe('true');
       expect(await readback.getAttribute('data-professional-signed-reviewer-href')).toContain(`officialFlowReviewDecisionEvidenceId=${decisionEvidenceId}`);
       expect(await readback.getAttribute('data-ahj-signed-reviewer-href')).toContain('targetGate=AHJ_APPROVAL_MISSING');
+      expect(await readback.getAttribute('data-manufacturer-signed-reviewer-href')).toContain('targetGate=MANUFACTURER_MODEL_APPROVAL_MISSING');
       expect(await readback.getAttribute('data-autosprink-signed-reviewer-href')).toContain('targetGate=AUTOSPRINK_EVIDENCE_MISSING');
       expect(await readback.innerText()).toContain(`Saved official_flow_professional_ahj_review_decision evidence #${decisionEvidenceId}`);
       expect(await readback.innerText()).toContain('claim gates remain blocked');
