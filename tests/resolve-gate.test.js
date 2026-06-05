@@ -172,7 +172,7 @@ describe('HaloFire resolve-gate API (evidence-gated)', () => {
     expect(notes.review_packet_artifact_type).toBe('halofire.claim_gate_review_packet.v1');
     expect(notes.resolve_audit_packet_href).toBe(`${PROJECT_PATH}/claim-gates/AUTOSPRINK_EVIDENCE_MISSING/resolve-audit-packet`);
     expect(notes.resolve_audit_packet_artifact_type).toBe('halofire.claim_gate_resolve_audit_packet.v1');
-    expect(notes.claim_gate_effect).toBe('gate_cleared');
+    expect(notes.claim_gate_effect).toBe('gate_cleared_after_explicit_signed_validation');
     expect(notes.signoff).toEqual(expect.objectContaining({
       reviewer_name: 'Dana Ortiz',
       reviewer_title: 'Design Manager',

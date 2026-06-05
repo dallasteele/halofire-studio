@@ -659,11 +659,15 @@ function parseStructuredSignedReviewerNotes(row) {
   }
 }
 
+function signedReviewerClaimGateExplicitClear(claimGateEffect) {
+  return String(claimGateEffect || '') === 'gate_cleared_after_explicit_signed_validation';
+}
+
 function signedReviewerEvidenceCanClearClaimGate(row) {
   const parsed = parseStructuredSignedReviewerNotes(row);
   if (!parsed) return false;
   if (parsed.kind !== 'signed_reviewer_evidence') return true;
-  return String(parsed.claim_gate_effect || 'no_claims_cleared') !== 'no_claims_cleared';
+  return signedReviewerClaimGateExplicitClear(parsed.claim_gate_effect);
 }
 
 function buildSignedReviewerEvidenceNotes(
@@ -697,7 +701,7 @@ function buildSignedReviewerEvidenceNotes(
       required_evidence_type: gatePacket.required_evidence_type || evidenceType,
       review_packet_href: gatePacket.review_packet_href,
       review_packet_artifact_type: gatePacket.review_packet_artifact_type,
-      ...(claimGateEffect === 'gate_cleared' ? {
+      ...(signedReviewerClaimGateExplicitClear(claimGateEffect) ? {
         resolve_audit_packet_href: claimGateResolveAuditPacketHref(projectName, normalizedGateCode),
         resolve_audit_packet_artifact_type: 'halofire.claim_gate_resolve_audit_packet.v1',
       } : {}),
@@ -783,7 +787,7 @@ function hydrateSignedReviewerEvidenceRow(row, options = {}) {
   const reviewPacketHref = parsedNotes.review_packet_href
     || (projectName && targetGateCode ? `/api/projects/${encodeURIComponent(projectName)}/claim-gates/${encodeURIComponent(targetGateCode)}/review-packet` : null);
   const resolveAuditPacketHref = parsedNotes.resolve_audit_packet_href
-    || (projectName && targetGateCode && parsedNotes.claim_gate_effect === 'gate_cleared'
+    || (projectName && targetGateCode && signedReviewerClaimGateExplicitClear(parsedNotes.claim_gate_effect)
       ? claimGateResolveAuditPacketHref(projectName, targetGateCode)
       : null);
   return {
@@ -6029,7 +6033,7 @@ app.post('/api/projects/:name/claim-gates/:code/resolve', authMiddleware, requir
           parsedNotes?.user_notes || existingEvidence.notes,
           parsedNotes?.signoff,
           code,
-          { claimGateEffect: 'gate_cleared' },
+          { claimGateEffect: 'gate_cleared_after_explicit_signed_validation' },
         );
         db.prepare('UPDATE project_evidence SET notes = ? WHERE project_name = ? AND id = ?')
           .run(upgradedNotes, projectName, existingEvidence.id);
@@ -6089,7 +6093,7 @@ app.post('/api/projects/:name/claim-gates/:code/resolve', authMiddleware, requir
         notes,
         signoff,
         code,
-        { claimGateEffect: 'gate_cleared' },
+        { claimGateEffect: 'gate_cleared_after_explicit_signed_validation' },
       );
     }
   } catch (err) {

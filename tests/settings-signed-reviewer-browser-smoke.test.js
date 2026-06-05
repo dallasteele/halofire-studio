@@ -123,28 +123,26 @@ describe('Settings signed reviewer browser smoke', () => {
 
   it('opens from Workbench and proves prefilled packet downloads stay source-linked', async () => {
     const token = await adminToken();
-    const recorded = await api(`${PROJECT_PATH}/evidence`, token, {
+    const resolveResult = await api(`${PROJECT_PATH}/claim-gates/PROFESSIONAL_REVIEW_MISSING/resolve`, token, {
       method: 'POST',
       body: JSON.stringify({
-        evidence_type: 'professional_review',
-        target_gate_code: 'PROFESSIONAL_REVIEW_MISSING',
-        source_ref: 'Signed reviewer packet browser-smoke PR-1881-100',
-        source_file: 'browser-smoke-professional-review.pdf',
-        status: 'present',
-        notes: 'Browser smoke signed reviewer packet.',
-        signoff: {
-          reviewer_name: 'Casey Morgan',
-          reviewer_title: 'Fire Protection Engineer',
-          signed_at: '2026-06-03T21:00:00.000Z',
-          organization: 'Halo Fire',
-          license_id: 'PE-BROWSER-100',
+        evidence: {
+          evidence_type: 'professional_review',
+          source_ref: 'Signed reviewer packet browser-smoke PR-1881-100',
+          source_file: 'browser-smoke-professional-review.pdf',
+          status: 'present',
+          notes: 'Browser smoke signed reviewer packet.',
+          signoff: {
+            reviewer_name: 'Casey Morgan',
+            reviewer_title: 'Fire Protection Engineer',
+            signed_at: '2026-06-03T21:00:00.000Z',
+            organization: 'Halo Fire',
+            license_id: 'PE-BROWSER-100',
+          },
         },
       }),
     });
-    await api(`${PROJECT_PATH}/claim-gates/PROFESSIONAL_REVIEW_MISSING/resolve`, token, {
-      method: 'POST',
-      body: JSON.stringify({ evidence_id: recorded.id }),
-    });
+    const recorded = { id: resolveResult.resolved_evidence_id };
 
     const page = await browser.newPage();
     page.setDefaultTimeout(8000);
@@ -289,28 +287,152 @@ describe('Settings signed reviewer browser smoke', () => {
     }
   }, 30_000);
 
-  it('renders resolved signed-reviewer gates in Settings and downloads the resolved-gate audit packet', async () => {
+  it('resolves a gate from official-flow signed reviewer resolve context with real signed evidence', async () => {
     const token = await adminToken();
-    const recorded = await api(`${PROJECT_PATH}/evidence`, token, {
+    const targetGateCode = 'PROFESSIONAL_REVIEW_MISSING';
+    const targetEvidenceType = 'professional_review';
+    const targetSourceRef = 'pe-review://settings-browser-smoke/official-flow-resolve';
+    const contextNotes = {
+      kind: 'official_flow_professional_ahj_review_decision',
+      artifact_type: 'halofire.official_flow_professional_ahj_review_decision.v1',
+      source_replay_evidence_id: 5900,
+      professional_review_ref: targetSourceRef,
+      ahj_review_ref: 'ahj://settings-browser-smoke/official-flow-resolve',
+      autosprink_export_ref: 'autosprink://settings-browser-smoke/official-flow-resolve',
+      source_refs: [
+        {
+          evidence_type: 'official_flow_hydraulic_replay_artifact',
+          evidence_id: 5900,
+          source_ref: 'official-flow-replay:settings-browser-smoke-resolve',
+        },
+      ],
+      decision: {
+        source_replay_evidence_id: 5900,
+        professional_review_ref: targetSourceRef,
+        ahj_review_ref: 'ahj://settings-browser-smoke/official-flow-resolve',
+        autosprink_export_ref: 'autosprink://settings-browser-smoke/official-flow-resolve',
+        claim_gate_effect: 'no_claims_cleared',
+      },
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+      claims_cleared_count: 0,
+    };
+    const context = await api(`${PROJECT_PATH}/evidence`, token, {
       method: 'POST',
       body: JSON.stringify({
-        evidence_type: 'ahj_approval',
-        target_gate_code: 'AHJ_APPROVAL_MISSING',
-        source_ref: 'Resolved signed reviewer packet AHJ-1881-900',
-        source_file: 'resolved-signed-reviewer-ahj.pdf',
-        status: 'present',
-        notes: 'Resolved signed reviewer browser smoke packet.',
-        signoff: {
-          reviewer_name: 'Jordan Lee',
-          reviewer_title: 'Fire Marshal',
-          signed_at: '2026-06-03T22:10:00.000Z',
-          organization: 'Salt Lake City',
-        },
+        evidence_type: 'official_flow_professional_ahj_review_decision',
+        source_ref: 'official-flow-review-decision:settings-browser-smoke-resolve',
+        source_file: 'settings-browser-smoke-official-flow-resolve.json',
+        status: 'fail_closed_review_recorded',
+        notes: JSON.stringify(contextNotes),
       }),
     });
+
+    const page = await browser.newPage();
+    page.setDefaultTimeout(8000);
+    await page.addInitScript((authToken) => {
+      localStorage.setItem('halofire_token', authToken);
+    }, token);
+
+    try {
+      await page.goto(
+        `${BASE}/settings.html?project=${encodeURIComponent(PROJECT_NAME)}&gate=${targetGateCode}&evidenceId=${context.id}&action=resolve#wizSignoff`,
+        { waitUntil: 'domcontentloaded' },
+      );
+      await page.locator('#wizGate').waitFor();
+      await page.waitForFunction(
+        (evidenceId) => document.getElementById('wizPacketStatus')?.dataset.officialFlowContextEvidenceId === evidenceId,
+        String(context.id),
+      );
+
+      expect(await page.locator('#wizGate').inputValue()).toBe(targetGateCode);
+      expect(await page.locator('#wizType').inputValue()).toBe(targetEvidenceType);
+      expect(await page.locator('#wizExistingEvidence').inputValue()).toBe('');
+      expect(await page.locator('#wizAction').inputValue()).toBe('resolve');
+      expect(await page.locator('#wizSourceRef').inputValue()).toBe(targetSourceRef);
+      expect(await page.locator('#wizPacketStatus').innerText()).toContain(
+        `Prefilled from official-flow review decision evidence #${context.id}`,
+      );
+      expect(await page.locator('#wizPacketStatus').innerText()).toContain('action=resolve');
+      expect(await page.locator('#wizPacketStatus').getAttribute('data-official-flow-context-evidence-id')).toBe(String(context.id));
+      expect(await page.locator('#wizPacketStatus').getAttribute('data-official-flow-context-action')).toBe('resolve');
+      expect(await page.locator('#wizNotes').inputValue()).toContain(`source_official_flow_review_decision_evidence_id ${context.id}`);
+      expect(await page.locator('#wizNotes').inputValue()).toContain('source_replay_evidence_id 5900');
+      expect(await page.locator('#wizNotes').inputValue()).toContain('claim_gate_effect requires_real_signed_evidence');
+      expect(await page.locator('#wizResolveAudit').isDisabled()).toBe(true);
+
+      await page.locator('#wizReviewerName').fill('Codex Resolve Smoke');
+      await page.locator('#wizReviewerTitle').fill('Fire Protection Engineer');
+      await page.locator('#wizSignedAt').fill('2026-06-04T21:10');
+      await page.locator('#wizOrganization').fill('Halo Fire');
+      await page.locator('#wizLicenseId').fill('PE-CODEX-SETTING-RESOLVE');
+      await page.locator('#wizSubmit').click();
+      await page.waitForFunction(() => document.getElementById('wizMsg')?.textContent?.includes('gate resolved with accepted evidence'));
+
+      const evidenceRows = await api(`${PROJECT_PATH}/evidence`, token);
+      const saved = evidenceRows.find((row) => row.evidence_type === targetEvidenceType
+        && row.source_ref === targetSourceRef);
+      expect(saved).toBeTruthy();
+      const savedNotes = JSON.parse(saved.notes);
+      expect(savedNotes.kind).toBe('signed_reviewer_evidence');
+      expect(savedNotes.target_gate_code).toBe(targetGateCode);
+      expect(savedNotes.required_evidence_type).toBe(targetEvidenceType);
+      expect(savedNotes.claim_gate_effect).toBe('gate_cleared_after_explicit_signed_validation');
+      expect(savedNotes.user_notes).toContain(`source_official_flow_review_decision_evidence_id ${context.id}`);
+      expect(savedNotes.signoff).toEqual(expect.objectContaining({
+        reviewer_name: 'Codex Resolve Smoke',
+        reviewer_title: 'Fire Protection Engineer',
+        license_id: 'PE-CODEX-SETTING-RESOLVE',
+      }));
+
+      const gates = await api(`${PROJECT_PATH}/claim-gates`, token);
+      const targetGate = gates.find((gate) => gate.code === targetGateCode);
+      expect(targetGate.status).toBe('cleared');
+      expect(String(targetGate.resolved_evidence_ref || '')).toBe(targetSourceRef);
+
+      await page.waitForFunction(
+        () => Array.from(document.querySelectorAll('#settingsResolvedSignedReviewerGates .note'))
+          .some((node) => node.textContent?.includes('PROFESSIONAL_REVIEW_MISSING')),
+      );
+      const resolvedGateText = await page.locator('#settingsResolvedSignedReviewerGates').innerText();
+      expect(resolvedGateText).toContain('PROFESSIONAL_REVIEW_MISSING');
+      expect(resolvedGateText).toContain('gate_cleared_after_explicit_signed_validation');
+
+      const auditButton = page.locator('[data-settings-resolved-gate-audit-download]').first();
+      await auditButton.click();
+      await page.waitForFunction(
+        () => {
+          const text = document.getElementById('settingsResolvedSignedReviewerGatesMsg')?.textContent || '';
+          return text.includes('downloaded halofire.claim_gate_resolve_audit_packet.v1');
+        },
+      );
+      expect(await page.locator('#settingsResolvedSignedReviewerGatesMsg').innerText()).toContain(
+        'claim_gate_effect gate_cleared_after_explicit_signed_validation',
+      );
+    } finally {
+      await page.close();
+    }
+  }, 30_000);
+
+  it('renders resolved signed-reviewer gates in Settings and downloads the resolved-gate audit packet', async () => {
+    const token = await adminToken();
     await api(`${PROJECT_PATH}/claim-gates/AHJ_APPROVAL_MISSING/resolve`, token, {
       method: 'POST',
-      body: JSON.stringify({ evidence_id: recorded.id }),
+      body: JSON.stringify({
+        evidence: {
+          evidence_type: 'ahj_approval',
+          source_ref: 'Resolved signed reviewer packet AHJ-1881-900',
+          source_file: 'resolved-signed-reviewer-ahj.pdf',
+          status: 'present',
+          notes: 'Resolved signed reviewer browser smoke packet.',
+          signoff: {
+            reviewer_name: 'Jordan Lee',
+            reviewer_title: 'Fire Marshal',
+            signed_at: '2026-06-03T22:10:00.000Z',
+            organization: 'Salt Lake City',
+          },
+        },
+      }),
     });
 
     const page = await browser.newPage();

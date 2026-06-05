@@ -1,5 +1,13 @@
 # HaloFire Build Log
 
+## 2026-06-04 - Official-flow signed reviewer resolve proof
+
+- Changed [`src/api/server.js`](C:/Users/dalla/OneDrive/Documents/HaloFire/src/api/server.js) so signed-reviewer evidence resolved through the explicit claim-gate path now records the explicit clearance token `gate_cleared_after_explicit_signed_validation` and still exposes the resolve-audit packet href/readback expected by Settings and Workbench.
+- Extended [`tests/settings-signed-reviewer-browser-smoke.test.js`](C:/Users/dalla/OneDrive/Documents/HaloFire/tests/settings-signed-reviewer-browser-smoke.test.js) with a focused browser-backed official-flow `action=resolve` smoke, and updated the older cleared-gate smokes to use the explicit resolve route instead of trying to clear record-only signed evidence rows by `evidence_id`.
+- Updated [`tests/resolve-gate.test.js`](C:/Users/dalla/OneDrive/Documents/HaloFire/tests/resolve-gate.test.js) so the resolve-gate API regression expects the same explicit signed-validation claim-gate effect.
+- Verified with `npx vitest run tests/resolve-gate.test.js tests/settings-signed-reviewer-browser-smoke.test.js --reporter=verbose`, `C:/Python312/python.exe E:/ClaudeBot/scripts/verify_agentic_rules.py`, and `git diff --check`. This is `NO_FORMALIZABLE_CLAIM`; the slice is explicit signed-reviewer workflow/browser/API contract proof, not a theorem-shaped invariant.
+- Still blocked: AutoSprink parity, AHJ approval outside explicit signed validation lanes, PE/professional review outside explicit signed validation lanes, permit readiness, fabrication readiness, manufacturer-exact models, brand readiness, production readiness, survey-grade claims, and engineering-grade claims.
+
 ## 2026-06-04 - Sprinkler-review source ref readback
 
 - Updated [`workbench.html`](C:/Users/dalla/OneDrive/Documents/HaloFire/workbench.html) so saved HaloFire SAM31 smoke preliminary replay follow-up rows and saved smoke follow-up packet review rows now render the persisted `source_refs` chips alongside the existing selected 1881 context instead of hiding that provenance behind packet downloads/status-only UI.
