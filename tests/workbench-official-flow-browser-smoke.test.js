@@ -329,6 +329,57 @@ describe('Workbench official-flow browser smoke', () => {
         source_attachment_intake_row_index: 0,
       }));
 
+      const defaultApprovalUploadDownload = page.waitForEvent('download');
+      await decisionRow.locator('[data-official-flow-default-sam31-approval-upload-gate-code="AHJ_APPROVAL_MISSING"]').first().click();
+      const defaultApprovalUploadPacketFile = await defaultApprovalUploadDownload;
+      const defaultApprovalUploadPacket = JSON.parse((await fs.promises.readFile(await defaultApprovalUploadPacketFile.path())).toString('utf8'));
+      expect(defaultApprovalUploadPacket).toEqual(expect.objectContaining({
+        artifact_type: 'halofire.sam31_approval_upload_gate_validation_packet.v1',
+        source_packet_review_decision_evidence_id: decisionEvidenceId,
+        gate_code: 'AHJ_APPROVAL_MISSING',
+        claim_gate_effect: 'no_claims_cleared',
+      }));
+      expect(defaultApprovalUploadPacket.source_refs).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          evidence_type: 'official_flow_professional_ahj_review_decision',
+          evidence_id: decisionEvidenceId,
+          claim_gate_effect: 'no_claims_cleared',
+        }),
+        expect.objectContaining({
+          evidence_type: 'official_flow_hydraulic_replay_artifact',
+          evidence_id: replayEvidenceId,
+        }),
+        expect.objectContaining({
+          evidence_type: 'official_flow_attachment_intake_records',
+          evidence_id: packetEvidenceId,
+        }),
+        expect.objectContaining({
+          evidence_type: 'halofire.official_flow_signed_evidence_upload_packet.v1',
+          target_gate_code: 'AHJ_APPROVAL_MISSING',
+          required_evidence_type: 'ahj_approval',
+          claim_gate_effect: 'requires_real_signed_evidence',
+        }),
+      ]));
+      const defaultApprovalUploadEvidenceId = String(defaultApprovalUploadPacket.approval_upload_evidence_id || '');
+      expect(defaultApprovalUploadEvidenceId).toMatch(/^\d+$/);
+      const defaultApprovalUploadStatus = page.locator(`#sam31ApprovalUploadValidationStatus-${defaultApprovalUploadEvidenceId}`).first();
+      await page.waitForFunction((uploadId) => {
+        const node = document.querySelector(`#sam31ApprovalUploadValidationStatus-${uploadId}`);
+        return node?.dataset.sam31ApprovalUploadEvidenceId === uploadId
+          && node?.dataset.downloadedGateValidationPacket === 'true'
+          && node?.dataset.approvalValidationPacketReady === 'true';
+      }, defaultApprovalUploadEvidenceId);
+      expect(await defaultApprovalUploadStatus.getAttribute('data-source-official-flow-review-decision-evidence-id')).toBe(String(decisionEvidenceId));
+      expect(await defaultApprovalUploadStatus.getAttribute('data-source-replay-evidence-id')).toBe(String(replayEvidenceId));
+      expect(await defaultApprovalUploadStatus.getAttribute('data-source-attachment-intake-packet-evidence-id')).toBe(String(packetEvidenceId));
+      expect(await defaultApprovalUploadStatus.getAttribute('data-source-attachment-intake-row-index')).toBe('0');
+      expect(await defaultApprovalUploadStatus.getAttribute('data-claim-gate-effect')).toBe('no_claims_cleared');
+      expect(await defaultApprovalUploadStatus.getAttribute('data-no-claim-gates-cleared')).toBe('true');
+      expect(await defaultApprovalUploadStatus.getAttribute('data-sam31-approval-validation-filter-href')).toContain('sam31ApprovalValidation=pending');
+      expect(await defaultApprovalUploadStatus.getAttribute('data-sam31-approval-upload-gate-validation-packet-href')).toContain(`/evidence/${defaultApprovalUploadEvidenceId}/openclaw/sam31/approval-upload/gate-validation-packet`);
+      expect(await defaultApprovalUploadStatus.innerText()).toContain('default/internal-alpha placeholder cannot validate as real signed evidence');
+      expect(await defaultApprovalUploadStatus.innerText()).toContain('approval validation packet ready');
+
       await page.reload({ waitUntil: 'domcontentloaded' });
       const decisionRowAfterRefresh = page.locator(`#evidence-${decisionEvidenceId}`).first();
       await decisionRowAfterRefresh.waitFor();
@@ -337,7 +388,20 @@ describe('Workbench official-flow browser smoke', () => {
       expect(decisionRowAfterRefreshText).toContain('source_attachment_intake_row_index 0');
       expect(decisionRowAfterRefreshText).toContain('Download signed evidence upload packet');
 
-      await decisionRowAfterRefresh.locator('[data-official-flow-signed-reviewer-resolve-workflow][data-official-flow-signed-reviewer-resolve-gate-code="AHJ_APPROVAL_MISSING"]').first().click();
+      await page.goto(`${BASE}/workbench.html?project=${encodeURIComponent(PROJECT_NAME)}#resolverQueue`, { waitUntil: 'domcontentloaded' });
+      await page.locator('[data-resolver-queue-filter="officialFlowSignedReviewer=pending&targetGate=AHJ_APPROVAL_MISSING&evidenceType=ahj_approval"]').first().click();
+      await page.waitForFunction((expected) => {
+        const text = document.querySelector('#resolverQueue')?.textContent || '';
+        return text.includes(`review_decision_evidence #${expected.decisionEvidenceId}`)
+          && text.includes(`latest_sam31_approval_upload_intake evidence #${expected.defaultApprovalUploadEvidenceId}`)
+          && text.includes('Open saved SAM31 approval validation queue')
+          && text.includes('default/internal-alpha SAM31 approval upload already exists');
+      }, {
+        decisionEvidenceId,
+        defaultApprovalUploadEvidenceId,
+      });
+
+      await page.locator('[data-official-flow-signed-reviewer-resolve-workflow][data-official-flow-signed-reviewer-resolve-gate-code="AHJ_APPROVAL_MISSING"]').first().click();
       await page.waitForURL((url) => url.pathname === '/settings.html' && url.hash === '#wizSignoff');
       await page.waitForFunction(
         () => document.getElementById('wizPacketStatus')?.dataset.officialFlowUploadPacketHref,

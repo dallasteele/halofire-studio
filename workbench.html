@@ -5165,7 +5165,7 @@ function resolverQueueDetail(item, index = '') {
       <div class="claims">resolved_evidence_id ${escapeHtml(item.resolved_evidence_id || 'missing')} - resolved_evidence_ref ${escapeHtml(item.resolved_evidence_ref || 'missing')} - evidence_type ${escapeHtml(item.resolved_evidence_type || 'missing')}</div>
       <div class="claims">claim_gate_effect ${escapeHtml(item.claim_gate_effect || 'gate_cleared_after_explicit_signed_validation')} - no_unrelated_claims_cleared ${escapeHtml(item.no_unrelated_claims_cleared === false ? 'false' : 'true')}</div>
       <div class="claims">Blocks still active unless separately resolved: ${claims.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('') || '<span class="chip">unrelated regulated claims remain fail-closed</span>'}</div>
-      <p style="margin-top:8px">${resolvedEvidenceId && resolvedEvidenceSettingsHref ? `<button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#0f766e;margin-right:6px" data-claim-gate-resolved-evidence-inspect="${escapeHtml(resolvedEvidenceId)}" data-signed-reviewer-workflow-evidence-id="${escapeHtml(resolvedEvidenceId)}" data-signed-reviewer-workflow-gate-code="${escapeHtml(item.code || '')}" data-signed-reviewer-workflow-href="${escapeHtml(resolvedEvidenceSettingsHref)}" data-signed-reviewer-workflow-action="inspect" onclick="openSignedReviewerWorkflow(${JSON.stringify(currentProjectName())}, ${JSON.stringify(item.code || '')}, ${JSON.stringify(resolvedEvidenceId)}, 'inspect', ${JSON.stringify(resolvedEvidenceSettingsHref)})">Open accepted evidence read-only</button>` : ''}${action.href ? `<a class="go" style="padding:7px 10px;font-size:11px;text-decoration:none;display:inline-block;margin-right:6px;background:#047857" href="${escapeHtml(action.href)}">${escapeHtml(action.label || 'Download resolve audit packet')}</a> <button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#0f766e" data-claim-gate-resolve-audit-save-evidence-id="${escapeHtml(item.resolved_evidence_id || '')}" data-claim-gate-resolve-audit-gate-code="${escapeHtml(item.code || '')}" data-claim-gate-resolve-audit-href="${escapeHtml(action.href || '')}" data-claim-gate-resolve-audit-resolved-ref="${escapeHtml(item.resolved_evidence_ref || '')}" data-claim-gate-resolve-audit-resolved-type="${escapeHtml(item.resolved_evidence_type || '')}">Save resolve audit evidence</button>` : '<span class="muted">audit packet action missing</span>'}</p>
+      <p style="margin-top:8px">${resolvedEvidenceId && resolvedEvidenceSettingsHref ? `<button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#0f766e;margin-right:6px" data-claim-gate-resolved-evidence-inspect="${escapeHtml(resolvedEvidenceId)}" data-signed-reviewer-workflow-evidence-id="${escapeHtml(resolvedEvidenceId)}" data-signed-reviewer-workflow-gate-code="${escapeHtml(item.code || '')}" data-signed-reviewer-workflow-href="${escapeHtml(resolvedEvidenceSettingsHref)}" data-signed-reviewer-workflow-action="inspect">Open accepted evidence read-only</button>` : ''}${action.href ? `<a class="go" style="padding:7px 10px;font-size:11px;text-decoration:none;display:inline-block;margin-right:6px;background:#047857" href="${escapeHtml(action.href)}">${escapeHtml(action.label || 'Download resolve audit packet')}</a> <button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#0f766e" data-claim-gate-resolve-audit-save-evidence-id="${escapeHtml(item.resolved_evidence_id || '')}" data-claim-gate-resolve-audit-gate-code="${escapeHtml(item.code || '')}" data-claim-gate-resolve-audit-href="${escapeHtml(action.href || '')}" data-claim-gate-resolve-audit-resolved-ref="${escapeHtml(item.resolved_evidence_ref || '')}" data-claim-gate-resolve-audit-resolved-type="${escapeHtml(item.resolved_evidence_type || '')}">Save resolve audit evidence</button>` : '<span class="muted">audit packet action missing</span>'}</p>
       <div class="muted" id="claimGateResolveAuditSaveStatus-${escapeHtml(item.resolved_evidence_id || item.code || '')}" style="font-size:11px;margin-top:4px"></div>
       <span class="muted" style="font-size:10px">halofire.claim_gate_resolve_audit_packet.v1 - claimGateAudit=cleared - targetGate=${escapeHtml(item.code || '')}</span>
     </div>`;
@@ -5780,24 +5780,31 @@ async function saveOfficialFlowDefaultSam31ApprovalUpload(evidenceId, gateCode =
     a.download = packet.download_name || 'halofire-sam31-approval-upload-gate-validation-packet.json';
     a.click();
     URL.revokeObjectURL(a.href);
-    if (status) {
-      const filterHref = '/api/projects/' + encodeURIComponent(currentProjectName()) + '/resolver-queue?sam31ApprovalValidation=pending&targetGate=' + encodeURIComponent(saved.gate_code || gateCode || '');
-      status.textContent = `Saved ${saved.artifact_type || 'halofire.sam31_approval_upload_intake.v1'} #${saved.id || 'missing'} from official-flow review decision ${saved.source_official_flow_review_decision_evidence_id || evidenceId || 'missing'} and downloaded ${packet.artifact_type || 'halofire.sam31_approval_upload_gate_validation_packet.v1'}; default/internal-alpha placeholder cannot validate as real signed evidence and no claims cleared.`;
-      status.dataset.sam31ApprovalUploadEvidenceId = String(saved.id || '');
-      status.dataset.sourceHalofireSam31ApprovalUploadEvidenceId = String(saved.id || '');
-      status.dataset.sourceOfficialFlowReviewDecisionEvidenceId = String(saved.source_official_flow_review_decision_evidence_id || evidenceId || '');
-      status.dataset.sourceReplayEvidenceId = String(saved.source_replay_evidence_id || '');
-      status.dataset.sourceAttachmentIntakePacketEvidenceId = String(saved.source_attachment_intake_packet_evidence_id || '');
-      status.dataset.sourceAttachmentIntakeRowIndex = String(saved.source_attachment_intake_row_index ?? '');
-      status.dataset.targetGateCode = saved.gate_code || gateCode || '';
-      status.dataset.requiredEvidenceType = saved.required_evidence_type || evidenceType || '';
-      status.dataset.sourceOfficialFlowTargetGateCode = saved.source_official_flow_target_gate_code || gateCode || '';
-      status.dataset.claimGateEffect = saved.claim_gate_effect || 'no_claims_cleared';
-      status.dataset.noClaimGatesCleared = saved.no_claim_gates_cleared === false ? 'false' : 'true';
-      status.dataset.sam31ApprovalValidationFilterHref = filterHref;
-    }
+    const filterHref = '/api/projects/' + encodeURIComponent(currentProjectName()) + '/resolver-queue?sam31ApprovalValidation=pending&targetGate=' + encodeURIComponent(saved.gate_code || gateCode || '');
+    const stampDefaultApprovalUploadStatus = (target) => {
+      if (!target) return;
+      target.textContent = `Saved ${saved.artifact_type || 'halofire.sam31_approval_upload_intake.v1'} #${saved.id || 'missing'} from official-flow review decision ${saved.source_official_flow_review_decision_evidence_id || evidenceId || 'missing'} and downloaded ${packet.artifact_type || 'halofire.sam31_approval_upload_gate_validation_packet.v1'}; approval validation packet ready at ${packetHref || 'missing'}; default/internal-alpha placeholder cannot validate as real signed evidence and no claims cleared.`;
+      target.dataset.sam31ApprovalUploadEvidenceId = String(saved.id || '');
+      target.dataset.sourceHalofireSam31ApprovalUploadEvidenceId = String(saved.id || '');
+      target.dataset.sourceOfficialFlowReviewDecisionEvidenceId = String(saved.source_official_flow_review_decision_evidence_id || evidenceId || '');
+      target.dataset.sourceReplayEvidenceId = String(saved.source_replay_evidence_id || '');
+      target.dataset.sourceAttachmentIntakePacketEvidenceId = String(saved.source_attachment_intake_packet_evidence_id || '');
+      target.dataset.sourceAttachmentIntakeRowIndex = String(saved.source_attachment_intake_row_index ?? '');
+      target.dataset.targetGateCode = saved.gate_code || gateCode || '';
+      target.dataset.requiredEvidenceType = saved.required_evidence_type || evidenceType || '';
+      target.dataset.sourceOfficialFlowTargetGateCode = saved.source_official_flow_target_gate_code || gateCode || '';
+      target.dataset.claimGateEffect = saved.claim_gate_effect || 'no_claims_cleared';
+      target.dataset.noClaimGatesCleared = saved.no_claim_gates_cleared === false ? 'false' : 'true';
+      target.dataset.sam31ApprovalValidationFilterHref = filterHref;
+      target.dataset.sam31ApprovalUploadGateValidationPacketHref = packetHref;
+      target.dataset.downloadedGateValidationPacket = packet?.artifact_type === 'halofire.sam31_approval_upload_gate_validation_packet.v1' ? 'true' : 'false';
+      target.dataset.approvalValidationPacketReady = packetHref ? 'true' : 'false';
+      target.dataset.placeholderUpload = saved.placeholder_upload ? 'true' : 'false';
+    };
+    stampDefaultApprovalUploadStatus(status);
     await refreshEvidence();
     await refreshResolverQueue();
+    stampDefaultApprovalUploadStatus(document.getElementById(`sam31ApprovalUploadValidationStatus-${saved.id || ''}`));
   } catch (err) {
     if (status) status.textContent = 'Error: ' + err.message;
   }
