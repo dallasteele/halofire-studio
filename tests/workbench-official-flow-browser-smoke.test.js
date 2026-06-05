@@ -353,6 +353,121 @@ describe('Workbench official-flow browser smoke', () => {
     }
   }, 40_000);
 
+  it('opens official-flow SAM31 placeholder replacement into Settings with read-only source chain context', async () => {
+    const token = await adminToken();
+    const intake = await api(`${PROJECT_PATH}/resolver-packets/official-flow/intake`, token, {
+      method: 'POST',
+      body: JSON.stringify({
+        staticPsi: 74,
+        residualPsi: 63,
+        flowingGpm: 1005,
+        flowDataDate: '2026-06-05',
+        source_file: 'official-flow-placeholder-settings.pdf',
+        source_ref: 'official-flow-placeholder-settings.pdf#page=4',
+        notes: 'Official-flow placeholder replacement Settings smoke; no regulated claims cleared.',
+      }),
+    });
+    const replay = await api(`${PROJECT_PATH}/resolver-packets/official-flow/${intake.id}/replay-artifact`, token, {
+      method: 'POST',
+    });
+    const decision = await api(`${PROJECT_PATH}/resolver-packets/official-flow-replay/${replay.id}/review-decision`, token, {
+      method: 'POST',
+      body: JSON.stringify({
+        reviewer_name: 'HaloFire Workbench Reviewer',
+        reviewer_title: 'Internal Alpha Reviewer',
+        professional_review_ref: 'pe-review://official-flow/placeholder-settings',
+        ahj_review_ref: 'ahj://official-flow/placeholder-settings',
+        autosprink_export_ref: 'autosprink://official-flow/placeholder-settings',
+        manufacturer_model_approval_ref: 'manufacturer://official-flow/placeholder-settings',
+        review_decision: 'recorded_evidence_refs_fail_closed',
+        notes: 'Decision source for placeholder replacement Settings smoke; no claim gates cleared.',
+      }),
+    });
+    const upload = await api(`${PROJECT_PATH}/resolver-packets/official-flow-review-decision/${decision.id}/sam31/default-approval-upload`, token, {
+      method: 'POST',
+      body: JSON.stringify({
+        targetGate: 'PROFESSIONAL_REVIEW_MISSING',
+        evidenceType: 'professional_review',
+      }),
+    });
+    const validation = await api(`${PROJECT_PATH}/evidence/${upload.id}/openclaw/sam31/approval-upload/gate-validation-decision`, token, {
+      method: 'POST',
+      body: JSON.stringify({
+        validation_decision: 'default_internal_alpha_placeholder_rejected',
+        validation_ref: `approval-validation://sam31/official-flow/${upload.id}`,
+        reviewer_name: 'HaloFire Workbench Reviewer',
+        reviewer_title: 'Internal Alpha Reviewer',
+        notes: 'Placeholder upload rejected for real signed evidence replacement; no claims cleared.',
+        selected_sheet_ref: '1881://proposal-cooperative/sheet-7',
+        selected_scale_ref: '1881://operator-scale/sheet-7/0.0833',
+        selected_boundary_candidate_ref: 'candidate:1881-official-flow-placeholder-settings',
+      }),
+    });
+
+    const page = await browser.newPage({ acceptDownloads: true });
+    page.setDefaultTimeout(10_000);
+    await page.addInitScript((authToken) => {
+      localStorage.setItem('halofire_token', authToken);
+    }, token);
+
+    try {
+      await page.goto(`${BASE}/workbench.html?project=${encodeURIComponent(PROJECT_NAME)}#resolverQueue`, { waitUntil: 'domcontentloaded' });
+      await page.waitForSelector('#resolverQueue');
+      await page.locator('[data-resolver-queue-filter="officialFlowSignedReviewer=pending&targetGate=PROFESSIONAL_REVIEW_MISSING&evidenceType=professional_review"]').first().click();
+      await page.waitForFunction((expected) => {
+        const text = document.querySelector('#resolverQueue')?.textContent || '';
+        return text.includes(`review_decision_evidence #${expected.decisionId}`)
+          && text.includes(`latest_sam31_approval_upload_intake evidence #${expected.uploadId}`)
+          && Boolean(document.querySelector(`[data-official-flow-sam31-approval-upload-placeholder-replacement-workflow="${expected.validationId}"]`));
+      }, {
+        decisionId: decision.id,
+        uploadId: upload.id,
+        validationId: validation.id,
+      });
+
+      const replacement = page.locator(`[data-official-flow-sam31-approval-upload-placeholder-replacement-workflow="${validation.id}"]`).first();
+      await replacement.waitFor();
+      expect(await replacement.getAttribute('data-source-official-flow-review-decision-evidence-id')).toBe(String(decision.id));
+      expect(await replacement.getAttribute('data-source-halofire-sam31-approval-upload-evidence-id')).toBe(String(upload.id));
+      expect(await replacement.getAttribute('data-selected-sheet-ref')).toBe('1881://proposal-cooperative/sheet-7');
+      expect(await replacement.getAttribute('data-claim-gate-effect')).toBe('no_claims_cleared');
+
+      await replacement.click();
+      await page.waitForURL((url) => url.pathname === '/settings.html' && url.hash === '#wizSignoff');
+      await page.waitForFunction((expected) => {
+        const status = document.getElementById('wizPacketStatus');
+        return status?.dataset.sourceOfficialFlowReviewDecisionEvidenceId === expected.decisionId
+          && status?.dataset.sourceHalofireSam31ApprovalUploadEvidenceId === expected.uploadId
+          && status?.dataset.sourceHalofireSam31ApprovalUploadValidationDecisionEvidenceId === expected.validationId;
+      }, {
+        decisionId: String(decision.id),
+        uploadId: String(upload.id),
+        validationId: String(validation.id),
+      });
+
+      expect(page.url()).toContain(`sourceOfficialFlowReviewDecisionEvidenceId=${decision.id}`);
+      expect(page.url()).toContain(`sourceHalofireSam31ApprovalUploadEvidenceId=${upload.id}`);
+      expect(page.url()).toContain(`sourceHalofireSam31ApprovalUploadValidationDecisionEvidenceId=${validation.id}`);
+      expect(await page.locator('#wizGate').inputValue()).toBe('PROFESSIONAL_REVIEW_MISSING');
+      expect(await page.locator('#wizType').inputValue()).toBe('professional_review');
+      expect(await page.locator('#wizAction').inputValue()).toBe('record');
+      expect(await page.locator('#wizSourceRef').inputValue()).toBe('pe-review://official-flow/placeholder-settings');
+      const packetStatus = page.locator('#wizPacketStatus');
+      expect(await packetStatus.getAttribute('data-placeholder-replacement')).toBe('official_flow_sam31_approval_upload');
+      expect(await packetStatus.getAttribute('data-selected-sheet-ref')).toBe('1881://proposal-cooperative/sheet-7');
+      expect(await packetStatus.getAttribute('data-selected-scale-ref')).toBe('1881://operator-scale/sheet-7/0.0833');
+      expect(await packetStatus.getAttribute('data-selected-boundary-candidate-ref')).toBe('candidate:1881-official-flow-placeholder-settings');
+      expect(await packetStatus.getAttribute('data-claim-gate-effect')).toBe('no_claims_cleared');
+      expect(await page.locator('#wizNotes').inputValue()).toContain(`source_official_flow_review_decision_evidence_id ${decision.id}`);
+      expect(await page.locator('#wizNotes').inputValue()).toContain(`source_halofire_sam31_approval_upload_evidence_id ${upload.id}`);
+      expect(await page.locator('#wizNotes').inputValue()).toContain(`source_halofire_sam31_approval_upload_validation_decision_evidence_id ${validation.id}`);
+      expect(await page.locator('#wizNotes').inputValue()).toContain('claim_gate_effect no_claims_cleared');
+      expect(await packetStatus.innerText()).toContain('Replace the default/internal-alpha placeholder with real signed evidence');
+    } finally {
+      await page.close();
+    }
+  }, 40_000);
+
   it('shows cleared official-flow signed-reviewer rows with resolve-audit proof instead of upload-pending actions', async () => {
     const token = await adminToken();
     const projectName = 'Home Depot - Rexburg ID';

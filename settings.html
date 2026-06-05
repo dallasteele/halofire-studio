@@ -304,6 +304,15 @@ function clearWizardOfficialFlowContext() {
   packetStatus.removeAttribute('data-official-flow-upload-packet-source-replay-evidence-id');
   packetStatus.removeAttribute('data-official-flow-upload-packet-source-attachment-intake-packet-evidence-id');
   packetStatus.removeAttribute('data-official-flow-upload-packet-source-attachment-intake-row-index');
+  packetStatus.removeAttribute('data-placeholder-replacement');
+  packetStatus.removeAttribute('data-source-official-flow-review-decision-evidence-id');
+  packetStatus.removeAttribute('data-source-halofire-sam31-approval-upload-evidence-id');
+  packetStatus.removeAttribute('data-source-halofire-sam31-approval-upload-validation-decision-evidence-id');
+  packetStatus.removeAttribute('data-source-openclaw-sam31-actual-value-replacement-readback-evidence-id');
+  packetStatus.removeAttribute('data-selected-sheet-ref');
+  packetStatus.removeAttribute('data-selected-scale-ref');
+  packetStatus.removeAttribute('data-selected-boundary-candidate-ref');
+  packetStatus.removeAttribute('data-claim-gate-effect');
   packetStatus.removeAttribute('data-signed-reviewer-readonly-evidence-id');
   packetStatus.removeAttribute('data-signed-reviewer-claim-gate-effect');
   packetStatus.removeAttribute('data-signed-reviewer-resolve-audit-href');
@@ -390,6 +399,15 @@ function prefillEvidenceWizardFromUrl() {
     evidenceId: params.get('evidenceId'),
     action: params.get('action'),
     uploadPacketHref: params.get('uploadPacketHref'),
+    placeholderReplacement: params.get('placeholderReplacement'),
+    sourceOfficialFlowReviewDecisionEvidenceId: params.get('sourceOfficialFlowReviewDecisionEvidenceId'),
+    sourceHalofireSam31ApprovalUploadEvidenceId: params.get('sourceHalofireSam31ApprovalUploadEvidenceId'),
+    sourceHalofireSam31ApprovalUploadValidationDecisionEvidenceId: params.get('sourceHalofireSam31ApprovalUploadValidationDecisionEvidenceId'),
+    sourceOpenclawSam31ActualValueReplacementReadbackEvidenceId: params.get('sourceOpenclawSam31ActualValueReplacementReadbackEvidenceId'),
+    selectedSheetRef: params.get('selectedSheetRef'),
+    selectedScaleRef: params.get('selectedScaleRef'),
+    selectedBoundaryCandidateRef: params.get('selectedBoundaryCandidateRef'),
+    claimGateEffect: params.get('claimGateEffect'),
   };
 }
 
@@ -405,6 +423,9 @@ async function applyWizardUrlPrefill() {
   if (wizardUrlPrefill.uploadPacketHref && await hydrateWizardFromOfficialFlowUploadPacket()) {
     return;
   }
+  if (await hydrateWizardFromSam31ApprovalPlaceholderReplacement()) {
+    return;
+  }
   if (wizardUrlPrefill.evidenceId) {
     const option = Array.from($('wizExistingEvidence').options || []).find((entry) => entry.value === wizardUrlPrefill.evidenceId);
     if (option) {
@@ -414,6 +435,15 @@ async function applyWizardUrlPrefill() {
     }
     await hydrateWizardFromOfficialFlowContextEvidence();
   }
+}
+
+function hasSam31ApprovalPlaceholderReplacementPrefill() {
+  return Boolean(
+    wizardUrlPrefill.placeholderReplacement
+    || wizardUrlPrefill.sourceOfficialFlowReviewDecisionEvidenceId
+    || wizardUrlPrefill.sourceHalofireSam31ApprovalUploadEvidenceId
+    || wizardUrlPrefill.sourceHalofireSam31ApprovalUploadValidationDecisionEvidenceId,
+  );
 }
 
 function hydrateWizardFromExistingEvidence() {
@@ -535,6 +565,66 @@ function formatOfficialFlowContextNotes(row, gateCode, config, context, action =
       ? 'real signed evidence resolve mode; claim gate clears only after present evidence and signed reviewer metadata are submitted'
       : 'record evidence only; explicit claim-gate resolve audit required before regulated claims clear',
   ].filter(Boolean).join('\n');
+}
+
+async function hydrateWizardFromSam31ApprovalPlaceholderReplacement() {
+  if (!hasSam31ApprovalPlaceholderReplacementPrefill()) return false;
+  const gateCode = $('wizGate').value;
+  const gate = wizardState.gateMap.get(gateCode);
+  if (!gate) return false;
+  const projectName = $('wizProject').value;
+  const sourceOfficialFlowReviewDecisionEvidenceId = wizardUrlPrefill.sourceOfficialFlowReviewDecisionEvidenceId || '';
+  const sourceHalofireSam31ApprovalUploadEvidenceId = wizardUrlPrefill.sourceHalofireSam31ApprovalUploadEvidenceId || '';
+  const sourceHalofireSam31ApprovalUploadValidationDecisionEvidenceId = wizardUrlPrefill.sourceHalofireSam31ApprovalUploadValidationDecisionEvidenceId || wizardUrlPrefill.evidenceId || '';
+  const rows = await api('/projects/' + encodeURIComponent(projectName) + '/evidence');
+  const officialFlowRow = sourceOfficialFlowReviewDecisionEvidenceId
+    ? (Array.isArray(rows) ? rows : []).find((entry) => String(entry.id) === String(sourceOfficialFlowReviewDecisionEvidenceId))
+    : null;
+  const context = parseWizardEvidenceNotes(officialFlowRow);
+  const config = officialFlowSignedReviewerPrefillConfig(gateCode, context, officialFlowRow || {});
+  const allowed = gate.allowed_evidence_types || [];
+  if (!config || !allowed.includes(config.evidenceType)) return false;
+
+  const actionEl = $('wizAction');
+  const action = wizardUrlPrefill.action === 'resolve' ? 'resolve' : 'record';
+  $('wizType').value = config.evidenceType;
+  $('wizExistingEvidence').value = '';
+  actionEl.value = action;
+  $('wizSourceRef').value = config.sourceRef || officialFlowRow?.source_ref || '';
+  $('wizSourceFile').value = officialFlowRow?.source_file || '';
+  const replacementNotes = [
+    officialFlowRow ? formatOfficialFlowContextNotes(officialFlowRow, gateCode, config, context, action) : '',
+    'sam31_approval_upload_placeholder_replacement_context',
+    sourceHalofireSam31ApprovalUploadEvidenceId ? `source_halofire_sam31_approval_upload_evidence_id ${sourceHalofireSam31ApprovalUploadEvidenceId}` : '',
+    sourceHalofireSam31ApprovalUploadValidationDecisionEvidenceId ? `source_halofire_sam31_approval_upload_validation_decision_evidence_id ${sourceHalofireSam31ApprovalUploadValidationDecisionEvidenceId}` : '',
+    wizardUrlPrefill.sourceOpenclawSam31ActualValueReplacementReadbackEvidenceId ? `source_openclaw_sam31_actual_value_replacement_readback_evidence_id ${wizardUrlPrefill.sourceOpenclawSam31ActualValueReplacementReadbackEvidenceId}` : '',
+    wizardUrlPrefill.selectedSheetRef ? `selected_sheet_ref ${wizardUrlPrefill.selectedSheetRef}` : '',
+    wizardUrlPrefill.selectedScaleRef ? `selected_scale_ref ${wizardUrlPrefill.selectedScaleRef}` : '',
+    wizardUrlPrefill.selectedBoundaryCandidateRef ? `selected_boundary_candidate_ref ${wizardUrlPrefill.selectedBoundaryCandidateRef}` : '',
+    `claim_gate_effect ${wizardUrlPrefill.claimGateEffect || 'no_claims_cleared'}`,
+    'default/internal-alpha placeholder replacement context only; upload real signed evidence and explicitly validate before any regulated claim gate can clear',
+  ].filter(Boolean).join('\n');
+  $('wizNotes').value = replacementNotes;
+
+  const packetStatus = $('wizPacketStatus');
+  clearWizardOfficialFlowContext();
+  packetStatus.setAttribute('data-placeholder-replacement', wizardUrlPrefill.placeholderReplacement || 'sam31_approval_upload');
+  packetStatus.setAttribute('data-source-official-flow-review-decision-evidence-id', sourceOfficialFlowReviewDecisionEvidenceId);
+  packetStatus.setAttribute('data-source-halofire-sam31-approval-upload-evidence-id', sourceHalofireSam31ApprovalUploadEvidenceId);
+  packetStatus.setAttribute('data-source-halofire-sam31-approval-upload-validation-decision-evidence-id', sourceHalofireSam31ApprovalUploadValidationDecisionEvidenceId);
+  packetStatus.setAttribute('data-source-openclaw-sam31-actual-value-replacement-readback-evidence-id', wizardUrlPrefill.sourceOpenclawSam31ActualValueReplacementReadbackEvidenceId || '');
+  packetStatus.setAttribute('data-selected-sheet-ref', wizardUrlPrefill.selectedSheetRef || '');
+  packetStatus.setAttribute('data-selected-scale-ref', wizardUrlPrefill.selectedScaleRef || '');
+  packetStatus.setAttribute('data-selected-boundary-candidate-ref', wizardUrlPrefill.selectedBoundaryCandidateRef || '');
+  packetStatus.setAttribute('data-claim-gate-effect', wizardUrlPrefill.claimGateEffect || 'no_claims_cleared');
+  packetStatus.textContent = `Replace the default/internal-alpha placeholder with real signed evidence for ${gateCode}; `
+    + `source official-flow review decision #${sourceOfficialFlowReviewDecisionEvidenceId || 'missing'}, `
+    + `SAM31 approval upload #${sourceHalofireSam31ApprovalUploadEvidenceId || 'missing'}, `
+    + `placeholder validation decision #${sourceHalofireSam31ApprovalUploadValidationDecisionEvidenceId || 'missing'}; `
+    + 'no claims cleared until explicit signed validation succeeds.';
+  $('wizResolveAudit').disabled = true;
+  syncWizardSignoff();
+  return true;
 }
 
 async function hydrateWizardFromOfficialFlowUploadPacket() {
