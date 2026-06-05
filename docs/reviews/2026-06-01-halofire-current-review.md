@@ -1,7 +1,7 @@
 # HaloFire Current Review - 2026-06-01
 
 Repo: `C:/Users/dalla/OneDrive/Documents/HaloFire`
-HEAD reviewed: current through T40 PDF boundary-candidate review workflow
+HEAD reviewed: current through PDF boundary-decision persistence and official-flow signed-reviewer workflow
 
 This is the current Codex pickup review after Claude ran out of credits. The
 project is a usable internal-alpha bid/CAD/evidence workbench, not a completed
@@ -11,6 +11,18 @@ fabrication readiness, manufacturer-exact models, and engineering-grade output
 until real evidence is supplied by Halo Fire staff or licensed/proper authorities.
 
 ## Verified Now
+
+Focused verification run on 2026-06-05:
+
+```powershell
+npx vitest run tests/workbench-evidence-detail.test.js tests/workbench-signed-reviewer-detail.test.js tests/workbench-official-flow-browser-smoke.test.js tests/settings-signed-reviewer-browser-smoke.test.js
+```
+
+Result: 4 files, 25 tests passed. This verifies the current signed-reviewer lane:
+Workbench official-flow review decisions survive refresh with the correct next
+actions, cleared signed-reviewer rows show resolve-audit proof instead of upload-
+pending actions, and Settings can prefill, resolve, and reopen signed-reviewer
+evidence read-only without clearing unrelated claims.
 
 Focused verification run on 2026-06-01:
 
@@ -118,6 +130,11 @@ registered OpenGeometry entities.
   wall-network outline, and wall-layer candidates on the chosen page and apply
   one to `pdfExtract` before generating. Every candidate is explicitly blocked
   from geometry-accuracy and regulated claims until real review evidence exists.
+- The Studio and API now persist the employee's chosen 1881 sheet / scale /
+  boundary-candidate decision as best-effort evidence. That saved decision can
+  be reloaded as Studio defaults, appears in Workbench evidence rows, and
+  propagates through saved readback bundles and downstream review packets
+  without clearing any claim gate.
 - SAM 3.1/OpenClaw plan segmentation is wired fail-soft through
   `OPENCLAW_BRIDGE_URL`: when the bridge is unset or unavailable, the request
   falls back to vector PDF extraction, returns a real bid, and reports
@@ -131,6 +148,11 @@ registered OpenGeometry entities.
 - Parts, part overrides, auto-source status, and component manifests exist.
   Catalog overrides can mark an individual component as manufacturer-exact only
   when manufacturer and license are supplied, while parity remains blocked.
+- The employee-facing evidence wizard has moved beyond a record-only intake:
+  official-flow signed-reviewer workflows now prefill from Workbench review
+  decisions, download the correct signed-evidence upload packets, keep resolved
+  gate rows source-linked, and reopen accepted evidence in read-only mode with
+  resolve-audit proof still attached.
 
 ## What Is Blocked And Why
 
@@ -163,9 +185,12 @@ and leave a truthful next blocker.
 1. When GX10 OpenClaw/SAM is reachable, run one real `pdfExtract:"sam"` call
    against the 1881 PDF and capture `pdfMeta` plus bid deltas without clearing
    any regulated gate.
-2. Finish the 1881 drawing workflow beyond T40 by persisting the employee's
-   chosen sheet/scale/candidate decision into evidence/workbench rows.
-3. Expand the employee-facing evidence wizard into a signed reviewer workflow
-   for AHJ/PE/AutoSprink/manufacturer artifacts.
-4. Keep source workbook values as truth for actual bid numbers; use generated
+2. Keep source workbook values as truth for actual bid numbers; use generated
    estimates as best-effort comparison/correction aids.
+3. Extend the signed-reviewer lane beyond official-flow so the same read-only
+   reopen + resolve-audit proof pattern applies consistently to AHJ / PE /
+   manufacturer / AutoSprink artifact follow-through outside the current packet
+   family.
+4. Re-run local browser/runtime proof after any export, kernel, or replay-lane
+   change and keep public/live claims blocked until a public target actually
+   serves the updated Studio.
