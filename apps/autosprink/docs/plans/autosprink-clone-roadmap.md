@@ -626,6 +626,149 @@ bridge (best-effort, graceful skip). Parity claim stays BLOCKED until complete.
       extraction path; it does not prove real geometry, clear claim gates, or
       substitute for OpenClaw/SAM/professional/AHJ/manufacturer evidence.
 
+## 3D-CAD ENGINE PATH (research decision — ultra workflow wwe95wfyc, 2026-06-05)
+
+The most reliable, **GX10/OpenClaw-INDEPENDENT** path to accurate 3D-CAD for HaloFire,
+from a 5-agent ultra research pass (TRELLIS.2 / step.parts / wawasensei-R3F / SAM, with
+adversarial honesty + correctness verification). Every recommended path removes the
+GX10/OpenClaw single point of failure.
+
+### PARTS path — PARAMETRIC-STEP-FIRST (catalog primary, AI mesh last-resort)
+Reliability tier order (most CAD-accurate first):
+1. **Manufacturer Revit/CAD families** (Viking, Tyco/Johnson Controls, Victaulic — we
+   already own the Victaulic + ARGCO + FFF pricebooks) + free BIM libraries (BIMobject).
+   Real, dimensionally-exact catalog parts (correct threads, K-factor, deflector, NPT).
+   Zero AI, zero GPU, zero GX10.
+2. **Code-authored parametric STEP via build123d** (the `earthtojake/text-to-cad` **`cad`**
+   skill — NOT step.parts itself). Author a head/fitting/hanger/riser once in Python and
+   re-parameterize per spec; primary artifact is real STEP B-rep, fully local.
+3. **step.parts public API** (`https://api.step.parts/v1`) ONLY for generic construction
+   hardware (fasteners, brackets). VERIFIED live: ZERO fire/MEP coverage (q=sprinkler →
+   total:0; q=pipe → only heat/light pipes), so it cannot supply sprinkler parts.
+4. **LAST RESORT — AI image→3D** (TRELLIS.2 via fal.ai, or Hunyuan3D 2.1) for parts with
+   no published CAD, treated explicitly as a visual PLACEHOLDER mesh that MUST be
+   dimension-verified against a catalog spec sheet before any bid use.
+
+   Accuracy reality: STEP/B-rep (exact NURBS, parametric, manufacturable) >> AI GLB mesh
+   (appearance-plausible triangle soup, non-watertight, no real dimensions). Current
+   `parts/*.stl` are hand-modeled meshes — replace the load-bearing ones with
+   manufacturer STEP / build123d output over time.
+
+### BUILDING path — VECTOR-PDF-FIRST (deterministic, no AI/GPU for the common case)
+1. **Vector CAD PDF (most arch/sprinkler sets):** wall/pipe lines are ALREADY vector
+   geometry — extract DXF/DWG polylines → feed straight into OpenGeometry / the
+   `halofire-ifc` package → extrude footprints to 3D. Fully deterministic, no SAM, no
+   GPU, no GX10. This is the FIRST check on every PDF.
+2. **Raster/scanned plans only:** fall back to **SAM 3 (segmentation-ONLY — outputs 2D
+   masks, NO geometry)** to turn the wall region into a 2D mask → polygon footprint, then
+   OpenGeometry EXTRUDES the polygon to 3D. This is 2D-plan→extrusion, NOT
+   image-to-3D-object. SAM 3 runs via hosted endpoints (Roboflow/HF), not GX10. Scope
+   `services/halofire-sam` + `src/sam31` to this raster-fallback lane only.
+
+   CORRECTION (verified): SAM does NOT make 3D parts. SAM 3 = 2D segmentation; SAM 3D
+   Objects is a separate model and is NOT recommended for parts (catalog STEP is strictly
+   better). Never use SAM to fabricate sprinkler-part meshes.
+
+### Reliability note (why this is GX10-free)
+PARTS primary (manufacturer STEP + build123d) is pure-CAD / pure-local Python — no
+gateway, no GPU, no network model. step.parts and fal.ai are plain public HTTP. AI
+fallback has two GX10-free routes: hosted (fal.ai TRELLIS.2 GLB ~$0.25–0.35/gen; or
+Meshy/Tripo) and local-GPU (Hunyuan3D 2.1 on the RTX 4090, Windows WinPortable, low-VRAM
+mode ~6GB). TRELLIS.2 local is Linux/24GB-leaning → prefer its free HF Space or fal.ai.
+A Blender-MCP route (`generate_hunyuan3d_model` / `generate_hyper3d_model_via_images` /
+`import_generated_asset`) exists locally + GX10-independent, but VERIFY an API key is
+configured before relying on it. BUILDING primary (vector PDF → DXF → extrude) is 100%
+deterministic local code; the SAM raster fallback uses hosted SAM 3, not GX10.
+
+### wawasensei skill (skills/wawasensei/SKILL.md)
+Two-half R3F + image→3D skill. Knowledge A (R3F render mastery, from his verified course):
+useGLTF/useLoader/`<primitive>`, gltfjsx (GLB → typed JSX, named meshes), Draco,
+`<Stage>/<Environment>/<Center>/<Bounds>`, OrbitControls/CameraControls/MapControls
+(MapControls = top-down plan view), useAnimations, drei `<Splat>` for Gaussian output.
+Knowledge B (image→3D decision matrix): local Hunyuan3D 2.1 vs hosted fal.ai TRELLIS.2 vs
+Meshy/Tripo, the GLB import contract, mesh-vs-splat. Three recipes (image→GLB→R3F viewer
+with `<Bounds>` auto-fit + orbit; AI/catalog part → instanced placement via
+`<Instances>/<Instance>`; Gaussian splat → `<Splat>`). HONESTY: the X post
+(status 2046653138426351718) could NOT be fetched (HTTP 402) — do NOT hard-code which
+model it used; his only verified image→3D-adjacent content is decals/textures onto
+existing meshes, NOT AI single-image→mesh. The part-GEOMETRY half is out of scope of his
+course (it teaches GLB→R3F render only).
+
+### UI/UX upgrades (packages/viewer → React Three Fiber + drei)
+(1) `<Instances>/<Instance>` + InstancedMesh — collapse hundreds of identical heads/
+fittings to ~1 draw call (biggest perf win). (2) gltfjsx + cached useGLTF — each part a
+reusable named component. (3) drei `<Bvh>` raycasting — fast click-to-select/inspect on
+large part counts (essential for an agent operating in 3D). (4) `<Bounds>` +
+CameraControls + MapControls — auto-frame + top-down plan pan/zoom. (5) `frameloop='demand'`
++ r3f-perf — render on-demand (CAD scenes are mostly static). Clean studio shell: left
+catalog/part browser (catalog + step.parts search), center R3F canvas (plan/3D toggle),
+right inspector showing each part's source (manufacturer-STEP vs build123d vs
+AI-placeholder) + dimension-verify status, and a provenance/accuracy badge on EVERY part
+so AI placeholders are never mistaken for engineering-accurate CAD.
+
+### Honesty caveats (carried from the research, fail-closed)
+- **Hunyuan3D 2.1 license is restricted**, not freely commercial: Territory EXCLUDES the
+  EU, UK, and South Korea, plus a >1M-MAU cap needing Tencent approval. Material risk.
+- SAM license allows broad commercial use (carve-outs: military/ITAR/nuclear/weapons) but
+  SAM 3D Objects is NOT recommended for parts anyway — catalog STEP is strictly better.
+- The wawasensei image→3D technique is INFERRED (post paywalled HTTP 402); do NOT build
+  assuming a specific model.
+- TRELLIS does NOT measure real dimensions (no thread pitch, K-factor, NPT); output is
+  appearance-plausible, non-watertight, needs remesh + external scaling. NEVER present an
+  AI part as engineering-accurate in a bid.
+- step.parts sprinkler coverage = ZERO (verified live). build123d `cad` skill STEP-output
+  is claimed in its SKILL.md but was NOT executed at runtime — pilot before committing.
+- The Blender-MCP local image→3D path exists but an API key was NOT verified configured.
+
+### Task Queue additions (3D-CAD engine — T41–T50)
+- [ ] **T41 — R3F viewer foundation (GX10-INDEPENDENT; highest leverage, do FIRST).**
+      Convert `packages/viewer` to React Three Fiber + `@react-three/drei`: render the
+      existing `parts/*.stl` via useLoader(STLLoader)/`<primitive>`, `<Bounds>` auto-fit,
+      OrbitControls, and a plan/3D `MapControls` toggle. DoD: loads all current part
+      meshes in-browser, screenshot-verified in the preview window. Pure frontend — no
+      OpenClaw/GX10/GPU.
+- [ ] **T42 — Part-provenance + accuracy-badge model (GX10-independent).** Add to
+      `packages/halofire-catalog` + the viewer inspector: every part record carries
+      `source` ('manufacturer-step' | 'build123d' | 'step.parts' | 'ai-placeholder') and
+      a `dimensionVerified` flag; render a colored badge so AI meshes are NEVER shown as
+      engineering-accurate. Tests on the schema + badge mapping.
+- [ ] **T43 — step.parts client for generic hardware only (GX10-independent, public HTTP).**
+      Implement the public API client (GET /v1/parts, /v1/parts/{id} with SHA256 verify)
+      in `halofire-catalog` behind a feature flag; add a guard/test asserting fire-sprinkler
+      queries return zero so the UI routes them to catalog/build123d instead.
+- [ ] **T44 — Manufacturer-STEP ingestion lane / Tier-1 parts (GX10-independent).** A
+      `halofire-catalog` importer mapping Victaulic/ARGCO/FFF pricebook line items to
+      manufacturer Revit/STEP family downloads (Viking/Tyco/Victaulic/BIMobject); store
+      STEP + a GLB preview; replace the highest-volume hand-modeled STL heads/fittings
+      with real catalog geometry. (Downloads are operator/manual-sourced, not auto-scraped.)
+- [ ] **T45 — build123d parametric-STEP service / Tier-2 parts (GX10-independent, local
+      Python).** Port the `earthtojake/text-to-cad` `cad` skill locally; author parametric
+      head/fitting/hanger/riser generators that output STEP (primary) + GLB preview, fully
+      local, no GX10; golden test re-parameterizes one part per spec.
+- [ ] **T46 — AI image→3D fallback adapter / Tier-3, last resort (external API/GPU, NOT
+      GX10).** One pluggable interface in `packages/halofire-ai-bridge` with a fal.ai
+      TRELLIS.2 backend (HTTP, GLB out) + optional local Hunyuan3D 2.1; every output
+      auto-tagged `source='ai-placeholder'`, `dimensionVerified=false`; gated behind
+      "no catalog/build123d match found". Adapter + fail-soft tests with a mock backend;
+      NO real generation claimed unless the tool actually runs.
+- [ ] **T47 — BUILDING vector-PDF-first lane (GX10-INDEPENDENT, deterministic).** A
+      deterministic extractor in `halofire-ifc` that detects a vector layer in bid PDFs,
+      pulls wall/pipe polylines to DXF, and extrudes footprints to 3D via OpenGeometry —
+      no SAM, no GPU. Test against one real bid set (the 1881 Salt Lake City proposal).
+- [ ] **T48 — SAM raster-fallback lane, segmentation ONLY (hosted SAM 3, NOT GX10).**
+      Route scanned/raster plans through `services/halofire-sam` (hosted SAM 3 endpoint)
+      to produce 2D masks → polygon footprints, then reuse the OpenGeometry extrude path;
+      assert in code/tests that SAM NEVER produces part meshes.
+- [ ] **T49 — wawasensei skill + viewer perf application (GX10-independent).** Author
+      `skills/wawasensei/SKILL.md` (two-half R3F + image→3D content, three recipes, the
+      unverified-post honesty note) and apply `<Instances>/<Instance>`, gltfjsx, `<Bvh>`,
+      and `frameloop='demand'` to the viewer for the part-heavy perf win.
+- [ ] **T50 — Clean studio shell + full-stack wiring (GX10-independent for the shell).**
+      Left catalog/part browser (catalog + step.parts search), center R3F canvas (plan/3D
+      toggle, instanced placement, click-to-select via `<Bvh>`), right inspector
+      (provenance + dimension-verify status); connect catalog/build123d/AI/PDF services
+      end-to-end and verify a full takeoff→3D flow in-browser with screenshots.
+
 ## AUTOSPRINK PARITY epic (the goal): close functional gaps to AutoSprink feature parity
 HONESTY CONTRACT: "parity" is tracked, not asserted. The `AUTOSPRINK_PARITY_INCOMPLETE`
 gate (registry.js) stays BLOCKED until every parity-matrix row is genuinely PRESENT
