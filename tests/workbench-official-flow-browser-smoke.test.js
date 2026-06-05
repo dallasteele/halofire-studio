@@ -581,6 +581,19 @@ describe('Workbench official-flow browser smoke', () => {
       expect(savedReplacementRowText).toContain('claim_gate_effect no_claims_cleared');
       expect(savedReplacementRowText).toContain('explicit claim-gate resolve still required');
 
+      const readOnlyInspect = savedReplacementRow.locator(
+        `[data-placeholder-replacement-readonly-workflow="${savedReplacement.id}"]`,
+      ).first();
+      await readOnlyInspect.waitFor();
+      expect(await readOnlyInspect.getAttribute('data-signed-reviewer-workflow-action')).toBe('inspect');
+      expect(await readOnlyInspect.getAttribute('data-source-official-flow-review-decision-evidence-id')).toBe(String(decision.id));
+      expect(await readOnlyInspect.getAttribute('data-source-halofire-sam31-approval-upload-evidence-id')).toBe(String(upload.id));
+      expect(await readOnlyInspect.getAttribute('data-source-halofire-sam31-approval-upload-validation-decision-evidence-id')).toBe(String(validation.id));
+      expect(await readOnlyInspect.getAttribute('data-selected-sheet-ref')).toBe('1881://proposal-cooperative/sheet-7');
+      expect(await readOnlyInspect.getAttribute('data-selected-scale-ref')).toBe('1881://operator-scale/sheet-7/0.0833');
+      expect(await readOnlyInspect.getAttribute('data-selected-boundary-candidate-ref')).toBe('candidate:1881-official-flow-placeholder-settings');
+      expect(await readOnlyInspect.getAttribute('data-claim-gate-effect')).toBe('no_claims_cleared');
+
       const explicitResolvePreview = savedReplacementRow.locator(
         `[data-placeholder-replacement-explicit-resolve-workflow="${savedReplacement.id}"]`,
       ).first();
