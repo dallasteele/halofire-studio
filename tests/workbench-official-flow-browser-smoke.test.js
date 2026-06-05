@@ -190,7 +190,10 @@ describe('Workbench official-flow browser smoke', () => {
       const decisionRowText = await page.locator(`#evidence-${decisionEvidenceId}`).innerText();
       expect(decisionRowText).toContain('official_flow_professional_ahj_review_decision');
       expect(decisionRowText).toContain('official_flow_signed_reviewer_validation rows');
-      expect(decisionRowText).toContain('Upload real signed evidence & resolve gate');
+      expect(decisionRowText).toContain('Upload real signed evidence & resolve PROFESSIONAL_REVIEW_MISSING');
+      expect(decisionRowText).toContain('Upload real signed evidence & resolve AHJ_APPROVAL_MISSING');
+      expect(decisionRowText).toContain('Upload real signed evidence & resolve MANUFACTURER_MODEL_APPROVAL_MISSING');
+      expect(decisionRowText).toContain('Upload real signed evidence & resolve AUTOSPRINK_EVIDENCE_MISSING');
 
       const gates = await api(`${PROJECT_PATH}/claim-gates`, token);
       expect(gates.find((gate) => gate.code === 'PROFESSIONAL_REVIEW_MISSING')).toEqual(
