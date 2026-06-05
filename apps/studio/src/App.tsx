@@ -34,6 +34,13 @@ import { colors, radii, spacing, typeScale } from './lib/tokens';
 import { PartGallery } from './PartViewer';
 import { Inspector } from './Inspector';
 import { CatalogBrowser } from './CatalogBrowser';
+import { LayoutControls } from './LayoutControls';
+import { LayoutScene } from './LayoutScene';
+import { layoutHeads, type HazardClass } from './lib/layout';
+
+/** Top-level app mode: the existing part gallery vs. the sprinkler layout tool. */
+export type AppMode = 'catalog' | 'layout';
+const APP_MODES: readonly AppMode[] = ['catalog', 'layout'] as const;
 
 declare global {
   interface Window {
@@ -43,6 +50,10 @@ declare global {
       presentCount: number;
       viewMode: ViewMode;
       selectedKey: string | null;
+      /** Active top-level mode: "catalog" (gallery) or "layout" (sprinkler tool). */
+      appMode: AppMode;
+      /** Head count of the current layout (only meaningful in layout mode). */
+      headCount: number;
     };
   }
 }
@@ -52,6 +63,12 @@ export function App(): ReactElement {
   const [error, setError] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('perspective');
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
+  // Default "catalog" so existing behavior/tests are unaffected on load.
+  const [appMode, setAppMode] = useState<AppMode>('catalog');
+  // Sprinkler layout inputs (only used in layout mode).
+  const [widthFt, setWidthFt] = useState(40);
+  const [lengthFt, setLengthFt] = useState(60);
+  const [hazard, setHazard] = useState<HazardClass>('ordinary');
 
   useEffect(() => {
     let cancelled = false;
@@ -90,6 +107,12 @@ export function App(): ReactElement {
     [records],
   );
 
+  // Head count of the current layout, for verification + the header readout.
+  const headCount = useMemo(
+    () => layoutHeads({ widthFt, lengthFt, hazard }).count,
+    [widthFt, lengthFt, hazard],
+  );
+
   // Expose state for screenshot / E2E verification once parts are loaded.
   useEffect(() => {
     if (!records) return;
@@ -99,8 +122,10 @@ export function App(): ReactElement {
       presentCount: present.length,
       viewMode,
       selectedKey,
+      appMode,
+      headCount,
     };
-  }, [records, present.length, viewMode, selectedKey]);
+  }, [records, present.length, viewMode, selectedKey, appMode, headCount]);
 
   // R3F sizes its canvas via ResizeObserver, which can miss the first measure in
   // headless/SSR-hydrated contexts. Kick one resize after mount so the canvas
@@ -118,6 +143,24 @@ export function App(): ReactElement {
 
   const cam = useMemo(() => cameraConfigFor(viewMode), [viewMode]);
 
+  // Layout camera is scaled to the building footprint (1 ft = 1 scene unit), so
+  // a 40x60 room is framed in full rather than a corner close-up.
+  const layoutCam = useMemo(() => {
+    const span = Math.max(widthFt, lengthFt, 10);
+    if (viewMode === 'plan') {
+      return {
+        position: [0, span * 1.3, 0.001] as [number, number, number],
+        up: [0, 0, -1] as [number, number, number],
+        fov: 45,
+      };
+    }
+    return {
+      position: [widthFt * 0.85, span * 0.95, lengthFt * 0.85] as [number, number, number],
+      up: [0, 1, 0] as [number, number, number],
+      fov: 50,
+    };
+  }, [widthFt, lengthFt, viewMode]);
+
   return (
     <div style={rootStyle}>
       <header style={headerStyle}>
@@ -128,10 +171,18 @@ export function App(): ReactElement {
           </span>
         </div>
 
+        <AppModeControl appMode={appMode} onChange={setAppMode} />
+
         <ViewModeControl viewMode={viewMode} onChange={setViewMode} />
 
         <span style={statusChipStyle} role="status">
-          {records ? (
+          {appMode === 'layout' ? (
+            <>
+              <strong style={statusNumStyle}>{headCount}</strong> heads{' '}
+              <span style={statusSepStyle}>·</span> {widthFt}×{lengthFt} ft{' '}
+              <span style={statusSepStyle}>·</span> {hazard}
+            </>
+          ) : records ? (
             <>
               <strong style={statusNumStyle}>{counts.present}</strong> present{' '}
               <span style={statusSepStyle}>/</span>{' '}
@@ -145,40 +196,130 @@ export function App(): ReactElement {
         </span>
 
         <p style={disclaimerStyle}>
-          source: generated · NOT manufacturer-exact · not dimensionally-accurate
-          / AHJ / fabrication-ready
+          {appMode === 'layout'
+            ? 'best-effort spacing heuristic · NOT hydraulic / AHJ / PE-sealed / code-compliant · not for construction'
+            : 'source: generated · NOT manufacturer-exact · not dimensionally-accurate / AHJ / fabrication-ready'}
         </p>
       </header>
 
       <div style={bodyStyle}>
-        <CatalogBrowser
-          records={records ?? []}
-          selectedKey={selectedKey}
-          onSelect={onSelect}
-        />
+        {appMode === 'catalog' ? (
+          <>
+            <CatalogBrowser
+              records={records ?? []}
+              selectedKey={selectedKey}
+              onSelect={onSelect}
+            />
 
-        <main style={canvasWrapStyle} aria-label="3D part viewer">
-          <Canvas
-            shadows
-            dpr={[1, 2]}
-            gl={{ preserveDrawingBuffer: true }}
-            camera={{ position: cam.position, up: cam.up, fov: 45 }}
-            key={viewMode}
-          >
-            <color attach="background" args={[colors.bgInset]} />
-            <Suspense fallback={null}>
-              <PartGallery
-                parts={present}
-                viewMode={viewMode}
-                selectedKey={selectedKey}
-                onSelect={onSelect}
-              />
-            </Suspense>
-          </Canvas>
-        </main>
+            <main style={canvasWrapStyle} aria-label="3D part viewer">
+              <Canvas
+                shadows
+                dpr={[1, 2]}
+                gl={{ preserveDrawingBuffer: true }}
+                camera={{ position: cam.position, up: cam.up, fov: 45 }}
+                key={viewMode}
+              >
+                <color attach="background" args={[colors.bgInset]} />
+                <Suspense fallback={null}>
+                  <PartGallery
+                    parts={present}
+                    viewMode={viewMode}
+                    selectedKey={selectedKey}
+                    onSelect={onSelect}
+                  />
+                </Suspense>
+              </Canvas>
+            </main>
 
-        <Inspector part={selected} />
+            <Inspector part={selected} />
+          </>
+        ) : (
+          <>
+            <LayoutControls
+              widthFt={widthFt}
+              lengthFt={lengthFt}
+              hazard={hazard}
+              onWidthChange={setWidthFt}
+              onLengthChange={setLengthFt}
+              onHazardChange={setHazard}
+            />
+
+            <main style={canvasWrapStyle} aria-label="Sprinkler layout viewer">
+              <Canvas
+                shadows
+                dpr={[1, 2]}
+                gl={{ preserveDrawingBuffer: true }}
+                camera={{ position: layoutCam.position, up: layoutCam.up, fov: layoutCam.fov }}
+                key={`layout-${viewMode}-${widthFt}x${lengthFt}`}
+              >
+                <Suspense fallback={null}>
+                  <LayoutScene
+                    widthFt={widthFt}
+                    lengthFt={lengthFt}
+                    hazard={hazard}
+                    viewMode={viewMode}
+                  />
+                </Suspense>
+              </Canvas>
+            </main>
+          </>
+        )}
       </div>
+    </div>
+  );
+}
+
+/* ----------------------------------------------- Catalog / Layout mode switch */
+
+interface AppModeControlProps {
+  appMode: AppMode;
+  onChange: (m: AppMode) => void;
+}
+
+/**
+ * Accessible segmented control (radiogroup) toggling the top-level app mode:
+ * Catalog (part gallery) vs. Layout (sprinkler tool). Same keyboard pattern as
+ * ViewModeControl: Tab to the active button, arrows to switch.
+ */
+function AppModeControl({ appMode, onChange }: AppModeControlProps): ReactElement {
+  const options: { mode: AppMode; label: string }[] = [
+    { mode: 'catalog', label: 'Catalog' },
+    { mode: 'layout', label: 'Layout' },
+  ];
+
+  return (
+    <div role="radiogroup" aria-label="Studio mode" style={segmentStyle}>
+      {options.map(({ mode, label }) => {
+        const active = appMode === mode;
+        const idx = APP_MODES.indexOf(mode);
+        return (
+          <button
+            key={mode}
+            type="button"
+            role="radio"
+            aria-checked={active}
+            tabIndex={active ? 0 : -1}
+            onClick={() => onChange(mode)}
+            onKeyDown={(e) => {
+              if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                e.preventDefault();
+                onChange(APP_MODES[Math.min(APP_MODES.length - 1, idx + 1)]);
+              } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                e.preventDefault();
+                onChange(APP_MODES[Math.max(0, idx - 1)]);
+              }
+            }}
+            style={{
+              ...segmentBtnStyle,
+              background: active ? colors.interactiveActive : 'transparent',
+              color: active ? '#ffffff' : colors.textSecondary,
+              fontWeight: active ? 600 : 500,
+            }}
+          >
+            {label}
+          </button>
+        );
+      })}
     </div>
   );
 }
