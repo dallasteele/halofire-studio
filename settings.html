@@ -1016,6 +1016,7 @@ $('wizSubmit').onclick = async () => {
   }
   try {
     const signoff = selectedEvidenceNeedsSignoff() ? wizardSignoffPayload() : null;
+    if (signoff && !payload.settings_prefill_href) payload.settings_prefill_href = currentSettingsPrefillHref();
     if (signoff) payload.signoff = signoff; // Preserve reviewer metadata even when recording evidence only.
     let submitMessage = '';
     if ($('wizAction').value === 'resolve') {

@@ -152,7 +152,9 @@ describe('Settings signed reviewer browser smoke', () => {
     try {
       await page.goto(`${BASE}/workbench.html`, { waitUntil: 'domcontentloaded' });
       await page.getByText('Signed reviewer packet browser-smoke PR-1881-100').waitFor();
-      await page.locator(`[data-signed-reviewer-workflow-evidence-id="${recorded.id}"]`).click();
+      const savedRow = page.locator(`#evidence-${recorded.id}`).first();
+      await savedRow.waitFor();
+      await savedRow.locator(`[data-signed-reviewer-workflow-evidence-id="${recorded.id}"]`).first().click();
       await page.waitForURL(/settings\.html\?/);
       await page.locator('#wizExistingEvidence').waitFor();
       await page.waitForFunction(
@@ -160,7 +162,7 @@ describe('Settings signed reviewer browser smoke', () => {
         String(recorded.id),
       );
       expect(await page.locator('#wizExistingEvidence').inputValue()).toBe(String(recorded.id));
-      expect(await page.locator('#wizPacketStatus').innerText()).toContain(`Prefilled from Workbench for evidence #${recorded.id}`);
+      expect(await page.locator('#wizPacketStatus').innerText()).toContain(`Read-only accepted signed reviewer evidence #${recorded.id}`);
       expect(await page.locator('#wizPacketStatus').getAttribute('data-signed-reviewer-prefill-evidence-id')).toBe(String(recorded.id));
       expect(await page.locator('#wizPacketStatus').getAttribute('data-signed-reviewer-prefill-gate')).toBe('PROFESSIONAL_REVIEW_MISSING');
       expect(await page.locator('#wizPacketStatus').getAttribute('data-signed-reviewer-review-packet-href')).toBe(
@@ -177,6 +179,84 @@ describe('Settings signed reviewer browser smoke', () => {
       await page.locator('#wizResolveAudit').click();
       await page.waitForFunction(() => document.getElementById('wizPacketStatus')?.textContent?.includes('Downloaded halofire.claim_gate_resolve_audit_packet.v1'));
       expect(await page.locator('#wizPacketStatus').innerText()).toContain('gate_cleared_after_explicit_signed_validation');
+    } finally {
+      await page.close();
+    }
+  }, 30_000);
+
+  it('persists generic blocked-gate Settings prefill after resolving signed evidence from Workbench', async () => {
+    const token = await adminToken();
+    const projectName = `Settings Generic Prefill ${Date.now()}`;
+    const projectPath = `/api/projects/${encodeURIComponent(projectName)}`;
+    const gateCode = 'PROFESSIONAL_REVIEW_MISSING';
+    const sourceRef = 'pe-review://settings-browser-smoke/generic-prefill-persist';
+
+    await api(`${projectPath}/claim-gates`, token);
+
+    const page = await browser.newPage();
+    page.setDefaultTimeout(8000);
+    await page.addInitScript((authToken) => {
+      localStorage.setItem('halofire_token', authToken);
+    }, token);
+
+    try {
+      await page.goto(`${BASE}/workbench.html?project=${encodeURIComponent(projectName)}`, { waitUntil: 'domcontentloaded' });
+      const blockedGateButton = page.locator(`[data-claim-gate-signed-reviewer-workflow="${gateCode}"]`).first();
+      await blockedGateButton.waitFor();
+      await blockedGateButton.click();
+
+      await page.waitForURL((url) => url.pathname === '/settings.html' && url.hash === '#wizSignoff');
+      await page.locator('#wizGate').waitFor();
+      await page.waitForFunction(
+        (expectedGate) => document.getElementById('wizGate')?.value === expectedGate,
+        gateCode,
+      );
+      const preSubmitHref = new URL(page.url()).pathname + new URL(page.url()).search + new URL(page.url()).hash;
+      expect(preSubmitHref).toContain(`gate=${gateCode}`);
+      expect(preSubmitHref).not.toContain('uploadPacketHref=');
+
+      await page.locator('#wizSourceRef').fill(sourceRef);
+      await page.locator('#wizSourceFile').fill('generic-prefill-persist-professional-review.pdf');
+      await page.locator('#wizReviewerName').fill('Generic Prefill Resolver');
+      await page.locator('#wizReviewerTitle').fill('Licensed PE');
+      await page.locator('#wizSignedAt').fill('2026-06-05T12:10');
+      await page.locator('#wizOrganization').fill('Halo Fire');
+      await page.locator('#wizLicenseId').fill('PE-GENERIC-PREFILL-001');
+      await page.locator('#wizAction').selectOption('resolve');
+      await page.locator('#wizSubmit').click();
+      await page.waitForFunction(() => document.getElementById('wizMsg')?.textContent?.includes('gate resolved with accepted evidence'));
+
+      const evidenceRows = await api(`${projectPath}/evidence`, token);
+      const saved = evidenceRows.find((row) => row.evidence_type === 'professional_review'
+        && row.source_ref === sourceRef);
+      expect(saved).toBeTruthy();
+      const savedNotes = JSON.parse(saved.notes);
+      expect(savedNotes.kind).toBe('signed_reviewer_evidence');
+      expect(savedNotes.claim_gate_effect).toBe('gate_cleared_after_explicit_signed_validation');
+      expect(savedNotes.settings_prefill_href).toBe(preSubmitHref);
+
+      await page.goto(`${BASE}/workbench.html?project=${encodeURIComponent(projectName)}#evidence-${saved.id}`, {
+        waitUntil: 'domcontentloaded',
+      });
+      const savedRow = page.locator(`#evidence-${saved.id}`).first();
+      await savedRow.waitFor();
+      expect(await savedRow.innerText()).toContain('settings_prefill_href');
+      expect(await savedRow.innerText()).toContain('Open accepted evidence read-only');
+      const inspectHref = await savedRow.locator('[data-signed-reviewer-workflow-href]').getAttribute('data-signed-reviewer-workflow-href');
+      expect(inspectHref).toContain(`gate=${gateCode}`);
+      expect(inspectHref).toContain(`evidenceId=${saved.id}`);
+      expect(inspectHref).toContain('action=inspect');
+
+      await savedRow.locator('[data-signed-reviewer-workflow-evidence-id]').first().click();
+      await page.waitForURL((url) => url.pathname === '/settings.html' && url.hash === '#wizSignoff');
+      await page.waitForFunction(
+        (expectedGate) => document.getElementById('wizGate')?.value === expectedGate,
+        gateCode,
+      );
+      expect(page.url()).toContain(`gate=${gateCode}`);
+      expect(page.url()).not.toContain('uploadPacketHref=');
+      expect(await page.locator('#wizGate').inputValue()).toBe(gateCode);
+      expect(await page.locator('#wizPacketStatus').innerText()).toContain(`Read-only accepted signed reviewer evidence #${saved.id}`);
     } finally {
       await page.close();
     }
@@ -400,27 +480,29 @@ describe('Settings signed reviewer browser smoke', () => {
       });
       const savedRow = page.locator(`#evidence-${saved.id}`).first();
       await savedRow.waitFor();
-      expect(await savedRow.innerText()).toContain('Open Settings packet prefill');
-      expect(await savedRow.locator('[data-signed-reviewer-workflow-href]').getAttribute('data-signed-reviewer-workflow-href')).toBe(
-        savedNotes.settings_prefill_href,
-      );
+      expect(await savedRow.innerText()).toContain('Open accepted evidence read-only');
+      const inspectHref = await savedRow.locator('[data-signed-reviewer-workflow-href]').getAttribute('data-signed-reviewer-workflow-href');
+      expect(inspectHref).toContain(`gate=${targetGateCode}`);
+      expect(inspectHref).toContain(`evidenceId=${saved.id}`);
+      expect(inspectHref).toContain('action=inspect');
 
       await page.reload({ waitUntil: 'domcontentloaded' });
       const savedRowAfterRefresh = page.locator(`#evidence-${saved.id}`).first();
       await savedRowAfterRefresh.waitFor();
-      expect(await savedRowAfterRefresh.innerText()).toContain('Open Settings packet prefill');
+      expect(await savedRowAfterRefresh.innerText()).toContain('Open accepted evidence read-only');
       await savedRowAfterRefresh.locator('[data-signed-reviewer-workflow-evidence-id]').first().click();
       await page.waitForURL((url) => url.pathname === '/settings.html' && url.hash === '#wizSignoff');
       await page.waitForFunction(
-        (packetHref) => document.getElementById('wizPacketStatus')?.dataset.officialFlowUploadPacketHref === packetHref,
-        uploadPacketHref,
+        (expectedGate) => document.getElementById('wizGate')?.value === expectedGate,
+        targetGateCode,
       );
-      expect(page.url()).toContain('uploadPacketHref=');
+      expect(page.url()).not.toContain('uploadPacketHref=');
+      expect(page.url()).toContain(`evidenceId=${saved.id}`);
+      expect(page.url()).toContain('action=inspect');
       expect(await page.locator('#wizGate').inputValue()).toBe(targetGateCode);
       expect(await page.locator('#wizType').inputValue()).toBe(targetEvidenceType);
       expect(await page.locator('#wizSourceRef').inputValue()).toBe(targetSourceRef);
-      expect(await page.locator('#wizPacketStatus').innerText()).toContain('Prefilled from halofire.official_flow_signed_evidence_upload_packet.v1');
-      expect(await page.locator('#wizPacketStatus').getAttribute('data-official-flow-upload-packet-no-claim-gates-cleared')).toBe('true');
+      expect(await page.locator('#wizPacketStatus').innerText()).toContain(`Read-only accepted signed reviewer evidence #${saved.id}`);
     } finally {
       await page.close();
     }
