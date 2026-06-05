@@ -433,7 +433,7 @@ describe('Workbench official-flow browser smoke', () => {
       expect(queueText).toContain(`review_decision_evidence #${decision.id}`);
       expect(queueText).toContain('gate_cleared_after_explicit_signed_validation');
       expect(queueText).toContain('halofire.claim_gate_resolve_audit_packet.v1');
-      expect(queueText).toContain('Open Settings packet prefill');
+      expect(queueText).toContain('Open accepted evidence read-only');
       await expect(queue.locator('[data-official-flow-signed-evidence-upload-packet-gate-code="MANUFACTURER_MODEL_APPROVAL_MISSING"]').count()).resolves.toBe(0);
       await expect(queue.locator('[data-official-flow-signed-reviewer-resolve-workflow][data-official-flow-signed-reviewer-resolve-gate-code="MANUFACTURER_MODEL_APPROVAL_MISSING"]').count()).resolves.toBe(0);
 
@@ -445,12 +445,17 @@ describe('Workbench official-flow browser smoke', () => {
       await clearedManufacturerRow.locator('[data-signed-reviewer-workflow-gate-code="MANUFACTURER_MODEL_APPROVAL_MISSING"]').click();
       await page.waitForURL((url) => url.pathname === '/settings.html' && url.hash === '#wizSignoff');
       await page.waitForFunction(
-        () => document.getElementById('wizPacketStatus')?.dataset.officialFlowUploadPacketHref,
+        (resolvedEvidenceId) => document.getElementById('wizPacketStatus')?.dataset.signedReviewerReadonlyEvidenceId === resolvedEvidenceId,
+        String(resolved.resolved_evidence_id),
       );
-      expect(await page.locator('#wizPacketStatus').innerText()).toContain('Prefilled from halofire.official_flow_signed_evidence_upload_packet.v1');
-      expect(await page.locator('#wizPacketStatus').getAttribute('data-official-flow-upload-packet-claim-gate-effect')).toBe('requires_real_signed_evidence');
-      expect(page.url()).toContain('uploadPacketHref=');
+      expect(await page.locator('#wizPacketStatus').innerText()).toContain('Read-only accepted signed reviewer evidence');
+      expect(await page.locator('#wizPacketStatus').innerText()).toContain('halofire.claim_gate_resolve_audit_packet.v1');
+      expect(await page.locator('#wizPacketStatus').getAttribute('data-signed-reviewer-claim-gate-effect')).toBe('gate_cleared_after_explicit_signed_validation');
+      expect(await page.locator('#wizPacketStatus').getAttribute('data-signed-reviewer-resolve-audit-href')).toMatch(/MANUFACTURER_MODEL_APPROVAL_MISSING\/resolve-audit-packet/);
+      expect(page.url()).toContain('action=inspect');
+      expect(page.url()).not.toContain('uploadPacketHref=');
       expect(await page.locator('#wizGate').inputValue()).toBe('MANUFACTURER_MODEL_APPROVAL_MISSING');
+      expect(await page.locator('#wizSubmit').isDisabled()).toBe(true);
     } finally {
       await page.close();
     }

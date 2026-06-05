@@ -304,6 +304,11 @@ function clearWizardOfficialFlowContext() {
   packetStatus.removeAttribute('data-official-flow-upload-packet-source-replay-evidence-id');
   packetStatus.removeAttribute('data-official-flow-upload-packet-source-attachment-intake-packet-evidence-id');
   packetStatus.removeAttribute('data-official-flow-upload-packet-source-attachment-intake-row-index');
+  packetStatus.removeAttribute('data-signed-reviewer-readonly-evidence-id');
+  packetStatus.removeAttribute('data-signed-reviewer-claim-gate-effect');
+  packetStatus.removeAttribute('data-signed-reviewer-resolve-audit-href');
+  packetStatus.removeAttribute('data-signed-reviewer-resolve-audit-artifact-type');
+  packetStatus.removeAttribute('data-signed-reviewer-no-unrelated-claims-cleared');
 }
 
 function syncWizardGateForm(options = {}) {
@@ -388,6 +393,10 @@ function prefillEvidenceWizardFromUrl() {
   };
 }
 
+function isWizardReadonlyInspectMode() {
+  return wizardUrlPrefill.action === 'inspect';
+}
+
 async function applyWizardUrlPrefill() {
   if (wizardUrlPrefill.gate && wizardState.gateMap.has(wizardUrlPrefill.gate)) {
     $('wizGate').value = wizardUrlPrefill.gate;
@@ -446,10 +455,25 @@ function hydrateWizardFromExistingEvidence() {
   packetStatus.dataset.signedReviewerPrefillGate = packetContext.targetGateCode || gate.code || '';
   packetStatus.dataset.signedReviewerReviewPacketHref = packetContext.reviewPacketHref || gate.review_packet_href || '';
   packetStatus.dataset.signedReviewerResolveAuditHref = packetContext.resolveAuditHref || '';
+  packetStatus.dataset.signedReviewerClaimGateEffect = packetContext.claimGateEffect || '';
   packetStatus.textContent = `Prefilled from Workbench for evidence #${selectedEvidenceId}.`
     + (packetContext.targetGateCode ? ` target_gate_code ${packetContext.targetGateCode}.` : '')
     + (packetContext.reviewPacketHref ? ` Review packet route ${packetContext.reviewPacketHref}.` : ' Resolve the gate or download the packet for this signed reviewer lane.')
     + (packetContext.resolveAuditHref ? ` Resolve audit route ${packetContext.resolveAuditHref}.` : '');
+  if (wizardUrlPrefill.action === 'inspect') {
+    packetStatus.dataset.signedReviewerReadonlyEvidenceId = String(selectedEvidenceId);
+    packetStatus.dataset.signedReviewerClaimGateEffect = packetContext.claimGateEffect || 'gate_cleared_after_explicit_signed_validation';
+    packetStatus.dataset.signedReviewerResolveAuditHref = packetContext.resolveAuditHref || '';
+    packetStatus.dataset.signedReviewerResolveAuditArtifactType = packetContext.resolveAuditArtifactType || 'halofire.claim_gate_resolve_audit_packet.v1';
+    packetStatus.dataset.signedReviewerNoUnrelatedClaimsCleared = 'true';
+    packetStatus.textContent = `Read-only accepted signed reviewer evidence #${selectedEvidenceId}; claim_gate_effect ${packetStatus.dataset.signedReviewerClaimGateEffect}; `
+      + `${packetStatus.dataset.signedReviewerResolveAuditArtifactType} ${packetContext.resolveAuditHref ? `ready at ${packetContext.resolveAuditHref}` : 'missing'}; `
+      + 'this route does not reopen a requires_real_signed_evidence upload packet.';
+    $('wizAction').value = 'record';
+    $('wizAction').disabled = true;
+    $('wizUseExisting').disabled = true;
+    $('wizSubmit').disabled = true;
+  }
   syncWizardSignoff();
 }
 
@@ -672,7 +696,7 @@ async function loadWizard(projectName) {
       </div>`).join('') || '<span class="muted">no gates for this project</span>';
     $('wizGate').innerHTML = (data.gates || []).map((gate) => `<option value="${gate.code}">${gate.code}</option>`).join('');
     await applyWizardUrlPrefill();
-    $('wizSubmit').disabled = !wizardState.canWrite;
+    $('wizSubmit').disabled = !wizardState.canWrite || isWizardReadonlyInspectMode();
     $('wizGates').querySelectorAll('[data-gate-pick]').forEach((btn) => btn.addEventListener('click', () => {
       $('wizGate').value = btn.getAttribute('data-gate-pick');
       syncWizardGateForm();
@@ -811,6 +835,11 @@ $('wizResolveAudit').addEventListener('click', downloadClaimGateResolveAuditPack
 $('wizUseExisting').addEventListener('click', resolveWizardWithExistingEvidence);
 $('wizSubmit').onclick = async () => {
   const msg = $('wizMsg'); msg.className = 'muted'; msg.textContent = '';
+  if (isWizardReadonlyInspectMode()) {
+    msg.className = 'err';
+    msg.textContent = 'read-only accepted evidence inspection; start a new evidence workflow to submit changes';
+    return;
+  }
   const gateCode = $('wizGate').value;
   const evidence_type = $('wizType').value;
   const source_ref = $('wizSourceRef').value.trim();
