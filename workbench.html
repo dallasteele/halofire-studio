@@ -4729,6 +4729,18 @@ function renderOfficialFlowSignedReviewerValidationRows(rows, sourceEvidenceId =
     const canMirrorToSam31ApprovalUpload = ['professional_review', 'ahj_approval', 'manufacturer_approval'].includes(requiredEvidenceType);
     const isCleared = row.status === 'gate_cleared_after_explicit_signed_validation'
       || row.claim_gate_effect === 'gate_cleared_after_explicit_signed_validation';
+    const latestSam31ApprovalValidationDecision = latestSam31ApprovalUploadIntake?.latest_approval_upload_validation_decision || null;
+    const latestSam31ApprovalValidationIsPlaceholder = latestSam31ApprovalValidationDecision
+      && latestSam31ApprovalValidationDecision.claim_gate_effect !== 'ready_for_explicit_gate_resolve'
+      && String(latestSam31ApprovalValidationDecision.validation_decision || '') === 'default_internal_alpha_placeholder_rejected';
+    const officialFlowSelected1881DataAttrs = renderSam31Selected1881DataAttrs(
+      latestSam31ApprovalUploadIntake,
+      latestSam31ApprovalValidationDecision,
+      row,
+    );
+    const officialFlowPlaceholderReplacementReadbackEvidenceId = latestSam31ApprovalValidationDecision?.source_openclaw_sam31_actual_value_replacement_readback_evidence_id
+      || latestSam31ApprovalUploadIntake?.source_openclaw_sam31_actual_value_replacement_readback_evidence_id
+      || '';
     const clearedSettingsPrefillHref = String(row.resolved_evidence_settings_href || '').trim();
     const clearedWorkflowEvidenceId = String(row.resolved_evidence_id || '');
     const auditHref = row.resolve_audit_packet_href
@@ -4755,6 +4767,7 @@ function renderOfficialFlowSignedReviewerValidationRows(rows, sourceEvidenceId =
         claim_gate_effect ${escapeHtml(latestSam31ApprovalUploadIntake.claim_gate_effect || 'no_claims_cleared')} - no_claim_gates_cleared ${escapeHtml(latestSam31ApprovalUploadIntake.no_claim_gates_cleared === false ? 'false' : 'true')} - placeholder_upload ${escapeHtml(latestSam31ApprovalUploadIntake.placeholder_upload ? 'true' : 'false')}<br>
         <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#7c3aed" data-official-flow-sam31-approval-validation-queue="1" data-sam31-approval-upload-default-validation-packet="${escapeHtml(latestSam31ApprovalUploadEvidenceId)}" data-sam31-approval-upload-gate-validation-packet-href="${escapeHtml(sam31ApprovalGateValidationPacketAction.href || '')}" data-sam31-approval-validation-filter-href="${escapeHtml(sam31ApprovalValidationQueueAction.href || `/api/projects/${encodeURIComponent(currentProjectName())}/resolver-queue?sam31ApprovalValidation=pending&targetGate=${encodeURIComponent(gateCode || '')}`)}" data-source-official-flow-review-decision-evidence-id="${escapeHtml(evidenceId)}" data-source-halofire-sam31-approval-upload-evidence-id="${escapeHtml(latestSam31ApprovalUploadEvidenceId)}" data-claim-gate-effect="no_claims_cleared" onclick="openSam31ApprovalUploadDefaultValidationPacket(${JSON.stringify(latestSam31ApprovalUploadEvidenceId)})">Open saved SAM31 approval validation queue</button>
         <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0f766e" data-sam31-approval-upload-validation-decision-save-evidence-id="${escapeHtml(latestSam31ApprovalUploadEvidenceId)}" data-sam31-approval-upload-validation-target-gate-code="${escapeHtml(gateCode)}" data-sam31-approval-upload-validation-resolve-href="${escapeHtml(sam31ApprovalValidationQueueAction.href || '')}">Save default placeholder validation decision</button>
+        ${latestSam31ApprovalValidationIsPlaceholder ? `<button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0f766e" data-official-flow-sam31-approval-upload-placeholder-replacement-workflow="${escapeHtml(latestSam31ApprovalValidationDecision.evidence_id || '')}" data-signed-reviewer-workflow-evidence-id="${escapeHtml(latestSam31ApprovalValidationDecision.evidence_id || '')}" data-signed-reviewer-workflow-gate-code="${escapeHtml(gateCode)}" data-source-official-flow-review-decision-evidence-id="${escapeHtml(evidenceId)}" data-source-halofire-sam31-approval-upload-evidence-id="${escapeHtml(latestSam31ApprovalUploadEvidenceId)}" data-source-openclaw-sam31-actual-value-replacement-readback-evidence-id="${escapeHtml(officialFlowPlaceholderReplacementReadbackEvidenceId)}" data-claim-gate-effect="no_claims_cleared"${officialFlowSelected1881DataAttrs}>Replace placeholder with real signed evidence</button>` : ''}
         <div class="muted" id="sam31ApprovalUploadValidationStatus-${escapeHtml(latestSam31ApprovalUploadEvidenceId)}" style="font-size:11px;margin-top:4px">Saved default/internal-alpha SAM31 approval upload already exists; continue to pending validation readback/download or replace with real signed evidence before resolving claims.</div>
         <div class="muted" id="sam31ApprovalValidationDecisionStatus-${escapeHtml(latestSam31ApprovalUploadEvidenceId)}" style="font-size:11px;margin-top:4px"></div>
       </div>` : ''}`;

@@ -93,6 +93,9 @@ describe('workbench signed reviewer evidence detail rendering', () => {
     expect(html).toContain('data-sam31-approval-upload-default-validation-packet');
     expect(html).toContain('data-sam31-approval-upload-validation-decision-save-evidence-id');
     expect(html).toContain('data-source-official-flow-review-decision-evidence-id');
+    expect(html).toContain('Replace placeholder with real signed evidence');
+    expect(html).toContain('data-official-flow-sam31-approval-upload-placeholder-replacement-workflow');
+    expect(html).toContain('data-source-halofire-sam31-approval-upload-evidence-id');
     expect(html).toContain('sam31ApprovalValidation=pending');
     expect(html).toContain('halofireUiBasePath');
     expect(html).toContain('halofireUiHref');
