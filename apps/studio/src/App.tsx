@@ -20,6 +20,7 @@ import {
   type ViewMode,
 } from './lib/view-mode';
 import { PartGallery } from './PartViewer';
+import { Inspector } from './Inspector';
 
 declare global {
   interface Window {
@@ -28,6 +29,7 @@ declare global {
       partCount: number;
       presentCount: number;
       viewMode: ViewMode;
+      selectedKey: string | null;
     };
   }
 }
@@ -36,6 +38,7 @@ export function App(): ReactElement {
   const [records, setRecords] = useState<PartRecord[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('perspective');
+  const [selectedKey, setSelectedKey] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -64,6 +67,11 @@ export function App(): ReactElement {
     [records],
   );
 
+  const selected = useMemo(
+    () => present.find((p) => p.key === selectedKey) ?? null,
+    [present, selectedKey],
+  );
+
   // Expose state for screenshot / E2E verification once parts are loaded.
   useEffect(() => {
     if (!records) return;
@@ -72,8 +80,9 @@ export function App(): ReactElement {
       partCount: records.length,
       presentCount: present.length,
       viewMode,
+      selectedKey,
     };
-  }, [records, present.length, viewMode]);
+  }, [records, present.length, viewMode, selectedKey]);
 
   // R3F sizes its canvas via ResizeObserver, which can miss the first measure in
   // headless/SSR-hydrated contexts. Kick one resize after mount so the canvas
@@ -87,6 +96,10 @@ export function App(): ReactElement {
 
   const onToggle = useCallback(() => {
     setViewMode((m) => toggleViewMode(m));
+  }, []);
+
+  const onSelect = useCallback((part: PartRecord) => {
+    setSelectedKey(part.key);
   }, []);
 
   const cam = useMemo(() => cameraConfigFor(viewMode), [viewMode]);
@@ -110,19 +123,27 @@ export function App(): ReactElement {
         </span>
       </header>
 
-      <div style={canvasWrapStyle}>
-        <Canvas
-          shadows
-          dpr={[1, 2]}
-          gl={{ preserveDrawingBuffer: true }}
-          camera={{ position: cam.position, up: cam.up, fov: 45 }}
-          key={viewMode}
-        >
-          <color attach="background" args={['#11161d']} />
-          <Suspense fallback={null}>
-            <PartGallery parts={present} viewMode={viewMode} />
-          </Suspense>
-        </Canvas>
+      <div style={bodyStyle}>
+        <div style={canvasWrapStyle}>
+          <Canvas
+            shadows
+            dpr={[1, 2]}
+            gl={{ preserveDrawingBuffer: true }}
+            camera={{ position: cam.position, up: cam.up, fov: 45 }}
+            key={viewMode}
+          >
+            <color attach="background" args={['#11161d']} />
+            <Suspense fallback={null}>
+              <PartGallery
+                parts={present}
+                viewMode={viewMode}
+                selectedKey={selectedKey}
+                onSelect={onSelect}
+              />
+            </Suspense>
+          </Canvas>
+        </div>
+        <Inspector part={selected} />
       </div>
     </div>
   );
@@ -165,7 +186,15 @@ const provenanceStyle: React.CSSProperties = {
   fontSize: 12,
 };
 
+const bodyStyle: React.CSSProperties = {
+  flex: 1,
+  display: 'flex',
+  flexDirection: 'row',
+  minHeight: 0,
+};
+
 const canvasWrapStyle: React.CSSProperties = {
   flex: 1,
+  minWidth: 0,
   minHeight: 0,
 };

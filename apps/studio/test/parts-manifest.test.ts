@@ -51,6 +51,30 @@ describe('normalizeManifest (real manifest)', () => {
     // And the manifest itself reports zero manufacturer-exact parts.
     expect(raw.manufacturerExactCount).toBe(0);
   });
+
+  it('derives modelStatus "visual_reference" for present generated parts (no upgrade)', () => {
+    const present = records.filter((r) => r.present);
+    expect(present.length).toBeGreaterThan(0);
+    for (const r of present) {
+      // Every present part in this manifest is source="generated".
+      expect(r.source).toBe('generated');
+      // Generated/OpenSCAD massing must NEVER read as engineering-accurate.
+      expect(r.modelStatus).toBe('visual_reference');
+      // And manufacturerExact must stay honestly false.
+      expect(r.manufacturerExact).toBe(false);
+    }
+  });
+
+  it('derives modelStatus "visual_reference" for missing parts too (fail-safe)', () => {
+    const cap = records.find((r) => r.key === 'fitting_cap')!;
+    expect(cap.source).toBe('missing');
+    expect(cap.modelStatus).toBe('visual_reference');
+    expect(cap.manufacturerExact).toBe(false);
+  });
+
+  it('every record across the manifest derives the lowest tier (none are upgraded)', () => {
+    expect(records.every((r) => r.modelStatus === 'visual_reference')).toBe(true);
+  });
 });
 
 describe('presentParts', () => {

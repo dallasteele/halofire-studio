@@ -17,16 +17,20 @@ const CELL_SPACING = 3.2;
 const TARGET_SIZE = 2;
 
 interface PartProps {
+  part: PartRecord;
   url: string;
   position: [number, number, number];
+  selected: boolean;
+  onSelect: (part: PartRecord) => void;
 }
 
 /**
  * Load one STL imperatively (no Suspense), center it, recompute normals, and
  * bake a normalize-to-unit scale into the geometry so heterogeneous parts
- * compare. Renders nothing until the geometry is ready.
+ * compare. Renders nothing until the geometry is ready. Clicking the mesh
+ * selects it; the selected mesh is highlighted via emissive color.
  */
-function Part({ url, position }: PartProps): ReactElement | null {
+function Part({ part, url, position, selected, onSelect }: PartProps): ReactElement | null {
   const [geo, setGeo] = useState<BufferGeometry | null>(null);
 
   useEffect(() => {
@@ -60,8 +64,23 @@ function Part({ url, position }: PartProps): ReactElement | null {
   if (!geo) return null;
 
   return (
-    <mesh geometry={geo} position={position} castShadow receiveShadow>
-      <meshStandardMaterial color="#b8c2cc" metalness={0.35} roughness={0.55} />
+    <mesh
+      geometry={geo}
+      position={position}
+      castShadow
+      receiveShadow
+      onPointerDown={(e) => {
+        e.stopPropagation();
+        onSelect(part);
+      }}
+    >
+      <meshStandardMaterial
+        color={selected ? '#ffd166' : '#b8c2cc'}
+        emissive={selected ? '#7a4f00' : '#000000'}
+        emissiveIntensity={selected ? 0.6 : 0}
+        metalness={0.35}
+        roughness={0.55}
+      />
     </mesh>
   );
 }
@@ -69,10 +88,19 @@ function Part({ url, position }: PartProps): ReactElement | null {
 export interface PartGalleryProps {
   parts: PartRecord[];
   viewMode: ViewMode;
+  /** Key of the currently selected part, or null. */
+  selectedKey: string | null;
+  /** Called when a part mesh is clicked. */
+  onSelect: (part: PartRecord) => void;
 }
 
 /** Lay present parts out in a grid (6 columns), centered on the origin. */
-export function PartGallery({ parts, viewMode }: PartGalleryProps): ReactElement {
+export function PartGallery({
+  parts,
+  viewMode,
+  selectedKey,
+  onSelect,
+}: PartGalleryProps): ReactElement {
   const placed = useMemo(() => {
     const renderable = parts.filter((p) => p.present && p.stlUrl);
     const rows = Math.ceil(renderable.length / GRID_COLUMNS) || 1;
@@ -99,7 +127,14 @@ export function PartGallery({ parts, viewMode }: PartGalleryProps): ReactElement
         position={[0, -1.4, 0]}
       />
       {placed.map(({ part, position }) => (
-        <Part key={part.key} url={part.stlUrl as string} position={position} />
+        <Part
+          key={part.key}
+          part={part}
+          url={part.stlUrl as string}
+          position={position}
+          selected={part.key === selectedKey}
+          onSelect={onSelect}
+        />
       ))}
       {viewMode === 'plan' ? (
         <MapControls makeDefault target={[0, 0, 0]} />

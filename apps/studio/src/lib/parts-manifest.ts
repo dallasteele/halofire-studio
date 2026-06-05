@@ -5,6 +5,8 @@
 // NOT manufacturer-exact and NOT dimensionally accurate / AHJ / fabrication-ready.
 // This module never fabricates parts and never silently flips manufacturerExact.
 
+import { deriveModelStatus, type ModelStatus } from './provenance';
+
 export interface RawComponent {
   key: string;
   category: string;
@@ -40,6 +42,11 @@ export interface PartRecord {
   file: string | null;
   /** Public URL derived from `file`, e.g. "/parts/head_pendent.stl". null when no file. */
   stlUrl: string | null;
+  /**
+   * Accuracy tier derived from `source` + `manufacturerExact` (fail-safe to the
+   * lowest tier). Generated/OpenSCAD parts derive "visual_reference".
+   */
+  modelStatus: ModelStatus;
 }
 
 /**
@@ -75,6 +82,11 @@ export function normalizeManifest(raw: RawManifest | null | undefined): PartReco
       present: c.present === true,
       file,
       stlUrl: deriveStlUrl(file),
+      // Derived honestly from source + manufacturerExact; never an upgrade.
+      modelStatus: deriveModelStatus({
+        source: c.source,
+        manufacturerExact: c.manufacturerExact,
+      }),
     };
   });
 }

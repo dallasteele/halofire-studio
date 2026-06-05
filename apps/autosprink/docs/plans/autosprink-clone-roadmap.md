@@ -746,11 +746,36 @@ so AI placeholders are never mistaken for engineering-accurate CAD.
       surfaced truthfully as NOT manufacturer-exact; NO 3D-model generation run was
       performed or claimed; no claim gate touched. Preview: `apps/studio` `npm run dev`
       (3220) / `vite preview` (static). Pure frontend — no OpenClaw/GX10/GPU.
-- [ ] **T42 — Part-provenance + accuracy-badge model (GX10-independent).** Add to
-      `packages/halofire-catalog` + the viewer inspector: every part record carries
-      `source` ('manufacturer-step' | 'build123d' | 'step.parts' | 'ai-placeholder') and
-      a `dimensionVerified` flag; render a colored badge so AI meshes are NEVER shown as
-      engineering-accurate. Tests on the schema + badge mapping.
+- [x] **T42 — Part-provenance + accuracy-badge model (GX10-independent).** DONE
+      2026-06-05 (ultra workflow wqmn405ao, implement + adversarial honesty+correctness
+      verifiers BOTH PASS). Built in `apps/studio` (the runnable studio), ALIGNED EXACTLY
+      to the catalog accuracy spine `packages/halofire-catalog/src/schema.ts`
+      `CatalogModelStatusSchema` (5 ordered tiers: visual_reference < proxy <
+      dimensioned_parametric < manufacturer_verified < sealed_approved) — model_status is
+      the canonical accuracy axis (richer than a bare dimensionVerified flag). NEW
+      `src/lib/provenance.ts` (pure): ModelStatus + MODEL_STATUS_ORDER; PartSource
+      ('manufacturer-step'|'build123d'|'step.parts'|'ai-placeholder'|'generated'|'unknown');
+      `deriveModelStatus` (generated/ai-placeholder→visual_reference, step.parts→proxy,
+      build123d→dimensioned_parametric, manufacturer-step + manufacturerExact===true→
+      manufacturer_verified, ALL else incl. uncertainty → visual_reference, fail-SAFE,
+      never upgrades, strict ===true so truthy non-bools can't coerce); `badgeFor`
+      (AccuracyBadge {label,color,engineeringAccurate,dimensionVerified}) where
+      engineeringAccurate is true ONLY for manufacturer_verified|sealed_approved and
+      dimensionVerified only for dimensioned_parametric+. `parts-manifest.ts` PartRecord
+      now carries derived `modelStatus`. NEW `src/Inspector.tsx` right panel (name, key,
+      category, source, colored badge, explicit engineering-accurate / dimension-verified
+      yes-no, plain warning for non-accurate parts). `PartViewer.tsx` click-to-select
+      (onPointerDown→onSelect) + emissive gold highlight (kept imperative STLLoader.load,
+      no useLoader/Suspense, default frameloop per T41 lessons). `App.tsx` selection state
+      + Inspector column. TDD: test/provenance.test.ts (16, incl. HARD INVARIANT that
+      generated/ai-placeholder/proxy/visual_reference are NEVER engineeringAccurate even
+      if manufacturerExact forced true) + parts-manifest.test.ts (now 16). vitest 40/40,
+      tsc -b 0, vite build 0. VERIFIED IN REAL CHROME: clicked the 90° elbow → gold
+      highlight + Inspector shows source=generated, amber "Visual reference — not
+      dimensional", engineering-accurate=no, dimension-verified=no, with the
+      not-for-submittals warning. HONESTY: no parts fabricated, no provenance upgraded,
+      no 3D-generation / manufacturer-CAD-ingestion run claimed (none happened); all 22
+      current parts stay visual_reference. GX10-independent.
 - [ ] **T43 — step.parts client for generic hardware only (GX10-independent, public HTTP).**
       Implement the public API client (GET /v1/parts, /v1/parts/{id} with SHA256 verify)
       in `halofire-catalog` behind a feature flag; add a guard/test asserting fire-sprinkler
