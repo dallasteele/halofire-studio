@@ -337,4 +337,95 @@ describe('Workbench official-flow browser smoke', () => {
       await page.close();
     }
   }, 40_000);
+
+  it('shows cleared official-flow signed-reviewer rows with resolve-audit proof instead of upload-pending actions', async () => {
+    const token = await adminToken();
+    const projectName = 'Home Depot - Rexburg ID';
+    const created = await api(`/api/projects/${encodeURIComponent(projectName)}/resolver-packets/official-flow/intake`, token, {
+      method: 'POST',
+      body: JSON.stringify({
+        staticPsi: 73,
+        residualPsi: 62,
+        flowingGpm: 990,
+        flowDataDate: '2026-06-05',
+        waterModelRequired: 'Workbench cleared reviewer row smoke values for internal-alpha replay only.',
+        source_file: 'official-flow-cleared-workbench.pdf',
+        source_ref: 'official-flow-cleared-workbench.pdf#page=2',
+        notes: 'Workbench cleared reviewer row smoke; no regulated claims cleared until explicit signed evidence resolve.',
+      }),
+    });
+
+    const replay = await api(`/api/projects/${encodeURIComponent(projectName)}/resolver-packets/official-flow/${created.id}/replay-artifact`, token, {
+      method: 'POST',
+    });
+
+    const decision = await api(`/api/projects/${encodeURIComponent(projectName)}/resolver-packets/official-flow-replay/${replay.id}/review-decision`, token, {
+      method: 'POST',
+      body: JSON.stringify({
+        reviewer_name: 'HaloFire Workbench Reviewer',
+        reviewer_title: 'Internal Alpha Reviewer',
+        professional_review_ref: 'pe-review://official-flow/workbench-cleared',
+        ahj_review_ref: 'ahj://official-flow/workbench-cleared',
+        autosprink_export_ref: 'autosprink://official-flow/workbench-cleared',
+        manufacturer_model_approval_ref: 'manufacturer://official-flow/workbench-cleared',
+        review_decision: 'recorded_evidence_refs_fail_closed',
+        notes: 'Workbench cleared reviewer row decision; no claim gates cleared here.',
+      }),
+    });
+
+    const resolved = await api(`/api/projects/${encodeURIComponent(projectName)}/claim-gates/MANUFACTURER_MODEL_APPROVAL_MISSING/resolve`, token, {
+      method: 'POST',
+      body: JSON.stringify({
+        evidence: {
+          evidence_type: 'manufacturer_approval',
+          source_ref: 'manufacturer://official-flow/workbench-cleared',
+          source_file: 'official-flow-cleared-workbench-manufacturer-approval.pdf',
+          status: 'present',
+          notes: [
+            'Workbench cleared reviewer row signed manufacturer resolve.',
+            `source_official_flow_review_decision_evidence_id ${decision.id}`,
+          ].join('\n'),
+          signoff: {
+            reviewer_name: 'Maya Workbench',
+            reviewer_title: 'Manufacturer Representative',
+            signed_at: '2026-06-05T08:45:00.000Z',
+            organization: 'Halo Fire Vendor Desk',
+            license_id: 'MFG-WORKBENCH-CLEARED-1',
+          },
+        },
+      }),
+    });
+    expect(resolved.cleared).toBe(true);
+
+    const page = await browser.newPage({ acceptDownloads: true });
+    page.setDefaultTimeout(10_000);
+    await page.addInitScript((authToken) => {
+      localStorage.setItem('halofire_token', authToken);
+    }, token);
+
+    try {
+      await page.goto(`${BASE}/workbench.html?project=${encodeURIComponent(projectName)}#resolverQueue`, { waitUntil: 'domcontentloaded' });
+      await page.waitForSelector('#resolverQueue');
+      await page.locator('[data-resolver-queue-filter="officialFlowSignedReviewer=pending&targetGate=MANUFACTURER_MODEL_APPROVAL_MISSING&evidenceType=manufacturer_approval"]').first().click();
+
+      const queue = page.locator('#resolverQueue');
+      await page.waitForFunction((decisionId) => {
+        const node = document.querySelector('#resolverQueue');
+        return node?.textContent?.includes(`review_decision_evidence #${decisionId}`);
+      }, decision.id);
+      const queueText = await queue.innerText();
+      expect(queueText).toContain('MANUFACTURER_MODEL_APPROVAL_MISSING');
+      expect(queueText).toContain(`review_decision_evidence #${decision.id}`);
+      expect(queueText).toContain('gate_cleared_after_explicit_signed_validation');
+      expect(queueText).toContain('halofire.claim_gate_resolve_audit_packet.v1');
+      await expect(queue.locator('[data-official-flow-signed-evidence-upload-packet-gate-code="MANUFACTURER_MODEL_APPROVAL_MISSING"]').count()).resolves.toBe(0);
+      await expect(queue.locator('[data-official-flow-signed-reviewer-resolve-workflow][data-official-flow-signed-reviewer-resolve-gate-code="MANUFACTURER_MODEL_APPROVAL_MISSING"]').count()).resolves.toBe(0);
+
+      const auditButton = queue.locator('[data-official-flow-signed-reviewer-resolve-audit-gate-code="MANUFACTURER_MODEL_APPROVAL_MISSING"]').first();
+      expect(await auditButton.getAttribute('data-official-flow-signed-reviewer-resolve-audit-evidence-id')).toBe(String(resolved.resolved_evidence_id));
+      expect(await auditButton.getAttribute('data-official-flow-signed-reviewer-resolve-audit-href')).toMatch(/MANUFACTURER_MODEL_APPROVAL_MISSING\/resolve-audit-packet/);
+    } finally {
+      await page.close();
+    }
+  }, 40_000);
 });
