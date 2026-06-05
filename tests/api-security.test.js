@@ -94,6 +94,43 @@ describe('HaloFire API security gates', () => {
     expect(body.user.role).toBe('admin');
   });
 
+  it('sets a hardened session cookie and accepts it for mounted workbench auth', async () => {
+    const res = await login('security-admin', 'actual-test-password');
+    expect(res.status).toBe(200);
+    const cookie = res.headers.get('set-cookie') || '';
+    expect(cookie).toContain('halofire_session=');
+    expect(cookie).toContain('HttpOnly');
+    expect(cookie).toContain('SameSite=Lax');
+
+    const me = await request('/api/auth/me', {
+      headers: { Cookie: cookie.split(';')[0] },
+    });
+    expect(me.status).toBe(200);
+    const body = await me.json();
+    expect(body.username).toBe('security-admin');
+  });
+
+  it('clears the mounted session cookie on logout', async () => {
+    const res = await login('security-admin', 'actual-test-password');
+    expect(res.status).toBe(200);
+    const cookie = res.headers.get('set-cookie') || '';
+    expect(cookie).toContain('halofire_session=');
+
+    const logout = await request('/api/auth/logout', {
+      method: 'POST',
+      headers: { Cookie: cookie.split(';')[0] },
+    });
+    expect(logout.status).toBe(204);
+    const clearedCookie = logout.headers.get('set-cookie') || '';
+    expect(clearedCookie).toContain('halofire_session=');
+    expect(clearedCookie).toMatch(/Max-Age=0|Expires=/);
+
+    const me = await request('/api/auth/me', {
+      headers: { Cookie: clearedCookie.split(';')[0] },
+    });
+    expect(me.status).toBe(401);
+  });
+
   it('rejects unsupported bid update fields', async () => {
     const token = await tokenFor('security-admin', 'actual-test-password');
     const res = await request('/api/bids/1', {

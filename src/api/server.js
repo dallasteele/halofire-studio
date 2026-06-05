@@ -56,6 +56,7 @@ const ALLOW_DEV_DEFAULTS = process.env.HALOFIRE_ALLOW_DEV_DEFAULTS === '1';
 const JWT_SECRET = process.env.JWT_SECRET || (NODE_ENV === 'development' && ALLOW_DEV_DEFAULTS ? 'halofire-local-dev-secret-change-me' : null);
 const ADMIN_USERNAME = process.env.HALOFIRE_ADMIN_USER || (ALLOW_DEV_DEFAULTS ? 'admin' : null);
 const ADMIN_PASSWORD = process.env.HALOFIRE_ADMIN_PASSWORD || (ALLOW_DEV_DEFAULTS ? 'halofire2026' : null);
+const AUTH_COOKIE_NAME = 'halofire_session';
 const DB_PATH = process.env.HALOFIRE_DB_PATH
   ? path.resolve(process.env.HALOFIRE_DB_PATH)
   : path.resolve(__dirname, '../../data/halofire.db');
@@ -329,8 +330,27 @@ app.use('/vendor/three', express.static(path.resolve(__dirname, '../../node_modu
 app.use('/vendor/opengeometry', express.static(path.resolve(__dirname, '../../node_modules/opengeometry')));
 
 // ── Auth Middleware ──
+function cookieValue(req, name) {
+  const raw = req.headers.cookie || '';
+  const prefix = `${name}=`;
+  const found = raw
+    .split(';')
+    .map((entry) => entry.trim())
+    .find((entry) => entry.startsWith(prefix));
+  return found ? decodeURIComponent(found.slice(prefix.length)) : null;
+}
+
+function sessionCookieOptions(req) {
+  return {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
+    path: '/',
+  };
+}
+
 function authMiddleware(req, res, next) {
-  const token = req.headers.authorization?.replace('Bearer ', '');
+  const token = req.headers.authorization?.replace('Bearer ', '') || cookieValue(req, AUTH_COOKIE_NAME);
   if (!token) return res.status(401).json({ error: 'No token provided' });
   try {
     req.user = jwt.verify(token, JWT_SECRET);
@@ -377,7 +397,16 @@ app.post('/api/auth/login', (req, res) => {
   }
   const role = normalizeRole(user.role);
   const token = jwt.sign({ id: user.id, username: user.username, name: user.name, role }, JWT_SECRET, { expiresIn: '24h' });
+  res.cookie(AUTH_COOKIE_NAME, token, {
+    ...sessionCookieOptions(req),
+    maxAge: 24 * 60 * 60 * 1000,
+  });
   res.json({ token, user: { id: user.id, username: user.username, name: user.name, role } });
+});
+
+app.post('/api/auth/logout', (req, res) => {
+  res.clearCookie(AUTH_COOKIE_NAME, sessionCookieOptions(req));
+  res.status(204).end();
 });
 
 app.get('/api/auth/me', authMiddleware, (req, res) => {

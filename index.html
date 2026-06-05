@@ -405,6 +405,29 @@ setTimeout(()=>{
 (function ck(){const d=new Date();document.getElementById('clk').textContent=d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+'  '+d.toLocaleTimeString('en-US',{hour12:false});setTimeout(ck,1000)})();
 
 // Login
+const HALOFIRE_BASE_PATH = window.location.pathname.startsWith('/halo-fire/') ? '/halo-fire' : '';
+function safeWorkbenchRedirect(){
+  const fallback = HALOFIRE_BASE_PATH + '/workbench.html';
+  const params = new URLSearchParams(window.location.search);
+  const requested = params.get('redirect');
+  if(!requested)return fallback;
+  try{
+    const target = new URL(requested, window.location.origin);
+    const allowedPath = HALOFIRE_BASE_PATH + '/workbench.html';
+    if(target.origin === window.location.origin && target.pathname === allowedPath){
+      return target.pathname + target.search + target.hash;
+    }
+  }catch(_){}
+  return fallback;
+}
+function storeLoginToken(data){
+  try{
+    localStorage.setItem('halofire_token',data.token);
+    localStorage.setItem('halofire_user',JSON.stringify(data.user));
+  }catch(_){
+    // The server also sets an HttpOnly session cookie; storage is convenience.
+  }
+}
 const ov=document.getElementById('overlay');
 document.getElementById('signBtn').onclick=()=>ov.classList.add('on');
 document.getElementById('enterBtn').onclick=()=>ov.classList.add('on');
@@ -414,7 +437,7 @@ document.getElementById('form').onsubmit=async e=>{
   e.preventDefault();
   const er=document.getElementById('err');
   try{
-    const res=await fetch('/api/auth/login',{
+    const res=await fetch(HALOFIRE_BASE_PATH + '/' + 'api/auth/login',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
@@ -424,9 +447,8 @@ document.getElementById('form').onsubmit=async e=>{
     });
     if(!res.ok)throw new Error('bad credentials');
     const data=await res.json();
-    localStorage.setItem('halofire_token',data.token);
-    localStorage.setItem('halofire_user',JSON.stringify(data.user));
-    window.location.href='/workbench.html';
+    storeLoginToken(data);
+    window.location.href=safeWorkbenchRedirect();
   }catch(_){
     er.style.display='block';setTimeout(()=>er.style.display='none',2500);
   }
