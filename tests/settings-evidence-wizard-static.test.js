@@ -87,6 +87,9 @@ describe('HaloFire Settings evidence wizard signed reviewer workflow', () => {
     expect(html).toContain('Resolved Signed-Reviewer Gates');
     expect(html).toContain('id="settingsResolvedSignedReviewerGates"');
     expect(html).toContain('loadSettingsResolvedSignedReviewerGates');
+    expect(html).toContain('openSettingsResolvedSignedReviewerEvidence');
+    expect(html).toContain('data-settings-resolved-gate-inspect');
+    expect(html).toContain('Open accepted evidence read-only');
     expect(html).toContain("claimGateAudit=cleared");
     expect(html).toContain('claim_gate_resolve_audit');
     expect(html).toContain('data-settings-resolved-gate-audit-download');

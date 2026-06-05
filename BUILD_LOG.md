@@ -1,5 +1,13 @@
 # HaloFire Build Log
 
+## 2026-06-05 - Settings resolved signed-reviewer read-only reopen
+
+- Updated [`settings.html`](C:/Users/dalla/OneDrive/Documents/HaloFire/settings.html) so each resolved signed-reviewer gate row now exposes `Open accepted evidence read-only`, carrying the resolved evidence id and gate into the existing Settings `action=inspect` flow instead of forcing operators back through Workbench.
+- Kept the lane fail-closed: the read-only reopen path only inspects the accepted signed evidence, preserves the resolve-audit packet link, disables submission, and does not reopen a `requires_real_signed_evidence` packet flow.
+- Extended [`tests/settings-evidence-wizard-static.test.js`](C:/Users/dalla/OneDrive/Documents/HaloFire/tests/settings-evidence-wizard-static.test.js) and [`tests/settings-signed-reviewer-browser-smoke.test.js`](C:/Users/dalla/OneDrive/Documents/HaloFire/tests/settings-signed-reviewer-browser-smoke.test.js) with red-to-green proof that the Settings shell renders the new action and that clicking it lands in the read-only accepted-evidence inspector with `action=inspect`.
+- Verified with `npx vitest run tests/settings-evidence-wizard-static.test.js --reporter=verbose`, `npx vitest run tests/settings-signed-reviewer-browser-smoke.test.js -t "renders resolved signed-reviewer gates in Settings and downloads the resolved-gate audit packet" --reporter=verbose`, `C:/Python312/python.exe E:/ClaudeBot/scripts/verify_agentic_rules.py`, and `git diff --check`. This slice is `NO_FORMALIZABLE_CLAIM`; it is Settings workflow continuity/read-only inspection plumbing, not a theorem-shaped invariant.
+- Still blocked: AutoSprink parity, AHJ approval outside explicit accepted evidence, PE/professional review outside explicit accepted evidence, manufacturer-exact approval outside explicit accepted evidence, permit readiness, fabrication readiness, brand readiness, production readiness, survey-grade claims, and engineering-grade claims.
+
 ## 2026-06-05 - 1881 default official-flow attachment intake
 
 - Added a server-owned `halofire.official_flow_default_attachment_intake_records.v1` packet for `The Cooperative 1881 - Salt Lake City UT`, with temporary best-guess official-flow values (`staticPsi 71`, `residualPsi 59`, `flowingGpm 940`) tied to the supplied 1881 proposal workbook refs and explicitly marked `temporary_best_guess_until_employee_updates`.

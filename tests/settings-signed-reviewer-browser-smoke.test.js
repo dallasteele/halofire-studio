@@ -589,9 +589,21 @@ describe('Settings signed reviewer browser smoke', () => {
       expect(gateRowText).toContain('gate_cleared_after_explicit_signed_validation');
       expect(gateRowText).toContain('no_unrelated_claims_cleared true');
       expect(gateRowText).toContain('halofire.claim_gate_resolve_audit_packet.v1');
+      expect(gateRowText).toContain('Open accepted evidence read-only');
       expect(await gateRow.getAttribute('data-settings-resolved-gate-audit-href')).toBe(
         `${PROJECT_PATH}/claim-gates/AHJ_APPROVAL_MISSING/resolve-audit-packet`,
       );
+      expect(await gateRow.getAttribute('data-settings-resolved-gate-evidence-id')).toBeTruthy();
+
+      await gateRow.locator('[data-settings-resolved-gate-inspect]').click();
+      await page.waitForURL((url) => url.pathname === '/settings.html' && url.hash === '#wizSignoff');
+      await page.waitForFunction(
+        () => Boolean(document.getElementById('wizPacketStatus')?.dataset.signedReviewerReadonlyEvidenceId),
+      );
+      expect(page.url()).toContain('action=inspect');
+      expect(await page.locator('#wizPacketStatus').innerText()).toContain('Read-only accepted signed reviewer evidence');
+      expect(await page.locator('#wizGate').inputValue()).toBe('AHJ_APPROVAL_MISSING');
+      expect(await page.locator('#wizSubmit').isDisabled()).toBe(true);
 
       await gateRow.locator('[data-settings-resolved-gate-audit-download]').click();
       await page.waitForFunction(() => {
