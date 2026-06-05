@@ -266,6 +266,42 @@ describe('Workbench official-flow browser smoke', () => {
       expect(replayRowAfterRefreshText).toContain(`source_attachment_intake_packet_evidence_id ${packetEvidenceId}`);
       expect(replayRowAfterRefreshText).toContain('source_attachment_intake_row_index 0');
       expect(replayRowAfterRefreshText).toContain('Download professional/AHJ review packet');
+
+      const reviewDetails = page.locator('#official-flow-replay-review details').first();
+      await reviewDetails.waitFor();
+      await reviewDetails.evaluate((node) => { node.open = true; });
+      await page.locator(`#officialFlowReviewDecision-${replayEvidenceId}-reviewer`).fill('HaloFire Employee');
+      await page.locator(`#officialFlowProfessionalReviewRef-${replayEvidenceId}`).fill('pe-review://default-1881/source-linked-flow');
+      await page.locator(`#officialFlowAhjReviewRef-${replayEvidenceId}`).fill('ahj://default-1881/source-linked-flow');
+      await page.locator(`#officialFlowAutosprinkExportRef-${replayEvidenceId}`).fill('autosprink://default-1881/source-linked-flow');
+      await page.locator(`[data-official-flow-review-decision-evidence-id="${replayEvidenceId}"]`).first().click();
+      await page.waitForFunction(() => {
+        const node = document.querySelector('#officialFlowReviewDecisionResults [data-official-flow-review-decision-evidence-id]');
+        return node?.dataset.claimGateEffect === 'no_claims_cleared';
+      });
+
+      const readback = page.locator('#officialFlowReviewDecisionResults [data-official-flow-review-decision-evidence-id]').first();
+      const decisionEvidenceId = Number(await readback.getAttribute('data-official-flow-review-decision-evidence-id'));
+      expect(decisionEvidenceId).toBeGreaterThan(0);
+      expect(await readback.getAttribute('data-source-official-flow-replay-evidence-id')).toBe(String(replayEvidenceId));
+      expect(await readback.getAttribute('data-source-attachment-intake-packet-evidence-id')).toBe(String(packetEvidenceId));
+      expect(await readback.getAttribute('data-source-attachment-intake-row-index')).toBe('0');
+      expect(await readback.innerText()).toContain(`source_attachment_intake_packet_evidence_id ${packetEvidenceId}`);
+      expect(await readback.innerText()).toContain('source_attachment_intake_row_index 0');
+
+      const decisionRow = page.locator(`#evidence-${decisionEvidenceId}`).first();
+      await decisionRow.waitFor();
+      const decisionRowText = await decisionRow.innerText();
+      expect(decisionRowText).toContain(`source_attachment_intake_packet_evidence_id ${packetEvidenceId}`);
+      expect(decisionRowText).toContain('source_attachment_intake_row_index 0');
+      expect(decisionRowText).toContain('official_flow_signed_reviewer_validation rows');
+
+      await page.reload({ waitUntil: 'domcontentloaded' });
+      const decisionRowAfterRefresh = page.locator(`#evidence-${decisionEvidenceId}`).first();
+      await decisionRowAfterRefresh.waitFor();
+      const decisionRowAfterRefreshText = await decisionRowAfterRefresh.innerText();
+      expect(decisionRowAfterRefreshText).toContain(`source_attachment_intake_packet_evidence_id ${packetEvidenceId}`);
+      expect(decisionRowAfterRefreshText).toContain('source_attachment_intake_row_index 0');
     } finally {
       await page.close();
     }

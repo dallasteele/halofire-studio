@@ -1714,6 +1714,72 @@ describe('S5 GET /api/auto-source/status', () => {
         status: 'referenced',
       }),
     ]));
+
+    const decisionRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-packets/official-flow-replay/${replay.id}/review-decision`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        reviewer_name: 'HaloFire Employee',
+        reviewer_title: 'Internal Alpha Reviewer',
+        professional_review_ref: 'pe-review://pending-source-linked-flow',
+        ahj_review_ref: 'ahj://pending-source-linked-flow',
+        autosprink_export_ref: 'autosprink://pending-source-linked-flow',
+        official_flow_test_ref: '1881-official-flow.pdf#page=2',
+        review_decision: 'recorded_evidence_refs_fail_closed',
+        notes: 'Source-linked attachment intake row recorded for review handoff; no claim gates cleared.',
+      }),
+    });
+    expect(decisionRes.status).toBe(201);
+    const decision = await decisionRes.json();
+    expect(decision).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.official_flow_professional_ahj_review_decision.v1',
+      source_replay_evidence_id: replay.id,
+      source_attachment_intake_packet_evidence_id: imported.packet_evidence_id,
+      source_attachment_intake_row_index: 0,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+      claims_cleared_count: 0,
+    }));
+    expect(decision.claim_gate_evaluation_audit_packet).toEqual(expect.objectContaining({
+      source_review_decision_evidence_id: decision.id,
+      source_replay_evidence_id: replay.id,
+      source_attachment_intake_packet_evidence_id: imported.packet_evidence_id,
+      source_attachment_intake_row_index: 0,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+      claims_cleared_count: 0,
+    }));
+
+    const signedQueueRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-queue?officialFlowReviewDecisionEvidenceId=${decision.id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(signedQueueRes.status).toBe(200);
+    const signedQueue = await signedQueueRes.json();
+    expect(signedQueue.items).toHaveLength(1);
+    expect(signedQueue.items[0]).toEqual(expect.objectContaining({
+      kind: 'official_flow_signed_reviewer_validation',
+      source_review_decision_evidence_id: decision.id,
+      source_attachment_intake_packet_evidence_id: imported.packet_evidence_id,
+      source_attachment_intake_row_index: 0,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    for (const row of signedQueue.items[0].validation_rows) {
+      expect(row).toEqual(expect.objectContaining({
+        source_attachment_intake_packet_evidence_id: imported.packet_evidence_id,
+        source_attachment_intake_row_index: 0,
+        claim_gate_effect: 'no_claims_cleared',
+      }));
+      expect(row.queue_action).toEqual(expect.objectContaining({
+        source_attachment_intake_packet_evidence_id: imported.packet_evidence_id,
+        source_attachment_intake_row_index: 0,
+        claim_gate_effect: 'no_claims_cleared',
+      }));
+      expect(row.signed_evidence_resolve_action).toEqual(expect.objectContaining({
+        source_attachment_intake_packet_evidence_id: imported.packet_evidence_id,
+        source_attachment_intake_row_index: 0,
+        claim_gate_effect: 'requires_real_signed_evidence',
+      }));
+    }
   }, 15000);
 
   it('builds and imports Cooperative 1881 default official-flow attachment intake without clearing claims', async () => {
