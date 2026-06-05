@@ -639,6 +639,10 @@ describe('studio static origin handling', () => {
     expect(html).toContain('/resolver-packets/official-flow/attachment-intake-records');
     expect(html).toContain('Import attachment intake records');
     expect(html).toContain('official_flow_attachment_intake_records');
+    expect(html).toContain('persistOfficialFlowHydraulicReplayAndDownloadReviewPacket');
+    expect(html).toContain('data-official-flow-persist-review-packet-evidence-id');
+    expect(html).toContain('Save replay evidence + download review packet');
+    expect(html).toContain('source_attachment_intake_packet_evidence_id');
   });
 
   it('lets the studio load the latest saved PDF boundary decision as import defaults', async () => {

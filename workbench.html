@@ -4663,7 +4663,7 @@ function resolverQueueDetail(item, index = '') {
       <div class="claims">AI fallback: ${escapeHtml(item.ai_fallback || '')}</div>
       <div class="claims">Blocks: ${claims.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('')}</div>
       <p style="margin-top:8px">${actions.map((action) => `<a class="go" style="padding:7px 10px;font-size:11px;text-decoration:none;display:inline-block;margin-right:6px" href="${escapeHtml(action.href || '#')}">${escapeHtml(action.label || 'Open')}</a>`).join('')}</p>
-      ${item.evidence_id ? `<p style="margin-top:8px"><button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#4f46e5" data-official-flow-replay-evidence-id="${escapeHtml(item.evidence_id)}">Download hydraulic replay artifact</button> <button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#0f766e" data-official-flow-persist-evidence-id="${escapeHtml(item.evidence_id)}">Save replay evidence</button></p><div class="muted" id="officialFlowReplayStatus-${escapeHtml(item.evidence_id)}" style="font-size:11px"></div>` : ''}
+      ${item.evidence_id ? `<p style="margin-top:8px"><button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#4f46e5" data-official-flow-replay-evidence-id="${escapeHtml(item.evidence_id)}">Download hydraulic replay artifact</button> <button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#0f766e" data-official-flow-persist-evidence-id="${escapeHtml(item.evidence_id)}">Save replay evidence</button> <button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#0369a1" data-official-flow-persist-review-packet-evidence-id="${escapeHtml(item.evidence_id)}">Save replay evidence + download review packet</button></p><div class="muted" id="officialFlowReplayStatus-${escapeHtml(item.evidence_id)}" style="font-size:11px"></div><div class="muted" style="font-size:10px">source_attachment_intake_packet_evidence_id is preserved when the intake came from official_flow_attachment_intake_records; claim_gate_effect no_claims_cleared</div>` : ''}
       <details style="margin-top:8px" id="officialFlowIntake">
         <summary class="muted" style="cursor:pointer">Record/update official flow intake</summary>
         <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:8px">
@@ -5074,6 +5074,28 @@ async function persistOfficialFlowHydraulicReplay(evidenceId) {
       method: 'POST',
     });
     if (status) status.textContent = 'Saved official_flow_hydraulic_replay_artifact evidence #' + saved.id + '; claims still blocked.';
+    await refreshEvidence();
+    await refreshResolverQueue();
+  } catch (err) {
+    if (status) status.textContent = 'Error: ' + err.message;
+  }
+}
+
+async function persistOfficialFlowHydraulicReplayAndDownloadReviewPacket(evidenceId) {
+  const status = document.getElementById('officialFlowReplayStatus-' + evidenceId);
+  if (status) status.textContent = 'Saving hydraulic replay artifact and preparing professional/AHJ review packet...';
+  try {
+    const saved = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/resolver-packets/official-flow/' + encodeURIComponent(evidenceId) + '/replay-artifact', {
+      method: 'POST',
+    });
+    const packet = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/resolver-packets/official-flow-replay/' + encodeURIComponent(saved.id) + '/review-packet');
+    const blob = new Blob([JSON.stringify(packet, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = packet.download_name || 'official-flow-professional-ahj-review-packet.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+    if (status) status.textContent = 'Saved official_flow_hydraulic_replay_artifact evidence #' + saved.id + ' and downloaded professional/AHJ review packet; claims still blocked.';
     await refreshEvidence();
     await refreshResolverQueue();
   } catch (err) {
@@ -6747,6 +6769,9 @@ async function refreshResolverQueue() {
   });
   document.querySelectorAll('[data-official-flow-persist-evidence-id]').forEach((button) => {
     button.onclick = () => persistOfficialFlowHydraulicReplay(button.dataset.officialFlowPersistEvidenceId);
+  });
+  document.querySelectorAll('[data-official-flow-persist-review-packet-evidence-id]').forEach((button) => {
+    button.onclick = () => persistOfficialFlowHydraulicReplayAndDownloadReviewPacket(button.dataset.officialFlowPersistReviewPacketEvidenceId);
   });
   document.querySelectorAll('[data-official-flow-replay-review-packet-evidence-id]').forEach((button) => {
     button.onclick = () => downloadOfficialFlowReplayReviewPacket(button.dataset.officialFlowReplayReviewPacketEvidenceId);

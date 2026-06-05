@@ -14133,6 +14133,8 @@ function buildOfficialFlowHydraulicReplayArtifact(projectName, evidence, intake,
     project_name: projectName,
     source_evidence_id: evidence.id,
     source_evidence_type: evidence.evidence_type,
+    source_attachment_intake_packet_evidence_id: intake.source_attachment_intake_packet_evidence_id || null,
+    source_attachment_intake_row_index: Number.isInteger(intake.source_attachment_intake_row_index) ? intake.source_attachment_intake_row_index : null,
     generated_at: new Date().toISOString(),
     download_name: `${slugForDownloadName(projectName)}-official-flow-hydraulic-replay-${evidence.id}.json`,
     official_flow_input: {
@@ -14144,6 +14146,8 @@ function buildOfficialFlowHydraulicReplayArtifact(projectName, evidence, intake,
       source_file: intake.source_file || evidence.source_file || null,
       source_ref: intake.source_ref || evidence.source_ref || null,
       reviewer_name: intake.reviewer_name || null,
+      source_attachment_intake_packet_evidence_id: intake.source_attachment_intake_packet_evidence_id || null,
+      source_attachment_intake_row_index: Number.isInteger(intake.source_attachment_intake_row_index) ? intake.source_attachment_intake_row_index : null,
     },
     hydraulic_summary: {
       estimate: true,
@@ -14180,6 +14184,8 @@ function officialFlowReplayArtifactEvidenceNotes(artifact) {
     artifact_type: artifact.artifact_type,
     artifact_status: artifact.status,
     source_evidence_id: artifact.source_evidence_id,
+    source_attachment_intake_packet_evidence_id: artifact.source_attachment_intake_packet_evidence_id || null,
+    source_attachment_intake_row_index: Number.isInteger(artifact.source_attachment_intake_row_index) ? artifact.source_attachment_intake_row_index : null,
     replay_generated_at: artifact.generated_at,
     download_name: artifact.download_name,
     official_flow_input: artifact.official_flow_input,
@@ -14348,12 +14354,29 @@ function officialFlowProfessionalAhjReviewPacket(projectName, replayEvidence) {
       status: 'referenced',
     });
   }
+  const sourceAttachmentPacketEvidenceId = artifact.source_attachment_intake_packet_evidence_id || artifact.official_flow_input?.source_attachment_intake_packet_evidence_id || null;
+  const sourceAttachmentPacket = sourceAttachmentPacketEvidenceId
+    ? db
+      .prepare(`SELECT id, evidence_type, source_ref, status FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'official_flow_attachment_intake_records'`)
+      .get(sourceAttachmentPacketEvidenceId, projectName)
+    : null;
+  if (sourceAttachmentPacket) {
+    sourceRefs.push({
+      evidence_id: sourceAttachmentPacket.id,
+      evidence_type: sourceAttachmentPacket.evidence_type,
+      source_ref: sourceAttachmentPacket.source_ref || null,
+      status: 'referenced',
+    });
+  }
   return {
     artifact_type: 'official_flow_professional_ahj_review_packet',
     status: 'ready_for_employee_review',
     project_name: projectName,
     source_evidence_id: row.id,
     source_evidence_type: 'official_flow_hydraulic_replay_artifact',
+    source_attachment_intake_packet_evidence_id: sourceAttachmentPacketEvidenceId,
+    source_attachment_intake_row_index: Number.isInteger(artifact.source_attachment_intake_row_index) ? artifact.source_attachment_intake_row_index : null,
     source_ref: row.source_ref || queueItem.source_ref || null,
     generated_at: new Date().toISOString(),
     download_name: `${slugForDownloadName(projectName)}-official-flow-professional-ahj-review-packet-${row.id}.json`,

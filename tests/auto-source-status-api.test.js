@@ -1389,5 +1389,48 @@ describe('S5 GET /api/auto-source/status', () => {
       residualPsi: 59,
       flowingGpm: 940,
     }));
+
+    const replayRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-packets/official-flow/${imported.accepted_rows[0].official_flow_intake_evidence_id}/replay-artifact`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(replayRes.status).toBe(201);
+    const replay = await replayRes.json();
+    expect(replay.artifact).toEqual(expect.objectContaining({
+      source_evidence_id: imported.accepted_rows[0].official_flow_intake_evidence_id,
+      source_attachment_intake_packet_evidence_id: imported.packet_evidence_id,
+      source_attachment_intake_row_index: 0,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(replay.artifact.official_flow_input).toEqual(expect.objectContaining({
+      source_ref: '1881-official-flow.pdf#page=2',
+      source_attachment_intake_packet_evidence_id: imported.packet_evidence_id,
+      source_attachment_intake_row_index: 0,
+    }));
+    const replayNotes = JSON.parse(replay.evidence.notes);
+    expect(replayNotes).toEqual(expect.objectContaining({
+      source_attachment_intake_packet_evidence_id: imported.packet_evidence_id,
+      source_attachment_intake_row_index: 0,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+
+    const reviewPacketRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-packets/official-flow-replay/${replay.id}/review-packet`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(reviewPacketRes.status).toBe(200);
+    const reviewPacket = await reviewPacketRes.json();
+    expect(reviewPacket).toEqual(expect.objectContaining({
+      source_attachment_intake_packet_evidence_id: imported.packet_evidence_id,
+      source_attachment_intake_row_index: 0,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(reviewPacket.source_refs).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        evidence_id: imported.packet_evidence_id,
+        evidence_type: 'official_flow_attachment_intake_records',
+        source_ref: 'halo_forge/official_flow_evidence_attachment_preflight/official-flow-evidence-attachment-intake.json',
+        status: 'referenced',
+      }),
+    ]));
   }, 15000);
 });
