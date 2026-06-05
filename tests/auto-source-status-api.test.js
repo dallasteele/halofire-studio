@@ -1867,6 +1867,121 @@ describe('S5 GET /api/auto-source/status', () => {
     }));
   }, 15000);
 
+  it('shows official-flow signed-reviewer queue rows as cleared only for gates explicitly resolved with signed evidence', async () => {
+    const projectName = 'Home Depot - Rexburg ID';
+    const createRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-packets/official-flow/intake`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        staticPsi: 72,
+        residualPsi: 61,
+        flowingGpm: 980,
+        flowDataDate: '2026-06-05',
+        waterModelRequired: 'Disposable queue truth test values for internal-alpha replay only.',
+        source_file: 'official-flow-queue-truth.pdf',
+        source_ref: 'official-flow-queue-truth.pdf#page=2',
+        notes: 'Official-flow queue truth regression; no regulated claims cleared until explicit signed evidence resolve.',
+      }),
+    });
+    expect(createRes.status).toBe(201);
+    const created = await createRes.json();
+
+    const persistRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-packets/official-flow/${created.id}/replay-artifact`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(persistRes.status).toBe(201);
+    const persisted = await persistRes.json();
+
+    const decisionRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-packets/official-flow-replay/${persisted.id}/review-decision`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        reviewer_name: 'HaloFire Queue Truth Reviewer',
+        reviewer_title: 'Internal Alpha Reviewer',
+        professional_review_ref: 'pe-review://official-flow/queue-truth',
+        ahj_review_ref: 'ahj://official-flow/queue-truth',
+        autosprink_export_ref: 'autosprink://official-flow/queue-truth',
+        manufacturer_model_approval_ref: 'manufacturer://official-flow/queue-truth',
+        review_decision: 'recorded_evidence_refs_fail_closed',
+        notes: 'Queue truth regression review decision; no claim gates cleared here.',
+      }),
+    });
+    expect(decisionRes.status).toBe(201);
+    const decision = await decisionRes.json();
+
+    const resolveRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/claim-gates/MANUFACTURER_MODEL_APPROVAL_MISSING/resolve`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        evidence: {
+          evidence_type: 'manufacturer_approval',
+          source_ref: 'manufacturer://official-flow/queue-truth',
+          source_file: 'official-flow-queue-truth-manufacturer-approval.pdf',
+          status: 'present',
+          notes: [
+            'Queue truth regression signed reviewer manufacturer resolve.',
+            `source_official_flow_review_decision_evidence_id ${decision.id}`,
+          ].join('\n'),
+          signoff: {
+            reviewer_name: 'Morgan Queue Truth',
+            reviewer_title: 'Manufacturer Representative',
+            signed_at: '2026-06-05T08:35:00.000Z',
+            organization: 'Halo Fire Vendor Desk',
+            license_id: 'MFG-QUEUE-TRUTH-1',
+          },
+        },
+      }),
+    });
+    expect(resolveRes.status).toBe(200);
+    const resolved = await resolveRes.json();
+    expect(resolved.cleared).toBe(true);
+
+    const queueRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-queue?officialFlowReviewDecisionEvidenceId=${decision.id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(queueRes.status).toBe(200);
+    const queue = await queueRes.json();
+    expect(queue.items).toHaveLength(1);
+    const signedReviewItem = queue.items[0];
+    expect(signedReviewItem).toEqual(expect.objectContaining({
+      kind: 'official_flow_signed_reviewer_validation',
+      source_review_decision_evidence_id: decision.id,
+      status: 'signed_reviewer_validation_needed',
+    }));
+
+    const manufacturerRow = signedReviewItem.validation_rows.find((row) => row.target_gate_code === 'MANUFACTURER_MODEL_APPROVAL_MISSING');
+    expect(manufacturerRow).toEqual(expect.objectContaining({
+      target_gate_code: 'MANUFACTURER_MODEL_APPROVAL_MISSING',
+      required_evidence_type: 'manufacturer_approval',
+      status: 'gate_cleared_after_explicit_signed_validation',
+      claim_gate_effect: 'gate_cleared_after_explicit_signed_validation',
+      no_claim_gates_cleared: false,
+      claims_cleared_count: 1,
+      source_review_decision_evidence_id: decision.id,
+      resolved_evidence_id: resolved.resolved_evidence_id,
+      resolved_evidence_ref: 'manufacturer://official-flow/queue-truth',
+    }));
+
+    const professionalRow = signedReviewItem.validation_rows.find((row) => row.target_gate_code === 'PROFESSIONAL_REVIEW_MISSING');
+    expect(professionalRow).toEqual(expect.objectContaining({
+      target_gate_code: 'PROFESSIONAL_REVIEW_MISSING',
+      status: 'ready_for_signed_reviewer_workflow',
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+      claims_cleared_count: 0,
+    }));
+  }, 15000);
+
   it('builds and imports Cooperative 1881 default official-flow attachment intake without clearing claims', async () => {
     const projectName = 'The Cooperative 1881 - Salt Lake City UT';
     const packetRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-packets/official-flow/default-attachment-intake-records`, {

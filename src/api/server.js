@@ -670,6 +670,51 @@ function signedReviewerEvidenceCanClearClaimGate(row) {
   return signedReviewerClaimGateExplicitClear(parsed.claim_gate_effect);
 }
 
+function signedReviewerOfficialFlowDecisionEvidenceId(parsedNotes) {
+  const userNotes = String(parsedNotes?.user_notes || '');
+  const match = userNotes.match(/source_official_flow_review_decision_evidence_id\s+(\d+)/i);
+  if (!match) return null;
+  const value = Number(match[1]);
+  return Number.isFinite(value) && value > 0 ? value : null;
+}
+
+function resolvedClaimGateEvidence(projectName, gateCode) {
+  const gate = db
+    .prepare('SELECT * FROM claim_gates WHERE project_name = ? AND code = ?')
+    .get(projectName, gateCode);
+  if (!gate || gate.status !== 'cleared') return null;
+  const resolvedEvidenceId = Number(gate.resolved_evidence_id || 0) || null;
+  const evidence = resolvedEvidenceId
+    ? db.prepare('SELECT * FROM project_evidence WHERE project_name = ? AND id = ?').get(projectName, resolvedEvidenceId)
+    : db.prepare(`SELECT * FROM project_evidence
+                  WHERE project_name = ? AND source_ref = ?
+                  ORDER BY created_at DESC, id DESC`)
+      .get(projectName, gate.resolved_evidence_ref || '');
+  if (!evidence) return null;
+  return { gate, evidence };
+}
+
+function officialFlowResolvedValidationState(projectName, reviewDecision, config) {
+  const decision = reviewDecision?.decision || {};
+  const decisionEvidenceId = Number(reviewDecision?.evidence?.id || 0) || null;
+  if (!decisionEvidenceId) return null;
+  const resolved = resolvedClaimGateEvidence(projectName, config.target_gate_code);
+  if (!resolved) return null;
+  const parsedNotes = parseStructuredSignedReviewerNotes(resolved.evidence);
+  if (!parsedNotes || !signedReviewerClaimGateExplicitClear(parsedNotes.claim_gate_effect)) return null;
+  const linkedDecisionId = signedReviewerOfficialFlowDecisionEvidenceId(parsedNotes);
+  const suppliedRef = String(decision[config.source_ref_field] || '').trim();
+  const resolvedRef = String(resolved.gate.resolved_evidence_ref || resolved.evidence.source_ref || '').trim();
+  const matchesDecision = linkedDecisionId === decisionEvidenceId
+    || (suppliedRef && resolvedRef && suppliedRef === resolvedRef);
+  if (!matchesDecision) return null;
+  return {
+    gate: resolved.gate,
+    evidence: resolved.evidence,
+    parsedNotes,
+  };
+}
+
 function buildSignedReviewerEvidenceNotes(
   projectName,
   evidenceType,
@@ -14988,9 +15033,10 @@ function officialFlowSignedReviewerValidationRow(projectName, reviewDecision, co
   const queueHref = `/api/projects/${encodeURIComponent(projectName)}/resolver-queue?${queueParams.toString()}`;
   const resolveRoute = `/api/projects/${encodeURIComponent(projectName)}/claim-gates/${encodeURIComponent(targetGateCode)}/resolve`;
   const uploadPacketHref = `/api/projects/${encodeURIComponent(projectName)}/resolver-packets/official-flow-review-decision/${encodeURIComponent(evidenceId)}/signed-evidence-upload-packet?${queueParams.toString()}`;
-  return {
+  const resolvedState = officialFlowResolvedValidationState(projectName, reviewDecision, config);
+  const row = {
     artifact_type: 'halofire.official_flow_signed_reviewer_validation_row.v1',
-    status: 'ready_for_signed_reviewer_workflow',
+    status: resolvedState ? 'gate_cleared_after_explicit_signed_validation' : 'ready_for_signed_reviewer_workflow',
     target_gate_code: targetGateCode,
     target_approval_lane: config.target_approval_lane,
     required_evidence_type: config.required_evidence_type,
@@ -15002,12 +15048,25 @@ function officialFlowSignedReviewerValidationRow(projectName, reviewDecision, co
     source_attachment_intake_row_index: Number.isInteger(decision.source_attachment_intake_row_index) ? decision.source_attachment_intake_row_index : null,
     source_supplied_ref: decision[config.source_ref_field] || null,
     blocked_claims: config.blocked_claims,
-    claim_gate_effect: 'no_claims_cleared',
-    no_claim_gates_cleared: true,
-    next_action: config.next_action,
+    claim_gate_effect: resolvedState ? 'gate_cleared_after_explicit_signed_validation' : 'no_claims_cleared',
+    no_claim_gates_cleared: resolvedState ? false : true,
+    claims_cleared_count: resolvedState ? 1 : 0,
+    next_action: resolvedState
+      ? `Signed reviewer evidence already cleared ${targetGateCode}; use the resolve-audit packet for exact proof while unrelated regulated claims stay fail-closed.`
+      : config.next_action,
+    ...(resolvedState ? {
+      resolved_evidence_id: resolvedState.evidence.id,
+      resolved_evidence_ref: resolvedState.gate.resolved_evidence_ref || resolvedState.evidence.source_ref || null,
+      resolved_by: resolvedState.gate.resolved_by || null,
+      resolved_at: resolvedState.gate.resolved_at || null,
+      resolve_audit_packet_href: claimGateResolveAuditPacketHref(projectName, targetGateCode),
+      resolve_audit_packet_artifact_type: 'halofire.claim_gate_resolve_audit_packet.v1',
+    } : {}),
     limitations: [
       'This row opens the signed reviewer workflow with the saved official-flow decision as context only.',
-      'It does not clear the target gate until real signed evidence is uploaded and explicitly validated.',
+      resolvedState
+        ? 'This row shows that the target gate already cleared through explicit signed reviewer validation.'
+        : 'It does not clear the target gate until real signed evidence is uploaded and explicitly validated.',
     ],
     action: {
       label: config.label,
@@ -15032,9 +15091,9 @@ function officialFlowSignedReviewerValidationRow(projectName, reviewDecision, co
       source_attachment_intake_packet_evidence_id: decision.source_attachment_intake_packet_evidence_id || null,
       source_attachment_intake_row_index: Number.isInteger(decision.source_attachment_intake_row_index) ? decision.source_attachment_intake_row_index : null,
       source_supplied_ref: decision[config.source_ref_field] || null,
-      claim_gate_effect: 'requires_real_signed_evidence',
-      no_claim_gates_cleared: true,
-      claims_cleared_count: 0,
+      claim_gate_effect: resolvedState ? 'gate_cleared_after_explicit_signed_validation' : 'requires_real_signed_evidence',
+      no_claim_gates_cleared: resolvedState ? false : true,
+      claims_cleared_count: resolvedState ? 1 : 0,
       after_success_queue_filter: `/api/projects/${encodeURIComponent(projectName)}/resolver-queue?${afterSuccessQueueParams.toString()}`,
       blocked_until: [
         'real signed reviewer evidence is uploaded through the explicit claim-gate resolve flow',
@@ -15053,12 +15112,14 @@ function officialFlowSignedReviewerValidationRow(projectName, reviewDecision, co
       source_replay_evidence_id: decision.source_replay_evidence_id || null,
       source_attachment_intake_packet_evidence_id: decision.source_attachment_intake_packet_evidence_id || null,
       source_attachment_intake_row_index: Number.isInteger(decision.source_attachment_intake_row_index) ? decision.source_attachment_intake_row_index : null,
-      claim_gate_effect: 'requires_real_signed_evidence',
-      no_claim_gates_cleared: true,
-      claims_cleared_count: 0,
+      claim_gate_effect: resolvedState ? 'gate_cleared_after_explicit_signed_validation' : 'requires_real_signed_evidence',
+      no_claim_gates_cleared: resolvedState ? false : true,
+      claims_cleared_count: resolvedState ? 1 : 0,
     },
     queue_action: {
-      label: `Open pending ${config.required_evidence_type} signed-reviewer queue`,
+      label: resolvedState
+        ? `Open cleared ${config.required_evidence_type} signed-reviewer audit`
+        : `Open pending ${config.required_evidence_type} signed-reviewer queue`,
       method: 'GET',
       href: queueHref,
       artifact_type: 'halofire.official_flow_signed_reviewer_validation_queue_item.v1',
@@ -15069,24 +15130,28 @@ function officialFlowSignedReviewerValidationRow(projectName, reviewDecision, co
       source_attachment_intake_packet_evidence_id: decision.source_attachment_intake_packet_evidence_id || null,
       source_attachment_intake_row_index: Number.isInteger(decision.source_attachment_intake_row_index) ? decision.source_attachment_intake_row_index : null,
       source_supplied_ref: decision[config.source_ref_field] || null,
-      claim_gate_effect: 'no_claims_cleared',
-      no_claim_gates_cleared: true,
-      claims_cleared_count: 0,
+      claim_gate_effect: resolvedState ? 'gate_cleared_after_explicit_signed_validation' : 'no_claims_cleared',
+      no_claim_gates_cleared: resolvedState ? false : true,
+      claims_cleared_count: resolvedState ? 1 : 0,
     },
   };
+  return row;
 }
 
 function officialFlowReviewDecisionSignedReviewerQueueItem(projectName, reviewDecision) {
   if (!reviewDecision?.evidence || !reviewDecision.decision) return null;
   const decision = reviewDecision.decision;
   const validationRows = OFFICIAL_FLOW_SIGNED_REVIEWER_VALIDATION_CONFIGS.map((config) => officialFlowSignedReviewerValidationRow(projectName, reviewDecision, config));
+  const claimsClearedCount = validationRows.reduce((acc, row) => acc + (Number(row.claims_cleared_count || 0) || 0), 0);
+  const pendingRows = validationRows.filter((row) => row.status !== 'gate_cleared_after_explicit_signed_validation');
+  const allRowsCleared = validationRows.length > 0 && pendingRows.length === 0;
   return {
     id: `resolver:official-flow-signed-reviewer-validation:${reviewDecision.evidence.id}`,
     project_name: projectName,
     kind: 'official_flow_signed_reviewer_validation',
     artifact_type: 'halofire.official_flow_signed_reviewer_validation_queue_item.v1',
     title: 'Official-flow signed reviewer validation handoff',
-    status: 'signed_reviewer_validation_needed',
+    status: allRowsCleared ? 'signed_reviewer_validation_cleared' : 'signed_reviewer_validation_needed',
     evidence_id: reviewDecision.evidence.id,
     source_evidence_type: 'official_flow_professional_ahj_review_decision',
     source_ref: reviewDecision.evidence.source_ref || decision.source_ref || null,
@@ -15097,18 +15162,28 @@ function officialFlowReviewDecisionSignedReviewerQueueItem(projectName, reviewDe
     source_attachment_intake_row_index: Number.isInteger(decision.source_attachment_intake_row_index) ? decision.source_attachment_intake_row_index : null,
     reviewer_name: decision.reviewer_name || null,
     review_decision: decision.review_decision || null,
-    next_action: 'Open the existing signed reviewer workflow for professional, AHJ, manufacturer, and AutoSprink evidence; all regulated claims remain blocked until those separate validations succeed.',
+    next_action: allRowsCleared
+      ? 'All official-flow signed-reviewer gates in this handoff were explicitly cleared; use the resolve-audit packet trail for proof and keep unrelated regulated claims fail-closed.'
+      : claimsClearedCount > 0
+        ? 'Some official-flow signed-reviewer gates were explicitly cleared; finish the remaining pending reviewer lanes and use resolve-audit packets for the cleared ones.'
+        : 'Open the existing signed reviewer workflow for professional, AHJ, manufacturer, and AutoSprink evidence; all regulated claims remain blocked until those separate validations succeed.',
     acceptable_evidence: validationRows.flatMap((row) => row.acceptable_evidence),
     ai_fallback: 'AI may assemble the handoff and summarize missing evidence, but it cannot sign, approve, or clear regulated claim gates.',
     source_refs: Array.isArray(decision.source_refs) ? decision.source_refs : [],
     validation_rows: validationRows,
     blocked_claims: Array.isArray(decision.blocked_claims) ? decision.blocked_claims : [...OFFICIAL_FLOW_BLOCKED_CLAIMS],
-    claim_gate_effect: 'no_claims_cleared',
-    no_claim_gates_cleared: true,
-    claims_cleared_count: 0,
+    claim_gate_effect: allRowsCleared
+      ? 'gate_cleared_after_explicit_signed_validation'
+      : claimsClearedCount > 0
+        ? 'partial_signed_reviewer_validation'
+        : 'no_claims_cleared',
+    no_claim_gates_cleared: claimsClearedCount === 0,
+    claims_cleared_count: claimsClearedCount,
     limitations: [
       'This queue item is a follow-through handoff from a saved official-flow review decision.',
-      'It preserves source refs and prefill context only; it does not validate professional, AHJ, manufacturer, official-flow, or AutoSprink evidence.',
+      allRowsCleared
+        ? 'This queue item preserves the cleared signed-reviewer audit trail for the saved official-flow review decision.'
+        : 'It preserves source refs and prefill context only; it does not validate professional, AHJ, manufacturer, official-flow, or AutoSprink evidence.',
       'Permit-ready, AHJ approval, PE review, engineering-grade, fabrication-ready, manufacturer-exact, and AutoSprink parity claims remain fail-closed.',
     ],
     actions: validationRows.map((row) => row.action),
