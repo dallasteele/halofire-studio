@@ -394,6 +394,33 @@ describe('Settings signed reviewer browser smoke', () => {
 
       const gates = await api(`/api/projects/${encodeURIComponent(projectName)}/claim-gates`, token);
       expect(gates.find((gate) => gate.code === targetGateCode).status).toBe('cleared');
+
+      await page.goto(`${BASE}/workbench.html?project=${encodeURIComponent(projectName)}#evidence-${saved.id}`, {
+        waitUntil: 'domcontentloaded',
+      });
+      const savedRow = page.locator(`#evidence-${saved.id}`).first();
+      await savedRow.waitFor();
+      expect(await savedRow.innerText()).toContain('Open Settings packet prefill');
+      expect(await savedRow.locator('[data-signed-reviewer-workflow-href]').getAttribute('data-signed-reviewer-workflow-href')).toBe(
+        savedNotes.settings_prefill_href,
+      );
+
+      await page.reload({ waitUntil: 'domcontentloaded' });
+      const savedRowAfterRefresh = page.locator(`#evidence-${saved.id}`).first();
+      await savedRowAfterRefresh.waitFor();
+      expect(await savedRowAfterRefresh.innerText()).toContain('Open Settings packet prefill');
+      await savedRowAfterRefresh.locator('[data-signed-reviewer-workflow-evidence-id]').first().click();
+      await page.waitForURL((url) => url.pathname === '/settings.html' && url.hash === '#wizSignoff');
+      await page.waitForFunction(
+        (packetHref) => document.getElementById('wizPacketStatus')?.dataset.officialFlowUploadPacketHref === packetHref,
+        uploadPacketHref,
+      );
+      expect(page.url()).toContain('uploadPacketHref=');
+      expect(await page.locator('#wizGate').inputValue()).toBe(targetGateCode);
+      expect(await page.locator('#wizType').inputValue()).toBe(targetEvidenceType);
+      expect(await page.locator('#wizSourceRef').inputValue()).toBe(targetSourceRef);
+      expect(await page.locator('#wizPacketStatus').innerText()).toContain('Prefilled from halofire.official_flow_signed_evidence_upload_packet.v1');
+      expect(await page.locator('#wizPacketStatus').getAttribute('data-official-flow-upload-packet-no-claim-gates-cleared')).toBe('true');
     } finally {
       await page.close();
     }
