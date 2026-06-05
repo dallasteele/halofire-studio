@@ -1896,6 +1896,39 @@ describe('S5 GET /api/auto-source/status', () => {
       claim_gate_effect: 'no_claims_cleared',
     }));
 
+    const signedReviewerQueueAfterBridgeRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-queue?officialFlowReviewDecisionEvidenceId=${decision.id}&targetGate=AHJ_APPROVAL_MISSING&evidenceType=ahj_approval`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(signedReviewerQueueAfterBridgeRes.status).toBe(200);
+    const signedReviewerQueueAfterBridge = await signedReviewerQueueAfterBridgeRes.json();
+    const ahjValidationRowAfterBridge = signedReviewerQueueAfterBridge.items
+      .flatMap((item) => item.validation_rows || [])
+      .find((row) => row.target_gate_code === 'AHJ_APPROVAL_MISSING');
+    expect(ahjValidationRowAfterBridge).toEqual(expect.objectContaining({
+      latest_sam31_approval_upload_intake: expect.objectContaining({
+        evidence_id: bridgedUpload.id,
+        code: 'HALOFIRE_SAM31_AHJ_APPROVAL_UPLOAD_MISSING',
+        source_official_flow_review_decision_evidence_id: decision.id,
+        source_official_flow_target_gate_code: 'AHJ_APPROVAL_MISSING',
+        placeholder_upload: true,
+        claim_gate_effect: 'no_claims_cleared',
+        no_claim_gates_cleared: true,
+      }),
+      sam31_approval_validation_queue_action: expect.objectContaining({
+        href: expect.stringContaining('sam31ApprovalValidation=pending'),
+        source_halofire_sam31_approval_upload_evidence_id: bridgedUpload.id,
+        target_gate_code: 'AHJ_APPROVAL_MISSING',
+        claim_gate_effect: 'no_claims_cleared',
+        no_claim_gates_cleared: true,
+      }),
+      sam31_approval_gate_validation_packet_action: expect.objectContaining({
+        href: expect.stringContaining(`/evidence/${bridgedUpload.id}/openclaw/sam31/approval-upload/gate-validation-packet`),
+        source_halofire_sam31_approval_upload_evidence_id: bridgedUpload.id,
+        artifact_type: 'halofire.sam31_approval_upload_gate_validation_packet.v1',
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    }));
+
     const validationQueueRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-queue?sam31ApprovalValidation=pending&targetGate=AHJ_APPROVAL_MISSING`, {
       headers: { Authorization: `Bearer ${token}` },
     });

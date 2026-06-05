@@ -87,6 +87,12 @@ describe('workbench signed reviewer evidence detail rendering', () => {
     expect(html).toContain('data-official-flow-default-sam31-approval-upload');
     expect(html).toContain('saveOfficialFlowDefaultSam31ApprovalUpload');
     expect(html).toContain('default/internal-alpha placeholder');
+    expect(html).toContain('latest_sam31_approval_upload_intake');
+    expect(html).toContain('Open saved SAM31 approval validation queue');
+    expect(html).toContain('data-official-flow-sam31-approval-validation-queue');
+    expect(html).toContain('data-sam31-approval-upload-default-validation-packet');
+    expect(html).toContain('data-sam31-approval-upload-validation-decision-save-evidence-id');
+    expect(html).toContain('data-source-official-flow-review-decision-evidence-id');
     expect(html).toContain('sam31ApprovalValidation=pending');
     expect(html).toContain('halofireUiBasePath');
     expect(html).toContain('halofireUiHref');

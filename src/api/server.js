@@ -10416,6 +10416,8 @@ function halofireSam31ApprovalUploadIntakeSummary(uploadEvidence) {
     latest_approval_upload_validation_decision: latestValidationDecision,
     use_for_claims: false,
     claim_gate_effect: intake.claim_gate_effect || 'no_claims_cleared',
+    no_claim_gates_cleared: intake.no_claim_gates_cleared !== false,
+    claims_cleared_count: Number.isFinite(Number(intake.claims_cleared_count)) ? Number(intake.claims_cleared_count) : 0,
     blocked_claims: Array.isArray(intake.blocked_claims) ? intake.blocked_claims : [],
   };
 }
@@ -14975,6 +14977,24 @@ function sam31ApprovalUploadMissingCodeForOfficialFlowConfig(config) {
   return null;
 }
 
+function latestOfficialFlowSam31ApprovalUploadIntakeSummary(projectName, reviewDecisionEvidenceId, config) {
+  const sourceReviewDecisionEvidenceId = Number(reviewDecisionEvidenceId);
+  if (!Number.isSafeInteger(sourceReviewDecisionEvidenceId) || sourceReviewDecisionEvidenceId <= 0) return null;
+  const code = sam31ApprovalUploadMissingCodeForOfficialFlowConfig(config);
+  const rule = code ? halofireSam31ApprovalUploadRule(code) : null;
+  if (!code || !rule) return null;
+  return latestHalofireSam31ApprovalUploadIntakeEvidence(projectName, null)
+    .map(halofireSam31ApprovalUploadIntakeSummary)
+    .filter(Boolean)
+    .find((summary) => (
+      Number(summary.source_official_flow_review_decision_evidence_id) === sourceReviewDecisionEvidenceId
+      && summary.source_official_flow_target_gate_code === config.target_gate_code
+      && summary.source_official_flow_required_evidence_type === config.required_evidence_type
+      && summary.code === code
+      && summary.evidence_type === rule.evidence_type
+    )) || null;
+}
+
 function officialFlowSignedEvidenceUploadPacket(projectName, reviewDecision, targetGateCode, evidenceType = '') {
   if (!reviewDecision?.evidence || !reviewDecision.decision) return null;
   const config = officialFlowSignedReviewerValidationConfig(targetGateCode, evidenceType);
@@ -15082,6 +15102,27 @@ function officialFlowSignedReviewerValidationRow(projectName, reviewDecision, co
   const uploadPacketHref = `/api/projects/${encodeURIComponent(projectName)}/resolver-packets/official-flow-review-decision/${encodeURIComponent(evidenceId)}/signed-evidence-upload-packet?${queueParams.toString()}`;
   resolveParams.set('uploadPacketHref', uploadPacketHref);
   const resolvedState = officialFlowResolvedValidationState(projectName, reviewDecision, config);
+  const latestSam31ApprovalUploadIntake = latestOfficialFlowSam31ApprovalUploadIntakeSummary(projectName, evidenceId, config);
+  const sam31ApprovalValidationQueueHref = latestSam31ApprovalUploadIntake
+    ? `/api/projects/${encodeURIComponent(projectName)}/resolver-queue?sam31ApprovalValidation=pending&targetGate=${encodeURIComponent(targetGateCode)}`
+    : null;
+  const sam31ApprovalGateValidationPacketAction = latestSam31ApprovalUploadIntake
+    ? {
+        ...(latestSam31ApprovalUploadIntake.gate_validation_packet_action || halofireSam31ApprovalUploadGateValidationPacketAction(projectName, latestSam31ApprovalUploadIntake.evidence_id)),
+        source_halofire_sam31_approval_upload_evidence_id: latestSam31ApprovalUploadIntake.evidence_id,
+        source_official_flow_review_decision_evidence_id: evidenceId,
+        source_replay_evidence_id: latestSam31ApprovalUploadIntake.source_replay_evidence_id || decision.source_replay_evidence_id || null,
+        source_attachment_intake_packet_evidence_id: latestSam31ApprovalUploadIntake.source_attachment_intake_packet_evidence_id || decision.source_attachment_intake_packet_evidence_id || null,
+        source_attachment_intake_row_index: Number.isInteger(latestSam31ApprovalUploadIntake.source_attachment_intake_row_index)
+          ? latestSam31ApprovalUploadIntake.source_attachment_intake_row_index
+          : (Number.isInteger(decision.source_attachment_intake_row_index) ? decision.source_attachment_intake_row_index : null),
+        target_gate_code: targetGateCode,
+        required_evidence_type: config.required_evidence_type,
+        claim_gate_effect: 'no_claims_cleared',
+        no_claim_gates_cleared: true,
+        claims_cleared_count: 0,
+      }
+    : null;
   const row = {
     artifact_type: 'halofire.official_flow_signed_reviewer_validation_row.v1',
     status: resolvedState ? 'gate_cleared_after_explicit_signed_validation' : 'ready_for_signed_reviewer_workflow',
@@ -15099,8 +15140,30 @@ function officialFlowSignedReviewerValidationRow(projectName, reviewDecision, co
     claim_gate_effect: resolvedState ? 'gate_cleared_after_explicit_signed_validation' : 'no_claims_cleared',
     no_claim_gates_cleared: resolvedState ? false : true,
     claims_cleared_count: resolvedState ? 1 : 0,
+    latest_sam31_approval_upload_intake: latestSam31ApprovalUploadIntake,
+    sam31_approval_validation_queue_action: latestSam31ApprovalUploadIntake ? {
+      label: `Open saved SAM31 approval validation queue for ${targetGateCode}`,
+      method: 'GET',
+      href: sam31ApprovalValidationQueueHref,
+      artifact_type: 'halofire.sam31_approval_upload_validation_queue_item.v1',
+      source_halofire_sam31_approval_upload_evidence_id: latestSam31ApprovalUploadIntake.evidence_id,
+      source_official_flow_review_decision_evidence_id: evidenceId,
+      source_replay_evidence_id: latestSam31ApprovalUploadIntake.source_replay_evidence_id || decision.source_replay_evidence_id || null,
+      source_attachment_intake_packet_evidence_id: latestSam31ApprovalUploadIntake.source_attachment_intake_packet_evidence_id || decision.source_attachment_intake_packet_evidence_id || null,
+      source_attachment_intake_row_index: Number.isInteger(latestSam31ApprovalUploadIntake.source_attachment_intake_row_index)
+        ? latestSam31ApprovalUploadIntake.source_attachment_intake_row_index
+        : (Number.isInteger(decision.source_attachment_intake_row_index) ? decision.source_attachment_intake_row_index : null),
+      target_gate_code: targetGateCode,
+      required_evidence_type: config.required_evidence_type,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+      claims_cleared_count: 0,
+    } : null,
+    sam31_approval_gate_validation_packet_action: sam31ApprovalGateValidationPacketAction,
     next_action: resolvedState
       ? `Signed reviewer evidence already cleared ${targetGateCode}; use the resolve-audit packet for exact proof while unrelated regulated claims stay fail-closed.`
+      : latestSam31ApprovalUploadIntake
+        ? `A saved default/internal-alpha SAM31 approval upload #${latestSam31ApprovalUploadIntake.evidence_id} is pending gate validation for ${targetGateCode}; continue to validation readback or replace it with real signed evidence before resolving any claim gate.`
       : config.next_action,
     ...(resolvedState ? {
       resolved_evidence_id: resolvedState.evidence.id,
