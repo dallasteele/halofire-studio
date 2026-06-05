@@ -433,12 +433,24 @@ describe('Workbench official-flow browser smoke', () => {
       expect(queueText).toContain(`review_decision_evidence #${decision.id}`);
       expect(queueText).toContain('gate_cleared_after_explicit_signed_validation');
       expect(queueText).toContain('halofire.claim_gate_resolve_audit_packet.v1');
+      expect(queueText).toContain('Open Settings packet prefill');
       await expect(queue.locator('[data-official-flow-signed-evidence-upload-packet-gate-code="MANUFACTURER_MODEL_APPROVAL_MISSING"]').count()).resolves.toBe(0);
       await expect(queue.locator('[data-official-flow-signed-reviewer-resolve-workflow][data-official-flow-signed-reviewer-resolve-gate-code="MANUFACTURER_MODEL_APPROVAL_MISSING"]').count()).resolves.toBe(0);
 
       const auditButton = queue.locator('[data-official-flow-signed-reviewer-resolve-audit-gate-code="MANUFACTURER_MODEL_APPROVAL_MISSING"]').first();
       expect(await auditButton.getAttribute('data-official-flow-signed-reviewer-resolve-audit-evidence-id')).toBe(String(resolved.resolved_evidence_id));
       expect(await auditButton.getAttribute('data-official-flow-signed-reviewer-resolve-audit-href')).toMatch(/MANUFACTURER_MODEL_APPROVAL_MISSING\/resolve-audit-packet/);
+
+      const clearedManufacturerRow = queue.locator('div').filter({ hasText: 'MANUFACTURER_MODEL_APPROVAL_MISSING manufacturer_approval gate_cleared_after_explicit_signed_validation' }).first();
+      await clearedManufacturerRow.locator('[data-signed-reviewer-workflow-gate-code="MANUFACTURER_MODEL_APPROVAL_MISSING"]').click();
+      await page.waitForURL((url) => url.pathname === '/settings.html' && url.hash === '#wizSignoff');
+      await page.waitForFunction(
+        () => document.getElementById('wizPacketStatus')?.dataset.officialFlowUploadPacketHref,
+      );
+      expect(await page.locator('#wizPacketStatus').innerText()).toContain('Prefilled from halofire.official_flow_signed_evidence_upload_packet.v1');
+      expect(await page.locator('#wizPacketStatus').getAttribute('data-official-flow-upload-packet-claim-gate-effect')).toBe('requires_real_signed_evidence');
+      expect(page.url()).toContain('uploadPacketHref=');
+      expect(await page.locator('#wizGate').inputValue()).toBe('MANUFACTURER_MODEL_APPROVAL_MISSING');
     } finally {
       await page.close();
     }

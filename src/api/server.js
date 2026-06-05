@@ -15085,6 +15085,7 @@ function officialFlowSignedReviewerValidationRow(projectName, reviewDecision, co
       resolved_evidence_ref: resolvedState.gate.resolved_evidence_ref || resolvedState.evidence.source_ref || null,
       resolved_by: resolvedState.gate.resolved_by || null,
       resolved_at: resolvedState.gate.resolved_at || null,
+      settings_prefill_href: resolvedState.parsedNotes?.settings_prefill_href || `/settings.html?${resolveParams.toString()}#wizSignoff`,
       resolve_audit_packet_href: claimGateResolveAuditPacketHref(projectName, targetGateCode),
       resolve_audit_packet_artifact_type: 'halofire.claim_gate_resolve_audit_packet.v1',
     } : {}),
