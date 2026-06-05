@@ -659,6 +659,13 @@ function parseStructuredSignedReviewerNotes(row) {
   }
 }
 
+function signedReviewerEvidenceCanClearClaimGate(row) {
+  const parsed = parseStructuredSignedReviewerNotes(row);
+  if (!parsed) return false;
+  if (parsed.kind !== 'signed_reviewer_evidence') return true;
+  return String(parsed.claim_gate_effect || 'no_claims_cleared') !== 'no_claims_cleared';
+}
+
 function buildSignedReviewerEvidenceNotes(
   projectName,
   evidenceType,
@@ -1026,6 +1033,7 @@ app.get('/api/projects/:name/evidence-wizard', authMiddleware, (req, res) => {
     if (!GATE_CLEARING_EVIDENCE_TYPES.has(row.evidence_type)) return false;
     if (String(row.status) !== 'present') return false;
     if (SIGNED_REVIEW_EVIDENCE_TYPES.has(row.evidence_type) && !hasStructuredSignedReviewerNotes(row)) return false;
+    if (SIGNED_REVIEW_EVIDENCE_TYPES.has(row.evidence_type) && !signedReviewerEvidenceCanClearClaimGate(row)) return false;
     return true;
   };
   const gateRows = gates.map((gate) => {
@@ -5990,6 +5998,11 @@ app.post('/api/projects/:name/claim-gates/:code/resolve', authMiddleware, requir
     }
     if (SIGNED_REVIEW_EVIDENCE_TYPES.has(evidenceType) && !hasStructuredSignedReviewerNotes(existingEvidence)) {
       return res.status(400).json({ error: 'existing evidence row is missing signed reviewer metadata required for this gate' });
+    }
+    if (SIGNED_REVIEW_EVIDENCE_TYPES.has(evidenceType) && !signedReviewerEvidenceCanClearClaimGate(existingEvidence)) {
+      return res.status(400).json({
+        error: 'existing signed reviewer evidence is record-only/no_claims_cleared; upload real signed evidence through the explicit claim-gate resolve flow before clearing this gate',
+      });
     }
     const tx = db.transaction(() => {
       if (structuredExistingNotes?.kind === 'halofire_sam31_approval_upload_validation_decision') {

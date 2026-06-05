@@ -249,6 +249,47 @@ describe('HaloFire resolve-gate API (evidence-gated)', () => {
     expect((await gate(token, 'AHJ_APPROVAL_MISSING')).status).toBe('blocked');
   });
 
+  it('rejects saved signed-reviewer evidence that is explicitly record-only/no_claims_cleared', async () => {
+    const token = await tokenFor('gate-admin', 'actual-test-password');
+    const recordOnly = await request(`${PROJECT_PATH}/evidence`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        evidence_type: 'ahj_approval',
+        source_ref: 'internal-alpha://ahj-placeholder/pending-real-approval',
+        source_file: 'internal-alpha-ahj-placeholder.json',
+        status: 'present',
+        target_gate_code: 'AHJ_APPROVAL_MISSING',
+        notes: 'Record-only AHJ placeholder from official-flow signed reviewer workflow; no claims cleared.',
+        signoff: {
+          reviewer_name: 'HaloFire Internal Alpha',
+          reviewer_title: 'Placeholder Reviewer - Replace With AHJ Approval',
+          signed_at: '2026-06-04T22:00:00.000Z',
+          organization: 'HaloFire Internal Alpha',
+        },
+      }),
+    });
+    expect(recordOnly.status).toBe(201);
+    const { id } = await recordOnly.json();
+
+    const evidence = await (await request(`${PROJECT_PATH}/evidence`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })).json();
+    const row = evidence.find((item) => item.id === id);
+    expect(row).toBeTruthy();
+    expect(JSON.parse(row.notes).claim_gate_effect).toBe('no_claims_cleared');
+
+    const res = await request(RESOLVE_PATH('AHJ_APPROVAL_MISSING'), {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ evidence_id: id }),
+    });
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.error).toMatch(/no_claims_cleared|record-only|explicit claim-gate resolve/i);
+    expect((await gate(token, 'AHJ_APPROVAL_MISSING')).status).toBe('blocked');
+  });
+
   it('rejects a resolve with missing evidence (400)', async () => {
     const token = await tokenFor('gate-admin', 'actual-test-password');
     const res = await request(RESOLVE_PATH('AHJ_APPROVAL_MISSING'), {
