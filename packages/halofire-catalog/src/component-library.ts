@@ -42,6 +42,13 @@ export const CatalogComponentSourceRecordSchema = z.object({
   notes: z.string(),
   size_bytes: z.number().int().nonnegative(),
 }).superRefine((value, ctx) => {
+  if (value.source_license.source_kind !== value.source_kind) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['source_license', 'source_kind'],
+      message: 'source_license.source_kind must match component source_kind',
+    })
+  }
   if (value.source_license.part_ref !== value.key) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,

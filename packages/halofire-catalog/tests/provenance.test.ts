@@ -130,6 +130,7 @@ describe('provenance artifacts', () => {
       const family = CatalogFamilyContractSchema.parse(component.family_contract)
 
       expect(license.part_ref).toBe(component.key)
+      expect(license.source_kind ?? 'procedural').toBe(component.source_kind)
       expect(family.part_ref).toBe(component.key)
       expect(license.model_status).toBe(component.model_status)
       expect(family.model_status).toBe(component.model_status)
