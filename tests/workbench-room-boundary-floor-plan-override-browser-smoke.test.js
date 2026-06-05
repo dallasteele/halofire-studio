@@ -1336,4 +1336,64 @@ describe('Workbench room-boundary floor-plan override browser smoke', () => {
       await page.close();
     }
   }, 30_000);
+
+  it('reopens cleared generic signed-reviewer evidence from Workbench in read-only inspect mode after refresh', async () => {
+    const token = await adminToken();
+    const gateCode = 'PROFESSIONAL_REVIEW_MISSING';
+    const resolved = await api(`${PROJECT_PATH}/claim-gates/${gateCode}/resolve`, token, {
+      method: 'POST',
+      body: JSON.stringify({
+        evidence: {
+          evidence_type: 'professional_review',
+          source_ref: 'workbench-generic-signed-reviewer://1881/professional/inspect-001',
+          source_file: 'workbench-generic-signed-reviewer-professional-inspect-001.pdf',
+          status: 'present',
+          notes: 'Workbench browser smoke generic signed reviewer inspect continuity.',
+          signoff: {
+            reviewer_name: 'Morgan Inspect',
+            reviewer_title: 'Licensed PE',
+            signed_at: '2026-06-05T11:45:00.000Z',
+            organization: 'HaloFire QA',
+            license_id: 'PE-WORKBENCH-INSPECT-001',
+          },
+        },
+      }),
+    });
+
+    const page = await browser.newPage();
+    page.setDefaultTimeout(8000);
+    await page.addInitScript((authToken) => {
+      localStorage.setItem('halofire_token', authToken);
+    }, token);
+
+    try {
+      await page.goto(`${BASE}/workbench.html?project=${encodeURIComponent(PROJECT_NAME)}`, { waitUntil: 'domcontentloaded' });
+
+      const evidenceRow = page.locator(`#evidence-${resolved.resolved_evidence_id}`);
+      await evidenceRow.waitFor({ state: 'attached' });
+      const evidenceText = await evidenceRow.innerText();
+      expect(evidenceText).toContain('claim_gate_effect gate_cleared_after_explicit_signed_validation');
+      expect(evidenceText).toContain('resolve_audit_packet_href');
+
+      const inspectButton = evidenceRow.locator(`[data-signed-reviewer-workflow-evidence-id="${resolved.resolved_evidence_id}"]`).first();
+      await inspectButton.waitFor({ state: 'attached' });
+      expect(await inspectButton.innerText()).toContain('Open accepted evidence read-only');
+      expect(await inspectButton.getAttribute('data-signed-reviewer-workflow-action')).toBe('inspect');
+
+      await inspectButton.click();
+      await page.waitForURL((url) => url.pathname === '/settings.html' && url.hash === '#wizSignoff');
+      await page.waitForFunction(
+        () => Boolean(document.getElementById('wizPacketStatus')?.dataset.signedReviewerReadonlyEvidenceId),
+      );
+      expect(page.url()).toContain(`project=${encodeURIComponent(PROJECT_NAME)}`);
+      expect(page.url()).toContain(`gate=${gateCode}`);
+      expect(page.url()).toContain(`evidenceId=${resolved.resolved_evidence_id}`);
+      expect(page.url()).toContain('action=inspect');
+      expect(await page.locator('#wizPacketStatus').innerText()).toContain('Read-only accepted signed reviewer evidence');
+      expect(await page.locator('#wizGate').inputValue()).toBe(gateCode);
+      expect(await page.locator('#wizSubmit').isDisabled()).toBe(true);
+    } finally {
+      await page.close();
+    }
+  }, 30_000);
 });
