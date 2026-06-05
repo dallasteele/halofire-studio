@@ -402,9 +402,17 @@ function halofireUiBasePath() {
   return HALOFIRE_BASE_PATH || (location.pathname.startsWith('/halo-fire/') ? '/halo-fire' : '');
 }
 
+function halofireUiHref(href = '') {
+  const value = String(href || '').trim();
+  if (!value) return '';
+  const base = halofireUiBasePath();
+  if (base && value.startsWith('/settings.html')) return base + value;
+  return value;
+}
+
 function openSignedReviewerWorkflow(projectName, gateCode, evidenceId, action, href = '') {
   if (href) {
-    location.href = href;
+    location.href = halofireUiHref(href);
     return;
   }
   const params = new URLSearchParams();
@@ -4645,7 +4653,7 @@ function renderOfficialFlowSignedReviewerValidationRows(rows, sourceEvidenceId =
     const actionMarkup = isCleared
       ? `<div class="claims" style="margin-top:5px">
           resolved_evidence_id ${escapeHtml(row.resolved_evidence_id || 'missing')} - resolved_evidence_ref ${escapeHtml(row.resolved_evidence_ref || 'missing')} - resolved_by ${escapeHtml(row.resolved_by || 'missing')} - resolved_at ${escapeHtml(row.resolved_at || 'missing')}<br>
-          ${clearedWorkflowEvidenceId ? `<button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0f766e" data-signed-reviewer-workflow-evidence-id="${escapeHtml(clearedWorkflowEvidenceId)}" data-signed-reviewer-workflow-gate-code="${escapeHtml(gateCode)}" data-signed-reviewer-workflow-href="${escapeHtml(clearedSettingsPrefillHref)}" data-signed-reviewer-workflow-action="inspect" onclick="openSignedReviewerWorkflow(${JSON.stringify(currentProjectName())}, ${JSON.stringify(gateCode)}, ${JSON.stringify(clearedWorkflowEvidenceId)}, 'inspect', ${JSON.stringify(clearedSettingsPrefillHref)})">Open accepted evidence read-only</button>` : ''}
+          ${clearedWorkflowEvidenceId ? `<button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0f766e" data-signed-reviewer-workflow-evidence-id="${escapeHtml(clearedWorkflowEvidenceId)}" data-signed-reviewer-workflow-gate-code="${escapeHtml(gateCode)}" data-signed-reviewer-workflow-href="${escapeHtml(clearedSettingsPrefillHref)}" data-signed-reviewer-workflow-action="inspect">Open accepted evidence read-only</button>` : ''}
           <a class="go" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#047857;text-decoration:none;display:inline-block" href="${escapeHtml(auditHref || '#')}" data-official-flow-signed-reviewer-resolve-audit-gate-code="${escapeHtml(gateCode)}" data-official-flow-signed-reviewer-resolve-audit-evidence-id="${escapeHtml(row.resolved_evidence_id || '')}" data-official-flow-signed-reviewer-resolve-audit-href="${escapeHtml(auditHref || '')}" data-official-flow-signed-reviewer-resolve-audit-artifact-type="${escapeHtml(row.resolve_audit_packet_artifact_type || 'halofire.claim_gate_resolve_audit_packet.v1')}" data-claim-gate-effect="${escapeHtml(row.claim_gate_effect || 'gate_cleared_after_explicit_signed_validation')}" data-no-unrelated-claims-cleared="true">Download resolve-audit proof</a>
           <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0f766e" data-claim-gate-resolve-audit-save-evidence-id="${escapeHtml(row.resolved_evidence_id || '')}" data-claim-gate-resolve-audit-gate-code="${escapeHtml(gateCode)}" data-claim-gate-resolve-audit-href="${escapeHtml(auditHref || '')}" data-claim-gate-resolve-audit-resolved-ref="${escapeHtml(row.resolved_evidence_ref || '')}" data-claim-gate-resolve-audit-resolved-type="${escapeHtml(requiredEvidenceType || '')}">Save resolve audit evidence</button>
           <div class="muted" id="${escapeHtml(auditStatusId)}" style="font-size:11px;margin-top:4px">halofire.claim_gate_resolve_audit_packet.v1 proves only ${escapeHtml(gateCode || 'this target gate')} cleared through explicit signed validation; unrelated regulated claims remain fail-closed.</div>

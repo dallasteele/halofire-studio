@@ -84,6 +84,9 @@ describe('workbench signed reviewer evidence detail rendering', () => {
     expect(html).toContain('action=resolve');
     expect(html).toContain('requires real signed evidence');
     expect(html).toContain('halofireUiBasePath');
+    expect(html).toContain('halofireUiHref');
+    expect(html).toContain("if (base && value.startsWith('/settings.html')) return base + value;");
+    expect(html).not.toContain('data-signed-reviewer-workflow-action="inspect" onclick=');
     expect(html).toContain('evidenceId');
   });
 
