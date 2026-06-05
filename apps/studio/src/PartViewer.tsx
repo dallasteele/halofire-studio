@@ -75,7 +75,7 @@ function Part({ part, url, position, selected, onSelect }: PartProps): ReactElem
       }}
     >
       <meshStandardMaterial
-        color={selected ? '#ffd166' : '#b8c2cc'}
+        color={selected ? '#f0a868' : '#b8c2cc'}
         emissive={selected ? '#7a4f00' : '#000000'}
         emissiveIntensity={selected ? 0.6 : 0}
         metalness={0.35}
