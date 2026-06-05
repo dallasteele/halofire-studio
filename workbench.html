@@ -1703,6 +1703,9 @@ async function refreshEvidence() {
   document.querySelectorAll('[data-official-flow-replay-artifact-evidence-id]').forEach((button) => {
     button.onclick = () => downloadOfficialFlowReplayEvidenceArtifact(button.dataset.officialFlowReplayArtifactEvidenceId);
   });
+  document.querySelectorAll('[data-official-flow-review-decision-evidence-id]').forEach((button) => {
+    button.onclick = () => saveOfficialFlowReviewDecision(button.dataset.officialFlowReviewDecisionEvidenceId);
+  });
   document.querySelectorAll('[data-sam31-visual-audit-evidence-id]').forEach((button) => {
     button.onclick = () => downloadSam31VisualAuditPacket(button.dataset.sam31VisualAuditEvidenceId);
   });
@@ -4628,6 +4631,7 @@ function resolverQueueDetail(item, index = '') {
   }
   if (item.kind === 'official_flow_hydraulic_replay_review') {
     const issue_actions = Array.isArray(item.issue_actions) ? item.issue_actions : [];
+    const reviewDecisionId = `officialFlowReviewDecision-${escapeHtml(item.evidence_id || 'missing')}`;
     return `
     <div class="gate warning" id="official-flow-replay-review">
       <div class="code">${escapeHtml(item.kind)} - ${escapeHtml(item.status).toUpperCase()}</div>
@@ -4646,6 +4650,22 @@ function resolverQueueDetail(item, index = '') {
       <div class="claims">AI fallback: ${escapeHtml(item.ai_fallback || '')}</div>
       <div class="claims">Blocks: ${claims.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('')}</div>
       <p style="margin-top:8px"><button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#4f46e5" data-official-flow-replay-artifact-evidence-id="${escapeHtml(item.evidence_id)}">Download saved replay artifact</button> <button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#0f766e" data-official-flow-replay-review-packet-evidence-id="${escapeHtml(item.evidence_id)}">Download professional/AHJ review packet</button></p>
+      <details style="margin-top:8px">
+        <summary class="muted" style="cursor:pointer">Save official-flow review decision</summary>
+        <div style="display:grid;gap:6px;margin-top:7px">
+          <select id="${reviewDecisionId}-decision" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px"><option value="recorded_evidence_refs_fail_closed">Record refs fail-closed</option><option value="needs_more_evidence">Needs more evidence</option><option value="rejected_internal_alpha_replay">Reject internal-alpha replay</option></select>
+          <input id="${reviewDecisionId}-reviewer" placeholder="reviewer_name" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
+          <input id="${reviewDecisionId}-title" placeholder="reviewer_title" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
+          <input id="officialFlowProfessionalReviewRef-${escapeHtml(item.evidence_id || '')}" placeholder="professional_review_ref" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
+          <input id="officialFlowAhjReviewRef-${escapeHtml(item.evidence_id || '')}" placeholder="ahj_review_ref" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
+          <input id="officialFlowAutosprinkExportRef-${escapeHtml(item.evidence_id || '')}" placeholder="autosprink_export_ref" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
+          <input id="officialFlowOfficialFlowTestRef-${escapeHtml(item.evidence_id || '')}" placeholder="official_flow_test_ref" value="${escapeHtml(defaults.source_ref || item.source_ref || '')}" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px">
+          <textarea id="${reviewDecisionId}-notes" placeholder="notes" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px;height:46px"></textarea>
+          <button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#7c2d12" data-official-flow-review-decision-evidence-id="${escapeHtml(item.evidence_id)}">Save official-flow review decision</button>
+          <div class="muted" id="${reviewDecisionId}-status" style="font-size:11px"></div>
+          <span class="muted" style="font-size:10px">/resolver-packets/official-flow-replay/{evidenceId}/review-decision - halofire.official_flow_professional_ahj_review_decision.v1 - halofire.official_flow_claim_gate_evaluation_audit_packet.v1 - claim_gate_effect no_claims_cleared</span>
+        </div>
+      </details>
       <p style="margin-top:8px">${actions.map((action) => `<a class="go" style="padding:7px 10px;font-size:11px;text-decoration:none;display:inline-block;margin-right:6px" href="${escapeHtml(action.href || '#')}">${escapeHtml(action.label || 'Open')}</a>`).join('')}</p>
     </div>`;
   }
@@ -5121,6 +5141,43 @@ async function downloadOfficialFlowReplayReviewPacket(evidenceId) {
   a.download = packet.download_name || 'official-flow-professional-ahj-review-packet.json';
   a.click();
   URL.revokeObjectURL(a.href);
+}
+
+async function saveOfficialFlowReviewDecision(evidenceId) {
+  const fieldPrefix = 'officialFlowReviewDecision-' + evidenceId;
+  const status = document.getElementById(fieldPrefix + '-status');
+  if (status) status.textContent = 'Saving official-flow review decision and fail-closed audit packet...';
+  try {
+    const saved = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/resolver-packets/official-flow-replay/' + encodeURIComponent(evidenceId) + '/review-decision', {
+      method: 'POST',
+      body: JSON.stringify({
+        review_decision: document.getElementById(fieldPrefix + '-decision')?.value || 'recorded_evidence_refs_fail_closed',
+        reviewer_name: document.getElementById(fieldPrefix + '-reviewer')?.value || 'HaloFire employee',
+        reviewer_title: document.getElementById(fieldPrefix + '-title')?.value || 'Internal Alpha Reviewer',
+        professional_review_ref: document.getElementById('officialFlowProfessionalReviewRef-' + evidenceId)?.value || '',
+        ahj_review_ref: document.getElementById('officialFlowAhjReviewRef-' + evidenceId)?.value || '',
+        autosprink_export_ref: document.getElementById('officialFlowAutosprinkExportRef-' + evidenceId)?.value || '',
+        official_flow_test_ref: document.getElementById('officialFlowOfficialFlowTestRef-' + evidenceId)?.value || '',
+        notes: document.getElementById(fieldPrefix + '-notes')?.value || 'Official-flow review refs recorded from Workbench; no claim gates cleared.',
+      }),
+    });
+    const packet = saved.claim_gate_evaluation_audit_packet || saved;
+    const blob = new Blob([JSON.stringify(packet, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = packet.download_name || 'official-flow-claim-gate-evaluation-audit-packet.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+    if (status) {
+      status.textContent = 'Saved official_flow_professional_ahj_review_decision evidence #' + saved.id + ' and downloaded fail-closed claim-gate audit packet; no claims cleared.';
+      status.dataset.officialFlowReviewDecisionEvidenceId = String(saved.id || '');
+      status.dataset.claimGateEffect = saved.claim_gate_effect || 'no_claims_cleared';
+    }
+    await refreshEvidence();
+    await refreshResolverQueue();
+  } catch (err) {
+    if (status) status.textContent = 'Error: ' + err.message;
+  }
 }
 
 async function downloadSuppliedDocumentBidTruthReviewPacket() {
@@ -6775,6 +6832,9 @@ async function refreshResolverQueue() {
   });
   document.querySelectorAll('[data-official-flow-replay-review-packet-evidence-id]').forEach((button) => {
     button.onclick = () => downloadOfficialFlowReplayReviewPacket(button.dataset.officialFlowReplayReviewPacketEvidenceId);
+  });
+  document.querySelectorAll('[data-official-flow-review-decision-evidence-id]').forEach((button) => {
+    button.onclick = () => saveOfficialFlowReviewDecision(button.dataset.officialFlowReviewDecisionEvidenceId);
   });
 }
 

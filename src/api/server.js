@@ -14431,6 +14431,153 @@ function officialFlowProfessionalAhjReviewPacket(projectName, replayEvidence) {
   };
 }
 
+function buildOfficialFlowReviewDecision(projectName, replayEvidence, body = {}, user = null) {
+  const reviewPacket = officialFlowProfessionalAhjReviewPacket(projectName, replayEvidence);
+  if (!reviewPacket) return null;
+  const field = (name) => String(body?.[name] || '').trim();
+  const reviewerName = field('reviewer_name') || user?.name || user?.username || 'HaloFire employee';
+  const sourceRefs = uniqueByJson([
+    ...(Array.isArray(reviewPacket.source_refs) ? reviewPacket.source_refs : []),
+    field('professional_review_ref') ? {
+      evidence_ref: field('professional_review_ref'),
+      evidence_type: 'licensed_professional_hydraulic_review',
+      field: 'professional_review_ref',
+      status: 'employee_supplied_ref_unverified',
+    } : null,
+    field('ahj_review_ref') ? {
+      evidence_ref: field('ahj_review_ref'),
+      evidence_type: 'AHJ_reviewed_hydraulic_calculation_package',
+      field: 'ahj_review_ref',
+      status: 'employee_supplied_ref_unverified',
+    } : null,
+    field('autosprink_export_ref') ? {
+      evidence_ref: field('autosprink_export_ref'),
+      evidence_type: 'AutoSprink_or_equivalent_professional_model_export',
+      field: 'autosprink_export_ref',
+      status: 'employee_supplied_ref_unverified',
+    } : null,
+    field('official_flow_test_ref') ? {
+      evidence_ref: field('official_flow_test_ref'),
+      evidence_type: 'official_flow_test_report_or_water_supply_data_sheet',
+      field: 'official_flow_test_ref',
+      status: 'employee_supplied_ref_unverified',
+    } : null,
+  ].filter(Boolean));
+  const evaluationRows = [
+    {
+      gate_code: 'PROFESSIONAL_REVIEW_MISSING',
+      evidence_lane: 'licensed_professional_hydraulic_review',
+      evidence_ref: field('professional_review_ref') || null,
+      gate_status: 'blocked',
+      blocked_claims: ['PE_review', 'engineering_grade', 'permit_ready'],
+      limitation: 'Employee-supplied refs are recorded for review only; no signed professional validation has been verified by this workflow.',
+    },
+    {
+      gate_code: 'AHJ_APPROVAL_MISSING',
+      evidence_lane: 'AHJ_reviewed_hydraulic_calculation_package',
+      evidence_ref: field('ahj_review_ref') || null,
+      gate_status: 'blocked',
+      blocked_claims: ['AHJ_approval', 'permit_ready'],
+      limitation: 'AHJ approval remains blocked until an explicit validated AHJ evidence workflow clears the gate.',
+    },
+    {
+      gate_code: 'AUTOSPRINK_EVIDENCE_MISSING',
+      evidence_lane: 'AutoSprink_or_equivalent_professional_model_export',
+      evidence_ref: field('autosprink_export_ref') || null,
+      gate_status: 'blocked',
+      blocked_claims: ['AutoSprink_parity', 'engineering_grade'],
+      limitation: 'AutoSprink/equivalent model refs are not parity proof until separately reviewed and validated.',
+    },
+    {
+      gate_code: 'OFFICIAL_FLOW_TEST_REVIEW_MISSING',
+      evidence_lane: 'official_flow_test_report_or_water_supply_data_sheet',
+      evidence_ref: field('official_flow_test_ref') || null,
+      gate_status: 'blocked',
+      blocked_claims: ['permit_ready', 'AHJ_approval', 'PE_review'],
+      limitation: 'Official-flow refs support downstream review only; they do not clear hydraulic calculation or AHJ gates by themselves.',
+    },
+  ];
+  const decision = {
+    artifact_type: 'halofire.official_flow_professional_ahj_review_decision.v1',
+    status: 'fail_closed_review_recorded',
+    project_name: projectName,
+    source_replay_evidence_id: replayEvidence.evidence.id,
+    source_replay_evidence_type: 'official_flow_hydraulic_replay_artifact',
+    source_original_official_flow_evidence_id: reviewPacket.official_flow_input?.source_evidence_id
+      || replayEvidence.artifact?.source_evidence_id
+      || replayEvidence.notes?.source_evidence_id
+      || null,
+    source_attachment_intake_packet_evidence_id: reviewPacket.source_attachment_intake_packet_evidence_id || null,
+    source_attachment_intake_row_index: Number.isInteger(reviewPacket.source_attachment_intake_row_index) ? reviewPacket.source_attachment_intake_row_index : null,
+    source_ref: `official-flow-replay:${replayEvidence.evidence.id}:professional-ahj-review-decision`,
+    generated_at: new Date().toISOString(),
+    reviewer_name: reviewerName,
+    reviewer_title: field('reviewer_title') || null,
+    professional_review_ref: field('professional_review_ref') || null,
+    ahj_review_ref: field('ahj_review_ref') || null,
+    autosprink_export_ref: field('autosprink_export_ref') || null,
+    official_flow_test_ref: field('official_flow_test_ref') || null,
+    review_decision: field('review_decision') || 'recorded_evidence_refs_fail_closed',
+    notes: field('notes') || null,
+    source_refs: sourceRefs,
+    evaluation_rows: evaluationRows,
+    blocked_claims: [...OFFICIAL_FLOW_BLOCKED_CLAIMS],
+    claim_gate_effect: 'no_claims_cleared',
+    no_claim_gates_cleared: true,
+    claims_cleared_count: 0,
+    limitations: [
+      'This employee decision records source refs for downstream review and audit only.',
+      'It does not clear professional, AHJ, permit-ready, engineering-grade, fabrication-ready, manufacturer-exact, or AutoSprink parity claims.',
+    ],
+  };
+  decision.claim_gate_evaluation_audit_packet = {
+    artifact_type: 'halofire.official_flow_claim_gate_evaluation_audit_packet.v1',
+    status: 'fail_closed_review_recorded',
+    project_name: projectName,
+    source_review_decision_evidence_id: null,
+    source_replay_evidence_id: decision.source_replay_evidence_id,
+    source_original_official_flow_evidence_id: decision.source_original_official_flow_evidence_id,
+    source_attachment_intake_packet_evidence_id: decision.source_attachment_intake_packet_evidence_id,
+    generated_at: decision.generated_at,
+    reviewer_name: decision.reviewer_name,
+    review_decision: decision.review_decision,
+    source_refs: decision.source_refs,
+    evaluation_rows: decision.evaluation_rows,
+    blocked_claims: decision.blocked_claims,
+    claim_gate_effect: 'no_claims_cleared',
+    no_claim_gates_cleared: true,
+    claims_cleared_count: 0,
+    next_action: 'Use the signed reviewer/claim-gate workflow to validate real professional, AHJ, official-flow, and AutoSprink evidence before clearing any regulated claim.',
+    limitations: decision.limitations,
+  };
+  decision.download_name = `${slugForDownloadName(projectName)}-official-flow-review-decision-${replayEvidence.evidence.id}.json`;
+  decision.claim_gate_evaluation_audit_packet.download_name = `${slugForDownloadName(projectName)}-official-flow-claim-gate-evaluation-audit-${replayEvidence.evidence.id}.json`;
+  return decision;
+}
+
+function officialFlowReviewDecisionEvidenceNotes(decision) {
+  return {
+    kind: 'official_flow_professional_ahj_review_decision',
+    artifact_type: decision.artifact_type,
+    status: decision.status,
+    source_replay_evidence_id: decision.source_replay_evidence_id,
+    source_original_official_flow_evidence_id: decision.source_original_official_flow_evidence_id,
+    source_attachment_intake_packet_evidence_id: decision.source_attachment_intake_packet_evidence_id,
+    source_attachment_intake_row_index: decision.source_attachment_intake_row_index,
+    reviewer_name: decision.reviewer_name,
+    reviewer_title: decision.reviewer_title,
+    review_decision: decision.review_decision,
+    source_refs: decision.source_refs,
+    evaluation_rows: decision.evaluation_rows,
+    blocked_claims: decision.blocked_claims,
+    claim_gate_effect: 'no_claims_cleared',
+    no_claim_gates_cleared: true,
+    claims_cleared_count: 0,
+    claim_gate_evaluation_audit_packet: decision.claim_gate_evaluation_audit_packet,
+    decision,
+  };
+}
+
 function officialFlowResolverQueueItem(projectName, matchedEvidence = null) {
   const intake = matchedEvidence?.intake || null;
   const facts = intake ? {
@@ -18702,6 +18849,50 @@ app.get('/api/projects/:name/resolver-packets/official-flow-replay/:evidenceId/r
     res.json(packet);
   } catch (err) {
     res.status(err.httpStatus || 400).json({ error: err.message });
+  }
+});
+
+app.post('/api/projects/:name/resolver-packets/official-flow-replay/:evidenceId/review-decision', authMiddleware, requireRole('admin'), (req, res) => {
+  try {
+    const projectName = req.params.name;
+    const evidenceId = Number(req.params.evidenceId);
+    if (!Number.isSafeInteger(evidenceId) || evidenceId <= 0) {
+      return res.status(400).json({ error: 'A positive evidence id is required' });
+    }
+    const evidence = db
+      .prepare(`SELECT * FROM project_evidence
+                WHERE id = ? AND project_name = ? AND evidence_type = 'official_flow_hydraulic_replay_artifact'`)
+      .get(evidenceId, projectName);
+    const replayEvidence = officialFlowReplayArtifactFromEvidence(evidence);
+    const decision = buildOfficialFlowReviewDecision(projectName, replayEvidence, req.body || {}, req.user);
+    if (!decision) {
+      return res.status(404).json({ error: 'Official-flow hydraulic replay evidence not found' });
+    }
+    const result = db
+      .prepare(`INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+                VALUES (?, ?, ?, ?, ?, ?)`)
+      .run(
+        projectName,
+        'official_flow_professional_ahj_review_decision',
+        evidence.source_file || null,
+        decision.source_ref,
+        'fail_closed_review_recorded',
+        JSON.stringify(officialFlowReviewDecisionEvidenceNotes(decision)),
+      );
+    decision.id = result.lastInsertRowid;
+    decision.evidence_id = result.lastInsertRowid;
+    decision.claim_gate_evaluation_audit_packet.source_review_decision_evidence_id = result.lastInsertRowid;
+    db
+      .prepare('UPDATE project_evidence SET notes = ? WHERE id = ?')
+      .run(JSON.stringify(officialFlowReviewDecisionEvidenceNotes(decision)), result.lastInsertRowid);
+    const evidenceRow = db.prepare('SELECT * FROM project_evidence WHERE id = ?').get(result.lastInsertRowid);
+    return res.status(201).json({
+      ...decision,
+      evidence: evidenceRow,
+      message: 'Official-flow professional/AHJ review decision saved fail-closed; no claim gates were cleared',
+    });
+  } catch (err) {
+    return res.status(err.httpStatus || 400).json({ error: err.message });
   }
 });
 

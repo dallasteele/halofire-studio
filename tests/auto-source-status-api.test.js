@@ -1294,6 +1294,96 @@ describe('S5 GET /api/auto-source/status', () => {
     expect(reviewPacket.blocked_claims).toEqual(
       expect.arrayContaining(['permit_ready', 'AHJ_approval', 'PE_review', 'AutoSprink_parity']),
     );
+
+    const decisionRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-packets/official-flow-replay/${persisted.id}/review-decision`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        reviewer_name: 'HaloFire Employee',
+        reviewer_title: 'Internal Alpha Reviewer',
+        professional_review_ref: 'pe-review://pending-official-flow-review',
+        ahj_review_ref: 'ahj://pending-official-flow-review',
+        autosprink_export_ref: 'autosprink://pending-parity-export',
+        official_flow_test_ref: 'field-flow-report.pdf#page=1',
+        review_decision: 'recorded_evidence_refs_fail_closed',
+        notes: 'Employee recorded available refs for downstream claim-gate evaluation; no claim gates cleared.',
+      }),
+    });
+    expect(decisionRes.status).toBe(201);
+    const decision = await decisionRes.json();
+    expect(decision).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.official_flow_professional_ahj_review_decision.v1',
+      source_replay_evidence_id: persisted.id,
+      source_original_official_flow_evidence_id: created.id,
+      source_attachment_intake_packet_evidence_id: null,
+      review_decision: 'recorded_evidence_refs_fail_closed',
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+      claims_cleared_count: 0,
+    }));
+    expect(decision.evidence).toEqual(expect.objectContaining({
+      evidence_type: 'official_flow_professional_ahj_review_decision',
+      status: 'fail_closed_review_recorded',
+      source_ref: `official-flow-replay:${persisted.id}:professional-ahj-review-decision`,
+    }));
+    expect(decision.source_refs).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        evidence_id: persisted.id,
+        evidence_type: 'official_flow_hydraulic_replay_artifact',
+      }),
+      expect.objectContaining({
+        evidence_ref: 'pe-review://pending-official-flow-review',
+        evidence_type: 'licensed_professional_hydraulic_review',
+        status: 'employee_supplied_ref_unverified',
+      }),
+      expect.objectContaining({
+        evidence_ref: 'ahj://pending-official-flow-review',
+        evidence_type: 'AHJ_reviewed_hydraulic_calculation_package',
+        status: 'employee_supplied_ref_unverified',
+      }),
+      expect.objectContaining({
+        evidence_ref: 'autosprink://pending-parity-export',
+        evidence_type: 'AutoSprink_or_equivalent_professional_model_export',
+        status: 'employee_supplied_ref_unverified',
+      }),
+    ]));
+    expect(decision.claim_gate_evaluation_audit_packet).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.official_flow_claim_gate_evaluation_audit_packet.v1',
+      source_review_decision_evidence_id: decision.id,
+      source_replay_evidence_id: persisted.id,
+      status: 'fail_closed_review_recorded',
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+      claims_cleared_count: 0,
+    }));
+    expect(decision.claim_gate_evaluation_audit_packet.evaluation_rows).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        gate_code: 'PROFESSIONAL_REVIEW_MISSING',
+        evidence_ref: 'pe-review://pending-official-flow-review',
+        gate_status: 'blocked',
+      }),
+      expect.objectContaining({
+        gate_code: 'AHJ_APPROVAL_MISSING',
+        evidence_ref: 'ahj://pending-official-flow-review',
+        gate_status: 'blocked',
+      }),
+      expect.objectContaining({
+        gate_code: 'AUTOSPRINK_EVIDENCE_MISSING',
+        evidence_ref: 'autosprink://pending-parity-export',
+        gate_status: 'blocked',
+      }),
+      expect.objectContaining({
+        gate_code: 'OFFICIAL_FLOW_TEST_REVIEW_MISSING',
+        evidence_ref: 'field-flow-report.pdf#page=1',
+        gate_status: 'blocked',
+      }),
+    ]));
+    expect(decision.claim_gate_evaluation_audit_packet.blocked_claims).toEqual(
+      expect.arrayContaining(['permit_ready', 'AHJ_approval', 'PE_review', 'AutoSprink_parity']),
+    );
   }, 15000);
 
   it('imports source-linked official-flow attachment intake records without clearing claims', async () => {

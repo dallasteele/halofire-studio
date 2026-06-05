@@ -643,6 +643,14 @@ describe('studio static origin handling', () => {
     expect(html).toContain('data-official-flow-persist-review-packet-evidence-id');
     expect(html).toContain('Save replay evidence + download review packet');
     expect(html).toContain('source_attachment_intake_packet_evidence_id');
+    expect(html).toContain('saveOfficialFlowReviewDecision');
+    expect(html).toContain('/review-decision');
+    expect(html).toContain('Save official-flow review decision');
+    expect(html).toContain('data-official-flow-review-decision-evidence-id');
+    expect(html).toContain('officialFlowProfessionalReviewRef');
+    expect(html).toContain('officialFlowAhjReviewRef');
+    expect(html).toContain('officialFlowAutosprinkExportRef');
+    expect(html).toContain('halofire.official_flow_claim_gate_evaluation_audit_packet.v1');
   });
 
   it('lets the studio load the latest saved PDF boundary decision as import defaults', async () => {
