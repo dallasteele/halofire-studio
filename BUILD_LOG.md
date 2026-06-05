@@ -1,5 +1,13 @@
 # HaloFire Build Log
 
+## 2026-06-05 - URL disposable project safety for Workbench smokes
+
+- Updated [`workbench.html`](C:/Users/dalla/OneDrive/Documents/HaloFire/workbench.html) so a non-empty `project=` query value is added to the Workbench project selector and selected before initial load, instead of silently falling back to the hard-coded project options.
+- Extended [`tests/workbench-catalog-source-browser-smoke.test.js`](C:/Users/dalla/OneDrive/Documents/HaloFire/tests/workbench-catalog-source-browser-smoke.test.js) with a browser-backed red-to-green smoke proving a URL-provided disposable project receives catalog source evidence and the default project does not.
+- This prevents live/browser smoke tests from accidentally mutating the real 1881 project when a disposable project name is supplied in the URL.
+- Verified with `node ./node_modules/vitest/vitest.mjs run tests/workbench-catalog-source-browser-smoke.test.js --reporter=verbose`, `node ./node_modules/vitest/vitest.mjs run tests/studio-static-origin.test.js -t "projectTarget|catalog source-acquisition" --reporter=verbose`, `C:/Python312/python.exe E:/ClaudeBot/scripts/verify_agentic_rules.py`, `git diff --check`, and GX10 prover health. This is `NO_FORMALIZABLE_CLAIM`; the slice is browser routing/state safety, not a theorem-shaped invariant.
+- Still blocked: AutoSprink parity, AHJ approval, PE/professional review, manufacturer approval/model exactness, permit readiness, fabrication readiness, brand readiness, production readiness, survey-grade claims, and engineering-grade claims until real evidence is validated.
+
 ## 2026-06-05 - Catalog approval validation Workbench readback
 
 - Updated [`workbench.html`](C:/Users/dalla/OneDrive/Documents/HaloFire/workbench.html) so signed catalog approval validation rows keep a durable saved-evidence readback after claim gates, evidence, and resolver queue refresh.

@@ -12,6 +12,8 @@ const PASSWORD = 'catalog-source-browser-smoke-pw';
 const PROJECT_NAME = 'Home Depot - Rexburg ID';
 const PROJECT_PATH = `/api/projects/${encodeURIComponent(PROJECT_NAME)}`;
 const FAMILY_REF = 'family:pipe_steel_sch40_2p0in';
+const DISPOSABLE_PROJECT_NAME = 'Codex Browser Disposable Project URL Smoke';
+const DISPOSABLE_PROJECT_PATH = `/api/projects/${encodeURIComponent(DISPOSABLE_PROJECT_NAME)}`;
 
 let server;
 let tempDir;
@@ -83,6 +85,53 @@ afterAll(async () => {
 });
 
 describe('Workbench catalog source browser smoke', () => {
+  it('honors a disposable project supplied by URL before recording evidence', async () => {
+    const token = await adminToken();
+    const page = await browser.newPage();
+    page.setDefaultTimeout(8000);
+    await page.addInitScript((authToken) => {
+      localStorage.setItem('halofire_token', authToken);
+    }, token);
+
+    try {
+      await page.goto(`${BASE}/workbench.html?project=${encodeURIComponent(DISPOSABLE_PROJECT_NAME)}#catalogSourceAcquisition`, {
+        waitUntil: 'domcontentloaded',
+      });
+      await page.locator('#projectTarget').waitFor();
+      await page.waitForFunction(
+        (projectName) => document.getElementById('projectTarget')?.value === projectName,
+        DISPOSABLE_PROJECT_NAME,
+      );
+      expect(await page.locator('#projectTarget').inputValue()).toBe(DISPOSABLE_PROJECT_NAME);
+
+      const recordButton = page.locator(`[data-catalog-source-record-family-ref="${FAMILY_REF}"]`).first();
+      await recordButton.waitFor();
+      const statusId = await recordButton.getAttribute('data-catalog-source-record-status-id');
+      await recordButton.click();
+      await page.waitForFunction(
+        (targetStatusId) => {
+          const node = document.getElementById(targetStatusId);
+          return node?.dataset.catalogSourceEvidenceId && node?.dataset.claimGateEffect === 'no_claims_cleared';
+        },
+        statusId,
+      );
+
+      const evidenceId = await page.locator(`[id="${statusId}"]`).getAttribute('data-catalog-source-evidence-id');
+      const disposableRows = await api(`${DISPOSABLE_PROJECT_PATH}/evidence`, token);
+      const saved = disposableRows.find((row) => String(row.id) === evidenceId);
+      expect(saved).toEqual(expect.objectContaining({
+        evidence_type: 'catalog_source_acquisition',
+        source_ref: FAMILY_REF,
+        source_file: 'pipe_sch40',
+        status: 'present',
+      }));
+      const defaultRows = await api(`${PROJECT_PATH}/evidence`, token);
+      expect(defaultRows.some((row) => String(row.id) === evidenceId)).toBe(false);
+    } finally {
+      await page.close();
+    }
+  }, 30_000);
+
   it('records catalog source evidence with source-linked no-claims-cleared readback', async () => {
     const token = await adminToken();
     const page = await browser.newPage();
