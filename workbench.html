@@ -1927,15 +1927,16 @@ function evidenceDetail(row) {
       const defaultInspectHref = packet.target_gate_code && row.id
         ? `/settings.html?project=${encodeURIComponent(currentProjectName())}&gate=${encodeURIComponent(packet.target_gate_code)}&evidenceId=${encodeURIComponent(String(row.id || ''))}&action=inspect#wizSignoff`
         : '';
-      const settingsPrefillHref = isCleared
+      const savedInspectHref = defaultInspectHref || '';
+      const settingsPrefillHref = savedInspectHref
         ? (packet.settings_prefill_href && packet.settings_prefill_href.includes('action=inspect')
           ? packet.settings_prefill_href
-          : (defaultInspectHref || packet.settings_prefill_href || ''))
+          : savedInspectHref)
         : (packet.settings_prefill_href || '');
-      const workflowAction = isCleared ? 'inspect' : (settingsPrefillHref ? 'resolve' : '');
+      const workflowAction = savedInspectHref ? 'inspect' : (settingsPrefillHref ? 'resolve' : '');
       const workflowLabel = isCleared
         ? 'Open accepted evidence read-only'
-        : (settingsPrefillHref ? 'Open Settings packet prefill' : 'Open signed reviewer workflow');
+        : (savedInspectHref ? 'Open recorded evidence read-only' : (settingsPrefillHref ? 'Open Settings packet prefill' : 'Open signed reviewer workflow'));
       const placeholderReplacement = packet.placeholder_replacement || '';
       const sourceOfficialFlowReviewDecisionEvidenceId = packet.source_official_flow_review_decision_evidence_id || '';
       const sourceApprovalUploadEvidenceId = packet.source_halofire_sam31_approval_upload_evidence_id || '';

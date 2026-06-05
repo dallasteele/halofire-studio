@@ -530,7 +530,8 @@ function hydrateWizardFromExistingEvidence() {
     packetStatus.dataset.signedReviewerResolveAuditHref = packetContext.resolveAuditHref || '';
     packetStatus.dataset.signedReviewerResolveAuditArtifactType = packetContext.resolveAuditArtifactType || 'halofire.claim_gate_resolve_audit_packet.v1';
     packetStatus.dataset.signedReviewerNoUnrelatedClaimsCleared = 'true';
-    packetStatus.textContent = `Read-only accepted signed reviewer evidence #${selectedEvidenceId}; claim_gate_effect ${packetStatus.dataset.signedReviewerClaimGateEffect}; `
+    const readonlyLabel = packetStatus.dataset.signedReviewerClaimGateEffect === 'no_claims_cleared' ? 'recorded' : 'accepted';
+    packetStatus.textContent = `Read-only ${readonlyLabel} signed reviewer evidence #${selectedEvidenceId}; claim_gate_effect ${packetStatus.dataset.signedReviewerClaimGateEffect}; `
       + `${packetStatus.dataset.signedReviewerResolveAuditArtifactType} ${packetContext.resolveAuditHref ? `ready at ${packetContext.resolveAuditHref}` : 'missing'}; `
       + 'this route does not reopen a requires_real_signed_evidence upload packet.';
     $('wizAction').value = 'record';
