@@ -75,6 +75,11 @@ describe('workbench signed reviewer evidence detail rendering', () => {
     expect(html).toContain('officialFlowReviewDecisionEvidenceId');
     expect(html).toContain('officialFlowSignedReviewerQueueStatus-');
     expect(html).toContain('no claims cleared by this queue readback');
+    expect(html).toContain('Upload real signed evidence & resolve gate');
+    expect(html).toContain('data-official-flow-signed-reviewer-resolve-workflow');
+    expect(html).toContain('signed_evidence_resolve_action');
+    expect(html).toContain('action=resolve');
+    expect(html).toContain('requires real signed evidence');
     expect(html).toContain('halofireUiBasePath');
     expect(html).toContain('evidenceId');
   });

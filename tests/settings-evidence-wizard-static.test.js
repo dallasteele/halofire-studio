@@ -36,6 +36,8 @@ describe('HaloFire Settings evidence wizard signed reviewer workflow', () => {
     expect(html).toContain("params.get('project')");
     expect(html).toContain("params.get('gate')");
     expect(html).toContain("params.get('evidenceId')");
+    expect(html).toContain("params.get('action')");
+    expect(html).toContain("action=resolve");
     expect(html).toContain('wizExistingEvidence');
   });
 
@@ -69,7 +71,9 @@ describe('HaloFire Settings evidence wizard signed reviewer workflow', () => {
     expect(html).toContain('official_flow_signed_reviewer_context');
     expect(html).toContain("source_official_flow_review_decision_evidence_id");
     expect(html).toContain("claim_gate_effect no_claims_cleared");
-    expect(html).toContain("actionEl.value = 'record'");
+    expect(html).toContain("actionEl.value = wizardUrlPrefill.action === 'resolve' ? 'resolve' : 'record'");
+    expect(html).toContain('real signed evidence resolve mode');
+    expect(html).toContain('claim gate clears only after present evidence and signed reviewer metadata are submitted');
     expect(html).toContain('data-official-flow-context-evidence-id');
   });
 

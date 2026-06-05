@@ -371,6 +371,7 @@ function prefillEvidenceWizardFromUrl() {
     project: params.get('project'),
     gate: params.get('gate'),
     evidenceId: params.get('evidenceId'),
+    action: params.get('action'),
   };
 }
 
@@ -468,10 +469,11 @@ function parseWizardEvidenceNotes(row) {
   }
 }
 
-function formatOfficialFlowContextNotes(row, gateCode, config, context) {
+function formatOfficialFlowContextNotes(row, gateCode, config, context, action = 'record') {
   const decision = context.decision && typeof context.decision === 'object' ? context.decision : context;
   const sourceRefs = Array.isArray(context.source_refs) ? context.source_refs : [];
   const sourceReplayEvidenceId = decision.source_replay_evidence_id || context.source_replay_evidence_id || '';
+  const resolveMode = action === 'resolve';
   const sourceRefText = sourceRefs
     .map((ref) => (typeof ref === 'string' ? ref : JSON.stringify(ref)))
     .filter(Boolean)
@@ -483,8 +485,10 @@ function formatOfficialFlowContextNotes(row, gateCode, config, context) {
     `target_gate_code ${gateCode}`,
     `required_evidence_type ${config.evidenceType}`,
     sourceRefText ? `source_refs ${sourceRefText}` : '',
-    'claim_gate_effect no_claims_cleared',
-    'record evidence only; explicit claim-gate resolve audit required before regulated claims clear',
+    resolveMode ? 'claim_gate_effect requires_real_signed_evidence' : 'claim_gate_effect no_claims_cleared',
+    resolveMode
+      ? 'real signed evidence resolve mode; claim gate clears only after present evidence and signed reviewer metadata are submitted'
+      : 'record evidence only; explicit claim-gate resolve audit required before regulated claims clear',
   ].filter(Boolean).join('\n');
 }
 
@@ -507,20 +511,23 @@ async function hydrateWizardFromOfficialFlowContextEvidence() {
   const actionEl = $('wizAction');
   $('wizType').value = config.evidenceType;
   $('wizExistingEvidence').value = '';
-  actionEl.value = 'record';
+  actionEl.value = wizardUrlPrefill.action === 'resolve' ? 'resolve' : 'record';
   $('wizSourceRef').value = config.sourceRef || row.source_ref || '';
   $('wizSourceFile').value = row.source_file || '';
-  $('wizNotes').value = formatOfficialFlowContextNotes(row, gateCode, config, context);
+  $('wizNotes').value = formatOfficialFlowContextNotes(row, gateCode, config, context, actionEl.value);
   const packetStatus = $('wizPacketStatus');
   const sourceReplayEvidenceId = context.decision?.source_replay_evidence_id || context.source_replay_evidence_id || '';
   packetStatus.setAttribute('data-official-flow-context-evidence-id', String(row.id));
   packetStatus.setAttribute('data-official-flow-context-gate', gateCode);
+  packetStatus.setAttribute('data-official-flow-context-action', actionEl.value);
   if (sourceReplayEvidenceId) {
     packetStatus.setAttribute('data-official-flow-context-source-replay-evidence-id', String(sourceReplayEvidenceId));
   } else {
     packetStatus.removeAttribute('data-official-flow-context-source-replay-evidence-id');
   }
-  packetStatus.textContent = `Prefilled from official-flow review decision evidence #${row.id} for ${config.label}; record evidence only; no claims cleared.`;
+  packetStatus.textContent = actionEl.value === 'resolve'
+    ? `Prefilled from official-flow review decision evidence #${row.id} for ${config.label}; action=resolve; real signed evidence resolve mode; claim gate clears only after present evidence and signed reviewer metadata are submitted.`
+    : `Prefilled from official-flow review decision evidence #${row.id} for ${config.label}; record evidence only; no claims cleared.`;
   $('wizResolveAudit').disabled = true;
   syncWizardSignoff();
   return true;

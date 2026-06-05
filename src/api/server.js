@@ -14638,7 +14638,18 @@ function officialFlowSignedReviewerValidationRow(projectName, reviewDecision, co
     targetGate: targetGateCode,
     evidenceType: config.required_evidence_type,
   });
+  const resolveParams = new URLSearchParams({
+    project: projectName,
+    gate: targetGateCode,
+    evidenceId: String(evidenceId),
+    action: 'resolve',
+  });
+  const afterSuccessQueueParams = new URLSearchParams({
+    claimGateAudit: 'cleared',
+    targetGate: targetGateCode,
+  });
   const queueHref = `/api/projects/${encodeURIComponent(projectName)}/resolver-queue?${queueParams.toString()}`;
+  const resolveRoute = `/api/projects/${encodeURIComponent(projectName)}/claim-gates/${encodeURIComponent(targetGateCode)}/resolve`;
   return {
     artifact_type: 'halofire.official_flow_signed_reviewer_validation_row.v1',
     status: 'ready_for_signed_reviewer_workflow',
@@ -14666,6 +14677,27 @@ function officialFlowSignedReviewerValidationRow(projectName, reviewDecision, co
       target_gate_code: targetGateCode,
       required_evidence_type: config.required_evidence_type,
       source_review_decision_evidence_id: evidenceId,
+    },
+    signed_evidence_resolve_action: {
+      label: `Upload real signed evidence & resolve ${targetGateCode}`,
+      method: 'POST',
+      href: `/settings.html?${resolveParams.toString()}#wizSignoff`,
+      resolve_route: resolveRoute,
+      artifact_type: 'halofire.signed_reviewer_evidence_resolve_action.v1',
+      target_gate_code: targetGateCode,
+      required_evidence_type: config.required_evidence_type,
+      source_review_decision_evidence_id: evidenceId,
+      source_replay_evidence_id: decision.source_replay_evidence_id || null,
+      source_supplied_ref: decision[config.source_ref_field] || null,
+      claim_gate_effect: 'requires_real_signed_evidence',
+      no_claim_gates_cleared: true,
+      claims_cleared_count: 0,
+      after_success_queue_filter: `/api/projects/${encodeURIComponent(projectName)}/resolver-queue?${afterSuccessQueueParams.toString()}`,
+      blocked_until: [
+        'real signed reviewer evidence is uploaded through the explicit claim-gate resolve flow',
+        'reviewer_name, reviewer_title, and signed_at are present',
+        'the submitted evidence type matches the target gate requirements',
+      ],
     },
     queue_action: {
       label: `Open pending ${config.required_evidence_type} signed-reviewer queue`,
@@ -17190,7 +17222,13 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
               .filter((row) => !filters.evidenceType || String(row.required_evidence_type || '').toLowerCase() === filters.evidenceType)
               .filter((row) => !filters.targetGate || String(row.target_gate_code || '').toUpperCase() === filters.targetGate)
             : [];
-          return validationRows.length ? { ...item, validation_rows: validationRows, actions: validationRows.map((row) => row.action).filter(Boolean) } : null;
+          return validationRows.length
+            ? {
+              ...item,
+              validation_rows: validationRows,
+              actions: validationRows.flatMap((row) => [row.action, row.signed_evidence_resolve_action]).filter(Boolean),
+            }
+            : null;
         }
         if (filters.officialFlowSignedReviewer) return null;
         if (filters.officialFlowReviewDecisionEvidenceId) return null;

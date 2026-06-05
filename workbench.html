@@ -393,11 +393,12 @@ function halofireUiBasePath() {
   return HALOFIRE_BASE_PATH || (location.pathname.startsWith('/halo-fire/') ? '/halo-fire' : '');
 }
 
-function openSignedReviewerWorkflow(projectName, gateCode, evidenceId) {
+function openSignedReviewerWorkflow(projectName, gateCode, evidenceId, action) {
   const params = new URLSearchParams();
   params.set('project', projectName || currentProjectName());
   if (gateCode) params.set('gate', gateCode);
   if (evidenceId) params.set('evidenceId', evidenceId);
+  if (action) params.set('action', action);
   location.href = halofireUiBasePath() + '/settings.html?' + params.toString() + '#wizSignoff';
 }
 
@@ -4428,6 +4429,7 @@ function renderOfficialFlowSignedReviewerValidationRows(rows, sourceEvidenceId =
   if (!validationRows.length) return '';
   return `<div class="claims">official_flow_signed_reviewer_validation rows <span class="chip">halofire.official_flow_signed_reviewer_validation_queue_item.v1</span><br>${validationRows.map((row) => {
     const action = row.action || {};
+    const resolveAction = row.signed_evidence_resolve_action || {};
     const evidenceId = String(row.source_review_decision_evidence_id || sourceEvidenceId || '');
     const gateCode = row.target_gate_code || '';
     const requiredEvidenceType = row.required_evidence_type || '';
@@ -4440,8 +4442,9 @@ function renderOfficialFlowSignedReviewerValidationRows(rows, sourceEvidenceId =
       Accepts: ${(Array.isArray(row.acceptable_evidence) ? row.acceptable_evidence : []).map((item) => `<span class="chip">${escapeHtml(item)}</span>`).join('') || '<span class="chip">signed reviewer evidence</span>'}
       Blocks: ${(Array.isArray(row.blocked_claims) ? row.blocked_claims : []).map((claim) => `<span class="chip">${escapeHtml(claim)}</span>`).join('') || '<span class="chip">regulated claims remain blocked</span>'}<br>
       <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0f766e" data-signed-reviewer-workflow-evidence-id="${escapeHtml(evidenceId)}" data-signed-reviewer-workflow-gate-code="${escapeHtml(gateCode)}" data-signed-reviewer-workflow-review-packet-href="${escapeHtml(action.href || '')}" onclick="openSignedReviewerWorkflow(${JSON.stringify(currentProjectName())}, ${JSON.stringify(gateCode)}, ${JSON.stringify(evidenceId)})">${escapeHtml(action.label || 'Open signed reviewer workflow')}</button>
+      <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#b45309" data-official-flow-signed-reviewer-resolve-workflow="1" data-official-flow-signed-reviewer-resolve-gate-code="${escapeHtml(gateCode)}" data-official-flow-signed-reviewer-resolve-evidence-type="${escapeHtml(requiredEvidenceType)}" data-official-flow-signed-reviewer-resolve-source-evidence-id="${escapeHtml(evidenceId)}" data-official-flow-signed-reviewer-resolve-href="${escapeHtml(resolveAction.href || '')}" data-official-flow-signed-reviewer-resolve-route="${escapeHtml(resolveAction.resolve_route || '')}" onclick="openSignedReviewerWorkflow(${JSON.stringify(currentProjectName())}, ${JSON.stringify(gateCode)}, ${JSON.stringify(evidenceId)}, 'resolve')">${escapeHtml(resolveAction.label || 'Upload real signed evidence & resolve gate')}</button>
       <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#4338ca" data-official-flow-signed-reviewer-validation-queue="1" data-official-flow-signed-reviewer-validation-gate-code="${escapeHtml(gateCode)}" data-official-flow-signed-reviewer-validation-evidence-type="${escapeHtml(requiredEvidenceType)}" data-official-flow-signed-reviewer-validation-source-evidence-id="${escapeHtml(evidenceId)}" data-official-flow-signed-reviewer-validation-status-id="${escapeHtml(queueStatusId)}" onclick="openOfficialFlowSignedReviewerValidationQueue(${JSON.stringify(gateCode)}, ${JSON.stringify(requiredEvidenceType)}, ${JSON.stringify(evidenceId)}, ${JSON.stringify(queueStatusId)})">${escapeHtml(row.queue_action?.label || 'Open pending signed-reviewer queue')}</button>
-      <div class="muted" id="${escapeHtml(queueStatusId)}" style="font-size:11px;margin-top:4px">officialFlowReviewDecisionEvidenceId ${escapeHtml(evidenceId || 'missing')} - no claims cleared by this queue readback</div>
+      <div class="muted" id="${escapeHtml(queueStatusId)}" style="font-size:11px;margin-top:4px">officialFlowReviewDecisionEvidenceId ${escapeHtml(evidenceId || 'missing')} - signed_evidence_resolve_action requires real signed evidence; action=resolve opens the explicit gate resolve path; no claims cleared by this queue readback</div>
     </div>`;
   }).join('')}<span class="muted" style="font-size:10px">Filter API: /resolver-queue?officialFlowReviewDecisionEvidenceId=:id&targetGate=PROFESSIONAL_REVIEW_MISSING or evidenceType=ahj_approval - source official_flow_professional_ahj_review_decision - claim_gate_effect no_claims_cleared</span></div>`;
 }

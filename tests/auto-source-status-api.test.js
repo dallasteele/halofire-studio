@@ -1449,6 +1449,24 @@ describe('S5 GET /api/auto-source/status', () => {
       expect(row.queue_action.href).toContain(`officialFlowReviewDecisionEvidenceId=${decision.id}`);
       expect(row.queue_action.href).toContain(`targetGate=${encodeURIComponent(row.target_gate_code)}`);
       expect(row.queue_action.href).toContain(`evidenceType=${encodeURIComponent(row.required_evidence_type)}`);
+      expect(row.signed_evidence_resolve_action).toEqual(expect.objectContaining({
+        label: expect.stringContaining('Upload real signed evidence'),
+        method: 'POST',
+        source_review_decision_evidence_id: decision.id,
+        target_gate_code: row.target_gate_code,
+        required_evidence_type: row.required_evidence_type,
+        claim_gate_effect: 'requires_real_signed_evidence',
+        no_claim_gates_cleared: true,
+        claims_cleared_count: 0,
+      }));
+      expect(row.signed_evidence_resolve_action.href).toContain('/settings.html?');
+      expect(row.signed_evidence_resolve_action.href).toContain('action=resolve');
+      expect(row.signed_evidence_resolve_action.href).toContain(`gate=${encodeURIComponent(row.target_gate_code)}`);
+      expect(row.signed_evidence_resolve_action.href).toContain(`evidenceId=${decision.id}`);
+      expect(row.signed_evidence_resolve_action.href).toContain('#wizSignoff');
+      expect(row.signed_evidence_resolve_action.resolve_route).toContain(`/api/projects/${encodeURIComponent(projectName)}/claim-gates/${encodeURIComponent(row.target_gate_code)}/resolve`);
+      expect(row.signed_evidence_resolve_action.after_success_queue_filter).toContain('claimGateAudit=cleared');
+      expect(row.signed_evidence_resolve_action.after_success_queue_filter).toContain(`targetGate=${encodeURIComponent(row.target_gate_code)}`);
     }
     const scopedSignedQueueRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-queue?officialFlowReviewDecisionEvidenceId=${decision.id}&targetGate=AHJ_APPROVAL_MISSING&evidenceType=ahj_approval`, {
       headers: { Authorization: `Bearer ${token}` },
