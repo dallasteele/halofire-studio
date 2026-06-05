@@ -14036,6 +14036,38 @@ function normalizeOfficialFlowIntake(projectName, body = {}, user = {}) {
   };
 }
 
+function officialFlowAttachmentRows(body = {}) {
+  if (Array.isArray(body.rows)) return body.rows;
+  if (Array.isArray(body.attachment_intake_records)) return body.attachment_intake_records;
+  if (Array.isArray(body.attachmentIntakeRecords)) return body.attachmentIntakeRecords;
+  return [];
+}
+
+function officialFlowAttachmentRowBody(row = {}) {
+  const values = row.values && typeof row.values === 'object' ? row.values : {};
+  return {
+    staticPsi: row.staticPsi ?? row.static_psi ?? values.staticPsi ?? values.static_psi,
+    residualPsi: row.residualPsi ?? row.residual_psi ?? values.residualPsi ?? values.residual_psi,
+    flowingGpm: row.flowingGpm ?? row.flowing_gpm ?? values.flowingGpm ?? values.flowing_gpm,
+    flowDataDate: row.flowDataDate ?? row.flow_data_date ?? values.flowDataDate ?? values.flow_data_date,
+    waterModelRequired: row.waterModelRequired ?? row.water_model_required ?? values.waterModelRequired ?? values.water_model_required,
+    source_file: row.source_file ?? row.sourceFile ?? values.source_file ?? values.sourceFile,
+    source_ref: row.source_ref ?? row.sourceRef ?? values.source_ref ?? values.sourceRef,
+    reviewer_name: row.reviewer_name ?? row.reviewerName ?? values.reviewer_name ?? values.reviewerName,
+    notes: row.notes ?? values.notes,
+  };
+}
+
+function officialFlowAttachmentSourceRef(body = {}) {
+  return String(
+    body.source_ref
+    || body.sourceRef
+    || body.preflight_source_ref
+    || body.preflightSourceRef
+    || 'official-flow-evidence-attachment-intake-records',
+  ).trim();
+}
+
 function buildOfficialFlowHydraulicReplayArtifact(projectName, evidence, intake, user = {}) {
   const pipelineReq = {
     params: { name: projectName },
@@ -18446,6 +18478,121 @@ app.post('/api/projects/:name/resolver-packets/official-flow/intake', authMiddle
       message: 'Official-flow intake evidence recorded for preliminary hydraulic replay; claims still blocked',
       evidence: evidenceRow,
       intake,
+    });
+  } catch (err) {
+    res.status(err.httpStatus || 400).json({ error: err.message });
+  }
+});
+
+app.post('/api/projects/:name/resolver-packets/official-flow/attachment-intake-records', authMiddleware, requireRole('admin'), (req, res) => {
+  try {
+    const projectName = req.params.name;
+    const rows = officialFlowAttachmentRows(req.body);
+    const sourceRef = officialFlowAttachmentSourceRef(req.body);
+    const acceptedRows = [];
+    const rejectedRows = [];
+    const packet = {
+      artifact_type: 'halofire.official_flow_attachment_intake_records.v1',
+      source_artifact_type: req.body.artifact_type || req.body.artifactType || 'official_flow_evidence_attachment_intake_records',
+      project_name: projectName,
+      source_ref: sourceRef,
+      row_count: rows.length,
+      rows,
+      imported_at: new Date().toISOString(),
+      no_claim_gates_cleared: true,
+      claim_gate_effect: 'no_claims_cleared',
+      blocked_claims: [...OFFICIAL_FLOW_BLOCKED_CLAIMS],
+      limitations: [
+        'Attachment intake records are internal-alpha source-document intake only.',
+        'Accepted rows can seed preliminary official-flow replay, but they do not clear permit-ready, AHJ, PE, engineering-grade, fabrication-ready, manufacturer-exact, or AutoSprink parity claims.',
+      ],
+    };
+    const packetResult = db
+      .prepare(`INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+                VALUES (?, ?, ?, ?, ?, ?)`)
+      .run(
+        projectName,
+        'official_flow_attachment_intake_records',
+        req.body.source_file || req.body.sourceFile || null,
+        sourceRef,
+        'present',
+        JSON.stringify(packet),
+      );
+    const packetEvidenceId = Number(packetResult.lastInsertRowid);
+
+    for (const [index, row] of rows.entries()) {
+      const acceptedForInventoryRerun = row && row.accepted_for_inventory_rerun !== false && row.acceptedForInventoryRerun !== false;
+      if (!acceptedForInventoryRerun) {
+        rejectedRows.push({
+          row_index: index,
+          ...row,
+          rejection_reason: row.rejection_reason || row.rejectionReason || 'not accepted for inventory rerun',
+        });
+        continue;
+      }
+      try {
+        const intake = normalizeOfficialFlowIntake(projectName, officialFlowAttachmentRowBody(row), req.user);
+        const intakePacket = {
+          kind: 'official_flow_intake_record',
+          project_name: projectName,
+          intake: {
+            ...intake,
+            source_attachment_intake_packet_evidence_id: packetEvidenceId,
+            source_attachment_intake_row_index: index,
+          },
+          source_attachment_intake_packet_evidence_id: packetEvidenceId,
+          source_attachment_intake_row_index: index,
+          stored_at: new Date().toISOString(),
+          no_claim_gates_cleared: true,
+        };
+        const intakeResult = db
+          .prepare(`INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
+                    VALUES (?, ?, ?, ?, ?, ?)`)
+          .run(
+            projectName,
+            'official_flow_intake',
+            intake.source_file,
+            intake.source_ref,
+            'present',
+            JSON.stringify(intakePacket),
+          );
+        acceptedRows.push({
+          row_index: index,
+          attachment_kind: row.attachment_kind || row.attachmentKind || null,
+          source_file: intake.source_file,
+          source_ref: intake.source_ref,
+          official_flow_intake_evidence_id: Number(intakeResult.lastInsertRowid),
+          staticPsi: intake.staticPsi,
+          residualPsi: intake.residualPsi,
+          flowingGpm: intake.flowingGpm,
+          flowDataDate: intake.flowDataDate,
+          claim_gate_effect: 'no_claims_cleared',
+        });
+      } catch (err) {
+        rejectedRows.push({
+          row_index: index,
+          ...row,
+          rejection_reason: err.message || 'invalid official-flow attachment intake row',
+        });
+      }
+    }
+
+    res.status(201).json({
+      artifact_type: 'halofire.official_flow_attachment_intake_records.v1',
+      project_name: projectName,
+      packet_evidence_id: packetEvidenceId,
+      row_count: rows.length,
+      accepted_for_inventory_rerun_count: acceptedRows.length,
+      official_flow_intake_evidence_count: acceptedRows.length,
+      rejected_row_count: rejectedRows.length,
+      claims_cleared_count: 0,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+      source_ref: sourceRef,
+      accepted_rows: acceptedRows,
+      rejected_rows: rejectedRows,
+      blocked_claims: [...OFFICIAL_FLOW_BLOCKED_CLAIMS],
+      message: 'Official-flow attachment intake records imported; preliminary intake rows saved and claims still blocked',
     });
   } catch (err) {
     res.status(err.httpStatus || 400).json({ error: err.message });

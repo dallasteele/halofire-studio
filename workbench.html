@@ -4678,6 +4678,12 @@ function resolverQueueDetail(item, index = '') {
         <p style="margin-top:8px"><button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#3b82f6" data-official-flow-save="1">Save official flow evidence</button></p>
         <div class="muted" id="officialFlowStatus" style="font-size:11px"></div>
       </details>
+      <details style="margin-top:8px" id="officialFlowAttachmentIntake">
+        <summary class="muted" style="cursor:pointer">Import source-linked official_flow_attachment_intake_records</summary>
+        <textarea id="officialFlowAttachmentIntakeJson" placeholder='Paste official_flow_evidence_attachment_intake_records JSON from the attachment preflight packet' style="width:100%;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px;height:112px;margin-top:6px"></textarea>
+        <p style="margin-top:8px"><button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#2563eb" data-official-flow-attachment-intake-import="1">Import attachment intake records</button></p>
+        <div class="muted" id="officialFlowAttachmentIntakeStatus" style="font-size:11px"></div>
+      </details>
     </div>`;
   }
   return `
@@ -6445,6 +6451,25 @@ async function saveOfficialFlowIntake() {
   }
 }
 
+async function importOfficialFlowAttachmentIntakeRecords() {
+  const status = document.getElementById('officialFlowAttachmentIntakeStatus');
+  try {
+    const raw = document.getElementById('officialFlowAttachmentIntakeJson').value.trim();
+    const body = raw ? JSON.parse(raw) : {};
+    const imported = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/resolver-packets/official-flow/attachment-intake-records', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    });
+    if (status) {
+      status.textContent = 'Imported official_flow_attachment_intake_records packet #' + imported.packet_evidence_id + ' with ' + imported.official_flow_intake_evidence_count + ' official-flow intake row(s); claims still blocked.';
+    }
+    await refreshEvidence();
+    await refreshResolverQueue();
+  } catch (err) {
+    if (status) status.textContent = 'Error: ' + err.message;
+  }
+}
+
 async function refreshResolverQueue() {
   const activeQuery = resolverQueueFilterQuery || '';
   const projectName = currentProjectName();
@@ -6713,6 +6738,9 @@ async function refreshResolverQueue() {
   });
   document.querySelectorAll('[data-official-flow-save]').forEach((button) => {
     button.onclick = () => saveOfficialFlowIntake();
+  });
+  document.querySelectorAll('[data-official-flow-attachment-intake-import]').forEach((button) => {
+    button.onclick = () => importOfficialFlowAttachmentIntakeRecords();
   });
   document.querySelectorAll('[data-official-flow-replay-evidence-id]').forEach((button) => {
     button.onclick = () => downloadOfficialFlowHydraulicReplay(button.dataset.officialFlowReplayEvidenceId);

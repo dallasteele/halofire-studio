@@ -634,6 +634,11 @@ describe('studio static origin handling', () => {
     expect(html).toContain('/review-packet');
     expect(html).toContain('Download professional/AHJ review packet');
     expect(html).toContain('data-official-flow-replay-review-packet-evidence-id');
+    expect(html).toContain('officialFlowAttachmentIntakeJson');
+    expect(html).toContain('importOfficialFlowAttachmentIntakeRecords');
+    expect(html).toContain('/resolver-packets/official-flow/attachment-intake-records');
+    expect(html).toContain('Import attachment intake records');
+    expect(html).toContain('official_flow_attachment_intake_records');
   });
 
   it('lets the studio load the latest saved PDF boundary decision as import defaults', async () => {

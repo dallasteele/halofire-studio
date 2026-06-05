@@ -1295,4 +1295,99 @@ describe('S5 GET /api/auto-source/status', () => {
       expect.arrayContaining(['permit_ready', 'AHJ_approval', 'PE_review', 'AutoSprink_parity']),
     );
   }, 15000);
+
+  it('imports source-linked official-flow attachment intake records without clearing claims', async () => {
+    const projectName = 'The Cooperative 1881 - Salt Lake City UT';
+    const importRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-packets/official-flow/attachment-intake-records`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        artifact_type: 'official_flow_evidence_attachment_intake_records',
+        source_ref: 'halo_forge/official_flow_evidence_attachment_preflight/official-flow-evidence-attachment-intake.json',
+        rows: [
+          {
+            attachment_kind: 'source_document',
+            accepted_for_inventory_rerun: true,
+            source_file: '1881-official-flow.pdf',
+            source_ref: '1881-official-flow.pdf#page=2',
+            staticPsi: 71,
+            residualPsi: 59,
+            flowingGpm: 940,
+            flowDataDate: '2026-06-01',
+            reviewer_name: 'HaloFire Employee',
+            waterModelRequired: 'Use for internal-alpha replay only until authority/professional evidence is attached.',
+          },
+          {
+            attachment_kind: 'source_document',
+            accepted_for_inventory_rerun: false,
+            source_file: 'bad-flow-row.pdf',
+            source_ref: 'bad-flow-row.pdf#page=1',
+            rejection_reason: 'missing residual pressure',
+          },
+        ],
+      }),
+    });
+    expect(importRes.status).toBe(201);
+    const imported = await importRes.json();
+    expect(imported).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.official_flow_attachment_intake_records.v1',
+      row_count: 2,
+      accepted_for_inventory_rerun_count: 1,
+      official_flow_intake_evidence_count: 1,
+      claims_cleared_count: 0,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(imported.accepted_rows[0]).toEqual(expect.objectContaining({
+      source_ref: '1881-official-flow.pdf#page=2',
+      official_flow_intake_evidence_id: expect.any(Number),
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(imported.rejected_rows).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        source_ref: 'bad-flow-row.pdf#page=1',
+        rejection_reason: 'missing residual pressure',
+      }),
+    ]));
+    expect(imported.blocked_claims).toEqual(
+      expect.arrayContaining(['permit_ready', 'AHJ_approval', 'PE_review', 'AutoSprink_parity']),
+    );
+
+    const evidenceRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/evidence`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(evidenceRes.status).toBe(200);
+    const evidenceRows = await evidenceRes.json();
+    expect(evidenceRows).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        id: imported.packet_evidence_id,
+        evidence_type: 'official_flow_attachment_intake_records',
+        status: 'present',
+      }),
+      expect.objectContaining({
+        id: imported.accepted_rows[0].official_flow_intake_evidence_id,
+        evidence_type: 'official_flow_intake',
+        status: 'present',
+        source_ref: '1881-official-flow.pdf#page=2',
+      }),
+    ]));
+
+    const queueRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-queue`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(queueRes.status).toBe(200);
+    const queue = await queueRes.json();
+    const item = queue.items.find((row) => row.kind === 'official_flow_intake');
+    expect(item).toEqual(expect.objectContaining({
+      status: 'official_flow_evidence_recorded',
+      evidence_id: imported.accepted_rows[0].official_flow_intake_evidence_id,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(item.input_defaults).toEqual(expect.objectContaining({
+      source_status: 'employee_recorded_official_flow_intake',
+      staticPsi: 71,
+      residualPsi: 59,
+      flowingGpm: 940,
+    }));
+  }, 15000);
 });
