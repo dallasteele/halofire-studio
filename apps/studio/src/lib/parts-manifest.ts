@@ -6,6 +6,10 @@
 // This module never fabricates parts and never silently flips manufacturerExact.
 
 import { deriveModelStatus, type ModelStatus } from './provenance';
+import {
+  applyManufacturerStep,
+  type ManufacturerStepManifest,
+} from './manufacturer-step';
 
 export interface RawComponent {
   key: string;
@@ -47,6 +51,16 @@ export interface PartRecord {
    * lowest tier). Generated/OpenSCAD parts derive "visual_reference".
    */
   modelStatus: ModelStatus;
+  /**
+   * Operator-supplied manufacturer STEP file URL. ONLY set when the
+   * manufacturer-step manifest has a verified entry for this part key. Used by
+   * the part viewer to load real CAD geometry instead of the STL massing.
+   */
+  stepUrl?: string;
+  /** Manufacturer product code / SKU. Set only with a verified upgrade. */
+  productCode?: string;
+  /** Manufacturer name. Set only with a verified upgrade. */
+  manufacturer?: string;
 }
 
 /**
@@ -67,10 +81,18 @@ export function deriveStlUrl(file: string | null | undefined): string | null {
  * Map the raw manifest into typed PartRecords.
  * Preserves source/manufacturerExact exactly as written — never fabricates a part,
  * never invents a stlUrl for a part with no file.
+ *
+ * When `manufacturerStep` is provided, applyManufacturerStep is invoked AFTER
+ * normalization to upgrade records whose key matches an operator-verified entry.
+ * Records without a verified entry are returned UNCHANGED. The default-arg path
+ * (no `manufacturerStep`) preserves legacy behavior byte-for-byte.
  */
-export function normalizeManifest(raw: RawManifest | null | undefined): PartRecord[] {
+export function normalizeManifest(
+  raw: RawManifest | null | undefined,
+  manufacturerStep?: ManufacturerStepManifest | null,
+): PartRecord[] {
   const components = raw?.components ?? [];
-  return components.map((c) => {
+  const base = components.map((c) => {
     const file = c.file ?? null;
     return {
       key: c.key,
@@ -87,8 +109,12 @@ export function normalizeManifest(raw: RawManifest | null | undefined): PartReco
         source: c.source,
         manufacturerExact: c.manufacturerExact,
       }),
-    };
+    } satisfies PartRecord;
   });
+  if (manufacturerStep == null) {
+    return base;
+  }
+  return applyManufacturerStep(base, manufacturerStep);
 }
 
 /** Only the parts that actually have a present mesh. */

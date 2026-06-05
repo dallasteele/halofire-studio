@@ -7,8 +7,9 @@
 import { useEffect, useMemo, useState, type ReactElement } from 'react';
 import { Grid, MapControls, OrbitControls } from '@react-three/drei';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
-import { Box3, Vector3, type BufferGeometry } from 'three';
+import { Box3, BufferAttribute, BufferGeometry, Vector3 } from 'three';
 import type { PartRecord } from './lib/parts-manifest';
+import { loadStepGeometry } from './lib/step-loader';
 import type { ViewMode } from './lib/view-mode';
 
 const GRID_COLUMNS = 6;
@@ -35,21 +36,48 @@ function Part({ part, url, position, selected, onSelect }: PartProps): ReactElem
 
   useEffect(() => {
     let alive = true;
+    /** Normalize/center an arbitrary BufferGeometry into the unit cell. */
+    const finalize = (g: BufferGeometry): BufferGeometry => {
+      g.center();
+      g.computeVertexNormals();
+      g.computeBoundingBox();
+      const box = g.boundingBox ?? new Box3();
+      const size = new Vector3();
+      box.getSize(size);
+      const maxDim = Math.max(size.x, size.y, size.z) || 1;
+      const s = TARGET_SIZE / maxDim;
+      g.scale(s, s, s);
+      return g;
+    };
+
+    // Manufacturer-verified path: decode the operator-supplied STEP file in
+    // the browser via occt-import-js. visual_reference parts keep the STL path
+    // unchanged.
+    if (part.source === 'manufacturer-step' && part.stepUrl) {
+      loadStepGeometry(part.stepUrl)
+        .then((step) => {
+          if (!alive) return;
+          const g = new BufferGeometry();
+          g.setAttribute('position', new BufferAttribute(step.positions, 3));
+          if (step.normals.length === step.positions.length) {
+            g.setAttribute('normal', new BufferAttribute(step.normals, 3));
+          }
+          setGeo(finalize(g));
+        })
+        .catch((err) => {
+          console.error('STEP load failed', part.stepUrl, err);
+        });
+      return () => {
+        alive = false;
+      };
+    }
+
     const loader = new STLLoader();
     loader.load(
       url,
       (g) => {
         if (!alive) return;
-        g.center();
-        g.computeVertexNormals();
-        g.computeBoundingBox();
-        const box = g.boundingBox ?? new Box3();
-        const size = new Vector3();
-        box.getSize(size);
-        const maxDim = Math.max(size.x, size.y, size.z) || 1;
-        const s = TARGET_SIZE / maxDim;
-        g.scale(s, s, s);
-        setGeo(g);
+        setGeo(finalize(g));
       },
       undefined,
       (err) => {
@@ -59,7 +87,7 @@ function Part({ part, url, position, selected, onSelect }: PartProps): ReactElem
     return () => {
       alive = false;
     };
-  }, [url]);
+  }, [url, part.source, part.stepUrl]);
 
   if (!geo) return null;
 

@@ -794,11 +794,24 @@ so AI placeholders are never mistaken for engineering-accurate CAD.
       zero fire coverage verified-live (not fabricated); tests mock-only (no live-API claim);
       client opt-in; results capped at proxy. No UI consumer yet (catalog/step.parts browser is
       T50). GX10-independent.
-- [ ] **T44 — Manufacturer-STEP ingestion lane / Tier-1 parts (GX10-independent).** A
-      `halofire-catalog` importer mapping Victaulic/ARGCO/FFF pricebook line items to
-      manufacturer Revit/STEP family downloads (Viking/Tyco/Victaulic/BIMobject); store
-      STEP + a GLB preview; replace the highest-volume hand-modeled STL heads/fittings
-      with real catalog geometry. (Downloads are operator/manual-sourced, not auto-scraped.)
+- [x] **T44 — Manufacturer-STEP ingestion lane / Tier-1 parts (GX10-independent).** DONE
+      2026-06-05 (ultra workflow wbuqtdt6z, both adversarial verifiers PASS). Built the
+      fail-closed INFRASTRUCTURE (operator-supplied registry) in apps/studio:
+      src/lib/manufacturer-step.ts (ManufacturerStepEntry/Manifest, isOperatorVerified =
+      requires BOTH stepUrl AND sha256, applyManufacturerStep deterministic upgrade,
+      loadManufacturerStepManifest fail-soft→empty); public/parts/manufacturer-step.json
+      ships EMPTY ({entries:[]}) — honest zero-operator-entries default; normalizeManifest
+      applies upgrades after normalize (default unchanged); src/lib/step-loader.ts
+      (occt-import-js WASM, lazy+injectable, in-browser STEP→geometry); PartViewer branches
+      to loadStepGeometry for source==="manufacturer-step"; Inspector shows
+      manufacturer/productCode + gated "Download STEP" + explicit "Manufacturer-CAD-accurate,
+      NOT permit-ready/AHJ/PE-sealed" caveat; App window.__studio.manufacturerVerifiedCount
+      (=0 with empty manifest) + status chip "N present / M catalogued / K manufacturer-verified".
+      HONESTY (verifier zero issues): NO auto-scraping; manufacturer_verified requires
+      source==="manufacturer-step" AND manufacturerExact===true AND real stepUrl+sha256;
+      unmatched keys no-op; visual_reference parts stay visual_reference. vitest 154/154,
+      tsc 0, vite build 0 (occt code-split 59kB). Operator supplies real Viking/Tyco/
+      Victaulic/BIMobject STEP files into manufacturer-step.json to populate Tier-1.
 - [ ] **T45 — build123d parametric-STEP service / Tier-2 parts (GX10-independent, local
       Python).** Port the `earthtojake/text-to-cad` `cad` skill locally; author parametric
       head/fitting/hanger/riser generators that output STEP (primary) + GLB preview, fully

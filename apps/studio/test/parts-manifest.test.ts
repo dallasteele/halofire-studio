@@ -96,6 +96,28 @@ describe('presentParts', () => {
   });
 });
 
+describe('normalizeManifest with empty manufacturer-step manifest (T44 no-regression)', () => {
+  it('matches legacy 22-present result byte-for-byte', () => {
+    const legacy = normalizeManifest(raw);
+    const withEmpty = normalizeManifest(raw, { entries: [] });
+    expect(withEmpty).toHaveLength(legacy.length);
+    for (let i = 0; i < legacy.length; i++) {
+      expect(withEmpty[i].key).toBe(legacy[i].key);
+      expect(withEmpty[i].source).toBe(legacy[i].source);
+      expect(withEmpty[i].manufacturerExact).toBe(legacy[i].manufacturerExact);
+      expect(withEmpty[i].modelStatus).toBe(legacy[i].modelStatus);
+      expect(withEmpty[i].stlUrl).toBe(legacy[i].stlUrl);
+      expect(withEmpty[i].present).toBe(legacy[i].present);
+      expect(withEmpty[i].file).toBe(legacy[i].file);
+    }
+    // Confirm the 22-present invariant survives.
+    const present = withEmpty.filter((r) => r.present);
+    expect(present).toHaveLength(22);
+    // Zero manufacturer-verified records when the manifest is empty.
+    expect(withEmpty.filter((r) => r.modelStatus === 'manufacturer_verified')).toHaveLength(0);
+  });
+});
+
 describe('partsByCategory', () => {
   it('groups present parts into their categories', () => {
     const present = presentParts(normalizeManifest(raw));

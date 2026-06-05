@@ -40,6 +40,8 @@ export function Inspector({ part }: InspectorProps): ReactElement {
         <Field label="Category" value={part.category} />
         <Field label="Source" value={part.source} mono />
         <Field label="Present" value={part.present ? 'yes' : 'no'} />
+        {part.manufacturer ? <Field label="Manufacturer" value={part.manufacturer} /> : null}
+        {part.productCode ? <Field label="Product code" value={part.productCode} mono /> : null}
       </div>
 
       <div style={{ ...badgeChipStyle, background: badge.color }} data-testid="accuracy-badge">
@@ -50,6 +52,24 @@ export function Inspector({ part }: InspectorProps): ReactElement {
         <Verdict label="engineering-accurate" yes={badge.engineeringAccurate} />
         <Verdict label="dimension-verified" yes={badge.dimensionVerified} />
       </dl>
+
+      {part.modelStatus === 'manufacturer_verified' && part.stepUrl ? (
+        <div style={stepLinkWrapStyle}>
+          <a
+            href={part.stepUrl}
+            download
+            style={stepLinkStyle}
+            data-testid="step-download-link"
+          >
+            Download STEP
+          </a>
+          <p style={stepCaptionStyle}>operator-supplied manufacturer file</p>
+          <p style={mfgVerifiedCaveatStyle}>
+            Manufacturer-CAD-accurate. NOT permit-ready / AHJ / PE-sealed —
+            CAD geometry only, not code-compliance evidence.
+          </p>
+        </div>
+      ) : null}
 
       {!badge.engineeringAccurate ? (
         <p style={warnStyle}>
@@ -185,6 +205,38 @@ const verdictRowStyle: CSSProperties = {
 const verdictValueStyle: CSSProperties = {
   margin: 0,
   fontWeight: 600,
+};
+
+const stepLinkWrapStyle: CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: spacing[1],
+  marginBottom: spacing[3],
+  padding: `${spacing[3]} ${spacing[3]}`,
+  background: '#0f2a18',
+  border: `1px solid #1c5234`,
+  borderRadius: radii.md,
+};
+
+const stepLinkStyle: CSSProperties = {
+  color: '#86efac',
+  fontWeight: 600,
+  textDecoration: 'underline',
+  fontSize: typeScale.sm.size,
+};
+
+const stepCaptionStyle: CSSProperties = {
+  margin: 0,
+  color: colors.textSecondary,
+  fontSize: typeScale.xs.size,
+  lineHeight: 1.4,
+};
+
+const mfgVerifiedCaveatStyle: CSSProperties = {
+  margin: `${spacing[1]} 0 0`,
+  color: colors.accentText,
+  fontSize: typeScale.xs.size,
+  lineHeight: 1.45,
 };
 
 const warnStyle: CSSProperties = {

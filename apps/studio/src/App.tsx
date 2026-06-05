@@ -28,6 +28,10 @@ import {
   type PartRecord,
   type RawManifest,
 } from './lib/parts-manifest';
+import {
+  loadManufacturerStepManifest,
+  type ManufacturerStepManifest,
+} from './lib/manufacturer-step';
 import { cameraConfigFor, type ViewMode } from './lib/view-mode';
 import { catalogCounts } from './lib/catalog';
 import { colors, radii, spacing, typeScale } from './lib/tokens';
@@ -54,6 +58,12 @@ declare global {
       appMode: AppMode;
       /** Head count of the current layout (only meaningful in layout mode). */
       headCount: number;
+      /**
+       * Number of records whose modelStatus === "manufacturer_verified" — i.e.
+       * the count of operator-supplied manufacturer-STEP upgrades. With zero
+       * operator entries (the shipped default) this is 0. Honest by construction.
+       */
+      manufacturerVerifiedCount: number;
     };
   }
 }
@@ -72,16 +82,23 @@ export function App(): ReactElement {
 
   useEffect(() => {
     let cancelled = false;
-    fetch('/parts/parts-manifest.json')
-      .then((r) => {
-        if (!r.ok) {
-          throw new Error(`manifest fetch failed: ${r.status}`);
-        }
-        return r.json() as Promise<RawManifest>;
-      })
-      .then((raw) => {
+    // Fetch BOTH the legacy parts manifest and the (default empty)
+    // manufacturer-step manifest. The latter fail-softs to an empty manifest
+    // on any error, so zero operator entries -> zero upgrades.
+    const partsP = fetch('/parts/parts-manifest.json').then((r) => {
+      if (!r.ok) {
+        throw new Error(`manifest fetch failed: ${r.status}`);
+      }
+      return r.json() as Promise<RawManifest>;
+    });
+    const mfgP: Promise<ManufacturerStepManifest> = loadManufacturerStepManifest(
+      typeof fetch === 'function' ? fetch.bind(globalThis) : undefined,
+    );
+
+    Promise.all([partsP, mfgP])
+      .then(([raw, mfg]) => {
         if (cancelled) return;
-        setRecords(normalizeManifest(raw));
+        setRecords(normalizeManifest(raw, mfg));
       })
       .catch((e: unknown) => {
         if (cancelled) return;
@@ -107,6 +124,17 @@ export function App(): ReactElement {
     [records],
   );
 
+  // K (manufacturer-verified) = count of records that earned the upgrade. With
+  // the shipped empty manifest this is 0 — the honest, visible truth that no
+  // operator entries have been ingested yet.
+  const manufacturerVerifiedCount = useMemo(
+    () =>
+      records
+        ? records.filter((r) => r.modelStatus === 'manufacturer_verified').length
+        : 0,
+    [records],
+  );
+
   // Head count of the current layout, for verification + the header readout.
   const headCount = useMemo(
     () => layoutHeads({ widthFt, lengthFt, hazard }).count,
@@ -124,8 +152,17 @@ export function App(): ReactElement {
       selectedKey,
       appMode,
       headCount,
+      manufacturerVerifiedCount,
     };
-  }, [records, present.length, viewMode, selectedKey, appMode, headCount]);
+  }, [
+    records,
+    present.length,
+    viewMode,
+    selectedKey,
+    appMode,
+    headCount,
+    manufacturerVerifiedCount,
+  ]);
 
   // R3F sizes its canvas via ResizeObserver, which can miss the first measure in
   // headless/SSR-hydrated contexts. Kick one resize after mount so the canvas
@@ -186,7 +223,10 @@ export function App(): ReactElement {
             <>
               <strong style={statusNumStyle}>{counts.present}</strong> present{' '}
               <span style={statusSepStyle}>/</span>{' '}
-              <strong style={statusNumStyle}>{counts.total}</strong> catalogued
+              <strong style={statusNumStyle}>{counts.total}</strong> catalogued{' '}
+              <span style={statusSepStyle}>/</span>{' '}
+              <strong style={statusNumStyle}>{manufacturerVerifiedCount}</strong>{' '}
+              manufacturer-verified
             </>
           ) : error ? (
             <span style={{ color: colors.danger }}>error: {error}</span>
