@@ -1515,6 +1515,69 @@ describe('S5 GET /api/auto-source/status', () => {
     expect(signedQueue.summary.official_flow_signed_reviewer_autosprink_rows).toBeGreaterThanOrEqual(1);
   }, 15000);
 
+  it('persists official-flow replay artifacts for disposable projects with posted floorPlan overrides', async () => {
+    const projectName = 'Codex Disposable Official Flow FloorPlan Override';
+    const createRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-packets/official-flow/intake`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        staticPsi: 68,
+        residualPsi: 58,
+        flowingGpm: 820,
+        flowDataDate: '2026-06-05',
+        waterModelRequired: 'employee placeholder until real official-flow values are attached',
+        source_file: 'disposable-official-flow.pdf',
+        source_ref: 'disposable-official-flow.pdf#page=1',
+        notes: 'Disposable floorPlan replay smoke; no regulated claims cleared.',
+      }),
+    });
+    expect(createRes.status).toBe(201);
+    const created = await createRes.json();
+
+    const persistRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-packets/official-flow/${created.id}/replay-artifact`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        floorPlan: {
+          name: projectName,
+          units: 'ft',
+          rooms: [
+            {
+              id: 'disposable-room-1',
+              name: 'Disposable Room 1',
+              polygon: [[0, 0], [40, 0], [40, 30], [0, 30]],
+              ceilingHeightFt: 12,
+              hazard: 'ordinary',
+            },
+          ],
+        },
+        markupPct: 25,
+      }),
+    });
+    expect(persistRes.status).toBe(201);
+    const persisted = await persistRes.json();
+    expect(persisted).toEqual(expect.objectContaining({
+      message: expect.stringMatching(/claims still blocked/i),
+      artifact: expect.objectContaining({
+        artifact_type: 'official_flow_hydraulic_replay_artifact',
+        project_name: projectName,
+        source_evidence_id: created.id,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+      evidence: expect.objectContaining({
+        evidence_type: 'official_flow_hydraulic_replay_artifact',
+        status: 'best_effort',
+      }),
+    }));
+    expect(persisted.artifact.bid_summary).toEqual(expect.objectContaining({
+      total_area_sqft: expect.any(Number),
+      total_head_count: expect.any(Number),
+    }));
+    expect(persisted.artifact.blocked_claims).toEqual(
+      expect.arrayContaining(['permit_ready', 'AHJ_approval', 'PE_review', 'AutoSprink_parity']),
+    );
+  });
+
   it('imports source-linked official-flow attachment intake records without clearing claims', async () => {
     const projectName = 'The Cooperative 1881 - Salt Lake City UT';
     const importRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-packets/official-flow/attachment-intake-records`, {

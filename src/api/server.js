@@ -14085,10 +14085,10 @@ function officialFlowAttachmentSourceRef(body = {}) {
   ).trim();
 }
 
-function buildOfficialFlowHydraulicReplayArtifact(projectName, evidence, intake, user = {}) {
+function buildOfficialFlowHydraulicReplayArtifact(projectName, evidence, intake, user = {}, replayInput = {}) {
   const pipelineReq = {
     params: { name: projectName },
-    body: { markupPct: 25 },
+    body: { ...replayInput, markupPct: Number(replayInput.markupPct) || 25 },
     user: { ...user, role: 'user' },
   };
   const out = runSprinklerPipeline(pipelineReq, null);
@@ -19063,7 +19063,7 @@ app.post('/api/projects/:name/resolver-packets/official-flow/:evidenceId/replay-
     if (!evidence || !intake) {
       return res.status(404).json({ error: 'Official-flow intake evidence not found' });
     }
-    const artifact = buildOfficialFlowHydraulicReplayArtifact(projectName, evidence, intake, req.user);
+    const artifact = buildOfficialFlowHydraulicReplayArtifact(projectName, evidence, intake, req.user, req.body || {});
     const notes = officialFlowReplayArtifactEvidenceNotes(artifact);
     const result = db
       .prepare(`INSERT INTO project_evidence (project_name, evidence_type, source_file, source_ref, status, notes)
