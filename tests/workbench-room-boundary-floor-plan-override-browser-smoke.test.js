@@ -297,6 +297,22 @@ describe('Workbench room-boundary floor-plan override browser smoke', () => {
       expect(savedAuditText).toContain('claim_gate_effect gate_cleared_after_explicit_signed_validation');
       expect(savedAuditText).toContain('no_unrelated_claims_cleared true');
 
+      const savedAuditInspectButton = savedAuditRow.locator(
+        `[data-claim-gate-audit-readback-resolved-evidence-inspect="${savedAuditEvidenceId}"]`,
+      ).first();
+      await savedAuditInspectButton.waitFor({ state: 'attached' });
+      expect(await savedAuditInspectButton.innerText()).toContain('Open accepted evidence read-only');
+      expect(await savedAuditInspectButton.getAttribute('data-claim-gate-resolved-evidence-inspect')).toBe(String(approvalValidationDecision.evidence_id));
+      expect(await savedAuditInspectButton.getAttribute('data-signed-reviewer-workflow-evidence-id')).toBe(String(approvalValidationDecision.evidence_id));
+      expect(await savedAuditInspectButton.getAttribute('data-signed-reviewer-workflow-action')).toBe('inspect');
+      expect(await savedAuditInspectButton.getAttribute('data-source-claim-gate-resolve-audit-evidence-id')).toBe(String(savedAuditEvidenceId));
+      expect(await savedAuditInspectButton.getAttribute('data-source-claim-gate-effect')).toBe('gate_cleared_after_explicit_signed_validation');
+      expect(await savedAuditInspectButton.getAttribute('data-no-unrelated-claims-cleared')).toBe('true');
+      const savedAuditInspectHref = await savedAuditInspectButton.getAttribute('data-signed-reviewer-workflow-href');
+      expect(savedAuditInspectHref).toContain(`evidenceId=${approvalValidationDecision.evidence_id}`);
+      expect(savedAuditInspectHref).toContain('action=inspect');
+      expect(savedAuditInspectHref).toContain(`sourceClaimGateResolveAuditEvidenceId=${savedAuditEvidenceId}`);
+
       const saveAuditActualValue = page.locator(`[data-claim-gate-audit-actual-value-readback-evidence-id="${savedAuditEvidenceId}"]`).first();
       await saveAuditActualValue.waitFor({ state: 'attached' });
       expect(await saveAuditActualValue.getAttribute('data-source-resolved-evidence-id')).toBe(String(approvalValidationDecision.evidence_id));
