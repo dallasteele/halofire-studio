@@ -66,6 +66,11 @@ describe('HaloFire Settings evidence wizard signed reviewer workflow', () => {
   it('prefills record-only signed reviewer uploads from official-flow decision context', () => {
     const html = fs.readFileSync(SETTINGS_HTML, 'utf8');
     expect(html).toContain('hydrateWizardFromOfficialFlowContextEvidence');
+    expect(html).toContain('hydrateWizardFromOfficialFlowUploadPacket');
+    expect(html).toContain("params.get('uploadPacketHref')");
+    expect(html).toContain('data-official-flow-upload-packet-href');
+    expect(html).toContain('data-official-flow-upload-packet-artifact-type');
+    expect(html).toContain('requires_real_signed_evidence');
     expect(html).toContain('officialFlowSignedReviewerPrefillConfig');
     expect(html).toContain('official_flow_professional_ahj_review_decision');
     expect(html).toContain('official_flow_signed_reviewer_context');

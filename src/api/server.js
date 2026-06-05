@@ -15033,6 +15033,7 @@ function officialFlowSignedReviewerValidationRow(projectName, reviewDecision, co
   const queueHref = `/api/projects/${encodeURIComponent(projectName)}/resolver-queue?${queueParams.toString()}`;
   const resolveRoute = `/api/projects/${encodeURIComponent(projectName)}/claim-gates/${encodeURIComponent(targetGateCode)}/resolve`;
   const uploadPacketHref = `/api/projects/${encodeURIComponent(projectName)}/resolver-packets/official-flow-review-decision/${encodeURIComponent(evidenceId)}/signed-evidence-upload-packet?${queueParams.toString()}`;
+  resolveParams.set('uploadPacketHref', uploadPacketHref);
   const resolvedState = officialFlowResolvedValidationState(projectName, reviewDecision, config);
   const row = {
     artifact_type: 'halofire.official_flow_signed_reviewer_validation_row.v1',

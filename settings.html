@@ -296,6 +296,14 @@ function clearWizardOfficialFlowContext() {
   packetStatus.removeAttribute('data-official-flow-context-evidence-id');
   packetStatus.removeAttribute('data-official-flow-context-gate');
   packetStatus.removeAttribute('data-official-flow-context-source-replay-evidence-id');
+  packetStatus.removeAttribute('data-official-flow-upload-packet-href');
+  packetStatus.removeAttribute('data-official-flow-upload-packet-artifact-type');
+  packetStatus.removeAttribute('data-official-flow-upload-packet-claim-gate-effect');
+  packetStatus.removeAttribute('data-official-flow-upload-packet-no-claim-gates-cleared');
+  packetStatus.removeAttribute('data-official-flow-upload-packet-source-review-decision-evidence-id');
+  packetStatus.removeAttribute('data-official-flow-upload-packet-source-replay-evidence-id');
+  packetStatus.removeAttribute('data-official-flow-upload-packet-source-attachment-intake-packet-evidence-id');
+  packetStatus.removeAttribute('data-official-flow-upload-packet-source-attachment-intake-row-index');
 }
 
 function syncWizardGateForm(options = {}) {
@@ -372,6 +380,7 @@ function prefillEvidenceWizardFromUrl() {
     gate: params.get('gate'),
     evidenceId: params.get('evidenceId'),
     action: params.get('action'),
+    uploadPacketHref: params.get('uploadPacketHref'),
   };
 }
 
@@ -380,6 +389,9 @@ async function applyWizardUrlPrefill() {
     $('wizGate').value = wizardUrlPrefill.gate;
   }
   syncWizardGateForm({ skipHydrate: true });
+  if (wizardUrlPrefill.uploadPacketHref && await hydrateWizardFromOfficialFlowUploadPacket()) {
+    return;
+  }
   if (wizardUrlPrefill.evidenceId) {
     const option = Array.from($('wizExistingEvidence').options || []).find((entry) => entry.value === wizardUrlPrefill.evidenceId);
     if (option) {
@@ -495,6 +507,48 @@ function formatOfficialFlowContextNotes(row, gateCode, config, context, action =
       ? 'real signed evidence resolve mode; claim gate clears only after present evidence and signed reviewer metadata are submitted'
       : 'record evidence only; explicit claim-gate resolve audit required before regulated claims clear',
   ].filter(Boolean).join('\n');
+}
+
+async function hydrateWizardFromOfficialFlowUploadPacket() {
+  const uploadPacketHref = wizardUrlPrefill.uploadPacketHref;
+  if (!uploadPacketHref) return false;
+  const packet = await api(apiPathFromHref(uploadPacketHref));
+  if (!packet || packet.artifact_type !== 'halofire.official_flow_signed_evidence_upload_packet.v1') return false;
+  const targetGateCode = packet.target_gate_code || packet.prefill?.target_gate_code || $('wizGate').value;
+  if (targetGateCode && wizardState.gateMap.has(targetGateCode) && $('wizGate').value !== targetGateCode) {
+    $('wizGate').value = targetGateCode;
+    syncWizardGateForm({ skipHydrate: true });
+  }
+  const gate = wizardState.gateMap.get($('wizGate').value);
+  if (!gate) return false;
+  const prefill = packet.prefill && typeof packet.prefill === 'object' ? packet.prefill : {};
+  const evidenceType = prefill.evidence_type || packet.required_evidence_type || '';
+  const allowed = gate.allowed_evidence_types || [];
+  if (!allowed.includes(evidenceType)) return false;
+
+  const actionEl = $('wizAction');
+  $('wizType').value = evidenceType;
+  $('wizExistingEvidence').value = '';
+  actionEl.value = wizardUrlPrefill.action === 'resolve' ? 'resolve' : 'record';
+  $('wizSourceRef').value = prefill.source_ref || packet.source_supplied_ref || '';
+  $('wizSourceFile').value = prefill.source_file || '';
+  $('wizNotes').value = prefill.notes || '';
+  const packetStatus = $('wizPacketStatus');
+  packetStatus.setAttribute('data-official-flow-upload-packet-href', uploadPacketHref);
+  packetStatus.setAttribute('data-official-flow-upload-packet-artifact-type', packet.artifact_type);
+  packetStatus.setAttribute('data-official-flow-upload-packet-claim-gate-effect', packet.claim_gate_effect || 'requires_real_signed_evidence');
+  packetStatus.setAttribute('data-official-flow-upload-packet-no-claim-gates-cleared', packet.no_claim_gates_cleared === false ? 'false' : 'true');
+  packetStatus.setAttribute('data-official-flow-upload-packet-source-review-decision-evidence-id', String(packet.source_review_decision_evidence_id || ''));
+  packetStatus.setAttribute('data-official-flow-upload-packet-source-replay-evidence-id', String(packet.source_replay_evidence_id || ''));
+  packetStatus.setAttribute('data-official-flow-upload-packet-source-attachment-intake-packet-evidence-id', String(packet.source_attachment_intake_packet_evidence_id || ''));
+  packetStatus.setAttribute('data-official-flow-upload-packet-source-attachment-intake-row-index', packet.source_attachment_intake_row_index === 0 || packet.source_attachment_intake_row_index ? String(packet.source_attachment_intake_row_index) : '');
+  packetStatus.textContent =
+    `Prefilled from ${packet.artifact_type} for ${targetGateCode || gate.code}; ${packet.status || 'requires_real_signed_evidence'}; `
+    + `claim_gate_effect ${packet.claim_gate_effect || 'requires_real_signed_evidence'}; no_claim_gates_cleared ${packet.no_claim_gates_cleared === false ? 'false' : 'true'}. `
+    + 'Real signed reviewer metadata and acceptable evidence are still required before this gate can clear.';
+  $('wizResolveAudit').disabled = true;
+  syncWizardSignoff();
+  return true;
 }
 
 async function hydrateWizardFromOfficialFlowContextEvidence() {

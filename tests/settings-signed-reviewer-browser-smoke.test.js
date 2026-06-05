@@ -287,6 +287,100 @@ describe('Settings signed reviewer browser smoke', () => {
     }
   }, 30_000);
 
+  it('prefills signed reviewer fields from an official-flow signed-evidence upload packet href', async () => {
+    const token = await adminToken();
+    const projectName = `Settings Upload Packet ${Date.now()}`;
+    const targetGateCode = 'AHJ_APPROVAL_MISSING';
+    const targetEvidenceType = 'ahj_approval';
+    const targetSourceRef = 'ahj://settings-upload-packet/pending';
+    const intake = await api(`/api/projects/${encodeURIComponent(projectName)}/resolver-packets/official-flow/intake`, token, {
+      method: 'POST',
+      body: JSON.stringify({
+        staticPsi: 72,
+        residualPsi: 60,
+        flowingGpm: 930,
+        flowDataDate: '2026-06-05',
+        waterModelRequired: 'Settings upload packet smoke values for internal-alpha replay only.',
+        source_file: 'settings-upload-packet-official-flow.pdf',
+        source_ref: 'settings-upload-packet-official-flow.pdf#page=1',
+        notes: 'Settings upload packet smoke; no regulated claims cleared.',
+      }),
+    });
+    const replay = await api(`/api/projects/${encodeURIComponent(projectName)}/resolver-packets/official-flow/${intake.id}/replay-artifact`, token, {
+      method: 'POST',
+      body: JSON.stringify({
+        floorPlan: {
+          name: projectName,
+          units: 'ft',
+          rooms: [
+            {
+              id: 'settings-upload-packet-room-1',
+              name: 'Settings Upload Packet Room',
+              polygon: [[0, 0], [40, 0], [40, 30], [0, 30]],
+              ceilingHeightFt: 12,
+              hazard: 'ordinary',
+            },
+          ],
+        },
+      }),
+    });
+    const decision = await api(`/api/projects/${encodeURIComponent(projectName)}/resolver-packets/official-flow-replay/${replay.id}/review-decision`, token, {
+      method: 'POST',
+      body: JSON.stringify({
+        reviewer_name: 'Settings Upload Packet Reviewer',
+        reviewer_title: 'Internal Alpha Reviewer',
+        professional_review_ref: 'pe-review://settings-upload-packet/pending',
+        ahj_review_ref: targetSourceRef,
+        autosprink_export_ref: 'autosprink://settings-upload-packet/pending',
+        manufacturer_model_approval_ref: 'manufacturer://settings-upload-packet/pending',
+        review_decision: 'recorded_evidence_refs_fail_closed',
+        notes: 'Settings upload packet decision; no claim gates cleared here.',
+      }),
+    });
+    const uploadPacketHref = `/api/projects/${encodeURIComponent(projectName)}/resolver-packets/official-flow-review-decision/${decision.id}/signed-evidence-upload-packet?targetGate=${targetGateCode}&evidenceType=${targetEvidenceType}`;
+    const uploadPacket = await api(uploadPacketHref, token);
+    expect(uploadPacket.settings_prefill_href).toContain('uploadPacketHref=');
+
+    const page = await browser.newPage();
+    page.setDefaultTimeout(8000);
+    await page.addInitScript((authToken) => {
+      localStorage.setItem('halofire_token', authToken);
+    }, token);
+
+    try {
+      await page.goto(
+        `${BASE}/settings.html?project=${encodeURIComponent(projectName)}&gate=${targetGateCode}&evidenceId=${decision.id}&action=resolve&uploadPacketHref=${encodeURIComponent(uploadPacketHref)}#wizSignoff`,
+        { waitUntil: 'domcontentloaded' },
+      );
+      await page.locator('#wizGate').waitFor();
+      await page.waitForFunction(
+        (packetHref) => document.getElementById('wizPacketStatus')?.dataset.officialFlowUploadPacketHref === packetHref,
+        uploadPacketHref,
+      );
+
+      expect(await page.locator('#wizGate').inputValue()).toBe(targetGateCode);
+      expect(await page.locator('#wizType').inputValue()).toBe(targetEvidenceType);
+      expect(await page.locator('#wizExistingEvidence').inputValue()).toBe('');
+      expect(await page.locator('#wizAction').inputValue()).toBe('resolve');
+      expect(await page.locator('#wizSourceRef').inputValue()).toBe(targetSourceRef);
+      expect(await page.locator('#wizSourceFile').inputValue()).toBe('settings-upload-packet-official-flow.pdf');
+      expect(await page.locator('#wizNotes').inputValue()).toContain(`source_official_flow_review_decision_evidence_id ${decision.id}`);
+      expect(await page.locator('#wizNotes').inputValue()).toContain(`source_replay_evidence_id ${replay.id}`);
+      expect(await page.locator('#wizNotes').inputValue()).toContain('claim_gate_effect requires_real_signed_evidence');
+      expect(await page.locator('#wizPacketStatus').innerText()).toContain('Prefilled from halofire.official_flow_signed_evidence_upload_packet.v1');
+      expect(await page.locator('#wizPacketStatus').innerText()).toContain('requires_real_signed_evidence');
+      expect(await page.locator('#wizPacketStatus').getAttribute('data-official-flow-upload-packet-artifact-type')).toBe('halofire.official_flow_signed_evidence_upload_packet.v1');
+      expect(await page.locator('#wizPacketStatus').getAttribute('data-official-flow-upload-packet-claim-gate-effect')).toBe('requires_real_signed_evidence');
+      expect(await page.locator('#wizPacketStatus').getAttribute('data-official-flow-upload-packet-no-claim-gates-cleared')).toBe('true');
+      expect(await page.locator('#wizResolveAudit').isDisabled()).toBe(true);
+
+      const gates = await api(`/api/projects/${encodeURIComponent(projectName)}/claim-gates`, token);
+      expect(gates.find((gate) => gate.code === targetGateCode).status).toBe('blocked');
+    } finally {
+      await page.close();
+    }
+  }, 30_000);
+
   it('resolves a gate from official-flow signed reviewer resolve context with real signed evidence', async () => {
     const token = await adminToken();
     const targetGateCode = 'PROFESSIONAL_REVIEW_MISSING';
