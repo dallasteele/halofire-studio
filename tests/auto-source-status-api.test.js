@@ -1439,7 +1439,39 @@ describe('S5 GET /api/auto-source/status', () => {
       expect(row.action.href).toContain(`gate=${encodeURIComponent(row.target_gate_code)}`);
       expect(row.action.href).toContain(`evidenceId=${decision.id}`);
       expect(row.action.href).toContain('#wizSignoff');
+      expect(row.queue_action).toEqual(expect.objectContaining({
+        label: expect.stringContaining('Open pending'),
+        source_review_decision_evidence_id: decision.id,
+        claim_gate_effect: 'no_claims_cleared',
+        no_claim_gates_cleared: true,
+      }));
+      expect(row.queue_action.href).toContain(`/api/projects/${encodeURIComponent(projectName)}/resolver-queue?`);
+      expect(row.queue_action.href).toContain(`officialFlowReviewDecisionEvidenceId=${decision.id}`);
+      expect(row.queue_action.href).toContain(`targetGate=${encodeURIComponent(row.target_gate_code)}`);
+      expect(row.queue_action.href).toContain(`evidenceType=${encodeURIComponent(row.required_evidence_type)}`);
     }
+    const scopedSignedQueueRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-queue?officialFlowReviewDecisionEvidenceId=${decision.id}&targetGate=AHJ_APPROVAL_MISSING&evidenceType=ahj_approval`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(scopedSignedQueueRes.status).toBe(200);
+    const scopedSignedQueue = await scopedSignedQueueRes.json();
+    expect(scopedSignedQueue.filters.officialFlowReviewDecisionEvidenceId).toBe(decision.id);
+    expect(scopedSignedQueue.items).toHaveLength(1);
+    expect(scopedSignedQueue.items[0]).toEqual(expect.objectContaining({
+      kind: 'official_flow_signed_reviewer_validation',
+      source_review_decision_evidence_id: decision.id,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(scopedSignedQueue.items[0].validation_rows).toEqual([
+      expect.objectContaining({
+        target_gate_code: 'AHJ_APPROVAL_MISSING',
+        required_evidence_type: 'ahj_approval',
+        source_review_decision_evidence_id: decision.id,
+        claim_gate_effect: 'no_claims_cleared',
+        no_claim_gates_cleared: true,
+      }),
+    ]);
     expect(signedQueue.summary.official_flow_signed_reviewer_validation_needed).toBeGreaterThanOrEqual(1);
   }, 15000);
 

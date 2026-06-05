@@ -14633,6 +14633,12 @@ function officialFlowSignedReviewerValidationRow(projectName, reviewDecision, co
   const decision = reviewDecision.decision || {};
   const evidenceId = reviewDecision.evidence.id;
   const targetGateCode = config.target_gate_code;
+  const queueParams = new URLSearchParams({
+    officialFlowReviewDecisionEvidenceId: String(evidenceId),
+    targetGate: targetGateCode,
+    evidenceType: config.required_evidence_type,
+  });
+  const queueHref = `/api/projects/${encodeURIComponent(projectName)}/resolver-queue?${queueParams.toString()}`;
   return {
     artifact_type: 'halofire.official_flow_signed_reviewer_validation_row.v1',
     status: 'ready_for_signed_reviewer_workflow',
@@ -14660,6 +14666,20 @@ function officialFlowSignedReviewerValidationRow(projectName, reviewDecision, co
       target_gate_code: targetGateCode,
       required_evidence_type: config.required_evidence_type,
       source_review_decision_evidence_id: evidenceId,
+    },
+    queue_action: {
+      label: `Open pending ${config.required_evidence_type} signed-reviewer queue`,
+      method: 'GET',
+      href: queueHref,
+      artifact_type: 'halofire.official_flow_signed_reviewer_validation_queue_item.v1',
+      target_gate_code: targetGateCode,
+      required_evidence_type: config.required_evidence_type,
+      source_review_decision_evidence_id: evidenceId,
+      source_replay_evidence_id: decision.source_replay_evidence_id || null,
+      source_supplied_ref: decision[config.source_ref_field] || null,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+      claims_cleared_count: 0,
     },
   };
 }
@@ -17015,6 +17035,10 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
     claimGateAudit: String(req.query?.claimGateAudit || req.query?.claim_gate_audit || '').trim().toLowerCase() || null,
     evidenceType: String(req.query?.evidenceType || req.query?.evidence_type || '').trim().toLowerCase() || null,
     targetGate: String(req.query?.targetGate || req.query?.target_gate || '').trim().toUpperCase() || null,
+    officialFlowReviewDecisionEvidenceId: Number.isFinite(Number(req.query?.officialFlowReviewDecisionEvidenceId || req.query?.official_flow_review_decision_evidence_id))
+      && Number(req.query?.officialFlowReviewDecisionEvidenceId || req.query?.official_flow_review_decision_evidence_id) > 0
+      ? Number(req.query?.officialFlowReviewDecisionEvidenceId || req.query?.official_flow_review_decision_evidence_id)
+      : null,
   };
   const evidence = latestPdfBoundaryDecisionEvidence(projectName);
   const decision = decisionFromEvidence(evidence);
@@ -17153,11 +17177,12 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
       return true;
     });
   }
-  if (filters.catalogApproval || filters.evidenceType || (filters.targetGate && !filters.sam31ApprovalValidation && !filters.claimGateAudit)) {
+  if (filters.catalogApproval || filters.evidenceType || filters.officialFlowReviewDecisionEvidenceId || (filters.targetGate && !filters.sam31ApprovalValidation && !filters.claimGateAudit)) {
     visibleItems = visibleItems
       .map((item) => {
         if (item.kind === 'official_flow_signed_reviewer_validation') {
           if (filters.catalogApproval) return null;
+          if (filters.officialFlowReviewDecisionEvidenceId && Number(item.source_review_decision_evidence_id) !== filters.officialFlowReviewDecisionEvidenceId) return null;
           const validationRows = Array.isArray(item.validation_rows)
             ? item.validation_rows
               .filter((row) => !filters.evidenceType || String(row.required_evidence_type || '').toLowerCase() === filters.evidenceType)
@@ -17165,6 +17190,7 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
             : [];
           return validationRows.length ? { ...item, validation_rows: validationRows, actions: validationRows.map((row) => row.action).filter(Boolean) } : null;
         }
+        if (filters.officialFlowReviewDecisionEvidenceId) return null;
         const approvalRows = Array.isArray(item.catalog_approval_packet_rows)
           ? item.catalog_approval_packet_rows
             .filter((row) => filters.catalogApproval !== 'ready' || row.status === 'ready_for_signed_evidence_upload')

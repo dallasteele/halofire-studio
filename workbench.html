@@ -401,6 +401,34 @@ function openSignedReviewerWorkflow(projectName, gateCode, evidenceId) {
   location.href = halofireUiBasePath() + '/settings.html?' + params.toString() + '#wizSignoff';
 }
 
+function officialFlowSignedReviewerValidationQueueQuery(gateCode = '', evidenceType = '', sourceEvidenceId = '') {
+  const params = new URLSearchParams();
+  if (sourceEvidenceId) params.set('officialFlowReviewDecisionEvidenceId', sourceEvidenceId);
+  if (gateCode) params.set('targetGate', gateCode);
+  if (evidenceType) params.set('evidenceType', evidenceType);
+  return params.toString();
+}
+
+async function openOfficialFlowSignedReviewerValidationQueue(gateCode = '', evidenceType = '', sourceEvidenceId = '', statusId = '') {
+  const query = officialFlowSignedReviewerValidationQueueQuery(gateCode, evidenceType, sourceEvidenceId);
+  const status = statusId ? document.getElementById(statusId) : null;
+  resolverQueueFilterQuery = query;
+  if (status) {
+    status.textContent = 'Opening pending signed-reviewer queue readback; no claims cleared by this queue readback.';
+    status.dataset.officialFlowReviewDecisionEvidenceId = sourceEvidenceId || '';
+    status.dataset.targetGateCode = gateCode || '';
+    status.dataset.requiredEvidenceType = evidenceType || '';
+    status.dataset.claimGateEffect = 'no_claims_cleared';
+    status.dataset.noClaimGatesCleared = 'true';
+  }
+  await refreshResolverQueue();
+  const resolverQueue = document.getElementById('resolverQueue');
+  if (resolverQueue && typeof resolverQueue.scrollIntoView === 'function') resolverQueue.scrollIntoView({ block: 'start' });
+  if (status) {
+    status.textContent = 'Opened pending signed-reviewer queue readback for ' + (gateCode || 'target gate') + '; no claims cleared by this queue readback.';
+  }
+}
+
 async function downloadSignedReviewerResolveAuditPacket(href, gateCode = '', evidenceId = '') {
   const status = evidenceId ? document.getElementById('signedReviewerResolveAuditStatus-' + evidenceId) : null;
   if (!href) {
@@ -441,6 +469,17 @@ document.addEventListener('click', (event) => {
       currentProjectName(),
       workflowButton.getAttribute('data-signed-reviewer-workflow-gate-code') || '',
       workflowButton.getAttribute('data-signed-reviewer-workflow-evidence-id') || '',
+    );
+    return;
+  }
+  const officialFlowQueueButton = event.target.closest('[data-official-flow-signed-reviewer-validation-queue]');
+  if (officialFlowQueueButton) {
+    event.preventDefault();
+    openOfficialFlowSignedReviewerValidationQueue(
+      officialFlowQueueButton.getAttribute('data-official-flow-signed-reviewer-validation-gate-code') || '',
+      officialFlowQueueButton.getAttribute('data-official-flow-signed-reviewer-validation-evidence-type') || '',
+      officialFlowQueueButton.getAttribute('data-official-flow-signed-reviewer-validation-source-evidence-id') || '',
+      officialFlowQueueButton.getAttribute('data-official-flow-signed-reviewer-validation-status-id') || '',
     );
     return;
   }
@@ -4391,16 +4430,20 @@ function renderOfficialFlowSignedReviewerValidationRows(rows, sourceEvidenceId =
     const action = row.action || {};
     const evidenceId = String(row.source_review_decision_evidence_id || sourceEvidenceId || '');
     const gateCode = row.target_gate_code || '';
+    const requiredEvidenceType = row.required_evidence_type || '';
+    const queueStatusId = `officialFlowSignedReviewerQueueStatus-${evidenceId}-${gateCode || 'target_gate_missing'}`;
     return `<div style="margin-top:6px;border-top:1px solid rgba(255,213,79,.16);padding-top:6px">
-      <span class="chip">${escapeHtml(gateCode || 'target gate missing')}</span> <span class="chip">${escapeHtml(row.required_evidence_type || 'required evidence missing')}</span> <span class="chip">${escapeHtml(row.status || 'ready_for_signed_reviewer_workflow')}</span><br>
+      <span class="chip">${escapeHtml(gateCode || 'target gate missing')}</span> <span class="chip">${escapeHtml(requiredEvidenceType || 'required evidence missing')}</span> <span class="chip">${escapeHtml(row.status || 'ready_for_signed_reviewer_workflow')}</span><br>
       ${escapeHtml(row.next_action || 'Open signed reviewer workflow; no claims are cleared by this handoff.')}<br>
       source_review_decision_evidence_id ${escapeHtml(evidenceId || 'missing')} - source_replay_evidence_id ${escapeHtml(row.source_replay_evidence_id || 'missing')} - source_supplied_ref ${escapeHtml(row.source_supplied_ref || 'missing')}<br>
       claim_gate_effect ${escapeHtml(row.claim_gate_effect || 'no_claims_cleared')} - no_claim_gates_cleared ${escapeHtml(row.no_claim_gates_cleared === false ? 'false' : 'true')}<br>
       Accepts: ${(Array.isArray(row.acceptable_evidence) ? row.acceptable_evidence : []).map((item) => `<span class="chip">${escapeHtml(item)}</span>`).join('') || '<span class="chip">signed reviewer evidence</span>'}
       Blocks: ${(Array.isArray(row.blocked_claims) ? row.blocked_claims : []).map((claim) => `<span class="chip">${escapeHtml(claim)}</span>`).join('') || '<span class="chip">regulated claims remain blocked</span>'}<br>
       <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0f766e" data-signed-reviewer-workflow-evidence-id="${escapeHtml(evidenceId)}" data-signed-reviewer-workflow-gate-code="${escapeHtml(gateCode)}" data-signed-reviewer-workflow-review-packet-href="${escapeHtml(action.href || '')}" onclick="openSignedReviewerWorkflow(${JSON.stringify(currentProjectName())}, ${JSON.stringify(gateCode)}, ${JSON.stringify(evidenceId)})">${escapeHtml(action.label || 'Open signed reviewer workflow')}</button>
+      <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#4338ca" data-official-flow-signed-reviewer-validation-queue="1" data-official-flow-signed-reviewer-validation-gate-code="${escapeHtml(gateCode)}" data-official-flow-signed-reviewer-validation-evidence-type="${escapeHtml(requiredEvidenceType)}" data-official-flow-signed-reviewer-validation-source-evidence-id="${escapeHtml(evidenceId)}" data-official-flow-signed-reviewer-validation-status-id="${escapeHtml(queueStatusId)}" onclick="openOfficialFlowSignedReviewerValidationQueue(${JSON.stringify(gateCode)}, ${JSON.stringify(requiredEvidenceType)}, ${JSON.stringify(evidenceId)}, ${JSON.stringify(queueStatusId)})">${escapeHtml(row.queue_action?.label || 'Open pending signed-reviewer queue')}</button>
+      <div class="muted" id="${escapeHtml(queueStatusId)}" style="font-size:11px;margin-top:4px">officialFlowReviewDecisionEvidenceId ${escapeHtml(evidenceId || 'missing')} - no claims cleared by this queue readback</div>
     </div>`;
-  }).join('')}<span class="muted" style="font-size:10px">Filter API: /resolver-queue?targetGate=PROFESSIONAL_REVIEW_MISSING or evidenceType=ahj_approval - source official_flow_professional_ahj_review_decision - claim_gate_effect no_claims_cleared</span></div>`;
+  }).join('')}<span class="muted" style="font-size:10px">Filter API: /resolver-queue?officialFlowReviewDecisionEvidenceId=:id&targetGate=PROFESSIONAL_REVIEW_MISSING or evidenceType=ahj_approval - source official_flow_professional_ahj_review_decision - claim_gate_effect no_claims_cleared</span></div>`;
 }
 
 function renderCatalogApprovalPacketRows(rows) {
