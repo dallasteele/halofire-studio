@@ -1,5 +1,13 @@
 # HaloFire Build Log
 
+## 2026-06-05 - Catalog source evidence Workbench readback
+
+- Updated [`workbench.html`](C:/Users/dalla/OneDrive/Documents/HaloFire/workbench.html) so both catalog source-acquisition buttons, including the resolver-queue row button an operator sees first, keep a durable saved-evidence readback after the Workbench refreshes evidence and queue data.
+- The readback now exposes `data-catalog-source-evidence-id`, `data-catalog-source-family-ref`, `data-catalog-source-component-key`, `data-claim-gate-effect`, and `data-no-claim-gates-cleared` so the saved catalog source row remains source-linked while manufacturer, AutoSprink, AHJ, PE, permit, and fabrication claims stay blocked.
+- Added [`tests/workbench-catalog-source-browser-smoke.test.js`](C:/Users/dalla/OneDrive/Documents/HaloFire/tests/workbench-catalog-source-browser-smoke.test.js) with a browser-backed red-to-green smoke that clicks the Workbench record button, verifies the persisted DOM readback, checks the saved `halofire.catalog_source_acquisition_ledger_row.v1` notes, and confirms manufacturer/AutoSprink gates remain blocked.
+- Verified with `node ./node_modules/vitest/vitest.mjs run tests/workbench-catalog-source-browser-smoke.test.js --reporter=verbose`, `node ./node_modules/vitest/vitest.mjs run tests/studio-static-origin.test.js -t "catalog source-acquisition" --reporter=verbose`, `node ./node_modules/vitest/vitest.mjs run tests/auto-source-status-api.test.js -t "catalog" --reporter=verbose`, `C:/Python312/python.exe E:/ClaudeBot/scripts/verify_agentic_rules.py`, `git diff --check`, and GX10 prover health. This is `NO_FORMALIZABLE_CLAIM`; the slice is browser/UI provenance readback, not a theorem-shaped invariant.
+- Still blocked: AutoSprink parity, AHJ approval, PE/professional review, permit readiness, fabrication readiness, manufacturer-exact models, brand readiness, production readiness, survey-grade claims, and engineering-grade claims.
+
 ## 2026-06-04 - Official-flow signed reviewer resolve proof
 
 - Changed [`src/api/server.js`](C:/Users/dalla/OneDrive/Documents/HaloFire/src/api/server.js) so signed-reviewer evidence resolved through the explicit claim-gate path now records the explicit clearance token `gate_cleared_after_explicit_signed_validation` and still exposes the resolve-audit packet href/readback expected by Settings and Workbench.
