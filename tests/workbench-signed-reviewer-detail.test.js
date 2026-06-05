@@ -70,6 +70,7 @@ describe('workbench signed reviewer evidence detail rendering', () => {
     expect(html).toContain('downloadSignedReviewerResolveAuditPacket');
     expect(html).toContain('Open signed reviewer workflow');
     expect(html).toContain('openSignedReviewerWorkflow');
+    expect(html).toContain('halofireUiBasePath');
     expect(html).toContain('evidenceId');
   });
 

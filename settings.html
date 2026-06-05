@@ -37,7 +37,7 @@
 <body>
 <header>
   <div class="brand">Halo<span>Fire</span> · Settings &amp; Parity</div>
-  <div class="nav"><a href="/workbench.html">Workbench</a><a href="/autosprink.html">Studio</a><a id="logout">Sign out</a></div>
+  <div class="nav"><a href="./workbench.html">Workbench</a><a href="./autosprink.html">Studio</a><a id="logout">Sign out</a></div>
 </header>
 <main>
   <div class="card wide">
@@ -225,13 +225,15 @@
 </main>
 
 <script type="module">
+const HALOFIRE_BASE_PATH = window.location.pathname.startsWith('/halo-fire/') ? '/halo-fire' : '';
+const HALOFIRE_API_BASE = HALOFIRE_BASE_PATH + ['', 'api'].join('/');
 const token = localStorage.getItem('halofire_token');
-if (!token) location.href = '/';
+if (!token) location.href = HALOFIRE_BASE_PATH + '/';
 const $ = (id) => document.getElementById(id);
-$('logout').onclick = () => { localStorage.removeItem('halofire_token'); location.href = '/'; };
+$('logout').onclick = () => { localStorage.removeItem('halofire_token'); location.href = HALOFIRE_BASE_PATH + '/'; };
 function api(path, opts={}) {
-  return fetch('/api'+path, { ...opts, headers:{ 'Content-Type':'application/json', Authorization:'Bearer '+token, ...(opts.headers||{}) }})
-    .then(async r => { if (r.status===401){ localStorage.removeItem('halofire_token'); location.href='/'; throw new Error('unauth'); } if(!r.ok) throw new Error(await r.text()); return r.json(); });
+  return fetch(HALOFIRE_API_BASE + path, { ...opts, headers:{ 'Content-Type':'application/json', Authorization:'Bearer '+token, ...(opts.headers||{}) }})
+    .then(async r => { if (r.status===401){ localStorage.removeItem('halofire_token'); location.href = HALOFIRE_BASE_PATH + '/'; throw new Error('unauth'); } if(!r.ok) throw new Error(await r.text()); return r.json(); });
 }
 const stClass = (s) => String(s).toLowerCase().replace(/[^a-z]/g,'');
 let wizardState = { projects: [], gateMap: new Map(), selectedProject: '', canWrite: false };
@@ -289,7 +291,14 @@ async function loadDeps() {
   } catch(e){ $('deps').innerHTML = '<span class="err">'+e.message+'</span>'; }
 }
 
-function syncWizardGateForm() {
+function clearWizardOfficialFlowContext() {
+  const packetStatus = $('wizPacketStatus');
+  packetStatus.removeAttribute('data-official-flow-context-evidence-id');
+  packetStatus.removeAttribute('data-official-flow-context-gate');
+  packetStatus.removeAttribute('data-official-flow-context-source-replay-evidence-id');
+}
+
+function syncWizardGateForm(options = {}) {
   const gate = wizardState.gateMap.get($('wizGate').value);
   const typeEl = $('wizType');
   const existingEl = $('wizExistingEvidence');
@@ -303,6 +312,7 @@ function syncWizardGateForm() {
     $('wizUseExisting').disabled = true;
     packetButton.disabled = true;
     auditButton.disabled = true;
+    clearWizardOfficialFlowContext();
     $('wizPacketStatus').textContent = 'Choose a gate to download the exact review packet for that evidence lane.';
     $('wizGateHelp').textContent = 'Choose a gate to see acceptable evidence.';
     return;
@@ -346,7 +356,8 @@ function syncWizardGateForm() {
   $('wizGateHelp').innerHTML =
     `<b>${escapeHtml(gate.code)}</b> — ${escapeHtml(gate.acceptable_evidence || gate.next_action || '')}`
     + (gate.blocked_claims?.length ? `<div style="margin-top:6px">Blocks: ${gate.blocked_claims.map((claim) => `<span class="pill missing">${escapeHtml(claim)}</span>`).join('')}</div>` : '');
-  hydrateWizardFromExistingEvidence();
+  clearWizardOfficialFlowContext();
+  if (!options.skipHydrate) hydrateWizardFromExistingEvidence();
 }
 
 function selectedEvidenceNeedsSignoff() {
@@ -363,17 +374,19 @@ function prefillEvidenceWizardFromUrl() {
   };
 }
 
-function applyWizardUrlPrefill() {
+async function applyWizardUrlPrefill() {
   if (wizardUrlPrefill.gate && wizardState.gateMap.has(wizardUrlPrefill.gate)) {
     $('wizGate').value = wizardUrlPrefill.gate;
   }
-  syncWizardGateForm();
+  syncWizardGateForm({ skipHydrate: true });
   if (wizardUrlPrefill.evidenceId) {
     const option = Array.from($('wizExistingEvidence').options || []).find((entry) => entry.value === wizardUrlPrefill.evidenceId);
     if (option) {
       $('wizExistingEvidence').value = wizardUrlPrefill.evidenceId;
       hydrateWizardFromExistingEvidence();
+      return;
     }
+    await hydrateWizardFromOfficialFlowContextEvidence();
   }
 }
 
@@ -406,6 +419,7 @@ function hydrateWizardFromExistingEvidence() {
     userNotes = row.notes || '';
   }
   $('wizNotes').value = userNotes;
+  clearWizardOfficialFlowContext();
   $('wizReviewerName').value = signoff.reviewer_name || '';
   $('wizReviewerTitle').value = signoff.reviewer_title || '';
   $('wizSignedAt').value = formatWizardDateTimeLocal(signoff.signed_at);
@@ -420,6 +434,96 @@ function hydrateWizardFromExistingEvidence() {
     + (packetContext.reviewPacketHref ? ` Review packet route ${packetContext.reviewPacketHref}.` : ' Resolve the gate or download the packet for this signed reviewer lane.')
     + (packetContext.resolveAuditHref ? ` Resolve audit route ${packetContext.resolveAuditHref}.` : '');
   syncWizardSignoff();
+}
+
+function officialFlowSignedReviewerPrefillConfig(gateCode, context = {}, row = {}) {
+  const decision = context.decision && typeof context.decision === 'object' ? context.decision : context;
+  const sourceRefFallback = row.source_ref || `official-flow-review-decision:${row.id || 'missing'}:${gateCode || 'claim-gate'}`;
+  const configs = {
+    PROFESSIONAL_REVIEW_MISSING: {
+      evidenceType: 'professional_review',
+      sourceRef: decision.professional_review_ref || context.professional_review_ref || sourceRefFallback,
+      label: 'professional signed reviewer',
+    },
+    AHJ_APPROVAL_MISSING: {
+      evidenceType: 'ahj_approval',
+      sourceRef: decision.ahj_review_ref || context.ahj_review_ref || sourceRefFallback,
+      label: 'AHJ signed reviewer',
+    },
+    AUTOSPRINK_EVIDENCE_MISSING: {
+      evidenceType: 'autosprink_packet',
+      sourceRef: decision.autosprink_export_ref || context.autosprink_export_ref || sourceRefFallback,
+      label: 'AutoSprink evidence reviewer',
+    },
+  };
+  return configs[gateCode] || null;
+}
+
+function parseWizardEvidenceNotes(row) {
+  if (!row?.notes) return {};
+  try {
+    return JSON.parse(row.notes || '{}');
+  } catch {
+    return { raw_notes: row.notes };
+  }
+}
+
+function formatOfficialFlowContextNotes(row, gateCode, config, context) {
+  const decision = context.decision && typeof context.decision === 'object' ? context.decision : context;
+  const sourceRefs = Array.isArray(context.source_refs) ? context.source_refs : [];
+  const sourceReplayEvidenceId = decision.source_replay_evidence_id || context.source_replay_evidence_id || '';
+  const sourceRefText = sourceRefs
+    .map((ref) => (typeof ref === 'string' ? ref : JSON.stringify(ref)))
+    .filter(Boolean)
+    .join(' | ');
+  return [
+    'official_flow_signed_reviewer_context',
+    `source_official_flow_review_decision_evidence_id ${row.id}`,
+    sourceReplayEvidenceId ? `source_replay_evidence_id ${sourceReplayEvidenceId}` : '',
+    `target_gate_code ${gateCode}`,
+    `required_evidence_type ${config.evidenceType}`,
+    sourceRefText ? `source_refs ${sourceRefText}` : '',
+    'claim_gate_effect no_claims_cleared',
+    'record evidence only; explicit claim-gate resolve audit required before regulated claims clear',
+  ].filter(Boolean).join('\n');
+}
+
+async function hydrateWizardFromOfficialFlowContextEvidence() {
+  const gateCode = $('wizGate').value;
+  const gate = wizardState.gateMap.get(gateCode);
+  const evidenceId = wizardUrlPrefill.evidenceId;
+  if (!gate || !evidenceId) return false;
+  const projectName = $('wizProject').value;
+  const rows = await api('/projects/' + encodeURIComponent(projectName) + '/evidence');
+  const row = (Array.isArray(rows) ? rows : []).find((entry) => String(entry.id) === String(evidenceId));
+  const context = parseWizardEvidenceNotes(row);
+  if (!row || (row.evidence_type !== 'official_flow_professional_ahj_review_decision' && context.kind !== 'official_flow_professional_ahj_review_decision')) {
+    return false;
+  }
+  const config = officialFlowSignedReviewerPrefillConfig(gateCode, context, row);
+  const allowed = gate.allowed_evidence_types || [];
+  if (!config || !allowed.includes(config.evidenceType)) return false;
+
+  const actionEl = $('wizAction');
+  $('wizType').value = config.evidenceType;
+  $('wizExistingEvidence').value = '';
+  actionEl.value = 'record';
+  $('wizSourceRef').value = config.sourceRef || row.source_ref || '';
+  $('wizSourceFile').value = row.source_file || '';
+  $('wizNotes').value = formatOfficialFlowContextNotes(row, gateCode, config, context);
+  const packetStatus = $('wizPacketStatus');
+  const sourceReplayEvidenceId = context.decision?.source_replay_evidence_id || context.source_replay_evidence_id || '';
+  packetStatus.setAttribute('data-official-flow-context-evidence-id', String(row.id));
+  packetStatus.setAttribute('data-official-flow-context-gate', gateCode);
+  if (sourceReplayEvidenceId) {
+    packetStatus.setAttribute('data-official-flow-context-source-replay-evidence-id', String(sourceReplayEvidenceId));
+  } else {
+    packetStatus.removeAttribute('data-official-flow-context-source-replay-evidence-id');
+  }
+  packetStatus.textContent = `Prefilled from official-flow review decision evidence #${row.id} for ${config.label}; record evidence only; no claims cleared.`;
+  $('wizResolveAudit').disabled = true;
+  syncWizardSignoff();
+  return true;
 }
 
 function formatWizardDateTimeLocal(value) {
@@ -459,7 +563,9 @@ function selectedSignedReviewerPacketContext() {
 }
 
 function apiPathFromHref(href) {
-  return String(href || '').startsWith('/api/') ? String(href).slice(4) : href;
+  const value = String(href || '');
+  const apiPathPrefix = ['', 'api'].join('/');
+  return value.startsWith(apiPathPrefix + '/') ? value.slice(apiPathPrefix.length) : href;
 }
 
 function wizardSignoffPayload() {
@@ -495,7 +601,7 @@ async function loadWizard(projectName) {
         <div style="margin-top:8px"><button data-gate-pick="${escapeHtml(gate.code)}">Use this gate</button></div>
       </div>`).join('') || '<span class="muted">no gates for this project</span>';
     $('wizGate').innerHTML = (data.gates || []).map((gate) => `<option value="${gate.code}">${gate.code}</option>`).join('');
-    applyWizardUrlPrefill();
+    await applyWizardUrlPrefill();
     $('wizSubmit').disabled = !wizardState.canWrite;
     $('wizGates').querySelectorAll('[data-gate-pick]').forEach((btn) => btn.addEventListener('click', () => {
       $('wizGate').value = btn.getAttribute('data-gate-pick');
@@ -599,8 +705,11 @@ async function initWizard() {
     wizardState.canWrite = me.role === 'admin';
     const projects = await api('/projects');
     wizardState.projects = (projects || []).length
-      ? projects
+      ? [...projects]
       : (wizardUrlPrefill.project ? [{ name: wizardUrlPrefill.project }] : []);
+    if (wizardUrlPrefill.project && !wizardState.projects.some((p) => p.name === wizardUrlPrefill.project)) {
+      wizardState.projects.unshift({ name: wizardUrlPrefill.project });
+    }
     $('wizProject').innerHTML = wizardState.projects.map((p) => `<option value="${p.name}">${p.name}</option>`).join('');
     const defaultProject = wizardState.projects.find((p) => p.name === wizardUrlPrefill.project)
       || wizardState.projects.find((p) => p.name === 'Home Depot - Rexburg ID')
@@ -645,18 +754,19 @@ $('wizSubmit').onclick = async () => {
   try {
     const signoff = selectedEvidenceNeedsSignoff() ? wizardSignoffPayload() : null;
     if (signoff) payload.signoff = signoff; // Preserve reviewer metadata even when recording evidence only.
+    let submitMessage = '';
     if ($('wizAction').value === 'resolve') {
       await api('/projects/' + encodeURIComponent(projectName) + '/claim-gates/' + encodeURIComponent(gateCode) + '/resolve', {
         method: 'POST',
         body: JSON.stringify({ evidence: payload }),
       });
-      msg.textContent = 'gate resolved with accepted evidence';
+      submitMessage = 'gate resolved with accepted evidence';
     } else {
       await api('/projects/' + encodeURIComponent(projectName) + '/evidence', {
         method: 'POST',
         body: JSON.stringify({ ...payload, status: 'present', target_gate_code: gateCode }),
       });
-      msg.textContent = 'evidence recorded only';
+      submitMessage = 'evidence recorded only';
     }
     $('wizSourceRef').value = '';
     $('wizSourceFile').value = '';
@@ -668,6 +778,8 @@ $('wizSubmit').onclick = async () => {
     $('wizLicenseId').value = '';
     await loadWizard(projectName);
     await loadSettingsResolvedSignedReviewerGates(projectName);
+    msg.className = 'muted';
+    msg.textContent = submitMessage;
   } catch (e) {
     msg.className = 'err';
     msg.textContent = e.message;
@@ -1191,7 +1303,7 @@ async function recordSettingsRoomBoundaryFloorPlanOverrideAcknowledgement(index)
     floor_plan_override_source: row.floor_plan_override_source || action.room_boundary_source || row.floor_plan_override?.room_boundary_source || 'latest_employee_review_packet',
     floor_plan_override_artifact_type: row.floor_plan_override?.artifact_type || 'halofire.room_boundary_floor_plan_override.v1',
     action_packet_artifact_type: 'halofire.room_boundary_floor_plan_override_action_packet.v1',
-    action_href: action.action_href || `/api/projects/${encodeURIComponent(projectName)}/sprinkler-bid`,
+    action_href: action.action_href || `${['', 'api', 'projects'].join('/')}/${encodeURIComponent(projectName)}/sprinkler-bid`,
     download_href: action.download_href || null,
     corrected_room_polygon_count: action.corrected_room_polygon_count ?? row.corrected_room_polygon_count ?? 0,
     blocked_claims: Array.isArray(row.blocked_claims) ? row.blocked_claims : [],

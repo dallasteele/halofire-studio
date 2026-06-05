@@ -389,12 +389,16 @@ function applySam31ActualValueReadbackAuditContextDataset(element, context = nul
   });
 }
 
+function halofireUiBasePath() {
+  return HALOFIRE_BASE_PATH || (location.pathname.startsWith('/halo-fire/') ? '/halo-fire' : '');
+}
+
 function openSignedReviewerWorkflow(projectName, gateCode, evidenceId) {
   const params = new URLSearchParams();
   params.set('project', projectName || currentProjectName());
   if (gateCode) params.set('gate', gateCode);
   if (evidenceId) params.set('evidenceId', evidenceId);
-  location.href = '/settings.html?' + params.toString() + '#wizSignoff';
+  location.href = halofireUiBasePath() + '/settings.html?' + params.toString() + '#wizSignoff';
 }
 
 async function downloadSignedReviewerResolveAuditPacket(href, gateCode = '', evidenceId = '') {

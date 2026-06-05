@@ -184,6 +184,111 @@ describe('Settings signed reviewer browser smoke', () => {
     }
   }, 30_000);
 
+  it('prefills record-only signed evidence from official-flow review decision context', async () => {
+    const token = await adminToken();
+    const targetGateCode = 'AUTOSPRINK_EVIDENCE_MISSING';
+    const targetEvidenceType = 'autosprink_packet';
+    const targetSourceRef = 'autosprink://settings-browser-smoke/pending';
+    const contextNotes = {
+      kind: 'official_flow_professional_ahj_review_decision',
+      artifact_type: 'halofire.official_flow_professional_ahj_review_decision.v1',
+      source_replay_evidence_id: 4900,
+      professional_review_ref: 'pe-review://settings-browser-smoke/pending',
+      ahj_review_ref: 'ahj://settings-browser-smoke/pending',
+      autosprink_export_ref: 'autosprink://settings-browser-smoke/pending',
+      source_refs: [
+        {
+          evidence_type: 'official_flow_hydraulic_replay_artifact',
+          evidence_id: 4900,
+          source_ref: 'official-flow-replay:settings-browser-smoke',
+        },
+      ],
+      decision: {
+        source_replay_evidence_id: 4900,
+        professional_review_ref: 'pe-review://settings-browser-smoke/pending',
+        ahj_review_ref: 'ahj://settings-browser-smoke/pending',
+        autosprink_export_ref: 'autosprink://settings-browser-smoke/pending',
+        claim_gate_effect: 'no_claims_cleared',
+      },
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+      claims_cleared_count: 0,
+    };
+    const context = await api(`${PROJECT_PATH}/evidence`, token, {
+      method: 'POST',
+      body: JSON.stringify({
+        evidence_type: 'official_flow_professional_ahj_review_decision',
+        source_ref: 'official-flow-review-decision:settings-browser-smoke',
+        source_file: 'settings-browser-smoke-official-flow-review.json',
+        status: 'fail_closed_review_recorded',
+        notes: JSON.stringify(contextNotes),
+      }),
+    });
+
+    const page = await browser.newPage();
+    page.setDefaultTimeout(8000);
+    await page.addInitScript((authToken) => {
+      localStorage.setItem('halofire_token', authToken);
+    }, token);
+
+    try {
+      await page.goto(
+        `${BASE}/settings.html?project=${encodeURIComponent(PROJECT_NAME)}&gate=${targetGateCode}&evidenceId=${context.id}#wizSignoff`,
+        { waitUntil: 'domcontentloaded' },
+      );
+      await page.locator('#wizGate').waitFor();
+      await page.waitForFunction(
+        (evidenceId) => document.getElementById('wizPacketStatus')?.dataset.officialFlowContextEvidenceId === evidenceId,
+        String(context.id),
+      );
+
+      expect(await page.locator('#wizGate').inputValue()).toBe(targetGateCode);
+      expect(await page.locator('#wizType').inputValue()).toBe(targetEvidenceType);
+      expect(await page.locator('#wizExistingEvidence').inputValue()).toBe('');
+      expect(await page.locator('#wizAction').inputValue()).toBe('record');
+      expect(await page.locator('#wizSourceRef').inputValue()).toBe(targetSourceRef);
+      expect(await page.locator('#wizPacketStatus').innerText()).toContain(
+        `Prefilled from official-flow review decision evidence #${context.id}`,
+      );
+      expect(await page.locator('#wizPacketStatus').innerText()).toContain('no claims cleared');
+      expect(await page.locator('#wizPacketStatus').getAttribute('data-official-flow-context-evidence-id')).toBe(String(context.id));
+      expect(await page.locator('#wizNotes').inputValue()).toContain(`source_official_flow_review_decision_evidence_id ${context.id}`);
+      expect(await page.locator('#wizNotes').inputValue()).toContain('source_replay_evidence_id 4900');
+      expect(await page.locator('#wizNotes').inputValue()).toContain('claim_gate_effect no_claims_cleared');
+      expect(await page.locator('#wizResolveAudit').isDisabled()).toBe(true);
+
+      await page.locator('#wizReviewerName').fill('Codex Settings Smoke');
+      await page.locator('#wizReviewerTitle').fill('Fire Protection Engineer');
+      await page.locator('#wizSignedAt').fill('2026-06-04T20:30');
+      await page.locator('#wizOrganization').fill('Halo Fire');
+      await page.locator('#wizLicenseId').fill('PE-CODEX-SETTING-SMOKE');
+      await page.locator('#wizSubmit').click();
+      await page.waitForFunction(() => document.getElementById('wizMsg')?.textContent?.includes('evidence recorded only'));
+
+      const evidenceRows = await api(`${PROJECT_PATH}/evidence`, token);
+      const saved = evidenceRows.find((row) => row.evidence_type === targetEvidenceType
+        && row.source_ref === targetSourceRef);
+      expect(saved).toBeTruthy();
+      const savedNotes = JSON.parse(saved.notes);
+      expect(savedNotes.kind).toBe('signed_reviewer_evidence');
+      expect(savedNotes.target_gate_code).toBe(targetGateCode);
+      expect(savedNotes.required_evidence_type).toBe(targetEvidenceType);
+      expect(savedNotes.claim_gate_effect).toBe('no_claims_cleared');
+      expect(savedNotes.user_notes).toContain(`source_official_flow_review_decision_evidence_id ${context.id}`);
+      expect(savedNotes.signoff).toEqual(expect.objectContaining({
+        reviewer_name: 'Codex Settings Smoke',
+        reviewer_title: 'Fire Protection Engineer',
+        license_id: 'PE-CODEX-SETTING-SMOKE',
+      }));
+
+      const gates = await api(`${PROJECT_PATH}/claim-gates`, token);
+      const targetGate = gates.find((gate) => gate.code === targetGateCode);
+      expect(targetGate.status).toBe('blocked');
+    } finally {
+      await page.close();
+    }
+  }, 30_000);
+
   it('renders resolved signed-reviewer gates in Settings and downloads the resolved-gate audit packet', async () => {
     const token = await adminToken();
     const recorded = await api(`${PROJECT_PATH}/evidence`, token, {

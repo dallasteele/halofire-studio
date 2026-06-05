@@ -12,6 +12,23 @@ describe('HaloFire Settings evidence wizard signed reviewer workflow', () => {
     expect(html).toContain('downloadClaimGateReviewPacket');
   });
 
+  it('uses the HaloFire public base path for Settings API calls and navigation', () => {
+    const html = fs.readFileSync(SETTINGS_HTML, 'utf8');
+    expect(html).toContain('HALOFIRE_BASE_PATH');
+    expect(html).toContain('HALOFIRE_API_BASE');
+    expect(html).toContain("window.location.pathname.startsWith('/halo-fire/')");
+    expect(html).toContain("HALOFIRE_BASE_PATH + ['', 'api'].join('/')");
+    expect(html).not.toContain("HALOFIRE_BASE_PATH + '/api'");
+    expect(html).toContain("const apiPathPrefix = ['', 'api'].join('/');");
+    expect(html).not.toContain("startsWith('/api/') ? String(href).slice(4)");
+    expect(html).toContain("['', 'api', 'projects'].join('/')");
+    expect(html).toContain('fetch(HALOFIRE_API_BASE + path');
+    expect(html).toContain("location.href = HALOFIRE_BASE_PATH + '/'");
+    expect(html).toContain('wizardState.projects.unshift({ name: wizardUrlPrefill.project })');
+    expect(html).toContain('href="./workbench.html"');
+    expect(html).toContain('href="./autosprink.html"');
+  });
+
   it('can prefill the signed reviewer workflow from Workbench query parameters', () => {
     const html = fs.readFileSync(SETTINGS_HTML, 'utf8');
     expect(html).toContain('prefillEvidenceWizardFromUrl');
@@ -42,6 +59,18 @@ describe('HaloFire Settings evidence wizard signed reviewer workflow', () => {
     expect(html).toContain('parsed.resolve_audit_packet_href');
     expect(html).toContain('packetStatus.textContent = `Prefilled from Workbench for evidence #${selectedEvidenceId}.');
     expect(html).toContain("auditButton.disabled = !selectedPacketContext.resolveAuditHref && gate.status !== 'cleared'");
+  });
+
+  it('prefills record-only signed reviewer uploads from official-flow decision context', () => {
+    const html = fs.readFileSync(SETTINGS_HTML, 'utf8');
+    expect(html).toContain('hydrateWizardFromOfficialFlowContextEvidence');
+    expect(html).toContain('officialFlowSignedReviewerPrefillConfig');
+    expect(html).toContain('official_flow_professional_ahj_review_decision');
+    expect(html).toContain('official_flow_signed_reviewer_context');
+    expect(html).toContain("source_official_flow_review_decision_evidence_id");
+    expect(html).toContain("claim_gate_effect no_claims_cleared");
+    expect(html).toContain("actionEl.value = 'record'");
+    expect(html).toContain('data-official-flow-context-evidence-id');
   });
 
   it('surfaces resolved signed-reviewer gates and audit packet downloads in Settings', () => {
