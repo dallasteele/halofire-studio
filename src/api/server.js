@@ -14578,6 +14578,150 @@ function officialFlowReviewDecisionEvidenceNotes(decision) {
   };
 }
 
+function officialFlowReviewDecisionFromEvidence(row) {
+  if (!row || row.evidence_type !== 'official_flow_professional_ahj_review_decision') return null;
+  const notes = safeParseJsonObject(row.notes);
+  if (!notes || notes.kind !== 'official_flow_professional_ahj_review_decision') return null;
+  const decision = notes.decision && typeof notes.decision === 'object' ? notes.decision : notes;
+  return {
+    evidence: row,
+    notes,
+    decision: {
+      ...decision,
+      source_refs: Array.isArray(decision.source_refs)
+        ? decision.source_refs
+        : (Array.isArray(notes.source_refs) ? notes.source_refs : []),
+      evaluation_rows: Array.isArray(decision.evaluation_rows)
+        ? decision.evaluation_rows
+        : (Array.isArray(notes.evaluation_rows) ? notes.evaluation_rows : []),
+      blocked_claims: Array.isArray(decision.blocked_claims)
+        ? decision.blocked_claims
+        : (Array.isArray(notes.blocked_claims) ? notes.blocked_claims : [...OFFICIAL_FLOW_BLOCKED_CLAIMS]),
+      claim_gate_effect: decision.claim_gate_effect || notes.claim_gate_effect || 'no_claims_cleared',
+      no_claim_gates_cleared: decision.no_claim_gates_cleared !== false && notes.no_claim_gates_cleared !== false,
+      claims_cleared_count: Number.isFinite(Number(decision.claims_cleared_count ?? notes.claims_cleared_count))
+        ? Number(decision.claims_cleared_count ?? notes.claims_cleared_count)
+        : 0,
+    },
+  };
+}
+
+function officialFlowReviewDecisionEvidenceRows(projectName) {
+  return db
+    .prepare(`SELECT * FROM project_evidence
+              WHERE project_name = ? AND evidence_type = 'official_flow_professional_ahj_review_decision'
+              ORDER BY created_at DESC, id DESC`)
+    .all(projectName)
+    .map(officialFlowReviewDecisionFromEvidence)
+    .filter(Boolean);
+}
+
+function officialFlowSignedReviewerValidationRow(projectName, reviewDecision, config) {
+  const decision = reviewDecision.decision || {};
+  const evidenceId = reviewDecision.evidence.id;
+  const targetGateCode = config.target_gate_code;
+  return {
+    artifact_type: 'halofire.official_flow_signed_reviewer_validation_row.v1',
+    status: 'ready_for_signed_reviewer_workflow',
+    target_gate_code: targetGateCode,
+    target_approval_lane: config.target_approval_lane,
+    required_evidence_type: config.required_evidence_type,
+    acceptable_evidence: config.acceptable_evidence,
+    source_review_decision_evidence_id: evidenceId,
+    source_replay_evidence_id: decision.source_replay_evidence_id || null,
+    source_original_official_flow_evidence_id: decision.source_original_official_flow_evidence_id || null,
+    source_attachment_intake_packet_evidence_id: decision.source_attachment_intake_packet_evidence_id || null,
+    source_supplied_ref: decision[config.source_ref_field] || null,
+    blocked_claims: config.blocked_claims,
+    claim_gate_effect: 'no_claims_cleared',
+    no_claim_gates_cleared: true,
+    next_action: config.next_action,
+    limitations: [
+      'This row opens the signed reviewer workflow with the saved official-flow decision as context only.',
+      'It does not clear the target gate until real signed evidence is uploaded and explicitly validated.',
+    ],
+    action: {
+      label: config.label,
+      href: `/settings.html?project=${encodeURIComponent(projectName)}&gate=${encodeURIComponent(targetGateCode)}&evidenceId=${encodeURIComponent(evidenceId)}#wizSignoff`,
+      artifact_type: 'halofire.claim_gate_review_packet.v1',
+      target_gate_code: targetGateCode,
+      required_evidence_type: config.required_evidence_type,
+      source_review_decision_evidence_id: evidenceId,
+    },
+  };
+}
+
+function officialFlowReviewDecisionSignedReviewerQueueItem(projectName, reviewDecision) {
+  if (!reviewDecision?.evidence || !reviewDecision.decision) return null;
+  const decision = reviewDecision.decision;
+  const validationConfigs = [
+    {
+      target_gate_code: 'PROFESSIONAL_REVIEW_MISSING',
+      target_approval_lane: 'licensed_professional_hydraulic_review',
+      required_evidence_type: 'professional_review',
+      source_ref_field: 'professional_review_ref',
+      acceptable_evidence: ['professional_review', 'pe_signoff'],
+      blocked_claims: ['PE_review', 'engineering_grade', 'permit_ready'],
+      label: 'Open professional signed reviewer workflow',
+      next_action: 'Upload or link licensed professional hydraulic review evidence in the signed reviewer workflow before clearing PE or engineering-grade claims.',
+    },
+    {
+      target_gate_code: 'AHJ_APPROVAL_MISSING',
+      target_approval_lane: 'AHJ_reviewed_hydraulic_calculation_package',
+      required_evidence_type: 'ahj_approval',
+      source_ref_field: 'ahj_review_ref',
+      acceptable_evidence: ['ahj_approval'],
+      blocked_claims: ['AHJ_approval', 'permit_ready'],
+      label: 'Open AHJ signed reviewer workflow',
+      next_action: 'Upload or link AHJ approval evidence in the signed reviewer workflow before clearing AHJ or permit-ready claims.',
+    },
+    {
+      target_gate_code: 'AUTOSPRINK_EVIDENCE_MISSING',
+      target_approval_lane: 'AutoSprink_or_equivalent_professional_model_export',
+      required_evidence_type: 'autosprink_packet',
+      source_ref_field: 'autosprink_export_ref',
+      acceptable_evidence: ['autosprink_packet'],
+      blocked_claims: ['AutoSprink_parity', 'engineering_grade'],
+      label: 'Open AutoSprink signed reviewer workflow',
+      next_action: 'Upload or link AutoSprink/equivalent professional model evidence in the signed reviewer workflow before clearing parity claims.',
+    },
+  ];
+  const validationRows = validationConfigs.map((config) => officialFlowSignedReviewerValidationRow(projectName, reviewDecision, config));
+  return {
+    id: `resolver:official-flow-signed-reviewer-validation:${reviewDecision.evidence.id}`,
+    project_name: projectName,
+    kind: 'official_flow_signed_reviewer_validation',
+    artifact_type: 'halofire.official_flow_signed_reviewer_validation_queue_item.v1',
+    title: 'Official-flow signed reviewer validation handoff',
+    status: 'signed_reviewer_validation_needed',
+    evidence_id: reviewDecision.evidence.id,
+    source_evidence_type: 'official_flow_professional_ahj_review_decision',
+    source_ref: reviewDecision.evidence.source_ref || decision.source_ref || null,
+    source_review_decision_evidence_id: reviewDecision.evidence.id,
+    source_replay_evidence_id: decision.source_replay_evidence_id || null,
+    source_original_official_flow_evidence_id: decision.source_original_official_flow_evidence_id || null,
+    source_attachment_intake_packet_evidence_id: decision.source_attachment_intake_packet_evidence_id || null,
+    source_attachment_intake_row_index: Number.isInteger(decision.source_attachment_intake_row_index) ? decision.source_attachment_intake_row_index : null,
+    reviewer_name: decision.reviewer_name || null,
+    review_decision: decision.review_decision || null,
+    next_action: 'Open the existing signed reviewer workflow for professional, AHJ, and AutoSprink evidence; all regulated claims remain blocked until those separate validations succeed.',
+    acceptable_evidence: validationRows.flatMap((row) => row.acceptable_evidence),
+    ai_fallback: 'AI may assemble the handoff and summarize missing evidence, but it cannot sign, approve, or clear regulated claim gates.',
+    source_refs: Array.isArray(decision.source_refs) ? decision.source_refs : [],
+    validation_rows: validationRows,
+    blocked_claims: Array.isArray(decision.blocked_claims) ? decision.blocked_claims : [...OFFICIAL_FLOW_BLOCKED_CLAIMS],
+    claim_gate_effect: 'no_claims_cleared',
+    no_claim_gates_cleared: true,
+    claims_cleared_count: 0,
+    limitations: [
+      'This queue item is a follow-through handoff from a saved official-flow review decision.',
+      'It preserves source refs and prefill context only; it does not validate professional, AHJ, official-flow, or AutoSprink evidence.',
+      'Permit-ready, AHJ approval, PE review, engineering-grade, fabrication-ready, manufacturer-exact, and AutoSprink parity claims remain fail-closed.',
+    ],
+    actions: validationRows.map((row) => row.action),
+  };
+}
+
 function officialFlowResolverQueueItem(projectName, matchedEvidence = null) {
   const intake = matchedEvidence?.intake || null;
   const facts = intake ? {
@@ -16896,6 +17040,10 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
     const replayItem = officialFlowReplayReviewQueueItem(projectName, replayEvidence);
     if (replayItem) items.push(replayItem);
   }
+  for (const reviewDecision of officialFlowReviewDecisionEvidenceRows(projectName)) {
+    const signedReviewerItem = officialFlowReviewDecisionSignedReviewerQueueItem(projectName, reviewDecision);
+    if (signedReviewerItem) items.push(signedReviewerItem);
+  }
   const boundaryItem = pdfBoundaryResolverQueueItem(projectName, evidence, decision, reviewEvidence, sam31Evidence, sam31ReplacementEvidence, sam31SmokeEvidence, sam31ExtrapolationEvidence, sam31ExtrapolationReviewEvidence, sam31SectioningContractReviewEvidence, sam31SectioningDownstreamPacketEvidence, sam31SectioningSprinklerReviewAdapterEvidence, sam31ConsumerSmokeEvidence, sam31ConsumerReviewEvidences, sam31SprinklerReviewDecisionEvidences, sam31SprinklerPreliminaryReplayFollowupDecisionEvidences, sam31SprinklerFollowupPacketReviewDecisionEvidences, sam31ApprovalUploadIntakeEvidences);
   if (boundaryItem) items.push(boundaryItem);
   if (filters.sam31ApprovalValidation) {
@@ -16995,6 +17143,15 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
   if (filters.catalogApproval || filters.evidenceType || (filters.targetGate && !filters.sam31ApprovalValidation && !filters.claimGateAudit)) {
     visibleItems = visibleItems
       .map((item) => {
+        if (item.kind === 'official_flow_signed_reviewer_validation') {
+          if (filters.catalogApproval) return null;
+          const validationRows = Array.isArray(item.validation_rows)
+            ? item.validation_rows
+              .filter((row) => !filters.evidenceType || String(row.required_evidence_type || '').toLowerCase() === filters.evidenceType)
+              .filter((row) => !filters.targetGate || String(row.target_gate_code || '').toUpperCase() === filters.targetGate)
+            : [];
+          return validationRows.length ? { ...item, validation_rows: validationRows, actions: validationRows.map((row) => row.action).filter(Boolean) } : null;
+        }
         const approvalRows = Array.isArray(item.catalog_approval_packet_rows)
           ? item.catalog_approval_packet_rows
             .filter((row) => filters.catalogApproval !== 'ready' || row.status === 'ready_for_signed_evidence_upload')
@@ -17068,6 +17225,8 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
       official_flow_needed: statusCounts.official_flow_needed || 0,
       official_flow_evidence_recorded: statusCounts.official_flow_evidence_recorded || 0,
       official_flow_replay_review_needed: statusCounts.official_flow_replay_review_needed || 0,
+      official_flow_signed_reviewer_validation_needed: statusCounts.signed_reviewer_validation_needed || 0,
+      official_flow_signed_reviewer_validation_rows: visibleItems.reduce((acc, item) => acc + (Array.isArray(item.validation_rows) ? item.validation_rows.length : 0), 0),
     },
   });
 });

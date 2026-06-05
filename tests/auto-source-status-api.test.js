@@ -1384,6 +1384,63 @@ describe('S5 GET /api/auto-source/status', () => {
     expect(decision.claim_gate_evaluation_audit_packet.blocked_claims).toEqual(
       expect.arrayContaining(['permit_ready', 'AHJ_approval', 'PE_review', 'AutoSprink_parity']),
     );
+
+    const signedQueueRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-queue`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(signedQueueRes.status).toBe(200);
+    const signedQueue = await signedQueueRes.json();
+    const signedReviewItem = signedQueue.items.find((item) => (
+      item.kind === 'official_flow_signed_reviewer_validation'
+      && item.source_review_decision_evidence_id === decision.id
+    ));
+    expect(signedReviewItem).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.official_flow_signed_reviewer_validation_queue_item.v1',
+      status: 'signed_reviewer_validation_needed',
+      evidence_id: decision.id,
+      source_review_decision_evidence_id: decision.id,
+      source_replay_evidence_id: persisted.id,
+      source_original_official_flow_evidence_id: created.id,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+      claims_cleared_count: 0,
+    }));
+    expect(signedReviewItem.validation_rows).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        target_gate_code: 'PROFESSIONAL_REVIEW_MISSING',
+        required_evidence_type: 'professional_review',
+        claim_gate_effect: 'no_claims_cleared',
+        source_review_decision_evidence_id: decision.id,
+        action: expect.objectContaining({
+          label: 'Open professional signed reviewer workflow',
+        }),
+      }),
+      expect.objectContaining({
+        target_gate_code: 'AHJ_APPROVAL_MISSING',
+        required_evidence_type: 'ahj_approval',
+        claim_gate_effect: 'no_claims_cleared',
+        source_review_decision_evidence_id: decision.id,
+        action: expect.objectContaining({
+          label: 'Open AHJ signed reviewer workflow',
+        }),
+      }),
+      expect.objectContaining({
+        target_gate_code: 'AUTOSPRINK_EVIDENCE_MISSING',
+        required_evidence_type: 'autosprink_packet',
+        claim_gate_effect: 'no_claims_cleared',
+        source_review_decision_evidence_id: decision.id,
+        action: expect.objectContaining({
+          label: 'Open AutoSprink signed reviewer workflow',
+        }),
+      }),
+    ]));
+    for (const row of signedReviewItem.validation_rows) {
+      expect(row.action.href).toContain('/settings.html?');
+      expect(row.action.href).toContain(`gate=${encodeURIComponent(row.target_gate_code)}`);
+      expect(row.action.href).toContain(`evidenceId=${decision.id}`);
+      expect(row.action.href).toContain('#wizSignoff');
+    }
+    expect(signedQueue.summary.official_flow_signed_reviewer_validation_needed).toBeGreaterThanOrEqual(1);
   }, 15000);
 
   it('imports source-linked official-flow attachment intake records without clearing claims', async () => {

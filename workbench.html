@@ -1508,6 +1508,60 @@ function evidenceDetail(row) {
       return '<div class="muted" style="font-size:11px;margin-top:3px">official-flow hydraulic replay artifact; detail unavailable</div>';
     }
   }
+  if (row.evidence_type === 'official_flow_professional_ahj_review_decision') {
+    try {
+      const packet = JSON.parse(row.notes || '{}');
+      const decision = packet.decision || packet;
+      const blocked = Array.isArray(decision.blocked_claims) ? decision.blocked_claims : (Array.isArray(packet.blocked_claims) ? packet.blocked_claims : []);
+      const validationRows = [
+        {
+          target_gate_code: 'PROFESSIONAL_REVIEW_MISSING',
+          required_evidence_type: 'professional_review',
+          source_review_decision_evidence_id: row.id,
+          source_replay_evidence_id: decision.source_replay_evidence_id || packet.source_replay_evidence_id,
+          source_supplied_ref: decision.professional_review_ref || '',
+          status: 'ready_for_signed_reviewer_workflow',
+          acceptable_evidence: ['professional_review', 'pe_signoff'],
+          blocked_claims: ['PE_review', 'engineering_grade', 'permit_ready'],
+          claim_gate_effect: 'no_claims_cleared',
+          no_claim_gates_cleared: true,
+          next_action: 'Upload licensed professional hydraulic review evidence in the signed reviewer workflow before clearing professional/engineering claims.',
+          action: { label: 'Open professional signed reviewer workflow' },
+        },
+        {
+          target_gate_code: 'AHJ_APPROVAL_MISSING',
+          required_evidence_type: 'ahj_approval',
+          source_review_decision_evidence_id: row.id,
+          source_replay_evidence_id: decision.source_replay_evidence_id || packet.source_replay_evidence_id,
+          source_supplied_ref: decision.ahj_review_ref || '',
+          status: 'ready_for_signed_reviewer_workflow',
+          acceptable_evidence: ['ahj_approval'],
+          blocked_claims: ['AHJ_approval', 'permit_ready'],
+          claim_gate_effect: 'no_claims_cleared',
+          no_claim_gates_cleared: true,
+          next_action: 'Upload AHJ approval evidence in the signed reviewer workflow before clearing AHJ or permit-ready claims.',
+          action: { label: 'Open AHJ signed reviewer workflow' },
+        },
+        {
+          target_gate_code: 'AUTOSPRINK_EVIDENCE_MISSING',
+          required_evidence_type: 'autosprink_packet',
+          source_review_decision_evidence_id: row.id,
+          source_replay_evidence_id: decision.source_replay_evidence_id || packet.source_replay_evidence_id,
+          source_supplied_ref: decision.autosprink_export_ref || '',
+          status: 'ready_for_signed_reviewer_workflow',
+          acceptable_evidence: ['autosprink_packet'],
+          blocked_claims: ['AutoSprink_parity', 'engineering_grade'],
+          claim_gate_effect: 'no_claims_cleared',
+          no_claim_gates_cleared: true,
+          next_action: 'Upload AutoSprink/equivalent professional model evidence in the signed reviewer workflow before clearing parity claims.',
+          action: { label: 'Open AutoSprink signed reviewer workflow' },
+        },
+      ];
+      return `<div class="muted" style="font-size:11px;margin-top:3px">official_flow_professional_ahj_review_decision: ${escapeHtml(decision.artifact_type || packet.artifact_type || 'halofire.official_flow_professional_ahj_review_decision.v1')}<br>reviewer ${escapeHtml(decision.reviewer_name || packet.reviewer_name || 'missing')} - decision ${escapeHtml(decision.review_decision || packet.review_decision || 'recorded_evidence_refs_fail_closed')} - source_replay_evidence_id ${escapeHtml(decision.source_replay_evidence_id || packet.source_replay_evidence_id || 'missing')}<br>claim_gate_effect ${escapeHtml(decision.claim_gate_effect || packet.claim_gate_effect || 'no_claims_cleared')} - no_claim_gates_cleared true - claims_cleared_count 0<br>${renderOfficialFlowSignedReviewerValidationRows(validationRows, row.id)}Blocks still active: ${blocked.map((claim) => `<span class="chip">${escapeHtml(claim)}</span>`).join('') || '<span class="chip">regulated claims remain blocked</span>'}</div>`;
+    } catch {
+      return '<div class="muted" style="font-size:11px;margin-top:3px">official-flow review decision evidence; detail unavailable</div>';
+    }
+  }
   if (row.evidence_type === 'best_effort_ai_layout') {
     try {
       const packet = JSON.parse(row.notes || '{}');
@@ -4326,6 +4380,25 @@ async function refreshCatalogSourceAcquisition() {
   bindCatalogSourceEvidenceButtons();
 }
 
+function renderOfficialFlowSignedReviewerValidationRows(rows, sourceEvidenceId = '') {
+  const validationRows = Array.isArray(rows) ? rows : [];
+  if (!validationRows.length) return '';
+  return `<div class="claims">official_flow_signed_reviewer_validation rows <span class="chip">halofire.official_flow_signed_reviewer_validation_queue_item.v1</span><br>${validationRows.map((row) => {
+    const action = row.action || {};
+    const evidenceId = String(row.source_review_decision_evidence_id || sourceEvidenceId || '');
+    const gateCode = row.target_gate_code || '';
+    return `<div style="margin-top:6px;border-top:1px solid rgba(255,213,79,.16);padding-top:6px">
+      <span class="chip">${escapeHtml(gateCode || 'target gate missing')}</span> <span class="chip">${escapeHtml(row.required_evidence_type || 'required evidence missing')}</span> <span class="chip">${escapeHtml(row.status || 'ready_for_signed_reviewer_workflow')}</span><br>
+      ${escapeHtml(row.next_action || 'Open signed reviewer workflow; no claims are cleared by this handoff.')}<br>
+      source_review_decision_evidence_id ${escapeHtml(evidenceId || 'missing')} - source_replay_evidence_id ${escapeHtml(row.source_replay_evidence_id || 'missing')} - source_supplied_ref ${escapeHtml(row.source_supplied_ref || 'missing')}<br>
+      claim_gate_effect ${escapeHtml(row.claim_gate_effect || 'no_claims_cleared')} - no_claim_gates_cleared ${escapeHtml(row.no_claim_gates_cleared === false ? 'false' : 'true')}<br>
+      Accepts: ${(Array.isArray(row.acceptable_evidence) ? row.acceptable_evidence : []).map((item) => `<span class="chip">${escapeHtml(item)}</span>`).join('') || '<span class="chip">signed reviewer evidence</span>'}
+      Blocks: ${(Array.isArray(row.blocked_claims) ? row.blocked_claims : []).map((claim) => `<span class="chip">${escapeHtml(claim)}</span>`).join('') || '<span class="chip">regulated claims remain blocked</span>'}<br>
+      <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0f766e" data-signed-reviewer-workflow-evidence-id="${escapeHtml(evidenceId)}" data-signed-reviewer-workflow-gate-code="${escapeHtml(gateCode)}" data-signed-reviewer-workflow-review-packet-href="${escapeHtml(action.href || '')}" onclick="openSignedReviewerWorkflow(${JSON.stringify(currentProjectName())}, ${JSON.stringify(gateCode)}, ${JSON.stringify(evidenceId)})">${escapeHtml(action.label || 'Open signed reviewer workflow')}</button>
+    </div>`;
+  }).join('')}<span class="muted" style="font-size:10px">Filter API: /resolver-queue?targetGate=PROFESSIONAL_REVIEW_MISSING or evidenceType=ahj_approval - source official_flow_professional_ahj_review_decision - claim_gate_effect no_claims_cleared</span></div>`;
+}
+
 function renderCatalogApprovalPacketRows(rows) {
   const catalog_approval_packet_rows = Array.isArray(rows) ? rows : [];
   if (!catalog_approval_packet_rows.length) return '';
@@ -4627,6 +4700,34 @@ function resolverQueueDetail(item, index = '') {
       <p style="margin-top:8px"><button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#0f766e" data-catalog-source-packet-family-ref="${escapeHtml(defaults.family_ref || '')}">Download catalog source packet</button> ${visibleActions.map((action) => `<a class="go" style="padding:7px 10px;font-size:11px;text-decoration:none;display:inline-block;margin-right:6px" href="${escapeHtml(action.href || '#')}">${escapeHtml(action.label || 'Open')}</a>`).join('')}<button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#b45309" data-catalog-source-record-family-ref="${escapeHtml(defaults.family_ref || '')}" data-catalog-source-record-component-key="${escapeHtml(defaults.component_key || '')}" data-catalog-source-record-nominal-size-in="${escapeHtml(defaults.nominal_size_in ?? '')}" data-catalog-source-record-source-url="${escapeHtml(defaults.source_url || '')}" data-catalog-source-record-license="${escapeHtml(defaults.license || '')}" data-catalog-source-record-artifact-hash="${escapeHtml(defaults.downloaded_artifact_hash || '')}" data-catalog-source-record-status-tier="${escapeHtml(defaults.status_tier || 'missing_catalog_source')}" data-catalog-source-record-status-id="${catalogStatusId}">Record catalog source evidence</button></p>
       ${renderCatalogSourceApprovalValidation(defaults)}
       <div class="muted" id="${catalogStatusId}" style="font-size:11px"></div>
+    </div>`;
+  }
+  if (item.kind === 'official_flow_signed_reviewer_validation') {
+    const validationRows = Array.isArray(item.validation_rows) ? item.validation_rows : [];
+    return `
+    <div class="gate warning" id="${escapeHtml(item.id || 'official-flow-signed-reviewer-validation')}">
+      <div class="code">${escapeHtml(item.kind)} - ${escapeHtml(item.status || 'signed_reviewer_validation_needed').toUpperCase()}</div>
+      <div class="na">${escapeHtml(item.next_action || 'Open signed reviewer workflows for professional, AHJ, and AutoSprink evidence.')}</div>
+      <div class="claims">review_decision_evidence #${escapeHtml(item.source_review_decision_evidence_id || item.evidence_id || 'missing')} - replay #${escapeHtml(item.source_replay_evidence_id || 'missing')} - original official flow #${escapeHtml(item.source_original_official_flow_evidence_id || 'missing')}</div>
+      <div class="claims">artifact_type ${escapeHtml(item.artifact_type || 'halofire.official_flow_signed_reviewer_validation_queue_item.v1')} - claim_gate_effect ${escapeHtml(item.claim_gate_effect || 'no_claims_cleared')} - no_claim_gates_cleared ${escapeHtml(item.no_claim_gates_cleared === false ? 'false' : 'true')} - claims_cleared_count ${escapeHtml(item.claims_cleared_count ?? 0)}</div>
+      ${renderOfficialFlowSignedReviewerValidationRows(validationRows, item.source_review_decision_evidence_id || item.evidence_id || '')}
+      <div class="claims">Blocks: ${claims.map((claim) => `<span class="chip">${escapeHtml(claim)}</span>`).join('') || '<span class="chip">regulated claims remain blocked</span>'}</div>
+      <div class="claims">AI fallback: ${escapeHtml(item.ai_fallback || '')}</div>
+      <span class="muted" style="font-size:10px">official_flow_professional_ahj_review_decision - signed reviewer validation only - no approval claim gates cleared</span>
+    </div>`;
+  }
+  if (item.kind === 'official_flow_signed_reviewer_validation') {
+    return `
+    <div class="gate warning" id="${escapeHtml(item.id || 'official-flow-signed-reviewer-validation')}">
+      <div class="code">${escapeHtml(item.kind)} - ${escapeHtml(item.status || 'signed_reviewer_validation_needed').toUpperCase()}</div>
+      <div class="na">${escapeHtml(item.next_action || 'Open the signed reviewer workflow for the saved official-flow decision context.')}</div>
+      <div class="claims">Review decision evidence #${escapeHtml(item.source_review_decision_evidence_id || item.evidence_id || 'missing')} - replay evidence #${escapeHtml(item.source_replay_evidence_id || 'missing')} - official flow evidence #${escapeHtml(item.source_original_official_flow_evidence_id || 'missing')}</div>
+      <div class="claims">Attachment intake packet #${escapeHtml(item.source_attachment_intake_packet_evidence_id || 'missing')} - reviewer ${escapeHtml(item.reviewer_name || 'missing')} - decision ${escapeHtml(item.review_decision || 'missing')}</div>
+      <div class="claims">Source refs: ${(Array.isArray(item.source_refs) ? item.source_refs : []).map((ref) => `<span class="chip">${escapeHtml(ref)}</span>`).join('') || '<span class="chip">missing official flow source refs</span>'}</div>
+      <div class="claims">Accepts: ${acceptable.map((e) => `<span class="chip">${escapeHtml(e)}</span>`).join('')}</div>
+      <div class="claims">AI fallback: ${escapeHtml(item.ai_fallback || '')}</div>
+      <div class="claims">Blocks: ${claims.map((c) => `<span class="chip">${escapeHtml(c)}</span>`).join('')}</div>
+      ${renderOfficialFlowSignedReviewerValidationRows(item.validation_rows, item.source_review_decision_evidence_id || item.evidence_id || '')}
     </div>`;
   }
   if (item.kind === 'official_flow_hydraulic_replay_review') {
