@@ -1715,4 +1715,72 @@ describe('S5 GET /api/auto-source/status', () => {
       }),
     ]));
   }, 15000);
+
+  it('builds and imports Cooperative 1881 default official-flow attachment intake without clearing claims', async () => {
+    const projectName = 'The Cooperative 1881 - Salt Lake City UT';
+    const packetRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-packets/official-flow/default-attachment-intake-records`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(packetRes.status).toBe(200);
+    const packet = await packetRes.json();
+    expect(packet).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.official_flow_default_attachment_intake_records.v1',
+      source_artifact_type: 'official_flow_evidence_attachment_intake_records',
+      project_name: projectName,
+      source_file: 'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx',
+      source_status: 'temporary_best_guess_until_employee_updates',
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(packet.rows).toEqual([
+      expect.objectContaining({
+        accepted_for_inventory_rerun: true,
+        source_file: 'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx',
+        source_ref: expect.stringContaining('#Building (1)!'),
+        staticPsi: 71,
+        residualPsi: 59,
+        flowingGpm: 940,
+        source_status: 'temporary_best_guess_until_employee_updates',
+      }),
+    ]);
+    expect(packet.source_refs).toEqual(expect.arrayContaining([
+      expect.stringContaining('Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!G6'),
+      expect.stringContaining('Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx#Building (1)!B9'),
+    ]));
+    expect(packet.blocked_claims).toEqual(expect.arrayContaining(['permit_ready', 'AHJ_approval', 'PE_review', 'AutoSprink_parity']));
+
+    const importRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-packets/official-flow/default-attachment-intake-records/import`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    });
+    expect(importRes.status).toBe(201);
+    const imported = await importRes.json();
+    expect(imported).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.official_flow_attachment_intake_records.v1',
+      source_artifact_type: 'official_flow_evidence_attachment_intake_records',
+      source_default_packet_artifact_type: 'halofire.official_flow_default_attachment_intake_records.v1',
+      accepted_for_inventory_rerun_count: 1,
+      official_flow_intake_evidence_count: 1,
+      claims_cleared_count: 0,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(imported.accepted_rows[0]).toEqual(expect.objectContaining({
+      source_file: 'Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx',
+      source_ref: expect.stringContaining('#Building (1)!'),
+      staticPsi: 71,
+      residualPsi: 59,
+      flowingGpm: 940,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+
+    const gates = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/claim-gates`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(gates.status).toBe(200);
+    const gateRows = await gates.json();
+    expect(gateRows.find((gate) => gate.code === 'PROFESSIONAL_REVIEW_MISSING')).toEqual(expect.objectContaining({ status: 'blocked' }));
+    expect(gateRows.find((gate) => gate.code === 'AHJ_APPROVAL_MISSING')).toEqual(expect.objectContaining({ status: 'blocked' }));
+    expect(gateRows.find((gate) => gate.code === 'AUTOSPRINK_EVIDENCE_MISSING')).toEqual(expect.objectContaining({ status: 'blocked' }));
+  }, 15000);
 });

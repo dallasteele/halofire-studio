@@ -82,6 +82,52 @@ afterAll(async () => {
 });
 
 describe('Workbench official-flow browser smoke', () => {
+  it('imports the Cooperative 1881 default official-flow attachment packet from the Workbench', async () => {
+    const token = await adminToken();
+    const page = await browser.newPage({ acceptDownloads: true });
+    page.setDefaultTimeout(10_000);
+    await page.addInitScript((authToken) => {
+      localStorage.setItem('halofire_token', authToken);
+    }, token);
+
+    try {
+      await page.goto(`${BASE}/workbench.html?project=${encodeURIComponent(PROJECT_NAME)}#officialFlowAttachmentIntake`, {
+        waitUntil: 'domcontentloaded',
+      });
+      const details = page.locator('#officialFlowAttachmentIntake').first();
+      await details.waitFor();
+      await details.evaluate((node) => { node.open = true; });
+      const button = page.locator('[data-official-flow-default-attachment-intake-import="1"]').first();
+      await button.click();
+      const status = page.locator('#officialFlowAttachmentIntakeStatus');
+      await page.waitForFunction(() => {
+        const node = document.querySelector('#officialFlowAttachmentIntakeStatus');
+        return Number(node?.dataset.defaultOfficialFlowPacketEvidenceId || 0) > 0;
+      });
+      expect(await status.getAttribute('data-claim-gate-effect')).toBe('no_claims_cleared');
+      expect(await status.getAttribute('data-no-claim-gates-cleared')).toBe('true');
+      expect(await status.innerText()).toContain('Imported default 1881 official-flow packet');
+
+      const packetEvidenceId = Number(await status.getAttribute('data-default-official-flow-packet-evidence-id'));
+      const intakeEvidenceId = Number(await status.getAttribute('data-default-official-flow-intake-evidence-id'));
+      expect(packetEvidenceId).toBeGreaterThan(0);
+      expect(intakeEvidenceId).toBeGreaterThan(0);
+
+      await page.locator(`#evidence-${packetEvidenceId}`).waitFor();
+      await page.locator(`#evidence-${intakeEvidenceId}`).waitFor();
+      const intakeText = await page.locator(`#evidence-${intakeEvidenceId}`).innerText();
+      expect(intakeText).toContain('official_flow_intake');
+      expect(intakeText).toContain('Proposal-Cooperative 1881-Salt Lake City UT-9-18-25.xlsx');
+
+      const gates = await api(`${PROJECT_PATH}/claim-gates`, token);
+      expect(gates.find((gate) => gate.code === 'PROFESSIONAL_REVIEW_MISSING')).toEqual(expect.objectContaining({ status: 'blocked' }));
+      expect(gates.find((gate) => gate.code === 'AHJ_APPROVAL_MISSING')).toEqual(expect.objectContaining({ status: 'blocked' }));
+      expect(gates.find((gate) => gate.code === 'AUTOSPRINK_EVIDENCE_MISSING')).toEqual(expect.objectContaining({ status: 'blocked' }));
+    } finally {
+      await page.close();
+    }
+  }, 40_000);
+
   it('keeps official-flow review decisions visible after refresh with signed-reviewer next actions', async () => {
     const token = await adminToken();
     const intake = await api(`${PROJECT_PATH}/resolver-packets/official-flow/intake`, token, {

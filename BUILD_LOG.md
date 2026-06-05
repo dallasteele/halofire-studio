@@ -1,5 +1,13 @@
 # HaloFire Build Log
 
+## 2026-06-05 - 1881 default official-flow attachment intake
+
+- Added a server-owned `halofire.official_flow_default_attachment_intake_records.v1` packet for `The Cooperative 1881 - Salt Lake City UT`, with temporary best-guess official-flow values (`staticPsi 71`, `residualPsi 59`, `flowingGpm 940`) tied to the supplied 1881 proposal workbook refs and explicitly marked `temporary_best_guess_until_employee_updates`.
+- Added `GET /resolver-packets/official-flow/default-attachment-intake-records` plus `POST /resolver-packets/official-flow/default-attachment-intake-records/import`, reusing the existing `official_flow_attachment_intake_records` importer so the one-click path preserves `source_default_packet_artifact_type`, packet evidence id, intake evidence id, source refs, and `claim_gate_effect: no_claims_cleared`.
+- Updated [`workbench.html`](C:/Users/dalla/OneDrive/Documents/HaloFire/workbench.html) with an "Import default 1881 official-flow packet" button under the official-flow attachment intake panel, plus DOM readback metadata for the saved packet/intake ids and blocked claim status.
+- Extended [`tests/auto-source-status-api.test.js`](C:/Users/dalla/OneDrive/Documents/HaloFire/tests/auto-source-status-api.test.js) and [`tests/workbench-official-flow-browser-smoke.test.js`](C:/Users/dalla/OneDrive/Documents/HaloFire/tests/workbench-official-flow-browser-smoke.test.js) with red-to-green API/browser coverage proving the default packet import works and leaves professional, AHJ, AutoSprink, manufacturer, permit, fabrication, and engineering claims blocked.
+- Still blocked: AutoSprink parity, AHJ approval, PE/professional review, manufacturer-exact approval, permit readiness, fabrication readiness, brand readiness, production readiness, survey-grade claims, and engineering-grade claims until HaloFire employees replace the temporary values with real official-flow/professional/AHJ evidence and explicitly validate gates.
+
 ## 2026-06-05 - Official-flow disposable replay floor-plan overrides
 
 - Updated [`src/api/server.js`](C:/Users/dalla/OneDrive/Documents/HaloFire/src/api/server.js) so `POST /resolver-packets/official-flow/{evidenceId}/replay-artifact` accepts a posted `floorPlan` for disposable/internal-alpha projects instead of requiring a built-in 1881/Home Depot project name.

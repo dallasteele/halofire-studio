@@ -4986,7 +4986,7 @@ function resolverQueueDetail(item, index = '') {
       <details style="margin-top:8px" id="officialFlowAttachmentIntake">
         <summary class="muted" style="cursor:pointer">Import source-linked official_flow_attachment_intake_records</summary>
         <textarea id="officialFlowAttachmentIntakeJson" placeholder='Paste official_flow_evidence_attachment_intake_records JSON from the attachment preflight packet' style="width:100%;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px;height:112px;margin-top:6px"></textarea>
-        <p style="margin-top:8px"><button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#2563eb" data-official-flow-attachment-intake-import="1">Import attachment intake records</button></p>
+        <p style="margin-top:8px"><button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#2563eb" data-official-flow-attachment-intake-import="1">Import attachment intake records</button> <button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#0f766e" data-official-flow-default-attachment-intake-import="1">Import default 1881 official-flow packet</button></p>
         <div class="muted" id="officialFlowAttachmentIntakeStatus" style="font-size:11px"></div>
       </details>
     </div>`;
@@ -6919,6 +6919,33 @@ async function importOfficialFlowAttachmentIntakeRecords() {
   }
 }
 
+async function importOfficialFlowDefaultAttachmentIntakeRecords() {
+  const status = document.getElementById('officialFlowAttachmentIntakeStatus');
+  try {
+    if (status) {
+      status.textContent = 'Importing default 1881 official-flow packet...';
+      delete status.dataset.defaultOfficialFlowPacketEvidenceId;
+      delete status.dataset.defaultOfficialFlowIntakeEvidenceId;
+    }
+    const imported = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/resolver-packets/official-flow/default-attachment-intake-records/import', {
+      method: 'POST',
+      body: JSON.stringify({}),
+    });
+    const firstAccepted = Array.isArray(imported.accepted_rows) ? imported.accepted_rows[0] : null;
+    if (status) {
+      status.dataset.defaultOfficialFlowPacketEvidenceId = String(imported.packet_evidence_id || '');
+      status.dataset.defaultOfficialFlowIntakeEvidenceId = String(firstAccepted?.official_flow_intake_evidence_id || '');
+      status.dataset.claimGateEffect = imported.claim_gate_effect || 'no_claims_cleared';
+      status.dataset.noClaimGatesCleared = imported.no_claim_gates_cleared === false ? 'false' : 'true';
+      status.textContent = 'Imported default 1881 official-flow packet #' + imported.packet_evidence_id + ' and intake #' + (firstAccepted?.official_flow_intake_evidence_id || 'missing') + '; temporary values only, claims still blocked.';
+    }
+    await refreshEvidence();
+    await refreshResolverQueue();
+  } catch (err) {
+    if (status) status.textContent = 'Error: ' + err.message;
+  }
+}
+
 async function refreshResolverQueue() {
   const activeQuery = resolverQueueFilterQuery || '';
   const projectName = currentProjectName();
@@ -7190,6 +7217,9 @@ async function refreshResolverQueue() {
   });
   document.querySelectorAll('[data-official-flow-attachment-intake-import]').forEach((button) => {
     button.onclick = () => importOfficialFlowAttachmentIntakeRecords();
+  });
+  document.querySelectorAll('[data-official-flow-default-attachment-intake-import]').forEach((button) => {
+    button.onclick = () => importOfficialFlowDefaultAttachmentIntakeRecords();
   });
   document.querySelectorAll('[data-official-flow-replay-evidence-id]').forEach((button) => {
     button.onclick = () => downloadOfficialFlowHydraulicReplay(button.dataset.officialFlowReplayEvidenceId);
