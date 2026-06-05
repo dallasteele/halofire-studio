@@ -508,6 +508,8 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toContain('data-selected-sheet-ref');
     expect(html).toContain('data-selected-scale-ref');
     expect(html).toContain('data-selected-boundary-candidate-ref');
+    expect(html).toContain("approvalPacket.kind !== 'halofire_sam31_approval_upload_intake'");
+    expect(html).toMatch(/function saveSam31ApprovalUploadValidationDecision[\s\S]*const selected1881 = sam31Selected1881Refs\(saved, triggerSelected1881\);[\s\S]*selected_1881_context selected_sheet_ref[\s\S]*targetStatus\.textContent = `Saved \$\{saved\?\.artifact_type \|\| 'halofire\.sam31_approval_upload_validation_decision\.v1'\} evidence #\$\{savedId\}; claim_gate_effect \$\{saved\?\.claim_gate_effect \|\| 'no_claims_cleared'\}\.\$\{selected1881Text\}`;/);
   });
 
   it('surfaces SAM31 sectioning downstream resolver rows and filter links in the workbench', async () => {
