@@ -558,6 +558,24 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toMatch(/function saveSam31ApprovalUploadValidationDecision[\s\S]*const selected1881 = sam31Selected1881Refs\(saved, triggerSelected1881\);[\s\S]*selected_1881_context selected_sheet_ref[\s\S]*targetStatus\.textContent = `Saved \$\{saved\?\.artifact_type \|\| 'halofire\.sam31_approval_upload_validation_decision\.v1'\} evidence #\$\{savedId\}; claim_gate_effect \$\{saved\?\.claim_gate_effect \|\| 'no_claims_cleared'\}\.\$\{selected1881Text\}`;/);
   });
 
+  it('prehydrates saved approval-upload validation decision status from approval upload rows', async () => {
+    const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
+    expect(shell.status).toBe(200);
+    const html = await shell.text();
+    expect(html).toContain('latestApprovalUploadValidationDecisionRow');
+    expect(html).toContain('latestApprovalUploadValidationDecisionStatusAttrs');
+    expect(html).toContain('latestApprovalUploadValidationDecisionStatusText');
+    expect(html).toContain('data-sam31-approval-upload-validation-decision-evidence-id');
+    expect(html).toContain('data-source-halofire-sam31-approval-upload-evidence-id');
+    expect(html).toContain('data-sam31-approval-upload-validation-target-gate-code');
+    expect(html).toContain('data-validation-decision');
+    expect(html).toContain('data-no-claim-gates-cleared');
+    expect(html).toContain('data-resolve-action-href');
+    expect(html).toContain('latest saved approval-validation decision');
+    expect(html).toContain('default/internal-alpha placeholder approval validation cannot clear regulated claims');
+    expect(html).toContain('<div class="muted" id="${escapeHtml(validationDecisionStatusId)}"${latestApprovalUploadValidationDecisionStatusAttrs}');
+  });
+
   it('surfaces SAM31 sectioning downstream resolver rows and filter links in the workbench', async () => {
     const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
     expect(shell.status).toBe(200);
