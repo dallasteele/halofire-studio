@@ -34,7 +34,8 @@
     "@types/three": "^0.184.0"
   },
   "workspaces": [
-    "apps/*",
+    "apps/editor",
+    "apps/halofire-studio-desktop",
     "packages/*",
     "tooling/*"
   ]

@@ -22,3 +22,7 @@ output/playwright/
 scripts/preview-server.js
 .claude/
 data/state/
+
+# Proprietary bid workbooks + vendor pricebooks (source-of-truth data; present on dev + VPS, never committed)
+*.xlsx
+*.docx
