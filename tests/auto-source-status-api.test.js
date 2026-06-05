@@ -1472,7 +1472,29 @@ describe('S5 GET /api/auto-source/status', () => {
         no_claim_gates_cleared: true,
       }),
     ]);
+    const laneSignedQueueRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-queue?officialFlowSignedReviewer=pending&targetGate=AHJ_APPROVAL_MISSING&evidenceType=ahj_approval`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(laneSignedQueueRes.status).toBe(200);
+    const laneSignedQueue = await laneSignedQueueRes.json();
+    expect(laneSignedQueue.filters.officialFlowSignedReviewer).toBe('pending');
+    expect(laneSignedQueue.items).toHaveLength(1);
+    expect(laneSignedQueue.items[0]).toEqual(expect.objectContaining({
+      kind: 'official_flow_signed_reviewer_validation',
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(laneSignedQueue.items[0].validation_rows).toEqual([
+      expect.objectContaining({
+        target_gate_code: 'AHJ_APPROVAL_MISSING',
+        required_evidence_type: 'ahj_approval',
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    ]);
     expect(signedQueue.summary.official_flow_signed_reviewer_validation_needed).toBeGreaterThanOrEqual(1);
+    expect(signedQueue.summary.official_flow_signed_reviewer_professional_rows).toBeGreaterThanOrEqual(1);
+    expect(signedQueue.summary.official_flow_signed_reviewer_ahj_rows).toBeGreaterThanOrEqual(1);
+    expect(signedQueue.summary.official_flow_signed_reviewer_autosprink_rows).toBeGreaterThanOrEqual(1);
   }, 15000);
 
   it('imports source-linked official-flow attachment intake records without clearing claims', async () => {

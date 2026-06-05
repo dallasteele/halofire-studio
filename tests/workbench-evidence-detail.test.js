@@ -286,6 +286,16 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toContain('Pending SAM31 approval validations');
     expect(html).toContain('sam31_approval_validation_pending');
     expect(html).toContain('sam31_approval_validation_ready_for_gate_resolve');
+    expect(html).toContain('officialFlowSignedReviewerQuickFilter');
+    expect(html).toContain('Official-flow professional signed-reviewer');
+    expect(html).toContain('Official-flow AHJ signed-reviewer');
+    expect(html).toContain('Official-flow AutoSprink signed-reviewer');
+    expect(html).toContain('officialFlowSignedReviewer=pending&targetGate=PROFESSIONAL_REVIEW_MISSING&evidenceType=professional_review');
+    expect(html).toContain('officialFlowSignedReviewer=pending&targetGate=AHJ_APPROVAL_MISSING&evidenceType=ahj_approval');
+    expect(html).toContain('officialFlowSignedReviewer=pending&targetGate=AUTOSPRINK_EVIDENCE_MISSING&evidenceType=autosprink_packet');
+    expect(html).toContain('official_flow_signed_reviewer_professional_rows');
+    expect(html).toContain('official_flow_signed_reviewer_ahj_rows');
+    expect(html).toContain('official_flow_signed_reviewer_autosprink_rows');
     expect(html).toContain('claimGateAuditQuickFilter');
     expect(html).toContain('claimGateAudit=cleared');
     expect(html).toContain('Cleared claim-gate audits');

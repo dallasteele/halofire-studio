@@ -17033,6 +17033,7 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
     lane: String(req.query?.lane || '').trim().toLowerCase() || null,
     catalogApproval: String(req.query?.catalogApproval || req.query?.catalog_approval || '').trim().toLowerCase() || null,
     claimGateAudit: String(req.query?.claimGateAudit || req.query?.claim_gate_audit || '').trim().toLowerCase() || null,
+    officialFlowSignedReviewer: String(req.query?.officialFlowSignedReviewer || req.query?.official_flow_signed_reviewer || '').trim().toLowerCase() || null,
     evidenceType: String(req.query?.evidenceType || req.query?.evidence_type || '').trim().toLowerCase() || null,
     targetGate: String(req.query?.targetGate || req.query?.target_gate || '').trim().toUpperCase() || null,
     officialFlowReviewDecisionEvidenceId: Number.isFinite(Number(req.query?.officialFlowReviewDecisionEvidenceId || req.query?.official_flow_review_decision_evidence_id))
@@ -17177,12 +17178,13 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
       return true;
     });
   }
-  if (filters.catalogApproval || filters.evidenceType || filters.officialFlowReviewDecisionEvidenceId || (filters.targetGate && !filters.sam31ApprovalValidation && !filters.claimGateAudit)) {
+  if (filters.catalogApproval || filters.evidenceType || filters.officialFlowSignedReviewer || filters.officialFlowReviewDecisionEvidenceId || (filters.targetGate && !filters.sam31ApprovalValidation && !filters.claimGateAudit)) {
     visibleItems = visibleItems
       .map((item) => {
         if (item.kind === 'official_flow_signed_reviewer_validation') {
           if (filters.catalogApproval) return null;
           if (filters.officialFlowReviewDecisionEvidenceId && Number(item.source_review_decision_evidence_id) !== filters.officialFlowReviewDecisionEvidenceId) return null;
+          if (filters.officialFlowSignedReviewer === 'pending' && item.status !== 'signed_reviewer_validation_needed') return null;
           const validationRows = Array.isArray(item.validation_rows)
             ? item.validation_rows
               .filter((row) => !filters.evidenceType || String(row.required_evidence_type || '').toLowerCase() === filters.evidenceType)
@@ -17190,6 +17192,7 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
             : [];
           return validationRows.length ? { ...item, validation_rows: validationRows, actions: validationRows.map((row) => row.action).filter(Boolean) } : null;
         }
+        if (filters.officialFlowSignedReviewer) return null;
         if (filters.officialFlowReviewDecisionEvidenceId) return null;
         const approvalRows = Array.isArray(item.catalog_approval_packet_rows)
           ? item.catalog_approval_packet_rows
@@ -17266,6 +17269,9 @@ app.get('/api/projects/:name/resolver-queue', authMiddleware, (req, res) => {
       official_flow_replay_review_needed: statusCounts.official_flow_replay_review_needed || 0,
       official_flow_signed_reviewer_validation_needed: statusCounts.signed_reviewer_validation_needed || 0,
       official_flow_signed_reviewer_validation_rows: visibleItems.reduce((acc, item) => acc + (Array.isArray(item.validation_rows) ? item.validation_rows.length : 0), 0),
+      official_flow_signed_reviewer_professional_rows: visibleItems.reduce((acc, item) => acc + (Array.isArray(item.validation_rows) ? item.validation_rows.filter((row) => row.target_gate_code === 'PROFESSIONAL_REVIEW_MISSING' && row.required_evidence_type === 'professional_review').length : 0), 0),
+      official_flow_signed_reviewer_ahj_rows: visibleItems.reduce((acc, item) => acc + (Array.isArray(item.validation_rows) ? item.validation_rows.filter((row) => row.target_gate_code === 'AHJ_APPROVAL_MISSING' && row.required_evidence_type === 'ahj_approval').length : 0), 0),
+      official_flow_signed_reviewer_autosprink_rows: visibleItems.reduce((acc, item) => acc + (Array.isArray(item.validation_rows) ? item.validation_rows.filter((row) => row.target_gate_code === 'AUTOSPRINK_EVIDENCE_MISSING' && row.required_evidence_type === 'autosprink_packet').length : 0), 0),
     },
   });
 });

@@ -4483,6 +4483,29 @@ function catalogApprovalQuickFilter(summary, activeQuery) {
   </div>`;
 }
 
+function officialFlowSignedReviewerQuickFilter(summary, activeQuery) {
+  const professionalQuery = 'officialFlowSignedReviewer=pending&targetGate=PROFESSIONAL_REVIEW_MISSING&evidenceType=professional_review';
+  const ahjQuery = 'officialFlowSignedReviewer=pending&targetGate=AHJ_APPROVAL_MISSING&evidenceType=ahj_approval';
+  const autosprinkQuery = 'officialFlowSignedReviewer=pending&targetGate=AUTOSPRINK_EVIDENCE_MISSING&evidenceType=autosprink_packet';
+  const isProfessionalActive = activeQuery === professionalQuery;
+  const isAhjActive = activeQuery === ahjQuery;
+  const isAutosprinkActive = activeQuery === autosprinkQuery;
+  return `<div class="muted" style="font-size:11px;margin-bottom:8px">
+    officialFlowSignedReviewerQuickFilter:
+    <button class="go" type="button" style="padding:6px 9px;font-size:10px;background:${isProfessionalActive ? '#0f766e' : '#374151'}" data-resolver-queue-filter="${escapeHtml(professionalQuery)}">Official-flow professional signed-reviewer</button>
+    <button class="go" type="button" style="padding:6px 9px;font-size:10px;background:${isAhjActive ? '#b45309' : '#374151'}" data-resolver-queue-filter="${escapeHtml(ahjQuery)}">Official-flow AHJ signed-reviewer</button>
+    <button class="go" type="button" style="padding:6px 9px;font-size:10px;background:${isAutosprinkActive ? '#4338ca' : '#374151'}" data-resolver-queue-filter="${escapeHtml(autosprinkQuery)}">Official-flow AutoSprink signed-reviewer</button>
+    ${activeQuery && !isProfessionalActive && !isAhjActive && !isAutosprinkActive ? '<button class="go" type="button" style="padding:6px 9px;font-size:10px;background:#374151" data-resolver-queue-filter="">Show all resolver rows</button>' : ''}
+    <span class="chip">officialFlowSignedReviewer=pending&targetGate=PROFESSIONAL_REVIEW_MISSING&evidenceType=professional_review</span>
+    <span class="chip">officialFlowSignedReviewer=pending&targetGate=AHJ_APPROVAL_MISSING&evidenceType=ahj_approval</span>
+    <span class="chip">officialFlowSignedReviewer=pending&targetGate=AUTOSPRINK_EVIDENCE_MISSING&evidenceType=autosprink_packet</span>
+    <span class="chip">official_flow_signed_reviewer_professional_rows ${escapeHtml(summary.official_flow_signed_reviewer_professional_rows || 0)}</span>
+    <span class="chip">official_flow_signed_reviewer_ahj_rows ${escapeHtml(summary.official_flow_signed_reviewer_ahj_rows || 0)}</span>
+    <span class="chip">official_flow_signed_reviewer_autosprink_rows ${escapeHtml(summary.official_flow_signed_reviewer_autosprink_rows || 0)}</span>
+    <span class="chip">claim_gate_effect no_claims_cleared</span>
+  </div>`;
+}
+
 function sam31ApprovalValidationQuickFilter(summary, activeQuery) {
   const pendingQuery = 'sam31ApprovalValidation=pending';
   const readyQuery = 'sam31ApprovalValidation=ready_for_explicit_gate_resolve';
@@ -6709,7 +6732,7 @@ async function refreshResolverQueue() {
     <span class="chip">ready_for_signed_evidence_upload</span>
     <span class="chip">catalog_approval_claims_cleared ${escapeHtml(summary.catalog_approval_claims_cleared || 0)}</span>
     <span class="chip">no claim gates cleared</span>
-  </div>${roomBoundaryQuickFilter(summary, activeQuery)}${sam31ActualValueQuickFilter(summary, activeQuery)}${sam31ApprovalValidationQuickFilter(summary, activeQuery)}${claimGateAuditQuickFilter(summary, activeQuery)}${catalogApprovalQuickFilter(summary, activeQuery)}`;
+  </div>${roomBoundaryQuickFilter(summary, activeQuery)}${sam31ActualValueQuickFilter(summary, activeQuery)}${officialFlowSignedReviewerQuickFilter(summary, activeQuery)}${sam31ApprovalValidationQuickFilter(summary, activeQuery)}${claimGateAuditQuickFilter(summary, activeQuery)}${catalogApprovalQuickFilter(summary, activeQuery)}`;
   document.getElementById('resolverQueue').innerHTML = queue.items && queue.items.length
     ? summaryHtml + queue.items.map((item, index) => resolverQueueDetail(item, index)).join('')
     : (activeQuery
