@@ -1733,6 +1733,21 @@ async function refreshEvidence() {
       saveReplaySam31ConsumerIntakeSmokeDefaultApprovalUpload(button.dataset.replaySam31ConsumerIntakeSmokeDefaultApprovalUpload);
     }, { once: true });
   });
+  document.querySelectorAll('[data-sam31-approval-upload-default-validation-packet]').forEach((button) => {
+    button.onclick = () => openSam31ApprovalUploadDefaultValidationPacket(
+      button.dataset.sam31ApprovalUploadDefaultValidationPacket,
+    );
+  });
+  document.querySelectorAll('[data-sam31-approval-upload-review-evidence-id]').forEach((button) => {
+    button.onclick = () => reviewSam31ApprovalUploadEvidence(
+      button.dataset.sam31ApprovalUploadReviewEvidenceId,
+    );
+  });
+  document.querySelectorAll('[data-sam31-approval-upload-validation-decision-save-evidence-id]').forEach((button) => {
+    button.onclick = () => saveSam31ApprovalUploadValidationDecision(
+      button.dataset.sam31ApprovalUploadValidationDecisionSaveEvidenceId,
+    );
+  });
   document.querySelectorAll('[data-sam31-actual-value-saved-service-descriptor-download]').forEach((button) => {
     button.onclick = () => downloadSavedSam31ActualValueServiceDescriptorEvidence(button.dataset.sam31ActualValueSavedServiceDescriptorDownload);
   });

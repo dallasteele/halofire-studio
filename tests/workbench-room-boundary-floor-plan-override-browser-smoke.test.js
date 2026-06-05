@@ -375,7 +375,7 @@ describe('Workbench room-boundary floor-plan override browser smoke', () => {
       expect(defaultReplacementText).toContain('source_sam31_actual_value_replacement_evidence_id');
 
       const defaultReplacementSmoke = page.locator(
-        `[data-replay-sam31-consumer-intake-smoke-source-replacement-evidence-id="${defaultReplacementEvidenceId}"]`,
+        `[data-replay-sam31-consumer-intake-smoke-source-replacement-evidence-id="${defaultReplacementEvidenceId}"][data-replay-sam31-consumer-intake-smoke-consumer="halo_fire"]`,
       ).first();
       await defaultReplacementSmoke.waitFor({ state: 'attached' });
       expect(await defaultReplacementSmoke.getAttribute('data-source-sam31-actual-value-replacement-evidence-id'))
@@ -1009,8 +1009,27 @@ describe('Workbench room-boundary floor-plan override browser smoke', () => {
       expect(followupReviewRow).toContain(`source_sam31_actual_value_replacement_evidence_id ${replacementEvidenceId}`);
       expect(followupReviewRow).toContain('claim_gate_effect no_claims_cleared');
 
-      await sprinkler.click();
-      await page.waitForFunction(() => document.getElementById('sam31ActualValueQueueStatus')?.textContent?.includes('Downloaded HaloFire SAM31 consumer intake smoke sprinkler review packet'));
+      const [sprinklerPacketDownload] = await Promise.all([
+        page.waitForEvent('download'),
+        sprinkler.click(),
+      ]);
+      expect(sprinklerPacketDownload.suggestedFilename()).toContain('sprinkler-review');
+      await page.waitForFunction(({ replayId, replacementId, followupId }) => {
+        const status = document.getElementById('sam31ActualValueQueueStatus');
+        const text = status?.textContent || '';
+        return text.includes('Downloaded HaloFire SAM31 consumer intake smoke sprinkler review packet')
+          || (
+            status?.dataset.sourceReplayEvidenceId === replayId
+            && status?.dataset.sourceSam31ActualValueReplacementEvidenceId === replacementId
+            && status?.dataset.sourceHalofireSam31ConsumerIntakeSmokeFollowupReviewEvidenceId === followupId
+            && status?.dataset.downloadedSprinklerReviewPacket === 'true'
+            && status?.dataset.claimGateEffect === 'no_claims_cleared'
+          );
+      }, {
+        replayId: String(savedReplayEvidenceId),
+        replacementId: String(replacementEvidenceId),
+        followupId: String(followupReviewEvidenceId),
+      });
       expect(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-source-replay-evidence-id')).toBe(String(savedReplayEvidenceId));
       expect(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-source-sam31-actual-value-replacement-evidence-id')).toBe(String(replacementEvidenceId));
       expect(await page.locator('#sam31ActualValueQueueStatus').getAttribute('data-source-halofire-sam31-consumer-intake-smoke-followup-review-evidence-id')).toBe(String(followupReviewEvidenceId));
@@ -1215,7 +1234,11 @@ describe('Workbench room-boundary floor-plan override browser smoke', () => {
       expect(await approvalValidation.getAttribute('data-source-halofire-sam31-preliminary-replay-followup-evidence-id')).toBe(String(replayFollowupEvidenceId));
       expect(await approvalValidation.getAttribute('data-sam31-approval-validation-filter-href')).toBe(`${approvalValidationQueueHref}&targetGate=PROFESSIONAL_REVIEW_MISSING`);
       expect(await approvalValidation.getAttribute('data-claim-gate-effect')).toBe('no_claims_cleared');
-      await approvalValidation.click();
+      const [approvalValidationDownload] = await Promise.all([
+        page.waitForEvent('download'),
+        approvalValidation.click(),
+      ]);
+      expect(approvalValidationDownload.suggestedFilename()).toContain('gate-validation');
       await page.waitForFunction((approvalUploadId) => {
         const status = document.getElementById(`sam31ApprovalUploadValidationStatus-${approvalUploadId}`);
         return status?.dataset.sam31ApprovalUploadEvidenceId === approvalUploadId
@@ -1274,15 +1297,27 @@ describe('Workbench room-boundary floor-plan override browser smoke', () => {
         return status?.dataset.sourceHalofireSam31ApprovalUploadEvidenceId === approvalUploadId
           && status?.dataset.validationDecision === 'default_internal_alpha_placeholder_rejected'
           && status?.dataset.claimGateEffect === 'no_claims_cleared'
-          && status?.dataset.noClaimGatesCleared === 'true';
+          && status?.dataset.noClaimGatesCleared === 'true'
+          && status?.dataset.selectedSheetRef === '1881://proposal-cooperative/sheet-7'
+          && status?.dataset.selectedScaleRef === '1881://operator-scale/sheet-7/0.0833'
+          && status?.dataset.selectedBoundaryCandidateRef === 'candidate:1881-sheet-7-outline';
       }, approvalUploadEvidenceId);
       const approvalValidationDecisionStatus = page.locator(`#sam31ApprovalValidationDecisionStatus-${approvalUploadEvidenceId}`);
       const approvalValidationDecisionEvidenceId = String(await approvalValidationDecisionStatus.getAttribute('data-sam31-approval-upload-validation-decision-evidence-id') || '');
       expect(approvalValidationDecisionEvidenceId).toMatch(/^\d+$/);
       expect(await approvalValidationDecisionStatus.getAttribute('data-sam31-approval-upload-validation-target-gate-code')).toBe('PROFESSIONAL_REVIEW_MISSING');
       expect(await approvalValidationDecisionStatus.getAttribute('data-resolve-action-href')).toBe('');
-      expect(await page.locator(`#evidence-${approvalValidationDecisionEvidenceId}`).innerText()).toContain('halofire.sam31_approval_upload_validation_decision.v1');
-      expect(await page.locator(`#evidence-${approvalValidationDecisionEvidenceId}`).innerText()).toContain('default_internal_alpha_placeholder_rejected');
+      expect(await approvalValidationDecisionStatus.getAttribute('data-selected-sheet-ref')).toBe('1881://proposal-cooperative/sheet-7');
+      expect(await approvalValidationDecisionStatus.getAttribute('data-selected-scale-ref')).toBe('1881://operator-scale/sheet-7/0.0833');
+      expect(await approvalValidationDecisionStatus.getAttribute('data-selected-boundary-candidate-ref')).toBe('candidate:1881-sheet-7-outline');
+      const approvalValidationDecisionStatusText = await approvalValidationDecisionStatus.innerText();
+      expect(approvalValidationDecisionStatusText).toContain('selected_1881_context');
+      expect(approvalValidationDecisionStatusText).toContain('1881://proposal-cooperative/sheet-7');
+      const approvalValidationDecisionEvidenceText = await page.locator(`#evidence-${approvalValidationDecisionEvidenceId}`).innerText();
+      expect(approvalValidationDecisionEvidenceText).toContain('halofire.sam31_approval_upload_validation_decision.v1');
+      expect(approvalValidationDecisionEvidenceText).toContain('default_internal_alpha_placeholder_rejected');
+      expect(approvalValidationDecisionEvidenceText).toContain('selected_1881_context');
+      expect(approvalValidationDecisionEvidenceText).toContain('1881://proposal-cooperative/sheet-7');
       await page.waitForFunction((decisionEvidenceId) => {
         const text = document.getElementById('resolverQueue')?.innerText || '';
         return text.includes(`latest_approval_upload_validation_decision evidence #${decisionEvidenceId}`)
