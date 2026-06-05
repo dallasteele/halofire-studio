@@ -494,6 +494,22 @@ describe('workbench evidence detail rendering', () => {
     expect(html).toMatch(/openOpenClawSam31ProductOwnerReplacementIntake[\s\S]*await refreshResolverQueue\(\);\s*await refreshSam31ActualValueQueue\(\);[\s\S]*Opened product_owner_replacement_intake evidence/);
   });
 
+  it('prehydrates replay-scoped sprinkler review readiness from saved smoke rows', async () => {
+    const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
+    expect(shell.status).toBe(200);
+    const html = await shell.text();
+
+    expect(html).toContain('latestSprinklerReviewStatusAttrs');
+    expect(html).toContain('data-halofire-sam31-sprinkler-review-decision-evidence-id');
+    expect(html).toContain('data-source-halofire-sam31-sprinkler-review-decision-evidence-id');
+    expect(html).toContain('data-preliminary-replay-inputs-ready="true"');
+    expect(html).toContain('data-sam31-consumer-intake-smoke-preliminary-replay-inputs-href');
+    expect(html).toContain('Saved default HaloFire sprinkler review decision');
+    expect(html).toContain('preliminary replay inputs ready');
+    expect(html).toContain('claim_gate_effect no_claims_cleared');
+    expect(html).toContain('<div class="muted" id="${sprinklerReviewId}-status"${latestSprinklerReviewStatusAttrs}');
+  });
+
   it('surfaces selected 1881 refs on replay-scoped smoke and sprinkler evidence readbacks', async () => {
     const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
     expect(shell.status).toBe(200);
