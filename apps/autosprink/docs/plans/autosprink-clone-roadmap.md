@@ -776,10 +776,24 @@ so AI placeholders are never mistaken for engineering-accurate CAD.
       not-for-submittals warning. HONESTY: no parts fabricated, no provenance upgraded,
       no 3D-generation / manufacturer-CAD-ingestion run claimed (none happened); all 22
       current parts stay visual_reference. GX10-independent.
-- [ ] **T43 — step.parts client for generic hardware only (GX10-independent, public HTTP).**
-      Implement the public API client (GET /v1/parts, /v1/parts/{id} with SHA256 verify)
-      in `halofire-catalog` behind a feature flag; add a guard/test asserting fire-sprinkler
-      queries return zero so the UI routes them to catalog/build123d instead.
+- [x] **T43 — step.parts client for generic hardware only (GX10-independent, public HTTP).**
+      DONE 2026-06-05 (ultra workflow wahq2hbbe, implement + adversarial honesty+correctness
+      verifiers BOTH PASS). LIVE-PROBED the real API first (q=sprinkler -> total:0 items:[]
+      confirmed ZERO fire coverage; q=pipe -> only thermal heat-pipe; q=bolt -> real ISO
+      fasteners; catalog 12,734 parts, sha256 05a52774…833e). NEW `apps/studio/src/lib/step-parts.ts`
+      (pure, injected fetch): StepPart + StepPartsSearchResponse matching the real shape;
+      `buildStepPartsClient({fetchImpl,baseUrl,enabled})` OPT-IN (enabled defaults FALSE — no
+      network unless explicitly enabled; throws "disabled" otherwise); searchParts(q,{limit,page})
+      + getPart(id), non-2xx -> throw; catalogSha() helper. GUARD: FIRE_SPRINKLER_TERMS +
+      isFireSprinklerQuery (word-boundary; flags sprinkler/fdc/standpipe/esfr/riser/deluge/head/…
+      but NOT bolt/bracket/screw/header) + routeQuery/assertGenericOnly — searchParts calls
+      assertGenericOnly BEFORE fetching, so a fire/MEP query can NEVER silently reach step.parts
+      (routes to catalog/build123d). step.parts results map to model_status "proxy" (NOT
+      engineering-accurate). TDD test/step-parts.test.ts (19, MOCK fetch mirroring the real
+      captured shapes — never hits live network). vitest 59/59, tsc -b 0, vite build 0. HONESTY:
+      zero fire coverage verified-live (not fabricated); tests mock-only (no live-API claim);
+      client opt-in; results capped at proxy. No UI consumer yet (catalog/step.parts browser is
+      T50). GX10-independent.
 - [ ] **T44 — Manufacturer-STEP ingestion lane / Tier-1 parts (GX10-independent).** A
       `halofire-catalog` importer mapping Victaulic/ARGCO/FFF pricebook line items to
       manufacturer Revit/STEP family downloads (Viking/Tyco/Victaulic/BIMobject); store
