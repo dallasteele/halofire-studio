@@ -1999,6 +1999,14 @@ async function refreshEvidence() {
       button.dataset.officialFlowSignedEvidenceUploadPacketHref,
     );
   });
+  document.querySelectorAll('[data-official-flow-default-sam31-approval-upload]').forEach((button) => {
+    button.onclick = () => saveOfficialFlowDefaultSam31ApprovalUpload(
+      button.dataset.officialFlowDefaultSam31ApprovalUploadSourceEvidenceId,
+      button.dataset.officialFlowDefaultSam31ApprovalUploadGateCode,
+      button.dataset.officialFlowDefaultSam31ApprovalUploadEvidenceType,
+      button.dataset.officialFlowDefaultSam31ApprovalUploadStatusId,
+    );
+  });
   document.querySelectorAll('[data-official-flow-signed-reviewer-resolve-workflow]').forEach((button) => {
     button.onclick = () => openSignedReviewerWorkflow(
       currentProjectName(),
@@ -4712,7 +4720,9 @@ function renderOfficialFlowSignedReviewerValidationRows(rows, sourceEvidenceId =
     const requiredEvidenceType = row.required_evidence_type || '';
     const queueStatusId = `officialFlowSignedReviewerQueueStatus-${evidenceId}-${gateCode || 'target_gate_missing'}`;
     const uploadPacketStatusId = `officialFlowSignedEvidenceUploadPacketStatus-${evidenceId}-${gateCode || 'target_gate_missing'}`;
+    const defaultApprovalUploadStatusId = `officialFlowDefaultSam31ApprovalUploadStatus-${evidenceId}-${gateCode || 'target_gate_missing'}`;
     const auditStatusId = `officialFlowSignedReviewerResolveAuditStatus-${evidenceId}-${gateCode || 'target_gate_missing'}`;
+    const canMirrorToSam31ApprovalUpload = ['professional_review', 'ahj_approval', 'manufacturer_approval'].includes(requiredEvidenceType);
     const isCleared = row.status === 'gate_cleared_after_explicit_signed_validation'
       || row.claim_gate_effect === 'gate_cleared_after_explicit_signed_validation';
     const clearedSettingsPrefillHref = String(row.resolved_evidence_settings_href || '').trim();
@@ -4733,7 +4743,8 @@ function renderOfficialFlowSignedReviewerValidationRows(rows, sourceEvidenceId =
         </div>`
       : `<button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0f766e" data-signed-reviewer-workflow-evidence-id="${escapeHtml(evidenceId)}" data-signed-reviewer-workflow-gate-code="${escapeHtml(gateCode)}" data-signed-reviewer-workflow-review-packet-href="${escapeHtml(action.href || '')}" onclick="openSignedReviewerWorkflow(${JSON.stringify(currentProjectName())}, ${JSON.stringify(gateCode)}, ${JSON.stringify(evidenceId)})">${escapeHtml(action.label || 'Open signed reviewer workflow')}</button>
       <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#b45309" data-official-flow-signed-reviewer-resolve-workflow="1" data-official-flow-signed-reviewer-resolve-gate-code="${escapeHtml(gateCode)}" data-official-flow-signed-reviewer-resolve-evidence-type="${escapeHtml(requiredEvidenceType)}" data-official-flow-signed-reviewer-resolve-source-evidence-id="${escapeHtml(evidenceId)}" data-official-flow-signed-reviewer-resolve-href="${escapeHtml(resolveAction.href || '')}" data-official-flow-signed-reviewer-resolve-route="${escapeHtml(resolveAction.resolve_route || '')}" onclick="openSignedReviewerWorkflow(${JSON.stringify(currentProjectName())}, ${JSON.stringify(gateCode)}, ${JSON.stringify(evidenceId)}, 'resolve', ${JSON.stringify(resolveAction.href || '')})">${escapeHtml(resolveAction.label || 'Upload real signed evidence & resolve gate')}</button>
-      <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0369a1" data-official-flow-signed-evidence-upload-packet="1" data-official-flow-signed-evidence-upload-packet-source-evidence-id="${escapeHtml(evidenceId)}" data-official-flow-signed-evidence-upload-packet-gate-code="${escapeHtml(gateCode)}" data-official-flow-signed-evidence-upload-packet-evidence-type="${escapeHtml(requiredEvidenceType)}" data-official-flow-signed-evidence-upload-packet-href="${escapeHtml(uploadPacketAction.href || '')}" data-official-flow-signed-evidence-upload-packet-status-id="${escapeHtml(uploadPacketStatusId)}">${escapeHtml(uploadPacketAction.label || 'Download signed evidence upload packet')}</button>`;
+      <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#0369a1" data-official-flow-signed-evidence-upload-packet="1" data-official-flow-signed-evidence-upload-packet-source-evidence-id="${escapeHtml(evidenceId)}" data-official-flow-signed-evidence-upload-packet-gate-code="${escapeHtml(gateCode)}" data-official-flow-signed-evidence-upload-packet-evidence-type="${escapeHtml(requiredEvidenceType)}" data-official-flow-signed-evidence-upload-packet-href="${escapeHtml(uploadPacketAction.href || '')}" data-official-flow-signed-evidence-upload-packet-status-id="${escapeHtml(uploadPacketStatusId)}">${escapeHtml(uploadPacketAction.label || 'Download signed evidence upload packet')}</button>
+      ${canMirrorToSam31ApprovalUpload ? `<button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#7c3aed" data-official-flow-default-sam31-approval-upload="1" data-official-flow-default-sam31-approval-upload-source-evidence-id="${escapeHtml(evidenceId)}" data-official-flow-default-sam31-approval-upload-gate-code="${escapeHtml(gateCode)}" data-official-flow-default-sam31-approval-upload-evidence-type="${escapeHtml(requiredEvidenceType)}" data-official-flow-default-sam31-approval-upload-status-id="${escapeHtml(defaultApprovalUploadStatusId)}">Save default SAM31 approval upload + validation packet</button>` : ''}`;
     return `<div style="margin-top:6px;border-top:1px solid rgba(255,213,79,.16);padding-top:6px">
       <span class="chip">${escapeHtml(gateCode || 'target gate missing')}</span> <span class="chip">${escapeHtml(requiredEvidenceType || 'required evidence missing')}</span> <span class="chip">${escapeHtml(row.status || 'ready_for_signed_reviewer_workflow')}</span><br>
       ${escapeHtml(row.next_action || 'Open signed reviewer workflow; no claims are cleared by this handoff.')}<br>
@@ -4745,6 +4756,7 @@ function renderOfficialFlowSignedReviewerValidationRows(rows, sourceEvidenceId =
       ${actionMarkup}
       <button class="go" type="button" style="padding:6px 9px;font-size:10px;margin-top:5px;background:#4338ca" data-official-flow-signed-reviewer-validation-queue="1" data-official-flow-signed-reviewer-validation-gate-code="${escapeHtml(gateCode)}" data-official-flow-signed-reviewer-validation-evidence-type="${escapeHtml(requiredEvidenceType)}" data-official-flow-signed-reviewer-validation-source-evidence-id="${escapeHtml(evidenceId)}" data-official-flow-signed-reviewer-validation-status-id="${escapeHtml(queueStatusId)}" onclick="openOfficialFlowSignedReviewerValidationQueue(${JSON.stringify(gateCode)}, ${JSON.stringify(requiredEvidenceType)}, ${JSON.stringify(evidenceId)}, ${JSON.stringify(queueStatusId)})">${escapeHtml(row.queue_action?.label || 'Open pending signed-reviewer queue')}</button>
       ${isCleared ? '' : `<div class="muted" id="${escapeHtml(uploadPacketStatusId)}" style="font-size:11px;margin-top:4px">signed evidence upload packet preserves official-flow provenance and still requires real signed evidence; no claims cleared</div>`}
+      ${isCleared || !canMirrorToSam31ApprovalUpload ? '' : `<div class="muted" id="${escapeHtml(defaultApprovalUploadStatusId)}" style="font-size:11px;margin-top:4px">default/internal-alpha placeholder SAM31 approval upload can create the validation packet path, but it cannot validate as real signed evidence or clear claims</div>`}
       <div class="muted" id="${escapeHtml(queueStatusId)}" style="font-size:11px;margin-top:4px">${queueReadbackText}</div>
     </div>`;
   }).join('')}<span class="muted" style="font-size:10px">Filter API: /resolver-queue?officialFlowReviewDecisionEvidenceId=:id&targetGate=PROFESSIONAL_REVIEW_MISSING or evidenceType=ahj_approval - source official_flow_professional_ahj_review_decision - claim_gate_effect no_claims_cleared</span></div>`;
@@ -5641,6 +5653,48 @@ async function downloadOfficialFlowSignedEvidenceUploadPacket(evidenceId, gateCo
       status.dataset.claimGateEffect = packet.claim_gate_effect || 'requires_real_signed_evidence';
       status.dataset.noClaimGatesCleared = packet.no_claim_gates_cleared === false ? 'false' : 'true';
     }
+  } catch (err) {
+    if (status) status.textContent = 'Error: ' + err.message;
+  }
+}
+
+async function saveOfficialFlowDefaultSam31ApprovalUpload(evidenceId, gateCode = '', evidenceType = '', statusId = '') {
+  const status = statusId ? document.getElementById(statusId) : null;
+  if (status) status.textContent = 'Saving default/internal-alpha SAM31 approval upload placeholder; no claims cleared...';
+  try {
+    const saved = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/resolver-packets/official-flow-review-decision/' + encodeURIComponent(evidenceId) + '/sam31/default-approval-upload', {
+      method: 'POST',
+      body: JSON.stringify({
+        targetGate: gateCode || '',
+        evidenceType: evidenceType || '',
+      }),
+    });
+    const packetHref = saved.gate_validation_packet_action?.href || '';
+    const packet = packetHref ? await api(normalizeApiPath(packetHref)) : saved;
+    const blob = new Blob([JSON.stringify(packet, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = packet.download_name || 'halofire-sam31-approval-upload-gate-validation-packet.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+    if (status) {
+      const filterHref = '/api/projects/' + encodeURIComponent(currentProjectName()) + '/resolver-queue?sam31ApprovalValidation=pending&targetGate=' + encodeURIComponent(saved.gate_code || gateCode || '');
+      status.textContent = `Saved ${saved.artifact_type || 'halofire.sam31_approval_upload_intake.v1'} #${saved.id || 'missing'} from official-flow review decision ${saved.source_official_flow_review_decision_evidence_id || evidenceId || 'missing'} and downloaded ${packet.artifact_type || 'halofire.sam31_approval_upload_gate_validation_packet.v1'}; default/internal-alpha placeholder cannot validate as real signed evidence and no claims cleared.`;
+      status.dataset.sam31ApprovalUploadEvidenceId = String(saved.id || '');
+      status.dataset.sourceHalofireSam31ApprovalUploadEvidenceId = String(saved.id || '');
+      status.dataset.sourceOfficialFlowReviewDecisionEvidenceId = String(saved.source_official_flow_review_decision_evidence_id || evidenceId || '');
+      status.dataset.sourceReplayEvidenceId = String(saved.source_replay_evidence_id || '');
+      status.dataset.sourceAttachmentIntakePacketEvidenceId = String(saved.source_attachment_intake_packet_evidence_id || '');
+      status.dataset.sourceAttachmentIntakeRowIndex = String(saved.source_attachment_intake_row_index ?? '');
+      status.dataset.targetGateCode = saved.gate_code || gateCode || '';
+      status.dataset.requiredEvidenceType = saved.required_evidence_type || evidenceType || '';
+      status.dataset.sourceOfficialFlowTargetGateCode = saved.source_official_flow_target_gate_code || gateCode || '';
+      status.dataset.claimGateEffect = saved.claim_gate_effect || 'no_claims_cleared';
+      status.dataset.noClaimGatesCleared = saved.no_claim_gates_cleared === false ? 'false' : 'true';
+      status.dataset.sam31ApprovalValidationFilterHref = filterHref;
+    }
+    await refreshEvidence();
+    await refreshResolverQueue();
   } catch (err) {
     if (status) status.textContent = 'Error: ' + err.message;
   }
@@ -7462,6 +7516,14 @@ async function refreshResolverQueue() {
       button.dataset.officialFlowSignedEvidenceUploadPacketEvidenceType,
       button.dataset.officialFlowSignedEvidenceUploadPacketStatusId,
       button.dataset.officialFlowSignedEvidenceUploadPacketHref,
+    );
+  });
+  document.querySelectorAll('[data-official-flow-default-sam31-approval-upload]').forEach((button) => {
+    button.onclick = () => saveOfficialFlowDefaultSam31ApprovalUpload(
+      button.dataset.officialFlowDefaultSam31ApprovalUploadSourceEvidenceId,
+      button.dataset.officialFlowDefaultSam31ApprovalUploadGateCode,
+      button.dataset.officialFlowDefaultSam31ApprovalUploadEvidenceType,
+      button.dataset.officialFlowDefaultSam31ApprovalUploadStatusId,
     );
   });
   document.querySelectorAll('[data-official-flow-signed-reviewer-resolve-workflow]').forEach((button) => {

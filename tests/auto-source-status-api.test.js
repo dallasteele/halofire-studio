@@ -1865,6 +1865,93 @@ describe('S5 GET /api/auto-source/status', () => {
       source_attachment_intake_packet_evidence_id: imported.packet_evidence_id,
       source_attachment_intake_row_index: 0,
     }));
+
+    const bridgeRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-packets/official-flow-review-decision/${decision.id}/sam31/default-approval-upload`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        targetGate: 'AHJ_APPROVAL_MISSING',
+        evidenceType: 'ahj_approval',
+      }),
+    });
+    expect(bridgeRes.status).toBe(201);
+    const bridgedUpload = await bridgeRes.json();
+    expect(bridgedUpload).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.sam31_approval_upload_intake.v1',
+      code: 'HALOFIRE_SAM31_AHJ_APPROVAL_UPLOAD_MISSING',
+      target_approval_lane: 'AHJ_approval',
+      evidence_type: 'ahj_approval',
+      source_official_flow_review_decision_evidence_id: decision.id,
+      source_replay_evidence_id: replay.id,
+      source_attachment_intake_packet_evidence_id: imported.packet_evidence_id,
+      source_attachment_intake_row_index: 0,
+      source_official_flow_target_gate_code: 'AHJ_APPROVAL_MISSING',
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+      placeholder_upload: true,
+    }));
+    expect(bridgedUpload.source_ref).toContain('default-internal-alpha-sam31-approval-upload');
+    expect(bridgedUpload.gate_validation_packet_action).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.sam31_approval_upload_gate_validation_packet.v1',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+
+    const validationQueueRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-queue?sam31ApprovalValidation=pending&targetGate=AHJ_APPROVAL_MISSING`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(validationQueueRes.status).toBe(200);
+    const validationQueue = await validationQueueRes.json();
+    expect(validationQueue.summary.sam31_approval_upload_standalone_rows).toBeGreaterThanOrEqual(1);
+    expect(validationQueue.summary.sam31_approval_uploads_recorded).toBeGreaterThanOrEqual(1);
+    expect(validationQueue.items).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        kind: 'sam31_approval_upload_validation',
+        evidence_id: bridgedUpload.id,
+        approval_upload_resolver_rows: expect.arrayContaining([
+          expect.objectContaining({
+            latest_approval_upload_intake: expect.objectContaining({
+              evidence_id: bridgedUpload.id,
+              source_official_flow_review_decision_evidence_id: decision.id,
+              source_official_flow_target_gate_code: 'AHJ_APPROVAL_MISSING',
+            }),
+            claim_gate_effect: 'no_claims_cleared',
+          }),
+        ]),
+      }),
+    ]));
+
+    const placeholderValidationRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/evidence/${bridgedUpload.id}/openclaw/sam31/approval-upload/gate-validation-decision`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        validation_decision: 'real_signed_evidence_validated',
+        validation_ref: 'ahj://placeholder-must-not-clear',
+      }),
+    });
+    expect(placeholderValidationRes.status).toBe(400);
+    const placeholderValidation = await placeholderValidationRes.json();
+    expect(placeholderValidation.error).toMatch(/placeholders cannot be validated as real signed evidence/i);
+
+    const summaryRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-queue`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(summaryRes.status).toBe(200);
+    const summaryQueue = await summaryRes.json();
+    expect(summaryQueue.summary.sam31_approval_upload_standalone_rows).toBeGreaterThanOrEqual(1);
+    expect(summaryQueue.summary.sam31_approval_upload_resolver_rows).toBeGreaterThanOrEqual(1);
+    expect(summaryQueue.summary.sam31_approval_uploads_recorded).toBeGreaterThanOrEqual(1);
+
+    const autosprinkBridgeRes = await fetch(`${BASE}/api/projects/${encodeURIComponent(projectName)}/resolver-packets/official-flow-review-decision/${decision.id}/sam31/default-approval-upload`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        targetGate: 'AUTOSPRINK_EVIDENCE_MISSING',
+        evidenceType: 'autosprink_packet',
+      }),
+    });
+    expect(autosprinkBridgeRes.status).toBe(400);
+    const autosprinkBridge = await autosprinkBridgeRes.json();
+    expect(autosprinkBridge.error).toMatch(/cannot be mirrored as a SAM31 approval-upload intake/i);
   }, 15000);
 
   it('shows official-flow signed-reviewer queue rows as cleared only for gates explicitly resolved with signed evidence', async () => {

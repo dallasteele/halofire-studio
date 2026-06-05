@@ -83,6 +83,11 @@ describe('workbench signed reviewer evidence detail rendering', () => {
     expect(html).toContain('signed_evidence_resolve_action');
     expect(html).toContain('action=resolve');
     expect(html).toContain('requires real signed evidence');
+    expect(html).toContain('Save default SAM31 approval upload + validation packet');
+    expect(html).toContain('data-official-flow-default-sam31-approval-upload');
+    expect(html).toContain('saveOfficialFlowDefaultSam31ApprovalUpload');
+    expect(html).toContain('default/internal-alpha placeholder');
+    expect(html).toContain('sam31ApprovalValidation=pending');
     expect(html).toContain('halofireUiBasePath');
     expect(html).toContain('halofireUiHref');
     expect(html).toContain("if (base && value.startsWith('/settings.html')) return base + value;");
