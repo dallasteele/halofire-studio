@@ -374,8 +374,26 @@ describe('Settings signed reviewer browser smoke', () => {
       expect(await page.locator('#wizPacketStatus').getAttribute('data-official-flow-upload-packet-no-claim-gates-cleared')).toBe('true');
       expect(await page.locator('#wizResolveAudit').isDisabled()).toBe(true);
 
+      await page.locator('#wizReviewerName').fill('Settings Upload Packet Resolver');
+      await page.locator('#wizReviewerTitle').fill('AHJ Reviewer');
+      await page.locator('#wizSignedAt').fill('2026-06-05T09:25');
+      await page.locator('#wizOrganization').fill('Halo Fire');
+      await page.locator('#wizLicenseId').fill('AHJ-UPLOAD-PACKET-SMOKE');
+      await page.locator('#wizSubmit').click();
+      await page.waitForFunction(() => document.getElementById('wizMsg')?.textContent?.includes('gate resolved with accepted evidence'));
+
+      const evidenceRows = await api(`/api/projects/${encodeURIComponent(projectName)}/evidence`, token);
+      const saved = evidenceRows.find((row) => row.evidence_type === targetEvidenceType
+        && row.source_ref === targetSourceRef);
+      expect(saved).toBeTruthy();
+      const savedNotes = JSON.parse(saved.notes);
+      expect(savedNotes.kind).toBe('signed_reviewer_evidence');
+      expect(savedNotes.claim_gate_effect).toBe('gate_cleared_after_explicit_signed_validation');
+      expect(savedNotes.settings_prefill_href).toContain('uploadPacketHref=');
+      expect(savedNotes.settings_prefill_href).toContain(encodeURIComponent(uploadPacketHref));
+
       const gates = await api(`/api/projects/${encodeURIComponent(projectName)}/claim-gates`, token);
-      expect(gates.find((gate) => gate.code === targetGateCode).status).toBe('blocked');
+      expect(gates.find((gate) => gate.code === targetGateCode).status).toBe('cleared');
     } finally {
       await page.close();
     }

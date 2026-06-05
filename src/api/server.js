@@ -556,7 +556,7 @@ app.get('/api/analytics/summary', authMiddleware, (req, res) => {
 // fail-closed: adding best-effort/AI evidence never flips a blocking gate to
 // cleared. Only a recorded human/professional/AHJ artifact can do that, and
 // that resolution path is intentionally not exposed as a casual write here.
-const EVIDENCE_INSERT_FIELDS = new Set(['evidence_type', 'source_file', 'source_ref', 'status', 'notes', 'signoff', 'target_gate_code']);
+const EVIDENCE_INSERT_FIELDS = new Set(['evidence_type', 'source_file', 'source_ref', 'status', 'notes', 'signoff', 'target_gate_code', 'settings_prefill_href']);
 
 // Only these real-world artifact types may clear a fail-closed claim gate.
 // AI/best-effort output is intentionally excluded — it can never clear a gate.
@@ -726,6 +726,7 @@ function buildSignedReviewerEvidenceNotes(
 ) {
   const normalizedGateCode = String(targetGateCode || '').trim().toUpperCase() || null;
   const claimGateEffect = String(options.claimGateEffect || 'no_claims_cleared');
+  const settingsPrefillHref = String(options.settingsPrefillHref || '').trim() || null;
   let gatePacket = null;
   if (normalizedGateCode) {
     const rule = gateEvidenceRule(normalizedGateCode);
@@ -741,6 +742,7 @@ function buildSignedReviewerEvidenceNotes(
     evidence_type: evidenceType,
     source_ref: sourceRef,
     signoff,
+    ...(settingsPrefillHref ? { settings_prefill_href: settingsPrefillHref } : {}),
     ...(gatePacket ? {
       target_gate_code: normalizedGateCode,
       required_evidence_type: gatePacket.required_evidence_type || evidenceType,
@@ -844,6 +846,7 @@ function hydrateSignedReviewerEvidenceRow(row, options = {}) {
     review_packet_artifact_type: parsedNotes.review_packet_artifact_type || (reviewPacketHref ? 'halofire.claim_gate_review_packet.v1' : null),
     resolve_audit_packet_href: resolveAuditPacketHref,
     resolve_audit_packet_artifact_type: parsedNotes.resolve_audit_packet_artifact_type || null,
+    settings_prefill_href: parsedNotes.settings_prefill_href || null,
     claim_gate_effect: parsedNotes.claim_gate_effect || null,
     user_notes: parsedNotes.user_notes || null,
   };
@@ -5958,7 +5961,16 @@ app.get('/api/projects/:name/evidence/:evidenceId/official-flow-hydraulic-replay
 app.post('/api/projects/:name/evidence', authMiddleware, requireRole('admin'), (req, res) => {
   const rejected = Object.keys(req.body).filter((key) => !EVIDENCE_INSERT_FIELDS.has(key));
   if (rejected.length) return res.status(400).json({ error: `Unsupported fields: ${rejected.join(', ')}` });
-  const { evidence_type, source_file = null, source_ref = null, status, notes = null, signoff, target_gate_code = null } = req.body;
+  const {
+    evidence_type,
+    source_file = null,
+    source_ref = null,
+    status,
+    notes = null,
+    signoff,
+    target_gate_code = null,
+    settings_prefill_href = null,
+  } = req.body;
   if (!evidence_type || !status) {
     return res.status(400).json({ error: 'evidence_type and status are required' });
   }
@@ -5973,6 +5985,7 @@ app.post('/api/projects/:name/evidence', authMiddleware, requireRole('admin'), (
         notes,
         normalizedSignoff,
         target_gate_code,
+        { settingsPrefillHref: settings_prefill_href },
       );
     }
   } catch (err) {
@@ -6078,7 +6091,10 @@ app.post('/api/projects/:name/claim-gates/:code/resolve', authMiddleware, requir
           parsedNotes?.user_notes || existingEvidence.notes,
           parsedNotes?.signoff,
           code,
-          { claimGateEffect: 'gate_cleared_after_explicit_signed_validation' },
+          {
+            claimGateEffect: 'gate_cleared_after_explicit_signed_validation',
+            settingsPrefillHref: parsedNotes?.settings_prefill_href || null,
+          },
         );
         db.prepare('UPDATE project_evidence SET notes = ? WHERE project_name = ? AND id = ?')
           .run(upgradedNotes, projectName, existingEvidence.id);
@@ -6106,7 +6122,13 @@ app.post('/api/projects/:name/claim-gates/:code/resolve', authMiddleware, requir
   if (!evidence || typeof evidence !== 'object') {
     return res.status(400).json({ error: 'Provide either evidence_id or a real evidence object to clear a gate' });
   }
-  const { evidence_type, source_ref = null, source_file = null, notes = null } = evidence;
+  const {
+    evidence_type,
+    source_ref = null,
+    source_file = null,
+    notes = null,
+    settings_prefill_href = null,
+  } = evidence;
   if (!evidence_type || !source_ref) {
     return res.status(400).json({ error: 'evidence.evidence_type and evidence.source_ref are required' });
   }
@@ -6138,7 +6160,10 @@ app.post('/api/projects/:name/claim-gates/:code/resolve', authMiddleware, requir
         notes,
         signoff,
         code,
-        { claimGateEffect: 'gate_cleared_after_explicit_signed_validation' },
+        {
+          claimGateEffect: 'gate_cleared_after_explicit_signed_validation',
+          settingsPrefillHref: settings_prefill_href,
+        },
       );
     }
   } catch (err) {

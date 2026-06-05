@@ -333,6 +333,18 @@ describe('Workbench official-flow browser smoke', () => {
       expect(decisionRowAfterRefreshText).toContain(`source_attachment_intake_packet_evidence_id ${packetEvidenceId}`);
       expect(decisionRowAfterRefreshText).toContain('source_attachment_intake_row_index 0');
       expect(decisionRowAfterRefreshText).toContain('Download signed evidence upload packet');
+
+      await decisionRowAfterRefresh.locator('[data-official-flow-signed-reviewer-resolve-workflow][data-official-flow-signed-reviewer-resolve-gate-code="AHJ_APPROVAL_MISSING"]').first().click();
+      await page.waitForURL((url) => url.pathname === '/settings.html' && url.hash === '#wizSignoff');
+      await page.waitForFunction(
+        () => document.getElementById('wizPacketStatus')?.dataset.officialFlowUploadPacketHref,
+      );
+      expect(page.url()).toContain('action=resolve');
+      expect(page.url()).toContain('gate=AHJ_APPROVAL_MISSING');
+      expect(page.url()).toContain('uploadPacketHref=');
+      expect(await page.locator('#wizType').inputValue()).toBe('ahj_approval');
+      expect(await page.locator('#wizSourceRef').inputValue()).toBe('ahj://default-1881/source-linked-flow');
+      expect(await page.locator('#wizPacketStatus').innerText()).toContain('Prefilled from halofire.official_flow_signed_evidence_upload_packet.v1');
     } finally {
       await page.close();
     }

@@ -373,6 +373,10 @@ function selectedEvidenceNeedsSignoff() {
   return Boolean(gate && (gate.requires_signoff_for || []).includes($('wizType').value));
 }
 
+function currentSettingsPrefillHref() {
+  return `${location.pathname}${location.search}${location.hash || '#wizSignoff'}`;
+}
+
 function prefillEvidenceWizardFromUrl() {
   const params = new URLSearchParams(window.location.search);
   return {
@@ -817,6 +821,7 @@ $('wizSubmit').onclick = async () => {
   if (!source_ref) { msg.className = 'err'; msg.textContent = 'enter an evidence source reference'; return; }
   const projectName = $('wizProject').value;
   const payload = { evidence_type, source_ref, ...(source_file ? { source_file } : {}), ...(notes ? { notes } : {}) };
+  if (wizardUrlPrefill.uploadPacketHref) payload.settings_prefill_href = currentSettingsPrefillHref();
   try {
     const signoff = selectedEvidenceNeedsSignoff() ? wizardSignoffPayload() : null;
     if (signoff) payload.signoff = signoff; // Preserve reviewer metadata even when recording evidence only.

@@ -59,6 +59,7 @@ describe('workbench signed reviewer evidence detail rendering', () => {
     expect(html).toContain('required_evidence_type');
     expect(html).toContain('review_packet_href');
     expect(html).toContain('review_packet_artifact_type');
+    expect(html).toContain('settings_prefill_href');
     expect(html).toContain('resolve_audit_packet_href');
     expect(html).toContain('resolve_audit_packet_artifact_type');
     expect(html).toContain('Download resolve audit packet');
@@ -69,7 +70,9 @@ describe('workbench signed reviewer evidence detail rendering', () => {
     expect(html).toContain('Resolve audit packet unavailable until explicit gate resolution.');
     expect(html).toContain('downloadSignedReviewerResolveAuditPacket');
     expect(html).toContain('Open signed reviewer workflow');
+    expect(html).toContain('Open Settings packet prefill');
     expect(html).toContain('openSignedReviewerWorkflow');
+    expect(html).toContain('data-signed-reviewer-workflow-href');
     expect(html).toContain('Open pending signed-reviewer queue');
     expect(html).toContain('openOfficialFlowSignedReviewerValidationQueue');
     expect(html).toContain('officialFlowReviewDecisionEvidenceId');
