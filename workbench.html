@@ -202,6 +202,7 @@ let latestSam31ActualValueReplacementReadbackEvidence = null;
 let latestSam31ActualValueResolverQueueReadback = null;
 let lastSam31ActualValueResolverReplay = null;
 let catalogSourceRecordResults = {};
+let catalogApprovalValidationResults = {};
 const SAM31_ACTUAL_VALUE_GLOBAL_READBACK_ROUTE = '/api/openclaw/sam31/actual-value-resolver-queue?projectName=';
 const SAM31_ACTUAL_VALUE_SERVICE_DESCRIPTOR_ROUTE = '/api/openclaw/sam31/actual-value-service?projectName=';
 const SAM31_ACTUAL_VALUE_REPLACEMENT_READBACK_ROUTE = '/api/openclaw/sam31/actual-value-replacements?projectName=';
@@ -4181,6 +4182,22 @@ function catalogSourceRecordStatusMarkup(statusId, familyRef, componentKey) {
     data-no-claim-gates-cleared="${escapeHtml(record.noClaimGatesCleared === false ? 'false' : 'true')}">Recorded catalog_source_acquisition evidence #${escapeHtml(String(record.evidenceId || ''))}; claim gates still blocked.</div>`;
 }
 
+function catalogApprovalValidationKey(projectName, familyRef, rowKey) {
+  return [projectName || currentProjectName(), familyRef || '', rowKey || ''].join('::');
+}
+
+function catalogApprovalValidationStatusMarkup(statusId, familyRef, rowKey) {
+  const record = catalogApprovalValidationResults[catalogApprovalValidationKey(currentProjectName(), familyRef, rowKey)] || null;
+  if (!record) return `<div class="muted" id="${statusId}" style="font-size:11px"></div>`;
+  return `<div class="muted" id="${statusId}" style="font-size:11px"
+    data-catalog-approval-validation-evidence-id="${escapeHtml(String(record.evidenceId || ''))}"
+    data-catalog-approval-validation-family-ref="${escapeHtml(record.familyRef || '')}"
+    data-catalog-approval-validation-gate-code="${escapeHtml(record.targetGateCode || '')}"
+    data-catalog-approval-validation-source-ref="${escapeHtml(record.sourceRef || '')}"
+    data-claim-gate-effect="${escapeHtml(record.claimGateEffect || 'gate_cleared_after_explicit_signed_validation')}"
+    data-no-unrelated-claim-gates-cleared="${escapeHtml(record.noUnrelatedClaimGatesCleared === false ? 'false' : 'true')}">Validated catalog approval gate ${escapeHtml(record.targetGateCode || 'target gate missing')} with evidence #${escapeHtml(String(record.evidenceId || ''))}; unrelated claim gates still blocked.</div>`;
+}
+
 function catalogSourceRowDetail(row) {
   const claims = Array.isArray(row.blocked_claims) ? row.blocked_claims : [];
   const rejected = Array.isArray(row.rejected_candidates) ? row.rejected_candidates : [];
@@ -4372,6 +4389,7 @@ function syncCatalogApprovalGateOptions(rowKey) {
 
 function renderCatalogSourceApprovalValidation(defaults) {
   const rowKey = escapeHtml(defaults.family_ref || defaults.component_key || 'unknown');
+  const statusId = `catalogApprovalValidationStatus-${rowKey}`;
   return `<details style="margin-top:8px">
     <summary class="muted" style="cursor:pointer">Validate catalog approval refs</summary>
     <div style="display:grid;gap:6px;margin-top:8px">
@@ -4394,7 +4412,7 @@ ${renderCatalogApprovalGateOptions()}
       <textarea id="catalogApprovalNotes-${rowKey}" placeholder="notes" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px;font-size:11px;height:44px"></textarea>
       <button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#0f766e" data-catalog-source-approval-packet-family-ref="${escapeHtml(defaults.family_ref || '')}" data-catalog-source-approval-packet-row-key="${rowKey}">Download selected approval packet</button>
       <button class="go" type="button" style="padding:7px 10px;font-size:11px;background:#15803d" data-catalog-source-approval-family-ref="${escapeHtml(defaults.family_ref || '')}" data-catalog-source-approval-row-key="${rowKey}" data-catalog-source-approval-action="Upload signed manufacturer model approval">Upload signed manufacturer model approval</button>
-      <div class="muted" id="catalogApprovalValidationStatus-${rowKey}" style="font-size:11px"></div>
+      ${catalogApprovalValidationStatusMarkup(statusId, defaults.family_ref || '', rowKey)}
     </div>
   </details>`;
 }
@@ -4422,7 +4440,25 @@ async function validateCatalogSourceApproval(button) {
       method: 'POST',
       body: JSON.stringify(body),
     });
-    if (status) status.textContent = 'Validated catalog approval gate ' + saved.code + ' with evidence #' + saved.resolved_evidence_id + '.';
+    const result = {
+      evidenceId: saved.resolved_evidence_id,
+      familyRef: saved.family_ref || familyRef,
+      rowKey,
+      targetGateCode: saved.code || body.target_gate_code,
+      sourceRef: saved.resolved_evidence_ref || body.source_ref,
+      claimGateEffect: saved.evidence_notes?.claim_gate_effect || 'gate_cleared_after_explicit_signed_validation',
+      noUnrelatedClaimGatesCleared: true,
+    };
+    catalogApprovalValidationResults[catalogApprovalValidationKey(currentProjectName(), result.familyRef, rowKey)] = result;
+    if (status) {
+      status.textContent = 'Validated catalog approval gate ' + result.targetGateCode + ' with evidence #' + result.evidenceId + '; unrelated claim gates still blocked.';
+      status.dataset.catalogApprovalValidationEvidenceId = String(result.evidenceId || '');
+      status.dataset.catalogApprovalValidationFamilyRef = result.familyRef || '';
+      status.dataset.catalogApprovalValidationGateCode = result.targetGateCode || '';
+      status.dataset.catalogApprovalValidationSourceRef = result.sourceRef || '';
+      status.dataset.claimGateEffect = result.claimGateEffect || 'gate_cleared_after_explicit_signed_validation';
+      status.dataset.noUnrelatedClaimGatesCleared = 'true';
+    }
     await refreshClaimGates();
     await refreshEvidence();
     await refreshResolverQueue();

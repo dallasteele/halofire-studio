@@ -159,4 +159,94 @@ describe('Workbench catalog source browser smoke', () => {
       await page.close();
     }
   }, 30_000);
+
+  it('validates signed catalog approval evidence with explicit target-gate readback only', async () => {
+    const token = await adminToken();
+    const page = await browser.newPage();
+    page.setDefaultTimeout(8000);
+    await page.addInitScript((authToken) => {
+      localStorage.setItem('halofire_token', authToken);
+    }, token);
+
+    try {
+      await page.goto(`${BASE}/workbench.html?project=${encodeURIComponent(PROJECT_NAME)}#catalogSourceAcquisition`, {
+        waitUntil: 'domcontentloaded',
+      });
+      const approvalButton = page.locator(`[data-catalog-source-approval-family-ref="${FAMILY_REF}"]`).first();
+      await approvalButton.waitFor({ state: 'attached' });
+      await approvalButton.evaluate((button) => {
+        const details = button.closest('details');
+        if (details) details.open = true;
+      });
+      const rowKey = await approvalButton.getAttribute('data-catalog-source-approval-row-key');
+      const statusId = `catalogApprovalValidationStatus-${rowKey}`;
+      const sourceRef = 'manufacturer://catalog-source-browser-smoke/pipe-sch40-2in/signed-model-approval';
+      await page.locator(`[id="catalogApprovalSourceRef-${rowKey}"]`).fill(sourceRef);
+      await page.locator(`[id="catalogApprovalSourceFile-${rowKey}"]`).fill('catalog-source-browser-smoke-manufacturer-approval.pdf');
+      await page.locator(`[id="catalogApprovalReviewerName-${rowKey}"]`).fill('Codex Catalog Approval Smoke');
+      await page.locator(`[id="catalogApprovalReviewerTitle-${rowKey}"]`).fill('Manufacturer Technical Reviewer');
+      await page.locator(`[id="catalogApprovalSignedAt-${rowKey}"]`).fill('2026-06-05T05:45:00.000Z');
+      await page.locator(`[id="catalogApprovalOrganization-${rowKey}"]`).fill('Halo Fire');
+      await page.locator(`[id="catalogApprovalLicenseId-${rowKey}"]`).fill('MFG-CATALOG-SMOKE-001');
+      await page.locator(`[id="catalogApprovalNotes-${rowKey}"]`).fill('Browser smoke signed manufacturer approval. Explicit target-gate validation only.');
+      await approvalButton.click();
+
+      const status = page.locator(`[id="${statusId}"]`);
+      await page.waitForFunction(
+        (targetStatusId) => {
+          const node = document.getElementById(targetStatusId);
+          return node?.dataset.catalogApprovalValidationEvidenceId
+            && node?.dataset.claimGateEffect === 'gate_cleared_after_explicit_signed_validation';
+        },
+        statusId,
+      );
+
+      const evidenceId = await status.getAttribute('data-catalog-approval-validation-evidence-id');
+      expect(evidenceId).toMatch(/^\d+$/);
+      expect(await status.getAttribute('data-catalog-approval-validation-family-ref')).toBe(FAMILY_REF);
+      expect(await status.getAttribute('data-catalog-approval-validation-gate-code')).toBe('MANUFACTURER_MODEL_APPROVAL_MISSING');
+      expect(await status.getAttribute('data-catalog-approval-validation-source-ref')).toBe(sourceRef);
+      expect(await status.getAttribute('data-claim-gate-effect')).toBe('gate_cleared_after_explicit_signed_validation');
+      expect(await status.getAttribute('data-no-unrelated-claim-gates-cleared')).toBe('true');
+      expect(await status.innerText()).toContain(`Validated catalog approval gate MANUFACTURER_MODEL_APPROVAL_MISSING with evidence #${evidenceId}`);
+      expect(await status.innerText()).toContain('unrelated claim gates still blocked');
+
+      const evidenceRows = await api(`${PROJECT_PATH}/evidence`, token);
+      const saved = evidenceRows.find((row) => String(row.id) === evidenceId);
+      expect(saved).toEqual(expect.objectContaining({
+        evidence_type: 'manufacturer_approval',
+        source_ref: sourceRef,
+        source_file: 'catalog-source-browser-smoke-manufacturer-approval.pdf',
+        status: 'present',
+      }));
+      const notes = JSON.parse(saved.notes);
+      expect(notes).toEqual(expect.objectContaining({
+        kind: 'catalog_source_approval_validation',
+        family_ref: FAMILY_REF,
+        component_key: 'pipe_sch40',
+        approval_ref_field: 'manufacturer_model_approval_ref',
+        target_gate_code: 'MANUFACTURER_MODEL_APPROVAL_MISSING',
+        source_ref: sourceRef,
+        claim_gate_effect: 'gate_cleared_after_explicit_signed_validation',
+      }));
+      expect(notes.signoff).toEqual(expect.objectContaining({
+        reviewer_name: 'Codex Catalog Approval Smoke',
+        reviewer_title: 'Manufacturer Technical Reviewer',
+        license_id: 'MFG-CATALOG-SMOKE-001',
+      }));
+
+      const gates = await api(`${PROJECT_PATH}/claim-gates`, token);
+      expect(gates.find((gate) => gate.code === 'MANUFACTURER_MODEL_APPROVAL_MISSING')).toEqual(
+        expect.objectContaining({ status: 'cleared' }),
+      );
+      expect(gates.find((gate) => gate.code === 'AUTOSPRINK_EVIDENCE_MISSING')).toEqual(
+        expect.objectContaining({ status: 'blocked' }),
+      );
+      expect(gates.find((gate) => gate.code === 'AHJ_APPROVAL_MISSING')).toEqual(
+        expect.objectContaining({ status: 'blocked' }),
+      );
+    } finally {
+      await page.close();
+    }
+  }, 30_000);
 });
