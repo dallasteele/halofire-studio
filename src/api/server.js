@@ -17548,6 +17548,9 @@ function claimGateResolveAuditQueueItems(projectName) {
       resolved_evidence_id: evidence?.id || evidenceId,
       resolved_evidence_ref: gate.resolved_evidence_ref || evidence?.source_ref || null,
       resolved_evidence_type: evidence?.evidence_type || null,
+      resolved_evidence_settings_href: evidenceId
+        ? `/settings.html?project=${encodeURIComponent(projectName)}&gate=${encodeURIComponent(gate.code)}&evidenceId=${encodeURIComponent(String(evidenceId))}&action=inspect#wizSignoff`
+        : null,
       audit_packet_action: auditPacketAction,
       download_href: auditPacketAction.href,
       download_name: auditPacketAction.download_name,

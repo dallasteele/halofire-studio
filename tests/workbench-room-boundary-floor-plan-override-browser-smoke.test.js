@@ -240,6 +240,35 @@ describe('Workbench room-boundary floor-plan override browser smoke', () => {
           && text.includes('halofire.claim_gate_resolve_audit_packet.v1');
       }, String(approvalValidationDecision.evidence_id));
 
+      const clearedAuditInspectButton = page.locator(
+        `[data-claim-gate-resolved-evidence-inspect="${approvalValidationDecision.evidence_id}"]`,
+      ).first();
+      await clearedAuditInspectButton.waitFor({ state: 'attached' });
+      expect(await clearedAuditInspectButton.innerText()).toContain('Open accepted evidence read-only');
+      expect(await clearedAuditInspectButton.getAttribute('data-signed-reviewer-workflow-action')).toBe('inspect');
+      expect(await clearedAuditInspectButton.getAttribute('data-signed-reviewer-workflow-gate-code')).toBe(gateCode);
+
+      await clearedAuditInspectButton.click();
+      await page.waitForURL((url) => url.pathname === '/settings.html' && url.hash === '#wizSignoff');
+      await page.waitForFunction(
+        (resolvedEvidenceId) => document.getElementById('wizPacketStatus')?.dataset.signedReviewerReadonlyEvidenceId === resolvedEvidenceId,
+        String(approvalValidationDecision.evidence_id),
+      );
+      expect(page.url()).toContain(`project=${encodeURIComponent(PROJECT_NAME)}`);
+      expect(page.url()).toContain(`gate=${gateCode}`);
+      expect(page.url()).toContain(`evidenceId=${approvalValidationDecision.evidence_id}`);
+      expect(page.url()).toContain('action=inspect');
+      expect(await page.locator('#wizPacketStatus').innerText()).toContain('Read-only accepted signed reviewer evidence');
+      expect(await page.locator('#wizGate').inputValue()).toBe(gateCode);
+      expect(await page.locator('#wizSubmit').isDisabled()).toBe(true);
+
+      await page.goto(`${BASE}/workbench.html?project=${encodeURIComponent(PROJECT_NAME)}#resolverQueue`, { waitUntil: 'domcontentloaded' });
+      await page.locator('[data-resolver-queue-filter="claimGateAudit=cleared"]').first().click();
+      await page.waitForFunction((decisionEvidenceId) => {
+        const text = document.getElementById('resolverQueue')?.innerText || '';
+        return text.includes(`resolved_evidence_id ${decisionEvidenceId}`);
+      }, String(approvalValidationDecision.evidence_id));
+
       const saveAuditEvidence = page.locator(`[data-claim-gate-resolve-audit-save-evidence-id="${approvalValidationDecision.evidence_id}"]`).first();
       await saveAuditEvidence.waitFor({ state: 'attached' });
       expect(await saveAuditEvidence.getAttribute('data-claim-gate-resolve-audit-gate-code')).toBe(gateCode);
