@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HaloFire Studio — Sprinkler CAD (Internal Alpha)</title>
+<style>
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --bg:#0b0b0e;--panel:#141418;--panel2:#1c1c22;--line:rgba(255,255,255,.08);
+    --fire:#E53935;--blue:#3b82f6;--cyan:#22d3ee;--gold:#FFD54F;--green:#4ade80;
+    --text:#d4d4d8;--muted:#71717a;--bright:#fafafa;
+    --font:'Inter',system-ui,sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace;
+  }
+  html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--font)}
+  #app{display:grid;grid-template-columns:248px 1fr 312px;grid-template-rows:48px 1fr;height:100vh}
+  header{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:var(--panel);border-bottom:1px solid var(--line)}
+  .brand{font-weight:900;font-style:italic;font-size:17px;color:var(--bright)}
+  .brand span{color:var(--fire)}
+  .brand small{font-style:normal;font-weight:600;font-size:10px;color:var(--muted);letter-spacing:1px;margin-left:8px}
+  header .right{display:flex;align-items:center;gap:10px}
+  .badge{font-family:var(--mono);font-size:10px;color:var(--gold);border:1px solid rgba(255,213,79,.35);border-radius:99px;padding:3px 9px}
+  .seg{display:flex;border:1px solid var(--line);border-radius:7px;overflow:hidden}
+  .seg button{background:var(--panel2);color:var(--muted);border:none;padding:5px 11px;font-size:12px;cursor:pointer}
+  .seg button.on{background:var(--blue);color:#fff}
+  aside{background:var(--panel);overflow-y:auto;padding:14px}
+  aside.left{border-right:1px solid var(--line)}
+  aside.right{border-left:1px solid var(--line)}
+  h3{font-size:11px;text-transform:uppercase;letter-spacing:1.4px;color:var(--muted);margin:16px 0 8px;font-weight:700}
+  h3:first-child{margin-top:0}
+  label{display:block;font-size:11px;color:var(--muted);margin:8px 0 3px}
+  select,input,textarea{width:100%;background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:7px;padding:7px 9px;font-size:12px;font-family:var(--font)}
+  textarea{font-family:var(--mono);font-size:10px;height:74px;resize:vertical}
+  button.act{width:100%;background:var(--fire);color:#fff;border:none;border-radius:8px;padding:10px;font-weight:700;cursor:pointer;font-size:13px;margin-top:10px}
+  button.act:hover{filter:brightness(1.1)} button.act:disabled{opacity:.5;cursor:wait}
+  button.ghost{background:var(--panel2);color:var(--text);border:1px solid var(--line)}
+  #canvasWrap{position:relative;background:#08080b}
+  #canvas{width:100%;height:100%;display:block}
+  #legend{position:absolute;left:12px;bottom:12px;font-family:var(--mono);font-size:10px;color:var(--muted);background:rgba(8,8,11,.7);border:1px solid var(--line);border-radius:6px;padding:8px 10px;line-height:1.7}
+  .sw{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px;vertical-align:middle}
+  #status{position:absolute;right:12px;top:12px;font-family:var(--mono);font-size:10px;color:var(--muted)}
+  .layer{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:12px}
+  .layer input{width:auto}
+  .kv{display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px solid var(--line)}
+  .kv b{font-family:var(--mono);color:var(--bright)}
+  table{width:100%;border-collapse:collapse;font-size:11px;margin-top:6px}
+  td,th{text-align:left;padding:3px 4px;border-bottom:1px solid var(--line)}
+  th{color:var(--muted);font-size:9px;text-transform:uppercase}
+  td.n{text-align:right;font-family:var(--mono)}
+  .total{font-size:20px;font-weight:900;color:var(--green);font-family:var(--mono)}
+  .est{color:var(--gold);font-size:10px;font-family:var(--mono)}
+  .warn{font-size:10px;color:var(--gold);font-family:var(--mono);line-height:1.5;margin-top:8px}
+  a.link{color:var(--cyan);text-decoration:none;font-size:11px}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="brand">Halo<span>Fire</span> Studio <small>SPRINKLER CAD · OpenGeometry</small></div>
+    <div class="right">
+      <span class="badge">INTERNAL ALPHA · NOT AHJ/PE/AutoSprink parity</span>
+      <div class="seg" id="viewSeg">
+        <button data-view="iso" class="on">3D</button>
+        <button data-view="top">Plan</button>
+      </div>
+      <button id="demoBtn" title="Animate the structure + sprinkler system rising out of the plan">▶ Demo</button>
+      <a class="link" href="/workbench.html">Workbench →</a>
+      <a class="link" href="/settings.html">Settings &amp; Parity</a>
+    </div>
+  </header>
+
+  <aside class="left">
+    <h3>Floor Plan</h3>
+    <label>Project target</label>
+    <select id="projectTarget">
+      <option value="Home Depot - Rexburg ID">Home Depot - Rexburg ID</option>
+      <option value="The Cooperative 1881 - Salt Lake City UT">The Cooperative 1881 - Salt Lake City UT</option>
+    </select>
+    <label>Source</label>
+    <select id="planSource">
+      <option value="builtin">Selected project built-in plan</option>
+      <option value="svg">Import SVG (single space)…</option>
+      <option value="building">Building drawing (multi-space SVG)…</option>
+      <option value="dxf">Import DXF (single space)…</option>
+      <option value="building-dxf">Building drawing (multi-space DXF)…</option>
+      <option value="pdf">Import vector PDF (plan set)…</option>
+    </select>
+    <div id="svgBox" style="display:none">
+      <label>Feet per drawing unit</label>
+      <input id="unitsPerPx" type="number" value="1" step="0.1">
+      <label id="drawingLabel">SVG (rect / polygon / path)</label>
+      <textarea id="svgInput" placeholder='&lt;svg&gt;&lt;rect x="0" y="0" width="60" height="40" data-hazard="ordinary"/&gt;&lt;/svg&gt;'></textarea>
+    </div>
+    <div id="pdfBox" style="display:none">
+      <label>PDF page (0-based index)</label>
+      <input id="pdfPageIndex" type="number" value="0" min="0" step="1">
+      <label>Drawing scale (feet per PDF point)</label>
+      <input id="pdfScale" type="number" value="" step="0.001" placeholder="e.g. 0.0833 (1 pt = 1 in @ 1:1)">
+      <label>Extraction mode</label>
+      <select id="pdfExtract">
+        <option value="vector">Whole vector bbox</option>
+        <option value="dominant">Dominant plan cluster</option>
+        <option value="fullExtent">Full plan extent</option>
+        <option value="outline">Wall-network outline</option>
+        <option value="wallLayer">Lineweight/color wall layer</option>
+        <option value="sam">OpenClaw/SAM 3.1 if reachable</option>
+      </select>
+      <label>Vector PDF plan</label>
+      <input id="pdfFile" type="file" accept="application/pdf,.pdf">
+      <button class="act ghost" id="pdfInspectBtn" type="button">Inspect pages</button>
+      <div id="pdfPageList" style="font-size:10px;margin-top:6px;color:var(--muted)"></div>
+      <iframe id="pdfPreview" title="Selected PDF page preview" style="width:100%;height:170px;margin-top:6px;border:1px solid var(--line);border-radius:7px;background:var(--panel2)"></iframe>
+      <button class="act ghost" id="pdfCandidateBtn" type="button">Review boundary candidates</button>
+      <div id="pdfBoundaryCandidates" style="font-size:10px;margin-top:6px;color:var(--muted)"></div>
+      <button class="act ghost" id="pdfDecisionBtn" type="button">Save selected boundary decision</button>
+      <button class="act ghost" id="pdfDecisionLoadBtn" type="button">Load saved boundary decision</button>
+      <div id="pdfDecisionStatus" style="font-size:10px;margin-top:6px;color:var(--muted)"></div>
+      <p style="font-size:11px;opacity:.75;margin:6px 0 0">
+        Extracts the plan's real vector geometry. The footprint shown is a
+        best-effort <b>bbox of the extracted geometry</b> — not a full room
+        segmentation, and not an AHJ/PE/accurate drawing. The scale is
+        operator-supplied (never guessed); enter the drawing's real scale.
+      </p>
+    </div>
+
+    <h3>Design Basis</h3>
+    <label>Hazard class (NFPA 13)</label>
+    <select id="hazard">
+      <option value="">From plan</option>
+      <option value="light">Light Hazard</option>
+      <option value="ordinary">Ordinary Hazard</option>
+      <option value="extra">Extra Hazard</option>
+    </select>
+    <label>Markup %</label>
+    <input id="markup" type="number" value="25" min="0" max="100">
+
+    <button class="act" id="genBtn">Generate Layout</button>
+    <h3>Export (CAD interchange)</h3>
+    <button class="act ghost" id="dxfBtn" disabled>DXF (AutoCAD)</button>
+    <button class="act ghost" id="stepBtn" disabled>STEP (.step)</button>
+    <button class="act ghost" id="ifcBtn" disabled>IFC (BIM)</button>
+    <button class="act ghost" id="stlBtn" disabled>STL (mesh)</button>
+    <div class="warn" id="exportMsg"></div>
+
+    <h3>View</h3>
+    <div class="layer"><input type="checkbox" id="exaggerate" checked><label for="exaggerate" style="margin:0;color:var(--text)">Exaggerate pipe radius (×6)</label></div>
+    <p class="muted" style="font-size:10px;margin-top:4px">Off = true NFPA pipe scale (thin at building scale).</p>
+    <h3>Layers</h3>
+    <div id="layers"></div>
+  </aside>
+
+  <div id="canvasWrap">
+    <canvas id="canvas"></canvas>
+    <div id="status">initializing OpenGeometry kernel…</div>
+    <div id="legend">
+      <div><span class="sw" style="background:#6b7280"></span>building shell</div>
+      <div><span class="sw" style="background:#E53935"></span>cross-main / riser</div>
+      <div><span class="sw" style="background:#3b82f6"></span>branch lines</div>
+      <div><span class="sw" style="background:#22d3ee"></span>drops</div>
+      <div><span class="sw" style="background:#ff3b30"></span>sprinkler heads</div>
+    </div>
+  </div>
+
+  <aside class="right">
+    <h3>Layout</h3>
+    <div id="layout"><span class="muted" style="font-size:12px">Generate a layout to begin.</span></div>
+    <h3>Pipe Schedule (NFPA-13)</h3>
+    <div id="pipes"><span class="muted" style="font-size:12px">—</span></div>
+    <h3>Hydraulics (NFPA-13, est.)</h3>
+    <div id="hydraulics"><span class="muted" style="font-size:12px">—</span></div>
+    <h3>Compliance (NFPA-13, geometric)</h3>
+    <div id="compliance"><span class="muted" style="font-size:12px">—</span></div>
+    <h3>Auto Bid</h3>
+    <div id="bid"></div>
+    <div id="bom"></div>
+    <div class="warn" id="warn"></div>
+    <h3>Submittal</h3>
+    <button id="submitBtn" disabled style="width:100%;margin-bottom:4px">Download submittal (.json)</button>
+    <div class="muted" style="font-size:10px">Best-effort internal-alpha package — NOT a stamped/sealed submittal, NOT AHJ/PE approved, NOT permit-ready.</div>
+  </aside>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "/vendor/three/build/three.module.js",
+    "three/examples/jsm/": "/vendor/three/examples/jsm/",
+    "opengeometry": "/vendor/opengeometry/index.js"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
+import { OpenGeometry, Vector3, Cuboid, Cylinder, Opening, OGSceneManager } from 'opengeometry';
+import { planOrthoFrustum, planCenter } from '/src/engine/plan-view.js';
+import { demoTimeline } from '/src/engine/demo-timeline.js';
+import { summarizeExportArtifact, buildExportProofMessage } from '/src/ui/export-proof.js';
+
+const HOME_DEPOT = 'Home Depot - Rexburg ID';
+const token = localStorage.getItem('halofire_token');
+if (!token) location.href = '/';
+const usd = (n) => '$' + Number(n).toLocaleString('en-US', { maximumFractionDigits: 0 });
+const $ = (id) => document.getElementById(id);
+function currentProjectName() {
+  return $('projectTarget') ? $('projectTarget').value : HOME_DEPOT;
+}
+
+function api(path, options = {}) {
+  return fetch('/api' + path, {
+    ...options,
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token, ...(options.headers || {}) },
+  }).then(async (r) => {
+    if (r.status === 401) { localStorage.removeItem('halofire_token'); location.href = '/'; throw new Error('unauth'); }
+    if (!r.ok) throw new Error(await r.text());
+    return r.json();
+  });
+}
+
+// ── OpenGeometry / Three scene ──
+const COLORS = { WALLS: 0x6b7280, WALLS_INT: 0x9aa3b2, COLUMN: 0x8a8f98, FLOOR: 0x16161c, MAIN: 0xE53935, BRANCH: 0x3b82f6, DROPS: 0x22d3ee, HEADS: 0xff3b30, COMPONENTS: 0xfbbf24 };
+// Viewer pipe-radius exaggeration (true-scale=1). CAD-structural geometry
+// (walls/mains/branches/riser) is built on the OpenGeometry kernel; the many
+// identical heads + drops are drawn with Three InstancedMesh for performance at
+// 900+ count. The full kernel model (incl. heads/drops) is rebuilt on-demand at
+// export time (buildExportScene), so STEP/IFC/STL stay complete & true-scale.
+let pipeVizScale = 6;
+let renderer, scene, perspCam, orthoCam, camera, controls, ogReady = false;
+const layerGroups = {};
+let modelGroup, currentCadModel = null;
+// R3: real CAD part mesh for sprinkler heads, loaded from the parts library
+// (GET /api/parts -> /parts/<key>.stl). Falls back to a primitive when no part
+// is available. Generated parts are best-effort, NOT manufacturer-exact.
+let headPartGeo = null, partsSource = 'primitive';
+let partsManifest = null;          // cached GET /api/parts response
+const partGeoCache = {};           // componentKey -> normalized BufferGeometry | null (attempted)
+
+// Normalize a loaded STL: center at origin, OpenSCAD Z-up -> three Y-up, scale to ~targetFt.
+function normalizePartGeo(geo, targetFt) {
+  geo.computeBoundingBox();
+  const bb = geo.boundingBox, size = new THREE.Vector3(), center = new THREE.Vector3();
+  bb.getSize(size); bb.getCenter(center);
+  geo.translate(-center.x, -center.y, -center.z);
+  geo.rotateX(-Math.PI / 2);
+  const maxDim = Math.max(size.x, size.y, size.z) || 1;
+  const sc = targetFt / maxDim; geo.scale(sc, sc, sc); geo.computeVertexNormals();
+  return geo;
+}
+
+// Load + cache the part mesh for a registry component key (best-effort, fail-soft).
+// Returns the normalized geometry, or null (caller renders a marked primitive).
+async function loadPartGeo(key, targetFt) {
+  if (key in partGeoCache) return partGeoCache[key];
+  partGeoCache[key] = null; // mark attempted up-front
+  try {
+    if (!partsManifest) partsManifest = await api('/parts');
+    const entry = (partsManifest.components || []).find((c) => c.key === key && c.present && c.file);
+    if (!entry) return null;
+    const geo = normalizePartGeo(await new STLLoader().loadAsync('/' + String(entry.file).replace(/^\/+/, '')), targetFt);
+    partGeoCache[key] = geo;
+    return geo;
+  } catch (e) { return null; }
+}
+
+// Preload the head part mesh at init so the first render shows real heads.
+async function loadPartMeshes() {
+  headPartGeo = await loadPartGeo('head_pendent', 1.0);
+  const entry = partsManifest && (partsManifest.components || []).find((c) => c.key === 'head_pendent');
+  partsSource = headPartGeo ? (entry && entry.source === 'catalog' ? 'catalog' : 'generated') : 'primitive';
+}
+
+async function initStudio() {
+  const canvas = $('canvas');
+  const w = canvas.clientWidth, h = canvas.clientHeight;
+  // preserveDrawingBuffer lets us capture the WebGL canvas to a PNG for headless
+  // visual verification (the continuous rAF loop makes preview_screenshot hang).
+  renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true });
+  renderer.setSize(w, h, false);
+  renderer.setPixelRatio(window.devicePixelRatio);
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x08080b);
+  perspCam = new THREE.PerspectiveCamera(50, w / h, 0.1, 20000);
+  orthoCam = new THREE.OrthographicCamera(-100, 100, 100, -100, 0.1, 20000);
+  camera = perspCam;
+  controls = new OrbitControls(camera, renderer.domElement);
+  scene.add(new THREE.AmbientLight(0xffffff, 0.75));
+  const d = new THREE.DirectionalLight(0xffffff, 0.9); d.position.set(300, 600, 400); scene.add(d);
+  scene.add(new THREE.GridHelper(2000, 80, 0x222228, 0x18181c));
+  (function loop() { requestAnimationFrame(loop); controls.update(); renderer.render(scene, camera); })();
+  // Headless capture hook: render at a capped size + return a compact JPEG data URL
+  // for visual verification (the rAF loop makes preview_screenshot hang). Restores
+  // the live canvas size via onResize() afterward.
+  window.__snapshot = (mw = 760, mh = 500, q = 0.6) => {
+    renderer.setSize(mw, mh, false); renderer.render(scene, camera);
+    const d = renderer.domElement.toDataURL('image/jpeg', q);
+    onResize();
+    return d;
+  };
+  window.addEventListener('resize', onResize);
+  await OpenGeometry.create({ wasmURL: '/vendor/opengeometry/opengeometry_bg.wasm' });
+  ogReady = true;
+  await loadPartMeshes(); // best-effort; heads render as a real part mesh when available
+  $('status').textContent = 'OpenGeometry ready' + (headPartGeo ? ` · head part: ${partsSource}` : '');
+}
+function onResize() {
+  const c = $('canvas'); const w = c.clientWidth, h = c.clientHeight;
+  renderer.setSize(w, h, false);
+  perspCam.aspect = w / h; perspCam.updateProjectionMatrix();
+  // Re-fit the plan ortho frustum to the new aspect so the drawing stays framed.
+  if (camera === orthoCam && window._frame && window._frame.bbox) {
+    const b = window._frame.bbox; fitPlanOrtho(b.minX, b.maxX, b.minY, b.maxY, (w / h) || 1.5);
+  }
+}
+
+const W = ([x, y, z]) => [x, z, y]; // cad (planX,planY,elevZ) -> world Y-up
+function pipeRot(aw, bw) {
+  const dx = Math.abs(bw[0]-aw[0]), dy = Math.abs(bw[1]-aw[1]), dz = Math.abs(bw[2]-aw[2]);
+  if (dy >= dx && dy >= dz) return [0,0,0];
+  if (dx >= dz) return [0,0,Math.PI/2];
+  return [Math.PI/2,0,0];
+}
+function layerOf(role) {
+  if (role === 'branch') return 'BRANCH';
+  if (role === 'drop') return 'DROPS';
+  return 'MAIN'; // main, main-tie, riser
+}
+function addPipe(s) {
+  if (s.role === 'drop') return; // drops are instanced in renderModel for perf
+  const aw = W(s.from), bw = W(s.to);
+  const len = Math.hypot(bw[0]-aw[0], bw[1]-aw[1], bw[2]-aw[2]);
+  if (len < 1e-3) return;
+  const [rx, ry, rz] = pipeRot(aw, bw);
+  const layer = layerOf(s.role);
+  const cyl = new Cylinder({
+    center: new Vector3((aw[0]+bw[0])/2, (aw[1]+bw[1])/2, (aw[2]+bw[2])/2),
+    radius: Math.max(0.25, (s.diameterIn/12/2) * pipeVizScale),
+    height: len, segments: 10, angle: 360, color: COLORS[layer],
+    rotation: new Vector3(rx, ry, rz),
+  });
+  layerGroups[layer].add(cyl);
+}
+
+// Instanced heads (one draw call for all sprinkler heads). Uses the real CAD
+// part mesh (headPartGeo) when the parts library has one; else a primitive.
+function addInstancedHeads(worldPts) {
+  if (!worldPts.length) return;
+  const geo = headPartGeo || new THREE.SphereGeometry(0.6, 8, 8);
+  const mat = new THREE.MeshStandardMaterial({
+    color: COLORS.HEADS, emissive: 0x330000,
+    metalness: headPartGeo ? 0.55 : 0, roughness: headPartGeo ? 0.45 : 1,
+  });
+  const inst = new THREE.InstancedMesh(geo, mat, worldPts.length);
+  const d = new THREE.Object3D();
+  worldPts.forEach((p, i) => { d.position.set(p[0], p[1], p[2]); d.rotation.set(0,0,0); d.scale.set(1,1,1); d.updateMatrix(); inst.setMatrixAt(i, d.matrix); });
+  inst.instanceMatrix.needsUpdate = true;
+  layerGroups.HEADS.add(inst);
+  window.__headDebug = { usingPartMesh: !!headPartGeo, source: partsSource, vertsPerHead: geo.attributes.position.count, instances: worldPts.length };
+}
+
+// Instanced drops (vertical pipe stubs; cylinder default axis is world Y).
+function addInstancedDrops(dropSolids) {
+  if (!dropSolids.length) return;
+  const r = Math.max(0.12, (1.0/12/2) * pipeVizScale); // drop pipe dia 1"
+  const geo = new THREE.CylinderGeometry(r, r, 1, 6); // unit height, scaled per drop
+  const mat = new THREE.MeshStandardMaterial({ color: COLORS.DROPS });
+  const inst = new THREE.InstancedMesh(geo, mat, dropSolids.length);
+  const d = new THREE.Object3D();
+  dropSolids.forEach((s, i) => {
+    const aw = W(s.from), bw = W(s.to);
+    const len = Math.hypot(aw[0]-bw[0], aw[1]-bw[1], aw[2]-bw[2]) || 0.5;
+    d.position.set((aw[0]+bw[0])/2, (aw[1]+bw[1])/2, (aw[2]+bw[2])/2);
+    d.rotation.set(0, 0, 0); d.scale.set(1, len, 1);
+    d.updateMatrix(); inst.setMatrixAt(i, d.matrix);
+  });
+  inst.instanceMatrix.needsUpdate = true;
+  layerGroups.DROPS.add(inst);
+}
+
+// R6: render discrete component placement solids (riser assembly, alarm valve,
+// FDC, tees) using their real CAD part meshes when the parts library has one,
+// else a clearly-marked primitive box. Grouped per componentKey for perf.
+// Sets window.__componentDebug for verification. Best-effort; not mfg-exact.
+function addComponentParts(componentSolids) {
+  if (!componentSolids.length) return;
+  const byKey = {};
+  for (const s of componentSolids) (byKey[s.componentKey] || (byKey[s.componentKey] = [])).push(s);
+  const debug = { total: componentSolids.length, byKey: {}, partKeys: 0, primitiveKeys: 0 };
+  for (const key of Object.keys(byKey)) {
+    const pts = byKey[key].map((s) => W(s.position));
+    const geo = partGeoCache[key]; // preloaded in generate(); null -> primitive fallback
+    const usingPart = !!geo;
+    const g = geo || new THREE.BoxGeometry(2, 2, 2);
+    const mat = new THREE.MeshStandardMaterial({
+      color: COLORS.COMPONENTS,
+      emissive: usingPart ? 0x000000 : 0x3a2a00,
+      metalness: usingPart ? 0.55 : 0, roughness: usingPart ? 0.45 : 1,
+      wireframe: !usingPart, // marked: missing-part fallback drawn as a wire box
+    });
+    const inst = new THREE.InstancedMesh(g, mat, pts.length);
+    const d = new THREE.Object3D();
+    pts.forEach((p, i) => { d.position.set(p[0], p[1], p[2]); d.rotation.set(0, 0, 0); d.scale.set(1, 1, 1); d.updateMatrix(); inst.setMatrixAt(i, d.matrix); });
+    inst.instanceMatrix.needsUpdate = true;
+    layerGroups.COMPONENTS.add(inst);
+    debug.byKey[key] = { count: pts.length, usingPartMesh: usingPart };
+    if (usingPart) debug.partKeys++; else debug.primitiveKeys++;
+  }
+  window.__componentDebug = debug;
+}
+
+// Cut door/window openings into a wall via OpenGeometry boolean subtract and
+// return the mesh to render. Each opening sits along the wall at offsetFt,
+// sized widthFt x heightFt at sill. subtract() takes an OPERAND ARRAY and
+// returns a NEW cut mesh (it does not mutate the wall), so we return that.
+function cutWall(wallCuboid, s) {
+  if (!Array.isArray(s.openings) || !s.openings.length || !s.a || !s.b) return wallCuboid;
+  const dx = s.b[0] - s.a[0], dy = s.b[1] - s.a[1];
+  const len = Math.hypot(dx, dy) || 1; const ux = dx / len, uy = dy / len;
+  const ops = [];
+  for (const op of s.openings) {
+    const dist = (op.offsetFt || 0) + (op.widthFt || 0) / 2;
+    const px = s.a[0] + ux * dist, py = s.a[1] + uy * dist;
+    const sill = op.sill != null ? op.sill : (op.type === 'window' ? 3 : 0);
+    const w = W([px, py, (s.baseZ || 0) + sill + (op.heightFt || 0) / 2]);
+    ops.push(new Opening({
+      center: new Vector3(w[0], w[1], w[2]),
+      width: Math.max(0.1, op.widthFt || 0), height: Math.max(0.1, op.heightFt || 0),
+      depth: (s.thicknessFt || 0.5) * 3, color: COLORS.WALLS,
+      rotation: new Vector3(0, s.rotationY, 0),
+    }));
+  }
+  try { const cut = wallCuboid.subtract(ops, {}); return cut || wallCuboid; }
+  catch (_) { return wallCuboid; /* boolean unsupported here; render solid wall */ }
+}
+
+function renderModel(cadModel) {
+  currentCadModel = cadModel;
+  window.__wallDebug = [];
+  if (modelGroup) scene.remove(modelGroup);
+  modelGroup = new THREE.Group(); scene.add(modelGroup);
+  for (const k of Object.keys(COLORS)) { layerGroups[k] = new THREE.Group(); modelGroup.add(layerGroups[k]); }
+
+  const headPts = []; const dropSolids = []; const componentSolids = [];
+  let minX=Infinity,maxX=-Infinity,minZ=Infinity,maxZ=-Infinity,ceil=14;
+  for (const s of cadModel.solids) {
+    if (s.kind === 'wall') {
+      ceil = Math.max(ceil, s.heightFt + (s.baseZ || 0));
+      const wc = W([s.center[0], s.center[1], (s.baseZ || 0) + s.heightFt/2]);
+      const wall = new Cuboid({
+        center: new Vector3(wc[0], wc[1], wc[2]),
+        width: s.lengthFt, height: s.heightFt, depth: s.thicknessFt,
+        color: s.type === 'interior' ? COLORS.WALLS_INT : COLORS.WALLS,
+        rotation: new Vector3(0, s.rotationY, 0),
+      });
+      const wallMesh = cutWall(wall, s); // boolean-subtract door/window holes -> cut mesh
+      layerGroups.WALLS.add(wallMesh);
+      try {
+        const vc = wallMesh.geometry && wallMesh.geometry.attributes && wallMesh.geometry.attributes.position
+          ? wallMesh.geometry.attributes.position.count : 0;
+        (window.__wallDebug = window.__wallDebug || []).push({ type: s.type || 'exterior', openings: (s.openings || []).length, verts: vc });
+      } catch (_) { /* debug only */ }
+      for (const p of [s.a, s.b]) { minX=Math.min(minX,p[0]);maxX=Math.max(maxX,p[0]);minZ=Math.min(minZ,p[1]);maxZ=Math.max(maxZ,p[1]); }
+    } else if (s.kind === 'column') {
+      ceil = Math.max(ceil, s.heightFt + (s.baseZ || 0));
+      const wc = W([s.x, s.y, (s.baseZ || 0) + s.heightFt/2]);
+      layerGroups.COLUMN.add(new Cuboid({
+        center: new Vector3(wc[0], wc[1], wc[2]),
+        width: s.sizeFt, height: s.heightFt, depth: s.sizeFt, color: COLORS.COLUMN,
+      }));
+      minX=Math.min(minX,s.x);maxX=Math.max(maxX,s.x);minZ=Math.min(minZ,s.y);maxZ=Math.max(maxZ,s.y);
+    } else if (s.kind === 'pipe') {
+      if (s.role === 'drop') dropSolids.push(s); else addPipe(s);
+    } else if (s.kind === 'head') {
+      headPts.push(W(s.position));
+    } else if (s.kind === 'component') {
+      componentSolids.push(s);
+    }
+  }
+  // Heads + drops are the high-count, identical geometry -> instanced (perf).
+  addInstancedHeads(headPts);
+  addInstancedDrops(dropSolids);
+  addComponentParts(componentSolids); // R6: riser assembly / valve / FDC / tees as part meshes
+
+  const fw = maxX-minX, fd = maxZ-minZ;
+  if (fw > 0 && fd > 0) {
+    const floor = new Cuboid({
+      center: new Vector3((minX+maxX)/2, -0.25, (minZ+maxZ)/2),
+      width: fw, height: 0.5, depth: fd, color: COLORS.FLOOR,
+    });
+    layerGroups.FLOOR.add(floor);
+  }
+  frameCamera(minX, maxX, minZ, maxZ, ceil);
+  buildLayerToggles();
+}
+
+// Rebuild the COMPLETE kernel scene (walls + every pipe + every head, at TRUE
+// scale) from the stored cad model, on-demand at export time. Decoupled from
+// the viewer (which instances heads/drops) so STEP/IFC/STL are always complete.
+function buildExportScene() {
+  const sm = new OGSceneManager();
+  const id = sm.createScene('halofire-export'); sm.setCurrentScene(id);
+  let n = 0;
+  if (!currentCadModel) return { sm, n };
+  for (const s of currentCadModel.solids) {
+    try {
+      if (s.kind === 'wall') {
+        const wc = W([s.center[0], s.center[1], (s.baseZ || 0) + s.heightFt/2]);
+        const c = new Cuboid({ center: new Vector3(wc[0], wc[1], wc[2]), width: s.lengthFt, height: s.heightFt, depth: s.thicknessFt, color: COLORS.WALLS, rotation: new Vector3(0, s.rotationY, 0) });
+        if (c.cuboid) { sm.addCuboidToCurrentScene('e'+n, c.cuboid); n++; }
+      } else if (s.kind === 'pipe') {
+        const aw = W(s.from), bw = W(s.to); const len = Math.hypot(aw[0]-bw[0], aw[1]-bw[1], aw[2]-bw[2]); if (len < 1e-3) continue;
+        const [rx, ry, rz] = pipeRot(aw, bw);
+        const cyl = new Cylinder({ center: new Vector3((aw[0]+bw[0])/2, (aw[1]+bw[1])/2, (aw[2]+bw[2])/2), radius: Math.max(0.04, s.diameterIn/12/2), height: len, segments: 8, angle: 360, color: 0x888888, rotation: new Vector3(rx, ry, rz) });
+        if (cyl.cylinder) { sm.addCylinderToCurrentScene('e'+n, cyl.cylinder); n++; }
+      } else if (s.kind === 'head') {
+        const w = W(s.position);
+        const cyl = new Cylinder({ center: new Vector3(w[0], w[1], w[2]), radius: 0.5, height: 0.6, segments: 6, angle: 360, color: 0xff0000, rotation: new Vector3(0,0,0) });
+        if (cyl.cylinder) { sm.addCylinderToCurrentScene('e'+n, cyl.cylinder); n++; }
+      }
+    } catch (_) { /* skip a shape that can't serialize */ }
+  }
+  return { sm, n };
+}
+
+function exportCad(format) {
+  if (!currentCadModel) return null;
+  const { sm, n } = buildExportScene();
+  if (!n) return null;
+  if (format === 'step') return { res: sm.exportCurrentSceneToStep(), ext: 'step', text: true, registered: n };
+  if (format === 'ifc') return { res: sm.exportCurrentSceneToIfc(), ext: 'ifc', text: true, registered: n };
+  return { res: sm.exportCurrentSceneToStl(), ext: 'stl', text: false, registered: n };
+}
+
+function download(name, dataOrBytes, isText) {
+  const blob = isText ? new Blob([dataOrBytes], { type: 'text/plain' }) : new Blob([dataOrBytes], { type: 'application/octet-stream' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click(); URL.revokeObjectURL(a.href);
+}
+
+async function buildExportProof(format) {
+  const out = exportCad(format);
+  if (!out) return null;
+  const payload = out.text ? out.res.text : out.res.bytes;
+  const proof = await summarizeExportArtifact(out.ext, payload, { text: out.text, registered: out.registered });
+  return { out, payload, proof };
+}
+
+// Fit the ortho frustum to the plan bbox (cad planX = world x, planY = world z)
+// so the WHOLE floor-plan drawing frames edge-to-edge (V1, tested helper).
+function fitPlanOrtho(minX, maxX, minZ, maxZ, aspect) {
+  const f = planOrthoFrustum({ minX, maxX, minY: minZ, maxY: maxZ }, aspect || 1.5, 0.08);
+  const o = orthoCam; o.left = f.left; o.right = f.right; o.top = f.top; o.bottom = f.bottom; o.updateProjectionMatrix();
+}
+
+// Plan-mode look: lighter backdrop + brighter floor so the footprint reads like
+// a drawing surface; restore the dark 3D look otherwise. Defensive (OG meshes).
+function setPlanStyle(isPlan) {
+  if (scene) scene.background = new THREE.Color(isPlan ? 0x0e1320 : 0x08080b);
+  if (layerGroups.FLOOR) {
+    try { layerGroups.FLOOR.traverse((o) => { if (o.material && o.material.color) o.material.color.set(isPlan ? 0x232a38 : COLORS.FLOOR); }); } catch (_) { /* OG mesh shape */ }
+  }
+}
+
+function frameCamera(minX, maxX, minZ, maxZ, ceil) {
+  const cx = (minX+maxX)/2, cz = (minZ+maxZ)/2; const span = Math.max(maxX-minX, maxZ-minZ, 40);
+  perspCam.position.set(cx + span*0.8, ceil + span*0.8, cz + span*0.8);
+  const a = ($('canvas').clientWidth / $('canvas').clientHeight) || 1.5;
+  fitPlanOrtho(minX, maxX, minZ, maxZ, a);
+  orthoCam.up.set(0, 0, -1);                          // north-up plan orientation
+  orthoCam.position.set(cx, Math.max(ceil, span) * 2, cz);
+  controls.target.set(cx, ceil/2, cz); controls.update();
+  window._frame = { cx, cz, span, ceil, bbox: { minX, maxX, minY: minZ, maxY: maxZ } };
+}
+
+function setView(view) {
+  camera = view === 'top' ? orthoCam : perspCam;
+  controls.object = camera;
+  setPlanStyle(view === 'top');
+  if (window._frame) {
+    const { cx, cz, span, ceil, bbox } = window._frame;
+    if (view === 'top') {
+      const a = ($('canvas').clientWidth / $('canvas').clientHeight) || 1.5;
+      if (bbox) fitPlanOrtho(bbox.minX, bbox.maxX, bbox.minY, bbox.maxY, a);
+      orthoCam.up.set(0, 0, -1);
+      orthoCam.position.set(cx, Math.max(ceil || 14, span) * 2, cz);
+    }
+  }
+  controls.update();
+}
+
+// V2 Demo: animate the structure rising out of the floor plan, then the
+// sprinkler system rising into place. Pure timeline (demo-timeline.js) maps
+// elapsed time -> per-group rise. Scaling a layer group's Y about world y=0
+// (groups sit at the origin) makes its geometry grow up FROM the floor.
+let demoRAF = null;
+function playDemo() {
+  if (!currentCadModel) { $('status').textContent = 'generate a layout first'; return; }
+  if (demoRAF) { cancelAnimationFrame(demoRAF); demoRAF = null; }
+  document.querySelectorAll('#viewSeg button').forEach((x) => x.classList.toggle('on', x.dataset.view === 'iso'));
+  setView('iso');
+  const structure = ['WALLS', 'COLUMN'];          // rise first
+  const system = ['MAIN', 'BRANCH', 'DROPS', 'HEADS', 'COMPONENTS']; // then the sprinkler system
+  const setY = (keys, sy) => keys.forEach((k) => { if (layerGroups[k]) layerGroups[k].scale.set(1, Math.max(0.0001, sy), 1); });
+  setY(structure, 0.0001); setY(system, 0.0001);
+  const opts = { wallsMs: 1300, systemMs: 1400, gapMs: 250 };
+  const start = performance.now();
+  $('demoBtn').disabled = true; window.__demoDone = false;
+  $('status').textContent = 'demo: structure rising out of the plan…';
+  function step(now) {
+    const tl = demoTimeline(now - start, opts);
+    setY(structure, tl.wallsT);
+    setY(system, tl.systemT);
+    if (tl.systemT > 0.02) $('status').textContent = 'demo: sprinkler system rising into place…';
+    if (!tl.done) { demoRAF = requestAnimationFrame(step); }
+    else {
+      setY(structure, 1); setY(system, 1); demoRAF = null;
+      $('demoBtn').disabled = false; window.__demoDone = true;
+      $('status').textContent = 'demo complete · structure + sprinkler system in place';
+    }
+  }
+  demoRAF = requestAnimationFrame(step);
+}
+
+// Deterministic demo-frame applier (verification + rAF-throttle-proof): apply the
+// rise at an explicit elapsed time without the rAF clock. Same mapping as playDemo.
+window.__applyDemoFrame = (ms) => {
+  const tl = demoTimeline(ms, { wallsMs: 1300, systemMs: 1400, gapMs: 250 });
+  ['WALLS', 'COLUMN'].forEach((k) => { if (layerGroups[k]) layerGroups[k].scale.set(1, Math.max(0.0001, tl.wallsT), 1); });
+  ['MAIN', 'BRANCH', 'DROPS', 'HEADS', 'COMPONENTS'].forEach((k) => { if (layerGroups[k]) layerGroups[k].scale.set(1, Math.max(0.0001, tl.systemT), 1); });
+  return { wallsT: +tl.wallsT.toFixed(3), systemT: +tl.systemT.toFixed(3), done: tl.done };
+};
+
+function buildLayerToggles() {
+  const names = { WALLS: 'Building shell', COLUMN: 'Columns', FLOOR: 'Floor', MAIN: 'Mains / riser', BRANCH: 'Branch lines', DROPS: 'Drops', HEADS: 'Sprinkler heads' };
+  $('layers').innerHTML = Object.keys(names).map((k) =>
+    `<div class="layer"><input type="checkbox" id="L_${k}" checked><label for="L_${k}" style="margin:0;color:var(--text)">${names[k]}</label></div>`).join('');
+  for (const k of Object.keys(names)) {
+    $('L_' + k).onchange = (e) => { if (layerGroups[k]) layerGroups[k].visible = e.target.checked; };
+  }
+}
+
+// ── data + actions ──
+let lastBody = {};
+function currentBody() {
+  const body = { markupPct: Number($('markup').value) || 25 };
+  const hz = $('hazard').value; if (hz) body.hazard = hz;
+  const src = $('planSource').value;
+  const txt = $('svgInput').value.trim();
+  const units = Number($('unitsPerPx').value) || 1;
+  if (src === 'svg') { body.svg = txt; body.unitsPerPx = units; }
+  else if (src === 'building') { body.buildingSvg = txt; body.unitsPerPx = units; }
+  else if (src === 'dxf') { body.dxf = txt; body.unitsPerDrawingUnit = units; }
+  else if (src === 'building-dxf') { body.buildingDxf = txt; body.unitsPerDrawingUnit = units; }
+  else if (src === 'pdf') {
+    body.pdf = pdfBase64 || '';
+    body.pdfPageIndex = Number($('pdfPageIndex').value) || 0;
+    body.pdfScale = Number($('pdfScale').value); // operator-supplied; server throws if absent/<=0
+    const pdfExtract = $('pdfExtract') ? $('pdfExtract').value : 'vector';
+    if (pdfExtract && pdfExtract !== 'vector') body.pdfExtract = pdfExtract;
+    const loadedDecisionPayload = currentLoadedPdfBoundaryDecisionPayload();
+    if (loadedDecisionPayload) {
+      body.employee_decision = loadedDecisionPayload.employee_decision;
+      body.source_refs = loadedDecisionPayload.source_refs;
+    }
+  }
+  return body;
+}
+
+// Holds the base64 of the selected vector PDF (read on file pick).
+let pdfBase64 = '';
+let pdfObjectUrl = '';
+let lastPdfBoundaryMeta = null;
+let selectedPdfBoundaryCandidate = null;
+let loadedPdfBoundaryDecision = null;
+function readPdfFile(file) {
+  return new Promise((resolve, reject) => {
+    const fr = new FileReader();
+    fr.onload = () => {
+      // data URL -> strip the "data:...;base64," prefix.
+      const s = String(fr.result);
+      resolve(s.slice(s.indexOf(',') + 1));
+    };
+    fr.onerror = () => reject(fr.error);
+    fr.readAsDataURL(file);
+  });
+}
+
+function setPdfPageFromInspection(index) {
+  const pageIndex = Math.max(0, Number(index) || 0);
+  if ($('pdfPageIndex')) $('pdfPageIndex').value = String(pageIndex);
+  if (pdfObjectUrl && $('pdfPreview')) {
+    $('pdfPreview').src = `${pdfObjectUrl}#page=${pageIndex + 1}`;
+  }
+  document.querySelectorAll('[data-pdf-page-index]').forEach((btn) => {
+    btn.classList.toggle('on', Number(btn.dataset.pdfPageIndex) === pageIndex);
+  });
+}
+
+function currentLoadedPdfBoundaryDecisionPayload() {
+  if (!loadedPdfBoundaryDecision || $('planSource').value !== 'pdf') return null;
+  const decision = loadedPdfBoundaryDecision;
+  const currentPageIndex = Number($('pdfPageIndex').value) || 0;
+  const currentScale = Number($('pdfScale').value);
+  const currentExtract = $('pdfExtract') ? $('pdfExtract').value : 'vector';
+  const currentCandidateMode = selectedPdfBoundaryCandidate && selectedPdfBoundaryCandidate.mode
+    ? selectedPdfBoundaryCandidate.mode
+    : currentExtract;
+  if (Number(decision.pageIndex ?? 0) !== currentPageIndex) return null;
+  if (Number(decision.scale ?? NaN) !== currentScale) return null;
+  if ((decision.extractMode || (decision.candidate && decision.candidate.mode) || 'vector') !== currentExtract) return null;
+  if ((decision.candidate && decision.candidate.mode ? decision.candidate.mode : currentExtract) !== currentCandidateMode) return null;
+  const employeeDecision = decision.employeeDecision && typeof decision.employeeDecision === 'object'
+    ? decision.employeeDecision
+    : null;
+  if (!employeeDecision) return null;
+  const sourceRefs = Array.isArray(employeeDecision.source_refs) ? employeeDecision.source_refs : (Array.isArray(decision.sourceRefs) ? decision.sourceRefs : []);
+  return {
+    employee_decision: employeeDecision,
+    source_refs: sourceRefs,
+  };
+}
+
+function renderPdfPageInspection(meta) {
+  if (!$('pdfPageList')) return;
+  const pages = Array.isArray(meta.pages) ? meta.pages : [];
+  if (!pages.length) {
+    $('pdfPageList').textContent = 'No pages found in this PDF.';
+    return;
+  }
+  $('pdfPageIndex').max = String(pages.length - 1);
+  $('pdfPageList').innerHTML = pages.map((p) => (
+    `<button type="button" class="ghost" data-pdf-page-index="${p.index}" style="width:auto;margin:2px 4px 2px 0;padding:4px 6px">` +
+    `p${p.index} · ${Math.round(p.widthPt)}×${Math.round(p.heightPt)} pt</button>`
+  )).join('');
+  document.querySelectorAll('[data-pdf-page-index]').forEach((btn) => {
+    btn.onclick = () => setPdfPageFromInspection(btn.dataset.pdfPageIndex);
+  });
+  const current = Math.min(Math.max(0, Number($('pdfPageIndex').value) || 0), pages.length - 1);
+  setPdfPageFromInspection(current);
+}
+
+function applyPdfBoundaryCandidate(mode) {
+  if (!$('pdfExtract')) return;
+  $('pdfExtract').value = mode || 'vector';
+  const candidates = lastPdfBoundaryMeta && Array.isArray(lastPdfBoundaryMeta.candidates) ? lastPdfBoundaryMeta.candidates : [];
+  selectedPdfBoundaryCandidate = candidates.find((c) => c.mode === $('pdfExtract').value) || selectedPdfBoundaryCandidate;
+  document.querySelectorAll('[data-pdf-candidate-mode]').forEach((btn) => {
+    btn.classList.toggle('on', btn.dataset.pdfCandidateMode === $('pdfExtract').value);
+  });
+  if ($('pdfDecisionStatus') && selectedPdfBoundaryCandidate) {
+    $('pdfDecisionStatus').textContent = `Selected ${selectedPdfBoundaryCandidate.label || selectedPdfBoundaryCandidate.mode}; save to evidence when this is the employee choice.`;
+  }
+}
+
+function renderPdfBoundaryCandidates(meta) {
+  if (!$('pdfBoundaryCandidates')) return;
+  lastPdfBoundaryMeta = meta || null;
+  const candidates = Array.isArray(meta.candidates) ? meta.candidates : [];
+  if (!candidates.length) {
+    $('pdfBoundaryCandidates').textContent = 'No boundary candidates returned for this page.';
+    return;
+  }
+  $('pdfBoundaryCandidates').innerHTML = candidates.map((c) => {
+    const bbox = c.bbox || {};
+    const area = c.areaSqft ? ` · ${Math.round(c.areaSqft).toLocaleString()} sqft` : '';
+    const method = c.method ? ` · ${c.method}` : '';
+    return `<div style="border:1px solid var(--line);border-radius:6px;padding:6px;margin-top:4px">` +
+      `<button type="button" class="ghost" data-pdf-candidate-mode="${c.mode}" style="width:auto;margin-right:6px;padding:4px 6px">Use</button>` +
+      `<b style="color:var(--bright)">${c.label}</b>` +
+      `<div>${Math.round(bbox.widthFt || 0)}×${Math.round(bbox.heightFt || 0)} ft${area}${method}</div>` +
+      `<div>${c.status || 'candidate'} · claims still blocked</div>` +
+      `</div>`;
+  }).join('');
+  document.querySelectorAll('[data-pdf-candidate-mode]').forEach((btn) => {
+    btn.onclick = () => applyPdfBoundaryCandidate(btn.dataset.pdfCandidateMode);
+  });
+  applyPdfBoundaryCandidate($('pdfExtract').value || 'vector');
+}
+
+async function savePdfBoundaryDecision() {
+  if (!lastPdfBoundaryMeta) { $('status').textContent = 'review boundary candidates before saving a decision'; return; }
+  if (!(Number($('pdfScale').value) > 0)) { $('status').textContent = 'enter the drawing scale before saving a boundary decision'; return; }
+  const candidates = Array.isArray(lastPdfBoundaryMeta.candidates) ? lastPdfBoundaryMeta.candidates : [];
+  const candidate = selectedPdfBoundaryCandidate || candidates.find((c) => c.mode === $('pdfExtract').value);
+  if (!candidate) { $('status').textContent = 'choose a boundary candidate before saving'; return; }
+  const btn = $('pdfDecisionBtn');
+  const label = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+  try {
+    const pageIndex = Number($('pdfPageIndex').value) || 0;
+    const extractMode = $('pdfExtract').value || candidate.mode;
+    const saved = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/pdf-boundary-decision', {
+      method: 'POST',
+      body: JSON.stringify({
+        pdfPageIndex: pageIndex,
+        pdfScale: Number($('pdfScale').value),
+        pdfExtract: extractMode,
+        candidate,
+        source_ref: `studio PDF page ${pageIndex} / ${extractMode} boundary candidate`,
+        notes: 'Employee selected PDF boundary candidate from HaloFire Studio. This is correction evidence only; regulated claims remain blocked.',
+      }),
+    });
+    loadedPdfBoundaryDecision = saved.decision || null;
+    $('pdfDecisionStatus').textContent = `Saved evidence #${saved.id}: ${candidate.label || candidate.mode}. Claims still blocked.`;
+    $('status').textContent = 'boundary decision saved as best-effort evidence';
+  } catch (err) {
+    $('status').textContent = 'Boundary decision save error: ' + err.message;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = label;
+  }
+}
+
+async function loadPdfBoundaryDecision() {
+  const btn = $('pdfDecisionLoadBtn');
+  const label = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Loading...';
+  try {
+    const latest = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/pdf-boundary-decision');
+    if (!latest.decision) {
+      $('pdfDecisionStatus').textContent = 'No saved boundary decision for this project yet.';
+      return;
+    }
+    const decision = latest.decision;
+    loadedPdfBoundaryDecision = decision;
+    $('planSource').value = 'pdf';
+    $('planSource').dispatchEvent(new Event('change'));
+    $('pdfPageIndex').value = String(decision.pageIndex ?? 0);
+    $('pdfScale').value = String(decision.scale ?? '');
+    $('pdfExtract').value = decision.extractMode || (decision.candidate && decision.candidate.mode) || 'vector';
+    selectedPdfBoundaryCandidate = decision.candidate || null;
+    lastPdfBoundaryMeta = {
+      pageIndex: decision.pageIndex,
+      scale: decision.scale,
+      candidates: decision.candidate ? [decision.candidate] : [],
+    };
+    if (lastPdfBoundaryMeta.candidates.length) renderPdfBoundaryCandidates(lastPdfBoundaryMeta);
+    $('pdfDecisionStatus').textContent = `Loaded saved evidence #${latest.evidence.id}: page ${decision.pageIndex}, scale ${decision.scale}, ${decision.extractMode}. Pick the original PDF file before Generate.`;
+    $('status').textContent = 'loaded saved PDF boundary defaults';
+  } catch (err) {
+    $('status').textContent = 'Boundary decision load error: ' + err.message;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = label;
+  }
+}
+
+async function generate() {
+  if (!ogReady) { $('status').textContent = 'kernel still loading…'; return; }
+  const btn = $('genBtn'); btn.disabled = true; btn.textContent = 'Generating…';
+  $('status').textContent = 'building layout…';
+  try {
+    lastBody = currentBody();
+    const planSrc = $('planSource').value;
+    const importSrc = ['svg', 'building', 'dxf', 'building-dxf'].includes(planSrc);
+    if (importSrc && !$('svgInput').value.trim()) { $('status').textContent = 'paste the drawing first'; return; }
+    if (planSrc === 'pdf') {
+      if (!pdfBase64) { $('status').textContent = 'pick a vector PDF first'; return; }
+      if (!(Number($('pdfScale').value) > 0)) { $('status').textContent = 'enter the drawing scale (feet per PDF point) — never guessed'; return; }
+    }
+    const { bid, cadModel, hydraulics, hydraulicNetwork, compliance, fullScopeBid, isBuilding } = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/sprinkler-bid', {
+      method: 'POST', body: JSON.stringify(lastBody),
+    });
+    // R6: preload the part meshes for the distinct component keys in this model
+    // (riser_assembly/valve_alarm_check/fdc/fitting_tee) so renderModel can
+    // instance them synchronously; missing parts fall back to a marked primitive.
+    const compKeys = [...new Set((cadModel.solids || []).filter((s) => s.kind === 'component').map((s) => s.componentKey))];
+    await Promise.all(compKeys.map((k) => loadPartGeo(k, 2.5)));
+    renderModel(cadModel);
+    const r = bid.rooms[0];
+    $('layout').innerHTML = `
+      <div class="kv"><span>Total area</span><b>${bid.totalAreaSqFt.toLocaleString()} sqft</b></div>
+      <div class="kv"><span>Sprinkler heads</span><b>${bid.totalHeadCount}</b></div>
+      <div class="kv"><span>Hazard</span><b>${r.hazard}</b></div>
+      <div class="kv"><span>Head spacing</span><b>${r.spacingX}×${r.spacingY} ft</b></div>
+      <div class="kv"><span>Coverage/head</span><b>${r.coveragePerHeadSqFt} sqft</b></div>
+      <div class="kv"><span>OpenGeometry solids</span><b>${cadModel.counts.walls}w ${cadModel.counts.pipes}p ${cadModel.counts.heads}h</b></div>
+      ${isBuilding ? `<div class="kv"><span>Building</span><b>${cadModel.counts.spaces} spaces · ${cadModel.counts.interiorWalls} int walls · ${cadModel.counts.columns} cols · ${cadModel.counts.openings} openings</b></div>` : ''}`;
+    const room0 = cadModel.rooms ? cadModel.rooms[0] : null;
+    if (room0) {
+      $('pipes').innerHTML = `
+        <div class="kv"><span>Cross-main</span><b>${room0.sizing.mainDiameterIn}"</b></div>
+        <div class="kv"><span>Branch lines</span><b>${room0.network.branchLines.length} @ ${[...new Set(room0.sizing.branchDiameters)].join('/')}"</b></div>
+        <div class="kv"><span>System riser</span><b>${room0.sizing.mainDiameterIn}"</b></div>`;
+    } else {
+      // Building model: pipe sizing is per-space/per-story (see DXF/STEP export).
+      $('pipes').innerHTML = `<div class="kv"><span>Network</span><b>per-space (building)</b></div>
+        <div class="muted" style="font-size:10px">${cadModel.counts.spaces} spaces · ${cadModel.counts.pipes} pipe segments · ${cadModel.counts.heads} heads — sizes per space in DXF/STEP export</div>`;
+    }
+    if (hydraulics && !hydraulics.error) {
+      const warns = (hydraulics.warnings || []);
+      const net = (hydraulicNetwork && !hydraulicNetwork.error) ? `
+        <div class="kv" style="border-top:1px solid var(--border);margin-top:4px;padding-top:4px"><span>Network demand</span><b>${Math.round(hydraulicNetwork.totalDemandGpm)} gpm</b></div>
+        <div class="kv"><span>Network friction</span><b>${hydraulicNetwork.frictionLossPsi} psi</b></div>
+        <div class="kv"><span>Req. @ source (balanced)</span><b class="total" style="font-size:14px">${hydraulicNetwork.requiredSourcePsi} psi</b></div>
+        <div class="muted" style="font-size:10px">full iterative network balance (best-effort, NOT a sealed Hardy-Cross / PE calc)</div>`
+        : `<div class="muted" style="font-size:10px">network balance: ${(hydraulicNetwork && hydraulicNetwork.error) ? hydraulicNetwork.error + ' (per-space building network — see export)' : 'n/a'}</div>`;
+      $('hydraulics').innerHTML = `
+        <div class="kv"><span>Design demand</span><b>${Math.round(hydraulics.demand.requiredFlowGpm)} gpm</b></div>
+        <div class="kv"><span>Single-path friction</span><b>${hydraulics.frictionLossPsi} psi</b></div>
+        <div class="kv"><span>Elevation head</span><b>${hydraulics.elevationPsi} psi</b></div>
+        <div class="kv"><span>Req. pressure @ riser (1-path)</span><b>${hydraulics.requiredPressurePsi} psi</b></div>
+        ${warns.length ? `<div class="est">⚠ ${warns.length} schedule warning(s)</div>` : '<div class="muted" style="font-size:10px">no velocity/loss warnings</div>'}
+        ${net}`;
+    } else {
+      $('hydraulics').innerHTML = '<span class="est">hydraulics unavailable' + (hydraulics && hydraulics.error ? ': ' + hydraulics.error : '') + '</span>';
+    }
+    // Compliance findings (NFPA-13 geometric checks — a pass is NOT AHJ/PE approval).
+    if (compliance && !compliance.error && Array.isArray(compliance.findings)) {
+      const sev = { pass: '#4ade80', warn: '#FFD54F', fail: '#E53935' };
+      const fails = compliance.findings.filter((f) => f.severity === 'fail').length;
+      const head = `<div class="kv"><span>Geometric result</span><b style="color:${fails ? sev.fail : sev.pass}">${fails ? fails + ' fail(s)' : 'no failures'}</b></div>`;
+      const rows = compliance.findings.map((f) => `<div class="kv" style="align-items:flex-start"><span style="color:${sev[f.severity] || '#71717a'}">${f.severity.toUpperCase()}</span><b style="font-weight:500;font-size:11px;text-align:right;max-width:200px">${f.rule || f.code}</b></div>`).join('');
+      $('compliance').innerHTML = head + rows + `<div class="muted" style="font-size:10px;margin-top:4px">${compliance.note || ''}</div>`;
+    } else {
+      $('compliance').innerHTML = '<span class="est">compliance unavailable' + (compliance && compliance.error ? ': ' + compliance.error : '') + '</span>';
+    }
+    $('submitBtn').disabled = false;
+    let fsHtml = '';
+    if (fullScopeBid && !fullScopeBid.error) {
+      const cal = fullScopeBid.calibration;
+      const ohpTotal = fullScopeBid.ohp ? fullScopeBid.ohp.ohpTotal : 0;
+      fsHtml = `
+      <div class="kv" style="border-top:1px solid var(--border);margin-top:6px;padding-top:6px"><span>System components</span><b>${usd(fullScopeBid.systemComponentCost)}</b></div>
+      <div class="kv"><span>Field labor (est)</span><b>${usd(fullScopeBid.laborCost)}</b></div>
+      <div class="kv"><span>Soft costs (permit/design/freight)</span><b>${usd(fullScopeBid.softCostTotal)}</b></div>
+      <div class="kv"><span>Overhead &amp; Profit (est)</span><b>${usd(ohpTotal)}</b></div>
+      <div class="kv"><span>Full-scope estimate</span><b class="total" style="font-size:14px">${usd(fullScopeBid.fullScopeTotal)}</b></div>
+      <div class="muted" style="font-size:10px">best-effort full scope — field labor, system components, soft costs, and overhead &amp; profit are assumption-based estimates (documented public conventions), NOT a quoted bid</div>`
+      + (cal ? `<div class="muted" style="font-size:10px;margin-top:4px">vs real bid-log ${usd(cal.referenceTotal)}: <b style="color:${Math.abs(cal.deltaPct) <= 25 ? 'var(--gold)' : 'var(--fire)'}">${cal.deltaPct > 0 ? '+' : ''}${cal.deltaPct}%</b> — ${cal.note}</div>` : '');
+      const rt = cal && cal.realTakeoff;
+      if (rt) {
+        fsHtml += `
+      <div style="border-top:1px solid var(--border);margin-top:8px;padding-top:6px">
+        <div class="muted" style="font-size:11px;font-weight:600;color:var(--gold)">Real ESI takeoff (parsed from the proposal — source cells cited)</div>
+        <div class="kv"><span>Materials (w/ markup)</span><b>${usd(rt.withMarkup.materials)}</b></div>
+        <div class="kv"><span>Labor + equipment (w/ markup)</span><b>${usd(rt.withMarkup.labor)}</b></div>
+        <div class="kv"><span>Design (sub + misc, w/ markup)</span><b>${usd(rt.withMarkup.design)}</b></div>
+        <div class="kv"><span>SOV total</span><b>${usd(rt.withMarkup.sovTotal)}</b></div>
+        <div class="kv"><span>Total price (base)</span><b class="total">${usd(rt.totalPrice)}</b></div>
+        <div class="muted" style="font-size:10px;margin-top:4px">This is the <b>actual submitted breakdown</b> (real rows parsed from <code>${rt.sourceRefs[0].split('#')[0]}</code> — cells ${rt.sourceRefs.map((r) => r.split('!')[1]).join(', ')}). The auto-generated estimate above is the model's best effort and is still short (materials-limited by simplified geometry). This is real source data, not an auto-bidder result, and asserts no accuracy/AHJ/PE/AutoSprink/manufacturer parity claim.</div>
+      </div>`;
+      }
+    } else if (fullScopeBid && fullScopeBid.error) {
+      fsHtml = `<div class="est" style="font-size:10px">full-scope unavailable: ${fullScopeBid.error}</div>`;
+    }
+    $('bid').innerHTML = `
+      <div class="kv"><span>Bare materials</span><b>${usd(bid.pricing.materialCost)}</b></div>
+      <div class="kv"><span>Labor</span><b>${usd(bid.pricing.laborCost)}</b></div>
+      <div class="kv"><span>Bare-materials total (+${bid.pricing.markupPct}%)</span><b>${usd(bid.pricing.total)}</b></div>`
+      + fsHtml;
+    $('bom').innerHTML = `<table><tr><th>Item</th><th>Qty</th><th>Cost</th><th>Total</th></tr>${
+      bid.pricing.lines.map((l) => `<tr><td>${l.description.split('(')[0]}</td><td class="n">${l.quantity}</td><td class="n">${usd(l.unitCost)}</td><td class="n">${usd(l.lineTotal)}</td></tr>`).join('')}</table>`;
+    $('warn').textContent = (bid.pricing.anyEstimated ? '⚠ some unit costs are fallback estimates. ' : '')
+      + cadModel.disclaimer;
+    ['dxfBtn','stepBtn','ifcBtn','stlBtn'].forEach((id) => { $(id).disabled = false; });
+    const headsNote = headPartGeo
+      ? `heads: ${partsSource} CAD part${partsSource === 'catalog' ? '' : ' (best-effort, not mfg-exact)'}`
+      : 'heads: primitive (no part mesh)';
+    const cd = window.__componentDebug;
+    const compNote = (cadModel.counts && cadModel.counts.components)
+      ? ` · ${cadModel.counts.components} components (${cd ? cd.partKeys : 0} part types as meshes, ${cd ? cd.primitiveKeys : 0} primitive fallback)`
+      : '';
+    $('status').textContent = `rendered ${cadModel.counts.heads} heads · ${cadModel.counts.pipes} pipe segments · ${headsNote}${compNote}`;
+  } catch (e) {
+    $('status').textContent = 'error: ' + e.message;
+  } finally { btn.disabled = false; btn.textContent = 'Generate Layout'; }
+}
+
+$('planSource').onchange = (e) => {
+  const v = e.target.value;
+  const isImport = ['svg', 'building', 'dxf', 'building-dxf'].includes(v);
+  $('svgBox').style.display = isImport ? '' : 'none';
+  if ($('pdfBox')) $('pdfBox').style.display = v === 'pdf' ? '' : 'none';
+  const isDxf = v === 'dxf' || v === 'building-dxf';
+  if ($('drawingLabel')) $('drawingLabel').textContent = isDxf
+    ? 'DXF (ENTITIES: LWPOLYLINE / LINE / CIRCLE; layers ROOMS/WALLS-EXT/WALLS-INT/DOOR/COLUMN for buildings)'
+    : 'SVG (rect / polygon / path)';
+  if ($('svgInput')) $('svgInput').placeholder = isDxf ? '0\nSECTION\n2\nENTITIES\n…\n0\nEOF' : '<svg><rect x="0" y="0" width="60" height="40" data-hazard="ordinary"/></svg>';
+};
+if ($('pdfFile')) $('pdfFile').onchange = async (e) => {
+  const f = e.target.files && e.target.files[0];
+  if (!f) { pdfBase64 = ''; return; }
+  $('status').textContent = 'reading PDF…';
+  try { pdfBase64 = await readPdfFile(f); $('status').textContent = 'PDF loaded (' + Math.round(f.size / 1024) + ' KB) — set the scale, then Generate'; }
+  catch (err) { pdfBase64 = ''; $('status').textContent = 'PDF read error: ' + err.message; }
+};
+if ($('pdfFile')) $('pdfFile').onchange = async (e) => {
+  const f = e.target.files && e.target.files[0];
+  if (!f) {
+    pdfBase64 = '';
+    if ($('pdfPageList')) $('pdfPageList').textContent = '';
+    if ($('pdfPreview')) $('pdfPreview').removeAttribute('src');
+    return;
+  }
+  $('status').textContent = 'reading PDF...';
+  try {
+    pdfBase64 = await readPdfFile(f);
+    if (pdfObjectUrl) URL.revokeObjectURL(pdfObjectUrl);
+    pdfObjectUrl = URL.createObjectURL(f);
+    setPdfPageFromInspection(Number($('pdfPageIndex').value) || 0);
+    if ($('pdfPageList')) $('pdfPageList').textContent = 'Click Inspect pages to list sheets before extraction.';
+    $('status').textContent = 'PDF loaded (' + Math.round(f.size / 1024) + ' KB) - inspect pages, set the scale, then Generate';
+  } catch (err) {
+    pdfBase64 = '';
+    $('status').textContent = 'PDF read error: ' + err.message;
+  }
+};
+if ($('pdfInspectBtn')) $('pdfInspectBtn').onclick = async () => {
+  if (!pdfBase64) { $('status').textContent = 'pick a vector PDF first'; return; }
+  const btn = $('pdfInspectBtn');
+  const label = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Inspecting...';
+  try {
+    const meta = await api('/pdf/inspect', { method: 'POST', body: JSON.stringify({ pdf: pdfBase64 }) });
+    renderPdfPageInspection(meta);
+    $('status').textContent = `PDF inspected: ${meta.pageCount} page(s) - choose the floor-plan sheet, then enter scale`;
+  } catch (err) {
+    $('status').textContent = 'PDF inspect error: ' + err.message;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = label;
+  }
+};
+if ($('pdfCandidateBtn')) $('pdfCandidateBtn').onclick = async () => {
+  if (!pdfBase64) { $('status').textContent = 'pick a vector PDF first'; return; }
+  if (!(Number($('pdfScale').value) > 0)) { $('status').textContent = 'enter the drawing scale before reviewing boundary candidates'; return; }
+  const btn = $('pdfCandidateBtn');
+  const label = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Reviewing...';
+  try {
+    const meta = await api('/pdf/boundary-candidates', {
+      method: 'POST',
+      body: JSON.stringify({
+        pdf: pdfBase64,
+        pdfPageIndex: Number($('pdfPageIndex').value) || 0,
+        pdfScale: Number($('pdfScale').value),
+        hazard: $('hazard').value || undefined,
+      }),
+    });
+    renderPdfBoundaryCandidates(meta);
+    $('status').textContent = `Boundary candidates ready for page ${meta.pageIndex} - choose one, then Generate`;
+  } catch (err) {
+    $('status').textContent = 'Boundary candidate error: ' + err.message;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = label;
+  }
+};
+if ($('pdfDecisionBtn')) $('pdfDecisionBtn').onclick = savePdfBoundaryDecision;
+if ($('pdfDecisionLoadBtn')) $('pdfDecisionLoadBtn').onclick = loadPdfBoundaryDecision;
+$('exaggerate').onchange = (e) => { pipeVizScale = e.target.checked ? 6 : 1; if (currentCadModel) renderModel(currentCadModel); };
+$('genBtn').onclick = generate;
+$('submitBtn').onclick = async () => {
+  const btn = $('submitBtn'); btn.disabled = true; const label = btn.textContent; btn.textContent = 'Building…';
+  try {
+    const res = await fetch('/api/projects/' + encodeURIComponent(currentProjectName()) + '/submittal', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+      body: JSON.stringify(lastBody),
+    });
+    if (!res.ok) { $('status').textContent = 'submittal error: ' + res.status; return; }
+    const blob = await res.blob(); const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = 'halofire-submittal.json'; a.click(); URL.revokeObjectURL(a.href);
+    $('status').textContent = 'submittal downloaded (best-effort package)';
+  } finally { btn.disabled = false; btn.textContent = label; }
+};
+$('dxfBtn').onclick = async () => {
+  const res = await fetch('/api/projects/' + encodeURIComponent(currentProjectName()) + '/cad.dxf', {
+    method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+    body: JSON.stringify(lastBody),
+  });
+  if (!res.ok) return;
+  const blob = await res.blob(); const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = 'halofire-cad.dxf'; a.click(); URL.revokeObjectURL(a.href);
+};
+for (const [id, fmt] of [['stepBtn','step'],['ifcBtn','ifc'],['stlBtn','stl']]) {
+  $(id).onclick = async () => {
+    try {
+      const built = await buildExportProof(fmt);
+      if (!built) { $('exportMsg').textContent = 'Generate a layout first.'; return; }
+      const { out, payload, proof } = built;
+      if (!proof.byteLength) { $('exportMsg').textContent = `${fmt.toUpperCase()} export returned empty (${out.registered} entities registered).`; return; }
+      download(proof.downloadName, payload, out.text);
+      window.__lastExportProof = proof;
+      $('exportMsg').textContent = buildExportProofMessage(proof);
+    } catch (e) { $('exportMsg').textContent = fmt.toUpperCase() + ' export error: ' + e.message; }
+  };
+}
+window.__exportCadProof = buildExportProof;
+$('demoBtn').onclick = playDemo;
+document.querySelectorAll('#viewSeg button').forEach((b) => {
+  b.onclick = () => { if (demoRAF) { cancelAnimationFrame(demoRAF); demoRAF = null; $('demoBtn').disabled = false; } document.querySelectorAll('#viewSeg button').forEach((x) => x.classList.remove('on')); b.classList.add('on'); setView(b.dataset.view); };
+});
+
+(async () => { await initStudio(); })();
+</script>
+</body>
+</html>

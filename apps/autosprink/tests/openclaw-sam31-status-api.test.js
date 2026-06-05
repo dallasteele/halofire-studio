@@ -1,0 +1,3024 @@
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { spawn } from 'node:child_process';
+import express from 'express';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+
+import { COOPERATIVE_1881_PROJECT_NAME } from '../src/data/floorplans.js';
+import { createSam31BridgeApp } from '../src/sam31/bridge.js';
+
+const ROOT = path.resolve(import.meta.dirname, '..');
+const PORT = 3217;
+const BASE = `http://127.0.0.1:${PORT}`;
+const COOPERATIVE_1881_PATH = `/api/projects/${encodeURIComponent(COOPERATIVE_1881_PROJECT_NAME)}`;
+
+let bridgeServer;
+let bridgeBaseUrl;
+let perceptionServer;
+let perceptionBaseUrl;
+let apiServer;
+let tempDir;
+let token;
+const consumerQueuePosts = [];
+
+function request(pathname, options = {}) {
+  return fetch(`${BASE}${pathname}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(options.headers || {}),
+    },
+  });
+}
+
+async function waitForHealth() {
+  const t0 = Date.now();
+  while (Date.now() - t0 < 8000) {
+    try {
+      const r = await request('/api/health');
+      if (r.ok) return;
+    } catch {
+      // server is still starting
+    }
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+  throw new Error('HaloFire API did not become healthy');
+}
+
+beforeAll(async () => {
+  const bridgeApp = createSam31BridgeApp();
+  await new Promise((resolve) => {
+    bridgeServer = bridgeApp.listen(0, '127.0.0.1', resolve);
+  });
+  const bridgeAddress = bridgeServer.address();
+  bridgeBaseUrl = `http://127.0.0.1:${bridgeAddress.port}`;
+
+  const perceptionApp = express();
+  perceptionApp.use(express.json({ limit: '2mb' }));
+  perceptionApp.get('/vision/sam31/tool', (_req, res) => {
+    res.json({
+      artifact_type: 'openclaw.sam31_llm_extrapolation_tool',
+      status: 'ready',
+      source_runtime: 'sam-3.1+llm',
+      input_lanes: ['image_ref', 'sections', 'object_hypotheses', 'prompt'],
+      output_lanes: ['llm_observations', 'vector_overlays', 'model_3d_candidates', 'extrapolation_index'],
+      supported_applications: ['halo_fire', 'landscout', 'nameforge'],
+      perception_lanes: ['segmentation', 'object_identification', 'vector_overlay', 'model_3d_candidate', 'spatial_observation'],
+      action: {
+        method: 'POST',
+        href: '/vision/sam31/extrapolate',
+        contract_ref: 'openclaw.sam31_extrapolation_contract',
+      },
+      product_review_queue_contract: {
+        artifact_type: 'openclaw.sam31.product_review_queue_contract.v1',
+        status: 'ready',
+        source_runtime: 'sam-3.1+llm',
+        supported_applications: ['halo_fire', 'landscout', 'nameforge'],
+        requires_review_before_claims: true,
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      },
+      consumer_actions: {
+        landscout: {
+          method: 'POST',
+          href: '/landscout/sam31/product-review-queue',
+          consumes: 'openclaw.sam31.product_review_queue_item.v1',
+          artifact_type: 'openclaw.sam31.consumer_review_queue.landscout.v1',
+          claim_gate_effect: 'no_claims_cleared',
+        },
+        nameforge: {
+          method: 'POST',
+          href: '/nameforge/sam31/product-review-queue',
+          consumes: 'openclaw.sam31.product_review_queue_item.v1',
+          artifact_type: 'openclaw.sam31.consumer_review_queue.nameforge.v1',
+          claim_gate_effect: 'no_claims_cleared',
+        },
+      },
+      application_contracts: {
+        halo_fire: { contract_ref: 'openclaw.sam31.application_contract.halo_fire.v1' },
+        landscout: { contract_ref: 'openclaw.sam31.application_contract.landscout.v1' },
+        nameforge: { contract_ref: 'openclaw.sam31.application_contract.nameforge.v1' },
+      },
+      temporary_value_policy: 'best_guess_until_employee_replaced',
+      acceptable_human_updates: ['semantic_label', 'polygon', 'bbox', 'object_hypothesis', 'vector_overlay', 'model_3d_candidate', 'source_ref', 'confidence'],
+      blocked_claims: ['permit_ready', 'AHJ_approval', 'AutoSprink_parity'],
+      claim_gate_effect: 'no_claims_cleared',
+      limitations: ['Canonical OpenClaw SAM31 tool descriptor fixture.'],
+    });
+  });
+  perceptionApp.post('/vision/sam31/extrapolate', (req, res) => {
+    const body = req.body || {};
+    const sections = Array.isArray(body.sections) ? body.sections : [];
+    const objectHypotheses = Array.isArray(body.object_hypotheses) ? body.object_hypotheses : [];
+    res.json({
+      artifact_type: 'openclaw.sam31_llm_extrapolation_artifact',
+      status: 'best_effort_extrapolation_ready',
+      source_runtime: 'sam-3.1+llm',
+      tool: {
+        artifact_type: 'openclaw.sam31_llm_extrapolation_tool',
+        action: {
+          method: 'POST',
+          href: '/vision/sam31/extrapolate',
+          contract_ref: 'openclaw.sam31_extrapolation_contract',
+        },
+        claim_gate_effect: 'no_claims_cleared',
+      },
+      project_ref: body.project_ref,
+      application: body.application || 'halo_fire',
+      source_ref: body.source_ref,
+      image_ref: body.image_ref,
+      section_count: sections.length,
+      object_hypothesis_count: objectHypotheses.length,
+      source_refs: [
+        {
+          source_ref: body.source_ref,
+          image_ref: body.image_ref,
+          runtime: 'sam-3.1+llm',
+        },
+      ],
+      product_review_action: {
+        application: body.application || 'halo_fire',
+        contract_ref: 'openclaw.sam31.application_contract.halo_fire.v1',
+        status: 'ready_for_product_review_queue',
+        next_action: 'Queue HaloFire room-boundary or sleeve/firestop review with SAM31 vector/3D best guesses; keep permit, AHJ, AutoSprink, fabrication, and manufacturer claims blocked.',
+        claim_gate_effect: 'no_claims_cleared',
+      },
+      product_review_queue_item: {
+        artifact_type: 'openclaw.sam31.product_review_queue_item.v1',
+        status: 'ready_for_human_replacement_or_acceptance',
+        application: body.application || 'halo_fire',
+        project_ref: body.project_ref,
+        source_runtime: 'sam-3.1+llm',
+        source_packet_ref: 'openclaw.sam31_perception_packet',
+        contract_ref: 'openclaw.sam31.application_contract.halo_fire.v1',
+        supported_evidence_lanes: [
+          'room_boundary_visual_audit',
+          'sleeve_or_firestop_candidate_review',
+          'obstruction_or_clash_review',
+          'vector_overlay_generation',
+          'model_3d_candidate_generation',
+        ],
+        acceptable_human_updates: [
+          'semantic_label',
+          'polygon',
+          'bbox',
+          'object_hypothesis',
+          'vector_overlay',
+          'model_3d_candidate',
+          'source_ref',
+          'confidence',
+        ],
+        temporary_value_policy: 'best_guess_until_employee_replaced',
+        section_count: sections.length,
+        object_hypothesis_count: objectHypotheses.length,
+        vector_overlay_count: 1,
+        model_3d_candidate_count: 1,
+        source_refs: [
+          {
+            source_ref: body.source_ref,
+            image_ref: body.image_ref,
+            runtime: 'sam-3.1+llm',
+          },
+        ],
+        next_action: 'Queue HaloFire room-boundary or sleeve/firestop review with SAM31 vector/3D best guesses; keep permit, AHJ, AutoSprink, fabrication, and manufacturer claims blocked.',
+        use_for_claims: false,
+        blocked_claims: ['permit_ready', 'AHJ_approval', 'AutoSprink_parity'],
+        claim_gate_effect: 'no_claims_cleared',
+      },
+      perception_packet: {
+        artifact_type: 'openclaw.sam31_perception_packet',
+        status: 'best_effort_perception_ready',
+        project_ref: body.project_ref,
+        application: body.application || 'halo_fire',
+        source_runtime: 'sam-3.1+llm',
+        source_ref: body.source_ref,
+        image_ref: body.image_ref,
+        perception_lanes: ['segmentation', 'object_identification', 'vector_overlay', 'model_3d_candidate', 'spatial_observation'],
+        segments: sections,
+        object_hypotheses: objectHypotheses,
+        vector_overlays: [
+          {
+            id: 'vector:section-room-101',
+            segment_id: sections[0]?.id || 'section-room-101',
+            kind: 'polygon_path',
+            svg_path: 'M 10 20 L 510 20 L 510 320 L 10 320 Z',
+            confidence: 0.52,
+            source: 'mock-openclaw-sam31',
+          },
+        ],
+        model_3d_candidates: [
+          {
+            id: 'model3d:section-room-101',
+            segment_id: sections[0]?.id || 'section-room-101',
+            primitive: 'extruded_polygon',
+            height_ft: 10,
+            confidence: 0.33,
+            source: 'mock-openclaw-sam31',
+            limitations: ['Mock OpenClaw SAM31 artifact for deterministic HaloFire API test only.'],
+          },
+        ],
+        blocked_claims: ['permit_ready', 'AHJ_approval', 'AutoSprink_parity'],
+        claim_gate_effect: 'no_claims_cleared',
+      },
+      blocked_claims: ['permit_ready', 'AHJ_approval', 'AutoSprink_parity'],
+      claim_gate_effect: 'no_claims_cleared',
+      limitations: ['Mock OpenClaw SAM31 artifact for deterministic HaloFire API test only.'],
+    });
+  });
+  perceptionApp.post('/landscout/sam31/product-review-queue', (req, res) => {
+    consumerQueuePosts.push({ consumer: 'landscout', body: req.body });
+    res.status(202).json({
+      artifact_type: 'openclaw.sam31.consumer_review_queue.landscout.v1',
+      status: 'queued_for_product_review',
+      accepted: true,
+      queue_id: 'sam31-landscout-testqueue',
+      persisted_review_packet_ref: 'openclaw://landscout/sam31/product-review/sam31-landscout-testqueue',
+      claim_gate_effect: 'no_claims_cleared',
+    });
+  });
+  perceptionApp.post('/nameforge/sam31/product-review-queue', (req, res) => {
+    consumerQueuePosts.push({ consumer: 'nameforge', body: req.body });
+    res.status(202).json({
+      artifact_type: 'openclaw.sam31.consumer_review_queue.nameforge.v1',
+      status: 'queued_for_product_review',
+      accepted: true,
+      queue_id: 'sam31-nameforge-testqueue',
+      persisted_review_packet_ref: 'openclaw://nameforge/sam31/product-review/sam31-nameforge-testqueue',
+      claim_gate_effect: 'no_claims_cleared',
+    });
+  });
+  await new Promise((resolve) => {
+    perceptionServer = perceptionApp.listen(0, '127.0.0.1', resolve);
+  });
+  const perceptionAddress = perceptionServer.address();
+  perceptionBaseUrl = `http://127.0.0.1:${perceptionAddress.port}`;
+
+  tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'halofire-sam31-status-'));
+  apiServer = spawn(process.execPath, ['src/api/server.js'], {
+    cwd: ROOT,
+    env: {
+      ...process.env,
+      PORT: String(PORT),
+      NODE_ENV: 'test',
+      HALOFIRE_DB_PATH: path.join(tempDir, 'h.db'),
+      JWT_SECRET: 'test-jwt-secret-with-more-than-32-characters',
+      HALOFIRE_ADMIN_USER: 'admin',
+      HALOFIRE_ADMIN_PASSWORD: 'sam31-status-test-pw',
+      HALOFIRE_ALLOW_DEV_DEFAULTS: '0',
+      HALOFIRE_CORS_ORIGINS: 'http://allowed.test',
+      OPENCLAW_BRIDGE_URL: bridgeBaseUrl,
+      OPENCLAW_PERCEPTION_URL: perceptionBaseUrl,
+      OPENCLAW_SAM31_LANDSCOUT_QUEUE_URL: `${perceptionBaseUrl}/landscout/sam31/product-review-queue`,
+      OPENCLAW_SAM31_NAMEFORGE_QUEUE_URL: `${perceptionBaseUrl}/nameforge/sam31/product-review-queue`,
+    },
+    stdio: ['ignore', 'pipe', 'pipe'],
+  });
+  await waitForHealth();
+  token = (await (await request('/api/auth/login', {
+    method: 'POST',
+    body: JSON.stringify({ username: 'admin', password: 'sam31-status-test-pw' }),
+  })).json()).token;
+});
+
+afterAll(async () => {
+  if (apiServer && !apiServer.killed) {
+    apiServer.kill();
+    await new Promise((resolve) => apiServer.once('exit', resolve));
+  }
+  if (bridgeServer) {
+    await new Promise((resolve) => bridgeServer.close(resolve));
+  }
+  if (perceptionServer) {
+    await new Promise((resolve) => perceptionServer.close(resolve));
+  }
+  if (tempDir) fs.rmSync(tempDir, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
+});
+
+describe('OpenClaw SAM31 bridge status API', () => {
+  it('probes a configured bridge and reports verified reachability without clearing claims', async () => {
+    const res = await request('/api/openclaw/sam31/status', {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31_bridge_status',
+      status: 'verified_reachable',
+      tool_ref: 'pdfExtract:sam',
+      bridge_url_configured: true,
+      bridge_url: bridgeBaseUrl,
+      bridge_reachable: true,
+      openclaw_status: 'local-shim',
+      sam31_status: 'online',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(body.probe_status_url).toBe(`${bridgeBaseUrl}/status`);
+    expect(body.observed_at).toEqual(expect.any(String));
+    expect(body.supported_applications).toEqual(expect.arrayContaining(['halo_fire', 'landscout', 'nameforge']));
+    expect(body.blocked_claims).toEqual(expect.arrayContaining(['OpenClaw_runtime_verified', 'permit_ready']));
+    expect(body.limitations.join(' ')).toMatch(/does not clear/i);
+    expect(body.raw_status).toEqual(expect.objectContaining({
+      service: 'halofire-sam31-bridge',
+      services: expect.objectContaining({
+        sam31: expect.objectContaining({ status: 'online' }),
+      }),
+    }));
+    expect(body.canonical_tool_descriptor_status).toBe('ready');
+    expect(body.canonical_tool_descriptor_url).toBe(`${perceptionBaseUrl}/vision/sam31/tool`);
+    expect(body.canonical_tool_descriptor).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31_llm_extrapolation_tool',
+      status: 'ready',
+      source_runtime: 'sam-3.1+llm',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(body.canonical_tool_descriptor.supported_applications).toEqual(['halo_fire', 'landscout', 'nameforge']);
+    expect(body.canonical_tool_descriptor.output_lanes).toEqual(expect.arrayContaining([
+      'llm_observations',
+      'vector_overlays',
+      'model_3d_candidates',
+      'extrapolation_index',
+    ]));
+    expect(body.canonical_tool_descriptor.consumer_actions.landscout).toEqual(expect.objectContaining({
+      href: '/landscout/sam31/product-review-queue',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(body.consumer_queue_statuses).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        consumer: 'landscout',
+        status: 'configured_unverified',
+        endpoint_configured: true,
+        endpoint: `${perceptionBaseUrl}/landscout/sam31/product-review-queue`,
+        endpoint_source_file: 'OPENCLAW_SAM31_LANDSCOUT_QUEUE_URL',
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+      expect.objectContaining({
+        consumer: 'nameforge',
+        status: 'configured_unverified',
+        endpoint_configured: true,
+        endpoint: `${perceptionBaseUrl}/nameforge/sam31/product-review-queue`,
+        endpoint_source_file: 'OPENCLAW_SAM31_NAMEFORGE_QUEUE_URL',
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    ]));
+    expect(body.canonical_tool_descriptor.product_review_queue_contract).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.product_review_queue_contract.v1',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+  });
+
+  it('runs a SAM31 bridge invocation and persists a best-effort smoke artifact without clearing claims', async () => {
+    const res = await request(`${COOPERATIVE_1881_PATH}/openclaw/sam31/smoke-artifact`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        pdfRef: 'provided-docs:Proposal-Cooperative-1881-Salt-Lake-City-UT-9-18-25.pdf#page=7',
+        pdfPageIndex: 7,
+        pdfScale: 0.083333,
+        targets: ['building_outline', 'walls', 'rooms', 'sprinkler_obstructions'],
+      }),
+    });
+
+    expect(res.status).toBe(201);
+    const body = await res.json();
+    expect(body).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31_bridge_smoke_artifact',
+      status: 'sam31_invocation_verified',
+      project_name: COOPERATIVE_1881_PROJECT_NAME,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(body.bridge_status).toEqual(expect.objectContaining({
+      status: 'verified_reachable',
+      bridge_reachable: true,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(body.invocation).toEqual(expect.objectContaining({
+      tool: 'sam_segment_floorplan',
+      endpoint: `${bridgeBaseUrl}/codex-bridge/invoke`,
+    }));
+    expect(body.sam31_request).toEqual(expect.objectContaining({
+      service: 'sam-3.1',
+      op: 'segment_floorplan',
+      pdfRef: 'provided-docs:Proposal-Cooperative-1881-Salt-Lake-City-UT-9-18-25.pdf#page=7',
+      pageIndex: 7,
+      scale: 0.083333,
+    }));
+    expect(body.sam31_request.targets).toEqual(expect.arrayContaining(['building_outline', 'sprinkler_obstructions']));
+    expect(body.result_summary).toEqual(expect.objectContaining({
+      ok: true,
+      source: 'sam-3.1-shim',
+      runtime: 'halofire-local-sam31-bridge',
+      layer_keys: expect.arrayContaining(['building_outline', 'walls', 'rooms']),
+    }));
+    expect(body.blocked_claims).toEqual(expect.arrayContaining([
+      'geometry_accuracy',
+      'permit_ready',
+      'AutoSprink_parity',
+      'SAM31_runtime_verified',
+      'OpenClaw_runtime_verified',
+    ]));
+    expect(body.evidence).toEqual(expect.objectContaining({
+      evidence_type: 'openclaw_sam31_bridge_smoke_artifact',
+      source_file: 'OPENCLAW_BRIDGE_URL',
+      source_ref: `${bridgeBaseUrl}/codex-bridge/invoke`,
+      status: 'best_effort',
+    }));
+    const savedNotes = JSON.parse(body.evidence.notes);
+    expect(savedNotes).toEqual(expect.objectContaining({
+      kind: 'openclaw_sam31_bridge_smoke_artifact',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(savedNotes.artifact.status).toBe('sam31_invocation_verified');
+
+    const evidenceRes = await request(`${COOPERATIVE_1881_PATH}/evidence`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(evidenceRes.status).toBe(200);
+    const evidenceRows = await evidenceRes.json();
+    expect(evidenceRows).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        id: body.evidence.id,
+        evidence_type: 'openclaw_sam31_bridge_smoke_artifact',
+        status: 'best_effort',
+      }),
+    ]));
+  });
+
+  it('surfaces the SAM31 bridge smoke action and latest artifact in the resolver queue', async () => {
+    const boundaryRes = await request(`${COOPERATIVE_1881_PATH}/pdf-boundary-decision`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        pdfPageIndex: 4,
+        pdfScale: 0.075,
+        pdfExtract: 'sam-action-test-outline',
+        source_file: 'Proposal-Cooperative-1881-Salt-Lake-City-UT-9-18-25.pdf',
+        source_ref: '1881 plan PDF sheet 4 / SAM31 smoke queue action',
+        candidate: {
+          mode: 'outline',
+          label: 'SAM31 queue smoke outline',
+          status: 'candidate',
+          bbox: { x: 10, y: 20, width: 500, height: 300 },
+          segmentCount: 9,
+        },
+      }),
+    });
+    expect(boundaryRes.status).toBe(201);
+    const boundary = await boundaryRes.json();
+
+    const beforeQueueRes = await request(`${COOPERATIVE_1881_PATH}/resolver-queue`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(beforeQueueRes.status).toBe(200);
+    const beforeQueue = await beforeQueueRes.json();
+    const beforeItem = beforeQueue.items.find((row) => row.evidence_id === boundary.id);
+    expect(beforeItem.sam31_bridge_smoke_action).toEqual(expect.objectContaining({
+      label: 'Run OpenClaw SAM31 bridge smoke artifact',
+      method: 'POST',
+      href: `${COOPERATIVE_1881_PATH}/openclaw/sam31/smoke-artifact`,
+      status: 'configured_unverified',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(beforeItem.sam31_bridge_smoke_action.request_body).toEqual(expect.objectContaining({
+      pdfRef: 'Proposal-Cooperative-1881-Salt-Lake-City-UT-9-18-25.pdf',
+      pdfPageIndex: 4,
+      pdfScale: 0.075,
+    }));
+    expect(beforeItem.sam31_bridge_smoke_action.request_body.targets).toEqual(expect.arrayContaining([
+      'building_outline',
+      'walls',
+      'rooms',
+      'sprinkler_obstructions',
+    ]));
+    expect(beforeItem.actions).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        label: 'Run OpenClaw SAM31 bridge smoke artifact',
+        href: `${COOPERATIVE_1881_PATH}/openclaw/sam31/smoke-artifact`,
+        method: 'POST',
+      }),
+    ]));
+
+    const smokeRes = await request(beforeItem.sam31_bridge_smoke_action.href, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify(beforeItem.sam31_bridge_smoke_action.request_body),
+    });
+    expect(smokeRes.status).toBe(201);
+    const smoke = await smokeRes.json();
+
+    const afterQueueRes = await request(`${COOPERATIVE_1881_PATH}/resolver-queue`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(afterQueueRes.status).toBe(200);
+    const afterQueue = await afterQueueRes.json();
+    const afterItem = afterQueue.items.find((row) => row.evidence_id === boundary.id);
+    expect(afterItem.latest_openclaw_sam31_bridge_smoke_artifact).toEqual(expect.objectContaining({
+      evidence_id: smoke.id,
+      evidence_status: 'best_effort',
+      status: 'sam31_invocation_verified',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(afterItem.latest_openclaw_sam31_bridge_smoke_artifact.result_summary).toEqual(expect.objectContaining({
+      source: 'sam-3.1-shim',
+      runtime: 'halofire-local-sam31-bridge',
+    }));
+    expect(afterQueue.summary.sam31_bridge_smoke_recorded).toBeGreaterThanOrEqual(1);
+  });
+
+  it('posts the visual-audit packet to OpenClaw SAM31 extrapolate and persists product-review evidence', async () => {
+    const boundaryRes = await request(`${COOPERATIVE_1881_PATH}/pdf-boundary-decision`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        pdfPageIndex: 8,
+        pdfScale: 0.08,
+        pdfExtract: 'sam31-extrapolate-outline',
+        source_file: 'Proposal-Cooperative-1881-Salt-Lake-City-UT-9-18-25.pdf',
+        source_ref: '1881 plan PDF sheet 8 / SAM31 extrapolate queue action',
+        candidate: {
+          mode: 'outline',
+          label: 'SAM31 extrapolate outline',
+          status: 'candidate',
+          bbox: { x: 10, y: 20, width: 500, height: 300 },
+          segmentCount: 11,
+        },
+      }),
+    });
+    expect(boundaryRes.status).toBe(201);
+    const boundary = await boundaryRes.json();
+
+    const queueRes = await request(`${COOPERATIVE_1881_PATH}/resolver-queue`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(queueRes.status).toBe(200);
+    const queue = await queueRes.json();
+    const item = queue.items.find((row) => row.evidence_id === boundary.id);
+    expect(item.openclaw_sam31_extrapolation_action).toEqual(expect.objectContaining({
+      label: 'Run OpenClaw SAM31 extrapolation artifact',
+      method: 'POST',
+      href: `${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/extrapolation-artifact`,
+      status: 'configured_unverified',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(item.actions).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        label: 'Run OpenClaw SAM31 extrapolation artifact',
+        method: 'POST',
+      }),
+    ]));
+
+    const artifactRes = await request(item.openclaw_sam31_extrapolation_action.href, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(artifactRes.status).toBe(201);
+    const artifact = await artifactRes.json();
+    expect(artifact).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31_llm_extrapolation_artifact',
+      status: 'best_effort_extrapolation_ready',
+      project_name: COOPERATIVE_1881_PROJECT_NAME,
+      source_pdf_boundary_evidence_id: boundary.id,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(artifact.openclaw_endpoint).toBe(`${perceptionBaseUrl}/vision/sam31/extrapolate`);
+    expect(artifact.request.sections[0]).toEqual(expect.objectContaining({
+      id: 'candidate:pdf-boundary',
+      semantic_label: 'room_boundary_candidate',
+    }));
+    expect(artifact.perception_packet).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31_perception_packet',
+      project_ref: `halo_fire:${COOPERATIVE_1881_PROJECT_NAME}`,
+      application: 'halo_fire',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(artifact.sectioning_pipeline_contract).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.sectioning_pipeline_contract.v1',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(artifact.product_review_queue_item.sectioning_pipeline_contract_ref).toBe('openclaw.sam31.sectioning_pipeline_contract.v1');
+    expect(artifact.product_review_action).toEqual(expect.objectContaining({
+      status: 'ready_for_product_review_queue',
+      contract_ref: 'openclaw.sam31.application_contract.halo_fire.v1',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(artifact.product_review_queue_item).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.product_review_queue_item.v1',
+      application: 'halo_fire',
+      project_ref: `halo_fire:${COOPERATIVE_1881_PROJECT_NAME}`,
+      source_packet_ref: 'openclaw.sam31_perception_packet',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(artifact.product_review_queue_item.supported_evidence_lanes).toEqual(expect.arrayContaining([
+      'room_boundary_visual_audit',
+      'vector_overlay_generation',
+      'model_3d_candidate_generation',
+    ]));
+    expect(artifact.extrapolation_index).toEqual([
+      expect.objectContaining({
+        artifact_type: 'openclaw.sam31.extrapolation_index_item.v1',
+        section_id: 'candidate:pdf-boundary',
+        semantic_label: 'room_boundary_candidate',
+        vector_overlay_ids: expect.arrayContaining(['vector:section-room-101']),
+        model_3d_candidate_ids: expect.arrayContaining(['model3d:section-room-101']),
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    ]);
+    expect(artifact.evidence).toEqual(expect.objectContaining({
+      evidence_type: 'openclaw_sam31_extrapolation_artifact',
+      source_file: 'OPENCLAW_PERCEPTION_URL',
+      source_ref: `${perceptionBaseUrl}/vision/sam31/extrapolate`,
+      status: 'best_effort',
+    }));
+    const notes = JSON.parse(artifact.evidence.notes);
+    expect(notes).toEqual(expect.objectContaining({
+      kind: 'openclaw_sam31_extrapolation_artifact',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+
+    const afterQueueRes = await request(`${COOPERATIVE_1881_PATH}/resolver-queue`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(afterQueueRes.status).toBe(200);
+    const afterQueue = await afterQueueRes.json();
+    const afterItem = afterQueue.items.find((row) => row.evidence_id === boundary.id);
+    expect(afterItem.latest_openclaw_sam31_extrapolation_artifact).toEqual(expect.objectContaining({
+      evidence_id: artifact.id,
+      evidence_status: 'best_effort',
+      status: 'best_effort_extrapolation_ready',
+      source_pdf_boundary_evidence_id: boundary.id,
+      product_review_action: expect.objectContaining({
+        status: 'ready_for_product_review_queue',
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+      product_review_queue_item: expect.objectContaining({
+        artifact_type: 'openclaw.sam31.product_review_queue_item.v1',
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+      extrapolation_index: [
+        expect.objectContaining({
+          section_id: 'candidate:pdf-boundary',
+          use_for_claims: false,
+          claim_gate_effect: 'no_claims_cleared',
+        }),
+      ],
+      extrapolation_index_count: 1,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(afterItem.openclaw_sam31_sectioning_pipeline_contract_action).toEqual(expect.objectContaining({
+      label: 'Download SAM31 sectioning pipeline contract',
+      method: 'GET',
+      href: `${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/sectioning-pipeline-contract`,
+      artifact_type: 'openclaw.sam31.sectioning_pipeline_contract_packet.v1',
+      source_openclaw_sam31_extrapolation_evidence_id: artifact.id,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(afterItem.actions).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        label: 'Download SAM31 sectioning pipeline contract',
+        href: `${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/sectioning-pipeline-contract`,
+        artifact_type: 'openclaw.sam31.sectioning_pipeline_contract_packet.v1',
+      }),
+    ]));
+    expect(afterQueue.summary.sam31_extrapolation_recorded).toBeGreaterThanOrEqual(1);
+
+    const sectioningContractRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/sectioning-pipeline-contract`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(sectioningContractRes.status).toBe(200);
+    const sectioningContractPacket = await sectioningContractRes.json();
+    expect(sectioningContractPacket).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.sectioning_pipeline_contract_packet.v1',
+      status: 'ready_for_internal_alpha_review',
+      project_name: COOPERATIVE_1881_PROJECT_NAME,
+      source_pdf_boundary_evidence_id: boundary.id,
+      source_openclaw_sam31_extrapolation_evidence_id: artifact.id,
+      download_name: expect.stringContaining('sam31-sectioning-pipeline-contract'),
+      use_for_claims: false,
+      no_claim_gates_cleared: true,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(sectioningContractPacket.sectioning_pipeline_contract).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.sectioning_pipeline_contract.v1',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(sectioningContractPacket.sectioning_pipeline_contract.stages.map((stage) => stage.stage)).toEqual([
+      'sam31_sectioning',
+      'llm_object_identification',
+      'vector_overlay_generation',
+      'model_3d_candidate_generation',
+      'product_review_queue',
+    ]);
+    expect(sectioningContractPacket.source_refs).toEqual(expect.arrayContaining([
+      expect.objectContaining({ evidence_id: boundary.id, evidence_type: 'pdf_boundary_decision' }),
+      expect.objectContaining({ evidence_id: artifact.id, evidence_type: 'openclaw_sam31_extrapolation_artifact' }),
+    ]));
+    expect(sectioningContractPacket.blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'AHJ_approval',
+      'AutoSprink_parity',
+      'SAM31_runtime_verified',
+      'OpenClaw_runtime_verified',
+    ]));
+
+    const sectioningReviewRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/sectioning-pipeline-contract-review`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        source_openclaw_sam31_extrapolation_evidence_id: artifact.id,
+        review_decision: 'replaced',
+        reviewer_name: 'HaloFire estimator',
+        replacement_ref: '1881://employee-review/sam31/sectioning/room-101',
+        replacement_values: {
+          semantic_labels: [
+            {
+              section_id: 'section-room-101',
+              label: 'employee reviewed corridor boundary',
+              source_ref: '1881://employee-review/sam31/sectioning/semantic-label',
+            },
+          ],
+          polygons: [
+            {
+              section_id: 'section-room-101',
+              polygon: [[12, 22], [508, 22], [508, 318], [12, 318]],
+              source_ref: '1881://employee-review/sam31/sectioning/polygon',
+            },
+          ],
+          bboxes: [
+            {
+              section_id: 'section-room-101',
+              bbox: { x: 12, y: 22, width: 496, height: 296 },
+              source_ref: '1881://employee-review/sam31/sectioning/bbox',
+            },
+          ],
+          vector_overlays: [
+            {
+              id: 'vector:room-101-reviewed-sectioning',
+              source_vector_overlay_id: 'vector:section-room-101',
+              svg_path: 'M 12 22 L 508 22 L 508 318 L 12 318 Z',
+              source_ref: '1881://employee-review/sam31/sectioning/vector',
+            },
+          ],
+          model_3d_candidates: [
+            {
+              id: 'model3d:room-101-reviewed-sectioning',
+              source_model_3d_candidate_id: 'model3d:section-room-101',
+              primitive: 'extruded_polygon',
+              source_ref: '1881://employee-review/sam31/sectioning/model3d',
+            },
+          ],
+        },
+        notes: 'Employee replacement values for the SAM31 sectioning pipeline contract only.',
+      }),
+    });
+    expect(sectioningReviewRes.status).toBe(201);
+    const sectioningReview = await sectioningReviewRes.json();
+    expect(sectioningReview).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.sectioning_pipeline_contract_review.v1',
+      status: 'present',
+      source_pdf_boundary_evidence_id: boundary.id,
+      source_openclaw_sam31_extrapolation_evidence_id: artifact.id,
+      source_sectioning_pipeline_contract_artifact_type: 'openclaw.sam31.sectioning_pipeline_contract.v1',
+      review_decision: 'replaced',
+      replacement_ref: '1881://employee-review/sam31/sectioning/room-101',
+      use_for_claims: false,
+      no_claim_gates_cleared: true,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(sectioningReview.evidence).toEqual(expect.objectContaining({
+      evidence_type: 'openclaw_sam31_sectioning_pipeline_contract_review',
+      status: 'present',
+    }));
+    expect(sectioningReview.replacement_values).toEqual(expect.objectContaining({
+      semantic_labels: expect.any(Array),
+      polygons: expect.any(Array),
+      bboxes: expect.any(Array),
+      vector_overlays: expect.any(Array),
+      model_3d_candidates: expect.any(Array),
+    }));
+    expect(sectioningReview.replaced_fields).toEqual(expect.arrayContaining([
+      'semantic_labels',
+      'polygons',
+      'bboxes',
+      'vector_overlays',
+      'model_3d_candidates',
+    ]));
+    expect(sectioningReview.source_refs).toEqual(expect.arrayContaining([
+      expect.objectContaining({ evidence_id: boundary.id, evidence_type: 'pdf_boundary_decision' }),
+      expect.objectContaining({ evidence_id: artifact.id, evidence_type: 'openclaw_sam31_extrapolation_artifact' }),
+    ]));
+    expect(sectioningReview.blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'AHJ_approval',
+      'AutoSprink_parity',
+      'SAM31_runtime_verified',
+      'OpenClaw_runtime_verified',
+    ]));
+
+    const sectioningReviewedQueueRes = await request(`${COOPERATIVE_1881_PATH}/resolver-queue`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(sectioningReviewedQueueRes.status).toBe(200);
+    const sectioningReviewedQueue = await sectioningReviewedQueueRes.json();
+    const sectioningReviewedItem = sectioningReviewedQueue.items.find((row) => row.evidence_id === boundary.id);
+    expect(sectioningReviewedItem.latest_openclaw_sam31_sectioning_pipeline_contract_review).toEqual(expect.objectContaining({
+      evidence_id: sectioningReview.id,
+      evidence_status: 'present',
+      review_decision: 'replaced',
+      source_openclaw_sam31_extrapolation_evidence_id: artifact.id,
+      source_sectioning_pipeline_contract_artifact_type: 'openclaw.sam31.sectioning_pipeline_contract.v1',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(sectioningReviewedItem.sam31_sectioning_downstream_resolver_queue_items).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        artifact_type: 'halofire.sam31_sectioning_downstream_resolver_queue_item.v1',
+        status: 'ready_for_downstream_resolver',
+        downstream_resolver_lane: 'room_boundary_visual_audit',
+        source_pdf_boundary_evidence_id: boundary.id,
+        source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id: sectioningReview.id,
+        source_openclaw_sam31_extrapolation_evidence_id: artifact.id,
+        reviewed_semantic_label_count: 1,
+        reviewed_polygon_count: 1,
+        reviewed_bbox_count: 1,
+        use_for_claims: false,
+        no_claim_gates_cleared: true,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+      expect.objectContaining({
+        artifact_type: 'halofire.sam31_sectioning_downstream_resolver_queue_item.v1',
+        status: 'ready_for_downstream_resolver',
+        downstream_resolver_lane: 'obstruction_or_clash_review',
+        source_pdf_boundary_evidence_id: boundary.id,
+        source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id: sectioningReview.id,
+        source_openclaw_sam31_extrapolation_evidence_id: artifact.id,
+        reviewed_vector_overlay_count: 1,
+        reviewed_model_3d_candidate_count: 1,
+        use_for_claims: false,
+        no_claim_gates_cleared: true,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    ]));
+    expect(sectioningReviewedItem.sam31_sectioning_downstream_resolver_queue_items[0].blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'AHJ_approval',
+      'AutoSprink_parity',
+      'fabrication_ready',
+    ]));
+    expect(sectioningReviewedQueue.summary.sam31_sectioning_downstream_resolver_queue_items).toBeGreaterThanOrEqual(2);
+    expect(sectioningReviewedQueue.summary.sam31_sectioning_contract_reviews_recorded).toBeGreaterThanOrEqual(1);
+
+    const sectioningDownstreamQueueRes = await request(`${COOPERATIVE_1881_PATH}/resolver-queue?sam31SectioningReview=ready&lane=obstruction_or_clash_review`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(sectioningDownstreamQueueRes.status).toBe(200);
+    const sectioningDownstreamQueue = await sectioningDownstreamQueueRes.json();
+    expect(sectioningDownstreamQueue.filters.sam31SectioningReview).toBe('ready');
+    expect(sectioningDownstreamQueue.summary.sam31_sectioning_downstream_resolver_queue_items).toBe(1);
+    const sectioningDownstreamItem = sectioningDownstreamQueue.items.find((row) => row.evidence_id === boundary.id);
+    expect(sectioningDownstreamItem.sam31_sectioning_downstream_resolver_queue_items).toEqual([
+      expect.objectContaining({
+        downstream_resolver_lane: 'obstruction_or_clash_review',
+        source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id: sectioningReview.id,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    ]);
+
+    const sectioningDownstreamPacketRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/sectioning-downstream-resolvers`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(sectioningDownstreamPacketRes.status).toBe(200);
+    const sectioningDownstreamPacket = await sectioningDownstreamPacketRes.json();
+    expect(sectioningDownstreamPacket).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.sam31_sectioning_downstream_resolver_packet.v1',
+      status: 'ready_for_downstream_resolver',
+      source_pdf_boundary_evidence_id: boundary.id,
+      source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id: sectioningReview.id,
+      source_openclaw_sam31_extrapolation_evidence_id: artifact.id,
+      downstream_resolver_queue_item_count: 2,
+      use_for_claims: false,
+      no_claim_gates_cleared: true,
+      claim_gate_effect: 'no_claims_cleared',
+      download_name: expect.stringContaining('sam31-sectioning-downstream-resolvers'),
+    }));
+    expect(sectioningDownstreamPacket.downstream_resolver_queue_items).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        artifact_type: 'halofire.sam31_sectioning_downstream_resolver_queue_item.v1',
+        downstream_resolver_lane: 'room_boundary_visual_audit',
+        executable_action: expect.objectContaining({
+          label: 'Download room-boundary replay input',
+          claim_gate_effect: 'no_claims_cleared',
+        }),
+      }),
+      expect.objectContaining({
+        artifact_type: 'halofire.sam31_sectioning_downstream_resolver_queue_item.v1',
+        downstream_resolver_lane: 'obstruction_or_clash_review',
+        executable_action: expect.objectContaining({
+          label: 'Download SAM31 vector/model artifact packet',
+          claim_gate_effect: 'no_claims_cleared',
+        }),
+      }),
+    ]));
+    expect(sectioningDownstreamPacket.blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'AHJ_approval',
+      'AutoSprink_parity',
+      'fabrication_ready',
+    ]));
+
+    const persistedSectioningDownstreamPacketRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/sectioning-downstream-resolvers`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(persistedSectioningDownstreamPacketRes.status).toBe(201);
+    const persistedSectioningDownstreamPacket = await persistedSectioningDownstreamPacketRes.json();
+    expect(persistedSectioningDownstreamPacket).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.sam31_sectioning_downstream_resolver_packet.v1',
+      id: expect.any(Number),
+      message: expect.stringContaining('claims still blocked'),
+      source_pdf_boundary_evidence_id: boundary.id,
+      source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id: sectioningReview.id,
+      downstream_resolver_queue_item_count: 2,
+      use_for_claims: false,
+      no_claim_gates_cleared: true,
+      claim_gate_effect: 'no_claims_cleared',
+      evidence: expect.objectContaining({
+        evidence_type: 'halofire_sam31_sectioning_downstream_resolver_packet',
+        status: 'best_effort',
+        source_ref: expect.stringContaining('sam31-sectioning-downstream-resolvers'),
+      }),
+    }));
+
+    const sectioningSprinklerAdapterRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/sectioning-downstream-resolvers/${persistedSectioningDownstreamPacket.id}/sprinkler-review-adapter`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(sectioningSprinklerAdapterRes.status).toBe(201);
+    const sectioningSprinklerAdapter = await sectioningSprinklerAdapterRes.json();
+    expect(sectioningSprinklerAdapter).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31_to_sprinkler_review_adapter.v1',
+      status: 'ready_for_internal_alpha_sprinkler_review',
+      adapter_source: 'halofire.sam31_sectioning_downstream_resolver_packet.v1',
+      source_pdf_boundary_evidence_id: boundary.id,
+      source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id: persistedSectioningDownstreamPacket.id,
+      source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id: sectioningReview.id,
+      source_openclaw_sam31_extrapolation_evidence_id: artifact.id,
+      supported_applications: ['halo_fire', 'landscout', 'nameforge'],
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+      evidence: expect.objectContaining({
+        evidence_type: 'halofire_sam31_sectioning_sprinkler_review_adapter',
+        status: 'best_effort',
+        source_ref: expect.stringContaining('sam31-sectioning-sprinkler-review-adapter'),
+      }),
+    }));
+    expect(sectioningSprinklerAdapter.supported_sprinkler_review_lanes).toEqual(expect.arrayContaining([
+      'room_boundary_visual_audit',
+      'obstruction_or_clash_review',
+      'vector_overlay_generation',
+      'model_3d_candidate_generation',
+    ]));
+    expect(sectioningSprinklerAdapter.source_linked_vector_overlays).toEqual(expect.arrayContaining([
+      expect.objectContaining({ id: 'vector:room-101-reviewed-sectioning' }),
+    ]));
+    expect(sectioningSprinklerAdapter.source_linked_model_3d_candidates).toEqual(expect.arrayContaining([
+      expect.objectContaining({ id: 'model3d:room-101-reviewed-sectioning' }),
+    ]));
+    expect(sectioningSprinklerAdapter.sprinkler_review_packet).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.sam31_sprinkler_review_packet.v1',
+      source: 'openclaw.sam31_to_sprinkler_review_adapter.v1',
+      adapter_source: 'halofire.sam31_sectioning_downstream_resolver_packet.v1',
+      status: 'requires_employee_sprinkler_review',
+      source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id: persistedSectioningDownstreamPacket.id,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(sectioningSprinklerAdapter.sprinkler_review_packet.issue_seeds).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        issue_type: 'sam31_sectioning_reviewed_room_boundary',
+        supported_sprinkler_review_lane: 'room_boundary_visual_audit',
+      }),
+      expect.objectContaining({
+        issue_type: 'sam31_sectioning_reviewed_vector_model_candidates',
+        supported_sprinkler_review_lane: 'obstruction_or_clash_review',
+      }),
+    ]));
+    expect(sectioningSprinklerAdapter.source_refs).toEqual(expect.arrayContaining([
+      expect.objectContaining({ evidence_id: boundary.id, evidence_type: 'pdf_boundary_decision' }),
+      expect.objectContaining({ evidence_id: sectioningReview.id, evidence_type: 'openclaw_sam31_sectioning_pipeline_contract_review' }),
+      expect.objectContaining({ evidence_id: persistedSectioningDownstreamPacket.id, evidence_type: 'halofire_sam31_sectioning_downstream_resolver_packet' }),
+    ]));
+    expect(sectioningSprinklerAdapter.blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'AHJ_approval',
+      'AutoSprink_parity',
+      'fabrication_ready',
+      'professional_approval',
+      'manufacturer_exact',
+    ]));
+
+    const persistedSectioningQueueRes = await request(`${COOPERATIVE_1881_PATH}/resolver-queue`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(persistedSectioningQueueRes.status).toBe(200);
+    const persistedSectioningQueue = await persistedSectioningQueueRes.json();
+    const persistedSectioningItem = persistedSectioningQueue.items.find((row) => row.evidence_id === boundary.id);
+    expect(persistedSectioningQueue.summary.sam31_sectioning_downstream_resolver_packets_recorded).toBeGreaterThanOrEqual(1);
+    expect(persistedSectioningItem.latest_halofire_sam31_sectioning_downstream_resolver_packet).toEqual(expect.objectContaining({
+      evidence_id: persistedSectioningDownstreamPacket.id,
+      artifact_type: 'halofire.sam31_sectioning_downstream_resolver_packet.v1',
+      downstream_resolver_queue_item_count: 2,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(persistedSectioningQueue.summary.sam31_sectioning_sprinkler_review_adapters_recorded).toBeGreaterThanOrEqual(1);
+    expect(persistedSectioningItem.latest_halofire_sam31_sectioning_sprinkler_review_adapter).toEqual(expect.objectContaining({
+      evidence_id: sectioningSprinklerAdapter.id,
+      evidence_type: 'halofire_sam31_sectioning_sprinkler_review_adapter',
+      artifact_type: 'openclaw.sam31_to_sprinkler_review_adapter.v1',
+      adapter_source: 'halofire.sam31_sectioning_downstream_resolver_packet.v1',
+      source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id: persistedSectioningDownstreamPacket.id,
+      sprinkler_review_issue_seed_count: 2,
+      supported_sprinkler_review_lanes: expect.arrayContaining([
+        'room_boundary_visual_audit',
+        'obstruction_or_clash_review',
+      ]),
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(persistedSectioningItem.openclaw_sam31_sectioning_sprinkler_review_adapter_action).toEqual(expect.objectContaining({
+      label: 'Save SAM31 sectioning sprinkler review adapter',
+      method: 'POST',
+      href: expect.stringContaining(`/sectioning-downstream-resolvers/${persistedSectioningDownstreamPacket.id}/sprinkler-review-adapter`),
+      source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id: persistedSectioningDownstreamPacket.id,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+
+    const queueItemRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/product-review-queue-item`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(queueItemRes.status).toBe(200);
+    const queueItemPacket = await queueItemRes.json();
+    expect(queueItemPacket).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.product_review_queue_item.v1',
+      application: 'halo_fire',
+      project_ref: `halo_fire:${COOPERATIVE_1881_PROJECT_NAME}`,
+      source_pdf_boundary_evidence_id: boundary.id,
+      source_openclaw_sam31_extrapolation_evidence_id: artifact.id,
+      source_packet_ref: 'openclaw.sam31_perception_packet',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      download_name: expect.stringContaining('sam31-product-review-queue-item'),
+    }));
+    expect(queueItemPacket.supported_evidence_lanes).toEqual(expect.arrayContaining([
+      'room_boundary_visual_audit',
+      'vector_overlay_generation',
+      'model_3d_candidate_generation',
+    ]));
+    expect(queueItemPacket.extrapolation_index).toEqual([
+      expect.objectContaining({
+        artifact_type: 'openclaw.sam31.extrapolation_index_item.v1',
+        section_id: 'candidate:pdf-boundary',
+        semantic_label: 'room_boundary_candidate',
+        vector_overlay_ids: expect.arrayContaining(['vector:section-room-101']),
+        model_3d_candidate_ids: expect.arrayContaining(['model3d:section-room-101']),
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    ]);
+    expect(queueItemPacket.extrapolation_index[0].source_refs).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        source_ref: expect.stringContaining('SAM31 extrapolate'),
+        runtime: 'sam-3.1+llm',
+      }),
+    ]));
+    expect(queueItemPacket.extrapolation_index[0].blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'AHJ_approval',
+      'AutoSprink_parity',
+    ]));
+    expect(queueItemPacket.source_refs).toEqual(expect.arrayContaining([
+      expect.objectContaining({ evidence_id: boundary.id, evidence_type: 'pdf_boundary_decision' }),
+      expect.objectContaining({ evidence_id: artifact.id, evidence_type: 'openclaw_sam31_extrapolation_artifact' }),
+    ]));
+    expect(queueItemPacket.blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'AHJ_approval',
+      'AutoSprink_parity',
+      'SAM31_runtime_verified',
+      'OpenClaw_runtime_verified',
+    ]));
+
+    const reviewRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/extrapolation-review`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        source_openclaw_sam31_extrapolation_evidence_id: artifact.id,
+        review_decision: 'replaced',
+        reviewer_name: 'HaloFire estimator',
+        replacement_ref: '1881://employee-review/sam31/extrapolation/room-101',
+        replacement_values: {
+          object_hypotheses: [
+            {
+              id: 'obj:door-reviewed',
+              label: 'rated corridor door',
+              segment_id: 'section-room-101',
+              confidence: 0.82,
+              source_ref: '1881://employee-review/sam31/extrapolation/door',
+            },
+          ],
+          vector_overlays: [
+            {
+              id: 'vector:room-101-reviewed',
+              kind: 'polygon_path',
+              svg_path: 'M 12 22 L 508 22 L 508 318 L 12 318 Z',
+              source_ref: '1881://employee-review/sam31/extrapolation/vector',
+            },
+          ],
+          model_3d_candidates: [
+            {
+              id: 'model3d:room-101-reviewed',
+              primitive: 'extruded_polygon',
+              height_ft: 11,
+              source_ref: '1881://employee-review/sam31/extrapolation/model3d',
+            },
+          ],
+          confidence: 0.81,
+        },
+        notes: 'Employee replacement values for temporary SAM31 extrapolation only.',
+      }),
+    });
+    expect(reviewRes.status).toBe(201);
+    const review = await reviewRes.json();
+    expect(review).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31_extrapolation_product_review',
+      status: 'present',
+      source_pdf_boundary_evidence_id: boundary.id,
+      source_openclaw_sam31_extrapolation_evidence_id: artifact.id,
+      review_decision: 'replaced',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(review.evidence).toEqual(expect.objectContaining({
+      evidence_type: 'openclaw_sam31_extrapolation_review',
+      status: 'present',
+    }));
+    expect(review.replacement_values).toEqual(expect.objectContaining({
+      object_hypotheses: expect.any(Array),
+      vector_overlays: expect.any(Array),
+      model_3d_candidates: expect.any(Array),
+      confidence: 0.81,
+    }));
+    expect(review.replaced_fields).toEqual(expect.arrayContaining([
+      'object_hypotheses',
+      'vector_overlays',
+      'model_3d_candidates',
+      'confidence',
+    ]));
+
+    const reviewedQueueRes = await request(`${COOPERATIVE_1881_PATH}/resolver-queue`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(reviewedQueueRes.status).toBe(200);
+    const reviewedQueue = await reviewedQueueRes.json();
+    const reviewedItem = reviewedQueue.items.find((row) => row.evidence_id === boundary.id);
+    expect(reviewedItem.latest_openclaw_sam31_extrapolation_review).toEqual(expect.objectContaining({
+      evidence_id: review.id,
+      evidence_status: 'present',
+      review_decision: 'replaced',
+      source_openclaw_sam31_extrapolation_evidence_id: artifact.id,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(reviewedQueue.summary.sam31_extrapolation_reviews_recorded).toBeGreaterThanOrEqual(1);
+
+    const packetRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/extrapolation-review-packet`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(packetRes.status).toBe(200);
+    const packet = await packetRes.json();
+    expect(packet).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31_extrapolation_product_review_packet',
+      status: 'ready_for_sprinkler_cad_review',
+      project_name: COOPERATIVE_1881_PROJECT_NAME,
+      source_pdf_boundary_evidence_id: boundary.id,
+      source_openclaw_sam31_extrapolation_evidence_id: artifact.id,
+      source_openclaw_sam31_extrapolation_review_evidence_id: review.id,
+      claim_gate_effect: 'no_claims_cleared',
+      download_name: expect.stringContaining('sam31-extrapolation-product-review-packet'),
+    }));
+    expect(packet.openclaw_sam31_product_review_queue_item).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.product_review_queue_item.v1',
+      application: 'halo_fire',
+      source_packet_ref: 'openclaw.sam31_perception_packet',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(packet.reviewed_values).toEqual(expect.objectContaining({
+      object_hypotheses: expect.arrayContaining([
+        expect.objectContaining({ id: 'obj:door-reviewed', label: 'rated corridor door' }),
+      ]),
+      vector_overlays: expect.arrayContaining([
+        expect.objectContaining({ id: 'vector:room-101-reviewed' }),
+      ]),
+      model_3d_candidates: expect.arrayContaining([
+        expect.objectContaining({ id: 'model3d:room-101-reviewed', primitive: 'extruded_polygon' }),
+      ]),
+      confidence: 0.81,
+    }));
+    expect(packet.downstream_review_lanes).toEqual(expect.arrayContaining([
+      'sprinkler_obstruction_review',
+      'cad_vector_overlay_review',
+      'model_3d_candidate_review',
+      'room_boundary_visual_audit',
+    ]));
+    expect(packet.source_refs).toEqual(expect.arrayContaining([
+      expect.objectContaining({ evidence_id: boundary.id, evidence_type: 'pdf_boundary_decision' }),
+      expect.objectContaining({ evidence_id: artifact.id, evidence_type: 'openclaw_sam31_extrapolation_artifact' }),
+      expect.objectContaining({ evidence_id: review.id, evidence_type: 'openclaw_sam31_extrapolation_review' }),
+    ]));
+    expect(packet.blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'AHJ_approval',
+      'AutoSprink_parity',
+      'professional_approval',
+      'SAM31_runtime_verified',
+      'OpenClaw_runtime_verified',
+    ]));
+
+    const boundaryReviewRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/reviews`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        review_decision: 'corrected',
+        reviewer_name: 'HaloFire estimator',
+        marked_up_plan_ref: '1881://employee-review/sam31/extrapolation/room-boundary-markup',
+        corrected_room_polygons: [
+          {
+            room_id: 'reviewed corridor',
+            polygon: [[0, 0], [28, 0], [28, 8], [0, 8]],
+            hazard: 'ordinary',
+            source_ref: '1881://employee-review/sam31/extrapolation/room-boundary',
+          },
+        ],
+        issue_list: [
+          {
+            issue_type: 'sam31_extrapolation_product_review_required',
+            severity: 'warning',
+            observed: 'SAM31+LLM identified reviewed door/vector/model candidates.',
+            expected: 'Carry reviewed values into CAD/sprinkler review metadata only.',
+            required_action: 'Review obstruction, vector overlay, and model candidates before export or regulated claims.',
+          },
+        ],
+      }),
+    });
+    expect(boundaryReviewRes.status).toBe(201);
+    const boundaryReview = await boundaryReviewRes.json();
+
+    const replayRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/replay-input`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(replayRes.status).toBe(200);
+    const replay = await replayRes.json();
+    expect(replay).toEqual(expect.objectContaining({
+      artifact_type: 'room_boundary_replay_input_packet',
+      review_source: 'latest_employee_review_packet',
+      source_review_evidence_id: boundaryReview.id,
+      source_openclaw_sam31_extrapolation_evidence_id: artifact.id,
+      source_openclaw_sam31_extrapolation_review_evidence_id: review.id,
+      source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id: persistedSectioningDownstreamPacket.id,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(replay.halofire_sam31_sectioning_downstream_resolver_packet).toEqual(expect.objectContaining({
+      evidence_id: persistedSectioningDownstreamPacket.id,
+      artifact_type: 'halofire.sam31_sectioning_downstream_resolver_packet.v1',
+      downstream_resolver_queue_item_count: 2,
+      downstream_resolver_lanes: expect.arrayContaining([
+        'room_boundary_visual_audit',
+        'obstruction_or_clash_review',
+      ]),
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(replay.openclaw_sam31_extrapolation_product_review_packet).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31_extrapolation_product_review_packet',
+      source_openclaw_sam31_extrapolation_evidence_id: artifact.id,
+      source_openclaw_sam31_extrapolation_review_evidence_id: review.id,
+      reviewed_values: expect.objectContaining({
+        object_hypotheses: expect.arrayContaining([
+          expect.objectContaining({ id: 'obj:door-reviewed' }),
+        ]),
+        vector_overlays: expect.arrayContaining([
+          expect.objectContaining({ id: 'vector:room-101-reviewed' }),
+        ]),
+        model_3d_candidates: expect.arrayContaining([
+          expect.objectContaining({ id: 'model3d:room-101-reviewed' }),
+        ]),
+      }),
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(replay.sprinkler_bid_request.openclaw_sam31_extrapolation_product_review_packet).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31_extrapolation_product_review_packet',
+      openclaw_sam31_product_review_queue_item: expect.objectContaining({
+        artifact_type: 'openclaw.sam31.product_review_queue_item.v1',
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+      downstream_review_lanes: expect.arrayContaining([
+        'sprinkler_obstruction_review',
+        'cad_vector_overlay_review',
+        'model_3d_candidate_review',
+      ]),
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(replay.sprinkler_bid_request.sam31_downstream_review_metadata).toEqual(expect.objectContaining({
+      source: 'openclaw.sam31_extrapolation_product_review_packet',
+      use_for_claims: false,
+      object_hypothesis_count: 1,
+      vector_overlay_count: 1,
+      model_3d_candidate_count: 1,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(replay.sprinkler_bid_request.floor_plan_override).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.room_boundary_floor_plan_override.v1',
+      status: 'internal_alpha_floor_plan_override',
+      room_boundary_source: 'latest_employee_review_packet',
+      source_evidence_id: boundary.id,
+      source_review_evidence_id: boundaryReview.id,
+      corrected_room_polygon_count: 1,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(replay.sprinkler_bid_request.corrected_room_polygons[0]).toEqual(expect.objectContaining({
+      floor_plan_override_source: 'latest_employee_review_packet',
+      source_evidence_id: boundary.id,
+      source_review_evidence_id: boundaryReview.id,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(replay.sprinkler_bid_request.corrected_room_polygons[0].source_refs).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        evidence_id: boundaryReview.id,
+        evidence_type: 'room_boundary_review_packet',
+      }),
+    ]));
+    expect(replay.sprinkler_bid_request.halofire_sam31_sectioning_downstream_resolver_packet).toEqual(expect.objectContaining({
+      evidence_id: persistedSectioningDownstreamPacket.id,
+      artifact_type: 'halofire.sam31_sectioning_downstream_resolver_packet.v1',
+      source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id: sectioningReview.id,
+      downstream_resolver_queue_item_count: 2,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(replay.source_refs).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        evidence_id: artifact.id,
+        evidence_type: 'openclaw_sam31_extrapolation_artifact',
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+      expect.objectContaining({
+        evidence_id: review.id,
+        evidence_type: 'openclaw_sam31_extrapolation_review',
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+      expect.objectContaining({
+        evidence_id: persistedSectioningDownstreamPacket.id,
+        evidence_type: 'halofire_sam31_sectioning_downstream_resolver_packet',
+        artifact_type: 'halofire.sam31_sectioning_downstream_resolver_packet.v1',
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    ]));
+    expect(replay.blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'AHJ_approval',
+      'AutoSprink_parity',
+      'professional_approval',
+      'SAM31_runtime_verified',
+      'OpenClaw_runtime_verified',
+    ]));
+
+    const replayBidRes = await request(`${COOPERATIVE_1881_PATH}/sprinkler-bid`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        markupPct: 25,
+        ...replay.sprinkler_bid_request,
+      }),
+    });
+    expect(replayBidRes.status).toBe(200);
+    const replayBid = await replayBidRes.json();
+    expect(replayBid.roomBoundaryReplay).toEqual(expect.objectContaining({
+      room_boundary_source: 'latest_employee_review_packet',
+      source_openclaw_sam31_extrapolation_evidence_id: artifact.id,
+      source_openclaw_sam31_extrapolation_review_evidence_id: review.id,
+      source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id: persistedSectioningDownstreamPacket.id,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(replayBid.roomBoundaryReplay.halofire_sam31_sectioning_downstream_resolver_packet).toEqual(expect.objectContaining({
+      evidence_id: persistedSectioningDownstreamPacket.id,
+      artifact_type: 'halofire.sam31_sectioning_downstream_resolver_packet.v1',
+      downstream_resolver_queue_item_count: 2,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(replayBid.roomBoundaryReplay.openclaw_sam31_extrapolation_product_review_packet).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31_extrapolation_product_review_packet',
+      reviewed_values: expect.objectContaining({
+        vector_overlays: expect.arrayContaining([
+          expect.objectContaining({ id: 'vector:room-101-reviewed' }),
+        ]),
+        model_3d_candidates: expect.arrayContaining([
+          expect.objectContaining({ id: 'model3d:room-101-reviewed' }),
+        ]),
+      }),
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(replayBid.roomBoundaryReplay.sam31_downstream_review_metadata).toEqual(expect.objectContaining({
+      source: 'openclaw.sam31_extrapolation_product_review_packet',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(replayBid.floorPlan.rooms[0]).toEqual(expect.objectContaining({
+      name: 'reviewed corridor',
+      polygon: [[0, 0], [28, 0], [28, 8], [0, 8]],
+      hazard: 'ordinary',
+    }));
+    expect(replayBid.roomBoundaryReplay.floor_plan_override).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.room_boundary_floor_plan_override.v1',
+      room_boundary_source: 'latest_employee_review_packet',
+      source_review_evidence_id: boundaryReview.id,
+      corrected_room_polygon_count: 1,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(replayBid.roomBoundaryReplay.corrected_room_polygons[0]).toEqual(expect.objectContaining({
+      floor_plan_override_source: 'latest_employee_review_packet',
+      source_review_evidence_id: boundaryReview.id,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+
+    const evidenceRes = await request(`${COOPERATIVE_1881_PATH}/evidence`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(evidenceRes.status).toBe(200);
+    const evidenceRows = await evidenceRes.json();
+    const replayEvidence = evidenceRows.find((row) => row.evidence_type === 'best_effort_ai_layout'
+      && String(row.source_ref || '').includes(`pdf-boundary:${boundary.id}:room-boundary-replay:${boundaryReview.id}`));
+    expect(replayEvidence).toEqual(expect.objectContaining({
+      status: 'best_effort',
+    }));
+    const replayArtifactRes = await request(`${COOPERATIVE_1881_PATH}/evidence/${replayEvidence.id}/replay-bid-artifact`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(replayArtifactRes.status).toBe(200);
+    const replayArtifact = await replayArtifactRes.json();
+    expect(replayArtifact.openclaw_sam31_extrapolation_product_review_packet).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31_extrapolation_product_review_packet',
+      source_openclaw_sam31_extrapolation_evidence_id: artifact.id,
+      source_openclaw_sam31_extrapolation_review_evidence_id: review.id,
+      openclaw_sam31_product_review_queue_item: expect.objectContaining({
+        artifact_type: 'openclaw.sam31.product_review_queue_item.v1',
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+      reviewed_values: expect.objectContaining({
+        object_hypotheses: expect.any(Array),
+        vector_overlays: expect.any(Array),
+        model_3d_candidates: expect.any(Array),
+      }),
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(replayArtifact.sam31_downstream_review_metadata).toEqual(expect.objectContaining({
+      source: 'openclaw.sam31_extrapolation_product_review_packet',
+      use_for_claims: false,
+      object_hypothesis_count: 1,
+      vector_overlay_count: 1,
+      model_3d_candidate_count: 1,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(replayArtifact.halofire_sam31_sectioning_downstream_resolver_packet).toEqual(expect.objectContaining({
+      evidence_id: persistedSectioningDownstreamPacket.id,
+      artifact_type: 'halofire.sam31_sectioning_downstream_resolver_packet.v1',
+      downstream_resolver_queue_item_count: 2,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(replayArtifact.source_replay_packet).toEqual(expect.objectContaining({
+      source_openclaw_sam31_extrapolation_evidence_id: artifact.id,
+      source_openclaw_sam31_extrapolation_review_evidence_id: review.id,
+      source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id: persistedSectioningDownstreamPacket.id,
+    }));
+  }, 15000);
+
+  it('posts the SAM31 product review queue item to canonical consumer queues and saves no-claims smoke evidence', async () => {
+    consumerQueuePosts.length = 0;
+    const boundaryRes = await request(`${COOPERATIVE_1881_PATH}/pdf-boundary-decision`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        pdfPageIndex: 9,
+        pdfScale: 0.08,
+        pdfExtract: 'sam31-consumer-smoke-outline',
+        source_file: 'Proposal-Cooperative-1881-Salt-Lake-City-UT-9-18-25.pdf',
+        source_ref: '1881 plan PDF sheet 9 / SAM31 consumer queue smoke',
+        candidate: {
+          mode: 'outline',
+          label: 'SAM31 consumer queue outline',
+          status: 'candidate',
+          bbox: { x: 10, y: 20, width: 500, height: 300 },
+          segmentCount: 11,
+        },
+      }),
+    });
+    expect(boundaryRes.status).toBe(201);
+    const boundary = await boundaryRes.json();
+
+    const artifactRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/extrapolation-artifact`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(artifactRes.status).toBe(201);
+    const extrapolation = await artifactRes.json();
+
+    const sectioningReviewRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/sectioning-pipeline-contract-review`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        source_openclaw_sam31_extrapolation_evidence_id: extrapolation.id,
+        review_decision: 'replaced',
+        reviewer_name: 'HaloFire estimator',
+        replacement_ref: '1881://employee-review/sam31/sectioning/downstream-sprinkler',
+        replacement_values: {
+          semantic_labels: [{ section_id: 'section-sprinkler-test', label: 'employee reviewed sprinkler review zone' }],
+          polygons: [{ section_id: 'section-sprinkler-test', polygon: [[10, 20], [510, 20], [510, 320], [10, 320]] }],
+          bboxes: [{ section_id: 'section-sprinkler-test', bbox: { x: 10, y: 20, width: 500, height: 300 } }],
+          vector_overlays: [{ id: 'vector:sprinkler-test-sectioning', svg_path: 'M 10 20 L 510 20 L 510 320 L 10 320 Z' }],
+          model_3d_candidates: [{ id: 'model3d:sprinkler-test-sectioning', primitive: 'extruded_polygon' }],
+        },
+        notes: 'Employee replacement values for downstream sprinkler replay carry-through.',
+      }),
+    });
+    expect(sectioningReviewRes.status).toBe(201);
+    const sectioningReview = await sectioningReviewRes.json();
+
+    const persistedSectioningDownstreamPacketRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/sectioning-downstream-resolvers`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(persistedSectioningDownstreamPacketRes.status).toBe(201);
+    const persistedSectioningDownstreamPacket = await persistedSectioningDownstreamPacketRes.json();
+    expect(persistedSectioningDownstreamPacket.source_openclaw_sam31_sectioning_pipeline_contract_review_evidence_id).toBe(sectioningReview.id);
+
+    const sectioningSprinklerAdapterRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/sectioning-downstream-resolvers/${persistedSectioningDownstreamPacket.id}/sprinkler-review-adapter`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(sectioningSprinklerAdapterRes.status).toBe(201);
+    const sectioningSprinklerAdapter = await sectioningSprinklerAdapterRes.json();
+    expect(sectioningSprinklerAdapter).toEqual(expect.objectContaining({
+      id: expect.any(Number),
+      evidence: expect.objectContaining({ evidence_type: 'halofire_sam31_sectioning_sprinkler_review_adapter' }),
+      source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id: persistedSectioningDownstreamPacket.id,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+
+    const consumerRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/consumer-smoke`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(consumerRes.status).toBe(201);
+    const consumerSmoke = await consumerRes.json();
+    expect(consumerSmoke).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.consumer_smoke_artifact.v1',
+      status: 'consumer_smoke_recorded',
+      project_name: COOPERATIVE_1881_PROJECT_NAME,
+      source_pdf_boundary_evidence_id: boundary.id,
+      source_openclaw_sam31_extrapolation_evidence_id: extrapolation.id,
+      canonical_tool_descriptor_url: `${perceptionBaseUrl}/vision/sam31/tool`,
+      posted_consumer_count: 2,
+      blocked_consumer_count: 0,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(consumerSmoke.product_review_queue_item).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.product_review_queue_item.v1',
+      source_openclaw_sam31_extrapolation_evidence_id: extrapolation.id,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(consumerSmoke.consumer_results).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        consumer: 'landscout',
+        status: 'posted',
+        endpoint: `${perceptionBaseUrl}/landscout/sam31/product-review-queue`,
+        endpoint_source_file: 'OPENCLAW_SAM31_LANDSCOUT_QUEUE_URL',
+        response_status: 202,
+        accepted_queue_id: 'sam31-landscout-testqueue',
+        persisted_review_packet_ref: 'openclaw://landscout/sam31/product-review/sam31-landscout-testqueue',
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+      expect.objectContaining({
+        consumer: 'nameforge',
+        status: 'posted',
+        endpoint: `${perceptionBaseUrl}/nameforge/sam31/product-review-queue`,
+        endpoint_source_file: 'OPENCLAW_SAM31_NAMEFORGE_QUEUE_URL',
+        response_status: 202,
+        accepted_queue_id: 'sam31-nameforge-testqueue',
+        persisted_review_packet_ref: 'openclaw://nameforge/sam31/product-review/sam31-nameforge-testqueue',
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    ]));
+    expect(consumerSmoke.consumer_review_tasks).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        artifact_type: 'openclaw.sam31.consumer_review_task.v1',
+        consumer: 'landscout',
+        status: 'requires_product_review',
+        source_application: 'halo_fire',
+        source_pdf_boundary_evidence_id: boundary.id,
+        source_openclaw_sam31_extrapolation_evidence_id: extrapolation.id,
+        accepted_queue_id: 'sam31-landscout-testqueue',
+        persisted_review_packet_ref: 'openclaw://landscout/sam31/product-review/sam31-landscout-testqueue',
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+      expect.objectContaining({
+        artifact_type: 'openclaw.sam31.consumer_review_task.v1',
+        consumer: 'nameforge',
+        status: 'requires_product_review',
+        source_application: 'halo_fire',
+        source_pdf_boundary_evidence_id: boundary.id,
+        source_openclaw_sam31_extrapolation_evidence_id: extrapolation.id,
+        accepted_queue_id: 'sam31-nameforge-testqueue',
+        persisted_review_packet_ref: 'openclaw://nameforge/sam31/product-review/sam31-nameforge-testqueue',
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    ]));
+    for (const task of consumerSmoke.consumer_review_tasks) {
+      expect(task.next_action).toContain('accept or replace SAM31');
+      expect(task.next_action).toContain('regulated claims remain blocked');
+      expect(task.acceptable_evidence).toEqual(expect.arrayContaining([
+        'product owner review note tied to accepted queue id',
+        'employee accepted or replaced SAM31 semantic label/object/vector/3D candidate',
+        'source screenshot or console evidence for reviewed sectioning',
+      ]));
+      expect(task.blocked_claims).toEqual(expect.arrayContaining([
+        'permit_ready',
+        'AHJ_approval',
+        'AutoSprink_parity',
+        'fabrication_ready',
+        'manufacturer_exact',
+      ]));
+    }
+    expect(consumerSmoke.missing_evidence_rows).toEqual([]);
+    expect(consumerSmoke.evidence).toEqual(expect.objectContaining({
+      evidence_type: 'openclaw_sam31_consumer_smoke_artifact',
+      source_file: 'OPENCLAW_PERCEPTION_URL',
+      source_ref: `${perceptionBaseUrl}/vision/sam31/tool`,
+      status: 'best_effort',
+    }));
+    expect(consumerQueuePosts.map((post) => post.consumer).sort()).toEqual(['landscout', 'nameforge']);
+    const packetRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/consumer-smoke-packet`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(packetRes.status).toBe(200);
+    const packet = await packetRes.json();
+    expect(packet).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.consumer_smoke_artifact.v1',
+      download_name: expect.stringContaining('sam31-consumer-smoke-artifact'),
+      source_pdf_boundary_evidence_id: boundary.id,
+      source_openclaw_sam31_consumer_smoke_evidence_id: consumerSmoke.id,
+      posted_consumer_count: 2,
+      blocked_consumer_count: 0,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(packet.consumer_results).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        consumer: 'landscout',
+        status: 'posted',
+        accepted_queue_id: 'sam31-landscout-testqueue',
+        persisted_review_packet_ref: 'openclaw://landscout/sam31/product-review/sam31-landscout-testqueue',
+      }),
+      expect.objectContaining({
+        consumer: 'nameforge',
+        status: 'posted',
+        accepted_queue_id: 'sam31-nameforge-testqueue',
+        persisted_review_packet_ref: 'openclaw://nameforge/sam31/product-review/sam31-nameforge-testqueue',
+      }),
+    ]));
+    expect(packet.consumer_review_tasks).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        consumer: 'landscout',
+        status: 'requires_product_review',
+        accepted_queue_id: 'sam31-landscout-testqueue',
+        persisted_review_packet_ref: 'openclaw://landscout/sam31/product-review/sam31-landscout-testqueue',
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+      expect.objectContaining({
+        consumer: 'nameforge',
+        status: 'requires_product_review',
+        accepted_queue_id: 'sam31-nameforge-testqueue',
+        persisted_review_packet_ref: 'openclaw://nameforge/sam31/product-review/sam31-nameforge-testqueue',
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    ]));
+    expect(packet.product_review_queue_item).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.product_review_queue_item.v1',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    const consumerReviewRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/consumer-review`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        source_openclaw_sam31_consumer_smoke_evidence_id: consumerSmoke.id,
+        consumer: 'landscout',
+        accepted_queue_id: 'sam31-landscout-testqueue',
+        persisted_review_packet_ref: 'openclaw://landscout/sam31/product-review/sam31-landscout-testqueue',
+        review_decision: 'replaced',
+        reviewer_name: 'LandScout product owner',
+        replacement_ref: 'landscout://sam31/reviews/sam31-landscout-testqueue/replacement.json',
+        screenshot_ref: 'landscout://sam31/reviews/sam31-landscout-testqueue/screenshot.png',
+        console_log_ref: 'landscout://sam31/reviews/sam31-landscout-testqueue/console.log',
+        replacement_values: {
+          semantic_labels: ['employee reviewed parcel edge'],
+          object_hypotheses: [{ id: 'obj:parcel-edge', semantic_label: 'reviewed parcel edge' }],
+          vector_overlays: [{ id: 'vector:parcel-edge', svg_path: 'M 0 0 L 10 0 L 10 5 Z' }],
+          model_3d_candidates: [{ id: 'model3d:parcel-edge', primitive: 'extruded_review_shape' }],
+          source_ref: 'landscout://field-review/sam31-landscout-testqueue',
+          confidence: 0.82,
+        },
+        notes: 'Product owner replaced the SAM31 temporary values for LandScout review.',
+      }),
+    });
+    expect(consumerReviewRes.status).toBe(201);
+    const consumerReview = await consumerReviewRes.json();
+    expect(consumerReview).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.consumer_review_task_decision.v1',
+      status: 'present',
+      consumer: 'landscout',
+      source_application: 'halo_fire',
+      source_pdf_boundary_evidence_id: boundary.id,
+      source_openclaw_sam31_consumer_smoke_evidence_id: consumerSmoke.id,
+      accepted_queue_id: 'sam31-landscout-testqueue',
+      persisted_review_packet_ref: 'openclaw://landscout/sam31/product-review/sam31-landscout-testqueue',
+      review_decision: 'replaced',
+      reviewer_name: 'LandScout product owner',
+      replacement_ref: 'landscout://sam31/reviews/sam31-landscout-testqueue/replacement.json',
+      screenshot_ref: 'landscout://sam31/reviews/sam31-landscout-testqueue/screenshot.png',
+      console_log_ref: 'landscout://sam31/reviews/sam31-landscout-testqueue/console.log',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(consumerReview.replacement_values).toEqual(expect.objectContaining({
+      semantic_labels: ['employee reviewed parcel edge'],
+      confidence: 0.82,
+    }));
+    expect(consumerReview.replaced_fields).toEqual(expect.arrayContaining([
+      'semantic_labels',
+      'object_hypotheses',
+      'vector_overlays',
+      'model_3d_candidates',
+      'source_ref',
+      'confidence',
+    ]));
+    expect(consumerReview.acceptable_evidence).toEqual(expect.arrayContaining([
+      'product owner review note tied to accepted queue id',
+      'employee accepted or replaced SAM31 semantic label/object/vector/3D candidate',
+      'source screenshot or console evidence for reviewed sectioning',
+    ]));
+    expect(consumerReview.blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'AHJ_approval',
+      'AutoSprink_parity',
+      'fabrication_ready',
+      'manufacturer_exact',
+    ]));
+    expect(consumerReview.evidence).toEqual(expect.objectContaining({
+      evidence_type: 'openclaw_sam31_consumer_review',
+      status: 'present',
+      source_ref: 'landscout://sam31/reviews/sam31-landscout-testqueue/replacement.json',
+    }));
+    const consumerReviewPacketRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/consumer-review/${consumerReview.id}/packet`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(consumerReviewPacketRes.status).toBe(200);
+    const consumerReviewPacket = await consumerReviewPacketRes.json();
+    expect(consumerReviewPacket).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.consumer_review_decision_packet.v1',
+      status: 'ready_for_consumer_review_replay',
+      consumer: 'landscout',
+      source_application: 'halo_fire',
+      source_pdf_boundary_evidence_id: boundary.id,
+      source_openclaw_sam31_consumer_review_evidence_id: consumerReview.id,
+      source_openclaw_sam31_consumer_smoke_evidence_id: consumerSmoke.id,
+      accepted_queue_id: 'sam31-landscout-testqueue',
+      persisted_review_packet_ref: 'openclaw://landscout/sam31/product-review/sam31-landscout-testqueue',
+      replacement_ref: 'landscout://sam31/reviews/sam31-landscout-testqueue/replacement.json',
+      download_name: expect.stringContaining('sam31-consumer-review-decision-landscout'),
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(consumerReviewPacket.consumer_review_decision).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.consumer_review_task_decision.v1',
+      review_decision: 'replaced',
+      replacement_values: expect.objectContaining({
+        semantic_labels: ['employee reviewed parcel edge'],
+        confidence: 0.82,
+      }),
+    }));
+    expect(consumerReviewPacket.consumer_review_task).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.consumer_review_task.v1',
+      consumer: 'landscout',
+      accepted_queue_id: 'sam31-landscout-testqueue',
+    }));
+    expect(consumerReviewPacket.source_refs).toEqual(expect.arrayContaining([
+      expect.objectContaining({ evidence_type: 'pdf_boundary_decision', evidence_id: boundary.id }),
+      expect.objectContaining({ evidence_type: 'openclaw_sam31_consumer_smoke_artifact', evidence_id: consumerSmoke.id }),
+      expect.objectContaining({ evidence_type: 'openclaw_sam31_consumer_review', evidence_id: consumerReview.id }),
+    ]));
+    const actualValueWorkItemRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/consumer-review/${consumerReview.id}/actual-value-work-item`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(actualValueWorkItemRes.status).toBe(200);
+    const actualValueWorkItem = await actualValueWorkItemRes.json();
+    expect(actualValueWorkItem).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.actual_value_work_item_packet.v1',
+      status: 'requires_employee_actual_value_update',
+      consumer: 'landscout',
+      source_application: 'halo_fire',
+      source_pdf_boundary_evidence_id: boundary.id,
+      source_openclaw_sam31_consumer_review_evidence_id: consumerReview.id,
+      source_openclaw_sam31_consumer_smoke_evidence_id: consumerSmoke.id,
+      accepted_queue_id: 'sam31-landscout-testqueue',
+      persisted_review_packet_ref: 'openclaw://landscout/sam31/product-review/sam31-landscout-testqueue',
+      replacement_ref: 'landscout://sam31/reviews/sam31-landscout-testqueue/replacement.json',
+      download_name: expect.stringContaining('sam31-actual-value-work-item-landscout'),
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+      employee_actual_value_next_action: expect.stringContaining('Replace SAM31 best guesses with actual HaloFire documentation values'),
+    }));
+    expect(actualValueWorkItem.replacement_values).toEqual(expect.objectContaining({
+      semantic_labels: ['employee reviewed parcel edge'],
+      object_hypotheses: [{ id: 'obj:parcel-edge', semantic_label: 'reviewed parcel edge' }],
+      vector_overlays: [{ id: 'vector:parcel-edge', svg_path: 'M 0 0 L 10 0 L 10 5 Z' }],
+      model_3d_candidates: [{ id: 'model3d:parcel-edge', primitive: 'extruded_review_shape' }],
+      source_ref: 'landscout://field-review/sam31-landscout-testqueue',
+      confidence: 0.82,
+    }));
+    expect(actualValueWorkItem.replacement_summary).toEqual(expect.objectContaining({
+      semantic_label_count: 1,
+      object_hypothesis_count: 1,
+      vector_overlay_count: 1,
+      model_3d_candidate_count: 1,
+    }));
+    expect(actualValueWorkItem.acceptable_actual_evidence).toEqual(expect.arrayContaining([
+      '1881 proposal workbook row or sheet reference',
+      'reviewed vector overlay SVG or marked-up plan ref',
+      'reviewed 3D model candidate ref or model note',
+      'screenshot or console evidence for the reviewed SAM31 section',
+    ]));
+    expect(actualValueWorkItem.blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'fabrication_ready',
+      'AHJ_approval',
+      'professional_approval',
+      'manufacturer_exact',
+      'AutoSprink_parity',
+    ]));
+    expect(actualValueWorkItem.source_refs).toEqual(expect.arrayContaining([
+      expect.objectContaining({ evidence_type: 'pdf_boundary_decision', evidence_id: boundary.id }),
+      expect.objectContaining({ evidence_type: 'openclaw_sam31_consumer_smoke_artifact', evidence_id: consumerSmoke.id }),
+      expect.objectContaining({ evidence_type: 'openclaw_sam31_consumer_review', evidence_id: consumerReview.id }),
+    ]));
+    const sprinklerAdapterRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/sprinkler-review-adapter/${consumerReview.id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(sprinklerAdapterRes.status).toBe(200);
+    const sprinklerAdapter = await sprinklerAdapterRes.json();
+    expect(sprinklerAdapter).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31_to_sprinkler_review_adapter.v1',
+      status: 'ready_for_internal_alpha_sprinkler_review',
+      source_pdf_boundary_evidence_id: boundary.id,
+      source_openclaw_sam31_consumer_review_evidence_id: consumerReview.id,
+      source_openclaw_sam31_consumer_smoke_evidence_id: consumerSmoke.id,
+      source_application: 'halo_fire',
+      consumer: 'landscout',
+      accepted_queue_id: 'sam31-landscout-testqueue',
+      persisted_review_packet_ref: 'openclaw://landscout/sam31/product-review/sam31-landscout-testqueue',
+      replacement_ref: 'landscout://sam31/reviews/sam31-landscout-testqueue/replacement.json',
+      download_name: expect.stringContaining('sam31-to-sprinkler-review-landscout'),
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(sprinklerAdapter.supported_sprinkler_review_lanes).toEqual(expect.arrayContaining([
+      'room_boundary_visual_audit',
+      'sleeve_or_firestop_candidate_review',
+      'obstruction_or_clash_review',
+      'vector_overlay_generation',
+      'model_3d_candidate_generation',
+    ]));
+    expect(sprinklerAdapter.reviewed_sam31_values).toEqual(expect.objectContaining({
+      semantic_labels: ['employee reviewed parcel edge'],
+      source_ref: 'landscout://field-review/sam31-landscout-testqueue',
+      confidence: 0.82,
+    }));
+    expect(sprinklerAdapter.sprinkler_review_packet).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.sam31_sprinkler_review_packet.v1',
+      source: 'openclaw.sam31_to_sprinkler_review_adapter.v1',
+      status: 'requires_employee_sprinkler_review',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(sprinklerAdapter.sprinkler_review_packet.issue_seeds).toEqual(expect.arrayContaining([
+      expect.objectContaining({ issue_type: 'sam31_consumer_reviewed_semantic_labels' }),
+      expect.objectContaining({ issue_type: 'sam31_consumer_reviewed_vector_overlays' }),
+      expect.objectContaining({ issue_type: 'sam31_consumer_reviewed_model_3d_candidates' }),
+    ]));
+    expect(sprinklerAdapter.blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'AHJ_approval',
+      'AutoSprink_parity',
+      'fabrication_ready',
+      'professional_approval',
+      'manufacturer_exact',
+    ]));
+    expect(sprinklerAdapter.source_refs).toEqual(expect.arrayContaining([
+      expect.objectContaining({ evidence_type: 'pdf_boundary_decision', evidence_id: boundary.id }),
+      expect.objectContaining({ evidence_type: 'openclaw_sam31_consumer_review', evidence_id: consumerReview.id }),
+    ]));
+    expect(consumerQueuePosts.map((post) => post.consumer).sort()).toEqual(['landscout', 'nameforge']);
+    for (const post of consumerQueuePosts) {
+      expect(post.body.product_review_queue_item).toEqual(expect.objectContaining({
+        artifact_type: 'openclaw.sam31.product_review_queue_item.v1',
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }));
+      expect(post.body.source_application).toBe('halo_fire');
+      expect(post.body.claim_gate_effect).toBe('no_claims_cleared');
+    }
+
+    const queueRes = await request(`${COOPERATIVE_1881_PATH}/resolver-queue`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(queueRes.status).toBe(200);
+    const queue = await queueRes.json();
+    const item = queue.items.find((row) => row.evidence_id === boundary.id);
+    expect(item.openclaw_sam31_consumer_smoke_action).toEqual(expect.objectContaining({
+      label: 'Run LandScout/NameForge SAM31 queue smoke',
+      method: 'POST',
+      href: `${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/consumer-smoke`,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(item.latest_openclaw_sam31_consumer_smoke_artifact).toEqual(expect.objectContaining({
+      evidence_id: consumerSmoke.id,
+      status: 'consumer_smoke_recorded',
+      posted_consumer_count: 2,
+      blocked_consumer_count: 0,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(item.latest_openclaw_sam31_consumer_smoke_artifact.consumer_results).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        consumer: 'landscout',
+        accepted_queue_id: 'sam31-landscout-testqueue',
+        persisted_review_packet_ref: 'openclaw://landscout/sam31/product-review/sam31-landscout-testqueue',
+      }),
+      expect.objectContaining({
+        consumer: 'nameforge',
+        accepted_queue_id: 'sam31-nameforge-testqueue',
+        persisted_review_packet_ref: 'openclaw://nameforge/sam31/product-review/sam31-nameforge-testqueue',
+      }),
+    ]));
+    expect(item.latest_openclaw_sam31_consumer_smoke_artifact.consumer_review_tasks).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        consumer: 'landscout',
+        status: 'requires_product_review',
+        accepted_queue_id: 'sam31-landscout-testqueue',
+        persisted_review_packet_ref: 'openclaw://landscout/sam31/product-review/sam31-landscout-testqueue',
+      }),
+      expect.objectContaining({
+        consumer: 'nameforge',
+        status: 'requires_product_review',
+        accepted_queue_id: 'sam31-nameforge-testqueue',
+        persisted_review_packet_ref: 'openclaw://nameforge/sam31/product-review/sam31-nameforge-testqueue',
+      }),
+    ]));
+    expect(item.latest_openclaw_sam31_consumer_reviews).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        evidence_id: consumerReview.id,
+        consumer: 'landscout',
+        review_decision: 'replaced',
+        accepted_queue_id: 'sam31-landscout-testqueue',
+        persisted_review_packet_ref: 'openclaw://landscout/sam31/product-review/sam31-landscout-testqueue',
+        replacement_ref: 'landscout://sam31/reviews/sam31-landscout-testqueue/replacement.json',
+        screenshot_ref: 'landscout://sam31/reviews/sam31-landscout-testqueue/screenshot.png',
+        console_log_ref: 'landscout://sam31/reviews/sam31-landscout-testqueue/console.log',
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    ]));
+    const landScoutReviewSummary = item.latest_openclaw_sam31_consumer_reviews.find((review) => review.consumer === 'landscout');
+    expect(landScoutReviewSummary.replacement_values).toEqual(expect.objectContaining({
+      semantic_labels: ['employee reviewed parcel edge'],
+      source_ref: 'landscout://field-review/sam31-landscout-testqueue',
+      confidence: 0.82,
+    }));
+    expect(landScoutReviewSummary.replacement_summary).toEqual(expect.objectContaining({
+      semantic_label_count: 1,
+      object_hypothesis_count: 1,
+      vector_overlay_count: 1,
+      model_3d_candidate_count: 1,
+    }));
+    expect(landScoutReviewSummary.use_for_claims).toBe(false);
+    expect(item.sam31_sprinkler_review_queue_items).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        artifact_type: 'halofire.sam31_sprinkler_review_queue_item.v1',
+        status: 'requires_employee_sprinkler_review',
+        consumer: 'landscout',
+        source_adapter_artifact_type: 'openclaw.sam31_to_sprinkler_review_adapter.v1',
+        source_openclaw_sam31_consumer_review_evidence_id: consumerReview.id,
+        source_pdf_boundary_evidence_id: boundary.id,
+        issue_type: 'sam31_consumer_reviewed_semantic_labels',
+        supported_sprinkler_review_lane: 'room_boundary_visual_audit',
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+      expect.objectContaining({
+        artifact_type: 'halofire.sam31_sprinkler_review_queue_item.v1',
+        issue_type: 'sam31_consumer_reviewed_object_hypotheses',
+        supported_sprinkler_review_lane: 'obstruction_or_clash_review',
+        blocked_claims: expect.arrayContaining(['permit_ready', 'AHJ_approval', 'AutoSprink_parity', 'fabrication_ready', 'professional_approval', 'manufacturer_exact']),
+      }),
+      expect.objectContaining({
+        artifact_type: 'halofire.sam31_sprinkler_review_queue_item.v1',
+        issue_type: 'sam31_consumer_reviewed_vector_overlays',
+        supported_sprinkler_review_lane: 'vector_overlay_generation',
+      }),
+      expect.objectContaining({
+        artifact_type: 'halofire.sam31_sprinkler_review_queue_item.v1',
+        issue_type: 'sam31_consumer_reviewed_model_3d_candidates',
+        supported_sprinkler_review_lane: 'model_3d_candidate_generation',
+      }),
+    ]));
+    expect(queue.summary.sam31_consumer_smoke_recorded).toBeGreaterThanOrEqual(1);
+    expect(queue.summary.sam31_consumer_reviews_recorded).toBeGreaterThanOrEqual(1);
+    expect(queue.summary.sam31_consumer_reviews_unresolved).toBeGreaterThanOrEqual(1);
+    expect(queue.summary.sam31_sprinkler_review_queue_items).toBeGreaterThanOrEqual(4);
+
+    const unresolvedNameForgeRes = await request(`${COOPERATIVE_1881_PATH}/resolver-queue?sam31ConsumerReview=unresolved&consumer=nameforge`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(unresolvedNameForgeRes.status).toBe(200);
+    const unresolvedNameForge = await unresolvedNameForgeRes.json();
+    expect(unresolvedNameForge.filters).toEqual(expect.objectContaining({
+      sam31ConsumerReview: 'unresolved',
+      consumer: 'nameforge',
+    }));
+    expect(unresolvedNameForge.summary.sam31_consumer_reviews_unresolved).toBeGreaterThanOrEqual(1);
+    const unresolvedItem = unresolvedNameForge.items.find((row) => row.evidence_id === boundary.id);
+    expect(unresolvedItem).toEqual(expect.objectContaining({
+      evidence_id: boundary.id,
+      sam31_unresolved_consumer_reviews: expect.arrayContaining([
+        expect.objectContaining({
+          consumer: 'nameforge',
+          accepted_queue_id: 'sam31-nameforge-testqueue',
+          persisted_review_packet_ref: 'openclaw://nameforge/sam31/product-review/sam31-nameforge-testqueue',
+          status: 'requires_product_review',
+          claim_gate_effect: 'no_claims_cleared',
+        }),
+      ]),
+    }));
+    expect(unresolvedItem.sam31_unresolved_consumer_reviews.some((review) => review.consumer === 'landscout')).toBe(false);
+
+    const sprinklerLaneRes = await request(`${COOPERATIVE_1881_PATH}/resolver-queue?sam31SprinklerReview=queued&lane=obstruction_or_clash_review`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(sprinklerLaneRes.status).toBe(200);
+    const sprinklerLane = await sprinklerLaneRes.json();
+    expect(sprinklerLane.filters).toEqual(expect.objectContaining({
+      sam31SprinklerReview: 'queued',
+      lane: 'obstruction_or_clash_review',
+    }));
+    expect(sprinklerLane.summary.sam31_sprinkler_review_queue_items).toBeGreaterThanOrEqual(1);
+    const sprinklerLaneItem = sprinklerLane.items.find((row) => row.evidence_id === boundary.id);
+    expect(sprinklerLaneItem.sam31_sprinkler_review_queue_items).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        consumer: 'landscout',
+        issue_type: 'sam31_consumer_reviewed_object_hypotheses',
+        supported_sprinkler_review_lane: 'obstruction_or_clash_review',
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    ]));
+    expect(sprinklerLaneItem.sam31_sprinkler_review_queue_items.some((row) => row.supported_sprinkler_review_lane !== 'obstruction_or_clash_review')).toBe(false);
+
+    const sprinklerReviewRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/sprinkler-review/${consumerReview.id}`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        issue_type: 'sam31_consumer_reviewed_object_hypotheses',
+        supported_sprinkler_review_lane: 'obstruction_or_clash_review',
+        review_decision: 'replaced',
+        reviewer_name: 'HaloFire sprinkler reviewer',
+        review_ref: 'halofire://sam31/sprinkler-review/sam31-landscout-testqueue/object-hypothesis.json',
+        screenshot_ref: 'halofire://sam31/sprinkler-review/sam31-landscout-testqueue/object-hypothesis.png',
+        reviewed_values: {
+          obstruction_candidates: [{ id: 'obj:parcel-edge', sprinkler_relevance: 'not_a_sprinkler_obstruction' }],
+          sleeve_or_firestop_candidates: [],
+          notes: 'LandScout parcel edge hypothesis is not a sprinkler obstruction on the 1881 sheet.',
+          confidence: 0.74,
+        },
+        notes: 'Temporary employee sprinkler review decision; keep regulated claims blocked.',
+      }),
+    });
+    expect(sprinklerReviewRes.status).toBe(201);
+    const sprinklerReview = await sprinklerReviewRes.json();
+    expect(sprinklerReview).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.sam31_sprinkler_review_decision.v1',
+      status: 'present',
+      source_queue_item_artifact_type: 'halofire.sam31_sprinkler_review_queue_item.v1',
+      source_pdf_boundary_evidence_id: boundary.id,
+      source_openclaw_sam31_consumer_review_evidence_id: consumerReview.id,
+      consumer: 'landscout',
+      issue_type: 'sam31_consumer_reviewed_object_hypotheses',
+      supported_sprinkler_review_lane: 'obstruction_or_clash_review',
+      review_decision: 'replaced',
+      reviewer_name: 'HaloFire sprinkler reviewer',
+      review_ref: 'halofire://sam31/sprinkler-review/sam31-landscout-testqueue/object-hypothesis.json',
+      screenshot_ref: 'halofire://sam31/sprinkler-review/sam31-landscout-testqueue/object-hypothesis.png',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(sprinklerReview.reviewed_values).toEqual(expect.objectContaining({
+      obstruction_candidates: [expect.objectContaining({ sprinkler_relevance: 'not_a_sprinkler_obstruction' })],
+      confidence: 0.74,
+    }));
+    expect(sprinklerReview.acceptable_evidence).toEqual(expect.arrayContaining([
+      'HaloFire employee sprinkler review note',
+      'marked-up 1881 sheet screenshot',
+      'source-linked sleeve/firestop/obstruction/clash decision',
+    ]));
+    expect(sprinklerReview.blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'AHJ_approval',
+      'AutoSprink_parity',
+      'fabrication_ready',
+      'professional_approval',
+      'manufacturer_exact',
+    ]));
+    expect(sprinklerReview.evidence).toEqual(expect.objectContaining({
+      evidence_type: 'halofire_sam31_sprinkler_review_decision',
+      status: 'present',
+      source_ref: 'halofire://sam31/sprinkler-review/sam31-landscout-testqueue/object-hypothesis.json',
+    }));
+
+    const reviewedSprinklerLaneRes = await request(`${COOPERATIVE_1881_PATH}/resolver-queue?sam31SprinklerReview=queued&lane=obstruction_or_clash_review`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(reviewedSprinklerLaneRes.status).toBe(200);
+    const reviewedSprinklerLane = await reviewedSprinklerLaneRes.json();
+    const reviewedSprinklerLaneItem = reviewedSprinklerLane.items.find((row) => row.evidence_id === boundary.id);
+    expect(reviewedSprinklerLaneItem.sam31_sprinkler_review_queue_items).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        issue_type: 'sam31_consumer_reviewed_object_hypotheses',
+        status: 'employee_sprinkler_review_recorded',
+        latest_sam31_sprinkler_review_decision: expect.objectContaining({
+          evidence_id: sprinklerReview.id,
+          review_decision: 'replaced',
+          claim_gate_effect: 'no_claims_cleared',
+        }),
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    ]));
+    expect(reviewedSprinklerLane.summary.sam31_sprinkler_review_decisions_recorded).toBeGreaterThanOrEqual(1);
+
+    const sprinklerReviewPacketRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/sprinkler-review/${consumerReview.id}/decision/${sprinklerReview.id}/packet`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(sprinklerReviewPacketRes.status).toBe(200);
+    const sprinklerReviewPacket = await sprinklerReviewPacketRes.json();
+    expect(sprinklerReviewPacket).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.sam31_sprinkler_review_decision_packet.v1',
+      status: 'ready_for_internal_alpha_sprinkler_replay',
+      source: 'halofire.sam31_sprinkler_review_decision.v1',
+      source_queue_item_artifact_type: 'halofire.sam31_sprinkler_review_queue_item.v1',
+      source_adapter_artifact_type: 'openclaw.sam31_to_sprinkler_review_adapter.v1',
+      source_pdf_boundary_evidence_id: boundary.id,
+      source_openclaw_sam31_consumer_review_evidence_id: consumerReview.id,
+      source_halofire_sam31_sprinkler_review_decision_evidence_id: sprinklerReview.id,
+      source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id: sectioningSprinklerAdapter.id,
+      consumer: 'landscout',
+      issue_type: 'sam31_consumer_reviewed_object_hypotheses',
+      supported_sprinkler_review_lane: 'obstruction_or_clash_review',
+      review_decision: 'replaced',
+      download_name: expect.stringContaining('sam31-sprinkler-review-decision-landscout'),
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(sprinklerReviewPacket.halofire_sam31_sectioning_sprinkler_review_adapter).toEqual(expect.objectContaining({
+      evidence_id: sectioningSprinklerAdapter.id,
+      adapter_source: 'halofire.sam31_sectioning_downstream_resolver_packet.v1',
+      source_halofire_sam31_sectioning_downstream_resolver_packet_evidence_id: persistedSectioningDownstreamPacket.id,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(sprinklerReviewPacket.reviewed_values).toEqual(expect.objectContaining({
+      obstruction_candidates: [expect.objectContaining({ sprinkler_relevance: 'not_a_sprinkler_obstruction' })],
+      confidence: 0.74,
+    }));
+    expect(sprinklerReviewPacket.preliminary_replay_inputs).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.sam31_sprinkler_review_preliminary_replay_inputs.v1',
+      status: 'requires_internal_alpha_replay',
+      source_halofire_sam31_sprinkler_review_decision_evidence_id: sprinklerReview.id,
+      source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id: sectioningSprinklerAdapter.id,
+      supported_sprinkler_review_lane: 'obstruction_or_clash_review',
+      replay_scope: 'obstruction_clash_candidate_review',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(sprinklerReviewPacket.preliminary_replay_inputs.evidence_lanes).toEqual(expect.arrayContaining([
+      'obstruction_or_clash_review',
+    ]));
+    expect(sprinklerReviewPacket.source_refs).toEqual(expect.arrayContaining([
+      expect.objectContaining({ evidence_id: boundary.id, evidence_type: 'pdf_boundary_decision' }),
+      expect.objectContaining({ evidence_id: consumerReview.id, evidence_type: 'openclaw_sam31_consumer_review' }),
+      expect.objectContaining({ evidence_id: sprinklerReview.id, evidence_type: 'halofire_sam31_sprinkler_review_decision' }),
+      expect.objectContaining({ evidence_id: sectioningSprinklerAdapter.id, evidence_type: 'halofire_sam31_sectioning_sprinkler_review_adapter' }),
+    ]));
+    expect(sprinklerReviewPacket.blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'AHJ_approval',
+      'AutoSprink_parity',
+      'fabrication_ready',
+      'professional_approval',
+      'manufacturer_exact',
+    ]));
+
+    const preliminaryReplayQueueRes = await request(`${COOPERATIVE_1881_PATH}/resolver-queue?sam31SprinklerReplay=ready&lane=obstruction_or_clash_review`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(preliminaryReplayQueueRes.status).toBe(200);
+    const preliminaryReplayQueue = await preliminaryReplayQueueRes.json();
+    expect(preliminaryReplayQueue.filters).toEqual(expect.objectContaining({
+      sam31SprinklerReplay: 'ready',
+      lane: 'obstruction_or_clash_review',
+    }));
+    expect(preliminaryReplayQueue.summary.sam31_sprinkler_preliminary_replay_queue_items).toBeGreaterThanOrEqual(1);
+    const preliminaryReplayQueueItem = preliminaryReplayQueue.items.find((row) => row.evidence_id === boundary.id);
+    expect(preliminaryReplayQueueItem.sam31_sprinkler_preliminary_replay_queue_items).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        artifact_type: 'halofire.sam31_sprinkler_preliminary_replay_queue_item.v1',
+        status: 'ready_for_preliminary_replay',
+        source_decision_packet_artifact_type: 'halofire.sam31_sprinkler_review_decision_packet.v1',
+        source_preliminary_replay_inputs_artifact_type: 'halofire.sam31_sprinkler_review_preliminary_replay_inputs.v1',
+        source_pdf_boundary_evidence_id: boundary.id,
+        source_openclaw_sam31_consumer_review_evidence_id: consumerReview.id,
+        source_halofire_sam31_sprinkler_review_decision_evidence_id: sprinklerReview.id,
+        source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id: sectioningSprinklerAdapter.id,
+        supported_sprinkler_review_lane: 'obstruction_or_clash_review',
+        replay_scope: 'obstruction_clash_candidate_review',
+        action_label: 'Run SAM31 sprinkler preliminary replay',
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    ]));
+
+    const preliminaryReplayRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/sprinkler-review/${consumerReview.id}/decision/${sprinklerReview.id}/preliminary-replay`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(preliminaryReplayRes.status).toBe(200);
+    const preliminaryReplay = await preliminaryReplayRes.json();
+    expect(preliminaryReplay).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.sam31_sprinkler_preliminary_replay_artifact.v1',
+      status: 'preliminary_replay_ready_for_internal_alpha_review',
+      source: 'halofire.sam31_sprinkler_review_preliminary_replay_inputs.v1',
+      source_decision_packet_artifact_type: 'halofire.sam31_sprinkler_review_decision_packet.v1',
+      source_pdf_boundary_evidence_id: boundary.id,
+      source_openclaw_sam31_consumer_review_evidence_id: consumerReview.id,
+      source_halofire_sam31_sprinkler_review_decision_evidence_id: sprinklerReview.id,
+      source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id: sectioningSprinklerAdapter.id,
+      supported_sprinkler_review_lane: 'obstruction_or_clash_review',
+      replay_scope: 'obstruction_clash_candidate_review',
+      download_name: expect.stringContaining('sam31-sprinkler-preliminary-replay-landscout'),
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(preliminaryReplay.replay_inputs).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.sam31_sprinkler_review_preliminary_replay_inputs.v1',
+      source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id: sectioningSprinklerAdapter.id,
+      reviewed_values: expect.objectContaining({
+        obstruction_candidates: [expect.objectContaining({ sprinkler_relevance: 'not_a_sprinkler_obstruction' })],
+      }),
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(preliminaryReplay.replay_output).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.sam31_sprinkler_preliminary_replay_output.v1',
+      status: 'requires_employee_or_professional_followup',
+      source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id: sectioningSprinklerAdapter.id,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(preliminaryReplay.blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'AHJ_approval',
+      'AutoSprink_parity',
+      'fabrication_ready',
+      'professional_approval',
+      'manufacturer_exact',
+    ]));
+
+    const replayFollowupRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/sprinkler-review/${consumerReview.id}/decision/${sprinklerReview.id}/preliminary-replay/followup`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        followup_decision: 'confirmed_internal_obstruction_clash_packet',
+        reviewer_name: 'HaloFire replay reviewer',
+        review_ref: 'halofire://sam31/sprinkler-preliminary-replay/sam31-landscout-testqueue/followup.json',
+        screenshot_ref: 'halofire://sam31/sprinkler-preliminary-replay/sam31-landscout-testqueue/followup.png',
+        packet_ref: 'halofire://sam31/obstruction-clash/sam31-landscout-testqueue/packet.json',
+        issue_decisions: [
+          {
+            source_field: 'obstruction_candidates',
+            source_index: 0,
+            decision: 'not_a_sprinkler_obstruction',
+            target_packet_lane: 'obstruction_or_clash_review',
+            notes: 'Parcel-edge object is not a sprinkler obstruction on the 1881 sheet.',
+          },
+        ],
+        notes: 'Internal-alpha replay follow-up only; keep all regulated claims blocked.',
+      }),
+    });
+    expect(replayFollowupRes.status).toBe(201);
+    const replayFollowup = await replayFollowupRes.json();
+    expect(replayFollowup).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.sam31_sprinkler_preliminary_replay_followup_decision.v1',
+      status: 'present',
+      source_preliminary_replay_artifact_type: 'halofire.sam31_sprinkler_preliminary_replay_artifact.v1',
+      source_preliminary_replay_output_artifact_type: 'halofire.sam31_sprinkler_preliminary_replay_output.v1',
+      source_pdf_boundary_evidence_id: boundary.id,
+      source_openclaw_sam31_consumer_review_evidence_id: consumerReview.id,
+      source_halofire_sam31_sprinkler_review_decision_evidence_id: sprinklerReview.id,
+      source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id: sectioningSprinklerAdapter.id,
+      supported_sprinkler_review_lane: 'obstruction_or_clash_review',
+      replay_scope: 'obstruction_clash_candidate_review',
+      followup_decision: 'confirmed_internal_obstruction_clash_packet',
+      reviewer_name: 'HaloFire replay reviewer',
+      review_ref: 'halofire://sam31/sprinkler-preliminary-replay/sam31-landscout-testqueue/followup.json',
+      packet_ref: 'halofire://sam31/obstruction-clash/sam31-landscout-testqueue/packet.json',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(replayFollowup.packet_queue_items).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        artifact_type: 'halofire.sam31_obstruction_clash_packet_queue_item.v1',
+        status: 'ready_for_internal_alpha_packet',
+        source_followup_decision_artifact_type: 'halofire.sam31_sprinkler_preliminary_replay_followup_decision.v1',
+        source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id: sectioningSprinklerAdapter.id,
+        target_packet_lane: 'obstruction_or_clash_review',
+        source_field: 'obstruction_candidates',
+        source_index: 0,
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    ]));
+    expect(replayFollowup.evidence).toEqual(expect.objectContaining({
+      evidence_type: 'halofire_sam31_sprinkler_preliminary_replay_followup_decision',
+      status: 'present',
+      source_ref: 'halofire://sam31/sprinkler-preliminary-replay/sam31-landscout-testqueue/followup.json',
+    }));
+    expect(replayFollowup.blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'AHJ_approval',
+      'AutoSprink_parity',
+      'fabrication_ready',
+      'professional_approval',
+      'manufacturer_exact',
+    ]));
+
+    const replayFollowupQueueRes = await request(`${COOPERATIVE_1881_PATH}/resolver-queue?sam31SprinklerReplay=ready&lane=obstruction_or_clash_review`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(replayFollowupQueueRes.status).toBe(200);
+    const replayFollowupQueue = await replayFollowupQueueRes.json();
+    expect(replayFollowupQueue.summary.sam31_sprinkler_preliminary_replay_followups_recorded).toBeGreaterThanOrEqual(1);
+    expect(replayFollowupQueue.summary.sam31_sprinkler_packet_queue_items).toBeGreaterThanOrEqual(1);
+    const replayFollowupQueueItem = replayFollowupQueue.items.find((row) => row.evidence_id === boundary.id);
+    expect(replayFollowupQueueItem.sam31_sprinkler_preliminary_replay_queue_items).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        status: 'preliminary_replay_followup_recorded',
+        latest_sam31_sprinkler_preliminary_replay_followup_decision: expect.objectContaining({
+          evidence_id: replayFollowup.id,
+          followup_decision: 'confirmed_internal_obstruction_clash_packet',
+          source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id: sectioningSprinklerAdapter.id,
+          claim_gate_effect: 'no_claims_cleared',
+        }),
+        packet_queue_items: expect.arrayContaining([
+          expect.objectContaining({
+            artifact_type: 'halofire.sam31_obstruction_clash_packet_queue_item.v1',
+            target_packet_lane: 'obstruction_or_clash_review',
+            source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id: sectioningSprinklerAdapter.id,
+            claim_gate_effect: 'no_claims_cleared',
+          }),
+        ]),
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    ]));
+
+    const replayFollowupPacketRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/sprinkler-review/${consumerReview.id}/decision/${sprinklerReview.id}/preliminary-replay/followup/${replayFollowup.id}/packet/0`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(replayFollowupPacketRes.status).toBe(200);
+    const replayFollowupPacket = await replayFollowupPacketRes.json();
+    expect(replayFollowupPacket).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.sam31_obstruction_clash_packet.v1',
+      source_packet_queue_item_artifact_type: 'halofire.sam31_obstruction_clash_packet_queue_item.v1',
+      source_followup_decision_artifact_type: 'halofire.sam31_sprinkler_preliminary_replay_followup_decision.v1',
+      source_followup_decision_evidence_id: replayFollowup.id,
+      source_pdf_boundary_evidence_id: boundary.id,
+      source_openclaw_sam31_consumer_review_evidence_id: consumerReview.id,
+      source_halofire_sam31_sprinkler_review_decision_evidence_id: sprinklerReview.id,
+      source_halofire_sam31_sectioning_sprinkler_review_adapter_evidence_id: sectioningSprinklerAdapter.id,
+      target_packet_lane: 'obstruction_or_clash_review',
+      source_field: 'obstruction_candidates',
+      packet_index: 0,
+      status: 'ready_for_internal_alpha_review',
+      review_ref: 'halofire://sam31/sprinkler-preliminary-replay/sam31-landscout-testqueue/followup.json',
+      screenshot_ref: 'halofire://sam31/sprinkler-preliminary-replay/sam31-landscout-testqueue/followup.png',
+      packet_ref: 'halofire://sam31/obstruction-clash/sam31-landscout-testqueue/packet.json',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(replayFollowupPacket.download_name).toContain('sam31-obstruction-clash-packet');
+    expect(replayFollowupPacket.issue_decision).toEqual(expect.objectContaining({
+      source_field: 'obstruction_candidates',
+      target_packet_lane: 'obstruction_or_clash_review',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(replayFollowupPacket.acceptable_evidence).toEqual(expect.arrayContaining([
+      'HaloFire employee packet review',
+      'marked-up obstruction/clash or sleeve/firestop screenshot',
+      'source-linked packet JSON',
+      'professional/AHJ/manufacturer evidence for any regulated claim',
+    ]));
+    expect(replayFollowupPacket.blocked_claims).toEqual(expect.arrayContaining([
+      'permit_ready',
+      'AHJ_approval',
+      'AutoSprink_parity',
+      'fabrication_ready',
+      'professional_approval',
+      'manufacturer_exact',
+    ]));
+
+    const replayFollowupPacketReviewRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/sprinkler-review/${consumerReview.id}/decision/${sprinklerReview.id}/preliminary-replay/followup/${replayFollowup.id}/packet/0/review`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        review_decision: 'accepted_internal_alpha_packet',
+        reviewer_name: 'HaloFire obstruction reviewer',
+        review_ref: 'halofire://sam31/obstruction-clash/sam31-landscout-testqueue/review.json',
+        signed_packet_ref: 'halofire://sam31/obstruction-clash/sam31-landscout-testqueue/signed-packet.json',
+        marked_up_screenshot_ref: 'halofire://sam31/obstruction-clash/sam31-landscout-testqueue/markup.png',
+        notes: 'Employee reviewed the obstruction packet for internal-alpha routing only.',
+      }),
+    });
+    expect(replayFollowupPacketReviewRes.status).toBe(201);
+    const replayFollowupPacketReview = await replayFollowupPacketReviewRes.json();
+    expect(replayFollowupPacketReview).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.sam31_sprinkler_followup_packet_review_decision.v1',
+      status: 'present',
+      source_packet_artifact_type: 'halofire.sam31_obstruction_clash_packet.v1',
+      source_followup_decision_evidence_id: replayFollowup.id,
+      packet_index: 0,
+      review_decision: 'accepted_internal_alpha_packet',
+      reviewer_name: 'HaloFire obstruction reviewer',
+      review_ref: 'halofire://sam31/obstruction-clash/sam31-landscout-testqueue/review.json',
+      signed_packet_ref: 'halofire://sam31/obstruction-clash/sam31-landscout-testqueue/signed-packet.json',
+      marked_up_screenshot_ref: 'halofire://sam31/obstruction-clash/sam31-landscout-testqueue/markup.png',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(replayFollowupPacketReview.evidence).toEqual(expect.objectContaining({
+      evidence_type: 'halofire_sam31_sprinkler_followup_packet_review_decision',
+      status: 'present',
+      source_ref: 'halofire://sam31/obstruction-clash/sam31-landscout-testqueue/review.json',
+    }));
+
+    const replayFollowupPacketReviewQueueRes = await request(`${COOPERATIVE_1881_PATH}/resolver-queue?sam31SprinklerReplay=ready&lane=obstruction_or_clash_review`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(replayFollowupPacketReviewQueueRes.status).toBe(200);
+    const replayFollowupPacketReviewQueue = await replayFollowupPacketReviewQueueRes.json();
+    expect(replayFollowupPacketReviewQueue.summary.sam31_sprinkler_packet_reviews_recorded).toBeGreaterThanOrEqual(1);
+    expect(replayFollowupPacketReviewQueue.summary.sam31_approval_upload_resolver_rows).toBeGreaterThanOrEqual(3);
+    const replayFollowupPacketReviewQueueItem = replayFollowupPacketReviewQueue.items.find((row) => row.evidence_id === boundary.id);
+    const replayFollowupPacketReviewRows = replayFollowupPacketReviewQueueItem.sam31_sprinkler_preliminary_replay_queue_items || [];
+    const replayFollowupPacketReviewRow = replayFollowupPacketReviewRows.find((row) => row.source_halofire_sam31_sprinkler_review_decision_evidence_id === sprinklerReview.id);
+    expect(replayFollowupPacketReviewRow.packet_queue_items).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        artifact_type: 'halofire.sam31_obstruction_clash_packet_queue_item.v1',
+        status: 'internal_alpha_packet_review_recorded',
+        latest_packet_review_decision: expect.objectContaining({
+          evidence_id: replayFollowupPacketReview.id,
+          artifact_type: 'halofire.sam31_sprinkler_followup_packet_review_decision.v1',
+          review_decision: 'accepted_internal_alpha_packet',
+          claim_gate_effect: 'no_claims_cleared',
+        }),
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    ]));
+    const packetReviewQueueItem = replayFollowupPacketReviewRow.packet_queue_items.find((packet) => packet.latest_packet_review_decision?.evidence_id === replayFollowupPacketReview.id);
+    expect(packetReviewQueueItem.approval_upload_resolver_rows).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        artifact_type: 'halofire.sam31_approval_upload_resolver_row.v1',
+        code: 'HALOFIRE_SAM31_PROFESSIONAL_APPROVAL_UPLOAD_MISSING',
+        target_approval_lane: 'professional_approval',
+        required_evidence_type: 'licensed_professional_signed_review',
+        next_action: expect.stringContaining('Upload'),
+        acceptable_evidence: expect.arrayContaining(['PE or licensed sprinkler professional signed review packet']),
+        ai_fallback: expect.stringContaining('SAM31'),
+        blocked_claims: expect.arrayContaining(['professional_approval', 'permit_ready', 'fabrication_ready']),
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+      expect.objectContaining({
+        artifact_type: 'halofire.sam31_approval_upload_resolver_row.v1',
+        code: 'HALOFIRE_SAM31_AHJ_APPROVAL_UPLOAD_MISSING',
+        target_approval_lane: 'AHJ_approval',
+        required_evidence_type: 'AHJ_signed_approval_or_plan_check_record',
+        acceptable_evidence: expect.arrayContaining(['AHJ signed approval, plan-check response, or correction letter']),
+        blocked_claims: expect.arrayContaining(['AHJ_approval', 'permit_ready']),
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+      expect.objectContaining({
+        artifact_type: 'halofire.sam31_approval_upload_resolver_row.v1',
+        code: 'HALOFIRE_SAM31_MANUFACTURER_EVIDENCE_UPLOAD_MISSING',
+        target_approval_lane: 'manufacturer_exact',
+        required_evidence_type: 'manufacturer_catalog_or_model_proof',
+        acceptable_evidence: expect.arrayContaining(['manufacturer catalog page, cut sheet, BIM/STEP file, or source-linked model proof']),
+        blocked_claims: expect.arrayContaining(['manufacturer_exact', 'fabrication_ready']),
+        use_for_claims: false,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    ]));
+    expect(packetReviewQueueItem.approval_upload_resolver_rows.every((row) => row.source_packet_review_decision_evidence_id === replayFollowupPacketReview.id)).toBe(true);
+
+    const professionalApprovalUploadRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/openclaw/sam31/sprinkler-review/${consumerReview.id}/decision/${sprinklerReview.id}/preliminary-replay/followup/${replayFollowup.id}/packet/0/review/${replayFollowupPacketReview.id}/approval-upload`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        code: 'HALOFIRE_SAM31_PROFESSIONAL_APPROVAL_UPLOAD_MISSING',
+        target_approval_lane: 'professional_approval',
+        evidence_type: 'professional_review',
+        source_ref: 'halofire://sam31/obstruction-clash/sam31-landscout-testqueue/professional-review.pdf',
+        source_file: 'sam31-obstruction-professional-review.pdf',
+        notes: 'Uploaded signed professional review evidence for later gate validation only.',
+        signoff: {
+          reviewer_name: 'Pat Licensed',
+          reviewer_title: 'Licensed Fire Protection Engineer',
+          signed_at: '2026-06-02T16:30:00.000Z',
+          organization: 'Halo Fire',
+          license_id: 'PE-SAM31-1881',
+        },
+      }),
+    });
+    expect(professionalApprovalUploadRes.status).toBe(201);
+    const professionalApprovalUpload = await professionalApprovalUploadRes.json();
+    expect(professionalApprovalUpload).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.sam31_approval_upload_intake.v1',
+      status: 'uploaded_pending_gate_validation',
+      evidence_type: 'professional_review',
+      source_packet_review_decision_evidence_id: replayFollowupPacketReview.id,
+      source_followup_decision_evidence_id: replayFollowup.id,
+      code: 'HALOFIRE_SAM31_PROFESSIONAL_APPROVAL_UPLOAD_MISSING',
+      target_approval_lane: 'professional_approval',
+      required_evidence_type: 'licensed_professional_signed_review',
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+      no_claim_gates_cleared: true,
+    }));
+    expect(professionalApprovalUpload.signoff).toEqual(expect.objectContaining({
+      reviewer_name: 'Pat Licensed',
+      reviewer_title: 'Licensed Fire Protection Engineer',
+      signed_at: '2026-06-02T16:30:00.000Z',
+      organization: 'Halo Fire',
+      license_id: 'PE-SAM31-1881',
+    }));
+    expect(professionalApprovalUpload.evidence).toEqual(expect.objectContaining({
+      evidence_type: 'professional_review',
+      status: 'present',
+      source_ref: 'halofire://sam31/obstruction-clash/sam31-landscout-testqueue/professional-review.pdf',
+    }));
+    const professionalUploadNotes = JSON.parse(professionalApprovalUpload.evidence.notes);
+    expect(professionalUploadNotes).toEqual(expect.objectContaining({
+      kind: 'halofire_sam31_approval_upload_intake',
+      artifact_type: 'halofire.sam31_approval_upload_intake.v1',
+      claim_gate_effect: 'no_claims_cleared',
+      use_for_claims: false,
+    }));
+
+    const replayFollowupApprovalUploadQueueRes = await request(`${COOPERATIVE_1881_PATH}/resolver-queue?sam31SprinklerReplay=ready&lane=obstruction_or_clash_review`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(replayFollowupApprovalUploadQueueRes.status).toBe(200);
+    const replayFollowupApprovalUploadQueue = await replayFollowupApprovalUploadQueueRes.json();
+    expect(replayFollowupApprovalUploadQueue.summary.sam31_approval_uploads_recorded).toBeGreaterThanOrEqual(1);
+    const replayFollowupApprovalUploadQueueItem = replayFollowupApprovalUploadQueue.items.find((row) => row.evidence_id === boundary.id);
+    const replayFollowupApprovalUploadRows = replayFollowupApprovalUploadQueueItem.sam31_sprinkler_preliminary_replay_queue_items || [];
+    const replayFollowupApprovalUploadRow = replayFollowupApprovalUploadRows.find((row) => row.source_halofire_sam31_sprinkler_review_decision_evidence_id === sprinklerReview.id);
+    const packetWithApprovalUpload = replayFollowupApprovalUploadRow.packet_queue_items.find((packet) => packet.latest_packet_review_decision?.evidence_id === replayFollowupPacketReview.id);
+    const professionalApprovalRow = packetWithApprovalUpload.approval_upload_resolver_rows.find((row) => row.code === 'HALOFIRE_SAM31_PROFESSIONAL_APPROVAL_UPLOAD_MISSING');
+    expect(professionalApprovalRow).toEqual(expect.objectContaining({
+      status: 'approval_upload_recorded_pending_gate_validation',
+      latest_approval_upload_intake: expect.objectContaining({
+        evidence_id: professionalApprovalUpload.id,
+        artifact_type: 'halofire.sam31_approval_upload_intake.v1',
+        evidence_type: 'professional_review',
+        target_approval_lane: 'professional_approval',
+        source_packet_review_decision_evidence_id: replayFollowupPacketReview.id,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    const professionalGateAfterUpload = await request(`${COOPERATIVE_1881_PATH}/claim-gates`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const professionalGates = await professionalGateAfterUpload.json();
+    expect(professionalGates.find((gate) => gate.code === 'PROFESSIONAL_REVIEW_MISSING')?.status).toBe('blocked');
+
+    const pendingApprovalValidationRes = await request(`${COOPERATIVE_1881_PATH}/resolver-queue?sam31ApprovalValidation=pending&targetGate=PROFESSIONAL_REVIEW_MISSING`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(pendingApprovalValidationRes.status).toBe(200);
+    const pendingApprovalValidationQueue = await pendingApprovalValidationRes.json();
+    expect(pendingApprovalValidationQueue.filters).toEqual(expect.objectContaining({
+      sam31ApprovalValidation: 'pending',
+      targetGate: 'PROFESSIONAL_REVIEW_MISSING',
+    }));
+    expect(pendingApprovalValidationQueue.summary.sam31_approval_validation_pending).toBeGreaterThanOrEqual(1);
+    expect(pendingApprovalValidationQueue.summary.sam31_approval_validation_decisions_recorded || 0).toBe(0);
+    expect(pendingApprovalValidationQueue.summary.sam31_approval_validation_placeholder_no_claims || 0).toBe(0);
+    expect(pendingApprovalValidationQueue.summary.sam31_approval_validation_ready_for_gate_resolve || 0).toBe(0);
+    const pendingApprovalValidationItem = pendingApprovalValidationQueue.items.find((row) => row.evidence_id === boundary.id);
+    const pendingApprovalValidationRows = pendingApprovalValidationItem.sam31_sprinkler_preliminary_replay_queue_items || [];
+    const pendingApprovalValidationRow = pendingApprovalValidationRows.find((row) => row.source_halofire_sam31_sprinkler_review_decision_evidence_id === sprinklerReview.id);
+    const pendingApprovalValidationPacket = pendingApprovalValidationRow.packet_queue_items.find((packet) => packet.latest_packet_review_decision?.evidence_id === replayFollowupPacketReview.id);
+    expect(pendingApprovalValidationPacket.approval_upload_resolver_rows).toEqual([
+      expect.objectContaining({
+        code: 'HALOFIRE_SAM31_PROFESSIONAL_APPROVAL_UPLOAD_MISSING',
+        target_gate_code: 'PROFESSIONAL_REVIEW_MISSING',
+        gate_validation_status: 'pending_gate_validation',
+        latest_approval_upload_intake: expect.objectContaining({
+          evidence_id: professionalApprovalUpload.id,
+          gate_validation_packet_action: expect.objectContaining({
+            artifact_type: 'halofire.sam31_approval_upload_gate_validation_packet.v1',
+          }),
+        }),
+        latest_approval_upload_validation_decision: null,
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    ]);
+
+    const rawApprovalUploadResolveRes = await request(`${COOPERATIVE_1881_PATH}/claim-gates/PROFESSIONAL_REVIEW_MISSING/resolve`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ evidence_id: professionalApprovalUpload.id }),
+    });
+    expect(rawApprovalUploadResolveRes.status).toBe(400);
+    await expect(rawApprovalUploadResolveRes.json()).resolves.toEqual(expect.objectContaining({
+      error: expect.stringContaining('SAM31 approval upload intake must be validated'),
+    }));
+
+    const approvalValidationDecisionRes = await request(`${COOPERATIVE_1881_PATH}/evidence/${professionalApprovalUpload.id}/openclaw/sam31/approval-upload/gate-validation-decision`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        validation_decision: 'real_signed_evidence_validated',
+        validation_ref: 'approval-validation://sam31-landscout-testqueue/professional-review',
+        reviewer_name: 'Pat Licensed',
+        reviewer_title: 'Licensed Fire Protection Engineer',
+        signed_at: '2026-06-02T17:00:00.000Z',
+        organization: 'Halo Fire',
+        license_id: 'PE-SAM31-1881',
+        notes: 'Validated real signed professional evidence for explicit gate resolve.',
+      }),
+    });
+    expect(approvalValidationDecisionRes.status).toBe(201);
+    const approvalValidationDecision = await approvalValidationDecisionRes.json();
+    expect(approvalValidationDecision).toEqual(expect.objectContaining({
+      artifact_type: 'halofire.sam31_approval_upload_validation_decision.v1',
+      validation_decision: 'real_signed_evidence_validated',
+      source_halofire_sam31_approval_upload_evidence_id: professionalApprovalUpload.id,
+      target_gate_code: 'PROFESSIONAL_REVIEW_MISSING',
+      evidence_type: 'professional_review',
+      status: 'present',
+      use_for_claims: true,
+      claim_gate_effect: 'ready_for_explicit_gate_resolve',
+      no_claim_gates_cleared: true,
+      resolve_action: expect.objectContaining({
+        method: 'POST',
+        href: expect.stringContaining('/claim-gates/PROFESSIONAL_REVIEW_MISSING/resolve'),
+        request_body: { evidence_id: expect.any(Number) },
+      }),
+    }));
+
+    const readyApprovalValidationRes = await request(`${COOPERATIVE_1881_PATH}/resolver-queue?sam31ApprovalValidation=ready_for_explicit_gate_resolve&targetGate=PROFESSIONAL_REVIEW_MISSING`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(readyApprovalValidationRes.status).toBe(200);
+    const readyApprovalValidationQueue = await readyApprovalValidationRes.json();
+    expect(readyApprovalValidationQueue.summary.sam31_approval_validation_pending || 0).toBe(0);
+    expect(readyApprovalValidationQueue.summary.sam31_approval_validation_decisions_recorded).toBeGreaterThanOrEqual(1);
+    expect(readyApprovalValidationQueue.summary.sam31_approval_validation_ready_for_gate_resolve).toBeGreaterThanOrEqual(1);
+    const readyApprovalValidationItem = readyApprovalValidationQueue.items.find((row) => row.evidence_id === boundary.id);
+    const readyApprovalValidationRows = readyApprovalValidationItem.sam31_sprinkler_preliminary_replay_queue_items || [];
+    const readyApprovalValidationRow = readyApprovalValidationRows.find((row) => row.source_halofire_sam31_sprinkler_review_decision_evidence_id === sprinklerReview.id);
+    const readyApprovalValidationPacket = readyApprovalValidationRow.packet_queue_items.find((packet) => packet.latest_packet_review_decision?.evidence_id === replayFollowupPacketReview.id);
+    expect(readyApprovalValidationPacket.approval_upload_resolver_rows).toEqual([
+      expect.objectContaining({
+        code: 'HALOFIRE_SAM31_PROFESSIONAL_APPROVAL_UPLOAD_MISSING',
+        target_gate_code: 'PROFESSIONAL_REVIEW_MISSING',
+        gate_validation_status: 'ready_for_explicit_gate_resolve',
+        latest_approval_upload_intake: expect.objectContaining({
+          evidence_id: professionalApprovalUpload.id,
+        }),
+        latest_approval_upload_validation_decision: expect.objectContaining({
+          evidence_id: approvalValidationDecision.evidence_id,
+          validation_decision: 'real_signed_evidence_validated',
+          claim_gate_effect: 'ready_for_explicit_gate_resolve',
+          resolve_action: expect.objectContaining({
+            href: expect.stringContaining('/claim-gates/PROFESSIONAL_REVIEW_MISSING/resolve'),
+            request_body: { evidence_id: approvalValidationDecision.evidence_id },
+          }),
+        }),
+        claim_gate_effect: 'ready_for_explicit_gate_resolve',
+      }),
+    ]);
+
+    const professionalGateResolveRes = await request(`${COOPERATIVE_1881_PATH}/claim-gates/PROFESSIONAL_REVIEW_MISSING/resolve`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ evidence_id: approvalValidationDecision.evidence_id }),
+    });
+    expect(professionalGateResolveRes.status).toBe(200);
+    const professionalGateResolve = await professionalGateResolveRes.json();
+    expect(professionalGateResolve).toEqual(expect.objectContaining({
+      cleared: true,
+      code: 'PROFESSIONAL_REVIEW_MISSING',
+      resolved_evidence_id: approvalValidationDecision.evidence_id,
+      resolved_evidence_ref: 'approval-validation://sam31-landscout-testqueue/professional-review',
+    }));
+    const professionalGateAfterExplicitResolve = await request(`${COOPERATIVE_1881_PATH}/claim-gates`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const professionalGatesAfterExplicitResolve = await professionalGateAfterExplicitResolve.json();
+    expect(professionalGatesAfterExplicitResolve.find((gate) => gate.code === 'PROFESSIONAL_REVIEW_MISSING')?.status).toBe('cleared');
+
+    const nameForgeAdapterRes = await request(`${COOPERATIVE_1881_PATH}/openclaw/sam31/product-owner-replacements`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        source_pdf_boundary_evidence_id: boundary.id,
+        source_openclaw_sam31_consumer_smoke_evidence_id: consumerSmoke.id,
+        source_application: 'nameforge',
+        consumer: 'nameforge',
+        accepted_queue_id: 'sam31-nameforge-testqueue',
+        persisted_review_packet_ref: 'openclaw://nameforge/sam31/product-review/sam31-nameforge-testqueue',
+        review_decision: 'accepted',
+        reviewer_name: 'NameForge product owner',
+        replacement_ref: 'nameforge://sam31/reviews/sam31-nameforge-testqueue/replacement.json',
+        screenshot_ref: 'nameforge://sam31/reviews/sam31-nameforge-testqueue/screenshot.png',
+        console_log_ref: 'nameforge://sam31/reviews/sam31-nameforge-testqueue/console.log',
+        replacement_values: {
+          semantic_labels: ['reviewed monument sign zone'],
+          object_hypotheses: [{ id: 'obj:sign-zone', semantic_label: 'reviewed sign placement zone' }],
+          vector_overlays: [{ id: 'vector:sign-zone', svg_path: 'M 0 0 L 8 0 L 8 4 Z' }],
+          model_3d_candidates: [{ id: 'model3d:sign-zone', primitive: 'extruded_brand_zone' }],
+          source_ref: 'nameforge://creative-review/sam31-nameforge-testqueue',
+          confidence: 0.79,
+        },
+        notes: 'NameForge accepted the shared OpenClaw SAM31 product-owner replacement intake.',
+      }),
+    });
+    expect(nameForgeAdapterRes.status).toBe(201);
+    const nameForgeAdapter = await nameForgeAdapterRes.json();
+    expect(nameForgeAdapter).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.product_owner_replacement_intake.v1',
+      status: 'accepted_for_internal_alpha_review',
+      source_application: 'nameforge',
+      consumer: 'nameforge',
+      source_pdf_boundary_evidence_id: boundary.id,
+      source_openclaw_sam31_consumer_smoke_evidence_id: consumerSmoke.id,
+      use_for_claims: false,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(nameForgeAdapter.supported_applications).toEqual(['halo_fire', 'landscout', 'nameforge']);
+    expect(nameForgeAdapter.intake_contract).toEqual(expect.objectContaining({
+      method: 'POST',
+      href: `${COOPERATIVE_1881_PATH}/openclaw/sam31/product-owner-replacements`,
+      artifact_type: 'openclaw.sam31.product_owner_replacement_intake.v1',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(nameForgeAdapter.product_owner_replacement).toEqual(expect.objectContaining({
+      artifact_type: 'openclaw.sam31.consumer_review_task_decision.v1',
+      consumer: 'nameforge',
+      review_decision: 'accepted',
+      accepted_queue_id: 'sam31-nameforge-testqueue',
+      replacement_ref: 'nameforge://sam31/reviews/sam31-nameforge-testqueue/replacement.json',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(nameForgeAdapter.evidence).toEqual(expect.objectContaining({
+      evidence_type: 'openclaw_sam31_consumer_review',
+      status: 'present',
+      source_ref: 'nameforge://sam31/reviews/sam31-nameforge-testqueue/replacement.json',
+    }));
+
+    const resolvedNameForgeRes = await request(`${COOPERATIVE_1881_PATH}/resolver-queue?sam31ConsumerReview=unresolved&consumer=nameforge`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(resolvedNameForgeRes.status).toBe(200);
+    const resolvedNameForge = await resolvedNameForgeRes.json();
+    expect(resolvedNameForge.items.find((row) => row.evidence_id === boundary.id)).toBeUndefined();
+    const resolvedQueueRes = await request(`${COOPERATIVE_1881_PATH}/resolver-queue`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(resolvedQueueRes.status).toBe(200);
+    const resolvedQueue = await resolvedQueueRes.json();
+    const resolvedBoundary = resolvedQueue.items.find((row) => row.evidence_id === boundary.id);
+    const nameForgeReviewSummary = resolvedBoundary.latest_openclaw_sam31_consumer_reviews.find((review) => review.consumer === 'nameforge');
+    expect(nameForgeReviewSummary.replacement_values).toEqual(expect.objectContaining({
+      semantic_labels: ['reviewed monument sign zone'],
+      source_ref: 'nameforge://creative-review/sam31-nameforge-testqueue',
+      confidence: 0.79,
+    }));
+    expect(nameForgeReviewSummary.replacement_summary).toEqual(expect.objectContaining({
+      semantic_label_count: 1,
+      object_hypothesis_count: 1,
+      vector_overlay_count: 1,
+      model_3d_candidate_count: 1,
+    }));
+    expect(nameForgeReviewSummary.use_for_claims).toBe(false);
+  }, 25000);
+
+  it('carries saved bridge smoke artifacts into SAM31 audit defaults and replay evidence without clearing claims', async () => {
+    const boundaryRes = await request(`${COOPERATIVE_1881_PATH}/pdf-boundary-decision`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        pdfPageIndex: 6,
+        pdfScale: 0.0625,
+        pdfExtract: 'sam31-smoke-default-outline',
+        source_file: 'Proposal-Cooperative-1881-Salt-Lake-City-UT-9-18-25.pdf',
+        source_ref: '1881 plan PDF sheet 6 / SAM31 smoke-to-review default',
+        candidate: {
+          mode: 'outline',
+          label: 'SAM31 smoke default outline',
+          status: 'candidate',
+          bbox: { x: 40, y: 50, width: 620, height: 340 },
+          segmentCount: 14,
+        },
+      }),
+    });
+    expect(boundaryRes.status).toBe(201);
+    const boundary = await boundaryRes.json();
+
+    const queueRes = await request(`${COOPERATIVE_1881_PATH}/resolver-queue`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(queueRes.status).toBe(200);
+    const queue = await queueRes.json();
+    const item = queue.items.find((row) => row.evidence_id === boundary.id);
+    expect(item.sam31_bridge_smoke_action.request_body.source_pdf_boundary_evidence_id).toBe(boundary.id);
+
+    const smokeRes = await request(item.sam31_bridge_smoke_action.href, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify(item.sam31_bridge_smoke_action.request_body),
+    });
+    expect(smokeRes.status).toBe(201);
+    const smoke = await smokeRes.json();
+
+    const packetRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/sam31-visual-audit`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(packetRes.status).toBe(200);
+    const packet = await packetRes.json();
+    expect(packet.latest_openclaw_sam31_bridge_smoke_artifact).toEqual(expect.objectContaining({
+      evidence_id: smoke.id,
+      evidence_status: 'best_effort',
+      status: 'sam31_invocation_verified',
+      source_pdf_boundary_evidence_id: boundary.id,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(packet.employee_capture_defaults).toEqual(expect.objectContaining({
+      source_openclaw_sam31_bridge_smoke_evidence_id: smoke.id,
+      sam31_result_ref: `openclaw-sam31-smoke-artifact:${smoke.id}`,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(packet.employee_capture_defaults.console_log_ref).toContain('/codex-bridge/invoke');
+    expect(packet.source_refs).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        evidence_id: smoke.id,
+        evidence_type: 'openclaw_sam31_bridge_smoke_artifact',
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    ]));
+
+    const auditRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/sam31-visual-audit/results`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        review_decision: 'corrected',
+        reviewer_name: 'Halo Fire SAM bridge reviewer',
+        source_openclaw_sam31_bridge_smoke_evidence_id: packet.employee_capture_defaults.source_openclaw_sam31_bridge_smoke_evidence_id,
+        sam31_result_ref: packet.employee_capture_defaults.sam31_result_ref,
+        screenshot_ref: 'employee://sam31/sheet-6-after-smoke-review.png',
+        console_log_ref: packet.employee_capture_defaults.console_log_ref,
+        marked_up_plan_ref: 'employee://sam31/sheet-6-marked-up-boundary.png',
+        corrected_room_polygons: [
+          {
+            room_id: 'sam31-smoke-reviewed-room',
+            source_ref: packet.employee_capture_defaults.sam31_result_ref,
+            polygon: [[0, 0], [42, 0], [42, 12], [0, 12]],
+          },
+        ],
+        issue_list: [
+          {
+            issue_type: 'sam31_bridge_smoke_review_required',
+            severity: 'blocking',
+            observed: 'Bridge smoke produced best-effort segmentation only.',
+            expected: 'Employee reviewed boundary before replay.',
+            required_action: 'Keep regulated claims blocked until professional/AHJ evidence exists.',
+          },
+        ],
+      }),
+    });
+    expect(auditRes.status).toBe(201);
+    const audit = await auditRes.json();
+    expect(audit.result).toEqual(expect.objectContaining({
+      source_openclaw_sam31_bridge_smoke_evidence_id: smoke.id,
+      sam31_result_ref: `openclaw-sam31-smoke-artifact:${smoke.id}`,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(audit.result.openclaw_sam31_bridge_smoke_artifact).toEqual(expect.objectContaining({
+      evidence_id: smoke.id,
+      status: 'sam31_invocation_verified',
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(audit.result.source_refs).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        evidence_id: smoke.id,
+        evidence_type: 'openclaw_sam31_bridge_smoke_artifact',
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    ]));
+
+    const replayRes = await request(`${COOPERATIVE_1881_PATH}/resolver-packets/pdf-boundary/${boundary.id}/replay-input`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    expect(replayRes.status).toBe(200);
+    const replay = await replayRes.json();
+    expect(replay).toEqual(expect.objectContaining({
+      review_source: 'latest_sam31_visual_audit',
+      source_openclaw_sam31_bridge_smoke_evidence_id: smoke.id,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(replay.openclaw_sam31_bridge_smoke_artifact).toEqual(expect.objectContaining({
+      evidence_id: smoke.id,
+      source_pdf_boundary_evidence_id: boundary.id,
+      claim_gate_effect: 'no_claims_cleared',
+    }));
+    expect(replay.sprinkler_bid_request).toEqual(expect.objectContaining({
+      source_openclaw_sam31_bridge_smoke_evidence_id: smoke.id,
+      use_for_claims: false,
+    }));
+    expect(replay.source_refs).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        evidence_id: smoke.id,
+        evidence_type: 'openclaw_sam31_bridge_smoke_artifact',
+        claim_gate_effect: 'no_claims_cleared',
+      }),
+    ]));
+    expect(replay.blocked_claims).toEqual(expect.arrayContaining([
+      'geometry_accuracy',
+      'permit_ready',
+      'AutoSprink_parity',
+      'SAM31_runtime_verified',
+      'OpenClaw_runtime_verified',
+    ]));
+  });
+});
