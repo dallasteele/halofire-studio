@@ -505,6 +505,52 @@ describe('Workbench official-flow browser smoke', () => {
       expect(gatesAfterRecord.find((gate) => gate.code === 'PROFESSIONAL_REVIEW_MISSING')).toEqual(
         expect.objectContaining({ status: 'blocked' }),
       );
+
+      await page.goto(`${BASE}/workbench.html?project=${encodeURIComponent(PROJECT_NAME)}#evidence`, { waitUntil: 'domcontentloaded' });
+      const savedReplacementRow = page.locator(`#evidence-${savedReplacement.id}`).first();
+      await savedReplacementRow.waitFor();
+      const savedReplacementRowText = await savedReplacementRow.innerText();
+      expect(savedReplacementRowText).toContain('placeholder_replacement official_flow_sam31_approval_upload');
+      expect(savedReplacementRowText).toContain(`source_official_flow_review_decision_evidence_id ${decision.id}`);
+      expect(savedReplacementRowText).toContain(`source_halofire_sam31_approval_upload_evidence_id ${upload.id}`);
+      expect(savedReplacementRowText).toContain(`source_halofire_sam31_approval_upload_validation_decision_evidence_id ${validation.id}`);
+      expect(savedReplacementRowText).toContain('claim_gate_effect no_claims_cleared');
+      expect(savedReplacementRowText).toContain('explicit claim-gate resolve still required');
+
+      const explicitResolvePreview = savedReplacementRow.locator(
+        `[data-placeholder-replacement-explicit-resolve-workflow="${savedReplacement.id}"]`,
+      ).first();
+      await explicitResolvePreview.waitFor();
+      expect(await explicitResolvePreview.getAttribute('data-signed-reviewer-workflow-action')).toBe('resolve');
+      expect(await explicitResolvePreview.getAttribute('data-source-official-flow-review-decision-evidence-id')).toBe(String(decision.id));
+      expect(await explicitResolvePreview.getAttribute('data-source-halofire-sam31-approval-upload-evidence-id')).toBe(String(upload.id));
+      expect(await explicitResolvePreview.getAttribute('data-source-halofire-sam31-approval-upload-validation-decision-evidence-id')).toBe(String(validation.id));
+      expect(await explicitResolvePreview.getAttribute('data-selected-sheet-ref')).toBe('1881://proposal-cooperative/sheet-7');
+      expect(await explicitResolvePreview.getAttribute('data-selected-scale-ref')).toBe('1881://operator-scale/sheet-7/0.0833');
+      expect(await explicitResolvePreview.getAttribute('data-selected-boundary-candidate-ref')).toBe('candidate:1881-official-flow-placeholder-settings');
+      expect(await explicitResolvePreview.getAttribute('data-claim-gate-effect')).toBe('no_claims_cleared');
+
+      await explicitResolvePreview.click();
+      await page.waitForURL((url) => url.pathname === '/settings.html' && url.hash === '#wizSignoff');
+      await page.waitForFunction((expected) => {
+        const status = document.getElementById('wizPacketStatus');
+        return status?.dataset.placeholderReplacementExplicitResolveEvidenceId === expected.savedReplacementId
+          && status?.dataset.sourceOfficialFlowReviewDecisionEvidenceId === expected.decisionId
+          && status?.dataset.sourceHalofireSam31ApprovalUploadEvidenceId === expected.uploadId
+          && status?.dataset.sourceHalofireSam31ApprovalUploadValidationDecisionEvidenceId === expected.validationId;
+      }, {
+        savedReplacementId: String(savedReplacement.id),
+        decisionId: String(decision.id),
+        uploadId: String(upload.id),
+        validationId: String(validation.id),
+      });
+      expect(page.url()).toContain('action=resolve');
+      expect(page.url()).toContain(`evidenceId=${savedReplacement.id}`);
+      expect(await page.locator('#wizAction').inputValue()).toBe('resolve');
+      expect(await packetStatus.getAttribute('data-placeholder-replacement')).toBe('official_flow_sam31_approval_upload');
+      expect(await packetStatus.getAttribute('data-claim-gate-effect')).toBe('no_claims_cleared');
+      expect(await packetStatus.innerText()).toContain('explicit resolve preview');
+      expect(await packetStatus.innerText()).toContain('no claims are cleared by this preview');
     } finally {
       await page.close();
     }

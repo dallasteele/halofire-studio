@@ -305,6 +305,7 @@ function clearWizardOfficialFlowContext() {
   packetStatus.removeAttribute('data-official-flow-upload-packet-source-attachment-intake-packet-evidence-id');
   packetStatus.removeAttribute('data-official-flow-upload-packet-source-attachment-intake-row-index');
   packetStatus.removeAttribute('data-placeholder-replacement');
+  packetStatus.removeAttribute('data-placeholder-replacement-explicit-resolve-evidence-id');
   packetStatus.removeAttribute('data-source-official-flow-review-decision-evidence-id');
   packetStatus.removeAttribute('data-source-halofire-sam31-approval-upload-evidence-id');
   packetStatus.removeAttribute('data-source-halofire-sam31-approval-upload-validation-decision-evidence-id');
@@ -433,6 +434,9 @@ async function applyWizardUrlPrefill() {
       hydrateWizardFromExistingEvidence();
       return;
     }
+    if (await hydrateWizardFromSavedSignedReviewerEvidence()) {
+      return;
+    }
     await hydrateWizardFromOfficialFlowContextEvidence();
   }
 }
@@ -470,6 +474,13 @@ function hydrateWizardFromExistingEvidence() {
       resolveAuditHref: parsed.resolve_audit_packet_href || '',
       resolveAuditArtifactType: parsed.resolve_audit_packet_artifact_type || '',
       claimGateEffect: parsed.claim_gate_effect || '',
+      placeholderReplacement: parsed.placeholder_replacement || '',
+      sourceOfficialFlowReviewDecisionEvidenceId: parsed.source_official_flow_review_decision_evidence_id || '',
+      sourceHalofireSam31ApprovalUploadEvidenceId: parsed.source_halofire_sam31_approval_upload_evidence_id || '',
+      sourceHalofireSam31ApprovalUploadValidationDecisionEvidenceId: parsed.source_halofire_sam31_approval_upload_validation_decision_evidence_id || '',
+      selectedSheetRef: parsed.selected_sheet_ref || '',
+      selectedScaleRef: parsed.selected_scale_ref || '',
+      selectedBoundaryCandidateRef: parsed.selected_boundary_candidate_ref || '',
     };
   } catch {
     userNotes = row.notes || '';
@@ -486,10 +497,27 @@ function hydrateWizardFromExistingEvidence() {
   packetStatus.dataset.signedReviewerReviewPacketHref = packetContext.reviewPacketHref || gate.review_packet_href || '';
   packetStatus.dataset.signedReviewerResolveAuditHref = packetContext.resolveAuditHref || '';
   packetStatus.dataset.signedReviewerClaimGateEffect = packetContext.claimGateEffect || '';
+  if (packetContext.placeholderReplacement) {
+    packetStatus.dataset.placeholderReplacement = packetContext.placeholderReplacement;
+    packetStatus.dataset.sourceOfficialFlowReviewDecisionEvidenceId = String(packetContext.sourceOfficialFlowReviewDecisionEvidenceId || '');
+    packetStatus.dataset.sourceHalofireSam31ApprovalUploadEvidenceId = String(packetContext.sourceHalofireSam31ApprovalUploadEvidenceId || '');
+    packetStatus.dataset.sourceHalofireSam31ApprovalUploadValidationDecisionEvidenceId = String(packetContext.sourceHalofireSam31ApprovalUploadValidationDecisionEvidenceId || '');
+    packetStatus.dataset.selectedSheetRef = packetContext.selectedSheetRef || '';
+    packetStatus.dataset.selectedScaleRef = packetContext.selectedScaleRef || '';
+    packetStatus.dataset.selectedBoundaryCandidateRef = packetContext.selectedBoundaryCandidateRef || '';
+    packetStatus.dataset.claimGateEffect = packetContext.claimGateEffect || 'no_claims_cleared';
+  }
+  if (wizardUrlPrefill.action === 'resolve' && gate.can_resolve) {
+    $('wizAction').value = 'resolve';
+  }
   packetStatus.textContent = `Prefilled from Workbench for evidence #${selectedEvidenceId}.`
     + (packetContext.targetGateCode ? ` target_gate_code ${packetContext.targetGateCode}.` : '')
     + (packetContext.reviewPacketHref ? ` Review packet route ${packetContext.reviewPacketHref}.` : ' Resolve the gate or download the packet for this signed reviewer lane.')
-    + (packetContext.resolveAuditHref ? ` Resolve audit route ${packetContext.resolveAuditHref}.` : '');
+    + (packetContext.resolveAuditHref ? ` Resolve audit route ${packetContext.resolveAuditHref}.` : '')
+    + (packetContext.placeholderReplacement ? ` placeholder_replacement ${packetContext.placeholderReplacement}; explicit resolve preview for saved replacement evidence; no claims are cleared by this preview.` : '');
+  if (packetContext.placeholderReplacement && wizardUrlPrefill.action === 'resolve') {
+    packetStatus.dataset.placeholderReplacementExplicitResolveEvidenceId = String(selectedEvidenceId);
+  }
   if (wizardUrlPrefill.action === 'inspect') {
     packetStatus.dataset.signedReviewerReadonlyEvidenceId = String(selectedEvidenceId);
     packetStatus.dataset.signedReviewerClaimGateEffect = packetContext.claimGateEffect || 'gate_cleared_after_explicit_signed_validation';
@@ -505,6 +533,31 @@ function hydrateWizardFromExistingEvidence() {
     $('wizSubmit').disabled = true;
   }
   syncWizardSignoff();
+}
+
+async function hydrateWizardFromSavedSignedReviewerEvidence() {
+  const gate = wizardState.gateMap.get($('wizGate').value);
+  const evidenceId = wizardUrlPrefill.evidenceId;
+  if (!gate || !evidenceId) return false;
+  const projectName = $('wizProject').value;
+  const rows = await api('/projects/' + encodeURIComponent(projectName) + '/evidence');
+  const row = (Array.isArray(rows) ? rows : []).find((entry) => String(entry.id) === String(evidenceId));
+  const packet = parseWizardEvidenceNotes(row);
+  if (!row || packet.kind !== 'signed_reviewer_evidence') return false;
+  if (!Array.isArray(gate.matching_evidence)) gate.matching_evidence = [];
+  if (!gate.matching_evidence.some((entry) => String(entry.id) === String(row.id))) {
+    gate.matching_evidence.unshift(row);
+  }
+  const existingEl = $('wizExistingEvidence');
+  if (!Array.from(existingEl.options || []).some((entry) => entry.value === String(row.id))) {
+    const option = document.createElement('option');
+    option.value = String(row.id);
+    option.textContent = `${row.evidence_type || 'signed_reviewer_evidence'} - ${row.source_ref || row.source_file || `evidence #${row.id}`}`;
+    existingEl.prepend(option);
+  }
+  existingEl.value = String(row.id);
+  hydrateWizardFromExistingEvidence();
+  return true;
 }
 
 function officialFlowSignedReviewerPrefillConfig(gateCode, context = {}, row = {}) {
