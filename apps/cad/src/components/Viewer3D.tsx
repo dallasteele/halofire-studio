@@ -25,9 +25,10 @@ import {
 import { Canvas } from '@react-three/fiber';
 import { Grid, OrbitControls } from '@react-three/drei';
 import { useCadStore } from '../store';
-import { hasBuilding, type HazardClass, type Project } from '../lib/model';
+import { hasBuilding, type HazardClass, type Node, type Project } from '../lib/model';
 import {
   buildBuildingMeshes,
+  buildingBoundsFt,
   type BuildingMeshes,
   type FloorMesh,
 } from '../lib/building3d';
@@ -78,12 +79,68 @@ function FloorSlab({
   );
 }
 
+/**
+ * A sprinkler head marker in 3D: a small inverted-cone glyph (a stand-in pendent
+ * head, NOT manufacturer-exact geometry) hanging at the ceiling plane. Heads are
+ * stored in plan-FEET; the caller recenters them onto the building origin so they
+ * align with the recentered floor slabs. Selected heads glow.
+ */
+function HeadMarker({
+  x,
+  y,
+  z,
+  selected,
+  onSelect,
+}: {
+  x: number;
+  y: number;
+  z: number;
+  selected: boolean;
+  onSelect: () => void;
+}): ReactElement {
+  return (
+    <group position={[x, y, z]}>
+      {/* small sphere body */}
+      <mesh
+        onClick={(e) => {
+          e.stopPropagation();
+          onSelect();
+        }}
+      >
+        <sphereGeometry args={[selected ? 0.5 : 0.35, 16, 12]} />
+        <meshStandardMaterial
+          color={selected ? '#ffd27f' : '#6fb3ff'}
+          emissive={selected ? '#ffd27f' : '#1b3b5f'}
+          emissiveIntensity={selected ? 0.6 : 0.25}
+          roughness={0.4}
+          metalness={0.2}
+        />
+      </mesh>
+      {/* deflector disc just below the body */}
+      <mesh position={[0, -0.45, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.5, 0.5, 0.05, 16]} />
+        <meshStandardMaterial color={selected ? '#ffd27f' : '#9fc7ff'} roughness={0.6} />
+      </mesh>
+    </group>
+  );
+}
+
 function BuildingScene({
   meshes,
   selectedRoomId,
+  heads,
+  centerX,
+  centerZ,
+  selectedNodeId,
+  onSelectHead,
 }: {
   meshes: BuildingMeshes;
   selectedRoomId: string | null;
+  heads: Node[];
+  centerX: number;
+  centerZ: number;
+  selectedNodeId: string | null;
+  onSelectHead: (id: string) => void;
 }): ReactElement {
   // Frame size from building bounds so the grid + camera target fit it.
   const span = useMemo(() => {
@@ -114,6 +171,19 @@ function BuildingScene({
         ) : null,
       )}
 
+      {/* sprinkler heads — recentered onto the building origin so they sit over the
+          floor slabs. pos.y is the head's ceiling height (feet). */}
+      {heads.map((h) => (
+        <HeadMarker
+          key={h.id}
+          x={h.pos.x - centerX}
+          y={h.pos.y}
+          z={h.pos.z - centerZ}
+          selected={h.id === selectedNodeId}
+          onSelect={() => onSelectHead(h.id)}
+        />
+      ))}
+
       <Grid
         args={[span * 2, span * 2]}
         cellSize={1}
@@ -131,12 +201,32 @@ function BuildingScene({
   );
 }
 
-function GroundScene(): ReactElement {
+function GroundScene({
+  heads,
+  selectedNodeId,
+  onSelectHead,
+}: {
+  heads: Node[];
+  selectedNodeId: string | null;
+  onSelectHead: (id: string) => void;
+}): ReactElement {
   return (
     <>
       <color attach="background" args={[colors.ground3d]} />
       <ambientLight intensity={0.6} />
       <directionalLight position={[8, 14, 6]} intensity={1.1} />
+      {/* Heads can exist before a building is reconstructed — show them at their
+          plan-feet positions (no recentering applies with no building bounds). */}
+      {heads.map((h) => (
+        <HeadMarker
+          key={h.id}
+          x={h.pos.x}
+          y={h.pos.y}
+          z={h.pos.z}
+          selected={h.id === selectedNodeId}
+          onSelect={() => onSelectHead(h.id)}
+        />
+      ))}
       {/* Ground grid: honest empty floor, no building drawn. */}
       <Grid
         args={[40, 40]}
@@ -169,8 +259,17 @@ function cameraFor(meshes: BuildingMeshes | null): {
 export function Viewer3D(): ReactElement {
   const project = useCadStore((s) => s.project);
   const selectedRoomId = useCadStore((s) => s.selection.selectedRoomId);
+  const selectedNodeId = useCadStore((s) => s.selection.selectedNodeId);
+  const select = useCadStore((s) => s.select);
   const loaded = hasBuilding(project);
   const gl = useMemo(webglAvailable, []);
+
+  const heads = useMemo(
+    () => project.network.nodes.filter((n) => n.type === 'HEAD'),
+    [project.network.nodes],
+  );
+  // Recenter heads onto the same origin the floor slabs use (building bounds center).
+  const bounds = useMemo(() => buildingBoundsFt(project.building), [project.building]);
 
   // PURE, deterministic rebuild whenever the building changes (room/wall/scale).
   // This is what makes the 3D view reactive to 2D edits via the shared store.
@@ -188,8 +287,8 @@ export function Viewer3D(): ReactElement {
 
   // Publish a small honest 3D snapshot for the preview harness.
   useEffect(() => {
-    publish3dWindow(project, meshes);
-  }, [project, meshes]);
+    publish3dWindow(project, meshes, heads.length);
+  }, [project, meshes, heads.length]);
 
   // R3F sizes its canvas via ResizeObserver, which can miss the first measure in
   // headless/SSR-hydrated contexts. Kick one resize after mount so the canvas
@@ -215,9 +314,17 @@ export function Viewer3D(): ReactElement {
           camera={{ position: cam.position, fov: cam.fov }}
         >
           {meshes ? (
-            <BuildingScene meshes={meshes} selectedRoomId={selectedRoomId} />
+            <BuildingScene
+              meshes={meshes}
+              selectedRoomId={selectedRoomId}
+              heads={heads}
+              centerX={bounds.cx}
+              centerZ={bounds.cy}
+              selectedNodeId={selectedNodeId}
+              onSelectHead={(id) => select('node', id)}
+            />
           ) : (
-            <GroundScene />
+            <GroundScene heads={heads} selectedNodeId={selectedNodeId} onSelectHead={(id) => select('node', id)} />
           )}
         </Canvas>
       ) : (
@@ -245,7 +352,11 @@ export function Viewer3D(): ReactElement {
  * only true when meshes were actually built; the backend name is whatever
  * building3d reports (never faked).
  */
-function publish3dWindow(project: Project, meshes: BuildingMeshes | null): void {
+function publish3dWindow(
+  project: Project,
+  meshes: BuildingMeshes | null,
+  headCount: number,
+): void {
   if (typeof window === 'undefined') return;
   const prev = window.__cad;
   const next = {
@@ -253,6 +364,7 @@ function publish3dWindow(project: Project, meshes: BuildingMeshes | null): void 
     buildingBackend: meshes?.backend ?? null,
     floorCount: meshes?.floors.length ?? 0,
     wallCount: meshes?.walls.length ?? 0,
+    headCount3d: headCount,
   };
   window.__cad = { ...(prev ?? {}), ...next } as typeof window.__cad;
   // Silence unused-param lint while keeping the signature explicit for clarity.

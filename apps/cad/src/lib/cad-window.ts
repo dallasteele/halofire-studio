@@ -8,6 +8,8 @@
 
 import { hasNetwork, type Project } from './model';
 import { polygonAreaSqFt } from './scale';
+import { coverageReport } from './head-layout';
+import { booleanPointInPolygon, point as turfPoint, polygon as turfPolygon } from '@turf/turf';
 import type { ViewMode } from '../store';
 
 export interface CadWindowState {
@@ -38,6 +40,21 @@ export interface CadWindowState {
   floorCount?: number;
   /** Number of wall runs built in 3D (1:1 with walls). */
   wallCount?: number;
+
+  /* --- W3 head-layout handle --- */
+  /** Number of sprinkler-head nodes in the network (1:1 with the store). */
+  headCount: number;
+  /**
+   * True iff EVERY room with at least one head inside it passes its cited coverage
+   * report (area + spacing), AND at least one head is placed. False when no heads
+   * exist or any covered room fails a cited check. Honest: rooms with no heads at
+   * all are NOT silently treated as covered.
+   */
+  coverageOk: boolean;
+  /** The active head SKU id selected for placement, or null. */
+  activeHeadSku: string | null;
+  /** 3D head marker count (set by Viewer3D; mirrors headCount when 3D is live). */
+  headCount3d?: number;
 }
 
 /** Sum of every room polygon's area, in square feet, at the building scale. */
@@ -50,13 +67,55 @@ function sumRoomAreaSqFt(project: Project): number {
   return total;
 }
 
+/**
+ * Aggregate cited coverage across all rooms. Returns true only when at least one
+ * head is placed AND every room that has heads inside it passes its cited coverage
+ * report. Numbers come ONLY from coverageReport (cited nfpa13-rules) — never forked.
+ */
+function aggregateCoverageOk(project: Project): boolean {
+  const heads = project.network.nodes.filter((n) => n.type === 'HEAD');
+  if (heads.length === 0) return false;
+  const scale = project.building.scaleFtPerUnit > 0 ? project.building.scaleFtPerUnit : 1;
+  const rooms = project.building.rooms;
+  if (rooms.length === 0) return false;
+  let anyRoomHasHeads = false;
+  for (const room of rooms) {
+    const polyFt = room.polygon.map((p) => ({ x: p.x * scale, y: p.y * scale }));
+    if (polyFt.length < 3) continue;
+    const ring = polyFt.map((p) => [p.x, p.y]);
+    ring.push([polyFt[0].x, polyFt[0].y]);
+    let turfPoly: ReturnType<typeof turfPolygon>;
+    try {
+      turfPoly = turfPolygon([ring]);
+    } catch {
+      continue;
+    }
+    const inRoom = heads
+      .map((h) => ({ x: h.pos.x, y: h.pos.z }))
+      .filter((h) => {
+        try {
+          return booleanPointInPolygon(turfPoint([h.x, h.y]), turfPoly);
+        } catch {
+          return false;
+        }
+      });
+    if (inRoom.length === 0) continue;
+    anyRoomHasHeads = true;
+    const rep = coverageReport(polyFt, inRoom, room.hazard);
+    if (!rep.covered) return false;
+  }
+  return anyRoomHasHeads;
+}
+
 /** Compute the published snapshot from live state. */
 export function cadWindowSnapshot(
   project: Project,
   viewMode: ViewMode,
   toolCount: number,
+  activeHeadSku: string | null = null,
 ): CadWindowState {
   const roomCount = project.building.rooms.length;
+  const headCount = project.network.nodes.filter((n) => n.type === 'HEAD').length;
   return {
     ready: true,
     viewMode,
@@ -65,6 +124,9 @@ export function cadWindowSnapshot(
     scaleFtPerUnit: project.building.scaleFtPerUnit,
     roomCount,
     buildingAreaSqFt: Math.round(sumRoomAreaSqFt(project) * 100) / 100,
+    headCount,
+    coverageOk: aggregateCoverageOk(project),
+    activeHeadSku,
   };
 }
 
@@ -83,5 +145,6 @@ export function publishCadWindow(state: CadWindowState): void {
     buildingBackend: prev?.buildingBackend ?? null,
     floorCount: prev?.floorCount ?? 0,
     wallCount: prev?.wallCount ?? 0,
+    headCount3d: prev?.headCount3d ?? 0,
   };
 }

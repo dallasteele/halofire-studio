@@ -23,11 +23,12 @@ import { colors } from './lib/tokens';
 export function App(): ReactElement {
   const project = useCadStore((s) => s.project);
   const viewMode = useCadStore((s) => s.viewMode);
+  const activeHeadSku = useCadStore((s) => s.activeHeadSku);
 
   // Publish the preview-verification handle whenever the relevant state changes.
   useEffect(() => {
-    publishCadWindow(cadWindowSnapshot(project, viewMode, TOOL_COUNT));
-  }, [project, viewMode]);
+    publishCadWindow(cadWindowSnapshot(project, viewMode, TOOL_COUNT, activeHeadSku));
+  }, [project, viewMode, activeHeadSku]);
 
   return (
     <div style={appStyle}>

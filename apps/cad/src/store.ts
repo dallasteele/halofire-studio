@@ -14,10 +14,13 @@ import {
   type Building,
   type BuildingSource,
   type HazardClass,
+  type Node,
+  type Point3,
   type Project,
   type Room,
   type Wall,
 } from './lib/model';
+import { autoLayoutHeads } from './lib/head-layout';
 
 /* --------------------------------------------------------------- view mode */
 
@@ -133,6 +136,11 @@ export interface CadState {
   activeTool: ToolId;
   /** The plan underlay being traced over, or null when none is loaded. */
   underlay: Underlay | null;
+  /**
+   * The currently-selected head SKU id (a real catalog head id). Used as the SKU
+   * for newly-placed and auto-laid-out heads. null until the operator picks one.
+   */
+  activeHeadSku: string | null;
 
   /** Replace the entire project (e.g. after an import or new-file). Clears selection. */
   setProject: (project: Project) => void;
@@ -162,6 +170,33 @@ export interface CadState {
     hazard: HazardClass,
     extra?: { ceilingHt?: number; name?: string },
   ) => string;
+
+  /** Set the active head SKU id used for placement / auto-layout (null clears it). */
+  setActiveHeadSku: (sku: string | null) => void;
+  /**
+   * Add one sprinkler head node at a building-space position (ft). When `sku` is
+   * omitted the current activeHeadSku is used. Returns the new node id.
+   */
+  addHead: (pos: Point3, sku?: string) => string;
+  /** Move a head node to a new position (ft). No-op if the id is not a HEAD node. */
+  moveHead: (id: string, pos: Point3) => void;
+  /** Delete a head node by id (and clear selection if it was selected). */
+  deleteHead: (id: string) => void;
+  /**
+   * Auto-layout heads inside a room at the room's hazard MAX spacing (cited
+   * nfpa13-rules), clipping to the room polygon. REPLACES any heads previously
+   * auto-placed in that room. Uses `sku` (or activeHeadSku). The head Z is the
+   * room's ceiling height. Returns the ids of the heads placed.
+   */
+  autoLayoutRoom: (roomId: string, sku?: string) => string[];
+}
+
+/** A head node carries a room-tag in its id prefix so room auto-layout can replace
+ * the prior set for that room without touching manually-placed heads elsewhere. We
+ * track room ownership via a Map kept on the node id convention `head_<roomId>_*`
+ * for auto-laid heads, and `head_*` for free-placed heads. */
+function isHeadOfRoom(node: Node, roomId: string): boolean {
+  return node.type === 'HEAD' && node.id.startsWith(`head_${roomId}_`);
 }
 
 /** Build the selection object for a single-kind selection. */
@@ -180,6 +215,7 @@ export const useCadStore = create<CadState>((set) => ({
   viewMode: 'split',
   activeTool: 'select',
   underlay: null,
+  activeHeadSku: null,
 
   setProject: (project) =>
     set({ project, selection: { ...EMPTY_SELECTION } }),
@@ -235,5 +271,88 @@ export const useCadStore = create<CadState>((set) => ({
       return { project: { ...s.project, building } };
     });
     return id;
+  },
+
+  setActiveHeadSku: (sku) => set({ activeHeadSku: sku }),
+
+  addHead: (pos, sku) => {
+    const id = makeId('head');
+    set((s) => {
+      const resolvedSku = sku ?? s.activeHeadSku ?? undefined;
+      const node: Node = {
+        id,
+        type: 'HEAD',
+        pos,
+        ...(resolvedSku ? { sku: resolvedSku } : {}),
+      };
+      const network = {
+        ...s.project.network,
+        nodes: [...s.project.network.nodes, node],
+      };
+      return { project: { ...s.project, network } };
+    });
+    return id;
+  },
+
+  moveHead: (id, pos) =>
+    set((s) => {
+      const nodes = s.project.network.nodes;
+      let changed = false;
+      const next = nodes.map((n) => {
+        if (n.id === id && n.type === 'HEAD') {
+          changed = true;
+          return { ...n, pos };
+        }
+        return n;
+      });
+      if (!changed) return s;
+      return {
+        project: { ...s.project, network: { ...s.project.network, nodes: next } },
+      };
+    }),
+
+  deleteHead: (id) =>
+    set((s) => {
+      const nodes = s.project.network.nodes;
+      const next = nodes.filter((n) => !(n.id === id && n.type === 'HEAD'));
+      if (next.length === nodes.length) return s;
+      const selection =
+        s.selection.selectedNodeId === id ? { ...EMPTY_SELECTION } : s.selection;
+      return {
+        project: { ...s.project, network: { ...s.project.network, nodes: next } },
+        selection,
+      };
+    }),
+
+  autoLayoutRoom: (roomId, sku) => {
+    const placedIds: string[] = [];
+    set((s) => {
+      const room = s.project.building.rooms.find((r) => r.id === roomId);
+      if (!room) return s;
+      const resolvedSku = sku ?? s.activeHeadSku ?? undefined;
+      // The room polygon is in plan-space UNITS; convert to FEET (the unit the
+      // cited NFPA-13 spacing/area rules are expressed in) before laying heads.
+      const scale =
+        s.project.building.scaleFtPerUnit > 0 ? s.project.building.scaleFtPerUnit : 1;
+      const polyFt = room.polygon.map((p) => ({ x: p.x * scale, y: p.y * scale }));
+      const laid = autoLayoutHeads(polyFt, room.hazard, { sku: resolvedSku });
+      const z = room.ceilingHt;
+      const newNodes: Node[] = laid.map((h, i) => {
+        const id = `head_${roomId}_${i}`;
+        placedIds.push(id);
+        return {
+          id,
+          type: 'HEAD',
+          pos: { x: h.x, y: z, z: h.y },
+          ...(resolvedSku ? { sku: resolvedSku } : {}),
+        };
+      });
+      // Replace only the heads previously auto-laid for THIS room; keep all other
+      // heads (other rooms' auto heads + manually placed heads) untouched.
+      const kept = s.project.network.nodes.filter((n) => !isHeadOfRoom(n, roomId));
+      const network = { ...s.project.network, nodes: [...kept, ...newNodes] };
+      return { project: { ...s.project, network } };
+    });
+    return placedIds;
   },
 }));

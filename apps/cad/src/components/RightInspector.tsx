@@ -4,8 +4,15 @@
 // (the shell carries no geometry), it states that plainly rather than inventing
 // properties.
 
-import type { CSSProperties, ReactElement } from 'react';
+import { useEffect, useState, type CSSProperties, type ReactElement } from 'react';
 import { useCadStore } from '../store';
+import { coverageReport, type CoverageFinding } from '../lib/head-layout';
+import {
+  findHeadBySku,
+  loadManufacturerCatalog,
+  type CatalogPart,
+} from '../lib/head-catalog';
+import type { Point2, Point3, Room } from '../lib/model';
 import { colors, radii, spacing, typeScale } from '../lib/tokens';
 
 interface Row {
@@ -22,6 +29,7 @@ export function RightInspector(): ReactElement {
   let title = 'Nothing selected';
   let rows: Row[] = [];
   let note: string | null = null;
+  let headExtra: ReactElement | null = null;
 
   if (kind && id) {
     if (kind === 'node') {
@@ -38,6 +46,9 @@ export function RightInspector(): ReactElement {
           ]
         : [];
       if (!node) note = 'Selected node id is not in the current (empty) network.';
+      if (node?.type === 'HEAD') {
+        headExtra = <HeadDetail pos={node.pos} sku={node.sku} project={project} />;
+      }
     } else if (kind === 'segment') {
       const seg = project.network.segments.find((s) => s.id === id);
       title = seg ? `Segment · ${seg.role}` : 'Segment';
@@ -92,10 +103,123 @@ export function RightInspector(): ReactElement {
           ) : (
             <p style={emptyBodyStyle}>{note ?? 'No properties.'}</p>
           )}
+          {headExtra}
         </div>
       )}
     </aside>
   );
+}
+
+/**
+ * Head-specific inspector block: resolves the real catalog SKU (model + K-factor)
+ * and shows the CITED coverage finding for the room that contains this head.
+ *
+ * HONESTY: the K-factor is the real catalog value (or "—" when the sheet had none).
+ * Coverage findings carry their verbatim NFPA-13 citation and say "verify adopted
+ * edition" — a design aid, NOT a certified calculation.
+ */
+function HeadDetail({
+  pos,
+  sku,
+  project,
+}: {
+  pos: Point3;
+  sku: string | undefined;
+  project: ReturnType<typeof useCadStore.getState>['project'];
+}): ReactElement {
+  const [part, setPart] = useState<CatalogPart | null>(null);
+
+  useEffect(() => {
+    if (!sku) {
+      setPart(null);
+      return;
+    }
+    let alive = true;
+    const fetchImpl = typeof fetch === 'function' ? fetch.bind(globalThis) : undefined;
+    void loadManufacturerCatalog(fetchImpl).then((cat) => {
+      if (alive) setPart(findHeadBySku(cat, sku));
+    });
+    return () => {
+      alive = false;
+    };
+  }, [sku]);
+
+  // Find the room that contains this head (in feet) and report its cited coverage.
+  const scale =
+    project.building.scaleFtPerUnit > 0 ? project.building.scaleFtPerUnit : 1;
+  const headFt: Point2 = { x: pos.x, y: pos.z };
+  const room = project.building.rooms.find((r: Room) => {
+    const polyFt = r.polygon.map((p) => ({ x: p.x * scale, y: p.y * scale }));
+    return polyFt.length >= 3 && pointInPolygonFt(headFt, polyFt);
+  });
+
+  let finding: CoverageFinding | null = null;
+  let covered: boolean | null = null;
+  if (room) {
+    const polyFt = room.polygon.map((p) => ({ x: p.x * scale, y: p.y * scale }));
+    const inRoom = project.network.nodes
+      .filter((n) => n.type === 'HEAD')
+      .map((n) => ({ x: n.pos.x, y: n.pos.z }))
+      .filter((h) => pointInPolygonFt(h, polyFt));
+    const rep = coverageReport(polyFt, inRoom, room.hazard);
+    covered = rep.covered;
+    finding = rep.findings.find((f) => !f.ok) ?? rep.findings[0] ?? null;
+  }
+
+  return (
+    <div style={headBlockStyle}>
+      <div style={headBlockTitleStyle}>Sprinkler head</div>
+      <dl style={{ display: 'flex', flexDirection: 'column', gap: spacing[1] }}>
+        <div style={rowStyle}>
+          <dt style={dtStyle}>Model</dt>
+          <dd style={ddStyle}>{part?.model ?? sku ?? '—'}</dd>
+        </div>
+        <div style={rowStyle}>
+          <dt style={dtStyle}>K-factor</dt>
+          <dd style={ddStyle}>{part?.kFactor ?? '—'}</dd>
+        </div>
+        <div style={rowStyle}>
+          <dt style={dtStyle}>Mfr</dt>
+          <dd style={ddStyle}>{part?.mfr ?? '—'}</dd>
+        </div>
+      </dl>
+      {room ? (
+        <div
+          style={{
+            ...coverageNoteStyle,
+            color: covered ? colors.accentText : colors.danger,
+            borderColor: covered ? colors.border : colors.danger,
+          }}
+        >
+          <div style={{ fontWeight: 600 }}>
+            Room {room.name ?? room.id} ({room.hazard}):{' '}
+            {covered ? 'coverage OK' : 'coverage FAIL'}
+          </div>
+          {finding && <div>{finding.message}</div>}
+          {finding && <div style={citationStyle}>{finding.citation}</div>}
+        </div>
+      ) : (
+        <p style={emptyBodyStyle}>
+          This head is not inside any classified room — coverage not evaluated.
+        </p>
+      )}
+    </div>
+  );
+}
+
+/** Ray-cast point-in-polygon for feet-space points. */
+function pointInPolygonFt(pt: Point2, poly: Point2[]): boolean {
+  let inside = false;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const xi = poly[i].x;
+    const yi = poly[i].y;
+    const xj = poly[j].x;
+    const yj = poly[j].y;
+    const intersect =
+      yi > pt.y !== yj > pt.y && pt.x < ((xj - xi) * (pt.y - yi)) / (yj - yi) + xi;
+    if (intersect) inside = !inside;
+  }
+  return inside;
 }
 
 function activeSelection(s: {
@@ -193,4 +317,38 @@ const ddStyle: CSSProperties = {
   color: colors.textPrimary,
   fontSize: typeScale.xs.size,
   fontFamily: 'var(--hf-font-mono)',
+};
+
+const headBlockStyle: CSSProperties = {
+  marginTop: spacing[2],
+  paddingTop: spacing[2],
+  borderTop: `1px solid ${colors.border}`,
+  display: 'flex',
+  flexDirection: 'column',
+  gap: spacing[2],
+};
+
+const headBlockTitleStyle: CSSProperties = {
+  color: colors.textSecondary,
+  fontSize: typeScale.xs.size,
+  textTransform: 'uppercase',
+  letterSpacing: '0.09em',
+  fontWeight: 600,
+};
+
+const coverageNoteStyle: CSSProperties = {
+  border: `1px solid ${colors.border}`,
+  borderRadius: radii.md,
+  padding: spacing[2],
+  display: 'flex',
+  flexDirection: 'column',
+  gap: spacing[1],
+  fontSize: typeScale.xs.size,
+  lineHeight: 1.4,
+};
+
+const citationStyle: CSSProperties = {
+  color: colors.textMuted,
+  fontSize: typeScale.xs.size,
+  lineHeight: 1.4,
 };

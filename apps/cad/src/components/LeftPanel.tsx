@@ -4,9 +4,15 @@
 // count honestly when a count is available, otherwise shows a labeled empty
 // state — it never fabricates parts. The real catalog wiring lands later.
 
-import { useRef, useState, type CSSProperties, type ReactElement } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type ReactElement } from 'react';
 import { TOOLS, useCadStore, type ToolDef, type ToolId } from '../store';
 import { importFile } from '../lib/import-actions';
+import {
+  findHeadBySku,
+  headSkus,
+  loadManufacturerCatalog,
+  type CatalogPart,
+} from '../lib/head-catalog';
 import { colors, radii, spacing, typeScale } from '../lib/tokens';
 
 const GROUP_LABEL: Record<ToolDef['group'], string> = {
@@ -48,8 +54,139 @@ export function LeftPanel(): ReactElement {
         </div>
       </section>
 
-      <CatalogStub />
+      <HeadCatalogSection />
     </aside>
+  );
+}
+
+/**
+ * Real head-SKU picker. Loads the ingested manufacturer catalog (public/catalog/
+ * manufacturer-catalog.json) and lists every catalog HEAD that carries a real
+ * K-factor. Selecting one sets the active head SKU used for placement / auto-layout.
+ *
+ * HONESTY: SKUs + K-factors are real extracted catalog values; nothing is invented.
+ * If the catalog fails to load the list is empty and the panel says so.
+ */
+function HeadCatalogSection(): ReactElement {
+  const activeHeadSku = useCadStore((s) => s.activeHeadSku);
+  const setActiveHeadSku = useCadStore((s) => s.setActiveHeadSku);
+  const [parts, setParts] = useState<CatalogPart[] | null>(null);
+  const [query, setQuery] = useState('');
+
+  useEffect(() => {
+    let alive = true;
+    const fetchImpl =
+      typeof fetch === 'function' ? fetch.bind(globalThis) : undefined;
+    void loadManufacturerCatalog(fetchImpl).then((cat) => {
+      if (alive) setParts(headSkus(cat));
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  const q = query.trim().toLowerCase();
+  const visible =
+    parts === null
+      ? []
+      : q === ''
+        ? parts
+        : parts.filter(
+            (p) =>
+              p.model.toLowerCase().includes(q) ||
+              p.mfr.toLowerCase().includes(q) ||
+              (p.sin?.toLowerCase().includes(q) ?? false),
+          );
+
+  return (
+    <section style={catalogSectionStyle}>
+      <h2 style={sectionTitleStyle}>Head Catalog</h2>
+      {parts === null ? (
+        <div style={catalogEmptyStyle}>
+          <div style={catalogEmptyTitleStyle}>Loading head SKUs…</div>
+        </div>
+      ) : parts.length === 0 ? (
+        <div style={catalogEmptyStyle}>
+          <div style={catalogEmptyTitleStyle}>No head SKUs loaded</div>
+          <p style={catalogEmptyBodyStyle}>
+            The manufacturer catalog could not be loaded. Heads need a real SKU
+            (model + K-factor) before placement.
+          </p>
+        </div>
+      ) : (
+        <>
+          <input
+            type="text"
+            value={query}
+            placeholder={`Filter ${parts.length} head SKUs…`}
+            onChange={(e) => setQuery(e.target.value)}
+            style={skuSearchStyle}
+            aria-label="Filter head SKUs"
+          />
+          <div style={skuListStyle} className="hf-scroll">
+            {visible.map((p) => {
+              const active = p.id === activeHeadSku;
+              return (
+                <button
+                  key={p.id}
+                  type="button"
+                  onClick={() => setActiveHeadSku(active ? null : p.id)}
+                  aria-pressed={active}
+                  title={`${p.mfr} ${p.model} — K=${p.kFactor ?? '—'} (${p.datasheetUrl})`}
+                  style={skuRowStyle(active)}
+                >
+                  <span style={skuModelStyle}>{p.model}</span>
+                  <span style={skuMetaStyle}>
+                    {p.mfr} · K={p.kFactor ?? '—'}
+                  </span>
+                </button>
+              );
+            })}
+            {visible.length === 0 && (
+              <div style={catalogEmptyBodyStyle}>No head SKU matches “{query}”.</div>
+            )}
+          </div>
+          <ActiveSkuNote />
+        </>
+      )}
+    </section>
+  );
+}
+
+/** A small confirmation of the active SKU (model + K-factor) for placement. */
+function ActiveSkuNote(): ReactElement | null {
+  const activeHeadSku = useCadStore((s) => s.activeHeadSku);
+  const [part, setPart] = useState<CatalogPart | null>(null);
+
+  useEffect(() => {
+    if (!activeHeadSku) {
+      setPart(null);
+      return;
+    }
+    let alive = true;
+    const fetchImpl = typeof fetch === 'function' ? fetch.bind(globalThis) : undefined;
+    void loadManufacturerCatalog(fetchImpl).then((cat) => {
+      if (alive) setPart(findHeadBySku(cat, activeHeadSku));
+    });
+    return () => {
+      alive = false;
+    };
+  }, [activeHeadSku]);
+
+  if (!activeHeadSku) {
+    return (
+      <p style={catalogEmptyBodyStyle}>
+        No active head SKU — pick one above before placing or auto-laying heads.
+      </p>
+    );
+  }
+  return (
+    <div style={activeSkuStyle}>
+      <span style={catalogEmptyTitleStyle}>Active: {part?.model ?? activeHeadSku}</span>
+      <span style={catalogEmptyBodyStyle}>
+        {part ? `${part.mfr} · K=${part.kFactor ?? '—'} gpm/psi^0.5` : activeHeadSku}
+      </span>
+    </div>
   );
 }
 
@@ -154,32 +291,6 @@ function ToolRow({
       />
       <span style={toolRowLabelStyle}>{tool.label}</span>
     </button>
-  );
-}
-
-function CatalogStub(): ReactElement {
-  // No catalog DB wired into this slice. Be honest: show the labeled empty state
-  // rather than invent a count. (W-slices wire the real parts DB count here.)
-  const partCount: number | null = null;
-
-  return (
-    <section style={catalogSectionStyle}>
-      <h2 style={sectionTitleStyle}>Catalog</h2>
-      {partCount === null ? (
-        <div style={catalogEmptyStyle}>
-          <div style={catalogEmptyTitleStyle}>No catalog loaded</div>
-          <p style={catalogEmptyBodyStyle}>
-            The part library connects in a later slice. Heads and fittings will
-            list here for placement.
-          </p>
-        </div>
-      ) : (
-        <div style={catalogCountStyle}>
-          <span style={catalogCountNumStyle}>{partCount}</span>
-          <span style={catalogCountLabelStyle}>parts available</span>
-        </div>
-      )}
-    </section>
   );
 }
 
@@ -298,22 +409,61 @@ const catalogEmptyBodyStyle: CSSProperties = {
   lineHeight: 1.5,
 };
 
-const catalogCountStyle: CSSProperties = {
-  display: 'flex',
-  alignItems: 'baseline',
-  gap: spacing[2],
+const skuSearchStyle: CSSProperties = {
+  background: colors.surfaceRaised,
+  color: colors.textPrimary,
+  border: `1px solid ${colors.border}`,
+  borderRadius: radii.md,
+  padding: `${spacing[1]} ${spacing[2]}`,
+  fontSize: typeScale.xs.size,
+  width: '100%',
 };
 
-const catalogCountNumStyle: CSSProperties = {
+const skuListStyle: CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: spacing[1],
+  maxHeight: 220,
+  overflowY: 'auto',
+};
+
+function skuRowStyle(active: boolean): CSSProperties {
+  return {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    gap: 2,
+    background: active ? colors.surfaceHover : 'transparent',
+    color: colors.textPrimary,
+    border: `1px solid ${active ? colors.borderStrong : colors.border}`,
+    borderRadius: radii.md,
+    padding: `${spacing[1]} ${spacing[2]}`,
+    width: '100%',
+    textAlign: 'left',
+    cursor: 'pointer',
+  };
+}
+
+const skuModelStyle: CSSProperties = {
   color: colors.textPrimary,
-  fontSize: typeScale.xl.size,
-  fontWeight: 700,
+  fontSize: typeScale.xs.size,
+  fontWeight: 600,
+};
+
+const skuMetaStyle: CSSProperties = {
+  color: colors.textMuted,
+  fontSize: typeScale.xs.size,
   fontFamily: 'var(--hf-font-mono)',
 };
 
-const catalogCountLabelStyle: CSSProperties = {
-  color: colors.textMuted,
-  fontSize: typeScale.xs.size,
+const activeSkuStyle: CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 2,
+  background: colors.bgInset,
+  border: `1px solid ${colors.border}`,
+  borderRadius: radii.md,
+  padding: spacing[2],
 };
 
 const importSectionStyle: CSSProperties = {

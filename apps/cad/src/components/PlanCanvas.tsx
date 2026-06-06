@@ -26,6 +26,7 @@ import type Konva from 'konva';
 import { useCadStore } from '../store';
 import { HAZARD_CLASSES, makeId, type HazardClass, type Point2 } from '../lib/model';
 import { measureFeet, polygonAreaSqFt, setScaleFromTwoPoints } from '../lib/scale';
+import { coverageReport } from '../lib/head-layout';
 import { colors, spacing, typeScale } from '../lib/tokens';
 
 /** Spacing between minor grid lines, in px. */
@@ -125,10 +126,30 @@ export function PlanCanvas(): ReactElement {
   const setScale = useCadStore((s) => s.setScale);
   const addWall = useCadStore((s) => s.addWall);
   const addRoom = useCadStore((s) => s.addRoom);
+  const addHead = useCadStore((s) => s.addHead);
+  const moveHead = useCadStore((s) => s.moveHead);
+  const deleteHead = useCadStore((s) => s.deleteHead);
+  const autoLayoutRoom = useCadStore((s) => s.autoLayoutRoom);
+  const select = useCadStore((s) => s.select);
+  const selectedNodeId = useCadStore((s) => s.selection.selectedNodeId);
+  const selectedRoomId = useCadStore((s) => s.selection.selectedRoomId);
+  const activeHeadSku = useCadStore((s) => s.activeHeadSku);
 
   const building = project.building;
   const ftPerUnit = building.scaleFtPerUnit;
-  const hasContent = building.rooms.length > 0 || building.walls.length > 0 || underlay !== null;
+  const scale = ftPerUnit > 0 ? ftPerUnit : 1;
+  const heads = useMemo(
+    () => project.network.nodes.filter((n) => n.type === 'HEAD'),
+    [project.network.nodes],
+  );
+  const selectedRoom = selectedRoomId
+    ? building.rooms.find((r) => r.id === selectedRoomId) ?? null
+    : null;
+  const hasContent =
+    building.rooms.length > 0 ||
+    building.walls.length > 0 ||
+    underlay !== null ||
+    heads.length > 0;
 
   // In-progress interactions.
   const [scalePts, setScalePts] = useState<Point2[]>([]);
@@ -154,6 +175,24 @@ export function PlanCanvas(): ReactElement {
     setWallPts([]);
     setRoomPts([]);
   }, [activeTool]);
+
+  // Delete / Backspace removes the selected head (ignored while typing in a field).
+  useEffect(() => {
+    function onKey(e: KeyboardEvent): void {
+      if (e.key !== 'Delete' && e.key !== 'Backspace') return;
+      const tag = (e.target as HTMLElement | null)?.tagName;
+      if (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') return;
+      if (!selectedNodeId) return;
+      const node = project.network.nodes.find((n) => n.id === selectedNodeId);
+      if (node?.type !== 'HEAD') return;
+      e.preventDefault();
+      deleteHead(selectedNodeId);
+      setStatusMsg('head deleted');
+    }
+    if (typeof window === 'undefined') return;
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [selectedNodeId, project.network.nodes, deleteHead]);
 
   const ready = size.w > 0 && size.h > 0;
   const grid = ready ? buildGridLines(size) : { minor: [], major: [] };
@@ -247,6 +286,25 @@ export function PlanCanvas(): ReactElement {
 
     if (activeTool === 'room') {
       setRoomPts((prev) => [...prev, p]);
+      return;
+    }
+
+    if (activeTool === 'place-head') {
+      // Convert the plan-space click (units) into building-space FEET. Heads live in
+      // feet; the head Z (height) is the selected room's ceiling, else the project
+      // default ceiling height. plan x -> feet x; plan y -> feet z (floor plane).
+      const fx = p.x * scale;
+      const fz = p.y * scale;
+      const ceilingHt = selectedRoom?.ceilingHt ?? project.hazardDefaults.defaultCeilingHt;
+      const id = addHead(
+        { x: fx, y: ceilingHt, z: fz },
+        activeHeadSku ?? undefined,
+      );
+      select('node', id);
+      setStatusMsg(
+        `head placed at ${fx.toFixed(1)}, ${fz.toFixed(1)} ft` +
+          (activeHeadSku ? ` (${activeHeadSku})` : ' (no SKU selected)'),
+      );
       return;
     }
   }
@@ -433,6 +491,43 @@ export function PlanCanvas(): ReactElement {
               />
             )}
           </Layer>
+
+          {/* heads layer — INTERACTIVE: click to select, drag to move. Heads are in
+              FEET; convert to plan units (feet / scale) then to screen. */}
+          <Layer>
+            {heads.map((h) => {
+              const planPt: Point2 = { x: h.pos.x / scale, y: h.pos.z / scale };
+              const s = toScreen(planPt);
+              const isSel = h.id === selectedNodeId;
+              return (
+                <Circle
+                  key={h.id}
+                  x={s.sx}
+                  y={s.sy}
+                  radius={isSel ? 7 : 5}
+                  fill={isSel ? colors.warn : colors.interactiveText}
+                  stroke={isSel ? colors.warn : colors.accentText}
+                  strokeWidth={isSel ? 2 : 1}
+                  draggable
+                  onClick={(e) => {
+                    e.cancelBubble = true;
+                    select('node', h.id);
+                  }}
+                  onDragStart={(e) => {
+                    e.cancelBubble = true;
+                    select('node', h.id);
+                  }}
+                  onDragEnd={(e) => {
+                    e.cancelBubble = true;
+                    const sx = e.target.x();
+                    const sy = e.target.y();
+                    const plan = toPlan(sx, sy);
+                    moveHead(h.id, { x: plan.x * scale, y: h.pos.y, z: plan.y * scale });
+                  }}
+                />
+              );
+            })}
+          </Layer>
         </Stage>
       ) : null}
 
@@ -462,7 +557,44 @@ export function PlanCanvas(): ReactElement {
                   : ''}
               </span>
             )}
+            {activeTool === 'place-head' && (
+              <span style={hudHintStyle}>
+                Click the plan to place a head
+                {activeHeadSku
+                  ? ` (${activeHeadSku})`
+                  : ' — pick a head SKU in the left panel first'}
+                . Drag to move; Delete removes the selected head.
+              </span>
+            )}
           </div>
+
+          {/* Per-room auto-layout (uses current SKU + the room's hazard) + a live
+              cited coverage readout for the selected room. */}
+          {selectedRoom && (
+            <div style={headBarStyle}>
+              <button
+                type="button"
+                style={autoLayoutBtnStyle}
+                onClick={() => {
+                  const ids = autoLayoutRoom(selectedRoom.id, activeHeadSku ?? undefined);
+                  setStatusMsg(
+                    `auto-laid ${ids.length} head(s) in ${
+                      selectedRoom.name ?? selectedRoom.id
+                    } (${selectedRoom.hazard})` +
+                      (activeHeadSku ? ` with ${activeHeadSku}` : ' — no SKU selected'),
+                  );
+                }}
+              >
+                Auto-layout heads
+              </button>
+              <RoomCoverageBadge
+                roomPolygonUnits={selectedRoom.polygon}
+                hazard={selectedRoom.hazard}
+                scale={scale}
+                heads={heads.map((h) => ({ x: h.pos.x, y: h.pos.z }))}
+              />
+            </div>
+          )}
 
           {activeTool === 'room' && (
             <label style={hazardLabelStyle}>
@@ -497,6 +629,60 @@ export function PlanCanvas(): ReactElement {
       )}
     </div>
   );
+}
+
+/**
+ * A compact, CITED coverage badge for the selected room. Converts the room polygon
+ * to feet, evaluates coverageReport against the heads that fall inside it, and shows
+ * covered/uncovered + the first failing cited finding. Numbers come ONLY from the
+ * cited nfpa13-rules via coverageReport — never forked here.
+ */
+function RoomCoverageBadge({
+  roomPolygonUnits,
+  hazard,
+  scale,
+  heads,
+}: {
+  roomPolygonUnits: Point2[];
+  hazard: HazardClass;
+  scale: number;
+  heads: Point2[];
+}): ReactElement {
+  const polyFt = roomPolygonUnits.map((p) => ({ x: p.x * scale, y: p.y * scale }));
+  // Only heads inside this room count toward its coverage.
+  const inRoom = heads.filter((h) => pointInPolygonFt(h, polyFt));
+  const rep = coverageReport(polyFt, inRoom, hazard);
+  const firstFail = rep.findings.find((f) => !f.ok);
+  return (
+    <span
+      style={{
+        ...coverageBadgeStyle,
+        color: rep.covered ? colors.accentText : colors.danger,
+        borderColor: rep.covered ? colors.border : colors.danger,
+      }}
+      title={firstFail?.citation ?? rep.disclaimer}
+    >
+      {rep.covered
+        ? `coverage OK — ${rep.headCount} head(s), <= ${rep.maxAllowedAreaPerHead} ft^2/head`
+        : `coverage FAIL — ${firstFail?.message ?? 'not covered'}`}
+    </span>
+  );
+}
+
+/** Ray-cast point-in-polygon for feet-space points (no turf dependency in render). */
+function pointInPolygonFt(pt: Point2, poly: Point2[]): boolean {
+  let inside = false;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const xi = poly[i].x;
+    const yi = poly[i].y;
+    const xj = poly[j].x;
+    const yj = poly[j].y;
+    const intersect =
+      yi > pt.y !== yj > pt.y &&
+      pt.x < ((xj - xi) * (pt.y - yi)) / (yj - yi) + xi;
+    if (intersect) inside = !inside;
+  }
+  return inside;
 }
 
 /* --------------------------------------------------------------- styles */
@@ -565,6 +751,34 @@ const hazardSelectStyle: CSSProperties = {
 const statusMsgStyle: CSSProperties = {
   color: colors.accentText,
   fontSize: typeScale.xs.size,
+  fontFamily: 'var(--hf-font-mono)',
+};
+
+const headBarStyle: CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: spacing[2],
+  flexWrap: 'wrap',
+  pointerEvents: 'auto',
+};
+
+const autoLayoutBtnStyle: CSSProperties = {
+  background: colors.interactiveActive,
+  color: '#ffffff',
+  border: `1px solid ${colors.interactive}`,
+  borderRadius: 6,
+  padding: `4px 10px`,
+  fontSize: typeScale.xs.size,
+  fontWeight: 600,
+  cursor: 'pointer',
+};
+
+const coverageBadgeStyle: CSSProperties = {
+  background: colors.bgInset,
+  border: `1px solid ${colors.border}`,
+  borderRadius: 999,
+  fontSize: typeScale.xs.size,
+  padding: `${spacing[0.5]} ${spacing[2]}`,
   fontFamily: 'var(--hf-font-mono)',
 };
 
