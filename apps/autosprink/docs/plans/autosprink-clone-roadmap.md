@@ -962,6 +962,26 @@ so AI placeholders are never mistaken for engineering-accurate CAD.
       (header "76 SKUs / 74 with 3D geometry / 0 AI placeholder", badges + viewer render RA1311's
       STEP). NEXT: (F) studio system-assembly view; catalog finishes-parse (task_7d133fb9);
       expand mfrs (Viking/Victaulic/Senju/Globe/Potter/AGF); T46 live gen once bridge fixed.
+- [x] **T54 — System-assembly 3D view (GX10-independent capstone).** DONE 2026-06-05
+      (ultra workflow wf_f48f4f37-646, TDD, both adversarial verifiers PASS). The visual
+      capstone fusing T52 (NFPA-13 topology + cited spacing) with T53 (catalog->geometry).
+      src/lib/assembly-layout.ts (pure/deterministic): computeAssembly(spec) lays a real
+      branch-line grid — heads + branches spaced at the real cited MAX_SPACING_FT[hazard],
+      tee+reducer at each branch tap, elbow at each branch end, schematic pipe runs between
+      nodes; each head references its resolved build123d key or an honest proxy; fittings
+      reference real build123d keys; head tier capped at the resolver's grant; no Date/random.
+      src/AssemblyScene.tsx (R3F): loads each distinct build123d STEP once (occt-import-js,
+      imperative+useState), instances repeated bodies via drei <Instances>, schematic pipe
+      cylinders, amber wireframe proxy boxes for parts lacking real geometry. AssemblyControls
+      + App 'Assembly' mode: head-SKU/hazard/branch/heads-per-branch controls + legend +
+      honest banner. window.__studio.assemblyPartCount + assemblyHeadsPlaced. HONESTY (both
+      verifiers PASS; spacing measured == real cited NFPA values for all 5 hazards, determinism
+      + non-overlap verified, referenced STEP files confirmed on disk): SCHEMATIC DESIGN AID —
+      NOT coordinated/clash-checked/manufacturer-exact/AHJ/PE/for-construction (code constant +
+      UI banner); pipes schematic (tier null), proxies make no real-tier claim. Gates: 400
+      tests (+26), tsc -b=0, vite build=0; preview-verified (Assembly renders 26 parts/12 heads
+      + banner). NEXT: real manufacturer CAD import (3dfindit via Chrome, user-driven login) ->
+      manufacturer_verified tier; add-catalog UX (SAM drawing->CAD or import models).
 
 ## AUTOSPRINK PARITY epic (the goal): close functional gaps to AutoSprink feature parity
 HONESTY CONTRACT: "parity" is tracked, not asserted. The `AUTOSPRINK_PARITY_INCOMPLETE`
