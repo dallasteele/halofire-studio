@@ -32,14 +32,41 @@ function qtyFmt(n: number): string {
   return Number.isInteger(n) ? String(n) : n.toFixed(2);
 }
 
+/**
+ * Honest one-line statement of which price source is ACTIVE: the real pricebook
+ * medians (with the row count they were derived over) or the representative
+ * fallback. Shown verbatim so the user always knows what they are looking at.
+ */
+function priceSourceLabel(bid: BidEstimate): string {
+  if (bid.priceSource === 'pricebook-median') {
+    return `Materials priced from REAL pricebook medians (${bid.pricebookRowCount.toLocaleString(
+      'en-US',
+    )} imported rows). Labor + OH&P use standard construction assumptions.`;
+  }
+  return 'Materials priced from REPRESENTATIVE fallback figures (pricebook medians unavailable). Labor + OH&P use standard construction assumptions.';
+}
+
+/** Short per-line provenance tag. */
+function lineSourceTag(source: BidEstimate['lineItems'][number]['priceSource']): string {
+  switch (source) {
+    case 'pricebook-median':
+      return 'pricebook median';
+    case 'representative-fallback':
+      return 'representative (fallback)';
+    case 'representative-only':
+      return 'representative';
+    default:
+      return '';
+  }
+}
+
 export function BidPanel({ bid }: BidPanelProps): ReactElement {
   return (
     <aside style={panelStyle} aria-label="Auto-bid estimate">
       <h2 style={headingStyle}>Bid estimate</h2>
 
       <p style={subheadStyle}>
-        Best-effort estimate from representative prices + standard labor
-        assumptions.
+        Best-effort estimate. {priceSourceLabel(bid)}
       </p>
 
       <table style={tableStyle}>
@@ -62,7 +89,15 @@ export function BidPanel({ bid }: BidPanelProps): ReactElement {
         <tbody>
           {bid.lineItems.map((li) => (
             <tr key={li.key}>
-              <td style={tdLeftStyle}>{li.description}</td>
+              <td style={tdLeftStyle}>
+                {li.description}
+                <span style={sourceTagStyle}>
+                  {lineSourceTag(li.priceSource)}
+                  {li.priceSource === 'pricebook-median' && li.matchedRows
+                    ? ` · ${li.matchedRows.toLocaleString('en-US')} rows`
+                    : ''}
+                </span>
+              </td>
               <td style={tdNumStyle}>
                 {qtyFmt(li.qty)} {li.unit}
               </td>
@@ -165,6 +200,14 @@ const tdLeftStyle: CSSProperties = {
   padding: `${spacing[1]} ${spacing[2]} ${spacing[1]} 0`,
   borderBottom: `1px solid ${colors.border}`,
   color: colors.textSecondary,
+};
+
+const sourceTagStyle: CSSProperties = {
+  display: 'block',
+  marginTop: 2,
+  fontSize: typeScale.xs.size,
+  color: colors.textMuted,
+  letterSpacing: '0.02em',
 };
 
 const tdNumStyle: CSSProperties = {

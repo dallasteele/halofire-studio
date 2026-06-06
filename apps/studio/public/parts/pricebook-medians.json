@@ -1,0 +1,99 @@
+{
+  "generatedAt": "2026-06-06T02:18:10.679Z",
+  "sourceRowCount": 7208,
+  "currency": "USD",
+  "source": "apps/autosprink/data/halofire.db pricebook (imported Victaulic/ARGCO/FFF rows)",
+  "note": "Each unitPrice is a REAL in-band median over real imported pricebook rows (same PRICE_BANDS logic as apps/autosprink/src/engine/pricebook-pricing.js). Representative pricebook-derived price, NOT a live per-line manufacturer quote.",
+  "medians": {
+    "sprinkler_head": {
+      "unitPrice": 42,
+      "unit": "EA",
+      "matchedRows": 24,
+      "band": [
+        5,
+        80
+      ]
+    },
+    "esfr_head": {
+      "unitPrice": 42,
+      "unit": "EA",
+      "matchedRows": 17,
+      "band": [
+        15,
+        150
+      ]
+    },
+    "branch_pipe": {
+      "unitPrice": 2.44,
+      "unit": "FT",
+      "matchedRows": 380,
+      "band": [
+        0.5,
+        20
+      ]
+    },
+    "cross_main_pipe": {
+      "unitPrice": 10.92,
+      "unit": "FT",
+      "matchedRows": 228,
+      "band": [
+        3,
+        45
+      ]
+    },
+    "feed_main_pipe": {
+      "unitPrice": 21.56,
+      "unit": "FT",
+      "matchedRows": 152,
+      "band": [
+        8,
+        120
+      ]
+    },
+    "fitting": {
+      "unitPrice": 6.66,
+      "unit": "EA",
+      "matchedRows": 1134,
+      "band": [
+        0.5,
+        30
+      ]
+    },
+    "hanger": {
+      "unitPrice": 1.8,
+      "unit": "EA",
+      "matchedRows": 77,
+      "band": [
+        0.3,
+        15
+      ]
+    },
+    "escutcheon": {
+      "unitPrice": 2.6,
+      "unit": "EA",
+      "matchedRows": 164,
+      "band": [
+        0.2,
+        12
+      ]
+    },
+    "drop_armover": {
+      "unitPrice": 4.88,
+      "unit": "EA",
+      "matchedRows": 399,
+      "band": [
+        1,
+        40
+      ]
+    },
+    "underground_main": {
+      "unitPrice": 30.17,
+      "unit": "FT",
+      "matchedRows": 149,
+      "band": [
+        12,
+        300
+      ]
+    }
+  }
+}

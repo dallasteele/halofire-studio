@@ -47,7 +47,12 @@ import { LayoutScene } from './LayoutScene';
 import { BuildingControls } from './BuildingControls';
 import { BuildingScene } from './BuildingScene';
 import { layoutHeads, type HazardClass } from './lib/layout';
-import { estimateFromLayout } from './lib/bid';
+import {
+  estimateFullFromLayout,
+  loadPricebook,
+  resolvePriceTable,
+  type PriceTable,
+} from './lib/bid';
 import { BidPanel } from './BidPanel';
 import type { FootprintResult } from './lib/pdf-building';
 import { buildSamInvoker } from './lib/sam-invoker';
@@ -124,6 +129,12 @@ export function App(): ReactElement {
   const [buildingPageIndex, setBuildingPageIndex] = useState(0);
   const [buildingHeightFt, setBuildingHeightFt] = useState(12);
   const [footprint, setFootprint] = useState<FootprintResult | null>(null);
+
+  // Resolved bid price table. Starts as the representative fallback; once the
+  // REAL pricebook medians (public/parts/pricebook-medians.json, generated from
+  // the imported Victaulic/ARGCO/FFF pricebook) load, this flips to the
+  // pricebook-median table. Fail-soft: a missing file keeps the fallback.
+  const [priceTable, setPriceTable] = useState<PriceTable>(() => resolvePriceTable(null));
   // T48 raster-fallback (SAM) operator scale: feet per IMAGE PIXEL (never guessed).
   const [rasterScaleFtPerPx, setRasterScaleFtPerPx] = useState(0.1);
 
@@ -160,6 +171,24 @@ export function App(): ReactElement {
       .catch((e: unknown) => {
         if (cancelled) return;
         setError(e instanceof Error ? e.message : String(e));
+      });
+    return () => {
+      cancelled = true;
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Load the REAL pricebook medians (fail-soft to the representative fallback).
+  useEffect(() => {
+    let cancelled = false;
+    loadPricebook(typeof fetch === 'function' ? fetch.bind(globalThis) : undefined)
+      .then((book) => {
+        if (cancelled) return;
+        setPriceTable(resolvePriceTable(book));
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setPriceTable(resolvePriceTable(null));
       });
     return () => {
       cancelled = true;
@@ -210,8 +239,8 @@ export function App(): ReactElement {
 
   // Best-effort priced bid ESTIMATE for the current layout (deterministic).
   const bid = useMemo(
-    () => estimateFromLayout({ widthFt, lengthFt, hazard }),
-    [widthFt, lengthFt, hazard],
+    () => estimateFullFromLayout({ widthFt, lengthFt, hazard }, { priceTable }),
+    [widthFt, lengthFt, hazard, priceTable],
   );
 
   // Expose state for screenshot / E2E verification once parts are loaded.

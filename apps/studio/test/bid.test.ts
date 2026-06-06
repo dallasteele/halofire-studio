@@ -1,15 +1,27 @@
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { dirname, resolve as resolvePath } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   BID_DISCLAIMER,
   buildBidEstimate,
   deriveDriversFromLayout,
+  deriveFullDriversFromLayout,
   estimateFromLayout,
+  estimateFullFromLayout,
   LABOR_ASSUMPTIONS,
+  loadPricebook,
   OHP_ASSUMPTIONS,
+  parsePricebook,
   REPRESENTATIVE_UNIT_PRICES,
+  resolvePriceTable,
   type BidDrivers,
+  type PricebookMedians,
 } from '../src/lib/bid';
 import { layoutHeads } from '../src/lib/layout';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const MEDIANS_PATH = resolvePath(__dirname, '../public/parts/pricebook-medians.json');
 
 /* ------------------------------------------------ buildBidEstimate math */
 
@@ -223,5 +235,222 @@ describe('buildBidEstimate — overridable knobs', () => {
     expect(bid.overhead).toBe(0);
     expect(bid.profit).toBe(0);
     expect(bid.total).toBe(1200);
+  });
+});
+
+/* ------------------------------------------------ price source on line items */
+
+describe('priceSource — every line item is honest about its source', () => {
+  const drivers: BidDrivers = {
+    headCount: 10,
+    branchPipeFt: 50,
+    fittingCount: 5,
+    hangerCount: 5,
+  };
+
+  it('defaults (no price table) -> representative-fallback / representative-only', () => {
+    const bid = buildBidEstimate(drivers);
+    const byKey = Object.fromEntries(bid.lineItems.map((l) => [l.key, l]));
+    // pricebook-backed keys are representative-FALLBACK (no real medians supplied)
+    expect(byKey.sprinkler_head.priceSource).toBe('representative-fallback');
+    expect(byKey.branch_pipe.priceSource).toBe('representative-fallback');
+    // riser/valve has no pricebook band -> always representative-only
+    expect(byKey.riser_valve_assy.priceSource).toBe('representative-only');
+    // overall provenance is representative-fallback
+    expect(bid.priceSource).toBe('representative-fallback');
+    expect(bid.pricebookRowCount).toBe(0);
+    // every line carries a priceSource
+    for (const li of bid.lineItems) {
+      expect(typeof li.priceSource).toBe('string');
+      expect(li.priceSource.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('with a real-median price table -> pricebook-median lines + matchedRows', () => {
+    const book: PricebookMedians = {
+      generatedAt: '2026-01-01T00:00:00.000Z',
+      sourceRowCount: 7208,
+      currency: 'USD',
+      medians: {
+        sprinkler_head: { unitPrice: 42, unit: 'EA', matchedRows: 24, band: [5, 80] },
+        branch_pipe: { unitPrice: 2.44, unit: 'FT', matchedRows: 380, band: [0.5, 20] },
+        fitting: { unitPrice: 6.66, unit: 'EA', matchedRows: 1134, band: [0.5, 30] },
+        hanger: { unitPrice: 1.8, unit: 'EA', matchedRows: 77, band: [0.3, 15] },
+        escutcheon: { unitPrice: 2.6, unit: 'EA', matchedRows: 164, band: [0.2, 12] },
+      },
+    };
+    const table = resolvePriceTable(book);
+    expect(table.kind).toBe('pricebook');
+
+    const bid = buildBidEstimate(drivers, { priceTable: table });
+    const byKey = Object.fromEntries(bid.lineItems.map((l) => [l.key, l]));
+
+    // head: real median $42, 24 rows
+    expect(byKey.sprinkler_head.unitPrice).toBe(42);
+    expect(byKey.sprinkler_head.priceSource).toBe('pricebook-median');
+    expect(byKey.sprinkler_head.matchedRows).toBe(24);
+    // branch pipe: real median $2.44, 380 rows
+    expect(byKey.branch_pipe.unitPrice).toBe(2.44);
+    expect(byKey.branch_pipe.priceSource).toBe('pricebook-median');
+    expect(byKey.branch_pipe.matchedRows).toBe(380);
+    // 10 heads * 42 = 420 ; 50 ft * 2.44 = 122 ; 5 fit * 6.66 = 33.3 ;
+    // 5 hangers * 1.8 = 9 ; 10 escutcheon * 2.6 = 26 ; 1 riser * 1850 = 1850
+    // materialTotal = 420 + 122 + 33.3 + 9 + 26 + 1850 = 2460.3
+    expect(byKey.fitting.extended).toBe(33.3);
+    expect(bid.materialTotal).toBe(2460.3);
+
+    // riser stays representative-only even under a pricebook table
+    expect(byKey.riser_valve_assy.priceSource).toBe('representative-only');
+
+    // overall provenance flips to pricebook-median with the real row count
+    expect(bid.priceSource).toBe('pricebook-median');
+    expect(bid.pricebookRowCount).toBe(7208);
+  });
+
+  it('a key missing from the book falls back per-line to representative', () => {
+    const book: PricebookMedians = {
+      generatedAt: '',
+      sourceRowCount: 7208,
+      currency: 'USD',
+      // only sprinkler_head present; branch_pipe etc. absent
+      medians: { sprinkler_head: { unitPrice: 42, unit: 'EA', matchedRows: 24, band: [5, 80] } },
+    };
+    const bid = buildBidEstimate(drivers, { priceTable: resolvePriceTable(book) });
+    const byKey = Object.fromEntries(bid.lineItems.map((l) => [l.key, l]));
+    expect(byKey.sprinkler_head.priceSource).toBe('pricebook-median');
+    // branch_pipe had no median -> representative-fallback at the rep price
+    expect(byKey.branch_pipe.priceSource).toBe('representative-fallback');
+    expect(byKey.branch_pipe.unitPrice).toBe(REPRESENTATIVE_UNIT_PRICES.branch_pipe);
+  });
+
+  it('is deterministic with a supplied price table', () => {
+    const table = resolvePriceTable({
+      generatedAt: '',
+      sourceRowCount: 100,
+      currency: 'USD',
+      medians: { sprinkler_head: { unitPrice: 40, unit: 'EA', matchedRows: 10, band: [5, 80] } },
+    });
+    const a = buildBidEstimate(drivers, { priceTable: table });
+    const b = buildBidEstimate(drivers, { priceTable: table });
+    expect(a).toStrictEqual(b);
+  });
+});
+
+/* ------------------------------------------------ loadPricebook / parsePricebook */
+
+describe('loadPricebook / parsePricebook — parse the medians JSON', () => {
+  const validJson = {
+    generatedAt: '2026-01-01T00:00:00.000Z',
+    sourceRowCount: 7208,
+    currency: 'USD',
+    medians: {
+      sprinkler_head: { unitPrice: 42, unit: 'EA', matchedRows: 24, band: [5, 80] },
+      branch_pipe: { unitPrice: 2.44, unit: 'FT', matchedRows: 380, band: [0.5, 20] },
+    },
+  };
+
+  it('parsePricebook accepts a valid document', () => {
+    const book = parsePricebook(validJson);
+    expect(book).not.toBeNull();
+    expect(book?.sourceRowCount).toBe(7208);
+    expect(book?.medians.sprinkler_head?.unitPrice).toBe(42);
+  });
+
+  it('parsePricebook rejects malformed / empty docs', () => {
+    expect(parsePricebook(null)).toBeNull();
+    expect(parsePricebook({})).toBeNull();
+    expect(parsePricebook({ medians: {} })).toBeNull();
+    expect(parsePricebook({ medians: { x: { unitPrice: 0 } } })).toBeNull();
+  });
+
+  it('loadPricebook returns null with no fetch (honest fallback)', async () => {
+    expect(await loadPricebook(undefined)).toBeNull();
+  });
+
+  it('loadPricebook parses a 200 response', async () => {
+    const fakeFetch = (async () =>
+      ({ ok: true, json: async () => validJson }) as unknown as Response) as typeof fetch;
+    const book = await loadPricebook(fakeFetch);
+    expect(book?.medians.branch_pipe?.unitPrice).toBe(2.44);
+  });
+
+  it('loadPricebook returns null on non-2xx / throw (fail-soft)', async () => {
+    const notOk = (async () => ({ ok: false }) as unknown as Response) as typeof fetch;
+    expect(await loadPricebook(notOk)).toBeNull();
+    const throwing = (async () => {
+      throw new Error('network');
+    }) as typeof fetch;
+    expect(await loadPricebook(throwing)).toBeNull();
+  });
+
+  it('resolvePriceTable(null) is the representative fallback table', () => {
+    const table = resolvePriceTable(null);
+    expect(table.kind).toBe('representative');
+    expect(table.sourceRowCount).toBe(0);
+    expect(table.prices.sprinkler_head).toBe(REPRESENTATIVE_UNIT_PRICES.sprinkler_head);
+  });
+});
+
+/* ------------------------------------------ shipped REAL pricebook-medians.json */
+
+describe('shipped pricebook-medians.json — proves REAL data shipped', () => {
+  const raw = JSON.parse(readFileSync(MEDIANS_PATH, 'utf8')) as unknown;
+  const book = parsePricebook(raw);
+
+  it('parses + has sourceRowCount > 1000 (real imported pricebook)', () => {
+    expect(book).not.toBeNull();
+    expect(book!.sourceRowCount).toBeGreaterThan(1000);
+  });
+
+  it('has a positive unit price for sprinkler_head + branch_pipe (real medians)', () => {
+    expect(book!.medians.sprinkler_head?.unitPrice).toBeGreaterThan(0);
+    expect(book!.medians.branch_pipe?.unitPrice).toBeGreaterThan(0);
+    // each backed by real matched rows
+    expect(book!.medians.sprinkler_head?.matchedRows).toBeGreaterThan(0);
+    expect(book!.medians.branch_pipe?.matchedRows).toBeGreaterThan(0);
+  });
+
+  it('prices a layout against the shipped real medians end-to-end', () => {
+    const table = resolvePriceTable(book);
+    expect(table.kind).toBe('pricebook');
+    const bid = estimateFullFromLayout(
+      { widthFt: 40, lengthFt: 60, hazard: 'ordinary' as const },
+      { priceTable: table },
+    );
+    expect(bid.priceSource).toBe('pricebook-median');
+    expect(bid.pricebookRowCount).toBeGreaterThan(1000);
+    expect(bid.total).toBeGreaterThan(0);
+    // deterministic
+    expect(estimateFullFromLayout(
+      { widthFt: 40, lengthFt: 60, hazard: 'ordinary' as const },
+      { priceTable: table },
+    )).toStrictEqual(bid);
+  });
+});
+
+/* -------------------------------------------- deriveFullDriversFromLayout split */
+
+describe('deriveFullDriversFromLayout — fuller split takeoff', () => {
+  it('splits branch + cross-main and adds drops per head (40x60)', () => {
+    const layout = layoutHeads({ widthFt: 40, lengthFt: 60, hazard: 'ordinary' as const });
+    const full = deriveFullDriversFromLayout(layout);
+    // branch run/row = (4-1)*10 = 30; *6 rows = 180
+    expect(full.branchPipeFt).toBe(180);
+    // cross-main = (6-1)*10 = 50
+    expect(full.crossMainFt).toBe(50);
+    // legacy combined = 230 (back-compat figure)
+    const legacy = deriveDriversFromLayout(layout);
+    expect(legacy.branchPipeFt).toBe(full.branchPipeFt! + full.crossMainFt!);
+    // one drop per head
+    expect(full.dropCount).toBe(24);
+    // hangers over the combined pipe: ceil(230/10) = 23
+    expect(full.hangerCount).toBe(23);
+  });
+
+  it('full takeoff emits a cross-main + drop line when priced', () => {
+    const bid = estimateFullFromLayout({ widthFt: 40, lengthFt: 60, hazard: 'ordinary' as const });
+    const keys = bid.lineItems.map((l) => l.key);
+    expect(keys).toContain('cross_main_pipe');
+    expect(keys).toContain('drop_armover');
   });
 });
