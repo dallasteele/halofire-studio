@@ -56,13 +56,23 @@ import {
 import { BidPanel } from './BidPanel';
 import type { FootprintResult } from './lib/pdf-building';
 import { buildSamInvoker } from './lib/sam-invoker';
+import {
+  loadManufacturerCatalog,
+  type ManufacturerCatalog,
+} from './lib/manufacturer-catalog';
+import { ManufacturerCatalogPanel } from './ManufacturerCatalogPanel';
 
 /**
  * Top-level app mode: the existing part gallery, the sprinkler layout tool, or the
  * T47 vector-PDF building footprint lane.
  */
-export type AppMode = 'catalog' | 'layout' | 'building';
-const APP_MODES: readonly AppMode[] = ['catalog', 'layout', 'building'] as const;
+export type AppMode = 'catalog' | 'mfr-catalog' | 'layout' | 'building';
+const APP_MODES: readonly AppMode[] = [
+  'catalog',
+  'mfr-catalog',
+  'layout',
+  'building',
+] as const;
 
 declare global {
   interface Window {
@@ -109,6 +119,14 @@ declare global {
        * Honest by construction.
        */
       dimensionedParametricCount: number;
+      /**
+       * Number of REAL manufacturer catalog SKU/SIN spec records ingested from
+       * public data sheets (public/catalog/manufacturer-catalog.json). Zero when
+       * the catalog is missing / failed to load. Honest by construction — these
+       * are catalog SPEC records, NOT manufacturer-exact geometry and NOT AHJ /
+       * PE / code-certified selections.
+       */
+      catalogPartCount: number;
     };
   }
 }
@@ -129,6 +147,9 @@ export function App(): ReactElement {
   const [buildingPageIndex, setBuildingPageIndex] = useState(0);
   const [buildingHeightFt, setBuildingHeightFt] = useState(12);
   const [footprint, setFootprint] = useState<FootprintResult | null>(null);
+  // REAL manufacturer catalog (Tyco / Reliable / … spec records from public data
+  // sheets). Fail-soft: a missing/blocked file leaves this null -> 0 SKUs.
+  const [mfrCatalog, setMfrCatalog] = useState<ManufacturerCatalog | null>(null);
 
   // Resolved bid price table. Starts as the representative fallback; once the
   // REAL pricebook medians (public/parts/pricebook-medians.json, generated from
@@ -195,10 +216,36 @@ export function App(): ReactElement {
     };
   }, []);
 
+  // Load the REAL manufacturer catalog (fail-soft to an empty catalog).
+  useEffect(() => {
+    let cancelled = false;
+    loadManufacturerCatalog(
+      typeof fetch === 'function' ? fetch.bind(globalThis) : undefined,
+    )
+      .then((cat) => {
+        if (cancelled) return;
+        setMfrCatalog(cat);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setMfrCatalog({
+          generatedAt: null,
+          disclaimer: null,
+          sources: [],
+          entries: [],
+        });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const present = useMemo(
     () => (records ? presentParts(records) : []),
     [records],
   );
+
+  const catalogPartCount = mfrCatalog?.entries.length ?? 0;
 
   const selected = useMemo(
     () => (records ? (records.find((p) => p.key === selectedKey) ?? null) : null),
@@ -257,6 +304,7 @@ export function App(): ReactElement {
       bidTotal: bid.total,
       manufacturerVerifiedCount,
       dimensionedParametricCount,
+      catalogPartCount,
       footprintAreaSqft:
         footprint && !footprint.empty ? footprint.areaSqft : null,
       samAvailable,
@@ -271,6 +319,7 @@ export function App(): ReactElement {
     bid.total,
     manufacturerVerifiedCount,
     dimensionedParametricCount,
+    catalogPartCount,
     footprint,
     samAvailable,
   ]);
@@ -352,7 +401,14 @@ export function App(): ReactElement {
         <ViewModeControl viewMode={viewMode} onChange={setViewMode} />
 
         <span style={statusChipStyle} role="status">
-          {appMode === 'building' ? (
+          {appMode === 'mfr-catalog' ? (
+            <>
+              <strong style={statusNumStyle}>{catalogPartCount}</strong>{' '}
+              manufacturer SKUs{' '}
+              <span style={statusSepStyle}>·</span> spec records from public data
+              sheets
+            </>
+          ) : appMode === 'building' ? (
             footprint && !footprint.empty ? (
               <>
                 <strong style={statusNumStyle}>{Math.round(footprint.areaSqft)}</strong>{' '}
@@ -390,7 +446,9 @@ export function App(): ReactElement {
         </span>
 
         <p style={disclaimerStyle}>
-          {appMode === 'building'
+          {appMode === 'mfr-catalog'
+            ? 'catalog SPEC records from public manufacturer data sheets · NOT manufacturer-exact geometry · NOT AHJ / PE / code-certified selections'
+            : appMode === 'building'
             ? footprint && !footprint.empty && footprint.method === 'sam-raster'
               ? 'best-effort SAM raster segmentation (2D mask only) · scale is operator-supplied · raster-segmented, NOT vector-exact / AHJ / PE-sealed / code-compliant · not for construction'
               : 'best-effort vector-geometry extraction · scale is operator-supplied · NOT AHJ / PE-sealed / code-compliant · not for construction'
@@ -431,6 +489,8 @@ export function App(): ReactElement {
 
             <Inspector part={selected} />
           </>
+        ) : appMode === 'mfr-catalog' ? (
+          <ManufacturerCatalogPanel catalog={mfrCatalog} />
         ) : appMode === 'layout' ? (
           <>
             <LayoutControls
@@ -520,6 +580,7 @@ interface AppModeControlProps {
 function AppModeControl({ appMode, onChange }: AppModeControlProps): ReactElement {
   const options: { mode: AppMode; label: string }[] = [
     { mode: 'catalog', label: 'Catalog' },
+    { mode: 'mfr-catalog', label: 'Manufacturer' },
     { mode: 'layout', label: 'Layout' },
     { mode: 'building', label: 'Building' },
   ];

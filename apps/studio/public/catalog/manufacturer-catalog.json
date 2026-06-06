@@ -1,0 +1,2015 @@
+{
+  "generatedAt": "2026-06-06T03:17:51.503729Z",
+  "disclaimer": "Catalog SPEC records extracted from PUBLIC manufacturer data sheets. Every field is a real extracted value; unparseable fields are null. These are NOT manufacturer-exact geometry and NOT AHJ / PE / code-certified selections. Verify against the governing NFPA 13 edition and stamped calcs before any bid / takeoff / permit use.",
+  "sources": [
+    {
+      "mfr": "Tyco/Johnson Controls",
+      "url": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/JXGj~rL_f_FBVCY52uMTJw/content",
+      "partCount": 10
+    },
+    {
+      "mfr": "Tyco/Johnson Controls",
+      "url": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/SC0wntXoMEz0fJHGSDFKYg/content",
+      "partCount": 2
+    },
+    {
+      "mfr": "Tyco/Johnson Controls",
+      "url": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/GjYamLcgtxwHCclUKVEuNg/content",
+      "partCount": 1
+    },
+    {
+      "mfr": "Tyco/Johnson Controls",
+      "url": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/Y5s5g2HZNr6Um_t5iOK7dw/content",
+      "partCount": 8
+    },
+    {
+      "mfr": "Tyco/Johnson Controls",
+      "url": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/sHaKx63LNR0Plc0DRhpTjA/content",
+      "partCount": 2
+    },
+    {
+      "mfr": "Tyco/Johnson Controls",
+      "url": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/xmJhVJHLJCO77YuktCNBQg/content",
+      "partCount": 1
+    },
+    {
+      "mfr": "Tyco/Johnson Controls",
+      "url": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/Z5ZVzAKjhf_8O8We9to1rA/content",
+      "partCount": 1
+    },
+    {
+      "mfr": "Tyco/Johnson Controls",
+      "url": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/e9bESi3o9KPZtqpBqxrTKg/content",
+      "partCount": 1
+    },
+    {
+      "mfr": "Tyco/Johnson Controls",
+      "url": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/XcprNdeSrDHsQ_AiuOJ9yQ/content",
+      "partCount": 1
+    },
+    {
+      "mfr": "Tyco/Johnson Controls",
+      "url": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/Hw0FcFvFTQeaX2w0E2C7UQ/content",
+      "partCount": 1
+    },
+    {
+      "mfr": "Tyco/Johnson Controls",
+      "url": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/piBCkF8DgCJI3dI0xFBMgw/content",
+      "partCount": 1
+    },
+    {
+      "mfr": "Tyco/Johnson Controls",
+      "url": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/nceqcVPMarrl8RwvTtXH6A/content",
+      "partCount": 1
+    },
+    {
+      "mfr": "Reliable",
+      "url": "https://www.reliablesprinkler.com/files/bulletins/060.pdf",
+      "partCount": 2
+    },
+    {
+      "mfr": "Reliable",
+      "url": "https://www.reliablesprinkler.com/files/bulletins/061.pdf",
+      "partCount": 1
+    },
+    {
+      "mfr": "Reliable",
+      "url": "https://www.reliablesprinkler.com/files/bulletins/062.pdf",
+      "partCount": 2
+    },
+    {
+      "mfr": "Reliable",
+      "url": "https://www.reliablesprinkler.com/files/bulletins/063.pdf",
+      "partCount": 2
+    },
+    {
+      "mfr": "Reliable",
+      "url": "https://www.reliablesprinkler.com/files/bulletins/064.pdf",
+      "partCount": 4
+    },
+    {
+      "mfr": "Reliable",
+      "url": "https://www.reliablesprinkler.com/files/bulletins/065.pdf",
+      "partCount": 4
+    },
+    {
+      "mfr": "Reliable",
+      "url": "https://www.reliablesprinkler.com/files/bulletins/066.pdf",
+      "partCount": 2
+    },
+    {
+      "mfr": "Reliable",
+      "url": "https://www.reliablesprinkler.com/files/bulletins/067.pdf",
+      "partCount": 2
+    },
+    {
+      "mfr": "Reliable",
+      "url": "https://www.reliablesprinkler.com/files/bulletins/071.pdf",
+      "partCount": 4
+    },
+    {
+      "mfr": "Reliable",
+      "url": "https://www.reliablesprinkler.com/files/bulletins/072.pdf",
+      "partCount": 2
+    },
+    {
+      "mfr": "Reliable",
+      "url": "https://www.reliablesprinkler.com/files/bulletins/073.pdf",
+      "partCount": 2
+    },
+    {
+      "mfr": "Reliable",
+      "url": "https://www.reliablesprinkler.com/files/bulletins/074.pdf",
+      "partCount": 4
+    },
+    {
+      "mfr": "Reliable",
+      "url": "https://www.reliablesprinkler.com/files/bulletins/075.pdf",
+      "partCount": 2
+    },
+    {
+      "mfr": "Reliable",
+      "url": "https://www.reliablesprinkler.com/files/bulletins/076.pdf",
+      "partCount": 2
+    },
+    {
+      "mfr": "Reliable",
+      "url": "https://www.reliablesprinkler.com/files/bulletins/077.pdf",
+      "partCount": 3
+    },
+    {
+      "mfr": "Reliable",
+      "url": "https://www.reliablesprinkler.com/files/bulletins/078.pdf",
+      "partCount": 2
+    },
+    {
+      "mfr": "Reliable",
+      "url": "https://www.reliablesprinkler.com/files/bulletins/085.pdf",
+      "partCount": 2
+    },
+    {
+      "mfr": "Reliable",
+      "url": "https://www.reliablesprinkler.com/files/bulletins/104.pdf",
+      "partCount": 0,
+      "error": "no per-SIN spec block or summary row parsed"
+    },
+    {
+      "mfr": "Reliable",
+      "url": "https://www.reliablesprinkler.com/files/bulletins/135.pdf",
+      "partCount": 1
+    },
+    {
+      "mfr": "Reliable",
+      "url": "https://www.reliablesprinkler.com/files/bulletins/182.pdf",
+      "partCount": 2
+    },
+    {
+      "mfr": "Reliable",
+      "url": "https://www.reliablesprinkler.com/files/bulletins/183.pdf",
+      "partCount": 1
+    },
+    {
+      "mfr": "Reliable",
+      "url": "https://www.reliablesprinkler.com/files/bulletins/184.pdf",
+      "partCount": 4
+    }
+  ],
+  "entries": [
+    {
+      "id": "reliable-ra1311",
+      "mfr": "Reliable",
+      "model": "Model F1-28",
+      "sin": "RA1311",
+      "category": "head_pendent",
+      "kFactor": 2.8,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286,
+        360
+      ],
+      "responseType": "standard",
+      "finishes": null,
+      "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/066.pdf",
+      "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/066.pdf"
+    },
+    {
+      "id": "reliable-ra1313",
+      "mfr": "Reliable",
+      "model": "Model F1-42",
+      "sin": "RA1313",
+      "category": "head_pendent",
+      "kFactor": 4.2,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.75,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286,
+        360
+      ],
+      "responseType": "standard",
+      "finishes": null,
+      "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/067.pdf",
+      "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/067.pdf"
+    },
+    {
+      "id": "reliable-ra1314",
+      "mfr": "Reliable",
+      "model": "Model F1-56",
+      "sin": "RA1314",
+      "category": "head_pendent",
+      "kFactor": 5.6,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286,
+        360,
+        500
+      ],
+      "responseType": "standard",
+      "finishes": null,
+      "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/071.pdf",
+      "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/071.pdf"
+    },
+    {
+      "id": "reliable-ra1321",
+      "mfr": "Reliable",
+      "model": "Model F1-28",
+      "sin": "RA1321",
+      "category": "head_upright",
+      "kFactor": 2.8,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286,
+        360
+      ],
+      "responseType": "standard",
+      "finishes": null,
+      "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/066.pdf",
+      "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/066.pdf"
+    },
+    {
+      "id": "reliable-ra1323",
+      "mfr": "Reliable",
+      "model": "Model F1-42",
+      "sin": "RA1323",
+      "category": "head_upright",
+      "kFactor": 4.2,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286,
+        360
+      ],
+      "responseType": "standard",
+      "finishes": null,
+      "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/067.pdf",
+      "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/067.pdf"
+    },
+    {
+      "id": "reliable-ra1325",
+      "mfr": "Reliable",
+      "model": "Model F1-56",
+      "sin": "RA1325",
+      "category": "head_upright",
+      "kFactor": 5.6,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286,
+        360,
+        500
+      ],
+      "responseType": "standard",
+      "finishes": null,
+      "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/071.pdf",
+      "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/071.pdf"
+    },
+    {
+      "id": "reliable-ra1335",
+      "mfr": "Reliable",
+      "model": "Model F1-56",
+      "sin": "RA1335",
+      "category": "head_sidewall",
+      "kFactor": 5.6,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286,
+        360,
+        500
+      ],
+      "responseType": "standard",
+      "finishes": null,
+      "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/071.pdf",
+      "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/071.pdf"
+    },
+    {
+      "id": "reliable-ra1375",
+      "mfr": "Reliable",
+      "model": "Model F1-56",
+      "sin": "RA1375",
+      "category": "head_upright",
+      "kFactor": 5.6,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286,
+        360
+      ],
+      "responseType": "quick/standard",
+      "finishes": null,
+      "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/182.pdf",
+      "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/182.pdf"
+    },
+    {
+      "id": "reliable-ra1385",
+      "mfr": "Reliable",
+      "model": "Model F1-56",
+      "sin": "RA1385",
+      "category": "head_sidewall",
+      "kFactor": 5.6,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286,
+        360,
+        500
+      ],
+      "responseType": "standard",
+      "finishes": null,
+      "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/071.pdf",
+      "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/071.pdf"
+    },
+    {
+      "id": "reliable-ra1410",
+      "mfr": "Reliable",
+      "model": "Model F1FR42LL",
+      "sin": "RA1410",
+      "category": "head_pendent",
+      "kFactor": 4.2,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        200
+      ],
+      "responseType": "quick",
+      "finishes": null,
+      "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/085.pdf",
+      "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/085.pdf"
+    },
+    {
+      "id": "reliable-ra1411",
+      "mfr": "Reliable",
+      "model": "Model F1FR28",
+      "sin": "RA1411",
+      "category": "head_pendent",
+      "kFactor": 2.8,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286
+      ],
+      "responseType": "quick",
+      "finishes": null,
+      "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/072.pdf",
+      "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/072.pdf"
+    },
+    {
+      "id": "reliable-ra1413",
+      "mfr": "Reliable",
+      "model": "Model F1FR42",
+      "sin": "RA1413",
+      "category": "head_pendent",
+      "kFactor": 4.2,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286
+      ],
+      "responseType": "quick",
+      "finishes": null,
+      "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/073.pdf",
+      "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/073.pdf"
+    },
+    {
+      "id": "reliable-ra1414",
+      "mfr": "Reliable",
+      "model": "Model F1FR56",
+      "sin": "RA1414",
+      "category": "head_pendent",
+      "kFactor": 5.6,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286
+      ],
+      "responseType": "quick",
+      "finishes": null,
+      "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/074.pdf",
+      "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/074.pdf"
+    },
+    {
+      "id": "reliable-ra1415",
+      "mfr": "Reliable",
+      "model": "Model F1FR56LL",
+      "sin": "RA1415",
+      "category": "head_pendent",
+      "kFactor": 5.6,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        200
+      ],
+      "responseType": "quick",
+      "finishes": null,
+      "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/085.pdf",
+      "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/085.pdf"
+    },
+    {
+      "id": "reliable-ra1418",
+      "mfr": "Reliable",
+      "model": "Model F1FR40",
+      "sin": "RA1418",
+      "category": "head_pendent",
+      "kFactor": 4.0,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286
+      ],
+      "responseType": "quick",
+      "finishes": null,
+      "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/183.pdf",
+      "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/183.pdf"
+    },
+    {
+      "id": "reliable-ra1421",
+      "mfr": "Reliable",
+      "model": "Model F1FR28",
+      "sin": "RA1421",
+      "category": "head_upright",
+      "kFactor": 2.8,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286
+      ],
+      "responseType": "quick",
+      "finishes": null,
+      "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/072.pdf",
+      "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/072.pdf"
+    },
+    {
+      "id": "reliable-ra1423",
+      "mfr": "Reliable",
+      "model": "Model F1FR42",
+      "sin": "RA1423",
+      "category": "head_upright",
+      "kFactor": 4.2,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286
+      ],
+      "responseType": "quick",
+      "finishes": null,
+      "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/073.pdf",
+      "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/073.pdf"
+    },
+    {
+      "id": "reliable-ra1425",
+      "mfr": "Reliable",
+      "model": "Model F1FR56",
+      "sin": "RA1425",
+      "category": "head_upright",
+      "kFactor": 5.6,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286
+      ],
+      "responseType": "quick",
+      "finishes": null,
+      "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/074.pdf",
+      "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/074.pdf"
+    },
+    {
+      "id": "reliable-ra1435",
+      "mfr": "Reliable",
+      "model": "Model F1FR56",
+      "sin": "RA1435",
+      "category": "head_sidewall",
+      "kFactor": 5.6,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286
+      ],
+      "responseType": "quick",
+      "finishes": null,
+      "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/074.pdf",
+      "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/074.pdf"
+    },
+    {
+      "id": "reliable-ra1475",
+      "mfr": "Reliable",
+      "model": "Model F1FR56",
+      "sin": "RA1475",
+      "category": "head_upright",
+      "kFactor": 5.6,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286,
+        360
+      ],
+      "responseType": "quick/standard",
+      "finishes": null,
+      "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/182.pdf",
+      "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/182.pdf"
+    },
+    {
+      "id": "reliable-ra1485",
+      "mfr": "Reliable",
+      "model": "Model F1FR56",
+      "sin": "RA1485",
+      "category": "head_sidewall",
+      "kFactor": 5.6,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286
+      ],
+      "responseType": "quick",
+      "finishes": null,
+      "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/074.pdf",
+      "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/074.pdf"
+    },
+    {
+      "id": "reliable-ra2514",
+      "mfr": "Reliable",
+      "model": "Model F1-56-300",
+      "sin": "RA2514",
+      "category": "head_pendent",
+      "kFactor": 5.6,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286,
+        360
+      ],
+      "responseType": "standard",
+      "finishes": null,
+      "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/075.pdf",
+      "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/075.pdf"
+    },
+    {
+      "id": "reliable-ra2525",
+      "mfr": "Reliable",
+      "model": "Model F1-56-300",
+      "sin": "RA2525",
+      "category": "head_upright",
+      "kFactor": 5.6,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286,
+        360
+      ],
+      "responseType": "standard",
+      "finishes": null,
+      "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/075.pdf",
+      "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/075.pdf"
+    },
+    {
+      "id": "reliable-ra2614",
+      "mfr": "Reliable",
+      "model": "Model F1FR56-300",
+      "sin": "RA2614",
+      "category": "head_pendent",
+      "kFactor": 5.6,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286
+      ],
+      "responseType": "quick",
+      "finishes": null,
+      "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/077.pdf",
+      "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/077.pdf"
+    },
+    {
+      "id": "reliable-ra2625",
+      "mfr": "Reliable",
+      "model": "Model F1FR56-300",
+      "sin": "RA2625",
+      "category": "head_upright",
+      "kFactor": 5.6,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286
+      ],
+      "responseType": "quick",
+      "finishes": null,
+      "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/077.pdf",
+      "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/077.pdf"
+    },
+    {
+      "id": "reliable-ra2634",
+      "mfr": "Reliable",
+      "model": "Model F1FR56-300",
+      "sin": "RA2634",
+      "category": "head_sidewall",
+      "kFactor": 5.6,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286
+      ],
+      "responseType": "quick",
+      "finishes": null,
+      "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/077.pdf",
+      "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/077.pdf"
+    },
+    {
+      "id": "reliable-ra3533",
+      "mfr": "Reliable",
+      "model": "F1Res 58 HSWX",
+      "sin": "RA3533",
+      "category": "head_sidewall",
+      "kFactor": 5.8,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        155,
+        175
+      ],
+      "responseType": null,
+      "finishes": null,
+      "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/135.pdf",
+      "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/135.pdf"
+    },
+    {
+      "id": "reliable-ra6012",
+      "mfr": "Reliable",
+      "model": "F3-80 Dry Pendent",
+      "sin": "RA6012",
+      "category": "head_pendent",
+      "kFactor": 8.0,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 1.0,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        155,
+        175,
+        200
+      ],
+      "responseType": null,
+      "finishes": null,
+      "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/060.pdf",
+      "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/060.pdf"
+    },
+    {
+      "id": "reliable-ra6032",
+      "mfr": "Reliable",
+      "model": "F3-80 Dry Horizontal Sidewall",
+      "sin": "RA6032",
+      "category": "head_sidewall",
+      "kFactor": 8.0,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 1.0,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        155,
+        175,
+        200
+      ],
+      "responseType": null,
+      "finishes": null,
+      "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/060.pdf",
+      "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/060.pdf"
+    },
+    {
+      "id": "reliable-ra6112",
+      "mfr": "Reliable",
+      "model": "F3QR80 Dry Pendent",
+      "sin": "RA6112",
+      "category": "head_pendent",
+      "kFactor": 8.0,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 1.0,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        155,
+        175,
+        200
+      ],
+      "responseType": "quick",
+      "finishes": null,
+      "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/061.pdf",
+      "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/061.pdf"
+    },
+    {
+      "id": "reliable-ra6212",
+      "mfr": "Reliable",
+      "model": "Model F1-80",
+      "sin": "RA6212",
+      "category": "head_pendent",
+      "kFactor": 8.0,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.75,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286,
+        360
+      ],
+      "responseType": "standard",
+      "finishes": null,
+      "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/062.pdf",
+      "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/062.pdf"
+    },
+    {
+      "id": "reliable-ra6222",
+      "mfr": "Reliable",
+      "model": "Model F1-80",
+      "sin": "RA6222",
+      "category": "head_upright",
+      "kFactor": 8.0,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.75,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286,
+        360
+      ],
+      "responseType": "standard",
+      "finishes": null,
+      "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/062.pdf",
+      "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/062.pdf"
+    },
+    {
+      "id": "reliable-ra6312",
+      "mfr": "Reliable",
+      "model": "Model F1FR80",
+      "sin": "RA6312",
+      "category": "head_pendent",
+      "kFactor": 8.0,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.75,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286
+      ],
+      "responseType": "quick",
+      "finishes": null,
+      "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/063.pdf",
+      "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/063.pdf"
+    },
+    {
+      "id": "reliable-ra6322",
+      "mfr": "Reliable",
+      "model": "Model F1FR80",
+      "sin": "RA6322",
+      "category": "head_upright",
+      "kFactor": 8.0,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.75,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286
+      ],
+      "responseType": "quick",
+      "finishes": null,
+      "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/063.pdf",
+      "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/063.pdf"
+    },
+    {
+      "id": "reliable-ra6412",
+      "mfr": "Reliable",
+      "model": "Model F1-80SS",
+      "sin": "RA6412",
+      "category": "head_pendent",
+      "kFactor": 8.0,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.75,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286,
+        360,
+        500
+      ],
+      "responseType": null,
+      "finishes": null,
+      "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/064.pdf",
+      "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/064.pdf"
+    },
+    {
+      "id": "reliable-ra6414",
+      "mfr": "Reliable",
+      "model": "Model F1-56SS",
+      "sin": "RA6414",
+      "category": "head_pendent",
+      "kFactor": 5.6,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286,
+        360,
+        500
+      ],
+      "responseType": null,
+      "finishes": null,
+      "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/064.pdf",
+      "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/064.pdf"
+    },
+    {
+      "id": "reliable-ra6422",
+      "mfr": "Reliable",
+      "model": "Model F1-80SS",
+      "sin": "RA6422",
+      "category": "head_upright",
+      "kFactor": 8.0,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.75,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286,
+        360,
+        500
+      ],
+      "responseType": null,
+      "finishes": null,
+      "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/064.pdf",
+      "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/064.pdf"
+    },
+    {
+      "id": "reliable-ra6424",
+      "mfr": "Reliable",
+      "model": "Model F1-56SS",
+      "sin": "RA6424",
+      "category": "head_upright",
+      "kFactor": 5.6,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286,
+        360,
+        500
+      ],
+      "responseType": null,
+      "finishes": null,
+      "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/064.pdf",
+      "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/064.pdf"
+    },
+    {
+      "id": "reliable-ra6512",
+      "mfr": "Reliable",
+      "model": "Model F1FR80SS",
+      "sin": "RA6512",
+      "category": "head_pendent",
+      "kFactor": 8.0,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.75,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286
+      ],
+      "responseType": "quick",
+      "finishes": null,
+      "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/065.pdf",
+      "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/065.pdf"
+    },
+    {
+      "id": "reliable-ra6514",
+      "mfr": "Reliable",
+      "model": "Model F1FR56SS",
+      "sin": "RA6514",
+      "category": "head_pendent",
+      "kFactor": 5.6,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286
+      ],
+      "responseType": "quick",
+      "finishes": null,
+      "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/065.pdf",
+      "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/065.pdf"
+    },
+    {
+      "id": "reliable-ra6522",
+      "mfr": "Reliable",
+      "model": "Model F1FR80SS",
+      "sin": "RA6522",
+      "category": "head_upright",
+      "kFactor": 8.0,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.75,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286
+      ],
+      "responseType": "quick",
+      "finishes": null,
+      "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/065.pdf",
+      "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/065.pdf"
+    },
+    {
+      "id": "reliable-ra6524",
+      "mfr": "Reliable",
+      "model": "Model F1FR56SS",
+      "sin": "RA6524",
+      "category": "head_upright",
+      "kFactor": 5.6,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286
+      ],
+      "responseType": "quick",
+      "finishes": null,
+      "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/065.pdf",
+      "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/065.pdf"
+    },
+    {
+      "id": "reliable-ra7612",
+      "mfr": "Reliable",
+      "model": "Model F1-80-300",
+      "sin": "RA7612",
+      "category": "head_pendent",
+      "kFactor": 8.0,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.75,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286,
+        360
+      ],
+      "responseType": "standard",
+      "finishes": null,
+      "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/076.pdf",
+      "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/076.pdf"
+    },
+    {
+      "id": "reliable-ra7622",
+      "mfr": "Reliable",
+      "model": "Model F1-80-300",
+      "sin": "RA7622",
+      "category": "head_upright",
+      "kFactor": 8.0,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.75,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286,
+        360
+      ],
+      "responseType": "standard",
+      "finishes": null,
+      "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/076.pdf",
+      "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/076.pdf"
+    },
+    {
+      "id": "reliable-ra7812",
+      "mfr": "Reliable",
+      "model": "Model F1FR80-300",
+      "sin": "RA7812",
+      "category": "head_pendent",
+      "kFactor": 8.0,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.75,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286
+      ],
+      "responseType": "quick",
+      "finishes": null,
+      "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/078.pdf",
+      "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/078.pdf"
+    },
+    {
+      "id": "reliable-ra7822",
+      "mfr": "Reliable",
+      "model": "Model F1FR80-300",
+      "sin": "RA7822",
+      "category": "head_upright",
+      "kFactor": 8.0,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.75,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286
+      ],
+      "responseType": "quick",
+      "finishes": null,
+      "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/078.pdf",
+      "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/078.pdf"
+    },
+    {
+      "id": "tyco-ty1131",
+      "mfr": "Tyco",
+      "model": "Series TY-FRB TY1131",
+      "sin": "TY1131",
+      "category": "head_upright",
+      "kFactor": 2.8,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286
+      ],
+      "responseType": "quick",
+      "finishes": null,
+      "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/JXGj~rL_f_FBVCY52uMTJw/content",
+      "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-frb_fis/series-ty-frb-sprinklers"
+    },
+    {
+      "id": "tyco-ty1151",
+      "mfr": "Tyco",
+      "model": "Series TY-B TY1151",
+      "sin": "TY1151",
+      "category": "head_upright",
+      "kFactor": 2.8,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        150,
+        155,
+        175,
+        200,
+        286,
+        360
+      ],
+      "responseType": "standard",
+      "finishes": null,
+      "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/Y5s5g2HZNr6Um_t5iOK7dw/content",
+      "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-b_fis/series-ty-b-sprinklers"
+    },
+    {
+      "id": "tyco-ty1231",
+      "mfr": "Tyco",
+      "model": "Series TY-FRB TY1231",
+      "sin": "TY1231",
+      "category": "head_pendent",
+      "kFactor": 2.8,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286
+      ],
+      "responseType": "quick",
+      "finishes": null,
+      "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/JXGj~rL_f_FBVCY52uMTJw/content",
+      "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-frb_fis/series-ty-frb-sprinklers"
+    },
+    {
+      "id": "tyco-ty1251",
+      "mfr": "Tyco",
+      "model": "Series TY-B TY1251",
+      "sin": "TY1251",
+      "category": "head_pendent",
+      "kFactor": 2.8,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        150,
+        155,
+        175,
+        200,
+        286,
+        360
+      ],
+      "responseType": "standard",
+      "finishes": null,
+      "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/Y5s5g2HZNr6Um_t5iOK7dw/content",
+      "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-b_fis/series-ty-b-sprinklers"
+    },
+    {
+      "id": "tyco-ty2131",
+      "mfr": "Tyco",
+      "model": "Series TY-FRB TY2131",
+      "sin": "TY2131",
+      "category": "head_upright",
+      "kFactor": 4.2,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286
+      ],
+      "responseType": "quick",
+      "finishes": null,
+      "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/JXGj~rL_f_FBVCY52uMTJw/content",
+      "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-frb_fis/series-ty-frb-sprinklers"
+    },
+    {
+      "id": "tyco-ty2231",
+      "mfr": "Tyco",
+      "model": "Series TY-FRB TY2231",
+      "sin": "TY2231",
+      "category": "head_pendent",
+      "kFactor": 4.2,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286
+      ],
+      "responseType": "quick",
+      "finishes": null,
+      "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/JXGj~rL_f_FBVCY52uMTJw/content",
+      "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-frb_fis/series-ty-frb-sprinklers"
+    },
+    {
+      "id": "tyco-ty313",
+      "mfr": "Tyco",
+      "model": "Series TY-FRB TY313",
+      "sin": "TY313",
+      "category": "head_upright",
+      "kFactor": 5.6,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286
+      ],
+      "responseType": "quick",
+      "finishes": null,
+      "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/SC0wntXoMEz0fJHGSDFKYg/content",
+      "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-frb_fis/series-ty-frb-sprinklers"
+    },
+    {
+      "id": "tyco-ty3131",
+      "mfr": "Tyco",
+      "model": "Series TY-FRB TY3131",
+      "sin": "TY3131",
+      "category": "head_upright",
+      "kFactor": 5.6,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286
+      ],
+      "responseType": "quick",
+      "finishes": null,
+      "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/JXGj~rL_f_FBVCY52uMTJw/content",
+      "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-frb_fis/series-ty-frb-sprinklers"
+    },
+    {
+      "id": "tyco-ty315",
+      "mfr": "Tyco",
+      "model": "Series TY-B TY315",
+      "sin": "TY315",
+      "category": "head_upright",
+      "kFactor": 5.6,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286,
+        360
+      ],
+      "responseType": "standard",
+      "finishes": null,
+      "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/sHaKx63LNR0Plc0DRhpTjA/content",
+      "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-b_fis/series-ty-b-sprinklers"
+    },
+    {
+      "id": "tyco-ty3151",
+      "mfr": "Tyco",
+      "model": "Series TY-B TY3151",
+      "sin": "TY3151",
+      "category": "head_upright",
+      "kFactor": 5.6,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        150,
+        155,
+        175,
+        200,
+        286,
+        360
+      ],
+      "responseType": "standard",
+      "finishes": null,
+      "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/Y5s5g2HZNr6Um_t5iOK7dw/content",
+      "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-b_fis/series-ty-b-sprinklers"
+    },
+    {
+      "id": "tyco-ty323",
+      "mfr": "Tyco",
+      "model": "Series TY-FRB TY323",
+      "sin": "TY323",
+      "category": "head_pendent",
+      "kFactor": 5.6,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286
+      ],
+      "responseType": "quick",
+      "finishes": null,
+      "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/SC0wntXoMEz0fJHGSDFKYg/content",
+      "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-frb_fis/series-ty-frb-sprinklers"
+    },
+    {
+      "id": "tyco-ty3231",
+      "mfr": "Tyco",
+      "model": "Series TY-FRB TY3231",
+      "sin": "TY3231",
+      "category": "head_pendent",
+      "kFactor": 5.6,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286
+      ],
+      "responseType": "quick",
+      "finishes": null,
+      "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/JXGj~rL_f_FBVCY52uMTJw/content",
+      "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-frb_fis/series-ty-frb-sprinklers"
+    },
+    {
+      "id": "tyco-ty325",
+      "mfr": "Tyco",
+      "model": "Series TY-B TY325",
+      "sin": "TY325",
+      "category": "head_pendent",
+      "kFactor": 5.6,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286,
+        360
+      ],
+      "responseType": "standard",
+      "finishes": null,
+      "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/sHaKx63LNR0Plc0DRhpTjA/content",
+      "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-b_fis/series-ty-b-sprinklers"
+    },
+    {
+      "id": "tyco-ty3251",
+      "mfr": "Tyco",
+      "model": "Series TY-B TY3251",
+      "sin": "TY3251",
+      "category": "head_pendent",
+      "kFactor": 5.6,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        150,
+        155,
+        175,
+        200,
+        286,
+        360
+      ],
+      "responseType": "standard",
+      "finishes": null,
+      "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/Y5s5g2HZNr6Um_t5iOK7dw/content",
+      "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-b_fis/series-ty-b-sprinklers"
+    },
+    {
+      "id": "tyco-ty3291",
+      "mfr": "Tyco",
+      "model": "Tyco TY3291",
+      "sin": "TY3291",
+      "category": "head_pendent",
+      "kFactor": 5.6,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200
+      ],
+      "responseType": "quick",
+      "finishes": null,
+      "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/XcprNdeSrDHsQ_AiuOJ9yQ/content",
+      "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories"
+    },
+    {
+      "id": "tyco-ty3331",
+      "mfr": "Tyco",
+      "model": "Series TY-FRB TY3331",
+      "sin": "TY3331",
+      "category": "head",
+      "kFactor": 5.6,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286
+      ],
+      "responseType": "quick/standard",
+      "finishes": null,
+      "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/GjYamLcgtxwHCclUKVEuNg/content",
+      "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-frb_fis/series-ty-frb-sprinklers"
+    },
+    {
+      "id": "tyco-ty3531",
+      "mfr": "Tyco",
+      "model": "Series RFII TY3531",
+      "sin": "TY3531",
+      "category": "head_pendent",
+      "kFactor": 5.6,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        139,
+        155,
+        165,
+        200
+      ],
+      "responseType": "quick/standard",
+      "finishes": null,
+      "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/xmJhVJHLJCO77YuktCNBQg/content",
+      "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/rfii_fis/series-rfii-standard-coverage-sprinkler"
+    },
+    {
+      "id": "tyco-ty3532",
+      "mfr": "Tyco",
+      "model": "Series RFII TY3532",
+      "sin": "TY3532",
+      "category": "head_pendent",
+      "kFactor": 5.6,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        100,
+        155,
+        200
+      ],
+      "responseType": "standard",
+      "finishes": null,
+      "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/Z5ZVzAKjhf_8O8We9to1rA/content",
+      "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/extended-coverage/rfii_ec_fis/series-rfii-extended-coverage-sprinkler"
+    },
+    {
+      "id": "tyco-ty3582",
+      "mfr": "Tyco",
+      "model": "Series RFII-C TY3582",
+      "sin": "TY3582",
+      "category": "head_pendent",
+      "kFactor": 5.6,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        139,
+        155,
+        165,
+        200
+      ],
+      "responseType": "quick",
+      "finishes": null,
+      "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/e9bESi3o9KPZtqpBqxrTKg/content",
+      "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/extended-coverage/rfii-c_fis/series-rfii-c-sprinkler"
+    },
+    {
+      "id": "tyco-ty4131",
+      "mfr": "Tyco",
+      "model": "Series TY-FRB TY4131",
+      "sin": "TY4131",
+      "category": "head_upright",
+      "kFactor": 8.0,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.75,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286
+      ],
+      "responseType": "quick",
+      "finishes": null,
+      "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/JXGj~rL_f_FBVCY52uMTJw/content",
+      "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-frb_fis/series-ty-frb-sprinklers"
+    },
+    {
+      "id": "tyco-ty4151",
+      "mfr": "Tyco",
+      "model": "Series TY-B TY4151",
+      "sin": "TY4151",
+      "category": "head_upright",
+      "kFactor": 8.0,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.75,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        150,
+        155,
+        175,
+        200,
+        286,
+        360
+      ],
+      "responseType": "standard",
+      "finishes": null,
+      "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/Y5s5g2HZNr6Um_t5iOK7dw/content",
+      "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-b_fis/series-ty-b-sprinklers"
+    },
+    {
+      "id": "tyco-ty4231",
+      "mfr": "Tyco",
+      "model": "Series TY-FRB TY4231",
+      "sin": "TY4231",
+      "category": "head_pendent",
+      "kFactor": 8.0,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.75,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286
+      ],
+      "responseType": "quick",
+      "finishes": null,
+      "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/JXGj~rL_f_FBVCY52uMTJw/content",
+      "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-frb_fis/series-ty-frb-sprinklers"
+    },
+    {
+      "id": "tyco-ty4251",
+      "mfr": "Tyco",
+      "model": "Series TY-B TY4251",
+      "sin": "TY4251",
+      "category": "head_pendent",
+      "kFactor": 8.0,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.75,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        150,
+        155,
+        175,
+        200,
+        286,
+        360
+      ],
+      "responseType": "standard",
+      "finishes": null,
+      "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/Y5s5g2HZNr6Um_t5iOK7dw/content",
+      "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-b_fis/series-ty-b-sprinklers"
+    },
+    {
+      "id": "tyco-ty4831",
+      "mfr": "Tyco",
+      "model": "Series TY-FRB TY4831",
+      "sin": "TY4831",
+      "category": "head_upright",
+      "kFactor": 8.0,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286
+      ],
+      "responseType": "quick",
+      "finishes": null,
+      "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/JXGj~rL_f_FBVCY52uMTJw/content",
+      "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-frb_fis/series-ty-frb-sprinklers"
+    },
+    {
+      "id": "tyco-ty4851",
+      "mfr": "Tyco",
+      "model": "Series TY-B TY4851",
+      "sin": "TY4851",
+      "category": "head_upright",
+      "kFactor": 8.0,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        150,
+        155,
+        175,
+        200,
+        286,
+        360
+      ],
+      "responseType": "standard",
+      "finishes": null,
+      "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/Y5s5g2HZNr6Um_t5iOK7dw/content",
+      "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-b_fis/series-ty-b-sprinklers"
+    },
+    {
+      "id": "tyco-ty4931",
+      "mfr": "Tyco",
+      "model": "Series TY-FRB TY4931",
+      "sin": "TY4931",
+      "category": "head_pendent",
+      "kFactor": 8.0,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        155,
+        175,
+        200,
+        286
+      ],
+      "responseType": "quick",
+      "finishes": null,
+      "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/JXGj~rL_f_FBVCY52uMTJw/content",
+      "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-frb_fis/series-ty-frb-sprinklers"
+    },
+    {
+      "id": "tyco-ty4951",
+      "mfr": "Tyco",
+      "model": "Series TY-B TY4951",
+      "sin": "TY4951",
+      "category": "head_pendent",
+      "kFactor": 8.0,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.5,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        135,
+        150,
+        155,
+        175,
+        200,
+        286,
+        360
+      ],
+      "responseType": "standard",
+      "finishes": null,
+      "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/Y5s5g2HZNr6Um_t5iOK7dw/content",
+      "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-b_fis/series-ty-b-sprinklers"
+    },
+    {
+      "id": "tyco-ty6226",
+      "mfr": "Tyco",
+      "model": "Model ESFR-1 TY6226",
+      "sin": "TY6226",
+      "category": "head_pendent",
+      "kFactor": 14.0,
+      "port": null,
+      "tempRatingsF": [
+        100,
+        165,
+        214
+      ],
+      "responseType": null,
+      "finishes": null,
+      "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/nceqcVPMarrl8RwvTtXH6A/content",
+      "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/storage"
+    },
+    {
+      "id": "tyco-ty7126",
+      "mfr": "Tyco",
+      "model": "Model ESFR-17 TY7126",
+      "sin": "TY7126",
+      "category": "head_upright",
+      "kFactor": 16.8,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 0.75,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        165,
+        212
+      ],
+      "responseType": null,
+      "finishes": null,
+      "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/piBCkF8DgCJI3dI0xFBMgw/content",
+      "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/storage"
+    },
+    {
+      "id": "tyco-ty9226",
+      "mfr": "Tyco",
+      "model": "Model ESFR-25 TY9226",
+      "sin": "TY9226",
+      "category": "head_pendent",
+      "kFactor": 25.2,
+      "port": {
+        "method": "THREADED_NPT",
+        "nominalSizeIn": 1.0,
+        "role": "INLET"
+      },
+      "tempRatingsF": [
+        165,
+        212
+      ],
+      "responseType": null,
+      "finishes": null,
+      "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/Hw0FcFvFTQeaX2w0E2C7UQ/content",
+      "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/storage/esfr-25_fis/model-esfr-25-sprinklers"
+    }
+  ]
+}
