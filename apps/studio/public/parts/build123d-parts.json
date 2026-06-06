@@ -208,46 +208,120 @@
       "key": "head_pendent",
       "source": "build123d",
       "productCode": "B123D-HEAD-PEND-050",
-      "name": "Pendent Head (parametric)",
+      "name": "Pendent Head 1/2 in (parametric)",
       "stepUrl": "/parts/build123d/head_pendent.step",
-      "sha256": "2f869283c2e6722508087c3370012bb50ad87671411d0c1bf8db8eb8e7338d8d",
+      "sha256": "70d471e7989647600d405d2e4a12d3f2edb764641855bb2dbae73210c6de89e3",
       "dimensions": {
         "nptSize": "1/2\"",
         "bodyLengthMm": 18.0,
         "deflectorDiaMm": 28.0,
         "kFactorLabel": "K5.6",
         "units": "mm"
-      }
+      },
+      "category": "head_pendent",
+      "nominalSizeIn": 0.5
+    },
+    {
+      "key": "head_pendent_075",
+      "source": "build123d",
+      "productCode": "B123D-HEAD-PEND-075",
+      "name": "Pendent Head 3/4 in (parametric)",
+      "stepUrl": "/parts/build123d/head_pendent_075.step",
+      "sha256": "585716f9654331673e11ac4cf524af9936c1f7c17cc7a7c3830ab2f7119e8d1f",
+      "dimensions": {
+        "nptSize": "3/4\"",
+        "bodyLengthMm": 20.0,
+        "deflectorDiaMm": 32.0,
+        "kFactorLabel": "K8.0",
+        "units": "mm"
+      },
+      "category": "head_pendent",
+      "nominalSizeIn": 0.75
+    },
+    {
+      "key": "head_pendent_100",
+      "source": "build123d",
+      "productCode": "B123D-HEAD-PEND-100",
+      "name": "Pendent Head 1 in (parametric)",
+      "stepUrl": "/parts/build123d/head_pendent_100.step",
+      "sha256": "f3fc61cc6081e0367d0baa2cb94970cb134a123eb10fb018f18d98627a258318",
+      "dimensions": {
+        "nptSize": "1\"",
+        "bodyLengthMm": 22.0,
+        "deflectorDiaMm": 36.0,
+        "kFactorLabel": "K8.0",
+        "units": "mm"
+      },
+      "category": "head_pendent",
+      "nominalSizeIn": 1.0
     },
     {
       "key": "head_sidewall",
       "source": "build123d",
       "productCode": "B123D-HEAD-SW-050",
-      "name": "Sidewall Head (parametric)",
+      "name": "Sidewall Head 1/2 in (parametric)",
       "stepUrl": "/parts/build123d/head_sidewall.step",
-      "sha256": "7f0da85b82925ecdd1fd9fe8802de56961be10bae2421d6b0eb9c4ec6ebfe931",
+      "sha256": "cb9118d55e1b153d9aeb397c6d7c4eb99ba538e407ae7529bc428627e456eb9f",
       "dimensions": {
         "nptSize": "1/2\"",
         "bodyLengthMm": 18.0,
         "deflectorDiaMm": 30.0,
         "kFactorLabel": "K5.6",
         "units": "mm"
-      }
+      },
+      "category": "head_sidewall",
+      "nominalSizeIn": 0.5
+    },
+    {
+      "key": "head_sidewall_100",
+      "source": "build123d",
+      "productCode": "B123D-HEAD-SW-100",
+      "name": "Sidewall Head 1 in (parametric)",
+      "stepUrl": "/parts/build123d/head_sidewall_100.step",
+      "sha256": "002d81e8afd2649cb376f7e7b0c068c6cea072cb29dc085417ab116d017d63f1",
+      "dimensions": {
+        "nptSize": "1\"",
+        "bodyLengthMm": 22.0,
+        "deflectorDiaMm": 38.0,
+        "kFactorLabel": "K8.0",
+        "units": "mm"
+      },
+      "category": "head_sidewall",
+      "nominalSizeIn": 1.0
     },
     {
       "key": "head_upright",
       "source": "build123d",
       "productCode": "B123D-HEAD-UPR-050",
-      "name": "Upright Head (parametric)",
+      "name": "Upright Head 1/2 in (parametric)",
       "stepUrl": "/parts/build123d/head_upright.step",
-      "sha256": "210f418a43212dae5bca76a73bba2cc6ffeb104d52d0c7c43fcbdc7280347542",
+      "sha256": "ba01e220f3105dfb1323ed569c7ca3f0ca45db470ffa3cfc7477ff8ce5372a5d",
       "dimensions": {
         "nptSize": "1/2\"",
         "bodyLengthMm": 18.0,
         "deflectorDiaMm": 28.0,
         "kFactorLabel": "K5.6",
         "units": "mm"
-      }
+      },
+      "category": "head_upright",
+      "nominalSizeIn": 0.5
+    },
+    {
+      "key": "head_upright_075",
+      "source": "build123d",
+      "productCode": "B123D-HEAD-UPR-075",
+      "name": "Upright Head 3/4 in (parametric)",
+      "stepUrl": "/parts/build123d/head_upright_075.step",
+      "sha256": "a9608ee8276d5759115164e316a85172a543d92abc3c5934c463b652e520ab48",
+      "dimensions": {
+        "nptSize": "3/4\"",
+        "bodyLengthMm": 20.0,
+        "deflectorDiaMm": 32.0,
+        "kFactorLabel": "K8.0",
+        "units": "mm"
+      },
+      "category": "head_upright",
+      "nominalSizeIn": 0.75
     },
     {
       "key": "pipe_sch10",

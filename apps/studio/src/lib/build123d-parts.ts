@@ -55,6 +55,17 @@ export interface Build123dPartEntry {
   sha256?: string;
   /** Explicit dimension spec the part was generated from. */
   dimensions?: Build123dDimensions;
+  /**
+   * OPTIONAL catalog HEAD category this part resolves to (head_pendent /
+   * head_upright / head_sidewall). Emitted only for size-specific head parts so
+   * catalog-geometry.ts can map a catalog SKU by (category, nominalSizeIn).
+   */
+  category?: string;
+  /**
+   * OPTIONAL nominal NPT size in INCHES (e.g. 0.5, 0.75, 1.0). Paired with
+   * `category` for the catalog-SKU geometry match. Absent for non-head parts.
+   */
+  nominalSizeIn?: number;
 }
 
 export interface Build123dManifest {

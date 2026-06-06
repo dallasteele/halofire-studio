@@ -73,6 +73,14 @@ class PartSpec:
     dims: dict[str, Any]
     # The geometry builder (closure over build123d, injected at run time).
     build: Callable[[Any, "PartSpec"], Any] = field(repr=False, default=None)  # type: ignore[assignment]
+    # OPTIONAL catalog head category this part resolves to (head_pendent /
+    # head_upright / head_sidewall). Lets src/lib/catalog-geometry.ts match a
+    # catalog SKU by (category, nominalSizeIn). None for non-head parts whose
+    # catalog mapping is by key only. Surfaced verbatim into the manifest entry.
+    category: str | None = None
+    # OPTIONAL nominal NPT size in INCHES this part resolves to (e.g. 0.5, 0.75,
+    # 1.0). Used together with `category` for the catalog-SKU geometry match.
+    nominal_size_in: float | None = None
 
     def dimensions(self) -> dict[str, Any]:
         out = dict(self.dims)
@@ -135,16 +143,34 @@ def _hex_prism(b: Any, across_flats: float, length: float, z0: float = 0.0) -> A
 # --------------------------------------------------------------------------- #
 
 
+# Real NPT nominal-size -> (thread boss OD mm, wrench hex across-flats mm).
+# Boss OD ~ the NPT major diameter (1/2" NPT ~ 21.2 mm, 3/4" NPT ~ 26.7 mm,
+# 1" NPT ~ 33.4 mm OD). Wrench flats are a defensible nominal per size. These
+# are honest parametric design intents, NOT manufacturer-measured values.
+_NPT_BOSS_HEX_MM: dict[str, tuple[float, float]] = {
+    '1/2"': (21.2, 19.0),
+    '3/4"': (26.7, 24.0),
+    '1"': (33.4, 30.0),
+}
+
+
+def _npt_boss_hex(spec: PartSpec) -> tuple[float, float]:
+    """Resolve (boss_dia_mm, hex_af_mm) for the spec's NPT size, defaulting to
+    the 1/2" geometry when the size string is not in the table (fail-safe)."""
+    npt = str(spec.dims.get("nptSize", '1/2"'))
+    return _NPT_BOSS_HEX_MM.get(npt, _NPT_BOSS_HEX_MM['1/2"'])
+
+
 def _build_pendent_head(b: Any, spec: PartSpec) -> Any:
     """Pendent sprinkler head: hex body + threaded boss stub + deflector disc.
 
-    Deterministic massing of a 1/2" NPT pendent head: a hex prism body, a
-    cylindrical thread boss on top, and a thin deflector disc below the frame.
+    Deterministic massing of an NPT pendent head: a hex prism body, a
+    cylindrical thread boss on top (OD scaled to the NPT nominal size), and a
+    thin deflector disc below the frame.
     """
     body_len = float(spec.dims["bodyLengthMm"])
     deflector_dia = float(spec.dims["deflectorDiaMm"])
-    hex_af = 19.0  # 3/4" wrench flats, mm
-    boss_dia = 21.0  # ~1/2" NPT boss OD
+    boss_dia, hex_af = _npt_boss_hex(spec)
     boss_len = 12.0
     deflector_thk = 1.6
 
@@ -158,8 +184,7 @@ def _build_upright_head(b: Any, spec: PartSpec) -> Any:
     """Upright head: hex body, thread boss BELOW, deflector disc ABOVE."""
     body_len = float(spec.dims["bodyLengthMm"])
     deflector_dia = float(spec.dims["deflectorDiaMm"])
-    hex_af = 19.0
-    boss_dia = 21.0
+    boss_dia, hex_af = _npt_boss_hex(spec)
     boss_len = 12.0
     deflector_thk = 1.6
 
@@ -174,8 +199,7 @@ def _build_sidewall_head(b: Any, spec: PartSpec) -> Any:
     to one side (sprays horizontally). Boss on the back (-Z)."""
     body_len = float(spec.dims["bodyLengthMm"])
     deflector_dia = float(spec.dims["deflectorDiaMm"])
-    hex_af = 19.0
-    boss_dia = 21.0
+    boss_dia, hex_af = _npt_boss_hex(spec)
     boss_len = 12.0
     plate_thk = 1.6
 
@@ -540,26 +564,74 @@ def specs() -> list[PartSpec]:
     """
     return [
         # ---- HEADS ----
+        # Size-specific head bodies covering the (category, NPT nominal size)
+        # combinations the manufacturer catalog actually uses (1/2", 3/4", 1").
+        # Each carries category + nominal_size_in so catalog-geometry.ts can map
+        # a catalog SKU to the right parametric body. The legacy unsuffixed keys
+        # (head_pendent / head_upright / head_sidewall) remain the 1/2" parts so
+        # the existing parts-manifest upgrade path is byte-stable.
         PartSpec(
             key="head_pendent",
-            name="Pendent Head (parametric)",
+            name="Pendent Head 1/2 in (parametric)",
             product_code="B123D-HEAD-PEND-050",
             dims={"nptSize": '1/2"', "bodyLengthMm": 18.0, "deflectorDiaMm": 28.0, "kFactorLabel": "K5.6"},
             build=_build_pendent_head,
+            category="head_pendent",
+            nominal_size_in=0.5,
+        ),
+        PartSpec(
+            key="head_pendent_075",
+            name="Pendent Head 3/4 in (parametric)",
+            product_code="B123D-HEAD-PEND-075",
+            dims={"nptSize": '3/4"', "bodyLengthMm": 20.0, "deflectorDiaMm": 32.0, "kFactorLabel": "K8.0"},
+            build=_build_pendent_head,
+            category="head_pendent",
+            nominal_size_in=0.75,
+        ),
+        PartSpec(
+            key="head_pendent_100",
+            name="Pendent Head 1 in (parametric)",
+            product_code="B123D-HEAD-PEND-100",
+            dims={"nptSize": '1"', "bodyLengthMm": 22.0, "deflectorDiaMm": 36.0, "kFactorLabel": "K8.0"},
+            build=_build_pendent_head,
+            category="head_pendent",
+            nominal_size_in=1.0,
         ),
         PartSpec(
             key="head_upright",
-            name="Upright Head (parametric)",
+            name="Upright Head 1/2 in (parametric)",
             product_code="B123D-HEAD-UPR-050",
             dims={"nptSize": '1/2"', "bodyLengthMm": 18.0, "deflectorDiaMm": 28.0, "kFactorLabel": "K5.6"},
             build=_build_upright_head,
+            category="head_upright",
+            nominal_size_in=0.5,
+        ),
+        PartSpec(
+            key="head_upright_075",
+            name="Upright Head 3/4 in (parametric)",
+            product_code="B123D-HEAD-UPR-075",
+            dims={"nptSize": '3/4"', "bodyLengthMm": 20.0, "deflectorDiaMm": 32.0, "kFactorLabel": "K8.0"},
+            build=_build_upright_head,
+            category="head_upright",
+            nominal_size_in=0.75,
         ),
         PartSpec(
             key="head_sidewall",
-            name="Sidewall Head (parametric)",
+            name="Sidewall Head 1/2 in (parametric)",
             product_code="B123D-HEAD-SW-050",
             dims={"nptSize": '1/2"', "bodyLengthMm": 18.0, "deflectorDiaMm": 30.0, "kFactorLabel": "K5.6"},
             build=_build_sidewall_head,
+            category="head_sidewall",
+            nominal_size_in=0.5,
+        ),
+        PartSpec(
+            key="head_sidewall_100",
+            name="Sidewall Head 1 in (parametric)",
+            product_code="B123D-HEAD-SW-100",
+            dims={"nptSize": '1"', "bodyLengthMm": 22.0, "deflectorDiaMm": 38.0, "kFactorLabel": "K8.0"},
+            build=_build_sidewall_head,
+            category="head_sidewall",
+            nominal_size_in=1.0,
         ),
         PartSpec(
             key="head_concealed",
@@ -847,7 +919,7 @@ def main() -> int:
             _normalize_step(step_path)
             _export_stl(b, solid, stl_path)
             sha = _sha256(step_path)
-            entries.append({
+            entry: dict[str, Any] = {
                 "key": spec.key,
                 "source": "build123d",
                 "productCode": spec.product_code,
@@ -855,7 +927,14 @@ def main() -> int:
                 "stepUrl": f"/parts/build123d/{spec.key}.step",
                 "sha256": sha,
                 "dimensions": spec.dimensions(),
-            })
+            }
+            # Catalog-SKU resolution hints (heads only). When present, these let
+            # catalog-geometry.ts map a catalog SKU by (category, nominalSizeIn).
+            if spec.category is not None:
+                entry["category"] = spec.category
+            if spec.nominal_size_in is not None:
+                entry["nominalSizeIn"] = spec.nominal_size_in
+            entries.append(entry)
             generated_keys.append(spec.key)
         except Exception as exc:  # noqa: BLE001
             # A failed part is skipped honestly; never write a fake STEP/entry.

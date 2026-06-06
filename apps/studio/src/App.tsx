@@ -60,6 +60,12 @@ import {
   loadManufacturerCatalog,
   type ManufacturerCatalog,
 } from './lib/manufacturer-catalog';
+import {
+  loadAiPlaceholderManifest,
+  resolveCatalogGeometryAll,
+  type AiPlaceholderManifest,
+  type CatalogGeometry,
+} from './lib/catalog-geometry';
 import { ManufacturerCatalogPanel } from './ManufacturerCatalogPanel';
 import { SystemPanel } from './SystemPanel';
 import { RULE_CONSTANT_COUNT } from './lib/nfpa13-rules';
@@ -136,6 +142,19 @@ declare global {
        */
       catalogPartCount: number;
       /**
+       * Number of catalog SKUs that resolve to REAL 3D geometry (build123d
+       * dimensioned-parametric or operator manufacturer-step). SKUs with no real
+       * asset resolve to "none" and are NOT counted. Honest by construction.
+       */
+      skusWithGeometry: number;
+      /**
+       * Number of AI-placeholder (visual_reference) assets resolved for catalog
+       * SKUs. 0 this run: the generate_3d_model image->3D backend is DOWN
+       * ([Errno 21] / gateway :19002 unreachable), so NO AI meshes were produced
+       * (fail-closed). Honest by construction.
+       */
+      aiPlaceholderCount: number;
+      /**
        * Number of ENCODED (non-null) NFPA-13 code constants in the rules table
        * (nfpa13-rules.RULES), each carrying its citation. Uncertain values are
        * left null with a cite-TODO and are NOT counted here. Honest by
@@ -165,6 +184,16 @@ export function App(): ReactElement {
   // REAL manufacturer catalog (Tyco / Reliable / … spec records from public data
   // sheets). Fail-soft: a missing/blocked file leaves this null -> 0 SKUs.
   const [mfrCatalog, setMfrCatalog] = useState<ManufacturerCatalog | null>(null);
+  // Loaded geometry-source manifests, retained so catalog SKUs can be resolved
+  // to real 3D geometry (resolveCatalogGeometryAll). All fail-soft to empty.
+  const [mfgStep, setMfgStep] = useState<ManufacturerStepManifest>({ entries: [] });
+  const [b123Manifest, setB123Manifest] = useState<Build123dManifest>({ entries: [] });
+  // AI placeholder manifest. EMPTY this run — the generate_3d_model image->3D
+  // backend is DOWN ([Errno 21] / gateway :19002 unreachable). aiPlaceholderCount
+  // is 0 (fail-closed) and stays 0 until a live backend produces real assets.
+  const [aiPlaceholder, setAiPlaceholder] = useState<AiPlaceholderManifest>({
+    entries: [],
+  });
 
   // Resolved bid price table. Starts as the representative fallback; once the
   // REAL pricebook medians (public/parts/pricebook-medians.json, generated from
@@ -199,10 +228,17 @@ export function App(): ReactElement {
       typeof fetch === 'function' ? fetch.bind(globalThis) : undefined,
     );
 
-    Promise.all([partsP, mfgP, b123P])
-      .then(([raw, mfg, b123]) => {
+    const aiP: Promise<AiPlaceholderManifest> = loadAiPlaceholderManifest(
+      typeof fetch === 'function' ? fetch.bind(globalThis) : undefined,
+    );
+
+    Promise.all([partsP, mfgP, b123P, aiP])
+      .then(([raw, mfg, b123, ai]) => {
         if (cancelled) return;
         setRecords(normalizeManifest(raw, mfg, b123));
+        setMfgStep(mfg);
+        setB123Manifest(b123);
+        setAiPlaceholder(ai);
       })
       .catch((e: unknown) => {
         if (cancelled) return;
@@ -262,6 +298,24 @@ export function App(): ReactElement {
 
   const catalogPartCount = mfrCatalog?.entries.length ?? 0;
 
+  // Resolve every catalog SKU to its BEST available 3D geometry by the priority
+  // ladder (manufacturer-step > build123d match > ai-placeholder > none). The
+  // honest, GX10-independent connection of the ingested SKUs to REAL geometry.
+  const catalogGeometry = useMemo(
+    () =>
+      resolveCatalogGeometryAll(mfrCatalog?.entries ?? [], {
+        manufacturerStep: mfgStep,
+        build123dParts: b123Manifest,
+        aiPlaceholder,
+      }),
+    [mfrCatalog, mfgStep, b123Manifest, aiPlaceholder],
+  );
+  const geometryById: Map<string, CatalogGeometry> = catalogGeometry.byId;
+  // Count of catalog SKUs that resolved to REAL geometry (anything != "none").
+  const skusWithGeometry = catalogGeometry.withGeometry;
+  // AI placeholder coverage. 0 this run (backend down, fail-closed).
+  const aiPlaceholderCount = aiPlaceholder.entries.length;
+
   const selected = useMemo(
     () => (records ? (records.find((p) => p.key === selectedKey) ?? null) : null),
     [records, selectedKey],
@@ -320,6 +374,8 @@ export function App(): ReactElement {
       manufacturerVerifiedCount,
       dimensionedParametricCount,
       catalogPartCount,
+      skusWithGeometry,
+      aiPlaceholderCount,
       systemRuleCount: RULE_CONSTANT_COUNT,
       footprintAreaSqft:
         footprint && !footprint.empty ? footprint.areaSqft : null,
@@ -336,6 +392,8 @@ export function App(): ReactElement {
     manufacturerVerifiedCount,
     dimensionedParametricCount,
     catalogPartCount,
+    skusWithGeometry,
+    aiPlaceholderCount,
     footprint,
     samAvailable,
   ]);
@@ -421,8 +479,11 @@ export function App(): ReactElement {
             <>
               <strong style={statusNumStyle}>{catalogPartCount}</strong>{' '}
               manufacturer SKUs{' '}
-              <span style={statusSepStyle}>·</span> spec records from public data
-              sheets
+              <span style={statusSepStyle}>·</span>{' '}
+              <strong style={statusNumStyle}>{skusWithGeometry}</strong> with 3D
+              geometry <span style={statusSepStyle}>·</span>{' '}
+              <strong style={statusNumStyle}>{aiPlaceholderCount}</strong> AI
+              placeholder
             </>
           ) : appMode === 'system' ? (
             <>
@@ -514,7 +575,10 @@ export function App(): ReactElement {
             <Inspector part={selected} />
           </>
         ) : appMode === 'mfr-catalog' ? (
-          <ManufacturerCatalogPanel catalog={mfrCatalog} />
+          <ManufacturerCatalogPanel
+            catalog={mfrCatalog}
+            geometryById={geometryById}
+          />
         ) : appMode === 'system' ? (
           <SystemPanel catalog={mfrCatalog} />
         ) : appMode === 'layout' ? (

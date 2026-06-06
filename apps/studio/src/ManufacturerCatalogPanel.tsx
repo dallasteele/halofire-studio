@@ -23,19 +23,45 @@ import {
   type CatalogPart,
   type ManufacturerCatalog,
 } from './lib/manufacturer-catalog';
+import type { CatalogGeometry } from './lib/catalog-geometry';
+import { badgeFor } from './lib/provenance';
+import { CatalogPartViewer } from './CatalogPartViewer';
 import { colors, radii, spacing, typeScale } from './lib/tokens';
 
 export interface ManufacturerCatalogPanelProps {
   catalog: ManufacturerCatalog | null;
+  /**
+   * Resolved geometry per SKU id (resolveCatalogGeometryAll). When omitted,
+   * every SKU shows the honest "no 3D geometry yet" note. Honest by
+   * construction — the panel never claims geometry it was not handed.
+   */
+  geometryById?: Map<string, CatalogGeometry> | null;
 }
 
 export function ManufacturerCatalogPanel({
   catalog,
+  geometryById,
 }: ManufacturerCatalogPanelProps): ReactElement {
   const [query, setQuery] = useState('');
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const entries = catalog?.entries ?? [];
   const filtered = useMemo(() => filterCatalog(entries, query), [entries, query]);
   const groups = useMemo(() => groupByManufacturer(filtered), [filtered]);
+
+  const selectedGeo =
+    selectedId && geometryById ? geometryById.get(selectedId) ?? null : null;
+  const selectedPart = selectedId
+    ? entries.find((p) => p.id === selectedId) ?? null
+    : null;
+  const withGeometryCount = useMemo(() => {
+    if (!geometryById) return 0;
+    let n = 0;
+    for (const p of entries) {
+      const g = geometryById.get(p.id);
+      if (g && g.source !== 'none') n += 1;
+    }
+    return n;
+  }, [entries, geometryById]);
 
   return (
     <section style={wrapStyle} aria-label="Manufacturer catalog">
@@ -57,6 +83,10 @@ export function ManufacturerCatalogPanel({
           <strong style={{ color: colors.textPrimary }}>{filtered.length}</strong>{' '}
           / {entries.length} SKUs
         </span>
+        <span style={countChipStyle} role="status" data-testid="skus-with-geometry">
+          <strong style={{ color: colors.textPrimary }}>{withGeometryCount}</strong>{' '}
+          with 3D geometry
+        </span>
       </div>
 
       <p style={provenanceNote}>
@@ -66,6 +96,7 @@ export function ManufacturerCatalogPanel({
         code-certified selections.
       </p>
 
+      <div style={bodyRowStyle}>
       <div className="hf-scroll" style={scrollStyle}>
         {entries.length === 0 ? (
           <p style={emptyStyle}>
@@ -99,8 +130,8 @@ export function ManufacturerCatalogPanel({
                       <span role="columnheader" style={colPort}>
                         Port
                       </span>
-                      <span role="columnheader" style={colTemp}>
-                        Temp °F
+                      <span role="columnheader" style={colGeo}>
+                        3D geometry
                       </span>
                       <span role="columnheader" style={colResp}>
                         Response
@@ -110,7 +141,13 @@ export function ManufacturerCatalogPanel({
                       </span>
                     </div>
                     {cat.parts.map((p) => (
-                      <CatalogRow key={p.id} part={p} />
+                      <CatalogRow
+                        key={p.id}
+                        part={p}
+                        geometry={geometryById?.get(p.id) ?? null}
+                        selected={p.id === selectedId}
+                        onSelect={setSelectedId}
+                      />
                     ))}
                   </div>
                 </div>
@@ -119,13 +156,64 @@ export function ManufacturerCatalogPanel({
           ))
         )}
       </div>
+
+      <aside style={viewerAsideStyle} aria-label="Selected part geometry">
+        {selectedPart && selectedGeo && selectedGeo.assetUrl &&
+        (selectedGeo.source === 'build123d' ||
+          selectedGeo.source === 'manufacturer-step') ? (
+          <>
+            <div style={viewerTitleStyle}>
+              {selectedPart.model}
+              {selectedPart.sin ? (
+                <span className="hf-mono" style={sinStyle}> · {selectedPart.sin}</span>
+              ) : null}
+            </div>
+            <CatalogPartViewer stepUrl={selectedGeo.assetUrl} />
+            <p style={viewerCaptionStyle}>
+              {selectedGeo.source === 'manufacturer-step'
+                ? 'Operator-supplied manufacturer STEP (manufacturer-verified).'
+                : 'build123d dimensioned-parametric body: REAL NPT thread nominal size, APPROXIMATE body/orifice (K-factor-informed). NOT manufacturer-exact, NOT AHJ / PE / code-certified.'}
+            </p>
+          </>
+        ) : (
+          <p style={viewerEmptyStyle}>
+            Select a SKU with resolved parametric geometry to preview its 3D
+            body. SKUs showing “no 3D geometry yet” have no real asset — the
+            studio never fabricates one.
+          </p>
+        )}
+      </aside>
+      </div>
     </section>
   );
 }
 
-function CatalogRow({ part }: { part: CatalogPart }): ReactElement {
+interface CatalogRowProps {
+  part: CatalogPart;
+  geometry: CatalogGeometry | null;
+  selected: boolean;
+  onSelect: (id: string) => void;
+}
+
+function CatalogRow({
+  part,
+  geometry,
+  selected,
+  onSelect,
+}: CatalogRowProps): ReactElement {
+  const hasGeometry = geometry != null && geometry.source !== 'none';
   return (
-    <div role="row" style={dataRowStyle}>
+    <div
+      role="row"
+      data-sku-id={part.id}
+      data-geometry-source={geometry?.source ?? 'none'}
+      style={{
+        ...dataRowStyle,
+        ...(selected ? selectedRowStyle : null),
+        ...(hasGeometry ? { cursor: 'pointer' } : null),
+      }}
+      onClick={hasGeometry ? () => onSelect(part.id) : undefined}
+    >
       <span role="cell" style={colModel}>
         <span style={modelNameStyle}>{part.model}</span>
         {part.sin ? (
@@ -140,10 +228,8 @@ function CatalogRow({ part }: { part: CatalogPart }): ReactElement {
       <span role="cell" style={colPort}>
         {formatPort(part)}
       </span>
-      <span role="cell" className="hf-mono" style={colTemp}>
-        {part.tempRatingsF && part.tempRatingsF.length > 0
-          ? part.tempRatingsF.join(', ')
-          : DASH}
+      <span role="cell" style={colGeo}>
+        <GeometryCell geometry={geometry} />
       </span>
       <span role="cell" style={colResp}>
         {part.responseType ?? DASH}
@@ -155,6 +241,7 @@ function CatalogRow({ part }: { part: CatalogPart }): ReactElement {
           rel="noopener noreferrer"
           style={linkStyle}
           title={`Open data sheet for ${part.model}`}
+          onClick={(e) => e.stopPropagation()}
         >
           data sheet ↗
         </a>
@@ -162,6 +249,48 @@ function CatalogRow({ part }: { part: CatalogPart }): ReactElement {
     </div>
   );
 }
+
+/**
+ * Geometry cell: a provenance-tier badge + source label when geometry resolved,
+ * or an honest "no 3D geometry yet" note when it did not. NEVER claims a tier
+ * the resolver did not return.
+ */
+function GeometryCell({
+  geometry,
+}: {
+  geometry: CatalogGeometry | null;
+}): ReactElement {
+  if (!geometry || geometry.source === 'none' || geometry.modelStatus === null) {
+    return <span style={noGeoStyle}>no 3D geometry yet</span>;
+  }
+  const badge = badgeFor(geometry.modelStatus);
+  return (
+    <span style={geoCellStyle}>
+      <span
+        style={{ ...geoBadgeStyle, background: `${badge.color}22`, color: badge.color, borderColor: `${badge.color}66` }}
+        title={badge.label}
+      >
+        {SOURCE_LABEL[geometry.source]}
+      </span>
+      <span style={geoTierStyle}>{TIER_SHORT[geometry.modelStatus]}</span>
+    </span>
+  );
+}
+
+const SOURCE_LABEL: Record<string, string> = {
+  'manufacturer-step': 'mfr STEP',
+  build123d: 'parametric',
+  'ai-placeholder': 'AI ref',
+  none: '—',
+};
+
+const TIER_SHORT: Record<string, string> = {
+  visual_reference: 'visual ref',
+  proxy: 'proxy',
+  dimensioned_parametric: 'dimensioned (approx body)',
+  manufacturer_verified: 'mfr-verified',
+  sealed_approved: 'sealed',
+};
 
 /* ------------------------------------------------------------- helpers */
 
@@ -351,12 +480,82 @@ const colModel: CSSProperties = {
 };
 const colK: CSSProperties = { textAlign: 'right' };
 const colPort: CSSProperties = { color: colors.textSecondary };
-const colTemp: CSSProperties = {
+const colGeo: CSSProperties = {
   color: colors.textSecondary,
   fontSize: typeScale.xs.size,
 };
 const colResp: CSSProperties = { color: colors.textSecondary };
 const colSheet: CSSProperties = { textAlign: 'right' };
+
+const selectedRowStyle: CSSProperties = {
+  background: colors.surfaceRaised,
+  boxShadow: `inset 3px 0 0 ${colors.accent}`,
+};
+
+const noGeoStyle: CSSProperties = {
+  color: colors.textMuted,
+  fontStyle: 'italic',
+  fontSize: typeScale.xs.size,
+};
+
+const geoCellStyle: CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 2,
+  minWidth: 0,
+};
+
+const geoBadgeStyle: CSSProperties = {
+  display: 'inline-block',
+  alignSelf: 'flex-start',
+  padding: '1px 6px',
+  borderRadius: radii.pill,
+  border: '1px solid',
+  fontSize: typeScale.xs.size,
+  fontWeight: 700,
+  whiteSpace: 'nowrap',
+};
+
+const geoTierStyle: CSSProperties = {
+  fontSize: typeScale.xs.size,
+  color: colors.textMuted,
+};
+
+const bodyRowStyle: CSSProperties = {
+  flex: 1,
+  minHeight: 0,
+  display: 'flex',
+  flexDirection: 'row',
+};
+
+const viewerAsideStyle: CSSProperties = {
+  width: 320,
+  flexShrink: 0,
+  borderLeft: `1px solid ${colors.border}`,
+  background: colors.surface,
+  padding: spacing[4],
+  overflowY: 'auto',
+};
+
+const viewerTitleStyle: CSSProperties = {
+  fontSize: typeScale.sm.size,
+  fontWeight: 700,
+  color: colors.textPrimary,
+  marginBottom: spacing[2],
+};
+
+const viewerCaptionStyle: CSSProperties = {
+  marginTop: spacing[3],
+  fontSize: typeScale.xs.size,
+  lineHeight: 1.5,
+  color: colors.accentText,
+};
+
+const viewerEmptyStyle: CSSProperties = {
+  fontSize: typeScale.xs.size,
+  lineHeight: 1.5,
+  color: colors.textMuted,
+};
 
 const modelNameStyle: CSSProperties = {
   whiteSpace: 'nowrap',

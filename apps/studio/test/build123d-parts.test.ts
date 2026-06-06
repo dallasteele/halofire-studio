@@ -354,6 +354,55 @@ describe('shipped build123d-parts.json (real generated artifacts)', () => {
     }
   });
 
+  it('grew to the FULL head-size-covered set (>=28 entries, was 24)', () => {
+    expect(manifest.entries.length).toBeGreaterThanOrEqual(28);
+  });
+
+  it('covers EVERY (head category, NPT size) combination the manufacturer catalog uses', () => {
+    // Read the REAL ingested manufacturer catalog and collect the head
+    // (category, nominalSizeIn) combinations that actually appear with a known
+    // size. The shipped build123d manifest MUST carry a parametric body for each.
+    const mfrCatalogPath = resolve(here, '../public/catalog/manufacturer-catalog.json');
+    const mfr = JSON.parse(readFileSync(mfrCatalogPath, 'utf-8')) as {
+      entries: { category: string; port: { nominalSizeIn: number | null } | null }[];
+    };
+    const HEAD_CATS = new Set(['head_pendent', 'head_upright', 'head_sidewall']);
+    const needed = new Set<string>();
+    for (const e of mfr.entries) {
+      const size = e.port?.nominalSizeIn;
+      if (!HEAD_CATS.has(e.category)) continue;
+      if (typeof size !== 'number' || !Number.isFinite(size)) continue;
+      needed.add(`${e.category}@${size}`);
+    }
+    expect(needed.size).toBeGreaterThan(0);
+
+    // What the build123d manifest covers (entries carrying category + size).
+    const covered = new Set<string>();
+    for (const e of manifest.entries) {
+      const cat = (e as { category?: string }).category;
+      const size = (e as { nominalSizeIn?: number }).nominalSizeIn;
+      if (typeof cat === 'string' && typeof size === 'number') {
+        covered.add(`${cat}@${size}`);
+      }
+    }
+
+    const missing = [...needed].filter((k) => !covered.has(k));
+    expect(missing).toEqual([]);
+  });
+
+  it('every head-size entry carries category + nominalSizeIn and a real sha256', () => {
+    const headSized = manifest.entries.filter(
+      (e) => typeof (e as { nominalSizeIn?: number }).nominalSizeIn === 'number',
+    );
+    expect(headSized.length).toBeGreaterThanOrEqual(7);
+    for (const e of headSized) {
+      expect(typeof (e as { category?: string }).category).toBe('string');
+      expect(typeof e.sha256).toBe('string');
+      expect((e.sha256 as string).length).toBe(64);
+      expect(isParametricVerified(e)).toBe(true);
+    }
+  });
+
   it('applyBuild123dParts upgrades MANY catalog records to dimensioned_parametric', () => {
     const records: PartRecord[] = catalog.components.map((c) => ({
       key: c.key,

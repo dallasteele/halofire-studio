@@ -37,6 +37,50 @@
       "format": "stl"
     },
     {
+      "key": "head_pendent_075",
+      "category": "heads",
+      "name": "Pendent sprinkler head (3/4 in)",
+      "required": false,
+      "manufacturerExact": false,
+      "source": "generated",
+      "present": false,
+      "file": null,
+      "format": null
+    },
+    {
+      "key": "head_pendent_100",
+      "category": "heads",
+      "name": "Pendent sprinkler head (1 in)",
+      "required": false,
+      "manufacturerExact": false,
+      "source": "generated",
+      "present": false,
+      "file": null,
+      "format": null
+    },
+    {
+      "key": "head_upright_075",
+      "category": "heads",
+      "name": "Upright sprinkler head (3/4 in)",
+      "required": false,
+      "manufacturerExact": false,
+      "source": "generated",
+      "present": false,
+      "file": null,
+      "format": null
+    },
+    {
+      "key": "head_sidewall_100",
+      "category": "heads",
+      "name": "Sidewall sprinkler head (1 in)",
+      "required": false,
+      "manufacturerExact": false,
+      "source": "generated",
+      "present": false,
+      "file": null,
+      "format": null
+    },
+    {
       "key": "head_concealed",
       "category": "heads",
       "name": "Concealed pendent sprinkler head",
@@ -105,7 +149,7 @@
     {
       "key": "fitting_elbow_90",
       "category": "fittings",
-      "name": "90° elbow",
+      "name": "90\u00c2\u00b0 elbow",
       "required": true,
       "manufacturerExact": false,
       "source": "generated",
@@ -116,7 +160,7 @@
     {
       "key": "fitting_elbow_45",
       "category": "fittings",
-      "name": "45° elbow",
+      "name": "45\u00c2\u00b0 elbow",
       "required": true,
       "manufacturerExact": false,
       "source": "generated",

@@ -1,0 +1,4 @@
+{
+  "_comment": "INTENTIONALLY EMPTY. The OpenClaw generate_3d_model image->3D backend is DOWN (server-side [Errno 21] Is a directory; gateway :19002 unreachable as of 2026-06-05). No AI placeholder meshes were generated this run — ai-placeholder coverage is 0 (fail-closed). See src/lib/ai-3d-invoker.ts.",
+  "entries": []
+}
