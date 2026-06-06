@@ -911,6 +911,31 @@ so AI placeholders are never mistaken for engineering-accurate CAD.
       verified (76 SKUs + 76 datasheet links render, honest banner present). FOLLOW-UPS: parse
       `finishes` (Table D/B tabular); expand to Viking/Victaulic/Senju/Globe/Potter/AGF; then
       NFPA-13 system/connectivity model (D) + image→3D via OpenClaw generate_3d_model (E).
+- [x] **T52 — NFPA-13 connectivity + system model (GX10-independent, pure logic, DESIGN AID).**
+      DONE 2026-06-05 (ultra workflow wf_4c31d702-6a8, TDD, both adversarial verifiers PASS).
+      The "how the parts fit together in a real code-compliant system" half. `src/lib/connectivity.ts`
+      = Port {method THREADED_NPT|GROOVED|FLANGED|THREADED_BSP|PLAIN_END|SOLDER, nominalSizeIn,
+      role INLET|OUTLET} + arePortsCompatible/checkPorts (match method+size or a REAL adapter,
+      opposing roles), a typed list of only physically-real adapters (Victaulic grooved-flange,
+      NPT reducing bushings 3/4x1/2 & 1x3/4, NPT x grooved nipple, BlazeMaster CPVC x NPT brass —
+      findAdapter exact+symmetric, no invented transitions), connectableSizesFor. `src/lib/system-model.ts`
+      = NFPA-13 wet-pipe topology graph supply->backflow->control_valve->system_valve->riser->
+      feed_main->cross_main->branch_line->head (+drain/ITC); buildSystem(spec) + validateSystem()
+      returning typed ok/warn/error findings each citing its rule (port mate-ability, over-area
+      coverage, min/max spacing, dangling topology, always-on disclaimer). `src/lib/nfpa13-rules.ts`
+      = ONLY published values, each CITED — max protection area (Light 225/Ord 130/Extra 100 ft^2),
+      max spacing 15/12 ft, wall <= 1/2 spacing, 6 ft min head-to-head, Hazen-Williams C-factors +
+      4.52 coefficient, Q=K*sqrt(P); uncertain values (K-bands, density/area curves) left null with
+      cite-TODO (NOT fabricated); citations flagged edition-dependent. `SystemPanel.tsx` + App
+      'System' mode: head SKU (from the real T51 catalog) + hazard selectors, builds an example
+      branch-line system, runs validateSystem, lists findings with cited NFPA sections under a
+      design-aid banner. window.__studio.systemRuleCount=22. HONESTY (both verifiers PASS; honesty
+      agent re-derived Q=K*sqrt(P) + Hazen-Williams in Python to full float precision, spot-checked
+      4+ constants vs real NFPA-13): DESIGN AID only — NOT code-compliant/AHJ/PE/for-construction
+      (disclaimer as code constant + UI banner + status + a validateSystem finding). Gates: 348
+      tests (51 new), tsc -b=0, vite build=0; preview-verified (System mode renders real findings,
+      e.g. coverage 177.8 > 130 ft^2 Ord-1 warn, with cited sections + banner). NEXT: image->3D via
+      OpenClaw generate_3d_model (E, ai-placeholder tier) + studio system-assembly view (F).
 
 ## AUTOSPRINK PARITY epic (the goal): close functional gaps to AutoSprink feature parity
 HONESTY CONTRACT: "parity" is tracked, not asserted. The `AUTOSPRINK_PARITY_INCOMPLETE`
