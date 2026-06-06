@@ -91,3 +91,8 @@ apps/halofire-studio-desktop/src-tauri/target/
 
 # SAM sidecar runtime audit log
 data/sam_requests.jsonl
+
+# Submittal raw extracts + rendered manufacturer cut-sheet pages (IP — analysis docs only are committed)
+docs/research/scanned/
+docs/research/submittal-pages.txt
+docs/research/submittal-pages.json
