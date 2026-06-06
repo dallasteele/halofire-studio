@@ -856,10 +856,26 @@ so AI placeholders are never mistaken for engineering-accurate CAD.
       TDD test/pdf-building.test.ts (35; shoelace area, scale-throw, honest-empty, injected
       pdfjs mock). vitest 214/214, tsc 0, vite build 0. VERIFIED in Claude's preview window:
       Building mode → Load sample → 1025 ft² L-shaped footprint renders clean in 3D + Plan.
-- [ ] **T48 — SAM raster-fallback lane, segmentation ONLY (hosted SAM 3, NOT GX10).**
-      Route scanned/raster plans through `services/halofire-sam` (hosted SAM 3 endpoint)
-      to produce 2D masks → polygon footprints, then reuse the OpenGeometry extrude path;
-      assert in code/tests that SAM NEVER produces part meshes.
+- [x] **T48 — SAM raster-fallback lane, segmentation ONLY (hosted SAM 3, NOT GX10).** DONE
+      2026-06-05 (ultra workflow w93zthbmh, both verifiers PASS). Built in apps/studio,
+      mirroring the proven autosprink sam-floorplan/sam-invoker pattern. src/lib/sam-floorplan.ts
+      (PURE except INJECTED invoker): buildSamPayload, segmentFloorPlanViaSam (usable
+      building_outline mask -> {ok,source:"sam-3",outlinePx}; invoker absent/non-function/
+      throws/empty/no-outline/degenerate -> FAIL-SOFT {skipped,reason} with NO outline —
+      NEVER fabricates a mask), reconstructFootprintFromSam (reuses T47 FootprintResult,
+      px->ft via operator scaleFtPerPx, method "sam-raster"; THROWS if scale missing/<=0;
+      skipped -> honest empty footprint). src/lib/sam-invoker.ts buildSamInvoker({bridgeUrl,
+      fetchImpl}) -> undefined (DISABLED) without a bridgeUrl, else POSTs {tool:
+      "sam_segment_floorplan",args} to bridgeUrl/codex-bridge/invoke. Building-mode raster
+      section (image input + required ft/px scale + Segment(SAM)) GATED disabled with honest
+      "SAM endpoint not configured — raster fallback unavailable" by default. window.__studio.samAvailable
+      (false by default). SAM is SEGMENTATION ONLY (2D mask, not 3D); SAM footprints labeled
+      raster-segmented, NOT vector-exact / AHJ / PE / code / construction. TDD test/sam-floorplan.test.ts
+      (24, mock invoker only, no real network; asserts no outline on every skip path + scale-throw).
+      vitest 238/238, tsc 0, vite build 0. VERIFIED in preview window: Building mode shows the
+      raster section + samAvailable=false + "SAM endpoint not configured" (honest fail-closed).
+      Real SAM run deferred (no SAM endpoint configured; OpenClaw bridge exposes no SAM tool) —
+      none claimed.
 - [ ] **T49 — wawasensei skill + viewer perf application (GX10-independent).** Author
       `skills/wawasensei/SKILL.md` (two-half R3F + image→3D content, three recipes, the
       unverified-post honesty note) and apply `<Instances>/<Instance>`, gltfjsx, `<Bvh>`,

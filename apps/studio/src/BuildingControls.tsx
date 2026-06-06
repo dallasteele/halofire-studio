@@ -32,6 +32,11 @@ import {
   type PdfjsLike,
   type VectorSegment,
 } from './lib/pdf-building';
+import {
+  segmentFloorPlanViaSam,
+  reconstructFootprintFromSam,
+  type SamInvoker,
+} from './lib/sam-floorplan';
 import { colors, radii, spacing, typeScale } from './lib/tokens';
 
 // Wire the pdfjs worker for the browser once at module load.
@@ -48,8 +53,12 @@ export const BUILDING_DISCLAIMER =
   'accuracy or parity is claimed. Engage a licensed fire-protection engineer for ' +
   'any real design.';
 
+/** Shown when no SAM endpoint is configured (the honest default). */
+export const SAM_UNAVAILABLE_MESSAGE =
+  'SAM endpoint not configured — raster fallback unavailable (vector PDFs work via the lane above)';
+
 export interface BuildingControlsProps {
-  /** Operator-supplied feet-per-PDF-point scale (REQUIRED for extraction). */
+  /** Operator-supplied feet-per-PDF-point scale (REQUIRED for vector extraction). */
   scaleFtPerPt: number;
   onScaleChange: (s: number) => void;
   pageIndex: number;
@@ -60,6 +69,17 @@ export interface BuildingControlsProps {
   onFootprint: (fp: FootprintResult | null) => void;
   /** Current footprint for the readout (null when none loaded). */
   footprint: FootprintResult | null;
+  /**
+   * T48 raster-fallback: operator-supplied feet-per-IMAGE-PIXEL scale (REQUIRED for
+   * SAM segmentation; never guessed).
+   */
+  rasterScaleFtPerPx: number;
+  onRasterScaleChange: (s: number) => void;
+  /**
+   * INJECTED SAM invoker. undefined => SAM DISABLED (the honest default): the
+   * raster fallback is gated unavailable. A real invoker enables segment.
+   */
+  samInvoker?: SamInvoker;
 }
 
 export function BuildingControls({
@@ -71,18 +91,27 @@ export function BuildingControls({
   onHeightChange,
   onFootprint,
   footprint,
+  rasterScaleFtPerPx,
+  onRasterScaleChange,
+  samInvoker,
 }: BuildingControlsProps): ReactElement {
   const ids = useId();
   const scaleId = `${ids}-scale`;
   const pageId = `${ids}-page`;
   const heightId = `${ids}-h`;
   const fileId = `${ids}-file`;
+  const rasterScaleId = `${ids}-rscale`;
+  const imageId = `${ids}-image`;
 
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // The raster image the operator picked (name only; bytes are not sent by default).
+  const [rasterImageRef, setRasterImageRef] = useState<string | null>(null);
 
   const scaleValid = Number.isFinite(scaleFtPerPt) && scaleFtPerPt > 0;
+  const rasterScaleValid = Number.isFinite(rasterScaleFtPerPx) && rasterScaleFtPerPx > 0;
+  const samAvailable = typeof samInvoker === 'function';
 
   async function handleFile(file: File): Promise<void> {
     setError(null);
@@ -130,6 +159,47 @@ export function BuildingControls({
       });
       onFootprint(fp);
       setStatus(`Loaded bundled sample (${sample.segments.length} wall segments).`);
+    } catch (e: unknown) {
+      onFootprint(null);
+      setError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  // T48 raster fallback: segment a SCANNED/RASTER plan via SAM (2D mask only), then
+  // reconstruct the footprint through the SAME T47 path. Gated: with no SAM endpoint
+  // configured (samInvoker undefined) the button is disabled and we say so plainly —
+  // we never pretend a SAM run happened.
+  async function handleSamSegment(): Promise<void> {
+    setError(null);
+    setStatus(null);
+    if (!samAvailable) {
+      setError(SAM_UNAVAILABLE_MESSAGE);
+      return;
+    }
+    if (!rasterScaleValid) {
+      setError(
+        'Enter a positive operator scale (ft per image pixel) before segmenting — the scale is operator-supplied and never guessed.',
+      );
+      return;
+    }
+    setBusy(true);
+    try {
+      const seg = await segmentFloorPlanViaSam({
+        invoker: samInvoker,
+        imageRef: rasterImageRef ?? undefined,
+        scaleFtPerPx: rasterScaleFtPerPx,
+      });
+      // reconstructFootprintFromSam handles both ok and skipped honestly (no fabrication).
+      const fp = reconstructFootprintFromSam(seg, { scaleFtPerPx: rasterScaleFtPerPx });
+      onFootprint(fp);
+      if (fp.empty) {
+        const reason = seg.ok ? 'no usable mask' : seg.reason;
+        setStatus(`SAM segmentation produced no usable building mask (${reason}). Nothing fabricated.`);
+      } else {
+        setStatus('Reconstructed footprint from SAM raster segmentation (2D mask only — raster-segmented, not vector-exact).');
+      }
     } catch (e: unknown) {
       onFootprint(null);
       setError(e instanceof Error ? e.message : String(e));
@@ -233,6 +303,76 @@ export function BuildingControls({
         </button>
       </div>
 
+      {/* T48 raster-fallback lane (SCANNED / RASTER plans with no vector layer). */}
+      <div style={rasterSectionStyle} aria-label="Raster plan fallback (SAM)">
+        <h3 style={subHeadingStyle}>Raster fallback (SAM)</h3>
+        <p style={hintStyle}>
+          For SCANNED / RASTER plans with NO vector layer. SAM produces a 2D segmentation
+          MASK ONLY (not 3D); its outline becomes the footprint. Vector PDFs should use the
+          lane above.
+        </p>
+
+        <div style={fieldWrapStyle}>
+          <label htmlFor={rasterScaleId} style={labelStyle}>
+            Operator scale (ft / image pixel) — required
+          </label>
+          <input
+            id={rasterScaleId}
+            type="number"
+            inputMode="decimal"
+            min={0}
+            step={0.001}
+            value={rasterScaleFtPerPx}
+            onChange={(e) => onRasterScaleChange(Number(e.target.value))}
+            style={{
+              ...inputStyle,
+              borderColor: rasterScaleValid ? colors.border : colors.danger,
+            }}
+            aria-invalid={!rasterScaleValid}
+          />
+          <p style={hintStyle}>Operator-supplied — NEVER guessed. e.g. 0.1 for 1px = 0.1 ft.</p>
+        </div>
+
+        <div style={fieldWrapStyle}>
+          <label htmlFor={imageId} style={labelStyle}>
+            Raster plan image
+          </label>
+          <input
+            id={imageId}
+            type="file"
+            accept="image/*"
+            disabled={busy}
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              setRasterImageRef(f ? f.name : null);
+            }}
+            style={fileInputStyle}
+          />
+        </div>
+
+        <button
+          type="button"
+          onClick={() => void handleSamSegment()}
+          disabled={busy || !samAvailable}
+          aria-disabled={busy || !samAvailable}
+          title={samAvailable ? undefined : SAM_UNAVAILABLE_MESSAGE}
+          style={{
+            ...sampleBtnStyle,
+            background: samAvailable ? colors.interactiveActive : colors.surfaceRaised,
+            color: samAvailable ? '#ffffff' : colors.textMuted,
+            cursor: samAvailable && !busy ? 'pointer' : 'not-allowed',
+          }}
+        >
+          {busy ? 'Segmenting…' : 'Segment (SAM)'}
+        </button>
+
+        {!samAvailable ? (
+          <p style={statusLineStyle} role="status">
+            {SAM_UNAVAILABLE_MESSAGE}
+          </p>
+        ) : null}
+      </div>
+
       {error ? (
         <p style={errorStyle} role="alert">
           {error}
@@ -310,6 +450,25 @@ const headingStyle: CSSProperties = {
   textTransform: 'uppercase',
   color: colors.textMuted,
   fontWeight: 600,
+};
+
+const subHeadingStyle: CSSProperties = {
+  fontSize: typeScale.xs.size,
+  margin: 0,
+  letterSpacing: '0.06em',
+  textTransform: 'uppercase',
+  color: colors.textSecondary,
+  fontWeight: 600,
+};
+
+const rasterSectionStyle: CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: spacing[3],
+  padding: `${spacing[3]} ${spacing[4]}`,
+  background: colors.surfaceRaised,
+  border: `1px solid ${colors.border}`,
+  borderRadius: radii.md,
 };
 
 const fieldGroupStyle: CSSProperties = {

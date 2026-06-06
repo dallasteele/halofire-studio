@@ -48,6 +48,7 @@ import { BuildingControls } from './BuildingControls';
 import { BuildingScene } from './BuildingScene';
 import { layoutHeads, type HazardClass } from './lib/layout';
 import type { FootprintResult } from './lib/pdf-building';
+import { buildSamInvoker } from './lib/sam-invoker';
 
 /**
  * Top-level app mode: the existing part gallery, the sprinkler layout tool, or the
@@ -74,6 +75,13 @@ declare global {
        * Only meaningful in building mode. Honest by construction.
        */
       footprintAreaSqft: number | null;
+      /**
+       * T48: whether the SAM raster-fallback lane is available (a SAM endpoint /
+       * invoker is configured). false by default — the studio never silently calls a
+       * network/SAM service, and the Building-mode UI says so plainly. Honest by
+       * construction.
+       */
+      samAvailable: boolean;
       /**
        * Number of records whose modelStatus === "manufacturer_verified" — i.e.
        * the count of operator-supplied manufacturer-STEP upgrades. With zero
@@ -107,6 +115,15 @@ export function App(): ReactElement {
   const [buildingPageIndex, setBuildingPageIndex] = useState(0);
   const [buildingHeightFt, setBuildingHeightFt] = useState(12);
   const [footprint, setFootprint] = useState<FootprintResult | null>(null);
+  // T48 raster-fallback (SAM) operator scale: feet per IMAGE PIXEL (never guessed).
+  const [rasterScaleFtPerPx, setRasterScaleFtPerPx] = useState(0.1);
+
+  // SAM invoker is DISABLED by default: no bridge URL is configured here, so
+  // buildSamInvoker returns undefined and the raster lane is gated unavailable. The
+  // studio NEVER silently calls a network/SAM service. (A future build can wire a
+  // bridgeUrl from config to enable it; tests inject a mock invoker directly.)
+  const samInvoker = useMemo(() => buildSamInvoker(), []);
+  const samAvailable = typeof samInvoker === 'function';
 
   useEffect(() => {
     let cancelled = false;
@@ -197,6 +214,7 @@ export function App(): ReactElement {
       dimensionedParametricCount,
       footprintAreaSqft:
         footprint && !footprint.empty ? footprint.areaSqft : null,
+      samAvailable,
     };
   }, [
     records,
@@ -208,6 +226,7 @@ export function App(): ReactElement {
     manufacturerVerifiedCount,
     dimensionedParametricCount,
     footprint,
+    samAvailable,
   ]);
 
   // R3F sizes its canvas via ResizeObserver, which can miss the first measure in
@@ -326,7 +345,9 @@ export function App(): ReactElement {
 
         <p style={disclaimerStyle}>
           {appMode === 'building'
-            ? 'best-effort vector-geometry extraction · scale is operator-supplied · NOT AHJ / PE-sealed / code-compliant · not for construction'
+            ? footprint && !footprint.empty && footprint.method === 'sam-raster'
+              ? 'best-effort SAM raster segmentation (2D mask only) · scale is operator-supplied · raster-segmented, NOT vector-exact / AHJ / PE-sealed / code-compliant · not for construction'
+              : 'best-effort vector-geometry extraction · scale is operator-supplied · NOT AHJ / PE-sealed / code-compliant · not for construction'
             : appMode === 'layout'
               ? 'best-effort spacing heuristic · NOT hydraulic / AHJ / PE-sealed / code-compliant · not for construction'
               : 'source: generated · NOT manufacturer-exact · not dimensionally-accurate / AHJ / fabrication-ready'}
@@ -405,6 +426,9 @@ export function App(): ReactElement {
               onHeightChange={setBuildingHeightFt}
               footprint={footprint}
               onFootprint={setFootprint}
+              rasterScaleFtPerPx={rasterScaleFtPerPx}
+              onRasterScaleChange={setRasterScaleFtPerPx}
+              samInvoker={samInvoker}
             />
 
             <main style={canvasWrapStyle} aria-label="Building footprint viewer">
