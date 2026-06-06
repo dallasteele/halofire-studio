@@ -24,6 +24,7 @@ import {
   type ManufacturerCatalog,
 } from './lib/manufacturer-catalog';
 import type { CatalogGeometry } from './lib/catalog-geometry';
+import type { ManufacturerVerifiedPart } from './lib/manufacturer-step';
 import { badgeFor } from './lib/provenance';
 import { CatalogPartViewer } from './CatalogPartViewer';
 import { colors, radii, spacing, typeScale } from './lib/tokens';
@@ -36,14 +37,26 @@ export interface ManufacturerCatalogPanelProps {
    * construction — the panel never claims geometry it was not handed.
    */
   geometryById?: Map<string, CatalogGeometry> | null;
+  /**
+   * STANDALONE imported manufacturer-verified parts (T54 import lane). These are
+   * REAL downloaded, licensed manufacturer STEP files at the TOP provenance tier
+   * (manufacturer_verified / engineeringAccurate). Empty by default.
+   */
+  verifiedParts?: ManufacturerVerifiedPart[] | null;
 }
 
 export function ManufacturerCatalogPanel({
   catalog,
   geometryById,
+  verifiedParts,
 }: ManufacturerCatalogPanelProps): ReactElement {
   const [query, setQuery] = useState('');
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  // Separate selection for the imported manufacturer-CAD section (T54). null =
+  // nothing picked. Selecting an imported part clears the catalog-SKU selection
+  // so the right-hand viewer shows exactly one thing.
+  const [selectedVerifiedId, setSelectedVerifiedId] = useState<string | null>(null);
+  const verified = verifiedParts ?? [];
   const entries = catalog?.entries ?? [];
   const filtered = useMemo(() => filterCatalog(entries, query), [entries, query]);
   const groups = useMemo(() => groupByManufacturer(filtered), [filtered]);
@@ -52,6 +65,9 @@ export function ManufacturerCatalogPanel({
     selectedId && geometryById ? geometryById.get(selectedId) ?? null : null;
   const selectedPart = selectedId
     ? entries.find((p) => p.id === selectedId) ?? null
+    : null;
+  const selectedVerified = selectedVerifiedId
+    ? verified.find((v) => v.id === selectedVerifiedId) ?? null
     : null;
   const withGeometryCount = useMemo(() => {
     if (!geometryById) return 0;
@@ -98,6 +114,50 @@ export function ManufacturerCatalogPanel({
 
       <div style={bodyRowStyle}>
       <div className="hf-scroll" style={scrollStyle}>
+        {verified.length > 0 ? (
+          <div style={verifiedSectionStyle} data-testid="imported-manufacturer-cad">
+            <h3 style={mfrHeadingStyle}>
+              Imported manufacturer CAD
+              <span style={mfrCountStyle}>
+                {verified.length} part{verified.length === 1 ? '' : 's'} ·
+                manufacturer-verified
+              </span>
+            </h3>
+            <p style={verifiedNoteStyle}>
+              REAL downloaded manufacturer STEP files — the TOP provenance tier
+              (manufacturer-verified, dimensionally accurate). Manufacturer CAD
+              (licensed, not for redistribution). NOT AHJ / PE / sealed / permit.
+            </p>
+            <div role="table" style={tableStyle}>
+              <div role="row" style={verifiedHeaderRowStyle}>
+                <span role="columnheader" style={vColModel}>
+                  Manufacturer / model
+                </span>
+                <span role="columnheader" style={vColCat}>
+                  Category
+                </span>
+                <span role="columnheader" style={vColTier}>
+                  Provenance
+                </span>
+                <span role="columnheader" style={vColSrc}>
+                  Source
+                </span>
+              </div>
+              {verified.map((v) => (
+                <VerifiedRow
+                  key={v.id}
+                  part={v}
+                  selected={v.id === selectedVerifiedId}
+                  onSelect={(id) => {
+                    setSelectedVerifiedId(id);
+                    setSelectedId(null);
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        ) : null}
+
         {entries.length === 0 ? (
           <p style={emptyStyle}>
             No manufacturer catalog loaded. Run{' '}
@@ -146,7 +206,10 @@ export function ManufacturerCatalogPanel({
                         part={p}
                         geometry={geometryById?.get(p.id) ?? null}
                         selected={p.id === selectedId}
-                        onSelect={setSelectedId}
+                        onSelect={(id) => {
+                          setSelectedId(id);
+                          setSelectedVerifiedId(null);
+                        }}
                       />
                     ))}
                   </div>
@@ -158,7 +221,48 @@ export function ManufacturerCatalogPanel({
       </div>
 
       <aside style={viewerAsideStyle} aria-label="Selected part geometry">
-        {selectedPart && selectedGeo && selectedGeo.assetUrl &&
+        {selectedVerified ? (
+          <div data-testid="imported-cad-viewer">
+            <div style={viewerTitleStyle}>
+              {selectedVerified.manufacturer}
+              <span className="hf-mono" style={sinStyle}>
+                {' '}· {selectedVerified.productCode}
+              </span>
+            </div>
+            <span
+              style={{
+                ...geoBadgeStyle,
+                marginBottom: spacing[2],
+                background: `${badgeFor('manufacturer_verified').color}22`,
+                color: badgeFor('manufacturer_verified').color,
+                borderColor: `${badgeFor('manufacturer_verified').color}66`,
+              }}
+              title={badgeFor('manufacturer_verified').label}
+            >
+              manufacturer-verified
+            </span>
+            <CatalogPartViewer stepUrl={selectedVerified.stepUrl} />
+            <p style={viewerCaptionStyle}>
+              Manufacturer CAD (licensed, not for redistribution). Dimensionally
+              accurate manufacturer STEP{' '}
+              {selectedVerified.license ? `(${selectedVerified.license})` : ''}.
+              NOT AHJ / PE / sealed / permit / for-construction.
+            </p>
+            {selectedVerified.sourceUrl ? (
+              <p style={viewerCaptionStyle}>
+                Source:{' '}
+                <a
+                  href={selectedVerified.sourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={linkStyle}
+                >
+                  {selectedVerified.sourceUrl} ↗
+                </a>
+              </p>
+            ) : null}
+          </div>
+        ) : selectedPart && selectedGeo && selectedGeo.assetUrl &&
         (selectedGeo.source === 'build123d' ||
           selectedGeo.source === 'manufacturer-step') ? (
           <>
@@ -274,6 +378,73 @@ function GeometryCell({
       </span>
       <span style={geoTierStyle}>{TIER_SHORT[geometry.modelStatus]}</span>
     </span>
+  );
+}
+
+interface VerifiedRowProps {
+  part: ManufacturerVerifiedPart;
+  selected: boolean;
+  onSelect: (id: string) => void;
+}
+
+/**
+ * One imported manufacturer-verified part row. Always selectable (it always has a
+ * real STEP). The provenance badge is the green manufacturer_verified tier; the
+ * caption (in the viewer aside) carries the "licensed, not for redistribution"
+ * + NOT-AHJ/PE honesty.
+ */
+function VerifiedRow({ part, selected, onSelect }: VerifiedRowProps): ReactElement {
+  const badge = badgeFor('manufacturer_verified');
+  return (
+    <div
+      role="row"
+      data-verified-id={part.id}
+      data-model-status="manufacturer_verified"
+      style={{
+        ...verifiedDataRowStyle,
+        ...(selected ? selectedRowStyle : null),
+        cursor: 'pointer',
+      }}
+      onClick={() => onSelect(part.id)}
+    >
+      <span role="cell" style={vColModel}>
+        <span style={modelNameStyle}>{part.manufacturer}</span>
+        <span className="hf-mono" style={sinStyle}>
+          {part.productCode}
+        </span>
+      </span>
+      <span role="cell" style={vColCat}>
+        {part.category ?? DASH}
+      </span>
+      <span role="cell" style={vColTier}>
+        <span
+          style={{
+            ...geoBadgeStyle,
+            background: `${badge.color}22`,
+            color: badge.color,
+            borderColor: `${badge.color}66`,
+          }}
+          title={badge.label}
+        >
+          mfr-verified
+        </span>
+      </span>
+      <span role="cell" style={vColSrc}>
+        {part.sourceUrl ? (
+          <a
+            href={part.sourceUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={linkStyle}
+            onClick={(e) => e.stopPropagation()}
+          >
+            source ↗
+          </a>
+        ) : (
+          DASH
+        )}
+      </span>
+    </div>
   );
 }
 
@@ -398,6 +569,54 @@ const scrollStyle: CSSProperties = {
 const mfrGroupStyle: CSSProperties = {
   marginBottom: spacing[6],
 };
+
+const verifiedSectionStyle: CSSProperties = {
+  marginBottom: spacing[6],
+};
+
+const verifiedNoteStyle: CSSProperties = {
+  margin: `${spacing[1]} 0 ${spacing[3]}`,
+  color: colors.accentText,
+  fontSize: typeScale.xs.size,
+  lineHeight: 1.5,
+};
+
+const vRowBase: CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: '2.6fr 1fr 1.2fr 0.9fr',
+  alignItems: 'center',
+  gap: spacing[3],
+  padding: `${spacing[2]} ${spacing[3]}`,
+};
+
+const verifiedHeaderRowStyle: CSSProperties = {
+  ...vRowBase,
+  background: colors.surfaceRaised,
+  fontSize: typeScale.xs.size,
+  fontWeight: 700,
+  textTransform: 'uppercase',
+  letterSpacing: '0.04em',
+  color: colors.textMuted,
+  borderBottom: `1px solid ${colors.border}`,
+};
+
+const verifiedDataRowStyle: CSSProperties = {
+  ...vRowBase,
+  fontSize: typeScale.sm.size,
+  color: colors.textPrimary,
+  borderBottom: `1px solid ${colors.border}`,
+  background: colors.surface,
+};
+
+const vColModel: CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 2,
+  minWidth: 0,
+};
+const vColCat: CSSProperties = { color: colors.textSecondary };
+const vColTier: CSSProperties = {};
+const vColSrc: CSSProperties = { textAlign: 'right' };
 
 const mfrHeadingStyle: CSSProperties = {
   display: 'flex',

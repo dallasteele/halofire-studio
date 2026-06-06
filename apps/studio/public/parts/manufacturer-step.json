@@ -1,3 +1,19 @@
 {
-  "entries": []
+  "entries": [
+    {
+      "key": "ksb-etanorm-fxe-125-100-200-2a",
+      "slug": "ksb-etanorm-fxe-125-100-200-2a",
+      "manufacturer": "KSB SE & Co. KGaA",
+      "productCode": "Etanorm FXE 125-100-200-2a",
+      "modelName": "Etanorm FXE 125-100-200-2a",
+      "category": "pump",
+      "stepUrl": "/parts/manufacturer-step/ksb-etanorm-fxe-125-100-200-2a.stp",
+      "stepFile": "/parts/manufacturer-step/ksb-etanorm-fxe-125-100-200-2a.stp",
+      "sha256": "E58B7EC32CB12D19CD0B6FA668D7BA732B3080F3481747DE11B0CA36601AA060",
+      "manufacturerExact": true,
+      "sourceUrl": "https://www.ksb.com/",
+      "license": "CADENAS 3Dfindit terms-of-use",
+      "ingestedFrom": "public/parts/manufacturer-incoming/ksb-etanorm-fxe-125-100-200-2a/Etanorm_FXE_125-100-200-2a.stp"
+    }
+  ]
 }

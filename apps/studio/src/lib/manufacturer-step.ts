@@ -52,6 +52,31 @@ export interface ManufacturerStepEntry {
     kFactor?: number;
     deflectorType?: string;
   };
+  // --- T54 import-lane fields (OPTIONAL; older upgrade-only entries omit them) ---
+  /**
+   * Stable slug for the imported folder (e.g. "ksb-etanorm-fxe-125-100-200-2a").
+   * The import script (scripts/import-manufacturer-step.mjs) uses this as both the
+   * folder name and the staged STEP filename (/parts/manufacturer-step/<slug>.stp).
+   * When present, this entry is a STANDALONE imported manufacturer part — it lists
+   * itself as a manufacturer_verified part even if no catalog SKU shares its key.
+   */
+  slug?: string;
+  /** Honest part category, e.g. "pump". Optional; defaults are never invented. */
+  category?: string;
+  /**
+   * Explicit operator/ingest confirmation that this is real manufacturer CAD.
+   * The import script writes this true; the honesty gate still REQUIRES a real
+   * stepUrl + sha256 — manufacturerExact alone never grants the upgrade.
+   */
+  manufacturerExact?: boolean;
+  /**
+   * License the licensed CAD was downloaded under (e.g.
+   * "CADENAS 3Dfindit terms-of-use"). Surfaced in the UI caption so the demo
+   * states plainly the binary is licensed and NOT for redistribution.
+   */
+  license?: string;
+  /** Provenance breadcrumb: the incoming folder the STEP was imported from. */
+  ingestedFrom?: string;
 }
 
 export interface ManufacturerStepManifest {
@@ -147,6 +172,72 @@ export function applyManufacturerStep(
       modelStatus: 'manufacturer_verified' as const,
     };
   });
+}
+
+/**
+ * A STANDALONE manufacturer-verified part derived from a manufacturer-step entry.
+ *
+ * This is the view-model the Manufacturer panel renders at the TOP provenance tier
+ * (manufacturer_verified). Unlike applyManufacturerStep (which UPGRADES an existing
+ * catalog SKU keyed by part-key), this surfaces an IMPORTED manufacturer STEP as its
+ * own part even when no catalog SKU shares its key — e.g. the KSB Etanorm pump.
+ *
+ * HONESTY (hard, fail-closed): produced ONLY for operator-verified entries (real
+ * stepUrl + sha256). modelStatus is ALWAYS "manufacturer_verified" and
+ * engineeringAccurate is ALWAYS true here — and ONLY here — because that is exactly
+ * what an operator-verified manufacturer STEP earns. It is NOT sealed/PE/AHJ.
+ */
+export interface ManufacturerVerifiedPart {
+  /** Stable id (slug when present, else the entry key). */
+  id: string;
+  manufacturer: string;
+  productCode: string;
+  modelName: string;
+  category: string | null;
+  /** Relative URL to the staged STEP file (/parts/manufacturer-step/<slug>.stp). */
+  stepUrl: string;
+  sha256: string;
+  sourceUrl: string | null;
+  license: string | null;
+  ingestedFrom: string | null;
+  /** Always 'manufacturer_verified' — the top dimensional tier (NOT sealed/PE). */
+  modelStatus: 'manufacturer_verified';
+  /** Always true — manufacturer CAD is the ONLY engineering-accurate tier. */
+  engineeringAccurate: true;
+}
+
+/**
+ * Derive the STANDALONE manufacturer-verified parts from a manifest. ONLY
+ * operator-verified entries (real stepUrl + sha256) participate; everything else
+ * is dropped (fail-safe — never fabricated). Deterministic: preserves entry order.
+ */
+export function manufacturerVerifiedParts(
+  manifest: ManufacturerStepManifest | null | undefined,
+): ManufacturerVerifiedPart[] {
+  const entries = manifest?.entries;
+  if (!Array.isArray(entries) || entries.length === 0) return [];
+  const out: ManufacturerVerifiedPart[] = [];
+  for (const e of entries) {
+    if (!isOperatorVerified(e)) continue;
+    const id = typeof e.slug === 'string' && e.slug.trim().length > 0 ? e.slug.trim() : e.key;
+    out.push({
+      id,
+      manufacturer: e.manufacturer,
+      productCode: e.productCode,
+      modelName: typeof e.modelName === 'string' && e.modelName.length > 0 ? e.modelName : e.productCode,
+      category: typeof e.category === 'string' && e.category.length > 0 ? e.category : null,
+      stepUrl: e.stepUrl,
+      // isOperatorVerified guarantees a non-empty string sha256.
+      sha256: (e.sha256 as string).trim(),
+      sourceUrl: typeof e.sourceUrl === 'string' && e.sourceUrl.length > 0 ? e.sourceUrl : null,
+      license: typeof e.license === 'string' && e.license.length > 0 ? e.license : null,
+      ingestedFrom:
+        typeof e.ingestedFrom === 'string' && e.ingestedFrom.length > 0 ? e.ingestedFrom : null,
+      modelStatus: 'manufacturer_verified',
+      engineeringAccurate: true,
+    });
+  }
+  return out;
 }
 
 /**

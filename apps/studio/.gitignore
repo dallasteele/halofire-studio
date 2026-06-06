@@ -2,3 +2,13 @@ node_modules/
 dist/
 *.log
 .vite/
+
+# Licensed manufacturer CAD (T54 import lane) — NOT for redistribution.
+# The incoming drop folders and the staged STEP binaries are gitignored; the
+# committed manifest (public/parts/manufacturer-step.json) references them by
+# url + sha256. The dev/build server still serves the local files for the demo.
+public/parts/manufacturer-incoming/
+public/parts/manufacturer-step/*.stp
+public/parts/manufacturer-step/*.step
+public/parts/manufacturer-step/*.STP
+public/parts/manufacturer-step/*.STEP

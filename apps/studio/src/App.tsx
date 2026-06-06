@@ -30,7 +30,9 @@ import {
 } from './lib/parts-manifest';
 import {
   loadManufacturerStepManifest,
+  manufacturerVerifiedParts,
   type ManufacturerStepManifest,
+  type ManufacturerVerifiedPart,
 } from './lib/manufacturer-step';
 import {
   loadBuild123dManifest,
@@ -67,6 +69,7 @@ import {
   type CatalogGeometry,
 } from './lib/catalog-geometry';
 import { ManufacturerCatalogPanel } from './ManufacturerCatalogPanel';
+import { AddCatalogPanel } from './AddCatalogPanel';
 import { SystemPanel } from './SystemPanel';
 import { RULE_CONSTANT_COUNT, type HazardClass as Nfpa13HazardClass } from './lib/nfpa13-rules';
 import { AssemblyControls } from './AssemblyControls';
@@ -130,11 +133,18 @@ declare global {
        */
       samAvailable: boolean;
       /**
-       * Number of records whose modelStatus === "manufacturer_verified" — i.e.
-       * the count of operator-supplied manufacturer-STEP upgrades. With zero
-       * operator entries (the shipped default) this is 0. Honest by construction.
+       * Number of manufacturer-verified parts — standalone imported manufacturer
+       * STEP files (T54 import lane) PLUS any legacy part records upgraded by an
+       * operator manufacturer-STEP. Each requires a real stepUrl + sha256. After
+       * the KSB Etanorm import this is 1. Honest by construction.
        */
       manufacturerVerifiedCount: number;
+      /**
+       * T54: whether the Add-Catalog UX is mounted + ready (both paths present:
+       * the fail-closed SAM drawing->CAD lane and the client-side STEP import
+       * affordance). true once the studio shell renders. Honest by construction.
+       */
+      addCatalogReady: boolean;
       /**
        * Number of records whose modelStatus === "dimensioned_parametric" — i.e.
        * the count of build123d-generated Tier-2 parts. Zero when build123d was
@@ -192,6 +202,8 @@ export function App(): ReactElement {
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   // Default "catalog" so existing behavior/tests are unaffected on load.
   const [appMode, setAppMode] = useState<AppMode>('catalog');
+  // Within Manufacturer mode: browse the catalog vs. the T54 Add-Catalog UX.
+  const [mfrView, setMfrView] = useState<'browse' | 'add'>('browse');
   // Sprinkler layout inputs (only used in layout mode).
   const [widthFt, setWidthFt] = useState(40);
   const [lengthFt, setLengthFt] = useState(60);
@@ -352,16 +364,23 @@ export function App(): ReactElement {
     [records],
   );
 
-  // K (manufacturer-verified) = count of records that earned the upgrade. With
-  // the shipped empty manifest this is 0 — the honest, visible truth that no
-  // operator entries have been ingested yet.
-  const manufacturerVerifiedCount = useMemo(
-    () =>
-      records
-        ? records.filter((r) => r.modelStatus === 'manufacturer_verified').length
-        : 0,
-    [records],
+  // STANDALONE imported manufacturer-verified parts (T54): REAL downloaded,
+  // licensed manufacturer STEP files surfaced at the top tier. Empty by default;
+  // after the KSB Etanorm import the manifest carries one operator-verified entry.
+  const manufacturerVerified: ManufacturerVerifiedPart[] = useMemo(
+    () => manufacturerVerifiedParts(mfgStep),
+    [mfgStep],
   );
+
+  // K (manufacturer-verified) = standalone imported manufacturer parts PLUS legacy
+  // part records that earned the upgrade. With the shipped empty manifest this is
+  // 0; after the KSB import it is 1. Honest, visible truth.
+  const manufacturerVerifiedCount = useMemo(() => {
+    const recordUpgrades = records
+      ? records.filter((r) => r.modelStatus === 'manufacturer_verified').length
+      : 0;
+    return manufacturerVerified.length + recordUpgrades;
+  }, [records, manufacturerVerified]);
 
   // D (dimensioned-parametric) = count of build123d Tier-2 records. Zero when
   // build123d was unavailable at generation time. Honest by construction.
@@ -458,6 +477,9 @@ export function App(): ReactElement {
       footprintAreaSqft:
         footprint && !footprint.empty ? footprint.areaSqft : null,
       samAvailable,
+      // The Add-Catalog UX is always mounted in mfr-catalog mode and both of its
+      // paths exist (fail-closed SAM lane + client-side STEP import). Ready true.
+      addCatalogReady: true,
     };
   }, [
     records,
@@ -666,10 +688,48 @@ export function App(): ReactElement {
             <Inspector part={selected} />
           </>
         ) : appMode === 'mfr-catalog' ? (
-          <ManufacturerCatalogPanel
-            catalog={mfrCatalog}
-            geometryById={geometryById}
-          />
+          <div style={mfrWrapStyle}>
+            <div role="radiogroup" aria-label="Manufacturer view" style={mfrSubNavStyle}>
+              <button
+                type="button"
+                role="radio"
+                aria-checked={mfrView === 'browse'}
+                onClick={() => setMfrView('browse')}
+                style={{
+                  ...segmentBtnStyle,
+                  background: mfrView === 'browse' ? colors.interactiveActive : 'transparent',
+                  color: mfrView === 'browse' ? '#ffffff' : colors.textSecondary,
+                  fontWeight: mfrView === 'browse' ? 600 : 500,
+                }}
+              >
+                Browse catalog
+              </button>
+              <button
+                type="button"
+                role="radio"
+                aria-checked={mfrView === 'add'}
+                onClick={() => setMfrView('add')}
+                data-testid="add-catalog-toggle"
+                style={{
+                  ...segmentBtnStyle,
+                  background: mfrView === 'add' ? colors.interactiveActive : 'transparent',
+                  color: mfrView === 'add' ? '#ffffff' : colors.textSecondary,
+                  fontWeight: mfrView === 'add' ? 600 : 500,
+                }}
+              >
+                Add Catalog
+              </button>
+            </div>
+            {mfrView === 'add' ? (
+              <AddCatalogPanel samInvoker={samInvoker} />
+            ) : (
+              <ManufacturerCatalogPanel
+                catalog={mfrCatalog}
+                geometryById={geometryById}
+                verifiedParts={manufacturerVerified}
+              />
+            )}
+          </div>
         ) : appMode === 'system' ? (
           <SystemPanel catalog={mfrCatalog} />
         ) : appMode === 'assembly' ? (
@@ -1004,4 +1064,24 @@ const canvasWrapStyle: CSSProperties = {
   minWidth: 0,
   minHeight: 0,
   background: colors.bgInset,
+};
+
+const mfrWrapStyle: CSSProperties = {
+  flex: 1,
+  minWidth: 0,
+  minHeight: 0,
+  display: 'flex',
+  flexDirection: 'column',
+  background: colors.bg,
+};
+
+const mfrSubNavStyle: CSSProperties = {
+  display: 'inline-flex',
+  alignSelf: 'flex-start',
+  gap: spacing[0.5],
+  margin: spacing[3],
+  background: colors.bgInset,
+  border: `1px solid ${colors.border}`,
+  borderRadius: radii.lg,
+  padding: spacing[0.5],
 };
