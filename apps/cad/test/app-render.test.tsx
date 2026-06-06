@@ -20,6 +20,8 @@ vi.mock('react-konva', () => {
     Line: Noop,
     Text: Noop,
     Rect: Noop,
+    Image: Noop,
+    Circle: Noop,
   };
 });
 

@@ -4,8 +4,9 @@
 // count honestly when a count is available, otherwise shows a labeled empty
 // state — it never fabricates parts. The real catalog wiring lands later.
 
-import { useState, type CSSProperties, type ReactElement } from 'react';
+import { useRef, useState, type CSSProperties, type ReactElement } from 'react';
 import { TOOLS, useCadStore, type ToolDef, type ToolId } from '../store';
+import { importFile } from '../lib/import-actions';
 import { colors, radii, spacing, typeScale } from '../lib/tokens';
 
 const GROUP_LABEL: Record<ToolDef['group'], string> = {
@@ -23,6 +24,7 @@ export function LeftPanel(): ReactElement {
 
   return (
     <aside style={panelStyle} aria-label="Tools and catalog">
+      <ImportSection />
       <section style={sectionStyle}>
         <h2 style={sectionTitleStyle}>Tools</h2>
         <div style={toolListStyle} className="hf-scroll">
@@ -48,6 +50,78 @@ export function LeftPanel(): ReactElement {
 
       <CatalogStub />
     </aside>
+  );
+}
+
+function ImportSection(): ReactElement {
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const setBuilding = useCadStore((s) => s.setBuilding);
+  const setUnderlay = useCadStore((s) => s.setUnderlay);
+  const setTool = useCadStore((s) => s.setTool);
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState<string | null>(null);
+  const [err, setErr] = useState(false);
+
+  async function onPick(file: File | null): Promise<void> {
+    if (!file) return;
+    setBusy(true);
+    setMsg(`Importing ${file.name}…`);
+    setErr(false);
+    try {
+      const outcome = await importFile(file);
+      setErr(!outcome.ok);
+      setMsg(outcome.message);
+      if (outcome.ok) {
+        if (outcome.underlay) setUnderlay(outcome.underlay);
+        if (outcome.building) {
+          // DXF lane: apply walls + real scale + source, then nudge to the scale
+          // tool so the operator can verify the auto-derived scale if they wish.
+          setBuilding(outcome.building);
+          setTool('set-scale');
+        } else {
+          // PDF lane: no geometry yet — guide the operator to set the scale first.
+          setTool('set-scale');
+        }
+      }
+    } catch (e) {
+      setErr(true);
+      setMsg(e instanceof Error ? e.message : 'Import failed');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <section style={importSectionStyle}>
+      <h2 style={sectionTitleStyle}>Import Plan</h2>
+      <input
+        ref={inputRef}
+        type="file"
+        accept=".dxf,.pdf,application/pdf"
+        style={{ display: 'none' }}
+        onChange={(e) => {
+          void onPick(e.target.files?.[0] ?? null);
+          e.target.value = '';
+        }}
+      />
+      <button
+        type="button"
+        onClick={() => inputRef.current?.click()}
+        disabled={busy}
+        style={importButtonStyle(busy)}
+      >
+        {busy ? 'Importing…' : 'Choose DXF or PDF…'}
+      </button>
+      <p style={importHintStyle}>
+        DXF imports walls + a real scale from its own coordinates. PDF loads as a
+        raster underlay — set the scale (two points) then trace.
+      </p>
+      {msg && (
+        <div style={importMsgStyle(err)} role={err ? 'alert' : 'status'}>
+          {msg}
+        </div>
+      )}
+    </section>
   );
 }
 
@@ -241,3 +315,42 @@ const catalogCountLabelStyle: CSSProperties = {
   color: colors.textMuted,
   fontSize: typeScale.xs.size,
 };
+
+const importSectionStyle: CSSProperties = {
+  borderBottom: `1px solid ${colors.border}`,
+  padding: spacing[3],
+  display: 'flex',
+  flexDirection: 'column',
+  gap: spacing[2],
+  flex: '0 0 auto',
+};
+
+function importButtonStyle(busy: boolean): CSSProperties {
+  return {
+    background: busy ? colors.surfaceRaised : colors.interactiveActive,
+    color: '#ffffff',
+    border: `1px solid ${colors.interactive}`,
+    borderRadius: radii.md,
+    padding: `${spacing[2]} ${spacing[2]}`,
+    fontSize: typeScale.sm.size,
+    fontWeight: 600,
+    cursor: busy ? 'default' : 'pointer',
+  };
+}
+
+const importHintStyle: CSSProperties = {
+  color: colors.textMuted,
+  fontSize: typeScale.xs.size,
+  lineHeight: 1.5,
+  margin: 0,
+};
+
+function importMsgStyle(err: boolean): CSSProperties {
+  return {
+    color: err ? colors.danger : colors.accentText,
+    fontSize: typeScale.xs.size,
+    lineHeight: 1.4,
+    fontFamily: 'var(--hf-font-mono)',
+    wordBreak: 'break-word',
+  };
+}
