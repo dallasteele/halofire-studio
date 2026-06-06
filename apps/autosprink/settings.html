@@ -33,8 +33,12 @@
   .stack{display:grid;gap:8px}
   .note{padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:rgba(255,255,255,.02)}
 </style>
+<!-- Shared HaloFire design system (AAA tokens + self-hosted fonts). Loaded
+     AFTER the legacy inline <style> so its :root bridge re-points the legacy
+     vars onto the token system without touching markup, ids, or JS. -->
+<link rel="stylesheet" href="/public/styles/halofire-tokens.css">
 </head>
-<body>
+<body class="hf-shell">
 <header>
   <div class="brand">Halo<span>Fire</span> · Settings &amp; Parity</div>
   <div class="nav"><a href="./workbench.html">Workbench</a><a href="./autosprink.html">Studio</a><a id="logout">Sign out</a></div>

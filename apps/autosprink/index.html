@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Halo Fire - Fire Protection Management Platform</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 /* ═══════════════════════════════════════════════════════════
    HALOFIRE PLATFORM — Golden Ratio Layout System
@@ -116,8 +115,12 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:55px;display:flex;ali
   .btn-main,.btn-outline{width:100%;text-align:center}
 }
 </style>
+<!-- Shared HaloFire design system (AAA tokens + self-hosted fonts). Loaded
+     AFTER the legacy inline <style> so its :root bridge re-points the legacy
+     --bg/--fire/--text vars onto the token system without touching markup. -->
+<link rel="stylesheet" href="/public/styles/halofire-tokens.css">
 </head>
-<body>
+<body class="hf-shell">
 <div id="loader"><div class="loader-mark"></div><div class="loader-label">HALOFIRE</div></div>
 
 <nav>

@@ -1,0 +1,407 @@
+/* HaloFire — shared design system (PLATFORM SHELL copy).
+ *
+ * This file mirrors the HaloFire Studio token system EXACTLY:
+ *   apps/studio/src/lib/tokens.ts      (typed source of truth)
+ *   apps/studio/src/styles/tokens.css  (reset + base + focus + motion)
+ *
+ * Every `--hf-*` custom property below is the same value emitted by the studio's
+ * cssVariablesBlock(). The WCAG-AAA palette, the ~1.25 modular type scale, the
+ * 4px spacing scale, radii, elevation, motion, and the focus-ring token are
+ * identical. If a color regresses below AAA the contrast-gate test fails — fix
+ * the color, never the assertion (see tests/design-tokens.test.js).
+ *
+ * Fonts are SELF-HOSTED (no Google-CDN runtime fetch): the latin weight-axis
+ * variable woff2 for Inter + JetBrains Mono are vendored into public/fonts/.
+ */
+
+/* --------------------------------------------------------- self-hosted fonts */
+
+@font-face {
+  font-family: 'Inter Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('/public/fonts/inter-latin-wght-normal.woff2') format('woff2-variations');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 800;
+  src: url('/public/fonts/jetbrains-mono-latin-wght-normal.woff2') format('woff2-variations');
+}
+
+/* ------------------------------------------------------------- design tokens */
+/* Mirrors cssVariablesBlock(':root') from apps/studio/src/lib/tokens.ts. */
+
+:root {
+  /* colors */
+  --hf-color-bg: #0e1318;
+  --hf-color-bg-inset: #11161d;
+  --hf-color-surface: #161c25;
+  --hf-color-surface-raised: #1d2530;
+  --hf-color-surface-hover: #232c39;
+  --hf-color-border: #2a323d;
+  --hf-color-border-strong: #3a4654;
+  --hf-color-text-primary: #f0f4f8;
+  --hf-color-text-secondary: #c4cdd8;
+  --hf-color-text-muted: #b8c1cb;
+  --hf-color-accent: #f0a868;
+  --hf-color-accent-text: #f4b87f;
+  --hf-color-interactive: #3b82f6;
+  --hf-color-interactive-text: #7fb4ff;
+  --hf-color-interactive-active: #1e40af;
+  --hf-color-success: #4ade80;
+  --hf-color-warn: #fbbf24;
+  --hf-color-danger: #fca5a5;
+  --hf-color-on-accent: #0e1318;
+
+  /* type scale (ratio ~1.25, 1rem = 16px base) */
+  --hf-font-size-xs: 0.75rem;
+  --hf-line-height-xs: 1.5;
+  --hf-font-weight-xs: 500;
+  --hf-font-size-sm: 0.875rem;
+  --hf-line-height-sm: 1.5;
+  --hf-font-weight-sm: 400;
+  --hf-font-size-base: 1rem;
+  --hf-line-height-base: 1.6;
+  --hf-font-weight-base: 400;
+  --hf-font-size-lg: 1.25rem;
+  --hf-line-height-lg: 1.45;
+  --hf-font-weight-lg: 500;
+  --hf-font-size-xl: 1.5625rem;
+  --hf-line-height-xl: 1.3;
+  --hf-font-weight-xl: 600;
+  --hf-font-size-2xl: 1.953125rem;
+  --hf-line-height-2xl: 1.2;
+  --hf-font-weight-2xl: 600;
+  --hf-font-size-3xl: 2.44140625rem;
+  --hf-line-height-3xl: 1.15;
+  --hf-font-weight-3xl: 700;
+
+  /* font stacks */
+  --hf-font-ui: 'Inter Variable', Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --hf-font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, SFMono-Regular, 'Cascadia Code', monospace;
+
+  /* 4px spacing scale */
+  --hf-space-px: 1px;
+  --hf-space-0_5: 0.125rem;
+  --hf-space-1: 0.25rem;
+  --hf-space-2: 0.5rem;
+  --hf-space-3: 0.75rem;
+  --hf-space-4: 1rem;
+  --hf-space-5: 1.25rem;
+  --hf-space-6: 1.5rem;
+  --hf-space-8: 2rem;
+  --hf-space-10: 2.5rem;
+  --hf-space-12: 3rem;
+
+  /* radii */
+  --hf-radius-none: 0;
+  --hf-radius-sm: 4px;
+  --hf-radius-md: 6px;
+  --hf-radius-lg: 10px;
+  --hf-radius-xl: 14px;
+  --hf-radius-pill: 999px;
+
+  /* elevation */
+  --hf-elevation-none: none;
+  --hf-elevation-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --hf-elevation-md: 0 4px 12px rgba(0, 0, 0, 0.45);
+  --hf-elevation-lg: 0 12px 32px rgba(0, 0, 0, 0.55);
+
+  /* motion */
+  --hf-duration-instant: 80ms;
+  --hf-duration-fast: 140ms;
+  --hf-duration-base: 220ms;
+  --hf-duration-slow: 360ms;
+  --hf-easing-standard: cubic-bezier(0.2, 0, 0, 1);
+  --hf-easing-emphasized: cubic-bezier(0.3, 0, 0, 1);
+  --hf-easing-decelerate: cubic-bezier(0, 0, 0, 1);
+
+  /* focus ring */
+  --hf-focus-width: 2px;
+  --hf-focus-offset: 2px;
+  --hf-focus-color: #7fb4ff;
+}
+
+/* ------------------------------------------------------------------- reset */
+/* Mirrors apps/studio/src/styles/tokens.css. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--hf-font-ui);
+  font-size: var(--hf-font-size-base);
+  line-height: var(--hf-line-height-base);
+  font-weight: var(--hf-font-weight-base);
+  color: var(--hf-color-text-primary);
+  background: var(--hf-color-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'cv01', 'cv03', 'ss01';
+  text-rendering: optimizeLegibility;
+}
+
+/* Technical text (keys, SKUs, numbers) uses the mono variable face with
+ * tabular figures so numbers align. */
+.hf-mono,
+code,
+kbd,
+samp {
+  font-family: var(--hf-font-mono);
+  font-feature-settings: 'tnum', 'zero';
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+/* --------------------------------------------------------------- focus ring */
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+:focus-visible {
+  outline: var(--hf-focus-width) solid var(--hf-focus-color);
+  outline-offset: var(--hf-focus-offset);
+  border-radius: var(--hf-radius-sm);
+}
+
+/* ----------------------------------------------------------- reduced motion */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Custom scrollbars — subtle, on-brand. */
+.hf-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--hf-color-border-strong) transparent;
+}
+.hf-scroll::-webkit-scrollbar {
+  width: 10px;
+}
+.hf-scroll::-webkit-scrollbar-thumb {
+  background: var(--hf-color-border-strong);
+  border-radius: var(--hf-radius-pill);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+.hf-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ===========================================================================
+ * PLATFORM-SHELL BRIDGE
+ *
+ * The deployed autosprink pages (index/app/settings) predate the token system
+ * and drive their chrome through their own legacy custom properties (--bg,
+ * --fire, --text, ...). To restyle them onto the AAA token system WITHOUT
+ * touching any markup, JS, ids, or data-* hooks, we re-point those legacy
+ * variables at the `--hf-*` tokens. The ember-flame-on-charcoal brand is
+ * preserved; contrast is lifted to AAA.
+ *
+ * `--fire` keeps the warm ember accent, but text/labels resolve to AAA-safe
+ * tokens so nothing drops below the gate.
+ * ======================================================================== */
+
+:root {
+  /* surfaces (charcoal layers) */
+  --bg: var(--hf-color-bg);
+  --surface: var(--hf-color-surface);
+  --surface2: var(--hf-color-surface-raised);
+
+  /* brand ember / halo gold / accent cyan -> token accents */
+  --fire: var(--hf-color-accent);
+  --fire-light: var(--hf-color-accent-text);
+  --fire-glow: rgba(240, 168, 104, 0.15);
+  --gold: var(--hf-color-accent);
+  --gold-bright: var(--hf-color-accent-text);
+  --cyan: var(--hf-color-interactive-text);
+  --green: var(--hf-color-success);
+
+  /* text */
+  --text: var(--hf-color-text-secondary);
+  --text-muted: var(--hf-color-text-muted);
+  --muted: var(--hf-color-text-muted);
+  --text-bright: var(--hf-color-text-primary);
+  --bright: var(--hf-color-text-primary);
+
+  /* borders */
+  --border: var(--hf-color-border);
+  --border-hover: var(--hf-color-border-strong);
+
+  /* fonts */
+  --font: var(--hf-font-ui);
+  --mono: var(--hf-font-mono);
+}
+
+/* Pull the page background + body type onto tokens regardless of legacy rules. */
+body.hf-shell {
+  background: var(--hf-color-bg);
+  color: var(--hf-color-text-primary);
+  font-family: var(--hf-font-ui);
+}
+
+/* Primary action surfaces (sign-in, submit, hero CTA) read white-on-charcoal
+ * with the ember as a strong border/glow so AAA contrast holds on the label.
+ * The filled-ember button keeps dark ink (onAccent) which clears AAA on accent. */
+.hf-shell .btn-sign,
+.hf-shell .btn-main,
+.hf-shell .submit-btn,
+.hf-shell button.hf-primary {
+  background: var(--hf-color-accent);
+  color: var(--hf-color-on-accent);
+  border-radius: var(--hf-radius-md);
+  font-weight: 600;
+}
+.hf-shell .btn-sign:hover,
+.hf-shell .btn-main:hover,
+.hf-shell .submit-btn:hover,
+.hf-shell button.hf-primary:hover {
+  background: var(--hf-color-accent-text);
+  color: var(--hf-color-on-accent);
+  box-shadow: var(--hf-elevation-md);
+}
+
+/* Card / panel chrome on tokens. */
+.hf-shell .kpi,
+.hf-shell .card,
+.hf-shell .login,
+.hf-shell .note {
+  background: var(--hf-color-surface);
+  border-color: var(--hf-color-border);
+  border-radius: var(--hf-radius-lg);
+}
+.hf-shell .kpi:hover {
+  border-color: var(--hf-color-border-strong);
+  box-shadow: var(--hf-elevation-sm);
+}
+
+/* KPI numerals: keep brand differentiation but on AAA-safe accent/interactive. */
+.hf-shell .kpi-num.c1 { color: var(--hf-color-accent); }
+.hf-shell .kpi-num.c2 { color: var(--hf-color-accent-text); }
+.hf-shell .kpi-num.c3 { color: var(--hf-color-interactive-text); }
+
+/* Form fields on tokens with a clear interactive focus border. */
+.hf-shell input,
+.hf-shell select,
+.hf-shell textarea {
+  background: var(--hf-color-surface-raised);
+  color: var(--hf-color-text-primary);
+  border: 1px solid var(--hf-color-border);
+  border-radius: var(--hf-radius-md);
+}
+.hf-shell input:focus,
+.hf-shell select:focus,
+.hf-shell textarea:focus {
+  border-color: var(--hf-color-interactive-text);
+  outline: none;
+}
+
+/* Generic in-card buttons (settings admin actions) -> filled ember, dark ink. */
+.hf-shell main button,
+.hf-shell .card button {
+  background: var(--hf-color-accent);
+  color: var(--hf-color-on-accent);
+  border-radius: var(--hf-radius-md);
+  font-weight: 600;
+}
+.hf-shell main button:hover,
+.hf-shell .card button:hover {
+  background: var(--hf-color-accent-text);
+  filter: none;
+}
+
+/* Status pills keep semantic meaning on AAA-safe semantic tokens. */
+.hf-shell .st.present,
+.hf-shell .st.satisfied,
+.hf-shell .st.linked,
+.hf-shell .st.true {
+  background: rgba(74, 222, 128, 0.16);
+  color: var(--hf-color-success);
+}
+.hf-shell .st.missing,
+.hf-shell .st.false,
+.hf-shell .st.blocked {
+  background: rgba(252, 165, 165, 0.16);
+  color: var(--hf-color-danger);
+}
+.hf-shell .st.partial,
+.hf-shell .st.gated,
+.hf-shell .st.unknown,
+.hf-shell .st.generated {
+  background: rgba(251, 191, 36, 0.16);
+  color: var(--hf-color-warn);
+}
+
+/* Links resolve to the interactive blue text token (AAA large tier). */
+.hf-shell a {
+  color: var(--hf-color-interactive-text);
+}
+
+/* Inline code / SKUs use the mono token + accent (AAA body on surfaces). */
+.hf-shell code {
+  color: var(--hf-color-accent);
+}
+
+/* Hero headline gradient: a real two-stop ember ramp (accent -> lighter ember). */
+.hf-shell .hero-h1 .accent {
+  background: linear-gradient(135deg, var(--hf-color-accent), var(--hf-color-accent-text));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Eyebrow / pulse / hero accents stay ember (token), not the old red. */
+.hf-shell .hero-eyebrow { color: var(--hf-color-accent-text); }
+.hf-shell .hero-eyebrow .pulse { background: var(--hf-color-accent); }
+
+/* Footer status dot -> success token. */
+.hf-shell .foot-dot { background: var(--hf-color-success); }
+
+/* Login error / inline errors -> danger token (AAA large tier). */
+.hf-shell .login-err,
+.hf-shell .err { color: var(--hf-color-danger); }
+
+/* Settings parity gate banner: ember-on-charcoal, token-driven, AAA label. */
+.hf-shell .gate {
+  background: linear-gradient(90deg, rgba(240, 168, 104, 0.14), rgba(240, 168, 104, 0.06));
+  border: 1px solid var(--hf-color-border-strong);
+  color: var(--hf-color-accent-text);
+  border-radius: var(--hf-radius-md);
+}
+
+/* Settings brand wordmark: ember accent on the "Fire". */
+.hf-shell .brand span { color: var(--hf-color-accent); }
