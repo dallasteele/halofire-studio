@@ -885,6 +885,32 @@ so AI placeholders are never mistaken for engineering-accurate CAD.
       toggle, instanced placement, click-to-select via `<Bvh>`), right inspector
       (provenance + dimension-verify status); connect catalog/build123d/AI/PDF services
       end-to-end and verify a full takeoff→3D flow in-browser with screenshots.
+- [x] **T51 — REAL manufacturer catalog ingestion (GX10-independent, public HTTP+PyMuPDF).**
+      DONE 2026-06-05 (ultra workflow wf_4269b1ae-3a4, TDD, both adversarial verifiers PASS).
+      Per the user ("get the online catalogs … build for all parts … real code-compliant
+      system"): `apps/studio/scripts/ingest-catalog/crawl.py` is a Python+PyMuPDF crawler
+      pulling REAL catalog SPEC records from public manufacturer data sheets — Tyco/Johnson
+      Controls khub datasheet PDFs (tyco-fire.com HTML is Incapsula-blocked for scripts, so
+      it crawls the authoritative datasheet PDFs the listing pages link to) and Reliable
+      bulletin PDFs (reliablesprinkler.com/files/bulletins/NNN.pdf, 22 bulletins). Extracts
+      SIN, K-factor, NPT size, orientation→category, temp ratings, response type. Output
+      `apps/studio/public/catalog/manufacturer-catalog.json` = 76 unique SINs (Tyco 30,
+      Reliable 46), 53 models, 32 datasheet URLs, K 2.8-25.2; every entry carries a real
+      http datasheetUrl. `finishes` nulled on ALL (tabular, not text-parseable — NULLED, not
+      fabricated; follow-up). 1 source (bulletin 104) failed and is recorded in `sources`.
+      NEW `src/lib/manufacturer-catalog.ts` (pure typed loader/parser — drops entries missing
+      mfr/model/datasheetUrl; groupByManufacturer; filterCatalog; fail-soft loader→empty) +
+      `src/ManufacturerCatalogPanel.tsx` + App 'Manufacturer' mode (searchable SKUs grouped by
+      mfr+category; row shows model/SIN, K-factor, port, temps, response, datasheet link).
+      `window.__studio.catalogPartCount=76`. HONESTY (both verifiers zero blocking; honesty
+      agent spot-checked 4 entries against LIVE datasheets — RA6322/F1FR80 K8.0, RA3533 K5.8,
+      TY1131 K2.8, TY9226 ESFR-25 K25.2): catalog SPEC records from public data sheets — NOT
+      manufacturer-exact geometry, NOT AHJ/PE/code-certified selections (banner in UI + JSON
+      disclaimer); real specs only; null where unparseable; no invented entries. Gates: 297
+      tests (22 new incl. shipped-file REAL-data assertions), tsc -b=0, vite build=0; preview-
+      verified (76 SKUs + 76 datasheet links render, honest banner present). FOLLOW-UPS: parse
+      `finishes` (Table D/B tabular); expand to Viking/Victaulic/Senju/Globe/Potter/AGF; then
+      NFPA-13 system/connectivity model (D) + image→3D via OpenClaw generate_3d_model (E).
 
 ## AUTOSPRINK PARITY epic (the goal): close functional gaps to AutoSprink feature parity
 HONESTY CONTRACT: "parity" is tracked, not asserted. The `AUTOSPRINK_PARITY_INCOMPLETE`
