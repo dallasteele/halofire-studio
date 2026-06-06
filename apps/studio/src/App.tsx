@@ -68,7 +68,14 @@ import {
 } from './lib/catalog-geometry';
 import { ManufacturerCatalogPanel } from './ManufacturerCatalogPanel';
 import { SystemPanel } from './SystemPanel';
-import { RULE_CONSTANT_COUNT } from './lib/nfpa13-rules';
+import { RULE_CONSTANT_COUNT, type HazardClass as Nfpa13HazardClass } from './lib/nfpa13-rules';
+import { AssemblyControls } from './AssemblyControls';
+import { AssemblyScene } from './AssemblyScene';
+import {
+  computeAssembly,
+  type ResolvedHeadGeometry,
+} from './lib/assembly-layout';
+import { resolveCatalogGeometry } from './lib/catalog-geometry';
 
 /**
  * Top-level app mode: the existing part gallery, the sprinkler layout tool, the
@@ -78,12 +85,14 @@ export type AppMode =
   | 'catalog'
   | 'mfr-catalog'
   | 'system'
+  | 'assembly'
   | 'layout'
   | 'building';
 const APP_MODES: readonly AppMode[] = [
   'catalog',
   'mfr-catalog',
   'system',
+  'assembly',
   'layout',
   'building',
 ] as const;
@@ -161,6 +170,17 @@ declare global {
        * construction — a design aid from published values, NOT code compliance.
        */
       systemRuleCount: number;
+      /**
+       * Number of placed parts (heads + pipes + fittings) in the current
+       * system-assembly view. Only meaningful in assembly mode. Honest by
+       * construction — a schematic design aid, not a coordinated model.
+       */
+      assemblyPartCount: number;
+      /**
+       * Number of sprinkler heads placed in the current assembly
+       * (= branchCount * headsPerBranch). Only meaningful in assembly mode.
+       */
+      assemblyHeadsPlaced: number;
     };
   }
 }
@@ -176,6 +196,12 @@ export function App(): ReactElement {
   const [widthFt, setWidthFt] = useState(40);
   const [lengthFt, setLengthFt] = useState(60);
   const [hazard, setHazard] = useState<HazardClass>('ordinary');
+  // System-assembly inputs (only used in assembly mode). Hazard uses the full
+  // NFPA-13 5-class enum (distinct from the layout's coarse 3-class enum).
+  const [assemblyHeadSku, setAssemblyHeadSku] = useState<string | null>(null);
+  const [assemblyHazard, setAssemblyHazard] = useState<Nfpa13HazardClass>('ordinary_1');
+  const [assemblyBranchCount, setAssemblyBranchCount] = useState(3);
+  const [assemblyHeadsPerBranch, setAssemblyHeadsPerBranch] = useState(4);
   // T47 building (vector-PDF) inputs (only used in building mode).
   const [buildingScaleFtPerPt, setBuildingScaleFtPerPt] = useState(0.125);
   const [buildingPageIndex, setBuildingPageIndex] = useState(0);
@@ -353,6 +379,56 @@ export function App(): ReactElement {
     [widthFt, lengthFt, hazard],
   );
 
+  // Head SKU options for assembly mode: catalog entries with a head category.
+  const assemblyHeadOptions = useMemo(
+    () =>
+      (mfrCatalog?.entries ?? []).filter((p) => p.category.startsWith('head')),
+    [mfrCatalog],
+  );
+
+  // Default the selected assembly head SKU to the first catalog head once loaded.
+  useEffect(() => {
+    if (assemblyHeadSku === null && assemblyHeadOptions.length > 0) {
+      setAssemblyHeadSku(assemblyHeadOptions[0].id);
+    }
+  }, [assemblyHeadSku, assemblyHeadOptions]);
+
+  // The chosen head SKU's resolved geometry (purely from already-loaded manifests).
+  // computeAssembly stays pure: we resolve here and pass the result down.
+  const assemblyHeadGeometry: ResolvedHeadGeometry | null = useMemo(() => {
+    const part = assemblyHeadOptions.find((p) => p.id === assemblyHeadSku) ?? null;
+    if (!part) return null;
+    const geo = resolveCatalogGeometry(part, {
+      manufacturerStep: mfgStep,
+      build123dParts: b123Manifest,
+      aiPlaceholder,
+    });
+    return {
+      source: geo.source,
+      build123dKey: geo.build123dKey,
+      modelStatus: geo.modelStatus,
+    };
+  }, [assemblyHeadOptions, assemblyHeadSku, mfgStep, b123Manifest, aiPlaceholder]);
+
+  // The computed system assembly (deterministic, pure layout).
+  const assembly = useMemo(
+    () =>
+      computeAssembly({
+        headSku: assemblyHeadSku ?? '',
+        hazard: assemblyHazard,
+        branchCount: assemblyBranchCount,
+        headsPerBranch: assemblyHeadsPerBranch,
+        headGeometry: assemblyHeadGeometry,
+      }),
+    [
+      assemblyHeadSku,
+      assemblyHazard,
+      assemblyBranchCount,
+      assemblyHeadsPerBranch,
+      assemblyHeadGeometry,
+    ],
+  );
+
   // Best-effort priced bid ESTIMATE for the current layout (deterministic).
   const bid = useMemo(
     () => estimateFullFromLayout({ widthFt, lengthFt, hazard }, { priceTable }),
@@ -377,6 +453,8 @@ export function App(): ReactElement {
       skusWithGeometry,
       aiPlaceholderCount,
       systemRuleCount: RULE_CONSTANT_COUNT,
+      assemblyPartCount: assembly.parts.length,
+      assemblyHeadsPlaced: assembly.headsPlaced,
       footprintAreaSqft:
         footprint && !footprint.empty ? footprint.areaSqft : null,
       samAvailable,
@@ -394,6 +472,8 @@ export function App(): ReactElement {
     catalogPartCount,
     skusWithGeometry,
     aiPlaceholderCount,
+    assembly.parts.length,
+    assembly.headsPlaced,
     footprint,
     samAvailable,
   ]);
@@ -491,6 +571,15 @@ export function App(): ReactElement {
               cited NFPA-13 values{' '}
               <span style={statusSepStyle}>·</span> design aid, not code-certified
             </>
+          ) : appMode === 'assembly' ? (
+            <>
+              <strong style={statusNumStyle}>{assembly.headsPlaced}</strong> heads{' '}
+              <span style={statusSepStyle}>·</span>{' '}
+              <strong style={statusNumStyle}>{assembly.parts.length}</strong> parts{' '}
+              <span style={statusSepStyle}>·</span>{' '}
+              <strong style={statusNumStyle}>{assembly.spacingFt}</strong> ft spacing{' '}
+              <span style={statusSepStyle}>·</span> schematic design aid
+            </>
           ) : appMode === 'building' ? (
             footprint && !footprint.empty ? (
               <>
@@ -533,6 +622,8 @@ export function App(): ReactElement {
             ? 'catalog SPEC records from public manufacturer data sheets · NOT manufacturer-exact geometry · NOT AHJ / PE / code-certified selections'
             : appMode === 'system'
             ? 'design aid based on published NFPA-13 values · NOT a certified hydraulic calculation · NOT AHJ-approved · NOT PE-sealed · NOT for construction'
+            : appMode === 'assembly'
+            ? 'schematic design-aid assembly from published NFPA-13 spacing + dimensioned-parametric parts · NOT a coordinated/clash-checked model · NOT manufacturer-exact · NOT AHJ / PE-sealed · NOT for construction'
             : appMode === 'building'
             ? footprint && !footprint.empty && footprint.method === 'sam-raster'
               ? 'best-effort SAM raster segmentation (2D mask only) · scale is operator-supplied · raster-segmented, NOT vector-exact / AHJ / PE-sealed / code-compliant · not for construction'
@@ -581,6 +672,43 @@ export function App(): ReactElement {
           />
         ) : appMode === 'system' ? (
           <SystemPanel catalog={mfrCatalog} />
+        ) : appMode === 'assembly' ? (
+          <>
+            <AssemblyControls
+              headSku={assemblyHeadSku}
+              hazard={assemblyHazard}
+              branchCount={assemblyBranchCount}
+              headsPerBranch={assemblyHeadsPerBranch}
+              headOptions={assemblyHeadOptions}
+              assembly={assembly}
+              onHeadSkuChange={setAssemblyHeadSku}
+              onHazardChange={setAssemblyHazard}
+              onBranchCountChange={setAssemblyBranchCount}
+              onHeadsPerBranchChange={setAssemblyHeadsPerBranch}
+            />
+
+            <main style={canvasWrapStyle} aria-label="System assembly viewer">
+              <Canvas
+                shadows
+                dpr={[1, 2]}
+                gl={{ preserveDrawingBuffer: true }}
+                camera={{
+                  position: [
+                    assembly.spacingFt * 2.2,
+                    assembly.spacingFt * 1.8 + 6,
+                    assembly.spacingFt * 2.2,
+                  ],
+                  up: [0, 1, 0],
+                  fov: 50,
+                }}
+                key={`assembly-${viewMode}-${assembly.parts.length}-${assembly.spacingFt}`}
+              >
+                <Suspense fallback={null}>
+                  <AssemblyScene assembly={assembly} viewMode={viewMode} />
+                </Suspense>
+              </Canvas>
+            </main>
+          </>
         ) : appMode === 'layout' ? (
           <>
             <LayoutControls
@@ -672,6 +800,7 @@ function AppModeControl({ appMode, onChange }: AppModeControlProps): ReactElemen
     { mode: 'catalog', label: 'Catalog' },
     { mode: 'mfr-catalog', label: 'Manufacturer' },
     { mode: 'system', label: 'System' },
+    { mode: 'assembly', label: 'Assembly' },
     { mode: 'layout', label: 'Layout' },
     { mode: 'building', label: 'Building' },
   ];
