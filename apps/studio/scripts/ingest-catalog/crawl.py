@@ -195,14 +195,6 @@ def _get(url: str, *, retries: int = 2, sleep: float = 1.0) -> requests.Response
     raise last if last else RuntimeError("unknown fetch error")
 
 
-def _pdf_text(content: bytes) -> str:
-    doc = fitz.open(stream=content, filetype="pdf")
-    try:
-        return "\n".join(doc[p].get_text() for p in range(doc.page_count))
-    finally:
-        doc.close()
-
-
 def _npt_size_to_in(raw: str) -> Optional[float]:
     """Parse a thread spec like '1/2 in. NPT' / '3/4" NPT' / '1 in. NPT' -> float."""
     if not raw:
@@ -240,6 +232,161 @@ def _temps_in_range(text: str) -> list:
     # Standard sprinkler temperature classifications top out at 650°F; ratings
     # below 100°F are not real ratings. Keep the plausible rating band only.
     return [v for v in vals if 100 <= v <= 650]
+
+
+# ---------------------------------------------------------------------------
+# Finish extraction (shared)
+#
+# Sprinkler finish lists live in tabular sections of the datasheets — Tyco's
+# per-K-factor "Sprinkler Finish" sub-columns + the part-number "SPRINKLER
+# FINISH" code block, and Reliable's "Table B". The flat text-regex extraction
+# used for SIN/K/NPT does NOT recover these grids, so we use PyMuPDF
+# find_tables() (column-aware) plus a targeted code-block regex. Every emitted
+# finish is a verbatim cell from the cited PDF — unparseable sheets yield null.
+# ---------------------------------------------------------------------------
+
+# Any cell mentioning a real finish/coating vocabulary token.
+_FINISH_KW = re.compile(
+    r"(brass|chrome|polyester|lead|wax|nickel|ptfe|bronze|alumin|black|white|"
+    r"paint|galvani|plated|coated|signal|natural|pure|jet|satin|dull|"
+    r"electroless|enamel|off white)",
+    re.IGNORECASE,
+)
+# A finish phrase must carry a finish *noun* (rejects bare "Pure White", header
+# noise like "Type" / "Temperature").
+_FINISH_NOUN = re.compile(
+    r"(brass|polyester|plated|coated|chrome|nickel|bronze|paint|alumin|enamel)",
+    re.IGNORECASE,
+)
+# A strictly clean, title-cased finish phrase (lowercase connectors allowed).
+# Used to reject garbled fragments parsed out of the dotted code block.
+_FINISH_STRICT = re.compile(r"^[A-Z][a-zA-Z]*(?:\s(?:[A-Z][a-zA-Z]*|over|or))*$")
+
+
+def _norm_finish(raw: str) -> str:
+    """Normalize a raw finish cell to a clean finish name (never fabricates).
+
+    Strips RAL color codes, footnote markers (parenthetical numbers, trailing
+    superscript/footnote digits, and a single footnote letter glued onto a known
+    finish word such as "Polyesterc"), collapses whitespace, title-cases an
+    ALL-CAPS cell, and restores the PTFE acronym.
+    """
+    s = re.sub(r"\(RAL\s*\d+\)", "", raw)
+    s = re.sub(r"\(\d+\)", "", s)             # footnote like "(3)"
+    s = re.sub(r"[*¹²³⁰-⁹]", "", s)
+    s = re.sub(r"\s+", " ", s).strip()
+    s = re.sub(r"\s*\d+$", "", s).strip()      # trailing footnote digit
+    s = re.sub(
+        r"\b(Polyester|Brass|Chrome|Bronze|Nickel|Lead|Wax|Plated|Coated|"
+        r"Aluminum|White|Black|PTFE)[a-z]\b",
+        r"\1",
+        s,
+    )
+    if s.isupper():
+        s = s.title()
+    s = re.sub(r"\bPtfe\b", "PTFE", s, flags=re.IGNORECASE)
+    return s.strip(" ,.")
+
+
+def _add_finish(out: list, cell: str) -> None:
+    """Append a normalized finish to `out` if non-empty and not already present."""
+    c = _norm_finish(cell)
+    if c and c.lower() not in {o.lower() for o in out}:
+        out.append(c)
+
+
+def _tyco_finishes(doc, text: str) -> Optional[list]:
+    """Parse the REAL sprinkler finish list from a Tyco TFP datasheet.
+
+    Two complementary in-PDF sources:
+      1. The finish sub-column headers of the per-K-factor / max-pressure tables
+         (find_tables) — e.g. "Natural Brass", "Chrome Plated", "Polyester",
+         "Lead Coated" / "Wax Coated". Clean and reliable.
+      2. The part-number "SPRINKLER FINISH ... TEMPERATURE RATINGS" coded block,
+         which additionally names the polyester color variants ("Pure White
+         Polyester", "Signal White Polyester", "Jet Black Polyester"). Only
+         strictly clean, title-cased phrases are accepted; garbled fragments are
+         dropped, never emitted.
+    Returns None when no finish table is parseable (honest null).
+    """
+    out: list = []
+    for pno in range(doc.page_count):
+        try:
+            tabs = doc[pno].find_tables()
+        except Exception:  # noqa: BLE001
+            continue
+        for t in tabs.tables:
+            rows = t.extract()
+            for ri, r in enumerate(rows):
+                if ri + 1 >= len(rows):
+                    continue
+                for cell in r:
+                    if cell and re.match(r"Sprinkler Finish", cell.strip()):
+                        for sub in rows[ri + 1]:
+                            if sub and _FINISH_KW.search(sub):
+                                _add_finish(out, sub)
+    m = re.search(r"SPRINKLER\s+FINISH\b(.*?)TEMPERATURE\s+RATINGS", text, re.DOTALL)
+    if m:
+        groups: list = []
+        cur: list = []
+        for ln in m.group(1).split("\n"):
+            ln = ln.strip()
+            if not ln:
+                continue
+            if re.fullmatch(r"\d{1,2}", ln):       # finish code -> group separator
+                if cur:
+                    groups.append(" ".join(cur))
+                    cur = []
+                continue
+            if re.fullmatch(r"[a-z*]{1,2}", ln):   # footnote marker line
+                continue
+            cur.append(ln)
+        if cur:
+            groups.append(" ".join(cur))
+        for g in groups:
+            c = _norm_finish(g)
+            if c and len(c) <= 28 and _FINISH_NOUN.search(c) and _FINISH_STRICT.match(c):
+                _add_finish(out, c)
+    return out or None
+
+
+def _reliable_finishes(doc) -> Optional[list]:
+    """Parse Reliable "Table B" sprinkler finishes from a bulletin PDF.
+
+    Table B is a 4-column grid: (Standard Finishes: Sprinkler | Escutcheons),
+    (Special Application Finishes: Sprinkler | Escutcheons). Only the columns
+    whose header cell is exactly "Sprinkler" are sprinkler finishes — the
+    Escutcheon columns are deliberately excluded. Returns None when no Table B
+    is parseable (honest null).
+    """
+    for pno in range(doc.page_count):
+        try:
+            tabs = doc[pno].find_tables()
+        except Exception:  # noqa: BLE001
+            continue
+        for t in tabs.tables:
+            rows = t.extract()
+            flat = " ".join(str(c) for r in rows for c in r if c)
+            if "Finishes" not in flat:
+                continue
+            hdr = None
+            for ri, r in enumerate(rows):
+                if any(c and c.strip() == "Sprinkler" for c in r):
+                    hdr = ri
+                    break
+            if hdr is None:
+                continue
+            cols = [
+                ci for ci, c in enumerate(rows[hdr]) if c and c.strip() == "Sprinkler"
+            ]
+            out: list = []
+            for r in rows[hdr + 1:]:
+                for ci in cols:
+                    if ci < len(r) and r[ci] and _FINISH_KW.search(r[ci]):
+                        _add_finish(out, r[ci])
+            if out:
+                return out
+    return None
 
 
 # ---------------------------------------------------------------------------
@@ -287,15 +434,20 @@ def _tyco_orientation_to_category(orient: Optional[str]) -> str:
 def crawl_tyco() -> tuple[list, list]:
     entries: list = []
     reports: list = []
-    for doc in TYCO_DOCS:
-        url = JC_BASE.format(id=doc["id"])
+    for doc_meta in TYCO_DOCS:
+        url = JC_BASE.format(id=doc_meta["id"])
         rep = SourceReport(mfr="Tyco/Johnson Controls", url=url)
         try:
             r = _get(url)
             ct = r.headers.get("content-type", "")
             if "pdf" not in ct:
                 raise RuntimeError(f"not a PDF (content-type={ct})")
-            text = _pdf_text(r.content)
+            doc = fitz.open(stream=r.content, filetype="pdf")
+            try:
+                text = "\n".join(doc[p].get_text() for p in range(doc.page_count))
+                finishes = _tyco_finishes(doc, text)
+            finally:
+                doc.close()
             tfp_m = re.search(r"\bTFP\d{2,4}\b", text)
             tfp = tfp_m.group(0) if tfp_m else None
             resp = _tyco_response_type(text)
@@ -331,15 +483,17 @@ def crawl_tyco() -> tuple[list, list]:
                         ),
                         tempRatingsF=temps,
                         responseType=resp,
-                        finishes=None,
+                        finishes=finishes,
                         datasheetUrl=url,
-                        sourceUrl=doc["landing"],
+                        sourceUrl=doc_meta["landing"],
                     ).__dict__
                 )
 
             # Format 2: single/low-count SIN datasheets (ESFR, concealed, etc.)
             if len(entries) == count_before:
-                for ent in _tyco_single_sin(text, url, doc["landing"], tfp, resp, temps):
+                for ent in _tyco_single_sin(
+                    text, url, doc_meta["landing"], tfp, resp, temps, finishes
+                ):
                     if ent["sin"] in seen:
                         continue
                     seen.add(ent["sin"])
@@ -365,7 +519,7 @@ def _tyco_series_name(text: str) -> str:
     return "Tyco"
 
 
-def _tyco_single_sin(text, url, landing, tfp, resp, temps) -> list:
+def _tyco_single_sin(text, url, landing, tfp, resp, temps, finishes) -> list:
     """Extract single-SIN datasheets (one SIN, spec block in body)."""
     out: list = []
     sins = re.findall(r"\bTY\d{3,4}\b", text)
@@ -426,7 +580,7 @@ def _tyco_single_sin(text, url, landing, tfp, resp, temps) -> list:
             else None,
             tempRatingsF=temps,
             responseType=resp,
-            finishes=None,
+            finishes=finishes,
             datasheetUrl=url,
             sourceUrl=landing,
         ).__dict__
@@ -544,7 +698,12 @@ def crawl_reliable() -> tuple[list, list]:
             ct = r.headers.get("content-type", "")
             if "pdf" not in ct:
                 raise RuntimeError(f"not a PDF (content-type={ct})")
-            text = _pdf_text(r.content)
+            doc = fitz.open(stream=r.content, filetype="pdf")
+            try:
+                text = "\n".join(doc[p].get_text() for p in range(doc.page_count))
+                finishes = _reliable_finishes(doc)
+            finally:
+                doc.close()
             resp = _reliable_response(text)
             temps = _reliable_temps(text)
             count_before = len(entries)
@@ -583,7 +742,7 @@ def crawl_reliable() -> tuple[list, list]:
                         else None,
                         tempRatingsF=temps,
                         responseType=resp,
-                        finishes=None,
+                        finishes=finishes,
                         datasheetUrl=url,
                         sourceUrl=url,
                     ).__dict__
@@ -636,7 +795,7 @@ def crawl_reliable() -> tuple[list, list]:
                             else None,
                             tempRatingsF=temps,
                             responseType=resp,
-                            finishes=None,
+                            finishes=finishes,
                             datasheetUrl=url,
                             sourceUrl=url,
                         ).__dict__

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-06T03:17:51.503729Z",
+  "generatedAt": "2026-06-06T04:18:34.745703Z",
   "disclaimer": "Catalog SPEC records extracted from PUBLIC manufacturer data sheets. Every field is a real extracted value; unparseable fields are null. These are NOT manufacturer-exact geometry and NOT AHJ / PE / code-certified selections. Verify against the governing NFPA 13 edition and stamped calcs before any bid / takeoff / permit use.",
   "sources": [
     {
@@ -196,7 +196,15 @@
         360
       ],
       "responseType": "standard",
-      "finishes": null,
+      "finishes": [
+        "Bronze",
+        "Electroless Nickel PTFE",
+        "Chrome Plated",
+        "Bright Brass",
+        "White Polyester",
+        "Satin Chrome",
+        "Custom Color Polyester"
+      ],
       "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/066.pdf",
       "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/066.pdf"
     },
@@ -221,7 +229,15 @@
         360
       ],
       "responseType": "standard",
-      "finishes": null,
+      "finishes": [
+        "Bronze",
+        "Electroless Nickel PTFE",
+        "Chrome Plated",
+        "Bright Brass",
+        "White Polyester",
+        "Satin Chrome",
+        "Custom Color Polyester"
+      ],
       "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/067.pdf",
       "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/067.pdf"
     },
@@ -247,7 +263,18 @@
         500
       ],
       "responseType": "standard",
-      "finishes": null,
+      "finishes": [
+        "Bronze (Unfinished)",
+        "Electroless Nickel PTFE",
+        "Chrome",
+        "Bright Brass",
+        "White Polyester",
+        "Satin Chrome",
+        "Custom Color Polyester",
+        "Lead Plated",
+        "Wax Coated",
+        "Wax Over Lead"
+      ],
       "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/071.pdf",
       "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/071.pdf"
     },
@@ -272,7 +299,15 @@
         360
       ],
       "responseType": "standard",
-      "finishes": null,
+      "finishes": [
+        "Bronze",
+        "Electroless Nickel PTFE",
+        "Chrome Plated",
+        "Bright Brass",
+        "White Polyester",
+        "Satin Chrome",
+        "Custom Color Polyester"
+      ],
       "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/066.pdf",
       "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/066.pdf"
     },
@@ -297,7 +332,15 @@
         360
       ],
       "responseType": "standard",
-      "finishes": null,
+      "finishes": [
+        "Bronze",
+        "Electroless Nickel PTFE",
+        "Chrome Plated",
+        "Bright Brass",
+        "White Polyester",
+        "Satin Chrome",
+        "Custom Color Polyester"
+      ],
       "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/067.pdf",
       "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/067.pdf"
     },
@@ -323,7 +366,18 @@
         500
       ],
       "responseType": "standard",
-      "finishes": null,
+      "finishes": [
+        "Bronze (Unfinished)",
+        "Electroless Nickel PTFE",
+        "Chrome",
+        "Bright Brass",
+        "White Polyester",
+        "Satin Chrome",
+        "Custom Color Polyester",
+        "Lead Plated",
+        "Wax Coated",
+        "Wax Over Lead"
+      ],
       "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/071.pdf",
       "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/071.pdf"
     },
@@ -349,7 +403,18 @@
         500
       ],
       "responseType": "standard",
-      "finishes": null,
+      "finishes": [
+        "Bronze (Unfinished)",
+        "Electroless Nickel PTFE",
+        "Chrome",
+        "Bright Brass",
+        "White Polyester",
+        "Satin Chrome",
+        "Custom Color Polyester",
+        "Lead Plated",
+        "Wax Coated",
+        "Wax Over Lead"
+      ],
       "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/071.pdf",
       "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/071.pdf"
     },
@@ -400,7 +465,18 @@
         500
       ],
       "responseType": "standard",
-      "finishes": null,
+      "finishes": [
+        "Bronze (Unfinished)",
+        "Electroless Nickel PTFE",
+        "Chrome",
+        "Bright Brass",
+        "White Polyester",
+        "Satin Chrome",
+        "Custom Color Polyester",
+        "Lead Plated",
+        "Wax Coated",
+        "Wax Over Lead"
+      ],
       "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/071.pdf",
       "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/071.pdf"
     },
@@ -444,7 +520,15 @@
         286
       ],
       "responseType": "quick",
-      "finishes": null,
+      "finishes": [
+        "Bronze",
+        "Electroless Nickel PTFE",
+        "Chrome Plated",
+        "Bright Brass",
+        "White Polyester",
+        "Satin Chrome",
+        "Custom Color Polyester"
+      ],
       "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/072.pdf",
       "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/072.pdf"
     },
@@ -468,7 +552,15 @@
         286
       ],
       "responseType": "quick",
-      "finishes": null,
+      "finishes": [
+        "Bronze",
+        "Electroless Nickel PTFE",
+        "Chrome Plated",
+        "Bright Brass",
+        "White Polyester",
+        "Satin Chrome",
+        "Custom Color Polyester"
+      ],
       "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/073.pdf",
       "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/073.pdf"
     },
@@ -492,7 +584,15 @@
         286
       ],
       "responseType": "quick",
-      "finishes": null,
+      "finishes": [
+        "Bronze",
+        "Electroless Nickel PTFE",
+        "Chrome",
+        "Bright Brass",
+        "White Polyester",
+        "Satin Chrome",
+        "Custom Color Polyester"
+      ],
       "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/074.pdf",
       "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/074.pdf"
     },
@@ -536,7 +636,16 @@
         286
       ],
       "responseType": "quick",
-      "finishes": null,
+      "finishes": [
+        "Bronze",
+        "Electroless Nickel PTFE",
+        "Chrome Plated",
+        "Bright Brass",
+        "White Polyester",
+        "Black Paint",
+        "Off White",
+        "Chrome Dull"
+      ],
       "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/183.pdf",
       "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/183.pdf"
     },
@@ -560,7 +669,15 @@
         286
       ],
       "responseType": "quick",
-      "finishes": null,
+      "finishes": [
+        "Bronze",
+        "Electroless Nickel PTFE",
+        "Chrome Plated",
+        "Bright Brass",
+        "White Polyester",
+        "Satin Chrome",
+        "Custom Color Polyester"
+      ],
       "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/072.pdf",
       "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/072.pdf"
     },
@@ -584,7 +701,15 @@
         286
       ],
       "responseType": "quick",
-      "finishes": null,
+      "finishes": [
+        "Bronze",
+        "Electroless Nickel PTFE",
+        "Chrome Plated",
+        "Bright Brass",
+        "White Polyester",
+        "Satin Chrome",
+        "Custom Color Polyester"
+      ],
       "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/073.pdf",
       "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/073.pdf"
     },
@@ -608,7 +733,15 @@
         286
       ],
       "responseType": "quick",
-      "finishes": null,
+      "finishes": [
+        "Bronze",
+        "Electroless Nickel PTFE",
+        "Chrome",
+        "Bright Brass",
+        "White Polyester",
+        "Satin Chrome",
+        "Custom Color Polyester"
+      ],
       "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/074.pdf",
       "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/074.pdf"
     },
@@ -632,7 +765,15 @@
         286
       ],
       "responseType": "quick",
-      "finishes": null,
+      "finishes": [
+        "Bronze",
+        "Electroless Nickel PTFE",
+        "Chrome",
+        "Bright Brass",
+        "White Polyester",
+        "Satin Chrome",
+        "Custom Color Polyester"
+      ],
       "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/074.pdf",
       "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/074.pdf"
     },
@@ -681,7 +822,15 @@
         286
       ],
       "responseType": "quick",
-      "finishes": null,
+      "finishes": [
+        "Bronze",
+        "Electroless Nickel PTFE",
+        "Chrome",
+        "Bright Brass",
+        "White Polyester",
+        "Satin Chrome",
+        "Custom Color Polyester"
+      ],
       "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/074.pdf",
       "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/074.pdf"
     },
@@ -706,7 +855,18 @@
         360
       ],
       "responseType": "standard",
-      "finishes": null,
+      "finishes": [
+        "Bronze",
+        "Electroless Nickel PTFE",
+        "Chrome",
+        "Bright Brass",
+        "White Polyester",
+        "Satin Chrome",
+        "Custom Color Polyester",
+        "Lead",
+        "Wax",
+        "Wax over Lead"
+      ],
       "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/075.pdf",
       "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/075.pdf"
     },
@@ -731,7 +891,18 @@
         360
       ],
       "responseType": "standard",
-      "finishes": null,
+      "finishes": [
+        "Bronze",
+        "Electroless Nickel PTFE",
+        "Chrome",
+        "Bright Brass",
+        "White Polyester",
+        "Satin Chrome",
+        "Custom Color Polyester",
+        "Lead",
+        "Wax",
+        "Wax over Lead"
+      ],
       "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/075.pdf",
       "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/075.pdf"
     },
@@ -755,7 +926,15 @@
         286
       ],
       "responseType": "quick",
-      "finishes": null,
+      "finishes": [
+        "Bronze",
+        "Electroless Nickel PTFE",
+        "Chrome",
+        "Bright Brass",
+        "White Polyester",
+        "Satin Chrome",
+        "Custom Color Polyester"
+      ],
       "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/077.pdf",
       "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/077.pdf"
     },
@@ -779,7 +958,15 @@
         286
       ],
       "responseType": "quick",
-      "finishes": null,
+      "finishes": [
+        "Bronze",
+        "Electroless Nickel PTFE",
+        "Chrome",
+        "Bright Brass",
+        "White Polyester",
+        "Satin Chrome",
+        "Custom Color Polyester"
+      ],
       "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/077.pdf",
       "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/077.pdf"
     },
@@ -803,7 +990,15 @@
         286
       ],
       "responseType": "quick",
-      "finishes": null,
+      "finishes": [
+        "Bronze",
+        "Electroless Nickel PTFE",
+        "Chrome",
+        "Bright Brass",
+        "White Polyester",
+        "Satin Chrome",
+        "Custom Color Polyester"
+      ],
       "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/077.pdf",
       "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/077.pdf"
     },
@@ -915,7 +1110,18 @@
         360
       ],
       "responseType": "standard",
-      "finishes": null,
+      "finishes": [
+        "Bronze",
+        "Electroless Nickel PTFE",
+        "Chrome Plated",
+        "Bright Brass",
+        "White Polyester",
+        "Satin Chrome",
+        "Custom Color Polyester",
+        "Lead Plated",
+        "Wax Coated",
+        "Wax Over Lead"
+      ],
       "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/062.pdf",
       "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/062.pdf"
     },
@@ -940,7 +1146,18 @@
         360
       ],
       "responseType": "standard",
-      "finishes": null,
+      "finishes": [
+        "Bronze",
+        "Electroless Nickel PTFE",
+        "Chrome Plated",
+        "Bright Brass",
+        "White Polyester",
+        "Satin Chrome",
+        "Custom Color Polyester",
+        "Lead Plated",
+        "Wax Coated",
+        "Wax Over Lead"
+      ],
       "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/062.pdf",
       "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/062.pdf"
     },
@@ -964,7 +1181,15 @@
         286
       ],
       "responseType": "quick",
-      "finishes": null,
+      "finishes": [
+        "Bronze",
+        "Electroless Nickel PTFE",
+        "Chrome Plated",
+        "Bright Brass",
+        "White Polyester",
+        "Satin Chrome",
+        "Custom Color Polyester"
+      ],
       "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/063.pdf",
       "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/063.pdf"
     },
@@ -988,7 +1213,15 @@
         286
       ],
       "responseType": "quick",
-      "finishes": null,
+      "finishes": [
+        "Bronze",
+        "Electroless Nickel PTFE",
+        "Chrome Plated",
+        "Bright Brass",
+        "White Polyester",
+        "Satin Chrome",
+        "Custom Color Polyester"
+      ],
       "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/063.pdf",
       "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/063.pdf"
     },
@@ -1213,7 +1446,18 @@
         360
       ],
       "responseType": "standard",
-      "finishes": null,
+      "finishes": [
+        "Bronze",
+        "Electroless Nickel PTFE",
+        "Chrome Plated",
+        "Bright Brass",
+        "White Polyester",
+        "Satin Chrome",
+        "Custom Color Polyester",
+        "Lead",
+        "Wax",
+        "Wax over Lead"
+      ],
       "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/076.pdf",
       "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/076.pdf"
     },
@@ -1238,7 +1482,18 @@
         360
       ],
       "responseType": "standard",
-      "finishes": null,
+      "finishes": [
+        "Bronze",
+        "Electroless Nickel PTFE",
+        "Chrome Plated",
+        "Bright Brass",
+        "White Polyester",
+        "Satin Chrome",
+        "Custom Color Polyester",
+        "Lead",
+        "Wax",
+        "Wax over Lead"
+      ],
       "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/076.pdf",
       "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/076.pdf"
     },
@@ -1262,7 +1517,15 @@
         286
       ],
       "responseType": "quick",
-      "finishes": null,
+      "finishes": [
+        "Bronze",
+        "Electroless Nickel PTFE",
+        "Chrome Plated",
+        "Bright Brass",
+        "White Polyester",
+        "Satin Chrome",
+        "Custom Color Polyester"
+      ],
       "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/078.pdf",
       "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/078.pdf"
     },
@@ -1286,7 +1549,15 @@
         286
       ],
       "responseType": "quick",
-      "finishes": null,
+      "finishes": [
+        "Bronze",
+        "Electroless Nickel PTFE",
+        "Chrome Plated",
+        "Bright Brass",
+        "White Polyester",
+        "Satin Chrome",
+        "Custom Color Polyester"
+      ],
       "datasheetUrl": "https://www.reliablesprinkler.com/files/bulletins/078.pdf",
       "sourceUrl": "https://www.reliablesprinkler.com/files/bulletins/078.pdf"
     },
@@ -1310,7 +1581,15 @@
         286
       ],
       "responseType": "quick",
-      "finishes": null,
+      "finishes": [
+        "Natural Brass",
+        "Chrome Plated",
+        "Polyester",
+        "Lead Coated",
+        "Pure White Polyester",
+        "Signal White Polyester",
+        "Jet Black Polyester"
+      ],
       "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/JXGj~rL_f_FBVCY52uMTJw/content",
       "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-frb_fis/series-ty-frb-sprinklers"
     },
@@ -1336,7 +1615,12 @@
         360
       ],
       "responseType": "standard",
-      "finishes": null,
+      "finishes": [
+        "Natural Brass",
+        "Chrome Plated",
+        "Polyester",
+        "Wax Coated"
+      ],
       "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/Y5s5g2HZNr6Um_t5iOK7dw/content",
       "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-b_fis/series-ty-b-sprinklers"
     },
@@ -1360,7 +1644,15 @@
         286
       ],
       "responseType": "quick",
-      "finishes": null,
+      "finishes": [
+        "Natural Brass",
+        "Chrome Plated",
+        "Polyester",
+        "Lead Coated",
+        "Pure White Polyester",
+        "Signal White Polyester",
+        "Jet Black Polyester"
+      ],
       "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/JXGj~rL_f_FBVCY52uMTJw/content",
       "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-frb_fis/series-ty-frb-sprinklers"
     },
@@ -1386,7 +1678,12 @@
         360
       ],
       "responseType": "standard",
-      "finishes": null,
+      "finishes": [
+        "Natural Brass",
+        "Chrome Plated",
+        "Polyester",
+        "Wax Coated"
+      ],
       "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/Y5s5g2HZNr6Um_t5iOK7dw/content",
       "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-b_fis/series-ty-b-sprinklers"
     },
@@ -1410,7 +1707,15 @@
         286
       ],
       "responseType": "quick",
-      "finishes": null,
+      "finishes": [
+        "Natural Brass",
+        "Chrome Plated",
+        "Polyester",
+        "Lead Coated",
+        "Pure White Polyester",
+        "Signal White Polyester",
+        "Jet Black Polyester"
+      ],
       "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/JXGj~rL_f_FBVCY52uMTJw/content",
       "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-frb_fis/series-ty-frb-sprinklers"
     },
@@ -1434,7 +1739,15 @@
         286
       ],
       "responseType": "quick",
-      "finishes": null,
+      "finishes": [
+        "Natural Brass",
+        "Chrome Plated",
+        "Polyester",
+        "Lead Coated",
+        "Pure White Polyester",
+        "Signal White Polyester",
+        "Jet Black Polyester"
+      ],
       "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/JXGj~rL_f_FBVCY52uMTJw/content",
       "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-frb_fis/series-ty-frb-sprinklers"
     },
@@ -1458,7 +1771,13 @@
         286
       ],
       "responseType": "quick",
-      "finishes": null,
+      "finishes": [
+        "Natural Brass",
+        "Chrome Plated",
+        "Polyester",
+        "Signal White Polyester",
+        "Jet Black Polyester"
+      ],
       "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/SC0wntXoMEz0fJHGSDFKYg/content",
       "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-frb_fis/series-ty-frb-sprinklers"
     },
@@ -1482,7 +1801,15 @@
         286
       ],
       "responseType": "quick",
-      "finishes": null,
+      "finishes": [
+        "Natural Brass",
+        "Chrome Plated",
+        "Polyester",
+        "Lead Coated",
+        "Pure White Polyester",
+        "Signal White Polyester",
+        "Jet Black Polyester"
+      ],
       "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/JXGj~rL_f_FBVCY52uMTJw/content",
       "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-frb_fis/series-ty-frb-sprinklers"
     },
@@ -1507,7 +1834,13 @@
         360
       ],
       "responseType": "standard",
-      "finishes": null,
+      "finishes": [
+        "Natural Brass",
+        "Chrome Plated",
+        "Polyester",
+        "Pure White Polyester",
+        "Signal White Polyester"
+      ],
       "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/sHaKx63LNR0Plc0DRhpTjA/content",
       "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-b_fis/series-ty-b-sprinklers"
     },
@@ -1533,7 +1866,12 @@
         360
       ],
       "responseType": "standard",
-      "finishes": null,
+      "finishes": [
+        "Natural Brass",
+        "Chrome Plated",
+        "Polyester",
+        "Wax Coated"
+      ],
       "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/Y5s5g2HZNr6Um_t5iOK7dw/content",
       "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-b_fis/series-ty-b-sprinklers"
     },
@@ -1557,7 +1895,13 @@
         286
       ],
       "responseType": "quick",
-      "finishes": null,
+      "finishes": [
+        "Natural Brass",
+        "Chrome Plated",
+        "Polyester",
+        "Signal White Polyester",
+        "Jet Black Polyester"
+      ],
       "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/SC0wntXoMEz0fJHGSDFKYg/content",
       "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-frb_fis/series-ty-frb-sprinklers"
     },
@@ -1581,7 +1925,15 @@
         286
       ],
       "responseType": "quick",
-      "finishes": null,
+      "finishes": [
+        "Natural Brass",
+        "Chrome Plated",
+        "Polyester",
+        "Lead Coated",
+        "Pure White Polyester",
+        "Signal White Polyester",
+        "Jet Black Polyester"
+      ],
       "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/JXGj~rL_f_FBVCY52uMTJw/content",
       "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-frb_fis/series-ty-frb-sprinklers"
     },
@@ -1606,7 +1958,13 @@
         360
       ],
       "responseType": "standard",
-      "finishes": null,
+      "finishes": [
+        "Natural Brass",
+        "Chrome Plated",
+        "Polyester",
+        "Pure White Polyester",
+        "Signal White Polyester"
+      ],
       "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/sHaKx63LNR0Plc0DRhpTjA/content",
       "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-b_fis/series-ty-b-sprinklers"
     },
@@ -1632,7 +1990,12 @@
         360
       ],
       "responseType": "standard",
-      "finishes": null,
+      "finishes": [
+        "Natural Brass",
+        "Chrome Plated",
+        "Polyester",
+        "Wax Coated"
+      ],
       "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/Y5s5g2HZNr6Um_t5iOK7dw/content",
       "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-b_fis/series-ty-b-sprinklers"
     },
@@ -1679,7 +2042,12 @@
         286
       ],
       "responseType": "quick/standard",
-      "finishes": null,
+      "finishes": [
+        "Natural Brass",
+        "Chrome Plated",
+        "Polyester",
+        "Signal White Polyester"
+      ],
       "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/GjYamLcgtxwHCclUKVEuNg/content",
       "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-frb_fis/series-ty-frb-sprinklers"
     },
@@ -1771,7 +2139,15 @@
         286
       ],
       "responseType": "quick",
-      "finishes": null,
+      "finishes": [
+        "Natural Brass",
+        "Chrome Plated",
+        "Polyester",
+        "Lead Coated",
+        "Pure White Polyester",
+        "Signal White Polyester",
+        "Jet Black Polyester"
+      ],
       "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/JXGj~rL_f_FBVCY52uMTJw/content",
       "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-frb_fis/series-ty-frb-sprinklers"
     },
@@ -1797,7 +2173,12 @@
         360
       ],
       "responseType": "standard",
-      "finishes": null,
+      "finishes": [
+        "Natural Brass",
+        "Chrome Plated",
+        "Polyester",
+        "Wax Coated"
+      ],
       "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/Y5s5g2HZNr6Um_t5iOK7dw/content",
       "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-b_fis/series-ty-b-sprinklers"
     },
@@ -1821,7 +2202,15 @@
         286
       ],
       "responseType": "quick",
-      "finishes": null,
+      "finishes": [
+        "Natural Brass",
+        "Chrome Plated",
+        "Polyester",
+        "Lead Coated",
+        "Pure White Polyester",
+        "Signal White Polyester",
+        "Jet Black Polyester"
+      ],
       "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/JXGj~rL_f_FBVCY52uMTJw/content",
       "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-frb_fis/series-ty-frb-sprinklers"
     },
@@ -1847,7 +2236,12 @@
         360
       ],
       "responseType": "standard",
-      "finishes": null,
+      "finishes": [
+        "Natural Brass",
+        "Chrome Plated",
+        "Polyester",
+        "Wax Coated"
+      ],
       "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/Y5s5g2HZNr6Um_t5iOK7dw/content",
       "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-b_fis/series-ty-b-sprinklers"
     },
@@ -1871,7 +2265,15 @@
         286
       ],
       "responseType": "quick",
-      "finishes": null,
+      "finishes": [
+        "Natural Brass",
+        "Chrome Plated",
+        "Polyester",
+        "Lead Coated",
+        "Pure White Polyester",
+        "Signal White Polyester",
+        "Jet Black Polyester"
+      ],
       "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/JXGj~rL_f_FBVCY52uMTJw/content",
       "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-frb_fis/series-ty-frb-sprinklers"
     },
@@ -1897,7 +2299,12 @@
         360
       ],
       "responseType": "standard",
-      "finishes": null,
+      "finishes": [
+        "Natural Brass",
+        "Chrome Plated",
+        "Polyester",
+        "Wax Coated"
+      ],
       "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/Y5s5g2HZNr6Um_t5iOK7dw/content",
       "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-b_fis/series-ty-b-sprinklers"
     },
@@ -1921,7 +2328,15 @@
         286
       ],
       "responseType": "quick",
-      "finishes": null,
+      "finishes": [
+        "Natural Brass",
+        "Chrome Plated",
+        "Polyester",
+        "Lead Coated",
+        "Pure White Polyester",
+        "Signal White Polyester",
+        "Jet Black Polyester"
+      ],
       "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/JXGj~rL_f_FBVCY52uMTJw/content",
       "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-frb_fis/series-ty-frb-sprinklers"
     },
@@ -1947,7 +2362,12 @@
         360
       ],
       "responseType": "standard",
-      "finishes": null,
+      "finishes": [
+        "Natural Brass",
+        "Chrome Plated",
+        "Polyester",
+        "Wax Coated"
+      ],
       "datasheetUrl": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/Y5s5g2HZNr6Um_t5iOK7dw/content",
       "sourceUrl": "https://www.tyco-fire.com/products-and-solutions/sprinklers-nozzles-and-accessories/standard-coverage/ty-b_fis/series-ty-b-sprinklers"
     },
