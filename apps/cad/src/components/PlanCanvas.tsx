@@ -33,10 +33,11 @@ import {
   type SegmentRole,
 } from '../lib/model';
 import { measureFeet, polygonAreaSqFt, setScaleFromTwoPoints } from '../lib/scale';
+import { SAMPLE_PROJECT_NAME } from '../lib/sample-project';
 import { coverageReport } from '../lib/head-layout';
 import { pressureColor, pressureRange, type HydraulicsResult } from '../lib/hydraulics';
 import { selectHydraulics } from '../store';
-import { colors, spacing, typeScale } from '../lib/tokens';
+import { colors, radii, spacing, typeScale } from '../lib/tokens';
 
 /** Spacing between minor grid lines, in px. */
 const MINOR = 24;
@@ -176,6 +177,11 @@ export function PlanCanvas(): ReactElement {
   const pressureHeatmap = useCadStore((s) => s.pressureHeatmap);
   const supply = useCadStore((s) => s.supply);
   const designAreaSqFt = useCadStore((s) => s.designAreaSqFt);
+  const loadSampleProject = useCadStore((s) => s.loadSampleProject);
+
+  // True when the loaded project is the labelled example/sample data. Drives the
+  // "SAMPLE" badge so the operator never mistakes it for their real plan.
+  const isSample = project.name === SAMPLE_PROJECT_NAME;
 
   const building = project.building;
   const ftPerUnit = building.scaleFtPerUnit;
@@ -242,6 +248,15 @@ export function PlanCanvas(): ReactElement {
   const [hazard, setHazard] = useState<HazardClass>('ORDINARY_1');
   const [cursor, setCursor] = useState<Point2 | null>(null);
   const [statusMsg, setStatusMsg] = useState<string | null>(null);
+  // In-app inline set-scale popover: holds the two captured plan points + the screen
+  // position to anchor the input near the second click. Replaces window.prompt().
+  const [scalePrompt, setScalePrompt] = useState<{
+    a: Point2;
+    b: Point2;
+    screenX: number;
+    screenY: number;
+  } | null>(null);
+  const [scaleInput, setScaleInput] = useState('');
 
   useEffect(() => {
     const el = wrapRef.current;
@@ -258,6 +273,8 @@ export function PlanCanvas(): ReactElement {
     setScalePts([]);
     setWallPts([]);
     setRoomPts([]);
+    setScalePrompt(null);
+    setScaleInput('');
   }, [activeTool]);
 
   // Delete / Backspace removes the selected head (ignored while typing in a field).
@@ -367,27 +384,20 @@ export function PlanCanvas(): ReactElement {
         setScalePts(next);
         return;
       }
-      // Two points captured — prompt for the known real distance in feet.
+      // Two points captured — open the IN-APP inline popover near the second click
+      // for the known real distance (no window.prompt). The screen position anchors
+      // the input; Apply/Cancel live in the popover (see scalePrompt render below).
       const [a, b] = next;
-      const answer =
-        typeof window !== 'undefined'
-          ? window.prompt(
-              'Known real distance between the two points, in FEET\n' +
-                '(read it off a dimension string, grid line, or the scale bar):',
-              '',
-            )
-          : null;
-      setScalePts([]);
-      setCursor(null);
-      if (answer == null) return;
-      const knownFeet = Number(answer.trim());
-      try {
-        const ft = setScaleFromTwoPoints(a, b, knownFeet);
-        setScale(ft, building.source === 'none' ? 'manual' : undefined);
-        setStatusMsg(`scale set: ${ft.toFixed(4)} ft/unit`);
-      } catch (err) {
-        setStatusMsg(err instanceof Error ? err.message : 'invalid scale input');
-      }
+      const stage = e.target.getStage();
+      const pos = stage?.getPointerPosition();
+      setScalePts(next);
+      setScalePrompt({
+        a,
+        b,
+        screenX: pos?.x ?? size.w / 2,
+        screenY: pos?.y ?? size.h / 2,
+      });
+      setScaleInput('');
       return;
     }
 
@@ -446,6 +456,31 @@ export function PlanCanvas(): ReactElement {
       setRoomPts([]);
       return;
     }
+  }
+
+  // Apply the inline set-scale popover: compute ft/unit from the two captured points
+  // + the typed known distance, call setScale, then clear the in-progress state.
+  function applyScalePrompt(): void {
+    if (!scalePrompt) return;
+    const knownFeet = Number(scaleInput.trim());
+    try {
+      const ft = setScaleFromTwoPoints(scalePrompt.a, scalePrompt.b, knownFeet);
+      setScale(ft, building.source === 'none' ? 'manual' : undefined);
+      setStatusMsg(`scale set: ${ft.toFixed(4)} ft/unit`);
+    } catch (err) {
+      setStatusMsg(err instanceof Error ? err.message : 'invalid scale input');
+    }
+    setScalePrompt(null);
+    setScaleInput('');
+    setScalePts([]);
+    setCursor(null);
+  }
+
+  function cancelScalePrompt(): void {
+    setScalePrompt(null);
+    setScaleInput('');
+    setScalePts([]);
+    setCursor(null);
   }
 
   // Live readouts for the in-progress interaction.
@@ -736,10 +771,60 @@ export function PlanCanvas(): ReactElement {
         </Stage>
       ) : null}
 
+      {/* In-app inline SET-SCALE popover (replaces window.prompt). Anchored near the
+          second click; a numeric "known distance (ft)" field + Apply/Cancel. */}
+      {scalePrompt && (
+        <div
+          style={{
+            ...scalePopoverStyle,
+            left: Math.min(Math.max(scalePrompt.screenX + 12, 8), Math.max(8, size.w - 240)),
+            top: Math.min(Math.max(scalePrompt.screenY + 12, 8), Math.max(8, size.h - 120)),
+          }}
+          aria-label="Set scale"
+          role="dialog"
+        >
+          <div style={scalePopoverTitleStyle}>Set scale</div>
+          <label style={scalePopoverLabelStyle}>
+            Known distance (ft)
+            <input
+              type="number"
+              autoFocus
+              value={scaleInput}
+              min={0}
+              step="any"
+              placeholder="e.g. 20"
+              onChange={(ev) => setScaleInput(ev.target.value)}
+              onKeyDown={(ev) => {
+                if (ev.key === 'Enter') applyScalePrompt();
+                else if (ev.key === 'Escape') cancelScalePrompt();
+              }}
+              style={scalePopoverInputStyle}
+              aria-label="Known real distance between the two points, in feet"
+            />
+          </label>
+          <div style={scalePopoverHintStyle}>
+            Read it off a dimension string, grid line, or the scale bar.
+          </div>
+          <div style={scalePopoverBtnRowStyle}>
+            <button type="button" style={scalePopoverApplyStyle} onClick={applyScalePrompt}>
+              Apply
+            </button>
+            <button type="button" style={scalePopoverCancelStyle} onClick={cancelScalePrompt}>
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Tool HUD: instructions + live readouts + hazard picker. */}
       {hasContent && (
         <div style={hudStyle}>
           <div style={hudRowStyle}>
+            {isSample && (
+              <span style={sampleBadgeStyle} title="Example/sample data — not your real plan or a real building.">
+                SAMPLE
+              </span>
+            )}
             <span style={hudBadgeStyle}>{`scale: ${ftPerUnit} ft/unit`}</span>
             {activeTool === 'set-scale' && (
               <span style={hudHintStyle}>
@@ -868,6 +953,21 @@ export function PlanCanvas(): ReactElement {
           <div style={overlayTitleStyle}>No plan loaded</div>
           <div style={overlayBodyStyle}>
             Import a DXF (auto walls + scale) or a PDF (raster to trace) — W1.
+          </div>
+          <div style={overlayCtaWrapStyle}>
+            <button
+              type="button"
+              style={overlayCtaBtnStyle}
+              onClick={() => {
+                void loadSampleProject();
+              }}
+            >
+              Load sample project
+            </button>
+            <div style={overlayCtaNoteStyle}>
+              Loads CLEARLY-LABELLED example data (not your plan, not a real building)
+              so you can try the whole flow: heads → pipe → hydraulics → bid.
+            </div>
           </div>
         </div>
       )}
@@ -1068,4 +1168,116 @@ const overlayTitleStyle: CSSProperties = {
 const overlayBodyStyle: CSSProperties = {
   color: colors.textMuted,
   fontSize: typeScale.sm.size,
+};
+
+const overlayCtaWrapStyle: CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  gap: spacing[1],
+  pointerEvents: 'auto',
+  maxWidth: 360,
+  marginTop: spacing[2],
+};
+
+const overlayCtaBtnStyle: CSSProperties = {
+  background: colors.interactiveActive,
+  color: '#ffffff',
+  border: `1px solid ${colors.interactive}`,
+  borderRadius: radii.md,
+  padding: `${spacing[2]} ${spacing[4]}`,
+  fontSize: typeScale.sm.size,
+  fontWeight: 600,
+  cursor: 'pointer',
+};
+
+const overlayCtaNoteStyle: CSSProperties = {
+  color: colors.textMuted,
+  fontSize: typeScale.xs.size,
+  lineHeight: 1.4,
+  textAlign: 'center',
+};
+
+const sampleBadgeStyle: CSSProperties = {
+  background: colors.warn,
+  color: '#1a1206',
+  border: `1px solid ${colors.warn}`,
+  borderRadius: 999,
+  fontSize: typeScale.xs.size,
+  fontWeight: 700,
+  letterSpacing: '0.08em',
+  padding: `${spacing[0.5]} ${spacing[2]}`,
+  pointerEvents: 'auto',
+};
+
+const scalePopoverStyle: CSSProperties = {
+  position: 'absolute',
+  zIndex: 10,
+  background: colors.surfaceRaised,
+  border: `1px solid ${colors.borderStrong}`,
+  borderRadius: radii.lg,
+  padding: spacing[3],
+  display: 'flex',
+  flexDirection: 'column',
+  gap: spacing[2],
+  width: 220,
+  boxShadow: '0 8px 24px rgba(0,0,0,0.35)',
+  pointerEvents: 'auto',
+};
+
+const scalePopoverTitleStyle: CSSProperties = {
+  color: colors.textPrimary,
+  fontSize: typeScale.sm.size,
+  fontWeight: 600,
+};
+
+const scalePopoverLabelStyle: CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: spacing[1],
+  color: colors.textSecondary,
+  fontSize: typeScale.xs.size,
+};
+
+const scalePopoverInputStyle: CSSProperties = {
+  background: colors.surface,
+  color: colors.textPrimary,
+  border: `1px solid ${colors.border}`,
+  borderRadius: radii.md,
+  padding: `${spacing[1]} ${spacing[2]}`,
+  fontSize: typeScale.sm.size,
+  fontFamily: 'var(--hf-font-mono)',
+};
+
+const scalePopoverHintStyle: CSSProperties = {
+  color: colors.textMuted,
+  fontSize: typeScale.xs.size,
+  lineHeight: 1.4,
+};
+
+const scalePopoverBtnRowStyle: CSSProperties = {
+  display: 'flex',
+  gap: spacing[2],
+};
+
+const scalePopoverApplyStyle: CSSProperties = {
+  background: colors.interactiveActive,
+  color: '#ffffff',
+  border: `1px solid ${colors.interactive}`,
+  borderRadius: radii.md,
+  padding: `${spacing[1]} ${spacing[3]}`,
+  fontSize: typeScale.xs.size,
+  fontWeight: 600,
+  cursor: 'pointer',
+};
+
+const scalePopoverCancelStyle: CSSProperties = {
+  background: colors.surfaceRaised,
+  color: colors.textSecondary,
+  border: `1px solid ${colors.border}`,
+  borderRadius: radii.md,
+  padding: `${spacing[1]} ${spacing[3]}`,
+  fontSize: typeScale.xs.size,
+  fontWeight: 500,
+  cursor: 'pointer',
 };

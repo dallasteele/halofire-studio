@@ -87,7 +87,11 @@ export function TopRibbon(): ReactElement {
       </div>
 
       {/* Tool buttons for the active tab */}
-      {activeTab === 'Hydraulics' ? (
+      {activeTab === 'File' ? (
+        <div style={toolRowStyle} aria-label="File tools">
+          <FileTabTools />
+        </div>
+      ) : activeTab === 'Hydraulics' ? (
         <div style={hydraulicsWrapStyle} aria-label="Hydraulics tools">
           <HydraulicsPanel />
         </div>
@@ -112,6 +116,33 @@ export function TopRibbon(): ReactElement {
         </div>
       )}
     </header>
+  );
+}
+
+/**
+ * File-tab tools. The "Load sample project" CTA drives the WHOLE vertical from a
+ * fresh page (heads -> pipe -> hydraulics -> bid) using CLEARLY-LABELLED example
+ * data, so a new operator can try the flow before importing a real plan.
+ */
+function FileTabTools(): ReactElement {
+  const loadSampleProject = useCadStore((s) => s.loadSampleProject);
+  return (
+    <div style={fileToolsWrapStyle}>
+      <button
+        type="button"
+        style={loadSampleBtnStyle}
+        onClick={() => {
+          void loadSampleProject();
+        }}
+        title="Load CLEARLY-LABELLED example data (not your plan, not a real building)."
+      >
+        Load sample project
+      </button>
+      <span style={fileToolsNoteStyle}>
+        Example/sample data — not your real plan or a real building. A design aid to
+        try the flow.
+      </span>
+    </div>
   );
 }
 
@@ -246,6 +277,29 @@ const toolEmptyStyle: CSSProperties = {
   color: colors.textMuted,
   fontSize: typeScale.sm.size,
   fontStyle: 'italic',
+};
+
+const fileToolsWrapStyle: CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: spacing[3],
+  flexWrap: 'wrap',
+};
+
+const loadSampleBtnStyle: CSSProperties = {
+  background: colors.interactiveActive,
+  color: '#ffffff',
+  border: `1px solid ${colors.interactive}`,
+  borderRadius: radii.md,
+  padding: `${spacing[1]} ${spacing[3]}`,
+  fontSize: typeScale.sm.size,
+  fontWeight: 600,
+  cursor: 'pointer',
+};
+
+const fileToolsNoteStyle: CSSProperties = {
+  color: colors.textMuted,
+  fontSize: typeScale.xs.size,
 };
 
 /** The Hydraulics tab expands into a scrollable panel (supply inputs + results). */

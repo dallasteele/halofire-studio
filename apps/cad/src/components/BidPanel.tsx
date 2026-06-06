@@ -138,6 +138,10 @@ export function BidPanel(): ReactElement {
                 (NO PRICE). They are NOT silently dropped.
               </div>
             )}
+            <div style={bomFootingNoteStyle}>
+              Materials total also includes derived hangers, escutcheons and drops
+              (per head / per pipe-ft) that are not shown as individual BOM lines.
+            </div>
           </div>
 
           {/* Totals. */}
@@ -384,6 +388,13 @@ const warnNoteStyle: CSSProperties = {
   color: colors.warn,
   fontSize: typeScale.xs.size,
   lineHeight: 1.4,
+};
+
+const bomFootingNoteStyle: CSSProperties = {
+  color: colors.textMuted,
+  fontSize: typeScale.xs.size,
+  lineHeight: 1.4,
+  fontStyle: 'italic',
 };
 
 const sendNoteStyle: CSSProperties = {

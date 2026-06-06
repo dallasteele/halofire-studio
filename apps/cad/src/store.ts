@@ -38,6 +38,26 @@ import {
   resolvePriceTable,
   type PriceTable,
 } from './lib/bid';
+import { buildSampleProject } from './lib/sample-project';
+import type { WaterSupply as Supply } from './lib/hydraulics';
+
+/**
+ * The real catalog head SKU id the sample project lays out with. This is the only
+ * head in the ingested manufacturer catalog that carries a K-factor (Tyco TY-FRB,
+ * K=5.6), so the sample uses a REAL part — never a fabricated SKU.
+ */
+export const SAMPLE_HEAD_SKU = 'tyco-ty3331';
+
+/**
+ * A representative water-supply flow test for the sample project (static / residual
+ * @ flow). Operator-typical figures so the sample exercises the hydraulics adequacy
+ * check; the operator overrides these with their real flow test for a real job.
+ */
+export const SAMPLE_SUPPLY: Supply = {
+  staticPsi: 70,
+  residualPsi: 50,
+  flowGpm: 1000,
+};
 
 /* --------------------------------------------------------------- view mode */
 
@@ -287,6 +307,21 @@ export interface CadState {
    * invoke once on mount).
    */
   ensurePricebookLoaded: (fetchImpl?: typeof fetch) => Promise<void>;
+
+  /* ----------------------------------------------------------- W7 UX polish */
+
+  /**
+   * Load the CLEARLY-LABELLED example/sample project and drive the WHOLE vertical
+   * in one call: set the sample building, auto-layout heads in every room with a
+   * REAL catalog head SKU, route a wet-pipe tree, set a default supply (flow test),
+   * and best-effort load the real pricebook so the bid prices. After this the heads,
+   * pipe, hydraulics, and bid are all populated.
+   *
+   * HONESTY: the project is EXAMPLE data (names say "Sample"/"example"); heads use a
+   * real SKU and the bid uses the real pricebook (or the honest representative
+   * fallback). Nothing about the geometry or prices is fabricated.
+   */
+  loadSampleProject: (fetchImpl?: typeof fetch) => Promise<void>;
 }
 
 /**
@@ -348,7 +383,7 @@ function selectionFor(kind: SelectionKind, id: string | null): Selection {
   };
 }
 
-export const useCadStore = create<CadState>((set) => ({
+export const useCadStore = create<CadState>((set, get) => ({
   project: emptyProject(),
   selection: { ...EMPTY_SELECTION },
   viewMode: 'split',
@@ -615,5 +650,25 @@ export const useCadStore = create<CadState>((set) => ({
     // loadPricebook fail-softs to null; resolvePriceTable(null) -> representative.
     const book = await loadPricebook(impl);
     set({ priceTable: resolvePriceTable(book) });
+  },
+
+  /* ----------------------------------------------------------- W7 UX polish */
+
+  loadSampleProject: async (fetchImpl) => {
+    const sample = buildSampleProject();
+    // 1) Seed the example building (clears selection + any prior network).
+    get().setProject(sample);
+    // 2) Use the real catalog head SKU for the laid heads.
+    get().setActiveHeadSku(SAMPLE_HEAD_SKU);
+    // 3) Auto-layout heads in EVERY room at its hazard spacing, with the real SKU.
+    for (const room of sample.building.rooms) {
+      get().autoLayoutRoom(room.id, SAMPLE_HEAD_SKU);
+    }
+    // 4) Route the laid heads into a wet-pipe tree (branches -> cross-main -> riser).
+    get().routeSystem();
+    // 5) Seed a default supply so the hydraulics adequacy check has inputs.
+    get().setSupply(SAMPLE_SUPPLY);
+    // 6) Best-effort load the real pricebook so the bid prices off real medians.
+    await get().ensurePricebookLoaded(fetchImpl);
   },
 }));
