@@ -830,12 +830,16 @@ so AI placeholders are never mistaken for engineering-accurate CAD.
       "Real CAD dimensions, NOT manufacturer-exact / AHJ / PE / permit". HONESTY: dimensioned_parametric
       engineeringAccurate=false; no fake entries (tests re-hash on-disk STEP vs manifest).
       vitest 179/179, tsc 0, vite build 0.
-- [ ] **T46 — AI image→3D fallback adapter / Tier-3, last resort (external API/GPU, NOT
-      GX10).** One pluggable interface in `packages/halofire-ai-bridge` with a fal.ai
-      TRELLIS.2 backend (HTTP, GLB out) + optional local Hunyuan3D 2.1; every output
-      auto-tagged `source='ai-placeholder'`, `dimensionVerified=false`; gated behind
-      "no catalog/build123d match found". Adapter + fail-soft tests with a mock backend;
-      NO real generation claimed unless the tool actually runs.
+- [~] **T46 — AI image→3D fallback adapter / Tier-3, last resort.** ADAPTER DONE / LIVE
+      GEN BLOCKED 2026-06-05 (workflow wf_f77416c2-e3a, both verifiers PASS). The pluggable
+      adapter `src/lib/ai-3d-invoker.ts` ships (mirrors sam-invoker): disabled-by-default
+      (no bridge url -> undefined), every output capped at `source='ai-placeholder'` /
+      `visual_reference` / `engineeringAccurate=false`, fail-soft to null on error, never
+      fabricates; `public/parts/ai-placeholder.json` is EMPTY (aiPlaceholderCount=0). LIVE
+      GENERATION IS BLOCKED: OpenClaw generate_3d_model via the governed bridge errors
+      server-side ([Errno 21] Is a directory: '.') and the gateway :19002 is unreachable —
+      flagged for fix (task_4e659e35, brain ep 32301). NO real generation claimed (none ran).
+      Re-open as DONE once the bridge tool works end-to-end and real ai-placeholder assets flow.
 - [x] **T47 — BUILDING vector-PDF-first lane (GX10-INDEPENDENT, deterministic).** DONE
       2026-06-05 (ultra workflow wwcxga3fz, both verifiers PASS; + camera/material polish).
       Built in apps/studio (TS port of the proven apps/autosprink/src/engine/pdf-floorplan.js
@@ -936,6 +940,28 @@ so AI placeholders are never mistaken for engineering-accurate CAD.
       tests (51 new), tsc -b=0, vite build=0; preview-verified (System mode renders real findings,
       e.g. coverage 177.8 > 130 ft^2 Ord-1 warn, with cited sections + banner). NEXT: image->3D via
       OpenClaw generate_3d_model (E, ai-placeholder tier) + studio system-assembly view (F).
+- [x] **T53 — Catalog SKU -> REAL geometry resolver + build123d coverage (GX10-independent).**
+      DONE 2026-06-05 (ultra workflow wf_f77416c2-e3a, TDD, both adversarial verifiers PASS).
+      The honest path toward "CAD models for all parts" (image->3D backend is down, see T46 —
+      no meshes fabricated). build123d head builders are now size-parametric (real NPT boss OD
+      1/2"=21.2 / 3/4"=26.7 / 1"=33.4 mm, correct deflector per category); build123d-parts.json
+      24 -> 28 parts, each a REAL ISO-10303-21 STEP with a real sha256 (timestamp-pinned),
+      dimensioned_parametric ONLY. NEW src/lib/catalog-geometry.ts (pure): resolveCatalogGeometry
+      priority manufacturer-step (manufacturer_verified, the only engineeringAccurate tier) ->
+      build123d by (category,nominalSizeIn) (dimensioned_parametric) -> ai-placeholder
+      (visual_reference) -> none; fail-safe (null size / no match -> none, never a guessed tier).
+      74/76 SKUs resolve to real build123d geometry; the 2 that don't (generic "head" category,
+      null port size) honestly resolve to none. ManufacturerCatalogPanel shows each SKU's
+      geometry source + provenance tier badge or honest "no 3D geometry yet"; CatalogPartViewer
+      (occt-import-js) renders the parametric STEP on select with a "REAL NPT thread, APPROXIMATE
+      body, NOT manufacturer-exact/AHJ/PE" caption. window.__studio.skusWithGeometry=74,
+      aiPlaceholderCount=0. HONESTY (both verifiers PASS; honesty agent re-hashed all 28 STEP
+      files = 0 mismatches, simulated resolver over all 76 SKUs = 0 over-claimed tiers): no
+      fabricated geometry; dimensioned_parametric not manufacturer-exact; resolver returns none
+      when no real asset. Gates: 374 tests (+23 new), tsc -b=0, vite build=0; preview-verified
+      (header "76 SKUs / 74 with 3D geometry / 0 AI placeholder", badges + viewer render RA1311's
+      STEP). NEXT: (F) studio system-assembly view; catalog finishes-parse (task_7d133fb9);
+      expand mfrs (Viking/Victaulic/Senju/Globe/Potter/AGF); T46 live gen once bridge fixed.
 
 ## AUTOSPRINK PARITY epic (the goal): close functional gaps to AutoSprink feature parity
 HONESTY CONTRACT: "parity" is tracked, not asserted. The `AUTOSPRINK_PARITY_INCOMPLETE`
