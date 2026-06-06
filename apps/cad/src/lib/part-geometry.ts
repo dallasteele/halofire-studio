@@ -274,6 +274,9 @@ interface OcctMesh {
     position: { array: number[] | Float32Array };
     normal?: { array: number[] | Float32Array };
   };
+  /** Triangle indices into the position vertex pool. MUST be honored (the pool is
+   *  NOT a flat triangle list — drawing it un-indexed produces garbage geometry). */
+  index?: { array: number[] | Uint32Array };
 }
 
 /** Shape of the object returned by occt-import-js ReadStepFile. */
@@ -370,28 +373,73 @@ async function decodeStep(
     throw new Error('loadPartGeometry: occt-import-js failed to parse STEP file');
   }
 
+  // occt meshes are INDEXED: `position.array` is a vertex POOL and `index.array`
+  // lists the triangles into it. We MUST honor the index — drawing the pool as a
+  // raw sequential triangle soup connects unrelated vertices into spikes. Merge all
+  // meshes into ONE indexed geometry, offsetting each mesh's indices by the running
+  // vertex count.
   const positionsArrays: Float32Array[] = [];
   const normalsArrays: Float32Array[] = [];
+  const indexArrays: Uint32Array[] = [];
+  let allMeshesHaveNormals = true;
+  let vertexOffset = 0; // in vertices (position.length / 3)
   for (const m of result.meshes) {
-    const pos = m.attributes.position.array;
-    const nrm = m.attributes.normal?.array;
-    positionsArrays.push(pos instanceof Float32Array ? pos : new Float32Array(pos));
-    if (nrm) normalsArrays.push(nrm instanceof Float32Array ? nrm : new Float32Array(nrm));
+    const posRaw = m.attributes.position.array;
+    const pos = posRaw instanceof Float32Array ? posRaw : new Float32Array(posRaw);
+    positionsArrays.push(pos);
+    const vCount = (pos.length / 3) | 0;
+
+    const nrmRaw = m.attributes.normal?.array;
+    if (nrmRaw) {
+      normalsArrays.push(nrmRaw instanceof Float32Array ? nrmRaw : new Float32Array(nrmRaw));
+    } else {
+      allMeshesHaveNormals = false;
+    }
+
+    const idxRaw = m.index?.array;
+    if (idxRaw && idxRaw.length > 0) {
+      const idx = new Uint32Array(idxRaw.length);
+      for (let i = 0; i < idxRaw.length; i += 1) idx[i] = (idxRaw[i] as number) + vertexOffset;
+      indexArrays.push(idx);
+    } else {
+      // No index: fall back to a sequential triangle list over this mesh's pool.
+      const idx = new Uint32Array(vCount);
+      for (let i = 0; i < vCount; i += 1) idx[i] = i + vertexOffset;
+      indexArrays.push(idx);
+    }
+    vertexOffset += vCount;
   }
   const positions = concatFloat32(positionsArrays);
 
   const geo = new BufferGeometry();
   geo.setAttribute('position', new BufferAttribute(positions, 3));
-  if (normalsArrays.length > 0) {
+  geo.setIndex(new BufferAttribute(concatUint32(indexArrays), 1));
+  // Prefer occt's per-vertex normals when present and aligned with the pool;
+  // otherwise compute them from the now-correct indexed faces.
+  let normalsSet = false;
+  if (allMeshesHaveNormals && normalsArrays.length === result.meshes.length) {
     const normals = concatFloat32(normalsArrays);
     if (normals.length === positions.length) {
       geo.setAttribute('normal', new BufferAttribute(normals, 3));
+      normalsSet = true;
     }
   }
   geo.center();
-  geo.computeVertexNormals();
+  if (!normalsSet) geo.computeVertexNormals();
   geo.computeBoundingBox();
   return geo;
+}
+
+function concatUint32(parts: Uint32Array[]): Uint32Array {
+  let total = 0;
+  for (const p of parts) total += p.length;
+  const out = new Uint32Array(total);
+  let offset = 0;
+  for (const p of parts) {
+    out.set(p, offset);
+    offset += p.length;
+  }
+  return out;
 }
 
 function concatFloat32(parts: Float32Array[]): Float32Array {

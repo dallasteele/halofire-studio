@@ -246,4 +246,34 @@ describe('loadPartGeometry — cached by url, fail-soft on error', () => {
       loadPartGeometry('/parts/build123d/bad.step', fetchImpl, async () => badOcct),
     ).rejects.toThrow();
   });
+
+  it('HONORS the occt index (vertex pool + triangles), not a raw vertex soup', async () => {
+    const fetchImpl = (async () => ({
+      ok: true,
+      arrayBuffer: async () => new Uint8Array([1]).buffer,
+    })) as unknown as typeof fetch;
+    // A 4-vertex quad POOL + 2 triangles via index. The pre-fix code ignored the
+    // index and drew the 4 pooled verts as a soup (the spiky-blob bug); the fix
+    // must yield an INDEXED geometry (6 indices) over the preserved 4-vertex pool.
+    const indexedOcct: OcctModule = {
+      ReadStepFile: () => ({
+        success: true,
+        meshes: [
+          {
+            attributes: { position: { array: [0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0] } },
+            index: { array: [0, 1, 2, 0, 2, 3] },
+          },
+        ],
+      }),
+    };
+    const g = await loadPartGeometry(
+      '/parts/build123d/indexed.step',
+      fetchImpl,
+      async () => indexedOcct,
+    );
+    const idx = g.getIndex();
+    expect(idx).not.toBeNull();
+    expect(idx!.count).toBe(6); // two triangles from the index, NOT a vertex soup
+    expect(g.getAttribute('position').count).toBe(4); // pool preserved, not expanded
+  });
 });
