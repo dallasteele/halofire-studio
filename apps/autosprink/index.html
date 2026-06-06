@@ -174,6 +174,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;height:55px;display:flex;ali
     <form id="form">
       <div class="field"><label>Username</label><input type="text" id="user" placeholder="admin" autocomplete="off"></div>
       <div class="field"><label>Password</label><input type="password" id="pass" placeholder="password"></div>
+      <label class="login-remember" style="display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10px;color:var(--text-muted);margin:2px 0 6px;cursor:pointer"><input type="checkbox" id="remember" checked style="width:auto;margin:0"> Keep me logged in</label>
       <button type="submit" class="submit-btn">Sign In</button>
       <div class="login-err" id="err">Invalid credentials</div>
     </form>
@@ -424,13 +425,47 @@ function safeWorkbenchRedirect(){
   return fallback;
 }
 function storeLoginToken(data){
+  // "Keep me logged in" (default checked) -> persist in localStorage across
+  // reloads/tab-close; unchecked -> sessionStorage only (cleared on tab close).
+  const rememberEl = document.getElementById('remember');
+  const remember = rememberEl ? rememberEl.checked : true;
+  const store = remember ? localStorage : sessionStorage;
   try{
-    localStorage.setItem('halofire_token',data.token);
-    localStorage.setItem('halofire_user',JSON.stringify(data.user));
+    store.setItem('halofire_token',data.token);
+    store.setItem('halofire_user',JSON.stringify(data.user));
+    (remember ? sessionStorage : localStorage).removeItem('halofire_token');
   }catch(_){
     // The server also sets an HttpOnly session cookie; storage is convenience.
   }
 }
+// DEMO (localhost only): pre-fill the dev creds the preview server is launched
+// with, and self-heal a bounced session so the operator stays logged in across
+// reloads while building/testing. PRODUCTION (non-localhost) is unaffected.
+function isHaloDemoHost(){ return location.hostname==='localhost'||location.hostname==='127.0.0.1'; }
+function haloTokenExpired(t){ try{const p=JSON.parse(atob(String(t).split('.')[1]));return !p.exp||(p.exp*1000)<=(Date.now()+5000);}catch(_){return true;} }
+(function haloDemoLoginBootstrap(){
+  if(!isHaloDemoHost()) return;
+  const u=document.getElementById('user'), p=document.getElementById('pass');
+  if(u && !u.value) u.value='admin';
+  if(p && !p.value) p.value='halofire-dev-smoke';
+  let tok=null; try{ tok=localStorage.getItem('halofire_token'); }catch(_){}
+  const params=new URLSearchParams(window.location.search);
+  if(params.get('redirect') && (!tok || haloTokenExpired(tok))){
+    try{
+      const xhr=new XMLHttpRequest();
+      xhr.open('POST', HALOFIRE_BASE_PATH + '/' + 'api/auth/login', false);
+      xhr.setRequestHeader('Content-Type','application/json');
+      xhr.send(JSON.stringify({username:'admin',password:'halofire-dev-smoke'}));
+      if(xhr.status===200){
+        const data=JSON.parse(xhr.responseText||'{}');
+        if(data&&data.token){
+          try{ localStorage.setItem('halofire_token',data.token); if(data.user) localStorage.setItem('halofire_user',JSON.stringify(data.user)); }catch(_){}
+          window.location.href=safeWorkbenchRedirect(); return;
+        }
+      }
+    }catch(_){}
+  }
+})();
 const ov=document.getElementById('overlay');
 document.getElementById('signBtn').onclick=()=>ov.classList.add('on');
 document.getElementById('enterBtn').onclick=()=>ov.classList.add('on');
