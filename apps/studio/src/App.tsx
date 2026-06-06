@@ -61,15 +61,23 @@ import {
   type ManufacturerCatalog,
 } from './lib/manufacturer-catalog';
 import { ManufacturerCatalogPanel } from './ManufacturerCatalogPanel';
+import { SystemPanel } from './SystemPanel';
+import { RULE_CONSTANT_COUNT } from './lib/nfpa13-rules';
 
 /**
- * Top-level app mode: the existing part gallery, the sprinkler layout tool, or the
- * T47 vector-PDF building footprint lane.
+ * Top-level app mode: the existing part gallery, the sprinkler layout tool, the
+ * T47 vector-PDF building footprint lane, or the NFPA-13 system-model view.
  */
-export type AppMode = 'catalog' | 'mfr-catalog' | 'layout' | 'building';
+export type AppMode =
+  | 'catalog'
+  | 'mfr-catalog'
+  | 'system'
+  | 'layout'
+  | 'building';
 const APP_MODES: readonly AppMode[] = [
   'catalog',
   'mfr-catalog',
+  'system',
   'layout',
   'building',
 ] as const;
@@ -127,6 +135,13 @@ declare global {
        * PE / code-certified selections.
        */
       catalogPartCount: number;
+      /**
+       * Number of ENCODED (non-null) NFPA-13 code constants in the rules table
+       * (nfpa13-rules.RULES), each carrying its citation. Uncertain values are
+       * left null with a cite-TODO and are NOT counted here. Honest by
+       * construction — a design aid from published values, NOT code compliance.
+       */
+      systemRuleCount: number;
     };
   }
 }
@@ -305,6 +320,7 @@ export function App(): ReactElement {
       manufacturerVerifiedCount,
       dimensionedParametricCount,
       catalogPartCount,
+      systemRuleCount: RULE_CONSTANT_COUNT,
       footprintAreaSqft:
         footprint && !footprint.empty ? footprint.areaSqft : null,
       samAvailable,
@@ -408,6 +424,12 @@ export function App(): ReactElement {
               <span style={statusSepStyle}>·</span> spec records from public data
               sheets
             </>
+          ) : appMode === 'system' ? (
+            <>
+              <strong style={statusNumStyle}>{RULE_CONSTANT_COUNT}</strong>{' '}
+              cited NFPA-13 values{' '}
+              <span style={statusSepStyle}>·</span> design aid, not code-certified
+            </>
           ) : appMode === 'building' ? (
             footprint && !footprint.empty ? (
               <>
@@ -448,6 +470,8 @@ export function App(): ReactElement {
         <p style={disclaimerStyle}>
           {appMode === 'mfr-catalog'
             ? 'catalog SPEC records from public manufacturer data sheets · NOT manufacturer-exact geometry · NOT AHJ / PE / code-certified selections'
+            : appMode === 'system'
+            ? 'design aid based on published NFPA-13 values · NOT a certified hydraulic calculation · NOT AHJ-approved · NOT PE-sealed · NOT for construction'
             : appMode === 'building'
             ? footprint && !footprint.empty && footprint.method === 'sam-raster'
               ? 'best-effort SAM raster segmentation (2D mask only) · scale is operator-supplied · raster-segmented, NOT vector-exact / AHJ / PE-sealed / code-compliant · not for construction'
@@ -491,6 +515,8 @@ export function App(): ReactElement {
           </>
         ) : appMode === 'mfr-catalog' ? (
           <ManufacturerCatalogPanel catalog={mfrCatalog} />
+        ) : appMode === 'system' ? (
+          <SystemPanel catalog={mfrCatalog} />
         ) : appMode === 'layout' ? (
           <>
             <LayoutControls
@@ -581,6 +607,7 @@ function AppModeControl({ appMode, onChange }: AppModeControlProps): ReactElemen
   const options: { mode: AppMode; label: string }[] = [
     { mode: 'catalog', label: 'Catalog' },
     { mode: 'mfr-catalog', label: 'Manufacturer' },
+    { mode: 'system', label: 'System' },
     { mode: 'layout', label: 'Layout' },
     { mode: 'building', label: 'Building' },
   ];
