@@ -1,6 +1,36 @@
 {
   "entries": [
     {
+      "key": "ksb-etanorm-fxe-100-080-200-2a",
+      "slug": "ksb-etanorm-fxe-100-080-200-2a",
+      "manufacturer": "KSB SE & Co. KGaA",
+      "productCode": "Etanorm FXE 100-080-200-2a",
+      "modelName": "Etanorm FXE 100-080-200-2a",
+      "stepUrl": "/parts/manufacturer-step/ksb-etanorm-fxe-100-080-200-2a.stp",
+      "stepFile": "/parts/manufacturer-step/ksb-etanorm-fxe-100-080-200-2a.stp",
+      "sha256": "561E6A4F2834694AF53AAE9F89B109720EC975E29B12D0D4D4330D710803A045",
+      "manufacturerExact": true,
+      "license": "CADENAS 3Dfindit terms-of-use",
+      "ingestedFrom": "public/parts/manufacturer-incoming/ksb-etanorm-fxe-100-080-200-2a/Etanorm_FXE_100-080-200-2a.stp",
+      "category": "pump",
+      "sourceUrl": "https://www.ksb.com/"
+    },
+    {
+      "key": "ksb-etanorm-fxe-100-080-250-2a",
+      "slug": "ksb-etanorm-fxe-100-080-250-2a",
+      "manufacturer": "KSB SE & Co. KGaA",
+      "productCode": "Etanorm FXE 100-080-250-2a",
+      "modelName": "Etanorm FXE 100-080-250-2a",
+      "stepUrl": "/parts/manufacturer-step/ksb-etanorm-fxe-100-080-250-2a.stp",
+      "stepFile": "/parts/manufacturer-step/ksb-etanorm-fxe-100-080-250-2a.stp",
+      "sha256": "82623F62F0C146E0417EF35D2DEDD6B9EC8FB6EF415BF70C4DA55FF8525CF605",
+      "manufacturerExact": true,
+      "license": "CADENAS 3Dfindit terms-of-use",
+      "ingestedFrom": "public/parts/manufacturer-incoming/ksb-etanorm-fxe-100-080-250-2a/Etanorm_FXE_100-080-250-2a.stp",
+      "category": "pump",
+      "sourceUrl": "https://www.ksb.com/"
+    },
+    {
       "key": "ksb-etanorm-fxe-125-100-200-2a",
       "slug": "ksb-etanorm-fxe-125-100-200-2a",
       "manufacturer": "KSB SE & Co. KGaA",
@@ -14,6 +44,36 @@
       "sourceUrl": "https://www.ksb.com/",
       "license": "CADENAS 3Dfindit terms-of-use",
       "ingestedFrom": "public/parts/manufacturer-incoming/ksb-etanorm-fxe-125-100-200-2a/Etanorm_FXE_125-100-200-2a.stp"
+    },
+    {
+      "key": "ksb-etanorm-fxe-125-100-315-2a",
+      "slug": "ksb-etanorm-fxe-125-100-315-2a",
+      "manufacturer": "KSB SE & Co. KGaA",
+      "productCode": "Etanorm FXE 125-100-315-2a",
+      "modelName": "Etanorm FXE 125-100-315-2a",
+      "stepUrl": "/parts/manufacturer-step/ksb-etanorm-fxe-125-100-315-2a.stp",
+      "stepFile": "/parts/manufacturer-step/ksb-etanorm-fxe-125-100-315-2a.stp",
+      "sha256": "2867B322835C504857FC8A7FE20ED5DCB6212294FF4ADD4B712F1D919C23EE02",
+      "manufacturerExact": true,
+      "license": "CADENAS 3Dfindit terms-of-use",
+      "ingestedFrom": "public/parts/manufacturer-incoming/ksb-etanorm-fxe-125-100-315-2a/Etanorm_FXE_125-100-315-2a.stp",
+      "category": "pump",
+      "sourceUrl": "https://www.ksb.com/"
+    },
+    {
+      "key": "ksb-etanorm-fxe-150-125-250-2a",
+      "slug": "ksb-etanorm-fxe-150-125-250-2a",
+      "manufacturer": "KSB SE & Co. KGaA",
+      "productCode": "Etanorm FXE 150-125-250-2a",
+      "modelName": "Etanorm FXE 150-125-250-2a",
+      "stepUrl": "/parts/manufacturer-step/ksb-etanorm-fxe-150-125-250-2a.stp",
+      "stepFile": "/parts/manufacturer-step/ksb-etanorm-fxe-150-125-250-2a.stp",
+      "sha256": "390CEF4B69C5456D28AFA66B2B3B5865D41B325836DC28E835AC816DBBAA9C96",
+      "manufacturerExact": true,
+      "license": "CADENAS 3Dfindit terms-of-use",
+      "ingestedFrom": "public/parts/manufacturer-incoming/ksb-etanorm-fxe-150-125-250-2a/Etanorm_FXE_150-125-250-2a.stp",
+      "category": "pump",
+      "sourceUrl": "https://www.ksb.com/"
     }
   ]
 }

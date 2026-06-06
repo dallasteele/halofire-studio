@@ -125,14 +125,23 @@ describe('shipped manufacturer-step.json (KSB Etanorm pump)', () => {
     expect(ksb!.license).toBe('CADENAS 3Dfindit terms-of-use');
   });
 
-  it('the KSB entry resolves to exactly one manufacturer-verified part (count=1)', () => {
+  it('every shipped manufacturer-step entry resolves to a manufacturer_verified part, incl. the KSB anchor', () => {
     const json = JSON.parse(
       readFileSync(resolve(HERE, '../public/parts/manufacturer-step.json'), 'utf8'),
     ) as ManufacturerStepManifest;
     const parts = manufacturerVerifiedParts(json);
-    expect(parts).toHaveLength(1);
-    expect(parts[0].modelStatus).toBe('manufacturer_verified');
-    expect(parts[0].engineeringAccurate).toBe(true);
-    expect(parts[0].sha256).toBe(KSB_SHA);
+    // At least the anchor part is shipped; count grows as more real CAD is imported.
+    expect(parts.length).toBeGreaterThanOrEqual(1);
+    // EVERY shipped manufacturer part must be a real operator-verified part.
+    for (const p of parts) {
+      expect(p.modelStatus).toBe('manufacturer_verified');
+      expect(p.engineeringAccurate).toBe(true);
+      expect(typeof p.sha256).toBe('string');
+      expect((p.sha256 ?? '').length).toBe(64);
+    }
+    // The KSB 125-100-200 anchor must be present with its known real sha256.
+    const anchor = parts.find((p) => p.sha256 === KSB_SHA);
+    expect(anchor).toBeDefined();
+    expect(anchor!.modelStatus).toBe('manufacturer_verified');
   });
 });
