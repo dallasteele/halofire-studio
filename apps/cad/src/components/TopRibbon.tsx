@@ -16,6 +16,7 @@ import {
 } from '../store';
 import { colors, radii, spacing, typeScale } from '../lib/tokens';
 import { HydraulicsPanel } from './HydraulicsPanel';
+import { BidPanel } from './BidPanel';
 
 const TABS = [
   'File',
@@ -25,6 +26,7 @@ const TABS = [
   'Layout',
   'Pipe',
   'Hydraulics',
+  'Bid',
 ] as const;
 type Tab = (typeof TABS)[number];
 
@@ -88,6 +90,10 @@ export function TopRibbon(): ReactElement {
       {activeTab === 'Hydraulics' ? (
         <div style={hydraulicsWrapStyle} aria-label="Hydraulics tools">
           <HydraulicsPanel />
+        </div>
+      ) : activeTab === 'Bid' ? (
+        <div style={hydraulicsWrapStyle} aria-label="Bid tools">
+          <BidPanel />
         </div>
       ) : (
         <div style={toolRowStyle} aria-label={`${activeTab} tools`}>

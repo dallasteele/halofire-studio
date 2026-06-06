@@ -31,6 +31,13 @@ import {
   type HydraulicsResult,
   type WaterSupply,
 } from './lib/hydraulics';
+import { computeTakeoff, type Takeoff } from './lib/takeoff';
+import { buildPricedBid, type PricedBid } from './lib/priced-bid';
+import {
+  loadPricebook,
+  resolvePriceTable,
+  type PriceTable,
+} from './lib/bid';
 
 /* --------------------------------------------------------------- view mode */
 
@@ -262,6 +269,45 @@ export interface CadState {
   pressureHeatmap: boolean;
   /** Toggle the pressure heatmap on/off (shared 2D + 3D). */
   setPressureHeatmap: (on: boolean) => void;
+
+  /* ----------------------------------------------------------- W6 takeoff + bid */
+
+  /**
+   * The resolved pricing table (REAL pricebook medians preferred). null until
+   * ensurePricebookLoaded resolves it; the bid then falls back to representative
+   * figures. NEVER fabricated — comes from the studio loadPricebook/resolvePriceTable.
+   */
+  priceTable: PriceTable | null;
+
+  /**
+   * Best-effort load the REAL pricebook medians (apps/cad/public/parts/
+   * pricebook-medians.json, copied from the studio) and resolve the price table.
+   * Fail-soft: on any failure the table resolves to the representative fallback so
+   * the bid still prices (honestly labelled). Idempotent-friendly (callers may
+   * invoke once on mount).
+   */
+  ensurePricebookLoaded: (fetchImpl?: typeof fetch) => Promise<void>;
+}
+
+/**
+ * PURE selector: the live quantity TAKEOFF for the current routed network. Recomputed
+ * from computeTakeoff whenever the network changes — the live-recalc source for the
+ * BOM. Pure, no fabrication; quantities map 1:1 to nodes + segments.
+ */
+export function selectTakeoff(state: CadState): Takeoff {
+  return computeTakeoff(state.project.network);
+}
+
+/**
+ * PURE selector: the live PRICED BID for the current takeoff + resolved price table.
+ * Recomputed whenever the network or the price table changes. Uses the studio bid
+ * math VERBATIM (buildPricedBid -> buildBidEstimate); materials use ONLY real
+ * pricebook medians (or the representative fallback), unpriced lines honestly 0.
+ */
+export function selectPricedBid(state: CadState): PricedBid {
+  const takeoff = computeTakeoff(state.project.network);
+  const table = state.priceTable ?? resolvePriceTable(null);
+  return buildPricedBid(takeoff, table);
 }
 
 /**
@@ -313,6 +359,7 @@ export const useCadStore = create<CadState>((set) => ({
   supply: null,
   designAreaSqFt: null,
   pressureHeatmap: false,
+  priceTable: null,
 
   setProject: (project) =>
     set({ project, selection: { ...EMPTY_SELECTION } }),
@@ -559,4 +606,14 @@ export const useCadStore = create<CadState>((set) => ({
   setDesignArea: (sqft) =>
     set({ designAreaSqFt: sqft != null && sqft > 0 ? sqft : null }),
   setPressureHeatmap: (on) => set({ pressureHeatmap: on }),
+
+  /* ----------------------------------------------------------- W6 takeoff + bid */
+
+  ensurePricebookLoaded: async (fetchImpl) => {
+    const impl =
+      fetchImpl ?? (typeof fetch === 'function' ? fetch.bind(globalThis) : undefined);
+    // loadPricebook fail-softs to null; resolvePriceTable(null) -> representative.
+    const book = await loadPricebook(impl);
+    set({ priceTable: resolvePriceTable(book) });
+  },
 }));

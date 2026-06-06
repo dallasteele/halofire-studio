@@ -26,15 +26,31 @@ export function App(): ReactElement {
   const activeHeadSku = useCadStore((s) => s.activeHeadSku);
   const supply = useCadStore((s) => s.supply);
   const designAreaSqFt = useCadStore((s) => s.designAreaSqFt);
+  const priceTable = useCadStore((s) => s.priceTable);
+  const ensurePricebookLoaded = useCadStore((s) => s.ensurePricebookLoaded);
+
+  // W6: load the REAL pricebook medians once on mount (fail-soft to representative).
+  useEffect(() => {
+    void ensurePricebookLoaded();
+  }, [ensurePricebookLoaded]);
 
   // Publish the preview-verification handle whenever the relevant state changes.
-  // Includes the W5 live hydraulics (demand/riser psi/adequacy) so the handle
-  // recomputes on every network OR supply OR design-area edit (live recalc).
+  // Includes the W5 live hydraulics (demand/riser psi/adequacy) and the W6 live
+  // takeoff + priced bid so the handle recomputes on every network OR supply OR
+  // design-area OR pricebook edit (live recalc).
   useEffect(() => {
     publishCadWindow(
-      cadWindowSnapshot(project, viewMode, TOOL_COUNT, activeHeadSku, supply, designAreaSqFt),
+      cadWindowSnapshot(
+        project,
+        viewMode,
+        TOOL_COUNT,
+        activeHeadSku,
+        supply,
+        designAreaSqFt,
+        priceTable,
+      ),
     );
-  }, [project, viewMode, activeHeadSku, supply, designAreaSqFt]);
+  }, [project, viewMode, activeHeadSku, supply, designAreaSqFt, priceTable]);
 
   // DEV-only: expose the store getState for the preview/E2E harness to drive the app
   // (seed a building + heads, route pipe) without faking the UI. Stripped from prod.

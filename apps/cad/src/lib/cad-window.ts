@@ -11,6 +11,9 @@ import { polygonAreaSqFt } from './scale';
 import { coverageReport } from './head-layout';
 import { reachableFrom } from './pipe-routing';
 import { solveHydraulics, type WaterSupply } from './hydraulics';
+import { computeTakeoff } from './takeoff';
+import { buildPricedBid } from './priced-bid';
+import { resolvePriceTable, type PriceTable } from './bid';
 import { booleanPointInPolygon, point as turfPoint, polygon as turfPolygon } from '@turf/turf';
 import type { ViewMode } from '../store';
 
@@ -84,6 +87,23 @@ export interface CadWindowState {
    * recomputed from solveHydraulics over the PERSISTED network — never a stored flag.
    */
   supplyAdequate: boolean;
+
+  /* --- W6 takeoff + priced-bid handle (live design-aid estimate) --- */
+  /** Number of grouped BOM line items in the live takeoff. 0 with no network. */
+  bomLineCount: number;
+  /** Materials subtotal (USD) from the studio bid math over the takeoff. */
+  bidMaterialsUsd: number;
+  /** Bottom-line ESTIMATE total (USD): materials + labor + OH&P (10%+10%). */
+  bidTotalUsd: number;
+  /** Count of BOM lines that resolved a real/representative price (>0 qty). */
+  pricedLineCount: number;
+  /** Count of BOM lines with NO price found (honestly 0). */
+  unpricedLineCount: number;
+  /**
+   * 'pricebook-median' when ANY line used a real pricebook median, else
+   * 'representative-fallback'. Honest about which pricing source is active.
+   */
+  bidPriceSource: 'pricebook-median' | 'representative-fallback';
 }
 
 /**
@@ -161,6 +181,7 @@ export function cadWindowSnapshot(
   activeHeadSku: string | null = null,
   supply: WaterSupply | null = null,
   designAreaSqFt: number | null = null,
+  priceTable: PriceTable | null = null,
 ): CadWindowState {
   const roomCount = project.building.rooms.length;
   const nodes = project.network.nodes;
@@ -176,6 +197,11 @@ export function cadWindowSnapshot(
     supply: supply ?? undefined,
     designAreaSqFt: designAreaSqFt ?? undefined,
   });
+
+  // W6: live takeoff + priced bid (recomputed from the persisted network + price
+  // table). Uses the studio bid math VERBATIM; representative fallback when no table.
+  const takeoff = computeTakeoff(project.network);
+  const bid = buildPricedBid(takeoff, priceTable ?? resolvePriceTable(null));
 
   return {
     ready: true,
@@ -195,6 +221,12 @@ export function cadWindowSnapshot(
     hydraulicsDemandGpm: hyd.systemDemand.gpm,
     riserPressurePsi: hyd.systemDemand.psiAtRiser,
     supplyAdequate: hyd.adequate,
+    bomLineCount: bid.bomLines.length,
+    bidMaterialsUsd: bid.estimate.materialTotal,
+    bidTotalUsd: bid.estimate.total,
+    pricedLineCount: bid.pricedLineCount,
+    unpricedLineCount: bid.unpricedLineCount,
+    bidPriceSource: bid.estimate.priceSource,
   };
 }
 
