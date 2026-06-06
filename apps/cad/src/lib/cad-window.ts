@@ -28,6 +28,16 @@ export interface CadWindowState {
   roomCount: number;
   /** Sum of room areas in square feet (0 until rooms + a scale exist). */
   buildingAreaSqFt: number;
+
+  /* --- W2 3D building handle (set by Viewer3D when it builds meshes) --- */
+  /** True once the 3D viewer has actually built building meshes (not faked). */
+  has3DBuilding?: boolean;
+  /** The geometry backend that built the 3D meshes ("three-extrude" | "opengeometry"), or null. */
+  buildingBackend?: string | null;
+  /** Number of floor slabs built in 3D (1:1 with rooms that have a polygon). */
+  floorCount?: number;
+  /** Number of wall runs built in 3D (1:1 with walls). */
+  wallCount?: number;
 }
 
 /** Sum of every room polygon's area, in square feet, at the building scale. */
@@ -58,8 +68,20 @@ export function cadWindowSnapshot(
   };
 }
 
-/** Publish the snapshot to window.__cad (no-op when window is absent, e.g. SSR). */
+/**
+ * Publish the snapshot to window.__cad (no-op when window is absent, e.g. SSR).
+ * PRESERVES any W2 3D fields (has3DBuilding/buildingBackend/floor/wall counts)
+ * that Viewer3D set, so the shell snapshot and the 3D snapshot coexist rather
+ * than clobbering each other.
+ */
 export function publishCadWindow(state: CadWindowState): void {
   if (typeof window === 'undefined') return;
-  window.__cad = state;
+  const prev = window.__cad;
+  window.__cad = {
+    ...state,
+    has3DBuilding: prev?.has3DBuilding ?? false,
+    buildingBackend: prev?.buildingBackend ?? null,
+    floorCount: prev?.floorCount ?? 0,
+    wallCount: prev?.wallCount ?? 0,
+  };
 }
