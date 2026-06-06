@@ -1,0 +1,44 @@
+{
+  "name": "Sample L-room",
+  "units": "drawing-units",
+  "scaleFtPerUnit": 1,
+  "note": "Committed deterministic wall-segment fixture for preview verification. NOT a real bid PDF; an honest synthetic L-shaped room footprint.",
+  "segments": [
+    {
+      "x1": 0,
+      "y1": 0,
+      "x2": 40,
+      "y2": 0
+    },
+    {
+      "x1": 40,
+      "y1": 0,
+      "x2": 40,
+      "y2": 18
+    },
+    {
+      "x1": 40,
+      "y1": 18,
+      "x2": 25,
+      "y2": 18
+    },
+    {
+      "x1": 25,
+      "y1": 18,
+      "x2": 25,
+      "y2": 30
+    },
+    {
+      "x1": 25,
+      "y1": 30,
+      "x2": 0,
+      "y2": 30
+    },
+    {
+      "x1": 0,
+      "y1": 30,
+      "x2": 0,
+      "y2": 0
+    }
+  ]
+}

@@ -44,11 +44,17 @@ import { Inspector } from './Inspector';
 import { CatalogBrowser } from './CatalogBrowser';
 import { LayoutControls } from './LayoutControls';
 import { LayoutScene } from './LayoutScene';
+import { BuildingControls } from './BuildingControls';
+import { BuildingScene } from './BuildingScene';
 import { layoutHeads, type HazardClass } from './lib/layout';
+import type { FootprintResult } from './lib/pdf-building';
 
-/** Top-level app mode: the existing part gallery vs. the sprinkler layout tool. */
-export type AppMode = 'catalog' | 'layout';
-const APP_MODES: readonly AppMode[] = ['catalog', 'layout'] as const;
+/**
+ * Top-level app mode: the existing part gallery, the sprinkler layout tool, or the
+ * T47 vector-PDF building footprint lane.
+ */
+export type AppMode = 'catalog' | 'layout' | 'building';
+const APP_MODES: readonly AppMode[] = ['catalog', 'layout', 'building'] as const;
 
 declare global {
   interface Window {
@@ -58,10 +64,16 @@ declare global {
       presentCount: number;
       viewMode: ViewMode;
       selectedKey: string | null;
-      /** Active top-level mode: "catalog" (gallery) or "layout" (sprinkler tool). */
+      /** Active top-level mode: "catalog", "layout", or "building". */
       appMode: AppMode;
       /** Head count of the current layout (only meaningful in layout mode). */
       headCount: number;
+      /**
+       * Enclosed footprint area (sqft) of the currently loaded building, or null
+       * when no building is loaded (or extraction found no usable wall geometry).
+       * Only meaningful in building mode. Honest by construction.
+       */
+      footprintAreaSqft: number | null;
       /**
        * Number of records whose modelStatus === "manufacturer_verified" — i.e.
        * the count of operator-supplied manufacturer-STEP upgrades. With zero
@@ -90,6 +102,11 @@ export function App(): ReactElement {
   const [widthFt, setWidthFt] = useState(40);
   const [lengthFt, setLengthFt] = useState(60);
   const [hazard, setHazard] = useState<HazardClass>('ordinary');
+  // T47 building (vector-PDF) inputs (only used in building mode).
+  const [buildingScaleFtPerPt, setBuildingScaleFtPerPt] = useState(0.125);
+  const [buildingPageIndex, setBuildingPageIndex] = useState(0);
+  const [buildingHeightFt, setBuildingHeightFt] = useState(12);
+  const [footprint, setFootprint] = useState<FootprintResult | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -178,6 +195,8 @@ export function App(): ReactElement {
       headCount,
       manufacturerVerifiedCount,
       dimensionedParametricCount,
+      footprintAreaSqft:
+        footprint && !footprint.empty ? footprint.areaSqft : null,
     };
   }, [
     records,
@@ -188,6 +207,7 @@ export function App(): ReactElement {
     headCount,
     manufacturerVerifiedCount,
     dimensionedParametricCount,
+    footprint,
   ]);
 
   // R3F sizes its canvas via ResizeObserver, which can miss the first measure in
@@ -224,6 +244,34 @@ export function App(): ReactElement {
     };
   }, [widthFt, lengthFt, viewMode]);
 
+  // Building camera, scaled to the extracted footprint bbox (1 ft = 1 unit), so the
+  // whole building is framed. Mirrors the layoutCam pattern.
+  const buildingSpan = useMemo(() => {
+    if (footprint && !footprint.empty) {
+      return Math.max(footprint.bboxFt.w, footprint.bboxFt.l, 10);
+    }
+    return 40;
+  }, [footprint]);
+
+  const buildingCam = useMemo(() => {
+    if (viewMode === 'plan') {
+      return {
+        position: [0, buildingSpan * 1.9, 0.001] as [number, number, number],
+        up: [0, 0, -1] as [number, number, number],
+        fov: 45,
+      };
+    }
+    return {
+      position: [buildingSpan * 1.05, buildingSpan * 1.15, buildingSpan * 1.05] as [
+        number,
+        number,
+        number,
+      ],
+      up: [0, 1, 0] as [number, number, number],
+      fov: 50,
+    };
+  }, [buildingSpan, viewMode]);
+
   return (
     <div style={rootStyle}>
       <header style={headerStyle}>
@@ -239,7 +287,19 @@ export function App(): ReactElement {
         <ViewModeControl viewMode={viewMode} onChange={setViewMode} />
 
         <span style={statusChipStyle} role="status">
-          {appMode === 'layout' ? (
+          {appMode === 'building' ? (
+            footprint && !footprint.empty ? (
+              <>
+                <strong style={statusNumStyle}>{Math.round(footprint.areaSqft)}</strong>{' '}
+                ft² <span style={statusSepStyle}>·</span>{' '}
+                {footprint.bboxFt.w.toFixed(0)}×{footprint.bboxFt.l.toFixed(0)} ft{' '}
+                <span style={statusSepStyle}>·</span>{' '}
+                <strong style={statusNumStyle}>{footprint.wallSegmentCount}</strong> walls
+              </>
+            ) : (
+              'no building loaded — load a vector PDF or the sample'
+            )
+          ) : appMode === 'layout' ? (
             <>
               <strong style={statusNumStyle}>{headCount}</strong> heads{' '}
               <span style={statusSepStyle}>·</span> {widthFt}×{lengthFt} ft{' '}
@@ -265,9 +325,11 @@ export function App(): ReactElement {
         </span>
 
         <p style={disclaimerStyle}>
-          {appMode === 'layout'
-            ? 'best-effort spacing heuristic · NOT hydraulic / AHJ / PE-sealed / code-compliant · not for construction'
-            : 'source: generated · NOT manufacturer-exact · not dimensionally-accurate / AHJ / fabrication-ready'}
+          {appMode === 'building'
+            ? 'best-effort vector-geometry extraction · scale is operator-supplied · NOT AHJ / PE-sealed / code-compliant · not for construction'
+            : appMode === 'layout'
+              ? 'best-effort spacing heuristic · NOT hydraulic / AHJ / PE-sealed / code-compliant · not for construction'
+              : 'source: generated · NOT manufacturer-exact · not dimensionally-accurate / AHJ / fabrication-ready'}
         </p>
       </header>
 
@@ -302,7 +364,7 @@ export function App(): ReactElement {
 
             <Inspector part={selected} />
           </>
-        ) : (
+        ) : appMode === 'layout' ? (
           <>
             <LayoutControls
               widthFt={widthFt}
@@ -332,6 +394,39 @@ export function App(): ReactElement {
               </Canvas>
             </main>
           </>
+        ) : (
+          <>
+            <BuildingControls
+              scaleFtPerPt={buildingScaleFtPerPt}
+              onScaleChange={setBuildingScaleFtPerPt}
+              pageIndex={buildingPageIndex}
+              onPageChange={setBuildingPageIndex}
+              heightFt={buildingHeightFt}
+              onHeightChange={setBuildingHeightFt}
+              footprint={footprint}
+              onFootprint={setFootprint}
+            />
+
+            <main style={canvasWrapStyle} aria-label="Building footprint viewer">
+              <Canvas
+                shadows
+                dpr={[1, 2]}
+                gl={{ preserveDrawingBuffer: true }}
+                camera={{ position: buildingCam.position, up: buildingCam.up, fov: buildingCam.fov }}
+                key={`building-${viewMode}-${buildingSpan}`}
+              >
+                <Suspense fallback={null}>
+                  {footprint && !footprint.empty ? (
+                    <BuildingScene
+                      outline={footprint.outline}
+                      heightFt={buildingHeightFt}
+                      viewMode={viewMode}
+                    />
+                  ) : null}
+                </Suspense>
+              </Canvas>
+            </main>
+          </>
         )}
       </div>
     </div>
@@ -354,6 +449,7 @@ function AppModeControl({ appMode, onChange }: AppModeControlProps): ReactElemen
   const options: { mode: AppMode; label: string }[] = [
     { mode: 'catalog', label: 'Catalog' },
     { mode: 'layout', label: 'Layout' },
+    { mode: 'building', label: 'Building' },
   ];
 
   return (

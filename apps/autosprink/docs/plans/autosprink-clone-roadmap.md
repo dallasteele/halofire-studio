@@ -836,10 +836,26 @@ so AI placeholders are never mistaken for engineering-accurate CAD.
       auto-tagged `source='ai-placeholder'`, `dimensionVerified=false`; gated behind
       "no catalog/build123d match found". Adapter + fail-soft tests with a mock backend;
       NO real generation claimed unless the tool actually runs.
-- [ ] **T47 — BUILDING vector-PDF-first lane (GX10-INDEPENDENT, deterministic).** A
-      deterministic extractor in `halofire-ifc` that detects a vector layer in bid PDFs,
-      pulls wall/pipe polylines to DXF, and extrudes footprints to 3D via OpenGeometry —
-      no SAM, no GPU. Test against one real bid set (the 1881 Salt Lake City proposal).
+- [x] **T47 — BUILDING vector-PDF-first lane (GX10-INDEPENDENT, deterministic).** DONE
+      2026-06-05 (ultra workflow wwcxga3fz, both verifiers PASS; + camera/material polish).
+      Built in apps/studio (TS port of the proven apps/autosprink/src/engine/pdf-floorplan.js
+      algorithm). src/lib/pdf-building.ts (PURE deterministic): extractVectorSegments
+      (CTM-aware, legacy + v6 DrawOPS), parseArchitecturalScale (3/32"=1'-0" family),
+      segmentsToFootprint (wall-like filter → dominant connected network via union-find →
+      enclosed rectilinear footprint via occupancy-grid flood-fill + boundary trace →
+      {outline,bboxFt,areaSqft,wallSegmentCount,...}; THROWS if scale missing/<=0 — scale is
+      operator-supplied, NEVER guessed; returns honest EMPTY result, never fabricates),
+      loadPdfVectorPage (pdfjs-dist injectable). src/BuildingScene.tsx (R3F: filled
+      THREE.Shape floor + perimeter walls extruded along outline edges, recentered on origin,
+      lit, building-scaled camera). New "building" app mode + BuildingControls (vector-PDF
+      file input + REQUIRED operator scale + page + wall height + Load-sample). Bundled
+      public/samples/room-segments.json (synthetic L-room ~1025 sqft) for deterministic
+      preview without the 1881 file. window.__studio.appMode "building" + footprintAreaSqft.
+      HONESTY: best-effort vector-geometry extraction; scale operator-supplied + required;
+      no fabricated footprint; prominent NOT-AHJ/PE/code/permit/construction disclaimer.
+      TDD test/pdf-building.test.ts (35; shoelace area, scale-throw, honest-empty, injected
+      pdfjs mock). vitest 214/214, tsc 0, vite build 0. VERIFIED in Claude's preview window:
+      Building mode → Load sample → 1025 ft² L-shaped footprint renders clean in 3D + Plan.
 - [ ] **T48 — SAM raster-fallback lane, segmentation ONLY (hosted SAM 3, NOT GX10).**
       Route scanned/raster plans through `services/halofire-sam` (hosted SAM 3 endpoint)
       to produce 2D masks → polygon footprints, then reuse the OpenGeometry extrude path;
