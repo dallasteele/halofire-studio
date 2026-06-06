@@ -468,21 +468,9 @@ export function routeSystem(
       : Math.max(2, (bounds.maxX - bounds.minX) / Math.max(1, heads.length - 1));
   const span = Math.max(1, branchSpacing);
   const crossMainX = round(bounds.minX - span * 0.5);
-  const midZ = round((bounds.minZ + bounds.maxZ) / 2);
 
-  // Supply / riser position (plan feet). Default: one spacing left of the cross main.
-  const supply: SupplyPoint = opts.supplyPoint ?? { x: round(crossMainX - span), y: midZ };
-
-  // --- Riser node (the supply root). It exposes a single OUTLET at the main size. ---
-  const totalHeads = heads.length;
-  const mainSizeIn = sizeForHeadCount(totalHeads);
-  const riser = b.addNode({
-    id: b.id('riser'),
-    type: 'SOURCE',
-    pos: { x: supply.x, y: ceilingHt, z: supply.y },
-  });
-
-  // --- Per-row tee taps on the cross main, ordered by Z. ---
+  // --- Per-row tee taps on the cross main, ordered by Z. Built FIRST so the riser
+  //     can align to the cross-main head and the feed main runs straight (orthogonal). ---
   interface RowPlan {
     row: BranchRow;
     teeId: string;
@@ -504,16 +492,52 @@ export function routeSystem(
       branchSizeIn: sizeForHeadCount(row.heads.length),
     };
   });
-
-  // --- MAIN: riser -> elbow at the cross-main head. The elbow turns the X-running
-  //     main into the Z-running cross-main. Both carry all heads (main size). ---
   const firstTap = rowPlans[0];
+
+  // --- Riser / supply (plan feet). The feed main enters the cross-main at its HEAD
+  //     (firstTap Z) through a corner elbow. The DEFAULT supply sits on that same Z,
+  //     one span to the side, so the feed main is a single STRAIGHT run. A custom
+  //     off-axis supply is routed ORTHOGONALLY (an L via a corner) — never diagonal. ---
+  const totalHeads = heads.length;
+  const mainSizeIn = sizeForHeadCount(totalHeads);
+  const supply: SupplyPoint =
+    opts.supplyPoint ?? { x: round(crossMainX - span), y: firstTap.tapPos.z };
+  const riser = b.addNode({
+    id: b.id('riser'),
+    type: 'SOURCE',
+    pos: { x: round(supply.x), y: ceilingHt, z: round(supply.y) },
+  });
+
+  // Elbow at the cross-main head turns the X-running feed main into the Z cross-main.
   const elbowMain = b.addNode({
     id: b.id('elbow'),
     type: 'ELBOW',
     pos: { x: crossMainX, y: ceilingHt, z: firstTap.tapPos.z },
   });
-  b.run(riser.id, elbowMain.id, 'MAIN', mainSizeIn, planDist(riser.pos, elbowMain.pos), mainMaterial);
+
+  // --- MAIN: orthogonal. Straight when the riser shares the elbow's X or Z; otherwise
+  //     an axis-aligned L through a corner elbow. NEVER a diagonal segment. ---
+  const dxDiffers = Math.abs(riser.pos.x - elbowMain.pos.x) > 1e-6;
+  const dzDiffers = Math.abs(riser.pos.z - elbowMain.pos.z) > 1e-6;
+  if (dxDiffers && dzDiffers) {
+    // Corner elbow: run in Z at the riser's X, then in X to the cross-main elbow.
+    const corner = b.addNode({
+      id: b.id('elbow'),
+      type: 'ELBOW',
+      pos: { x: riser.pos.x, y: ceilingHt, z: elbowMain.pos.z },
+    });
+    b.run(riser.id, corner.id, 'MAIN', mainSizeIn, planDist(riser.pos, corner.pos), mainMaterial);
+    b.run(corner.id, elbowMain.id, 'MAIN', mainSizeIn, planDist(corner.pos, elbowMain.pos), mainMaterial);
+    b.fitting(
+      corner.id,
+      'ELBOW',
+      { method: mainMethod, nominalSizeIn: mainSizeIn, role: 'INLET' },
+      [{ method: mainMethod, nominalSizeIn: mainSizeIn, role: 'OUTLET' }],
+    );
+  } else {
+    b.run(riser.id, elbowMain.id, 'MAIN', mainSizeIn, planDist(riser.pos, elbowMain.pos), mainMaterial);
+  }
+
   // Riser fitting: single OUTLET at the main size feeding the main.
   b.fitting(
     riser.id,

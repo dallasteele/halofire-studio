@@ -267,3 +267,39 @@ describe('routeSystem — honest empty + supply override', () => {
     expect(routed.disclaimer).toMatch(/NOT a hydraulically-calculated/);
   });
 });
+
+describe('routeSystem — every segment is axis-aligned (NO diagonal pipe)', () => {
+  const grid = (rowsN: number, colsN: number): Node[] => {
+    const heads: Node[] = [];
+    for (let r = 0; r < rowsN; r += 1)
+      for (let c = 0; c < colsN; c += 1) heads.push(head(`h${r}_${c}`, c * 12, r * 12));
+    return heads;
+  };
+  const assertNoXZDiagonal = (routed: ReturnType<typeof routeSystem>) => {
+    const posOf = (id: string) => routed.nodes.find((n) => n.id === id)!.pos;
+    for (const s of routed.segments) {
+      const a = posOf(s.from);
+      const b = posOf(s.to);
+      const dx = Math.abs(a.x - b.x);
+      const dz = Math.abs(a.z - b.z);
+      // A real run moves along exactly one plan axis; a diagonal moves along both.
+      expect(
+        dx > 1e-6 && dz > 1e-6,
+        `segment ${s.from}->${s.to} (${s.role}) is diagonal in XZ: dx=${dx} dz=${dz}`,
+      ).toBe(false);
+    }
+  };
+
+  it('default supply: no segment runs diagonally', () => {
+    const routed = routeSystem(net(grid(4, 5)));
+    expect(routed.segments.length).toBeGreaterThan(0);
+    assertNoXZDiagonal(routed);
+  });
+
+  it('off-axis custom supply is still routed orthogonally (L via a corner elbow)', () => {
+    // supply off BOTH axes from the cross-main head — the old code drew a diagonal main.
+    const routed = routeSystem(net(grid(3, 4)), { supplyPoint: { x: -60, y: -40 } });
+    assertNoXZDiagonal(routed);
+    expect(routed.routedOk).toBe(true);
+  });
+});
