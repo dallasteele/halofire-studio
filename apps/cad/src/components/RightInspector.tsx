@@ -4,8 +4,8 @@
 // (the shell carries no geometry), it states that plainly rather than inventing
 // properties.
 
-import { useEffect, useState, type CSSProperties, type ReactElement } from 'react';
-import { useCadStore } from '../store';
+import { useEffect, useMemo, useState, type CSSProperties, type ReactElement } from 'react';
+import { selectHydraulics, useCadStore } from '../store';
 import { coverageReport, type CoverageFinding } from '../lib/head-layout';
 import {
   findHeadBySku,
@@ -24,8 +24,18 @@ interface Row {
 export function RightInspector(): ReactElement {
   const selection = useCadStore((s) => s.selection);
   const project = useCadStore((s) => s.project);
+  const supply = useCadStore((s) => s.supply);
+  const designAreaSqFt = useCadStore((s) => s.designAreaSqFt);
 
   const { kind, id } = activeSelection(selection);
+
+  // W5: live hydraulics for the selected segment (friction/velocity) and node
+  // (pressure/flow). Recomputed when the network / supply / design area change.
+  const hydraulics = useMemo(
+    () => selectHydraulics(useCadStore.getState()),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [project.network, supply, designAreaSqFt, project.hazardDefaults.defaultClass],
+  );
 
   let title = 'Nothing selected';
   let rows: Row[] = [];
@@ -47,11 +57,22 @@ export function RightInspector(): ReactElement {
           ]
         : [];
       if (!node) note = 'Selected node id is not in the current (empty) network.';
+      const nodeHyd = node ? hydraulics.perNode.find((n) => n.id === node.id) ?? null : null;
       if (node?.type === 'HEAD') {
-        headExtra = <HeadDetail pos={node.pos} sku={node.sku} project={project} />;
+        headExtra = (
+          <>
+            <HeadDetail pos={node.pos} sku={node.sku} project={project} />
+            {nodeHyd && <NodeHydraulics pressurePsi={nodeHyd.pressurePsi} flowGpm={nodeHyd.flowGpm} />}
+          </>
+        );
       } else if (node) {
         // A fitting (tee/elbow/reducer) or the riser — show its connectivity ports.
-        headExtra = <FittingDetail node={node} />;
+        headExtra = (
+          <>
+            <FittingDetail node={node} />
+            {nodeHyd && <NodeHydraulics pressurePsi={nodeHyd.pressurePsi} flowGpm={nodeHyd.flowGpm} />}
+          </>
+        );
       }
     } else if (kind === 'segment') {
       const seg = project.network.segments.find((s) => s.id === id);
@@ -66,7 +87,21 @@ export function RightInspector(): ReactElement {
           ]
         : [];
       if (!seg) note = 'Selected segment id is not in the current (empty) network.';
-      if (seg) headExtra = <SegmentEditor seg={seg} />;
+      if (seg) {
+        const segHyd = hydraulics.perSegment.find((s) => s.id === seg.id) ?? null;
+        headExtra = (
+          <>
+            <SegmentEditor seg={seg} />
+            {segHyd && (
+              <SegmentHydraulics
+                frictionPsi={segHyd.frictionPsi}
+                velocityFps={segHyd.velocityFps}
+                flowGpm={segHyd.flowGpm}
+              />
+            )}
+          </>
+        );
+      }
     } else {
       const room = project.building.rooms.find((r) => r.id === id);
       title = room ? `Room · ${room.name ?? room.id}` : 'Room';
@@ -317,6 +352,76 @@ function FittingDetail({ node }: { node: Node }): ReactElement {
       <div style={citationStyle}>
         Mate-ability uses the connectivity Port model (real reducing fittings only).
         Design aid — not a hydraulic calc or code certification.
+      </div>
+    </div>
+  );
+}
+
+/**
+ * W5 node hydraulics: the live pressure (psi) + flow (gpm) at the selected node from
+ * the design-aid solve. Honest: design aid / estimate, not a certified calc.
+ */
+function NodeHydraulics({
+  pressurePsi,
+  flowGpm,
+}: {
+  pressurePsi: number;
+  flowGpm: number;
+}): ReactElement {
+  return (
+    <div style={headBlockStyle}>
+      <div style={headBlockTitleStyle}>Hydraulics (design aid)</div>
+      <dl style={{ display: 'flex', flexDirection: 'column', gap: spacing[1] }}>
+        <div style={rowStyle}>
+          <dt style={dtStyle}>Pressure</dt>
+          <dd style={ddStyle}>{`${pressurePsi.toFixed(1)} psi`}</dd>
+        </div>
+        <div style={rowStyle}>
+          <dt style={dtStyle}>Flow</dt>
+          <dd style={ddStyle}>{`${flowGpm.toFixed(1)} gpm`}</dd>
+        </div>
+      </dl>
+      <div style={citationStyle}>
+        Q=K√P + Hazen-Williams (cited NFPA-13 constants). Estimate / design aid — not a
+        certified hydraulic calc, AHJ, or PE-sealed.
+      </div>
+    </div>
+  );
+}
+
+/**
+ * W5 segment hydraulics: the live friction loss (psi), velocity (ft/s), and flow
+ * (gpm) for the selected pipe from the design-aid solve.
+ */
+function SegmentHydraulics({
+  frictionPsi,
+  velocityFps,
+  flowGpm,
+}: {
+  frictionPsi: number;
+  velocityFps: number;
+  flowGpm: number;
+}): ReactElement {
+  return (
+    <div style={headBlockStyle}>
+      <div style={headBlockTitleStyle}>Hydraulics (design aid)</div>
+      <dl style={{ display: 'flex', flexDirection: 'column', gap: spacing[1] }}>
+        <div style={rowStyle}>
+          <dt style={dtStyle}>Friction</dt>
+          <dd style={ddStyle}>{`${frictionPsi.toFixed(2)} psi`}</dd>
+        </div>
+        <div style={rowStyle}>
+          <dt style={dtStyle}>Velocity</dt>
+          <dd style={ddStyle}>{`${velocityFps.toFixed(2)} ft/s`}</dd>
+        </div>
+        <div style={rowStyle}>
+          <dt style={dtStyle}>Flow</dt>
+          <dd style={ddStyle}>{`${flowGpm.toFixed(1)} gpm`}</dd>
+        </div>
+      </dl>
+      <div style={citationStyle}>
+        Hazen-Williams Pm=4.52·Q^1.85/(C^1.85·d^4.87)·L + fitting equivalent lengths
+        (cited NFPA-13). Estimate / design aid — verify the adopted edition.
       </div>
     </div>
   );

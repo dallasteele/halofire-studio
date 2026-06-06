@@ -26,6 +26,11 @@ import {
   type RouteOpts,
   type SupplyPoint,
 } from './lib/pipe-routing';
+import {
+  solveHydraulics,
+  type HydraulicsResult,
+  type WaterSupply,
+} from './lib/hydraulics';
 
 /* --------------------------------------------------------------- view mode */
 
@@ -230,6 +235,48 @@ export interface CadState {
    * non-positive diameter. This is an operator override of the schedule size.
    */
   setSegmentDiameter: (id: string, diameterIn: number) => void;
+
+  /* ----------------------------------------------------------- W5 hydraulics */
+
+  /**
+   * The operator water supply (flow test: static / residual @ flow), or null until
+   * one is entered. Drives the hydraulic adequacy check.
+   */
+  supply: WaterSupply | null;
+
+  /**
+   * The remote DESIGN AREA in ft^2 (NFPA-13 density/area), or null to operate ALL
+   * heads (conservative whole-system demand). The head COUNT is derived from this
+   * via the cited max-protection-area-per-head — the magnitude itself is operator-
+   * supplied (not a single cited constant), surfaced honestly in the findings.
+   */
+  designAreaSqFt: number | null;
+
+  /** Set the water supply (static / residual @ flow), or null to clear it. */
+  setSupply: (supply: WaterSupply | null) => void;
+
+  /** Set the remote design area (ft^2), or null to operate all heads. */
+  setDesignArea: (sqft: number | null) => void;
+
+  /** When true, the 2D + 3D views color heads/segments by hydraulic pressure. */
+  pressureHeatmap: boolean;
+  /** Toggle the pressure heatmap on/off (shared 2D + 3D). */
+  setPressureHeatmap: (on: boolean) => void;
+}
+
+/**
+ * PURE selector: the live hydraulic design-aid result for the current project +
+ * supply + design area. Recomputed from solveHydraulics whenever the inputs change
+ * (the network, supply, design area, or hazard default). This is the LIVE-RECALC
+ * source: a selector over the store, so editing a segment diameter, re-routing, or
+ * changing the supply produces a fresh result. Pure — no fabrication.
+ */
+export function selectHydraulics(state: CadState): HydraulicsResult {
+  return solveHydraulics(state.project.network, {
+    hazard: state.project.hazardDefaults.defaultClass,
+    supply: state.supply ?? undefined,
+    designAreaSqFt: state.designAreaSqFt ?? undefined,
+  });
 }
 
 /** True when a node is part of the auto-routed pipe (not a head). */
@@ -263,6 +310,9 @@ export const useCadStore = create<CadState>((set) => ({
   underlay: null,
   activeHeadSku: null,
   supplyPoint: null,
+  supply: null,
+  designAreaSqFt: null,
+  pressureHeatmap: false,
 
   setProject: (project) =>
     set({ project, selection: { ...EMPTY_SELECTION } }),
@@ -502,4 +552,11 @@ export const useCadStore = create<CadState>((set) => ({
         project: { ...s.project, network: { ...s.project.network, segments: next } },
       };
     }),
+
+  /* ----------------------------------------------------------- W5 hydraulics */
+
+  setSupply: (supply) => set({ supply }),
+  setDesignArea: (sqft) =>
+    set({ designAreaSqFt: sqft != null && sqft > 0 ? sqft : null }),
+  setPressureHeatmap: (on) => set({ pressureHeatmap: on }),
 }));

@@ -10,6 +10,7 @@ import { hasNetwork, type Project } from './model';
 import { polygonAreaSqFt } from './scale';
 import { coverageReport } from './head-layout';
 import { reachableFrom } from './pipe-routing';
+import { solveHydraulics, type WaterSupply } from './hydraulics';
 import { booleanPointInPolygon, point as turfPoint, polygon as turfPolygon } from '@turf/turf';
 import type { ViewMode } from '../store';
 
@@ -71,6 +72,18 @@ export interface CadWindowState {
    * the PERSISTED segments — it is not a stored flag that can drift from the geometry.
    */
   routedOk: boolean;
+
+  /* --- W5 hydraulics handle (live design-aid result) --- */
+  /** System demand (gpm) from the live hydraulic design aid. 0 with no routed system. */
+  hydraulicsDemandGpm: number;
+  /** Required pressure at the riser (psi) at the demand flow. 0 with no routed system. */
+  riserPressurePsi: number;
+  /**
+   * True iff a water supply is set AND the available supply pressure at the demand
+   * flow >= the required riser pressure. False with no supply or when short. Honest:
+   * recomputed from solveHydraulics over the PERSISTED network — never a stored flag.
+   */
+  supplyAdequate: boolean;
 }
 
 /**
@@ -146,6 +159,8 @@ export function cadWindowSnapshot(
   viewMode: ViewMode,
   toolCount: number,
   activeHeadSku: string | null = null,
+  supply: WaterSupply | null = null,
+  designAreaSqFt: number | null = null,
 ): CadWindowState {
   const roomCount = project.building.rooms.length;
   const nodes = project.network.nodes;
@@ -154,6 +169,14 @@ export function cadWindowSnapshot(
     (n) => n.type === 'TEE' || n.type === 'ELBOW' || n.type === 'REDUCER',
   ).length;
   const riserCount = nodes.filter((n) => n.type === 'SOURCE').length;
+
+  // W5: live hydraulic design aid (recomputed from the persisted network + supply).
+  const hyd = solveHydraulics(project.network, {
+    hazard: project.hazardDefaults.defaultClass,
+    supply: supply ?? undefined,
+    designAreaSqFt: designAreaSqFt ?? undefined,
+  });
+
   return {
     ready: true,
     viewMode,
@@ -169,6 +192,9 @@ export function cadWindowSnapshot(
     fittingCount,
     riserCount,
     routedOk: computeRoutedOk(project),
+    hydraulicsDemandGpm: hyd.systemDemand.gpm,
+    riserPressurePsi: hyd.systemDemand.psiAtRiser,
+    supplyAdequate: hyd.adequate,
   };
 }
 

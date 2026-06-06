@@ -34,6 +34,8 @@ import {
 } from '../lib/model';
 import { measureFeet, polygonAreaSqFt, setScaleFromTwoPoints } from '../lib/scale';
 import { coverageReport } from '../lib/head-layout';
+import { pressureColor, pressureRange, type HydraulicsResult } from '../lib/hydraulics';
+import { selectHydraulics } from '../store';
 import { colors, spacing, typeScale } from '../lib/tokens';
 
 /** Spacing between minor grid lines, in px. */
@@ -171,6 +173,9 @@ export function PlanCanvas(): ReactElement {
   const selectedSegmentId = useCadStore((s) => s.selection.selectedSegmentId);
   const selectedRoomId = useCadStore((s) => s.selection.selectedRoomId);
   const activeHeadSku = useCadStore((s) => s.activeHeadSku);
+  const pressureHeatmap = useCadStore((s) => s.pressureHeatmap);
+  const supply = useCadStore((s) => s.supply);
+  const designAreaSqFt = useCadStore((s) => s.designAreaSqFt);
 
   const building = project.building;
   const ftPerUnit = building.scaleFtPerUnit;
@@ -190,6 +195,36 @@ export function PlanCanvas(): ReactElement {
     return m;
   }, [project.network.nodes]);
   const segments = project.network.segments;
+
+  // W5 pressure heatmap: compute the live hydraulics ONLY when the heatmap is on, then
+  // map node/segment ids to a shared blue->red pressure color (legend below).
+  const hydraulics = useMemo<HydraulicsResult | null>(() => {
+    if (!pressureHeatmap) return null;
+    return selectHydraulics(useCadStore.getState());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pressureHeatmap, project.network, supply, designAreaSqFt, project.hazardDefaults.defaultClass]);
+  const pRange = useMemo(
+    () => (hydraulics ? pressureRange(hydraulics) : null),
+    [hydraulics],
+  );
+  const nodePsi = useMemo(() => {
+    const m = new Map<string, number>();
+    if (hydraulics) for (const n of hydraulics.perNode) m.set(n.id, n.pressurePsi);
+    return m;
+  }, [hydraulics]);
+  const segPsi = useMemo(() => {
+    // A segment's heatmap pressure = the mean of its two endpoint node pressures.
+    const m = new Map<string, number>();
+    if (hydraulics) {
+      for (const seg of project.network.segments) {
+        const a = nodePsi.get(seg.from);
+        const b = nodePsi.get(seg.to);
+        if (a != null && b != null) m.set(seg.id, (a + b) / 2);
+      }
+    }
+    return m;
+  }, [hydraulics, project.network.segments, nodePsi]);
+
   const selectedRoom = selectedRoomId
     ? building.rooms.find((r) => r.id === selectedRoomId) ?? null
     : null;
@@ -580,11 +615,17 @@ export function PlanCanvas(): ReactElement {
               const pa = toScreen({ x: a.pos.x / scale, y: a.pos.z / scale });
               const pc = toScreen({ x: c.pos.x / scale, y: c.pos.z / scale });
               const isSel = seg.id === selectedSegmentId;
+              const heatPsi = pRange && segPsi.has(seg.id) ? segPsi.get(seg.id)! : null;
+              const stroke = isSel
+                ? colors.warn
+                : heatPsi != null && pRange
+                  ? pressureColor(heatPsi, pRange.min, pRange.max)
+                  : roleColor(seg.role);
               return (
                 <Line
                   key={seg.id}
                   points={[pa.sx, pa.sy, pc.sx, pc.sy]}
-                  stroke={isSel ? colors.warn : roleColor(seg.role)}
+                  stroke={stroke}
                   strokeWidth={widthForDiameter(seg.diameterIn) + (isSel ? 2 : 0)}
                   lineCap="round"
                   hitStrokeWidth={12}
@@ -657,13 +698,19 @@ export function PlanCanvas(): ReactElement {
               const planPt: Point2 = { x: h.pos.x / scale, y: h.pos.z / scale };
               const s = toScreen(planPt);
               const isSel = h.id === selectedNodeId;
+              const heatPsi = pRange && nodePsi.has(h.id) ? nodePsi.get(h.id)! : null;
+              const headFill = isSel
+                ? colors.warn
+                : heatPsi != null && pRange
+                  ? pressureColor(heatPsi, pRange.min, pRange.max)
+                  : colors.interactiveText;
               return (
                 <Circle
                   key={h.id}
                   x={s.sx}
                   y={s.sy}
                   radius={isSel ? 7 : 5}
-                  fill={isSel ? colors.warn : colors.interactiveText}
+                  fill={headFill}
                   stroke={isSel ? colors.warn : colors.accentText}
                   strokeWidth={isSel ? 2 : 1}
                   draggable
@@ -797,6 +844,17 @@ export function PlanCanvas(): ReactElement {
                 ))}
               </select>
             </label>
+          )}
+
+          {/* W5 pressure heatmap legend (only when the heatmap is on + there is range). */}
+          {pressureHeatmap && pRange && pRange.max > pRange.min && (
+            <div style={headBarStyle}>
+              <span style={hudBadgeStyle}>Pressure heatmap (psi)</span>
+              <span style={legendGradientStyle} aria-hidden="true" />
+              <span style={hudHintStyle}>
+                {`${pRange.min.toFixed(0)} (low) → ${pRange.max.toFixed(0)} (high) psi — design aid estimate`}
+              </span>
+            </div>
           )}
 
           {statusMsg && <div style={statusMsgStyle}>{statusMsg}</div>}
@@ -957,6 +1015,17 @@ const autoLayoutBtnStyle: CSSProperties = {
   fontSize: typeScale.xs.size,
   fontWeight: 600,
   cursor: 'pointer',
+};
+
+const legendGradientStyle: CSSProperties = {
+  display: 'inline-block',
+  width: 120,
+  height: 10,
+  borderRadius: 999,
+  // The same blue->red ramp pressureColor produces (5 stops).
+  background:
+    'linear-gradient(90deg, rgb(59,130,246), rgb(34,211,238), rgb(74,222,128), rgb(250,204,21), rgb(239,68,68))',
+  border: `1px solid ${colors.border}`,
 };
 
 const coverageBadgeStyle: CSSProperties = {

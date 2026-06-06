@@ -33,6 +33,8 @@ import {
   type BuildingMeshes,
   type FloorMesh,
 } from '../lib/building3d';
+import { pressureColor, pressureRange, type HydraulicsResult } from '../lib/hydraulics';
+import { selectHydraulics } from '../store';
 import { colors, spacing, typeScale } from '../lib/tokens';
 
 /** True when a WebGL context can be created (false in jsdom / headless-no-GL). */
@@ -91,14 +93,17 @@ function HeadMarker({
   y,
   z,
   selected,
+  heatColor,
   onSelect,
 }: {
   x: number;
   y: number;
   z: number;
   selected: boolean;
+  heatColor: string | null;
   onSelect: () => void;
 }): ReactElement {
+  const body = selected ? '#ffd27f' : heatColor ?? '#6fb3ff';
   return (
     <group position={[x, y, z]}>
       {/* small sphere body */}
@@ -110,9 +115,9 @@ function HeadMarker({
       >
         <sphereGeometry args={[selected ? 0.5 : 0.35, 16, 12]} />
         <meshStandardMaterial
-          color={selected ? '#ffd27f' : '#6fb3ff'}
-          emissive={selected ? '#ffd27f' : '#1b3b5f'}
-          emissiveIntensity={selected ? 0.6 : 0.25}
+          color={body}
+          emissive={selected ? '#ffd27f' : heatColor ?? '#1b3b5f'}
+          emissiveIntensity={selected ? 0.6 : heatColor ? 0.4 : 0.25}
           roughness={0.4}
           metalness={0.2}
         />
@@ -120,7 +125,7 @@ function HeadMarker({
       {/* deflector disc just below the body */}
       <mesh position={[0, -0.45, 0]} rotation={[Math.PI / 2, 0, 0]}>
         <cylinderGeometry args={[0.5, 0.5, 0.05, 16]} />
-        <meshStandardMaterial color={selected ? '#ffd27f' : '#9fc7ff'} roughness={0.6} />
+        <meshStandardMaterial color={selected ? '#ffd27f' : heatColor ?? '#9fc7ff'} roughness={0.6} />
       </mesh>
     </group>
   );
@@ -153,6 +158,7 @@ function PipeRun({
   diameterIn,
   role,
   selected,
+  heatColor,
   onSelect,
 }: {
   a: [number, number, number];
@@ -160,6 +166,7 @@ function PipeRun({
   diameterIn: number;
   role: string;
   selected: boolean;
+  heatColor: string | null;
   onSelect: () => void;
 }): ReactElement | null {
   const dx = b[0] - a[0];
@@ -173,7 +180,7 @@ function PipeRun({
   const up = new THREE.Vector3(0, 1, 0);
   const quat = new THREE.Quaternion().setFromUnitVectors(up, dir);
   const r = radiusForDiameter(diameterIn) * (selected ? 1.6 : 1);
-  const color = selected ? '#ffd27f' : PIPE_ROLE_COLOR[role] ?? '#8aa0b4';
+  const color = selected ? '#ffd27f' : heatColor ?? PIPE_ROLE_COLOR[role] ?? '#8aa0b4';
   return (
     <mesh
       position={mid}
@@ -196,6 +203,7 @@ function FittingMarker({
   z,
   type,
   selected,
+  heatColor,
   onSelect,
 }: {
   x: number;
@@ -203,10 +211,12 @@ function FittingMarker({
   z: number;
   type: string;
   selected: boolean;
+  heatColor: string | null;
   onSelect: () => void;
 }): ReactElement {
   const isRiser = type === 'SOURCE';
   const s = (selected ? 0.55 : 0.4) * (isRiser ? 1.4 : 1);
+  const color = selected ? '#ffd27f' : heatColor ?? (isRiser ? '#c062d0' : '#cdd6e0');
   return (
     <mesh
       position={[x, y, z]}
@@ -217,14 +227,20 @@ function FittingMarker({
     >
       <boxGeometry args={[s, s, s]} />
       <meshStandardMaterial
-        color={selected ? '#ffd27f' : isRiser ? '#c062d0' : '#cdd6e0'}
-        emissive={selected ? '#7a5a1f' : '#000000'}
-        emissiveIntensity={selected ? 0.4 : 0}
+        color={color}
+        emissive={selected ? '#7a5a1f' : heatColor ?? '#000000'}
+        emissiveIntensity={selected ? 0.4 : heatColor ? 0.35 : 0}
         roughness={0.5}
         metalness={0.3}
       />
     </mesh>
   );
+}
+
+/** Heatmap color accessors (id -> css color | null) shared by heads/segments/fittings. */
+interface HeatMap {
+  node: (id: string) => string | null;
+  seg: (id: string) => string | null;
 }
 
 /**
@@ -239,6 +255,7 @@ function PipeNetwork({
   centerZ,
   selectedNodeId,
   selectedSegmentId,
+  heat,
   onSelectSegment,
   onSelectNode,
 }: {
@@ -248,6 +265,8 @@ function PipeNetwork({
   centerZ: number;
   selectedNodeId: string | null;
   selectedSegmentId: string | null;
+  /** Heatmap accessor (id -> color) or null when the heatmap is off. */
+  heat: HeatMap | null;
   onSelectSegment: (id: string) => void;
   onSelectNode: (id: string) => void;
 }): ReactElement {
@@ -271,6 +290,7 @@ function PipeNetwork({
             diameterIn={seg.diameterIn}
             role={seg.role}
             selected={seg.id === selectedSegmentId}
+            heatColor={heat ? heat.seg(seg.id) : null}
             onSelect={() => onSelectSegment(seg.id)}
           />
         );
@@ -283,6 +303,7 @@ function PipeNetwork({
           z={f.pos.z - centerZ}
           type={f.type}
           selected={f.id === selectedNodeId}
+          heatColor={heat ? heat.node(f.id) : null}
           onSelect={() => onSelectNode(f.id)}
         />
       ))}
@@ -297,6 +318,7 @@ function BuildingScene({
   centerX,
   centerZ,
   selectedNodeId,
+  heat,
   onSelectHead,
   network,
   selectedSegmentId,
@@ -309,6 +331,7 @@ function BuildingScene({
   centerX: number;
   centerZ: number;
   selectedNodeId: string | null;
+  heat: HeatMap | null;
   onSelectHead: (id: string) => void;
   network: Project['network'];
   selectedSegmentId: string | null;
@@ -353,6 +376,7 @@ function BuildingScene({
           y={h.pos.y}
           z={h.pos.z - centerZ}
           selected={h.id === selectedNodeId}
+          heatColor={heat ? heat.node(h.id) : null}
           onSelect={() => onSelectHead(h.id)}
         />
       ))}
@@ -365,6 +389,7 @@ function BuildingScene({
         centerZ={centerZ}
         selectedNodeId={selectedNodeId}
         selectedSegmentId={selectedSegmentId}
+        heat={heat}
         onSelectSegment={onSelectSegment}
         onSelectNode={onSelectNode}
       />
@@ -389,6 +414,7 @@ function BuildingScene({
 function GroundScene({
   heads,
   selectedNodeId,
+  heat,
   onSelectHead,
   network,
   selectedSegmentId,
@@ -397,6 +423,7 @@ function GroundScene({
 }: {
   heads: Node[];
   selectedNodeId: string | null;
+  heat: HeatMap | null;
   onSelectHead: (id: string) => void;
   network: Project['network'];
   selectedSegmentId: string | null;
@@ -417,6 +444,7 @@ function GroundScene({
           y={h.pos.y}
           z={h.pos.z}
           selected={h.id === selectedNodeId}
+          heatColor={heat ? heat.node(h.id) : null}
           onSelect={() => onSelectHead(h.id)}
         />
       ))}
@@ -428,6 +456,7 @@ function GroundScene({
         centerZ={0}
         selectedNodeId={selectedNodeId}
         selectedSegmentId={selectedSegmentId}
+        heat={heat}
         onSelectSegment={onSelectSegment}
         onSelectNode={onSelectNode}
       />
@@ -466,6 +495,9 @@ export function Viewer3D(): ReactElement {
   const selectedNodeId = useCadStore((s) => s.selection.selectedNodeId);
   const selectedSegmentId = useCadStore((s) => s.selection.selectedSegmentId);
   const select = useCadStore((s) => s.select);
+  const pressureHeatmap = useCadStore((s) => s.pressureHeatmap);
+  const supply = useCadStore((s) => s.supply);
+  const designAreaSqFt = useCadStore((s) => s.designAreaSqFt);
   const loaded = hasBuilding(project);
   const gl = useMemo(webglAvailable, []);
 
@@ -473,6 +505,29 @@ export function Viewer3D(): ReactElement {
     () => project.network.nodes.filter((n) => n.type === 'HEAD'),
     [project.network.nodes],
   );
+
+  // W5 pressure heatmap accessor (shared blue->red scale; only when toggled on).
+  const heat = useMemo<HeatMap | null>(() => {
+    if (!pressureHeatmap) return null;
+    const result: HydraulicsResult = selectHydraulics(useCadStore.getState());
+    const range = pressureRange(result);
+    if (range.max <= range.min) return null;
+    const nodePsi = new Map(result.perNode.map((n) => [n.id, n.pressurePsi]));
+    const colorFor = (psi: number | undefined): string | null =>
+      psi == null ? null : pressureColor(psi, range.min, range.max);
+    return {
+      node: (id) => colorFor(nodePsi.get(id)),
+      seg: (id) => {
+        const seg = project.network.segments.find((s) => s.id === id);
+        if (!seg) return null;
+        const a = nodePsi.get(seg.from);
+        const b = nodePsi.get(seg.to);
+        if (a == null || b == null) return null;
+        return colorFor((a + b) / 2);
+      },
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pressureHeatmap, project.network, supply, designAreaSqFt, project.hazardDefaults.defaultClass]);
   // Recenter heads onto the same origin the floor slabs use (building bounds center).
   const bounds = useMemo(() => buildingBoundsFt(project.building), [project.building]);
 
@@ -526,6 +581,7 @@ export function Viewer3D(): ReactElement {
               centerX={bounds.cx}
               centerZ={bounds.cy}
               selectedNodeId={selectedNodeId}
+              heat={heat}
               onSelectHead={(id) => select('node', id)}
               network={project.network}
               selectedSegmentId={selectedSegmentId}
@@ -536,6 +592,7 @@ export function Viewer3D(): ReactElement {
             <GroundScene
               heads={heads}
               selectedNodeId={selectedNodeId}
+              heat={heat}
               onSelectHead={(id) => select('node', id)}
               network={project.network}
               selectedSegmentId={selectedSegmentId}

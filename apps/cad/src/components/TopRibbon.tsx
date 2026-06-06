@@ -15,6 +15,7 @@ import {
   type ViewMode,
 } from '../store';
 import { colors, radii, spacing, typeScale } from '../lib/tokens';
+import { HydraulicsPanel } from './HydraulicsPanel';
 
 const TABS = [
   'File',
@@ -84,24 +85,26 @@ export function TopRibbon(): ReactElement {
       </div>
 
       {/* Tool buttons for the active tab */}
-      <div style={toolRowStyle} aria-label={`${activeTab} tools`}>
-        {tabTools.length === 0 ? (
-          <span style={toolEmptyStyle}>
-            {activeTab === 'Hydraulics'
-              ? 'Hydraulic calculations land in a later slice (W5).'
-              : `No ${activeTab} tools in this slice.`}
-          </span>
-        ) : (
-          tabTools.map((tool) => (
-            <ToolButton
-              key={tool.id}
-              tool={tool}
-              active={tool.id === activeTool}
-              onSelect={setTool}
-            />
-          ))
-        )}
-      </div>
+      {activeTab === 'Hydraulics' ? (
+        <div style={hydraulicsWrapStyle} aria-label="Hydraulics tools">
+          <HydraulicsPanel />
+        </div>
+      ) : (
+        <div style={toolRowStyle} aria-label={`${activeTab} tools`}>
+          {tabTools.length === 0 ? (
+            <span style={toolEmptyStyle}>{`No ${activeTab} tools in this slice.`}</span>
+          ) : (
+            tabTools.map((tool) => (
+              <ToolButton
+                key={tool.id}
+                tool={tool}
+                active={tool.id === activeTool}
+                onSelect={setTool}
+              />
+            ))
+          )}
+        </div>
+      )}
     </header>
   );
 }
@@ -237,6 +240,14 @@ const toolEmptyStyle: CSSProperties = {
   color: colors.textMuted,
   fontSize: typeScale.sm.size,
   fontStyle: 'italic',
+};
+
+/** The Hydraulics tab expands into a scrollable panel (supply inputs + results). */
+const hydraulicsWrapStyle: CSSProperties = {
+  maxHeight: '48vh',
+  overflowY: 'auto',
+  borderTop: `1px solid ${colors.border}`,
+  background: colors.surface,
 };
 
 function toolButtonStyle(active: boolean, hover: boolean): CSSProperties {

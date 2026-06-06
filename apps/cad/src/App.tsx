@@ -24,11 +24,17 @@ export function App(): ReactElement {
   const project = useCadStore((s) => s.project);
   const viewMode = useCadStore((s) => s.viewMode);
   const activeHeadSku = useCadStore((s) => s.activeHeadSku);
+  const supply = useCadStore((s) => s.supply);
+  const designAreaSqFt = useCadStore((s) => s.designAreaSqFt);
 
   // Publish the preview-verification handle whenever the relevant state changes.
+  // Includes the W5 live hydraulics (demand/riser psi/adequacy) so the handle
+  // recomputes on every network OR supply OR design-area edit (live recalc).
   useEffect(() => {
-    publishCadWindow(cadWindowSnapshot(project, viewMode, TOOL_COUNT, activeHeadSku));
-  }, [project, viewMode, activeHeadSku]);
+    publishCadWindow(
+      cadWindowSnapshot(project, viewMode, TOOL_COUNT, activeHeadSku, supply, designAreaSqFt),
+    );
+  }, [project, viewMode, activeHeadSku, supply, designAreaSqFt]);
 
   // DEV-only: expose the store getState for the preview/E2E harness to drive the app
   // (seed a building + heads, route pipe) without faking the UI. Stripped from prod.
