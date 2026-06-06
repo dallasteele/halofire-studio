@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
@@ -12,6 +12,7 @@ import {
 import {
   normalizeManifest,
   type RawManifest,
+  type PartRecord,
 } from '../src/lib/parts-manifest';
 import { deriveModelStatus } from '../src/lib/provenance';
 
@@ -271,17 +272,41 @@ describe('loadBuild123dManifest (fail-soft loader)', () => {
 
 // --- Real generated artifact assertions (realStepGenerated === true) ---------
 // These run against the SHIPPED build123d-parts.json. Because build123d was
-// installed and the generator produced real STEP files, the manifest is
-// non-empty and every entry must carry a sha256 + a stepUrl under
-// /parts/build123d/.
+// installed and the generator produced real STEP files for the FULL part
+// library, the manifest is non-empty (>=18 entries) and every entry must carry
+// a real sha256 + a stepUrl under /parts/build123d/ that exists on disk, and
+// every key must match a real catalog key.
 describe('shipped build123d-parts.json (real generated artifacts)', () => {
   const here = dirname(fileURLToPath(import.meta.url));
   const manifestPath = resolve(here, '../public/parts/build123d-parts.json');
   const manifest = JSON.parse(readFileSync(manifestPath, 'utf-8')) as Build123dManifest;
 
+  // The canonical catalog manifest — its keys are the source of truth.
+  const catalogPath = resolve(here, '../public/parts/parts-manifest.json');
+  const catalog = JSON.parse(readFileSync(catalogPath, 'utf-8')) as {
+    components: { key: string; category: string; name: string }[];
+  };
+  const catalogKeys = new Set(catalog.components.map((c) => c.key));
+
   it('has at least one real generated entry', () => {
     expect(Array.isArray(manifest.entries)).toBe(true);
     expect(manifest.entries.length).toBeGreaterThan(0);
+  });
+
+  it('has the FULL real set (>=18 entries)', () => {
+    expect(manifest.entries.length).toBeGreaterThanOrEqual(18);
+  });
+
+  it('every entry key is unique', () => {
+    const keys = manifest.entries.map((e) => e.key);
+    expect(new Set(keys).size).toBe(keys.length);
+  });
+
+  it('every entry key matches a real catalog key', () => {
+    expect(catalogKeys.size).toBeGreaterThan(0);
+    for (const e of manifest.entries) {
+      expect(catalogKeys.has(e.key)).toBe(true);
+    }
   });
 
   it('every entry has a sha256 + a stepUrl under /parts/build123d/ and is parametric-verified', () => {
@@ -295,13 +320,61 @@ describe('shipped build123d-parts.json (real generated artifacts)', () => {
     }
   });
 
-  it('every entry sha256 matches the on-disk STEP file', async () => {
+  it('every entry stepUrl points at a real on-disk STEP file', () => {
+    for (const e of manifest.entries) {
+      const stepPath = resolve(here, '../public', e.stepUrl.replace(/^\//, ''));
+      expect(existsSync(stepPath)).toBe(true);
+      // A real STEP file is a non-trivial ISO-10303-21 text file.
+      const head = readFileSync(stepPath, 'utf-8').slice(0, 40);
+      expect(head.startsWith('ISO-10303-21')).toBe(true);
+    }
+  });
+
+  it('every entry sha256 matches the on-disk STEP file (no fake entries)', async () => {
     const { createHash } = await import('node:crypto');
     for (const e of manifest.entries) {
       const stepPath = resolve(here, '../public', e.stepUrl.replace(/^\//, ''));
       const bytes = readFileSync(stepPath);
       const sha = createHash('sha256').update(bytes).digest('hex');
       expect(sha).toBe(e.sha256);
+    }
+  });
+
+  it('a re-hashed sample of on-disk STEP files matches the manifest sha256', async () => {
+    const { createHash } = await import('node:crypto');
+    // Deterministically sample up to 6 entries (sorted -> stable selection).
+    const sorted = [...manifest.entries].sort((a, b) => a.key.localeCompare(b.key));
+    const step = Math.max(1, Math.floor(sorted.length / 6));
+    const sample = sorted.filter((_, i) => i % step === 0).slice(0, 6);
+    expect(sample.length).toBeGreaterThanOrEqual(3);
+    for (const e of sample) {
+      const stepPath = resolve(here, '../public', e.stepUrl.replace(/^\//, ''));
+      const sha = createHash('sha256').update(readFileSync(stepPath)).digest('hex');
+      expect(sha).toBe(e.sha256);
+    }
+  });
+
+  it('applyBuild123dParts upgrades MANY catalog records to dimensioned_parametric', () => {
+    const records: PartRecord[] = catalog.components.map((c) => ({
+      key: c.key,
+      category: c.category,
+      name: c.name,
+      source: 'generated',
+      manufacturerExact: false,
+      present: true,
+      file: `parts/${c.key}.stl`,
+      stlUrl: `/parts/${c.key}.stl`,
+      modelStatus: 'visual_reference' as const,
+    }));
+    const upgraded = applyBuild123dParts(records, manifest);
+    const dimensioned = upgraded.filter((r) => r.modelStatus === 'dimensioned_parametric');
+    // Every manifest entry has a matching catalog key, so the upgrade count
+    // equals the manifest size (>=18) — "many" records upgraded honestly.
+    expect(dimensioned.length).toBe(manifest.entries.length);
+    expect(dimensioned.length).toBeGreaterThanOrEqual(18);
+    for (const r of dimensioned) {
+      expect(r.source).toBe('build123d');
+      expect(r.stepUrl?.startsWith('/parts/build123d/')).toBe(true);
     }
   });
 });

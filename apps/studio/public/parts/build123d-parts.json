@@ -1,17 +1,62 @@
 {
   "entries": [
     {
-      "key": "head_pendent",
+      "key": "fitting_cap",
       "source": "build123d",
-      "productCode": "B123D-HEAD-PEND-050",
-      "name": "Pendent Head (parametric)",
-      "stepUrl": "/parts/build123d/head_pendent.step",
-      "sha256": "52d1daa2282dc35100b7e640479d7d90fc72cfd3527303b38af9803df9561e0a",
+      "productCode": "B123D-CAP-100",
+      "name": "Cap (parametric)",
+      "stepUrl": "/parts/build123d/fitting_cap.step",
+      "sha256": "4e75a286f34599418a26b91283824783f272478e0bce3d1bdce7734c29b8388e",
       "dimensions": {
-        "nptSize": "1/2\"",
-        "bodyLengthMm": 18.0,
-        "deflectorDiaMm": 28.0,
-        "kFactorLabel": "K5.6",
+        "nptSize": "1\"",
+        "odMm": 42.2,
+        "lengthMm": 30.0,
+        "boreMm": 33.4,
+        "endWallMm": 8.0,
+        "units": "mm"
+      }
+    },
+    {
+      "key": "fitting_coupling",
+      "source": "build123d",
+      "productCode": "B123D-CPLG-100",
+      "name": "Coupling (parametric)",
+      "stepUrl": "/parts/build123d/fitting_coupling.step",
+      "sha256": "d2f68ac77c9300bcc832b6f94d5c28e07c62de448d13f82fd5686acd0952179d",
+      "dimensions": {
+        "nptSize": "1\"",
+        "odMm": 42.2,
+        "lengthMm": 40.0,
+        "boreMm": 33.4,
+        "units": "mm"
+      }
+    },
+    {
+      "key": "fitting_cross",
+      "source": "build123d",
+      "productCode": "B123D-CROSS-100",
+      "name": "Cross (parametric)",
+      "stepUrl": "/parts/build123d/fitting_cross.step",
+      "sha256": "a1302d32d8d95d639d1c4895bf5f007f3a21219536be8531c9e9252d34fb85a3",
+      "dimensions": {
+        "nptSize": "1\"",
+        "odMm": 33.4,
+        "runLengthMm": 64.0,
+        "branchLengthMm": 64.0,
+        "units": "mm"
+      }
+    },
+    {
+      "key": "fitting_elbow_45",
+      "source": "build123d",
+      "productCode": "B123D-ELL45-075",
+      "name": "45 Elbow (parametric)",
+      "stepUrl": "/parts/build123d/fitting_elbow_45.step",
+      "sha256": "1af08ef6efa1ebe046ca74444f8dbbec8336bdbbbdaa5dee8ed973d72e044d5a",
+      "dimensions": {
+        "nptSize": "3/4\"",
+        "odMm": 26.7,
+        "legLengthMm": 30.0,
         "units": "mm"
       }
     },
@@ -21,12 +66,27 @@
       "productCode": "B123D-ELL90-075",
       "name": "90 Elbow (parametric)",
       "stepUrl": "/parts/build123d/fitting_elbow_90.step",
-      "sha256": "31f295ab6981e7083282b8a19ac593580eba1b8abec1f808be1ac9bd35cead15",
+      "sha256": "46b5e0762f57679e6c901e3ae782e4294f0fcc1d11ac7f83c515814ea59b2f69",
       "dimensions": {
         "nptSize": "3/4\"",
-        "bodyLengthMm": 30.0,
-        "deflectorDiaMm": 0.0,
-        "kFactorLabel": "n/a",
+        "odMm": 26.7,
+        "legLengthMm": 30.0,
+        "units": "mm"
+      }
+    },
+    {
+      "key": "fitting_reducer",
+      "source": "build123d",
+      "productCode": "B123D-RED-100-075",
+      "name": "Reducer (parametric)",
+      "stepUrl": "/parts/build123d/fitting_reducer.step",
+      "sha256": "be1b9dade1389ac9cda47def06a7938cdf135d72c7c32ca9710e05bc65dd301a",
+      "dimensions": {
+        "nptSize": "1\"x3/4\"",
+        "largeOdMm": 42.2,
+        "smallOdMm": 34.5,
+        "lengthMm": 45.0,
+        "boreMm": 26.6,
         "units": "mm"
       }
     },
@@ -36,12 +96,280 @@
       "productCode": "B123D-TEE-100",
       "name": "Tee (parametric)",
       "stepUrl": "/parts/build123d/fitting_tee.step",
-      "sha256": "7051710faf217d575c0e5b22238a5314290a23109ac33471374f967977f23ec0",
+      "sha256": "97151ff2c187d787922720f268a61812e9f5e587e430e511f3c60c5614d2a99f",
       "dimensions": {
         "nptSize": "1\"",
-        "bodyLengthMm": 32.0,
-        "deflectorDiaMm": 0.0,
-        "kFactorLabel": "n/a",
+        "odMm": 33.4,
+        "runLengthMm": 64.0,
+        "branchLengthMm": 24.0,
+        "units": "mm"
+      }
+    },
+    {
+      "key": "grooved_coupling",
+      "source": "build123d",
+      "productCode": "B123D-GRV-CPLG-200",
+      "name": "Grooved Coupling (parametric)",
+      "stepUrl": "/parts/build123d/grooved_coupling.step",
+      "sha256": "32a4d164a00448da1e7411607a32c2a69527fbc387a352831c126f846bb57e37",
+      "dimensions": {
+        "nominalSize": "2\"",
+        "housingOdMm": 90.0,
+        "lengthMm": 60.0,
+        "boreMm": 60.3,
+        "boltPadMm": 28.0,
+        "units": "mm"
+      }
+    },
+    {
+      "key": "grooved_flange_adapter",
+      "source": "build123d",
+      "productCode": "B123D-GRV-FLG-200",
+      "name": "Grooved Flange Adapter (parametric)",
+      "stepUrl": "/parts/build123d/grooved_flange_adapter.step",
+      "sha256": "5ae36fac41f8d2469a7d54ec80a242218925c8deb66895fbdc8ff20ce957edaa",
+      "dimensions": {
+        "nominalSize": "2\"",
+        "flangeDiaMm": 152.0,
+        "flangeThkMm": 18.0,
+        "boreMm": 60.3,
+        "hubDiaMm": 90.0,
+        "hubLengthMm": 35.0,
+        "boltCircleMm": 120.7,
+        "boltHoleMm": 19.0,
+        "boltCount": 4,
+        "units": "mm"
+      }
+    },
+    {
+      "key": "hanger",
+      "source": "build123d",
+      "productCode": "B123D-HNGR-100",
+      "name": "Pipe Hanger (parametric)",
+      "stepUrl": "/parts/build123d/hanger.step",
+      "sha256": "1aba35388288eaa05cc1c2961ca0b8f140620cec86102139fd1539d27958c3b6",
+      "dimensions": {
+        "nptSize": "1\"",
+        "pipeOdMm": 33.4,
+        "ringThkMm": 6.0,
+        "rodDiaMm": 9.5,
+        "rodLengthMm": 60.0,
+        "units": "mm"
+      }
+    },
+    {
+      "key": "head_concealed",
+      "source": "build123d",
+      "productCode": "B123D-HEAD-CNC-050",
+      "name": "Concealed Pendent Head (parametric)",
+      "stepUrl": "/parts/build123d/head_concealed.step",
+      "sha256": "74405825e978bc93d4a6c2d4269a1780fd69df6a98512a636e76d6ffadf257d4",
+      "dimensions": {
+        "nptSize": "1/2\"",
+        "bodyLengthMm": 16.0,
+        "cupDiaMm": 40.0,
+        "coverPlateDiaMm": 70.0,
+        "kFactorLabel": "K4.9",
+        "units": "mm"
+      }
+    },
+    {
+      "key": "head_dry_pendent",
+      "source": "build123d",
+      "productCode": "B123D-HEAD-DRY-050",
+      "name": "Dry Pendent Head (parametric)",
+      "stepUrl": "/parts/build123d/head_dry_pendent.step",
+      "sha256": "cf4e83a40a75c354ea145590862ca9c0ac73e0f80eac44d1750755acff2d121e",
+      "dimensions": {
+        "nptSize": "1\"",
+        "barrelLengthMm": 150.0,
+        "barrelDiaMm": 22.0,
+        "deflectorDiaMm": 28.0,
+        "kFactorLabel": "K5.6",
+        "units": "mm"
+      }
+    },
+    {
+      "key": "head_esfr",
+      "source": "build123d",
+      "productCode": "B123D-HEAD-ESFR-100",
+      "name": "ESFR Storage Head (parametric)",
+      "stepUrl": "/parts/build123d/head_esfr.step",
+      "sha256": "73abb0214a37474d39b708af816343e8ae4e8be60915b6a76ebd60e4492cc0c0",
+      "dimensions": {
+        "nptSize": "1\"",
+        "bodyLengthMm": 24.0,
+        "deflectorDiaMm": 50.0,
+        "kFactorLabel": "K25.2",
+        "units": "mm"
+      }
+    },
+    {
+      "key": "head_pendent",
+      "source": "build123d",
+      "productCode": "B123D-HEAD-PEND-050",
+      "name": "Pendent Head (parametric)",
+      "stepUrl": "/parts/build123d/head_pendent.step",
+      "sha256": "2f869283c2e6722508087c3370012bb50ad87671411d0c1bf8db8eb8e7338d8d",
+      "dimensions": {
+        "nptSize": "1/2\"",
+        "bodyLengthMm": 18.0,
+        "deflectorDiaMm": 28.0,
+        "kFactorLabel": "K5.6",
+        "units": "mm"
+      }
+    },
+    {
+      "key": "head_sidewall",
+      "source": "build123d",
+      "productCode": "B123D-HEAD-SW-050",
+      "name": "Sidewall Head (parametric)",
+      "stepUrl": "/parts/build123d/head_sidewall.step",
+      "sha256": "7f0da85b82925ecdd1fd9fe8802de56961be10bae2421d6b0eb9c4ec6ebfe931",
+      "dimensions": {
+        "nptSize": "1/2\"",
+        "bodyLengthMm": 18.0,
+        "deflectorDiaMm": 30.0,
+        "kFactorLabel": "K5.6",
+        "units": "mm"
+      }
+    },
+    {
+      "key": "head_upright",
+      "source": "build123d",
+      "productCode": "B123D-HEAD-UPR-050",
+      "name": "Upright Head (parametric)",
+      "stepUrl": "/parts/build123d/head_upright.step",
+      "sha256": "210f418a43212dae5bca76a73bba2cc6ffeb104d52d0c7c43fcbdc7280347542",
+      "dimensions": {
+        "nptSize": "1/2\"",
+        "bodyLengthMm": 18.0,
+        "deflectorDiaMm": 28.0,
+        "kFactorLabel": "K5.6",
+        "units": "mm"
+      }
+    },
+    {
+      "key": "pipe_sch10",
+      "source": "build123d",
+      "productCode": "B123D-PIPE-SCH10-200",
+      "name": "Schedule 10 Pipe (parametric)",
+      "stepUrl": "/parts/build123d/pipe_sch10.step",
+      "sha256": "ec6b70c2a644fae11a48bd55dd2d9a86249198ab61deab923cf0bf4ddaa3eeed",
+      "dimensions": {
+        "nominalSize": "2\"",
+        "odMm": 60.3,
+        "wallMm": 2.77,
+        "lengthMm": 300.0,
+        "schedule": "Sch10",
+        "units": "mm"
+      }
+    },
+    {
+      "key": "pipe_sch40",
+      "source": "build123d",
+      "productCode": "B123D-PIPE-SCH40-200",
+      "name": "Schedule 40 Pipe (parametric)",
+      "stepUrl": "/parts/build123d/pipe_sch40.step",
+      "sha256": "fadcad18f74657f033d539a8ea249fcfb479d966d02dbe809d5e94fbfbd37278",
+      "dimensions": {
+        "nominalSize": "2\"",
+        "odMm": 60.3,
+        "wallMm": 3.91,
+        "lengthMm": 300.0,
+        "schedule": "Sch40",
+        "units": "mm"
+      }
+    },
+    {
+      "key": "valve_alarm_check",
+      "source": "build123d",
+      "productCode": "B123D-VLV-ALMCHK-400",
+      "name": "Alarm Check Valve (parametric)",
+      "stepUrl": "/parts/build123d/valve_alarm_check.step",
+      "sha256": "a221ef5868f2f4dff79f699d6ce81e5fbe8d13bc604d4cb20bf7ea5274b09900",
+      "dimensions": {
+        "nominalSize": "4\"",
+        "odMm": 114.3,
+        "faceToFaceMm": 200.0,
+        "boreMm": 102.0,
+        "units": "mm"
+      }
+    },
+    {
+      "key": "valve_butterfly",
+      "source": "build123d",
+      "productCode": "B123D-VLV-BFLY-400",
+      "name": "Butterfly Valve (parametric, supervised)",
+      "stepUrl": "/parts/build123d/valve_butterfly.step",
+      "sha256": "7a80794a3292369fb47f43d7ebe1704d5b650dc361a91970697f9d0b1c3dc2e7",
+      "dimensions": {
+        "nominalSize": "4\"",
+        "odMm": 114.3,
+        "faceToFaceMm": 56.0,
+        "boreMm": 102.0,
+        "units": "mm"
+      }
+    },
+    {
+      "key": "valve_check",
+      "source": "build123d",
+      "productCode": "B123D-VLV-CHK-400",
+      "name": "Check Valve (parametric)",
+      "stepUrl": "/parts/build123d/valve_check.step",
+      "sha256": "d5b4f54ec80cf9b0979b3c4bc62963c16f6cd6861aee8f157fc22cc3802377a0",
+      "dimensions": {
+        "nominalSize": "4\"",
+        "odMm": 114.3,
+        "faceToFaceMm": 180.0,
+        "boreMm": 102.0,
+        "units": "mm"
+      }
+    },
+    {
+      "key": "valve_deluge",
+      "source": "build123d",
+      "productCode": "B123D-VLV-DLG-400",
+      "name": "Deluge Valve (parametric)",
+      "stepUrl": "/parts/build123d/valve_deluge.step",
+      "sha256": "fe8dd861e0b11ec1070a3aca874ad81630d18d9260ef95154d9d44bb3607c2ee",
+      "dimensions": {
+        "nominalSize": "4\"",
+        "odMm": 114.3,
+        "faceToFaceMm": 220.0,
+        "boreMm": 102.0,
+        "units": "mm"
+      }
+    },
+    {
+      "key": "valve_osy_gate",
+      "source": "build123d",
+      "productCode": "B123D-VLV-OSY-400",
+      "name": "OS&Y Gate Valve (parametric)",
+      "stepUrl": "/parts/build123d/valve_osy_gate.step",
+      "sha256": "d45ab41b183be626bb11b83c41cc7a3ae36094370513a937136d28cc8ab9675f",
+      "dimensions": {
+        "nominalSize": "4\"",
+        "odMm": 114.3,
+        "faceToFaceMm": 230.0,
+        "boreMm": 102.0,
+        "stemLengthMm": 160.0,
+        "handwheelDiaMm": 150.0,
+        "units": "mm"
+      }
+    },
+    {
+      "key": "valve_prv",
+      "source": "build123d",
+      "productCode": "B123D-VLV-PRV-250",
+      "name": "Pressure Reducing Valve (parametric)",
+      "stepUrl": "/parts/build123d/valve_prv.step",
+      "sha256": "03e740290f780f68e9ea7ec7640aca30d8abcfccac478afbb18cb785074fd562",
+      "dimensions": {
+        "nominalSize": "2.5\"",
+        "odMm": 73.0,
+        "faceToFaceMm": 200.0,
+        "boreMm": 64.0,
         "units": "mm"
       }
     }
