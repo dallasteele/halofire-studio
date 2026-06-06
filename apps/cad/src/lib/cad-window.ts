@@ -61,6 +61,19 @@ export interface CadWindowState {
   /** 3D head marker count (set by Viewer3D; mirrors headCount when 3D is live). */
   headCount3d?: number;
 
+  /* --- W8 real-CAD geometry handle (set by Viewer3D) --- */
+  /**
+   * Number of network parts (heads + fittings + pipes) drawn with a REAL resolved
+   * STEP body (build123d dimensioned_parametric or manufacturer_verified). Honest:
+   * counts only parts whose model resolved to a committed STEP file.
+   */
+  realGeometryPartCount?: number;
+  /**
+   * Number of network parts drawn as a clearly-flagged PROXY (amber wireframe)
+   * because no real model resolved. Honest: a part is in exactly one bucket.
+   */
+  proxyPartCount?: number;
+
   /* --- W4 pipe-routing handle --- */
   /** Number of pipe segments in the network (1:1 with the store). */
   segmentCount: number;
@@ -246,5 +259,7 @@ export function publishCadWindow(state: CadWindowState): void {
     floorCount: prev?.floorCount ?? 0,
     wallCount: prev?.wallCount ?? 0,
     headCount3d: prev?.headCount3d ?? 0,
+    realGeometryPartCount: prev?.realGeometryPartCount ?? 0,
+    proxyPartCount: prev?.proxyPartCount ?? 0,
   };
 }

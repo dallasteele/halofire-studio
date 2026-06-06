@@ -14,7 +14,93 @@ import {
 } from '../lib/head-catalog';
 import type { Node, Point2, Point3, Room, Segment } from '../lib/model';
 import { arePortsCompatible } from '../lib/connectivity';
+import { resolvePartModel, type ResolvedPartModel } from '../lib/part-geometry';
+import { loadBuild123dManifest, type Build123dManifest } from '../../../studio/src/lib/build123d-parts';
+import {
+  loadManufacturerStepManifest,
+  type ManufacturerStepManifest,
+} from '../../../studio/src/lib/manufacturer-step';
 import { colors, radii, spacing, typeScale } from '../lib/tokens';
+
+/** Human label per provenance tier (W8) — never claims more than the tier earns. */
+const TIER_LABEL: Record<string, string> = {
+  manufacturer_verified: 'Manufacturer-verified (real manufacturer CAD)',
+  dimensioned_parametric: 'Dimensioned parametric — NOT manufacturer-exact',
+  proxy: 'Proxy — approximate placeholder',
+  visual_reference: 'Visual reference — not dimensional',
+};
+
+/**
+ * Load the geometry manifests once for the Inspector (fail-soft to empty). Lets the
+ * selected-part provenance block resolve the SAME model the 3D viewer draws.
+ */
+function useGeometryManifests(): {
+  build123d: Build123dManifest | null;
+  manufacturerStep: ManufacturerStepManifest | null;
+} {
+  const [m, setM] = useState<{
+    build123d: Build123dManifest | null;
+    manufacturerStep: ManufacturerStepManifest | null;
+  }>({ build123d: null, manufacturerStep: null });
+  useEffect(() => {
+    let alive = true;
+    const fetchImpl = typeof fetch === 'function' ? fetch.bind(globalThis) : undefined;
+    void Promise.all([
+      loadBuild123dManifest(fetchImpl),
+      loadManufacturerStepManifest(fetchImpl),
+    ]).then(([build123d, manufacturerStep]) => {
+      if (alive) setM({ build123d, manufacturerStep });
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
+  return m;
+}
+
+/**
+ * W8 model-provenance block: shows the REAL CAD model source + tier for a selected
+ * part (the same resolvePartModel the 3D viewer uses), or an honest "no resolvable
+ * model — drawn as a proxy" note. Never claims manufacturer-exact for a build123d body.
+ */
+function ModelProvenance({ model }: { model: ResolvedPartModel | null }): ReactElement {
+  if (!model) {
+    return (
+      <div style={headBlockStyle}>
+        <div style={headBlockTitleStyle}>3D model</div>
+        <p style={emptyBodyStyle}>
+          No real CAD model resolved for this part — drawn as a clearly-flagged amber
+          proxy in 3D. Not real geometry.
+        </p>
+      </div>
+    );
+  }
+  return (
+    <div style={headBlockStyle}>
+      <div style={headBlockTitleStyle}>3D model (W8 real CAD)</div>
+      <dl style={{ display: 'flex', flexDirection: 'column', gap: spacing[1] }}>
+        <div style={rowStyle}>
+          <dt style={dtStyle}>Source</dt>
+          <dd style={ddStyle}>{model.source}</dd>
+        </div>
+        <div style={rowStyle}>
+          <dt style={dtStyle}>Key</dt>
+          <dd style={ddStyle}>{model.build123dKey}</dd>
+        </div>
+        <div style={rowStyle}>
+          <dt style={dtStyle}>Tier</dt>
+          <dd style={ddStyle}>{model.provenanceTier}</dd>
+        </div>
+      </dl>
+      <div style={citationStyle}>
+        {TIER_LABEL[model.provenanceTier] ?? model.provenanceTier}.{' '}
+        {model.engineeringAccurate
+          ? 'Manufacturer CAD geometry.'
+          : 'Real dimensioned parametric geometry — NOT manufacturer-exact, NOT AHJ / PE / code-certified.'}
+      </div>
+    </div>
+  );
+}
 
 interface Row {
   label: string;
@@ -26,6 +112,7 @@ export function RightInspector(): ReactElement {
   const project = useCadStore((s) => s.project);
   const supply = useCadStore((s) => s.supply);
   const designAreaSqFt = useCadStore((s) => s.designAreaSqFt);
+  const manifests = useGeometryManifests();
 
   const { kind, id } = activeSelection(selection);
 
@@ -58,10 +145,17 @@ export function RightInspector(): ReactElement {
         : [];
       if (!node) note = 'Selected node id is not in the current (empty) network.';
       const nodeHyd = node ? hydraulics.perNode.find((n) => n.id === node.id) ?? null : null;
+      const nodeModel = node
+        ? resolvePartModel(node, {
+            build123d: manifests.build123d,
+            manufacturerStep: manifests.manufacturerStep,
+          })
+        : null;
       if (node?.type === 'HEAD') {
         headExtra = (
           <>
             <HeadDetail pos={node.pos} sku={node.sku} project={project} />
+            <ModelProvenance model={nodeModel} />
             {nodeHyd && <NodeHydraulics pressurePsi={nodeHyd.pressurePsi} flowGpm={nodeHyd.flowGpm} />}
           </>
         );
@@ -70,6 +164,7 @@ export function RightInspector(): ReactElement {
         headExtra = (
           <>
             <FittingDetail node={node} />
+            <ModelProvenance model={nodeModel} />
             {nodeHyd && <NodeHydraulics pressurePsi={nodeHyd.pressurePsi} flowGpm={nodeHyd.flowGpm} />}
           </>
         );

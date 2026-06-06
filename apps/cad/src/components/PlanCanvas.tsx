@@ -148,8 +148,10 @@ function widthForDiameter(diameterIn: number): number {
 /** A short glyph per fitting type for the 2D symbol. */
 const FITTING_GLYPH: Record<string, string> = {
   TEE: 'T',
+  CROSS: 'X',
   ELBOW: 'L',
   REDUCER: 'R',
+  VALVE: 'V',
   SOURCE: '◈', // riser diamond
 };
 
@@ -672,38 +674,125 @@ export function PlanCanvas(): ReactElement {
               );
             })}
 
-            {/* fitting markers (tees/elbows/reducers/riser) */}
+            {/* fitting markers — distinct STANDARD-style 2D symbols per fitting type:
+                  TEE     — a filled circle joint with a perpendicular branch stub (the
+                            classic tee glyph)
+                  ELBOW   — a small filled circle (a turn joint)
+                  REDUCER — a concentric reducer: two stacked triangles meeting at a point
+                  SOURCE  — the riser diamond
+                The riser/source keeps its magenta diamond. All are draggable + selectable. */}
             {fittings.map((f) => {
               const s = toScreen({ x: f.pos.x / scale, y: f.pos.z / scale });
               const isSel = f.id === selectedNodeId;
-              const isRiser = f.type === 'SOURCE';
+              const stroke = isSel ? colors.warn : colors.accentText;
+              const common = {
+                draggable: true,
+                onClick: (e: Konva.KonvaEventObject<MouseEvent>) => {
+                  e.cancelBubble = true;
+                  select('node', f.id);
+                },
+                onDragStart: (e: Konva.KonvaEventObject<DragEvent>) => {
+                  e.cancelBubble = true;
+                  select('node', f.id);
+                },
+                onDragEnd: (e: Konva.KonvaEventObject<DragEvent>) => {
+                  e.cancelBubble = true;
+                  const plan = toPlan(e.target.x(), e.target.y());
+                  moveNode(f.id, { x: plan.x * scale, y: f.pos.y, z: plan.y * scale });
+                },
+              };
+
+              if (f.type === 'SOURCE') {
+                const half = isSel ? 7 : 5;
+                return (
+                  <Rect
+                    key={f.id}
+                    x={s.sx}
+                    y={s.sy}
+                    width={half * 2}
+                    height={half * 2}
+                    rotation={45}
+                    offsetX={half}
+                    offsetY={half}
+                    fill="#c062d0"
+                    stroke={stroke}
+                    strokeWidth={1.5}
+                    {...common}
+                  />
+                );
+              }
+
+              if (f.type === 'TEE' || f.type === 'CROSS') {
+                const r = isSel ? 5 : 3.5;
+                return (
+                  <Circle
+                    key={f.id}
+                    x={s.sx}
+                    y={s.sy}
+                    radius={r}
+                    fill={isSel ? colors.warn : '#cdd6e0'}
+                    stroke={stroke}
+                    strokeWidth={1.25}
+                    {...common}
+                  />
+                );
+              }
+
+              if (f.type === 'REDUCER') {
+                // Concentric reducer glyph: a bow-tie of two triangles meeting at center.
+                const w = isSel ? 7 : 5;
+                const h = isSel ? 5 : 3.5;
+                return (
+                  <Line
+                    key={f.id}
+                    x={s.sx}
+                    y={s.sy}
+                    points={[-w, -h, 0, 0, -w, h, w, -h, 0, 0, w, h]}
+                    closed
+                    fill={isSel ? colors.warn : '#cdd6e0'}
+                    stroke={stroke}
+                    strokeWidth={1.25}
+                    {...common}
+                  />
+                );
+              }
+
+              // ELBOW (and any other) — a small filled circle turn joint.
+              const r = isSel ? 5 : 3.5;
               return (
-                <Rect
+                <Circle
                   key={f.id}
-                  x={s.sx - (isSel ? 6 : 4)}
-                  y={s.sy - (isSel ? 6 : 4)}
-                  width={isSel ? 12 : 8}
-                  height={isSel ? 12 : 8}
-                  rotation={45}
-                  offsetX={isSel ? 6 : 4}
-                  offsetY={isSel ? 6 : 4}
-                  fill={isRiser ? '#c062d0' : isSel ? colors.warn : '#cdd6e0'}
-                  stroke={isSel ? colors.warn : colors.accentText}
-                  strokeWidth={1}
-                  draggable
-                  onClick={(e) => {
-                    e.cancelBubble = true;
-                    select('node', f.id);
-                  }}
-                  onDragStart={(e) => {
-                    e.cancelBubble = true;
-                    select('node', f.id);
-                  }}
-                  onDragEnd={(e) => {
-                    e.cancelBubble = true;
-                    const plan = toPlan(e.target.x(), e.target.y());
-                    moveNode(f.id, { x: plan.x * scale, y: f.pos.y, z: plan.y * scale });
-                  }}
+                  x={s.sx}
+                  y={s.sy}
+                  radius={r}
+                  fill={isSel ? colors.warn : '#9fb0c2'}
+                  stroke={stroke}
+                  strokeWidth={1.25}
+                  {...common}
+                />
+              );
+            })}
+
+            {/* TEE branch stubs (non-interactive): a short perpendicular tick marking the
+                branch leg, distinguishing a tee from an elbow at a glance. */}
+            {fittings.map((f) => {
+              if (f.type !== 'TEE' && f.type !== 'CROSS') return null;
+              const s = toScreen({ x: f.pos.x / scale, y: f.pos.z / scale });
+              const isSel = f.id === selectedNodeId;
+              const stroke = isSel ? colors.warn : colors.accentText;
+              const L = isSel ? 8 : 6;
+              const pts =
+                f.type === 'CROSS'
+                  ? [s.sx - L, s.sy, s.sx + L, s.sy, s.sx, s.sy, s.sx, s.sy - L, s.sx, s.sy + L]
+                  : [s.sx - L, s.sy, s.sx + L, s.sy, s.sx, s.sy, s.sx, s.sy + L];
+              return (
+                <Line
+                  key={`ts-${f.id}`}
+                  points={pts}
+                  stroke={stroke}
+                  strokeWidth={1.25}
+                  listening={false}
+                  lineCap="round"
                 />
               );
             })}
@@ -715,8 +804,8 @@ export function PlanCanvas(): ReactElement {
                 <Text
                   key={`g-${f.id}`}
                   text={FITTING_GLYPH[f.type] ?? ''}
-                  x={s.sx + 6}
-                  y={s.sy - 12}
+                  x={s.sx + 7}
+                  y={s.sy - 13}
                   fill={colors.textMuted}
                   fontSize={9}
                   listening={false}
@@ -727,27 +816,32 @@ export function PlanCanvas(): ReactElement {
           </Layer>
 
           {/* heads layer — INTERACTIVE: click to select, drag to move. Heads are in
-              FEET; convert to plan units (feet / scale) then to screen. */}
+              FEET; convert to plan units (feet / scale) then to screen. Each head is
+              a STANDARD sprinkler symbol: a circle with an inscribed cross (the common
+              plan glyph for a sprinkler), not a plain dot. The interactive (draggable)
+              circle carries the hit area; the cross lines are decorative overlays. */}
           <Layer>
             {heads.map((h) => {
               const planPt: Point2 = { x: h.pos.x / scale, y: h.pos.z / scale };
               const s = toScreen(planPt);
               const isSel = h.id === selectedNodeId;
               const heatPsi = pRange && nodePsi.has(h.id) ? nodePsi.get(h.id)! : null;
-              const headFill = isSel
+              const headColor = isSel
                 ? colors.warn
                 : heatPsi != null && pRange
                   ? pressureColor(heatPsi, pRange.min, pRange.max)
                   : colors.interactiveText;
+              const r = isSel ? 8 : 6;
               return (
                 <Circle
                   key={h.id}
                   x={s.sx}
                   y={s.sy}
-                  radius={isSel ? 7 : 5}
-                  fill={headFill}
-                  stroke={isSel ? colors.warn : colors.accentText}
-                  strokeWidth={isSel ? 2 : 1}
+                  radius={r}
+                  // Hollow circle outline (standard head symbol body).
+                  fill={colors.canvasBg}
+                  stroke={headColor}
+                  strokeWidth={isSel ? 2.5 : 1.75}
                   draggable
                   onClick={(e) => {
                     e.cancelBubble = true;
@@ -764,6 +858,29 @@ export function PlanCanvas(): ReactElement {
                     const plan = toPlan(sx, sy);
                     moveHead(h.id, { x: plan.x * scale, y: h.pos.y, z: plan.y * scale });
                   }}
+                />
+              );
+            })}
+            {/* Cross overlays for each head (the "+" inside the circle). Non-interactive
+                so the underlying draggable circle keeps the hit/drag behavior. */}
+            {heads.map((h) => {
+              const s = toScreen({ x: h.pos.x / scale, y: h.pos.z / scale });
+              const isSel = h.id === selectedNodeId;
+              const heatPsi = pRange && nodePsi.has(h.id) ? nodePsi.get(h.id)! : null;
+              const headColor = isSel
+                ? colors.warn
+                : heatPsi != null && pRange
+                  ? pressureColor(heatPsi, pRange.min, pRange.max)
+                  : colors.interactiveText;
+              const r = isSel ? 8 : 6;
+              return (
+                <Line
+                  key={`hx-${h.id}`}
+                  points={[s.sx - r, s.sy, s.sx + r, s.sy, s.sx, s.sy, s.sx, s.sy - r, s.sx, s.sy + r]}
+                  stroke={headColor}
+                  strokeWidth={isSel ? 1.75 : 1.25}
+                  listening={false}
+                  lineCap="round"
                 />
               );
             })}

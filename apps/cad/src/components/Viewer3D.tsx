@@ -1,32 +1,39 @@
 // HaloFire CAD — Viewer3D (3D). An R3F Canvas that renders the REAL building the
-// operator traced/imported in 2D (W1): a filled floor slab per room and extruded
-// wall runs, in feet (1 scene unit == 1 ft), plus a ground grid for context. It
-// is REACTIVE — it subscribes to the shared zustand store, so a room/wall/scale
-// change re-renders immediately, and selecting a room in 2D highlights it here
-// (shared `selection`). When no building is loaded it shows an honest empty state.
+// operator traced/imported (filled floor slabs + extruded walls) AND — W8 — the
+// REAL CAD geometry of every sprinkler part: each head, tee, elbow, reducer, cross,
+// and riser/valve is drawn with its actual build123d STEP body (decoded in-browser
+// via occt-import-js), NOT the old placeholder glyphs (sphere+cone head, box
+// fitting). Pipe runs stay correctly-sized cylinders (real pipe IS cylindrical).
 //
-// GEOMETRY: built by `buildBuildingMeshes` behind the BuildingGeometryBackend
-// adapter (three.js extrude is the active backend; see lib/building3d.ts for the
-// truthful OpenGeometry evaluation + fallback rationale). Nothing is fabricated —
-// floors/walls map 1:1 to store.project.building.
+// REAL GEOMETRY (W8): part-geometry.resolvePartModel maps each part to its committed
+// STEP file (build123d dimensioned_parametric, or a local manufacturer STEP when an
+// operator dropped one in). loadPartGeometry decodes + CACHES it by url, so 28 heads
+// of the same SKU share ONE loaded geometry, rendered via drei <Instances>/<Instance>
+// (one draw call per distinct body). A part that resolves to NO real model is drawn
+// as a clearly-distinct amber wireframe PROXY and counted truthfully.
+//
+// HONESTY: build123d bodies are dimensioned_parametric — REAL parametric CAD
+// dimensions, explicitly NOT manufacturer-exact, NOT AHJ / PE / code-certified.
+// Proxies are visually distinct and counted (window.__cad.proxyPartCount). The
+// per-part provenance tier is carried into the Inspector. Pipe cylinders are
+// correctly-sized schematic routing. Nothing is fabricated.
 //
 // ENV-SAFETY: R3F's Canvas needs a WebGL context. In jsdom there is none, so we
-// detect WebGL availability and render the DOM empty-state fallback instead of
-// mounting the Canvas. This keeps the App render smoke test honest. R3F-under-
-// React19 patterns mirror the studio scenes: default frameloop, gl
-// preserveDrawingBuffer, a mount-time requestAnimationFrame resize kick, imperative.
+// detect WebGL and render the DOM empty-state fallback instead of mounting the
+// Canvas — the resolver still runs so the honest part counts are published.
 
 import {
   useEffect,
   useMemo,
+  useState,
   type CSSProperties,
   type ReactElement,
 } from 'react';
 import * as THREE from 'three';
 import { Canvas } from '@react-three/fiber';
-import { Grid, OrbitControls } from '@react-three/drei';
+import { Grid, Instance, Instances, OrbitControls } from '@react-three/drei';
 import { useCadStore } from '../store';
-import { hasBuilding, type HazardClass, type Node, type Project } from '../lib/model';
+import { hasBuilding, type HazardClass, type Node, type Project, type Segment } from '../lib/model';
 import {
   buildBuildingMeshes,
   buildingBoundsFt,
@@ -35,6 +42,14 @@ import {
 } from '../lib/building3d';
 import { pressureColor, pressureRange, type HydraulicsResult } from '../lib/hydraulics';
 import { selectHydraulics } from '../store';
+import {
+  displayScaleFor,
+  loadPartGeometry,
+  resolvePartModel,
+  type ResolvedPartModel,
+} from '../lib/part-geometry';
+import { loadBuild123dManifest, type Build123dManifest } from '../../../studio/src/lib/build123d-parts';
+import { loadManufacturerStepManifest, type ManufacturerStepManifest } from '../../../studio/src/lib/manufacturer-step';
 import { colors, spacing, typeScale } from '../lib/tokens';
 
 /** True when a WebGL context can be created (false in jsdom / headless-no-GL). */
@@ -60,6 +75,10 @@ const HAZARD_TINT: Record<HazardClass, string> = {
 /** Selected-room highlight tint. */
 const SELECTED_TINT = '#7fb4ff';
 
+/** Target display size (ft) per body family so real mm bodies read at a sensible scale. */
+const HEAD_TARGET_FT = 0.9;
+const FITTING_TARGET_FT = 0.8;
+
 function FloorSlab({
   floor,
   selected,
@@ -82,55 +101,6 @@ function FloorSlab({
   );
 }
 
-/**
- * A sprinkler head marker in 3D: a small inverted-cone glyph (a stand-in pendent
- * head, NOT manufacturer-exact geometry) hanging at the ceiling plane. Heads are
- * stored in plan-FEET; the caller recenters them onto the building origin so they
- * align with the recentered floor slabs. Selected heads glow.
- */
-function HeadMarker({
-  x,
-  y,
-  z,
-  selected,
-  heatColor,
-  onSelect,
-}: {
-  x: number;
-  y: number;
-  z: number;
-  selected: boolean;
-  heatColor: string | null;
-  onSelect: () => void;
-}): ReactElement {
-  const body = selected ? '#ffd27f' : heatColor ?? '#6fb3ff';
-  return (
-    <group position={[x, y, z]}>
-      {/* small sphere body */}
-      <mesh
-        onClick={(e) => {
-          e.stopPropagation();
-          onSelect();
-        }}
-      >
-        <sphereGeometry args={[selected ? 0.5 : 0.35, 16, 12]} />
-        <meshStandardMaterial
-          color={body}
-          emissive={selected ? '#ffd27f' : heatColor ?? '#1b3b5f'}
-          emissiveIntensity={selected ? 0.6 : heatColor ? 0.4 : 0.25}
-          roughness={0.4}
-          metalness={0.2}
-        />
-      </mesh>
-      {/* deflector disc just below the body */}
-      <mesh position={[0, -0.45, 0]} rotation={[Math.PI / 2, 0, 0]}>
-        <cylinderGeometry args={[0.5, 0.5, 0.05, 16]} />
-        <meshStandardMaterial color={selected ? '#ffd27f' : heatColor ?? '#9fc7ff'} roughness={0.6} />
-      </mesh>
-    </group>
-  );
-}
-
 /** Pipe role -> 3D color (visual legend only — not a code color requirement). */
 const PIPE_ROLE_COLOR: Record<string, string> = {
   MAIN: '#e06c4f',
@@ -141,16 +111,151 @@ const PIPE_ROLE_COLOR: Record<string, string> = {
   DROP: '#9fc7ff',
 };
 
-/** Nominal diameter (in) -> 3D cylinder radius (ft). 1" pipe ~1in = 1/12 ft radius-ish,
- *  but exaggerated for visibility (a design-aid schematic, not manufacturer-exact). */
+/** Nominal diameter (in) -> 3D cylinder radius (ft), exaggerated for visibility. */
 function radiusForDiameter(diameterIn: number): number {
   return Math.max(0.05, (diameterIn / 12) * 0.6);
 }
 
+/* ---------------------------------------------------- imperative STEP body load */
+
 /**
- * A pipe run between two endpoints (feet, recentered) as a cylinder oriented along
- * the segment. R3F cylinders default to the Y axis; we orient via quaternion. The
- * radius scales with the nominal diameter. Selectable.
+ * Load + display-scale ONE STEP body, imperatively (no Suspense/useLoader). Returns
+ * { geo, failed }. `failed` flips true on a real load error so the caller can draw a
+ * proxy instead. Cached by url in loadPartGeometry, so repeat urls share the body.
+ */
+function useStepBody(stepUrl: string, targetFt: number): { geo: THREE.BufferGeometry | null; failed: boolean } {
+  const [geo, setGeo] = useState<THREE.BufferGeometry | null>(null);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    let alive = true;
+    setGeo(null);
+    setFailed(false);
+    loadPartGeometry(stepUrl)
+      .then((cached) => {
+        if (!alive) return;
+        // Clone so each family can be display-scaled independently without mutating
+        // the shared cached geometry (the cache returns the SAME instance per url).
+        const g = cached.clone();
+        const s = displayScaleFor(g, targetFt);
+        g.scale(s, s, s);
+        g.computeVertexNormals();
+        setGeo(g);
+      })
+      .catch((err) => {
+        if (!alive) return;
+        console.error('CAD part STEP load failed', stepUrl, err);
+        setFailed(true);
+      });
+    return () => {
+      alive = false;
+    };
+  }, [stepUrl, targetFt]);
+
+  return { geo, failed };
+}
+
+/* --------------------------------------------------------------- placed parts */
+
+/** One placed network part with its resolved real model + render transform. */
+interface PlacedPart {
+  id: string;
+  kind: 'head' | 'fitting';
+  /** Recentered building-space position (ft). */
+  position: [number, number, number];
+  /** Yaw (radians) about Y to orient a fitting along its pipe; 0 for heads. */
+  rotationY: number;
+  model: ResolvedPartModel;
+  selected: boolean;
+  heatColor: string | null;
+  onSelect: () => void;
+}
+
+/**
+ * Instanced real-STEP bodies for every placement sharing ONE stepUrl. Loads the body
+ * once (cached) and renders an <Instance> per placement. Heads flip 180deg about X so
+ * the deflector points DOWN at the ceiling. Falls back to per-instance proxies on a
+ * real load failure (honest — never silently blank).
+ */
+function StepInstances({
+  stepUrl,
+  placements,
+  targetFt,
+  flipDown,
+}: {
+  stepUrl: string;
+  placements: PlacedPart[];
+  targetFt: number;
+  flipDown: boolean;
+}): ReactElement | null {
+  const { geo, failed } = useStepBody(stepUrl, targetFt);
+
+  if (failed) {
+    // Load failed at runtime — draw honest proxies so the part is never invisible.
+    return (
+      <>
+        {placements.map((p) => (
+          <ProxyPart key={p.id} part={p} />
+        ))}
+      </>
+    );
+  }
+  if (!geo || placements.length === 0) return null;
+
+  return (
+    <Instances geometry={geo} limit={Math.max(1, placements.length)} castShadow receiveShadow>
+      <meshStandardMaterial color="#c2ccd6" metalness={0.4} roughness={0.5} />
+      {placements.map((p) => (
+        <Instance
+          key={p.id}
+          position={p.position}
+          rotation={flipDown ? [Math.PI, p.rotationY, 0] : [0, p.rotationY, 0]}
+          color={p.selected ? '#ffd27f' : p.heatColor ?? undefined}
+          onClick={(e) => {
+            e.stopPropagation();
+            p.onSelect();
+          }}
+        />
+      ))}
+    </Instances>
+  );
+}
+
+/**
+ * A clearly-distinct PROXY for a part with no resolvable real model: an amber,
+ * wireframe-edged box. It can NEVER be mistaken for real CAD. Selectable.
+ */
+function ProxyPart({ part }: { part: PlacedPart }): ReactElement {
+  const size = part.kind === 'head' ? 0.6 : 0.7;
+  return (
+    <group position={part.position} rotation={[0, part.rotationY, 0]}>
+      <mesh
+        onClick={(e) => {
+          e.stopPropagation();
+          part.onSelect();
+        }}
+      >
+        <boxGeometry args={[size, size, size]} />
+        <meshStandardMaterial
+          color={part.selected ? '#ffd27f' : '#f0a868'}
+          metalness={0}
+          roughness={0.9}
+          transparent
+          opacity={0.5}
+        />
+      </mesh>
+      <mesh>
+        <boxGeometry args={[size, size, size]} />
+        <meshStandardMaterial color={part.selected ? '#ffd27f' : '#f0a868'} wireframe />
+      </mesh>
+    </group>
+  );
+}
+
+/**
+ * A pipe run between two endpoints (feet, recentered) as a correctly-sized cylinder
+ * oriented along the segment. Real pipe IS cylindrical; the radius scales with the
+ * nominal diameter. Selectable.
  */
 function PipeRun({
   a,
@@ -175,7 +280,6 @@ function PipeRun({
   const len = Math.hypot(dx, dy, dz);
   if (len < 1e-4) return null;
   const mid: [number, number, number] = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2];
-  // Quaternion rotating the +Y axis onto the segment direction.
   const dir = new THREE.Vector3(dx, dy, dz).normalize();
   const up = new THREE.Vector3(0, 1, 0);
   const quat = new THREE.Quaternion().setFromUnitVectors(up, dir);
@@ -191,47 +295,12 @@ function PipeRun({
       }}
     >
       <cylinderGeometry args={[r, r, len, 12]} />
-      <meshStandardMaterial color={color} roughness={0.5} metalness={0.25} emissive={selected ? '#7a5a1f' : '#000000'} emissiveIntensity={selected ? 0.4 : 0} />
-    </mesh>
-  );
-}
-
-/** A fitting marker (tee/elbow/reducer/riser) as a small box at the ceiling. */
-function FittingMarker({
-  x,
-  y,
-  z,
-  type,
-  selected,
-  heatColor,
-  onSelect,
-}: {
-  x: number;
-  y: number;
-  z: number;
-  type: string;
-  selected: boolean;
-  heatColor: string | null;
-  onSelect: () => void;
-}): ReactElement {
-  const isRiser = type === 'SOURCE';
-  const s = (selected ? 0.55 : 0.4) * (isRiser ? 1.4 : 1);
-  const color = selected ? '#ffd27f' : heatColor ?? (isRiser ? '#c062d0' : '#cdd6e0');
-  return (
-    <mesh
-      position={[x, y, z]}
-      onClick={(e) => {
-        e.stopPropagation();
-        onSelect();
-      }}
-    >
-      <boxGeometry args={[s, s, s]} />
       <meshStandardMaterial
         color={color}
-        emissive={selected ? '#7a5a1f' : heatColor ?? '#000000'}
-        emissiveIntensity={selected ? 0.4 : heatColor ? 0.35 : 0}
         roughness={0.5}
-        metalness={0.3}
+        metalness={0.25}
+        emissive={selected ? '#7a5a1f' : '#000000'}
+        emissiveIntensity={selected ? 0.4 : 0}
       />
     </mesh>
   );
@@ -244,11 +313,30 @@ interface HeatMap {
 }
 
 /**
- * Render the pipe network (segments as cylinders + fittings as boxes), recentered
- * onto the building origin. Endpoints resolve from the node map; an orphan segment
- * (missing endpoint) is skipped — never drawn.
+ * Compute the yaw (about Y) to orient a fitting along its DOMINANT adjacent pipe in
+ * the floor plane. Best-effort: aligns the fitting's local +X with the run direction.
+ * Honest schematic orientation — not a solved spool fit-up.
  */
-function PipeNetwork({
+function fittingYaw(node: Node, segments: Segment[], byId: Map<string, Node>): number {
+  const adj = segments.filter((s) => s.from === node.id || s.to === node.id);
+  for (const s of adj) {
+    const other = byId.get(s.from === node.id ? s.to : s.from);
+    if (!other) continue;
+    const dx = other.pos.x - node.pos.x;
+    const dz = other.pos.z - node.pos.z;
+    if (Math.hypot(dx, dz) > 1e-4) return Math.atan2(dz, dx);
+  }
+  return 0;
+}
+
+/* ----------------------------------------------------------- the parts renderer */
+
+/**
+ * Resolve + render EVERY network part with its real STEP body (instanced per url),
+ * plus correctly-sized pipe cylinders and amber proxies for unresolvable parts.
+ * Recenters onto the building origin like the floors.
+ */
+function PartsLayer({
   nodes,
   segments,
   centerX,
@@ -256,28 +344,65 @@ function PipeNetwork({
   selectedNodeId,
   selectedSegmentId,
   heat,
-  onSelectSegment,
+  manifests,
   onSelectNode,
+  onSelectSegment,
 }: {
   nodes: Node[];
-  segments: { id: string; from: string; to: string; diameterIn: number; role: string }[];
+  segments: Segment[];
   centerX: number;
   centerZ: number;
   selectedNodeId: string | null;
   selectedSegmentId: string | null;
-  /** Heatmap accessor (id -> color) or null when the heatmap is off. */
   heat: HeatMap | null;
-  onSelectSegment: (id: string) => void;
+  manifests: Manifests;
   onSelectNode: (id: string) => void;
+  onSelectSegment: (id: string) => void;
 }): ReactElement {
   const byId = useMemo(() => {
     const m = new Map<string, Node>();
     for (const n of nodes) m.set(n.id, n);
     return m;
   }, [nodes]);
-  const fittings = useMemo(() => nodes.filter((n) => n.type !== 'HEAD'), [nodes]);
+
+  // Resolve each node to a real model (or null -> proxy), grouped by stepUrl for
+  // instancing. Heads and fittings instance separately so flipDown/target differ.
+  const { headGroups, fittingGroups, proxies } = useMemo(() => {
+    const headGroups = new Map<string, PlacedPart[]>();
+    const fittingGroups = new Map<string, PlacedPart[]>();
+    const proxies: PlacedPart[] = [];
+    for (const n of nodes) {
+      const isHead = n.type === 'HEAD';
+      const model = resolvePartModel(n, {
+        build123d: manifests.build123d,
+        manufacturerStep: manifests.manufacturerStep,
+      });
+      const placed: PlacedPart = {
+        id: n.id,
+        kind: isHead ? 'head' : 'fitting',
+        position: [n.pos.x - centerX, n.pos.y, n.pos.z - centerZ],
+        rotationY: isHead ? 0 : fittingYaw(n, segments, byId),
+        // model may be null; ProxyPart doesn't read it.
+        model: model as ResolvedPartModel,
+        selected: n.id === selectedNodeId,
+        heatColor: heat ? heat.node(n.id) : null,
+        onSelect: () => onSelectNode(n.id),
+      };
+      if (!model) {
+        proxies.push(placed);
+        continue;
+      }
+      const group = isHead ? headGroups : fittingGroups;
+      const arr = group.get(model.stepUrl);
+      if (arr) arr.push(placed);
+      else group.set(model.stepUrl, [placed]);
+    }
+    return { headGroups, fittingGroups, proxies };
+  }, [nodes, segments, byId, centerX, centerZ, selectedNodeId, heat, manifests, onSelectNode]);
+
   return (
     <>
+      {/* Pipe runs — correctly-sized cylinders (real pipe is cylindrical). */}
       {segments.map((seg) => {
         const a = byId.get(seg.from);
         const b = byId.get(seg.to);
@@ -295,50 +420,115 @@ function PipeNetwork({
           />
         );
       })}
-      {fittings.map((f) => (
-        <FittingMarker
-          key={f.id}
-          x={f.pos.x - centerX}
-          y={f.pos.y}
-          z={f.pos.z - centerZ}
-          type={f.type}
-          selected={f.id === selectedNodeId}
-          heatColor={heat ? heat.node(f.id) : null}
-          onSelect={() => onSelectNode(f.id)}
-        />
+
+      {/* Real head STEP bodies, instanced per url, deflector down. */}
+      {[...headGroups.entries()].map(([url, placements]) => (
+        <StepInstances key={url} stepUrl={url} placements={placements} targetFt={HEAD_TARGET_FT} flipDown />
+      ))}
+
+      {/* Real fitting STEP bodies (tee/elbow/reducer/cross/riser-valve), instanced per url. */}
+      {[...fittingGroups.entries()].map(([url, placements]) => (
+        <StepInstances key={url} stepUrl={url} placements={placements} targetFt={FITTING_TARGET_FT} flipDown={false} />
+      ))}
+
+      {/* Honest amber-wireframe proxies for any part with no resolvable model. */}
+      {proxies.map((p) => (
+        <ProxyPart key={p.id} part={p} />
       ))}
     </>
   );
 }
 
+/* --------------------------------------------------------------- manifests hook */
+
+interface Manifests {
+  build123d: Build123dManifest | null;
+  manufacturerStep: ManufacturerStepManifest | null;
+}
+
+/**
+ * Load the committed build123d manifest (and any local manufacturer-step manifest)
+ * once. Fail-soft: both default to EMPTY, so a missing file degrades parts to proxies
+ * rather than crashing. The resolved part counts reflect whatever actually loaded.
+ */
+function useManifests(): Manifests {
+  const [manifests, setManifests] = useState<Manifests>({ build123d: null, manufacturerStep: null });
+  useEffect(() => {
+    let alive = true;
+    const fetchImpl = typeof fetch === 'function' ? fetch.bind(globalThis) : undefined;
+    void Promise.all([
+      loadBuild123dManifest(fetchImpl),
+      loadManufacturerStepManifest(fetchImpl),
+    ]).then(([build123d, manufacturerStep]) => {
+      if (alive) setManifests({ build123d, manufacturerStep });
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
+  return manifests;
+}
+
+/* --------------------------------------------------------------- honest counts */
+
+/**
+ * PURE. Count how many network parts resolve to a REAL model vs a proxy. A part is in
+ * exactly one bucket. Pipes always resolve (pipe_sch40/sch10) so they count real.
+ * This is the truthful basis for window.__cad.realGeometryPartCount / proxyPartCount.
+ */
+export function countPartProvenance(
+  nodes: Node[],
+  segments: Segment[],
+  manifests: Manifests,
+): { realGeometryPartCount: number; proxyPartCount: number } {
+  let real = 0;
+  let proxy = 0;
+  for (const n of nodes) {
+    const m = resolvePartModel(n, {
+      build123d: manifests.build123d,
+      manufacturerStep: manifests.manufacturerStep,
+    });
+    if (m) real += 1;
+    else proxy += 1;
+  }
+  for (const s of segments) {
+    const m = resolvePartModel(s, {
+      build123d: manifests.build123d,
+      manufacturerStep: manifests.manufacturerStep,
+    });
+    if (m) real += 1;
+    else proxy += 1;
+  }
+  return { realGeometryPartCount: real, proxyPartCount: proxy };
+}
+
+/* --------------------------------------------------------------- scenes */
+
 function BuildingScene({
   meshes,
   selectedRoomId,
-  heads,
   centerX,
   centerZ,
   selectedNodeId,
-  heat,
-  onSelectHead,
-  network,
   selectedSegmentId,
-  onSelectSegment,
+  heat,
+  manifests,
+  network,
   onSelectNode,
+  onSelectSegment,
 }: {
   meshes: BuildingMeshes;
   selectedRoomId: string | null;
-  heads: Node[];
   centerX: number;
   centerZ: number;
   selectedNodeId: string | null;
-  heat: HeatMap | null;
-  onSelectHead: (id: string) => void;
-  network: Project['network'];
   selectedSegmentId: string | null;
-  onSelectSegment: (id: string) => void;
+  heat: HeatMap | null;
+  manifests: Manifests;
+  network: Project['network'];
   onSelectNode: (id: string) => void;
+  onSelectSegment: (id: string) => void;
 }): ReactElement {
-  // Frame size from building bounds so the grid + camera target fit it.
   const span = useMemo(() => {
     const s = Math.max(meshes.bounds.widthFt, meshes.bounds.depthFt, 10);
     return Math.ceil(s * 1.4);
@@ -352,11 +542,7 @@ function BuildingScene({
       <hemisphereLight args={['#cdd6e0', '#0e1318', 0.4]} />
 
       {meshes.floors.map((floor) => (
-        <FloorSlab
-          key={floor.roomId}
-          floor={floor}
-          selected={floor.roomId === selectedRoomId}
-        />
+        <FloorSlab key={floor.roomId} floor={floor} selected={floor.roomId === selectedRoomId} />
       ))}
 
       {meshes.walls.map((w) =>
@@ -367,22 +553,7 @@ function BuildingScene({
         ) : null,
       )}
 
-      {/* sprinkler heads — recentered onto the building origin so they sit over the
-          floor slabs. pos.y is the head's ceiling height (feet). */}
-      {heads.map((h) => (
-        <HeadMarker
-          key={h.id}
-          x={h.pos.x - centerX}
-          y={h.pos.y}
-          z={h.pos.z - centerZ}
-          selected={h.id === selectedNodeId}
-          heatColor={heat ? heat.node(h.id) : null}
-          onSelect={() => onSelectHead(h.id)}
-        />
-      ))}
-
-      {/* W4 pipe network — cylinders + fitting boxes, recentered like the heads. */}
-      <PipeNetwork
+      <PartsLayer
         nodes={network.nodes}
         segments={network.segments}
         centerX={centerX}
@@ -390,8 +561,9 @@ function BuildingScene({
         selectedNodeId={selectedNodeId}
         selectedSegmentId={selectedSegmentId}
         heat={heat}
-        onSelectSegment={onSelectSegment}
+        manifests={manifests}
         onSelectNode={onSelectNode}
+        onSelectSegment={onSelectSegment}
       />
 
       <Grid
@@ -412,44 +584,29 @@ function BuildingScene({
 }
 
 function GroundScene({
-  heads,
   selectedNodeId,
-  heat,
-  onSelectHead,
-  network,
   selectedSegmentId,
-  onSelectSegment,
+  heat,
+  manifests,
+  network,
   onSelectNode,
+  onSelectSegment,
 }: {
-  heads: Node[];
   selectedNodeId: string | null;
-  heat: HeatMap | null;
-  onSelectHead: (id: string) => void;
-  network: Project['network'];
   selectedSegmentId: string | null;
-  onSelectSegment: (id: string) => void;
+  heat: HeatMap | null;
+  manifests: Manifests;
+  network: Project['network'];
   onSelectNode: (id: string) => void;
+  onSelectSegment: (id: string) => void;
 }): ReactElement {
   return (
     <>
       <color attach="background" args={[colors.ground3d]} />
       <ambientLight intensity={0.6} />
       <directionalLight position={[8, 14, 6]} intensity={1.1} />
-      {/* Heads can exist before a building is reconstructed — show them at their
-          plan-feet positions (no recentering applies with no building bounds). */}
-      {heads.map((h) => (
-        <HeadMarker
-          key={h.id}
-          x={h.pos.x}
-          y={h.pos.y}
-          z={h.pos.z}
-          selected={h.id === selectedNodeId}
-          heatColor={heat ? heat.node(h.id) : null}
-          onSelect={() => onSelectHead(h.id)}
-        />
-      ))}
-      {/* W4 pipe network at plan-feet (no building recenter). */}
-      <PipeNetwork
+
+      <PartsLayer
         nodes={network.nodes}
         segments={network.segments}
         centerX={0}
@@ -457,10 +614,11 @@ function GroundScene({
         selectedNodeId={selectedNodeId}
         selectedSegmentId={selectedSegmentId}
         heat={heat}
-        onSelectSegment={onSelectSegment}
+        manifests={manifests}
         onSelectNode={onSelectNode}
+        onSelectSegment={onSelectSegment}
       />
-      {/* Ground grid: honest empty floor, no building drawn. */}
+
       <Grid
         args={[40, 40]}
         cellSize={1}
@@ -500,6 +658,7 @@ export function Viewer3D(): ReactElement {
   const designAreaSqFt = useCadStore((s) => s.designAreaSqFt);
   const loaded = hasBuilding(project);
   const gl = useMemo(webglAvailable, []);
+  const manifests = useManifests();
 
   const heads = useMemo(
     () => project.network.nodes.filter((n) => n.type === 'HEAD'),
@@ -528,11 +687,9 @@ export function Viewer3D(): ReactElement {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pressureHeatmap, project.network, supply, designAreaSqFt, project.hazardDefaults.defaultClass]);
-  // Recenter heads onto the same origin the floor slabs use (building bounds center).
+
   const bounds = useMemo(() => buildingBoundsFt(project.building), [project.building]);
 
-  // PURE, deterministic rebuild whenever the building changes (room/wall/scale).
-  // This is what makes the 3D view reactive to 2D edits via the shared store.
   const meshes = useMemo<BuildingMeshes | null>(() => {
     if (!loaded) return null;
     return buildBuildingMeshes(project.building, {
@@ -545,14 +702,17 @@ export function Viewer3D(): ReactElement {
     });
   }, [loaded, project.building, project.hazardDefaults.defaultCeilingHt, project.levels]);
 
-  // Publish a small honest 3D snapshot for the preview harness.
-  useEffect(() => {
-    publish3dWindow(project, meshes, heads.length);
-  }, [project, meshes, heads.length]);
+  // Honest provenance counts (resolution-based; recomputed when network/manifests change).
+  const provCounts = useMemo(
+    () => countPartProvenance(project.network.nodes, project.network.segments, manifests),
+    [project.network.nodes, project.network.segments, manifests],
+  );
 
-  // R3F sizes its canvas via ResizeObserver, which can miss the first measure in
-  // headless/SSR-hydrated contexts. Kick one resize after mount so the canvas
-  // fills its container reliably (no-op in a normal browser already sized).
+  // Publish a small honest 3D + provenance snapshot for the preview harness.
+  useEffect(() => {
+    publish3dWindow(meshes, heads.length, provCounts);
+  }, [meshes, heads.length, provCounts]);
+
   useEffect(() => {
     if (!gl) return;
     const id = requestAnimationFrame(() => {
@@ -577,32 +737,29 @@ export function Viewer3D(): ReactElement {
             <BuildingScene
               meshes={meshes}
               selectedRoomId={selectedRoomId}
-              heads={heads}
               centerX={bounds.cx}
               centerZ={bounds.cy}
               selectedNodeId={selectedNodeId}
-              heat={heat}
-              onSelectHead={(id) => select('node', id)}
-              network={project.network}
               selectedSegmentId={selectedSegmentId}
-              onSelectSegment={(id) => select('segment', id)}
+              heat={heat}
+              manifests={manifests}
+              network={project.network}
               onSelectNode={(id) => select('node', id)}
+              onSelectSegment={(id) => select('segment', id)}
             />
           ) : (
             <GroundScene
-              heads={heads}
               selectedNodeId={selectedNodeId}
-              heat={heat}
-              onSelectHead={(id) => select('node', id)}
-              network={project.network}
               selectedSegmentId={selectedSegmentId}
-              onSelectSegment={(id) => select('segment', id)}
+              heat={heat}
+              manifests={manifests}
+              network={project.network}
               onSelectNode={(id) => select('node', id)}
+              onSelectSegment={(id) => select('segment', id)}
             />
           )}
         </Canvas>
       ) : (
-        // No GL context (e.g. test env): solid ground fill stands in for the canvas.
         <div style={{ ...wrapStyle, background: colors.ground3d }} aria-hidden="true" />
       )}
 
@@ -622,14 +779,14 @@ export function Viewer3D(): ReactElement {
 /* ----------------------------------------------------- preview handle */
 
 /**
- * Publish a small honest 3D snapshot onto window.__cad. Truthful: has3DBuilding is
- * only true when meshes were actually built; the backend name is whatever
- * building3d reports (never faked).
+ * Publish a small honest 3D + provenance snapshot onto window.__cad. Truthful:
+ * has3DBuilding only when meshes were actually built; the part counts come straight
+ * from the resolver (real STEP body vs amber proxy).
  */
 function publish3dWindow(
-  project: Project,
   meshes: BuildingMeshes | null,
   headCount: number,
+  prov: { realGeometryPartCount: number; proxyPartCount: number },
 ): void {
   if (typeof window === 'undefined') return;
   const prev = window.__cad;
@@ -639,10 +796,10 @@ function publish3dWindow(
     floorCount: meshes?.floors.length ?? 0,
     wallCount: meshes?.walls.length ?? 0,
     headCount3d: headCount,
+    realGeometryPartCount: prov.realGeometryPartCount,
+    proxyPartCount: prov.proxyPartCount,
   };
   window.__cad = { ...(prev ?? {}), ...next } as typeof window.__cad;
-  // Silence unused-param lint while keeping the signature explicit for clarity.
-  void project;
 }
 
 /* --------------------------------------------------------------- styles */
