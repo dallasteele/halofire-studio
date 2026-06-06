@@ -70,6 +70,20 @@ import {
 } from './lib/catalog-geometry';
 import { ManufacturerCatalogPanel } from './ManufacturerCatalogPanel';
 import { AddCatalogPanel } from './AddCatalogPanel';
+import { ManufacturersPanel } from './ManufacturersPanel';
+import {
+  loadConnectorRegistry,
+  connectorCount as countConnectors,
+  connectorsEnabledCount as countConnectorsEnabled,
+  type ManufacturerConnector,
+} from './lib/manufacturer-connectors';
+import {
+  loadPartsDb,
+  resolveConnectors,
+  type PartsDbResult,
+} from './lib/parts-db';
+import initSqlJs from 'sql.js';
+import sqlWasmUrl from 'sql.js/dist/sql-wasm.wasm?url';
 import { SystemPanel } from './SystemPanel';
 import { RULE_CONSTANT_COUNT, type HazardClass as Nfpa13HazardClass } from './lib/nfpa13-rules';
 import { AssemblyControls } from './AssemblyControls';
@@ -191,6 +205,29 @@ declare global {
        * (= branchCount * headsPerBranch). Only meaningful in assembly mode.
        */
       assemblyHeadsPlaced: number;
+      /**
+       * Number of part rows read from the SQLite source-of-truth (public/parts/
+       * parts.db) via sql.js. -1 when the DB was unavailable and the studio
+       * fail-softed to the JSON loaders. Honest by construction — the DB changes
+       * no provenance gate; it is the metadata source-of-truth only.
+       */
+      dbPartCount: number;
+      /**
+       * true when the parts.db loaded + queried successfully via sql.js; false when
+       * the studio fail-softed to the JSON loaders. Honest by construction.
+       */
+      dbAvailable: boolean;
+      /**
+       * Number of per-manufacturer connectors in the registry (researched +
+       * user-added). Honest by construction.
+       */
+      connectorCount: number;
+      /**
+       * Number of connectors with status "enabled" — genuinely zero-credential
+       * ungated sources ONLY (Victaulic, Reliable, Wheatland, Bull Moose). Honest
+       * by construction; saving a config does NOT run a live integration.
+       */
+      connectorsEnabledCount: number;
     };
   }
 }
@@ -202,8 +239,16 @@ export function App(): ReactElement {
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   // Default "catalog" so existing behavior/tests are unaffected on load.
   const [appMode, setAppMode] = useState<AppMode>('catalog');
-  // Within Manufacturer mode: browse the catalog vs. the T54 Add-Catalog UX.
-  const [mfrView, setMfrView] = useState<'browse' | 'add'>('browse');
+  // Within Manufacturer mode: browse the catalog, the T54 Add-Catalog UX, or the
+  // per-manufacturer Connectors settings panel.
+  const [mfrView, setMfrView] = useState<'browse' | 'add' | 'connectors'>('browse');
+  // SQLite source-of-truth (parts.db via sql.js). Fail-soft: stays "unavailable"
+  // and the studio uses the JSON loaders if the DB can't load. dbPartCount is -1
+  // until resolved, then the DB row count (or -1 if the DB was unavailable).
+  const [dbPartCount, setDbPartCount] = useState<number>(-1);
+  const [dbAvailable, setDbAvailable] = useState<boolean>(false);
+  // Per-manufacturer connectors (DB first, fail-soft to the committed registry).
+  const [connectors, setConnectors] = useState<ManufacturerConnector[]>([]);
   // Sprinkler layout inputs (only used in layout mode).
   const [widthFt, setWidthFt] = useState(40);
   const [lengthFt, setLengthFt] = useState(60);
@@ -324,6 +369,56 @@ export function App(): ReactElement {
           entries: [],
         });
       });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Load the SQLite source-of-truth (parts.db) via sql.js, plus the connector
+  // list. FAIL-SOFT: any error leaves the DB unavailable (dbPartCount -1) and the
+  // connectors come from the committed registry JSON. The DB changes NO provenance
+  // gate — it is the metadata source-of-truth only.
+  useEffect(() => {
+    let cancelled = false;
+    const f =
+      typeof fetch === 'function' ? fetch.bind(globalThis) : undefined;
+    (async () => {
+      let db: PartsDbResult = { ok: false, reason: 'not loaded' };
+      try {
+        db = await loadPartsDb(
+          initSqlJs as never,
+          f,
+          '/parts/parts.db',
+          sqlWasmUrl,
+        );
+      } catch (e) {
+        db = { ok: false, reason: e instanceof Error ? e.message : 'db load error' };
+      }
+      if (cancelled) return;
+      if (db.ok) {
+        setDbAvailable(true);
+        setDbPartCount(db.partCount());
+      } else {
+        setDbAvailable(false);
+        setDbPartCount(-1);
+      }
+      // Connectors: DB first, fail-soft to committed registry.
+      const { connectors: conns } = await resolveConnectors(db, f);
+      if (cancelled) return;
+      if (conns.length > 0) {
+        setConnectors(conns);
+      } else {
+        // Last-resort: load the registry directly (so the panel is never empty).
+        const reg = await loadConnectorRegistry(f);
+        if (!cancelled) setConnectors(reg.connectors);
+      }
+      if (db.ok) db.close();
+    })().catch(() => {
+      if (!cancelled) {
+        setDbAvailable(false);
+        setDbPartCount(-1);
+      }
+    });
     return () => {
       cancelled = true;
     };
@@ -480,6 +575,13 @@ export function App(): ReactElement {
       // The Add-Catalog UX is always mounted in mfr-catalog mode and both of its
       // paths exist (fail-closed SAM lane + client-side STEP import). Ready true.
       addCatalogReady: true,
+      dbPartCount,
+      dbAvailable,
+      connectorCount: countConnectors({ generatedAt: null, connectors }),
+      connectorsEnabledCount: countConnectorsEnabled({
+        generatedAt: null,
+        connectors,
+      }),
     };
   }, [
     records,
@@ -498,6 +600,9 @@ export function App(): ReactElement {
     assembly.headsPlaced,
     footprint,
     samAvailable,
+    dbPartCount,
+    dbAvailable,
+    connectors,
   ]);
 
   // R3F sizes its canvas via ResizeObserver, which can miss the first measure in
@@ -579,13 +684,14 @@ export function App(): ReactElement {
         <span style={statusChipStyle} role="status">
           {appMode === 'mfr-catalog' ? (
             <>
-              <strong style={statusNumStyle}>{catalogPartCount}</strong>{' '}
-              manufacturer SKUs{' '}
+              <strong style={statusNumStyle}>
+                {dbAvailable ? dbPartCount : catalogPartCount}
+              </strong>{' '}
+              parts {dbAvailable ? 'in DB' : '(catalog)'}{' '}
               <span style={statusSepStyle}>·</span>{' '}
               <strong style={statusNumStyle}>{skusWithGeometry}</strong> with 3D
               geometry <span style={statusSepStyle}>·</span>{' '}
-              <strong style={statusNumStyle}>{aiPlaceholderCount}</strong> AI
-              placeholder
+              <strong style={statusNumStyle}>{connectors.length}</strong> connectors
             </>
           ) : appMode === 'system' ? (
             <>
@@ -719,9 +825,26 @@ export function App(): ReactElement {
               >
                 Add Catalog
               </button>
+              <button
+                type="button"
+                role="radio"
+                aria-checked={mfrView === 'connectors'}
+                onClick={() => setMfrView('connectors')}
+                data-testid="connectors-toggle"
+                style={{
+                  ...segmentBtnStyle,
+                  background: mfrView === 'connectors' ? colors.interactiveActive : 'transparent',
+                  color: mfrView === 'connectors' ? '#ffffff' : colors.textSecondary,
+                  fontWeight: mfrView === 'connectors' ? 600 : 500,
+                }}
+              >
+                Connectors
+              </button>
             </div>
             {mfrView === 'add' ? (
               <AddCatalogPanel samInvoker={samInvoker} />
+            ) : mfrView === 'connectors' ? (
+              <ManufacturersPanel connectors={connectors} />
             ) : (
               <ManufacturerCatalogPanel
                 catalog={mfrCatalog}
