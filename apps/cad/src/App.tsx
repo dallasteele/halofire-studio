@@ -30,6 +30,14 @@ export function App(): ReactElement {
     publishCadWindow(cadWindowSnapshot(project, viewMode, TOOL_COUNT, activeHeadSku));
   }, [project, viewMode, activeHeadSku]);
 
+  // DEV-only: expose the store getState for the preview/E2E harness to drive the app
+  // (seed a building + heads, route pipe) without faking the UI. Stripped from prod.
+  useEffect(() => {
+    if (import.meta.env.DEV && typeof window !== 'undefined') {
+      (window as unknown as { __cadStore?: typeof useCadStore }).__cadStore = useCadStore;
+    }
+  }, []);
+
   return (
     <div style={appStyle}>
       <TopRibbon />

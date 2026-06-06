@@ -24,7 +24,14 @@ import {
 import { Stage, Layer, Line, Text, Rect, Image as KonvaImage, Circle } from 'react-konva';
 import type Konva from 'konva';
 import { useCadStore } from '../store';
-import { HAZARD_CLASSES, makeId, type HazardClass, type Point2 } from '../lib/model';
+import {
+  HAZARD_CLASSES,
+  makeId,
+  type HazardClass,
+  type Node,
+  type Point2,
+  type SegmentRole,
+} from '../lib/model';
 import { measureFeet, polygonAreaSqFt, setScaleFromTwoPoints } from '../lib/scale';
 import { coverageReport } from '../lib/head-layout';
 import { colors, spacing, typeScale } from '../lib/tokens';
@@ -116,6 +123,33 @@ const HAZARD_LABEL: Record<HazardClass, string> = {
   EXTRA_2: 'Extra 2',
 };
 
+/** Pipe color by role (W4). Visual legend only — not a code color requirement. */
+const ROLE_COLOR: Record<SegmentRole, string> = {
+  MAIN: '#e06c4f',
+  CROSS_MAIN: '#f0a868',
+  BRANCH: '#6fb3ff',
+  ARM_OVER: '#9fc7ff',
+  RISER: '#c062d0',
+  DROP: '#9fc7ff',
+};
+
+function roleColor(role: SegmentRole): string {
+  return ROLE_COLOR[role] ?? colors.interactiveText;
+}
+
+/** Screen stroke width (px) from a nominal pipe diameter (in). Bigger pipe = wider. */
+function widthForDiameter(diameterIn: number): number {
+  return Math.max(1.5, Math.min(8, 1 + diameterIn * 1.6));
+}
+
+/** A short glyph per fitting type for the 2D symbol. */
+const FITTING_GLYPH: Record<string, string> = {
+  TEE: 'T',
+  ELBOW: 'L',
+  REDUCER: 'R',
+  SOURCE: '◈', // riser diamond
+};
+
 export function PlanCanvas(): ReactElement {
   const wrapRef = useRef<HTMLDivElement | null>(null);
   const [size, setSize] = useState<Size>({ w: 0, h: 0 });
@@ -130,8 +164,11 @@ export function PlanCanvas(): ReactElement {
   const moveHead = useCadStore((s) => s.moveHead);
   const deleteHead = useCadStore((s) => s.deleteHead);
   const autoLayoutRoom = useCadStore((s) => s.autoLayoutRoom);
+  const routeSystem = useCadStore((s) => s.routeSystem);
+  const moveNode = useCadStore((s) => s.moveNode);
   const select = useCadStore((s) => s.select);
   const selectedNodeId = useCadStore((s) => s.selection.selectedNodeId);
+  const selectedSegmentId = useCadStore((s) => s.selection.selectedSegmentId);
   const selectedRoomId = useCadStore((s) => s.selection.selectedRoomId);
   const activeHeadSku = useCadStore((s) => s.activeHeadSku);
 
@@ -142,6 +179,17 @@ export function PlanCanvas(): ReactElement {
     () => project.network.nodes.filter((n) => n.type === 'HEAD'),
     [project.network.nodes],
   );
+  // W4: pipe fittings + a node lookup so segments can resolve their endpoints.
+  const fittings = useMemo(
+    () => project.network.nodes.filter((n) => n.type !== 'HEAD'),
+    [project.network.nodes],
+  );
+  const nodeById = useMemo(() => {
+    const m = new Map<string, Node>();
+    for (const n of project.network.nodes) m.set(n.id, n);
+    return m;
+  }, [project.network.nodes]);
+  const segments = project.network.segments;
   const selectedRoom = selectedRoomId
     ? building.rooms.find((r) => r.id === selectedRoomId) ?? null
     : null;
@@ -149,7 +197,8 @@ export function PlanCanvas(): ReactElement {
     building.rooms.length > 0 ||
     building.walls.length > 0 ||
     underlay !== null ||
-    heads.length > 0;
+    heads.length > 0 ||
+    segments.length > 0;
 
   // In-progress interactions.
   const [scalePts, setScalePts] = useState<Point2[]>([]);
@@ -218,8 +267,36 @@ export function PlanCanvas(): ReactElement {
         padY: (size.h - bh * scale) / 2,
       };
     }
-    return IDENTITY_XFORM;
-  }, [ready, underlay, size]);
+    // No underlay: fit the traced/laid geometry (rooms + heads + pipe nodes) so the
+    // plan frames what exists. Rooms are in plan units; heads/pipe nodes are in FEET,
+    // so convert them to plan units (ft / scale). This makes W3/W4 geometry visible
+    // even with no imported underlay. Falls back to identity when there's nothing.
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+    const extend = (px: number, py: number): void => {
+      if (px < minX) minX = px;
+      if (py < minY) minY = py;
+      if (px > maxX) maxX = px;
+      if (py > maxY) maxY = py;
+    };
+    for (const r of building.rooms) for (const p of r.polygon) extend(p.x, p.y);
+    for (const w of building.walls) {
+      extend(w.start.x, w.start.y);
+      extend(w.end.x, w.end.y);
+    }
+    for (const n of project.network.nodes) extend(n.pos.x / scale, n.pos.z / scale);
+    if (![minX, minY, maxX, maxY].every(Number.isFinite) || maxX <= minX || maxY <= minY) {
+      return IDENTITY_XFORM;
+    }
+    // Pad the bounds a little so geometry isn't flush to the canvas edge.
+    const padFt = Math.max(2, (maxX - minX + maxY - minY) * 0.05);
+    return fitBounds(
+      { minX: minX - padFt, minY: minY - padFt, maxX: maxX + padFt, maxY: maxY + padFt },
+      size,
+    );
+  }, [ready, underlay, size, building.rooms, building.walls, project.network.nodes, scale]);
 
   // For a PDF underlay, plan-space y grows DOWN, so screen mapping differs.
   const isRaster = underlay?.kind === 'pdf';
@@ -492,6 +569,87 @@ export function PlanCanvas(): ReactElement {
             )}
           </Layer>
 
+          {/* W4 pipe layer — segments styled by role + width by diameter; fittings as
+              symbols. Pipe nodes live in FEET; convert to plan units then to screen.
+              Segments are click-selectable; fittings are draggable + selectable. */}
+          <Layer>
+            {segments.map((seg) => {
+              const a = nodeById.get(seg.from);
+              const c = nodeById.get(seg.to);
+              if (!a || !c) return null; // never draw an orphan pipe
+              const pa = toScreen({ x: a.pos.x / scale, y: a.pos.z / scale });
+              const pc = toScreen({ x: c.pos.x / scale, y: c.pos.z / scale });
+              const isSel = seg.id === selectedSegmentId;
+              return (
+                <Line
+                  key={seg.id}
+                  points={[pa.sx, pa.sy, pc.sx, pc.sy]}
+                  stroke={isSel ? colors.warn : roleColor(seg.role)}
+                  strokeWidth={widthForDiameter(seg.diameterIn) + (isSel ? 2 : 0)}
+                  lineCap="round"
+                  hitStrokeWidth={12}
+                  onClick={(e) => {
+                    e.cancelBubble = true;
+                    select('segment', seg.id);
+                  }}
+                />
+              );
+            })}
+
+            {/* fitting markers (tees/elbows/reducers/riser) */}
+            {fittings.map((f) => {
+              const s = toScreen({ x: f.pos.x / scale, y: f.pos.z / scale });
+              const isSel = f.id === selectedNodeId;
+              const isRiser = f.type === 'SOURCE';
+              return (
+                <Rect
+                  key={f.id}
+                  x={s.sx - (isSel ? 6 : 4)}
+                  y={s.sy - (isSel ? 6 : 4)}
+                  width={isSel ? 12 : 8}
+                  height={isSel ? 12 : 8}
+                  rotation={45}
+                  offsetX={isSel ? 6 : 4}
+                  offsetY={isSel ? 6 : 4}
+                  fill={isRiser ? '#c062d0' : isSel ? colors.warn : '#cdd6e0'}
+                  stroke={isSel ? colors.warn : colors.accentText}
+                  strokeWidth={1}
+                  draggable
+                  onClick={(e) => {
+                    e.cancelBubble = true;
+                    select('node', f.id);
+                  }}
+                  onDragStart={(e) => {
+                    e.cancelBubble = true;
+                    select('node', f.id);
+                  }}
+                  onDragEnd={(e) => {
+                    e.cancelBubble = true;
+                    const plan = toPlan(e.target.x(), e.target.y());
+                    moveNode(f.id, { x: plan.x * scale, y: f.pos.y, z: plan.y * scale });
+                  }}
+                />
+              );
+            })}
+
+            {/* fitting glyph labels (non-interactive) */}
+            {fittings.map((f) => {
+              const s = toScreen({ x: f.pos.x / scale, y: f.pos.z / scale });
+              return (
+                <Text
+                  key={`g-${f.id}`}
+                  text={FITTING_GLYPH[f.type] ?? ''}
+                  x={s.sx + 6}
+                  y={s.sy - 12}
+                  fill={colors.textMuted}
+                  fontSize={9}
+                  listening={false}
+                  fontFamily="var(--hf-font-mono)"
+                />
+              );
+            })}
+          </Layer>
+
           {/* heads layer — INTERACTIVE: click to select, drag to move. Heads are in
               FEET; convert to plan units (feet / scale) then to screen. */}
           <Layer>
@@ -566,7 +724,35 @@ export function PlanCanvas(): ReactElement {
                 . Drag to move; Delete removes the selected head.
               </span>
             )}
+            {activeTool === 'route-pipe' && (
+              <span style={hudHintStyle}>
+                Generate a wet-pipe tree from the laid heads, then drag fittings or
+                edit a selected pipe in the inspector.
+              </span>
+            )}
           </div>
+
+          {/* W4: route the laid heads into a real pipe tree (branches -> cross-main
+              -> main -> riser). Available whenever heads exist. */}
+          {heads.length > 0 && (
+            <div style={headBarStyle}>
+              <button
+                type="button"
+                style={autoLayoutBtnStyle}
+                onClick={() => {
+                  routeSystem();
+                  setStatusMsg(`routed ${heads.length} head(s) into a pipe tree`);
+                }}
+              >
+                Route pipe
+              </button>
+              {segments.length > 0 && (
+                <span style={hudBadgeStyle}>
+                  {`${segments.length} pipe(s), ${fittings.length} fitting(s)`}
+                </span>
+              )}
+            </div>
+          )}
 
           {/* Per-room auto-layout (uses current SKU + the room's hazard) + a live
               cited coverage readout for the selected room. */}

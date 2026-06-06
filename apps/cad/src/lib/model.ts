@@ -131,13 +131,28 @@ export interface Node {
   sku?: string;
 }
 
-/** The hydraulic/plumbing role a pipe segment plays. */
-export type SegmentRole = 'MAIN' | 'CROSS_MAIN' | 'BRANCH' | 'RISER' | 'DROP';
+/**
+ * The hydraulic/plumbing role a pipe segment plays.
+ *   MAIN       — feed main from the riser/supply to the cross-main.
+ *   CROSS_MAIN — runs across the branch taps, feeding each branch line.
+ *   BRANCH     — the branch line along a row of heads.
+ *   ARM_OVER   — the short drop/arm-over from a branch line down to a head (W4).
+ *   RISER      — the vertical system riser run.
+ *   DROP       — a generic vertical drop (kept for back-compat / non-arm drops).
+ */
+export type SegmentRole =
+  | 'MAIN'
+  | 'CROSS_MAIN'
+  | 'BRANCH'
+  | 'ARM_OVER'
+  | 'RISER'
+  | 'DROP';
 
 export const SEGMENT_ROLES: readonly SegmentRole[] = [
   'MAIN',
   'CROSS_MAIN',
   'BRANCH',
+  'ARM_OVER',
   'RISER',
   'DROP',
 ] as const;

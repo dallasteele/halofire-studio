@@ -12,7 +12,8 @@ import {
   loadManufacturerCatalog,
   type CatalogPart,
 } from '../lib/head-catalog';
-import type { Point2, Point3, Room } from '../lib/model';
+import type { Node, Point2, Point3, Room, Segment } from '../lib/model';
+import { arePortsCompatible } from '../lib/connectivity';
 import { colors, radii, spacing, typeScale } from '../lib/tokens';
 
 interface Row {
@@ -48,6 +49,9 @@ export function RightInspector(): ReactElement {
       if (!node) note = 'Selected node id is not in the current (empty) network.';
       if (node?.type === 'HEAD') {
         headExtra = <HeadDetail pos={node.pos} sku={node.sku} project={project} />;
+      } else if (node) {
+        // A fitting (tee/elbow/reducer) or the riser — show its connectivity ports.
+        headExtra = <FittingDetail node={node} />;
       }
     } else if (kind === 'segment') {
       const seg = project.network.segments.find((s) => s.id === id);
@@ -62,6 +66,7 @@ export function RightInspector(): ReactElement {
           ]
         : [];
       if (!seg) note = 'Selected segment id is not in the current (empty) network.';
+      if (seg) headExtra = <SegmentEditor seg={seg} />;
     } else {
       const room = project.building.rooms.find((r) => r.id === id);
       title = room ? `Room · ${room.name ?? room.id}` : 'Room';
@@ -203,6 +208,116 @@ function HeadDetail({
           This head is not inside any classified room — coverage not evaluated.
         </p>
       )}
+    </div>
+  );
+}
+
+/**
+ * Segment editor (W4): override the schedule diameter and delete the pipe. The
+ * diameter override is an operator action; the schedule auto-sizes on a re-route.
+ */
+function SegmentEditor({ seg }: { seg: Segment }): ReactElement {
+  const setSegmentDiameter = useCadStore((s) => s.setSegmentDiameter);
+  const deleteSegment = useCadStore((s) => s.deleteSegment);
+  const [draft, setDraft] = useState<string>(String(seg.diameterIn));
+
+  useEffect(() => {
+    setDraft(String(seg.diameterIn));
+  }, [seg.id, seg.diameterIn]);
+
+  return (
+    <div style={headBlockStyle}>
+      <div style={headBlockTitleStyle}>Edit pipe</div>
+      <label style={{ display: 'flex', flexDirection: 'column', gap: spacing[1] }}>
+        <span style={dtStyle}>Diameter (in) — override schedule</span>
+        <div style={{ display: 'flex', gap: spacing[1] }}>
+          <input
+            type="number"
+            min={0.25}
+            step={0.25}
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            style={inputStyle}
+          />
+          <button
+            type="button"
+            style={smallBtnStyle}
+            onClick={() => {
+              const n = Number(draft);
+              if (Number.isFinite(n) && n > 0) setSegmentDiameter(seg.id, n);
+            }}
+          >
+            Set
+          </button>
+        </div>
+      </label>
+      <button
+        type="button"
+        style={{ ...smallBtnStyle, borderColor: colors.danger, color: colors.danger }}
+        onClick={() => deleteSegment(seg.id)}
+      >
+        Delete segment
+      </button>
+    </div>
+  );
+}
+
+/**
+ * Fitting detail (W4): show a selected fitting/riser's connectivity Ports, derived
+ * from its ADJACENT pipe segments (the larger adjacent run is the inlet; the rest are
+ * outlets). Reports whether each outlet mates the inlet via the SAME arePortsCompatible
+ * the routing used — honest, no invented connections. Threaded NPT is the modeled
+ * method for the schedule sizes.
+ */
+function FittingDetail({ node }: { node: Node }): ReactElement {
+  const segments = useCadStore((s) => s.project.network.segments);
+  const moveLabel = node.type === 'SOURCE' ? 'Riser / supply' : `Fitting · ${node.type}`;
+
+  // Adjacent segment diameters (this node is an endpoint).
+  const adjacent = segments.filter((s) => s.from === node.id || s.to === node.id);
+  const sizes = adjacent.map((s) => s.diameterIn);
+  const inletSize = sizes.length > 0 ? Math.max(...sizes) : null;
+  const outletSizes = sizes.filter((d) => d !== inletSize);
+  // If all adjacent are the same size, outlets mirror the inlet size.
+  const outs = outletSizes.length > 0 ? outletSizes : inletSize != null ? [inletSize] : [];
+
+  const mateOk = (() => {
+    if (inletSize == null) return null;
+    return outs.every((o) =>
+      arePortsCompatible(
+        { method: 'THREADED_NPT', nominalSizeIn: inletSize, role: 'OUTLET' },
+        { method: 'THREADED_NPT', nominalSizeIn: o, role: 'INLET' },
+      ),
+    );
+  })();
+
+  return (
+    <div style={headBlockStyle}>
+      <div style={headBlockTitleStyle}>{moveLabel} — ports</div>
+      {inletSize == null ? (
+        <p style={emptyBodyStyle}>No pipe is connected to this fitting yet.</p>
+      ) : (
+        <dl style={{ display: 'flex', flexDirection: 'column', gap: spacing[1] }}>
+          <div style={rowStyle}>
+            <dt style={dtStyle}>Inlet</dt>
+            <dd style={ddStyle}>{`NPT ${inletSize}"`}</dd>
+          </div>
+          <div style={rowStyle}>
+            <dt style={dtStyle}>Outlet(s)</dt>
+            <dd style={ddStyle}>{outs.map((o) => `NPT ${o}"`).join(', ')}</dd>
+          </div>
+          <div style={rowStyle}>
+            <dt style={dtStyle}>Ports mate</dt>
+            <dd style={{ ...ddStyle, color: mateOk ? colors.accentText : colors.danger }}>
+              {mateOk ? 'yes (real connection/adapter)' : 'NO — size step has no real reducer'}
+            </dd>
+          </div>
+        </dl>
+      )}
+      <div style={citationStyle}>
+        Mate-ability uses the connectivity Port model (real reducing fittings only).
+        Design aid — not a hydraulic calc or code certification.
+      </div>
     </div>
   );
 }
@@ -351,4 +466,26 @@ const citationStyle: CSSProperties = {
   color: colors.textMuted,
   fontSize: typeScale.xs.size,
   lineHeight: 1.4,
+};
+
+const inputStyle: CSSProperties = {
+  flex: 1,
+  background: colors.surfaceRaised,
+  color: colors.textPrimary,
+  border: `1px solid ${colors.border}`,
+  borderRadius: 6,
+  padding: '4px 6px',
+  fontSize: typeScale.xs.size,
+  fontFamily: 'var(--hf-font-mono)',
+};
+
+const smallBtnStyle: CSSProperties = {
+  background: colors.surfaceRaised,
+  color: colors.textPrimary,
+  border: `1px solid ${colors.border}`,
+  borderRadius: 6,
+  padding: '4px 10px',
+  fontSize: typeScale.xs.size,
+  fontWeight: 600,
+  cursor: 'pointer',
 };

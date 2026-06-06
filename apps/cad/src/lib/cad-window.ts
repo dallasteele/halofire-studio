@@ -9,6 +9,7 @@
 import { hasNetwork, type Project } from './model';
 import { polygonAreaSqFt } from './scale';
 import { coverageReport } from './head-layout';
+import { reachableFrom } from './pipe-routing';
 import { booleanPointInPolygon, point as turfPoint, polygon as turfPolygon } from '@turf/turf';
 import type { ViewMode } from '../store';
 
@@ -55,6 +56,38 @@ export interface CadWindowState {
   activeHeadSku: string | null;
   /** 3D head marker count (set by Viewer3D; mirrors headCount when 3D is live). */
   headCount3d?: number;
+
+  /* --- W4 pipe-routing handle --- */
+  /** Number of pipe segments in the network (1:1 with the store). */
+  segmentCount: number;
+  /** Number of fitting nodes (TEE + ELBOW + REDUCER) in the network. */
+  fittingCount: number;
+  /** Number of riser/source nodes in the network. */
+  riserCount: number;
+  /**
+   * True iff there is a routed system AND EVERY head is connected to a riser through
+   * the pipe tree (real graph connectivity over the segments). False when there are
+   * no heads, no riser, or any head is unreachable. Honest: this re-runs the BFS over
+   * the PERSISTED segments — it is not a stored flag that can drift from the geometry.
+   */
+  routedOk: boolean;
+}
+
+/**
+ * Real connectivity check over the PERSISTED network: every HEAD reachable from a
+ * SOURCE (riser) node through the segments. Returns false with no heads or no riser.
+ * Re-runs the BFS so the flag can never drift from the actual geometry.
+ */
+function computeRoutedOk(project: Project): boolean {
+  const heads = project.network.nodes.filter((n) => n.type === 'HEAD');
+  const risers = project.network.nodes.filter((n) => n.type === 'SOURCE');
+  if (heads.length === 0 || risers.length === 0) return false;
+  // Union of reachability from every riser (typically one).
+  const reached = new Set<string>();
+  for (const r of risers) {
+    for (const id of reachableFrom(r.id, project.network.segments)) reached.add(id);
+  }
+  return heads.every((h) => reached.has(h.id));
 }
 
 /** Sum of every room polygon's area, in square feet, at the building scale. */
@@ -115,7 +148,12 @@ export function cadWindowSnapshot(
   activeHeadSku: string | null = null,
 ): CadWindowState {
   const roomCount = project.building.rooms.length;
-  const headCount = project.network.nodes.filter((n) => n.type === 'HEAD').length;
+  const nodes = project.network.nodes;
+  const headCount = nodes.filter((n) => n.type === 'HEAD').length;
+  const fittingCount = nodes.filter(
+    (n) => n.type === 'TEE' || n.type === 'ELBOW' || n.type === 'REDUCER',
+  ).length;
+  const riserCount = nodes.filter((n) => n.type === 'SOURCE').length;
   return {
     ready: true,
     viewMode,
@@ -127,6 +165,10 @@ export function cadWindowSnapshot(
     headCount,
     coverageOk: aggregateCoverageOk(project),
     activeHeadSku,
+    segmentCount: project.network.segments.length,
+    fittingCount,
+    riserCount,
+    routedOk: computeRoutedOk(project),
   };
 }
 

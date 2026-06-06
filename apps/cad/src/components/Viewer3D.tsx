@@ -22,6 +22,7 @@ import {
   type CSSProperties,
   type ReactElement,
 } from 'react';
+import * as THREE from 'three';
 import { Canvas } from '@react-three/fiber';
 import { Grid, OrbitControls } from '@react-three/drei';
 import { useCadStore } from '../store';
@@ -125,6 +126,170 @@ function HeadMarker({
   );
 }
 
+/** Pipe role -> 3D color (visual legend only — not a code color requirement). */
+const PIPE_ROLE_COLOR: Record<string, string> = {
+  MAIN: '#e06c4f',
+  CROSS_MAIN: '#f0a868',
+  BRANCH: '#6fb3ff',
+  ARM_OVER: '#9fc7ff',
+  RISER: '#c062d0',
+  DROP: '#9fc7ff',
+};
+
+/** Nominal diameter (in) -> 3D cylinder radius (ft). 1" pipe ~1in = 1/12 ft radius-ish,
+ *  but exaggerated for visibility (a design-aid schematic, not manufacturer-exact). */
+function radiusForDiameter(diameterIn: number): number {
+  return Math.max(0.05, (diameterIn / 12) * 0.6);
+}
+
+/**
+ * A pipe run between two endpoints (feet, recentered) as a cylinder oriented along
+ * the segment. R3F cylinders default to the Y axis; we orient via quaternion. The
+ * radius scales with the nominal diameter. Selectable.
+ */
+function PipeRun({
+  a,
+  b,
+  diameterIn,
+  role,
+  selected,
+  onSelect,
+}: {
+  a: [number, number, number];
+  b: [number, number, number];
+  diameterIn: number;
+  role: string;
+  selected: boolean;
+  onSelect: () => void;
+}): ReactElement | null {
+  const dx = b[0] - a[0];
+  const dy = b[1] - a[1];
+  const dz = b[2] - a[2];
+  const len = Math.hypot(dx, dy, dz);
+  if (len < 1e-4) return null;
+  const mid: [number, number, number] = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2];
+  // Quaternion rotating the +Y axis onto the segment direction.
+  const dir = new THREE.Vector3(dx, dy, dz).normalize();
+  const up = new THREE.Vector3(0, 1, 0);
+  const quat = new THREE.Quaternion().setFromUnitVectors(up, dir);
+  const r = radiusForDiameter(diameterIn) * (selected ? 1.6 : 1);
+  const color = selected ? '#ffd27f' : PIPE_ROLE_COLOR[role] ?? '#8aa0b4';
+  return (
+    <mesh
+      position={mid}
+      quaternion={quat}
+      onClick={(e) => {
+        e.stopPropagation();
+        onSelect();
+      }}
+    >
+      <cylinderGeometry args={[r, r, len, 12]} />
+      <meshStandardMaterial color={color} roughness={0.5} metalness={0.25} emissive={selected ? '#7a5a1f' : '#000000'} emissiveIntensity={selected ? 0.4 : 0} />
+    </mesh>
+  );
+}
+
+/** A fitting marker (tee/elbow/reducer/riser) as a small box at the ceiling. */
+function FittingMarker({
+  x,
+  y,
+  z,
+  type,
+  selected,
+  onSelect,
+}: {
+  x: number;
+  y: number;
+  z: number;
+  type: string;
+  selected: boolean;
+  onSelect: () => void;
+}): ReactElement {
+  const isRiser = type === 'SOURCE';
+  const s = (selected ? 0.55 : 0.4) * (isRiser ? 1.4 : 1);
+  return (
+    <mesh
+      position={[x, y, z]}
+      onClick={(e) => {
+        e.stopPropagation();
+        onSelect();
+      }}
+    >
+      <boxGeometry args={[s, s, s]} />
+      <meshStandardMaterial
+        color={selected ? '#ffd27f' : isRiser ? '#c062d0' : '#cdd6e0'}
+        emissive={selected ? '#7a5a1f' : '#000000'}
+        emissiveIntensity={selected ? 0.4 : 0}
+        roughness={0.5}
+        metalness={0.3}
+      />
+    </mesh>
+  );
+}
+
+/**
+ * Render the pipe network (segments as cylinders + fittings as boxes), recentered
+ * onto the building origin. Endpoints resolve from the node map; an orphan segment
+ * (missing endpoint) is skipped — never drawn.
+ */
+function PipeNetwork({
+  nodes,
+  segments,
+  centerX,
+  centerZ,
+  selectedNodeId,
+  selectedSegmentId,
+  onSelectSegment,
+  onSelectNode,
+}: {
+  nodes: Node[];
+  segments: { id: string; from: string; to: string; diameterIn: number; role: string }[];
+  centerX: number;
+  centerZ: number;
+  selectedNodeId: string | null;
+  selectedSegmentId: string | null;
+  onSelectSegment: (id: string) => void;
+  onSelectNode: (id: string) => void;
+}): ReactElement {
+  const byId = useMemo(() => {
+    const m = new Map<string, Node>();
+    for (const n of nodes) m.set(n.id, n);
+    return m;
+  }, [nodes]);
+  const fittings = useMemo(() => nodes.filter((n) => n.type !== 'HEAD'), [nodes]);
+  return (
+    <>
+      {segments.map((seg) => {
+        const a = byId.get(seg.from);
+        const b = byId.get(seg.to);
+        if (!a || !b) return null;
+        return (
+          <PipeRun
+            key={seg.id}
+            a={[a.pos.x - centerX, a.pos.y, a.pos.z - centerZ]}
+            b={[b.pos.x - centerX, b.pos.y, b.pos.z - centerZ]}
+            diameterIn={seg.diameterIn}
+            role={seg.role}
+            selected={seg.id === selectedSegmentId}
+            onSelect={() => onSelectSegment(seg.id)}
+          />
+        );
+      })}
+      {fittings.map((f) => (
+        <FittingMarker
+          key={f.id}
+          x={f.pos.x - centerX}
+          y={f.pos.y}
+          z={f.pos.z - centerZ}
+          type={f.type}
+          selected={f.id === selectedNodeId}
+          onSelect={() => onSelectNode(f.id)}
+        />
+      ))}
+    </>
+  );
+}
+
 function BuildingScene({
   meshes,
   selectedRoomId,
@@ -133,6 +298,10 @@ function BuildingScene({
   centerZ,
   selectedNodeId,
   onSelectHead,
+  network,
+  selectedSegmentId,
+  onSelectSegment,
+  onSelectNode,
 }: {
   meshes: BuildingMeshes;
   selectedRoomId: string | null;
@@ -141,6 +310,10 @@ function BuildingScene({
   centerZ: number;
   selectedNodeId: string | null;
   onSelectHead: (id: string) => void;
+  network: Project['network'];
+  selectedSegmentId: string | null;
+  onSelectSegment: (id: string) => void;
+  onSelectNode: (id: string) => void;
 }): ReactElement {
   // Frame size from building bounds so the grid + camera target fit it.
   const span = useMemo(() => {
@@ -184,6 +357,18 @@ function BuildingScene({
         />
       ))}
 
+      {/* W4 pipe network — cylinders + fitting boxes, recentered like the heads. */}
+      <PipeNetwork
+        nodes={network.nodes}
+        segments={network.segments}
+        centerX={centerX}
+        centerZ={centerZ}
+        selectedNodeId={selectedNodeId}
+        selectedSegmentId={selectedSegmentId}
+        onSelectSegment={onSelectSegment}
+        onSelectNode={onSelectNode}
+      />
+
       <Grid
         args={[span * 2, span * 2]}
         cellSize={1}
@@ -205,10 +390,18 @@ function GroundScene({
   heads,
   selectedNodeId,
   onSelectHead,
+  network,
+  selectedSegmentId,
+  onSelectSegment,
+  onSelectNode,
 }: {
   heads: Node[];
   selectedNodeId: string | null;
   onSelectHead: (id: string) => void;
+  network: Project['network'];
+  selectedSegmentId: string | null;
+  onSelectSegment: (id: string) => void;
+  onSelectNode: (id: string) => void;
 }): ReactElement {
   return (
     <>
@@ -227,6 +420,17 @@ function GroundScene({
           onSelect={() => onSelectHead(h.id)}
         />
       ))}
+      {/* W4 pipe network at plan-feet (no building recenter). */}
+      <PipeNetwork
+        nodes={network.nodes}
+        segments={network.segments}
+        centerX={0}
+        centerZ={0}
+        selectedNodeId={selectedNodeId}
+        selectedSegmentId={selectedSegmentId}
+        onSelectSegment={onSelectSegment}
+        onSelectNode={onSelectNode}
+      />
       {/* Ground grid: honest empty floor, no building drawn. */}
       <Grid
         args={[40, 40]}
@@ -260,6 +464,7 @@ export function Viewer3D(): ReactElement {
   const project = useCadStore((s) => s.project);
   const selectedRoomId = useCadStore((s) => s.selection.selectedRoomId);
   const selectedNodeId = useCadStore((s) => s.selection.selectedNodeId);
+  const selectedSegmentId = useCadStore((s) => s.selection.selectedSegmentId);
   const select = useCadStore((s) => s.select);
   const loaded = hasBuilding(project);
   const gl = useMemo(webglAvailable, []);
@@ -322,9 +527,21 @@ export function Viewer3D(): ReactElement {
               centerZ={bounds.cy}
               selectedNodeId={selectedNodeId}
               onSelectHead={(id) => select('node', id)}
+              network={project.network}
+              selectedSegmentId={selectedSegmentId}
+              onSelectSegment={(id) => select('segment', id)}
+              onSelectNode={(id) => select('node', id)}
             />
           ) : (
-            <GroundScene heads={heads} selectedNodeId={selectedNodeId} onSelectHead={(id) => select('node', id)} />
+            <GroundScene
+              heads={heads}
+              selectedNodeId={selectedNodeId}
+              onSelectHead={(id) => select('node', id)}
+              network={project.network}
+              selectedSegmentId={selectedSegmentId}
+              onSelectSegment={(id) => select('segment', id)}
+              onSelectNode={(id) => select('node', id)}
+            />
           )}
         </Canvas>
       ) : (

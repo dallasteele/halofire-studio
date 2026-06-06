@@ -155,6 +155,85 @@ export const ADAPTERS: readonly Adapter[] = [
     toSizeIn: 1,
     note: 'BlazeMaster CPVC-to-metal brass transition adapter (solvent-weld socket on the CPVC side, NPT thread on the metal side); modeled CPVC socket as PLAIN_END. QRFS CPVC use & care.',
   },
+  // --- Concentric reducing fittings for the pipe-schedule step sizes (W4 routing).
+  // NFPA-13 pipe-schedule branch lines step up one nominal size at a time (1" ->
+  // 1-1/4" -> 1-1/2" -> 2" -> 2-1/2" -> 3" -> 3-1/2" -> 4"); a concentric reducing
+  // coupling / reducing tee / reducing bushing at EACH adjacent step is a standard,
+  // commercially-stocked Schedule-40 fitting. We enumerate ONLY the adjacent-step
+  // transitions the schedule actually produces (plus the 1" x 1/2" head bushing) —
+  // every one is a real, off-the-shelf fitting, not invented to force a connection.
+  {
+    id: 'npt-reducer-125-100',
+    label: 'NPT concentric reducer (1-1/4" x 1")',
+    fromMethod: 'THREADED_NPT',
+    fromSizeIn: 1.25,
+    toMethod: 'THREADED_NPT',
+    toSizeIn: 1,
+    note: 'Standard Schedule-40 concentric reducing coupling/bushing 1-1/4" x 1" — adjacent pipe-schedule branch step. Common malleable-iron / threaded fitting.',
+  },
+  {
+    id: 'npt-reducer-150-125',
+    label: 'NPT concentric reducer (1-1/2" x 1-1/4")',
+    fromMethod: 'THREADED_NPT',
+    fromSizeIn: 1.5,
+    toMethod: 'THREADED_NPT',
+    toSizeIn: 1.25,
+    note: 'Standard Schedule-40 concentric reducing coupling/bushing 1-1/2" x 1-1/4" — adjacent pipe-schedule branch step. Common threaded fitting.',
+  },
+  {
+    id: 'npt-reducer-200-150',
+    label: 'NPT concentric reducer (2" x 1-1/2")',
+    fromMethod: 'THREADED_NPT',
+    fromSizeIn: 2,
+    toMethod: 'THREADED_NPT',
+    toSizeIn: 1.5,
+    note: 'Standard Schedule-40 concentric reducing coupling/reducing tee 2" x 1-1/2" — adjacent pipe-schedule step. Common threaded/grooved fitting.',
+  },
+  {
+    id: 'npt-reducer-250-200',
+    label: 'NPT concentric reducer (2-1/2" x 2")',
+    fromMethod: 'THREADED_NPT',
+    fromSizeIn: 2.5,
+    toMethod: 'THREADED_NPT',
+    toSizeIn: 2,
+    note: 'Standard Schedule-40 concentric reducing coupling/reducing tee 2-1/2" x 2" — adjacent pipe-schedule step. Common threaded/grooved fitting.',
+  },
+  {
+    id: 'npt-reducer-300-250',
+    label: 'NPT concentric reducer (3" x 2-1/2")',
+    fromMethod: 'THREADED_NPT',
+    fromSizeIn: 3,
+    toMethod: 'THREADED_NPT',
+    toSizeIn: 2.5,
+    note: 'Standard Schedule-40 concentric reducing coupling/reducing tee 3" x 2-1/2" — adjacent pipe-schedule step. Common threaded/grooved fitting.',
+  },
+  {
+    id: 'npt-reducer-350-300',
+    label: 'NPT concentric reducer (3-1/2" x 3")',
+    fromMethod: 'THREADED_NPT',
+    fromSizeIn: 3.5,
+    toMethod: 'THREADED_NPT',
+    toSizeIn: 3,
+    note: 'Standard Schedule-40 concentric reducing coupling/reducing tee 3-1/2" x 3" — adjacent pipe-schedule step. Common threaded/grooved fitting.',
+  },
+  {
+    id: 'npt-reducer-400-350',
+    label: 'NPT concentric reducer (4" x 3-1/2")',
+    fromMethod: 'THREADED_NPT',
+    fromSizeIn: 4,
+    toMethod: 'THREADED_NPT',
+    toSizeIn: 3.5,
+    note: 'Standard Schedule-40 concentric reducing coupling/reducing tee 4" x 3-1/2" — adjacent pipe-schedule step. Common threaded/grooved fitting.',
+  },
+  {
+    id: 'npt-bushing-100-050',
+    label: 'NPT reducing bushing (1" x 1/2")',
+    fromMethod: 'THREADED_NPT',
+    fromSizeIn: 1,
+    toMethod: 'THREADED_NPT',
+    toSizeIn: 0.5,
+    note: 'Standard NPT hex reducing bushing 1" x 1/2" — feeds a 1/2" sprinkler head off a 1" branch (the smallest pipe-schedule branch size). Common malleable-iron fitting.',
+  },
 ] as const;
 
 /** True when two roles oppose: an OUTLET feeds an INLET (order-independent). */

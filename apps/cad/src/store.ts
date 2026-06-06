@@ -21,6 +21,11 @@ import {
   type Wall,
 } from './lib/model';
 import { autoLayoutHeads } from './lib/head-layout';
+import {
+  routeSystem,
+  type RouteOpts,
+  type SupplyPoint,
+} from './lib/pipe-routing';
 
 /* --------------------------------------------------------------- view mode */
 
@@ -189,6 +194,47 @@ export interface CadState {
    * room's ceiling height. Returns the ids of the heads placed.
    */
   autoLayoutRoom: (roomId: string, sku?: string) => string[];
+
+  /* ----------------------------------------------------------- W4 pipe routing */
+
+  /**
+   * The supply/riser entry point in plan FEET (x = plan-X, y = plan-Y/floor), or
+   * null to let routeSystem default it to an edge point. Editable via setSupplyPoint.
+   */
+  supplyPoint: SupplyPoint | null;
+
+  /**
+   * Generate a real wet-pipe TREE from the current heads (pipe-routing.routeSystem):
+   * branch lines, cross-main(s), a main, a riser, and the fittings (tees/elbows/
+   * reducers) with schedule-sized segments. REPLACES any prior auto-routed pipe
+   * (every non-HEAD node + every segment); HEADS are preserved. Uses supplyPoint
+   * (or opts.supplyPoint). Clears any selection that pointed at removed pipe. A no-op
+   * (clears pipe only) when there are no heads.
+   */
+  routeSystem: (opts?: RouteOpts) => void;
+
+  /** Set the supply/riser entry point (plan feet), or null to clear it. */
+  setSupplyPoint: (point: SupplyPoint | null) => void;
+
+  /**
+   * Move ANY non-head network node (fitting/riser) to a new building-space position
+   * (ft). Heads use moveHead. No-op for an unknown id or a HEAD node.
+   */
+  moveNode: (id: string, pos: Point3) => void;
+
+  /** Delete one pipe segment by id (clears selection if it was selected). No-op if absent. */
+  deleteSegment: (id: string) => void;
+
+  /**
+   * Set a pipe segment's nominal diameter (in). No-op for an unknown id or a
+   * non-positive diameter. This is an operator override of the schedule size.
+   */
+  setSegmentDiameter: (id: string, diameterIn: number) => void;
+}
+
+/** True when a node is part of the auto-routed pipe (not a head). */
+function isRoutedFitting(node: Node): boolean {
+  return node.type !== 'HEAD';
 }
 
 /** A head node carries a room-tag in its id prefix so room auto-layout can replace
@@ -216,6 +262,7 @@ export const useCadStore = create<CadState>((set) => ({
   activeTool: 'select',
   underlay: null,
   activeHeadSku: null,
+  supplyPoint: null,
 
   setProject: (project) =>
     set({ project, selection: { ...EMPTY_SELECTION } }),
@@ -355,4 +402,104 @@ export const useCadStore = create<CadState>((set) => ({
     });
     return placedIds;
   },
+
+  /* ----------------------------------------------------------- W4 pipe routing */
+
+  setSupplyPoint: (point) => set({ supplyPoint: point }),
+
+  routeSystem: (opts) =>
+    set((s) => {
+      const heads = s.project.network.nodes.filter((n) => n.type === 'HEAD');
+      // Strip any prior auto-routed pipe (every non-head node + ALL segments); keep heads.
+      if (heads.length === 0) {
+        const network = {
+          ...s.project.network,
+          nodes: s.project.network.nodes.filter((n) => !isRoutedFitting(n)),
+          segments: [],
+        };
+        // Clear any selection that pointed at removed pipe.
+        const selection =
+          s.selection.selectedSegmentId ||
+          (s.selection.selectedNodeId &&
+            s.project.network.nodes.find((n) => n.id === s.selection.selectedNodeId)?.type !== 'HEAD')
+            ? { ...EMPTY_SELECTION }
+            : s.selection;
+        return { project: { ...s.project, network }, selection };
+      }
+
+      const ceilingHt = s.project.hazardDefaults.defaultCeilingHt;
+      const routeOpts: RouteOpts = {
+        ceilingHt: heads[0].pos.y || ceilingHt,
+        ...opts,
+        ...(opts?.supplyPoint
+          ? { supplyPoint: opts.supplyPoint }
+          : s.supplyPoint
+            ? { supplyPoint: s.supplyPoint }
+            : {}),
+      };
+      // routeSystem returns heads + new fittings + riser; we replace the network
+      // nodes/segments with that result wholesale (heads are inside it verbatim).
+      const headNetwork = {
+        nodes: heads,
+        segments: [],
+        remoteAreas: s.project.network.remoteAreas,
+      };
+      const routed = routeSystem(headNetwork, routeOpts);
+      const network = {
+        ...s.project.network,
+        nodes: routed.nodes,
+        segments: routed.segments,
+      };
+      // A re-route invalidates a selected segment/fitting id; clear it.
+      const selection = { ...EMPTY_SELECTION };
+      return { project: { ...s.project, network }, selection };
+    }),
+
+  moveNode: (id, pos) =>
+    set((s) => {
+      const nodes = s.project.network.nodes;
+      let changed = false;
+      const next = nodes.map((n) => {
+        if (n.id === id && n.type !== 'HEAD') {
+          changed = true;
+          return { ...n, pos };
+        }
+        return n;
+      });
+      if (!changed) return s;
+      return {
+        project: { ...s.project, network: { ...s.project.network, nodes: next } },
+      };
+    }),
+
+  deleteSegment: (id) =>
+    set((s) => {
+      const segments = s.project.network.segments;
+      const next = segments.filter((seg) => seg.id !== id);
+      if (next.length === segments.length) return s;
+      const selection =
+        s.selection.selectedSegmentId === id ? { ...EMPTY_SELECTION } : s.selection;
+      return {
+        project: { ...s.project, network: { ...s.project.network, segments: next } },
+        selection,
+      };
+    }),
+
+  setSegmentDiameter: (id, diameterIn) =>
+    set((s) => {
+      if (!Number.isFinite(diameterIn) || diameterIn <= 0) return s;
+      const segments = s.project.network.segments;
+      let changed = false;
+      const next = segments.map((seg) => {
+        if (seg.id === id) {
+          changed = true;
+          return { ...seg, diameterIn };
+        }
+        return seg;
+      });
+      if (!changed) return s;
+      return {
+        project: { ...s.project, network: { ...s.project.network, segments: next } },
+      };
+    }),
 }));
