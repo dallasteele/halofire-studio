@@ -10,6 +10,10 @@ import {
   applyManufacturerStep,
   type ManufacturerStepManifest,
 } from './manufacturer-step';
+import {
+  applyBuild123dParts,
+  type Build123dManifest,
+} from './build123d-parts';
 
 export interface RawComponent {
   key: string;
@@ -61,6 +65,18 @@ export interface PartRecord {
   productCode?: string;
   /** Manufacturer name. Set only with a verified upgrade. */
   manufacturer?: string;
+  /**
+   * Parametric dimension spec, set only when a build123d entry upgraded this
+   * record to "dimensioned_parametric". REAL CAD dimensions, NOT
+   * manufacturer-exact / AHJ / PE / permit.
+   */
+  dimensions?: {
+    nptSize?: string;
+    bodyLengthMm?: number;
+    deflectorDiaMm?: number;
+    kFactorLabel?: string;
+    units?: string;
+  };
 }
 
 /**
@@ -86,10 +102,17 @@ export function deriveStlUrl(file: string | null | undefined): string | null {
  * normalization to upgrade records whose key matches an operator-verified entry.
  * Records without a verified entry are returned UNCHANGED. The default-arg path
  * (no `manufacturerStep`) preserves legacy behavior byte-for-byte.
+ *
+ * When `build123d` is provided, applyBuild123dParts upgrades matched records to
+ * source="build123d" -> "dimensioned_parametric". It is applied BEFORE
+ * manufacturer-step so that manufacturer_verified ALWAYS WINS over build123d on
+ * a key collision (applyBuild123dParts also guards against downgrading a
+ * higher tier, so the ordering is belt-and-suspenders).
  */
 export function normalizeManifest(
   raw: RawManifest | null | undefined,
   manufacturerStep?: ManufacturerStepManifest | null,
+  build123d?: Build123dManifest | null,
 ): PartRecord[] {
   const components = raw?.components ?? [];
   const base = components.map((c) => {
@@ -111,10 +134,16 @@ export function normalizeManifest(
       }),
     } satisfies PartRecord;
   });
-  if (manufacturerStep == null) {
+  if (manufacturerStep == null && build123d == null) {
     return base;
   }
-  return applyManufacturerStep(base, manufacturerStep);
+  // build123d FIRST (dimensioned_parametric), then manufacturer-step so a
+  // manufacturer_verified upgrade always wins on a key collision.
+  const withBuild123d = build123d == null ? base : applyBuild123dParts(base, build123d);
+  if (manufacturerStep == null) {
+    return withBuild123d;
+  }
+  return applyManufacturerStep(withBuild123d, manufacturerStep);
 }
 
 /** Only the parts that actually have a present mesh. */

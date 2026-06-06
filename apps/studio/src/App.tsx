@@ -32,6 +32,10 @@ import {
   loadManufacturerStepManifest,
   type ManufacturerStepManifest,
 } from './lib/manufacturer-step';
+import {
+  loadBuild123dManifest,
+  type Build123dManifest,
+} from './lib/build123d-parts';
 import { cameraConfigFor, type ViewMode } from './lib/view-mode';
 import { catalogCounts } from './lib/catalog';
 import { colors, radii, spacing, typeScale } from './lib/tokens';
@@ -64,6 +68,13 @@ declare global {
        * operator entries (the shipped default) this is 0. Honest by construction.
        */
       manufacturerVerifiedCount: number;
+      /**
+       * Number of records whose modelStatus === "dimensioned_parametric" — i.e.
+       * the count of build123d-generated Tier-2 parts. Zero when build123d was
+       * unavailable at generation time (shipped manifest is {entries:[]}).
+       * Honest by construction.
+       */
+      dimensionedParametricCount: number;
     };
   }
 }
@@ -94,11 +105,14 @@ export function App(): ReactElement {
     const mfgP: Promise<ManufacturerStepManifest> = loadManufacturerStepManifest(
       typeof fetch === 'function' ? fetch.bind(globalThis) : undefined,
     );
+    const b123P: Promise<Build123dManifest> = loadBuild123dManifest(
+      typeof fetch === 'function' ? fetch.bind(globalThis) : undefined,
+    );
 
-    Promise.all([partsP, mfgP])
-      .then(([raw, mfg]) => {
+    Promise.all([partsP, mfgP, b123P])
+      .then(([raw, mfg, b123]) => {
         if (cancelled) return;
-        setRecords(normalizeManifest(raw, mfg));
+        setRecords(normalizeManifest(raw, mfg, b123));
       })
       .catch((e: unknown) => {
         if (cancelled) return;
@@ -135,6 +149,16 @@ export function App(): ReactElement {
     [records],
   );
 
+  // D (dimensioned-parametric) = count of build123d Tier-2 records. Zero when
+  // build123d was unavailable at generation time. Honest by construction.
+  const dimensionedParametricCount = useMemo(
+    () =>
+      records
+        ? records.filter((r) => r.modelStatus === 'dimensioned_parametric').length
+        : 0,
+    [records],
+  );
+
   // Head count of the current layout, for verification + the header readout.
   const headCount = useMemo(
     () => layoutHeads({ widthFt, lengthFt, hazard }).count,
@@ -153,6 +177,7 @@ export function App(): ReactElement {
       appMode,
       headCount,
       manufacturerVerifiedCount,
+      dimensionedParametricCount,
     };
   }, [
     records,
@@ -162,6 +187,7 @@ export function App(): ReactElement {
     appMode,
     headCount,
     manufacturerVerifiedCount,
+    dimensionedParametricCount,
   ]);
 
   // R3F sizes its canvas via ResizeObserver, which can miss the first measure in
@@ -224,6 +250,9 @@ export function App(): ReactElement {
               <strong style={statusNumStyle}>{counts.present}</strong> present{' '}
               <span style={statusSepStyle}>/</span>{' '}
               <strong style={statusNumStyle}>{counts.total}</strong> catalogued{' '}
+              <span style={statusSepStyle}>/</span>{' '}
+              <strong style={statusNumStyle}>{dimensionedParametricCount}</strong>{' '}
+              dimensioned{' '}
               <span style={statusSepStyle}>/</span>{' '}
               <strong style={statusNumStyle}>{manufacturerVerifiedCount}</strong>{' '}
               manufacturer-verified

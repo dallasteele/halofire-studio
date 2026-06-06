@@ -1,0 +1,49 @@
+{
+  "entries": [
+    {
+      "key": "head_pendent",
+      "source": "build123d",
+      "productCode": "B123D-HEAD-PEND-050",
+      "name": "Pendent Head (parametric)",
+      "stepUrl": "/parts/build123d/head_pendent.step",
+      "sha256": "52d1daa2282dc35100b7e640479d7d90fc72cfd3527303b38af9803df9561e0a",
+      "dimensions": {
+        "nptSize": "1/2\"",
+        "bodyLengthMm": 18.0,
+        "deflectorDiaMm": 28.0,
+        "kFactorLabel": "K5.6",
+        "units": "mm"
+      }
+    },
+    {
+      "key": "fitting_elbow_90",
+      "source": "build123d",
+      "productCode": "B123D-ELL90-075",
+      "name": "90 Elbow (parametric)",
+      "stepUrl": "/parts/build123d/fitting_elbow_90.step",
+      "sha256": "31f295ab6981e7083282b8a19ac593580eba1b8abec1f808be1ac9bd35cead15",
+      "dimensions": {
+        "nptSize": "3/4\"",
+        "bodyLengthMm": 30.0,
+        "deflectorDiaMm": 0.0,
+        "kFactorLabel": "n/a",
+        "units": "mm"
+      }
+    },
+    {
+      "key": "fitting_tee",
+      "source": "build123d",
+      "productCode": "B123D-TEE-100",
+      "name": "Tee (parametric)",
+      "stepUrl": "/parts/build123d/fitting_tee.step",
+      "sha256": "7051710faf217d575c0e5b22238a5314290a23109ac33471374f967977f23ec0",
+      "dimensions": {
+        "nptSize": "1\"",
+        "bodyLengthMm": 32.0,
+        "deflectorDiaMm": 0.0,
+        "kFactorLabel": "n/a",
+        "units": "mm"
+      }
+    }
+  ]
+}

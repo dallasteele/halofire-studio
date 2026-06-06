@@ -812,10 +812,24 @@ so AI placeholders are never mistaken for engineering-accurate CAD.
       unmatched keys no-op; visual_reference parts stay visual_reference. vitest 154/154,
       tsc 0, vite build 0 (occt code-split 59kB). Operator supplies real Viking/Tyco/
       Victaulic/BIMobject STEP files into manufacturer-step.json to populate Tier-1.
-- [ ] **T45 — build123d parametric-STEP service / Tier-2 parts (GX10-independent, local
-      Python).** Port the `earthtojake/text-to-cad` `cad` skill locally; author parametric
-      head/fitting/hanger/riser generators that output STEP (primary) + GLB preview, fully
-      local, no GX10; golden test re-parameterizes one part per spec.
+- [x] **T45 — build123d parametric-STEP service / Tier-2 parts (GX10-independent, local
+      Python).** DONE 2026-06-05 (ultra workflow w1hdfansz, both verifiers PASS) — REAL
+      dimensioned parts generated. Install gate: build123d was absent; one bounded
+      `pip install build123d` succeeded (v0.10.0 + OCP/OCCT). scripts/build123d/generate_parts.py
+      authors 3 deterministic parametric solids (pendent head, 90 elbow, tee) from explicit
+      dimension specs and exports REAL ISO-10303-21 STEP (+ STL preview) to
+      public/parts/build123d/<key>.step (timestamp-pinned → byte-deterministic sha256);
+      prints {generated,skipped,build123d_available}; on ImportError generates NOTHING +
+      exits 0 (honest fail-soft). public/parts/build123d-parts.json populated ONLY from
+      actually-generated files with real on-disk sha256 (3 entries). src/lib/build123d-parts.ts
+      (isParametricVerified requires stepUrl+sha256; applyBuild123dParts → source "build123d"
+      → dimensioned_parametric, GUARDS against downgrading manufacturer_verified; fail-soft
+      loader). normalizeManifest applies build123d THEN manufacturer-step (manufacturer wins).
+      App window.__studio.dimensionedParametricCount + status chip; PartViewer loads these via
+      occt step-loader; Inspector blue "Dimensioned parametric" badge + dimensions table +
+      "Real CAD dimensions, NOT manufacturer-exact / AHJ / PE / permit". HONESTY: dimensioned_parametric
+      engineeringAccurate=false; no fake entries (tests re-hash on-disk STEP vs manifest).
+      vitest 179/179, tsc 0, vite build 0.
 - [ ] **T46 — AI image→3D fallback adapter / Tier-3, last resort (external API/GPU, NOT
       GX10).** One pluggable interface in `packages/halofire-ai-bridge` with a fal.ai
       TRELLIS.2 backend (HTTP, GLB out) + optional local Hunyuan3D 2.1; every output

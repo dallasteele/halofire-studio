@@ -50,10 +50,13 @@ function Part({ part, url, position, selected, onSelect }: PartProps): ReactElem
       return g;
     };
 
-    // Manufacturer-verified path: decode the operator-supplied STEP file in
-    // the browser via occt-import-js. visual_reference parts keep the STL path
-    // unchanged.
-    if (part.source === 'manufacturer-step' && part.stepUrl) {
+    // STEP path: decode an operator-supplied (manufacturer-step) OR a
+    // build123d-generated (dimensioned_parametric) STEP file in the browser via
+    // occt-import-js. visual_reference parts keep the STL path unchanged.
+    if (
+      (part.source === 'manufacturer-step' || part.source === 'build123d') &&
+      part.stepUrl
+    ) {
       loadStepGeometry(part.stepUrl)
         .then((step) => {
           if (!alive) return;

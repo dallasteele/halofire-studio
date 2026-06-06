@@ -53,6 +53,48 @@ export function Inspector({ part }: InspectorProps): ReactElement {
         <Verdict label="dimension-verified" yes={badge.dimensionVerified} />
       </dl>
 
+      {part.modelStatus === 'dimensioned_parametric' && part.stepUrl ? (
+        <div style={dimWrapStyle} data-testid="dimensioned-parametric">
+          <a
+            href={part.stepUrl}
+            download
+            style={dimLinkStyle}
+            data-testid="step-download-link"
+          >
+            Download STEP
+          </a>
+          <p style={stepCaptionStyle}>build123d-generated parametric file</p>
+          {part.dimensions ? (
+            <dl style={dimListStyle} data-testid="dimensions">
+              {part.dimensions.nptSize ? (
+                <DimRow label="NPT size" value={part.dimensions.nptSize} />
+              ) : null}
+              {typeof part.dimensions.bodyLengthMm === 'number' ? (
+                <DimRow
+                  label="Body length"
+                  value={`${part.dimensions.bodyLengthMm} mm`}
+                />
+              ) : null}
+              {typeof part.dimensions.deflectorDiaMm === 'number' &&
+              part.dimensions.deflectorDiaMm > 0 ? (
+                <DimRow
+                  label="Deflector dia"
+                  value={`${part.dimensions.deflectorDiaMm} mm`}
+                />
+              ) : null}
+              {part.dimensions.kFactorLabel ? (
+                <DimRow label="K-factor" value={part.dimensions.kFactorLabel} />
+              ) : null}
+            </dl>
+          ) : null}
+          <p style={dimCaveatStyle}>
+            Real CAD dimensions, NOT manufacturer-exact, NOT AHJ / PE / permit.
+            Parametric design intent only — do not use for shop drawings or
+            submittals.
+          </p>
+        </div>
+      ) : null}
+
       {part.modelStatus === 'manufacturer_verified' && part.stepUrl ? (
         <div style={stepLinkWrapStyle}>
           <a
@@ -100,6 +142,15 @@ function Field({
       >
         {value}
       </span>
+    </div>
+  );
+}
+
+function DimRow({ label, value }: { label: string; value: string }): ReactElement {
+  return (
+    <div style={dimRowStyle}>
+      <dt style={fieldLabelStyle}>{label}</dt>
+      <dd style={dimValueStyle}>{value}</dd>
     </div>
   );
 }
@@ -233,6 +284,53 @@ const stepCaptionStyle: CSSProperties = {
 };
 
 const mfgVerifiedCaveatStyle: CSSProperties = {
+  margin: `${spacing[1]} 0 0`,
+  color: colors.accentText,
+  fontSize: typeScale.xs.size,
+  lineHeight: 1.45,
+};
+
+const dimWrapStyle: CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: spacing[1],
+  marginBottom: spacing[3],
+  padding: `${spacing[3]} ${spacing[3]}`,
+  background: '#0e1d33',
+  border: `1px solid #1e3a5f`,
+  borderRadius: radii.md,
+};
+
+const dimLinkStyle: CSSProperties = {
+  color: '#93c5fd',
+  fontWeight: 600,
+  textDecoration: 'underline',
+  fontSize: typeScale.sm.size,
+};
+
+const dimListStyle: CSSProperties = {
+  margin: `${spacing[1]} 0 0`,
+  display: 'flex',
+  flexDirection: 'column',
+  gap: spacing[1],
+};
+
+const dimRowStyle: CSSProperties = {
+  display: 'flex',
+  justifyContent: 'space-between',
+  gap: spacing[3],
+  margin: 0,
+};
+
+const dimValueStyle: CSSProperties = {
+  margin: 0,
+  textAlign: 'right',
+  color: colors.textPrimary,
+  fontFamily: 'var(--hf-font-mono)',
+  fontSize: typeScale.xs.size,
+};
+
+const dimCaveatStyle: CSSProperties = {
   margin: `${spacing[1]} 0 0`,
   color: colors.accentText,
   fontSize: typeScale.xs.size,
