@@ -47,6 +47,8 @@ import { LayoutScene } from './LayoutScene';
 import { BuildingControls } from './BuildingControls';
 import { BuildingScene } from './BuildingScene';
 import { layoutHeads, type HazardClass } from './lib/layout';
+import { estimateFromLayout } from './lib/bid';
+import { BidPanel } from './BidPanel';
 import type { FootprintResult } from './lib/pdf-building';
 import { buildSamInvoker } from './lib/sam-invoker';
 
@@ -69,6 +71,13 @@ declare global {
       appMode: AppMode;
       /** Head count of the current layout (only meaningful in layout mode). */
       headCount: number;
+      /**
+       * Bottom-line auto-bid ESTIMATE total (USD) for the current layout. Only
+       * meaningful in layout mode. This is a BEST-EFFORT estimate from
+       * representative prices + standard labor assumptions — NOT a quote, NOT a
+       * committed bid, NOT AHJ / PE / permit. Honest by construction.
+       */
+      bidTotal: number;
       /**
        * Enclosed footprint area (sqft) of the currently loaded building, or null
        * when no building is loaded (or extraction found no usable wall geometry).
@@ -199,6 +208,12 @@ export function App(): ReactElement {
     [widthFt, lengthFt, hazard],
   );
 
+  // Best-effort priced bid ESTIMATE for the current layout (deterministic).
+  const bid = useMemo(
+    () => estimateFromLayout({ widthFt, lengthFt, hazard }),
+    [widthFt, lengthFt, hazard],
+  );
+
   // Expose state for screenshot / E2E verification once parts are loaded.
   useEffect(() => {
     if (!records) return;
@@ -210,6 +225,7 @@ export function App(): ReactElement {
       selectedKey,
       appMode,
       headCount,
+      bidTotal: bid.total,
       manufacturerVerifiedCount,
       dimensionedParametricCount,
       footprintAreaSqft:
@@ -223,6 +239,7 @@ export function App(): ReactElement {
     selectedKey,
     appMode,
     headCount,
+    bid.total,
     manufacturerVerifiedCount,
     dimensionedParametricCount,
     footprint,
@@ -414,6 +431,8 @@ export function App(): ReactElement {
                 </Suspense>
               </Canvas>
             </main>
+
+            <BidPanel bid={bid} />
           </>
         ) : (
           <>
