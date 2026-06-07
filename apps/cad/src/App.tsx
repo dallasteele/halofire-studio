@@ -28,11 +28,35 @@ export function App(): ReactElement {
   const designAreaSqFt = useCadStore((s) => s.designAreaSqFt);
   const priceTable = useCadStore((s) => s.priceTable);
   const ensurePricebookLoaded = useCadStore((s) => s.ensurePricebookLoaded);
+  const undo = useCadStore((s) => s.undo);
+  const redo = useCadStore((s) => s.redo);
 
   // W6: load the REAL pricebook medians once on mount (fail-soft to representative).
   useEffect(() => {
     void ensurePricebookLoaded();
   }, [ensurePricebookLoaded]);
+
+  // E0: global undo/redo keyboard shortcuts. Ctrl/Cmd+Z = undo, Ctrl/Cmd+Y or
+  // Ctrl/Cmd+Shift+Z = redo. Ignored while typing in an input/textarea so the
+  // shortcut never eats a field's own edit history.
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent): void {
+      if (!(e.ctrlKey || e.metaKey)) return;
+      const target = e.target as HTMLElement | null;
+      const tag = target?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || target?.isContentEditable) return;
+      const key = e.key.toLowerCase();
+      if (key === 'z' && !e.shiftKey) {
+        e.preventDefault();
+        undo();
+      } else if (key === 'y' || (key === 'z' && e.shiftKey)) {
+        e.preventDefault();
+        redo();
+      }
+    }
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [undo, redo]);
 
   // Publish the preview-verification handle whenever the relevant state changes.
   // Includes the W5 live hydraulics (demand/riser psi/adequacy) and the W6 live

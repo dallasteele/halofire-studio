@@ -83,6 +83,7 @@ export function TopRibbon(): ReactElement {
           })}
         </nav>
 
+        <UndoRedoControl />
         <ViewSegmentedControl viewMode={viewMode} onChange={setViewMode} />
       </div>
 
@@ -168,6 +169,45 @@ function ToolButton({
     >
       {tool.label}
     </button>
+  );
+}
+
+/**
+ * E0 Undo/Redo control. Reactive: subscribes to the history stacks so the buttons
+ * enable/disable as edits are made/undone. Buttons mirror the Ctrl+Z / Ctrl+Y
+ * keyboard shortcuts wired in App.
+ */
+function UndoRedoControl(): ReactElement {
+  const history = useCadStore((s) => s.history);
+  const undo = useCadStore((s) => s.undo);
+  const redo = useCadStore((s) => s.redo);
+  const canUndo = history.past.length > 0;
+  const canRedo = history.future.length > 0;
+  return (
+    <div style={undoWrapStyle} role="group" aria-label="Undo and redo">
+      <button
+        type="button"
+        onClick={() => undo()}
+        disabled={!canUndo}
+        aria-label="Undo"
+        title="Undo (Ctrl+Z)"
+        style={undoBtnStyle(canUndo)}
+        data-cad-undo
+      >
+        ↶ Undo
+      </button>
+      <button
+        type="button"
+        onClick={() => redo()}
+        disabled={!canRedo}
+        aria-label="Redo"
+        title="Redo (Ctrl+Y)"
+        style={undoBtnStyle(canRedo)}
+        data-cad-redo
+      >
+        ↷ Redo
+      </button>
+    </div>
   );
 }
 
@@ -325,6 +365,26 @@ function toolButtonStyle(active: boolean, hover: boolean): CSSProperties {
     fontSize: typeScale.sm.size,
     fontWeight: 500,
     transition: 'background 140ms, border-color 140ms',
+  };
+}
+
+const undoWrapStyle: CSSProperties = {
+  display: 'inline-flex',
+  gap: spacing[1],
+  flex: '0 0 auto',
+};
+
+function undoBtnStyle(enabled: boolean): CSSProperties {
+  return {
+    background: enabled ? colors.surfaceRaised : colors.bgInset,
+    color: enabled ? colors.textPrimary : colors.textMuted,
+    border: `1px solid ${colors.border}`,
+    borderRadius: radii.md,
+    padding: `${spacing[1]} ${spacing[2]}`,
+    fontSize: typeScale.sm.size,
+    fontWeight: 500,
+    cursor: enabled ? 'pointer' : 'default',
+    transition: 'background 140ms, color 140ms',
   };
 }
 

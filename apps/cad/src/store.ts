@@ -40,6 +40,15 @@ import {
 } from './lib/bid';
 import { buildSampleProject } from './lib/sample-project';
 import type { WaterSupply as Supply } from './lib/hydraulics';
+import {
+  emptyHistory,
+  record as recordHistory,
+  undo as historyUndo,
+  redo as historyRedo,
+  canUndo as historyCanUndo,
+  canRedo as historyCanRedo,
+  type History,
+} from './lib/history';
 
 /**
  * The real catalog head SKU id the sample project lays out with. This is the only
@@ -160,6 +169,21 @@ export type Underlay =
       label: string;
     };
 
+/* --------------------------------------------------------------- history */
+
+/**
+ * The undoable DOCUMENT slice of the store. Undo/redo restores the drawing — the
+ * project (building + sprinkler network) and the supply/riser entry point that
+ * shapes routing. UI state (selection, active tool, view mode, underlay, heatmap,
+ * price table) and pure analysis knobs (supply flow test, design area) are NOT
+ * undoable: they recompute live and are cheap to re-set, matching how a CAD undo
+ * affects the drawing, not the view.
+ */
+export interface DocSnapshot {
+  project: Project;
+  supplyPoint: SupplyPoint | null;
+}
+
 /* --------------------------------------------------------------- store */
 
 export interface CadState {
@@ -178,6 +202,22 @@ export interface CadState {
    * for newly-placed and auto-laid-out heads. null until the operator picks one.
    */
   activeHeadSku: string | null;
+
+  /**
+   * The undo/redo history of document snapshots (E0). Every model-mutating action
+   * records the PRE-mutation document before applying its change, so the edit is
+   * reversible. UI-only actions do not touch this.
+   */
+  history: History<DocSnapshot>;
+
+  /** Undo the last document edit (no-op when there is nothing to undo). Clears selection. */
+  undo: () => void;
+  /** Redo the last undone document edit (no-op when there is nothing to redo). Clears selection. */
+  redo: () => void;
+  /** True when there is a document edit to undo. */
+  canUndo: () => boolean;
+  /** True when there is an undone edit to redo. */
+  canRedo: () => boolean;
 
   /** Replace the entire project (e.g. after an import or new-file). Clears selection. */
   setProject: (project: Project) => void;
@@ -373,6 +413,11 @@ function isHeadOfRoom(node: Node, roomId: string): boolean {
   return node.type === 'HEAD' && node.id.startsWith(`head_${roomId}_`);
 }
 
+/** The undoable document slice of the current state. */
+function docOf(s: CadState): DocSnapshot {
+  return { project: s.project, supplyPoint: s.supplyPoint };
+}
+
 /** Build the selection object for a single-kind selection. */
 function selectionFor(kind: SelectionKind, id: string | null): Selection {
   if (id === null) return { ...EMPTY_SELECTION };
@@ -383,21 +428,60 @@ function selectionFor(kind: SelectionKind, id: string | null): Selection {
   };
 }
 
-export const useCadStore = create<CadState>((set, get) => ({
+export const useCadStore = create<CadState>((set, get) => {
+  /**
+   * Apply a model-mutating recipe while recording the PRE-mutation document for
+   * undo (E0). A recipe that returns the SAME state reference is treated as a
+   * no-op: no history entry is recorded. This is the single path every undoable
+   * action goes through, so history is consistent without per-action bookkeeping.
+   */
+  const mutate = (recipe: (s: CadState) => Partial<CadState> | CadState) =>
+    set((s) => {
+      const next = recipe(s);
+      if (next === s) return s; // no-op: leave history untouched
+      const history = recordHistory(s.history, docOf(s));
+      return { ...next, history };
+    });
+
+  return {
   project: emptyProject(),
   selection: { ...EMPTY_SELECTION },
   viewMode: 'split',
   activeTool: 'select',
   underlay: null,
   activeHeadSku: null,
+  history: emptyHistory<DocSnapshot>(),
   supplyPoint: null,
   supply: null,
   designAreaSqFt: null,
   pressureHeatmap: false,
   priceTable: null,
 
+  undo: () =>
+    set((s) => {
+      const move = historyUndo(s.history, docOf(s));
+      if (!move) return s;
+      return {
+        ...move.present,
+        history: move.history,
+        selection: { ...EMPTY_SELECTION },
+      };
+    }),
+  redo: () =>
+    set((s) => {
+      const move = historyRedo(s.history, docOf(s));
+      if (!move) return s;
+      return {
+        ...move.present,
+        history: move.history,
+        selection: { ...EMPTY_SELECTION },
+      };
+    }),
+  canUndo: () => historyCanUndo(get().history),
+  canRedo: () => historyCanRedo(get().history),
+
   setProject: (project) =>
-    set({ project, selection: { ...EMPTY_SELECTION } }),
+    mutate(() => ({ project, selection: { ...EMPTY_SELECTION } })),
   select: (kind, id) => set({ selection: selectionFor(kind, id) }),
   clearSelection: () => set({ selection: { ...EMPTY_SELECTION } }),
   setTool: (activeTool) => set({ activeTool }),
@@ -405,10 +489,10 @@ export const useCadStore = create<CadState>((set, get) => ({
   setUnderlay: (underlay) => set({ underlay }),
 
   setBuilding: (building) =>
-    set((s) => ({ project: { ...s.project, building } })),
+    mutate((s) => ({ project: { ...s.project, building } })),
 
   setScale: (ftPerUnit, source) =>
-    set((s) => {
+    mutate((s) => {
       if (!Number.isFinite(ftPerUnit) || ftPerUnit <= 0) return s;
       const building: Building = {
         ...s.project.building,
@@ -421,7 +505,7 @@ export const useCadStore = create<CadState>((set, get) => ({
     }),
 
   addWall: (wall) =>
-    set((s) => {
+    mutate((s) => {
       const b = s.project.building;
       const building: Building = {
         ...b,
@@ -433,7 +517,7 @@ export const useCadStore = create<CadState>((set, get) => ({
 
   addRoom: (polygon, hazard, extra) => {
     const id = makeId('room');
-    set((s) => {
+    mutate((s) => {
       const b = s.project.building;
       const room: Room = {
         id,
@@ -456,7 +540,7 @@ export const useCadStore = create<CadState>((set, get) => ({
 
   addHead: (pos, sku) => {
     const id = makeId('head');
-    set((s) => {
+    mutate((s) => {
       const resolvedSku = sku ?? s.activeHeadSku ?? undefined;
       const node: Node = {
         id,
@@ -474,7 +558,7 @@ export const useCadStore = create<CadState>((set, get) => ({
   },
 
   moveHead: (id, pos) =>
-    set((s) => {
+    mutate((s) => {
       const nodes = s.project.network.nodes;
       let changed = false;
       const next = nodes.map((n) => {
@@ -491,7 +575,7 @@ export const useCadStore = create<CadState>((set, get) => ({
     }),
 
   deleteHead: (id) =>
-    set((s) => {
+    mutate((s) => {
       const nodes = s.project.network.nodes;
       const next = nodes.filter((n) => !(n.id === id && n.type === 'HEAD'));
       if (next.length === nodes.length) return s;
@@ -505,7 +589,7 @@ export const useCadStore = create<CadState>((set, get) => ({
 
   autoLayoutRoom: (roomId, sku) => {
     const placedIds: string[] = [];
-    set((s) => {
+    mutate((s) => {
       const room = s.project.building.rooms.find((r) => r.id === roomId);
       if (!room) return s;
       const resolvedSku = sku ?? s.activeHeadSku ?? undefined;
@@ -537,10 +621,10 @@ export const useCadStore = create<CadState>((set, get) => ({
 
   /* ----------------------------------------------------------- W4 pipe routing */
 
-  setSupplyPoint: (point) => set({ supplyPoint: point }),
+  setSupplyPoint: (point) => mutate(() => ({ supplyPoint: point })),
 
   routeSystem: (opts) =>
-    set((s) => {
+    mutate((s) => {
       const heads = s.project.network.nodes.filter((n) => n.type === 'HEAD');
       // Strip any prior auto-routed pipe (every non-head node + ALL segments); keep heads.
       if (heads.length === 0) {
@@ -588,7 +672,7 @@ export const useCadStore = create<CadState>((set, get) => ({
     }),
 
   moveNode: (id, pos) =>
-    set((s) => {
+    mutate((s) => {
       const nodes = s.project.network.nodes;
       let changed = false;
       const next = nodes.map((n) => {
@@ -605,7 +689,7 @@ export const useCadStore = create<CadState>((set, get) => ({
     }),
 
   deleteSegment: (id) =>
-    set((s) => {
+    mutate((s) => {
       const segments = s.project.network.segments;
       const next = segments.filter((seg) => seg.id !== id);
       if (next.length === segments.length) return s;
@@ -618,7 +702,7 @@ export const useCadStore = create<CadState>((set, get) => ({
     }),
 
   setSegmentDiameter: (id, diameterIn) =>
-    set((s) => {
+    mutate((s) => {
       if (!Number.isFinite(diameterIn) || diameterIn <= 0) return s;
       const segments = s.project.network.segments;
       let changed = false;
@@ -671,4 +755,5 @@ export const useCadStore = create<CadState>((set, get) => ({
     // 6) Best-effort load the real pricebook so the bid prices off real medians.
     await get().ensurePricebookLoaded(fetchImpl);
   },
-}));
+  };
+});
