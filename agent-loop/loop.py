@@ -175,12 +175,20 @@ def process_task(task: dict, dry_run: bool) -> bool:
     for attempt in range(1, MAX_ATTEMPTS + 1):
         task["attempts"] = task.get("attempts", 0) + 1
         log(f"attempt {attempt}/{MAX_ATTEMPTS} (qwen call)...")
+        written: list[Path] = []
         try:
             out = call_qwen(build_prompt(task, error_tail))
             files = out.get("files", [])
             if not files:
                 raise ValueError("model returned no files")
-            written: list[Path] = []
+            for f in files:
+                if not isinstance(f, dict) or not isinstance(f.get("path"), str) \
+                        or not isinstance(f.get("content"), str) or not f["content"].strip():
+                    raise ValueError(
+                        'every files[] entry must be an OBJECT {"path": "<repo-relative path>", '
+                        '"content": "<full file text>"} — got a malformed entry: '
+                        f"{json.dumps(f)[:200]}"
+                    )
             for f in files:
                 p = safe_path(f["path"], task["write_roots"])
                 p.parent.mkdir(parents=True, exist_ok=True)
@@ -188,6 +196,7 @@ def process_task(task: dict, dry_run: bool) -> bool:
                 written.append(p)
                 log(f"  wrote {f['path']} ({len(f['content'])} chars)")
         except Exception as exc:  # noqa: BLE001 — feed the failure back to the model
+            revert(written)  # clean up any partial writes before retrying
             error_tail = f"{type(exc).__name__}: {exc}"
             log(f"  attempt error: {error_tail}")
             continue
