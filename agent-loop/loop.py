@@ -83,12 +83,30 @@ def brain_remember(content: str) -> None:
         log(f"brain_remember skipped: {exc}")
 
 
+def extract_json(text: str) -> dict:
+    """Parse model output to a dict — tolerate fences/preamble by slicing the
+    outermost {...} block. Raises ValueError with a clear message otherwise."""
+    text = text.strip()
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        start, end = text.find("{"), text.rfind("}")
+        if start >= 0 and end > start:
+            return json.loads(text[start : end + 1])
+        raise ValueError(
+            f"model output was not a JSON object (first 200 chars): {text[:200]!r}"
+        )
+
+
 def call_qwen(prompt: str) -> dict:
-    """One JSON-forced chat call to local Ollama. Raises on transport/parse error."""
+    """One JSON-forced chat call to local Ollama. Raises on transport/parse error.
+    think:false — qwen3 is a thinking model; with thinking on, the budget can be
+    consumed by the think block and the JSON content comes back empty/truncated."""
     body = json.dumps({
         "model": MODEL,
         "stream": False,
         "format": "json",
+        "think": False,
         "options": {"num_ctx": NUM_CTX, "num_predict": MAX_OUTPUT_TOKENS, "temperature": 0.2},
         "messages": [
             {"role": "system", "content": SYSTEM_PROMPT},
@@ -98,7 +116,7 @@ def call_qwen(prompt: str) -> dict:
     req = urllib.request.Request(OLLAMA_URL, data=body, headers={"Content-Type": "application/json"})
     raw = urllib.request.urlopen(req, timeout=1800).read()
     content = json.loads(raw)["message"]["content"]
-    return json.loads(content)
+    return extract_json(content)
 
 
 def safe_path(rel: str, write_roots: list[str]) -> Path:
@@ -245,6 +263,8 @@ def main() -> int:
     else:
         run(f"git checkout {AGENT_BRANCH}")
         run(f"git pull --rebase origin {AGENT_BRANCH}", timeout=300)
+    # Absorb upstream harness/spec fixes from main on every run.
+    run("git merge --no-edit origin/main", timeout=120)
 
     data = load_backlog()
     pending = [t for t in data["tasks"] if t["status"] == "pending"]
