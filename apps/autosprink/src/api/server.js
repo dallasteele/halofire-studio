@@ -24,6 +24,8 @@ import { floorPlanFromSvg, floorPlanFromDxf, normalizeFloorPlan, buildingFromSvg
 import { floorPlanFromPdf } from '../engine/pdf-floorplan.js';
 import { buildCadModel } from '../engine/cad-model.js';
 import { toDxf } from '../engine/dxf-export.js';
+import { invokeOpenClawCad, buildGenerate3dModelPayload, buildGenerateDxfPayload } from '../cad/openclaw-cad.js';
+import { buildBridgeInvoker } from '../cad/openclaw-invoker.js';
 import { requiredPressureAtRiser, flagSchedule, remoteAreaDemand } from '../engine/hydraulics.js';
 import { buildParityMatrix, parityAchieved } from '../engine/parity-matrix.js';
 import { AUTOSPRINK_PARITY_GATE, buildParityInventory, parityGateStatus, getComponent } from '../components/registry.js';
@@ -20728,6 +20730,39 @@ app.post('/api/projects/:name/cad.dxf', authMiddleware, (req, res) => {
     res.setHeader('Content-Type', 'application/dxf');
     res.setHeader('Content-Disposition', `attachment; filename="${projectName.replace(/[^a-z0-9]+/gi, '_')}.dxf"`);
     res.send(dxf);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// Drive OpenClaw's GX10 CAD tools (generate_3d_model | generate_dxf) from the
+// project's CAD model, via the env-configured codex bridge (OPENCLAW_CAD_BRIDGE_URL
+// or HAL_API_URL). HONEST fail-soft: when the bridge is not configured/reachable
+// the response is { ok:false, skipped:true, reason } — never a fabricated result.
+const OPENCLAW_CAD_TOOLS = {
+  '3d': { tool: 'generate_3d_model', build: buildGenerate3dModelPayload },
+  dxf: { tool: 'generate_dxf', build: buildGenerateDxfPayload },
+};
+app.post('/api/projects/:name/cad/openclaw/:tool', authMiddleware, async (req, res) => {
+  try {
+    const spec = OPENCLAW_CAD_TOOLS[req.params.tool];
+    if (!spec) {
+      return res.status(400).json({ error: `Unknown OpenClaw CAD tool '${req.params.tool}' (use 3d | dxf)` });
+    }
+    const projectName = req.params.name;
+    let floorPlan = null;
+    if (req.body && typeof req.body.svg === 'string' && req.body.svg.trim()) {
+      floorPlan = floorPlanFromSvg(req.body.svg, { name: projectName, unitsPerPx: Number(req.body.unitsPerPx) || 1 });
+    } else if (req.body && req.body.floorPlan) {
+      floorPlan = normalizeFloorPlan(req.body.floorPlan);
+    } else if (projectName === HOME_DEPOT_PROJECT_NAME) {
+      floorPlan = homeDepotRexburgFloorPlan();
+    }
+    if (!floorPlan) return res.status(400).json({ error: 'No floor plan for OpenClaw CAD invocation' });
+    const payload = spec.build(buildCadModel(floorPlan));
+    const invoker = buildBridgeInvoker();
+    const result = await invokeOpenClawCad(spec.tool, payload, invoker ? { invoker } : {});
+    res.json({ tool: spec.tool, bridgeConfigured: !!invoker, ...result });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
