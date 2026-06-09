@@ -17,6 +17,11 @@ cd "$REPO"
 git config user.name  >/dev/null 2>&1 || git config user.name  "HaloFire Agent Loop"
 git config user.email >/dev/null 2>&1 || git config user.email "agent-loop@halofire.local"
 
+# Brain auth — canonical single source of truth on GX10 (fail-soft when absent).
+if [ -f /opt/hal9000/config/hal-brain.env ]; then
+  set -a; . /opt/hal9000/config/hal-brain.env; set +a
+fi
+
 # qwen must be reachable or there is nothing to do (fail fast, no token waste).
 if ! curl -sf http://127.0.0.1:11434/api/tags >/dev/null; then
   echo "[run.sh] ollama not reachable on :11434; exiting"
