@@ -68,15 +68,23 @@ def save_backlog(data: dict) -> None:
 
 
 def brain_remember(content: str) -> None:
-    """Best-effort write to the canonical hal-brain (fail-soft, never blocks the loop)."""
+    """Best-effort write to the canonical hal-brain (fail-soft, never blocks the loop).
+    Auth: bearer from HAL_BRAIN_TOKEN env (the canonical :8790 endpoint requires it)."""
     try:
+        import os
+        token = os.environ.get("HAL_BRAIN_TOKEN", "").strip()
         body = json.dumps({
             "content": content,
             "source": "halofire-agent-loop",
             "tags": ["halofire", "agent-loop", "autosprink-parity"],
         }).encode("utf-8")
         req = urllib.request.Request(
-            BRAIN_URL, data=body, headers={"Content-Type": "application/json"}
+            BRAIN_URL,
+            data=body,
+            headers={
+                "Content-Type": "application/json",
+                **({"Authorization": f"Bearer {token}"} if token else {}),
+            },
         )
         urllib.request.urlopen(req, timeout=10).read()
     except Exception as exc:  # noqa: BLE001 — brain is optional telemetry
