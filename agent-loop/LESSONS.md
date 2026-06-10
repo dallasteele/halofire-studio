@@ -9,3 +9,4 @@ prompts so run N+1 knows what runs 1..N tried. Do not edit by hand mid-run.
 - 2026-06-10 BLOCKED W3C-bom-group (model qwen3:30b-a3b); last error class: dule '../src/lib/bom-types' or its corresponding type declarations.
 test/bom-group.test.ts(4,7): error TS6133: 'round2' is declared but its value is never read.
 - 2026-06-10 DONE W3D-coverage-area on attempt 2 (model qwen3:30b-a3b).
+- 2026-06-10 DONE W3C-bom-group on attempt 2 (model qwen3:30b-a3b).
