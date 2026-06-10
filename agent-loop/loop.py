@@ -332,7 +332,7 @@ def commit_and_push(task: dict, written: list[Path]) -> str:
     return sha
 
 
-def process_task(task: dict, dry_run: bool) -> bool:
+def process_task(task: dict, dry_run: bool, backlog_data: dict | None = None) -> bool:
     """Returns True when the task lands (done), False when blocked."""
     log(f"=== task {task['id']}: {task['title']} ===")
     error_tail: str | None = None
@@ -387,6 +387,8 @@ def process_task(task: dict, dry_run: bool) -> bool:
                 continue
             task["status"] = "done"
             task["completed_at"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
+            if backlog_data is not None:
+                save_backlog(backlog_data)  # persist the done-status BEFORE the commit stages backlog.json
             sha = commit_and_push(task, written)
             task["commit"] = sha
             log(f"  ✅ GATES GREEN + VERIFIED — committed {sha}")
@@ -436,7 +438,7 @@ def main() -> int:
     for task in pending[: args.max_tasks]:
         task["status"] = "in_progress"
         save_backlog(data)
-        process_task(task, args.dry_run)
+        process_task(task, args.dry_run, data)
         save_backlog(data)
         if task["status"] == "done":
             landed += 1
