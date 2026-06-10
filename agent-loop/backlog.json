@@ -275,12 +275,13 @@
       "gate": "cd apps/cad && npx tsc -b && npx vitest run test/fitting-le.test.ts",
       "attempts": 2,
       "spec": "Pure fitting equivalent-length lookup for Hazen-Williams friction (C=120 schedule-40 basis; cited, verify adopted edition). Use EXACTLY these equivalent lengths (ft) by fitting type and nominal size (in). TEE_BRANCH: 1->5,1.25->6,1.5->8,2->10,2.5->12,3->15,4->20,6->30,8->35. ELBOW_90: 1->2,1.25->3,1.5->4,2->5,2.5->6,3->7,4->10,6->14,8->18. GATE_VALVE: 1->1,1.25->1,1.5->1,2->1,2.5->1,3->1,4->2,6->3,8->4. Exports (exact): export type FittingType='TEE_BRANCH'|'ELBOW_90'|'GATE_VALVE'; export const FITTING_LE_FT: Record<FittingType,Record<number,number>>; export const FITTING_LE_CITATION: string (contains 'Verify adopted edition'); export function equivalentLengthFt(type:FittingType, nominalIn:number): number \u2014 throws on unknown type or nominal; export function totalEquivalentLengthFt(fittings: Array<{type:FittingType;nominalIn:number}>): number \u2014 sum, skips nothing, throws on any unknown entry. Tests: equivalentLengthFt('ELBOW_90',2)=5; TEE_BRANCH 4=20; totalEquivalentLengthFt of [elbow 2, tee 2, gate 2]=5+10+1=16; throws unknown type, unknown nominal; citation contains the caveat.",
-      "completed_at": "2026-06-10T14:36:20+00:00"
+      "completed_at": "2026-06-10T14:36:20+00:00",
+      "commit": "82f5093f"
     },
     {
       "id": "W3C-bom-group",
       "title": "Reports > BOM grouping/aggregation (part legend)",
-      "status": "pending",
+      "status": "blocked",
       "phase": "wave3",
       "write_roots": [
         "apps/cad/src/lib",
@@ -292,13 +293,14 @@
         "apps/cad/test/bom-group.test.ts"
       ],
       "gate": "cd apps/cad && npx tsc -b && npx vitest run test/bom-group.test.ts",
-      "attempts": 0,
-      "spec": "Pure bill-of-materials aggregation: collapse takeoff line items into grouped rows by (category, size, material), summing quantities and extending cost. Exports (exact): export interface BomItem { category:string; sizeIn:number; material:string; qty:number; unitCost:number } export interface BomRow { key:string; category:string; sizeIn:number; material:string; qty:number; unitCost:number; extendedCost:number } export interface BomSummary { rows:BomRow[]; totalQty:number; totalCost:number } export function groupBom(items:BomItem[]): BomSummary \u2014 group key is `${category}|${sizeIn}|${material}`; qty sums; unitCost is the cost of the FIRST item in each group (assert all in a group share unitCost is NOT required \u2014 use first); extendedCost=round2(qty*unitCost); rows sorted by key ascending; totals are sums (round2 the cost). round2(n)=Math.round(n*100)/100. Throws on any item with negative qty or negative unitCost or non-finite values. Tests: two items same category/size/material sum qty and extend cost; different sizes stay separate; rows sorted by key; totalCost sums extended costs with round2; empty input -> empty rows, totals 0; throws on negative qty."
+      "attempts": 4,
+      "spec": "Pure bill-of-materials aggregation: collapse takeoff line items into grouped rows by (category, size, material), summing quantities and extending cost. Exports (exact): export interface BomItem { category:string; sizeIn:number; material:string; qty:number; unitCost:number } export interface BomRow { key:string; category:string; sizeIn:number; material:string; qty:number; unitCost:number; extendedCost:number } export interface BomSummary { rows:BomRow[]; totalQty:number; totalCost:number } export function groupBom(items:BomItem[]): BomSummary \u2014 group key is `${category}|${sizeIn}|${material}`; qty sums; unitCost is the cost of the FIRST item in each group (assert all in a group share unitCost is NOT required \u2014 use first); extendedCost=round2(qty*unitCost); rows sorted by key ascending; totals are sums (round2 the cost). round2(n)=Math.round(n*100)/100. Throws on any item with negative qty or negative unitCost or non-finite values. Tests: two items same category/size/material sum qty and extend cost; different sizes stay separate; rows sorted by key; totalCost sums extended costs with round2; empty input -> empty rows, totals 0; throws on negative qty.",
+      "last_error": "src/lib/bom-group.ts(1,45): error TS2307: Cannot find module './bom-types' or its corresponding type declarations.\ntest/bom-group.test.ts(2,19): error TS6133: 'BomRow' is declared but its value is never read.\ntest/bom-group.test.ts(2,27): error TS6133: 'BomSummary' is declared but its value is never read.\ntest/bom-group.test.ts(2,45): error TS2307: Cannot find module '../src/lib/bom-types' or its corresponding type declarations.\ntest/bom-group.test.ts(4,7): error TS6133: 'round2' is declared but its value is never read."
     },
     {
       "id": "W3D-coverage-area",
       "title": "Commands > Draw Sprinkler Coverage (rectangular coverage cell)",
-      "status": "pending",
+      "status": "done",
       "phase": "wave3",
       "write_roots": [
         "apps/cad/src/lib",
@@ -310,8 +312,9 @@
         "apps/cad/test/coverage-area.test.ts"
       ],
       "gate": "cd apps/cad && npx tsc -b && npx vitest run test/coverage-area.test.ts",
-      "attempts": 0,
-      "spec": "Pure rectangular sprinkler coverage-cell geometry + NFPA spacing check. A head at center (cx,cy) with spacing S (ft) covers a square of side S (S/2 each direction). Exports (exact): export interface Pt{x:number;y:number} export interface CoverageCell{ center:Pt; sideFt:number; minX:number; minY:number; maxX:number; maxY:number; areaSqFt:number } export function coverageCell(center:Pt, sideFt:number): CoverageCell \u2014 throws on non-finite center or non-finite/non-positive sideFt; areaSqFt=sideFt*sideFt; bounds are center +/- sideFt/2. export function cellsOverlap(a:CoverageCell,b:CoverageCell):boolean \u2014 axis-aligned overlap (touching edges = not overlap, use strict <). export function maxAreaWithinLimit(sideFt:number, maxProtectionSqFt:number):boolean \u2014 sideFt*sideFt <= maxProtectionSqFt; throws on non-positive inputs. Tests: coverageCell({x:0,y:0},12) -> bounds -6..6, area 144; two cells 12 apart centers (0,0) and (12,0) do NOT overlap (edges touch); centers (0,0)/(10,0) DO overlap; maxAreaWithinLimit(12,225) true, (16,225) false; throw cases."
+      "attempts": 2,
+      "spec": "Pure rectangular sprinkler coverage-cell geometry + NFPA spacing check. A head at center (cx,cy) with spacing S (ft) covers a square of side S (S/2 each direction). Exports (exact): export interface Pt{x:number;y:number} export interface CoverageCell{ center:Pt; sideFt:number; minX:number; minY:number; maxX:number; maxY:number; areaSqFt:number } export function coverageCell(center:Pt, sideFt:number): CoverageCell \u2014 throws on non-finite center or non-finite/non-positive sideFt; areaSqFt=sideFt*sideFt; bounds are center +/- sideFt/2. export function cellsOverlap(a:CoverageCell,b:CoverageCell):boolean \u2014 axis-aligned overlap (touching edges = not overlap, use strict <). export function maxAreaWithinLimit(sideFt:number, maxProtectionSqFt:number):boolean \u2014 sideFt*sideFt <= maxProtectionSqFt; throws on non-positive inputs. Tests: coverageCell({x:0,y:0},12) -> bounds -6..6, area 144; two cells 12 apart centers (0,0) and (12,0) do NOT overlap (edges touch); centers (0,0)/(10,0) DO overlap; maxAreaWithinLimit(12,225) true, (16,225) false; throw cases.",
+      "completed_at": "2026-06-10T15:02:23+00:00"
     }
   ]
 }
