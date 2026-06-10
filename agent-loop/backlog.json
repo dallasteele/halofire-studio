@@ -316,6 +316,60 @@
       "spec": "Pure rectangular sprinkler coverage-cell geometry + NFPA spacing check. A head at center (cx,cy) with spacing S (ft) covers a square of side S (S/2 each direction). Exports (exact): export interface Pt{x:number;y:number} export interface CoverageCell{ center:Pt; sideFt:number; minX:number; minY:number; maxX:number; maxY:number; areaSqFt:number } export function coverageCell(center:Pt, sideFt:number): CoverageCell \u2014 throws on non-finite center or non-finite/non-positive sideFt; areaSqFt=sideFt*sideFt; bounds are center +/- sideFt/2. export function cellsOverlap(a:CoverageCell,b:CoverageCell):boolean \u2014 axis-aligned overlap (touching edges = not overlap, use strict <). export function maxAreaWithinLimit(sideFt:number, maxProtectionSqFt:number):boolean \u2014 sideFt*sideFt <= maxProtectionSqFt; throws on non-positive inputs. Tests: coverageCell({x:0,y:0},12) -> bounds -6..6, area 144; two cells 12 apart centers (0,0) and (12,0) do NOT overlap (edges touch); centers (0,0)/(10,0) DO overlap; maxAreaWithinLimit(12,225) true, (16,225) false; throw cases.",
       "completed_at": "2026-06-10T15:02:23+00:00",
       "commit": "e94c480e"
+    },
+    {
+      "id": "W4A-wall-solid",
+      "title": "3D > Wall solid mesh (thickness + height, pure)",
+      "status": "pending",
+      "phase": "wave4-3d",
+      "write_roots": [
+        "apps/cad/src/lib",
+        "apps/cad/test"
+      ],
+      "context_files": [],
+      "files_create": [
+        "apps/cad/src/lib/wall-solid.ts",
+        "apps/cad/test/wall-solid.test.ts"
+      ],
+      "gate": "cd apps/cad && npx tsc -b && npx vitest run test/wall-solid.test.ts",
+      "attempts": 0,
+      "spec": "Pure mesh builder: one wall segment -> a closed rectangular box mesh as flat arrays (three.js BufferGeometry-ready). Exports (exact): export interface Pt2{x:number;y:number} export interface WallMesh{positions:number[];indices:number[];vertexCount:number} export function wallSolid(start:Pt2,end:Pt2,thicknessFt:number,heightFt:number,baseY?:number):WallMesh \u2014 the wall runs start->end in plan (plan x->world x, plan y->world z), extruded UP (world y) from baseY (default 0) to baseY+heightFt, with thickness centered on the centerline (offset +/- thickness/2 along the 2D normal of the segment). Output: 8 corner vertices (positions length 24) and 12 triangles (indices length 36) with OUTWARD-facing CCW winding for the 6 faces. Throws on zero-length segment (distance < 1e-9), non-finite inputs, or non-positive thickness/height. Determinism: vertex order = bottom face first (4 verts: start-left, start-right, end-right, end-left), then top face same order. Tests: a unit wall (0,0)->(10,0), thickness 1, height 8: vertexCount 8, positions contain z=+0.5 and z=-0.5 corners, all top verts y=8, bottom y=0; indices length 36 with every index <8; a diagonal wall (3-4-5) has correct normal offsets (toBeCloseTo); throws on zero-length/negative thickness."
+    },
+    {
+      "id": "W4B-slab-solid",
+      "title": "3D > Floor/ceiling slab mesh from room polygon (pure)",
+      "status": "pending",
+      "phase": "wave4-3d",
+      "write_roots": [
+        "apps/cad/src/lib",
+        "apps/cad/test"
+      ],
+      "context_files": [],
+      "files_create": [
+        "apps/cad/src/lib/slab-solid.ts",
+        "apps/cad/test/slab-solid.test.ts"
+      ],
+      "gate": "cd apps/cad && npx tsc -b && npx vitest run test/slab-solid.test.ts",
+      "attempts": 0,
+      "spec": "Pure mesh builder: a room polygon -> a horizontal slab mesh via fan triangulation (polygons from the trace tool are convex-ish; document the convex assumption honestly). Exports (exact): export interface Pt2{x:number;y:number} export interface SlabMesh{positions:number[];indices:number[];vertexCount:number} export function slabSolid(polygon:Pt2[],elevationY:number,thicknessFt:number):SlabMesh \u2014 polygon (>=3 points, plan x->world x, plan y->world z) extruded from elevationY down to elevationY-thicknessFt (slab hangs below its elevation). Top + bottom faces by fan triangulation from vertex 0; side walls quad per edge. For N polygon points: vertexCount 2N, indices length = (N-2)*3*2 + N*6. Throws on <3 points, non-finite, non-positive thickness, or repeated consecutive points (distance <1e-9). Tests: unit square (0,0)(10,0)(10,10)(0,10) at elevation 0 thickness 0.5: vertexCount 8, top verts y=0, bottom y=-0.5, indices length 36; triangle polygon N=3 -> indices length (1*6)+(3*6)=24; throw cases."
+    },
+    {
+      "id": "W4C-fitting-orient",
+      "title": "3D > Fitting orientation at junctions (pure quaternion math)",
+      "status": "pending",
+      "phase": "wave4-3d",
+      "write_roots": [
+        "apps/cad/src/lib",
+        "apps/cad/test"
+      ],
+      "context_files": [],
+      "files_create": [
+        "apps/cad/src/lib/fitting-orient.ts",
+        "apps/cad/test/fitting-orient.test.ts"
+      ],
+      "gate": "cd apps/cad && npx tsc -b && npx vitest run test/fitting-orient.test.ts",
+      "attempts": 0,
+      "spec": "Pure orientation solver: given the unit directions of pipes meeting at a junction, compute the Y-up Euler rotation to place a fitting STEP body (modeled with primary run along +X, branch along +Z). Exports (exact): export interface V3{x:number;y:number;z:number} export function normalize(v:V3):V3 \u2014 throws on zero-length. export function elbowRotationY(dirA:V3,dirB:V3):number \u2014 both dirs in the horizontal plane (y component must be <0.01 in magnitude after normalize, else throw 'non-horizontal'): returns the rotation (radians, about world Y) that aligns the elbow's +X leg with dirA; computed as atan2(-dirA.z, dirA.x). export function teeRotationY(runDir:V3,branchDir:V3):number \u2014 aligns the tee run (+X) with runDir using the same atan2; throws when branchDir is parallel to runDir (|dot|>0.99 after normalize). export function isOrthogonal(a:V3,b:V3,tolDeg?:number):boolean \u2014 angle within tolDeg (default 5) of 90 degrees. Tests: dirA=+X -> rotation 0; dirA=+Z -> rotation -PI/2 (toBeCloseTo); dirA=-X -> PI (or -PI, assert abs==PI closeTo); tee with run +X branch +Z passes isOrthogonal and rotation 0; parallel branch throws; non-horizontal throws; normalize throws on zero vector."
     }
   ]
 }
