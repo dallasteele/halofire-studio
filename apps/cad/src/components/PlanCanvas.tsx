@@ -43,6 +43,12 @@ import {
   type DrawingElement,
 } from '../lib/drawing-elements';
 import { SAMPLE_PROJECT_NAME } from '../lib/sample-project';
+import {
+  emptySelection,
+  marqueeSelect,
+  selectionCount,
+  type MarqueeItems,
+} from '../lib/selection-set';
 import { coverageReport } from '../lib/head-layout';
 import { pressureColor, pressureRange, type HydraulicsResult } from '../lib/hydraulics';
 import { selectHydraulics } from '../store';
@@ -260,6 +266,10 @@ export function PlanCanvas(): ReactElement {
   const moveNode = useCadStore((s) => s.moveNode);
   const addAnnotation = useCadStore((s) => s.addAnnotation);
   const select = useCadStore((s) => s.select);
+  const multi = useCadStore((s) => s.multi);
+  const setMulti = useCadStore((s) => s.setMulti);
+  const togglePickMulti = useCadStore((s) => s.togglePickMulti);
+  const deleteSelected = useCadStore((s) => s.deleteSelected);
   const selectedNodeId = useCadStore((s) => s.selection.selectedNodeId);
   const selectedSegmentId = useCadStore((s) => s.selection.selectedSegmentId);
   const selectedRoomId = useCadStore((s) => s.selection.selectedRoomId);
@@ -291,6 +301,11 @@ export function PlanCanvas(): ReactElement {
     return m;
   }, [project.network.nodes]);
   const segments = project.network.segments;
+
+  // Multi-selection lookups (W2D engine): O(1) id membership for highlight strokes.
+  const multiNodeSet = useMemo(() => new Set(multi.nodeIds), [multi.nodeIds]);
+  const multiSegSet = useMemo(() => new Set(multi.segmentIds), [multi.segmentIds]);
+  const multiCount = selectionCount(multi);
 
   // W5 pressure heatmap: compute the live hydraulics ONLY when the heatmap is on, then
   // map node/segment ids to a shared blue->red pressure color (legend below).
@@ -342,6 +357,18 @@ export function PlanCanvas(): ReactElement {
   const [hazard, setHazard] = useState<HazardClass>('ORDINARY_1');
   const [cursor, setCursor] = useState<Point2 | null>(null);
   const [statusMsg, setStatusMsg] = useState<string | null>(null);
+  // Marquee drag (select tool): screen-space corners of the in-progress rectangle.
+  // Direction encodes the AutoCAD convention — left-to-right = window (fully
+  // contained), right-to-left = crossing (anything touching).
+  const [marquee, setMarquee] = useState<{
+    sx: number;
+    sy: number;
+    ex: number;
+    ey: number;
+  } | null>(null);
+  // True right after a marquee commit, so the synthetic click that follows the
+  // mouse-up does not clear the fresh multi-selection.
+  const didMarquee = useRef(false);
   // In-app inline set-scale popover: holds the two captured plan points + the screen
   // position to anchor the input near the second click. Replaces window.prompt().
   const [scalePrompt, setScalePrompt] = useState<{
@@ -371,14 +398,34 @@ export function PlanCanvas(): ReactElement {
     setPolyPts([]);
     setScalePrompt(null);
     setScaleInput('');
+    setMarquee(null);
   }, [activeTool]);
 
-  // Delete / Backspace removes the selected head (ignored while typing in a field).
+  // Delete / Backspace: when a multi-selection exists, delete everything deletable
+  // in it as ONE undo step; otherwise keep the single-selected-head fallback.
+  // Ignored while typing in a field.
   useEffect(() => {
     function onKey(e: KeyboardEvent): void {
       if (e.key !== 'Delete' && e.key !== 'Backspace') return;
       const tag = (e.target as HTMLElement | null)?.tagName;
       if (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') return;
+      if (selectionCount(multi) > 0) {
+        e.preventDefault();
+        // Count by diffing the store before/after so the message is exact
+        // (includes orphan-swept fittings, excludes undeletable picks).
+        const before = useCadStore.getState().project.network;
+        deleteSelected();
+        const after = useCadStore.getState().project.network;
+        const removed =
+          before.nodes.length - after.nodes.length +
+          (before.segments.length - after.segments.length);
+        setStatusMsg(
+          removed > 0
+            ? `deleted ${removed} selected element(s)`
+            : 'nothing deletable in selection (source/fittings are pipe-owned)',
+        );
+        return;
+      }
       if (!selectedNodeId) return;
       const node = project.network.nodes.find((n) => n.id === selectedNodeId);
       if (node?.type !== 'HEAD') return;
@@ -389,7 +436,7 @@ export function PlanCanvas(): ReactElement {
     if (typeof window === 'undefined') return;
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [selectedNodeId, project.network.nodes, deleteHead]);
+  }, [selectedNodeId, project.network.nodes, deleteHead, multi, deleteSelected]);
 
   const ready = size.w > 0 && size.h > 0;
   const grid = ready ? buildGridLines(size) : { minor: [], major: [] };
@@ -491,13 +538,61 @@ export function PlanCanvas(): ReactElement {
     activeTool === 'draw-point';
 
   function onStageMouseDown(e: Konva.KonvaEventObject<MouseEvent>): void {
-    if (activeTool !== 'pan') return;
-    const pos = e.target.getStage()?.getPointerPosition();
-    if (pos) panDrag.current = { sx: pos.x, sy: pos.y };
+    if (activeTool === 'pan') {
+      const pos = e.target.getStage()?.getPointerPosition();
+      if (pos) panDrag.current = { sx: pos.x, sy: pos.y };
+      return;
+    }
+    // Select tool: a mouse-down on EMPTY canvas (the stage itself, not a shape)
+    // starts a marquee drag. Shape hits keep their own click/drag handlers.
+    if (activeTool === 'select' && e.target === e.target.getStage()) {
+      const pos = e.target.getStage()?.getPointerPosition();
+      if (pos) {
+        setMarquee({ sx: pos.x, sy: pos.y, ex: pos.x, ey: pos.y });
+        didMarquee.current = false;
+      }
+    }
   }
 
   function onStageMouseUp(): void {
     panDrag.current = null;
+    if (!marquee) return;
+    const dragPx = Math.hypot(marquee.ex - marquee.sx, marquee.ey - marquee.sy);
+    if (dragPx > 4) {
+      // Build the hit-test items from the CURRENT plan-space positions, mapped
+      // exactly like the rendering does (nodes in feet -> plan units via /scale).
+      const items: MarqueeItems = {
+        nodes: project.network.nodes.map((n) => ({
+          id: n.id,
+          at: { x: n.pos.x / scale, y: n.pos.z / scale },
+        })),
+        segments: project.network.segments.flatMap((seg) => {
+          const a = nodeById.get(seg.from);
+          const b = nodeById.get(seg.to);
+          if (!a || !b) return []; // orphan pipe is never hit-tested
+          return [
+            {
+              id: seg.id,
+              a: { x: a.pos.x / scale, y: a.pos.z / scale },
+              b: { x: b.pos.x / scale, y: b.pos.z / scale },
+            },
+          ];
+        }),
+      };
+      // AutoCAD convention: drag left-to-right = window (fully contained only),
+      // right-to-left = crossing (anything touching the rect).
+      const mode = marquee.ex >= marquee.sx ? 'window' : 'crossing';
+      const result = marqueeSelect(
+        items,
+        toPlan(marquee.sx, marquee.sy),
+        toPlan(marquee.ex, marquee.ey),
+        mode,
+      );
+      setMulti(result);
+      didMarquee.current = true;
+      setStatusMsg(`${selectionCount(result)} selected (${mode} marquee)`);
+    }
+    setMarquee(null);
   }
 
   function onStageMouseMove(e: Konva.KonvaEventObject<MouseEvent>): void {
@@ -509,12 +604,31 @@ export function PlanCanvas(): ReactElement {
       }
       return;
     }
+    if (activeTool === 'select' && marquee) {
+      const pos = e.target.getStage()?.getPointerPosition();
+      if (pos) setMarquee({ ...marquee, ex: pos.x, ey: pos.y });
+      return;
+    }
     if (activeTool === 'set-scale' || activeTool === 'wall' || activeTool === 'room' || isDrawTool) {
       setCursor(pointerPlan(e));
     }
   }
 
   function onStageClick(e: Konva.KonvaEventObject<MouseEvent>): void {
+    if (activeTool === 'select') {
+      // The click that follows a marquee mouse-up must not clear the fresh picks.
+      if (didMarquee.current) {
+        didMarquee.current = false;
+        return;
+      }
+      // A plain click on empty canvas clears the multi-selection (single-pick
+      // clicks on shapes are handled by the shapes themselves and never bubble).
+      if (e.target === e.target.getStage() && multiCount > 0) {
+        setMulti(emptySelection());
+      }
+      return;
+    }
+
     const p = pointerPlan(e);
     if (!p) return;
 
@@ -877,6 +991,27 @@ export function PlanCanvas(): ReactElement {
                 fill={'rgba(240,168,104,0.08)'}
               />
             )}
+
+            {/* in-progress marquee (select tool, screen-space). AutoCAD-style:
+                left-to-right = WINDOW (solid, accent); right-to-left = CROSSING
+                (dashed, warn). */}
+            {marquee &&
+              Math.hypot(marquee.ex - marquee.sx, marquee.ey - marquee.sy) > 4 && (
+                <Rect
+                  x={Math.min(marquee.sx, marquee.ex)}
+                  y={Math.min(marquee.sy, marquee.ey)}
+                  width={Math.abs(marquee.ex - marquee.sx)}
+                  height={Math.abs(marquee.ey - marquee.sy)}
+                  stroke={marquee.ex >= marquee.sx ? colors.accent : colors.warn}
+                  strokeWidth={1}
+                  dash={marquee.ex >= marquee.sx ? undefined : [6, 4]}
+                  fill={
+                    marquee.ex >= marquee.sx
+                      ? 'rgba(240,168,104,0.06)'
+                      : 'rgba(240,196,90,0.06)'
+                  }
+                />
+              )}
           </Layer>
 
           {/* W4 pipe layer — segments styled by role + width by diameter; fittings as
@@ -889,7 +1024,7 @@ export function PlanCanvas(): ReactElement {
               if (!a || !c) return null; // never draw an orphan pipe
               const pa = toScreen({ x: a.pos.x / scale, y: a.pos.z / scale });
               const pc = toScreen({ x: c.pos.x / scale, y: c.pos.z / scale });
-              const isSel = seg.id === selectedSegmentId;
+              const isSel = seg.id === selectedSegmentId || multiSegSet.has(seg.id);
               const heatPsi = pRange && segPsi.has(seg.id) ? segPsi.get(seg.id)! : null;
               const stroke = isSel
                 ? colors.warn
@@ -906,6 +1041,14 @@ export function PlanCanvas(): ReactElement {
                   hitStrokeWidth={12}
                   onClick={(e) => {
                     e.cancelBubble = true;
+                    if (e.evt.shiftKey) {
+                      // Shift-click: toggle in/out of the multi-set, keep other picks.
+                      togglePickMulti('segment', seg.id, true);
+                      return;
+                    }
+                    // Single pick: mirror into multi FIRST (setMulti clears the
+                    // single selection), then restore the single-pick contract.
+                    setMulti({ nodeIds: [], segmentIds: [seg.id], roomIds: [] });
                     select('segment', seg.id);
                   }}
                 />
@@ -921,12 +1064,17 @@ export function PlanCanvas(): ReactElement {
                 The riser/source keeps its magenta diamond. All are draggable + selectable. */}
             {fittings.map((f) => {
               const s = toScreen({ x: f.pos.x / scale, y: f.pos.z / scale });
-              const isSel = f.id === selectedNodeId;
+              const isSel = f.id === selectedNodeId || multiNodeSet.has(f.id);
               const stroke = isSel ? colors.warn : colors.accentText;
               const common = {
                 draggable: true,
                 onClick: (e: Konva.KonvaEventObject<MouseEvent>) => {
                   e.cancelBubble = true;
+                  if (e.evt.shiftKey) {
+                    togglePickMulti('node', f.id, true);
+                    return;
+                  }
+                  setMulti({ nodeIds: [f.id], segmentIds: [], roomIds: [] });
                   select('node', f.id);
                 },
                 onDragStart: (e: Konva.KonvaEventObject<DragEvent>) => {
@@ -1016,7 +1164,7 @@ export function PlanCanvas(): ReactElement {
             {fittings.map((f) => {
               if (f.type !== 'TEE' && f.type !== 'CROSS') return null;
               const s = toScreen({ x: f.pos.x / scale, y: f.pos.z / scale });
-              const isSel = f.id === selectedNodeId;
+              const isSel = f.id === selectedNodeId || multiNodeSet.has(f.id);
               const stroke = isSel ? colors.warn : colors.accentText;
               const L = isSel ? 8 : 6;
               const pts =
@@ -1062,7 +1210,7 @@ export function PlanCanvas(): ReactElement {
             {heads.map((h) => {
               const planPt: Point2 = { x: h.pos.x / scale, y: h.pos.z / scale };
               const s = toScreen(planPt);
-              const isSel = h.id === selectedNodeId;
+              const isSel = h.id === selectedNodeId || multiNodeSet.has(h.id);
               const heatPsi = pRange && nodePsi.has(h.id) ? nodePsi.get(h.id)! : null;
               const headColor = isSel
                 ? colors.warn
@@ -1083,6 +1231,11 @@ export function PlanCanvas(): ReactElement {
                   draggable
                   onClick={(e) => {
                     e.cancelBubble = true;
+                    if (e.evt.shiftKey) {
+                      togglePickMulti('node', h.id, true);
+                      return;
+                    }
+                    setMulti({ nodeIds: [h.id], segmentIds: [], roomIds: [] });
                     select('node', h.id);
                   }}
                   onDragStart={(e) => {
@@ -1103,7 +1256,7 @@ export function PlanCanvas(): ReactElement {
                 so the underlying draggable circle keeps the hit/drag behavior. */}
             {heads.map((h) => {
               const s = toScreen({ x: h.pos.x / scale, y: h.pos.z / scale });
-              const isSel = h.id === selectedNodeId;
+              const isSel = h.id === selectedNodeId || multiNodeSet.has(h.id);
               const heatPsi = pRange && nodePsi.has(h.id) ? nodePsi.get(h.id)! : null;
               const headColor = isSel
                 ? colors.warn
@@ -1184,6 +1337,11 @@ export function PlanCanvas(): ReactElement {
             <span style={hudBadgeStyle} data-cad-zoom>
               {`zoom: ${fitXform.scale > 0 ? zoomPercent(xform, fitXform.scale) : 100}%`}
             </span>
+            {multiCount > 0 && (
+              <span style={hudBadgeStyle} data-cad-multi>
+                {`${multiCount} selected`}
+              </span>
+            )}
             {vpOverride && (
               <button
                 type="button"

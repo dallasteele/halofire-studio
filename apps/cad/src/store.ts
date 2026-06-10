@@ -51,6 +51,13 @@ import {
   canRedo as historyCanRedo,
   type History,
 } from './lib/history';
+import {
+  emptySelection,
+  selectionCount,
+  togglePick,
+  type SelectionSet,
+  type SelKind,
+} from './lib/selection-set';
 
 /**
  * The real catalog head SKU id the sample project lays out with. This is the only
@@ -231,6 +238,38 @@ export interface CadState {
   canUndo: () => boolean;
   /** True when there is an undone edit to redo. */
   canRedo: () => boolean;
+
+  /**
+   * The MULTI-selection set (W2D selection engine): shift-click + marquee picks.
+   * UI-only state — NOT undoable (plain set()); undo/redo clears it alongside the
+   * single selection so it never points at restored/removed ids.
+   */
+  multi: SelectionSet;
+
+  /**
+   * Replace the multi-selection wholesale (e.g. a marquee result). When the set is
+   * non-empty the single selection is cleared — EXCEPT that a set with exactly one
+   * node id mirrors that id into selection.selectedNodeId, so the RightInspector /
+   * Viewer3D single-pick contract keeps working for single picks.
+   */
+  setMulti: (sel: SelectionSet) => void;
+
+  /**
+   * Toggle one element in the multi-selection (shift-click). Wraps the pure
+   * togglePick over the current set; an empty id is a safe no-op (the pure fn's
+   * throw is caught), matching fail-soft canvas behavior.
+   */
+  togglePickMulti: (kind: SelKind, id: string, additive: boolean) => void;
+
+  /**
+   * Delete everything deletable in the multi-selection as ONE undoable edit:
+   * every picked node whose type is HEAD (SOURCE is never deleted; picked
+   * fittings are pipe-owned and only removed by the orphan sweep), every picked
+   * segment, and afterwards any non-HEAD/non-SOURCE node left with degree 0
+   * (no remaining segment touches it). Clears multi + single selection.
+   * A no-op (no history entry) when nothing would be removed.
+   */
+  deleteSelected: () => void;
 
   /** Replace the entire project (e.g. after an import or new-file). Clears selection. */
   setProject: (project: Project) => void;
@@ -473,6 +512,7 @@ export const useCadStore = create<CadState>((set, get) => {
   return {
   project: emptyProject(),
   selection: { ...EMPTY_SELECTION },
+  multi: emptySelection(),
   viewMode: 'split',
   activeTool: 'select',
   underlay: null,
@@ -492,6 +532,7 @@ export const useCadStore = create<CadState>((set, get) => {
         ...move.present,
         history: move.history,
         selection: { ...EMPTY_SELECTION },
+        multi: emptySelection(),
       };
     }),
   redo: () =>
@@ -502,6 +543,7 @@ export const useCadStore = create<CadState>((set, get) => {
         ...move.present,
         history: move.history,
         selection: { ...EMPTY_SELECTION },
+        multi: emptySelection(),
       };
     }),
   canUndo: () => historyCanUndo(get().history),
@@ -511,6 +553,67 @@ export const useCadStore = create<CadState>((set, get) => {
     mutate(() => ({ project, selection: { ...EMPTY_SELECTION } })),
   select: (kind, id) => set({ selection: selectionFor(kind, id) }),
   clearSelection: () => set({ selection: { ...EMPTY_SELECTION } }),
+
+  setMulti: (sel) =>
+    set(() => {
+      if (selectionCount(sel) === 0) return { multi: sel };
+      // Non-empty multi takes over: clear the single selection — but a set with
+      // exactly one node id mirrors into selectedNodeId so single-pick consumers
+      // (RightInspector, Viewer3D) keep working.
+      const selection: Selection =
+        sel.nodeIds.length === 1
+          ? { ...EMPTY_SELECTION, selectedNodeId: sel.nodeIds[0] }
+          : { ...EMPTY_SELECTION };
+      return { multi: sel, selection };
+    }),
+
+  togglePickMulti: (kind, id, additive) => {
+    let next: SelectionSet;
+    try {
+      next = togglePick(get().multi, kind, id, additive);
+    } catch {
+      return; // empty id — fail-soft no-op
+    }
+    get().setMulti(next);
+  },
+
+  deleteSelected: () =>
+    mutate((s) => {
+      const { nodeIds, segmentIds } = s.multi;
+      const net = s.project.network;
+      const pickedNodes = new Set(nodeIds);
+      const pickedSegs = new Set(segmentIds);
+      // Only HEAD nodes are directly deletable; SOURCE never is, and picked
+      // fittings are pipe-owned (the orphan sweep below removes them only once
+      // no segment touches them).
+      const headsToDelete = new Set(
+        net.nodes
+          .filter((n) => pickedNodes.has(n.id) && n.type === 'HEAD')
+          .map((n) => n.id),
+      );
+      const segsToDelete = new Set(
+        net.segments.filter((seg) => pickedSegs.has(seg.id)).map((seg) => seg.id),
+      );
+      if (headsToDelete.size === 0 && segsToDelete.size === 0) return s; // no-op
+      const segments = net.segments.filter((seg) => !segsToDelete.has(seg.id));
+      const touched = new Set<string>();
+      for (const seg of segments) {
+        touched.add(seg.from);
+        touched.add(seg.to);
+      }
+      const nodes = net.nodes.filter((n) => {
+        if (headsToDelete.has(n.id)) return false;
+        if (n.type === 'HEAD' || n.type === 'SOURCE') return true;
+        // Orphan sweep: a fitting left with degree 0 has no pipe reason to exist.
+        return touched.has(n.id);
+      });
+      return {
+        project: { ...s.project, network: { ...net, nodes, segments } },
+        multi: emptySelection(),
+        selection: { ...EMPTY_SELECTION },
+      };
+    }),
+
   setTool: (activeTool) => set({ activeTool }),
   setViewMode: (viewMode) => set({ viewMode }),
   setUnderlay: (underlay) => set({ underlay }),
