@@ -26,3 +26,13 @@ was violated by a real failed attempt. Add to them; never delete without cause.
 - Output ONLY the JSON object {"files":[{"path","content"}...],"notes"} —
   every files[] entry is an OBJECT with COMPLETE file contents (no diffs, no
   placeholders, no '...').
+
+## 3D work verification (MANDATORY — added after the flat-mat/sealed-box failure)
+- Any task touching 3D geometry/rendering MUST keep test/scene-invariants.test.ts
+  green and extend it with invariants for the new geometry (positions/elevations/
+  scale asserted numerically through the same composition paths the viewer uses).
+- Never accept a far-away screenshot as proof. Verification = numeric scene
+  assertions (window.__cadVerify3D in the live app) + close-range screenshots
+  from at least: exterior 3/4, interior at system height, top-down.
+- Systems mount at ceiling height, never y=0. Buildings are never synthesized
+  from non-architectural linework.

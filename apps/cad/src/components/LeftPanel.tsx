@@ -248,7 +248,11 @@ function ImportSection(): ReactElement {
     try {
       const res = await fetch('/samples/1881-kernel.dxf');
       if (!res.ok) throw new Error(`fetch failed (${res.status})`);
-      applyOutcome(importDxfText(await res.text(), '1881-kernel.dxf'));
+      applyOutcome(
+        importDxfText(await res.text(), '1881-kernel.dxf', undefined, {
+          kernelElevationFt: useCadStore.getState().project.hazardDefaults.defaultCeilingHt,
+        }),
+      );
     } catch (e) {
       setErr(true);
       setMsg(e instanceof Error ? e.message : '1881 load failed');
