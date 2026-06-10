@@ -18,6 +18,9 @@ fi
 
 cd "$REPO"
 git config user.name  >/dev/null 2>&1 || git config user.name  "HaloFire Agent Loop"
+# Checkpoint dirty loop state (LESSONS/backlog/PROPOSALS) so merges stay clean.
+git add -A agent-loop 2>/dev/null
+git diff --cached --quiet || git -c user.name="HaloFire Agent Loop" -c user.email="agent-loop@halofire.local" commit -qm "agent-loop: state checkpoint"
 git config user.email >/dev/null 2>&1 || git config user.email "agent-loop@halofire.local"
 
 # Brain auth — canonical single source of truth on GX10 (fail-soft when absent).
