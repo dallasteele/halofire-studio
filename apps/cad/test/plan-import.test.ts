@@ -134,3 +134,30 @@ describe('wallCandidates', () => {
     expect(wallCandidates(parseDxf('', parser))).toEqual([]);
   });
 });
+
+describe('kernel-lane wall exclusion (importDxfText)', () => {
+  it('never fabricates walls from HALOFIRE_PIPES/HEADS linework', async () => {
+    const { importDxfText } = await import('../src/lib/import-actions');
+    // Synthetic kernel doc: 3 long pipe lines + 1 long line on a real layer.
+    const doc = {
+      header: { $INSUNITS: 2 },
+      entities: [
+        { type: 'LINE', layer: 'HALOFIRE_PIPES', vertices: [{ x: 0, y: 0 }, { x: 50, y: 0 }] },
+        { type: 'LINE', layer: 'HALOFIRE_PIPES', vertices: [{ x: 0, y: 10 }, { x: 50, y: 10 }] },
+        { type: 'LINE', layer: 'HALOFIRE_PIPES', vertices: [{ x: 0, y: 20 }, { x: 50, y: 20 }] },
+        { type: 'LINE', layer: 'A-WALL', vertices: [{ x: 0, y: 0 }, { x: 0, y: 40 }] },
+        { type: 'CIRCLE', layer: 'HALOFIRE_HEADS', center: { x: 5, y: 5 }, radius: 0.5 },
+      ],
+    };
+    const out = importDxfText('kernel', 'k.dxf', { parseSync: () => doc });
+    expect(out.ok).toBe(true);
+    expect(out.kernelNetwork?.headCount).toBe(1);
+    // Pipe linework must NOT become walls; only the A-WALL line may qualify.
+    const wallCount = out.building?.walls.length ?? 0;
+    expect(wallCount).toBeLessThanOrEqual(1);
+    for (const w of out.building?.walls ?? []) {
+      // any surviving wall must be the A-WALL vertical, never a pipe horizontal
+      expect(Math.abs(w.start.x - w.end.x)).toBeLessThan(1e-9);
+    }
+  });
+});

@@ -11,7 +11,7 @@ import { Viewer3D } from '../src/components/Viewer3D';
 import { useCadStore } from '../src/store';
 import { emptyProject, type Building, type Project } from '../src/lib/model';
 import { EMPTY_SELECTION } from '../src/store';
-import { ACTIVE_BACKEND_NAME } from '../src/lib/building3d';
+import { BUILDING_MESH_BACKEND } from '../src/lib/building-mesh';
 
 function fixtureProject(): Project {
   const p = emptyProject('Fixture');
@@ -87,7 +87,8 @@ describe('Viewer3D render smoke', () => {
     // Building loaded -> empty state gone.
     expect(() => render(<Viewer3D />)).not.toThrow();
     expect(window.__cad?.has3DBuilding).toBe(true);
-    expect(window.__cad?.buildingBackend).toBe(ACTIVE_BACKEND_NAME);
+    // M-3D.1: the viewer composes via the pure wallSolid/slabSolid path.
+    expect(window.__cad?.buildingBackend).toBe(BUILDING_MESH_BACKEND);
     expect(window.__cad?.floorCount).toBe(2);
     expect(window.__cad?.wallCount).toBe(2);
   });

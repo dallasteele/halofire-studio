@@ -1,5 +1,9 @@
 // HaloFire CAD — Viewer3D (3D). An R3F Canvas that renders the REAL building the
-// operator traced/imported (filled floor slabs + extruded walls) AND — W8 — the
+// operator traced/imported — M-3D.1: solid walls (ONE merged wallSolid geometry,
+// thickness from wall.thicknessFt else a documented 0.5 ft default, height from
+// the enclosing room's ceilingHt else the project default) plus per-room floor
+// AND ceiling slabs (slabSolid), lit by hemisphere + shadow-casting key light
+// (lights only — no network-fetched HDR; tests run offline) — AND — W8 — the
 // REAL CAD geometry of every sprinkler part: each head, tee, elbow, reducer, cross,
 // and riser/valve is drawn with its actual build123d STEP body (decoded in-browser
 // via occt-import-js), NOT the old placeholder glyphs (sphere+cone head, box
@@ -31,15 +35,14 @@ import {
 } from 'react';
 import * as THREE from 'three';
 import { Canvas } from '@react-three/fiber';
-import { Grid, Instance, Instances, OrbitControls } from '@react-three/drei';
+import { ContactShadows, Grid, Instance, Instances, OrbitControls } from '@react-three/drei';
 import { useCadStore } from '../store';
-import { hasBuilding, type HazardClass, type Node, type Project, type Segment } from '../lib/model';
+import { hasBuilding, type Node, type Project, type Segment } from '../lib/model';
+import { buildingBoundsFt, type BuildingBoundsFt } from '../lib/building3d';
 import {
-  buildBuildingMeshes,
-  buildingBoundsFt,
-  type BuildingMeshes,
-  type FloorMesh,
-} from '../lib/building3d';
+  buildingToMeshData,
+  type CombinedMesh,
+} from '../lib/building-mesh';
 import { pressureColor, pressureRange, type HydraulicsResult } from '../lib/hydraulics';
 import { selectHydraulics } from '../store';
 import {
@@ -50,7 +53,7 @@ import {
 } from '../lib/part-geometry';
 import { loadBuild123dManifest, type Build123dManifest } from '../../../studio/src/lib/build123d-parts';
 import { loadManufacturerStepManifest, type ManufacturerStepManifest } from '../../../studio/src/lib/manufacturer-step';
-import { colors, spacing, typeScale } from '../lib/tokens';
+import { colors, radii, spacing, typeScale } from '../lib/tokens';
 
 /** True when a WebGL context can be created (false in jsdom / headless-no-GL). */
 function webglAvailable(): boolean {
@@ -63,41 +66,84 @@ function webglAvailable(): boolean {
   }
 }
 
-/** Subtle per-hazard floor tint (decoration only — not a code color legend). */
-const HAZARD_TINT: Record<HazardClass, string> = {
-  LIGHT: '#2f5d52',
-  ORDINARY_1: '#3a5a73',
-  ORDINARY_2: '#4a5a86',
-  EXTRA_1: '#6a4f7a',
-  EXTRA_2: '#7a4a55',
-};
-
 /** Selected-room highlight tint. */
 const SELECTED_TINT = '#7fb4ff';
+
+/** Wall PBR color — light warm gray (design-aid finish, not a real material). */
+const WALL_COLOR = '#b8b0a4';
+/** Slab PBR color — concrete gray (design-aid finish, not a real material). */
+const SLAB_COLOR = '#8f8f8a';
 
 /** Target display size (ft) per body family so real mm bodies read at a sensible scale. */
 const HEAD_TARGET_FT = 0.9;
 const FITTING_TARGET_FT = 0.8;
 
-function FloorSlab({
-  floor,
+/* --------------------------------------------- pure buffers -> THREE geometry */
+
+/**
+ * Build a THREE.BufferGeometry from the pure combined buffers produced by
+ * building-mesh.ts (Float32Array positions + Uint32Array indices). Returns null
+ * for an empty buffer — the caller skips the mesh honestly.
+ */
+function toBufferGeometry(mesh: CombinedMesh | null): THREE.BufferGeometry | null {
+  if (!mesh || mesh.positions.length === 0) return null;
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(mesh.positions, 3));
+  geo.setIndex(new THREE.BufferAttribute(mesh.indices, 1));
+  geo.computeVertexNormals();
+  geo.computeBoundingBox();
+  return geo;
+}
+
+/** The 3D building geometry actually handed to the scene (built per project). */
+interface Building3dGeo {
+  /** Which composition path built these — reported truthfully. */
+  backend: string;
+  bounds: BuildingBoundsFt;
+  /** ONE merged geometry for ALL walls (one draw call, 1,000+ walls OK). */
+  wallGeometry: THREE.BufferGeometry | null;
+  /** How many source walls contributed to the merged geometry. */
+  wallCount: number;
+  /** Per-room floor + ceiling slab geometries (empty when no rooms — honest). */
+  slabs: Array<{
+    roomId: string;
+    ceilingHt: number;
+    floor: THREE.BufferGeometry | null;
+    ceiling: THREE.BufferGeometry | null;
+  }>;
+}
+
+/**
+ * Floor + ceiling slab for one room. Floor top face sits at y == 0; the
+ * ceiling underside sits at the room's ceiling height. Concrete-gray PBR; the
+ * floor carries the selected-room highlight (existing behavior kept).
+ */
+function RoomSlab({
+  slab,
   selected,
 }: {
-  floor: FloorMesh;
+  slab: Building3dGeo['slabs'][number];
   selected: boolean;
-}): ReactElement | null {
-  if (!floor.geometry) return null;
+}): ReactElement {
   return (
-    <mesh geometry={floor.geometry} position={[0, 0, 0]} receiveShadow>
-      <meshStandardMaterial
-        color={selected ? SELECTED_TINT : HAZARD_TINT[floor.hazard]}
-        roughness={0.92}
-        metalness={0}
-        emissive={selected ? SELECTED_TINT : '#000000'}
-        emissiveIntensity={selected ? 0.35 : 0}
-        side={2}
-      />
-    </mesh>
+    <group>
+      {slab.floor && (
+        <mesh geometry={slab.floor} castShadow receiveShadow>
+          <meshStandardMaterial
+            color={selected ? SELECTED_TINT : SLAB_COLOR}
+            roughness={0.95}
+            metalness={0}
+            emissive={selected ? SELECTED_TINT : '#000000'}
+            emissiveIntensity={selected ? 0.35 : 0}
+          />
+        </mesh>
+      )}
+      {slab.ceiling && (
+        <mesh geometry={slab.ceiling} castShadow receiveShadow>
+          <meshStandardMaterial color={SLAB_COLOR} roughness={0.95} metalness={0} />
+        </mesh>
+      )}
+    </group>
   );
 }
 
@@ -289,6 +335,7 @@ function PipeRun({
     <mesh
       position={mid}
       quaternion={quat}
+      castShadow
       onClick={(e) => {
         e.stopPropagation();
         onSelect();
@@ -297,8 +344,8 @@ function PipeRun({
       <cylinderGeometry args={[r, r, len, 12]} />
       <meshStandardMaterial
         color={color}
-        roughness={0.5}
-        metalness={0.25}
+        roughness={0.35}
+        metalness={0.6}
         emissive={selected ? '#7a5a1f' : '#000000'}
         emissiveIntensity={selected ? 0.4 : 0}
       />
@@ -505,7 +552,7 @@ export function countPartProvenance(
 /* --------------------------------------------------------------- scenes */
 
 function BuildingScene({
-  meshes,
+  geo,
   selectedRoomId,
   centerX,
   centerZ,
@@ -517,7 +564,7 @@ function BuildingScene({
   onSelectNode,
   onSelectSegment,
 }: {
-  meshes: BuildingMeshes;
+  geo: Building3dGeo;
   selectedRoomId: string | null;
   centerX: number;
   centerZ: number;
@@ -530,28 +577,52 @@ function BuildingScene({
   onSelectSegment: (id: string) => void;
 }): ReactElement {
   const span = useMemo(() => {
-    const s = Math.max(meshes.bounds.widthFt, meshes.bounds.depthFt, 10);
+    const s = Math.max(geo.bounds.widthFt, geo.bounds.depthFt, 10);
     return Math.ceil(s * 1.4);
-  }, [meshes.bounds.widthFt, meshes.bounds.depthFt]);
+  }, [geo.bounds.widthFt, geo.bounds.depthFt]);
 
   return (
     <>
       <color attach="background" args={[colors.ground3d]} />
-      <ambientLight intensity={0.85} />
-      <directionalLight position={[span * 0.6, span, span * 0.5]} intensity={1.2} castShadow />
-      <hemisphereLight args={['#cdd6e0', '#0e1318', 0.4]} />
+      {/* Sky/ground fill + a single shadow-casting key light sized to the building. */}
+      <hemisphereLight args={['#dbe4ee', '#23282e', 0.75]} />
+      <directionalLight
+        position={[span * 0.6, span * 1.1, span * 0.45]}
+        intensity={1.5}
+        castShadow
+        shadow-mapSize-width={2048}
+        shadow-mapSize-height={2048}
+        shadow-camera-left={-span}
+        shadow-camera-right={span}
+        shadow-camera-top={span}
+        shadow-camera-bottom={-span}
+        shadow-camera-near={0.5}
+        shadow-camera-far={span * 4}
+      />
 
-      {meshes.floors.map((floor) => (
-        <FloorSlab key={floor.roomId} floor={floor} selected={floor.roomId === selectedRoomId} />
+      {/* Per-room floor + ceiling slabs. NO rooms -> NO slabs (honest skip). */}
+      {geo.slabs.map((slab) => (
+        <RoomSlab key={slab.roomId} slab={slab} selected={slab.roomId === selectedRoomId} />
       ))}
 
-      {meshes.walls.map((w) =>
-        w.geometry ? (
-          <mesh key={w.wallId} geometry={w.geometry} castShadow receiveShadow>
-            <meshStandardMaterial color="#7d8a9a" roughness={0.85} metalness={0.08} />
-          </mesh>
-        ) : null,
+      {/* ALL walls as ONE merged solid geometry (single draw call). */}
+      {geo.wallGeometry && (
+        <mesh geometry={geo.wallGeometry} castShadow receiveShadow>
+          <meshStandardMaterial color={WALL_COLOR} roughness={0.9} metalness={0} />
+        </mesh>
       )}
+
+      {/* Soft grounding shadow under the building (baked once — lights only,
+          no network-fetched environment maps; tests run offline). */}
+      <ContactShadows
+        position={[0, -0.55, 0]}
+        scale={span * 2.2}
+        opacity={0.45}
+        blur={2.5}
+        far={Math.max(20, span)}
+        resolution={512}
+        frames={1}
+      />
 
       <PartsLayer
         nodes={network.nodes}
@@ -603,8 +674,8 @@ function GroundScene({
   return (
     <>
       <color attach="background" args={[colors.ground3d]} />
-      <ambientLight intensity={0.6} />
-      <directionalLight position={[8, 14, 6]} intensity={1.1} />
+      <hemisphereLight args={['#dbe4ee', '#23282e', 0.6]} />
+      <directionalLight position={[8, 14, 6]} intensity={1.1} castShadow />
 
       <PartsLayer
         nodes={network.nodes}
@@ -635,15 +706,43 @@ function GroundScene({
   );
 }
 
-/** Compute the camera position framing the building bounds (or a default). */
-function cameraFor(meshes: BuildingMeshes | null): {
+/** Bounds (ft) of the sprinkler network nodes — the camera fallback when a
+ * kernel import carries a SYSTEM but no building shell. */
+function networkSpanFt(nodes: Node[]): { span: number; cx: number; cz: number } | null {
+  if (nodes.length === 0) return null;
+  let minX = Infinity;
+  let maxX = -Infinity;
+  let minZ = Infinity;
+  let maxZ = -Infinity;
+  for (const n of nodes) {
+    if (n.pos.x < minX) minX = n.pos.x;
+    if (n.pos.x > maxX) maxX = n.pos.x;
+    if (n.pos.z < minZ) minZ = n.pos.z;
+    if (n.pos.z > maxZ) maxZ = n.pos.z;
+  }
+  const span = Math.max(maxX - minX, maxZ - minZ, 10);
+  return { span, cx: (minX + maxX) / 2, cz: (minZ + maxZ) / 2 };
+}
+
+/** Compute the camera position framing the building bounds, else the network,
+ * else a default. */
+function cameraFor(
+  geo: Building3dGeo | null,
+  net?: { span: number; cx: number; cz: number } | null,
+): {
   position: [number, number, number];
   fov: number;
 } {
-  if (!meshes || (meshes.bounds.widthFt === 0 && meshes.bounds.depthFt === 0)) {
+  if (!geo || (geo.bounds.widthFt === 0 && geo.bounds.depthFt === 0)) {
+    if (net) {
+      return {
+        position: [net.cx + net.span * 0.85, net.span * 0.9, net.cz + net.span * 0.85],
+        fov: 50,
+      };
+    }
     return { position: [12, 10, 12], fov: 45 };
   }
-  const span = Math.max(meshes.bounds.widthFt, meshes.bounds.depthFt, 10);
+  const span = Math.max(geo.bounds.widthFt, geo.bounds.depthFt, 10);
   return { position: [span * 0.85, span * 0.9, span * 0.85], fov: 50 };
 }
 
@@ -690,17 +789,28 @@ export function Viewer3D(): ReactElement {
 
   const bounds = useMemo(() => buildingBoundsFt(project.building), [project.building]);
 
-  const meshes = useMemo<BuildingMeshes | null>(() => {
+  // PURE composition (building-mesh.ts) -> THREE geometries. One merged wall
+  // geometry + per-room floor/ceiling slabs. Wall thickness comes from
+  // wall.thicknessFt when present (else the documented 0.5 ft default); wall
+  // height resolves to the enclosing room's ceilingHt else the project default.
+  const geo = useMemo<Building3dGeo | null>(() => {
     if (!loaded) return null;
-    return buildBuildingMeshes(project.building, {
-      ceilingHt: project.hazardDefaults.defaultCeilingHt,
-      levels: project.levels.map((l) => ({
-        id: l.id,
-        name: l.name,
-        elevationFt: l.elevationFt,
-      })),
+    const data = buildingToMeshData(project.building, {
+      defaultCeilingHt: project.hazardDefaults.defaultCeilingHt,
     });
-  }, [loaded, project.building, project.hazardDefaults.defaultCeilingHt, project.levels]);
+    return {
+      backend: data.backend,
+      bounds: data.bounds,
+      wallGeometry: toBufferGeometry(data.walls),
+      wallCount: data.walls.wallCount,
+      slabs: data.slabs.map((s) => ({
+        roomId: s.roomId,
+        ceilingHt: s.ceilingHt,
+        floor: toBufferGeometry(s.floor),
+        ceiling: toBufferGeometry(s.ceiling),
+      })),
+    };
+  }, [loaded, project.building, project.hazardDefaults.defaultCeilingHt]);
 
   // Honest provenance counts (resolution-based; recomputed when network/manifests change).
   const provCounts = useMemo(
@@ -710,8 +820,8 @@ export function Viewer3D(): ReactElement {
 
   // Publish a small honest 3D + provenance snapshot for the preview harness.
   useEffect(() => {
-    publish3dWindow(meshes, heads.length, provCounts);
-  }, [meshes, heads.length, provCounts]);
+    publish3dWindow(geo, heads.length, provCounts);
+  }, [geo, heads.length, provCounts]);
 
   useEffect(() => {
     if (!gl) return;
@@ -721,7 +831,9 @@ export function Viewer3D(): ReactElement {
     return () => cancelAnimationFrame(id);
   }, [gl]);
 
-  const cam = useMemo(() => cameraFor(meshes), [meshes]);
+  const netSpan = useMemo(() => networkSpanFt(project.network.nodes), [project.network.nodes]);
+  const hasSystem = project.network.nodes.length > 0 || project.network.segments.length > 0;
+  const cam = useMemo(() => cameraFor(geo, netSpan), [geo, netSpan]);
 
   return (
     <div style={wrapStyle} aria-label="3D building viewer">
@@ -733,9 +845,9 @@ export function Viewer3D(): ReactElement {
           gl={{ preserveDrawingBuffer: true }}
           camera={{ position: cam.position, fov: cam.fov }}
         >
-          {meshes ? (
+          {geo ? (
             <BuildingScene
-              meshes={meshes}
+              geo={geo}
               selectedRoomId={selectedRoomId}
               centerX={bounds.cx}
               centerZ={bounds.cy}
@@ -763,13 +875,19 @@ export function Viewer3D(): ReactElement {
         <div style={{ ...wrapStyle, background: colors.ground3d }} aria-hidden="true" />
       )}
 
-      {!loaded && (
+      {!loaded && !hasSystem && (
         <div style={overlayStyle}>
           <div style={overlayBadgeStyle}>3D VIEW</div>
           <div style={overlayTitleStyle}>No building yet</div>
           <div style={overlayBodyStyle}>
             Reconstruct or import a building shell to see it here.
           </div>
+        </div>
+      )}
+      {!loaded && hasSystem && (
+        <div style={systemOnlyHintStyle}>
+          System only — no building shell in this file. Import or trace the plan
+          sheets to add the architecture.
         </div>
       )}
     </div>
@@ -784,17 +902,17 @@ export function Viewer3D(): ReactElement {
  * from the resolver (real STEP body vs amber proxy).
  */
 function publish3dWindow(
-  meshes: BuildingMeshes | null,
+  geo: Building3dGeo | null,
   headCount: number,
   prov: { realGeometryPartCount: number; proxyPartCount: number },
 ): void {
   if (typeof window === 'undefined') return;
   const prev = window.__cad;
   const next = {
-    has3DBuilding: meshes !== null,
-    buildingBackend: meshes?.backend ?? null,
-    floorCount: meshes?.floors.length ?? 0,
-    wallCount: meshes?.walls.length ?? 0,
+    has3DBuilding: geo !== null,
+    buildingBackend: geo?.backend ?? null,
+    floorCount: geo?.slabs.filter((s) => s.floor !== null).length ?? 0,
+    wallCount: geo?.wallCount ?? 0,
     headCount3d: headCount,
     realGeometryPartCount: prov.realGeometryPartCount,
     proxyPartCount: prov.proxyPartCount,
@@ -845,4 +963,19 @@ const overlayTitleStyle: CSSProperties = {
 const overlayBodyStyle: CSSProperties = {
   color: colors.textMuted,
   fontSize: typeScale.sm.size,
+};
+
+/** Corner hint when a SYSTEM renders without a building shell (kernel imports). */
+const systemOnlyHintStyle: CSSProperties = {
+  position: 'absolute',
+  left: 12,
+  bottom: 12,
+  maxWidth: 360,
+  background: 'rgba(20, 24, 32, 0.85)',
+  border: `1px solid ${colors.border}`,
+  borderRadius: radii.md,
+  color: colors.textSecondary,
+  fontSize: typeScale.xs.size,
+  padding: `${spacing[1]} ${spacing[2]}`,
+  pointerEvents: 'none',
 };
