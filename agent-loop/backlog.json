@@ -361,7 +361,7 @@
     {
       "id": "W4C-fitting-orient",
       "title": "3D > Fitting orientation at junctions (pure quaternion math)",
-      "status": "pending",
+      "status": "blocked",
       "phase": "wave4-3d",
       "write_roots": [
         "apps/cad/src/lib",
@@ -373,8 +373,9 @@
         "apps/cad/test/fitting-orient.test.ts"
       ],
       "gate": "cd apps/cad && npx tsc -b && npx vitest run test/fitting-orient.test.ts",
-      "attempts": 0,
-      "spec": "Pure orientation solver: given the unit directions of pipes meeting at a junction, compute the Y-up Euler rotation to place a fitting STEP body (modeled with primary run along +X, branch along +Z). Exports (exact): export interface V3{x:number;y:number;z:number} export function normalize(v:V3):V3 \u2014 throws on zero-length. export function elbowRotationY(dirA:V3,dirB:V3):number \u2014 both dirs in the horizontal plane (y component must be <0.01 in magnitude after normalize, else throw 'non-horizontal'): returns the rotation (radians, about world Y) that aligns the elbow's +X leg with dirA; computed as atan2(-dirA.z, dirA.x). export function teeRotationY(runDir:V3,branchDir:V3):number \u2014 aligns the tee run (+X) with runDir using the same atan2; throws when branchDir is parallel to runDir (|dot|>0.99 after normalize). export function isOrthogonal(a:V3,b:V3,tolDeg?:number):boolean \u2014 angle within tolDeg (default 5) of 90 degrees. Tests: dirA=+X -> rotation 0; dirA=+Z -> rotation -PI/2 (toBeCloseTo); dirA=-X -> PI (or -PI, assert abs==PI closeTo); tee with run +X branch +Z passes isOrthogonal and rotation 0; parallel branch throws; non-horizontal throws; normalize throws on zero vector."
+      "attempts": 6,
+      "spec": "Pure orientation solver: given the unit directions of pipes meeting at a junction, compute the Y-up Euler rotation to place a fitting STEP body (modeled with primary run along +X, branch along +Z). Exports (exact): export interface V3{x:number;y:number;z:number} export function normalize(v:V3):V3 \u2014 throws on zero-length. export function elbowRotationY(dirA:V3,dirB:V3):number \u2014 both dirs in the horizontal plane (y component must be <0.01 in magnitude after normalize, else throw 'non-horizontal'): returns the rotation (radians, about world Y) that aligns the elbow's +X leg with dirA; computed as atan2(-dirA.z, dirA.x). export function teeRotationY(runDir:V3,branchDir:V3):number \u2014 aligns the tee run (+X) with runDir using the same atan2; throws when branchDir is parallel to runDir (|dot|>0.99 after normalize). export function isOrthogonal(a:V3,b:V3,tolDeg?:number):boolean \u2014 angle within tolDeg (default 5) of 90 degrees. Tests: dirA=+X -> rotation 0; dirA=+Z -> rotation -PI/2 (toBeCloseTo); dirA=-X -> PI (or -PI, assert abs==PI closeTo); tee with run +X branch +Z passes isOrthogonal and rotation 0; parallel branch throws; non-horizontal throws; normalize throws on zero vector.",
+      "last_error": "ValueError: your files[] is missing required file(s): apps/cad/test/fitting-orient.test.ts \u2014 emit ALL required files as {\"path\", \"content\"} objects."
     }
   ]
 }
