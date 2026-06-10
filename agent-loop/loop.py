@@ -36,6 +36,9 @@ OLLAMA_URL = "http://127.0.0.1:11434/api/chat"
 # Canonical model is qwen3:30b-a3b (hal-vault LOCAL_LLM.md). The env override
 # exists ONLY for documented benchmarks of candidate executors — never cloud.
 MODEL = os.environ.get("HALOFIRE_LOOP_MODEL", "qwen3:30b-a3b")
+# Tier-1.5: a BIGGER local coder tried ONCE before a task blocks for cloud
+# escalation. Empty = disabled. Set after a documented bench (LOCAL_LLM.md).
+ESCALATION_MODEL = os.environ.get("HALOFIRE_ESCALATION_MODEL", "")
 NUM_CTX = 12288                   # default 40960 crashes this GPU (CUDA INT_MAX)
 MAX_OUTPUT_TOKENS = 8192
 MAX_ATTEMPTS = 4  # attempts are local-only (free); only wall-clock is spent
@@ -122,12 +125,12 @@ def extract_json(text: str) -> dict:
         )
 
 
-def call_qwen(prompt: str, system: str = SYSTEM_PROMPT) -> dict:
+def call_qwen(prompt: str, system: str = SYSTEM_PROMPT, model: str = "") -> dict:
     """One JSON-forced chat call to local Ollama. Raises on transport/parse error.
     think:false — qwen3 is a thinking model; with thinking on, the budget can be
     consumed by the think block and the JSON content comes back empty/truncated."""
     body = json.dumps({
-        "model": MODEL,
+        "model": model or MODEL,
         "stream": False,
         "format": "json",
         "think": False,
@@ -138,7 +141,8 @@ def call_qwen(prompt: str, system: str = SYSTEM_PROMPT) -> dict:
         ],
     }).encode("utf-8")
     req = urllib.request.Request(OLLAMA_URL, data=body, headers={"Content-Type": "application/json"})
-    raw = urllib.request.urlopen(req, timeout=1800).read()
+    # 72B escalation generates at ~3 tok/s — give the big model a longer leash.
+    raw = urllib.request.urlopen(req, timeout=3600 if model else 1800).read()
     content = json.loads(raw)["message"]["content"]
     return extract_json(content)
 
@@ -354,12 +358,19 @@ def process_task(task: dict, dry_run: bool, backlog_data: dict | None = None) ->
     log(f"=== task {task['id']}: {task['title']} ===")
     error_tail: str | None = None
     verifier_rejections = 0
-    for attempt in range(1, MAX_ATTEMPTS + 1):
+    total_attempts = MAX_ATTEMPTS + (1 if ESCALATION_MODEL else 0)
+    for attempt in range(1, total_attempts + 1):
+        # Tier-1.5: the FINAL attempt (when configured) uses the bigger local
+        # coder — one shot before the task blocks for cloud escalation.
+        attempt_model = ESCALATION_MODEL if attempt > MAX_ATTEMPTS else ""
         task["attempts"] = task.get("attempts", 0) + 1
-        log(f"attempt {attempt}/{MAX_ATTEMPTS} (qwen call)...")
+        if attempt_model:
+            log(f"attempt {attempt}/{total_attempts} — TIER-1.5 escalation ({attempt_model})...")
+        else:
+            log(f"attempt {attempt}/{total_attempts} (qwen call)...")
         written: list[Path] = []
         try:
-            out = call_qwen(build_prompt(task, error_tail))
+            out = call_qwen(build_prompt(task, error_tail), model=attempt_model)
             raw = out.get("files", [])
             # Tolerate stray non-file entries (the model sometimes leaks "notes"
             # strings into files[]) — keep only well-formed file objects.
@@ -425,7 +436,7 @@ def process_task(task: dict, dry_run: bool, backlog_data: dict | None = None) ->
             sha = commit_and_push(task, written)
             task["commit"] = sha
             log(f"  ✅ GATES GREEN + VERIFIED — committed {sha}")
-            append_lesson(f"DONE {task['id']} on attempt {attempt} (model {MODEL}).")
+            append_lesson(f"DONE {task['id']} on attempt {attempt} (model {attempt_model or MODEL}).")
             brain_remember(
                 f"agent-loop DONE {task['id']} ({task['title']}) commit {sha}; "
                 f"gates green + spec-verified on attempt {attempt}."
