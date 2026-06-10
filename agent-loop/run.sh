@@ -8,7 +8,9 @@ LOCK="/tmp/halofire-agent-loop.lock"
 MAX_TASKS="${MAX_TASKS:-2}"
 # Tier-1.5 local escalation coder (benched 3.0 tok/s on GB10 — see LOCAL_LLM.md);
 # one unattended shot per blocked task before cloud escalation. Override to "" to disable.
-export HALOFIRE_ESCALATION_MODEL="${HALOFIRE_ESCALATION_MODEL:-kimi-dev:72b}"
+export HALOFIRE_ESCALATION_MODELS="${HALOFIRE_ESCALATION_MODELS:-gemma4:26b-a4b-it-qat,kimi-dev:72b}"
+# Cross-family verifier (Google QAT Gemma judges Qwen-built code).
+export HALOFIRE_VERIFIER_MODEL="${HALOFIRE_VERIFIER_MODEL:-gemma4:26b-a4b-it-qat}"
 
 exec 9>"$LOCK"
 if ! flock -n 9; then
