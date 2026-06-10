@@ -51,7 +51,10 @@ module and its vitest test file. Rules:
 - tsconfig is STRICT (noUnusedLocals/noUnusedParameters): never import or declare \
 anything you do not use — including type-only imports in tests.
 - Never assign to a const; declare mutable values with let.
-- Use Number.isFinite for numeric validation; throw new Error('<clear message>')."""
+- Use Number.isFinite for numeric validation; throw new Error('<clear message>').
+- In tests, assert throw cases with expect(() => ...).toThrow() and NO message \
+argument, unless the spec pins an exact message. Never invent a message string \
+in a test that your implementation file does not literally throw."""
 
 
 def log(msg: str) -> None:
