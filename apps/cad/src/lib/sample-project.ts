@@ -14,7 +14,7 @@
 // HONESTY: this is SAMPLE/EXAMPLE data, not a survey, not a real building, not an
 // AHJ/PE selection. The labels carry that disclaimer so the UI can surface it.
 
-import { emptyProject, makeId, type Project, type Room } from './model';
+import { emptyProject, makeId, type Project, type Room, type Wall } from './model';
 
 /** A human-visible marker that brands the sample so it reads as example data. */
 export const SAMPLE_PROJECT_NAME = 'Sample Project (example data)';
@@ -63,6 +63,22 @@ export function buildSampleProject(): Project {
     ],
   };
 
+  // Perimeter walls derived from each room polygon — the rooms ARE the example
+  // geometry, so enclosing them is honest derived data (not an invented plan).
+  // Without these the 3D view showed floating slabs with no shell.
+  const walls: Wall[] = [];
+  let wallSeed = 100;
+  for (const room of [zoneA, zoneB]) {
+    const pts = room.polygon;
+    for (let i = 0; i < pts.length; i++) {
+      walls.push({
+        id: makeId('wall', wallSeed++),
+        start: pts[i],
+        end: pts[(i + 1) % pts.length],
+      });
+    }
+  }
+
   return {
     ...base,
     name: SAMPLE_PROJECT_NAME,
@@ -70,7 +86,7 @@ export function buildSampleProject(): Project {
       ...base.building,
       scaleFtPerUnit,
       source: 'manual',
-      walls: [],
+      walls,
       rooms: [zoneA, zoneB],
     },
   };

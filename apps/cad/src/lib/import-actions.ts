@@ -61,7 +61,13 @@ export function importDxfText(
       parsed,
     };
   }
-  const walls: Wall[] = wallCandidates(parsed);
+  // KERNEL layers carry SYSTEM geometry (pipes/heads), never architecture —
+  // excluding them prevents pipe runs becoming fake 10-ft wall fins in 3D.
+  const isKernel = parsed.layers.includes(KERNEL_PIPE_LAYER) || parsed.layers.includes(KERNEL_HEAD_LAYER);
+  const wallSource = isKernel
+    ? { ...parsed, lines: parsed.lines.filter((l) => l.layer !== KERNEL_PIPE_LAYER && l.layer !== KERNEL_HEAD_LAYER) }
+    : parsed;
+  const walls: Wall[] = wallCandidates(wallSource);
   const building: Building = {
     walls,
     rooms: [],
@@ -90,7 +96,10 @@ export function importDxfText(
     });
     kernelNote =
       ` — KERNEL design detected: ${kernelNetwork.headCount} heads, ` +
-      `${kernelNetwork.segments.length} pipes (predecessor-engine geometry)`;
+      `${kernelNetwork.segments.length} pipes (predecessor-engine geometry)` +
+      (walls.length === 0
+        ? '. No architectural linework in this file — import/trace the building from the plan sheets.'
+        : '');
   }
   return {
     ok: true,

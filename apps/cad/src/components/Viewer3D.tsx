@@ -53,7 +53,7 @@ import {
 } from '../lib/part-geometry';
 import { loadBuild123dManifest, type Build123dManifest } from '../../../studio/src/lib/build123d-parts';
 import { loadManufacturerStepManifest, type ManufacturerStepManifest } from '../../../studio/src/lib/manufacturer-step';
-import { colors, spacing, typeScale } from '../lib/tokens';
+import { colors, radii, spacing, typeScale } from '../lib/tokens';
 
 /** True when a WebGL context can be created (false in jsdom / headless-no-GL). */
 function webglAvailable(): boolean {
@@ -706,12 +706,40 @@ function GroundScene({
   );
 }
 
-/** Compute the camera position framing the building bounds (or a default). */
-function cameraFor(geo: Building3dGeo | null): {
+/** Bounds (ft) of the sprinkler network nodes — the camera fallback when a
+ * kernel import carries a SYSTEM but no building shell. */
+function networkSpanFt(nodes: Node[]): { span: number; cx: number; cz: number } | null {
+  if (nodes.length === 0) return null;
+  let minX = Infinity;
+  let maxX = -Infinity;
+  let minZ = Infinity;
+  let maxZ = -Infinity;
+  for (const n of nodes) {
+    if (n.pos.x < minX) minX = n.pos.x;
+    if (n.pos.x > maxX) maxX = n.pos.x;
+    if (n.pos.z < minZ) minZ = n.pos.z;
+    if (n.pos.z > maxZ) maxZ = n.pos.z;
+  }
+  const span = Math.max(maxX - minX, maxZ - minZ, 10);
+  return { span, cx: (minX + maxX) / 2, cz: (minZ + maxZ) / 2 };
+}
+
+/** Compute the camera position framing the building bounds, else the network,
+ * else a default. */
+function cameraFor(
+  geo: Building3dGeo | null,
+  net?: { span: number; cx: number; cz: number } | null,
+): {
   position: [number, number, number];
   fov: number;
 } {
   if (!geo || (geo.bounds.widthFt === 0 && geo.bounds.depthFt === 0)) {
+    if (net) {
+      return {
+        position: [net.cx + net.span * 0.85, net.span * 0.9, net.cz + net.span * 0.85],
+        fov: 50,
+      };
+    }
     return { position: [12, 10, 12], fov: 45 };
   }
   const span = Math.max(geo.bounds.widthFt, geo.bounds.depthFt, 10);
@@ -803,7 +831,9 @@ export function Viewer3D(): ReactElement {
     return () => cancelAnimationFrame(id);
   }, [gl]);
 
-  const cam = useMemo(() => cameraFor(geo), [geo]);
+  const netSpan = useMemo(() => networkSpanFt(project.network.nodes), [project.network.nodes]);
+  const hasSystem = project.network.nodes.length > 0 || project.network.segments.length > 0;
+  const cam = useMemo(() => cameraFor(geo, netSpan), [geo, netSpan]);
 
   return (
     <div style={wrapStyle} aria-label="3D building viewer">
@@ -845,13 +875,19 @@ export function Viewer3D(): ReactElement {
         <div style={{ ...wrapStyle, background: colors.ground3d }} aria-hidden="true" />
       )}
 
-      {!loaded && (
+      {!loaded && !hasSystem && (
         <div style={overlayStyle}>
           <div style={overlayBadgeStyle}>3D VIEW</div>
           <div style={overlayTitleStyle}>No building yet</div>
           <div style={overlayBodyStyle}>
             Reconstruct or import a building shell to see it here.
           </div>
+        </div>
+      )}
+      {!loaded && hasSystem && (
+        <div style={systemOnlyHintStyle}>
+          System only — no building shell in this file. Import or trace the plan
+          sheets to add the architecture.
         </div>
       )}
     </div>
@@ -927,4 +963,19 @@ const overlayTitleStyle: CSSProperties = {
 const overlayBodyStyle: CSSProperties = {
   color: colors.textMuted,
   fontSize: typeScale.sm.size,
+};
+
+/** Corner hint when a SYSTEM renders without a building shell (kernel imports). */
+const systemOnlyHintStyle: CSSProperties = {
+  position: 'absolute',
+  left: 12,
+  bottom: 12,
+  maxWidth: 360,
+  background: 'rgba(20, 24, 32, 0.85)',
+  border: `1px solid ${colors.border}`,
+  borderRadius: radii.md,
+  color: colors.textSecondary,
+  fontSize: typeScale.xs.size,
+  padding: `${spacing[1]} ${spacing[2]}`,
+  pointerEvents: 'none',
 };
