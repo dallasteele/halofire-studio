@@ -239,7 +239,7 @@
     {
       "id": "W3A-pipe-sizing",
       "title": "Auto Draw > Auto Size (schedule pipe sizing)",
-      "status": "pending",
+      "status": "done",
       "phase": "wave3",
       "write_roots": [
         "apps/cad/src/lib",
@@ -253,8 +253,9 @@
         "apps/cad/test/pipe-sizing.test.ts"
       ],
       "gate": "cd apps/cad && npx tsc -b && npx vitest run test/pipe-sizing.test.ts",
-      "attempts": 0,
-      "spec": "Pure pipe schedule sizing: pick the smallest nominal size whose velocity stays within a limit for a given flow. Use EXACTLY these SCH40 internal diameters (in): 1->1.049,1.25->1.380,1.5->1.610,2->2.067,2.5->2.469,3->3.068,4->4.026,6->6.065,8->7.981. Velocity ft/s = 0.4085*gpm/(idIn^2) (the standard V=0.4085*Q/d^2 with d in inches). Exports (exact): export const SCH40_ID_IN: Record<number,number>; export const NOMINAL_SIZES_IN: number[] (ascending: 1,1.25,1.5,2,2.5,3,4,6,8); export function velocityFps(gpm:number, nominalIn:number): number \u2014 throws on unknown nominal or non-finite/negative gpm; export interface SizePick { nominalIn:number; velocityFps:number; withinLimit:boolean } export function pickPipeSize(gpm:number, maxVelocityFps:number): SizePick \u2014 smallest nominal whose velocity<=maxVelocityFps; if none qualifies return the LARGEST (8) with withinLimit:false; throws on non-finite/non-positive maxVelocityFps or negative gpm. Tests: velocityFps(100,2)=0.4085*100/(2.067^2)=~9.56 (toBeCloseTo 2); pickPipeSize(100,10) picks 2 (9.56<=10) withinLimit true; pickPipeSize(20,10) picks 1; a huge flow returns 8 withinLimit false; throws (unknown nominal, negative gpm, maxVelocity 0)."
+      "attempts": 2,
+      "spec": "Pure pipe schedule sizing: pick the smallest nominal size whose velocity stays within a limit for a given flow. Use EXACTLY these SCH40 internal diameters (in): 1->1.049,1.25->1.380,1.5->1.610,2->2.067,2.5->2.469,3->3.068,4->4.026,6->6.065,8->7.981. Velocity ft/s = 0.4085*gpm/(idIn^2) (the standard V=0.4085*Q/d^2 with d in inches). Exports (exact): export const SCH40_ID_IN: Record<number,number>; export const NOMINAL_SIZES_IN: number[] (ascending: 1,1.25,1.5,2,2.5,3,4,6,8); export function velocityFps(gpm:number, nominalIn:number): number \u2014 throws on unknown nominal or non-finite/negative gpm; export interface SizePick { nominalIn:number; velocityFps:number; withinLimit:boolean } export function pickPipeSize(gpm:number, maxVelocityFps:number): SizePick \u2014 smallest nominal whose velocity<=maxVelocityFps; if none qualifies return the LARGEST (8) with withinLimit:false; throws on non-finite/non-positive maxVelocityFps or negative gpm. Tests: velocityFps(100,2)=0.4085*100/(2.067^2)=~9.56 (toBeCloseTo 2); pickPipeSize(100,10) picks 2 (9.56<=10) withinLimit true; pickPipeSize(20,10) picks 1; a huge flow returns 8 withinLimit false; throws (unknown nominal, negative gpm, maxVelocity 0).",
+      "completed_at": "2026-06-10T14:11:57+00:00"
     },
     {
       "id": "W3B-fitting-le",
