@@ -462,7 +462,7 @@ def main() -> int:
         run(f"git checkout {AGENT_BRANCH}")
         run(f"git pull --rebase origin {AGENT_BRANCH}", timeout=300)
     # Absorb upstream harness/spec fixes from main on every run.
-    run("git merge --no-edit origin/main", timeout=120)
+    run("git merge --no-edit -X theirs origin/main", timeout=120)
 
     data = load_backlog()
     pending = [t for t in data["tasks"] if t["status"] == "pending"]
