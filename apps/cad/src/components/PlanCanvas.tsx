@@ -33,6 +33,14 @@ import {
   type SegmentRole,
 } from '../lib/model';
 import { measureFeet, polygonAreaSqFt, setScaleFromTwoPoints } from '../lib/scale';
+import {
+  makeCircle,
+  makeLine,
+  makePoint,
+  makePolyline,
+  makeRectangle,
+  type DrawingElement,
+} from '../lib/drawing-elements';
 import { SAMPLE_PROJECT_NAME } from '../lib/sample-project';
 import { coverageReport } from '../lib/head-layout';
 import { pressureColor, pressureRange, type HydraulicsResult } from '../lib/hydraulics';
@@ -155,6 +163,84 @@ const FITTING_GLYPH: Record<string, string> = {
   SOURCE: '◈', // riser diamond
 };
 
+/** Screen-space corner loop for a rectangle preview given two opposite corners. */
+function rectScreenPoints(
+  a: Point2,
+  b: Point2,
+  toScreen: (p: Point2) => { sx: number; sy: number },
+): number[] {
+  const corners: Point2[] = [
+    { x: a.x, y: a.y },
+    { x: b.x, y: a.y },
+    { x: b.x, y: b.y },
+    { x: a.x, y: b.y },
+  ];
+  return corners.flatMap((c) => {
+    const s = toScreen(c);
+    return [s.sx, s.sy];
+  });
+}
+
+/**
+ * Render one committed annotation element (T29-T34) in screen space. Circles
+ * stay true circles because the fit transform is uniform; arcs are sampled as
+ * polylines so they are exact under the y-flip without konva angle gymnastics.
+ */
+function renderAnnotation(
+  el: DrawingElement,
+  toScreen: (p: Point2) => { sx: number; sy: number },
+  pxPerUnit: number,
+): ReactElement | null {
+  const stroke = colors.accentText;
+  switch (el.kind) {
+    case 'line': {
+      const a = toScreen(el.a);
+      const b = toScreen(el.b);
+      return <Line key={el.id} points={[a.sx, a.sy, b.sx, b.sy]} stroke={stroke} strokeWidth={1.5} />;
+    }
+    case 'polyline': {
+      const pts = el.points.flatMap((p) => {
+        const s = toScreen(p);
+        return [s.sx, s.sy];
+      });
+      return <Line key={el.id} points={pts} stroke={stroke} strokeWidth={1.5} />;
+    }
+    case 'circle': {
+      const c = toScreen(el.center);
+      return (
+        <Circle key={el.id} x={c.sx} y={c.sy} radius={el.radiusFt * pxPerUnit} stroke={stroke} strokeWidth={1.5} />
+      );
+    }
+    case 'rectangle': {
+      const a = el.corner;
+      const b = { x: a.x + el.widthFt, y: a.y + el.heightFt };
+      return <Line key={el.id} points={rectScreenPoints(a, b, toScreen)} closed stroke={stroke} strokeWidth={1.5} />;
+    }
+    case 'arc': {
+      // Sample the arc into a polyline — exact under any uniform transform/flip.
+      const sweep = (el.endDeg - el.startDeg + 360) % 360;
+      const steps = 32;
+      const pts: number[] = [];
+      for (let i = 0; i <= steps; i++) {
+        const deg = el.startDeg + (sweep * i) / steps;
+        const rad = (deg * Math.PI) / 180;
+        const s = toScreen({
+          x: el.center.x + el.radiusFt * Math.cos(rad),
+          y: el.center.y + el.radiusFt * Math.sin(rad),
+        });
+        pts.push(s.sx, s.sy);
+      }
+      return <Line key={el.id} points={pts} stroke={stroke} strokeWidth={1.5} />;
+    }
+    case 'point': {
+      const s = toScreen(el.at);
+      return <Circle key={el.id} x={s.sx} y={s.sy} radius={3} fill={stroke} />;
+    }
+    default:
+      return null;
+  }
+}
+
 export function PlanCanvas(): ReactElement {
   const wrapRef = useRef<HTMLDivElement | null>(null);
   const [size, setSize] = useState<Size>({ w: 0, h: 0 });
@@ -171,6 +257,7 @@ export function PlanCanvas(): ReactElement {
   const autoLayoutRoom = useCadStore((s) => s.autoLayoutRoom);
   const routeSystem = useCadStore((s) => s.routeSystem);
   const moveNode = useCadStore((s) => s.moveNode);
+  const addAnnotation = useCadStore((s) => s.addAnnotation);
   const select = useCadStore((s) => s.select);
   const selectedNodeId = useCadStore((s) => s.selection.selectedNodeId);
   const selectedSegmentId = useCadStore((s) => s.selection.selectedSegmentId);
@@ -247,6 +334,10 @@ export function PlanCanvas(): ReactElement {
   const [scalePts, setScalePts] = useState<Point2[]>([]);
   const [wallPts, setWallPts] = useState<Point2[]>([]);
   const [roomPts, setRoomPts] = useState<Point2[]>([]);
+  // T29-T34 draw tools: first click of a 2-click tool (line/circle/rect), and the
+  // accumulated polyline points (double-click commits).
+  const [drawPt, setDrawPt] = useState<Point2 | null>(null);
+  const [polyPts, setPolyPts] = useState<Point2[]>([]);
   const [hazard, setHazard] = useState<HazardClass>('ORDINARY_1');
   const [cursor, setCursor] = useState<Point2 | null>(null);
   const [statusMsg, setStatusMsg] = useState<string | null>(null);
@@ -275,6 +366,8 @@ export function PlanCanvas(): ReactElement {
     setScalePts([]);
     setWallPts([]);
     setRoomPts([]);
+    setDrawPt(null);
+    setPolyPts([]);
     setScalePrompt(null);
     setScaleInput('');
   }, [activeTool]);
@@ -370,8 +463,15 @@ export function PlanCanvas(): ReactElement {
     return toPlan(pos.x, pos.y);
   }
 
+  const isDrawTool =
+    activeTool === 'draw-line' ||
+    activeTool === 'draw-polyline' ||
+    activeTool === 'draw-circle' ||
+    activeTool === 'draw-rect' ||
+    activeTool === 'draw-point';
+
   function onStageMouseMove(e: Konva.KonvaEventObject<MouseEvent>): void {
-    if (activeTool === 'set-scale' || activeTool === 'wall' || activeTool === 'room') {
+    if (activeTool === 'set-scale' || activeTool === 'wall' || activeTool === 'room' || isDrawTool) {
       setCursor(pointerPlan(e));
     }
   }
@@ -413,6 +513,50 @@ export function PlanCanvas(): ReactElement {
       return;
     }
 
+    if (activeTool === 'draw-point') {
+      addAnnotation(makePoint(makeId('ann'), p));
+      setStatusMsg(`point placed at ${(p.x * scale).toFixed(1)}, ${(p.y * scale).toFixed(1)} ft`);
+      return;
+    }
+
+    if (activeTool === 'draw-polyline') {
+      setPolyPts((prev) => [...prev, p]);
+      return;
+    }
+
+    if (activeTool === 'draw-line' || activeTool === 'draw-circle' || activeTool === 'draw-rect') {
+      if (!drawPt) {
+        setDrawPt(p);
+        return;
+      }
+      // Second click — commit via the validated drawing-elements constructor.
+      // Constructors throw on degenerate input (zero-length line, zero radius,
+      // zero-area rect); surface that honestly in the status bar instead of crashing.
+      try {
+        let el: DrawingElement;
+        if (activeTool === 'draw-line') {
+          el = makeLine(makeId('ann'), drawPt, p);
+        } else if (activeTool === 'draw-circle') {
+          const r = Math.hypot(p.x - drawPt.x, p.y - drawPt.y);
+          el = makeCircle(makeId('ann'), drawPt, r);
+        } else {
+          const corner = { x: Math.min(drawPt.x, p.x), y: Math.min(drawPt.y, p.y) };
+          el = makeRectangle(
+            makeId('ann'),
+            corner,
+            Math.abs(p.x - drawPt.x),
+            Math.abs(p.y - drawPt.y),
+          );
+        }
+        addAnnotation(el);
+        setStatusMsg(`${el.kind} added`);
+      } catch (err) {
+        setStatusMsg(err instanceof Error ? err.message : String(err));
+      }
+      setDrawPt(null);
+      return;
+    }
+
     if (activeTool === 'place-head') {
       // Convert the plan-space click (units) into building-space FEET. Heads live in
       // feet; the head Z (height) is the selected room's ceiling, else the project
@@ -434,6 +578,16 @@ export function PlanCanvas(): ReactElement {
   }
 
   function onStageDblClick(): void {
+    if (activeTool === 'draw-polyline' && polyPts.length >= 2) {
+      try {
+        addAnnotation(makePolyline(makeId('ann'), polyPts));
+        setStatusMsg(`polyline added (${polyPts.length} points)`);
+      } catch (err) {
+        setStatusMsg(err instanceof Error ? err.message : String(err));
+      }
+      setPolyPts([]);
+      return;
+    }
     if (activeTool === 'wall' && wallPts.length >= 2) {
       // Commit each consecutive segment as a Wall.
       for (let i = 0; i < wallPts.length - 1; i++) {
@@ -592,6 +746,49 @@ export function PlanCanvas(): ReactElement {
                 />
               );
             })}
+
+            {/* committed annotations (T29-T34 drawing primitives, plan units) */}
+            {(project.annotations ?? []).map((el) => renderAnnotation(el, toScreen, xform.scale))}
+
+            {/* in-progress draw-tool previews */}
+            {drawPt && cursor && activeTool === 'draw-line' && (
+              <Line
+                points={[toScreen(drawPt).sx, toScreen(drawPt).sy, toScreen(cursor).sx, toScreen(cursor).sy]}
+                stroke={colors.accentText}
+                strokeWidth={1.5}
+                dash={[6, 4]}
+              />
+            )}
+            {drawPt && cursor && activeTool === 'draw-circle' && (
+              <Circle
+                x={toScreen(drawPt).sx}
+                y={toScreen(drawPt).sy}
+                radius={Math.hypot(cursor.x - drawPt.x, cursor.y - drawPt.y) * xform.scale}
+                stroke={colors.accentText}
+                strokeWidth={1.5}
+                dash={[6, 4]}
+              />
+            )}
+            {drawPt && cursor && activeTool === 'draw-rect' && (
+              <Line
+                points={rectScreenPoints(drawPt, cursor, toScreen)}
+                closed
+                stroke={colors.accentText}
+                strokeWidth={1.5}
+                dash={[6, 4]}
+              />
+            )}
+            {polyPts.length > 0 && activeTool === 'draw-polyline' && (
+              <Line
+                points={[...polyPts, ...(cursor ? [cursor] : [])].flatMap((p) => {
+                  const s = toScreen(p);
+                  return [s.sx, s.sy];
+                })}
+                stroke={colors.accentText}
+                strokeWidth={1.5}
+                dash={[6, 4]}
+              />
+            )}
 
             {/* in-progress set-scale */}
             {scalePts.map((p, i) => {

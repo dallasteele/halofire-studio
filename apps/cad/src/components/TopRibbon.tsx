@@ -23,6 +23,7 @@ const TABS = [
   'Edit',
   'View',
   'Plan',
+  'Draw',
   'Layout',
   'Pipe',
   'Hydraulics',
@@ -34,6 +35,7 @@ type Tab = (typeof TABS)[number];
 const TAB_GROUPS: Partial<Record<Tab, ToolDef['group'][]>> = {
   Edit: ['edit'],
   Plan: ['plan'],
+  Draw: ['draw'],
   Layout: ['layout'],
   Pipe: ['pipe'],
 };

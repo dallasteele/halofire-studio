@@ -15,6 +15,7 @@ import {
   type Port,
   type PortRole,
 } from './connectivity';
+import { type DrawingElement } from './drawing-elements';
 
 // Re-export the connectivity Port shape so consumers get ONE Port type across
 // the catalog/connectivity logic and the CAD network model — they never drift.
@@ -229,6 +230,12 @@ export interface Project {
   network: SprinklerNetwork;
   /** Project-wide hazard defaults. */
   hazardDefaults: HazardDefaults;
+  /**
+   * Annotation/drawing primitives (AutoSprink Tools > Line/Polyline/Arc/Circle/
+   * Rectangle/Point) in PLAN UNITS — the same space as walls/rooms. Optional so
+   * pre-annotation project literals (tests, samples) stay valid.
+   */
+  annotations?: DrawingElement[];
 }
 
 /* ----------------------------------------------------- constructors */
@@ -264,6 +271,7 @@ export function emptyProject(name = 'Untitled Project'): Project {
       defaultClass: 'LIGHT',
       defaultCeilingHt: 10,
     },
+    annotations: [],
   };
 }
 

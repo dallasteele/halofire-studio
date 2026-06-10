@@ -18,11 +18,12 @@ import { colors, radii, spacing, typeScale } from '../lib/tokens';
 const GROUP_LABEL: Record<ToolDef['group'], string> = {
   edit: 'Edit',
   plan: 'Plan',
+  draw: 'Draw',
   layout: 'Layout',
   pipe: 'Pipe',
 };
 
-const GROUP_ORDER: ToolDef['group'][] = ['edit', 'plan', 'layout', 'pipe'];
+const GROUP_ORDER: ToolDef['group'][] = ['edit', 'plan', 'draw', 'layout', 'pipe'];
 
 export function LeftPanel(): ReactElement {
   const activeTool = useCadStore((s) => s.activeTool);

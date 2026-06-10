@@ -40,6 +40,7 @@ import {
 } from './lib/bid';
 import { buildSampleProject } from './lib/sample-project';
 import type { WaterSupply as Supply } from './lib/hydraulics';
+import type { DrawingElement } from './lib/drawing-elements';
 import {
   emptyHistory,
   record as recordHistory,
@@ -87,7 +88,12 @@ export type ToolId =
   | 'room'
   | 'place-head'
   | 'route-pipe'
-  | 'import-plan';
+  | 'import-plan'
+  | 'draw-line'
+  | 'draw-polyline'
+  | 'draw-circle'
+  | 'draw-rect'
+  | 'draw-point';
 
 /** A tool definition surfaced in the ribbon / left tool list. */
 export interface ToolDef {
@@ -95,7 +101,7 @@ export interface ToolDef {
   /** Short label shown on the button. */
   label: string;
   /** Which ribbon group this belongs to (used for layout). */
-  group: 'edit' | 'plan' | 'layout' | 'pipe';
+  group: 'edit' | 'plan' | 'layout' | 'pipe' | 'draw';
   /** One-line tooltip / aria description. */
   hint: string;
 }
@@ -116,6 +122,12 @@ export const TOOLS: readonly ToolDef[] = [
   { id: 'room', label: 'Room', group: 'plan', hint: 'Click a closed room polygon and pick a hazard class' },
   { id: 'place-head', label: 'Place Head', group: 'layout', hint: 'Place a sprinkler head (W3)' },
   { id: 'route-pipe', label: 'Route Pipe', group: 'pipe', hint: 'Route a pipe segment (W4)' },
+  // AutoSprink Tools-menu drawing primitives (T29-T34) — annotation geometry.
+  { id: 'draw-line', label: 'Line', group: 'draw', hint: 'Click two points to draw a line segment' },
+  { id: 'draw-polyline', label: 'Polyline', group: 'draw', hint: 'Click points; double-click to finish the polyline' },
+  { id: 'draw-circle', label: 'Circle', group: 'draw', hint: 'Click the center, then a point on the circle' },
+  { id: 'draw-rect', label: 'Rectangle', group: 'draw', hint: 'Click two opposite corners' },
+  { id: 'draw-point', label: 'Point', group: 'draw', hint: 'Click to place a point marker' },
 ] as const;
 
 /** Total number of tools the workspace exposes (for the preview handle). */
@@ -247,6 +259,14 @@ export interface CadState {
     hazard: HazardClass,
     extra?: { ceilingHt?: number; name?: string },
   ) => string;
+
+  /**
+   * Append one drawing/annotation element (T29-T34 primitives, plan units).
+   * Undoable. The element is pre-validated by its drawing-elements constructor.
+   */
+  addAnnotation: (el: DrawingElement) => void;
+  /** Delete one annotation by id (undoable). No-op when the id is absent. */
+  deleteAnnotation: (id: string) => void;
 
   /** Set the active head SKU id used for placement / auto-layout (null clears it). */
   setActiveHeadSku: (sku: string | null) => void;
@@ -535,6 +555,22 @@ export const useCadStore = create<CadState>((set, get) => {
     });
     return id;
   },
+
+  addAnnotation: (el) =>
+    mutate((s) => ({
+      project: {
+        ...s.project,
+        annotations: [...(s.project.annotations ?? []), el],
+      },
+    })),
+
+  deleteAnnotation: (id) =>
+    mutate((s) => {
+      const list = s.project.annotations ?? [];
+      const next = list.filter((a) => a.id !== id);
+      if (next.length === list.length) return s; // no-op: nothing recorded
+      return { project: { ...s.project, annotations: next } };
+    }),
 
   setActiveHeadSku: (sku) => set({ activeHeadSku: sku }),
 
