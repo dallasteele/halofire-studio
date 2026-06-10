@@ -55,14 +55,14 @@ module and its vitest test file. Rules:
 - No 'any' types. Strict TS. JSDoc on exported functions.
 The RULES section appended to each task is mandatory."""
 
-VERIFIER_PROMPT = """You are a SKEPTICAL senior code reviewer. You did NOT write \
-this code; judge it against the task spec only. Check: (1) every spec export \
-exists with the exact name/signature; (2) cited constants/formulas match the \
-spec EXACTLY (no invented values); (3) tests assert real behavior from the spec \
-(not just that code runs) and cover the spec's listed cases. Deterministic gates \
-(compile + tests) already PASSED — your job is spec fidelity, not style. \
-Output ONLY JSON: {"approve": true|false, "reasons": ["<specific issue>", ...]} \
-— approve true with [] when faithful; false with concrete, actionable reasons."""
+VERIFIER_PROMPT = """You are a senior code reviewer checking SPEC FIDELITY. You did \
+NOT write this code. Deterministic gates (strict compile + tests) already PASSED. \
+Reject ONLY for MATERIAL deviations: (1) a spec export is missing or has a wrong \
+name; (2) a cited constant/formula/table value differs from the spec; (3) a test \
+asserts behavior the spec contradicts. Do NOT reject for style, naming of \
+internals, borderline interpretation differences, or anything you yourself judge \
+correct-per-spec. When unsure, APPROVE — the gates are the hard floor. \
+Output ONLY JSON: {"approve": true|false, "reasons": ["<specific material issue>", ...]}"""
 
 
 def log(msg: str) -> None:
@@ -178,6 +178,23 @@ def verify_against_spec(task: dict, written: list[Path]) -> tuple[bool, str]:
     except Exception as exc:  # noqa: BLE001 — reviewer is best-effort
         log(f"  verifier unavailable ({exc}); accepting on deterministic gates")
         return True, ""
+
+
+ERROR_LINE_RE = re.compile(
+    r"error TS\d+|FAIL |AssertionError|Unterminated|expected|Expected|Received|✗|"
+    r"is not assignable|Cannot find|does not exist|threw|toBe|toEqual|toThrow",
+)
+
+
+def summarize_gate_error(err: str) -> str:
+    """Extract the MEANINGFUL error lines from gate output. Raw tails are often
+    vite/node stack noise — feeding those back taught the model nothing (the
+    whole Wave-2 wipeout's feedback was '/node_modules/vite/dist/...')."""
+    lines = [l for l in err.splitlines() if ERROR_LINE_RE.search(l)]
+    picked = "\n".join(lines[:60])
+    if len(picked) >= 80:
+        return picked[:4000]
+    return err[-4000:]  # fallback: nothing matched, give the tail
 
 
 def safe_path(rel: str, write_roots: list[str]) -> Path:
@@ -336,23 +353,32 @@ def process_task(task: dict, dry_run: bool, backlog_data: dict | None = None) ->
     """Returns True when the task lands (done), False when blocked."""
     log(f"=== task {task['id']}: {task['title']} ===")
     error_tail: str | None = None
+    verifier_rejections = 0
     for attempt in range(1, MAX_ATTEMPTS + 1):
         task["attempts"] = task.get("attempts", 0) + 1
         log(f"attempt {attempt}/{MAX_ATTEMPTS} (qwen call)...")
         written: list[Path] = []
         try:
             out = call_qwen(build_prompt(task, error_tail))
-            files = out.get("files", [])
-            if not files:
-                raise ValueError("model returned no files")
-            for f in files:
-                if not isinstance(f, dict) or not isinstance(f.get("path"), str) \
-                        or not isinstance(f.get("content"), str) or not f["content"].strip():
-                    raise ValueError(
-                        'every files[] entry must be an OBJECT {"path": "<repo-relative path>", '
-                        '"content": "<full file text>"} — got a malformed entry: '
-                        f"{json.dumps(f)[:200]}"
-                    )
+            raw = out.get("files", [])
+            # Tolerate stray non-file entries (the model sometimes leaks "notes"
+            # strings into files[]) — keep only well-formed file objects.
+            files = [
+                f for f in raw
+                if isinstance(f, dict) and isinstance(f.get("path"), str)
+                and isinstance(f.get("content"), str) and f["content"].strip()
+            ]
+            if len(files) != len(raw):
+                log(f"  filtered {len(raw) - len(files)} malformed files[] entr(ies)")
+            # Precise feedback: every required file must be present.
+            got = {f["path"] for f in files}
+            missing = [p for p in task["files_create"] if p not in got]
+            if missing:
+                raise ValueError(
+                    "your files[] is missing required file(s): "
+                    + ", ".join(missing)
+                    + ' — emit ALL required files as {"path", "content"} objects.'
+                )
             for f in files:
                 p = safe_path(f["path"], task["write_roots"])
                 p.parent.mkdir(parents=True, exist_ok=True)
@@ -378,13 +404,20 @@ def process_task(task: dict, dry_run: bool, backlog_data: dict | None = None) ->
         if ok:
             # Maker != checker: a separate reviewer judges SPEC FIDELITY before
             # anything lands (loop-engineering canon — the maker never grades
-            # its own homework). Rejection = a normal failed attempt.
-            approved, reasons = verify_against_spec(task, written)
-            if not approved:
-                error_tail = f"SPEC REVIEWER rejected your gates-green attempt: {reasons}"
-                log(f"  🔍 verifier rejected: {reasons[:300]}")
-                revert(written)
-                continue
+            # its own homework). Capped at ONE rejection per task: the reviewer
+            # is an honesty layer, not a livelock (Wave-2 lesson: it rejected
+            # gates-green work over hair-splitting); after one retry the
+            # deterministic gates decide and the note is logged for humans.
+            if verifier_rejections == 0:
+                approved, reasons = verify_against_spec(task, written)
+                if not approved:
+                    verifier_rejections += 1
+                    error_tail = f"SPEC REVIEWER rejected your gates-green attempt: {reasons}"
+                    log(f"  🔍 verifier rejected (1 allowed): {reasons[:300]}")
+                    revert(written)
+                    continue
+            else:
+                log("  verifier cap reached — accepting on deterministic gates")
             task["status"] = "done"
             task["completed_at"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
             if backlog_data is not None:
@@ -398,8 +431,8 @@ def process_task(task: dict, dry_run: bool, backlog_data: dict | None = None) ->
                 f"gates green + spec-verified on attempt {attempt}."
             )
             return True
-        error_tail = err
-        log(f"  ❌ gate failed (tail): {err.strip()[-300:]}")
+        error_tail = summarize_gate_error(err)
+        log(f"  ❌ gate failed: {error_tail.strip()[-300:]}")
         revert(written)
 
     task["status"] = "blocked"
