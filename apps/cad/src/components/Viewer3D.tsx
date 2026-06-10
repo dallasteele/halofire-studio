@@ -46,11 +46,15 @@ import {
 import { pressureColor, pressureRange, type HydraulicsResult } from '../lib/hydraulics';
 import { selectHydraulics } from '../store';
 import {
-  displayScaleFor,
   loadPartGeometry,
   resolvePartModel,
   type ResolvedPartModel,
 } from '../lib/part-geometry';
+import {
+  attachedDirections,
+  placementFor,
+  type PartPlacement,
+} from '../lib/part-placement';
 import { loadBuild123dManifest, type Build123dManifest } from '../../../studio/src/lib/build123d-parts';
 import { loadManufacturerStepManifest, type ManufacturerStepManifest } from '../../../studio/src/lib/manufacturer-step';
 import { colors, radii, spacing, typeScale } from '../lib/tokens';
@@ -74,9 +78,14 @@ const WALL_COLOR = '#b8b0a4';
 /** Slab PBR color — concrete gray (design-aid finish, not a real material). */
 const SLAB_COLOR = '#8f8f8a';
 
-/** Target display size (ft) per body family so real mm bodies read at a sensible scale. */
+/** NOMINAL display target (ft) per body family — used ONLY when the placement
+ * contract reports 'nominal-fallback' (bbox missing or implausible). A plausible
+ * physical bbox renders at REAL size instead (sizeMode 'physical', scale 1). */
 const HEAD_TARGET_FT = 0.9;
 const FITTING_TARGET_FT = 0.8;
+
+/** build123d STEP bodies are exported in MILLIMETRES; the viewer renders FEET. */
+const MM_PER_FT = 304.8;
 
 /* --------------------------------------------- pure buffers -> THREE geometry */
 
@@ -166,31 +175,91 @@ function radiusForDiameter(diameterIn: number): number {
   return Math.max(0.05, (diameterIn / 12) * 0.6);
 }
 
+/* ------------------------------------------- placement-contract verification */
+
+/** Per-instanced-group sizing reports (group key -> mode + part count), feeding
+ * the honest physical/fallback counts on window.__cadVerify3D as bodies load. */
+const placementGroupReports = new Map<string, { sizeMode: PartPlacement['sizeMode']; count: number }>();
+
+/** Sum the loaded groups into { physical, fallback } part counts. */
+function placementCounts(): { physical: number; fallback: number } {
+  let physical = 0;
+  let fallback = 0;
+  for (const g of placementGroupReports.values()) {
+    if (g.sizeMode === 'physical') physical += g.count;
+    else fallback += g.count;
+  }
+  return { physical, fallback };
+}
+
+/** Merge the current contract counts into window.__cadVerify3D (dev handle). */
+function publishPlacementCounts(): void {
+  if (typeof window === 'undefined') return;
+  const w = window as unknown as { __cadVerify3D?: Record<string, unknown> };
+  const counts = placementCounts();
+  w.__cadVerify3D = {
+    ...(w.__cadVerify3D ?? {}),
+    placementContract: true,
+    physicalCount: counts.physical,
+    fallbackCount: counts.fallback,
+  };
+}
+
+function reportPlacementGroup(key: string, sizeMode: PartPlacement['sizeMode'], count: number): void {
+  placementGroupReports.set(key, { sizeMode, count });
+  publishPlacementCounts();
+}
+
+function removePlacementGroup(key: string): void {
+  placementGroupReports.delete(key);
+  publishPlacementCounts();
+}
+
 /* ---------------------------------------------------- imperative STEP body load */
 
 /**
- * Load + display-scale ONE STEP body, imperatively (no Suspense/useLoader). Returns
- * { geo, failed }. `failed` flips true on a real load error so the caller can draw a
- * proxy instead. Cached by url in loadPartGeometry, so repeat urls share the body.
+ * Load + contract-size ONE STEP body, imperatively (no Suspense/useLoader). The
+ * cached mm geometry is cloned, converted to FEET, then sized by the placement
+ * SIZING CONTRACT: a plausible physical bbox renders at REAL size ('physical',
+ * scale 1); anything else is scaled to the nominal target and REPORTED as
+ * 'nominal-fallback'. `failed` flips true on a real load error so the caller can
+ * draw a proxy instead. Cached by url in loadPartGeometry, so repeat urls share
+ * the decoded body.
  */
-function useStepBody(stepUrl: string, targetFt: number): { geo: THREE.BufferGeometry | null; failed: boolean } {
-  const [geo, setGeo] = useState<THREE.BufferGeometry | null>(null);
+function useStepBody(
+  stepUrl: string,
+  nominalTargetFt: number,
+  sizingType: string,
+): { geo: THREE.BufferGeometry | null; failed: boolean; sizeMode: PartPlacement['sizeMode'] | null } {
+  const [state, setState] = useState<{
+    geo: THREE.BufferGeometry | null;
+    sizeMode: PartPlacement['sizeMode'] | null;
+  }>({ geo: null, sizeMode: null });
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
     let alive = true;
-    setGeo(null);
+    setState({ geo: null, sizeMode: null });
     setFailed(false);
     loadPartGeometry(stepUrl)
       .then((cached) => {
         if (!alive) return;
-        // Clone so each family can be display-scaled independently without mutating
-        // the shared cached geometry (the cache returns the SAME instance per url).
+        // Clone so each family can be sized independently without mutating the
+        // shared cached geometry (the cache returns the SAME instance per url).
         const g = cached.clone();
-        const s = displayScaleFor(g, targetFt);
+        g.computeBoundingBox();
+        const box = g.boundingBox;
+        const maxDimRaw = box
+          ? Math.max(box.max.x - box.min.x, box.max.y - box.min.y, box.max.z - box.min.z)
+          : 0;
+        // Real bbox in FEET (bodies are mm). Degenerate bbox -> null (contract
+        // reports nominal-fallback; nothing is silently fabricated).
+        const bboxMaxFt = Number.isFinite(maxDimRaw) && maxDimRaw > 0 ? maxDimRaw / MM_PER_FT : null;
+        const placement = placementFor(sizingType, [], { bboxMaxFt, nominalTargetFt });
+        const s = (1 / MM_PER_FT) * placement.scale;
         g.scale(s, s, s);
         g.computeVertexNormals();
-        setGeo(g);
+        setState({ geo: g, sizeMode: placement.sizeMode });
       })
       .catch((err) => {
         if (!alive) return;
@@ -200,21 +269,25 @@ function useStepBody(stepUrl: string, targetFt: number): { geo: THREE.BufferGeom
     return () => {
       alive = false;
     };
-  }, [stepUrl, targetFt]);
+  }, [stepUrl, nominalTargetFt, sizingType]);
 
-  return { geo, failed };
+  return { geo: state.geo, failed, sizeMode: state.sizeMode };
 }
 
 /* --------------------------------------------------------------- placed parts */
 
-/** One placed network part with its resolved real model + render transform. */
+/** One placed network part with its resolved real model + contracted transform. */
 interface PlacedPart {
   id: string;
   kind: 'head' | 'fitting';
+  /** The network node type (drives the placement contract's rotation rules). */
+  nodeType: string;
   /** Recentered building-space position (ft). */
   position: [number, number, number];
-  /** Yaw (radians) about Y to orient a fitting along its pipe; 0 for heads. */
+  /** Contracted yaw (radians) about Y from part-placement.placementFor. */
   rotationY: number;
+  /** Contracted deflector-down flip (true for heads). */
+  deflectorDown: boolean;
   model: ResolvedPartModel;
   selected: boolean;
   heatColor: string | null;
@@ -223,22 +296,31 @@ interface PlacedPart {
 
 /**
  * Instanced real-STEP bodies for every placement sharing ONE stepUrl. Loads the body
- * once (cached) and renders an <Instance> per placement. Heads flip 180deg about X so
- * the deflector points DOWN at the ceiling. Falls back to per-instance proxies on a
- * real load failure (honest — never silently blank).
+ * once (cached), sizes it by the placement SIZING CONTRACT, and renders an
+ * <Instance> per placement with its contracted rotation. Heads flip 180deg about X
+ * so the deflector points DOWN at the ceiling (placement.deflectorDown). Falls back
+ * to per-instance proxies on a real load failure (honest — never silently blank).
  */
 function StepInstances({
   stepUrl,
   placements,
   targetFt,
-  flipDown,
 }: {
   stepUrl: string;
   placements: PlacedPart[];
   targetFt: number;
-  flipDown: boolean;
 }): ReactElement | null {
-  const { geo, failed } = useStepBody(stepUrl, targetFt);
+  const sizingType = placements[0]?.nodeType ?? 'TEE';
+  const groupKey = `${placements[0]?.kind ?? 'fitting'}:${stepUrl}`;
+  const { geo, failed, sizeMode } = useStepBody(stepUrl, targetFt, sizingType);
+
+  // Report this group's contracted size mode (physical vs nominal-fallback) so
+  // fake sizing is NEVER silent — the counts land on window.__cadVerify3D.
+  useEffect(() => {
+    if (!sizeMode) return;
+    reportPlacementGroup(groupKey, sizeMode, placements.length);
+    return () => removePlacementGroup(groupKey);
+  }, [groupKey, sizeMode, placements.length]);
 
   if (failed) {
     // Load failed at runtime — draw honest proxies so the part is never invisible.
@@ -259,7 +341,7 @@ function StepInstances({
         <Instance
           key={p.id}
           position={p.position}
-          rotation={flipDown ? [Math.PI, p.rotationY, 0] : [0, p.rotationY, 0]}
+          rotation={p.deflectorDown ? [Math.PI, p.rotationY, 0] : [0, p.rotationY, 0]}
           color={p.selected ? '#ffd27f' : p.heatColor ?? undefined}
           onClick={(e) => {
             e.stopPropagation();
@@ -363,23 +445,6 @@ interface HeatMap {
   seg: (id: string) => string | null;
 }
 
-/**
- * Compute the yaw (about Y) to orient a fitting along its DOMINANT adjacent pipe in
- * the floor plane. Best-effort: aligns the fitting's local +X with the run direction.
- * Honest schematic orientation — not a solved spool fit-up.
- */
-function fittingYaw(node: Node, segments: Segment[], byId: Map<string, Node>): number {
-  const adj = segments.filter((s) => s.from === node.id || s.to === node.id);
-  for (const s of adj) {
-    const other = byId.get(s.from === node.id ? s.to : s.from);
-    if (!other) continue;
-    const dx = other.pos.x - node.pos.x;
-    const dz = other.pos.z - node.pos.z;
-    if (Math.hypot(dx, dz) > 1e-4) return Math.atan2(dz, dx);
-  }
-  return 0;
-}
-
 /* ----------------------------------------------------------- the parts renderer */
 
 /**
@@ -428,11 +493,20 @@ function PartsLayer({
         build123d: manifests.build123d,
         manufacturerStep: manifests.manufacturerStep,
       });
+      // Contracted rotation/orientation from the attached segment directions.
+      // bboxMaxFt is null here (the body loads later); rotation and the
+      // deflector flip do not depend on it — sizing is contracted at load time.
+      const placement = placementFor(n.type, attachedDirections(n.id, nodes, segments), {
+        bboxMaxFt: null,
+        nominalTargetFt: isHead ? HEAD_TARGET_FT : FITTING_TARGET_FT,
+      });
       const placed: PlacedPart = {
         id: n.id,
         kind: isHead ? 'head' : 'fitting',
+        nodeType: n.type,
         position: [n.pos.x - centerX, n.pos.y, n.pos.z - centerZ],
-        rotationY: isHead ? 0 : fittingYaw(n, segments, byId),
+        rotationY: placement.rotationY,
+        deflectorDown: placement.deflectorDown,
         // model may be null; ProxyPart doesn't read it.
         model: model as ResolvedPartModel,
         selected: n.id === selectedNodeId,
@@ -449,7 +523,7 @@ function PartsLayer({
       else group.set(model.stepUrl, [placed]);
     }
     return { headGroups, fittingGroups, proxies };
-  }, [nodes, segments, byId, centerX, centerZ, selectedNodeId, heat, manifests, onSelectNode]);
+  }, [nodes, segments, centerX, centerZ, selectedNodeId, heat, manifests, onSelectNode]);
 
   return (
     <>
@@ -472,14 +546,14 @@ function PartsLayer({
         );
       })}
 
-      {/* Real head STEP bodies, instanced per url, deflector down. */}
+      {/* Real head STEP bodies, instanced per url, deflector down (contracted). */}
       {[...headGroups.entries()].map(([url, placements]) => (
-        <StepInstances key={url} stepUrl={url} placements={placements} targetFt={HEAD_TARGET_FT} flipDown />
+        <StepInstances key={url} stepUrl={url} placements={placements} targetFt={HEAD_TARGET_FT} />
       ))}
 
       {/* Real fitting STEP bodies (tee/elbow/reducer/cross/riser-valve), instanced per url. */}
       {[...fittingGroups.entries()].map(([url, placements]) => (
-        <StepInstances key={url} stepUrl={url} placements={placements} targetFt={FITTING_TARGET_FT} flipDown={false} />
+        <StepInstances key={url} stepUrl={url} placements={placements} targetFt={FITTING_TARGET_FT} />
       ))}
 
       {/* Honest amber-wireframe proxies for any part with no resolvable model. */}
@@ -850,6 +924,21 @@ export function Viewer3D(): ReactElement {
     if (typeof window === 'undefined') return;
     const heads3d = project.network.nodes.filter((n) => n.type === 'HEAD');
     const ys = heads3d.map((h) => h.pos.y);
+    // Placement contract snapshot: the first 3 fitting rotations (pure, from the
+    // attached segment directions) + live physical/fallback counts (updated as
+    // instanced bodies load and report their contracted size mode).
+    const sampleRotations = project.network.nodes
+      .filter((n) => n.type !== 'HEAD')
+      .slice(0, 3)
+      .map(
+        (n) =>
+          placementFor(
+            n.type,
+            attachedDirections(n.id, project.network.nodes, project.network.segments),
+            { bboxMaxFt: null, nominalTargetFt: FITTING_TARGET_FT },
+          ).rotationY,
+      );
+    const counts = placementCounts();
     (window as unknown as { __cadVerify3D?: unknown }).__cadVerify3D = {
       backend: geo?.backend ?? null,
       wallCount: geo?.wallCount ?? 0,
@@ -861,8 +950,12 @@ export function Viewer3D(): ReactElement {
       headYMax: ys.length ? Math.max(...ys) : null,
       systemRecentered: !!geo, // network subtracts (cx, cy) only when a building renders
       sceneCenter: geo ? [bounds.cx, bounds.cy] : [0, 0],
+      placementContract: true,
+      physicalCount: counts.physical,
+      fallbackCount: counts.fallback,
+      sampleRotations,
     };
-  }, [geo, project.network.nodes, showCeilings, bounds.cx, bounds.cy]);
+  }, [geo, project.network.nodes, project.network.segments, showCeilings, bounds.cx, bounds.cy]);
 
   return (
     <div style={wrapStyle} aria-label="3D building viewer">

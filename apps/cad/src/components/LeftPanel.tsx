@@ -14,6 +14,16 @@ import {
   type CatalogPart,
 } from '../lib/head-catalog';
 import { colors, radii, spacing, typeScale } from '../lib/tokens';
+import { glassEdge, glassSheen, glassSurface, hoverLift } from '../lib/glass';
+import {
+  ChipIcon,
+  FileUp,
+  GROUP_ICONS,
+  ShowerHead,
+  TOOL_ICONS,
+  Wrench,
+  type LucideIcon,
+} from '../lib/tool-icons';
 
 const GROUP_LABEL: Record<ToolDef['group'], string> = {
   edit: 'Edit',
@@ -33,14 +43,17 @@ export function LeftPanel(): ReactElement {
     <aside style={panelStyle} aria-label="Tools and catalog">
       <ImportSection />
       <section style={sectionStyle}>
-        <h2 style={sectionTitleStyle}>Tools</h2>
+        <SectionTitle icon={Wrench}>Tools</SectionTitle>
         <div style={toolListStyle} className="hf-scroll">
           {GROUP_ORDER.map((group) => {
             const tools = TOOLS.filter((t) => t.group === group);
             if (tools.length === 0) return null;
             return (
               <div key={group} style={groupStyle}>
-                <div style={groupLabelStyle}>{GROUP_LABEL[group]}</div>
+                <div style={groupLabelStyle}>
+                  <ChipIcon icon={GROUP_ICONS[group]} size={12} />
+                  {GROUP_LABEL[group]}
+                </div>
                 {tools.map((tool) => (
                   <ToolRow
                     key={tool.id}
@@ -101,7 +114,7 @@ function HeadCatalogSection(): ReactElement {
 
   return (
     <section style={catalogSectionStyle}>
-      <h2 style={sectionTitleStyle}>Head Catalog</h2>
+      <SectionTitle icon={ShowerHead}>Head Catalog</SectionTitle>
       {parts === null ? (
         <div style={catalogEmptyStyle}>
           <div style={catalogEmptyTitleStyle}>Loading head SKUs…</div>
@@ -263,7 +276,7 @@ function ImportSection(): ReactElement {
 
   return (
     <section style={importSectionStyle}>
-      <h2 style={sectionTitleStyle}>Import Plan</h2>
+      <SectionTitle icon={FileUp}>Import Plan</SectionTitle>
       <input
         ref={inputRef}
         type="file"
@@ -306,6 +319,22 @@ function ImportSection(): ReactElement {
   );
 }
 
+/** Section header: small icon + the SAME visible title text as before. */
+function SectionTitle({
+  icon,
+  children,
+}: {
+  icon: LucideIcon;
+  children: string;
+}): ReactElement {
+  return (
+    <h2 style={sectionTitleStyle}>
+      <ChipIcon icon={icon} size={13} />
+      {children}
+    </h2>
+  );
+}
+
 function ToolRow({
   tool,
   active,
@@ -328,11 +357,13 @@ function ToolRow({
     >
       <span
         style={{
-          ...toolDotStyle,
-          background: active ? colors.interactiveText : colors.border,
+          ...toolIconWrapStyle,
+          color: active ? colors.interactiveText : colors.textMuted,
         }}
         aria-hidden="true"
-      />
+      >
+        <ChipIcon icon={TOOL_ICONS[tool.id]} size={15} />
+      </span>
       <span style={toolRowLabelStyle}>{tool.label}</span>
     </button>
   );
@@ -341,13 +372,15 @@ function ToolRow({
 /* --------------------------------------------------------------- styles */
 
 const panelStyle: CSSProperties = {
-  background: colors.panel,
+  ...glassSurface(colors.panel),
   borderRight: `1px solid ${colors.border}`,
   width: 232,
   flex: '0 0 232px',
   display: 'flex',
   flexDirection: 'column',
   minHeight: 0,
+  position: 'relative',
+  zIndex: 1,
 };
 
 const sectionStyle: CSSProperties = {
@@ -360,11 +393,15 @@ const sectionStyle: CSSProperties = {
 };
 
 const sectionTitleStyle: CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: spacing[1],
   color: colors.textMuted,
   fontSize: typeScale.xs.size,
   textTransform: 'uppercase',
   letterSpacing: '0.09em',
   fontWeight: 600,
+  margin: 0,
 };
 
 const toolListStyle: CSSProperties = {
@@ -382,6 +419,9 @@ const groupStyle: CSSProperties = {
 };
 
 const groupLabelStyle: CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: spacing[1],
   color: colors.textSecondary,
   fontSize: typeScale.xs.size,
   fontWeight: 600,
@@ -400,21 +440,23 @@ function toolRowStyle(active: boolean, hover: boolean): CSSProperties {
     alignItems: 'center',
     gap: spacing[2],
     background: bg,
+    backgroundImage: active ? glassSheen : undefined,
     color: colors.textPrimary,
     border: `1px solid ${active ? colors.borderStrong : 'transparent'}`,
+    boxShadow: active ? `inset 2px 0 0 ${colors.accent}` : undefined,
     borderRadius: radii.md,
     padding: `${spacing[2]} ${spacing[2]}`,
     fontSize: typeScale.sm.size,
     width: '100%',
     textAlign: 'left',
-    transition: 'background 140ms, border-color 140ms',
+    cursor: 'pointer',
+    transition: 'background 140ms, border-color 140ms, box-shadow 140ms',
+    ...(hover && !active ? hoverLift : null),
   };
 }
 
-const toolDotStyle: CSSProperties = {
-  width: 8,
-  height: 8,
-  borderRadius: radii.pill,
+const toolIconWrapStyle: CSSProperties = {
+  display: 'inline-flex',
   flex: '0 0 auto',
 };
 
@@ -522,13 +564,15 @@ const importSectionStyle: CSSProperties = {
 function importButtonStyle(busy: boolean): CSSProperties {
   return {
     background: busy ? colors.surfaceRaised : colors.interactiveActive,
+    backgroundImage: busy ? undefined : glassSheen,
     color: '#ffffff',
-    border: `1px solid ${colors.interactive}`,
-    borderRadius: radii.md,
+    border: `1px solid ${busy ? glassEdge : colors.interactive}`,
+    borderRadius: radii.lg,
     padding: `${spacing[2]} ${spacing[2]}`,
     fontSize: typeScale.sm.size,
     fontWeight: 600,
     cursor: busy ? 'default' : 'pointer',
+    transition: 'background 140ms, transform 140ms, box-shadow 140ms',
   };
 }
 

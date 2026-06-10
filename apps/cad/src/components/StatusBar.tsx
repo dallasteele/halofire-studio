@@ -2,10 +2,24 @@
 // view mode, and the mandatory design-aid disclaimer. The disclaimer is always
 // present and never dismissible — this tool is a design aid, not a certified
 // engineering deliverable.
+//
+// SHOWCASE: each stat gets a small lucide icon; the bar is a glass surface. The
+// disclaimer TEXT is byte-identical (tests query DESIGN_AID_DISCLAIMER).
 
 import type { CSSProperties, ReactElement } from 'react';
 import { TOOLS, useCadStore } from '../store';
 import { colors, spacing, typeScale } from '../lib/tokens';
+import { glassSurface } from '../lib/glass';
+import {
+  ChipIcon,
+  Crosshair,
+  Eye,
+  Ruler,
+  Scaling,
+  TriangleAlert,
+  ZoomIn,
+  type LucideIcon,
+} from '../lib/tool-icons';
 
 /** The hard-coded honesty disclaimer. Always shown. */
 export const DESIGN_AID_DISCLAIMER =
@@ -23,20 +37,20 @@ export function StatusBar(): ReactElement {
   return (
     <footer style={barStyle} aria-label="Status bar">
       <div style={leftGroupStyle}>
-        <Stat label="Units" value="ft" />
+        <Stat icon={Ruler} label="Units" value="ft" />
         <Divider />
-        <Stat label="Scale" value={`${scale} ft/unit`} />
+        <Stat icon={Scaling} label="Scale" value={`${scale} ft/unit`} />
         <Divider />
-        <Stat label="Zoom" value="100%" />
+        <Stat icon={ZoomIn} label="Zoom" value="100%" />
         <Divider />
-        <Stat label="Tool" value={toolLabel} />
+        <Stat icon={Crosshair} label="Tool" value={toolLabel} />
         <Divider />
-        <Stat label="View" value={viewMode} />
+        <Stat icon={Eye} label="View" value={viewMode} />
       </div>
 
       <div style={disclaimerStyle} role="note">
         <span style={disclaimerDotStyle} aria-hidden="true">
-          ⚠
+          <ChipIcon icon={TriangleAlert} size={13} />
         </span>
         {DESIGN_AID_DISCLAIMER}
       </div>
@@ -44,9 +58,20 @@ export function StatusBar(): ReactElement {
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }): ReactElement {
+function Stat({
+  icon,
+  label,
+  value,
+}: {
+  icon: LucideIcon;
+  label: string;
+  value: string;
+}): ReactElement {
   return (
     <span style={statStyle}>
+      <span style={statIconStyle} aria-hidden="true">
+        <ChipIcon icon={icon} size={12} />
+      </span>
       <span style={statLabelStyle}>{label}</span>
       <span style={statValueStyle}>{value}</span>
     </span>
@@ -64,11 +89,13 @@ const barStyle: CSSProperties = {
   alignItems: 'center',
   justifyContent: 'space-between',
   gap: spacing[4],
-  background: colors.surface,
+  ...glassSurface(colors.surface),
   borderTop: `1px solid ${colors.border}`,
   padding: `${spacing[1]} ${spacing[4]}`,
   flex: '0 0 auto',
   minHeight: 30,
+  position: 'relative',
+  zIndex: 1,
 };
 
 const leftGroupStyle: CSSProperties = {
@@ -79,8 +106,13 @@ const leftGroupStyle: CSSProperties = {
 
 const statStyle: CSSProperties = {
   display: 'inline-flex',
-  alignItems: 'baseline',
+  alignItems: 'center',
   gap: spacing[1],
+};
+
+const statIconStyle: CSSProperties = {
+  display: 'inline-flex',
+  color: colors.textMuted,
 };
 
 const statLabelStyle: CSSProperties = {
@@ -112,5 +144,6 @@ const disclaimerStyle: CSSProperties = {
 };
 
 const disclaimerDotStyle: CSSProperties = {
+  display: 'inline-flex',
   color: colors.accent,
 };

@@ -4,6 +4,11 @@
 // tabs surface the real tool buttons from the store's TOOLS catalog and wire
 // each to setTool. Tools whose editing logic is unimplemented are honest — they
 // set the active tool and the canvas shows its empty state.
+//
+// SHOWCASE: Apple-glass chrome (translucent layered ribbon, blur, inner-light
+// edges) + lucide icons on every tool/file/view control, with the Halo Fire
+// ember-amber accent glowing on active states. All visible labels and aria
+// attributes are unchanged — the tests' query surface is identical.
 
 import { useRef, useState, type CSSProperties, type ReactElement } from 'react';
 import { deserializeProject, serializeProject } from '../lib/project-io';
@@ -16,6 +21,19 @@ import {
   type ViewMode,
 } from '../store';
 import { colors, radii, spacing, typeScale } from '../lib/tokens';
+import { accentGlow, glassEdge, glassSheen, glassSurface, hoverLift } from '../lib/glass';
+import {
+  ChipIcon,
+  FolderOpen,
+  History,
+  Redo2,
+  Save,
+  Sparkles,
+  TAB_ICONS,
+  TOOL_ICONS,
+  Undo2,
+  VIEW_ICONS,
+} from '../lib/tool-icons';
 import { HydraulicsPanel } from './HydraulicsPanel';
 import { BidPanel } from './BidPanel';
 
@@ -72,6 +90,7 @@ export function TopRibbon(): ReactElement {
         <nav style={tabStripStyle} aria-label="Ribbon tabs">
           {TABS.map((tab) => {
             const active = tab === activeTab;
+            const TabIcon = TAB_ICONS[tab];
             return (
               <button
                 key={tab}
@@ -80,6 +99,7 @@ export function TopRibbon(): ReactElement {
                 aria-pressed={active}
                 style={tabStyle(active)}
               >
+                {TabIcon && <ChipIcon icon={TabIcon} size={14} />}
                 {tab}
               </button>
             );
@@ -185,34 +205,77 @@ function FileTabTools(): ReactElement {
           e.target.value = '';
         }}
       />
-      <button type="button" style={loadSampleBtnStyle} onClick={onSave} data-cad-save
-        title="Download the current project as a .hfcad file">
+      <FileChip
+        onClick={onSave}
+        icon={<ChipIcon icon={Save} />}
+        dataAttr="data-cad-save"
+        title="Download the current project as a .hfcad file"
+      >
         Save
-      </button>
-      <button type="button" style={loadSampleBtnStyle} onClick={() => openRef.current?.click()}
-        data-cad-open title="Open a .hfcad project file">
+      </FileChip>
+      <FileChip
+        onClick={() => openRef.current?.click()}
+        icon={<ChipIcon icon={FolderOpen} />}
+        dataAttr="data-cad-open"
+        title="Open a .hfcad project file"
+      >
         Open…
-      </button>
+      </FileChip>
       {hasAutosave && (
-        <button type="button" style={loadSampleBtnStyle} onClick={onRestoreAutosave}
-          data-cad-restore title="Restore the most recent in-browser autosave">
+        <FileChip
+          onClick={onRestoreAutosave}
+          icon={<ChipIcon icon={History} />}
+          dataAttr="data-cad-restore"
+          title="Restore the most recent in-browser autosave"
+        >
           Restore autosave
-        </button>
+        </FileChip>
       )}
-      <button
-        type="button"
-        style={loadSampleBtnStyle}
+      <FileChip
         onClick={() => {
           void loadSampleProject();
         }}
+        icon={<ChipIcon icon={Sparkles} />}
         title="Load CLEARLY-LABELLED example data (not your plan, not a real building)."
       >
         Load sample project
-      </button>
+      </FileChip>
       <span style={fileToolsNoteStyle}>
         {msg ?? 'Autosave runs every few seconds in this browser; Save downloads a portable .hfcad.'}
       </span>
     </div>
+  );
+}
+
+/** Filled (interactive-blue) file-action chip with an icon + hover lift. */
+function FileChip({
+  onClick,
+  icon,
+  title,
+  dataAttr,
+  children,
+}: {
+  onClick: () => void;
+  icon: ReactElement;
+  title: string;
+  dataAttr?: string;
+  children: string;
+}): ReactElement {
+  const [hover, setHover] = useState(false);
+  const data: Record<string, string> = dataAttr ? { [dataAttr]: 'true' } : {};
+  return (
+    <button
+      type="button"
+      style={fileChipStyle(hover)}
+      onClick={onClick}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      title={title}
+      {...data}
+    >
+      {icon}
+      {children}
+    </button>
   );
 }
 
@@ -236,6 +299,7 @@ function ToolButton({
       title={tool.hint}
       style={toolButtonStyle(active, hover)}
     >
+      <ChipIcon icon={TOOL_ICONS[tool.id]} />
       {tool.label}
     </button>
   );
@@ -263,7 +327,8 @@ function UndoRedoControl(): ReactElement {
         style={undoBtnStyle(canUndo)}
         data-cad-undo
       >
-        ↶ Undo
+        <ChipIcon icon={Undo2} size={14} />
+        Undo
       </button>
       <button
         type="button"
@@ -274,7 +339,8 @@ function UndoRedoControl(): ReactElement {
         style={undoBtnStyle(canRedo)}
         data-cad-redo
       >
-        ↷ Redo
+        <ChipIcon icon={Redo2} size={14} />
+        Redo
       </button>
     </div>
   );
@@ -299,6 +365,7 @@ function ViewSegmentedControl({
             aria-pressed={active}
             style={segmentStyle(active)}
           >
+            <ChipIcon icon={VIEW_ICONS[mode]} size={14} />
             {VIEW_LABEL[mode]}
           </button>
         );
@@ -310,11 +377,13 @@ function ViewSegmentedControl({
 /* --------------------------------------------------------------- styles */
 
 const ribbonStyle: CSSProperties = {
-  background: colors.ribbon,
+  ...glassSurface(colors.ribbon),
   borderBottom: `1px solid ${colors.border}`,
   display: 'flex',
   flexDirection: 'column',
   userSelect: 'none',
+  position: 'relative',
+  zIndex: 2,
 };
 
 const topRowStyle: CSSProperties = {
@@ -322,7 +391,7 @@ const topRowStyle: CSSProperties = {
   alignItems: 'center',
   gap: spacing[4],
   padding: `${spacing[2]} ${spacing[4]}`,
-  borderBottom: `1px solid ${colors.border}`,
+  borderBottom: `1px solid ${glassEdge}`,
 };
 
 const brandStyle: CSSProperties = {
@@ -337,6 +406,7 @@ const brandMarkStyle: CSSProperties = {
   fontSize: typeScale.lg.size,
   lineHeight: 1,
   transform: 'translateY(2px)',
+  textShadow: `0 0 12px ${colors.accent}66`,
 };
 
 const brandTitleStyle: CSSProperties = {
@@ -362,14 +432,20 @@ const tabStripStyle: CSSProperties = {
 
 function tabStyle(active: boolean): CSSProperties {
   return {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: spacing[1],
     background: active ? colors.surfaceRaised : 'transparent',
+    backgroundImage: active ? glassSheen : undefined,
     color: active ? colors.textPrimary : colors.textSecondary,
-    border: `1px solid ${active ? colors.borderStrong : 'transparent'}`,
+    border: `1px solid ${active ? glassEdge : 'transparent'}`,
+    boxShadow: active ? `inset 0 -2px 0 ${colors.accent}` : undefined,
     borderRadius: radii.md,
     padding: `${spacing[1]} ${spacing[3]}`,
     fontSize: typeScale.sm.size,
     fontWeight: active ? 600 : 500,
-    transition: 'background 140ms, color 140ms, border-color 140ms',
+    cursor: 'pointer',
+    transition: 'background 140ms, color 140ms, border-color 140ms, box-shadow 140ms',
   };
 }
 
@@ -378,7 +454,7 @@ const toolRowStyle: CSSProperties = {
   alignItems: 'center',
   gap: spacing[2],
   padding: `${spacing[2]} ${spacing[4]}`,
-  minHeight: 44,
+  minHeight: 48,
   flexWrap: 'wrap',
 };
 
@@ -395,16 +471,24 @@ const fileToolsWrapStyle: CSSProperties = {
   flexWrap: 'wrap',
 };
 
-const loadSampleBtnStyle: CSSProperties = {
-  background: colors.interactiveActive,
-  color: '#ffffff',
-  border: `1px solid ${colors.interactive}`,
-  borderRadius: radii.md,
-  padding: `${spacing[1]} ${spacing[3]}`,
-  fontSize: typeScale.sm.size,
-  fontWeight: 600,
-  cursor: 'pointer',
-};
+function fileChipStyle(hover: boolean): CSSProperties {
+  return {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: spacing[1],
+    background: colors.interactiveActive,
+    backgroundImage: glassSheen,
+    color: '#ffffff',
+    border: `1px solid ${colors.interactive}`,
+    borderRadius: radii.lg,
+    padding: `${spacing[1]} ${spacing[3]}`,
+    fontSize: typeScale.sm.size,
+    fontWeight: 600,
+    cursor: 'pointer',
+    transition: 'transform 140ms, box-shadow 140ms',
+    ...(hover ? hoverLift : null),
+  };
+}
 
 const fileToolsNoteStyle: CSSProperties = {
   color: colors.textMuted,
@@ -426,14 +510,24 @@ function toolButtonStyle(active: boolean, hover: boolean): CSSProperties {
       ? colors.surfaceHover
       : colors.surfaceRaised;
   return {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: spacing[1],
     background: bg,
+    backgroundImage: active || hover ? glassSheen : undefined,
     color: active ? '#ffffff' : colors.textPrimary,
-    border: `1px solid ${active ? colors.interactive : colors.border}`,
-    borderRadius: radii.md,
+    border: `1px solid ${active ? colors.interactive : glassEdge}`,
+    borderRadius: radii.lg,
     padding: `${spacing[1]} ${spacing[3]}`,
     fontSize: typeScale.sm.size,
     fontWeight: 500,
-    transition: 'background 140ms, border-color 140ms',
+    cursor: 'pointer',
+    transition: 'background 140ms, border-color 140ms, transform 140ms, box-shadow 140ms',
+    ...(active
+      ? { boxShadow: accentGlow(colors.accent) }
+      : hover
+        ? hoverLift
+        : null),
   };
 }
 
@@ -445,14 +539,19 @@ const undoWrapStyle: CSSProperties = {
 
 function undoBtnStyle(enabled: boolean): CSSProperties {
   return {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: spacing[1],
     background: enabled ? colors.surfaceRaised : colors.bgInset,
+    backgroundImage: enabled ? glassSheen : undefined,
     color: enabled ? colors.textPrimary : colors.textMuted,
-    border: `1px solid ${colors.border}`,
+    border: `1px solid ${glassEdge}`,
     borderRadius: radii.md,
     padding: `${spacing[1]} ${spacing[2]}`,
     fontSize: typeScale.sm.size,
     fontWeight: 500,
     cursor: enabled ? 'pointer' : 'default',
+    opacity: enabled ? 1 : 0.65,
     transition: 'background 140ms, color 140ms',
   };
 }
@@ -460,21 +559,28 @@ function undoBtnStyle(enabled: boolean): CSSProperties {
 const segmentWrapStyle: CSSProperties = {
   display: 'inline-flex',
   background: colors.bgInset,
-  border: `1px solid ${colors.border}`,
+  border: `1px solid ${glassEdge}`,
   borderRadius: radii.lg,
   padding: spacing.px,
   flex: '0 0 auto',
+  boxShadow: 'inset 0 1px 2px rgba(0, 0, 0, 0.35)',
 };
 
 function segmentStyle(active: boolean): CSSProperties {
   return {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: spacing[1],
     background: active ? colors.interactiveActive : 'transparent',
+    backgroundImage: active ? glassSheen : undefined,
     color: active ? '#ffffff' : colors.textSecondary,
     border: 'none',
     borderRadius: radii.md,
     padding: `${spacing[1]} ${spacing[3]}`,
     fontSize: typeScale.sm.size,
     fontWeight: active ? 600 : 500,
-    transition: 'background 140ms, color 140ms',
+    cursor: 'pointer',
+    boxShadow: active ? accentGlow(colors.accent) : undefined,
+    transition: 'background 140ms, color 140ms, box-shadow 140ms',
   };
 }

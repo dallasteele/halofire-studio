@@ -11,6 +11,10 @@ import { buildingToMeshData } from '../src/lib/building-mesh';
 import { autoLayoutHeads } from '../src/lib/head-layout';
 import { buildKernelNetwork } from '../src/lib/kernel-import';
 import { importDxfText, KERNEL_DEFAULT_ELEVATION_FT } from '../src/lib/import-actions';
+import { routeSystem } from '../src/lib/pipe-routing';
+import { attachedDirections, placementFor } from '../src/lib/part-placement';
+import { teeRotationY } from '../src/lib/fitting-orient';
+import type { Node } from '../src/lib/model';
 
 function bbox(positions: Float32Array | number[]): {
   min: [number, number, number];
@@ -113,5 +117,74 @@ describe('INVARIANT: kernel imports are NEVER a flat mat at y=0', () => {
     for (const n of out.kernelNetwork!.nodes) {
       expect(n.pos.y).toBe(KERNEL_DEFAULT_ELEVATION_FT);
     }
+  });
+});
+
+describe('INVARIANT: every routed part obeys the placement contract', () => {
+  // A tiny 2-branch network: 2 rows of 2 heads, 1 ft below a 10 ft ceiling —
+  // routed through the SAME routeSystem the store uses, then every node is run
+  // through the placement contract the 3D viewer applies.
+  const head = (id: string, x: number, z: number): Node => ({
+    id,
+    type: 'HEAD',
+    pos: { x, y: 9, z },
+  });
+  const routed = routeSystem(
+    {
+      nodes: [head('h1', 10, 0), head('h2', 20, 0), head('h3', 10, 12), head('h4', 20, 12)],
+      segments: [],
+      remoteAreas: [],
+    },
+    { ceilingHt: 10 },
+  );
+
+  it('the routed system is real (connected + mated) and contains tees', () => {
+    expect(routed.routedOk).toBe(true);
+    expect(routed.nodes.some((n) => n.type === 'TEE')).toBe(true);
+  });
+
+  it('NO part gets a non-finite rotation or a scale <= 0 — pre-load and loaded', () => {
+    for (const n of routed.nodes) {
+      const dirs = attachedDirections(n.id, routed.nodes, routed.segments);
+      // bbox null = body not yet loaded; 0.25 = plausible physical; 10 = wrong-units fallback.
+      for (const bboxMaxFt of [null, 0.25, 10]) {
+        const p = placementFor(n.type, dirs, { bboxMaxFt, nominalTargetFt: 0.8 });
+        expect(Number.isFinite(p.rotationY)).toBe(true);
+        expect(Number.isFinite(p.scale)).toBe(true);
+        expect(p.scale).toBeGreaterThan(0);
+        // Heads (and only heads) are contracted deflector-down.
+        expect(p.deflectorDown).toBe(n.type === 'HEAD');
+        // Sizing contract: a plausible bbox is ALWAYS physical at scale 1.
+        if (bboxMaxFt === 0.25) {
+          expect(p.sizeMode).toBe('physical');
+          expect(p.scale).toBe(1);
+        } else {
+          expect(p.sizeMode).toBe('nominal-fallback');
+        }
+      }
+    }
+  });
+
+  it('a branch-line TEE (run ±X, branch +Z) rotates to the analytic teeRotationY', () => {
+    // Junction literal in the same shape routeSystem builds: a through-run along X
+    // with a horizontal branch toward +Z.
+    const nodes: Node[] = [
+      { id: 'run-a', type: 'ELBOW', pos: { x: -8, y: 10, z: 0 } },
+      { id: 'tee', type: 'TEE', pos: { x: 0, y: 10, z: 0 } },
+      { id: 'run-b', type: 'ELBOW', pos: { x: 8, y: 10, z: 0 } },
+      { id: 'branch-end', type: 'HEAD', pos: { x: 0, y: 10, z: 6 } },
+    ];
+    const segments = [
+      { from: 'run-a', to: 'tee' },
+      { from: 'tee', to: 'run-b' },
+      { from: 'tee', to: 'branch-end' },
+    ];
+    const dirs = attachedDirections('tee', nodes, segments);
+    expect(dirs).toHaveLength(3);
+    const p = placementFor('TEE', dirs, { bboxMaxFt: null, nominalTargetFt: 0.8 });
+    // Run = the most-collinear pair (first member: toward run-a = -X), branch = +Z.
+    const analytic = teeRotationY({ x: -1, y: 0, z: 0 }, { x: 0, y: 0, z: 1 });
+    expect(p.rotationY).toBeCloseTo(analytic, 12);
+    expect(Math.abs(p.rotationY)).toBeCloseTo(Math.PI, 12); // body +X maps onto the -X run leg
   });
 });

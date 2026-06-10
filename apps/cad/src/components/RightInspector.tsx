@@ -21,6 +21,8 @@ import {
   type ManufacturerStepManifest,
 } from '../../../studio/src/lib/manufacturer-step';
 import { colors, radii, spacing, typeScale } from '../lib/tokens';
+import { glassSurface } from '../lib/glass';
+import { ChipIcon, SlidersHorizontal } from '../lib/tool-icons';
 
 /** Human label per provenance tier (W8) — never claims more than the tier earns. */
 const TIER_LABEL: Record<string, string> = {
@@ -214,7 +216,10 @@ export function RightInspector(): ReactElement {
 
   return (
     <aside style={panelStyle} aria-label="Inspector">
-      <h2 style={sectionTitleStyle}>Inspector</h2>
+      <h2 style={sectionTitleStyle}>
+        <ChipIcon icon={SlidersHorizontal} size={13} />
+        Inspector
+      </h2>
 
       {!kind ? (
         <div style={emptyStyle}>
@@ -551,7 +556,7 @@ function activeSelection(s: {
 /* --------------------------------------------------------------- styles */
 
 const panelStyle: CSSProperties = {
-  background: colors.panel,
+  ...glassSurface(colors.panel),
   borderLeft: `1px solid ${colors.border}`,
   width: 268,
   flex: '0 0 268px',
@@ -561,14 +566,20 @@ const panelStyle: CSSProperties = {
   padding: spacing[3],
   minHeight: 0,
   overflowY: 'auto',
+  position: 'relative',
+  zIndex: 1,
 };
 
 const sectionTitleStyle: CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: spacing[1],
   color: colors.textMuted,
   fontSize: typeScale.xs.size,
   textTransform: 'uppercase',
   letterSpacing: '0.09em',
   fontWeight: 600,
+  margin: 0,
 };
 
 const emptyStyle: CSSProperties = {
@@ -601,6 +612,7 @@ const cardStyle: CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
   gap: spacing[2],
+  boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 4px 14px rgba(0, 0, 0, 0.25)',
 };
 
 const cardTitleStyle: CSSProperties = {
