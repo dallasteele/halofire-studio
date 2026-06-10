@@ -36,9 +36,18 @@ OLLAMA_URL = "http://127.0.0.1:11434/api/chat"
 # Canonical model is qwen3:30b-a3b (hal-vault LOCAL_LLM.md). The env override
 # exists ONLY for documented benchmarks of candidate executors — never cloud.
 MODEL = os.environ.get("HALOFIRE_LOOP_MODEL", "qwen3:30b-a3b")
-# Tier-1.5: a BIGGER local coder tried ONCE before a task blocks for cloud
-# escalation. Empty = disabled. Set after a documented bench (LOCAL_LLM.md).
-ESCALATION_MODEL = os.environ.get("HALOFIRE_ESCALATION_MODEL", "")
+# Local escalation LADDER: each listed model gets ONE attempt (in order) after
+# the primary exhausts MAX_ATTEMPTS, before the task blocks for cloud
+# escalation. Comma-separated; empty = disabled. Benched first (LOCAL_LLM.md).
+ESCALATION_MODELS = [
+    m.strip()
+    for m in os.environ.get(
+        "HALOFIRE_ESCALATION_MODELS", os.environ.get("HALOFIRE_ESCALATION_MODEL", "")
+    ).split(",")
+    if m.strip()
+]
+# Cross-FAMILY verifier (maker != checker): empty = use the primary model.
+VERIFIER_MODEL = os.environ.get("HALOFIRE_VERIFIER_MODEL", "")
 NUM_CTX = 12288                   # default 40960 crashes this GPU (CUDA INT_MAX)
 MAX_OUTPUT_TOKENS = 8192
 MAX_ATTEMPTS = 4  # attempts are local-only (free); only wall-clock is spent
@@ -175,7 +184,7 @@ def verify_against_spec(task: dict, written: list[Path]) -> tuple[bool, str]:
         rel = p.relative_to(REPO).as_posix()
         parts.append(f"\n## {rel}\n```ts\n{read_capped(p, 8000)}\n```")
     try:
-        out = call_qwen("\n".join(parts), system=VERIFIER_PROMPT)
+        out = call_qwen("\n".join(parts), system=VERIFIER_PROMPT, model=VERIFIER_MODEL)
         approved = bool(out.get("approve", False))
         reasons = "; ".join(str(r) for r in out.get("reasons", []) if r)
         return approved, reasons
@@ -358,11 +367,13 @@ def process_task(task: dict, dry_run: bool, backlog_data: dict | None = None) ->
     log(f"=== task {task['id']}: {task['title']} ===")
     error_tail: str | None = None
     verifier_rejections = 0
-    total_attempts = MAX_ATTEMPTS + (1 if ESCALATION_MODEL else 0)
+    total_attempts = MAX_ATTEMPTS + len(ESCALATION_MODELS)
     for attempt in range(1, total_attempts + 1):
-        # Tier-1.5: the FINAL attempt (when configured) uses the bigger local
-        # coder — one shot before the task blocks for cloud escalation.
-        attempt_model = ESCALATION_MODEL if attempt > MAX_ATTEMPTS else ""
+        # Escalation ladder: attempts beyond MAX_ATTEMPTS walk the configured
+        # local models in order — each gets one shot before cloud escalation.
+        attempt_model = (
+            ESCALATION_MODELS[attempt - MAX_ATTEMPTS - 1] if attempt > MAX_ATTEMPTS else ""
+        )
         task["attempts"] = task.get("attempts", 0) + 1
         if attempt_model:
             log(f"attempt {attempt}/{total_attempts} — TIER-1.5 escalation ({attempt_model})...")
