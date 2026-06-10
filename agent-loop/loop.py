@@ -32,7 +32,7 @@ OLLAMA_URL = "http://127.0.0.1:11434/api/chat"
 MODEL = "qwen3:30b-a3b"          # MANDATORY model — see hal-vault LOCAL_LLM.md
 NUM_CTX = 12288                   # default 40960 crashes this GPU (CUDA INT_MAX)
 MAX_OUTPUT_TOKENS = 8192
-MAX_ATTEMPTS = 3
+MAX_ATTEMPTS = 4  # attempts are local-only (free); only wall-clock is spent
 CONTEXT_FILE_CHAR_CAP = 9000      # per context file, keep prompt within num_ctx
 BRAIN_URL = "http://127.0.0.1:8790/remember"
 AGENT_BRANCH = "agent/qwen-loop"
@@ -46,7 +46,11 @@ module and its vitest test file. Rules:
 - Tests import from '../src/lib/<module>' and use vitest (describe/expect/it).
 - Follow the exact file paths, exported names, and signatures in the task spec.
 - Keep cited constants/formulas EXACTLY as given in the spec; do not invent values.
-- No 'any' types. Strict TS. JSDoc on exported functions."""
+- No 'any' types. Strict TS. JSDoc on exported functions.
+- tsconfig is STRICT (noUnusedLocals/noUnusedParameters): never import or declare \
+anything you do not use — including type-only imports in tests.
+- Never assign to a const; declare mutable values with let.
+- Use Number.isFinite for numeric validation; throw new Error('<clear message>')."""
 
 
 def log(msg: str) -> None:
@@ -74,7 +78,7 @@ def brain_remember(content: str) -> None:
         import os
         token = os.environ.get("HAL_BRAIN_TOKEN", "").strip()
         body = json.dumps({
-            "content": content,
+            "text": content,
             "source": "halofire-agent-loop",
             "tags": ["halofire", "agent-loop", "autosprink-parity"],
         }).encode("utf-8")
