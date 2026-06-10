@@ -31,6 +31,11 @@
 // traced/imported — NOT an as-built, NOT AHJ / PE / code-certified. Nothing is
 // fabricated: a building with no rooms produces zero floors; no walls -> zero
 // walls. Every floor/wall corresponds 1:1 to a real entry in `building`.
+//
+// M-3D.1 NOTE: Viewer3D now composes its render geometry via the pure
+// wallSolid/slabSolid path in `building-mesh.ts` (solid walls + floor/ceiling
+// slabs, one merged wall buffer). This module remains the canonical
+// bounds/units provider (`buildingBoundsFt`) and the documented backend seam.
 
 import {
   BufferAttribute,

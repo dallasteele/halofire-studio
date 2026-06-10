@@ -73,6 +73,12 @@ export interface Wall {
   id: string;
   start: Point2;
   end: Point2;
+  /**
+   * Real wall thickness in FEET when the source data carries one (e.g. a
+   * measured/import value). Absent on traced walls — the 3D viewer then uses
+   * the documented 0.5 ft drawing default, never an invented dimension.
+   */
+  thicknessFt?: number;
 }
 
 /** A room/space: a closed polygon with a hazard class and ceiling height. */
