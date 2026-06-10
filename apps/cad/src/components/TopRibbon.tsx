@@ -5,7 +5,8 @@
 // each to setTool. Tools whose editing logic is unimplemented are honest — they
 // set the active tool and the canvas shows its empty state.
 
-import { useState, type CSSProperties, type ReactElement } from 'react';
+import { useRef, useState, type CSSProperties, type ReactElement } from 'react';
+import { deserializeProject, serializeProject } from '../lib/project-io';
 import {
   TOOLS,
   VIEW_MODES,
@@ -127,10 +128,77 @@ export function TopRibbon(): ReactElement {
  * fresh page (heads -> pipe -> hydraulics -> bid) using CLEARLY-LABELLED example
  * data, so a new operator can try the flow before importing a real plan.
  */
+export const AUTOSAVE_KEY = 'hfcad-autosave';
+
 function FileTabTools(): ReactElement {
   const loadSampleProject = useCadStore((s) => s.loadSampleProject);
+  const project = useCadStore((s) => s.project);
+  const setProject = useCadStore((s) => s.setProject);
+  const openRef = useRef<HTMLInputElement | null>(null);
+  const [msg, setMsg] = useState<string | null>(null);
+  const hasAutosave =
+    typeof localStorage !== 'undefined' && localStorage.getItem(AUTOSAVE_KEY) !== null;
+
+  function onSave(): void {
+    const text = serializeProject(project);
+    const blob = new Blob([text], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `${project.name.replace(/[^A-Za-z0-9._-]+/g, '_') || 'project'}.hfcad`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    setMsg('Saved (.hfcad downloaded)');
+  }
+
+  async function onOpen(file: File | null): Promise<void> {
+    if (!file) return;
+    const out = deserializeProject(await file.text());
+    if (out.ok) {
+      setProject(out.project);
+      setMsg(`Opened ${file.name}${out.savedAt ? ` (saved ${out.savedAt})` : ''}`);
+    } else {
+      setMsg(`Open failed: ${out.reason}`);
+    }
+  }
+
+  function onRestoreAutosave(): void {
+    const text = localStorage.getItem(AUTOSAVE_KEY);
+    if (!text) return setMsg('No autosave found');
+    const out = deserializeProject(text);
+    if (out.ok) {
+      setProject(out.project);
+      setMsg(`Autosave restored${out.savedAt ? ` (from ${out.savedAt})` : ''}`);
+    } else {
+      setMsg(`Autosave unreadable: ${out.reason}`);
+    }
+  }
+
   return (
     <div style={fileToolsWrapStyle}>
+      <input
+        ref={openRef}
+        type="file"
+        accept=".hfcad,application/json"
+        style={{ display: 'none' }}
+        onChange={(e) => {
+          void onOpen(e.target.files?.[0] ?? null);
+          e.target.value = '';
+        }}
+      />
+      <button type="button" style={loadSampleBtnStyle} onClick={onSave} data-cad-save
+        title="Download the current project as a .hfcad file">
+        Save
+      </button>
+      <button type="button" style={loadSampleBtnStyle} onClick={() => openRef.current?.click()}
+        data-cad-open title="Open a .hfcad project file">
+        Open…
+      </button>
+      {hasAutosave && (
+        <button type="button" style={loadSampleBtnStyle} onClick={onRestoreAutosave}
+          data-cad-restore title="Restore the most recent in-browser autosave">
+          Restore autosave
+        </button>
+      )}
       <button
         type="button"
         style={loadSampleBtnStyle}
@@ -142,8 +210,7 @@ function FileTabTools(): ReactElement {
         Load sample project
       </button>
       <span style={fileToolsNoteStyle}>
-        Example/sample data — not your real plan or a real building. A design aid to
-        try the flow.
+        {msg ?? 'Autosave runs every few seconds in this browser; Save downloads a portable .hfcad.'}
       </span>
     </div>
   );

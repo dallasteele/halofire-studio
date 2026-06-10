@@ -18,6 +18,7 @@ import { RightInspector } from './components/RightInspector';
 import { StatusBar } from './components/StatusBar';
 import { TOOL_COUNT, useCadStore } from './store';
 import { cadWindowSnapshot, publishCadWindow } from './lib/cad-window';
+import { serializeProject } from './lib/project-io';
 import { colors } from './lib/tokens';
 
 export function App(): ReactElement {
@@ -35,6 +36,28 @@ export function App(): ReactElement {
   useEffect(() => {
     void ensurePricebookLoaded();
   }, [ensurePricebookLoaded]);
+
+  // M0 autosave crash net: persist the document to localStorage (debounced 2s)
+  // whenever it changes. Restore is OPERATOR-driven (File > Restore autosave) —
+  // never a silent overwrite of whatever is open.
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    const unsub = useCadStore.subscribe((s, prev) => {
+      if (s.project === prev.project) return;
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => {
+        try {
+          localStorage.setItem('hfcad-autosave', serializeProject(s.project));
+        } catch {
+          /* quota/unavailable — autosave is best-effort */
+        }
+      }, 2000);
+    });
+    return () => {
+      unsub();
+      if (timer) clearTimeout(timer);
+    };
+  }, []);
 
   // E0: global undo/redo keyboard shortcuts. Ctrl/Cmd+Z = undo, Ctrl/Cmd+Y or
   // Ctrl/Cmd+Shift+Z = redo. Ignored while typing in an input/textarea so the
