@@ -1,77 +1,124 @@
 {
-  "doc": "HaloFire agent-loop backlog. Tasks come from docs/research/autosprink-tool-parity-plan.md (real mepcad.com AutoSprink 2018 docs). Each task = ONE pure module + tests, gated by tsc + vitest. Status: pending | in_progress | done | blocked. UI/store integration of landed modules is tracked separately (Claude integration passes) — a 'done' here is NOT a parity/AHJ/PE claim.",
+  "doc": "HaloFire agent-loop backlog. Tasks come from docs/research/autosprink-tool-parity-plan.md (real mepcad.com AutoSprink 2018 docs). Each task = ONE pure module + tests, gated by tsc + vitest. Status: pending | in_progress | done | blocked. UI/store integration of landed modules is tracked separately (Claude integration passes) \u2014 a 'done' here is NOT a parity/AHJ/PE claim.",
   "tasks": [
     {
       "id": "H6-flow-calculator",
-      "title": "Hydraulics > Flow Calculator (Q = K√P solver)",
-      "status": "pending",
+      "title": "Hydraulics > Flow Calculator (Q = K\u221aP solver)",
+      "status": "blocked",
       "phase": 4,
-      "write_roots": ["apps/cad/src/lib", "apps/cad/test"],
-      "context_files": ["apps/cad/src/lib/nfpa13-rules.ts"],
-      "files_create": ["apps/cad/src/lib/flow-calculator.ts", "apps/cad/test/flow-calculator.test.ts"],
+      "write_roots": [
+        "apps/cad/src/lib",
+        "apps/cad/test"
+      ],
+      "context_files": [
+        "apps/cad/src/lib/nfpa13-rules.ts"
+      ],
+      "files_create": [
+        "apps/cad/src/lib/flow-calculator.ts",
+        "apps/cad/test/flow-calculator.test.ts"
+      ],
       "gate": "cd apps/cad && npx tsc -b && npx vitest run test/flow-calculator.test.ts",
-      "attempts": 0,
-      "spec": "Implement the AutoSprink 'Flow Calculator' (Hydraulics menu): given any TWO of {flow Q (gpm), K-factor (gpm/psi^0.5), pressure P (psi)}, derive the third using the cited sprinkler discharge formula Q = K * sqrt(P).\n\nExports (exact):\n- export interface FlowCalcInput { flowGpm?: number; kFactor?: number; pressurePsi?: number; }\n- export interface FlowCalcResult { flowGpm: number; kFactor: number; pressurePsi: number; solvedFor: 'flowGpm' | 'kFactor' | 'pressurePsi'; formula: 'Q = K * sqrt(P)'; }\n- export function solveFlow(input: FlowCalcInput): FlowCalcResult — throws an Error with a clear message when fewer or more than exactly 2 fields are given, when any given value is not a finite positive number, or when pressure must be derived from K=0.\n\nMath: flow = K*sqrt(P); K = Q/sqrt(P); P = (Q/K)^2.\nTests must cover: solve each of the 3 unknowns with K=5.6, P=25 -> Q=28 exactly; round-trip consistency; each error case (0 fields, 1 field, 3 fields, negative/zero/NaN values)."
+      "attempts": 4,
+      "spec": "Implement the AutoSprink 'Flow Calculator' (Hydraulics menu): given any TWO of {flow Q (gpm), K-factor (gpm/psi^0.5), pressure P (psi)}, derive the third using the cited sprinkler discharge formula Q = K * sqrt(P).\n\nExports (exact):\n- export interface FlowCalcInput { flowGpm?: number; kFactor?: number; pressurePsi?: number; }\n- export interface FlowCalcResult { flowGpm: number; kFactor: number; pressurePsi: number; solvedFor: 'flowGpm' | 'kFactor' | 'pressurePsi'; formula: 'Q = K * sqrt(P)'; }\n- export function solveFlow(input: FlowCalcInput): FlowCalcResult \u2014 throws an Error with a clear message when fewer or more than exactly 2 fields are given, when any given value is not a finite positive number, or when pressure must be derived from K=0.\n\nMath: flow = K*sqrt(P); K = Q/sqrt(P); P = (Q/K)^2.\nTests must cover: solve each of the 3 unknowns with K=5.6, P=25 -> Q=28 exactly; round-trip consistency; each error case (0 fields, 1 field, 3 fields, negative/zero/NaN values).",
+      "last_error": "including 'pressurePsi must be a finite positive\u2026' but got 'Input must have exactly 2 fields, got\u2026'\n\nExpected: \"pressurePsi must be a finite positive number\"\nReceived: \"Input must have exactly 2 fields, got 3\"\n\n \u276f test/flow-calculator.test.ts:58:36\n     56|   it('throws error for negative pressure', () => {\n     57|     const input: FlowCalcInput = { flowGpm: 10, kFactor: 5, pressurePs\u2026\n     58|     expect(() => solveFlow(input)).toThrowError('pressurePsi must be a\u2026\n       |                                    ^\n     59|   });\n     60| \n\n\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af[3/5]\u23af\n\n FAIL  test/flow-calculator.test.ts > solveFlow > throws error for NaN values\nAssertionError: expected [Function] to throw error including 'flowGpm must be a finite positive num\u2026' but got 'Input must have exactly 2 fields, got\u2026'\n\nExpected: \"flowGpm must be a finite positive number\"\nReceived: \"Input must have exactly 2 fields, got 3\"\n\n \u276f test/flow-calculator.test.ts:63:36\n     61|   it('throws error for NaN values', () => {\n     62|     const input: FlowCalcInput = { flowGpm: NaN, kFactor: 5, pressureP\u2026\n     63|     expect(() => solveFlow(input)).toThrowError('flowGpm must be a fin\u2026\n       |                                    ^\n     64|   });\n     65| \n\n\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af[4/5]\u23af\n\n FAIL  test/flow-calculator.test.ts > solveFlow > throws error when solving for pressure with K=0\nAssertionError: expected [Function] to throw error including 'kFactor cannot be zero when solving f\u2026' but got 'kFactor must be a finite positive num\u2026'\n\nExpected: \"kFactor cannot be zero when solving for pressure\"\nReceived: \"kFactor must be a finite positive number\"\n\n \u276f test/flow-calculator.test.ts:68:36\n     66|   it('throws error when solving for pressure with K=0', () => {\n     67|     const input: FlowCalcInput = { flowGpm: 10, kFactor: 0 };\n     68|     expect(() => solveFlow(input)).toThrowError('kFactor cannot be zer\u2026\n       |                                    ^\n     69|   });\n     70| \n\n\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af[5/5]\u23af\n\n"
     },
     {
       "id": "H17-pipe-volume",
       "title": "Hydraulics > Show Pipe Volumes",
-      "status": "pending",
+      "status": "blocked",
       "phase": 4,
-      "write_roots": ["apps/cad/src/lib", "apps/cad/test"],
-      "context_files": ["apps/cad/src/lib/model.ts"],
-      "files_create": ["apps/cad/src/lib/pipe-volume.ts", "apps/cad/test/pipe-volume.test.ts"],
+      "write_roots": [
+        "apps/cad/src/lib",
+        "apps/cad/test"
+      ],
+      "context_files": [
+        "apps/cad/src/lib/model.ts"
+      ],
+      "files_create": [
+        "apps/cad/src/lib/pipe-volume.ts",
+        "apps/cad/test/pipe-volume.test.ts"
+      ],
       "gate": "cd apps/cad && npx tsc -b && npx vitest run test/pipe-volume.test.ts",
-      "attempts": 0,
-      "spec": "Implement the AutoSprink 'Show Pipe Volumes' calculation: water volume of pipe segments from internal diameter and length.\n\nUse EXACTLY these internal diameters (inches), from ANSI/ASME B36.10M steel pipe tables (verify against adopted edition before regulated use):\nSCH40: 0.5->0.622, 0.75->0.824, 1->1.049, 1.25->1.380, 1.5->1.610, 2->2.067, 2.5->2.469, 3->3.068, 4->4.026, 6->6.065, 8->7.981\nSCH10: 1->1.097, 1.25->1.442, 1.5->1.682, 2->2.157, 2.5->2.635, 3->3.260, 4->4.260, 6->6.357, 8->8.329\nGallons per cubic foot: 7.48052.\n\nExports (exact):\n- export function internalDiameterIn(material: 'STEEL_SCH40' | 'STEEL_SCH10' | 'CPVC' | 'COPPER', nominalIn: number): number — SCH40 table for STEEL_SCH40 and (as a documented approximation) CPVC/COPPER; SCH10 table for STEEL_SCH10; throws on unknown nominal size.\n- export interface SegmentVolume { segmentId: string; gallons: number; cubicFeet: number; }\n- export interface VolumeReport { perSegment: SegmentVolume[]; totalGallons: number; totalCubicFeet: number; }\n- export function pipeVolumes(segments: Array<{ id: string; diameterIn: number; lengthFt: number; material: 'STEEL_SCH40' | 'STEEL_SCH10' | 'CPVC' | 'COPPER' }>): VolumeReport\n\nMath per segment: radiusFt = internalDiameterIn/24; cubicFeet = PI * radiusFt^2 * lengthFt; gallons = cubicFeet * 7.48052. Totals are sums. Skip (omit from perSegment) segments with non-positive length, but throw on unknown nominal sizes.\nTests: 2in SCH40 x 100ft -> cubicFeet = PI*(2.067/24)^2*100 (assert with toBeCloseTo, 4 digits) and gallons = that * 7.48052; SCH10 vs SCH40 differ for same nominal; totals sum; zero-length skipped; unknown nominal throws."
+      "attempts": 4,
+      "spec": "Implement the AutoSprink 'Show Pipe Volumes' calculation: water volume of pipe segments from internal diameter and length.\n\nUse EXACTLY these internal diameters (inches), from ANSI/ASME B36.10M steel pipe tables (verify against adopted edition before regulated use):\nSCH40: 0.5->0.622, 0.75->0.824, 1->1.049, 1.25->1.380, 1.5->1.610, 2->2.067, 2.5->2.469, 3->3.068, 4->4.026, 6->6.065, 8->7.981\nSCH10: 1->1.097, 1.25->1.442, 1.5->1.682, 2->2.157, 2.5->2.635, 3->3.260, 4->4.260, 6->6.357, 8->8.329\nGallons per cubic foot: 7.48052.\n\nExports (exact):\n- export function internalDiameterIn(material: 'STEEL_SCH40' | 'STEEL_SCH10' | 'CPVC' | 'COPPER', nominalIn: number): number \u2014 SCH40 table for STEEL_SCH40 and (as a documented approximation) CPVC/COPPER; SCH10 table for STEEL_SCH10; throws on unknown nominal size.\n- export interface SegmentVolume { segmentId: string; gallons: number; cubicFeet: number; }\n- export interface VolumeReport { perSegment: SegmentVolume[]; totalGallons: number; totalCubicFeet: number; }\n- export function pipeVolumes(segments: Array<{ id: string; diameterIn: number; lengthFt: number; material: 'STEEL_SCH40' | 'STEEL_SCH10' | 'CPVC' | 'COPPER' }>): VolumeReport\n\nMath per segment: radiusFt = internalDiameterIn/24; cubicFeet = PI * radiusFt^2 * lengthFt; gallons = cubicFeet * 7.48052. Totals are sums. Skip (omit from perSegment) segments with non-positive length, but throw on unknown nominal sizes.\nTests: 2in SCH40 x 100ft -> cubicFeet = PI*(2.067/24)^2*100 (assert with toBeCloseTo, 4 digits) and gallons = that * 7.48052; SCH10 vs SCH40 differ for same nominal; totals sum; zero-length skipped; unknown nominal throws.",
+      "last_error": "src/lib/pipe-volume.ts(1,20): error TS2307: Cannot find module 'math' or its corresponding type declarations.\ntest/pipe-volume.test.ts(2,43): error TS6133: 'SegmentVolume' is declared but its value is never read.\ntest/pipe-volume.test.ts(2,58): error TS6133: 'VolumeReport' is declared but its value is never read.\n\n"
     },
     {
       "id": "C1C2C3-segment-ops",
       "title": "Commands > Break / Divide / Reverse (pure segment ops)",
-      "status": "pending",
+      "status": "blocked",
       "phase": 6,
-      "write_roots": ["apps/cad/src/lib", "apps/cad/test"],
-      "context_files": ["apps/cad/src/lib/model.ts"],
-      "files_create": ["apps/cad/src/lib/segment-ops.ts", "apps/cad/test/segment-ops.test.ts"],
+      "write_roots": [
+        "apps/cad/src/lib",
+        "apps/cad/test"
+      ],
+      "context_files": [
+        "apps/cad/src/lib/model.ts"
+      ],
+      "files_create": [
+        "apps/cad/src/lib/segment-ops.ts",
+        "apps/cad/test/segment-ops.test.ts"
+      ],
       "gate": "cd apps/cad && npx tsc -b && npx vitest run test/segment-ops.test.ts",
-      "attempts": 0,
-      "spec": "Implement pure versions of three AutoSprink Commands-menu operations over the network model (see model.ts for Node/Segment shapes; Node.pos is {x,y,z} feet; Segment has from/to node ids, diameterIn, lengthFt, role, material).\n\nExports (exact):\n- export interface NetworkSlice { nodes: Array<{ id: string; type: string; pos: { x: number; y: number; z: number } }>; segments: Array<{ id: string; from: string; to: string; diameterIn: number; lengthFt: number; role: string; material: string }>; }\n- export function breakSegment(net: NetworkSlice, segmentId: string, t: number, newNodeId: string, seg1Id: string, seg2Id: string): NetworkSlice — split one segment at parameter t (0<t<1, throw otherwise or when ids collide/missing): insert a new node of type 'FITTING' linearly interpolated between the endpoints' positions, replace the segment with two segments (from->new with lengthFt*t, new->to with lengthFt*(1-t)), preserving diameterIn/role/material. Pure: returns a NEW object, inputs untouched.\n- export function divideSegment(net: NetworkSlice, segmentId: string, parts: number, idPrefix: string): NetworkSlice — divide into N equal parts (integer 2..50, throw otherwise) by repeated interpolation: creates N-1 nodes `${idPrefix}_n1..` and N segments `${idPrefix}_s1..`, equal lengths summing to the original lengthFt (each lengthFt/N). Pure.\n- export function reverseSegment(net: NetworkSlice, segmentId: string): NetworkSlice — swap from/to of one segment. Pure. Throws when the segment id is missing.\n\nTests: break at t=0.25 puts the new node at the 25% interpolated position and lengths 25/75 of original; divide a 30ft segment into 3 -> 3 segments of 10ft each, 2 new nodes, connectivity chain intact (from/to ids form a path from original endpoints); reverse swaps endpoints and double-reverse restores; purity (original object unchanged, use structuredClone comparison); all throw cases."
+      "attempts": 4,
+      "spec": "Implement pure versions of three AutoSprink Commands-menu operations over the network model (see model.ts for Node/Segment shapes; Node.pos is {x,y,z} feet; Segment has from/to node ids, diameterIn, lengthFt, role, material).\n\nExports (exact):\n- export interface NetworkSlice { nodes: Array<{ id: string; type: string; pos: { x: number; y: number; z: number } }>; segments: Array<{ id: string; from: string; to: string; diameterIn: number; lengthFt: number; role: string; material: string }>; }\n- export function breakSegment(net: NetworkSlice, segmentId: string, t: number, newNodeId: string, seg1Id: string, seg2Id: string): NetworkSlice \u2014 split one segment at parameter t (0<t<1, throw otherwise or when ids collide/missing): insert a new node of type 'FITTING' linearly interpolated between the endpoints' positions, replace the segment with two segments (from->new with lengthFt*t, new->to with lengthFt*(1-t)), preserving diameterIn/role/material. Pure: returns a NEW object, inputs untouched.\n- export function divideSegment(net: NetworkSlice, segmentId: string, parts: number, idPrefix: string): NetworkSlice \u2014 divide into N equal parts (integer 2..50, throw otherwise) by repeated interpolation: creates N-1 nodes `${idPrefix}_n1..` and N segments `${idPrefix}_s1..`, equal lengths summing to the original lengthFt (each lengthFt/N). Pure.\n- export function reverseSegment(net: NetworkSlice, segmentId: string): NetworkSlice \u2014 swap from/to of one segment. Pure. Throws when the segment id is missing.\n\nTests: break at t=0.25 puts the new node at the 25% interpolated position and lengths 25/75 of original; divide a 30ft segment into 3 -> 3 segments of 10ft each, 2 new nodes, connectivity chain intact (from/to ids form a path from original endpoints); reverse swaps endpoints and double-reverse restores; purity (original object unchanged, use structuredClone comparison); all throw cases.",
+      "last_error": " an 'any' type.\nsrc/lib/segment-ops.ts(117,20): error TS7006: Parameter 'node' implicitly has an 'any' type.\nsrc/lib/segment-ops.ts(118,23): error TS7006: Parameter 'seg' implicitly has an 'any' type.\nsrc/lib/segment-ops.ts(124,7): error TS2322: Type '\"FITTING\"' is not assignable to type 'NodeType'.\nsrc/lib/segment-ops.ts(167,31): error TS7006: Parameter 'seg' implicitly has an 'any' type.\nsrc/lib/segment-ops.ts(180,41): error TS7006: Parameter 'seg' implicitly has an 'any' type.\nsrc/lib/segment-ops.ts(199,28): error TS7006: Parameter 'seg' implicitly has an 'any' type.\ntest/segment-ops.test.ts(1,10): error TS2305: Module '\"../src/lib/model\"' has no exported member 'NetworkSlice'.\ntest/segment-ops.test.ts(1,24): error TS6133: 'Node' is declared but its value is never read.\ntest/segment-ops.test.ts(1,30): error TS6133: 'Segment' is declared but its value is never read.\ntest/segment-ops.test.ts(14,7): error TS6133: 'testNetworkWithTwoSegments' is declared but its value is never read.\ntest/segment-ops.test.ts(31,39): error TS7006: Parameter 'n' implicitly has an 'any' type.\ntest/segment-ops.test.ts(38,39): error TS7006: Parameter 's' implicitly has an 'any' type.\ntest/segment-ops.test.ts(39,39): error TS7006: Parameter 's' implicitly has an 'any' type.\ntest/segment-ops.test.ts(82,32): error TS7006: Parameter 'n' implicitly has an 'any' type.\ntest/segment-ops.test.ts(83,30): error TS7006: Parameter 'n' implicitly has an 'any' type.\ntest/segment-ops.test.ts(84,30): error TS7006: Parameter 'n' implicitly has an 'any' type.\ntest/segment-ops.test.ts(87,41): error TS7006: Parameter 's' implicitly has an 'any' type.\ntest/segment-ops.test.ts(94,33): error TS7006: Parameter 's' implicitly has an 'any' type.\ntest/segment-ops.test.ts(95,33): error TS7006: Parameter 's' implicitly has an 'any' type.\ntest/segment-ops.test.ts(96,33): error TS7006: Parameter 's' implicitly has an 'any' type.\ntest/segment-ops.test.ts(132,46): error TS7006: Parameter 's' implicitly has an 'any' type.\n\n"
     },
     {
       "id": "H7-hydrant-flow",
       "title": "Hydraulics > Hydrant Flow Calculator (smoothbore)",
-      "status": "pending",
+      "status": "in_progress",
       "phase": 4,
-      "write_roots": ["apps/cad/src/lib", "apps/cad/test"],
+      "write_roots": [
+        "apps/cad/src/lib",
+        "apps/cad/test"
+      ],
       "context_files": [],
-      "files_create": ["apps/cad/src/lib/hydrant-flow.ts", "apps/cad/test/hydrant-flow.test.ts"],
+      "files_create": [
+        "apps/cad/src/lib/hydrant-flow.ts",
+        "apps/cad/test/hydrant-flow.test.ts"
+      ],
       "gate": "cd apps/cad && npx tsc -b && npx vitest run test/hydrant-flow.test.ts",
       "attempts": 0,
-      "spec": "Implement the AutoSprink 'Hydrant Flow Calculator': smoothbore nozzle discharge from outlet coefficient, diameter, and pitot pressure, using the cited standard smoothbore discharge formula (NFPA 291 style — verify adopted edition): Q = 29.83 * c * d^2 * sqrt(P), Q in gpm, d = orifice diameter in INCHES, P = pitot pressure in psi, c = discharge coefficient (0 < c <= 1).\n\nExports (exact):\n- export const SMOOTHBORE_CONSTANT = 29.83;\n- export interface HydrantFlowInput { coefficient: number; diameterIn: number; pitotPsi: number; }\n- export interface HydrantFlowResult { flowGpm: number; formula: 'Q = 29.83 * c * d^2 * sqrt(P)'; input: HydrantFlowInput; }\n- export function hydrantFlow(input: HydrantFlowInput): HydrantFlowResult — throws on non-finite/non-positive diameter or pitot, or coefficient outside (0, 1].\n\nTests: c=0.9, d=2.5, P=36 -> Q = 29.83*0.9*6.25*6 = 1006.7625 (toBeCloseTo 4 digits); coefficient 1 upper bound accepted; each throw case (c=0, c>1, d<=0, P<0, NaN)."
+      "spec": "Implement the AutoSprink 'Hydrant Flow Calculator': smoothbore nozzle discharge from outlet coefficient, diameter, and pitot pressure, using the cited standard smoothbore discharge formula (NFPA 291 style \u2014 verify adopted edition): Q = 29.83 * c * d^2 * sqrt(P), Q in gpm, d = orifice diameter in INCHES, P = pitot pressure in psi, c = discharge coefficient (0 < c <= 1).\n\nExports (exact):\n- export const SMOOTHBORE_CONSTANT = 29.83;\n- export interface HydrantFlowInput { coefficient: number; diameterIn: number; pitotPsi: number; }\n- export interface HydrantFlowResult { flowGpm: number; formula: 'Q = 29.83 * c * d^2 * sqrt(P)'; input: HydrantFlowInput; }\n- export function hydrantFlow(input: HydrantFlowInput): HydrantFlowResult \u2014 throws on non-finite/non-positive diameter or pitot, or coefficient outside (0, 1].\n\nTests: c=0.9, d=2.5, P=36 -> Q = 29.83*0.9*6.25*6 = 1006.7625 (toBeCloseTo 4 digits); coefficient 1 upper bound accepted; each throw case (c=0, c>1, d<=0, P<0, NaN)."
     },
     {
       "id": "T29T34-drawing-elements",
       "title": "Tools > Line/Polyline/Arc/Circle/Rectangle/Point (element model)",
       "status": "pending",
       "phase": 2,
-      "write_roots": ["apps/cad/src/lib", "apps/cad/test"],
+      "write_roots": [
+        "apps/cad/src/lib",
+        "apps/cad/test"
+      ],
       "context_files": [],
-      "files_create": ["apps/cad/src/lib/drawing-elements.ts", "apps/cad/test/drawing-elements.test.ts"],
+      "files_create": [
+        "apps/cad/src/lib/drawing-elements.ts",
+        "apps/cad/test/drawing-elements.test.ts"
+      ],
       "gate": "cd apps/cad && npx tsc -b && npx vitest run test/drawing-elements.test.ts",
       "attempts": 0,
-      "spec": "Implement the pure data model for six AutoSprink Tools-menu drawing primitives (2D plan-space, units = feet): Line Segment, Polyline, Arc, Circle, Rectangle, Point.\n\nExports (exact):\n- export interface Pt { x: number; y: number; }\n- export type DrawingElement = { id: string } & ( { kind: 'line'; a: Pt; b: Pt } | { kind: 'polyline'; points: Pt[] } | { kind: 'arc'; center: Pt; radiusFt: number; startDeg: number; endDeg: number } | { kind: 'circle'; center: Pt; radiusFt: number } | { kind: 'rectangle'; corner: Pt; widthFt: number; heightFt: number } | { kind: 'point'; at: Pt } );\n- Constructors, each validating finiteness and throwing on invalid input: makeLine(id, a, b) (a!=b), makePolyline(id, points) (>=2 points), makeArc(id, center, radiusFt>0, startDeg, endDeg) (angles finite, normalized into [0,360)), makeCircle(id, center, radiusFt>0), makeRectangle(id, corner, widthFt>0, heightFt>0), makePoint(id, at).\n- export function elementLengthFt(el: DrawingElement): number — line: Euclidean distance; polyline: sum of consecutive distances; arc: 2*PI*r*(sweep/360) where sweep = (endDeg-startDeg+360)%360 (full circle when sweep computes to 0 AND start!==end is impossible after normalization, so sweep 0 means 0); circle: circumference 2*PI*r; rectangle: perimeter 2*(w+h); point: 0.\n- export function elementAreaFt2(el: DrawingElement): number — circle: PI*r^2; rectangle: w*h; closed polyline (first point equals last point): shoelace formula absolute value; all others: 0.\n\nTests: 3-4-5 line length 5; polyline lengths sum; quarter arc (r=10, 0..90) length = 2*PI*10*0.25; circle area PI*r^2; rectangle perimeter and area; closed square polyline (0,0)(10,0)(10,10)(0,10)(0,0) area 100 via shoelace; open polyline area 0; every constructor throw case (NaN coords, radius<=0, <2 polyline points, degenerate line, non-positive rectangle dims)."
+      "spec": "Implement the pure data model for six AutoSprink Tools-menu drawing primitives (2D plan-space, units = feet): Line Segment, Polyline, Arc, Circle, Rectangle, Point.\n\nExports (exact):\n- export interface Pt { x: number; y: number; }\n- export type DrawingElement = { id: string } & ( { kind: 'line'; a: Pt; b: Pt } | { kind: 'polyline'; points: Pt[] } | { kind: 'arc'; center: Pt; radiusFt: number; startDeg: number; endDeg: number } | { kind: 'circle'; center: Pt; radiusFt: number } | { kind: 'rectangle'; corner: Pt; widthFt: number; heightFt: number } | { kind: 'point'; at: Pt } );\n- Constructors, each validating finiteness and throwing on invalid input: makeLine(id, a, b) (a!=b), makePolyline(id, points) (>=2 points), makeArc(id, center, radiusFt>0, startDeg, endDeg) (angles finite, normalized into [0,360)), makeCircle(id, center, radiusFt>0), makeRectangle(id, corner, widthFt>0, heightFt>0), makePoint(id, at).\n- export function elementLengthFt(el: DrawingElement): number \u2014 line: Euclidean distance; polyline: sum of consecutive distances; arc: 2*PI*r*(sweep/360) where sweep = (endDeg-startDeg+360)%360 (full circle when sweep computes to 0 AND start!==end is impossible after normalization, so sweep 0 means 0); circle: circumference 2*PI*r; rectangle: perimeter 2*(w+h); point: 0.\n- export function elementAreaFt2(el: DrawingElement): number \u2014 circle: PI*r^2; rectangle: w*h; closed polyline (first point equals last point): shoelace formula absolute value; all others: 0.\n\nTests: 3-4-5 line length 5; polyline lengths sum; quarter arc (r=10, 0..90) length = 2*PI*10*0.25; circle area PI*r^2; rectangle perimeter and area; closed square polyline (0,0)(10,0)(10,10)(0,10)(0,0) area 100 via shoelace; open polyline area 0; every constructor throw case (NaN coords, radius<=0, <2 polyline points, degenerate line, non-positive rectangle dims)."
     },
     {
       "id": "C22-tag-leaks",
       "title": "Commands > Tag Leaks (open pipe ends)",
       "status": "pending",
       "phase": 6,
-      "write_roots": ["apps/cad/src/lib", "apps/cad/test"],
-      "context_files": ["apps/cad/src/lib/model.ts"],
-      "files_create": ["apps/cad/src/lib/leak-check.ts", "apps/cad/test/leak-check.test.ts"],
+      "write_roots": [
+        "apps/cad/src/lib",
+        "apps/cad/test"
+      ],
+      "context_files": [
+        "apps/cad/src/lib/model.ts"
+      ],
+      "files_create": [
+        "apps/cad/src/lib/leak-check.ts",
+        "apps/cad/test/leak-check.test.ts"
+      ],
       "gate": "cd apps/cad && npx tsc -b && npx vitest run test/leak-check.test.ts",
       "attempts": 0,
-      "spec": "Implement the AutoSprink 'Tag Leaks' analysis: find OPEN PIPE ENDS in the sprinkler network — connection points where water would escape. A leak is (a) a segment endpoint referencing a node id that does not exist (dangling reference), or (b) a node of degree 1 (exactly one attached segment) whose type is NOT one of the closed/terminal types: 'HEAD', 'SOURCE', 'VALVE'.\n\nExports (exact):\n- export interface Leak { nodeId: string; reason: 'dangling-reference' | 'open-end'; segmentIds: string[]; }\n- export interface LeakReport { leaks: Leak[]; checkedNodes: number; checkedSegments: number; clean: boolean; }\n- export function findLeaks(net: { nodes: Array<{ id: string; type: string }>; segments: Array<{ id: string; from: string; to: string }> }): LeakReport\n\nRules: degree = number of segment endpoints touching the node (a self-loop counts 2). For dangling references the Leak.nodeId is the MISSING id and segmentIds lists the referencing segments. Sort leaks by nodeId for determinism. clean = leaks.length === 0. Pure function, inputs untouched.\n\nTests: linear run HEAD - FITTING - FITTING - SOURCE is clean; chop the last segment -> the now degree-1 FITTING is an open-end leak; a segment pointing at a nonexistent id is a dangling-reference leak listing that segment; isolated degree-0 fitting node is NOT a leak (it is unpiped, not open); HEAD/SOURCE/VALVE at degree 1 are never leaks; determinism (sorted by nodeId)."
+      "spec": "Implement the AutoSprink 'Tag Leaks' analysis: find OPEN PIPE ENDS in the sprinkler network \u2014 connection points where water would escape. A leak is (a) a segment endpoint referencing a node id that does not exist (dangling reference), or (b) a node of degree 1 (exactly one attached segment) whose type is NOT one of the closed/terminal types: 'HEAD', 'SOURCE', 'VALVE'.\n\nExports (exact):\n- export interface Leak { nodeId: string; reason: 'dangling-reference' | 'open-end'; segmentIds: string[]; }\n- export interface LeakReport { leaks: Leak[]; checkedNodes: number; checkedSegments: number; clean: boolean; }\n- export function findLeaks(net: { nodes: Array<{ id: string; type: string }>; segments: Array<{ id: string; from: string; to: string }> }): LeakReport\n\nRules: degree = number of segment endpoints touching the node (a self-loop counts 2). For dangling references the Leak.nodeId is the MISSING id and segmentIds lists the referencing segments. Sort leaks by nodeId for determinism. clean = leaks.length === 0. Pure function, inputs untouched.\n\nTests: linear run HEAD - FITTING - FITTING - SOURCE is clean; chop the last segment -> the now degree-1 FITTING is an open-end leak; a segment pointing at a nonexistent id is a dangling-reference leak listing that segment; isolated degree-0 fitting node is NOT a leak (it is unpiped, not open); HEAD/SOURCE/VALVE at degree 1 are never leaks; determinism (sorted by nodeId)."
     }
   ]
 }
