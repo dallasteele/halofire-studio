@@ -67,7 +67,7 @@
     {
       "id": "H7-hydrant-flow",
       "title": "Hydraulics > Hydrant Flow Calculator (smoothbore)",
-      "status": "in_progress",
+      "status": "done",
       "phase": 4,
       "write_roots": [
         "apps/cad/src/lib",
@@ -79,13 +79,15 @@
         "apps/cad/test/hydrant-flow.test.ts"
       ],
       "gate": "cd apps/cad && npx tsc -b && npx vitest run test/hydrant-flow.test.ts",
-      "attempts": 0,
-      "spec": "Implement the AutoSprink 'Hydrant Flow Calculator': smoothbore nozzle discharge from outlet coefficient, diameter, and pitot pressure, using the cited standard smoothbore discharge formula (NFPA 291 style \u2014 verify adopted edition): Q = 29.83 * c * d^2 * sqrt(P), Q in gpm, d = orifice diameter in INCHES, P = pitot pressure in psi, c = discharge coefficient (0 < c <= 1).\n\nExports (exact):\n- export const SMOOTHBORE_CONSTANT = 29.83;\n- export interface HydrantFlowInput { coefficient: number; diameterIn: number; pitotPsi: number; }\n- export interface HydrantFlowResult { flowGpm: number; formula: 'Q = 29.83 * c * d^2 * sqrt(P)'; input: HydrantFlowInput; }\n- export function hydrantFlow(input: HydrantFlowInput): HydrantFlowResult \u2014 throws on non-finite/non-positive diameter or pitot, or coefficient outside (0, 1].\n\nTests: c=0.9, d=2.5, P=36 -> Q = 29.83*0.9*6.25*6 = 1006.7625 (toBeCloseTo 4 digits); coefficient 1 upper bound accepted; each throw case (c=0, c>1, d<=0, P<0, NaN)."
+      "attempts": 4,
+      "spec": "Implement the AutoSprink 'Hydrant Flow Calculator': smoothbore nozzle discharge from outlet coefficient, diameter, and pitot pressure, using the cited standard smoothbore discharge formula (NFPA 291 style \u2014 verify adopted edition): Q = 29.83 * c * d^2 * sqrt(P), Q in gpm, d = orifice diameter in INCHES, P = pitot pressure in psi, c = discharge coefficient (0 < c <= 1).\n\nExports (exact):\n- export const SMOOTHBORE_CONSTANT = 29.83;\n- export interface HydrantFlowInput { coefficient: number; diameterIn: number; pitotPsi: number; }\n- export interface HydrantFlowResult { flowGpm: number; formula: 'Q = 29.83 * c * d^2 * sqrt(P)'; input: HydrantFlowInput; }\n- export function hydrantFlow(input: HydrantFlowInput): HydrantFlowResult \u2014 throws on non-finite/non-positive diameter or pitot, or coefficient outside (0, 1].\n\nTests: c=0.9, d=2.5, P=36 -> Q = 29.83*0.9*6.25*6 = 1006.7625 (toBeCloseTo 4 digits); coefficient 1 upper bound accepted; each throw case (c=0, c>1, d<=0, P<0, NaN).",
+      "completed_at": "2026-06-10T00:34:03+00:00",
+      "commit": "e53de506"
     },
     {
       "id": "T29T34-drawing-elements",
       "title": "Tools > Line/Polyline/Arc/Circle/Rectangle/Point (element model)",
-      "status": "pending",
+      "status": "in_progress",
       "phase": 2,
       "write_roots": [
         "apps/cad/src/lib",
