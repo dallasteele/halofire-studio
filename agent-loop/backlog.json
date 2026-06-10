@@ -314,7 +314,8 @@
       "gate": "cd apps/cad && npx tsc -b && npx vitest run test/coverage-area.test.ts",
       "attempts": 2,
       "spec": "Pure rectangular sprinkler coverage-cell geometry + NFPA spacing check. A head at center (cx,cy) with spacing S (ft) covers a square of side S (S/2 each direction). Exports (exact): export interface Pt{x:number;y:number} export interface CoverageCell{ center:Pt; sideFt:number; minX:number; minY:number; maxX:number; maxY:number; areaSqFt:number } export function coverageCell(center:Pt, sideFt:number): CoverageCell \u2014 throws on non-finite center or non-finite/non-positive sideFt; areaSqFt=sideFt*sideFt; bounds are center +/- sideFt/2. export function cellsOverlap(a:CoverageCell,b:CoverageCell):boolean \u2014 axis-aligned overlap (touching edges = not overlap, use strict <). export function maxAreaWithinLimit(sideFt:number, maxProtectionSqFt:number):boolean \u2014 sideFt*sideFt <= maxProtectionSqFt; throws on non-positive inputs. Tests: coverageCell({x:0,y:0},12) -> bounds -6..6, area 144; two cells 12 apart centers (0,0) and (12,0) do NOT overlap (edges touch); centers (0,0)/(10,0) DO overlap; maxAreaWithinLimit(12,225) true, (16,225) false; throw cases.",
-      "completed_at": "2026-06-10T15:02:23+00:00"
+      "completed_at": "2026-06-10T15:02:23+00:00",
+      "commit": "e94c480e"
     }
   ]
 }
