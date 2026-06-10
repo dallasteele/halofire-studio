@@ -19,6 +19,7 @@ State:  agent-loop/backlog.json  (single source of truth, committed with results
 
 import argparse
 import json
+import os
 import re
 import subprocess
 import sys
@@ -29,8 +30,12 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
 BACKLOG = REPO / "agent-loop" / "backlog.json"
+RULES = REPO / "agent-loop" / "RULES.md"      # skill file — read EVERY run
+LESSONS = REPO / "agent-loop" / "LESSONS.md"  # compounding memory across runs
 OLLAMA_URL = "http://127.0.0.1:11434/api/chat"
-MODEL = "qwen3:30b-a3b"          # MANDATORY model — see hal-vault LOCAL_LLM.md
+# Canonical model is qwen3:30b-a3b (hal-vault LOCAL_LLM.md). The env override
+# exists ONLY for documented benchmarks of candidate executors — never cloud.
+MODEL = os.environ.get("HALOFIRE_LOOP_MODEL", "qwen3:30b-a3b")
 NUM_CTX = 12288                   # default 40960 crashes this GPU (CUDA INT_MAX)
 MAX_OUTPUT_TOKENS = 8192
 MAX_ATTEMPTS = 4  # attempts are local-only (free); only wall-clock is spent
@@ -48,13 +53,16 @@ module and its vitest test file. Rules:
 - Follow the exact file paths, exported names, and signatures in the task spec.
 - Keep cited constants/formulas EXACTLY as given in the spec; do not invent values.
 - No 'any' types. Strict TS. JSDoc on exported functions.
-- tsconfig is STRICT (noUnusedLocals/noUnusedParameters): never import or declare \
-anything you do not use — including type-only imports in tests.
-- Never assign to a const; declare mutable values with let.
-- Use Number.isFinite for numeric validation; throw new Error('<clear message>').
-- In tests, assert throw cases with expect(() => ...).toThrow() and NO message \
-argument, unless the spec pins an exact message. Never invent a message string \
-in a test that your implementation file does not literally throw."""
+The RULES section appended to each task is mandatory."""
+
+VERIFIER_PROMPT = """You are a SKEPTICAL senior code reviewer. You did NOT write \
+this code; judge it against the task spec only. Check: (1) every spec export \
+exists with the exact name/signature; (2) cited constants/formulas match the \
+spec EXACTLY (no invented values); (3) tests assert real behavior from the spec \
+(not just that code runs) and cover the spec's listed cases. Deterministic gates \
+(compile + tests) already PASSED — your job is spec fidelity, not style. \
+Output ONLY JSON: {"approve": true|false, "reasons": ["<specific issue>", ...]} \
+— approve true with [] when faithful; false with concrete, actionable reasons."""
 
 
 def log(msg: str) -> None:
@@ -114,7 +122,7 @@ def extract_json(text: str) -> dict:
         )
 
 
-def call_qwen(prompt: str) -> dict:
+def call_qwen(prompt: str, system: str = SYSTEM_PROMPT) -> dict:
     """One JSON-forced chat call to local Ollama. Raises on transport/parse error.
     think:false — qwen3 is a thinking model; with thinking on, the budget can be
     consumed by the think block and the JSON content comes back empty/truncated."""
@@ -125,7 +133,7 @@ def call_qwen(prompt: str) -> dict:
         "think": False,
         "options": {"num_ctx": NUM_CTX, "num_predict": MAX_OUTPUT_TOKENS, "temperature": 0.2},
         "messages": [
-            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "system", "content": system},
             {"role": "user", "content": prompt},
         ],
     }).encode("utf-8")
@@ -133,6 +141,43 @@ def call_qwen(prompt: str) -> dict:
     raw = urllib.request.urlopen(req, timeout=1800).read()
     content = json.loads(raw)["message"]["content"]
     return extract_json(content)
+
+
+def read_capped(path: Path, cap: int) -> str:
+    """Read a text file best-effort, capped (empty string when absent)."""
+    try:
+        return path.read_text(encoding="utf-8")[:cap]
+    except OSError:
+        return ""
+
+
+def append_lesson(line: str) -> None:
+    """Compounding memory: one lesson line per land/block event (fail-soft)."""
+    try:
+        stamp = datetime.now(timezone.utc).date().isoformat()
+        with LESSONS.open("a", encoding="utf-8") as f:
+            f.write(f"- {stamp} {line}\n")
+    except OSError:
+        pass
+
+
+def verify_against_spec(task: dict, written: list[Path]) -> tuple[bool, str]:
+    """Maker != checker: a SEPARATE reviewer call judges spec fidelity AFTER the
+    deterministic gates pass. Returns (approved, reasons_text). Fail-OPEN on
+    reviewer transport errors — the deterministic gates remain the hard floor,
+    the reviewer is an extra honesty layer, not a flaky blocker."""
+    parts = [f"# Task spec\n{task['spec']}", "\n# Files produced (gates already green):"]
+    for p in written:
+        rel = p.relative_to(REPO).as_posix()
+        parts.append(f"\n## {rel}\n```ts\n{read_capped(p, 8000)}\n```")
+    try:
+        out = call_qwen("\n".join(parts), system=VERIFIER_PROMPT)
+        approved = bool(out.get("approve", False))
+        reasons = "; ".join(str(r) for r in out.get("reasons", []) if r)
+        return approved, reasons
+    except Exception as exc:  # noqa: BLE001 — reviewer is best-effort
+        log(f"  verifier unavailable ({exc}); accepting on deterministic gates")
+        return True, ""
 
 
 def safe_path(rel: str, write_roots: list[str]) -> Path:
@@ -147,6 +192,12 @@ def safe_path(rel: str, write_roots: list[str]) -> Path:
 
 def build_prompt(task: dict, error_tail: str | None) -> str:
     parts = [f"# Task: {task['title']}\n\n{task['spec']}"]
+    rules = read_capped(RULES, 4000)
+    if rules:
+        parts.append(f"\n## RULES (mandatory — each exists because an attempt violated it)\n{rules}")
+    lessons = read_capped(LESSONS, 1500)
+    if lessons:
+        parts.append(f"\n## Lessons from previous runs\n{lessons}")
     for rel in task.get("context_files", []):
         f = REPO / rel
         if f.exists():
@@ -325,14 +376,24 @@ def process_task(task: dict, dry_run: bool) -> bool:
         if not ok and nocheck_tests(err, written):
             ok, err = gate(task)  # second free re-gate (tests now runtime-gated)
         if ok:
+            # Maker != checker: a separate reviewer judges SPEC FIDELITY before
+            # anything lands (loop-engineering canon — the maker never grades
+            # its own homework). Rejection = a normal failed attempt.
+            approved, reasons = verify_against_spec(task, written)
+            if not approved:
+                error_tail = f"SPEC REVIEWER rejected your gates-green attempt: {reasons}"
+                log(f"  🔍 verifier rejected: {reasons[:300]}")
+                revert(written)
+                continue
             task["status"] = "done"
             task["completed_at"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
             sha = commit_and_push(task, written)
             task["commit"] = sha
-            log(f"  ✅ GATES GREEN — committed {sha}")
+            log(f"  ✅ GATES GREEN + VERIFIED — committed {sha}")
+            append_lesson(f"DONE {task['id']} on attempt {attempt} (model {MODEL}).")
             brain_remember(
                 f"agent-loop DONE {task['id']} ({task['title']}) commit {sha}; "
-                f"gates green (scoped + full vitest) on attempt {attempt}."
+                f"gates green + spec-verified on attempt {attempt}."
             )
             return True
         error_tail = err
@@ -342,6 +403,9 @@ def process_task(task: dict, dry_run: bool) -> bool:
     task["status"] = "blocked"
     task["last_error"] = (error_tail or "")[-2000:]
     log(f"  ⛔ BLOCKED after {MAX_ATTEMPTS} attempts — escalation needed")
+    append_lesson(
+        f"BLOCKED {task['id']} (model {MODEL}); last error class: {(error_tail or '')[-160:]}"
+    )
     brain_remember(
         f"agent-loop BLOCKED {task['id']} ({task['title']}) after {MAX_ATTEMPTS} attempts. "
         f"Error tail: {(error_tail or '')[-500:]}"
