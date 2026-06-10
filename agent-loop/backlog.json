@@ -322,7 +322,7 @@
     {
       "id": "W4A-wall-solid",
       "title": "3D > Wall solid mesh (thickness + height, pure)",
-      "status": "pending",
+      "status": "done",
       "phase": "wave4-3d",
       "write_roots": [
         "apps/cad/src/lib",
@@ -334,8 +334,9 @@
         "apps/cad/test/wall-solid.test.ts"
       ],
       "gate": "cd apps/cad && npx tsc -b && npx vitest run test/wall-solid.test.ts",
-      "attempts": 0,
-      "spec": "Pure mesh builder: one wall segment -> a closed rectangular box mesh as flat arrays (three.js BufferGeometry-ready). Exports (exact): export interface Pt2{x:number;y:number} export interface WallMesh{positions:number[];indices:number[];vertexCount:number} export function wallSolid(start:Pt2,end:Pt2,thicknessFt:number,heightFt:number,baseY?:number):WallMesh \u2014 the wall runs start->end in plan (plan x->world x, plan y->world z), extruded UP (world y) from baseY (default 0) to baseY+heightFt, with thickness centered on the centerline (offset +/- thickness/2 along the 2D normal of the segment). Output: 8 corner vertices (positions length 24) and 12 triangles (indices length 36) with OUTWARD-facing CCW winding for the 6 faces. Throws on zero-length segment (distance < 1e-9), non-finite inputs, or non-positive thickness/height. Determinism: vertex order = bottom face first (4 verts: start-left, start-right, end-right, end-left), then top face same order. Tests: a unit wall (0,0)->(10,0), thickness 1, height 8: vertexCount 8, positions contain z=+0.5 and z=-0.5 corners, all top verts y=8, bottom y=0; indices length 36 with every index <8; a diagonal wall (3-4-5) has correct normal offsets (toBeCloseTo); throws on zero-length/negative thickness."
+      "attempts": 4,
+      "spec": "Pure mesh builder: one wall segment -> a closed rectangular box mesh as flat arrays (three.js BufferGeometry-ready). Exports (exact): export interface Pt2{x:number;y:number} export interface WallMesh{positions:number[];indices:number[];vertexCount:number} export function wallSolid(start:Pt2,end:Pt2,thicknessFt:number,heightFt:number,baseY?:number):WallMesh \u2014 the wall runs start->end in plan (plan x->world x, plan y->world z), extruded UP (world y) from baseY (default 0) to baseY+heightFt, with thickness centered on the centerline (offset +/- thickness/2 along the 2D normal of the segment). Output: 8 corner vertices (positions length 24) and 12 triangles (indices length 36) with OUTWARD-facing CCW winding for the 6 faces. Throws on zero-length segment (distance < 1e-9), non-finite inputs, or non-positive thickness/height. Determinism: vertex order = bottom face first (4 verts: start-left, start-right, end-right, end-left), then top face same order. Tests: a unit wall (0,0)->(10,0), thickness 1, height 8: vertexCount 8, positions contain z=+0.5 and z=-0.5 corners, all top verts y=8, bottom y=0; indices length 36 with every index <8; a diagonal wall (3-4-5) has correct normal offsets (toBeCloseTo); throws on zero-length/negative thickness.",
+      "completed_at": "2026-06-10T16:39:15+00:00"
     },
     {
       "id": "W4B-slab-solid",
