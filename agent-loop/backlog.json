@@ -120,6 +120,123 @@
       "gate": "cd apps/cad && npx tsc -b && npx vitest run test/leak-check.test.ts",
       "attempts": 0,
       "spec": "Implement the AutoSprink 'Tag Leaks' analysis: find OPEN PIPE ENDS in the sprinkler network \u2014 connection points where water would escape. A leak is (a) a segment endpoint referencing a node id that does not exist (dangling reference), or (b) a node of degree 1 (exactly one attached segment) whose type is NOT one of the closed/terminal types: 'HEAD', 'SOURCE', 'VALVE'.\n\nExports (exact):\n- export interface Leak { nodeId: string; reason: 'dangling-reference' | 'open-end'; segmentIds: string[]; }\n- export interface LeakReport { leaks: Leak[]; checkedNodes: number; checkedSegments: number; clean: boolean; }\n- export function findLeaks(net: { nodes: Array<{ id: string; type: string }>; segments: Array<{ id: string; from: string; to: string }> }): LeakReport\n\nRules: degree = number of segment endpoints touching the node (a self-loop counts 2). For dangling references the Leak.nodeId is the MISSING id and segmentIds lists the referencing segments. Sort leaks by nodeId for determinism. clean = leaks.length === 0. Pure function, inputs untouched.\n\nTests: linear run HEAD - FITTING - FITTING - SOURCE is clean; chop the last segment -> the now degree-1 FITTING is an open-end leak; a segment pointing at a nonexistent id is a dangling-reference leak listing that segment; isolated degree-0 fitting node is NOT a leak (it is unpiped, not open); HEAD/SOURCE/VALVE at degree 1 are never leaks; determinism (sorted by nodeId)."
+    },
+    {
+      "id": "W2A-density-demand",
+      "title": "Hydraulics > Density/area per-head demand floor",
+      "status": "pending",
+      "phase": "wave2",
+      "write_roots": [
+        "apps/cad/src/lib",
+        "apps/cad/test"
+      ],
+      "context_files": [
+        "apps/cad/src/lib/nfpa13-rules.ts"
+      ],
+      "files_create": [
+        "apps/cad/src/lib/density-demand.ts",
+        "apps/cad/test/density-demand.test.ts"
+      ],
+      "gate": "cd apps/cad && npx tsc -b && npx vitest run test/density-demand.test.ts",
+      "attempts": 0,
+      "spec": "Implement the NFPA-13 density/area per-head demand floor as a pure module. Use EXACTLY these design densities (gpm/ft^2), the low-point of the NFPA-13 density/area curves, edition-dependent \u2014 every export carries a citation string ending \"Verify adopted edition.\": LIGHT\u21920.10, ORDINARY_1\u21920.15, ORDINARY_2\u21920.20, EXTRA_1\u21920.30, EXTRA_2\u21920.40. Use EXACTLY these per-head max protection areas (ft^2), matching the repo's cited MAX_PROTECTION_AREA_SQFT: LIGHT\u2192225, ORDINARY_1\u2192130, ORDINARY_2\u2192130, EXTRA_1\u2192100, EXTRA_2\u2192100. Use EXACTLY these minimum remote design areas (ft^2): LIGHT\u21921500, ORDINARY_1\u21921500, ORDINARY_2\u21921500, EXTRA_1\u21922500, EXTRA_2\u21922500. Exports (exact): `export type HazardClass = 'LIGHT' | 'ORDINARY_1' | 'ORDINARY_2' | 'EXTRA_1' | 'EXTRA_2';` `export interface CitedNumber { value: number; citation: string; }` `export const DESIGN_DENSITY_GPM_SQFT: Record<HazardClass, CitedNumber>;` `export const PER_HEAD_AREA_SQFT: Record<HazardClass, CitedNumber>;` `export const MIN_REMOTE_AREA_SQFT: Record<HazardClass, CitedNumber>;` `export function densityFloorGpm(hazard: HazardClass, perHeadAreaSqFt?: number): number` \u2014 density \u00d7 (perHeadAreaSqFt ?? PER_HEAD_AREA_SQFT[hazard].value); throws on non-finite/non-positive override. `export function pressureForFlow(flowGpm: number, kFactor: number): number` \u2014 (Q/K)^2; throws on K<=0 or Q<0. `export interface HeadDemand { flowGpm: number; pressurePsi: number; governedBy: 'min-pressure' | 'density-floor'; citation: string; }` `export function effectiveHeadDemand(kFactor: number, minOperatingPsi: number, hazard: HazardClass, perHeadAreaSqFt?: number): HeadDemand` \u2014 qMin = kFactor*sqrt(minOperatingPsi); qFloor = densityFloorGpm(...); if qFloor > qMin return {flowGpm: qFloor, pressurePsi: pressureForFlow(qFloor, kFactor), governedBy: 'density-floor', citation: DESIGN_DENSITY_GPM_SQFT[hazard].citation} else {flowGpm: qMin, pressurePsi: minOperatingPsi, governedBy: 'min-pressure', citation: <minimum-operating-pressure citation string authored in this module>}; throws on kFactor<=0 or minOperatingPsi<=0. Tests: ORDINARY_1, K=5.6, 7 psi \u2192 qMin=5.6*sqrt(7)\u224814.8167, qFloor=0.15*130=19.5 \u2192 density-floor governs, pressurePsi=(19.5/5.6)^2\u224812.1249 (toBeCloseTo 3 digits); LIGHT, K=5.6, 7 psi \u2192 qFloor=0.10*225=22.5 > 14.8167 \u2192 density-floor; LIGHT, K=8.0, 16 psi \u2192 qMin=32 > 22.5 \u2192 min-pressure governs with pressurePsi=16; perHeadAreaSqFt override changes the floor linearly; every throw case; every CitedNumber.citation is a non-empty string containing \"Verify adopted edition\"."
+    },
+    {
+      "id": "W2B-viewport",
+      "title": "View > Pan/zoom viewport transform math (pure)",
+      "status": "pending",
+      "phase": "wave2",
+      "write_roots": [
+        "apps/cad/src/lib",
+        "apps/cad/test"
+      ],
+      "context_files": [],
+      "files_create": [
+        "apps/cad/src/lib/viewport.ts",
+        "apps/cad/test/viewport.test.ts"
+      ],
+      "gate": "cd apps/cad && npx tsc -b && npx vitest run test/viewport.test.ts",
+      "attempts": 0,
+      "spec": "Pure 2D viewport math for a plan canvas: stagePt = planPt*scale + offset. Exports (exact): `export interface Viewport { scale: number; offsetX: number; offsetY: number; }` `export interface Pt { x: number; y: number; }` `export interface Bounds { minX: number; minY: number; maxX: number; maxY: number; }` `export const MIN_SCALE = 1e-6;` `export const MAX_SCALE = 1e6;` `export const ZOOM_STEP = 1.1;` `export function fitViewport(bounds: Bounds, stageW: number, stageH: number, paddingPx: number): Viewport` \u2014 uniform scale = min((stageW-2*paddingPx)/boundsW, (stageH-2*paddingPx)/boundsH) clamped to [MIN_SCALE, MAX_SCALE], offsets center the bounds in the stage; for zero/negative bounds dimensions or stage dims <= 2*paddingPx return {scale: 1, offsetX: stageW/2, offsetY: stageH/2}. `export function toStagePt(vp: Viewport, plan: Pt): Pt` \u2014 {x: plan.x*vp.scale+vp.offsetX, y: plan.y*vp.scale+vp.offsetY}. `export function toPlanPt(vp: Viewport, stage: Pt): Pt` \u2014 exact inverse. `export function zoomAt(vp: Viewport, stageCursor: Pt, factor: number): Viewport` \u2014 newScale = clamp(vp.scale*factor, MIN_SCALE, MAX_SCALE); the plan point under stageCursor must map to the SAME stage point after zoom: newOffset = stageCursor - planPtUnderCursor*newScale; throws on non-finite or non-positive factor. `export function panBy(vp: Viewport, dxPx: number, dyPx: number): Viewport` \u2014 offsets += deltas; throws on non-finite deltas. `export function zoomPercent(vp: Viewport, fitScale: number): number` \u2014 round(100*vp.scale/fitScale); throws when fitScale <= 0. All functions pure (return new objects). Tests: toPlanPt(toStagePt(p)) round-trips (toBeCloseTo 10 digits); fitViewport of bounds {0,0,100,50} into 1000x600 stage with padding 20 gives scale = min(960/100, 560/50) = 9.6 and centers; zoomAt invariant: for vp {scale:2, offsetX:10, offsetY:-5}, cursor {x:300,y:200}, factor 1.5 \u2014 toPlanPt before === toPlanPt after at the cursor (toBeCloseTo); repeated zoomAt clamps at MAX_SCALE; panBy(3,-4) shifts a mapped point by exactly (3,-4) stage px; degenerate-bounds fallback; throw cases."
+    },
+    {
+      "id": "W2C-project-io",
+      "title": "File > Project serialize/deserialize (.hfcad JSON codec)",
+      "status": "pending",
+      "phase": "wave2",
+      "write_roots": [
+        "apps/cad/src/lib",
+        "apps/cad/test"
+      ],
+      "context_files": [
+        "apps/cad/src/lib/model.ts"
+      ],
+      "files_create": [
+        "apps/cad/src/lib/project-io.ts",
+        "apps/cad/test/project-io.test.ts"
+      ],
+      "gate": "cd apps/cad && npx tsc -b && npx vitest run test/project-io.test.ts",
+      "attempts": 0,
+      "spec": "Pure JSON codec for the `Project` type in model.ts (import `type Project` and `emptyProject` from `./model`). Exports (exact): `export const PROJECT_FILE_KIND = 'halofire-cad-project';` `export const PROJECT_FILE_VERSION = 1;` `export interface ProjectFile { kind: typeof PROJECT_FILE_KIND; version: number; savedAt: string; project: Project; }` `export function serializeProject(project: Project, savedAt?: string): string` \u2014 JSON.stringify of a ProjectFile with savedAt ?? new Date().toISOString(), 2-space indent. `export type LoadResult = { ok: true; project: Project; savedAt: string } | { ok: false; reason: string };` `export function deserializeProject(json: string): LoadResult` \u2014 fail-soft, NEVER throws: returns ok:false with a human reason when JSON.parse fails, kind !== PROJECT_FILE_KIND, version is not a positive integer <= PROJECT_FILE_VERSION, project is missing, or validateProject fails. `export function validateProject(p: unknown): { ok: true } | { ok: false; reason: string }` \u2014 structural checks ONLY (no fabrication): p is an object with string id and name; levels is a non-empty array of {id: string, name: string, elevationFt: finite number}; building is an object with arrays walls/rooms, finite positive scaleFtPerUnit, and source one of 'none'|'dxf'|'pdf'|'manual'; network is an object with arrays nodes/segments/remoteAreas; hazardDefaults has defaultClass in ['LIGHT','ORDINARY_1','ORDINARY_2','EXTRA_1','EXTRA_2'] and finite positive defaultCeilingHt; every wall has finite start/end x/y; every room polygon has >= 3 finite points; every segment has string from/to, finite positive diameterIn and non-negative lengthFt. On ok:true deserializeProject must default a missing `annotations` field to `[]`. Tests: round-trip emptyProject() \u2014 deserialize(serialize(p)) deep-equals p (with annotations normalized to []); a populated project literal (2 walls, 1 triangle room, 2 nodes, 1 segment, scaleFtPerUnit 0.25) round-trips deep-equal; ok:false (with non-empty reason mentioning the failing field) for: invalid JSON text, wrong kind, version 2, scaleFtPerUnit 0, scaleFtPerUnit NaN (via JSON null), room polygon of 2 points, segment missing `to`, empty levels array; deserializeProject never throws (wrap calls, assert no throw)."
+    },
+    {
+      "id": "W2D-selection-set",
+      "title": "Edit > Multi-selection set + window/crossing marquee hit tests (pure)",
+      "status": "pending",
+      "phase": "wave2",
+      "write_roots": [
+        "apps/cad/src/lib",
+        "apps/cad/test"
+      ],
+      "context_files": [],
+      "files_create": [
+        "apps/cad/src/lib/selection-set.ts",
+        "apps/cad/test/selection-set.test.ts"
+      ],
+      "gate": "cd apps/cad && npx tsc -b && npx vitest run test/selection-set.test.ts",
+      "attempts": 0,
+      "spec": "Pure multi-selection model and marquee geometry. Exports (exact): `export interface Pt { x: number; y: number; }` `export interface Rect { minX: number; minY: number; maxX: number; maxY: number; }` `export type SelKind = 'node' | 'segment' | 'room';` `export interface SelectionSet { nodeIds: string[]; segmentIds: string[]; roomIds: string[]; }` `export function emptySelection(): SelectionSet` \u2014 all arrays empty. `export function selectionCount(sel: SelectionSet): number` \u2014 sum of lengths. `export function togglePick(sel: SelectionSet, kind: SelKind, id: string, additive: boolean): SelectionSet` \u2014 pure; non-additive returns a selection containing ONLY that id in its kind list; additive toggles membership (add if absent, remove if present) keeping other kinds; output arrays sorted lexicographically; throws on empty id. `export function normalizeRect(a: Pt, b: Pt): Rect` \u2014 min/max of the two corners. `export function pointInRect(p: Pt, r: Rect): boolean` \u2014 inclusive bounds. `export function segmentInRect(a: Pt, b: Pt, r: Rect): boolean` \u2014 both endpoints pointInRect. `export function segmentIntersectsRect(a: Pt, b: Pt, r: Rect): boolean` \u2014 true when either endpoint is inside OR the segment properly crosses any of the 4 rect edges; implement a `segmentsIntersect(p1,p2,p3,p4)` helper via orientation sign tests: orient(p,q,r) = sign((q.x-p.x)*(r.y-p.y)-(q.y-p.y)*(r.x-p.x)); segments intersect when orientations of (p1,p2,p3)/(p1,p2,p4) differ AND (p3,p4,p1)/(p3,p4,p2) differ; treat collinear-overlap (any orient 0 with the point's coordinates within the other segment's bounding box, inclusive) as intersecting. `export interface MarqueeItems { nodes: Array<{ id: string; at: Pt }>; segments: Array<{ id: string; a: Pt; b: Pt }>; }` `export function marqueeSelect(items: MarqueeItems, cornerA: Pt, cornerB: Pt, mode: 'window' | 'crossing'): SelectionSet` \u2014 window: nodes with pointInRect, segments with segmentInRect (fully contained); crossing: nodes with pointInRect, segments with segmentIntersectsRect; roomIds always []; outputs sorted; pure. Tests: togglePick non-additive replaces across kinds; additive add/remove round-trip; sorted determinism; rect normalization from any corner pair; segment fully inside selected in both modes; segment crossing one rect edge selected ONLY in crossing mode; segment fully outside never selected; collinear segment lying along a rect edge counts as crossing; marquee over mixed items returns exactly the expected sorted ids; throw on empty id."
+    },
+    {
+      "id": "W2E-kernel-import",
+      "title": "Import > 1881 kernel DXF entities \u2192 SprinklerNetwork slice (pure)",
+      "status": "pending",
+      "phase": "wave2",
+      "write_roots": [
+        "apps/cad/src/lib",
+        "apps/cad/test"
+      ],
+      "context_files": [
+        "apps/cad/src/lib/model.ts",
+        "apps/cad/src/lib/plan-import.ts"
+      ],
+      "files_create": [
+        "apps/cad/src/lib/kernel-import.ts",
+        "apps/cad/test/kernel-import.test.ts"
+      ],
+      "gate": "cd apps/cad && npx tsc -b && npx vitest run test/kernel-import.test.ts",
+      "attempts": 0,
+      "spec": "Pure builder turning already-parsed kernel-DXF entities into network nodes/segments. The 1881 kernel (`design.dxf`) carries heads as CIRCLE entities on layer `HALOFIRE_HEADS` and pipes as LINE entities on layer `HALOFIRE_PIPES` (verified: 1303 head circles, 1758 pipe lines). This module does NOT parse DXF text \u2014 it consumes plain entity inputs so tests are synthetic. Exports (exact): `export const KERNEL_HEAD_LAYER = 'HALOFIRE_HEADS';` `export const KERNEL_PIPE_LAYER = 'HALOFIRE_PIPES';` `export const SNAP_TOLERANCE_FT = 0.05;` `export interface KernelCircle { cx: number; cy: number; layer: string; }` `export interface KernelLine { x1: number; y1: number; x2: number; y2: number; layer: string; }` `export interface KernelImportOpts { ftPerUnit: number; headLayer?: string; pipeLayer?: string; zFt?: number; defaultDiameterIn?: number; }` `export interface KernelNetwork { nodes: Array<{ id: string; type: 'HEAD' | 'TEE' | 'ELBOW'; pos: { x: number; y: number; z: number } }>; segments: Array<{ id: string; from: string; to: string; diameterIn: number; lengthFt: number; role: 'BRANCH'; material: 'STEEL_SCH40' }>; headCount: number; junctionCount: number; droppedZeroLength: number; }` `export function buildKernelNetwork(circles: KernelCircle[], lines: KernelLine[], opts: KernelImportOpts): KernelNetwork`. Algorithm (exact): (1) throw on non-finite/non-positive ftPerUnit; let head layer = opts.headLayer ?? KERNEL_HEAD_LAYER, pipe layer = opts.pipeLayer ?? KERNEL_PIPE_LAYER, z = opts.zFt ?? 0, dia = opts.defaultDiameterIn ?? 1. (2) Scale every coordinate by ftPerUnit. (3) For each circle on the head layer create a HEAD node id `head_<index1Based>` at (cx, cy) scaled, pos {x, y: z, z: cy\u2192use pos {x: scaledCx, y: zFt, z: scaledCy}} \u2014 plan x\u2192pos.x, plan y\u2192pos.z, elevation\u2192pos.y (matches model.ts 'y is up'). (4) For each line endpoint on the pipe layer, snap to an existing node when the 2D plan distance (x/z plane) <= SNAP_TOLERANCE_FT, preferring HEAD nodes, else the earliest-created junction; otherwise create a junction node id `jct_<n>` (n increments from 1) at that point. (5) After all segments exist, set each junction node's type: 'TEE' when its degree (number of segment endpoints touching it) >= 3, else 'ELBOW'. (6) Each pipe line becomes segment id `pipe_<index1Based>` with from/to = resolved node ids, lengthFt = 2D Euclidean distance (in feet) rounded to 4 decimals, role 'BRANCH', material 'STEEL_SCH40', diameterIn = dia; lines whose scaled length <= SNAP_TOLERANCE_FT are dropped and counted in droppedZeroLength. (7) Ignore circles/lines on other layers entirely. headCount/junctionCount are the created counts. Pure: inputs untouched; deterministic ids by input order. Tests: one circle + one line ending within tolerance of it \u2192 segment.from or .to is `head_1` (no duplicate junction); H-shape of 3 lines meeting at a shared point \u2192 that junction degree 3 \u2192 'TEE', the others 'ELBOW' or HEAD per setup; ftPerUnit 0.25 scales a 40-unit line to lengthFt 10; zero-length line dropped and counted; off-layer entities ignored; custom layer names honored; mapping check pos {x, y: zFt, z: planY}; determinism (same input twice \u2192 deep-equal output); throw on ftPerUnit <= 0."
+    },
+    {
+      "id": "W2F-hydraulic-report",
+      "title": "Reports > Hydraulic calc summary text formatter (pure)",
+      "status": "pending",
+      "phase": "wave2",
+      "write_roots": [
+        "apps/cad/src/lib",
+        "apps/cad/test"
+      ],
+      "context_files": [
+        "apps/cad/src/lib/hydraulics.ts"
+      ],
+      "files_create": [
+        "apps/cad/src/lib/hydraulic-report.ts",
+        "apps/cad/test/hydraulic-report.test.ts"
+      ],
+      "gate": "cd apps/cad && npx tsc -b && npx vitest run test/hydraulic-report.test.ts",
+      "attempts": 0,
+      "spec": "Pure plain-text formatter for a hydraulic result \u2014 the submittal-lane \"calc summary\". It consumes a structural input (NOT importing solver internals) so it stays decoupled. Exports (exact): `export interface ReportNodeRow { id: string; pressurePsi: number; flowGpm: number; }` `export interface ReportSegmentRow { id: string; flowGpm: number; frictionPsi: number; velocityFps: number; }` `export interface ReportInput { projectName: string; hazard: string; demandGpm: number; demandPsiAtRiser: number; supply?: { staticPsi: number; residualPsi: number; flowGpm: number; availablePsiAtDemand: number; adequate: boolean }; nodes: ReportNodeRow[]; segments: ReportSegmentRow[]; disclaimer: string; citations: string[]; }` `export const REPORT_HEADER = 'HALOFIRE CAD - HYDRAULIC DESIGN AID SUMMARY';` `export function formatNumber(n: number, decimals: number): string` \u2014 toFixed(decimals); throws on non-finite n or negative/non-integer decimals. `export function formatHydraulicReport(input: ReportInput): string`. Layout (exact): line 1 REPORT_HEADER; line 2 `Project: <projectName>`; line 3 `Hazard: <hazard>`; line 4 blank; line 5 `SYSTEM DEMAND: <demandGpm,1>gpm @ <demandPsiAtRiser,1> psi at riser` (numbers via formatNumber with 1 decimal, format exactly `DEMAND: X.X gpm @ Y.Y psi at riser` prefixed `SYSTEM `); then when supply is present: `SUPPLY: static <staticPsi,1> psi, residual <residualPsi,1> psi @ <flowGpm,1> gpm` and `AVAILABLE @ DEMAND: <availablePsiAtDemand,1> psi -> <ADEQUATE|INADEQUATE>`; when supply is absent the single line `SUPPLY: none provided (demand-only result)`; blank line; `NODES (<count>)` followed by one line per node `  <id padded right to 16 chars with spaces>  P=<pressurePsi,2> psi  Q=<flowGpm,2> gpm`; blank line; `SEGMENTS (<count>)` followed by one line per segment `  <id padded right to 16 chars>  Q=<flowGpm,2> gpm  dP=<frictionPsi,3> psi  v=<velocityFps,2> ft/s`; blank line; `CITATIONS:` then `  - <each citation>` in input order; blank line; the disclaimer verbatim as the final line(s). Rows are emitted in INPUT ORDER (caller sorts). Pad ids longer than 16 chars without truncation (pad-to-at-least-16). Throws when disclaimer is an empty string or citations is empty (fail-closed honesty: a report without citations/disclaimer must not be producible). Tests: golden full report string for a 2-node/1-segment input with supply (assert exact string equality, template literal in test); demand-only variant contains 'SUPPLY: none provided'; INADEQUATE rendered when adequate=false; long id padding; throw on empty disclaimer; throw on empty citations; formatNumber rounding (1.005 with 2 decimals via toFixed semantics \u2014 assert toFixed output equality, not an invented rounding rule).\n\n---"
     }
   ]
 }
