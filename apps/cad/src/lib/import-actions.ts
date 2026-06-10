@@ -47,10 +47,15 @@ function ext(name: string): string {
  * Import a DXF text body: parse, derive a real scale from its units, pull candidate
  * walls, and build a DXF underlay. Pure given the text + a parser (default real one).
  */
+/** Default system elevation (ft) for plan-view kernel imports that carry no
+ * elevations — matches the project default ceiling height convention. */
+export const KERNEL_DEFAULT_ELEVATION_FT = 10;
+
 export function importDxfText(
   text: string,
   fileName: string,
   parser: { parseSync(s: string): unknown } = new DxfParser(),
+  opts?: { kernelElevationFt?: number },
 ): ImportOutcome {
   const parsed = parseDxf(text, parser);
   if (!parsed.ok) {
@@ -91,8 +96,12 @@ export function importDxfText(
   let kernelNetwork: KernelNetwork | undefined;
   let kernelNote = '';
   if (headCircles.length > 0 || pipeLines.length > 0) {
+    // Plan-view kernel files carry NO elevations. Place the system at the
+    // documented default ceiling height (operator-adjustable) — at z=0 the
+    // whole system rendered as a flat mat on the ground, which is wrong.
     kernelNetwork = buildKernelNetwork(headCircles, pipeLines, {
       ftPerUnit: parsed.ftPerUnit,
+      zFt: opts?.kernelElevationFt ?? KERNEL_DEFAULT_ELEVATION_FT,
     });
     kernelNote =
       ` — KERNEL design detected: ${kernelNetwork.headCount} heads, ` +

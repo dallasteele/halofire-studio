@@ -121,9 +121,13 @@ interface Building3dGeo {
 function RoomSlab({
   slab,
   selected,
+  showCeiling,
 }: {
   slab: Building3dGeo['slabs'][number];
   selected: boolean;
+  /** Ceilings default OFF — they sealed the model and hid the entire sprinkler
+   * system from every exterior view (standard CAD: look INTO the model). */
+  showCeiling: boolean;
 }): ReactElement {
   return (
     <group>
@@ -138,7 +142,7 @@ function RoomSlab({
           />
         </mesh>
       )}
-      {slab.ceiling && (
+      {showCeiling && slab.ceiling && (
         <mesh geometry={slab.ceiling} castShadow receiveShadow>
           <meshStandardMaterial color={SLAB_COLOR} roughness={0.95} metalness={0} />
         </mesh>
@@ -561,6 +565,7 @@ function BuildingScene({
   heat,
   manifests,
   network,
+  showCeilings,
   onSelectNode,
   onSelectSegment,
 }: {
@@ -573,6 +578,7 @@ function BuildingScene({
   heat: HeatMap | null;
   manifests: Manifests;
   network: Project['network'];
+  showCeilings: boolean;
   onSelectNode: (id: string) => void;
   onSelectSegment: (id: string) => void;
 }): ReactElement {
@@ -602,7 +608,7 @@ function BuildingScene({
 
       {/* Per-room floor + ceiling slabs. NO rooms -> NO slabs (honest skip). */}
       {geo.slabs.map((slab) => (
-        <RoomSlab key={slab.roomId} slab={slab} selected={slab.roomId === selectedRoomId} />
+        <RoomSlab key={slab.roomId} slab={slab} selected={slab.roomId === selectedRoomId} showCeiling={showCeilings} />
       ))}
 
       {/* ALL walls as ONE merged solid geometry (single draw call). */}
@@ -834,6 +840,29 @@ export function Viewer3D(): ReactElement {
   const netSpan = useMemo(() => networkSpanFt(project.network.nodes), [project.network.nodes]);
   const hasSystem = project.network.nodes.length > 0 || project.network.segments.length > 0;
   const cam = useMemo(() => cameraFor(geo, netSpan), [geo, netSpan]);
+  // Ceilings OFF by default — rendered ceilings sealed the model and hid the
+  // entire sprinkler system from exterior views (user-reported).
+  const [showCeilings, setShowCeilings] = useState(false);
+
+  // VERIFICATION HANDLE (DEV): numeric truth about the live scene so 3D work is
+  // verified against real geometry, never a far-away screenshot vibe-check.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const heads3d = project.network.nodes.filter((n) => n.type === 'HEAD');
+    const ys = heads3d.map((h) => h.pos.y);
+    (window as unknown as { __cadVerify3D?: unknown }).__cadVerify3D = {
+      backend: geo?.backend ?? null,
+      wallCount: geo?.wallCount ?? 0,
+      wallVertexCount: geo?.wallGeometry?.getAttribute('position')?.count ?? 0,
+      slabRooms: geo?.slabs.length ?? 0,
+      showCeilings,
+      headCount: heads3d.length,
+      headYMin: ys.length ? Math.min(...ys) : null,
+      headYMax: ys.length ? Math.max(...ys) : null,
+      systemRecentered: !!geo, // network subtracts (cx, cy) only when a building renders
+      sceneCenter: geo ? [bounds.cx, bounds.cy] : [0, 0],
+    };
+  }, [geo, project.network.nodes, showCeilings, bounds.cx, bounds.cy]);
 
   return (
     <div style={wrapStyle} aria-label="3D building viewer">
@@ -856,6 +885,7 @@ export function Viewer3D(): ReactElement {
               heat={heat}
               manifests={manifests}
               network={project.network}
+              showCeilings={showCeilings}
               onSelectNode={(id) => select('node', id)}
               onSelectSegment={(id) => select('segment', id)}
             />
@@ -883,6 +913,17 @@ export function Viewer3D(): ReactElement {
             Reconstruct or import a building shell to see it here.
           </div>
         </div>
+      )}
+      {loaded && (
+        <label style={ceilingToggleStyle}>
+          <input
+            type="checkbox"
+            checked={showCeilings}
+            onChange={(e) => setShowCeilings(e.target.checked)}
+            data-cad-ceilings
+          />
+          {' '}Ceilings
+        </label>
       )}
       {!loaded && hasSystem && (
         <div style={systemOnlyHintStyle}>
@@ -963,6 +1004,20 @@ const overlayTitleStyle: CSSProperties = {
 const overlayBodyStyle: CSSProperties = {
   color: colors.textMuted,
   fontSize: typeScale.sm.size,
+};
+
+const ceilingToggleStyle: CSSProperties = {
+  position: 'absolute',
+  right: 12,
+  top: 12,
+  background: 'rgba(20, 24, 32, 0.85)',
+  border: `1px solid ${colors.border}`,
+  borderRadius: radii.md,
+  color: colors.textSecondary,
+  fontSize: typeScale.xs.size,
+  padding: `${spacing[0.5]} ${spacing[2]}`,
+  userSelect: 'none',
+  cursor: 'pointer',
 };
 
 /** Corner hint when a SYSTEM renders without a building shell (kernel imports). */
