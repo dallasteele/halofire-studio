@@ -281,7 +281,7 @@
     {
       "id": "W3C-bom-group",
       "title": "Reports > BOM grouping/aggregation (part legend)",
-      "status": "pending",
+      "status": "done",
       "phase": "wave3",
       "write_roots": [
         "apps/cad/src/lib",
@@ -293,9 +293,10 @@
         "apps/cad/test/bom-group.test.ts"
       ],
       "gate": "cd apps/cad && npx tsc -b && npx vitest run test/bom-group.test.ts",
-      "attempts": 0,
+      "attempts": 2,
       "spec": "Pure bill-of-materials aggregation: collapse takeoff line items into grouped rows by (category, size, material), summing quantities and extending cost. Exports (exact): export interface BomItem { category:string; sizeIn:number; material:string; qty:number; unitCost:number } export interface BomRow { key:string; category:string; sizeIn:number; material:string; qty:number; unitCost:number; extendedCost:number } export interface BomSummary { rows:BomRow[]; totalQty:number; totalCost:number } export function groupBom(items:BomItem[]): BomSummary \u2014 group key is `${category}|${sizeIn}|${material}`; qty sums; unitCost is the cost of the FIRST item in each group (assert all in a group share unitCost is NOT required \u2014 use first); extendedCost=round2(qty*unitCost); rows sorted by key ascending; totals are sums (round2 the cost). round2(n)=Math.round(n*100)/100. Throws on any item with negative qty or negative unitCost or non-finite values. Tests: two items same category/size/material sum qty and extend cost; different sizes stay separate; rows sorted by key; totalCost sums extended costs with round2; empty input -> empty rows, totals 0; throws on negative qty.",
-      "last_error": "src/lib/bom-group.ts(1,45): error TS2307: Cannot find module './bom-types' or its corresponding type declarations.\ntest/bom-group.test.ts(2,19): error TS6133: 'BomRow' is declared but its value is never read.\ntest/bom-group.test.ts(2,27): error TS6133: 'BomSummary' is declared but its value is never read.\ntest/bom-group.test.ts(2,45): error TS2307: Cannot find module '../src/lib/bom-types' or its corresponding type declarations.\ntest/bom-group.test.ts(4,7): error TS6133: 'round2' is declared but its value is never read."
+      "last_error": "src/lib/bom-group.ts(1,45): error TS2307: Cannot find module './bom-types' or its corresponding type declarations.\ntest/bom-group.test.ts(2,19): error TS6133: 'BomRow' is declared but its value is never read.\ntest/bom-group.test.ts(2,27): error TS6133: 'BomSummary' is declared but its value is never read.\ntest/bom-group.test.ts(2,45): error TS2307: Cannot find module '../src/lib/bom-types' or its corresponding type declarations.\ntest/bom-group.test.ts(4,7): error TS6133: 'round2' is declared but its value is never read.",
+      "completed_at": "2026-06-10T16:22:02+00:00"
     },
     {
       "id": "W3D-coverage-area",
