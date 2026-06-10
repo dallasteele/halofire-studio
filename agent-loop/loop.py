@@ -141,7 +141,8 @@ def call_qwen(prompt: str, system: str = SYSTEM_PROMPT, model: str = "") -> dict
         ],
     }).encode("utf-8")
     req = urllib.request.Request(OLLAMA_URL, data=body, headers={"Content-Type": "application/json"})
-    raw = urllib.request.urlopen(req, timeout=1800).read()
+    # 72B escalation generates at ~3 tok/s — give the big model a longer leash.
+    raw = urllib.request.urlopen(req, timeout=3600 if model else 1800).read()
     content = json.loads(raw)["message"]["content"]
     return extract_json(content)
 

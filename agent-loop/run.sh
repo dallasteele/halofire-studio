@@ -6,6 +6,9 @@ set -uo pipefail
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 LOCK="/tmp/halofire-agent-loop.lock"
 MAX_TASKS="${MAX_TASKS:-2}"
+# Tier-1.5 local escalation coder (benched 3.0 tok/s on GB10 — see LOCAL_LLM.md);
+# one unattended shot per blocked task before cloud escalation. Override to "" to disable.
+export HALOFIRE_ESCALATION_MODEL="${HALOFIRE_ESCALATION_MODEL:-hf.co/unsloth/Kimi-Dev-72B-GGUF:Q4_0}"
 
 exec 9>"$LOCK"
 if ! flock -n 9; then
