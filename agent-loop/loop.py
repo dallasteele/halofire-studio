@@ -19,6 +19,7 @@ State:  agent-loop/backlog.json  (single source of truth, committed with results
 
 import argparse
 import json
+import re
 import subprocess
 import sys
 import time
@@ -171,6 +172,55 @@ def gate(task: dict) -> tuple[bool, str]:
     return True, ""
 
 
+TS6133_RE = re.compile(r"^(.+?)\((\d+),\d+\): error TS6133: '([^']+)'", re.M)
+
+
+def autofix_unused(err: str, written: list[Path]) -> bool:
+    """Tier-0 DETERMINISTIC fix for TS6133 (unused declaration) noise — the local
+    model's dominant near-miss. Only applies when every TS error in the gate
+    output is TS6133 and targets a file this attempt wrote. Removes the unused
+    named-import specifier (dropping the import line when emptied) or a one-line
+    `const|let name = ...;` declaration. Returns True when anything was fixed."""
+    hits = TS6133_RE.findall(err)
+    if not hits:
+        return False
+    other = [l for l in err.splitlines() if "): error TS" in l and "TS6133" not in l]
+    if other:
+        return False
+    written_set = {p.resolve() for p in written}
+    by_file: dict[Path, list[tuple[int, str]]] = {}
+    for rel, lineno, name in hits:
+        p = (REPO / "apps" / "cad" / rel).resolve()
+        if p in written_set:
+            by_file.setdefault(p, []).append((int(lineno), name))
+    fixed = False
+    for p, items in by_file.items():
+        lines = p.read_text(encoding="utf-8").splitlines()
+        # Process bottom-up so line numbers stay valid while we delete lines.
+        for lineno, name in sorted(items, reverse=True):
+            i = lineno - 1
+            if i >= len(lines):
+                continue
+            line = lines[i]
+            if re.match(r"\s*import\b", line) and "{" in line:
+                # Drop `name` from the named-specifier list (with optional alias/type).
+                new = re.sub(rf"(?:\btype\s+)?\b{re.escape(name)}\b\s*,?\s*", "", line, count=1)
+                new = re.sub(r",\s*}", " }", new)
+                if re.search(r"\{\s*\}", new):
+                    del lines[i]
+                else:
+                    lines[i] = new
+                fixed = True
+            elif re.match(rf"\s*(const|let)\s+{re.escape(name)}\b", line) and line.rstrip().endswith(";"):
+                del lines[i]
+                fixed = True
+        if fixed:
+            p.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    if fixed:
+        log("  tier-0 autofix: stripped unused TS6133 declarations")
+    return fixed
+
+
 def revert(paths: list[Path]) -> None:
     for p in paths:
         rel = p.relative_to(REPO).as_posix()
@@ -237,6 +287,8 @@ def process_task(task: dict, dry_run: bool) -> bool:
             return False
 
         ok, err = gate(task)
+        if not ok and autofix_unused(err, written):
+            ok, err = gate(task)  # one free deterministic re-gate, no LLM call
         if ok:
             task["status"] = "done"
             task["completed_at"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
