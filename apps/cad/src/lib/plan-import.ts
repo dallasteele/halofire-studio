@@ -45,6 +45,14 @@ export interface DxfPolyline {
   layer: string;
 }
 
+/** A circle pulled from a DXF, in DXF units (sprinkler heads in kernel DXFs). */
+export interface DxfCircle {
+  cx: number;
+  cy: number;
+  r: number;
+  layer: string;
+}
+
 /** Axis-aligned bounds over the parsed geometry, in DXF units. */
 export interface DxfBounds {
   minX: number;
@@ -69,6 +77,8 @@ export interface ParsedDxf {
   layers: string[];
   lines: DxfLine[];
   polylines: DxfPolyline[];
+  /** CIRCLE entities (kernel DXFs draw sprinkler heads as circles). */
+  circles: DxfCircle[];
   bounds: DxfBounds;
   /** Human note when ok:false (bad parse / empty / no geometry). */
   reason?: string;
@@ -108,6 +118,7 @@ function emptyResult(reason: string): ParsedDxf {
     layers: [],
     lines: [],
     polylines: [],
+    circles: [],
     bounds: { ...EMPTY_BOUNDS },
     reason,
   };
@@ -124,6 +135,7 @@ interface DxfEntityish {
   layer?: string;
   vertices?: DxfPointish[];
   center?: DxfPointish;
+  radius?: number;
   shape?: boolean;
   closed?: boolean;
 }
@@ -205,13 +217,23 @@ export function parseDxf(text: string, parser: DxfParserLike): ParsedDxf {
 
   const lines: DxfLine[] = [];
   const polylines: DxfPolyline[] = [];
+  const circles: DxfCircle[] = [];
   const layerSet = new Set<string>();
 
   for (const ent of doc.entities) {
     const type = ent?.type;
     const layer = typeof ent?.layer === 'string' ? ent.layer : '0';
 
-    if (type === 'LINE') {
+    if (type === 'CIRCLE') {
+      const c = ent.center ?? {};
+      const cx = num(c.x);
+      const cy = num(c.y);
+      const r = num(ent.radius);
+      if (cx !== null && cy !== null && r !== null && r >= 0) {
+        circles.push({ cx, cy, r, layer });
+        layerSet.add(layer);
+      }
+    } else if (type === 'LINE') {
       const v = ent.vertices ?? [];
       if (v.length >= 2) {
         const x1 = num(v[0].x);
@@ -241,9 +263,29 @@ export function parseDxf(text: string, parser: DxfParserLike): ParsedDxf {
     }
   }
 
-  if (lines.length === 0 && polylines.length === 0) {
-    return emptyResult('DXF had no LINE / POLYLINE geometry to import');
+  if (lines.length === 0 && polylines.length === 0 && circles.length === 0) {
+    return emptyResult('DXF had no LINE / POLYLINE / CIRCLE geometry to import');
   }
+
+  // Fold circle extents into the line/polyline bounds.
+  const base = boundsOf(lines, polylines);
+  let { minX, minY, maxX, maxY } = lines.length || polylines.length
+    ? base
+    : { minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity };
+  for (const c of circles) {
+    minX = Math.min(minX, c.cx - c.r);
+    minY = Math.min(minY, c.cy - c.r);
+    maxX = Math.max(maxX, c.cx + c.r);
+    maxY = Math.max(maxY, c.cy + c.r);
+  }
+  const bounds: DxfBounds = {
+    minX,
+    minY,
+    maxX,
+    maxY,
+    width: maxX - minX,
+    height: maxY - minY,
+  };
 
   return {
     ok: true,
@@ -252,7 +294,8 @@ export function parseDxf(text: string, parser: DxfParserLike): ParsedDxf {
     layers: [...layerSet].sort(),
     lines,
     polylines,
-    bounds: boundsOf(lines, polylines),
+    circles,
+    bounds,
   };
 }
 

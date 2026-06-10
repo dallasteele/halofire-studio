@@ -18,6 +18,7 @@ import {
   type Point3,
   type Project,
   type Room,
+  type Segment,
   type Wall,
 } from './lib/model';
 import { autoLayoutHeads } from './lib/head-layout';
@@ -245,6 +246,12 @@ export interface CadState {
   setUnderlay: (underlay: Underlay | null) => void;
   /** Replace the whole building shell (walls/rooms/scale/source) at once. */
   setBuilding: (building: Building) => void;
+  /**
+   * Replace the sprinkler network with a KERNEL-imported design (heads + pipes
+   * reconstructed from a kernel DXF's HALOFIRE layers). Undoable. Provenance:
+   * predecessor-engine geometry — an import, never an approved/engineered claim.
+   */
+  setKernelNetwork: (net: { nodes: Node[]; segments: Segment[] }) => void;
   /** Set the plan-to-feet scale (operator-supplied or DXF-derived). */
   setScale: (ftPerUnit: number, source?: BuildingSource) => void;
   /** Append one wall to the building (sets source if it was 'none'). */
@@ -510,6 +517,19 @@ export const useCadStore = create<CadState>((set, get) => {
 
   setBuilding: (building) =>
     mutate((s) => ({ project: { ...s.project, building } })),
+
+  setKernelNetwork: (net) =>
+    mutate((s) => ({
+      project: {
+        ...s.project,
+        network: {
+          nodes: net.nodes,
+          segments: net.segments,
+          remoteAreas: s.project.network.remoteAreas,
+        },
+      },
+      selection: { ...EMPTY_SELECTION },
+    })),
 
   setScale: (ftPerUnit, source) =>
     mutate((s) => {

@@ -33,6 +33,7 @@ import {
   type SegmentRole,
 } from '../lib/model';
 import { measureFeet, polygonAreaSqFt, setScaleFromTwoPoints } from '../lib/scale';
+import { panXform, zoomXformAt, zoomPercent, ZOOM_STEP } from '../lib/viewport';
 import {
   makeCircle,
   makeLine,
@@ -393,8 +394,8 @@ export function PlanCanvas(): ReactElement {
   const ready = size.w > 0 && size.h > 0;
   const grid = ready ? buildGridLines(size) : { minor: [], major: [] };
 
-  // Compute the view transform from the underlay bounds (or building geometry).
-  const xform = useMemo<ViewXform>(() => {
+  // Compute the FIT view transform from the underlay bounds (or building geometry).
+  const fitXform = useMemo<ViewXform>(() => {
     if (!ready) return IDENTITY_XFORM;
     if (underlay?.kind === 'dxf') {
       return fitBounds(underlay.bounds, size);
@@ -445,6 +446,25 @@ export function PlanCanvas(): ReactElement {
     );
   }, [ready, underlay, size, building.rooms, building.walls, project.network.nodes, scale]);
 
+  // M1.1 pan/zoom: an interactive override of the fit transform. Wheel zooms
+  // about the cursor; the Pan tool drags. Cleared when the underlay changes
+  // (new plan -> re-fit) or via the Fit button.
+  const [vpOverride, setVpOverride] = useState<ViewXform | null>(null);
+  const panDrag = useRef<{ sx: number; sy: number } | null>(null);
+  useEffect(() => {
+    setVpOverride(null);
+  }, [underlay]);
+  const xform = vpOverride ?? fitXform;
+
+  function onStageWheel(e: Konva.KonvaEventObject<WheelEvent>): void {
+    e.evt.preventDefault();
+    const stage = e.target.getStage();
+    const pos = stage?.getPointerPosition();
+    if (!pos) return;
+    const factor = e.evt.deltaY < 0 ? ZOOM_STEP : 1 / ZOOM_STEP;
+    setVpOverride(zoomXformAt(xform, pos.x, pos.y, factor));
+  }
+
   // For a PDF underlay, plan-space y grows DOWN, so screen mapping differs.
   const isRaster = underlay?.kind === 'pdf';
   const toScreen = (p: Point2): { sx: number; sy: number } =>
@@ -470,7 +490,25 @@ export function PlanCanvas(): ReactElement {
     activeTool === 'draw-rect' ||
     activeTool === 'draw-point';
 
+  function onStageMouseDown(e: Konva.KonvaEventObject<MouseEvent>): void {
+    if (activeTool !== 'pan') return;
+    const pos = e.target.getStage()?.getPointerPosition();
+    if (pos) panDrag.current = { sx: pos.x, sy: pos.y };
+  }
+
+  function onStageMouseUp(): void {
+    panDrag.current = null;
+  }
+
   function onStageMouseMove(e: Konva.KonvaEventObject<MouseEvent>): void {
+    if (activeTool === 'pan' && panDrag.current) {
+      const pos = e.target.getStage()?.getPointerPosition();
+      if (pos) {
+        setVpOverride(panXform(xform, pos.x - panDrag.current.sx, pos.y - panDrag.current.sy));
+        panDrag.current = { sx: pos.x, sy: pos.y };
+      }
+      return;
+    }
     if (activeTool === 'set-scale' || activeTool === 'wall' || activeTool === 'room' || isDrawTool) {
       setCursor(pointerPlan(e));
     }
@@ -656,6 +694,9 @@ export function PlanCanvas(): ReactElement {
           width={size.w}
           height={size.h}
           onMouseMove={onStageMouseMove}
+          onMouseDown={onStageMouseDown}
+          onMouseUp={onStageMouseUp}
+          onWheel={onStageWheel}
           onClick={onStageClick}
           onDblClick={onStageDblClick}
         >
@@ -1140,6 +1181,20 @@ export function PlanCanvas(): ReactElement {
               </span>
             )}
             <span style={hudBadgeStyle}>{`scale: ${ftPerUnit} ft/unit`}</span>
+            <span style={hudBadgeStyle} data-cad-zoom>
+              {`zoom: ${fitXform.scale > 0 ? zoomPercent(xform, fitXform.scale) : 100}%`}
+            </span>
+            {vpOverride && (
+              <button
+                type="button"
+                style={hudFitBtnStyle}
+                onClick={() => setVpOverride(null)}
+                title="Reset to fit view"
+                data-cad-fit
+              >
+                Fit
+              </button>
+            )}
             {activeTool === 'set-scale' && (
               <span style={hudHintStyle}>
                 {scalePts.length === 0
@@ -1386,6 +1441,16 @@ const hudBadgeStyle: CSSProperties = {
 const hudHintStyle: CSSProperties = {
   color: colors.textMuted,
   fontSize: typeScale.xs.size,
+};
+
+const hudFitBtnStyle: CSSProperties = {
+  background: colors.surfaceRaised,
+  border: `1px solid ${colors.border}`,
+  borderRadius: 999,
+  color: colors.textPrimary,
+  fontSize: typeScale.xs.size,
+  padding: `${spacing[0.5]} ${spacing[2]}`,
+  cursor: 'pointer',
 };
 
 const hazardLabelStyle: CSSProperties = {

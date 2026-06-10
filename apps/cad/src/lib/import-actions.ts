@@ -9,6 +9,12 @@
 import DxfParser from 'dxf-parser';
 import { parseDxf, wallCandidates, type ParsedDxf } from './plan-import';
 import { loadPdfPage } from './pdf-underlay';
+import {
+  buildKernelNetwork,
+  KERNEL_HEAD_LAYER,
+  KERNEL_PIPE_LAYER,
+  type KernelNetwork,
+} from './kernel-import';
 import type { Building, Wall } from './model';
 import type { Underlay } from '../store';
 
@@ -23,6 +29,12 @@ export interface ImportOutcome {
   underlay?: Underlay;
   /** Parsed DXF detail, for callers that want layer/scale info. */
   parsed?: ParsedDxf;
+  /**
+   * KERNEL lane: when the DXF carries the kernel layers (HALOFIRE_HEADS circles
+   * + HALOFIRE_PIPES lines), the reconstructed sprinkler network. Provenance is
+   * the predecessor engine's design — a geometry import, not an approved layout.
+   */
+  kernelNetwork?: KernelNetwork;
 }
 
 /** Lower-cased file extension (no dot), or ''. */
@@ -67,15 +79,29 @@ export function importDxfText(
     },
     label: fileName,
   };
+  // KERNEL lane: head circles + pipe lines on the kernel layers -> a real network.
+  const headCircles = parsed.circles.filter((c) => c.layer === KERNEL_HEAD_LAYER);
+  const pipeLines = parsed.lines.filter((l) => l.layer === KERNEL_PIPE_LAYER);
+  let kernelNetwork: KernelNetwork | undefined;
+  let kernelNote = '';
+  if (headCircles.length > 0 || pipeLines.length > 0) {
+    kernelNetwork = buildKernelNetwork(headCircles, pipeLines, {
+      ftPerUnit: parsed.ftPerUnit,
+    });
+    kernelNote =
+      ` — KERNEL design detected: ${kernelNetwork.headCount} heads, ` +
+      `${kernelNetwork.segments.length} pipes (predecessor-engine geometry)`;
+  }
   return {
     ok: true,
     kind: 'dxf',
     message:
       `DXF: ${parsed.lines.length} lines, ${walls.length} wall candidates, ` +
-      `units=${parsed.units} (${parsed.ftPerUnit} ft/unit)`,
+      `units=${parsed.units} (${parsed.ftPerUnit} ft/unit)` + kernelNote,
     building,
     underlay,
     parsed,
+    ...(kernelNetwork ? { kernelNetwork } : {}),
   };
 }
 

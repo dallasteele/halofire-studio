@@ -6,7 +6,7 @@
 
 import { useEffect, useRef, useState, type CSSProperties, type ReactElement } from 'react';
 import { TOOLS, useCadStore, type ToolDef, type ToolId } from '../store';
-import { importFile } from '../lib/import-actions';
+import { importDxfText, importFile, type ImportOutcome } from '../lib/import-actions';
 import {
   findHeadBySku,
   headSkus,
@@ -195,10 +195,36 @@ function ImportSection(): ReactElement {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const setBuilding = useCadStore((s) => s.setBuilding);
   const setUnderlay = useCadStore((s) => s.setUnderlay);
+  const setKernelNetwork = useCadStore((s) => s.setKernelNetwork);
   const setTool = useCadStore((s) => s.setTool);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
   const [err, setErr] = useState(false);
+
+  function applyOutcome(outcome: ImportOutcome): void {
+    setErr(!outcome.ok);
+    setMsg(outcome.message);
+    if (!outcome.ok) return;
+    if (outcome.underlay) setUnderlay(outcome.underlay);
+    if (outcome.building) {
+      // DXF lane: apply walls + real scale + source, then nudge to the scale
+      // tool so the operator can verify the auto-derived scale if they wish.
+      setBuilding(outcome.building);
+      setTool('set-scale');
+    } else {
+      // PDF lane: no geometry yet — guide the operator to set the scale first.
+      setTool('set-scale');
+    }
+    if (outcome.kernelNetwork) {
+      // KERNEL lane: the DXF carried the predecessor engine's design — load the
+      // reconstructed heads + pipes as the live network (undoable).
+      setKernelNetwork({
+        nodes: outcome.kernelNetwork.nodes,
+        segments: outcome.kernelNetwork.segments,
+      });
+      setTool('select');
+    }
+  }
 
   async function onPick(file: File | null): Promise<void> {
     if (!file) return;
@@ -206,24 +232,26 @@ function ImportSection(): ReactElement {
     setMsg(`Importing ${file.name}…`);
     setErr(false);
     try {
-      const outcome = await importFile(file);
-      setErr(!outcome.ok);
-      setMsg(outcome.message);
-      if (outcome.ok) {
-        if (outcome.underlay) setUnderlay(outcome.underlay);
-        if (outcome.building) {
-          // DXF lane: apply walls + real scale + source, then nudge to the scale
-          // tool so the operator can verify the auto-derived scale if they wish.
-          setBuilding(outcome.building);
-          setTool('set-scale');
-        } else {
-          // PDF lane: no geometry yet — guide the operator to set the scale first.
-          setTool('set-scale');
-        }
-      }
+      applyOutcome(await importFile(file));
     } catch (e) {
       setErr(true);
       setMsg(e instanceof Error ? e.message : 'Import failed');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function onLoad1881(): Promise<void> {
+    setBusy(true);
+    setMsg('Loading the real 1881 kernel design…');
+    setErr(false);
+    try {
+      const res = await fetch('/samples/1881-kernel.dxf');
+      if (!res.ok) throw new Error(`fetch failed (${res.status})`);
+      applyOutcome(importDxfText(await res.text(), '1881-kernel.dxf'));
+    } catch (e) {
+      setErr(true);
+      setMsg(e instanceof Error ? e.message : '1881 load failed');
     } finally {
       setBusy(false);
     }
@@ -250,9 +278,20 @@ function ImportSection(): ReactElement {
       >
         {busy ? 'Importing…' : 'Choose DXF or PDF…'}
       </button>
+      <button
+        type="button"
+        onClick={() => void onLoad1881()}
+        disabled={busy}
+        style={importButtonStyle(busy)}
+        title="Load the REAL 1881 project's kernel design (1,303 heads / 1,758 pipes) — predecessor-engine geometry, not an approved layout."
+        data-cad-load-1881
+      >
+        Load 1881 kernel design
+      </button>
       <p style={importHintStyle}>
         DXF imports walls + a real scale from its own coordinates. PDF loads as a
-        raster underlay — set the scale (two points) then trace.
+        raster underlay — set the scale (two points) then trace. The 1881 button
+        loads the real project&apos;s kernel geometry (import, not an approved design).
       </p>
       {msg && (
         <div style={importMsgStyle(err)} role={err ? 'alert' : 'status'}>
