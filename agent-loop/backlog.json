@@ -255,12 +255,13 @@
       "gate": "cd apps/cad && npx tsc -b && npx vitest run test/pipe-sizing.test.ts",
       "attempts": 2,
       "spec": "Pure pipe schedule sizing: pick the smallest nominal size whose velocity stays within a limit for a given flow. Use EXACTLY these SCH40 internal diameters (in): 1->1.049,1.25->1.380,1.5->1.610,2->2.067,2.5->2.469,3->3.068,4->4.026,6->6.065,8->7.981. Velocity ft/s = 0.4085*gpm/(idIn^2) (the standard V=0.4085*Q/d^2 with d in inches). Exports (exact): export const SCH40_ID_IN: Record<number,number>; export const NOMINAL_SIZES_IN: number[] (ascending: 1,1.25,1.5,2,2.5,3,4,6,8); export function velocityFps(gpm:number, nominalIn:number): number \u2014 throws on unknown nominal or non-finite/negative gpm; export interface SizePick { nominalIn:number; velocityFps:number; withinLimit:boolean } export function pickPipeSize(gpm:number, maxVelocityFps:number): SizePick \u2014 smallest nominal whose velocity<=maxVelocityFps; if none qualifies return the LARGEST (8) with withinLimit:false; throws on non-finite/non-positive maxVelocityFps or negative gpm. Tests: velocityFps(100,2)=0.4085*100/(2.067^2)=~9.56 (toBeCloseTo 2); pickPipeSize(100,10) picks 2 (9.56<=10) withinLimit true; pickPipeSize(20,10) picks 1; a huge flow returns 8 withinLimit false; throws (unknown nominal, negative gpm, maxVelocity 0).",
-      "completed_at": "2026-06-10T14:11:57+00:00"
+      "completed_at": "2026-06-10T14:11:57+00:00",
+      "commit": "e053e775"
     },
     {
       "id": "W3B-fitting-le",
       "title": "Hydraulics > Fitting equivalent lengths (Hazen-Williams)",
-      "status": "pending",
+      "status": "done",
       "phase": "wave3",
       "write_roots": [
         "apps/cad/src/lib",
@@ -272,8 +273,9 @@
         "apps/cad/test/fitting-le.test.ts"
       ],
       "gate": "cd apps/cad && npx tsc -b && npx vitest run test/fitting-le.test.ts",
-      "attempts": 0,
-      "spec": "Pure fitting equivalent-length lookup for Hazen-Williams friction (C=120 schedule-40 basis; cited, verify adopted edition). Use EXACTLY these equivalent lengths (ft) by fitting type and nominal size (in). TEE_BRANCH: 1->5,1.25->6,1.5->8,2->10,2.5->12,3->15,4->20,6->30,8->35. ELBOW_90: 1->2,1.25->3,1.5->4,2->5,2.5->6,3->7,4->10,6->14,8->18. GATE_VALVE: 1->1,1.25->1,1.5->1,2->1,2.5->1,3->1,4->2,6->3,8->4. Exports (exact): export type FittingType='TEE_BRANCH'|'ELBOW_90'|'GATE_VALVE'; export const FITTING_LE_FT: Record<FittingType,Record<number,number>>; export const FITTING_LE_CITATION: string (contains 'Verify adopted edition'); export function equivalentLengthFt(type:FittingType, nominalIn:number): number \u2014 throws on unknown type or nominal; export function totalEquivalentLengthFt(fittings: Array<{type:FittingType;nominalIn:number}>): number \u2014 sum, skips nothing, throws on any unknown entry. Tests: equivalentLengthFt('ELBOW_90',2)=5; TEE_BRANCH 4=20; totalEquivalentLengthFt of [elbow 2, tee 2, gate 2]=5+10+1=16; throws unknown type, unknown nominal; citation contains the caveat."
+      "attempts": 2,
+      "spec": "Pure fitting equivalent-length lookup for Hazen-Williams friction (C=120 schedule-40 basis; cited, verify adopted edition). Use EXACTLY these equivalent lengths (ft) by fitting type and nominal size (in). TEE_BRANCH: 1->5,1.25->6,1.5->8,2->10,2.5->12,3->15,4->20,6->30,8->35. ELBOW_90: 1->2,1.25->3,1.5->4,2->5,2.5->6,3->7,4->10,6->14,8->18. GATE_VALVE: 1->1,1.25->1,1.5->1,2->1,2.5->1,3->1,4->2,6->3,8->4. Exports (exact): export type FittingType='TEE_BRANCH'|'ELBOW_90'|'GATE_VALVE'; export const FITTING_LE_FT: Record<FittingType,Record<number,number>>; export const FITTING_LE_CITATION: string (contains 'Verify adopted edition'); export function equivalentLengthFt(type:FittingType, nominalIn:number): number \u2014 throws on unknown type or nominal; export function totalEquivalentLengthFt(fittings: Array<{type:FittingType;nominalIn:number}>): number \u2014 sum, skips nothing, throws on any unknown entry. Tests: equivalentLengthFt('ELBOW_90',2)=5; TEE_BRANCH 4=20; totalEquivalentLengthFt of [elbow 2, tee 2, gate 2]=5+10+1=16; throws unknown type, unknown nominal; citation contains the caveat.",
+      "completed_at": "2026-06-10T14:36:20+00:00"
     },
     {
       "id": "W3C-bom-group",
