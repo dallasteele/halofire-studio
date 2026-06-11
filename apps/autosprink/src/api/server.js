@@ -29,6 +29,7 @@ import { buildBridgeInvoker } from '../cad/openclaw-invoker.js';
 import { requiredPressureAtRiser, flagSchedule, remoteAreaDemand } from '../engine/hydraulics.js';
 import { buildParityMatrix, parityAchieved } from '../engine/parity-matrix.js';
 import { AUTOSPRINK_PARITY_GATE, buildParityInventory, parityGateStatus, getComponent } from '../components/registry.js';
+import { buildLedger, ledgerSummary } from '../autobid/verification-ledger.js';
 import { buildPartManifest } from '../components/part-mesh.js';
 import { buildSourceAcquisitionLedger, makeBridgeInvoker, probeBridge } from '../components/auto-source-runner.js';
 import { balanceNetwork } from '../engine/hydraulic-network.js';
@@ -21042,13 +21043,28 @@ app.get('/api/parity', authMiddleware, (req, res) => {
   // the AUTOSPRINK_PARITY gate is fail-closed BLOCKED.
   const inventory = buildParityInventory({});
   const gateStatus = parityGateStatus(inventory);
+  // Doctrine: flag-don't-gate. The surface reports a verification LEDGER, not a
+  // permanent block. Every catalog component is a best-effort model awaiting
+  // human verification; humans flip items to 'human-verified' over time. The
+  // system is ALWAYS usable — nothing is gated by verification status.
+  const ledgerItems = Array.from({ length: inventory.total }, () => ({
+    verificationStatus: 'needs-verification',
+  }));
+  const ledger = buildLedger(ledgerItems);
   res.json({
+    status: 'ledger', // was a permanent 'blocked' gate — now a usable ledger
+    usable: true, // nothing is gated by verification; the system is always usable
     matrix,
     parityAchieved: parityAchieved(matrix, { generatedOnly: false, inventory }),
+    ledger,
+    ledgerSummary: ledgerSummary(ledger),
+    modelsBuilt: inventory.present, // best-effort models present (of ledger.total)
+    // Legacy gate kept for back-compat clients; it is no longer a blocker — the
+    // manufacturer-exact/AHJ/PE caveat is now a flag carried in the summary.
     gate: {
       code: AUTOSPRINK_PARITY_GATE.code,
       severity: AUTOSPRINK_PARITY_GATE.severity,
-      status: gateStatus, // always 'blocked' from an empty inventory (fail-closed)
+      status: gateStatus,
       blockedClaims: AUTOSPRINK_PARITY_GATE.blockedClaims,
       reason: AUTOSPRINK_PARITY_GATE.reason,
     },
