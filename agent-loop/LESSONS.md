@@ -25,3 +25,8 @@ AssertionError: expected [ …(3) ] to deeply equal [ { index: +0, score: 1, …
 - Expected
 + Received
      49|     expect(scores).toEqual([
+- 2026-06-11 DONE W5C-bid-payload on attempt 5 (model gemma4:26b-a4b-it-qat).
+- 2026-06-11 BLOCKED W5D-head-clearance (model qwen3:30b-a3b); last error class: : expected [ { headId: 'headA', …(4) }, …(1) ] to deeply equal [ { headId: 'headA', …(4) }, …(1) ]
+- Expected
++ Received
+     70|       expect(issues).toEqual([
