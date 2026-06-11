@@ -690,7 +690,7 @@
   {
    "id": "W10C-clearance-overlay",
    "title": "CAD 2D > head-clearance issue overlay in PlanCanvas",
-   "status": "blocked",
+   "status": "done",
    "phase": "wave10-ui-integration",
    "write_roots": [
     "apps/cad/src",
@@ -704,7 +704,45 @@
    "gate": "cd apps/cad && npx vitest run test/clearance-overlay.test.ts",
    "attempts": 6,
    "spec": "Integration with a pure core. Create apps/cad/src/lib/clearance-overlay.ts exporting issueMarkers(building, network, hazardClass): Array of { headId: string; x: number; y: number; kind: string; message: string } by running the existing head-clearance check (read the lib for exact export) over all heads against room walls and mapping each issue to its head position with a short human message including the cited limit text. Create apps/cad/test/clearance-overlay.test.ts: a head 0.2 ft from a wall yields a too-close marker with the citation hedge text present; a compliant head yields none; empty walls yields empty (honest skip). Then render markers in PlanCanvas when a new store toggle showClearanceIssues is on (default false, View controls pattern): amber warning circles radius 6 screen px at head positions with a tooltip-on-hover title. Keep all geometry math in the pure lib. HINT after blocked run: read apps/cad/src/lib/head-clearance.ts FIRST and use its real exported names and issue object shape; map issues to markers without renaming fields. Keep PlanCanvas changes minimal: one toggle, one marker layer.",
-   "last_error": "     \u2192 expected [ { headId: 'h1', x: +0, \u2026(3) }, \u2026(1) ] to have a length of 1 but got 2\n FAIL  test/clearance-overlay.test.ts > issueMarkers > marks too-close heads with citation\nAssertionError: expected [ { headId: 'h1', x: +0, \u2026(3) }, \u2026(1) ] to have a length of 1 but got 2\n- Expected\n+ Received\n     12|         expect(markers[0].kind).toBe('too-close');"
+   "last_error": "     \u2192 expected [ { headId: 'h1', x: +0, \u2026(3) }, \u2026(1) ] to have a length of 1 but got 2\n FAIL  test/clearance-overlay.test.ts > issueMarkers > marks too-close heads with citation\nAssertionError: expected [ { headId: 'h1', x: +0, \u2026(3) }, \u2026(1) ] to have a length of 1 but got 2\n- Expected\n+ Received\n     12|         expect(markers[0].kind).toBe('too-close');",
+   "note": "hand-built by Claude Tier-2 (commit 611ec4c), 600/600. Do not regenerate."
+  },
+  {
+   "id": "W11A-kernel-heat-riser",
+   "title": "CAD 3D > auto-infer riser on kernel imports so the pressure heatmap lights up",
+   "status": "pending",
+   "phase": "wave11-integration",
+   "write_roots": [
+    "apps/cad/src",
+    "apps/cad/test"
+   ],
+   "context_files": [
+    "apps/cad/src/lib/riser-inference.ts",
+    "apps/cad/src/components/Viewer3D.tsx",
+    "apps/cad/src/store.ts"
+   ],
+   "files_create": [],
+   "gate": "cd apps/cad && npx vitest run test/kernel-heat-riser.test.ts",
+   "attempts": 0,
+   "spec": "Integration with a pure core. Create apps/cad/src/lib/kernel-heat-riser.ts exporting inferKernelTopology(nodes, segments) returning an object with riserId string, oriented Map of segment id to from-to pairs, and fraction number \u2014 a thin composition of inferRiser, orientFlow and solvableFraction from the existing riser-inference lib; returns null instead of throwing when inferRiser throws (no non-head nodes). Create test/kernel-heat-riser.test.ts: a small tree yields non-null with fraction 1; an all-HEAD input yields null. Then in the Viewer3D heat memo: when the existing solver result produces no pressure spread AND the network has segments, call inferKernelTopology and, when non-null and fraction is at least 0.5, re-run the solver with the inferred riser as the supply point so imported kernel networks show the fluid pressure gradient; publish riserInferred boolean and riserNodeId on the window.__cadVerify3D object (false and null when not used). HONESTY: when fraction is below 0.5 do nothing (partial mats stay dark rather than showing fabricated pressures) and never override an operator-set supplyPoint."
+  },
+  {
+   "id": "W11B-pdf-trace-assist",
+   "title": "CAD import > suggest wall candidates from PDF linework (assisted trace)",
+   "status": "pending",
+   "phase": "wave11-integration",
+   "write_roots": [
+    "apps/cad/src",
+    "apps/cad/test"
+   ],
+   "context_files": [
+    "apps/cad/src/lib/pdf-line-cluster.ts",
+    "apps/cad/src/lib/wall-extract-score.ts"
+   ],
+   "files_create": [],
+   "gate": "cd apps/cad && npx vitest run test/pdf-trace-assist.test.ts",
+   "attempts": 0,
+   "spec": "Integration with a pure core. Create apps/cad/src/lib/pdf-trace-assist.ts exporting suggestWalls(strokes, scaleFtPerPt, opts optional) returning Array of { a, b, scoreInfo } \u2014 pipeline: clusterColinear from pdf-line-cluster, convert runs to the input shape wall-extract-score expects, score with scoreWallCandidates and dominantStrokeWidth from that lib, keep only candidates whose score is at least 0.6 (opts.minScore overrides), convert PDF points to feet with scaleFtPerPt, sorted by score descending. Returns empty array on empty input (never throws on it). Create test/pdf-trace-assist.test.ts: a synthetic page with two long thick parallel strokes plus short thin noise yields exactly the two wall suggestions in feet; empty input yields empty; minScore override filters. These suggestions are OPERATOR-CONFIRMED proposals for the trace tool, never auto-committed walls \u2014 say so in the module doc comment."
   }
  ]
 }
