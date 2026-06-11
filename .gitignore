@@ -96,3 +96,7 @@ data/sam_requests.jsonl
 docs/research/scanned/
 docs/research/submittal-pages.txt
 docs/research/submittal-pages.json
+
+# Unattended infra secrets — NEVER commit real tokens
+infra-secrets.env
+*.secrets.env
