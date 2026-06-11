@@ -36,10 +36,8 @@ if ! curl -sf http://127.0.0.1:11434/api/tags >/dev/null; then
   exit 1
 fi
 
-# Gate deps: apps/cad needs node_modules for tsc/vitest.
-if [ ! -d "$REPO/apps/cad/node_modules" ]; then
-  echo "[run.sh] installing apps/cad deps..."
-  (cd "$REPO/apps/cad" && npm install --no-audit --no-fund)
-fi
+# Gate deps: ALWAYS reconcile (fast no-op when satisfied) — a dep added on main
+# blocked an entire wave when node_modules existed but was stale.
+(cd "$REPO/apps/cad" && npm install --no-audit --no-fund --prefer-offline >/dev/null 2>&1) ||   echo "[run.sh] npm install failed — gates may fail on missing deps"
 
 python3 "$REPO/agent-loop/loop.py" --max-tasks "$MAX_TASKS"
