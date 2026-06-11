@@ -367,6 +367,10 @@ def process_task(task: dict, dry_run: bool, backlog_data: dict | None = None) ->
     log(f"=== task {task['id']}: {task['title']} ===")
     error_tail: str | None = None
     verifier_rejections = 0
+    # HAL PROPOSAL (PROPOSALS.md 2026-06-11): accumulate emitted files ACROSS
+    # attempts — a model that sends one valid file at a time now converges
+    # instead of failing the whole attempt for the missing sibling.
+    received: dict[str, str] = {}
     total_attempts = MAX_ATTEMPTS + len(ESCALATION_MODELS)
     for attempt in range(1, total_attempts + 1):
         # Escalation ladder: attempts beyond MAX_ATTEMPTS walk the configured
@@ -392,21 +396,23 @@ def process_task(task: dict, dry_run: bool, backlog_data: dict | None = None) ->
             ]
             if len(files) != len(raw):
                 log(f"  filtered {len(raw) - len(files)} malformed files[] entr(ies)")
-            # Precise feedback: every required file must be present.
-            got = {f["path"] for f in files}
-            missing = [p for p in task["files_create"] if p not in got]
+            for f in files:
+                received[f["path"]] = f["content"]
+            # Precise feedback: every required file must be present (counting
+            # files already received in EARLIER attempts of this task).
+            missing = [p for p in task["files_create"] if p not in received]
             if missing:
                 raise ValueError(
                     "your files[] is missing required file(s): "
                     + ", ".join(missing)
-                    + ' — emit ALL required files as {"path", "content"} objects.'
+                    + ' — emit ONLY the missing file(s) as {"path", "content"} objects.'
                 )
-            for f in files:
-                p = safe_path(f["path"], task["write_roots"])
+            for path, content in received.items():
+                p = safe_path(path, task["write_roots"])
                 p.parent.mkdir(parents=True, exist_ok=True)
-                p.write_text(f["content"], encoding="utf-8")
+                p.write_text(content, encoding="utf-8")
                 written.append(p)
-                log(f"  wrote {f['path']} ({len(f['content'])} chars)")
+                log(f"  wrote {path} ({len(content)} chars)")
         except Exception as exc:  # noqa: BLE001 — feed the failure back to the model
             revert(written)  # clean up any partial writes before retrying
             error_tail = f"{type(exc).__name__}: {exc}"
