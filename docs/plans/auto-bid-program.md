@@ -55,3 +55,19 @@ EMAIL INBOX ──▶ INTAKE WATCHER ──▶ CRM RECORD ──▶ ESTIMATE ─
 - Credentials only via Settings/env — never committed.
 - Every bid carries the design-aid/not-a-committed-bid disclaimer.
 - Misclassified emails must be recoverable: intake NEVER deletes or moves mail.
+
+
+## PDF-FIRST (user constraint, 2026-06-11)
+Clients send PDFs; a DWG is luck, never the plan. The estimating path MUST work
+from PDF alone:
+1. **Vector PDFs (most CAD exports, incl. the 1881 set):** extract linework +
+   stroke weights directly (pdfjs operator list) -> wall-candidate scoring
+   (W5B) -> operator confirms in the trace tool (assisted, not magic).
+2. **Printed scale auto-detect:** plan sheets carry the scale as TEXT
+   (1/8" = 1'-0") — parse it from the vector text layer (W8A) and pre-fill
+   set-scale; operator verifies with the two-point tool.
+3. **Sheet triage:** classify the 110-page set's pages by title text (FLOOR
+   PLAN / FP-x / details / schedules) so intake lands on the right sheets (W8B).
+4. **Raster/scanned PDFs:** SAM segmentation lane on GX10 proposes geometry;
+   always operator-confirmed.
+DWG remains a fast path when it exists; it is never required.
