@@ -47,6 +47,10 @@ import {
   sam31ToolDescriptorBody,
 } from '../sam31/bridge.js';
 import { buildSamInvoker } from './sam-invoker.js';
+import {
+  BID_STATUSES,
+  applyTransition as applyBidStatusTransition,
+} from '../autobid/crm-status.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const log = createLogger('api-server');
@@ -245,6 +249,32 @@ function initDatabase() {
       created_by TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
+
+    -- AB1 CRM layer: clients + bid_requests (status machine in src/autobid/crm-status.js).
+    CREATE TABLE IF NOT EXISTS clients (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      company TEXT,
+      email TEXT,
+      phone TEXT,
+      notes TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS bid_requests (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      client_id INTEGER REFERENCES clients(id),
+      title TEXT NOT NULL,
+      source TEXT DEFAULT 'manual',
+      due_date TEXT,
+      status TEXT DEFAULT 'received',
+      status_history TEXT,
+      project_id INTEGER REFERENCES projects(id),
+      estimate_total_cents INTEGER,
+      notes TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
   `);
 
   function ensureColumn(table, column, definition) {
@@ -389,6 +419,10 @@ function buildAllowedUpdate(body, allowedFields) {
 const BID_UPDATE_FIELDS = new Set(['project', 'contractor', 'value', 'status', 'date', 'due_date', 'sqft', 'system_type', 'contact', 'notes']);
 const PROJECT_UPDATE_FIELDS = new Set(['name', 'bid_id', 'phase', 'progress', 'budget', 'spent', 'manager', 'start_date', 'end_date', 'status', 'notes']);
 const COMPLIANCE_UPDATE_FIELDS = new Set(['project_id', 'project_name', 'type', 'due_date', 'status', 'authority', 'notes']);
+// AB1 CRM. NOTE: bid_requests.status is intentionally NOT updatable here — status
+// only changes via POST /api/bid-requests/:id/transition through the status machine.
+const CLIENT_UPDATE_FIELDS = new Set(['name', 'company', 'email', 'phone', 'notes']);
+const BID_REQUEST_UPDATE_FIELDS = new Set(['client_id', 'title', 'source', 'due_date', 'project_id', 'estimate_total_cents', 'notes']);
 
 // ── Auth Routes ──
 app.post('/api/auth/login', (req, res) => {
@@ -21152,6 +21186,206 @@ app.get('/api/auto-source/status', authMiddleware, (req, res) => {
     sourceAcquisitionLedger: buildSourceAcquisitionLedger({}, new Date(0).toISOString()),
     note: 'Auto-source loop has not run yet.',
   });
+});
+
+// ── AB1 CRM: Clients ──
+// CRUD over the CRM client records. Auth-guarded like the rest of the API.
+app.get('/api/clients', authMiddleware, (req, res) => {
+  const { search } = req.query;
+  let query = 'SELECT * FROM clients WHERE 1=1';
+  const params = [];
+  if (search) {
+    query += ' AND (name LIKE ? OR company LIKE ? OR email LIKE ?)';
+    params.push(`%${search}%`, `%${search}%`, `%${search}%`);
+  }
+  query += ' ORDER BY created_at DESC';
+  res.json(db.prepare(query).all(...params));
+});
+
+app.get('/api/clients/:id', authMiddleware, (req, res) => {
+  const client = db.prepare('SELECT * FROM clients WHERE id = ?').get(req.params.id);
+  if (!client) return res.status(404).json({ error: 'Client not found' });
+  res.json(client);
+});
+
+app.post('/api/clients', authMiddleware, (req, res) => {
+  const { name, company, email, phone, notes } = req.body || {};
+  if (!name || !String(name).trim()) return res.status(400).json({ error: 'name is required' });
+  const result = db.prepare(
+    'INSERT INTO clients (name, company, email, phone, notes) VALUES (?,?,?,?,?)',
+  ).run(String(name).trim(), company || null, email || null, phone || null, notes || null);
+  res.status(201).json({ id: result.lastInsertRowid, message: 'Client created' });
+});
+
+app.put('/api/clients/:id', authMiddleware, (req, res) => {
+  const existing = db.prepare('SELECT id FROM clients WHERE id = ?').get(req.params.id);
+  if (!existing) return res.status(404).json({ error: 'Client not found' });
+  const update = buildAllowedUpdate(req.body, CLIENT_UPDATE_FIELDS);
+  if (update.error) return res.status(400).json({ error: update.error });
+  db.prepare(`UPDATE clients SET ${update.sets} WHERE id = ?`).run(...update.values, req.params.id);
+  res.json({ message: 'Client updated' });
+});
+
+app.delete('/api/clients/:id', authMiddleware, requireRole('admin'), (req, res) => {
+  // Fail-closed: a client with attached bid requests cannot be deleted (FK is
+  // NO ACTION). Detect it explicitly and return a clean 409 instead of letting
+  // the SQLITE_CONSTRAINT_FOREIGNKEY error surface as a raw 500 HTML page.
+  const refs = db.prepare('SELECT COUNT(*) AS n FROM bid_requests WHERE client_id = ?').get(req.params.id);
+  if (refs && refs.n > 0) {
+    return res.status(409).json({ error: 'client has bid requests; delete or reassign them first' });
+  }
+  try {
+    db.prepare('DELETE FROM clients WHERE id = ?').run(req.params.id);
+  } catch (err) {
+    if (err && typeof err.code === 'string' && err.code.startsWith('SQLITE_CONSTRAINT')) {
+      return res.status(409).json({ error: 'client is referenced by other records and cannot be deleted' });
+    }
+    throw err;
+  }
+  res.json({ message: 'Client deleted' });
+});
+
+// ── AB1 CRM: Bid Requests ──
+// Status NEVER changes through create/update; it is owned by the status machine
+// (src/autobid/crm-status.js) and only advances via the /transition route below.
+// Honesty/fail-closed: the status_history blob is the audit backbone of the
+// status machine. Corruption (unparseable JSON, or a non-array payload) must
+// NOT be silently coerced to []. parseStatusHistory throws CorruptHistoryError
+// so the route layer can surface a 500 instead of presenting a corrupt trail as
+// an empty one or overwriting it on the next transition.
+class CorruptHistoryError extends Error {
+  constructor(id) {
+    super(`status_history for bid request ${id} is corrupt`);
+    this.name = 'CorruptHistoryError';
+    this.bidRequestId = id;
+  }
+}
+
+function parseStatusHistory(row) {
+  if (!row) return [];
+  // A genuinely empty/NULL column is a legitimate empty history.
+  if (row.status_history == null || row.status_history === '') return [];
+  let parsed;
+  try {
+    parsed = JSON.parse(row.status_history);
+  } catch {
+    throw new CorruptHistoryError(row.id);
+  }
+  if (!Array.isArray(parsed)) throw new CorruptHistoryError(row.id);
+  return parsed;
+}
+
+function hydrateBidRequest(row) {
+  if (!row) return row;
+  return { ...row, status_history: parseStatusHistory(row) };
+}
+
+// Maps a CorruptHistoryError to an explicit 500 (data integrity failure), and
+// re-throws anything else for Express's error handling.
+function sendCorruptHistory(res, err) {
+  if (err instanceof CorruptHistoryError) {
+    res.status(500).json({ error: err.message });
+    return true;
+  }
+  return false;
+}
+
+app.get('/api/bid-requests', authMiddleware, (req, res) => {
+  const { status, client_id } = req.query;
+  let query = 'SELECT * FROM bid_requests WHERE 1=1';
+  const params = [];
+  if (status) { query += ' AND status = ?'; params.push(status); }
+  if (client_id) { query += ' AND client_id = ?'; params.push(client_id); }
+  query += ' ORDER BY created_at DESC';
+  try {
+    const rows = db.prepare(query).all(...params).map(hydrateBidRequest);
+    res.json(rows);
+  } catch (err) {
+    if (sendCorruptHistory(res, err)) return;
+    throw err;
+  }
+});
+
+app.get('/api/bid-requests/:id', authMiddleware, (req, res) => {
+  const row = db.prepare('SELECT * FROM bid_requests WHERE id = ?').get(req.params.id);
+  if (!row) return res.status(404).json({ error: 'Bid request not found' });
+  try {
+    res.json(hydrateBidRequest(row));
+  } catch (err) {
+    if (sendCorruptHistory(res, err)) return;
+    throw err;
+  }
+});
+
+app.post('/api/bid-requests', authMiddleware, (req, res) => {
+  const { client_id, title, source, due_date, project_id, estimate_total_cents, notes } = req.body || {};
+  if (!title || !String(title).trim()) return res.status(400).json({ error: 'title is required' });
+  // New records always start at 'received' with a seeded history entry — the only
+  // way status changes afterward is the transition route.
+  const atIso = new Date().toISOString();
+  const history = [{ status: 'received', atIso }];
+  const result = db.prepare(
+    `INSERT INTO bid_requests (client_id, title, source, due_date, status, status_history, project_id, estimate_total_cents, notes)
+     VALUES (?,?,?,?,?,?,?,?,?)`,
+  ).run(
+    client_id || null,
+    String(title).trim(),
+    source || 'manual',
+    due_date || null,
+    'received',
+    JSON.stringify(history),
+    project_id || null,
+    estimate_total_cents ?? null,
+    notes || null,
+  );
+  res.status(201).json({ id: result.lastInsertRowid, status: 'received', message: 'Bid request created' });
+});
+
+app.put('/api/bid-requests/:id', authMiddleware, (req, res) => {
+  const existing = db.prepare('SELECT id FROM bid_requests WHERE id = ?').get(req.params.id);
+  if (!existing) return res.status(404).json({ error: 'Bid request not found' });
+  // Honesty/fail-closed: reject any attempt to write status or status_history
+  // directly — those are owned by the status machine.
+  if ('status' in (req.body || {}) || 'status_history' in (req.body || {})) {
+    return res.status(400).json({ error: 'status changes only via POST /api/bid-requests/:id/transition' });
+  }
+  const update = buildAllowedUpdate(req.body, BID_REQUEST_UPDATE_FIELDS);
+  if (update.error) return res.status(400).json({ error: update.error });
+  db.prepare(`UPDATE bid_requests SET ${update.sets}, updated_at = CURRENT_TIMESTAMP WHERE id = ?`)
+    .run(...update.values, req.params.id);
+  res.json({ message: 'Bid request updated' });
+});
+
+app.post('/api/bid-requests/:id/transition', authMiddleware, (req, res) => {
+  const row = db.prepare('SELECT * FROM bid_requests WHERE id = ?').get(req.params.id);
+  if (!row) return res.status(404).json({ error: 'Bid request not found' });
+  const to = req.body?.to;
+  if (!to || !BID_STATUSES.includes(to)) {
+    return res.status(400).json({ error: `to must be one of: ${BID_STATUSES.join(', ')}` });
+  }
+  let record;
+  try {
+    record = { status: row.status, history: parseStatusHistory(row) };
+  } catch (err) {
+    // Fail-closed: never transition (and thus overwrite) a corrupt history blob.
+    if (sendCorruptHistory(res, err)) return;
+    throw err;
+  }
+  let next;
+  try {
+    next = applyBidStatusTransition(record, to, new Date().toISOString());
+  } catch (err) {
+    // Invalid transition -> 409 with the machine's exact error message.
+    return res.status(409).json({ error: err.message });
+  }
+  db.prepare('UPDATE bid_requests SET status = ?, status_history = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
+    .run(next.status, JSON.stringify(next.history), req.params.id);
+  res.json(hydrateBidRequest(db.prepare('SELECT * FROM bid_requests WHERE id = ?').get(req.params.id)));
+});
+
+app.delete('/api/bid-requests/:id', authMiddleware, requireRole('admin'), (req, res) => {
+  db.prepare('DELETE FROM bid_requests WHERE id = ?').run(req.params.id);
+  res.json({ message: 'Bid request deleted' });
 });
 
 // ── Health Check ──
