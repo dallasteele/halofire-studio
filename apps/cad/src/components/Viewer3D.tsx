@@ -55,8 +55,7 @@ import {
   placementFor,
   type PartPlacement,
 } from '../lib/part-placement';
-import { loadBuild123dManifest, type Build123dManifest } from '../../../studio/src/lib/build123d-parts';
-import { loadManufacturerStepManifest, type ManufacturerStepManifest } from '../../../studio/src/lib/manufacturer-step';
+import { useManifests, type Manifests } from '../lib/use-manifests';
 import { colors, radii, spacing, typeScale } from '../lib/tokens';
 
 /** True when a WebGL context can be created (false in jsdom / headless-no-GL). */
@@ -562,36 +561,6 @@ function PartsLayer({
       ))}
     </>
   );
-}
-
-/* --------------------------------------------------------------- manifests hook */
-
-interface Manifests {
-  build123d: Build123dManifest | null;
-  manufacturerStep: ManufacturerStepManifest | null;
-}
-
-/**
- * Load the committed build123d manifest (and any local manufacturer-step manifest)
- * once. Fail-soft: both default to EMPTY, so a missing file degrades parts to proxies
- * rather than crashing. The resolved part counts reflect whatever actually loaded.
- */
-function useManifests(): Manifests {
-  const [manifests, setManifests] = useState<Manifests>({ build123d: null, manufacturerStep: null });
-  useEffect(() => {
-    let alive = true;
-    const fetchImpl = typeof fetch === 'function' ? fetch.bind(globalThis) : undefined;
-    void Promise.all([
-      loadBuild123dManifest(fetchImpl),
-      loadManufacturerStepManifest(fetchImpl),
-    ]).then(([build123d, manufacturerStep]) => {
-      if (alive) setManifests({ build123d, manufacturerStep });
-    });
-    return () => {
-      alive = false;
-    };
-  }, []);
-  return manifests;
 }
 
 /* --------------------------------------------------------------- honest counts */

@@ -15,11 +15,8 @@ import {
 import type { Node, Point2, Point3, Room, Segment } from '../lib/model';
 import { arePortsCompatible } from '../lib/connectivity';
 import { resolvePartModel, type ResolvedPartModel } from '../lib/part-geometry';
-import { loadBuild123dManifest, type Build123dManifest } from '../../../studio/src/lib/build123d-parts';
-import {
-  loadManufacturerStepManifest,
-  type ManufacturerStepManifest,
-} from '../../../studio/src/lib/manufacturer-step';
+import { useManifests } from '../lib/use-manifests';
+import { PartViewer3D } from './PartViewer3D';
 import { colors, radii, spacing, typeScale } from '../lib/tokens';
 import { glassSurface } from '../lib/glass';
 import { ChipIcon, SlidersHorizontal } from '../lib/tool-icons';
@@ -31,34 +28,6 @@ const TIER_LABEL: Record<string, string> = {
   proxy: 'Proxy — approximate placeholder',
   visual_reference: 'Visual reference — not dimensional',
 };
-
-/**
- * Load the geometry manifests once for the Inspector (fail-soft to empty). Lets the
- * selected-part provenance block resolve the SAME model the 3D viewer draws.
- */
-function useGeometryManifests(): {
-  build123d: Build123dManifest | null;
-  manufacturerStep: ManufacturerStepManifest | null;
-} {
-  const [m, setM] = useState<{
-    build123d: Build123dManifest | null;
-    manufacturerStep: ManufacturerStepManifest | null;
-  }>({ build123d: null, manufacturerStep: null });
-  useEffect(() => {
-    let alive = true;
-    const fetchImpl = typeof fetch === 'function' ? fetch.bind(globalThis) : undefined;
-    void Promise.all([
-      loadBuild123dManifest(fetchImpl),
-      loadManufacturerStepManifest(fetchImpl),
-    ]).then(([build123d, manufacturerStep]) => {
-      if (alive) setM({ build123d, manufacturerStep });
-    });
-    return () => {
-      alive = false;
-    };
-  }, []);
-  return m;
-}
 
 /**
  * W8 model-provenance block: shows the REAL CAD model source + tier for a selected
@@ -114,7 +83,7 @@ export function RightInspector(): ReactElement {
   const project = useCadStore((s) => s.project);
   const supply = useCadStore((s) => s.supply);
   const designAreaSqFt = useCadStore((s) => s.designAreaSqFt);
-  const manifests = useGeometryManifests();
+  const manifests = useManifests();
 
   const { kind, id } = activeSelection(selection);
 
@@ -157,6 +126,13 @@ export function RightInspector(): ReactElement {
         headExtra = (
           <>
             <HeadDetail pos={node.pos} sku={node.sku} project={project} />
+            <PartViewer3D
+              stepUrl={nodeModel?.stepUrl ?? null}
+              provenanceTier={nodeModel?.provenanceTier ?? null}
+              label={`Part body: ${nodeModel?.build123dKey ?? node.sku ?? 'sprinkler head'}`}
+              deflectorDown
+              orientationNote="canonical orientation: deflector down (same flip as the main viewer)"
+            />
             <ModelProvenance model={nodeModel} />
             {nodeHyd && <NodeHydraulics pressurePsi={nodeHyd.pressurePsi} flowGpm={nodeHyd.flowGpm} />}
           </>
@@ -166,6 +142,12 @@ export function RightInspector(): ReactElement {
         headExtra = (
           <>
             <FittingDetail node={node} />
+            <PartViewer3D
+              stepUrl={nodeModel?.stepUrl ?? null}
+              provenanceTier={nodeModel?.provenanceTier ?? null}
+              label={`Part body: ${nodeModel?.build123dKey ?? node.type}`}
+              orientationNote="canonical orientation: run +X, branch +Z"
+            />
             <ModelProvenance model={nodeModel} />
             {nodeHyd && <NodeHydraulics pressurePsi={nodeHyd.pressurePsi} flowGpm={nodeHyd.flowGpm} />}
           </>
@@ -188,6 +170,13 @@ export function RightInspector(): ReactElement {
         const segHyd = hydraulics.perSegment.find((s) => s.id === seg.id) ?? null;
         headExtra = (
           <>
+            <PartViewer3D
+              stepUrl={null}
+              cylinderDiameterIn={seg.diameterIn}
+              provenanceTier="dimensioned_parametric"
+              label={`Pipe Ø ${seg.diameterIn}" ${seg.material} — a parametric cylinder is the REAL geometry of pipe (diameter-true)`}
+              orientationNote="canonical orientation: run +X"
+            />
             <SegmentEditor seg={seg} />
             {segHyd && (
               <SegmentHydraulics
