@@ -70,6 +70,28 @@
   </div>
 
   <div class="card wide">
+    <h2>Auto-bid Email Intake <span class="muted" style="text-transform:none">· IMAP, read-only · AB2</span></h2>
+    <p class="muted" style="margin-bottom:8px">
+      Polls the company inbox every 15 min, classifies incoming bid invitations, and files matches into the CRM.
+      Read-only: intake never deletes, moves, or marks mail. The password is write-only — saved here but never shown again.
+      No outbound email is sent. Credentials are stored only in the local app DB, never committed or logged.
+    </p>
+    <div id="intakeState" class="note muted" style="margin-bottom:10px">loading intake settings…</div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;max-width:640px">
+      <label class="muted">IMAP host<input id="imHost" placeholder="imap.gmail.com"></label>
+      <label class="muted">Port<input id="imPort" type="number" placeholder="993"></label>
+      <label class="muted">Username<input id="imUser" placeholder="bids@halofire.com"></label>
+      <label class="muted">Password (write-only)<input id="imPass" type="password" placeholder="leave blank to keep current"></label>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;margin-top:10px">
+      <label class="muted" style="display:flex;align-items:center;gap:6px"><input id="imEnabled" type="checkbox" style="width:auto"> Enable polling</label>
+      <button id="imSave">Save intake settings</button>
+      <button id="imPoll" style="background:var(--surface2);color:var(--cyan);border:1px solid var(--border)">Poll now (test)</button>
+    </div>
+    <div id="imMsg" class="muted" style="margin-top:8px"></div>
+  </div>
+
+  <div class="card wide">
     <h2>Component Library <span class="muted" style="text-transform:none">· catalog → OpenSCAD → SAM 3.1 → gated</span></h2>
     <div id="lib"><span class="muted">loading…</span></div>
   </div>
@@ -294,6 +316,51 @@ async function loadDeps() {
     $('deps').innerHTML = Object.entries(d).map(([k,v]) => `<div class="row"><span>${k}</span><span class="st ${stClass(v)}">${v}</span></div>`).join('');
   } catch(e){ $('deps').innerHTML = '<span class="err">'+e.message+'</span>'; }
 }
+
+async function loadIntake() {
+  try {
+    const c = await api('/settings/intake-email');
+    if (c.host) $('imHost').value = c.host;
+    if (c.port) $('imPort').value = c.port;
+    if (c.username) $('imUser').value = c.username;
+    $('imEnabled').checked = Boolean(c.enabled);
+    // Never populate the password field — it is write-only. Show only whether one exists.
+    $('imPass').placeholder = c.password_set ? 'leave blank to keep current password' : 'enter app password';
+    const cfg = c.configured ? '<span class="st satisfied" style="padding:2px 8px">configured</span>' : '<span class="st missing" style="padding:2px 8px">not configured</span>';
+    const en = c.enabled ? '<span class="st satisfied" style="padding:2px 8px">polling on</span>' : '<span class="st unknown" style="padding:2px 8px">polling off</span>';
+    $('intakeState').innerHTML = `Status: ${cfg} ${en} · password ${c.password_set ? 'set' : 'not set'} (write-only).`;
+  } catch(e){ $('intakeState').innerHTML = '<span class="err">'+e.message+'</span>'; }
+}
+
+$('imSave').onclick = async () => {
+  const msg = $('imMsg'); msg.className = 'muted'; msg.textContent = 'saving…';
+  const body = {
+    host: $('imHost').value.trim(),
+    port: $('imPort').value ? Number($('imPort').value) : null,
+    username: $('imUser').value.trim(),
+    enabled: $('imEnabled').checked,
+  };
+  // Only send the password when the operator typed one; omit it to keep the stored secret.
+  const pw = $('imPass').value;
+  if (pw) body.password = pw;
+  try {
+    await api('/settings/intake-email', { method:'POST', body: JSON.stringify(body) });
+    $('imPass').value = '';
+    msg.className = 'muted'; msg.textContent = 'saved · password is never echoed back.';
+    await loadIntake();
+  } catch(e){ msg.className = 'err'; msg.textContent = e.message; }
+};
+
+$('imPoll').onclick = async () => {
+  const msg = $('imMsg'); msg.className = 'muted'; msg.textContent = 'polling (read-only)…';
+  try {
+    const r = await api('/autobid/intake/poll', { method:'POST', body: JSON.stringify({ force: true }) });
+    if (r.skipped) { msg.textContent = 'skipped: ' + r.skipped; }
+    else if (r.error) { msg.className = 'err'; msg.textContent = 'poll error: ' + r.error; }
+    else { msg.textContent = `poll ok · seen ${r.messagesSeen} · bids created ${r.bidsCreated} · errors ${r.errors ? r.errors.length : 0}`; }
+    await loadIntake();
+  } catch(e){ msg.className = 'err'; msg.textContent = e.message; }
+};
 
 function clearWizardOfficialFlowContext() {
   const packetStatus = $('wizPacketStatus');
@@ -1716,7 +1783,7 @@ $('attSubmit').onclick = async () => {
   } catch(e){ msg.className = 'err'; msg.textContent = e.message; }
 };
 
-loadParity(); loadDocs(); loadDeps(); initWizard(); loadLibrary(); loadSettingsCatalogSourceAcquisition(); loadSettingsResolvedSignedReviewerGates(); loadSettingsSam31ActualValueWorkItems(); loadSettingsRoomBoundaryFloorPlanOverrides();
+loadParity(); loadDocs(); loadDeps(); loadIntake(); initWizard(); loadLibrary(); loadSettingsCatalogSourceAcquisition(); loadSettingsResolvedSignedReviewerGates(); loadSettingsSam31ActualValueWorkItems(); loadSettingsRoomBoundaryFloorPlanOverrides();
 </script>
 </body>
 </html>

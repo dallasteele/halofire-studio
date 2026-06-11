@@ -13,6 +13,9 @@
  *   - Health check endpoint
  */
 
+import path from 'path';
+import { fileURLToPath } from 'url';
+import process from 'process';
 import cron from 'node-cron';
 import { advertiseSkills } from '../core/skill-loader.js';
 import runner from '../core/skill-runner.js';
@@ -153,3 +156,32 @@ class CronScheduler {
 const scheduler = new CronScheduler();
 export { CronScheduler };
 export default scheduler;
+
+// Main-guard: `npm run cron` (node src/cron/scheduler.js) must actually START
+// the scheduler, not just construct the singleton. Without this the 15-minute
+// intake job (and every other skill cron) is registered nowhere and never
+// fires. We register jobs, then keep the event loop alive (node-cron's timers
+// are not enough to hold the process on their own across all platforms) and
+// shut down cleanly on SIGINT/SIGTERM.
+function isMainModule() {
+  try {
+    return process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1]);
+  } catch {
+    return false;
+  }
+}
+
+if (isMainModule()) {
+  scheduler.init();
+  log.info('Cron scheduler running (keep-alive). Ctrl-C to stop.');
+  // Explicit keep-alive timer so the process never exits while jobs are armed.
+  const keepAlive = setInterval(() => {}, 1 << 30);
+  const shutdown = (sig) => {
+    log.info(`Received ${sig}; stopping scheduler`);
+    clearInterval(keepAlive);
+    scheduler.stop();
+    process.exit(0);
+  };
+  process.on('SIGINT', () => shutdown('SIGINT'));
+  process.on('SIGTERM', () => shutdown('SIGTERM'));
+}

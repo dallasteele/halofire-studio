@@ -51,6 +51,7 @@ import {
   BID_STATUSES,
   applyTransition as applyBidStatusTransition,
 } from '../autobid/crm-status.js';
+import { pollOnce as runIntakePoll } from '../autobid/intake.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const log = createLogger('api-server');
@@ -275,6 +276,36 @@ function initDatabase() {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
+
+    -- AB2 email intake: per-message idempotency log. A uid is recorded exactly
+    -- once; re-polls that re-list a uid here create nothing (intake.js).
+    CREATE TABLE IF NOT EXISTS autobid_intake_log (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      uid TEXT NOT NULL UNIQUE,
+      message_id TEXT,
+      classified_score REAL,
+      is_likely_bid INTEGER NOT NULL DEFAULT 0,
+      bid_request_id INTEGER REFERENCES bid_requests(id),
+      processed_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
+    -- AB2 email intake: single-row config + persisted poll status. The IMAP
+    -- password is stored here ONLY when configured via the admin Settings route;
+    -- it is NEVER echoed back through any GET (write-only).
+    CREATE TABLE IF NOT EXISTS autobid_intake_config (
+      id INTEGER PRIMARY KEY CHECK (id = 1),
+      host TEXT,
+      port INTEGER,
+      username TEXT,
+      password TEXT,
+      enabled INTEGER NOT NULL DEFAULT 0,
+      last_poll_at DATETIME,
+      last_messages_seen INTEGER,
+      last_bids_created INTEGER,
+      last_uid INTEGER DEFAULT 0,
+      last_error TEXT,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
   `);
 
   function ensureColumn(table, column, definition) {
@@ -291,6 +322,12 @@ function initDatabase() {
   ensureColumn('pricebook', 'status', "TEXT DEFAULT 'vendor_pricebook'");
   db.exec('DROP INDEX IF EXISTS pricebook_supplier_sku_source_idx');
   db.exec('DROP INDEX IF EXISTS pricebook_supplier_sku_source_row_idx');
+
+  // AB2 intake: mailbox identity so a host/username/UIDVALIDITY change re-baselines
+  // the watermark + dedup log (uids are only meaningful within one mailbox epoch).
+  ensureColumn('autobid_intake_config', 'mbox_host', 'TEXT');
+  ensureColumn('autobid_intake_config', 'mbox_username', 'TEXT');
+  ensureColumn('autobid_intake_config', 'uidvalidity', 'TEXT');
 
   // Claim-gate resolution provenance (who/what/when cleared a gate).
   ensureColumn('claim_gates', 'resolved_by', 'TEXT');
@@ -21387,6 +21424,236 @@ app.delete('/api/bid-requests/:id', authMiddleware, requireRole('admin'), (req, 
   db.prepare('DELETE FROM bid_requests WHERE id = ?').run(req.params.id);
   res.json({ message: 'Bid request deleted' });
 });
+
+// Evidence attached to a bid request (intake-created plan attachments). Links a
+// bid card on the CRM board to the plan files that arrived with the email. Read
+// the bid's project_name out of its intake notes (origin email-intake) and look
+// up the matching project_evidence rows.
+app.get('/api/bid-requests/:id/evidence', authMiddleware, (req, res) => {
+  const row = db.prepare('SELECT id, title FROM bid_requests WHERE id = ?').get(req.params.id);
+  if (!row) return res.status(404).json({ error: 'Bid request not found' });
+  const projectName = `Email bid #${row.id} — ${row.title}`.slice(0, 200);
+  const evidence = db
+    .prepare(`SELECT id, evidence_type, source_file, source_ref, status, created_at
+              FROM project_evidence
+              WHERE project_name = ? AND evidence_type = 'email_attachment'
+              ORDER BY id ASC`)
+    .all(projectName);
+  res.json({ bid_request_id: row.id, project_name: projectName, evidence });
+});
+
+// ── AB2 Email intake: settings (admin) + status ──
+// The IMAP password is WRITE-ONLY: it is saved when supplied but never returned
+// by any GET. Credentials live only here (admin-set) or in env — never in code.
+function readIntakeConfig() {
+  return db.prepare('SELECT * FROM autobid_intake_config WHERE id = 1').get() || null;
+}
+
+function intakeConfigured(cfg) {
+  return Boolean(cfg && cfg.host && cfg.port && cfg.username && cfg.password);
+}
+
+// Re-baseline intake when the mailbox identity changes (different host/username,
+// or a server-side UIDVALIDITY reset). IMAP uids are only meaningful within one
+// (mailbox, UIDVALIDITY) epoch, so the watermark and the uid-keyed dedup log
+// MUST be cleared — otherwise new mail with uids <= the stale last_uid is never
+// listed, and any colliding uid is wrongly skipped as already-processed. Both
+// silently drop real bid emails. Runs in one transaction.
+function resetIntakeBaseline({ host, username, uidvalidity = null }) {
+  const tx = db.transaction(() => {
+    db.prepare('DELETE FROM autobid_intake_log').run();
+    db.prepare(`UPDATE autobid_intake_config
+                SET last_uid = 0, uidvalidity = ?, mbox_host = ?, mbox_username = ?,
+                    last_messages_seen = NULL, last_bids_created = NULL,
+                    updated_at = CURRENT_TIMESTAMP
+                WHERE id = 1`)
+      .run(uidvalidity, host || null, username || null);
+  });
+  tx();
+}
+
+// Shared poll: runs one read-only intake pass and persists status. Used by the
+// manual trigger route and the skill-cron job. Returns the poll result or a
+// quiet skip object when intake is not fully configured / disabled.
+async function runIntakeAndPersist({ force = false } = {}) {
+  const cfg = readIntakeConfig();
+  if (!intakeConfigured(cfg)) {
+    return { skipped: 'unconfigured' };
+  }
+  if (!force && !cfg.enabled) {
+    return { skipped: 'disabled' };
+  }
+  const { createImapMailbox } = await import('../autobid/imap-transport.js');
+  const nowIso = new Date().toISOString();
+  let mailbox = null;
+  try {
+    mailbox = await createImapMailbox(
+      { host: cfg.host, port: cfg.port, user: cfg.username, password: cfg.password },
+      { logger: log },
+    );
+    await mailbox.connect();
+
+    // UIDVALIDITY gate: if the server reissued the mailbox's uid space, the
+    // stored watermark + dedup log are meaningless. Re-baseline before polling.
+    let sinceUid = cfg.last_uid || 0;
+    const liveUidValidity = mailbox.uidValidity != null ? String(mailbox.uidValidity) : null;
+    if (liveUidValidity && cfg.uidvalidity && String(cfg.uidvalidity) !== liveUidValidity) {
+      log.warn(`intake: UIDVALIDITY changed (${cfg.uidvalidity} -> ${liveUidValidity}); re-baselining intake`);
+      resetIntakeBaseline({ host: cfg.host, username: cfg.username, uidvalidity: liveUidValidity });
+      sinceUid = 0;
+    } else if (liveUidValidity && !cfg.uidvalidity) {
+      // First poll on this mailbox — record the epoch without wiping anything.
+      db.prepare('UPDATE autobid_intake_config SET uidvalidity = ?, mbox_host = ?, mbox_username = ? WHERE id = 1')
+        .run(liveUidValidity, cfg.host || null, cfg.username || null);
+    }
+
+    const result = await runIntakePoll(db, mailbox, { sinceUid, nowIso, logger: log });
+    db.prepare(`UPDATE autobid_intake_config
+                SET last_poll_at = ?, last_messages_seen = ?, last_bids_created = ?, last_uid = ?,
+                    last_error = ?, updated_at = CURRENT_TIMESTAMP
+                WHERE id = 1`)
+      .run(
+        result.pollFinishedAt || nowIso,
+        result.messagesSeen,
+        result.bidsCreated,
+        result.lastUid,
+        result.errors.length ? JSON.stringify(result.errors.slice(0, 5)) : null,
+      );
+    return result;
+  } catch (err) {
+    db.prepare(`UPDATE autobid_intake_config
+                SET last_poll_at = ?, last_error = ?, updated_at = CURRENT_TIMESTAMP
+                WHERE id = 1`)
+      .run(nowIso, String(err.message).slice(0, 500));
+    return { error: err.message };
+  } finally {
+    if (mailbox) { try { await mailbox.close(); } catch { /* best-effort */ } }
+  }
+}
+
+app.get('/api/settings/intake-email', authMiddleware, (req, res) => {
+  const cfg = readIntakeConfig();
+  // NEVER return the password. Only report whether one is set.
+  res.json({
+    host: cfg?.host || null,
+    port: cfg?.port || null,
+    username: cfg?.username || null,
+    enabled: Boolean(cfg?.enabled),
+    password_set: Boolean(cfg?.password),
+    configured: intakeConfigured(cfg),
+  });
+});
+
+const INTAKE_EMAIL_FIELDS = new Set(['host', 'port', 'username', 'password', 'enabled']);
+app.post('/api/settings/intake-email', authMiddleware, requireRole('admin'), (req, res) => {
+  const body = req.body || {};
+  const rejected = Object.keys(body).filter((key) => !INTAKE_EMAIL_FIELDS.has(key));
+  if (rejected.length) return res.status(400).json({ error: `Unsupported fields: ${rejected.join(', ')}` });
+
+  const existing = readIntakeConfig();
+  const host = body.host != null ? String(body.host).trim() : existing?.host || null;
+  const port = body.port != null ? Number(body.port) : existing?.port || null;
+  const username = body.username != null ? String(body.username).trim() : existing?.username || null;
+  // Password is only overwritten when a non-empty value is supplied; omitting it
+  // (or sending '') leaves the stored secret untouched.
+  const password = (body.password != null && String(body.password) !== '')
+    ? String(body.password)
+    : existing?.password || null;
+  const enabled = body.enabled != null ? (body.enabled ? 1 : 0) : (existing?.enabled || 0);
+
+  if (port != null && (!Number.isFinite(port) || port <= 0)) {
+    return res.status(400).json({ error: 'port must be a positive number' });
+  }
+
+  // Detect a mailbox-identity change (different host or username). Pointing
+  // intake at a new mailbox must reset the watermark + clear the uid-keyed dedup
+  // log, or new mail silently vanishes (uids <= stale last_uid never listed,
+  // colliding uids skipped as already-processed).
+  const mailboxChanged = Boolean(
+    existing && existing.host && existing.username
+    && (existing.host !== host || existing.username !== username),
+  );
+
+  if (existing) {
+    db.prepare(`UPDATE autobid_intake_config
+                SET host = ?, port = ?, username = ?, password = ?, enabled = ?, updated_at = CURRENT_TIMESTAMP
+                WHERE id = 1`)
+      .run(host, port, username, password, enabled);
+  } else {
+    db.prepare(`INSERT INTO autobid_intake_config (id, host, port, username, password, enabled)
+                VALUES (1, ?, ?, ?, ?, ?)`)
+      .run(host, port, username, password, enabled);
+  }
+  if (mailboxChanged) {
+    // New mailbox -> unknown epoch. Clear uidvalidity so the next poll re-baselines.
+    resetIntakeBaseline({ host, username, uidvalidity: null });
+  }
+  const cfg = readIntakeConfig();
+  res.json({
+    host: cfg.host, port: cfg.port, username: cfg.username,
+    enabled: Boolean(cfg.enabled), password_set: Boolean(cfg.password),
+    configured: intakeConfigured(cfg), message: 'Intake email settings saved',
+  });
+});
+
+app.get('/api/autobid/intake/status', authMiddleware, (req, res) => {
+  const cfg = readIntakeConfig();
+  const recent = db
+    .prepare(`SELECT l.uid, l.message_id, l.classified_score, l.is_likely_bid, l.bid_request_id, l.processed_at,
+                     b.title AS bid_title
+              FROM autobid_intake_log l
+              LEFT JOIN bid_requests b ON b.id = l.bid_request_id
+              ORDER BY l.id DESC LIMIT 20`)
+    .all()
+    .map((r) => {
+      // Surface the classifier reasons for transparency (operator sees WHY).
+      let reasons = [];
+      if (r.bid_request_id) {
+        try {
+          const bid = db.prepare('SELECT notes FROM bid_requests WHERE id = ?').get(r.bid_request_id);
+          if (bid && bid.notes) {
+            const parsed = JSON.parse(bid.notes);
+            if (Array.isArray(parsed.reasons)) reasons = parsed.reasons;
+          }
+        } catch { /* notes not JSON / no reasons — leave empty */ }
+      }
+      return {
+        uid: r.uid,
+        message_id: r.message_id,
+        score: r.classified_score,
+        is_likely_bid: Boolean(r.is_likely_bid),
+        bid_request_id: r.bid_request_id,
+        bid_title: r.bid_title || null,
+        reasons,
+        processed_at: r.processed_at,
+      };
+    });
+  res.json({
+    configured: intakeConfigured(cfg),
+    enabled: Boolean(cfg?.enabled),
+    last_poll_at: cfg?.last_poll_at || null,
+    last_messages_seen: cfg?.last_messages_seen ?? null,
+    last_bids_created: cfg?.last_bids_created ?? null,
+    last_error: cfg?.last_error || null,
+    recent,
+  });
+});
+
+// Manual one-shot poll (admin). force=true polls even when enabled is false,
+// for an operator "test connection / pull now" action.
+app.post('/api/autobid/intake/poll', authMiddleware, requireRole('admin'), async (req, res) => {
+  try {
+    const result = await runIntakeAndPersist({ force: Boolean(req.body?.force) });
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Exposed so the skill-cron intake job runs through the same persisted-status path.
+app.locals.runIntakeAndPersist = runIntakeAndPersist;
+app.locals.readIntakeConfig = readIntakeConfig;
+app.locals.intakeConfigured = intakeConfigured;
 
 // ── Health Check ──
 app.get('/api/health', (req, res) => {

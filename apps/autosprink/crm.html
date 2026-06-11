@@ -45,6 +45,20 @@
   .muted{color:var(--muted);font-size:12px}
   .empty{color:var(--muted);font-size:11px;font-style:italic;font-family:var(--mono)}
   .err{color:var(--fire-light);font-size:12px;font-family:var(--mono);margin-top:8px}
+  .intake{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-bottom:22px}
+  .intake h2{margin-bottom:8px}
+  .intake .meta{font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:10px}
+  .intake .meta b{color:var(--cyan)}
+  .recent{display:flex;flex-direction:column;gap:6px;max-height:220px;overflow-y:auto}
+  .rrow{display:flex;align-items:center;gap:10px;font-size:12px;border-bottom:1px solid var(--border);padding:5px 0}
+  .rrow .sc{font-family:var(--mono);font-size:11px;padding:1px 7px;border-radius:99px}
+  .rrow .sc.bid{background:rgba(74,222,128,.15);color:var(--green)}
+  .rrow .sc.nobid{background:rgba(113,113,122,.18);color:var(--muted)}
+  .rrow .why{color:var(--muted);font-family:var(--mono);font-size:10px}
+  .rrow .ti{color:var(--bright);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .bidcard .ev{margin-top:6px;font-size:10px;font-family:var(--mono)}
+  .bidcard .ev a{color:var(--cyan);text-decoration:none;cursor:pointer}
+  .bidcard .ev a:hover{text-decoration:underline}
 </style>
 </head>
 <body>
@@ -74,6 +88,11 @@
       <button class="go" id="bBtn">Create bid request</button>
       <div class="err" id="bErr"></div>
     </div>
+  </div>
+  <div class="intake" id="intake">
+    <h2>Email Intake</h2>
+    <div class="meta" id="intakeMeta">loading intake status…</div>
+    <div class="recent" id="intakeRecent"></div>
   </div>
   <div class="board" id="board"><span class="muted">Loading board…</span></div>
 </main>
@@ -160,13 +179,16 @@ function renderBoard(){
       const cname = clientName(b.client_id);
       const adv = (ALLOWED[status] || []).map((to) =>
         `<button data-act="adv" data-id="${b.id}" data-to="${to}">→ ${escapeHtml(LABEL[to])}</button>`).join('');
+      const fromEmail = b.source === 'email';
       return `<div class="bidcard" draggable="true" data-id="${b.id}" data-status="${status}">
         <div class="t">${escapeHtml(b.title)}</div>
         <div class="meta">
           ${cname ? '👤 ' + escapeHtml(cname) + '<br>' : ''}
+          ${fromEmail ? '<span style="color:var(--cyan)">✉ from email</span><br>' : ''}
           ${b.due_date ? '<span class="due">due ' + escapeHtml(b.due_date) + '</span><br>' : ''}
           <span class="tis">in status ${escapeHtml(fmtTimeInStatus(b.status_history))}</span>
         </div>
+        ${fromEmail ? `<div class="ev"><a data-act="ev" data-id="${b.id}">view plan attachments →</a></div>` : ''}
         <div class="adv">${adv || '<span class="empty">terminal</span>'}</div>
       </div>`;
     }).join('') : '<span class="empty">empty</span>';
@@ -179,7 +201,49 @@ function renderBoard(){
   board.querySelectorAll('button[data-act="adv"]').forEach((btn) => {
     btn.onclick = () => transition(Number(btn.dataset.id), btn.dataset.to);
   });
+  board.querySelectorAll('a[data-act="ev"]').forEach((a) => {
+    a.onclick = () => showEvidence(Number(a.dataset.id));
+  });
   wireDragDrop();
+}
+
+async function showEvidence(id){
+  try{
+    const r = await api('/bid-requests/' + id + '/evidence');
+    if (!r.evidence || !r.evidence.length){ alert('No plan attachments recorded for this bid.'); return; }
+    const lines = r.evidence.map((e) => `• ${e.source_file} [${e.status}] ${e.source_ref}`).join('\n');
+    alert('Plan attachments for "' + r.project_name + '":\n\n' + lines);
+  }catch(e){ alert('Evidence unavailable: ' + e.message); }
+}
+
+function scorePct(s){ return Number.isFinite(s) ? Math.round(s * 100) + '%' : '—'; }
+
+async function loadIntakeStatus(){
+  const meta = document.getElementById('intakeMeta');
+  const recent = document.getElementById('intakeRecent');
+  try{
+    const s = await api('/autobid/intake/status');
+    const cfg = s.configured ? 'configured' : 'not configured';
+    const en = s.enabled ? 'polling on' : 'polling off';
+    const last = s.last_poll_at ? new Date(s.last_poll_at).toLocaleString() : 'never';
+    meta.innerHTML = `intake: <b>${cfg}</b> · <b>${en}</b> · last poll <b>${escapeHtml(last)}</b>`
+      + ` · seen ${s.last_messages_seen ?? '—'} · bids ${s.last_bids_created ?? '—'}`
+      + (s.last_error ? ` · <span style="color:var(--fire-light)">last error: ${escapeHtml(s.last_error)}</span>` : '');
+    if (!s.recent || !s.recent.length){
+      recent.innerHTML = '<span class="empty">no classified messages yet — the operator sees every classification here with its score and reasons.</span>';
+      return;
+    }
+    recent.innerHTML = s.recent.map((r) => {
+      const cls = r.is_likely_bid ? 'bid' : 'nobid';
+      const why = (r.reasons && r.reasons.length) ? r.reasons.join(', ') : (r.is_likely_bid ? '—' : 'no bid signals');
+      const title = r.bid_title || (r.is_likely_bid ? '(bid)' : '(not a bid)');
+      return `<div class="rrow">
+        <span class="sc ${cls}">${scorePct(r.score)} ${r.is_likely_bid ? 'BID' : 'skip'}</span>
+        <span class="ti">${escapeHtml(title)}</span>
+        <span class="why">${escapeHtml(why)}</span>
+      </div>`;
+    }).join('');
+  }catch(e){ meta.innerHTML = '<span style="color:var(--fire-light)">intake status unavailable: ' + escapeHtml(e.message) + '</span>'; }
 }
 
 function wireDragDrop(){
@@ -255,6 +319,7 @@ document.getElementById('bBtn').onclick = async () => {
   }catch(_){}
   await loadClients();
   await loadBoard();
+  await loadIntakeStatus();
 })();
 </script>
 </body>
