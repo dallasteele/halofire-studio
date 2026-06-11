@@ -112,3 +112,13 @@ AssertionError: expected '// Dimensioned parametric, not manufa…' to contain '
 
 
 - 2026-06-11 BLOCKED W15A-cutsheet-dims-parse (model qwen3:30b-a3b); last error class: JSONDecodeError: Expecting ',' delimiter: line 1 column 1840 (char 1839)
+- 2026-06-11 BLOCKED W15A-cutsheet-dims-parse (model qwen3:30b-a3b); last error class: les missing fields
+     16|         expect(result.dims).toEqual({ odIn: 2.0 });
+     17|         expect(result.missing).toEqual(['wallIn', 'centerToEndIn', 'br…
+- 2026-06-11 BLOCKED W16A-claim-gate-flag (model qwen3:30b-a3b); last error class: | ^
+     18|   it('should return needs-verification for blocked gate', () => {
+     19|     const result = gateFlag(testGate);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
