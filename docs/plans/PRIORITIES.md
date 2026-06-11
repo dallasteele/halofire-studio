@@ -14,8 +14,13 @@ tracking. Full program: auto-bid-program.md.
 ## Priority queue (descending)
 1. ~~AB1+AB2~~ SHIPPED 2026-06-11: AB1 CRM (646a3d4, 787/787), AB2 intake
    (7aed36a, 840/840 — read-only IMAP, spec-exact W7A classifier, fail-closed)
-2. **AB3-5 — estimate wiring + HTML bid + outbound draft + tracking** (#26,
-   IN FLIGHT as workflow wid4b0c25; W7B renderer built inside it)
+2. ~~AB3-5~~ SHIPPED 2026-06-11 (0973420, 902/902): estimate wiring (CAD
+   payload or manual, labeled price provenance — estimated prices surface on
+   the bid/board/approval), W7B HTML renderer, outbound DRAFTS with
+   per-message admin approval (no auto-send path; mock seam refuses prod
+   boot; /data static hole closed — DB no longer downloadable), follow-ups +
+   won/lost. **AUTO-BID PIPELINE v1 IS END-TO-END.** Next: operator pilot —
+   Halo Fire configures mailbox+SMTP in Settings and runs real ITBs through.
 3. **PDF-first assist** — vector linework extraction w/ stroke widths feeding
    the W5B scorer; scale pre-fill (W8A) + sheet triage (W8B) integration
 4. **CAD fidelity debts (user-flagged):** junction orientation close-range
