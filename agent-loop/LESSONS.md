@@ -84,3 +84,13 @@ AssertionError: expected '// Dimensioned parametric, not manufa…' to contain '
 
 
 - 2026-06-11 DONE W14A-verification-flag on attempt 2 (model qwen3:30b-a3b).
+- 2026-06-11 BLOCKED W14B-cutsheet-to-model (model qwen3:30b-a3b); last error class: cutsheet-to-model.test.ts ]
+/opt/hal9000/apps/halofire-studio/apps/cad/src/lib/cutsheet-to-model.ts:39:0: ERROR: Unexpected end of file
+  Unexpected end of file
+- 2026-06-11 BLOCKED W14C-verification-ledger (model qwen3:30b-a3b); last error class:   | ^
+     20|   it('calculates ledger correctly for mixed items', () => {
+     21|     const ledger = buildLedger(testItems);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
