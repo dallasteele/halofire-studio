@@ -843,7 +843,8 @@
       "gate": "cd apps/cad && npx vitest run test/verification-flag.test.ts",
       "attempts": 2,
       "spec": "Pure strict-TS module apps/cad/src/lib/verification-flag.ts. Product doctrine is build-complete flag-do-not-gate: machine-generated content is allowed everywhere but must be labeled. Exports: type VerificationStatus = needs-verification | human-verified ; interface Verification with fields status, note string, source string, verifiedBy string or null, verifiedAt string or null. export function machineGenerated(note, source) returning status needs-verification with given note and source and nulls for verifiedBy and verifiedAt. export function verify(v, who, atIso) returning a NEW object status human-verified, verifiedBy who, verifiedAt atIso, note and source preserved, pure and input untouched, throws TypeError on empty who or atIso. export function isUsable(v) ALWAYS returns true (usability never depends on verification). export function needsAttention(v) true when status is needs-verification. Files MUST be apps/cad/src/lib/verification-flag.ts and apps/cad/test/verification-flag.test.ts. Tests cover all of the above plus purity and the TypeError cases.",
-      "completed_at": "2026-06-11T17:46:03+00:00"
+      "completed_at": "2026-06-11T17:46:03+00:00",
+      "commit": "34da6921"
     },
     {
       "id": "W14B-cutsheet-to-model",

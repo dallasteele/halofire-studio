@@ -77,3 +77,10 @@ AssertionError: expected [ { a: { x: NaN, y: NaN }, …(2) } ] to have a length 
 AssertionError: expected '// Dimensioned parametric, not manufa…' to contain 'cylinder(h=76.2, r=25.4, center=true);'
 - Expected
 + Received
+- 2026-06-11 BLOCKED W13B-scad-render-harness (model qwen3:30b-a3b); last error class: st/node_modules/esbuild/lib/main.js:677:12
+ ❯ Socket.readFromStdout node_modules/vitest/node_modules/esbuild/lib/main.js:600:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+- 2026-06-11 DONE W14A-verification-flag on attempt 2 (model qwen3:30b-a3b).
