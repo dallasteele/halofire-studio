@@ -868,7 +868,7 @@
     {
       "id": "W14C-verification-ledger",
       "title": "Settings > verification ledger replacing the blocked parity gate (pure)",
-      "status": "pending",
+      "status": "done",
       "phase": "wave14-parts-flag",
       "write_roots": [
         "apps/autosprink/src",
@@ -877,8 +877,9 @@
       "context_files": [],
       "files_create": [],
       "gate": "cd apps/autosprink && npx vitest run tests/verification-ledger.test.js",
-      "attempts": 0,
-      "spec": "Pure ESM module apps/autosprink/src/autobid/verification-ledger.js. New doctrine: report a verification LEDGER, never a block. export function buildLedger(items) where items is an array of objects each having a verificationStatus equal to needs-verification or human-verified. Returns object with total, humanVerified, needsVerification, coveragePct where coveragePct is humanVerified over total times 100 rounded to 1 decimal and 0 when total is 0. export function ledgerSummary(ledger) returns a short human string using plain words not symbols, for example 12 of 155 human-verified (7.7 percent), 143 need verification. Never throws on a valid array; empty array yields zeros and a 0 of 0 summary. Files MUST be apps/autosprink/src/autobid/verification-ledger.js and apps/autosprink/tests/verification-ledger.test.js. Tests cover mixed list math, empty list, rounding, summary wording. Top comment notes a follow-up wave wires this into GET /api/parity and settings.html so the surface shows the ledger instead of a permanent blocked gate."
+      "attempts": 5,
+      "spec": "Pure ESM module apps/autosprink/src/autobid/verification-ledger.js. New doctrine: report a verification LEDGER, never a block. export function buildLedger(items) where items is an array of objects each having a verificationStatus equal to needs-verification or human-verified. Returns object with total, humanVerified, needsVerification, coveragePct where coveragePct is humanVerified over total times 100 rounded to 1 decimal and 0 when total is 0. export function ledgerSummary(ledger) returns a short human string using plain words not symbols, for example 12 of 155 human-verified (7.7 percent), 143 need verification. Never throws on a valid array; empty array yields zeros and a 0 of 0 summary. Files MUST be apps/autosprink/src/autobid/verification-ledger.js and apps/autosprink/tests/verification-ledger.test.js. Tests cover mixed list math, empty list, rounding, summary wording. Top comment notes a follow-up wave wires this into GET /api/parity and settings.html so the surface shows the ledger instead of a permanent blocked gate.",
+      "completed_at": "2026-06-11T19:03:23+00:00"
     }
   ]
 }
