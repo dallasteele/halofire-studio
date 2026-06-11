@@ -96,3 +96,4 @@ AssertionError: expected '// Dimensioned parametric, not manufa…' to contain '
 
 - 2026-06-11 BLOCKED W12A-followup-badges (model qwen3:30b-a3b); last error class:  FAIL  tests/autobid-followup-badges.test.js [ tests/autobid-followup-badges.test.js ]
 - 2026-06-11 DONE W14B-cutsheet-to-model on attempt 5 (model gemma4:26b-a4b-it-qat).
+- 2026-06-11 DONE W14C-verification-ledger on attempt 5 (model gemma4:26b-a4b-it-qat).
