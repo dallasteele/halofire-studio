@@ -725,12 +725,13 @@
       "gate": "cd apps/cad && npx vitest run test/kernel-heat-riser.test.ts",
       "attempts": 2,
       "spec": "Integration with a pure core. Create apps/cad/src/lib/kernel-heat-riser.ts exporting inferKernelTopology(nodes, segments) returning an object with riserId string, oriented Map of segment id to from-to pairs, and fraction number \u2014 a thin composition of inferRiser, orientFlow and solvableFraction from the existing riser-inference lib; returns null instead of throwing when inferRiser throws (no non-head nodes). Create test/kernel-heat-riser.test.ts: a small tree yields non-null with fraction 1; an all-HEAD input yields null. Then in the Viewer3D heat memo: when the existing solver result produces no pressure spread AND the network has segments, call inferKernelTopology and, when non-null and fraction is at least 0.5, re-run the solver with the inferred riser as the supply point so imported kernel networks show the fluid pressure gradient; publish riserInferred boolean and riserNodeId on the window.__cadVerify3D object (false and null when not used). HONESTY: when fraction is below 0.5 do nothing (partial mats stay dark rather than showing fabricated pressures) and never override an operator-set supplyPoint.",
-      "completed_at": "2026-06-11T12:32:31+00:00"
+      "completed_at": "2026-06-11T12:32:31+00:00",
+      "commit": "74743fad"
     },
     {
       "id": "W11B-pdf-trace-assist",
       "title": "CAD import > suggest wall candidates from PDF linework (assisted trace)",
-      "status": "pending",
+      "status": "blocked",
       "phase": "wave11-integration",
       "write_roots": [
         "apps/cad/src",
@@ -742,8 +743,9 @@
       ],
       "files_create": [],
       "gate": "cd apps/cad && npx vitest run test/pdf-trace-assist.test.ts",
-      "attempts": 0,
-      "spec": "Integration with a pure core. Create apps/cad/src/lib/pdf-trace-assist.ts exporting suggestWalls(strokes, scaleFtPerPt, opts optional) returning Array of { a, b, scoreInfo } \u2014 pipeline: clusterColinear from pdf-line-cluster, convert runs to the input shape wall-extract-score expects, score with scoreWallCandidates and dominantStrokeWidth from that lib, keep only candidates whose score is at least 0.6 (opts.minScore overrides), convert PDF points to feet with scaleFtPerPt, sorted by score descending. Returns empty array on empty input (never throws on it). Create test/pdf-trace-assist.test.ts: a synthetic page with two long thick parallel strokes plus short thin noise yields exactly the two wall suggestions in feet; empty input yields empty; minScore override filters. These suggestions are OPERATOR-CONFIRMED proposals for the trace tool, never auto-committed walls \u2014 say so in the module doc comment."
+      "attempts": 6,
+      "spec": "Integration with a pure core. Create apps/cad/src/lib/pdf-trace-assist.ts exporting suggestWalls(strokes, scaleFtPerPt, opts optional) returning Array of { a, b, scoreInfo } \u2014 pipeline: clusterColinear from pdf-line-cluster, convert runs to the input shape wall-extract-score expects, score with scoreWallCandidates and dominantStrokeWidth from that lib, keep only candidates whose score is at least 0.6 (opts.minScore overrides), convert PDF points to feet with scaleFtPerPt, sorted by score descending. Returns empty array on empty input (never throws on it). Create test/pdf-trace-assist.test.ts: a synthetic page with two long thick parallel strokes plus short thin noise yields exactly the two wall suggestions in feet; empty input yields empty; minScore override filters. These suggestions are OPERATOR-CONFIRMED proposals for the trace tool, never auto-committed walls \u2014 say so in the module doc comment.",
+      "last_error": "ValueError: path outside write_roots: test/pdf-trace-assist.test.ts"
     }
   ]
 }
