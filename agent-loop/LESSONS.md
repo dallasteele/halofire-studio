@@ -111,3 +111,4 @@ AssertionError: expected '// Dimensioned parametric, not manufa…' to contain '
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
 
 
+- 2026-06-11 BLOCKED W15A-cutsheet-dims-parse (model qwen3:30b-a3b); last error class: JSONDecodeError: Expecting ',' delimiter: line 1 column 1840 (char 1839)
