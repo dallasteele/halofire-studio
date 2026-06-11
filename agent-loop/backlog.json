@@ -453,6 +453,44 @@
       "gate": "cd apps/cad && npx tsc -b && npx vitest run test/head-clearance.test.ts",
       "attempts": 0,
       "spec": "NFPA-13-style head placement clearance checks as a pure module. Use EXACTLY these cited limits (standard spray, edition-dependent \u2014 every exported constant carries a citation string ending 'Verify adopted edition.'): max distance from wall = HALF the allowed head spacing for the hazard (use these spacings ft: LIGHT->15, ORDINARY_1->15, ORDINARY_2->15, EXTRA_1->12, EXTRA_2->12) and MIN distance from any wall = 4 INCHES (0.3333 ft). Exports (exact): export interface CitedNumber{value:number;citation:string} export const MAX_SPACING_FT: Record<'LIGHT'|'ORDINARY_1'|'ORDINARY_2'|'EXTRA_1'|'EXTRA_2',CitedNumber>; export const MIN_WALL_CLEARANCE_FT: CitedNumber (0.3333); export interface ClearanceIssue{headId:string;kind:'too-close-to-wall'|'too-far-from-wall';distanceFt:number;limitFt:number;citation:string} export function checkWallClearance(heads:Array<{id:string;x:number;z:number}>, wallSegments:Array<{x1:number;z1:number;x2:number;z2:number}>, hazard:'LIGHT'|'ORDINARY_1'|'ORDINARY_2'|'EXTRA_1'|'EXTRA_2'):ClearanceIssue[] \u2014 distance of each head to its NEAREST wall segment (point-to-segment 2D); too-close when < MIN_WALL_CLEARANCE_FT.value; too-far when > MAX_SPACING_FT[hazard].value/2; heads with NO walls produce no issues (honest skip); sorted by headId. Tests: head 0.2ft from a wall -> too-close (limit 0.3333); head 9ft from nearest wall in LIGHT (limit 7.5) -> too-far with distance ~9; compliant head (e.g. 5ft) -> no issue; empty walls -> no issues; citations all end with 'Verify adopted edition.'; sorted output."
+    },
+    {
+      "id": "W6A-hanger-spacing",
+      "title": "Auto Draw > Hangers \u2014 NFPA hanger placement along pipe runs (cited, pure)",
+      "status": "pending",
+      "phase": "wave6",
+      "write_roots": [
+        "apps/cad/src/lib",
+        "apps/cad/test"
+      ],
+      "context_files": [
+        "apps/cad/src/lib/model.ts"
+      ],
+      "files_create": [
+        "apps/cad/src/lib/hanger-spacing.ts",
+        "apps/cad/test/hanger-spacing.test.ts"
+      ],
+      "gate": "cd apps/cad && npx tsc -b && npx vitest run test/hanger-spacing.test.ts",
+      "attempts": 0,
+      "spec": "AutoSprink 'Hangers' auto-placement math as a pure module. Use EXACTLY these cited max hanger spacings for steel pipe (ft, NFPA-13 hanger table class \u2014 every exported constant carries a citation string ending 'Verify adopted edition.'): nominal 1->12, 1.25->12, 1.5->15, 2->15, 2.5->15, 3->15, 4->15, 6->15, 8->15; plus MAX unsupported end distance 3 ft from any pipe end. Exports (exact): export interface CitedNumber{value:number;citation:string} export const MAX_HANGER_SPACING_FT: Record<number,CitedNumber>; export const MAX_END_DISTANCE_FT: CitedNumber (3); export interface HangerPoint{segmentId:string;t:number;x:number;y:number;z:number} export function hangersForSegment(seg:{id:string;diameterIn:number;lengthFt:number}, a:{x:number;y:number;z:number}, b:{x:number;y:number;z:number}): HangerPoint[] \u2014 place hangers along the segment so that: first hanger within MAX_END_DISTANCE_FT of end a, last within MAX_END_DISTANCE_FT of end b, adjacent hangers <= MAX_HANGER_SPACING_FT[nearest defined nominal >= diameterIn, else 15]; use the MINIMUM count satisfying both, evenly spaced (equal gaps) between the first/last positions; segments shorter than 2*MAX_END_DISTANCE get exactly ONE hanger at t=0.5; positions linearly interpolated between a and b; throws on non-finite inputs or lengthFt<=0. Tests: a 30ft 2in run -> first/last within 3ft of ends, gaps <= 15ft, count minimal (3 hangers: t at 0.1, 0.5, 0.9 \u2014 verify gaps == (30-6)/2=12 <=15); a 4ft run -> single hanger t=0.5; spacing table lookup rounds UP to next defined nominal; citations end with 'Verify adopted edition.'; throws on lengthFt 0."
+    },
+    {
+      "id": "W6B-ceiling-grid",
+      "title": "Tools > Ceiling Grid \u2014 2x4 drop-ceiling grid lines for a room (pure)",
+      "status": "pending",
+      "phase": "wave6",
+      "write_roots": [
+        "apps/cad/src/lib",
+        "apps/cad/test"
+      ],
+      "context_files": [],
+      "files_create": [
+        "apps/cad/src/lib/ceiling-grid.ts",
+        "apps/cad/test/ceiling-grid.test.ts"
+      ],
+      "gate": "cd apps/cad && npx tsc -b && npx vitest run test/ceiling-grid.test.ts",
+      "attempts": 0,
+      "spec": "AutoSprink 'Ceiling Grid' geometry as a pure module: standard 2ft x 4ft lay-in grid lines clipped to a rectangular room bbox (full polygon clipping documented as follow-up). Exports (exact): export interface Pt{x:number;y:number} export interface GridLine{x1:number;y1:number;x2:number;y2:number;dir:'x'|'y'} export interface CeilingGrid{lines:GridLine[];cellW:number;cellH:number;originX:number;originY:number} export function ceilingGridForBounds(minX:number,minY:number,maxX:number,maxY:number,opts?:{cellW?:number;cellH?:number;originX?:number;originY?:number}):CeilingGrid \u2014 cellW default 4, cellH default 2 (feet, standard 2x4 lay-in tile with long axis on x); grid origin defaults to (minX,minY); generate interior lines ONLY (no lines on the boundary itself): vertical ('y'-dir) lines at every cellW step strictly between minX and maxX spanning minY..maxY, horizontal ('x'-dir) lines at every cellH step strictly between minY and maxY spanning minX..maxX. Throws on non-finite or degenerate bounds (maxX<=minX etc.) or non-positive cells. export function polygonBounds(poly:Pt[]):{minX:number;minY:number;maxX:number;maxY:number} \u2014 throws on <3 points/non-finite. Tests: a 12x8 room with defaults -> vertical lines at x=+4,+8 (2 lines) and horizontal at y=+2,+4,+6 (3 lines), all spanning the bbox; custom origin shifts the phase; non-positive cell throws; degenerate bounds throws; polygonBounds of a triangle correct."
     }
   ]
 }
