@@ -17,8 +17,11 @@ tracking. Full program: auto-bid-program.md.
 3. **PDF-first assist** — vector linework extraction w/ stroke widths feeding
    the W5B scorer; scale pre-fill (W8A) + sheet triage (W8B) integration
 4. **CAD fidelity debts (user-flagged):** junction orientation close-range
-   verification + fixes; inspector part viewer + flow gradients (in flight);
-   hangers (W6A) + ceiling grids (W6B) rendering
+   verification + fixes; hangers (W6A) + ceiling grids (W6B) rendering;
+   1881-kernel hydraulic solvability — imported pipe-mats have no riser/demand
+   topology so the fluid heat map stays dark on 1881 (needs riser inference);
+   DONE 2026-06-11: inspector part viewer (6bd2e4a) + flow gradients (87fc40a,
+   preview-verified 154/154 gradient segments on the sample project)
 5. **Parts pipeline** — manufacturer connectors + image/dims→3D so the
    nominal-fallback count (126/155) drops toward zero
 6. **W9 building extraction** — assisted walls/doors from PDF sheets (the
