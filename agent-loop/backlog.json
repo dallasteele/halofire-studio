@@ -380,7 +380,7 @@
     {
       "id": "W5A-pipe-snap",
       "title": "Tools > Pipe \u2014 endpoint snapping math (pure)",
-      "status": "pending",
+      "status": "done",
       "phase": "wave5",
       "write_roots": [
         "apps/cad/src/lib",
@@ -394,8 +394,9 @@
         "apps/cad/test/pipe-snap.test.ts"
       ],
       "gate": "cd apps/cad && npx tsc -b && npx vitest run test/pipe-snap.test.ts",
-      "attempts": 0,
-      "spec": "Pure snapping for the manual Pipe tool: given a click point (feet, 2D plan: x and z), find what it should connect to. Exports (exact): export interface Pt{x:number;z:number} export type SnapHit = { kind:'node'; nodeId:string; at:Pt } | { kind:'segment'; segmentId:string; at:Pt; t:number } | { kind:'none'; at:Pt }; export function distPointToSegment2D(p:Pt,a:Pt,b:Pt):{dist:number;t:number;closest:Pt} \u2014 standard point-to-segment projection with t clamped to [0,1]; export function snapToNetwork(p:Pt, nodes:Array<{id:string;pos:{x:number;y:number;z:number}}>, segments:Array<{id:string;from:string;to:string}>, tolFt:number): SnapHit \u2014 nearest NODE within tolFt wins (smallest distance, ties by id ascending); else nearest segment within tolFt (projection point, its t); else {kind:'none',at:p}. Throws on non-finite p or tolFt<=0. Segments with missing endpoint nodes are skipped. Tests: node win over farther segment; segment hit returns clamped t in (0,1) and correct closest point for a click beside the middle of a 10ft run (toBeCloseTo); t clamps to 0/1 beyond the ends; none beyond tolerance; tie-break by id; throws (NaN point, tol 0); missing-endpoint segment skipped."
+      "attempts": 5,
+      "spec": "Pure snapping for the manual Pipe tool: given a click point (feet, 2D plan: x and z), find what it should connect to. Exports (exact): export interface Pt{x:number;z:number} export type SnapHit = { kind:'node'; nodeId:string; at:Pt } | { kind:'segment'; segmentId:string; at:Pt; t:number } | { kind:'none'; at:Pt }; export function distPointToSegment2D(p:Pt,a:Pt,b:Pt):{dist:number;t:number;closest:Pt} \u2014 standard point-to-segment projection with t clamped to [0,1]; export function snapToNetwork(p:Pt, nodes:Array<{id:string;pos:{x:number;y:number;z:number}}>, segments:Array<{id:string;from:string;to:string}>, tolFt:number): SnapHit \u2014 nearest NODE within tolFt wins (smallest distance, ties by id ascending); else nearest segment within tolFt (projection point, its t); else {kind:'none',at:p}. Throws on non-finite p or tolFt<=0. Segments with missing endpoint nodes are skipped. Tests: node win over farther segment; segment hit returns clamped t in (0,1) and correct closest point for a click beside the middle of a 10ft run (toBeCloseTo); t clamps to 0/1 beyond the ends; none beyond tolerance; tie-break by id; throws (NaN point, tol 0); missing-endpoint segment skipped.",
+      "completed_at": "2026-06-11T04:44:34+00:00"
     },
     {
       "id": "W5B-wall-extract-score",
