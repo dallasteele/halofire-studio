@@ -35,3 +35,9 @@ test/hanger-spacing.test.ts(36,19): error TS2304: Cannot find name 'findMaxHange
 - 2026-06-11 DONE W6B-ceiling-grid on attempt 6 (model kimi-dev:72b).
 - 2026-06-11 BLOCKED W7A-bid-classifier (model qwen3:30b-a3b); last error class: _FOUND]: Cannot find package 'vitest' imported from /opt/hal9000/apps/halofire-studio/apps/autosprink/vitest.config.js.timestamp-1781159893829-def1f7555bd01.mjs
 - 2026-06-11 BLOCKED W7B-bid-html (model qwen3:30b-a3b); last error class: JSONDecodeError: Unterminated string starting at: line 1 column 71 (char 70)
+- 2026-06-11 BLOCKED W8A-scale-notation (model qwen3:30b-a3b); last error class: 5: ';' expected.
+src/lib/scale-notation.ts(16,48): error TS1005: ';' expected.
+src/lib/scale-notation.ts(21,3): error TS1128: Declaration or statement expected.
+- 2026-06-11 BLOCKED W8B-sheet-classify (model qwen3:30b-a3b); last error class: src/lib/sheet-classify.ts(70,1): error TS1005: '}' expected.
+
+
