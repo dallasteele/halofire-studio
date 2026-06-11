@@ -63,3 +63,7 @@ Received: "No non-HEAD nodes found"
      12|         expect(markers[0].kind).toBe('too-close');
 - 2026-06-11 DONE W11A-kernel-heat-riser on attempt 2 (model qwen3:30b-a3b).
 - 2026-06-11 BLOCKED W11B-pdf-trace-assist (model qwen3:30b-a3b); last error class: ValueError: path outside write_roots: test/pdf-trace-assist.test.ts
+- 2026-06-11 BLOCKED W11B-pdf-trace-assist (model qwen3:30b-a3b); last error class:  suggestWalls > filters by minScore override
+AssertionError: expected [ { a: { x: NaN, y: NaN }, …(2) } ] to have a length of +0 but got 1
+- Expected
++ Received
