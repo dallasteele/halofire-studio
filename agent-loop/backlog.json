@@ -731,7 +731,7 @@
     {
       "id": "W11B-pdf-trace-assist",
       "title": "CAD import > suggest wall candidates from PDF linework (assisted trace)",
-      "status": "blocked",
+      "status": "done",
       "phase": "wave11-integration",
       "write_roots": [
         "apps/cad/src",
@@ -745,7 +745,50 @@
       "gate": "cd apps/cad && npx vitest run test/pdf-trace-assist.test.ts",
       "attempts": 6,
       "spec": "Integration with a pure core. Create apps/cad/src/lib/pdf-trace-assist.ts exporting suggestWalls(strokes, scaleFtPerPt, opts optional) returning Array of { a, b, scoreInfo } \u2014 pipeline: clusterColinear from pdf-line-cluster, convert runs to the input shape wall-extract-score expects, score with scoreWallCandidates and dominantStrokeWidth from that lib, keep only candidates whose score is at least 0.6 (opts.minScore overrides), convert PDF points to feet with scaleFtPerPt, sorted by score descending. Returns empty array on empty input (never throws on it). Create test/pdf-trace-assist.test.ts: a synthetic page with two long thick parallel strokes plus short thin noise yields exactly the two wall suggestions in feet; empty input yields empty; minScore override filters. These suggestions are OPERATOR-CONFIRMED proposals for the trace tool, never auto-committed walls \u2014 say so in the module doc comment. HINT after blocked run: every files entry path MUST start with apps/cad/ \u2014 emit apps/cad/src/lib/pdf-trace-assist.ts and apps/cad/test/pdf-trace-assist.test.ts, never bare src/ or test/ paths.",
-      "last_error": "     \u2192 expected [] to have a length of 2 but got +0\n     \u2192 expected [ { a: { x: NaN, y: NaN }, \u2026(2) } ] to have a length of +0 but got 1\n FAIL  test/pdf-trace-assist.test.ts > pdf-trace-assist > suggestWalls > suggests two wall candidates from synthetic input (thick parallel lines + noise)\nAssertionError: expected [] to have a length of 2 but got +0\n- Expected\n+ Received\n FAIL  test/pdf-trace-assist.test.ts > pdf-trace-assist > suggestWalls > filters by minScore override\nAssertionError: expected [ { a: { x: NaN, y: NaN }, \u2026(2) } ] to have a length of +0 but got 1\n- Expected\n+ Received"
+      "last_error": "     \u2192 expected [] to have a length of 2 but got +0\n     \u2192 expected [ { a: { x: NaN, y: NaN }, \u2026(2) } ] to have a length of +0 but got 1\n FAIL  test/pdf-trace-assist.test.ts > pdf-trace-assist > suggestWalls > suggests two wall candidates from synthetic input (thick parallel lines + noise)\nAssertionError: expected [] to have a length of 2 but got +0\n- Expected\n+ Received\n FAIL  test/pdf-trace-assist.test.ts > pdf-trace-assist > suggestWalls > filters by minScore override\nAssertionError: expected [ { a: { x: NaN, y: NaN }, \u2026(2) } ] to have a length of +0 but got 1\n- Expected\n+ Received",
+      "note": "hand-built by Claude Tier-2 (commit 459b1b0). Do not regenerate."
+    },
+    {
+      "id": "W12A-followup-badges",
+      "title": "CRM board > follow-up due badges + days-out sorting (pure helper)",
+      "status": "blocked",
+      "phase": "wave12",
+      "write_roots": [
+        "apps/cad/src",
+        "apps/cad/test",
+        "apps/autosprink/src",
+        "apps/autosprink/tests"
+      ],
+      "context_files": [
+        "apps/autosprink/src/autobid/followups.js",
+        "apps/autosprink/crm.html"
+      ],
+      "files_create": [],
+      "gate": "cd apps/autosprink && npx vitest run tests/autobid-followup-badges.test.js",
+      "attempts": 6,
+      "spec": "Pure ESM helper apps/autosprink/src/autobid/followup-badges.js exporting badgeForBid(bid, nowIso, thresholdDays) returning null when bid status is not bid_sent, otherwise an object with daysOut number (whole days since the last status_history entry timestamp) and level string: ok when daysOut below thresholdDays, due when at or above thresholdDays, overdue when at or above twice thresholdDays. Throws TypeError on missing nowIso or malformed bid. Also export sortByUrgency(bids, nowIso, thresholdDays) returning a NEW array sorted overdue first then due then ok then non-bid_sent, ties by daysOut descending. Test file apps/autosprink/tests/autobid-followup-badges.test.js covers all levels, null for won bids, purity, TypeError cases. Then in crm.html render the badge text and color (ok muted, due ember, overdue red) on bid_sent cards using the helper logic mirrored client-side (the page already loads ESM from /src \u2014 import the module directly, do not duplicate constants). HINT after blocked run: your JSON emission broke mid-file \u2014 keep each file under 120 lines, no markdown fences inside content strings, and escape every backslash and double quote in JS strings properly.",
+      "last_error": "Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'vitest' imported from /opt/hal9000/apps/halofire-studio/apps/autosprink/vitest.config.js.timestamp-1781192437810-2a2b90b19e051.mjs"
+    },
+    {
+      "id": "W12B-takeoff-rollup",
+      "title": "CAD > BOM rollup summary for the bid payload (pure)",
+      "status": "done",
+      "phase": "wave12",
+      "write_roots": [
+        "apps/cad/src",
+        "apps/cad/test",
+        "apps/autosprink/src",
+        "apps/autosprink/tests"
+      ],
+      "context_files": [
+        "apps/cad/src/lib/bid-payload.ts"
+      ],
+      "files_create": [],
+      "gate": "cd apps/cad && npx vitest run test/takeoff-rollup.test.ts",
+      "attempts": 5,
+      "spec": "Pure strict-TS module apps/cad/src/lib/takeoff-rollup.ts exporting rollupTakeoff(payload) where payload is the existing toBidPayload output (read apps/cad/src/lib/bid-payload.ts FIRST and use its exported types). Returns { totalHeads: number; totalPipeLengthFt: number; pipeByDiameter: Array of { diameterIn: number; lengthFt: number; count: number } sorted by diameterIn ascending; fittingCounts: Array of { kind: string; count: number } sorted by kind ascending }. Lengths rounded to 2 decimals. Empty payload sections yield zeros and empty arrays, never throws on a structurally valid payload. Test file apps/cad/test/takeoff-rollup.test.ts: hand-built payload with two diameters verifies grouping math, rounding, sort order, and the empty-payload case. Files MUST be at apps/cad/src/lib/takeoff-rollup.ts and apps/cad/test/takeoff-rollup.test.ts. HINT after blocked run: READ apps/cad/src/lib/bid-payload.ts first and use its REAL exported type names and field names for the payload \u2014 do not invent fields; your test expectations must be computed from the same hand-built payload literal, and rounding is to 2 decimals via Math.round times 100 over 100.",
+      "completed_at": "2026-06-11T15:46:06+00:00",
+      "commit": "51206c93"
     }
   ]
 }

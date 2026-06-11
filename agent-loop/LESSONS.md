@@ -67,3 +67,8 @@ Received: "No non-HEAD nodes found"
 AssertionError: expected [ { a: { x: NaN, y: NaN }, …(2) } ] to have a length of +0 but got 1
 - Expected
 + Received
+- 2026-06-11 BLOCKED W12A-followup-badges (model qwen3:30b-a3b); last error class: JSONDecodeError: Expecting ',' delimiter: line 1 column 2081 (char 2080)
+- 2026-06-11 BLOCKED W12B-takeoff-rollup (model qwen3:30b-a3b); last error class: /takeoff-rollup.test.ts > rollupTakeoff > counts heads correctly
+ FAIL  test/takeoff-rollup.test.ts > rollupTakeoff > skips lines with zero or negative quantity
+- 2026-06-11 BLOCKED W12A-followup-badges (model qwen3:30b-a3b); last error class: _FOUND]: Cannot find package 'vitest' imported from /opt/hal9000/apps/halofire-studio/apps/autosprink/vitest.config.js.timestamp-1781192437810-2a2b90b19e051.mjs
+- 2026-06-11 DONE W12B-takeoff-rollup on attempt 5 (model gemma4:26b-a4b-it-qat).
