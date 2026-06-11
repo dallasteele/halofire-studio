@@ -525,7 +525,7 @@
   {
    "id": "W7B-bid-html",
    "title": "AutoBid > branded HTML bid document renderer (pure)",
-   "status": "claimed",
+   "status": "done",
    "phase": "wave7-autobid",
    "write_roots": [
     "apps/autosprink/src",
@@ -540,7 +540,7 @@
    "attempts": 6,
    "spec": "Pure ESM JS renderer: bid record -> complete standalone HTML string (inline CSS, no external assets). Exports (exact): export function renderBidHtml(bid) where bid = {projectName, clientName, dateIso, items:[{description, quantity, unit, unitCost, extendedCost}], subtotal, overheadPct, profitPct, total, notes?, disclaimer}. Requirements: <!doctype html> document; header block with 'HALO FIRE PROTECTION' brand line + ember accent color #f0a868 used in inline styles; a line-item table (description/qty/unit/unit cost/extended) with right-aligned currency formatted via Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}); summary rows (subtotal, OH %, profit %, TOTAL bolded); notes paragraph when provided; the disclaimer VERBATIM in a visually distinct footer block; all user-provided strings HTML-ESCAPED (export function escapeHtml(s) \u2014 & < > \" ' \u2014 and use it on every interpolated field; test asserts <script> in a description renders escaped). Throws on: empty projectName/clientName, empty items, missing disclaimer, non-finite money fields. Tests: golden structural assertions (contains brand line, escaped script tag, currency '$1,234.50' formatting, disclaimer present, TOTAL row), throws cases.",
    "last_error": "JSONDecodeError: Unterminated string starting at: line 1 column 71 (char 70)",
-   "note": "claimed by Claude AB3-5 workflow 2026-06-11 \u2014 will land bid-html.js to spec. Loop must not generate."
+   "note": "landed by Claude AB3-5 workflow (commit 0973420): src/autobid/bid-html.js spec-exact + 22 tests. Do not regenerate."
   },
   {
    "id": "W7C-crm-status",
@@ -598,6 +598,46 @@
    "attempts": 6,
    "spec": "Pure classifier for plan-set pages from their extracted text. Exports (exact): export type SheetKind='floor-plan'|'fire-protection'|'detail'|'schedule'|'title'|'other' export interface SheetInfo{kind:SheetKind;score:number;floor:number|null;sheetNo:string|null} export function classifySheet(pageText:string):SheetInfo \u2014 signals (case-insensitive): fire-protection when /\b(FP-?\\d|FIRE (PROTECTION|SPRINKLER)|SPRINKLER PLAN)\b/ (score .9); floor-plan when /\b(FLOOR PLAN|\bA-?1\\d{2}\b|LEVEL \\d+ PLAN)\b/ (.8); schedule when /\bSCHEDULE\b/ (.7); detail when /\b(DETAILS?|SECTIONS?)\b/ (.6); title when /\b(COVER|TITLE SHEET|SHEET INDEX|DRAWING INDEX)\b/ (.8); precedence by the listed order when multiple match (fire-protection wins); 'other' score 0 when none. floor: parse from /\b(\\d+)(ST|ND|RD|TH)? FLOOR\b/ or /\bLEVEL (\\d+)\b/ else null. sheetNo: first match of /\b([A-Z]{1,2}-?\\d{1,3}(?:\\.\\d{1,2})?)\b/ on a line also containing /sheet|dwg|no\\.?/i, else first standalone token matching the same pattern near 'SHEET', else null \u2014 keep this heuristic SIMPLE and documented. Throws TypeError on non-string input. Tests: 'SECOND FLOOR PLAN  A-102' -> floor-plan, floor 2; 'FP-3 FIRE SPRINKLER PLAN LEVEL 3' -> fire-protection, floor 3; 'DOOR SCHEDULE' -> schedule; 'COVER SHEET / SHEET INDEX' -> title; lorem text -> other score 0; precedence fire-protection over floor-plan when both present; non-string throws.",
    "last_error": "src/lib/sheet-classify.ts(70,1): error TS1005: '}' expected.\n\n"
+  },
+  {
+   "id": "W9A-riser-inference",
+   "title": "CAD > infer riser + flow topology on imported kernel networks (pure)",
+   "status": "pending",
+   "phase": "wave9-fidelity",
+   "write_roots": [
+    "apps/cad/src",
+    "apps/cad/test"
+   ],
+   "context_files": [
+    "apps/cad/src/lib/flow-calculator.ts"
+   ],
+   "files_create": [
+    "apps/cad/src/lib/riser-inference.ts",
+    "apps/cad/test/riser-inference.test.ts"
+   ],
+   "gate": "cd apps/cad && npx vitest run test/riser-inference.test.ts",
+   "attempts": 0,
+   "spec": "Pure strict-TS module. Imported DXF kernel networks have nodes (id, type HEAD or other, pos {x,y} ft) and segments (id, from, to, diameterIn, lengthFt) but no riser or flow direction, so hydraulics cannot solve them. Exports (exact): export interface RiserCandidate { nodeId: string; score: number; reasons: string[] }. export function inferRiser(nodes, segments): RiserCandidate -- scores every non-HEAD node: +0.4 if it touches the segment with the maximum diameterIn in the network (reason max-diameter); +0.3 if its degree (count of incident segments) is in the top decile (reason high-degree); +0.3 if it is within 10 percent of the network bounding-box perimeter edge, i.e. near an exterior wall where risers live (reason perimeter). Returns the highest score; ties break by lowest nodeId lexicographically. Throws Error with message no non-head nodes when every node is HEAD or lists empty. export function orientFlow(nodes, segments, riserId): Map<string,{from:string,to:string}> -- BFS from riserId across segments treating them undirected, re-orient each segment so from is the node closer (in hops) to the riser; unreachable segments are EXCLUDED from the map (honest partial result, never fabricated). export function solvableFraction(segments, oriented: Map): number 0..1 = oriented.size/segments.length (0 when no segments). Tests: a hand-built 6-node tree with one fat 4in segment at the root picks that node with max-diameter reason; orientFlow on the tree points every from toward the riser side; a disconnected island is excluded and solvableFraction reflects it; all-HEAD network throws; tie-break determinism asserted."
+  },
+  {
+   "id": "W9B-pdf-line-cluster",
+   "title": "CAD > cluster colinear PDF vector segments into wall-candidate runs (pure)",
+   "status": "pending",
+   "phase": "wave9-pdf-first",
+   "write_roots": [
+    "apps/cad/src",
+    "apps/cad/test"
+   ],
+   "context_files": [
+    "apps/cad/src/lib/wall-extract-score.ts"
+   ],
+   "files_create": [
+    "apps/cad/src/lib/pdf-line-cluster.ts",
+    "apps/cad/test/pdf-line-cluster.test.ts"
+   ],
+   "gate": "cd apps/cad && npx vitest run test/pdf-line-cluster.test.ts",
+   "attempts": 0,
+   "spec": "Pure strict-TS module. PDF vector extraction yields thousands of tiny colinear strokes that must merge into wall-candidate runs before scoring (wall-extract-score). Exports (exact): export interface RawStroke { a:{x:number,y:number}; b:{x:number,y:number}; widthPt:number }. export interface ClusteredRun { a:{x:number,y:number}; b:{x:number,y:number}; widthPt:number; sourceCount:number }. export function clusterColinear(strokes: RawStroke[], opts?: {angleTolDeg?: number; gapTolPt?: number; offsetTolPt?: number}): ClusteredRun[] with defaults angleTolDeg 2, gapTolPt 3, offsetTolPt 1.5. Algorithm: group strokes whose direction angles differ by at most angleTolDeg (mod 180), whose perpendicular offset from a shared infinite line is at most offsetTolPt, and whose projected 1D intervals on that line overlap or have gaps at most gapTolPt; each group merges into one run spanning min..max projection, widthPt = max member width, sourceCount = member count. Zero-length strokes (a equals b within 1e-9) are dropped before clustering. Output sorted by run length descending then a.x then a.y ascending. Pure, no mutation of inputs. Tests: three collinear horizontal strokes with 2pt gaps merge into one run with sourceCount 3 spanning the full extent; a parallel stroke offset 5pt does NOT merge; a perpendicular stroke never merges; angle within tolerance (1 degree skew) merges; zero-length strokes dropped; empty input returns empty array; determinism of sort order asserted."
   }
  ]
 }
