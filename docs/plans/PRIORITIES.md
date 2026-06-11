@@ -29,8 +29,11 @@ tracking. Full program: auto-bid-program.md.
    topology so the fluid heat map stays dark on 1881 (needs riser inference);
    DONE 2026-06-11: inspector part viewer (6bd2e4a) + flow gradients (87fc40a,
    preview-verified 154/154 gradient segments on the sample project)
-5. **Parts pipeline** — manufacturer connectors + image/dims→3D so the
-   nominal-fallback count (126/155) drops toward zero
+5. **Parts pipeline** — UNBLOCKED 2026-06-11: OpenSCAD 2021.01 installed on
+   GX10 (/usr/bin/openscad) + Windows dev box; docs at
+   docs/research/openscad-parts-pipeline.md. Wave 13 = parametric .scad
+   emitters + headless STL render harness so the nominal-fallback count
+   (126/155) drops with honest dimensioned-parametric provenance
 6. **W9 building extraction** — assisted walls/doors from PDF sheets (the
    long pole; W5B/W8A/W8B are its bricks)
 
