@@ -5,6 +5,23 @@
 > When the user gives new direction, THIS file is updated first — loops re-aim
 > without losing context. Updated: 2026-06-11.
 
+## Client delivery (user 2026-06-11)
+Halo Fire's team must see live progress + upload info we can't scrape. Targets:
+- **Live on the VPS, always-on** (systemd; openclaw-vps skill: 187.124.234.28).
+- **Secure client access by emailed/texted link** → standard flow: link → set
+  password by email → in. **Username = the company email.** First client:
+  Wade@halofireus.com (Director of Operations).
+- Clean professional **Apple-glass UI**, **only Halo Fire's own logos**, animate
+  ONLY the fire. (All HaloFire software uses the apple-glass system.)
+- BLOCKED ON USER (cannot proceed without): (1) the official Halo Fire logo
+  asset — interim uses a flagged placeholder per doctrine; (2) SMTP creds in
+  Settings to actually send (user enters them — never committed/handled by AI);
+  (3) explicit approval of the exact Wade invite before any send (real external
+  client; per-message human approval is a hard gate). SMS needs a provider.
+- Wave 17 seeds the buildable core: secure invite/set-password token
+  (email=username), apple-glass portal shell + flagged placeholder logo +
+  animated fire. VPS deploy + invite-email DRAFT follow.
+
 ## North star (the product)
 An AI-run AUTO-BID system for Halo Fire: scrape company email → identify bid
 invitations → import (PDF-FIRST; DWG is luck) → estimate via the AutoSprink-
