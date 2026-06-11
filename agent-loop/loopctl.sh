@@ -44,6 +44,8 @@ PY
     ;;
   report)
     # ONE deterministic call gathering everything the self-improve agent needs.
+    echo "===== PRIORITIES (steering file) ====="
+    head -40 /opt/hal9000/apps/halofire-studio/docs/plans/PRIORITIES.md 2>/dev/null || echo "no priorities file"
     bash "$0" status
     echo "===== LESSONS (tail) ====="
     tail -n 20 "$DIR/LESSONS.md" 2>/dev/null || true
