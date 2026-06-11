@@ -491,6 +491,60 @@
       "gate": "cd apps/cad && npx tsc -b && npx vitest run test/ceiling-grid.test.ts",
       "attempts": 0,
       "spec": "AutoSprink 'Ceiling Grid' geometry as a pure module: standard 2ft x 4ft lay-in grid lines clipped to a rectangular room bbox (full polygon clipping documented as follow-up). Exports (exact): export interface Pt{x:number;y:number} export interface GridLine{x1:number;y1:number;x2:number;y2:number;dir:'x'|'y'} export interface CeilingGrid{lines:GridLine[];cellW:number;cellH:number;originX:number;originY:number} export function ceilingGridForBounds(minX:number,minY:number,maxX:number,maxY:number,opts?:{cellW?:number;cellH?:number;originX?:number;originY?:number}):CeilingGrid \u2014 cellW default 4, cellH default 2 (feet, standard 2x4 lay-in tile with long axis on x); grid origin defaults to (minX,minY); generate interior lines ONLY (no lines on the boundary itself): vertical ('y'-dir) lines at every cellW step strictly between minX and maxX spanning minY..maxY, horizontal ('x'-dir) lines at every cellH step strictly between minY and maxY spanning minX..maxX. Throws on non-finite or degenerate bounds (maxX<=minX etc.) or non-positive cells. export function polygonBounds(poly:Pt[]):{minX:number;minY:number;maxX:number;maxY:number} \u2014 throws on <3 points/non-finite. Tests: a 12x8 room with defaults -> vertical lines at x=+4,+8 (2 lines) and horizontal at y=+2,+4,+6 (3 lines), all spanning the bbox; custom origin shifts the phase; non-positive cell throws; degenerate bounds throws; polygonBounds of a triangle correct."
+    },
+    {
+      "id": "W7A-bid-classifier",
+      "title": "AutoBid > bid-invitation email classifier (pure heuristics)",
+      "status": "pending",
+      "phase": "wave7-autobid",
+      "write_roots": [
+        "apps/autosprink/src",
+        "apps/autosprink/tests"
+      ],
+      "context_files": [],
+      "files_create": [
+        "apps/autosprink/src/autobid/bid-classifier.js",
+        "apps/autosprink/tests/autobid-classifier.test.js"
+      ],
+      "gate": "cd apps/autosprink && npx vitest run tests/autobid-classifier.test.js",
+      "attempts": 0,
+      "spec": "Pure ESM JavaScript module (apps/autosprink is type:module, plain JS, vitest). Classify an email as a likely bid invitation. Exports (exact): export function classifyBidEmail(email) where email = {subject:string, body:string, attachments:[{filename:string,sizeBytes:number}], from:string}. Returns {score:number (0..1), isLikelyBid:boolean (score>=0.5), reasons:string[]}. Scoring (additive, cap 1.0): +0.35 when subject/body matches /\b(invitation to bid|itb|rfp|request for proposal|bid request|bid invitation|tender)\b/i ('keyword'); +0.2 subject/body matches /\b(fire (sprinkler|protection|suppression)|nfpa|sprinkler)\b/i ('domain'); +0.25 any attachment filename matches /\\.(pdf|dwg|dxf)$/i ('plan-attachment'); +0.1 body matches /\b(due|deadline|bid date|proposals? due)\b/i ('deadline'); +0.1 from matches /\b(gc|construction|builders?|contracting|estimating)\b/i or body matches /general contractor/i ('sender-context'). Reasons list each matched criterion name. Pure; throws TypeError on missing subject/body strings or non-array attachments. Tests: a real-shaped ITB email (subject 'Invitation to Bid - Fire Sprinkler - Marriott TI', pdf attachment, deadline in body) scores >=0.8 with >=3 reasons; a newsletter scores <0.3 and isLikelyBid false; missing fields throw; attachment-only email gets exactly the plan-attachment reason; score caps at 1.0."
+    },
+    {
+      "id": "W7B-bid-html",
+      "title": "AutoBid > branded HTML bid document renderer (pure)",
+      "status": "pending",
+      "phase": "wave7-autobid",
+      "write_roots": [
+        "apps/autosprink/src",
+        "apps/autosprink/tests"
+      ],
+      "context_files": [],
+      "files_create": [
+        "apps/autosprink/src/autobid/bid-html.js",
+        "apps/autosprink/tests/autobid-html.test.js"
+      ],
+      "gate": "cd apps/autosprink && npx vitest run tests/autobid-html.test.js",
+      "attempts": 0,
+      "spec": "Pure ESM JS renderer: bid record -> complete standalone HTML string (inline CSS, no external assets). Exports (exact): export function renderBidHtml(bid) where bid = {projectName, clientName, dateIso, items:[{description, quantity, unit, unitCost, extendedCost}], subtotal, overheadPct, profitPct, total, notes?, disclaimer}. Requirements: <!doctype html> document; header block with 'HALO FIRE PROTECTION' brand line + ember accent color #f0a868 used in inline styles; a line-item table (description/qty/unit/unit cost/extended) with right-aligned currency formatted via Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}); summary rows (subtotal, OH %, profit %, TOTAL bolded); notes paragraph when provided; the disclaimer VERBATIM in a visually distinct footer block; all user-provided strings HTML-ESCAPED (export function escapeHtml(s) \u2014 & < > \" ' \u2014 and use it on every interpolated field; test asserts <script> in a description renders escaped). Throws on: empty projectName/clientName, empty items, missing disclaimer, non-finite money fields. Tests: golden structural assertions (contains brand line, escaped script tag, currency '$1,234.50' formatting, disclaimer present, TOTAL row), throws cases."
+    },
+    {
+      "id": "W7C-crm-status",
+      "title": "AutoBid > CRM bid status machine (pure)",
+      "status": "pending",
+      "phase": "wave7-autobid",
+      "write_roots": [
+        "apps/autosprink/src",
+        "apps/autosprink/tests"
+      ],
+      "context_files": [],
+      "files_create": [
+        "apps/autosprink/src/autobid/crm-status.js",
+        "apps/autosprink/tests/autobid-status.test.js"
+      ],
+      "gate": "cd apps/autosprink && npx vitest run tests/autobid-status.test.js",
+      "attempts": 0,
+      "spec": "Pure ESM JS status machine for bid_requests. Exports (exact): export const BID_STATUSES = ['received','reviewing','estimating','bid_sent','won','lost']; export const ALLOWED_TRANSITIONS = { received:['reviewing'], reviewing:['estimating','lost'], estimating:['bid_sent','lost'], bid_sent:['won','lost'], won:[], lost:['reviewing'] } (lost->reviewing = reopen); export function canTransition(from,to) -> boolean (false for unknown states, never throws); export function applyTransition(record, to, atIso) where record={status, history:[{status,atIso}]} -> NEW record {status:to, history:[...history,{status:to,atIso}]} (pure, input untouched); throws Error('invalid transition <from> -> <to>') when not allowed, and TypeError on malformed record/missing atIso. export function timeInStatusMs(record, nowIso) -> ms since the LAST history entry (throws on empty history or invalid dates). Tests: full happy path received->...->won; reopen lost->reviewing allowed; won is terminal (no transitions); invalid jump received->bid_sent throws with the exact message; purity via structuredClone compare; timeInStatusMs computes from the last entry; malformed record throws TypeError."
     }
   ]
 }
