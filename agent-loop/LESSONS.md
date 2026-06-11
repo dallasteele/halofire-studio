@@ -49,3 +49,5 @@ Received: "No non-HEAD nodes found"
  FAIL  test/pdf-line-cluster.test.ts > clusterColinear > asserts determinism of sort order (length desc, then a.x asc, then a.y asc)
 - 2026-06-11 DONE W10A-scale-prefill on attempt 5 (model gemma4:26b-a4b-it-qat).
 - 2026-06-11 BLOCKED W10B-hanger-grid-3d (model qwen3:30b-a3b); last error class:  FAIL  test/hanger-grid-3d.test.ts > hanger-3d logic > computes hanger drops correctly for a 30ft run
+- 2026-06-11 BLOCKED W10C-clearance-overlay (model qwen3:30b-a3b); last error class: arkers > yields no markers for a compliant head
+ FAIL  test/clearance-overlay.test.ts > getClearanceIssueMarkers > returns empty array when no walls are present
