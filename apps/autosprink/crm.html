@@ -59,6 +59,22 @@
   .bidcard .ev{margin-top:6px;font-size:10px;font-family:var(--mono)}
   .bidcard .ev a{color:var(--cyan);text-decoration:none;cursor:pointer}
   .bidcard .ev a:hover{text-decoration:underline}
+  /* AB3-5 per-card actions */
+  .acts{margin-top:8px;display:flex;flex-wrap:wrap;gap:5px}
+  .acts button{background:rgba(77,208,225,.10);border:1px solid rgba(77,208,225,.35);color:var(--cyan);border-radius:99px;padding:3px 9px;font-size:10px;font-family:var(--mono);cursor:pointer}
+  .acts button:hover{background:rgba(77,208,225,.20)}
+  /* The human approval gate — visually distinct (ember), never auto. */
+  .acts button.approve{background:rgba(240,168,104,.16);border-color:rgba(240,168,104,.6);color:var(--ember);font-weight:700}
+  .acts button.approve:hover{background:rgba(240,168,104,.28)}
+  .bidcard .est{margin-top:6px;font-size:10px;font-family:var(--mono);color:var(--green)}
+  .bidcard .fu{display:inline-block;margin-top:6px;background:rgba(255,213,79,.16);border:1px solid rgba(255,213,79,.5);color:var(--gold);border-radius:99px;padding:2px 8px;font-size:10px;font-family:var(--mono)}
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:50}
+  .modal.open{display:flex}
+  .modal .box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;max-width:520px;width:92%}
+  .modal .box h3{color:var(--ember);font-size:13px;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+  .modal .box .gate{background:rgba(240,168,104,.08);border:1px solid rgba(240,168,104,.35);border-radius:8px;padding:9px;font-size:11px;color:var(--ember);margin:8px 0}
+  .modal .box .row{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
+  .modal .box button.cancel{background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:8px 14px;cursor:pointer}
 </style>
 </head>
 <body>
@@ -66,7 +82,7 @@
   <div class="brand">Halo<span>Fire</span> · CRM</div>
   <div class="who"><a href="/workbench.html">← Workbench</a><a href="/autosprink.html">Sprinkler Studio →</a><span id="whoami">…</span><a id="logout">Sign out</a></div>
 </header>
-<div class="alpha-banner">INTERNAL ALPHA · AUTO-BID CRM · no outbound email in this slice · nothing fabricated</div>
+<div class="alpha-banner">INTERNAL ALPHA · AUTO-BID CRM · outbound email requires explicit human approval per message · nothing fabricated</div>
 <main>
   <div class="forms">
     <div class="card">
@@ -96,6 +112,8 @@
   </div>
   <div class="board" id="board"><span class="muted">Loading board…</span></div>
 </main>
+
+<div class="modal" id="modal"><div class="box" id="modalBox"></div></div>
 
 <script type="module">
 const BASE_PATH = window.location.pathname.startsWith('/halo-fire/') ? '/halo-fire' : '';
@@ -146,6 +164,7 @@ document.getElementById('logout').onclick = async () => {
 
 let clients = [];
 let bids = [];
+let followupIds = new Set();
 
 function clientName(id){
   const c = clients.find((x) => x.id === id);
@@ -171,6 +190,117 @@ async function transition(id, to){
   }catch(e){ alert('Transition rejected: ' + e.message); }
 }
 
+// ── AB3-5 card actions ──
+const modal = document.getElementById('modal');
+const modalBox = document.getElementById('modalBox');
+function openModal(html){ modalBox.innerHTML = html; modal.classList.add('open'); }
+function closeModal(){ modal.classList.remove('open'); modalBox.innerHTML = ''; }
+modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+const ESTIMATE_TEMPLATE = JSON.stringify({
+  overheadPct: 10, profitPct: 10,
+  items: [{ description: 'Pendent sprinkler head', quantity: 40, unit: 'ea', unitCost: 12.5 }],
+}, null, 2);
+
+function estimateDialog(id){
+  openModal(`<h3>Estimate bid #${id}</h3>
+    <div class="gate">Manual line items OR a CAD bid-payload (source:"halofire-cad"). Every estimate is a design aid, not a committed bid.</div>
+    <label style="font-size:11px;color:var(--muted)">Estimate JSON</label>
+    <textarea id="estJson" rows="12" style="font-family:var(--mono);font-size:11px">${escapeHtml(ESTIMATE_TEMPLATE)}</textarea>
+    <div class="err" id="estErr"></div>
+    <div class="row"><button class="cancel" data-act="modal-cancel">Cancel</button>
+      <button class="go" data-act="estimate-submit" data-id="${id}">Price it</button></div>`);
+}
+
+async function submitEstimate(id){
+  const errEl = document.getElementById('estErr'); errEl.textContent = '';
+  let body;
+  try{ body = JSON.parse(document.getElementById('estJson').value); }
+  catch(_){ errEl.textContent = 'Invalid JSON.'; return; }
+  try{
+    await api('/bid-requests/' + id + '/estimate', { method:'POST', body: JSON.stringify(body) });
+    closeModal();
+    await loadBoard();
+  }catch(e){ errEl.textContent = e.message; }
+}
+
+async function renderBid(id){
+  try{
+    await api('/bid-requests/' + id + '/render-bid', { method:'POST' });
+    await loadBoard();
+    alert('Branded HTML bid rendered and stored. Use "View HTML" to preview, then "Create draft".');
+  }catch(e){ alert('Render failed: ' + e.message); }
+}
+
+function viewBid(id){
+  // The stored HTML is auth-gated; fetch with the token then open in a new tab.
+  fetch(API_BASE + '/bid-requests/' + id + '/render-bid', { credentials:'include', headers: token ? { Authorization:'Bearer '+token } : {} })
+    .then((r) => r.ok ? r.text() : Promise.reject(new Error('no rendered bid')))
+    .then((html) => { const w = window.open('', '_blank'); if (w) { w.document.write(html); w.document.close(); } })
+    .catch((e) => alert('Cannot open bid: ' + e.message));
+}
+
+async function createDraft(id){
+  try{
+    const draft = await api('/bid-requests/' + id + '/outbound-draft', { method:'POST', body: JSON.stringify({}) });
+    approveDialog(draft.id, id, draft.to_email, draft.subject, draft.any_estimated);
+  }catch(e){ alert('Draft not created: ' + e.message); }
+}
+
+function approveDialog(draftId, bidId, toEmail, subject, anyEstimated){
+  const estWarn = anyEstimated
+    ? '<div class="gate" style="background:#fffbeb;border-color:#fcd34d;color:#92400e"><b>ESTIMATED PRICES.</b> This bid contains one or more representative or unpriced lines (marked <b>*</b> in the document), NOT firm sourced prices. Verify them before sending.</div>'
+    : '';
+  openModal(`<h3>Send bid #${bidId}</h3>
+    <div class="gate"><b>HUMAN APPROVAL GATE.</b> Nothing has been sent. Approving will transmit this email via the configured SMTP account. There is no auto-send anywhere — this per-message approval is the only send path. If SMTP is not configured, approval is refused.</div>
+    ${estWarn}
+    <div style="font-size:12px;font-family:var(--mono);color:var(--muted)">
+      <div>to: <span style="color:var(--cyan)">${escapeHtml(toEmail)}</span></div>
+      <div>subject: ${escapeHtml(subject)}</div>
+    </div>
+    <div class="err" id="apvErr"></div>
+    <div class="row"><button class="cancel" data-act="modal-cancel">Keep as draft</button>
+      <button class="go approve-go" data-act="approve-submit" data-draft="${draftId}">Approve &amp; send</button></div>`);
+}
+
+async function submitApprove(draftId){
+  const errEl = document.getElementById('apvErr'); errEl.textContent = '';
+  try{
+    await api('/outbound-drafts/' + draftId + '/approve', { method:'POST' });
+    closeModal();
+    await loadBoard();
+    alert('Approved and sent. Bid advanced to "Bid sent".');
+  }catch(e){ errEl.textContent = e.message; }
+}
+
+function outcomeDialog(id, outcome){
+  openModal(`<h3>Mark bid #${id} ${outcome}</h3>
+    <label style="font-size:11px;color:var(--muted)">Outcome notes</label>
+    <textarea id="outNotes" rows="3" placeholder="Why won/lost (optional)"></textarea>
+    <div class="err" id="outErr"></div>
+    <div class="row"><button class="cancel" data-act="modal-cancel">Cancel</button>
+      <button class="go" data-act="outcome-submit" data-id="${id}" data-outcome="${outcome}">Record ${outcome}</button></div>`);
+}
+
+async function submitOutcome(id, outcome){
+  const errEl = document.getElementById('outErr'); errEl.textContent = '';
+  try{
+    await api('/bid-requests/' + id + '/outcome', { method:'POST', body: JSON.stringify({ outcome, notes: document.getElementById('outNotes').value || null }) });
+    closeModal();
+    await loadBoard();
+  }catch(e){ errEl.textContent = e.message; }
+}
+
+// Modal-scoped button delegation (buttons are recreated each open).
+modalBox.addEventListener('click', (e) => {
+  const btn = e.target.closest('button'); if (!btn) return;
+  const act = btn.dataset.act;
+  if (act === 'modal-cancel') return closeModal();
+  if (act === 'estimate-submit') return submitEstimate(Number(btn.dataset.id));
+  if (act === 'approve-submit') return submitApprove(Number(btn.dataset.draft));
+  if (act === 'outcome-submit') return submitOutcome(Number(btn.dataset.id), btn.dataset.outcome);
+});
+
 function renderBoard(){
   const board = document.getElementById('board');
   board.innerHTML = STATUSES.map((status) => {
@@ -180,6 +310,18 @@ function renderBoard(){
       const adv = (ALLOWED[status] || []).map((to) =>
         `<button data-act="adv" data-id="${b.id}" data-to="${to}">→ ${escapeHtml(LABEL[to])}</button>`).join('');
       const fromEmail = b.source === 'email';
+      const hasEstimate = b.estimate_total_cents != null;
+      const hasHtml = Boolean(b.bid_html_set);
+      const dollars = hasEstimate ? '$' + (b.estimate_total_cents / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : null;
+      const isFollowup = followupIds.has(b.id);
+      // Per-status actions: estimate (reviewing/estimating), render+draft once an
+      // estimate exists, the approval gate on a draft, and won/lost on bid_sent.
+      const acts = [];
+      if (status === 'reviewing' || status === 'estimating') acts.push(`<button data-act="estimate" data-id="${b.id}">＄ Estimate</button>`);
+      if (hasEstimate) acts.push(`<button data-act="render" data-id="${b.id}">⧉ Render bid</button>`);
+      if (hasHtml) acts.push(`<button data-act="view-bid" data-id="${b.id}">↗ View HTML</button>`);
+      if (status === 'estimating' && hasHtml) acts.push(`<button data-act="draft" data-id="${b.id}">✉ Create draft</button>`);
+      if (status === 'bid_sent') { acts.push(`<button data-act="outcome" data-id="${b.id}" data-outcome="won">✓ Won</button>`); acts.push(`<button data-act="outcome" data-id="${b.id}" data-outcome="lost">✕ Lost</button>`); }
       return `<div class="bidcard" draggable="true" data-id="${b.id}" data-status="${status}">
         <div class="t">${escapeHtml(b.title)}</div>
         <div class="meta">
@@ -188,7 +330,10 @@ function renderBoard(){
           ${b.due_date ? '<span class="due">due ' + escapeHtml(b.due_date) + '</span><br>' : ''}
           <span class="tis">in status ${escapeHtml(fmtTimeInStatus(b.status_history))}</span>
         </div>
+        ${dollars ? `<div class="est">est ${escapeHtml(dollars)} · design-aid, not committed${b.estimate_any_estimated ? ' · <span style="color:var(--ember,#b45309);font-weight:700">⚠ contains estimated prices</span>' : ''}</div>` : ''}
+        ${isFollowup ? '<span class="fu">⏰ follow-up due</span>' : ''}
         ${fromEmail ? `<div class="ev"><a data-act="ev" data-id="${b.id}">view plan attachments →</a></div>` : ''}
+        ${acts.length ? `<div class="acts">${acts.join('')}</div>` : ''}
         <div class="adv">${adv || '<span class="empty">terminal</span>'}</div>
       </div>`;
     }).join('') : '<span class="empty">empty</span>';
@@ -204,6 +349,11 @@ function renderBoard(){
   board.querySelectorAll('a[data-act="ev"]').forEach((a) => {
     a.onclick = () => showEvidence(Number(a.dataset.id));
   });
+  board.querySelectorAll('button[data-act="estimate"]').forEach((b) => { b.onclick = () => estimateDialog(Number(b.dataset.id)); });
+  board.querySelectorAll('button[data-act="render"]').forEach((b) => { b.onclick = () => renderBid(Number(b.dataset.id)); });
+  board.querySelectorAll('button[data-act="view-bid"]').forEach((b) => { b.onclick = () => viewBid(Number(b.dataset.id)); });
+  board.querySelectorAll('button[data-act="draft"]').forEach((b) => { b.onclick = () => createDraft(Number(b.dataset.id)); });
+  board.querySelectorAll('button[data-act="outcome"]').forEach((b) => { b.onclick = () => outcomeDialog(Number(b.dataset.id), b.dataset.outcome); });
   wireDragDrop();
 }
 
@@ -276,7 +426,11 @@ function refreshClientSelect(){
 }
 
 async function loadClients(){ clients = await api('/clients'); refreshClientSelect(); }
-async function loadBoard(){ bids = await api('/bid-requests'); renderBoard(); }
+async function loadFollowups(){
+  try{ const r = await api('/bid-requests/followups'); followupIds = new Set((r.followups || []).map((f) => f.id)); }
+  catch(_){ followupIds = new Set(); }
+}
+async function loadBoard(){ bids = await api('/bid-requests'); await loadFollowups(); renderBoard(); }
 
 document.getElementById('cBtn').onclick = async () => {
   const errEl = document.getElementById('cErr'); errEl.textContent = '';

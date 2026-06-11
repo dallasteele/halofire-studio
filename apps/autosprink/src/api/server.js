@@ -50,8 +50,13 @@ import { buildSamInvoker } from './sam-invoker.js';
 import {
   BID_STATUSES,
   applyTransition as applyBidStatusTransition,
+  canTransition as canBidTransition,
 } from '../autobid/crm-status.js';
 import { pollOnce as runIntakePoll } from '../autobid/intake.js';
+import { buildEstimateFromBody, ESTIMATE_DISCLAIMER } from '../autobid/estimate.js';
+import { renderBidHtml } from '../autobid/bid-html.js';
+import { dueFollowups, DEFAULT_FOLLOWUP_DAYS } from '../autobid/followups.js';
+import { createSmtpTransport, createMockSmtpTransport } from '../autobid/smtp-transport.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const log = createLogger('api-server');
@@ -82,6 +87,14 @@ const HOME_DEPOT_BID_LOG_TOTAL = 792543.84;
 
 if (!JWT_SECRET) {
   throw new Error('JWT_SECRET is required unless HALOFIRE_ALLOW_DEV_DEFAULTS=1 in local development');
+}
+
+// SECURITY: HALOFIRE_SMTP_MOCK injects a no-op SMTP transport that reports
+// success without sending. It is a TEST-ONLY seam. Refuse to boot if it is set
+// outside the test harness — otherwise a stray env var would silently convert
+// the outbound pipeline into a success-reporting no-op in production.
+if (process.env.HALOFIRE_SMTP_MOCK && NODE_ENV !== 'test') {
+  throw new Error('HALOFIRE_SMTP_MOCK is a test-only seam and must not be set when NODE_ENV !== "test"');
 }
 
 if (!ADMIN_USERNAME || !ADMIN_PASSWORD) {
@@ -306,6 +319,40 @@ function initDatabase() {
       last_error TEXT,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
+
+    -- AB5 outbound: per-message DRAFTS requiring explicit admin approval. There
+    -- is NO auto-send path anywhere; a draft only leaves the building when an
+    -- admin approves it AND SMTP is configured. status: draft|approved|sent|failed.
+    CREATE TABLE IF NOT EXISTS outbound_drafts (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      bid_request_id INTEGER NOT NULL REFERENCES bid_requests(id),
+      to_email TEXT NOT NULL,
+      subject TEXT NOT NULL,
+      body_html TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'draft',
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      approved_by TEXT,
+      approved_at DATETIME,
+      sent_at DATETIME,
+      last_error TEXT
+    );
+
+    -- AB5 outbound: single-row SMTP config + persisted send status. The SMTP
+    -- password is stored here ONLY when configured via the admin Settings route
+    -- and is NEVER echoed back through any GET (write-only), mirroring AB2 intake.
+    CREATE TABLE IF NOT EXISTS autobid_outbound_config (
+      id INTEGER PRIMARY KEY CHECK (id = 1),
+      host TEXT,
+      port INTEGER,
+      username TEXT,
+      password TEXT,
+      from_email TEXT,
+      enabled INTEGER NOT NULL DEFAULT 0,
+      followup_days INTEGER NOT NULL DEFAULT 5,
+      last_send_at DATETIME,
+      last_error TEXT,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
   `);
 
   function ensureColumn(table, column, definition) {
@@ -328,6 +375,15 @@ function initDatabase() {
   ensureColumn('autobid_intake_config', 'mbox_host', 'TEXT');
   ensureColumn('autobid_intake_config', 'mbox_username', 'TEXT');
   ensureColumn('autobid_intake_config', 'uidvalidity', 'TEXT');
+
+  // AB3/AB4: the stored priced estimate (JSON: lineItems + subtotal/OH/profit/total
+  // + per-line priceSource + disclaimer) and the rendered branded HTML bid. Both
+  // additive so existing bid_requests rows are untouched.
+  ensureColumn('bid_requests', 'estimate', 'TEXT');
+  ensureColumn('bid_requests', 'bid_html', 'TEXT');
+  ensureColumn('bid_requests', 'bid_rendered_at', 'DATETIME');
+  // AB5 outcome capture (won/lost reason notes recorded alongside the transition).
+  ensureColumn('bid_requests', 'outcome_notes', 'TEXT');
 
   // Claim-gate resolution provenance (who/what/when cleared a gate).
   ensureColumn('claim_gates', 'resolved_by', 'TEXT');
@@ -393,6 +449,22 @@ const API_RATE_MAX = NODE_ENV === 'test' ? 100000 : 100;
 const LOGIN_RATE_MAX = NODE_ENV === 'test' ? 100000 : 10;
 app.use('/api/', rateLimit({ windowMs: 15 * 60 * 1000, max: API_RATE_MAX, standardHeaders: true, legacyHeaders: false }));
 app.use('/api/auth/login', rateLimit({ windowMs: 15 * 60 * 1000, max: LOGIN_RATE_MAX, standardHeaders: true, legacyHeaders: false }));
+// SECURITY: the static root below is the whole app directory, which contains the
+// SQLite DB (default data/halofire.db), its lock/state files, and any other
+// runtime data dir. Those hold credentials (SMTP + IMAP passwords, bcrypt
+// hashes) and all CRM data, so they must NEVER be reachable as static files.
+// Deny the data directories BEFORE express.static gets a chance to serve them.
+// 403 (not 404) so the denial is explicit and not mistakable for "no such file".
+// Version-agnostic prefix check (avoids Express-4 vs 5 wildcard-route syntax
+// differences): block /data, /data/..., and any other on-disk runtime dirs.
+const STATIC_DENY_PREFIXES = ['/data/', '/locks/', '/state/'];
+app.use((req, res, next) => {
+  const p = req.path;
+  if (p === '/data' || STATIC_DENY_PREFIXES.some((prefix) => p.startsWith(prefix))) {
+    return res.status(403).type('text/plain').send('Forbidden');
+  }
+  next();
+});
 app.use(express.static(path.resolve(__dirname, '../../')));
 // Serve the bundled Three.js + OpenGeometry CAD kernel locally (no CDN).
 app.use('/vendor/three', express.static(path.resolve(__dirname, '../../node_modules/three')));
@@ -21335,12 +21407,50 @@ app.get('/api/bid-requests', authMiddleware, (req, res) => {
   if (client_id) { query += ' AND client_id = ?'; params.push(client_id); }
   query += ' ORDER BY created_at DESC';
   try {
-    const rows = db.prepare(query).all(...params).map(hydrateBidRequest);
+    // Strip the heavy bid_html / estimate blobs from the list payload (the board
+    // only needs booleans + the total); the per-:id GET returns them in full.
+    const rows = db.prepare(query).all(...params).map((row) => {
+      const hydrated = hydrateBidRequest(row);
+      const { bid_html, estimate, ...rest } = hydrated;
+      // Surface whether the stored estimate has any fabricated/representative or
+      // unpriced lines so the board card can flag a design-aid price as estimated
+      // (corrupt JSON is treated as "estimated" — fail toward the louder warning).
+      let estimateAnyEstimated = false;
+      if (estimate) {
+        try { estimateAnyEstimated = JSON.parse(estimate).anyEstimated === true; }
+        catch { estimateAnyEstimated = true; }
+      }
+      return {
+        ...rest,
+        bid_html_set: Boolean(bid_html),
+        estimate_set: Boolean(estimate),
+        estimate_any_estimated: estimateAnyEstimated,
+      };
+    });
     res.json(rows);
   } catch (err) {
     if (sendCorruptHistory(res, err)) return;
     throw err;
   }
+});
+
+// AB5 — follow-up tracking: which bid_sent requests are overdue (default 5 days,
+// configurable via autobid_outbound_config.followup_days or ?days=). Surfaced as
+// a badge on the CRM board. Registered BEFORE /:id so 'followups' isn't captured
+// as an id.
+app.get('/api/bid-requests/followups', authMiddleware, (req, res) => {
+  const cfg = db.prepare('SELECT followup_days FROM autobid_outbound_config WHERE id = 1').get() || null;
+  const days = req.query.days != null
+    ? Number(req.query.days)
+    : (cfg && Number.isFinite(cfg.followup_days) ? cfg.followup_days : DEFAULT_FOLLOWUP_DAYS);
+  let rows;
+  try {
+    rows = db.prepare("SELECT * FROM bid_requests WHERE status = 'bid_sent'").all().map(hydrateBidRequest);
+  } catch (err) {
+    if (sendCorruptHistory(res, err)) return;
+    throw err;
+  }
+  res.json({ days, followups: dueFollowups(rows, { days }) });
 });
 
 app.get('/api/bid-requests/:id', authMiddleware, (req, res) => {
@@ -21440,6 +21550,319 @@ app.get('/api/bid-requests/:id/evidence', authMiddleware, (req, res) => {
               ORDER BY id ASC`)
     .all(projectName);
   res.json({ bid_request_id: row.id, project_name: projectName, evidence });
+});
+
+// ── AB3/AB4/AB5: estimate → render → outbound (human-approved) → tracking ──
+//
+// Shared internal transition: advance a bid_request through the status machine
+// (src/autobid/crm-status.js) inside an automated step. Returns {ok:true,row} on
+// success or {ok:false,status,error} so the caller can fail closed. Never writes
+// status outside the machine. `extraSet`/`extraValues` let a caller persist
+// additional columns atomically with the transition.
+function advanceBidStatus(id, to, { extraSet = '', extraValues = [] } = {}) {
+  const row = db.prepare('SELECT * FROM bid_requests WHERE id = ?').get(id);
+  if (!row) return { ok: false, status: 404, error: 'Bid request not found' };
+  let record;
+  try {
+    record = { status: row.status, history: parseStatusHistory(row) };
+  } catch (err) {
+    if (err instanceof CorruptHistoryError) return { ok: false, status: 500, error: err.message };
+    throw err;
+  }
+  let next;
+  try {
+    next = applyBidStatusTransition(record, to, new Date().toISOString());
+  } catch (err) {
+    return { ok: false, status: 409, error: err.message };
+  }
+  const sets = ['status = ?', 'status_history = ?'].concat(extraSet ? [extraSet] : []).join(', ');
+  db.prepare(`UPDATE bid_requests SET ${sets}, updated_at = CURRENT_TIMESTAMP WHERE id = ?`)
+    .run(next.status, JSON.stringify(next.history), ...extraValues, id);
+  return { ok: true, row: db.prepare('SELECT * FROM bid_requests WHERE id = ?').get(id) };
+}
+
+function parseStoredEstimate(row, res) {
+  if (!row.estimate) return null;
+  try {
+    return JSON.parse(row.estimate);
+  } catch {
+    res.status(500).json({ error: 'stored estimate is corrupt' });
+    return undefined; // signals "handled with an error"
+  }
+}
+
+// AB3 — produce a priced estimate for a bid request from EITHER a CAD W5C
+// bid-payload (source:'halofire-cad') or manual line items. Prices via the real
+// pricebook resolver; stores the estimate JSON + estimate_total_cents on the bid.
+// Transitions reviewing -> estimating when an estimate begins (idempotent: if the
+// bid is already estimating/later, the estimate is (re)stored without a
+// transition). HONESTY: the stored estimate always carries the design-aid
+// disclaimer; nothing auto-commits or sends.
+app.post('/api/bid-requests/:id/estimate', authMiddleware, (req, res) => {
+  const row = db.prepare('SELECT * FROM bid_requests WHERE id = ?').get(req.params.id);
+  if (!row) return res.status(404).json({ error: 'Bid request not found' });
+
+  let estimate;
+  try {
+    const resolver = buildResolverFromDb(db);
+    estimate = buildEstimateFromBody(req.body || {}, resolver);
+  } catch (err) {
+    return res.status(400).json({ error: err.message });
+  }
+
+  const estimateTotalCents = Math.round(estimate.total * 100);
+  const estimateJson = JSON.stringify(estimate);
+
+  // Move reviewing -> estimating once, when estimating begins. From 'received'
+  // we cannot legally jump straight to estimating, so require the bid to be at
+  // least 'reviewing' first (fail-closed: surface the machine's 409).
+  if (row.status === 'received') {
+    return res.status(409).json({ error: 'invalid transition received -> estimating' });
+  }
+  if (row.status === 'reviewing') {
+    const adv = advanceBidStatus(req.params.id, 'estimating', {
+      extraSet: 'estimate = ?, estimate_total_cents = ?',
+      extraValues: [estimateJson, estimateTotalCents],
+    });
+    if (!adv.ok) return res.status(adv.status).json({ error: adv.error });
+    return res.status(200).json(hydrateBidRequest(adv.row));
+  }
+  // Already estimating (or beyond) — (re)store the estimate without a transition.
+  db.prepare('UPDATE bid_requests SET estimate = ?, estimate_total_cents = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
+    .run(estimateJson, estimateTotalCents, req.params.id);
+  res.status(200).json(hydrateBidRequest(db.prepare('SELECT * FROM bid_requests WHERE id = ?').get(req.params.id)));
+});
+
+// AB4 — render the stored estimate to branded HTML via the W7B renderer, persist
+// it on the bid request, and return it. Requires an estimate to exist first.
+app.post('/api/bid-requests/:id/render-bid', authMiddleware, (req, res) => {
+  const row = db.prepare('SELECT * FROM bid_requests WHERE id = ?').get(req.params.id);
+  if (!row) return res.status(404).json({ error: 'Bid request not found' });
+  const estimate = parseStoredEstimate(row, res);
+  if (estimate === undefined) return; // corrupt — already responded 500
+  if (!estimate) return res.status(409).json({ error: 'no estimate to render; POST /estimate first' });
+
+  const client = row.client_id
+    ? db.prepare('SELECT name, company FROM clients WHERE id = ?').get(row.client_id)
+    : null;
+  const clientName = (client && (client.company || client.name)) || 'Prospective Client';
+
+  let html;
+  try {
+    html = renderBidHtml({
+      projectName: row.title,
+      clientName,
+      dateIso: new Date().toISOString().slice(0, 10),
+      items: estimate.lineItems,
+      subtotal: estimate.subtotal,
+      overheadPct: estimate.overheadPct,
+      profitPct: estimate.profitPct,
+      total: estimate.total,
+      notes: row.notes && !isJsonObject(row.notes) ? row.notes : undefined,
+      disclaimer: estimate.disclaimer || ESTIMATE_DISCLAIMER,
+      anyEstimated: estimate.anyEstimated === true,
+    });
+  } catch (err) {
+    return res.status(400).json({ error: `render failed: ${err.message}` });
+  }
+
+  db.prepare('UPDATE bid_requests SET bid_html = ?, bid_rendered_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
+    .run(html, req.params.id);
+  res.type('html').status(200).send(html);
+});
+
+// AB4 — serve the stored rendered HTML bid.
+app.get('/api/bid-requests/:id/render-bid', authMiddleware, (req, res) => {
+  const row = db.prepare('SELECT bid_html FROM bid_requests WHERE id = ?').get(req.params.id);
+  if (!row) return res.status(404).json({ error: 'Bid request not found' });
+  if (!row.bid_html) return res.status(404).json({ error: 'no rendered bid; POST /render-bid first' });
+  res.type('html').status(200).send(row.bid_html);
+});
+
+// Small helper: is a string a JSON object (intake stores classifier JSON in
+// notes)? Used so we only surface free-text operator notes on the bid document.
+function isJsonObject(s) {
+  try {
+    const v = JSON.parse(s);
+    return v !== null && typeof v === 'object';
+  } catch {
+    return false;
+  }
+}
+
+// AB5 — create an outbound DRAFT for a bid request. to = client email; body =
+// the rendered bid HTML preceded by a short cover paragraph. Requires a rendered
+// bid and a client email. Creates a draft ONLY — nothing is sent here.
+app.post('/api/bid-requests/:id/outbound-draft', authMiddleware, (req, res) => {
+  const row = db.prepare('SELECT * FROM bid_requests WHERE id = ?').get(req.params.id);
+  if (!row) return res.status(404).json({ error: 'Bid request not found' });
+  if (!row.bid_html) return res.status(409).json({ error: 'no rendered bid; POST /render-bid first' });
+  // Fail closed: only allow drafting a send for a bid that can still legally reach
+  // 'bid_sent'. A won/lost/already-sent bid must not spawn a fresh sendable draft.
+  if (!canBidTransition(row.status, 'bid_sent')) {
+    return res.status(409).json({
+      error: `Cannot draft a send: bid is '${row.status}' and cannot transition to 'bid_sent'.`,
+    });
+  }
+
+  const client = row.client_id
+    ? db.prepare('SELECT name, company, email FROM clients WHERE id = ?').get(row.client_id)
+    : null;
+  const toEmail = (req.body && req.body.to_email) || client?.email || null;
+  if (!toEmail || !String(toEmail).trim()) {
+    return res.status(400).json({ error: 'no recipient email (client has no email and none was provided)' });
+  }
+  const clientName = (client && (client.company || client.name)) || 'there';
+  const subject = (req.body && req.body.subject) || `Halo Fire Protection — Bid for ${row.title}`;
+  const coverText = (req.body && req.body.cover)
+    || `Hello ${clientName}, please find attached our fire sprinkler bid for "${row.title}". `
+       + 'This is a best-effort design-aid estimate, not a committed bid; we welcome your questions.';
+  const coverHtml = `<div style="max-width:720px;margin:24px auto;font-family:Arial,Helvetica,sans-serif;`
+    + `font-size:14px;line-height:1.5;color:#1c1917;">${escapeHtmlServer(coverText)}</div>`;
+  const bodyHtml = coverHtml + '\n' + row.bid_html;
+
+  const result = db.prepare(
+    `INSERT INTO outbound_drafts (bid_request_id, to_email, subject, body_html, status)
+     VALUES (?,?,?,?, 'draft')`,
+  ).run(row.id, String(toEmail).trim(), subject, bodyHtml);
+  const draft = db.prepare('SELECT id, bid_request_id, to_email, subject, status, created_at FROM outbound_drafts WHERE id = ?')
+    .get(result.lastInsertRowid);
+  // Surface whether the underlying estimate contains any fabricated/representative
+  // or unpriced lines so the approving admin sees an estimated-prices warning in
+  // the approval dialog (the prices themselves are also marked in the bid HTML).
+  const storedEstimate = parseStoredEstimate(row, res);
+  if (storedEstimate === undefined) return; // corrupt — already responded 500
+  res.status(201).json({ ...draft, any_estimated: storedEstimate ? storedEstimate.anyEstimated === true : false });
+});
+
+// AB5 — list outbound drafts for a bid request (status surfaced; body omitted).
+app.get('/api/bid-requests/:id/outbound-drafts', authMiddleware, (req, res) => {
+  const row = db.prepare('SELECT id FROM bid_requests WHERE id = ?').get(req.params.id);
+  if (!row) return res.status(404).json({ error: 'Bid request not found' });
+  const drafts = db.prepare(
+    `SELECT id, bid_request_id, to_email, subject, status, created_at, approved_by, approved_at, sent_at, last_error
+     FROM outbound_drafts WHERE bid_request_id = ? ORDER BY id DESC`,
+  ).all(req.params.id);
+  res.json(drafts);
+});
+
+// Server-side HTML escaper for cover text (the client-page escapeHtml is separate).
+function escapeHtmlServer(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+  }[c]));
+}
+
+// Resolve an SMTP transport: the test/DI seam wins, then the env mock, then the
+// real nodemailer transport. Returns null when SMTP is not configured.
+async function resolveSmtpTransport() {
+  const cfg = db.prepare('SELECT * FROM autobid_outbound_config WHERE id = 1').get() || null;
+  const configured = Boolean(cfg && cfg.host && cfg.port && cfg.username && cfg.password);
+  // DI seam (tests inject a factory) — used regardless of stored config so a test
+  // can exercise the send path without persisting fake credentials.
+  if (typeof app.locals.smtpTransportFactory === 'function') {
+    return { transport: await app.locals.smtpTransportFactory(cfg), cfg, configured: true };
+  }
+  if (process.env.HALOFIRE_SMTP_MOCK && NODE_ENV === 'test') {
+    // Test seam: a mock transport that NEVER touches the network. Set
+    // HALOFIRE_SMTP_MOCK_FAIL to force the send to throw (failure-path coverage).
+    // GATED on NODE_ENV==='test': outside the test harness this mock would make
+    // the approve gate pass and falsely stamp drafts 'sent' / bids 'bid_sent'
+    // while no email ever left the building. The refuse-to-boot guard below
+    // ensures a stray HALOFIRE_SMTP_MOCK in production can never reach here.
+    return {
+      transport: createMockSmtpTransport({ failWith: process.env.HALOFIRE_SMTP_MOCK_FAIL || null }),
+      cfg,
+      configured: true,
+    };
+  }
+  if (!configured) return { transport: null, cfg, configured: false };
+  // Kill switch: an admin who set enabled=0 must NOT get real emails transmitted
+  // on approve. Enforce it on the real send path (the DI/mock seams above are
+  // explicit test sends and bypass this). Reported as `disabled` so the approve
+  // route can fail closed with a clear message rather than a generic 409.
+  if (!cfg.enabled) return { transport: null, cfg, configured: true, disabled: true };
+  return { transport: await createSmtpTransport(cfg, { logger: log }), cfg, configured: true };
+}
+
+// AB5 — THE HUMAN APPROVAL GATE (admin only). Marks a draft approved AND attempts
+// the send. If SMTP is not configured, approval fails with a 409 and NOTHING is
+// sent. There is NO auto-send path anywhere — a message leaves the building only
+// through this explicit per-message admin action. On success: draft -> sent and
+// the bid_request transitions estimating -> bid_sent via the status machine. On
+// failure: draft -> failed, last_error surfaced, bid status UNCHANGED.
+app.post('/api/outbound-drafts/:id/approve', authMiddleware, requireRole('admin'), async (req, res) => {
+  const draft = db.prepare('SELECT * FROM outbound_drafts WHERE id = ?').get(req.params.id);
+  if (!draft) return res.status(404).json({ error: 'Draft not found' });
+  if (draft.status === 'sent') return res.status(409).json({ error: 'draft already sent' });
+
+  const { transport, configured, disabled } = await resolveSmtpTransport();
+  if (disabled) {
+    // Kill switch engaged (admin set enabled=0): refuse to send, fail closed.
+    return res.status(409).json({ error: 'Outbound email is disabled. Enable it in Settings before sending.' });
+  }
+  if (!configured || !transport) {
+    // Fail-closed: refuse approval when there is no configured way to send.
+    return res.status(409).json({ error: 'SMTP not configured; cannot send. Configure outbound email in Settings first.' });
+  }
+
+  // Consult the state machine BEFORE the irreversible send. A bid that is already
+  // won/lost/bid_sent (or otherwise not legally advanceable to bid_sent) must not
+  // have a stale document emailed and then have the rejected transition swallowed.
+  // Fail closed here so the send never happens out of order.
+  const bidRow = db.prepare('SELECT status FROM bid_requests WHERE id = ?').get(draft.bid_request_id);
+  if (!bidRow) return res.status(404).json({ error: 'Bid request not found for this draft' });
+  if (!canBidTransition(bidRow.status, 'bid_sent')) {
+    return res.status(409).json({
+      error: `Cannot send: bid is '${bidRow.status}' and cannot transition to 'bid_sent'. Nothing was sent.`,
+    });
+  }
+
+  const approver = req.user?.username || req.user?.name || 'admin';
+  const nowIso = new Date().toISOString();
+  // Record the approval decision first (audit) — approved even if the send then fails.
+  db.prepare('UPDATE outbound_drafts SET status = ?, approved_by = ?, approved_at = ? WHERE id = ?')
+    .run('approved', approver, nowIso, draft.id);
+
+  const cfg = db.prepare('SELECT from_email, username FROM autobid_outbound_config WHERE id = 1').get() || {};
+  const from = cfg.from_email || cfg.username || 'no-reply@halofire.local';
+  try {
+    await transport.sendMail({ from, to: draft.to_email, subject: draft.subject, html: draft.body_html });
+  } catch (err) {
+    const msg = String(err.message).slice(0, 500);
+    db.prepare('UPDATE outbound_drafts SET status = ?, last_error = ? WHERE id = ?').run('failed', msg, draft.id);
+    db.prepare('UPDATE autobid_outbound_config SET last_error = ?, updated_at = CURRENT_TIMESTAMP WHERE id = 1').run(msg);
+    // Bid status is intentionally LEFT UNCHANGED on a send failure.
+    return res.status(502).json({ status: 'failed', error: msg });
+  }
+
+  // Sent. Advance the bid estimating -> bid_sent through the machine.
+  db.prepare('UPDATE outbound_drafts SET status = ?, sent_at = ? WHERE id = ?').run('sent', nowIso, draft.id);
+  db.prepare('UPDATE autobid_outbound_config SET last_send_at = ?, last_error = NULL, updated_at = CURRENT_TIMESTAMP WHERE id = 1').run(nowIso);
+  const adv = advanceBidStatus(draft.bid_request_id, 'bid_sent');
+  const sentDraft = db.prepare('SELECT id, bid_request_id, to_email, subject, status, approved_by, approved_at, sent_at FROM outbound_drafts WHERE id = ?')
+    .get(draft.id);
+  res.status(200).json({
+    draft: sentDraft,
+    bid_request: adv.ok ? hydrateBidRequest(adv.row) : null,
+    bid_transition: adv.ok ? 'bid_sent' : `not advanced (${adv.error})`,
+  });
+});
+
+// AB5 — record a won/lost outcome. Transitions via the status machine and stores
+// the outcome notes. won/lost are only legal from bid_sent (machine enforces it).
+app.post('/api/bid-requests/:id/outcome', authMiddleware, (req, res) => {
+  const outcome = req.body?.outcome;
+  if (outcome !== 'won' && outcome !== 'lost') {
+    return res.status(400).json({ error: "outcome must be 'won' or 'lost'" });
+  }
+  const notes = req.body?.notes != null ? String(req.body.notes) : null;
+  const adv = advanceBidStatus(req.params.id, outcome, {
+    extraSet: 'outcome_notes = ?',
+    extraValues: [notes],
+  });
+  if (!adv.ok) return res.status(adv.status).json({ error: adv.error });
+  res.status(200).json(hydrateBidRequest(adv.row));
 });
 
 // ── AB2 Email intake: settings (admin) + status ──
@@ -21636,6 +22059,80 @@ app.get('/api/autobid/intake/status', authMiddleware, (req, res) => {
     last_bids_created: cfg?.last_bids_created ?? null,
     last_error: cfg?.last_error || null,
     recent,
+  });
+});
+
+// ── AB5 Outbound email: SMTP settings (admin) ──
+// The SMTP password is WRITE-ONLY (saved when supplied, never returned by any
+// GET) — same discipline as AB2 intake. Credentials live only here (admin-set)
+// or in env — never in code. There is still NO auto-send: configuring SMTP only
+// makes the per-message admin approval gate able to actually transmit.
+function readOutboundConfig() {
+  return db.prepare('SELECT * FROM autobid_outbound_config WHERE id = 1').get() || null;
+}
+
+function outboundConfigured(cfg) {
+  return Boolean(cfg && cfg.host && cfg.port && cfg.username && cfg.password);
+}
+
+app.get('/api/settings/outbound-email', authMiddleware, (req, res) => {
+  const cfg = readOutboundConfig();
+  res.json({
+    host: cfg?.host || null,
+    port: cfg?.port || null,
+    username: cfg?.username || null,
+    from_email: cfg?.from_email || null,
+    enabled: Boolean(cfg?.enabled),
+    followup_days: cfg?.followup_days ?? DEFAULT_FOLLOWUP_DAYS,
+    password_set: Boolean(cfg?.password),
+    configured: outboundConfigured(cfg),
+    last_send_at: cfg?.last_send_at || null,
+    last_error: cfg?.last_error || null,
+  });
+});
+
+const OUTBOUND_EMAIL_FIELDS = new Set(['host', 'port', 'username', 'password', 'from_email', 'enabled', 'followup_days']);
+app.post('/api/settings/outbound-email', authMiddleware, requireRole('admin'), (req, res) => {
+  const body = req.body || {};
+  const rejected = Object.keys(body).filter((key) => !OUTBOUND_EMAIL_FIELDS.has(key));
+  if (rejected.length) return res.status(400).json({ error: `Unsupported fields: ${rejected.join(', ')}` });
+
+  const existing = readOutboundConfig();
+  const host = body.host != null ? String(body.host).trim() : existing?.host || null;
+  const port = body.port != null ? Number(body.port) : existing?.port || null;
+  const username = body.username != null ? String(body.username).trim() : existing?.username || null;
+  const fromEmail = body.from_email != null ? String(body.from_email).trim() : existing?.from_email || null;
+  // Password is only overwritten when a non-empty value is supplied.
+  const password = (body.password != null && String(body.password) !== '')
+    ? String(body.password)
+    : existing?.password || null;
+  const enabled = body.enabled != null ? (body.enabled ? 1 : 0) : (existing?.enabled || 0);
+  const followupDays = body.followup_days != null ? Number(body.followup_days) : (existing?.followup_days ?? DEFAULT_FOLLOWUP_DAYS);
+
+  if (port != null && (!Number.isFinite(port) || port <= 0)) {
+    return res.status(400).json({ error: 'port must be a positive number' });
+  }
+  if (!Number.isFinite(followupDays) || followupDays < 0) {
+    return res.status(400).json({ error: 'followup_days must be a non-negative number' });
+  }
+
+  if (existing) {
+    db.prepare(`UPDATE autobid_outbound_config
+                SET host = ?, port = ?, username = ?, password = ?, from_email = ?, enabled = ?, followup_days = ?,
+                    updated_at = CURRENT_TIMESTAMP
+                WHERE id = 1`)
+      .run(host, port, username, password, fromEmail, enabled, followupDays);
+  } else {
+    db.prepare(`INSERT INTO autobid_outbound_config (id, host, port, username, password, from_email, enabled, followup_days)
+                VALUES (1, ?, ?, ?, ?, ?, ?, ?)`)
+      .run(host, port, username, password, fromEmail, enabled, followupDays);
+  }
+  const cfg = readOutboundConfig();
+  res.json({
+    host: cfg.host, port: cfg.port, username: cfg.username, from_email: cfg.from_email,
+    enabled: Boolean(cfg.enabled), followup_days: cfg.followup_days,
+    password_set: Boolean(cfg.password), configured: outboundConfigured(cfg),
+    message: 'Outbound email settings saved',
   });
 });
 
