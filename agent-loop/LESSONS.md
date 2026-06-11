@@ -103,3 +103,11 @@ AssertionError: expected '// Dimensioned parametric, not manufa…' to contain '
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
 
 
+- 2026-06-11 BLOCKED W12A-followup-badges (model qwen3:30b-a3b); last error class:  FAIL  tests/autobid-followup-badges.test.js [ tests/autobid-followup-badges.test.js ]
+- 2026-06-11 BLOCKED W14E-settings-ledger-ui (model qwen3:30b-a3b); last error class:       | ^
+      4|     it('should return ledger summary when ledger exists', () => {
+      5|         const parityResponse = {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
