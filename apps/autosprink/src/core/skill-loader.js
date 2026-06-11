@@ -44,6 +44,16 @@ function parseFrontmatter(content) {
   return { meta, body: content.slice(match[0].length).trim() };
 }
 
+// Normalize a frontmatter list value to an array. parseFrontmatter may hand us
+// either an already-parsed array (value started with `[`) or a raw string.
+function coerceList(value) {
+  if (Array.isArray(value)) return value;
+  if (typeof value === 'string' && value.trim()) {
+    try { return JSON.parse(value); } catch { return [value]; }
+  }
+  return [];
+}
+
 // Phase 1: Advertise — lightweight skill catalog
 export function advertiseSkills() {
   const skills = [];
@@ -65,11 +75,13 @@ export function advertiseSkills() {
       name: meta.name || dir.name,
       description: meta.description || '',
       version: meta.version || '1.0.0',
-      triggers: meta.triggers ? JSON.parse(meta.triggers) : [],
+      // parseFrontmatter already turns a `[...]` value into an array; only parse
+      // when it is still a raw string (defensive against double-parsing).
+      triggers: coerceList(meta.triggers),
       cronSchedule: meta.cron || null,
       enabled: meta.enabled !== 'false',
       category: meta.category || 'general',
-      dependencies: meta.dependencies ? JSON.parse(meta.dependencies) : [],
+      dependencies: coerceList(meta.dependencies),
     });
   }
 
