@@ -1,4 +1,4 @@
-import { machineGenerated, verify, isUsable, needsAttention, Verification } from '../src/lib/verification-flag';
+import { machineGenerated, verify, isUsable, needsAttention } from '../src/lib/verification-flag';
 
 describe('verification-flag', () => {
   const testNote = 'Test note';

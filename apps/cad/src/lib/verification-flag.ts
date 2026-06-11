@@ -6,12 +6,12 @@
 /**
  * Verification status types.
  */
-type VerificationStatus = 'needs-verification' | 'human-verified';
+export type VerificationStatus = 'needs-verification' | 'human-verified';
 
 /**
  * Verification metadata.
  */
-interface Verification {
+export interface Verification {
   status: VerificationStatus;
   note: string;
   source: string;
@@ -61,7 +61,7 @@ export function verify(v: Verification, who: string, atIso: string): Verificatio
  * @param v - The verification object.
  * @returns Always true (usability never depends on verification).
  */
-export function isUsable(v: Verification): boolean {
+export function isUsable(_v: Verification): boolean {
   return true;
 }
 
