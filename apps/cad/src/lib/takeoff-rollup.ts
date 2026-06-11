@@ -43,7 +43,7 @@ export function rollupTakeoff(payload: BidPayloadItem[]): RollupSummary {
       throw new Error('Quantity must be a finite number');
     }
 
-    const [kind, sizeStr, material] = item.sku.split(':');
+    const [kind, sizeStr] = item.sku.split(':');
     // SKU format: kind:sizeIn:material (or na)
     
     if (kind === 'pipe') {

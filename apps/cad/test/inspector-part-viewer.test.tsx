@@ -125,7 +125,7 @@ describe('Inspector part viewer (jsdom — no WebGL)', () => {
     expect(provenanceBadge('dimensioned_parametric').text).toBe(
       'dimensioned parametric — NOT manufacturer-exact',
     );
-    expect(provenanceBadge(null).text).toBe('proxy — no real body');
-    expect(provenanceBadge('proxy').text).toBe('proxy — no real body');
+    expect(provenanceBadge(null).text).toBe('best guess — needs verification');
+    expect(provenanceBadge('proxy').text).toBe('best guess — needs verification');
   });
 });

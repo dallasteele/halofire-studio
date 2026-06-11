@@ -43,7 +43,10 @@ function webglAvailable(): boolean {
   }
 }
 
-/** Honest badge text + color per provenance tier. null tier = proxy. */
+/** Honest badge text + color per provenance tier. null tier = best-guess
+ * geometry the operator should verify. Doctrine: flag, never gate — the lowest
+ * tier is still a usable best-effort model, labelled needs-verification, never
+ * a dead "no body" state. */
 export function provenanceBadge(tier: string | null): { text: string; color: string } {
   if (tier === 'manufacturer_verified') {
     return { text: 'manufacturer verified', color: colors.success };
@@ -54,7 +57,7 @@ export function provenanceBadge(tier: string | null): { text: string; color: str
       color: colors.warn,
     };
   }
-  return { text: 'proxy — no real body', color: colors.textMuted };
+  return { text: 'best guess — needs verification', color: colors.warn };
 }
 
 export interface PartViewer3DProps {
@@ -254,7 +257,7 @@ export function PartViewer3D({
           {badge.text}
         </span>
       </div>
-      {showProxy && <div style={captionStyle}>no real body — proxy</div>}
+      {showProxy && <div style={captionStyle}>best-guess geometry — verify against the cut sheet</div>}
       <div style={captionStyle}>{label}</div>
       {orientationNote && <div style={captionStyle}>{orientationNote}</div>}
     </div>
