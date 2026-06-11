@@ -787,7 +787,8 @@
       "gate": "cd apps/cad && npx vitest run test/takeoff-rollup.test.ts",
       "attempts": 5,
       "spec": "Pure strict-TS module apps/cad/src/lib/takeoff-rollup.ts exporting rollupTakeoff(payload) where payload is the existing toBidPayload output (read apps/cad/src/lib/bid-payload.ts FIRST and use its exported types). Returns { totalHeads: number; totalPipeLengthFt: number; pipeByDiameter: Array of { diameterIn: number; lengthFt: number; count: number } sorted by diameterIn ascending; fittingCounts: Array of { kind: string; count: number } sorted by kind ascending }. Lengths rounded to 2 decimals. Empty payload sections yield zeros and empty arrays, never throws on a structurally valid payload. Test file apps/cad/test/takeoff-rollup.test.ts: hand-built payload with two diameters verifies grouping math, rounding, sort order, and the empty-payload case. Files MUST be at apps/cad/src/lib/takeoff-rollup.ts and apps/cad/test/takeoff-rollup.test.ts. HINT after blocked run: READ apps/cad/src/lib/bid-payload.ts first and use its REAL exported type names and field names for the payload \u2014 do not invent fields; your test expectations must be computed from the same hand-built payload literal, and rounding is to 2 decimals via Math.round times 100 over 100.",
-      "completed_at": "2026-06-11T15:46:06+00:00"
+      "completed_at": "2026-06-11T15:46:06+00:00",
+      "commit": "51206c93"
     }
   ]
 }
