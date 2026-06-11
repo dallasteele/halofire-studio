@@ -1,832 +1,877 @@
 {
-  "doc": "HaloFire agent-loop backlog. Tasks come from docs/research/autosprink-tool-parity-plan.md (real mepcad.com AutoSprink 2018 docs). Each task = ONE pure module + tests, gated by tsc + vitest. Status: pending | in_progress | done | blocked. UI/store integration of landed modules is tracked separately (Claude integration passes) \u2014 a 'done' here is NOT a parity/AHJ/PE claim.",
-  "tasks": [
-    {
-      "id": "H6-flow-calculator",
-      "title": "Hydraulics > Flow Calculator (Q = K\u221aP solver)",
-      "status": "done",
-      "phase": 4,
-      "write_roots": [
-        "apps/cad/src/lib",
-        "apps/cad/test"
-      ],
-      "context_files": [
-        "apps/cad/src/lib/nfpa13-rules.ts"
-      ],
-      "files_create": [
-        "apps/cad/src/lib/flow-calculator.ts",
-        "apps/cad/test/flow-calculator.test.ts"
-      ],
-      "gate": "cd apps/cad && npx tsc -b && npx vitest run test/flow-calculator.test.ts",
-      "spec": "Implement the AutoSprink 'Flow Calculator' (Hydraulics menu): given any TWO of {flow Q (gpm), K-factor (gpm/psi^0.5), pressure P (psi)}, derive the third using the cited sprinkler discharge formula Q = K * sqrt(P).\n\nExports (exact):\n- export interface FlowCalcInput { flowGpm?: number; kFactor?: number; pressurePsi?: number; }\n- export interface FlowCalcResult { flowGpm: number; kFactor: number; pressurePsi: number; solvedFor: 'flowGpm' | 'kFactor' | 'pressurePsi'; formula: 'Q = K * sqrt(P)'; }\n- export function solveFlow(input: FlowCalcInput): FlowCalcResult \u2014 throws an Error with a clear message when fewer or more than exactly 2 fields are given, when any given value is not a finite positive number, or when pressure must be derived from K=0.\n\nMath: flow = K*sqrt(P); K = Q/sqrt(P); P = (Q/K)^2.\nTests must cover: solve each of the 3 unknowns with K=5.6, P=25 -> Q=28 exactly; round-trip consistency; each error case (0 fields, 1 field, 3 fields, negative/zero/NaN values).",
-      "commit": "55a9472"
-    },
-    {
-      "id": "H17-pipe-volume",
-      "title": "Hydraulics > Show Pipe Volumes",
-      "status": "done",
-      "phase": 4,
-      "write_roots": [
-        "apps/cad/src/lib",
-        "apps/cad/test"
-      ],
-      "context_files": [
-        "apps/cad/src/lib/model.ts"
-      ],
-      "files_create": [
-        "apps/cad/src/lib/pipe-volume.ts",
-        "apps/cad/test/pipe-volume.test.ts"
-      ],
-      "gate": "cd apps/cad && npx tsc -b && npx vitest run test/pipe-volume.test.ts",
-      "spec": "Implement the AutoSprink 'Show Pipe Volumes' calculation: water volume of pipe segments from internal diameter and length.\n\nUse EXACTLY these internal diameters (inches), from ANSI/ASME B36.10M steel pipe tables (verify against adopted edition before regulated use):\nSCH40: 0.5->0.622, 0.75->0.824, 1->1.049, 1.25->1.380, 1.5->1.610, 2->2.067, 2.5->2.469, 3->3.068, 4->4.026, 6->6.065, 8->7.981\nSCH10: 1->1.097, 1.25->1.442, 1.5->1.682, 2->2.157, 2.5->2.635, 3->3.260, 4->4.260, 6->6.357, 8->8.329\nGallons per cubic foot: 7.48052.\n\nExports (exact):\n- export function internalDiameterIn(material: 'STEEL_SCH40' | 'STEEL_SCH10' | 'CPVC' | 'COPPER', nominalIn: number): number \u2014 SCH40 table for STEEL_SCH40 and (as a documented approximation) CPVC/COPPER; SCH10 table for STEEL_SCH10; throws on unknown nominal size.\n- export interface SegmentVolume { segmentId: string; gallons: number; cubicFeet: number; }\n- export interface VolumeReport { perSegment: SegmentVolume[]; totalGallons: number; totalCubicFeet: number; }\n- export function pipeVolumes(segments: Array<{ id: string; diameterIn: number; lengthFt: number; material: 'STEEL_SCH40' | 'STEEL_SCH10' | 'CPVC' | 'COPPER' }>): VolumeReport\n\nMath per segment: radiusFt = internalDiameterIn/24; cubicFeet = PI * radiusFt^2 * lengthFt; gallons = cubicFeet * 7.48052. Totals are sums. Skip (omit from perSegment) segments with non-positive length, but throw on unknown nominal sizes.\nTests: 2in SCH40 x 100ft -> cubicFeet = PI*(2.067/24)^2*100 (assert with toBeCloseTo, 4 digits) and gallons = that * 7.48052; SCH10 vs SCH40 differ for same nominal; totals sum; zero-length skipped; unknown nominal throws.",
-      "commit": "fa586b76"
-    },
-    {
-      "id": "C1C2C3-segment-ops",
-      "title": "Commands > Break / Divide / Reverse (pure segment ops)",
-      "status": "done",
-      "phase": 6,
-      "write_roots": [
-        "apps/cad/src/lib",
-        "apps/cad/test"
-      ],
-      "context_files": [
-        "apps/cad/src/lib/model.ts"
-      ],
-      "files_create": [
-        "apps/cad/src/lib/segment-ops.ts",
-        "apps/cad/test/segment-ops.test.ts"
-      ],
-      "gate": "cd apps/cad && npx tsc -b && npx vitest run test/segment-ops.test.ts",
-      "spec": "Implement pure versions of three AutoSprink Commands-menu operations over the network model (see model.ts for Node/Segment shapes; Node.pos is {x,y,z} feet; Segment has from/to node ids, diameterIn, lengthFt, role, material).\n\nExports (exact):\n- export interface NetworkSlice { nodes: Array<{ id: string; type: string; pos: { x: number; y: number; z: number } }>; segments: Array<{ id: string; from: string; to: string; diameterIn: number; lengthFt: number; role: string; material: string }>; }\n- export function breakSegment(net: NetworkSlice, segmentId: string, t: number, newNodeId: string, seg1Id: string, seg2Id: string): NetworkSlice \u2014 split one segment at parameter t (0<t<1, throw otherwise or when ids collide/missing): insert a new node of type 'FITTING' linearly interpolated between the endpoints' positions, replace the segment with two segments (from->new with lengthFt*t, new->to with lengthFt*(1-t)), preserving diameterIn/role/material. Pure: returns a NEW object, inputs untouched.\n- export function divideSegment(net: NetworkSlice, segmentId: string, parts: number, idPrefix: string): NetworkSlice \u2014 divide into N equal parts (integer 2..50, throw otherwise) by repeated interpolation: creates N-1 nodes `${idPrefix}_n1..` and N segments `${idPrefix}_s1..`, equal lengths summing to the original lengthFt (each lengthFt/N). Pure.\n- export function reverseSegment(net: NetworkSlice, segmentId: string): NetworkSlice \u2014 swap from/to of one segment. Pure. Throws when the segment id is missing.\n\nTests: break at t=0.25 puts the new node at the 25% interpolated position and lengths 25/75 of original; divide a 30ft segment into 3 -> 3 segments of 10ft each, 2 new nodes, connectivity chain intact (from/to ids form a path from original endpoints); reverse swaps endpoints and double-reverse restores; purity (original object unchanged, use structuredClone comparison); all throw cases.",
-      "commit": "55a9472"
-    },
-    {
-      "id": "H7-hydrant-flow",
-      "title": "Hydraulics > Hydrant Flow Calculator (smoothbore)",
-      "status": "done",
-      "phase": 4,
-      "write_roots": [
-        "apps/cad/src/lib",
-        "apps/cad/test"
-      ],
-      "context_files": [],
-      "files_create": [
-        "apps/cad/src/lib/hydrant-flow.ts",
-        "apps/cad/test/hydrant-flow.test.ts"
-      ],
-      "gate": "cd apps/cad && npx tsc -b && npx vitest run test/hydrant-flow.test.ts",
-      "spec": "Implement the AutoSprink 'Hydrant Flow Calculator': smoothbore nozzle discharge from outlet coefficient, diameter, and pitot pressure, using the cited standard smoothbore discharge formula (NFPA 291 style \u2014 verify adopted edition): Q = 29.83 * c * d^2 * sqrt(P), Q in gpm, d = orifice diameter in INCHES, P = pitot pressure in psi, c = discharge coefficient (0 < c <= 1).\n\nExports (exact):\n- export const SMOOTHBORE_CONSTANT = 29.83;\n- export interface HydrantFlowInput { coefficient: number; diameterIn: number; pitotPsi: number; }\n- export interface HydrantFlowResult { flowGpm: number; formula: 'Q = 29.83 * c * d^2 * sqrt(P)'; input: HydrantFlowInput; }\n- export function hydrantFlow(input: HydrantFlowInput): HydrantFlowResult \u2014 throws on non-finite/non-positive diameter or pitot, or coefficient outside (0, 1].\n\nTests: c=0.9, d=2.5, P=36 -> Q = 29.83*0.9*6.25*6 = 1006.7625 (toBeCloseTo 4 digits); coefficient 1 upper bound accepted; each throw case (c=0, c>1, d<=0, P<0, NaN).",
-      "completed_at": "2026-06-10T00:34:03+00:00",
-      "commit": "e53de506"
-    },
-    {
-      "id": "T29T34-drawing-elements",
-      "title": "Tools > Line/Polyline/Arc/Circle/Rectangle/Point (element model)",
-      "status": "done",
-      "phase": 2,
-      "write_roots": [
-        "apps/cad/src/lib",
-        "apps/cad/test"
-      ],
-      "context_files": [],
-      "files_create": [
-        "apps/cad/src/lib/drawing-elements.ts",
-        "apps/cad/test/drawing-elements.test.ts"
-      ],
-      "gate": "cd apps/cad && npx tsc -b && npx vitest run test/drawing-elements.test.ts",
-      "spec": "Implement the pure data model for six AutoSprink Tools-menu drawing primitives (2D plan-space, units = feet): Line Segment, Polyline, Arc, Circle, Rectangle, Point.\n\nExports (exact):\n- export interface Pt { x: number; y: number; }\n- export type DrawingElement = { id: string } & ( { kind: 'line'; a: Pt; b: Pt } | { kind: 'polyline'; points: Pt[] } | { kind: 'arc'; center: Pt; radiusFt: number; startDeg: number; endDeg: number } | { kind: 'circle'; center: Pt; radiusFt: number } | { kind: 'rectangle'; corner: Pt; widthFt: number; heightFt: number } | { kind: 'point'; at: Pt } );\n- Constructors, each validating finiteness and throwing on invalid input: makeLine(id, a, b) (a!=b), makePolyline(id, points) (>=2 points), makeArc(id, center, radiusFt>0, startDeg, endDeg) (angles finite, normalized into [0,360)), makeCircle(id, center, radiusFt>0), makeRectangle(id, corner, widthFt>0, heightFt>0), makePoint(id, at).\n- export function elementLengthFt(el: DrawingElement): number \u2014 line: Euclidean distance; polyline: sum of consecutive distances; arc: 2*PI*r*(sweep/360) where sweep = (endDeg-startDeg+360)%360 (full circle when sweep computes to 0 AND start!==end is impossible after normalization, so sweep 0 means 0); circle: circumference 2*PI*r; rectangle: perimeter 2*(w+h); point: 0.\n- export function elementAreaFt2(el: DrawingElement): number \u2014 circle: PI*r^2; rectangle: w*h; closed polyline (first point equals last point): shoelace formula absolute value; all others: 0.\n\nTests: 3-4-5 line length 5; polyline lengths sum; quarter arc (r=10, 0..90) length = 2*PI*10*0.25; circle area PI*r^2; rectangle perimeter and area; closed square polyline (0,0)(10,0)(10,10)(0,10)(0,0) area 100 via shoelace; open polyline area 0; every constructor throw case (NaN coords, radius<=0, <2 polyline points, degenerate line, non-positive rectangle dims).",
-      "completed_at": "2026-06-10T00:37:20+00:00",
-      "commit": "9c9ccd1a"
-    },
-    {
-      "id": "C22-tag-leaks",
-      "title": "Commands > Tag Leaks (open pipe ends)",
-      "status": "done",
-      "phase": 6,
-      "write_roots": [
-        "apps/cad/src/lib",
-        "apps/cad/test"
-      ],
-      "context_files": [
-        "apps/cad/src/lib/model.ts"
-      ],
-      "files_create": [
-        "apps/cad/src/lib/leak-check.ts",
-        "apps/cad/test/leak-check.test.ts"
-      ],
-      "gate": "cd apps/cad && npx tsc -b && npx vitest run test/leak-check.test.ts",
-      "spec": "Implement the AutoSprink 'Tag Leaks' analysis: find OPEN PIPE ENDS in the sprinkler network \u2014 connection points where water would escape. A leak is (a) a segment endpoint referencing a node id that does not exist (dangling reference), or (b) a node of degree 1 (exactly one attached segment) whose type is NOT one of the closed/terminal types: 'HEAD', 'SOURCE', 'VALVE'.\n\nExports (exact):\n- export interface Leak { nodeId: string; reason: 'dangling-reference' | 'open-end'; segmentIds: string[]; }\n- export interface LeakReport { leaks: Leak[]; checkedNodes: number; checkedSegments: number; clean: boolean; }\n- export function findLeaks(net: { nodes: Array<{ id: string; type: string }>; segments: Array<{ id: string; from: string; to: string }> }): LeakReport\n\nRules: degree = number of segment endpoints touching the node (a self-loop counts 2). For dangling references the Leak.nodeId is the MISSING id and segmentIds lists the referencing segments. Sort leaks by nodeId for determinism. clean = leaks.length === 0. Pure function, inputs untouched.\n\nTests: linear run HEAD - FITTING - FITTING - SOURCE is clean; chop the last segment -> the now degree-1 FITTING is an open-end leak; a segment pointing at a nonexistent id is a dangling-reference leak listing that segment; isolated degree-0 fitting node is NOT a leak (it is unpiped, not open); HEAD/SOURCE/VALVE at degree 1 are never leaks; determinism (sorted by nodeId).",
-      "commit": "55a9472"
-    },
-    {
-      "id": "W2A-density-demand",
-      "title": "Hydraulics > Density/area per-head demand floor",
-      "status": "done",
-      "phase": "wave2",
-      "write_roots": [
-        "apps/cad/src/lib",
-        "apps/cad/test"
-      ],
-      "context_files": [
-        "apps/cad/src/lib/nfpa13-rules.ts"
-      ],
-      "files_create": [
-        "apps/cad/src/lib/density-demand.ts",
-        "apps/cad/test/density-demand.test.ts"
-      ],
-      "gate": "cd apps/cad && npx tsc -b && npx vitest run test/density-demand.test.ts",
-      "spec": "Implement the NFPA-13 density/area per-head demand floor as a pure module. Use EXACTLY these design densities (gpm/ft^2), the low-point of the NFPA-13 density/area curves, edition-dependent \u2014 every export carries a citation string ending \"Verify adopted edition.\": LIGHT\u21920.10, ORDINARY_1\u21920.15, ORDINARY_2\u21920.20, EXTRA_1\u21920.30, EXTRA_2\u21920.40. Use EXACTLY these per-head max protection areas (ft^2), matching the repo's cited MAX_PROTECTION_AREA_SQFT: LIGHT\u2192225, ORDINARY_1\u2192130, ORDINARY_2\u2192130, EXTRA_1\u2192100, EXTRA_2\u2192100. Use EXACTLY these minimum remote design areas (ft^2): LIGHT\u21921500, ORDINARY_1\u21921500, ORDINARY_2\u21921500, EXTRA_1\u21922500, EXTRA_2\u21922500. Exports (exact): `export type HazardClass = 'LIGHT' | 'ORDINARY_1' | 'ORDINARY_2' | 'EXTRA_1' | 'EXTRA_2';` `export interface CitedNumber { value: number; citation: string; }` `export const DESIGN_DENSITY_GPM_SQFT: Record<HazardClass, CitedNumber>;` `export const PER_HEAD_AREA_SQFT: Record<HazardClass, CitedNumber>;` `export const MIN_REMOTE_AREA_SQFT: Record<HazardClass, CitedNumber>;` `export function densityFloorGpm(hazard: HazardClass, perHeadAreaSqFt?: number): number` \u2014 density \u00d7 (perHeadAreaSqFt ?? PER_HEAD_AREA_SQFT[hazard].value); throws on non-finite/non-positive override. `export function pressureForFlow(flowGpm: number, kFactor: number): number` \u2014 (Q/K)^2; throws on K<=0 or Q<0. `export interface HeadDemand { flowGpm: number; pressurePsi: number; governedBy: 'min-pressure' | 'density-floor'; citation: string; }` `export function effectiveHeadDemand(kFactor: number, minOperatingPsi: number, hazard: HazardClass, perHeadAreaSqFt?: number): HeadDemand` \u2014 qMin = kFactor*sqrt(minOperatingPsi); qFloor = densityFloorGpm(...); if qFloor > qMin return {flowGpm: qFloor, pressurePsi: pressureForFlow(qFloor, kFactor), governedBy: 'density-floor', citation: DESIGN_DENSITY_GPM_SQFT[hazard].citation} else {flowGpm: qMin, pressurePsi: minOperatingPsi, governedBy: 'min-pressure', citation: <minimum-operating-pressure citation string authored in this module>}; throws on kFactor<=0 or minOperatingPsi<=0. Tests: ORDINARY_1, K=5.6, 7 psi \u2192 qMin=5.6*sqrt(7)\u224814.8167, qFloor=0.15*130=19.5 \u2192 density-floor governs, pressurePsi=(19.5/5.6)^2\u224812.1249 (toBeCloseTo 3 digits); LIGHT, K=5.6, 7 psi \u2192 qFloor=0.10*225=22.5 > 14.8167 \u2192 density-floor; LIGHT, K=8.0, 16 psi \u2192 qMin=32 > 22.5 \u2192 min-pressure governs with pressurePsi=16; perHeadAreaSqFt override changes the floor linearly; every throw case; every CitedNumber.citation is a non-empty string containing \"Verify adopted edition\".",
-      "commit": "10161ca"
-    },
-    {
-      "id": "W2B-viewport",
-      "title": "View > Pan/zoom viewport transform math (pure)",
-      "status": "done",
-      "phase": "wave2",
-      "write_roots": [
-        "apps/cad/src/lib",
-        "apps/cad/test"
-      ],
-      "context_files": [],
-      "files_create": [
-        "apps/cad/src/lib/viewport.ts",
-        "apps/cad/test/viewport.test.ts"
-      ],
-      "gate": "cd apps/cad && npx tsc -b && npx vitest run test/viewport.test.ts",
-      "spec": "Pure 2D viewport math for a plan canvas: stagePt = planPt*scale + offset. Exports (exact): `export interface Viewport { scale: number; offsetX: number; offsetY: number; }` `export interface Pt { x: number; y: number; }` `export interface Bounds { minX: number; minY: number; maxX: number; maxY: number; }` `export const MIN_SCALE = 1e-6;` `export const MAX_SCALE = 1e6;` `export const ZOOM_STEP = 1.1;` `export function fitViewport(bounds: Bounds, stageW: number, stageH: number, paddingPx: number): Viewport` \u2014 uniform scale = min((stageW-2*paddingPx)/boundsW, (stageH-2*paddingPx)/boundsH) clamped to [MIN_SCALE, MAX_SCALE], offsets center the bounds in the stage; for zero/negative bounds dimensions or stage dims <= 2*paddingPx return {scale: 1, offsetX: stageW/2, offsetY: stageH/2}. `export function toStagePt(vp: Viewport, plan: Pt): Pt` \u2014 {x: plan.x*vp.scale+vp.offsetX, y: plan.y*vp.scale+vp.offsetY}. `export function toPlanPt(vp: Viewport, stage: Pt): Pt` \u2014 exact inverse. `export function zoomAt(vp: Viewport, stageCursor: Pt, factor: number): Viewport` \u2014 newScale = clamp(vp.scale*factor, MIN_SCALE, MAX_SCALE); the plan point under stageCursor must map to the SAME stage point after zoom: newOffset = stageCursor - planPtUnderCursor*newScale; throws on non-finite or non-positive factor. `export function panBy(vp: Viewport, dxPx: number, dyPx: number): Viewport` \u2014 offsets += deltas; throws on non-finite deltas. `export function zoomPercent(vp: Viewport, fitScale: number): number` \u2014 round(100*vp.scale/fitScale); throws when fitScale <= 0. All functions pure (return new objects). Tests: toPlanPt(toStagePt(p)) round-trips (toBeCloseTo 10 digits); fitViewport of bounds {0,0,100,50} into 1000x600 stage with padding 20 gives scale = min(960/100, 560/50) = 9.6 and centers; zoomAt invariant: for vp {scale:2, offsetX:10, offsetY:-5}, cursor {x:300,y:200}, factor 1.5 \u2014 toPlanPt before === toPlanPt after at the cursor (toBeCloseTo); repeated zoomAt clamps at MAX_SCALE; panBy(3,-4) shifts a mapped point by exactly (3,-4) stage px; degenerate-bounds fallback; throw cases.",
-      "commit": "ccdb680"
-    },
-    {
-      "id": "W2C-project-io",
-      "title": "File > Project serialize/deserialize (.hfcad JSON codec)",
-      "status": "done",
-      "phase": "wave2",
-      "write_roots": [
-        "apps/cad/src/lib",
-        "apps/cad/test"
-      ],
-      "context_files": [
-        "apps/cad/src/lib/model.ts"
-      ],
-      "files_create": [
-        "apps/cad/src/lib/project-io.ts",
-        "apps/cad/test/project-io.test.ts"
-      ],
-      "gate": "cd apps/cad && npx tsc -b && npx vitest run test/project-io.test.ts",
-      "spec": "Pure JSON codec for the `Project` type in model.ts (import `type Project` and `emptyProject` from `./model`). Exports (exact): `export const PROJECT_FILE_KIND = 'halofire-cad-project';` `export const PROJECT_FILE_VERSION = 1;` `export interface ProjectFile { kind: typeof PROJECT_FILE_KIND; version: number; savedAt: string; project: Project; }` `export function serializeProject(project: Project, savedAt?: string): string` \u2014 JSON.stringify of a ProjectFile with savedAt ?? new Date().toISOString(), 2-space indent. `export type LoadResult = { ok: true; project: Project; savedAt: string } | { ok: false; reason: string };` `export function deserializeProject(json: string): LoadResult` \u2014 fail-soft, NEVER throws: returns ok:false with a human reason when JSON.parse fails, kind !== PROJECT_FILE_KIND, version is not a positive integer <= PROJECT_FILE_VERSION, project is missing, or validateProject fails. `export function validateProject(p: unknown): { ok: true } | { ok: false; reason: string }` \u2014 structural checks ONLY (no fabrication): p is an object with string id and name; levels is a non-empty array of {id: string, name: string, elevationFt: finite number}; building is an object with arrays walls/rooms, finite positive scaleFtPerUnit, and source one of 'none'|'dxf'|'pdf'|'manual'; network is an object with arrays nodes/segments/remoteAreas; hazardDefaults has defaultClass in ['LIGHT','ORDINARY_1','ORDINARY_2','EXTRA_1','EXTRA_2'] and finite positive defaultCeilingHt; every wall has finite start/end x/y; every room polygon has >= 3 finite points; every segment has string from/to, finite positive diameterIn and non-negative lengthFt. On ok:true deserializeProject must default a missing `annotations` field to `[]`. Tests: round-trip emptyProject() \u2014 deserialize(serialize(p)) deep-equals p (with annotations normalized to []); a populated project literal (2 walls, 1 triangle room, 2 nodes, 1 segment, scaleFtPerUnit 0.25) round-trips deep-equal; ok:false (with non-empty reason mentioning the failing field) for: invalid JSON text, wrong kind, version 2, scaleFtPerUnit 0, scaleFtPerUnit NaN (via JSON null), room polygon of 2 points, segment missing `to`, empty levels array; deserializeProject never throws (wrap calls, assert no throw).",
-      "commit": "cb9b211"
-    },
-    {
-      "id": "W2D-selection-set",
-      "title": "Edit > Multi-selection set + window/crossing marquee hit tests (pure)",
-      "status": "done",
-      "phase": "wave2",
-      "write_roots": [
-        "apps/cad/src/lib",
-        "apps/cad/test"
-      ],
-      "context_files": [],
-      "files_create": [
-        "apps/cad/src/lib/selection-set.ts",
-        "apps/cad/test/selection-set.test.ts"
-      ],
-      "gate": "cd apps/cad && npx tsc -b && npx vitest run test/selection-set.test.ts",
-      "spec": "Pure multi-selection model and marquee geometry. Exports (exact): `export interface Pt { x: number; y: number; }` `export interface Rect { minX: number; minY: number; maxX: number; maxY: number; }` `export type SelKind = 'node' | 'segment' | 'room';` `export interface SelectionSet { nodeIds: string[]; segmentIds: string[]; roomIds: string[]; }` `export function emptySelection(): SelectionSet` \u2014 all arrays empty. `export function selectionCount(sel: SelectionSet): number` \u2014 sum of lengths. `export function togglePick(sel: SelectionSet, kind: SelKind, id: string, additive: boolean): SelectionSet` \u2014 pure; non-additive returns a selection containing ONLY that id in its kind list; additive toggles membership (add if absent, remove if present) keeping other kinds; output arrays sorted lexicographically; throws on empty id. `export function normalizeRect(a: Pt, b: Pt): Rect` \u2014 min/max of the two corners. `export function pointInRect(p: Pt, r: Rect): boolean` \u2014 inclusive bounds. `export function segmentInRect(a: Pt, b: Pt, r: Rect): boolean` \u2014 both endpoints pointInRect. `export function segmentIntersectsRect(a: Pt, b: Pt, r: Rect): boolean` \u2014 true when either endpoint is inside OR the segment properly crosses any of the 4 rect edges; implement a `segmentsIntersect(p1,p2,p3,p4)` helper via orientation sign tests: orient(p,q,r) = sign((q.x-p.x)*(r.y-p.y)-(q.y-p.y)*(r.x-p.x)); segments intersect when orientations of (p1,p2,p3)/(p1,p2,p4) differ AND (p3,p4,p1)/(p3,p4,p2) differ; treat collinear-overlap (any orient 0 with the point's coordinates within the other segment's bounding box, inclusive) as intersecting. `export interface MarqueeItems { nodes: Array<{ id: string; at: Pt }>; segments: Array<{ id: string; a: Pt; b: Pt }>; }` `export function marqueeSelect(items: MarqueeItems, cornerA: Pt, cornerB: Pt, mode: 'window' | 'crossing'): SelectionSet` \u2014 window: nodes with pointInRect, segments with segmentInRect (fully contained); crossing: nodes with pointInRect, segments with segmentIntersectsRect; roomIds always []; outputs sorted; pure. Tests: togglePick non-additive replaces across kinds; additive add/remove round-trip; sorted determinism; rect normalization from any corner pair; segment fully inside selected in both modes; segment crossing one rect edge selected ONLY in crossing mode; segment fully outside never selected; collinear segment lying along a rect edge counts as crossing; marquee over mixed items returns exactly the expected sorted ids; throw on empty id.",
-      "commit": "10161ca"
-    },
-    {
-      "id": "W2E-kernel-import",
-      "title": "Import > 1881 kernel DXF entities \u2192 SprinklerNetwork slice (pure)",
-      "status": "done",
-      "phase": "wave2",
-      "write_roots": [
-        "apps/cad/src/lib",
-        "apps/cad/test"
-      ],
-      "context_files": [
-        "apps/cad/src/lib/model.ts",
-        "apps/cad/src/lib/plan-import.ts"
-      ],
-      "files_create": [
-        "apps/cad/src/lib/kernel-import.ts",
-        "apps/cad/test/kernel-import.test.ts"
-      ],
-      "gate": "cd apps/cad && npx tsc -b && npx vitest run test/kernel-import.test.ts",
-      "spec": "Pure builder turning already-parsed kernel-DXF entities into network nodes/segments. The 1881 kernel (`design.dxf`) carries heads as CIRCLE entities on layer `HALOFIRE_HEADS` and pipes as LINE entities on layer `HALOFIRE_PIPES` (verified: 1303 head circles, 1758 pipe lines). This module does NOT parse DXF text \u2014 it consumes plain entity inputs so tests are synthetic. Exports (exact): `export const KERNEL_HEAD_LAYER = 'HALOFIRE_HEADS';` `export const KERNEL_PIPE_LAYER = 'HALOFIRE_PIPES';` `export const SNAP_TOLERANCE_FT = 0.05;` `export interface KernelCircle { cx: number; cy: number; layer: string; }` `export interface KernelLine { x1: number; y1: number; x2: number; y2: number; layer: string; }` `export interface KernelImportOpts { ftPerUnit: number; headLayer?: string; pipeLayer?: string; zFt?: number; defaultDiameterIn?: number; }` `export interface KernelNetwork { nodes: Array<{ id: string; type: 'HEAD' | 'TEE' | 'ELBOW'; pos: { x: number; y: number; z: number } }>; segments: Array<{ id: string; from: string; to: string; diameterIn: number; lengthFt: number; role: 'BRANCH'; material: 'STEEL_SCH40' }>; headCount: number; junctionCount: number; droppedZeroLength: number; }` `export function buildKernelNetwork(circles: KernelCircle[], lines: KernelLine[], opts: KernelImportOpts): KernelNetwork`. Algorithm (exact): (1) throw on non-finite/non-positive ftPerUnit; let head layer = opts.headLayer ?? KERNEL_HEAD_LAYER, pipe layer = opts.pipeLayer ?? KERNEL_PIPE_LAYER, z = opts.zFt ?? 0, dia = opts.defaultDiameterIn ?? 1. (2) Scale every coordinate by ftPerUnit. (3) For each circle on the head layer create a HEAD node id `head_<index1Based>` at (cx, cy) scaled, pos {x, y: z, z: cy\u2192use pos {x: scaledCx, y: zFt, z: scaledCy}} \u2014 plan x\u2192pos.x, plan y\u2192pos.z, elevation\u2192pos.y (matches model.ts 'y is up'). (4) For each line endpoint on the pipe layer, snap to an existing node when the 2D plan distance (x/z plane) <= SNAP_TOLERANCE_FT, preferring HEAD nodes, else the earliest-created junction; otherwise create a junction node id `jct_<n>` (n increments from 1) at that point. (5) After all segments exist, set each junction node's type: 'TEE' when its degree (number of segment endpoints touching it) >= 3, else 'ELBOW'. (6) Each pipe line becomes segment id `pipe_<index1Based>` with from/to = resolved node ids, lengthFt = 2D Euclidean distance (in feet) rounded to 4 decimals, role 'BRANCH', material 'STEEL_SCH40', diameterIn = dia; lines whose scaled length <= SNAP_TOLERANCE_FT are dropped and counted in droppedZeroLength. (7) Ignore circles/lines on other layers entirely. headCount/junctionCount are the created counts. Pure: inputs untouched; deterministic ids by input order. Tests: one circle + one line ending within tolerance of it \u2192 segment.from or .to is `head_1` (no duplicate junction); H-shape of 3 lines meeting at a shared point \u2192 that junction degree 3 \u2192 'TEE', the others 'ELBOW' or HEAD per setup; ftPerUnit 0.25 scales a 40-unit line to lengthFt 10; zero-length line dropped and counted; off-layer entities ignored; custom layer names honored; mapping check pos {x, y: zFt, z: planY}; determinism (same input twice \u2192 deep-equal output); throw on ftPerUnit <= 0.",
-      "commit": "ccdb680"
-    },
-    {
-      "id": "W2F-hydraulic-report",
-      "title": "Reports > Hydraulic calc summary text formatter (pure)",
-      "status": "done",
-      "phase": "wave2",
-      "write_roots": [
-        "apps/cad/src/lib",
-        "apps/cad/test"
-      ],
-      "context_files": [
-        "apps/cad/src/lib/hydraulics.ts"
-      ],
-      "files_create": [
-        "apps/cad/src/lib/hydraulic-report.ts",
-        "apps/cad/test/hydraulic-report.test.ts"
-      ],
-      "gate": "cd apps/cad && npx tsc -b && npx vitest run test/hydraulic-report.test.ts",
-      "spec": "Pure plain-text formatter for a hydraulic result \u2014 the submittal-lane \"calc summary\". It consumes a structural input (NOT importing solver internals) so it stays decoupled. Exports (exact): `export interface ReportNodeRow { id: string; pressurePsi: number; flowGpm: number; }` `export interface ReportSegmentRow { id: string; flowGpm: number; frictionPsi: number; velocityFps: number; }` `export interface ReportInput { projectName: string; hazard: string; demandGpm: number; demandPsiAtRiser: number; supply?: { staticPsi: number; residualPsi: number; flowGpm: number; availablePsiAtDemand: number; adequate: boolean }; nodes: ReportNodeRow[]; segments: ReportSegmentRow[]; disclaimer: string; citations: string[]; }` `export const REPORT_HEADER = 'HALOFIRE CAD - HYDRAULIC DESIGN AID SUMMARY';` `export function formatNumber(n: number, decimals: number): string` \u2014 toFixed(decimals); throws on non-finite n or negative/non-integer decimals. `export function formatHydraulicReport(input: ReportInput): string`. Layout (exact): line 1 REPORT_HEADER; line 2 `Project: <projectName>`; line 3 `Hazard: <hazard>`; line 4 blank; line 5 `SYSTEM DEMAND: <demandGpm,1>gpm @ <demandPsiAtRiser,1> psi at riser` (numbers via formatNumber with 1 decimal, format exactly `DEMAND: X.X gpm @ Y.Y psi at riser` prefixed `SYSTEM `); then when supply is present: `SUPPLY: static <staticPsi,1> psi, residual <residualPsi,1> psi @ <flowGpm,1> gpm` and `AVAILABLE @ DEMAND: <availablePsiAtDemand,1> psi -> <ADEQUATE|INADEQUATE>`; when supply is absent the single line `SUPPLY: none provided (demand-only result)`; blank line; `NODES (<count>)` followed by one line per node `  <id padded right to 16 chars with spaces>  P=<pressurePsi,2> psi  Q=<flowGpm,2> gpm`; blank line; `SEGMENTS (<count>)` followed by one line per segment `  <id padded right to 16 chars>  Q=<flowGpm,2> gpm  dP=<frictionPsi,3> psi  v=<velocityFps,2> ft/s`; blank line; `CITATIONS:` then `  - <each citation>` in input order; blank line; the disclaimer verbatim as the final line(s). Rows are emitted in INPUT ORDER (caller sorts). Pad ids longer than 16 chars without truncation (pad-to-at-least-16). Throws when disclaimer is an empty string or citations is empty (fail-closed honesty: a report without citations/disclaimer must not be producible). Tests: golden full report string for a 2-node/1-segment input with supply (assert exact string equality, template literal in test); demand-only variant contains 'SUPPLY: none provided'; INADEQUATE rendered when adequate=false; long id padding; throw on empty disclaimer; throw on empty citations; formatNumber rounding (1.005 with 2 decimals via toFixed semantics \u2014 assert toFixed output equality, not an invented rounding rule).\n\n---",
-      "commit": "10161ca"
-    },
-    {
-      "id": "W3A-pipe-sizing",
-      "title": "Auto Draw > Auto Size (schedule pipe sizing)",
-      "status": "done",
-      "phase": "wave3",
-      "write_roots": [
-        "apps/cad/src/lib",
-        "apps/cad/test"
-      ],
-      "context_files": [
-        "apps/cad/src/lib/model.ts"
-      ],
-      "files_create": [
-        "apps/cad/src/lib/pipe-sizing.ts",
-        "apps/cad/test/pipe-sizing.test.ts"
-      ],
-      "gate": "cd apps/cad && npx tsc -b && npx vitest run test/pipe-sizing.test.ts",
-      "attempts": 2,
-      "spec": "Pure pipe schedule sizing: pick the smallest nominal size whose velocity stays within a limit for a given flow. Use EXACTLY these SCH40 internal diameters (in): 1->1.049,1.25->1.380,1.5->1.610,2->2.067,2.5->2.469,3->3.068,4->4.026,6->6.065,8->7.981. Velocity ft/s = 0.4085*gpm/(idIn^2) (the standard V=0.4085*Q/d^2 with d in inches). Exports (exact): export const SCH40_ID_IN: Record<number,number>; export const NOMINAL_SIZES_IN: number[] (ascending: 1,1.25,1.5,2,2.5,3,4,6,8); export function velocityFps(gpm:number, nominalIn:number): number \u2014 throws on unknown nominal or non-finite/negative gpm; export interface SizePick { nominalIn:number; velocityFps:number; withinLimit:boolean } export function pickPipeSize(gpm:number, maxVelocityFps:number): SizePick \u2014 smallest nominal whose velocity<=maxVelocityFps; if none qualifies return the LARGEST (8) with withinLimit:false; throws on non-finite/non-positive maxVelocityFps or negative gpm. Tests: velocityFps(100,2)=0.4085*100/(2.067^2)=~9.56 (toBeCloseTo 2); pickPipeSize(100,10) picks 2 (9.56<=10) withinLimit true; pickPipeSize(20,10) picks 1; a huge flow returns 8 withinLimit false; throws (unknown nominal, negative gpm, maxVelocity 0).",
-      "completed_at": "2026-06-10T14:11:57+00:00",
-      "commit": "e053e775"
-    },
-    {
-      "id": "W3B-fitting-le",
-      "title": "Hydraulics > Fitting equivalent lengths (Hazen-Williams)",
-      "status": "done",
-      "phase": "wave3",
-      "write_roots": [
-        "apps/cad/src/lib",
-        "apps/cad/test"
-      ],
-      "context_files": [],
-      "files_create": [
-        "apps/cad/src/lib/fitting-le.ts",
-        "apps/cad/test/fitting-le.test.ts"
-      ],
-      "gate": "cd apps/cad && npx tsc -b && npx vitest run test/fitting-le.test.ts",
-      "attempts": 2,
-      "spec": "Pure fitting equivalent-length lookup for Hazen-Williams friction (C=120 schedule-40 basis; cited, verify adopted edition). Use EXACTLY these equivalent lengths (ft) by fitting type and nominal size (in). TEE_BRANCH: 1->5,1.25->6,1.5->8,2->10,2.5->12,3->15,4->20,6->30,8->35. ELBOW_90: 1->2,1.25->3,1.5->4,2->5,2.5->6,3->7,4->10,6->14,8->18. GATE_VALVE: 1->1,1.25->1,1.5->1,2->1,2.5->1,3->1,4->2,6->3,8->4. Exports (exact): export type FittingType='TEE_BRANCH'|'ELBOW_90'|'GATE_VALVE'; export const FITTING_LE_FT: Record<FittingType,Record<number,number>>; export const FITTING_LE_CITATION: string (contains 'Verify adopted edition'); export function equivalentLengthFt(type:FittingType, nominalIn:number): number \u2014 throws on unknown type or nominal; export function totalEquivalentLengthFt(fittings: Array<{type:FittingType;nominalIn:number}>): number \u2014 sum, skips nothing, throws on any unknown entry. Tests: equivalentLengthFt('ELBOW_90',2)=5; TEE_BRANCH 4=20; totalEquivalentLengthFt of [elbow 2, tee 2, gate 2]=5+10+1=16; throws unknown type, unknown nominal; citation contains the caveat.",
-      "completed_at": "2026-06-10T14:36:20+00:00",
-      "commit": "82f5093f"
-    },
-    {
-      "id": "W3C-bom-group",
-      "title": "Reports > BOM grouping/aggregation (part legend)",
-      "status": "done",
-      "phase": "wave3",
-      "write_roots": [
-        "apps/cad/src/lib",
-        "apps/cad/test"
-      ],
-      "context_files": [],
-      "files_create": [
-        "apps/cad/src/lib/bom-group.ts",
-        "apps/cad/test/bom-group.test.ts"
-      ],
-      "gate": "cd apps/cad && npx tsc -b && npx vitest run test/bom-group.test.ts",
-      "attempts": 2,
-      "spec": "Pure bill-of-materials aggregation: collapse takeoff line items into grouped rows by (category, size, material), summing quantities and extending cost. Exports (exact): export interface BomItem { category:string; sizeIn:number; material:string; qty:number; unitCost:number } export interface BomRow { key:string; category:string; sizeIn:number; material:string; qty:number; unitCost:number; extendedCost:number } export interface BomSummary { rows:BomRow[]; totalQty:number; totalCost:number } export function groupBom(items:BomItem[]): BomSummary \u2014 group key is `${category}|${sizeIn}|${material}`; qty sums; unitCost is the cost of the FIRST item in each group (assert all in a group share unitCost is NOT required \u2014 use first); extendedCost=round2(qty*unitCost); rows sorted by key ascending; totals are sums (round2 the cost). round2(n)=Math.round(n*100)/100. Throws on any item with negative qty or negative unitCost or non-finite values. Tests: two items same category/size/material sum qty and extend cost; different sizes stay separate; rows sorted by key; totalCost sums extended costs with round2; empty input -> empty rows, totals 0; throws on negative qty.",
-      "last_error": "src/lib/bom-group.ts(1,45): error TS2307: Cannot find module './bom-types' or its corresponding type declarations.\ntest/bom-group.test.ts(2,19): error TS6133: 'BomRow' is declared but its value is never read.\ntest/bom-group.test.ts(2,27): error TS6133: 'BomSummary' is declared but its value is never read.\ntest/bom-group.test.ts(2,45): error TS2307: Cannot find module '../src/lib/bom-types' or its corresponding type declarations.\ntest/bom-group.test.ts(4,7): error TS6133: 'round2' is declared but its value is never read.",
-      "completed_at": "2026-06-10T16:22:02+00:00",
-      "commit": "e1fdf5e8"
-    },
-    {
-      "id": "W3D-coverage-area",
-      "title": "Commands > Draw Sprinkler Coverage (rectangular coverage cell)",
-      "status": "done",
-      "phase": "wave3",
-      "write_roots": [
-        "apps/cad/src/lib",
-        "apps/cad/test"
-      ],
-      "context_files": [],
-      "files_create": [
-        "apps/cad/src/lib/coverage-area.ts",
-        "apps/cad/test/coverage-area.test.ts"
-      ],
-      "gate": "cd apps/cad && npx tsc -b && npx vitest run test/coverage-area.test.ts",
-      "attempts": 2,
-      "spec": "Pure rectangular sprinkler coverage-cell geometry + NFPA spacing check. A head at center (cx,cy) with spacing S (ft) covers a square of side S (S/2 each direction). Exports (exact): export interface Pt{x:number;y:number} export interface CoverageCell{ center:Pt; sideFt:number; minX:number; minY:number; maxX:number; maxY:number; areaSqFt:number } export function coverageCell(center:Pt, sideFt:number): CoverageCell \u2014 throws on non-finite center or non-finite/non-positive sideFt; areaSqFt=sideFt*sideFt; bounds are center +/- sideFt/2. export function cellsOverlap(a:CoverageCell,b:CoverageCell):boolean \u2014 axis-aligned overlap (touching edges = not overlap, use strict <). export function maxAreaWithinLimit(sideFt:number, maxProtectionSqFt:number):boolean \u2014 sideFt*sideFt <= maxProtectionSqFt; throws on non-positive inputs. Tests: coverageCell({x:0,y:0},12) -> bounds -6..6, area 144; two cells 12 apart centers (0,0) and (12,0) do NOT overlap (edges touch); centers (0,0)/(10,0) DO overlap; maxAreaWithinLimit(12,225) true, (16,225) false; throw cases.",
-      "completed_at": "2026-06-10T15:02:23+00:00",
-      "commit": "e94c480e"
-    },
-    {
-      "id": "W4A-wall-solid",
-      "title": "3D > Wall solid mesh (thickness + height, pure)",
-      "status": "done",
-      "phase": "wave4-3d",
-      "write_roots": [
-        "apps/cad/src/lib",
-        "apps/cad/test"
-      ],
-      "context_files": [],
-      "files_create": [
-        "apps/cad/src/lib/wall-solid.ts",
-        "apps/cad/test/wall-solid.test.ts"
-      ],
-      "gate": "cd apps/cad && npx tsc -b && npx vitest run test/wall-solid.test.ts",
-      "attempts": 4,
-      "spec": "Pure mesh builder: one wall segment -> a closed rectangular box mesh as flat arrays (three.js BufferGeometry-ready). Exports (exact): export interface Pt2{x:number;y:number} export interface WallMesh{positions:number[];indices:number[];vertexCount:number} export function wallSolid(start:Pt2,end:Pt2,thicknessFt:number,heightFt:number,baseY?:number):WallMesh \u2014 the wall runs start->end in plan (plan x->world x, plan y->world z), extruded UP (world y) from baseY (default 0) to baseY+heightFt, with thickness centered on the centerline (offset +/- thickness/2 along the 2D normal of the segment). Output: 8 corner vertices (positions length 24) and 12 triangles (indices length 36) with OUTWARD-facing CCW winding for the 6 faces. Throws on zero-length segment (distance < 1e-9), non-finite inputs, or non-positive thickness/height. Determinism: vertex order = bottom face first (4 verts: start-left, start-right, end-right, end-left), then top face same order. Tests: a unit wall (0,0)->(10,0), thickness 1, height 8: vertexCount 8, positions contain z=+0.5 and z=-0.5 corners, all top verts y=8, bottom y=0; indices length 36 with every index <8; a diagonal wall (3-4-5) has correct normal offsets (toBeCloseTo); throws on zero-length/negative thickness.",
-      "completed_at": "2026-06-10T16:39:15+00:00",
-      "commit": "199bf10e"
-    },
-    {
-      "id": "W4B-slab-solid",
-      "title": "3D > Floor/ceiling slab mesh from room polygon (pure)",
-      "status": "done",
-      "phase": "wave4-3d",
-      "write_roots": [
-        "apps/cad/src/lib",
-        "apps/cad/test"
-      ],
-      "context_files": [],
-      "files_create": [
-        "apps/cad/src/lib/slab-solid.ts",
-        "apps/cad/test/slab-solid.test.ts"
-      ],
-      "gate": "cd apps/cad && npx tsc -b && npx vitest run test/slab-solid.test.ts",
-      "attempts": 0,
-      "spec": "Pure mesh builder: a room polygon -> a horizontal slab mesh via fan triangulation (polygons from the trace tool are convex-ish; document the convex assumption honestly). Exports (exact): export interface Pt2{x:number;y:number} export interface SlabMesh{positions:number[];indices:number[];vertexCount:number} export function slabSolid(polygon:Pt2[],elevationY:number,thicknessFt:number):SlabMesh \u2014 polygon (>=3 points, plan x->world x, plan y->world z) extruded from elevationY down to elevationY-thicknessFt (slab hangs below its elevation). Top + bottom faces by fan triangulation from vertex 0; side walls quad per edge. For N polygon points: vertexCount 2N, indices length = (N-2)*3*2 + N*6. Throws on <3 points, non-finite, non-positive thickness, or repeated consecutive points (distance <1e-9). Tests: unit square (0,0)(10,0)(10,10)(0,10) at elevation 0 thickness 0.5: vertexCount 8, top verts y=0, bottom y=-0.5, indices length 36; triangle polygon N=3 -> indices length (1*6)+(3*6)=24; throw cases.",
-      "commit": "claude-tier2"
-    },
-    {
-      "id": "W4C-fitting-orient",
-      "title": "3D > Fitting orientation at junctions (pure quaternion math)",
-      "status": "done",
-      "phase": "wave4-3d",
-      "write_roots": [
-        "apps/cad/src/lib",
-        "apps/cad/test"
-      ],
-      "context_files": [],
-      "files_create": [
-        "apps/cad/src/lib/fitting-orient.ts",
-        "apps/cad/test/fitting-orient.test.ts"
-      ],
-      "gate": "cd apps/cad && npx tsc -b && npx vitest run test/fitting-orient.test.ts",
-      "attempts": 0,
-      "spec": "Pure orientation solver: given the unit directions of pipes meeting at a junction, compute the Y-up Euler rotation to place a fitting STEP body (modeled with primary run along +X, branch along +Z). Exports (exact): export interface V3{x:number;y:number;z:number} export function normalize(v:V3):V3 \u2014 throws on zero-length. export function elbowRotationY(dirA:V3,dirB:V3):number \u2014 both dirs in the horizontal plane (y component must be <0.01 in magnitude after normalize, else throw 'non-horizontal'): returns the rotation (radians, about world Y) that aligns the elbow's +X leg with dirA; computed as atan2(-dirA.z, dirA.x). export function teeRotationY(runDir:V3,branchDir:V3):number \u2014 aligns the tee run (+X) with runDir using the same atan2; throws when branchDir is parallel to runDir (|dot|>0.99 after normalize). export function isOrthogonal(a:V3,b:V3,tolDeg?:number):boolean \u2014 angle within tolDeg (default 5) of 90 degrees. Tests: dirA=+X -> rotation 0; dirA=+Z -> rotation -PI/2 (toBeCloseTo); dirA=-X -> PI (or -PI, assert abs==PI closeTo); tee with run +X branch +Z passes isOrthogonal and rotation 0; parallel branch throws; non-horizontal throws; normalize throws on zero vector.",
-      "commit": "claude-tier2"
-    },
-    {
-      "id": "W5A-pipe-snap",
-      "title": "Tools > Pipe \u2014 endpoint snapping math (pure)",
-      "status": "done",
-      "phase": "wave5",
-      "write_roots": [
-        "apps/cad/src/lib",
-        "apps/cad/test"
-      ],
-      "context_files": [
-        "apps/cad/src/lib/model.ts"
-      ],
-      "files_create": [
-        "apps/cad/src/lib/pipe-snap.ts",
-        "apps/cad/test/pipe-snap.test.ts"
-      ],
-      "gate": "cd apps/cad && npx tsc -b && npx vitest run test/pipe-snap.test.ts",
-      "attempts": 5,
-      "spec": "Pure snapping for the manual Pipe tool: given a click point (feet, 2D plan: x and z), find what it should connect to. Exports (exact): export interface Pt{x:number;z:number} export type SnapHit = { kind:'node'; nodeId:string; at:Pt } | { kind:'segment'; segmentId:string; at:Pt; t:number } | { kind:'none'; at:Pt }; export function distPointToSegment2D(p:Pt,a:Pt,b:Pt):{dist:number;t:number;closest:Pt} \u2014 standard point-to-segment projection with t clamped to [0,1]; export function snapToNetwork(p:Pt, nodes:Array<{id:string;pos:{x:number;y:number;z:number}}>, segments:Array<{id:string;from:string;to:string}>, tolFt:number): SnapHit \u2014 nearest NODE within tolFt wins (smallest distance, ties by id ascending); else nearest segment within tolFt (projection point, its t); else {kind:'none',at:p}. Throws on non-finite p or tolFt<=0. Segments with missing endpoint nodes are skipped. Tests: node win over farther segment; segment hit returns clamped t in (0,1) and correct closest point for a click beside the middle of a 10ft run (toBeCloseTo); t clamps to 0/1 beyond the ends; none beyond tolerance; tie-break by id; throws (NaN point, tol 0); missing-endpoint segment skipped.",
-      "completed_at": "2026-06-11T04:44:34+00:00",
-      "commit": "5e4609ed"
-    },
-    {
-      "id": "W5B-wall-extract-score",
-      "title": "Import > PDF wall-candidate scoring (stroke-weight signal, pure)",
-      "status": "done",
-      "phase": "wave5",
-      "write_roots": [
-        "apps/cad/src/lib",
-        "apps/cad/test"
-      ],
-      "context_files": [],
-      "files_create": [
-        "apps/cad/src/lib/wall-extract-score.ts",
-        "apps/cad/test/wall-extract-score.test.ts"
-      ],
-      "gate": "cd apps/cad && npx tsc -b && npx vitest run test/wall-extract-score.test.ts",
-      "attempts": 6,
-      "spec": "Codify the verified 1881 stroke-weight wall signal as a pure scorer for assisted extraction (W9). Input lines carry geometry + strokeWidthPt + optional layer. Exports (exact): export interface ScoredLine{x1:number;y1:number;x2:number;y2:number;strokeWidthPt:number;layer?:string} export interface WallScore{index:number;score:number;reasons:string[]} export function dominantStrokeWidth(lines:ScoredLine[]):number \u2014 the most frequent strokeWidthPt among lines LONGER than the median length (rounding widths to 2 decimals); throws on empty input. export function scoreWallCandidates(lines:ScoredLine[],opts?:{targetWidthPt?:number;minLengthFt?:number}):WallScore[] \u2014 per line, score in [0,1]: +0.5 when |strokeWidthPt - target| <= 0.05 (target = opts.targetWidthPt ?? dominantStrokeWidth(lines)); +0.3 when length >= (opts.minLengthFt ?? 3); +0.2 when axis-aligned within 2 degrees (horizontal or vertical); reasons[] names each criterion met ('stroke-match','long-enough','axis-aligned'). Output sorted by score desc then index asc. Pure; throws on empty lines. Tests: a 2.83pt-stroke long axis-aligned line scores 1.0 with all 3 reasons; a thin short diagonal scores 0; dominantStrokeWidth picks the most frequent among long lines (synthetic set); sort order; throws on empty.",
-      "last_error": "     \u2192 expected [Function] to throw error including 'Input lines cannot be empty' but got 'No lines provided'\n     \u2192 expected [Function] to throw error including 'Input lines cannot be empty' but got 'No lines provided'\n     \u2192 expected [ { index: +0, score: 0.7, \u2026(1) } ] to deeply equal [ { index: +0, score: 1, \u2026(1) } ]\n     \u2192 expected [ \u2026(3) ] to deeply equal [ { index: +0, score: 1, \u2026(1) }, \u2026(2) ]\n FAIL  test/wall-extract-score.test.ts > dominantStrokeWidth > throws on empty input\nAssertionError: expected [Function] to throw error including 'Input lines cannot be empty' but got 'No lines provided'\nExpected: \"Input lines cannot be empty\"\nReceived: \"No lines provided\"\n      7|     expect(() => dominantStrokeWidth([])).toThrow('Input lines cannot \u2026\n FAIL  test/wall-extract-score.test.ts > scoreWallCandidates > throws on empty input\nAssertionError: expected [Function] to throw error including 'Input lines cannot be empty' but got 'No lines provided'\nExpected: \"Input lines cannot be empty\"\nReceived: \"No lines provided\"\n     23|     expect(() => scoreWallCandidates([])).toThrow('Input lines cannot \u2026\n FAIL  test/wall-extract-score.test.ts > scoreWallCandidates > scores a line with all criteria met\nAssertionError: expected [ { index: +0, score: 0.7, \u2026(1) } ] to deeply equal [ { index: +0, score: 1, \u2026(1) } ]\n- Expected\n+ Received\n     31|     expect(scores).toEqual([{ index: 0, score: 1.0, reasons: ['stroke-\u2026\n FAIL  test/wall-extract-score.test.ts > scoreWallCandidates > sorts by score desc then index asc\nAssertionError: expected [ \u2026(3) ] to deeply equal [ { index: +0, score: 1, \u2026(1) }, \u2026(2) ]\n- Expected\n+ Received\n     49|     expect(scores).toEqual([",
-      "note": "hand-built by Claude Tier-2 agent (commit 63d03c6), gates 549/549. Do not regenerate."
-    },
-    {
-      "id": "W5C-bid-payload",
-      "title": "Bid > CAD takeoff -> autosprink bid payload (pure mapping)",
-      "status": "done",
-      "phase": "wave5",
-      "write_roots": [
-        "apps/cad/src/lib",
-        "apps/cad/test"
-      ],
-      "context_files": [
-        "apps/cad/src/lib/takeoff.ts"
-      ],
-      "files_create": [
-        "apps/cad/src/lib/bid-payload.ts",
-        "apps/cad/test/bid-payload.test.ts"
-      ],
-      "gate": "cd apps/cad && npx tsc -b && npx vitest run test/bid-payload.test.ts",
-      "attempts": 5,
-      "spec": "Pure mapper from the CAD takeoff to the apps/autosprink bid-intake payload shape (the CAD->auto-bid bridge contract). Exports (exact): export interface TakeoffLine{kind:string;label:string;qty:number;unit:string;sizeIn?:number;material?:string} export interface BidPayloadItem{sku:string;description:string;quantity:number;unit:string} export interface BidPayload{projectName:string;source:'halofire-cad';generatedAt:string;items:BidPayloadItem[];disclaimer:string} export function toBidPayload(projectName:string, lines:TakeoffLine[], generatedAt:string):BidPayload \u2014 sku built as `${kind}:${sizeIn ?? 'na'}:${material ?? 'na'}` lowercased; description = label; quantity = qty rounded to 2 decimals; unit passes through; lines with qty<=0 are SKIPPED; disclaimer is a fixed string containing 'design aid' and 'not a committed bid'; throws on empty projectName or non-finite qty in any kept line; generatedAt passes through verbatim (caller supplies the timestamp \u2014 keep the function pure). Tests: two lines map with correct skus; zero-qty skipped; rounding 1.005->use toFixed semantics via Math.round(q*100)/100; throws on empty name and NaN qty; disclaimer contains both phrases; purity (input array untouched).",
-      "completed_at": "2026-06-11T05:05:34+00:00",
-      "commit": "e13fc49e"
-    },
-    {
-      "id": "W5D-head-clearance",
-      "title": "Commands > Analyze coverage \u2014 head-to-wall clearance checks (cited, pure)",
-      "status": "done",
-      "phase": "wave5",
-      "write_roots": [
-        "apps/cad/src/lib",
-        "apps/cad/test"
-      ],
-      "context_files": [],
-      "files_create": [
-        "apps/cad/src/lib/head-clearance.ts",
-        "apps/cad/test/head-clearance.test.ts"
-      ],
-      "gate": "cd apps/cad && npx tsc -b && npx vitest run test/head-clearance.test.ts",
-      "attempts": 0,
-      "spec": "NFPA-13-style head placement clearance checks as a pure module. Use EXACTLY these cited limits (standard spray, edition-dependent \u2014 every exported constant carries a citation string ending 'Verify adopted edition.'): max distance from wall = HALF the allowed head spacing for the hazard (use these spacings ft: LIGHT->15, ORDINARY_1->15, ORDINARY_2->15, EXTRA_1->12, EXTRA_2->12) and MIN distance from any wall = 4 INCHES (0.3333 ft). Exports (exact): export interface CitedNumber{value:number;citation:string} export const MAX_SPACING_FT: Record<'LIGHT'|'ORDINARY_1'|'ORDINARY_2'|'EXTRA_1'|'EXTRA_2',CitedNumber>; export const MIN_WALL_CLEARANCE_FT: CitedNumber (0.3333); export interface ClearanceIssue{headId:string;kind:'too-close-to-wall'|'too-far-from-wall';distanceFt:number;limitFt:number;citation:string} export function checkWallClearance(heads:Array<{id:string;x:number;z:number}>, wallSegments:Array<{x1:number;z1:number;x2:number;z2:number}>, hazard:'LIGHT'|'ORDINARY_1'|'ORDINARY_2'|'EXTRA_1'|'EXTRA_2'):ClearanceIssue[] \u2014 distance of each head to its NEAREST wall segment (point-to-segment 2D); too-close when < MIN_WALL_CLEARANCE_FT.value; too-far when > MAX_SPACING_FT[hazard].value/2; heads with NO walls produce no issues (honest skip); sorted by headId. Tests: head 0.2ft from a wall -> too-close (limit 0.3333); head 9ft from nearest wall in LIGHT (limit 7.5) -> too-far with distance ~9; compliant head (e.g. 5ft) -> no issue; empty walls -> no issues; citations all end with 'Verify adopted edition.'; sorted output.",
-      "note": "hand-built by Claude Tier-2 agent (commit 63d03c6), gates 549/549. Do not regenerate."
-    },
-    {
-      "id": "W6A-hanger-spacing",
-      "title": "Auto Draw > Hangers \u2014 NFPA hanger placement along pipe runs (cited, pure)",
-      "status": "done",
-      "phase": "wave6",
-      "write_roots": [
-        "apps/cad/src/lib",
-        "apps/cad/test"
-      ],
-      "context_files": [
-        "apps/cad/src/lib/model.ts"
-      ],
-      "files_create": [
-        "apps/cad/src/lib/hanger-spacing.ts",
-        "apps/cad/test/hanger-spacing.test.ts"
-      ],
-      "gate": "cd apps/cad && npx tsc -b && npx vitest run test/hanger-spacing.test.ts",
-      "attempts": 6,
-      "spec": "AutoSprink 'Hangers' auto-placement math as a pure module. Use EXACTLY these cited max hanger spacings for steel pipe (ft, NFPA-13 hanger table class \u2014 every exported constant carries a citation string ending 'Verify adopted edition.'): nominal 1->12, 1.25->12, 1.5->15, 2->15, 2.5->15, 3->15, 4->15, 6->15, 8->15; plus MAX unsupported end distance 3 ft from any pipe end. Exports (exact): export interface CitedNumber{value:number;citation:string} export const MAX_HANGER_SPACING_FT: Record<number,CitedNumber>; export const MAX_END_DISTANCE_FT: CitedNumber (3); export interface HangerPoint{segmentId:string;t:number;x:number;y:number;z:number} export function hangersForSegment(seg:{id:string;diameterIn:number;lengthFt:number}, a:{x:number;y:number;z:number}, b:{x:number;y:number;z:number}): HangerPoint[] \u2014 place hangers along the segment so that: first hanger within MAX_END_DISTANCE_FT of end a, last within MAX_END_DISTANCE_FT of end b, adjacent hangers <= MAX_HANGER_SPACING_FT[nearest defined nominal >= diameterIn, else 15]; use the MINIMUM count satisfying both, evenly spaced (equal gaps) between the first/last positions; segments shorter than 2*MAX_END_DISTANCE get exactly ONE hanger at t=0.5; positions linearly interpolated between a and b; throws on non-finite inputs or lengthFt<=0. Tests: a 30ft 2in run -> first/last within 3ft of ends, gaps <= 15ft, count minimal (3 hangers: t at 0.1, 0.5, 0.9 \u2014 verify gaps == (30-6)/2=12 <=15); a 4ft run -> single hanger t=0.5; spacing table lookup rounds UP to next defined nominal; citations end with 'Verify adopted edition.'; throws on lengthFt 0.",
-      "last_error": "src/lib/hanger-spacing.ts(1,1): error TS6133: 'Segment' is declared but its value is never read.\nsrc/lib/hanger-spacing.ts(113,25): error TS2304: Cannot find name 'Point3'.\nsrc/lib/hanger-spacing.ts(113,36): error TS2304: Cannot find name 'Point3'.\nsrc/lib/hanger-spacing.ts(113,56): error TS2304: Cannot find name 'Point3'.\ntest/hanger-spacing.test.ts(1,29): error TS6133: 'MAX_HANGER_SPACING_FT' is declared but its value is never read.\ntest/hanger-spacing.test.ts(1,52): error TS6133: 'MAX_END_DISTANCE_FT' is declared but its value is never read.\ntest/hanger-spacing.test.ts(36,19): error TS2304: Cannot find name 'findMaxHangerSpacing'.",
-      "note": "hand-built by Claude Tier-2 agent (commit 63d03c6), gates 549/549. Do not regenerate."
-    },
-    {
-      "id": "W6B-ceiling-grid",
-      "title": "Tools > Ceiling Grid \u2014 2x4 drop-ceiling grid lines for a room (pure)",
-      "status": "done",
-      "phase": "wave6",
-      "write_roots": [
-        "apps/cad/src/lib",
-        "apps/cad/test"
-      ],
-      "context_files": [],
-      "files_create": [
-        "apps/cad/src/lib/ceiling-grid.ts",
-        "apps/cad/test/ceiling-grid.test.ts"
-      ],
-      "gate": "cd apps/cad && npx tsc -b && npx vitest run test/ceiling-grid.test.ts",
-      "attempts": 6,
-      "spec": "AutoSprink 'Ceiling Grid' geometry as a pure module: standard 2ft x 4ft lay-in grid lines clipped to a rectangular room bbox (full polygon clipping documented as follow-up). Exports (exact): export interface Pt{x:number;y:number} export interface GridLine{x1:number;y1:number;x2:number;y2:number;dir:'x'|'y'} export interface CeilingGrid{lines:GridLine[];cellW:number;cellH:number;originX:number;originY:number} export function ceilingGridForBounds(minX:number,minY:number,maxX:number,maxY:number,opts?:{cellW?:number;cellH?:number;originX?:number;originY?:number}):CeilingGrid \u2014 cellW default 4, cellH default 2 (feet, standard 2x4 lay-in tile with long axis on x); grid origin defaults to (minX,minY); generate interior lines ONLY (no lines on the boundary itself): vertical ('y'-dir) lines at every cellW step strictly between minX and maxX spanning minY..maxY, horizontal ('x'-dir) lines at every cellH step strictly between minY and maxY spanning minX..maxX. Throws on non-finite or degenerate bounds (maxX<=minX etc.) or non-positive cells. export function polygonBounds(poly:Pt[]):{minX:number;minY:number;maxX:number;maxY:number} \u2014 throws on <3 points/non-finite. Tests: a 12x8 room with defaults -> vertical lines at x=+4,+8 (2 lines) and horizontal at y=+2,+4,+6 (3 lines), all spanning the bbox; custom origin shifts the phase; non-positive cell throws; degenerate bounds throws; polygonBounds of a triangle correct.",
-      "completed_at": "2026-06-11T06:12:10+00:00",
-      "commit": "8aeb4aec"
-    },
-    {
-      "id": "W7A-bid-classifier",
-      "title": "AutoBid > bid-invitation email classifier (pure heuristics)",
-      "status": "done",
-      "phase": "wave7-autobid",
-      "write_roots": [
-        "apps/autosprink/src",
-        "apps/autosprink/tests"
-      ],
-      "context_files": [],
-      "files_create": [
-        "apps/autosprink/src/autobid/bid-classifier.js",
-        "apps/autosprink/tests/autobid-classifier.test.js"
-      ],
-      "gate": "cd apps/autosprink && npx vitest run tests/autobid-classifier.test.js",
-      "attempts": 6,
-      "spec": "Pure ESM JavaScript module (apps/autosprink is type:module, plain JS, vitest). Classify an email as a likely bid invitation. Exports (exact): export function classifyBidEmail(email) where email = {subject:string, body:string, attachments:[{filename:string,sizeBytes:number}], from:string}. Returns {score:number (0..1), isLikelyBid:boolean (score>=0.5), reasons:string[]}. Scoring (additive, cap 1.0): +0.35 when subject/body matches /\b(invitation to bid|itb|rfp|request for proposal|bid request|bid invitation|tender)\b/i ('keyword'); +0.2 subject/body matches /\b(fire (sprinkler|protection|suppression)|nfpa|sprinkler)\b/i ('domain'); +0.25 any attachment filename matches /\\.(pdf|dwg|dxf)$/i ('plan-attachment'); +0.1 body matches /\b(due|deadline|bid date|proposals? due)\b/i ('deadline'); +0.1 from matches /\b(gc|construction|builders?|contracting|estimating)\b/i or body matches /general contractor/i ('sender-context'). Reasons list each matched criterion name. Pure; throws TypeError on missing subject/body strings or non-array attachments. Tests: a real-shaped ITB email (subject 'Invitation to Bid - Fire Sprinkler - Marriott TI', pdf attachment, deadline in body) scores >=0.8 with >=3 reasons; a newsletter scores <0.3 and isLikelyBid false; missing fields throw; attachment-only email gets exactly the plan-attachment reason; score caps at 1.0.",
-      "last_error": "Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'vitest' imported from /opt/hal9000/apps/halofire-studio/apps/autosprink/vitest.config.js.timestamp-1781159893829-def1f7555bd01.mjs",
-      "note": "landed by Claude AB2 workflow (commit 7aed36a): src/autobid/bid-classifier.js spec-exact (word boundaries enforced by adversarial verifier) + tests. Do not regenerate."
-    },
-    {
-      "id": "W7B-bid-html",
-      "title": "AutoBid > branded HTML bid document renderer (pure)",
-      "status": "done",
-      "phase": "wave7-autobid",
-      "write_roots": [
-        "apps/autosprink/src",
-        "apps/autosprink/tests"
-      ],
-      "context_files": [],
-      "files_create": [
-        "apps/autosprink/src/autobid/bid-html.js",
-        "apps/autosprink/tests/autobid-html.test.js"
-      ],
-      "gate": "cd apps/autosprink && npx vitest run tests/autobid-html.test.js",
-      "attempts": 6,
-      "spec": "Pure ESM JS renderer: bid record -> complete standalone HTML string (inline CSS, no external assets). Exports (exact): export function renderBidHtml(bid) where bid = {projectName, clientName, dateIso, items:[{description, quantity, unit, unitCost, extendedCost}], subtotal, overheadPct, profitPct, total, notes?, disclaimer}. Requirements: <!doctype html> document; header block with 'HALO FIRE PROTECTION' brand line + ember accent color #f0a868 used in inline styles; a line-item table (description/qty/unit/unit cost/extended) with right-aligned currency formatted via Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}); summary rows (subtotal, OH %, profit %, TOTAL bolded); notes paragraph when provided; the disclaimer VERBATIM in a visually distinct footer block; all user-provided strings HTML-ESCAPED (export function escapeHtml(s) \u2014 & < > \" ' \u2014 and use it on every interpolated field; test asserts <script> in a description renders escaped). Throws on: empty projectName/clientName, empty items, missing disclaimer, non-finite money fields. Tests: golden structural assertions (contains brand line, escaped script tag, currency '$1,234.50' formatting, disclaimer present, TOTAL row), throws cases.",
-      "last_error": "JSONDecodeError: Unterminated string starting at: line 1 column 71 (char 70)",
-      "note": "landed by Claude AB3-5 workflow (commit 0973420): src/autobid/bid-html.js spec-exact + 22 tests. Do not regenerate."
-    },
-    {
-      "id": "W7C-crm-status",
-      "title": "AutoBid > CRM bid status machine (pure)",
-      "status": "done",
-      "phase": "wave7-autobid",
-      "write_roots": [
-        "apps/autosprink/src",
-        "apps/autosprink/tests"
-      ],
-      "context_files": [],
-      "files_create": [
-        "apps/autosprink/src/autobid/crm-status.js",
-        "apps/autosprink/tests/autobid-status.test.js"
-      ],
-      "gate": "cd apps/autosprink && npx vitest run tests/autobid-status.test.js",
-      "attempts": 0,
-      "spec": "Pure ESM JS status machine for bid_requests. Exports (exact): export const BID_STATUSES = ['received','reviewing','estimating','bid_sent','won','lost']; export const ALLOWED_TRANSITIONS = { received:['reviewing'], reviewing:['estimating','lost'], estimating:['bid_sent','lost'], bid_sent:['won','lost'], won:[], lost:['reviewing'] } (lost->reviewing = reopen); export function canTransition(from,to) -> boolean (false for unknown states, never throws); export function applyTransition(record, to, atIso) where record={status, history:[{status,atIso}]} -> NEW record {status:to, history:[...history,{status:to,atIso}]} (pure, input untouched); throws Error('invalid transition <from> -> <to>') when not allowed, and TypeError on malformed record/missing atIso. export function timeInStatusMs(record, nowIso) -> ms since the LAST history entry (throws on empty history or invalid dates). Tests: full happy path received->...->won; reopen lost->reviewing allowed; won is terminal (no transitions); invalid jump received->bid_sent throws with the exact message; purity via structuredClone compare; timeInStatusMs computes from the last entry; malformed record throws TypeError.",
-      "note": "landed by Claude AB1 workflow (commit 646a3d4): src/autobid/crm-status.js + 15 spec tests + CRM API/board integration; gate green 36/36. Do not regenerate."
-    },
-    {
-      "id": "W8A-scale-notation",
-      "title": "Import > printed-scale notation parser (PDF-first)",
-      "status": "done",
-      "phase": "wave8-pdf",
-      "write_roots": [
-        "apps/cad/src/lib",
-        "apps/cad/test"
-      ],
-      "context_files": [],
-      "files_create": [
-        "apps/cad/src/lib/scale-notation.ts",
-        "apps/cad/test/scale-notation.test.ts"
-      ],
-      "gate": "cd apps/cad && npx tsc -b && npx vitest run test/scale-notation.test.ts",
-      "attempts": 6,
-      "spec": "Pure parser for architectural scale notations found in plan-sheet text. Exports (exact): export interface ParsedScale{ftPerInch:number;notation:string} export function parseScaleNotation(text:string):ParsedScale|null \u2014 recognize, case/space tolerant: (a) fractional inch = feet-inches form like 1/8\\\" = 1'-0\\\" or 3/32\\\"=1'-0\\\" or 1/4 in = 1 ft -> ftPerInch = feet / inches (e.g. 1/8\\\"=1' -> 8 ft per inch); (b) whole/decimal inch forms like 1\\\" = 40' (civil) -> 40; (c) ratio form 1:96 -> 96/12 = 8 ft per inch. Return null (never throw) when no notation matches; when multiple notations appear use the FIRST. notation = the matched substring verbatim. export function ftPerUnitFromPdfPoints(ftPerInch:number):number \u2014 PDF user units are points (72/inch): ftPerInch/72; throws on non-finite/non-positive. Tests: '1/8\\\" = 1'-0\\\"' -> 8; '3/32\\\"=1'-0\\\"' -> 32/3 (toBeCloseTo); '1/4 IN = 1 FT' -> 4; '1\\\" = 40'' -> 40; '1:96' -> 8; 'SCALE: AS NOTED' -> null; first-match-wins with two notations; ftPerUnitFromPdfPoints(8) -> 8/72 (toBeCloseTo 6); throws on 0.",
-      "last_error": "src/lib/scale-notation.ts(7,22): error TS1127: Invalid character.\nsrc/lib/scale-notation.ts(7,23): error TS1134: Variable declaration expected.\nsrc/lib/scale-notation.ts(7,24): error TS1109: Expression expected.\nsrc/lib/scale-notation.ts(7,25): error TS1109: Expression expected.\nsrc/lib/scale-notation.ts(7,33): error TS1127: Invalid character.\nsrc/lib/scale-notation.ts(7,47): error TS1127: Invalid character.\nsrc/lib/scale-notation.ts(7,49): error TS1005: ';' expected.\nsrc/lib/scale-notation.ts(7,84): error TS1002: Unterminated string literal.\nsrc/lib/scale-notation.ts(16,19): error TS1005: ')' expected.\nsrc/lib/scale-notation.ts(16,30): error TS1005: ';' expected.\nsrc/lib/scale-notation.ts(16,48): error TS1005: ';' expected.\nsrc/lib/scale-notation.ts(21,3): error TS1128: Declaration or statement expected.",
-      "note": "hand-built by Claude Tier-2 agent (commit e2ae29f), 572/572. Quote chars via unicode escapes. Do not regenerate."
-    },
-    {
-      "id": "W8B-sheet-classify",
-      "title": "Import > plan-set sheet triage by title text (PDF-first)",
-      "status": "done",
-      "phase": "wave8-pdf",
-      "write_roots": [
-        "apps/cad/src/lib",
-        "apps/cad/test"
-      ],
-      "context_files": [],
-      "files_create": [
-        "apps/cad/src/lib/sheet-classify.ts",
-        "apps/cad/test/sheet-classify.test.ts"
-      ],
-      "gate": "cd apps/cad && npx tsc -b && npx vitest run test/sheet-classify.test.ts",
-      "attempts": 6,
-      "spec": "Pure classifier for plan-set pages from their extracted text. Exports (exact): export type SheetKind='floor-plan'|'fire-protection'|'detail'|'schedule'|'title'|'other' export interface SheetInfo{kind:SheetKind;score:number;floor:number|null;sheetNo:string|null} export function classifySheet(pageText:string):SheetInfo \u2014 signals (case-insensitive): fire-protection when /\b(FP-?\\d|FIRE (PROTECTION|SPRINKLER)|SPRINKLER PLAN)\b/ (score .9); floor-plan when /\b(FLOOR PLAN|\bA-?1\\d{2}\b|LEVEL \\d+ PLAN)\b/ (.8); schedule when /\bSCHEDULE\b/ (.7); detail when /\b(DETAILS?|SECTIONS?)\b/ (.6); title when /\b(COVER|TITLE SHEET|SHEET INDEX|DRAWING INDEX)\b/ (.8); precedence by the listed order when multiple match (fire-protection wins); 'other' score 0 when none. floor: parse from /\b(\\d+)(ST|ND|RD|TH)? FLOOR\b/ or /\bLEVEL (\\d+)\b/ else null. sheetNo: first match of /\b([A-Z]{1,2}-?\\d{1,3}(?:\\.\\d{1,2})?)\b/ on a line also containing /sheet|dwg|no\\.?/i, else first standalone token matching the same pattern near 'SHEET', else null \u2014 keep this heuristic SIMPLE and documented. Throws TypeError on non-string input. Tests: 'SECOND FLOOR PLAN  A-102' -> floor-plan, floor 2; 'FP-3 FIRE SPRINKLER PLAN LEVEL 3' -> fire-protection, floor 3; 'DOOR SCHEDULE' -> schedule; 'COVER SHEET / SHEET INDEX' -> title; lorem text -> other score 0; precedence fire-protection over floor-plan when both present; non-string throws.",
-      "last_error": "src/lib/sheet-classify.ts(70,1): error TS1005: '}' expected.\n\n",
-      "note": "hand-built by Claude Tier-2 agent (commit e2ae29f), 572/572. Quote chars via unicode escapes. Do not regenerate."
-    },
-    {
-      "id": "W9A-riser-inference",
-      "title": "CAD > infer riser + flow topology on imported kernel networks (pure)",
-      "status": "done",
-      "phase": "wave9-fidelity",
-      "write_roots": [
-        "apps/cad/src",
-        "apps/cad/test"
-      ],
-      "context_files": [
-        "apps/cad/src/lib/flow-calculator.ts"
-      ],
-      "files_create": [
-        "apps/cad/src/lib/riser-inference.ts",
-        "apps/cad/test/riser-inference.test.ts"
-      ],
-      "gate": "cd apps/cad && npx vitest run test/riser-inference.test.ts",
-      "attempts": 6,
-      "spec": "Pure strict-TS module. Imported DXF kernel networks have nodes (id, type HEAD or other, pos {x,y} ft) and segments (id, from, to, diameterIn, lengthFt) but no riser or flow direction, so hydraulics cannot solve them. Exports (exact): export interface RiserCandidate { nodeId: string; score: number; reasons: string[] }. export function inferRiser(nodes, segments): RiserCandidate -- scores every non-HEAD node: +0.4 if it touches the segment with the maximum diameterIn in the network (reason max-diameter); +0.3 if its degree (count of incident segments) is in the top decile (reason high-degree); +0.3 if it is within 10 percent of the network bounding-box perimeter edge, i.e. near an exterior wall where risers live (reason perimeter). Returns the highest score; ties break by lowest nodeId lexicographically. Throws Error with message no non-head nodes when every node is HEAD or lists empty. export function orientFlow(nodes, segments, riserId): Map<string,{from:string,to:string}> -- BFS from riserId across segments treating them undirected, re-orient each segment so from is the node closer (in hops) to the riser; unreachable segments are EXCLUDED from the map (honest partial result, never fabricated). export function solvableFraction(segments, oriented: Map): number 0..1 = oriented.size/segments.length (0 when no segments). Tests: a hand-built 6-node tree with one fat 4in segment at the root picks that node with max-diameter reason; orientFlow on the tree points every from toward the riser side; a disconnected island is excluded and solvableFraction reflects it; all-HEAD network throws; tie-break determinism asserted. HINT after blocked run: write tests so no two candidates tie on score unless the test is the explicit tie-break test (give the tie-break test two identical isolated nodes named alpha and beta so alpha wins). The perimeter criterion: a node is near-perimeter when its distance to the bounding box edge is at most 10 percent of the box diagonal. solvableFraction returns a plain ratio like 0.5, not rounded values.",
-      "last_error": "JSONDecodeError: Expecting ',' delimiter: line 1 column 4672 (char 4671)",
-      "note": "hand-built by Claude Tier-2 (commit 3ec1eb4), 593/593. Do not regenerate."
-    },
-    {
-      "id": "W9B-pdf-line-cluster",
-      "title": "CAD > cluster colinear PDF vector segments into wall-candidate runs (pure)",
-      "status": "done",
-      "phase": "wave9-pdf-first",
-      "write_roots": [
-        "apps/cad/src",
-        "apps/cad/test"
-      ],
-      "context_files": [
-        "apps/cad/src/lib/wall-extract-score.ts"
-      ],
-      "files_create": [
-        "apps/cad/src/lib/pdf-line-cluster.ts",
-        "apps/cad/test/pdf-line-cluster.test.ts"
-      ],
-      "gate": "cd apps/cad && npx vitest run test/pdf-line-cluster.test.ts",
-      "attempts": 6,
-      "spec": "Pure strict-TS module. PDF vector extraction yields thousands of tiny colinear strokes that must merge into wall-candidate runs before scoring (wall-extract-score). Exports (exact): export interface RawStroke { a:{x:number,y:number}; b:{x:number,y:number}; widthPt:number }. export interface ClusteredRun { a:{x:number,y:number}; b:{x:number,y:number}; widthPt:number; sourceCount:number }. export function clusterColinear(strokes: RawStroke[], opts?: {angleTolDeg?: number; gapTolPt?: number; offsetTolPt?: number}): ClusteredRun[] with defaults angleTolDeg 2, gapTolPt 3, offsetTolPt 1.5. Algorithm: group strokes whose direction angles differ by at most angleTolDeg (mod 180), whose perpendicular offset from a shared infinite line is at most offsetTolPt, and whose projected 1D intervals on that line overlap or have gaps at most gapTolPt; each group merges into one run spanning min..max projection, widthPt = max member width, sourceCount = member count. Zero-length strokes (a equals b within 1e-9) are dropped before clustering. Output sorted by run length descending then a.x then a.y ascending. Pure, no mutation of inputs. Tests: three collinear horizontal strokes with 2pt gaps merge into one run with sourceCount 3 spanning the full extent; a parallel stroke offset 5pt does NOT merge; a perpendicular stroke never merges; angle within tolerance (1 degree skew) merges; zero-length strokes dropped; empty input returns empty array; determinism of sort order asserted. HINT after blocked run: implement projection-interval merging carefully \u2014 sort member strokes by projected start before merging; two strokes with a 2pt gap and gapTolPt 3 MUST merge. Build test strokes axis-aligned with simple integer coordinates so expectations are exact.",
-      "last_error": "0 }, \u2026(3) } ] to deeply equal [ { a: { x: +0, y: +0 }, \u2026(3) }, \u2026(1) ]\n FAIL  test/pdf-line-cluster.test.ts > clusterColinear > merges three collinear horizontal strokes with 2pt gaps\nAssertionError: expected [ { a: { x: +0, y: +0 }, \u2026(3) } ] to deeply equal [ { a: { x: +0, y: +0 }, \u2026(3) } ]\n- Expected\n+ Received\n     23|         expect(result).toEqual([\n FAIL  test/pdf-line-cluster.test.ts > clusterColinear > does not merge a parallel stroke offset 5pt\nAssertionError: expected [ { a: { x: +0, y: +0 }, \u2026(3) }, \u2026(1) ] to deeply equal [ { a: { x: +0, y: +0 }, \u2026(3) }, \u2026(1) ]\n- Expected\n+ Received\n     39|         expect(result).toEqual([\n FAIL  test/pdf-line-cluster.test.ts > clusterColinear > does not merge a perpendicular stroke\nAssertionError: expected [ { a: { x: +0, y: +0 }, \u2026(3) }, \u2026(1) ] to deeply equal [ { a: { x: +0, y: +0 }, \u2026(3) }, \u2026(1) ]\n- Expected\n+ Received\n     51|         expect(result).toEqual([\n FAIL  test/pdf-line-cluster.test.ts > clusterColinear > merges strokes with 1 degree angle skew\nAssertionError: expected [ Array(2) ] to deeply equal [ { a: { x: +0, y: +0 }, \u2026(3) } ]\n- Expected\n+ Received\n     63|         expect(result).toEqual([\n FAIL  test/pdf-line-cluster.test.ts > clusterColinear > sorts runs by length descending, then a.x, then a.y\nAssertionError: expected [ { a: { x: +0, y: +0 }, \u2026(3) }, \u2026(1) ] to deeply equal [ { a: { x: +0, y: +0 }, \u2026(3) }, \u2026(2) ]\n- Expected\n+ Received\n     84|         expect(result).toEqual([\n FAIL  test/pdf-line-cluster.test.ts > clusterColinear > merges strokes with gapTolPt 3\nAssertionError: expected [ { a: { x: +0, y: +0 }, \u2026(3) } ] to deeply equal [ { a: { x: +0, y: +0 }, \u2026(3) } ]\n- Expected\n+ Received\n     97|         expect(result).toEqual([\n FAIL  test/pdf-line-cluster.test.ts > clusterColinear > does not merge strokes with gapTolPt 2\nAssertionError: expected [ { a: { x: +0, y: +0 }, \u2026(3) } ] to deeply equal [ { a: { x: +0, y: +0 }, \u2026(3) }, \u2026(1) ]\n- Expected\n+ Received\n    113|         expect(result).toEqual([",
-      "note": "hand-built by Claude Tier-2 (commit 3ec1eb4), 593/593. Do not regenerate."
-    },
-    {
-      "id": "W10A-scale-prefill",
-      "title": "CAD UI > prefill Set Scale from printed scale text on PDF import",
-      "status": "done",
-      "phase": "wave10-ui-integration",
-      "write_roots": [
-        "apps/cad/src",
-        "apps/cad/test"
-      ],
-      "context_files": [
-        "apps/cad/src/lib/scale-notation.ts",
-        "apps/cad/src/components/TopRibbon.tsx"
-      ],
-      "files_create": [],
-      "gate": "cd apps/cad && npx vitest run test/scale-prefill.test.ts",
-      "attempts": 5,
-      "spec": "Integration with a pure core. Create apps/cad/src/lib/scale-prefill.ts exporting prefillScaleFromText(pageTexts: string[]): { ftPerUnit: number; sourceText: string; pageIndex: number } | null \u2014 runs parseScaleNotation (existing lib scale-notation) over each page text in order, returns the first hit converted via ftPerUnitFromPdfPoints plus the matched source text and page index, null when no page parses. Create apps/cad/test/scale-prefill.test.ts covering: first-page hit wins, later-page fallback, no-match null, the eighth-inch example mapping to 8 ftPerInch over 72. Then wire it into the existing PDF import path so the import flow stores the suggestion on the project import state where the Set Scale tool reads its default \u2014 find the import handler that already receives pdf text content; if page text is not currently extracted, add extraction via the pdfjs text content API in the existing import module. The suggestion must be OPERATOR-CONFIRMED: it pre-fills the scale input only, never silently applies. Add no new deps.",
-      "completed_at": "2026-06-11T09:03:19+00:00",
-      "commit": "409498c0"
-    },
-    {
-      "id": "W10B-hanger-grid-3d",
-      "title": "CAD 3D > render hangers and ceiling grids in Viewer3D behind toggles",
-      "status": "done",
-      "phase": "wave10-ui-integration",
-      "write_roots": [
-        "apps/cad/src",
-        "apps/cad/test"
-      ],
-      "context_files": [
-        "apps/cad/src/lib/hanger-spacing.ts",
-        "apps/cad/src/lib/ceiling-grid.ts",
-        "apps/cad/src/components/Viewer3D.tsx",
-        "apps/cad/test/scene-invariants.test.ts"
-      ],
-      "files_create": [],
-      "gate": "cd apps/cad && npx vitest run test/hanger-grid-3d.test.ts",
-      "attempts": 1,
-      "spec": "Integration. Add two store toggles showHangers and showCeilingGrid (default false) following the existing pressureHeatmap toggle pattern in store.ts and the View controls. In Viewer3D: when showHangers is on, compute hanger positions per segment via the existing hanger-spacing lib (placeHangers or the exported placement function \u2014 read the lib for exact name) and render small cylinder drops from each hanger point up to the ceiling height of the enclosing room (or default ceiling) \u2014 thin cylinders radius 0.02 ft, steel gray. When showCeilingGrid is on, render grid lines per room via the existing ceiling-grid lib at the room ceiling height as thin line segments. Extend the window.__cadVerify3D published object with hangerCount and gridSegmentCount numbers (0 when toggles off). Create apps/cad/test/hanger-grid-3d.test.ts: pure tests asserting the position computation helpers you extract (put them in apps/cad/src/lib/hanger-3d.ts and grid-3d.ts as pure functions returning arrays of positions/segments from network+building inputs) \u2014 counts match the libs spacing rules for a hand-built 30 ft run (3 hangers) and a 20x10 room grid. React rendering itself is verified by the numeric __cadVerify3D fields, not jsdom. HINT after blocked run: read apps/cad/src/lib/hanger-spacing.ts FIRST and call its actual exported function with its actual signature \u2014 do not invent a signature. A 30 ft run of 1.5 inch pipe has max spacing 15 and max end distance 3, so expect hangers at positions consistent with that lib output, not hardcoded guesses.",
-      "completed_at": "2026-06-11T11:01:46+00:00",
-      "commit": "a94e0ae6"
-    },
-    {
-      "id": "W10C-clearance-overlay",
-      "title": "CAD 2D > head-clearance issue overlay in PlanCanvas",
-      "status": "done",
-      "phase": "wave10-ui-integration",
-      "write_roots": [
-        "apps/cad/src",
-        "apps/cad/test"
-      ],
-      "context_files": [
-        "apps/cad/src/lib/head-clearance.ts",
-        "apps/cad/src/components/PlanCanvas.tsx"
-      ],
-      "files_create": [],
-      "gate": "cd apps/cad && npx vitest run test/clearance-overlay.test.ts",
-      "attempts": 6,
-      "spec": "Integration with a pure core. Create apps/cad/src/lib/clearance-overlay.ts exporting issueMarkers(building, network, hazardClass): Array of { headId: string; x: number; y: number; kind: string; message: string } by running the existing head-clearance check (read the lib for exact export) over all heads against room walls and mapping each issue to its head position with a short human message including the cited limit text. Create apps/cad/test/clearance-overlay.test.ts: a head 0.2 ft from a wall yields a too-close marker with the citation hedge text present; a compliant head yields none; empty walls yields empty (honest skip). Then render markers in PlanCanvas when a new store toggle showClearanceIssues is on (default false, View controls pattern): amber warning circles radius 6 screen px at head positions with a tooltip-on-hover title. Keep all geometry math in the pure lib. HINT after blocked run: read apps/cad/src/lib/head-clearance.ts FIRST and use its real exported names and issue object shape; map issues to markers without renaming fields. Keep PlanCanvas changes minimal: one toggle, one marker layer.",
-      "last_error": "     \u2192 expected [ { headId: 'h1', x: +0, \u2026(3) }, \u2026(1) ] to have a length of 1 but got 2\n FAIL  test/clearance-overlay.test.ts > issueMarkers > marks too-close heads with citation\nAssertionError: expected [ { headId: 'h1', x: +0, \u2026(3) }, \u2026(1) ] to have a length of 1 but got 2\n- Expected\n+ Received\n     12|         expect(markers[0].kind).toBe('too-close');",
-      "note": "hand-built by Claude Tier-2 (commit 611ec4c), 600/600. Do not regenerate."
-    },
-    {
-      "id": "W11A-kernel-heat-riser",
-      "title": "CAD 3D > auto-infer riser on kernel imports so the pressure heatmap lights up",
-      "status": "done",
-      "phase": "wave11-integration",
-      "write_roots": [
-        "apps/cad/src",
-        "apps/cad/test"
-      ],
-      "context_files": [
-        "apps/cad/src/lib/riser-inference.ts",
-        "apps/cad/src/components/Viewer3D.tsx",
-        "apps/cad/src/store.ts"
-      ],
-      "files_create": [],
-      "gate": "cd apps/cad && npx vitest run test/kernel-heat-riser.test.ts",
-      "attempts": 2,
-      "spec": "Integration with a pure core. Create apps/cad/src/lib/kernel-heat-riser.ts exporting inferKernelTopology(nodes, segments) returning an object with riserId string, oriented Map of segment id to from-to pairs, and fraction number \u2014 a thin composition of inferRiser, orientFlow and solvableFraction from the existing riser-inference lib; returns null instead of throwing when inferRiser throws (no non-head nodes). Create test/kernel-heat-riser.test.ts: a small tree yields non-null with fraction 1; an all-HEAD input yields null. Then in the Viewer3D heat memo: when the existing solver result produces no pressure spread AND the network has segments, call inferKernelTopology and, when non-null and fraction is at least 0.5, re-run the solver with the inferred riser as the supply point so imported kernel networks show the fluid pressure gradient; publish riserInferred boolean and riserNodeId on the window.__cadVerify3D object (false and null when not used). HONESTY: when fraction is below 0.5 do nothing (partial mats stay dark rather than showing fabricated pressures) and never override an operator-set supplyPoint.",
-      "completed_at": "2026-06-11T12:32:31+00:00",
-      "commit": "74743fad"
-    },
-    {
-      "id": "W11B-pdf-trace-assist",
-      "title": "CAD import > suggest wall candidates from PDF linework (assisted trace)",
-      "status": "done",
-      "phase": "wave11-integration",
-      "write_roots": [
-        "apps/cad/src",
-        "apps/cad/test"
-      ],
-      "context_files": [
-        "apps/cad/src/lib/pdf-line-cluster.ts",
-        "apps/cad/src/lib/wall-extract-score.ts"
-      ],
-      "files_create": [],
-      "gate": "cd apps/cad && npx vitest run test/pdf-trace-assist.test.ts",
-      "attempts": 6,
-      "spec": "Integration with a pure core. Create apps/cad/src/lib/pdf-trace-assist.ts exporting suggestWalls(strokes, scaleFtPerPt, opts optional) returning Array of { a, b, scoreInfo } \u2014 pipeline: clusterColinear from pdf-line-cluster, convert runs to the input shape wall-extract-score expects, score with scoreWallCandidates and dominantStrokeWidth from that lib, keep only candidates whose score is at least 0.6 (opts.minScore overrides), convert PDF points to feet with scaleFtPerPt, sorted by score descending. Returns empty array on empty input (never throws on it). Create test/pdf-trace-assist.test.ts: a synthetic page with two long thick parallel strokes plus short thin noise yields exactly the two wall suggestions in feet; empty input yields empty; minScore override filters. These suggestions are OPERATOR-CONFIRMED proposals for the trace tool, never auto-committed walls \u2014 say so in the module doc comment. HINT after blocked run: every files entry path MUST start with apps/cad/ \u2014 emit apps/cad/src/lib/pdf-trace-assist.ts and apps/cad/test/pdf-trace-assist.test.ts, never bare src/ or test/ paths.",
-      "last_error": "     \u2192 expected [] to have a length of 2 but got +0\n     \u2192 expected [ { a: { x: NaN, y: NaN }, \u2026(2) } ] to have a length of +0 but got 1\n FAIL  test/pdf-trace-assist.test.ts > pdf-trace-assist > suggestWalls > suggests two wall candidates from synthetic input (thick parallel lines + noise)\nAssertionError: expected [] to have a length of 2 but got +0\n- Expected\n+ Received\n FAIL  test/pdf-trace-assist.test.ts > pdf-trace-assist > suggestWalls > filters by minScore override\nAssertionError: expected [ { a: { x: NaN, y: NaN }, \u2026(2) } ] to have a length of +0 but got 1\n- Expected\n+ Received",
-      "note": "hand-built by Claude Tier-2 (commit 459b1b0). Do not regenerate."
-    },
-    {
-      "id": "W12A-followup-badges",
-      "title": "CRM board > follow-up due badges + days-out sorting (pure helper)",
-      "status": "blocked",
-      "phase": "wave12",
-      "write_roots": [
-        "apps/cad/src",
-        "apps/cad/test",
-        "apps/autosprink/src",
-        "apps/autosprink/tests"
-      ],
-      "context_files": [
-        "apps/autosprink/src/autobid/followups.js",
-        "apps/autosprink/crm.html"
-      ],
-      "files_create": [],
-      "gate": "cd apps/autosprink && npx vitest run tests/autobid-followup-badges.test.js",
-      "attempts": 6,
-      "spec": "Pure ESM helper apps/autosprink/src/autobid/followup-badges.js exporting badgeForBid(bid, nowIso, thresholdDays) returning null when bid status is not bid_sent, otherwise an object with daysOut number (whole days since the last status_history entry timestamp) and level string: ok when daysOut below thresholdDays, due when at or above thresholdDays, overdue when at or above twice thresholdDays. Throws TypeError on missing nowIso or malformed bid. Also export sortByUrgency(bids, nowIso, thresholdDays) returning a NEW array sorted overdue first then due then ok then non-bid_sent, ties by daysOut descending. Test file apps/autosprink/tests/autobid-followup-badges.test.js covers all levels, null for won bids, purity, TypeError cases. Then in crm.html render the badge text and color (ok muted, due ember, overdue red) on bid_sent cards using the helper logic mirrored client-side (the page already loads ESM from /src \u2014 import the module directly, do not duplicate constants). HINT after blocked run: your JSON emission broke mid-file \u2014 keep each file under 120 lines, no markdown fences inside content strings, and escape every backslash and double quote in JS strings properly.",
-      "last_error": "HTTPError: HTTP Error 500: Internal Server Error"
-    },
-    {
-      "id": "W12B-takeoff-rollup",
-      "title": "CAD > BOM rollup summary for the bid payload (pure)",
-      "status": "done",
-      "phase": "wave12",
-      "write_roots": [
-        "apps/cad/src",
-        "apps/cad/test",
-        "apps/autosprink/src",
-        "apps/autosprink/tests"
-      ],
-      "context_files": [
-        "apps/cad/src/lib/bid-payload.ts"
-      ],
-      "files_create": [],
-      "gate": "cd apps/cad && npx vitest run test/takeoff-rollup.test.ts",
-      "attempts": 5,
-      "spec": "Pure strict-TS module apps/cad/src/lib/takeoff-rollup.ts exporting rollupTakeoff(payload) where payload is the existing toBidPayload output (read apps/cad/src/lib/bid-payload.ts FIRST and use its exported types). Returns { totalHeads: number; totalPipeLengthFt: number; pipeByDiameter: Array of { diameterIn: number; lengthFt: number; count: number } sorted by diameterIn ascending; fittingCounts: Array of { kind: string; count: number } sorted by kind ascending }. Lengths rounded to 2 decimals. Empty payload sections yield zeros and empty arrays, never throws on a structurally valid payload. Test file apps/cad/test/takeoff-rollup.test.ts: hand-built payload with two diameters verifies grouping math, rounding, sort order, and the empty-payload case. Files MUST be at apps/cad/src/lib/takeoff-rollup.ts and apps/cad/test/takeoff-rollup.test.ts. HINT after blocked run: READ apps/cad/src/lib/bid-payload.ts first and use its REAL exported type names and field names for the payload \u2014 do not invent fields; your test expectations must be computed from the same hand-built payload literal, and rounding is to 2 decimals via Math.round times 100 over 100.",
-      "completed_at": "2026-06-11T15:46:06+00:00",
-      "commit": "51206c93"
-    },
-    {
-      "id": "W13A-scad-emitters",
-      "title": "Parts > parametric OpenSCAD source emitters for pipe fittings (pure)",
-      "status": "blocked",
-      "phase": "wave13-parts",
-      "write_roots": [
-        "apps/cad/src",
-        "apps/cad/test",
-        "apps/cad/scripts"
-      ],
-      "context_files": [
-        "docs/research/openscad-parts-pipeline.md"
-      ],
-      "files_create": [],
-      "gate": "cd apps/cad && npx vitest run test/scad-emitters.test.ts",
-      "attempts": 6,
-      "spec": "Pure strict-TS module apps/cad/src/lib/scad-emitters.ts. Exports: emitPipe(opts with nominalIn, lengthIn, odIn, wallIn), emitElbow90(opts with nominalIn, odIn, centerToEndIn), emitTee(opts with nominalIn, odIn, centerToEndIn, branchCenterToEndIn), emitCoupling(opts with nominalIn, odIn, lengthIn). Each returns a complete OpenSCAD source STRING: a leading comment line stating dimensioned parametric, not manufacturer-exact, then $fn=64; then solid geometry built from cylinder, rotate, translate, difference (hollow bores where wall thickness given). All dims in the emitted source are millimeters converted from inches times 25.4 with 3 decimals. Every emitter throws RangeError on non-finite or non-positive dims and Error when odIn is not greater than 2 times wallIn for pipe. Deterministic output (no randomness). Test file apps/cad/test/scad-emitters.test.ts: each emitter output contains its expected module call tokens (cylinder, difference for hollow parts), the honesty comment, balanced braces and parens counts, correct mm conversion for one known value, and the throw cases. Files MUST be at apps/cad/src/lib/scad-emitters.ts and apps/cad/test/scad-emitters.test.ts.",
-      "last_error": "     \u2192 expected '// Dimensioned parametric, not manufa\u2026' to contain 'cylinder(h=50.8, r=38.1, center=true);'\n     \u2192 expected '// Dimensioned parametric, not manufa\u2026' to contain 'cylinder(h=76.2, r=25.4, center=true);'\n     \u2192 expected '// Dimensioned parametric, not manufa\u2026' to contain 'cylinder(h=152.4, r=25.4, center=true\u2026'\n     \u2192 expected '// Dimensioned parametric, not manufa\u2026' to contain 'cylinder(h=76.2, r=25.4, center=true);'\n FAIL  test/scad-emitters.test.ts > emitPipe > generates valid OpenSCAD code with difference for hollow part\nAssertionError: expected '// Dimensioned parametric, not manufa\u2026' to contain 'cylinder(h=50.8, r=38.1, center=true);'\n- Expected\n+ Received\n FAIL  test/scad-emitters.test.ts > emitElbow90 > generates valid OpenSCAD code with rotate and cylinder\nAssertionError: expected '// Dimensioned parametric, not manufa\u2026' to contain 'cylinder(h=76.2, r=25.4, center=true);'\n- Expected\n+ Received\n FAIL  test/scad-emitters.test.ts > emitTee > generates valid OpenSCAD code with union and difference for hollow part\nAssertionError: expected '// Dimensioned parametric, not manufa\u2026' to contain 'cylinder(h=152.4, r=25.4, center=true\u2026'\n- Expected\n+ Received\n FAIL  test/scad-emitters.test.ts > emitCoupling > generates valid OpenSCAD code with difference for hollow part\nAssertionError: expected '// Dimensioned parametric, not manufa\u2026' to contain 'cylinder(h=76.2, r=25.4, center=true);'\n- Expected\n+ Received"
-    },
-    {
-      "id": "W13B-scad-render-harness",
-      "title": "Parts > headless OpenSCAD STL render harness with honest failure",
-      "status": "pending",
-      "phase": "wave13-parts",
-      "write_roots": [
-        "apps/cad/src",
-        "apps/cad/test",
-        "apps/cad/scripts"
-      ],
-      "context_files": [
-        "apps/cad/src/lib/scad-emitters.ts",
-        "docs/research/openscad-parts-pipeline.md"
-      ],
-      "files_create": [],
-      "gate": "cd apps/cad && npx vitest run test/scad-render.test.ts",
-      "attempts": 0,
-      "spec": "Node harness apps/cad/scripts/render-scad.mjs exporting renderScadToStl(scadSource, outPath) async: resolves the binary from env OPENSCAD_BIN, else openscad on PATH, else the well-known Windows path C colon backslash Program Files backslash OpenSCAD backslash openscad.exe; writes scadSource to a temp .scad file, spawns the binary with -o outPath, awaits exit; SUCCESS only when exit code 0 AND outPath exists AND size greater than 84 bytes (binary STL header); on any failure throws an Error carrying the captured stderr tail \u2014 never returns a fake success. Also export stlTriangleCount(buffer) reading the little-endian uint32 at byte offset 80 of a binary STL. Test file apps/cad/test/scad-render.test.ts: renders emitElbow90 from the existing scad-emitters lib to a temp dir, asserts triangle count greater than 0; asserts a syntactically broken scad source rejects with stderr in the message; skips cleanly with it.skip semantics ONLY when no binary resolves (CI without openscad) by probing first and logging one line. Files MUST be at apps/cad/scripts/render-scad.mjs and apps/cad/test/scad-render.test.ts."
-    }
-  ]
+ "doc": "HaloFire agent-loop backlog. Tasks come from docs/research/autosprink-tool-parity-plan.md (real mepcad.com AutoSprink 2018 docs). Each task = ONE pure module + tests, gated by tsc + vitest. Status: pending | in_progress | done | blocked. UI/store integration of landed modules is tracked separately (Claude integration passes) \u2014 a 'done' here is NOT a parity/AHJ/PE claim.",
+ "tasks": [
+  {
+   "id": "H6-flow-calculator",
+   "title": "Hydraulics > Flow Calculator (Q = K\u221aP solver)",
+   "status": "done",
+   "phase": 4,
+   "write_roots": [
+    "apps/cad/src/lib",
+    "apps/cad/test"
+   ],
+   "context_files": [
+    "apps/cad/src/lib/nfpa13-rules.ts"
+   ],
+   "files_create": [
+    "apps/cad/src/lib/flow-calculator.ts",
+    "apps/cad/test/flow-calculator.test.ts"
+   ],
+   "gate": "cd apps/cad && npx tsc -b && npx vitest run test/flow-calculator.test.ts",
+   "spec": "Implement the AutoSprink 'Flow Calculator' (Hydraulics menu): given any TWO of {flow Q (gpm), K-factor (gpm/psi^0.5), pressure P (psi)}, derive the third using the cited sprinkler discharge formula Q = K * sqrt(P).\n\nExports (exact):\n- export interface FlowCalcInput { flowGpm?: number; kFactor?: number; pressurePsi?: number; }\n- export interface FlowCalcResult { flowGpm: number; kFactor: number; pressurePsi: number; solvedFor: 'flowGpm' | 'kFactor' | 'pressurePsi'; formula: 'Q = K * sqrt(P)'; }\n- export function solveFlow(input: FlowCalcInput): FlowCalcResult \u2014 throws an Error with a clear message when fewer or more than exactly 2 fields are given, when any given value is not a finite positive number, or when pressure must be derived from K=0.\n\nMath: flow = K*sqrt(P); K = Q/sqrt(P); P = (Q/K)^2.\nTests must cover: solve each of the 3 unknowns with K=5.6, P=25 -> Q=28 exactly; round-trip consistency; each error case (0 fields, 1 field, 3 fields, negative/zero/NaN values).",
+   "commit": "55a9472"
+  },
+  {
+   "id": "H17-pipe-volume",
+   "title": "Hydraulics > Show Pipe Volumes",
+   "status": "done",
+   "phase": 4,
+   "write_roots": [
+    "apps/cad/src/lib",
+    "apps/cad/test"
+   ],
+   "context_files": [
+    "apps/cad/src/lib/model.ts"
+   ],
+   "files_create": [
+    "apps/cad/src/lib/pipe-volume.ts",
+    "apps/cad/test/pipe-volume.test.ts"
+   ],
+   "gate": "cd apps/cad && npx tsc -b && npx vitest run test/pipe-volume.test.ts",
+   "spec": "Implement the AutoSprink 'Show Pipe Volumes' calculation: water volume of pipe segments from internal diameter and length.\n\nUse EXACTLY these internal diameters (inches), from ANSI/ASME B36.10M steel pipe tables (verify against adopted edition before regulated use):\nSCH40: 0.5->0.622, 0.75->0.824, 1->1.049, 1.25->1.380, 1.5->1.610, 2->2.067, 2.5->2.469, 3->3.068, 4->4.026, 6->6.065, 8->7.981\nSCH10: 1->1.097, 1.25->1.442, 1.5->1.682, 2->2.157, 2.5->2.635, 3->3.260, 4->4.260, 6->6.357, 8->8.329\nGallons per cubic foot: 7.48052.\n\nExports (exact):\n- export function internalDiameterIn(material: 'STEEL_SCH40' | 'STEEL_SCH10' | 'CPVC' | 'COPPER', nominalIn: number): number \u2014 SCH40 table for STEEL_SCH40 and (as a documented approximation) CPVC/COPPER; SCH10 table for STEEL_SCH10; throws on unknown nominal size.\n- export interface SegmentVolume { segmentId: string; gallons: number; cubicFeet: number; }\n- export interface VolumeReport { perSegment: SegmentVolume[]; totalGallons: number; totalCubicFeet: number; }\n- export function pipeVolumes(segments: Array<{ id: string; diameterIn: number; lengthFt: number; material: 'STEEL_SCH40' | 'STEEL_SCH10' | 'CPVC' | 'COPPER' }>): VolumeReport\n\nMath per segment: radiusFt = internalDiameterIn/24; cubicFeet = PI * radiusFt^2 * lengthFt; gallons = cubicFeet * 7.48052. Totals are sums. Skip (omit from perSegment) segments with non-positive length, but throw on unknown nominal sizes.\nTests: 2in SCH40 x 100ft -> cubicFeet = PI*(2.067/24)^2*100 (assert with toBeCloseTo, 4 digits) and gallons = that * 7.48052; SCH10 vs SCH40 differ for same nominal; totals sum; zero-length skipped; unknown nominal throws.",
+   "commit": "fa586b76"
+  },
+  {
+   "id": "C1C2C3-segment-ops",
+   "title": "Commands > Break / Divide / Reverse (pure segment ops)",
+   "status": "done",
+   "phase": 6,
+   "write_roots": [
+    "apps/cad/src/lib",
+    "apps/cad/test"
+   ],
+   "context_files": [
+    "apps/cad/src/lib/model.ts"
+   ],
+   "files_create": [
+    "apps/cad/src/lib/segment-ops.ts",
+    "apps/cad/test/segment-ops.test.ts"
+   ],
+   "gate": "cd apps/cad && npx tsc -b && npx vitest run test/segment-ops.test.ts",
+   "spec": "Implement pure versions of three AutoSprink Commands-menu operations over the network model (see model.ts for Node/Segment shapes; Node.pos is {x,y,z} feet; Segment has from/to node ids, diameterIn, lengthFt, role, material).\n\nExports (exact):\n- export interface NetworkSlice { nodes: Array<{ id: string; type: string; pos: { x: number; y: number; z: number } }>; segments: Array<{ id: string; from: string; to: string; diameterIn: number; lengthFt: number; role: string; material: string }>; }\n- export function breakSegment(net: NetworkSlice, segmentId: string, t: number, newNodeId: string, seg1Id: string, seg2Id: string): NetworkSlice \u2014 split one segment at parameter t (0<t<1, throw otherwise or when ids collide/missing): insert a new node of type 'FITTING' linearly interpolated between the endpoints' positions, replace the segment with two segments (from->new with lengthFt*t, new->to with lengthFt*(1-t)), preserving diameterIn/role/material. Pure: returns a NEW object, inputs untouched.\n- export function divideSegment(net: NetworkSlice, segmentId: string, parts: number, idPrefix: string): NetworkSlice \u2014 divide into N equal parts (integer 2..50, throw otherwise) by repeated interpolation: creates N-1 nodes `${idPrefix}_n1..` and N segments `${idPrefix}_s1..`, equal lengths summing to the original lengthFt (each lengthFt/N). Pure.\n- export function reverseSegment(net: NetworkSlice, segmentId: string): NetworkSlice \u2014 swap from/to of one segment. Pure. Throws when the segment id is missing.\n\nTests: break at t=0.25 puts the new node at the 25% interpolated position and lengths 25/75 of original; divide a 30ft segment into 3 -> 3 segments of 10ft each, 2 new nodes, connectivity chain intact (from/to ids form a path from original endpoints); reverse swaps endpoints and double-reverse restores; purity (original object unchanged, use structuredClone comparison); all throw cases.",
+   "commit": "55a9472"
+  },
+  {
+   "id": "H7-hydrant-flow",
+   "title": "Hydraulics > Hydrant Flow Calculator (smoothbore)",
+   "status": "done",
+   "phase": 4,
+   "write_roots": [
+    "apps/cad/src/lib",
+    "apps/cad/test"
+   ],
+   "context_files": [],
+   "files_create": [
+    "apps/cad/src/lib/hydrant-flow.ts",
+    "apps/cad/test/hydrant-flow.test.ts"
+   ],
+   "gate": "cd apps/cad && npx tsc -b && npx vitest run test/hydrant-flow.test.ts",
+   "spec": "Implement the AutoSprink 'Hydrant Flow Calculator': smoothbore nozzle discharge from outlet coefficient, diameter, and pitot pressure, using the cited standard smoothbore discharge formula (NFPA 291 style \u2014 verify adopted edition): Q = 29.83 * c * d^2 * sqrt(P), Q in gpm, d = orifice diameter in INCHES, P = pitot pressure in psi, c = discharge coefficient (0 < c <= 1).\n\nExports (exact):\n- export const SMOOTHBORE_CONSTANT = 29.83;\n- export interface HydrantFlowInput { coefficient: number; diameterIn: number; pitotPsi: number; }\n- export interface HydrantFlowResult { flowGpm: number; formula: 'Q = 29.83 * c * d^2 * sqrt(P)'; input: HydrantFlowInput; }\n- export function hydrantFlow(input: HydrantFlowInput): HydrantFlowResult \u2014 throws on non-finite/non-positive diameter or pitot, or coefficient outside (0, 1].\n\nTests: c=0.9, d=2.5, P=36 -> Q = 29.83*0.9*6.25*6 = 1006.7625 (toBeCloseTo 4 digits); coefficient 1 upper bound accepted; each throw case (c=0, c>1, d<=0, P<0, NaN).",
+   "completed_at": "2026-06-10T00:34:03+00:00",
+   "commit": "e53de506"
+  },
+  {
+   "id": "T29T34-drawing-elements",
+   "title": "Tools > Line/Polyline/Arc/Circle/Rectangle/Point (element model)",
+   "status": "done",
+   "phase": 2,
+   "write_roots": [
+    "apps/cad/src/lib",
+    "apps/cad/test"
+   ],
+   "context_files": [],
+   "files_create": [
+    "apps/cad/src/lib/drawing-elements.ts",
+    "apps/cad/test/drawing-elements.test.ts"
+   ],
+   "gate": "cd apps/cad && npx tsc -b && npx vitest run test/drawing-elements.test.ts",
+   "spec": "Implement the pure data model for six AutoSprink Tools-menu drawing primitives (2D plan-space, units = feet): Line Segment, Polyline, Arc, Circle, Rectangle, Point.\n\nExports (exact):\n- export interface Pt { x: number; y: number; }\n- export type DrawingElement = { id: string } & ( { kind: 'line'; a: Pt; b: Pt } | { kind: 'polyline'; points: Pt[] } | { kind: 'arc'; center: Pt; radiusFt: number; startDeg: number; endDeg: number } | { kind: 'circle'; center: Pt; radiusFt: number } | { kind: 'rectangle'; corner: Pt; widthFt: number; heightFt: number } | { kind: 'point'; at: Pt } );\n- Constructors, each validating finiteness and throwing on invalid input: makeLine(id, a, b) (a!=b), makePolyline(id, points) (>=2 points), makeArc(id, center, radiusFt>0, startDeg, endDeg) (angles finite, normalized into [0,360)), makeCircle(id, center, radiusFt>0), makeRectangle(id, corner, widthFt>0, heightFt>0), makePoint(id, at).\n- export function elementLengthFt(el: DrawingElement): number \u2014 line: Euclidean distance; polyline: sum of consecutive distances; arc: 2*PI*r*(sweep/360) where sweep = (endDeg-startDeg+360)%360 (full circle when sweep computes to 0 AND start!==end is impossible after normalization, so sweep 0 means 0); circle: circumference 2*PI*r; rectangle: perimeter 2*(w+h); point: 0.\n- export function elementAreaFt2(el: DrawingElement): number \u2014 circle: PI*r^2; rectangle: w*h; closed polyline (first point equals last point): shoelace formula absolute value; all others: 0.\n\nTests: 3-4-5 line length 5; polyline lengths sum; quarter arc (r=10, 0..90) length = 2*PI*10*0.25; circle area PI*r^2; rectangle perimeter and area; closed square polyline (0,0)(10,0)(10,10)(0,10)(0,0) area 100 via shoelace; open polyline area 0; every constructor throw case (NaN coords, radius<=0, <2 polyline points, degenerate line, non-positive rectangle dims).",
+   "completed_at": "2026-06-10T00:37:20+00:00",
+   "commit": "9c9ccd1a"
+  },
+  {
+   "id": "C22-tag-leaks",
+   "title": "Commands > Tag Leaks (open pipe ends)",
+   "status": "done",
+   "phase": 6,
+   "write_roots": [
+    "apps/cad/src/lib",
+    "apps/cad/test"
+   ],
+   "context_files": [
+    "apps/cad/src/lib/model.ts"
+   ],
+   "files_create": [
+    "apps/cad/src/lib/leak-check.ts",
+    "apps/cad/test/leak-check.test.ts"
+   ],
+   "gate": "cd apps/cad && npx tsc -b && npx vitest run test/leak-check.test.ts",
+   "spec": "Implement the AutoSprink 'Tag Leaks' analysis: find OPEN PIPE ENDS in the sprinkler network \u2014 connection points where water would escape. A leak is (a) a segment endpoint referencing a node id that does not exist (dangling reference), or (b) a node of degree 1 (exactly one attached segment) whose type is NOT one of the closed/terminal types: 'HEAD', 'SOURCE', 'VALVE'.\n\nExports (exact):\n- export interface Leak { nodeId: string; reason: 'dangling-reference' | 'open-end'; segmentIds: string[]; }\n- export interface LeakReport { leaks: Leak[]; checkedNodes: number; checkedSegments: number; clean: boolean; }\n- export function findLeaks(net: { nodes: Array<{ id: string; type: string }>; segments: Array<{ id: string; from: string; to: string }> }): LeakReport\n\nRules: degree = number of segment endpoints touching the node (a self-loop counts 2). For dangling references the Leak.nodeId is the MISSING id and segmentIds lists the referencing segments. Sort leaks by nodeId for determinism. clean = leaks.length === 0. Pure function, inputs untouched.\n\nTests: linear run HEAD - FITTING - FITTING - SOURCE is clean; chop the last segment -> the now degree-1 FITTING is an open-end leak; a segment pointing at a nonexistent id is a dangling-reference leak listing that segment; isolated degree-0 fitting node is NOT a leak (it is unpiped, not open); HEAD/SOURCE/VALVE at degree 1 are never leaks; determinism (sorted by nodeId).",
+   "commit": "55a9472"
+  },
+  {
+   "id": "W2A-density-demand",
+   "title": "Hydraulics > Density/area per-head demand floor",
+   "status": "done",
+   "phase": "wave2",
+   "write_roots": [
+    "apps/cad/src/lib",
+    "apps/cad/test"
+   ],
+   "context_files": [
+    "apps/cad/src/lib/nfpa13-rules.ts"
+   ],
+   "files_create": [
+    "apps/cad/src/lib/density-demand.ts",
+    "apps/cad/test/density-demand.test.ts"
+   ],
+   "gate": "cd apps/cad && npx tsc -b && npx vitest run test/density-demand.test.ts",
+   "spec": "Implement the NFPA-13 density/area per-head demand floor as a pure module. Use EXACTLY these design densities (gpm/ft^2), the low-point of the NFPA-13 density/area curves, edition-dependent \u2014 every export carries a citation string ending \"Verify adopted edition.\": LIGHT\u21920.10, ORDINARY_1\u21920.15, ORDINARY_2\u21920.20, EXTRA_1\u21920.30, EXTRA_2\u21920.40. Use EXACTLY these per-head max protection areas (ft^2), matching the repo's cited MAX_PROTECTION_AREA_SQFT: LIGHT\u2192225, ORDINARY_1\u2192130, ORDINARY_2\u2192130, EXTRA_1\u2192100, EXTRA_2\u2192100. Use EXACTLY these minimum remote design areas (ft^2): LIGHT\u21921500, ORDINARY_1\u21921500, ORDINARY_2\u21921500, EXTRA_1\u21922500, EXTRA_2\u21922500. Exports (exact): `export type HazardClass = 'LIGHT' | 'ORDINARY_1' | 'ORDINARY_2' | 'EXTRA_1' | 'EXTRA_2';` `export interface CitedNumber { value: number; citation: string; }` `export const DESIGN_DENSITY_GPM_SQFT: Record<HazardClass, CitedNumber>;` `export const PER_HEAD_AREA_SQFT: Record<HazardClass, CitedNumber>;` `export const MIN_REMOTE_AREA_SQFT: Record<HazardClass, CitedNumber>;` `export function densityFloorGpm(hazard: HazardClass, perHeadAreaSqFt?: number): number` \u2014 density \u00d7 (perHeadAreaSqFt ?? PER_HEAD_AREA_SQFT[hazard].value); throws on non-finite/non-positive override. `export function pressureForFlow(flowGpm: number, kFactor: number): number` \u2014 (Q/K)^2; throws on K<=0 or Q<0. `export interface HeadDemand { flowGpm: number; pressurePsi: number; governedBy: 'min-pressure' | 'density-floor'; citation: string; }` `export function effectiveHeadDemand(kFactor: number, minOperatingPsi: number, hazard: HazardClass, perHeadAreaSqFt?: number): HeadDemand` \u2014 qMin = kFactor*sqrt(minOperatingPsi); qFloor = densityFloorGpm(...); if qFloor > qMin return {flowGpm: qFloor, pressurePsi: pressureForFlow(qFloor, kFactor), governedBy: 'density-floor', citation: DESIGN_DENSITY_GPM_SQFT[hazard].citation} else {flowGpm: qMin, pressurePsi: minOperatingPsi, governedBy: 'min-pressure', citation: <minimum-operating-pressure citation string authored in this module>}; throws on kFactor<=0 or minOperatingPsi<=0. Tests: ORDINARY_1, K=5.6, 7 psi \u2192 qMin=5.6*sqrt(7)\u224814.8167, qFloor=0.15*130=19.5 \u2192 density-floor governs, pressurePsi=(19.5/5.6)^2\u224812.1249 (toBeCloseTo 3 digits); LIGHT, K=5.6, 7 psi \u2192 qFloor=0.10*225=22.5 > 14.8167 \u2192 density-floor; LIGHT, K=8.0, 16 psi \u2192 qMin=32 > 22.5 \u2192 min-pressure governs with pressurePsi=16; perHeadAreaSqFt override changes the floor linearly; every throw case; every CitedNumber.citation is a non-empty string containing \"Verify adopted edition\".",
+   "commit": "10161ca"
+  },
+  {
+   "id": "W2B-viewport",
+   "title": "View > Pan/zoom viewport transform math (pure)",
+   "status": "done",
+   "phase": "wave2",
+   "write_roots": [
+    "apps/cad/src/lib",
+    "apps/cad/test"
+   ],
+   "context_files": [],
+   "files_create": [
+    "apps/cad/src/lib/viewport.ts",
+    "apps/cad/test/viewport.test.ts"
+   ],
+   "gate": "cd apps/cad && npx tsc -b && npx vitest run test/viewport.test.ts",
+   "spec": "Pure 2D viewport math for a plan canvas: stagePt = planPt*scale + offset. Exports (exact): `export interface Viewport { scale: number; offsetX: number; offsetY: number; }` `export interface Pt { x: number; y: number; }` `export interface Bounds { minX: number; minY: number; maxX: number; maxY: number; }` `export const MIN_SCALE = 1e-6;` `export const MAX_SCALE = 1e6;` `export const ZOOM_STEP = 1.1;` `export function fitViewport(bounds: Bounds, stageW: number, stageH: number, paddingPx: number): Viewport` \u2014 uniform scale = min((stageW-2*paddingPx)/boundsW, (stageH-2*paddingPx)/boundsH) clamped to [MIN_SCALE, MAX_SCALE], offsets center the bounds in the stage; for zero/negative bounds dimensions or stage dims <= 2*paddingPx return {scale: 1, offsetX: stageW/2, offsetY: stageH/2}. `export function toStagePt(vp: Viewport, plan: Pt): Pt` \u2014 {x: plan.x*vp.scale+vp.offsetX, y: plan.y*vp.scale+vp.offsetY}. `export function toPlanPt(vp: Viewport, stage: Pt): Pt` \u2014 exact inverse. `export function zoomAt(vp: Viewport, stageCursor: Pt, factor: number): Viewport` \u2014 newScale = clamp(vp.scale*factor, MIN_SCALE, MAX_SCALE); the plan point under stageCursor must map to the SAME stage point after zoom: newOffset = stageCursor - planPtUnderCursor*newScale; throws on non-finite or non-positive factor. `export function panBy(vp: Viewport, dxPx: number, dyPx: number): Viewport` \u2014 offsets += deltas; throws on non-finite deltas. `export function zoomPercent(vp: Viewport, fitScale: number): number` \u2014 round(100*vp.scale/fitScale); throws when fitScale <= 0. All functions pure (return new objects). Tests: toPlanPt(toStagePt(p)) round-trips (toBeCloseTo 10 digits); fitViewport of bounds {0,0,100,50} into 1000x600 stage with padding 20 gives scale = min(960/100, 560/50) = 9.6 and centers; zoomAt invariant: for vp {scale:2, offsetX:10, offsetY:-5}, cursor {x:300,y:200}, factor 1.5 \u2014 toPlanPt before === toPlanPt after at the cursor (toBeCloseTo); repeated zoomAt clamps at MAX_SCALE; panBy(3,-4) shifts a mapped point by exactly (3,-4) stage px; degenerate-bounds fallback; throw cases.",
+   "commit": "ccdb680"
+  },
+  {
+   "id": "W2C-project-io",
+   "title": "File > Project serialize/deserialize (.hfcad JSON codec)",
+   "status": "done",
+   "phase": "wave2",
+   "write_roots": [
+    "apps/cad/src/lib",
+    "apps/cad/test"
+   ],
+   "context_files": [
+    "apps/cad/src/lib/model.ts"
+   ],
+   "files_create": [
+    "apps/cad/src/lib/project-io.ts",
+    "apps/cad/test/project-io.test.ts"
+   ],
+   "gate": "cd apps/cad && npx tsc -b && npx vitest run test/project-io.test.ts",
+   "spec": "Pure JSON codec for the `Project` type in model.ts (import `type Project` and `emptyProject` from `./model`). Exports (exact): `export const PROJECT_FILE_KIND = 'halofire-cad-project';` `export const PROJECT_FILE_VERSION = 1;` `export interface ProjectFile { kind: typeof PROJECT_FILE_KIND; version: number; savedAt: string; project: Project; }` `export function serializeProject(project: Project, savedAt?: string): string` \u2014 JSON.stringify of a ProjectFile with savedAt ?? new Date().toISOString(), 2-space indent. `export type LoadResult = { ok: true; project: Project; savedAt: string } | { ok: false; reason: string };` `export function deserializeProject(json: string): LoadResult` \u2014 fail-soft, NEVER throws: returns ok:false with a human reason when JSON.parse fails, kind !== PROJECT_FILE_KIND, version is not a positive integer <= PROJECT_FILE_VERSION, project is missing, or validateProject fails. `export function validateProject(p: unknown): { ok: true } | { ok: false; reason: string }` \u2014 structural checks ONLY (no fabrication): p is an object with string id and name; levels is a non-empty array of {id: string, name: string, elevationFt: finite number}; building is an object with arrays walls/rooms, finite positive scaleFtPerUnit, and source one of 'none'|'dxf'|'pdf'|'manual'; network is an object with arrays nodes/segments/remoteAreas; hazardDefaults has defaultClass in ['LIGHT','ORDINARY_1','ORDINARY_2','EXTRA_1','EXTRA_2'] and finite positive defaultCeilingHt; every wall has finite start/end x/y; every room polygon has >= 3 finite points; every segment has string from/to, finite positive diameterIn and non-negative lengthFt. On ok:true deserializeProject must default a missing `annotations` field to `[]`. Tests: round-trip emptyProject() \u2014 deserialize(serialize(p)) deep-equals p (with annotations normalized to []); a populated project literal (2 walls, 1 triangle room, 2 nodes, 1 segment, scaleFtPerUnit 0.25) round-trips deep-equal; ok:false (with non-empty reason mentioning the failing field) for: invalid JSON text, wrong kind, version 2, scaleFtPerUnit 0, scaleFtPerUnit NaN (via JSON null), room polygon of 2 points, segment missing `to`, empty levels array; deserializeProject never throws (wrap calls, assert no throw).",
+   "commit": "cb9b211"
+  },
+  {
+   "id": "W2D-selection-set",
+   "title": "Edit > Multi-selection set + window/crossing marquee hit tests (pure)",
+   "status": "done",
+   "phase": "wave2",
+   "write_roots": [
+    "apps/cad/src/lib",
+    "apps/cad/test"
+   ],
+   "context_files": [],
+   "files_create": [
+    "apps/cad/src/lib/selection-set.ts",
+    "apps/cad/test/selection-set.test.ts"
+   ],
+   "gate": "cd apps/cad && npx tsc -b && npx vitest run test/selection-set.test.ts",
+   "spec": "Pure multi-selection model and marquee geometry. Exports (exact): `export interface Pt { x: number; y: number; }` `export interface Rect { minX: number; minY: number; maxX: number; maxY: number; }` `export type SelKind = 'node' | 'segment' | 'room';` `export interface SelectionSet { nodeIds: string[]; segmentIds: string[]; roomIds: string[]; }` `export function emptySelection(): SelectionSet` \u2014 all arrays empty. `export function selectionCount(sel: SelectionSet): number` \u2014 sum of lengths. `export function togglePick(sel: SelectionSet, kind: SelKind, id: string, additive: boolean): SelectionSet` \u2014 pure; non-additive returns a selection containing ONLY that id in its kind list; additive toggles membership (add if absent, remove if present) keeping other kinds; output arrays sorted lexicographically; throws on empty id. `export function normalizeRect(a: Pt, b: Pt): Rect` \u2014 min/max of the two corners. `export function pointInRect(p: Pt, r: Rect): boolean` \u2014 inclusive bounds. `export function segmentInRect(a: Pt, b: Pt, r: Rect): boolean` \u2014 both endpoints pointInRect. `export function segmentIntersectsRect(a: Pt, b: Pt, r: Rect): boolean` \u2014 true when either endpoint is inside OR the segment properly crosses any of the 4 rect edges; implement a `segmentsIntersect(p1,p2,p3,p4)` helper via orientation sign tests: orient(p,q,r) = sign((q.x-p.x)*(r.y-p.y)-(q.y-p.y)*(r.x-p.x)); segments intersect when orientations of (p1,p2,p3)/(p1,p2,p4) differ AND (p3,p4,p1)/(p3,p4,p2) differ; treat collinear-overlap (any orient 0 with the point's coordinates within the other segment's bounding box, inclusive) as intersecting. `export interface MarqueeItems { nodes: Array<{ id: string; at: Pt }>; segments: Array<{ id: string; a: Pt; b: Pt }>; }` `export function marqueeSelect(items: MarqueeItems, cornerA: Pt, cornerB: Pt, mode: 'window' | 'crossing'): SelectionSet` \u2014 window: nodes with pointInRect, segments with segmentInRect (fully contained); crossing: nodes with pointInRect, segments with segmentIntersectsRect; roomIds always []; outputs sorted; pure. Tests: togglePick non-additive replaces across kinds; additive add/remove round-trip; sorted determinism; rect normalization from any corner pair; segment fully inside selected in both modes; segment crossing one rect edge selected ONLY in crossing mode; segment fully outside never selected; collinear segment lying along a rect edge counts as crossing; marquee over mixed items returns exactly the expected sorted ids; throw on empty id.",
+   "commit": "10161ca"
+  },
+  {
+   "id": "W2E-kernel-import",
+   "title": "Import > 1881 kernel DXF entities \u2192 SprinklerNetwork slice (pure)",
+   "status": "done",
+   "phase": "wave2",
+   "write_roots": [
+    "apps/cad/src/lib",
+    "apps/cad/test"
+   ],
+   "context_files": [
+    "apps/cad/src/lib/model.ts",
+    "apps/cad/src/lib/plan-import.ts"
+   ],
+   "files_create": [
+    "apps/cad/src/lib/kernel-import.ts",
+    "apps/cad/test/kernel-import.test.ts"
+   ],
+   "gate": "cd apps/cad && npx tsc -b && npx vitest run test/kernel-import.test.ts",
+   "spec": "Pure builder turning already-parsed kernel-DXF entities into network nodes/segments. The 1881 kernel (`design.dxf`) carries heads as CIRCLE entities on layer `HALOFIRE_HEADS` and pipes as LINE entities on layer `HALOFIRE_PIPES` (verified: 1303 head circles, 1758 pipe lines). This module does NOT parse DXF text \u2014 it consumes plain entity inputs so tests are synthetic. Exports (exact): `export const KERNEL_HEAD_LAYER = 'HALOFIRE_HEADS';` `export const KERNEL_PIPE_LAYER = 'HALOFIRE_PIPES';` `export const SNAP_TOLERANCE_FT = 0.05;` `export interface KernelCircle { cx: number; cy: number; layer: string; }` `export interface KernelLine { x1: number; y1: number; x2: number; y2: number; layer: string; }` `export interface KernelImportOpts { ftPerUnit: number; headLayer?: string; pipeLayer?: string; zFt?: number; defaultDiameterIn?: number; }` `export interface KernelNetwork { nodes: Array<{ id: string; type: 'HEAD' | 'TEE' | 'ELBOW'; pos: { x: number; y: number; z: number } }>; segments: Array<{ id: string; from: string; to: string; diameterIn: number; lengthFt: number; role: 'BRANCH'; material: 'STEEL_SCH40' }>; headCount: number; junctionCount: number; droppedZeroLength: number; }` `export function buildKernelNetwork(circles: KernelCircle[], lines: KernelLine[], opts: KernelImportOpts): KernelNetwork`. Algorithm (exact): (1) throw on non-finite/non-positive ftPerUnit; let head layer = opts.headLayer ?? KERNEL_HEAD_LAYER, pipe layer = opts.pipeLayer ?? KERNEL_PIPE_LAYER, z = opts.zFt ?? 0, dia = opts.defaultDiameterIn ?? 1. (2) Scale every coordinate by ftPerUnit. (3) For each circle on the head layer create a HEAD node id `head_<index1Based>` at (cx, cy) scaled, pos {x, y: z, z: cy\u2192use pos {x: scaledCx, y: zFt, z: scaledCy}} \u2014 plan x\u2192pos.x, plan y\u2192pos.z, elevation\u2192pos.y (matches model.ts 'y is up'). (4) For each line endpoint on the pipe layer, snap to an existing node when the 2D plan distance (x/z plane) <= SNAP_TOLERANCE_FT, preferring HEAD nodes, else the earliest-created junction; otherwise create a junction node id `jct_<n>` (n increments from 1) at that point. (5) After all segments exist, set each junction node's type: 'TEE' when its degree (number of segment endpoints touching it) >= 3, else 'ELBOW'. (6) Each pipe line becomes segment id `pipe_<index1Based>` with from/to = resolved node ids, lengthFt = 2D Euclidean distance (in feet) rounded to 4 decimals, role 'BRANCH', material 'STEEL_SCH40', diameterIn = dia; lines whose scaled length <= SNAP_TOLERANCE_FT are dropped and counted in droppedZeroLength. (7) Ignore circles/lines on other layers entirely. headCount/junctionCount are the created counts. Pure: inputs untouched; deterministic ids by input order. Tests: one circle + one line ending within tolerance of it \u2192 segment.from or .to is `head_1` (no duplicate junction); H-shape of 3 lines meeting at a shared point \u2192 that junction degree 3 \u2192 'TEE', the others 'ELBOW' or HEAD per setup; ftPerUnit 0.25 scales a 40-unit line to lengthFt 10; zero-length line dropped and counted; off-layer entities ignored; custom layer names honored; mapping check pos {x, y: zFt, z: planY}; determinism (same input twice \u2192 deep-equal output); throw on ftPerUnit <= 0.",
+   "commit": "ccdb680"
+  },
+  {
+   "id": "W2F-hydraulic-report",
+   "title": "Reports > Hydraulic calc summary text formatter (pure)",
+   "status": "done",
+   "phase": "wave2",
+   "write_roots": [
+    "apps/cad/src/lib",
+    "apps/cad/test"
+   ],
+   "context_files": [
+    "apps/cad/src/lib/hydraulics.ts"
+   ],
+   "files_create": [
+    "apps/cad/src/lib/hydraulic-report.ts",
+    "apps/cad/test/hydraulic-report.test.ts"
+   ],
+   "gate": "cd apps/cad && npx tsc -b && npx vitest run test/hydraulic-report.test.ts",
+   "spec": "Pure plain-text formatter for a hydraulic result \u2014 the submittal-lane \"calc summary\". It consumes a structural input (NOT importing solver internals) so it stays decoupled. Exports (exact): `export interface ReportNodeRow { id: string; pressurePsi: number; flowGpm: number; }` `export interface ReportSegmentRow { id: string; flowGpm: number; frictionPsi: number; velocityFps: number; }` `export interface ReportInput { projectName: string; hazard: string; demandGpm: number; demandPsiAtRiser: number; supply?: { staticPsi: number; residualPsi: number; flowGpm: number; availablePsiAtDemand: number; adequate: boolean }; nodes: ReportNodeRow[]; segments: ReportSegmentRow[]; disclaimer: string; citations: string[]; }` `export const REPORT_HEADER = 'HALOFIRE CAD - HYDRAULIC DESIGN AID SUMMARY';` `export function formatNumber(n: number, decimals: number): string` \u2014 toFixed(decimals); throws on non-finite n or negative/non-integer decimals. `export function formatHydraulicReport(input: ReportInput): string`. Layout (exact): line 1 REPORT_HEADER; line 2 `Project: <projectName>`; line 3 `Hazard: <hazard>`; line 4 blank; line 5 `SYSTEM DEMAND: <demandGpm,1>gpm @ <demandPsiAtRiser,1> psi at riser` (numbers via formatNumber with 1 decimal, format exactly `DEMAND: X.X gpm @ Y.Y psi at riser` prefixed `SYSTEM `); then when supply is present: `SUPPLY: static <staticPsi,1> psi, residual <residualPsi,1> psi @ <flowGpm,1> gpm` and `AVAILABLE @ DEMAND: <availablePsiAtDemand,1> psi -> <ADEQUATE|INADEQUATE>`; when supply is absent the single line `SUPPLY: none provided (demand-only result)`; blank line; `NODES (<count>)` followed by one line per node `  <id padded right to 16 chars with spaces>  P=<pressurePsi,2> psi  Q=<flowGpm,2> gpm`; blank line; `SEGMENTS (<count>)` followed by one line per segment `  <id padded right to 16 chars>  Q=<flowGpm,2> gpm  dP=<frictionPsi,3> psi  v=<velocityFps,2> ft/s`; blank line; `CITATIONS:` then `  - <each citation>` in input order; blank line; the disclaimer verbatim as the final line(s). Rows are emitted in INPUT ORDER (caller sorts). Pad ids longer than 16 chars without truncation (pad-to-at-least-16). Throws when disclaimer is an empty string or citations is empty (fail-closed honesty: a report without citations/disclaimer must not be producible). Tests: golden full report string for a 2-node/1-segment input with supply (assert exact string equality, template literal in test); demand-only variant contains 'SUPPLY: none provided'; INADEQUATE rendered when adequate=false; long id padding; throw on empty disclaimer; throw on empty citations; formatNumber rounding (1.005 with 2 decimals via toFixed semantics \u2014 assert toFixed output equality, not an invented rounding rule).\n\n---",
+   "commit": "10161ca"
+  },
+  {
+   "id": "W3A-pipe-sizing",
+   "title": "Auto Draw > Auto Size (schedule pipe sizing)",
+   "status": "done",
+   "phase": "wave3",
+   "write_roots": [
+    "apps/cad/src/lib",
+    "apps/cad/test"
+   ],
+   "context_files": [
+    "apps/cad/src/lib/model.ts"
+   ],
+   "files_create": [
+    "apps/cad/src/lib/pipe-sizing.ts",
+    "apps/cad/test/pipe-sizing.test.ts"
+   ],
+   "gate": "cd apps/cad && npx tsc -b && npx vitest run test/pipe-sizing.test.ts",
+   "attempts": 2,
+   "spec": "Pure pipe schedule sizing: pick the smallest nominal size whose velocity stays within a limit for a given flow. Use EXACTLY these SCH40 internal diameters (in): 1->1.049,1.25->1.380,1.5->1.610,2->2.067,2.5->2.469,3->3.068,4->4.026,6->6.065,8->7.981. Velocity ft/s = 0.4085*gpm/(idIn^2) (the standard V=0.4085*Q/d^2 with d in inches). Exports (exact): export const SCH40_ID_IN: Record<number,number>; export const NOMINAL_SIZES_IN: number[] (ascending: 1,1.25,1.5,2,2.5,3,4,6,8); export function velocityFps(gpm:number, nominalIn:number): number \u2014 throws on unknown nominal or non-finite/negative gpm; export interface SizePick { nominalIn:number; velocityFps:number; withinLimit:boolean } export function pickPipeSize(gpm:number, maxVelocityFps:number): SizePick \u2014 smallest nominal whose velocity<=maxVelocityFps; if none qualifies return the LARGEST (8) with withinLimit:false; throws on non-finite/non-positive maxVelocityFps or negative gpm. Tests: velocityFps(100,2)=0.4085*100/(2.067^2)=~9.56 (toBeCloseTo 2); pickPipeSize(100,10) picks 2 (9.56<=10) withinLimit true; pickPipeSize(20,10) picks 1; a huge flow returns 8 withinLimit false; throws (unknown nominal, negative gpm, maxVelocity 0).",
+   "completed_at": "2026-06-10T14:11:57+00:00",
+   "commit": "e053e775"
+  },
+  {
+   "id": "W3B-fitting-le",
+   "title": "Hydraulics > Fitting equivalent lengths (Hazen-Williams)",
+   "status": "done",
+   "phase": "wave3",
+   "write_roots": [
+    "apps/cad/src/lib",
+    "apps/cad/test"
+   ],
+   "context_files": [],
+   "files_create": [
+    "apps/cad/src/lib/fitting-le.ts",
+    "apps/cad/test/fitting-le.test.ts"
+   ],
+   "gate": "cd apps/cad && npx tsc -b && npx vitest run test/fitting-le.test.ts",
+   "attempts": 2,
+   "spec": "Pure fitting equivalent-length lookup for Hazen-Williams friction (C=120 schedule-40 basis; cited, verify adopted edition). Use EXACTLY these equivalent lengths (ft) by fitting type and nominal size (in). TEE_BRANCH: 1->5,1.25->6,1.5->8,2->10,2.5->12,3->15,4->20,6->30,8->35. ELBOW_90: 1->2,1.25->3,1.5->4,2->5,2.5->6,3->7,4->10,6->14,8->18. GATE_VALVE: 1->1,1.25->1,1.5->1,2->1,2.5->1,3->1,4->2,6->3,8->4. Exports (exact): export type FittingType='TEE_BRANCH'|'ELBOW_90'|'GATE_VALVE'; export const FITTING_LE_FT: Record<FittingType,Record<number,number>>; export const FITTING_LE_CITATION: string (contains 'Verify adopted edition'); export function equivalentLengthFt(type:FittingType, nominalIn:number): number \u2014 throws on unknown type or nominal; export function totalEquivalentLengthFt(fittings: Array<{type:FittingType;nominalIn:number}>): number \u2014 sum, skips nothing, throws on any unknown entry. Tests: equivalentLengthFt('ELBOW_90',2)=5; TEE_BRANCH 4=20; totalEquivalentLengthFt of [elbow 2, tee 2, gate 2]=5+10+1=16; throws unknown type, unknown nominal; citation contains the caveat.",
+   "completed_at": "2026-06-10T14:36:20+00:00",
+   "commit": "82f5093f"
+  },
+  {
+   "id": "W3C-bom-group",
+   "title": "Reports > BOM grouping/aggregation (part legend)",
+   "status": "done",
+   "phase": "wave3",
+   "write_roots": [
+    "apps/cad/src/lib",
+    "apps/cad/test"
+   ],
+   "context_files": [],
+   "files_create": [
+    "apps/cad/src/lib/bom-group.ts",
+    "apps/cad/test/bom-group.test.ts"
+   ],
+   "gate": "cd apps/cad && npx tsc -b && npx vitest run test/bom-group.test.ts",
+   "attempts": 2,
+   "spec": "Pure bill-of-materials aggregation: collapse takeoff line items into grouped rows by (category, size, material), summing quantities and extending cost. Exports (exact): export interface BomItem { category:string; sizeIn:number; material:string; qty:number; unitCost:number } export interface BomRow { key:string; category:string; sizeIn:number; material:string; qty:number; unitCost:number; extendedCost:number } export interface BomSummary { rows:BomRow[]; totalQty:number; totalCost:number } export function groupBom(items:BomItem[]): BomSummary \u2014 group key is `${category}|${sizeIn}|${material}`; qty sums; unitCost is the cost of the FIRST item in each group (assert all in a group share unitCost is NOT required \u2014 use first); extendedCost=round2(qty*unitCost); rows sorted by key ascending; totals are sums (round2 the cost). round2(n)=Math.round(n*100)/100. Throws on any item with negative qty or negative unitCost or non-finite values. Tests: two items same category/size/material sum qty and extend cost; different sizes stay separate; rows sorted by key; totalCost sums extended costs with round2; empty input -> empty rows, totals 0; throws on negative qty.",
+   "last_error": "src/lib/bom-group.ts(1,45): error TS2307: Cannot find module './bom-types' or its corresponding type declarations.\ntest/bom-group.test.ts(2,19): error TS6133: 'BomRow' is declared but its value is never read.\ntest/bom-group.test.ts(2,27): error TS6133: 'BomSummary' is declared but its value is never read.\ntest/bom-group.test.ts(2,45): error TS2307: Cannot find module '../src/lib/bom-types' or its corresponding type declarations.\ntest/bom-group.test.ts(4,7): error TS6133: 'round2' is declared but its value is never read.",
+   "completed_at": "2026-06-10T16:22:02+00:00",
+   "commit": "e1fdf5e8"
+  },
+  {
+   "id": "W3D-coverage-area",
+   "title": "Commands > Draw Sprinkler Coverage (rectangular coverage cell)",
+   "status": "done",
+   "phase": "wave3",
+   "write_roots": [
+    "apps/cad/src/lib",
+    "apps/cad/test"
+   ],
+   "context_files": [],
+   "files_create": [
+    "apps/cad/src/lib/coverage-area.ts",
+    "apps/cad/test/coverage-area.test.ts"
+   ],
+   "gate": "cd apps/cad && npx tsc -b && npx vitest run test/coverage-area.test.ts",
+   "attempts": 2,
+   "spec": "Pure rectangular sprinkler coverage-cell geometry + NFPA spacing check. A head at center (cx,cy) with spacing S (ft) covers a square of side S (S/2 each direction). Exports (exact): export interface Pt{x:number;y:number} export interface CoverageCell{ center:Pt; sideFt:number; minX:number; minY:number; maxX:number; maxY:number; areaSqFt:number } export function coverageCell(center:Pt, sideFt:number): CoverageCell \u2014 throws on non-finite center or non-finite/non-positive sideFt; areaSqFt=sideFt*sideFt; bounds are center +/- sideFt/2. export function cellsOverlap(a:CoverageCell,b:CoverageCell):boolean \u2014 axis-aligned overlap (touching edges = not overlap, use strict <). export function maxAreaWithinLimit(sideFt:number, maxProtectionSqFt:number):boolean \u2014 sideFt*sideFt <= maxProtectionSqFt; throws on non-positive inputs. Tests: coverageCell({x:0,y:0},12) -> bounds -6..6, area 144; two cells 12 apart centers (0,0) and (12,0) do NOT overlap (edges touch); centers (0,0)/(10,0) DO overlap; maxAreaWithinLimit(12,225) true, (16,225) false; throw cases.",
+   "completed_at": "2026-06-10T15:02:23+00:00",
+   "commit": "e94c480e"
+  },
+  {
+   "id": "W4A-wall-solid",
+   "title": "3D > Wall solid mesh (thickness + height, pure)",
+   "status": "done",
+   "phase": "wave4-3d",
+   "write_roots": [
+    "apps/cad/src/lib",
+    "apps/cad/test"
+   ],
+   "context_files": [],
+   "files_create": [
+    "apps/cad/src/lib/wall-solid.ts",
+    "apps/cad/test/wall-solid.test.ts"
+   ],
+   "gate": "cd apps/cad && npx tsc -b && npx vitest run test/wall-solid.test.ts",
+   "attempts": 4,
+   "spec": "Pure mesh builder: one wall segment -> a closed rectangular box mesh as flat arrays (three.js BufferGeometry-ready). Exports (exact): export interface Pt2{x:number;y:number} export interface WallMesh{positions:number[];indices:number[];vertexCount:number} export function wallSolid(start:Pt2,end:Pt2,thicknessFt:number,heightFt:number,baseY?:number):WallMesh \u2014 the wall runs start->end in plan (plan x->world x, plan y->world z), extruded UP (world y) from baseY (default 0) to baseY+heightFt, with thickness centered on the centerline (offset +/- thickness/2 along the 2D normal of the segment). Output: 8 corner vertices (positions length 24) and 12 triangles (indices length 36) with OUTWARD-facing CCW winding for the 6 faces. Throws on zero-length segment (distance < 1e-9), non-finite inputs, or non-positive thickness/height. Determinism: vertex order = bottom face first (4 verts: start-left, start-right, end-right, end-left), then top face same order. Tests: a unit wall (0,0)->(10,0), thickness 1, height 8: vertexCount 8, positions contain z=+0.5 and z=-0.5 corners, all top verts y=8, bottom y=0; indices length 36 with every index <8; a diagonal wall (3-4-5) has correct normal offsets (toBeCloseTo); throws on zero-length/negative thickness.",
+   "completed_at": "2026-06-10T16:39:15+00:00",
+   "commit": "199bf10e"
+  },
+  {
+   "id": "W4B-slab-solid",
+   "title": "3D > Floor/ceiling slab mesh from room polygon (pure)",
+   "status": "done",
+   "phase": "wave4-3d",
+   "write_roots": [
+    "apps/cad/src/lib",
+    "apps/cad/test"
+   ],
+   "context_files": [],
+   "files_create": [
+    "apps/cad/src/lib/slab-solid.ts",
+    "apps/cad/test/slab-solid.test.ts"
+   ],
+   "gate": "cd apps/cad && npx tsc -b && npx vitest run test/slab-solid.test.ts",
+   "attempts": 0,
+   "spec": "Pure mesh builder: a room polygon -> a horizontal slab mesh via fan triangulation (polygons from the trace tool are convex-ish; document the convex assumption honestly). Exports (exact): export interface Pt2{x:number;y:number} export interface SlabMesh{positions:number[];indices:number[];vertexCount:number} export function slabSolid(polygon:Pt2[],elevationY:number,thicknessFt:number):SlabMesh \u2014 polygon (>=3 points, plan x->world x, plan y->world z) extruded from elevationY down to elevationY-thicknessFt (slab hangs below its elevation). Top + bottom faces by fan triangulation from vertex 0; side walls quad per edge. For N polygon points: vertexCount 2N, indices length = (N-2)*3*2 + N*6. Throws on <3 points, non-finite, non-positive thickness, or repeated consecutive points (distance <1e-9). Tests: unit square (0,0)(10,0)(10,10)(0,10) at elevation 0 thickness 0.5: vertexCount 8, top verts y=0, bottom y=-0.5, indices length 36; triangle polygon N=3 -> indices length (1*6)+(3*6)=24; throw cases.",
+   "commit": "claude-tier2"
+  },
+  {
+   "id": "W4C-fitting-orient",
+   "title": "3D > Fitting orientation at junctions (pure quaternion math)",
+   "status": "done",
+   "phase": "wave4-3d",
+   "write_roots": [
+    "apps/cad/src/lib",
+    "apps/cad/test"
+   ],
+   "context_files": [],
+   "files_create": [
+    "apps/cad/src/lib/fitting-orient.ts",
+    "apps/cad/test/fitting-orient.test.ts"
+   ],
+   "gate": "cd apps/cad && npx tsc -b && npx vitest run test/fitting-orient.test.ts",
+   "attempts": 0,
+   "spec": "Pure orientation solver: given the unit directions of pipes meeting at a junction, compute the Y-up Euler rotation to place a fitting STEP body (modeled with primary run along +X, branch along +Z). Exports (exact): export interface V3{x:number;y:number;z:number} export function normalize(v:V3):V3 \u2014 throws on zero-length. export function elbowRotationY(dirA:V3,dirB:V3):number \u2014 both dirs in the horizontal plane (y component must be <0.01 in magnitude after normalize, else throw 'non-horizontal'): returns the rotation (radians, about world Y) that aligns the elbow's +X leg with dirA; computed as atan2(-dirA.z, dirA.x). export function teeRotationY(runDir:V3,branchDir:V3):number \u2014 aligns the tee run (+X) with runDir using the same atan2; throws when branchDir is parallel to runDir (|dot|>0.99 after normalize). export function isOrthogonal(a:V3,b:V3,tolDeg?:number):boolean \u2014 angle within tolDeg (default 5) of 90 degrees. Tests: dirA=+X -> rotation 0; dirA=+Z -> rotation -PI/2 (toBeCloseTo); dirA=-X -> PI (or -PI, assert abs==PI closeTo); tee with run +X branch +Z passes isOrthogonal and rotation 0; parallel branch throws; non-horizontal throws; normalize throws on zero vector.",
+   "commit": "claude-tier2"
+  },
+  {
+   "id": "W5A-pipe-snap",
+   "title": "Tools > Pipe \u2014 endpoint snapping math (pure)",
+   "status": "done",
+   "phase": "wave5",
+   "write_roots": [
+    "apps/cad/src/lib",
+    "apps/cad/test"
+   ],
+   "context_files": [
+    "apps/cad/src/lib/model.ts"
+   ],
+   "files_create": [
+    "apps/cad/src/lib/pipe-snap.ts",
+    "apps/cad/test/pipe-snap.test.ts"
+   ],
+   "gate": "cd apps/cad && npx tsc -b && npx vitest run test/pipe-snap.test.ts",
+   "attempts": 5,
+   "spec": "Pure snapping for the manual Pipe tool: given a click point (feet, 2D plan: x and z), find what it should connect to. Exports (exact): export interface Pt{x:number;z:number} export type SnapHit = { kind:'node'; nodeId:string; at:Pt } | { kind:'segment'; segmentId:string; at:Pt; t:number } | { kind:'none'; at:Pt }; export function distPointToSegment2D(p:Pt,a:Pt,b:Pt):{dist:number;t:number;closest:Pt} \u2014 standard point-to-segment projection with t clamped to [0,1]; export function snapToNetwork(p:Pt, nodes:Array<{id:string;pos:{x:number;y:number;z:number}}>, segments:Array<{id:string;from:string;to:string}>, tolFt:number): SnapHit \u2014 nearest NODE within tolFt wins (smallest distance, ties by id ascending); else nearest segment within tolFt (projection point, its t); else {kind:'none',at:p}. Throws on non-finite p or tolFt<=0. Segments with missing endpoint nodes are skipped. Tests: node win over farther segment; segment hit returns clamped t in (0,1) and correct closest point for a click beside the middle of a 10ft run (toBeCloseTo); t clamps to 0/1 beyond the ends; none beyond tolerance; tie-break by id; throws (NaN point, tol 0); missing-endpoint segment skipped.",
+   "completed_at": "2026-06-11T04:44:34+00:00",
+   "commit": "5e4609ed"
+  },
+  {
+   "id": "W5B-wall-extract-score",
+   "title": "Import > PDF wall-candidate scoring (stroke-weight signal, pure)",
+   "status": "done",
+   "phase": "wave5",
+   "write_roots": [
+    "apps/cad/src/lib",
+    "apps/cad/test"
+   ],
+   "context_files": [],
+   "files_create": [
+    "apps/cad/src/lib/wall-extract-score.ts",
+    "apps/cad/test/wall-extract-score.test.ts"
+   ],
+   "gate": "cd apps/cad && npx tsc -b && npx vitest run test/wall-extract-score.test.ts",
+   "attempts": 6,
+   "spec": "Codify the verified 1881 stroke-weight wall signal as a pure scorer for assisted extraction (W9). Input lines carry geometry + strokeWidthPt + optional layer. Exports (exact): export interface ScoredLine{x1:number;y1:number;x2:number;y2:number;strokeWidthPt:number;layer?:string} export interface WallScore{index:number;score:number;reasons:string[]} export function dominantStrokeWidth(lines:ScoredLine[]):number \u2014 the most frequent strokeWidthPt among lines LONGER than the median length (rounding widths to 2 decimals); throws on empty input. export function scoreWallCandidates(lines:ScoredLine[],opts?:{targetWidthPt?:number;minLengthFt?:number}):WallScore[] \u2014 per line, score in [0,1]: +0.5 when |strokeWidthPt - target| <= 0.05 (target = opts.targetWidthPt ?? dominantStrokeWidth(lines)); +0.3 when length >= (opts.minLengthFt ?? 3); +0.2 when axis-aligned within 2 degrees (horizontal or vertical); reasons[] names each criterion met ('stroke-match','long-enough','axis-aligned'). Output sorted by score desc then index asc. Pure; throws on empty lines. Tests: a 2.83pt-stroke long axis-aligned line scores 1.0 with all 3 reasons; a thin short diagonal scores 0; dominantStrokeWidth picks the most frequent among long lines (synthetic set); sort order; throws on empty.",
+   "last_error": "     \u2192 expected [Function] to throw error including 'Input lines cannot be empty' but got 'No lines provided'\n     \u2192 expected [Function] to throw error including 'Input lines cannot be empty' but got 'No lines provided'\n     \u2192 expected [ { index: +0, score: 0.7, \u2026(1) } ] to deeply equal [ { index: +0, score: 1, \u2026(1) } ]\n     \u2192 expected [ \u2026(3) ] to deeply equal [ { index: +0, score: 1, \u2026(1) }, \u2026(2) ]\n FAIL  test/wall-extract-score.test.ts > dominantStrokeWidth > throws on empty input\nAssertionError: expected [Function] to throw error including 'Input lines cannot be empty' but got 'No lines provided'\nExpected: \"Input lines cannot be empty\"\nReceived: \"No lines provided\"\n      7|     expect(() => dominantStrokeWidth([])).toThrow('Input lines cannot \u2026\n FAIL  test/wall-extract-score.test.ts > scoreWallCandidates > throws on empty input\nAssertionError: expected [Function] to throw error including 'Input lines cannot be empty' but got 'No lines provided'\nExpected: \"Input lines cannot be empty\"\nReceived: \"No lines provided\"\n     23|     expect(() => scoreWallCandidates([])).toThrow('Input lines cannot \u2026\n FAIL  test/wall-extract-score.test.ts > scoreWallCandidates > scores a line with all criteria met\nAssertionError: expected [ { index: +0, score: 0.7, \u2026(1) } ] to deeply equal [ { index: +0, score: 1, \u2026(1) } ]\n- Expected\n+ Received\n     31|     expect(scores).toEqual([{ index: 0, score: 1.0, reasons: ['stroke-\u2026\n FAIL  test/wall-extract-score.test.ts > scoreWallCandidates > sorts by score desc then index asc\nAssertionError: expected [ \u2026(3) ] to deeply equal [ { index: +0, score: 1, \u2026(1) }, \u2026(2) ]\n- Expected\n+ Received\n     49|     expect(scores).toEqual([",
+   "note": "hand-built by Claude Tier-2 agent (commit 63d03c6), gates 549/549. Do not regenerate."
+  },
+  {
+   "id": "W5C-bid-payload",
+   "title": "Bid > CAD takeoff -> autosprink bid payload (pure mapping)",
+   "status": "done",
+   "phase": "wave5",
+   "write_roots": [
+    "apps/cad/src/lib",
+    "apps/cad/test"
+   ],
+   "context_files": [
+    "apps/cad/src/lib/takeoff.ts"
+   ],
+   "files_create": [
+    "apps/cad/src/lib/bid-payload.ts",
+    "apps/cad/test/bid-payload.test.ts"
+   ],
+   "gate": "cd apps/cad && npx tsc -b && npx vitest run test/bid-payload.test.ts",
+   "attempts": 5,
+   "spec": "Pure mapper from the CAD takeoff to the apps/autosprink bid-intake payload shape (the CAD->auto-bid bridge contract). Exports (exact): export interface TakeoffLine{kind:string;label:string;qty:number;unit:string;sizeIn?:number;material?:string} export interface BidPayloadItem{sku:string;description:string;quantity:number;unit:string} export interface BidPayload{projectName:string;source:'halofire-cad';generatedAt:string;items:BidPayloadItem[];disclaimer:string} export function toBidPayload(projectName:string, lines:TakeoffLine[], generatedAt:string):BidPayload \u2014 sku built as `${kind}:${sizeIn ?? 'na'}:${material ?? 'na'}` lowercased; description = label; quantity = qty rounded to 2 decimals; unit passes through; lines with qty<=0 are SKIPPED; disclaimer is a fixed string containing 'design aid' and 'not a committed bid'; throws on empty projectName or non-finite qty in any kept line; generatedAt passes through verbatim (caller supplies the timestamp \u2014 keep the function pure). Tests: two lines map with correct skus; zero-qty skipped; rounding 1.005->use toFixed semantics via Math.round(q*100)/100; throws on empty name and NaN qty; disclaimer contains both phrases; purity (input array untouched).",
+   "completed_at": "2026-06-11T05:05:34+00:00",
+   "commit": "e13fc49e"
+  },
+  {
+   "id": "W5D-head-clearance",
+   "title": "Commands > Analyze coverage \u2014 head-to-wall clearance checks (cited, pure)",
+   "status": "done",
+   "phase": "wave5",
+   "write_roots": [
+    "apps/cad/src/lib",
+    "apps/cad/test"
+   ],
+   "context_files": [],
+   "files_create": [
+    "apps/cad/src/lib/head-clearance.ts",
+    "apps/cad/test/head-clearance.test.ts"
+   ],
+   "gate": "cd apps/cad && npx tsc -b && npx vitest run test/head-clearance.test.ts",
+   "attempts": 0,
+   "spec": "NFPA-13-style head placement clearance checks as a pure module. Use EXACTLY these cited limits (standard spray, edition-dependent \u2014 every exported constant carries a citation string ending 'Verify adopted edition.'): max distance from wall = HALF the allowed head spacing for the hazard (use these spacings ft: LIGHT->15, ORDINARY_1->15, ORDINARY_2->15, EXTRA_1->12, EXTRA_2->12) and MIN distance from any wall = 4 INCHES (0.3333 ft). Exports (exact): export interface CitedNumber{value:number;citation:string} export const MAX_SPACING_FT: Record<'LIGHT'|'ORDINARY_1'|'ORDINARY_2'|'EXTRA_1'|'EXTRA_2',CitedNumber>; export const MIN_WALL_CLEARANCE_FT: CitedNumber (0.3333); export interface ClearanceIssue{headId:string;kind:'too-close-to-wall'|'too-far-from-wall';distanceFt:number;limitFt:number;citation:string} export function checkWallClearance(heads:Array<{id:string;x:number;z:number}>, wallSegments:Array<{x1:number;z1:number;x2:number;z2:number}>, hazard:'LIGHT'|'ORDINARY_1'|'ORDINARY_2'|'EXTRA_1'|'EXTRA_2'):ClearanceIssue[] \u2014 distance of each head to its NEAREST wall segment (point-to-segment 2D); too-close when < MIN_WALL_CLEARANCE_FT.value; too-far when > MAX_SPACING_FT[hazard].value/2; heads with NO walls produce no issues (honest skip); sorted by headId. Tests: head 0.2ft from a wall -> too-close (limit 0.3333); head 9ft from nearest wall in LIGHT (limit 7.5) -> too-far with distance ~9; compliant head (e.g. 5ft) -> no issue; empty walls -> no issues; citations all end with 'Verify adopted edition.'; sorted output.",
+   "note": "hand-built by Claude Tier-2 agent (commit 63d03c6), gates 549/549. Do not regenerate."
+  },
+  {
+   "id": "W6A-hanger-spacing",
+   "title": "Auto Draw > Hangers \u2014 NFPA hanger placement along pipe runs (cited, pure)",
+   "status": "done",
+   "phase": "wave6",
+   "write_roots": [
+    "apps/cad/src/lib",
+    "apps/cad/test"
+   ],
+   "context_files": [
+    "apps/cad/src/lib/model.ts"
+   ],
+   "files_create": [
+    "apps/cad/src/lib/hanger-spacing.ts",
+    "apps/cad/test/hanger-spacing.test.ts"
+   ],
+   "gate": "cd apps/cad && npx tsc -b && npx vitest run test/hanger-spacing.test.ts",
+   "attempts": 6,
+   "spec": "AutoSprink 'Hangers' auto-placement math as a pure module. Use EXACTLY these cited max hanger spacings for steel pipe (ft, NFPA-13 hanger table class \u2014 every exported constant carries a citation string ending 'Verify adopted edition.'): nominal 1->12, 1.25->12, 1.5->15, 2->15, 2.5->15, 3->15, 4->15, 6->15, 8->15; plus MAX unsupported end distance 3 ft from any pipe end. Exports (exact): export interface CitedNumber{value:number;citation:string} export const MAX_HANGER_SPACING_FT: Record<number,CitedNumber>; export const MAX_END_DISTANCE_FT: CitedNumber (3); export interface HangerPoint{segmentId:string;t:number;x:number;y:number;z:number} export function hangersForSegment(seg:{id:string;diameterIn:number;lengthFt:number}, a:{x:number;y:number;z:number}, b:{x:number;y:number;z:number}): HangerPoint[] \u2014 place hangers along the segment so that: first hanger within MAX_END_DISTANCE_FT of end a, last within MAX_END_DISTANCE_FT of end b, adjacent hangers <= MAX_HANGER_SPACING_FT[nearest defined nominal >= diameterIn, else 15]; use the MINIMUM count satisfying both, evenly spaced (equal gaps) between the first/last positions; segments shorter than 2*MAX_END_DISTANCE get exactly ONE hanger at t=0.5; positions linearly interpolated between a and b; throws on non-finite inputs or lengthFt<=0. Tests: a 30ft 2in run -> first/last within 3ft of ends, gaps <= 15ft, count minimal (3 hangers: t at 0.1, 0.5, 0.9 \u2014 verify gaps == (30-6)/2=12 <=15); a 4ft run -> single hanger t=0.5; spacing table lookup rounds UP to next defined nominal; citations end with 'Verify adopted edition.'; throws on lengthFt 0.",
+   "last_error": "src/lib/hanger-spacing.ts(1,1): error TS6133: 'Segment' is declared but its value is never read.\nsrc/lib/hanger-spacing.ts(113,25): error TS2304: Cannot find name 'Point3'.\nsrc/lib/hanger-spacing.ts(113,36): error TS2304: Cannot find name 'Point3'.\nsrc/lib/hanger-spacing.ts(113,56): error TS2304: Cannot find name 'Point3'.\ntest/hanger-spacing.test.ts(1,29): error TS6133: 'MAX_HANGER_SPACING_FT' is declared but its value is never read.\ntest/hanger-spacing.test.ts(1,52): error TS6133: 'MAX_END_DISTANCE_FT' is declared but its value is never read.\ntest/hanger-spacing.test.ts(36,19): error TS2304: Cannot find name 'findMaxHangerSpacing'.",
+   "note": "hand-built by Claude Tier-2 agent (commit 63d03c6), gates 549/549. Do not regenerate."
+  },
+  {
+   "id": "W6B-ceiling-grid",
+   "title": "Tools > Ceiling Grid \u2014 2x4 drop-ceiling grid lines for a room (pure)",
+   "status": "done",
+   "phase": "wave6",
+   "write_roots": [
+    "apps/cad/src/lib",
+    "apps/cad/test"
+   ],
+   "context_files": [],
+   "files_create": [
+    "apps/cad/src/lib/ceiling-grid.ts",
+    "apps/cad/test/ceiling-grid.test.ts"
+   ],
+   "gate": "cd apps/cad && npx tsc -b && npx vitest run test/ceiling-grid.test.ts",
+   "attempts": 6,
+   "spec": "AutoSprink 'Ceiling Grid' geometry as a pure module: standard 2ft x 4ft lay-in grid lines clipped to a rectangular room bbox (full polygon clipping documented as follow-up). Exports (exact): export interface Pt{x:number;y:number} export interface GridLine{x1:number;y1:number;x2:number;y2:number;dir:'x'|'y'} export interface CeilingGrid{lines:GridLine[];cellW:number;cellH:number;originX:number;originY:number} export function ceilingGridForBounds(minX:number,minY:number,maxX:number,maxY:number,opts?:{cellW?:number;cellH?:number;originX?:number;originY?:number}):CeilingGrid \u2014 cellW default 4, cellH default 2 (feet, standard 2x4 lay-in tile with long axis on x); grid origin defaults to (minX,minY); generate interior lines ONLY (no lines on the boundary itself): vertical ('y'-dir) lines at every cellW step strictly between minX and maxX spanning minY..maxY, horizontal ('x'-dir) lines at every cellH step strictly between minY and maxY spanning minX..maxX. Throws on non-finite or degenerate bounds (maxX<=minX etc.) or non-positive cells. export function polygonBounds(poly:Pt[]):{minX:number;minY:number;maxX:number;maxY:number} \u2014 throws on <3 points/non-finite. Tests: a 12x8 room with defaults -> vertical lines at x=+4,+8 (2 lines) and horizontal at y=+2,+4,+6 (3 lines), all spanning the bbox; custom origin shifts the phase; non-positive cell throws; degenerate bounds throws; polygonBounds of a triangle correct.",
+   "completed_at": "2026-06-11T06:12:10+00:00",
+   "commit": "8aeb4aec"
+  },
+  {
+   "id": "W7A-bid-classifier",
+   "title": "AutoBid > bid-invitation email classifier (pure heuristics)",
+   "status": "done",
+   "phase": "wave7-autobid",
+   "write_roots": [
+    "apps/autosprink/src",
+    "apps/autosprink/tests"
+   ],
+   "context_files": [],
+   "files_create": [
+    "apps/autosprink/src/autobid/bid-classifier.js",
+    "apps/autosprink/tests/autobid-classifier.test.js"
+   ],
+   "gate": "cd apps/autosprink && npx vitest run tests/autobid-classifier.test.js",
+   "attempts": 6,
+   "spec": "Pure ESM JavaScript module (apps/autosprink is type:module, plain JS, vitest). Classify an email as a likely bid invitation. Exports (exact): export function classifyBidEmail(email) where email = {subject:string, body:string, attachments:[{filename:string,sizeBytes:number}], from:string}. Returns {score:number (0..1), isLikelyBid:boolean (score>=0.5), reasons:string[]}. Scoring (additive, cap 1.0): +0.35 when subject/body matches /\b(invitation to bid|itb|rfp|request for proposal|bid request|bid invitation|tender)\b/i ('keyword'); +0.2 subject/body matches /\b(fire (sprinkler|protection|suppression)|nfpa|sprinkler)\b/i ('domain'); +0.25 any attachment filename matches /\\.(pdf|dwg|dxf)$/i ('plan-attachment'); +0.1 body matches /\b(due|deadline|bid date|proposals? due)\b/i ('deadline'); +0.1 from matches /\b(gc|construction|builders?|contracting|estimating)\b/i or body matches /general contractor/i ('sender-context'). Reasons list each matched criterion name. Pure; throws TypeError on missing subject/body strings or non-array attachments. Tests: a real-shaped ITB email (subject 'Invitation to Bid - Fire Sprinkler - Marriott TI', pdf attachment, deadline in body) scores >=0.8 with >=3 reasons; a newsletter scores <0.3 and isLikelyBid false; missing fields throw; attachment-only email gets exactly the plan-attachment reason; score caps at 1.0.",
+   "last_error": "Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'vitest' imported from /opt/hal9000/apps/halofire-studio/apps/autosprink/vitest.config.js.timestamp-1781159893829-def1f7555bd01.mjs",
+   "note": "landed by Claude AB2 workflow (commit 7aed36a): src/autobid/bid-classifier.js spec-exact (word boundaries enforced by adversarial verifier) + tests. Do not regenerate."
+  },
+  {
+   "id": "W7B-bid-html",
+   "title": "AutoBid > branded HTML bid document renderer (pure)",
+   "status": "done",
+   "phase": "wave7-autobid",
+   "write_roots": [
+    "apps/autosprink/src",
+    "apps/autosprink/tests"
+   ],
+   "context_files": [],
+   "files_create": [
+    "apps/autosprink/src/autobid/bid-html.js",
+    "apps/autosprink/tests/autobid-html.test.js"
+   ],
+   "gate": "cd apps/autosprink && npx vitest run tests/autobid-html.test.js",
+   "attempts": 6,
+   "spec": "Pure ESM JS renderer: bid record -> complete standalone HTML string (inline CSS, no external assets). Exports (exact): export function renderBidHtml(bid) where bid = {projectName, clientName, dateIso, items:[{description, quantity, unit, unitCost, extendedCost}], subtotal, overheadPct, profitPct, total, notes?, disclaimer}. Requirements: <!doctype html> document; header block with 'HALO FIRE PROTECTION' brand line + ember accent color #f0a868 used in inline styles; a line-item table (description/qty/unit/unit cost/extended) with right-aligned currency formatted via Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}); summary rows (subtotal, OH %, profit %, TOTAL bolded); notes paragraph when provided; the disclaimer VERBATIM in a visually distinct footer block; all user-provided strings HTML-ESCAPED (export function escapeHtml(s) \u2014 & < > \" ' \u2014 and use it on every interpolated field; test asserts <script> in a description renders escaped). Throws on: empty projectName/clientName, empty items, missing disclaimer, non-finite money fields. Tests: golden structural assertions (contains brand line, escaped script tag, currency '$1,234.50' formatting, disclaimer present, TOTAL row), throws cases.",
+   "last_error": "JSONDecodeError: Unterminated string starting at: line 1 column 71 (char 70)",
+   "note": "landed by Claude AB3-5 workflow (commit 0973420): src/autobid/bid-html.js spec-exact + 22 tests. Do not regenerate."
+  },
+  {
+   "id": "W7C-crm-status",
+   "title": "AutoBid > CRM bid status machine (pure)",
+   "status": "done",
+   "phase": "wave7-autobid",
+   "write_roots": [
+    "apps/autosprink/src",
+    "apps/autosprink/tests"
+   ],
+   "context_files": [],
+   "files_create": [
+    "apps/autosprink/src/autobid/crm-status.js",
+    "apps/autosprink/tests/autobid-status.test.js"
+   ],
+   "gate": "cd apps/autosprink && npx vitest run tests/autobid-status.test.js",
+   "attempts": 0,
+   "spec": "Pure ESM JS status machine for bid_requests. Exports (exact): export const BID_STATUSES = ['received','reviewing','estimating','bid_sent','won','lost']; export const ALLOWED_TRANSITIONS = { received:['reviewing'], reviewing:['estimating','lost'], estimating:['bid_sent','lost'], bid_sent:['won','lost'], won:[], lost:['reviewing'] } (lost->reviewing = reopen); export function canTransition(from,to) -> boolean (false for unknown states, never throws); export function applyTransition(record, to, atIso) where record={status, history:[{status,atIso}]} -> NEW record {status:to, history:[...history,{status:to,atIso}]} (pure, input untouched); throws Error('invalid transition <from> -> <to>') when not allowed, and TypeError on malformed record/missing atIso. export function timeInStatusMs(record, nowIso) -> ms since the LAST history entry (throws on empty history or invalid dates). Tests: full happy path received->...->won; reopen lost->reviewing allowed; won is terminal (no transitions); invalid jump received->bid_sent throws with the exact message; purity via structuredClone compare; timeInStatusMs computes from the last entry; malformed record throws TypeError.",
+   "note": "landed by Claude AB1 workflow (commit 646a3d4): src/autobid/crm-status.js + 15 spec tests + CRM API/board integration; gate green 36/36. Do not regenerate."
+  },
+  {
+   "id": "W8A-scale-notation",
+   "title": "Import > printed-scale notation parser (PDF-first)",
+   "status": "done",
+   "phase": "wave8-pdf",
+   "write_roots": [
+    "apps/cad/src/lib",
+    "apps/cad/test"
+   ],
+   "context_files": [],
+   "files_create": [
+    "apps/cad/src/lib/scale-notation.ts",
+    "apps/cad/test/scale-notation.test.ts"
+   ],
+   "gate": "cd apps/cad && npx tsc -b && npx vitest run test/scale-notation.test.ts",
+   "attempts": 6,
+   "spec": "Pure parser for architectural scale notations found in plan-sheet text. Exports (exact): export interface ParsedScale{ftPerInch:number;notation:string} export function parseScaleNotation(text:string):ParsedScale|null \u2014 recognize, case/space tolerant: (a) fractional inch = feet-inches form like 1/8\\\" = 1'-0\\\" or 3/32\\\"=1'-0\\\" or 1/4 in = 1 ft -> ftPerInch = feet / inches (e.g. 1/8\\\"=1' -> 8 ft per inch); (b) whole/decimal inch forms like 1\\\" = 40' (civil) -> 40; (c) ratio form 1:96 -> 96/12 = 8 ft per inch. Return null (never throw) when no notation matches; when multiple notations appear use the FIRST. notation = the matched substring verbatim. export function ftPerUnitFromPdfPoints(ftPerInch:number):number \u2014 PDF user units are points (72/inch): ftPerInch/72; throws on non-finite/non-positive. Tests: '1/8\\\" = 1'-0\\\"' -> 8; '3/32\\\"=1'-0\\\"' -> 32/3 (toBeCloseTo); '1/4 IN = 1 FT' -> 4; '1\\\" = 40'' -> 40; '1:96' -> 8; 'SCALE: AS NOTED' -> null; first-match-wins with two notations; ftPerUnitFromPdfPoints(8) -> 8/72 (toBeCloseTo 6); throws on 0.",
+   "last_error": "src/lib/scale-notation.ts(7,22): error TS1127: Invalid character.\nsrc/lib/scale-notation.ts(7,23): error TS1134: Variable declaration expected.\nsrc/lib/scale-notation.ts(7,24): error TS1109: Expression expected.\nsrc/lib/scale-notation.ts(7,25): error TS1109: Expression expected.\nsrc/lib/scale-notation.ts(7,33): error TS1127: Invalid character.\nsrc/lib/scale-notation.ts(7,47): error TS1127: Invalid character.\nsrc/lib/scale-notation.ts(7,49): error TS1005: ';' expected.\nsrc/lib/scale-notation.ts(7,84): error TS1002: Unterminated string literal.\nsrc/lib/scale-notation.ts(16,19): error TS1005: ')' expected.\nsrc/lib/scale-notation.ts(16,30): error TS1005: ';' expected.\nsrc/lib/scale-notation.ts(16,48): error TS1005: ';' expected.\nsrc/lib/scale-notation.ts(21,3): error TS1128: Declaration or statement expected.",
+   "note": "hand-built by Claude Tier-2 agent (commit e2ae29f), 572/572. Quote chars via unicode escapes. Do not regenerate."
+  },
+  {
+   "id": "W8B-sheet-classify",
+   "title": "Import > plan-set sheet triage by title text (PDF-first)",
+   "status": "done",
+   "phase": "wave8-pdf",
+   "write_roots": [
+    "apps/cad/src/lib",
+    "apps/cad/test"
+   ],
+   "context_files": [],
+   "files_create": [
+    "apps/cad/src/lib/sheet-classify.ts",
+    "apps/cad/test/sheet-classify.test.ts"
+   ],
+   "gate": "cd apps/cad && npx tsc -b && npx vitest run test/sheet-classify.test.ts",
+   "attempts": 6,
+   "spec": "Pure classifier for plan-set pages from their extracted text. Exports (exact): export type SheetKind='floor-plan'|'fire-protection'|'detail'|'schedule'|'title'|'other' export interface SheetInfo{kind:SheetKind;score:number;floor:number|null;sheetNo:string|null} export function classifySheet(pageText:string):SheetInfo \u2014 signals (case-insensitive): fire-protection when /\b(FP-?\\d|FIRE (PROTECTION|SPRINKLER)|SPRINKLER PLAN)\b/ (score .9); floor-plan when /\b(FLOOR PLAN|\bA-?1\\d{2}\b|LEVEL \\d+ PLAN)\b/ (.8); schedule when /\bSCHEDULE\b/ (.7); detail when /\b(DETAILS?|SECTIONS?)\b/ (.6); title when /\b(COVER|TITLE SHEET|SHEET INDEX|DRAWING INDEX)\b/ (.8); precedence by the listed order when multiple match (fire-protection wins); 'other' score 0 when none. floor: parse from /\b(\\d+)(ST|ND|RD|TH)? FLOOR\b/ or /\bLEVEL (\\d+)\b/ else null. sheetNo: first match of /\b([A-Z]{1,2}-?\\d{1,3}(?:\\.\\d{1,2})?)\b/ on a line also containing /sheet|dwg|no\\.?/i, else first standalone token matching the same pattern near 'SHEET', else null \u2014 keep this heuristic SIMPLE and documented. Throws TypeError on non-string input. Tests: 'SECOND FLOOR PLAN  A-102' -> floor-plan, floor 2; 'FP-3 FIRE SPRINKLER PLAN LEVEL 3' -> fire-protection, floor 3; 'DOOR SCHEDULE' -> schedule; 'COVER SHEET / SHEET INDEX' -> title; lorem text -> other score 0; precedence fire-protection over floor-plan when both present; non-string throws.",
+   "last_error": "src/lib/sheet-classify.ts(70,1): error TS1005: '}' expected.\n\n",
+   "note": "hand-built by Claude Tier-2 agent (commit e2ae29f), 572/572. Quote chars via unicode escapes. Do not regenerate."
+  },
+  {
+   "id": "W9A-riser-inference",
+   "title": "CAD > infer riser + flow topology on imported kernel networks (pure)",
+   "status": "done",
+   "phase": "wave9-fidelity",
+   "write_roots": [
+    "apps/cad/src",
+    "apps/cad/test"
+   ],
+   "context_files": [
+    "apps/cad/src/lib/flow-calculator.ts"
+   ],
+   "files_create": [
+    "apps/cad/src/lib/riser-inference.ts",
+    "apps/cad/test/riser-inference.test.ts"
+   ],
+   "gate": "cd apps/cad && npx vitest run test/riser-inference.test.ts",
+   "attempts": 6,
+   "spec": "Pure strict-TS module. Imported DXF kernel networks have nodes (id, type HEAD or other, pos {x,y} ft) and segments (id, from, to, diameterIn, lengthFt) but no riser or flow direction, so hydraulics cannot solve them. Exports (exact): export interface RiserCandidate { nodeId: string; score: number; reasons: string[] }. export function inferRiser(nodes, segments): RiserCandidate -- scores every non-HEAD node: +0.4 if it touches the segment with the maximum diameterIn in the network (reason max-diameter); +0.3 if its degree (count of incident segments) is in the top decile (reason high-degree); +0.3 if it is within 10 percent of the network bounding-box perimeter edge, i.e. near an exterior wall where risers live (reason perimeter). Returns the highest score; ties break by lowest nodeId lexicographically. Throws Error with message no non-head nodes when every node is HEAD or lists empty. export function orientFlow(nodes, segments, riserId): Map<string,{from:string,to:string}> -- BFS from riserId across segments treating them undirected, re-orient each segment so from is the node closer (in hops) to the riser; unreachable segments are EXCLUDED from the map (honest partial result, never fabricated). export function solvableFraction(segments, oriented: Map): number 0..1 = oriented.size/segments.length (0 when no segments). Tests: a hand-built 6-node tree with one fat 4in segment at the root picks that node with max-diameter reason; orientFlow on the tree points every from toward the riser side; a disconnected island is excluded and solvableFraction reflects it; all-HEAD network throws; tie-break determinism asserted. HINT after blocked run: write tests so no two candidates tie on score unless the test is the explicit tie-break test (give the tie-break test two identical isolated nodes named alpha and beta so alpha wins). The perimeter criterion: a node is near-perimeter when its distance to the bounding box edge is at most 10 percent of the box diagonal. solvableFraction returns a plain ratio like 0.5, not rounded values.",
+   "last_error": "JSONDecodeError: Expecting ',' delimiter: line 1 column 4672 (char 4671)",
+   "note": "hand-built by Claude Tier-2 (commit 3ec1eb4), 593/593. Do not regenerate."
+  },
+  {
+   "id": "W9B-pdf-line-cluster",
+   "title": "CAD > cluster colinear PDF vector segments into wall-candidate runs (pure)",
+   "status": "done",
+   "phase": "wave9-pdf-first",
+   "write_roots": [
+    "apps/cad/src",
+    "apps/cad/test"
+   ],
+   "context_files": [
+    "apps/cad/src/lib/wall-extract-score.ts"
+   ],
+   "files_create": [
+    "apps/cad/src/lib/pdf-line-cluster.ts",
+    "apps/cad/test/pdf-line-cluster.test.ts"
+   ],
+   "gate": "cd apps/cad && npx vitest run test/pdf-line-cluster.test.ts",
+   "attempts": 6,
+   "spec": "Pure strict-TS module. PDF vector extraction yields thousands of tiny colinear strokes that must merge into wall-candidate runs before scoring (wall-extract-score). Exports (exact): export interface RawStroke { a:{x:number,y:number}; b:{x:number,y:number}; widthPt:number }. export interface ClusteredRun { a:{x:number,y:number}; b:{x:number,y:number}; widthPt:number; sourceCount:number }. export function clusterColinear(strokes: RawStroke[], opts?: {angleTolDeg?: number; gapTolPt?: number; offsetTolPt?: number}): ClusteredRun[] with defaults angleTolDeg 2, gapTolPt 3, offsetTolPt 1.5. Algorithm: group strokes whose direction angles differ by at most angleTolDeg (mod 180), whose perpendicular offset from a shared infinite line is at most offsetTolPt, and whose projected 1D intervals on that line overlap or have gaps at most gapTolPt; each group merges into one run spanning min..max projection, widthPt = max member width, sourceCount = member count. Zero-length strokes (a equals b within 1e-9) are dropped before clustering. Output sorted by run length descending then a.x then a.y ascending. Pure, no mutation of inputs. Tests: three collinear horizontal strokes with 2pt gaps merge into one run with sourceCount 3 spanning the full extent; a parallel stroke offset 5pt does NOT merge; a perpendicular stroke never merges; angle within tolerance (1 degree skew) merges; zero-length strokes dropped; empty input returns empty array; determinism of sort order asserted. HINT after blocked run: implement projection-interval merging carefully \u2014 sort member strokes by projected start before merging; two strokes with a 2pt gap and gapTolPt 3 MUST merge. Build test strokes axis-aligned with simple integer coordinates so expectations are exact.",
+   "last_error": "0 }, \u2026(3) } ] to deeply equal [ { a: { x: +0, y: +0 }, \u2026(3) }, \u2026(1) ]\n FAIL  test/pdf-line-cluster.test.ts > clusterColinear > merges three collinear horizontal strokes with 2pt gaps\nAssertionError: expected [ { a: { x: +0, y: +0 }, \u2026(3) } ] to deeply equal [ { a: { x: +0, y: +0 }, \u2026(3) } ]\n- Expected\n+ Received\n     23|         expect(result).toEqual([\n FAIL  test/pdf-line-cluster.test.ts > clusterColinear > does not merge a parallel stroke offset 5pt\nAssertionError: expected [ { a: { x: +0, y: +0 }, \u2026(3) }, \u2026(1) ] to deeply equal [ { a: { x: +0, y: +0 }, \u2026(3) }, \u2026(1) ]\n- Expected\n+ Received\n     39|         expect(result).toEqual([\n FAIL  test/pdf-line-cluster.test.ts > clusterColinear > does not merge a perpendicular stroke\nAssertionError: expected [ { a: { x: +0, y: +0 }, \u2026(3) }, \u2026(1) ] to deeply equal [ { a: { x: +0, y: +0 }, \u2026(3) }, \u2026(1) ]\n- Expected\n+ Received\n     51|         expect(result).toEqual([\n FAIL  test/pdf-line-cluster.test.ts > clusterColinear > merges strokes with 1 degree angle skew\nAssertionError: expected [ Array(2) ] to deeply equal [ { a: { x: +0, y: +0 }, \u2026(3) } ]\n- Expected\n+ Received\n     63|         expect(result).toEqual([\n FAIL  test/pdf-line-cluster.test.ts > clusterColinear > sorts runs by length descending, then a.x, then a.y\nAssertionError: expected [ { a: { x: +0, y: +0 }, \u2026(3) }, \u2026(1) ] to deeply equal [ { a: { x: +0, y: +0 }, \u2026(3) }, \u2026(2) ]\n- Expected\n+ Received\n     84|         expect(result).toEqual([\n FAIL  test/pdf-line-cluster.test.ts > clusterColinear > merges strokes with gapTolPt 3\nAssertionError: expected [ { a: { x: +0, y: +0 }, \u2026(3) } ] to deeply equal [ { a: { x: +0, y: +0 }, \u2026(3) } ]\n- Expected\n+ Received\n     97|         expect(result).toEqual([\n FAIL  test/pdf-line-cluster.test.ts > clusterColinear > does not merge strokes with gapTolPt 2\nAssertionError: expected [ { a: { x: +0, y: +0 }, \u2026(3) } ] to deeply equal [ { a: { x: +0, y: +0 }, \u2026(3) }, \u2026(1) ]\n- Expected\n+ Received\n    113|         expect(result).toEqual([",
+   "note": "hand-built by Claude Tier-2 (commit 3ec1eb4), 593/593. Do not regenerate."
+  },
+  {
+   "id": "W10A-scale-prefill",
+   "title": "CAD UI > prefill Set Scale from printed scale text on PDF import",
+   "status": "done",
+   "phase": "wave10-ui-integration",
+   "write_roots": [
+    "apps/cad/src",
+    "apps/cad/test"
+   ],
+   "context_files": [
+    "apps/cad/src/lib/scale-notation.ts",
+    "apps/cad/src/components/TopRibbon.tsx"
+   ],
+   "files_create": [],
+   "gate": "cd apps/cad && npx vitest run test/scale-prefill.test.ts",
+   "attempts": 5,
+   "spec": "Integration with a pure core. Create apps/cad/src/lib/scale-prefill.ts exporting prefillScaleFromText(pageTexts: string[]): { ftPerUnit: number; sourceText: string; pageIndex: number } | null \u2014 runs parseScaleNotation (existing lib scale-notation) over each page text in order, returns the first hit converted via ftPerUnitFromPdfPoints plus the matched source text and page index, null when no page parses. Create apps/cad/test/scale-prefill.test.ts covering: first-page hit wins, later-page fallback, no-match null, the eighth-inch example mapping to 8 ftPerInch over 72. Then wire it into the existing PDF import path so the import flow stores the suggestion on the project import state where the Set Scale tool reads its default \u2014 find the import handler that already receives pdf text content; if page text is not currently extracted, add extraction via the pdfjs text content API in the existing import module. The suggestion must be OPERATOR-CONFIRMED: it pre-fills the scale input only, never silently applies. Add no new deps.",
+   "completed_at": "2026-06-11T09:03:19+00:00",
+   "commit": "409498c0"
+  },
+  {
+   "id": "W10B-hanger-grid-3d",
+   "title": "CAD 3D > render hangers and ceiling grids in Viewer3D behind toggles",
+   "status": "done",
+   "phase": "wave10-ui-integration",
+   "write_roots": [
+    "apps/cad/src",
+    "apps/cad/test"
+   ],
+   "context_files": [
+    "apps/cad/src/lib/hanger-spacing.ts",
+    "apps/cad/src/lib/ceiling-grid.ts",
+    "apps/cad/src/components/Viewer3D.tsx",
+    "apps/cad/test/scene-invariants.test.ts"
+   ],
+   "files_create": [],
+   "gate": "cd apps/cad && npx vitest run test/hanger-grid-3d.test.ts",
+   "attempts": 1,
+   "spec": "Integration. Add two store toggles showHangers and showCeilingGrid (default false) following the existing pressureHeatmap toggle pattern in store.ts and the View controls. In Viewer3D: when showHangers is on, compute hanger positions per segment via the existing hanger-spacing lib (placeHangers or the exported placement function \u2014 read the lib for exact name) and render small cylinder drops from each hanger point up to the ceiling height of the enclosing room (or default ceiling) \u2014 thin cylinders radius 0.02 ft, steel gray. When showCeilingGrid is on, render grid lines per room via the existing ceiling-grid lib at the room ceiling height as thin line segments. Extend the window.__cadVerify3D published object with hangerCount and gridSegmentCount numbers (0 when toggles off). Create apps/cad/test/hanger-grid-3d.test.ts: pure tests asserting the position computation helpers you extract (put them in apps/cad/src/lib/hanger-3d.ts and grid-3d.ts as pure functions returning arrays of positions/segments from network+building inputs) \u2014 counts match the libs spacing rules for a hand-built 30 ft run (3 hangers) and a 20x10 room grid. React rendering itself is verified by the numeric __cadVerify3D fields, not jsdom. HINT after blocked run: read apps/cad/src/lib/hanger-spacing.ts FIRST and call its actual exported function with its actual signature \u2014 do not invent a signature. A 30 ft run of 1.5 inch pipe has max spacing 15 and max end distance 3, so expect hangers at positions consistent with that lib output, not hardcoded guesses.",
+   "completed_at": "2026-06-11T11:01:46+00:00",
+   "commit": "a94e0ae6"
+  },
+  {
+   "id": "W10C-clearance-overlay",
+   "title": "CAD 2D > head-clearance issue overlay in PlanCanvas",
+   "status": "done",
+   "phase": "wave10-ui-integration",
+   "write_roots": [
+    "apps/cad/src",
+    "apps/cad/test"
+   ],
+   "context_files": [
+    "apps/cad/src/lib/head-clearance.ts",
+    "apps/cad/src/components/PlanCanvas.tsx"
+   ],
+   "files_create": [],
+   "gate": "cd apps/cad && npx vitest run test/clearance-overlay.test.ts",
+   "attempts": 6,
+   "spec": "Integration with a pure core. Create apps/cad/src/lib/clearance-overlay.ts exporting issueMarkers(building, network, hazardClass): Array of { headId: string; x: number; y: number; kind: string; message: string } by running the existing head-clearance check (read the lib for exact export) over all heads against room walls and mapping each issue to its head position with a short human message including the cited limit text. Create apps/cad/test/clearance-overlay.test.ts: a head 0.2 ft from a wall yields a too-close marker with the citation hedge text present; a compliant head yields none; empty walls yields empty (honest skip). Then render markers in PlanCanvas when a new store toggle showClearanceIssues is on (default false, View controls pattern): amber warning circles radius 6 screen px at head positions with a tooltip-on-hover title. Keep all geometry math in the pure lib. HINT after blocked run: read apps/cad/src/lib/head-clearance.ts FIRST and use its real exported names and issue object shape; map issues to markers without renaming fields. Keep PlanCanvas changes minimal: one toggle, one marker layer.",
+   "last_error": "     \u2192 expected [ { headId: 'h1', x: +0, \u2026(3) }, \u2026(1) ] to have a length of 1 but got 2\n FAIL  test/clearance-overlay.test.ts > issueMarkers > marks too-close heads with citation\nAssertionError: expected [ { headId: 'h1', x: +0, \u2026(3) }, \u2026(1) ] to have a length of 1 but got 2\n- Expected\n+ Received\n     12|         expect(markers[0].kind).toBe('too-close');",
+   "note": "hand-built by Claude Tier-2 (commit 611ec4c), 600/600. Do not regenerate."
+  },
+  {
+   "id": "W11A-kernel-heat-riser",
+   "title": "CAD 3D > auto-infer riser on kernel imports so the pressure heatmap lights up",
+   "status": "done",
+   "phase": "wave11-integration",
+   "write_roots": [
+    "apps/cad/src",
+    "apps/cad/test"
+   ],
+   "context_files": [
+    "apps/cad/src/lib/riser-inference.ts",
+    "apps/cad/src/components/Viewer3D.tsx",
+    "apps/cad/src/store.ts"
+   ],
+   "files_create": [],
+   "gate": "cd apps/cad && npx vitest run test/kernel-heat-riser.test.ts",
+   "attempts": 2,
+   "spec": "Integration with a pure core. Create apps/cad/src/lib/kernel-heat-riser.ts exporting inferKernelTopology(nodes, segments) returning an object with riserId string, oriented Map of segment id to from-to pairs, and fraction number \u2014 a thin composition of inferRiser, orientFlow and solvableFraction from the existing riser-inference lib; returns null instead of throwing when inferRiser throws (no non-head nodes). Create test/kernel-heat-riser.test.ts: a small tree yields non-null with fraction 1; an all-HEAD input yields null. Then in the Viewer3D heat memo: when the existing solver result produces no pressure spread AND the network has segments, call inferKernelTopology and, when non-null and fraction is at least 0.5, re-run the solver with the inferred riser as the supply point so imported kernel networks show the fluid pressure gradient; publish riserInferred boolean and riserNodeId on the window.__cadVerify3D object (false and null when not used). HONESTY: when fraction is below 0.5 do nothing (partial mats stay dark rather than showing fabricated pressures) and never override an operator-set supplyPoint.",
+   "completed_at": "2026-06-11T12:32:31+00:00",
+   "commit": "74743fad"
+  },
+  {
+   "id": "W11B-pdf-trace-assist",
+   "title": "CAD import > suggest wall candidates from PDF linework (assisted trace)",
+   "status": "done",
+   "phase": "wave11-integration",
+   "write_roots": [
+    "apps/cad/src",
+    "apps/cad/test"
+   ],
+   "context_files": [
+    "apps/cad/src/lib/pdf-line-cluster.ts",
+    "apps/cad/src/lib/wall-extract-score.ts"
+   ],
+   "files_create": [],
+   "gate": "cd apps/cad && npx vitest run test/pdf-trace-assist.test.ts",
+   "attempts": 6,
+   "spec": "Integration with a pure core. Create apps/cad/src/lib/pdf-trace-assist.ts exporting suggestWalls(strokes, scaleFtPerPt, opts optional) returning Array of { a, b, scoreInfo } \u2014 pipeline: clusterColinear from pdf-line-cluster, convert runs to the input shape wall-extract-score expects, score with scoreWallCandidates and dominantStrokeWidth from that lib, keep only candidates whose score is at least 0.6 (opts.minScore overrides), convert PDF points to feet with scaleFtPerPt, sorted by score descending. Returns empty array on empty input (never throws on it). Create test/pdf-trace-assist.test.ts: a synthetic page with two long thick parallel strokes plus short thin noise yields exactly the two wall suggestions in feet; empty input yields empty; minScore override filters. These suggestions are OPERATOR-CONFIRMED proposals for the trace tool, never auto-committed walls \u2014 say so in the module doc comment. HINT after blocked run: every files entry path MUST start with apps/cad/ \u2014 emit apps/cad/src/lib/pdf-trace-assist.ts and apps/cad/test/pdf-trace-assist.test.ts, never bare src/ or test/ paths.",
+   "last_error": "     \u2192 expected [] to have a length of 2 but got +0\n     \u2192 expected [ { a: { x: NaN, y: NaN }, \u2026(2) } ] to have a length of +0 but got 1\n FAIL  test/pdf-trace-assist.test.ts > pdf-trace-assist > suggestWalls > suggests two wall candidates from synthetic input (thick parallel lines + noise)\nAssertionError: expected [] to have a length of 2 but got +0\n- Expected\n+ Received\n FAIL  test/pdf-trace-assist.test.ts > pdf-trace-assist > suggestWalls > filters by minScore override\nAssertionError: expected [ { a: { x: NaN, y: NaN }, \u2026(2) } ] to have a length of +0 but got 1\n- Expected\n+ Received",
+   "note": "hand-built by Claude Tier-2 (commit 459b1b0). Do not regenerate."
+  },
+  {
+   "id": "W12A-followup-badges",
+   "title": "CRM board > follow-up due badges + days-out sorting (pure helper)",
+   "status": "blocked",
+   "phase": "wave12",
+   "write_roots": [
+    "apps/cad/src",
+    "apps/cad/test",
+    "apps/autosprink/src",
+    "apps/autosprink/tests"
+   ],
+   "context_files": [
+    "apps/autosprink/src/autobid/followups.js",
+    "apps/autosprink/crm.html"
+   ],
+   "files_create": [],
+   "gate": "cd apps/autosprink && npx vitest run tests/autobid-followup-badges.test.js",
+   "attempts": 6,
+   "spec": "Pure ESM helper apps/autosprink/src/autobid/followup-badges.js exporting badgeForBid(bid, nowIso, thresholdDays) returning null when bid status is not bid_sent, otherwise an object with daysOut number (whole days since the last status_history entry timestamp) and level string: ok when daysOut below thresholdDays, due when at or above thresholdDays, overdue when at or above twice thresholdDays. Throws TypeError on missing nowIso or malformed bid. Also export sortByUrgency(bids, nowIso, thresholdDays) returning a NEW array sorted overdue first then due then ok then non-bid_sent, ties by daysOut descending. Test file apps/autosprink/tests/autobid-followup-badges.test.js covers all levels, null for won bids, purity, TypeError cases. Then in crm.html render the badge text and color (ok muted, due ember, overdue red) on bid_sent cards using the helper logic mirrored client-side (the page already loads ESM from /src \u2014 import the module directly, do not duplicate constants). HINT after blocked run: your JSON emission broke mid-file \u2014 keep each file under 120 lines, no markdown fences inside content strings, and escape every backslash and double quote in JS strings properly.",
+   "last_error": "HTTPError: HTTP Error 500: Internal Server Error"
+  },
+  {
+   "id": "W12B-takeoff-rollup",
+   "title": "CAD > BOM rollup summary for the bid payload (pure)",
+   "status": "done",
+   "phase": "wave12",
+   "write_roots": [
+    "apps/cad/src",
+    "apps/cad/test",
+    "apps/autosprink/src",
+    "apps/autosprink/tests"
+   ],
+   "context_files": [
+    "apps/cad/src/lib/bid-payload.ts"
+   ],
+   "files_create": [],
+   "gate": "cd apps/cad && npx vitest run test/takeoff-rollup.test.ts",
+   "attempts": 5,
+   "spec": "Pure strict-TS module apps/cad/src/lib/takeoff-rollup.ts exporting rollupTakeoff(payload) where payload is the existing toBidPayload output (read apps/cad/src/lib/bid-payload.ts FIRST and use its exported types). Returns { totalHeads: number; totalPipeLengthFt: number; pipeByDiameter: Array of { diameterIn: number; lengthFt: number; count: number } sorted by diameterIn ascending; fittingCounts: Array of { kind: string; count: number } sorted by kind ascending }. Lengths rounded to 2 decimals. Empty payload sections yield zeros and empty arrays, never throws on a structurally valid payload. Test file apps/cad/test/takeoff-rollup.test.ts: hand-built payload with two diameters verifies grouping math, rounding, sort order, and the empty-payload case. Files MUST be at apps/cad/src/lib/takeoff-rollup.ts and apps/cad/test/takeoff-rollup.test.ts. HINT after blocked run: READ apps/cad/src/lib/bid-payload.ts first and use its REAL exported type names and field names for the payload \u2014 do not invent fields; your test expectations must be computed from the same hand-built payload literal, and rounding is to 2 decimals via Math.round times 100 over 100.",
+   "completed_at": "2026-06-11T15:46:06+00:00",
+   "commit": "51206c93"
+  },
+  {
+   "id": "W13A-scad-emitters",
+   "title": "Parts > parametric OpenSCAD source emitters for pipe fittings (pure)",
+   "status": "blocked",
+   "phase": "wave13-parts",
+   "write_roots": [
+    "apps/cad/src",
+    "apps/cad/test",
+    "apps/cad/scripts"
+   ],
+   "context_files": [
+    "docs/research/openscad-parts-pipeline.md"
+   ],
+   "files_create": [],
+   "gate": "cd apps/cad && npx vitest run test/scad-emitters.test.ts",
+   "attempts": 6,
+   "spec": "Pure strict-TS module apps/cad/src/lib/scad-emitters.ts. Exports: emitPipe(opts with nominalIn, lengthIn, odIn, wallIn), emitElbow90(opts with nominalIn, odIn, centerToEndIn), emitTee(opts with nominalIn, odIn, centerToEndIn, branchCenterToEndIn), emitCoupling(opts with nominalIn, odIn, lengthIn). Each returns a complete OpenSCAD source STRING: a leading comment line stating dimensioned parametric, not manufacturer-exact, then $fn=64; then solid geometry built from cylinder, rotate, translate, difference (hollow bores where wall thickness given). All dims in the emitted source are millimeters converted from inches times 25.4 with 3 decimals. Every emitter throws RangeError on non-finite or non-positive dims and Error when odIn is not greater than 2 times wallIn for pipe. Deterministic output (no randomness). Test file apps/cad/test/scad-emitters.test.ts: each emitter output contains its expected module call tokens (cylinder, difference for hollow parts), the honesty comment, balanced braces and parens counts, correct mm conversion for one known value, and the throw cases. Files MUST be at apps/cad/src/lib/scad-emitters.ts and apps/cad/test/scad-emitters.test.ts.",
+   "last_error": "     \u2192 expected '// Dimensioned parametric, not manufa\u2026' to contain 'cylinder(h=50.8, r=38.1, center=true);'\n     \u2192 expected '// Dimensioned parametric, not manufa\u2026' to contain 'cylinder(h=76.2, r=25.4, center=true);'\n     \u2192 expected '// Dimensioned parametric, not manufa\u2026' to contain 'cylinder(h=152.4, r=25.4, center=true\u2026'\n     \u2192 expected '// Dimensioned parametric, not manufa\u2026' to contain 'cylinder(h=76.2, r=25.4, center=true);'\n FAIL  test/scad-emitters.test.ts > emitPipe > generates valid OpenSCAD code with difference for hollow part\nAssertionError: expected '// Dimensioned parametric, not manufa\u2026' to contain 'cylinder(h=50.8, r=38.1, center=true);'\n- Expected\n+ Received\n FAIL  test/scad-emitters.test.ts > emitElbow90 > generates valid OpenSCAD code with rotate and cylinder\nAssertionError: expected '// Dimensioned parametric, not manufa\u2026' to contain 'cylinder(h=76.2, r=25.4, center=true);'\n- Expected\n+ Received\n FAIL  test/scad-emitters.test.ts > emitTee > generates valid OpenSCAD code with union and difference for hollow part\nAssertionError: expected '// Dimensioned parametric, not manufa\u2026' to contain 'cylinder(h=152.4, r=25.4, center=true\u2026'\n- Expected\n+ Received\n FAIL  test/scad-emitters.test.ts > emitCoupling > generates valid OpenSCAD code with difference for hollow part\nAssertionError: expected '// Dimensioned parametric, not manufa\u2026' to contain 'cylinder(h=76.2, r=25.4, center=true);'\n- Expected\n+ Received"
+  },
+  {
+   "id": "W13B-scad-render-harness",
+   "title": "Parts > headless OpenSCAD STL render harness with honest failure",
+   "status": "pending",
+   "phase": "wave13-parts",
+   "write_roots": [
+    "apps/cad/src",
+    "apps/cad/test",
+    "apps/cad/scripts"
+   ],
+   "context_files": [
+    "apps/cad/src/lib/scad-emitters.ts",
+    "docs/research/openscad-parts-pipeline.md"
+   ],
+   "files_create": [],
+   "gate": "cd apps/cad && npx vitest run test/scad-render.test.ts",
+   "attempts": 0,
+   "spec": "Node harness apps/cad/scripts/render-scad.mjs exporting renderScadToStl(scadSource, outPath) async: resolves the binary from env OPENSCAD_BIN, else openscad on PATH, else the well-known Windows path C colon backslash Program Files backslash OpenSCAD backslash openscad.exe; writes scadSource to a temp .scad file, spawns the binary with -o outPath, awaits exit; SUCCESS only when exit code 0 AND outPath exists AND size greater than 84 bytes (binary STL header); on any failure throws an Error carrying the captured stderr tail \u2014 never returns a fake success. Also export stlTriangleCount(buffer) reading the little-endian uint32 at byte offset 80 of a binary STL. Test file apps/cad/test/scad-render.test.ts: renders emitElbow90 from the existing scad-emitters lib to a temp dir, asserts triangle count greater than 0; asserts a syntactically broken scad source rejects with stderr in the message; skips cleanly with it.skip semantics ONLY when no binary resolves (CI without openscad) by probing first and logging one line. Files MUST be at apps/cad/scripts/render-scad.mjs and apps/cad/test/scad-render.test.ts."
+  },
+  {
+   "id": "W14A-verification-flag",
+   "title": "System > verification-status flag model (flag, never gate)",
+   "status": "pending",
+   "phase": "wave14-parts-flag",
+   "write_roots": [
+    "apps/cad/src/lib",
+    "apps/cad/test"
+   ],
+   "context_files": [],
+   "files_create": [],
+   "gate": "cd apps/cad && npx vitest run test/verification-flag.test.ts",
+   "attempts": 0,
+   "spec": "Pure strict-TS module apps/cad/src/lib/verification-flag.ts. Product doctrine is build-complete flag-do-not-gate: machine-generated content is allowed everywhere but must be labeled. Exports: type VerificationStatus = needs-verification | human-verified ; interface Verification with fields status, note string, source string, verifiedBy string or null, verifiedAt string or null. export function machineGenerated(note, source) returning status needs-verification with given note and source and nulls for verifiedBy and verifiedAt. export function verify(v, who, atIso) returning a NEW object status human-verified, verifiedBy who, verifiedAt atIso, note and source preserved, pure and input untouched, throws TypeError on empty who or atIso. export function isUsable(v) ALWAYS returns true (usability never depends on verification). export function needsAttention(v) true when status is needs-verification. Files MUST be apps/cad/src/lib/verification-flag.ts and apps/cad/test/verification-flag.test.ts. Tests cover all of the above plus purity and the TypeError cases."
+  },
+  {
+   "id": "W14B-cutsheet-to-model",
+   "title": "Parts > generate a flagged CAD model from cut-sheet dims (pure)",
+   "status": "pending",
+   "phase": "wave14-parts-flag",
+   "write_roots": [
+    "apps/cad/src/lib",
+    "apps/cad/test"
+   ],
+   "context_files": [],
+   "files_create": [],
+   "gate": "cd apps/cad && npx vitest run test/cutsheet-to-model.test.ts",
+   "attempts": 0,
+   "spec": "Pure strict-TS module apps/cad/src/lib/cutsheet-to-model.ts composing the scad-emitters lib (read apps/cad/src/lib/scad-emitters.ts FIRST for exact emitter names and option shapes) and the verification-flag lib. interface CutSheetDims with partType one of pipe elbow tee coupling, nominalIn, odIn, optional lengthIn, optional centerToEndIn, optional branchCenterToEndIn, optional wallIn, optional sourceUrl. export function modelFromCutSheet(dims) returning an object with scad string and verification Verification, where it picks the matching emitter by partType, builds the scad source, and attaches machineGenerated(note, source) with note naming the partType and key dims and source the sourceUrl or the literal cut-sheet-derived. Unknown partType throws RangeError. Missing dims required by the chosen emitter let the emitter error propagate. Result is ALWAYS produced for valid input and ALWAYS flagged needs-verification, never proxy never blocked. Files MUST be apps/cad/src/lib/cutsheet-to-model.ts and apps/cad/test/cutsheet-to-model.test.ts. Tests: a tee dims set yields scad with tee tokens and a needs-verification flag whose note mentions tee, unknown partType throws RangeError, flag source carries sourceUrl when provided."
+  },
+  {
+   "id": "W14C-verification-ledger",
+   "title": "Settings > verification ledger replacing the blocked parity gate (pure)",
+   "status": "pending",
+   "phase": "wave14-parts-flag",
+   "write_roots": [
+    "apps/autosprink/src",
+    "apps/autosprink/tests"
+   ],
+   "context_files": [],
+   "files_create": [],
+   "gate": "cd apps/autosprink && npx vitest run tests/verification-ledger.test.js",
+   "attempts": 0,
+   "spec": "Pure ESM module apps/autosprink/src/autobid/verification-ledger.js. New doctrine: report a verification LEDGER, never a block. export function buildLedger(items) where items is an array of objects each having a verificationStatus equal to needs-verification or human-verified. Returns object with total, humanVerified, needsVerification, coveragePct where coveragePct is humanVerified over total times 100 rounded to 1 decimal and 0 when total is 0. export function ledgerSummary(ledger) returns a short human string using plain words not symbols, for example 12 of 155 human-verified (7.7 percent), 143 need verification. Never throws on a valid array; empty array yields zeros and a 0 of 0 summary. Files MUST be apps/autosprink/src/autobid/verification-ledger.js and apps/autosprink/tests/verification-ledger.test.js. Tests cover mixed list math, empty list, rounding, summary wording. Top comment notes a follow-up wave wires this into GET /api/parity and settings.html so the surface shows the ledger instead of a permanent blocked gate."
+  }
+ ]
 }
