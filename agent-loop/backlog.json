@@ -862,7 +862,8 @@
       "gate": "cd apps/cad && npx vitest run test/cutsheet-to-model.test.ts",
       "attempts": 5,
       "spec": "Pure strict-TS module apps/cad/src/lib/cutsheet-to-model.ts composing the scad-emitters lib (read apps/cad/src/lib/scad-emitters.ts FIRST for exact emitter names and option shapes) and the verification-flag lib. interface CutSheetDims with partType one of pipe elbow tee coupling, nominalIn, odIn, optional lengthIn, optional centerToEndIn, optional branchCenterToEndIn, optional wallIn, optional sourceUrl. export function modelFromCutSheet(dims) returning an object with scad string and verification Verification, where it picks the matching emitter by partType, builds the scad source, and attaches machineGenerated(note, source) with note naming the partType and key dims and source the sourceUrl or the literal cut-sheet-derived. Unknown partType throws RangeError. Missing dims required by the chosen emitter let the emitter error propagate. Result is ALWAYS produced for valid input and ALWAYS flagged needs-verification, never proxy never blocked. Files MUST be apps/cad/src/lib/cutsheet-to-model.ts and apps/cad/test/cutsheet-to-model.test.ts. Tests: a tee dims set yields scad with tee tokens and a needs-verification flag whose note mentions tee, unknown partType throws RangeError, flag source carries sourceUrl when provided. HINT: apps/cad/src/lib/scad-emitters.ts now exists with emitPipe emitElbow90 emitTee emitCoupling (opts objects, see its exports); verification-flag.ts now exports Verification and machineGenerated. Import both, do not redefine.",
-      "completed_at": "2026-06-11T18:49:58+00:00"
+      "completed_at": "2026-06-11T18:49:58+00:00",
+      "commit": "e4c7d04a"
     },
     {
       "id": "W14C-verification-ledger",
