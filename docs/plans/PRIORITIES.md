@@ -35,7 +35,10 @@ tracking. Full program: auto-bid-program.md.
    emitters + headless STL render harness so the nominal-fallback count
    (126/155) drops with honest dimensioned-parametric provenance
 6. **W9 building extraction** — assisted walls/doors from PDF sheets (the
-   long pole; W5B/W8A/W8B are its bricks)
+   long pole; W5B/W8A/W8B are its bricks). SAM raster lane UNBLOCKED
+   2026-06-11: hal-sam3 on GX10 now runs geometric prompts on the GB10 GPU
+   (torch cu129→cu130 sm_120 kernels; was silently CPU-fallback) — OpenClaw
+   sam3 MCP fronts it for scanned-PDF segmentation proposals.
 
 ## Standing constraints (never violated)
 - PDF-first; DWG never required.
