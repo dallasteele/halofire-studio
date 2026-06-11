@@ -38,7 +38,10 @@ tracking. Full program: auto-bid-program.md.
 - PDF-first; DWG never required.
 - Fail-closed honesty: design-aid disclaimers, no AHJ/PE/parity claims, no
   outbound email without human approval, nothing fabricated.
-- Local models do volume (qwen → Gemma QAT → Kimi ladder); cloud only for
-  integration/audit the ladder can't do.
+- TOKEN CONSERVATION (user, 2026-06-11): the GX10 loop does ALL build work —
+  pure modules AND UI integration (Wave 10+ proves it). Claude is harvest +
+  audit + backlog-seeding ONLY; no cloud implementation workflows unless the
+  ladder has failed a task twice AND it blocks the queue head. Ladder:
+  qwen → Gemma QAT → Kimi.
 - All 3D work passes the scene-invariants gate + numeric verification.
 - New user direction → update THIS file + seed/adjust waves in the same turn.
