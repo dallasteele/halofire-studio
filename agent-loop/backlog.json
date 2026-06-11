@@ -919,7 +919,7 @@
   {
    "id": "W15A-cutsheet-dims-parse",
    "title": "Parts > parse cut-sheet text into CutSheetDims (pure)",
-   "status": "pending",
+   "status": "blocked",
    "phase": "wave15-scraper",
    "write_roots": [
     "apps/cad/src/lib",
@@ -928,13 +928,14 @@
    "context_files": [],
    "files_create": [],
    "gate": "cd apps/cad && npx vitest run test/cutsheet-dims-parse.test.ts",
-   "attempts": 0,
-   "spec": "Pure strict-TS module apps/cad/src/lib/cutsheet-dims-parse.ts. A scraped manufacturer cut sheet gives a text blob plus a known partType and nominalIn; extract the dimensions the emitters need. export function parseCutSheetDims(text, partType, nominalIn) returning a CutSheetDims object compatible with cutsheet-to-model (read apps/cad/src/lib/cutsheet-to-model.ts for the exact CutSheetDims shape; import that type, do not redefine). Strategy: find numbers near labels in the text using case-insensitive regex \u2014 odIn from outside diameter or OD, wallIn from wall, lengthIn from length or laying length, centerToEndIn from center to end or C to E, branchCenterToEndIn from branch. Numbers may be decimal inches. When a required field for the partType is not found in the text, OMIT it (let the downstream emitter throw or the caller flag it) and record it in a returned missing array. Return shape: object with dims (the CutSheetDims) and missing (array of field names not found). Pure, never throws on a string input; throws TypeError only when text is not a string. Files MUST be apps/cad/src/lib/cutsheet-dims-parse.ts and apps/cad/test/cutsheet-dims-parse.test.ts. Tests: a sample tee cut-sheet text yields odIn and the center-to-end fields parsed correctly with empty missing; a sparse text yields the found fields and lists the rest in missing; non-string throws TypeError. HINT after blocked run: keep the file small and the regexes simple; emit valid JSON with all backslashes in regex escaped; if unsure, use new RegExp with a plain string pattern instead of slash-literals."
+   "attempts": 6,
+   "spec": "Pure strict-TS module apps/cad/src/lib/cutsheet-dims-parse.ts. A scraped manufacturer cut sheet gives a text blob plus a known partType and nominalIn; extract the dimensions the emitters need. export function parseCutSheetDims(text, partType, nominalIn) returning a CutSheetDims object compatible with cutsheet-to-model (read apps/cad/src/lib/cutsheet-to-model.ts for the exact CutSheetDims shape; import that type, do not redefine). Strategy: find numbers near labels in the text using case-insensitive regex \u2014 odIn from outside diameter or OD, wallIn from wall, lengthIn from length or laying length, centerToEndIn from center to end or C to E, branchCenterToEndIn from branch. Numbers may be decimal inches. When a required field for the partType is not found in the text, OMIT it (let the downstream emitter throw or the caller flag it) and record it in a returned missing array. Return shape: object with dims (the CutSheetDims) and missing (array of field names not found). Pure, never throws on a string input; throws TypeError only when text is not a string. Files MUST be apps/cad/src/lib/cutsheet-dims-parse.ts and apps/cad/test/cutsheet-dims-parse.test.ts. Tests: a sample tee cut-sheet text yields odIn and the center-to-end fields parsed correctly with empty missing; a sparse text yields the found fields and lists the rest in missing; non-string throws TypeError. HINT after blocked run: keep the file small and the regexes simple; emit valid JSON with all backslashes in regex escaped; if unsure, use new RegExp with a plain string pattern instead of slash-literals.",
+   "last_error": " FAIL  test/cutsheet-dims-parse.test.ts > parseCutSheetDims > parses tee dimensions correctly\n      9|         expect(result.dims).toEqual({ odIn: 2.0, wallIn: 0.1, centerTo\u2026\n     10|         expect(result.missing).toEqual([]);\n FAIL  test/cutsheet-dims-parse.test.ts > parseCutSheetDims > handles missing fields\n     16|         expect(result.dims).toEqual({ odIn: 2.0 });\n     17|         expect(result.missing).toEqual(['wallIn', 'centerToEndIn', 'br\u2026"
   },
   {
    "id": "W16A-claim-gate-flag",
    "title": "Claim gates > convert blocked gates to needs-verification flags (pure)",
-   "status": "pending",
+   "status": "blocked",
    "phase": "wave16-ungate-claim-gates",
    "write_roots": [
     "apps/autosprink/src",
@@ -943,8 +944,9 @@
    "context_files": [],
    "files_create": [],
    "gate": "cd apps/autosprink && npx vitest run tests/claim-gate-flag.test.js",
-   "attempts": 0,
-   "spec": "Pure ESM module apps/autosprink/src/autobid/claim-gate-flag.js. Doctrine flag-do-not-gate: a claim gate must never present as a hard block; it presents as a usable item flagged needs-verification with what is still required. export function gateFlag(gate) where gate has fields code, missing_artifact, next_action, status, and optional resolved_by. Returns an object with verificationStatus equal to human-verified when status is resolved or resolved_by is set, otherwise needs-verification; usable true ALWAYS; label a short human string; note set to the missing_artifact plus next_action; residual the missing_artifact string when needs-verification else empty string. export function gatesSummary(gates) returning an object with total, verified (count human-verified), needsVerification, and a summary string like 1 of 4 verified, 3 need verification. Never throws on array or object input of the right shape; throws TypeError on non-object gate. Files MUST be apps/autosprink/src/autobid/claim-gate-flag.js and apps/autosprink/tests/claim-gate-flag.test.js. Tests: a blocked AHJ gate maps to needs-verification usable true with residual naming the AHJ artifact; a resolved gate maps to human-verified; gatesSummary counts correctly; non-object throws."
+   "attempts": 6,
+   "spec": "Pure ESM module apps/autosprink/src/autobid/claim-gate-flag.js. Doctrine flag-do-not-gate: a claim gate must never present as a hard block; it presents as a usable item flagged needs-verification with what is still required. export function gateFlag(gate) where gate has fields code, missing_artifact, next_action, status, and optional resolved_by. Returns an object with verificationStatus equal to human-verified when status is resolved or resolved_by is set, otherwise needs-verification; usable true ALWAYS; label a short human string; note set to the missing_artifact plus next_action; residual the missing_artifact string when needs-verification else empty string. export function gatesSummary(gates) returning an object with total, verified (count human-verified), needsVerification, and a summary string like 1 of 4 verified, 3 need verification. Never throws on array or object input of the right shape; throws TypeError on non-object gate. Files MUST be apps/autosprink/src/autobid/claim-gate-flag.js and apps/autosprink/tests/claim-gate-flag.test.js. Tests: a blocked AHJ gate maps to needs-verification usable true with residual naming the AHJ artifact; a resolved gate maps to human-verified; gatesSummary counts correctly; non-object throws.",
+   "last_error": "\n RUN  v2.1.9 /opt/hal9000/apps/halofire-studio/apps/autosprink\n\n \u276f tests/claim-gate-flag.test.js (0 test)\n\n Test Files  1 failed (1)\n      Tests  no tests\n   Start at  16:21:20\n   Duration  315ms (transform 40ms, setup 0ms, collect 0ms, tests 0ms, environment 0ms, prepare 72ms)\n\n\n\u23af\u23af\u23af\u23af\u23af\u23af Failed Suites 1 \u23af\u23af\u23af\u23af\u23af\u23af\u23af\n\n FAIL  tests/claim-gate-flag.test.js [ tests/claim-gate-flag.test.js ]\nReferenceError: describe is not defined\n \u276f tests/claim-gate-flag.test.js:17:1\n     15| const gatesArray = [testGate, resolvedGate];\n     16| \n     17| describe('gateFlag function', () => {\n       | ^\n     18|   it('should return needs-verification for blocked gate', () => {\n     19|     const result = gateFlag(testGate);\n\n\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af[1/1]\u23af\n\n"
   },
   {
    "id": "W16B-claim-gates-api-flag",
@@ -1004,6 +1006,36 @@
    "gate": "cd apps/autosprink && npx vitest run tests/submittal-packet-prep.test.js",
    "attempts": 0,
    "spec": "Pure ESM apps/autosprink/src/autobid/submittal-packet-prep.js. For the three human-signoff gates AHJ_APPROVAL_MISSING PROFESSIONAL_REVIEW_MISSING AUTOSPRINK_EVIDENCE_MISSING, a loop cannot manufacture the approval but CAN prepare the best-effort packet and flag the residual human step. export function prepareSubmittalPacket(gateCode, project) returning an object with gateCode, preparedArtifacts an array of the documents the system can auto-assemble for that gate (for AHJ a permit submittal index, for professional review an automated NFPA design-check summary, for AutoSprink a best-effort engine export manifest), verificationStatus needs-verification, residual a clear string naming the human step still required (AHJ authority approval, licensed PE signoff, or AutoSprink-verified export), and claim_gate_effect no_claims_cleared. Unknown gateCode throws RangeError. Pure. Test apps/autosprink/tests/submittal-packet-prep.test.js: each of the three gate codes yields preparedArtifacts non-empty, needs-verification, a residual naming the human step, and no_claims_cleared; unknown code throws RangeError. NOTE honesty: this NEVER claims AHJ or PE approval exists; it only prepares and flags."
+  },
+  {
+   "id": "W17A-invite-token",
+   "title": "Client portal > secure invite + set-password token model (pure)",
+   "status": "pending",
+   "phase": "wave17-client-portal",
+   "write_roots": [
+    "apps/autosprink/src",
+    "apps/autosprink/tests"
+   ],
+   "context_files": [],
+   "files_create": [],
+   "gate": "cd apps/autosprink && npx vitest run tests/invite-token.test.js",
+   "attempts": 0,
+   "spec": "Pure ESM apps/autosprink/src/autobid/invite-token.js \u2014 security core of client self-registration where username equals the company email. export function createInvite(email, secret, nowMs, ttlMs) returns object with token a url-safe string from node crypto HMAC sha256 of email plus random nonce plus nowMs keyed by secret, tokenHash the sha256 hex of token (store the HASH never the token), email lowercased trimmed, expiresAtMs nowMs plus ttlMs, used false. export function verifyInvite(record, token, nowMs) returns ok true only when sha256 of token equals record tokenHash and nowMs below expiresAtMs and used false, else ok false with reason expired or used or mismatch. export function markUsed(record) returns a NEW record with used true (pure). Throws TypeError on missing email or secret. Use only node crypto. Files MUST be apps/autosprink/src/autobid/invite-token.js and apps/autosprink/tests/invite-token.test.js. Tests cover all branches plus purity."
+  },
+  {
+   "id": "W17B-glass-portal-shell",
+   "title": "Client portal > apple-glass brand helper with placeholder logo flag + animated fire (pure)",
+   "status": "pending",
+   "phase": "wave17-client-portal",
+   "write_roots": [
+    "apps/autosprink/src",
+    "apps/autosprink/tests"
+   ],
+   "context_files": [],
+   "files_create": [],
+   "gate": "cd apps/autosprink && npx vitest run tests/portal-brand.test.js",
+   "attempts": 0,
+   "spec": "Pure ESM apps/autosprink/src/autobid/portal-brand.js exporting brandConfig(opts) returning logoSrc opts.logoUrl when given else the literal placeholder-logo, logoVerified false for placeholder true for a real url, animateFire true, glass true, and a needsVerification note when placeholder saying replace with the official Halo Fire logo. export function brandStyleVars(cfg) returning a CSS custom-properties string for an apple-glass look using backdrop-filter blur and saturate, translucent backgrounds, soft borders. Pure never throws. Files MUST be apps/autosprink/src/autobid/portal-brand.js and apps/autosprink/tests/portal-brand.test.js. Tests cover placeholder vs real logo and that brandStyleVars contains backdrop-filter."
   }
  ]
 }
