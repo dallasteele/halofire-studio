@@ -502,7 +502,7 @@
   {
    "id": "W7A-bid-classifier",
    "title": "AutoBid > bid-invitation email classifier (pure heuristics)",
-   "status": "pending",
+   "status": "done",
    "phase": "wave7-autobid",
    "write_roots": [
     "apps/autosprink/src",
@@ -514,13 +514,15 @@
     "apps/autosprink/tests/autobid-classifier.test.js"
    ],
    "gate": "cd apps/autosprink && npx vitest run tests/autobid-classifier.test.js",
-   "attempts": 0,
-   "spec": "Pure ESM JavaScript module (apps/autosprink is type:module, plain JS, vitest). Classify an email as a likely bid invitation. Exports (exact): export function classifyBidEmail(email) where email = {subject:string, body:string, attachments:[{filename:string,sizeBytes:number}], from:string}. Returns {score:number (0..1), isLikelyBid:boolean (score>=0.5), reasons:string[]}. Scoring (additive, cap 1.0): +0.35 when subject/body matches /\b(invitation to bid|itb|rfp|request for proposal|bid request|bid invitation|tender)\b/i ('keyword'); +0.2 subject/body matches /\b(fire (sprinkler|protection|suppression)|nfpa|sprinkler)\b/i ('domain'); +0.25 any attachment filename matches /\\.(pdf|dwg|dxf)$/i ('plan-attachment'); +0.1 body matches /\b(due|deadline|bid date|proposals? due)\b/i ('deadline'); +0.1 from matches /\b(gc|construction|builders?|contracting|estimating)\b/i or body matches /general contractor/i ('sender-context'). Reasons list each matched criterion name. Pure; throws TypeError on missing subject/body strings or non-array attachments. Tests: a real-shaped ITB email (subject 'Invitation to Bid - Fire Sprinkler - Marriott TI', pdf attachment, deadline in body) scores >=0.8 with >=3 reasons; a newsletter scores <0.3 and isLikelyBid false; missing fields throw; attachment-only email gets exactly the plan-attachment reason; score caps at 1.0."
+   "attempts": 6,
+   "spec": "Pure ESM JavaScript module (apps/autosprink is type:module, plain JS, vitest). Classify an email as a likely bid invitation. Exports (exact): export function classifyBidEmail(email) where email = {subject:string, body:string, attachments:[{filename:string,sizeBytes:number}], from:string}. Returns {score:number (0..1), isLikelyBid:boolean (score>=0.5), reasons:string[]}. Scoring (additive, cap 1.0): +0.35 when subject/body matches /\b(invitation to bid|itb|rfp|request for proposal|bid request|bid invitation|tender)\b/i ('keyword'); +0.2 subject/body matches /\b(fire (sprinkler|protection|suppression)|nfpa|sprinkler)\b/i ('domain'); +0.25 any attachment filename matches /\\.(pdf|dwg|dxf)$/i ('plan-attachment'); +0.1 body matches /\b(due|deadline|bid date|proposals? due)\b/i ('deadline'); +0.1 from matches /\b(gc|construction|builders?|contracting|estimating)\b/i or body matches /general contractor/i ('sender-context'). Reasons list each matched criterion name. Pure; throws TypeError on missing subject/body strings or non-array attachments. Tests: a real-shaped ITB email (subject 'Invitation to Bid - Fire Sprinkler - Marriott TI', pdf attachment, deadline in body) scores >=0.8 with >=3 reasons; a newsletter scores <0.3 and isLikelyBid false; missing fields throw; attachment-only email gets exactly the plan-attachment reason; score caps at 1.0.",
+   "last_error": "Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'vitest' imported from /opt/hal9000/apps/halofire-studio/apps/autosprink/vitest.config.js.timestamp-1781159893829-def1f7555bd01.mjs",
+   "note": "landed by Claude AB2 workflow (commit 7aed36a): src/autobid/bid-classifier.js spec-exact (word boundaries enforced by adversarial verifier) + tests. Do not regenerate."
   },
   {
    "id": "W7B-bid-html",
    "title": "AutoBid > branded HTML bid document renderer (pure)",
-   "status": "pending",
+   "status": "claimed",
    "phase": "wave7-autobid",
    "write_roots": [
     "apps/autosprink/src",
@@ -532,8 +534,10 @@
     "apps/autosprink/tests/autobid-html.test.js"
    ],
    "gate": "cd apps/autosprink && npx vitest run tests/autobid-html.test.js",
-   "attempts": 0,
-   "spec": "Pure ESM JS renderer: bid record -> complete standalone HTML string (inline CSS, no external assets). Exports (exact): export function renderBidHtml(bid) where bid = {projectName, clientName, dateIso, items:[{description, quantity, unit, unitCost, extendedCost}], subtotal, overheadPct, profitPct, total, notes?, disclaimer}. Requirements: <!doctype html> document; header block with 'HALO FIRE PROTECTION' brand line + ember accent color #f0a868 used in inline styles; a line-item table (description/qty/unit/unit cost/extended) with right-aligned currency formatted via Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}); summary rows (subtotal, OH %, profit %, TOTAL bolded); notes paragraph when provided; the disclaimer VERBATIM in a visually distinct footer block; all user-provided strings HTML-ESCAPED (export function escapeHtml(s) \u2014 & < > \" ' \u2014 and use it on every interpolated field; test asserts <script> in a description renders escaped). Throws on: empty projectName/clientName, empty items, missing disclaimer, non-finite money fields. Tests: golden structural assertions (contains brand line, escaped script tag, currency '$1,234.50' formatting, disclaimer present, TOTAL row), throws cases."
+   "attempts": 6,
+   "spec": "Pure ESM JS renderer: bid record -> complete standalone HTML string (inline CSS, no external assets). Exports (exact): export function renderBidHtml(bid) where bid = {projectName, clientName, dateIso, items:[{description, quantity, unit, unitCost, extendedCost}], subtotal, overheadPct, profitPct, total, notes?, disclaimer}. Requirements: <!doctype html> document; header block with 'HALO FIRE PROTECTION' brand line + ember accent color #f0a868 used in inline styles; a line-item table (description/qty/unit/unit cost/extended) with right-aligned currency formatted via Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}); summary rows (subtotal, OH %, profit %, TOTAL bolded); notes paragraph when provided; the disclaimer VERBATIM in a visually distinct footer block; all user-provided strings HTML-ESCAPED (export function escapeHtml(s) \u2014 & < > \" ' \u2014 and use it on every interpolated field; test asserts <script> in a description renders escaped). Throws on: empty projectName/clientName, empty items, missing disclaimer, non-finite money fields. Tests: golden structural assertions (contains brand line, escaped script tag, currency '$1,234.50' formatting, disclaimer present, TOTAL row), throws cases.",
+   "last_error": "JSONDecodeError: Unterminated string starting at: line 1 column 71 (char 70)",
+   "note": "claimed by Claude AB3-5 workflow 2026-06-11 \u2014 will land bid-html.js to spec. Loop must not generate."
   },
   {
    "id": "W7C-crm-status",

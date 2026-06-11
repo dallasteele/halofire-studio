@@ -33,3 +33,5 @@ AssertionError: expected [ …(3) ] to deeply equal [ { index: +0, score: 1, …
 - 2026-06-11 BLOCKED W6A-hanger-spacing (model qwen3:30b-a3b); last error class: S6133: 'MAX_END_DISTANCE_FT' is declared but its value is never read.
 test/hanger-spacing.test.ts(36,19): error TS2304: Cannot find name 'findMaxHangerSpacing'.
 - 2026-06-11 DONE W6B-ceiling-grid on attempt 6 (model kimi-dev:72b).
+- 2026-06-11 BLOCKED W7A-bid-classifier (model qwen3:30b-a3b); last error class: _FOUND]: Cannot find package 'vitest' imported from /opt/hal9000/apps/halofire-studio/apps/autosprink/vitest.config.js.timestamp-1781159893829-def1f7555bd01.mjs
+- 2026-06-11 BLOCKED W7B-bid-html (model qwen3:30b-a3b); last error class: JSONDecodeError: Unterminated string starting at: line 1 column 71 (char 70)
