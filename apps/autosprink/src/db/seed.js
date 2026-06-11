@@ -136,6 +136,32 @@ db.exec(`
     created_by TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   );
+
+  -- AB1 CRM layer: clients + bid_requests (status machine in src/autobid/crm-status.js).
+  CREATE TABLE IF NOT EXISTS clients (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    company TEXT,
+    email TEXT,
+    phone TEXT,
+    notes TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS bid_requests (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    client_id INTEGER REFERENCES clients(id),
+    title TEXT NOT NULL,
+    source TEXT DEFAULT 'manual',
+    due_date TEXT,
+    status TEXT DEFAULT 'received',
+    status_history TEXT,
+    project_id INTEGER REFERENCES projects(id),
+    estimate_total_cents INTEGER,
+    notes TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
 `);
 
 function ensureColumn(table, column, definition) {
