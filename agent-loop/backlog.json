@@ -375,6 +375,82 @@
       "attempts": 0,
       "spec": "Pure orientation solver: given the unit directions of pipes meeting at a junction, compute the Y-up Euler rotation to place a fitting STEP body (modeled with primary run along +X, branch along +Z). Exports (exact): export interface V3{x:number;y:number;z:number} export function normalize(v:V3):V3 \u2014 throws on zero-length. export function elbowRotationY(dirA:V3,dirB:V3):number \u2014 both dirs in the horizontal plane (y component must be <0.01 in magnitude after normalize, else throw 'non-horizontal'): returns the rotation (radians, about world Y) that aligns the elbow's +X leg with dirA; computed as atan2(-dirA.z, dirA.x). export function teeRotationY(runDir:V3,branchDir:V3):number \u2014 aligns the tee run (+X) with runDir using the same atan2; throws when branchDir is parallel to runDir (|dot|>0.99 after normalize). export function isOrthogonal(a:V3,b:V3,tolDeg?:number):boolean \u2014 angle within tolDeg (default 5) of 90 degrees. Tests: dirA=+X -> rotation 0; dirA=+Z -> rotation -PI/2 (toBeCloseTo); dirA=-X -> PI (or -PI, assert abs==PI closeTo); tee with run +X branch +Z passes isOrthogonal and rotation 0; parallel branch throws; non-horizontal throws; normalize throws on zero vector.",
       "commit": "claude-tier2"
+    },
+    {
+      "id": "W5A-pipe-snap",
+      "title": "Tools > Pipe \u2014 endpoint snapping math (pure)",
+      "status": "pending",
+      "phase": "wave5",
+      "write_roots": [
+        "apps/cad/src/lib",
+        "apps/cad/test"
+      ],
+      "context_files": [
+        "apps/cad/src/lib/model.ts"
+      ],
+      "files_create": [
+        "apps/cad/src/lib/pipe-snap.ts",
+        "apps/cad/test/pipe-snap.test.ts"
+      ],
+      "gate": "cd apps/cad && npx tsc -b && npx vitest run test/pipe-snap.test.ts",
+      "attempts": 0,
+      "spec": "Pure snapping for the manual Pipe tool: given a click point (feet, 2D plan: x and z), find what it should connect to. Exports (exact): export interface Pt{x:number;z:number} export type SnapHit = { kind:'node'; nodeId:string; at:Pt } | { kind:'segment'; segmentId:string; at:Pt; t:number } | { kind:'none'; at:Pt }; export function distPointToSegment2D(p:Pt,a:Pt,b:Pt):{dist:number;t:number;closest:Pt} \u2014 standard point-to-segment projection with t clamped to [0,1]; export function snapToNetwork(p:Pt, nodes:Array<{id:string;pos:{x:number;y:number;z:number}}>, segments:Array<{id:string;from:string;to:string}>, tolFt:number): SnapHit \u2014 nearest NODE within tolFt wins (smallest distance, ties by id ascending); else nearest segment within tolFt (projection point, its t); else {kind:'none',at:p}. Throws on non-finite p or tolFt<=0. Segments with missing endpoint nodes are skipped. Tests: node win over farther segment; segment hit returns clamped t in (0,1) and correct closest point for a click beside the middle of a 10ft run (toBeCloseTo); t clamps to 0/1 beyond the ends; none beyond tolerance; tie-break by id; throws (NaN point, tol 0); missing-endpoint segment skipped."
+    },
+    {
+      "id": "W5B-wall-extract-score",
+      "title": "Import > PDF wall-candidate scoring (stroke-weight signal, pure)",
+      "status": "pending",
+      "phase": "wave5",
+      "write_roots": [
+        "apps/cad/src/lib",
+        "apps/cad/test"
+      ],
+      "context_files": [],
+      "files_create": [
+        "apps/cad/src/lib/wall-extract-score.ts",
+        "apps/cad/test/wall-extract-score.test.ts"
+      ],
+      "gate": "cd apps/cad && npx tsc -b && npx vitest run test/wall-extract-score.test.ts",
+      "attempts": 0,
+      "spec": "Codify the verified 1881 stroke-weight wall signal as a pure scorer for assisted extraction (W9). Input lines carry geometry + strokeWidthPt + optional layer. Exports (exact): export interface ScoredLine{x1:number;y1:number;x2:number;y2:number;strokeWidthPt:number;layer?:string} export interface WallScore{index:number;score:number;reasons:string[]} export function dominantStrokeWidth(lines:ScoredLine[]):number \u2014 the most frequent strokeWidthPt among lines LONGER than the median length (rounding widths to 2 decimals); throws on empty input. export function scoreWallCandidates(lines:ScoredLine[],opts?:{targetWidthPt?:number;minLengthFt?:number}):WallScore[] \u2014 per line, score in [0,1]: +0.5 when |strokeWidthPt - target| <= 0.05 (target = opts.targetWidthPt ?? dominantStrokeWidth(lines)); +0.3 when length >= (opts.minLengthFt ?? 3); +0.2 when axis-aligned within 2 degrees (horizontal or vertical); reasons[] names each criterion met ('stroke-match','long-enough','axis-aligned'). Output sorted by score desc then index asc. Pure; throws on empty lines. Tests: a 2.83pt-stroke long axis-aligned line scores 1.0 with all 3 reasons; a thin short diagonal scores 0; dominantStrokeWidth picks the most frequent among long lines (synthetic set); sort order; throws on empty."
+    },
+    {
+      "id": "W5C-bid-payload",
+      "title": "Bid > CAD takeoff -> autosprink bid payload (pure mapping)",
+      "status": "pending",
+      "phase": "wave5",
+      "write_roots": [
+        "apps/cad/src/lib",
+        "apps/cad/test"
+      ],
+      "context_files": [
+        "apps/cad/src/lib/takeoff.ts"
+      ],
+      "files_create": [
+        "apps/cad/src/lib/bid-payload.ts",
+        "apps/cad/test/bid-payload.test.ts"
+      ],
+      "gate": "cd apps/cad && npx tsc -b && npx vitest run test/bid-payload.test.ts",
+      "attempts": 0,
+      "spec": "Pure mapper from the CAD takeoff to the apps/autosprink bid-intake payload shape (the CAD->auto-bid bridge contract). Exports (exact): export interface TakeoffLine{kind:string;label:string;qty:number;unit:string;sizeIn?:number;material?:string} export interface BidPayloadItem{sku:string;description:string;quantity:number;unit:string} export interface BidPayload{projectName:string;source:'halofire-cad';generatedAt:string;items:BidPayloadItem[];disclaimer:string} export function toBidPayload(projectName:string, lines:TakeoffLine[], generatedAt:string):BidPayload \u2014 sku built as `${kind}:${sizeIn ?? 'na'}:${material ?? 'na'}` lowercased; description = label; quantity = qty rounded to 2 decimals; unit passes through; lines with qty<=0 are SKIPPED; disclaimer is a fixed string containing 'design aid' and 'not a committed bid'; throws on empty projectName or non-finite qty in any kept line; generatedAt passes through verbatim (caller supplies the timestamp \u2014 keep the function pure). Tests: two lines map with correct skus; zero-qty skipped; rounding 1.005->use toFixed semantics via Math.round(q*100)/100; throws on empty name and NaN qty; disclaimer contains both phrases; purity (input array untouched)."
+    },
+    {
+      "id": "W5D-head-clearance",
+      "title": "Commands > Analyze coverage \u2014 head-to-wall clearance checks (cited, pure)",
+      "status": "pending",
+      "phase": "wave5",
+      "write_roots": [
+        "apps/cad/src/lib",
+        "apps/cad/test"
+      ],
+      "context_files": [],
+      "files_create": [
+        "apps/cad/src/lib/head-clearance.ts",
+        "apps/cad/test/head-clearance.test.ts"
+      ],
+      "gate": "cd apps/cad && npx tsc -b && npx vitest run test/head-clearance.test.ts",
+      "attempts": 0,
+      "spec": "NFPA-13-style head placement clearance checks as a pure module. Use EXACTLY these cited limits (standard spray, edition-dependent \u2014 every exported constant carries a citation string ending 'Verify adopted edition.'): max distance from wall = HALF the allowed head spacing for the hazard (use these spacings ft: LIGHT->15, ORDINARY_1->15, ORDINARY_2->15, EXTRA_1->12, EXTRA_2->12) and MIN distance from any wall = 4 INCHES (0.3333 ft). Exports (exact): export interface CitedNumber{value:number;citation:string} export const MAX_SPACING_FT: Record<'LIGHT'|'ORDINARY_1'|'ORDINARY_2'|'EXTRA_1'|'EXTRA_2',CitedNumber>; export const MIN_WALL_CLEARANCE_FT: CitedNumber (0.3333); export interface ClearanceIssue{headId:string;kind:'too-close-to-wall'|'too-far-from-wall';distanceFt:number;limitFt:number;citation:string} export function checkWallClearance(heads:Array<{id:string;x:number;z:number}>, wallSegments:Array<{x1:number;z1:number;x2:number;z2:number}>, hazard:'LIGHT'|'ORDINARY_1'|'ORDINARY_2'|'EXTRA_1'|'EXTRA_2'):ClearanceIssue[] \u2014 distance of each head to its NEAREST wall segment (point-to-segment 2D); too-close when < MIN_WALL_CLEARANCE_FT.value; too-far when > MAX_SPACING_FT[hazard].value/2; heads with NO walls produce no issues (honest skip); sorted by headId. Tests: head 0.2ft from a wall -> too-close (limit 0.3333); head 9ft from nearest wall in LIGHT (limit 7.5) -> too-far with distance ~9; compliant head (e.g. 5ft) -> no issue; empty walls -> no issues; citations all end with 'Verify adopted edition.'; sorted output."
     }
   ]
 }
