@@ -56,3 +56,8 @@ Received: "No non-HEAD nodes found"
 - Expected
 + Received
     113|         expect(result).toEqual([
+- 2026-06-11 DONE W10B-hanger-grid-3d on attempt 1 (model qwen3:30b-a3b).
+- 2026-06-11 BLOCKED W10C-clearance-overlay (model qwen3:30b-a3b); last error class: pected [ { headId: 'h1', x: +0, …(3) }, …(1) ] to have a length of 1 but got 2
+- Expected
++ Received
+     12|         expect(markers[0].kind).toBe('too-close');
