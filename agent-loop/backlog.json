@@ -564,7 +564,7 @@
   {
    "id": "W8A-scale-notation",
    "title": "Import > printed-scale notation parser (PDF-first)",
-   "status": "blocked",
+   "status": "done",
    "phase": "wave8-pdf",
    "write_roots": [
     "apps/cad/src/lib",
@@ -578,12 +578,13 @@
    "gate": "cd apps/cad && npx tsc -b && npx vitest run test/scale-notation.test.ts",
    "attempts": 6,
    "spec": "Pure parser for architectural scale notations found in plan-sheet text. Exports (exact): export interface ParsedScale{ftPerInch:number;notation:string} export function parseScaleNotation(text:string):ParsedScale|null \u2014 recognize, case/space tolerant: (a) fractional inch = feet-inches form like 1/8\\\" = 1'-0\\\" or 3/32\\\"=1'-0\\\" or 1/4 in = 1 ft -> ftPerInch = feet / inches (e.g. 1/8\\\"=1' -> 8 ft per inch); (b) whole/decimal inch forms like 1\\\" = 40' (civil) -> 40; (c) ratio form 1:96 -> 96/12 = 8 ft per inch. Return null (never throw) when no notation matches; when multiple notations appear use the FIRST. notation = the matched substring verbatim. export function ftPerUnitFromPdfPoints(ftPerInch:number):number \u2014 PDF user units are points (72/inch): ftPerInch/72; throws on non-finite/non-positive. Tests: '1/8\\\" = 1'-0\\\"' -> 8; '3/32\\\"=1'-0\\\"' -> 32/3 (toBeCloseTo); '1/4 IN = 1 FT' -> 4; '1\\\" = 40'' -> 40; '1:96' -> 8; 'SCALE: AS NOTED' -> null; first-match-wins with two notations; ftPerUnitFromPdfPoints(8) -> 8/72 (toBeCloseTo 6); throws on 0.",
-   "last_error": "src/lib/scale-notation.ts(7,22): error TS1127: Invalid character.\nsrc/lib/scale-notation.ts(7,23): error TS1134: Variable declaration expected.\nsrc/lib/scale-notation.ts(7,24): error TS1109: Expression expected.\nsrc/lib/scale-notation.ts(7,25): error TS1109: Expression expected.\nsrc/lib/scale-notation.ts(7,33): error TS1127: Invalid character.\nsrc/lib/scale-notation.ts(7,47): error TS1127: Invalid character.\nsrc/lib/scale-notation.ts(7,49): error TS1005: ';' expected.\nsrc/lib/scale-notation.ts(7,84): error TS1002: Unterminated string literal.\nsrc/lib/scale-notation.ts(16,19): error TS1005: ')' expected.\nsrc/lib/scale-notation.ts(16,30): error TS1005: ';' expected.\nsrc/lib/scale-notation.ts(16,48): error TS1005: ';' expected.\nsrc/lib/scale-notation.ts(21,3): error TS1128: Declaration or statement expected."
+   "last_error": "src/lib/scale-notation.ts(7,22): error TS1127: Invalid character.\nsrc/lib/scale-notation.ts(7,23): error TS1134: Variable declaration expected.\nsrc/lib/scale-notation.ts(7,24): error TS1109: Expression expected.\nsrc/lib/scale-notation.ts(7,25): error TS1109: Expression expected.\nsrc/lib/scale-notation.ts(7,33): error TS1127: Invalid character.\nsrc/lib/scale-notation.ts(7,47): error TS1127: Invalid character.\nsrc/lib/scale-notation.ts(7,49): error TS1005: ';' expected.\nsrc/lib/scale-notation.ts(7,84): error TS1002: Unterminated string literal.\nsrc/lib/scale-notation.ts(16,19): error TS1005: ')' expected.\nsrc/lib/scale-notation.ts(16,30): error TS1005: ';' expected.\nsrc/lib/scale-notation.ts(16,48): error TS1005: ';' expected.\nsrc/lib/scale-notation.ts(21,3): error TS1128: Declaration or statement expected.",
+   "note": "hand-built by Claude Tier-2 agent (commit e2ae29f), 572/572. Quote chars via unicode escapes. Do not regenerate."
   },
   {
    "id": "W8B-sheet-classify",
    "title": "Import > plan-set sheet triage by title text (PDF-first)",
-   "status": "blocked",
+   "status": "done",
    "phase": "wave8-pdf",
    "write_roots": [
     "apps/cad/src/lib",
@@ -597,7 +598,8 @@
    "gate": "cd apps/cad && npx tsc -b && npx vitest run test/sheet-classify.test.ts",
    "attempts": 6,
    "spec": "Pure classifier for plan-set pages from their extracted text. Exports (exact): export type SheetKind='floor-plan'|'fire-protection'|'detail'|'schedule'|'title'|'other' export interface SheetInfo{kind:SheetKind;score:number;floor:number|null;sheetNo:string|null} export function classifySheet(pageText:string):SheetInfo \u2014 signals (case-insensitive): fire-protection when /\b(FP-?\\d|FIRE (PROTECTION|SPRINKLER)|SPRINKLER PLAN)\b/ (score .9); floor-plan when /\b(FLOOR PLAN|\bA-?1\\d{2}\b|LEVEL \\d+ PLAN)\b/ (.8); schedule when /\bSCHEDULE\b/ (.7); detail when /\b(DETAILS?|SECTIONS?)\b/ (.6); title when /\b(COVER|TITLE SHEET|SHEET INDEX|DRAWING INDEX)\b/ (.8); precedence by the listed order when multiple match (fire-protection wins); 'other' score 0 when none. floor: parse from /\b(\\d+)(ST|ND|RD|TH)? FLOOR\b/ or /\bLEVEL (\\d+)\b/ else null. sheetNo: first match of /\b([A-Z]{1,2}-?\\d{1,3}(?:\\.\\d{1,2})?)\b/ on a line also containing /sheet|dwg|no\\.?/i, else first standalone token matching the same pattern near 'SHEET', else null \u2014 keep this heuristic SIMPLE and documented. Throws TypeError on non-string input. Tests: 'SECOND FLOOR PLAN  A-102' -> floor-plan, floor 2; 'FP-3 FIRE SPRINKLER PLAN LEVEL 3' -> fire-protection, floor 3; 'DOOR SCHEDULE' -> schedule; 'COVER SHEET / SHEET INDEX' -> title; lorem text -> other score 0; precedence fire-protection over floor-plan when both present; non-string throws.",
-   "last_error": "src/lib/sheet-classify.ts(70,1): error TS1005: '}' expected.\n\n"
+   "last_error": "src/lib/sheet-classify.ts(70,1): error TS1005: '}' expected.\n\n",
+   "note": "hand-built by Claude Tier-2 agent (commit e2ae29f), 572/572. Quote chars via unicode escapes. Do not regenerate."
   },
   {
    "id": "W9A-riser-inference",
@@ -638,6 +640,62 @@
    "gate": "cd apps/cad && npx vitest run test/pdf-line-cluster.test.ts",
    "attempts": 0,
    "spec": "Pure strict-TS module. PDF vector extraction yields thousands of tiny colinear strokes that must merge into wall-candidate runs before scoring (wall-extract-score). Exports (exact): export interface RawStroke { a:{x:number,y:number}; b:{x:number,y:number}; widthPt:number }. export interface ClusteredRun { a:{x:number,y:number}; b:{x:number,y:number}; widthPt:number; sourceCount:number }. export function clusterColinear(strokes: RawStroke[], opts?: {angleTolDeg?: number; gapTolPt?: number; offsetTolPt?: number}): ClusteredRun[] with defaults angleTolDeg 2, gapTolPt 3, offsetTolPt 1.5. Algorithm: group strokes whose direction angles differ by at most angleTolDeg (mod 180), whose perpendicular offset from a shared infinite line is at most offsetTolPt, and whose projected 1D intervals on that line overlap or have gaps at most gapTolPt; each group merges into one run spanning min..max projection, widthPt = max member width, sourceCount = member count. Zero-length strokes (a equals b within 1e-9) are dropped before clustering. Output sorted by run length descending then a.x then a.y ascending. Pure, no mutation of inputs. Tests: three collinear horizontal strokes with 2pt gaps merge into one run with sourceCount 3 spanning the full extent; a parallel stroke offset 5pt does NOT merge; a perpendicular stroke never merges; angle within tolerance (1 degree skew) merges; zero-length strokes dropped; empty input returns empty array; determinism of sort order asserted."
+  },
+  {
+   "id": "W10A-scale-prefill",
+   "title": "CAD UI > prefill Set Scale from printed scale text on PDF import",
+   "status": "pending",
+   "phase": "wave10-ui-integration",
+   "write_roots": [
+    "apps/cad/src",
+    "apps/cad/test"
+   ],
+   "context_files": [
+    "apps/cad/src/lib/scale-notation.ts",
+    "apps/cad/src/components/TopRibbon.tsx"
+   ],
+   "files_create": [],
+   "gate": "cd apps/cad && npx vitest run test/scale-prefill.test.ts",
+   "attempts": 0,
+   "spec": "Integration with a pure core. Create apps/cad/src/lib/scale-prefill.ts exporting prefillScaleFromText(pageTexts: string[]): { ftPerUnit: number; sourceText: string; pageIndex: number } | null \u2014 runs parseScaleNotation (existing lib scale-notation) over each page text in order, returns the first hit converted via ftPerUnitFromPdfPoints plus the matched source text and page index, null when no page parses. Create apps/cad/test/scale-prefill.test.ts covering: first-page hit wins, later-page fallback, no-match null, the eighth-inch example mapping to 8 ftPerInch over 72. Then wire it into the existing PDF import path so the import flow stores the suggestion on the project import state where the Set Scale tool reads its default \u2014 find the import handler that already receives pdf text content; if page text is not currently extracted, add extraction via the pdfjs text content API in the existing import module. The suggestion must be OPERATOR-CONFIRMED: it pre-fills the scale input only, never silently applies. Add no new deps."
+  },
+  {
+   "id": "W10B-hanger-grid-3d",
+   "title": "CAD 3D > render hangers and ceiling grids in Viewer3D behind toggles",
+   "status": "pending",
+   "phase": "wave10-ui-integration",
+   "write_roots": [
+    "apps/cad/src",
+    "apps/cad/test"
+   ],
+   "context_files": [
+    "apps/cad/src/lib/hanger-spacing.ts",
+    "apps/cad/src/lib/ceiling-grid.ts",
+    "apps/cad/src/components/Viewer3D.tsx",
+    "apps/cad/test/scene-invariants.test.ts"
+   ],
+   "files_create": [],
+   "gate": "cd apps/cad && npx vitest run test/hanger-grid-3d.test.ts",
+   "attempts": 0,
+   "spec": "Integration. Add two store toggles showHangers and showCeilingGrid (default false) following the existing pressureHeatmap toggle pattern in store.ts and the View controls. In Viewer3D: when showHangers is on, compute hanger positions per segment via the existing hanger-spacing lib (placeHangers or the exported placement function \u2014 read the lib for exact name) and render small cylinder drops from each hanger point up to the ceiling height of the enclosing room (or default ceiling) \u2014 thin cylinders radius 0.02 ft, steel gray. When showCeilingGrid is on, render grid lines per room via the existing ceiling-grid lib at the room ceiling height as thin line segments. Extend the window.__cadVerify3D published object with hangerCount and gridSegmentCount numbers (0 when toggles off). Create apps/cad/test/hanger-grid-3d.test.ts: pure tests asserting the position computation helpers you extract (put them in apps/cad/src/lib/hanger-3d.ts and grid-3d.ts as pure functions returning arrays of positions/segments from network+building inputs) \u2014 counts match the libs spacing rules for a hand-built 30 ft run (3 hangers) and a 20x10 room grid. React rendering itself is verified by the numeric __cadVerify3D fields, not jsdom."
+  },
+  {
+   "id": "W10C-clearance-overlay",
+   "title": "CAD 2D > head-clearance issue overlay in PlanCanvas",
+   "status": "pending",
+   "phase": "wave10-ui-integration",
+   "write_roots": [
+    "apps/cad/src",
+    "apps/cad/test"
+   ],
+   "context_files": [
+    "apps/cad/src/lib/head-clearance.ts",
+    "apps/cad/src/components/PlanCanvas.tsx"
+   ],
+   "files_create": [],
+   "gate": "cd apps/cad && npx vitest run test/clearance-overlay.test.ts",
+   "attempts": 0,
+   "spec": "Integration with a pure core. Create apps/cad/src/lib/clearance-overlay.ts exporting issueMarkers(building, network, hazardClass): Array of { headId: string; x: number; y: number; kind: string; message: string } by running the existing head-clearance check (read the lib for exact export) over all heads against room walls and mapping each issue to its head position with a short human message including the cited limit text. Create apps/cad/test/clearance-overlay.test.ts: a head 0.2 ft from a wall yields a too-close marker with the citation hedge text present; a compliant head yields none; empty walls yields empty (honest skip). Then render markers in PlanCanvas when a new store toggle showClearanceIssues is on (default false, View controls pattern): amber warning circles radius 6 screen px at head positions with a tooltip-on-hover title. Keep all geometry math in the pure lib."
   }
  ]
 }
