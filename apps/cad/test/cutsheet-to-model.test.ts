@@ -1,38 +1,32 @@
 import { describe, it, expect } from 'vitest';
-import { modelFromCutSheet, CutSheetDims } from '../src/lib/cutsheet-to-model';
-import * as emitters from '../src/lib/scad-emitters';
-
-// Mocking emitters to isolate the logic of cutsheet-to-model
-vi.mock('../src/lib/scad-emitters', () => ({
-  emitPipe: vi.fn(() => 'pipe_scad'),
-  emitElbow90: vi.fn(() => 'elbow_scad'),
-  emitTee: vi.fn(() => 'tee_scad'),
-  emitCoupling: vi.fn(() => 'coupling_scad'),
-}));
+import { modelFromCutSheet, type CutSheetDims } from '../src/lib/cutsheet-to-model';
 
 describe('modelFromCutSheet', () => {
-  it('should generate scad and verification for a tee', () => {
+  it('generates real scad + a needs-verification flag for a tee', () => {
     const dims: CutSheetDims = {
       partType: 'tee',
       nominalIn: 2,
       odIn: 2.375,
+      centerToEndIn: 2,
       branchCenterToEndIn: 1.5,
-      wallIn: 0.167,
     };
 
     const result = modelFromCutSheet(dims);
 
-    expect(result.scad).toBe('tee_scad');
+    // Real emitter output, not a mock pass-through.
+    expect(result.scad).toContain('union()');
+    expect(result.scad).toContain('cylinder(');
+    expect(result.verification.status).toBe('needs-verification');
     expect(result.verification.note).toContain('tee');
     expect(result.verification.source).toBe('cut-sheet-derived');
   });
 
-  it('should throw RangeError for unknown partType', () => {
-    const dims = { partType: 'unknown' as any, nominalIn: 1, odIn: 1 } as CutSheetDims;
+  it('throws RangeError for an unknown partType', () => {
+    const dims = { partType: 'unknown', nominalIn: 1, odIn: 1 } as unknown as CutSheetDims;
     expect(() => modelFromCutSheet(dims)).toThrow(RangeError);
   });
 
-  it('should use sourceUrl in verification if provided', () => {
+  it('carries the sourceUrl into the verification flag when provided', () => {
     const dims: CutSheetDims = {
       partType: 'pipe',
       nominalIn: 1,
@@ -44,16 +38,12 @@ describe('modelFromCutSheet', () => {
 
     const result = modelFromCutSheet(dims);
     expect(result.verification.source).toBe('https://example.com/sheet.pdf');
+    expect(result.verification.status).toBe('needs-verification');
   });
 
-  it('should propagate errors from emitters if required dims are missing', () => {
-    // @ts-expect-error - testing runtime error for invalid input
-    const dims: CutSheetDims = { partType: 'pipe', nominalIn: 1, odIn: 1.3 }; // Missing lengthIn/wallIn
-    
-    emitters.emitPipe.mockImplementationOnce(() => {
-      throw new Error('Missing required dimensions');
-    });
-
-    expect(() => modelFromCutSheet(dims)).toThrow('Missing required dimensions');
+  it('propagates the emitter error when required dims are missing', () => {
+    // pipe with no lengthIn/wallIn -> emitter sees NaN -> RangeError.
+    const dims = { partType: 'pipe', nominalIn: 1, odIn: 1.3 } as unknown as CutSheetDims;
+    expect(() => modelFromCutSheet(dims)).toThrow(RangeError);
   });
 });

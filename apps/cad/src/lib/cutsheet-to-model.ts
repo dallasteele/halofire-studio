@@ -38,15 +38,14 @@ export function modelFromCutSheet(dims: CutSheetDims): { scad: string; verificat
         nominalIn: dims.nominalIn,
         odIn: dims.odIn,
         centerToEndIn: dims.centerToEndIn as number,
-        wallIn: dims.wallIn as number,
       });
       break;
     case 'tee':
       scad = emitTee({
         nominalIn: dims.nominalIn,
         odIn: dims.odIn,
+        centerToEndIn: dims.centerToEndIn as number,
         branchCenterToEndIn: dims.branchCenterToEndIn as number,
-        wallIn: dims.wallIn as number,
       });
       break;
     case 'coupling':
@@ -54,7 +53,6 @@ export function modelFromCutSheet(dims: CutSheetDims): { scad: string; verificat
         nominalIn: dims.nominalIn,
         odIn: dims.odIn,
         lengthIn: dims.lengthIn as number,
-        wallIn: dims.wallIn as number,
       });
       break;
     default:
