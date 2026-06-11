@@ -41,3 +41,9 @@ src/lib/scale-notation.ts(21,3): error TS1128: Declaration or statement expected
 - 2026-06-11 BLOCKED W8B-sheet-classify (model qwen3:30b-a3b); last error class: src/lib/sheet-classify.ts(70,1): error TS1005: '}' expected.
 
 
+- 2026-06-11 BLOCKED W9A-riser-inference (model qwen3:30b-a3b); last error class:  nodes found'
+Expected: "no non-head nodes"
+Received: "No non-HEAD nodes found"
+     90|     expect(() => inferRiser(nodes, segments)).toThrow('no non-head nod…
+- 2026-06-11 BLOCKED W9B-pdf-line-cluster (model qwen3:30b-a3b); last error class: e tolerance (1 degree skew)
+ FAIL  test/pdf-line-cluster.test.ts > clusterColinear > asserts determinism of sort order (length desc, then a.x asc, then a.y asc)
