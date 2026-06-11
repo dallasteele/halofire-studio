@@ -51,3 +51,8 @@ Received: "No non-HEAD nodes found"
 - 2026-06-11 BLOCKED W10B-hanger-grid-3d (model qwen3:30b-a3b); last error class:  FAIL  test/hanger-grid-3d.test.ts > hanger-3d logic > computes hanger drops correctly for a 30ft run
 - 2026-06-11 BLOCKED W10C-clearance-overlay (model qwen3:30b-a3b); last error class: arkers > yields no markers for a compliant head
  FAIL  test/clearance-overlay.test.ts > getClearanceIssueMarkers > returns empty array when no walls are present
+- 2026-06-11 BLOCKED W9A-riser-inference (model qwen3:30b-a3b); last error class: JSONDecodeError: Expecting ',' delimiter: line 1 column 4672 (char 4671)
+- 2026-06-11 BLOCKED W9B-pdf-line-cluster (model qwen3:30b-a3b); last error class: pected [ { a: { x: +0, y: +0 }, …(3) } ] to deeply equal [ { a: { x: +0, y: +0 }, …(3) }, …(1) ]
+- Expected
++ Received
+    113|         expect(result).toEqual([
