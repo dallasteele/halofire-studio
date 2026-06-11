@@ -30,3 +30,6 @@ AssertionError: expected [ …(3) ] to deeply equal [ { index: +0, score: 1, …
 - Expected
 + Received
      70|       expect(issues).toEqual([
+- 2026-06-11 BLOCKED W6A-hanger-spacing (model qwen3:30b-a3b); last error class: S6133: 'MAX_END_DISTANCE_FT' is declared but its value is never read.
+test/hanger-spacing.test.ts(36,19): error TS2304: Cannot find name 'findMaxHangerSpacing'.
+- 2026-06-11 DONE W6B-ceiling-grid on attempt 6 (model kimi-dev:72b).
