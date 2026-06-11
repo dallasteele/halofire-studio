@@ -646,7 +646,7 @@
     {
       "id": "W10A-scale-prefill",
       "title": "CAD UI > prefill Set Scale from printed scale text on PDF import",
-      "status": "pending",
+      "status": "done",
       "phase": "wave10-ui-integration",
       "write_roots": [
         "apps/cad/src",
@@ -658,8 +658,9 @@
       ],
       "files_create": [],
       "gate": "cd apps/cad && npx vitest run test/scale-prefill.test.ts",
-      "attempts": 0,
-      "spec": "Integration with a pure core. Create apps/cad/src/lib/scale-prefill.ts exporting prefillScaleFromText(pageTexts: string[]): { ftPerUnit: number; sourceText: string; pageIndex: number } | null \u2014 runs parseScaleNotation (existing lib scale-notation) over each page text in order, returns the first hit converted via ftPerUnitFromPdfPoints plus the matched source text and page index, null when no page parses. Create apps/cad/test/scale-prefill.test.ts covering: first-page hit wins, later-page fallback, no-match null, the eighth-inch example mapping to 8 ftPerInch over 72. Then wire it into the existing PDF import path so the import flow stores the suggestion on the project import state where the Set Scale tool reads its default \u2014 find the import handler that already receives pdf text content; if page text is not currently extracted, add extraction via the pdfjs text content API in the existing import module. The suggestion must be OPERATOR-CONFIRMED: it pre-fills the scale input only, never silently applies. Add no new deps."
+      "attempts": 5,
+      "spec": "Integration with a pure core. Create apps/cad/src/lib/scale-prefill.ts exporting prefillScaleFromText(pageTexts: string[]): { ftPerUnit: number; sourceText: string; pageIndex: number } | null \u2014 runs parseScaleNotation (existing lib scale-notation) over each page text in order, returns the first hit converted via ftPerUnitFromPdfPoints plus the matched source text and page index, null when no page parses. Create apps/cad/test/scale-prefill.test.ts covering: first-page hit wins, later-page fallback, no-match null, the eighth-inch example mapping to 8 ftPerInch over 72. Then wire it into the existing PDF import path so the import flow stores the suggestion on the project import state where the Set Scale tool reads its default \u2014 find the import handler that already receives pdf text content; if page text is not currently extracted, add extraction via the pdfjs text content API in the existing import module. The suggestion must be OPERATOR-CONFIRMED: it pre-fills the scale input only, never silently applies. Add no new deps.",
+      "completed_at": "2026-06-11T09:03:19+00:00"
     },
     {
       "id": "W10B-hanger-grid-3d",
