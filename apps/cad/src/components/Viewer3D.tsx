@@ -29,12 +29,13 @@
 import {
   useEffect,
   useMemo,
+  useRef,
   useState,
   type CSSProperties,
   type ReactElement,
 } from 'react';
 import * as THREE from 'three';
-import { Canvas } from '@react-three/fiber';
+import { Canvas, useFrame } from '@react-three/fiber';
 import { ContactShadows, Grid, Instance, Instances, OrbitControls } from '@react-three/drei';
 import { useCadStore } from '../store';
 import { hasBuilding, type Node, type Project, type Segment } from '../lib/model';
@@ -44,6 +45,7 @@ import {
   type CombinedMesh,
 } from '../lib/building-mesh';
 import { pressureColor, pressureRange, type HydraulicsResult } from '../lib/hydraulics';
+import { segmentVertexColors } from '../lib/flow-gradient';
 import { selectHydraulics } from '../store';
 import {
   loadPartGeometry,
@@ -383,10 +385,28 @@ function ProxyPart({ part }: { part: PlacedPart }): ReactElement {
   );
 }
 
+/** Endpoint pressures + shared scale for one pipe's continuous gradient. */
+interface SegmentGradient {
+  fromPsi: number;
+  toPsi: number;
+  min: number;
+  max: number;
+}
+
+/** Radial faces around each pipe cylinder. */
+const PIPE_RADIAL_SEGMENTS = 12;
+/** Axial divisions on a GRADIENT pipe so the per-vertex ramp bends through the
+ * intermediate scale colors (a 1-division cylinder could only show 2 colors). */
+const PIPE_GRADIENT_DIVISIONS = 8;
+
 /**
  * A pipe run between two endpoints (feet, recentered) as a correctly-sized cylinder
  * oriented along the segment. Real pipe IS cylindrical; the radius scales with the
- * nominal diameter. Selectable.
+ * nominal diameter. Selectable. When the pressure heatmap is on and BOTH endpoint
+ * pressures are known, the cylinder carries a PER-VERTEX pressure gradient from the
+ * from-node psi to the to-node psi (segmentVertexColors — the same lerp the 2D
+ * gradient strokes use) plus a subtle emissive pulse so the system reads as live
+ * flow. Hazen-Williams design-aid visualization, NOT a CFD solve.
  */
 function PipeRun({
   a,
@@ -395,6 +415,7 @@ function PipeRun({
   role,
   selected,
   heatColor,
+  gradient,
   onSelect,
 }: {
   a: [number, number, number];
@@ -403,19 +424,84 @@ function PipeRun({
   role: string;
   selected: boolean;
   heatColor: string | null;
+  gradient: SegmentGradient | null;
   onSelect: () => void;
 }): ReactElement | null {
   const dx = b[0] - a[0];
   const dy = b[1] - a[1];
   const dz = b[2] - a[2];
   const len = Math.hypot(dx, dy, dz);
+  const r = radiusForDiameter(diameterIn) * (selected ? 1.6 : 1);
+  // The selected pipe keeps its solid highlight — gradient applies otherwise.
+  const grad = !selected && len >= 1e-4 ? gradient : null;
+
+  // Vertex-colored cylinder for the gradient path. Local +Y maps onto a->b via
+  // the quaternion below, so axis t = (y + len/2) / len runs 0 at the FROM node
+  // and 1 at the TO node — matching segmentVertexColors' contract.
+  const gradGeo = useMemo(() => {
+    if (!grad) return null;
+    const g = new THREE.CylinderGeometry(r, r, len, PIPE_RADIAL_SEGMENTS, PIPE_GRADIENT_DIVISIONS);
+    const pos = g.getAttribute('position');
+    const axisT = new Float32Array(pos.count);
+    for (let i = 0; i < pos.count; i++) axisT[i] = (pos.getY(i) + len / 2) / len;
+    g.setAttribute(
+      'color',
+      new THREE.BufferAttribute(
+        segmentVertexColors(axisT, grad.fromPsi, grad.toPsi, grad.min, grad.max),
+        3,
+      ),
+    );
+    return g;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [grad?.fromPsi, grad?.toPsi, grad?.min, grad?.max, r, len]);
+  useEffect(() => {
+    return () => {
+      gradGeo?.dispose();
+    };
+  }, [gradGeo]);
+
+  // Subtle emissive pulse (0.15..0.35) on the heatmap material — reads as live
+  // flow. Purely visual; pressures are untouched.
+  const matRef = useRef<THREE.MeshStandardMaterial>(null);
+  useFrame(({ clock }) => {
+    if (!grad || !matRef.current) return;
+    matRef.current.emissiveIntensity = 0.25 + 0.1 * Math.sin(clock.elapsedTime * 2);
+  });
+
   if (len < 1e-4) return null;
   const mid: [number, number, number] = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2];
   const dir = new THREE.Vector3(dx, dy, dz).normalize();
   const up = new THREE.Vector3(0, 1, 0);
   const quat = new THREE.Quaternion().setFromUnitVectors(up, dir);
-  const r = radiusForDiameter(diameterIn) * (selected ? 1.6 : 1);
   const color = selected ? '#ffd27f' : heatColor ?? PIPE_ROLE_COLOR[role] ?? '#8aa0b4';
+
+  if (grad && gradGeo) {
+    // Mid-pressure color drives the pulse glow so it stays on the shared scale.
+    const midColor = pressureColor((grad.fromPsi + grad.toPsi) / 2, grad.min, grad.max);
+    return (
+      <mesh
+        position={mid}
+        quaternion={quat}
+        geometry={gradGeo}
+        castShadow
+        onClick={(e) => {
+          e.stopPropagation();
+          onSelect();
+        }}
+      >
+        <meshStandardMaterial
+          ref={matRef}
+          vertexColors
+          color="#ffffff"
+          roughness={0.35}
+          metalness={0.6}
+          emissive={midColor}
+          emissiveIntensity={0.25}
+        />
+      </mesh>
+    );
+  }
+
   return (
     <mesh
       position={mid}
@@ -426,7 +512,7 @@ function PipeRun({
         onSelect();
       }}
     >
-      <cylinderGeometry args={[r, r, len, 12]} />
+      <cylinderGeometry args={[r, r, len, PIPE_RADIAL_SEGMENTS]} />
       <meshStandardMaterial
         color={color}
         roughness={0.35}
@@ -438,10 +524,19 @@ function PipeRun({
   );
 }
 
-/** Heatmap color accessors (id -> css color | null) shared by heads/segments/fittings. */
+/** Heatmap color accessors (id -> css color | null) shared by heads/segments/fittings,
+ * plus the per-segment endpoint-pressure gradient + shared scale for the
+ * continuous "fluid dynamics" rendering. */
 interface HeatMap {
   node: (id: string) => string | null;
   seg: (id: string) => string | null;
+  /** Endpoint pressures for a segment's continuous gradient (null when either
+   * endpoint has no computed pressure — drawn with the mean color instead). */
+  segGradient: (id: string) => SegmentGradient | null;
+  /** Shared psi scale (drives the legend). */
+  range: { min: number; max: number };
+  /** How many segments have BOTH endpoint pressures (gradient-renderable). */
+  gradientSegments: number;
 }
 
 /* ----------------------------------------------------------- the parts renderer */
@@ -540,6 +635,7 @@ function PartsLayer({
             role={seg.role}
             selected={seg.id === selectedSegmentId}
             heatColor={heat ? heat.seg(seg.id) : null}
+            gradient={heat ? heat.segGradient(seg.id) : null}
             onSelect={() => onSelectSegment(seg.id)}
           />
         );
@@ -822,6 +918,12 @@ export function Viewer3D(): ReactElement {
     const nodePsi = new Map(result.perNode.map((n) => [n.id, n.pressurePsi]));
     const colorFor = (psi: number | undefined): string | null =>
       psi == null ? null : pressureColor(psi, range.min, range.max);
+    // Count the segments whose BOTH endpoints carry a computed pressure — the
+    // honest gradient-renderable count published on window.__cadVerify3D.
+    let gradientSegments = 0;
+    for (const s of project.network.segments) {
+      if (nodePsi.has(s.from) && nodePsi.has(s.to)) gradientSegments += 1;
+    }
     return {
       node: (id) => colorFor(nodePsi.get(id)),
       seg: (id) => {
@@ -832,6 +934,16 @@ export function Viewer3D(): ReactElement {
         if (a == null || b == null) return null;
         return colorFor((a + b) / 2);
       },
+      segGradient: (id) => {
+        const seg = project.network.segments.find((s) => s.id === id);
+        if (!seg) return null;
+        const a = nodePsi.get(seg.from);
+        const b = nodePsi.get(seg.to);
+        if (a == null || b == null) return null;
+        return { fromPsi: a, toPsi: b, min: range.min, max: range.max };
+      },
+      range,
+      gradientSegments,
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pressureHeatmap, project.network, supply, designAreaSqFt, project.hazardDefaults.defaultClass]);
@@ -923,8 +1035,11 @@ export function Viewer3D(): ReactElement {
       physicalCount: counts.physical,
       fallbackCount: counts.fallback,
       sampleRotations,
+      // Continuous pressure-gradient state (true only while the heatmap is on).
+      flowGradient: heat !== null,
+      gradientSegments: heat?.gradientSegments ?? 0,
     };
-  }, [geo, project.network.nodes, project.network.segments, showCeilings, bounds.cx, bounds.cy]);
+  }, [geo, project.network.nodes, project.network.segments, showCeilings, bounds.cx, bounds.cy, heat]);
 
   return (
     <div style={wrapStyle} aria-label="3D building viewer">
@@ -986,6 +1101,15 @@ export function Viewer3D(): ReactElement {
           />
           {' '}Ceilings
         </label>
+      )}
+      {/* Continuous pressure-gradient legend — same scale as the 2D plan legend. */}
+      {heat && (
+        <div style={flowLegendStyle} data-cad-flow-legend aria-label="Pressure gradient legend">
+          <span style={flowLegendBarStyle} aria-hidden="true" />
+          <span>
+            {`${heat.range.min.toFixed(0)} → ${heat.range.max.toFixed(0)} psi — Hazen-Williams design aid`}
+          </span>
+        </div>
       )}
       {!loaded && hasSystem && (
         <div style={systemOnlyHintStyle}>
@@ -1080,6 +1204,34 @@ const ceilingToggleStyle: CSSProperties = {
   padding: `${spacing[0.5]} ${spacing[2]}`,
   userSelect: 'none',
   cursor: 'pointer',
+};
+
+/** Compact pressure-gradient legend overlay (heatmap on only). */
+const flowLegendStyle: CSSProperties = {
+  position: 'absolute',
+  right: 12,
+  bottom: 12,
+  display: 'flex',
+  alignItems: 'center',
+  gap: spacing[2],
+  background: 'rgba(20, 24, 32, 0.85)',
+  border: `1px solid ${colors.border}`,
+  borderRadius: radii.md,
+  color: colors.textSecondary,
+  fontSize: typeScale.xs.size,
+  padding: `${spacing[0.5]} ${spacing[2]}`,
+  pointerEvents: 'none',
+};
+
+/** The same blue->red ramp pressureColor produces (5 stops) — one shared scale. */
+const flowLegendBarStyle: CSSProperties = {
+  display: 'inline-block',
+  width: 110,
+  height: 8,
+  borderRadius: 999,
+  background:
+    'linear-gradient(90deg, rgb(59,130,246), rgb(34,211,238), rgb(74,222,128), rgb(250,204,21), rgb(239,68,68))',
+  border: `1px solid ${colors.border}`,
 };
 
 /** Corner hint when a SYSTEM renders without a building shell (kernel imports). */

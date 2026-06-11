@@ -51,6 +51,7 @@ import {
 } from '../lib/selection-set';
 import { coverageReport } from '../lib/head-layout';
 import { pressureColor, pressureRange, type HydraulicsResult } from '../lib/hydraulics';
+import { konvaColorStops, stopsForSegment } from '../lib/flow-gradient';
 import { selectHydraulics } from '../store';
 import { colors, radii, spacing, typeScale } from '../lib/tokens';
 
@@ -1031,11 +1032,24 @@ export function PlanCanvas(): ReactElement {
                 : heatPsi != null && pRange
                   ? pressureColor(heatPsi, pRange.min, pRange.max)
                   : roleColor(seg.role);
+              // Continuous "fluid dynamics" heatmap stroke: a linear gradient from
+              // the FROM-node pressure color to the TO-node pressure color along the
+              // pipe (selected pipes keep the solid highlight). Konva gradient points
+              // are local shape coords; this Line sits at x=0,y=0 so screen == local.
+              const fromPsi = nodePsi.get(seg.from);
+              const toPsi = nodePsi.get(seg.to);
+              const gradStops =
+                !isSel && pRange && fromPsi != null && toPsi != null
+                  ? konvaColorStops(stopsForSegment(fromPsi, toPsi, pRange.min, pRange.max))
+                  : null;
               return (
                 <Line
                   key={seg.id}
                   points={[pa.sx, pa.sy, pc.sx, pc.sy]}
-                  stroke={stroke}
+                  stroke={gradStops ? undefined : stroke}
+                  strokeLinearGradientStartPoint={gradStops ? { x: pa.sx, y: pa.sy } : undefined}
+                  strokeLinearGradientEndPoint={gradStops ? { x: pc.sx, y: pc.sy } : undefined}
+                  strokeLinearGradientColorStops={gradStops ?? undefined}
                   strokeWidth={widthForDiameter(seg.diameterIn) + (isSel ? 2 : 0)}
                   lineCap="round"
                   hitStrokeWidth={12}
@@ -1464,7 +1478,7 @@ export function PlanCanvas(): ReactElement {
               <span style={hudBadgeStyle}>Pressure heatmap (psi)</span>
               <span style={legendGradientStyle} aria-hidden="true" />
               <span style={hudHintStyle}>
-                {`${pRange.min.toFixed(0)} (low) → ${pRange.max.toFixed(0)} (high) psi — design aid estimate`}
+                {`${pRange.min.toFixed(0)} (low) → ${pRange.max.toFixed(0)} (high) psi — Hazen-Williams design aid estimate`}
               </span>
             </div>
           )}
