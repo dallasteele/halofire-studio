@@ -660,12 +660,13 @@
       "gate": "cd apps/cad && npx vitest run test/scale-prefill.test.ts",
       "attempts": 5,
       "spec": "Integration with a pure core. Create apps/cad/src/lib/scale-prefill.ts exporting prefillScaleFromText(pageTexts: string[]): { ftPerUnit: number; sourceText: string; pageIndex: number } | null \u2014 runs parseScaleNotation (existing lib scale-notation) over each page text in order, returns the first hit converted via ftPerUnitFromPdfPoints plus the matched source text and page index, null when no page parses. Create apps/cad/test/scale-prefill.test.ts covering: first-page hit wins, later-page fallback, no-match null, the eighth-inch example mapping to 8 ftPerInch over 72. Then wire it into the existing PDF import path so the import flow stores the suggestion on the project import state where the Set Scale tool reads its default \u2014 find the import handler that already receives pdf text content; if page text is not currently extracted, add extraction via the pdfjs text content API in the existing import module. The suggestion must be OPERATOR-CONFIRMED: it pre-fills the scale input only, never silently applies. Add no new deps.",
-      "completed_at": "2026-06-11T09:03:19+00:00"
+      "completed_at": "2026-06-11T09:03:19+00:00",
+      "commit": "409498c0"
     },
     {
       "id": "W10B-hanger-grid-3d",
       "title": "CAD 3D > render hangers and ceiling grids in Viewer3D behind toggles",
-      "status": "pending",
+      "status": "blocked",
       "phase": "wave10-ui-integration",
       "write_roots": [
         "apps/cad/src",
@@ -679,8 +680,9 @@
       ],
       "files_create": [],
       "gate": "cd apps/cad && npx vitest run test/hanger-grid-3d.test.ts",
-      "attempts": 0,
-      "spec": "Integration. Add two store toggles showHangers and showCeilingGrid (default false) following the existing pressureHeatmap toggle pattern in store.ts and the View controls. In Viewer3D: when showHangers is on, compute hanger positions per segment via the existing hanger-spacing lib (placeHangers or the exported placement function \u2014 read the lib for exact name) and render small cylinder drops from each hanger point up to the ceiling height of the enclosing room (or default ceiling) \u2014 thin cylinders radius 0.02 ft, steel gray. When showCeilingGrid is on, render grid lines per room via the existing ceiling-grid lib at the room ceiling height as thin line segments. Extend the window.__cadVerify3D published object with hangerCount and gridSegmentCount numbers (0 when toggles off). Create apps/cad/test/hanger-grid-3d.test.ts: pure tests asserting the position computation helpers you extract (put them in apps/cad/src/lib/hanger-3d.ts and grid-3d.ts as pure functions returning arrays of positions/segments from network+building inputs) \u2014 counts match the libs spacing rules for a hand-built 30 ft run (3 hangers) and a 20x10 room grid. React rendering itself is verified by the numeric __cadVerify3D fields, not jsdom."
+      "attempts": 6,
+      "spec": "Integration. Add two store toggles showHangers and showCeilingGrid (default false) following the existing pressureHeatmap toggle pattern in store.ts and the View controls. In Viewer3D: when showHangers is on, compute hanger positions per segment via the existing hanger-spacing lib (placeHangers or the exported placement function \u2014 read the lib for exact name) and render small cylinder drops from each hanger point up to the ceiling height of the enclosing room (or default ceiling) \u2014 thin cylinders radius 0.02 ft, steel gray. When showCeilingGrid is on, render grid lines per room via the existing ceiling-grid lib at the room ceiling height as thin line segments. Extend the window.__cadVerify3D published object with hangerCount and gridSegmentCount numbers (0 when toggles off). Create apps/cad/test/hanger-grid-3d.test.ts: pure tests asserting the position computation helpers you extract (put them in apps/cad/src/lib/hanger-3d.ts and grid-3d.ts as pure functions returning arrays of positions/segments from network+building inputs) \u2014 counts match the libs spacing rules for a hand-built 30 ft run (3 hangers) and a 20x10 room grid. React rendering itself is verified by the numeric __cadVerify3D fields, not jsdom.",
+      "last_error": " FAIL  test/hanger-grid-3d.test.ts > hanger-3d logic > computes hanger drops correctly for a 30ft run"
     },
     {
       "id": "W10C-clearance-overlay",
