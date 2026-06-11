@@ -16,3 +16,6 @@ test/bom-group.test.ts(4,7): error TS6133: 'round2' is declared but its value is
 - 2026-06-11 BLOCKED W5A-pipe-snap (model qwen3:30b-a3b); last error class: 39: Property 'nodeId' does not exist on type 'SnapHit'.
   Property 'nodeId' does not exist on type '{ kind: "segment"; segmentId: string; at: Pt; t: number; }'.
 - 2026-06-11 BLOCKED W5B-wall-extract-score (model qwen3:30b-a3b); last error class: ValueError: your files[] is missing required file(s): apps/cad/test/wall-extract-score.test.ts — emit ALL required files as {"path", "content"} objects.
+- 2026-06-11 BLOCKED W5C-bid-payload (model qwen3:30b-a3b); last error class: e 'any[]' in some locations where its type cannot be determined.
+test/bid-payload.test.ts(41,51): error TS7005: Variable 'lines' implicitly has an 'any[]' type.
+- 2026-06-11 BLOCKED W5D-head-clearance (model qwen3:30b-a3b); last error class: ValueError: your files[] is missing required file(s): apps/cad/test/head-clearance.test.ts — emit ALL required files as {"path", "content"} objects.
