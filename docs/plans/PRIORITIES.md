@@ -5,6 +5,16 @@
 > When the user gives new direction, THIS file is updated first — loops re-aim
 > without losing context. Updated: 2026-06-11.
 
+## Deploy workflow — VPS canonical, verify before go-live (user 2026-06-11)
+NO MORE LOCALHOST as the reference. Live site = http://halofire.rankempire.io
+(VPS 187.124.234.28, halofire.service, :3301, tracks origin/main). All work is
+pushed + gated locally, then deployed ONLY via `scripts/deploy-vps.sh`
+(gates → snapshot → pull/install/restart → health-check → AUTO-ROLLBACK on
+failure). The blind hourly git-pull cron must NOT be the thing that updates the
+client site. Preview/verify against the live URL, not a local dev server. Full
+workflow: DEPLOY.md. OPEN GAP: vhost is HTTP only — enable certbot HTTPS for
+halofire.rankempire.io BEFORE client logins flow (flagged, tracked here).
+
 ## Client delivery (user 2026-06-11)
 Halo Fire's team must see live progress + upload info we can't scrape. Targets:
 - **Live on the VPS, always-on** (systemd; openclaw-vps skill: 187.124.234.28).
