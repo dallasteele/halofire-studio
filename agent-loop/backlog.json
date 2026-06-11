@@ -421,7 +421,7 @@
     {
       "id": "W5C-bid-payload",
       "title": "Bid > CAD takeoff -> autosprink bid payload (pure mapping)",
-      "status": "pending",
+      "status": "done",
       "phase": "wave5",
       "write_roots": [
         "apps/cad/src/lib",
@@ -435,8 +435,9 @@
         "apps/cad/test/bid-payload.test.ts"
       ],
       "gate": "cd apps/cad && npx tsc -b && npx vitest run test/bid-payload.test.ts",
-      "attempts": 0,
-      "spec": "Pure mapper from the CAD takeoff to the apps/autosprink bid-intake payload shape (the CAD->auto-bid bridge contract). Exports (exact): export interface TakeoffLine{kind:string;label:string;qty:number;unit:string;sizeIn?:number;material?:string} export interface BidPayloadItem{sku:string;description:string;quantity:number;unit:string} export interface BidPayload{projectName:string;source:'halofire-cad';generatedAt:string;items:BidPayloadItem[];disclaimer:string} export function toBidPayload(projectName:string, lines:TakeoffLine[], generatedAt:string):BidPayload \u2014 sku built as `${kind}:${sizeIn ?? 'na'}:${material ?? 'na'}` lowercased; description = label; quantity = qty rounded to 2 decimals; unit passes through; lines with qty<=0 are SKIPPED; disclaimer is a fixed string containing 'design aid' and 'not a committed bid'; throws on empty projectName or non-finite qty in any kept line; generatedAt passes through verbatim (caller supplies the timestamp \u2014 keep the function pure). Tests: two lines map with correct skus; zero-qty skipped; rounding 1.005->use toFixed semantics via Math.round(q*100)/100; throws on empty name and NaN qty; disclaimer contains both phrases; purity (input array untouched)."
+      "attempts": 5,
+      "spec": "Pure mapper from the CAD takeoff to the apps/autosprink bid-intake payload shape (the CAD->auto-bid bridge contract). Exports (exact): export interface TakeoffLine{kind:string;label:string;qty:number;unit:string;sizeIn?:number;material?:string} export interface BidPayloadItem{sku:string;description:string;quantity:number;unit:string} export interface BidPayload{projectName:string;source:'halofire-cad';generatedAt:string;items:BidPayloadItem[];disclaimer:string} export function toBidPayload(projectName:string, lines:TakeoffLine[], generatedAt:string):BidPayload \u2014 sku built as `${kind}:${sizeIn ?? 'na'}:${material ?? 'na'}` lowercased; description = label; quantity = qty rounded to 2 decimals; unit passes through; lines with qty<=0 are SKIPPED; disclaimer is a fixed string containing 'design aid' and 'not a committed bid'; throws on empty projectName or non-finite qty in any kept line; generatedAt passes through verbatim (caller supplies the timestamp \u2014 keep the function pure). Tests: two lines map with correct skus; zero-qty skipped; rounding 1.005->use toFixed semantics via Math.round(q*100)/100; throws on empty name and NaN qty; disclaimer contains both phrases; purity (input array untouched).",
+      "completed_at": "2026-06-11T05:05:34+00:00"
     },
     {
       "id": "W5D-head-clearance",
