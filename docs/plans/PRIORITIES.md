@@ -12,6 +12,18 @@ clone CAD engine → branded HTML bid → human-approved outbound email → CRM
 tracking. Full program: auto-bid-program.md.
 
 ## Priority queue (descending)
+00. **UN-GATE THE CLAIM GATES — loop per blocked issue (user 2026-06-11):** the
+    Settings page still shows red BLOCKED claim gates (AHJ_APPROVAL_MISSING,
+    PROFESSIONAL_REVIEW_MISSING, MANUFACTURER_MODEL_APPROVAL_MISSING,
+    AUTOSPRINK_EVIDENCE_MISSING). Per doctrine these become needs-verification
+    FLAGS, never walls. Build a self-improving loop PER gate that uses all
+    OpenClaw tools (GPU SAM, Scrapling scraper, internet, OpenSCAD) to get each
+    as close as possible, iterating, and where it cannot fully verify it STILL
+    presents the best-effort result with a clear "needs further review" flag.
+    Honesty preserved: never claim AHJ/PE/manufacturer approval exists — that
+    residual is the flag. Wave 16 (W16A flag model, W16B API, W16C settings UI,
+    W16D manufacturer-evidence loop, W16E AHJ/PE/AutoSprink packet prep; W16F
+    scraper feeds them). This IS the self-contained AI self-improvement loop.
 0. **PARTS PIPELINE + UN-GATE (NEW TOP PRIORITY, user 2026-06-11):** a
    non-human loop scrapes manufacturer cut sheets for ALL 155 catalog parts →
    generates a CAD model for each (parametric OpenSCAD via the Wave 13
