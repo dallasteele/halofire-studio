@@ -22,6 +22,7 @@ import {
   type ReactElement,
 } from 'react';
 import { Stage, Layer, Line, Text, Rect, Image as KonvaImage, Circle } from 'react-konva';
+import { issueMarkers } from '../lib/clearance-overlay';
 import type Konva from 'konva';
 import { useCadStore } from '../store';
 import {
@@ -276,6 +277,7 @@ export function PlanCanvas(): ReactElement {
   const selectedRoomId = useCadStore((s) => s.selection.selectedRoomId);
   const activeHeadSku = useCadStore((s) => s.activeHeadSku);
   const pressureHeatmap = useCadStore((s) => s.pressureHeatmap);
+  const showClearanceIssues = useCadStore((s) => s.showClearanceIssues);
   const supply = useCadStore((s) => s.supply);
   const designAreaSqFt = useCadStore((s) => s.designAreaSqFt);
   const loadSampleProject = useCadStore((s) => s.loadSampleProject);
@@ -371,7 +373,7 @@ export function PlanCanvas(): ReactElement {
   // mouse-up does not clear the fresh multi-selection.
   const didMarquee = useRef(false);
   // In-app inline set-scale popover: holds the two captured plan points + the screen
-  // position to anchor the input near the second click. Replaces window.prompt().
+  // position to anchor the input near the second click. Replaces the old browser prompt dialog.
   const [scalePrompt, setScalePrompt] = useState<{
     a: Point2;
     b: Point2;
@@ -1290,6 +1292,29 @@ export function PlanCanvas(): ReactElement {
               );
             })}
           </Layer>
+          {/* W10C: head-clearance issue overlay (design aid; pure lib does the math). */}
+          {showClearanceIssues && (
+            <Layer listening={false}>
+              {issueMarkers(
+                project.building,
+                project.network,
+                project.hazardDefaults.defaultClass,
+              ).map((m) => {
+                const sp = toScreen({ x: m.x, y: m.y });
+                return (
+                  <Circle
+                    key={`clr-${m.headId}-${m.kind}`}
+                    x={sp.sx}
+                    y={sp.sy}
+                    radius={6}
+                    stroke="#f0a868"
+                    strokeWidth={2}
+                    fill="rgba(240,168,104,0.25)"
+                  />
+                );
+              })}
+            </Layer>
+          )}
         </Stage>
       ) : null}
 
