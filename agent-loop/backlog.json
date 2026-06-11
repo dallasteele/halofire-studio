@@ -455,9 +455,136 @@
         "apps/cad/test/head-clearance.test.ts"
       ],
       "gate": "cd apps/cad && npx tsc -b && npx vitest run test/head-clearance.test.ts",
-      "attempts": 6,
-      "spec": "NFPA-13-style head placement clearance checks as a pure module. Use EXACTLY these cited limits (standard spray, edition-dependent \u2014 every exported constant carries a citation string ending 'Verify adopted edition.'): max distance from wall = HALF the allowed head spacing for the hazard (use these spacings ft: LIGHT->15, ORDINARY_1->15, ORDINARY_2->15, EXTRA_1->12, EXTRA_2->12) and MIN distance from any wall = 4 INCHES (0.3333 ft). Exports (exact): export interface CitedNumber{value:number;citation:string} export const MAX_SPACING_FT: Record<'LIGHT'|'ORDINARY_1'|'ORDINARY_2'|'EXTRA_1'|'EXTRA_2',CitedNumber>; export const MIN_WALL_CLEARANCE_FT: CitedNumber (0.3333); export interface ClearanceIssue{headId:string;kind:'too-close-to-wall'|'too-far-from-wall';distanceFt:number;limitFt:number;citation:string} export function checkWallClearance(heads:Array<{id:string;x:number;z:number}>, wallSegments:Array<{x1:number;z1:number;x2:number;z2:number}>, hazard:'LIGHT'|'ORDINARY_1'|'ORDINARY_2'|'EXTRA_1'|'EXTRA_2'):ClearanceIssue[] \u2014 distance of each head to its NEAREST wall segment (point-to-segment 2D); too-close when < MIN_WALL_CLEARANCE_FT.value; too-far when > MAX_SPACING_FT[hazard].value/2; heads with NO walls produce no issues (honest skip); sorted by headId. Tests: head 0.2ft from a wall -> too-close (limit 0.3333); head 9ft from nearest wall in LIGHT (limit 7.5) -> too-far with distance ~9; compliant head (e.g. 5ft) -> no issue; empty walls -> no issues; citations all end with 'Verify adopted edition.'; sorted output.",
-      "last_error": "     \u2192 expected [ { headId: 'head1', \u2026(4) } ] to deeply equal [ { headId: 'head1', \u2026(4) } ]\n     \u2192 expected [ { headId: 'head2', \u2026(4) } ] to deeply equal [ { headId: 'head2', \u2026(4) } ]\n     \u2192 expected [ { headId: 'head3', \u2026(4) } ] to deeply equal []\n     \u2192 expected [ { headId: 'headA', \u2026(4) }, \u2026(1) ] to deeply equal [ { headId: 'headA', \u2026(4) }, \u2026(1) ]\n FAIL  test/head-clearance.test.ts > head-clearance > checkWallClearance > reports too-close when head is within MIN_WALL_CLEARANCE_FT\nAssertionError: expected [ { headId: 'head1', \u2026(4) } ] to deeply equal [ { headId: 'head1', \u2026(4) } ]\n- Expected\n+ Received\n     27|       expect(issues).toEqual([\n FAIL  test/head-clearance.test.ts > head-clearance > checkWallClearance > reports too-far when head is beyond MAX_SPACING_FT[hazard]/2\nAssertionError: expected [ { headId: 'head2', \u2026(4) } ] to deeply equal [ { headId: 'head2', \u2026(4) } ]\n- Expected\n+ Received\n     41|       expect(issues).toEqual([\n FAIL  test/head-clearance.test.ts > head-clearance > checkWallClearance > does not report compliant head\nAssertionError: expected [ { headId: 'head3', \u2026(4) } ] to deeply equal []\n- Expected\n+ Received\n     55|       expect(issues).toEqual([]);\n FAIL  test/head-clearance.test.ts > head-clearance > checkWallClearance > sorts issues by headId\nAssertionError: expected [ { headId: 'headA', \u2026(4) }, \u2026(1) ] to deeply equal [ { headId: 'headA', \u2026(4) }, \u2026(1) ]\n- Expected\n+ Received\n     70|       expect(issues).toEqual(["
+      "attempts": 0,
+      "spec": "NFPA-13-style head placement clearance checks as a pure module. Use EXACTLY these cited limits (standard spray, edition-dependent \u2014 every exported constant carries a citation string ending 'Verify adopted edition.'): max distance from wall = HALF the allowed head spacing for the hazard (use these spacings ft: LIGHT->15, ORDINARY_1->15, ORDINARY_2->15, EXTRA_1->12, EXTRA_2->12) and MIN distance from any wall = 4 INCHES (0.3333 ft). Exports (exact): export interface CitedNumber{value:number;citation:string} export const MAX_SPACING_FT: Record<'LIGHT'|'ORDINARY_1'|'ORDINARY_2'|'EXTRA_1'|'EXTRA_2',CitedNumber>; export const MIN_WALL_CLEARANCE_FT: CitedNumber (0.3333); export interface ClearanceIssue{headId:string;kind:'too-close-to-wall'|'too-far-from-wall';distanceFt:number;limitFt:number;citation:string} export function checkWallClearance(heads:Array<{id:string;x:number;z:number}>, wallSegments:Array<{x1:number;z1:number;x2:number;z2:number}>, hazard:'LIGHT'|'ORDINARY_1'|'ORDINARY_2'|'EXTRA_1'|'EXTRA_2'):ClearanceIssue[] \u2014 distance of each head to its NEAREST wall segment (point-to-segment 2D); too-close when < MIN_WALL_CLEARANCE_FT.value; too-far when > MAX_SPACING_FT[hazard].value/2; heads with NO walls produce no issues (honest skip); sorted by headId. Tests: head 0.2ft from a wall -> too-close (limit 0.3333); head 9ft from nearest wall in LIGHT (limit 7.5) -> too-far with distance ~9; compliant head (e.g. 5ft) -> no issue; empty walls -> no issues; citations all end with 'Verify adopted edition.'; sorted output."
+    },
+    {
+      "id": "W6A-hanger-spacing",
+      "title": "Auto Draw > Hangers \u2014 NFPA hanger placement along pipe runs (cited, pure)",
+      "status": "pending",
+      "phase": "wave6",
+      "write_roots": [
+        "apps/cad/src/lib",
+        "apps/cad/test"
+      ],
+      "context_files": [
+        "apps/cad/src/lib/model.ts"
+      ],
+      "files_create": [
+        "apps/cad/src/lib/hanger-spacing.ts",
+        "apps/cad/test/hanger-spacing.test.ts"
+      ],
+      "gate": "cd apps/cad && npx tsc -b && npx vitest run test/hanger-spacing.test.ts",
+      "attempts": 0,
+      "spec": "AutoSprink 'Hangers' auto-placement math as a pure module. Use EXACTLY these cited max hanger spacings for steel pipe (ft, NFPA-13 hanger table class \u2014 every exported constant carries a citation string ending 'Verify adopted edition.'): nominal 1->12, 1.25->12, 1.5->15, 2->15, 2.5->15, 3->15, 4->15, 6->15, 8->15; plus MAX unsupported end distance 3 ft from any pipe end. Exports (exact): export interface CitedNumber{value:number;citation:string} export const MAX_HANGER_SPACING_FT: Record<number,CitedNumber>; export const MAX_END_DISTANCE_FT: CitedNumber (3); export interface HangerPoint{segmentId:string;t:number;x:number;y:number;z:number} export function hangersForSegment(seg:{id:string;diameterIn:number;lengthFt:number}, a:{x:number;y:number;z:number}, b:{x:number;y:number;z:number}): HangerPoint[] \u2014 place hangers along the segment so that: first hanger within MAX_END_DISTANCE_FT of end a, last within MAX_END_DISTANCE_FT of end b, adjacent hangers <= MAX_HANGER_SPACING_FT[nearest defined nominal >= diameterIn, else 15]; use the MINIMUM count satisfying both, evenly spaced (equal gaps) between the first/last positions; segments shorter than 2*MAX_END_DISTANCE get exactly ONE hanger at t=0.5; positions linearly interpolated between a and b; throws on non-finite inputs or lengthFt<=0. Tests: a 30ft 2in run -> first/last within 3ft of ends, gaps <= 15ft, count minimal (3 hangers: t at 0.1, 0.5, 0.9 \u2014 verify gaps == (30-6)/2=12 <=15); a 4ft run -> single hanger t=0.5; spacing table lookup rounds UP to next defined nominal; citations end with 'Verify adopted edition.'; throws on lengthFt 0."
+    },
+    {
+      "id": "W6B-ceiling-grid",
+      "title": "Tools > Ceiling Grid \u2014 2x4 drop-ceiling grid lines for a room (pure)",
+      "status": "pending",
+      "phase": "wave6",
+      "write_roots": [
+        "apps/cad/src/lib",
+        "apps/cad/test"
+      ],
+      "context_files": [],
+      "files_create": [
+        "apps/cad/src/lib/ceiling-grid.ts",
+        "apps/cad/test/ceiling-grid.test.ts"
+      ],
+      "gate": "cd apps/cad && npx tsc -b && npx vitest run test/ceiling-grid.test.ts",
+      "attempts": 0,
+      "spec": "AutoSprink 'Ceiling Grid' geometry as a pure module: standard 2ft x 4ft lay-in grid lines clipped to a rectangular room bbox (full polygon clipping documented as follow-up). Exports (exact): export interface Pt{x:number;y:number} export interface GridLine{x1:number;y1:number;x2:number;y2:number;dir:'x'|'y'} export interface CeilingGrid{lines:GridLine[];cellW:number;cellH:number;originX:number;originY:number} export function ceilingGridForBounds(minX:number,minY:number,maxX:number,maxY:number,opts?:{cellW?:number;cellH?:number;originX?:number;originY?:number}):CeilingGrid \u2014 cellW default 4, cellH default 2 (feet, standard 2x4 lay-in tile with long axis on x); grid origin defaults to (minX,minY); generate interior lines ONLY (no lines on the boundary itself): vertical ('y'-dir) lines at every cellW step strictly between minX and maxX spanning minY..maxY, horizontal ('x'-dir) lines at every cellH step strictly between minY and maxY spanning minX..maxX. Throws on non-finite or degenerate bounds (maxX<=minX etc.) or non-positive cells. export function polygonBounds(poly:Pt[]):{minX:number;minY:number;maxX:number;maxY:number} \u2014 throws on <3 points/non-finite. Tests: a 12x8 room with defaults -> vertical lines at x=+4,+8 (2 lines) and horizontal at y=+2,+4,+6 (3 lines), all spanning the bbox; custom origin shifts the phase; non-positive cell throws; degenerate bounds throws; polygonBounds of a triangle correct."
+    },
+    {
+      "id": "W7A-bid-classifier",
+      "title": "AutoBid > bid-invitation email classifier (pure heuristics)",
+      "status": "pending",
+      "phase": "wave7-autobid",
+      "write_roots": [
+        "apps/autosprink/src",
+        "apps/autosprink/tests"
+      ],
+      "context_files": [],
+      "files_create": [
+        "apps/autosprink/src/autobid/bid-classifier.js",
+        "apps/autosprink/tests/autobid-classifier.test.js"
+      ],
+      "gate": "cd apps/autosprink && npx vitest run tests/autobid-classifier.test.js",
+      "attempts": 0,
+      "spec": "Pure ESM JavaScript module (apps/autosprink is type:module, plain JS, vitest). Classify an email as a likely bid invitation. Exports (exact): export function classifyBidEmail(email) where email = {subject:string, body:string, attachments:[{filename:string,sizeBytes:number}], from:string}. Returns {score:number (0..1), isLikelyBid:boolean (score>=0.5), reasons:string[]}. Scoring (additive, cap 1.0): +0.35 when subject/body matches /\b(invitation to bid|itb|rfp|request for proposal|bid request|bid invitation|tender)\b/i ('keyword'); +0.2 subject/body matches /\b(fire (sprinkler|protection|suppression)|nfpa|sprinkler)\b/i ('domain'); +0.25 any attachment filename matches /\\.(pdf|dwg|dxf)$/i ('plan-attachment'); +0.1 body matches /\b(due|deadline|bid date|proposals? due)\b/i ('deadline'); +0.1 from matches /\b(gc|construction|builders?|contracting|estimating)\b/i or body matches /general contractor/i ('sender-context'). Reasons list each matched criterion name. Pure; throws TypeError on missing subject/body strings or non-array attachments. Tests: a real-shaped ITB email (subject 'Invitation to Bid - Fire Sprinkler - Marriott TI', pdf attachment, deadline in body) scores >=0.8 with >=3 reasons; a newsletter scores <0.3 and isLikelyBid false; missing fields throw; attachment-only email gets exactly the plan-attachment reason; score caps at 1.0."
+    },
+    {
+      "id": "W7B-bid-html",
+      "title": "AutoBid > branded HTML bid document renderer (pure)",
+      "status": "pending",
+      "phase": "wave7-autobid",
+      "write_roots": [
+        "apps/autosprink/src",
+        "apps/autosprink/tests"
+      ],
+      "context_files": [],
+      "files_create": [
+        "apps/autosprink/src/autobid/bid-html.js",
+        "apps/autosprink/tests/autobid-html.test.js"
+      ],
+      "gate": "cd apps/autosprink && npx vitest run tests/autobid-html.test.js",
+      "attempts": 0,
+      "spec": "Pure ESM JS renderer: bid record -> complete standalone HTML string (inline CSS, no external assets). Exports (exact): export function renderBidHtml(bid) where bid = {projectName, clientName, dateIso, items:[{description, quantity, unit, unitCost, extendedCost}], subtotal, overheadPct, profitPct, total, notes?, disclaimer}. Requirements: <!doctype html> document; header block with 'HALO FIRE PROTECTION' brand line + ember accent color #f0a868 used in inline styles; a line-item table (description/qty/unit/unit cost/extended) with right-aligned currency formatted via Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}); summary rows (subtotal, OH %, profit %, TOTAL bolded); notes paragraph when provided; the disclaimer VERBATIM in a visually distinct footer block; all user-provided strings HTML-ESCAPED (export function escapeHtml(s) \u2014 & < > \" ' \u2014 and use it on every interpolated field; test asserts <script> in a description renders escaped). Throws on: empty projectName/clientName, empty items, missing disclaimer, non-finite money fields. Tests: golden structural assertions (contains brand line, escaped script tag, currency '$1,234.50' formatting, disclaimer present, TOTAL row), throws cases."
+    },
+    {
+      "id": "W7C-crm-status",
+      "title": "AutoBid > CRM bid status machine (pure)",
+      "status": "pending",
+      "phase": "wave7-autobid",
+      "write_roots": [
+        "apps/autosprink/src",
+        "apps/autosprink/tests"
+      ],
+      "context_files": [],
+      "files_create": [
+        "apps/autosprink/src/autobid/crm-status.js",
+        "apps/autosprink/tests/autobid-status.test.js"
+      ],
+      "gate": "cd apps/autosprink && npx vitest run tests/autobid-status.test.js",
+      "attempts": 0,
+      "spec": "Pure ESM JS status machine for bid_requests. Exports (exact): export const BID_STATUSES = ['received','reviewing','estimating','bid_sent','won','lost']; export const ALLOWED_TRANSITIONS = { received:['reviewing'], reviewing:['estimating','lost'], estimating:['bid_sent','lost'], bid_sent:['won','lost'], won:[], lost:['reviewing'] } (lost->reviewing = reopen); export function canTransition(from,to) -> boolean (false for unknown states, never throws); export function applyTransition(record, to, atIso) where record={status, history:[{status,atIso}]} -> NEW record {status:to, history:[...history,{status:to,atIso}]} (pure, input untouched); throws Error('invalid transition <from> -> <to>') when not allowed, and TypeError on malformed record/missing atIso. export function timeInStatusMs(record, nowIso) -> ms since the LAST history entry (throws on empty history or invalid dates). Tests: full happy path received->...->won; reopen lost->reviewing allowed; won is terminal (no transitions); invalid jump received->bid_sent throws with the exact message; purity via structuredClone compare; timeInStatusMs computes from the last entry; malformed record throws TypeError."
+    },
+    {
+      "id": "W8A-scale-notation",
+      "title": "Import > printed-scale notation parser (PDF-first)",
+      "status": "pending",
+      "phase": "wave8-pdf",
+      "write_roots": [
+        "apps/cad/src/lib",
+        "apps/cad/test"
+      ],
+      "context_files": [],
+      "files_create": [
+        "apps/cad/src/lib/scale-notation.ts",
+        "apps/cad/test/scale-notation.test.ts"
+      ],
+      "gate": "cd apps/cad && npx tsc -b && npx vitest run test/scale-notation.test.ts",
+      "attempts": 0,
+      "spec": "Pure parser for architectural scale notations found in plan-sheet text. Exports (exact): export interface ParsedScale{ftPerInch:number;notation:string} export function parseScaleNotation(text:string):ParsedScale|null \u2014 recognize, case/space tolerant: (a) fractional inch = feet-inches form like 1/8\\\" = 1'-0\\\" or 3/32\\\"=1'-0\\\" or 1/4 in = 1 ft -> ftPerInch = feet / inches (e.g. 1/8\\\"=1' -> 8 ft per inch); (b) whole/decimal inch forms like 1\\\" = 40' (civil) -> 40; (c) ratio form 1:96 -> 96/12 = 8 ft per inch. Return null (never throw) when no notation matches; when multiple notations appear use the FIRST. notation = the matched substring verbatim. export function ftPerUnitFromPdfPoints(ftPerInch:number):number \u2014 PDF user units are points (72/inch): ftPerInch/72; throws on non-finite/non-positive. Tests: '1/8\\\" = 1'-0\\\"' -> 8; '3/32\\\"=1'-0\\\"' -> 32/3 (toBeCloseTo); '1/4 IN = 1 FT' -> 4; '1\\\" = 40'' -> 40; '1:96' -> 8; 'SCALE: AS NOTED' -> null; first-match-wins with two notations; ftPerUnitFromPdfPoints(8) -> 8/72 (toBeCloseTo 6); throws on 0."
+    },
+    {
+      "id": "W8B-sheet-classify",
+      "title": "Import > plan-set sheet triage by title text (PDF-first)",
+      "status": "pending",
+      "phase": "wave8-pdf",
+      "write_roots": [
+        "apps/cad/src/lib",
+        "apps/cad/test"
+      ],
+      "context_files": [],
+      "files_create": [
+        "apps/cad/src/lib/sheet-classify.ts",
+        "apps/cad/test/sheet-classify.test.ts"
+      ],
+      "gate": "cd apps/cad && npx tsc -b && npx vitest run test/sheet-classify.test.ts",
+      "attempts": 0,
+      "spec": "Pure classifier for plan-set pages from their extracted text. Exports (exact): export type SheetKind='floor-plan'|'fire-protection'|'detail'|'schedule'|'title'|'other' export interface SheetInfo{kind:SheetKind;score:number;floor:number|null;sheetNo:string|null} export function classifySheet(pageText:string):SheetInfo \u2014 signals (case-insensitive): fire-protection when /\b(FP-?\\d|FIRE (PROTECTION|SPRINKLER)|SPRINKLER PLAN)\b/ (score .9); floor-plan when /\b(FLOOR PLAN|\bA-?1\\d{2}\b|LEVEL \\d+ PLAN)\b/ (.8); schedule when /\bSCHEDULE\b/ (.7); detail when /\b(DETAILS?|SECTIONS?)\b/ (.6); title when /\b(COVER|TITLE SHEET|SHEET INDEX|DRAWING INDEX)\b/ (.8); precedence by the listed order when multiple match (fire-protection wins); 'other' score 0 when none. floor: parse from /\b(\\d+)(ST|ND|RD|TH)? FLOOR\b/ or /\bLEVEL (\\d+)\b/ else null. sheetNo: first match of /\b([A-Z]{1,2}-?\\d{1,3}(?:\\.\\d{1,2})?)\b/ on a line also containing /sheet|dwg|no\\.?/i, else first standalone token matching the same pattern near 'SHEET', else null \u2014 keep this heuristic SIMPLE and documented. Throws TypeError on non-string input. Tests: 'SECOND FLOOR PLAN  A-102' -> floor-plan, floor 2; 'FP-3 FIRE SPRINKLER PLAN LEVEL 3' -> fire-protection, floor 3; 'DOOR SCHEDULE' -> schedule; 'COVER SHEET / SHEET INDEX' -> title; lorem text -> other score 0; precedence fire-protection over floor-plan when both present; non-string throws."
     }
   ]
 }
