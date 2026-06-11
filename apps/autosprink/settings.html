@@ -283,11 +283,24 @@ function escapeHtml(value) {
     .replace(/"/g, '&quot;');
 }
 
+function renderLedgerLine(p) {
+  // Doctrine: flag-don't-gate. Show the verification ledger, never a block.
+  if (p && p.ledger && typeof p.ledger.total === 'number') {
+    const built = typeof p.modelsBuilt === 'number' ? `, models built ${p.modelsBuilt} of ${p.ledger.total}` : '';
+    const summary = p.ledgerSummary || `${p.ledger.humanVerified} of ${p.ledger.total} human-verified`;
+    return `Verification: ${summary}${built} — best-effort models are usable now and flagged for human verification.`;
+  }
+  return 'Verification ledger unavailable — components are usable best-effort models, flagged for human verification.';
+}
 async function loadParity() {
   try {
     const p = await api('/parity');
-    const gate = (p.gate && p.gate.status) || p.gateStatus || 'blocked';
-    $('gate').innerHTML = `AUTOSPRINK PARITY GATE: <b class="st ${stClass(gate)}">${String(gate).toUpperCase()}</b> · parityAchieved: <b>${p.parityAchieved}</b> — manufacturer-exact models + licensed PE/AHJ review required (best-effort engine ≠ parity).`;
+    if (p.ledger) {
+      $('gate').innerHTML = `<b class="st" style="background:#3a2c12;color:var(--fire);padding:2px 8px">VERIFICATION LEDGER</b> · ${renderLedgerLine(p)}`;
+    } else {
+      const gate = (p.gate && p.gate.status) || p.gateStatus || 'blocked';
+      $('gate').innerHTML = `AUTOSPRINK PARITY GATE: <b class="st ${stClass(gate)}">${String(gate).toUpperCase()}</b> · parityAchieved: <b>${p.parityAchieved}</b> — manufacturer-exact models + licensed PE/AHJ review required (best-effort engine ≠ parity).`;
+    }
     const areas = (p.matrix && p.matrix.areas) || [];
     $('matrix').innerHTML = areas.map(a => `<div class="row"><span title="${(a.evidence||'').replace(/"/g,'&quot;')}">${a.name||a.key}${a.gated?' <span class="st gated" style="padding:1px 5px">gated</span>':''}</span><span class="st ${stClass(a.status)}">${a.status}</span></div>`).join('') || '<span class="muted">no matrix</span>';
   } catch(e){ $('gate').innerHTML = '<span class="err">parity unavailable: '+e.message+'</span>'; }
