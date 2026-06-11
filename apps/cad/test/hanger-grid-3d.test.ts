@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { computeHangerPositions, countHangers } from '../src/lib/hanger-3d';
 import { hangersForSegment } from '../src/lib/hanger-spacing';
-import { HangerPoint } from '../src/lib/hanger-spacing';
 
 /**
  * A 30 ft run of 1.5 inch pipe has max spacing 15 and max end distance 3,
@@ -19,12 +18,6 @@ const b30ft = { x: 30, y: 0, z: 0 };
  * A 20x10 room grid with default cell size (4x2) should produce a grid
  * with specific segment counts.
  */
-const roomBounds = {
-  minX: 0,
-  minY: 0,
-  maxX: 20,
-  maxY: 10,
-};
 
 describe('hanger-3d', () => {
   it('computes hanger positions for a 30 ft run of 1.5 inch pipe', () => {

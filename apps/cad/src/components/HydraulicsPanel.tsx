@@ -27,7 +27,9 @@ export function HydraulicsPanel(): ReactElement {
   const setSupply = useCadStore((s) => s.setSupply);
   const setDesignArea = useCadStore((s) => s.setDesignArea);
   const pressureHeatmap = useCadStore((s) => s.pressureHeatmap);
+  const showClearanceIssues = useCadStore((s) => s.showClearanceIssues);
   const setPressureHeatmap = useCadStore((s) => s.setPressureHeatmap);
+  const setShowClearanceIssues = useCadStore((s) => s.setShowClearanceIssues);
 
   // LIVE result — recomputed whenever the network / supply / design area change.
   const result = useMemo(
@@ -90,6 +92,14 @@ export function HydraulicsPanel(): ReactElement {
             onChange={(e) => setPressureHeatmap(e.target.checked)}
           />
           Pressure heatmap
+        </label>
+        <label style={toggleLabelStyle}>
+          <input
+            type="checkbox"
+            checked={showClearanceIssues}
+            onChange={(e) => setShowClearanceIssues(e.target.checked)}
+          />
+          Clearance issues
         </label>
       </div>
 

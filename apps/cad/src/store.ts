@@ -393,8 +393,10 @@ export interface CadState {
 
   /** When true, the 2D + 3D views color heads/segments by hydraulic pressure. */
   pressureHeatmap: boolean;
+  showClearanceIssues: boolean;
   /** Toggle the pressure heatmap on/off (shared 2D + 3D). */
   setPressureHeatmap: (on: boolean) => void;
+  setShowClearanceIssues: (on: boolean) => void;
 
   /* ----------------------------------------------------------- W6 takeoff + bid */
 
@@ -522,6 +524,7 @@ export const useCadStore = create<CadState>((set, get) => {
   supply: null,
   designAreaSqFt: null,
   pressureHeatmap: false,
+  showClearanceIssues: false,
   priceTable: null,
 
   undo: () =>
@@ -884,6 +887,7 @@ export const useCadStore = create<CadState>((set, get) => {
   setDesignArea: (sqft) =>
     set({ designAreaSqFt: sqft != null && sqft > 0 ? sqft : null }),
   setPressureHeatmap: (on) => set({ pressureHeatmap: on }),
+  setShowClearanceIssues: (on) => set({ showClearanceIssues: on }),
 
   /* ----------------------------------------------------------- W6 takeoff + bid */
 
