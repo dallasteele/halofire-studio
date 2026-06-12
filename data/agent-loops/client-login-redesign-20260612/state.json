@@ -1,0 +1,30 @@
+{
+  "name": "client-login-redesign-20260612",
+  "status": "verified",
+  "iteration": 2,
+  "last_updated": "2026-06-12T00:44:31Z",
+  "current_stage": "VERIFY",
+  "completed": [
+    "Created closed-loop contract before production edits.",
+    "Added a static regression test for official-logo usage, clean public copy, and no exposed development credentials.",
+    "Redesigned the public secure login page around the official Halo Fire mark, Apple glass styling, and authenticated collaboration copy.",
+    "Created a transparent sharpened PNG from the official Halo Fire logo for hero use.",
+    "Animated the logo with deterministic CSS float, glow, halo drift, and sheen effects.",
+    "Verified focused tests, production build, and browser-rendered desktop/mobile screenshots."
+  ],
+  "verification": {
+    "client_login_static": "passed",
+    "focused_vitest": "passed",
+    "vite_build": "passed",
+    "browser_desktop": "passed",
+    "browser_mobile": "passed",
+    "browser_login_modal": "passed",
+    "formal_proof": "NO_FORMALIZABLE_CLAIM"
+  },
+  "evidence": [
+    "out/agent-loops/client-login-redesign-20260612/desktop.png",
+    "out/agent-loops/client-login-redesign-20260612/mobile.png",
+    "out/agent-loops/client-login-redesign-20260612/login-modal.png",
+    "out/agent-loops/client-login-redesign-20260612/report.json"
+  ]
+}

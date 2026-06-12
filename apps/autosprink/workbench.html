@@ -50,8 +50,76 @@
   .muted{color:var(--muted);font-size:12px}
   .disclaimer{font-size:11px;color:var(--gold);font-family:var(--mono);margin-top:10px;line-height:1.5}
 </style>
+<link rel="stylesheet" href="/public/styles/halofire-tokens.css">
+<style id="employee-studio-glass-overrides">
+  body.hf-studio-glass{
+    --surface:rgba(13,12,10,0.76);
+    --surface2:rgba(0,0,0,0.46);
+    --border:rgba(255,255,255,0.14);
+    --fire:#e8432d;
+    --fire-light:#ff6b57;
+    --gold:#ffd54f;
+    --cyan:#ffd54f;
+    --text:#f2ece0;
+    --muted:rgba(242,236,224,0.62);
+    --bright:#fff8e8;
+    background:
+      radial-gradient(circle at 30% 42%,rgba(255,213,79,0.14),transparent 24%),
+      radial-gradient(circle at 74% 37%,rgba(232,67,45,0.14),transparent 31%),
+      linear-gradient(125deg,#050505 0%,#11100e 45%,#090302 100%);
+    overflow:auto;
+  }
+  body.hf-studio-glass header{
+    background:linear-gradient(180deg,rgba(255,255,255,0.08),rgba(0,0,0,0.42)),rgba(13,12,10,0.72);
+    border-bottom:1px solid rgba(255,255,255,0.14);
+    backdrop-filter:blur(28px) saturate(1.35);
+    -webkit-backdrop-filter:blur(28px) saturate(1.35);
+  }
+  body.hf-studio-glass .card,
+  body.hf-studio-glass .gate,
+  body.hf-studio-glass #viewport{
+    background:
+      linear-gradient(145deg,rgba(255,255,255,0.1),rgba(255,255,255,0.025)),
+      rgba(13,12,10,0.78);
+    border:1px solid rgba(255,255,255,0.14);
+    border-radius:18px;
+    box-shadow:0 30px 80px rgba(0,0,0,0.46),inset 0 1px 0 rgba(255,255,255,0.12);
+    backdrop-filter:blur(28px) saturate(1.35);
+    -webkit-backdrop-filter:blur(28px) saturate(1.35);
+  }
+  body.hf-studio-glass input,
+  body.hf-studio-glass select,
+  body.hf-studio-glass textarea{
+    background:linear-gradient(180deg,rgba(255,255,255,0.05),rgba(0,0,0,0.48))!important;
+    border:1px solid rgba(255,255,255,0.16)!important;
+    border-radius:12px!important;
+    color:var(--bright)!important;
+  }
+  body.hf-studio-glass button.go{
+    background:linear-gradient(180deg,#ffd54f,#c89a3c)!important;
+    color:#0d0c0a!important;
+    border:1px solid rgba(255,213,79,0.42)!important;
+    border-radius:12px!important;
+    box-shadow:0 16px 36px rgba(255,213,79,0.16);
+  }
+  body.hf-studio-glass .brand span{color:#e8432d}
+  body.hf-studio-glass .alpha-banner{
+    background:linear-gradient(90deg,rgba(232,67,45,0.16),rgba(255,213,79,0.1));
+    border-color:rgba(255,213,79,0.24);
+    color:#ffd54f;
+  }
+  @media(max-width:840px){
+    body.hf-studio-glass{overflow:auto}
+    body.hf-studio-glass header{position:sticky;flex-wrap:wrap;gap:8px;padding:12px 16px}
+    body.hf-studio-glass .who{display:flex;flex-wrap:wrap;gap:8px}
+    body.hf-studio-glass .who a{margin-left:0}
+    body.hf-studio-glass main{grid-template-columns:1fr;padding:16px;width:100%;gap:14px}
+    body.hf-studio-glass .card{padding:16px}
+    body.hf-studio-glass #viewport{height:min(58vh,460px)}
+  }
+</style>
 </head>
-<body>
+<body class="hf-shell hf-studio-glass">
 <header>
   <div class="brand">Halo<span>Fire</span> · Workbench</div>
   <div class="who"><a href="/crm.html" style="margin-right:14px">CRM</a><a href="/autosprink.html" style="margin-right:14px">Sprinkler Studio →</a><a href="/settings.html" style="margin-right:14px">Settings &amp; Parity</a><span id="whoami">…</span><a id="logout">Sign out</a></div>

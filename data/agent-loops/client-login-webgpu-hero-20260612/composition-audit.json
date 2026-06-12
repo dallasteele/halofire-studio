@@ -1,0 +1,40 @@
+{
+  "loop": "client-login-webgpu-hero-20260612",
+  "status": "accepted_for_slice",
+  "layout_math": {
+    "system": "golden_ratio",
+    "phi": 1.618,
+    "desktop_split": "Hero column approximately 1.6x login column; login card remains compact and aligned to optical center.",
+    "mobile_split": "Hero remains first, scaled down; login follows with no overlap."
+  },
+  "geometry": {
+    "hero": "Unframed scene, no visible rectangular border or glass card around the flame.",
+    "flame": "Actual extruded 3D object inspired by the Halo Fire logo flame silhouette. Entire flame and halo must fit inside hero safe zone; no top halo clip, no bottom flame crop.",
+    "login": "Single glass panel, max width around 430px, no nested cards."
+  },
+  "scale": {
+    "hero_to_card": "Hero visual may be larger than the card but should not dominate the whole viewport or collide with the login panel.",
+    "logo": "Logo visible in header and login card; not oversized in the hero.",
+    "controls": "Inputs and sign-in button use consistent modular sizing and stable heights."
+  },
+  "clipping": {
+    "desktop": "Codex preview screenshot confirms animated halo/flame bounds remain inside visible viewport and stage.",
+    "mobile": "Hero height constrained; no canvas or flame overlap with login form."
+  },
+  "interaction": {
+    "drag": "Pointer drag must tug/stretch the 3D flame object like fabric or elastic glass, not rotate the whole display.",
+    "hover": "Hover should energize the flame/halo material without changing layout bounds.",
+    "click": "Click should create a pulse through the flame and halo."
+  },
+  "color": {
+    "palette": "Black glass base, warm fire amber/red, official Halo Fire mark, blue header wordmark retained only from logo/brand lockup.",
+    "dominant_hue_rule": "Avoid one-note red/orange page; use black glass and restrained amber accent.",
+    "contrast": "Form labels, inputs, and CTA must stay legible over glass."
+  },
+  "evidence": {
+    "figma_reference_file": "https://www.figma.com/design/41Et0LQ9n6YEutm2zknbOX",
+    "accepted_screenshot": "apps/autosprink/out/agent-loops/client-login-webgpu-hero-20260612/preview-window-webgpu-red-flame.png",
+    "browser_preview_url": "http://localhost:5175/?codexFresh=1781231186866",
+    "decision": "pass"
+  }
+}

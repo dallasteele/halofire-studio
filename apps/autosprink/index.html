@@ -3,416 +3,1121 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Halo Fire - Fire Protection Management Platform</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<title>Halo Fire - Secure Client Access</title>
 <style>
-/* ═══════════════════════════════════════════════════════════
-   HALOFIRE PLATFORM — Golden Ratio Layout System
-   φ = 1.618 | 1/φ = 0.618
-   Fibonacci spacings: 5, 8, 13, 21, 34, 55, 89px
-   Content/Data split: 61.8% / 38.2%
-   ═══════════════════════════════════════════════════════════ */
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+*,*::before,*::after{box-sizing:border-box}
 :root{
-  --bg:#08080a;--surface:#111114;--surface2:#18181c;
-  --fire:#E53935;--fire-light:#FF6E40;--fire-glow:rgba(229,57,53,0.15);
-  --gold:#FFD54F;--gold-bright:#FFE082;
-  --cyan:#4DD0E1;
-  --text:#d4d4d8;--text-muted:#71717a;--text-bright:#fafafa;
-  --border:rgba(255,255,255,0.06);--border-hover:rgba(255,255,255,0.12);
-  --font:'Inter',system-ui,-apple-system,sans-serif;
-  --mono:'JetBrains Mono',monospace;
+  --bg:#07080a;
+  --panel:rgba(255,255,255,0.09);
+  --panel-strong:rgba(255,255,255,0.14);
+  --stroke:rgba(255,255,255,0.22);
+  --stroke-soft:rgba(255,255,255,0.12);
+  --text:#f7f7f4;
+  --muted:#b8b8b2;
+  --subtle:#85857f;
+  --fire:#e8432d;
+  --fire-soft:rgba(232,67,45,0.34);
+  --gold:#c89a3c;
+  --halo-yellow:#ffd54f;
+  --paper:#f2ece0;
+  --amber:#c89a3c;
+  --studio-surface:#141210;
+  --studio-surface-2:#1b1815;
+  --phi:1.618;
+  --glass-blur:24px;
+  --font:"IBM Plex Mono","JetBrains Mono","SF Mono","Cascadia Code",Consolas,monospace;
+  --display:"Fraunces","Didot",Georgia,ui-serif,serif;
+  --mono:"JetBrains Mono","IBM Plex Mono","SF Mono","Cascadia Code",Consolas,monospace;
 }
-html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:var(--font);color:var(--text);-webkit-font-smoothing:antialiased}
-canvas#bg{position:fixed;top:0;left:0;z-index:0;opacity:0.55}
-
-/* ── LOADER ── */
-#loader{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 1s ease,visibility 1s}
-#loader.done{opacity:0;visibility:hidden;pointer-events:none}
-.loader-mark{width:34px;height:34px;border:2px solid rgba(229,57,53,0.2);border-top-color:var(--fire);border-radius:50%;animation:spin 1.2s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.loader-label{margin-top:21px;font-family:var(--mono);font-size:11px;color:var(--text-muted);letter-spacing:3px}
-
-/* ── NAV (height: 55px — Fibonacci) ── */
-nav{position:fixed;top:0;left:0;right:0;z-index:100;height:55px;display:flex;align-items:center;justify-content:space-between;padding:0 34px;background:rgba(8,8,10,0.82);backdrop-filter:blur(21px);-webkit-backdrop-filter:blur(21px);border-bottom:1px solid var(--border)}
-.brand{display:flex;align-items:center;gap:8px}
-.brand-name{font-size:21px;font-weight:900;font-style:italic;letter-spacing:0.5px;color:var(--text-bright)}
-.brand-tag{font-family:var(--mono);font-size:8px;color:var(--text-muted);padding:2px 8px;border:1px solid var(--border);border-radius:3px;letter-spacing:1.5px;font-style:normal}
-.nav-links{display:flex;gap:0}
-.nav-links a{font-size:11px;font-weight:500;color:var(--text-muted);text-decoration:none;padding:8px 13px;border-radius:5px;letter-spacing:1px;text-transform:uppercase;transition:color .2s,background .2s}
-.nav-links a:hover,.nav-links a.on{color:var(--text-bright);background:rgba(255,255,255,0.04)}
-.nav-right{display:flex;align-items:center;gap:8px}
-.btn-sign{font-family:var(--font);font-size:11px;font-weight:600;padding:7px 21px;border-radius:5px;border:none;cursor:pointer;letter-spacing:1px;transition:all .2s;background:var(--fire);color:#fff}
-.btn-sign:hover{background:var(--fire-light)}
-.menu-btn{display:none;background:none;border:none;cursor:pointer;padding:5px}
-.menu-btn span{display:block;width:21px;height:1.5px;background:var(--text-muted);margin:5px 0;border-radius:1px}
-
-/* ── HERO — 61.8% left / 38.2% right golden split ── */
-.hero{position:relative;z-index:10;width:100%;height:100vh;display:grid;grid-template-columns:61.8fr 38.2fr;align-items:center;padding:89px 55px 55px;pointer-events:none}
-.hero-left{pointer-events:auto;max-width:560px}
-.hero-eyebrow{font-family:var(--mono);font-size:10px;color:var(--fire);letter-spacing:3px;text-transform:uppercase;margin-bottom:13px;display:flex;align-items:center;gap:8px}
-.hero-eyebrow .pulse{width:5px;height:5px;border-radius:50%;background:var(--fire);animation:blink 2.5s ease-in-out infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
-.hero-h1{font-size:clamp(34px,4.5vw,55px);font-weight:800;line-height:1.12;letter-spacing:-0.3px;margin-bottom:21px;color:var(--text-bright)}
-.hero-h1 .accent{background:linear-gradient(135deg,var(--fire),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.hero-p{font-size:15px;line-height:1.618;color:var(--text-muted);margin-bottom:34px;max-width:440px}
-.hero-btns{display:flex;gap:13px}
-.btn-main{font-family:var(--font);font-size:12px;font-weight:700;padding:13px 34px;border-radius:5px;border:none;cursor:pointer;letter-spacing:1.5px;text-transform:uppercase;transition:all .2s;background:var(--fire);color:#fff}
-.btn-main:hover{background:var(--fire-light);box-shadow:0 8px 34px rgba(229,57,53,0.25)}
-.btn-outline{font-family:var(--font);font-size:12px;font-weight:500;padding:13px 34px;border-radius:5px;border:1px solid var(--border);background:none;color:var(--text-muted);cursor:pointer;letter-spacing:1.5px;text-transform:uppercase;transition:all .2s}
-.btn-outline:hover{color:var(--text-bright);border-color:var(--border-hover)}
-
-/* ── KPI CARDS — right 38.2% column ── */
-.hero-right{display:flex;flex-direction:column;gap:13px;justify-self:end;width:100%;max-width:240px;pointer-events:auto}
-.kpi{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:21px;transition:border-color .25s,box-shadow .25s}
-.kpi:hover{border-color:var(--border-hover);box-shadow:0 0 34px rgba(229,57,53,0.04)}
-.kpi-label{font-family:var(--mono);font-size:9px;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:5px}
-.kpi-num{font-size:28px;font-weight:800;letter-spacing:-0.5px}
-.kpi-num.c1{color:var(--fire)}
-.kpi-num.c2{color:var(--gold)}
-.kpi-num.c3{color:var(--cyan)}
-.kpi-delta{font-family:var(--mono);font-size:9px;color:var(--text-muted);margin-top:5px}
-.kpi-delta .g{color:#4ade80}
-
-/* ── FOOTER (height: 34px — Fibonacci) ── */
-.foot{position:fixed;bottom:0;left:0;right:0;z-index:100;height:34px;display:flex;align-items:center;justify-content:space-between;padding:0 34px;background:rgba(8,8,10,0.82);backdrop-filter:blur(13px);border-top:1px solid var(--border);font-family:var(--mono);font-size:9px;color:var(--text-muted);letter-spacing:1px}
-.foot-left{display:flex;align-items:center;gap:21px}
-.foot-dot{width:5px;height:5px;border-radius:50%;background:#4ade80;display:inline-block;margin-right:5px}
-
-/* ── LOGIN ── */
-.overlay{position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.85);backdrop-filter:blur(13px);display:none;align-items:center;justify-content:center}
-.overlay.on{display:flex}
-.login{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:55px 34px 34px;width:370px;max-width:92vw;position:relative}
-.login-head{text-align:center;margin-bottom:34px}
-.login-head h2{font-size:26px;font-weight:900;font-style:italic;color:var(--text-bright);margin-bottom:5px}
-.login-head small{font-family:var(--mono);font-size:9px;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase}
-.field{margin-bottom:13px}
-.field label{display:block;font-size:11px;font-weight:500;color:var(--text-muted);margin-bottom:5px;letter-spacing:0.5px}
-.field input{width:100%;padding:11px 13px;background:var(--surface2);border:1px solid var(--border);border-radius:5px;color:var(--text-bright);font-family:var(--font);font-size:13px;outline:none;transition:border-color .2s}
-.field input:focus{border-color:var(--fire)}
-.field input::placeholder{color:#52525b}
-.submit-btn{width:100%;padding:13px;border-radius:5px;background:var(--fire);color:#fff;font-family:var(--font);font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;border:none;cursor:pointer;margin-top:8px;transition:background .2s}
-.submit-btn:hover{background:var(--fire-light)}
-.login-err{font-family:var(--mono);font-size:10px;color:#ef4444;text-align:center;margin-top:8px;display:none}
-.login-x{position:absolute;top:13px;right:13px;background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer;line-height:1}
-.login-x:hover{color:var(--text-bright)}
-.login-hint{font-family:var(--mono);font-size:8px;color:#52525b;text-align:center;margin-top:21px;padding-top:13px;border-top:1px solid var(--border)}
-
-/* ── RESPONSIVE ── */
-@media(max-width:900px){
-  .hero{grid-template-columns:1fr;padding:89px 21px 55px;gap:34px}
-  .hero-left{max-width:none}
-  .hero-right{flex-direction:row;flex-wrap:wrap;max-width:none;justify-self:start}
-  .kpi{flex:1;min-width:140px}
-  .nav-links{display:none;position:absolute;top:55px;left:0;right:0;background:rgba(8,8,10,0.97);flex-direction:column;padding:8px;border-bottom:1px solid var(--border)}
-  .nav-links.open{display:flex}
-  .menu-btn{display:block}
+html,body{width:100%;min-height:100%;margin:0;background:#050505;color:var(--text);font-family:var(--font);-webkit-font-smoothing:antialiased}
+body{overflow:hidden}
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:0;
+  background:
+    radial-gradient(circle at 33% 42%,rgba(247,213,22,0.16),transparent 23%),
+    radial-gradient(circle at 69% 38%,rgba(227,38,33,0.18),transparent 30%),
+    radial-gradient(circle at 77% 68%,rgba(255,255,255,0.05),transparent 22%),
+    linear-gradient(125deg,#050505 0%,#11100e 44%,#090302 100%);
+}
+body::after{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:0;
+  background:linear-gradient(90deg,rgba(0,0,0,0.2),transparent 36%,rgba(0,0,0,0.55));
+  pointer-events:none;
+}
+.ember-field{
+  position:fixed;
+  inset:0;
+  z-index:0;
+  width:100vw;
+  height:100vh;
+  pointer-events:none;
+  opacity:.72;
+  mix-blend-mode:screen;
+}
+button,input{font:inherit}
+img{user-select:none;-webkit-user-drag:none}
+.page{position:relative;z-index:1;min-height:100vh;display:grid;grid-template-rows:auto 1fr}
+.topbar{display:flex;align-items:center;justify-content:flex-end;padding:24px clamp(20px,4vw,58px)}
+.top-actions{color:rgba(255,255,255,0.62);font-size:12px;letter-spacing:.12em;text-transform:uppercase}
+.btn-sign,.btn-main,.submit-btn{
+  border:1px solid rgba(255,213,79,0.42);
+  background:linear-gradient(180deg,rgba(255,213,79,0.96),rgba(200,154,60,0.94));
+  color:#0d0c0a;
+  border-radius:12px;
+  cursor:pointer;
+  box-shadow:0 20px 48px rgba(200,154,60,0.2);
+}
+.portal{
+  width:min(1376px,calc(100vw - 40px));
+  margin:0 auto;
+  display:grid;
+  grid-template-columns:minmax(560px,1.618fr) minmax(360px,0.92fr);
+  align-items:center;
+  gap:clamp(34px,5.2vw,92px);
+  min-height:calc(100vh - 94px);
+  padding:24px 0 58px;
+}
+.brand-stage{
+  position:relative;
+  min-height:min(70vh,704px);
+  overflow:visible;
+  isolation:isolate;
+}
+.brand-stage::before{
+  content:"";
+  position:absolute;
+  inset:-18%;
+  z-index:-1;
+  pointer-events:none;
+  background:radial-gradient(circle at 50% 54%,rgba(247,213,22,0.18),rgba(227,38,33,0.16) 22%,rgba(6,7,9,0) 58%);
+  filter:blur(34px);
+}
+.brand-stage::after{
+  content:"";
+  position:absolute;
+  inset:12% 8%;
+  z-index:-1;
+  pointer-events:none;
+  background:radial-gradient(ellipse at center,rgba(255,255,255,0.08),rgba(255,255,255,0) 58%);
+}
+.halo-three-canvas{
+  position:absolute;
+  inset:-4%;
+  z-index:0;
+  width:108%;
+  height:108%;
+  display:block;
+}
+.hero-logo-fallback{
+  position:absolute;
+  left:50%;
+  top:50%;
+  z-index:0;
+  width:min(74%,560px);
+  height:auto;
+  opacity:0.88;
+  transform:translate(-50%,-50%);
+  filter:drop-shadow(0 22px 38px rgba(0,0,0,0.55)) drop-shadow(0 0 30px rgba(227,38,33,0.2));
+  transition:opacity .4s ease;
+  pointer-events:none;
+}
+.brand-stage.scene-ready .hero-logo-fallback{opacity:0}
+.renderer-badge{display:none}
+.login{
+  position:relative;
+  z-index:3;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,0.12);
+  border-radius:28px;
+  padding:34px;
+  background:
+    linear-gradient(142deg,rgba(255,255,255,0.12),rgba(255,255,255,0.045) 30%,rgba(255,255,255,0.02)),
+    radial-gradient(circle at 12% 0%,rgba(232,67,45,0.16),transparent 32%),
+    rgba(13,12,10,0.82);
+  box-shadow:
+    0 44px 130px rgba(0,0,0,0.68),
+    0 0 0 1px rgba(232,67,45,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.18),
+    inset 0 -1px 0 rgba(0,0,0,0.28);
+  backdrop-filter:blur(36px) saturate(1.45);
+  -webkit-backdrop-filter:blur(36px) saturate(1.45);
+}
+.login::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:
+    linear-gradient(115deg,rgba(242,236,224,0.12),transparent 18%,transparent 72%,rgba(232,67,45,0.1)),
+    repeating-linear-gradient(0deg,rgba(255,255,255,0.025) 0 1px,transparent 1px 12px);
+  opacity:.78;
+}
+.login>*{position:relative;z-index:1}
+.login-head{margin-bottom:25px}
+.login-brand-title{
+  margin:0 0 18px;
+  color:var(--paper);
+  font-family:var(--display);
+  font-size:22px;
+  line-height:1;
+  letter-spacing:0;
+  font-weight:720;
+}
+.login-brand-title span{color:var(--fire)}
+.eyebrow{color:var(--fire);font-family:var(--mono);font-size:10px;letter-spacing:0.22em;text-transform:uppercase;margin:0 0 12px}
+.login-head h1{margin:0 0 8px;font-family:var(--display);font-size:40px;line-height:0.95;letter-spacing:0;font-weight:650;color:var(--paper)}
+.login-head small{display:block;color:rgba(242,236,224,0.72);font-size:14px;line-height:1.45}
+.login-note{display:none;color:rgba(255,213,79,0.78);font-size:11px;line-height:1.45;margin:-4px 0 14px}
+.field{display:grid;gap:8px;margin-bottom:15px}
+.field label{font-family:var(--mono);font-size:10px;color:rgba(242,236,224,0.62);font-weight:700;letter-spacing:0.08em}
+.field input{
+  width:100%;
+  min-height:52px;
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:12px;
+  background:linear-gradient(180deg,rgba(255,255,255,0.04),rgba(0,0,0,0.58));
+  color:var(--paper);
+  padding:14px 14px;
+  outline:none;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.12),inset 0 -10px 24px rgba(0,0,0,0.18);
+}
+.field input:hover{border-color:rgba(255,255,255,0.26)}
+.field input:focus{border-color:rgba(232,67,45,0.72);box-shadow:0 0 0 3px rgba(232,67,45,0.15),inset 0 1px 0 rgba(255,255,255,0.16)}
+.field input::placeholder{color:#777}
+.login-remember{display:flex;align-items:center;gap:9px;color:rgba(242,236,224,0.66);font-size:11px;margin:7px 0 18px;cursor:pointer}
+.login-remember input{accent-color:var(--halo-yellow)}
+.login-actions{display:flex;justify-content:flex-end;margin:-5px 0 17px}
+.auth-link{border:0;background:transparent;color:rgba(255,213,79,0.82);font-size:11px;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:3px}
+.auth-link:hover{color:#ffd54f}
+.submit-btn{
+  width:100%;
+  min-height:52px;
+  padding:14px 16px;
+  text-transform:uppercase;
+  font-size:12px;
+  font-family:var(--mono);
+  font-weight:850;
+  letter-spacing:0.12em;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,0.36),transparent 38%),
+    linear-gradient(180deg,#ffd54f,#c89a3c);
+  box-shadow:
+    0 20px 54px rgba(255,213,79,0.2),
+    inset 0 1px 0 rgba(255,255,255,0.55),
+    inset 0 -1px 0 rgba(58,42,0,0.5);
+}
+.submit-btn:hover{transform:translateY(-1px);box-shadow:0 26px 64px rgba(255,213,79,0.28),inset 0 1px 0 rgba(255,255,255,0.6)}
+.submit-btn:active{transform:translateY(0);filter:saturate(0.94) brightness(0.96)}
+.submit-btn:focus-visible{outline:3px solid rgba(255,213,79,0.42);outline-offset:3px}
+.login-err{display:none;color:#ffb4a9;font-size:12px;text-align:center;margin-top:12px}
+.login-ok{display:none;color:#ffe9a8;font-size:12px;text-align:center;margin-top:12px;line-height:1.45}
+@media(max-width:840px){
+  .topbar{padding:16px 18px}
+  body{overflow:auto}
+  .portal{grid-template-columns:1fr;min-height:auto;padding:14px 0 38px}
+  .brand-stage{min-height:330px;order:-1}
+  .login{width:min(100%,430px);margin:0 auto}
 }
 @media(max-width:520px){
-  .hero{padding:89px 13px 34px}
-  .kpi{min-width:calc(50% - 8px)}
-  .hero-btns{flex-direction:column}
-  .btn-main,.btn-outline{width:100%;text-align:center}
+  .top-actions{display:none}
+  .brand-stage{min-height:280px}
+  .login{padding:24px;border-radius:20px}
+  .login-head h1{font-size:34px}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;scroll-behavior:auto!important}
 }
 </style>
-<!-- Shared HaloFire design system (AAA tokens + self-hosted fonts). Loaded
-     AFTER the legacy inline <style> so its :root bridge re-points the legacy
-     --bg/--fire/--text vars onto the token system without touching markup. -->
 <link rel="stylesheet" href="/public/styles/halofire-tokens.css">
+<style id="client-portal-cad-overrides">
+body.hf-shell .login{
+  border:1px solid rgba(255,255,255,0.12);
+  border-radius:28px;
+  background:
+    linear-gradient(142deg,rgba(255,255,255,0.12),rgba(255,255,255,0.045) 30%,rgba(255,255,255,0.02)),
+    radial-gradient(circle at 12% 0%,rgba(232,67,45,0.16),transparent 32%),
+    rgba(13,12,10,0.82);
+}
+body.hf-shell .login-head h1{
+  color:#f2ece0;
+  font-family:var(--display);
+}
+body.hf-shell .login-brand-title{
+  color:#f2ece0;
+  font-family:var(--display);
+}
+body.hf-shell .login-brand-title span{color:#e8432d}
+body.hf-shell .eyebrow{color:#e8432d}
+body.hf-shell .submit-btn{
+  border-radius:12px;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,0.36),transparent 38%),
+    linear-gradient(180deg,#ffd54f,#c89a3c);
+  color:#0d0c0a;
+}
+body.hf-shell .field input{
+  border-radius:12px;
+  background:linear-gradient(180deg,rgba(255,255,255,0.04),rgba(0,0,0,0.58));
+}
+</style>
 </head>
 <body class="hf-shell">
-<div id="loader"><div class="loader-mark"></div><div class="loader-label">HALOFIRE</div></div>
+<canvas class="ember-field" id="emberField" aria-hidden="true"></canvas>
+<main class="page">
+  <header class="topbar">
+    <div class="top-actions">Secure access</div>
+  </header>
 
-<nav>
-  <div class="brand">
-    <span class="brand-name">HaloFire</span>
-    <span class="brand-tag">PLATFORM</span>
-  </div>
-  <div class="nav-links" id="navLinks">
-    <a href="#" class="on">Home</a>
-    <a href="#sales">Sales</a>
-    <a href="#estimating">Estimating</a>
-    <a href="#projects">Projects</a>
-    <a href="#compliance">Compliance</a>
-    <a href="#analytics">Analytics</a>
-  </div>
-  <div class="nav-right">
-    <button class="btn-sign" id="signBtn">Sign In</button>
-    <button class="menu-btn" id="menuBtn"><span></span><span></span><span></span></button>
-  </div>
-</nav>
-
-<canvas id="bg"></canvas>
-
-<div class="hero">
-  <div class="hero-left">
-    <div class="hero-eyebrow"><span class="pulse"></span> National Fire Protection</div>
-    <h1 class="hero-h1">Serving, Protecting,<br><span class="accent">Nationwide.</span></h1>
-    <p class="hero-p">End-to-end fire sprinkler management from bid to closeout. AI-powered estimating, real-time project tracking, and compliance in one platform.</p>
-    <div class="hero-btns">
-      <button class="btn-main" id="enterBtn">Enter Platform</button>
-      <button class="btn-outline">View Demo</button>
+  <section class="portal" aria-labelledby="loginTitle">
+    <div class="brand-stage" id="haloHeroScene" aria-label="Halo Fire rendered brand scene">
+      <canvas class="halo-three-canvas" id="haloHeroCanvas" data-renderer-mode="pending"></canvas>
+      <img class="hero-logo-fallback" src="/public/brand/halo-fire-logo-glass.png" alt="Halo Fire" draggable="false">
+      <div class="renderer-badge" id="rendererBadge" aria-hidden="true"></div>
     </div>
-  </div>
-  <div class="hero-right">
-    <div class="kpi"><div class="kpi-label">Bids Tracked</div><div class="kpi-num c1" id="k1">0</div><div class="kpi-delta">from source bid log</div></div>
-    <div class="kpi"><div class="kpi-label">Pricebook Items</div><div class="kpi-num c2" id="k2">0</div><div class="kpi-delta">ARGCO · FFF · Victaulic</div></div>
-    <div class="kpi"><div class="kpi-label">Source Workbooks</div><div class="kpi-num c3" id="k3">0</div><div class="kpi-delta">real .xlsx inputs</div></div>
-    <div class="kpi"><div class="kpi-label">Claim Gates</div><div class="kpi-num c1" id="k4">0</div><div class="kpi-delta"><span class="g">fail-closed</span> · internal alpha</div></div>
-  </div>
-</div>
 
-<div class="foot">
-  <div class="foot-left"><span><span class="foot-dot"></span>ONLINE</span><span>QWEN: STANDBY</span></div>
-  <span id="clk"></span>
-</div>
+    <section class="login" aria-labelledby="loginTitle">
+      <div class="login-head">
+        <p class="login-brand-title">Halo <span>Fire</span></p>
+        <p class="eyebrow">Secure client access</p>
+        <h1 id="loginTitle">Secure Portal</h1>
+        <small id="formMode">Sign in to continue.</small>
+      </div>
+      <form id="form">
+        <div class="field"><label for="user">Email or username</label><input type="text" id="user" placeholder="name@company.com" autocomplete="username"></div>
+        <div class="field" id="passField"><label for="pass">Password</label><input type="password" id="pass" placeholder="Password" autocomplete="current-password"></div>
+        <div class="field" id="confirmPassField" hidden><label for="confirmPass">Confirm password</label><input type="password" id="confirmPass" placeholder="Confirm password" autocomplete="new-password"></div>
+        <p class="login-note" id="passwordHelp">Apple can generate and save this password for future HaloFire sign-ins.</p>
+        <label class="login-remember" id="rememberRow"><input type="checkbox" id="remember" checked> Keep me signed in</label>
+        <div class="login-actions"><button type="button" class="auth-link" id="forgotPassword">Forgot password?</button></div>
+        <button type="submit" class="submit-btn" id="submitButton">Sign in</button>
+        <div class="login-err" id="err">Unable to sign in.</div>
+        <div class="login-ok" id="ok"></div>
+      </form>
+    </section>
+  </section>
+</main>
 
-<div class="overlay" id="overlay">
-  <div class="login">
-    <button class="login-x" id="closeBtn">&times;</button>
-    <div class="login-head"><h2>HaloFire</h2><small>Secure Access</small></div>
-    <form id="form">
-      <div class="field"><label>Username</label><input type="text" id="user" placeholder="admin" autocomplete="off"></div>
-      <div class="field"><label>Password</label><input type="password" id="pass" placeholder="password"></div>
-      <label class="login-remember" style="display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10px;color:var(--text-muted);margin:2px 0 6px;cursor:pointer"><input type="checkbox" id="remember" checked style="width:auto;margin:0"> Keep me logged in</label>
-      <button type="submit" class="submit-btn">Sign In</button>
-      <div class="login-err" id="err">Invalid credentials</div>
-    </form>
-    <div class="login-hint">Internal alpha — authorized Halo Fire staff only</div>
-  </div>
-</div>
+<script type="module">
+import {
+  AdditiveBlending,
+  CanvasTexture,
+  ClampToEdgeWrapping,
+  Group,
+  LinearFilter,
+  Matrix4,
+  Mesh,
+  MeshBasicMaterial,
+  MeshPhysicalMaterial,
+  PerspectiveCamera,
+  Scene,
+  ShaderMaterial,
+  Sprite,
+  SpriteMaterial,
+  SphereGeometry,
+  SRGBColorSpace,
+  TorusGeometry,
+  Vector2,
+  Vector3,
+  Vector4,
+  WebGLRenderer,
+} from 'three';
+
+function buildGlowTexture(){
+  const size = 128;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+  gradient.addColorStop(0, 'rgba(255, 214, 64, 0.9)');
+  gradient.addColorStop(0.34, 'rgba(227, 38, 33, 0.5)');
+  gradient.addColorStop(1, 'rgba(227, 38, 33, 0)');
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, size, size);
+  const texture = new CanvasTexture(canvas);
+  texture.colorSpace = SRGBColorSpace;
+  return texture;
+}
+
+function buildSteamTexture(){
+  const size = 96;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  const gradient = ctx.createRadialGradient(size * 0.5, size * 0.5, 1, size * 0.5, size * 0.5, size * 0.48);
+  gradient.addColorStop(0, 'rgba(255,255,255,0.62)');
+  gradient.addColorStop(0.45, 'rgba(230,240,245,0.28)');
+  gradient.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, size, size);
+  const texture = new CanvasTexture(canvas);
+  texture.colorSpace = SRGBColorSpace;
+  return texture;
+}
+
+function seededUnit(index, offset){
+  const raw = Math.sin(index * 12.9898 + offset * 78.233) * 43758.5453;
+  return raw - Math.floor(raw);
+}
+
+function initEmberField(){
+  const canvas = document.getElementById('emberField');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const particles = [];
+  for(let i = 0; i < 72; i += 1){
+    particles.push({
+      x:seededUnit(i, 11),
+      y:seededUnit(i, 12),
+      size:1.4 + seededUnit(i, 13) * 5.8,
+      speed:0.00012 + seededUnit(i, 14) * 0.0005,
+      drift:(seededUnit(i, 15) - 0.5) * 0.00016,
+      alpha:0.08 + seededUnit(i, 16) * 0.2,
+      hue:seededUnit(i, 17) > 0.66 ? '#f7d516' : '#e32621',
+    });
+  }
+  function resizeEmbers(){
+    canvas.width = Math.max(1, Math.floor(window.innerWidth * Math.min(window.devicePixelRatio || 1, 2)));
+    canvas.height = Math.max(1, Math.floor(window.innerHeight * Math.min(window.devicePixelRatio || 1, 2)));
+  }
+  resizeEmbers();
+  window.addEventListener('resize', resizeEmbers, { passive:true });
+  function drawEmbers(){
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for(const ember of particles){
+      ember.y -= ember.speed;
+      ember.x += ember.drift + Math.sin((ember.y + ember.size) * 16) * 0.00006;
+      if(ember.y < -0.05){
+        ember.y = 1.05;
+        ember.x = seededUnit(Math.floor(performance.now()), ember.size);
+      }
+      const px = ember.x * canvas.width;
+      const py = ember.y * canvas.height;
+      const radius = ember.size * Math.min(window.devicePixelRatio || 1, 2);
+      const gradient = ctx.createRadialGradient(px, py, 0, px, py, radius * 2.8);
+      gradient.addColorStop(0, `${ember.hue}${Math.floor(ember.alpha * 255).toString(16).padStart(2, '0')}`);
+      gradient.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.arc(px, py, radius * 2.8, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    requestAnimationFrame(drawEmbers);
+  }
+  drawEmbers();
+}
+
+// Adapted from mattatz/THREE.Fire (MIT, Copyright (c) 2015 mattatz):
+// raymarched procedural volume fire tuned for the Halo Fire login hero.
+const fireVertexShader = `
+varying vec3 vWorldPos;
+void main(){
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  vWorldPos = (modelMatrix * vec4(position, 1.0)).xyz;
+}
+`;
+
+const fireFragmentShader = `
+#define ITERATIONS 24
+#define OCTIVES 3
+uniform sampler2D fireTex;
+uniform float time;
+uniform float seed;
+uniform float magnitude;
+uniform float lacunarity;
+uniform float gain;
+uniform float intensity;
+uniform float topTaper;
+uniform float baseRound;
+uniform float redLayerWidth;
+uniform float yellowLayerWidth;
+uniform float coreLayerWidth;
+uniform float interactionEnergy;
+uniform float waterDamp;
+uniform vec2 fabricGrabPoint;
+uniform vec2 fabricDrag;
+uniform float fabricGrip;
+uniform mat4 invModelMatrix;
+uniform vec3 scale;
+uniform vec4 noiseScale;
+varying vec3 vWorldPos;
+vec3 mod289(vec3 x){return x - floor(x * (1.0 / 289.0)) * 289.0;}
+vec4 mod289(vec4 x){return x - floor(x * (1.0 / 289.0)) * 289.0;}
+vec4 permute(vec4 x){return mod289(((x * 34.0) + 1.0) * x);}
+vec4 taylorInvSqrt(vec4 r){return 1.79284291400159 - 0.85373472095314 * r;}
+float snoise(vec3 v){
+  const vec2 C = vec2(1.0 / 6.0, 1.0 / 3.0);
+  const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
+  vec3 i = floor(v + dot(v, C.yyy));
+  vec3 x0 = v - i + dot(i, C.xxx);
+  vec3 g = step(x0.yzx, x0.xyz);
+  vec3 l = 1.0 - g;
+  vec3 i1 = min(g.xyz, l.zxy);
+  vec3 i2 = max(g.xyz, l.zxy);
+  vec3 x1 = x0 - i1 + C.xxx;
+  vec3 x2 = x0 - i2 + C.yyy;
+  vec3 x3 = x0 - D.yyy;
+  i = mod289(i);
+  vec4 p = permute(permute(permute(
+    i.z + vec4(0.0, i1.z, i2.z, 1.0))
+    + i.y + vec4(0.0, i1.y, i2.y, 1.0))
+    + i.x + vec4(0.0, i1.x, i2.x, 1.0));
+  float n_ = 0.142857142857;
+  vec3 ns = n_ * D.wyz - D.xzx;
+  vec4 j = p - 49.0 * floor(p * ns.z * ns.z);
+  vec4 x_ = floor(j * ns.z);
+  vec4 y_ = floor(j - 7.0 * x_);
+  vec4 x = x_ * ns.x + ns.yyyy;
+  vec4 y = y_ * ns.x + ns.yyyy;
+  vec4 h = 1.0 - abs(x) - abs(y);
+  vec4 b0 = vec4(x.xy, y.xy);
+  vec4 b1 = vec4(x.zw, y.zw);
+  vec4 s0 = floor(b0) * 2.0 + 1.0;
+  vec4 s1 = floor(b1) * 2.0 + 1.0;
+  vec4 sh = -step(h, vec4(0.0));
+  vec4 a0 = b0.xzyw + s0.xzyw * sh.xxyy;
+  vec4 a1 = b1.xzyw + s1.xzyw * sh.zzww;
+  vec3 p0 = vec3(a0.xy, h.x);
+  vec3 p1 = vec3(a0.zw, h.y);
+  vec3 p2 = vec3(a1.xy, h.z);
+  vec3 p3 = vec3(a1.zw, h.w);
+  vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2,p2), dot(p3,p3)));
+  p0 *= norm.x; p1 *= norm.y; p2 *= norm.z; p3 *= norm.w;
+  vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
+  m = m * m;
+  return 42.0 * dot(m * m, vec4(dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3)));
+}
+float turbulence(vec3 p){
+  float sum = 0.0;
+  float freq = 1.0;
+  float amp = 1.0;
+  for(int i = 0; i < OCTIVES; i++){
+    sum += abs(snoise(p * freq)) * amp;
+    freq *= lacunarity;
+    amp *= gain;
+  }
+  return sum;
+}
+float ellipseField(vec2 q, vec2 center, vec2 radius){
+  vec2 d = (q - center) / radius;
+  return 1.0 - dot(d, d);
+}
+vec3 thermalColor(float heat, float r, float y){
+  vec3 ember = vec3(0.58, 0.015, 0.0);
+  vec3 red = vec3(0.95, 0.08, 0.01);
+  vec3 orange = vec3(1.0, 0.36, 0.02);
+  vec3 gold = vec3(1.0, 0.68, 0.12);
+  vec3 pale = vec3(1.0, 0.9, 0.45);
+  float redReach = 1.0 - smoothstep(0.82 * redLayerWidth, 1.02 * redLayerWidth, r);
+  float yellowHeight = smoothstep(0.06, 0.22, y) * (1.0 - smoothstep(0.66, 0.94, y));
+  float coreHeight = smoothstep(0.05, 0.18, y) * (1.0 - smoothstep(0.48, 0.84, y));
+  float yellowReach = (1.0 - smoothstep(0.28 * yellowLayerWidth, 0.58 * yellowLayerWidth, r)) * yellowHeight;
+  float coreReach = (1.0 - smoothstep(0.12 * coreLayerWidth, 0.29 * coreLayerWidth, r)) * coreHeight;
+  float outerRim = smoothstep(0.5 * yellowLayerWidth, 0.95 * redLayerWidth, r);
+  float baseWarmth = 1.0 - smoothstep(0.04, 0.28, y);
+  heat = max(heat, redReach * 0.34 + yellowReach * 0.3 + coreReach * 0.28 + baseWarmth * 0.08);
+  vec3 color = mix(ember, red, smoothstep(0.08, 0.32, heat));
+  color = mix(color, orange, smoothstep(0.28, 0.52, heat));
+  color = mix(color, gold, max(smoothstep(0.48, 0.72, heat), yellowReach * 0.86));
+  color = mix(color, pale, smoothstep(0.74, 1.0, heat));
+  color = mix(color, pale, coreReach * 0.34);
+  color = mix(color, red, outerRim * (0.72 + 0.18 * smoothstep(0.1, 0.82, y)));
+  return color;
+}
+vec4 sampleFire(vec3 p, vec4 localScale){
+  float grabY = clamp(p.y, 0.0, 1.0);
+  vec2 grabOffset = vec2(p.x - fabricGrabPoint.x, grabY - fabricGrabPoint.y);
+  float gripField = exp(-dot(grabOffset / vec2(0.28, 0.18), grabOffset / vec2(0.28, 0.18))) * fabricGrip;
+  float clothField = exp(-dot(grabOffset / vec2(0.72, 0.38), grabOffset / vec2(0.72, 0.38))) * fabricGrip;
+  vec2 pull = fabricDrag * vec2(0.48, 0.2);
+  p.x -= pull.x * gripField;
+  p.y -= pull.y * gripField;
+  p.x += pull.x * max(clothField - gripField, 0.0) * 0.24;
+  p.y += abs(pull.x) * max(clothField - gripField, 0.0) * 0.055;
+  float y = clamp(p.y, 0.0, 1.0);
+  float tipFlicker = snoise(vec3(time * 1.35 + seed, y * 9.0, p.z * 2.1));
+  float bodyFlicker = snoise(vec3(time * 1.05 + seed * 0.7, y * 5.4, p.x * 2.0 + p.z));
+  float upperHalfBand = smoothstep(0.42, 0.6, y) * (1.0 - smoothstep(0.94, 1.0, y));
+  float tipBand = exp(-pow((y - 0.86) / 0.16, 2.0));
+  float lean = 0.1 * smoothstep(0.48, 1.0, y) - 0.03 * exp(-pow((y - 0.42) / 0.24, 2.0));
+  lean += tipFlicker * tipBand * 0.04 + bodyFlicker * upperHalfBand * 0.045;
+  vec2 q = vec2(p.x - lean, y);
+  float rise = smoothstep(0.0, 0.15, y);
+  float taper = 1.0 - smoothstep(0.32, 1.02, y);
+  float outerWidth = 0.12 + 0.64 * rise * taper;
+  outerWidth += mix(0.22, 0.42, baseRound) * exp(-pow((y - 0.12) / 0.11, 2.0));
+  outerWidth += 0.12 * exp(-pow((y - 0.3) / 0.22, 2.0));
+  outerWidth += 0.08 * exp(-pow((y - 0.56) / 0.24, 2.0));
+  outerWidth += (0.08 + (1.0 - topTaper) * 0.05) * exp(-pow((y - 0.88) / 0.17, 2.0));
+  outerWidth *= 1.0 + tipFlicker * tipBand * 0.07 + bodyFlicker * upperHalfBand * 0.11;
+  outerWidth = max(0.045, outerWidth);
+  float outerCore = 1.0 - pow(abs(q.x) / outerWidth, 1.82);
+  float tipGate = 1.0 - smoothstep(0.92, 1.0, y);
+  float silhouette = outerCore * tipGate;
+  float depthWidth = 0.54 - 0.3 * smoothstep(0.25, 1.0, y);
+  depthWidth += 0.12 * exp(-pow((y - 0.24) / 0.18, 2.0));
+  float depthMask = smoothstep(1.0, 0.18, abs(p.z) / max(depthWidth, 0.08));
+  float shapeMask = smoothstep(0.02, 0.24, silhouette) * depthMask;
+  float baseX = clamp(abs(q.x) / max(outerWidth, 0.12), 0.0, 1.0);
+  float baseArc = 0.5 - 0.5 * cos(baseX * 3.14159265);
+  float baseBowl = mix(0.025, 0.082, baseRound) + mix(0.018, 0.058, baseRound) * baseArc;
+  shapeMask *= smoothstep(baseBowl - 0.07, baseBowl + 0.085, y) * (1.0 - smoothstep(0.985, 1.015, y));
+  if(shapeMask <= 0.01) return vec4(0.0);
+  float width = mix(0.68, 0.07, smoothstep(0.1, 1.0, y));
+  width += 0.22 * exp(-pow((y - 0.24) / 0.22, 2.0));
+  width += 0.16 * exp(-pow((y - 0.5) / 0.18, 2.0));
+  width *= mix(1.0, 0.74, smoothstep(0.58, 1.0, y) * topTaper);
+  float r = length(vec2((p.x - lean) / max(width, 0.05), p.z / max(depthWidth, 0.05)));
+  vec2 st = vec2(clamp(r, 0.0, 1.0), y);
+  if(st.x <= 0.0 || st.x >= 1.0 || st.y <= 0.0 || st.y >= 1.0) return vec4(0.0);
+  p.y -= (seed + time) * localScale.w;
+  p *= localScale.xyz;
+  float buoyantNoise = turbulence(p + vec3(0.0, time * 0.95, 0.0));
+  float curlNoise = snoise(p * 2.6 + vec3(time * 0.8, -time * 2.4, seed));
+  float edgeFlutter = snoise(vec3(q.x * 5.6, y * 8.2 - time * 3.8, p.z * 2.4));
+  st.y += sqrt(st.y) * magnitude * (buoyantNoise * 0.22 + curlNoise * 0.07 + edgeFlutter * interactionEnergy * 0.05 + bodyFlicker * upperHalfBand * 0.14);
+  if(st.y <= 0.0 || st.y >= 1.0) return vec4(0.0);
+  vec4 fireTexel = texture2D(fireTex, st);
+  float centerHeat = 1.0 - smoothstep(0.0, 0.72, r);
+  float baseFuel = 1.0 - smoothstep(0.06, 0.9, y);
+  float tipCooling = 1.0 - smoothstep(0.7, 1.02, y);
+  float flicker = 0.66 + buoyantNoise * 0.22 + curlNoise * 0.12 + edgeFlutter * (0.08 + interactionEnergy * 0.16) + abs(bodyFlicker) * upperHalfBand * 0.22;
+  float heat = clamp(centerHeat * 0.5 + baseFuel * 0.22 + fireTexel.r * 0.16, 0.0, 1.0);
+  heat *= mix(0.62, 1.0, tipCooling) * flicker;
+  heat *= mix(1.0, 0.48, waterDamp);
+  float hotCore = smoothstep(0.92, 0.02, r);
+  float density = pow(shapeMask, 1.28) * (0.36 + hotCore * 0.64) * (0.82 + fireTexel.a * 0.14 + buoyantNoise * 0.08 + abs(edgeFlutter) * interactionEnergy * 0.08 + abs(bodyFlicker) * upperHalfBand * 0.12);
+  density *= mix(0.44, 1.0, baseFuel);
+  density *= 1.0 - smoothstep(0.9, 1.0, y);
+  density *= mix(1.0, 0.34, waterDamp);
+  vec3 color = thermalColor(heat, r, y);
+  color *= 0.64 + density * 0.56;
+  return vec4(color * density, clamp(density * 0.78, 0.0, 0.88));
+}
+vec3 localize(vec3 p){return (invModelMatrix * vec4(p, 1.0)).xyz;}
+void main(){
+  vec3 rayPos = vWorldPos;
+  vec3 rayDir = normalize(rayPos - cameraPosition);
+  float rayLen = 0.026 * length(scale.xyz);
+  vec4 col = vec4(0.0);
+  for(int i = 0; i < ITERATIONS; i++){
+    rayPos += rayDir * rayLen;
+    vec3 lp = localize(rayPos);
+    lp.y = lp.y * 0.96 + 0.48;
+    lp.xz *= 2.0;
+    col += sampleFire(lp, noiseScale);
+  }
+  col.rgb *= intensity * 0.42;
+  col.rgb = col.rgb / (vec3(1.0) + col.rgb * 0.72);
+  col.a = clamp(max(max(col.r, col.g), col.b) * 1.15, 0.0, 0.92);
+  if(col.a < 0.02) discard;
+  gl_FragColor = col;
+}
+`;
+
+function buildFireTexture(){
+  const size = 256;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  const image = ctx.createImageData(size, size);
+  for(let y = 0; y < size; y += 1){
+    const v = y / (size - 1);
+    for(let x = 0; x < size; x += 1){
+      const u = x / (size - 1);
+      const radius = u;
+      const core = Math.max(0, 1 - radius * 1.78);
+      const heat = Math.pow(Math.max(0, 1 - v * 0.68), 0.84) * core;
+      const rim = Math.pow(Math.max(0, 1 - radius), 0.28);
+      const alpha = Math.max(0, rim * (1 - Math.pow(v, 2.4)));
+      const i = (y * size + x) * 4;
+      image.data[i] = Math.min(255, 255 * (0.42 + heat * 0.96));
+      image.data[i + 1] = Math.min(255, 255 * (0.04 + heat * 0.5 + v * 0.08));
+      image.data[i + 2] = Math.min(255, 255 * (0.0 + heat * heat * 0.12));
+      image.data[i + 3] = Math.min(255, 255 * alpha);
+    }
+  }
+  ctx.putImageData(image, 0, 0);
+  const texture = new CanvasTexture(canvas);
+  texture.colorSpace = SRGBColorSpace;
+  texture.magFilter = LinearFilter;
+  texture.minFilter = LinearFilter;
+  texture.wrapS = ClampToEdgeWrapping;
+  texture.wrapT = ClampToEdgeWrapping;
+  return texture;
+}
+
+function createThreeFireMesh(){
+  const material = new ShaderMaterial({
+    transparent:true,
+    depthWrite:false,
+    depthTest:false,
+    uniforms:{
+      fireTex:{ value:buildFireTexture() },
+      time:{ value:0 },
+      seed:{ value:0.37 },
+      invModelMatrix:{ value:new Matrix4() },
+      scale:{ value:new Vector3(1, 1, 1) },
+      noiseScale:{ value:new Vector4(1, 2, 1, 0.3) },
+      magnitude:{ value:0.9 },
+      lacunarity:{ value:2 },
+      gain:{ value:0.48 },
+      intensity:{ value:0.98 },
+      topTaper:{ value:0 },
+      baseRound:{ value:0.56 },
+      redLayerWidth:{ value:1 },
+      yellowLayerWidth:{ value:1.22 },
+      coreLayerWidth:{ value:0.58 },
+      interactionEnergy:{ value:0 },
+      waterDamp:{ value:0 },
+      fabricGrabPoint:{ value:new Vector2(0, 0.55) },
+      fabricDrag:{ value:new Vector2(0, 0) },
+      fabricGrip:{ value:0 },
+    },
+    vertexShader:fireVertexShader,
+    fragmentShader:fireFragmentShader,
+  });
+  const mesh = new Mesh(new SphereGeometry(0.5, 64, 32), material);
+  mesh.name = 'THREE.Fire adapted volumetric flame';
+  mesh.scale.set(1.72, 3.24, 1.35);
+  mesh.position.set(0, 0, 0);
+  return mesh;
+}
+
+async function initHaloHeroScene(){
+  const host = document.getElementById('haloHeroScene');
+  const canvas = document.getElementById('haloHeroCanvas');
+  const badge = document.getElementById('rendererBadge');
+  if(!host || !canvas || !badge) return;
+  const tuningDefaults = {
+    flameScale:0.93,
+    flameWidth:1.12,
+    flameHeight:1.0,
+    baseRound:0.56,
+    topTaper:0,
+    redLayerWidth:1.0,
+    yellowLayerWidth:1.22,
+    coreLayerWidth:0.58,
+    speed:0.05,
+    smoke:0.33,
+    haloScale:1.46,
+    haloY:0.54,
+    haloOpacity:0.95,
+  };
+  const tuning = { ...tuningDefaults };
+
+  const renderer = new WebGLRenderer({ canvas, antialias:true, alpha:true, powerPreference:'high-performance' });
+  const rendererMode = 'webgl-shader-fire';
+
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.setClearColor(0x000000, 0);
+  canvas.dataset.rendererMode = rendererMode;
+  canvas.dataset.interaction = 'idle';
+  badge.textContent = '';
+
+  const scene = new Scene();
+  const camera = new PerspectiveCamera(33, 1, 0.1, 100);
+  camera.position.set(0, 0.12, 5.8);
+
+  const flameRoot = new Group();
+  flameRoot.position.set(0, 0.02, 0);
+  scene.add(flameRoot);
+  const flameGroup = new Group();
+  const haloGroup = new Group();
+  flameRoot.add(flameGroup);
+  flameRoot.add(haloGroup);
+
+  const fireMesh = createThreeFireMesh();
+  flameGroup.add(fireMesh);
+  const flameMeshHeight = fireMesh.scale.y;
+  const flameBaseY = -1.32;
+
+  const halo = new Mesh(
+    new TorusGeometry(0.6, 0.022, 28, 180),
+    new MeshPhysicalMaterial({
+      color:0xf7d516,
+      emissive:0x8a6500,
+      emissiveIntensity:0.32,
+      transparent:true,
+      opacity:0.48,
+      metalness:0.68,
+      roughness:0.18,
+      clearcoat:1,
+      clearcoatRoughness:0.08,
+      blending:AdditiveBlending,
+    }),
+  );
+  halo.position.set(-0.02, 0, 0.2);
+  halo.rotation.set(1.18, 0.08, -0.08);
+  haloGroup.add(halo);
+
+  const haloHighlight = new Mesh(
+    new TorusGeometry(0.605, 0.006, 16, 180),
+    new MeshBasicMaterial({ color:0xffffff, transparent:true, opacity:0.22, blending:AdditiveBlending }),
+  );
+  haloHighlight.position.set(-0.02, 0.015, 0.22);
+  haloHighlight.rotation.set(1.18, 0.08, -0.08);
+  haloGroup.add(haloHighlight);
+
+  const waterGroup = new Group();
+  const steamGroup = new Group();
+  flameRoot.add(waterGroup);
+  flameRoot.add(steamGroup);
+  const steamTexture = buildSteamTexture();
+  const waterDrops = [];
+  const steamPuffs = [];
+  const waterDropGeometry = new SphereGeometry(0.026, 16, 10);
+  const waterDropMaterial = new MeshBasicMaterial({
+    color:0xbfeaff,
+    transparent:true,
+    opacity:0,
+    blending:AdditiveBlending,
+    depthWrite:false,
+    depthTest:false,
+  });
+  const sprinklerNozzleCount = 24;
+  for(let i = 0; i < 144; i += 1){
+    const drop = new Mesh(waterDropGeometry, waterDropMaterial.clone());
+    drop.name = '3D halo sprinkler water droplet';
+    drop.visible = false;
+    drop.userData.velocity = new Vector3();
+    drop.userData.life = 0;
+    drop.userData.seed = i;
+    drop.userData.delay = seededUnit(i, 52) * 0.9;
+    drop.userData.nozzleIndex = i % sprinklerNozzleCount;
+    drop.userData.nozzleAngle = 0;
+    waterGroup.add(drop);
+    waterDrops.push(drop);
+  }
+  for(let i = 0; i < 38; i += 1){
+    const puff = new Sprite(new SpriteMaterial({
+      map:steamTexture,
+      color:0xffffff,
+      transparent:true,
+      opacity:0,
+      blending:AdditiveBlending,
+      depthWrite:false,
+    }));
+    puff.visible = false;
+    puff.userData.velocity = new Vector3();
+    puff.userData.life = 0;
+    puff.userData.seed = i + 101;
+    steamGroup.add(puff);
+    steamPuffs.push(puff);
+  }
+  const showerState = { active:false, amount:0 };
+
+  function applySceneTuning(){
+    flameGroup.scale.set(tuning.flameScale * tuning.flameWidth, tuning.flameScale * tuning.flameHeight, tuning.flameScale);
+    flameGroup.position.set(0, flameBaseY + (flameMeshHeight * flameGroup.scale.y) / 2, 0);
+    haloGroup.scale.setScalar(tuning.haloScale);
+    haloGroup.position.y = tuning.haloY;
+    halo.material.opacity = tuning.haloOpacity;
+    haloHighlight.material.opacity = Math.min(0.42, tuning.haloOpacity * 0.38);
+    halo.scale.setScalar(1);
+    haloHighlight.scale.setScalar(1.01);
+    fireMesh.material.uniforms.magnitude.value = 0.45 + tuning.smoke * 0.95;
+    fireMesh.material.uniforms.gain.value = 0.35 + tuning.smoke * 0.28;
+    fireMesh.material.uniforms.noiseScale.value.set(0.92 + tuning.smoke * 0.55, 1.92 - tuning.topTaper * 0.32, 1, 0.18 + tuning.speed * 0.18);
+    fireMesh.material.uniforms.topTaper.value = tuning.topTaper;
+    fireMesh.material.uniforms.baseRound.value = tuning.baseRound;
+    fireMesh.material.uniforms.redLayerWidth.value = tuning.redLayerWidth;
+    fireMesh.material.uniforms.yellowLayerWidth.value = tuning.yellowLayerWidth;
+    fireMesh.material.uniforms.coreLayerWidth.value = tuning.coreLayerWidth;
+    fireMesh.material.uniforms.intensity.value = 0.92 + tuning.smoke * 0.18;
+  }
+
+  function haloNozzlePosition(angle, target){
+    const ringRadius = 0.6 * tuning.haloScale;
+    const tiltCos = Math.cos(1.18);
+    const tiltSin = Math.sin(1.18);
+    target.set(
+      halo.position.x + Math.cos(angle) * ringRadius,
+      haloGroup.position.y + Math.sin(angle) * ringRadius * tiltCos,
+      halo.position.z + Math.sin(angle) * ringRadius * tiltSin,
+    );
+    return target;
+  }
+
+  function resetWaterDrop(drop, index, amount){
+    const nozzleIndex = drop.userData.nozzleIndex;
+    const streamIndex = Math.floor(index / sprinklerNozzleCount);
+    const angle = (nozzleIndex / sprinklerNozzleCount) * Math.PI * 2;
+    const source = haloNozzlePosition(angle, drop.position);
+    const jitter = (seededUnit(index, streamIndex + Math.floor(frame * 3) + 31) - 0.5) * 0.012;
+    const sprayForce = 0.012 + streamIndex * 0.003 + amount * 0.01;
+    source.y -= 0.018;
+    source.x += jitter;
+    const outward = new Vector3(Math.cos(angle), 0, Math.sin(angle) * 0.22).normalize();
+    drop.userData.velocity.set(
+      outward.x * sprayForce * 0.28 + jitter * 0.34,
+      -0.008 - amount * 0.006 - streamIndex * 0.001,
+      outward.z * sprayForce * 0.2,
+    );
+    drop.userData.life = 0.75 + streamIndex * 0.18;
+    drop.userData.delay = 0.08 + seededUnit(index, streamIndex + 38) * 0.13;
+    drop.userData.nozzleAngle = angle;
+    drop.visible = true;
+    const scale = 0.72 + seededUnit(index, streamIndex + 39) * 0.36;
+    drop.scale.setScalar(scale);
+    drop.material.opacity = 0.82;
+  }
+
+  function resetSteamPuff(puff, index, amount){
+    const angle = seededUnit(index, Math.floor(frame * 13) + 41) * Math.PI * 2;
+    const radius = 0.08 + seededUnit(index, 42) * 0.32;
+    puff.position.set(
+      Math.cos(angle) * radius,
+      flameBaseY + 0.7 + seededUnit(index, 43) * 0.34,
+      0.1 + Math.sin(angle) * 0.08,
+    );
+    puff.userData.velocity.set(
+      (seededUnit(index, 44) - 0.5) * 0.006,
+      0.012 + seededUnit(index, 45) * 0.012 + amount * 0.012,
+      (seededUnit(index, 46) - 0.5) * 0.004,
+    );
+    puff.userData.life = 0.9 + seededUnit(index, 47) * 0.8;
+    puff.visible = true;
+    const scale = 0.12 + seededUnit(index, 48) * 0.14;
+    puff.scale.setScalar(scale);
+  }
+
+  function updateWaterAndSteam(amount){
+    const active = amount > 0.025;
+    waterGroup.visible = active;
+    steamGroup.visible = active;
+    for(let i = 0; i < waterDrops.length; i += 1){
+      const drop = waterDrops[i];
+      if(active && (!drop.visible || drop.userData.life <= 0 || drop.position.y < flameBaseY + 0.24)){
+        drop.visible = false;
+        drop.userData.delay -= 0.045 + amount * 0.035;
+        if(drop.userData.delay <= 0){
+          resetWaterDrop(drop, i, amount);
+        }
+      }
+      if(!drop.visible) continue;
+      const angle = drop.userData.nozzleAngle || 0;
+      const targetX = Math.cos(angle) * 0.00003 * amount;
+      const targetZ = Math.sin(angle) * 0.00002 * amount;
+      drop.userData.velocity.x += targetX;
+      drop.userData.velocity.z += targetZ;
+      drop.userData.velocity.y -= 0.0019 + amount * 0.0014;
+      drop.position.add(drop.userData.velocity);
+      drop.rotation.x += drop.userData.velocity.z * 7;
+      drop.rotation.z -= drop.userData.velocity.x * 9;
+      drop.userData.life -= 0.015;
+      drop.material.opacity = Math.max(0, Math.min(0.86, amount * drop.userData.life));
+      if(!active && drop.material.opacity <= 0.02) drop.visible = false;
+    }
+    for(let i = 0; i < steamPuffs.length; i += 1){
+      const puff = steamPuffs[i];
+      if(active && (!puff.visible || puff.userData.life <= 0 || puff.position.y > haloGroup.position.y + 0.32)){
+        resetSteamPuff(puff, i, amount);
+      }
+      if(!puff.visible) continue;
+      puff.position.add(puff.userData.velocity);
+      puff.position.x += Math.sin(frame * 2 + i) * 0.0018;
+      puff.userData.life -= 0.012;
+      puff.scale.multiplyScalar(1.006 + amount * 0.006);
+      puff.material.opacity = Math.max(0, Math.min(0.48, amount * puff.userData.life * 0.56));
+      if(!active && puff.material.opacity <= 0.02) puff.visible = false;
+    }
+  }
+
+  applySceneTuning();
+
+  const pointer = new Vector3();
+  const fabricGrabPoint = new Vector2(0, 0.55);
+  const fabricDragTarget = new Vector2(0, 0);
+  const fabricDragCurrent = new Vector2(0, 0);
+  const fabricDragRest = new Vector2(0, 0);
+  const dragState = { active:false, x:0, y:0, pointerX:0, pointerY:0, strength:0 };
+  const projectedHalo = new Vector3();
+  let hover = 0;
+  let clickPulse = 0;
+  host.style.cursor = 'grab';
+  function updatePointerFromEvent(event){
+    const rect = host.getBoundingClientRect();
+    pointer.x = ((event.clientX - rect.left) / rect.width - 0.5) * 2;
+    pointer.y = ((event.clientY - rect.top) / rect.height - 0.5) * -2;
+  }
+  function pointerNearHalo(){
+    halo.getWorldPosition(projectedHalo);
+    projectedHalo.project(camera);
+    const dx = pointer.x - projectedHalo.x;
+    const dy = pointer.y - projectedHalo.y;
+    const haloHit = (dx * dx) / 0.58 + (dy * dy) / 0.13;
+    return haloHit < 1.0;
+  }
+  host.addEventListener('pointermove', (event) => {
+    updatePointerFromEvent(event);
+    if(dragState.active && !showerState.active){
+      fabricDragTarget.set(
+        Math.max(-1, Math.min(1, pointer.x - dragState.pointerX)),
+        Math.max(-1, Math.min(1, pointer.y - dragState.pointerY)),
+      );
+      const dx = event.clientX - dragState.x;
+      const dy = event.clientY - dragState.y;
+      dragState.strength = Math.min(1, Math.hypot(dx, dy) / 180);
+    }
+  });
+  host.addEventListener('pointerenter', () => {
+    hover = 1;
+    canvas.dataset.interaction = 'hover';
+  });
+  host.addEventListener('pointerleave', () => {
+    hover = 0;
+    dragState.active = false;
+    dragState.strength = 0;
+    showerState.active = false;
+    canvas.dataset.interaction = 'idle';
+    host.style.cursor = 'grab';
+  });
+  host.addEventListener('pointerdown', (event) => {
+    event.preventDefault();
+    updatePointerFromEvent(event);
+    const grabbedHalo = pointerNearHalo();
+    showerState.active = grabbedHalo;
+    dragState.active = !grabbedHalo;
+    dragState.x = event.clientX;
+    dragState.y = event.clientY;
+    dragState.pointerX = pointer.x;
+    dragState.pointerY = pointer.y;
+    fabricGrabPoint.set(
+      Math.max(-0.82, Math.min(0.82, pointer.x * 0.62)),
+      Math.max(0.08, Math.min(0.96, (pointer.y + 1) * 0.5)),
+    );
+    fabricDragTarget.set(0, 0);
+    clickPulse = 1;
+    canvas.dataset.interaction = grabbedHalo ? 'halo-shower' : 'dragging';
+    host.style.cursor = 'grabbing';
+    host.setPointerCapture?.(event.pointerId);
+  });
+  host.addEventListener('pointerup', (event) => {
+    dragState.active = false;
+    dragState.strength = 0;
+    showerState.active = false;
+    canvas.dataset.interaction = 'released';
+    host.style.cursor = 'grab';
+    host.releasePointerCapture?.(event.pointerId);
+  });
+
+  function resize(){
+    const rect = host.getBoundingClientRect();
+    const width = Math.max(1, Math.floor(rect.width));
+    const height = Math.max(1, Math.floor(rect.height));
+    renderer.setSize(width, height, false);
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+  }
+  resize();
+  window.addEventListener('resize', resize, { passive:true });
+
+  let frame = 0;
+  function animate(){
+    frame += tuning.speed === 0 ? 0 : 0.016 * tuning.speed;
+    clickPulse *= 0.92;
+    showerState.amount += ((showerState.active ? 1 : 0) - showerState.amount) * 0.1;
+    fabricDragCurrent.lerp(dragState.active ? fabricDragTarget : fabricDragRest, 0.18);
+    const fabricGrip = dragState.active ? Math.max(0.2, dragState.strength) : 0;
+    const waterDamp = showerState.amount;
+    const motionTime = tuning.speed === 0 ? 0 : frame;
+    const breath = 1 + Math.sin(motionTime * 2.2) * 0.018 + clickPulse * 0.06;
+    flameGroup.scale.set(
+      tuning.flameScale * tuning.flameWidth * (breath + clickPulse * 0.015) * (1 - waterDamp * 0.18),
+      tuning.flameScale * tuning.flameHeight * (1 + clickPulse * 0.025) * (1 - waterDamp * 0.42),
+      tuning.flameScale * (1 - waterDamp * 0.12),
+    );
+    flameGroup.position.x = 0;
+    flameGroup.position.y = flameBaseY + (flameMeshHeight * flameGroup.scale.y) / 2;
+    fireMesh.updateMatrixWorld();
+    fireMesh.material.uniforms.invModelMatrix.value.copy(fireMesh.matrixWorld).invert();
+    const interactionEnergy = hover * 0.42 + clickPulse * 0.85 + fabricGrip * 0.45;
+    const fireTime = tuning.speed === 0 ? 0 : motionTime * (3.2 + tuning.speed * 2.8);
+    fireMesh.material.uniforms.time.value = fireTime;
+    canvas.dataset.fireTime = fireTime.toFixed(4);
+    canvas.dataset.speed = tuning.speed.toFixed(2);
+    canvas.dataset.fabricGrip = fabricGrip.toFixed(3);
+    canvas.dataset.fabricDrag = `${fabricDragCurrent.x.toFixed(3)},${fabricDragCurrent.y.toFixed(3)}`;
+    canvas.dataset.showerAmount = waterDamp.toFixed(3);
+    fireMesh.material.uniforms.scale.value.copy(flameGroup.scale);
+    fireMesh.material.uniforms.fabricGrabPoint.value.copy(fabricGrabPoint);
+    fireMesh.material.uniforms.fabricDrag.value.copy(fabricDragCurrent);
+    fireMesh.material.uniforms.fabricGrip.value = fabricGrip;
+    fireMesh.material.uniforms.interactionEnergy.value = interactionEnergy;
+    fireMesh.material.uniforms.waterDamp.value = waterDamp;
+    fireMesh.material.uniforms.magnitude.value = 0.5 + tuning.smoke * 0.95 + clickPulse * 0.16 + hover * 0.06;
+    fireMesh.material.uniforms.gain.value = 0.35 + tuning.smoke * 0.28;
+    fireMesh.material.uniforms.topTaper.value = tuning.topTaper;
+    fireMesh.material.uniforms.baseRound.value = tuning.baseRound;
+    fireMesh.material.uniforms.redLayerWidth.value = tuning.redLayerWidth;
+    fireMesh.material.uniforms.yellowLayerWidth.value = tuning.yellowLayerWidth;
+    fireMesh.material.uniforms.coreLayerWidth.value = tuning.coreLayerWidth;
+    fireMesh.material.uniforms.noiseScale.value.set(1.02 + tuning.smoke * 0.55, 2.15 - tuning.topTaper * 0.32, 1, 0.34 + tuning.speed * 0.32);
+    fireMesh.material.uniforms.intensity.value = 0.94 + tuning.smoke * 0.18 + clickPulse * 0.08 + hover * 0.04;
+    haloGroup.position.y = tuning.haloY + Math.sin(motionTime * 0.9) * 0.012 + clickPulse * 0.018;
+    halo.rotation.z = -0.08 + Math.sin(motionTime * 0.78) * 0.025 + clickPulse * 0.08;
+    halo.material.opacity = tuning.haloOpacity;
+    haloGroup.scale.setScalar(tuning.haloScale * (1 + hover * 0.012 + clickPulse * 0.08));
+    haloHighlight.position.y = 0.015;
+    haloHighlight.rotation.z = halo.rotation.z + 0.018;
+    haloHighlight.material.opacity = Math.min(0.42, tuning.haloOpacity * 0.38);
+    haloHighlight.scale.setScalar(1.01);
+    updateWaterAndSteam(waterDamp);
+    renderer.render(scene, camera);
+    requestAnimationFrame(animate);
+  }
+  host.classList.add('scene-ready');
+  animate();
+}
+
+window.initHaloHeroScene = initHaloHeroScene;
+initEmberField();
+initHaloHeroScene().catch((error) => {
+  const canvas = document.getElementById('haloHeroCanvas');
+  if(canvas){
+    canvas.dataset.rendererMode = 'fallback-image';
+    canvas.dataset.rendererError = error instanceof Error ? error.message : 'hero scene init failed';
+  }
+});
+</script>
 
 <script>
-// ═══════════════════════════════════════════════════════
-// THREE.JS — Elegant ambient fire orb + golden halo
-// Smooth, slow, refined — a background design element
-// ═══════════════════════════════════════════════════════
-const C = document.getElementById('bg');
-const R = new THREE.WebGLRenderer({canvas:C, antialias:true, alpha:true});
-R.setSize(innerWidth, innerHeight);
-R.setPixelRatio(Math.min(devicePixelRatio, 2));
-R.toneMapping = THREE.ACESFilmicToneMapping;
-R.toneMappingExposure = 0.9;
-
-const S = new THREE.Scene();
-const cam = new THREE.PerspectiveCamera(50, innerWidth/innerHeight, 0.1, 200);
-// Position orb in the golden section intersection (right-center)
-cam.position.set(0.5, 0.2, 6);
-
-// ── SMOOTH FIRE ORB — elegant gradient sphere ──
-const orbVert = `
-  varying vec3 vNorm, vPos;
-  varying vec2 vUv;
-  uniform float uT;
-
-  // Smooth simplex noise
-  vec3 mod289(vec3 x){return x-floor(x/289.0)*289.0;}
-  vec4 mod289(vec4 x){return x-floor(x/289.0)*289.0;}
-  vec4 perm(vec4 x){return mod289((x*34.0+1.0)*x);}
-  vec4 tISq(vec4 r){return 1.79284291400159-0.85373472095314*r;}
-  float snoise(vec3 v){
-    const vec2 C=vec2(1./6.,1./3.);const vec4 D=vec4(0,.5,1,2);
-    vec3 i=floor(v+dot(v,C.yyy)),x0=v-i+dot(i,C.xxx);
-    vec3 g=step(x0.yzx,x0.xyz),l=1.0-g,i1=min(g,l.zxy),i2=max(g,l.zxy);
-    vec3 x1=x0-i1+C.x,x2=x0-i2+C.y,x3=x0-D.y;
-    i=mod289(i);
-    vec4 p=perm(perm(perm(i.z+vec4(0,i1.z,i2.z,1))+i.y+vec4(0,i1.y,i2.y,1))+i.x+vec4(0,i1.x,i2.x,1));
-    vec3 ns=0.142857142857*D.wyz-D.xzx;
-    vec4 j=p-49.0*floor(p*ns.z*ns.z),x_=floor(j*ns.z),y_=floor(j-7.0*x_);
-    vec4 x4=x_*ns.x+ns.y,y4=y_*ns.x+ns.y,h=1.0-abs(x4)-abs(y4);
-    vec4 b0=vec4(x4.xy,y4.xy),b1=vec4(x4.zw,y4.zw);
-    vec4 s0=floor(b0)*2.0+1.0,s1=floor(b1)*2.0+1.0,sh=-step(h,vec4(0));
-    vec4 a0=b0.xzyw+s0.xzyw*sh.xxyy,a1=b1.xzyw+s1.xzyw*sh.zzww;
-    vec3 p0=vec3(a0.xy,h.x),p1=vec3(a0.zw,h.y),p2=vec3(a1.xy,h.z),p3=vec3(a1.zw,h.w);
-    vec4 nm=tISq(vec4(dot(p0,p0),dot(p1,p1),dot(p2,p2),dot(p3,p3)));
-    p0*=nm.x;p1*=nm.y;p2*=nm.z;p3*=nm.w;
-    vec4 m=max(.6-vec4(dot(x0,x0),dot(x1,x1),dot(x2,x2),dot(x3,x3)),0.);m*=m;
-    return 42.0*dot(m*m,vec4(dot(p0,x0),dot(p1,x1),dot(p2,x2),dot(p3,x3)));
-  }
-
-  void main(){
-    vUv=uv; vNorm=normal;
-    vec3 p=position;
-    // Gentle flame shape: taper top, wider base
-    float hf=(p.y+1.0)/2.0;
-    p.xz *= 1.0 - pow(hf,0.7)*0.5;
-    p.y *= 1.35;
-    // Very gentle organic deformation — slow and smooth
-    float n1 = snoise(p*1.8 + vec3(0, uT*0.18, 0)) * (0.08 + hf*0.18);
-    float n2 = snoise(p*3.5 + vec3(uT*0.06, uT*0.25, 0)) * (0.04 + hf*0.08);
-    p += normal * (n1+n2);
-    p.y += hf * 0.08 * sin(uT*0.3 + p.x*1.5); // Subtle upward drift
-    // Very slow breath
-    p *= 1.0 + sin(uT*0.25)*0.008;
-    vPos=p;
-    gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1);
-  }
-`;
-const orbFrag = `
-  varying vec3 vNorm, vPos;
-  uniform float uT;
-  void main(){
-    float fr = pow(max(0., .55-dot(vNorm,vec3(0,0,1))), 2.2);
-    float h = (vPos.y+1.4)/3.8;
-    // Refined color ramp
-    vec3 deep = vec3(0.45,0.03,0.01);
-    vec3 red  = vec3(0.82,0.12,0.04);
-    vec3 org  = vec3(0.95,0.38,0.05);
-    vec3 yel  = vec3(1.0,0.75,0.12);
-    vec3 wht  = vec3(1.0,0.92,0.7);
-    vec3 c = mix(deep,red,smoothstep(0.,.25,h));
-    c = mix(c,org,smoothstep(.2,.5,h));
-    c = mix(c,yel,smoothstep(.45,.72,h));
-    c = mix(c,wht,smoothstep(.7,1.,h));
-    // Soft hot center
-    c += wht * exp(-length(vPos.xz)*3.5) * 0.3;
-    // Subtle edge glow
-    c += vec3(.6,.15,0) * fr * 0.4;
-    // Dim for background
-    c *= 0.55;
-    float a = 0.65 - fr*0.2;
-    a *= smoothstep(0.,.12, 1.-h+.12);
-    gl_FragColor = vec4(c,a);
-  }
-`;
-
-// ── HALO SHADERS ──
-const hVert = `
-  varying vec2 vUv; varying vec3 vP; uniform float uT;
-  void main(){
-    vUv=uv; vP=position;
-    vec3 p=position;
-    p.y += sin(uT*0.35+p.x)*0.008;
-    gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1);
-  }
-`;
-const hFrag = `
-  varying vec2 vUv; varying vec3 vP; uniform float uT;
-  void main(){
-    float a=atan(vP.z,vP.x);
-    float sh=sin(a*5.0+uT*0.8)*0.1+0.9;
-    vec3 gold=vec3(1,.84,0);
-    vec3 c=mix(gold,vec3(1,.94,.5),sh*0.35)*(sin(uT*0.5)*0.06+0.94);
-    float tf=1.-abs(vUv.y-.5)*2.; tf=pow(max(0.,tf),0.55);
-    c+=gold*0.2;
-    gl_FragColor=vec4(c, tf*0.75*sh);
-  }
-`;
-
-// ── BUILD SCENE ──
-const orbG = new THREE.IcosahedronGeometry(1, 6);
-const orbM = new THREE.ShaderMaterial({vertexShader:orbVert, fragmentShader:orbFrag, uniforms:{uT:{value:0}}, transparent:true, side:THREE.DoubleSide, depthWrite:false});
-const orb = new THREE.Mesh(orbG, orbM);
-orb.position.set(0, -0.15, 0);
-S.add(orb);
-
-// Inner glow core
-const coreM = new THREE.MeshBasicMaterial({color:0xffaa00, transparent:true, opacity:0.06, depthWrite:false});
-S.add(new THREE.Mesh(new THREE.IcosahedronGeometry(0.35,3), coreM));
-
-// Halo — just slightly above flame tip (NOT floating way above)
-const haloU = {uT:{value:0}};
-const haloM = new THREE.ShaderMaterial({vertexShader:hVert, fragmentShader:hFrag, uniforms:haloU, transparent:true, side:THREE.DoubleSide, depthWrite:false});
-const halo = new THREE.Mesh(new THREE.TorusGeometry(0.72, 0.035, 16, 100), haloM);
-halo.position.set(0, 1.15, 0); // Just above the flame
-halo.rotation.x = Math.PI * 0.4;
-halo.rotation.z = -0.12;
-S.add(halo);
-
-// Subtle outer halo glow
-const halo2M = new THREE.ShaderMaterial({vertexShader:hVert, fragmentShader:hFrag, uniforms:{uT:haloU.uT}, transparent:true, side:THREE.DoubleSide, depthWrite:false});
-const halo2 = new THREE.Mesh(new THREE.TorusGeometry(0.76, 0.012, 10, 100), halo2M);
-halo2.position.copy(halo.position);
-halo2.rotation.copy(halo.rotation);
-S.add(halo2);
-
-// Sparse rising embers — few and elegant
-const EC = 120;
-const eG = new THREE.BufferGeometry();
-const eP = new Float32Array(EC*3), eV = new Float32Array(EC*3), eC = new Float32Array(EC*3);
-function resetE(i){
-  const a=Math.random()*Math.PI*2, r=Math.random()*0.4;
-  eP[i*3]=Math.cos(a)*r; eP[i*3+1]=-0.3+Math.random()*0.3; eP[i*3+2]=Math.sin(a)*r;
-  eV[i*3]=(Math.random()-.5)*.002; eV[i*3+1]=.004+Math.random()*.01; eV[i*3+2]=(Math.random()-.5)*.002;
-  const t=Math.random(); eC[i*3]=1; eC[i*3+1]=.3+t*.55; eC[i*3+2]=t*.1;
-}
-for(let i=0;i<EC;i++) resetE(i);
-eG.setAttribute('position',new THREE.BufferAttribute(eP,3));
-eG.setAttribute('color',new THREE.BufferAttribute(eC,3));
-const embers = new THREE.Points(eG, new THREE.PointsMaterial({size:.025, vertexColors:true, transparent:true, opacity:.5, blending:THREE.AdditiveBlending, depthWrite:false, sizeAttenuation:true}));
-S.add(embers);
-
-// Background stars
-const SN=800, sG=new THREE.BufferGeometry(), sP=new Float32Array(SN*3);
-for(let i=0;i<SN;i++){sP[i*3]=(Math.random()-.5)*50;sP[i*3+1]=(Math.random()-.5)*50;sP[i*3+2]=-8-Math.random()*40;}
-sG.setAttribute('position',new THREE.BufferAttribute(sP,3));
-const stars = new THREE.Points(sG, new THREE.PointsMaterial({size:.04, color:0x2a2a3a, transparent:true, opacity:.4, blending:THREE.AdditiveBlending, depthWrite:false}));
-S.add(stars);
-
-// Lights
-const fL = new THREE.PointLight(0xE53935, 1.5, 10);
-fL.position.set(0,.5,3); S.add(fL);
-const hL = new THREE.PointLight(0xFFD700, 0.8, 6);
-hL.position.set(0,1.5,2); S.add(hL);
-S.add(new THREE.AmbientLight(0x060608));
-
-// Mouse
-let mx=0,my=0;
-document.addEventListener('mousemove',e=>{mx=(e.clientX/innerWidth-.5)*2;my=(e.clientY/innerHeight-.5)*2;});
-
-// Animate
-const clk=new THREE.Clock();
-(function loop(){
-  requestAnimationFrame(loop);
-  const t=clk.getElapsedTime();
-  orbM.uniforms.uT.value=t;
-  haloU.uT.value=t;
-  orb.rotation.y=t*0.04; // Very slow rotation
-  halo.position.y=1.15+Math.sin(t*0.35)*0.015;
-  halo2.position.y=halo.position.y;
-  halo.rotation.z=-0.12+Math.sin(t*0.2)*0.01;
-  halo2.rotation.z=halo.rotation.z;
-  // Embers
-  const p=embers.geometry.attributes.position.array;
-  for(let i=0;i<EC;i++){
-    p[i*3]+=eV[i*3]; p[i*3+1]+=eV[i*3+1]; p[i*3+2]+=eV[i*3+2];
-    if(p[i*3+1]>3) resetE(i);
-  }
-  embers.geometry.attributes.position.needsUpdate=true;
-  stars.rotation.y=t*0.003;
-  // Gentle camera follow
-  cam.position.x+=(.5+mx*0.2-cam.position.x)*0.008;
-  cam.position.y+=(0.2-my*0.12-cam.position.y)*0.008;
-  cam.lookAt(0,0.3,0);
-  fL.intensity=1.5+Math.sin(t*2.5)*0.15;
-  R.render(S,cam);
-})();
-
-addEventListener('resize',()=>{cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();R.setSize(innerWidth,innerHeight);});
-
-// Loader
-setTimeout(()=>document.getElementById('loader').classList.add('done'),1800);
-
-// KPI counters
-function ctr(el,v,pre,suf,d){const s=performance.now();(function t(n){const p=Math.min((n-s)/d,1);el.textContent=(pre||'')+Math.round(v*(1-Math.pow(1-p,3))).toLocaleString()+(suf||'');if(p<1)requestAnimationFrame(t);})(performance.now());}
-// Real, non-sensitive scale counts from the API (no fabricated metrics).
-setTimeout(()=>{
-  fetch('/api/public/summary').then(r=>r.json()).then(s=>{
-    ctr(document.getElementById('k1'),s.bidsTracked||0,'','',1600);
-    ctr(document.getElementById('k2'),s.pricebookItems||0,'','',1800);
-    ctr(document.getElementById('k3'),s.sourceWorkbooks||0,'','',1400);
-    ctr(document.getElementById('k4'),s.claimGates||0,'','',1200);
-  }).catch(()=>{});
-},2200);
-
-// Clock
-(function ck(){const d=new Date();document.getElementById('clk').textContent=d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+'  '+d.toLocaleTimeString('en-US',{hour12:false});setTimeout(ck,1000)})();
-
-// Login
 const HALOFIRE_BASE_PATH = window.location.pathname.startsWith('/halo-fire/') ? '/halo-fire' : '';
+const params = new URLSearchParams(window.location.search);
+const setupToken = params.get('setup');
+const usernameParam = params.get('username');
+let authMode = setupToken ? 'setup' : 'login';
+
+const form = document.getElementById('form');
+const userInput = document.getElementById('user');
+const passInput = document.getElementById('pass');
+const passField = document.getElementById('passField');
+const confirmPassInput = document.getElementById('confirmPass');
+const confirmPassField = document.getElementById('confirmPassField');
+const passwordHelp = document.getElementById('passwordHelp');
+const rememberRow = document.getElementById('rememberRow');
+const submitButton = document.getElementById('submitButton');
+const formMode = document.getElementById('formMode');
+const loginTitle = document.getElementById('loginTitle');
+const forgotPassword = document.getElementById('forgotPassword');
+const err = document.getElementById('err');
+const ok = document.getElementById('ok');
+
+function apiPath(pathname){
+  return HALOFIRE_BASE_PATH + pathname;
+}
+
 function safeWorkbenchRedirect(){
   const fallback = HALOFIRE_BASE_PATH + '/workbench.html';
-  const params = new URLSearchParams(window.location.search);
   const requested = params.get('redirect');
   if(!requested)return fallback;
   try{
@@ -424,9 +1129,27 @@ function safeWorkbenchRedirect(){
   }catch(_){}
   return fallback;
 }
+
+function clearMessages(){
+  err.style.display = 'none';
+  ok.style.display = 'none';
+  err.textContent = '';
+  ok.textContent = '';
+}
+
+function showError(message){
+  ok.style.display = 'none';
+  err.textContent = message || 'Unable to sign in.';
+  err.style.display = 'block';
+}
+
+function showOk(message){
+  err.style.display = 'none';
+  ok.textContent = message;
+  ok.style.display = 'block';
+}
+
 function storeLoginToken(data){
-  // "Keep me logged in" (default checked) -> persist in localStorage across
-  // reloads/tab-close; unchecked -> sessionStorage only (cleared on tab close).
   const rememberEl = document.getElementById('remember');
   const remember = rememberEl ? rememberEl.checked : true;
   const store = remember ? localStorage : sessionStorage;
@@ -438,60 +1161,146 @@ function storeLoginToken(data){
     // The server also sets an HttpOnly session cookie; storage is convenience.
   }
 }
-// DEMO (localhost only): pre-fill the dev creds the preview server is launched
-// with, and self-heal a bounced session so the operator stays logged in across
-// reloads while building/testing. PRODUCTION (non-localhost) is unaffected.
-function isHaloDemoHost(){ return location.hostname==='localhost'||location.hostname==='127.0.0.1'; }
-function haloTokenExpired(t){ try{const p=JSON.parse(atob(String(t).split('.')[1]));return !p.exp||(p.exp*1000)<=(Date.now()+5000);}catch(_){return true;} }
-(function haloDemoLoginBootstrap(){
-  if(!isHaloDemoHost()) return;
-  const u=document.getElementById('user'), p=document.getElementById('pass');
-  if(u && !u.value) u.value='admin';
-  if(p && !p.value) p.value='halofire-dev-smoke';
-  let tok=null; try{ tok=localStorage.getItem('halofire_token'); }catch(_){}
-  const params=new URLSearchParams(window.location.search);
-  if(params.get('redirect') && (!tok || haloTokenExpired(tok))){
-    try{
-      const xhr=new XMLHttpRequest();
-      xhr.open('POST', HALOFIRE_BASE_PATH + '/' + 'api/auth/login', false);
-      xhr.setRequestHeader('Content-Type','application/json');
-      xhr.send(JSON.stringify({username:'admin',password:'halofire-dev-smoke'}));
-      if(xhr.status===200){
-        const data=JSON.parse(xhr.responseText||'{}');
-        if(data&&data.token){
-          try{ localStorage.setItem('halofire_token',data.token); if(data.user) localStorage.setItem('halofire_user',JSON.stringify(data.user)); }catch(_){}
-          window.location.href=safeWorkbenchRedirect(); return;
-        }
-      }
-    }catch(_){}
-  }
-})();
-const ov=document.getElementById('overlay');
-document.getElementById('signBtn').onclick=()=>ov.classList.add('on');
-document.getElementById('enterBtn').onclick=()=>ov.classList.add('on');
-document.getElementById('closeBtn').onclick=()=>ov.classList.remove('on');
-ov.onclick=e=>{if(e.target===ov)ov.classList.remove('on');};
-document.getElementById('form').onsubmit=async e=>{
-  e.preventDefault();
-  const er=document.getElementById('err');
+
+function applyLoginMode(){
+  authMode = 'login';
+  loginTitle.textContent = 'Secure Portal';
+  formMode.textContent = 'Sign in to continue.';
+  passField.hidden = false;
+  passInput.required = true;
+  passInput.autocomplete = 'current-password';
+  passInput.placeholder = 'Password';
+  confirmPassField.hidden = true;
+  confirmPassInput.required = false;
+  passwordHelp.style.display = 'none';
+  rememberRow.style.display = 'flex';
+  forgotPassword.hidden = false;
+  submitButton.textContent = 'Sign in';
+  clearMessages();
+}
+
+async function applyInviteSetupMode(){
+  authMode = 'setup';
+  loginTitle.textContent = 'Create Password';
+  formMode.textContent = 'Create your HaloFire password.';
+  passField.hidden = false;
+  passInput.required = true;
+  passInput.autocomplete = 'new-password';
+  passInput.placeholder = 'Create password';
+  confirmPassField.hidden = false;
+  confirmPassInput.required = true;
+  passwordHelp.style.display = 'block';
+  rememberRow.style.display = 'flex';
+  forgotPassword.hidden = true;
+  submitButton.textContent = 'Create password';
+  clearMessages();
   try{
+    const verify = await fetch(apiPath('/api/auth/setup/verify') + '?token=' + encodeURIComponent(setupToken), {
+      credentials:'include',
+    });
+    if(!verify.ok) throw new Error('invalid setup token');
+    const data = await verify.json();
+    if(data.username) userInput.value = data.username;
+    userInput.readOnly = true;
+  }catch(_){
+    showError('This setup link is expired or has already been used.');
+    submitButton.disabled = true;
+  }
+}
+
+function applyRecoveryMode(){
+  authMode = 'recovery';
+  loginTitle.textContent = 'Recover Access';
+  formMode.textContent = 'Enter your HaloFire email to request a password reset link.';
+  passField.hidden = true;
+  passInput.required = false;
+  confirmPassField.hidden = true;
+  confirmPassInput.required = false;
+  passwordHelp.style.display = 'none';
+  rememberRow.style.display = 'none';
+  forgotPassword.hidden = true;
+  submitButton.textContent = 'Send recovery link';
+  userInput.readOnly = false;
+  clearMessages();
+}
+
+if(usernameParam){
+  userInput.value = usernameParam;
+}
+
+forgotPassword.addEventListener('click', () => {
+  applyRecoveryMode();
+});
+
+if(params.get('recover')){
+  applyRecoveryMode();
+}else if(setupToken){
+  applyInviteSetupMode();
+}else{
+  applyLoginMode();
+}
+
+form.onsubmit=async e=>{
+  e.preventDefault();
+  clearMessages();
+  submitButton.disabled = true;
+  try{
+    if(authMode === 'setup'){
+      if(passInput.value !== confirmPassInput.value){
+        throw new Error('Passwords must match');
+      }
+      if(passInput.value.length < 12){
+        throw new Error('Use at least 12 characters.');
+      }
+      const setup = await fetch(apiPath('/api/auth/setup-password'), {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        credentials:'include',
+        body:JSON.stringify({
+          token:setupToken,
+          password:passInput.value,
+        }),
+      });
+      if(!setup.ok) throw new Error('Unable to create password.');
+      const data = await setup.json();
+      storeLoginToken(data);
+      window.location.href = safeWorkbenchRedirect();
+      return;
+    }
+    if(authMode === 'recovery'){
+      const recovery = await fetch(apiPath('/api/auth/password-recovery/request'), {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        credentials:'include',
+        body:JSON.stringify({
+          email:userInput.value,
+        }),
+      });
+      if(!recovery.ok) throw new Error('Unable to request recovery.');
+      showOk('If that email exists, a recovery link has been prepared.');
+      return;
+    }
     const res=await fetch(HALOFIRE_BASE_PATH + '/' + 'api/auth/login',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
+      credentials:'include',
       body:JSON.stringify({
-        username:document.getElementById('user').value,
-        password:document.getElementById('pass').value,
+        username:userInput.value,
+        password:passInput.value,
       }),
     });
     if(!res.ok)throw new Error('bad credentials');
     const data=await res.json();
     storeLoginToken(data);
     window.location.href=safeWorkbenchRedirect();
-  }catch(_){
-    er.style.display='block';setTimeout(()=>er.style.display='none',2500);
+  }catch(error){
+    showError(error instanceof Error ? error.message : 'Unable to sign in.');
+  }finally{
+    if(!window.location.href.includes('workbench.html')){
+      submitButton.disabled = false;
+    }
   }
 };
-document.getElementById('menuBtn').onclick=()=>document.getElementById('navLinks').classList.toggle('open');
 </script>
 </body>
 </html>

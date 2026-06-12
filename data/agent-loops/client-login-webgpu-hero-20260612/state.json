@@ -1,0 +1,51 @@
+{
+  "loop": "client-login-webgpu-hero-20260612",
+  "status": "accepted_for_slice",
+  "current_iteration": 5,
+  "last_updated": "2026-06-12T02:17:00Z",
+  "completed_stages": [
+    "discover",
+    "reference_gate",
+    "figma_gate",
+    "creative_production_gate",
+    "composition_audit",
+    "material_audit",
+    "implementation",
+    "browser_preview",
+    "interaction_smoke",
+    "visual_review"
+  ],
+  "accepted_evidence": {
+    "figma_file": "https://www.figma.com/design/41Et0LQ9n6YEutm2zknbOX",
+    "preview_url": "http://localhost:5175/?codexFresh=1781231186866",
+    "screenshot": "apps/autosprink/out/agent-loops/client-login-webgpu-hero-20260612/preview-window-webgpu-red-flame.png",
+    "renderer_mode": "webgpu",
+    "hero_ready": true,
+    "fallback_opacity": 0,
+    "drag_result": "released",
+    "logo_images_draggable": false
+  },
+  "rejected_iterations": [
+    {
+      "name": "pasted/generated image plane",
+      "reason": "Looked like a bitmap pasted over bad visuals instead of a real Three.js hero."
+    },
+    {
+      "name": "procedural beam/flame",
+      "reason": "Did not read as the Halo Fire flame."
+    },
+    {
+      "name": "shader ribbon/flame",
+      "reason": "Abstract VFX, not a brand-derived flame."
+    },
+    {
+      "name": "first extruded flame",
+      "reason": "Double halo, cartoon yellow core, oversized geometry, and poor logo fidelity."
+    }
+  ],
+  "remaining_risks": [
+    "The flame is a stylized extruded brand mesh, not a physically simulated volumetric fire plume.",
+    "Public deployment is not part of this local preview slice."
+  ],
+  "next_required_gate": "Run loop guard, focused tests, production build, workspace rulebook verifier, then commit scoped files only if all pass."
+}

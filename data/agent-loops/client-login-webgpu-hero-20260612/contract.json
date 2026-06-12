@@ -1,0 +1,52 @@
+{
+  "name": "client-login-webgpu-hero-20260612",
+  "owner": "codex",
+  "goal": "Ship a clean Halo Fire secure client login page using the official Halo Fire logo, Apple Liquid Glass-inspired UI treatment, and a live Three.js halo/flame hero that is reference-gated, visually inspected, and free of fake data or internal client-facing text.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "E:/ClaudeBot/AGENTIC_RULES.md",
+    "E:/ClaudeBot/CODEX.md",
+    "E:/ClaudeBot/halofire-studio/AGENTS.md",
+    "E:/ClaudeBot/halofire-studio/apps/autosprink/index.html",
+    "E:/ClaudeBot/halofire-studio/apps/autosprink/public/brand/halo-fire-logo-glass.png",
+    "Figma reference file https://www.figma.com/design/41Et0LQ9n6YEutm2zknbOX",
+    "Creative Production moodboard reference gate",
+    "Codex in-app preview screenshot evidence"
+  ],
+  "exit_criteria": [
+    "The visible page is the secure login surface, not a marketing page, dashboard, modal teaser, or fake-data screen.",
+    "The hero is a live Three.js canvas scene using an extruded logo-derived flame mesh, one animated halo ring, and sparse ember particles.",
+    "The hero does not use a pasted flame image, visible texture rectangle, hero card, implementation label, or hidden draggable logo as the primary visual.",
+    "Pointer drag tugs/stretch-pulls the 3D flame material and does not rotate the entire display.",
+    "The official Halo Fire logo remains deterministic in the header and login card and all logo images are non-draggable.",
+    "The login page copy is concise, client-grade, and contains no fake metrics, demo credentials, permit/AHJ overclaims, internal-alpha wording, web-scraping copy, or co-development explanation text.",
+    "Layout uses recorded composition math: golden-ratio desktop split, stable safe zones, no clipping, and responsive mobile constraints.",
+    "Visible controls use Apple Liquid Glass-inspired materials with dimensional buttons, glass inputs, focus/hover/pressed states, and readable contrast.",
+    "A real Codex in-app browser preview screenshot is saved, decoded, visually inspected, and marked pass/reject.",
+    "Focused tests, production build, loop guard, and workspace rulebook verification pass before commit."
+  ],
+  "verification_gates": [
+    "Loop guard: C:/Python312/python.exe E:/ClaudeBot/scripts/agent_loop_guard.py validate data/agent-loops/client-login-webgpu-hero-20260612/contract.json",
+    "Focused tests: npx vitest run tests/client-login-static.test.js tests/workbench-deep-link.test.js tests/consolidate-surfaces.test.js",
+    "Production build: npm run build",
+    "Browser preview: Codex in-app browser at localhost shows rendererMode webgpu when WebGPU is available, heroReady true, fallback opacity 0, and no console errors",
+    "Interaction smoke: drag over #haloHeroScene records released after dragging and images remain draggable=false",
+    "Visual screenshot: apps/autosprink/out/agent-loops/client-login-webgpu-hero-20260612/preview-window-webgpu-red-flame.png",
+    "Workspace rulebook check: C:/Python312/python.exe E:/ClaudeBot/scripts/verify_agentic_rules.py",
+    "Formal proof posture: NO_FORMALIZABLE_CLAIM for visual-only HTML/CSS/Three.js rendering and copy changes"
+  ],
+  "state_path": "data/agent-loops/client-login-webgpu-hero-20260612/state.json",
+  "evidence_paths": [
+    "apps/autosprink/out/agent-loops/client-login-webgpu-hero-20260612/preview-window-webgpu-red-flame.png",
+    "apps/autosprink/out/agent-loops/client-login-webgpu-hero-20260612/preview-window-logo-derived-mesh.png",
+    "apps/autosprink/out/agent-loops/client-login-webgpu-hero-20260612/extruded-flame-object-desktop.png",
+    "data/agent-loops/client-login-webgpu-hero-20260612/visual-review.json",
+    "data/agent-loops/client-login-webgpu-hero-20260612/composition-audit.json",
+    "data/agent-loops/client-login-webgpu-hero-20260612/material-audit.json"
+  ],
+  "max_iterations": 5,
+  "max_tokens": 200000,
+  "model_tier": "balanced",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

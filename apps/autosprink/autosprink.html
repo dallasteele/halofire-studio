@@ -52,8 +52,71 @@
   .warn{font-size:10px;color:var(--gold);font-family:var(--mono);line-height:1.5;margin-top:8px}
   a.link{color:var(--cyan);text-decoration:none;font-size:11px}
 </style>
+<link rel="stylesheet" href="/public/styles/halofire-tokens.css">
+<style id="employee-studio-glass-overrides">
+  body.hf-studio-glass{
+    --panel:rgba(13,12,10,0.76);
+    --panel2:rgba(0,0,0,0.46);
+    --line:rgba(255,255,255,0.14);
+    --fire:#e8432d;
+    --gold:#ffd54f;
+    --cyan:#ffd54f;
+    --blue:#c89a3c;
+    --text:#f2ece0;
+    --muted:rgba(242,236,224,0.62);
+    --bright:#fff8e8;
+    background:
+      radial-gradient(circle at 30% 42%,rgba(255,213,79,0.14),transparent 24%),
+      radial-gradient(circle at 74% 37%,rgba(232,67,45,0.14),transparent 31%),
+      linear-gradient(125deg,#050505 0%,#11100e 45%,#090302 100%);
+  }
+  body.hf-studio-glass header,
+  body.hf-studio-glass aside,
+  body.hf-studio-glass #legend{
+    background:linear-gradient(180deg,rgba(255,255,255,0.08),rgba(0,0,0,0.42)),rgba(13,12,10,0.72);
+    border-color:rgba(255,255,255,0.14);
+    backdrop-filter:blur(28px) saturate(1.35);
+    -webkit-backdrop-filter:blur(28px) saturate(1.35);
+  }
+  body.hf-studio-glass #canvasWrap{
+    background:
+      radial-gradient(circle at 48% 42%,rgba(255,213,79,0.08),transparent 30%),
+      linear-gradient(180deg,#070707,#0d0b09);
+  }
+  body.hf-studio-glass input,
+  body.hf-studio-glass select,
+  body.hf-studio-glass textarea{
+    background:linear-gradient(180deg,rgba(255,255,255,0.05),rgba(0,0,0,0.48))!important;
+    border:1px solid rgba(255,255,255,0.16)!important;
+    border-radius:12px!important;
+    color:var(--bright)!important;
+  }
+  body.hf-studio-glass button.act,
+  body.hf-studio-glass .seg button.on{
+    background:linear-gradient(180deg,#ffd54f,#c89a3c)!important;
+    color:#0d0c0a!important;
+    border:1px solid rgba(255,213,79,0.42)!important;
+    border-radius:12px!important;
+    box-shadow:0 16px 36px rgba(255,213,79,0.16);
+  }
+  body.hf-studio-glass button.ghost,
+  body.hf-studio-glass .seg button{
+    background:rgba(0,0,0,0.38)!important;
+    color:#f2ece0!important;
+    border:1px solid rgba(255,255,255,0.14)!important;
+  }
+  body.hf-studio-glass .brand span{color:#e8432d}
+  @media(max-width:840px){
+    html,body.hf-studio-glass{height:auto;overflow:auto}
+    body.hf-studio-glass #app{display:block;height:auto;min-height:100vh;overflow:visible;grid-template-columns:1fr}
+    body.hf-studio-glass header{position:sticky;top:0;z-index:20;flex-wrap:wrap;height:auto;min-height:56px;gap:8px;padding:12px 16px}
+    body.hf-studio-glass header .right{flex-wrap:wrap}
+    body.hf-studio-glass aside{max-height:none;border:0;border-bottom:1px solid rgba(255,255,255,0.14)}
+    body.hf-studio-glass #canvasWrap{height:min(62vh,520px);min-height:360px}
+  }
+</style>
 </head>
-<body>
+<body class="hf-shell hf-studio-glass">
 <div id="app">
   <header>
     <div class="brand">Halo<span>Fire</span> Studio <small>SPRINKLER CAD · OpenGeometry</small></div>

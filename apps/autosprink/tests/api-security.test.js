@@ -171,6 +171,98 @@ describe('HaloFire API security gates', () => {
     expect(res.status).toBe(403);
   });
 
+  it('lets an admin invite an employee by email and the employee create a password once', async () => {
+    const adminToken = await tokenFor('security-admin', 'actual-test-password');
+    const invite = await request('/api/auth/invite', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${adminToken}` },
+      body: JSON.stringify({
+        email: 'Wade@HaloFireUS.com',
+        name: 'Wade',
+        role: 'user',
+      }),
+    });
+    expect(invite.status).toBe(201);
+    const inviteBody = await invite.json();
+    expect(inviteBody.user).toEqual(expect.objectContaining({
+      username: 'wade@halofireus.com',
+      email: 'wade@halofireus.com',
+      role: 'user',
+    }));
+    expect(inviteBody.setup_token).toMatch(/^[A-Za-z0-9_-]{32,}$/);
+    expect(inviteBody.invite_url).toContain('username=wade%40halofireus.com');
+    expect(inviteBody.invite_url).toContain('setup=');
+
+    const verify = await request(`/api/auth/setup/verify?token=${encodeURIComponent(inviteBody.setup_token)}`);
+    expect(verify.status).toBe(200);
+    expect(await verify.json()).toEqual(expect.objectContaining({
+      username: 'wade@halofireus.com',
+      email: 'wade@halofireus.com',
+      name: 'Wade',
+    }));
+
+    const setup = await request('/api/auth/setup-password', {
+      method: 'POST',
+      body: JSON.stringify({
+        token: inviteBody.setup_token,
+        password: 'Wade-secure-passphrase-2026!',
+      }),
+    });
+    expect(setup.status).toBe(200);
+    expect(setup.headers.get('set-cookie') || '').toContain('halofire_session=');
+    const setupBody = await setup.json();
+    expect(setupBody.user.username).toBe('wade@halofireus.com');
+
+    const loginAfterSetup = await login('wade@halofireus.com', 'Wade-secure-passphrase-2026!');
+    expect(loginAfterSetup.status).toBe(200);
+
+    const reuse = await request('/api/auth/setup-password', {
+      method: 'POST',
+      body: JSON.stringify({
+        token: inviteBody.setup_token,
+        password: 'Different-secure-passphrase-2026!',
+      }),
+    });
+    expect(reuse.status).toBe(400);
+  });
+
+  it('blocks non-admin users from inviting employees', async () => {
+    const db = new Database(dbPath);
+    const hash = bcrypt.hashSync('invite-viewer-password', 12);
+    db.prepare('INSERT INTO users (username, password_hash, name, role, email) VALUES (?, ?, ?, ?, ?)').run(
+      'invite-viewer',
+      hash,
+      'Invite Viewer',
+      'user',
+      'invite-viewer@example.test',
+    );
+    db.close();
+
+    const viewerToken = await tokenFor('invite-viewer', 'invite-viewer-password');
+    const res = await request('/api/auth/invite', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${viewerToken}` },
+      body: JSON.stringify({ email: 'new@halofireus.com', name: 'New User' }),
+    });
+    expect(res.status).toBe(403);
+  });
+
+  it('accepts password recovery requests without leaking whether an email exists', async () => {
+    const existing = await request('/api/auth/password-recovery/request', {
+      method: 'POST',
+      body: JSON.stringify({ email: 'security-admin' }),
+    });
+    expect(existing.status).toBe(202);
+    expect(await existing.json()).toEqual({ ok: true });
+
+    const missing = await request('/api/auth/password-recovery/request', {
+      method: 'POST',
+      body: JSON.stringify({ email: 'missing@halofireus.com' }),
+    });
+    expect(missing.status).toBe(202);
+    expect(await missing.json()).toEqual({ ok: true });
+  });
+
   it('rejects CORS preflight from untrusted origins', async () => {
     const res = await request('/api/auth/login', {
       method: 'OPTIONS',

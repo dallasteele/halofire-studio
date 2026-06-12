@@ -1,0 +1,40 @@
+{
+  "name": "client-login-redesign-20260612",
+  "owner": "codex",
+  "goal": "Redesign the Halo Fire client secure login page so it uses the official Halo Fire logo as an animated glass hero, removes fake public dashboard data, preserves the secure workbench login redirect, and keeps client collaboration language honest.",
+  "loop_type": "closed",
+  "sources_of_truth": [
+    "E:/ClaudeBot/AGENTIC_RULES.md",
+    "E:/ClaudeBot/CODEX.md",
+    "E:/ClaudeBot/halofire-studio/AGENTS.md",
+    "E:/ClaudeBot/halofire-studio/apps/autosprink/index.html",
+    "E:/ClaudeBot/halofire-studio/apps/autosprink/public/brand/halo-fire-logo.jpg",
+    "GX10 hal-brain recall for HaloFire live HTTPS and remaining client login work"
+  ],
+  "exit_criteria": [
+    "The public login page uses the official Halo Fire logo asset in the hero and login dialog.",
+    "The hero/logo treatment is animated with deterministic CSS rather than generated or redrawn brand art.",
+    "The public page does not expose fake dashboard KPIs, demo CTAs, or development credentials.",
+    "The existing secure login request and safe workbench redirect contract still pass regression tests.",
+    "A real browser smoke confirms the page renders without blank or obviously broken visual content."
+  ],
+  "verification_gates": [
+    "RED: npx vitest run tests/client-login-static.test.js fails before the redesign",
+    "GREEN: npx vitest run tests/client-login-static.test.js tests/workbench-deep-link.test.js tests/consolidate-surfaces.test.js",
+    "Production build: npm run build",
+    "Browser smoke: Playwright screenshot of the local login page at desktop and mobile widths",
+    "Workspace rulebook check: C:/Python312/python.exe E:/ClaudeBot/scripts/verify_agentic_rules.py",
+    "Formal proof posture: NO_FORMALIZABLE_CLAIM for visual-only HTML/CSS copy and login form wiring"
+  ],
+  "state_path": "data/agent-loops/client-login-redesign-20260612/state.json",
+  "evidence_paths": [
+    "out/agent-loops/client-login-redesign-20260612/desktop.png",
+    "out/agent-loops/client-login-redesign-20260612/mobile.png",
+    "out/agent-loops/client-login-redesign-20260612/report.json"
+  ],
+  "max_iterations": 3,
+  "max_tokens": 200000,
+  "model_tier": "balanced",
+  "human_gate_required": false,
+  "brain_writeback_required": true
+}

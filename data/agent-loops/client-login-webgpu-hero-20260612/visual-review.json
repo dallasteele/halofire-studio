@@ -1,0 +1,87 @@
+{
+  "loop": "client-login-webgpu-hero-20260612",
+  "status": "accepted_for_slice",
+  "reviewed_at": "2026-06-12T02:17:00Z",
+  "brief": {
+    "screen": "Halo Fire secure client login",
+    "audience": "client reviewers opening a private secure portal",
+    "visual_target": "Apple Liquid Glass-inspired secure access page with official Halo Fire logo and an interactive Three.js halo/flame hero",
+    "interaction": "hover, click pulse, and drag tug/stretch on the 3D flame material"
+  },
+  "references_used": [
+    {
+      "type": "figma-reference-gate",
+      "url": "https://www.figma.com/design/41Et0LQ9n6YEutm2zknbOX",
+      "purpose": "Locked visual rules: one halo only, logo-derived flame, no image plane, Apple-glass login panel, no fake data"
+    },
+    {
+      "type": "creative-production-board",
+      "title": "Halo Fire Hero Visual Reference Gate",
+      "purpose": "Compared rejected browser result, generated flame/halo reference, and official logo before the accepted mesh pass"
+    },
+    {
+      "type": "official-brand-asset",
+      "path": "apps/autosprink/public/brand/halo-fire-logo-glass.png",
+      "purpose": "Actual Halo Fire logo remains deterministic in header/card and supplies the flame silhouette language"
+    },
+    {
+      "type": "apple-design-reference",
+      "urls": [
+        "https://developer.apple.com/design/Human-Interface-Guidelines/materials",
+        "https://developer.apple.com/documentation/technologyoverviews/liquid-glass",
+        "https://developer.apple.com/videos/play/wwdc2025/219/"
+      ],
+      "purpose": "Material direction for translucent depth, highlights, hierarchy, and readable glass controls"
+    }
+  ],
+  "reject_criteria": [
+    "No rectangular hero box or visible frame",
+    "No pasted/generated image plane",
+    "No double halo",
+    "No clipped halo or clipped flame base",
+    "No cartoon yellow core or unrelated abstract VFX",
+    "Drag must tug/stretch the flame material, not rotate the display",
+    "No hidden draggable logo/image in the hero",
+    "No visible implementation labels",
+    "No fake metrics, demo data, AHJ/permit overclaims, web-scraping/co-development copy, or internal-alpha wording",
+    "Screenshot must exist, decode, and be visually inspected"
+  ],
+  "screenshots": [
+    {
+      "path": "apps/autosprink/out/agent-loops/client-login-webgpu-hero-20260612/extruded-flame-object-desktop.png",
+      "decoded": true,
+      "decision": "reject",
+      "reasons": [
+        "Double halo was visible",
+        "Yellow cartoon core did not match the Halo Fire mark",
+        "Flame was oversized and not sufficiently logo-derived"
+      ]
+    },
+    {
+      "path": "apps/autosprink/out/agent-loops/client-login-webgpu-hero-20260612/preview-window-webgpu-red-flame.png",
+      "decoded": true,
+      "decision": "pass",
+      "reasons": [
+        "Codex in-app browser preview shows one halo, no visible hero box, no clipping, no pasted image plane",
+        "Hero is a live Three.js canvas with logo-derived extruded flame mesh, right flame tongue, and bottom cutout",
+        "Login copy is clean and contains no fake dashboard data or internal-alpha wording",
+        "All logo images are non-draggable; fallback logo opacity is zero after scene readiness",
+        "Browser state reported renderer mode webgpu and heroReady true"
+      ]
+    }
+  ],
+  "interaction_check": {
+    "tool": "Codex in-app browser",
+    "result": "pass",
+    "evidence": {
+      "after_drag_interaction": "released",
+      "canvasMode": "webgpu",
+      "image_draggable_attributes": [
+        "false",
+        "false",
+        "false"
+      ]
+    }
+  },
+  "final_decision": "Accepted for this bounded login-page visual slice. Remaining risk: it is a stylized extruded brand flame, not a physically simulated volumetric fire system."
+}
