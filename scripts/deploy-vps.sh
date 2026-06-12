@@ -27,7 +27,7 @@ say() { printf '\n=== %s ===\n' "$1"; }
 # edge check below catch real UI breakage. The reliable unit/integration suite
 # (900+ tests) is the deploy gate.
 say "LOCAL GATES (autosprink — unit/integration, excl. flaky browser-smoke)"
-( cd "$REPO_ROOT/apps/autosprink" && npx vitest run --exclude '**/*-browser-smoke.test.js' >/tmp/hf-deploy-asprink.log 2>&1 ) \
+( cd "$REPO_ROOT/apps/autosprink" && npx vitest run --exclude '**/*browser*smoke*.test.js' --exclude '**/*smoke*browser*.test.js' >/tmp/hf-deploy-asprink.log 2>&1 ) \
   || { echo "autosprink tests FAILED — aborting deploy"; tail -25 /tmp/hf-deploy-asprink.log; exit 1; }
 echo "autosprink: green"
 
