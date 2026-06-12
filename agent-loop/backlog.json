@@ -982,7 +982,7 @@
     {
       "id": "W16D-manufacturer-evidence-loop",
       "title": "Claim gates > best-effort manufacturer-model evidence via scraper + OpenSCAD",
-      "status": "pending",
+      "status": "done",
       "phase": "wave16-ungate-claim-gates",
       "write_roots": [
         "apps/autosprink/src",
@@ -991,8 +991,9 @@
       "context_files": [],
       "files_create": [],
       "gate": "cd apps/autosprink && npx vitest run tests/manufacturer-evidence.test.js",
-      "attempts": 0,
-      "spec": "Pure ESM apps/autosprink/src/autobid/manufacturer-evidence.js that assembles best-effort evidence for the MANUFACTURER_MODEL_APPROVAL_MISSING gate so it advances toward needs-verification with a model attached, never claiming manufacturer-exact. export function buildManufacturerEvidence(part) where part has sku, manufacturer, cutSheetUrl optional, generatedModelRef optional. Returns an evidence record with evidence_type manufacturer_model_best_effort, source_ref the cutSheetUrl or generated, notes a JSON string carrying verificationStatus needs-verification and a disclaimer that the model is dimensioned parametric not manufacturer-exact and needs manufacturer confirmation, and claim_gate_effect no_claims_cleared (best-effort evidence never auto-clears the regulated gate; it only attaches and flags). Pure, throws TypeError on missing sku. Test apps/autosprink/tests/manufacturer-evidence.test.js: a part yields an evidence record with the best-effort type, needs-verification in notes, and no_claims_cleared; missing sku throws. NOTE in a comment: a follow-up cron uses OpenClaw scraper plus the GPU SAM service and cutsheet-to-model to fetch real cut sheets and generate the model ref fed here, iterating per part and recording lessons; that scraper task is W16F."
+      "attempts": 5,
+      "spec": "Pure ESM apps/autosprink/src/autobid/manufacturer-evidence.js that assembles best-effort evidence for the MANUFACTURER_MODEL_APPROVAL_MISSING gate so it advances toward needs-verification with a model attached, never claiming manufacturer-exact. export function buildManufacturerEvidence(part) where part has sku, manufacturer, cutSheetUrl optional, generatedModelRef optional. Returns an evidence record with evidence_type manufacturer_model_best_effort, source_ref the cutSheetUrl or generated, notes a JSON string carrying verificationStatus needs-verification and a disclaimer that the model is dimensioned parametric not manufacturer-exact and needs manufacturer confirmation, and claim_gate_effect no_claims_cleared (best-effort evidence never auto-clears the regulated gate; it only attaches and flags). Pure, throws TypeError on missing sku. Test apps/autosprink/tests/manufacturer-evidence.test.js: a part yields an evidence record with the best-effort type, needs-verification in notes, and no_claims_cleared; missing sku throws. NOTE in a comment: a follow-up cron uses OpenClaw scraper plus the GPU SAM service and cutsheet-to-model to fetch real cut sheets and generate the model ref fed here, iterating per part and recording lessons; that scraper task is W16F.",
+      "completed_at": "2026-06-12T00:03:28+00:00"
     },
     {
       "id": "W16E-submittal-packet-prep",
