@@ -538,9 +538,20 @@ function hashAuthToken(token) {
   return createHash('sha256').update(token).digest('hex');
 }
 
+function invalidateAuthTokensForUser(userId, purpose) {
+  db.prepare(`
+    UPDATE auth_tokens
+    SET used_at = datetime('now')
+    WHERE user_id = ?
+      AND purpose = ?
+      AND used_at IS NULL
+  `).run(userId, purpose);
+}
+
 function createOneTimeAuthToken(userId, purpose, ttlHours = 72) {
   const raw = randomBytes(32).toString('base64url');
   const expires = new Date(Date.now() + ttlHours * 60 * 60 * 1000).toISOString();
+  invalidateAuthTokensForUser(userId, purpose);
   db.prepare('INSERT INTO auth_tokens (user_id, purpose, token_hash, expires_at) VALUES (?, ?, ?, ?)').run(
     userId,
     purpose,

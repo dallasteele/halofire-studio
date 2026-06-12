@@ -274,6 +274,31 @@ describe('HaloFire API security gates', () => {
     expect(res.status).toBe(403);
   });
 
+  it('invalidates an older unused invite when a fresh employee invite is issued', async () => {
+    const adminToken = await tokenFor('security-admin', 'actual-test-password');
+    const first = await request('/api/auth/invite', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${adminToken}` },
+      body: JSON.stringify({ email: 'replacement@halofireus.com', name: 'Replacement User' }),
+    });
+    expect(first.status).toBe(201);
+    const firstBody = await first.json();
+
+    const second = await request('/api/auth/invite', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${adminToken}` },
+      body: JSON.stringify({ email: 'replacement@halofireus.com', name: 'Replacement User' }),
+    });
+    expect(second.status).toBe(201);
+    const secondBody = await second.json();
+
+    const oldVerify = await request(`/api/auth/setup/verify?token=${encodeURIComponent(firstBody.setup_token)}`);
+    expect(oldVerify.status).toBe(400);
+
+    const freshVerify = await request(`/api/auth/setup/verify?token=${encodeURIComponent(secondBody.setup_token)}`);
+    expect(freshVerify.status).toBe(200);
+  });
+
   it('accepts password recovery requests without leaking whether an email exists', async () => {
     const dbBefore = new Database(dbPath);
     const beforeCount = dbBefore.prepare("SELECT COUNT(*) AS count FROM auth_tokens WHERE purpose = 'password_reset'").get().count;
