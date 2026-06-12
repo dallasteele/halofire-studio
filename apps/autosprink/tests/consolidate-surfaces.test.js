@@ -47,7 +47,7 @@ afterAll(async () => {
 describe('T9 consolidated surfaces', () => {
   it('serves the landing (index) at /, not the legacy dashboard', async () => {
     const body = await (await fetch(`${BASE}/`)).text();
-    expect(body).toMatch(/Enter Platform/i);
+    expect(body).toMatch(/Secure Portal/i);
     expect(body).not.toMatch(/Pure Vanilla JS, Zero Dependencies/);
   });
 
@@ -64,7 +64,7 @@ describe('T9 consolidated surfaces', () => {
 
   it('serves the landing for unknown SPA routes, not the legacy dashboard', async () => {
     const body = await (await fetch(`${BASE}/some/unknown/route`)).text();
-    expect(body).toMatch(/Enter Platform/i);
+    expect(body).toMatch(/Secure Portal/i);
     expect(body).not.toMatch(/Pure Vanilla JS, Zero Dependencies/);
   });
 

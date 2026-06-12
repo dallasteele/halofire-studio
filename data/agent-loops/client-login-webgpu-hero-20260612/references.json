@@ -1,0 +1,43 @@
+{
+  "loop": "client-login-webgpu-hero-20260612",
+  "brief": "Secure Halo Fire client login with Apple Liquid Glass UI/UX, official Halo Fire logo, and an interactive Three.js halo/flame hero.",
+  "references": [
+    {
+      "type": "official_brand_asset",
+      "path": "apps/autosprink/public/brand/halo-fire-logo-glass.png",
+      "use": "Header and login card logo. Do not redraw or replace the client mark; derive the hero flame silhouette from its flame geometry."
+    },
+    {
+      "type": "figma_reference_gate",
+      "url": "https://www.figma.com/design/41Et0LQ9n6YEutm2zknbOX",
+      "use": "Figma frame documenting the accepted target rules: one halo, logo-derived flame, unframed Three.js canvas, Apple-glass login panel, no fake data."
+    },
+    {
+      "type": "creative_production_reference_gate",
+      "title": "Halo Fire Hero Visual Reference Gate",
+      "use": "Moodboard comparison of rejected screenshot, generated flame/halo reference, and official logo before implementation."
+    },
+    {
+      "type": "generated_visual_reference",
+      "source_path": "C:/Users/dalla/.codex/generated_images/019eb939-3afc-7800-a21f-b32e6f3c247f/ig_04af3d66c36f6490016a2b5f9f6cfc81959327dc1be94cc629.png",
+      "use": "Reference only for fire/halo lighting energy. Do not use as a pasted hero image, texture plane, or final brand art."
+    },
+    {
+      "type": "apple_design_reference",
+      "urls": [
+        "https://developer.apple.com/design/Human-Interface-Guidelines/materials",
+        "https://developer.apple.com/documentation/technologyoverviews/liquid-glass",
+        "https://developer.apple.com/videos/play/wwdc2025/219/"
+      ],
+      "use": "Liquid Glass material direction: translucent depth, fluidity, hierarchy between content and controls, readable glass."
+    },
+    {
+      "type": "x_research_boundary",
+      "urls": [
+        "https://docs.x.com/x-api/posts/search/introduction",
+        "https://docs.x.com/x-api/posts/search-recent-posts"
+      ],
+      "use": "Read-only X research is allowed in future visual loops for current references; not needed for this locked pass."
+    }
+  ]
+}

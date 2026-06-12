@@ -1,0 +1,33 @@
+{
+  "loop": "client-login-webgpu-hero-20260612",
+  "status": "accepted_for_slice",
+  "default_style": "Apple Liquid Glass-inspired UI/UX",
+  "materials": {
+    "page_background": "Layered dark glass with restrained amber/red light fields; no fake dashboard decoration.",
+    "brand_header": "Official Halo Fire mark plus compact client-access text; no internal alpha or invite-only wording.",
+    "login_panel": "Translucent glass, blur/saturation, inner highlight, soft stroke, deep shadow, readable contrast.",
+    "inputs": "Inset glass wells with hover border, focus ring, highlight, stable height, and no browser-default flat treatment.",
+    "button": "Dimensional amber glass button with top sheen, inset edge highlight, hover lift, pressed state, and focus-visible ring.",
+    "checkbox": "Native checkbox retained with fire accent and clean spacing because no complex custom control is needed.",
+    "hero": "Unframed Three.js canvas with extruded flame mesh, one halo ring, ember sprites, hover/click/drag states, and hidden non-draggable fallback logo."
+  },
+  "states": [
+    "idle",
+    "hover",
+    "pressed",
+    "focus-visible",
+    "dragging",
+    "released",
+    "reduced-motion fallback"
+  ],
+  "reject_if": [
+    "Flat/default button",
+    "Flat/default input wells",
+    "Visible card border around hero scene",
+    "Second halo ring appears",
+    "Hero becomes a pasted image or texture rectangle",
+    "Implementation labels visible or selectable",
+    "Unreadable text over glass",
+    "Motion causes clipping"
+  ]
+}
