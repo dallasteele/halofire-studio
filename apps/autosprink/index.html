@@ -303,6 +303,13 @@ body.hf-shell .field input{
   </section>
 </main>
 
+<script type="importmap">
+{
+  "imports": {
+    "three": "/vendor/three/build/three.module.js"
+  }
+}
+</script>
 <script type="module">
 import {
   AdditiveBlending,
@@ -1149,17 +1156,22 @@ function showOk(message){
   ok.style.display = 'block';
 }
 
-function storeLoginToken(data){
+function selectedRemember(){
   const rememberEl = document.getElementById('remember');
-  const remember = rememberEl ? rememberEl.checked : true;
-  const store = remember ? localStorage : sessionStorage;
+  return rememberEl ? rememberEl.checked : true;
+}
+
+function clearBrowserAuthStorage(){
   try{
-    store.setItem('halofire_token',data.token);
-    store.setItem('halofire_user',JSON.stringify(data.user));
-    (remember ? sessionStorage : localStorage).removeItem('halofire_token');
-  }catch(_){
-    // The server also sets an HttpOnly session cookie; storage is convenience.
-  }
+    localStorage.removeItem('halofire_token');
+    localStorage.removeItem('halofire_user');
+    sessionStorage.removeItem('halofire_token');
+    sessionStorage.removeItem('halofire_user');
+  }catch(_){}
+}
+
+function acceptCookieSession(){
+  clearBrowserAuthStorage();
 }
 
 function applyLoginMode(){
@@ -1259,11 +1271,12 @@ form.onsubmit=async e=>{
         body:JSON.stringify({
           token:setupToken,
           password:passInput.value,
+          remember:selectedRemember(),
         }),
       });
       if(!setup.ok) throw new Error('Unable to create password.');
       const data = await setup.json();
-      storeLoginToken(data);
+      acceptCookieSession(data);
       window.location.href = safeWorkbenchRedirect();
       return;
     }
@@ -1277,7 +1290,7 @@ form.onsubmit=async e=>{
         }),
       });
       if(!recovery.ok) throw new Error('Unable to request recovery.');
-      showOk('If that email exists, a recovery link has been prepared.');
+      showOk('If that email exists, a recovery link has been sent.');
       return;
     }
     const res=await fetch(HALOFIRE_BASE_PATH + '/' + 'api/auth/login',{
@@ -1287,11 +1300,12 @@ form.onsubmit=async e=>{
       body:JSON.stringify({
         username:userInput.value,
         password:passInput.value,
+        remember:selectedRemember(),
       }),
     });
     if(!res.ok)throw new Error('bad credentials');
     const data=await res.json();
-    storeLoginToken(data);
+    acceptCookieSession(data);
     window.location.href=safeWorkbenchRedirect();
   }catch(error){
     showError(error instanceof Error ? error.message : 'Unable to sign in.');

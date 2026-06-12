@@ -567,13 +567,17 @@ function consumeAuthToken(id) {
   db.prepare("UPDATE auth_tokens SET used_at = datetime('now') WHERE id = ? AND used_at IS NULL").run(id);
 }
 
-function issueSessionForUser(req, res, user) {
+function issueSessionForUser(req, res, user, { remember = true } = {}) {
   const role = normalizeRole(user.role);
-  const token = jwt.sign({ id: user.id, username: user.username, name: user.name, role }, JWT_SECRET, { expiresIn: '24h' });
-  res.cookie(AUTH_COOKIE_NAME, token, {
-    ...sessionCookieOptions(req),
-    maxAge: 24 * 60 * 60 * 1000,
-  });
+  const maxAge = remember ? 30 * 24 * 60 * 60 * 1000 : null;
+  const token = jwt.sign(
+    { id: user.id, username: user.username, name: user.name, role },
+    JWT_SECRET,
+    { expiresIn: remember ? '30d' : '8h' },
+  );
+  const cookieOptions = sessionCookieOptions(req);
+  if (maxAge) cookieOptions.maxAge = maxAge;
+  res.cookie(AUTH_COOKIE_NAME, token, cookieOptions);
   return { token, user: { id: user.id, username: user.username, name: user.name, role, email: user.email } };
 }
 
@@ -584,6 +588,28 @@ function publicLoginUrl(req, params = {}) {
     if (value != null && value !== '') url.searchParams.set(key, value);
   }
   return url.toString();
+}
+
+function buildPasswordResetEmail({ name, resetUrl }) {
+  const safeName = escapeHtmlServer(name || 'there');
+  const safeUrl = escapeHtmlServer(resetUrl);
+  return `
+    <div style="margin:0;padding:24px;background:#050505;font-family:Arial,Helvetica,sans-serif;color:#f7f2e8;">
+      <div style="max-width:620px;margin:0 auto;background:rgba(12,12,12,.92);border:1px solid rgba(255,214,52,.38);border-radius:18px;overflow:hidden;">
+        <div style="padding:22px 26px;border-bottom:1px solid rgba(255,214,52,.22);">
+          <div style="font-size:22px;font-weight:900;letter-spacing:.04em;color:#ffffff;">Halo <span style="color:#ff3426;">Fire</span></div>
+          <div style="margin-top:6px;font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:#ffd634;">Secure access recovery</div>
+        </div>
+        <div style="padding:26px;font-size:15px;line-height:1.55;color:#f7f2e8;">
+          <p>Hi ${safeName},</p>
+          <p>Use the secure link below to create a new HaloFire password.</p>
+          <p style="margin:24px 0;">
+            <a href="${safeUrl}" style="display:inline-block;background:#ffd634;color:#111111;text-decoration:none;font-weight:800;padding:12px 18px;border-radius:12px;">Reset password</a>
+          </p>
+          <p style="font-size:13px;color:#c8beb0;">This link expires in 2 hours. If you did not request it, you can ignore this email.</p>
+        </div>
+      </div>
+    </div>`;
 }
 
 function buildAllowedUpdate(body, allowedFields) {
@@ -607,12 +633,13 @@ const BID_REQUEST_UPDATE_FIELDS = new Set(['client_id', 'title', 'source', 'due_
 
 // ── Auth Routes ──
 app.post('/api/auth/login', (req, res) => {
-  const { username, password } = req.body;
-  const user = db.prepare('SELECT * FROM users WHERE username = ?').get(username);
+  const { password } = req.body;
+  const username = canonicalEmail(req.body?.username);
+  const user = db.prepare('SELECT * FROM users WHERE lower(username) = ? OR lower(email) = ?').get(username, username);
   if (!user || !bcrypt.compareSync(password, user.password_hash)) {
     return res.status(401).json({ error: 'Invalid credentials' });
   }
-  res.json(issueSessionForUser(req, res, user));
+  res.json(issueSessionForUser(req, res, user, { remember: req.body?.remember !== false }));
 });
 
 app.post('/api/auth/invite', authMiddleware, requireRole('admin'), (req, res) => {
@@ -671,13 +698,32 @@ app.post('/api/auth/setup-password', (req, res) => {
   db.prepare('UPDATE users SET password_hash = ? WHERE id = ?').run(passwordHash, found.user_id);
   consumeAuthToken(found.id);
   const user = db.prepare('SELECT id, username, name, role, email FROM users WHERE id = ?').get(found.user_id);
-  res.json(issueSessionForUser(req, res, user));
+  res.json(issueSessionForUser(req, res, user, { remember: req.body?.remember !== false }));
 });
 
-app.post('/api/auth/password-recovery/request', (req, res) => {
+app.post('/api/auth/password-recovery/request', async (req, res) => {
   const emailOrUsername = canonicalEmail(req.body?.email || req.body?.username);
   const user = db.prepare('SELECT * FROM users WHERE lower(username) = ? OR lower(email) = ?').get(emailOrUsername, emailOrUsername);
-  if (user) createOneTimeAuthToken(user.id, 'password_reset', 2);
+  if (user) {
+    try {
+      const { transport, cfg, configured, disabled } = await resolveSmtpTransport();
+      if (configured && !disabled && transport) {
+        const reset = createOneTimeAuthToken(user.id, 'password_reset', 2);
+        const resetUrl = publicLoginUrl(req, { username: user.username, setup: reset.raw });
+        const from = cfg?.from_email || cfg?.username || 'no-reply@halofire.local';
+        await transport.sendMail({
+          from,
+          to: user.email || user.username,
+          subject: 'Reset your HaloFire password',
+          html: buildPasswordResetEmail({ name: user.name, resetUrl }),
+        });
+      } else {
+        log.warn?.('password recovery requested but outbound email is not configured', { user: user.username });
+      }
+    } catch (error) {
+      log.warn?.('password recovery email failed', { user: user.username, error: error.message });
+    }
+  }
   res.status(202).json({ ok: true });
 });
 

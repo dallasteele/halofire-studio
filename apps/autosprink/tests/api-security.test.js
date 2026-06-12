@@ -67,6 +67,7 @@ beforeAll(async () => {
       HALOFIRE_ADMIN_PASSWORD: 'actual-test-password',
       HALOFIRE_ALLOW_DEV_DEFAULTS: '0',
       HALOFIRE_CORS_ORIGINS: 'http://allowed.test',
+      HALOFIRE_SMTP_MOCK: '1',
     },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
@@ -108,6 +109,29 @@ describe('HaloFire API security gates', () => {
     expect(me.status).toBe(200);
     const body = await me.json();
     expect(body.username).toBe('security-admin');
+  });
+
+  it('keeps remember-me duration server-side and marks secure cookies behind HTTPS proxy', async () => {
+    const shortSession = await request('/api/auth/login', {
+      method: 'POST',
+      headers: { 'X-Forwarded-Proto': 'https' },
+      body: JSON.stringify({ username: ' SECURITY-ADMIN ', password: 'actual-test-password', remember: false }),
+    });
+    expect(shortSession.status).toBe(200);
+    const shortCookie = shortSession.headers.get('set-cookie') || '';
+    expect(shortCookie).toContain('halofire_session=');
+    expect(shortCookie).toContain('Secure');
+    expect(shortCookie).not.toContain('Max-Age=');
+
+    const remembered = await request('/api/auth/login', {
+      method: 'POST',
+      headers: { 'X-Forwarded-Proto': 'https' },
+      body: JSON.stringify({ username: 'security-admin', password: 'actual-test-password', remember: true }),
+    });
+    expect(remembered.status).toBe(200);
+    const rememberedCookie = remembered.headers.get('set-cookie') || '';
+    expect(rememberedCookie).toContain('Secure');
+    expect(rememberedCookie).toContain('Max-Age=2592000');
   });
 
   it('clears the mounted session cookie on logout', async () => {
@@ -216,6 +240,9 @@ describe('HaloFire API security gates', () => {
     const loginAfterSetup = await login('wade@halofireus.com', 'Wade-secure-passphrase-2026!');
     expect(loginAfterSetup.status).toBe(200);
 
+    const canonicalizedLogin = await login(' Wade@HaloFireUS.com ', 'Wade-secure-passphrase-2026!');
+    expect(canonicalizedLogin.status).toBe(200);
+
     const reuse = await request('/api/auth/setup-password', {
       method: 'POST',
       body: JSON.stringify({
@@ -248,6 +275,10 @@ describe('HaloFire API security gates', () => {
   });
 
   it('accepts password recovery requests without leaking whether an email exists', async () => {
+    const dbBefore = new Database(dbPath);
+    const beforeCount = dbBefore.prepare("SELECT COUNT(*) AS count FROM auth_tokens WHERE purpose = 'password_reset'").get().count;
+    dbBefore.close();
+
     const existing = await request('/api/auth/password-recovery/request', {
       method: 'POST',
       body: JSON.stringify({ email: 'security-admin' }),
@@ -255,12 +286,22 @@ describe('HaloFire API security gates', () => {
     expect(existing.status).toBe(202);
     expect(await existing.json()).toEqual({ ok: true });
 
+    const dbAfterExisting = new Database(dbPath);
+    const afterExistingCount = dbAfterExisting.prepare("SELECT COUNT(*) AS count FROM auth_tokens WHERE purpose = 'password_reset'").get().count;
+    dbAfterExisting.close();
+    expect(afterExistingCount).toBe(beforeCount + 1);
+
     const missing = await request('/api/auth/password-recovery/request', {
       method: 'POST',
       body: JSON.stringify({ email: 'missing@halofireus.com' }),
     });
     expect(missing.status).toBe(202);
     expect(await missing.json()).toEqual({ ok: true });
+
+    const dbAfterMissing = new Database(dbPath);
+    const afterMissingCount = dbAfterMissing.prepare("SELECT COUNT(*) AS count FROM auth_tokens WHERE purpose = 'password_reset'").get().count;
+    dbAfterMissing.close();
+    expect(afterMissingCount).toBe(afterExistingCount);
   });
 
   it('rejects CORS preflight from untrusted origins', async () => {
