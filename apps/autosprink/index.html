@@ -117,16 +117,16 @@ img{user-select:none;-webkit-user-drag:none}
 .hero-wordmark{
   position:absolute;
   left:50%;
-  top:54%;
+  top:53%;
   z-index:2;
-  width:min(92%,760px);
+  width:min(86%,708px);
   height:auto;
   opacity:0.96;
   transform:translate(-50%,-50%);
   filter:
     drop-shadow(0 21px 30px rgba(0,0,0,0.64))
     drop-shadow(0 2px 0 rgba(0,0,0,0.78))
-    drop-shadow(0 0 18px rgba(232,67,45,0.12));
+    drop-shadow(0 0 20px rgba(232,67,45,0.18));
   transition:opacity .35s ease, transform .35s ease;
   pointer-events:none;
 }
@@ -134,11 +134,33 @@ img{user-select:none;-webkit-user-drag:none}
   font-family:"Arial Black","Impact","Helvetica Neue",Arial,sans-serif;
   font-weight:900;
   font-style:italic;
-  letter-spacing:-0.055em;
+  letter-spacing:-0.075em;
+}
+.hero-wordmark .wordmark-depth{
+  fill:rgba(0,0,0,0.42);
+  filter:url(#wordmarkDepthBlur);
+  transform:translate(7px,8px);
+}
+.hero-wordmark .wordmark-backlight{
+  fill:url(#wordmarkFlameBacklight);
+  filter:url(#wordmarkBacklightBlur);
+  opacity:0.82;
+  mix-blend-mode:screen;
+}
+.hero-wordmark .wordmark-rim{
+  fill:url(#wordmarkHotRim);
+  filter:url(#wordmarkRimBlur);
+  transform:translate(-2px,-3px);
+}
+.hero-wordmark .wordmark-glass{
+  fill:url(#wordmarkGlass);
+  filter:url(#wordmarkGlassLift);
+  opacity:0.76;
+}
+.hero-wordmark .wordmark-sheen{
   fill:url(#wordmarkSheen);
-  stroke:#000;
-  stroke-width:2.4px;
-  paint-order:stroke fill;
+  opacity:0.48;
+  mix-blend-mode:screen;
 }
 .brand-stage.scene-ready .hero-wordmark{
   transform:translate(-50%,-50%) scale(1.012);
@@ -169,8 +191,7 @@ img{user-select:none;-webkit-user-drag:none}
   inset:0;
   pointer-events:none;
   background:
-    linear-gradient(115deg,rgba(242,236,224,0.12),transparent 18%,transparent 72%,rgba(232,67,45,0.1)),
-    repeating-linear-gradient(0deg,rgba(255,255,255,0.025) 0 1px,transparent 1px 12px);
+    linear-gradient(115deg,rgba(242,236,224,0.1),transparent 18%,transparent 72%,rgba(232,67,45,0.08));
   opacity:.78;
 }
 .login>*{position:relative;z-index:1}
@@ -292,17 +313,54 @@ body.hf-shell .field input{
   <section class="portal" aria-labelledby="loginTitle">
     <div class="brand-stage" id="haloHeroScene" aria-label="Halo Fire rendered brand scene">
       <canvas class="halo-three-canvas" id="haloHeroCanvas" data-renderer-mode="pending"></canvas>
-      <svg class="hero-wordmark" id="heroWordmark" viewBox="0 0 820 170" role="img" aria-label="Halo Fire text wordmark" data-wordmark-layer="foreground-text" draggable="false">
+      <svg class="hero-wordmark" id="heroWordmark" viewBox="0 0 820 170" role="img" aria-label="Halo Fire text wordmark" data-wordmark-layer="foreground-text" data-wordmark-centerline="410" draggable="false">
         <defs>
-          <linearGradient id="wordmarkSheen" x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0" stop-color="#17110f"/>
-            <stop offset="0.52" stop-color="#030202"/>
-            <stop offset="1" stop-color="#0a0504"/>
+          <linearGradient id="wordmarkGlass" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0" stop-color="rgba(32,25,24,0.76)"/>
+            <stop offset="0.38" stop-color="rgba(9,7,6,0.68)"/>
+            <stop offset="0.72" stop-color="rgba(2,1,1,0.58)"/>
+            <stop offset="1" stop-color="rgba(26,6,5,0.7)"/>
           </linearGradient>
+          <radialGradient id="wordmarkFlameBacklight" gradientUnits="userSpaceOnUse" cx="410" cy="102" r="246">
+            <stop offset="0" stop-color="rgba(255,213,79,0.7)"/>
+            <stop offset="0.26" stop-color="rgba(232,67,45,0.34)"/>
+            <stop offset="0.7" stop-color="rgba(232,67,45,0)"/>
+          </radialGradient>
+          <radialGradient id="wordmarkHotRim" gradientUnits="userSpaceOnUse" cx="410" cy="102" r="260">
+            <stop offset="0" stop-color="rgba(255,214,92,0.3)"/>
+            <stop offset="0.32" stop-color="rgba(255,255,255,0.12)"/>
+            <stop offset="0.78" stop-color="rgba(255,255,255,0.02)"/>
+          </radialGradient>
+          <linearGradient id="wordmarkSheen" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0" stop-color="rgba(255,255,255,0.58)"/>
+            <stop offset="0.22" stop-color="rgba(255,255,255,0.16)"/>
+            <stop offset="0.52" stop-color="rgba(255,255,255,0)"/>
+          </linearGradient>
+          <filter id="wordmarkDepthBlur" x="-12%" y="-16%" width="124%" height="140%" color-interpolation-filters="sRGB">
+            <feGaussianBlur stdDeviation="1.4"/>
+          </filter>
+          <filter id="wordmarkBacklightBlur" x="-14%" y="-18%" width="128%" height="142%" color-interpolation-filters="sRGB">
+            <feGaussianBlur stdDeviation="3.2"/>
+          </filter>
+          <filter id="wordmarkRimBlur" x="-12%" y="-16%" width="124%" height="140%" color-interpolation-filters="sRGB">
+            <feGaussianBlur stdDeviation="0.45"/>
+          </filter>
+          <filter id="wordmarkGlassLift" x="-14%" y="-18%" width="128%" height="142%" color-interpolation-filters="sRGB">
+            <feDropShadow dx="0" dy="9" stdDeviation="4.5" flood-color="#000000" flood-opacity="0.66"/>
+            <feDropShadow dx="0" dy="-2" stdDeviation="1.2" flood-color="#ffffff" flood-opacity="0.13"/>
+          </filter>
         </defs>
         <g transform="skewX(-11)">
-          <text x="72" y="118" font-size="104" fill="url(#wordmarkSheen)">Halo</text>
-          <text x="476" y="118" font-size="104" fill="url(#wordmarkSheen)">Fire</text>
+          <text class="wordmark-depth" x="392" y="118" font-size="104" text-anchor="end" aria-hidden="true">Halo</text>
+          <text class="wordmark-depth" x="438" y="118" font-size="104" text-anchor="start" aria-hidden="true">Fire</text>
+          <text class="wordmark-backlight" x="392" y="118" font-size="104" text-anchor="end" aria-hidden="true">Halo</text>
+          <text class="wordmark-backlight" x="438" y="118" font-size="104" text-anchor="start" aria-hidden="true">Fire</text>
+          <text class="wordmark-rim" x="392" y="118" font-size="104" text-anchor="end" aria-hidden="true">Halo</text>
+          <text class="wordmark-rim" x="438" y="118" font-size="104" text-anchor="start" aria-hidden="true">Fire</text>
+          <text class="wordmark-glass" x="392" y="118" font-size="104" text-anchor="end">Halo</text>
+          <text class="wordmark-glass" x="438" y="118" font-size="104" text-anchor="start">Fire</text>
+          <text class="wordmark-sheen" x="392" y="118" font-size="104" text-anchor="end" aria-hidden="true">Halo</text>
+          <text class="wordmark-sheen" x="438" y="118" font-size="104" text-anchor="start" aria-hidden="true">Fire</text>
         </g>
       </svg>
       <div class="renderer-badge" id="rendererBadge" aria-hidden="true"></div>
