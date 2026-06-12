@@ -3,7 +3,7 @@
 > Every automation reads this each cycle: Claude's wakeup loop, the GX10
 > build-loop wave seeding, and HAL's self-improve cron (via `loopctl report`).
 > When the user gives new direction, THIS file is updated first — loops re-aim
-> without losing context. Updated: 2026-06-11.
+> without losing context. Updated: 2026-06-12.
 
 ## Deploy workflow — VPS canonical, verify before go-live (user 2026-06-11)
 NO MORE LOCALHOST as the reference. Live site = http://halofire.rankempire.io
@@ -31,6 +31,74 @@ Halo Fire's team must see live progress + upload info we can't scrape. Targets:
 - Wave 17 seeds the buildable core: secure invite/set-password token
   (email=username), apple-glass portal shell + flagged placeholder logo +
   animated fire. VPS deploy + invite-email DRAFT follow.
+
+## Operations Calendar = the FRONT DOOR (NEW HEADLINE, user 2026-06-12)
+The calendar is HaloFire's operational hub — "Dentrix/Denticon for fire
+protection." It is what every Halo employee opens into (NOT the workbench, which
+is the AI/back-office surface). Requirements:
+- **Landing:** authenticated employees land on `/calendar`, not `/workbench`.
+  workbench stays for AI/admin back-office. Role decides the default route.
+- **Style:** the black apple-glass system (same as the portal); only Halo Fire
+  branding; animate only the fire.
+- **Function like Dentrix/Denticon:** day/week/month scheduling that runs the
+  whole office — jobs, bids, inspections, crew/resource dispatch, the entire
+  workflow — one SHARED calendar all employees see.
+- **External sync:** link to Google, Apple, and whatever Halo Fire uses today
+  (two-way where possible; read-through at minimum). OAuth per provider, creds
+  user-supplied, never committed.
+- **OpenClaw visibility (critical):** the calendar surfaces what the AI is doing
+  in real time — bids arriving by email, auto-bids being drafted, and an
+  **"Awaiting approval"** lane where an authorized user can **one-click approve &
+  send** a drafted bid (only while an authorized user is logged in; per-message
+  human approval gate is preserved — this is the UI for it).
+- **RBAC like Dentrix:** every employee has access restrictions by role; admin
+  (Dallas) sees everything. Server-enforced (not just hidden in UI).
+
+### P0 BUG — logout on navigation (user 2026-06-12)
+Opening any page other than workbench logs the user out. ROOT CAUSE (live-repro
+verified 2026-06-12): the SERVER auth is fine — login→`Secure` cookie→`/auth/me`
+200→`/api/bids` 200 all pass. The logout is client-side: (1) browsing via the
+`localhost:3399` preview proxy drops the `Secure` session cookie — real use must
+be the https URL; (2) `autosprink.html`/`crm.html`/`settings.html` blanket-
+redirect to login on ANY 401 from ANY call while `workbench.html` masks it. FIX:
+one shared auth guard (`/public/halofire-auth.js`) used by every page that only
+redirects on a real `/auth/me` session failure, never on an incidental feature
+401; `app.set('trust proxy', 1)` confirmed so `Secure` is correct behind nginx.
+
+### Calendar epic phases (seed to the loop / Codex)
+- **CAL-0 Auth-guard unification + employee landing** (P0; unblocks the app):
+  shared guard, role-based post-login route (employee→/calendar, admin→choice),
+  kill the false logouts. Ship FIRST.
+- **CAL-1 Calendar core:** apple-glass day/week/month grid, events table
+  (`calendar_events`: kind=job|bid|inspection|office|task, ref to bid/job, owner,
+  attendees, start/end, status), CRUD, shared across users. Server RBAC by role.
+- **CAL-2 Workflow binding:** jobs/bids/inspections appear as events; status
+  changes reflect both ways; CRM + auto-bid records link to calendar items.
+- **CAL-3 OpenClaw lane:** live "bids in / auto-bids drafting / awaiting approval"
+  feed on the calendar; one-click approve→send wired to the existing
+  per-message-approved outbound draft path (no new auto-send).
+- **CAL-4 External sync:** Google (CalDAV/Google Calendar API), Apple (CalDAV),
+  + Halo Fire's current system; user-supplied OAuth/creds in Settings.
+- **CAL-5 Roles/permissions admin:** define roles + per-feature access; admin UI
+  to assign; enforced server-side on every calendar + workflow route.
+
+## Activity & Observability (OBS) — log ALL usage so AI helps live (user 2026-06-12)
+Wade's live login proved the need: every user action must be monitored + logged
+with user attribution so HAL/OpenClaw/Claude can assist in REAL TIME (today this
+only exists as Claude hand-reading nginx logs). Build:
+- **Audit log:** server middleware records every authenticated request + each
+  significant action (login, logout, setup-password, page open, bid view/approve/
+  send, CAD action) → `activity_log {id, user_id, username, role, action, path,
+  method, status, ip, meta, at}`. NEVER log passwords or tokens.
+- **Admin Activity view (apple-glass):** live sessions + recent actions, filter by
+  user; admin-only via RBAC. Shows who is in, what they're doing, where they got
+  stuck or errored.
+- **Live AI feed:** an SSE/stream HAL/OpenClaw/Claude can watch to help as it
+  happens (failed logins, a user stuck mid-flow) → proactive assist + alerts.
+- Ties to CAL-3 (OpenClaw activity lane on the calendar) and CAL-5 (RBAC). This is
+  the substrate that lets the AI "help as it's happening."
+- Honesty/privacy: support-oriented, admin-scoped, no surveillance creep; data
+  stays in the app DB; sensitive fields never logged.
 
 ## North star (the product)
 An AI-run AUTO-BID system for Halo Fire: scrape company email → identify bid
@@ -116,3 +184,161 @@ use the whole thing and see plainly what is machine-generated vs human-verified.
   qwen → Gemma QAT → Kimi.
 - All 3D work passes the scene-invariants gate + numeric verification.
 - New user direction → update THIS file + seed/adjust waves in the same turn.
+
+## Domain knowledge — Halo Fire field facts (user 2026-06-12) — MUST honor in models + BOM
+- **Pipe stock length: 24 ft in Arizona, 21 ft everywhere else.** Takeoff/BOM
+  coupling counts derive from this — a pipe run is assembled from stock lengths,
+  so each joint between stock lengths needs a coupling. Region (AZ vs other) sets
+  the cut length used for the count.
+- **Couplings are REQUIRED in the part models AND the BOM — both RIGID and
+  FLEXIBLE types.** Every routed pipe run must place couplings at stock-length
+  intervals (24 ft AZ / 21 ft else) and where the design calls for flexible
+  couplings (e.g., seismic/movement joints); the takeoff line-items them by
+  type (rigid|flexible) and size. This feeds the parts pipeline (rigid + flexible
+  coupling .scad emitters) and the W6 takeoff/bid. Flag any inferred coupling
+  type/spacing needs-verification per doctrine; never claim manufacturer-exact.
+
+## Studio MUST be real interactive CAD (user 2026-06-12, live-demo findings) — TOP UX PRIORITY
+The live "Sprinkler Studio" (apps/autosprink/autosprink.html) is an auto-layout
+VIEWER, not CAD. The interactive CAD (selection/inspector/edit/undo) already lives
+in apps/cad but is NOT wired to the live Studio. Make the live Studio real CAD:
+- **Part selection + inspector:** click ANY part (head, pipe, coupling, fitting) →
+  highlight + open an inspector with its specs. The autosprink viewer has NO
+  raycaster/selection today; apps/cad does (W-series selection engine). Wire
+  apps/cad in as the Studio OR port selection+inspector into the viewer.
+- **Camera focus on selection (AutoCAD-style):** selecting a part makes it the
+  orbit pivot; rotate/zoom around the selected part.
+- **View orbit must always work:** OrbitControls exist but the Demo timeline
+  hijacked the camera → "can't rotate." Demo button now hidden live; remove it
+  from source and guarantee manual orbit is never blocked.
+- **Floor-plan underlay toggle:** show the imported plan drawing as a ground
+  underlay beneath the 3D structure (a LAYERS toggle) so the operator can verify
+  the structure was built correctly on the real plan. Missing today.
+- **Pipe max length enforced (HARD):** segment every run to ≤21 ft (non-AZ) /
+  ≤24 ft (AZ) with a COUPLING at each joint; region drives the cut length.
+- **Couplings: fix placement + ORIENTATION** (currently wrong — gold couplings
+  sit/aim wrong on the pipes). Rigid + flexible per the domain rule; reuse the
+  apps/cad fitting-orient logic (oriented along the pipe axis at joints).
+- **Remove the Demo button** (done — hidden live; strip from source permanently).
+DECISION (user 2026-06-12, FINAL): the Studio IS the autosprink clone
+(apps/autosprink/autosprink.html) — build ALL CAD features INTO it; do NOT move
+the Studio to a separate app. REUSE apps/cad logic/patterns (selection engine,
+fitting-orient, inspector). The missing **top menu bar + useful tool buttons**
+must be added here too.
+- **AUTO-LOAD (user, high priority):** if the selected Project target already has
+  a generated layout, LOAD it automatically (persist generated state per target;
+  reload on open/target-change) — never force the user to re-Generate. If nothing
+  is generated yet, show the **PDF/plan underlay by default** so they see the plan.
+- **PUSH LIVE:** the Studio is unbundled static (autosprink.html imports /src/*.js
+  natively) — deploy = sync changed files to the VPS; do it as each piece lands.
+  Base work on the CURRENT LIVE file (it carries hotfixes: `#demoBtn{display:none}`
+  + dark `select option` CSS) so they're preserved; back up + verify each deploy;
+  never leave the live Studio half-edited (Dallas demos on it live).
+
+### Studio layout + project lifecycle (user 2026-06-12)
+- **Top menu bar owns EXPORT (+ file/view tools):** MOVE the CAD interchange
+  exports (DXF / STEP / IFC / STL) OUT of the left panel INTO the top menu bar.
+  Export is a top-menu function, not a side-menu one.
+- **Rename "Settings & Parity" → "Settings"** everywhere (nav links + page title);
+  parity/ledger is a section INSIDE Settings, not part of its name (user 2026-06-12).
+  DONE live on settings.html itself 2026-06-12 (title + header); nav LINK LABELS on
+  other pages still say "Settings & Parity" — fix with the unified header.
+- **UNIFIED HEADER on every window (user 2026-06-12, exact spec):** one identical
+  top bar across ALL pages (Calendar, Workbench, Studio, CRM, Settings):
+  · LEFT = nav links to all core windows, same order on every page, so any window
+    is one click away. · RIGHT = the consistent "HaloFire" brand text + the name of
+    the CURRENT open window (e.g. "HaloFire · Settings") + user (name · role) +
+    Sign out. Implement once as a shared include/web component (pairs with
+    halofire-auth.js) — never per-page copies that drift.
+- **Settings must LIVE-UPDATE as the build progresses (user 2026-06-12):** the
+  parity/verification-ledger counts and parts data on Settings are fetched once on
+  page load today (zero polling — verified). Add auto-refresh (poll the cheap
+  count endpoints ~every 30–60s, or SSE later with the OBS feed) so the operator
+  watches the ledger climb while the AI loops fill parts/models — no manual reload.
+- **Systemic auth invariant (user 2026-06-12):** NO page inside the Halo Fire stack
+  may ever bounce a logged-in user to login. One shared guard (halofire-auth.js) on
+  EVERY page; logout only on a real /auth/me session failure; gate-loop tests this
+  on all pages every round. (settings.html localStorage gate hotfixed live
+  2026-06-12 — .bak-gatefix on VPS; proper shared-guard fix in the ultramode run.)
+- **Left panel = AutoSprink-style TOOLS, project at top:** Project selector at the
+  very top, then design TOOLS + layers/properties below — mirror AutoSprink's tool
+  panel. The left panel is for tools, not export.
+- **Source is automatic, not a manual dropdown:** for BIDS the source is ALWAYS the
+  PDF the AI pulled from the client email (PDF-first, always). Auto-set Source to
+  "email PDF" for bid projects rather than a built-in/SVG/DXF picker.
+- **Project lifecycle — bid → won → CAD upgrade (IMPORTANT):** a project STARTS as a
+  BID built from the email PDF. When the bid is WON, the client sends DWG / other
+  CAD; those files attach to the SAME project to enhance accuracy, and the design
+  PICKS UP WHERE THE BID LEFT OFF (preserve the bid layout/network; refine geometry
+  with the better CAD). Project model must hold multiple source files over time +
+  a status (bid|won|…). Ties directly to CRM/auto-bid (AB1–5): a project IS the bid
+  record, upgraded in place when won.
+
+### AutoSprink MENU SYSTEM parity (user 2026-06-12) — the Studio's real shape
+The Studio must clone AutoSprink's menu system + toolbars (apple-glass), full
+function parity as the target: real DROPDOWN menus (File Edit Select Snaps Tools
+Actions Commands Auto Draw Roof Planes Wizards Hydraulics Finish Alerts Listing
+Parts Database AutoPREP Settings View Window Help), Alt-mnemonics + Esc, Export
+under File (not loose buttons). Spec + scrape plan:
+docs/research/autosprink-menu-parity.md. The help docs are JS-rendered — Codex
+scrapes them with Scrapling into autosprink-menus.json / autosprink-toolbars.json.
+Unmapped items ship as visible grayed stubs (flag-don't-gate; never claim parity
+until the ledger proves it).
+
+### Floor-plan underlay must be the REAL plan (user 2026-06-12) — current is a placeholder
+The deployed underlay shows a grey rectangle with mirrored text (rendered facing
+-Z) instead of the actual plan. FIX: render the project's REAL PDF plan page
+(pdfjs raster → texture; the PDFs exist in the repo/projects), correct the plane
+orientation/UVs so text reads correctly from above (+Y view), correct scale +
+alignment under the structure. Underlay toggle lives under View → Layers in the
+menu system. Placeholder grey-box is acceptable ONLY as a flagged fallback when a
+project has no plan file.
+
+### UNREAL-ENGINE-STYLE UX (user 2026-06-12) — standing design principle
+**UE5 is the UX reference for all Studio improvements** — when designing any
+interaction for this AutoSprink clone, derive it from how Unreal Engine operates.
+- **TRUE SCALE ONLY:** REMOVE the "Exaggerate pipe radius" option entirely (user
+  said this twice). No exaggeration mode exists; everything renders true scale.
+- **Selection → Inspector in the right panel** (shipped 2026-06-12; keep it).
+- **Movable/dockable PANELS like UE:** every panel (Inspector, left tools, layout
+  results, layers) can be dragged/rearranged/docked. **Layout auto-saves to the
+  USER PROFILE** (server-side per-account, e.g. user_prefs {user_id, workspace
+  JSON}) so each person's window arrangement follows their login — per-user
+  workflow setups.
+- **Orientation/view CUBE top-right of the viewport** exactly like UE: click
+  faces/edges to snap Top/Front/Iso views; drag it to orbit; shows current
+  orientation at all times. (three.js ViewHelper / a gizmo equivalent.)
+- **SELECTION INTERACTION CONTRACT (user 2026-06-12 — implement as a WHOLE, not
+  piecemeal; UE/AutoCAD-derived):** selecting a part makes it the focal point of
+  EVERY camera operation until deselect:
+  1. Click part → select + highlight + Inspector (right panel).
+  2. Click a DIFFERENT part → selection MOVES to it (repeatable forever).
+  3. Orbit (drag) pivots about the selected part.
+  4. **Scroll-zoom dollies toward/away from the selected part** (zoom locks to
+     selection; zoomToCursor off — dolly targets the pivot).
+  5. Pan moves the pivot with the camera (standard OrbitControls pan).
+  6. F = frame/focus selected (UE-style); double-click = select + frame.
+  7. Esc / empty-click → deselect, restore prior pivot; all camera ops keep working.
+  8. Selection marker/inspector must NEVER intercept pointer events meant for the
+     canvas (raycast-transparent marker; panel outside the canvas hit area).
+  Every item is a BEHAVIORAL gate (real synthetic pointer/wheel events, numeric
+  assertions) in the gate loop — a partial implementation fails the loop.
+
+### CAD geometry accuracy (user 2026-06-12, close-up review) — the parts are WRONG
+Fix the actual 3D geometry (reuse the OpenSCAD .scad emitters + apps/cad
+fitting-orient). Every part flagged needs-verification; never claim mfg-exact.
+- **TRUE scale by default, no exaggeration:** make true NFPA pipe scale the
+  DEFAULT; the ×6 "exaggerate" is a viewing aid only. Parts at real dimensions.
+- **Pipe = correct threaded-pipe CAD** (modeled threaded ends), not plain cylinders.
+- **Proper connectivity pipe → drop → head:** the geometry AND topology must connect
+  correctly. The "elbow on the end of the sprinkler" is an ERROR — it must read as a
+  real reducing fitting / drop nipple into the head, not a confusing elbow.
+- **Couplings (the oversized gold/orange barrels):** wrong SIZE + orientation +
+  placement. Size to real coupling OD (snug to pipe, not a barrel), orient along the
+  pipe axis, place at the 21 ft (24 ft AZ) joints. Rigid + flexible.
+- **Fastener hardware (hangers/brackets) MUST be visible:** render W6A/W18C hanger
+  hardware at support points + in the BOM (already speced).
+- **Drop ceilings MUST be visible:** render the ceiling grid (W6B) as a layer.
+This is the parts pipeline (OpenSCAD emitters: threaded pipe, rigid+flex coupling,
+elbow/tee/reducer, drop nipple, hanger) + correct placement/orientation in the
+studio scene. HIGHEST CAD-fidelity priority.

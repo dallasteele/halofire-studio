@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HaloFire — Settings, Library &amp; Parity</title>
+<title>HaloFire — Settings</title>
 <style>
   *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
   :root{--bg:#08080a;--surface:#111114;--surface2:#18181c;--fire:#E53935;--gold:#FFD54F;--cyan:#4DD0E1;--green:#4ade80;--text:#d4d4d8;--muted:#71717a;--bright:#fafafa;--border:rgba(255,255,255,.08);--font:'Inter',system-ui,sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
@@ -37,11 +37,14 @@
      AFTER the legacy inline <style> so its :root bridge re-points the legacy
      vars onto the token system without touching markup, ids, or JS. -->
 <link rel="stylesheet" href="/public/styles/halofire-tokens.css">
+<!-- Shared cookie-session auth guard (HFAuth). Loaded as a classic script so
+     window.HFAuth exists before any module script runs. -->
+<script src="/public/halofire-auth.js"></script>
 </head>
 <body class="hf-shell">
 <header>
-  <div class="brand">Halo<span>Fire</span> · Settings &amp; Parity</div>
-  <div class="nav"><a href="./workbench.html">Workbench</a><a href="./autosprink.html">Studio</a><a id="logout">Sign out</a></div>
+  <div class="brand">Halo<span>Fire</span> · Settings</div>
+  <div class="nav"><a href="./calendar.html">Calendar</a><a href="./workbench.html">Workbench</a><a href="./autosprink.html">Studio</a><span data-whoami style="color:#71717a;font-size:12px;margin-left:14px"></span><a id="logout">Sign out</a></div>
 </header>
 <main>
   <div class="card wide">
@@ -253,13 +256,15 @@
 <script type="module">
 const HALOFIRE_BASE_PATH = window.location.pathname.startsWith('/halo-fire/') ? '/halo-fire' : '';
 const HALOFIRE_API_BASE = HALOFIRE_BASE_PATH + ['', 'api'].join('/');
-const token = localStorage.getItem('halofire_token');
-if (!token) location.href = HALOFIRE_BASE_PATH + '/';
+// Cookie-session auth via shared HFAuth guard. The old localStorage
+// 'halofire_token' gate is GONE — cookie logins never set that key, so it
+// falsely bounced signed-in users back to the login page.
 const $ = (id) => document.getElementById(id);
-$('logout').onclick = () => { localStorage.removeItem('halofire_token'); location.href = HALOFIRE_BASE_PATH + '/'; };
+$('logout').onclick = () => { HFAuth.logout(); };
+HFAuth.guard();
 function api(path, opts={}) {
-  return fetch(HALOFIRE_API_BASE + path, { ...opts, headers:{ 'Content-Type':'application/json', Authorization:'Bearer '+token, ...(opts.headers||{}) }})
-    .then(async r => { if (r.status===401){ localStorage.removeItem('halofire_token'); location.href = HALOFIRE_BASE_PATH + '/'; throw new Error('unauth'); } if(!r.ok) throw new Error(await r.text()); return r.json(); });
+  // HFAuth.api: cookies included, 401 throws (guard() owns the only redirect).
+  return HFAuth.api(path, { ...opts, headers:{ 'Content-Type':'application/json', ...(opts.headers||{}) } });
 }
 const stClass = (s) => String(s).toLowerCase().replace(/[^a-z]/g,'');
 let wizardState = { projects: [], gateMap: new Map(), selectedProject: '', canWrite: false };

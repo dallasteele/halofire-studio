@@ -379,10 +379,10 @@ body.hf-shell .field input{
         <h1 id="loginTitle">Secure Portal</h1>
         <small id="formMode">Sign in to continue.</small>
       </div>
-      <form id="form">
-        <div class="field"><label for="user">Email or username</label><input type="text" id="user" placeholder="name@company.com" autocomplete="username"></div>
-        <div class="field" id="passField"><label for="pass">Password</label><input type="password" id="pass" placeholder="Password" autocomplete="current-password"></div>
-        <div class="field" id="confirmPassField" hidden><label for="confirmPass">Confirm password</label><input type="password" id="confirmPass" placeholder="Confirm password" autocomplete="new-password"></div>
+      <form id="form" method="post" action="#" novalidate>
+        <div class="field"><label for="user">Email or username</label><input type="email" id="user" name="username" placeholder="name@company.com" autocomplete="username"></div>
+        <div class="field" id="passField"><label for="pass">Password</label><input type="password" id="pass" name="password" placeholder="Password" autocomplete="current-password"></div>
+        <div class="field" id="confirmPassField" hidden><label for="confirmPass">Confirm password</label><input type="password" id="confirmPass" name="confirm-password" placeholder="Confirm password" autocomplete="new-password"></div>
         <p class="login-note" id="passwordHelp">Apple can generate and save this password for future HaloFire sign-ins.</p>
         <label class="login-remember" id="rememberRow"><input type="checkbox" id="remember" checked> Keep me signed in</label>
         <div class="login-actions"><button type="button" class="auth-link" id="forgotPassword">Forgot password?</button></div>
@@ -1214,14 +1214,17 @@ function apiPath(pathname){
   return HALOFIRE_BASE_PATH + pathname;
 }
 
-function safeWorkbenchRedirect(){
-  const fallback = HALOFIRE_BASE_PATH + '/workbench.html';
+function safePostLoginRedirect(){
+  // All roles land on the calendar by default. ?redirect= is honored only for
+  // same-origin, allowlisted app pages.
+  const fallback = HALOFIRE_BASE_PATH + '/calendar.html';
   const requested = params.get('redirect');
   if(!requested)return fallback;
+  const allowedPaths = ['/calendar.html','/workbench.html','/autosprink.html','/crm.html','/settings.html']
+    .map((p) => HALOFIRE_BASE_PATH + p);
   try{
     const target = new URL(requested, window.location.origin);
-    const allowedPath = HALOFIRE_BASE_PATH + '/workbench.html';
-    if(target.origin === window.location.origin && target.pathname === allowedPath){
+    if(target.origin === window.location.origin && allowedPaths.includes(target.pathname)){
       return target.pathname + target.search + target.hash;
     }
   }catch(_){}
@@ -1306,9 +1309,23 @@ async function applyInviteSetupMode(){
     if(data.username) userInput.value = data.username;
     userInput.readOnly = true;
   }catch(_){
-    showError('This setup link is expired or has already been used.');
-    submitButton.disabled = true;
+    // Invalid/used setup link: fall back to a working login form with a
+    // notice instead of a dead, disabled form. Strip the stale params so a
+    // reload shows a clean login.
+    stripAuthParamsFromUrl();
+    userInput.readOnly = false;
+    applyLoginMode();
+    showError('That setup link is expired or has already been used. Sign in below, or use "Forgot password?" to request a new link.');
   }
+}
+
+function stripAuthParamsFromUrl(){
+  try{
+    const url = new URL(window.location.href);
+    url.searchParams.delete('setup');
+    url.searchParams.delete('username');
+    history.replaceState(null, '', url.pathname + (url.searchParams.toString() ? '?' + url.searchParams.toString() : '') + url.hash);
+  }catch(_){}
 }
 
 function applyRecoveryMode(){
@@ -1343,6 +1360,7 @@ if(params.get('recover')){
   applyLoginMode();
 }
 
+let redirecting = false;
 form.onsubmit=async e=>{
   e.preventDefault();
   clearMessages();
@@ -1368,7 +1386,11 @@ form.onsubmit=async e=>{
       if(!setup.ok) throw new Error('Unable to create password.');
       const data = await setup.json();
       acceptCookieSession(data);
-      window.location.href = safeWorkbenchRedirect();
+      // Strip ?setup=&username= so reload/back shows a clean login page
+      // instead of re-offering a consumed setup token.
+      stripAuthParamsFromUrl();
+      redirecting = true;
+      window.location.href = safePostLoginRedirect();
       return;
     }
     if(authMode === 'recovery'){
@@ -1397,11 +1419,12 @@ form.onsubmit=async e=>{
     if(!res.ok)throw new Error('bad credentials');
     const data=await res.json();
     acceptCookieSession(data);
-    window.location.href=safeWorkbenchRedirect();
+    redirecting = true;
+    window.location.href=safePostLoginRedirect();
   }catch(error){
     showError(error instanceof Error ? error.message : 'Unable to sign in.');
   }finally{
-    if(!window.location.href.includes('workbench.html')){
+    if(!redirecting){
       submitButton.disabled = false;
     }
   }

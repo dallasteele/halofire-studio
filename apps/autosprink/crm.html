@@ -76,11 +76,14 @@
   .modal .box .row{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
   .modal .box button.cancel{background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:8px 14px;cursor:pointer}
 </style>
+<!-- Shared cookie-session auth guard (HFAuth). Classic script: window.HFAuth
+     exists before the module script below runs. -->
+<script src="/public/halofire-auth.js"></script>
 </head>
 <body>
 <header>
   <div class="brand">Halo<span>Fire</span> · CRM</div>
-  <div class="who"><a href="/workbench.html">← Workbench</a><a href="/autosprink.html">Sprinkler Studio →</a><span id="whoami">…</span><a id="logout">Sign out</a></div>
+  <div class="who"><a href="/calendar.html">← Calendar</a><a href="/workbench.html">Workbench</a><a href="/autosprink.html">Sprinkler Studio →</a><span id="whoami" data-whoami>…</span><a id="logout">Sign out</a></div>
 </header>
 <div class="alpha-banner">INTERNAL ALPHA · AUTO-BID CRM · outbound email requires explicit human approval per message · nothing fabricated</div>
 <main>
@@ -129,38 +132,20 @@ const ALLOWED = {
 };
 const LABEL = { received: 'Received', reviewing: 'Reviewing', estimating: 'Estimating', bid_sent: 'Bid sent', won: 'Won', lost: 'Lost' };
 
-function readStoredToken(){ try{ return localStorage.getItem('halofire_token') || sessionStorage.getItem('halofire_token'); }catch(_){ return null; } }
-function clearStoredToken(){ try{ localStorage.removeItem('halofire_token'); }catch(_){} try{ sessionStorage.removeItem('halofire_token'); }catch(_){} }
-function authRedirect(){
-  const target = window.location.pathname + window.location.search + window.location.hash;
-  location.href = BASE_PATH + '/?redirect=' + encodeURIComponent(target);
-}
-// No hardcoded demo credentials here: the page relies on the normal token /
-// redirect flow. If no valid token is present, the first api() call gets a 401
-// and authRedirect() sends the user to the login page. (Removed an
-// ensureDemoSession() that hardcoded an admin password — credentials must never
-// be embedded in client code.)
-let token = readStoredToken();
-
+// Cookie-session auth via shared HFAuth guard (/public/halofire-auth.js).
+// HFAuth.guard() (called at load, below) is the ONLY place that may redirect
+// to login, and only on a real 401 from /api/auth/me. Feature API calls that
+// 401 just throw — the old blanket 401->redirect here caused false logouts.
 function api(path, options = {}){
   const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
-  if (token) headers.Authorization = 'Bearer ' + token;
-  return fetch(API_BASE + path, { ...options, credentials: 'include', headers }).then(async (r) => {
-    if (r.status === 401){ clearStoredToken(); authRedirect(); throw new Error('unauth'); }
-    if (!r.ok){ let msg; try{ msg = (await r.json()).error; }catch(_){ msg = await r.text(); } throw new Error(msg || ('HTTP ' + r.status)); }
-    return r.json();
-  });
+  return HFAuth.api(path, { ...options, headers });
 }
 
 function escapeHtml(s){
   return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
 }
 
-document.getElementById('logout').onclick = async () => {
-  try{ await fetch(API_BASE + '/auth/logout', { method:'POST', credentials:'include', headers: token ? { Authorization:'Bearer '+token } : {} }); }catch(_){}
-  clearStoredToken();
-  location.href = BASE_PATH + '/';
-};
+document.getElementById('logout').onclick = () => { HFAuth.logout(); };
 
 let clients = [];
 let bids = [];
@@ -233,8 +218,8 @@ async function renderBid(id){
 }
 
 function viewBid(id){
-  // The stored HTML is auth-gated; fetch with the token then open in a new tab.
-  fetch(API_BASE + '/bid-requests/' + id + '/render-bid', { credentials:'include', headers: token ? { Authorization:'Bearer '+token } : {} })
+  // The stored HTML is auth-gated; the session cookie rides along, then open in a new tab.
+  fetch(API_BASE + '/bid-requests/' + id + '/render-bid', { credentials:'include' })
     .then((r) => r.ok ? r.text() : Promise.reject(new Error('no rendered bid')))
     .then((html) => { const w = window.open('', '_blank'); if (w) { w.document.write(html); w.document.close(); } })
     .catch((e) => alert('Cannot open bid: ' + e.message));
@@ -467,10 +452,9 @@ document.getElementById('bBtn').onclick = async () => {
 };
 
 (async () => {
-  try{
-    const me = await api('/auth/me');
-    document.getElementById('whoami').textContent = me.name || me.username || '';
-  }catch(_){}
+  // guard() fills [data-whoami] and redirects to login on a real 401.
+  const me = await HFAuth.guard();
+  if (!me) return;
   await loadClients();
   await loadBoard();
   await loadIntakeStatus();

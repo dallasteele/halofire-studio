@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HaloFire — Calendar</title>
+<style>
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+  :root{--bg:#08080a;--surface:#111114;--surface2:#18181c;--fire:#E53935;--gold:#FFD54F;--cyan:#4DD0E1;--green:#4ade80;--text:#d4d4d8;--muted:#71717a;--bright:#fafafa;--border:rgba(255,255,255,.08);--font:'Inter Variable','Inter',system-ui,sans-serif;--mono:'JetBrains Mono Variable',ui-monospace,monospace}
+  body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh}
+  body::before{content:'';position:fixed;inset:0;background:radial-gradient(1200px 500px at 50% -10%,rgba(229,57,53,.07),transparent 60%);pointer-events:none}
+  header{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:1px solid var(--border);background:rgba(8,8,10,.72);backdrop-filter:blur(18px) saturate(140%);-webkit-backdrop-filter:blur(18px) saturate(140%);position:sticky;top:0;z-index:10}
+  .brand{font-weight:900;font-style:italic;font-size:20px;color:var(--bright)} .brand span{color:var(--fire)}
+  .nav{display:flex;align-items:center;gap:14px}
+  .nav a{color:var(--cyan);text-decoration:none;font-size:13px;cursor:pointer}
+  .nav a.current{color:var(--bright);font-weight:700}
+  .whoami{font-family:var(--mono);font-size:11px;color:var(--muted);border:1px solid var(--border);border-radius:99px;padding:3px 10px;background:var(--surface)}
+  main{max-width:1180px;margin:0 auto;padding:22px;display:grid;grid-template-columns:2fr 1fr;gap:18px}
+  @media(max-width:900px){main{grid-template-columns:1fr}}
+  .card{background:rgba(17,17,20,.82);border:1px solid var(--border);border-radius:14px;padding:18px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+  .card.wide{grid-column:1/-1}
+  h2{font-size:12px;text-transform:uppercase;letter-spacing:1.4px;color:var(--muted);margin-bottom:12px;font-weight:700}
+  .banner{grid-column:1/-1;background:linear-gradient(90deg,rgba(255,213,79,.14),rgba(229,57,53,.08));border:1px solid rgba(255,213,79,.4);color:var(--gold);font-family:var(--mono);font-size:12px;padding:10px 14px;border-radius:10px}
+  .banner b{letter-spacing:.6px}
+  .cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .cal-title{font-size:18px;font-weight:800;color:var(--bright)}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+  .dow{font-family:var(--mono);font-size:10px;color:var(--muted);text-align:center;padding:4px 0;text-transform:uppercase;letter-spacing:1px}
+  .day{min-height:72px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px;font-size:11px;color:var(--muted);font-family:var(--mono)}
+  .day.out{opacity:.35}
+  .day.today{border-color:rgba(229,57,53,.55);box-shadow:0 0 0 1px rgba(229,57,53,.3) inset;color:var(--bright)}
+  .day .n{font-size:11px}
+  .lane-item{border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:8px;background:var(--surface2)}
+  .lane-item .proj{font-size:13px;color:var(--bright);font-weight:700}
+  .lane-item .meta{font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:3px}
+  .st{font-family:var(--mono);font-size:10px;padding:2px 8px;border-radius:99px;background:rgba(255,213,79,.15);color:var(--gold)}
+  button{background:var(--fire);color:#fff;border:none;border-radius:7px;padding:7px 12px;font-weight:700;cursor:pointer;font-size:12px}
+  button:disabled{opacity:.45;cursor:not-allowed;filter:grayscale(.4)}
+  .muted{color:var(--muted);font-size:12px}
+  .approve-row{display:flex;align-items:center;gap:8px;margin-top:8px}
+  .approve-note{font-family:var(--mono);font-size:10px;color:var(--muted)}
+</style>
+<!-- Shared HaloFire design system (AAA tokens + self-hosted fonts). -->
+<link rel="stylesheet" href="/public/styles/halofire-tokens.css">
+<script src="/public/halofire-auth.js"></script>
+</head>
+<body class="hf-shell">
+<header>
+  <div class="brand">Halo<span>Fire</span> · Calendar</div>
+  <div class="nav">
+    <a href="./calendar.html" class="current">Calendar</a>
+    <a href="./workbench.html" data-role="admin">Workbench</a>
+    <a href="./autosprink.html">Studio</a>
+    <a href="./crm.html">CRM</a>
+    <a href="./settings.html" data-role="admin">Settings</a>
+    <span class="whoami" data-whoami>…</span>
+    <a id="logout">Sign out</a>
+  </div>
+</header>
+<main>
+  <div class="banner"><b>NEEDS VERIFICATION</b> — Calendar core under construction (CAL-1). Dates and lanes below are placeholders, not scheduled work.</div>
+
+  <div class="card">
+    <div class="cal-head">
+      <div class="cal-title" id="calTitle">…</div>
+      <span class="muted" id="calSub"></span>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
+  </div>
+
+  <div class="card">
+    <h2>AI activity · Awaiting approval</h2>
+    <p class="muted" style="margin-bottom:10px">Bids the system has prepared that still require a human decision. Nothing is ever auto-sent.</p>
+    <div id="lane"><span class="muted">loading…</span></div>
+  </div>
+</main>
+
+<script>
+(function () {
+  'use strict';
+  document.getElementById('logout').onclick = function () { HFAuth.logout(); };
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c];
+    });
+  }
+
+  function renderMonth() {
+    var now = new Date();
+    var y = now.getFullYear(), m = now.getMonth();
+    document.getElementById('calTitle').textContent =
+      now.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+    document.getElementById('calSub').textContent = 'month view · placeholder';
+    var grid = document.getElementById('calGrid');
+    var html = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
+      .map(function (d) { return '<div class="dow">' + d + '</div>'; }).join('');
+    var first = new Date(y, m, 1);
+    var start = new Date(y, m, 1 - first.getDay());
+    for (var i = 0; i < 42; i++) {
+      var d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+      var out = d.getMonth() !== m;
+      var today = d.toDateString() === now.toDateString();
+      html += '<div class="day' + (out ? ' out' : '') + (today ? ' today' : '') + '"><span class="n">' + d.getDate() + '</span></div>';
+    }
+    grid.innerHTML = html;
+  }
+
+  function renderLane(bids) {
+    var lane = document.getElementById('lane');
+    var awaiting = (bids || []).filter(function (b) {
+      var s = String(b.status || '').toLowerCase();
+      return s !== 'won' && s !== 'lost';
+    });
+    if (!awaiting.length) {
+      lane.innerHTML = '<span class="muted">Nothing awaiting approval.</span>';
+      return;
+    }
+    lane.innerHTML = awaiting.slice(0, 12).map(function (b) {
+      return '<div class="lane-item">' +
+        '<div class="proj">' + esc(b.project || ('Bid #' + b.id)) + '</div>' +
+        '<div class="meta">' + esc(b.contractor || '—') +
+          (b.due_date ? ' · due ' + esc(b.due_date) : '') +
+          ' · <span class="st">' + esc(b.status || 'Pending') + '</span></div>' +
+        '<div class="approve-row">' +
+          '<button type="button" disabled title="Approval flow ships with CAL-1">Approve &amp; send</button>' +
+          '<span class="approve-note">disabled — human approval flow under construction (CAL-1)</span>' +
+        '</div></div>';
+    }).join('');
+  }
+
+  renderMonth();
+  HFAuth.guard().then(function (me) {
+    if (!me) return;
+    return HFAuth.api('/bids?limit=50').then(function (data) {
+      renderLane(data && data.bids);
+    });
+  }).catch(function (err) {
+    document.getElementById('lane').innerHTML =
+      '<span class="muted">Could not load activity: ' + esc(err && err.message) + '</span>';
+  });
+})();
+</script>
+</body>
+</html>

@@ -30,6 +30,8 @@
   h3:first-child{margin-top:0}
   label{display:block;font-size:11px;color:var(--muted);margin:8px 0 3px}
   select,input,textarea{width:100%;background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:7px;padding:7px 9px;font-size:12px;font-family:var(--font)}
+select option,select optgroup{background:#12141a;color:#f5f5f5}
+#demoBtn{display:none!important}
   textarea{font-family:var(--mono);font-size:10px;height:74px;resize:vertical}
   button.act{width:100%;background:var(--fire);color:#fff;border:none;border-radius:8px;padding:10px;font-weight:700;cursor:pointer;font-size:13px;margin-top:10px}
   button.act:hover{filter:brightness(1.1)} button.act:disabled{opacity:.5;cursor:wait}
@@ -38,7 +40,7 @@
   #canvas{width:100%;height:100%;display:block}
   #legend{position:absolute;left:12px;bottom:12px;font-family:var(--mono);font-size:10px;color:var(--muted);background:rgba(8,8,11,.7);border:1px solid var(--line);border-radius:6px;padding:8px 10px;line-height:1.7}
   .sw{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px;vertical-align:middle}
-  #status{position:absolute;right:12px;top:12px;font-family:var(--mono);font-size:10px;color:var(--muted)}
+  #status{position:absolute;right:12px;bottom:12px;font-family:var(--mono);font-size:10px;color:var(--muted);max-width:46%;text-align:right}
   .layer{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:12px}
   .layer input{width:auto}
   .kv{display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px solid var(--line)}
@@ -51,6 +53,27 @@
   .est{color:var(--gold);font-size:10px;font-family:var(--mono)}
   .warn{font-size:10px;color:var(--gold);font-family:var(--mono);line-height:1.5;margin-top:8px}
   a.link{color:var(--cyan);text-decoration:none;font-size:11px}
+
+  /* HF-A1 CAD layer: top menu bar, inspector, underlay, auto-load */
+  #cadBar{position:absolute;left:50%;top:10px;transform:translateX(-50%);display:flex;align-items:center;gap:5px;background:linear-gradient(180deg,rgba(255,255,255,0.08),rgba(0,0,0,0.45)),rgba(13,12,10,0.78);border:1px solid rgba(255,255,255,0.14);border-radius:12px;padding:5px 9px;backdrop-filter:blur(24px) saturate(1.3);-webkit-backdrop-filter:blur(24px) saturate(1.3);z-index:12;max-width:calc(100% - 24px);flex-wrap:wrap;justify-content:center}
+  #cadBar button{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10);color:rgba(242,236,224,0.85);border-radius:8px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:var(--font);transition:background .12s}
+  #cadBar button:hover{background:rgba(255,255,255,0.13)}
+  #cadBar button.on{background:linear-gradient(180deg,rgba(255,213,79,0.32),rgba(200,154,60,0.22));border-color:rgba(255,213,79,0.5);color:#ffd54f}
+  #cadBar button:disabled{opacity:.38;cursor:default}
+  #cadBar .tb-sep{width:1px;height:18px;background:rgba(255,255,255,0.12);margin:0 3px}
+  #cadBar .tb-label{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin:0 2px}
+  #inspector{position:absolute;right:10px;top:54px;bottom:12px;width:264px;background:linear-gradient(180deg,rgba(255,255,255,0.07),rgba(0,0,0,0.5)),rgba(13,12,10,0.82);border:1px solid rgba(255,255,255,0.15);border-radius:14px;backdrop-filter:blur(28px) saturate(1.35);-webkit-backdrop-filter:blur(28px) saturate(1.35);z-index:14;display:none;flex-direction:column;overflow:hidden;box-shadow:0 18px 48px rgba(0,0,0,0.5)}
+  #inspector.open{display:flex}
+  #inspHeader{padding:10px 12px 8px;border-bottom:1px solid rgba(255,255,255,0.10);display:flex;align-items:center;justify-content:space-between}
+  #inspTitle{font-size:12px;font-weight:700;color:var(--bright)}
+  #inspClose{background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;padding:2px 6px}
+  #inspClose:hover{color:var(--bright)}
+  #inspBody{padding:10px 12px;overflow-y:auto;flex:1}
+  #inspBody .kv{font-size:11px}
+  .nv-flag{display:inline-block;margin-top:8px;font-family:var(--mono);font-size:9px;color:var(--gold);border:1px solid rgba(255,213,79,.4);border-radius:6px;padding:3px 7px;line-height:1.5}
+  #autoLoadBadge{font-family:var(--mono);font-size:9px;color:var(--green);border:1px solid rgba(74,222,128,.35);border-radius:99px;padding:3px 8px;display:none}
+  #autoLoadBadge.show{display:inline-block}
+  #sourceLockNote{display:none;font-size:10px;color:var(--gold);font-family:var(--mono);margin-top:4px;line-height:1.5}
 </style>
 <link rel="stylesheet" href="/public/styles/halofire-tokens.css">
 <style id="employee-studio-glass-overrides">
@@ -121,24 +144,21 @@
   <header>
     <div class="brand">Halo<span>Fire</span> Studio <small>SPRINKLER CAD · OpenGeometry</small></div>
     <div class="right">
+      <span id="autoLoadBadge">● auto-loaded</span>
       <span class="badge">INTERNAL ALPHA · NOT AHJ/PE/AutoSprink parity</span>
-      <div class="seg" id="viewSeg">
-        <button data-view="iso" class="on">3D</button>
-        <button data-view="top">Plan</button>
-      </div>
       <button id="demoBtn" title="Animate the structure + sprinkler system rising out of the plan">▶ Demo</button>
       <a class="link" href="/workbench.html">Workbench →</a>
-      <a class="link" href="/settings.html">Settings &amp; Parity</a>
+      <a class="link" href="/settings.html">Settings</a>
     </div>
   </header>
 
   <aside class="left">
-    <h3>Floor Plan</h3>
-    <label>Project target</label>
+    <h3>Project</h3>
     <select id="projectTarget">
       <option value="Home Depot - Rexburg ID">Home Depot - Rexburg ID</option>
       <option value="The Cooperative 1881 - Salt Lake City UT">The Cooperative 1881 - Salt Lake City UT</option>
     </select>
+    <h3>Design</h3>
     <label>Source</label>
     <select id="planSource">
       <option value="builtin">Selected project built-in plan</option>
@@ -186,7 +206,8 @@
       </p>
     </div>
 
-    <h3>Design Basis</h3>
+    <div id="sourceLockNote">Source locked: AI-pulled email PDF (bid-originated project)</div>
+
     <label>Hazard class (NFPA 13)</label>
     <select id="hazard">
       <option value="">From plan</option>
@@ -198,22 +219,39 @@
     <input id="markup" type="number" value="25" min="0" max="100">
 
     <button class="act" id="genBtn">Generate Layout</button>
-    <h3>Export (CAD interchange)</h3>
-    <button class="act ghost" id="dxfBtn" disabled>DXF (AutoCAD)</button>
-    <button class="act ghost" id="stepBtn" disabled>STEP (.step)</button>
-    <button class="act ghost" id="ifcBtn" disabled>IFC (BIM)</button>
-    <button class="act ghost" id="stlBtn" disabled>STL (mesh)</button>
-    <div class="warn" id="exportMsg"></div>
+    <button class="act ghost" id="regenBtn" style="display:none;font-size:11px;padding:7px">↻ Regenerate (replace saved layout)</button>
 
-    <h3>View</h3>
-    <div class="layer"><input type="checkbox" id="exaggerate" checked><label for="exaggerate" style="margin:0;color:var(--text)">Exaggerate pipe radius (×6)</label></div>
-    <p class="muted" style="font-size:10px;margin-top:4px">Off = true NFPA pipe scale (thin at building scale).</p>
     <h3>Layers</h3>
     <div id="layers"></div>
+
+    <h3>Properties</h3>
+    <div class="layer"><input type="checkbox" id="exaggerate"><label for="exaggerate" style="margin:0;color:var(--text)">Exaggerate pipe radius (×6)</label></div>
+    <p class="muted" style="font-size:10px;margin-top:4px">Default OFF = true NFPA pipe scale (thin at building scale). Opt-in view aid only.</p>
+    <div class="warn" id="exportMsg"></div>
   </aside>
 
   <div id="canvasWrap">
     <canvas id="canvas"></canvas>
+    <!-- HF-A1-CADBAR top menu bar (apple-glass) -->
+    <div id="cadBar">
+      <div class="seg" id="viewSeg">
+        <button data-view="iso" class="on">3D</button>
+        <button data-view="top">Top</button>
+      </div>
+      <button id="fitBtn" title="Fit the whole model in view">Fit</button>
+      <button id="selBtn" class="on" title="Click parts to select + inspect (orbit always works)">Select</button>
+      <button id="scaleBtn" class="on" title="True NFPA pipe scale (off = ×6 exaggerated radius)">True scale</button>
+      <div class="tb-sep"></div>
+      <span class="tb-label">Export</span>
+      <button id="dxfBtn" disabled>DXF</button>
+      <button id="stepBtn" disabled>STEP</button>
+      <button id="ifcBtn" disabled>IFC</button>
+      <button id="stlBtn" disabled>STL</button>
+    </div>
+    <div id="inspector">
+      <div id="inspHeader"><span id="inspTitle">Inspector</span><button id="inspClose" title="Deselect (Esc)">×</button></div>
+      <div id="inspBody"></div>
+    </div>
     <div id="status">initializing OpenGeometry kernel…</div>
     <div id="legend">
       <div><span class="sw" style="background:#6b7280"></span>building shell</div>
@@ -256,10 +294,13 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'; // HF-G1-COUPLE
 import { OpenGeometry, Vector3, Cuboid, Cylinder, Opening, OGSceneManager } from 'opengeometry';
 import { planOrthoFrustum, planCenter } from '/src/engine/plan-view.js';
 import { demoTimeline } from '/src/engine/demo-timeline.js';
 import { summarizeExportArtifact, buildExportProofMessage } from '/src/ui/export-proof.js';
+// HF-A1-UNDERLAY: built-in plan fixtures (same module the server uses) for the floor-plan ground underlay.
+import { homeDepotRexburgFloorPlan, cooperative1881FloorPlan, COOPERATIVE_1881_PROJECT_NAME } from '/src/data/floorplans.js';
 
 const HOME_DEPOT = 'Home Depot - Rexburg ID';
 try{
@@ -288,16 +329,18 @@ function api(path, options = {}) {
 }
 
 // ── OpenGeometry / Three scene ──
-const COLORS = { WALLS: 0x6b7280, WALLS_INT: 0x9aa3b2, COLUMN: 0x8a8f98, FLOOR: 0x16161c, MAIN: 0xE53935, BRANCH: 0x3b82f6, DROPS: 0x22d3ee, HEADS: 0xff3b30, COMPONENTS: 0xfbbf24 };
+const COLORS = { WALLS: 0x6b7280, WALLS_INT: 0x9aa3b2, COLUMN: 0x8a8f98, FLOOR: 0x16161c, MAIN: 0xE53935, BRANCH: 0x3b82f6, DROPS: 0x22d3ee, HEADS: 0xff3b30, COMPONENTS: 0xfbbf24, HANGERS: 0xb6bcc6, CEILING: 0xd8d2c2 }; // HF-G4-HANGER + HF-G5-CEILGRID layers
 // Viewer pipe-radius exaggeration (true-scale=1). CAD-structural geometry
 // (walls/mains/branches/riser) is built on the OpenGeometry kernel; the many
 // identical heads + drops are drawn with Three InstancedMesh for performance at
 // 900+ count. The full kernel model (incl. heads/drops) is rebuilt on-demand at
 // export time (buildExportScene), so STEP/IFC/STL stay complete & true-scale.
-let pipeVizScale = 6;
+// HF-A1-TRUESCALE: default is TRUE NFPA pipe scale (1). Exaggeration (6) is an opt-in view aid.
+let pipeVizScale = 1;
 let renderer, scene, perspCam, orthoCam, camera, controls, ogReady = false;
 const layerGroups = {};
 let modelGroup, currentCadModel = null;
+let planGroup = null, planVisible = true, lastPlanBbox = null; // HF-A1-UNDERLAY ground-plane floor plan
 // R3: real CAD part mesh for sprinkler heads, loaded from the parts library
 // (GET /api/parts -> /parts/<key>.stl). Falls back to a primitive when no part
 // is available. Generated parts are best-effort, NOT manufacturer-exact.
@@ -356,6 +399,18 @@ async function initStudio() {
   scene.add(new THREE.AmbientLight(0xffffff, 0.75));
   const d = new THREE.DirectionalLight(0xffffff, 0.9); d.position.set(300, 600, 400); scene.add(d);
   scene.add(new THREE.GridHelper(2000, 80, 0x222228, 0x18181c));
+  planGroup = new THREE.Group(); scene.add(planGroup); // HF-A1-UNDERLAY
+  // HF-A1-SELECT: click-select (drag = orbit, untouched). A click is a pointer
+  // press+release that moved < 6px; everything else stays pure OrbitControls.
+  let downPt = null;
+  renderer.domElement.addEventListener('pointerdown', (e) => { downPt = { x: e.clientX, y: e.clientY }; });
+  renderer.domElement.addEventListener('pointerup', (e) => {
+    if (!downPt) return;
+    const moved = Math.hypot(e.clientX - downPt.x, e.clientY - downPt.y);
+    downPt = null;
+    if (moved < 6) handleCanvasClick(e);
+  });
+  window.addEventListener('keydown', (e) => { if (e.key === 'Escape') clearSelection(true); });
   (function loop() { requestAnimationFrame(loop); controls.update(); renderer.render(scene, camera); })();
   // Headless capture hook: render at a capped size + return a compact JPEG data URL
   // for visual verification (the rAF loop makes preview_screenshot hang). Restores
@@ -407,12 +462,13 @@ function addPipe(s) {
     height: len, segments: 10, angle: 360, color: COLORS[layer],
     rotation: new Vector3(rx, ry, rz),
   });
+  cyl.userData.hfPart = { kind: 'pipe', solid: s }; // HF-A1-SELECT
   layerGroups[layer].add(cyl);
 }
 
 // Instanced heads (one draw call for all sprinkler heads). Uses the real CAD
 // part mesh (headPartGeo) when the parts library has one; else a primitive.
-function addInstancedHeads(worldPts) {
+function addInstancedHeads(worldPts, headSolids) {
   if (!worldPts.length) return;
   const geo = headPartGeo || new THREE.SphereGeometry(0.6, 8, 8);
   const mat = new THREE.MeshStandardMaterial({
@@ -423,6 +479,7 @@ function addInstancedHeads(worldPts) {
   const d = new THREE.Object3D();
   worldPts.forEach((p, i) => { d.position.set(p[0], p[1], p[2]); d.rotation.set(0,0,0); d.scale.set(1,1,1); d.updateMatrix(); inst.setMatrixAt(i, d.matrix); });
   inst.instanceMatrix.needsUpdate = true;
+  inst.userData.hfInstanced = { kind: 'head', solids: headSolids || [] }; // HF-A1-SELECT
   layerGroups.HEADS.add(inst);
   window.__headDebug = { usingPartMesh: !!headPartGeo, source: partsSource, vertsPerHead: geo.attributes.position.count, instances: worldPts.length };
 }
@@ -443,6 +500,7 @@ function addInstancedDrops(dropSolids) {
     d.updateMatrix(); inst.setMatrixAt(i, d.matrix);
   });
   inst.instanceMatrix.needsUpdate = true;
+  inst.userData.hfInstanced = { kind: 'drop', solids: dropSolids }; // HF-A1-SELECT
   layerGroups.DROPS.add(inst);
 }
 
@@ -451,7 +509,13 @@ function addInstancedDrops(dropSolids) {
 // else a clearly-marked primitive box. Grouped per componentKey for perf.
 // Sets window.__componentDebug for verification. Best-effort; not mfg-exact.
 function addComponentParts(componentSolids) {
-  if (!componentSolids.length) return;
+  // HF-G3-DROPASM: registry fitting markers superseded by the derived
+  // geometry-accurate fittings (couplings at stock joints, tees/elbows at the
+  // actual junctions, reducers above heads). Rendering both would double-draw
+  // misplaced/oversized barrels at close-up, so these keys are skipped here.
+  const REPLACED_BY_GEOM = new Set(['fitting_coupling', 'fitting_elbow_90', 'fitting_tee', 'fitting_reducer']);
+  componentSolids = componentSolids.filter((s) => !REPLACED_BY_GEOM.has(s.componentKey));
+  if (!componentSolids.length) { window.__componentDebug = { total: 0, byKey: {}, partKeys: 0, primitiveKeys: 0 }; return; }
   const byKey = {};
   for (const s of componentSolids) (byKey[s.componentKey] || (byKey[s.componentKey] = [])).push(s);
   const debug = { total: componentSolids.length, byKey: {}, partKeys: 0, primitiveKeys: 0 };
@@ -470,11 +534,374 @@ function addComponentParts(componentSolids) {
     const d = new THREE.Object3D();
     pts.forEach((p, i) => { d.position.set(p[0], p[1], p[2]); d.rotation.set(0, 0, 0); d.scale.set(1, 1, 1); d.updateMatrix(); inst.setMatrixAt(i, d.matrix); });
     inst.instanceMatrix.needsUpdate = true;
+    inst.userData.hfInstanced = { kind: 'component', componentKey: key, solids: byKey[key] }; // HF-A1-SELECT
     layerGroups.COMPONENTS.add(inst);
     debug.byKey[key] = { count: pts.length, usingPartMesh: usingPart };
     if (usingPart) debug.partKeys++; else debug.primitiveKeys++;
   }
   window.__componentDebug = debug;
+}
+
+// ── HF-G1-COUPLE / HF-G2-THREAD / HF-G3-DROPASM / HF-G4-HANGER / HF-G5-CEILGRID ──
+// Geometry-accuracy pass. Every coordinate below is DERIVED from the cad
+// model's pipe solids (never invented); sizes, stock lengths and spacings are
+// inferred trade conventions + NFPA-13 table values — each part carries a
+// needs-verification flag in the Inspector and is NEVER AHJ/PE/mfg-exact.
+// Orientation math ported from apps/cad/src/lib/fitting-orient.ts (Y-rotation
+// for horizontal runs); hanger spacing ported from lib/hanger-spacing.ts.
+
+// HF-G1-COUPLE: stock pipe stick length by region — AZ ships 24 ft sticks,
+// everywhere else 21 ft (inferred convention; Rexburg ID + SLC UT -> 21 ft).
+function stockLengthFt() { return /\bAZ\b|Arizona/i.test(currentProjectName()) ? 24 : 21; }
+
+// HF-G4-HANGER: NFPA-13 max hanger spacing, steel pipe (ported from
+// apps/cad lib/hanger-spacing.ts; citation: NFPA 13 hanger table — verify adopted edition).
+const MAX_HANGER_SPACING_FT = { 1: 12, 1.25: 12, 1.5: 15, 2: 15, 2.5: 15, 3: 15, 4: 15, 6: 15, 8: 15 };
+const MAX_HANGER_END_FT = 3;
+function maxHangerSpacing(diaIn) {
+  for (const k of Object.keys(MAX_HANGER_SPACING_FT).map(Number).sort((a, b) => a - b)) if (k >= diaIn) return MAX_HANGER_SPACING_FT[k];
+  return 15;
+}
+// hangersForSegment port (pure): minimum count satisfying the 3-ft end
+// distance + max-spacing table, evenly spaced. Short segments get one at mid.
+function hangerTs(lengthFt, diaIn) {
+  if (!(lengthFt > 0)) return [];
+  if (lengthFt < 2 * MAX_HANGER_END_FT) return [0.5];
+  const spacing = maxHangerSpacing(diaIn);
+  const span = lengthFt - 2 * MAX_HANGER_END_FT;
+  const count = Math.max(2, Math.ceil(span / spacing) + 1);
+  const tF = MAX_HANGER_END_FT / lengthFt, tL = (lengthFt - MAX_HANGER_END_FT) / lengthFt;
+  const ts = []; for (let i = 0; i < count; i += 1) ts.push(tF + ((tL - tF) * i) / (count - 1));
+  return ts;
+}
+
+// Rendered (viewer) pipe radius — MUST match addPipe/addInstancedDrops clamps
+// so fittings sit snug over the drawn pipe at both true + exaggerated scale.
+function renderedPipeR(diaIn, isDrop) {
+  return Math.max(isDrop ? 0.12 : 0.25, ((diaIn || 1) / 12 / 2) * pipeVizScale);
+}
+// fitting-orient.ts elbowRotationY/teeRotationY core: world-Y rotation mapping
+// local +X onto the horizontal direction (dx, dz).
+function rotYFor(dx, dz) { return Math.atan2(-dz, dx); }
+
+// Fitting geometry builders (local axis +X = pipe run unless noted).
+function couplingGeoRigid(r) { // snug housing band (~1.35x pipe OD) + end lips
+  const len = Math.max(0.3, r * 1.5);
+  const band = new THREE.CylinderGeometry(r * 1.35, r * 1.35, len * 0.64, 14);
+  const lipA = new THREE.CylinderGeometry(r * 1.48, r * 1.48, len * 0.18, 14); lipA.translate(0, -len * 0.41, 0);
+  const lipB = lipA.clone(); lipB.translate(0, len * 0.82, 0);
+  const g = mergeGeometries([band, lipA, lipB]); g.rotateZ(Math.PI / 2); return g;
+}
+function couplingGeoFlex(r) { // flexible: two separated housing bands
+  const len = Math.max(0.34, r * 1.7);
+  const a = new THREE.CylinderGeometry(r * 1.4, r * 1.4, len * 0.3, 14); a.translate(0, -len * 0.28, 0);
+  const b = a.clone(); b.translate(0, len * 0.56, 0);
+  const g = mergeGeometries([a, b]); g.rotateZ(Math.PI / 2); return g;
+}
+function threadGeo(r, vertical) { // 3 thin ridges = visible threaded end (best-effort)
+  const parts = [];
+  for (let i = -1; i <= 1; i += 1) {
+    const ring = new THREE.CylinderGeometry(r * 1.12, r * 1.12, Math.max(0.035, r * 0.22), 10);
+    ring.translate(0, i * Math.max(0.06, r * 0.38), 0); parts.push(ring);
+  }
+  const g = mergeGeometries(parts);
+  if (!vertical) g.rotateZ(Math.PI / 2);
+  return g;
+}
+function teeGeo(rRun, rStub, stubLen, stubUp) { // run sleeve along X + branch stub
+  const sleeve = new THREE.CylinderGeometry(rRun * 1.3, rRun * 1.3, rRun * 4.4, 12); sleeve.rotateZ(Math.PI / 2);
+  const stub = new THREE.CylinderGeometry(rStub * 1.25, rStub * 1.25, stubLen, 12);
+  stub.translate(0, (stubUp ? 1 : -1) * stubLen / 2, 0);
+  return mergeGeometries([sleeve, stub]);
+}
+function elbowGeo(r, legLen, stubLen, stubUp) { // horizontal leg back along -X + vertical stub
+  const leg = new THREE.CylinderGeometry(r * 1.3, r * 1.3, legLen, 12); leg.rotateZ(Math.PI / 2); leg.translate(-legLen / 2, 0, 0);
+  const stub = new THREE.CylinderGeometry(r * 1.3, r * 1.3, stubLen, 12);
+  stub.translate(0, (stubUp ? 1 : -1) * stubLen / 2, 0);
+  return mergeGeometries([leg, stub]);
+}
+function hangerRingGeo(r) { // band-hanger ring around the pipe, axis along run
+  const g = new THREE.CylinderGeometry(r * 1.22, r * 1.22, Math.max(0.05, r * 0.3), 12);
+  g.rotateZ(Math.PI / 2); return g;
+}
+
+// One InstancedMesh from prebuilt items [{p:[wx,wy,wz], rotY, sy, info}].
+function instancedDetail(geo, color, items, kind, fittingType) {
+  const mat = new THREE.MeshStandardMaterial({ color, metalness: 0.55, roughness: 0.45 });
+  const inst = new THREE.InstancedMesh(geo, mat, items.length);
+  const d = new THREE.Object3D();
+  items.forEach((it, i) => {
+    d.position.set(it.p[0], it.p[1], it.p[2]);
+    d.rotation.set(0, it.rotY || 0, 0);
+    d.scale.set(1, it.sy || 1, 1);
+    d.updateMatrix(); inst.setMatrixAt(i, d.matrix);
+  });
+  inst.instanceMatrix.needsUpdate = true;
+  inst.userData.hfInstanced = { kind, fittingType, solids: items.map((it) => it.info) };
+  return inst;
+}
+
+// HF-G5-CEILGRID: suspended-ceiling 2x4 grid plane(s) at the head elevation(s).
+function renderCeilingGrid(heads) {
+  if (!heads.length || !layerGroups.CEILING) return 0;
+  const byZ = new Map();
+  for (const h of heads) {
+    const z = Math.round((h.position[2] || 0) * 10) / 10;
+    if (!byZ.has(z)) byZ.set(z, []);
+    byZ.get(z).push(h);
+  }
+  let planes = 0;
+  for (const [z, hs] of byZ) {
+    if (hs.length < 4) continue; // skip stray elevations
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    for (const h of hs) {
+      minX = Math.min(minX, h.position[0]); maxX = Math.max(maxX, h.position[0]);
+      minY = Math.min(minY, h.position[1]); maxY = Math.max(maxY, h.position[1]);
+    }
+    minX -= 4; minY -= 4; maxX += 4; maxY += 4;
+    const w = maxX - minX, d = maxY - minY;
+    if (!(w > 0 && d > 0)) continue;
+    const cnv = document.createElement('canvas');
+    const px = Math.min(2048, Math.max(512, Math.round(w * 4)));
+    cnv.width = px; cnv.height = Math.max(64, Math.round(px * d / w));
+    const ctx = cnv.getContext('2d');
+    const sx = cnv.width / w, sy = cnv.height / d;
+    ctx.fillStyle = 'rgba(216,210,194,0.05)'; ctx.fillRect(0, 0, cnv.width, cnv.height);
+    ctx.strokeStyle = 'rgba(216,210,194,0.55)'; ctx.lineWidth = 1;
+    for (let gx = 0; gx <= w; gx += 2) { ctx.beginPath(); ctx.moveTo(gx * sx, 0); ctx.lineTo(gx * sx, cnv.height); ctx.stroke(); } // 2 ft tees
+    for (let gy = 0; gy <= d; gy += 4) { ctx.beginPath(); ctx.moveTo(0, gy * sy); ctx.lineTo(cnv.width, gy * sy); ctx.stroke(); } // 4 ft mains
+    const tex = new THREE.CanvasTexture(cnv);
+    const geo = new THREE.PlaneGeometry(w, d); geo.rotateX(Math.PI / 2);
+    const mesh = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ map: tex, transparent: true, opacity: 0.34, side: THREE.DoubleSide, depthWrite: false }));
+    mesh.position.set((minX + maxX) / 2, z + 0.02, (minY + maxY) / 2);
+    mesh.userData.hfPart = { kind: 'ceiling', solid: { z, widthFt: w, depthFt: d } };
+    layerGroups.CEILING.add(mesh);
+    planes += 1;
+  }
+  return planes;
+}
+
+// Main geometry-accuracy renderer: derives + instances couplings, threaded
+// ends, drop assemblies (tee -> nipple -> reducer -> head) and hangers.
+function renderGeometryDetail(cadModel, ceilFt) {
+  const solids = cadModel.solids || [];
+  const pipes = solids.filter((s) => s.kind === 'pipe' && Array.isArray(s.from) && Array.isArray(s.to));
+  const heads = solids.filter((s) => s.kind === 'head' && Array.isArray(s.position));
+  const stock = stockLengthFt();
+  const runs = [], drops = [];
+  for (const s of pipes) {
+    const d = [s.to[0] - s.from[0], s.to[1] - s.from[1], s.to[2] - s.from[2]];
+    const len = Math.hypot(d[0], d[1], d[2]);
+    if (len < 1e-6) continue;
+    const u = [d[0] / len, d[1] / len, d[2] / len];
+    const rec = { s, len, u, horiz: Math.abs(u[2]) < 0.01 };
+    if (s.role === 'drop') drops.push(rec); else runs.push(rec);
+  }
+  const lerp = (s, t) => [s.from[0] + (s.to[0] - s.from[0]) * t, s.from[1] + (s.to[1] - s.from[1]) * t, s.from[2] + (s.to[2] - s.from[2]) * t];
+  // groupers: geometry depends on rendered radius -> bucket by radius key
+  const buckets = {};
+  const push = (group, rKey, geoFn, color, item) => {
+    const key = group + '::' + rKey;
+    if (!buckets[key]) buckets[key] = { group, geoFn, color, items: [] };
+    buckets[key].items.push(item);
+  };
+  const fmtP = (p) => p.map((v) => Math.round(v * 10) / 10).join(', ');
+
+  let nCoupling = 0, nFlex = 0, nHanger = 0, nTee = 0, nElbow = 0, nReducer = 0, nThread = 0;
+
+  // ── HF-G1-COUPLE: couplings at stock-length joints on every horizontal run ──
+  for (const rec of runs) {
+    if (!rec.horiz) continue; // vertical risers/ties are shorter than a stick here
+    const { s, len, u } = rec;
+    const r = renderedPipeR(s.diameterIn, false);
+    const rotY = rotYFor(u[0], u[1]); // cad y -> world z
+    const flex = s.couplingType === 'flexible' || s.seismic === true; // data-marked only; else rigid (inferred)
+    const joints = Math.max(0, Math.ceil(len / stock) - 1);
+    for (let k = 1; k <= joints; k += 1) {
+      const p = lerp(s, (k * stock) / len);
+      const wp = W(p);
+      const label = flex ? 'Flexible coupling' : 'Rigid coupling';
+      push(flex ? 'couplingFlex' : 'coupling', r.toFixed(3), () => (flex ? couplingGeoFlex(r) : couplingGeoRigid(r)), flex ? 0xd98a3c : 0xc9a84c, {
+        p: wp, rotY,
+        info: { p: wp, label, verify: `coupling type ${flex ? 'flexible (data-marked)' : 'rigid (inferred — no seismic/movement data on this run)'}; stock length ${stock} ft is a regional convention, not AHJ/PE/mfg-exact`, rows: [
+          ['Type', label], ['Pipe size', `${s.diameterIn}"`], ['Joint', `stock-length joint #${k} @ ${stock} ft sticks`],
+          ['Run', s.name || s.role], ['Plan coords (ft)', fmtP(p)],
+        ] },
+      });
+      if (flex) nFlex += 1; else nCoupling += 1;
+    }
+    // ── HF-G2-THREAD: visible threaded ends on threaded (branch) runs ──
+    if (s.role === 'branch' || (s.diameterIn || 0) <= 2) {
+      const inset = Math.min(0.18, len / 4);
+      for (const t of [inset / len, 1 - inset / len]) {
+        const p = lerp(s, t); const wp = W(p);
+        push('thread', r.toFixed(3), () => threadGeo(r, false), 0x8a8f98, {
+          p: wp, rotY,
+          info: { p: wp, label: 'Threaded pipe end', verify: 'threaded-end ridges are a best-effort visual of a threaded joint, not thread-exact geometry', rows: [
+            ['Type', 'Threaded pipe end'], ['Pipe size', `${s.diameterIn}"`], ['Run', s.name || s.role], ['Plan coords (ft)', fmtP(p)],
+          ] },
+        });
+        nThread += 1;
+      }
+    }
+    // ── HF-G4-HANGER: NFPA-spaced hangers (ring + rod to deck) on horizontal runs ──
+    if (s.role === 'main' || s.role === 'branch') {
+      for (const t of hangerTs(len, s.diameterIn)) {
+        const p = lerp(s, t); const wp = W(p);
+        const rodLen = Math.max(0.2, ceilFt - p[2]);
+        push('hangerRing', r.toFixed(3), () => hangerRingGeo(r), COLORS.HANGERS, {
+          p: wp, rotY,
+          info: { p: wp, label: 'Hanger', verify: 'NFPA-13 max-spacing table placement (steel pipe) — spacing is edition-dependent and the hardware is a generic band-hanger visual; verify against the adopted edition', rows: [
+            ['Type', 'Pipe hanger (band + rod)'], ['Pipe size', `${s.diameterIn}"`],
+            ['Max spacing basis', `${maxHangerSpacing(s.diameterIn)} ft (NFPA-13 steel table)`],
+            ['Rod length', `${Math.round(rodLen * 10) / 10} ft to deck`], ['Plan coords (ft)', fmtP(p)],
+          ] },
+        });
+        push('hangerRod', '0', () => { const g = new THREE.CylinderGeometry(0.035, 0.035, 1, 6); g.translate(0, 0.5, 0); return g; }, COLORS.HANGERS, {
+          p: [wp[0], wp[1] + r, wp[2]], sy: Math.max(0.05, rodLen - r),
+          info: { p: wp, label: 'Hanger rod', verify: 'generic rod visual to deck; not hardware-exact', rows: [['Type', 'Hanger rod'], ['Length', `${Math.round(rodLen * 10) / 10} ft`]] },
+        });
+        nHanger += 1;
+      }
+    }
+  }
+
+  // junction helpers for drop/tie fittings
+  const branchRuns = runs.filter((r) => r.s.role === 'branch');
+  const mainRuns = runs.filter((r) => r.s.role === 'main' && r.horiz);
+  const onRun = (rec, p) => { // point on the run (2D plan + same elevation)
+    if (Math.abs(p[2] - rec.s.from[2]) > 0.05) return false;
+    const ax = rec.s.from[0], ay = rec.s.from[1], bx = rec.s.to[0], by = rec.s.to[1];
+    const cross = Math.abs((bx - ax) * (p[1] - ay) - (by - ay) * (p[0] - ax));
+    if (cross / Math.max(1e-6, rec.len) > 0.05) return false;
+    const dot = (p[0] - ax) * (bx - ax) + (p[1] - ay) * (by - ay);
+    return dot >= -0.01 && dot <= rec.len * rec.len + 0.01;
+  };
+  const nearEnd = (rec, p) => {
+    const dA = Math.hypot(p[0] - rec.s.from[0], p[1] - rec.s.from[1]);
+    const dB = Math.hypot(p[0] - rec.s.to[0], p[1] - rec.s.to[1]);
+    if (dA < 0.05) return 'from'; if (dB < 0.05) return 'to'; return null;
+  };
+
+  // ── HF-G3-DROPASM: branch tee (or end-of-line elbow) -> drop nipple ->
+  //    reducing fitting -> sprinkler head. Tee/elbow at the drop top, reducer
+  //    just above the head; the nipple itself is the existing instanced drop. ──
+  for (const drec of drops) {
+    const top = drec.s.from[2] >= drec.s.to[2] ? drec.s.from : drec.s.to;
+    const bot = top === drec.s.from ? drec.s.to : drec.s.from;
+    const dropR = renderedPipeR(drec.s.diameterIn, true);
+    const host = branchRuns.find((b) => onRun(b, top)) || mainRuns.find((m) => onRun(m, top));
+    const stubLen = Math.min(0.32, Math.max(0.12, drec.len * 0.45));
+    if (host) {
+      const hr = renderedPipeR(host.s.diameterIn, false);
+      const end = nearEnd(host, top);
+      const wp = W(top);
+      if (end) { // end-of-line: elbow turning DOWN into the drop (not a tee)
+        const back = end === 'to' ? host.u : [-host.u[0], -host.u[1], -host.u[2]];
+        const rotY = rotYFor(back[0], back[1]);
+        push('elbowDown', hr.toFixed(3), () => elbowGeo(hr, Math.max(0.3, hr * 2.4), stubLen, false), 0xc9a84c, {
+          p: wp, rotY,
+          info: { p: wp, label: 'End-of-line elbow (turn down to drop)', verify: 'inferred end-of-line turn-down fitting; not mfg-exact', rows: [
+            ['Type', '90° elbow, branch end -> drop'], ['Run size', `${host.s.diameterIn}"`], ['Drop size', `${drec.s.diameterIn}"`], ['Plan coords (ft)', fmtP(top)],
+          ] },
+        });
+        nElbow += 1;
+      } else { // mid-run: reducing tee on the branch, branch port down to the drop
+        const rotY = rotYFor(host.u[0], host.u[1]);
+        push('teeDown', hr.toFixed(3) + '/' + dropR.toFixed(3), () => teeGeo(hr, dropR, stubLen, false), 0xc9a84c, {
+          p: wp, rotY,
+          info: { p: wp, label: 'Branch tee (drop take-off)', verify: 'inferred reducing tee at the branch x drop junction; not mfg-exact', rows: [
+            ['Type', 'Tee, branch run x drop outlet'], ['Run size', `${host.s.diameterIn}"`], ['Outlet size', `${drec.s.diameterIn}"`], ['Plan coords (ft)', fmtP(top)],
+          ] },
+        });
+        nTee += 1;
+      }
+    }
+    // reducing fitting just above the head (drop bottom)
+    const wb = W(bot);
+    const redLen = Math.min(0.16, Math.max(0.08, drec.len * 0.25));
+    push('reducer', dropR.toFixed(3), () => { const g = new THREE.CylinderGeometry(dropR * 1.18, dropR * 0.72, redLen, 12); return g; }, 0xc9a84c, {
+      p: [wb[0], wb[1] + redLen / 2 + 0.02, wb[2]],
+      info: { p: wb, label: 'Reducing fitting (drop -> head)', verify: 'inferred drop-to-head reducer; head thread size not mfg-exact', rows: [
+        ['Type', 'Reducer, drop nipple -> sprinkler head'], ['Drop size', `${drec.s.diameterIn}"`], ['Plan coords (ft)', fmtP(bot)],
+      ] },
+    });
+    nReducer += 1;
+    // HF-G2-THREAD: threaded ends on the drop nipple (vertical)
+    for (const [pt, off] of [[top, -0.08], [bot, 0.08]]) {
+      const wp2 = W(pt);
+      push('threadV', dropR.toFixed(3), () => threadGeo(dropR, true), 0x8a8f98, {
+        p: [wp2[0], wp2[1] + off, wp2[2]],
+        info: { p: wp2, label: 'Threaded nipple end', verify: 'best-effort visual of a threaded joint, not thread-exact', rows: [['Type', 'Threaded drop-nipple end'], ['Size', `${drec.s.diameterIn}"`]] },
+      });
+      nThread += 1;
+    }
+  }
+
+  // ── cross-main junction fittings for the riser ties (tee on main, elbow at branch start) ──
+  const ties = runs.filter((r) => r.s.role === 'main-tie');
+  for (const tie of ties) {
+    const top = tie.s.from[2] >= tie.s.to[2] ? tie.s.from : tie.s.to;
+    const bot = top === tie.s.from ? tie.s.to : tie.s.from;
+    const tieR = renderedPipeR(tie.s.diameterIn, false);
+    const main = mainRuns.find((m) => onRun(m, top));
+    if (main) {
+      const mr = renderedPipeR(main.s.diameterIn, false);
+      const wp = W(top);
+      push('teeDown', mr.toFixed(3) + '/' + tieR.toFixed(3), () => teeGeo(mr, tieR, Math.max(0.18, tieR * 1.2), false), 0xc9a84c, {
+        p: wp, rotY: rotYFor(main.u[0], main.u[1]),
+        info: { p: wp, label: 'Cross-main tee (branch tie)', verify: 'inferred tee at the cross-main x riser-tie junction; not mfg-exact', rows: [
+          ['Type', 'Tee, cross-main x riser tie'], ['Run size', `${main.s.diameterIn}"`], ['Outlet size', `${tie.s.diameterIn}"`], ['Plan coords (ft)', fmtP(top)],
+        ] },
+      });
+      nTee += 1;
+    }
+    const branch = branchRuns.find((b) => nearEnd(b, bot));
+    if (branch) {
+      const end = nearEnd(branch, bot);
+      const into = end === 'from' ? branch.u : [-branch.u[0], -branch.u[1], -branch.u[2]]; // direction INTO the branch run
+      const wp = W(bot);
+      push('elbowUp', tieR.toFixed(3), () => elbowGeo(tieR, Math.max(0.3, tieR * 2.4), Math.max(0.18, tieR * 1.2), true), 0xc9a84c, {
+        p: wp, rotY: rotYFor(-into[0], -into[1]), // leg occupies local -X -> point it along the branch
+        info: { p: wp, label: 'Riser-tie elbow (tie -> branch)', verify: 'inferred vertical-to-horizontal elbow; not mfg-exact', rows: [
+          ['Type', '90° elbow, riser tie -> branch line'], ['Size', `${tie.s.diameterIn}" / ${branch.s.diameterIn}"`], ['Plan coords (ft)', fmtP(bot)],
+        ] },
+      });
+      nElbow += 1;
+    }
+  }
+
+  // build the instanced meshes
+  for (const key of Object.keys(buckets)) {
+    const b = buckets[key];
+    const kind = b.group.startsWith('hanger') ? 'hanger' : 'fitting';
+    const target = b.group.startsWith('hanger') ? layerGroups.HANGERS : layerGroups.COMPONENTS;
+    if (!target) continue;
+    try { target.add(instancedDetail(b.geoFn(), b.color, b.items, kind, b.group)); } catch (_) { /* fail-soft per bucket */ }
+  }
+  const ceilingPlanes = renderCeilingGrid(heads);
+
+  const takeoff = {
+    stockLenFt: stock, couplings: nCoupling + nFlex, couplingsRigid: nCoupling, couplingsFlexible: nFlex,
+    hangers: nHanger, dropTees: nTee, endElbows: nElbow, reducers: nReducer, threadBands: nThread, ceilingPlanes,
+  };
+  window.__geomTakeoff = takeoff;
+  window.__geomDebug = { ...takeoff, buckets: Object.keys(buckets).length };
+  // Headless-verification helper: screen coords of the first instance of a
+  // fitting/hanger group so the click-select path can be exercised end-to-end.
+  window.__geomPick = (group) => {
+    let hitMesh = null;
+    for (const t of [layerGroups.COMPONENTS, layerGroups.HANGERS]) {
+      if (!t || hitMesh) continue;
+      t.traverse((o) => { if (!hitMesh && o.userData && o.userData.hfInstanced && o.userData.hfInstanced.fittingType === group) hitMesh = o; });
+    }
+    if (!hitMesh || !hitMesh.userData.hfInstanced.solids.length) return null;
+    const info = hitMesh.userData.hfInstanced.solids[0];
+    const v = new THREE.Vector3(info.p[0], info.p[1], info.p[2]).project(camera);
+    const r = renderer.domElement.getBoundingClientRect();
+    return { x: r.left + (v.x + 1) / 2 * r.width, y: r.top + (1 - (v.y + 1) / 2) / 1 * r.height, label: info.label, world: info.p };
+  };
+  return takeoff;
 }
 
 // Cut door/window openings into a wall via OpenGeometry boolean subtract and
@@ -503,13 +930,14 @@ function cutWall(wallCuboid, s) {
 }
 
 function renderModel(cadModel) {
+  clearSelection(false); // HF-A1-SELECT: model rebuild invalidates the selection
   currentCadModel = cadModel;
   window.__wallDebug = [];
   if (modelGroup) scene.remove(modelGroup);
   modelGroup = new THREE.Group(); scene.add(modelGroup);
   for (const k of Object.keys(COLORS)) { layerGroups[k] = new THREE.Group(); modelGroup.add(layerGroups[k]); }
 
-  const headPts = []; const dropSolids = []; const componentSolids = [];
+  const headPts = []; const headSolids = []; const dropSolids = []; const componentSolids = [];
   let minX=Infinity,maxX=-Infinity,minZ=Infinity,maxZ=-Infinity,ceil=14;
   for (const s of cadModel.solids) {
     if (s.kind === 'wall') {
@@ -522,6 +950,7 @@ function renderModel(cadModel) {
         rotation: new Vector3(0, s.rotationY, 0),
       });
       const wallMesh = cutWall(wall, s); // boolean-subtract door/window holes -> cut mesh
+      wallMesh.userData.hfPart = { kind: 'wall', solid: s }; // HF-A1-SELECT
       layerGroups.WALLS.add(wallMesh);
       try {
         const vc = wallMesh.geometry && wallMesh.geometry.attributes && wallMesh.geometry.attributes.position
@@ -532,23 +961,27 @@ function renderModel(cadModel) {
     } else if (s.kind === 'column') {
       ceil = Math.max(ceil, s.heightFt + (s.baseZ || 0));
       const wc = W([s.x, s.y, (s.baseZ || 0) + s.heightFt/2]);
-      layerGroups.COLUMN.add(new Cuboid({
+      const col = new Cuboid({
         center: new Vector3(wc[0], wc[1], wc[2]),
         width: s.sizeFt, height: s.heightFt, depth: s.sizeFt, color: COLORS.COLUMN,
-      }));
+      });
+      col.userData.hfPart = { kind: 'column', solid: s }; // HF-A1-SELECT
+      layerGroups.COLUMN.add(col);
       minX=Math.min(minX,s.x);maxX=Math.max(maxX,s.x);minZ=Math.min(minZ,s.y);maxZ=Math.max(maxZ,s.y);
     } else if (s.kind === 'pipe') {
       if (s.role === 'drop') dropSolids.push(s); else addPipe(s);
     } else if (s.kind === 'head') {
-      headPts.push(W(s.position));
+      headPts.push(W(s.position)); headSolids.push(s);
     } else if (s.kind === 'component') {
       componentSolids.push(s);
     }
   }
   // Heads + drops are the high-count, identical geometry -> instanced (perf).
-  addInstancedHeads(headPts);
+  addInstancedHeads(headPts, headSolids);
   addInstancedDrops(dropSolids);
-  addComponentParts(componentSolids); // R6: riser assembly / valve / FDC / tees as part meshes
+  addComponentParts(componentSolids); // R6: riser assembly / valve / FDC as part meshes
+  // HF-G1..G5: derived couplings, threaded ends, drop assemblies, hangers, ceiling grid
+  try { renderGeometryDetail(cadModel, ceil); } catch (e) { window.__geomError = String(e && e.message || e); }
 
   const fw = maxX-minX, fd = maxZ-minZ;
   if (fw > 0 && fd > 0) {
@@ -667,7 +1100,7 @@ function playDemo() {
   document.querySelectorAll('#viewSeg button').forEach((x) => x.classList.toggle('on', x.dataset.view === 'iso'));
   setView('iso');
   const structure = ['WALLS', 'COLUMN'];          // rise first
-  const system = ['MAIN', 'BRANCH', 'DROPS', 'HEADS', 'COMPONENTS']; // then the sprinkler system
+  const system = ['MAIN', 'BRANCH', 'DROPS', 'HEADS', 'COMPONENTS', 'HANGERS', 'CEILING']; // then the sprinkler system
   const setY = (keys, sy) => keys.forEach((k) => { if (layerGroups[k]) layerGroups[k].scale.set(1, Math.max(0.0001, sy), 1); });
   setY(structure, 0.0001); setY(system, 0.0001);
   const opts = { wallsMs: 1300, systemMs: 1400, gapMs: 250 };
@@ -694,17 +1127,221 @@ function playDemo() {
 window.__applyDemoFrame = (ms) => {
   const tl = demoTimeline(ms, { wallsMs: 1300, systemMs: 1400, gapMs: 250 });
   ['WALLS', 'COLUMN'].forEach((k) => { if (layerGroups[k]) layerGroups[k].scale.set(1, Math.max(0.0001, tl.wallsT), 1); });
-  ['MAIN', 'BRANCH', 'DROPS', 'HEADS', 'COMPONENTS'].forEach((k) => { if (layerGroups[k]) layerGroups[k].scale.set(1, Math.max(0.0001, tl.systemT), 1); });
+  ['MAIN', 'BRANCH', 'DROPS', 'HEADS', 'COMPONENTS', 'HANGERS', 'CEILING'].forEach((k) => { if (layerGroups[k]) layerGroups[k].scale.set(1, Math.max(0.0001, tl.systemT), 1); });
   return { wallsT: +tl.wallsT.toFixed(3), systemT: +tl.systemT.toFixed(3), done: tl.done };
 };
 
 function buildLayerToggles() {
-  const names = { WALLS: 'Building shell', COLUMN: 'Columns', FLOOR: 'Floor', MAIN: 'Mains / riser', BRANCH: 'Branch lines', DROPS: 'Drops', HEADS: 'Sprinkler heads' };
+  // HF-A1-UNDERLAY: "Floor plan" layer toggles the ground-plane plan underlay (default ON).
+  const names = { PLAN: 'Floor plan', WALLS: 'Building shell', COLUMN: 'Columns', FLOOR: 'Floor', MAIN: 'Mains / riser', BRANCH: 'Branch lines', DROPS: 'Drops', HEADS: 'Sprinkler heads', COMPONENTS: 'Fittings & components', HANGERS: 'Hangers', CEILING: 'Ceiling grid' }; // HF-G4-HANGER + HF-G5-CEILGRID toggles
   $('layers').innerHTML = Object.keys(names).map((k) =>
-    `<div class="layer"><input type="checkbox" id="L_${k}" checked><label for="L_${k}" style="margin:0;color:var(--text)">${names[k]}</label></div>`).join('');
+    `<div class="layer"><input type="checkbox" id="L_${k}" ${k === 'PLAN' ? (planVisible ? 'checked' : '') : 'checked'}><label for="L_${k}" style="margin:0;color:var(--text)">${names[k]}</label></div>`).join('');
   for (const k of Object.keys(names)) {
-    $('L_' + k).onchange = (e) => { if (layerGroups[k]) layerGroups[k].visible = e.target.checked; };
+    $('L_' + k).onchange = (e) => {
+      if (k === 'PLAN') { planVisible = e.target.checked; if (planGroup) planGroup.visible = planVisible; return; }
+      if (layerGroups[k]) layerGroups[k].visible = e.target.checked;
+    };
   }
+}
+
+// ── HF-A1-UNDERLAY: floor-plan ground underlay ──
+function builtinPlanFor(name) {
+  try {
+    if (name === HOME_DEPOT) return homeDepotRexburgFloorPlan();
+    if (name === COOPERATIVE_1881_PROJECT_NAME) return cooperative1881FloorPlan();
+  } catch (_) { /* fixture unavailable */ }
+  return null;
+}
+
+// Draw the plan's room polygons (+25ft grid + room labels) onto a canvas and
+// lay it as a ground-plane texture under the structure. Best-effort drawing of
+// the SAME plan geometry the generator uses — not a surveyed/AHJ plan.
+function renderPlanUnderlay(plan) {
+  if (!planGroup) return;
+  while (planGroup.children.length) {
+    const c = planGroup.children.pop();
+    try { if (c.material && c.material.map) c.material.map.dispose(); if (c.material) c.material.dispose(); if (c.geometry) c.geometry.dispose(); } catch (_) {}
+  }
+  lastPlanBbox = null;
+  if (!plan || !Array.isArray(plan.rooms) || !plan.rooms.length) return;
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  for (const r of plan.rooms) for (const p of (r.polygon || [])) {
+    minX = Math.min(minX, p[0]); maxX = Math.max(maxX, p[0]);
+    minY = Math.min(minY, p[1]); maxY = Math.max(maxY, p[1]);
+  }
+  if (!(maxX > minX && maxY > minY)) return;
+  const w = maxX - minX, d = maxY - minY;
+  const cnv = document.createElement('canvas');
+  const px = Math.min(2048, Math.max(512, Math.round(w * 4)));
+  cnv.width = px; cnv.height = Math.max(64, Math.round(px * d / w));
+  const ctx = cnv.getContext('2d');
+  const sx = cnv.width / w, sy = cnv.height / d;
+  ctx.fillStyle = 'rgba(13,15,22,0.94)'; ctx.fillRect(0, 0, cnv.width, cnv.height);
+  ctx.save();
+  ctx.translate(0, cnv.height); ctx.scale(1, -1); // plan +y up
+  ctx.strokeStyle = 'rgba(255,255,255,0.05)'; ctx.lineWidth = 1;
+  for (let gx = 0; gx <= w; gx += 25) { ctx.beginPath(); ctx.moveTo(gx * sx, 0); ctx.lineTo(gx * sx, cnv.height); ctx.stroke(); }
+  for (let gy = 0; gy <= d; gy += 25) { ctx.beginPath(); ctx.moveTo(0, gy * sy); ctx.lineTo(cnv.width, gy * sy); ctx.stroke(); }
+  for (const r of plan.rooms) {
+    const poly = r.polygon || []; if (poly.length < 3) continue;
+    ctx.beginPath();
+    poly.forEach((p, i) => { const X = (p[0] - minX) * sx, Y = (p[1] - minY) * sy; if (i === 0) ctx.moveTo(X, Y); else ctx.lineTo(X, Y); });
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(200,154,60,0.07)'; ctx.fill();
+    ctx.strokeStyle = 'rgba(255,213,79,0.55)'; ctx.lineWidth = 3; ctx.stroke();
+  }
+  ctx.restore();
+  ctx.fillStyle = 'rgba(242,236,224,0.72)';
+  ctx.font = `${Math.max(14, Math.round(px / 42))}px Inter,system-ui,sans-serif`;
+  ctx.textAlign = 'center';
+  for (const r of plan.rooms) {
+    const poly = r.polygon || []; if (!poly.length) continue;
+    let cx = 0, cy = 0; poly.forEach((p) => { cx += p[0]; cy += p[1]; }); cx /= poly.length; cy /= poly.length;
+    ctx.fillText(`${r.name || 'Room'}${r.hazard ? ' · ' + r.hazard : ''}`, (cx - minX) * sx, cnv.height - (cy - minY) * sy);
+  }
+  const tex = new THREE.CanvasTexture(cnv);
+  const geo = new THREE.PlaneGeometry(w, d);
+  geo.rotateX(Math.PI / 2); // local +y -> world +z (plan +y)
+  const mesh = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ map: tex, transparent: true, opacity: 0.95, side: THREE.DoubleSide, depthWrite: false }));
+  mesh.position.set((minX + maxX) / 2, 0.06, (minY + maxY) / 2);
+  planGroup.add(mesh);
+  planGroup.visible = planVisible;
+  lastPlanBbox = { minX, maxX, minY, maxY };
+  window.__planUnderlay = { rooms: plan.rooms.length, bbox: lastPlanBbox, visible: planVisible };
+}
+
+// ── HF-A1-SELECT: raycast selection + apple-glass inspector + orbit-to-part ──
+const raycaster = new THREE.Raycaster();
+let selectMode = true, selMarker = null, preSelectTarget = null, selectedCount = 0;
+const fmtFt = (n) => (Math.round(Number(n) * 100) / 100) + ' ft';
+const fmtPt = (p) => Array.isArray(p) ? p.map((v) => Math.round(v * 10) / 10).join(', ') : '—';
+const ROLE_LABEL = { main: 'Cross-main', 'main-tie': 'Main tie', riser: 'System riser', branch: 'Branch line', drop: 'Drop' };
+const COMP_LABEL = { riser_assembly: 'Riser assembly', valve_alarm_check: 'Alarm check valve', fdc: 'Fire dept. connection', fitting_tee: 'Tee fitting', head_pendent: 'Pendent head' };
+// Material/coupling are INFERRED defaults (typical wet-system conventions), never mfg/AHJ/PE-exact.
+function pipeMaterial(s) { return s.material || (Number(s.diameterIn) >= 2.5 ? 'Steel, sch-10 (inferred)' : 'Steel, sch-40 (inferred)'); }
+function pipeCoupling(s) {
+  if (s.coupling) return s.coupling;
+  return (s.role === 'branch' || s.role === 'drop') ? 'Threaded (inferred)' : 'Grooved (inferred)';
+}
+
+function clearSelection(restoreTarget) {
+  if (selMarker) {
+    scene.remove(selMarker);
+    try { if (selMarker.geometry) selMarker.geometry.dispose(); if (selMarker.material) selMarker.material.dispose(); } catch (_) {}
+    selMarker = null;
+  }
+  const insp = $('inspector'); if (insp) insp.classList.remove('open');
+  if (restoreTarget && preSelectTarget && controls) { controls.target.copy(preSelectTarget); controls.update(); }
+  preSelectTarget = null;
+}
+
+function showSelMarker(center, sizeFt) {
+  const half = Math.max(0.9, Math.min(8, sizeFt / 2));
+  const box = new THREE.Box3(
+    new THREE.Vector3(center.x - half, center.y - half, center.z - half),
+    new THREE.Vector3(center.x + half, center.y + half, center.z + half));
+  selMarker = new THREE.Box3Helper(box, 0xffd54f);
+  if (selMarker.material) { selMarker.material.depthTest = false; selMarker.material.transparent = true; selMarker.material.opacity = 0.95; }
+  selMarker.renderOrder = 999;
+  scene.add(selMarker);
+}
+
+function openInspector(title, rows, verifyNote) {
+  $('inspTitle').textContent = title;
+  $('inspBody').innerHTML = rows.filter((r) => r && r[1] !== undefined && r[1] !== null && r[1] !== '')
+    .map((r) => `<div class="kv"><span>${r[0]}</span><b>${r[1]}</b></div>`).join('')
+    + (verifyNote ? `<div class="nv-flag">⚠ NEEDS-VERIFICATION — ${verifyNote}</div>` : '');
+  $('inspector').classList.add('open');
+}
+
+// Build {title, rows, center(world THREE.Vector3), sizeFt, verify} for any hit part.
+function describeHit(found) {
+  const toWorld = (p) => { const ww = W(p); return new THREE.Vector3(ww[0], ww[1], ww[2]); };
+  if (found.inst) {
+    const meta = found.inst, i = found.idx, s = (meta.solids || [])[i] || {};
+    // HF-G1..G4: derived fittings + hangers carry prebuilt inspector rows + flags
+    if (meta.kind === 'fitting' || meta.kind === 'hanger') {
+      const c = Array.isArray(s.p) ? new THREE.Vector3(s.p[0], s.p[1], s.p[2]) : found.point.clone();
+      return { title: s.label || (meta.kind === 'hanger' ? 'Hanger' : 'Fitting'), center: c, sizeFt: 1.6, verify: s.verify || 'derived/inferred part — needs verification', rows: s.rows || [] };
+    }
+    if (meta.kind === 'head') {
+      const c = s.position ? toWorld(s.position) : found.point.clone();
+      return { title: `Sprinkler head #${i + 1}`, center: c, sizeFt: 2.2, verify: 'head model/K-factor are placeholders, not manufacturer-exact', rows: [
+        ['Type', 'Pendent sprinkler head'], ['Part mesh', partsSource], ['Plan coords (ft)', fmtPt(s.position)],
+      ] };
+    }
+    if (meta.kind === 'drop') {
+      const s2 = (meta.solids || [])[i] || {};
+      const a = s2.from ? toWorld(s2.from) : found.point.clone(), b = s2.to ? toWorld(s2.to) : found.point.clone();
+      const c = a.clone().add(b).multiplyScalar(0.5);
+      const len = s2.from && s2.to ? a.distanceTo(b) : 0;
+      return { title: 'Drop', center: c, sizeFt: Math.max(2, len), verify: 'material + coupling are inferred conventions, not AHJ/PE/mfg-exact', rows: [
+        ['Type', 'Drop (armover to head)'], ['Size', `${s2.diameterIn || 1}"`], ['Length', fmtFt(len)],
+        ['Material', pipeMaterial({ ...s2, role: 'drop' })], ['Coupling', pipeCoupling({ ...s2, role: 'drop' })],
+        ['From (ft)', fmtPt(s2.from)], ['To (ft)', fmtPt(s2.to)],
+      ] };
+    }
+    if (meta.kind === 'component') {
+      const c = s.position ? toWorld(s.position) : found.point.clone();
+      return { title: COMP_LABEL[meta.componentKey] || meta.componentKey || 'Component', center: c, sizeFt: 3.5, verify: 'generated part geometry, not manufacturer-exact', rows: [
+        ['Type', COMP_LABEL[meta.componentKey] || meta.componentKey], ['Part mesh', (partGeoCache[meta.componentKey] ? 'CAD part (generated)' : 'primitive fallback')],
+        ['Plan coords (ft)', fmtPt(s.position)],
+      ] };
+    }
+  }
+  if (found.part) {
+    const s = found.part.solid || {};
+    if (found.part.kind === 'pipe') {
+      const a = toWorld(s.from), b = toWorld(s.to), c = a.clone().add(b).multiplyScalar(0.5);
+      const len = a.distanceTo(b);
+      return { title: ROLE_LABEL[s.role] || 'Pipe', center: c, sizeFt: Math.min(10, Math.max(2.5, len * 0.2)), verify: 'material + coupling are inferred conventions, not AHJ/PE/mfg-exact', rows: [
+        ['Type', ROLE_LABEL[s.role] || s.role || 'pipe'], ['Size', `${s.diameterIn}"`], ['Length', fmtFt(len)],
+        ['Material', pipeMaterial(s)], ['Coupling', pipeCoupling(s)],
+        ['From (ft)', fmtPt(s.from)], ['To (ft)', fmtPt(s.to)],
+      ] };
+    }
+    if (found.part.kind === 'wall') {
+      const c = s.center ? toWorld([s.center[0], s.center[1], (s.baseZ || 0) + (s.heightFt || 0) / 2]) : found.point.clone();
+      return { title: `Wall (${s.type || 'exterior'})`, center: c, sizeFt: 8, verify: 'simplified shell from the plan fixture, not a surveyed wall', rows: [
+        ['Type', `Wall — ${s.type || 'exterior'}`], ['Length', fmtFt(s.lengthFt || 0)], ['Height', fmtFt(s.heightFt || 0)],
+        ['Thickness', fmtFt(s.thicknessFt || 0)], ['Openings', (s.openings || []).length || '0'],
+      ] };
+    }
+    if (found.part.kind === 'column') {
+      const c = toWorld([s.x, s.y, (s.baseZ || 0) + (s.heightFt || 0) / 2]);
+      return { title: 'Column', center: c, sizeFt: 5, verify: 'simplified structure from the plan fixture', rows: [
+        ['Type', 'Column'], ['Size', fmtFt(s.sizeFt || 0)], ['Height', fmtFt(s.heightFt || 0)], ['Plan coords (ft)', fmtPt([s.x, s.y])],
+      ] };
+    }
+  }
+  return null;
+}
+
+function handleCanvasClick(e) {
+  if (!selectMode || !modelGroup || !camera) return;
+  const r = renderer.domElement.getBoundingClientRect();
+  const ndc = new THREE.Vector2(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+  raycaster.setFromCamera(ndc, camera);
+  const hits = raycaster.intersectObjects(modelGroup.children, true);
+  let found = null;
+  for (const h of hits) {
+    if (h.object.userData && h.object.userData.hfInstanced && h.instanceId !== undefined && h.instanceId !== null) {
+      found = { inst: h.object.userData.hfInstanced, idx: h.instanceId, point: h.point }; break;
+    }
+    let p = h.object;
+    while (p && p !== modelGroup && !(p.userData && p.userData.hfPart)) p = p.parent;
+    if (p && p.userData && p.userData.hfPart) { found = { part: p.userData.hfPart, point: h.point }; break; }
+  }
+  if (!found) { clearSelection(true); return; } // empty click deselects + restores orbit target
+  const info = describeHit(found);
+  if (!info) { clearSelection(true); return; }
+  if (selMarker) { scene.remove(selMarker); try { selMarker.geometry.dispose(); selMarker.material.dispose(); } catch (_) {} selMarker = null; }
+  if (!preSelectTarget) preSelectTarget = controls.target.clone(); // remember pre-selection orbit pivot
+  showSelMarker(info.center, info.sizeFt);
+  openInspector(info.title, info.rows, info.verify);
+  controls.target.copy(info.center); controls.update(); // AutoCAD-style: orbit about the part
+  selectedCount += 1;
+  window.__lastSelection = { title: info.title, center: [info.center.x, info.center.y, info.center.z], n: selectedCount };
 }
 
 // ── data + actions ──
@@ -928,15 +1565,34 @@ async function generate() {
       if (!pdfBase64) { $('status').textContent = 'pick a vector PDF first'; return; }
       if (!(Number($('pdfScale').value) > 0)) { $('status').textContent = 'enter the drawing scale (feet per PDF point) — never guessed'; return; }
     }
-    const { bid, cadModel, hydraulics, hydraulicNetwork, compliance, fullScopeBid, isBuilding } = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/sprinkler-bid', {
+    const data = await api('/projects/' + encodeURIComponent(currentProjectName()) + '/sprinkler-bid', {
       method: 'POST', body: JSON.stringify(lastBody),
     });
-    // R6: preload the part meshes for the distinct component keys in this model
-    // (riser_assembly/valve_alarm_check/fdc/fitting_tee) so renderModel can
-    // instance them synchronously; missing parts fall back to a marked primitive.
-    const compKeys = [...new Set((cadModel.solids || []).filter((s) => s.kind === 'component').map((s) => s.componentKey))];
-    await Promise.all(compKeys.map((k) => loadPartGeo(k, 2.5)));
-    renderModel(cadModel);
+    await applyGenerated(data);
+    saveLayout(data, lastBody); // HF-A1-AUTOLOAD: persist per (project target + source)
+    $('regenBtn').style.display = '';
+    setAutoLoadBadge(Date.now(), 'saved');
+  } catch (e) {
+    $('status').textContent = 'error: ' + e.message;
+  } finally { btn.disabled = false; btn.textContent = 'Generate Layout'; }
+}
+
+// Apply a generated (or saved) sprinkler-bid payload to the viewer + panels.
+// Shared by Generate and the HF-A1-AUTOLOAD path so a saved layout renders
+// identically to a fresh one.
+async function applyGenerated(data) {
+  const { bid, cadModel, hydraulics, hydraulicNetwork, compliance, fullScopeBid, isBuilding, floorPlan } = data;
+  // R6: preload the part meshes for the distinct component keys in this model
+  // (riser_assembly/valve_alarm_check/fdc/fitting_tee) so renderModel can
+  // instance them synchronously; missing parts fall back to a marked primitive.
+  const compKeys = [...new Set((cadModel.solids || []).filter((s) => s.kind === 'component').map((s) => s.componentKey))];
+  // HF-G1-COUPLE: realistic per-component target sizes (the old flat 2.5 ft made
+  // every fitting an oversized barrel at close-up). Inferred typical envelope
+  // sizes, NOT manufacturer-exact (needs-verification surfaces in the Inspector).
+  const COMP_TARGET_FT = { riser_assembly: 3.0, valve_alarm_check: 1.2, fdc: 1.5, fitting_tee: 0.8, fitting_elbow_90: 0.55, fitting_coupling: 0.45, fitting_reducer: 0.4 };
+  await Promise.all(compKeys.map((k) => loadPartGeo(k, COMP_TARGET_FT[k] || 1.5)));
+  renderModel(cadModel);
+  renderPlanUnderlay(floorPlan || builtinPlanFor(currentProjectName()));
     const r = bid.rooms[0];
     $('layout').innerHTML = `
       <div class="kv"><span>Total area</span><b>${bid.totalAreaSqFt.toLocaleString()} sqft</b></div>
@@ -998,7 +1654,13 @@ async function generate() {
       <div class="kv"><span>Full-scope estimate</span><b class="total" style="font-size:14px">${usd(fullScopeBid.fullScopeTotal)}</b></div>
       <div class="muted" style="font-size:10px">best-effort full scope — field labor, system components, soft costs, and overhead &amp; profit are assumption-based estimates (documented public conventions), NOT a quoted bid</div>`
       + (cal ? `<div class="muted" style="font-size:10px;margin-top:4px">vs real bid-log ${usd(cal.referenceTotal)}: <b style="color:${Math.abs(cal.deltaPct) <= 25 ? 'var(--gold)' : 'var(--fire)'}">${cal.deltaPct > 0 ? '+' : ''}${cal.deltaPct}%</b> — ${cal.note}</div>` : '');
-      const rt = cal && cal.realTakeoff;
+      // Defensive: some bid packages carry a partial realTakeoff (no withMarkup
+      // breakdown / source refs). Render the block only when the full shape is
+      // present — a missing breakdown must never abort applyGenerated (it was
+      // hard-erroring Generate on Cooperative 1881).
+      const rt = cal && cal.realTakeoff && cal.realTakeoff.withMarkup
+        && Array.isArray(cal.realTakeoff.sourceRefs) && cal.realTakeoff.sourceRefs.length
+        ? cal.realTakeoff : null;
       if (rt) {
         fsHtml += `
       <div style="border-top:1px solid var(--border);margin-top:8px;padding-top:6px">
@@ -1021,6 +1683,19 @@ async function generate() {
       + fsHtml;
     $('bom').innerHTML = `<table><tr><th>Item</th><th>Qty</th><th>Cost</th><th>Total</th></tr>${
       bid.pricing.lines.map((l) => `<tr><td>${l.description.split('(')[0]}</td><td class="n">${l.quantity}</td><td class="n">${usd(l.unitCost)}</td><td class="n">${usd(l.lineTotal)}</td></tr>`).join('')}</table>`;
+    // HF-G6-BOMTAKEOFF: viewer-derived geometric takeoff (stock-length coupling
+    // joints + NFPA-spaced hangers). Quantities come from the rendered model's
+    // pipe segmentation; they are flagged and NOT added into the totals above.
+    const gt = window.__geomTakeoff;
+    if (gt && (gt.couplings || gt.hangers)) {
+      $('bom').innerHTML += `<table>
+        <tr><th>Geometric takeoff (derived)</th><th>Qty</th><th>Cost</th><th>Total</th></tr>
+        <tr><td>Couplings — stock-length joints @ ${gt.stockLenFt} ft (${gt.couplingsFlexible ? gt.couplingsRigid + ' rigid / ' + gt.couplingsFlexible + ' flex' : 'rigid, inferred'})</td><td class="n">${gt.couplings}</td><td class="n">—</td><td class="n">—</td></tr>
+        <tr><td>Hangers (NFPA-13 max-spacing, steel)</td><td class="n">${gt.hangers}</td><td class="n">—</td><td class="n">—</td></tr>
+        <tr><td>Drop tees / end + tie elbows / reducers</td><td class="n">${gt.dropTees}/${gt.endElbows}/${gt.reducers}</td><td class="n">—</td><td class="n">—</td></tr>
+      </table>
+      <div class="est" style="margin-top:4px">⚠ NEEDS-VERIFICATION — viewer-derived from pipe segmentation (${gt.stockLenFt} ft sticks, NFPA hanger table); counts not priced + not in the totals above</div>`;
+    }
     $('warn').textContent = (bid.pricing.anyEstimated ? '⚠ some unit costs are fallback estimates. ' : '')
       + cadModel.disclaimer;
     ['dxfBtn','stepBtn','ifcBtn','stlBtn'].forEach((id) => { $(id).disabled = false; });
@@ -1031,10 +1706,103 @@ async function generate() {
     const compNote = (cadModel.counts && cadModel.counts.components)
       ? ` · ${cadModel.counts.components} components (${cd ? cd.partKeys : 0} part types as meshes, ${cd ? cd.primitiveKeys : 0} primitive fallback)`
       : '';
-    $('status').textContent = `rendered ${cadModel.counts.heads} heads · ${cadModel.counts.pipes} pipe segments · ${headsNote}${compNote}`;
-  } catch (e) {
-    $('status').textContent = 'error: ' + e.message;
-  } finally { btn.disabled = false; btn.textContent = 'Generate Layout'; }
+    const gtl = window.__geomTakeoff;
+    const geomNote = gtl ? ` · ${gtl.couplings} couplings · ${gtl.hangers} hangers` : '';
+    $('status').textContent = `rendered ${cadModel.counts.heads} heads · ${cadModel.counts.pipes} pipe segments · ${headsNote}${compNote}${geomNote}`;
+}
+
+// ── HF-A1-AUTOLOAD: per-(project target + source) layout persistence ──
+const LAYOUT_STORE_PREFIX = 'hfStudioLayout.v1::';
+function layoutKey() { return LAYOUT_STORE_PREFIX + currentProjectName() + '::' + $('planSource').value; }
+function setAutoLoadBadge(ts, mode) {
+  const b = $('autoLoadBadge'); if (!b) return;
+  const t = new Date(ts);
+  b.textContent = `● ${mode === 'saved' ? 'layout saved' : 'auto-loaded'} ${t.toLocaleDateString()} ${t.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+  b.classList.add('show');
+}
+function saveLayout(data, body) {
+  try {
+    const slimBody = { ...(body || {}) }; delete slimBody.pdf; // never persist the PDF base64 (quota)
+    localStorage.setItem(layoutKey(), JSON.stringify({
+      savedAt: Date.now(),
+      body: slimBody,
+      data: {
+        bid: data.bid, cadModel: data.cadModel, hydraulics: data.hydraulics,
+        hydraulicNetwork: data.hydraulicNetwork, compliance: data.compliance,
+        fullScopeBid: data.fullScopeBid, isBuilding: data.isBuilding, floorPlan: data.floorPlan || null,
+      },
+    }));
+  } catch (_) { /* quota exceeded -> session-only, honest no-op */ }
+}
+function loadSavedLayout() {
+  try {
+    const raw = localStorage.getItem(layoutKey());
+    if (!raw) return null;
+    const p = JSON.parse(raw);
+    return (p && p.data && p.data.cadModel && p.data.bid) ? p : null;
+  } catch (_) { return null; }
+}
+let autoLoading = false;
+// On load + target/source change: saved layout -> render immediately (no
+// Generate click); else show the floor-plan underlay by default.
+async function autoLoadOrUnderlay() {
+  if (!ogReady || autoLoading) return;
+  autoLoading = true;
+  try {
+    clearSelection(false);
+    const saved = loadSavedLayout();
+    if (saved) {
+      lastBody = saved.body || lastBody;
+      await applyGenerated(saved.data);
+      setAutoLoadBadge(saved.savedAt, 'auto');
+      $('regenBtn').style.display = '';
+      $('status').textContent = `auto-loaded saved layout (${saved.data.cadModel.counts.heads} heads) · Regenerate to rebuild`;
+    } else {
+      $('autoLoadBadge').classList.remove('show');
+      $('regenBtn').style.display = 'none';
+      if (modelGroup) { scene.remove(modelGroup); modelGroup = null; }
+      currentCadModel = null;
+      ['dxfBtn', 'stepBtn', 'ifcBtn', 'stlBtn', 'submitBtn'].forEach((id) => { if ($(id)) $(id).disabled = true; });
+      renderPlanUnderlay(builtinPlanFor(currentProjectName()));
+      buildLayerToggles();
+      if (lastPlanBbox) frameCamera(lastPlanBbox.minX, lastPlanBbox.maxX, lastPlanBbox.minY, lastPlanBbox.maxY, 14);
+      $('layout').innerHTML = '<span class="muted" style="font-size:12px">No saved layout for this project + source yet — Generate to begin.</span>';
+      ['pipes', 'hydraulics', 'compliance'].forEach((id) => { $(id).innerHTML = '<span class="muted" style="font-size:12px">—</span>'; });
+      $('bid').innerHTML = ''; $('bom').innerHTML = ''; $('warn').textContent = '';
+      $('status').textContent = 'floor-plan underlay · Generate Layout to build the sprinkler system';
+    }
+  } finally { autoLoading = false; }
+}
+
+// ── HF-A1-SRCLOCK: bid-originated projects always source from the AI-pulled email PDF ──
+const BUILTIN_TARGETS = new Set([HOME_DEPOT, COOPERATIVE_1881_PROJECT_NAME]);
+const bidTargets = new Set();
+async function loadProjectTargets() {
+  try {
+    const list = await api('/projects');
+    for (const p of (Array.isArray(list) ? list : [])) {
+      if (!p || !p.name || BUILTIN_TARGETS.has(p.name)) continue;
+      bidTargets.add(p.name);
+      if (![...$('projectTarget').options].some((o) => o.value === p.name)) {
+        const o = document.createElement('option');
+        o.value = p.name; o.textContent = p.name + ' (bid)';
+        $('projectTarget').appendChild(o);
+      }
+    }
+  } catch (_) { /* keep built-in targets */ }
+  applySourcePolicy();
+}
+function applySourcePolicy() {
+  const isBid = bidTargets.has(currentProjectName());
+  const sel = $('planSource');
+  if (isBid) {
+    if (sel.value !== 'pdf') { sel.value = 'pdf'; sel.dispatchEvent(new Event('change')); }
+    sel.disabled = true;
+    $('sourceLockNote').style.display = 'block';
+  } else {
+    sel.disabled = false;
+    $('sourceLockNote').style.display = 'none';
+  }
 }
 
 $('planSource').onchange = (e) => {
@@ -1047,7 +1815,9 @@ $('planSource').onchange = (e) => {
     ? 'DXF (ENTITIES: LWPOLYLINE / LINE / CIRCLE; layers ROOMS/WALLS-EXT/WALLS-INT/DOOR/COLUMN for buildings)'
     : 'SVG (rect / polygon / path)';
   if ($('svgInput')) $('svgInput').placeholder = isDxf ? '0\nSECTION\n2\nENTITIES\n…\n0\nEOF' : '<svg><rect x="0" y="0" width="60" height="40" data-hazard="ordinary"/></svg>';
+  autoLoadOrUnderlay(); // HF-A1-AUTOLOAD: source change re-checks the saved layout
 };
+$('projectTarget').onchange = () => { applySourcePolicy(); autoLoadOrUnderlay(); };
 if ($('pdfFile')) $('pdfFile').onchange = async (e) => {
   const f = e.target.files && e.target.files[0];
   if (!f) { pdfBase64 = ''; return; }
@@ -1121,7 +1891,30 @@ if ($('pdfCandidateBtn')) $('pdfCandidateBtn').onclick = async () => {
 };
 if ($('pdfDecisionBtn')) $('pdfDecisionBtn').onclick = savePdfBoundaryDecision;
 if ($('pdfDecisionLoadBtn')) $('pdfDecisionLoadBtn').onclick = loadPdfBoundaryDecision;
-$('exaggerate').onchange = (e) => { pipeVizScale = e.target.checked ? 6 : 1; if (currentCadModel) renderModel(currentCadModel); };
+// HF-A1-TRUESCALE: checkbox (left panel) and "True scale" toolbar toggle stay in sync.
+function setExaggerate(on) {
+  $('exaggerate').checked = on;
+  pipeVizScale = on ? 6 : 1;
+  $('scaleBtn').classList.toggle('on', !on);
+  if (currentCadModel) renderModel(currentCadModel);
+}
+$('exaggerate').onchange = (e) => setExaggerate(e.target.checked);
+$('scaleBtn').onclick = () => setExaggerate($('scaleBtn').classList.contains('on'));
+// HF-A1-CADBAR: Fit view re-frames the whole model (or the plan underlay).
+$('fitBtn').onclick = () => {
+  clearSelection(false);
+  const f = window._frame;
+  if (f && f.bbox) frameCamera(f.bbox.minX, f.bbox.maxX, f.bbox.minY, f.bbox.maxY, f.ceil || 14);
+  else if (lastPlanBbox) frameCamera(lastPlanBbox.minX, lastPlanBbox.maxX, lastPlanBbox.minY, lastPlanBbox.maxY, 14);
+};
+// HF-A1-SELECT: select-mode toggle — orbit always works; this only gates click-select.
+$('selBtn').onclick = () => {
+  selectMode = !selectMode;
+  $('selBtn').classList.toggle('on', selectMode);
+  if (!selectMode) clearSelection(true);
+};
+$('inspClose').onclick = () => clearSelection(true);
+$('regenBtn').onclick = generate;
 $('genBtn').onclick = generate;
 $('submitBtn').onclick = async () => {
   const btn = $('submitBtn'); btn.disabled = true; const label = btn.textContent; btn.textContent = 'Building…';
@@ -1168,7 +1961,11 @@ document.querySelectorAll('#viewSeg button').forEach((b) => {
   b.onclick = () => { if (demoRAF) { cancelAnimationFrame(demoRAF); demoRAF = null; $('demoBtn').disabled = false; } document.querySelectorAll('#viewSeg button').forEach((x) => x.classList.remove('on')); b.classList.add('on'); setView(b.dataset.view); };
 });
 
-(async () => { await initStudio(); })();
+(async () => {
+  await initStudio();
+  await loadProjectTargets();   // HF-A1-SRCLOCK: bid projects -> email-PDF source, locked
+  await autoLoadOrUnderlay();   // HF-A1-AUTOLOAD: saved layout or plan underlay, no Generate click
+})();
 </script>
 </body>
 </html>

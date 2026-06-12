@@ -118,11 +118,14 @@
     body.hf-studio-glass #viewport{height:min(58vh,460px)}
   }
 </style>
+<!-- Shared cookie-session auth guard (HFAuth). Classic script: window.HFAuth
+     exists before the module script below runs. -->
+<script src="/public/halofire-auth.js"></script>
 </head>
 <body class="hf-shell hf-studio-glass">
 <header>
   <div class="brand">Halo<span>Fire</span> · Workbench</div>
-  <div class="who"><a href="/crm.html" style="margin-right:14px">CRM</a><a href="/autosprink.html" style="margin-right:14px">Sprinkler Studio →</a><a href="/settings.html" style="margin-right:14px">Settings &amp; Parity</a><span id="whoami">…</span><a id="logout">Sign out</a></div>
+  <div class="who"><a href="/calendar.html" style="margin-right:14px">← Calendar</a><a href="/crm.html" style="margin-right:14px">CRM</a><a href="/autosprink.html" style="margin-right:14px">Sprinkler Studio →</a><a href="/settings.html" style="margin-right:14px">Settings &amp; Parity</a><span id="whoami" data-whoami>…</span><a id="logout">Sign out</a></div>
 </header>
 <div class="alpha-banner" id="banner">INTERNAL ALPHA · best-effort · NOT AHJ-approved · NOT PE-reviewed · NOT AutoSprink-parity · NOT fabrication-ready</div>
 <main>
@@ -204,25 +207,10 @@ import { OpenGeometry, Vector3, Cuboid, Cylinder } from 'opengeometry';
 const HOME_DEPOT = 'Home Depot - Rexburg ID';
 const HALOFIRE_BASE_PATH = window.location.pathname.startsWith('/halo-fire/') ? '/halo-fire' : '';
 const HALOFIRE_API_BASE = HALOFIRE_BASE_PATH + '/' + 'api';
-function authRedirect(){
-  const redirectTarget = window.location.pathname + window.location.search + window.location.hash;
-  location.href = HALOFIRE_BASE_PATH + '/?redirect=' + encodeURIComponent(redirectTarget);
-}
-function readStoredToken(){
-  try{
-    return localStorage.getItem('halofire_token') || sessionStorage.getItem('halofire_token');
-  }catch(_){
-    return null;
-  }
-}
-function clearStoredToken(){
-  try{ localStorage.removeItem('halofire_token'); }catch(_){}
-  try{ localStorage.removeItem('halofire_user'); }catch(_){}
-  try{ sessionStorage.removeItem('halofire_token'); }catch(_){}
-  try{ sessionStorage.removeItem('halofire_user'); }catch(_){}
-}
-clearStoredToken();
-const token = readStoredToken();
+// Cookie-session auth via shared HFAuth guard (/public/halofire-auth.js).
+// HFAuth.guard() (in load(), below) is the ONLY place that may redirect to
+// login, and only on a real 401 from /api/auth/me. Feature API calls that 401
+// just throw — the old blanket 401->redirect here caused false logouts.
 
 function normalizeApiPath(path = '') {
   const value = String(path || '').trim();
@@ -234,29 +222,10 @@ function normalizeApiPath(path = '') {
 
 function api(path, options = {}) {
   const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
-  if (token) headers.Authorization = 'Bearer ' + token;
-  return fetch(HALOFIRE_API_BASE + normalizeApiPath(path), {
-    ...options,
-    credentials: 'include',
-    headers,
-  }).then(async (r) => {
-    if (r.status === 401) { clearStoredToken(); authRedirect(); throw new Error('unauth'); }
-    if (!r.ok) throw new Error(await r.text());
-    return r.json();
-  });
+  return HFAuth.api(normalizeApiPath(path), { ...options, headers });
 }
 
-document.getElementById('logout').onclick = async () => {
-  try{
-    await fetch(HALOFIRE_API_BASE + '/auth/logout', {
-      method: 'POST',
-      credentials: 'include',
-      headers: token ? { Authorization: 'Bearer ' + token } : {},
-    });
-  }catch(_){}
-  clearStoredToken();
-  location.href = HALOFIRE_BASE_PATH + '/';
-};
+document.getElementById('logout').onclick = () => { HFAuth.logout(); };
 
 const usd = (n) => '$' + Number(n).toLocaleString('en-US', { maximumFractionDigits: 0 });
 let resolverQueueFilterQuery = '';
@@ -329,10 +298,9 @@ async function refreshClaimGates() {
 }
 
 async function load() {
-  try {
-    const me = await api('/auth/me');
-    document.getElementById('whoami').textContent = me.name + ' · ' + me.role;
-  } catch (_) { return; }
+  // guard() fills [data-whoami] and redirects to login on a real 401.
+  const me = await HFAuth.guard().catch(() => null);
+  if (!me) return;
 
   const projectName = currentProjectName();
   const projects = await api('/projects');
@@ -7905,7 +7873,7 @@ document.getElementById('dxfBtn').onclick = async () => {
   const res = await fetch(HALOFIRE_API_BASE + '/projects/' + encodeURIComponent(currentProjectName()) + '/cad.dxf', {
     method: 'POST',
     credentials: 'include',
-    headers: token ? { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token } : { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(lastBody),
   });
   if (!res.ok) return;
