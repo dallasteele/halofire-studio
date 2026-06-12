@@ -9,6 +9,7 @@ import helmet from 'helmet';
 import path from 'path';
 import fs from 'fs';
 import { spawnSync } from 'node:child_process';
+import { createHash, randomBytes } from 'node:crypto';
 import { fileURLToPath } from 'url';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
@@ -119,6 +120,16 @@ function initDatabase() {
       name TEXT NOT NULL,
       role TEXT DEFAULT 'user',
       email TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS auth_tokens (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      purpose TEXT NOT NULL,
+      token_hash TEXT UNIQUE NOT NULL,
+      expires_at DATETIME NOT NULL,
+      used_at DATETIME,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
 
@@ -515,6 +526,66 @@ function requireRole(role) {
   };
 }
 
+function canonicalEmail(value) {
+  return String(value || '').trim().toLowerCase();
+}
+
+function isValidEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+function hashAuthToken(token) {
+  return createHash('sha256').update(token).digest('hex');
+}
+
+function createOneTimeAuthToken(userId, purpose, ttlHours = 72) {
+  const raw = randomBytes(32).toString('base64url');
+  const expires = new Date(Date.now() + ttlHours * 60 * 60 * 1000).toISOString();
+  db.prepare('INSERT INTO auth_tokens (user_id, purpose, token_hash, expires_at) VALUES (?, ?, ?, ?)').run(
+    userId,
+    purpose,
+    hashAuthToken(raw),
+    expires,
+  );
+  return { raw, expires };
+}
+
+function findUsableAuthToken(rawToken, purpose) {
+  if (!rawToken || typeof rawToken !== 'string') return null;
+  return db.prepare(`
+    SELECT auth_tokens.*, users.username, users.name, users.role, users.email
+    FROM auth_tokens
+    JOIN users ON users.id = auth_tokens.user_id
+    WHERE auth_tokens.token_hash = ?
+      AND auth_tokens.purpose = ?
+      AND auth_tokens.used_at IS NULL
+      AND datetime(auth_tokens.expires_at) > datetime('now')
+  `).get(hashAuthToken(rawToken), purpose);
+}
+
+function consumeAuthToken(id) {
+  db.prepare("UPDATE auth_tokens SET used_at = datetime('now') WHERE id = ? AND used_at IS NULL").run(id);
+}
+
+function issueSessionForUser(req, res, user) {
+  const role = normalizeRole(user.role);
+  const token = jwt.sign({ id: user.id, username: user.username, name: user.name, role }, JWT_SECRET, { expiresIn: '24h' });
+  res.cookie(AUTH_COOKIE_NAME, token, {
+    ...sessionCookieOptions(req),
+    maxAge: 24 * 60 * 60 * 1000,
+  });
+  return { token, user: { id: user.id, username: user.username, name: user.name, role, email: user.email } };
+}
+
+function publicLoginUrl(req, params = {}) {
+  const base = process.env.HALOFIRE_PUBLIC_URL || `${req.protocol}://${req.get('host')}/`;
+  const url = new URL(base);
+  for (const [key, value] of Object.entries(params)) {
+    if (value != null && value !== '') url.searchParams.set(key, value);
+  }
+  return url.toString();
+}
+
 function buildAllowedUpdate(body, allowedFields) {
   const entries = Object.entries(body).filter(([key]) => key !== 'id');
   const rejected = entries.filter(([key]) => !allowedFields.has(key)).map(([key]) => key);
@@ -541,13 +612,73 @@ app.post('/api/auth/login', (req, res) => {
   if (!user || !bcrypt.compareSync(password, user.password_hash)) {
     return res.status(401).json({ error: 'Invalid credentials' });
   }
-  const role = normalizeRole(user.role);
-  const token = jwt.sign({ id: user.id, username: user.username, name: user.name, role }, JWT_SECRET, { expiresIn: '24h' });
-  res.cookie(AUTH_COOKIE_NAME, token, {
-    ...sessionCookieOptions(req),
-    maxAge: 24 * 60 * 60 * 1000,
+  res.json(issueSessionForUser(req, res, user));
+});
+
+app.post('/api/auth/invite', authMiddleware, requireRole('admin'), (req, res) => {
+  const email = canonicalEmail(req.body?.email);
+  const name = String(req.body?.name || email).trim();
+  const role = normalizeRole(req.body?.role || 'user') === 'admin' ? 'admin' : 'user';
+  if (!isValidEmail(email)) return res.status(400).json({ error: 'Valid employee email is required' });
+
+  let user = db.prepare('SELECT * FROM users WHERE username = ?').get(email);
+  if (!user) {
+    const disabledHash = bcrypt.hashSync(randomBytes(24).toString('base64url'), 12);
+    const info = db.prepare('INSERT INTO users (username, password_hash, name, role, email) VALUES (?, ?, ?, ?, ?)').run(
+      email,
+      disabledHash,
+      name,
+      role,
+      email,
+    );
+    user = db.prepare('SELECT * FROM users WHERE id = ?').get(info.lastInsertRowid);
+  } else {
+    db.prepare('UPDATE users SET name = ?, role = ?, email = ? WHERE id = ?').run(name || user.name, role, email, user.id);
+    user = db.prepare('SELECT * FROM users WHERE id = ?').get(user.id);
+  }
+
+  const setup = createOneTimeAuthToken(user.id, 'employee_invite', 72);
+  res.status(201).json({
+    setup_token: setup.raw,
+    invite_url: publicLoginUrl(req, { username: email, setup: setup.raw }),
+    expires_at: setup.expires,
+    user: { id: user.id, username: user.username, name: user.name, role: normalizeRole(user.role), email: user.email },
   });
-  res.json({ token, user: { id: user.id, username: user.username, name: user.name, role } });
+});
+
+app.get('/api/auth/setup/verify', (req, res) => {
+  const token = findUsableAuthToken(req.query?.token, 'employee_invite')
+    || findUsableAuthToken(req.query?.token, 'password_reset');
+  if (!token) return res.status(400).json({ error: 'Invalid or expired setup link' });
+  res.json({
+    username: token.username,
+    email: token.email,
+    name: token.name,
+    role: normalizeRole(token.role),
+    expires_at: token.expires_at,
+  });
+});
+
+app.post('/api/auth/setup-password', (req, res) => {
+  const { token: rawToken, password } = req.body || {};
+  const found = findUsableAuthToken(rawToken, 'employee_invite')
+    || findUsableAuthToken(rawToken, 'password_reset');
+  if (!found) return res.status(400).json({ error: 'Invalid or expired setup link' });
+  if (typeof password !== 'string' || password.length < 12) {
+    return res.status(400).json({ error: 'Password must be at least 12 characters' });
+  }
+  const passwordHash = bcrypt.hashSync(password, 12);
+  db.prepare('UPDATE users SET password_hash = ? WHERE id = ?').run(passwordHash, found.user_id);
+  consumeAuthToken(found.id);
+  const user = db.prepare('SELECT id, username, name, role, email FROM users WHERE id = ?').get(found.user_id);
+  res.json(issueSessionForUser(req, res, user));
+});
+
+app.post('/api/auth/password-recovery/request', (req, res) => {
+  const emailOrUsername = canonicalEmail(req.body?.email || req.body?.username);
+  const user = db.prepare('SELECT * FROM users WHERE lower(username) = ? OR lower(email) = ?').get(emailOrUsername, emailOrUsername);
+  if (user) createOneTimeAuthToken(user.id, 'password_reset', 2);
+  res.status(202).json({ ok: true });
 });
 
 app.post('/api/auth/logout', (req, res) => {
