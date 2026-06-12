@@ -919,7 +919,7 @@
   {
    "id": "W15A-cutsheet-dims-parse",
    "title": "Parts > parse cut-sheet text into CutSheetDims (pure)",
-   "status": "blocked",
+   "status": "done",
    "phase": "wave15-scraper",
    "write_roots": [
     "apps/cad/src/lib",
@@ -930,12 +930,13 @@
    "gate": "cd apps/cad && npx vitest run test/cutsheet-dims-parse.test.ts",
    "attempts": 6,
    "spec": "Pure strict-TS module apps/cad/src/lib/cutsheet-dims-parse.ts. A scraped manufacturer cut sheet gives a text blob plus a known partType and nominalIn; extract the dimensions the emitters need. export function parseCutSheetDims(text, partType, nominalIn) returning a CutSheetDims object compatible with cutsheet-to-model (read apps/cad/src/lib/cutsheet-to-model.ts for the exact CutSheetDims shape; import that type, do not redefine). Strategy: find numbers near labels in the text using case-insensitive regex \u2014 odIn from outside diameter or OD, wallIn from wall, lengthIn from length or laying length, centerToEndIn from center to end or C to E, branchCenterToEndIn from branch. Numbers may be decimal inches. When a required field for the partType is not found in the text, OMIT it (let the downstream emitter throw or the caller flag it) and record it in a returned missing array. Return shape: object with dims (the CutSheetDims) and missing (array of field names not found). Pure, never throws on a string input; throws TypeError only when text is not a string. Files MUST be apps/cad/src/lib/cutsheet-dims-parse.ts and apps/cad/test/cutsheet-dims-parse.test.ts. Tests: a sample tee cut-sheet text yields odIn and the center-to-end fields parsed correctly with empty missing; a sparse text yields the found fields and lists the rest in missing; non-string throws TypeError. HINT after blocked run: keep the file small and the regexes simple; emit valid JSON with all backslashes in regex escaped; if unsure, use new RegExp with a plain string pattern instead of slash-literals.",
-   "last_error": " FAIL  test/cutsheet-dims-parse.test.ts > parseCutSheetDims > parses tee dimensions correctly\n      9|         expect(result.dims).toEqual({ odIn: 2.0, wallIn: 0.1, centerTo\u2026\n     10|         expect(result.missing).toEqual([]);\n FAIL  test/cutsheet-dims-parse.test.ts > parseCutSheetDims > handles missing fields\n     16|         expect(result.dims).toEqual({ odIn: 2.0 });\n     17|         expect(result.missing).toEqual(['wallIn', 'centerToEndIn', 'br\u2026"
+   "last_error": " FAIL  test/cutsheet-dims-parse.test.ts > parseCutSheetDims > parses tee dimensions correctly\n      9|         expect(result.dims).toEqual({ odIn: 2.0, wallIn: 0.1, centerTo\u2026\n     10|         expect(result.missing).toEqual([]);\n FAIL  test/cutsheet-dims-parse.test.ts > parseCutSheetDims > handles missing fields\n     16|         expect(result.dims).toEqual({ odIn: 2.0 });\n     17|         expect(result.missing).toEqual(['wallIn', 'centerToEndIn', 'br\u2026",
+   "note": "hand-built by Claude Tier-2 (b9b55d3). Do not regenerate."
   },
   {
    "id": "W16A-claim-gate-flag",
    "title": "Claim gates > convert blocked gates to needs-verification flags (pure)",
-   "status": "blocked",
+   "status": "done",
    "phase": "wave16-ungate-claim-gates",
    "write_roots": [
     "apps/autosprink/src",
@@ -946,12 +947,13 @@
    "gate": "cd apps/autosprink && npx vitest run tests/claim-gate-flag.test.js",
    "attempts": 6,
    "spec": "Pure ESM module apps/autosprink/src/autobid/claim-gate-flag.js. Doctrine flag-do-not-gate: a claim gate must never present as a hard block; it presents as a usable item flagged needs-verification with what is still required. export function gateFlag(gate) where gate has fields code, missing_artifact, next_action, status, and optional resolved_by. Returns an object with verificationStatus equal to human-verified when status is resolved or resolved_by is set, otherwise needs-verification; usable true ALWAYS; label a short human string; note set to the missing_artifact plus next_action; residual the missing_artifact string when needs-verification else empty string. export function gatesSummary(gates) returning an object with total, verified (count human-verified), needsVerification, and a summary string like 1 of 4 verified, 3 need verification. Never throws on array or object input of the right shape; throws TypeError on non-object gate. Files MUST be apps/autosprink/src/autobid/claim-gate-flag.js and apps/autosprink/tests/claim-gate-flag.test.js. Tests: a blocked AHJ gate maps to needs-verification usable true with residual naming the AHJ artifact; a resolved gate maps to human-verified; gatesSummary counts correctly; non-object throws.",
-   "last_error": "\n RUN  v2.1.9 /opt/hal9000/apps/halofire-studio/apps/autosprink\n\n \u276f tests/claim-gate-flag.test.js (0 test)\n\n Test Files  1 failed (1)\n      Tests  no tests\n   Start at  16:21:20\n   Duration  315ms (transform 40ms, setup 0ms, collect 0ms, tests 0ms, environment 0ms, prepare 72ms)\n\n\n\u23af\u23af\u23af\u23af\u23af\u23af Failed Suites 1 \u23af\u23af\u23af\u23af\u23af\u23af\u23af\n\n FAIL  tests/claim-gate-flag.test.js [ tests/claim-gate-flag.test.js ]\nReferenceError: describe is not defined\n \u276f tests/claim-gate-flag.test.js:17:1\n     15| const gatesArray = [testGate, resolvedGate];\n     16| \n     17| describe('gateFlag function', () => {\n       | ^\n     18|   it('should return needs-verification for blocked gate', () => {\n     19|     const result = gateFlag(testGate);\n\n\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af[1/1]\u23af\n\n"
+   "last_error": "\n RUN  v2.1.9 /opt/hal9000/apps/halofire-studio/apps/autosprink\n\n \u276f tests/claim-gate-flag.test.js (0 test)\n\n Test Files  1 failed (1)\n      Tests  no tests\n   Start at  16:21:20\n   Duration  315ms (transform 40ms, setup 0ms, collect 0ms, tests 0ms, environment 0ms, prepare 72ms)\n\n\n\u23af\u23af\u23af\u23af\u23af\u23af Failed Suites 1 \u23af\u23af\u23af\u23af\u23af\u23af\u23af\n\n FAIL  tests/claim-gate-flag.test.js [ tests/claim-gate-flag.test.js ]\nReferenceError: describe is not defined\n \u276f tests/claim-gate-flag.test.js:17:1\n     15| const gatesArray = [testGate, resolvedGate];\n     16| \n     17| describe('gateFlag function', () => {\n       | ^\n     18|   it('should return needs-verification for blocked gate', () => {\n     19|     const result = gateFlag(testGate);\n\n\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af[1/1]\u23af\n\n",
+   "note": "hand-built by Claude Tier-2 (b9b55d3). Do not regenerate."
   },
   {
    "id": "W16B-claim-gates-api-flag",
    "title": "Claim gates > API returns flags + usable, never a top-level block",
-   "status": "blocked",
+   "status": "done",
    "phase": "wave16-ungate-claim-gates",
    "write_roots": [
     "apps/autosprink/src",
@@ -962,12 +964,13 @@
    "gate": "cd apps/autosprink && npx vitest run tests/claim-gates-flag-api.test.js",
    "attempts": 6,
    "spec": "Wire the claim-gate-flag module into GET /api/projects/:name/claim-gates in apps/autosprink/src/api/server.js (read claim-gate-flag.js first). Keep every existing field for back-compat, but ADD to each gate object verificationStatus and usable true from gateFlag, and ADD a top-level response shape change: instead of returning a bare array, return an object with gates (the array) and a flags summary from gatesSummary and usable true. IMPORTANT do not remove the honest missing_artifact/next_action/blocked_claims fields; they become the verification note, not a wall. Update any internal caller that expected a bare array to read response.gates. Test apps/autosprink/tests/claim-gates-flag-api.test.js spawns the real server on a unique port like the other api tests (copy the beforeAll harness from tests/autobid-crm-api.test.js exactly, new port 3271): GET a project claim-gates returns 200 with gates array, each gate has verificationStatus and usable true, and a top-level usable true and flags summary. Files under apps/autosprink.",
-   "last_error": " FAIL  tests/claim-gates-flag-api.test.js [ tests/claim-gates-flag-api.test.js ]"
+   "last_error": " FAIL  tests/claim-gates-flag-api.test.js [ tests/claim-gates-flag-api.test.js ]",
+   "note": "hand-built by Claude Tier-2 (b9b55d3). Do not regenerate."
   },
   {
    "id": "W16C-claim-gates-settings-ui",
    "title": "Settings > claim-gate sections show needs-verification flags not red blocked",
-   "status": "blocked",
+   "status": "done",
    "phase": "wave16-ungate-claim-gates",
    "write_roots": [
     "apps/autosprink"
@@ -977,7 +980,8 @@
    "gate": "cd apps/autosprink && npx vitest run tests/claim-gates-view.test.js",
    "attempts": 6,
    "spec": "Pure helper apps/autosprink/src/autobid/claim-gates-view.js exporting renderGateFlag(gate) returning a plain string for the settings UI like NEEDS VERIFICATION: AHJ approval record \u2014 record the AHJ approval artifact (best-effort prepared, human signoff still required) using gate fields verificationStatus, missing_artifact, next_action; for a human-verified gate it returns VERIFIED plus the code. Then in settings.html replace the copy and styling that says stays blocked or no claims cleared so claim-gate rows render via renderGateFlag with amber needs-verification styling not red blocked, and the line that said does NOT clear the AUTOSPRINK parity gate which stays blocked is reworded to say best-effort prepared, flagged for human verification. Keep one back-compat path. Test apps/autosprink/tests/claim-gates-view.test.js imports renderGateFlag and checks a needs-verification gate yields a string containing NEEDS VERIFICATION and the artifact and not the word blocked, and a verified gate yields VERIFIED. Files under apps/autosprink.",
-   "last_error": "\n RUN  v2.1.9 /opt/hal9000/apps/halofire-studio/apps/autosprink\n\n \u276f tests/claim-gates-view.test.js (0 test)\n\n Test Files  1 failed (1)\n      Tests  no tests\n   Start at  16:49:50\n   Duration  850ms (transform 151ms, setup 0ms, collect 0ms, tests 0ms, environment 0ms, prepare 221ms)\n\n\n\u23af\u23af\u23af\u23af\u23af\u23af Failed Suites 1 \u23af\u23af\u23af\u23af\u23af\u23af\u23af\n\n FAIL  tests/claim-gates-view.test.js [ tests/claim-gates-view.test.js ]\nError: Failed to load url ../src/lib/autobid/claim-gates-view (resolved id: ../src/lib/autobid/claim-gates-view) in /opt/hal9000/apps/halofire-studio/apps/autosprink/tests/claim-gates-view.test.js. Does the file exist?\n \u276f loadAndTransform node_modules/vitest/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:51969:17\n\n\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af[1/1]\u23af\n\n"
+   "last_error": "\n RUN  v2.1.9 /opt/hal9000/apps/halofire-studio/apps/autosprink\n\n \u276f tests/claim-gates-view.test.js (0 test)\n\n Test Files  1 failed (1)\n      Tests  no tests\n   Start at  16:49:50\n   Duration  850ms (transform 151ms, setup 0ms, collect 0ms, tests 0ms, environment 0ms, prepare 221ms)\n\n\n\u23af\u23af\u23af\u23af\u23af\u23af Failed Suites 1 \u23af\u23af\u23af\u23af\u23af\u23af\u23af\n\n FAIL  tests/claim-gates-view.test.js [ tests/claim-gates-view.test.js ]\nError: Failed to load url ../src/lib/autobid/claim-gates-view (resolved id: ../src/lib/autobid/claim-gates-view) in /opt/hal9000/apps/halofire-studio/apps/autosprink/tests/claim-gates-view.test.js. Does the file exist?\n \u276f loadAndTransform node_modules/vitest/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:51969:17\n\n\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af[1/1]\u23af\n\n",
+   "note": "hand-built by Claude Tier-2 (b9b55d3). Do not regenerate."
   },
   {
    "id": "W16D-manufacturer-evidence-loop",
@@ -1016,7 +1020,7 @@
   {
    "id": "W17A-invite-token",
    "title": "Client portal > secure invite + set-password token model (pure)",
-   "status": "claimed",
+   "status": "done",
    "phase": "wave17-client-portal",
    "write_roots": [
     "apps/autosprink/src",
@@ -1027,12 +1031,12 @@
    "gate": "cd apps/autosprink && npx vitest run tests/invite-token.test.js",
    "attempts": 0,
    "spec": "Pure ESM apps/autosprink/src/autobid/invite-token.js \u2014 security core of client self-registration where username equals the company email. export function createInvite(email, secret, nowMs, ttlMs) returns object with token a url-safe string from node crypto HMAC sha256 of email plus random nonce plus nowMs keyed by secret, tokenHash the sha256 hex of token (store the HASH never the token), email lowercased trimmed, expiresAtMs nowMs plus ttlMs, used false. export function verifyInvite(record, token, nowMs) returns ok true only when sha256 of token equals record tokenHash and nowMs below expiresAtMs and used false, else ok false with reason expired or used or mismatch. export function markUsed(record) returns a NEW record with used true (pure). Throws TypeError on missing email or secret. Use only node crypto. Files MUST be apps/autosprink/src/autobid/invite-token.js and apps/autosprink/tests/invite-token.test.js. Tests cover all branches plus purity.",
-   "note": "claimed by Claude \u2014 security-critical client auth, hand-built + audited (not loop). Do not generate."
+   "note": "SUPERSEDED by Codex auth_tokens invite flow (commits 7e61ba0..a13daec, audited ep 45421). Do not generate."
   },
   {
    "id": "W17B-glass-portal-shell",
    "title": "Client portal > apple-glass brand helper with placeholder logo flag + animated fire (pure)",
-   "status": "claimed",
+   "status": "done",
    "phase": "wave17-client-portal",
    "write_roots": [
     "apps/autosprink/src",
@@ -1043,7 +1047,22 @@
    "gate": "cd apps/autosprink && npx vitest run tests/portal-brand.test.js",
    "attempts": 0,
    "spec": "Pure ESM apps/autosprink/src/autobid/portal-brand.js exporting brandConfig(opts) returning logoSrc opts.logoUrl when given else the literal placeholder-logo, logoVerified false for placeholder true for a real url, animateFire true, glass true, and a needsVerification note when placeholder saying replace with the official Halo Fire logo. export function brandStyleVars(cfg) returning a CSS custom-properties string for an apple-glass look using backdrop-filter blur and saturate, translucent backgrounds, soft borders. Pure never throws. Files MUST be apps/autosprink/src/autobid/portal-brand.js and apps/autosprink/tests/portal-brand.test.js. Tests cover placeholder vs real logo and that brandStyleVars contains backdrop-filter.",
-   "note": "claimed by Claude \u2014 security-critical client auth, hand-built + audited (not loop). Do not generate."
+   "note": "SUPERSEDED by Codex auth_tokens invite flow (commits 7e61ba0..a13daec, audited ep 45421). Do not generate."
+  },
+  {
+   "id": "W18A-parts-batch-flagged",
+   "title": "Parts > batch-generate flagged scad models for the catalog fitting families (pure)",
+   "status": "pending",
+   "phase": "wave18-parts-fill",
+   "write_roots": [
+    "apps/cad/src/lib",
+    "apps/cad/test"
+   ],
+   "context_files": [],
+   "files_create": [],
+   "gate": "cd apps/cad && npx vitest run test/parts-batch-flagged.test.ts",
+   "attempts": 0,
+   "spec": "Pure strict-TS module apps/cad/src/lib/parts-batch-flagged.ts. Composes parseCutSheetDims (cutsheet-dims-parse), modelFromCutSheet (cutsheet-to-model) and the Verification type. export interface PartSheetInput { sku: string; partType: string; nominalIn: number; text: string; sourceUrl?: string }. export function batchFromCutSheets(inputs: PartSheetInput[]) returning an object with results an array of { sku, scad string or null, verification, missing string[] } and counts { generated, incomplete }. For each input: parse dims; when missing is empty call modelFromCutSheet and use its verification; when missing is non-empty DO NOT throw and DO NOT invent dims \u2014 set scad null and verification machineGenerated with a note listing the missing fields (flag-not-gate: the part stays in the catalog flagged incomplete). Never throws on a structurally valid input array; throws TypeError on non-array. Files MUST be apps/cad/src/lib/parts-batch-flagged.ts and apps/cad/test/parts-batch-flagged.test.ts. Tests: a two-input batch with one complete tee sheet and one sparse sheet yields generated 1 incomplete 1, the complete one has scad containing union and needs-verification status, the sparse one has scad null and its note lists the missing fields; empty array yields zeros; non-array throws TypeError."
   }
  ]
 }
