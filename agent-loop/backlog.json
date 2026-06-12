@@ -1052,7 +1052,7 @@
   {
    "id": "W18A-parts-batch-flagged",
    "title": "Parts > batch-generate flagged scad models for the catalog fitting families (pure)",
-   "status": "pending",
+   "status": "claimed",
    "phase": "wave18-parts-fill",
    "write_roots": [
     "apps/cad/src/lib",
@@ -1062,7 +1062,8 @@
    "files_create": [],
    "gate": "cd apps/cad && npx vitest run test/parts-batch-flagged.test.ts",
    "attempts": 0,
-   "spec": "Pure strict-TS module apps/cad/src/lib/parts-batch-flagged.ts. Composes parseCutSheetDims (cutsheet-dims-parse), modelFromCutSheet (cutsheet-to-model) and the Verification type. export interface PartSheetInput { sku: string; partType: string; nominalIn: number; text: string; sourceUrl?: string }. export function batchFromCutSheets(inputs: PartSheetInput[]) returning an object with results an array of { sku, scad string or null, verification, missing string[] } and counts { generated, incomplete }. For each input: parse dims; when missing is empty call modelFromCutSheet and use its verification; when missing is non-empty DO NOT throw and DO NOT invent dims \u2014 set scad null and verification machineGenerated with a note listing the missing fields (flag-not-gate: the part stays in the catalog flagged incomplete). Never throws on a structurally valid input array; throws TypeError on non-array. Files MUST be apps/cad/src/lib/parts-batch-flagged.ts and apps/cad/test/parts-batch-flagged.test.ts. Tests: a two-input batch with one complete tee sheet and one sparse sheet yields generated 1 incomplete 1, the complete one has scad containing union and needs-verification status, the sparse one has scad null and its note lists the missing fields; empty array yields zeros; non-array throws TypeError."
+   "spec": "Pure strict-TS module apps/cad/src/lib/parts-batch-flagged.ts. Composes parseCutSheetDims (cutsheet-dims-parse), modelFromCutSheet (cutsheet-to-model) and the Verification type. export interface PartSheetInput { sku: string; partType: string; nominalIn: number; text: string; sourceUrl?: string }. export function batchFromCutSheets(inputs: PartSheetInput[]) returning an object with results an array of { sku, scad string or null, verification, missing string[] } and counts { generated, incomplete }. For each input: parse dims; when missing is empty call modelFromCutSheet and use its verification; when missing is non-empty DO NOT throw and DO NOT invent dims \u2014 set scad null and verification machineGenerated with a note listing the missing fields (flag-not-gate: the part stays in the catalog flagged incomplete). Never throws on a structurally valid input array; throws TypeError on non-array. Files MUST be apps/cad/src/lib/parts-batch-flagged.ts and apps/cad/test/parts-batch-flagged.test.ts. Tests: a two-input batch with one complete tee sheet and one sparse sheet yields generated 1 incomplete 1, the complete one has scad containing union and needs-verification status, the sparse one has scad null and its note lists the missing fields; empty array yields zeros; non-array throws TypeError.",
+   "note": "claimed by Claude ultramode workflow 2026-06-12. Do not generate."
   }
  ]
 }
