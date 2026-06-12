@@ -993,12 +993,13 @@
       "gate": "cd apps/autosprink && npx vitest run tests/manufacturer-evidence.test.js",
       "attempts": 5,
       "spec": "Pure ESM apps/autosprink/src/autobid/manufacturer-evidence.js that assembles best-effort evidence for the MANUFACTURER_MODEL_APPROVAL_MISSING gate so it advances toward needs-verification with a model attached, never claiming manufacturer-exact. export function buildManufacturerEvidence(part) where part has sku, manufacturer, cutSheetUrl optional, generatedModelRef optional. Returns an evidence record with evidence_type manufacturer_model_best_effort, source_ref the cutSheetUrl or generated, notes a JSON string carrying verificationStatus needs-verification and a disclaimer that the model is dimensioned parametric not manufacturer-exact and needs manufacturer confirmation, and claim_gate_effect no_claims_cleared (best-effort evidence never auto-clears the regulated gate; it only attaches and flags). Pure, throws TypeError on missing sku. Test apps/autosprink/tests/manufacturer-evidence.test.js: a part yields an evidence record with the best-effort type, needs-verification in notes, and no_claims_cleared; missing sku throws. NOTE in a comment: a follow-up cron uses OpenClaw scraper plus the GPU SAM service and cutsheet-to-model to fetch real cut sheets and generate the model ref fed here, iterating per part and recording lessons; that scraper task is W16F.",
-      "completed_at": "2026-06-12T00:03:28+00:00"
+      "completed_at": "2026-06-12T00:03:28+00:00",
+      "commit": "bf563b31"
     },
     {
       "id": "W16E-submittal-packet-prep",
       "title": "Claim gates > auto-prepare AHJ/PE/AutoSprink submittal packets flagged residual",
-      "status": "pending",
+      "status": "done",
       "phase": "wave16-ungate-claim-gates",
       "write_roots": [
         "apps/autosprink/src",
@@ -1007,8 +1008,9 @@
       "context_files": [],
       "files_create": [],
       "gate": "cd apps/autosprink && npx vitest run tests/submittal-packet-prep.test.js",
-      "attempts": 0,
-      "spec": "Pure ESM apps/autosprink/src/autobid/submittal-packet-prep.js. For the three human-signoff gates AHJ_APPROVAL_MISSING PROFESSIONAL_REVIEW_MISSING AUTOSPRINK_EVIDENCE_MISSING, a loop cannot manufacture the approval but CAN prepare the best-effort packet and flag the residual human step. export function prepareSubmittalPacket(gateCode, project) returning an object with gateCode, preparedArtifacts an array of the documents the system can auto-assemble for that gate (for AHJ a permit submittal index, for professional review an automated NFPA design-check summary, for AutoSprink a best-effort engine export manifest), verificationStatus needs-verification, residual a clear string naming the human step still required (AHJ authority approval, licensed PE signoff, or AutoSprink-verified export), and claim_gate_effect no_claims_cleared. Unknown gateCode throws RangeError. Pure. Test apps/autosprink/tests/submittal-packet-prep.test.js: each of the three gate codes yields preparedArtifacts non-empty, needs-verification, a residual naming the human step, and no_claims_cleared; unknown code throws RangeError. NOTE honesty: this NEVER claims AHJ or PE approval exists; it only prepares and flags."
+      "attempts": 5,
+      "spec": "Pure ESM apps/autosprink/src/autobid/submittal-packet-prep.js. For the three human-signoff gates AHJ_APPROVAL_MISSING PROFESSIONAL_REVIEW_MISSING AUTOSPRINK_EVIDENCE_MISSING, a loop cannot manufacture the approval but CAN prepare the best-effort packet and flag the residual human step. export function prepareSubmittalPacket(gateCode, project) returning an object with gateCode, preparedArtifacts an array of the documents the system can auto-assemble for that gate (for AHJ a permit submittal index, for professional review an automated NFPA design-check summary, for AutoSprink a best-effort engine export manifest), verificationStatus needs-verification, residual a clear string naming the human step still required (AHJ authority approval, licensed PE signoff, or AutoSprink-verified export), and claim_gate_effect no_claims_cleared. Unknown gateCode throws RangeError. Pure. Test apps/autosprink/tests/submittal-packet-prep.test.js: each of the three gate codes yields preparedArtifacts non-empty, needs-verification, a residual naming the human step, and no_claims_cleared; unknown code throws RangeError. NOTE honesty: this NEVER claims AHJ or PE approval exists; it only prepares and flags.",
+      "completed_at": "2026-06-12T00:07:50+00:00"
     },
     {
       "id": "W17A-invite-token",
