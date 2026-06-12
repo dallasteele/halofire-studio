@@ -5,13 +5,21 @@ import path from 'node:path';
 const ROOT = path.resolve(import.meta.dirname, '..');
 
 describe('client secure login page', () => {
-  it('uses the official Halo Fire logo as the animated hero image', () => {
+  it('uses a text-only Halo Fire wordmark in front of the animated WebGL hero', () => {
     const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
 
-    expect(html).toContain('/public/brand/halo-fire-logo-glass.png');
     expect(html).toContain('halo-three-canvas');
     expect(html).toContain('initHaloHeroScene');
-    expect(html).toContain('alt="Halo Fire"');
+    expect(html).toContain('class="hero-wordmark"');
+    expect(html).toContain('data-wordmark-layer="foreground-text"');
+    expect(html).toContain('Halo Fire text wordmark');
+    expect(html).toContain('font-family:"Arial Black","Impact","Helvetica Neue",Arial,sans-serif');
+    expect(html).toContain('transform="skewX(-11)"');
+    expect(html).toContain('<text x="72" y="118" font-size="104" fill="url(#wordmarkSheen)">Halo</text>');
+    expect(html).toContain('<text x="476" y="118" font-size="104" fill="url(#wordmarkSheen)">Fire</text>');
+    expect(html).toContain('.brand-stage.scene-ready .hero-wordmark');
+    expect(html).not.toContain('class="hero-logo-fallback"');
+    expect(html).not.toContain('/public/brand/halo-fire-logo-glass.png');
     expect(html).not.toContain('/public/brand/halo-fire-hero-flame.png');
   });
 
