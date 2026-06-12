@@ -31,6 +31,7 @@ import { requiredPressureAtRiser, flagSchedule, remoteAreaDemand } from '../engi
 import { buildParityMatrix, parityAchieved } from '../engine/parity-matrix.js';
 import { AUTOSPRINK_PARITY_GATE, buildParityInventory, parityGateStatus, getComponent } from '../components/registry.js';
 import { buildLedger, ledgerSummary } from '../autobid/verification-ledger.js';
+import { gateFlag } from '../autobid/claim-gate-flag.js';
 import { buildPartManifest } from '../components/part-mesh.js';
 import { buildSourceAcquisitionLedger, makeBridgeInvoker, probeBridge } from '../components/auto-source-runner.js';
 import { balanceNetwork } from '../engine/hydraulic-network.js';
@@ -1420,12 +1421,20 @@ app.get('/api/projects/:name/claim-gates', authMiddleware, (req, res) => {
   res.json(gates.map((gate) => {
     const rule = gateEvidenceRule(gate.code);
     const requiresSignoffFor = rule.allowedEvidenceTypes.filter((type) => SIGNED_REVIEW_EVIDENCE_TYPES.has(type));
+    // Doctrine flag-don't-gate (W16B): each gate carries a verification flag —
+    // usable:true always; the missing artifact is the note, not a wall. The
+    // bare-array response shape is preserved for existing callers.
+    const flag = gateFlag(gate);
     return {
       ...gate,
       blocked_claims: safeParseJsonArray(gate.blocked_claims),
       allowed_evidence_types: [...rule.allowedEvidenceTypes],
       requires_signoff_for: requiresSignoffFor,
       can_resolve: rule.canResolve,
+      verificationStatus: flag.verificationStatus,
+      usable: flag.usable,
+      flag_label: flag.label,
+      flag_residual: flag.residual,
       review_packet_href: `/api/projects/${encodeURIComponent(projectName)}/claim-gates/${encodeURIComponent(gate.code)}/review-packet`,
       review_packet_artifact_type: 'halofire.claim_gate_review_packet.v1',
     };
