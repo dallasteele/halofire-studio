@@ -109,25 +109,40 @@ img{user-select:none;-webkit-user-drag:none}
 .halo-three-canvas{
   position:absolute;
   inset:-4%;
-  z-index:0;
+  z-index:1;
   width:108%;
   height:108%;
   display:block;
 }
-.hero-logo-fallback{
+.hero-wordmark{
   position:absolute;
   left:50%;
-  top:50%;
-  z-index:0;
-  width:min(74%,560px);
+  top:54%;
+  z-index:2;
+  width:min(92%,760px);
   height:auto;
-  opacity:0.88;
+  opacity:0.96;
   transform:translate(-50%,-50%);
-  filter:drop-shadow(0 22px 38px rgba(0,0,0,0.55)) drop-shadow(0 0 30px rgba(227,38,33,0.2));
-  transition:opacity .4s ease;
+  filter:
+    drop-shadow(0 21px 30px rgba(0,0,0,0.64))
+    drop-shadow(0 2px 0 rgba(0,0,0,0.78))
+    drop-shadow(0 0 18px rgba(232,67,45,0.12));
+  transition:opacity .35s ease, transform .35s ease;
   pointer-events:none;
 }
-.brand-stage.scene-ready .hero-logo-fallback{opacity:0}
+.hero-wordmark text{
+  font-family:"Arial Black","Impact","Helvetica Neue",Arial,sans-serif;
+  font-weight:900;
+  font-style:italic;
+  letter-spacing:-0.055em;
+  fill:url(#wordmarkSheen);
+  stroke:#000;
+  stroke-width:2.4px;
+  paint-order:stroke fill;
+}
+.brand-stage.scene-ready .hero-wordmark{
+  transform:translate(-50%,-50%) scale(1.012);
+}
 .renderer-badge{display:none}
 .login{
   position:relative;
@@ -277,7 +292,19 @@ body.hf-shell .field input{
   <section class="portal" aria-labelledby="loginTitle">
     <div class="brand-stage" id="haloHeroScene" aria-label="Halo Fire rendered brand scene">
       <canvas class="halo-three-canvas" id="haloHeroCanvas" data-renderer-mode="pending"></canvas>
-      <img class="hero-logo-fallback" src="/public/brand/halo-fire-logo-glass.png" alt="Halo Fire" draggable="false">
+      <svg class="hero-wordmark" id="heroWordmark" viewBox="0 0 820 170" role="img" aria-label="Halo Fire text wordmark" data-wordmark-layer="foreground-text" draggable="false">
+        <defs>
+          <linearGradient id="wordmarkSheen" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0" stop-color="#17110f"/>
+            <stop offset="0.52" stop-color="#030202"/>
+            <stop offset="1" stop-color="#0a0504"/>
+          </linearGradient>
+        </defs>
+        <g transform="skewX(-11)">
+          <text x="72" y="118" font-size="104" fill="url(#wordmarkSheen)">Halo</text>
+          <text x="476" y="118" font-size="104" fill="url(#wordmarkSheen)">Fire</text>
+        </g>
+      </svg>
       <div class="renderer-badge" id="rendererBadge" aria-hidden="true"></div>
     </div>
 
