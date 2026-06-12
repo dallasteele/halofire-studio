@@ -262,8 +262,13 @@ import { demoTimeline } from '/src/engine/demo-timeline.js';
 import { summarizeExportArtifact, buildExportProofMessage } from '/src/ui/export-proof.js';
 
 const HOME_DEPOT = 'Home Depot - Rexburg ID';
-const token = localStorage.getItem('halofire_token');
-if (!token) location.href = '/';
+try{
+  localStorage.removeItem('halofire_token');
+  localStorage.removeItem('halofire_user');
+  sessionStorage.removeItem('halofire_token');
+  sessionStorage.removeItem('halofire_user');
+}catch(_){}
+const token = null;
 const usd = (n) => '$' + Number(n).toLocaleString('en-US', { maximumFractionDigits: 0 });
 const $ = (id) => document.getElementById(id);
 function currentProjectName() {
@@ -273,9 +278,10 @@ function currentProjectName() {
 function api(path, options = {}) {
   return fetch('/api' + path, {
     ...options,
-    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token, ...(options.headers || {}) },
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}), ...(options.headers || {}) },
   }).then(async (r) => {
-    if (r.status === 401) { localStorage.removeItem('halofire_token'); location.href = '/'; throw new Error('unauth'); }
+    if (r.status === 401) { location.href = '/'; throw new Error('unauth'); }
     if (!r.ok) throw new Error(await r.text());
     return r.json();
   });
@@ -1121,7 +1127,9 @@ $('submitBtn').onclick = async () => {
   const btn = $('submitBtn'); btn.disabled = true; const label = btn.textContent; btn.textContent = 'Building…';
   try {
     const res = await fetch('/api/projects/' + encodeURIComponent(currentProjectName()) + '/submittal', {
-      method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
       body: JSON.stringify(lastBody),
     });
     if (!res.ok) { $('status').textContent = 'submittal error: ' + res.status; return; }
@@ -1132,7 +1140,9 @@ $('submitBtn').onclick = async () => {
 };
 $('dxfBtn').onclick = async () => {
   const res = await fetch('/api/projects/' + encodeURIComponent(currentProjectName()) + '/cad.dxf', {
-    method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
     body: JSON.stringify(lastBody),
   });
   if (!res.ok) return;

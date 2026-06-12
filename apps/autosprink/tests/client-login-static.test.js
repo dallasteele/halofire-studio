@@ -19,6 +19,8 @@ describe('client secure login page', () => {
     const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
 
     expect(html).toContain("from 'three'");
+    expect(html).toContain('<script type="importmap">');
+    expect(html).toContain('"three": "/vendor/three/build/three.module.js"');
     expect(html).toContain('new WebGLRenderer');
     expect(html).toContain("rendererMode = 'webgl-shader-fire'");
     expect(html).toContain('ShaderMaterial');
@@ -131,10 +133,19 @@ describe('client secure login page', () => {
     expect(html).toContain('autocomplete="username"');
     expect(html).toContain('autocomplete="new-password"');
     expect(html).toContain('id="confirmPass"');
+    expect(html).toContain('confirmPassField.hidden = true');
+    expect(html).toContain('confirmPassInput.required = false');
+    expect(html).toContain('confirmPassField.hidden = false');
+    expect(html).toContain('confirmPassInput.required = true');
     expect(html).toContain('id="forgotPassword"');
     expect(html).toContain('id="formMode"');
     expect(html).toContain('Passwords must match');
     expect(html).toContain('Apple can generate and save this password');
+    expect(html).toContain('remember:selectedRemember()');
+    expect(html).toContain('clearBrowserAuthStorage');
+    expect(html).toContain('acceptCookieSession');
+    expect(html).not.toContain("localStorage.setItem('halofire_token'");
+    expect(html).not.toContain("sessionStorage.setItem('halofire_token'");
   });
 
   it('models the flame as a teardrop thermal volume instead of cartoon color bands', () => {
@@ -275,10 +286,15 @@ describe('client secure login page', () => {
 
   it('does not expose development credentials or auto-login on the client page', () => {
     const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
+    const workbench = fs.readFileSync(path.join(ROOT, 'workbench.html'), 'utf8');
 
     expect(html).not.toContain('halofire-dev-smoke');
     expect(html).not.toContain("u.value='admin'");
     expect(html).not.toContain('haloDemoLoginBootstrap');
     expect(html).not.toContain('XMLHttpRequest');
+    expect(workbench).not.toContain('halofire-dev-smoke');
+    expect(workbench).not.toContain('ensureHaloDemoSession');
+    expect(workbench).not.toContain('XMLHttpRequest');
+    expect(workbench).toContain('credentials: \'include\'');
   });
 });
