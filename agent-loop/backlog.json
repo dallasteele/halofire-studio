@@ -1052,7 +1052,7 @@
   {
    "id": "W18A-parts-batch-flagged",
    "title": "Parts > batch-generate flagged scad models for the catalog fitting families (pure)",
-   "status": "claimed",
+   "status": "pending",
    "phase": "wave18-parts-fill",
    "write_roots": [
     "apps/cad/src/lib",
@@ -1063,7 +1063,52 @@
    "gate": "cd apps/cad && npx vitest run test/parts-batch-flagged.test.ts",
    "attempts": 0,
    "spec": "Pure strict-TS module apps/cad/src/lib/parts-batch-flagged.ts. Composes parseCutSheetDims (cutsheet-dims-parse), modelFromCutSheet (cutsheet-to-model) and the Verification type. export interface PartSheetInput { sku: string; partType: string; nominalIn: number; text: string; sourceUrl?: string }. export function batchFromCutSheets(inputs: PartSheetInput[]) returning an object with results an array of { sku, scad string or null, verification, missing string[] } and counts { generated, incomplete }. For each input: parse dims; when missing is empty call modelFromCutSheet and use its verification; when missing is non-empty DO NOT throw and DO NOT invent dims \u2014 set scad null and verification machineGenerated with a note listing the missing fields (flag-not-gate: the part stays in the catalog flagged incomplete). Never throws on a structurally valid input array; throws TypeError on non-array. Files MUST be apps/cad/src/lib/parts-batch-flagged.ts and apps/cad/test/parts-batch-flagged.test.ts. Tests: a two-input batch with one complete tee sheet and one sparse sheet yields generated 1 incomplete 1, the complete one has scad containing union and needs-verification status, the sparse one has scad null and its note lists the missing fields; empty array yields zeros; non-array throws TypeError.",
-   "note": "claimed by Claude ultramode workflow 2026-06-12. Do not generate."
+   "note": "reclaimed for qwen loop"
+  },
+  {
+   "id": "W18B-emit-grooved-valve-riser",
+   "title": "Emitters > grooved coupling, butterfly valve, check valve, riser assembly (pure)",
+   "status": "pending",
+   "phase": "wave18-finish",
+   "write_roots": [
+    "apps/cad/src/lib",
+    "apps/cad/test"
+   ],
+   "context_files": [],
+   "files_create": [],
+   "gate": "cd apps/cad && npx vitest run test/scad-emitters-extra.test.ts",
+   "attempts": 0,
+   "spec": "Read apps/cad/src/lib/scad-emitters.ts for the exact pattern (mm = inches times 25.4 toFixed 3, dollar fn 64, a leading honesty comment line, RangeError on non-finite or non-positive dims, deterministic). Create NEW file apps/cad/src/lib/scad-emitters-extra.ts exporting emitGroovedCoupling(opts with nominalIn odIn widthIn housingOdIn), emitButterflyValve(opts with nominalIn odIn faceToFaceIn handleLengthIn), emitCheckValve(opts with nominalIn odIn faceToFaceIn), emitRiserAssembly(opts with nominalIn odIn heightIn). Each returns an OpenSCAD source string built from cylinder rotate translate difference union, same error discipline and honesty comment. Do NOT modify scad-emitters.ts. Test apps/cad/test/scad-emitters-extra.test.ts: per emitter expected tokens present, honesty comment present, one exact mm conversion check, balanced parens and braces, RangeError cases. Files MUST be those two paths."
+  },
+  {
+   "id": "W18C-fastener-hardware-bom",
+   "title": "Fasteners > hanger hardware emitters + hanger BOM from spacing lib (pure)",
+   "status": "pending",
+   "phase": "wave18-finish",
+   "write_roots": [
+    "apps/cad/src/lib",
+    "apps/cad/test"
+   ],
+   "context_files": [],
+   "files_create": [],
+   "gate": "cd apps/cad && npx vitest run test/hanger-bom.test.ts",
+   "attempts": 0,
+   "spec": "Read apps/cad/src/lib/hanger-spacing.ts (exports and spacing rules) and scad-emitters.ts (pattern). Create NEW apps/cad/src/lib/scad-emitters-hangers.ts with emitAllThreadRod(opts diameterIn lengthIn), emitRingHanger(opts pipeOdIn rodDiameterIn), emitBeamClamp(opts flangeWidthIn rodDiameterIn), emitConcreteAnchor(opts rodDiameterIn embedIn) following the same honesty and error discipline. Create NEW apps/cad/src/lib/hanger-bom.ts exporting hangerHardwareForSegment(segment with diameterIn lengthFt, structureType which is beam or concrete, dropInches) returning an array of line items with kind description quantity, where counts come from the REAL hanger-spacing lib placement function (one rod plus one ring per hanger point, plus one beam clamp or one concrete anchor per point by structureType) NOT re-derived constants. Tests apps/cad/test/scad-emitters-hangers.test.ts and apps/cad/test/hanger-bom.test.ts: a 30 ft run of 1.5 inch pipe on beam yields the spacing-lib hanger count of rods rings clamps, plus emitter token and mm and RangeError checks. Do NOT modify existing files."
+  },
+  {
+   "id": "W18D-door-opening-detect",
+   "title": "Structures > door/opening detection from clustered wall runs (pure)",
+   "status": "pending",
+   "phase": "wave18-finish",
+   "write_roots": [
+    "apps/cad/src/lib",
+    "apps/cad/test"
+   ],
+   "context_files": [],
+   "files_create": [],
+   "gate": "cd apps/cad && npx vitest run test/door-detect.test.ts",
+   "attempts": 0,
+   "spec": "Read apps/cad/src/lib/pdf-line-cluster.ts (ClusteredRun shape). Create NEW apps/cad/src/lib/door-detect.ts exporting detectOpenings(runs in feet, opts optional with minOpeningFt default 2, maxOpeningFt default 8, colinearOffsetTolFt default 0.2) returning an array of door-candidate objects with a b widthFt betweenRuns kind. Group colinear runs (same infinite line within offset tol, angle within 2 degrees), sort by projection, report inter-run gaps whose length is within min to max as door candidates spanning the gap. Pure deterministic, never throws on valid arrays, TypeError on non-array. Operator-confirmed proposals, nothing auto-commits, say so in the doc comment. Test apps/cad/test/door-detect.test.ts: two colinear runs with a 3 ft gap yield one candidate widthFt 3; a 12 ft gap yields none; offset-parallel runs do not pair; perpendicular do not pair; empty yields empty; non-array throws."
   }
  ]
 }
