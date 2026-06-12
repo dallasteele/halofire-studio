@@ -17,6 +17,8 @@ describe('client secure login page', () => {
     expect(html).toContain('font-family:"Arial Black","Impact","Helvetica Neue",Arial,sans-serif');
     expect(html).toContain('transform="skewX(-11)"');
     expect(html).toContain('width:min(86%,708px)');
+    expect(html).toContain('@media(min-width:841px)');
+    expect(html).toContain('width:min(98%,920px)');
     expect(html).toContain('letter-spacing:-0.075em');
     expect(html).toContain('.hero-wordmark .wordmark-glass');
     expect(html).toContain('fill:url(#wordmarkGlass)');
