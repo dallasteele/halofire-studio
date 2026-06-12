@@ -129,3 +129,5 @@ AssertionError: expected '// Dimensioned parametric, not manufa…' to contain '
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
 
 
+- 2026-06-12 DONE W16D-manufacturer-evidence-loop on attempt 5 (model gemma4:26b-a4b-it-qat).
+- 2026-06-12 DONE W16E-submittal-packet-prep on attempt 5 (model gemma4:26b-a4b-it-qat).
