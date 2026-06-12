@@ -122,3 +122,10 @@ AssertionError: expected '// Dimensioned parametric, not manufa…' to contain '
 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
 
 
+- 2026-06-11 BLOCKED W16B-claim-gates-api-flag (model qwen3:30b-a3b); last error class:  FAIL  tests/claim-gates-flag-api.test.js [ tests/claim-gates-flag-api.test.js ]
+- 2026-06-11 BLOCKED W16C-claim-gates-settings-ui (model qwen3:30b-a3b); last error class: t.js. Does the file exist?
+ ❯ loadAndTransform node_modules/vitest/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:51969:17
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
