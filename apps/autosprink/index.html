@@ -3,413 +3,307 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Halo Fire - Fire Protection Management Platform</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<title>Halo Fire - Secure Client Access</title>
 <style>
-/* ═══════════════════════════════════════════════════════════
-   HALOFIRE PLATFORM — Golden Ratio Layout System
-   φ = 1.618 | 1/φ = 0.618
-   Fibonacci spacings: 5, 8, 13, 21, 34, 55, 89px
-   Content/Data split: 61.8% / 38.2%
-   ═══════════════════════════════════════════════════════════ */
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+*,*::before,*::after{box-sizing:border-box}
 :root{
-  --bg:#08080a;--surface:#111114;--surface2:#18181c;
-  --fire:#E53935;--fire-light:#FF6E40;--fire-glow:rgba(229,57,53,0.15);
-  --gold:#FFD54F;--gold-bright:#FFE082;
-  --cyan:#4DD0E1;
-  --text:#d4d4d8;--text-muted:#71717a;--text-bright:#fafafa;
-  --border:rgba(255,255,255,0.06);--border-hover:rgba(255,255,255,0.12);
-  --font:'Inter',system-ui,-apple-system,sans-serif;
-  --mono:'JetBrains Mono',monospace;
+  --bg:#07080a;
+  --panel:rgba(255,255,255,0.09);
+  --panel-strong:rgba(255,255,255,0.14);
+  --stroke:rgba(255,255,255,0.22);
+  --stroke-soft:rgba(255,255,255,0.12);
+  --text:#f7f7f4;
+  --muted:#b8b8b2;
+  --subtle:#85857f;
+  --fire:#e32621;
+  --fire-soft:rgba(227,38,33,0.34);
+  --gold:#f7d516;
+  --glass-blur:24px;
+  --font:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --mono:"SF Mono","Cascadia Code",Consolas,monospace;
 }
-html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:var(--font);color:var(--text);-webkit-font-smoothing:antialiased}
-canvas#bg{position:fixed;top:0;left:0;z-index:0;opacity:0.55}
-
-/* ── LOADER ── */
-#loader{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 1s ease,visibility 1s}
-#loader.done{opacity:0;visibility:hidden;pointer-events:none}
-.loader-mark{width:34px;height:34px;border:2px solid rgba(229,57,53,0.2);border-top-color:var(--fire);border-radius:50%;animation:spin 1.2s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.loader-label{margin-top:21px;font-family:var(--mono);font-size:11px;color:var(--text-muted);letter-spacing:3px}
-
-/* ── NAV (height: 55px — Fibonacci) ── */
-nav{position:fixed;top:0;left:0;right:0;z-index:100;height:55px;display:flex;align-items:center;justify-content:space-between;padding:0 34px;background:rgba(8,8,10,0.82);backdrop-filter:blur(21px);-webkit-backdrop-filter:blur(21px);border-bottom:1px solid var(--border)}
-.brand{display:flex;align-items:center;gap:8px}
-.brand-name{font-size:21px;font-weight:900;font-style:italic;letter-spacing:0.5px;color:var(--text-bright)}
-.brand-tag{font-family:var(--mono);font-size:8px;color:var(--text-muted);padding:2px 8px;border:1px solid var(--border);border-radius:3px;letter-spacing:1.5px;font-style:normal}
-.nav-links{display:flex;gap:0}
-.nav-links a{font-size:11px;font-weight:500;color:var(--text-muted);text-decoration:none;padding:8px 13px;border-radius:5px;letter-spacing:1px;text-transform:uppercase;transition:color .2s,background .2s}
-.nav-links a:hover,.nav-links a.on{color:var(--text-bright);background:rgba(255,255,255,0.04)}
-.nav-right{display:flex;align-items:center;gap:8px}
-.btn-sign{font-family:var(--font);font-size:11px;font-weight:600;padding:7px 21px;border-radius:5px;border:none;cursor:pointer;letter-spacing:1px;transition:all .2s;background:var(--fire);color:#fff}
-.btn-sign:hover{background:var(--fire-light)}
-.menu-btn{display:none;background:none;border:none;cursor:pointer;padding:5px}
-.menu-btn span{display:block;width:21px;height:1.5px;background:var(--text-muted);margin:5px 0;border-radius:1px}
-
-/* ── HERO — 61.8% left / 38.2% right golden split ── */
-.hero{position:relative;z-index:10;width:100%;height:100vh;display:grid;grid-template-columns:61.8fr 38.2fr;align-items:center;padding:89px 55px 55px;pointer-events:none}
-.hero-left{pointer-events:auto;max-width:560px}
-.hero-eyebrow{font-family:var(--mono);font-size:10px;color:var(--fire);letter-spacing:3px;text-transform:uppercase;margin-bottom:13px;display:flex;align-items:center;gap:8px}
-.hero-eyebrow .pulse{width:5px;height:5px;border-radius:50%;background:var(--fire);animation:blink 2.5s ease-in-out infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
-.hero-h1{font-size:clamp(34px,4.5vw,55px);font-weight:800;line-height:1.12;letter-spacing:-0.3px;margin-bottom:21px;color:var(--text-bright)}
-.hero-h1 .accent{background:linear-gradient(135deg,var(--fire),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.hero-p{font-size:15px;line-height:1.618;color:var(--text-muted);margin-bottom:34px;max-width:440px}
-.hero-btns{display:flex;gap:13px}
-.btn-main{font-family:var(--font);font-size:12px;font-weight:700;padding:13px 34px;border-radius:5px;border:none;cursor:pointer;letter-spacing:1.5px;text-transform:uppercase;transition:all .2s;background:var(--fire);color:#fff}
-.btn-main:hover{background:var(--fire-light);box-shadow:0 8px 34px rgba(229,57,53,0.25)}
-.btn-outline{font-family:var(--font);font-size:12px;font-weight:500;padding:13px 34px;border-radius:5px;border:1px solid var(--border);background:none;color:var(--text-muted);cursor:pointer;letter-spacing:1.5px;text-transform:uppercase;transition:all .2s}
-.btn-outline:hover{color:var(--text-bright);border-color:var(--border-hover)}
-
-/* ── KPI CARDS — right 38.2% column ── */
-.hero-right{display:flex;flex-direction:column;gap:13px;justify-self:end;width:100%;max-width:240px;pointer-events:auto}
-.kpi{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:21px;transition:border-color .25s,box-shadow .25s}
-.kpi:hover{border-color:var(--border-hover);box-shadow:0 0 34px rgba(229,57,53,0.04)}
-.kpi-label{font-family:var(--mono);font-size:9px;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:5px}
-.kpi-num{font-size:28px;font-weight:800;letter-spacing:-0.5px}
-.kpi-num.c1{color:var(--fire)}
-.kpi-num.c2{color:var(--gold)}
-.kpi-num.c3{color:var(--cyan)}
-.kpi-delta{font-family:var(--mono);font-size:9px;color:var(--text-muted);margin-top:5px}
-.kpi-delta .g{color:#4ade80}
-
-/* ── FOOTER (height: 34px — Fibonacci) ── */
-.foot{position:fixed;bottom:0;left:0;right:0;z-index:100;height:34px;display:flex;align-items:center;justify-content:space-between;padding:0 34px;background:rgba(8,8,10,0.82);backdrop-filter:blur(13px);border-top:1px solid var(--border);font-family:var(--mono);font-size:9px;color:var(--text-muted);letter-spacing:1px}
-.foot-left{display:flex;align-items:center;gap:21px}
-.foot-dot{width:5px;height:5px;border-radius:50%;background:#4ade80;display:inline-block;margin-right:5px}
-
-/* ── LOGIN ── */
-.overlay{position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.85);backdrop-filter:blur(13px);display:none;align-items:center;justify-content:center}
+html,body{width:100%;min-height:100%;margin:0;background:var(--bg);color:var(--text);font-family:var(--font);-webkit-font-smoothing:antialiased}
+body{overflow-x:hidden}
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:0;
+  background:
+    radial-gradient(circle at 17% 18%,rgba(247,213,22,0.18),transparent 29%),
+    radial-gradient(circle at 78% 24%,rgba(227,38,33,0.18),transparent 31%),
+    linear-gradient(135deg,#030405 0%,#121211 54%,#050606 100%);
+}
+body::after{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:0;
+  background-image:linear-gradient(rgba(255,255,255,0.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.03) 1px,transparent 1px);
+  background-size:44px 44px;
+  mask-image:linear-gradient(to bottom,rgba(0,0,0,0.8),transparent 82%);
+}
+button,input{font:inherit}
+.page{position:relative;z-index:1;min-height:100vh;display:grid;grid-template-rows:auto 1fr auto}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:22px clamp(18px,5vw,64px)}
+.brand-lockup{display:flex;align-items:center;gap:12px;color:var(--text);text-decoration:none}
+.brand-mark-small{width:62px;height:34px;object-fit:contain;filter:drop-shadow(0 10px 22px rgba(0,0,0,0.32))}
+.brand-copy{display:grid;gap:2px}
+.brand-copy strong{font-size:14px;letter-spacing:0.08em;text-transform:uppercase}
+.brand-copy span{font-size:11px;color:var(--muted)}
+.top-actions{display:flex;align-items:center;gap:10px}
+.invite-note{color:var(--muted);font-size:13px}
+.btn-sign,.btn-main,.submit-btn{
+  border:1px solid rgba(255,255,255,0.2);
+  background:linear-gradient(135deg,var(--fire),#9e1211);
+  color:white;
+  border-radius:8px;
+  cursor:pointer;
+  box-shadow:0 18px 44px rgba(227,38,33,0.18);
+}
+.btn-sign{padding:10px 16px;font-size:13px;font-weight:700}
+.hero{
+  width:min(1180px,calc(100vw - 36px));
+  margin:0 auto;
+  display:grid;
+  grid-template-columns:minmax(0,0.92fr) minmax(340px,0.68fr);
+  align-items:center;
+  gap:clamp(28px,5vw,78px);
+  padding:clamp(28px,8vh,80px) 0 56px;
+}
+.copy{max-width:660px}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;color:#ffe7df;font-family:var(--mono);font-size:12px;letter-spacing:0.14em;text-transform:uppercase;margin-bottom:18px}
+.eyebrow::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--fire);box-shadow:0 0 22px var(--fire)}
+h1{font-size:clamp(40px,5.8vw,76px);line-height:0.94;margin:0 0 24px;letter-spacing:0;font-weight:850}
+.lead{font-size:clamp(17px,2.1vw,23px);line-height:1.45;color:var(--muted);max-width:620px;margin:0 0 28px}
+.hero-actions{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:30px}
+.btn-main{padding:14px 22px;text-transform:uppercase;font-size:12px;font-weight:850;letter-spacing:0.12em}
+.status-strip{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  color:var(--muted);
+  font-size:13px;
+}
+.status-strip span{
+  border:1px solid var(--stroke-soft);
+  border-radius:8px;
+  padding:8px 10px;
+  background:rgba(255,255,255,0.055);
+  backdrop-filter:blur(14px);
+}
+.logo-stage{
+  position:relative;
+  min-height:410px;
+  display:grid;
+  place-items:center;
+}
+.logo-stage::before{
+  content:"";
+  position:absolute;
+  inset:10% 3% 6%;
+  border-radius:36px;
+  background:linear-gradient(145deg,rgba(255,255,255,0.18),rgba(255,255,255,0.04));
+  border:1px solid var(--stroke);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.28),0 34px 90px rgba(0,0,0,0.36),0 0 80px var(--fire-soft);
+  backdrop-filter:blur(var(--glass-blur)) saturate(1.5);
+  -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(1.5);
+  animation:glassBreath 6s ease-in-out infinite;
+}
+.logo-stage::after{
+  content:"";
+  position:absolute;
+  width:62%;
+  aspect-ratio:1;
+  border:1px solid rgba(247,213,22,0.46);
+  border-radius:50%;
+  transform:rotate(-15deg);
+  filter:blur(0.1px);
+  opacity:0.72;
+  animation:haloDrift 7s ease-in-out infinite;
+}
+.logo-hero-glass{
+  position:relative;
+  z-index:2;
+  width:min(620px,94%);
+  overflow:hidden;
+  padding:24px;
+  border:1px solid rgba(255,255,255,0.24);
+  border-radius:28px;
+  background:linear-gradient(145deg,rgba(255,255,255,0.16),rgba(255,255,255,0.045));
+  box-shadow:0 26px 80px rgba(0,0,0,0.36),0 0 42px rgba(227,38,33,0.18);
+  backdrop-filter:blur(18px) saturate(1.35);
+  -webkit-backdrop-filter:blur(18px) saturate(1.35);
+  animation:logoFloat 5.8s ease-in-out infinite;
+}
+.logo-hero-glass::before{
+  content:"";
+  position:absolute;
+  inset:-38% -64%;
+  z-index:1;
+  background:linear-gradient(100deg,transparent 35%,rgba(255,255,255,0.42) 48%,rgba(247,213,22,0.22) 52%,transparent 66%);
+  transform:translateX(-44%) rotate(8deg);
+  animation:logoSheen 7.4s ease-in-out infinite;
+}
+.halo-logo-hero{
+  position:relative;
+  z-index:2;
+  display:block;
+  width:100%;
+  height:auto;
+  border-radius:12px;
+  filter:drop-shadow(0 16px 28px rgba(0,0,0,0.42)) drop-shadow(0 0 20px rgba(227,38,33,0.22));
+  animation:logoIgnite 4.8s ease-in-out infinite;
+}
+.logo-caption{
+  position:relative;
+  z-index:2;
+  margin-top:20px;
+  text-align:center;
+  color:var(--muted);
+  font-size:13px;
+}
+.collab-band{
+  width:min(1180px,calc(100vw - 36px));
+  margin:0 auto 24px;
+  padding:18px clamp(16px,3vw,24px);
+  display:flex;
+  gap:14px;
+  justify-content:space-between;
+  align-items:center;
+  border:1px solid var(--stroke-soft);
+  border-radius:12px;
+  background:rgba(255,255,255,0.07);
+  backdrop-filter:blur(18px);
+}
+.collab-band p{margin:0;color:var(--muted);line-height:1.45}
+.collab-band strong{color:var(--text)}
+.foot{display:flex;justify-content:space-between;gap:18px;padding:18px clamp(18px,5vw,64px);color:var(--subtle);font-size:12px}
+.overlay{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,0.58);backdrop-filter:blur(22px)}
 .overlay.on{display:flex}
-.login{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:55px 34px 34px;width:370px;max-width:92vw;position:relative}
-.login-head{text-align:center;margin-bottom:34px}
-.login-head h2{font-size:26px;font-weight:900;font-style:italic;color:var(--text-bright);margin-bottom:5px}
-.login-head small{font-family:var(--mono);font-size:9px;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase}
-.field{margin-bottom:13px}
-.field label{display:block;font-size:11px;font-weight:500;color:var(--text-muted);margin-bottom:5px;letter-spacing:0.5px}
-.field input{width:100%;padding:11px 13px;background:var(--surface2);border:1px solid var(--border);border-radius:5px;color:var(--text-bright);font-family:var(--font);font-size:13px;outline:none;transition:border-color .2s}
-.field input:focus{border-color:var(--fire)}
-.field input::placeholder{color:#52525b}
-.submit-btn{width:100%;padding:13px;border-radius:5px;background:var(--fire);color:#fff;font-family:var(--font);font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;border:none;cursor:pointer;margin-top:8px;transition:background .2s}
-.submit-btn:hover{background:var(--fire-light)}
-.login-err{font-family:var(--mono);font-size:10px;color:#ef4444;text-align:center;margin-top:8px;display:none}
-.login-x{position:absolute;top:13px;right:13px;background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer;line-height:1}
-.login-x:hover{color:var(--text-bright)}
-.login-hint{font-family:var(--mono);font-size:8px;color:#52525b;text-align:center;margin-top:21px;padding-top:13px;border-top:1px solid var(--border)}
-
-/* ── RESPONSIVE ── */
-@media(max-width:900px){
-  .hero{grid-template-columns:1fr;padding:89px 21px 55px;gap:34px}
-  .hero-left{max-width:none}
-  .hero-right{flex-direction:row;flex-wrap:wrap;max-width:none;justify-self:start}
-  .kpi{flex:1;min-width:140px}
-  .nav-links{display:none;position:absolute;top:55px;left:0;right:0;background:rgba(8,8,10,0.97);flex-direction:column;padding:8px;border-bottom:1px solid var(--border)}
-  .nav-links.open{display:flex}
-  .menu-btn{display:block}
+.login{
+  position:relative;
+  width:410px;
+  max-width:100%;
+  border:1px solid var(--stroke);
+  border-radius:18px;
+  padding:28px;
+  background:rgba(16,17,18,0.78);
+  box-shadow:0 38px 100px rgba(0,0,0,0.48);
+  backdrop-filter:blur(28px) saturate(1.45);
+  -webkit-backdrop-filter:blur(28px) saturate(1.45);
+}
+.login-x{position:absolute;top:12px;right:12px;width:34px;height:34px;border:1px solid var(--stroke-soft);border-radius:8px;background:rgba(255,255,255,0.06);color:var(--muted);cursor:pointer}
+.login-head{margin-bottom:22px}
+.login-head img{width:184px;max-width:72%;filter:drop-shadow(0 12px 24px rgba(0,0,0,0.32));margin-bottom:18px}
+.login-head h2{margin:0 0 6px;font-size:24px}
+.login-head small{display:block;color:var(--muted);line-height:1.45}
+.field{display:grid;gap:7px;margin-bottom:14px}
+.field label{font-size:12px;color:var(--muted);font-weight:700}
+.field input{width:100%;border:1px solid var(--stroke-soft);border-radius:8px;background:rgba(255,255,255,0.08);color:var(--text);padding:13px 12px;outline:none}
+.field input:focus{border-color:rgba(247,213,22,0.6);box-shadow:0 0 0 3px rgba(247,213,22,0.12)}
+.field input::placeholder{color:#777}
+.login-remember{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px;margin:6px 0 16px;cursor:pointer}
+.login-remember input{accent-color:var(--fire)}
+.submit-btn{width:100%;padding:13px 16px;text-transform:uppercase;font-size:12px;font-weight:850;letter-spacing:0.12em}
+.login-err{display:none;color:#ffb4a9;font-size:12px;text-align:center;margin-top:12px}
+.login-hint{margin-top:18px;padding-top:16px;border-top:1px solid var(--stroke-soft);color:var(--subtle);font-size:12px;line-height:1.45}
+@keyframes logoFloat{0%,100%{transform:translateY(0) rotate(-0.25deg)}50%{transform:translateY(-12px) rotate(0.25deg)}}
+@keyframes logoIgnite{0%,100%{filter:drop-shadow(0 16px 28px rgba(0,0,0,0.42)) drop-shadow(0 0 18px rgba(227,38,33,0.2))}50%{filter:drop-shadow(0 18px 32px rgba(0,0,0,0.44)) drop-shadow(0 0 30px rgba(247,213,22,0.28))}}
+@keyframes logoSheen{0%,18%{transform:translateX(-44%) rotate(8deg);opacity:0}38%,48%{opacity:0.78}68%,100%{transform:translateX(44%) rotate(8deg);opacity:0}}
+@keyframes glassBreath{0%,100%{opacity:0.78;transform:scale(1)}50%{opacity:1;transform:scale(1.018)}}
+@keyframes haloDrift{0%,100%{transform:rotate(-15deg) translateY(0)}50%{transform:rotate(-11deg) translateY(-8px)}}
+@media(max-width:840px){
+  .topbar{padding:16px 18px}
+  .invite-note{display:none}
+  .hero{grid-template-columns:1fr;padding-top:26px}
+  .logo-stage{min-height:300px;order:-1}
+  .collab-band{align-items:flex-start;flex-direction:column}
+  .foot{flex-direction:column;padding-top:8px}
 }
 @media(max-width:520px){
-  .hero{padding:89px 13px 34px}
-  .kpi{min-width:calc(50% - 8px)}
-  .hero-btns{flex-direction:column}
-  .btn-main,.btn-outline{width:100%;text-align:center}
+  .brand-copy span{display:none}
+  .brand-mark-small{width:52px;height:28px}
+  h1{font-size:44px}
+  .logo-stage{min-height:250px}
+  .logo-hero-glass{padding:14px;border-radius:18px}
+  .halo-logo-hero{border-radius:10px}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;scroll-behavior:auto!important}
 }
 </style>
-<!-- Shared HaloFire design system (AAA tokens + self-hosted fonts). Loaded
-     AFTER the legacy inline <style> so its :root bridge re-points the legacy
-     --bg/--fire/--text vars onto the token system without touching markup. -->
 <link rel="stylesheet" href="/public/styles/halofire-tokens.css">
 </head>
 <body class="hf-shell">
-<div id="loader"><div class="loader-mark"></div><div class="loader-label">HALOFIRE</div></div>
-
-<nav>
-  <div class="brand">
-    <span class="brand-name">HaloFire</span>
-    <span class="brand-tag">PLATFORM</span>
-  </div>
-  <div class="nav-links" id="navLinks">
-    <a href="#" class="on">Home</a>
-    <a href="#sales">Sales</a>
-    <a href="#estimating">Estimating</a>
-    <a href="#projects">Projects</a>
-    <a href="#compliance">Compliance</a>
-    <a href="#analytics">Analytics</a>
-  </div>
-  <div class="nav-right">
-    <button class="btn-sign" id="signBtn">Sign In</button>
-    <button class="menu-btn" id="menuBtn"><span></span><span></span><span></span></button>
-  </div>
-</nav>
-
-<canvas id="bg"></canvas>
-
-<div class="hero">
-  <div class="hero-left">
-    <div class="hero-eyebrow"><span class="pulse"></span> National Fire Protection</div>
-    <h1 class="hero-h1">Serving, Protecting,<br><span class="accent">Nationwide.</span></h1>
-    <p class="hero-p">End-to-end fire sprinkler management from bid to closeout. AI-powered estimating, real-time project tracking, and compliance in one platform.</p>
-    <div class="hero-btns">
-      <button class="btn-main" id="enterBtn">Enter Platform</button>
-      <button class="btn-outline">View Demo</button>
+<main class="page">
+  <header class="topbar">
+    <a class="brand-lockup" href="/" aria-label="Halo Fire secure client access">
+      <img class="brand-mark-small" src="/public/brand/halo-fire-logo-glass.png" alt="Halo Fire">
+      <span class="brand-copy"><strong>Halo Fire</strong><span>Secure project portal</span></span>
+    </a>
+    <div class="top-actions">
+      <span class="invite-note">Invite-only review</span>
+      <button class="btn-sign" id="signBtn" type="button">Sign in</button>
     </div>
-  </div>
-  <div class="hero-right">
-    <div class="kpi"><div class="kpi-label">Bids Tracked</div><div class="kpi-num c1" id="k1">0</div><div class="kpi-delta">from source bid log</div></div>
-    <div class="kpi"><div class="kpi-label">Pricebook Items</div><div class="kpi-num c2" id="k2">0</div><div class="kpi-delta">ARGCO · FFF · Victaulic</div></div>
-    <div class="kpi"><div class="kpi-label">Source Workbooks</div><div class="kpi-num c3" id="k3">0</div><div class="kpi-delta">real .xlsx inputs</div></div>
-    <div class="kpi"><div class="kpi-label">Claim Gates</div><div class="kpi-num c1" id="k4">0</div><div class="kpi-delta"><span class="g">fail-closed</span> · internal alpha</div></div>
-  </div>
-</div>
+  </header>
 
-<div class="foot">
-  <div class="foot-left"><span><span class="foot-dot"></span>ONLINE</span><span>QWEN: STANDBY</span></div>
-  <span id="clk"></span>
-</div>
+  <section class="hero" aria-labelledby="heroTitle">
+    <div class="copy">
+      <div class="eyebrow">Secure client access</div>
+      <h1 id="heroTitle">Review the current project. Add what only Halo Fire knows.</h1>
+      <p class="lead">Sign in to see the live project workspace, review evidence in its current form, and add missing field knowledge, documents, or decisions that cannot be recovered by web scraping.</p>
+      <div class="hero-actions">
+        <button class="btn-main" id="enterBtn" type="button">Enter Platform</button>
+      </div>
+      <div class="status-strip" aria-label="Portal status">
+        <span>Project materials shown after sign-in only</span>
+        <span>Evidence-first review workflow</span>
+        <span>No permit or AHJ claims without signoff</span>
+      </div>
+    </div>
+
+    <div class="logo-stage" aria-label="Halo Fire official logo hero">
+      <div class="logo-hero-glass">
+        <img class="halo-logo-hero" src="/public/brand/halo-fire-logo-glass.png" alt="Halo Fire">
+      </div>
+      <div class="logo-caption">Official Halo Fire mark. Animated glass treatment only.</div>
+    </div>
+  </section>
+
+  <section class="collab-band" aria-label="Client collaboration note">
+    <p><strong>Built for co-development:</strong> the portal starts clean, then opens the workbench after authentication so Wade and the team can add the project details the system cannot infer safely.</p>
+    <button class="btn-sign" id="bandSignBtn" type="button">Open secure login</button>
+  </section>
+
+  <footer class="foot">
+    <span>Halo Fire client portal - internal alpha review</span>
+    <span id="clk"></span>
+  </footer>
+</main>
 
 <div class="overlay" id="overlay">
-  <div class="login">
-    <button class="login-x" id="closeBtn">&times;</button>
-    <div class="login-head"><h2>HaloFire</h2><small>Secure Access</small></div>
+  <div class="login" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+    <button class="login-x" id="closeBtn" type="button" aria-label="Close login">x</button>
+    <div class="login-head">
+      <img src="/public/brand/halo-fire-logo-glass.png" alt="Halo Fire">
+      <h2 id="loginTitle">Secure sign in</h2>
+      <small>Use the invited email or assigned username. The project workspace opens after authentication.</small>
+    </div>
     <form id="form">
-      <div class="field"><label>Username</label><input type="text" id="user" placeholder="admin" autocomplete="off"></div>
-      <div class="field"><label>Password</label><input type="password" id="pass" placeholder="password"></div>
-      <label class="login-remember" style="display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10px;color:var(--text-muted);margin:2px 0 6px;cursor:pointer"><input type="checkbox" id="remember" checked style="width:auto;margin:0"> Keep me logged in</label>
-      <button type="submit" class="submit-btn">Sign In</button>
-      <div class="login-err" id="err">Invalid credentials</div>
+      <div class="field"><label for="user">Email or username</label><input type="text" id="user" placeholder="name@company.com" autocomplete="username"></div>
+      <div class="field"><label for="pass">Password</label><input type="password" id="pass" placeholder="Enter password" autocomplete="current-password"></div>
+      <label class="login-remember"><input type="checkbox" id="remember" checked> Keep me logged in on this device</label>
+      <button type="submit" class="submit-btn">Sign in</button>
+      <div class="login-err" id="err">Unable to sign in with those credentials.</div>
     </form>
-    <div class="login-hint">Internal alpha — authorized Halo Fire staff only</div>
+    <div class="login-hint">Authorized Halo Fire project reviewers only. This alpha workspace is for evidence review and collaboration, not permit submission.</div>
   </div>
 </div>
 
 <script>
-// ═══════════════════════════════════════════════════════
-// THREE.JS — Elegant ambient fire orb + golden halo
-// Smooth, slow, refined — a background design element
-// ═══════════════════════════════════════════════════════
-const C = document.getElementById('bg');
-const R = new THREE.WebGLRenderer({canvas:C, antialias:true, alpha:true});
-R.setSize(innerWidth, innerHeight);
-R.setPixelRatio(Math.min(devicePixelRatio, 2));
-R.toneMapping = THREE.ACESFilmicToneMapping;
-R.toneMappingExposure = 0.9;
-
-const S = new THREE.Scene();
-const cam = new THREE.PerspectiveCamera(50, innerWidth/innerHeight, 0.1, 200);
-// Position orb in the golden section intersection (right-center)
-cam.position.set(0.5, 0.2, 6);
-
-// ── SMOOTH FIRE ORB — elegant gradient sphere ──
-const orbVert = `
-  varying vec3 vNorm, vPos;
-  varying vec2 vUv;
-  uniform float uT;
-
-  // Smooth simplex noise
-  vec3 mod289(vec3 x){return x-floor(x/289.0)*289.0;}
-  vec4 mod289(vec4 x){return x-floor(x/289.0)*289.0;}
-  vec4 perm(vec4 x){return mod289((x*34.0+1.0)*x);}
-  vec4 tISq(vec4 r){return 1.79284291400159-0.85373472095314*r;}
-  float snoise(vec3 v){
-    const vec2 C=vec2(1./6.,1./3.);const vec4 D=vec4(0,.5,1,2);
-    vec3 i=floor(v+dot(v,C.yyy)),x0=v-i+dot(i,C.xxx);
-    vec3 g=step(x0.yzx,x0.xyz),l=1.0-g,i1=min(g,l.zxy),i2=max(g,l.zxy);
-    vec3 x1=x0-i1+C.x,x2=x0-i2+C.y,x3=x0-D.y;
-    i=mod289(i);
-    vec4 p=perm(perm(perm(i.z+vec4(0,i1.z,i2.z,1))+i.y+vec4(0,i1.y,i2.y,1))+i.x+vec4(0,i1.x,i2.x,1));
-    vec3 ns=0.142857142857*D.wyz-D.xzx;
-    vec4 j=p-49.0*floor(p*ns.z*ns.z),x_=floor(j*ns.z),y_=floor(j-7.0*x_);
-    vec4 x4=x_*ns.x+ns.y,y4=y_*ns.x+ns.y,h=1.0-abs(x4)-abs(y4);
-    vec4 b0=vec4(x4.xy,y4.xy),b1=vec4(x4.zw,y4.zw);
-    vec4 s0=floor(b0)*2.0+1.0,s1=floor(b1)*2.0+1.0,sh=-step(h,vec4(0));
-    vec4 a0=b0.xzyw+s0.xzyw*sh.xxyy,a1=b1.xzyw+s1.xzyw*sh.zzww;
-    vec3 p0=vec3(a0.xy,h.x),p1=vec3(a0.zw,h.y),p2=vec3(a1.xy,h.z),p3=vec3(a1.zw,h.w);
-    vec4 nm=tISq(vec4(dot(p0,p0),dot(p1,p1),dot(p2,p2),dot(p3,p3)));
-    p0*=nm.x;p1*=nm.y;p2*=nm.z;p3*=nm.w;
-    vec4 m=max(.6-vec4(dot(x0,x0),dot(x1,x1),dot(x2,x2),dot(x3,x3)),0.);m*=m;
-    return 42.0*dot(m*m,vec4(dot(p0,x0),dot(p1,x1),dot(p2,x2),dot(p3,x3)));
-  }
-
-  void main(){
-    vUv=uv; vNorm=normal;
-    vec3 p=position;
-    // Gentle flame shape: taper top, wider base
-    float hf=(p.y+1.0)/2.0;
-    p.xz *= 1.0 - pow(hf,0.7)*0.5;
-    p.y *= 1.35;
-    // Very gentle organic deformation — slow and smooth
-    float n1 = snoise(p*1.8 + vec3(0, uT*0.18, 0)) * (0.08 + hf*0.18);
-    float n2 = snoise(p*3.5 + vec3(uT*0.06, uT*0.25, 0)) * (0.04 + hf*0.08);
-    p += normal * (n1+n2);
-    p.y += hf * 0.08 * sin(uT*0.3 + p.x*1.5); // Subtle upward drift
-    // Very slow breath
-    p *= 1.0 + sin(uT*0.25)*0.008;
-    vPos=p;
-    gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1);
-  }
-`;
-const orbFrag = `
-  varying vec3 vNorm, vPos;
-  uniform float uT;
-  void main(){
-    float fr = pow(max(0., .55-dot(vNorm,vec3(0,0,1))), 2.2);
-    float h = (vPos.y+1.4)/3.8;
-    // Refined color ramp
-    vec3 deep = vec3(0.45,0.03,0.01);
-    vec3 red  = vec3(0.82,0.12,0.04);
-    vec3 org  = vec3(0.95,0.38,0.05);
-    vec3 yel  = vec3(1.0,0.75,0.12);
-    vec3 wht  = vec3(1.0,0.92,0.7);
-    vec3 c = mix(deep,red,smoothstep(0.,.25,h));
-    c = mix(c,org,smoothstep(.2,.5,h));
-    c = mix(c,yel,smoothstep(.45,.72,h));
-    c = mix(c,wht,smoothstep(.7,1.,h));
-    // Soft hot center
-    c += wht * exp(-length(vPos.xz)*3.5) * 0.3;
-    // Subtle edge glow
-    c += vec3(.6,.15,0) * fr * 0.4;
-    // Dim for background
-    c *= 0.55;
-    float a = 0.65 - fr*0.2;
-    a *= smoothstep(0.,.12, 1.-h+.12);
-    gl_FragColor = vec4(c,a);
-  }
-`;
-
-// ── HALO SHADERS ──
-const hVert = `
-  varying vec2 vUv; varying vec3 vP; uniform float uT;
-  void main(){
-    vUv=uv; vP=position;
-    vec3 p=position;
-    p.y += sin(uT*0.35+p.x)*0.008;
-    gl_Position=projectionMatrix*modelViewMatrix*vec4(p,1);
-  }
-`;
-const hFrag = `
-  varying vec2 vUv; varying vec3 vP; uniform float uT;
-  void main(){
-    float a=atan(vP.z,vP.x);
-    float sh=sin(a*5.0+uT*0.8)*0.1+0.9;
-    vec3 gold=vec3(1,.84,0);
-    vec3 c=mix(gold,vec3(1,.94,.5),sh*0.35)*(sin(uT*0.5)*0.06+0.94);
-    float tf=1.-abs(vUv.y-.5)*2.; tf=pow(max(0.,tf),0.55);
-    c+=gold*0.2;
-    gl_FragColor=vec4(c, tf*0.75*sh);
-  }
-`;
-
-// ── BUILD SCENE ──
-const orbG = new THREE.IcosahedronGeometry(1, 6);
-const orbM = new THREE.ShaderMaterial({vertexShader:orbVert, fragmentShader:orbFrag, uniforms:{uT:{value:0}}, transparent:true, side:THREE.DoubleSide, depthWrite:false});
-const orb = new THREE.Mesh(orbG, orbM);
-orb.position.set(0, -0.15, 0);
-S.add(orb);
-
-// Inner glow core
-const coreM = new THREE.MeshBasicMaterial({color:0xffaa00, transparent:true, opacity:0.06, depthWrite:false});
-S.add(new THREE.Mesh(new THREE.IcosahedronGeometry(0.35,3), coreM));
-
-// Halo — just slightly above flame tip (NOT floating way above)
-const haloU = {uT:{value:0}};
-const haloM = new THREE.ShaderMaterial({vertexShader:hVert, fragmentShader:hFrag, uniforms:haloU, transparent:true, side:THREE.DoubleSide, depthWrite:false});
-const halo = new THREE.Mesh(new THREE.TorusGeometry(0.72, 0.035, 16, 100), haloM);
-halo.position.set(0, 1.15, 0); // Just above the flame
-halo.rotation.x = Math.PI * 0.4;
-halo.rotation.z = -0.12;
-S.add(halo);
-
-// Subtle outer halo glow
-const halo2M = new THREE.ShaderMaterial({vertexShader:hVert, fragmentShader:hFrag, uniforms:{uT:haloU.uT}, transparent:true, side:THREE.DoubleSide, depthWrite:false});
-const halo2 = new THREE.Mesh(new THREE.TorusGeometry(0.76, 0.012, 10, 100), halo2M);
-halo2.position.copy(halo.position);
-halo2.rotation.copy(halo.rotation);
-S.add(halo2);
-
-// Sparse rising embers — few and elegant
-const EC = 120;
-const eG = new THREE.BufferGeometry();
-const eP = new Float32Array(EC*3), eV = new Float32Array(EC*3), eC = new Float32Array(EC*3);
-function resetE(i){
-  const a=Math.random()*Math.PI*2, r=Math.random()*0.4;
-  eP[i*3]=Math.cos(a)*r; eP[i*3+1]=-0.3+Math.random()*0.3; eP[i*3+2]=Math.sin(a)*r;
-  eV[i*3]=(Math.random()-.5)*.002; eV[i*3+1]=.004+Math.random()*.01; eV[i*3+2]=(Math.random()-.5)*.002;
-  const t=Math.random(); eC[i*3]=1; eC[i*3+1]=.3+t*.55; eC[i*3+2]=t*.1;
-}
-for(let i=0;i<EC;i++) resetE(i);
-eG.setAttribute('position',new THREE.BufferAttribute(eP,3));
-eG.setAttribute('color',new THREE.BufferAttribute(eC,3));
-const embers = new THREE.Points(eG, new THREE.PointsMaterial({size:.025, vertexColors:true, transparent:true, opacity:.5, blending:THREE.AdditiveBlending, depthWrite:false, sizeAttenuation:true}));
-S.add(embers);
-
-// Background stars
-const SN=800, sG=new THREE.BufferGeometry(), sP=new Float32Array(SN*3);
-for(let i=0;i<SN;i++){sP[i*3]=(Math.random()-.5)*50;sP[i*3+1]=(Math.random()-.5)*50;sP[i*3+2]=-8-Math.random()*40;}
-sG.setAttribute('position',new THREE.BufferAttribute(sP,3));
-const stars = new THREE.Points(sG, new THREE.PointsMaterial({size:.04, color:0x2a2a3a, transparent:true, opacity:.4, blending:THREE.AdditiveBlending, depthWrite:false}));
-S.add(stars);
-
-// Lights
-const fL = new THREE.PointLight(0xE53935, 1.5, 10);
-fL.position.set(0,.5,3); S.add(fL);
-const hL = new THREE.PointLight(0xFFD700, 0.8, 6);
-hL.position.set(0,1.5,2); S.add(hL);
-S.add(new THREE.AmbientLight(0x060608));
-
-// Mouse
-let mx=0,my=0;
-document.addEventListener('mousemove',e=>{mx=(e.clientX/innerWidth-.5)*2;my=(e.clientY/innerHeight-.5)*2;});
-
-// Animate
-const clk=new THREE.Clock();
-(function loop(){
-  requestAnimationFrame(loop);
-  const t=clk.getElapsedTime();
-  orbM.uniforms.uT.value=t;
-  haloU.uT.value=t;
-  orb.rotation.y=t*0.04; // Very slow rotation
-  halo.position.y=1.15+Math.sin(t*0.35)*0.015;
-  halo2.position.y=halo.position.y;
-  halo.rotation.z=-0.12+Math.sin(t*0.2)*0.01;
-  halo2.rotation.z=halo.rotation.z;
-  // Embers
-  const p=embers.geometry.attributes.position.array;
-  for(let i=0;i<EC;i++){
-    p[i*3]+=eV[i*3]; p[i*3+1]+=eV[i*3+1]; p[i*3+2]+=eV[i*3+2];
-    if(p[i*3+1]>3) resetE(i);
-  }
-  embers.geometry.attributes.position.needsUpdate=true;
-  stars.rotation.y=t*0.003;
-  // Gentle camera follow
-  cam.position.x+=(.5+mx*0.2-cam.position.x)*0.008;
-  cam.position.y+=(0.2-my*0.12-cam.position.y)*0.008;
-  cam.lookAt(0,0.3,0);
-  fL.intensity=1.5+Math.sin(t*2.5)*0.15;
-  R.render(S,cam);
-})();
-
-addEventListener('resize',()=>{cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();R.setSize(innerWidth,innerHeight);});
-
-// Loader
-setTimeout(()=>document.getElementById('loader').classList.add('done'),1800);
-
-// KPI counters
-function ctr(el,v,pre,suf,d){const s=performance.now();(function t(n){const p=Math.min((n-s)/d,1);el.textContent=(pre||'')+Math.round(v*(1-Math.pow(1-p,3))).toLocaleString()+(suf||'');if(p<1)requestAnimationFrame(t);})(performance.now());}
-// Real, non-sensitive scale counts from the API (no fabricated metrics).
-setTimeout(()=>{
-  fetch('/api/public/summary').then(r=>r.json()).then(s=>{
-    ctr(document.getElementById('k1'),s.bidsTracked||0,'','',1600);
-    ctr(document.getElementById('k2'),s.pricebookItems||0,'','',1800);
-    ctr(document.getElementById('k3'),s.sourceWorkbooks||0,'','',1400);
-    ctr(document.getElementById('k4'),s.claimGates||0,'','',1200);
-  }).catch(()=>{});
-},2200);
-
-// Clock
-(function ck(){const d=new Date();document.getElementById('clk').textContent=d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+'  '+d.toLocaleTimeString('en-US',{hour12:false});setTimeout(ck,1000)})();
-
-// Login
 const HALOFIRE_BASE_PATH = window.location.pathname.startsWith('/halo-fire/') ? '/halo-fire' : '';
+
 function safeWorkbenchRedirect(){
   const fallback = HALOFIRE_BASE_PATH + '/workbench.html';
   const params = new URLSearchParams(window.location.search);
@@ -424,9 +318,8 @@ function safeWorkbenchRedirect(){
   }catch(_){}
   return fallback;
 }
+
 function storeLoginToken(data){
-  // "Keep me logged in" (default checked) -> persist in localStorage across
-  // reloads/tab-close; unchecked -> sessionStorage only (cleared on tab close).
   const rememberEl = document.getElementById('remember');
   const remember = rememberEl ? rememberEl.checked : true;
   const store = remember ? localStorage : sessionStorage;
@@ -438,46 +331,26 @@ function storeLoginToken(data){
     // The server also sets an HttpOnly session cookie; storage is convenience.
   }
 }
-// DEMO (localhost only): pre-fill the dev creds the preview server is launched
-// with, and self-heal a bounced session so the operator stays logged in across
-// reloads while building/testing. PRODUCTION (non-localhost) is unaffected.
-function isHaloDemoHost(){ return location.hostname==='localhost'||location.hostname==='127.0.0.1'; }
-function haloTokenExpired(t){ try{const p=JSON.parse(atob(String(t).split('.')[1]));return !p.exp||(p.exp*1000)<=(Date.now()+5000);}catch(_){return true;} }
-(function haloDemoLoginBootstrap(){
-  if(!isHaloDemoHost()) return;
-  const u=document.getElementById('user'), p=document.getElementById('pass');
-  if(u && !u.value) u.value='admin';
-  if(p && !p.value) p.value='halofire-dev-smoke';
-  let tok=null; try{ tok=localStorage.getItem('halofire_token'); }catch(_){}
-  const params=new URLSearchParams(window.location.search);
-  if(params.get('redirect') && (!tok || haloTokenExpired(tok))){
-    try{
-      const xhr=new XMLHttpRequest();
-      xhr.open('POST', HALOFIRE_BASE_PATH + '/' + 'api/auth/login', false);
-      xhr.setRequestHeader('Content-Type','application/json');
-      xhr.send(JSON.stringify({username:'admin',password:'halofire-dev-smoke'}));
-      if(xhr.status===200){
-        const data=JSON.parse(xhr.responseText||'{}');
-        if(data&&data.token){
-          try{ localStorage.setItem('halofire_token',data.token); if(data.user) localStorage.setItem('halofire_user',JSON.stringify(data.user)); }catch(_){}
-          window.location.href=safeWorkbenchRedirect(); return;
-        }
-      }
-    }catch(_){}
-  }
-})();
-const ov=document.getElementById('overlay');
-document.getElementById('signBtn').onclick=()=>ov.classList.add('on');
-document.getElementById('enterBtn').onclick=()=>ov.classList.add('on');
-document.getElementById('closeBtn').onclick=()=>ov.classList.remove('on');
-ov.onclick=e=>{if(e.target===ov)ov.classList.remove('on');};
+
+function openLogin(){ document.getElementById('overlay').classList.add('on'); }
+function closeLogin(){ document.getElementById('overlay').classList.remove('on'); }
+
+document.getElementById('signBtn').onclick=openLogin;
+document.getElementById('enterBtn').onclick=openLogin;
+document.getElementById('bandSignBtn').onclick=openLogin;
+document.getElementById('closeBtn').onclick=closeLogin;
+document.getElementById('overlay').onclick=e=>{if(e.target===e.currentTarget)closeLogin();};
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLogin();});
+
 document.getElementById('form').onsubmit=async e=>{
   e.preventDefault();
   const er=document.getElementById('err');
+  er.style.display='none';
   try{
     const res=await fetch(HALOFIRE_BASE_PATH + '/' + 'api/auth/login',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
+      credentials:'include',
       body:JSON.stringify({
         username:document.getElementById('user').value,
         password:document.getElementById('pass').value,
@@ -488,10 +361,18 @@ document.getElementById('form').onsubmit=async e=>{
     storeLoginToken(data);
     window.location.href=safeWorkbenchRedirect();
   }catch(_){
-    er.style.display='block';setTimeout(()=>er.style.display='none',2500);
+    er.style.display='block';
   }
 };
-document.getElementById('menuBtn').onclick=()=>document.getElementById('navLinks').classList.toggle('open');
+
+(function clock(){
+  const el=document.getElementById('clk');
+  if(el){
+    const d=new Date();
+    el.textContent=d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})+' '+d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+  }
+  setTimeout(clock,30000);
+})();
 </script>
 </body>
 </html>
