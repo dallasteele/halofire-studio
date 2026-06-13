@@ -1568,9 +1568,8 @@ function updateViewCube() {
   const dir = camera.position.clone().sub(tgt);
   if (dir.lengthSq() < 1e-6) dir.set(0, 0, 1);
   dir.normalize();
-  // Constant tilt bias so an ortho view (top/front/right) never collapses to a flat
-  // square — the cube always reads as a 3D cube (UE/Fusion ViewCube behaviour).
-  dir.add(new THREE.Vector3(0.18, 0.15, 0.12)).normalize();
+  // Faithful orientation: the cube shows the SAME face the main camera looks at, so
+  // clicking a face snaps the view AND squares the cube up on that face (no skew).
   vcCamera.position.copy(dir.multiplyScalar(6.2));
   vcCamera.up.set(0, 1, 0);
   vcCamera.lookAt(0, 0, 0);
