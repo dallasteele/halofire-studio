@@ -1,0 +1,1687 @@
+{
+  "source": "https://autosprink.com/help/44?v=latest (index) + per-toolbar subpages",
+  "scraped": "2026-06-12",
+  "provenance": "scraped 2026-06-12, needs-verification",
+  "gaps": [],
+  "toolbars": [
+    {
+      "toolbar": "Actions Toolbar",
+      "sourcePage": "https://autosprink.com/help/45?v=latest",
+      "sourceTitle": "Actions Toolbar",
+      "buttons": [
+        {
+          "name": "Access",
+          "desc": "View > Toolbars > Actions",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Scale Selection",
+          "desc": "Resize an element using a scaling factor you specify.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Rotate Selection",
+          "desc": "Rotate an element relative to the current benchmark. This can be a 3-D rotation.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Array",
+          "desc": "Make multiple copies of an element, and place them in a grid formation near the original element.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Group the Selection",
+          "desc": "Links two or more selected items together into a group.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Split All",
+          "desc": "Splits elements into their component parts.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Trim/Extend",
+          "desc": "Break elements where they cross a targeted element and/or extend elements to intersect with a targeted element.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Mirror",
+          "desc": "Mirror the selection across the benchmark.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Cleanup Intersections",
+          "desc": "Break up intersecting elements into pieces at the point where they intersect, and fuse overlapping collinear elements into a single element.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Flatten",
+          "desc": "Set the Z height to zero for all or all selected.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    },
+    {
+      "toolbar": "Alerts Toolbar",
+      "sourcePage": "https://autosprink.com/help/46?v=latest",
+      "sourceTitle": "Alerts Toolbar",
+      "buttons": [
+        {
+          "name": "Access",
+          "desc": "Alerts Pane",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    },
+    {
+      "toolbar": "Arcs Toolbar",
+      "sourcePage": "https://autosprink.com/help/47?v=latest",
+      "sourceTitle": "Arcs Toolbar",
+      "buttons": [
+        {
+          "name": "Center, Start, End",
+          "desc": "Equips the mouse cursor to add an arc by selecting a center, start, and end.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Start, End, Radius",
+          "desc": "Equips the mouse cursor to add an arc by selecting a start, end, and radius.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Start, Center, Angle",
+          "desc": "Equips the mouse cursor to add an arc by selecting a start, center, and angle.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Center, Start, Angle",
+          "desc": "Equips the mouse cursor to add an arc by selecting a center, start, and angle.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "3-Point",
+          "desc": "Equips the mouse cursor to add an arc using 3 points.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Arcs are consisted of three parts",
+          "desc": "a center, start, and end. The option you select determines the order you select each part of the arc, which forms how the arc is created. For example, in the image shown below, the arc was created with the Center, Start, End command.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    },
+    {
+      "toolbar": "Auto Draw Toolbar",
+      "sourcePage": "https://autosprink.com/help/48?v=latest",
+      "sourceTitle": "Auto Draw Toolbar",
+      "buttons": [
+        {
+          "name": "Access",
+          "desc": "View: Tool Bars: Auto Draw",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Connect Sprinklers to Pipes",
+          "desc": "Connects sprinklers to branch lines using arm-overs, sprigs and/or drops.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Connect Pipes to Target Pipe",
+          "desc": "Connects selected pipes to targeted pipes.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Swing Joint",
+          "desc": "Connects two selected pipes together using a swing joint.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Auto Easy Drop",
+          "desc": "Connects sprinklers at the end of vertical drops to pipes.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Swing Multiple",
+          "desc": "Connects selected pipes to each other using swing joints.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Auto Branch Lines",
+          "desc": "Creates branch lines based on sprinkler concentrations.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Size Selected Pipes",
+          "desc": "Sizes branch lines, outriggers, and riser nipples according to pipe sizing settings and reference.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Arm-Around",
+          "desc": "Creates an \"arm\" around an obstruction according to user selected options in order to correct an intersection that causes a conflict.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    },
+    {
+      "toolbar": "Camera Rotator Toolbar",
+      "sourcePage": "https://autosprink.com/help/49?v=latest",
+      "sourceTitle": "Camera Rotator Toolbar",
+      "buttons": [
+        {
+          "name": "Access",
+          "desc": "View: Tool Bars: Camera Rotator",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Hold Altitude",
+          "desc": "When active, keeps camera at the same Z elevation while it moves, regardless of the direction in which it is pointed. (Note: This command is only available if you are in First Person mode.)",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Auto Clip",
+          "desc": "When active, both foreground and backdrop clipping planes are recalculated whenever the camera is moved in order to keep the entire drawing visible.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "First Person",
+          "desc": "When active, the view is shown in first-person perspective, as if you are inside the drawing at the location of the camera. Objects are rendered so as to appear three-dimensional and give the appearance of depth.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Increase Camera Velocity",
+          "desc": "Starts camera moving forward; each click of this button increases forward velocity. Also usable to slow down backward camera motion. (Note: This command is only available if you are in First Person mode.)",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Decrease Camera Velocity",
+          "desc": "Starts camera moving backward; each click of this button increases backward velocity. Also usable to slow down forward camera motion. (Note: This command is only available if you are in First Person mode.)",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Stop Camera Movement",
+          "desc": "If the camera is moving, this stops its motion completely. (Note: This command is only available if you are in First Person mode.)",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Move Camera Forward",
+          "desc": "Moves the camera forward one movement increment. (Note: This command is only available if you are in First Person mode.)",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Move Foreground Clip Farther",
+          "desc": "Increases distance between the camera and the foreground clipping plane, the place in the foreground at which objects become visible.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Move Backdrop Clip Farther",
+          "desc": "Increases distance between the camera and the backdrop clipping plane (also known as the background clipping plane), the place in the background beyond which objects are no longer visible.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Move Camera Backward",
+          "desc": "Moves the camera backward one movement increment. (Note: This command is only available if you are in First Person mode.)",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Move Foreground Clip Nearer",
+          "desc": "Decreases distance between the camera and the place in the foreground at which objects become visible.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Move Backdrop Clip Nearer",
+          "desc": "Decreases distance between the camera and the place in the background beyond which objects are no longer visible.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Set Camera Position",
+          "desc": "Lets you set camera position and direction by clicking in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Camera Position Settings",
+          "desc": "Lets you set camera position and direction by entering coordinates.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Window Clipping Plane",
+          "desc": "Equips cursor with a rectangle tool, allowing you to select an area of your drawing outside of which everything will be invisible.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    },
+    {
+      "toolbar": "Clip Planes Toolbar",
+      "sourcePage": "https://autosprink.com/help/50?v=latest",
+      "sourceTitle": "Clip Planes Toolbar",
+      "buttons": [
+        {
+          "name": "Access",
+          "desc": "View: Tool Bars: Clip Planes",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "2-Point Vertical",
+          "desc": "Allows you to draw a vertical clipping plane between two points you specify.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "3-Point",
+          "desc": "Allows you to draw a clipping plane specified by three points.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Clip Plane Above",
+          "desc": "Creates a horizontal clipping plane that clips all elements above it.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Clip Plane Below",
+          "desc": "Creates a horizontal clipping plane that clips all elements below it.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Clip Plane East",
+          "desc": "Creates a vertical clipping plane that clips all elements to its east.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Clip Plane North",
+          "desc": "Creates a vertical clipping plane that clips all elements to its north.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Clip Plane South",
+          "desc": "Creates a vertical clipping plane that clips all elements to its south.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Clip Plane West",
+          "desc": "Creates a vertical clipping plane that clips all elements to its west.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Isolate Rectangle with Four Clip Planes",
+          "desc": "Allows four corners of an element area to be isolated (clipped).",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Isolate Selection with Cube of Clip Planes",
+          "desc": "When an element area is selected in a drawing, this tool clips everything except the selected area.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    },
+    {
+      "toolbar": "Clipping Slider Toolbar",
+      "sourcePage": "https://autosprink.com/help/51?v=latest",
+      "sourceTitle": "Clipping Slider Toolbar",
+      "buttons": [
+        {
+          "name": "Access",
+          "desc": "View: Tool Bars: Clipping Slider",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    },
+    {
+      "toolbar": "Clipping XYZ Slider Toolbar",
+      "sourcePage": "https://autosprink.com/help/52?v=latest",
+      "sourceTitle": "Clipping XYZ Slider Toolbar",
+      "buttons": [
+        {
+          "name": "Access",
+          "desc": "View: Tool Bars: Clipping XYZ Slider",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    },
+    {
+      "toolbar": "Display Rotator Toolbar",
+      "sourcePage": "https://autosprink.com/help/53?v=latest",
+      "sourceTitle": "Display Rotator Toolbar",
+      "buttons": [
+        {
+          "name": "Access",
+          "desc": "View: Tool Bars: Display Rotator",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Set Display Rotation",
+          "desc": "Sets the display's rotation to the value in this toolbar's input box. The value may be changed manually by typing a new angle into the input box.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Restore Display Rotation",
+          "desc": "Sets the display rotation of the selected element to 0 degrees.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    },
+    {
+      "toolbar": "Draw Toolbar",
+      "sourcePage": "https://autosprink.com/help/54?v=latest",
+      "sourceTitle": "Draw Toolbar",
+      "buttons": [
+        {
+          "name": "Access",
+          "desc": "View: Tool Bars: Draw",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Line Segment",
+          "desc": "Equips the cursor with the line tool. Draws individual line segments defined by their two endpoints.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Polyline",
+          "desc": "Equips the cursor with the polyline tool. Draws a continuos line of connect line segments with the starting point of each segment after the first at the endpoint of the previous segment. The continuous line is defined by all the segment...",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Rectangle",
+          "desc": "Equips the cursor with the rectangle tool. Draws a closed rectangular polyline.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Circle",
+          "desc": "Equips the cursor with the circle tool. Draws a circle defined by three points.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Crosshatch",
+          "desc": "Equips the cursor with the crosshatch tool. Draws a crosshatch defined by several points.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Column",
+          "desc": "Equips the cursor to place a column in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Column Line",
+          "desc": "Equips the cursor to add a column line to the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Automatic Roof Planes",
+          "desc": "Creates roof planes by connecting all selected walls and/or columns.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Roof Plane",
+          "desc": "Adds a roof plane to the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Continuous Beam",
+          "desc": "Equips the cursor with the beam tool. Adds a series of beams to the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Elevate Elements",
+          "desc": "Moves selected elements up or down to the nearest roof plane.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Convert",
+          "desc": "This submenu contains shortcuts for many of the commands listed under the Commands menu that convert elements from one type of element to another.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Cloud",
+          "desc": "Equips the cursor with the cloud tool. Draws a cloud defined by several points.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    },
+    {
+      "toolbar": "Dynamic Camera Toolbar",
+      "sourcePage": "https://autosprink.com/help/55?v=latest",
+      "sourceTitle": "Dynamic Camera Toolbar",
+      "buttons": [
+        {
+          "name": "Access",
+          "desc": "View: Tool Bars: Dynamic Camera",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Click and Drag",
+          "desc": "Several distinct views are available by selecting the appropriate toolbar icon, clicking the left mouse button, then dragging the mouse over the area in the drawing. To end a Dynamic Camera view, right-mouse click anywhere in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    },
+    {
+      "toolbar": "Finish Toolbar",
+      "sourcePage": "https://autosprink.com/help/56?v=latest",
+      "sourceTitle": "Finish Toolbar",
+      "buttons": [
+        {
+          "name": "Access",
+          "desc": "View: Tool Bars: Finish",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Update Pipe Labels",
+          "desc": "Updates pipe labels in your drawing according to parameters you specify.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Toggle Pipe Labels Display",
+          "desc": "Turns display of pipe labels on or off.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Create Node Tags",
+          "desc": "Creates hydraulic node tags for all remote areas.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Update Node Tags",
+          "desc": "Updates existing hydraulic node tags in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Remove Node Tags",
+          "desc": "Removes all hydraulic node tags from the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Stretch Hangers",
+          "desc": "Stretches hangers that are selected in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Auto Fittings",
+          "desc": "Automatically places fittings at all pipe intersections that do no have a fitting.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Auto Couplings",
+          "desc": "Breaks pipes that are too long and places couplings.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Automatic Roof Planes",
+          "desc": "Creates roof planes by connecting all selected walls and/or columns.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Auto Hangers",
+          "desc": "Automatically places hangers on pipes selected in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Harmonize Selected Pipes and Fittings",
+          "desc": "Compares pipes an fittings and makes adjustments to fittings as needed so that they match pipes.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Toggle Show Leaks",
+          "desc": "Turns visual indication of leaks in you system on or off.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    },
+    {
+      "toolbar": "Fittings Toolbar",
+      "sourcePage": "https://autosprink.com/help/57?v=latest",
+      "sourceTitle": "Fittings Toolbar",
+      "buttons": [
+        {
+          "name": "Access",
+          "desc": "View > Toolbars > Fittings",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Elbow",
+          "desc": "Used to connect two pipes at a 90-degree angle.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Tee",
+          "desc": "Used at a three-pipe intersection to connect pipes.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Cross",
+          "desc": "Used at a four-pipe intersection to connect pipes.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Bushing",
+          "desc": "Used to connect pipes (or pipes and fittings) of disparate sizes.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Cap",
+          "desc": "Used at an unconnected pipe end to keep water in the pipe.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Coupling",
+          "desc": "Used to connect two pipes end-to-end.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Flange",
+          "desc": "Used for connections where stiff, inflexible unions are required (typically in places where high pressure is involved).",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Valve",
+          "desc": "Used to control flow of water through the pipe to which it is attached.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Reducer/Adapter",
+          "desc": "A non-grooved fitting that does not fall into any of the other fitting categories.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Union",
+          "desc": "A flexible fitting for rigid pipes. If two fixed pipes must be joined, a union can rotate both ways to join the pipes before being locked into position.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Flex Head",
+          "desc": "A flexible pipe with a female connection at one end and a male connection at the other.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    },
+    {
+      "toolbar": "Hydraulics Toolbar",
+      "sourcePage": "https://autosprink.com/help/58?v=latest",
+      "sourceTitle": "Hydraulics Toolbar",
+      "buttons": [
+        {
+          "name": "Access",
+          "desc": "View: Tool Bars: Hydraulics",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Supply",
+          "desc": "Equips the mouse cursor with a supply that can be added to the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Pump",
+          "desc": "Equips the mouse cursor with a pump that can be added to the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Hose",
+          "desc": "Equips the mouse cursor with a hose that can be added to the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Remote Area",
+          "desc": "Equips the mouse cursor with a remote area to add to the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Remote Area Boundary",
+          "desc": "Equips the mouse cursor with a remote area boundary that can be drawn by selecting several points in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Gauge",
+          "desc": "Equips the mouse cursor with a check point gauge that can be added to the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Hydraulic Analysis Reports",
+          "desc": "Graphically display the hydraulic information of the currently selected remote area in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Color Pipes By...",
+          "desc": "Allows the user to color pipes according to hydraulic results.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    },
+    {
+      "toolbar": "Input Toolbar",
+      "sourcePage": "https://autosprink.com/help/59?v=latest",
+      "sourceTitle": "Input Toolbar",
+      "buttons": [
+        {
+          "name": "Access",
+          "desc": "View menu > Toolbars submenu > Input",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Camera Movement",
+          "desc": "In addition to coordinate input for the placement of elements, the Input Box can be used to control camera location while in First-Person Mode. Holding SHIFT before pressing the ENTER key with a set of coordinates in the box moves the...",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Input Codes",
+          "desc": "Input Codes force coordinates to be interpreted differently and can be combined to produce different results. If no input code is used, entered coordinates are interpreted relative to the current location and rotation of the benchmark.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    },
+    {
+      "toolbar": "Listing Toolbar",
+      "sourcePage": "https://autosprink.com/help/60?v=latest",
+      "sourceTitle": "Listing Toolbar",
+      "buttons": [
+        {
+          "name": "Access",
+          "desc": "View: Tool Bars: Listing",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Harmonize Selected Pipes and Fittings",
+          "desc": "Compares pipes an fittings and makes adjustments to fittings as needed so that they match pipes.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Toggle Show Leaks",
+          "desc": "Turns visual indication of leaks in you system on or off.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Create Pipelines & Make-Ons",
+          "desc": "For currently selected elements, generates listing aids that illustrate assembly order and factory-attached fittings via the options presented on the Create Pipelines & Make-Ons dialog. Note: Use this function to create and display a...",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Assign List Area",
+          "desc": "Gathers information on selected system components, grouping them under a designation you specify for presentation in a Bill of Material or a Stock Listing Report.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Listing Manager",
+          "desc": "Displays description, element count and date last listed for each list area in the drawing, along with otions to generate a Bill of Material or Stock Listing Report.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Bill of Material",
+          "desc": "Creates a Bill of Material )also known as a BOM) for currently selected elements or for your entire drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Default List Area",
+          "desc": "This pull-down list controls what List Area is set as the active list area.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    },
+    {
+      "toolbar": "Main Toolbar",
+      "sourcePage": "https://autosprink.com/help/61?v=latest",
+      "sourceTitle": "Main Toolbar",
+      "buttons": [
+        {
+          "name": "Access",
+          "desc": "View: Tool Bars: Main",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "New Drawing",
+          "desc": "Creates a new drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Open",
+          "desc": "Accesses the Open dialog box for opening a file.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Save",
+          "desc": "Saves the currently active file to disk.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Import AutoCAD Drawing",
+          "desc": "Imports an AutoCAD .DWG drawing into the current drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "External Reference",
+          "desc": "Adds a reference to an external drawing to the current drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Undo",
+          "desc": "Undoes the most recent action. (Repeated clicking of this button undoes more actions, in reverse order of when the actions were performed.)",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Redo",
+          "desc": "Redoes the most recently undone action. (Repeated clicking of this button restores more undone actions, in reverse order of when they were undone.)",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Plotting",
+          "desc": "This submenu acts as a shortcut for options available in the File menu.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Help",
+          "desc": "Activates context-sensitive help related to whatever you click on next.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "External Reference",
+          "desc": "Adds a reference to an external drawing to the current drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    },
+    {
+      "toolbar": "Modeling Toolbar",
+      "sourcePage": "https://autosprink.com/help/62?v=latest",
+      "sourceTitle": "Modeling Toolbar",
+      "buttons": [
+        {
+          "name": "Access",
+          "desc": "View: Tool Bars: Modeling",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Cylinder",
+          "desc": "Equips cursor with a tool to draw a cylinder.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Texture Plane",
+          "desc": "Equips cursor with a tool to create a flat plane textured with an image of the user's choice.Note: Buttons that are grayed-out indicate they are not available for AutoSPRINK Professional licensed users.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Apply Texture Plane",
+          "desc": "Applies the texture coordinates of a selected Texture Plane to all selected objects.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Disk/Pie",
+          "desc": "Opens a dialog box to select and define the solid to be drawn, then equips cursor with a tool to either draw a disk or \"pie slice\" (i.e. a portion of a disk).",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Polygon",
+          "desc": "Equips cursor with a tool to draw a polygon.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Quad",
+          "desc": "Equips cursor with a tool to draw a quad shape.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Rectangle",
+          "desc": "Equips cursor with a tool to draw a rectangle.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Triangle",
+          "desc": "Equips cursor with a tool to draw a triangle.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Box",
+          "desc": "Equips cursor with a tool to draw a box.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Cylinder",
+          "desc": "Opens a dialog box to select and define the solid to be drawn, then equips cursor with a tool to draw either a cylinder or a portion of one.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "3D Cylinder",
+          "desc": "Opens a dialog box to select and define the solid to be drawn, then equips cursor with a tool to draw either a 3D cylinder or a portion of one.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Mesh",
+          "desc": "Equips cursor with a tool to draw a mesh.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Pyramid/Cone",
+          "desc": "Opens a dialog box to select and define the solid to be drawn, then equips cursor with a tool to draw either a pyramid or a cone.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Sphere/Dome",
+          "desc": "Opens a dialog box to select and define the solid to be drawn, then equips cursor with a tool to draw either a sphere or a dome.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Extrusion",
+          "desc": "Opens a dialog box to define an extrusion from a selected solid.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Rotation",
+          "desc": "Opens a dialog box to specify parameters for rotation of a selected element. Note: This rotation makes multiple copies of the selected element and fills a specified arc with those copies. It does not change the orientation of the...",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Slice Triangles & Quads",
+          "desc": "Slices triangular and quadrangular solids.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Triangulate Elements",
+          "desc": "Triangulates selected elements.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Triangulate Points",
+          "desc": "Triangulates selected points.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Normalize Lighting Normals",
+          "desc": "Sets lighting normals for the selected element to those set for the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Reverse Lighting Normals",
+          "desc": "Reverses lighting normals for the selected element.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Smooth Lighting Normals",
+          "desc": "Smooths out sharp edges in lighting normals for the selected element.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Lock Automatically Oriented Textures",
+          "desc": "Locks selected textures in place so they do not change orientation when the view is changed.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    },
+    {
+      "toolbar": "Notes Toolbar",
+      "sourcePage": "https://autosprink.com/help/63?v=latest",
+      "sourceTitle": "Notes Toolbar",
+      "buttons": [
+        {
+          "name": "Access",
+          "desc": "View > Tool Bars > Notes",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Text Line",
+          "desc": "Equips the mouse cursor to add a text line to the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Leader Line",
+          "desc": "Equips the mouse cursor to add a leader line to the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Text Box",
+          "desc": "Equips the mouse cursor with a text box that can be placed in the drawing by selecting two points.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Toggle Pipe Label Display",
+          "desc": "Toggles the view of pipe labels in the drawing so that they are shown or hidden.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Point-To-Point Dimension 2D",
+          "desc": "Equips the mouse cursor with a flat line dimension that can be placed between two points.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Running Dimensions 2D",
+          "desc": "Equips the mouse cursor with a flat running dimension that can be placed between two points.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Finished Floor",
+          "desc": "Measures the elevation from the benchmark to the specified location.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Top of Steel",
+          "desc": "Measures elevation from floor plane to roof plane.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Sprinkler Legend",
+          "desc": "Equips the mouse cursor with a sprinkler legend table listing all sprinklers in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "View",
+          "desc": "Equips the mouse cursor with a selection cursor that can be used to add a view element into the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Dimension an Area",
+          "desc": "Adds a series of dimensions to all elements in an area.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "2-Point Star Dimension",
+          "desc": "Adds a default star dimension from input location to input location.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Section Tool",
+          "desc": "Equips the mouse cursor with a selection cursor that can be used to add a section to the drawing. Section views can be created using the Create Section View command in the Commands menu.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Hide Area",
+          "desc": "Equips the mouse cursor with a selection cursor that can be used to add a region that hides pipes and fittings in an area.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Part Tag",
+          "desc": "Places a single part tag in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Create Part Legend",
+          "desc": "Equips the mouse cursor with a Part Legend table that is generated based on elements that are selected in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    },
+    {
+      "toolbar": "Print Toolbar",
+      "sourcePage": "https://autosprink.com/help/64?v=latest",
+      "sourceTitle": "Print Toolbar",
+      "buttons": [
+        {
+          "name": "Access",
+          "desc": "View: Tool Bars: Print",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Plot",
+          "desc": "Exports the drawing as a PDF and prints your drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Batch Plot",
+          "desc": "Opens the Batch Printing dialog where you can select several drawings to print or export to PDF at one time.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Plotter Setup",
+          "desc": "Opens the Print dialog box where you can specify printer settings.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Plotting Options",
+          "desc": "Opens the Page Setup dialog where you can specify parameters for printing your drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Page Layout",
+          "desc": "Opens the Model - Page Layout dialog where you can specify what margins you would like to be applied when the model is plotted without a plot sheet.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Hydraulic Reports",
+          "desc": "Opens the Hydraulic Reports dialog box, from which you can set up, preview, print, and export hydraulic report data.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Stock Listing Reports",
+          "desc": "Opens the Stock Listing Reports dialog box, from which you can set up, preview, print, and export stock listing report data.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    },
+    {
+      "toolbar": "Render Toolbar",
+      "sourcePage": "https://autosprink.com/help/65?v=latest",
+      "sourceTitle": "Render Toolbar",
+      "buttons": [
+        {
+          "name": "Access",
+          "desc": "View: Tool Bars: Render",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Shaded Rendering",
+          "desc": "When this button is depressed, the currently active drawing will be rendered in shaded mode. Drawing elements will appear as solid three-dimensional objects, and will interact with light.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Wire Frame Rendering",
+          "desc": "When this button is depressed, the currently active drawing will be rendered in wireframe mode. Drawing elements will appear as skeletal structures, allowing viewers to see through them.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    },
+    {
+      "toolbar": "Select Toolbar",
+      "sourcePage": "https://autosprink.com/help/66?v=latest",
+      "sourceTitle": "Select Toolbar",
+      "buttons": [
+        {
+          "name": "Access",
+          "desc": "View: Tool Bars: Select",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    },
+    {
+      "toolbar": "Selection Rotator Toolbar",
+      "sourcePage": "https://autosprink.com/help/67?v=latest",
+      "sourceTitle": "Selection Rotator Toolbar",
+      "buttons": [
+        {
+          "name": "Access",
+          "desc": "View: Tool Bars: Selection Rotator",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Increment Z Positive",
+          "desc": "Rotates selection positively around the Z-axis of the benchmark.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Increment X Positive",
+          "desc": "Rotates selection positively around the X-axis of the benchmark.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Increment Z Negative",
+          "desc": "Rotates selection negatively around the Z-axis of the benchmark.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Increment Y Negative",
+          "desc": "Rotates selection negatively around the Y-axis of the benchmark.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Increment X Negative",
+          "desc": "Rotates selection negatively around the X-axis of the benchmark.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Increment Y Positive",
+          "desc": "Rotates selection positively around the Y-axis of the benchmark.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Rotation Increment",
+          "desc": "This field sets the rotation increment in degrees. Each button click on this toolbar will rotate the selected element this much. To enter an increment, click in this field and enter a number.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    },
+    {
+      "toolbar": "Snaps Toolbar",
+      "sourcePage": "https://autosprink.com/help/68?v=latest",
+      "sourceTitle": "Snaps Toolbar",
+      "buttons": [
+        {
+          "name": "Access",
+          "desc": "View > Tool Bars > Snaps",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Default Snaps",
+          "desc": "Ortho Snap: When active, forces drawing or dragging at 90-degree angles (i.e. along the X-axis or Y-axis relative to the point where you started drawing or dragging).",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Protractor Snap",
+          "desc": "Displays a protractor that allows pipes to be easily snapped 90, 45, 22.5, 11.25, or 0 degrees.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Center Snap",
+          "desc": "When active, snaps mouse cursor to the center of an element.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "End Point Snap",
+          "desc": "When active, snaps mouse cursor to the end grip of an element. (Also sometimes referred to as Location snap.)",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Perpendicular 2D Snap",
+          "desc": "When active, snaps mouse cursor so that what is being drawn or dragged will be precisely at right angles to an existing element. The endpoint of the element being drawn or the grip being dragged will remain at the same elevation as the...",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Perpendicular 3D Snap",
+          "desc": "When active, snaps mouse cursor so that what is being drawn or dragged will be precisely at right angles to an existing element. The endpoint of the element being drawn or the grip being dragged will snap to the same elevation as the...",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Intersection 2D Snap",
+          "desc": "When active, snaps mouse cursor to the intersection of two or more existing elements. (Of the intersecting elements, the element surrounded by the dashed line is the element to which the element being drawn or dragged will snap.)",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Intersection 3D Snap",
+          "desc": "When active, snaps mouse cursor to the intersection of two or more existing elements. (Of the intersecting elements, the element surrounded by the dashed line is the element to which the element being drawn or dragged will snap.) This...",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Near Snap",
+          "desc": "When active, snaps mouse cursor to any point along an existing element's visible boundaries.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Special Element Snap",
+          "desc": "When active, snaps mouse cursor appropriately according to the elements involved. For example, when drawing an opening and snapping to a wall, this will snap the opening inside the wall instead of outside the wall.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Snap into Symbol Snap",
+          "desc": "When active, snaps mouse cursor to items grouped in a symbol.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Element Snaps",
+          "desc": "When active, allows most other snaps to be used. When inactive, only Ortho snap is available.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Sprinkler Ceiling Snap",
+          "desc": "When active, allows the user to quickly snap sprinklers to points on a ceiling grid.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    },
+    {
+      "toolbar": "Star Dimension Toolbar",
+      "sourcePage": "https://autosprink.com/help/69?v=latest",
+      "sourceTitle": "Star Dimension Toolbar",
+      "buttons": [
+        {
+          "name": "Access",
+          "desc": "View: Tool Bars: Star Dimensions",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Finished Floor",
+          "desc": "Measures the elevation from the benchmark to the specified location.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Bottom of Beam",
+          "desc": "Measures elevation from floor plane to the bottom of the specified beam.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Top of Beam",
+          "desc": "Measures elevation from floor plane to the top of the specified beam.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Top of Steel",
+          "desc": "Measures elevation from floor plane to roof plane.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    },
+    {
+      "toolbar": "System Toolbar",
+      "sourcePage": "https://autosprink.com/help/70?v=latest",
+      "sourceTitle": "System Toolbar",
+      "buttons": [
+        {
+          "name": "Access",
+          "desc": "View > Toolbars > System",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Pipe",
+          "desc": "Equips the cursor with the pipe tool Draws a single pipe segment.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Continuous Pipe",
+          "desc": "Equips cursor with the pipe tool. Draws a continuous line of adjacent pipe segments. Each segments start point begins at the end point of the previous segment. Each pipe segment remains individually selectable after the continuous line...",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Sprinkler",
+          "desc": "Opens the Sprinkler Placement Options dialog where users can define sprinkler options. Then, equips the mouse cursor with a sprinkler that can be placed in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Upright",
+          "desc": "Equips the mouse cursor with a pendent sprinkler that can be placed in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Pendent",
+          "desc": "Equips the mouse cursor with a pendent sprinkler that can be placed in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Concealed Pendent",
+          "desc": "Equips the mouse cursor with a concealed pendent that can be placed in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Horizontal Sidewall",
+          "desc": "Equips the mouse cursor with a sidewall sprinkler that can be placed in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Horizontal Concealed Sidewall",
+          "desc": "Equips the mouse cursor with a horizontal concealed sidewall that can be placed in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Vertical Sidewall",
+          "desc": "Equips the mouse cursor with a vertical sidewall that can be placed in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Auto Fittings",
+          "desc": "Analyzes the selection to ensure pipes are connected using the appropriate fittings.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Auto Couplings",
+          "desc": "Searches through the drawing and places a coupling at each location require for stock listing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Auto Hangers",
+          "desc": "Automatically places hangers on the selected pipes.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Hanger",
+          "desc": "Equips the mouse cursor with a hanger that can be placed in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Sway Brace",
+          "desc": "Equips the mouse cursor with a sway brace that can be placed in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Auto Draw",
+          "desc": "This submenu gives quick access to elements that can be automatically placed in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Coverage Cell",
+          "desc": "Equips the mouse cursor with a selection cursor. Two clicks can be used to create a rectangle selection encompassing the coverage cell.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Stretch Hangers",
+          "desc": "Opens the Stretch Hangers dialog where users can input settings for stretching a hanger.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Stretch Sway Braces",
+          "desc": "Opens the Stretch Sway Braces dialog where users can input settings for stretching a sway brace.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    },
+    {
+      "toolbar": "Text Rotator Toolbar",
+      "sourcePage": "https://autosprink.com/help/71?v=latest",
+      "sourceTitle": "Text Rotator Toolbar",
+      "buttons": [
+        {
+          "name": "Access",
+          "desc": "View > Tool Bars > Text Rotator",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    },
+    {
+      "toolbar": "View ISO Rotator Toolbar",
+      "sourcePage": "https://autosprink.com/help/73?v=latest",
+      "sourceTitle": "View ISO Rotator Toolbar",
+      "buttons": [
+        {
+          "name": "Access",
+          "desc": "View: Tool Bars: View ISO Rotator",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Front View",
+          "desc": "Sets the view to the front edge of your drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Back View",
+          "desc": "Sets the view to the back edge of your drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Left Side View",
+          "desc": "Sets the view to the left edge of your drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Right Side View",
+          "desc": "Sets the view to the right edge of your drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Move Camera to Benchmark",
+          "desc": "Points the camera at the benchmark so that the benchmark is in the center of the view.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Rotate Camera Left",
+          "desc": "Rotates the camera to the left (counterclockwise).",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Rotate Camera Right",
+          "desc": "Rotates the camera to the right (clockwise).",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Camera Position Settings",
+          "desc": "Lets you set camera position and direction by entering coordinates.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "First Person",
+          "desc": "When active, the view is shown in first-person perspective, as if you are inside the drawing at the location of the camera. Objects are rendered so as to appear three-dimensional and give the appearance of depth.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Hold Altitude",
+          "desc": "When active, keeps camera at the same Z elevation while it moves, regardless of the direction in which it is pointed. (Note: This command is only available if you are in First Person mode.)",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Stop Camera Movement",
+          "desc": "If the camera is moving, this stops its motion completely. (Note: This command is only available if you are in First Person mode.)",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Control Area",
+          "desc": "Places a control area in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Control Area Navigation Dialog",
+          "desc": "Opens the Control Area Navigation dialog.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    },
+    {
+      "toolbar": "View Rotator Toolbar",
+      "sourcePage": "https://autosprink.com/help/74?v=latest",
+      "sourceTitle": "View Rotator Toolbar",
+      "buttons": [
+        {
+          "name": "Access",
+          "desc": "View: Tool Bars: View Rotator",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Roll Camera Counterclockwise",
+          "desc": "Rolls the camera to the left.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Pitch Camera Up",
+          "desc": "Pitches the camera up.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Roll Camera Clockwise",
+          "desc": "Rolls the camera to the right.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Yaw Camera Left",
+          "desc": "Rotates the camera to the left around its own Z-axis, along the plane of its own Y-axis.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Move Camera to Benchmark",
+          "desc": "In normal mode, points the camera at the benchmark so that the benchmark is in the center of the view. In First Person mode, moves the camera to the current location of the benchmark.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Yaw Camera Right",
+          "desc": "Yaws the camera to the right.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Rotate Camera Left",
+          "desc": "Rotates the camera to the left (counterclockwise).",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Pitch Camera Down",
+          "desc": "Pitches the camera down.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Rotate Camera Right",
+          "desc": "Rotates the camera to the right (clockwise).",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Left Side View",
+          "desc": "Sets the view to the left edge of your drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Front View",
+          "desc": "Sets the view to the \"front\" edge of your drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Right Side View",
+          "desc": "Sets the view to the right edge of your drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Back View",
+          "desc": "Sets the view to the \"back\" edge of your drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Zoom Camera to Area",
+          "desc": "Zooms in on an area you select so that area fills the drawing window.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Zoom All",
+          "desc": "Changes zoom level so all elements in the drawing are visible in the drawing window.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Zoom In",
+          "desc": "Zooms in one zoom increment. (Hold down the <Shift> key for a smaller zoom increment.)",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Zoom Out",
+          "desc": "Zooms out one zoom increment. (Hold down the <Shift> key for a smaller zoom increment.)",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Previous Camera Position",
+          "desc": "Restores the view to the camera position immediately preceding the current camera position.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Isometric View",
+          "desc": "Sets the view to above your drawing and towards its southwest corner. All three drawing axes are scaled equally.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Top View",
+          "desc": "Sets the view to directly above your drawing, with the view direction parallel to the Z-axis of the drawing. (This is also known as plan view.)",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Next Camera Position",
+          "desc": "Restores the view to the camera position immediately after the current camera position. (Note: This button is not available unless the Previous Camera Position button has been used.)",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    },
+    {
+      "toolbar": "View Toolbar",
+      "sourcePage": "https://autosprink.com/help/75?v=latest",
+      "sourceTitle": "View Toolbar",
+      "buttons": [
+        {
+          "name": "Access",
+          "desc": "View: Tool Bars: View",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Isometric View",
+          "desc": "Sets the view to above your drawing and towards its southwest corner. All three drawing axes are scaled equally.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Top View",
+          "desc": "Sets the view to directly above your drawing, with the view direction parallel to the Z-axis of the drawing. (This is also known as plan view.)",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Zoom All",
+          "desc": "Changes zoom level so all elements in the drawing are visible in the drawing window.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Zoom Camera to Area",
+          "desc": "Zooms in on an area you select so that area fills the drawing window.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Zoom In",
+          "desc": "Zooms in one zoom increment. (Hold down the <Shift> key for a smaller zoom increment.)",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Zoom Out",
+          "desc": "Zooms out one zoom increment. (Hold down the <Shift> key for a smaller zoom increment.)",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Zoom Camera to Selection",
+          "desc": "Sets zoom level so that the currently selected element(s) fill the drawing window.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Previous Camera Position",
+          "desc": "Restores the view to the camera position immediately preceding the current camera position.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Next Camera Position",
+          "desc": "Restores the view to the camera position immediately after the current camera position. (Note: This button is not available unless the Previous Camera Position button has been used.)",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Text Box Clipping Indicator",
+          "desc": "Toggles display of a red underline at the bottom of a Text Box containing text that is hidden from view.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    },
+    {
+      "toolbar": "Walkthrough Toolbar",
+      "sourcePage": "https://autosprink.com/help/76?v=latest",
+      "sourceTitle": "Walkthrough Toolbar",
+      "buttons": [
+        {
+          "name": "Access",
+          "desc": "View: Tool Bars: Walkthrough",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Add Scene",
+          "desc": "Adds the current view to your walkthrough.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Replace Last Scene",
+          "desc": "Replaces the last scene in the walkthrough file with the current view.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Show Walkthrough Dialog",
+          "desc": "Opens the Walkthrough Scenes dialog box.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Clear Walkthrough",
+          "desc": "Discards all scenes in your walkthrough.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Show Walkthrough",
+          "desc": "Plays the current walkthrough from start to finish.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Select Scene",
+          "desc": "Shows a drop-down list of scenes, allowing you to select a scene to display.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    },
+    {
+      "toolbar": "Wizards Toolbar",
+      "sourcePage": "https://autosprink.com/help/77?v=latest",
+      "sourceTitle": "Wizards Toolbar",
+      "buttons": [
+        {
+          "name": "Access",
+          "desc": "View: Tool Bars: Wizards",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "3-Point Wizard",
+          "desc": "Opens the 3-Point System wizard, which allows you to quickly create a tree or grid system within an area of your choice.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Grid System Wizard",
+          "desc": "Opens the Grid System wizard, allowing quick creation of a basic grid system.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "In-Rack System Wizard",
+          "desc": "Opens the In-Rack System wizard, allowing quick creation of a basic in-rack system.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Loop System Wizard",
+          "desc": "Opens the Loop System wizard, allowing quick creation of a basic loop system.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Tree System Wizard",
+          "desc": "Opens the Tree System wizard, allowing quick creation of a basic tree system.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "System Optimizer",
+          "desc": "Change pipe properties in your drawing and see up-to-the-second hydraulic data as you make changes.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    }
+  ]
+}

@@ -55,14 +55,22 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
   a.link{color:var(--cyan);text-decoration:none;font-size:11px}
 
   /* HF-A1 CAD layer: top menu bar, inspector, underlay, auto-load */
-  #cadBar{position:absolute;left:50%;top:10px;transform:translateX(-50%);display:flex;align-items:center;gap:5px;background:linear-gradient(180deg,rgba(255,255,255,0.08),rgba(0,0,0,0.45)),rgba(13,12,10,0.78);border:1px solid rgba(255,255,255,0.14);border-radius:12px;padding:5px 9px;backdrop-filter:blur(24px) saturate(1.3);-webkit-backdrop-filter:blur(24px) saturate(1.3);z-index:12;max-width:calc(100% - 24px);flex-wrap:wrap;justify-content:center}
+  /* HF-MENUBAR (Stream A): AutoSprink-parity menu bar mounts above the viewport;
+     the old flat CADBAR row stays below it as a compact view toolbar (AutoSprink
+     has BOTH menus and toolbars). Exports moved into File > Export. */
+  #menuBarHost{position:absolute;left:10px;top:8px;right:10px;z-index:15;display:flex;justify-content:center}
+  #menuBarHost .hf-menubar{max-width:100%}
+  #cadBar .tb-sep,#cadBar .tb-label,#dxfBtn,#stepBtn,#ifcBtn,#stlBtn{display:none!important} /* HF-MENUBAR: exports live in File > Export */
+  #cadBar{position:absolute;left:50%;top:52px;transform:translateX(-50%);display:flex;align-items:center;gap:5px;background:linear-gradient(180deg,rgba(255,255,255,0.08),rgba(0,0,0,0.45)),rgba(13,12,10,0.78);border:1px solid rgba(255,255,255,0.14);border-radius:12px;padding:5px 9px;backdrop-filter:blur(24px) saturate(1.3);-webkit-backdrop-filter:blur(24px) saturate(1.3);z-index:12;max-width:calc(100% - 24px);flex-wrap:wrap;justify-content:center}
   #cadBar button{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10);color:rgba(242,236,224,0.85);border-radius:8px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:var(--font);transition:background .12s}
   #cadBar button:hover{background:rgba(255,255,255,0.13)}
   #cadBar button.on{background:linear-gradient(180deg,rgba(255,213,79,0.32),rgba(200,154,60,0.22));border-color:rgba(255,213,79,0.5);color:#ffd54f}
   #cadBar button:disabled{opacity:.38;cursor:default}
   #cadBar .tb-sep{width:1px;height:18px;background:rgba(255,255,255,0.12);margin:0 3px}
   #cadBar .tb-label{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin:0 2px}
-  #inspector{position:absolute;right:10px;top:54px;bottom:12px;width:264px;background:linear-gradient(180deg,rgba(255,255,255,0.07),rgba(0,0,0,0.5)),rgba(13,12,10,0.82);border:1px solid rgba(255,255,255,0.15);border-radius:14px;backdrop-filter:blur(28px) saturate(1.35);-webkit-backdrop-filter:blur(28px) saturate(1.35);z-index:14;display:none;flex-direction:column;overflow:hidden;box-shadow:0 18px 48px rgba(0,0,0,0.5)}
+  /* HF-D1-INSPDOCK (PRIORITIES 3c): the Inspector lives IN the right results
+     panel — never floating over the viewport. */
+  #inspector{display:none;flex-direction:column;overflow:hidden;width:100%;max-height:46vh;margin:0 0 14px;background:linear-gradient(180deg,rgba(255,255,255,0.07),rgba(0,0,0,0.5)),rgba(13,12,10,0.82);border:1px solid rgba(255,255,255,0.15);border-radius:14px;box-shadow:0 18px 48px rgba(0,0,0,0.5)}
   #inspector.open{display:flex}
   #inspHeader{padding:10px 12px 8px;border-bottom:1px solid rgba(255,255,255,0.10);display:flex;align-items:center;justify-content:space-between}
   #inspTitle{font-size:12px;font-weight:700;color:var(--bright)}
@@ -71,6 +79,17 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
   #inspBody{padding:10px 12px;overflow-y:auto;flex:1}
   #inspBody .kv{font-size:11px}
   .nv-flag{display:inline-block;margin-top:8px;font-family:var(--mono);font-size:9px;color:var(--gold);border:1px solid rgba(255,213,79,.4);border-radius:6px;padding:3px 7px;line-height:1.5}
+  /* HF-B1-PDFUNDERLAY: apple-glass level / sheet switcher at the viewport edge */
+  #levelPanel{position:absolute;left:12px;top:96px;z-index:13;display:none;flex-direction:column;gap:6px;width:190px;max-height:calc(100% - 160px);overflow-y:auto;background:linear-gradient(180deg,rgba(255,255,255,0.07),rgba(0,0,0,0.5)),rgba(13,12,10,0.82);border:1px solid rgba(255,255,255,0.15);border-radius:14px;padding:10px 12px;backdrop-filter:blur(28px) saturate(1.35);-webkit-backdrop-filter:blur(28px) saturate(1.35);box-shadow:0 18px 48px rgba(0,0,0,0.5)}
+  #levelPanel.open{display:flex}
+  #levelPanel h4{font-size:9px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);font-weight:700;margin:2px 0 0}
+  #levelPanel .lvl-row{display:flex;flex-wrap:wrap;gap:4px}
+  #levelPanel .lvl-row button{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10);color:rgba(242,236,224,0.85);border-radius:7px;padding:4px 8px;font-size:11px;cursor:pointer;font-family:var(--font)}
+  #levelPanel .lvl-row button:hover{background:rgba(255,255,255,0.13)}
+  #levelPanel .lvl-row button.on{background:linear-gradient(180deg,rgba(255,213,79,0.32),rgba(200,154,60,0.22));border-color:rgba(255,213,79,0.5);color:#ffd54f}
+  #levelPanel .disc-row{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text);margin:0}
+  #levelPanel .disc-row input{width:auto}
+  #levelPanel .nv-flag{margin-top:4px}
   #autoLoadBadge{font-family:var(--mono);font-size:9px;color:var(--green);border:1px solid rgba(74,222,128,.35);border-radius:99px;padding:3px 8px;display:none}
   #autoLoadBadge.show{display:inline-block}
   #sourceLockNote{display:none;font-size:10px;color:var(--gold);font-family:var(--mono);margin-top:4px;line-height:1.5}
@@ -225,14 +244,15 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
     <div id="layers"></div>
 
     <h3>Properties</h3>
-    <div class="layer"><input type="checkbox" id="exaggerate"><label for="exaggerate" style="margin:0;color:var(--text)">Exaggerate pipe radius (×6)</label></div>
-    <p class="muted" style="font-size:10px;margin-top:4px">Default OFF = true NFPA pipe scale (thin at building scale). Opt-in view aid only.</p>
+    <p class="muted" style="font-size:10px;margin-top:4px">True NFPA pipe scale (thin at building scale) — the only render mode.</p>
     <div class="warn" id="exportMsg"></div>
   </aside>
 
   <div id="canvasWrap">
     <canvas id="canvas"></canvas>
-    <!-- HF-A1-CADBAR top menu bar (apple-glass) -->
+    <!-- HF-MENUBAR (Stream A): AutoSprink-parity menu bar (apple-glass) -->
+    <div id="menuBarHost"></div>
+    <!-- HF-A1-CADBAR compact view toolbar (apple-glass) below the menu bar -->
     <div id="cadBar">
       <div class="seg" id="viewSeg">
         <button data-view="iso" class="on">3D</button>
@@ -240,7 +260,6 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
       </div>
       <button id="fitBtn" title="Fit the whole model in view">Fit</button>
       <button id="selBtn" class="on" title="Click parts to select + inspect (orbit always works)">Select</button>
-      <button id="scaleBtn" class="on" title="True NFPA pipe scale (off = ×6 exaggerated radius)">True scale</button>
       <div class="tb-sep"></div>
       <span class="tb-label">Export</span>
       <button id="dxfBtn" disabled>DXF</button>
@@ -248,10 +267,8 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
       <button id="ifcBtn" disabled>IFC</button>
       <button id="stlBtn" disabled>STL</button>
     </div>
-    <div id="inspector">
-      <div id="inspHeader"><span id="inspTitle">Inspector</span><button id="inspClose" title="Deselect (Esc)">×</button></div>
-      <div id="inspBody"></div>
-    </div>
+    <!-- HF-B1-PDFUNDERLAY: level / sheet switcher (REAL plan sets only) -->
+    <div id="levelPanel"></div>
     <div id="status">initializing OpenGeometry kernel…</div>
     <div id="legend">
       <div><span class="sw" style="background:#6b7280"></span>building shell</div>
@@ -263,6 +280,11 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
   </div>
 
   <aside class="right">
+    <!-- HF-D1-INSPDOCK (PRIORITIES 3c): Inspector docked in the results panel, not over the viewport -->
+    <div id="inspector">
+      <div id="inspHeader"><span id="inspTitle">Inspector</span><button id="inspClose" title="Deselect (Esc)">×</button></div>
+      <div id="inspBody"></div>
+    </div>
     <h3>Layout</h3>
     <div id="layout"><span class="muted" style="font-size:12px">Generate a layout to begin.</span></div>
     <h3>Pipe Schedule (NFPA-13)</h3>
@@ -281,6 +303,7 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
   </aside>
 </div>
 
+<script src="/public/halofire-menubar.js"></script>
 <script type="importmap">
 {
   "imports": {
@@ -301,6 +324,13 @@ import { demoTimeline } from '/src/engine/demo-timeline.js';
 import { summarizeExportArtifact, buildExportProofMessage } from '/src/ui/export-proof.js';
 // HF-A1-UNDERLAY: built-in plan fixtures (same module the server uses) for the floor-plan ground underlay.
 import { homeDepotRexburgFloorPlan, cooperative1881FloorPlan, COOPERATIVE_1881_PROJECT_NAME } from '/src/data/floorplans.js';
+// HF-B1-PDFUNDERLAY (Stream B): REAL plan-sheet PDF underlays + multi-level scaffold.
+import { loadPdfjs, renderSheetToCanvas, computeUnderlayTransform, createUnderlayMesh } from '/src/engine/pdf-underlay.js';
+import { buildBuildingLevels } from '/src/engine/building-levels.js';
+import { manifestForProject, sheetsForLevel } from '/src/data/plan-manifest.js';
+// HF-C1-PARTMESH (Stream C): true-scale real CAD part meshes (mm->ft, Y-up)
+// with Inspector provenance; primitives stay as flagged fallback.
+import { createPartMeshLoader } from '/src/engine/part-meshes.js';
 
 const HOME_DEPOT = 'Home Depot - Rexburg ID';
 try{
@@ -330,13 +360,13 @@ function api(path, options = {}) {
 
 // ── OpenGeometry / Three scene ──
 const COLORS = { WALLS: 0x6b7280, WALLS_INT: 0x9aa3b2, COLUMN: 0x8a8f98, FLOOR: 0x16161c, MAIN: 0xE53935, BRANCH: 0x3b82f6, DROPS: 0x22d3ee, HEADS: 0xff3b30, COMPONENTS: 0xfbbf24, HANGERS: 0xb6bcc6, CEILING: 0xd8d2c2 }; // HF-G4-HANGER + HF-G5-CEILGRID layers
-// Viewer pipe-radius exaggeration (true-scale=1). CAD-structural geometry
+// CAD-structural geometry
 // (walls/mains/branches/riser) is built on the OpenGeometry kernel; the many
 // identical heads + drops are drawn with Three InstancedMesh for performance at
 // 900+ count. The full kernel model (incl. heads/drops) is rebuilt on-demand at
 // export time (buildExportScene), so STEP/IFC/STL stay complete & true-scale.
-// HF-A1-TRUESCALE: default is TRUE NFPA pipe scale (1). Exaggeration (6) is an opt-in view aid.
-let pipeVizScale = 1;
+// HF-A1-TRUESCALE: TRUE NFPA pipe scale (1) is the only render mode.
+const pipeVizScale = 1; // true NFPA pipe scale — the only render mode
 let renderer, scene, perspCam, orthoCam, camera, controls, ogReady = false;
 const layerGroups = {};
 let modelGroup, currentCadModel = null;
@@ -375,11 +405,68 @@ async function loadPartGeo(key, targetFt) {
   } catch (e) { return null; }
 }
 
+// HF-C1-PARTMESH: Stream C loader — TRUE SCALE meshes (a 63.5 mm coupling OD
+// arrives as 0.208 ft, exactly its generated dimension; no normalize-to-target).
+const hfPartMeshes = createPartMeshLoader();
+let headProvenance = null;
+
 // Preload the head part mesh at init so the first render shows real heads.
+// HF-C1-PARTMESH: true-scale real mesh via part-meshes.js (was: normalized to a
+// 1.0 ft envelope — 4-5x oversize vs a real pendent head; true scale only now).
 async function loadPartMeshes() {
-  headPartGeo = await loadPartGeo('head_pendent', 1.0);
-  const entry = partsManifest && (partsManifest.components || []).find((c) => c.key === 'head_pendent');
-  partsSource = headPartGeo ? (entry && entry.source === 'catalog' ? 'catalog' : 'generated') : 'primitive';
+  try {
+    const res = await hfPartMeshes.load('sprinkler_head');
+    headPartGeo = res.geometry; // true scale, Y-up, centered — or null (primitive fallback)
+    headProvenance = res.provenance;
+    partsSource = res.geometry ? `real mesh (${res.provenance.source}, true scale)` : 'primitive-fallback';
+  } catch (_) { headPartGeo = null; headProvenance = null; partsSource = 'primitive-fallback'; }
+}
+
+// HF-C1-PARTMESH: real geometries for the derived-detail buckets (couplings,
+// hanger rings, tees, elbows). Each real mesh is CLONED + uniformly rescaled to
+// the pipe-derived envelope of the procedural primitive it replaces — that
+// rescale means it is NO LONGER the generated true-scale part, so it is flagged
+// "rescaled to pipe size — needs-verification" in the Inspector. Kinds with no
+// honest mesh (threads, reducers, hanger rods, drop nipples, escutcheons) keep
+// their procedural primitives, flagged primitive-fallback (never fabricated).
+const DETAIL_MESH_KINDS = {
+  coupling:     { alias: 'rigid_coupling',    target: (r) => r * 3.0, axisToX: true },
+  couplingFlex: { alias: 'flexible_coupling', target: (r) => r * 3.0, axisToX: true },
+  hangerRing:   { alias: 'hanger_ring',       target: (r) => r * 2.5, axisToX: true },
+  teeDown:      { alias: 'tee',               target: (r) => r * 4.4, axisToX: true },
+  elbowDown:    { alias: 'elbow',             target: (r) => Math.max(0.6, r * 3.2), axisToX: false },
+  elbowUp:      { alias: 'elbow',             target: (r) => Math.max(0.6, r * 3.2), axisToX: false },
+};
+const detailMeshBase = {}; // group -> { geometry|null, provenance }
+async function preloadDetailMeshes() {
+  await Promise.all(Object.keys(DETAIL_MESH_KINDS).map(async (group) => {
+    if (detailMeshBase[group]) return;
+    try { detailMeshBase[group] = await hfPartMeshes.load(DETAIL_MESH_KINDS[group].alias); }
+    catch (_) { detailMeshBase[group] = { geometry: null, provenance: null }; }
+  }));
+}
+// Clone + rescale a preloaded real mesh to the bucket's pipe envelope (or null).
+function realDetailGeo(group, r) {
+  const cfg = DETAIL_MESH_KINDS[group];
+  const base = cfg && detailMeshBase[group];
+  if (!cfg || !base || !base.geometry) return null;
+  try {
+    const g = base.geometry.clone();
+    if (cfg.axisToX) g.rotateZ(Math.PI / 2); // generated axis +Y -> run axis +X
+    g.computeBoundingBox();
+    const size = new THREE.Vector3(); g.boundingBox.getSize(size);
+    const maxDim = Math.max(size.x, size.y, size.z) || 1;
+    const s = cfg.target(r) / maxDim;
+    g.scale(s, s, s);
+    return g;
+  } catch (_) { return null; }
+}
+function detailMeshProvenance(group) {
+  const base = detailMeshBase[group];
+  if (base && base.geometry && base.provenance) {
+    return `real mesh (${base.provenance.source}, rescaled to pipe size — needs-verification)`;
+  }
+  return 'primitive-fallback (no honest generated mesh)';
 }
 
 async function initStudio() {
@@ -400,18 +487,51 @@ async function initStudio() {
   const d = new THREE.DirectionalLight(0xffffff, 0.9); d.position.set(300, 600, 400); scene.add(d);
   scene.add(new THREE.GridHelper(2000, 80, 0x222228, 0x18181c));
   planGroup = new THREE.Group(); scene.add(planGroup); // HF-A1-UNDERLAY
-  // HF-A1-SELECT: click-select (drag = orbit, untouched). A click is a pointer
-  // press+release that moved < 6px; everything else stays pure OrbitControls.
-  let downPt = null;
+  // SELECTION INTERACTION CONTRACT (PRIORITIES.md, UE/AutoCAD-derived):
+  // plain click = select ONLY (camera-neutral); F or double-click = frame the
+  // selection (the ONLY place the orbit pivot changes); zoom dollies to the
+  // pivot (zoomToCursor stays OFF); Esc/empty-click restores the prior pivot.
+  controls.zoomToCursor = false; // contract #4: dolly targets the pivot, never the cursor
+  controls.addEventListener('start', () => { camTween = null; }); // user input cancels any frame tween
+  let downPt = null, lastUpPt = null;
   renderer.domElement.addEventListener('pointerdown', (e) => { downPt = { x: e.clientX, y: e.clientY }; });
   renderer.domElement.addEventListener('pointerup', (e) => {
     if (!downPt) return;
     const moved = Math.hypot(e.clientX - downPt.x, e.clientY - downPt.y);
     downPt = null;
+    lastUpPt = { clientX: e.clientX, clientY: e.clientY }; // fractional coords (see dblclick note)
     if (moved < 6) handleCanvasClick(e);
   });
-  window.addEventListener('keydown', (e) => { if (e.key === 'Escape') clearSelection(true); });
-  (function loop() { requestAnimationFrame(loop); controls.update(); renderer.render(scene, camera); })();
+  // contract #6: double-click = select + frame (smooth tween to the part).
+  // dblclick MouseEvents truncate clientX/Y to integers while pointerup events
+  // are fractional — at true NFPA pipe scale that sub-pixel loss can re-raycast
+  // onto a DIFFERENT part than the two pointerup selections (gate-loop round-1
+  // evidence: head at 753.867,297.271 -> wall at 753,297). Reuse the fractional
+  // pointerup point when the dblclick lands within the double-click slop.
+  renderer.domElement.addEventListener('dblclick', (e) => {
+    const p = lastUpPt && Math.hypot(e.clientX - lastUpPt.clientX, e.clientY - lastUpPt.clientY) <= 4 ? lastUpPt : e;
+    handleCanvasClick(p, true);
+  });
+  window.addEventListener('keydown', (e) => {
+    const t = e.target;
+    if (t && (/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) || t.isContentEditable)) return;
+    if (e.key === 'Escape') clearSelection(true);                       // contract #7
+    else if ((e.key === 'f' || e.key === 'F') && !e.ctrlKey && !e.metaKey && !e.altKey) frameSelected(); // contract #3/#6
+  });
+  // HF-C1-PARTMESH: live fps + draw-call stats for performance evidence.
+  let fpsFrames = 0, fpsLast = performance.now();
+  (function loop(now) {
+    requestAnimationFrame(loop); stepCamTween(now || performance.now()); controls.update(); renderer.render(scene, camera);
+    fpsFrames += 1; const t = now || performance.now();
+    if (t - fpsLast >= 1000) { window.__fps = Math.round(fpsFrames * 10000 / (t - fpsLast)) / 10; fpsFrames = 0; fpsLast = t; }
+  })();
+  window.__renderStats = () => ({
+    fps: window.__fps || null,
+    drawCalls: renderer.info.render.calls,
+    triangles: renderer.info.render.triangles,
+    geometries: renderer.info.memory.geometries,
+    textures: renderer.info.memory.textures,
+  });
   // Headless capture hook: render at a capped size + return a compact JPEG data URL
   // for visual verification (the rAF loop makes preview_screenshot hang). Restores
   // the live canvas size via onResize() afterward.
@@ -449,6 +569,18 @@ function layerOf(role) {
   if (role === 'drop') return 'DROPS';
   return 'MAIN'; // main, main-tie, riser
 }
+// HF-G2-THREAD fix (gate 5a): the pipe BODY is a SMOOTH 24-segment cylinder
+// (>=16 radial segments required). Plain THREE.CylinderGeometry — the previous
+// 10-segment kernel-meshed cylinder rendered a fluted/star cross-section along
+// the whole span at close range. Thread detail stays in the short end bands
+// (threadGeo) only; the body profile is convex and smooth. Exports are
+// unaffected (buildExportScene rebuilds kernel solids independently).
+const PIPE_BODY_SEGMENTS = 24;
+const pipeMats = {}; // per-layer shared material
+function pipeMat(layer) {
+  if (!pipeMats[layer]) pipeMats[layer] = new THREE.MeshStandardMaterial({ color: COLORS[layer], metalness: 0.45, roughness: 0.55 });
+  return pipeMats[layer];
+}
 function addPipe(s) {
   if (s.role === 'drop') return; // drops are instanced in renderModel for perf
   const aw = W(s.from), bw = W(s.to);
@@ -456,12 +588,10 @@ function addPipe(s) {
   if (len < 1e-3) return;
   const [rx, ry, rz] = pipeRot(aw, bw);
   const layer = layerOf(s.role);
-  const cyl = new Cylinder({
-    center: new Vector3((aw[0]+bw[0])/2, (aw[1]+bw[1])/2, (aw[2]+bw[2])/2),
-    radius: Math.max(0.25, (s.diameterIn/12/2) * pipeVizScale),
-    height: len, segments: 10, angle: 360, color: COLORS[layer],
-    rotation: new Vector3(rx, ry, rz),
-  });
+  const r = (s.diameterIn / 12 / 2) * pipeVizScale; // TRUE NFPA OD — no minimum-radius fudge floor (gate 6c)
+  const cyl = new THREE.Mesh(new THREE.CylinderGeometry(r, r, len, PIPE_BODY_SEGMENTS), pipeMat(layer));
+  cyl.position.set((aw[0]+bw[0])/2, (aw[1]+bw[1])/2, (aw[2]+bw[2])/2);
+  cyl.rotation.set(rx, ry, rz);
   cyl.userData.hfPart = { kind: 'pipe', solid: s }; // HF-A1-SELECT
   layerGroups[layer].add(cyl);
 }
@@ -470,14 +600,20 @@ function addPipe(s) {
 // part mesh (headPartGeo) when the parts library has one; else a primitive.
 function addInstancedHeads(worldPts, headSolids) {
   if (!worldPts.length) return;
-  const geo = headPartGeo || new THREE.SphereGeometry(0.6, 8, 8);
+  const geo = headPartGeo || new THREE.SphereGeometry(0.6, 16, 12);
+  // Gate 5b (interpenetration): the part geo is normalized about its center but
+  // a pendent head HANGS BELOW the drop end — its top thread meets the drop
+  // bottom. Offset each instance down by half the part height so the head
+  // never swallows the reducer / pierces the tee+coupling at the branch above.
+  geo.computeBoundingBox();
+  const headHalfH = geo.boundingBox ? (geo.boundingBox.max.y - geo.boundingBox.min.y) / 2 : 0;
   const mat = new THREE.MeshStandardMaterial({
     color: COLORS.HEADS, emissive: 0x330000,
     metalness: headPartGeo ? 0.55 : 0, roughness: headPartGeo ? 0.45 : 1,
   });
   const inst = new THREE.InstancedMesh(geo, mat, worldPts.length);
   const d = new THREE.Object3D();
-  worldPts.forEach((p, i) => { d.position.set(p[0], p[1], p[2]); d.rotation.set(0,0,0); d.scale.set(1,1,1); d.updateMatrix(); inst.setMatrixAt(i, d.matrix); });
+  worldPts.forEach((p, i) => { d.position.set(p[0], p[1] - headHalfH, p[2]); d.rotation.set(0,0,0); d.scale.set(1,1,1); d.updateMatrix(); inst.setMatrixAt(i, d.matrix); });
   inst.instanceMatrix.needsUpdate = true;
   inst.userData.hfInstanced = { kind: 'head', solids: headSolids || [] }; // HF-A1-SELECT
   layerGroups.HEADS.add(inst);
@@ -487,8 +623,8 @@ function addInstancedHeads(worldPts, headSolids) {
 // Instanced drops (vertical pipe stubs; cylinder default axis is world Y).
 function addInstancedDrops(dropSolids) {
   if (!dropSolids.length) return;
-  const r = Math.max(0.12, (1.0/12/2) * pipeVizScale); // drop pipe dia 1"
-  const geo = new THREE.CylinderGeometry(r, r, 1, 6); // unit height, scaled per drop
+  const r = (1.0 / 12 / 2) * pipeVizScale; // drop pipe dia 1" — TRUE NFPA OD, no fudge floor (gate 6c)
+  const geo = new THREE.CylinderGeometry(r, r, 1, 16); // unit height, scaled per drop; smooth body (>=16 radial segments, gate 5a)
   const mat = new THREE.MeshStandardMaterial({ color: COLORS.DROPS });
   const inst = new THREE.InstancedMesh(geo, mat, dropSolids.length);
   const d = new THREE.Object3D();
@@ -575,10 +711,11 @@ function hangerTs(lengthFt, diaIn) {
   return ts;
 }
 
-// Rendered (viewer) pipe radius — MUST match addPipe/addInstancedDrops clamps
-// so fittings sit snug over the drawn pipe at both true + exaggerated scale.
+// Rendered (viewer) pipe radius — MUST match addPipe/addInstancedDrops
+// so fittings sit snug over the drawn pipe at true NFPA scale. No minimum-radius
+// fudge floors anywhere in the radius path (gate 6c): r = diameterIn/24 ft exactly.
 function renderedPipeR(diaIn, isDrop) {
-  return Math.max(isDrop ? 0.12 : 0.25, ((diaIn || 1) / 12 / 2) * pipeVizScale);
+  return ((diaIn || 1) / 12 / 2) * pipeVizScale;
 }
 // fitting-orient.ts elbowRotationY/teeRotationY core: world-Y rotation mapping
 // local +X onto the horizontal direction (dx, dz).
@@ -587,21 +724,21 @@ function rotYFor(dx, dz) { return Math.atan2(-dz, dx); }
 // Fitting geometry builders (local axis +X = pipe run unless noted).
 function couplingGeoRigid(r) { // snug housing band (~1.35x pipe OD) + end lips
   const len = Math.max(0.3, r * 1.5);
-  const band = new THREE.CylinderGeometry(r * 1.35, r * 1.35, len * 0.64, 14);
-  const lipA = new THREE.CylinderGeometry(r * 1.48, r * 1.48, len * 0.18, 14); lipA.translate(0, -len * 0.41, 0);
+  const band = new THREE.CylinderGeometry(r * 1.35, r * 1.35, len * 0.64, 20);
+  const lipA = new THREE.CylinderGeometry(r * 1.48, r * 1.48, len * 0.18, 20); lipA.translate(0, -len * 0.41, 0);
   const lipB = lipA.clone(); lipB.translate(0, len * 0.82, 0);
   const g = mergeGeometries([band, lipA, lipB]); g.rotateZ(Math.PI / 2); return g;
 }
 function couplingGeoFlex(r) { // flexible: two separated housing bands
   const len = Math.max(0.34, r * 1.7);
-  const a = new THREE.CylinderGeometry(r * 1.4, r * 1.4, len * 0.3, 14); a.translate(0, -len * 0.28, 0);
+  const a = new THREE.CylinderGeometry(r * 1.4, r * 1.4, len * 0.3, 20); a.translate(0, -len * 0.28, 0);
   const b = a.clone(); b.translate(0, len * 0.56, 0);
   const g = mergeGeometries([a, b]); g.rotateZ(Math.PI / 2); return g;
 }
 function threadGeo(r, vertical) { // 3 thin ridges = visible threaded end (best-effort)
   const parts = [];
   for (let i = -1; i <= 1; i += 1) {
-    const ring = new THREE.CylinderGeometry(r * 1.12, r * 1.12, Math.max(0.035, r * 0.22), 10);
+    const ring = new THREE.CylinderGeometry(r * 1.12, r * 1.12, Math.max(0.035, r * 0.22), 16);
     ring.translate(0, i * Math.max(0.06, r * 0.38), 0); parts.push(ring);
   }
   const g = mergeGeometries(parts);
@@ -641,24 +778,46 @@ function instancedDetail(geo, color, items, kind, fittingType) {
   return inst;
 }
 
-// HF-G5-CEILGRID: suspended-ceiling 2x4 grid plane(s) at the head elevation(s).
-function renderCeilingGrid(heads) {
-  if (!heads.length || !layerGroups.CEILING) return 0;
-  const byZ = new Map();
-  for (const h of heads) {
-    const z = Math.round((h.position[2] || 0) * 10) / 10;
-    if (!byZ.has(z)) byZ.set(z, []);
-    byZ.get(z).push(h);
-  }
-  let planes = 0;
-  for (const [z, hs] of byZ) {
-    if (hs.length < 4) continue; // skip stray elevations
-    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
-    for (const h of hs) {
-      minX = Math.min(minX, h.position[0]); maxX = Math.max(maxX, h.position[0]);
-      minY = Math.min(minY, h.position[1]); maxY = Math.max(maxY, h.position[1]);
+// HF-G5-CEILGRID (gate 5c): suspended-ceiling 2x4 tee-grid — STRICTLY
+// DATA-DRIVEN. A grid plane renders ONLY where the model data EXPLICITLY
+// declares a suspended/drop/tile ceiling: a solid of kind 'ceiling', or a
+// room/space record carrying ceilingType matching suspended|drop|tile|grid|
+// acoustic. Head elevations are NEVER treated as proof of a ceiling — a
+// warehouse with exposed structure (e.g. Home Depot - Rexburg ID) has heads
+// at deck height and NO tile grid. When the model carries no ceiling-type
+// data, nothing is drawn and the takeoff + layer panel surface the note:
+// "ceiling type unknown — needs-verification".
+const CEILING_NOTE_UNKNOWN = 'ceiling type unknown — needs-verification (no ceiling-type data in this model; tile grid not drawn)';
+const SUSPENDED_RE = /susp|drop|tile|grid|acoustic/i;
+function declaredCeilings(cadModel) {
+  const out = [];
+  const solids = (cadModel && cadModel.solids) || [];
+  for (const s of solids) {
+    if (s.kind === 'ceiling' && SUSPENDED_RE.test(String(s.ceilingType || s.type || ''))) {
+      const poly = Array.isArray(s.polygon) ? s.polygon : null;
+      if (poly && poly.length >= 3 && Number.isFinite(Number(s.z))) out.push({ z: Number(s.z), poly });
     }
-    minX -= 4; minY -= 4; maxX += 4; maxY += 4;
+  }
+  // room/space records with an explicit ceilingType (none of the current
+  // fixtures declare one — this is the forward data contract, not a guess)
+  for (const r of ((cadModel && cadModel.roomsData) || [])) {
+    if (SUSPENDED_RE.test(String(r.ceilingType || '')) && Array.isArray(r.polygon) && r.polygon.length >= 3) {
+      out.push({ z: Number(r.ceilingZ ?? r.ceilingHeightFt) || 0, poly: r.polygon });
+    }
+  }
+  return out;
+}
+function renderCeilingGrid(cadModel) {
+  if (!layerGroups.CEILING) return { planes: 0, note: CEILING_NOTE_UNKNOWN };
+  const declared = declaredCeilings(cadModel);
+  if (!declared.length) return { planes: 0, note: CEILING_NOTE_UNKNOWN };
+  let planes = 0;
+  for (const { z, poly } of declared) {
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    for (const p of poly) {
+      minX = Math.min(minX, p[0]); maxX = Math.max(maxX, p[0]);
+      minY = Math.min(minY, p[1]); maxY = Math.max(maxY, p[1]);
+    }
     const w = maxX - minX, d = maxY - minY;
     if (!(w > 0 && d > 0)) continue;
     const cnv = document.createElement('canvas');
@@ -678,7 +837,7 @@ function renderCeilingGrid(heads) {
     layerGroups.CEILING.add(mesh);
     planes += 1;
   }
-  return planes;
+  return { planes, note: planes ? 'ceiling grid drawn ONLY over data-declared suspended ceilings — extent/tile module needs verification' : CEILING_NOTE_UNKNOWN };
 }
 
 // Main geometry-accuracy renderer: derives + instances couplings, threaded
@@ -686,7 +845,6 @@ function renderCeilingGrid(heads) {
 function renderGeometryDetail(cadModel, ceilFt) {
   const solids = cadModel.solids || [];
   const pipes = solids.filter((s) => s.kind === 'pipe' && Array.isArray(s.from) && Array.isArray(s.to));
-  const heads = solids.filter((s) => s.kind === 'head' && Array.isArray(s.position));
   const stock = stockLengthFt();
   const runs = [], drops = [];
   for (const s of pipes) {
@@ -871,19 +1029,30 @@ function renderGeometryDetail(cadModel, ceilFt) {
     }
   }
 
-  // build the instanced meshes
+  // build the instanced meshes — HF-C1-PARTMESH: real generated meshes where
+  // available (rescaled to the pipe envelope, flagged), procedural primitive
+  // fallback otherwise. One InstancedMesh per (group, radius) bucket either way.
+  const meshStats = { realBuckets: 0, primitiveBuckets: 0, byGroup: {} };
   for (const key of Object.keys(buckets)) {
     const b = buckets[key];
     const kind = b.group.startsWith('hanger') ? 'hanger' : 'fitting';
     const target = b.group.startsWith('hanger') ? layerGroups.HANGERS : layerGroups.COMPONENTS;
     if (!target) continue;
-    try { target.add(instancedDetail(b.geoFn(), b.color, b.items, kind, b.group)); } catch (_) { /* fail-soft per bucket */ }
+    const rBucket = parseFloat(key.split('::')[1]) || 0.1;
+    try {
+      const real = realDetailGeo(b.group, rBucket); // HF-C1-PARTMESH (null -> primitive)
+      target.add(instancedDetail(real || b.geoFn(), b.color, b.items, kind, b.group));
+      meshStats.byGroup[b.group] = detailMeshProvenance(b.group);
+      if (real) meshStats.realBuckets += 1; else meshStats.primitiveBuckets += 1;
+    } catch (_) { /* fail-soft per bucket */ }
   }
-  const ceilingPlanes = renderCeilingGrid(heads);
+  window.__detailMeshStats = meshStats;
+  const ceiling = renderCeilingGrid(cadModel); // gate 5c: data-driven only — never inferred from head elevations
 
   const takeoff = {
     stockLenFt: stock, couplings: nCoupling + nFlex, couplingsRigid: nCoupling, couplingsFlexible: nFlex,
-    hangers: nHanger, dropTees: nTee, endElbows: nElbow, reducers: nReducer, threadBands: nThread, ceilingPlanes,
+    hangers: nHanger, dropTees: nTee, endElbows: nElbow, reducers: nReducer, threadBands: nThread,
+    ceilingPlanes: ceiling.planes, ceilingNote: ceiling.note,
   };
   window.__geomTakeoff = takeoff;
   window.__geomDebug = { ...takeoff, buckets: Object.keys(buckets).length };
@@ -1134,8 +1303,11 @@ window.__applyDemoFrame = (ms) => {
 function buildLayerToggles() {
   // HF-A1-UNDERLAY: "Floor plan" layer toggles the ground-plane plan underlay (default ON).
   const names = { PLAN: 'Floor plan', WALLS: 'Building shell', COLUMN: 'Columns', FLOOR: 'Floor', MAIN: 'Mains / riser', BRANCH: 'Branch lines', DROPS: 'Drops', HEADS: 'Sprinkler heads', COMPONENTS: 'Fittings & components', HANGERS: 'Hangers', CEILING: 'Ceiling grid' }; // HF-G4-HANGER + HF-G5-CEILGRID toggles
+  // HF-G5-CEILGRID (gate 5c): the ceiling layer carries its data-driven status note.
+  const ceilNote = window.__geomTakeoff && window.__geomTakeoff.ceilingNote
+    ? `<div class="muted" style="font-size:10px;margin:-2px 0 4px 22px">⚠ ${window.__geomTakeoff.ceilingNote}</div>` : '';
   $('layers').innerHTML = Object.keys(names).map((k) =>
-    `<div class="layer"><input type="checkbox" id="L_${k}" ${k === 'PLAN' ? (planVisible ? 'checked' : '') : 'checked'}><label for="L_${k}" style="margin:0;color:var(--text)">${names[k]}</label></div>`).join('');
+    `<div class="layer"><input type="checkbox" id="L_${k}" ${k === 'PLAN' ? (planVisible ? 'checked' : '') : 'checked'}><label for="L_${k}" style="margin:0;color:var(--text)">${names[k]}</label></div>${k === 'CEILING' ? ceilNote : ''}`).join('');
   for (const k of Object.keys(names)) {
     $('L_' + k).onchange = (e) => {
       if (k === 'PLAN') { planVisible = e.target.checked; if (planGroup) planGroup.visible = planVisible; return; }
@@ -1210,9 +1382,351 @@ function renderPlanUnderlay(plan) {
   window.__planUnderlay = { rooms: plan.rooms.length, bbox: lastPlanBbox, visible: planVisible };
 }
 
-// ── HF-A1-SELECT: raycast selection + apple-glass inspector + orbit-to-part ──
+// ── HF-B1-PDFUNDERLAY (Stream B): REAL plan-sheet underlays at true scale ──
+// When the project has a real plan manifest (user-supplied bid PDFs), the
+// canvas-drawn fixture underlay is REPLACED by pdf.js renders of the actual
+// sheets — correctly oriented (readable from above, never mirrored), contain-
+// fit to the project footprint (flagged: NOT a title-block-verified plot
+// scale), at each level's ESTIMATED elevation. The drawn fixture stays ONLY
+// as a flagged fallback when a project has no real PDFs (Home Depot) or a
+// sheet render fails. Sheets load lazily per (level, discipline) — the arch
+// set alone is a 173 MB Bluebeam PDF; rendering all 8 levels up-front would
+// stall the page.
+let pdfjsLibPromise = null;
+let levelState = null; // { project, manifest, api, center, loadedKeys, disciplines, activeLevel, failures }
+const LEVEL_TARGET_PX = 2400;
+const DISC_LIFT = { arch: 0.05, rcp: 0.11, struct: 0.17, elec: 0.23, plumb: 0.29 }; // stagger to avoid z-fighting
+const DISC_LABEL = { arch: 'Architectural plan', rcp: 'Reflected ceiling', struct: 'Structural', elec: 'Electrical ⚠ heuristic', plumb: 'Plumbing ⚠ heuristic' };
+
+function getPdfjs() {
+  if (!pdfjsLibPromise) pdfjsLibPromise = loadPdfjs().catch((e) => { pdfjsLibPromise = null; throw e; });
+  return pdfjsLibPromise;
+}
+
+function fixturePlanBbox(plan) {
+  if (!plan || !Array.isArray(plan.rooms) || !plan.rooms.length) return null;
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  for (const r of plan.rooms) for (const p of (r.polygon || [])) {
+    minX = Math.min(minX, p[0]); maxX = Math.max(maxX, p[0]);
+    minY = Math.min(minY, p[1]); maxY = Math.max(maxY, p[1]);
+  }
+  return (maxX > minX && maxY > minY) ? { minX, maxX, minY, maxY } : null;
+}
+
+function destroyLevelScaffold() {
+  if (levelState && levelState.api && planGroup) {
+    planGroup.remove(levelState.api.root);
+    try {
+      levelState.api.root.traverse((o) => {
+        if (o.material) { if (o.material.map) o.material.map.dispose(); o.material.dispose(); }
+        if (o.geometry) o.geometry.dispose();
+      });
+    } catch (_) { /* dispose is best-effort */ }
+  }
+  levelState = null;
+  const lp = $('levelPanel');
+  if (lp) { lp.classList.remove('open'); lp.innerHTML = ''; }
+}
+
+async function ensureLevelSheets(levelN) {
+  const st = levelState;
+  if (!st || levelN === 'all') return;
+  const entry = st.api.levels.find((l) => l.level === Number(levelN));
+  if (!entry) return;
+  let lib;
+  try { lib = await getPdfjs(); }
+  catch (e) {
+    st.failures.push({ stage: 'pdfjs', error: String(e.message || e) });
+    $('status').textContent = 'pdf.js failed to load — REAL sheet underlays unavailable (flagged): ' + e.message;
+    return;
+  }
+  for (const disc of [...st.disciplines]) {
+    for (const sheet of sheetsForLevel(st.manifest, levelN, disc)) {
+      const key = `${levelN}:${sheet.sheet}:p${sheet.page}`;
+      if (st.loadedKeys.has(key)) continue;
+      st.loadedKeys.add(key);
+      $('status').textContent = `rendering REAL sheet ${sheet.sheet} p${sheet.page} (${sheet.file})…`;
+      try {
+        const rendered = await renderSheetToCanvas(lib, { url: sheet.url, page: sheet.page, targetPx: LEVEL_TARGET_PX });
+        const transform = computeUnderlayTransform({
+          pageWidthPt: rendered.widthPt, pageHeightPt: rendered.heightPt,
+          targetWidthFt: st.manifest.footprint.widthFt, targetDepthFt: st.manifest.footprint.depthFt,
+          elevationFt: entry.elevationFt, centerXFt: st.center.x, centerZFt: st.center.z,
+          liftFt: DISC_LIFT[disc] || 0.05,
+        });
+        const mesh = createUnderlayMesh(THREE, {
+          canvas: rendered.canvas, transform, opacity: 0.95,
+          name: `underlay:${sheet.sheet}:p${sheet.page}`, sheetMeta: sheet,
+        });
+        entry.group.add(mesh);
+        entry.underlays.push(mesh);
+        $('status').textContent = `REAL sheet ${sheet.sheet} “${sheet.title}” on ${entry.name} (${sheet.verified}; needs-verification)`;
+      } catch (e) {
+        st.loadedKeys.delete(key);
+        st.failures.push({ sheet: sheet.sheet, page: sheet.page, error: String(e.message || e) });
+        $('status').textContent = `sheet ${sheet.sheet} p${sheet.page} render failed (${e.message}) — flagged, not fabricated`;
+      }
+    }
+  }
+  window.__underlayMode = {
+    mode: 'real-pdf', project: st.project, activeLevel: st.activeLevel,
+    loaded: [...st.loadedKeys], disciplines: [...st.disciplines], failures: st.failures,
+    needsVerification: true,
+  };
+}
+
+async function setActiveStudioLevel(v) {
+  const st = levelState;
+  if (!st) return;
+  st.activeLevel = v === 'all' ? 'all' : Number(v);
+  st.api.setActiveLevel(st.activeLevel);
+  buildLevelPanel();
+  if (st.activeLevel !== 'all') await ensureLevelSheets(st.activeLevel);
+  else $('status').textContent = 'showing all levels — only already-rendered sheets are drawn (pick a level to render its sheets)';
+}
+
+async function toggleStudioDiscipline(d, on) {
+  const st = levelState;
+  if (!st) return;
+  if (on) {
+    st.disciplines.add(d);
+    st.api.setDisciplineVisible(d, true);
+    if (st.activeLevel !== 'all') await ensureLevelSheets(st.activeLevel);
+  } else {
+    st.disciplines.delete(d);
+    st.api.setDisciplineVisible(d, false);
+  }
+}
+
+function buildLevelPanel() {
+  const lp = $('levelPanel');
+  const st = levelState;
+  if (!lp || !st) return;
+  const lvlBtns = ['all', ...st.manifest.levels.map((l) => l.level)]
+    .map((v) => `<button data-lvl="${v}" class="${String(st.activeLevel) === String(v) ? 'on' : ''}">${v === 'all' ? 'All' : 'L' + v}</button>`).join('');
+  const discRows = Object.keys(DISC_LABEL)
+    .map((d) => `<label class="disc-row"><input type="checkbox" data-disc="${d}" ${st.disciplines.has(d) ? 'checked' : ''}> ${DISC_LABEL[d]}</label>`).join('');
+  lp.innerHTML = `
+    <h4>Levels — real plan set</h4>
+    <div class="lvl-row">${lvlBtns}</div>
+    <h4>Sheets by discipline</h4>
+    ${discRows}
+    <label class="disc-row" title="M-sheet→level mapping NOT confident — operator must map (plan-manifest.js)"><input type="checkbox" disabled> Mechanical (not mapped)</label>
+    <div class="nv-flag">⚠ NEEDS-VERIFICATION — machine-read sheet→level mapping; elevations ESTIMATED ${st.manifest.estimatedFloorToFloorFt} ft floor-to-floor; contain-fit scale, not title-block-verified</div>`;
+  lp.querySelectorAll('[data-lvl]').forEach((b) => { b.onclick = () => setActiveStudioLevel(b.dataset.lvl); });
+  lp.querySelectorAll('[data-disc]').forEach((c) => { c.onchange = (e) => toggleStudioDiscipline(c.dataset.disc, e.target.checked); });
+  lp.classList.add('open');
+}
+
+window.__levelPanelToggle = () => {
+  const lp = $('levelPanel');
+  if (lp && levelState) { lp.classList.toggle('open'); return true; }
+  $('status').textContent = 'no real plan sheets for this project — levels panel unavailable (needs-verification)';
+  return false;
+};
+
+// Underlay router: REAL plan manifest -> pdf underlays + level scaffold;
+// no manifest -> the old drawn fixture, explicitly FLAGGED as fallback.
+async function renderRealOrFixtureUnderlay(floorPlan) {
+  const name = currentProjectName();
+  const manifest = manifestForProject(name);
+  if (!manifest) {
+    destroyLevelScaffold();
+    renderPlanUnderlay(floorPlan || builtinPlanFor(name));
+    window.__underlayMode = { mode: 'fixture-fallback', project: name, reason: 'no real plan PDFs supplied for this project — drawn fixture underlay (needs-verification)' };
+    return;
+  }
+  if (levelState && levelState.project === name) { // scaffold already up — just re-sync
+    await ensureLevelSheets(levelState.activeLevel);
+    return;
+  }
+  destroyLevelScaffold();
+  renderPlanUnderlay(null); // clear the drawn fixture — the REAL sheet replaces it
+  const plan = floorPlan || builtinPlanFor(name);
+  const bb = (window._frame && window._frame.bbox) || fixturePlanBbox(plan)
+    || { minX: 0, maxX: manifest.footprint.widthFt, minY: 0, maxY: manifest.footprint.depthFt };
+  let api;
+  try { api = buildBuildingLevels(THREE, manifest, {}); }
+  catch (e) {
+    renderPlanUnderlay(plan); // flagged fixture fallback — never fabricate
+    window.__underlayMode = { mode: 'fixture-fallback', project: name, reason: 'level scaffold error: ' + String(e.message || e) };
+    return;
+  }
+  planGroup.add(api.root);
+  planGroup.visible = planVisible;
+  levelState = {
+    project: name, manifest, api,
+    center: { x: (bb.minX + bb.maxX) / 2, z: (bb.minY + bb.maxY) / 2 },
+    loadedKeys: new Set(), disciplines: new Set(['arch']),
+    activeLevel: 1, failures: [],
+  };
+  lastPlanBbox = bb; // keep Fit + plan framing working without the fixture
+  api.setActiveLevel(1);
+  buildLevelPanel();
+  await ensureLevelSheets(1);
+}
+
+// ── HF-A1-SELECT: raycast selection + apple-glass inspector ──
+// SELECTION INTERACTION CONTRACT (docs/plans/PRIORITIES.md): the selection is
+// the focal point of every camera op until deselect — but plain click NEVER
+// moves the camera; only F / double-click re-pivot + frame (smooth tween).
 const raycaster = new THREE.Raycaster();
-let selectMode = true, selMarker = null, preSelectTarget = null, selectedCount = 0;
+let selectMode = true, preSelectTarget = null, selectedCount = 0;
+let curSel = null;   // { center:Vector3, sizeFt, title, axis } — current selection (frame target)
+let curSelKey = null; // HF-D1-INSPDOCK: identity of the selected part (dblclick-again = deselect-all)
+let camTween = null; // in-flight frame tween, stepped from the render loop
+
+// contract #1 (HIGHLIGHT = the PART ITSELF recolored, NO bounding boxes):
+// one reserved hue used for nothing else in the scene palette — palette today is
+// greys (shell/hangers), red (mains/heads), blue (branches), cyan (drops),
+// gold (components); selection green is reserved for the highlight only.
+const SEL_COLOR = new THREE.Color(0x00e676);
+const selMeshMat = new THREE.MeshStandardMaterial({ color: SEL_COLOR.clone(), emissive: 0x0a3c22, metalness: 0.35, roughness: 0.5 });
+let selHL = null; // { kind:'mesh', mesh, origMat } | { kind:'inst', inst, idx }
+
+function applyHighlight(found) {
+  clearHighlight();
+  const obj = found.obj;
+  if (!obj) return;
+  if (obj.isInstancedMesh && found.idx !== undefined && found.idx !== null) {
+    // First highlight on this InstancedMesh: bake the shared material color into
+    // per-instance colors (visually identical — shader multiplies material x
+    // instance color) so ONLY the picked instance can be recolored (setColorAt).
+    if (!obj.instanceColor) {
+      const base = obj.material.color.clone();
+      for (let i = 0; i < obj.count; i += 1) obj.setColorAt(i, base);
+      obj.userData.hfBaseColor = base;
+      obj.material.color.set(0xffffff);
+      obj.material.needsUpdate = true;
+    }
+    obj.setColorAt(found.idx, SEL_COLOR);
+    obj.instanceColor.needsUpdate = true;
+    selHL = { kind: 'inst', inst: obj, idx: found.idx };
+  } else if (obj.isMesh) {
+    // Plain meshes share per-layer materials — swap the mesh's own material
+    // reference to the reserved highlight material; restore the exact original on deselect.
+    selHL = { kind: 'mesh', mesh: obj, origMat: obj.material };
+    obj.material = selMeshMat;
+  }
+}
+function clearHighlight() {
+  if (!selHL) return;
+  try {
+    if (selHL.kind === 'inst' && selHL.inst.instanceColor) {
+      selHL.inst.setColorAt(selHL.idx, selHL.inst.userData.hfBaseColor || new THREE.Color(0xffffff));
+      selHL.inst.instanceColor.needsUpdate = true;
+    } else if (selHL.kind === 'mesh') {
+      selHL.mesh.material = selHL.origMat; // exact original color restored
+    }
+  } catch (_) {}
+  selHL = null;
+}
+
+// contract #3b: DOUBLE-CLICK = inspect mode — X-RAY ISOLATION. The selected part
+// stays opaque + highlighted THROUGH obstructions (depthTest:false overlay) while
+// everything else goes translucent (~15% opacity). Esc/empty-click restores all
+// original material opacities exactly.
+let inspectState = null; // { saved: Map<material,{transparent,opacity,depthWrite}>, overlay: Mesh }
+function enterInspect(found) {
+  exitInspect();
+  if (!modelGroup) return;
+  const saved = new Map();
+  modelGroup.traverse((o) => {
+    if (!o.material) return;
+    const mats = Array.isArray(o.material) ? o.material : [o.material];
+    for (const m of mats) {
+      if (m === selMeshMat || saved.has(m)) continue; // selected part stays opaque
+      saved.set(m, { transparent: m.transparent, opacity: m.opacity, depthWrite: m.depthWrite });
+      m.transparent = true; m.opacity = 0.15; m.depthWrite = false; m.needsUpdate = true;
+    }
+  });
+  // Occlusion-piercing highlight: a clone of the picked part (or picked instance)
+  // rendered last with depthTest OFF so its occluded portions stay fully visible.
+  let overlay = null;
+  try {
+    const src = found && found.obj;
+    if (src && src.geometry) {
+      const mat = new THREE.MeshStandardMaterial({ color: SEL_COLOR.clone(), emissive: 0x0a3c22, metalness: 0.35, roughness: 0.5, depthTest: false });
+      overlay = new THREE.Mesh(src.geometry, mat);
+      overlay.renderOrder = 1000;
+      overlay.raycast = () => {}; // contract #8: overlay never intercepts selection clicks
+      overlay.matrixAutoUpdate = false;
+      src.updateMatrixWorld(true);
+      if (src.isInstancedMesh && found.idx !== undefined && found.idx !== null) {
+        const im = new THREE.Matrix4(); src.getMatrixAt(found.idx, im);
+        overlay.matrix.copy(src.matrixWorld).multiply(im);
+      } else {
+        overlay.matrix.copy(src.matrixWorld);
+      }
+      scene.add(overlay);
+    }
+  } catch (_) {}
+  inspectState = { saved, overlay };
+  window.__inspectMode = true;
+}
+function exitInspect() {
+  if (!inspectState) return;
+  for (const [m, p] of inspectState.saved) {
+    try { m.transparent = p.transparent; m.opacity = p.opacity; m.depthWrite = p.depthWrite; m.needsUpdate = true; } catch (_) {}
+  }
+  if (inspectState.overlay) {
+    scene.remove(inspectState.overlay);
+    try { inspectState.overlay.material.dispose(); } catch (_) {} // geometry is shared with the source mesh — never disposed here
+  }
+  inspectState = null;
+  window.__inspectMode = false;
+}
+
+function stepCamTween(now) {
+  if (!camTween || !controls) return;
+  const k = Math.min(1, (now - camTween.t0) / camTween.dur);
+  const e = 1 - Math.pow(1 - k, 3); // ease-out cubic
+  camera.position.lerpVectors(camTween.fromPos, camTween.toPos, e);
+  controls.target.lerpVectors(camTween.fromTgt, camTween.toTgt, e);
+  if (k >= 1) camTween = null;
+}
+
+// contract #3/#6: F (or double-click) frames the selected part — smooth-tween
+// the camera to it AND make it the orbit/zoom pivot. The pivot changes ONLY
+// here, never on plain click. After this, orbit revolves about the part and
+// scroll-zoom dollies toward/away from it (zoomToCursor is off).
+// contract #3b: front-facing approach direction for inspect mode — a horizontal
+// view axis PERPENDICULAR to the part's primary axis (pipes/branches face the
+// run side-on; vertical drops/risers face from plan south), with mild elevation
+// so the part fills the view face-on.
+function frontFacingDir(axis) {
+  const up = new THREE.Vector3(0, 1, 0);
+  let dir = new THREE.Vector3(0, 0, 1);
+  if (axis && axis.lengthSq() > 1e-8) {
+    const a = axis.clone().normalize();
+    if (Math.abs(a.y) < 0.9) {
+      dir = a.clone().cross(up);
+      if (dir.lengthSq() < 1e-8) dir.set(0, 0, 1); else dir.normalize();
+    }
+  }
+  dir.y = 0.35;
+  return dir.normalize();
+}
+
+function frameSelected(frontFacing) {
+  if (!curSel || !controls) return;
+  if (!preSelectTarget) preSelectTarget = controls.target.clone(); // restore point for Esc/empty-click
+  const dist = Math.max(8, (curSel.sizeFt || 2) * 4);
+  let dir;
+  if (frontFacing) {
+    dir = frontFacingDir(curSel.axis); // double-click: tween to a FRONT-FACING framed view
+  } else {
+    dir = camera.position.clone().sub(controls.target);
+    if (dir.lengthSq() < 1e-6) dir.set(1, 1, 1);
+    dir.normalize();
+  }
+  camTween = {
+    t0: performance.now(), dur: 450,
+    fromPos: camera.position.clone(), toPos: curSel.center.clone().add(dir.multiplyScalar(dist)),
+    fromTgt: controls.target.clone(), toTgt: curSel.center.clone(),
+  };
+  window.__lastFrame = { title: curSel.title, target: [curSel.center.x, curSel.center.y, curSel.center.z], n: (window.__lastFrame ? window.__lastFrame.n : 0) + 1 };
+}
 const fmtFt = (n) => (Math.round(Number(n) * 100) / 100) + ' ft';
 const fmtPt = (p) => Array.isArray(p) ? p.map((v) => Math.round(v * 10) / 10).join(', ') : '—';
 const ROLE_LABEL = { main: 'Cross-main', 'main-tie': 'Main tie', riser: 'System riser', branch: 'Branch line', drop: 'Drop' };
@@ -1225,25 +1739,21 @@ function pipeCoupling(s) {
 }
 
 function clearSelection(restoreTarget) {
-  if (selMarker) {
-    scene.remove(selMarker);
-    try { if (selMarker.geometry) selMarker.geometry.dispose(); if (selMarker.material) selMarker.material.dispose(); } catch (_) {}
-    selMarker = null;
-  }
+  exitInspect();    // contract #3b/#7: leave x-ray isolation — restores all original opacities exactly
+  clearHighlight(); // contract #1: restore the part's exact original color
   const insp = $('inspector'); if (insp) insp.classList.remove('open');
-  if (restoreTarget && preSelectTarget && controls) { controls.target.copy(preSelectTarget); controls.update(); }
+  curSel = null;
+  curSelKey = null;
+  // contract #7: deselect restores the PRIOR pivot (set only if a frame ever
+  // ran) with a short tween; camera position stays put — all camera ops keep working.
+  if (restoreTarget && preSelectTarget && controls) {
+    camTween = {
+      t0: performance.now(), dur: 350,
+      fromPos: camera.position.clone(), toPos: camera.position.clone(),
+      fromTgt: controls.target.clone(), toTgt: preSelectTarget.clone(),
+    };
+  }
   preSelectTarget = null;
-}
-
-function showSelMarker(center, sizeFt) {
-  const half = Math.max(0.9, Math.min(8, sizeFt / 2));
-  const box = new THREE.Box3(
-    new THREE.Vector3(center.x - half, center.y - half, center.z - half),
-    new THREE.Vector3(center.x + half, center.y + half, center.z + half));
-  selMarker = new THREE.Box3Helper(box, 0xffd54f);
-  if (selMarker.material) { selMarker.material.depthTest = false; selMarker.material.transparent = true; selMarker.material.opacity = 0.95; }
-  selMarker.renderOrder = 999;
-  scene.add(selMarker);
 }
 
 function openInspector(title, rows, verifyNote) {
@@ -1252,6 +1762,9 @@ function openInspector(title, rows, verifyNote) {
     .map((r) => `<div class="kv"><span>${r[0]}</span><b>${r[1]}</b></div>`).join('')
     + (verifyNote ? `<div class="nv-flag">⚠ NEEDS-VERIFICATION — ${verifyNote}</div>` : '');
   $('inspector').classList.add('open');
+  // HF-D1-INSPDOCK: the Inspector is docked at the top of the right results
+  // panel — bring it into view there (never floats over the viewport).
+  const rp = document.querySelector('aside.right'); if (rp) rp.scrollTop = 0;
 }
 
 // Build {title, rows, center(world THREE.Vector3), sizeFt, verify} for any hit part.
@@ -1262,7 +1775,8 @@ function describeHit(found) {
     // HF-G1..G4: derived fittings + hangers carry prebuilt inspector rows + flags
     if (meta.kind === 'fitting' || meta.kind === 'hanger') {
       const c = Array.isArray(s.p) ? new THREE.Vector3(s.p[0], s.p[1], s.p[2]) : found.point.clone();
-      return { title: s.label || (meta.kind === 'hanger' ? 'Hanger' : 'Fitting'), center: c, sizeFt: 1.6, verify: s.verify || 'derived/inferred part — needs verification', rows: s.rows || [] };
+      // HF-C1-PARTMESH: surface mesh provenance (real generated-scad vs primitive-fallback)
+      return { title: s.label || (meta.kind === 'hanger' ? 'Hanger' : 'Fitting'), center: c, sizeFt: 1.6, verify: s.verify || 'derived/inferred part — needs verification', rows: [...(s.rows || []), ['Part mesh', detailMeshProvenance(meta.fittingType)]] };
     }
     if (meta.kind === 'head') {
       const c = s.position ? toWorld(s.position) : found.point.clone();
@@ -1317,7 +1831,10 @@ function describeHit(found) {
   return null;
 }
 
-function handleCanvasClick(e) {
+// Plain click = select ONLY (contract #1: THE CAMERA DOES NOT MOVE ON SELECT —
+// recentering here is what broke re-selection: every other part shifted on
+// screen mid-click). frameAfter=true (double-click path) also frames the part.
+function handleCanvasClick(e, frameAfter) {
   if (!selectMode || !modelGroup || !camera) return;
   const r = renderer.domElement.getBoundingClientRect();
   const ndc = new THREE.Vector2(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
@@ -1326,26 +1843,47 @@ function handleCanvasClick(e) {
   let found = null;
   for (const h of hits) {
     if (h.object.userData && h.object.userData.hfInstanced && h.instanceId !== undefined && h.instanceId !== null) {
-      found = { inst: h.object.userData.hfInstanced, idx: h.instanceId, point: h.point }; break;
+      found = { inst: h.object.userData.hfInstanced, idx: h.instanceId, point: h.point, obj: h.object }; break;
     }
     let p = h.object;
     while (p && p !== modelGroup && !(p.userData && p.userData.hfPart)) p = p.parent;
-    if (p && p.userData && p.userData.hfPart) { found = { part: p.userData.hfPart, point: h.point }; break; }
+    if (p && p.userData && p.userData.hfPart) { found = { part: p.userData.hfPart, point: h.point, obj: p }; break; }
   }
   if (!found) { clearSelection(true); return; } // empty click deselects + restores orbit target
+  // HF-D1-INSPDOCK (contract 3b): double-click the SAME part again while in
+  // x-ray inspect = deselect-all (restores opacities, highlight, prior pivot).
+  const foundKey = (found.obj ? found.obj.uuid : 'x') + ':' + (found.idx !== undefined && found.idx !== null ? found.idx : '-');
+  if (frameAfter && inspectState && curSelKey === foundKey) { clearSelection(true); return; }
   const info = describeHit(found);
   if (!info) { clearSelection(true); return; }
-  if (selMarker) { scene.remove(selMarker); try { selMarker.geometry.dispose(); selMarker.material.dispose(); } catch (_) {} selMarker = null; }
-  if (!preSelectTarget) preSelectTarget = controls.target.clone(); // remember pre-selection orbit pivot
-  showSelMarker(info.center, info.sizeFt);
+  applyHighlight(found); // contract #1: the PART ITSELF is recolored (no bounding box)
+  // Primary axis (world) for the front-facing inspect view — derived from the
+  // picked solid's from/to when it is a run of pipe; null for point-like parts.
+  let axis = null;
+  const sol = found.part ? (found.part.solid || null) : ((found.inst && found.inst.solids) ? found.inst.solids[found.idx] : null);
+  if (sol && Array.isArray(sol.from) && Array.isArray(sol.to)) {
+    const aw = W(sol.from), bw = W(sol.to);
+    axis = new THREE.Vector3(bw[0] - aw[0], bw[1] - aw[1], bw[2] - aw[2]);
+  }
+  curSel = { center: info.center.clone(), sizeFt: info.sizeFt, title: info.title, axis };
+  curSelKey = foundKey; // HF-D1-INSPDOCK
   openInspector(info.title, info.rows, info.verify);
-  controls.target.copy(info.center); controls.update(); // AutoCAD-style: orbit about the part
+  // contract #1: NO controls.target change here — selection is camera-neutral,
+  // so contract #2 (click a different part at its unchanged screen position,
+  // re-select forever) holds naturally. Pivot/framing live in frameSelected().
   selectedCount += 1;
   window.__lastSelection = { title: info.title, center: [info.center.x, info.center.y, info.center.z], n: selectedCount };
+  if (frameAfter) {
+    enterInspect(found);  // contract #3b: dblclick = x-ray isolation
+    frameSelected(true);  // + tween to a front-facing framed view
+  } else if (inspectState) {
+    enterInspect(found);  // plain click while inspecting retargets the isolation to the new part
+  }
 }
 
 // ── data + actions ──
 let lastBody = {};
+let lastAppliedData = null; // HF-MENUBAR: last applied sprinkler-bid payload (File > Save)
 function currentBody() {
   const body = { markupPct: Number($('markup').value) || 25 };
   const hz = $('hazard').value; if (hz) body.hazard = hz;
@@ -1581,6 +2119,7 @@ async function generate() {
 // Shared by Generate and the HF-A1-AUTOLOAD path so a saved layout renders
 // identically to a fresh one.
 async function applyGenerated(data) {
+  lastAppliedData = data; // HF-MENUBAR: File > Save re-persists the current layout
   const { bid, cadModel, hydraulics, hydraulicNetwork, compliance, fullScopeBid, isBuilding, floorPlan } = data;
   // R6: preload the part meshes for the distinct component keys in this model
   // (riser_assembly/valve_alarm_check/fdc/fitting_tee) so renderModel can
@@ -1591,8 +2130,9 @@ async function applyGenerated(data) {
   // sizes, NOT manufacturer-exact (needs-verification surfaces in the Inspector).
   const COMP_TARGET_FT = { riser_assembly: 3.0, valve_alarm_check: 1.2, fdc: 1.5, fitting_tee: 0.8, fitting_elbow_90: 0.55, fitting_coupling: 0.45, fitting_reducer: 0.4 };
   await Promise.all(compKeys.map((k) => loadPartGeo(k, COMP_TARGET_FT[k] || 1.5)));
+  await preloadDetailMeshes(); // HF-C1-PARTMESH: real coupling/hanger/tee/elbow meshes for the detail pass
   renderModel(cadModel);
-  renderPlanUnderlay(floorPlan || builtinPlanFor(currentProjectName()));
+  await renderRealOrFixtureUnderlay(floorPlan); // HF-B1-PDFUNDERLAY: REAL sheets when the project has them
     const r = bid.rooms[0];
     $('layout').innerHTML = `
       <div class="kv"><span>Total area</span><b>${bid.totalAreaSqFt.toLocaleString()} sqft</b></div>
@@ -1763,7 +2303,7 @@ async function autoLoadOrUnderlay() {
       if (modelGroup) { scene.remove(modelGroup); modelGroup = null; }
       currentCadModel = null;
       ['dxfBtn', 'stepBtn', 'ifcBtn', 'stlBtn', 'submitBtn'].forEach((id) => { if ($(id)) $(id).disabled = true; });
-      renderPlanUnderlay(builtinPlanFor(currentProjectName()));
+      await renderRealOrFixtureUnderlay(null); // HF-B1-PDFUNDERLAY: REAL sheets when the project has them
       buildLayerToggles();
       if (lastPlanBbox) frameCamera(lastPlanBbox.minX, lastPlanBbox.maxX, lastPlanBbox.minY, lastPlanBbox.maxY, 14);
       $('layout').innerHTML = '<span class="muted" style="font-size:12px">No saved layout for this project + source yet — Generate to begin.</span>';
@@ -1891,15 +2431,7 @@ if ($('pdfCandidateBtn')) $('pdfCandidateBtn').onclick = async () => {
 };
 if ($('pdfDecisionBtn')) $('pdfDecisionBtn').onclick = savePdfBoundaryDecision;
 if ($('pdfDecisionLoadBtn')) $('pdfDecisionLoadBtn').onclick = loadPdfBoundaryDecision;
-// HF-A1-TRUESCALE: checkbox (left panel) and "True scale" toolbar toggle stay in sync.
-function setExaggerate(on) {
-  $('exaggerate').checked = on;
-  pipeVizScale = on ? 6 : 1;
-  $('scaleBtn').classList.toggle('on', !on);
-  if (currentCadModel) renderModel(currentCadModel);
-}
-$('exaggerate').onchange = (e) => setExaggerate(e.target.checked);
-$('scaleBtn').onclick = () => setExaggerate($('scaleBtn').classList.contains('on'));
+// HF-A1-TRUESCALE: true NFPA pipe scale is the ONLY render mode (radius toggle removed).
 // HF-A1-CADBAR: Fit view re-frames the whole model (or the plan underlay).
 $('fitBtn').onclick = () => {
   clearSelection(false);
@@ -1960,6 +2492,71 @@ $('demoBtn').onclick = playDemo;
 document.querySelectorAll('#viewSeg button').forEach((b) => {
   b.onclick = () => { if (demoRAF) { cancelAnimationFrame(demoRAF); demoRAF = null; $('demoBtn').disabled = false; } document.querySelectorAll('#viewSeg button').forEach((x) => x.classList.remove('on')); b.classList.add('on'); setView(b.dataset.view); };
 });
+
+// ── HF-MENUBAR (Stream A): mount the AutoSprink-parity menu bar above the
+// viewport and wire every action the Studio already implements. Unwired items
+// render grayed with "not yet wired — needs-verification" (flag-don't-gate);
+// the whole menu structure carries scraped-2026-06-12 needs-verification
+// provenance and asserts NO AutoSprink parity (top-right badge stays).
+(function mountMenuBar() {
+  if (!window.HFMenuBar || !$('menuBarHost')) return; // component missing — toolbar still works
+  const sdesc = 'HaloFire Studio action (Studio-added entry, not from the AutoSprink menu scrape)';
+  const addItems = (menuId, items, atTop = true) => {
+    const m = window.HFMenuBar.data.find((x) => x.id === menuId);
+    if (m && Array.isArray(m.items)) atTop ? m.items.unshift(...items) : m.items.push(...items);
+  };
+  addItems('view', [
+    { id: 'view.mode-3d', name: '3D (Perspective)', desc: sdesc },
+    { id: 'view.mode-top', name: 'Top (Plan)', desc: sdesc },
+    { id: 'view.mode-iso', name: 'Isometric (frame all)', desc: sdesc },
+    { id: 'view.fit', name: 'Fit View', desc: sdesc },
+    { id: 'view.layers', name: 'Layers panel', desc: sdesc },
+    { id: 'view.levels', name: 'Levels / sheets panel', desc: sdesc },
+  ]);
+  addItems('auto-draw', [{ id: 'auto-draw.generate-layout', name: 'Generate Layout', desc: sdesc }]);
+  addItems('actions', [{ id: 'actions.generate-layout', name: 'Generate Layout', desc: sdesc }]);
+  addItems('select', [{ id: 'select.mode-toggle', name: 'Select Mode (toggle)', desc: sdesc }]);
+  addItems('window', [{ id: 'window.inspector', name: 'Inspector (toggle)', desc: sdesc }]);
+  const scrollPanelTo = (id) => { const el = $(id); if (el && el.scrollIntoView) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
+  const clickView = (v) => { const b = document.querySelector(`#viewSeg button[data-view="${v}"]`); if (b) b.click(); };
+  const exportVia = (fmt) => {
+    const btn = $({ dxf: 'dxfBtn', step: 'stepBtn', ifc: 'ifcBtn', stl: 'stlBtn' }[fmt]);
+    if (!btn || btn.disabled) { $('status').textContent = 'Generate a layout first — exports need a built model'; return; }
+    btn.click();
+    $('status').textContent = `exporting ${fmt.toUpperCase()}…`;
+  };
+  const actions = {
+    export: exportVia,
+    'file.save': () => {
+      if (!lastAppliedData) { $('status').textContent = 'nothing to save — Generate a layout first'; return; }
+      saveLayout(lastAppliedData, lastBody); setAutoLoadBadge(Date.now(), 'saved');
+      $('status').textContent = 'layout saved for this project + source (browser localStorage)';
+    },
+    'file.open': () => { $('status').textContent = 'loading saved layout for this project + source…'; autoLoadOrUnderlay(); },
+    'view.mode-3d': () => clickView('iso'),
+    'view.mode-top': () => clickView('top'),
+    'view.mode-iso': () => { clickView('iso'); $('fitBtn').click(); },
+    'view.fit': () => $('fitBtn').click(),
+    'view.layers': () => scrollPanelTo('layers'),
+    'view.levels': () => {
+      if (window.__levelPanelToggle) window.__levelPanelToggle();
+      else $('status').textContent = 'no real plan sheets for this project — levels panel unavailable (needs-verification)';
+    },
+    'select.mode-toggle': () => $('selBtn').click(),
+    'select.deselect-all': () => clearSelection(true),
+    'auto-draw.generate-layout': () => generate(),
+    'actions.generate-layout': () => generate(),
+    'hydraulics.analysis-reports': () => { scrollPanelTo('hydraulics'); if (!currentCadModel) $('status').textContent = 'no hydraulics yet — Generate a layout first'; },
+    'listing.bill-of-material-bom': () => { scrollPanelTo('bom'); if (!currentCadModel) $('status').textContent = 'no BOM yet — Generate a layout first'; },
+    'listing.listing-manager': () => scrollPanelTo('bom'),
+    'parts-database.view-parts-list': () => window.open('/api/parts', '_blank'),
+    'window.inspector': () => { const i = $('inspector'); if (i) i.classList.toggle('open'); },
+  };
+  try {
+    window.__menuBar = window.HFMenuBar.mount($('menuBarHost'), { actions });
+    window.__menuBarStats = window.__menuBar.stats();
+  } catch (e) { window.__menuBarError = String(e && e.message || e); }
+})();
 
 (async () => {
   await initStudio();

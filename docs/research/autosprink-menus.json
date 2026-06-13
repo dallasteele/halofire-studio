@@ -1,0 +1,1918 @@
+{
+  "source": "https://autosprink.com/help/1?v=latest (and per-menu subpages)",
+  "scraped": "2026-06-12",
+  "provenance": "scraped 2026-06-12, needs-verification",
+  "gaps": [],
+  "menus": [
+    {
+      "menu": "File",
+      "sourcePage": "https://autosprink.com/help/14?v=latest",
+      "sourceTitle": "File Menu",
+      "items": [
+        {
+          "name": "New Drawing",
+          "desc": "Creates a new, empty AutoSPRINK drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Plot Sheet",
+          "desc": "Allows the user to add a plot sheet, access the Plot Sheet Manager, and import or export a Plot Sheet.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "New Plot Sheet",
+          "desc": "Creates a new AutoSPRINK drawing using plotter parameters.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Open",
+          "desc": "Accesses the Open dialog box for opening a file. Navigate to the desired directory, find the name of the desired file in the list, and either click Open or double-click on the file name in the list.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Close",
+          "desc": "Ends work on the current drawing. This closes the drawing but keeps AutoSPRINK active. (A user can also do this by clicking the close box in the upper right-hand corner of the drawing window.) If the drawing has not been saved,...",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Save",
+          "desc": "Saves changes for the current drawing. Drawing files are saved in .cad format.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Save As",
+          "desc": "Opens the Save As dialog box for saving changes to the current drawing. This option allows a user to save the drawing under a different file name or save it to a different location.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Save All",
+          "desc": "Saves changes for all open drawings.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Save All and Exit",
+          "desc": "Saves changes for all open drawings and then closes the program.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "AutoSave",
+          "desc": "Allows the user to set parameters for automatically saving an existing drawing to disk.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Options",
+          "desc": "Choose an alternative source for default settings.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Language",
+          "desc": "Allows the user to select from available languages to use.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Load Settings",
+          "desc": "Allows the user to open a specific document settings file.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Save Settings As",
+          "desc": "Allows the user to save document settings to disk.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Load Toolbar State",
+          "desc": "Load saved positioning and changes to the toolbars.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Save Toolbar State",
+          "desc": "Saves positioning and changes to the toolbars.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Import",
+          "desc": "This submenu has options for importing a 3DS model (.3ds format) or an AutoCAD drawing (.dwg format) into AutoSPRINK. In either case, AutoSPRINK will reproduce the imported file in .cad format, translating elements, mimicking fonts and...",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Export",
+          "desc": "This submenu has options for exporting an AutoSPRINK drawing to an AutoCAD file, or for exporting drawing data into AutoSPRINK Fab, or for exporting pipe and sprinkler data in ASCII format.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Plotting",
+          "desc": "This submenu has options for generating hard copies of a drawing according to the user's chosen page and printer settings. This includes a print preview mode that will show a drawing as it will actually appear, and that also allows a...",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Printing",
+          "desc": "This submenu has options for generating hydraulic, stock listing, or purchase order reports related to a current drawing, and also allows a user to set up report printer parameters.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Licensing",
+          "desc": "This submenu allows access to licensing dialogs for both AutoSPRINK and the stock listing functions. Without valid license numbers and passwords, stock listing and many other features of AutoSPRINK will be disabled.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Source Control",
+          "desc": "This submenu has options for checking in/out a document, getting the most updated document, adding a file and being able to change binding.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Recent Files",
+          "desc": "A list of the most recent files opened in AutoSPRINK appears near the bottom of the File menu. Click on a file name to immediately open that file.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Exit",
+          "desc": "Closes AutoSPRINK. (The program will prompt you to save any unsaved files before closing.)",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    },
+    {
+      "menu": "Edit",
+      "sourcePage": "https://autosprink.com/help/13?v=latest",
+      "sourceTitle": "Edit Menu",
+      "items": [
+        {
+          "name": "Undo",
+          "desc": "Restores the drawing to its state prior to the most recent action.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Redo",
+          "desc": "Restores the most recently undone action.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Cut",
+          "desc": "Removes the selected item(s) from the drawing onto the Clipboard, so that the selected item(s) can be pasted elsewhere.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Copy",
+          "desc": "Duplicates the selected item(s) in the drawing and places the copy on the Clipboard to be pasted elsewhere.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Paste",
+          "desc": "Inserts a previously cut or copied selection into the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Delete",
+          "desc": "Erases a selection from the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Delete All",
+          "desc": "Erases everything from the drawing field.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Lock View Element",
+          "desc": "Lock view element will lock a view that you have placed in a sheet.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Copy Bitmap",
+          "desc": "Takes a snapshot of the current drawing field; this snapshot can be inserted into the drawing as a Picture element.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Copy Element Bitmap",
+          "desc": "Copies either a view or picture element at its native resolution in .bmp format to the Clipboard for use in other programs.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Paste Bitmap",
+          "desc": "Takes the copied snapshot and places it as a picture element in the drawing field.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Undo List...",
+          "desc": "Displays a list of all actions taken since the last save, allowing multiple actions to be undone quickly.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Redo List...",
+          "desc": "Displays a list of all actions undone since the last undo action, allowing multiple actions to be redone quickly.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Find & Replace",
+          "desc": "Searches selected text within the drawing for specified words or phrases and allows you to replace specified words or phrases with different text that you specify.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    },
+    {
+      "menu": "Select",
+      "sourcePage": "https://autosprink.com/help/35?v=latest",
+      "sourceTitle": "Select Menu",
+      "items": [
+        {
+          "name": "All",
+          "desc": "Selects all elements in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "All Like Selected",
+          "desc": "Selects all elements in the drawing of the same type as the element currently selected.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Every",
+          "desc": "Lists element types that can be selected. Choosing a type selects all elements of that type in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Last",
+          "desc": "Reselects the items the user selected in the previous action.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "All in Rectangle",
+          "desc": "Equips the cursor with the rectangle tool; all items with all grips captured within the rectangle are added to the current selection.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Crossing Window",
+          "desc": "Equips the cursor with the rectangle tool. All elements with one or more grips captured within the rectangle are added to the current selection.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Alt-Window",
+          "desc": "Equips the cursor with the rectangle tool. All elements with one or more grips captured within the rectangle are added to the current selection; however, grips not captured within the rectangle remain anchored to their current positions.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Crossing Line",
+          "desc": "Equips the cursor with the line tool. All elements with any part crossing the line are added to the current selection.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Rectangular Crossing",
+          "desc": "Equips the cursor with the rectangle tool. All elements with any part crossing the four lines that form the rectangle are added to the current selection.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Invert Selection",
+          "desc": "Selects all currently unselected elements; deselects all currently selected elements.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Deselect All",
+          "desc": "Deselects any elements currently selected.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Maintain Connections",
+          "desc": "Maintains connections between/among selected Walls or Beams, so that when a wall or beam is moved, connected walls or beams will stretch to that wall or beam's new position.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Toggle Ctrl Key",
+          "desc": "Makes any subsequent commands be performed as if the CTRL key was pressed; while this option is active and the CTRL key is pressed, commands will be performed as if the CTRL key is not pressed.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Select with Filter",
+          "desc": "Opens the Selection dialogue, listing potential selections to be added to or removed from the current selection.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Next Target",
+          "desc": "If the cursor is placed so that multiple elements could be selected (e.g. pointed to multiple overlapping elements in top view), this shifts the selection status to the element in the set after the currently selected element.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Previous Target",
+          "desc": "If the cursor is placed so that multiple elements could be selected (e.g. pointed to multiple overlapping elements in top view), this shifts the selection status to the element in the set before the currently selected element.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Cursor Type",
+          "desc": "Choose between Rectangular, Elliptical, or Polyline selection cursor types.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "All Like Selected in Rectangle",
+          "desc": "Equips the cursor with the rectangle tool; all items with all grips captured within the rectangle, and are of the same type as the element currently selected, are added to the current selection.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "All Like Selected on Same Layer",
+          "desc": "Selects all elements in the drawing of the same type and on the same layer as the element currently selected.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "All on Selected Layer(s)",
+          "desc": "Selects all elements on the same layer as the element currently selected.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "By ID",
+          "desc": "Select an element by its unique ID number (found on the General tab in the element's Properties dialog).",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    },
+    {
+      "menu": "Snaps",
+      "sourcePage": "https://autosprink.com/help/37?v=latest",
+      "sourceTitle": "Snaps Menu",
+      "items": [
+        {
+          "name": "Z-Lock",
+          "desc": "Forces drawing to drag on the Z axis while in isometric view.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Elevation Lock",
+          "desc": "Allow the user to draw pipes at a locked elevation.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Alter Benchmark Elevation/Rotation",
+          "desc": "Allows the benchmark to be set at a specific location and rotation relative to its current location and rotation.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Auto Benchmark",
+          "desc": "Makes the benchmark move from point to point as you draw elements.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Visible Benchmark",
+          "desc": "Hides the benchmark from view.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Orthographic",
+          "desc": "Snaps the element you are drawing or moving at 45° or 90° angles. (The [Shift] key toggles this mode.)",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Protractor",
+          "desc": "Displays a protractor that allows pipes to be easily snapped 90, 45, 22.5, 11.25, or 0 degrees.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Center Point",
+          "desc": "Snaps the element you are drawing or moving to the center of another element.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "End Points",
+          "desc": "Snaps the element you are drawing or moving to any grip of another element. (Also sometimes referred to as Location snap.)",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Perpendicular All",
+          "desc": "Snaps the element you are drawing or moving at right angles to another element (relative to the benchmark) along the Z-axis.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Perpendicular",
+          "desc": "Snaps the element you are drawing or moving at right angles to another element (relative to the benchmark).",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Intersections All",
+          "desc": "Snaps the element you are drawing or moving to the intersection of two or more other elements in three dimensions.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Intersections",
+          "desc": "Snaps the element you are drawing or moving to the intersection of two or more other elements.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Near",
+          "desc": "Snaps the element you are drawing or moving to anywhere along another element’s visible lines.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Tangent",
+          "desc": "Draws the cursor to a location touching a single point along a curve.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Special Element",
+          "desc": "Snaps the element you are drawing or moving to another element in a way unique to the individual elements involved.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Pipe to Sprinkler Snap Options",
+          "desc": "Allows access to special options for snapping pipes to sprinklers in your drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Snap into Symbols",
+          "desc": "Snaps the element you are drawing or moving to items grouped in a symbol. Works in coordination with other snaps.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Sprinkler Ceiling Snap",
+          "desc": "Snaps sprinklers to points on a ceiling grid. You must set a ceiling snap layer before using this command.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Enable Element Snaps",
+          "desc": "Activates any snaps selected. This is also a quick way to turn off all snaps.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "UCS - Auto Benchmark Rotation",
+          "desc": "Automatically rotates the benchmark to the direction a pipe is placed in when snapped to an existing pipe in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "UCS - Auto Ortho Snaps",
+          "desc": "Automatically rotates the direction of pipe when snapped to an existing pipe.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "UCS - Ortho Input",
+          "desc": "Allows users to enter a distance into the input toolbar and move the pipe that distance in the direction that ortho is locked into.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Rounding",
+          "desc": "Forces mouse input to the nearest rounding increment.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Visible Grid",
+          "desc": "Shows a grid in the drawing. This grid is used by AutoSPRINK for rounding.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    },
+    {
+      "menu": "Tools",
+      "sourcePage": "https://autosprink.com/help/38?v=latest",
+      "sourceTitle": "Tools Menu",
+      "items": [
+        {
+          "name": "Move Benchmark",
+          "desc": "Equips the cursor to relocate the benchmark to a point you select",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "FDC",
+          "desc": "Equips the cursor to place a Fire Department Connection in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Fitting",
+          "desc": "This submenu has options for various fittings with which to equip the cursor.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Flow Device",
+          "desc": "Equips the cursor to place a flow device (i.e. a gauge, alarm, or switch/sensor) in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Hanger",
+          "desc": "Opens a dialog box for determining hanger properties, then equips the cursor to place a hanger.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Hose",
+          "desc": "Equips the cursor to place a hose in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Hydrant",
+          "desc": "Equips the cursor to place a hydrant in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Hydraulic Wormhole",
+          "desc": "Equips the cursor to place a hydraulic wormhole in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Nozzle",
+          "desc": "Equips the cursor to place a nozzle in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Pipe",
+          "desc": "This submenu has options for placing pipes in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Pipe Outlet",
+          "desc": "Equips the cursor to place an outlet on a pipe in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Pump",
+          "desc": "Equips the cursor to place a pump in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Sprinklers",
+          "desc": "This submenu has options for placing sprinklers in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Sprinkler Legend",
+          "desc": "Opens a dialog box to place and create a sprinkler legend table that users may use up to ten columns of specific choices selected.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Strainer",
+          "desc": "Equips the cursor to place a strainer in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Supply",
+          "desc": "Equips the cursor to place a supply in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Sway Brace",
+          "desc": "Equips the cursor to place a Sway Brace in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Dimension",
+          "desc": "This submenu has options for a variety of dimension indicators with which to equip the cursor.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Leader Line",
+          "desc": "Equips the cursor to place a leader line in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Text Box",
+          "desc": "Equips the cursor to place text in a specified area in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Text Line",
+          "desc": "Equips the cursor to insert text along a designated line in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Arc",
+          "desc": "Equips the cursor to place an arc in the drawing field.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Circle",
+          "desc": "Equips the cursor to place a circle or ellipse in the drawing field.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Crosshatch",
+          "desc": "Equips the cursor to place a crosshatched area in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Light",
+          "desc": "Equips the cursor to place a light element in the drawing. This element can be adjusted to change the luminance of the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Line Segment",
+          "desc": "Equips the cursor to place a line segment in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Point",
+          "desc": "Equips the cursor to place a point in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Polyline",
+          "desc": "Equips the cursor to place a jointed line (i.e. a series of connected line segments) in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Rectangle",
+          "desc": "Equips the cursor to place and size a rectangle in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Sketch",
+          "desc": "Allows you to sketch freely in the drawing. The resulting element has properties of a polyline.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Solid",
+          "desc": "Equips the cursor to place a four-sided solid in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Symbol",
+          "desc": "Equips the cursor to place a symbol in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Beam",
+          "desc": "This submenu has options for types of beams with which to equip the cursor.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Ceiling Grid",
+          "desc": "Equips the cursor to set the boundary of a ceiling tile grid in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Ceiling Grid Features",
+          "desc": "This submenu has options for ceiling grid features with which to equip the cursor.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Column",
+          "desc": "Equips the cursor to place a column in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Column Line",
+          "desc": "Equips the cursor to place a column line in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Roof Plane",
+          "desc": "Equips the cursor to establish a roof plane section in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Wall",
+          "desc": "This submenu has options for types of walls with which to equip the cursor.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Areas",
+          "desc": "This submenu has options for types of boundary delineation tools for concealing, identifying and classifying various regions of the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "View",
+          "desc": "Equips the cursor to stretch an area within the drawing into which a snapshot of another saved drawing may be inserted.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Protractor",
+          "desc": "Equips the cursor to place a protractor in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Ruler",
+          "desc": "Equips the cursor to place a ruler in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Coverage Cell",
+          "desc": "Equips the cursor to place an adjustable boundary into the drawing in order to provide the area enclosed with appropriately spaced and arranged sprinkler system components.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "3 Point Coverage Cell",
+          "desc": "Equips the cursor to establish the length and width of an adjustable boundary in the drawing in order to provide the area enclosed with appropriately spaced and arranged sprinkler system components.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Part Tag",
+          "desc": "Equips the cursor to place a part tag in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Cloud",
+          "desc": "Equips the cursor to place a cloud element in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Cylinder",
+          "desc": "Equips the cursor to place a cylinder in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Picture",
+          "desc": "Allows a bitmap image from an external file to be inserted into the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "XRef",
+          "desc": "Opens a submenu for selection of the external file to reference for a set of externally referenced drawing data, also called an Xref, then equips the cursor to place the Xref data in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Modeling",
+          "desc": "This submenu has options for a variety of basic modeling objects with which to equip the cursor.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Board",
+          "desc": "Two sub-menu options are available for placing the Board. The Board can be placed by its end locations or by its corner and edge locations. Equips the cursor to place a board in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Openings",
+          "desc": "This submenu has options for types of openings to create in a beam or wall element in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Slab",
+          "desc": "Two sub-menu options are available for placing the Slab. The Slab can be placed by its end locations or its corner and edge locations. Equips the cursor to place a concrete slab in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Callout",
+          "desc": "Equip the cursor to place a rectangle selection for an area that can be used to plot.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Link",
+          "desc": "Equips the cursor to place a connection to an external file into the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Section",
+          "desc": "Equips the mouse cursor with a selection cursor that can be used to add a section to the drawing. Section views can be created using the Create Section View command in the Commands menu.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Pipe Sleeve",
+          "desc": "Equips the cursor to place a sleeve on a pipe in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Text Leader Line",
+          "desc": "Equips the cursor to insert a leader line for text in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Clipping Planes",
+          "desc": "This submenu has options for types of clipping planes to place in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    },
+    {
+      "menu": "Actions",
+      "sourcePage": "https://autosprink.com/help/3?v=latest",
+      "sourceTitle": "Actions Menu",
+      "items": [
+        {
+          "name": "Hide Layers",
+          "desc": "Renders selected layers invisible by turning off the layers on which the selected elements reside. Use the Layer Pane to restore visibility.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Reparent Layers",
+          "desc": "Creates a new parent layer for the selected element and its associated layers.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Group Existing Labels",
+          "desc": "Consolidates selected labels or groups labels into a single unit. Only selected labels can be grouped.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Un-group Existing Labels",
+          "desc": "Separates grouped labels back into individual labels. This command applies only to labels that were previously grouped.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Offset Move/Copy",
+          "desc": "Moves or copies selected elements using numeric input.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Set Text Angle",
+          "desc": "Specifies the angle at which text is displayed to improve drawing readability.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Bind XRef Symbols",
+          "desc": "Binds selected symbols that reference external drawing files (also called XRefs) into the current drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Reload XRef Symbols",
+          "desc": "Reload selected XRefs from their source files.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Create Detail",
+          "desc": "Groups selected drawing elements into a detail treated as a single unit with properties used for stocklisting and trimming.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Split Drawing Using Control Areas",
+          "desc": "Splits drawing elements from the selected control areas.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Split Drawing Using Polyline Boundary",
+          "desc": "Splits drawing elements at a closed polyline boundary.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Round",
+          "desc": "Adjusts all insertion points of selected elements, fitting them to the nearest grid point according to the current rounding increment.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Cleanup Text",
+          "desc": "Spreads out overlapping text to improve drawing readability.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Fillet Pipes",
+          "desc": "Rounds intersecting pipes at a specified radius.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Flatten",
+          "desc": "Sets the elevation (Z-axis) of all selected elements to zero.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Flatten Dimensioning",
+          "desc": "Positions selected dimension lines and their associated elements to the benchmark's Z height.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Copy/Flatten Text",
+          "desc": "Improves text appearance in isometric views by copying and flattening text elements. This command also allows assignment of a different layer for the copied and flattened text, if desired.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    },
+    {
+      "menu": "Commands",
+      "sourcePage": "https://autosprink.com/help/10?v=latest",
+      "sourceTitle": "Commands Menu",
+      "items": [
+        {
+          "name": "Align Labels with Parent Element",
+          "desc": "Allows pipe, pipeline, and sprinkler labels to align and rotate along with the parent pipe as it is moved.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Assign Column Names",
+          "desc": "Allows users to assign names to the columns in a drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Assign Heights to Columns",
+          "desc": "Allows users to specify the height of columns in a drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Break",
+          "desc": "Breaks selected elements at 2D intersections with the line-based, target element. This will break selected elements at a 3D intersection if the target is the benchmark.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Center Ceiling Grid Between Walls",
+          "desc": "Changes the position of the center grip of the selected ceiling tile grid in order to keep all edge tiles on each side the same size.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Center Sprinklers on Ceiling Tiles",
+          "desc": "Repositions sprinklers placed on a ceiling tile to the center of the tile.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Create Part Tags",
+          "desc": "Creates part labels for all selected elements.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Convert Elements",
+          "desc": "From this submenu, choose into what elements or details the selected elements should be converted.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Divide",
+          "desc": "Will create point elements at even intervals along the perimeter of the selected element.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Reverse",
+          "desc": "This submenu allows you to turn fittings, pipelines or pipeline segments in the opposite direction.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Slabs",
+          "desc": "Cut slabs where they are intersected by lines.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Split Pipeline",
+          "desc": "Divides a pipeline at the end of a segment marked by benchmark placement at the desired point of separation.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Verify Drawing Elements",
+          "desc": "Checks all elements in a drawing to ensure that they are within a user-specified threshold for dimension, line width, and DB size.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Analyze Sprinkler Coverage Areas",
+          "desc": "Evaluates the coverage area for the selected sprinkler(s) in a drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Boards: Cut/Extract Cut Lines",
+          "desc": "Cuts and drills boards that are selected, and has ability to extract cut lines as well.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Calculate Slab Dimensions",
+          "desc": "Calculates the Total Mass and Total Volume for the Slab(s).",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Calculate Wall Dimensions",
+          "desc": "Calculates Total Length for a continuous, rectangle, or single wall in a drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Create Callout View",
+          "desc": "Place a view for an area that has been selecting using the Callout tool.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Create Section View",
+          "desc": "Creates a view of an area that has been selected using the Section tool.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Create Sprinkler Legend from View",
+          "desc": "Creates a sprinkler legend for a view that has been created.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Complex Symbols",
+          "desc": "Create a complex symbol relationship between selected symbol and targeted part.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Deflector Position Checking",
+          "desc": "Evaluates the deflector position of the highlighted sprinklers in relation to all visible roof planes in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Delete Pipes & Close Gaps",
+          "desc": "Removes a selected pipe segment, then extends the adjacent pipes and connects them.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Dimension Selected",
+          "desc": "From this submenu, choose to add running dimensions to sprinklers, hangers, or pipes.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Draw Sprinkler Coverage",
+          "desc": "Allows you to draw the sprinkler coverage area for the selected sprinkler.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Elevate Beams",
+          "desc": "Elevates beams to roof planes or a specified distance.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Elevate to Pipes",
+          "desc": "Moves selected elements to the nearest pipe on the Z-axis.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Format Dimension Text",
+          "desc": "If you have changed units of measure in your drawing, converts selected measurement labels to the newly designated unit.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Offset",
+          "desc": "Add a 45° or 90° offset at the midpoint of selected pipe.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Match Pipe Ends to Fittings",
+          "desc": "Adjusts end preps on pipes to conform to attached fittings.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Merge Pipelines",
+          "desc": "Joins selected pipelines to form a single unit. Only pipelines linked end to end can be merged.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Modeling",
+          "desc": "This submenu allows access to various modeling functions available in AutoSPRINK via the Symmetrica CAD engine.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Resize Assembly",
+          "desc": "Change the size of selected pipes and fittings.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Slope Pipes",
+          "desc": "Slope pipes up or down by a selected increment.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Spell Check Text",
+          "desc": "Spell-checks text within the drawing, and offers suggestions for spelling corrections.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Sway Bracing",
+          "desc": "This submenu allows users to access sway bracing functions. Sway bracing is a line element that is used to attach pipes to ceiling planes.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Tag Leaks",
+          "desc": "Alerts users when connections between pipes and fittings or outlets are leaking, and places an alert element next to the leak in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Elevate Pipes",
+          "desc": "Set elevation for selected pipes.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Set Sprinkler Coverage from Dimension",
+          "desc": "Set coverage for sprinkler(s) based on the dimension of the sprinkler(s).",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    },
+    {
+      "menu": "Auto Draw",
+      "sourcePage": "https://autosprink.com/help/6?v=latest",
+      "sourceTitle": "Auto Draw Menu",
+      "items": [
+        {
+          "name": "Couplings",
+          "desc": "Searches the drawing and automatically places couplings based on user-defined settings to ensure accurate stock listing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Fittings",
+          "desc": "Validates connections between selected pipes and automatically inserts required fittings as needed.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Hangers",
+          "desc": "Automatically places hangers on selected pipes based on user-defined settings.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Auto Branch Lines",
+          "desc": "Draws branch lines to selected sprinkler heads based on user-defined settings.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Easy Drop",
+          "desc": "Splits vertical pipes that are connected to sprinklers into user-defined segment lengths and inserts appropriate couplings automatically.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Remote Area Boundary",
+          "desc": "Creates a remote area boundary for one or more selected sprinklers based on coverage area styles. If multiple sprinklers are selected, a single boundary is created representing the combined coverage.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Riser Nipples",
+          "desc": "Automatically places riser nipples to connect branch lines to cross mains based on user-defined settings.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Route Pipe",
+          "desc": "Intelligently routes pipes between selected points, automatically adjusting for drawing conditions such as slopes or obstacles.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Auto Size",
+          "desc": "Adjusts selected pipes to match the current schedule settings.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Sprinkler Coverage",
+          "desc": "Creates coverage boundaries for all selected sprinkler heads.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Arm Around",
+          "desc": "Automatically resolves object conflicts by rerouting pipes around intersecting elements.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Bushings",
+          "desc": "Automatically places bushings as needed for selected elements to ensure proper connections.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    },
+    {
+      "menu": "Roof Planes",
+      "sourcePage": "https://autosprink.com/help/32?v=latest",
+      "sourceTitle": "Roof Planes Menu",
+      "items": [
+        {
+          "name": "Automatic Roof Planes",
+          "desc": "Generates a roof plane for a selection of columns or walls.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Elevate Elements to Roof Planes",
+          "desc": "Raises selected items to the height of the roof plane.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Rotate Beams to Roof Planes",
+          "desc": "Orients beams so that the top plane of the beam matches the slant of the roof plane.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Rotate Sprinklers to Roof Planes",
+          "desc": "Allows selected sprinklers to rotate along with the roof plane's orientation.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Stretch Columns to Roof Plane",
+          "desc": "Extends the length of selected columns until they meet the roof plane.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Stretch Hangers",
+          "desc": "Extends selected hangers to an existing roof plane directly above.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Stretch Sway Braces",
+          "desc": "Extends selected sway braces to an existing roof plane directly above.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    },
+    {
+      "menu": "Wizards",
+      "sourcePage": "https://autosprink.com/help/43?v=latest",
+      "sourceTitle": "Wizards Menu",
+      "items": [
+        {
+          "name": "Column Grid",
+          "desc": "Lays out a structured area formed by intersecting column lines, with columns located at each intersection of the grid and labeling bubbles located at the end of each column line. The current location of the benchmark will determine the...",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Grid System",
+          "desc": "Lays out a grid system according to the details you supply. Dimensions, pipe schedule, orientation and source along with numerous other selectable specifications define the structure of the system.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Tree System",
+          "desc": "Lays out a tree system according to the details you supply. Dimensions, pipe schedule, orientation and source along with numerous other selectable specifications define the structure of the system.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "3-Point System",
+          "desc": "Lets you select a 3-point area to be covered before the system details are addressed and offers the choice of a tree or grid system to cover that area. The wizard then lays out a fire sprinkler schematic according to the details you supply.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "In-Rack System",
+          "desc": "Lays out an in-rack system according to the details you supply. Dimensions, orientation and source along with numerous other selectable specifications define the structure of the system.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Loop System",
+          "desc": "Lays out a loop system according to the details you supply. Dimensions, pipe schedule, orientation and source along with numerous other selectable specifications define the structure of the system.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Multi-Point System",
+          "desc": "Lets you select a multi-point area to be covered before the system details are addressed and offers the choice of a tree or grid system to cover that area. The wizard then lays out a fire sprinkler schematic according to the details you...",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Standpipe",
+          "desc": "Lays out a standpipe system according to the details you supply. The number of levels, rotation and demand along with numerous other selectable specifications define the structure of the system.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Advanced Drop Connect",
+          "desc": "The newest of the Wizards, the Advanced Drop Connect offers an enhanced connection logic between pipes and sprinklers. It also offers greater flexibility to define these connections, and consolidates groups of sprinkler heads to ensure...",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Place Hangers",
+          "desc": "Lays out hanger placement.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Place Sprinklers in Ceiling Grid",
+          "desc": "Allows the user to easily place sprinklers on a ceiling grid according to specified parameters.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    },
+    {
+      "menu": "Hydraulics",
+      "sourcePage": "https://autosprink.com/help/17?v=latest",
+      "sourceTitle": "Hydraulics Menu",
+      "items": [
+        {
+          "name": "Auto Peak",
+          "desc": "Searches along branch lines within the selected remote area to find the greatest system demand.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Keep Hydraulically Most Demanding Area",
+          "desc": "Evaluates each remote area selected, then determines which is the hydraulically most demanding. All others will be discarded.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Analysis Reports",
+          "desc": "Displays graphically the hydraulic information for the currently selected remote area in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Remote Area",
+          "desc": "Allows you to define the hydraulically weakest region of the sprinkler system.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Remote Area Boundary",
+          "desc": "Allows you to draw the boundary surrounding a remote area, segment by segment.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Manual Hydraulic Graph",
+          "desc": "Allows users to manually create a hydraulic graph.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "System Optimizer",
+          "desc": "Allows you to modify the currently selected pipe to see what effect it will have on the system’s demand characteristics.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Update Riser Tags",
+          "desc": "Updates information in selected riser tags.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Remote Area Box",
+          "desc": "Allows you to draw a box around a remote area.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Remote Area Table",
+          "desc": "Generates a Remote Area's hydraulic information, in graphical form, into the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Check Point Gauge",
+          "desc": "Allows you to place gauges throughout a sprinkler design. Gauges provide pressure and flow statistics on the Remote Area Data tab of the Analysis Reports dialog.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Riser Tag",
+          "desc": "Allows you to place a riser tag in your drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Supply Table",
+          "desc": "Allows you to place a supply table in your drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Flow Calculator",
+          "desc": "Allows you to derive flow, pressure and K-factor using the standard flow formula.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Hydrant Flow Calculator",
+          "desc": "Allows you to determine discharge for smoothbore nozzles when given values for the constant, the diameter of the nozzle and the pressure on the pilot gauge.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Show Pipe Volumes",
+          "desc": "Displays the volume of air and water in selected pipes.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    },
+    {
+      "menu": "Finish",
+      "sourcePage": "https://autosprink.com/help/15?v=latest",
+      "sourceTitle": "Finish Menu",
+      "items": [
+        {
+          "name": "Harmonize Pipes and Fittings",
+          "desc": "Automatically harmonizes your pipes and fittings.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Manufacturer Harmonizing",
+          "desc": "Automatically harmonizes your selections' manufacturers if possible.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Labels",
+          "desc": "Lets user choose which items in the selection will be labeled.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Cleanup Intersections",
+          "desc": "Breaks selected elements possessing similar properties into segments at their point(s) of intersection, except if they are collinear, in which case the elements are fused into a single line.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Match Pipe Ends to Fittings",
+          "desc": "Adjusts end preps on pipes to conform to attached fittings.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Cleanup Text",
+          "desc": "Spreads out overlapping text to improve readability of your drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Flatten Dimensioning",
+          "desc": "Positions selected dimension lines and their associated elements at the same Z height as the benchmark.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    },
+    {
+      "menu": "Alerts",
+      "sourcePage": "https://autosprink.com/help/4?v=latest",
+      "sourceTitle": "Alerts Menu",
+      "items": [
+        {
+          "name": "Delete All Alerts",
+          "desc": "Deletes all Alerts regardless of status.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Interference Checking",
+          "desc": "Searches for collisions between pipes and beams or pipes and other pipes.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Alert List Sets Target Element",
+          "desc": "Designates Alert highlighted in the Alerts Pane as the target element.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Delete Closed Alerts",
+          "desc": "Deletes all Alerts with a status of Closed.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Alert Report",
+          "desc": "Displays a Report listing Alerts for the current drawing. Data includes ID, status, notes, the primary image, and images associated with additional notes.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Synchronize Alerts",
+          "desc": "Saves alerts to the Alert Database or retrieves alerts from the database.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Load Resolution Proposals",
+          "desc": "Loads alerts associated with elements that produced the resolution proposal.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Save Resolution Proposals",
+          "desc": "Saves alerts associated with elements that produced the resolution proposal.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Resolution Manager",
+          "desc": "The Alert Resolution Proposal Manager dialog aids in indicating any alert resolution process.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Alert Controls",
+          "desc": "This dialog provides various Alert settings options.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Trades Configuration",
+          "desc": "Allows users to create new trades, manages which trades are assigned to alerts and the priority level of each trade.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Assign Elements to Trade Layer",
+          "desc": "Assign an element to a trade layer to be automatically assigned an alert during interference checking.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    },
+    {
+      "menu": "Listing",
+      "sourcePage": "https://autosprink.com/help/20?v=latest",
+      "sourceTitle": "Listing Menu",
+      "items": [
+        {
+          "name": "Assign Price Area",
+          "desc": "Gathers information on selected system components, grouping them under a designation you specify for presentation in a text table or AutoPRICER Estimating Report.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Assign List Area",
+          "desc": "Gathers information on selected system components, grouping them under a designation you specify for presentation in a Bill of Materials or Stock Listing Report.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Active List Area",
+          "desc": "Indicates which list area is currently active, and also where new elements should be placed (in the active list area, or in the list area matching the appropriate default properties element).",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Listing Manager",
+          "desc": "Displays description, element count and date last listed for each list area in the drawing, along with options to generate a Bill of Materials or a Stock Listing Report.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Bill of Material (BOM)",
+          "desc": "Compiles a wide variety of product information for each item implemented in the drawing, then equips the cursor to place the data into the drawing in chart form.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Price Area Text Table",
+          "desc": "Compiles material cost, cost per sprinkler, and area per sprinkler in addition to the total cost for the components within a selected portion of a sprinkler system, then equips the cursor to place this data into the drawing in chart form.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Calculate Weight",
+          "desc": "Opens the Weight Calculations dialog, which displays the Pipe Weight Dry and Pipe Weight Wet calculations within the chosen boundary based on a full or partial selection of a drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Calculate Surface Area",
+          "desc": "Opens the Calculate Surface Area dialog, which displays the total surface area of all selected pipes.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    },
+    {
+      "menu": "Parts Database",
+      "sourcePage": "https://autosprink.com/help/27?v=latest",
+      "sourceTitle": "Parts Database Menu",
+      "items": [
+        {
+          "name": "Add New Parts Book Item",
+          "desc": "Opens a dialog listing parts book items and categories that can be created with a customized set of properties.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Edit Parts Book Item",
+          "desc": "Alters properties of a created component in the Parts Database.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Remove Parts Book Item",
+          "desc": "Deletes components from the Parts Database.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Sprinkler Definition Wizard",
+          "desc": "Allows users to select the parameters for the sprinklers to be added to the database.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Pump Definition Wizard",
+          "desc": "Can be used to create a custom pump.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "View Parts List",
+          "desc": "Opens a dialog presenting all system components stored in the Parts Database and their characteristics.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Database Utilities",
+          "desc": "This submenu offers several parts database file maintenance options.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Add New / Edit Parts Book Manufacturer",
+          "desc": "Allows you to include parts producers and brands not currently listed, or alter parts producers and brands already in the database.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Parts Book Quick Data Editors",
+          "desc": "This submenu has options for editing specific aspects of parts book components, including item level data, part numbers, costs, stock item data, equivalent lengths, item visibility, job types, sprinkler identification number (SIN) data,...",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Arrange Sortable Lists",
+          "desc": "Allows the rearrangement of sort orders to multiple list types.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Add Detail as Trim Kit",
+          "desc": "Allows users to create a Parts Book kit from detail created in drawings.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Synchronize Properties of Default and Selected Elements",
+          "desc": "Assigns the properties value of a highlighted element in the drawing to that element’s database profile so that all further use of the element type possesses the synchronized properties value.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Synchronize Costs of Default and Selected Elements",
+          "desc": "Assigns the cost value of a highlighted element in the drawing to that element’s database profile so that all further use of the element type possesses the synchronized cost value.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Update Unknown User Pipes",
+          "desc": "Changes all unknown user pipes to known pipes.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Database Utilities",
+          "desc": "This menu offers the parts database file maintenance options",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    },
+    {
+      "menu": "AutoPREP",
+      "sourcePage": "https://autosprink.com/help/7?v=latest",
+      "sourceTitle": "AutoPREP Menu",
+      "items": [
+        {
+          "name": "Host Drawing Manager",
+          "desc": "Organizes a set of .dwg or .cad files based on their reference relationships.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Drawing Compare - Multiple",
+          "desc": "Allows users to compare drawings and generate a comparison result. After the comparison is created, the End Compare dialog opens, providing access to options for reviewing and managing the comparison.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Drawing Compare - Review",
+          "desc": "Allows to review an existing drawing comparison. This option allows users to reopen the comparison file if it was previously closed, or reopens the End Compare dialog if the comparison is still active, allowing users to review and...",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Reports - Print",
+          "desc": "Opens the AutoPREP Report Logs dialog, where report logs for Host Drawing Manager Reports and Compare Reports can be viewed, printed, and deleted.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Drawing Cleanup",
+          "desc": "Allows users to define a series of cleanup commands to run on drawings prior to import. These command sequences can be reused or recorded into a wizard to help standardize and simplify drawing preparation workflows.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    },
+    {
+      "menu": "Settings",
+      "sourcePage": "https://autosprink.com/help/36?v=latest",
+      "sourceTitle": "Settings Menu",
+      "items": [
+        {
+          "name": "Drawing",
+          "desc": "Allows you to set a Drawing Description, adjust the View, Rounding, Background and Lighting. In addition, Job, Customer and Contractor can be specified and Miscellaneous re-scale and display options are available. Finally, Project...",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Fabrication Standards",
+          "desc": "Allows you to specify details regarding how AutoSPRINK places fittings and outlets on pipes, as well as to what degree the entries in the Parts Book are used.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Format",
+          "desc": "Defines the way AutoSPRINK displays values in real world lengths as determined by the Drawing and View settings and the way actual paper distances are scaled to your drawing. Note that these settings do not affect how AutoSPRINK stores...",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Hydraulic Calculations",
+          "desc": "Defines characteristics for Calculation Method, Sprinkler Pressure, Hydraulic Loss at Fittings and Node Tag placement.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Parts Profile",
+          "desc": "Sets what types of parts will be used when certain elements are placed in the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Render",
+          "desc": "Specifies how your drawing will be rendered.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Use Smart Pipe",
+          "desc": "This option toggles the use of the smart pipe system.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Minimize Pipe Label Spacing",
+          "desc": "This option chooses logical label placement so labels are easily legible.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Allow Manual Takeout",
+          "desc": "Enables the Cut Length section on the Pipe Properties dialog. It allows users to choose between Get takeout from connected fittings and Deduct a manual takeout are the two pipe cut length options.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Get Defaults from Selection",
+          "desc": "Makes characteristics of a selected element the default properties for other elements of that type.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Properties",
+          "desc": "Displays the properties page for the selected element.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Display Data Sheets on Property Pages",
+          "desc": "Displays manufacturer's part-specific data sheets on property pages when turned on.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Ignore Lines During Cleanup Intersections",
+          "desc": "Ignores all line elements in a drawing when the Cleanup Intersections command is executed.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Allow Views to XRef",
+          "desc": "Allows users to enter a path on all View property pages.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Save Settings",
+          "desc": "Saves drawing parameters to the user's personal folder.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Command Dialogs",
+          "desc": "Allows users to set a command so an option dialog will display each time the command is executed.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Sprinkler Dimensions",
+          "desc": "Allows users to specify when to show the dimensions surrounding line based elements when selected.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Get Defaults from Target",
+          "desc": "Equips the cursor to draw an element with identical settings to that of another that happens to be situated among a broad selection.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Set Properties from Defaults",
+          "desc": "Retrieves default properties of selected elements.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Common Properties",
+          "desc": "Allows similar elements' properties to be defined. If dissimilar elements are highlighted in the drawing, an apples and oranges dialog appears that reads, \"Properties for elements of different types are being shown.\" Only base property...",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Filtered Properties",
+          "desc": "Allows the filtering and definition of multiple elements' properties according to user's selection. Each group properties' definition can be given a unique name.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Part Selection Properties",
+          "desc": "Easily adjust size, part number, cost, and quantity of selected elements. Each column header is sortable. Elements' default properties can be accessed and edited from this dialog.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Speech Recognition",
+          "desc": "Turns on the speech recognition function, allowing voice commands to be used.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Customize Speech Recognition",
+          "desc": "Allows custom speech recognition profiles to be created.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Automatically Capitalize Text",
+          "desc": "Automatically capitalizes all new text when turned on.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Show Complex Symbols",
+          "desc": "This option toggles the display of complex symbols.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    },
+    {
+      "menu": "View",
+      "sourcePage": "https://autosprink.com/help/39?v=latest",
+      "sourceTitle": "View Menu",
+      "items": [
+        {
+          "name": "Camera",
+          "desc": "This submenu and its four submenus have many options for camera movement.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Rendering",
+          "desc": "This submenu has options for drawing display and rendering.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Walkthrough",
+          "desc": "This submenu has options for creating a walkthrough (a series of different views) of your drawing. It is known as Save/Restore View in some levels.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Enlarge Outlet Points on Fittings",
+          "desc": "Increases the size of connection point indicators (which show the actual point to which a pipe penetrates a fitting).",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Hide Pipe Labels",
+          "desc": "Conceals pipe label text.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Register Bitmap Background",
+          "desc": "Defines origin, dimensions and scale for an image used as a background.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Show Leaks",
+          "desc": "Reveals areas of a sprinkler system where pipe or fitting connections are compromised.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Show Page Breaks",
+          "desc": "Displays the arrangement of the drawing as it will appear on paper by indicating the borders of each page with dashed lines.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Show Pipe Insulation",
+          "desc": "Toggles the display of Pipe Insulation in the current drawing. Unchecking can increase performance in drawings that include a great deal of insulation.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Calculator",
+          "desc": "Opens the Calculator dialog. This allows you to perform complex calculations and insert the results directly into the Input Box.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Status Bar",
+          "desc": "Displays the status bar at the bottom of the screen, which shows useful information about activities in progress.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Panes",
+          "desc": "This submenu controls which panes are visible in your drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Tool Bars",
+          "desc": "This submenu offers a list of toolbars that can be displayed in AutoSPRINK.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Show Start Page",
+          "desc": "Opens the Start Page.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Text Box Clipping Indicator",
+          "desc": "Toggles display of a red underline at the bottom of a Text Box containing text that is hidden from view.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Refresh",
+          "desc": "Redraws the entire screen display.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Refresh Elements",
+          "desc": "Redraws selected elements only.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Color Pipes By",
+          "desc": "Presents options for the pipe coloring scheme.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Highlight Make-on Connectors",
+          "desc": "Highlights factory-attached end preps for fittings.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Show Sprinkler Dimensions",
+          "desc": "Toggles the display of selected sprinkler proximity from target layer elements.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Abbreviate Views and Pictures",
+          "desc": "Creates abbreviated views and pictures to speed performance.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Control Area Navigator",
+          "desc": "Opens the Control Area Navigator tool for use in toggling between established Control Areas within the drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    },
+    {
+      "menu": "Window",
+      "sourcePage": "https://autosprink.com/help/42?v=latest",
+      "sourceTitle": "Window Menu",
+      "items": [
+        {
+          "name": "Cascade",
+          "desc": "Displays all open windows in a stack, in order from the most recently opened window (on top of the stack) to the first window opened (on the bottom). Only the most recently opened window is completely visible.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Tile",
+          "desc": "Displays all open windows next to each other by dividing the viewing field into equal portions.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Arrange Icons",
+          "desc": "Arranges icons for minimized drawing windows in a row at the bottom of the AutoSPRINK drawing pane.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Clean House",
+          "desc": "Opens a dialog offering options to free up system resources if you are having performance problems while running AutoSPRINK.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Device Capabilities",
+          "desc": "Displays information regarding your current display and printer drivers.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Open Drawings",
+          "desc": "All drawings currently open in AutoSPRINK are listed at the bottom of this menu. A check mark appears next to the currently active drawing. Select any drawing on this list to make that drawing the active drawing.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    },
+    {
+      "menu": "Help",
+      "sourcePage": "https://autosprink.com/help/605?v=latest",
+      "sourceTitle": "Help Menu",
+      "items": [
+        {
+          "name": "Support Library",
+          "desc": "Opens the AutoSPRINK help page with the table of contents displayed. Select topics in the Home menu to navigate the AutoSPRINK help page.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "What's New",
+          "desc": "Opens the What's New page on the AutoSPRINK website.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Tutorial Videos",
+          "desc": "Opens the Training Videos on the AutoSPRINK website. Here you can find training courses, such as AutoSPRINK Pre-Training, Design Topic Webinars, and Tutorials.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Support",
+          "desc": "Opens the Product Support page on the AutoSPRINK website. This page contains Support Videos and Contact Information for technical support.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "AutoSPRINK Assistant",
+          "desc": "Toggles on the appearance of the AutoSPRINK Assistant while using the program. AutoSPRINK Assistant informs users of the newest updates to specific functions, as well as how to use them.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "Getting Started Guide",
+          "desc": "Opens the Getting Started table of contents on the AutoSPRINK website.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        },
+        {
+          "name": "About AutoSPRINK",
+          "desc": "Displays version information and credits for AutoSPRINK.",
+          "provenance": "scraped 2026-06-12, needs-verification"
+        }
+      ]
+    }
+  ]
+}

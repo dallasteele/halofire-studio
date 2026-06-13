@@ -119,3 +119,89 @@ Verifier pass: true, zero failures; both autosprink hotfixes (`#demoBtn{display:
 - [ ] Threaded-detail upgrades (ops hub detail views per seed doc).
 - [ ] Inspector inferred attributes (pipe material/joint "(inferred)") remain
       needs-verification — keep flags until verified against pricebook/specs.
+
+## Big-build 2026-06-12 — results
+
+Ultramode big-build (Streams A/B/C + integration + verify). Repo reconciled
+with live for every static Studio file (md5-verified); both autosprink hotfixes
+(`#demoBtn{display:none`, `select option,select optgroup`) confirmed intact in
+the live file and in the repo copy.
+
+### Stream A — AutoSprink menu system: DONE (core)
+- [x] Scraped official docs (Scrapling): **20 menus / 354 items** →
+      `docs/research/autosprink-menus.json`; **32 toolbars / 291 buttons** →
+      `docs/research/autosprink-toolbars.json`. Every entry carries
+      "scraped 2026-06-12, needs-verification" provenance.
+- [x] `public/halofire-menubar.js` — apple-glass menu bar component, GENERATED
+      from the scrape by `scripts/build-menubar.mjs`. Real dropdowns,
+      Alt-mnemonics, Esc/arrow/Home/End keyboard nav, File→Export
+      DXF/STEP/IFC/STL submenu (portal flyout).
+- [x] Mounted in autosprink.html above the viewport. **368 rendered items**
+      (354 scraped + 10 Studio-added entries + 4 export formats):
+      **22 wired, 346 stubbed** (grayed + NEEDS-VERIFICATION flag,
+      flag-don't-gate). Stats at `window.__menuBarStats`.
+- TODO: toolbar component (32 toolbars/291 buttons scraped, none built);
+      wire the 346 stubs as features land.
+
+### Stream B — real PDF plan underlays + levels: DONE (core)
+- [x] Real bid plans served: `/plans/cooperative-1881/` — 9 Bluebeam vector
+      PDFs, 345 pages total (arch 110, struct 104, elec 33, plumb 29, mech 24,
+      generals 21, civils 15, landscape 6, geopiers 3). On VPS + local disk;
+      **NOT committed to git (~434 MB)**.
+- [x] `src/data/plan-manifest.js` — 8 levels × 5 disciplines = 40 mapped
+      sheets. Arch (A-101..108) + RCP (A-151..158) + struct (S-110..S-180)
+      page-label verified; elec/plumb text-heuristic (flagged). Elevations
+      ESTIMATED (10.5 ft floor-to-floor, `elevationSource` says so). Home
+      Depot Rexburg: no plan PDFs exist → honest null, no fabrication.
+- [x] `src/engine/pdf-underlay.js` + `src/engine/building-levels.js` —
+      pdfjs page → true-scale CanvasTexture underlay + level/sheet switcher
+      (View → Levels / sheets panel).
+- TODO: mech sheet→level mapping is NOT_CONFIDENT (flagged in manifest) —
+      operator must map M-sheets.
+
+### Stream C — real CAD part meshes: DONE (core)
+- [x] `src/engine/part-meshes.js` — loads the R1 pipeline's real generated
+      STLs true-scale (mm→ft 1/304.8, OpenSCAD Z-up→three Y-up), Inspector
+      provenance records, `manufacturerExact` forced false.
+- [x] Smoke (`scripts/smoke-part-meshes.mjs`): **generated=22 meshes,
+      checkedDims=5, failures=0** (heads, pipes, fittings, grooved couplings,
+      valves, hanger).
+- [x] Honest primitive fallbacks (geometry:null, never faked): `drop_nipple`,
+      `escutcheon`, `identification_sign` (manifest-missing).
+- [x] `src/data/cutsheet-urls-fittings.json` + cutsheet-scraper skill seeds
+      manufacturer cut-sheet links (needs-verification).
+
+### Integration + verify — PASS
+- [x] Menu bar + levels panel + part meshes live on
+      https://halofire.rankempire.io/autosprink.html; curl 200; hotfix markers
+      present; menu actions invoke existing Studio functions (generate, fit,
+      views, exports, BOM, hydraulics, parts list, inspector).
+
+### Drift note (IMPORTANT — do not lose)
+- `src/api/server.js` W16B claim-gate-flag wiring (commit `b9b55d3`) is
+  committed in the repo but **NOT deployed** — live server.js predates it and
+  `src/autobid/claim-gate-flag.js` does not exist on the VPS. Record keeper
+  kept the repo (HEAD) version instead of reverting to live. Deploy needs:
+  copy claim-gate-flag.js + server.js (with .bak protocol) + node restart.
+- Pre-existing uncommitted local edits to seed.js/app.html/etc. were
+  reconciled to live content (eol-only differences after sync).
+
+### Codex / GX10-loop checklist (deep work remaining)
+- [ ] FULL MULTI-DISCIPLINE PLAN BUILD-OUT (PRIORITIES §, task #32):
+      extract structural beams/joists from S-sheets so the **888 hangers**
+      attach to real steel (not air); MEP obstruction volumes from M/E/P
+      sheets (mech level mapping NOT_CONFIDENT — resolve first); RCP-driven
+      ceilings from A-151..A-158 page-label-verified sheets.
+- [ ] Menu parity: wire the **346 stubbed** menu items (354 scraped, 22 wired
+      today incl. Studio entries); build the toolbar component for the
+      **32 toolbars / 291 buttons** scraped; auto-report wired/stub counts in
+      the Settings verification ledger.
+- [ ] Parts on primitive fallback: drop_nipple (needs a true-length nipple
+      emitter — 10-ft pipe meshes are wrong scale), escutcheon (no emitter),
+      identification_sign (no manifest entry); distinct rigid vs flexible
+      coupling models (both alias grooved_coupling today).
+- [ ] Scale-audit follow-ups: verify ESTIMATED_FLOOR_TO_FLOOR_FT=10.5 against
+      A-301..A-307 + S building sections; verify 413 × 413.2 ft footprint
+      (fixture-derived); confirm heuristic elec/plumb sheet mappings.
+- [ ] Deploy W16B server change to live (claim-gate-flag.js + server.js +
+      restart, .bak + curl-verify protocol).

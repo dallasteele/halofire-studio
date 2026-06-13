@@ -1,0 +1,164 @@
+[
+  {
+    "key": "pipe_sch10",
+    "name": "Schedule 10 steel pipe",
+    "category": "pipe",
+    "manufacturer": "Wheatland Tube",
+    "url": "https://www.wheatland.com/wp-content/uploads/2017/12/Schedule-10-Submittal-Sheet.pdf",
+    "confidence": "verified",
+    "note": "Wheatland Schedule 10 fire sprinkler pipe submittal sheet (ASTM A135/A795, UL/FM). URL checked HTTP 200 on 2026-06-12. Combined Sch 10+40 sheet also exists at /2021/08/Schedule-10-and-Schedule-40-Submittal-Sheet.pdf."
+  },
+  {
+    "key": "pipe_sch40",
+    "name": "Schedule 40 steel pipe",
+    "category": "pipe",
+    "manufacturer": "Wheatland Tube",
+    "url": "https://www.wheatland.com/wp-content/uploads/2017/12/Schedule-40-Submittal-Sheet.pdf",
+    "confidence": "verified",
+    "note": "Wheatland Schedule 40 fire sprinkler pipe submittal sheet (ASTM A53/A795, UL/FM). URL checked HTTP 200 on 2026-06-12."
+  },
+  {
+    "key": "fitting_tee",
+    "name": "Tee",
+    "category": "fittings",
+    "manufacturer": "ASC Engineered Solutions (Anvil)",
+    "url": "https://www.asc-es.com/resource/Fig%20358%20Straight%20Tee%20&%20Fig%20360%20Cross%20-%20Submittal",
+    "confidence": "verified",
+    "note": "Anvil Fig. 358 cast iron threaded straight tee (Class 125, ASME B16.4) submittal; document also covers Fig. 360 cross. URL checked HTTP 200 on 2026-06-12. Reducing tee combinations need separate figure submittals."
+  },
+  {
+    "key": "fitting_elbow_90",
+    "name": "90° elbow",
+    "category": "fittings",
+    "manufacturer": "ASC Engineered Solutions (Anvil)",
+    "url": "https://www.asc-es.com/resource/351+90%C2%BA+Elbow+Straight+Submittal",
+    "confidence": "verified",
+    "note": "Anvil Fig. 351 cast iron threaded 90-degree straight elbow (Class 125, ASME B16.4) submittal. URL checked HTTP 200 on 2026-06-12."
+  },
+  {
+    "key": "fitting_elbow_45",
+    "name": "45° elbow",
+    "category": "fittings",
+    "manufacturer": "ASC Engineered Solutions (Anvil)",
+    "url": "https://www.asc-es.com/resource/421+&+424+Elbows+Submittal",
+    "confidence": "probable",
+    "note": "Anvil cast iron threaded elbows submittal covering Fig. 421/424 (45-degree is Fig. 424; this figure set is the extra-heavy Class 250 line). URL checked HTTP 200 on 2026-06-12, but a dedicated Class 125 Fig. 356 45-degree elbow submittal page was not individually located (product page exists at asc-es.com/products/356-45-elbow) — needs-verification for class match."
+  },
+  {
+    "key": "fitting_coupling",
+    "name": "Coupling",
+    "category": "fittings",
+    "manufacturer": "ASC Engineered Solutions (Anvil)",
+    "url": "https://www.asc-es.com/resource/1121,+1122,+1124+Class+150+Standard+Couplings+&+Cap+Submittal",
+    "confidence": "verified",
+    "note": "Anvil Fig. 1121/1122 malleable iron Class 150 standard couplings submittal (same document also covers the Fig. 1124 cap). URL checked HTTP 200 on 2026-06-12."
+  },
+  {
+    "key": "fitting_reducer",
+    "name": "Reducer",
+    "category": "fittings",
+    "manufacturer": "ASC Engineered Solutions (Anvil)",
+    "url": "https://www.asc-es.com/resource/368%20Eccentric%20Reducer%20Submittal",
+    "confidence": "probable",
+    "note": "Anvil Fig. 368 cast iron threaded ECCENTRIC reducer submittal (URL checked HTTP 200 on 2026-06-12). Registry asks for a CONCENTRIC reducer; a per-figure concentric reducing-coupling submittal page was not individually located on asc-es.com — needs-verification. Full-line fallback: https://s3.us-east-2.amazonaws.com/asc-es.com/resources/literature/ASC-CAT-Pipe-Fittings-Submittal-Catalog-v01.pdf"
+  },
+  {
+    "key": "fitting_cap",
+    "name": "Cap",
+    "category": "fittings",
+    "manufacturer": "ASC Engineered Solutions (Anvil)",
+    "url": "https://www.asc-es.com/resource/1121,+1122,+1124+Class+150+Standard+Couplings+&+Cap+Submittal",
+    "confidence": "verified",
+    "note": "Anvil Fig. 1124 malleable iron Class 150 cap — shares the couplings & cap submittal document. URL checked HTTP 200 on 2026-06-12."
+  },
+  {
+    "key": "fitting_cross",
+    "name": "Cross",
+    "category": "fittings",
+    "manufacturer": "ASC Engineered Solutions (Anvil)",
+    "url": "https://www.asc-es.com/resource/Fig%20358%20Straight%20Tee%20&%20Fig%20360%20Cross%20-%20Submittal",
+    "confidence": "verified",
+    "note": "Anvil Fig. 360 cast iron threaded cross (Class 125, ASME B16.4) — shares the Fig. 358 tee / Fig. 360 cross submittal document. URL checked HTTP 200 on 2026-06-12."
+  },
+  {
+    "key": "grooved_coupling",
+    "name": "Grooved coupling",
+    "category": "grooved",
+    "manufacturer": "Victaulic",
+    "url": "https://assets.victaulic.com/assets/uploads/literature/10.02.pdf",
+    "confidence": "verified",
+    "note": "Victaulic publication 10.02: FireLock rigid coupling Style 005H submittal. URL checked HTTP 200 on 2026-06-12. Covers the rigid type only; the flexible type (e.g. Style 177 FireLock flexible coupling) has its own publication — needs-verification for the flexible variant."
+  },
+  {
+    "key": "grooved_flange_adapter",
+    "name": "Grooved flange adapter",
+    "category": "grooved",
+    "manufacturer": "Victaulic",
+    "url": "https://assets.victaulic.com/assets/uploads/literature/10.04.pdf",
+    "confidence": "verified",
+    "note": "Victaulic publication 10.04: FireLock flange adapter Style 744 (ANSI Class 125/150, fire protection only) submittal. URL checked HTTP 200 on 2026-06-12."
+  },
+  {
+    "key": "valve_alarm_check",
+    "name": "Alarm check valve",
+    "category": "valves",
+    "manufacturer": "Tyco (Johnson Controls)",
+    "url": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/1BlAbiphbAgwMOTfSiHCug/content",
+    "confidence": "verified",
+    "note": "Tyco TFP910 technical data sheet: Model AV-1-300 alarm check valve, 2-1/2 to 8 in., wet pipe systems, hosted on the manufacturer's (Johnson Controls) documentation portal. URL checked HTTP 200 on 2026-06-12; opaque docs-portal ID may rotate on doc revisions — landing page: tyco-fire.com AV-1-300 product page."
+  },
+  {
+    "key": "valve_check",
+    "name": "Check valve",
+    "category": "valves",
+    "manufacturer": "Tyco (Johnson Controls)",
+    "url": "https://docs.johnsoncontrols.com/tycofire/api/khub/documents/qgeRjGL8FKWwqw4RRcyicw/content",
+    "confidence": "verified",
+    "note": "Tyco TFP1550 technical data sheet: Model CV-1F grooved-end SWING check valves (matches registry style: swing), hosted on the manufacturer's (Johnson Controls) documentation portal. URL checked HTTP 200 on 2026-06-12; opaque docs-portal ID may rotate on doc revisions."
+  },
+  {
+    "key": "valve_butterfly",
+    "name": "Butterfly valve (supervised)",
+    "category": "valves",
+    "manufacturer": "Victaulic",
+    "url": "https://assets.victaulic.com/assets/uploads/literature/10.81.pdf",
+    "confidence": "verified",
+    "note": "Victaulic publication 10.81: FireLock butterfly valve Series 705 with weatherproof actuator, supervised-open with internal switches (matches registry supervised + tamperSwitch). URL checked HTTP 200 on 2026-06-12."
+  },
+  {
+    "key": "valve_osy_gate",
+    "name": "OS&Y gate valve",
+    "category": "valves",
+    "manufacturer": "NIBCO",
+    "url": "https://media.nibco.com/m/6a7c68021d0bf3a5/original/F-607-OTS-Spec-Sheet.pdf",
+    "confidence": "verified",
+    "note": "NIBCO F-607-OTS cast iron OS&Y gate valve spec/submittal sheet (fire protection, UL/FM, pre-grooved stem for tamper switch). Hosted on NIBCO's own media CDN. URL checked HTTP 200 on 2026-06-12."
+  },
+  {
+    "key": "valve_prv",
+    "name": "Pressure reducing valve",
+    "category": "valves",
+    "manufacturer": "Cla-Val",
+    "url": "https://www.cla-val.com/wp-content/uploads/2024/05/E-90-21_Fire.pdf",
+    "confidence": "verified",
+    "note": "Cla-Val E-90-21 data sheet: Model 90G-21/90A-21 UL/ULC-listed fire protection pressure reducing valve, 300 psi class (matches registry maxInletPsi 300). URL checked HTTP 200 on 2026-06-12."
+  },
+  {
+    "key": "valve_deluge",
+    "name": "Deluge valve",
+    "category": "valves",
+    "manufacturer": "Viking",
+    "url": "https://www.vikinggroupinc.com/databook/deluge/valves/040104.pdf",
+    "confidence": "verified",
+    "note": "Viking Model F-1 deluge valve technical data page from the official Viking databook. URL checked HTTP 200 on 2026-06-12. Confirm size coverage (F-1 is 2-1/2 to 8 in.; registry lists 3/4/6 in.) when selecting models."
+  },
+  {
+    "key": "backflow_preventer",
+    "name": "Backflow preventer (double-check / RPZ)",
+    "category": "backflow_preventer",
+    "manufacturer": "Zurn Wilkins",
+    "url": "https://www.zurn.com/media-library/web_documents/pdfs/specsheets/bf-350-pdf",
+    "confidence": "verified",
+    "note": "Zurn Wilkins Model 350 double check valve assembly specification sheet BF-350. URL checked HTTP 200 on 2026-06-12. Covers the double_check type; the RPZ type (e.g. Zurn 375/975XL or Watts 957) has separate sheets — the Watts 957 spec PDF returned HTTP 403 to automated checks, so only its product page (watts.com .../957) verified."
+  }
+]

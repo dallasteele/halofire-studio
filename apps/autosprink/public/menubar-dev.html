@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Halo Fire Studio — Menu Bar Dev Harness</title>
+<!-- relative refs so this page works from /public/ on the live server AND file:// in tests -->
+<link rel="stylesheet" href="./styles/halofire-tokens.css">
+<style>
+  body { margin: 0; min-height: 100vh; background: var(--hf-color-bg, #0e1318); color: var(--hf-color-text-primary, #f0f4f8); font-family: 'Inter Variable', Inter, system-ui, sans-serif; padding: 24px; }
+  h1 { font-size: 16px; font-weight: 600; margin: 0 0 4px; }
+  .sub { font-size: 12px; color: var(--hf-color-text-muted, #b8c1cb); margin-bottom: 18px; }
+  .sub .warn { color: var(--hf-color-warn, #fbbf24); }
+  #menubar-host { margin-bottom: 18px; }
+  #stats { font-size: 12px; color: var(--hf-color-text-secondary, #c4cdd8); margin-bottom: 12px; font-family: 'JetBrains Mono Variable', monospace; }
+  #log { background: var(--hf-color-surface, #161c25); border: 1px solid var(--hf-color-border, #2a323d); border-radius: 10px; padding: 12px; font-family: 'JetBrains Mono Variable', monospace; font-size: 12px; min-height: 120px; max-height: 320px; overflow-y: auto; white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<h1>Halo Fire Studio — menu bar dev harness</h1>
+<div class="sub">AutoSprink-structure menu bar component (apple-glass). <span class="warn">All menu content scraped 2026-06-12 — needs-verification. NOT AutoSprink parity.</span> Try: click a menu, Alt+F, Esc, arrow keys, File &gt; Export &gt; DXF.</div>
+<div id="menubar-host"></div>
+<div id="stats"></div>
+<div id="log">event log:
+</div>
+<script src="./halofire-menubar.js"></script>
+<script>
+  var logEl = document.getElementById('log');
+  function log(msg) {
+    logEl.textContent += new Date().toISOString().slice(11, 19) + '  ' + msg + '\n';
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+  // demo wiring: a handful of actions so wired vs stubbed rendering is visible
+  var api = window.HFMenuBar.mount(document.getElementById('menubar-host'), {
+    actions: {
+      'export': function (format) { log('actions.export("' + format + '") called'); },
+      'file.new-drawing': function () { log('File > New Drawing'); },
+      'file.save': function () { log('File > Save'); },
+      'view.zoom': function () { log('View > Zoom'); },
+      'select.all': function () { log('Select > All'); },
+      'select.deselect-all': function () { log('Select > Deselect All'); },
+      'hydraulics.analysis-reports': function () { log('Hydraulics > Analysis Reports'); }
+    }
+  });
+  var s = api.stats();
+  document.getElementById('stats').textContent =
+    'menus=' + s.menus + ' items=' + s.items + ' wired=' + s.wired + ' stubbed=' + s.stubbed + ' | ' + s.provenance;
+  log('mounted: ' + JSON.stringify(s));
+  // expose for the browser smoke test
+  window.__menubarApi = api;
+</script>
+</body>
+</html>
