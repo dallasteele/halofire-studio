@@ -13,8 +13,15 @@
     --font:'Inter',system-ui,sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace;
   }
   html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--font)}
-  #app{display:grid;grid-template-columns:248px 1fr 312px;grid-template-rows:48px 1fr;height:100vh}
+  /* HF-UXCLEAN §1: row 2 is a dedicated CHROME STRIP for the app menu bar that
+     spans the canvas column ABOVE the viewport — the menu bar is no longer an
+     absolute overlay painted over the canvas interior. */
+  #app{display:grid;grid-template-columns:248px 1fr 312px;grid-template-rows:48px auto 1fr;height:100vh}
   header{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:var(--panel);border-bottom:1px solid var(--line)}
+  aside.left{grid-row:2/4}
+  aside.right{grid-row:2/4}
+  #menuChrome{grid-column:2;grid-row:2;background:var(--panel);border-bottom:1px solid var(--line);min-height:0;overflow:hidden;display:flex;align-items:stretch}
+  #canvasWrap{grid-column:2;grid-row:3}
   .brand{font-weight:900;font-style:italic;font-size:17px;color:var(--bright)}
   .brand span{color:var(--fire)}
   .brand small{font-style:normal;font-weight:600;font-size:10px;color:var(--muted);letter-spacing:1px;margin-left:8px}
@@ -38,9 +45,11 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
   button.ghost{background:var(--panel2);color:var(--text);border:1px solid var(--line)}
   #canvasWrap{position:relative;background:#08080b}
   #canvas{width:100%;height:100%;display:block}
-  #legend{position:absolute;left:12px;bottom:12px;font-family:var(--mono);font-size:10px;color:var(--muted);background:rgba(8,8,11,.7);border:1px solid var(--line);border-radius:6px;padding:8px 10px;line-height:1.7}
+  /* HF-UXCLEAN §1: legend + render status DOCKED in the right results panel —
+     never absolute over the viewport canvas. */
+  #legend{font-family:var(--mono);font-size:10px;color:var(--muted);background:rgba(8,8,11,.5);border:1px solid var(--line);border-radius:8px;padding:8px 10px;line-height:1.7;width:100%;margin:0 0 10px}
   .sw{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px;vertical-align:middle}
-  #status{position:absolute;right:12px;bottom:12px;font-family:var(--mono);font-size:10px;color:var(--muted);max-width:46%;text-align:right}
+  #status{font-family:var(--mono);font-size:10px;color:var(--muted);width:100%;margin:0 0 6px;line-height:1.5;word-break:break-word;overflow-wrap:anywhere}
   .layer{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:12px}
   .layer input{width:auto}
   .kv{display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px solid var(--line)}
@@ -58,10 +67,12 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
   /* HF-MENUBAR (Stream A): AutoSprink-parity menu bar mounts above the viewport;
      the old flat CADBAR row stays below it as a compact view toolbar (AutoSprink
      has BOTH menus and toolbars). Exports moved into File > Export. */
-  #menuBarHost{position:absolute;left:10px;top:8px;right:10px;z-index:15;display:flex;justify-content:center}
-  #menuBarHost .hf-menubar{max-width:100%}
+  /* HF-UXCLEAN §1: the menu bar is STATIC inside the #menuChrome strip above the
+     canvas — never absolute over the viewport interior. */
+  #menuBarHost{width:100%;display:flex;justify-content:flex-start;align-items:center;overflow-x:auto;overflow-y:hidden}
+  #menuBarHost .hf-menubar{max-width:none}
   #cadBar .tb-sep,#cadBar .tb-label,#dxfBtn,#stepBtn,#ifcBtn,#stlBtn{display:none!important} /* HF-MENUBAR: exports live in File > Export */
-  #cadBar{position:absolute;left:50%;top:52px;transform:translateX(-50%);display:flex;align-items:center;gap:5px;background:linear-gradient(180deg,rgba(255,255,255,0.08),rgba(0,0,0,0.45)),rgba(13,12,10,0.78);border:1px solid rgba(255,255,255,0.14);border-radius:12px;padding:5px 9px;backdrop-filter:blur(24px) saturate(1.3);-webkit-backdrop-filter:blur(24px) saturate(1.3);z-index:12;max-width:calc(100% - 24px);flex-wrap:wrap;justify-content:center}
+  #cadBar{position:absolute;left:50%;top:10px;transform:translateX(-50%);display:flex;align-items:center;gap:5px;background:linear-gradient(180deg,rgba(255,255,255,0.08),rgba(0,0,0,0.45)),rgba(13,12,10,0.78);border:1px solid rgba(255,255,255,0.14);border-radius:12px;padding:5px 9px;backdrop-filter:blur(24px) saturate(1.3);-webkit-backdrop-filter:blur(24px) saturate(1.3);z-index:12;max-width:calc(100% - 24px);flex-wrap:wrap;justify-content:center}
   #cadBar button{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10);color:rgba(242,236,224,0.85);border-radius:8px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:var(--font);transition:background .12s}
   #cadBar button:hover{background:rgba(255,255,255,0.13)}
   #cadBar button.on{background:linear-gradient(180deg,rgba(255,213,79,0.32),rgba(200,154,60,0.22));border-color:rgba(255,213,79,0.5);color:#ffd54f}
@@ -83,15 +94,20 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
      switcher + plan-extraction stats + needs-verification banner are DOCKED in the
      LEFT tools panel, never floating over the canvas. Restyled from the old
      absolute apple-glass viewport overlay to a static in-panel section. */
-  #levelPanel{display:none;flex-direction:column;gap:6px;width:100%;margin:0 0 6px;overflow:visible;background:linear-gradient(180deg,rgba(255,255,255,0.05),rgba(0,0,0,0.32)),rgba(13,12,10,0.55);border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:10px 12px}
+  /* HF-UXCLEAN §1: clip the docked level panel so its stat rows wrap WITHIN the
+     left aside and never paint past its right edge onto the canvas. */
+  #levelPanel{display:none;flex-direction:column;gap:6px;width:100%;max-width:100%;margin:0 0 6px;overflow:hidden;background:linear-gradient(180deg,rgba(255,255,255,0.05),rgba(0,0,0,0.32)),rgba(13,12,10,0.55);border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:10px 12px}
   #levelPanel.open{display:flex}
+  #levelPanel *{min-width:0;max-width:100%;overflow-wrap:anywhere;word-break:break-word}
   #levelPanel h4{font-size:9px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);font-weight:700;margin:2px 0 0}
   #levelPanel .lvl-row{display:flex;flex-wrap:wrap;gap:4px}
   #levelPanel .lvl-row button{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10);color:rgba(242,236,224,0.85);border-radius:7px;padding:4px 8px;font-size:11px;cursor:pointer;font-family:var(--font)}
   #levelPanel .lvl-row button:hover{background:rgba(255,255,255,0.13)}
   #levelPanel .lvl-row button.on{background:linear-gradient(180deg,rgba(255,213,79,0.32),rgba(200,154,60,0.22));border-color:rgba(255,213,79,0.5);color:#ffd54f}
-  #levelPanel .disc-row{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text);margin:0}
+  #levelPanel .disc-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:11px;color:var(--text);margin:0}
   #levelPanel .disc-row input{width:auto}
+  /* stat blocks reuse .disc-row but stack their text divs vertically */
+  #levelPanel .disc-row>div{flex:1 1 100%;max-width:100%}
   #levelPanel .nv-flag{margin-top:4px}
   #autoLoadBadge{font-family:var(--mono);font-size:9px;color:var(--green);border:1px solid rgba(74,222,128,.35);border-radius:99px;padding:3px 8px;display:none}
   #autoLoadBadge.show{display:inline-block}
@@ -173,6 +189,10 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
       <a class="link" href="/settings.html">Settings</a>
     </div>
   </header>
+
+  <!-- HF-UXCLEAN §1: app menu bar docks in this chrome strip ABOVE the canvas
+       (spans the canvas column), never overlaying the viewport interior. -->
+  <div id="menuChrome"><div id="menuBarHost"></div></div>
 
   <aside class="left">
     <h3>Project</h3>
@@ -257,9 +277,11 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
 
   <div id="canvasWrap">
     <canvas id="canvas"></canvas>
-    <!-- HF-MENUBAR (Stream A): AutoSprink-parity menu bar (apple-glass) -->
-    <div id="menuBarHost"></div>
-    <!-- HF-A1-CADBAR compact view toolbar (apple-glass) below the menu bar -->
+    <!-- HF-UXCLEAN §1: viewport renders ONLY the model. The app menu bar moved to
+         #menuChrome above the canvas; #status + #legend moved to the right panel.
+         The ONLY edge controls allowed here are the #cadBar view toolbar +
+         (future) orientation cube / scale bar. -->
+    <!-- HF-A1-CADBAR compact view toolbar (apple-glass) -->
     <div id="cadBar">
       <div class="seg" id="viewSeg">
         <button data-view="iso" class="on">3D</button>
@@ -274,14 +296,6 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
       <button id="ifcBtn" disabled>IFC</button>
       <button id="stlBtn" disabled>STL</button>
     </div>
-    <div id="status">initializing OpenGeometry kernel…</div>
-    <div id="legend">
-      <div><span class="sw" style="background:#6b7280"></span>building shell</div>
-      <div><span class="sw" style="background:#E53935"></span>cross-main / riser</div>
-      <div><span class="sw" style="background:#3b82f6"></span>branch lines</div>
-      <div><span class="sw" style="background:#22d3ee"></span>drops</div>
-      <div><span class="sw" style="background:#ff3b30"></span>sprinkler heads</div>
-    </div>
   </div>
 
   <aside class="right">
@@ -289,6 +303,15 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
     <div id="inspector">
       <div id="inspHeader"><span id="inspTitle">Inspector</span><button id="inspClose" title="Deselect (Esc)">×</button></div>
       <div id="inspBody"></div>
+    </div>
+    <!-- HF-UXCLEAN §1: render status + colour legend DOCKED here, never over the canvas. -->
+    <div id="status">initializing OpenGeometry kernel…</div>
+    <div id="legend">
+      <div><span class="sw" style="background:#6b7280"></span>building shell</div>
+      <div><span class="sw" style="background:#E53935"></span>cross-main / riser</div>
+      <div><span class="sw" style="background:#3b82f6"></span>branch lines</div>
+      <div><span class="sw" style="background:#22d3ee"></span>drops</div>
+      <div><span class="sw" style="background:#ff3b30"></span>sprinkler heads</div>
     </div>
     <h3>Layout</h3>
     <div id="layout"><span class="muted" style="font-size:12px">Generate a layout to begin.</span></div>
@@ -568,6 +591,19 @@ async function initStudio() {
     return d;
   };
   window.addEventListener('resize', onResize);
+  // HF-UXCLEAN §2: inert debug hooks for the behavioral selection gate — report
+  // the orbit pivot + x-ray dim ratio so the headless gate can verify isolation
+  // and exact pivot-restore. No effect on rendering or interaction.
+  window.__dbgTarget = () => controls ? [controls.target.x, controls.target.y, controls.target.z] : null;
+  window.__dbgDim = () => {
+    let dimmed = 0, total = 0;
+    for (const g of [modelGroup, planGroup].filter(Boolean)) g.traverse((o) => {
+      if (!o.material) return;
+      const mats = Array.isArray(o.material) ? o.material : [o.material];
+      for (const m of mats) { total += 1; if (m.transparent && m.opacity <= 0.2) dimmed += 1; }
+    });
+    return { dimmed, total };
+  };
   await OpenGeometry.create({ wasmURL: '/vendor/opengeometry/opengeometry_bg.wasm' });
   ogReady = true;
   await loadPartMeshes(); // best-effort; heads render as a real part mesh when available
