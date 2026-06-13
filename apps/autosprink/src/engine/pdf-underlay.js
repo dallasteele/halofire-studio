@@ -140,30 +140,36 @@ export function createUnderlayMesh(THREE, {
   // RECORE orientation contract: the underlay plane is rotated rotation.x = -PI/2 so its
   // textured face normal points +Y (UP), toward the top-down plan camera — text reads
   // FORWARD, never mirrored (a +PI/2 plane shows its BACK to that camera = backwards text).
-  // With -PI/2, the texture's TOP row (image-top) maps to world -Z. For the CONTAIN-FIT path
-  // (pdf-underlay.computeUnderlayTransform) that is correct as-is (it does not bind plan-Y to
-  // world-Z). For the REGISTERED-geometry path (building-from-plan.computePlanUnderlayTransform),
-  // geometry maps plan-Y -> world-Z directly, so image-top (= MAX plan-Y) must land at MAX
-  // world-Z (+Z); pass flipTextureV:true so image-top maps to plane local -Y -> +Z. This keeps
-  // text readable AND the sheet registered under the extracted walls.
+  // Orientation (empirically re-verified 2026-06-13 via a 4-way (U,V) flip sweep on the live
+  // registered underlay at top+iso — evidence out/halofire-wallpipe/flipdiag/): with -PI/2 and
+  // NO flip, sheet text reads FORWARD at BOTH top AND iso for both the contain-fit and the
+  // registered-geometry (building-from-plan.computePlanUnderlayTransform) paths. flipTextureV:true
+  // MIRRORS the sheet top<->bottom (upside-down) and is therefore NOT used; the registered underlay
+  // is already correctly oriented at the default. Default-off; live-QA mirror knob only.
   flipTextureV = false,
+  // flipTextureU mirrors the texture's U (left<->right) axis. Inert default-off live-QA option for
+  // re-checking a left<->right mirror at oblique/iso; the verified default needs neither flip.
+  flipTextureU = false,
 }) {
   if (!THREE) throw new Error('createUnderlayMesh: THREE namespace is required');
   if (!canvas) throw new Error('createUnderlayMesh: rendered canvas is required');
   if (!transform) throw new Error('createUnderlayMesh: transform from computeUnderlayTransform is required');
   const texture = new THREE.CanvasTexture(canvas);
   // flipY default (true) keeps the texture upright; the readable-from-above contract is now
-  // carried by rotation.x = -PI/2 (face up). flipTextureV additionally mirrors the V axis so
-  // image-top lands at +Z for the plan-Y->world-Z registered path (see header).
+  // carried by rotation.x = -PI/2 (face up). flipTextureV/U mirror the V/U axis so the sheet
+  // registers AND reads forward for the plan-Y->world-Z registered path (see header).
   if ('colorSpace' in texture && THREE.SRGBColorSpace) texture.colorSpace = THREE.SRGBColorSpace;
-  if (flipTextureV) {
+  if (flipTextureV || flipTextureU) {
     if (texture.center && texture.repeat && texture.wrapT !== undefined) {
-      // Mirror about the texture's vertical center so the image flips top<->bottom in place.
+      // Mirror about the texture center so the image flips in place along the chosen axis/axes.
       texture.center.set(0.5, 0.5);
-      texture.repeat.set(1, -1);
-      if (THREE.RepeatWrapping) texture.wrapT = THREE.RepeatWrapping;
+      texture.repeat.set(flipTextureU ? -1 : 1, flipTextureV ? -1 : 1);
+      if (THREE.RepeatWrapping) {
+        texture.wrapT = THREE.RepeatWrapping;
+        if (texture.wrapS !== undefined) texture.wrapS = THREE.RepeatWrapping;
+      }
     } else {
-      texture.flipY = !texture.flipY; // stub-THREE / minimal texture fallback
+      if (flipTextureV) texture.flipY = !texture.flipY; // stub-THREE / minimal texture fallback
     }
   }
   texture.anisotropy = 8;
@@ -194,6 +200,7 @@ export function createUnderlayMesh(THREE, {
     scaleSource: transform.scaleSource,
     sheet: sheetMeta,
     flipTextureV: !!flipTextureV,
+    flipTextureU: !!flipTextureU,
   };
   return mesh;
 }

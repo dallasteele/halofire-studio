@@ -563,3 +563,66 @@ needs-verification — NOT AHJ/PE/mfr-exact/AutoSprink-parity.
 **Forward-wave readiness:** the core is now correct enough to resume W3/W4. Structure is
 plausible, plan is readable-from-above, nothing clips — all proven by screenshot, not a
 coverage %.
+
+## Wall ensemble pipeline 2026-06-13
+
+PIECE 1 (walls only) of the procedural per-element vision-verified extraction
+(`docs/plans/halofire-extraction-pipeline.md`). Replaces the single-pass heuristic that made
+3,643–41,784 fake walls (parking stalls + blue grid + dimension lines mislabeled as walls).
+Columns / stairs / doors come as LATER verified passes — flagged needs-verification on L1.
+
+**Scripts (built + run on GX10, persisted in repo):**
+`apps/autosprink/scripts/wall-pipeline/` — `wall_pipeline.py` (stages 0–6),
+`cubicasa_judge.py` (CubiCasa5K wall-pixel sidecar), `README.md`. Run env on GX10:
+`SAM3_URL=http://127.0.0.1:9003 OLLAMA_URL=http://127.0.0.1:11434`.
+
+**Models — which worked (honest):**
+- `sam3_sections` (SAM3 :9003 geometric box) — STOOD UP but returned HTTP 422 on the
+  footprint box (negative origin); sectioning is a secondary missed-wall aid, not the gate, so
+  NOT blocking. Marked needs-fix.
+- `cubicasa5k-native-tile` — WORKS and is the only judge both fast (0.1–0.8s) AND
+  discriminating enough to gate every candidate on this GPU. Production gate.
+- `qwen2.5vl:7b` (VLM judge) — works but 150–320s/inference on this GPU (timed out at 320s
+  under contention). Spot-validator only; per-element gating over 187 candidates is impractical
+  (~8–24h/wing).
+- `gemma4:26b-a4b-it-qat` (Gemma vision QAT) — AVAILABLE on GX10, ~250s/inference. Spot
+  validator only (same throughput wall as qwen2.5vl).
+- `moondream:latest` — fast but a yes-machine (no discrimination); not used as a gate.
+- `floorplanvlm` (mudasir13cs/qwen25-vl-3b-floorplan) — NOT deployed (no).
+- The real parking fix is the DETERMINISTIC `detect_parking_stalls()` regularity gate, not a
+  VLM — the VLMs that could do it per-element are too slow.
+
+**Candidate → verified counts:** 41,802 raw stroked segments → prefilter (drop 3,682 blue grid
++ 31,320 tiny dim-ticks + 5,334 off-footprint + 461 sub-lineweight) → 1,005 → axis-merge →
+**187 candidate wall runs** → gate (CubiCasa frac ≥0.04 + parking-regularity) rejected
+**89 parking_stall + 3 spanning_grid** → kept 95 → dedup parallel faces → **66 verified wall
+centerlines** in ~40s. Convergence: single pass converged (no oscillation); the regularity gate
+is what separated stalls from walls.
+
+**Integration / overlay:** L1.wallRuns 158 → 66 in `plan-levels.cooperative-1881.json`; old
+runs demoted to `L1.plan.wallRunsUnverifiedPrior`; `wallRunsMeta.verified=true`;
+columns/stairs/doors/rooms flagged needs-verification in `L1.plan.layersVerificationStatus`.
+Verified set sidecar: `src/data/plan-walls.cooperative-1881-L1.json`. Overlay (kept=green /
+rejected=red): `out/halofire-wallpipe/overlay_view.jpg` + `overlay_parking_excluded.jpg`.
+
+**Live verify (Playwright, https://halofire.rankempire.io — NEVER :3399):** L1 live counts
+walls=66, wallSource=wall-runs (was 158 parking-contaminated). Orbit screenshots in
+`out/halofire-wallpipe/`: `orbitcheck_top.jpg`, `orbitcheck_iso.jpg`,
+`orbitcheck_obliqueA/B.jpg` — sparse real partitions (central core + perimeter), NO dense
+parking grid; viewport clean (panels docked, no demo btn). repo md5 == VPS md5 for all 4 live
+files (autosprink.html, building-from-plan.js, pdf-underlay.js, plan-levels.*.json).
+
+**HONEST residual — orientation NOT re-verified this run (do NOT mark forward-ready):**
+The L1 plan-underlay TEXTURE failed to register in the final headless probe
+(`window.__planState().underlay === null`, `reg.ok=false`, `__underlayFlip → 'no-underlay'`),
+so no printed sheet text renders on the L1 slab → "text reads FORWARD at iso" is NOT observable
+in THIS run. This is the known headless flakiness (165 MB PDF render in swiftshader), NOT a code
+defect: the SAME deployed code registered the underlay forward earlier in-session
+(`out/halofire-wallpipe/flipdiag/iso_u0_v0.jpg` = no-flip reads forward at top+iso;
+`live_underlay_iso.jpg`), and the RECORE wave (ddb5f3b) proved sheet text upright+forward
+top-down. Defaults are flipTextureV=false, flipTextureU=false (the already-correct registered
+orientation); flipTextureU option added to createUnderlayMesh for live QA. USER signs off on
+forward-readiness — NOT claimed here.
+
+**Provenance:** AUTONOMOUS vision-ensemble proposal, needsVerification:true. NOT
+AHJ/PE/AutoSprink parity.

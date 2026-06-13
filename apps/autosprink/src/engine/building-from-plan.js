@@ -94,10 +94,17 @@ export function computePlanUnderlayTransform({
       z: pageHFt / 2 - Number(unionCenterYFt),
     },
     // -PI/2: textured face up (+Y) -> readable from the top-down plan camera (RECORE fix; +PI/2
-    // showed the plane's BACK = backwards/mirrored text). VERIFIED LIVE: -PI/2 with NO texture
-    // flip renders all sheet text UPRIGHT + FORWARD AND keeps the sheet's wall lines registered
-    // under the extracted walls (the top-view camera up=(0,0,-1) makes image-top read correctly).
-    // flipTextureV:true was tried and rendered the sheet UPSIDE-DOWN — so it stays false.
+    // showed the plane's BACK = backwards/mirrored text).
+    // ORIENTATION (empirically re-verified 2026-06-13 via a 4-way (U,V) texture-flip sweep on the
+    // live registered A-101 underlay at top+iso, evidence out/halofire-wallpipe/flipdiag/):
+    // u0_v0 = NO flip (flipTextureV:false, flipTextureU:false) reads sheet text FORWARD at BOTH
+    // top AND iso; flipTextureV:true MIRRORS top<->bottom (upside-down), flipTextureU:true mirrors
+    // left<->right. So the registered underlay is ALREADY oriented correctly with NO flip — the
+    // prior RECORE fix (-PI/2, no flip) stands. flipTextureV:true is WRONG for this path and is NOT
+    // used. (flipTextureU is exposed on createUnderlayMesh as an inert default-off live-QA option.)
+    // RESIDUAL: re-confirm iso-forward in a real browser when the underlay texture registers — the
+    // headless build occasionally fails to register the 165MB-PDF texture (underlay===null), in
+    // which case no sheet text renders and forward-at-iso is not observable (not a code defect).
     rotation: { x: -Math.PI / 2, y: 0, z: 0 },
     flipTextureV: false,
     scaleSource: 'registered to extracted geometry at the sheet-derived true scale — NOT a title-block-verified plot scale; needs-verification',
