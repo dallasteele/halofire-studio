@@ -444,3 +444,68 @@ Data: `src/data/plan-levels.cooperative-1881.json` L1 `wallsFullMeta.recallPct=8
 `recallMeasure` (carries the v6 numbers, the root-cause correction, and the prior
 artifact measure under `priorArtifactMeasure`). UI reads `extractionCompleteness.
 wallRecallPct` from this data (no hardcode); <90 renders amber, honestly.
+
+## W2b recall fix 2026-06-13
+
+**DEFINITIVE WALL RECALL = 77.66% whole-sheet. The ≥90% bar was NOT reached. The gap is a
+measurement ARTIFACT, not missing building walls.** Independently re-verified this session;
+no number trusted from prior claims.
+
+### Fraud / trust correction
+- Prior agent's reported numbers were checked against the WRONG repo. Commits `25ebb32`
+  and `f79c3ad` DO exist — in the nested `halofire-studio` git repo (branch
+  `studio/fix-1881-part-scale-align-20260613`), NOT the root `E:/ClaudeBot` repo. `git
+  cat-file -t` confirms both are real `commit` objects in halofire-studio.
+- The trust-gate failure ("building-from-plan.js modified in working tree, not in any
+  commit") was a PRE-commit snapshot. It is now committed at `04b38ec` (studio W2b-fix:
+  commit load-bearing renderer building-from-plan.js). Working tree == HEAD == clean.
+- repo==live md5 parity now holds for all 3 load-bearing/served files:
+  - `building-from-plan.js` = `e28403d2269d50fd3096d51cedd73f2f`
+  - `plan-extract.js` = `4ca2b06ef48251db23686e8ad1f09773` (live was a stale 27 KB
+    subset `4fbce69b…`; build-time only, NOT in the runtime import graph — synced
+    committed 71 KB superset up with .bak; render unaffected, site stayed 200)
+  - `plan-levels.cooperative-1881.json` = `4713228f7493be285ec8bfc05aff98c4`
+
+### Definitive recall (ONE method, version-consistent)
+Both sides rasterized from vectors by the SAME pdfjs 6.0.227 via the app's own
+`extractSegmentsFromOpList` + `selectWallLayer(partitionInclusive)` (lineWidth 0.09,
+strokeColor #3f3f7f). No version mismatch — that mismatch is what produced the RETIRED
+71% artifact. Reproduced live by `_tmp_plan_probe/recall-definitive.mjs`:
+- **Whole-sheet: 77.66%** — covered 683,111 / wall-ink 879,663 px (1 ft tolerance,
+  6 px/ft). 41,784 wallsFull vs 42,784 wall-ink segments.
+- **Per-wing whole-sheet: lowerWingA 73.56%, upperWingB 84.67%.**
+- **In-envelope (denominator shrunk to building footprint): 97.15%** (lowerWingA 98.01 /
+  upperWingB 95.83); ~99.3% by segment count (42,500/42,784).
+
+### Gap is an artifact — proof
+- ±12 ft shift sweep does NOT improve recall (lowerWing baseline 74.38→best 73.09;
+  upperWing 85.26→best 85.73) ⇒ not a registration offset and not a missing-wall gap;
+  merge registration (dx -57.0253, dy -111.6844, splitYFt 137.3439) is already optimal.
+- Heatmap misses are sheet furniture (border, grid-bubble diamonds, dimension/extension
+  lines, title block, match-line centerlines) + short curve glyphs the straight-wall
+  extractor flattens — irreducibly inside the partition-inclusive heavy-lineweight
+  denominator. Interior partitions / cores / cross-bracing / shell are covered.
+- **0 building walls are missing inside the envelope.** Both wings' exterior shell and
+  perimeter ARE present (the earlier "red exterior shell" was the v4.2-vs-v6 raster
+  artifact, now eliminated).
+
+### Doors / openings / fixtures (all needs-verification, deterministic best-effort)
+- 124 doors via swing-arc circle-fit (984 arcs scanned): **24 CONFIDENT** (hosts on a
+  wall AND real-door leaf width 2.3–4 ft) / **100 SUSPECT** (off-wall OR sub/over-door
+  width — small swing glyphs, mirrored half-leaves, closet/cabinet arcs; rendered muted-
+  grey, DOOR_SUSPECT_COLOR). NOT a verified door/hardware schedule, NOT AHJ/egress parity.
+- 15 cased openings (2.5–8 ft collinear wall-end gaps, no door arc).
+- 5 fixtures/cores (1 mech / 1 elec / 3 stair cores from segmented-room kinds + UP/DN/DOWN
+  stair-direction tokens; DW dishwasher tag deliberately excluded to avoid false cores).
+- SAM3 NOT used (not attempted — vector recovered the geometry).
+
+### Honest ceiling + status
+The ≥90% WHOLE-SHEET bar is genuinely UNACHIEVABLE for this sheet (~78% ceiling) without
+weakening the metric, because the heavy-lineweight denominator must include non-wall sheet
+furniture. The defensible building-wall recall is 97.15% in-envelope / ~99.3% by segment.
+Per W2 doctrine the metric was NOT weakened and ≥90% is NOT claimed. **W2 left [~] in the
+project queue — AWAITING USER DECISION on whether to accept this documented ~78%
+whole-sheet ceiling (≈97% in-envelope) or hold for further work.** Recommendation: advance
+to W3 only after the user accepts the ceiling.
+Heatmaps: `out/halofire-W2b/recall-definitive.png` (whole-sheet),
+`out/halofire-W2b/recall-inclip.png` (in-envelope).

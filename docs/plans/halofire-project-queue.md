@@ -34,21 +34,33 @@ loops (OpenClaw email→auto-bid→approval; NFPA-25 recall; GX10 qwen module lo
       draw preview + Shift ortho lock + Esc cancel. Evidence: 29 unit tests green
       (18 edit-commands + 11 snaps); live HTTPS md5-parity on autosprink.html + both
       engine modules; markers HF-W1-CMD=8/DRAW=3/SNAP=3, hotfixes 1/1 preserved.
-- [~] **W2 Extraction completeness** (2026-06-13): doors+openings+fixtures extracted,
-      both wings of A-101 merged (complete floor 1, verified 361.6×81.9 ft). DONE:
-      124 doors (swing-arc circle-fit, leaf+arc), 15 openings, 5 fixtures (1 mech /
-      1 elec / 3 stair cores), 41,784 recovered partition-inclusive walls; live-rendered
-      + selectable + layer toggles; 0 pageerrors. WALL RECALL = 80% (v6-consistent),
-      BELOW the ≥90% target — item 1 NOT passed. Root cause is a pdfjs MAJOR-VERSION
-      artifact, not a wall gap: served walls are pdfjs-6 (correct merged footprint), but
-      the only rasterizable env is pdfjs-4.2 (different geometry/registration + wrong
-      402×235 unmerged footprint), so a v4.2-raster-vs-v6-walls measure mis-scored 71%.
-      A v6-consistent vector measure = 80%, and the heatmap shows the residual miss is
-      grid-bubble diamonds + title block + sheet border (non-walls) wrongly counted, not
-      missing building walls (interior partitions/cores/shell are essentially all green).
-      A clean independent ≥90% raster measurement is NOT achievable here (no pdfjs-6
-      rasterizer); 80% reported honestly, gate item 1 left open. Heatmap:
-      apps/autosprink/public/halofire-W2/recall-heatmap.png. Deployed + live-verified.
+- [~] **W2 Extraction completeness** (W2b honest fix 2026-06-13): doors+openings+
+      fixtures extracted, both wings of A-101 merged (complete floor 1). DONE:
+      124 doors (swing-arc circle-fit; 24 confident / 100 suspect), 15 openings,
+      5 fixtures (1 mech / 1 elec / 3 stair cores), 41,784 recovered partition-
+      inclusive walls; live-rendered + selectable + layer toggles; 0 pageerrors.
+      WALL RECALL = 77.66% whole-sheet (DEFINITIVE, version-consistent), BELOW the
+      ≥90% target — gate item 1 NOT passed and NOT claimed passed. Measured ONE way:
+      both the served wallsFull[] AND the A-101 page-8 wall-ink are rasterized from
+      vectors by the SAME pdfjs 6.0.227 via the app's own extractSegmentsFromOpList +
+      selectWallLayer(partitionInclusive), so there is NO pdfjs version mismatch (that
+      mismatch caused the retired 71% artifact; the prior stored 80% was optimistic).
+      Independently reproduced 2026-06-13 by recall-definitive.mjs: covered 683,111 /
+      ink 879,663 px = 77.66%; per-wing lowerWingA 73.56% / upperWingB 84.67%.
+      THE GAP IS AN ARTIFACT, NOT MISSING WALLS: a ±12 ft shift sweep does not improve
+      recall (merge registration dx-57.03 dy-111.68 is already optimal), and the heatmap
+      misses are sheet furniture (border, grid-bubble diamonds, dimension/extension
+      lines, title block, match-line centerlines) irreducibly inside the partition-
+      inclusive denominator — NOT building walls. In-envelope building-wall coverage
+      (denominator shrunk to the building footprint) = 97.15% (lowerWingA 98.01 /
+      upperWingB 95.83), ~99.3% by segment count (42,500/42,784). HONEST CEILING: the
+      ≥90% WHOLE-SHEET bar is genuinely unachievable for THIS sheet (~78% ceiling)
+      without weakening the metric, because the heavy-lineweight denominator must
+      include non-wall sheet furniture. AWAITING USER DECISION on the 90% bar — left
+      [~], not auto-accepted. Heatmaps: out/halofire-W2b/recall-definitive.png (whole-
+      sheet), out/halofire-W2b/recall-inclip.png (in-envelope). Deployed + live-verified;
+      live==committed md5 parity on building-from-plan.js (e28403d2), plan-extract.js
+      (4ca2b06e), plan-levels.cooperative-1881.json (4713228f). Commit 04b38ec.
 - [ ] **W3 Real part models**: manufacturer cut-sheet dimensions → dimensioned models
       for all 155 catalog parts (rigid+flexible couplings, heads, hangers, tees,
       drops, escutcheons); parts pipeline 155/155 flagged; mfr-exact stays flagged.
