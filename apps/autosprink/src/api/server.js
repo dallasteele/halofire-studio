@@ -32,6 +32,7 @@ import { buildParityMatrix, parityAchieved } from '../engine/parity-matrix.js';
 import { AUTOSPRINK_PARITY_GATE, buildParityInventory, parityGateStatus, getComponent } from '../components/registry.js';
 import { buildLedger, ledgerSummary } from '../autobid/verification-ledger.js';
 import { gateFlag } from '../autobid/claim-gate-flag.js';
+import { emitPipe, emitElbow90, emitTee, emitCoupling } from '../autobid/scad-emitters-port.js';
 import { buildPartManifest } from '../components/part-mesh.js';
 import { buildSourceAcquisitionLedger, makeBridgeInvoker, probeBridge } from '../components/auto-source-runner.js';
 import { balanceNetwork } from '../engine/hydraulic-network.js';
@@ -274,6 +275,27 @@ function initDatabase() {
       license TEXT,
       notes TEXT,
       evidence_id INTEGER REFERENCES project_evidence(id),
+      created_by TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
+    -- AS-3 real-parts coverage: a best-effort generated-mesh ledger. Each POST
+    -- /api/parts/generate row records the JS-port OpenSCAD source (scad) for a
+    -- dimensioned fitting, or scad NULL when required dims are absent (flag, not
+    -- gate). missing_json lists the absent dim keys. Every row lands
+    -- needs-verification — generated geometry is NEVER manufacturer-exact and
+    -- NEVER clears AUTOSPRINK_PARITY.
+    CREATE TABLE IF NOT EXISTS parts_models (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      sku TEXT NOT NULL,
+      part_type TEXT NOT NULL,
+      nominal_in REAL,
+      dims_json TEXT,
+      scad TEXT,
+      missing_json TEXT NOT NULL DEFAULT '[]',
+      verification_status TEXT NOT NULL DEFAULT 'needs-verification',
+      source_url TEXT,
+      generated_at TEXT NOT NULL,
       created_by TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
@@ -21079,6 +21101,28 @@ app.post('/api/projects/:name/submittal', authMiddleware, async (req, res) => {
   }
 });
 
+// Built-in server-side floor plan for the demo projects that ship with NO
+// uploaded drawing — the live site posts no svg/floorPlan for these, so the CAD
+// exports (DXF + OpenClaw CAD) must resolve their own geometry or they 400. The
+// sprinkler pipeline already does this for its own resolution; this mirrors the
+// DEFAULT (no supplied-bid-truth) live-demo branch of that resolution so the
+// exports match what the studio renders. Returns null for any other project so
+// the caller surfaces the honest "no floor plan" error rather than fabricating.
+//
+// HONESTY/flag-don't-gate: every built-in plan carries its own
+// needs-verification source note (placeholder/extracted-plate disclaimers, NOT
+// surveyed, NOT AHJ/PE-reviewed, NOT AutoSprink parity). Resolving geometry here
+// clears NO regulated claim gate.
+function builtinFloorPlanForProject(projectName) {
+  if (projectName === HOME_DEPOT_PROJECT_NAME) return homeDepotRexburgFloorPlan();
+  if (projectName === COOPERATIVE_1881_PROJECT_NAME) {
+    // Prefer the REAL extracted Floor-1 plate; fall back to the documented
+    // area-only placeholder (never fabricate). Both are workbook-independent.
+    return cooperative1881FloorPlanFromExtractedPlate() || cooperative1881FloorPlan();
+  }
+  return null;
+}
+
 // Export the CAD model as an AutoCAD-openable DXF (layered 3D wireframe:
 // building shell, sized piping centerlines, head symbols, pipe-size labels).
 app.post('/api/projects/:name/cad.dxf', authMiddleware, (req, res) => {
@@ -21089,8 +21133,8 @@ app.post('/api/projects/:name/cad.dxf', authMiddleware, (req, res) => {
       floorPlan = floorPlanFromSvg(req.body.svg, { name: projectName, unitsPerPx: Number(req.body.unitsPerPx) || 1 });
     } else if (req.body && req.body.floorPlan) {
       floorPlan = normalizeFloorPlan(req.body.floorPlan);
-    } else if (projectName === HOME_DEPOT_PROJECT_NAME) {
-      floorPlan = homeDepotRexburgFloorPlan();
+    } else {
+      floorPlan = builtinFloorPlanForProject(projectName);
     }
     if (!floorPlan) return res.status(400).json({ error: 'No floor plan for DXF export' });
     const dxf = toDxf(buildCadModel(floorPlan));
@@ -21122,8 +21166,8 @@ app.post('/api/projects/:name/cad/openclaw/:tool', authMiddleware, async (req, r
       floorPlan = floorPlanFromSvg(req.body.svg, { name: projectName, unitsPerPx: Number(req.body.unitsPerPx) || 1 });
     } else if (req.body && req.body.floorPlan) {
       floorPlan = normalizeFloorPlan(req.body.floorPlan);
-    } else if (projectName === HOME_DEPOT_PROJECT_NAME) {
-      floorPlan = homeDepotRexburgFloorPlan();
+    } else {
+      floorPlan = builtinFloorPlanForProject(projectName);
     }
     if (!floorPlan) return res.status(400).json({ error: 'No floor plan for OpenClaw CAD invocation' });
     const payload = spec.build(buildCadModel(floorPlan));
@@ -21274,6 +21318,15 @@ app.get('/api/parity', authMiddleware, (req, res) => {
     verificationStatus: 'needs-verification',
   }));
   const ledger = buildLedger(ledgerItems);
+  // AS-3: modelsBuilt is the REAL count of generated-mesh rows (POST
+  // /api/parts/generate rows that produced .scad). Missing-dims rows (scad NULL)
+  // and rejected bad-dims requests (never persisted) do not count.
+  let modelsBuilt = 0;
+  try {
+    modelsBuilt = db.prepare('SELECT COUNT(*) c FROM parts_models WHERE scad IS NOT NULL').get().c;
+  } catch {
+    modelsBuilt = 0;
+  }
   res.json({
     status: 'ledger', // was a permanent 'blocked' gate — now a usable ledger
     usable: true, // nothing is gated by verification; the system is always usable
@@ -21281,7 +21334,8 @@ app.get('/api/parity', authMiddleware, (req, res) => {
     parityAchieved: parityAchieved(matrix, { generatedOnly: false, inventory }),
     ledger,
     ledgerSummary: ledgerSummary(ledger),
-    modelsBuilt: inventory.present, // best-effort models present (of ledger.total)
+    modelsBuilt, // real generated-mesh rows (scad present) from parts_models
+    modelsBuiltLegacy: inventory.present, // best-effort models present (of ledger.total)
     // Legacy gate kept for back-compat clients; it is no longer a blocker — the
     // manufacturer-exact/AHJ/PE caveat is now a flag carried in the summary.
     gate: {
@@ -21292,6 +21346,104 @@ app.get('/api/parity', authMiddleware, (req, res) => {
       reason: AUTOSPRINK_PARITY_GATE.reason,
     },
     disclaimer: matrix.disclaimer,
+  });
+});
+
+// ── Real-parts coverage: generate a best-effort dimensioned mesh (AS-3) ──
+// POST /api/parts/generate runs the JS port of the canonical W13A OpenSCAD
+// emitters (src/autobid/scad-emitters-port.js) against caller-supplied dims and
+// records the result in parts_models. Doctrine: flag-don't-gate.
+//   - All required dims present + valid -> store scad, 200, the new row.
+//   - A required dim ABSENT -> store an honest row with scad NULL + the missing
+//     keys listed, 200 (never blocks; awaits the cut sheet).
+//   - A present-but-INVALID dim (<=0 / non-finite) -> the emitter throws a
+//     RangeError; reject 400 and store NOTHING.
+// Every stored row is needs-verification: generated geometry is NOT
+// manufacturer-exact and NEVER clears AUTOSPRINK_PARITY.
+const PART_GENERATORS = {
+  // required: dim keys checked for PRESENCE (nominalIn comes in at top level and
+  // is checked first). emit() receives (nominalIn, dims) and returns .scad text.
+  pipe: {
+    required: ['odIn', 'lengthIn', 'wallIn'],
+    emit: (nominalIn, d) => emitPipe({ nominalIn, lengthIn: d.lengthIn, odIn: d.odIn, wallIn: d.wallIn }),
+  },
+  elbow90: {
+    required: ['odIn', 'centerToEndIn'],
+    emit: (nominalIn, d) => emitElbow90({ nominalIn, odIn: d.odIn, centerToEndIn: d.centerToEndIn }),
+  },
+  tee: {
+    required: ['odIn', 'centerToEndIn', 'branchCenterToEndIn'],
+    emit: (nominalIn, d) =>
+      emitTee({ nominalIn, odIn: d.odIn, centerToEndIn: d.centerToEndIn, branchCenterToEndIn: d.branchCenterToEndIn }),
+  },
+  coupling: {
+    required: ['odIn', 'lengthIn'],
+    emit: (nominalIn, d) => emitCoupling({ nominalIn, odIn: d.odIn, lengthIn: d.lengthIn }),
+  },
+};
+
+app.post('/api/parts/generate', authMiddleware, (req, res) => {
+  const { sku, partType, nominalIn, dims = {}, sourceUrl = null } = req.body || {};
+  if (!sku || typeof sku !== 'string') {
+    return res.status(400).json({ error: 'sku is required' });
+  }
+  const gen = PART_GENERATORS[partType];
+  if (!gen) {
+    return res.status(400).json({
+      error: `Unsupported partType '${partType}'. Supported: ${Object.keys(PART_GENERATORS).join(', ')}`,
+    });
+  }
+
+  // Presence-only gate. nominalIn is a required top-level dim; the rest live in
+  // dims. An absent dim flags the row (scad NULL); it never rejects.
+  const present = (v) => v !== undefined && v !== null;
+  const missing = [];
+  if (!present(nominalIn)) missing.push('nominalIn');
+  for (const key of gen.required) {
+    if (!present(dims[key])) missing.push(key);
+  }
+
+  const generatedAt = new Date().toISOString();
+  let scad = null;
+  if (missing.length === 0) {
+    // All dims present — let the emitter validate magnitudes. A bad (<=0) dim
+    // throws RangeError; we reject 400 and persist nothing.
+    try {
+      scad = gen.emit(Number(nominalIn), dims);
+    } catch (err) {
+      return res.status(400).json({ error: err.message });
+    }
+  }
+
+  const info = db
+    .prepare(`INSERT INTO parts_models
+              (sku, part_type, nominal_in, dims_json, scad, missing_json, verification_status, source_url, generated_at, created_by)
+              VALUES (?, ?, ?, ?, ?, ?, 'needs-verification', ?, ?, ?)`)
+    .run(
+      sku,
+      partType,
+      present(nominalIn) ? Number(nominalIn) : null,
+      JSON.stringify(dims),
+      scad,
+      JSON.stringify(missing),
+      sourceUrl ? String(sourceUrl) : null,
+      generatedAt,
+      req.user.username,
+    );
+
+  res.status(200).json({
+    id: info.lastInsertRowid,
+    sku,
+    part_type: partType,
+    nominal_in: present(nominalIn) ? Number(nominalIn) : null,
+    scad,
+    missing,
+    verification_status: 'needs-verification',
+    source_url: sourceUrl ? String(sourceUrl) : null,
+    generated_at: generatedAt,
+    disclaimer:
+      'Best-effort dimensioned-parametric mesh — NOT manufacturer-exact. It does ' +
+      'not clear AutoSprink parity, AHJ, PE, permit-ready, or fabrication-ready claims.',
   });
 });
 
@@ -21383,6 +21535,32 @@ function recountParts(components) {
   };
 }
 
+// W3 parts-pipeline ledger: dimensioned (real spec-accurate true-scale mesh) vs
+// flagged (needs-verification / no dimensioned mesh). A user-attached catalog
+// part counts as dimensioned (it carries a real mesh). manufacturer-EXACT is
+// reported separately and stays whatever the (sanitized) entries attest — the
+// generated pipeline contributes 0. Surfaced in Settings via /api/parts.
+function dimensionLedgerFor(components) {
+  const isDimensioned = (c) =>
+    c.dimensioned === true || (c.present === true && c.source === 'catalog');
+  const dimensioned = components.filter(isDimensioned).length;
+  return {
+    total: components.length,
+    dimensioned,
+    flagged: components.length - dimensioned,
+    manufacturerExact: components.filter((c) => c.manufacturerExact === true).length,
+    provenance: {
+      'spec-nominal': components.filter((c) => c.dimProvenance === 'spec-nominal').length,
+      cutsheet: components.filter((c) => c.dimProvenance === 'cutsheet').length,
+      catalog: components.filter((c) => c.present === true && c.source === 'catalog').length,
+    },
+    note:
+      'Dimensioned = spec-accurate true-scale mesh. Flagged = needs-verification ' +
+      '(no dimensioned mesh / awaiting manufacturer CAD). Manufacturer-EXACT stays ' +
+      'flagged needs-verification; the generated pipeline claims none.',
+  };
+}
+
 app.get('/api/parts', authMiddleware, async (req, res) => {
   // Prefer a prebuilt on-disk manifest.
   try {
@@ -21393,6 +21571,7 @@ app.get('/api/parts', authMiddleware, async (req, res) => {
       return res.json({
         components,
         ...recountParts(components),
+        dimensionLedger: dimensionLedgerFor(components),
         parityGateStatus: 'blocked', // fail-closed: found/generated/override parts never clear parity
         disclaimer: raw.disclaimer || PARTS_DISCLAIMER,
       });
@@ -21407,6 +21586,7 @@ app.get('/api/parts', authMiddleware, async (req, res) => {
   res.json({
     components,
     ...recountParts(components),
+    dimensionLedger: dimensionLedgerFor(components),
     parityGateStatus: 'blocked',
     disclaimer: PARTS_DISCLAIMER,
   });
