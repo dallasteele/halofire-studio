@@ -181,10 +181,21 @@ export function detectDoors(arcs, walls = [], opts = {}) {
   const maxSweepDeg = Number.isFinite(opts.maxSweepDeg) ? opts.maxSweepDeg : 115;
   const dedupFt = Number.isFinite(opts.dedupFt) ? opts.dedupFt : 1.2;
   const hostWallMaxFt = Number.isFinite(opts.hostWallMaxFt) ? opts.hostWallMaxFt : 3.0;
+  // HONEST CONFIDENCE BAND (W2b): a real architectural door leaf is ~2'6"-3'6" (single) up to a
+  // 4'0" hardware/double leaf. The circle-fit accept band reaches down to minWidthFt=1.8 to avoid
+  // dropping true doors, but a fitted leaf-radius below realDoorMinFt is NOT a confident door —
+  // it is almost always a small swing-arc glyph, a mirrored half-leaf, a closet/cabinet arc, or a
+  // grid-bubble curve the fitter latched onto. Such fits are kept (geometry is real) but DOWN-
+  // RANKED to 'low' (suspect) so the Studio never asserts them as confident doors.
+  const realDoorMinFt = Number.isFinite(opts.realDoorMinFt) ? opts.realDoorMinFt : 2.3;
+  const realDoorMaxFt = Number.isFinite(opts.realDoorMaxFt) ? opts.realDoorMaxFt : 4.0;
   const note =
     'Geometric door detection: swing ARCS (bezier curves circle-fit to a ~2-4 ft leaf radius ' +
     'swept ~quarter turn) recovered from the plan vector ops; arc center = hinge = door position, ' +
-    'radius = leaf width, start->end = swing. Nearest wall within 3 ft = host. Best-effort, ' +
+    'radius = leaf width, start->end = swing. Nearest wall within 3 ft = host. CONFIDENCE: a fit is ' +
+    "only 'medium' (confident) when it BOTH hosts on a wall AND has a real-door leaf width " +
+    '(' + realDoorMinFt + "-" + realDoorMaxFt + " ft). Off-wall OR sub/over-door-width fits are kept but DOWN-RANKED to " +
+    "'low' (suspect: small swing glyphs, mirrored half-leaves, closet/cabinet arcs). Best-effort, " +
     'deterministic; NOT a verified door/hardware schedule; NOT AHJ/egress parity. needs-verification.';
 
   // normalize walls to {x1,y1,x2,y2}
@@ -216,6 +227,12 @@ export function detectDoors(arcs, walls = [], opts = {}) {
     const sdx = a.endFt[0] - a.cxFt, sdy = a.endFt[1] - a.cyFt;
     const ldx = a.startFt[0] - a.cxFt, ldy = a.startFt[1] - a.cyFt;
     const ang = Math.atan2(sdy, sdx) * 180 / Math.PI;
+    // HONEST CONFIDENCE: a door is only 'medium' (the highest this geometric pass claims) when it
+    // BOTH hosts on a wall AND has a real-door leaf width. Off-wall OR sub-door width => 'low'
+    // (suspect). plausibleWidth = the leaf radius sits in the real architectural door band.
+    const plausibleWidth = a.rFt >= realDoorMinFt && a.rFt <= realDoorMaxFt;
+    const confident = onWall && plausibleWidth;
+    const widthClass = plausibleWidth ? 'real-door-width' : (a.rFt < realDoorMinFt ? 'sub-door(suspect)' : 'oversize(suspect)');
     doors.push({
       kind: 'door',
       position: [round(a.cxFt), round(a.cyFt)],
@@ -227,14 +244,18 @@ export function detectDoors(arcs, walls = [], opts = {}) {
       hostWall: onWall ? hostIdx : null,
       hostWallDistFt: round(hostD),
       onWall: !!onWall,
+      widthClass,
+      suspect: !confident,
       evidence: 'swing-arc(circle-fit,leaf-radius,quarter-sweep)',
-      confidence: onWall ? 'medium' : 'low',
+      confidence: confident ? 'medium' : 'low',
       provenance: 'extracted (vector PDF bezier arc, CTM-mapped) — needs-verification',
       needsVerification: true,
     });
   }
   doors.sort((p, q) => p.position[0] - q.position[0] || p.position[1] - q.position[1]);
-  return { doors, note };
+  const confidentCount = doors.filter((d) => !d.suspect).length;
+  const suspectCount = doors.length - confidentCount;
+  return { doors, note, confidentCount, suspectCount };
 }
 
 /**

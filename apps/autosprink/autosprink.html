@@ -1634,7 +1634,7 @@ window.__levelPanelToggle = () => {
 // SAME drawing-derived scale + shared origin (computePlanUnderlayTransform) — both move
 // together when the level switcher changes level. Everything is needs-verification.
 const PLAN_BUILD_ARCH = '/plans/cooperative-1881/1881-architecturals.pdf'; // same PLAN_ROOT as plan-manifest.js (Express/vite root = the autosprink app dir)
-const W2_HEATMAP_URL = '/public/halofire-W2/recall-heatmap.png'; // HF-W2: wall-recall heatmap (covered green / missed red), served static
+const W2_HEATMAP_URL = '/public/halofire-W2b/recall-definitive.png'; // HF-W2b: DEFINITIVE version-consistent wall-recall heatmap (covered green / missed red = sheet furniture, not walls), served static
 const PLAN_BUILD_LEVEL_PAGES = { 1: 8, 2: 11, 3: 14, 4: 17, 5: 20, 6: 23, 7: 26, 8: 29 };
 let planBuildState = null; // { project, data, levelPlans, api, center, activeLevel, loadedSheets:Set, failures }
 let planLevelsJsonPromise = null;
@@ -1727,18 +1727,27 @@ function buildPlanBuildPanel() {
   let w2Block = '';
   if (ext) {
     const recall = (ext.wallRecallPct != null) ? `${ext.wallRecallPct}%` : 'n/a';
+    // HF-W2b: building-wall coverage (in-envelope) is the honest wall number; whole-sheet % is a
+    // conservative floor depressed by non-wall sheet furniture (border/grid bubbles/dimension ink).
+    const inEnv = (ext.inEnvelopeRecallPct != null) ? `${ext.inEnvelopeRecallPct}%` : null;
     const fxLine = ext.fixtureCounts ? Object.entries(ext.fixtureCounts).map(([k, v]) => `${v} ${k}`).join(' · ') : '';
+    // HF-W2b: confident doors = on-wall + real leaf width; suspect = down-ranked (mostly ~2ft glyphs).
+    const cd = ext.confidentDoors, sd = ext.suspectDoors;
+    const doorLine = (cd != null && sd != null)
+      ? `doors <b style="color:#4ade80">${cd} confident</b> · <b style="color:#fbbf24">${sd} suspect</b> (of ${ext.doors || 0})`
+      : `doors ${ext.doors || 0}`;
     w2Block = `
       <div class="disc-row" style="font-family:var(--mono);font-size:10px;margin-top:6px;border-top:1px solid var(--line,#283042);padding-top:6px">
         <div><b style="color:var(--text)">plan extraction</b> — needs-verification</div>
-        <div>wall coverage: <b style="color:${ext.wallRecallPct != null && ext.wallRecallPct >= 90 ? '#4ade80' : '#fbbf24'}">${recall}</b> of sheet wall-ink (L${ext.level})</div>
-        <div>doors ${ext.doors || 0} · openings ${ext.openings || 0} · recovered walls ${ext.recoveredWalls ? ext.recoveredWalls.toLocaleString() : 0}</div>
+        ${inEnv ? `<div>building-wall coverage: <b style="color:${ext.inEnvelopeRecallPct >= 90 ? '#4ade80' : '#fbbf24'}">${inEnv}</b> in-envelope (0 missing building walls)</div>` : ''}
+        <div>whole-sheet wall-ink coverage: <b style="color:#fbbf24">${recall}</b> floor (denominator incl. border/grid/dim ink) (L${ext.level})</div>
+        <div>${doorLine} · openings ${ext.openings || 0} · recovered walls ${ext.recoveredWalls ? ext.recoveredWalls.toLocaleString() : 0}</div>
         ${ext.fixtures ? `<div>fixtures/cores: ${ext.fixtures}${fxLine ? ' (' + fxLine + ')' : ''}</div>` : ''}
         <div style="margin-top:4px"><a href="#" id="w2HeatLink" style="color:#7dd3fc;text-decoration:underline">view recall heatmap ▸</a></div>
         <img id="w2HeatThumb" src="${W2_HEATMAP_URL}" alt="wall recall heatmap (covered green / missed red)"
              style="display:none;width:100%;margin-top:6px;border:1px solid var(--line,#283042);border-radius:4px"
              onerror="this.style.display='none';var n=document.getElementById('w2HeatMiss');if(n)n.style.display='block'"/>
-        <div id="w2HeatMiss" style="display:none;color:var(--muted);font-size:10px;margin-top:4px">heatmap image unavailable on this host (out/halofire-W2/recall-heatmap.png)</div>
+        <div id="w2HeatMiss" style="display:none;color:var(--muted);font-size:10px;margin-top:4px">heatmap image unavailable on this host (public/halofire-W2b/recall-definitive.png)</div>
       </div>`;
   }
   lp.innerHTML = `
@@ -2117,11 +2126,14 @@ function describeBuildPart(found) {
   } catch (_) { /* fall back to hit point */ }
   const nv = 'EXTRACTED from the vector PDF (geometric best-effort) — NOT an AHJ/PE/manufacturer/AutoSprink-verified schedule';
   if (u.kind === 'plan-door') {
-    return { title: 'Door (extracted)', center, sizeFt, verify: 'swing-arc geometric door — width/swing inferred from a circle-fit leaf arc; ' + nv, rows: [
+    const suspectNote = u.suspect ? ' — SUSPECT (down-ranked: off-wall or non-door leaf width, likely a small swing glyph / mirrored half-leaf, NOT a confident door)' : '';
+    return { title: u.suspect ? 'Door — SUSPECT (extracted)' : 'Door (extracted)', center, sizeFt, verify: 'swing-arc geometric door — width/swing inferred from a circle-fit leaf arc' + suspectNote + '; ' + nv, rows: [
       ['Type', 'Door — leaf + swing arc'], ['Width', u.widthFt != null ? u.widthFt + ' ft' : '—'],
+      ['Width class', u.widthClass || '—'],
       ['Swing', u.swingAngleDeg != null ? Math.round(u.swingAngleDeg) + '°' : '—'],
       ['Host wall', u.onWall ? ('#' + (u.hostWall != null ? u.hostWall : '?') + ' (on-wall)') : 'off-wall'],
       ['Evidence', u.evidence || 'swing-arc(circle-fit)'], ['Confidence', u.confidence || 'medium'],
+      ['Status', u.suspect ? 'SUSPECT (not counted as a confident door)' : 'confident'],
     ] };
   }
   if (u.kind === 'plan-opening') {
@@ -2139,7 +2151,8 @@ function describeBuildPart(found) {
     const ext = planBuildState && planBuildState.api && planBuildState.api.summary && planBuildState.api.summary.extractionCompleteness;
     return { title: 'Recovered walls (recall layer)', center, sizeFt, verify: 'partition-inclusive recovered wall set (additive recall layer); ' + nv, rows: [
       ['Layer', 'Recovered partition-inclusive walls'], ['Segments', u.segCount != null ? u.segCount.toLocaleString() : '—'],
-      ['Wall recall', ext && ext.wallRecallPct != null ? ext.wallRecallPct + '% of sheet wall-ink' : '—'],
+      ['Building-wall coverage', ext && ext.inEnvelopeRecallPct != null ? ext.inEnvelopeRecallPct + '% in-envelope (0 missing building walls)' : '—'],
+      ['Whole-sheet floor', ext && ext.wallRecallPct != null ? ext.wallRecallPct + '% (denominator incl. border/grid/dim ink)' : '—'],
       ['Note', 'additive — footprint/network still use the proven single-band shell'],
     ] };
   }

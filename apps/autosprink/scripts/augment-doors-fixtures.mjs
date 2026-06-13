@@ -59,7 +59,7 @@ const splitYFt = plan.stackedSplit && Number.isFinite(plan.stackedSplit.splitYFt
 
   // host-wall set: prefer the recall-complete wallsFull (captures partition walls doors host on).
   const walls = (plan.wallsFull && plan.wallsFull.length ? plan.wallsFull : plan.walls) || [];
-  const { doors, note: doorNote } = detectDoors(placed, walls, {});
+  const { doors, note: doorNote, confidentCount, suspectCount } = detectDoors(placed, walls, {});
   // Openings: detect on the SINGLE-BAND major walls only (perimeter + primary partitions). The
   // dense partition-inclusive set produces O(n^2) spurious collinear "gaps"; major walls give the
   // honest cased-opening signal. Still conservative + flagged.
@@ -86,6 +86,11 @@ const splitYFt = plan.stackedSplit && Number.isFinite(plan.stackedSplit.splitYFt
   plan.fixtureCounts = fixtureCounts;
   plan.doorExtraction = {
     method: 'swing-arc-circle-fit', arcsTotal: arcs.length, doorsFound: doors.length,
+    // HONEST SPLIT (W2b): confidentDoors = on-wall fits with a real architectural leaf width
+    // (~2.3-4.0 ft). suspectDoors = down-ranked fits (off-wall OR sub/over-door width) kept for
+    // completeness but flagged — do NOT count these as confident doors. The bulk of suspects are
+    // ~2.0 ft circle-fits on small swing glyphs / mirrored half-leaves, not full doors.
+    confidentDoors: confidentCount, suspectDoors: suspectCount,
     openingsFound: openings.length, fixturesFound: fixtures.length,
     samUsed, samReason, registrationApplied: { dx: reg.dx, dy: reg.dy, splitYFt },
     notes: { doors: doorNote, openings: openNote, fixtures: fixNote },
