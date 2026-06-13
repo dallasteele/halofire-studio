@@ -590,6 +590,57 @@ async function initStudio() {
     onResize();
     return d;
   };
+  // Wall-pipeline dev-QA hook: pose the perspective camera + render a capped JPEG so the
+  // headless capture can orbit (top/iso/obliques) and judge underlay-text orientation in the
+  // LIVE scene. Inert in production (only used by the dev capture script). Returns a data URL.
+  window.__orbit = (camPos, look, mw = 1000, mh = 760, q = 0.7) => {
+    camera = perspCam; if (controls) controls.object = camera;
+    setPlanStyle(false);
+    const t = look || { x: 0, y: 6, z: 0 };
+    perspCam.position.set(camPos.x, camPos.y, camPos.z);
+    perspCam.up.set(0, 1, 0);
+    perspCam.lookAt(t.x, t.y, t.z);
+    if (controls) { controls.target.set(t.x, t.y, t.z); controls.update(); }
+    renderer.setSize(mw, mh, false); renderer.render(scene, perspCam);
+    const d = renderer.domElement.toDataURL('image/jpeg', q);
+    onResize();
+    return d;
+  };
+  window.__planFrame = () => window._frame || null;
+  // Wall-pipeline orientation diagnostic: live-mirror the registered underlay texture's U/V about
+  // its center so the capture can find the combo that reads FORWARD at BOTH top and iso, then bake
+  // that into the data path. No production effect (dev capture only).
+  window.__underlayFlip = (u, v) => {
+    const st = planBuildState; if (!st || !st.api) return 'no-build';
+    let hit = null;
+    for (const lvl of st.api.levels) lvl.group.traverse((o) => {
+      if (o.name && o.name.indexOf('plan-underlay') === 0 && o.material && o.material.map) {
+        const tx = o.material.map;
+        tx.center.set(0.5, 0.5);
+        tx.wrapS = THREE.RepeatWrapping; tx.wrapT = THREE.RepeatWrapping;
+        tx.repeat.set(u ? -1 : 1, v ? -1 : 1);
+        tx.needsUpdate = true;
+        o.userData.flipTextureU = !!u; o.userData.flipTextureV = !!v;
+        hit = o.name;
+      }
+    });
+    if (renderer && scene && camera) renderer.render(scene, camera);
+    return hit || 'no-underlay';
+  };
+  window.__setLevel = async (n) => { if (typeof setActivePlanBuildLevel === 'function') await setActivePlanBuildLevel(n); };
+  window.__planState = () => {
+    const st = planBuildState; if (!st || !st.api) return { error: window.__planBuildError || 'no planBuildState' };
+    const l1 = st.api.levels.find((l) => l.level === 1) || null;
+    let underlay = null;
+    if (l1) l1.group.traverse((o) => { if (o.name && o.name.indexOf('plan-underlay') === 0) underlay = { name: o.name, flipTextureV: o.userData && o.userData.flipTextureV, rotX: o.rotation.x }; });
+    return {
+      buildError: window.__planBuildError || null,
+      activeLevel: st.activeLevel,
+      l1counts: l1 ? l1.counts : null,
+      underlay,
+      extraction: st.api.summary && st.api.summary.extractionCompleteness,
+    };
+  };
   window.addEventListener('resize', onResize);
   // HF-UXCLEAN §2: inert debug hooks for the behavioral selection gate — report
   // the orbit pivot + x-ray dim ratio so the headless gate can verify isolation
@@ -1694,6 +1745,37 @@ function getPlanLevelsJson() {
   return planLevelsJsonPromise;
 }
 
+// HF-BAKED-UNDERLAY: PREFER a small pre-baked, registered underlay PNG over the
+// 173 MB architecturals PDF. The PDF rasterizes fine on a fat dev box but
+// fails on the VPS / headless (swiftshader can't register the 165MB-PDF
+// texture), leaving window.__planState().underlay === null and the walls
+// floating on a blank slab. The baked PNGs (scripts/bake-plan-underlays.mjs)
+// are the SAME engine render at the same true scale; the live-PDF path stays
+// as a fallback. Manifest carries each sheet's PDF page widthPt/heightPt so we
+// register with computePlanUnderlayTransform WITHOUT re-opening the PDF.
+const BAKED_UNDERLAY_MANIFEST = '/public/plan-underlays/cooperative-1881/manifest.json';
+let bakedUnderlayPromise = null;
+function getBakedUnderlayManifest() {
+  if (!bakedUnderlayPromise) {
+    bakedUnderlayPromise = fetch(BAKED_UNDERLAY_MANIFEST)
+      .then((r) => (r.ok ? r.json() : null))
+      .catch(() => null); // baked assets are an optimization, not a hard dependency
+  }
+  return bakedUnderlayPromise;
+}
+
+// Fetch a baked PNG into an <img> the GPU can upload as a texture. Resolves the
+// loaded HTMLImageElement (decoded) or rejects.
+function loadUnderlayImage(url) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error('baked underlay image failed to load: ' + url));
+    img.src = url;
+  });
+}
+
 function destroyPlanBuild() {
   if (planBuildState && planBuildState.api && planGroup) {
     planGroup.remove(planBuildState.api.root);
@@ -1709,6 +1791,32 @@ function destroyPlanBuild() {
 
 // Lazily render + register the ACTIVE level's REAL sheet UNDER the extracted geometry,
 // at the drawing-derived true scale + the shared geometry origin (no contain-fit, no re-fit).
+// Register a rendered sheet (baked PNG <img> OR live-PDF canvas) UNDER the level
+// geometry at the drawing-derived true scale + shared origin. `source` is any
+// CanvasTexture-compatible image source (HTMLImageElement or HTMLCanvasElement).
+function registerPlanBuildUnderlay(entry, levelN, page, source, pageWidthPt, pageHeightPt, s, st, sourceLabel) {
+  const t = computePlanUnderlayTransform({
+    pageWidthPt, pageHeightPt,
+    scaleFtPerUnit: s, unionCenterXFt: st.center.cx, unionCenterYFt: st.center.cy,
+    // RECORE clipping fix: lift the underlay 0.5 ft above the (also-transparent) slab so it
+    // never z-fights / cuts through geometry at grazing angles; polygonOffset (in
+    // createUnderlayMesh) resolves the remaining near-coplanar depth ties.
+    elevationFt: entry.elevationFt, liftFt: 0.5,
+  });
+  const mesh = createUnderlayMesh(THREE, {
+    canvas: source,
+    transform: { widthFt: t.widthFt, depthFt: t.depthFt, position: t.position, rotation: t.rotation, scaleSource: t.scaleSource, needsVerification: true },
+    opacity: 0.92, name: `plan-underlay:A-10${levelN}:p${page}`,
+    // ORIENTATION CONTRACT: -PI/2 (textured face up = readable from the top-down plan camera),
+    // NO texture flip — the verified default reads sheet text FORWARD at BOTH top and iso
+    // (empirically re-verified via the 4-way U/V flip sweep; see pdf-underlay.js header).
+    flipTextureV: t.flipTextureV === true,
+    sheetMeta: { sheet: `A-10${levelN}`, page, discipline: 'arch', verified: 'registered-true-scale', underlaySource: sourceLabel },
+  });
+  entry.group.add(mesh);
+  return mesh;
+}
+
 async function ensurePlanBuildSheet(levelN) {
   const st = planBuildState;
   if (!st || levelN === 'all') return;
@@ -1718,34 +1826,41 @@ async function ensurePlanBuildSheet(levelN) {
   const key = `arch:p${page}`;
   if (st.loadedSheets.has(key)) return;
   st.loadedSheets.add(key);
-  let lib;
-  try { lib = await getPdfjs(); }
-  catch (e) { st.failures.push({ stage: 'pdfjs', error: String(e.message || e) }); st.loadedSheets.delete(key); return; }
   // The level's own derived scale (from its sheet) — never a hardcoded fallback.
   const lvlSrc = (st.data.levels || []).find((l) => l.level === Number(levelN));
   const s = lvlSrc && lvlSrc.plan && Number(lvlSrc.plan.scaleFtPerUnit);
-  if (!(s > 0)) { st.failures.push({ level: levelN, error: 'no derived scaleFtPerUnit for level — sheet not registered (no fabricated scale)' }); return; }
+  if (!(s > 0)) { st.loadedSheets.delete(key); st.failures.push({ level: levelN, error: 'no derived scaleFtPerUnit for level — sheet not registered (no fabricated scale)' }); return; }
+  const scaleText = (lvlSrc && lvlSrc.plan && lvlSrc.plan.scaleText) || `${s} ft/pt`;
+
+  // ── PRIMARY: pre-baked registered PNG (small, VPS/headless-safe) ──
+  try {
+    const manifest = await getBakedUnderlayManifest();
+    const baked = manifest && Array.isArray(manifest.sheets)
+      ? manifest.sheets.find((x) => Number(x.level) === Number(levelN) && Number(x.page) === Number(page))
+      : null;
+    if (baked && baked.url && Number(baked.widthPt) > 0 && Number(baked.heightPt) > 0) {
+      $('status').textContent = `loading baked A-10${levelN} underlay…`;
+      const img = await loadUnderlayImage(baked.url);
+      registerPlanBuildUnderlay(entry, levelN, page, img, Number(baked.widthPt), Number(baked.heightPt), s, st, 'baked-png');
+      window.__underlayMode = { mode: 'baked-png', project: st.project, level: Number(levelN), url: baked.url, needsVerification: true };
+      $('status').textContent = `A-10${levelN} sheet registered under extracted geometry (baked underlay, true scale ${scaleText}; needs-verification)`;
+      return;
+    }
+  } catch (e) {
+    // Baked path failed — fall through to the live-PDF fallback below.
+    st.failures.push({ level: levelN, stage: 'baked-png', error: String(e.message || e) });
+  }
+
+  // ── FALLBACK: rasterize the real architecturals PDF in the browser ──
+  let lib;
+  try { lib = await getPdfjs(); }
+  catch (e) { st.failures.push({ stage: 'pdfjs', error: String(e.message || e) }); st.loadedSheets.delete(key); return; }
   $('status').textContent = `rendering REAL sheet A-10${levelN} p${page} as aligned underlay…`;
   try {
     const rendered = await renderSheetToCanvas(lib, { url: PLAN_BUILD_ARCH, page, targetPx: LEVEL_TARGET_PX });
-    const t = computePlanUnderlayTransform({
-      pageWidthPt: rendered.widthPt, pageHeightPt: rendered.heightPt,
-      scaleFtPerUnit: s, unionCenterXFt: st.center.cx, unionCenterYFt: st.center.cy,
-      // RECORE clipping fix: lift the underlay 0.5 ft above the (also-transparent) slab so it
-      // never z-fights / cuts through geometry at grazing angles; polygonOffset (in
-      // createUnderlayMesh) resolves the remaining near-coplanar depth ties.
-      elevationFt: entry.elevationFt, liftFt: 0.5,
-    });
-    const mesh = createUnderlayMesh(THREE, {
-      canvas: rendered.canvas,
-      transform: { widthFt: t.widthFt, depthFt: t.depthFt, position: t.position, rotation: t.rotation, scaleSource: t.scaleSource, needsVerification: true },
-      opacity: 0.92, name: `plan-underlay:A-10${levelN}:p${page}`,
-      // RECORE: -PI/2 (readable) + flipTextureV (image-top -> +Z to match plan-Y->world-Z registration).
-      flipTextureV: t.flipTextureV === true,
-      sheetMeta: { sheet: `A-10${levelN}`, page, discipline: 'arch', verified: 'registered-true-scale' },
-    });
-    entry.group.add(mesh);
-    $('status').textContent = `REAL A-10${levelN} sheet registered under extracted geometry (true scale ${lvlSrc.plan.scaleText}; needs-verification)`;
+    registerPlanBuildUnderlay(entry, levelN, page, rendered.canvas, rendered.widthPt, rendered.heightPt, s, st, 'live-pdf');
+    window.__underlayMode = { mode: 'real-pdf', project: st.project, level: Number(levelN), needsVerification: true };
+    $('status').textContent = `REAL A-10${levelN} sheet registered under extracted geometry (true scale ${scaleText}; needs-verification)`;
   } catch (e) {
     st.loadedSheets.delete(key);
     st.failures.push({ level: levelN, page, error: String(e.message || e) });

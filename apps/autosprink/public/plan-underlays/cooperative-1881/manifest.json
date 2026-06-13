@@ -1,0 +1,105 @@
+{
+  "project": "cooperative-1881",
+  "source": "plans/cooperative-1881/1881-architecturals.pdf",
+  "targetPx": 2400,
+  "generatedAt": "2026-06-13T20:32:32.200Z",
+  "note": "Pre-baked registered underlays. Register with computePlanUnderlayTransform using each sheet widthPt/heightPt + the level scaleFtPerUnit from plan-levels.cooperative-1881.json. needs-verification.",
+  "sheets": [
+    {
+      "level": 1,
+      "sheet": "A-101",
+      "page": 8,
+      "file": "A-101-p8.png",
+      "url": "/public/plan-underlays/cooperative-1881/A-101-p8.png",
+      "widthPt": 2592,
+      "heightPt": 1728,
+      "widthPx": 2400,
+      "heightPx": 1600,
+      "bytes": 708366
+    },
+    {
+      "level": 2,
+      "sheet": "A-102",
+      "page": 11,
+      "file": "A-102-p11.png",
+      "url": "/public/plan-underlays/cooperative-1881/A-102-p11.png",
+      "widthPt": 2592,
+      "heightPt": 1728,
+      "widthPx": 2400,
+      "heightPx": 1600,
+      "bytes": 596460
+    },
+    {
+      "level": 3,
+      "sheet": "A-103",
+      "page": 14,
+      "file": "A-103-p14.png",
+      "url": "/public/plan-underlays/cooperative-1881/A-103-p14.png",
+      "widthPt": 2592,
+      "heightPt": 1728,
+      "widthPx": 2400,
+      "heightPx": 1600,
+      "bytes": 765183
+    },
+    {
+      "level": 4,
+      "sheet": "A-104",
+      "page": 17,
+      "file": "A-104-p17.png",
+      "url": "/public/plan-underlays/cooperative-1881/A-104-p17.png",
+      "widthPt": 2592,
+      "heightPt": 1728,
+      "widthPx": 2400,
+      "heightPx": 1600,
+      "bytes": 673675
+    },
+    {
+      "level": 5,
+      "sheet": "A-105",
+      "page": 20,
+      "file": "A-105-p20.png",
+      "url": "/public/plan-underlays/cooperative-1881/A-105-p20.png",
+      "widthPt": 2592,
+      "heightPt": 1728,
+      "widthPx": 2400,
+      "heightPx": 1600,
+      "bytes": 658931
+    },
+    {
+      "level": 6,
+      "sheet": "A-106",
+      "page": 23,
+      "file": "A-106-p23.png",
+      "url": "/public/plan-underlays/cooperative-1881/A-106-p23.png",
+      "widthPt": 2592,
+      "heightPt": 1728,
+      "widthPx": 2400,
+      "heightPx": 1600,
+      "bytes": 632022
+    },
+    {
+      "level": 7,
+      "sheet": "A-107",
+      "page": 26,
+      "file": "A-107-p26.png",
+      "url": "/public/plan-underlays/cooperative-1881/A-107-p26.png",
+      "widthPt": 2592,
+      "heightPt": 1728,
+      "widthPx": 2400,
+      "heightPx": 1600,
+      "bytes": 633290
+    },
+    {
+      "level": 8,
+      "sheet": "A-108",
+      "page": 29,
+      "file": "A-108-p29.png",
+      "url": "/public/plan-underlays/cooperative-1881/A-108-p29.png",
+      "widthPt": 2592,
+      "heightPt": 1728,
+      "widthPx": 2400,
+      "heightPx": 1600,
+      "bytes": 642867
+    }
+  ]
+}
