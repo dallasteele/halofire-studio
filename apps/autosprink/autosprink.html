@@ -1488,9 +1488,10 @@ function initViewCube() {
     vcCube.add(edges);
   }
   vcRaycaster = new THREE.Raycaster();
-  vcRenderer.domElement.addEventListener('pointerdown', onViewCubeClick);
-  vcRenderer.domElement.addEventListener('pointermove', onViewCubeHover);
-  vcRenderer.domElement.addEventListener('pointerleave', () => { vcHoverIdx = -1; });
+  vcRenderer.domElement.addEventListener('pointerdown', onViewCubePointerDown);
+  vcRenderer.domElement.addEventListener('pointermove', onViewCubePointerMove);
+  vcRenderer.domElement.addEventListener('pointerup', onViewCubePointerUp);
+  vcRenderer.domElement.addEventListener('pointerleave', () => { if (!vcDrag) vcHoverIdx = -1; });
   // Inert verification hooks (dev capture only; no production effect): drive a cube
   // snap + read the scale bar's computed feet-per-pixel so the headless gate can
   // confirm the cube is INTERACTIVE and the scale bar is ACCURATE.
@@ -1515,6 +1516,49 @@ function onViewCubeHover(ev) {
   const hit = vcRaycaster.intersectObject(vcCube, false)[0];
   vcHoverIdx = hit ? hit.face.materialIndex : -1;
   vcRenderer.domElement.style.cursor = hit ? 'pointer' : 'default';
+}
+// The cube is GRABBABLE: drag it to orbit the scene; a click (no drag) snaps the view.
+let vcDrag = null;
+function onViewCubePointerDown(ev) {
+  try { vcRenderer.domElement.setPointerCapture(ev.pointerId); } catch (e) {}
+  vcDrag = { x: ev.clientX, y: ev.clientY, sx: ev.clientX, sy: ev.clientY, moved: false, ev };
+  ev.preventDefault();
+}
+function onViewCubePointerMove(ev) {
+  if (vcDrag) {
+    const dx = ev.clientX - vcDrag.x, dy = ev.clientY - vcDrag.y;
+    if (Math.abs(ev.clientX - vcDrag.sx) + Math.abs(ev.clientY - vcDrag.sy) > 3) vcDrag.moved = true;
+    if (vcDrag.moved) {
+      // grabbing the cube while in ortho/top drops into a free perspective orbit
+      if (camera === orthoCam) {
+        camera = perspCam; if (controls) controls.object = camera; setPlanStyle(false);
+        document.querySelectorAll('#viewSeg button').forEach((x) => x.classList.toggle('on', x.dataset.view === 'iso'));
+      }
+      vcOrbitMain(dx, dy);
+    }
+    vcDrag.x = ev.clientX; vcDrag.y = ev.clientY;
+    return;
+  }
+  onViewCubeHover(ev);
+}
+function onViewCubePointerUp(ev) {
+  if (vcDrag && !vcDrag.moved) onViewCubeClick(vcDrag.ev || ev); // click (no drag) = snap to face/corner
+  try { vcRenderer.domElement.releasePointerCapture(ev.pointerId); } catch (e) {}
+  vcDrag = null;
+}
+// Drag the cube to ORBIT the main scene camera about the current pivot.
+function vcOrbitMain(dx, dy) {
+  if (!camera || !controls) return;
+  const tgt = controls.target;
+  const off = camera.position.clone().sub(tgt);
+  const sph = new THREE.Spherical().setFromVector3(off);
+  sph.theta -= dx * 0.009;
+  sph.phi = Math.max(0.06, Math.min(Math.PI - 0.06, sph.phi - dy * 0.009));
+  off.setFromSpherical(sph);
+  camera.position.copy(tgt).add(off);
+  camera.up.set(0, 1, 0);
+  camera.lookAt(tgt);
+  controls.update();
 }
 function updateViewCube() {
   if (!vcRenderer || !vcCube || !camera) return;
