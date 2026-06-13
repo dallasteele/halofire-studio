@@ -51,9 +51,19 @@ const data = new Uint8Array(fs.readFileSync(ARCH));
       const pdfPage = await doc.getPage(page);
       // Stacked-view sheets (A-101) carry BOTH wings of an over-length floor: extract each wing
       // and MERGE into one complete-floor plan. Other sheets are single plan views.
+      // W2: partitionInclusive adds an ADDITIVE recall-complete wallsFull[] (all heavier-than-
+      // baseline lineweight bands: interior partitions + core walls), clipped to the single-band
+      // wall envelope. The footprint + rooms + netalign still use the proven single-band `walls`
+      // (unchanged), so the verified W0 footprint/netalign is preserved; `wallsFull` is for
+      // rendering + the wall-recall metric only. needs-verification.
+      // SCOPED to L1 (A-101, page 8) — the level with extracted doors/fixtures + a measured
+      // recall figure. L2-L8 partition-inclusive sets are ~670k extra segments (30MB) of
+      // UNVERIFIED, undoored bloat that only inflate the served payload, so they are NOT
+      // emitted. Re-enable per-level only when that level gets doors + a measured recall.
+      const extractOpts = (page === 8) ? { layerOpts: { partitionInclusive: true } } : {};
       const plan = STACKED_PAGES.has(page)
-        ? await extractStackedFloorPlanFromPdf(pdfPage, {})
-        : await extractLevelPlanFromPdf(pdfPage, {});
+        ? await extractStackedFloorPlanFromPdf(pdfPage, extractOpts)
+        : await extractLevelPlanFromPdf(pdfPage, extractOpts);
       levels.push({
         level,
         name: `Level ${level} (${LEVEL_WORDS[level]} FLOOR)`,
@@ -86,7 +96,9 @@ const data = new Uint8Array(fs.readFileSync(ARCH));
     provenance: 'extracted from real Bluebeam vector PDFs (1881-architecturals.pdf) — needs-verification; NOT AHJ/PE/AutoSprink parity',
     levels,
   };
-  fs.writeFileSync(OUT, JSON.stringify(out, null, 2));
+  // MINIFIED: this file is large (L1 carries 41,784 wallsFull segs) and is served static to
+  // the live Studio — pretty-printing it ~3x's the payload (139MB vs ~36MB) for no benefit.
+  fs.writeFileSync(OUT, JSON.stringify(out));
   const ok = levels.filter((l) => !l.error).length;
   console.log(`WROTE ${OUT} — ${ok}/${levels.length} levels extracted`);
 })().catch((e) => { console.error('GEN FAILED', e); process.exit(1); });

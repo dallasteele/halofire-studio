@@ -210,6 +210,147 @@ function makeRoomTile(THREE, room, bounds, elevationFt) {
   return mesh;
 }
 
+const DOOR_COLOR = 0xffb454;       // door leaf + swing arc — warm amber
+const OPENING_COLOR = 0x4ab0ff;    // cased opening / passage marker — blue
+const FIXTURE_COLOR = 0x4ad6c0;    // fixture / core marker — teal
+const WALLSFULL_COLOR = 0xc77dff;  // recovered partition-inclusive walls (recall layer) — violet
+
+/**
+ * Build a single DOOR as a thin leaf box + a swing-arc line, parented in one group so
+ * the whole door selects/inspects as a unit. Door fields are plan-feet:
+ *   position (hinge/center), width (leaf), swingDir, leafDir, swingAngleDeg.
+ * The leaf is drawn along leafDir from the hinge; the swing arc traces the leaf tip.
+ */
+function makeDoor(THREE, door, bounds, elevationFt) {
+  if (!door || !Array.isArray(door.position)) return null;
+  const g = new THREE.Group();
+  const hx = door.position[0] - bounds.cx, hz = door.position[1] - bounds.cy;
+  const wft = Math.max(0.5, Number(door.width) || 2);
+  const y = elevationFt + 0.06;
+  const leaf = Array.isArray(door.leafDir) ? door.leafDir : [1, 0];
+  const swing = Array.isArray(door.swingDir) ? door.swingDir : [0, 1];
+  // Leaf: a thin slab from hinge along leafDir.
+  if (THREE.BoxGeometry) {
+    const geo = new THREE.BoxGeometry(wft, 0.12, 0.34);
+    const mat = THREE.MeshStandardMaterial
+      ? new THREE.MeshStandardMaterial({ color: DOOR_COLOR, transparent: true, opacity: 0.92, metalness: 0, roughness: 0.6 })
+      : new THREE.MeshBasicMaterial({ color: DOOR_COLOR, transparent: true, opacity: 0.92 });
+    const leafMesh = new THREE.Mesh(geo, mat);
+    const ang = Math.atan2(leaf[1], leaf[0]);          // plan angle of the leaf
+    leafMesh.position.set(hx + Math.cos(ang) * wft / 2, y, hz + Math.sin(ang) * wft / 2);
+    leafMesh.rotation.y = -ang;                          // plan-Y -> world-Z (see W())
+    leafMesh.name = 'plan-door-leaf';
+    g.add(leafMesh);
+  }
+  // Swing arc: tip path from leafDir to swingDir, drawn as a thin Line (no fill).
+  if (THREE.BufferGeometry && THREE.Line && THREE.LineBasicMaterial && THREE.Vector3) {
+    const a0 = Math.atan2(leaf[1], leaf[0]);
+    let a1 = Math.atan2(swing[1], swing[0]);
+    let d = a1 - a0; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI;
+    const STEPS = 16; const pts = [];
+    for (let i = 0; i <= STEPS; i++) {
+      const a = a0 + d * (i / STEPS);
+      pts.push(new THREE.Vector3(hx + Math.cos(a) * wft, y, hz + Math.sin(a) * wft));
+    }
+    const lg = new THREE.BufferGeometry().setFromPoints(pts);
+    const lm = new THREE.LineBasicMaterial({ color: DOOR_COLOR, transparent: true, opacity: 0.8 });
+    const arc = new THREE.Line(lg, lm);
+    arc.name = 'plan-door-swing';
+    g.add(arc);
+  }
+  g.name = `plan-door:${wft.toFixed(1)}ft`;
+  g.userData = {
+    kind: 'plan-door', widthFt: Math.round(wft * 100) / 100,
+    swingAngleDeg: door.swingAngleDeg, hostWall: door.hostWall, onWall: door.onWall,
+    confidence: door.confidence, evidence: door.evidence, needsVerification: true,
+  };
+  return g;
+}
+
+/** Build a small post marker for a cased OPENING / passage (no door leaf). */
+function makeOpening(THREE, op, bounds, elevationFt) {
+  if (!op || !Array.isArray(op.position) || !THREE.BoxGeometry) return null;
+  const wft = Math.max(0.5, Number(op.width) || 3);
+  const geo = new THREE.BoxGeometry(wft, 0.1, 0.2);
+  const mat = THREE.MeshStandardMaterial
+    ? new THREE.MeshStandardMaterial({ color: OPENING_COLOR, transparent: true, opacity: 0.7, metalness: 0, roughness: 0.7 })
+    : new THREE.MeshBasicMaterial({ color: OPENING_COLOR, transparent: true, opacity: 0.7 });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.set(op.position[0] - bounds.cx, elevationFt + 0.05, op.position[1] - bounds.cy);
+  mesh.name = `plan-opening:${wft.toFixed(1)}ft`;
+  mesh.userData = { kind: 'plan-opening', widthFt: Math.round(wft * 100) / 100, evidence: op.evidence, confidence: op.confidence, needsVerification: true };
+  return mesh;
+}
+
+/** Build a FIXTURE/core marker (small upright box, colored by fixture kind). */
+function makeFixtureMarker(THREE, fx, bounds, elevationFt) {
+  if (!fx || !Array.isArray(fx.position) || !THREE.BoxGeometry) return null;
+  const geo = new THREE.BoxGeometry(1.6, 1.2, 1.6);
+  const col = kindColor(fx.fixtureKind) || FIXTURE_COLOR;
+  const mat = THREE.MeshStandardMaterial
+    ? new THREE.MeshStandardMaterial({ color: col, transparent: true, opacity: 0.8, metalness: 0, roughness: 0.6 })
+    : new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: 0.8 });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.set(fx.position[0] - bounds.cx, elevationFt + 0.7, fx.position[1] - bounds.cy);
+  mesh.name = `plan-fixture:${fx.fixtureKind || 'fixture'}`;
+  mesh.userData = { kind: 'plan-fixture', fixtureKind: fx.fixtureKind, label: fx.label || null, source: fx.source, confidence: fx.confidence, needsVerification: true };
+  return mesh;
+}
+
+/**
+ * Build the recall-complete additive wallsFull set as ONE merged line/box layer (violet).
+ * These are the previously-missed interior partitions recovered by the partition-inclusive
+ * lineweight pass. Rendered as thin low walls so they read as "recovered" without masking the
+ * proven single-band shell. Merged into one geometry when a merger is injected (perf: 41k segs).
+ */
+function makeWallsFullLayer(THREE, segs, bounds, elevationFt, heightFt, mergeGeometries) {
+  if (!Array.isArray(segs) || !segs.length || !THREE.BoxGeometry) return null;
+  const valid = segs.filter((s) => s && Array.isArray(s.a) && Array.isArray(s.b));
+  if (!valid.length) return null;
+  const mat = THREE.MeshStandardMaterial
+    ? new THREE.MeshStandardMaterial({ color: WALLSFULL_COLOR, transparent: true, opacity: 0.5, metalness: 0, roughness: 0.85 })
+    : new THREE.MeshBasicMaterial({ color: WALLSFULL_COLOR, transparent: true, opacity: 0.5 });
+  const h = Math.max(2, heightFt * 0.5);
+  if (typeof mergeGeometries === 'function') {
+    const geos = [];
+    for (const seg of valid) {
+      const ax = seg.a[0] - bounds.cx, az = seg.a[1] - bounds.cy;
+      const bx = seg.b[0] - bounds.cx, bz = seg.b[1] - bounds.cy;
+      const len = Math.hypot(bx - ax, bz - az);
+      if (!(len > 0.01)) continue;
+      const g = new THREE.BoxGeometry(len, h, 0.25);
+      if (g.rotateY) g.rotateY(-Math.atan2(bz - az, bx - ax));
+      if (g.translate) g.translate((ax + bx) / 2, elevationFt + h / 2, (az + bz) / 2);
+      geos.push(g);
+    }
+    if (!geos.length) return null;
+    const merged = mergeGeometries(geos, false);
+    for (const g of geos) { if (g.dispose) g.dispose(); }
+    if (!merged) return null;
+    const mesh = new THREE.Mesh(merged, mat);
+    mesh.name = 'plan-wallsfull-merged';
+    mesh.userData = { kind: 'plan-wallsfull', merged: true, segCount: geos.length, needsVerification: true };
+    return mesh;
+  }
+  // Stub THREE / small set: a tagged group of per-seg boxes.
+  const grp = new THREE.Group();
+  let n = 0;
+  for (const seg of valid) {
+    const ax = seg.a[0] - bounds.cx, az = seg.a[1] - bounds.cy;
+    const bx = seg.b[0] - bounds.cx, bz = seg.b[1] - bounds.cy;
+    const len = Math.hypot(bx - ax, bz - az);
+    if (!(len > 0.01)) continue;
+    const geo = new THREE.BoxGeometry(len, h, 0.25);
+    const m = new THREE.Mesh(geo, mat);
+    m.position.set((ax + bx) / 2, elevationFt + h / 2, (az + bz) / 2);
+    m.rotation.y = -Math.atan2(bz - az, bx - ax);
+    grp.add(m); n += 1;
+  }
+  grp.name = 'plan-wallsfull';
+  grp.userData = { kind: 'plan-wallsfull', merged: false, segCount: n, needsVerification: true };
+  return n ? grp : null;
+}
+
 /**
  * Build the multi-level building from extracted LevelPlans.
  *
@@ -359,13 +500,75 @@ export function buildBuildingFromPlans(THREE, levelPlans, opts = {}) {
       }
     }
 
+    // HF-W2: recovered partition-inclusive walls (additive recall layer), toggleable.
+    let wallsFullCount = 0;
+    if (Array.isArray(plan.wallsFull) && plan.wallsFull.length) {
+      const wfGroup = new THREE.Group();
+      wfGroup.name = 'recovered-walls';
+      wfGroup.userData = { kind: 'plan-wallsfull-layer', toggleKey: 'WALLSFULL', needsVerification: true };
+      const layer = makeWallsFullLayer(THREE, plan.wallsFull, bounds, elevationFt, wallHeightFt, mergeGeometries);
+      if (layer) { wfGroup.add(layer); wallsFullCount = plan.wallsFull.length; }
+      wfGroup.visible = false; // off by default — the proven shell shows first; toggle in LAYERS
+      group.add(wfGroup);
+    }
+
+    // HF-W2: DOORS — leaf + swing arc at each opening, selectable/inspectable.
+    let doorCount = 0;
+    if (Array.isArray(plan.doors) && plan.doors.length) {
+      const dGroup = new THREE.Group();
+      dGroup.name = 'doors';
+      dGroup.userData = { kind: 'plan-doors-layer', toggleKey: 'DOORS', needsVerification: true };
+      for (const door of plan.doors) {
+        const m = makeDoor(THREE, door, bounds, elevationFt);
+        if (m) { dGroup.add(m); doorCount += 1; }
+      }
+      group.add(dGroup);
+    }
+
+    // HF-W2: OPENINGS — cased-opening / passage markers (gaps with no door).
+    let openingCount = 0;
+    if (Array.isArray(plan.openings) && plan.openings.length) {
+      const oGroup = new THREE.Group();
+      oGroup.name = 'openings';
+      oGroup.userData = { kind: 'plan-openings-layer', toggleKey: 'DOORS', needsVerification: true };
+      for (const op of plan.openings) {
+        const m = makeOpening(THREE, op, bounds, elevationFt);
+        if (m) { oGroup.add(m); openingCount += 1; }
+      }
+      group.add(oGroup);
+    }
+
+    // HF-W2: FIXTURES / cores — labeled space content, toggleable.
+    let fixtureCount = 0;
+    if (Array.isArray(plan.fixtures) && plan.fixtures.length) {
+      const fGroup = new THREE.Group();
+      fGroup.name = 'fixtures';
+      fGroup.userData = { kind: 'plan-fixtures-layer', toggleKey: 'FIXTURES', needsVerification: true };
+      for (const fx of plan.fixtures) {
+        const m = makeFixtureMarker(THREE, fx, bounds, elevationFt);
+        if (m) { fGroup.add(m); fixtureCount += 1; }
+      }
+      fGroup.visible = false; // off by default — toggle in LAYERS
+      group.add(fGroup);
+    }
+
     root.add(group);
     levels.push({
       level: lp.level,
       name: lp.name || `Level ${lp.level}`,
       elevationFt,
       group,
-      counts: { walls: wallCount, rooms: roomCount, stairs: stairCount },
+      counts: {
+        walls: wallCount, rooms: roomCount, stairs: stairCount,
+        doors: doorCount, openings: openingCount, fixtures: fixtureCount,
+        wallsFull: wallsFullCount,
+      },
+      // HF-W2: honest recall of the rendered recovered-wall set vs the sheet wall-ink.
+      recallPct: (plan.wallsFullMeta && Number.isFinite(plan.wallsFullMeta.recallPct))
+        ? plan.wallsFullMeta.recallPct : null,
+      recallMeasure: (plan.wallsFullMeta && plan.wallsFullMeta.recallMeasure) || null,
+      fixtureCounts: plan.fixtureCounts || null,
+      doorExtraction: plan.doorExtraction || null,
     });
   }
 
@@ -377,14 +580,33 @@ export function buildBuildingFromPlans(THREE, levelPlans, opts = {}) {
     const l = levelEntry(level);
     if (l) l.group.visible = !!visible;
   }
+  // HF-W2: toggle a named overlay layer (by group.name) across every level.
+  function setLayerVisible(layerName, visible) {
+    for (const l of levels) {
+      l.group.traverse((o) => {
+        if (o && o.name === layerName && o.userData && o.userData.toggleKey !== undefined) o.visible = !!visible;
+      });
+    }
+  }
 
+  // HF-W2: surface the honest extraction completeness on the summary (level with the recall figure).
+  const recallLevel = levels.find((l) => Number.isFinite(l.recallPct)) || null;
   const summary = {
     levelCount: levels.length,
     bounds: { widthFt: Math.round(bounds.widthFt * 100) / 100, depthFt: Math.round(bounds.depthFt * 100) / 100 },
-    perLevel: levels.map((l) => ({ level: l.level, elevationFt: l.elevationFt, ...l.counts })),
+    perLevel: levels.map((l) => ({ level: l.level, elevationFt: l.elevationFt, ...l.counts, recallPct: l.recallPct })),
+    extractionCompleteness: recallLevel ? {
+      wallRecallPct: recallLevel.recallPct,
+      recallMeasure: recallLevel.recallMeasure,
+      doors: recallLevel.counts.doors, openings: recallLevel.counts.openings,
+      fixtures: recallLevel.counts.fixtures, fixtureCounts: recallLevel.fixtureCounts,
+      recoveredWalls: recallLevel.counts.wallsFull,
+      doorExtraction: recallLevel.doorExtraction,
+      level: recallLevel.level, needsVerification: true,
+    } : null,
     needsVerification: true,
     provenance: 'built from extracted LevelPlans — true scale derived from sheet, needs-verification',
   };
 
-  return { root, levels, setActiveLevel, setLevelVisible, bounds, summary };
+  return { root, levels, setActiveLevel, setLevelVisible, setLayerVisible, bounds, summary };
 }

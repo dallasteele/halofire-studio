@@ -281,6 +281,97 @@ describe('buildBuildingFromPlans (stub THREE)', () => {
     expect(b.levels[0].group.children.filter((c) => c.name === 'plan-walls-merged').length).toBe(0);
     expect(b.summary.perLevel[0].walls).toBe(2); // the 2 per-wall meshes from `plan`
   });
+
+  // HF-W2: doors / openings / fixtures / recovered walls + recall surfacing.
+  function w2StubThree() {
+    class Group {
+      constructor() { this.children = []; this.visible = true; this.userData = {}; this.name = ''; this.isMesh = false; }
+      add(c) { this.children.push(c); }
+      traverse(fn) { fn(this); for (const c of this.children) { if (c.traverse) c.traverse(fn); else fn(c); } }
+    }
+    class Shape { moveTo() {} lineTo() {} closePath() {} }
+    class ExtrudeGeometry { rotateX() {} }
+    class BoxGeometry { rotateY() { return this; } translate() { return this; } dispose() {} }
+    class Mesh { constructor(geo) { this.geometry = geo; this.position = { set() {}, y: 0 }; this.rotation = { y: 0 }; this.userData = {}; this.name = ''; this.isMesh = true; } }
+    class MeshStandardMaterial {}
+    class MeshBasicMaterial {}
+    class Vector3 { constructor(x, y, z) { this.x = x; this.y = y; this.z = z; } }
+    class BufferGeometry { setFromPoints(p) { this.points = p; return this; } }
+    class LineBasicMaterial {}
+    class Line { constructor(geo) { this.geometry = geo; this.userData = {}; this.name = ''; this.isMesh = false; } }
+    return { Group, Shape, ExtrudeGeometry, BoxGeometry, Mesh, MeshStandardMaterial, MeshBasicMaterial, Vector3, BufferGeometry, LineBasicMaterial, Line };
+  }
+  const w2Plan = {
+    ...plan,
+    wallsFull: [{ a: [0, 0], b: [100, 0] }, { a: [50, 0], b: [50, 50] }, { a: [10, 10], b: [40, 10] }],
+    wallsFullMeta: { merged: false, count: 3, recallPct: 71, recallMeasure: { method: 'stored-vs-ink', wallInkPx: 100, coveredPx: 71 } },
+    doors: [
+      { kind: 'door', position: [25, 0], width: 2, swingDir: [0, 1], leafDir: [1, 0], swingAngleDeg: 90, hostWall: 7, onWall: true, evidence: 'swing-arc', confidence: 'medium' },
+      { kind: 'door', position: [60, 25], width: 3, swingDir: [1, 0], leafDir: [0, 1], swingAngleDeg: 88, hostWall: 12, onWall: true, confidence: 'medium' },
+    ],
+    openings: [{ kind: 'opening', position: [55, 45], width: 5, evidence: 'collinear-wall-gap', confidence: 'low' }],
+    fixtures: [{ kind: 'fixture', fixtureKind: 'stair', position: [65, 15], source: 'stair-core', label: null, confidence: 'low' }],
+    fixtureCounts: { stair: 1 },
+    doorExtraction: { method: 'swing-arc-circle-fit', doorsFound: 2 },
+  };
+
+  it('renders doors (leaf+swing), openings, fixtures, recovered walls into named toggleable layers', () => {
+    const THREE = w2StubThree();
+    const b = buildBuildingFromPlans(THREE, [{ level: 1, elevationFt: 0, plan: w2Plan }]);
+    const g = b.levels[0].group;
+    const byName = (n) => g.children.find((c) => c.name === n);
+    expect(byName('doors').children.length).toBe(2);
+    expect(byName('openings').children.length).toBe(1);
+    expect(byName('fixtures').children.length).toBe(1);
+    expect(byName('recovered-walls')).toBeTruthy();
+    // each door is a group with a leaf mesh + swing-arc line, tagged plan-door + needs-verification.
+    const door0 = byName('doors').children[0];
+    expect(door0.userData.kind).toBe('plan-door');
+    expect(door0.userData.widthFt).toBe(2);
+    expect(door0.userData.onWall).toBe(true);
+    expect(door0.userData.needsVerification).toBe(true);
+    expect(door0.children.some((c) => c.name === 'plan-door-leaf')).toBe(true);
+    expect(door0.children.some((c) => c.name === 'plan-door-swing')).toBe(true);
+    // counts on the summary
+    expect(b.summary.perLevel[0].doors).toBe(2);
+    expect(b.summary.perLevel[0].openings).toBe(1);
+    expect(b.summary.perLevel[0].fixtures).toBe(1);
+    expect(b.summary.perLevel[0].wallsFull).toBe(3);
+  });
+
+  it('surfaces honest wall recall + extraction completeness on the summary (never fabricated)', () => {
+    const THREE = w2StubThree();
+    const b = buildBuildingFromPlans(THREE, [{ level: 1, elevationFt: 0, plan: w2Plan }]);
+    const ext = b.summary.extractionCompleteness;
+    expect(ext).toBeTruthy();
+    expect(ext.wallRecallPct).toBe(71); // reads the measured value from wallsFullMeta — NOT hardcoded 99
+    expect(ext.doors).toBe(2);
+    expect(ext.fixtures).toBe(1);
+    expect(ext.fixtureCounts).toEqual({ stair: 1 });
+    expect(ext.recoveredWalls).toBe(3);
+    expect(ext.needsVerification).toBe(true);
+    // a plan with NO wallsFullMeta surfaces null recall (no fabrication).
+    const noMeta = buildBuildingFromPlans(THREE, [{ level: 1, elevationFt: 0, plan }]);
+    expect(noMeta.summary.extractionCompleteness).toBeNull();
+  });
+
+  it('setLayerVisible toggles a named overlay across all levels; recovered walls + fixtures default OFF', () => {
+    const THREE = w2StubThree();
+    const b = buildBuildingFromPlans(THREE, [
+      { level: 1, elevationFt: 0, plan: w2Plan },
+      { level: 2, elevationFt: 10, plan: w2Plan },
+    ]);
+    const findLayer = (lvl, n) => b.levels[lvl].group.children.find((c) => c.name === n);
+    // defaults: doors visible, recovered-walls + fixtures hidden.
+    expect(findLayer(0, 'doors').visible).toBe(true);
+    expect(findLayer(0, 'recovered-walls').visible).toBe(false);
+    expect(findLayer(0, 'fixtures').visible).toBe(false);
+    b.setLayerVisible('recovered-walls', true);
+    expect(findLayer(0, 'recovered-walls').visible).toBe(true);
+    expect(findLayer(1, 'recovered-walls').visible).toBe(true); // applied across all levels
+    b.setLayerVisible('doors', false);
+    expect(findLayer(0, 'doors').visible).toBe(false);
+  });
 });
 
 describe('planBounds / polyCentroid', () => {

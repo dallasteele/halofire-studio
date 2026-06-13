@@ -341,6 +341,13 @@ import { createPartMeshLoader } from '/src/engine/part-meshes.js';
 import { createCommandStack, resolveSolidIndex, moveSolid, deleteSolid, copySolid, rotateSolid, mirrorSolid, addSolid, setSolidFields, solidCentroidPlan } from '/src/engine/edit-commands.js';
 import { snap as snapPoint, segmentsFromModel, orthoConstrain, defaultSnapState } from '/src/engine/snaps.js';
 
+// HF-W2 (Stream W2): EXTRACTION COMPLETENESS rendered in the live Studio — DOORS
+// (leaf + swing arc), recovered partition-inclusive WALLS, and FIXTURES/cores are
+// built into the plan-comprehension building (building-from-plan.js) as named,
+// toggleable, selectable+inspectable layers; the honest wall-RECALL % + heatmap
+// are surfaced in the Levels panel. All EXTRACTED + needs-verification.
+// HF-W2-DOORS HF-W2-WALLSFULL HF-W2-FIXTURES HF-W2-RECALL
+
 const HOME_DEPOT = 'Home Depot - Rexburg ID';
 try{
   localStorage.removeItem('halofire_token');
@@ -1371,6 +1378,44 @@ function buildLayerToggles() {
       if (layerGroups[k]) layerGroups[k].visible = e.target.checked;
     };
   }
+  appendPlanW2LayerToggles(); // HF-W2: doors / recovered walls / fixtures (only when the extracted building is up)
+}
+
+// HF-W2: extraction-completeness layer toggles — appended under the standard LAYERS
+// list, ONLY when the Cooperative-1881 extracted building is active and actually carries
+// the W2 overlays (doors/openings, recovered partition walls, fixtures). Each toggle drives
+// the building-from-plan overlay group via api.setLayerVisible across all levels.
+function appendPlanW2LayerToggles() {
+  const st = planBuildState;
+  if (!st || !st.api || typeof st.api.setLayerVisible !== 'function') return;
+  const ext = st.api.summary && st.api.summary.extractionCompleteness;
+  if (!ext) return;
+  const items = [];
+  if ((ext.doors || 0) + (ext.openings || 0) > 0) {
+    items.push({ key: 'DOORS', label: `Doors & openings (${ext.doors || 0} / ${ext.openings || 0})`, names: ['doors', 'openings'], on: true });
+  }
+  if ((ext.recoveredWalls || 0) > 0) {
+    items.push({ key: 'WALLSFULL', label: `Recovered walls (${ext.wallRecallPct != null ? ext.wallRecallPct + '%' : 'recall'})`, names: ['recovered-walls'], on: false });
+  }
+  if ((ext.fixtures || 0) > 0) {
+    items.push({ key: 'FIXTURES', label: `Fixtures / cores (${ext.fixtures || 0})`, names: ['fixtures'], on: false });
+  }
+  if (!items.length) return;
+  const host = $('layers');
+  const sep = document.createElement('div');
+  sep.style.cssText = 'margin:6px 0 2px;font-size:10px;color:var(--muted);font-family:var(--mono)';
+  sep.textContent = '— plan extraction (needs-verification) —';
+  host.appendChild(sep);
+  for (const it of items) {
+    const row = document.createElement('div'); row.className = 'layer';
+    const id = 'LW2_' + it.key;
+    row.innerHTML = `<input type="checkbox" id="${id}" ${it.on ? 'checked' : ''}><label for="${id}" style="margin:0;color:var(--text)">${it.label}</label>`;
+    host.appendChild(row);
+    const cb = row.querySelector('input');
+    cb.onchange = (e) => { for (const n of it.names) st.api.setLayerVisible(n, e.target.checked); };
+    // apply the initial state so render matches the checkbox.
+    for (const n of it.names) st.api.setLayerVisible(n, it.on);
+  }
 }
 
 // ── HF-A1-UNDERLAY: floor-plan ground underlay ──
@@ -1589,6 +1634,7 @@ window.__levelPanelToggle = () => {
 // SAME drawing-derived scale + shared origin (computePlanUnderlayTransform) — both move
 // together when the level switcher changes level. Everything is needs-verification.
 const PLAN_BUILD_ARCH = '/plans/cooperative-1881/1881-architecturals.pdf'; // same PLAN_ROOT as plan-manifest.js (Express/vite root = the autosprink app dir)
+const W2_HEATMAP_URL = '/public/halofire-W2/recall-heatmap.png'; // HF-W2: wall-recall heatmap (covered green / missed red), served static
 const PLAN_BUILD_LEVEL_PAGES = { 1: 8, 2: 11, 3: 14, 4: 17, 5: 20, 6: 23, 7: 26, 8: 29 };
 let planBuildState = null; // { project, data, levelPlans, api, center, activeLevel, loadedSheets:Set, failures }
 let planLevelsJsonPromise = null;
@@ -1676,12 +1722,34 @@ function buildPlanBuildPanel() {
   const active = st.api.levels.find((l) => l.level === Number(st.activeLevel));
   const c = active ? active.counts : null;
   const cntLine = c ? `walls ${c.walls} · rooms ${c.rooms} · stairs ${c.stairs}` : 'extracted geometry';
+  // HF-W2: surface extraction completeness — wall recall %, door/fixture counts, + a heatmap link.
+  const ext = st.api.summary && st.api.summary.extractionCompleteness;
+  let w2Block = '';
+  if (ext) {
+    const recall = (ext.wallRecallPct != null) ? `${ext.wallRecallPct}%` : 'n/a';
+    const fxLine = ext.fixtureCounts ? Object.entries(ext.fixtureCounts).map(([k, v]) => `${v} ${k}`).join(' · ') : '';
+    w2Block = `
+      <div class="disc-row" style="font-family:var(--mono);font-size:10px;margin-top:6px;border-top:1px solid var(--line,#283042);padding-top:6px">
+        <div><b style="color:var(--text)">plan extraction</b> — needs-verification</div>
+        <div>wall coverage: <b style="color:${ext.wallRecallPct != null && ext.wallRecallPct >= 90 ? '#4ade80' : '#fbbf24'}">${recall}</b> of sheet wall-ink (L${ext.level})</div>
+        <div>doors ${ext.doors || 0} · openings ${ext.openings || 0} · recovered walls ${ext.recoveredWalls ? ext.recoveredWalls.toLocaleString() : 0}</div>
+        ${ext.fixtures ? `<div>fixtures/cores: ${ext.fixtures}${fxLine ? ' (' + fxLine + ')' : ''}</div>` : ''}
+        <div style="margin-top:4px"><a href="#" id="w2HeatLink" style="color:#7dd3fc;text-decoration:underline">view recall heatmap ▸</a></div>
+        <img id="w2HeatThumb" src="${W2_HEATMAP_URL}" alt="wall recall heatmap (covered green / missed red)"
+             style="display:none;width:100%;margin-top:6px;border:1px solid var(--line,#283042);border-radius:4px"
+             onerror="this.style.display='none';var n=document.getElementById('w2HeatMiss');if(n)n.style.display='block'"/>
+        <div id="w2HeatMiss" style="display:none;color:var(--muted);font-size:10px;margin-top:4px">heatmap image unavailable on this host (out/halofire-W2/recall-heatmap.png)</div>
+      </div>`;
+  }
   lp.innerHTML = `
     <h4>Levels — built from plan</h4>
     <div class="lvl-row">${lvlBtns}</div>
     <div class="disc-row" style="font-family:var(--mono);font-size:10px">${cntLine}</div>
-    <div class="nv-flag">⚠ NEEDS-VERIFICATION — geometry EXTRACTED from the vector PDF (rooms/stairs/walls), true scale DERIVED from each sheet's printed notation; sheet registered under it. NOT AHJ/PE/manufacturer-exact, NOT AutoSprink-parity.</div>`;
+    ${w2Block}
+    <div class="nv-flag">⚠ NEEDS-VERIFICATION — geometry EXTRACTED from the vector PDF (rooms/stairs/walls/doors/fixtures), true scale DERIVED from each sheet's printed notation; sheet registered under it. Wall coverage is recall vs the sheet wall-ink, reported honestly. NOT AHJ/PE/manufacturer-exact, NOT AutoSprink-parity.</div>`;
   lp.querySelectorAll('[data-lvl]').forEach((b) => { b.onclick = () => setActivePlanBuildLevel(b.dataset.lvl); });
+  const heatLink = lp.querySelector('#w2HeatLink');
+  if (heatLink) heatLink.onclick = (e) => { e.preventDefault(); const t = lp.querySelector('#w2HeatThumb'); if (t) t.style.display = t.style.display === 'none' ? 'block' : 'none'; };
   lp.classList.add('open');
 }
 
@@ -1729,6 +1797,34 @@ async function renderPlanComprehensionBuild(name) {
     summary: api.summary, center, activeLevel: 1,
     note: 'building geometry EXTRACTED from vector PDF; sheet registered UNDER it at sheet-derived true scale — needs-verification',
     failures: planBuildState.failures, needsVerification: true,
+  };
+  // HF-W2: headless-verification hook — expose the extracted-building api + the live
+  // viewer essentials so the W2 gate can assert overlay layers + drive selection.
+  window.__hfPlanBuild = () => (planBuildState ? {
+    summary: planBuildState.api.summary,
+    setLayerVisible: planBuildState.api.setLayerVisible,
+    activeLevel: planBuildState.activeLevel,
+  } : null);
+  window.__THREE = THREE; window.__scene = scene; window.__renderer = renderer;
+  try { Object.defineProperty(window, '__camera', { configurable: true, get: () => camera }); } catch (_) { window.__camera = camera; }
+  window.__hfSetSelectMode = (v) => { selectMode = !!v; };
+  // HF-W2: deterministic selection-path probe — runs the SAME describeBuildPart + openInspector
+  // the click path uses, on the Nth door of the active level, so headless verification of the
+  // door inspector doesn't depend on fragile raycast geometry. Returns the inspector state.
+  window.__hfSelectDoor = (n = 0) => {
+    if (!scene) return { err: 'no scene' };
+    let doorsGrp = null;
+    scene.traverse((o) => { if (o.name === 'doors' && o.parent && o.parent.visible && !doorsGrp) doorsGrp = o; });
+    if (!doorsGrp || !doorsGrp.children.length) return { err: 'no visible doors group' };
+    const door = doorsGrp.children[Math.min(n, doorsGrp.children.length - 1)];
+    let mesh = door; if (!door.isMesh) door.traverse((o) => { if (!mesh.isMesh && o.isMesh) mesh = o; });
+    const info = describeBuildPart({ build: door.userData, obj: mesh, group: door });
+    applyHighlight({ build: door.userData, obj: mesh, group: door });
+    openInspector(info.title, info.rows, info.verify);
+    curSel = { center: info.center.clone(), sizeFt: info.sizeFt, title: info.title, axis: null };
+    selectedCount += 1; window.__lastSelection = { title: info.title, center: [info.center.x, info.center.y, info.center.z], n: selectedCount };
+    const insp = $('inspector'), it = $('inspTitle'), ib = $('inspBody');
+    return { open: insp && insp.classList.contains('open'), title: it ? it.textContent : '', bodyText: ib ? ib.textContent : '', userData: door.userData };
   };
   $('status').textContent = `built ${api.summary.levelCount} levels from the extracted plan (floor 1: parking plate + stair cores + rooms) — needs-verification`;
   return true;
@@ -1986,8 +2082,84 @@ function openInspector(title, rows, verifyNote) {
   const rp = document.querySelector('aside.right'); if (rp) rp.scrollTop = 0;
 }
 
+// HF-W2: raycast the extracted-building overlay (planGroup) for a selectable part.
+// Building meshes are placed directly in WORLD coords (planX-cx, elev, planY-cy) — no W()
+// remap — so their world bounding-box center is used as-is. Walks up to the nearest object
+// carrying a plan-* userData.kind (door group, recovered-wall layer, fixture, opening, shell
+// wall, room tile, stair core). Returns a {build, obj, point} found-record or null.
+function pickBuildPart() {
+  if (!planGroup || !planGroup.visible) return null;
+  const hits = raycaster.intersectObjects(planGroup.children, true);
+  const KINDS = new Set(['plan-door', 'plan-opening', 'plan-fixture', 'plan-wallsfull', 'plan-wall', 'plan-room', 'stair-core']);
+  for (const h of hits) {
+    let p = h.object;
+    while (p && p !== planGroup && !(p.userData && KINDS.has(p.userData.kind))) p = p.parent;
+    if (p && p.userData && KINDS.has(p.userData.kind)) {
+      // For highlight, prefer a concrete mesh (door groups parent a leaf mesh + arc line).
+      let mesh = p;
+      if (!p.isMesh) { p.traverse((o) => { if (!mesh.isMesh && o.isMesh) mesh = o; }); }
+      return { build: p.userData, obj: mesh, group: p, point: h.point };
+    }
+  }
+  return null;
+}
+
+// HF-W2: inspector rows + world center for an extracted-building part. All fields are
+// EXTRACTED + needs-verification (never AHJ/PE/mfr/AutoSprink parity).
+function describeBuildPart(found) {
+  const u = found.build || {};
+  // World center from the picked object's bounding box (already in world coords).
+  let center = found.point ? found.point.clone() : new THREE.Vector3();
+  let sizeFt = 2;
+  try {
+    const box = new THREE.Box3().setFromObject(found.group || found.obj);
+    if (!box.isEmpty()) { center = box.getCenter(new THREE.Vector3()); const s = box.getSize(new THREE.Vector3()); sizeFt = Math.max(2, s.x, s.z); }
+  } catch (_) { /* fall back to hit point */ }
+  const nv = 'EXTRACTED from the vector PDF (geometric best-effort) — NOT an AHJ/PE/manufacturer/AutoSprink-verified schedule';
+  if (u.kind === 'plan-door') {
+    return { title: 'Door (extracted)', center, sizeFt, verify: 'swing-arc geometric door — width/swing inferred from a circle-fit leaf arc; ' + nv, rows: [
+      ['Type', 'Door — leaf + swing arc'], ['Width', u.widthFt != null ? u.widthFt + ' ft' : '—'],
+      ['Swing', u.swingAngleDeg != null ? Math.round(u.swingAngleDeg) + '°' : '—'],
+      ['Host wall', u.onWall ? ('#' + (u.hostWall != null ? u.hostWall : '?') + ' (on-wall)') : 'off-wall'],
+      ['Evidence', u.evidence || 'swing-arc(circle-fit)'], ['Confidence', u.confidence || 'medium'],
+    ] };
+  }
+  if (u.kind === 'plan-opening') {
+    return { title: 'Cased opening (extracted)', center, sizeFt, verify: 'collinear wall-gap with no door arc — inferred passage; ' + nv, rows: [
+      ['Type', 'Opening / passage (no leaf)'], ['Width', u.widthFt != null ? u.widthFt + ' ft' : '—'],
+      ['Evidence', u.evidence || 'collinear-wall-gap'], ['Confidence', u.confidence || 'low'],
+    ] };
+  }
+  if (u.kind === 'plan-fixture') {
+    return { title: `Fixture / core: ${u.fixtureKind || 'fixture'}`, center, sizeFt, verify: 'fixture/core located from room kind + labels; ' + nv, rows: [
+      ['Kind', u.fixtureKind || '—'], ['Label', u.label || '—'], ['Source', u.source || '—'], ['Confidence', u.confidence || 'low'],
+    ] };
+  }
+  if (u.kind === 'plan-wallsfull') {
+    const ext = planBuildState && planBuildState.api && planBuildState.api.summary && planBuildState.api.summary.extractionCompleteness;
+    return { title: 'Recovered walls (recall layer)', center, sizeFt, verify: 'partition-inclusive recovered wall set (additive recall layer); ' + nv, rows: [
+      ['Layer', 'Recovered partition-inclusive walls'], ['Segments', u.segCount != null ? u.segCount.toLocaleString() : '—'],
+      ['Wall recall', ext && ext.wallRecallPct != null ? ext.wallRecallPct + '% of sheet wall-ink' : '—'],
+      ['Note', 'additive — footprint/network still use the proven single-band shell'],
+    ] };
+  }
+  if (u.kind === 'plan-wall') {
+    return { title: 'Building shell wall (extracted)', center, sizeFt, verify: nv, rows: [['Type', 'Perimeter / structural wall (single-band)'], ['Provenance', 'vector lineweight extraction']] };
+  }
+  if (u.kind === 'plan-room') {
+    return { title: `Space: ${u.spaceKind || 'room'}`, center, sizeFt, verify: nv, rows: [
+      ['Kind', u.spaceKind || '—'], ['Label', u.label || '—'], ['Area', u.areaSqft != null ? Math.round(u.areaSqft) + ' sq ft' : '—'], ['Confidence', u.confidence || '—'],
+    ] };
+  }
+  if (u.kind === 'stair-core') {
+    return { title: 'Stair core (extracted)', center, sizeFt, verify: nv, rows: [['Type', 'Stair core shaft'], ['Evidence', u.evidence || '—'], ['Confidence', u.confidence || '—']] };
+  }
+  return { title: 'Extracted building part', center, sizeFt, verify: nv, rows: [['Kind', u.kind || '—']] };
+}
+
 // Build {title, rows, center(world THREE.Vector3), sizeFt, verify} for any hit part.
 function describeHit(found) {
+  if (found.build) return describeBuildPart(found); // HF-W2: extracted-building parts
   const toWorld = (p) => { const ww = W(p); return new THREE.Vector3(ww[0], ww[1], ww[2]); };
   if (found.inst) {
     const meta = found.inst, i = found.idx, s = (meta.solids || [])[i] || {};
@@ -2054,20 +2226,26 @@ function describeHit(found) {
 // recentering here is what broke re-selection: every other part shifted on
 // screen mid-click). frameAfter=true (double-click path) also frames the part.
 function handleCanvasClick(e, frameAfter) {
-  if (!selectMode || !modelGroup || !camera) return;
+  if (!selectMode || !camera) return;
   const r = renderer.domElement.getBoundingClientRect();
   const ndc = new THREE.Vector2(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
   raycaster.setFromCamera(ndc, camera);
-  const hits = raycaster.intersectObjects(modelGroup.children, true);
   let found = null;
-  for (const h of hits) {
-    if (h.object.userData && h.object.userData.hfInstanced && h.instanceId !== undefined && h.instanceId !== null) {
-      found = { inst: h.object.userData.hfInstanced, idx: h.instanceId, point: h.point, obj: h.object }; break;
+  if (modelGroup) {
+    const hits = raycaster.intersectObjects(modelGroup.children, true);
+    for (const h of hits) {
+      if (h.object.userData && h.object.userData.hfInstanced && h.instanceId !== undefined && h.instanceId !== null) {
+        found = { inst: h.object.userData.hfInstanced, idx: h.instanceId, point: h.point, obj: h.object }; break;
+      }
+      let p = h.object;
+      while (p && p !== modelGroup && !(p.userData && p.userData.hfPart)) p = p.parent;
+      if (p && p.userData && p.userData.hfPart) { found = { part: p.userData.hfPart, point: h.point, obj: p }; break; }
     }
-    let p = h.object;
-    while (p && p !== modelGroup && !(p.userData && p.userData.hfPart)) p = p.parent;
-    if (p && p.userData && p.userData.hfPart) { found = { part: p.userData.hfPart, point: h.point, obj: p }; break; }
   }
+  // HF-W2: if no sprinkler-network part was hit, try the extracted BUILDING parts
+  // (doors, recovered walls, fixtures, openings, shell walls, rooms, stair cores)
+  // living in planGroup — so the plan-comprehension geometry is selectable/inspectable too.
+  if (!found) found = pickBuildPart();
   if (!found) { clearSelection(true); return; } // empty click deselects + restores orbit target
   // HF-D1-INSPDOCK (contract 3b): double-click the SAME part again while in
   // x-ray inspect = deselect-all (restores opacities, highlight, prior pivot).

@@ -502,8 +502,11 @@ export function buildLevelPlan(input, opts = {}) {
     throw new Error('buildLevelPlan: scaleFtPerUnit must be derived from the drawing (never hardcoded/guessed)');
   }
   // 1) WALL LAYER: select the heavier-than-baseline lineweight band (the cut walls), which
-  //    drops the hairline fill + thin grid/dimension annotation.
-  const wl = selectWallLayer(segments, opts.layerOpts || {});
+  //    drops the hairline fill + thin grid/dimension annotation. The footprint + room segmentation
+  //    MUST use the SINGLE dominant cut-wall band (the verified W0 footprint/netalign depends on it),
+  //    so partitionInclusive is explicitly stripped here — it only governs the additive wallsFull set.
+  const { partitionInclusive: _pi, ...singleBandLayerOpts } = (opts.layerOpts || {});
+  const wl = selectWallLayer(segments, singleBandLayerOpts);
   const wallSegs = wl.wallSegments.length >= 3 ? wl.wallSegments : segments;
 
   // 2) FOOTPRINT: enclosed rectilinear outline of the dominant connected wall network.
@@ -611,6 +614,44 @@ export function buildLevelPlan(input, opts = {}) {
   // Walls emitted as {a,b,thickness?} pairs (the wall-layer segments).
   const walls = wallSegs.map((s) => ({ a: [round(s.x1), round(s.y1)], b: [round(s.x2), round(s.y2)] }));
 
+  // RECALL-COMPLETE wall set (W2): the proven single-band `walls` above is the dominant cut-wall
+  // lineweight — it keeps footprint/room segmentation stable (it is what the verified W0 footprint
+  // and netalign depend on) but UNDER-captures interior partition + core walls (~71% wall recall
+  // vs the rasterized sheet ink). `wallsFull` adds the FULL heavier-than-baseline lineweight spread
+  // (partition-inclusive) so partition + core walls are present too (>=90% recall). It is CLIPPED
+  // to the single-band wall envelope (expanded by clipPadFt) so off-building grid/section/dimension
+  // ink at wall lineweights does NOT inflate the footprint — `wallsFull` is for RENDERING + recall,
+  // never the footprint. Additive: emitted only when opts.layerOpts.partitionInclusive is set.
+  let wallsFull = null;
+  let wallsFullMeta = null;
+  if (opts.layerOpts && opts.layerOpts.partitionInclusive) {
+    const wlFull = selectWallLayer(segments, { ...opts.layerOpts, partitionInclusive: true });
+    // clip envelope = single-band wall bbox padded.
+    let bMinX = Infinity, bMinY = Infinity, bMaxX = -Infinity, bMaxY = -Infinity;
+    for (const s of wallSegs) {
+      bMinX = Math.min(bMinX, s.x1, s.x2); bMinY = Math.min(bMinY, s.y1, s.y2);
+      bMaxX = Math.max(bMaxX, s.x1, s.x2); bMaxY = Math.max(bMaxY, s.y1, s.y2);
+    }
+    const pad = Number.isFinite(opts.layerOpts.clipPadFt) ? opts.layerOpts.clipPadFt : 3;
+    const inClip = (s) => {
+      const mx = (s.x1 + s.x2) / 2, my = (s.y1 + s.y2) / 2;
+      return mx >= bMinX - pad && mx <= bMaxX + pad && my >= bMinY - pad && my <= bMaxY + pad;
+    };
+    const kept = wlFull.wallSegments.filter(inClip);
+    wallsFull = kept.map((s) => ({ a: [round(s.x1), round(s.y1)], b: [round(s.x2), round(s.y2)] }));
+    wallsFullMeta = {
+      method: wlFull.method,
+      includedLineWidths: wlFull.includedLineWidths || null,
+      baselineLineWidth: wlFull.baselineLineWidth ?? null,
+      countBeforeClip: wlFull.wallSegments.length,
+      countAfterClip: kept.length,
+      clipEnvelopeFt: { minX: round(bMinX - pad), minY: round(bMinY - pad), maxX: round(bMaxX + pad), maxY: round(bMaxY + pad) },
+      note: 'Partition-inclusive wall set (all heavier-than-baseline lineweight bands) clipped to the ' +
+        'single-band wall envelope (+pad). For rendering + recall ONLY; the footprint uses the ' +
+        'single-band `walls`. needs-verification.',
+    };
+  }
+
   // Wall-segment ENVELOPE bbox (ALL wall-layer segments, not just the traced connected loop).
   // This is the honest footprint envelope when buildingOutlinePolygon's enclosed trace collapses
   // — e.g. a wing whose match-line edge is OPEN, so the outline trace only captures a sub-network
@@ -650,6 +691,7 @@ export function buildLevelPlan(input, opts = {}) {
     },
     wallBboxFt,
     walls,
+    ...(wallsFull ? { wallsFull, wallsFullMeta } : {}),
     rooms: roomRes.rooms.map((r) => ({
       poly: r.poly, label: r.label, kind: r.kind, areaSqft: r.areaSqft, confidence: r.confidence,
       ...(r.kindSource ? { kindSource: r.kindSource } : {}),
@@ -974,6 +1016,14 @@ export function mergeWingPlans(wingA, wingB, reg, meta = {}) {
   const wallsB = (wingB.walls || []).map((w) => ({ a: shiftPt(w.a), b: shiftPt(w.b) }));
   const walls = wallsA.concat(wallsB);
 
+  // wallsFull (recall-complete partition-inclusive set): A as-is; B translated. Additive.
+  let wallsFull = null;
+  if (wingA.wallsFull || wingB.wallsFull) {
+    const fa = (wingA.wallsFull || []).map((w) => ({ a: w.a, b: w.b }));
+    const fb = (wingB.wallsFull || []).map((w) => ({ a: shiftPt(w.a), b: shiftPt(w.b) }));
+    wallsFull = fa.concat(fb);
+  }
+
   // Rooms: A as-is; B translated (poly + any bbox).
   const roomsA = (wingA.rooms || []).map((r) => ({ ...r }));
   const roomsB = (wingB.rooms || []).map((r) => ({ ...r, poly: shiftPoly(r.poly) }));
@@ -1044,6 +1094,7 @@ export function mergeWingPlans(wingA, wingB, reg, meta = {}) {
     footprintAreaReliable: false, // a union of two wing envelopes — bbox only, not an enclosed trace
     footprintBboxFt: { widthFt, heightFt, minX: round(uMinX), minY: round(uMinY), maxX: round(uMaxX), maxY: round(uMaxY) },
     walls,
+    ...(wallsFull ? { wallsFull, wallsFullMeta: { merged: true, count: wallsFull.length, note: 'Partition-inclusive recall-complete wall set, both wings merged (wing B translated). Rendering + recall only; footprint uses single-band walls. needs-verification.' } } : {}),
     rooms,
     stairs,
     grid: { xs: xsMerged, ys: ysMerged, labels: { cols: colLabels, rows: rowLabels } },

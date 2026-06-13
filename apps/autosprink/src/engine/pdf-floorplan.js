@@ -1569,6 +1569,32 @@ export function selectWallLayer(segments, opts = {}) {
   }
   if (!best) best = candidates[0];
 
+  // --- (3) PARTITION-INCLUSIVE wall layer (opt-in, for RECALL) ----------------
+  // The single best heavier-than-baseline band is the dominant CUT-WALL lineweight, but a real
+  // floor's INTERIOR PARTITION walls and heavy CORE walls are drawn at OTHER heavier-than-baseline
+  // lineweights (on A-101: partitions at 0.255pt, primary walls at 0.51pt, cores at 0.992pt). The
+  // single-band selection drops the partitions+cores, costing wall RECALL (~71% measured vs the
+  // sheet's wall-ink). When opts.partitionInclusive is set, return the UNION of ALL strictly-
+  // heavier-than-baseline groups (the full structural lineweight spread) so partition + core walls
+  // are captured too. The hairline baseline mass (lw=0 hatch/fill) is still excluded. The primary
+  // band is still reported as `chosen`. Deterministic; raises recall to >=90% on A-101.
+  if (opts.partitionInclusive && heavyGroups.length > 0) {
+    const merged = [];
+    for (const g of heavyGroups) for (const m of g.members) merged.push(m);
+    return {
+      wallSegments: merged,
+      chosen: { lineWidth: best.lineWidth, strokeColor: best.strokeColor },
+      groups: histogram,
+      method: 'partition-inclusive-all-heavier-than-baseline',
+      baselineLineWidth,
+      includedLineWidths: heavyGroups.map((g) => g.lineWidth).sort((a, b) => a - b),
+      note: WALL_LAYER_NOTE +
+        ' PARTITION-INCLUSIVE: union of ALL lineweight bands strictly heavier than the hairline ' +
+        'baseline (captures interior partitions + core walls, not just the dominant cut-wall band) ' +
+        'to raise wall recall; baseline hatch/fill still excluded. needs-verification.',
+    };
+  }
+
   return finalize(best, method);
 }
 
