@@ -205,3 +205,71 @@ the live file and in the repo copy.
       (fixture-derived); confirm heuristic elec/plumb sheet mappings.
 - [ ] Deploy W16B server change to live (claim-gate-flag.js + server.js +
       restart, .bak + curl-verify protocol).
+
+## Plan-comprehension 2026-06-12
+
+Replaced the flat PDF-on-a-margin-box with REAL plan comprehension for
+the Cooperative 1881 set: read the printed scale off the drawing, extract
+vector geometry per page, comprehend spaces, build per-level 3D, and the
+A-101 sheet now registers UNDER the extracted geometry at the SAME
+drawing-derived true scale. Verified by OVERLAY, not markers.
+
+### DONE
+- **Scale from the drawing (never hardcoded).** A-101 ("OVERALL FIRST
+  FLOOR PLAN", page 8) prints `SCALE: 3/32" = 1'-0"`; extractor reads it
+  via pdfjs `getTextContent` →
+  `scaleFtPerUnit = 0.1481`, `scaleSource: sheet-printed-scale-notation`.
+- **Vector extraction engine** — `apps/autosprink/src/engine/plan-extract.js`
+  (pdfjs `getOperatorList` paths/lineweights + `getTextContent` labels/grid).
+  Floor 1: 238,563 path segments → 6,858 wall segments on the chosen
+  wall layer (`heavier-lineweight-coherent-extent`, lw 0.09), 155 rooms,
+  3 geometric stair cores, grid 37 cols × 6 rows (bubbles 1-5 / A-D).
+- **Building-from-plan + underlay registration** —
+  `apps/autosprink/src/engine/building-from-plan.js`:
+  `computePlanUnderlayTransform(...)` places the PDF sheet under the
+  extracted geometry at the same true scale + shared origin (no re-fit).
+- **Per-level data** — `apps/autosprink/src/data/plan-levels.cooperative-1881.json`
+  (8 levels A-101..A-108; floor 1 fully extracted; floor-to-floor 10.5 ft
+  ESTIMATED + flagged; structural sheet refs carried per level).
+- **OVERLAY verification (not markers)** —
+  `out/halofire-plan/overlay-floor1-r2.png`: extracted walls (red) + strokes
+  (magenta) over the grey A-101 sheet, identical feet→pt→px mapping the
+  extractor used (no fudge); alignment_error ~0.27 ft. Two long narrow
+  wings, stair cores, repetitive bays, grid bubbles all register.
+- **Floor 1 = parking, not a box.** roomKinds = parking 53, unknown 100,
+  stair 2. A-101 has no room tags, so room *kind* is `unknown` for the
+  interior bays — flagged, not invented.
+- **Tests green:** `vitest run tests/plan-extract.test.js tests/plan-underlay.test.js`
+  → 42 passed (28 + 14). Live Studio unbroken (curl 200 on `/` and
+  `/autosprink.html`); both hotfix markers preserved in autosprink.html.
+
+### HONESTY FLAGS (carried in the JSON, never claimed away)
+- `footprintAreaReliable: false` — enclosed-trace area 1,037 sqft is
+  unreliable (open-ended parking wings leak the exterior flood-fill); the
+  trustworthy figure is the **bbox 20,597 sqft / 267.2 × 77.1 ft**. Both
+  reported.
+- Room *kinds* for interior bays are `unknown` (no A-101 room tags).
+- `estimatedFloorToFloorFt: 10.5` is ESTIMATED — needs A-301..A-307 + S
+  building sections to confirm.
+- `samUsed: false` (`samReason: not-attempted`) — vector-only this pass;
+  SAM3 enhancement deferred to the loop below.
+- No AHJ / PE / manufacturer-exact / AutoSprink-parity claim anywhere.
+
+### Codex / GX10-loop checklist (deep remainder)
+- [ ] **Levels 2-8 residential extraction** — run the same extractor over
+      A-102..A-108 (pages 11,14,17,20,23,26,29); these are residential, so
+      expect real room tags → set room *kind* instead of `unknown`.
+- [ ] **Multi-discipline fusion:**
+      - [ ] Structural beams/joists from S-110/S-120..S-190 → so hangers
+            attach to real steel, not air.
+      - [ ] MEP obstruction volumes from mechanical/electrical/plumbing
+            PDFs (mech sheet mapping is heuristic — verify page labels first).
+      - [ ] RCP-driven ceilings from A-151..A-158 (pages 33..54 stride 3).
+- [ ] **Routing on the extracted plate** — sprinkler routing/hangers off
+      the real wall network + grid, not the old box.
+- [ ] **SAM3 raster enhancement** — segment spaces where vector is
+      ambiguous (GX10 :9003); fall back to vector-only if down.
+- [ ] **Accuracy iteration** — tighten wall-layer pick + footprint trace so
+      enclosed-area becomes reliable; re-overlay each level and gate on
+      visual match before shipping (a level ships only when its geometry
+      matches the sheet).

@@ -327,6 +327,10 @@ import { homeDepotRexburgFloorPlan, cooperative1881FloorPlan, COOPERATIVE_1881_P
 // HF-B1-PDFUNDERLAY (Stream B): REAL plan-sheet PDF underlays + multi-level scaffold.
 import { loadPdfjs, renderSheetToCanvas, computeUnderlayTransform, createUnderlayMesh } from '/src/engine/pdf-underlay.js';
 import { buildBuildingLevels } from '/src/engine/building-levels.js';
+// HF-E1-PLANBUILD (Stream D/E): build REAL per-level 3D from the extracted plan
+// (building-from-plan.js), with the sheet registered UNDER it at the drawing-derived
+// true scale. Replaces the margin-box for Cooperative 1881.
+import { buildBuildingFromPlans, computePlanUnderlayTransform, unionFootprintCenter, planBounds } from '/src/engine/building-from-plan.js';
 import { manifestForProject, sheetsForLevel } from '/src/data/plan-manifest.js';
 // HF-C1-PARTMESH (Stream C): true-scale real CAD part meshes (mm->ft, Y-up)
 // with Inspector provenance; primitives stay as flagged fallback.
@@ -1520,15 +1524,175 @@ function buildLevelPanel() {
 
 window.__levelPanelToggle = () => {
   const lp = $('levelPanel');
-  if (lp && levelState) { lp.classList.toggle('open'); return true; }
+  if (lp && (levelState || planBuildState)) { lp.classList.toggle('open'); return true; } // HF-E1-PLANBUILD
   $('status').textContent = 'no real plan sheets for this project — levels panel unavailable (needs-verification)';
   return false;
 };
+
+// ── HF-E1-PLANBUILD (Stream D/E): REAL per-level 3D built FROM the extracted plan ──
+// For Cooperative 1881 the margin-box scaffold is REPLACED by geometry extracted from
+// the vector PDFs (building-from-plan.js, true scale derived from each sheet). The actual
+// A-101..A-108 sheet stays as an aligned underlay UNDER the geometry, registered at the
+// SAME drawing-derived scale + shared origin (computePlanUnderlayTransform) — both move
+// together when the level switcher changes level. Everything is needs-verification.
+const PLAN_BUILD_ARCH = '/plans/cooperative-1881/1881-architecturals.pdf'; // same PLAN_ROOT as plan-manifest.js (Express/vite root = the autosprink app dir)
+const PLAN_BUILD_LEVEL_PAGES = { 1: 8, 2: 11, 3: 14, 4: 17, 5: 20, 6: 23, 7: 26, 8: 29 };
+let planBuildState = null; // { project, data, levelPlans, api, center, activeLevel, loadedSheets:Set, failures }
+let planLevelsJsonPromise = null;
+
+function getPlanLevelsJson() {
+  if (!planLevelsJsonPromise) {
+    planLevelsJsonPromise = fetch('/src/data/plan-levels.cooperative-1881.json')
+      .then((r) => { if (!r.ok) throw new Error('plan-levels json HTTP ' + r.status); return r.json(); })
+      .catch((e) => { planLevelsJsonPromise = null; throw e; });
+  }
+  return planLevelsJsonPromise;
+}
+
+function destroyPlanBuild() {
+  if (planBuildState && planBuildState.api && planGroup) {
+    planGroup.remove(planBuildState.api.root);
+    try {
+      planBuildState.api.root.traverse((o) => {
+        if (o.material) { if (o.material.map) o.material.map.dispose(); o.material.dispose(); }
+        if (o.geometry) o.geometry.dispose();
+      });
+    } catch (_) { /* dispose best-effort */ }
+  }
+  planBuildState = null;
+}
+
+// Lazily render + register the ACTIVE level's REAL sheet UNDER the extracted geometry,
+// at the drawing-derived true scale + the shared geometry origin (no contain-fit, no re-fit).
+async function ensurePlanBuildSheet(levelN) {
+  const st = planBuildState;
+  if (!st || levelN === 'all') return;
+  const page = PLAN_BUILD_LEVEL_PAGES[Number(levelN)];
+  const entry = st.api.levels.find((l) => l.level === Number(levelN));
+  if (!page || !entry) return;
+  const key = `arch:p${page}`;
+  if (st.loadedSheets.has(key)) return;
+  st.loadedSheets.add(key);
+  let lib;
+  try { lib = await getPdfjs(); }
+  catch (e) { st.failures.push({ stage: 'pdfjs', error: String(e.message || e) }); st.loadedSheets.delete(key); return; }
+  // The level's own derived scale (from its sheet) — never a hardcoded fallback.
+  const lvlSrc = (st.data.levels || []).find((l) => l.level === Number(levelN));
+  const s = lvlSrc && lvlSrc.plan && Number(lvlSrc.plan.scaleFtPerUnit);
+  if (!(s > 0)) { st.failures.push({ level: levelN, error: 'no derived scaleFtPerUnit for level — sheet not registered (no fabricated scale)' }); return; }
+  $('status').textContent = `rendering REAL sheet A-10${levelN} p${page} as aligned underlay…`;
+  try {
+    const rendered = await renderSheetToCanvas(lib, { url: PLAN_BUILD_ARCH, page, targetPx: LEVEL_TARGET_PX });
+    const t = computePlanUnderlayTransform({
+      pageWidthPt: rendered.widthPt, pageHeightPt: rendered.heightPt,
+      scaleFtPerUnit: s, unionCenterXFt: st.center.cx, unionCenterYFt: st.center.cy,
+      elevationFt: entry.elevationFt, liftFt: 0.04,
+    });
+    const mesh = createUnderlayMesh(THREE, {
+      canvas: rendered.canvas,
+      transform: { widthFt: t.widthFt, depthFt: t.depthFt, position: t.position, rotation: t.rotation, scaleSource: t.scaleSource, needsVerification: true },
+      opacity: 0.92, name: `plan-underlay:A-10${levelN}:p${page}`,
+      sheetMeta: { sheet: `A-10${levelN}`, page, discipline: 'arch', verified: 'registered-true-scale' },
+    });
+    entry.group.add(mesh);
+    $('status').textContent = `REAL A-10${levelN} sheet registered under extracted geometry (true scale ${lvlSrc.plan.scaleText}; needs-verification)`;
+  } catch (e) {
+    st.loadedSheets.delete(key);
+    st.failures.push({ level: levelN, page, error: String(e.message || e) });
+    $('status').textContent = `sheet A-10${levelN} p${page} render failed (${e.message}) — geometry still shown, underlay flagged`;
+  }
+}
+
+async function setActivePlanBuildLevel(v) {
+  const st = planBuildState;
+  if (!st) return;
+  st.activeLevel = v === 'all' ? 'all' : Number(v);
+  st.api.setActiveLevel(st.activeLevel);
+  buildPlanBuildPanel();
+  if (st.activeLevel !== 'all') await ensurePlanBuildSheet(st.activeLevel);
+  else $('status').textContent = 'showing all extracted levels — pick a level to register its sheet underlay';
+}
+
+function buildPlanBuildPanel() {
+  const lp = $('levelPanel');
+  const st = planBuildState;
+  if (!lp || !st) return;
+  const lvls = st.api.levels.map((l) => l.level);
+  const lvlBtns = ['all', ...lvls]
+    .map((v) => `<button data-lvl="${v}" class="${String(st.activeLevel) === String(v) ? 'on' : ''}">${v === 'all' ? 'All' : 'L' + v}</button>`).join('');
+  const active = st.api.levels.find((l) => l.level === Number(st.activeLevel));
+  const c = active ? active.counts : null;
+  const cntLine = c ? `walls ${c.walls} · rooms ${c.rooms} · stairs ${c.stairs}` : 'extracted geometry';
+  lp.innerHTML = `
+    <h4>Levels — built from plan</h4>
+    <div class="lvl-row">${lvlBtns}</div>
+    <div class="disc-row" style="font-family:var(--mono);font-size:10px">${cntLine}</div>
+    <div class="nv-flag">⚠ NEEDS-VERIFICATION — geometry EXTRACTED from the vector PDF (rooms/stairs/walls), true scale DERIVED from each sheet's printed notation; sheet registered under it. NOT AHJ/PE/manufacturer-exact, NOT AutoSprink-parity.</div>`;
+  lp.querySelectorAll('[data-lvl]').forEach((b) => { b.onclick = () => setActivePlanBuildLevel(b.dataset.lvl); });
+  lp.classList.add('open');
+}
+
+// Build the extracted-geometry building for Cooperative 1881. Returns true on success;
+// false (caller falls back to the manifest scaffold) only if the plan JSON is unusable.
+async function renderPlanComprehensionBuild(name) {
+  let data;
+  try { data = await getPlanLevelsJson(); }
+  catch (e) { window.__planBuildError = String(e.message || e); return false; }
+  const levels = (data && Array.isArray(data.levels)) ? data.levels : [];
+  const levelPlans = levels
+    .filter((l) => l && l.plan && Array.isArray(l.plan.footprintFt) && l.plan.footprintFt.length >= 3)
+    .map((l) => ({ level: l.level, name: l.name, elevationFt: l.elevationFt, elevationSource: l.elevationSource, plan: l.plan }));
+  if (!levelPlans.length) { window.__planBuildError = 'no level in plan-levels json has a usable footprint'; return false; }
+
+  destroyLevelScaffold();   // remove the margin-box scaffold if it was up
+  destroyPlanBuild();
+  renderPlanUnderlay(null);  // clear the drawn fixture — real geometry + real sheet replace it
+
+  let api;
+  try {
+    api = buildBuildingFromPlans(THREE, levelPlans, {
+      mergeGeometries,            // HF-G1-COUPLE merger — collapse thousands of walls to 1 mesh/level
+      wallMergeThreshold: 600,
+      wallHeightFt: 9, wallThicknessFt: 0.5, slabThicknessFt: 0.75,
+    });
+  } catch (e) { window.__planBuildError = 'buildBuildingFromPlans: ' + String(e.message || e); return false; }
+
+  const center = unionFootprintCenter(levelPlans) || { cx: 0, cy: 0 };
+  planGroup.add(api.root);
+  planGroup.visible = planVisible;
+  planBuildState = { project: name, data, levelPlans, api, center, activeLevel: 1, loadedSheets: new Set(), failures: [] };
+
+  // Frame on the built geometry's bbox (world coords = plan - center), so Fit + plan view work.
+  const b = api.bounds;
+  lastPlanBbox = { minX: b.minX - center.cx, maxX: b.maxX - center.cx, minY: b.minY - center.cy, maxY: b.maxY - center.cy };
+  try { frameCamera(lastPlanBbox.minX, lastPlanBbox.maxX, lastPlanBbox.minY, lastPlanBbox.maxY, 80); } catch (_) {}
+
+  api.setActiveLevel(1);
+  buildPlanBuildPanel();
+  await ensurePlanBuildSheet(1);
+
+  window.__underlayMode = {
+    mode: 'plan-comprehension-build', project: name,
+    summary: api.summary, center, activeLevel: 1,
+    note: 'building geometry EXTRACTED from vector PDF; sheet registered UNDER it at sheet-derived true scale — needs-verification',
+    failures: planBuildState.failures, needsVerification: true,
+  };
+  $('status').textContent = `built ${api.summary.levelCount} levels from the extracted plan (floor 1: parking plate + stair cores + rooms) — needs-verification`;
+  return true;
+}
 
 // Underlay router: REAL plan manifest -> pdf underlays + level scaffold;
 // no manifest -> the old drawn fixture, explicitly FLAGGED as fallback.
 async function renderRealOrFixtureUnderlay(floorPlan) {
   const name = currentProjectName();
+  // HF-E1-PLANBUILD: Cooperative 1881 builds REAL geometry from the extracted plan.
+  if (name === COOPERATIVE_1881_PROJECT_NAME) {
+    if (planBuildState && planBuildState.project === name) { await ensurePlanBuildSheet(planBuildState.activeLevel); return; }
+    const ok = await renderPlanComprehensionBuild(name);
+    if (ok) return;
+    // else: fall through to the manifest scaffold (flagged) — never leave a blank viewport.
+  }
+  destroyPlanBuild(); // HF-E1-PLANBUILD: switching away from Cooperative removes the extracted geometry
   const manifest = manifestForProject(name);
   if (!manifest) {
     destroyLevelScaffold();
@@ -2133,6 +2297,13 @@ async function applyGenerated(data) {
   await preloadDetailMeshes(); // HF-C1-PARTMESH: real coupling/hanger/tee/elbow meshes for the detail pass
   renderModel(cadModel);
   await renderRealOrFixtureUnderlay(floorPlan); // HF-B1-PDFUNDERLAY: REAL sheets when the project has them
+  // HF-E1-PLANBUILD INTEGRATION POINT (DEFERRED — next wave): for Cooperative 1881 the
+  // sprinkler Generate still lays heads against the SERVER cadModel (POST /sprinkler-bid),
+  // NOT the client-EXTRACTED parking plate from plan-levels.cooperative-1881.json. To run
+  // Generate against the real footprint, the server /sprinkler-bid handler must consume the
+  // extracted footprintFt + rooms (heads/branch lines clipped to the real plate, stair cores
+  // excluded) — a server-side change. Until then the extracted geometry is the comprehension
+  // view (planBuildState) and the box model is the sprinkler-bid view; flagged needs-verification.
     const r = bid.rooms[0];
     $('layout').innerHTML = `
       <div class="kv"><span>Total area</span><b>${bid.totalAreaSqFt.toLocaleString()} sqft</b></div>
