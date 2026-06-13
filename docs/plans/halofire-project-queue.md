@@ -24,7 +24,7 @@ loops (OpenClaw email→auto-bid→approval; NFPA-25 recall; GX10 qwen module lo
       to the extracted plate (361.6x81.9 ft, true scale); part sizing/centering correct;
       two-view both-wings merge (37/37 tests); FULL gate green BOTH projects (HD bbox
       300x405 exact, 1230 drops 0.0000 ft deviation; Coop bbox ±0.03%, true pipe ODs).
-- [x] **W1 Drawing/edit tools** (DONE 2026-06-13, commit cf5fca1): ported apps/cad edit
+- [x] **W1 Drawing/edit tools** (DONE 2026-06-13, commit c33c25a): ported apps/cad edit
       engine into autosprink.html as pure ES modules src/engine/edit-commands.js (snapshot
       undo/redo command stack + move/copy/delete/rotate/mirror) + src/engine/snaps.js
       (endpoint/midpoint/intersection/perpendicular/grid), wired into the live viewer.
