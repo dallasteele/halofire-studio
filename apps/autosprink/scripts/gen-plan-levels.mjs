@@ -12,7 +12,12 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
-import { extractLevelPlanFromPdf } from '../src/engine/plan-extract.js';
+import { extractLevelPlanFromPdf, extractStackedFloorPlanFromPdf } from '../src/engine/plan-extract.js';
+
+// Sheets known to carry TWO STACKED plan views (a building broken at a match line into an upper +
+// lower view on one sheet). A-101 (page 8) is the canonical case. For these, extract BOTH wings
+// and MERGE; for the rest, the single-region extractor is correct. (A-102..A-108 are single-view.)
+const STACKED_PAGES = new Set([8]); // A-101 first floor — both wings stacked on the sheet.
 
 const ARCH = path.resolve(process.cwd(), 'plans/cooperative-1881/1881-architecturals.pdf');
 const OUT = path.resolve(process.cwd(), 'src/data/plan-levels.cooperative-1881.json');
@@ -44,7 +49,11 @@ const data = new Uint8Array(fs.readFileSync(ARCH));
     const elevationFt = Math.round((level - 1) * ESTIMATED_FLOOR_TO_FLOOR_FT * 100) / 100;
     try {
       const pdfPage = await doc.getPage(page);
-      const plan = await extractLevelPlanFromPdf(pdfPage, {});
+      // Stacked-view sheets (A-101) carry BOTH wings of an over-length floor: extract each wing
+      // and MERGE into one complete-floor plan. Other sheets are single plan views.
+      const plan = STACKED_PAGES.has(page)
+        ? await extractStackedFloorPlanFromPdf(pdfPage, {})
+        : await extractLevelPlanFromPdf(pdfPage, {});
       levels.push({
         level,
         name: `Level ${level} (${LEVEL_WORDS[level]} FLOOR)`,

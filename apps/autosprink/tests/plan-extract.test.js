@@ -7,6 +7,9 @@ import {
   detectStairCores,
   buildLevelPlan,
   reconcileWithSam,
+  splitStackedPlanViews,
+  computeWingRegistration,
+  mergeWingPlans,
 } from '../src/engine/plan-extract.js';
 import { buildBuildingFromPlans, planBounds, polyCentroid, computePlanUnderlayTransform, unionFootprintCenter } from '../src/engine/building-from-plan.js';
 
@@ -334,5 +337,146 @@ describe('computePlanUnderlayTransform (register sheet UNDER geometry at true sc
   });
   it('throws on a non-positive sheet-derived scale (never hardcode a fallback scale)', () => {
     expect(() => computePlanUnderlayTransform({ pageWidthPt: 100, pageHeightPt: 100, scaleFtPerUnit: 0 })).toThrow(/scaleFtPerUnit/);
+  });
+});
+
+// ---- STREAM A: stacked plan views (A-101 two-wing match-line split) ----
+
+describe('splitStackedPlanViews', () => {
+  // Two stacked solid boxes separated by a sustained empty gap (the inter-view margin).
+  // Lower box y in [0,40], upper box y in [100,140], gap y in (40,100). Each box is a dense
+  // grid of short segments so the Y-occupancy histogram has two humps and one wide valley.
+  const denseBox = (y0, y1) => {
+    const segs = [];
+    for (let y = y0; y <= y1; y += 1) for (let x = 0; x <= 80; x += 2) segs.push({ x1: x, y1: y, x2: x + 2, y2: y });
+    return segs;
+  };
+  const segs = [...denseBox(0, 40), ...denseBox(100, 140)];
+
+  it('detects the inter-view gap and splits at its center (NOT a within-wing wall-row dip)', () => {
+    const r = splitStackedPlanViews(segs, [], {});
+    expect(r.isStacked).toBe(true);
+    expect(r.splitYFt).toBeGreaterThan(40);
+    expect(r.splitYFt).toBeLessThan(100);
+    const lower = r.views.find((v) => v.region === 'lower');
+    const upper = r.views.find((v) => v.region === 'upper');
+    expect(lower.segments.length).toBeGreaterThan(0);
+    expect(upper.segments.length).toBeGreaterThan(0);
+    expect(lower.segments.every((s) => (s.y1 + s.y2) / 2 < r.splitYFt)).toBe(true);
+    expect(upper.segments.every((s) => (s.y1 + s.y2) / 2 >= r.splitYFt)).toBe(true);
+  });
+
+  it('splits text items at the same Y line', () => {
+    const txt = [{ s: 'LOWER', xFt: 10, yFt: 20 }, { s: 'UPPER', xFt: 10, yFt: 120 }];
+    const r = splitStackedPlanViews(segs, txt, {});
+    const lower = r.views.find((v) => v.region === 'lower');
+    const upper = r.views.find((v) => v.region === 'upper');
+    expect(lower.textItemsFt.map((t) => t.s)).toEqual(['LOWER']);
+    expect(upper.textItemsFt.map((t) => t.s)).toEqual(['UPPER']);
+  });
+
+  it('returns isStacked=false for a single dense plan view (no sustained inter-view gap)', () => {
+    const r = splitStackedPlanViews(denseBox(0, 60), [], {});
+    expect(r.isStacked).toBe(false);
+    expect(r.views.length).toBe(1);
+    expect(r.views[0].region).toBe('single');
+  });
+
+  it('returns single for trivially few segments (never fabricates a split)', () => {
+    expect(splitStackedPlanViews([{ x1: 0, y1: 0, x2: 1, y2: 1 }], [], {}).isStacked).toBe(false);
+  });
+});
+
+describe('computeWingRegistration', () => {
+  // Shared columns 19..23 at a CONSTANT -57ft offset; columns 1,5 are CONTAMINATED and must be
+  // rejected by consensus. Equal wall-bbox height (same building width) so Y aligns by edge.
+  const wingA = {
+    grid: {
+      colDatums: [
+        { label: '1', xFt: 317 }, { label: '5', xFt: 314 },
+        { label: '19', xFt: 119.7 }, { label: '20', xFt: 108.7 }, { label: '21', xFt: 97.7 },
+        { label: '22', xFt: 86.7 }, { label: '23', xFt: 75.7 },
+      ],
+      rowDatums: [{ label: 'A', yFt: 38.2 }],
+    },
+    wallBboxFt: { minX: 73.6, maxX: 341.1, minY: 35.8, maxY: 117.7, widthFt: 267.5, heightFt: 81.9 },
+    footprintBboxFt: { minX: 73.6, maxX: 341.1, minY: 35.8, maxY: 117.7, widthFt: 267.5, heightFt: 81.9 },
+  };
+  const wingB = {
+    grid: {
+      colDatums: [
+        { label: '1', xFt: 39 }, { label: '5', xFt: 273 },
+        { label: '19', xFt: 176.6 }, { label: '20', xFt: 165.6 }, { label: '21', xFt: 154.6 },
+        { label: '22', xFt: 143.6 }, { label: '23', xFt: 132.6 },
+      ],
+      rowDatums: [{ label: 'A', yFt: 201.2 }],
+    },
+    wallBboxFt: { minX: 36.6, maxX: 216.5, minY: 147.5, maxY: 229.4, widthFt: 179.9, heightFt: 81.9 },
+    footprintBboxFt: { minX: 36.6, maxX: 216.5, minY: 147.5, maxY: 229.4, widthFt: 179.9, heightFt: 81.9 },
+  };
+
+  it('recovers the constant column offset via consensus, rejecting contaminated shared labels', () => {
+    const reg = computeWingRegistration(wingA, wingB, {});
+    expect(reg.dx).toBeCloseTo(-57, 0);
+    expect(reg.inlierCols.sort()).toEqual(['19', '20', '21', '22', '23']);
+    expect(reg.colInlierCount).toBe(5);
+    expect(reg.confidence).toBe('medium');
+  });
+
+  it('aligns Y by equal-height wall-bbox bottom edges (rejects prose-contaminated row consensus)', () => {
+    const reg = computeWingRegistration(wingA, wingB, {});
+    expect(reg.dy).toBeCloseTo(-111.7, 1);
+    expect(reg.inlierRows).toEqual([]);
+    expect(reg.method).toMatch(/wall-bbox-bottom-edge-Y/);
+  });
+
+  it('falls back to wall-bbox edges with low confidence when no shared columns', () => {
+    const a = { grid: { colDatums: [{ label: '1', xFt: 10 }] }, wallBboxFt: { minX: 0, maxX: 100, minY: 0, maxY: 50, widthFt: 100, heightFt: 50 }, footprintBboxFt: { minX: 0, maxX: 100, minY: 0, maxY: 50, widthFt: 100, heightFt: 50 } };
+    const b = { grid: { colDatums: [{ label: '9', xFt: 30 }] }, wallBboxFt: { minX: 20, maxX: 140, minY: 60, maxY: 110, widthFt: 120, heightFt: 50 }, footprintBboxFt: { minX: 20, maxX: 140, minY: 60, maxY: 110, widthFt: 120, heightFt: 50 } };
+    const reg = computeWingRegistration(a, b, {});
+    expect(reg.confidence).toBe('low');
+    expect(reg.method).toMatch(/no-shared-columns/);
+  });
+});
+
+describe('mergeWingPlans', () => {
+  const mkWing = (offX, offY, label) => ({
+    scaleFtPerUnit: 0.1481, scaleText: 'SCALE: 3/32 = 1', scaleSource: 'sheet-printed-scale-notation',
+    footprintFt: [[offX, offY], [offX + 100, offY], [offX + 100, offY + 80], [offX, offY + 80]],
+    footprintBboxFt: { minX: offX, maxX: offX + 100, minY: offY, maxY: offY + 80, widthFt: 100, heightFt: 80 },
+    wallBboxFt: { minX: offX, maxX: offX + 100, minY: offY, maxY: offY + 80, widthFt: 100, heightFt: 80 },
+    walls: [{ a: [offX, offY], b: [offX + 100, offY] }],
+    rooms: [{ poly: [[offX + 10, offY + 10], [offX + 20, offY + 10], [offX + 20, offY + 20], [offX + 10, offY + 20]], label, kind: 'unknown', areaSqft: 100, confidence: 'low' }],
+    stairs: [{ poly: [[offX + 5, offY + 5], [offX + 9, offY + 5], [offX + 9, offY + 9], [offX + 5, offY + 9]], bbox: { minX: offX + 5, minY: offY + 5, maxX: offX + 9, maxY: offY + 9 }, centroidFt: [offX + 7, offY + 7], evidence: 'x', confidence: 'low', source: 'geometric' }],
+    grid: { xs: [offX + 10], ys: [offY + 10], labels: { cols: ['1'], rows: ['A'] }, colDatums: [{ label: '1', xFt: offX + 10 }], rowDatums: [{ label: 'A', yFt: offY + 10 }] },
+    labels: [{ text: label, xFt: offX + 50, yFt: offY + 40 }],
+    counts: { segments: 1000, wallSegments: 1, rooms: 1, stairs: 1, stairCoresGeometric: 1, stairsLabelBased: 0, gridCols: 1, gridRows: 1 },
+    wallLayer: { method: 'm', chosen: {} }, occupancyHint: null,
+    notes: { rooms: 'rn', stairs: 'sn' },
+  });
+  const A = mkWing(0, 0, 'LOWER');
+  const B = mkWing(50, 200, 'UPPER');
+
+  it('translates wing B onto A and unions geometry + counts', () => {
+    const reg = computeWingRegistration(A, B, {});
+    const merged = mergeWingPlans(A, B, reg, { scaleFtPerUnit: 0.1481, scaleText: A.scaleText, scaleSource: A.scaleSource });
+    expect(merged.walls.length).toBe(2);
+    expect(merged.rooms.length).toBe(2);
+    expect(merged.stairs.length).toBe(2);
+    expect(merged.counts.stairs).toBe(2);
+    expect(merged.counts.rooms).toBe(2);
+    const upperLabel = merged.labels.find((l) => l.text === 'UPPER');
+    expect(upperLabel.yFt).toBeLessThan(120);
+    expect(merged.footprintAreaReliable).toBe(false);
+    expect(merged.merged.wings).toBe(2);
+    expect(merged.provenance).toMatch(/MERGED from TWO stacked plan views/);
+    expect(merged.needsVerification).toBe(true);
+  });
+
+  it('merged footprint bbox spans both wings in the common frame', () => {
+    const reg = computeWingRegistration(A, B, {});
+    const merged = mergeWingPlans(A, B, reg, {});
+    expect(merged.footprintBboxFt.widthFt).toBeGreaterThan(99);
+    expect(merged.footprintBboxFt.heightFt).toBeCloseTo(80, 0);
   });
 });

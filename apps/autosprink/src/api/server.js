@@ -38,6 +38,7 @@ import { balanceNetwork } from '../engine/hydraulic-network.js';
 import { checkCompliance } from '../engine/nfpa-compliance.js';
 import { buildSubmittal, renderSubmittalPdf } from '../engine/submittal.js';
 import { homeDepotRexburgFloorPlan, cooperative1881FloorPlan, COOPERATIVE_1881_PROJECT_NAME } from '../data/floorplans.js';
+import { cooperative1881FloorPlanFromExtractedPlate } from '../data/floorplans-server.js';
 import { HOME_DEPOT_PROJECT_NAME } from '../data/evidence-gates.js';
 import { readHomeDepotBidPackage, readHomeDepotRealTakeoff } from '../data/home-depot-bid-package.js';
 import { readCooperative1881BidPackage, readCooperative1881RealTakeoff } from '../data/cooperative-1881-bid-package.js';
@@ -20571,10 +20572,35 @@ function runSprinklerPipeline(req, prebuilt = null) {
     floorPlan = homeDepotRexburgFloorPlan();
     floorPlan = scaleFloorPlanAreaForSuppliedBidTruth(floorPlan, suppliedDocumentBidTruth);
   } else if (projectName === COOPERATIVE_1881_PROJECT_NAME) {
-    // Residential apartment job with no DXF — built-in plan uses the REAL
-    // sprinklered area (170,654 sqft) with a placeholder footprint shape.
-    floorPlan = cooperative1881FloorPlan();
-    floorPlan = scaleFloorPlanAreaForSuppliedBidTruth(floorPlan, suppliedDocumentBidTruth);
+    // Residential apartment job with no DXF. Two source modes, by precedence:
+    //
+    // (A) An employee-recorded supplied_document_bid_truth REPLACEMENT exists
+    //     (suppliedDocumentBidTruth non-null). The employee has explicitly
+    //     overridden the project area; the documented downstream-defaults
+    //     contract (geometry_policy: scale_placeholder_footprint_area_only)
+    //     requires the engine result to reflect that supplied square_feet. Use
+    //     the area-only square PLACEHOLDER and rescale it to the supplied truth
+    //     — that placeholder is purpose-built for this uniform area rescale.
+    //
+    // (B) No supplied-bid-truth replacement (the default / live-demo case). Use
+    //     the REAL extracted Floor-1 plate (vector-PDF extraction) so the
+    //     sprinkler network is generated against the SAME footprint + true scale
+    //     + coordinate frame as the extracted building geometry the viewer
+    //     renders. The plate is REAL geometry at the drawing's true scale and is
+    //     registered to the extracted building; uniformly rescaling it would
+    //     distort the footprint, break that registration, and not move the
+    //     un-scaled stair-core excludeRects — so the rescale is NEVER applied to
+    //     the extracted plate. Falls back to the placeholder only if the
+    //     extracted plate is unavailable (never fabricate).
+    const hasSuppliedTruth = Number(suppliedDocumentBidTruth?.project_truth?.square_feet) > 0;
+    if (hasSuppliedTruth) {
+      floorPlan = scaleFloorPlanAreaForSuppliedBidTruth(cooperative1881FloorPlan(), suppliedDocumentBidTruth);
+    } else {
+      floorPlan = cooperative1881FloorPlanFromExtractedPlate() || cooperative1881FloorPlan();
+      if (!floorPlan.extractedPlate) {
+        floorPlan = scaleFloorPlanAreaForSuppliedBidTruth(floorPlan, suppliedDocumentBidTruth);
+      }
+    }
   }
   // A building drawing (SVG or DXF) -> synthesize a flat floor plan for bid/hydraulics/scene.
   if (building && !floorPlan) {

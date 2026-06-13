@@ -116,6 +116,17 @@ export function layoutRoom(room) {
   const bbox = boundingBox(polygon);
   const { nx, ny } = gridCounts(bbox.width, bbox.height, rule);
 
+  // Optional excluded rectangles (open shafts: stair / elevator cores). Heads
+  // whose grid point falls inside an excluded rect are dropped — an open stair
+  // or elevator shaft is not sprinklered from this ceiling grid (it gets its
+  // own protection). Each rect is {minX,minY,maxX,maxY} in the SAME plan-feet
+  // coordinate frame as the room polygon. Empty/absent -> no exclusion (the
+  // pre-existing behaviour is byte-identical).
+  const excludeRects = Array.isArray(room.excludeRects) ? room.excludeRects : [];
+  const inExcluded = (x, y) => excludeRects.some(
+    (r) => x >= r.minX && x <= r.maxX && y >= r.minY && y <= r.maxY,
+  );
+
   const spacingX = bbox.width / nx;
   const spacingY = bbox.height / ny;
   const heads = [];
@@ -123,7 +134,7 @@ export function layoutRoom(room) {
     const y = bbox.minY + spacingY * (row + 0.5);
     for (let col = 0; col < nx; col += 1) {
       const x = bbox.minX + spacingX * (col + 0.5);
-      if (pointInPolygon([x, y], polygon)) {
+      if (pointInPolygon([x, y], polygon) && !inExcluded(x, y)) {
         heads.push({ x: round(x), y: round(y), row, col });
       }
     }

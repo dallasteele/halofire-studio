@@ -80,3 +80,8 @@ export function cooperative1881FloorPlan() {
     ],
   };
 }
+
+// NOTE: cooperative1881FloorPlanFromExtractedPlate() lives in the SERVER-only
+// module ./floorplans-server.js — it reads plan-levels JSON from disk via
+// node:fs and must NEVER be imported into the browser bundle (autosprink.html
+// imports THIS file directly, so this file stays browser-safe / Node-builtin-free).

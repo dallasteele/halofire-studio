@@ -168,6 +168,26 @@ export function extractGrid(textItemsFt) {
     }
     return out;
   };
+  // label -> datum-coordinate pairs (each distinct label snapped to its surviving datum). This
+  // is what cross-view registration needs: the X (or Y) where a NAMED grid line sits, so two
+  // stacked views can be aligned by their SHARED column/row labels regardless of how many total
+  // datums each view has. Snap each label's bubble to the nearest datum within tolerance.
+  const nearestDatum = (v, datums, tolFt) => {
+    let best = null, bestD = Infinity;
+    for (const d of datums) { const dd = Math.abs(v - d); if (dd <= tolFt + 1e-9 && dd < bestD) { bestD = dd; best = d; } }
+    return best;
+  };
+  const datumPairs = (bubbles, datums, axis) => {
+    const seen = new Set();
+    const out = [];
+    for (const b of bubbles) {
+      if (seen.has(b.label)) continue;
+      const v = axis === 'x' ? b.xFt : b.yFt;
+      const d = nearestDatum(v, datums, 2);
+      if (d != null) { seen.add(b.label); out.push({ label: b.label, [axis === 'x' ? 'xFt' : 'yFt']: round(d) }); }
+    }
+    return out;
+  };
   return {
     xs,
     ys,
@@ -175,6 +195,8 @@ export function extractGrid(textItemsFt) {
       cols: uniqOnDatum(colBubbles, xs, 'x'),
       rows: uniqOnDatum(rowBubbles, ys, 'y'),
     },
+    colDatums: datumPairs(colBubbles, xs, 'x'),
+    rowDatums: datumPairs(rowBubbles, ys, 'y'),
     colBubbles,
     rowBubbles,
   };
@@ -589,6 +611,19 @@ export function buildLevelPlan(input, opts = {}) {
   // Walls emitted as {a,b,thickness?} pairs (the wall-layer segments).
   const walls = wallSegs.map((s) => ({ a: [round(s.x1), round(s.y1)], b: [round(s.x2), round(s.y2)] }));
 
+  // Wall-segment ENVELOPE bbox (ALL wall-layer segments, not just the traced connected loop).
+  // This is the honest footprint envelope when buildingOutlinePolygon's enclosed trace collapses
+  // — e.g. a wing whose match-line edge is OPEN, so the outline trace only captures a sub-network
+  // and outline.bbox is a sliver. The merge/registration use wallBboxFt for such open wings.
+  let wMinX = Infinity, wMinY = Infinity, wMaxX = -Infinity, wMaxY = -Infinity;
+  for (const s of wallSegs) {
+    wMinX = Math.min(wMinX, s.x1, s.x2); wMinY = Math.min(wMinY, s.y1, s.y2);
+    wMaxX = Math.max(wMaxX, s.x1, s.x2); wMaxY = Math.max(wMaxY, s.y1, s.y2);
+  }
+  const wallBboxFt = Number.isFinite(wMinX)
+    ? { widthFt: round(wMaxX - wMinX), heightFt: round(wMaxY - wMinY), minX: round(wMinX), minY: round(wMinY), maxX: round(wMaxX), maxY: round(wMaxY) }
+    : null;
+
   // Footprint loop (close it).
   const footprintFt = outline.polygon.map(([x, y]) => [round(x), round(y)]);
 
@@ -613,6 +648,7 @@ export function buildLevelPlan(input, opts = {}) {
       minX: outline.bbox.minX, minY: outline.bbox.minY,
       maxX: outline.bbox.maxX, maxY: outline.bbox.maxY,
     },
+    wallBboxFt,
     walls,
     rooms: roomRes.rooms.map((r) => ({
       poly: r.poly, label: r.label, kind: r.kind, areaSqft: r.areaSqft, confidence: r.confidence,
@@ -624,7 +660,7 @@ export function buildLevelPlan(input, opts = {}) {
       ...(s.dirTokens != null ? { dirTokens: s.dirTokens } : {}),
       ...(s.centroidFt ? { centroidFt: s.centroidFt } : {}),
     })),
-    grid: { xs: grid.xs, ys: grid.ys, labels: grid.labels },
+    grid: { xs: grid.xs, ys: grid.ys, labels: grid.labels, colDatums: grid.colDatums, rowDatums: grid.rowDatums },
     labels: labelItems,
     roomKinds: roomRes.rooms.reduce((acc, r) => { acc[r.kind] = (acc[r.kind] || 0) + 1; return acc; }, {}),
     counts: {
@@ -647,6 +683,402 @@ export function buildLevelPlan(input, opts = {}) {
       rooms: roomRes.note,
       stairs: stairRes.note,
       stairCores: coreRes.note,
+    },
+  };
+}
+
+/**
+ * PURE. Split a sheet that carries TWO (or more) STACKED plan views into per-view regions.
+ *
+ * THE PROBLEM THIS FIXES: A-101 (and other "OVERALL" sheets) draw a building too long to fit
+ * the page at the printed scale, so the building is broken at a MATCH LINE into two plan views
+ * stacked vertically on one sheet (an UPPER view and a LOWER view), each with its own
+ * "TYPICAL ... ASSEMBLY / SCALE ..." sub-title band beneath it. The single-region extractor
+ * locks onto the densest connected wall band — only ONE wing — and silently drops the other.
+ *
+ * DETECTION (deterministic, geometry+text grounded — no fitted constants tied to a target):
+ *  1) Build a Y-occupancy histogram of segment endpoints (excluding the right title-block
+ *     column). Stacked plan views show up as TWO dense humps separated by a sparse VALLEY
+ *     (the inter-view margin + each view's sub-title text band).
+ *  2) Find the deepest valley between the two largest humps; its Y is the split line.
+ *  3) Return each view's segment + text subsets (split at that Y), plus the split metadata.
+ *
+ * Returns { views: [{ region:'lower'|'upper', yRangeFt, segments, textItemsFt }...], splitYFt,
+ *           valleyDepthFrac, isStacked }. When no clear valley (single plan view) -> isStacked
+ * false and a single view spanning everything (caller then uses the normal single-region path).
+ *
+ * @param {Array<{x1,y1,x2,y2}>} segments - ALL segments in FEET.
+ * @param {Array<{s:string,xFt:number,yFt:number}>} textItemsFt - text items in FEET.
+ * @param {Object} [opts]
+ * @param {number} [opts.bins] - Y histogram bins (default 96).
+ * @param {number} [opts.pageWidthFt] - if given, exclude the right 20% (title block) from the histogram.
+ * @param {number} [opts.minValleyFrac] - valley must drop below this fraction of the smaller hump peak (default 0.30).
+ * @returns {{views:Array, splitYFt:number|null, valleyDepthFrac:number, isStacked:boolean, note:string}}
+ */
+export function splitStackedPlanViews(segments, textItemsFt = [], opts = {}) {
+  const note =
+    'Stacked-plan-view split: detects TWO plan views drawn on one sheet (a match-line break) ' +
+    'via a Y-occupancy valley between two dense humps, so BOTH wings of an over-length floor ' +
+    'are extracted (not just the denser one). Deterministic; the split Y is the deepest valley ' +
+    'between the two largest geometry humps. needs-verification.';
+  const segs = Array.isArray(segments) ? segments : [];
+  const txt = Array.isArray(textItemsFt) ? textItemsFt : [];
+  const single = () => ({
+    views: [{ region: 'single', yRangeFt: null, segments: segs, textItemsFt: txt }],
+    splitYFt: null, valleyDepthFrac: 0, isStacked: false, note,
+  });
+  if (segs.length < 100) return single();
+
+  const bins = Number.isInteger(opts.bins) && opts.bins > 8 ? opts.bins : 96;
+  const minValleyFrac = Number.isFinite(opts.minValleyFrac) ? opts.minValleyFrac : 0.30;
+  const titleXFt = Number.isFinite(opts.pageWidthFt) ? 0.80 * opts.pageWidthFt : Infinity;
+
+  let minY = Infinity, maxY = -Infinity;
+  for (const s of segs) { minY = Math.min(minY, s.y1, s.y2); maxY = Math.max(maxY, s.y1, s.y2); }
+  if (!(maxY > minY)) return single();
+  const span = maxY - minY;
+  const hist = new Float64Array(bins);
+  const addPt = (x, y) => {
+    if (x > titleXFt) return;
+    const b = Math.min(bins - 1, Math.max(0, Math.floor((y - minY) / span * bins)));
+    hist[b] += 1;
+  };
+  for (const s of segs) { addPt(s.x1, s.y1); addPt(s.x2, s.y2); }
+
+  // Smooth lightly (3-tap) so single noisy bins don't read as occupied/empty by accident.
+  const sm = new Float64Array(bins);
+  for (let i = 0; i < bins; i++) {
+    sm[i] = (hist[Math.max(0, i - 1)] + hist[i] + hist[Math.min(bins - 1, i + 1)]) / 3;
+  }
+  // STACKED VIEWS = two OCCUPIED MASSES separated by a sustained LOW-DENSITY GAP (the inter-view
+  // margin + each view's sub-title band). The WRONG signal is the narrow dip BETWEEN two wall-rows
+  // of ONE wing (perimeter walls of a single mass) — those dips are deep but NARROW. So we do not
+  // pair two peaks (that finds within-wing wall-row dips); instead we find the LONGEST RUN of
+  // low-density bins that lies BETWEEN two substantial occupied regions, and split at its center.
+  const peak = Math.max(...sm);
+  if (!(peak > 0)) return single();
+  // "occupied" = density above a SMALL fraction of the peak. Wall-row spikes dwarf room interiors
+  // (peak ~47k vs interior ~hundreds), so the cutoff must be low (1% of peak) or the wings
+  // fragment into many false gaps at every interior row. The inter-view margin is genuinely
+  // near-zero and forms the LONGEST empty run; within-wing dips between wall-rows are 1-2 bins.
+  const occCutoffFrac = Number.isFinite(opts.occCutoffFrac) ? opts.occCutoffFrac : 0.01;
+  const occThresh = occCutoffFrac * peak;
+  const occupied = Array.from(sm, (v) => v >= occThresh ? 1 : 0);
+  // total occupied mass on each side of a candidate gap must be substantial (both wings real).
+  const prefix = new Float64Array(bins + 1);
+  for (let i = 0; i < bins; i++) prefix[i + 1] = prefix[i] + sm[i];
+  const totalMass = prefix[bins];
+  // Scan maximal empty runs; pick the longest run with substantial mass on BOTH sides.
+  let bestRun = null; // {start,end,len}
+  let i = 0;
+  while (i < bins) {
+    if (occupied[i]) { i++; continue; }
+    let j = i; while (j < bins && !occupied[j]) j++;
+    const start = i, end = j - 1, len = j - i;
+    const massBefore = prefix[start];
+    const massAfter = totalMass - prefix[end + 1];
+    // require each side >= 15% of total mass (a real wing), and the gap not at the very edge.
+    if (start > 0 && end < bins - 1 && massBefore >= 0.15 * totalMass && massAfter >= 0.15 * totalMass) {
+      if (!bestRun || len > bestRun.len) bestRun = { start, end, len };
+    }
+    i = j;
+  }
+  // A real inter-view margin spans several feet; require the gap >= minGapBins so a 1-2 bin dip
+  // between two wall-rows of ONE wing can never be mistaken for the inter-view break.
+  const minGapBins = Number.isInteger(opts.minGapBins) ? opts.minGapBins : 3;
+  if (!bestRun || bestRun.len < minGapBins) return single(); // no sustained inter-view gap.
+  const valleyi = Math.floor((bestRun.start + bestRun.end) / 2);
+  // valley depth = min smoothed density inside the gap, relative to the peak (diagnostic).
+  let valleyMin = Infinity;
+  for (let k = bestRun.start; k <= bestRun.end; k++) valleyMin = Math.min(valleyMin, sm[k]);
+  const valleyDepthFrac = peak > 0 ? valleyMin / peak : 1;
+
+  const splitYFt = round(minY + (valleyi + 0.5) / bins * span);
+  const lowerSegs = [], upperSegs = [];
+  for (const s of segs) {
+    const my = (s.y1 + s.y2) / 2;
+    (my < splitYFt ? lowerSegs : upperSegs).push(s);
+  }
+  const lowerTxt = [], upperTxt = [];
+  for (const t of txt) ((Number(t.yFt) < splitYFt) ? lowerTxt : upperTxt).push(t);
+  return {
+    views: [
+      { region: 'lower', yRangeFt: [round(minY), splitYFt], segments: lowerSegs, textItemsFt: lowerTxt },
+      { region: 'upper', yRangeFt: [splitYFt, round(maxY)], segments: upperSegs, textItemsFt: upperTxt },
+    ],
+    splitYFt, valleyDepthFrac: round(valleyDepthFrac), isStacked: true, note,
+  };
+}
+
+/**
+ * PURE. Compute the rigid (x,y) translation that registers wing B onto wing A using their
+ * SHARED grid-column datums (and, when available, shared rows).
+ *
+ * Stacked views of one over-length building OVERLAP at a match line — the same numbered grid
+ * columns appear in BOTH views (A-101: lower carries columns ~10..23, upper ~16..30; columns
+ * 16..23 are shared). Each view places its drawing at a different sheet offset, so the shared
+ * columns sit at different X in each view by a CONSTANT offset. We recover that offset from the
+ * shared column label positions (median of per-shared-column deltas — robust to a stray bubble),
+ * and the Y offset from shared row datums (median delta); rows are sparser/noisier so Y falls
+ * back to aligning the footprint-bbox match-line edges when < 1 shared row.
+ *
+ * Returns the translation to ADD to wing B's coordinates so its shared columns land on wing A's.
+ *
+ * @param {{grid:{xs:number[],ys:number[],labels:{cols:string[],rows:string[]}}, footprintBboxFt:Object}} wingA
+ * @param {Object} wingB - same shape.
+ * @param {Object} [opts]
+ * @returns {{dx:number, dy:number, sharedCols:string[], sharedRows:string[], method:string, confidence:string}}
+ */
+export function computeWingRegistration(wingA, wingB, opts = {}) {
+  const colsA = mapLabelToCoord(wingA, 'cols');
+  const colsB = mapLabelToCoord(wingB, 'cols');
+  const rowsA = mapLabelToCoord(wingA, 'rows');
+  const rowsB = mapLabelToCoord(wingB, 'rows');
+
+  const sharedCols = Object.keys(colsA).filter((k) => k in colsB);
+  const sharedRows = Object.keys(rowsA).filter((k) => k in rowsB);
+
+  // The shared-label set is CONTAMINATED: some "datums" are dimension-string fragments mis-read as
+  // grid bubbles and snapped to the wrong line, so their A-B delta is garbage. A real match-line
+  // offset is a SINGLE CONSTANT, so the genuine shared columns all agree on one delta while the
+  // noise scatters. Recover the offset as the CONSENSUS (largest agreeing cluster, tol ~2ft) of
+  // per-label deltas — robust to the contamination a plain median can't survive.
+  const tolFt = Number.isFinite(opts.deltaTolFt) ? opts.deltaTolFt : 2;
+  const consensus = (labels, coordA, coordB) => {
+    const deltas = labels.map((k) => ({ k, d: coordA[k] - coordB[k] })).filter((o) => Number.isFinite(o.d));
+    if (!deltas.length) return null;
+    // For each delta, count how many others agree within tol; pick the delta with the largest
+    // agreeing set, then average that set for the final offset. Deterministic.
+    let best = null;
+    for (const cand of deltas) {
+      const agree = deltas.filter((o) => Math.abs(o.d - cand.d) <= tolFt);
+      if (!best || agree.length > best.agree.length ||
+          (agree.length === best.agree.length && cand.d < best.cand.d)) {
+        best = { cand, agree };
+      }
+    }
+    const mean = best.agree.reduce((a, o) => a + o.d, 0) / best.agree.length;
+    return { offset: mean, inliers: best.agree.map((o) => o.k), count: best.agree.length, total: deltas.length };
+  };
+
+  const colCon = consensus(sharedCols, colsA, colsB);
+
+  let dx = colCon ? colCon.offset : null;
+  // Inlier labels are the columns/rows that actually agree on the consensus offset (the honest
+  // shared grid lines); report THOSE, not the contaminated full shared-label set.
+  const colInliers = colCon ? colCon.inliers : [];
+  let method = 'shared-grid-columns(consensus)';
+  let confidence = (colCon && colCon.count >= 3) ? 'medium' : 'low';
+
+  // Honest envelope per wing: the wall-segment bbox is the trustworthy extent for open-ended
+  // wings (whose enclosed-trace footprintBboxFt collapses to a sliver at the open match-line edge).
+  const envA = wingEnvelope(wingA);
+  const envB = wingEnvelope(wingB);
+
+  if (dx == null) {
+    // No shared columns — fall back to aligning envelope left edges (weak).
+    dx = (envA.minX ?? 0) - (envB.minX ?? 0);
+    method = 'wall-bbox-edges(no-shared-columns)';
+    confidence = 'low';
+  }
+
+  // Y REGISTRATION. Row-bubble extraction is heavily contaminated by prose letters (a single
+  // letter "A"/"F"/"N" inside a NOTES word clusters as a "row datum"), so a row-label consensus
+  // is UNRELIABLE on overall sheets. The trustworthy Y signal is geometric: in a match-line split
+  // BOTH views show the SAME building rows, so their wall-segment envelopes have (near-)equal
+  // HEIGHT and must be aligned edge-to-edge. We align the envelope bottom edges (minY). We only
+  // PREFER a row-label consensus when it has >= 2 inlier rows AND it agrees (within 6 ft) with the
+  // geometric alignment — otherwise the geometric alignment wins (and we say so).
+  const dyGeom = (envA.minY ?? 0) - (envB.minY ?? 0);
+  let rowCon = null;
+  let dy = dyGeom;
+  let rowInliers = [];
+  const heightsAgree = Math.abs((envA.heightFt ?? 0) - (envB.heightFt ?? 0)) <= Math.max(4, 0.1 * (envA.heightFt ?? 1));
+  // recompute row consensus here (declared earlier as const removed): use the same consensus fn.
+  rowCon = consensus(sharedRows, rowsA, rowsB);
+  if (rowCon && rowCon.count >= 2 && Math.abs(rowCon.offset - dyGeom) <= 6) {
+    dy = rowCon.offset;
+    rowInliers = rowCon.inliers;
+    method += '+shared-rows(consensus,agrees-geom)';
+  } else {
+    method += heightsAgree ? '+wall-bbox-bottom-edge-Y(equal-height)' : '+wall-bbox-bottom-edge-Y(height-mismatch,low-conf)';
+    if (!heightsAgree) confidence = 'low';
+  }
+  return {
+    dx: round(dx), dy: round(dy),
+    sharedCols, sharedRows,
+    inlierCols: colInliers, inlierRows: rowInliers,
+    colInlierCount: colCon ? colCon.count : 0, rowInlierCount: rowCon ? rowCon.count : 0,
+    method, confidence,
+  };
+}
+
+/** Honest extent of a wing: prefer the wall-segment bbox (covers open match-line edges), else the
+ *  enclosed-trace footprint bbox. */
+function wingEnvelope(wing) {
+  const wb = wing?.wallBboxFt;
+  if (wb && Number.isFinite(wb.minX) && (wb.widthFt > 0) && (wb.heightFt > 0)) return wb;
+  return wing?.footprintBboxFt || { minX: 0, minY: 0, maxX: 0, maxY: 0, widthFt: 0, heightFt: 0 };
+}
+
+/**
+ * Map grid labels -> datum coordinate. Prefer the explicit label->coord pairs (colDatums/rowDatums,
+ * each label snapped to its surviving datum) so a NAMED grid line's coordinate is known regardless
+ * of total datum count. Falls back to index-pairing only when the pairs are absent (legacy plans).
+ */
+function mapLabelToCoord(wing, which) {
+  const out = {};
+  const pairs = which === 'cols' ? (wing?.grid?.colDatums || []) : (wing?.grid?.rowDatums || []);
+  const key = which === 'cols' ? 'xFt' : 'yFt';
+  if (pairs.length) {
+    for (const p of pairs) if (p && p.label != null && Number.isFinite(p[key])) out[p.label] = p[key];
+    return out;
+  }
+  // Legacy fallback: index-pair labels[i] <-> coords[i] only when counts match.
+  const labels = wing?.grid?.labels?.[which] || [];
+  const coords = which === 'cols' ? (wing?.grid?.xs || []) : (wing?.grid?.ys || []);
+  if (labels.length === coords.length) {
+    for (let i = 0; i < labels.length; i++) out[labels[i]] = coords[i];
+  }
+  return out;
+}
+
+/**
+ * PURE. Merge two wing LevelPlans (lower + upper) of ONE over-length floor into a single
+ * complete LevelPlan, registering wing B (upper) onto wing A (lower) via shared grid columns.
+ *
+ * Geometry from BOTH wings is unioned in the COMMON coordinate frame (wing A's frame). Walls,
+ * rooms, stairs, grid datums, and labels are translated by the registration offset for wing B
+ * and concatenated. Footprint becomes the union bbox; counts are summed. The shared overlap
+ * columns mean a thin band of duplicated geometry at the match line — acceptable (and honest:
+ * we do NOT dedup walls, which could erase real geometry; the overlap is flagged in notes).
+ *
+ * @param {LevelPlan} wingA - lower wing (reference frame).
+ * @param {LevelPlan} wingB - upper wing (translated onto A).
+ * @param {Object} reg - from computeWingRegistration(wingA, wingB).
+ * @param {Object} [meta] - { scaleFtPerUnit, scaleText, scaleSource }.
+ * @returns {LevelPlan} merged complete-floor plan.
+ */
+export function mergeWingPlans(wingA, wingB, reg, meta = {}) {
+  const dx = Number(reg?.dx) || 0;
+  const dy = Number(reg?.dy) || 0;
+  const shiftPt = ([x, y]) => [round(x + dx), round(y + dy)];
+  const shiftPoly = (poly) => (Array.isArray(poly) ? poly.map(shiftPt) : poly);
+  const shiftBbox = (b) => (b ? {
+    minX: round(b.minX + dx), maxX: round(b.maxX + dx),
+    minY: round(b.minY + dy), maxY: round(b.maxY + dy),
+  } : b);
+
+  // Walls: A as-is; B translated.
+  const wallsA = (wingA.walls || []).map((w) => ({ a: w.a, b: w.b }));
+  const wallsB = (wingB.walls || []).map((w) => ({ a: shiftPt(w.a), b: shiftPt(w.b) }));
+  const walls = wallsA.concat(wallsB);
+
+  // Rooms: A as-is; B translated (poly + any bbox).
+  const roomsA = (wingA.rooms || []).map((r) => ({ ...r }));
+  const roomsB = (wingB.rooms || []).map((r) => ({ ...r, poly: shiftPoly(r.poly) }));
+  const rooms = roomsA.concat(roomsB);
+
+  // Stairs: A as-is; B translated (poly + bbox + centroid).
+  const stairsA = (wingA.stairs || []).map((s) => ({ ...s }));
+  const stairsB = (wingB.stairs || []).map((s) => ({
+    ...s, poly: shiftPoly(s.poly), bbox: shiftBbox(s.bbox),
+    ...(s.centroidFt ? { centroidFt: shiftPt(s.centroidFt) } : {}),
+  }));
+  const stairs = stairsA.concat(stairsB);
+
+  // Footprint: union of both wings' HONEST envelopes (wall-segment bbox, which covers open
+  // match-line edges where the enclosed-trace polygon collapses) in the common frame, reported
+  // as the union bbox loop. WingB's envelope is translated by (dx,dy).
+  const eA = wingEnvelope(wingA);
+  const eB = wingEnvelope(wingB);
+  let uMinX = Math.min(eA.minX, eB.minX + dx);
+  let uMaxX = Math.max(eA.maxX, eB.maxX + dx);
+  let uMinY = Math.min(eA.minY, eB.minY + dy);
+  let uMaxY = Math.max(eA.maxY, eB.maxY + dy);
+  // Fall back to translated wall endpoints if envelopes are degenerate.
+  if (!Number.isFinite(uMinX) || !(uMaxX > uMinX)) {
+    uMinX = Infinity; uMinY = Infinity; uMaxX = -Infinity; uMaxY = -Infinity;
+    for (const w of walls) {
+      for (const [x, y] of [w.a, w.b]) {
+        uMinX = Math.min(uMinX, x); uMinY = Math.min(uMinY, y);
+        uMaxX = Math.max(uMaxX, x); uMaxY = Math.max(uMaxY, y);
+      }
+    }
+  }
+  const footprintFt = [
+    [round(uMinX), round(uMinY)], [round(uMaxX), round(uMinY)],
+    [round(uMaxX), round(uMaxY)], [round(uMinX), round(uMaxY)], [round(uMinX), round(uMinY)],
+  ];
+  const widthFt = round(uMaxX - uMinX), heightFt = round(uMaxY - uMinY);
+
+  // Grid: A's datums as-is; B's translated; merge unique (within 1ft tolerance) keeping sorted.
+  const mergeAxis = (a, bShifted) => {
+    const out = [...(a || [])];
+    for (const v of (bShifted || [])) {
+      if (!out.some((u) => Math.abs(u - v) <= 1)) out.push(round(v));
+    }
+    return out.sort((p, q) => p - q);
+  };
+  const xsMerged = mergeAxis(wingA.grid?.xs, (wingB.grid?.xs || []).map((x) => x + dx));
+  const ysMerged = mergeAxis(wingA.grid?.ys, (wingB.grid?.ys || []).map((y) => y + dy));
+  const colLabels = Array.from(new Set([...(wingA.grid?.labels?.cols || []), ...(wingB.grid?.labels?.cols || [])]))
+    .sort((p, q) => (parseFloat(p) - parseFloat(q)) || String(p).localeCompare(String(q)));
+  const rowLabels = Array.from(new Set([...(wingA.grid?.labels?.rows || []), ...(wingB.grid?.labels?.rows || [])])).sort();
+
+  // Labels: A as-is; B translated.
+  const labelsA = (wingA.labels || []).map((l) => ({ ...l }));
+  const labelsB = (wingB.labels || []).map((l) => ({ text: l.text, xFt: round(l.xFt + dx), yFt: round(l.yFt + dy) }));
+  const labels = labelsA.concat(labelsB);
+
+  const roomKinds = rooms.reduce((acc, r) => { acc[r.kind] = (acc[r.kind] || 0) + 1; return acc; }, {});
+  const scaleFtPerUnit = Number(meta.scaleFtPerUnit) || wingA.scaleFtPerUnit;
+
+  return {
+    scaleFtPerUnit: round(scaleFtPerUnit),
+    scaleText: meta.scaleText || wingA.scaleText,
+    scaleSource: meta.scaleSource || wingA.scaleSource,
+    footprintFt,
+    footprintAreaSqft: round(widthFt * heightFt), // merged is a union envelope; bbox area is the honest measure
+    footprintBboxAreaSqft: round(widthFt * heightFt),
+    footprintAreaReliable: false, // a union of two wing envelopes — bbox only, not an enclosed trace
+    footprintBboxFt: { widthFt, heightFt, minX: round(uMinX), minY: round(uMinY), maxX: round(uMaxX), maxY: round(uMaxY) },
+    walls,
+    rooms,
+    stairs,
+    grid: { xs: xsMerged, ys: ysMerged, labels: { cols: colLabels, rows: rowLabels } },
+    labels,
+    roomKinds,
+    counts: {
+      segments: (wingA.counts?.segments || 0) + (wingB.counts?.segments || 0),
+      wallSegments: walls.length,
+      rooms: rooms.length,
+      stairs: stairs.length,
+      stairCoresGeometric: (wingA.counts?.stairCoresGeometric || 0) + (wingB.counts?.stairCoresGeometric || 0),
+      stairsLabelBased: (wingA.counts?.stairsLabelBased || 0) + (wingB.counts?.stairsLabelBased || 0),
+      gridCols: xsMerged.length,
+      gridRows: ysMerged.length,
+    },
+    wallLayer: wingA.wallLayer,
+    footprintMethod: 'stacked-wings-union(bbox)',
+    occupancyHint: wingA.occupancyHint || wingB.occupancyHint || null,
+    merged: {
+      wings: 2,
+      registration: { dx, dy, sharedCols: reg?.sharedCols || [], sharedRows: reg?.sharedRows || [], inlierCols: reg?.inlierCols || [], inlierRows: reg?.inlierRows || [], method: reg?.method, confidence: reg?.confidence },
+      wingA: { footprintBboxFt: wingA.footprintBboxFt, stairs: (wingA.stairs || []).length, rooms: (wingA.rooms || []).length },
+      wingB: { footprintBboxFt: wingB.footprintBboxFt, stairs: (wingB.stairs || []).length, rooms: (wingB.rooms || []).length },
+    },
+    provenance: PROVENANCE_BASE + ' — MERGED from TWO stacked plan views registered by shared grid columns',
+    needsVerification: true,
+    notes: {
+      footprint: 'Union envelope (bbox) of two stacked wings registered via shared grid columns; ' +
+        'NOT a single enclosed wall trace. Overlap band at the match line is NOT deduplicated ' +
+        '(deduping could erase real geometry); flagged needs-verification.',
+      rooms: wingA.notes?.rooms,
+      stairs: wingA.notes?.stairs,
+      merge: `Two plan views on one sheet merged: wing B (upper) translated by (dx=${dx}, dy=${dy}) ft ` +
+        `onto wing A (lower) using shared grid columns [${(reg?.sharedCols || []).join(',')}] ` +
+        `(method=${reg?.method}, confidence=${reg?.confidence}). needs-verification.`,
     },
   };
 }
@@ -728,6 +1160,93 @@ export async function extractLevelPlanFromPdf(page, opts = {}) {
   plan.samUsed = samUsed;
   plan.samReason = samReason;
   return plan;
+}
+
+/**
+ * Async. Extract a COMPLETE floor from a sheet that carries TWO STACKED plan views (a building
+ * broken at a match line into an upper + lower view on one sheet — e.g. A-101).
+ *
+ * Reads scale once (shared by both views — same printed notation), extracts ALL segments + text,
+ * SPLITS them into the two plan-view regions (Y-occupancy valley), builds a LevelPlan per wing,
+ * computes the rigid registration from shared grid columns, and MERGES into one complete-floor
+ * LevelPlan. If the sheet turns out to be a single plan view (no clear valley) it falls back to
+ * the normal single-region buildLevelPlan and flags merged:null.
+ *
+ * Honest: scale DERIVED from the sheet's printed notation; registration DERIVED from shared grid
+ * datums; everything flagged needs-verification. If splitting/registration cannot find shared
+ * columns it still merges (low-confidence, bbox-edge fallback) and SAYS SO in the merge note.
+ *
+ * @param {Object} page - a pdfjs page.
+ * @param {Object} [opts] - same opts as extractLevelPlanFromPdf (scaleFtPerUnit override, splitOpts, etc.)
+ * @returns {Promise<LevelPlan>} merged complete-floor plan (or single-view plan if not stacked).
+ */
+export async function extractStackedFloorPlanFromPdf(page, opts = {}) {
+  if (!page || typeof page.getOperatorList !== 'function' || typeof page.getTextContent !== 'function') {
+    throw new Error('extractStackedFloorPlanFromPdf: a pdfjs page (getOperatorList + getTextContent) is required');
+  }
+  // 1) TEXT + SCALE (shared by both stacked views).
+  const tc = await page.getTextContent();
+  const rawItems = (tc.items || []).map((it) => ({ s: it.str, xPt: it.transform[4], yPt: it.transform[5] }));
+  const joined = rawItems.map((i) => i.s).join(' ');
+  let scaleInfo = deriveScaleFromText(joined);
+  if (opts.scaleFtPerUnit && Number(opts.scaleFtPerUnit) > 0) {
+    scaleInfo = {
+      feetPerUnit: Number(opts.scaleFtPerUnit),
+      scaleText: scaleInfo ? scaleInfo.scaleText : `operator-supplied feetPerUnit=${opts.scaleFtPerUnit}`,
+      source: scaleInfo ? 'sheet-printed-scale-notation(+override)' : 'operator-supplied-override',
+    };
+  }
+  if (!scaleInfo) {
+    throw new Error('extractStackedFloorPlanFromPdf: no printed SCALE notation and no override — scale is DERIVED, never guessed.');
+  }
+  const scaleFtPerUnit = scaleInfo.feetPerUnit;
+
+  // 2) GEOMETRY + TEXT in feet.
+  const opList = await page.getOperatorList();
+  const { segments } = extractSegmentsFromOpList(opList, { scale: scaleFtPerUnit });
+  if (!segments.length) {
+    throw new Error('extractStackedFloorPlanFromPdf: no vector path geometry on this page.');
+  }
+  const textItemsFt = rawItems
+    .filter((i) => i.s && i.s.trim())
+    .map((i) => ({ s: i.s.trim(), xFt: i.xPt * scaleFtPerUnit, yFt: i.yPt * scaleFtPerUnit }));
+
+  // 3) SPLIT into stacked plan views.
+  const vp = (typeof page.getViewport === 'function') ? page.getViewport({ scale: 1 }) : null;
+  const pageWidthFt = vp ? vp.width * scaleFtPerUnit : undefined;
+  const split = splitStackedPlanViews(segments, textItemsFt, { ...(opts.splitOpts || {}), pageWidthFt });
+
+  // Not stacked -> single-region plan (honest fallback).
+  if (!split.isStacked) {
+    const plan = buildLevelPlan({ segments, textItemsFt, scaleFtPerUnit, scaleText: scaleInfo.scaleText }, opts);
+    plan.scaleSource = scaleInfo.source;
+    plan.merged = null;
+    plan.stackedSplit = { isStacked: false, note: split.note };
+    return plan;
+  }
+
+  // 4) Build a LevelPlan per wing (lower = reference frame A, upper = B).
+  const lowerView = split.views.find((v) => v.region === 'lower');
+  const upperView = split.views.find((v) => v.region === 'upper');
+  const buildWing = (view) => buildLevelPlan(
+    { segments: view.segments, textItemsFt: view.textItemsFt, scaleFtPerUnit, scaleText: scaleInfo.scaleText },
+    opts,
+  );
+  const wingA = buildWing(lowerView); // lower
+  const wingB = buildWing(upperView); // upper
+  wingA.scaleSource = scaleInfo.source;
+  wingB.scaleSource = scaleInfo.source;
+
+  // 5) REGISTER + MERGE.
+  const reg = computeWingRegistration(wingA, wingB, opts.regOpts || {});
+  const merged = mergeWingPlans(wingA, wingB, reg, {
+    scaleFtPerUnit, scaleText: scaleInfo.scaleText, scaleSource: scaleInfo.source,
+  });
+  merged.stackedSplit = {
+    isStacked: true, splitYFt: split.splitYFt, valleyDepthFrac: split.valleyDepthFrac,
+    lowerYRangeFt: lowerView.yRangeFt, upperYRangeFt: upperView.yRangeFt, note: split.note,
+  };
+  return merged;
 }
 
 /**

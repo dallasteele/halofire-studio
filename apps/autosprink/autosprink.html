@@ -1102,6 +1102,54 @@ function cutWall(wallCuboid, s) {
   catch (_) { return wallCuboid; /* boolean unsupported here; render solid wall */ }
 }
 
+// HF-E2-NETALIGN: shift the sprinkler network (modelGroup) into the SAME world
+// frame as the extracted building geometry. The building is baked at world =
+// plan - unionFootprintCenter (building-from-plan.js); the network is built at
+// raw plan coords (W maps plan-X->world-X, plan-Y->world-Z). So a translate of
+// (-cx, 0, -cy) registers the network onto the plate at the shared origin +
+// true scale. Only applies when BOTH (a) the server used the extracted plate
+// (floorPlan.extractedPlate) AND (b) the plan-comprehension build is live with
+// a center; otherwise the network stays at the origin (unchanged behaviour).
+function alignNetworkToExtractedPlate(floorPlan) {
+  if (!modelGroup) return;
+  const usingPlate = !!(floorPlan && floorPlan.extractedPlate);
+  const c = (usingPlate && planBuildState && planBuildState.center) ? planBuildState.center : null;
+  if (c && Number.isFinite(c.cx) && Number.isFinite(c.cy)) {
+    modelGroup.position.set(-c.cx, 0, -c.cy);
+    modelGroup.updateMatrixWorld(true);
+    const rec = { aligned: true, cx: c.cx, cy: c.cy, note: 'network registered to extracted plate frame (shared origin + true scale)' };
+    // Re-frame on the network in its NEW world position so Fit/plan view bound it.
+    // Also publish the network + building world bboxes + plan-overlap % so the
+    // registration can be verified headlessly (the network must sit ON the plate).
+    try {
+      const nb = new THREE.Box3().setFromObject(modelGroup);
+      if (Number.isFinite(nb.min.x) && nb.min.x <= nb.max.x) {
+        rec.networkWorldBbox = { minX: nb.min.x, maxX: nb.max.x, minY: nb.min.y, maxY: nb.max.y, minZ: nb.min.z, maxZ: nb.max.z };
+        frameCamera(nb.min.x, nb.max.x, nb.min.z, nb.max.z, nb.max.y);
+      }
+      if (planBuildState && planBuildState.api && planBuildState.api.root) {
+        const gb = new THREE.Box3().setFromObject(planBuildState.api.root);
+        if (Number.isFinite(gb.min.x)) {
+          rec.buildingWorldBbox = { minX: gb.min.x, maxX: gb.max.x, minZ: gb.min.z, maxZ: gb.max.z };
+          if (rec.networkWorldBbox) {
+            const n = rec.networkWorldBbox;
+            const ox = Math.max(0, Math.min(n.maxX, gb.max.x) - Math.max(n.minX, gb.min.x));
+            const oz = Math.max(0, Math.min(n.maxZ, gb.max.z) - Math.max(n.minZ, gb.min.z));
+            rec.planOverlapPct = {
+              x: (n.maxX - n.minX) > 0 ? Math.round((ox / (n.maxX - n.minX)) * 100) : 0,
+              z: (n.maxZ - n.minZ) > 0 ? Math.round((oz / (n.maxZ - n.minZ)) * 100) : 0,
+            };
+          }
+        }
+      }
+    } catch (e) { rec.bboxError = String(e && e.message || e); }
+    window.__netAlign = rec;
+  } else {
+    modelGroup.position.set(0, 0, 0);
+    window.__netAlign = { aligned: false, reason: usingPlate ? 'no plan-build center yet' : 'project not using extracted plate' };
+  }
+}
+
 function renderModel(cadModel) {
   clearSelection(false); // HF-A1-SELECT: model rebuild invalidates the selection
   currentCadModel = cadModel;
@@ -2297,13 +2345,17 @@ async function applyGenerated(data) {
   await preloadDetailMeshes(); // HF-C1-PARTMESH: real coupling/hanger/tee/elbow meshes for the detail pass
   renderModel(cadModel);
   await renderRealOrFixtureUnderlay(floorPlan); // HF-B1-PDFUNDERLAY: REAL sheets when the project has them
-  // HF-E1-PLANBUILD INTEGRATION POINT (DEFERRED — next wave): for Cooperative 1881 the
-  // sprinkler Generate still lays heads against the SERVER cadModel (POST /sprinkler-bid),
-  // NOT the client-EXTRACTED parking plate from plan-levels.cooperative-1881.json. To run
-  // Generate against the real footprint, the server /sprinkler-bid handler must consume the
-  // extracted footprintFt + rooms (heads/branch lines clipped to the real plate, stair cores
-  // excluded) — a server-side change. Until then the extracted geometry is the comprehension
-  // view (planBuildState) and the box model is the sprinkler-bid view; flagged needs-verification.
+  // HF-E2-NETALIGN: register the sprinkler network onto the EXTRACTED plate frame.
+  // For Cooperative 1881 the server now lays the network against the REAL extracted
+  // Floor-1 footprint (floorPlan.extractedPlate) at the drawing's true scale, in PLAN
+  // coordinates. The extracted BUILDING geometry is baked at world = plan - center
+  // (buildBuildingFromPlans maps plan(x,y) -> world(x-cx, elev, y-cy); see
+  // building-from-plan.js). The network is placed via W([x,y,z]) = [x, z, y] (plan-X ->
+  // world-X, plan-Y -> world-Z) with NO offset. So to co-locate the two frames we shift
+  // the whole modelGroup by (-cx, 0, -cy) — the SAME union-footprint center the building
+  // uses. Result: network + building share one origin + one true scale (1 unit = 1 ft).
+  // Non-1881 projects (and the placeholder fallback) keep modelGroup at the origin.
+  alignNetworkToExtractedPlate(floorPlan);
     const r = bid.rooms[0];
     $('layout').innerHTML = `
       <div class="kv"><span>Total area</span><b>${bid.totalAreaSqFt.toLocaleString()} sqft</b></div>
