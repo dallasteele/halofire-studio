@@ -79,8 +79,11 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
   #inspBody{padding:10px 12px;overflow-y:auto;flex:1}
   #inspBody .kv{font-size:11px}
   .nv-flag{display:inline-block;margin-top:8px;font-family:var(--mono);font-size:9px;color:var(--gold);border:1px solid rgba(255,213,79,.4);border-radius:6px;padding:3px 7px;line-height:1.5}
-  /* HF-B1-PDFUNDERLAY: apple-glass level / sheet switcher at the viewport edge */
-  #levelPanel{position:absolute;left:12px;top:96px;z-index:13;display:none;flex-direction:column;gap:6px;width:190px;max-height:calc(100% - 160px);overflow-y:auto;background:linear-gradient(180deg,rgba(255,255,255,0.07),rgba(0,0,0,0.5)),rgba(13,12,10,0.82);border:1px solid rgba(255,255,255,0.15);border-radius:14px;padding:10px 12px;backdrop-filter:blur(28px) saturate(1.35);-webkit-backdrop-filter:blur(28px) saturate(1.35);box-shadow:0 18px 48px rgba(0,0,0,0.5)}
+  /* HF-UXCLEAN §1 (user 2026-06-13, HARD RULE — VIEWPORT IS SACRED): the level
+     switcher + plan-extraction stats + needs-verification banner are DOCKED in the
+     LEFT tools panel, never floating over the canvas. Restyled from the old
+     absolute apple-glass viewport overlay to a static in-panel section. */
+  #levelPanel{display:none;flex-direction:column;gap:6px;width:100%;margin:0 0 6px;overflow:visible;background:linear-gradient(180deg,rgba(255,255,255,0.05),rgba(0,0,0,0.32)),rgba(13,12,10,0.55);border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:10px 12px}
   #levelPanel.open{display:flex}
   #levelPanel h4{font-size:9px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);font-weight:700;margin:2px 0 0}
   #levelPanel .lvl-row{display:flex;flex-wrap:wrap;gap:4px}
@@ -240,6 +243,10 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
     <button class="act" id="genBtn">Generate Layout</button>
     <button class="act ghost" id="regenBtn" style="display:none;font-size:11px;padding:7px">↻ Regenerate (replace saved layout)</button>
 
+    <!-- HF-UXCLEAN §1: level switcher + plan-extraction stats + needs-verification
+         banner DOCKED in the left tools panel (was a floating viewport overlay). -->
+    <div id="levelPanel"></div>
+
     <h3>Layers</h3>
     <div id="layers"></div>
 
@@ -267,8 +274,6 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
       <button id="ifcBtn" disabled>IFC</button>
       <button id="stlBtn" disabled>STL</button>
     </div>
-    <!-- HF-B1-PDFUNDERLAY: level / sheet switcher (REAL plan sets only) -->
-    <div id="levelPanel"></div>
     <div id="status">initializing OpenGeometry kernel…</div>
     <div id="legend">
       <div><span class="sw" style="background:#6b7280"></span>building shell</div>
@@ -1973,9 +1978,15 @@ function clearHighlight() {
 let inspectState = null; // { saved: Map<material,{transparent,opacity,depthWrite}>, overlay: Mesh }
 function enterInspect(found) {
   exitInspect();
-  if (!modelGroup) return;
+  // HF-UXCLEAN §2 (user 2026-06-13): x-ray isolation MUST dim EVERY other part —
+  // both the sprinkler network (modelGroup) AND the extracted building geometry
+  // (planGroup: walls/rooms/doors/fixtures + the registered sheet underlay). A
+  // prior wave only dimmed modelGroup, so dbl-clicking any part left the whole
+  // building opaque = no visible isolation. Dim both groups now.
+  const groups = [modelGroup, planGroup].filter(Boolean);
+  if (!groups.length) return;
   const saved = new Map();
-  modelGroup.traverse((o) => {
+  for (const g of groups) g.traverse((o) => {
     if (!o.material) return;
     const mats = Array.isArray(o.material) ? o.material : [o.material];
     for (const m of mats) {
