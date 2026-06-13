@@ -210,7 +210,8 @@ function makeRoomTile(THREE, room, bounds, elevationFt) {
   return mesh;
 }
 
-const DOOR_COLOR = 0xffb454;       // door leaf + swing arc — warm amber
+const DOOR_COLOR = 0xffb454;       // CONFIDENT door leaf + swing arc — warm amber
+const DOOR_SUSPECT_COLOR = 0x6b7280; // SUSPECT (down-ranked) door — muted grey, visually de-emphasized
 const OPENING_COLOR = 0x4ab0ff;    // cased opening / passage marker — blue
 const FIXTURE_COLOR = 0x4ad6c0;    // fixture / core marker — teal
 const WALLSFULL_COLOR = 0xc77dff;  // recovered partition-inclusive walls (recall layer) — violet
@@ -229,12 +230,16 @@ function makeDoor(THREE, door, bounds, elevationFt) {
   const y = elevationFt + 0.06;
   const leaf = Array.isArray(door.leafDir) ? door.leafDir : [1, 0];
   const swing = Array.isArray(door.swingDir) ? door.swingDir : [0, 1];
+  // HF-W2b: suspect (down-ranked) doors render muted + more transparent so confident doors stand out.
+  const suspect = door.suspect === true || door.confidence === 'low';
+  const col = suspect ? DOOR_SUSPECT_COLOR : DOOR_COLOR;
+  const leafOpacity = suspect ? 0.45 : 0.92;
   // Leaf: a thin slab from hinge along leafDir.
   if (THREE.BoxGeometry) {
     const geo = new THREE.BoxGeometry(wft, 0.12, 0.34);
     const mat = THREE.MeshStandardMaterial
-      ? new THREE.MeshStandardMaterial({ color: DOOR_COLOR, transparent: true, opacity: 0.92, metalness: 0, roughness: 0.6 })
-      : new THREE.MeshBasicMaterial({ color: DOOR_COLOR, transparent: true, opacity: 0.92 });
+      ? new THREE.MeshStandardMaterial({ color: col, transparent: true, opacity: leafOpacity, metalness: 0, roughness: 0.6 })
+      : new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: leafOpacity });
     const leafMesh = new THREE.Mesh(geo, mat);
     const ang = Math.atan2(leaf[1], leaf[0]);          // plan angle of the leaf
     leafMesh.position.set(hx + Math.cos(ang) * wft / 2, y, hz + Math.sin(ang) * wft / 2);
@@ -253,7 +258,7 @@ function makeDoor(THREE, door, bounds, elevationFt) {
       pts.push(new THREE.Vector3(hx + Math.cos(a) * wft, y, hz + Math.sin(a) * wft));
     }
     const lg = new THREE.BufferGeometry().setFromPoints(pts);
-    const lm = new THREE.LineBasicMaterial({ color: DOOR_COLOR, transparent: true, opacity: 0.8 });
+    const lm = new THREE.LineBasicMaterial({ color: col, transparent: true, opacity: suspect ? 0.4 : 0.8 });
     const arc = new THREE.Line(lg, lm);
     arc.name = 'plan-door-swing';
     g.add(arc);
@@ -262,7 +267,8 @@ function makeDoor(THREE, door, bounds, elevationFt) {
   g.userData = {
     kind: 'plan-door', widthFt: Math.round(wft * 100) / 100,
     swingAngleDeg: door.swingAngleDeg, hostWall: door.hostWall, onWall: door.onWall,
-    confidence: door.confidence, evidence: door.evidence, needsVerification: true,
+    confidence: door.confidence, suspect, widthClass: door.widthClass || null,
+    evidence: door.evidence, needsVerification: true,
   };
   return g;
 }
@@ -599,6 +605,14 @@ export function buildBuildingFromPlans(THREE, levelPlans, opts = {}) {
       wallRecallPct: recallLevel.recallPct,
       recallMeasure: recallLevel.recallMeasure,
       doors: recallLevel.counts.doors, openings: recallLevel.counts.openings,
+      // HF-W2b: honest door split — confident = on-wall + real leaf width; suspect = down-ranked.
+      confidentDoors: (recallLevel.doorExtraction && Number.isFinite(recallLevel.doorExtraction.confidentDoors))
+        ? recallLevel.doorExtraction.confidentDoors : null,
+      suspectDoors: (recallLevel.doorExtraction && Number.isFinite(recallLevel.doorExtraction.suspectDoors))
+        ? recallLevel.doorExtraction.suspectDoors : null,
+      // HF-W2b: building-wall coverage measured in-envelope (drops non-wall sheet furniture).
+      inEnvelopeRecallPct: (recallLevel.recallMeasure && Number.isFinite(recallLevel.recallMeasure.inEnvelopeRecallPct))
+        ? recallLevel.recallMeasure.inEnvelopeRecallPct : null,
       fixtures: recallLevel.counts.fixtures, fixtureCounts: recallLevel.fixtureCounts,
       recoveredWalls: recallLevel.counts.wallsFull,
       doorExtraction: recallLevel.doorExtraction,
