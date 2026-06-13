@@ -79,6 +79,27 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
   #cadBar button:disabled{opacity:.38;cursor:default}
   #cadBar .tb-sep{width:1px;height:18px;background:rgba(255,255,255,0.12);margin:0 3px}
   #cadBar .tb-label{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin:0 2px}
+  /* HF-VIEWCUBE (user 2026-06-13): UE-style orientation cube, TOP-RIGHT, in-viewport,
+     z-20 (design-system "viewport edge controls" layer), never occludes the model. */
+  #viewCube{position:absolute;top:var(--hf-space-3, 12px);right:var(--hf-space-3, 12px);width:86px;height:86px;z-index:20;cursor:pointer;
+    border-radius:var(--hf-radius-lg, 10px);overflow:hidden;
+    background:linear-gradient(180deg,rgba(255,255,255,0.06),rgba(0,0,0,0.42)),rgba(13,12,10,0.62);
+    border:1px solid rgba(255,255,255,0.14);box-shadow:var(--hf-elevation-md, 0 4px 12px rgba(0,0,0,0.45));
+    backdrop-filter:blur(18px) saturate(1.3);-webkit-backdrop-filter:blur(18px) saturate(1.3)}
+  #viewCube canvas{display:block;width:100%;height:100%}
+  /* HF-SCALEBAR: real-world scale bar, BOTTOM-LEFT, in-viewport, z-20, non-occluding. */
+  #scaleBar{position:absolute;left:var(--hf-space-3, 12px);bottom:var(--hf-space-3, 12px);z-index:20;
+    display:flex;flex-direction:column;align-items:flex-start;gap:var(--hf-space-1, 4px);
+    padding:var(--hf-space-2, 8px) var(--hf-space-3, 12px);border-radius:var(--hf-radius-md, 6px);
+    background:linear-gradient(180deg,rgba(255,255,255,0.05),rgba(0,0,0,0.46)),rgba(13,12,10,0.58);
+    border:1px solid rgba(255,255,255,0.12);box-shadow:var(--hf-elevation-sm, 0 1px 2px rgba(0,0,0,0.4));
+    backdrop-filter:blur(12px) saturate(1.2);-webkit-backdrop-filter:blur(12px) saturate(1.2);
+    font-family:var(--mono);pointer-events:none;user-select:none}
+  #scaleBarTrack{position:relative;height:8px;width:96px;border-bottom:2px solid var(--gold);}
+  #scaleBar .sb-tick{position:absolute;bottom:0;width:2px;height:8px;background:var(--gold)}
+  #scaleBar .sb-tick-l{left:0}
+  #scaleBar .sb-tick-r{right:0}
+  #scaleBarLabel{font-size:10px;line-height:1;color:var(--bright);letter-spacing:.3px}
   /* HF-D1-INSPDOCK (PRIORITIES 3c): the Inspector lives IN the right results
      panel — never floating over the viewport. */
   #inspector{display:none;flex-direction:column;overflow:hidden;width:100%;max-height:46vh;margin:0 0 14px;background:linear-gradient(180deg,rgba(255,255,255,0.07),rgba(0,0,0,0.5)),rgba(13,12,10,0.82);border:1px solid rgba(255,255,255,0.15);border-radius:14px;box-shadow:0 18px 48px rgba(0,0,0,0.5)}
@@ -295,6 +316,13 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
       <button id="stepBtn" disabled>STEP</button>
       <button id="ifcBtn" disabled>IFC</button>
       <button id="stlBtn" disabled>STL</button>
+    </div>
+    <!-- HF-UXCLEAN §1 / design-system z-20 edge controls: orientation cube (top-right)
+         + scale bar (bottom-left). Both are non-occluding, edge-anchored, in-viewport. -->
+    <div id="viewCube" title="Orientation cube — click a face for an ortho view, a corner for 3D"></div>
+    <div id="scaleBar" aria-label="viewport scale bar">
+      <div id="scaleBarTrack"><span id="scaleBarTick" class="sb-tick sb-tick-l"></span><span id="scaleBarTick2" class="sb-tick sb-tick-r"></span></div>
+      <div id="scaleBarLabel">—</div>
     </div>
   </div>
 
@@ -571,6 +599,8 @@ async function initStudio() {
   let fpsFrames = 0, fpsLast = performance.now();
   (function loop(now) {
     requestAnimationFrame(loop); stepCamTween(now || performance.now()); controls.update(); renderer.render(scene, camera);
+    try { updateViewCube(); } catch (_) { /* cube optional */ }
+    try { updateScaleBar(); } catch (_) { /* scale bar optional */ }
     fpsFrames += 1; const t = now || performance.now();
     if (t - fpsLast >= 1000) { window.__fps = Math.round(fpsFrames * 10000 / (t - fpsLast)) / 10; fpsFrames = 0; fpsLast = t; }
   })();
@@ -641,6 +671,9 @@ async function initStudio() {
       extraction: st.api.summary && st.api.summary.extractionCompleteness,
     };
   };
+  // HF-VIEWCUBE + HF-SCALEBAR: build the in-viewport orientation cube + scale bar.
+  try { initViewCube(); } catch (e) { console.warn('viewCube init failed', e); }
+  try { initScaleBar(); } catch (e) { console.warn('scaleBar init failed', e); }
   window.addEventListener('resize', onResize);
   // HF-UXCLEAN §2: inert debug hooks for the behavioral selection gate — report
   // the orbit pivot + x-ray dim ratio so the headless gate can verify isolation
@@ -1403,6 +1436,196 @@ function frameCamera(minX, maxX, minZ, maxZ, ceil) {
   window._frame = { cx, cz, span, ceil, bbox: { minX, maxX, minY: minZ, maxY: maxZ } };
 }
 
+// ── HF-VIEWCUBE: UE-style orientation cube ──────────────────────────────────
+// A small separate WebGLRenderer overlay in the TOP-RIGHT viewport corner. It
+// renders a labelled cube whose orientation MIRRORS the main camera (so it spins
+// with orbit), and is INTERACTIVE: clicking a face snaps the main camera to that
+// ortho view; clicking a corner snaps to iso. Uses the page's vendored three
+// (importmap 'three'), never occludes the model (86px, edge-anchored, z-20).
+let vcRenderer = null, vcScene = null, vcCamera = null, vcCube = null, vcRaycaster = null;
+function vcFaceTexture(label, accent) {
+  // LIGHT face with a soft directional gradient (reads as 3D once lit) + bevel frame.
+  const S = 256, c = document.createElement('canvas'); c.width = c.height = S;
+  const x = c.getContext('2d');
+  const g = x.createLinearGradient(0, 0, S, S);
+  g.addColorStop(0, '#f6f9fc'); g.addColorStop(1, '#dbe3ed');
+  x.fillStyle = g; x.fillRect(0, 0, S, S);
+  x.strokeStyle = 'rgba(110,130,155,.6)'; x.lineWidth = 10; x.strokeRect(8, 8, S - 16, S - 16);
+  if (accent) { x.fillStyle = accent; x.fillRect(8, 8, S - 16, 14); }
+  x.fillStyle = '#1b2330'; x.font = '700 58px Inter,system-ui,sans-serif';
+  x.textAlign = 'center'; x.textBaseline = 'middle';
+  x.fillText(label, S / 2, S / 2 + 4);
+  const t = new THREE.CanvasTexture(c);
+  if ('colorSpace' in t && THREE.SRGBColorSpace) t.colorSpace = THREE.SRGBColorSpace;
+  t.anisotropy = 8; return t;
+}
+function initViewCube() {
+  const host = $('viewCube');
+  if (!host || !THREE.WebGLRenderer) return;
+  const size = 86;
+  vcRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  vcRenderer.setSize(size, size, false);
+  vcRenderer.setPixelRatio(window.devicePixelRatio || 1);
+  host.appendChild(vcRenderer.domElement);
+  vcScene = new THREE.Scene();
+  vcCamera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
+  vcCamera.position.set(0, 0, 5);
+  vcScene.add(new THREE.AmbientLight(0xffffff, 0.72));
+  const dl = new THREE.DirectionalLight(0xffffff, 0.9); dl.position.set(4, 6, 3); vcScene.add(dl);
+  const fl = new THREE.DirectionalLight(0xcfe0ff, 0.4); fl.position.set(-5, -3, -4); vcScene.add(fl);
+  // BoxGeometry material order is [+x, -x, +y, -y, +z, -z]; map labels to that order
+  // so each face shows the world direction it represents (RIGHT/LEFT/TOP/BOT/FRONT/BACK).
+  // Lambert (not Basic) so the lights SHADE the three visible faces -> the cube reads as 3D.
+  const matFor = (label, accent) => new THREE.MeshLambertMaterial({ map: vcFaceTexture(label, accent), emissive: 0x000000 });
+  const mats = [
+    matFor('RIGHT'), matFor('LEFT'), matFor('TOP', '#e8b341'), matFor('BOT'), matFor('FRONT'), matFor('BACK'),
+  ];
+  vcCube = new THREE.Mesh(new THREE.BoxGeometry(2, 2, 2), mats);
+  vcScene.add(vcCube);
+  // subtle edge wire so corners read as clickable (corner click = iso snap).
+  if (THREE.EdgesGeometry && THREE.LineSegments) {
+    const edges = new THREE.LineSegments(new THREE.EdgesGeometry(vcCube.geometry), new THREE.LineBasicMaterial({ color: 0x2b3440 }));
+    vcCube.add(edges);
+  }
+  vcRaycaster = new THREE.Raycaster();
+  vcRenderer.domElement.addEventListener('pointerdown', onViewCubeClick);
+  vcRenderer.domElement.addEventListener('pointermove', onViewCubeHover);
+  vcRenderer.domElement.addEventListener('pointerleave', () => { vcHoverIdx = -1; });
+  // Inert verification hooks (dev capture only; no production effect): drive a cube
+  // snap + read the scale bar's computed feet-per-pixel so the headless gate can
+  // confirm the cube is INTERACTIVE and the scale bar is ACCURATE.
+  window.__cubeSnap = (view) => { snapCubeView(view); const d = camera.position.clone().sub(controls.target).normalize(); return { view, camIsOrtho: !!camera.isOrthographicCamera, dir: [+d.x.toFixed(2), +d.y.toFixed(2), +d.z.toFixed(2)] }; };
+  window.__scaleBarState = () => ({ feetPerPixel: feetPerPixelAtTarget(), label: $('scaleBarLabel') ? $('scaleBarLabel').textContent : null, trackPx: $('scaleBarTrack') ? parseFloat(getComputedStyle($('scaleBarTrack')).width) : null });
+  // Inert: measure the on-screen pixel length of a `ft`-foot segment laid along world
+  // X at the current pivot, so the gate can cross-check the scale bar's feet-per-pixel.
+  window.__measureFtPx = (ft) => {
+    const cnv = $('canvas'); const t = controls.target;
+    const toPx = (p) => { const v = p.clone().project(camera); return { x: (v.x * 0.5 + 0.5) * cnv.clientWidth, y: (-v.y * 0.5 + 0.5) * cnv.clientHeight }; };
+    const a = toPx(t.clone()); const b = toPx(t.clone().add(new THREE.Vector3(ft, 0, 0)));
+    return Math.hypot(b.x - a.x, b.y - a.y);
+  };
+}
+let vcHoverIdx = -1;
+function onViewCubeHover(ev) {
+  if (!vcRaycaster || !vcCamera || !vcCube) return;
+  const r = vcRenderer.domElement.getBoundingClientRect();
+  const mx = ((ev.clientX - r.left) / r.width) * 2 - 1;
+  const my = -((ev.clientY - r.top) / r.height) * 2 + 1;
+  vcRaycaster.setFromCamera({ x: mx, y: my }, vcCamera);
+  const hit = vcRaycaster.intersectObject(vcCube, false)[0];
+  vcHoverIdx = hit ? hit.face.materialIndex : -1;
+  vcRenderer.domElement.style.cursor = hit ? 'pointer' : 'default';
+}
+function updateViewCube() {
+  if (!vcRenderer || !vcCube || !camera) return;
+  // Orient the cube so it shows the SAME side of the model the main camera sees:
+  // place the cube camera along the main camera's view direction (from target).
+  const tgt = (controls && controls.target) ? controls.target : new THREE.Vector3();
+  const dir = camera.position.clone().sub(tgt);
+  if (dir.lengthSq() < 1e-6) dir.set(0, 0, 1);
+  dir.normalize();
+  // Constant tilt bias so an ortho view (top/front/right) never collapses to a flat
+  // square — the cube always reads as a 3D cube (UE/Fusion ViewCube behaviour).
+  dir.add(new THREE.Vector3(0.18, 0.15, 0.12)).normalize();
+  vcCamera.position.copy(dir.multiplyScalar(6.2));
+  vcCamera.up.set(0, 1, 0);
+  vcCamera.lookAt(0, 0, 0);
+  // hover highlight: warm emissive on the face under the cursor.
+  if (vcCube.material && vcCube.material.forEach) vcCube.material.forEach((m, i) => { if (m.emissive) m.emissive.setHex(i === vcHoverIdx ? 0x3b3012 : 0x000000); });
+  vcRenderer.render(vcScene, vcCamera);
+}
+function onViewCubeClick(ev) {
+  if (!vcRaycaster || !vcCamera || !vcCube) return;
+  const r = vcRenderer.domElement.getBoundingClientRect();
+  const mx = ((ev.clientX - r.left) / r.width) * 2 - 1;
+  const my = -((ev.clientY - r.top) / r.height) * 2 + 1;
+  vcRaycaster.setFromCamera({ x: mx, y: my }, vcCamera);
+  const hit = vcRaycaster.intersectObject(vcCube, false)[0];
+  if (!hit || !hit.face) return;
+  // Decide face vs corner: a hit near a cube corner (all |local coord| large) snaps iso.
+  const p = hit.point.clone(); // on a 2x2 cube, faces at |1|
+  const near = (v) => Math.abs(Math.abs(v) - 1) < 0.35;
+  const bigCount = [p.x, p.y, p.z].filter((v) => Math.abs(v) > 0.62).length;
+  if (bigCount >= 3) { snapCubeView('iso', p); return; }
+  // Pick the dominant axis = the clicked face normal.
+  const n = hit.face.normal.clone().applyMatrix3(new THREE.Matrix3().getNormalMatrix(vcCube.matrixWorld)).normalize();
+  const ax = Math.abs(n.x) >= Math.abs(n.y) && Math.abs(n.x) >= Math.abs(n.z) ? 'x'
+    : (Math.abs(n.y) >= Math.abs(n.z) ? 'y' : 'z');
+  const sign = (ax === 'x' ? n.x : ax === 'y' ? n.y : n.z) >= 0 ? 1 : -1;
+  const view = ax === 'y' ? (sign > 0 ? 'top' : 'bottom') : ax === 'z' ? (sign > 0 ? 'front' : 'back') : (sign > 0 ? 'right' : 'left');
+  snapCubeView(view);
+}
+// Snap the MAIN camera to an ortho-aligned view (or iso) about the current pivot.
+function snapCubeView(view, cornerPoint) {
+  const f = window._frame;
+  const cx = f ? f.cx : (controls ? controls.target.x : 0);
+  const cz = f ? f.cz : (controls ? controls.target.z : 0);
+  const ceil = f ? f.ceil : 12;
+  const span = f ? f.span : 60;
+  const tx = cx, ty = f ? ceil / 2 : (controls ? controls.target.y : 0), tz = cz;
+  const dist = Math.max(span, ceil || 12) * 1.6 + 20;
+  const clickViewBtn = (v) => { const b = document.querySelector(`#viewSeg button[data-view="${v}"]`); if (b) b.click(); };
+  if (view === 'top') { clickViewBtn('top'); const fb = $('fitBtn'); if (fb) fb.click(); return; }
+  // All non-top snaps use the perspective camera posed along the chosen axis.
+  camera = perspCam; if (controls) controls.object = camera;
+  setPlanStyle(false);
+  document.querySelectorAll('#viewSeg button').forEach((x) => x.classList.toggle('on', x.dataset.view === 'iso'));
+  let pos;
+  switch (view) {
+    case 'bottom': pos = [tx, ty - dist, tz]; perspCam.up.set(0, 0, 1); break;
+    case 'front': pos = [tx, ty, tz + dist]; perspCam.up.set(0, 1, 0); break;
+    case 'back': pos = [tx, ty, tz - dist]; perspCam.up.set(0, 1, 0); break;
+    case 'right': pos = [tx + dist, ty, tz]; perspCam.up.set(0, 1, 0); break;
+    case 'left': pos = [tx - dist, ty, tz]; perspCam.up.set(0, 1, 0); break;
+    case 'iso':
+    default: {
+      const s = cornerPoint || { x: 1, y: 1, z: 1 };
+      const sx = s.x >= 0 ? 1 : -1, sy = s.y >= 0 ? 1 : -1, sz = s.z >= 0 ? 1 : -1;
+      pos = [tx + dist * 0.6 * sx, ty + dist * 0.6 * Math.abs(sy || 1), tz + dist * 0.6 * sz];
+      perspCam.up.set(0, 1, 0);
+    }
+  }
+  perspCam.position.set(pos[0], pos[1], pos[2]);
+  perspCam.lookAt(tx, ty, tz);
+  if (controls) { controls.target.set(tx, ty, tz); controls.update(); }
+}
+
+// ── HF-SCALEBAR: real-world (true-scale, 1 unit = 1 ft) viewport scale bar ───
+// Bottom-left, updates every frame from the camera projection so the labelled
+// segment shows how many feet a fixed ~96px track spans at the current zoom.
+const SCALE_BAR_PX = 96; // matches #scaleBarTrack width
+const SCALE_NICE = [1, 2, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000, 2000, 5000];
+function feetPerPixelAtTarget() {
+  const cnv = $('canvas'); if (!cnv || !camera) return null;
+  const h = cnv.clientHeight || 1;
+  const tgt = (controls && controls.target) ? controls.target : new THREE.Vector3();
+  if (camera.isOrthographicCamera) {
+    // world units spanned vertically / pixels  (ortho is zoom-aware)
+    const worldH = (camera.top - camera.bottom) / (camera.zoom || 1);
+    return worldH / h;
+  }
+  // perspective: world height visible at the target plane
+  const dist = camera.position.distanceTo(tgt);
+  const worldH = 2 * dist * Math.tan((camera.fov * Math.PI / 180) / 2);
+  return worldH / h;
+}
+function niceFeet(raw) {
+  if (!(raw > 0)) return SCALE_NICE[0];
+  for (let i = SCALE_NICE.length - 1; i >= 0; i--) if (SCALE_NICE[i] <= raw) return SCALE_NICE[i];
+  return SCALE_NICE[0];
+}
+function updateScaleBar() {
+  const label = $('scaleBarLabel'), track = $('scaleBarTrack');
+  if (!label || !track) return;
+  const fpp = feetPerPixelAtTarget();
+  if (!fpp || !isFinite(fpp) || fpp <= 0) { label.textContent = '—'; return; }
+  const rawFt = fpp * SCALE_BAR_PX;
+  const ft = niceFeet(rawFt);
+  const widthPx = Math.max(12, Math.min(220, ft / fpp));
+  track.style.width = widthPx + 'px';
+  label.textContent = ft >= 1000 ? (ft / 1000) + 'k ft' : ft + ' ft';
+}
+
 function setView(view) {
   camera = view === 'top' ? orthoCam : perspCam;
   controls.object = camera;
@@ -1547,32 +1770,42 @@ function renderPlanUnderlay(plan) {
   cnv.width = px; cnv.height = Math.max(64, Math.round(px * d / w));
   const ctx = cnv.getContext('2d');
   const sx = cnv.width / w, sy = cnv.height / d;
+  // ORIENTATION FIX (user 2026-06-13, demo "Sales + Warehouse" read MIRRORED/upside-down):
+  // Draw the canvas as a TOP-DOWN RASTER in image space — row 0 (top) = MAX plan-y (north),
+  // canvas-row increases as plan-y DECREASES — i.e. canvasY = (maxY - planY) * sy. This is the
+  // SAME row-0-at-top convention a pdf.js page raster uses, so the proven underlay recipe
+  // (plane rotation.x = -PI/2 + CanvasTexture default flipY) renders the text FORWARD and
+  // UPRIGHT from the top-down plan camera (up = (0,0,-1)) AND from iso. The prior code drew
+  // grid/rooms y-up (ctx.scale(1,-1)) but text y-down, then used the OPPOSITE plane rotation
+  // (+PI/2 — back face toward the camera), which mirrored every label.
+  const planToCanvasY = (planY) => (maxY - planY) * sy; // plan-y up -> image-row down (north at top)
   ctx.fillStyle = 'rgba(13,15,22,0.94)'; ctx.fillRect(0, 0, cnv.width, cnv.height);
-  ctx.save();
-  ctx.translate(0, cnv.height); ctx.scale(1, -1); // plan +y up
   ctx.strokeStyle = 'rgba(255,255,255,0.05)'; ctx.lineWidth = 1;
   for (let gx = 0; gx <= w; gx += 25) { ctx.beginPath(); ctx.moveTo(gx * sx, 0); ctx.lineTo(gx * sx, cnv.height); ctx.stroke(); }
-  for (let gy = 0; gy <= d; gy += 25) { ctx.beginPath(); ctx.moveTo(0, gy * sy); ctx.lineTo(cnv.width, gy * sy); ctx.stroke(); }
+  for (let gy = 0; gy <= d; gy += 25) { const Y = gy * sy; ctx.beginPath(); ctx.moveTo(0, Y); ctx.lineTo(cnv.width, Y); ctx.stroke(); }
   for (const r of plan.rooms) {
     const poly = r.polygon || []; if (poly.length < 3) continue;
     ctx.beginPath();
-    poly.forEach((p, i) => { const X = (p[0] - minX) * sx, Y = (p[1] - minY) * sy; if (i === 0) ctx.moveTo(X, Y); else ctx.lineTo(X, Y); });
+    poly.forEach((p, i) => { const X = (p[0] - minX) * sx, Y = planToCanvasY(p[1]); if (i === 0) ctx.moveTo(X, Y); else ctx.lineTo(X, Y); });
     ctx.closePath();
     ctx.fillStyle = 'rgba(200,154,60,0.07)'; ctx.fill();
     ctx.strokeStyle = 'rgba(255,213,79,0.55)'; ctx.lineWidth = 3; ctx.stroke();
   }
-  ctx.restore();
   ctx.fillStyle = 'rgba(242,236,224,0.72)';
   ctx.font = `${Math.max(14, Math.round(px / 42))}px Inter,system-ui,sans-serif`;
   ctx.textAlign = 'center';
   for (const r of plan.rooms) {
     const poly = r.polygon || []; if (!poly.length) continue;
     let cx = 0, cy = 0; poly.forEach((p) => { cx += p[0]; cy += p[1]; }); cx /= poly.length; cy /= poly.length;
-    ctx.fillText(`${r.name || 'Room'}${r.hazard ? ' · ' + r.hazard : ''}`, (cx - minX) * sx, cnv.height - (cy - minY) * sy);
+    ctx.fillText(`${r.name || 'Room'}${r.hazard ? ' · ' + r.hazard : ''}`, (cx - minX) * sx, planToCanvasY(cy));
   }
   const tex = new THREE.CanvasTexture(cnv);
   const geo = new THREE.PlaneGeometry(w, d);
-  geo.rotateX(Math.PI / 2); // local +y -> world +z (plan +y)
+  // Proven underlay recipe (matches src/engine building-from-plan computePlanUnderlayTransform):
+  // rotation.x = -PI/2 sends the textured face normal to +Y (UP) toward the top-down plan camera
+  // so text reads FORWARD; CanvasTexture default flipY=true keeps it upright. The top-down raster
+  // draw above (north at image-top) makes the in-image text register correctly under the structure.
+  geo.rotateX(-Math.PI / 2);
   const mesh = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ map: tex, transparent: true, opacity: 0.95, side: THREE.DoubleSide, depthWrite: false }));
   mesh.position.set((minX + maxX) / 2, 0.06, (minY + maxY) / 2);
   planGroup.add(mesh);
