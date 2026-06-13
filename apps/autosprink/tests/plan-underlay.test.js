@@ -56,6 +56,40 @@ describe('createUnderlayMesh input contract', () => {
   });
 });
 
+describe('createUnderlayMesh orientation + clipping (RECORE)', () => {
+  // Minimal THREE that records what createUnderlayMesh sets on the texture + material.
+  class CanvasTexture {
+    constructor() { this.center = { set(x, y) { this.x = x; this.y = y; } }; this.repeat = { set(x, y) { this.x = x; this.y = y; } }; this.flipY = true; this.wrapT = 1000; this.colorSpace = null; this.anisotropy = 1; }
+  }
+  class MeshBasicMaterial { constructor(o) { Object.assign(this, o); } }
+  class PlaneGeometry { constructor(w, d) { this.w = w; this.d = d; } }
+  class Mesh { constructor(g, m) { this.geometry = g; this.material = m; this.rotation = { set(x, y, z) { this.x = x; this.y = y; this.z = z; } }; this.position = { set(x, y, z) { this.x = x; this.y = y; this.z = z; } }; this.userData = {}; } }
+  const THREE = { CanvasTexture, MeshBasicMaterial, PlaneGeometry, Mesh, DoubleSide: 2, SRGBColorSpace: 'srgb', RepeatWrapping: 1000 };
+  const transform = { widthFt: 50, depthFt: 30, position: { x: 1, y: 2, z: 3 }, rotation: { x: -Math.PI / 2, y: 0, z: 0 }, scaleSource: 'needs-verification' };
+
+  it('sets polygonOffset + renderOrder so the underlay never z-fights/clips at grazing angles', () => {
+    const mesh = createUnderlayMesh(THREE, { canvas: {}, transform });
+    expect(mesh.material.polygonOffset).toBe(true);
+    expect(mesh.material.polygonOffsetFactor).toBe(1);
+    expect(mesh.material.polygonOffsetUnits).toBe(1);
+    expect(mesh.material.depthWrite).toBe(false);
+    expect(mesh.renderOrder).toBe(-10);
+    expect(mesh.rotation.x).toBeCloseTo(-Math.PI / 2, 9); // face UP toward the top-down camera
+  });
+
+  it('flipTextureV mirrors the texture V (image-top -> +Z) for the registered plan-Y->world-Z path', () => {
+    const mesh = createUnderlayMesh(THREE, { canvas: {}, transform, flipTextureV: true });
+    expect(mesh.material.map.repeat.y).toBe(-1); // V mirrored about center
+    expect(mesh.userData.flipTextureV).toBe(true);
+  });
+
+  it('leaves the texture V un-mirrored by default (contain-fit path)', () => {
+    const mesh = createUnderlayMesh(THREE, { canvas: {}, transform });
+    expect(mesh.material.map.repeat.y === -1).toBe(false);
+    expect(mesh.userData.flipTextureV).toBe(false);
+  });
+});
+
 describe('slabOutlinePoints', () => {
   it('returns a closed centered rectangle loop at y=0', () => {
     const pts = slabOutlinePoints(100, 60);

@@ -480,7 +480,12 @@ function realDetailGeo(group, r) {
 function detailMeshProvenance(group) {
   const base = detailMeshBase[group];
   if (base && base.geometry && base.provenance) {
-    return `real mesh (${base.provenance.source}, rescaled to pipe size — needs-verification)`;
+    const p = base.provenance;
+    // HF-W3: these meshes are now DIMENSIONED to spec at true scale.
+    if (p.dimensioned) {
+      return `spec-dimensioned mesh (${p.dimProvenance || 'spec-nominal'}, true scale) — NOT mfr-exact, needs-verification`;
+    }
+    return `real mesh (${p.source}, rescaled to pipe size — needs-verification)`;
   }
   return 'primitive-fallback (no honest generated mesh)';
 }
@@ -1685,12 +1690,17 @@ async function ensurePlanBuildSheet(levelN) {
     const t = computePlanUnderlayTransform({
       pageWidthPt: rendered.widthPt, pageHeightPt: rendered.heightPt,
       scaleFtPerUnit: s, unionCenterXFt: st.center.cx, unionCenterYFt: st.center.cy,
-      elevationFt: entry.elevationFt, liftFt: 0.04,
+      // RECORE clipping fix: lift the underlay 0.5 ft above the (also-transparent) slab so it
+      // never z-fights / cuts through geometry at grazing angles; polygonOffset (in
+      // createUnderlayMesh) resolves the remaining near-coplanar depth ties.
+      elevationFt: entry.elevationFt, liftFt: 0.5,
     });
     const mesh = createUnderlayMesh(THREE, {
       canvas: rendered.canvas,
       transform: { widthFt: t.widthFt, depthFt: t.depthFt, position: t.position, rotation: t.rotation, scaleSource: t.scaleSource, needsVerification: true },
       opacity: 0.92, name: `plan-underlay:A-10${levelN}:p${page}`,
+      // RECORE: -PI/2 (readable) + flipTextureV (image-top -> +Z to match plan-Y->world-Z registration).
+      flipTextureV: t.flipTextureV === true,
       sheetMeta: { sheet: `A-10${levelN}`, page, discipline: 'arch', verified: 'registered-true-scale' },
     });
     entry.group.add(mesh);
@@ -1721,7 +1731,7 @@ function buildPlanBuildPanel() {
     .map((v) => `<button data-lvl="${v}" class="${String(st.activeLevel) === String(v) ? 'on' : ''}">${v === 'all' ? 'All' : 'L' + v}</button>`).join('');
   const active = st.api.levels.find((l) => l.level === Number(st.activeLevel));
   const c = active ? active.counts : null;
-  const cntLine = c ? `walls ${c.walls} · rooms ${c.rooms} · stairs ${c.stairs}` : 'extracted geometry';
+  const cntLine = c ? `walls ${(c.wallRuns || c.walls).toLocaleString()} · rooms ${c.rooms} · stairs ${c.stairs}` : 'extracted geometry';
   // HF-W2: surface extraction completeness — wall recall %, door/fixture counts, + a heatmap link.
   const ext = st.api.summary && st.api.summary.extractionCompleteness;
   let w2Block = '';
@@ -1736,12 +1746,23 @@ function buildPlanBuildPanel() {
     const doorLine = (cd != null && sd != null)
       ? `doors <b style="color:#4ade80">${cd} confident</b> · <b style="color:#fbbf24">${sd} suspect</b> (of ${ext.doors || 0})`
       : `doors ${ext.doors || 0}`;
+    // RECORE: headline the HONEST primary structure — collinear-merged wall RUNS (real walls:
+    // envelope + partitions, non-wall ink excluded), NOT a coverage %. The 41,784-segment
+    // lineweight union is demoted to an off-by-default diagnostic overlay.
+    const wrm = ext.wallRunsMeta || {};
+    const runLine = (ext.wallRuns != null)
+      ? `walls (structure): <b style="color:#4ade80">${ext.wallRuns.toLocaleString()} merged runs</b>`
+        + ` <span style="color:var(--muted)">(${wrm.totalRunLengthFt ? Math.round(wrm.totalRunLengthFt).toLocaleString() + ' ft; ' : ''}`
+        + `from ${ext.wallSegmentsRaw ? ext.wallSegmentsRaw.toLocaleString() : '?'} segs, `
+        + `excl. ${(wrm.shortRunsDropped || 0).toLocaleString()} non-wall stubs + ${wrm.diagonalDropped || 0} diag)</span>`
+      : '';
     w2Block = `
       <div class="disc-row" style="font-family:var(--mono);font-size:10px;margin-top:6px;border-top:1px solid var(--line,#283042);padding-top:6px">
         <div><b style="color:var(--text)">plan extraction</b> — needs-verification</div>
-        ${inEnv ? `<div>building-wall coverage: <b style="color:${ext.inEnvelopeRecallPct >= 90 ? '#4ade80' : '#fbbf24'}">${inEnv}</b> in-envelope (0 missing building walls)</div>` : ''}
-        <div>whole-sheet wall-ink coverage: <b style="color:#fbbf24">${recall}</b> floor (denominator incl. border/grid/dim ink) (L${ext.level})</div>
-        <div>${doorLine} · openings ${ext.openings || 0} · recovered walls ${ext.recoveredWalls ? ext.recoveredWalls.toLocaleString() : 0}</div>
+        ${runLine ? `<div>${runLine}</div>` : ''}
+        ${inEnv ? `<div>wall-ink coverage (diagnostic): <b style="color:${ext.inEnvelopeRecallPct >= 90 ? '#4ade80' : '#fbbf24'}">${inEnv}</b> in-envelope</div>` : ''}
+        <div>whole-sheet wall-ink coverage (diagnostic): <b style="color:#fbbf24">${recall}</b> floor (denominator incl. border/grid/dim ink) (L${ext.level})</div>
+        <div>${doorLine} · openings ${ext.openings || 0} · lineweight-union overlay ${ext.recoveredWalls ? ext.recoveredWalls.toLocaleString() : 0} segs (off by default)</div>
         ${ext.fixtures ? `<div>fixtures/cores: ${ext.fixtures}${fxLine ? ' (' + fxLine + ')' : ''}</div>` : ''}
         <div style="margin-top:4px"><a href="#" id="w2HeatLink" style="color:#7dd3fc;text-decoration:underline">view recall heatmap ▸</a></div>
         <img id="w2HeatThumb" src="${W2_HEATMAP_URL}" alt="wall recall heatmap (covered green / missed red)"
@@ -2184,8 +2205,15 @@ function describeHit(found) {
     }
     if (meta.kind === 'head') {
       const c = s.position ? toWorld(s.position) : found.point.clone();
-      return { title: `Sprinkler head #${i + 1}`, center: c, sizeFt: 2.2, verify: 'head model/K-factor are placeholders, not manufacturer-exact', rows: [
-        ['Type', 'Pendent sprinkler head'], ['Part mesh', partsSource], ['Plan coords (ft)', fmtPt(s.position)],
+      // HF-W3: surface spec dimensions + provenance for the dimensioned head mesh.
+      const hp = headProvenance;
+      const dimRows = hp && hp.dimensioned
+        ? [['Dimensioned', `yes (${hp.dimProvenance || 'spec-nominal'})`],
+           ['Spec dims', 'pendent body ~2.25" tall, deflector ~1.3" dia, 1/2 NPT (0.840" OD)'],
+           ['Manufacturer-exact', 'no — needs-verification (no mfr CAD)']]
+        : [['Part mesh', partsSource]];
+      return { title: `Sprinkler head #${i + 1}`, center: c, sizeFt: 2.2, verify: hp && hp.dimensioned ? 'spec-dimensioned at true scale; NOT manufacturer-exact — needs-verification' : 'head model/K-factor are placeholders, not manufacturer-exact', rows: [
+        ['Type', 'Pendent sprinkler head'], ...dimRows, ['Plan coords (ft)', fmtPt(s.position)],
       ] };
     }
     if (meta.kind === 'drop') {

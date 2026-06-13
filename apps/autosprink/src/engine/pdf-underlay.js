@@ -137,13 +137,35 @@ export function createUnderlayMesh(THREE, {
   name = 'plan-underlay',
   opacity = 1,
   sheetMeta = null,
+  // RECORE orientation contract: the underlay plane is rotated rotation.x = -PI/2 so its
+  // textured face normal points +Y (UP), toward the top-down plan camera — text reads
+  // FORWARD, never mirrored (a +PI/2 plane shows its BACK to that camera = backwards text).
+  // With -PI/2, the texture's TOP row (image-top) maps to world -Z. For the CONTAIN-FIT path
+  // (pdf-underlay.computeUnderlayTransform) that is correct as-is (it does not bind plan-Y to
+  // world-Z). For the REGISTERED-geometry path (building-from-plan.computePlanUnderlayTransform),
+  // geometry maps plan-Y -> world-Z directly, so image-top (= MAX plan-Y) must land at MAX
+  // world-Z (+Z); pass flipTextureV:true so image-top maps to plane local -Y -> +Z. This keeps
+  // text readable AND the sheet registered under the extracted walls.
+  flipTextureV = false,
 }) {
   if (!THREE) throw new Error('createUnderlayMesh: THREE namespace is required');
   if (!canvas) throw new Error('createUnderlayMesh: rendered canvas is required');
   if (!transform) throw new Error('createUnderlayMesh: transform from computeUnderlayTransform is required');
   const texture = new THREE.CanvasTexture(canvas);
-  // flipY default (true) is REQUIRED for the readable-from-above contract.
+  // flipY default (true) keeps the texture upright; the readable-from-above contract is now
+  // carried by rotation.x = -PI/2 (face up). flipTextureV additionally mirrors the V axis so
+  // image-top lands at +Z for the plan-Y->world-Z registered path (see header).
   if ('colorSpace' in texture && THREE.SRGBColorSpace) texture.colorSpace = THREE.SRGBColorSpace;
+  if (flipTextureV) {
+    if (texture.center && texture.repeat && texture.wrapT !== undefined) {
+      // Mirror about the texture's vertical center so the image flips top<->bottom in place.
+      texture.center.set(0.5, 0.5);
+      texture.repeat.set(1, -1);
+      if (THREE.RepeatWrapping) texture.wrapT = THREE.RepeatWrapping;
+    } else {
+      texture.flipY = !texture.flipY; // stub-THREE / minimal texture fallback
+    }
+  }
   texture.anisotropy = 8;
   const material = new THREE.MeshBasicMaterial({
     map: texture,
@@ -152,6 +174,13 @@ export function createUnderlayMesh(THREE, {
     side: THREE.DoubleSide,
     toneMapped: false,
     depthWrite: false,
+    // RECORE clipping fix: the underlay sits just above an also-transparent footprint slab
+    // (renderOrder -10, depthWrite false). With NO polygon offset and a tiny lift it z-fights /
+    // cuts through geometry at grazing camera angles. Push it back in depth so it always resolves
+    // BEHIND the model linework regardless of view angle, without disabling depthTest.
+    polygonOffset: true,
+    polygonOffsetFactor: 1,
+    polygonOffsetUnits: 1,
   });
   const geometry = new THREE.PlaneGeometry(transform.widthFt, transform.depthFt);
   const mesh = new THREE.Mesh(geometry, material);
@@ -164,6 +193,7 @@ export function createUnderlayMesh(THREE, {
     needsVerification: true,
     scaleSource: transform.scaleSource,
     sheet: sheetMeta,
+    flipTextureV: !!flipTextureV,
   };
   return mesh;
 }

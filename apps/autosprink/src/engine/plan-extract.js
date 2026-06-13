@@ -40,6 +40,7 @@ import {
   selectWallLayer,
   buildingOutlinePolygon,
 } from './pdf-floorplan.js';
+import { buildWallRuns } from './plan-wall-runs.js';
 
 const PROVENANCE_BASE = 'extracted (vector PDF, CTM-mapped, scale derived from sheet) — needs-verification';
 
@@ -614,6 +615,16 @@ export function buildLevelPlan(input, opts = {}) {
   // Walls emitted as {a,b,thickness?} pairs (the wall-layer segments).
   const walls = wallSegs.map((s) => ({ a: [round(s.x1), round(s.y1)], b: [round(s.x2), round(s.y2)] }));
 
+  // RECORE: collapse the FRAGMENTED single-band cut-wall segments into real wall RUNS, with
+  // non-wall exclusion (diagonals = door-swing arcs/hatch dropped; sub-2ft stubs = dimension
+  // ticks/glyphs dropped). This is the HONEST structure — a plausible count of actual walls
+  // (envelope + partitions), NOT the tens-of-thousands of ink fragments. Rendered as the
+  // primary walls; `wallsFull` (the over-inclusive lineweight union) is retained only as an
+  // OFF-by-default diagnostic overlay. needs-verification.
+  const wr = buildWallRuns(walls, opts.wallRunOpts || {});
+  const wallRuns = wr.runs;
+  const wallRunsMeta = wr.meta;
+
   // RECALL-COMPLETE wall set (W2): the proven single-band `walls` above is the dominant cut-wall
   // lineweight — it keeps footprint/room segmentation stable (it is what the verified W0 footprint
   // and netalign depend on) but UNDER-captures interior partition + core walls (~71% wall recall
@@ -691,6 +702,8 @@ export function buildLevelPlan(input, opts = {}) {
     },
     wallBboxFt,
     walls,
+    wallRuns,
+    wallRunsMeta,
     ...(wallsFull ? { wallsFull, wallsFullMeta } : {}),
     rooms: roomRes.rooms.map((r) => ({
       poly: r.poly, label: r.label, kind: r.kind, areaSqft: r.areaSqft, confidence: r.confidence,
@@ -1024,6 +1037,10 @@ export function mergeWingPlans(wingA, wingB, reg, meta = {}) {
     wallsFull = fa.concat(fb);
   }
 
+  // RECORE: wall RUNS computed from the MERGED single-band walls (both wings in the common
+  // frame) — the honest primary structure (envelope + partitions), non-wall ink excluded.
+  const wrMerged = buildWallRuns(walls, meta.wallRunOpts || {});
+
   // Rooms: A as-is; B translated (poly + any bbox).
   const roomsA = (wingA.rooms || []).map((r) => ({ ...r }));
   const roomsB = (wingB.rooms || []).map((r) => ({ ...r, poly: shiftPoly(r.poly) }));
@@ -1094,6 +1111,8 @@ export function mergeWingPlans(wingA, wingB, reg, meta = {}) {
     footprintAreaReliable: false, // a union of two wing envelopes — bbox only, not an enclosed trace
     footprintBboxFt: { widthFt, heightFt, minX: round(uMinX), minY: round(uMinY), maxX: round(uMaxX), maxY: round(uMaxY) },
     walls,
+    wallRuns: wrMerged.runs,
+    wallRunsMeta: wrMerged.meta,
     ...(wallsFull ? { wallsFull, wallsFullMeta: { merged: true, count: wallsFull.length, note: 'Partition-inclusive recall-complete wall set, both wings merged (wing B translated). Rendering + recall only; footprint uses single-band walls. needs-verification.' } } : {}),
     rooms,
     stairs,

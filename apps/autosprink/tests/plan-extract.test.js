@@ -420,9 +420,10 @@ describe('computePlanUnderlayTransform (register sheet UNDER geometry at true sc
     expect(t.position.x).toBeCloseTo(pageWFt / 2 - center.cx, 6);
     expect(t.position.z).toBeCloseTo(pageHFt / 2 - center.cy, 6);
   });
-  it('uses +PI/2 (keep plan-Y aligned to world-Z — NOT the -PI/2 mirror the contain-fit underlay uses)', () => {
+  it('uses -PI/2 with NO texture flip (RECORE: face UP toward the top-down camera = upright FORWARD text; +PI/2 showed the mirrored back-face, flipTextureV rendered it upside-down — both verified-wrong live)', () => {
     const t = computePlanUnderlayTransform({ pageWidthPt: 100, pageHeightPt: 100, scaleFtPerUnit: 0.15 });
-    expect(t.rotation.x).toBeCloseTo(Math.PI / 2, 9);
+    expect(t.rotation.x).toBeCloseTo(-Math.PI / 2, 9);
+    expect(t.flipTextureV).toBe(false);
     expect(t.needsVerification).toBe(true);
     expect(t.scaleSource).toMatch(/needs-verification/i);
   });

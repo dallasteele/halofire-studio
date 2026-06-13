@@ -57,12 +57,16 @@ function kindColor(kind) {
  *     plan-Y -> world-Z, centered on the union footprint bbox center (cx, cy).
  *   - So the page, in feet, spans world X in [-cx, pageWFt-cx] and world Z in
  *     [-cy, pageHFt-cy]; its center sits at world (pageWFt/2 - cx, elev+lift, pageHFt/2 - cy).
- *   - PlaneGeometry faces +Z with the texture upright; CanvasTexture flipY (default true)
- *     puts the image TOP at plane local +Y. PDF y-up means image-top = MAX PDF-y = MAX
- *     plan-Y, which must land at MAX world-Z. rotation.x = +PI/2 sends plane local +Y -> +Z
- *     (NOT -PI/2, which the contain-fit underlay uses and which would MIRROR plan-Y here).
+ *   - PlaneGeometry faces +Z. rotation.x = -PI/2 sends the textured face normal to +Y (UP),
+ *     toward the top-down plan camera, so text reads FORWARD (a +PI/2 plane would show its BACK
+ *     to that camera = the observed BACKWARDS text — the RECORE orientation bug, now fixed).
+ *   - VERIFIED LIVE on the Studio top view: -PI/2 with NO texture flip renders every sheet
+ *     text label (FLOOR PLAN GENERAL NOTES, the "22" logo, the title block, the PE seal) UPRIGHT
+ *     and FORWARD, with the sheet's own wall lines sitting under the extracted walls. (flipTextureV
+ *     was tried to "re-register" image-top->+Z but rendered the whole sheet UPSIDE-DOWN, so it is
+ *     left false. The top-view camera up=(0,0,-1) already yields the correct readable mapping.)
  *
- * @returns {{widthFt, depthFt, scaleFtPerUnit, position:{x,y,z}, rotation:{x,y,z}, scaleSource, needsVerification}}
+ * @returns {{widthFt, depthFt, scaleFtPerUnit, position:{x,y,z}, rotation:{x,y,z}, flipTextureV:boolean, scaleSource, needsVerification}}
  */
 export function computePlanUnderlayTransform({
   pageWidthPt,
@@ -89,8 +93,13 @@ export function computePlanUnderlayTransform({
       y: Number(elevationFt) + Number(liftFt),
       z: pageHFt / 2 - Number(unionCenterYFt),
     },
-    // +PI/2 (not -PI/2): keep plan-Y aligned with geometry world-Z (no mirror).
-    rotation: { x: Math.PI / 2, y: 0, z: 0 },
+    // -PI/2: textured face up (+Y) -> readable from the top-down plan camera (RECORE fix; +PI/2
+    // showed the plane's BACK = backwards/mirrored text). VERIFIED LIVE: -PI/2 with NO texture
+    // flip renders all sheet text UPRIGHT + FORWARD AND keeps the sheet's wall lines registered
+    // under the extracted walls (the top-view camera up=(0,0,-1) makes image-top read correctly).
+    // flipTextureV:true was tried and rendered the sheet UPSIDE-DOWN — so it stays false.
+    rotation: { x: -Math.PI / 2, y: 0, z: 0 },
+    flipTextureV: false,
     scaleSource: 'registered to extracted geometry at the sheet-derived true scale — NOT a title-block-verified plot scale; needs-verification',
     needsVerification: true,
   };
@@ -441,9 +450,14 @@ export function buildBuildingFromPlans(THREE, levelPlans, opts = {}) {
       group.add(slab);
     }
 
-    // Walls.
-    if (includeWalls && wallMat && THREE.BoxGeometry && Array.isArray(plan.walls)) {
-      const validWalls = plan.walls.filter((seg) => seg && Array.isArray(seg.a) && Array.isArray(seg.b));
+    // Walls. RECORE: prefer the collinear-merged wall RUNS (envelope + partitions, non-wall ink
+    // excluded — a plausible count of REAL walls) over the thousands of fragmented `walls`
+    // segments. Each run extrudes as one continuous wall box. Falls back to `walls` only if no
+    // runs were computed (older data). The fragmented `walls` set is no longer the headline.
+    const wallSource = (Array.isArray(plan.wallRuns) && plan.wallRuns.length) ? plan.wallRuns : plan.walls;
+    const usingRuns = (Array.isArray(plan.wallRuns) && plan.wallRuns.length) ? true : false;
+    if (includeWalls && wallMat && THREE.BoxGeometry && Array.isArray(wallSource)) {
+      const validWalls = wallSource.filter((seg) => seg && Array.isArray(seg.a) && Array.isArray(seg.b));
       const doMerge = typeof mergeGeometries === 'function' && validWalls.length >= wallMergeThreshold;
       if (doMerge) {
         // Build each wall's geometry, bake its transform into the verts, merge into one.
@@ -568,7 +582,12 @@ export function buildBuildingFromPlans(THREE, levelPlans, opts = {}) {
         walls: wallCount, rooms: roomCount, stairs: stairCount,
         doors: doorCount, openings: openingCount, fixtures: fixtureCount,
         wallsFull: wallsFullCount,
+        // RECORE: the honest primary wall count is the merged wall RUNS (when present).
+        wallRuns: (Array.isArray(plan.wallRuns) ? plan.wallRuns.length : 0),
+        wallSegmentsRaw: (Array.isArray(plan.walls) ? plan.walls.length : 0),
+        wallSource: usingRuns ? 'wall-runs' : 'wall-segments',
       },
+      wallRunsMeta: plan.wallRunsMeta || null,
       // HF-W2: honest recall of the rendered recovered-wall set vs the sheet wall-ink.
       recallPct: (plan.wallsFullMeta && Number.isFinite(plan.wallsFullMeta.recallPct))
         ? plan.wallsFullMeta.recallPct : null,
@@ -615,6 +634,12 @@ export function buildBuildingFromPlans(THREE, levelPlans, opts = {}) {
         ? recallLevel.recallMeasure.inEnvelopeRecallPct : null,
       fixtures: recallLevel.counts.fixtures, fixtureCounts: recallLevel.fixtureCounts,
       recoveredWalls: recallLevel.counts.wallsFull,
+      // RECORE: the honest primary structure — collinear-merged wall RUNS (real walls), with the
+      // raw fragment count + excluded non-wall ink, so the panel headlines correctness not coverage.
+      wallRuns: recallLevel.counts.wallRuns,
+      wallSegmentsRaw: recallLevel.counts.wallSegmentsRaw,
+      wallSource: recallLevel.counts.wallSource,
+      wallRunsMeta: recallLevel.wallRunsMeta,
       doorExtraction: recallLevel.doorExtraction,
       level: recallLevel.level, needsVerification: true,
     } : null,
