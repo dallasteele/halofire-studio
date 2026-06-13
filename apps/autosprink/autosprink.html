@@ -335,6 +335,11 @@ import { manifestForProject, sheetsForLevel } from '/src/data/plan-manifest.js';
 // HF-C1-PARTMESH (Stream C): true-scale real CAD part meshes (mm->ft, Y-up)
 // with Inspector provenance; primitives stay as flagged fallback.
 import { createPartMeshLoader } from '/src/engine/part-meshes.js';
+// HF-W1 (Stream W1): the EDIT ENGINE — snapshot command stack + pure cadModel
+// edit ops (ported from apps/cad history.ts + store.ts) and the pure snap
+// engine. All viewer-side preview/raycast/DOM wiring stays inline below.
+import { createCommandStack, resolveSolidIndex, moveSolid, deleteSolid, copySolid, rotateSolid, mirrorSolid, addSolid, setSolidFields, solidCentroidPlan } from '/src/engine/edit-commands.js';
+import { snap as snapPoint, segmentsFromModel, orthoConstrain, defaultSnapState } from '/src/engine/snaps.js';
 
 const HOME_DEPOT = 'Home Depot - Rexburg ID';
 try{
@@ -1786,6 +1791,7 @@ const raycaster = new THREE.Raycaster();
 let selectMode = true, preSelectTarget = null, selectedCount = 0;
 let curSel = null;   // { center:Vector3, sizeFt, title, axis } — current selection (frame target)
 let curSelKey = null; // HF-D1-INSPDOCK: identity of the selected part (dblclick-again = deselect-all)
+let curSelSolid = null; // HF-W1-CMD: the picked solid object (identity -> index in currentCadModel.solids for edit ops)
 let camTween = null; // in-flight frame tween, stepped from the render loop
 
 // contract #1 (HIGHLIGHT = the PART ITSELF recolored, NO bounding boxes):
@@ -1956,6 +1962,7 @@ function clearSelection(restoreTarget) {
   const insp = $('inspector'); if (insp) insp.classList.remove('open');
   curSel = null;
   curSelKey = null;
+  curSelSolid = null; // HF-W1-CMD
   // contract #7: deselect restores the PRIOR pivot (set only if a frame ever
   // ran) with a short tween; camera position stays put — all camera ops keep working.
   if (restoreTarget && preSelectTarget && controls) {
@@ -2079,6 +2086,11 @@ function handleCanvasClick(e, frameAfter) {
   }
   curSel = { center: info.center.clone(), sizeFt: info.sizeFt, title: info.title, axis };
   curSelKey = foundKey; // HF-D1-INSPDOCK
+  // HF-W1-CMD: remember the picked SOLID OBJECT so edit ops can resolve its
+  // index in currentCadModel.solids by identity (the viewer hands us the exact
+  // object reference from the live model — see addPipe/addInstanced*).
+  curSelSolid = sol || (found.part ? found.part.solid : null) || null;
+  window.__lastSelection = window.__lastSelection || null; // (set below)
   openInspector(info.title, info.rows, info.verify);
   // contract #1: NO controls.target change here — selection is camera-neutral,
   // so contract #2 (click a different part at its unchanged screen position,
@@ -2356,6 +2368,7 @@ async function applyGenerated(data) {
   // uses. Result: network + building share one origin + one true scale (1 unit = 1 ft).
   // Non-1881 projects (and the placeholder fallback) keep modelGroup at the origin.
   alignNetworkToExtractedPlate(floorPlan);
+  lastFloorPlan = floorPlan || null; // HF-W1: remembered so post-edit re-renders re-align to the same plate frame
     const r = bid.rooms[0];
     $('layout').innerHTML = `
       <div class="kv"><span>Total area</span><b>${bid.totalAreaSqFt.toLocaleString()} sqft</b></div>
@@ -2711,6 +2724,379 @@ for (const [id, fmt] of [['stepBtn','step'],['ifcBtn','ifc'],['stlBtn','stl']]) 
   };
 }
 window.__exportCadProof = buildExportProof;
+
+// ════════════════════════════════════════════════════════════════════════════
+// HF-W1-CMD / HF-W1-DRAW / HF-W1-SNAP — the EDIT ENGINE wired into the live
+// Studio. The pure logic (history + ops + snaps) lives in
+// /src/engine/edit-commands.js + /src/engine/snaps.js (unit-tested); this block
+// owns the viewer-side glue: command stack -> renderModel + netalign + persist,
+// selection -> ref resolution, draw-tool pointer flow with a LIVE THREE preview,
+// snap indicator, and the editable Inspector. SINGLE WRITER (autosprink.html).
+//
+// Every edit goes THROUGH the command stack so Ctrl+Z / Ctrl+Y are universal.
+// renderModel() fully rebuilds the scene + clears selection, so a snapshot
+// restore is residue-free (the reason snapshot-undo is correct here — see
+// edit-commands.js header). After each commit we re-run alignNetworkToExtracted-
+// Plate(lastFloorPlan) so edits keep the network registered on the plate, and
+// persist via saveLayout so reload keeps user edits (HF-A1-AUTOLOAD path).
+// ════════════════════════════════════════════════════════════════════════════
+let lastFloorPlan = null; // HF-W1: remembered for re-align after an edit re-render
+const HFEdit = createCommandStack({
+  getModel: () => currentCadModel,
+  setModel: (model, label) => {
+    renderModel(model);                       // full rebuild (clears selection, instanced colors)
+    try { alignNetworkToExtractedPlate(lastFloorPlan); } catch (_) {}
+    if (lastAppliedData) lastAppliedData.cadModel = model; // keep File>Save / autoload payload in sync
+    try { saveLayout(lastAppliedData || { cadModel: model, bid: (lastAppliedData && lastAppliedData.bid) || { rooms: [{}] } }, lastBody); } catch (_) {}
+    window.__hfEditState = { label, depth: HFEdit ? HFEdit.depth() : 0, canUndo: HFEdit ? HFEdit.canUndo() : false, canRedo: HFEdit ? HFEdit.canRedo() : false };
+    updateEditMenuState();
+  },
+  limit: 100,
+  onChange: (st) => { window.__hfEditState = st; updateEditMenuState(); },
+});
+window.__HFEdit = HFEdit; // headless-verification hook
+window.__hfEditState = { label: '', depth: 0, canUndo: false, canRedo: false };
+// Headless-verification accessors (module-scoped state isn't on window).
+window.__hfModel = () => currentCadModel;
+window.__hfReady = () => ogReady === true;
+window.__hfSolidCount = (kind) => (currentCadModel && Array.isArray(currentCadModel.solids))
+  ? (kind ? currentCadModel.solids.filter((s) => s.kind === kind).length : currentCadModel.solids.length) : null;
+
+function updateEditMenuState() {
+  // Reflect undo/redo availability on the menubar Edit items (best-effort; the
+  // menubar renders items as DOM nodes with data-id).
+  try {
+    document.querySelectorAll('.hf-menu-item').forEach((el) => {
+      const id = el.dataset && el.dataset.id;
+      if (id === 'edit.undo') el.setAttribute('aria-disabled', HFEdit.canUndo() ? 'false' : 'true');
+      if (id === 'edit.redo') el.setAttribute('aria-disabled', HFEdit.canRedo() ? 'false' : 'true');
+    });
+  } catch (_) {}
+}
+
+// Resolve the current selection to a stable { solidIndex } ref by identity.
+function selectedRef() {
+  if (!curSelSolid || !currentCadModel || !Array.isArray(currentCadModel.solids)) return null;
+  const i = currentCadModel.solids.indexOf(curSelSolid);
+  return i >= 0 ? { solidIndex: i } : null;
+}
+function requireSelection(verb) {
+  const ref = selectedRef();
+  if (!ref) { $('status').textContent = `select a part first to ${verb}`; return null; }
+  return ref;
+}
+
+// ── HF-W1-CMD: edit ops on the current selection (menu + keyboard) ──
+const NUDGE_FT = 0.5; // arrow-key nudge step (plain); Shift = 5x
+function editMove(delta, verb) {
+  const ref = requireSelection(verb || 'move'); if (!ref) return;
+  if (HFEdit.apply('move', (m) => moveSolid(m, ref, delta))) $('status').textContent = `moved ${verb || ''} (Ctrl+Z to undo)`.trim();
+}
+function editDelete() {
+  const ref = requireSelection('delete'); if (!ref) return;
+  if (HFEdit.apply('delete', (m) => deleteSolid(m, ref))) $('status').textContent = 'deleted part (Ctrl+Z to undo)';
+}
+function editCopy() {
+  const ref = requireSelection('copy'); if (!ref) return;
+  if (HFEdit.apply('copy', (m) => copySolid(m, ref, [2, 0, 0]))) $('status').textContent = 'copied part +2ft (Ctrl+Z to undo)';
+}
+function editRotate(deg) {
+  const ref = requireSelection('rotate'); if (!ref) return;
+  const rad = (deg || 90) * Math.PI / 180;
+  if (HFEdit.apply('rotate', (m) => rotateSolid(m, ref, rad))) $('status').textContent = `rotated ${deg || 90}° (Ctrl+Z to undo)`;
+}
+function editMirror(axis) {
+  const ref = requireSelection('mirror'); if (!ref) return;
+  if (HFEdit.apply('mirror', (m) => mirrorSolid(m, ref, axis || 'y'))) $('status').textContent = `mirrored (${axis || 'y'}) (Ctrl+Z to undo)`;
+}
+
+// Keyboard: Ctrl+Z / Ctrl+Y(or Ctrl+Shift+Z) undo/redo; arrows nudge the
+// selection; Delete removes it; Ctrl+C copies. Ignored while typing in a field.
+window.addEventListener('keydown', (e) => {
+  const t = e.target;
+  if (t && (/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) || t.isContentEditable)) return;
+  const ctrl = e.ctrlKey || e.metaKey;
+  if (ctrl && (e.key === 'z' || e.key === 'Z') && !e.shiftKey) { e.preventDefault(); if (HFEdit.undo()) $('status').textContent = 'undo'; return; }
+  if (ctrl && ((e.key === 'y' || e.key === 'Y') || ((e.key === 'z' || e.key === 'Z') && e.shiftKey))) { e.preventDefault(); if (HFEdit.redo()) $('status').textContent = 'redo'; return; }
+  if (ctrl && (e.key === 'c' || e.key === 'C')) { if (selectedRef()) { e.preventDefault(); editCopy(); } return; }
+  if (drawTool) return; // arrows/Delete reserved for draw mode below
+  const step = (e.shiftKey ? NUDGE_FT * 10 : NUDGE_FT);
+  if (e.key === 'ArrowLeft') { e.preventDefault(); editMove([-step, 0, 0], 'left'); }
+  else if (e.key === 'ArrowRight') { e.preventDefault(); editMove([step, 0, 0], 'right'); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); editMove([0, step, 0], 'up'); }
+  else if (e.key === 'ArrowDown') { e.preventDefault(); editMove([0, -step, 0], 'down'); }
+  else if (e.key === 'Delete' || e.key === 'Backspace') { if (selectedRef()) { e.preventDefault(); editDelete(); } }
+});
+
+// ── HF-W1-CMD: viewport drag-to-move the selected part (plan-space) ──
+// A pointer drag that STARTS on the highlighted part moves it on the ground
+// plane (snapped). Plain orbit still works when no part is grabbed.
+let moveDrag = null; // { ref, startPlan, lastDelta }
+const groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+function pointerToPlan(clientX, clientY) {
+  // Raycast the pointer onto the y=baseElevation ground plane, then UNDO the
+  // modelGroup offset (-cx,0,-cy) + W swap to recover plan [x,y].
+  const r = renderer.domElement.getBoundingClientRect();
+  const ndc = new THREE.Vector2(((clientX - r.left) / r.width) * 2 - 1, -((clientY - r.top) / r.height) * 2 + 1);
+  raycaster.setFromCamera(ndc, camera);
+  const hit = new THREE.Vector3();
+  if (!raycaster.ray.intersectPlane(groundPlane, hit)) return null;
+  const off = modelGroup ? modelGroup.position : { x: 0, z: 0 };
+  // world = modelGroup.pos + W([planX,planY,elev]) = (off.x+planX, elev, off.z+planY)
+  return [hit.x - off.x, hit.z - off.z];
+}
+// renderer/scene/controls don't exist until initStudio() runs — these viewport
+// listeners are attached in initEditEngine(), called from the bottom IIFE after
+// initStudio(). (Attaching at module-load threw "renderer.domElement undefined"
+// and silently aborted the rest of this block, incl. __hfDraw + menubar mount.)
+function attachMoveDragListeners() {
+  renderer.domElement.addEventListener('pointerdown', (e) => {
+    if (!selectMode || drawTool) return;
+    const ref = selectedRef(); if (!ref) return;
+    // only start a move-drag if the pointerdown is over the selected part
+    const r = renderer.domElement.getBoundingClientRect();
+    const ndc = new THREE.Vector2(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+    raycaster.setFromCamera(ndc, camera);
+    const hits = raycaster.intersectObjects(modelGroup ? modelGroup.children : [], true);
+    let onSel = false;
+    for (const h of hits) {
+      if (h.object.userData && h.object.userData.hfInstanced && h.instanceId !== undefined) { const sol = (h.object.userData.hfInstanced.solids || [])[h.instanceId]; if (sol === curSelSolid) { onSel = true; break; } }
+      let p = h.object; while (p && p !== modelGroup && !(p.userData && p.userData.hfPart)) p = p.parent;
+      if (p && p.userData && p.userData.hfPart && p.userData.hfPart.solid === curSelSolid) { onSel = true; break; }
+    }
+    if (!onSel) return;
+    const startPlan = pointerToPlan(e.clientX, e.clientY); if (!startPlan) return;
+    moveDrag = { ref, startPlan, lastDelta: [0, 0] };
+    controls.enabled = false; // suspend orbit while dragging the part
+  });
+  renderer.domElement.addEventListener('pointermove', (e) => {
+    if (!moveDrag) return;
+    const cur = pointerToPlan(e.clientX, e.clientY); if (!cur) return;
+    let target = [moveDrag.startPlan[0] + (cur[0] - moveDrag.startPlan[0]), moveDrag.startPlan[1] + (cur[1] - moveDrag.startPlan[1])];
+    const sn = snapPoint(target, segmentsFromModel(currentCadModel), snapState);
+    showSnapIndicator(sn);
+    moveDrag.lastDelta = [sn.p[0] - moveDrag.startPlan[0], sn.p[1] - moveDrag.startPlan[1]];
+  });
+  window.addEventListener('pointerup', () => {
+    if (!moveDrag) return;
+    const d = moveDrag.lastDelta, ref = moveDrag.ref; moveDrag = null; controls.enabled = true; hideSnapIndicator();
+    if (Math.abs(d[0]) > 1e-3 || Math.abs(d[1]) > 1e-3) {
+      if (HFEdit.apply('move', (m) => moveSolid(m, ref, [d[0], d[1], 0]))) $('status').textContent = 'moved part (Ctrl+Z to undo)';
+    }
+  });
+}
+
+// ── HF-W1-SNAP: snap state + visible indicator ──
+const snapState = defaultSnapState();
+function toggleSnap(type) {
+  if (!(type in snapState)) return;
+  snapState[type] = !snapState[type];
+  window.__hfSnapState = { ...snapState };
+  const labels = { endpoint: 'Endpoint', midpoint: 'Midpoint', intersection: 'Intersection', perpendicular: 'Perpendicular', grid: 'Grid' };
+  $('status').textContent = `snap ${labels[type] || type}: ${snapState[type] ? 'ON' : 'off'}`;
+}
+window.__hfSnapState = { ...snapState };
+let snapMarker = null;
+function ensureSnapMarker() {
+  if (snapMarker) return snapMarker;
+  const g = new THREE.SphereGeometry(0.4, 12, 8);
+  const m = new THREE.MeshBasicMaterial({ color: 0x00e676, depthTest: false, transparent: true, opacity: 0.95 });
+  snapMarker = new THREE.Mesh(g, m); snapMarker.renderOrder = 1200; snapMarker.visible = false; scene.add(snapMarker);
+  return snapMarker;
+}
+function planToWorldVec(plan, elev) {
+  const off = modelGroup ? modelGroup.position : { x: 0, z: 0 };
+  return new THREE.Vector3(off.x + plan[0], elev || 9, off.z + plan[1]);
+}
+function showSnapIndicator(sn) {
+  const mk = ensureSnapMarker();
+  if (sn && sn.snapped) { mk.position.copy(planToWorldVec(sn.p, drawElev)); mk.visible = true; window.__lastSnap = { type: sn.type, p: sn.p }; }
+  else { mk.visible = false; }
+}
+function hideSnapIndicator() { if (snapMarker) snapMarker.visible = false; }
+
+// ── HF-W1-DRAW: click-to-place / click-points draw tools with LIVE preview ──
+// drawTool: 'wall' | 'pipe' | 'head' | 'fitting' | 'door' | null.
+let drawTool = null;
+let drawPts = [];      // committed plan points for a 2-point tool
+let drawElev = 9;      // working elevation (ft) for placed runs
+let drawPreview = null; // THREE preview object in the scene
+const DRAW_LABEL = { wall: 'Draw Wall', pipe: 'Draw Pipe', head: 'Place Head', fitting: 'Add Fitting', door: 'Add Door' };
+
+function setDrawTool(tool) {
+  clearDrawPreview(); drawPts = [];
+  drawTool = tool || null;
+  $('status').textContent = drawTool
+    ? `${DRAW_LABEL[drawTool]}: ${drawTool === 'head' ? 'click to place a head' : drawTool === 'pipe' || drawTool === 'wall' ? 'click start point, then end point (Esc cancels)' : 'click to place (Esc cancels)'} · snaps on`
+    : 'draw tool off';
+  window.__hfDrawTool = drawTool;
+  document.body.style.cursor = drawTool ? 'crosshair' : '';
+}
+function clearDrawPreview() { if (drawPreview) { scene.remove(drawPreview); try { drawPreview.geometry && drawPreview.geometry.dispose(); } catch (_) {} drawPreview = null; } }
+
+function drawPreviewSegment(aPlan, bPlan, color) {
+  clearDrawPreview();
+  const a = planToWorldVec(aPlan, drawElev), b = planToWorldVec(bPlan, drawElev);
+  const geo = new THREE.BufferGeometry().setFromPoints([a, b]);
+  drawPreview = new THREE.Line(geo, new THREE.LineBasicMaterial({ color: color || 0x00e676, depthTest: false }));
+  drawPreview.renderOrder = 1100; scene.add(drawPreview);
+}
+function drawPreviewPoint(pPlan, color) {
+  clearDrawPreview();
+  const g = new THREE.SphereGeometry(0.5, 12, 8);
+  drawPreview = new THREE.Mesh(g, new THREE.MeshBasicMaterial({ color: color || 0x00e676, depthTest: false, transparent: true, opacity: 0.8 }));
+  drawPreview.position.copy(planToWorldVec(pPlan, drawElev)); drawPreview.renderOrder = 1100; scene.add(drawPreview);
+}
+
+// Live preview follows the cursor while a draw tool is active (attached in initEditEngine).
+function attachDrawPreviewListener() {
+  renderer.domElement.addEventListener('pointermove', (e) => {
+    if (!drawTool || moveDrag) return;
+    const plan = pointerToPlan(e.clientX, e.clientY); if (!plan) return;
+    let target = plan;
+    if (drawPts.length === 1 && e.shiftKey) target = orthoConstrain(drawPts[0], plan); // Shift = ortho lock
+    const sn = snapPoint(target, segmentsFromModel(currentCadModel), snapState);
+    showSnapIndicator(sn);
+    if (drawPts.length === 1 && (drawTool === 'pipe' || drawTool === 'wall')) drawPreviewSegment(drawPts[0], sn.p, drawTool === 'wall' ? 0x9aa3b2 : 0x3b82f6);
+    else drawPreviewPoint(sn.p, drawTool === 'head' ? 0xff3b30 : 0xfbbf24);
+  });
+}
+
+// Click placement. Hooks into the same pointerup path used by selection but is
+// short-circuited here when a draw tool is active (handleCanvasClick is gated by
+// selectMode; draw mode owns clicks while active).
+function drawClick(clientX, clientY, shift) {
+  const plan0 = pointerToPlan(clientX, clientY); if (!plan0) return;
+  let target = plan0;
+  if (drawPts.length === 1 && shift && (drawTool === 'pipe' || drawTool === 'wall')) target = orthoConstrain(drawPts[0], plan0);
+  const sn = snapPoint(target, segmentsFromModel(currentCadModel), snapState);
+  const p = sn.p;
+  if (drawTool === 'head') return commitHead(p);
+  if (drawTool === 'fitting') return commitFitting(p);
+  if (drawTool === 'door') return commitDoor(p);
+  // 2-point tools (pipe, wall)
+  if (drawPts.length === 0) { drawPts = [p]; $('status').textContent = `${DRAW_LABEL[drawTool]}: click the end point (Esc cancels)`; return; }
+  const a = drawPts[0]; drawPts = []; clearDrawPreview(); hideSnapIndicator();
+  if (Math.hypot(p[0] - a[0], p[1] - a[1]) < 1e-3) { $('status').textContent = 'zero-length — cancelled'; return; }
+  if (drawTool === 'pipe') return commitPipe(a, p);
+  if (drawTool === 'wall') return commitWall(a, p);
+}
+function commitPipe(a, b) {
+  const dia = Number($('hfDrawDia') && $('hfDrawDia').value) || 1.25;
+  const solid = { kind: 'pipe', role: 'branch', from: [a[0], a[1], drawElev], to: [b[0], b[1], drawElev], diameterIn: dia };
+  if (HFEdit.apply('draw-pipe', (m) => addSolid(m, solid))) $('status').textContent = `drew ${dia}" pipe (needs-verification) · Ctrl+Z to undo`;
+}
+function commitWall(a, b) {
+  const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
+  const rot = Math.atan2(b[1] - a[1], b[0] - a[0]);
+  const solid = { kind: 'wall', type: 'interior', a: [a[0], a[1]], b: [b[0], b[1]], center: [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], lengthFt: len, heightFt: 9, thicknessFt: 0.5, rotationY: rot, baseZ: 0, openings: [] };
+  if (HFEdit.apply('draw-wall', (m) => addSolid(m, solid))) $('status').textContent = `drew interior wall ${len.toFixed(1)}ft (needs-verification) · Ctrl+Z to undo`;
+}
+function commitHead(p) {
+  const solid = { kind: 'head', position: [p[0], p[1], drawElev - 1] };
+  if (HFEdit.apply('place-head', (m) => addSolid(m, solid))) $('status').textContent = 'placed sprinkler head (needs-verification) · Ctrl+Z to undo';
+}
+function commitFitting(p) {
+  const solid = { kind: 'component', componentKey: 'fitting_tee', position: [p[0], p[1], drawElev], label: 'Tee fitting (drawn)', verify: 'manually placed fitting — needs-verification' };
+  if (HFEdit.apply('add-fitting', (m) => addSolid(m, solid))) $('status').textContent = 'added tee fitting (needs-verification) · Ctrl+Z to undo';
+}
+function commitDoor(p) {
+  // A door is an opening on the nearest wall — flagged needs-verification.
+  if (!currentCadModel) return;
+  let best = -1, bestD = Infinity;
+  currentCadModel.solids.forEach((s, i) => { if (s.kind !== 'wall') return; const c = solidCentroidPlan(s); const d = Math.hypot(c[0] - p[0], c[1] - p[1]); if (d < bestD) { bestD = d; best = i; } });
+  if (best < 0) { $('status').textContent = 'no wall near the click to host a door'; return; }
+  if (HFEdit.apply('add-door', (m) => {
+    const s = { ...m.solids[best] };
+    s.openings = (s.openings || []).concat([{ type: 'door', widthFt: 3, heightFt: 7, atFt: bestD, hfEdited: 'drawn' }]);
+    s.hfEdited = 'door-added';
+    m.solids = m.solids.slice(); m.solids[best] = s; return m;
+  })) $('status').textContent = 'added door opening to nearest wall (needs-verification) · Ctrl+Z to undo';
+}
+
+// Route viewport clicks to the draw handler while a tool is active (else the
+// existing HF-A1-SELECT path runs). Reuses the move<6px tap detection.
+// Attached in initEditEngine() (needs renderer.domElement from initStudio).
+let drawDownPt = null;
+function attachDrawClickListeners() {
+  renderer.domElement.addEventListener('pointerdown', (e) => { if (drawTool) drawDownPt = { x: e.clientX, y: e.clientY, shift: e.shiftKey }; });
+  renderer.domElement.addEventListener('pointerup', (e) => {
+    if (!drawTool || !drawDownPt) return;
+    const moved = Math.hypot(e.clientX - drawDownPt.x, e.clientY - drawDownPt.y); const shift = drawDownPt.shift || e.shiftKey; drawDownPt = null;
+    if (moved < 6) drawClick(e.clientX, e.clientY, shift);
+  });
+}
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && drawTool) { e.stopPropagation(); setDrawTool(null); clearDrawPreview(); hideSnapIndicator(); }
+}, true);
+
+// HF-W1: attach all viewport (renderer/scene/controls) listeners. Called from
+// the bottom IIFE AFTER initStudio() has created renderer/scene/controls.
+function initEditEngine() {
+  if (!renderer || !renderer.domElement) { window.__hfEditEngineError = 'renderer missing at initEditEngine'; return; }
+  attachMoveDragListeners();
+  attachDrawPreviewListener();
+  attachDrawClickListeners();
+  window.__hfEditEngineReady = true;
+}
+
+// ── HF-W1: editable Inspector — make dimension/position fields editable ──
+// After openInspector renders read-only rows, inject an editable mini-form for
+// the selected solid; committing routes through the command stack with the
+// needs-verification flag preserved.
+const _origOpenInspector = openInspector;
+openInspector = function (title, rows, verifyNote) {
+  _origOpenInspector(title, rows, verifyNote);
+  try { renderInspectorEditor(); } catch (_) {}
+};
+function renderInspectorEditor() {
+  const ref = selectedRef(); if (!ref) return;
+  const s = currentCadModel.solids[ref.solidIndex]; if (!s) return;
+  const body = $('inspBody'); if (!body) return;
+  const fields = [];
+  if (typeof s.diameterIn === 'number') fields.push(['diameterIn', 'Size (in)', s.diameterIn, 'number', '0.25', '0.25']);
+  if (Array.isArray(s.position)) fields.push(['position', 'Plan X,Y (ft)', `${s.position[0]}, ${s.position[1]}`, 'text']);
+  if (Array.isArray(s.from)) fields.push(['from', 'From X,Y (ft)', `${s.from[0]}, ${s.from[1]}`, 'text']);
+  if (Array.isArray(s.to)) fields.push(['to', 'To X,Y (ft)', `${s.to[0]}, ${s.to[1]}`, 'text']);
+  if (typeof s.heightFt === 'number') fields.push(['heightFt', 'Height (ft)', s.heightFt, 'number', '0.5', '0']);
+  if (typeof s.thicknessFt === 'number') fields.push(['thicknessFt', 'Thickness (ft)', s.thicknessFt, 'number', '0.125', '0']);
+  if (!fields.length) return;
+  const wrap = document.createElement('div');
+  wrap.className = 'hf-insp-edit';
+  wrap.style.cssText = 'margin-top:8px;border-top:1px solid var(--border);padding-top:6px;display:flex;flex-direction:column;gap:5px';
+  wrap.innerHTML = '<div style="font-size:10px;letter-spacing:.04em;color:var(--muted)">EDIT (commits via undo-able command · needs-verification preserved)</div>';
+  for (const [key, label, val, type, step, min] of fields) {
+    const row = document.createElement('label'); row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11px';
+    const span = document.createElement('span'); span.textContent = label; span.style.color = 'var(--muted)';
+    const inp = document.createElement('input'); inp.type = type; inp.value = val; inp.dataset.key = key;
+    if (step) inp.step = step; if (min !== undefined) inp.min = min;
+    inp.style.cssText = 'width:120px;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:3px 6px;font:inherit;text-align:right';
+    row.appendChild(span); row.appendChild(inp); wrap.appendChild(row);
+  }
+  const btn = document.createElement('button'); btn.textContent = 'Apply edits'; btn.style.cssText = 'margin-top:2px;padding:5px;border-radius:7px;border:1px solid var(--border);background:rgba(0,230,118,.14);color:#7CFFB0;cursor:pointer;font:inherit';
+  btn.onclick = () => commitInspectorEdits(ref, wrap);
+  wrap.appendChild(btn);
+  body.appendChild(wrap);
+}
+function parseXY(str, fallbackZ) {
+  const parts = String(str).split(',').map((x) => Number(x.trim()));
+  if (parts.length < 2 || parts.some((n) => !Number.isFinite(n))) return null;
+  return fallbackZ === undefined ? [parts[0], parts[1]] : [parts[0], parts[1], fallbackZ];
+}
+function commitInspectorEdits(ref, wrap) {
+  const s = currentCadModel.solids[ref.solidIndex]; if (!s) return;
+  const patch = {};
+  wrap.querySelectorAll('input[data-key]').forEach((inp) => {
+    const k = inp.dataset.key;
+    if (inp.type === 'number') { const v = Number(inp.value); if (Number.isFinite(v)) patch[k] = v; }
+    else if (k === 'position') { const v = parseXY(inp.value, Array.isArray(s.position) ? s.position[2] : 0); if (v) patch[k] = v; }
+    else if (k === 'from') { const v = parseXY(inp.value, Array.isArray(s.from) ? s.from[2] : drawElev); if (v) patch[k] = v; }
+    else if (k === 'to') { const v = parseXY(inp.value, Array.isArray(s.to) ? s.to[2] : drawElev); if (v) patch[k] = v; }
+  });
+  if (HFEdit.apply('inspector-edit', (m) => setSolidFields(m, ref, patch))) $('status').textContent = 'applied inspector edits (Ctrl+Z to undo)';
+  else $('status').textContent = 'no field changes to apply';
+}
+window.__hfDraw = { setDrawTool: (t) => setDrawTool(t), commitPipe, commitWall, commitHead }; // headless hooks
 $('demoBtn').onclick = playDemo;
 document.querySelectorAll('#viewSeg button').forEach((b) => {
   b.onclick = () => { if (demoRAF) { cancelAnimationFrame(demoRAF); demoRAF = null; $('demoBtn').disabled = false; } document.querySelectorAll('#viewSeg button').forEach((x) => x.classList.remove('on')); b.classList.add('on'); setView(b.dataset.view); };
@@ -2740,6 +3126,16 @@ document.querySelectorAll('#viewSeg button').forEach((b) => {
   addItems('actions', [{ id: 'actions.generate-layout', name: 'Generate Layout', desc: sdesc }]);
   addItems('select', [{ id: 'select.mode-toggle', name: 'Select Mode (toggle)', desc: sdesc }]);
   addItems('window', [{ id: 'window.inspector', name: 'Inspector (toggle)', desc: sdesc }]);
+  // HF-W1: Studio-added draw tools (the AutoSprink scrape has no leading short
+  // labels for these; expose explicit, wired entries at the top of each menu).
+  addItems('tools', [
+    { id: 'tools.hf-draw-pipe', name: 'Draw Pipe (manual)', desc: sdesc },
+    { id: 'tools.hf-draw-wall', name: 'Draw Wall', desc: sdesc },
+    { id: 'tools.hf-place-head', name: 'Place Sprinkler Head', desc: sdesc },
+    { id: 'tools.hf-add-fitting', name: 'Add Fitting (tee)', desc: sdesc },
+    { id: 'tools.hf-add-door', name: 'Add Door (on wall)', desc: sdesc },
+    { id: 'tools.hf-draw-off', name: 'Cancel Draw Tool', desc: sdesc },
+  ]);
   const scrollPanelTo = (id) => { const el = $(id); if (el && el.scrollIntoView) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
   const clickView = (v) => { const b = document.querySelector(`#viewSeg button[data-view="${v}"]`); if (b) b.click(); };
   const exportVia = (fmt) => {
@@ -2769,6 +3165,33 @@ document.querySelectorAll('#viewSeg button').forEach((b) => {
     'select.deselect-all': () => clearSelection(true),
     'auto-draw.generate-layout': () => generate(),
     'actions.generate-layout': () => generate(),
+    // ── HF-W1-CMD: Edit menu — undo/redo/cut/copy/paste/delete on selection ──
+    'edit.undo': () => { if (!HFEdit.undo()) $('status').textContent = 'nothing to undo'; },
+    'edit.redo': () => { if (!HFEdit.redo()) $('status').textContent = 'nothing to redo'; },
+    'edit.delete': () => editDelete(),
+    'edit.copy': () => editCopy(),
+    // Cut = copy-offset then delete is ambiguous on a single model; map Cut->Delete
+    // (AutoSprink Cut removes onto clipboard; we have no clipboard yet — Delete is
+    // the honest wired subset, flagged via status). Paste stays grayed.
+    'edit.cut': () => editDelete(),
+    // ── HF-W1-CMD: Commands menu — rotate / mirror the selection ──
+    'commands.reverse': () => editMirror('y'),
+    // ── HF-W1-DRAW: Tools menu draw tools (Studio-added, wired) ──
+    'tools.hf-draw-pipe': () => setDrawTool('pipe'),
+    'tools.hf-draw-wall': () => setDrawTool('wall'),
+    'tools.hf-place-head': () => setDrawTool('head'),
+    'tools.hf-add-fitting': () => setDrawTool('fitting'),
+    'tools.hf-add-door': () => setDrawTool('door'),
+    'tools.hf-draw-off': () => setDrawTool(null),
+    // ── HF-W1-SNAP: Snaps menu toggles (visible indicator while drawing/moving) ──
+    'snaps.end-points': () => toggleSnap('endpoint'),
+    'snaps.center-point': () => toggleSnap('midpoint'),
+    'snaps.intersections': () => toggleSnap('intersection'),
+    'snaps.intersections-all': () => toggleSnap('intersection'),
+    'snaps.perpendicular': () => toggleSnap('perpendicular'),
+    'snaps.perpendicular-all': () => toggleSnap('perpendicular'),
+    'snaps.rounding': () => toggleSnap('grid'),
+    'snaps.visible-grid': () => toggleSnap('grid'),
     'hydraulics.analysis-reports': () => { scrollPanelTo('hydraulics'); if (!currentCadModel) $('status').textContent = 'no hydraulics yet — Generate a layout first'; },
     'listing.bill-of-material-bom': () => { scrollPanelTo('bom'); if (!currentCadModel) $('status').textContent = 'no BOM yet — Generate a layout first'; },
     'listing.listing-manager': () => scrollPanelTo('bom'),
@@ -2783,6 +3206,7 @@ document.querySelectorAll('#viewSeg button').forEach((b) => {
 
 (async () => {
   await initStudio();
+  try { initEditEngine(); } catch (e) { window.__hfEditEngineError = String(e && e.message || e); } // HF-W1: attach viewport edit/draw listeners
   await loadProjectTargets();   // HF-A1-SRCLOCK: bid projects -> email-PDF source, locked
   await autoLoadOrUnderlay();   // HF-A1-AUTOLOAD: saved layout or plan underlay, no Generate click
 })();

@@ -350,3 +350,39 @@ was just built in the wrong frame at the wrong footprint.
       placement and egress.
 - [ ] **Drawing / edit tools** — let an employee correct extracted geometry
       and re-run the network in-place.
+
+## W1 drawing/edit tools 2026-06-13
+
+The Studio is now editable (was view-only). Ported the proven `apps/cad` edit engine
+into `autosprink.html` (single writer) as two pure, unit-tested ES modules + inline
+viewer glue. Live = https://halofire.rankempire.io (static-served; md5-parity verified).
+
+### What shipped
+- `src/engine/edit-commands.js` — snapshot-based command stack (E0 history) over the
+  single in-memory `currentCadModel`: undo/redo + move/copy/delete/rotate/mirror on the
+  selected solid. (Snapshot, not op-log, to match the existing single-source model.)
+- `src/engine/snaps.js` — endpoint / midpoint / intersection / perpendicular / grid snap
+  with nearest-point resolution against segments derived from the model.
+- `autosprink.html` glue — drag-to-move selection in plan space, editable Inspector,
+  click-to-place / 2-point draw with live preview, Shift ortho lock, Esc cancel,
+  visible snap indicator, keyboard shortcuts.
+- 29 unit tests green (18 edit-commands + 11 snaps); live HTTPS md5-parity on all three
+  files; markers HF-W1-CMD=8 / HF-W1-DRAW=3 / HF-W1-SNAP=3; hotfixes (#demoBtn hide +
+  select-option visibility) preserved 1/1.
+
+### Menu items WIRED (real actions)
+- Edit: Undo, Redo, Delete, Copy.
+- Commands: Reverse (mapped to mirror about Y).
+- Tools: Draw Pipe, Draw Wall, Place Head, Add Fitting, Add Door, Draw-Off (Studio-added).
+- Snaps: End Points, Center/Mid Point, Intersections (+all), Perpendicular (+all),
+  Rounding/Visible-Grid — all toggle live snap state with on-screen indicator.
+
+### Honest deferrals / still grayed
+- Edit > Cut and Paste: there is NO clipboard yet. Cut is mapped to Delete (honest subset,
+  flagged via status line); Paste stays GRAYED. Real cut/paste clipboard = follow-up.
+- Commands > rotate/mirror are reachable from the command stack API but only Reverse is
+  surfaced on a standard AutoSprink menu item; the remaining AutoSprink Draw/Commands/
+  Snaps menu entries that have no Studio analog stay STUBBED/grayed (unchanged from the
+  HF-MENUBAR baseline) — not falsely enabled.
+- Draw tools place into the live model and persist via the existing HF-A1-AUTOLOAD
+  localStorage layout; a dedicated project-save format is deferred to a later wave.
