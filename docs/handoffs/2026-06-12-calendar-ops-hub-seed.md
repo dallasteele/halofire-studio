@@ -509,3 +509,57 @@ whole-sheet ceiling (≈97% in-envelope) or hold for further work.** Recommendat
 to W3 only after the user accepts the ceiling.
 Heatmaps: `out/halofire-W2b/recall-definitive.png` (whole-sheet),
 `out/halofire-W2b/recall-inclip.png` (in-envelope).
+
+## Extraction recore 2026-06-13
+
+The W2b "97.15% recall" above was a COVERAGE artifact on an over-inclusive wall set — it
+PASSED garbage. User + Claude visually confirmed on live 1881 (ss_7566rpo6u) that the core
+was broken. Recored to correctness, gated by screenshot (not coverage %). Superseded; this
+section is the honest record.
+
+**Which vision models actually work (honest):** NONE work on this sheet. Both were tested
+for real on GX10 (NVIDIA GB10):
+- **SAM3 @9003** — runs (cuda, 848M, 1.5s) but returns 0 wall / 0 column / 0 door
+  detections (max "wall" score 0.0204 via /debug/scores). Trained on natural-image
+  concepts, not CAD linework. NOT viable.
+- **CubiCasa5K** (ResNet34-UNet, Yytsi/floorplan-to-3d-walls, 93MB, smp 0.5.0) — runs in
+  0.9s but outputs ~98.9% background on this dense 384ft commercial sheet (walls go
+  sub-pixel; trained on simple 512px residential SVGs). NOT viable as-is.
+- **FloorplanVLM-class** (qwen2.5-vl) — deployable, not run; would only be for SEMANTIC
+  room labeling, never geometry.
+I did NOT fake model output. Structure comes from vectors, honestly.
+
+**The correct method used:** vector-first reconstruction. `extractSegmentsFromOpList` →
+single-band cut-wall lineweight layer → new `src/engine/plan-wall-runs.js buildWallRuns()`:
+collapse fragmented collinear segments into axis-aligned wall RUNS (perpTol 0.25ft,
+gap 1.0ft, minRun 2.0ft) with NON-WALL EXCLUSION — drop sub-2ft stubs (dimension ticks/
+glyphs) and diagonals (door-swing arcs/hatch). The 41,784 lineweight-union set is demoted
+to an off-by-default diagnostic overlay; primary structure is `wallSource:'wall-runs'`.
+Data augmented in place via `scripts/augment-wall-runs-recore.mjs` (no 173MB re-extraction).
+DOMAIN CORRECTION: A-101 is a long narrow WOOD-FRAMED multifamily building drawn as two
+stacked plan views, NOT a parking podium. The STRUCTURAL S-110 OVERALL sheet (1"=30') was
+tested but its column markers are sub-detectable (grid parser reads dimension strings as
+columns → 0 columns); columns/beams live on the ENLARGED S-1xx.B/.C sheets (1/8"=1') — a W4
+input, not usable for L1 structure now.
+
+**New element count:** L1 = **158 wall runs** (from 6,858 single-band segments; excluded
+2,692 stubs + 6 diagonals; 2,252 ft total). All 8 levels land 79–251 runs — hundreds, not
+41,784. Paint/furniture in structure field = 0. Orientation fixed (rotation.x +PI/2 → -PI/2,
+no texture flip). Clipping fixed (polygonOffset(1,1), lift 0.04→0.5 ft).
+
+**Screenshots (proof in `out/halofire-recore/`):** `r2-orientation-top.jpg` +
+`r2-orientation-top-zoom.jpg` (sheet text upright + forward — "FLOOR PLAN GENERAL NOTES",
+"KEY PLAN", "22 DESIGN+LAB" logo, title block, A-101 number all readable);
+`r2-structure-over-sheet-top.jpg` (158 runs registered on the sheet); `r2-orbit-1..6-*.jpg`
+(no clipping / no z-fight at 6 camera angles incl ~12° grazing). A/B orientation evidence:
+`ab-negPI2-noflip.png` (correct) vs the 3 wrong states.
+
+**Trust:** full vitest 1139/1139 green (+11 new). Live==committed==worktree md5 parity —
+building-from-plan.js (419bf0b5), pdf-underlay.js (354ca4a8), plan-wall-runs.js (6122ee5d),
+autosprink.html (d671c3ff). Commit **ddb5f3b** (`git cat-file -t` = commit) on
+studio/fix-1881-part-scale-align-20260613. Hotfix markers intact. All elements
+needs-verification — NOT AHJ/PE/mfr-exact/AutoSprink-parity.
+
+**Forward-wave readiness:** the core is now correct enough to resume W3/W4. Structure is
+plausible, plan is readable-from-above, nothing clips — all proven by screenshot, not a
+coverage %.
