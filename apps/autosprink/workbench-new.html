@@ -1,0 +1,757 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>HaloFire · Today</title>
+<style>
+:root{
+  /* Base surfaces */
+  --bg:#0b0d10;
+  --bg-grad-a:#0e1318; --bg-grad-b:#0a0c0f;
+  --panel:rgba(22,26,32,0.72);
+  --panel2:rgba(14,17,21,0.85);
+  --panel-raised:rgba(30,35,42,0.78);
+  /* Text */
+  --text:#e8ecf2; --muted:#9aa4b2; --faint:#5d6675;
+  /* Borders / hairlines */
+  --line:rgba(255,255,255,0.08);
+  --line-strong:rgba(255,255,255,0.14);
+  --line-inset:rgba(0,0,0,0.40);
+  /* Accent */
+  --gold:#d9a441; --gold-bright:#f0bd5a; --gold-dim:rgba(217,164,65,0.18);
+  /* Status */
+  --ok:#54b67a; --warn:#d9a441; --crit:#d9534f; --info:#5aa9e6; --select:#4ea1ff;
+  /* Radii / spacing */
+  --r-control:7px; --r-panel:12px;
+  --s1:4px; --s2:6px; --s3:8px; --s4:10px; --s5:12px; --s6:16px; --s7:24px;
+  /* Glass */
+  --blur-panel:blur(18px) saturate(1.2);
+  --blur-overlay:blur(28px) saturate(1.3);
+  --shadow-panel:0 1px 0 var(--line) inset, 0 8px 24px rgba(0,0,0,0.35);
+  --shadow-overlay:0 1px 0 var(--line) inset, 0 16px 48px rgba(0,0,0,0.50);
+  --shadow-recess:0 1px 0 var(--line-inset) inset, 0 -1px 0 rgba(255,255,255,0.03) inset;
+  --sheen:linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0) 40%);
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{height:100%;}
+body{
+  font:13px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,system-ui,sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(900px 600px at 86% -8%, rgba(217,164,65,0.10), transparent 60%),
+    radial-gradient(700px 500px at -6% 110%, rgba(90,169,230,0.06), transparent 60%),
+    linear-gradient(160deg, var(--bg-grad-a), var(--bg-grad-b));
+  -webkit-font-smoothing:antialiased;
+  overflow:hidden;
+}
+
+/* ============ APP FRAME ============ */
+.frame{
+  height:100vh; width:100vw;
+  display:grid;
+  grid-template-columns:232px 1fr;
+  grid-template-rows:48px 1fr;
+  grid-template-areas:
+    "brand topchrome"
+    "nav   main";
+}
+
+/* ---- Top chrome (z=100) ---- */
+.brandcell{
+  grid-area:brand;
+  display:flex; align-items:center; gap:var(--s4);
+  padding:0 var(--s6);
+  border-bottom:1px solid var(--line);
+  border-right:1px solid var(--line);
+  background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0) 70%), var(--panel2);
+}
+.brandmark{
+  width:24px; height:24px; border-radius:6px; flex:none;
+  background:radial-gradient(circle at 35% 28%, var(--gold-bright), var(--gold) 55%, #7a5a1c 100%);
+  box-shadow:0 0 0 1px rgba(0,0,0,0.4) inset, 0 0 12px rgba(217,164,65,0.45);
+  position:relative;
+}
+.brandmark:after{
+  content:""; position:absolute; inset:6px 7px;
+  background:rgba(11,13,16,0.55);
+  clip-path:polygon(50% 0,68% 38%,100% 42%,72% 64%,82% 100%,50% 78%,18% 100%,28% 64%,0 42%,32% 38%);
+}
+.wordmark{font-weight:650; letter-spacing:0.2px; font-size:14px;}
+.wordmark span{color:var(--gold);}
+
+.topchrome{
+  grid-area:topchrome;
+  display:flex; align-items:center; gap:var(--s5);
+  padding:0 var(--s6);
+  border-bottom:1px solid var(--line);
+  background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0) 70%), var(--panel2);
+}
+.windowname{font-size:12.5px; color:var(--muted);}
+.windowname b{color:var(--text); font-weight:600;}
+.global-search{
+  margin-left:var(--s5); flex:1; max-width:380px;
+  display:flex; align-items:center; gap:var(--s3);
+  height:30px; padding:0 var(--s4);
+  background:var(--panel2);
+  border:1px solid var(--line);
+  border-radius:var(--r-control);
+  box-shadow:var(--shadow-recess);
+  color:var(--faint);
+}
+.global-search .ico{opacity:0.7;}
+.global-search kbd{
+  margin-left:auto; font:11px ui-monospace,monospace; color:var(--faint);
+  border:1px solid var(--line); border-radius:4px; padding:1px 5px;
+}
+.chrome-right{margin-left:auto; display:flex; align-items:center; gap:var(--s4);}
+.iconbtn{
+  width:30px; height:30px; display:grid; place-items:center;
+  border:1px solid var(--line); border-radius:var(--r-control);
+  background:var(--panel); color:var(--muted); cursor:pointer; position:relative;
+}
+.iconbtn:hover{border-color:var(--line-strong); color:var(--text);}
+.iconbtn .dot{position:absolute; top:5px; right:6px; width:6px; height:6px; border-radius:50%; background:var(--crit);}
+.user{
+  display:flex; align-items:center; gap:var(--s3);
+  padding:3px 3px 3px var(--s4);
+  border:1px solid var(--line); border-radius:999px; background:var(--panel);
+}
+.user .name{font-size:12.5px; font-weight:600;}
+.user .role{
+  font-size:10.5px; text-transform:uppercase; letter-spacing:0.5px; color:var(--gold);
+  background:var(--gold-dim); border:1px solid rgba(217,164,65,0.3);
+  padding:1px 7px; border-radius:999px;
+}
+.avatar{
+  width:26px; height:26px; border-radius:50%;
+  background:linear-gradient(150deg,#3a4350,#222831);
+  border:1px solid var(--line-strong);
+  display:grid; place-items:center; font-size:11px; font-weight:700; color:var(--text);
+}
+
+/* ---- Left nav (shared shell, z=10) ---- */
+.nav{
+  grid-area:nav;
+  border-right:1px solid var(--line);
+  background:linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0) 30%), var(--panel);
+  backdrop-filter:var(--blur-panel);
+  display:flex; flex-direction:column;
+  padding:var(--s4) var(--s3) var(--s3);
+  gap:2px;
+}
+.nav-section{
+  font-size:10px; text-transform:uppercase; letter-spacing:0.8px; color:var(--faint);
+  padding:var(--s4) var(--s4) var(--s2);
+}
+.nav-item{
+  display:flex; align-items:center; gap:var(--s4);
+  height:34px; padding:0 var(--s4);
+  border-radius:var(--r-control);
+  color:var(--muted); cursor:pointer; position:relative;
+  border:1px solid transparent;
+}
+.nav-item .ico{width:18px; height:18px; flex:none; opacity:0.85;}
+.nav-item .lbl{font-size:13px; font-weight:500;}
+.nav-item .badge{
+  margin-left:auto; font-size:10.5px; font-weight:700;
+  min-width:18px; height:18px; padding:0 5px; border-radius:9px;
+  display:grid; place-items:center;
+  background:var(--panel2); color:var(--muted); border:1px solid var(--line);
+}
+.nav-item:hover{background:rgba(255,255,255,0.035); color:var(--text); border-color:var(--line);}
+.nav-item.active{
+  background:var(--gold-dim); color:var(--text);
+  border-color:rgba(217,164,65,0.28);
+}
+.nav-item.active:before{
+  content:""; position:absolute; left:-1px; top:6px; bottom:6px; width:3px;
+  background:var(--gold); border-radius:0 3px 3px 0;
+}
+.nav-item.active .ico{opacity:1; color:var(--gold);}
+.nav-item.admin .badge{background:rgba(90,169,230,0.14); color:var(--info); border-color:rgba(90,169,230,0.3);}
+.nav-spacer{flex:1;}
+.nav-foot{
+  margin-top:var(--s3); padding:var(--s4);
+  border-top:1px solid var(--line);
+  font-size:11px; color:var(--faint);
+  display:flex; align-items:center; justify-content:space-between;
+}
+.parity-pill{
+  font-size:10px; color:var(--warn); background:rgba(217,164,65,0.10);
+  border:1px solid rgba(217,164,65,0.25); padding:2px 7px; border-radius:999px;
+}
+
+/* ============ MAIN (z=0 content region, fills frame, no page scroll) ============ */
+.main{
+  grid-area:main;
+  display:grid;
+  grid-template-rows:auto auto 1fr;
+  min-height:0;
+  padding:var(--s6) var(--s7) var(--s6);
+  gap:var(--s5);
+}
+
+/* greeting / KPI strip */
+.greet{display:flex; align-items:flex-end; gap:var(--s7); flex-wrap:wrap;}
+.greet h1{font-size:22px; font-weight:680; letter-spacing:-0.2px;}
+.greet h1 .accent{color:var(--gold);}
+.greet .sub{font-size:12.5px; color:var(--muted); margin-top:2px;}
+.kpi-strip{display:flex; gap:var(--s4); margin-left:auto;}
+.kpi{
+  min-width:118px;
+  background:var(--panel); backdrop-filter:var(--blur-panel);
+  border:1px solid var(--line); border-radius:var(--r-panel);
+  box-shadow:var(--shadow-panel);
+  padding:var(--s4) var(--s5);
+  position:relative; overflow:hidden;
+}
+.kpi:before{content:""; position:absolute; inset:0; background:var(--sheen); pointer-events:none;}
+.kpi .k{font-size:10.5px; text-transform:uppercase; letter-spacing:0.6px; color:var(--muted);}
+.kpi .v{font-size:22px; font-weight:700; margin-top:3px; line-height:1;}
+.kpi .d{font-size:11px; margin-top:3px;}
+.kpi .d.up{color:var(--ok);} .kpi .d.dn{color:var(--crit);} .kpi .d.flat{color:var(--faint);}
+.kpi.accent .v{color:var(--gold);}
+
+/* dashboard grid — the dockable surface */
+.dash{
+  display:grid;
+  grid-template-columns:1.55fr 1fr 0.9fr;
+  grid-template-rows:1fr 1fr;
+  gap:var(--s5);
+  min-height:0;
+}
+
+/* a dock card (the per-user customizable panel) */
+.card{
+  background:var(--panel); backdrop-filter:var(--blur-panel);
+  border:1px solid var(--line); border-radius:var(--r-panel);
+  box-shadow:var(--shadow-panel);
+  display:flex; flex-direction:column; min-height:0; position:relative; overflow:hidden;
+}
+.card:before{content:""; position:absolute; left:0; right:0; top:0; height:46px; background:var(--sheen); pointer-events:none;}
+.card-hd{
+  display:flex; align-items:center; gap:var(--s3);
+  height:38px; padding:0 var(--s5) 0 var(--s4);
+  border-bottom:1px solid var(--line); flex:none;
+}
+.card-hd .grip{
+  width:14px; color:var(--faint); cursor:grab; letter-spacing:-2px; font-size:13px;
+  user-select:none;
+}
+.card-hd .ttl{font-size:12px; font-weight:650; text-transform:uppercase; letter-spacing:0.5px;}
+.card-hd .ct{font-size:11px; color:var(--muted); background:var(--panel2);
+  border:1px solid var(--line); border-radius:999px; padding:1px 8px;}
+.card-hd .tools{margin-left:auto; display:flex; gap:2px;}
+.card-hd .tbtn{
+  width:24px; height:24px; display:grid; place-items:center; border-radius:6px;
+  color:var(--faint); cursor:pointer; font-size:13px;
+}
+.card-hd .tbtn:hover{background:rgba(255,255,255,0.05); color:var(--text);}
+.card-bd{flex:1; min-height:0; overflow:auto; padding:var(--s4) var(--s4) var(--s5);}
+.card-bd::-webkit-scrollbar{width:8px;}
+.card-bd::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08); border-radius:4px;}
+
+/* span helpers */
+.col-span-2{grid-column:span 2;}
+.row-span-2{grid-row:span 2;}
+
+/* ---- Today's jobs list (schedule rows) ---- */
+.job{
+  display:grid; grid-template-columns:54px 4px 1fr auto;
+  gap:var(--s4); align-items:center;
+  padding:var(--s4); margin-bottom:var(--s2);
+  background:var(--panel2); border:1px solid var(--line);
+  border-radius:var(--r-control); box-shadow:var(--shadow-recess);
+  cursor:pointer; position:relative;
+}
+.job:hover{border-color:var(--line-strong);}
+.job .time{font:12px ui-monospace,monospace; color:var(--muted); text-align:right;}
+.job .time b{display:block; color:var(--text); font-size:13px;}
+.job .bar{align-self:stretch; border-radius:3px;}
+.job.install .bar{background:var(--info);}
+.job.inspect .bar{background:var(--ok);}
+.job.bid .bar{background:var(--gold);}
+.job.walk .bar{background:#9b7fd4;}
+.job .who{font-weight:600; font-size:13px;}
+.job .meta{font-size:11.5px; color:var(--muted); margin-top:2px; display:flex; gap:var(--s4); flex-wrap:wrap;}
+.job .meta .tag{display:inline-flex; align-items:center; gap:4px;}
+.job .crew{
+  font-size:11px; color:var(--muted);
+  display:flex; align-items:center; gap:var(--s2);
+}
+.job .crew .ava{
+  width:22px; height:22px; border-radius:50%; font-size:9.5px; font-weight:700;
+  display:grid; place-items:center; color:#0b0d10;
+  border:1.5px solid var(--bg);
+}
+.job .crew .stack{display:flex;}
+.job .crew .stack .ava{margin-left:-7px;}
+.chip{
+  font-size:10.5px; font-weight:600; padding:2px 8px; border-radius:999px;
+  border:1px solid var(--line); display:inline-flex; align-items:center; gap:4px;
+}
+.chip.ok{color:var(--ok); background:rgba(84,182,122,0.12); border-color:rgba(84,182,122,0.3);}
+.chip.warn{color:var(--warn); background:rgba(217,164,65,0.12); border-color:rgba(217,164,65,0.3);}
+.chip.crit{color:var(--crit); background:rgba(213,83,79,0.12); border-color:rgba(213,83,79,0.3);}
+.chip.info{color:var(--info); background:rgba(90,169,230,0.12); border-color:rgba(90,169,230,0.3);}
+.chip.muted{color:var(--muted); background:var(--panel2);}
+
+/* now divider */
+.nowline{
+  display:flex; align-items:center; gap:var(--s3); margin:var(--s3) 0 var(--s4); padding:0 var(--s2);
+}
+.nowline .lbl{font:10.5px ui-monospace,monospace; color:var(--gold); letter-spacing:0.5px;}
+.nowline .ln{flex:1; height:1px; background:linear-gradient(90deg,var(--gold),transparent);}
+
+/* ---- Bids / approval rail rows ---- */
+.row{
+  display:flex; align-items:center; gap:var(--s4);
+  padding:var(--s4); margin-bottom:var(--s2);
+  background:var(--panel2); border:1px solid var(--line);
+  border-radius:var(--r-control); box-shadow:var(--shadow-recess); cursor:pointer;
+}
+.row:hover{border-color:var(--line-strong);}
+.row .ic{
+  width:30px; height:30px; flex:none; border-radius:7px; display:grid; place-items:center;
+  background:rgba(255,255,255,0.04); border:1px solid var(--line); color:var(--muted);
+}
+.row .body{flex:1; min-width:0;}
+.row .t{font-size:12.5px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.row .s{font-size:11px; color:var(--muted); margin-top:1px;}
+.row .val{font:13px ui-monospace,monospace; font-weight:600; color:var(--text);}
+
+/* approval rail — one gold action per view */
+.approve-rail .row{border-color:rgba(217,164,65,0.18); background:rgba(217,164,65,0.04);}
+.btn{
+  font-size:11.5px; font-weight:650; height:28px; padding:0 var(--s4);
+  border-radius:var(--r-control); cursor:pointer; border:1px solid var(--line);
+  background:var(--panel-raised); color:var(--text); display:inline-flex; align-items:center; gap:5px;
+}
+.btn:hover{border-color:var(--line-strong);}
+.btn.gold{
+  background:linear-gradient(180deg, var(--gold-bright), var(--gold));
+  color:#241a06; border-color:rgba(0,0,0,0.25); font-weight:700;
+  box-shadow:0 1px 0 rgba(255,255,255,0.25) inset, 0 4px 12px rgba(217,164,65,0.25);
+}
+.btn.gold:hover{filter:brightness(1.05);}
+.btn.ghost{background:transparent; color:var(--muted);}
+.btn.sm{height:24px; padding:0 var(--s3); font-size:11px;}
+
+/* ---- Inspections / NFPA recall list ---- */
+.insp{
+  display:grid; grid-template-columns:1fr auto; gap:2px var(--s4); align-items:center;
+  padding:var(--s3) var(--s4); margin-bottom:var(--s2);
+  border-radius:var(--r-control); border:1px solid transparent;
+}
+.insp:hover{background:rgba(255,255,255,0.03); border-color:var(--line);}
+.insp .t{font-size:12.5px; font-weight:600;}
+.insp .s{font-size:11px; color:var(--muted); grid-column:1; }
+.insp .due{grid-column:2; grid-row:1 / span 2; text-align:right;}
+
+/* mini bar chart (reports) */
+.bars{display:flex; align-items:flex-end; gap:var(--s4); height:96px; padding:var(--s4) var(--s2) 0;}
+.bars .b{flex:1; display:flex; flex-direction:column; align-items:center; gap:var(--s2); height:100%; justify-content:flex-end;}
+.bars .b .fill{width:100%; max-width:26px; border-radius:5px 5px 0 0; background:linear-gradient(180deg, var(--info), rgba(90,169,230,0.35));}
+.bars .b.win .fill{background:linear-gradient(180deg, var(--gold-bright), rgba(217,164,65,0.4));}
+.bars .b .x{font-size:10px; color:var(--faint);}
+.legend{display:flex; gap:var(--s5); font-size:11px; color:var(--muted); padding:var(--s4) var(--s2) 0;}
+.legend i{width:9px; height:9px; border-radius:2px; display:inline-block; margin-right:5px;}
+
+/* AI activity feed */
+.feed-item{display:flex; gap:var(--s4); padding:var(--s3) 0; border-bottom:1px solid var(--line);}
+.feed-item:last-child{border-bottom:none;}
+.feed-item .dot{width:8px; height:8px; border-radius:50%; margin-top:5px; flex:none;}
+.feed-item .tx{font-size:12px; line-height:1.4;}
+.feed-item .tx b{font-weight:650;}
+.feed-item .tm{font-size:10.5px; color:var(--faint); margin-top:2px;}
+
+/* dock add tile (customizable dock affordance) */
+.add-tile{
+  border:1px dashed var(--line-strong); border-radius:var(--r-panel);
+  display:grid; place-items:center; color:var(--faint); gap:var(--s3);
+  background:rgba(255,255,255,0.012); cursor:pointer; text-align:center; padding:var(--s5);
+}
+.add-tile:hover{border-color:var(--gold); color:var(--gold); background:var(--gold-dim);}
+.add-tile .plus{font-size:24px; line-height:1;}
+.add-tile .l{font-size:12px; font-weight:600;}
+.add-tile .l2{font-size:10.5px;}
+
+/* customize dock toggle on greeting */
+.dock-ctl{display:flex; align-items:center; gap:var(--s3); margin-left:auto;}
+.seg{display:flex; border:1px solid var(--line); border-radius:var(--r-control); overflow:hidden; background:var(--panel2);}
+.seg .o{padding:5px 11px; font-size:11.5px; color:var(--muted); cursor:pointer; border-right:1px solid var(--line);}
+.seg .o:last-child{border-right:none;}
+.seg .o.on{background:var(--gold-dim); color:var(--text);}
+
+/* tiny ico svgs inherit currentColor */
+svg{display:block;}
+</style>
+<link rel="stylesheet" href="/public/styles/halofire-tokens.css">
+<script src="/public/halofire-auth.js"></script>
+</head>
+<body>
+<div class="frame">
+
+  <!-- BRAND CELL -->
+  <div class="brandcell">
+    <div class="brandmark"></div>
+    <div class="wordmark">Halo<span>Fire</span></div>
+  </div>
+
+  <!-- TOP CHROME -->
+  <header class="topchrome">
+    <div class="windowname"><b>Today</b> · Home</div>
+    <div class="global-search">
+      <span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span>
+      <span>Search clients, bids, jobs, properties…</span>
+      <kbd>⌘K</kbd>
+    </div>
+    <div class="chrome-right">
+      <div class="iconbtn" title="Notifications"><span class="dot"></span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div>
+      <div class="iconbtn" title="OpenClaw assistant">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v2M5 8l1.5 1.5M19 8l-1.5 1.5"/><rect x="6" y="9" width="12" height="9" rx="3"/><path d="M9 14h.01M15 14h.01"/></svg></div>
+      <div class="user">
+        <span class="name">Marcus Vidal</span>
+        <span class="role">Office</span>
+        <span class="avatar">MV</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- LEFT NAV (shared shell) -->
+  <nav class="nav">
+    <div class="nav-section">Workspace</div>
+    <div class="nav-item active">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg></span>
+      <span class="lbl">Job Book</span><span class="badge">7</span>
+    </div>
+    <div class="nav-item">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></span>
+      <span class="lbl">Clients</span>
+    </div>
+    <div class="nav-item">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="3" width="14" height="16" rx="2"/><path d="M8 3v16M8 21h11a2 2 0 0 0 2-2V6"/></svg></span>
+      <span class="lbl">Bids</span><span class="badge">4</span>
+    </div>
+    <div class="nav-item">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 3 7v6c0 5 3.5 7.5 9 9 5.5-1.5 9-4 9-9V7z" opacity=".4"/><path d="m21 3-9 5-9-5 9-5z" transform="translate(0 4)"/><path d="M12 6.5 4.5 11 12 15.5 19.5 11z"/><path d="M4.5 11v4L12 19.5 19.5 15v-4"/></svg></span>
+      <span class="lbl">Studio</span>
+    </div>
+    <div class="nav-item">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 5 6v5c0 4 3 7 7 8 4-1 7-4 7-8V6z"/><path d="m9 12 2 2 4-4"/></svg></span>
+      <span class="lbl">Inspections</span><span class="badge">12</span>
+    </div>
+    <div class="nav-item">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M6 21V11M11 21V6M16 21v-8M21 21V9"/></svg></span>
+      <span class="lbl">Reports</span>
+    </div>
+
+    <div class="nav-section">System</div>
+    <div class="nav-item">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-2.7 1.1V21a2 2 0 1 1-4 0v-.1A1.6 1.6 0 0 0 7 19.4a1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.6 1.6 0 0 0 2.6 14H2.5a2 2 0 1 1 0-4h.1A1.6 1.6 0 0 0 4 7.3l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.6 1.6 0 0 0 9 4.6h.1A1.6 1.6 0 0 0 10 2.5a2 2 0 1 1 4 0v.1A1.6 1.6 0 0 0 17 4.6l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9.4a1.6 1.6 0 0 0 1.4.9h.1a2 2 0 1 1 0 4z" transform="scale(.78) translate(3.4 3.4)"/></svg></span>
+      <span class="lbl">Settings</span>
+    </div>
+    <div class="nav-item admin">
+      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m14 7 3 3-9.5 9.5L4 20l.5-3.5z"/><path d="M14 7 17 4l3 3-3 3"/></svg></span>
+      <span class="lbl">Workbench</span><span class="badge">dev</span>
+    </div>
+
+    <div class="nav-spacer"></div>
+    <div class="nav-foot">
+      <span>v0.9.3 · alpha</span>
+      <span class="parity-pill">Internal · not AHJ/PE</span>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- greeting + KPI strip -->
+    <div class="greet">
+      <div>
+        <h1>Good morning, <span class="accent">Marcus</span></h1>
+        <div class="sub">Friday, June 13 · 7 jobs scheduled · 2 bids awaiting your approval · Phoenix &amp; Tucson crews active</div>
+      </div>
+      <div class="dock-ctl">
+        <div class="seg">
+          <div class="o on">My Dock</div>
+          <div class="o">Default</div>
+        </div>
+        <button class="btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> Customize dock</button>
+      </div>
+    </div>
+
+    <div class="kpi-strip" style="margin:0;">
+      <div class="kpi accent"><div class="k">Bids out</div><div class="v">$184K</div><div class="d up">▲ 3 sent this week</div></div>
+      <div class="kpi"><div class="k">Win rate (30d)</div><div class="v">61%</div><div class="d up">▲ 4 pts</div></div>
+      <div class="kpi"><div class="k">Crew utilization</div><div class="v">82%</div><div class="d flat">— 2 trucks idle</div></div>
+      <div class="kpi"><div class="k">Inspections due</div><div class="v">12</div><div class="d dn">▲ 3 overdue</div></div>
+    </div>
+
+    <!-- dashboard / dockable grid -->
+    <section class="dash">
+
+      <!-- TODAY'S JOBS (big, spans 2 rows) -->
+      <div class="card row-span-2">
+        <div class="card-hd">
+          <span class="grip">⋮⋮</span>
+          <span class="ttl">Today's Schedule</span>
+          <span class="ct">7 jobs</span>
+          <div class="tools">
+            <span class="tbtn" title="Open Job Book">↗</span>
+            <span class="tbtn" title="Collapse">▾</span>
+          </div>
+        </div>
+        <div class="card-bd">
+
+          <div class="job inspect">
+            <div class="time"><b>7:30</b>AM</div><div class="bar"></div>
+            <div>
+              <div class="who">NFPA 25 Annual — Mesa Gateway Logistics</div>
+              <div class="meta">
+                <span class="tag">📍 6200 S Sossaman Rd, Mesa AZ</span>
+                <span class="tag">Wet system · 4 risers</span>
+              </div>
+            </div>
+            <div style="text-align:right;">
+              <span class="chip ok">✓ Confirmed</span>
+              <div class="crew" style="justify-content:flex-end; margin-top:6px;"><div class="stack"><span class="ava" style="background:#5aa9e6">DR</span><span class="ava" style="background:#54b67a">TK</span></div></div>
+            </div>
+          </div>
+
+          <div class="job install">
+            <div class="time"><b>8:00</b>AM</div><div class="bar"></div>
+            <div>
+              <div class="who">Branch line rough-in — Desert Ridge Marketplace Bldg C</div>
+              <div class="meta">
+                <span class="tag">📍 21001 N Tatum Blvd, Phoenix AZ</span>
+                <span class="tag">Job #HF-2241 · 24ft AZ stock</span>
+              </div>
+            </div>
+            <div style="text-align:right;">
+              <span class="chip info">● In progress</span>
+              <div class="crew" style="justify-content:flex-end; margin-top:6px;"><div class="stack"><span class="ava" style="background:#d9a441">JM</span><span class="ava" style="background:#9b7fd4">RP</span><span class="ava" style="background:#54b67a">EL</span></div></div>
+            </div>
+          </div>
+
+          <div class="job walk">
+            <div class="time"><b>10:15</b>AM</div><div class="bar"></div>
+            <div>
+              <div class="who">Site walk + takeoff — Tucson Premium Outlets expansion</div>
+              <div class="meta">
+                <span class="tag">📍 6401 W Marana Center Blvd, Tucson AZ</span>
+                <span class="tag">Pre-bid · est. 38,000 sq ft</span>
+              </div>
+            </div>
+            <div style="text-align:right;">
+              <span class="chip warn">⚠ Needs scope</span>
+              <div class="crew" style="justify-content:flex-end; margin-top:6px;"><div class="stack"><span class="ava" style="background:#5aa9e6">SA</span></div></div>
+            </div>
+          </div>
+
+          <div class="nowline"><span class="lbl">NOW · 11:42 AM</span><span class="ln"></span></div>
+
+          <div class="job inspect">
+            <div class="time"><b>1:00</b>PM</div><div class="bar"></div>
+            <div>
+              <div class="who">Quarterly inspection — Scottsdale Quarter Tower 2</div>
+              <div class="meta">
+                <span class="tag">📍 15059 N Scottsdale Rd</span>
+                <span class="tag">Standpipe + sprinkler</span>
+              </div>
+            </div>
+            <div style="text-align:right;">
+              <span class="chip ok">✓ Confirmed</span>
+              <div class="crew" style="justify-content:flex-end; margin-top:6px;"><div class="stack"><span class="ava" style="background:#54b67a">TK</span></div></div>
+            </div>
+          </div>
+
+          <div class="job bid">
+            <div class="time"><b>2:30</b>PM</div><div class="bar"></div>
+            <div>
+              <div class="who">Bid review w/ GC — Chandler Fashion Center retenant</div>
+              <div class="meta">
+                <span class="tag">📍 3111 W Chandler Blvd</span>
+                <span class="tag">Bid #HF-2248 · $96,400</span>
+              </div>
+            </div>
+            <div style="text-align:right;">
+              <span class="chip muted">○ Scheduled</span>
+              <div class="crew" style="justify-content:flex-end; margin-top:6px;"><div class="stack"><span class="ava" style="background:#d9a441">MV</span></div></div>
+            </div>
+          </div>
+
+          <div class="job install">
+            <div class="time"><b>3:30</b>PM</div><div class="bar"></div>
+            <div>
+              <div class="who">Hydrostatic test — Gilbert Crossing Phase 2</div>
+              <div class="meta">
+                <span class="tag">📍 2765 S Market St, Gilbert AZ</span>
+                <span class="tag">Job #HF-2230 · 200 psi</span>
+              </div>
+            </div>
+            <div style="text-align:right;">
+              <span class="chip muted">○ Scheduled</span>
+              <div class="crew" style="justify-content:flex-end; margin-top:6px;"><div class="stack"><span class="ava" style="background:#9b7fd4">RP</span><span class="ava" style="background:#54b67a">EL</span></div></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- OPENCLAW APPROVAL RAIL -->
+      <div class="card approve-rail">
+        <div class="card-hd">
+          <span class="grip">⋮⋮</span>
+          <span class="ttl">OpenClaw · Awaiting Approval</span>
+          <span class="ct">2</span>
+          <div class="tools"><span class="tbtn" title="Settings">⚙</span><span class="tbtn" title="Collapse">▾</span></div>
+        </div>
+        <div class="card-bd">
+          <div class="row" style="align-items:flex-start;">
+            <div class="ic" style="color:var(--gold)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></div>
+            <div class="body">
+              <div class="t">AI drafted bid — Paradise Valley Mall HVAC tenant</div>
+              <div class="s">From: rfq@pvmall-gc.com · 14,200 sq ft · NFPA 13 · drafted 9:04 AM</div>
+              <div style="margin-top:8px; display:flex; gap:6px; align-items:center;">
+                <button class="btn gold sm">Approve &amp; send</button>
+                <button class="btn ghost sm">Review</button>
+                <span class="chip warn" style="margin-left:auto;">⚠ Sqft check</span>
+              </div>
+            </div>
+          </div>
+          <div class="row" style="align-items:flex-start;">
+            <div class="ic" style="color:var(--info)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+            <div class="body">
+              <div class="t">Follow-up reply — Tempe Marketplace re-roof RFQ</div>
+              <div class="s">AI suggests booking a site walk · client replied 10:51 AM</div>
+              <div style="margin-top:8px; display:flex; gap:6px; align-items:center;">
+                <button class="btn sm">Book site walk</button>
+                <button class="btn ghost sm">Edit reply</button>
+                <span class="chip ok" style="margin-left:auto;">✓ Ready</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- INSPECTIONS DUE (NFPA 25 recall) -->
+      <div class="card">
+        <div class="card-hd">
+          <span class="grip">⋮⋮</span>
+          <span class="ttl">Inspections Due</span>
+          <span class="ct">next 30d</span>
+          <div class="tools"><span class="tbtn" title="Open">↗</span><span class="tbtn">▾</span></div>
+        </div>
+        <div class="card-bd">
+          <div class="insp">
+            <div class="t">Tempe Marketplace — Bldg 4</div>
+            <div class="s">NFPA 25 annual · wet</div>
+            <div class="due"><span class="chip crit">3d overdue</span></div>
+          </div>
+          <div class="insp">
+            <div class="t">Arizona Mills Mall</div>
+            <div class="s">Quarterly standpipe</div>
+            <div class="due"><span class="chip warn">in 4d</span></div>
+          </div>
+          <div class="insp">
+            <div class="t">Chandler Viridian Apts</div>
+            <div class="s">Backflow · annual</div>
+            <div class="due"><span class="chip warn">in 6d</span></div>
+          </div>
+          <div class="insp">
+            <div class="t">Phoenix Sky Harbor T4 concourse</div>
+            <div class="s">NFPA 25 semi-annual</div>
+            <div class="due"><span class="chip muted">in 18d</span></div>
+          </div>
+          <div class="insp">
+            <div class="t">Mesa Riverview — anchor</div>
+            <div class="s">Fire pump annual</div>
+            <div class="due"><span class="chip muted">in 22d</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BID PIPELINE + win/loss bars -->
+      <div class="card">
+        <div class="card-hd">
+          <span class="grip">⋮⋮</span>
+          <span class="ttl">Bid Pipeline</span>
+          <span class="ct">$184K out</span>
+          <div class="tools"><span class="tbtn">↗</span><span class="tbtn">▾</span></div>
+        </div>
+        <div class="card-bd" style="overflow:hidden; display:flex; flex-direction:column;">
+          <div class="bars">
+            <div class="b"><div class="fill" style="height:42%"></div><div class="x">Feb</div></div>
+            <div class="b win"><div class="fill" style="height:30%"></div><div class="x"></div></div>
+            <div class="b"><div class="fill" style="height:58%"></div><div class="x">Mar</div></div>
+            <div class="b win"><div class="fill" style="height:40%"></div><div class="x"></div></div>
+            <div class="b"><div class="fill" style="height:70%"></div><div class="x">Apr</div></div>
+            <div class="b win"><div class="fill" style="height:52%"></div><div class="x"></div></div>
+            <div class="b"><div class="fill" style="height:85%"></div><div class="x">May</div></div>
+            <div class="b win"><div class="fill" style="height:62%"></div><div class="x"></div></div>
+          </div>
+          <div class="legend"><span><i style="background:#5aa9e6"></i>Bids sent</span><span><i style="background:#d9a441"></i>Won</span></div>
+          <div style="margin-top:auto; padding-top:10px; display:flex; gap:8px;">
+            <button class="btn sm">View pipeline</button>
+            <button class="btn gold sm" style="margin-left:auto;">New bid</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI ACTIVITY FEED -->
+      <div class="card">
+        <div class="card-hd">
+          <span class="grip">⋮⋮</span>
+          <span class="ttl">Activity</span>
+          <span class="ct">live</span>
+          <div class="tools"><span class="tbtn">↗</span><span class="tbtn">▾</span></div>
+        </div>
+        <div class="card-bd">
+          <div class="feed-item"><span class="dot" style="background:var(--gold)"></span><div><div class="tx"><b>AI</b> drafted bid for Paradise Valley Mall — awaiting your approval</div><div class="tm">38 min ago</div></div></div>
+          <div class="feed-item"><span class="dot" style="background:var(--ok)"></span><div><div class="tx"><b>Dana R.</b> marked Mesa Gateway inspection confirmed</div><div class="tm">1h ago</div></div></div>
+          <div class="feed-item"><span class="dot" style="background:var(--info)"></span><div><div class="tx">Bid <b>#HF-2244</b> moved to <i>sent</i> — Camelback Esplanade</div><div class="tm">2h ago</div></div></div>
+          <div class="feed-item"><span class="dot" style="background:var(--crit)"></span><div><div class="tx">Tempe Marketplace inspection now <b>overdue</b> — auto-added to Job Book</div><div class="tm">3h ago</div></div></div>
+          <div class="feed-item"><span class="dot" style="background:var(--ok)"></span><div><div class="tx">Won: <b>$96,400</b> Chandler Fashion Center — converted to Job #HF-2248</div><div class="tm">Yesterday</div></div></div>
+        </div>
+      </div>
+
+      <!-- ADD-PANEL TILE (customizable dock affordance) -->
+      <div class="add-tile">
+        <div class="plus">+</div>
+        <div>
+          <div class="l">Add a panel to your dock</div>
+          <div class="l2">My Tasks · Crew Map · Revenue · Documents…</div>
+        </div>
+      </div>
+
+    </section>
+  </main>
+</div>
+<script>
+(function () {
+  function initials(s){s=(s||'').trim();var x=s.split(/[\s@._-]+/).filter(Boolean);return(((x[0]||'')[0]||'')+((x[1]||'')[0]||'')).toUpperCase()||'U';}
+  if(window.HFAuth&&HFAuth.guard){
+    HFAuth.guard().then(function(me){
+      if(!me)return;
+      var nm=me.name||me.username||me.email||'User';
+      var u=document.querySelector('.user .name');if(u)u.textContent=nm;
+      var r=document.querySelector('.user .role');if(r)r.textContent=(me.role?me.role.charAt(0).toUpperCase()+me.role.slice(1):'User');
+      var a=document.querySelector('.user .avatar');if(a)a.textContent=initials(nm);
+      var g=document.querySelector('.greet h1');if(g){var hr=new Date().getHours();var part=hr<12?'Good morning':hr<18?'Good afternoon':'Good evening';g.textContent=part+', '+nm.split(' ')[0];}
+    }).catch(function(){});
+  }
+  var MAP={'Studio':'autosprink.html','Clients':'crm.html','Settings':'settings.html','Workbench':'workbench.html','Calendar':'calendar.html'};
+  document.querySelectorAll('.nav-item').forEach(function(item){
+    var lbl=item.querySelector('.lbl');if(!lbl)return;
+    var dest=MAP[lbl.textContent.trim()];
+    if(dest){item.style.cursor='pointer';item.addEventListener('click',function(){location.href=dest;});}
+  });
+  var user=document.querySelector('.user');
+  if(user){user.style.cursor='pointer';user.title='Sign out';user.addEventListener('click',function(){if(window.HFAuth&&HFAuth.logout)HFAuth.logout();});}
+})();
+</script>
+</body>
+</html>
