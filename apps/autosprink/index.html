@@ -211,6 +211,10 @@ img{user-select:none;-webkit-user-drag:none}
 .login-head small{display:block;color:rgba(242,236,224,0.72);font-size:14px;line-height:1.45}
 .login-note{display:none;color:rgba(255,213,79,0.78);font-size:11px;line-height:1.45;margin:-4px 0 14px}
 .field{display:grid;gap:8px;margin-bottom:15px}
+/* The .field{display:grid} above overrode the [hidden] attribute, so the
+   Confirm-password (and recovery-hidden) fields stayed visible on sign-in —
+   which also broke Apple/Google autofill. Make hidden actually hide. */
+.field[hidden]{display:none}
 .field label{font-family:var(--mono);font-size:10px;color:rgba(242,236,224,0.62);font-weight:700;letter-spacing:0.08em}
 .field input{
   width:100%;
