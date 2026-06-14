@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest';
 import { AHJ_APPROVAL_MISSING, PROFESSIONAL_REVIEW_MISSING, AUTOSPRINK_EVIDENCE_MISSING } from '../src/types/gate-codes';
 import { prepareSubmittalPacket } from '../src/autobid/submittal-packet-prep';
 
