@@ -747,7 +747,7 @@ svg{display:block;}
   document.querySelectorAll('.nav-item').forEach(function(item){
     var lbl=item.querySelector('.lbl');if(!lbl)return;
     var dest=MAP[lbl.textContent.trim()];
-    if(dest){item.style.cursor='pointer';item.addEventListener('click',function(){location.href=dest;});}
+    if(dest){item.style.cursor='pointer';item.addEventListener('click',function(){location.href=dest+(dest.indexOf('?')<0?'?hf=r2':'&hf=r2');});}
   });
   var user=document.querySelector('.user');
   if(user){user.style.cursor='pointer';user.title='Sign out';user.addEventListener('click',function(){if(window.HFAuth&&HFAuth.logout)HFAuth.logout();});}

@@ -133,4 +133,19 @@
     API_BASE: API_BASE,
   };
   window.HFAuth = HFAuth;
+  // One-time cache-bust: stale pre-no-store browser caches can serve OLD pages on
+  // navigation. Tag same-origin .html links with ?hf=r2 so clicks force a fresh fetch.
+  try {
+    var __HFV = "r2";
+    function __hfBust(){
+      var as = document.querySelectorAll('a[href]');
+      for (var i=0;i<as.length;i++){
+        try { var raw=as[i].getAttribute('href'); if(!raw||!/\.html(\?|#|$)/.test(raw)) continue;
+          var u=new URL(raw, location.origin);
+          if(u.origin===location.origin && !u.searchParams.has('hf')){ u.searchParams.set('hf',__HFV); as[i].setAttribute('href', u.pathname+u.search+u.hash); }
+        } catch(e){}
+      }
+    }
+    if(document.readyState!=='loading') __hfBust(); else document.addEventListener('DOMContentLoaded', __hfBust);
+  } catch(e){}
 })();
