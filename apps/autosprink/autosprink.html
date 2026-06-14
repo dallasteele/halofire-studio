@@ -1348,7 +1348,7 @@ function alignNetworkToExtractedPlate(floorPlan) {
   }
 }
 
-function renderModel(cadModel) {
+function renderModel(cadModel, opts) {
   clearSelection(false); // HF-A1-SELECT: model rebuild invalidates the selection
   currentCadModel = cadModel;
   window.__wallDebug = [];
@@ -1410,7 +1410,17 @@ function renderModel(cadModel) {
     });
     layerGroups.FLOOR.add(floor);
   }
-  frameCamera(minX, maxX, minZ, maxZ, ceil);
+  // HF draw-zoom fix: on an in-place edit (preserveView) keep the user's CURRENT
+  // camera — only refresh the frame bbox so Fit / view-cube stay correct. Frame
+  // the camera only on first render / explicit load (no _frame yet, or framing
+  // not suppressed). Previously this fired on EVERY draw/edit, zooming the user out.
+  if (opts && opts.preserveView && window._frame) {
+    const _cx = (minX + maxX) / 2, _cz = (minZ + maxZ) / 2;
+    const _span = Math.max(maxX - minX, maxZ - minZ, 40);
+    window._frame = { cx: _cx, cz: _cz, span: _span, ceil, bbox: { minX, maxX, minY: minZ, maxY: maxZ } };
+  } else {
+    frameCamera(minX, maxX, minZ, maxZ, ceil);
+  }
   buildLayerToggles();
 }
 
@@ -3457,7 +3467,7 @@ let lastFloorPlan = null; // HF-W1: remembered for re-align after an edit re-ren
 const HFEdit = createCommandStack({
   getModel: () => currentCadModel,
   setModel: (model, label) => {
-    renderModel(model);                       // full rebuild (clears selection, instanced colors)
+    renderModel(model, { preserveView: true }); // full rebuild; KEEP camera (HF draw-zoom fix — no reframe on edit)
     try { alignNetworkToExtractedPlate(lastFloorPlan); } catch (_) {}
     if (lastAppliedData) lastAppliedData.cadModel = model; // keep File>Save / autoload payload in sync
     try { saveLayout(lastAppliedData || { cadModel: model, bid: (lastAppliedData && lastAppliedData.bid) || { rooms: [{}] } }, lastBody); } catch (_) {}
