@@ -223,7 +223,7 @@ Sequenced build in [HALOFIRE_MASTER_ROADMAP.md](HALOFIRE_MASTER_ROADMAP.md): Wav
 
 ## §13. Source docs & glossary
 
-**Companion specs (this doc is the index):** OPS_FLOW_OPTIMIZATION · REPORTS_AND_ANALYTICS · VENDOR_PRICESYNC_AND_PART_CAD · AUDIT_AND_ROADMAP · DESIGN_SYSTEM_AND_ADAPTIVE_AI · MASTER_ROADMAP · **AI_BACKBONE_AND_TENANT_PROVISIONING** (the OpenClaw wiring, anti-stub register, and per-customer GX10 provisioning) (all in `halofire-studio/docs/`). AutoSPRINK bible: `docs/AUTOSPRINK_CLONE_PLAN_V2.md`, `research/autosprink-feature-matrix.md`, `blueprints/0x_*.md`.
+**Companion specs (this doc is the index):** OPS_FLOW_OPTIMIZATION · REPORTS_AND_ANALYTICS · VENDOR_PRICESYNC_AND_PART_CAD · AUDIT_AND_ROADMAP · DESIGN_SYSTEM_AND_ADAPTIVE_AI · MASTER_ROADMAP · **AI_BACKBONE_AND_TENANT_PROVISIONING** (the OpenClaw wiring, anti-stub register, and per-customer GX10 provisioning) · **CRM_UPGRADE_DESIGN** (full client+vendor ops, comms/payments/voice, the secure third-party boundary, and the AI virtual employee) (all in `halofire-studio/docs/`). AutoSPRINK bible: `docs/AUTOSPRINK_CLONE_PLAN_V2.md`, `research/autosprink-feature-matrix.md`, `blueprints/0x_*.md`.
 
 **Glossary:** **AHJ** Authority Having Jurisdiction · **ITM** Inspection/Testing/Maintenance (NFPA-25) · **NFPA-13** sprinkler design standard · **Remote area** hydraulically most-demanding design area · **Smart Pipe** auto pipe-role classification · **Review Queue** the human-in-loop approval gate · **Autonomy ladder** the earned-automation progression · **Job spine** the unifying entity record · **`[PLATFORM]`/`[VERTICAL]`/`[PATTERN]`** the template tags.
 
