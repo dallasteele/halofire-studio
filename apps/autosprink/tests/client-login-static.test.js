@@ -313,7 +313,7 @@ describe('client secure login page', () => {
 
   it('does not expose development credentials or auto-login on the client page', () => {
     const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
-    const workbench = fs.readFileSync(path.join(ROOT, 'workbench.html'), 'utf8');
+    const workbench = fs.readFileSync(path.join(ROOT, 'official-flow.html'), 'utf8');
 
     expect(html).not.toContain('halofire-dev-smoke');
     expect(html).not.toContain("u.value='admin'");

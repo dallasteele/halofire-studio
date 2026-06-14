@@ -6,7 +6,7 @@ const ROOT = path.resolve(import.meta.dirname, '..');
 
 describe('SAM31 sectioning adapter source visibility', () => {
   it('renders the sectioning-to-sprinkler adapter source chain in workbench rows', () => {
-    const html = fs.readFileSync(path.join(ROOT, 'workbench.html'), 'utf8');
+    const html = fs.readFileSync(path.join(ROOT, 'official-flow.html'), 'utf8');
 
     expect(html).toContain('renderSam31SectioningAdapterSourceSummary');
     expect(html).toContain('SAM31 sectioning adapter source evidence');

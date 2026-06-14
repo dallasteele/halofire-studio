@@ -22,11 +22,14 @@ describe('HaloFire Settings evidence wizard signed reviewer workflow', () => {
     expect(html).toContain("const apiPathPrefix = ['', 'api'].join('/');");
     expect(html).not.toContain("startsWith('/api/') ? String(href).slice(4)");
     expect(html).toContain("['', 'api', 'projects'].join('/')");
-    expect(html).toContain('fetch(HALOFIRE_API_BASE + path');
-    expect(html).toContain("location.href = HALOFIRE_BASE_PATH + '/'");
+    // HFAuth migration: Settings API calls and sign-out go through the
+    // shared cookie-session guard instead of inline fetch + redirect.
+    expect(html).toContain('return HFAuth.api(path');
+    expect(html).toContain('HFAuth.logout();');
     expect(html).toContain('wizardState.projects.unshift({ name: wizardUrlPrefill.project })');
-    expect(html).toContain('href="./workbench.html"');
-    expect(html).toContain('href="./autosprink.html"');
+    // Cross-app navigation moved to the shared top app bar, injected by
+    // halofire-shell.js (Workbench/Studio/etc.) instead of static per-page anchors.
+    expect(html).toContain('halofire-shell.js');
   });
 
   it('can prefill the signed reviewer workflow from Workbench query parameters', () => {

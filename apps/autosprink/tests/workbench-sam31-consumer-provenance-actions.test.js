@@ -6,7 +6,7 @@ const ROOT = path.resolve(import.meta.dirname, '..');
 
 describe('SAM31 consumer provenance workbench actions', () => {
   it('renders required provenance fields and replacement-intake actions for consumer tasks', () => {
-    const html = fs.readFileSync(path.join(ROOT, 'workbench.html'), 'utf8');
+    const html = fs.readFileSync(path.join(ROOT, 'official-flow.html'), 'utf8');
 
     expect(html).toContain('renderSam31RequiredSourceProvenanceFields');
     expect(html).toContain('required_source_provenance_fields');

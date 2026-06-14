@@ -114,7 +114,7 @@ describe('studio static origin handling', () => {
   });
 
   it('lets the workbench target the Cooperative 1881 project instead of only Home Depot', async () => {
-    const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
+    const shell = await fetch(`${BASE}/official-flow.html`, { headers: { Origin: BASE } });
     expect(shell.status).toBe(200);
     const html = await shell.text();
     expect(html).toContain('id="projectTarget"');
@@ -124,7 +124,7 @@ describe('studio static origin handling', () => {
   });
 
   it('surfaces resolver queue rows in the workbench', async () => {
-    const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
+    const shell = await fetch(`${BASE}/official-flow.html`, { headers: { Origin: BASE } });
     expect(shell.status).toBe(200);
     const html = await shell.text();
     expect(html).toContain('id="resolverQueue"');
@@ -149,7 +149,7 @@ describe('studio static origin handling', () => {
   });
 
   it('surfaces catalog source-acquisition ledger rows in the workbench with settings handoff actions', async () => {
-    const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
+    const shell = await fetch(`${BASE}/official-flow.html`, { headers: { Origin: BASE } });
     expect(shell.status).toBe(200);
     const html = await shell.text();
     expect(html).toContain('id="catalogSourceAcquisition"');
@@ -245,7 +245,7 @@ describe('studio static origin handling', () => {
   });
 
   it('lets the workbench download room-boundary review packets from resolver rows', async () => {
-    const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
+    const shell = await fetch(`${BASE}/official-flow.html`, { headers: { Origin: BASE } });
     expect(shell.status).toBe(200);
     const html = await shell.text();
     expect(html).toContain('downloadResolverPacket');
@@ -450,7 +450,7 @@ describe('studio static origin handling', () => {
   });
 
   it('lets the workbench save employee room-boundary review decisions', async () => {
-    const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
+    const shell = await fetch(`${BASE}/official-flow.html`, { headers: { Origin: BASE } });
     expect(shell.status).toBe(200);
     const html = await shell.text();
     expect(html).toContain('saveResolverPacketReview');
@@ -545,7 +545,7 @@ describe('studio static origin handling', () => {
   });
 
   it('surfaces signed reviewer evidence summaries in the workbench evidence lane', async () => {
-    const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
+    const shell = await fetch(`${BASE}/official-flow.html`, { headers: { Origin: BASE } });
     expect(shell.status).toBe(200);
     const html = await shell.text();
     expect(html).toContain('signed reviewer evidence');
@@ -609,7 +609,7 @@ describe('studio static origin handling', () => {
   });
 
   it('surfaces SAM31 section-to-artifacts replacement packets in the Workbench', async () => {
-    const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
+    const shell = await fetch(`${BASE}/official-flow.html`, { headers: { Origin: BASE } });
     expect(shell.status).toBe(200);
     const html = await shell.text();
     expect(html).toContain('renderSam31ActualValueSectionToArtifactsSummary');
@@ -624,7 +624,7 @@ describe('studio static origin handling', () => {
   });
 
   it('lets the workbench download official-flow hydraulic replay artifacts', async () => {
-    const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
+    const shell = await fetch(`${BASE}/official-flow.html`, { headers: { Origin: BASE } });
     expect(shell.status).toBe(200);
     const html = await shell.text();
     expect(html).toContain('downloadOfficialFlowHydraulicReplay');

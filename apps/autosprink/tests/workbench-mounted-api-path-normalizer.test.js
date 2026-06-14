@@ -6,7 +6,7 @@ const ROOT = path.resolve(import.meta.dirname, '..');
 
 describe('Workbench mounted API path normalizer', () => {
   it('accepts root and /halo-fire mounted API hrefs before fetch', () => {
-    const html = fs.readFileSync(path.join(ROOT, 'workbench.html'), 'utf8');
+    const html = fs.readFileSync(path.join(ROOT, 'official-flow.html'), 'utf8');
 
     expect(html).toContain('function normalizeApiPath');
     expect(html).toContain("const HALOFIRE_API_BASE = HALOFIRE_BASE_PATH + '/' + 'api';");

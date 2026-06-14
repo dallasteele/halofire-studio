@@ -51,7 +51,7 @@ afterAll(async () => {
 
 describe('workbench evidence detail rendering', () => {
   it('includes catalog approval validation evidence details for signed reviewer readback', async () => {
-    const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
+    const shell = await fetch(`${BASE}/official-flow.html`, { headers: { Origin: BASE } });
     expect(shell.status).toBe(200);
     const html = await shell.text();
     expect(html).toContain("packet.kind === 'catalog_source_approval_validation'");
@@ -62,7 +62,7 @@ describe('workbench evidence detail rendering', () => {
   });
 
   it('anchors saved PDF boundary evidence rows for resolver handoff readback', async () => {
-    const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
+    const shell = await fetch(`${BASE}/official-flow.html`, { headers: { Origin: BASE } });
     expect(shell.status).toBe(200);
     const html = await shell.text();
     expect(html).toContain('id="evidence-${escapeHtml(e.id)}"');
@@ -81,7 +81,7 @@ describe('workbench evidence detail rendering', () => {
   });
 
   it('surfaces supplied bid-truth downstream defaults on sprinkler bid results without clearing claims', async () => {
-    const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
+    const shell = await fetch(`${BASE}/official-flow.html`, { headers: { Origin: BASE } });
     expect(shell.status).toBe(200);
     const html = await shell.text();
     expect(html).toContain('renderSuppliedBidTruthDownstreamDefaults');
@@ -95,7 +95,7 @@ describe('workbench evidence detail rendering', () => {
   });
 
   it('surfaces room-boundary floor-plan override provenance in replay evidence detail', async () => {
-    const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
+    const shell = await fetch(`${BASE}/official-flow.html`, { headers: { Origin: BASE } });
     expect(shell.status).toBe(200);
     const html = await shell.text();
     expect(html).toContain('floor_plan_override');
@@ -111,7 +111,7 @@ describe('workbench evidence detail rendering', () => {
   });
 
   it('surfaces saved SAM31 sectioning contract review evidence details without clearing claims', async () => {
-    const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
+    const shell = await fetch(`${BASE}/official-flow.html`, { headers: { Origin: BASE } });
     expect(shell.status).toBe(200);
     const html = await shell.text();
     expect(html).toContain("row.evidence_type === 'openclaw_sam31_sectioning_pipeline_contract_review'");
@@ -129,7 +129,7 @@ describe('workbench evidence detail rendering', () => {
   });
 
   it('surfaces saved SAM31 consumer replacement summaries as employee actual-value work items', async () => {
-    const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
+    const shell = await fetch(`${BASE}/official-flow.html`, { headers: { Origin: BASE } });
     expect(shell.status).toBe(200);
     const html = await shell.text();
     expect(html).toContain("row.evidence_type === 'openclaw_sam31_consumer_review'");
@@ -160,7 +160,7 @@ describe('workbench evidence detail rendering', () => {
   });
 
   it('surfaces the SAM31 actual-value queue in the signed workbench portal', async () => {
-    const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
+    const shell = await fetch(`${BASE}/official-flow.html`, { headers: { Origin: BASE } });
     expect(shell.status).toBe(200);
     const html = await shell.text();
     expect(html).toContain('SAM31 Actual-Value Queue');
@@ -495,7 +495,7 @@ describe('workbench evidence detail rendering', () => {
   });
 
   it('prehydrates replay-scoped sprinkler review readiness from saved smoke rows', async () => {
-    const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
+    const shell = await fetch(`${BASE}/official-flow.html`, { headers: { Origin: BASE } });
     expect(shell.status).toBe(200);
     const html = await shell.text();
 
@@ -511,7 +511,7 @@ describe('workbench evidence detail rendering', () => {
   });
 
   it('prehydrates replay-scoped approval validation readiness from saved packet reviews', async () => {
-    const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
+    const shell = await fetch(`${BASE}/official-flow.html`, { headers: { Origin: BASE } });
     expect(shell.status).toBe(200);
     const html = await shell.text();
 
@@ -526,7 +526,7 @@ describe('workbench evidence detail rendering', () => {
   });
 
   it('surfaces selected 1881 refs on replay-scoped smoke and sprinkler evidence readbacks', async () => {
-    const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
+    const shell = await fetch(`${BASE}/official-flow.html`, { headers: { Origin: BASE } });
     expect(shell.status).toBe(200);
     const html = await shell.text();
     expect(html).toContain('renderSam31Selected1881SourceRefs');
@@ -544,7 +544,7 @@ describe('workbench evidence detail rendering', () => {
   });
 
   it('surfaces selected 1881 refs on SAM31 approval-upload readbacks and validation controls', async () => {
-    const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
+    const shell = await fetch(`${BASE}/official-flow.html`, { headers: { Origin: BASE } });
     expect(shell.status).toBe(200);
     const html = await shell.text();
     expect(html).toMatch(/packet.kind === 'halofire_sam31_approval_upload_validation_decision'[\s\S]*renderSam31Selected1881SourceRefs/);
@@ -559,7 +559,7 @@ describe('workbench evidence detail rendering', () => {
   });
 
   it('prehydrates saved approval-upload validation decision status from approval upload rows', async () => {
-    const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
+    const shell = await fetch(`${BASE}/official-flow.html`, { headers: { Origin: BASE } });
     expect(shell.status).toBe(200);
     const html = await shell.text();
     expect(html).toContain('latestApprovalUploadValidationDecisionRow');
@@ -577,7 +577,7 @@ describe('workbench evidence detail rendering', () => {
   });
 
   it('surfaces SAM31 sectioning downstream resolver rows and filter links in the workbench', async () => {
-    const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
+    const shell = await fetch(`${BASE}/official-flow.html`, { headers: { Origin: BASE } });
     expect(shell.status).toBe(200);
     const html = await shell.text();
     expect(html).toContain('renderHalofireSam31SectioningDownstreamResolverQueue');
@@ -610,7 +610,7 @@ describe('workbench evidence detail rendering', () => {
   });
 
   it('exposes a quick filter for employee room-boundary correction rows', async () => {
-    const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
+    const shell = await fetch(`${BASE}/official-flow.html`, { headers: { Origin: BASE } });
     expect(shell.status).toBe(200);
     const html = await shell.text();
     expect(html).toContain('roomBoundarySource=employee_review&roomBoundaryState=correction_ready');

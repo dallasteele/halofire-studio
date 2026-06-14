@@ -51,7 +51,7 @@ afterAll(async () => {
 
 describe('workbench signed reviewer evidence detail rendering', () => {
   it('includes gate packet context for evidence-only signed reviewer rows', async () => {
-    const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
+    const shell = await fetch(`${BASE}/official-flow.html`, { headers: { Origin: BASE } });
     expect(shell.status).toBe(200);
     const html = await shell.text();
     expect(html).toContain('signed reviewer evidence');
@@ -105,7 +105,7 @@ describe('workbench signed reviewer evidence detail rendering', () => {
   });
 
   it('surfaces a blocked-claim-gate signed reviewer launch action in the workbench shell', async () => {
-    const shell = await fetch(`${BASE}/workbench.html`, { headers: { Origin: BASE } });
+    const shell = await fetch(`${BASE}/official-flow.html`, { headers: { Origin: BASE } });
     expect(shell.status).toBe(200);
     const html = await shell.text();
     expect(html).toContain('Open signed reviewer workflow from blocked gate');
