@@ -508,6 +508,7 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
     <!-- HF-A1-CADBAR compact view toolbar (apple-glass) -->
     <div id="cadBar">
       <div class="seg" id="viewSeg">
+        <button data-view="2d" title="2D plan drafting — pan + zoom only, no orbit">2D</button>
         <button data-view="iso" class="on">3D</button>
         <button data-view="top">Top</button>
       </div>
@@ -805,8 +806,10 @@ async function initStudio() {
   controls.zoomToCursor = false; // contract #4: dolly targets the pivot, never the cursor
   controls.addEventListener('start', () => { camTween = null; }); // user input cancels any frame tween
   let downPt = null, lastUpPt = null;
-  renderer.domElement.addEventListener('pointerdown', (e) => { downPt = { x: e.clientX, y: e.clientY }; });
+  renderer.domElement.addEventListener('pointerdown', (e) => { downPt = { x: e.clientX, y: e.clientY }; hfTryStartObjectDrag(e); });
+  renderer.domElement.addEventListener('pointermove', (e) => { if (hfDrag) hfUpdateObjectDrag(e); });
   renderer.domElement.addEventListener('pointerup', (e) => {
+    if (hfDrag) { hfCommitObjectDrag(); downPt = null; return; }   // direct grab-drag move committed
     if (!downPt) return;
     const moved = Math.hypot(e.clientX - downPt.x, e.clientY - downPt.y);
     const d0 = downPt; downPt = null;
@@ -1924,12 +1927,18 @@ function updateScaleBar() {
 }
 
 function setView(view) {
-  camera = view === 'top' ? orthoCam : perspCam;
+  const ortho = (view === 'top' || view === '2d');
+  camera = ortho ? orthoCam : perspCam;
   controls.object = camera;
-  setPlanStyle(view === 'top');
+  // TRUE 2D drafting mode: straight-down ortho with NO orbit — pan + zoom only,
+  // so the plan is a stable drafting surface (AutoSPRINK works in 2D plan first).
+  controls.enableRotate = (view !== '2d');
+  window.__is2D = (view === '2d');
+  if (renderer) renderer.domElement.classList.toggle('hf-2d', view === '2d');
+  setPlanStyle(ortho);
   if (window._frame) {
     const { cx, cz, span, ceil, bbox } = window._frame;
-    if (view === 'top') {
+    if (ortho) {
       const a = ($('canvas').clientWidth / $('canvas').clientHeight) || 1.5;
       if (bbox) fitPlanOrtho(bbox.minX, bbox.maxX, bbox.minY, bbox.maxY, a);
       orthoCam.up.set(0, 0, -1);
@@ -4095,6 +4104,55 @@ function pointerToPlan(clientX, clientY, elev) {
   // world = modelGroup.pos + W([planX,planY,elev]) = (off.x+planX, elev, off.z+planY)
   return [hit.x - off.x, hit.z - off.z];
 }
+
+// ── HF-DM: direct-manipulation grab-drag (AutoSPRINK-style) ────────────────────
+// When a part is SELECTED, pressing on it and dragging MOVES it live (grid-snapped)
+// and commits ONE undoable moveSolid on release — no Move command needed. This is
+// the core AutoSPRINK interaction: select, then grab and drag.
+let hfDrag = null;
+function hfWorldToScreen(v) {
+  const p = v.clone().project(camera);
+  const r = renderer.domElement.getBoundingClientRect();
+  return { x: r.left + (p.x * 0.5 + 0.5) * r.width, y: r.top + (-p.y * 0.5 + 0.5) * r.height };
+}
+function hfTryStartObjectDrag(e) {
+  if (!selectMode || !curSelSolid || drawTool) return false;   // only when a part is selected + not drawing
+  let c; try { c = solidCentroidPlan(curSelSolid); } catch (_) { return false; }
+  if (!c) return false;
+  const scr = hfWorldToScreen(planToWorldVec(c, drawElev));
+  if (Math.hypot(e.clientX - scr.x, e.clientY - scr.y) > 46) return false; // press must be on/near the selected part
+  const start = pointerToPlan(e.clientX, e.clientY, drawElev);
+  if (!start) return false;
+  hfDrag = { start, dx: 0, dy: 0, moved: false, base: (selHL && selHL.kind === 'mesh' && selHL.mesh) ? selHL.mesh.position.clone() : null };
+  controls.enabled = false;                                    // stop the camera from orbiting/panning during the drag
+  try { renderer.domElement.style.cursor = 'move'; } catch (_) {}
+  return true;
+}
+function hfUpdateObjectDrag(e) {
+  if (!hfDrag) return;
+  const cur = pointerToPlan(e.clientX, e.clientY, drawElev); if (!cur) return;
+  let dx = cur[0] - hfDrag.start[0], dy = cur[1] - hfDrag.start[1];
+  const gridSnap = (typeof snapState !== 'undefined' && snapState) ? snapState.grid !== false : true;
+  if (gridSnap) { dx = Math.round(dx); dy = Math.round(dy); }  // 1 ft grid
+  hfDrag.dx = dx; hfDrag.dy = dy; hfDrag.moved = (Math.abs(dx) + Math.abs(dy)) > 0.001;
+  if (hfDrag.base) selHL.mesh.position.set(hfDrag.base.x + dx, hfDrag.base.y, hfDrag.base.z + dy); // live preview
+  try { $('status').textContent = `move Δ ${dx.toFixed(1)}, ${dy.toFixed(1)} ft · release to place`; } catch (_) {}
+}
+function hfCommitObjectDrag() {
+  const d = hfDrag; hfDrag = null;
+  controls.enabled = true;
+  try { renderer.domElement.style.cursor = ''; } catch (_) {}
+  if (d && d.base && selHL && selHL.kind === 'mesh' && selHL.mesh) selHL.mesh.position.copy(d.base); // reset preview; rebuild repositions
+  if (d && d.moved && curSelSolid) {
+    const ref = curSelSolid;
+    if (HFEdit.apply('move', (m) => moveSolid(m, ref, [d.dx, d.dy, 0]))) {
+      try { $('status').textContent = `moved ${d.dx.toFixed(1)}, ${d.dy.toFixed(1)} ft (Ctrl+Z to undo)`; } catch (_) {}
+    }
+  }
+  return !!(d && d.moved);
+}
+// headless-verification hook for the 2D mode + grab-drag
+window.__hfDM = () => ({ is2D: !!window.__is2D, sel: !!curSelSolid, dragging: !!hfDrag, depth: (window.__HFEdit && window.__HFEdit.depth) ? window.__HFEdit.depth() : 0 });
 // renderer/scene/controls don't exist until initStudio() runs — these viewport
 // listeners are attached in initEditEngine(), called from the bottom IIFE after
 // initStudio(). (Attaching at module-load threw "renderer.domElement undefined"
