@@ -10,6 +10,11 @@
  * One stylesheet for the full stack — link it on every page.
  * ========================================================================== */
 
+/* Self-host the UI + mono faces so EVERY page that loads this stylesheet renders
+   identical type (no per-page system-font drift). Same vendored files tokens.css uses. */
+@font-face{font-family:'Inter Variable';font-style:normal;font-display:swap;font-weight:100 900;src:url('/public/fonts/inter-latin-wght-normal.woff2') format('woff2-variations');}
+@font-face{font-family:'JetBrains Mono Variable';font-style:normal;font-display:swap;font-weight:100 800;src:url('/public/fonts/jetbrains-mono-latin-wght-normal.woff2') format('woff2-variations');}
+
 :root{
   /* ---- Halo Fire palette (from login index.html) ---- */
   --hf-fire:#e8432d; --hf-gold:#c89a3c; --hf-halo:#ffd54f; --hf-paper:#f2ece0;
@@ -17,8 +22,14 @@
 
   /* ---- brand + ui fonts (match the login page) ---- */
   --hf-display:"Fraunces","Didot",Georgia,ui-serif,serif;
-  --hf-ui:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-  --hf-mono:"JetBrains Mono","IBM Plex Mono","SF Mono","Cascadia Code",Consolas,monospace;
+  --hf-ui:"Inter Variable",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --hf-mono:"JetBrains Mono Variable","JetBrains Mono","IBM Plex Mono","SF Mono",Consolas,monospace;
+
+  /* ---- ONE type scale — clean, readable, used everywhere (no ad-hoc px) ---- */
+  --hf-fs-title:22px;  --hf-fs-h:16px;  --hf-fs-lg:15px;
+  --hf-fs-body:13.5px; --hf-fs-sm:12.5px; --hf-fs-label:11.5px;
+  --hf-fw-reg:400; --hf-fw-med:500; --hf-fw-semi:600; --hf-fw-bold:700;
+  --hf-lh:1.55; --hf-track-label:0.06em;
 
   /* ---- THEMEABLE glass (Settings overrides these) ---- */
   --hf-glass-tint:22,18,14;     /* warm-dark glass base — matches the login card */
@@ -54,7 +65,9 @@
 
 /* ---- the EMBER fire background (the login page's signature, full-stack) ---- */
 body.hf{
-  margin:0; color:var(--hf-text); font-family:var(--hf-ui); font-size:13px;
+  margin:0; color:var(--hf-text);
+  font-family:var(--hf-ui); font-size:var(--hf-fs-body); font-weight:var(--hf-fw-reg);
+  line-height:var(--hf-lh); letter-spacing:0;
   background:
     radial-gradient(circle at 33% 16%, rgba(247,213,22,0.11), transparent 26%),
     radial-gradient(circle at 78% 26%, rgba(227,38,33,0.13), transparent 32%),
@@ -63,6 +76,21 @@ body.hf{
   background-attachment:fixed;
   -webkit-font-smoothing:antialiased; min-height:100vh;
 }
+
+/* ===== TYPOGRAPHY — one system across the whole stack ===================== */
+/* Re-point the legacy per-page font vars to the canonical families, so every
+   page that loads this stylesheet uses the SAME sans (UI) / mono (data) /
+   serif (brand) instead of each page picking its own. */
+:root{ --font:var(--hf-ui); --mono:var(--hf-mono); --display:var(--hf-display); }
+/* Numbers / SKUs / codes: the mono face with aligned tabular figures. */
+body.hf code, body.hf kbd, body.hf samp, body.hf .hf-mono{ font-family:var(--hf-mono); font-variant-numeric:tabular-nums; }
+/* Headings inherit the UI sans + a consistent weight (no 650/680/900). */
+body.hf h1,body.hf h2,body.hf h3,body.hf h4{ font-family:var(--hf-ui); line-height:1.25; }
+body.hf h1{ font-size:var(--hf-fs-title); font-weight:var(--hf-fw-semi); }
+body.hf h2{ font-size:var(--hf-fs-h); font-weight:var(--hf-fw-semi); }
+body.hf h3{ font-size:var(--hf-fs-lg); font-weight:var(--hf-fw-semi); }
+/* The brand wordmark is the one serif moment. */
+.hf-brand{ font-family:var(--hf-display); }
 
 /* ============================ ALL WINDOWS ARE GLASS ======================== */
 .hf-win,.hf-panel,.hf-card,.hf-glass{
