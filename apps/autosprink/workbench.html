@@ -395,7 +395,6 @@ svg{display:block;}
 
   <!-- BRAND CELL -->
   <div class="brandcell">
-    <div class="brandmark"></div>
     <div class="wordmark">Halo<span>Fire</span></div>
   </div>
 
@@ -794,7 +793,7 @@ svg{display:block;}
         return '<div style="padding:10px 0;border-top:1px solid var(--line)">' +
           '<div style="color:var(--text);font-weight:600">' + esc(b.project || ('Bid #' + b.id)) + '</div>' +
           '<div style="color:var(--muted);font-size:11px;margin-top:3px">' + esc(b.contractor || '—') + ' · ' + money(b.value) + ' · <span style="color:var(--gold)">' + esc(statusLabel(b.status)) + '</span></div>' +
-          '<div style="margin-top:7px;display:flex;gap:6px"><button disabled style="opacity:.5;cursor:not-allowed" title="Send flow not built yet (CAL-1)">Approve &amp; send</button><button style="background:transparent;border:1px solid var(--line);color:var(--muted)">Review</button></div>' +
+          '<div style="margin-top:8px;display:flex;gap:6px;align-items:center"><button disabled style="all:unset;display:inline-flex;align-items:center;padding:5px 11px;border-radius:6px;font-size:11px;font-weight:600;color:#8b95a6;background:rgba(255,255,255,.05);border:1px solid var(--line);cursor:not-allowed" title="Approval send-flow not built yet (CAL-1)">Approve &amp; send</button><button style="all:unset;display:inline-flex;padding:5px 11px;border-radius:6px;font-size:11px;font-weight:600;color:var(--gold);background:rgba(217,164,65,.12);border:1px solid rgba(217,164,65,.35);cursor:pointer">Review</button></div>' +
           '</div>';
       }).join('') : '<div style="color:var(--muted);padding:14px 0">Nothing awaiting approval.</div>';
     }
@@ -811,7 +810,7 @@ svg{display:block;}
 
     // No-API panels — honest placeholders (do NOT fake real-looking jobs).
     var sc = cardByTitle("Today's Schedule");
-    if (sc) { var sct = sc.querySelector('.card-hd .ct'); if (sct) sct.textContent = '—'; sc.querySelector('.card-bd').innerHTML = '<div style="color:var(--muted);padding:18px 4px;line-height:1.6">No scheduling source connected yet — crew jobs &amp; inspections will populate here once the calendar/scheduling feed is wired.<br><a href="calendar.html" style="color:var(--gold)">Open Calendar →</a></div>'; }
+    if (sc) { var sct = sc.querySelector('.card-hd .ct'); if (sct) sct.textContent = '—'; sc.querySelector('.card-bd').innerHTML = '<div style="color:var(--muted);padding:18px 4px;line-height:1.6">No scheduling source connected yet — crew jobs &amp; inspections will populate here once the calendar/scheduling feed is wired.<br><a href="calendar.html?hf=r2" style="color:var(--gold)">Open Calendar →</a></div>'; }
     var ins = cardByTitle('Inspections'); if (ins) { var ic = ins.querySelector('.card-hd .ct'); if (ic) ic.textContent = '—'; ins.querySelector('.card-bd').innerHTML = '<div style="color:var(--muted);padding:14px 4px">No inspection data source connected yet.</div>'; }
     var act = cardByTitle('Activity'); if (act) { act.querySelector('.card-bd').innerHTML = '<div style="color:var(--muted);padding:14px 4px">Activity will appear here as bids and jobs update.</div>'; }
   }).catch(function () {
