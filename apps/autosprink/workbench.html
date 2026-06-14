@@ -836,5 +836,25 @@ svg{display:block;}
   var s=document.querySelector('.search,[class*="search"]'); if(s) inert(s);
 })();
 </script>
+<script>
+(function(){
+  // SEARCH: turn the mock search bar into a real live filter of the dashboard items.
+  var search=document.querySelector('.search,[class*="search"]');
+  if(search){
+    search.style.opacity='';search.style.pointerEvents='';search.style.cursor='';
+    var inp=search.querySelector('input');
+    if(!inp){ search.innerHTML='<input type="search" placeholder="Search clients, bids, jobs…" style="all:unset;width:100%;color:var(--text);font:inherit;cursor:text">'; inp=search.querySelector('input'); }
+    inp.addEventListener('input',function(){
+      var q=inp.value.trim().toLowerCase();
+      var ap=[].slice.call(document.querySelectorAll('.card')).filter(function(c){var t=c.querySelector('.card-hd .ttl');return t&&/openclaw/i.test(t.textContent);})[0];
+      var items=ap?ap.querySelectorAll('.card-bd > div'):[];
+      [].forEach.call(items,function(it){ it.style.display=(!q||(it.textContent||'').toLowerCase().indexOf(q)>=0)?'':'none'; });
+    });
+    inp.addEventListener('keydown',function(e){ if(e.key==='Enter'&&inp.value.trim()) location.href='crm.html?hf=r2&q='+encodeURIComponent(inp.value.trim()); });
+  }
+  // REVIEW buttons in the approval lane -> open the CRM bids board.
+  document.addEventListener('click',function(e){ var b=e.target.closest('button'); if(b&&(b.textContent||'').trim()==='Review'){ e.preventDefault(); location.href='crm.html?hf=r2'; } });
+})();
+</script>
 </body>
 </html>
