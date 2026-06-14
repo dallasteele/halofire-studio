@@ -21,21 +21,21 @@
   --hf-mono:"JetBrains Mono","IBM Plex Mono","SF Mono","Cascadia Code",Consolas,monospace;
 
   /* ---- THEMEABLE glass (Settings overrides these) ---- */
-  --hf-glass-tint:18,22,28;     /* rgb base of the glass (charcoal default)   */
-  --hf-glass-alpha:0.72;        /* glass opacity                              */
-  --hf-glass-blur:18px;         /* backdrop blur                              */
-  --hf-accent:#d9a441;          /* accent within the HF palette               */
-  --hf-accent-bright:#f0bd5a;
-  --hf-accent-rgb:217,164,65;
+  --hf-glass-tint:22,18,14;     /* warm-dark glass base — matches the login card */
+  --hf-glass-alpha:0.80;        /* glass opacity                              */
+  --hf-glass-blur:20px;         /* backdrop blur                              */
+  --hf-accent:#c89a3c;          /* Halo Fire gold (the login Sign-in CTA)     */
+  --hf-accent-bright:#ffd54f;   /* halo yellow                                */
+  --hf-accent-rgb:200,154,60;
 
-  /* ---- derived surfaces ---- */
-  --hf-bg:#0b0d10;
+  /* ---- derived surfaces (login warm-dark base) ---- */
+  --hf-bg:#0a0806;
   --hf-glass:rgba(var(--hf-glass-tint),var(--hf-glass-alpha));
   --hf-glass-2:rgba(var(--hf-glass-tint),calc(var(--hf-glass-alpha) + 0.10));
   --hf-glass-raised:rgba(var(--hf-glass-tint),calc(var(--hf-glass-alpha) + 0.06));
   --hf-overlay:rgba(var(--hf-glass-tint),0.92);
   --hf-line:rgba(255,255,255,0.11); --hf-line-strong:rgba(255,255,255,0.18);
-  --hf-text:#e8ecf2; --hf-muted:#9aa4b2; --hf-faint:#5d6675;
+  --hf-text:#f7f7f4; --hf-muted:#b8b8b2; --hf-faint:#85857f;
   --hf-ok:#54b67a; --hf-warn:#d9a441; --hf-bad:#d9534f; --hf-info:#5aa9e6;
 
   /* radii / spacing / motion */
@@ -52,21 +52,25 @@
   --hf-fire-color:var(--hf-fire);
 }
 
-/* ---- the ambient fire gradient (so glass has something to refract) ---- */
+/* ---- the EMBER fire background (the login page's signature, full-stack) ---- */
 body.hf{
   margin:0; color:var(--hf-text); font-family:var(--hf-ui); font-size:13px;
   background:
-    radial-gradient(1100px 640px at 70% -8%, rgba(217,164,65,0.07), transparent 60%),
-    radial-gradient(820px 560px at 12% 108%, rgba(90,169,230,0.05), transparent 55%),
-    radial-gradient(900px 600px at 33% 40%, rgba(232,67,45,0.05), transparent 45%),
-    var(--hf-bg);
+    radial-gradient(circle at 33% 16%, rgba(247,213,22,0.11), transparent 26%),
+    radial-gradient(circle at 78% 26%, rgba(227,38,33,0.13), transparent 32%),
+    radial-gradient(circle at 72% 92%, rgba(255,255,255,0.04), transparent 30%),
+    linear-gradient(125deg,#070605 0%,#11100e 46%,#090302 100%);
+  background-attachment:fixed;
   -webkit-font-smoothing:antialiased; min-height:100vh;
 }
 
 /* ============================ ALL WINDOWS ARE GLASS ======================== */
 .hf-win,.hf-panel,.hf-card,.hf-glass{
   position:relative; overflow:hidden;
-  background:var(--hf-glass);
+  background:
+    linear-gradient(142deg, rgba(255,255,255,0.10), rgba(255,255,255,0.035) 30%, rgba(255,255,255,0.012)),
+    radial-gradient(circle at 12% 0%, rgba(232,67,45,0.10), transparent 36%),
+    var(--hf-glass);
   backdrop-filter:var(--hf-blur-panel); -webkit-backdrop-filter:var(--hf-blur-panel);
   border:1px solid var(--hf-line); border-radius:var(--hf-r-win);
   box-shadow:var(--hf-shadow);

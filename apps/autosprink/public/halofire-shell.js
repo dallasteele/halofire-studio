@@ -11,27 +11,28 @@
   var BUST = 'g1'; // cache-bust token; bump on redesign waves
 
   // ---- glass-color themes (all within the Halo Fire palette) ----
-  // Glass tints are kept a few levels LIGHTER than the page bg (~rgb 11-16) so
-  // frosted glass actually separates from the background instead of melting into it.
+  // Glass themes — ALL within the login page's warm ember/gold/halo palette so the
+  // whole stack flows from the login. Default = Ember (the login scheme).
   var THEMES = {
-    charcoal: { name: 'Charcoal', tint: '28,34,42',  accent: '#d9a441', accentRgb: '217,164,65',  accentBright: '#f0bd5a' },
-    onyx:     { name: 'Onyx',     tint: '20,24,30',  accent: '#d9a441', accentRgb: '217,164,65',  accentBright: '#f0bd5a' },
-    ember:    { name: 'Ember',    tint: '44,30,26',  accent: '#e8432d', accentRgb: '232,67,45',   accentBright: '#ff6a52' },
-    gold:     { name: 'Gold',     tint: '40,34,22',  accent: '#c89a3c', accentRgb: '200,154,60',  accentBright: '#e6bf63' },
-    halo:     { name: 'Halo',     tint: '42,37,21',  accent: '#ffd54f', accentRgb: '255,213,79',  accentBright: '#ffe48a' },
-    slate:    { name: 'Slate',    tint: '26,33,43',  accent: '#5aa9e6', accentRgb: '90,169,230',  accentBright: '#86c4f5' }
+    ember:   { name: 'Ember',   tint: '22,18,14', accent: '#c89a3c', accentRgb: '200,154,60', accentBright: '#ffd54f' },
+    onyx:    { name: 'Onyx',    tint: '14,12,10', accent: '#c89a3c', accentRgb: '200,154,60', accentBright: '#ffd54f' },
+    ash:     { name: 'Ash',     tint: '26,25,23', accent: '#c89a3c', accentRgb: '200,154,60', accentBright: '#ffd54f' },
+    crimson: { name: 'Crimson', tint: '34,16,14', accent: '#e8432d', accentRgb: '232,67,45',  accentBright: '#ff6a52' },
+    gold:    { name: 'Gold',    tint: '32,26,15', accent: '#c89a3c', accentRgb: '200,154,60',  accentBright: '#e6bf63' },
+    halo:    { name: 'Halo',    tint: '34,30,16', accent: '#ffd54f', accentRgb: '255,213,79',  accentBright: '#ffe48a' }
   };
 
-  // ---- per-page "Fire" color, by function ----
+  // ---- per-page "Fire" color, by function — every color from the login palette ----
   var FIRE = {
-    workbench: '#f2ece0', // paper
-    studio:    '#e8432d', // fire red
-    calendar:  '#c89a3c', // gold
-    crm:       '#ffd54f', // halo yellow
-    reports:   '#5aa9e6', // blue
-    vendors:   '#54b67a', // green
-    settings:  '#9aa4b2', // muted
-    _default:  '#e8432d'
+    workbench:    '#f2ece0', // paper
+    studio:       '#e8432d', // fire red
+    vendors:      '#e32621', // login red
+    calendar:     '#c89a3c', // gold
+    reports:      '#f7d516', // ember yellow (login bg)
+    crm:          '#ffd54f', // halo yellow
+    settings:     '#b8b8b2', // login muted
+    officialflow: '#e8432d', // fire red
+    _default:     '#e8432d'
   };
 
   var NAV = [
@@ -45,7 +46,7 @@
   ];
 
   function applyTheme(id) {
-    var t = THEMES[id] || THEMES.charcoal;
+    var t = THEMES[id] || THEMES.ember;
     var r = document.documentElement.style;
     r.setProperty('--hf-glass-tint', t.tint);
     r.setProperty('--hf-accent', t.accent);
@@ -53,7 +54,7 @@
     r.setProperty('--hf-accent-bright', t.accentBright);
     document.documentElement.setAttribute('data-hf-theme', id);
   }
-  function savedTheme() { try { return localStorage.getItem('hf-theme') || 'charcoal'; } catch (e) { return 'charcoal'; } }
+  function savedTheme() { try { return localStorage.getItem('hf-theme') || 'ember'; } catch (e) { return 'ember'; } }
   function setTheme(id) { try { localStorage.setItem('hf-theme', id); } catch (e) {} applyTheme(id); }
 
   function page() { return (document.body && document.body.getAttribute('data-hf-page')) || '_default'; }
