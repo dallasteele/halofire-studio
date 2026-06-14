@@ -38,6 +38,7 @@
   --hf-accent:#c89a3c;          /* Halo Fire gold (the login Sign-in CTA)     */
   --hf-accent-bright:#ffd54f;   /* halo yellow                                */
   --hf-accent-rgb:200,154,60;
+  --hf-ember-rgb:240,116,46;    /* BACKGROUND ember glow color — set INDEPENDENTLY of the glass tint */
 
   /* ---- derived surfaces (login warm-dark base) ---- */
   --hf-bg:#0a0806;
@@ -68,12 +69,16 @@ body.hf{
   margin:0; color:var(--hf-text);
   font-family:var(--hf-ui); font-size:var(--hf-fs-body); font-weight:var(--hf-fw-reg);
   line-height:var(--hf-lh); letter-spacing:0;
-  background:
-    radial-gradient(circle at 33% 16%, rgba(var(--hf-accent-rgb),0.13), transparent 28%),
-    radial-gradient(circle at 78% 26%, rgba(227,38,33,0.10), transparent 32%),
-    radial-gradient(circle at 72% 92%, rgba(255,255,255,0.04), transparent 30%),
-    linear-gradient(125deg,#070605 0%,#11100e 46%,#090302 100%);
-  background-attachment:fixed;
+  /* STATIC EMBER IMAGE behind everything + an ember-glow tint set INDEPENDENTLY
+     of the glass color (--hf-ember-rgb). Glass tint lives on the windows only. */
+  background-color:#070605;
+  background-image:
+    radial-gradient(135% 105% at 50% 82%, rgba(var(--hf-ember-rgb),0.40), transparent 62%),
+    url('/public/img/halofire-ember-bg.svg');
+  background-size:cover, cover;
+  background-position:center, center bottom;
+  background-repeat:no-repeat, no-repeat;
+  background-attachment:fixed, fixed;
   -webkit-font-smoothing:antialiased; min-height:100vh;
 }
 
@@ -169,12 +174,19 @@ body.hf h3{ font-size:var(--hf-fs-lg); font-weight:var(--hf-fw-semi); }
    tokens.css pins .hf-shell .card to a flat --hf-color-surface that ignored the
    theme (only the app bar recolored). Re-glass the common legacy surfaces to the
    THEMEABLE glass so changing the glass color recolors the windows, not just the bar. */
-body.hf .card, body.hf .panel, body.hf .well, body.hf .intake, body.hf .col, body.hf .note{
+body.hf .card, body.hf .panel, body.hf .well, body.hf .intake, body.hf .col, body.hf .note,
+body.hf .box, body.hf .tile, body.hf .pane, body.hf .section, body.hf .widget, body.hf .surface{
   background:
     linear-gradient(142deg, rgba(255,255,255,0.08), rgba(255,255,255,0.022) 30%, rgba(255,255,255,0.008)),
     radial-gradient(circle at 12% 0%, rgba(var(--hf-accent-rgb),0.07), transparent 36%),
     var(--hf-glass) !important;
   border-color:var(--hf-line) !important;
+  -webkit-backdrop-filter:var(--hf-blur-panel); backdrop-filter:var(--hf-blur-panel);
+}
+/* Inner recessed regions (calendar grid, empty states) — give them a faint glass
+   wash instead of a flat opaque black so they read as glass, never dead panels. */
+body.hf .empty, body.hf .cal-grid, body.hf .cal-body, body.hf .gridwrap, body.hf .timeline{
+  background:rgba(var(--hf-glass-tint),0.16) !important;
   -webkit-backdrop-filter:var(--hf-blur-panel); backdrop-filter:var(--hf-blur-panel);
 }
 
@@ -191,20 +203,27 @@ body.hf .card, body.hf .panel, body.hf .well, body.hf .intake, body.hf .col, bod
 }
 :root[data-hf-mode="light"] body.hf{ color:var(--hf-text); }
 :root[data-hf-mode="light"] body.hf{
-  background:
-    radial-gradient(circle at 30% 12%, rgba(var(--hf-accent-rgb),0.22), transparent 32%),
-    radial-gradient(circle at 82% 22%, rgba(var(--hf-accent-rgb),0.12), transparent 36%),
-    linear-gradient(150deg,#f1ece2 0%,#e6dccb 52%,#ede5d7 100%);
+  /* SAME static ember image in light mode — multiply-blended onto warm paper so the
+     embers read as warm glow, plus the independent ember-color tint. */
+  background-color:#efe7da;
+  background-image:
+    radial-gradient(135% 105% at 50% 84%, rgba(var(--hf-ember-rgb),0.26), transparent 60%),
+    url('/public/img/halofire-ember-bg.svg');
+  background-size:cover, cover;
+  background-position:center, center bottom;
+  background-repeat:no-repeat, no-repeat;
+  background-attachment:fixed, fixed;
+  background-blend-mode:normal, multiply;
   color:var(--hf-text);
 }
 :root[data-hf-mode="light"] .hf-win, :root[data-hf-mode="light"] .hf-panel, :root[data-hf-mode="light"] .hf-card,
 :root[data-hf-mode="light"] body.hf .card, :root[data-hf-mode="light"] body.hf .panel,
 :root[data-hf-mode="light"] body.hf .well, :root[data-hf-mode="light"] body.hf .intake, :root[data-hf-mode="light"] body.hf .col{
-  /* light glass is a TINT of the chosen color (so the picker + blue show), not white pastel */
+  /* light glass is a TINT of the chosen GLASS color (so the picker + blue show), not white pastel */
   background:
-    linear-gradient(150deg, rgba(255,255,255,0.50), rgba(255,255,255,0.24) 55%),
-    radial-gradient(circle at 14% -8%, rgba(var(--hf-accent-rgb),0.32), transparent 58%),
-    rgba(var(--hf-accent-rgb),0.17) !important;
+    linear-gradient(150deg, rgba(255,255,255,0.46), rgba(255,255,255,0.20) 55%),
+    radial-gradient(circle at 14% -8%, rgba(var(--hf-glass-tint),0.30), transparent 58%),
+    rgba(var(--hf-glass-tint),0.22) !important;
   color:var(--hf-text);
 }
 :root[data-hf-mode="light"] .hf-appbar{ background:linear-gradient(180deg, rgba(255,255,255,0.84), rgba(255,255,255,0.70)); }

@@ -7,45 +7,122 @@
 <style>
   *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
   :root{
-    --bg:#0b0b0e;--panel:#141418;--panel2:#1c1c22;--line:rgba(255,255,255,.08);
-    --fire:#E53935;--blue:#3b82f6;--cyan:#22d3ee;--gold:#FFD54F;--green:#4ade80;
-    --text:#d4d4d8;--muted:#71717a;--bright:#fafafa;
-    --font:'Inter',system-ui,sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace;
+    --bg:#0b0d10;--panel:#141418;--panel2:#1c1c22;--line:rgba(255,255,255,.08);
+    --line-strong:rgba(255,255,255,0.14);
+    --fire:#E53935;--blue:#3b82f6;--cyan:#22d3ee;--gold:#d9a441;--gold-bright:#f0bd5a;--gold-dim:rgba(217,164,65,0.18);--green:#54b67a;
+    --ok:#54b67a;--warn:#d9a441;--crit:#d9534f;--info:#5aa9e6;
+    --text:#e8ecf2;--muted:#9aa4b2;--faint:#5d6675;--bright:#fafafa;
+    --font:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,'Inter',system-ui,sans-serif;
+    --mono:'JetBrains Mono',ui-monospace,monospace;
+    --r-control:7px;--r-panel:12px;
+    --blur-panel:blur(18px) saturate(1.2);--blur-overlay:blur(28px) saturate(1.3);
+    --shadow-panel:0 1px 0 var(--line) inset, 0 8px 24px rgba(0,0,0,0.35);
+    --shadow-overlay:0 1px 0 var(--line) inset, 0 16px 48px rgba(0,0,0,0.50);
+    --shadow-recess:0 1px 0 rgba(0,0,0,0.40) inset, 0 -1px 0 rgba(255,255,255,0.03) inset;
   }
-  html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--font)}
-  /* HF-UXCLEAN §1: row 2 is a dedicated CHROME STRIP for the app menu bar that
-     spans the canvas column ABOVE the viewport — the menu bar is no longer an
-     absolute overlay painted over the canvas interior. */
-  #app{display:grid;grid-template-columns:248px 1fr 312px;grid-template-rows:48px auto auto 1fr;height:100vh}
-  /* HF-TOOLBAR: draw/edit tool toolbar, full-width row under the menu bar (apple-glass). */
-  #toolBar{grid-column:1/-1;grid-row:3;position:relative;z-index:100;display:flex;align-items:center;gap:7px;
-    padding:4px 12px;background:linear-gradient(180deg,rgba(30,37,48,.92),rgba(20,26,34,.96));
-    border-bottom:1px solid var(--line);overflow-x:auto;overflow-y:visible;white-space:nowrap;min-height:34px}
-  #toolBar .tb-label{font-size:10px;letter-spacing:.6px;color:var(--muted);text-transform:uppercase;margin:0 2px 0 4px}
-  #toolBar .tool{font-size:12px;color:var(--bright);background:rgba(255,255,255,.045);border:1px solid var(--line);
-    border-radius:7px;padding:4px 11px;cursor:pointer;line-height:1.1;transition:background .12s,border-color .12s}
-  #toolBar .tool:hover{background:rgba(255,255,255,.10);border-color:rgba(255,213,79,.45)}
-  #toolBar .tool.on{background:rgba(255,213,79,.16);border-color:var(--gold);color:#fff}
-  #toolBar .tb-sep{width:1px;height:20px;background:var(--line);margin:0 5px;flex:0 0 auto}
-  header{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:var(--panel);border-bottom:1px solid var(--line)}
-  aside.left{grid-column:1;grid-row:4}
-  aside.right{grid-column:3;grid-row:4}
-  /* HF-MENUBAR §7: the app menu bar spans the FULL window on its own row, flush under
-     the top chrome, SINGLE row (horizontal-scroll on overflow, never wraps to a 2nd row). */
-  #menuChrome{grid-column:1/-1;grid-row:2;position:relative;z-index:110;background:var(--panel);border-bottom:1px solid var(--line);min-height:0;overflow:visible;display:flex;align-items:stretch}
+  html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--font);font-size:12px;-webkit-font-smoothing:antialiased}
+  body{background:
+    radial-gradient(1200px 700px at 70% -10%, rgba(217,164,65,0.06), transparent 60%),
+    radial-gradient(900px 600px at 15% 110%, rgba(90,169,230,0.05), transparent 55%),
+    var(--bg);}
+  /* ====== APPLE-GLASS APP FRAME (chrome / menubar / toolbar / body / statusbar) ====== */
+  #app{display:grid;grid-template-columns:248px 1fr 312px;grid-template-rows:42px 34px 40px 1fr 30px;height:100vh;width:100vw}
+
+  /* ---- TOP CHROME (header) ---- */
+  header{grid-column:1/-1;grid-row:1;z-index:100;display:flex;align-items:center;gap:16px;padding:0 16px;
+    background:linear-gradient(180deg, rgba(28,33,40,0.85), rgba(16,19,24,0.92));
+    -webkit-backdrop-filter:var(--blur-panel);backdrop-filter:var(--blur-panel);
+    border-bottom:1px solid var(--line);
+    box-shadow:0 1px 0 rgba(255,255,255,0.04) inset, 0 2px 10px rgba(0,0,0,0.4)}
+  .brand{display:flex;align-items:baseline;gap:8px;font-weight:700;font-style:italic;font-size:15px;color:var(--bright);letter-spacing:0.2px}
+  .brand span{color:var(--gold)}
+  .brand small{font-style:normal;font-weight:600;font-size:10px;color:var(--muted);letter-spacing:1.4px;text-transform:uppercase;margin-left:6px}
+  header .chrome-spacer{flex:1}
+  header .right{display:flex;align-items:center;gap:12px;color:var(--muted)}
+  .badge{font-family:var(--font);font-size:9.5px;letter-spacing:0.6px;text-transform:uppercase;color:var(--gold);
+    border:1px solid rgba(217,164,65,0.35);background:var(--gold-dim);border-radius:99px;padding:3px 10px}
+  .role-chip{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;color:var(--text);
+    background:rgba(14,17,21,0.85);border:1px solid var(--line);box-shadow:var(--shadow-recess);font-size:11px}
+  .role-chip .dot{width:6px;height:6px;border-radius:50%;background:var(--ok)}
+  /* ---- TOP MENU BAR (single row, full width) ---- */
+  #menuChrome{grid-column:1/-1;grid-row:2;position:relative;z-index:110;display:flex;align-items:stretch;min-height:0;overflow:visible;
+    padding:0 10px;
+    background:linear-gradient(180deg, rgba(24,28,34,0.78), rgba(15,18,23,0.85));
+    -webkit-backdrop-filter:var(--blur-panel);backdrop-filter:var(--blur-panel);
+    border-bottom:1px solid var(--line)}
+  /* ---- TOOLBAR (draw / edit / snap / readout) ---- */
+  #toolBar{grid-column:1/-1;grid-row:3;position:relative;z-index:90;display:flex;align-items:center;gap:6px;
+    padding:0 10px;
+    background:linear-gradient(180deg, rgba(20,24,30,0.7), rgba(13,16,20,0.82));
+    -webkit-backdrop-filter:var(--blur-panel);backdrop-filter:var(--blur-panel);
+    border-bottom:1px solid var(--line);overflow-x:auto;overflow-y:visible;white-space:nowrap}
+  #toolBar .tb-label{font-size:10px;letter-spacing:.6px;color:var(--muted);text-transform:uppercase;margin:0 2px 0 6px}
+  #toolBar .tool{display:inline-flex;align-items:center;gap:6px;height:26px;font-size:11px;color:var(--muted);
+    background:transparent;border:1px solid transparent;border-radius:var(--r-control);padding:0 9px;cursor:pointer;
+    line-height:1.1;transition:background .12s,border-color .12s,color .12s}
+  #toolBar .tool:hover{color:var(--text);background:rgba(255,255,255,.05);border-color:var(--line)}
+  #toolBar .tool.on{color:var(--gold-bright);background:var(--gold-dim);border-color:rgba(217,164,65,0.35)}
+  #toolBar .tool.toggle.on{color:var(--info);background:rgba(90,169,230,0.14);border-color:rgba(90,169,230,0.3)}
+  #toolBar .tb-sep{width:1px;height:20px;background:var(--line);margin:0 8px;flex:0 0 auto}
+  #toolBar .tb-spacer{flex:1}
+  #toolBar .tb-readout{display:flex;gap:14px;color:var(--faint);font-variant-numeric:tabular-nums;font-size:11px;padding-right:4px}
+  #toolBar .tb-readout b{color:var(--muted);font-weight:600}
+  /* ---- BODY DOCKS (left aside | viewport | right aside) ---- */
+  aside.left{grid-column:1;grid-row:4;border-right:1px solid var(--line)}
+  aside.right{grid-column:3;grid-row:4;border-left:1px solid var(--line)}
   aside.left,aside.right{position:relative;z-index:10}
   #canvasWrap{grid-column:2;grid-row:4}
-  .brand{font-weight:900;font-style:italic;font-size:17px;color:var(--bright)}
-  .brand span{color:var(--fire)}
-  .brand small{font-style:normal;font-weight:600;font-size:10px;color:var(--muted);letter-spacing:1px;margin-left:8px}
-  header .right{display:flex;align-items:center;gap:10px}
-  .badge{font-family:var(--mono);font-size:10px;color:var(--gold);border:1px solid rgba(255,213,79,.35);border-radius:99px;padding:3px 9px}
   .seg{display:flex;border:1px solid var(--line);border-radius:7px;overflow:hidden}
   .seg button{background:var(--panel2);color:var(--muted);border:none;padding:5px 11px;font-size:12px;cursor:pointer}
-  .seg button.on{background:var(--blue);color:#fff}
-  aside{background:var(--panel);overflow-y:auto;padding:14px}
-  aside.left{border-right:1px solid var(--line)}
-  aside.right{border-left:1px solid var(--line)}
+  .seg button.on{background:var(--gold-dim);color:var(--gold-bright)}
+  aside{background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(0,0,0,0) 40%), rgba(22,26,32,0.72);
+    -webkit-backdrop-filter:var(--blur-panel);backdrop-filter:var(--blur-panel);overflow-y:auto;padding:12px;
+    display:flex;flex-direction:column;gap:10px}
+  aside::-webkit-scrollbar{width:8px}
+  aside::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:6px}
+  /* ---- STATUS BAR (bottom command line) ---- */
+  #statusBar{grid-column:1/-1;grid-row:5;z-index:10;display:flex;align-items:center;gap:12px;padding:0 12px;
+    background:linear-gradient(180deg, rgba(18,22,28,0.82), rgba(11,14,18,0.9));
+    -webkit-backdrop-filter:var(--blur-panel);backdrop-filter:var(--blur-panel);
+    border-top:1px solid var(--line);color:var(--muted);font-size:11px}
+  #statusBar .cmd{display:flex;align-items:center;gap:8px;flex:1;color:var(--faint)}
+  #statusBar .cmd .prompt{color:var(--gold)}
+  #statusBar .pip{display:inline-flex;align-items:center;gap:6px}
+  #statusBar .pip .gl{width:6px;height:6px;border-radius:50%;background:var(--ok)}
+  #statusBar .seg-s{padding:0 4px}
+  #statusBar a{color:var(--muted);text-decoration:none}
+  /* dockable glass panel inside the asides (This Job / Next Actions / Layers / Tools·Design / Properties) */
+  .panel{background:linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0) 40%), rgba(22,26,32,0.72);
+    -webkit-backdrop-filter:var(--blur-panel);backdrop-filter:var(--blur-panel);
+    border:1px solid var(--line);border-radius:var(--r-panel);box-shadow:var(--shadow-panel);position:relative;overflow:hidden}
+  .phead{display:flex;align-items:center;gap:8px;padding:7px 10px;border-bottom:1px solid var(--line);user-select:none}
+  .phead .grip{display:flex;flex-direction:column;gap:2px}
+  .phead .grip i{width:11px;height:1.5px;background:var(--faint);border-radius:2px;display:block}
+  .phead .ptitle{font-size:10.5px;letter-spacing:0.9px;text-transform:uppercase;color:var(--muted);font-weight:600;flex:1}
+  .phead .pbtn{color:var(--faint)}
+  .pbody{padding:10px}
+  .well{background:rgba(14,17,21,0.85);border-radius:var(--r-control);box-shadow:var(--shadow-recess);padding:9px 10px}
+  .job-row{display:flex;align-items:center;justify-content:space-between;padding:4px 0}
+  .job-row + .job-row{border-top:1px solid var(--line)}
+  .job-row .k{color:var(--muted)}
+  .job-row .v{color:var(--text);font-weight:600}
+  .job-title{font-size:14px;font-weight:700;margin-bottom:2px;color:var(--bright)}
+  .job-sub{color:var(--muted);margin-bottom:8px}
+  .chip{display:inline-flex;align-items:center;gap:6px;padding:2px 9px;border-radius:999px;font-size:10.5px;border:1px solid var(--line)}
+  .chip .gl{width:6px;height:6px;border-radius:50%}
+  .chip.ok{color:var(--ok)} .chip.ok .gl{background:var(--ok)}
+  .chip.warn{color:var(--warn)} .chip.warn .gl{background:var(--warn)}
+  .chip.pend{color:var(--muted)} .chip.pend .gl{background:var(--faint)}
+  .chip.info{color:var(--info)} .chip.info .gl{background:var(--info)}
+  .task{display:flex;align-items:flex-start;gap:9px;padding:8px 0}
+  .task + .task{border-top:1px solid var(--line)}
+  .task .ico{width:18px;height:18px;flex:none;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;margin-top:1px}
+  .task .ico.warn{color:var(--warn);background:var(--gold-dim)}
+  .task .ico.pend{color:var(--faint);background:rgba(255,255,255,0.04)}
+  .task .tx{flex:1}
+  .task .tx .t{display:block;color:var(--text)}
+  .task .tx .d{display:block;color:var(--muted);font-size:11px;margin-top:2px;line-height:1.4}
+  .note{color:var(--muted);font-size:11px;line-height:1.5}
   h3{font-size:11px;text-transform:uppercase;letter-spacing:1.4px;color:var(--muted);margin:16px 0 8px;font-weight:700}
   /* HF-INSPTABS: tabbed right Inspector (glass tab bar; one panel visible at a time). */
   #inspTabs{display:flex;gap:1px;margin:-2px 0 12px;border-bottom:1px solid var(--line);overflow-x:auto}
@@ -159,7 +236,7 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
 <link rel="stylesheet" href="/public/styles/halofire-tokens.css">
 <!-- Shared glass system: ember background, glass windows, type scale, and the
      Studio banner restyled to match the shared app bar on every other page. -->
-<link rel="stylesheet" href="/public/styles/halofire-glass.css?v=10">
+<link rel="stylesheet" href="/public/styles/halofire-glass.css?v=11">
 <style>
   /* Studio banner -> match the shared app bar (warm glass + Fraunces brandmark + app-bar nav). */
   body.hf #app > header{
@@ -240,15 +317,17 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
 <body class="hf-shell hf-studio-glass" data-hf-page="studio" data-hf-appbar="off">
 <div id="app">
   <header>
-    <div class="brand">Halo<span>Fire</span> Studio <small>SPRINKLER CAD · OpenGeometry</small></div>
+    <div class="brand">Halo<span>Fire</span> Studio <small>Sprinkler CAD · OpenGeometry</small></div>
+    <div class="chrome-spacer"></div>
+    <span class="badge">Internal Alpha · NOT AHJ/PE/AutoSprink parity</span>
+    <div class="chrome-spacer"></div>
     <div class="right">
       <span id="autoLoadBadge">● auto-loaded</span>
-      <span class="badge">INTERNAL ALPHA · NOT AHJ/PE/AutoSprink parity</span>
       <button id="demoBtn" title="Animate the structure + sprinkler system rising out of the plan">▶ Demo</button>
-      <a class="link" href="/workbench.html?hf=r2">Workbench →</a>
-      <a class="link" href="/calendar.html?hf=r2">Calendar</a>
-      <a class="link" href="/crm.html?hf=r2">CRM</a>
-      <a class="link" href="/settings.html?hf=r2">Settings</a>
+      <a class="link" href="/workbench.html?hf=r2">Workbench</a>
+      <span class="role-chip"><span style="color:var(--muted)">Home Depot — Rexburg ID</span></span>
+      <a class="link" href="/settings.html?hf=r2">⚙ Settings</a>
+      <span class="role-chip"><span class="dot"></span> D. Steele · estimator</span>
     </div>
   </header>
 
@@ -258,20 +337,54 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
   <!-- HF-TOOLBAR: draw/edit tools (wired to setDrawTool / editDelete). -->
   <div id="toolBar">
     <button class="tool on" data-act="select" title="Select &amp; orbit — click parts to inspect">Select</button>
+    <button class="tool" id="moveToolBtn" title="Move / Transform — drag the selected part (coming soon)" disabled style="opacity:.45;cursor:default">Move</button>
+    <button class="tool" data-act="delete" title="Delete the selected part (Del)">Delete</button>
     <span class="tb-sep"></span>
     <span class="tb-label">Draw</span>
     <button class="tool" data-draw="wall" title="Draw Wall — click start, then end">Wall</button>
     <button class="tool" data-draw="pipe" title="Draw Pipe — click start, then end">Pipe</button>
     <button class="tool" data-draw="head" title="Place Head — click to place">Head</button>
-    <button class="tool" data-draw="fitting" title="Add Fitting — click to place">Fitting</button>
+    <button class="tool" data-draw="fitting" title="Add Fitting — click to place">Drop</button>
     <button class="tool" data-draw="door" title="Add Door — click to place">Door</button>
     <span class="tb-sep"></span>
-    <span class="tb-label">Edit</span>
-    <button class="tool" data-act="delete" title="Delete the selected part (Del)">Delete</button>
+    <button class="tool toggle on" id="snapToggleBtn" title="Snap to endpoint / grid (display only)">Snap</button>
+    <button class="tool toggle" id="gridToggleBtn" title="Grid 1ft (display only)">Grid 1ft</button>
+    <button class="tool toggle on" id="orthoToggleBtn" title="Ortho (display only)">Ortho</button>
+    <span class="tb-spacer"></span>
+    <div class="tb-readout"><span><b>X</b> 124.0 ft</span><span><b>Y</b> 86.5 ft</span><span><b>Z</b> 0.0 ft</span><span><b>Scale</b> 1 : 96</span></div>
   </div>
 
   <aside class="left">
-    <h3>Project</h3>
+    <!-- THIS JOB -->
+    <section class="panel">
+      <div class="phead"><span class="grip"><i></i><i></i></span><span class="ptitle">This Job</span><span class="pbtn">⌄</span></div>
+      <div class="pbody">
+        <div class="job-title">Home Depot — Rexburg</div>
+        <div class="job-sub">Distribution Center · Rexburg, ID</div>
+        <div class="well">
+          <div class="job-row"><span class="k">State</span><span class="v">ID · 21 ft pipe stock</span></div>
+          <div class="job-row"><span class="k">Bid value</span><span class="v">$842,500</span></div>
+          <div class="job-row"><span class="k">Phase</span><span class="v"><span class="chip info"><span class="gl"></span> Takeoff</span></span></div>
+          <div class="job-row"><span class="k">Due</span><span class="v">Jun 24, 2026</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- NEXT ACTIONS -->
+    <section class="panel">
+      <div class="phead"><span class="grip"><i></i><i></i></span><span class="ptitle">Next Actions</span><span class="pbtn">⌄</span></div>
+      <div class="pbody">
+        <div class="task"><span class="ico pend">○</span><span class="tx"><span class="t">Generate layout from plan</span><span class="d">No layout yet — start the AutoDraw pass.</span></span></div>
+        <div class="task"><span class="ico warn">⚠</span><span class="tx"><span class="t">Square footage doesn't match the proposal</span><span class="d">Plan reads 84,200 sq ft · proposal lists 81,900.</span></span></div>
+        <div class="task"><span class="ico pend">○</span><span class="tx"><span class="t">Awaiting AHJ approval</span><span class="d">Attach the AHJ approval packet when received.</span></span></div>
+      </div>
+    </section>
+
+    <!-- TOOLS · DESIGN (engine project + design controls preserved) -->
+    <section class="panel">
+      <div class="phead"><span class="grip"><i></i><i></i></span><span class="ptitle">Tools · Design</span><span class="pbtn">⌄</span></div>
+      <div class="pbody">
+    <h3 style="margin-top:0">Project</h3>
     <select id="projectTarget">
       <option value="Home Depot - Rexburg ID">Home Depot - Rexburg ID</option>
       <option value="The Cooperative 1881 - Salt Lake City UT">The Cooperative 1881 - Salt Lake City UT</option>
@@ -336,19 +449,32 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
     <label>Markup %</label>
     <input id="markup" type="number" value="25" min="0" max="100">
 
-    <button class="act" id="genBtn">Generate Layout</button>
+    <button class="act" id="genBtn">⚡ Generate Layout</button>
     <button class="act ghost" id="regenBtn" style="display:none;font-size:11px;padding:7px">↻ Regenerate (replace saved layout)</button>
 
     <!-- HF-UXCLEAN §1: level switcher + plan-extraction stats + needs-verification
          banner DOCKED in the left tools panel (was a floating viewport overlay). -->
     <div id="levelPanel"></div>
+      </div>
+    </section>
 
-    <h3>Layers</h3>
-    <div id="layers"></div>
+    <!-- LAYERS (engine #layers host preserved) -->
+    <section class="panel">
+      <div class="phead"><span class="grip"><i></i><i></i></span><span class="ptitle">Layers</span><span class="pbtn">⌄</span></div>
+      <div class="pbody">
+        <div id="layers"></div>
+      </div>
+    </section>
 
-    <h3>Properties</h3>
-    <p class="muted" style="font-size:10px;margin-top:4px">True NFPA pipe scale (thin at building scale) — the only render mode.</p>
-    <div class="warn" id="exportMsg"></div>
+    <!-- PROPERTIES -->
+    <section class="panel">
+      <div class="phead"><span class="grip"><i></i><i></i></span><span class="ptitle">Properties</span><span class="pbtn">⌄</span></div>
+      <div class="pbody">
+        <p class="note">No element selected. Click a part in the viewport to inspect it.</p>
+        <p class="note" style="margin-top:8px;color:var(--faint)">True NFPA pipe scale (thin at building scale) — the only render mode.</p>
+        <div class="warn" id="exportMsg"></div>
+      </div>
+    </section>
   </aside>
 
   <div id="canvasWrap">
@@ -386,7 +512,7 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
     <div id="inspTabs" role="tablist">
       <button data-panel="inspector" class="on">Inspector</button>
       <button data-panel="layout">Layout</button>
-      <button data-panel="hydraulics">Hydraulics</button>
+      <button data-panel="hydraulics">Pipe&nbsp;Sched · Hydraulics</button>
       <button data-panel="compliance">Compliance</button>
       <button data-panel="submittal">Submittal</button>
     </div>
@@ -430,6 +556,17 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
       <div class="muted" style="font-size:10px">Best-effort internal-alpha package — NOT a stamped/sealed submittal, NOT AHJ/PE approved, NOT permit-ready.</div>
     </div>
   </aside>
+
+  <!-- STATUS / BOTTOM DOCK: command line + readiness pips (display-only — engine
+       has no command parser yet, so the input is an honest placeholder). -->
+  <footer id="statusBar">
+    <div class="cmd"><span class="prompt">command ›</span><span>type a command or pick a tool…</span></div>
+    <span class="seg-s pip"><span class="gl"></span> OpenGeometry ready</span>
+    <span class="seg-s">Snap: <b style="color:var(--info)">on</b></span>
+    <span class="seg-s">Ortho: <b style="color:var(--info)">on</b></span>
+    <span class="seg-s">Units: ft (true scale)</span>
+    <a href="#" class="seg-s">▴ Expand log</a>
+  </footer>
 </div>
 
 <script src="/public/halofire-menubar.js"></script>
@@ -3989,6 +4126,6 @@ document.querySelectorAll('#viewSeg button').forEach((b) => {
 </script>
 <!-- Shared shell: applies the glass-color theme + light/dark mode + the studio
      Fire color. App bar suppressed (the Studio keeps its own CAD chrome). -->
-<script src="/public/halofire-shell.js?v=10"></script>
+<script src="/public/halofire-shell.js?v=11"></script>
 </body>
 </html>

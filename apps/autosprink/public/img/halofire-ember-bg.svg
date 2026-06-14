@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <radialGradient id="flame" cx="50%" cy="64%" r="42%">
+      <stop offset="0%" stop-color="#ffe7a0" stop-opacity="0.85"/>
+      <stop offset="22%" stop-color="#ffb24d" stop-opacity="0.72"/>
+      <stop offset="48%" stop-color="#f0742e" stop-opacity="0.42"/>
+      <stop offset="72%" stop-color="#c2331c" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#1a0a06" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="bed" cx="50%" cy="92%" r="55%">
+      <stop offset="0%" stop-color="#ff8a3c" stop-opacity="0.55"/>
+      <stop offset="40%" stop-color="#d8401e" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#1a0a06" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="ember" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffe6a8" stop-opacity="1"/>
+      <stop offset="55%" stop-color="#ff9b3d" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#ff6a1f" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="base" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0b0705"/>
+      <stop offset="46%" stop-color="#140d09"/>
+      <stop offset="100%" stop-color="#060302"/>
+    </linearGradient>
+    <filter id="soft"><feGaussianBlur stdDeviation="2.2"/></filter>
+  </defs>
+
+  <ellipse cx="800" cy="640" rx="900" ry="700" fill="url(#flame)"/>
+  <ellipse cx="800" cy="980" rx="1100" ry="360" fill="url(#bed)"/>
+
+  <!-- halo ring (the Halo Fire mark) -->
+  <ellipse cx="800" cy="360" rx="300" ry="64" fill="none" stroke="#e8b454" stroke-opacity="0.30" stroke-width="6"/>
+  <ellipse cx="800" cy="360" rx="300" ry="64" fill="none" stroke="#ffd98a" stroke-opacity="0.16" stroke-width="2"/>
+
+  <!-- rising flame wisps -->
+  <path d="M800 760 C 770 600 840 560 808 430 C 880 540 840 640 870 760 Z" fill="url(#flame)" opacity="0.5" filter="url(#soft)"/>
+  <path d="M740 780 C 720 660 760 620 742 540 C 786 620 760 700 786 780 Z" fill="url(#bed)" opacity="0.4" filter="url(#soft)"/>
+
+  <!-- scattered embers -->
+  <g filter="url(#soft)">
+    <circle cx="430" cy="700" r="4" fill="url(#ember)" opacity="0.8"/>
+    <circle cx="560" cy="540" r="2.4" fill="url(#ember)" opacity="0.7"/>
+    <circle cx="690" cy="470" r="3" fill="url(#ember)" opacity="0.85"/>
+    <circle cx="900" cy="500" r="2" fill="url(#ember)" opacity="0.6"/>
+    <circle cx="1010" cy="600" r="3.6" fill="url(#ember)" opacity="0.8"/>
+    <circle cx="1150" cy="700" r="2.6" fill="url(#ember)" opacity="0.7"/>
+    <circle cx="1240" cy="540" r="2" fill="url(#ember)" opacity="0.5"/>
+    <circle cx="360" cy="560" r="2.2" fill="url(#ember)" opacity="0.55"/>
+    <circle cx="520" cy="780" r="3.2" fill="url(#ember)" opacity="0.75"/>
+    <circle cx="1090" cy="800" r="2.4" fill="url(#ember)" opacity="0.65"/>
+    <circle cx="780" cy="600" r="2.8" fill="url(#ember)" opacity="0.8"/>
+    <circle cx="640" cy="660" r="2" fill="url(#ember)" opacity="0.6"/>
+    <circle cx="970" cy="720" r="2.2" fill="url(#ember)" opacity="0.6"/>
+    <circle cx="300" cy="720" r="2" fill="url(#ember)" opacity="0.45"/>
+    <circle cx="1320" cy="660" r="2.4" fill="url(#ember)" opacity="0.55"/>
+    <circle cx="840" cy="440" r="1.8" fill="url(#ember)" opacity="0.5"/>
+    <circle cx="1160" cy="480" r="2" fill="url(#ember)" opacity="0.5"/>
+    <circle cx="470" cy="620" r="2.2" fill="url(#ember)" opacity="0.6"/>
+  </g>
+</svg>

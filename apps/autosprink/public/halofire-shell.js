@@ -10,18 +10,27 @@
 (function () {
   var BUST = 'g1'; // cache-bust token; bump on redesign waves
 
-  // ---- glass-color themes (all within the Halo Fire palette) ----
-  // Glass themes — ALL within the login page's warm ember/gold/halo palette so the
-  // whole stack flows from the login. Default = Ember (the login scheme).
+  // ---- GLASS TINT (control 1) — the color of the glass WINDOWS only ----
+  // The brand accent (login gold) stays constant for consistency; only the glass
+  // tint changes. Set INDEPENDENTLY of the ember background (control 2 below).
   var THEMES = {
-    ember:   { name: 'Ember',   tint: '22,18,14', accent: '#c89a3c', accentRgb: '200,154,60', accentBright: '#ffd54f' },
-    onyx:    { name: 'Onyx',    tint: '14,12,10', accent: '#c89a3c', accentRgb: '200,154,60', accentBright: '#ffd54f' },
-    ash:     { name: 'Ash',     tint: '26,25,23', accent: '#c89a3c', accentRgb: '200,154,60', accentBright: '#ffd54f' },
-    crimson: { name: 'Crimson', tint: '34,16,14', accent: '#e8432d', accentRgb: '232,67,45',  accentBright: '#ff6a52' },
-    gold:    { name: 'Gold',    tint: '32,26,15', accent: '#c89a3c', accentRgb: '200,154,60',  accentBright: '#e6bf63' },
-    halo:    { name: 'Halo',    tint: '34,30,16', accent: '#ffd54f', accentRgb: '255,213,79',  accentBright: '#ffe48a' },
-    steel:   { name: 'Steel',   tint: '20,26,34', accent: '#5aa9e6', accentRgb: '90,169,230',  accentBright: '#86c4f5' },
-    azure:   { name: 'Azure',   tint: '16,26,42', accent: '#4d9fff', accentRgb: '77,159,255',  accentBright: '#8fc4ff' }
+    ember:  { name: 'Ember',  tint: '22,18,14', sw: '#221812' },
+    onyx:   { name: 'Onyx',   tint: '14,12,10', sw: '#0e0c0a' },
+    ash:    { name: 'Ash',    tint: '40,39,36', sw: '#282724' },
+    gold:   { name: 'Gold',   tint: '38,31,17', sw: '#3a3018' },
+    steel:  { name: 'Steel',  tint: '24,32,44', sw: '#18202c' },
+    azure:  { name: 'Azure',  tint: '18,30,50', sw: '#121e32' }
+  };
+
+  // ---- EMBER BACKGROUND COLOR (control 2) — the static ember image's glow tint ----
+  // Independent of the glass tint. Changing this recolors the background, not the glass.
+  var EMBERS = {
+    amber:   { name: 'Amber',   rgb: '240,116,46' },
+    crimson: { name: 'Crimson', rgb: '216,54,34' },
+    gold:    { name: 'Gold',    rgb: '216,160,70' },
+    azure:   { name: 'Azure',   rgb: '70,138,226' },
+    violet:  { name: 'Violet',  rgb: '150,96,212' },
+    emerald: { name: 'Emerald', rgb: '70,168,120' }
   };
 
   // ---- per-page "Fire" color, by function — every color from the login palette ----
@@ -51,10 +60,7 @@
     var t = THEMES[id] || THEMES.ember;
     var r = document.documentElement.style;
     r.setProperty('--hf-glass-tint', t.tint);
-    r.setProperty('--hf-accent', t.accent);
-    r.setProperty('--hf-accent-rgb', t.accentRgb);
-    r.setProperty('--hf-accent-bright', t.accentBright);
-    // Sync the legacy token surfaces so flat token-based cards recolor with the theme too.
+    // Sync the legacy token surfaces so flat token-based cards recolor with the tint too.
     r.setProperty('--hf-color-surface', 'rgba(' + t.tint + ',0.80)');
     r.setProperty('--hf-color-surface-raised', 'rgba(' + t.tint + ',0.90)');
     r.setProperty('--surface', 'rgba(' + t.tint + ',0.80)');
@@ -63,6 +69,15 @@
   }
   function savedTheme() { try { return localStorage.getItem('hf-theme') || 'ember'; } catch (e) { return 'ember'; } }
   function setTheme(id) { try { localStorage.setItem('hf-theme', id); } catch (e) {} applyTheme(id); }
+
+  // ---- ember background color (control 2, independent of the glass tint) ----
+  function applyEmber(id) {
+    var e = EMBERS[id] || EMBERS.amber;
+    document.documentElement.style.setProperty('--hf-ember-rgb', e.rgb);
+    document.documentElement.setAttribute('data-hf-ember', id);
+  }
+  function savedEmber() { try { return localStorage.getItem('hf-ember') || 'amber'; } catch (e) { return 'amber'; } }
+  function setEmber(id) { try { localStorage.setItem('hf-ember', id); } catch (e) {} applyEmber(id); }
 
   // ---- light / dark MODE (separate from the glass color) ----
   function savedMode() { try { return localStorage.getItem('hf-mode') || 'dark'; } catch (e) { return 'dark'; } }
@@ -119,11 +134,16 @@
     document.body.classList.add('hf');
     applyMode(savedMode());
     applyTheme(savedTheme());
+    applyEmber(savedEmber());
     applyFire();
     injectAppbar();
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 
   // public API for the Settings appearance controls
-  window.HFTheme = { themes: THEMES, get: savedTheme, set: setTheme, apply: applyTheme, fireMap: FIRE, getMode: savedMode, setMode: setMode };
+  window.HFTheme = {
+    themes: THEMES, get: savedTheme, set: setTheme, apply: applyTheme,
+    embers: EMBERS, getEmber: savedEmber, setEmber: setEmber, applyEmber: applyEmber,
+    fireMap: FIRE, getMode: savedMode, setMode: setMode
+  };
 })();

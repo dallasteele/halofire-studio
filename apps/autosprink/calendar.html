@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HaloFire — Calendar</title>
 <!-- Shared HaloFire apple-glass shell (themeable glass + app bar + brandmark). -->
-<link rel="stylesheet" href="/public/styles/halofire-glass.css?v=10">
+<link rel="stylesheet" href="/public/styles/halofire-glass.css?v=11">
 <style>
   *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
   :root{--bg:#08080a;--surface:#111114;--surface2:#18181c;--fire:#E53935;--gold:#d9a441;--cyan:#4DD0E1;--green:#4ade80;--text:#d4d4d8;--muted:#71717a;--bright:#fafafa;--border:rgba(255,255,255,.08);--font:'Inter Variable','Inter',system-ui,sans-serif;--mono:'JetBrains Mono Variable',ui-monospace,monospace}
@@ -76,7 +76,7 @@
 <script src="/public/halofire-auth.js"></script>
 </head>
 <body class="hf hf-shell" data-hf-page="calendar">
-<!-- Top app bar (brandmark + nav + role chip + Sign out) is injected by /public/halofire-shell.js?v=10 -->
+<!-- Top app bar (brandmark + nav + role chip + Sign out) is injected by /public/halofire-shell.js?v=11 -->
 <main>
   <div class="banner"><b>NEEDS VERIFICATION</b> — Calendar core under construction (CAL-1). Dates and lanes below are placeholders, not scheduled work.</div>
 
@@ -110,7 +110,7 @@
 <script>
 (function () {
   'use strict';
-  // Sign out now lives in the shared app bar injected by /public/halofire-shell.js?v=10.
+  // Sign out now lives in the shared app bar injected by /public/halofire-shell.js?v=11.
 
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
@@ -228,6 +228,6 @@
 })();
 </script>
 <!-- Shared shell: injects the top app bar, applies the saved glass theme, sets the per-page Fire color (gold). -->
-<script src="/public/halofire-shell.js?v=10"></script>
+<script src="/public/halofire-shell.js?v=11"></script>
 </body>
 </html>
