@@ -39,6 +39,32 @@
   .muted{color:var(--muted);font-size:12px}
   .approve-row{display:flex;align-items:center;gap:8px;margin-top:8px}
   .approve-note{font-family:var(--mono);font-size:10px;color:var(--muted)}
+  /* calendar view controls (Day/Week/Month) + nav */
+  .cal-controls{display:flex;align-items:center;gap:8px}
+  /* override the shared fire/gold button tokens so these read as subtle chrome */
+  .cal-controls .nav-btn{background:var(--surface2)!important;color:var(--text)!important;border:1px solid var(--border)!important;border-radius:7px!important;padding:6px 11px!important;font-weight:600!important;font-size:12px!important;font-family:var(--font)!important;filter:none!important}
+  .cal-controls .nav-btn:hover{background:rgba(255,255,255,.08)!important;border-color:rgba(255,213,79,.45)!important}
+  .view-toggle{display:inline-flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-left:4px}
+  .cal-controls .seg-btn{background:transparent!important;color:var(--muted)!important;border:none!important;border-radius:0!important;padding:6px 15px!important;font-weight:600!important;font-size:12px!important;font-family:var(--font)!important;filter:none!important}
+  .cal-controls .seg-btn:hover{color:var(--bright)!important;background:rgba(255,255,255,.05)!important}
+  .cal-controls .seg-btn.on{background:rgba(255,213,79,.18)!important;color:var(--bright)!important;box-shadow:inset 0 -2px 0 var(--gold)}
+  /* week view */
+  .week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+  .week-col{background:var(--surface2);border:1px solid var(--border);border-radius:8px;overflow:hidden;min-height:440px;display:flex;flex-direction:column}
+  .week-col-head{padding:7px 8px;text-align:center;border-bottom:1px solid var(--border);background:rgba(255,255,255,.03)}
+  .week-col-head .dn{font-family:var(--mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+  .week-col-head .dd{font-size:16px;font-weight:800;color:var(--bright)}
+  .week-col.today .week-col-head{background:rgba(229,57,53,.14)}
+  .week-col.today .dd{color:var(--fire)}
+  .week-body{flex:1;display:flex;flex-direction:column}
+  .wk-hour{flex:1;border-top:1px dashed rgba(255,255,255,.05);font-family:var(--mono);font-size:9px;color:rgba(255,255,255,.2);padding:2px 5px;min-height:28px}
+  /* day view */
+  .day-agenda{display:flex;flex-direction:column;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:var(--surface2)}
+  .agenda-hour{display:grid;grid-template-columns:72px 1fr;border-top:1px solid rgba(255,255,255,.05);min-height:42px}
+  .agenda-hour:first-child{border-top:none}
+  .agenda-hour.now{background:rgba(229,57,53,.07)}
+  .agenda-hour .hr{font-family:var(--mono);font-size:11px;color:var(--muted);padding:8px 12px;border-right:1px solid var(--border);text-align:right}
+  .agenda-hour .slot{padding:8px 12px}
 </style>
 <!-- Shared HaloFire design system (AAA tokens + self-hosted fonts). -->
 <link rel="stylesheet" href="/public/styles/halofire-tokens.css">
@@ -62,10 +88,22 @@
 
   <div class="card">
     <div class="cal-head">
-      <div class="cal-title" id="calTitle">…</div>
-      <span class="muted" id="calSub"></span>
+      <div style="display:flex;align-items:baseline;gap:10px">
+        <div class="cal-title" id="calTitle">…</div>
+        <span class="muted" id="calSub"></span>
+      </div>
+      <div class="cal-controls">
+        <button class="nav-btn" id="prevBtn" title="Previous" aria-label="Previous">‹</button>
+        <button class="nav-btn" id="todayBtn">Today</button>
+        <button class="nav-btn" id="nextBtn" title="Next" aria-label="Next">›</button>
+        <div class="view-toggle" role="tablist" aria-label="Calendar view">
+          <button class="seg-btn" data-view="day">Day</button>
+          <button class="seg-btn" data-view="week">Week</button>
+          <button class="seg-btn on" data-view="month">Month</button>
+        </div>
+      </div>
     </div>
-    <div class="cal-grid" id="calGrid"></div>
+    <div id="calBody"></div>
   </div>
 
   <div class="card">
@@ -86,24 +124,77 @@
     });
   }
 
-  function renderMonth() {
+  // Day / Week / Month views with prev/next/Today navigation.
+  var DOW = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  var MON = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var view = 'month';
+  var cursor = new Date();
+  function sameDay(a, b) { return a.toDateString() === b.toDateString(); }
+  function hourLabel(h) { return (h % 12 || 12) + ':00 ' + (h < 12 ? 'AM' : 'PM'); }
+
+  function render() {
+    var body = document.getElementById('calBody');
+    var title = document.getElementById('calTitle');
+    var sub = document.getElementById('calSub');
     var now = new Date();
-    var y = now.getFullYear(), m = now.getMonth();
-    document.getElementById('calTitle').textContent =
-      now.toLocaleString('en-US', { month: 'long', year: 'numeric' });
-    document.getElementById('calSub').textContent = 'month view · placeholder';
-    var grid = document.getElementById('calGrid');
-    var html = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
-      .map(function (d) { return '<div class="dow">' + d + '</div>'; }).join('');
-    var first = new Date(y, m, 1);
-    var start = new Date(y, m, 1 - first.getDay());
-    for (var i = 0; i < 42; i++) {
-      var d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
-      var out = d.getMonth() !== m;
-      var today = d.toDateString() === now.toDateString();
-      html += '<div class="day' + (out ? ' out' : '') + (today ? ' today' : '') + '"><span class="n">' + d.getDate() + '</span></div>';
+    if (view === 'month') {
+      title.textContent = MON[cursor.getMonth()] + ' ' + cursor.getFullYear();
+      sub.textContent = 'month view';
+      body.className = 'cal-grid';
+      var html = DOW.map(function (d) { return '<div class="dow">' + d + '</div>'; }).join('');
+      var first = new Date(cursor.getFullYear(), cursor.getMonth(), 1);
+      var start = new Date(first.getFullYear(), first.getMonth(), 1 - first.getDay());
+      for (var i = 0; i < 42; i++) {
+        var d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+        var out = d.getMonth() !== cursor.getMonth();
+        html += '<div class="day' + (out ? ' out' : '') + (sameDay(d, now) ? ' today' : '') + '"><span class="n">' + d.getDate() + '</span></div>';
+      }
+      body.innerHTML = html;
+    } else if (view === 'week') {
+      var ws = new Date(cursor.getFullYear(), cursor.getMonth(), cursor.getDate() - cursor.getDay());
+      var we = new Date(ws.getFullYear(), ws.getMonth(), ws.getDate() + 6);
+      var endStr = (ws.getMonth() === we.getMonth() ? '' : MON[we.getMonth()].slice(0, 3) + ' ') + we.getDate();
+      title.textContent = MON[ws.getMonth()].slice(0, 3) + ' ' + ws.getDate() + ' – ' + endStr + ', ' + we.getFullYear();
+      sub.textContent = 'week view';
+      body.className = 'week-grid';
+      var hrs = '';
+      for (var h = 7; h <= 18; h++) { hrs += '<div class="wk-hour">' + (h % 12 || 12) + (h < 12 ? 'a' : 'p') + '</div>'; }
+      var cols = '';
+      for (var c = 0; c < 7; c++) {
+        var wd = new Date(ws.getFullYear(), ws.getMonth(), ws.getDate() + c);
+        cols += '<div class="week-col' + (sameDay(wd, now) ? ' today' : '') + '"><div class="week-col-head"><div class="dn">' + DOW[c] + '</div><div class="dd">' + wd.getDate() + '</div></div><div class="week-body">' + hrs + '</div></div>';
+      }
+      body.innerHTML = cols;
+    } else {
+      title.textContent = cursor.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+      sub.textContent = 'day view';
+      body.className = 'day-agenda';
+      var isToday = sameDay(cursor, now);
+      var rows = '';
+      for (var hh = 7; hh <= 18; hh++) {
+        rows += '<div class="agenda-hour' + (isToday && now.getHours() === hh ? ' now' : '') + '"><div class="hr">' + hourLabel(hh) + '</div><div class="slot"></div></div>';
+      }
+      body.innerHTML = rows;
     }
-    grid.innerHTML = html;
+  }
+  function step(dir) {
+    if (view === 'month') cursor = new Date(cursor.getFullYear(), cursor.getMonth() + dir, 1);
+    else if (view === 'week') cursor = new Date(cursor.getFullYear(), cursor.getMonth(), cursor.getDate() + 7 * dir);
+    else cursor = new Date(cursor.getFullYear(), cursor.getMonth(), cursor.getDate() + dir);
+    render();
+  }
+  function wireCalendarControls() {
+    document.getElementById('prevBtn').onclick = function () { step(-1); };
+    document.getElementById('nextBtn').onclick = function () { step(1); };
+    document.getElementById('todayBtn').onclick = function () { cursor = new Date(); render(); };
+    var segs = document.querySelectorAll('.seg-btn');
+    segs.forEach(function (b) {
+      b.onclick = function () {
+        view = b.getAttribute('data-view');
+        segs.forEach(function (x) { x.classList.toggle('on', x === b); });
+        render();
+      };
+    });
   }
 
   function renderLane(bids) {
@@ -129,7 +220,8 @@
     }).join('');
   }
 
-  renderMonth();
+  wireCalendarControls();
+  render();
   HFAuth.guard().then(function (me) {
     if (!me) return;
     return HFAuth.api('/bids?limit=50').then(function (data) {
