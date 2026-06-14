@@ -6,7 +6,7 @@
 <title>HaloFire — Calendar</title>
 <style>
   *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-  :root{--bg:#08080a;--surface:#111114;--surface2:#18181c;--fire:#E53935;--gold:#FFD54F;--cyan:#4DD0E1;--green:#4ade80;--text:#d4d4d8;--muted:#71717a;--bright:#fafafa;--border:rgba(255,255,255,.08);--font:'Inter Variable','Inter',system-ui,sans-serif;--mono:'JetBrains Mono Variable',ui-monospace,monospace}
+  :root{--bg:#08080a;--surface:#111114;--surface2:#18181c;--fire:#E53935;--gold:#d9a441;--cyan:#4DD0E1;--green:#4ade80;--text:#d4d4d8;--muted:#71717a;--bright:#fafafa;--border:rgba(255,255,255,.08);--font:'Inter Variable','Inter',system-ui,sans-serif;--mono:'JetBrains Mono Variable',ui-monospace,monospace}
   body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh}
   body::before{content:'';position:fixed;inset:0;background:radial-gradient(1200px 500px at 50% -10%,rgba(229,57,53,.07),transparent 60%);pointer-events:none}
   header{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:1px solid var(--border);background:rgba(8,8,10,.72);backdrop-filter:blur(18px) saturate(140%);-webkit-backdrop-filter:blur(18px) saturate(140%);position:sticky;top:0;z-index:10}
@@ -20,7 +20,7 @@
   .card{background:rgba(17,17,20,.82);border:1px solid var(--border);border-radius:14px;padding:18px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
   .card.wide{grid-column:1/-1}
   h2{font-size:12px;text-transform:uppercase;letter-spacing:1.4px;color:var(--muted);margin-bottom:12px;font-weight:700}
-  .banner{grid-column:1/-1;background:linear-gradient(90deg,rgba(255,213,79,.14),rgba(229,57,53,.08));border:1px solid rgba(255,213,79,.4);color:var(--gold);font-family:var(--mono);font-size:12px;padding:10px 14px;border-radius:10px}
+  .banner{grid-column:1/-1;background:linear-gradient(90deg,rgba(217,164,65,.14),rgba(229,57,53,.08));border:1px solid rgba(217,164,65,.4);color:var(--gold);font-family:var(--mono);font-size:12px;padding:10px 14px;border-radius:10px}
   .banner b{letter-spacing:.6px}
   .cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
   .cal-title{font-size:18px;font-weight:800;color:var(--bright)}
@@ -33,7 +33,7 @@
   .lane-item{border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-bottom:8px;background:var(--surface2)}
   .lane-item .proj{font-size:13px;color:var(--bright);font-weight:700}
   .lane-item .meta{font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:3px}
-  .st{font-family:var(--mono);font-size:10px;padding:2px 8px;border-radius:99px;background:rgba(255,213,79,.15);color:var(--gold)}
+  .st{font-family:var(--mono);font-size:10px;padding:2px 8px;border-radius:99px;background:rgba(217,164,65,.15);color:var(--gold)}
   button{background:var(--fire);color:#fff;border:none;border-radius:7px;padding:7px 12px;font-weight:700;cursor:pointer;font-size:12px}
   button:disabled{opacity:.45;cursor:not-allowed;filter:grayscale(.4)}
   .muted{color:var(--muted);font-size:12px}
@@ -43,11 +43,11 @@
   .cal-controls{display:flex;align-items:center;gap:8px}
   /* override the shared fire/gold button tokens so these read as subtle chrome */
   .cal-controls .nav-btn{background:var(--surface2)!important;color:var(--text)!important;border:1px solid var(--border)!important;border-radius:7px!important;padding:6px 11px!important;font-weight:600!important;font-size:12px!important;font-family:var(--font)!important;filter:none!important}
-  .cal-controls .nav-btn:hover{background:rgba(255,255,255,.08)!important;border-color:rgba(255,213,79,.45)!important}
+  .cal-controls .nav-btn:hover{background:rgba(255,255,255,.08)!important;border-color:rgba(217,164,65,.45)!important}
   .view-toggle{display:inline-flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-left:4px}
   .cal-controls .seg-btn{background:transparent!important;color:var(--muted)!important;border:none!important;border-radius:0!important;padding:6px 15px!important;font-weight:600!important;font-size:12px!important;font-family:var(--font)!important;filter:none!important}
   .cal-controls .seg-btn:hover{color:var(--bright)!important;background:rgba(255,255,255,.05)!important}
-  .cal-controls .seg-btn.on{background:rgba(255,213,79,.18)!important;color:var(--bright)!important;box-shadow:inset 0 -2px 0 var(--gold)}
+  .cal-controls .seg-btn.on{background:rgba(217,164,65,.18)!important;color:var(--bright)!important;box-shadow:inset 0 -2px 0 var(--gold)}
   /* week view */
   .week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
   .week-col{background:var(--surface2);border:1px solid var(--border);border-radius:8px;overflow:hidden;min-height:440px;display:flex;flex-direction:column}
@@ -68,6 +68,7 @@
 </style>
 <!-- Shared HaloFire design system (AAA tokens + self-hosted fonts). -->
 <link rel="stylesheet" href="/public/styles/halofire-tokens.css">
+<style id="hf-glass-gold">:root{--gold:#d9a441}</style>
 <script src="/public/halofire-auth.js"></script>
 </head>
 <body class="hf-shell">
