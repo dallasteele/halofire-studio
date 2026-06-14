@@ -3,7 +3,21 @@
 > Every automation reads this each cycle: Claude's wakeup loop, the GX10
 > build-loop wave seeding, and HAL's self-improve cron (via `loopctl report`).
 > When the user gives new direction, THIS file is updated first — loops re-aim
-> without losing context. Updated: 2026-06-12.
+> without losing context. Updated: 2026-06-14.
+
+## CURRENT WAVE (user 2026-06-14): WIRE THE STUDIO TOOLS + MENUS
+Functional verify+fix wave 1 is DONE (140 controls, 0 broken, 14 fixes; honest
+matrix at apps/autosprink/docs/HALOFIRE_STACK_FUNCTIONAL_STATUS.md, shipReady:false).
+User picked the next wave: **make the ~332 stub Studio menu items + the draw/edit
+tools actually do real engine work** — multi-segment polyline draw, measure, typed
+Location-Input dimensions, trim/extend, array/mirror, grip/handle edit, offset,
+copy/move w/ basepoint. Wire every menu item to a real engine command or keep an
+HONEST stub (never fake). Verify each LIVE (logged-in harness, click → real effect →
+no error → screenshot). Background must stay: gentle glow + floating embers (static
+default, Settings Moving toggle), glass scrollbars tinted by selected glass color,
+Studio full nav + glass menus. Deep gaps still owed after this: NFPA hydraulics,
+PDF→building model, manufacturer-exact parts, payments/voice.
+Local verify: [[project_halofire_local_verify_harness]] — qa@halofire.local.
 
 ## Deploy workflow — VPS canonical, verify before go-live (user 2026-06-11)
 NO MORE LOCALHOST as the reference. Live site = http://halofire.rankempire.io
@@ -31,6 +45,13 @@ Halo Fire's team must see live progress + upload info we can't scrape. Targets:
 - Wave 17 seeds the buildable core: secure invite/set-password token
   (email=username), apple-glass portal shell + flagged placeholder logo +
   animated fire. VPS deploy + invite-email DRAFT follow.
+
+## ⭐ CONSTITUTION: docs/plans/halofire-operations-surface.md (2026-06-12)
+HaloFire = the Dentrix of fire protection — ONE operations surface (Job Book
+calendar = Appointment Book, Client File = Family File, Bid Pipeline = Treatment
+Planner, NFPA-25 recall engine = Continuing Care, Job Ledger, Reports, Studio =
+the chart). Real DB schema + real CRUD + behavioral gates per module — NO empty
+shells. Build order OPS-1..8 in that doc. The sections below feed into it.
 
 ## Operations Calendar = the FRONT DOOR (NEW HEADLINE, user 2026-06-12)
 The calendar is HaloFire's operational hub — "Dentrix/Denticon for fire
@@ -308,14 +329,57 @@ interaction for this AutoSprink clone, derive it from how Unreal Engine operates
 - **Orientation/view CUBE top-right of the viewport** exactly like UE: click
   faces/edges to snap Top/Front/Iso views; drag it to orbit; shows current
   orientation at all times. (three.js ViewHelper / a gizmo equivalent.)
+- **VIEWPORT SCALE INDICATOR (user 2026-06-12):** like any CAD env, a live scale
+  readout/bar rendered NEXT TO the orientation cube (top-right), updating with
+  zoom (e.g. dynamic scale bar showing what 10 ft / 5 m spans on screen at the
+  current camera distance). **Unit toggle: standard (imperial ft-in) ⇄ metric
+  (m/mm)** — switches the scale bar, Inspector dimensions, BOM lengths, and all
+  on-screen measurements together. Persisted per user (user_prefs).
+- **SCALE AUDIT (user: "scale is off on everything"):** prove true scale
+  numerically, don't assert it: a gate that compares RENDERED world distances to
+  DATA truth — e.g. head spacing in the layout data (10 ft) must measure exactly
+  10 world units apart in the scene; pipe OD at true scale must match the
+  schedule diameter (3" branch = 0.25 ft cylinder radius*2); building bbox must
+  equal the plan dims (Home Depot 300×405 ft). Any unit mismatch (ft vs in vs px)
+  found = the audit lists every affected subsystem; fix at the source transform,
+  not per-mesh fudge factors.
 - **SELECTION INTERACTION CONTRACT (user 2026-06-12 — implement as a WHOLE, not
   piecemeal; UE/AutoCAD-derived):** selecting a part makes it the focal point of
   EVERY camera operation until deselect:
-  1. Click part → select + highlight + Inspector (right panel).
-  2. Click a DIFFERENT part → selection MOVES to it (repeatable forever).
-  3. Orbit (drag) pivots about the selected part.
-  4. **Scroll-zoom dollies toward/away from the selected part** (zoom locks to
-     selection; zoomToCursor off — dolly targets the pivot).
+  1. Click part → select + highlight + Inspector (right panel). **THE CAMERA
+     DOES NOT MOVE ON SELECT** (UE behavior; root cause of the 2026-06-12
+     "can't select another part" bug was the camera recentering on select, which
+     shifted every other part on screen mid-click — gate-loop evidence).
+     **HIGHLIGHT = the PART ITSELF recolored, NO volume/bounding boxes (user
+     2026-06-12):** never draw a wireframe/box around the selection. Tint the
+     selected part's own material/instance (emissive or color swap) in ONE
+     RESERVED highlight color used for nothing else in the scene palette
+     (palette today: grey shell, red mains/heads, blue branches, cyan drops,
+     gold couplings → highlight must be a distinct reserved hue). InstancedMesh
+     parts highlight ONLY the picked instance (setColorAt). Deselect restores
+     the original color exactly.
+  2. Click a DIFFERENT part → selection MOVES to it (repeatable forever; works
+     naturally once #1 holds because nothing shifts on screen).
+  3. **F = frame the selected part** — smooth-tween the camera to it AND make it
+     the orbit/zoom pivot. Pivot changes ONLY on F/double-click, never plain click.
+  3b. **DOUBLE-CLICK = inspect mode (user 2026-06-12):** zooms to a FRONT-FACING
+     view of the part (camera tweens to face the part's primary axis at a
+     fill-the-view distance) AND enters X-RAY ISOLATION: the selected part stays
+     fully highlighted — including any OCCLUDED portions, which render visible
+     through obstructions (highlight with depthTest off / ghost pass) — while
+     EVERYTHING ELSE in the viewport goes translucent (~10-20% opacity). Goal:
+     instantly see the part you want to inspect, never hidden behind pipe/deck/
+     structure. Esc or empty-click exits inspect mode and restores all opacities
+     exactly. **DOUBLE-CLICK AGAIN = DESELECT ALL (user 2026-06-12):** a second
+     double-click (while in inspect mode) toggles OUT — exits x-ray, restores
+     opacities + pivot, clears the selection entirely.
+  3c. **INSPECTOR PLACEMENT (user 2026-06-12):** the Inspector must NOT pop up
+     over the viewport/canvas. It renders in the LAYOUT window area — the right
+     results panel (where Layout / Pipe Schedule / Hydraulics live) — as a
+     section there (top of that panel while a part is selected). The 3D viewport
+     stays unobstructed.
+  4. After framing, orbit pivots about the part and **scroll-zoom dollies
+     toward/away from it** (zoomToCursor off — dolly targets the pivot).
   5. Pan moves the pivot with the camera (standard OrbitControls pan).
   6. F = frame/focus selected (UE-style); double-click = select + frame.
   7. Esc / empty-click → deselect, restore prior pivot; all camera ops keep working.
@@ -330,6 +394,15 @@ fitting-orient). Every part flagged needs-verification; never claim mfg-exact.
 - **TRUE scale by default, no exaggeration:** make true NFPA pipe scale the
   DEFAULT; the ×6 "exaggerate" is a viewing aid only. Parts at real dimensions.
 - **Pipe = correct threaded-pipe CAD** (modeled threaded ends), not plain cylinders.
+  **DEFECT (user screenshot 2026-06-12, post-geometry-pass): pipes render with a
+  star/gear cross-section along their FULL length** — the thread ridges were
+  applied to the whole pipe profile. CORRECT: pipe body = smooth cylinder
+  (>=16 radial segments); thread detail ONLY in a short band (~2-3 in scale) at
+  each end; bands must not change the body profile. Also visible: head/escutcheon
+  clipping through the coupling — parts must not interpenetrate. VERIFY VISUALLY:
+  use the page's window.__snapshot hook for close-range screenshots of (a) pipe
+  mid-span (smooth), (b) pipe end (thread band), (c) coupling joint (no clip)
+  as gate evidence — geometry claims need pictures, not greps.
 - **Proper connectivity pipe → drop → head:** the geometry AND topology must connect
   correctly. The "elbow on the end of the sprinkler" is an ERROR — it must read as a
   real reducing fitting / drop nipple into the head, not a confusing elbow.
@@ -337,8 +410,89 @@ fitting-orient). Every part flagged needs-verification; never claim mfg-exact.
   placement. Size to real coupling OD (snug to pipe, not a barrel), orient along the
   pipe axis, place at the 21 ft (24 ft AZ) joints. Rigid + flexible.
 - **Fastener hardware (hangers/brackets) MUST be visible:** render W6A/W18C hanger
-  hardware at support points + in the BOM (already speced).
-- **Drop ceilings MUST be visible:** render the ceiling grid (W6B) as a layer.
+  hardware at support points + in the BOM (already speced). **Hangers must attach
+  TO STRUCTURE (user 2026-06-12)** — a hanger hanging from empty air is wrong; it
+  connects to a beam/joist/deck member (see build-out below).
+
+### EXTRACTION COMPLETENESS — recall + doors + openings (user 2026-06-12)
+Precision (extracted walls land on real ink, median 0.27 ft) is NOT completeness.
+Must measure + maximize RECALL and extract the things we skipped:
+- **Wall RECALL gate:** rasterize the sheet's wall-ink (dark linework, excluding
+  text/dimensions/hatch by lineweight+length), rasterize extracted walls, measure
+  % of sheet wall-ink covered by an extracted segment (within ~1 ft). Target
+  **≥90% coverage**; report the number + a HEATMAP image of MISSED ink so gaps are
+  visible, not hidden. Low recall = FAIL (don't claim "walls extracted" at 60%).
+- **DOORS + OPENINGS:** extract door swings (arc + leaf) and wall openings; place
+  door objects in the model; doors must sit on real openings in the walls.
+- **Fixtures/cores:** the small-room cluster (restrooms, mech, elevator) — extract
+  fixtures/equipment symbols at least as labeled space content.
+- All flagged needs-verification; the HF recognition model (below) feeds door/
+  symbol detection where vector linework is ambiguous.
+
+### DRAWING / EDIT TOOLS — it must be an editable CAD, not a viewer (user 2026-06-12)
+The Studio must let a user DRAW and EDIT, not just view/select. Port the proven
+apps/cad edit engine into the live Studio (autosprink.html) and wire the AutoSprink
+Draw/Tools/Commands/Snaps menu items to real actions:
+- **Edit engine (reuse apps/cad E0-E7):** undo/redo command stack (Ctrl+Z/Y),
+  move/copy/delete/rotate/mirror on the current selection.
+- **Draw tools:** Draw Wall, Draw Pipe (manual, T1), Place Head, Add Fitting,
+  Add Door — click-to-place / click-points-to-draw, live preview.
+- **Edit any element:** drag to move, edit dimensions in the Inspector (Inspector
+  becomes editable, writes back to the model), delete.
+- **Snaps (AutoSprink Snaps menu):** snap to grid / endpoint / midpoint /
+  intersection / perpendicular; visible snap indicator.
+- **Persistence:** edits update the model + persist (save layout / project).
+- Behavioral gates: synthetic draw-a-wall persists; move-an-element changes its
+  coords; delete removes it; undo reverts exactly; snap lands on the target.
+
+### PLAN-COMPREHENSION MODEL STACK (user 2026-06-12) — OpenClaw must read plans → build models
+This is a CORE feature; the prior "underlay" was a textured image on a box (overclaimed
+as done — acknowledged). The real extraction pipeline, GPU-run on GX10, orchestrated by
+OpenClaw. NOT an NVIDIA-specific model — NVIDIA = the GPU; models from HF:
+1. **Vector-first (deterministic):** the bid PDFs are Bluebeam VECTOR — parse linework,
+   text, layers, and READ THE PRINTED SCALE (e.g. A-101 "3/32\"=1'-0\"") → exact geometry,
+   no ML. Backbone. (Running workflow wjyunctyg builds this.)
+2. **SAM 3 (GX10 :9003, deployed):** raster region/space segmentation where vector ambiguous.
+3. **HF floor-plan recognition model (NEXT WAVE — committed):** for scanned/ambiguous sheets
+   + wall/room/door/symbol recognition. Candidates: **FloorplanVLM** (2602.06507 — outputs
+   structured JSON ≈ our LevelPlan, preferred), **CubiCasa5K** (1904.01920 — proven CNN
+   baseline), DeepFloorplan (1908.11025), Raster2Seq (2602.09016), CAGE (2509.15459).
+   Codex/GX10 loop: pull the deployable weights, GPU-infer on GX10, feed LevelPlan.
+Pipeline owner: OpenClaw on GX10 (vector parse → SAM3 → HF model) → structured per-level
+plan → Studio builds. Every output flagged needs-verification.
+ALSO FIX: the underlay PLANE CLIPS through geometry at grazing camera angles (z-fight /
+render order) — render it as a registered ground layer with polygonOffset, below the model.
+
+### FULL MULTI-DISCIPLINE PLAN BUILD-OUT (user 2026-06-12) — the building must be REAL
+The user provided a WHOLE FOLDER of PDF plans with each layer/discipline of the
+floor plan (architectural, structural, mechanical, electrical, plumbing sheets).
+**ALL of them must be built out** as toggleable model layers, because they:
+- give hangers something to attach to (beams/joists/roof deck — the ceiling
+  STRUCTURE, currently missing entirely even though hangers render);
+- are OBSTRUCTIONS that affect pipe routing (route around beams, ducts, conduit,
+  other trades' pipes);
+- drive NFPA-13 code compliance for head coverage + location (obstruction rules —
+  beams/ducts change spray coverage and head placement).
+Build-out lanes (extends W9; per-sheet pipeline: sheet-classify → extract →
+layered model, all flagged needs-verification):
+1. **Structural:** beams, joists, columns (exists), roof deck profile → hangers
+   attach to real members.
+2. **Mechanical/Electrical/Plumbing:** ducts, conduit/cable tray, other-trade
+   piping as obstruction volumes (best-effort extraction, flagged).
+3. **Ceilings:** per-room ceiling TYPE from the architectural reflected-ceiling
+   plan — drop grid ONLY where the RCP says so (Rexburg warehouse = exposed =
+   NO grid; gate already enforces).
+4. **Routing + compliance integration:** the router avoids obstruction volumes;
+   coverage checks account for obstructions per NFPA-13 geometric rules (cited,
+   needs-verification flags on extracted geometry).
+LAYERS panel lists each discipline (Structure, HVAC, Electrical, Plumbing,
+Ceilings, Floor plan) individually toggleable, UE-style.
+- **Drop ceilings MUST be visible — but ONLY where they exist (user 2026-06-12):**
+  render the ceiling grid (W6B) as a layer ONLY for rooms/areas whose plan data
+  actually has a drop ceiling (per-room ceiling type from the plan/project; e.g.
+  warehouse = exposed structure = NO grid). Never blanket-render ceilings; if
+  ceiling type is unknown, default to NONE and flag "ceiling type unknown —
+  needs-verification" rather than inventing a grid.
 This is the parts pipeline (OpenSCAD emitters: threaded pipe, rigid+flex coupling,
 elbow/tee/reducer, drop nipple, hanger) + correct placement/orientation in the
 studio scene. HIGHEST CAD-fidelity priority.
