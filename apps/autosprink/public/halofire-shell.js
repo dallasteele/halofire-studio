@@ -11,13 +11,15 @@
   var BUST = 'g1'; // cache-bust token; bump on redesign waves
 
   // ---- glass-color themes (all within the Halo Fire palette) ----
+  // Glass tints are kept a few levels LIGHTER than the page bg (~rgb 11-16) so
+  // frosted glass actually separates from the background instead of melting into it.
   var THEMES = {
-    charcoal: { name: 'Charcoal', tint: '18,22,28',  accent: '#d9a441', accentRgb: '217,164,65',  accentBright: '#f0bd5a' },
-    onyx:     { name: 'Onyx',     tint: '13,15,19',   accent: '#d9a441', accentRgb: '217,164,65',  accentBright: '#f0bd5a' },
-    ember:    { name: 'Ember',    tint: '34,21,18',   accent: '#e8432d', accentRgb: '232,67,45',   accentBright: '#ff6a52' },
-    gold:     { name: 'Gold',     tint: '30,26,17',   accent: '#c89a3c', accentRgb: '200,154,60',  accentBright: '#e6bf63' },
-    halo:     { name: 'Halo',     tint: '33,29,15',   accent: '#ffd54f', accentRgb: '255,213,79',  accentBright: '#ffe48a' },
-    slate:    { name: 'Slate',    tint: '19,25,33',   accent: '#5aa9e6', accentRgb: '90,169,230',  accentBright: '#86c4f5' }
+    charcoal: { name: 'Charcoal', tint: '28,34,42',  accent: '#d9a441', accentRgb: '217,164,65',  accentBright: '#f0bd5a' },
+    onyx:     { name: 'Onyx',     tint: '20,24,30',  accent: '#d9a441', accentRgb: '217,164,65',  accentBright: '#f0bd5a' },
+    ember:    { name: 'Ember',    tint: '44,30,26',  accent: '#e8432d', accentRgb: '232,67,45',   accentBright: '#ff6a52' },
+    gold:     { name: 'Gold',     tint: '40,34,22',  accent: '#c89a3c', accentRgb: '200,154,60',  accentBright: '#e6bf63' },
+    halo:     { name: 'Halo',     tint: '42,37,21',  accent: '#ffd54f', accentRgb: '255,213,79',  accentBright: '#ffe48a' },
+    slate:    { name: 'Slate',    tint: '26,33,43',  accent: '#5aa9e6', accentRgb: '90,169,230',  accentBright: '#86c4f5' }
   };
 
   // ---- per-page "Fire" color, by function ----
@@ -80,8 +82,16 @@
       brand() + navHtml() +
       '<div class="hf-right">' +
         '<span class="hf-role-chip" id="hfRole"><span class="dot"></span> …</span>' +
+        '<a class="hf-signout" id="hfSignout" href="#">Sign out</a>' +
       '</div>';
     document.body.insertBefore(bar, document.body.firstChild);
+    var so = document.getElementById('hfSignout');
+    if (so) so.onclick = function (e) {
+      e.preventDefault();
+      fetch('/api/auth/logout', { method: 'POST', credentials: 'include' })
+        .then(function () { location.href = '/index.html'; })
+        .catch(function () { location.href = '/index.html'; });
+    };
     // fill the role chip from the session if available
     fetch('/api/auth/me', { credentials: 'include' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
       var el = document.getElementById('hfRole'); if (!el) return;

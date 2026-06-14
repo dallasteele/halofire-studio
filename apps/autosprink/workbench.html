@@ -46,15 +46,16 @@ body{
   overflow:hidden;
 }
 
-/* ============ APP FRAME ============ */
+/* ============ APP FRAME (under the shared app bar) ============ */
+/* The shared app bar (48px, injected by halofire-shell.js) is sticky at the
+   top of <body>; the frame fills the remaining viewport height beneath it. */
 .frame{
-  height:100vh; width:100vw;
+  height:calc(100vh - 48px); width:100vw;
   display:grid;
-  grid-template-columns:232px 1fr;
-  grid-template-rows:48px 1fr;
+  grid-template-columns:1fr;
+  grid-template-rows:1fr;
   grid-template-areas:
-    "brand topchrome"
-    "nav   main";
+    "main";
 }
 
 /* ---- Top chrome (z=100) ---- */
@@ -388,81 +389,25 @@ body{
 svg{display:block;}
 </style>
 <link rel="stylesheet" href="/public/styles/halofire-tokens.css">
+<link rel="stylesheet" href="/public/styles/halofire-glass.css">
+<style>
+/* Bridge: this page's bespoke card-surface vars become the themeable glass,
+   so the Settings glass-color picker (halofire-shell.js) recolors it too. */
+:root{
+  --surface:var(--hf-glass); --surface2:var(--hf-glass-2); --bg:var(--hf-bg);
+  --panel:var(--hf-glass); --panel2:var(--hf-glass-2); --panel-raised:var(--hf-glass-raised);
+  --gold:var(--hf-accent); --gold-bright:var(--hf-accent-bright);
+  --gold-dim:rgba(var(--hf-accent-rgb),0.18);
+}
+</style>
 <script src="/public/halofire-auth.js"></script>
 </head>
-<body>
+<body class="hf" data-hf-page="workbench">
 <div class="frame">
 
-  <!-- BRAND CELL -->
-  <div class="brandcell">
-    <div class="wordmark">Halo<span>Fire</span></div>
-  </div>
-
-  <!-- TOP CHROME -->
-  <header class="topchrome">
-    <div class="windowname"><b>Today</b> · Home</div>
-    <div class="global-search">
-      <span class="ico"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span>
-      <span>Search clients, bids, jobs, properties…</span>
-      <kbd>⌘K</kbd>
-    </div>
-    <div class="chrome-right">
-      <div class="iconbtn" title="Notifications"><span class="dot"></span>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div>
-      <div class="iconbtn" title="OpenClaw assistant">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v2M5 8l1.5 1.5M19 8l-1.5 1.5"/><rect x="6" y="9" width="12" height="9" rx="3"/><path d="M9 14h.01M15 14h.01"/></svg></div>
-      <div class="user">
-        <span class="name">Marcus Vidal</span>
-        <span class="role">Office</span>
-        <span class="avatar">MV</span>
-      </div>
-    </div>
-  </header>
-
-  <!-- LEFT NAV (shared shell) -->
-  <nav class="nav">
-    <div class="nav-section">Workspace</div>
-    <div class="nav-item active">
-      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg></span>
-      <span class="lbl">Job Book</span><span class="badge">7</span>
-    </div>
-    <div class="nav-item">
-      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></span>
-      <span class="lbl">Clients</span>
-    </div>
-    <div class="nav-item">
-      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="3" width="14" height="16" rx="2"/><path d="M8 3v16M8 21h11a2 2 0 0 0 2-2V6"/></svg></span>
-      <span class="lbl">Bids</span><span class="badge">4</span>
-    </div>
-    <div class="nav-item">
-      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 3 7v6c0 5 3.5 7.5 9 9 5.5-1.5 9-4 9-9V7z" opacity=".4"/><path d="m21 3-9 5-9-5 9-5z" transform="translate(0 4)"/><path d="M12 6.5 4.5 11 12 15.5 19.5 11z"/><path d="M4.5 11v4L12 19.5 19.5 15v-4"/></svg></span>
-      <span class="lbl">Studio</span>
-    </div>
-    <div class="nav-item">
-      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 5 6v5c0 4 3 7 7 8 4-1 7-4 7-8V6z"/><path d="m9 12 2 2 4-4"/></svg></span>
-      <span class="lbl">Inspections</span><span class="badge">12</span>
-    </div>
-    <div class="nav-item">
-      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M6 21V11M11 21V6M16 21v-8M21 21V9"/></svg></span>
-      <span class="lbl">Reports</span>
-    </div>
-
-    <div class="nav-section">System</div>
-    <div class="nav-item">
-      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-2.7 1.1V21a2 2 0 1 1-4 0v-.1A1.6 1.6 0 0 0 7 19.4a1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.6 1.6 0 0 0 2.6 14H2.5a2 2 0 1 1 0-4h.1A1.6 1.6 0 0 0 4 7.3l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.6 1.6 0 0 0 9 4.6h.1A1.6 1.6 0 0 0 10 2.5a2 2 0 1 1 4 0v.1A1.6 1.6 0 0 0 17 4.6l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9.4a1.6 1.6 0 0 0 1.4.9h.1a2 2 0 1 1 0 4z" transform="scale(.78) translate(3.4 3.4)"/></svg></span>
-      <span class="lbl">Settings</span>
-    </div>
-    <div class="nav-item admin">
-      <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m14 7 3 3-9.5 9.5L4 20l.5-3.5z"/><path d="M14 7 17 4l3 3-3 3"/></svg></span>
-      <span class="lbl">Workbench</span><span class="badge">dev</span>
-    </div>
-
-    <div class="nav-spacer"></div>
-    <div class="nav-foot">
-      <span>v0.9.3 · alpha</span>
-      <span class="parity-pill">Internal · not AHJ/PE</span>
-    </div>
-  </nav>
+  <!-- Top chrome + left workspace nav removed: the shared HaloFire app bar
+       (injected by /public/halofire-shell.js) now provides the brandmark,
+       the 7-link nav, the role chip and Sign out. -->
 
   <!-- MAIN -->
   <main class="main">
@@ -856,5 +801,8 @@ svg{display:block;}
   document.addEventListener('click',function(e){ var b=e.target.closest('button'); if(b&&(b.textContent||'').trim()==='Review'){ e.preventDefault(); location.href='crm.html?hf=r2'; } });
 })();
 </script>
+<!-- Shared HaloFire shell: injects the top app bar, applies the saved glass
+     theme, and sets the per-page Fire brandmark color (workbench = paper). -->
+<script src="/public/halofire-shell.js"></script>
 </body>
 </html>

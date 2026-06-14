@@ -4,7 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HaloFire — CRM Board (Internal Alpha)</title>
+<link rel="stylesheet" href="/public/styles/halofire-glass.css">
 <style>
+  /* Bridge: legacy card surface vars now resolve to the themeable glass system,
+     so the Settings glass picker recolors this page's cards too. */
+  :root{--surface:var(--hf-glass);--surface2:var(--hf-glass-2);--bg:var(--hf-bg)}
   *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
   :root{
     --bg:#0b0d10;--surface:rgba(22,26,32,0.72);--surface2:rgba(12,15,19,0.82);--fire:#E53935;--fire-light:#FF6E40;
@@ -81,11 +85,15 @@
      exists before the module script below runs. -->
 <script src="/public/halofire-auth.js"></script>
 </head>
-<body>
-<header>
-  <div class="brand">Halo<span>Fire</span> · CRM</div>
-  <div class="who"><a href="/calendar.html">← Calendar</a><a href="/workbench.html">Workbench</a><a href="/autosprink.html">Sprinkler Studio →</a><span id="whoami" data-whoami>…</span><a id="logout">Sign out</a></div>
-</header>
+<body class="hf" data-hf-page="crm">
+<!-- Bespoke top header/nav removed: the shared app bar is injected by
+     /public/halofire-shell.js (brandmark + 7-link nav + role chip + Sign out).
+     Sign-out and whoami now live in the shared bar. The hidden anchors below
+     preserve the page's own JS hooks (HFAuth fills [data-whoami]; #logout wired
+     to HFAuth.logout) without rendering a second nav. -->
+<div style="display:none">
+  <span id="whoami" data-whoami>…</span><a id="logout">Sign out</a>
+</div>
 <div class="alpha-banner">INTERNAL ALPHA · AUTO-BID CRM · outbound email requires explicit human approval per message · nothing fabricated</div>
 <main>
   <div class="forms">
@@ -461,5 +469,9 @@ document.getElementById('bBtn').onclick = async () => {
   await loadIntakeStatus();
 })();
 </script>
+<!-- Shared shell: injects the unified glass app bar (brandmark + nav + role chip
+     + Sign out), applies the saved glass theme, sets the per-page Fire color
+     (#ffd54f for crm via data-hf-page). Loaded after the page's own scripts. -->
+<script src="/public/halofire-shell.js"></script>
 </body>
 </html>

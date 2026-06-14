@@ -8,7 +8,8 @@
   *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
   :root{--bg:#0b0d10;--surface:rgba(22,26,32,0.72);--surface2:rgba(12,15,19,0.82);--fire:#E53935;--gold:#d9a441;--gold-bright:#f0bd5a;--cyan:#5aa9e6;--green:#54b67a;--text:#e8ecf2;--muted:#9aa4b2;--bright:#fafafa;--border:rgba(255,255,255,.08);--border-strong:rgba(255,255,255,.14);--font:'Inter',system-ui,sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
   body{color:var(--text);font-family:var(--font);min-height:100vh;background:radial-gradient(900px 600px at 86% -8%,rgba(217,164,65,.10),transparent 60%),radial-gradient(700px 500px at -6% 110%,rgba(90,169,230,.06),transparent 60%),linear-gradient(160deg,#0e1318,#0a0c0f);background-attachment:fixed}
-  header{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,rgba(255,255,255,0.045),rgba(255,255,255,0) 70%),rgba(14,17,21,0.78);backdrop-filter:blur(18px) saturate(1.3);-webkit-backdrop-filter:blur(18px) saturate(1.3);position:sticky;top:0;z-index:10}
+  /* Legacy bespoke header removed; scope so it never restyles the injected .hf-appbar. */
+  header:not(.hf-appbar){display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,rgba(255,255,255,0.045),rgba(255,255,255,0) 70%),rgba(14,17,21,0.78);backdrop-filter:blur(18px) saturate(1.3);-webkit-backdrop-filter:blur(18px) saturate(1.3);position:sticky;top:0;z-index:10}
   .brand{font-weight:900;font-style:italic;font-size:20px;color:var(--bright)} .brand span{color:var(--fire)}
   .nav a{color:var(--cyan);text-decoration:none;margin-left:14px;font-size:13px;cursor:pointer}
   main{max-width:1180px;margin:0 auto;padding:22px;display:grid;grid-template-columns:1fr 1fr;gap:18px}
@@ -41,16 +42,12 @@
 <!-- Themeable glass system: bridge the legacy surfaces to the user's chosen glass
      so the Settings > Appearance picker recolors this page (and the whole app) live. -->
 <link rel="stylesheet" href="/public/styles/halofire-glass.css">
-<style>:root{--surface:var(--hf-glass);--surface2:var(--hf-glass-2)}</style>
+<style>:root{--surface:var(--hf-glass);--surface2:var(--hf-glass-2);--bg:var(--hf-bg)}</style>
 <!-- Shared cookie-session auth guard (HFAuth). Loaded as a classic script so
      window.HFAuth exists before any module script runs. -->
 <script src="/public/halofire-auth.js"></script>
 </head>
-<body class="hf-shell hf" data-hf-page="settings" data-hf-appbar="off">
-<header>
-  <div class="brand">Halo<span>Fire</span> · Settings</div>
-  <div class="nav"><a href="./calendar.html">Calendar</a><a href="./workbench.html">Workbench</a><a href="./autosprink.html">Studio</a><span data-whoami style="color:#71717a;font-size:12px;margin-left:14px"></span><a id="logout">Sign out</a></div>
-</header>
+<body class="hf-shell hf" data-hf-page="settings">
 <main>
   <div class="card">
     <h2>Appearance · Glass</h2>
@@ -270,7 +267,10 @@ const HALOFIRE_API_BASE = HALOFIRE_BASE_PATH + ['', 'api'].join('/');
 // 'halofire_token' gate is GONE — cookie logins never set that key, so it
 // falsely bounced signed-in users back to the login page.
 const $ = (id) => document.getElementById(id);
-$('logout').onclick = () => { HFAuth.logout(); };
+// Sign-out now lives in the shared app bar (halofire-shell.js). Guard the legacy
+// hook so it never throws if the bespoke #logout element is absent.
+const _logoutEl = $('logout');
+if (_logoutEl) _logoutEl.onclick = () => { HFAuth.logout(); };
 HFAuth.guard();
 function api(path, opts={}) {
   // HFAuth.api: cookies included, 401 throws (guard() owns the only redirect).

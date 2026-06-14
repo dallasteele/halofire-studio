@@ -34,7 +34,7 @@
   --hf-glass-2:rgba(var(--hf-glass-tint),calc(var(--hf-glass-alpha) + 0.10));
   --hf-glass-raised:rgba(var(--hf-glass-tint),calc(var(--hf-glass-alpha) + 0.06));
   --hf-overlay:rgba(var(--hf-glass-tint),0.92);
-  --hf-line:rgba(255,255,255,0.08); --hf-line-strong:rgba(255,255,255,0.14);
+  --hf-line:rgba(255,255,255,0.11); --hf-line-strong:rgba(255,255,255,0.18);
   --hf-text:#e8ecf2; --hf-muted:#9aa4b2; --hf-faint:#5d6675;
   --hf-ok:#54b67a; --hf-warn:#d9a441; --hf-bad:#d9534f; --hf-info:#5aa9e6;
 
@@ -109,6 +109,8 @@ body.hf{
 .hf-role-chip .dot{ width:6px; height:6px; border-radius:50%; background:var(--hf-ok); }
 .hf-appbar .hf-icon{ width:30px; height:30px; display:inline-flex; align-items:center; justify-content:center; border-radius:var(--hf-r-ctl); color:var(--hf-muted); cursor:pointer; }
 .hf-appbar .hf-icon:hover{ color:var(--hf-text); background:rgba(255,255,255,0.06); }
+.hf-appbar .hf-signout{ color:var(--hf-muted); text-decoration:none; font-size:12px; padding:5px 9px; border-radius:var(--hf-r-ctl); }
+.hf-appbar .hf-signout:hover{ color:var(--hf-text); background:rgba(255,255,255,0.06); }
 
 /* ============================ CONTROLS =================================== */
 .hf-btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; height:32px; padding:0 14px; border-radius:var(--hf-r-ctl); font:inherit; font-size:13px; font-weight:600; cursor:pointer; border:1px solid var(--hf-line); background:rgba(255,255,255,0.05); color:var(--hf-text); transition:all var(--hf-ease); }

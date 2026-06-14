@@ -4,9 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HaloFire — Calendar</title>
+<!-- Shared HaloFire apple-glass shell (themeable glass + app bar + brandmark). -->
+<link rel="stylesheet" href="/public/styles/halofire-glass.css">
 <style>
   *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
   :root{--bg:#08080a;--surface:#111114;--surface2:#18181c;--fire:#E53935;--gold:#d9a441;--cyan:#4DD0E1;--green:#4ade80;--text:#d4d4d8;--muted:#71717a;--bright:#fafafa;--border:rgba(255,255,255,.08);--font:'Inter Variable','Inter',system-ui,sans-serif;--mono:'JetBrains Mono Variable',ui-monospace,monospace}
+  /* Bridge: legacy card-surface vars become the themeable glass so the Settings picker recolors this page too. */
+  :root{--surface:var(--hf-glass);--surface2:var(--hf-glass-2);--bg:var(--hf-bg);--border:var(--hf-line,rgba(255,255,255,.08));--text:var(--hf-text,#d4d4d8);--muted:var(--hf-muted,#71717a);--bright:var(--hf-text,#fafafa)}
   body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh}
   body::before{content:'';position:fixed;inset:0;background:radial-gradient(1200px 500px at 50% -10%,rgba(229,57,53,.07),transparent 60%);pointer-events:none}
   header{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:1px solid var(--border);background:rgba(8,8,10,.72);backdrop-filter:blur(18px) saturate(140%);-webkit-backdrop-filter:blur(18px) saturate(140%);position:sticky;top:0;z-index:10}
@@ -17,7 +21,7 @@
   .whoami{font-family:var(--mono);font-size:11px;color:var(--muted);border:1px solid var(--border);border-radius:99px;padding:3px 10px;background:var(--surface)}
   main{max-width:1180px;margin:0 auto;padding:22px;display:grid;grid-template-columns:2fr 1fr;gap:18px}
   @media(max-width:900px){main{grid-template-columns:1fr}}
-  .card{background:rgba(17,17,20,.82);border:1px solid var(--border);border-radius:14px;padding:18px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+  .card{background:var(--hf-glass,rgba(17,17,20,.82));border:1px solid var(--hf-line,var(--border));border-radius:14px;padding:18px;backdrop-filter:var(--hf-blur-panel,blur(14px));-webkit-backdrop-filter:var(--hf-blur-panel,blur(14px));box-shadow:var(--hf-shadow,0 8px 30px rgba(0,0,0,.35))}
   .card.wide{grid-column:1/-1}
   h2{font-size:12px;text-transform:uppercase;letter-spacing:1.4px;color:var(--muted);margin-bottom:12px;font-weight:700}
   .banner{grid-column:1/-1;background:linear-gradient(90deg,rgba(217,164,65,.14),rgba(229,57,53,.08));border:1px solid rgba(217,164,65,.4);color:var(--gold);font-family:var(--mono);font-size:12px;padding:10px 14px;border-radius:10px}
@@ -71,19 +75,8 @@
 <style id="hf-glass-gold">:root{--gold:#d9a441}</style>
 <script src="/public/halofire-auth.js"></script>
 </head>
-<body class="hf-shell">
-<header>
-  <div class="brand">Halo<span>Fire</span> · Calendar</div>
-  <div class="nav">
-    <a href="./calendar.html" class="current">Calendar</a>
-    <a href="./workbench.html" data-role="admin">Workbench</a>
-    <a href="./autosprink.html">Studio</a>
-    <a href="./crm.html">CRM</a>
-    <a href="./settings.html" data-role="admin">Settings</a>
-    <span class="whoami" data-whoami>…</span>
-    <a id="logout">Sign out</a>
-  </div>
-</header>
+<body class="hf hf-shell" data-hf-page="calendar">
+<!-- Top app bar (brandmark + nav + role chip + Sign out) is injected by /public/halofire-shell.js -->
 <main>
   <div class="banner"><b>NEEDS VERIFICATION</b> — Calendar core under construction (CAL-1). Dates and lanes below are placeholders, not scheduled work.</div>
 
@@ -117,7 +110,7 @@
 <script>
 (function () {
   'use strict';
-  document.getElementById('logout').onclick = function () { HFAuth.logout(); };
+  // Sign out now lives in the shared app bar injected by /public/halofire-shell.js.
 
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
@@ -234,5 +227,7 @@
   });
 })();
 </script>
+<!-- Shared shell: injects the top app bar, applies the saved glass theme, sets the per-page Fire color (gold). -->
+<script src="/public/halofire-shell.js"></script>
 </body>
 </html>
