@@ -38,16 +38,25 @@
      vars onto the token system without touching markup, ids, or JS. -->
 <link rel="stylesheet" href="/public/styles/halofire-tokens.css">
 <style id="hf-glass-override">:root{--bg:#0b0d10;--surface:rgba(22,26,32,0.72);--surface2:rgba(12,15,19,0.82);--gold:#d9a441;--gold-bright:#f0bd5a;--cyan:#5aa9e6;--green:#54b67a;--text:#e8ecf2;--muted:#9aa4b2;--bright:#fafafa;--border:rgba(255,255,255,.08)}</style>
+<!-- Themeable glass system: bridge the legacy surfaces to the user's chosen glass
+     so the Settings > Appearance picker recolors this page (and the whole app) live. -->
+<link rel="stylesheet" href="/public/styles/halofire-glass.css">
+<style>:root{--surface:var(--hf-glass);--surface2:var(--hf-glass-2)}</style>
 <!-- Shared cookie-session auth guard (HFAuth). Loaded as a classic script so
      window.HFAuth exists before any module script runs. -->
 <script src="/public/halofire-auth.js"></script>
 </head>
-<body class="hf-shell">
+<body class="hf-shell hf" data-hf-page="settings" data-hf-appbar="off">
 <header>
   <div class="brand">Halo<span>Fire</span> · Settings</div>
   <div class="nav"><a href="./calendar.html">Calendar</a><a href="./workbench.html">Workbench</a><a href="./autosprink.html">Studio</a><span data-whoami style="color:#71717a;font-size:12px;margin-left:14px"></span><a id="logout">Sign out</a></div>
 </header>
 <main>
+  <div class="card">
+    <h2>Appearance · Glass</h2>
+    <p class="muted" style="margin-bottom:10px">Choose the glass color — all within the Halo Fire palette. Applies live across the whole app and is remembered for you.</p>
+    <div id="hfSwatches" style="display:flex;flex-wrap:wrap;gap:12px;margin-top:4px"></div>
+  </div>
   <div class="card wide">
     <h2>AutoSprink Parity</h2>
     <div id="gate" class="gate">checking parity gate…</div>
@@ -1803,6 +1812,31 @@ $('attSubmit').onclick = async () => {
 };
 
 loadParity(); loadDocs(); loadDeps(); loadIntake(); initWizard(); loadLibrary(); loadSettingsCatalogSourceAcquisition(); loadSettingsResolvedSignedReviewerGates(); loadSettingsSam31ActualValueWorkItems(); loadSettingsRoomBoundaryFloorPlanOverrides();
+</script>
+<script src="/public/halofire-shell.js"></script>
+<script>
+  // Settings > Appearance: the glass-color picker (uses the shared HFTheme API).
+  (function () {
+    var box = document.getElementById('hfSwatches'); if (!box || !window.HFTheme) return;
+    var themes = HFTheme.themes, cur = HFTheme.get();
+    Object.keys(themes).forEach(function (id) {
+      var t = themes[id];
+      var w = document.createElement('div'); w.style.textAlign = 'center';
+      var s = document.createElement('div');
+      s.className = 'hf-swatch' + (id === cur ? ' sel' : '');
+      s.style.background = 'linear-gradient(135deg, rgba(' + t.tint + ',0.92), rgba(' + t.tint + ',0.6))';
+      s.style.boxShadow = 'inset 0 0 0 2px rgba(' + t.accentRgb + ',0.5)';
+      s.title = t.name;
+      s.onclick = function () {
+        HFTheme.set(id);
+        [].forEach.call(box.querySelectorAll('.hf-swatch'), function (e) { e.classList.remove('sel'); });
+        s.classList.add('sel');
+      };
+      w.appendChild(s);
+      var nm = document.createElement('div'); nm.style.cssText = 'font-size:10.5px;color:var(--muted);margin-top:5px'; nm.textContent = t.name;
+      w.appendChild(nm); box.appendChild(w);
+    });
+  })();
 </script>
 </body>
 </html>

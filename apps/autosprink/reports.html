@@ -15,7 +15,7 @@
   .kpi .k{ font-size:11px; letter-spacing:0.4px; text-transform:uppercase; color:var(--hf-muted); }
   .kpi .v{ font-size:26px; font-weight:700; margin-top:6px; font-variant-numeric:tabular-nums; }
   .kpi .d{ font-size:11px; color:var(--hf-faint); margin-top:4px; }
-  .grid2{ display:grid; grid-template-columns:1fr 360px; gap:14px; align-items:start; }
+  .grid2{ display:grid; grid-template-columns:1fr; gap:14px; align-items:start; }
   .phd{ display:flex; align-items:center; gap:8px; padding:11px 14px; border-bottom:1px solid var(--hf-line); }
   .phd .t{ font-size:11px; letter-spacing:0.9px; text-transform:uppercase; color:var(--hf-muted); font-weight:600; flex:1; }
   .pbd{ padding:14px; }
@@ -50,44 +50,13 @@
           </div>
         </div>
       </section>
-
-      <!-- APPEARANCE: the themeable glass picker (also lives in Settings) -->
-      <section class="hf-panel">
-        <div class="phd"><span class="t">Appearance · Glass</span></div>
-        <div class="pbd">
-          <p class="note" style="margin-bottom:10px;">Choose the glass color — all within the Halo Fire palette. Applies live across the whole app and is remembered for you.</p>
-          <div class="swatches" id="swatches"></div>
-        </div>
-      </section>
     </div>
   </div>
 
   <script src="/public/halofire-shell.js"></script>
   <script>
-    // glass-color picker (uses the shared HFTheme API from the shell)
-    (function () {
-      var box = document.getElementById('swatches'); if (!box || !window.HFTheme) return;
-      var themes = HFTheme.themes, cur = HFTheme.get();
-      Object.keys(themes).forEach(function (id) {
-        var t = themes[id];
-        var w = document.createElement('div'); w.className = 'sw-wrap';
-        var s = document.createElement('div');
-        s.className = 'hf-swatch' + (id === cur ? ' sel' : '');
-        s.style.background = 'linear-gradient(135deg, rgba(' + t.tint + ',0.92), rgba(' + t.tint + ',0.6))';
-        s.style.boxShadow = 'inset 0 0 0 2px rgba(' + t.accentRgb + ',0.5)';
-        s.title = t.name;
-        s.onclick = function () {
-          HFTheme.set(id);
-          [].forEach.call(box.querySelectorAll('.hf-swatch'), function (e) { e.classList.remove('sel'); });
-          s.classList.add('sel');
-        };
-        w.appendChild(s);
-        var nm = document.createElement('div'); nm.className = 'nm'; nm.textContent = t.name; w.appendChild(nm);
-        box.appendChild(w);
-      });
-    })();
     // real bid KPIs (win-rate/pipeline are the only trustworthy metrics today)
-    fetch('/api/bids?limit=1000', { credentials: 'include' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+    fetch('/api/bids?limit=3000', { credentials: 'include' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
       if (!d) return; var bids = d.bids || []; var total = d.total || bids.length;
       var val = bids.reduce(function (a, b) { return a + (Number(b.value) || 0); }, 0);
       // status-canon (interim until R0): exact-match so "Not Awarded" is never counted as won

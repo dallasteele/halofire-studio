@@ -79,7 +79,6 @@
     bar.innerHTML =
       brand() + navHtml() +
       '<div class="hf-right">' +
-        '<span class="hf-icon" title="Assistant" id="hfAsk">✦</span>' +
         '<span class="hf-role-chip" id="hfRole"><span class="dot"></span> …</span>' +
       '</div>';
     document.body.insertBefore(bar, document.body.firstChild);
