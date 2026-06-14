@@ -47,7 +47,7 @@ body{
 }
 
 /* ============ APP FRAME (under the shared app bar) ============ */
-/* The shared app bar (48px, injected by halofire-shell.js) is sticky at the
+/* The shared app bar (48px, injected by halofire-shell.js?v=10) is sticky at the
    top of <body>; the frame fills the remaining viewport height beneath it. */
 .frame{
   height:calc(100vh - 48px); width:100vw;
@@ -389,10 +389,10 @@ body{
 svg{display:block;}
 </style>
 <link rel="stylesheet" href="/public/styles/halofire-tokens.css">
-<link rel="stylesheet" href="/public/styles/halofire-glass.css">
+<link rel="stylesheet" href="/public/styles/halofire-glass.css?v=10">
 <style>
 /* Bridge: this page's bespoke card-surface vars become the themeable glass,
-   so the Settings glass-color picker (halofire-shell.js) recolors it too. */
+   so the Settings glass-color picker (halofire-shell.js?v=10) recolors it too. */
 :root{
   --surface:var(--hf-glass); --surface2:var(--hf-glass-2); --bg:var(--hf-bg);
   --panel:var(--hf-glass); --panel2:var(--hf-glass-2); --panel-raised:var(--hf-glass-raised);
@@ -406,7 +406,7 @@ svg{display:block;}
 <div class="frame">
 
   <!-- Top chrome + left workspace nav removed: the shared HaloFire app bar
-       (injected by /public/halofire-shell.js) now provides the brandmark,
+       (injected by /public/halofire-shell.js?v=10) now provides the brandmark,
        the 7-link nav, the role chip and Sign out. -->
 
   <!-- MAIN -->
@@ -803,6 +803,6 @@ svg{display:block;}
 </script>
 <!-- Shared HaloFire shell: injects the top app bar, applies the saved glass
      theme, and sets the per-page Fire brandmark color (workbench = paper). -->
-<script src="/public/halofire-shell.js"></script>
+<script src="/public/halofire-shell.js?v=10"></script>
 </body>
 </html>

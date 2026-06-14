@@ -41,7 +41,7 @@
 <style id="hf-glass-override">:root{--bg:#0b0d10;--surface:rgba(22,26,32,0.72);--surface2:rgba(12,15,19,0.82);--gold:#d9a441;--gold-bright:#f0bd5a;--cyan:#5aa9e6;--green:#54b67a;--text:#e8ecf2;--muted:#9aa4b2;--bright:#fafafa;--border:rgba(255,255,255,.08)}</style>
 <!-- Themeable glass system: bridge the legacy surfaces to the user's chosen glass
      so the Settings > Appearance picker recolors this page (and the whole app) live. -->
-<link rel="stylesheet" href="/public/styles/halofire-glass.css">
+<link rel="stylesheet" href="/public/styles/halofire-glass.css?v=10">
 <style>:root{--surface:var(--hf-glass);--surface2:var(--hf-glass-2);--bg:var(--hf-bg)}</style>
 <!-- Shared cookie-session auth guard (HFAuth). Loaded as a classic script so
      window.HFAuth exists before any module script runs. -->
@@ -274,7 +274,7 @@ const HALOFIRE_API_BASE = HALOFIRE_BASE_PATH + ['', 'api'].join('/');
 // 'halofire_token' gate is GONE — cookie logins never set that key, so it
 // falsely bounced signed-in users back to the login page.
 const $ = (id) => document.getElementById(id);
-// Sign-out now lives in the shared app bar (halofire-shell.js). Guard the legacy
+// Sign-out now lives in the shared app bar (halofire-shell.js?v=10). Guard the legacy
 // hook so it never throws if the bespoke #logout element is absent.
 const _logoutEl = $('logout');
 if (_logoutEl) _logoutEl.onclick = () => { HFAuth.logout(); };
@@ -1820,7 +1820,7 @@ $('attSubmit').onclick = async () => {
 
 loadParity(); loadDocs(); loadDeps(); loadIntake(); initWizard(); loadLibrary(); loadSettingsCatalogSourceAcquisition(); loadSettingsResolvedSignedReviewerGates(); loadSettingsSam31ActualValueWorkItems(); loadSettingsRoomBoundaryFloorPlanOverrides();
 </script>
-<script src="/public/halofire-shell.js"></script>
+<script src="/public/halofire-shell.js?v=10"></script>
 <script>
   // Settings > Appearance: the glass-color picker (uses the shared HFTheme API).
   (function () {

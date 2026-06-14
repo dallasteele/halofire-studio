@@ -69,8 +69,8 @@ body.hf{
   font-family:var(--hf-ui); font-size:var(--hf-fs-body); font-weight:var(--hf-fw-reg);
   line-height:var(--hf-lh); letter-spacing:0;
   background:
-    radial-gradient(circle at 33% 16%, rgba(247,213,22,0.11), transparent 26%),
-    radial-gradient(circle at 78% 26%, rgba(227,38,33,0.13), transparent 32%),
+    radial-gradient(circle at 33% 16%, rgba(var(--hf-accent-rgb),0.13), transparent 28%),
+    radial-gradient(circle at 78% 26%, rgba(227,38,33,0.10), transparent 32%),
     radial-gradient(circle at 72% 92%, rgba(255,255,255,0.04), transparent 30%),
     linear-gradient(125deg,#070605 0%,#11100e 46%,#090302 100%);
   background-attachment:fixed;
@@ -192,18 +192,19 @@ body.hf .card, body.hf .panel, body.hf .well, body.hf .intake, body.hf .col, bod
 :root[data-hf-mode="light"] body.hf{ color:var(--hf-text); }
 :root[data-hf-mode="light"] body.hf{
   background:
-    radial-gradient(circle at 33% 14%, rgba(247,213,22,0.18), transparent 28%),
-    radial-gradient(circle at 80% 20%, rgba(232,67,45,0.10), transparent 32%),
-    linear-gradient(150deg,#f8f3ea 0%,#efe7da 50%,#f3ece0 100%);
+    radial-gradient(circle at 30% 12%, rgba(var(--hf-accent-rgb),0.22), transparent 32%),
+    radial-gradient(circle at 82% 22%, rgba(var(--hf-accent-rgb),0.12), transparent 36%),
+    linear-gradient(150deg,#f1ece2 0%,#e6dccb 52%,#ede5d7 100%);
   color:var(--hf-text);
 }
 :root[data-hf-mode="light"] .hf-win, :root[data-hf-mode="light"] .hf-panel, :root[data-hf-mode="light"] .hf-card,
 :root[data-hf-mode="light"] body.hf .card, :root[data-hf-mode="light"] body.hf .panel,
 :root[data-hf-mode="light"] body.hf .well, :root[data-hf-mode="light"] body.hf .intake, :root[data-hf-mode="light"] body.hf .col{
+  /* light glass is a TINT of the chosen color (so the picker + blue show), not white pastel */
   background:
-    linear-gradient(142deg, rgba(255,255,255,0.74), rgba(255,255,255,0.56) 42%),
-    radial-gradient(circle at 12% 0%, rgba(var(--hf-accent-rgb),0.12), transparent 42%),
-    rgba(255,255,255,0.52) !important;
+    linear-gradient(150deg, rgba(255,255,255,0.50), rgba(255,255,255,0.24) 55%),
+    radial-gradient(circle at 14% -8%, rgba(var(--hf-accent-rgb),0.32), transparent 58%),
+    rgba(var(--hf-accent-rgb),0.17) !important;
   color:var(--hf-text);
 }
 :root[data-hf-mode="light"] .hf-appbar{ background:linear-gradient(180deg, rgba(255,255,255,0.84), rgba(255,255,255,0.70)); }
