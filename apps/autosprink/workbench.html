@@ -819,5 +819,22 @@ svg{display:block;}
 })();
 
 </script>
+<script>
+(function(){
+  // Wire card collapse caret -> toggle the card body (real, trivial).
+  document.querySelectorAll('.tbtn[title="Collapse"]').forEach(function(t){
+    t.style.cursor='pointer';
+    t.addEventListener('click',function(e){e.stopPropagation();var card=t.closest('.card');var bd=card&&card.querySelector('.card-bd');if(bd){var hidden=bd.style.display==='none';bd.style.display=hidden?'':'none';t.textContent=hidden?'▾':'▸';}});
+  });
+  // Honestly inert the not-yet-built dock/customization chrome (no fake-clickable buttons).
+  function inert(el){if(!el)return;el.style.opacity='.4';el.style.cursor='default';el.style.pointerEvents='none';if(!el.getAttribute('title'))el.setAttribute('title','Coming soon');}
+  document.querySelectorAll('.iconbtn,.grip,.tbtn[title="Open Job Book"],.tbtn[title="Open"],.tbtn[title="Settings"]').forEach(inert);
+  var deadText=['My Dock','Default','Customize dock','Add a panel to your dock'];
+  document.querySelectorAll('button,span,div,a').forEach(function(el){
+    var t=(el.textContent||'').replace(/\s+/g,' ').trim();if(deadText.indexOf(t)>=0)inert(el);
+  });
+  var s=document.querySelector('.search,[class*="search"]'); if(s) inert(s);
+})();
+</script>
 </body>
 </html>
