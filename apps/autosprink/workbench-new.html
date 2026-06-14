@@ -753,5 +753,72 @@ svg{display:block;}
   if(user){user.style.cursor='pointer';user.title='Sign out';user.addEventListener('click',function(){if(window.HFAuth&&HFAuth.logout)HFAuth.logout();});}
 })();
 </script>
+<script>
+// Workbench data wiring: real /api/bids -> approval lane, KPI strip, pipeline.
+// Honest placeholders where no API exists (schedule, inspections, activity).
+(function () {
+  function cardByTitle(t) {
+    return [...document.querySelectorAll('.card')].find(function (c) {
+      var x = c.querySelector('.card-hd .ttl');
+      return x && x.textContent.trim().toLowerCase().indexOf(t.toLowerCase()) === 0;
+    });
+  }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function money(v) { v = Number(v) || 0; if (!v) return '—'; if (v >= 1e6) return '$' + (v / 1e6).toFixed(1) + 'M'; return v >= 1000 ? '$' + (v / 1000).toFixed(v >= 10000 ? 0 : 1) + 'K' : '$' + v; }
+  function statusLabel(s) { return String(s || '').replace(/_/g, ' '); }
+
+  if (!(window.HFAuth && HFAuth.api)) return;
+  HFAuth.api('/bids?limit=200').then(function (data) {
+    var bids = (data && data.bids) || [];
+    var total = (data && data.total) || bids.length;
+    var st = function (b) { return String(b.status || '').toLowerCase(); };
+    var won = bids.filter(function (b) { return st(b) === 'won'; }).length;
+    var lost = bids.filter(function (b) { return st(b) === 'lost'; }).length;
+    var decided = won + lost;
+    var awaiting = bids.filter(function (b) { var s = st(b); return s !== 'won' && s !== 'lost' && s !== 'sent' && s !== 'archived'; });
+    var totalVal = bids.reduce(function (a, b) { return a + (Number(b.value) || 0); }, 0);
+
+    // KPI strip — real bids out + win rate; honest '—' for crew/inspections (no source).
+    var kpis = document.querySelectorAll('.kpi-strip .kpi');
+    function setKpi(i, k, v, d) { if (!kpis[i]) return; var kk = kpis[i].querySelector('.k'), vv = kpis[i].querySelector('.v'), dd = kpis[i].querySelector('.d'); if (kk) kk.textContent = k; if (vv) vv.textContent = v; if (dd) { dd.textContent = d; dd.className = 'd'; } }
+    setKpi(0, 'Bids out', money(totalVal), total + ' total bids');
+    setKpi(1, 'Win rate', decided ? Math.round(won / decided * 100) + '%' : '—', decided ? (won + ' won · ' + lost + ' lost') : 'no decided bids yet');
+    setKpi(2, 'Crew utilization', '—', 'no crew data source yet');
+    setKpi(3, 'Inspections due', '—', 'no inspection source yet');
+
+    // OpenClaw approval lane — real bids awaiting a decision.
+    var ap = cardByTitle('OpenClaw');
+    if (ap) {
+      var ct = ap.querySelector('.card-hd .ct'); if (ct) ct.textContent = awaiting.length;
+      ap.querySelector('.card-bd').innerHTML = awaiting.length ? awaiting.slice(0, 8).map(function (b) {
+        return '<div style="padding:10px 0;border-top:1px solid var(--line)">' +
+          '<div style="color:var(--text);font-weight:600">' + esc(b.project || ('Bid #' + b.id)) + '</div>' +
+          '<div style="color:var(--muted);font-size:11px;margin-top:3px">' + esc(b.contractor || '—') + ' · ' + money(b.value) + ' · <span style="color:var(--gold)">' + esc(statusLabel(b.status)) + '</span></div>' +
+          '<div style="margin-top:7px;display:flex;gap:6px"><button disabled style="opacity:.5;cursor:not-allowed" title="Send flow not built yet (CAL-1)">Approve &amp; send</button><button style="background:transparent;border:1px solid var(--line);color:var(--muted)">Review</button></div>' +
+          '</div>';
+      }).join('') : '<div style="color:var(--muted);padding:14px 0">Nothing awaiting approval.</div>';
+    }
+
+    // Bid pipeline — real status counts.
+    var pl = cardByTitle('Bid');
+    if (pl) {
+      var counts = {}; bids.forEach(function (b) { var s = statusLabel(b.status) || 'unknown'; counts[s] = (counts[s] || 0) + 1; });
+      var rows = Object.keys(counts).sort(function (a, b) { return counts[b] - counts[a]; }).slice(0, 7).map(function (k) {
+        return '<div style="display:flex;justify-content:space-between;padding:6px 0;border-top:1px solid var(--line)"><span style="color:var(--muted)">' + esc(k) + '</span><span style="color:var(--text);font-weight:600">' + counts[k] + '</span></div>';
+      }).join('');
+      pl.querySelector('.card-bd').innerHTML = '<div style="padding:2px">' + (rows || '<span style="color:var(--muted)">No bids yet.</span>') + '</div>';
+    }
+
+    // No-API panels — honest placeholders (do NOT fake real-looking jobs).
+    var sc = cardByTitle("Today's Schedule");
+    if (sc) { var sct = sc.querySelector('.card-hd .ct'); if (sct) sct.textContent = '—'; sc.querySelector('.card-bd').innerHTML = '<div style="color:var(--muted);padding:18px 4px;line-height:1.6">No scheduling source connected yet — crew jobs &amp; inspections will populate here once the calendar/scheduling feed is wired.<br><a href="calendar.html" style="color:var(--gold)">Open Calendar →</a></div>'; }
+    var ins = cardByTitle('Inspections'); if (ins) { var ic = ins.querySelector('.card-hd .ct'); if (ic) ic.textContent = '—'; ins.querySelector('.card-bd').innerHTML = '<div style="color:var(--muted);padding:14px 4px">No inspection data source connected yet.</div>'; }
+    var act = cardByTitle('Activity'); if (act) { act.querySelector('.card-bd').innerHTML = '<div style="color:var(--muted);padding:14px 4px">Activity will appear here as bids and jobs update.</div>'; }
+  }).catch(function () {
+    var ap = cardByTitle('OpenClaw'); if (ap) ap.querySelector('.card-bd').innerHTML = '<div style="color:var(--muted);padding:14px">Could not load bids.</div>';
+  });
+})();
+
+</script>
 </body>
 </html>
