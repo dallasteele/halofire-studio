@@ -71,7 +71,9 @@ HaloFire is the first instance of a reusable platform. Every section is tagged s
 ```
 
 **Stack:** Express 4 + better-sqlite3 (WAL), bcrypt/jwt, helmet/cors/rate-limit, multer, imapflow/nodemailer, winston · OpenGeometry/OpenSCAD CAD · Three.js viewport · the `--hf-*` AAA token design system · local Qwen + Obsidian brain on GX10 · OpenClaw orchestration.
-**Deployment:** single VPS (Hostinger KVM), `halofire.service` node on :3301, nginx TLS at `https://halofire.rankempire.io`. Heavy/agentic AI runs on GX10 over SSH/tunnel.
+**Deployment:** single VPS (Hostinger KVM), `halofire.service` node on :3301, nginx at `https://halofire.rankempire.io` (edge TLS via Cloudflare; origin HTTP). Heavy/agentic AI runs on a GX10-class box.
+
+> **AI-backbone status (honest — see `HALOFIRE_AI_BACKBONE_AND_TENANT_PROVISIONING.md`):** the OpenClaw/perception endpoints are real, **env-driven, and fail-soft**, which makes the app **tenant-ready by design** (point `OPENCLAW_BRIDGE_URL`/`HAL_API_URL` + token at the customer's box — no code change). But today they default to a **localhost shim**, the **brain and local LLM are not yet called at runtime**, SAM "vision" is a **deterministic shim**, and image→3D is **down**. These are *honest, claim-gated stubs* — to be converted to real per the Anti-Stub Register, not shipped as "done." Tenant provisioning (`openclaw-halofire/` module runtime) is a correct-but-unadopted prototype.
 
 ---
 
@@ -221,7 +223,7 @@ Sequenced build in [HALOFIRE_MASTER_ROADMAP.md](HALOFIRE_MASTER_ROADMAP.md): Wav
 
 ## §13. Source docs & glossary
 
-**Companion specs (this doc is the index):** OPS_FLOW_OPTIMIZATION · REPORTS_AND_ANALYTICS · VENDOR_PRICESYNC_AND_PART_CAD · AUDIT_AND_ROADMAP · DESIGN_SYSTEM_AND_ADAPTIVE_AI · MASTER_ROADMAP (all in `halofire-studio/docs/`). AutoSPRINK bible: `docs/AUTOSPRINK_CLONE_PLAN_V2.md`, `research/autosprink-feature-matrix.md`, `blueprints/0x_*.md`.
+**Companion specs (this doc is the index):** OPS_FLOW_OPTIMIZATION · REPORTS_AND_ANALYTICS · VENDOR_PRICESYNC_AND_PART_CAD · AUDIT_AND_ROADMAP · DESIGN_SYSTEM_AND_ADAPTIVE_AI · MASTER_ROADMAP · **AI_BACKBONE_AND_TENANT_PROVISIONING** (the OpenClaw wiring, anti-stub register, and per-customer GX10 provisioning) (all in `halofire-studio/docs/`). AutoSPRINK bible: `docs/AUTOSPRINK_CLONE_PLAN_V2.md`, `research/autosprink-feature-matrix.md`, `blueprints/0x_*.md`.
 
 **Glossary:** **AHJ** Authority Having Jurisdiction · **ITM** Inspection/Testing/Maintenance (NFPA-25) · **NFPA-13** sprinkler design standard · **Remote area** hydraulically most-demanding design area · **Smart Pipe** auto pipe-role classification · **Review Queue** the human-in-loop approval gate · **Autonomy ladder** the earned-automation progression · **Job spine** the unifying entity record · **`[PLATFORM]`/`[VERTICAL]`/`[PATTERN]`** the template tags.
 
