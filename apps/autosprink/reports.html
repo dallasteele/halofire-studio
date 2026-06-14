@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta http-equiv="Cache-Control" content="no-store" />
+<title>HaloFire — Reports</title>
+<link rel="stylesheet" href="/public/styles/halofire-glass.css" />
+<style>
+  .wrap{ max-width:1180px; margin:0 auto; padding:22px 24px 80px; }
+  .ptitle{ font-family:var(--hf-display); font-size:24px; font-weight:700; margin:6px 0 2px; }
+  .psub{ color:var(--hf-muted); font-size:13px; margin-bottom:20px; }
+  .kpis{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:18px; }
+  .kpi{ padding:14px 16px; }
+  .kpi .k{ font-size:11px; letter-spacing:0.4px; text-transform:uppercase; color:var(--hf-muted); }
+  .kpi .v{ font-size:26px; font-weight:700; margin-top:6px; font-variant-numeric:tabular-nums; }
+  .kpi .d{ font-size:11px; color:var(--hf-faint); margin-top:4px; }
+  .grid2{ display:grid; grid-template-columns:1fr 360px; gap:14px; align-items:start; }
+  .phd{ display:flex; align-items:center; gap:8px; padding:11px 14px; border-bottom:1px solid var(--hf-line); }
+  .phd .t{ font-size:11px; letter-spacing:0.9px; text-transform:uppercase; color:var(--hf-muted); font-weight:600; flex:1; }
+  .pbd{ padding:14px; }
+  .empty{ border:1px dashed var(--hf-line); border-radius:8px; padding:18px; text-align:center; color:var(--hf-muted); background:rgba(0,0,0,0.14); }
+  .empty .e-t{ color:var(--hf-text); margin-bottom:4px; }
+  .swatches{ display:flex; flex-wrap:wrap; gap:12px; margin-top:6px; }
+  .sw-wrap{ text-align:center; }
+  .sw-wrap .nm{ font-size:10.5px; color:var(--hf-muted); margin-top:5px; }
+  .note{ color:var(--hf-muted); font-size:12px; line-height:1.55; }
+  @media(max-width:900px){ .kpis{ grid-template-columns:repeat(2,1fr);} .grid2{ grid-template-columns:1fr; } }
+</style>
+</head>
+<body class="hf" data-hf-page="reports">
+  <div class="wrap">
+    <div class="ptitle">Reports</div>
+    <div class="psub">Role-based dashboards · this view defaults to the company (owner/dev) tier.</div>
+
+    <div class="kpis">
+      <div class="kpi hf-card"><div class="k">Bids out</div><div class="v" id="kBids">—</div><div class="d" id="kBidsD">loading…</div></div>
+      <div class="kpi hf-card"><div class="k">Win rate</div><div class="v" id="kWin">—</div><div class="d" id="kWinD">needs status-canon (R0)</div></div>
+      <div class="kpi hf-card"><div class="k">Recurring (ITM)</div><div class="v">—</div><div class="d">service module not built yet</div></div>
+      <div class="kpi hf-card"><div class="k">Crew utilization</div><div class="v">—</div><div class="d">no crew source yet</div></div>
+    </div>
+
+    <div class="grid2">
+      <section class="hf-panel">
+        <div class="phd"><span class="t">Company dashboard</span><span class="hf-chip info"><span class="gl"></span> owner / dev tier</span></div>
+        <div class="pbd">
+          <div class="empty">
+            <div class="e-t">Real role dashboards land here</div>
+            <div class="note">Estimator · CFO · Designer · PM · Service-ITM · Dispatcher · Tech · Safety · HR — each scoped by access tier, plus the per-position / per-employee drill-down. Powered by the <code>activity_log</code> telemetry spine once the foundation (R0) is wired. Today only bid win-rate / pipeline is computable off real data.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- APPEARANCE: the themeable glass picker (also lives in Settings) -->
+      <section class="hf-panel">
+        <div class="phd"><span class="t">Appearance · Glass</span></div>
+        <div class="pbd">
+          <p class="note" style="margin-bottom:10px;">Choose the glass color — all within the Halo Fire palette. Applies live across the whole app and is remembered for you.</p>
+          <div class="swatches" id="swatches"></div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script src="/public/halofire-shell.js"></script>
+  <script>
+    // glass-color picker (uses the shared HFTheme API from the shell)
+    (function () {
+      var box = document.getElementById('swatches'); if (!box || !window.HFTheme) return;
+      var themes = HFTheme.themes, cur = HFTheme.get();
+      Object.keys(themes).forEach(function (id) {
+        var t = themes[id];
+        var w = document.createElement('div'); w.className = 'sw-wrap';
+        var s = document.createElement('div');
+        s.className = 'hf-swatch' + (id === cur ? ' sel' : '');
+        s.style.background = 'linear-gradient(135deg, rgba(' + t.tint + ',0.92), rgba(' + t.tint + ',0.6))';
+        s.style.boxShadow = 'inset 0 0 0 2px rgba(' + t.accentRgb + ',0.5)';
+        s.title = t.name;
+        s.onclick = function () {
+          HFTheme.set(id);
+          [].forEach.call(box.querySelectorAll('.hf-swatch'), function (e) { e.classList.remove('sel'); });
+          s.classList.add('sel');
+        };
+        w.appendChild(s);
+        var nm = document.createElement('div'); nm.className = 'nm'; nm.textContent = t.name; w.appendChild(nm);
+        box.appendChild(w);
+      });
+    })();
+    // real bid KPIs (win-rate/pipeline are the only trustworthy metrics today)
+    fetch('/api/bids?limit=1000', { credentials: 'include' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+      if (!d) return; var bids = d.bids || []; var total = d.total || bids.length;
+      var val = bids.reduce(function (a, b) { return a + (Number(b.value) || 0); }, 0);
+      // status-canon (interim until R0): exact-match so "Not Awarded" is never counted as won
+      var st = function (b) { return String(b.status || '').trim().toLowerCase(); };
+      var won = bids.filter(function (b) { var s = st(b); return s === 'awarded' || s === 'won'; }).length;
+      var lost = bids.filter(function (b) { var s = st(b); return s === 'not awarded' || s === 'lost'; }).length;
+      var dec = won + lost;
+      document.getElementById('kBids').textContent = val >= 1e6 ? '$' + (val / 1e6).toFixed(1) + 'M' : '$' + Math.round(val / 1000) + 'K';
+      document.getElementById('kBidsD').textContent = total + ' total bids';
+      document.getElementById('kWin').textContent = dec ? Math.round(won / dec * 100) + '%' : '—';
+      document.getElementById('kWinD').textContent = dec ? (won + ' won · ' + lost + ' lost') : 'no decided bids';
+    }).catch(function () {});
+  </script>
+</body>
+</html>

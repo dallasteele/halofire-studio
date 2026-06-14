@@ -1,0 +1,132 @@
+/* ============================================================================
+ * HaloFire — Apple-Glass Design System (full-stack)
+ * Derived from the LOGIN page (index.html) so the whole app matches it:
+ *   brand font  = --hf-display (Fraunces serif, as the login wordmark)
+ *   palette     = Halo Fire colors (fire #e8432d, gold #c89a3c, halo #ffd54f, paper #f2ece0)
+ *   glass       = translucent + backdrop-blur, every window is glass
+ * THEMEABLE: Settings changes the glass color/tint + accent within the HF
+ * palette via the --hf-glass-* / --hf-accent vars (persisted by halofire-shell.js).
+ * Per-page "Fire" color-coding via --hf-fire-color (set from <body data-hf-page>).
+ * One stylesheet for the full stack — link it on every page.
+ * ========================================================================== */
+
+:root{
+  /* ---- Halo Fire palette (from login index.html) ---- */
+  --hf-fire:#e8432d; --hf-gold:#c89a3c; --hf-halo:#ffd54f; --hf-paper:#f2ece0;
+  --hf-blue:#5aa9e6; --hf-green:#54b67a; --hf-crit:#d9534f;
+
+  /* ---- brand + ui fonts (match the login page) ---- */
+  --hf-display:"Fraunces","Didot",Georgia,ui-serif,serif;
+  --hf-ui:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --hf-mono:"JetBrains Mono","IBM Plex Mono","SF Mono","Cascadia Code",Consolas,monospace;
+
+  /* ---- THEMEABLE glass (Settings overrides these) ---- */
+  --hf-glass-tint:18,22,28;     /* rgb base of the glass (charcoal default)   */
+  --hf-glass-alpha:0.72;        /* glass opacity                              */
+  --hf-glass-blur:18px;         /* backdrop blur                              */
+  --hf-accent:#d9a441;          /* accent within the HF palette               */
+  --hf-accent-bright:#f0bd5a;
+  --hf-accent-rgb:217,164,65;
+
+  /* ---- derived surfaces ---- */
+  --hf-bg:#0b0d10;
+  --hf-glass:rgba(var(--hf-glass-tint),var(--hf-glass-alpha));
+  --hf-glass-2:rgba(var(--hf-glass-tint),calc(var(--hf-glass-alpha) + 0.10));
+  --hf-glass-raised:rgba(var(--hf-glass-tint),calc(var(--hf-glass-alpha) + 0.06));
+  --hf-overlay:rgba(var(--hf-glass-tint),0.92);
+  --hf-line:rgba(255,255,255,0.08); --hf-line-strong:rgba(255,255,255,0.14);
+  --hf-text:#e8ecf2; --hf-muted:#9aa4b2; --hf-faint:#5d6675;
+  --hf-ok:#54b67a; --hf-warn:#d9a441; --hf-bad:#d9534f; --hf-info:#5aa9e6;
+
+  /* radii / spacing / motion */
+  --hf-r-ctl:7px; --hf-r-win:12px; --hf-r-pill:999px;
+  --hf-s1:4px; --hf-s2:6px; --hf-s3:8px; --hf-s4:10px; --hf-s5:12px; --hf-s6:16px; --hf-s7:24px;
+  --hf-blur-panel:blur(var(--hf-glass-blur)) saturate(1.2);
+  --hf-blur-overlay:blur(28px) saturate(1.3);
+  --hf-shadow:0 1px 0 var(--hf-line) inset, 0 8px 24px rgba(0,0,0,0.35);
+  --hf-shadow-overlay:0 1px 0 var(--hf-line) inset, 0 16px 48px rgba(0,0,0,0.50);
+  --hf-recess:0 1px 0 rgba(0,0,0,0.40) inset, 0 -1px 0 rgba(255,255,255,0.03) inset;
+  --hf-ease:cubic-bezier(0.2,0,0,1);
+
+  /* per-page Fire color (overridden per page by data-hf-page, see shell js) */
+  --hf-fire-color:var(--hf-fire);
+}
+
+/* ---- the ambient fire gradient (so glass has something to refract) ---- */
+body.hf{
+  margin:0; color:var(--hf-text); font-family:var(--hf-ui); font-size:13px;
+  background:
+    radial-gradient(1100px 640px at 70% -8%, rgba(217,164,65,0.07), transparent 60%),
+    radial-gradient(820px 560px at 12% 108%, rgba(90,169,230,0.05), transparent 55%),
+    radial-gradient(900px 600px at 33% 40%, rgba(232,67,45,0.05), transparent 45%),
+    var(--hf-bg);
+  -webkit-font-smoothing:antialiased; min-height:100vh;
+}
+
+/* ============================ ALL WINDOWS ARE GLASS ======================== */
+.hf-win,.hf-panel,.hf-card,.hf-glass{
+  position:relative; overflow:hidden;
+  background:var(--hf-glass);
+  backdrop-filter:var(--hf-blur-panel); -webkit-backdrop-filter:var(--hf-blur-panel);
+  border:1px solid var(--hf-line); border-radius:var(--hf-r-win);
+  box-shadow:var(--hf-shadow);
+}
+.hf-win::before,.hf-panel::before,.hf-card::before{ /* top sheen — the glass gradient */
+  content:""; position:absolute; inset:0; pointer-events:none; border-radius:inherit;
+  background:linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0) 42%);
+}
+.hf-win>*,.hf-panel>*,.hf-card>*{position:relative;}
+.hf-overlay{ background:var(--hf-glass-raised); backdrop-filter:var(--hf-blur-overlay); border:1px solid var(--hf-line-strong); border-radius:10px; box-shadow:var(--hf-shadow-overlay); }
+.hf-recess{ background:rgba(0,0,0,0.22); border-radius:var(--hf-r-ctl); box-shadow:var(--hf-recess); }
+
+/* ============================ BRANDMARK =================================== */
+/* "Halo Fire" in the login display font; the word "Fire" takes the per-page color. */
+.hf-brand{ font-family:var(--hf-display); font-weight:700; letter-spacing:0.2px; color:var(--hf-text); white-space:nowrap; }
+.hf-brand .fire{ color:var(--hf-fire-color); }
+.hf-brand .sub{ font-family:var(--hf-ui); font-weight:500; color:var(--hf-muted); font-size:0.7em; letter-spacing:1.3px; text-transform:uppercase; margin-left:8px; }
+
+/* ============================ TOP APP BAR (shared nav) ==================== */
+.hf-appbar{
+  position:sticky; top:0; z-index:200; display:flex; align-items:center; gap:var(--hf-s6);
+  height:48px; padding:0 var(--hf-s6);
+  background:linear-gradient(180deg, rgba(var(--hf-glass-tint),0.86), rgba(var(--hf-glass-tint),0.74));
+  backdrop-filter:var(--hf-blur-panel); -webkit-backdrop-filter:var(--hf-blur-panel);
+  border-bottom:1px solid var(--hf-line);
+  box-shadow:0 1px 0 rgba(255,255,255,0.04) inset, 0 2px 12px rgba(0,0,0,0.35);
+}
+.hf-appbar .hf-brand{ font-size:16px; }
+.hf-appbar .hf-nav{ display:flex; align-items:center; gap:2px; flex:1; }
+.hf-appbar .hf-nav a{
+  display:inline-flex; align-items:center; gap:7px; height:32px; padding:0 12px;
+  color:var(--hf-muted); text-decoration:none; border-radius:var(--hf-r-ctl);
+  border:1px solid transparent; font-size:13px; transition:background var(--hf-ease), color var(--hf-ease);
+}
+.hf-appbar .hf-nav a:hover{ color:var(--hf-text); background:rgba(255,255,255,0.06); }
+.hf-appbar .hf-nav a.active{ color:var(--hf-text); background:rgba(var(--hf-accent-rgb),0.16); border-color:rgba(var(--hf-accent-rgb),0.35); }
+.hf-appbar .hf-nav a .ic{ width:15px; height:15px; opacity:0.85; }
+.hf-appbar .hf-right{ display:flex; align-items:center; gap:var(--hf-s4); }
+.hf-role-chip{ display:inline-flex; align-items:center; gap:7px; padding:4px 11px; border-radius:var(--hf-r-pill); color:var(--hf-text); background:var(--hf-glass-2); border:1px solid var(--hf-line); box-shadow:var(--hf-recess); font-size:12px; }
+.hf-role-chip .dot{ width:6px; height:6px; border-radius:50%; background:var(--hf-ok); }
+.hf-appbar .hf-icon{ width:30px; height:30px; display:inline-flex; align-items:center; justify-content:center; border-radius:var(--hf-r-ctl); color:var(--hf-muted); cursor:pointer; }
+.hf-appbar .hf-icon:hover{ color:var(--hf-text); background:rgba(255,255,255,0.06); }
+
+/* ============================ CONTROLS =================================== */
+.hf-btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; height:32px; padding:0 14px; border-radius:var(--hf-r-ctl); font:inherit; font-size:13px; font-weight:600; cursor:pointer; border:1px solid var(--hf-line); background:rgba(255,255,255,0.05); color:var(--hf-text); transition:all var(--hf-ease); }
+.hf-btn:hover{ background:rgba(255,255,255,0.09); }
+.hf-btn-primary{ background:linear-gradient(180deg, var(--hf-accent-bright), var(--hf-accent)); color:#1a1206; border-color:rgba(255,255,255,0.18); box-shadow:0 1px 0 rgba(255,255,255,0.35) inset, 0 4px 14px rgba(var(--hf-accent-rgb),0.3); }
+.hf-btn-primary:hover{ filter:brightness(1.05); }
+.hf-btn:disabled,.hf-btn[disabled]{ opacity:0.5; cursor:not-allowed; color:var(--hf-faint); background:rgba(255,255,255,0.04); box-shadow:none; }
+.hf-field label{ display:block; font-size:11px; color:var(--hf-muted); margin-bottom:5px; }
+.hf-input,.hf-field input,.hf-field select,.hf-field textarea{ width:100%; height:32px; padding:0 11px; background:rgba(0,0,0,0.25); border:1px solid var(--hf-line); border-radius:var(--hf-r-ctl); color:var(--hf-text); font:inherit; }
+.hf-input:focus,.hf-field input:focus,.hf-field select:focus{ outline:none; border-color:rgba(var(--hf-accent-rgb),0.6); box-shadow:0 0 0 3px rgba(var(--hf-accent-rgb),0.15); }
+.hf-chip{ display:inline-flex; align-items:center; gap:6px; padding:2px 9px; border-radius:var(--hf-r-pill); font-size:11px; border:1px solid var(--hf-line); color:var(--hf-muted); }
+.hf-chip .gl{ width:6px; height:6px; border-radius:50%; background:currentColor; }
+.hf-chip.ok{ color:var(--hf-ok); } .hf-chip.warn{ color:var(--hf-warn); } .hf-chip.bad{ color:var(--hf-bad); } .hf-chip.info{ color:var(--hf-info); }
+
+/* theme swatch (Settings glass-color picker) */
+.hf-swatch{ width:46px; height:46px; border-radius:10px; border:2px solid var(--hf-line); cursor:pointer; position:relative; backdrop-filter:blur(8px); }
+.hf-swatch.sel{ border-color:var(--hf-accent-bright); box-shadow:0 0 0 3px rgba(var(--hf-accent-rgb),0.25); }
+
+.hf-scroll{ scrollbar-width:thin; scrollbar-color:var(--hf-line-strong) transparent; }
+.hf-scroll::-webkit-scrollbar{ width:9px; } .hf-scroll::-webkit-scrollbar-thumb{ background:rgba(255,255,255,0.10); border-radius:6px; }
+@media (prefers-reduced-motion:reduce){ *{ transition-duration:0.001ms !important; } }

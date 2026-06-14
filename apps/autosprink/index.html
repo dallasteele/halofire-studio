@@ -1215,12 +1215,12 @@ function apiPath(pathname){
 }
 
 function safePostLoginRedirect(){
-  // All roles land on the calendar by default. ?redirect= is honored only for
-  // same-origin, allowlisted app pages.
-  const fallback = HALOFIRE_BASE_PATH + '/calendar.html';
+  // All roles land on the WORKBENCH (role home) by default. ?redirect= is honored
+  // only for same-origin, allowlisted app pages.
+  const fallback = HALOFIRE_BASE_PATH + '/workbench.html';
   const requested = params.get('redirect');
   if(!requested)return fallback;
-  const allowedPaths = ['/calendar.html','/workbench.html','/autosprink.html','/crm.html','/settings.html']
+  const allowedPaths = ['/calendar.html','/workbench.html','/autosprink.html','/crm.html','/settings.html','/reports.html','/vendors.html']
     .map((p) => HALOFIRE_BASE_PATH + p);
   try{
     const target = new URL(requested, window.location.origin);
