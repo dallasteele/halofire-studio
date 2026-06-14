@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HaloFire — CRM Board (Internal Alpha)</title>
-<link rel="stylesheet" href="/public/styles/halofire-glass.css?v=11">
+<link rel="stylesheet" href="/public/styles/halofire-glass.css?v=13">
 <style>
   /* Bridge: legacy card surface vars now resolve to the themeable glass system,
      so the Settings glass picker recolors this page's cards too. */
@@ -87,7 +87,7 @@
 </head>
 <body class="hf" data-hf-page="crm">
 <!-- Bespoke top header/nav removed: the shared app bar is injected by
-     /public/halofire-shell.js?v=11 (brandmark + 7-link nav + role chip + Sign out).
+     /public/halofire-shell.js?v=13 (brandmark + 7-link nav + role chip + Sign out).
      Sign-out and whoami now live in the shared bar. The hidden anchors below
      preserve the page's own JS hooks (HFAuth fills [data-whoami]; #logout wired
      to HFAuth.logout) without rendering a second nav. -->
@@ -472,6 +472,6 @@ document.getElementById('bBtn').onclick = async () => {
 <!-- Shared shell: injects the unified glass app bar (brandmark + nav + role chip
      + Sign out), applies the saved glass theme, sets the per-page Fire color
      (#ffd54f for crm via data-hf-page). Loaded after the page's own scripts. -->
-<script src="/public/halofire-shell.js?v=11"></script>
+<script src="/public/halofire-shell.js?v=13"></script>
 </body>
 </html>

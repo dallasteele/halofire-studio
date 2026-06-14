@@ -35,7 +35,7 @@
     border-bottom:1px solid var(--line);
     box-shadow:0 1px 0 rgba(255,255,255,0.04) inset, 0 2px 10px rgba(0,0,0,0.4)}
   .brand{display:flex;align-items:baseline;gap:8px;font-weight:700;font-style:italic;font-size:15px;color:var(--bright);letter-spacing:0.2px}
-  .brand span{color:var(--gold)}
+  .brand span{color:var(--hf-fire-color, var(--gold))}
   .brand small{font-style:normal;font-weight:600;font-size:10px;color:var(--muted);letter-spacing:1.4px;text-transform:uppercase;margin-left:6px}
   header .chrome-spacer{flex:1}
   header .right{display:flex;align-items:center;gap:12px;color:var(--muted)}
@@ -44,6 +44,14 @@
   .role-chip{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;color:var(--text);
     background:rgba(14,17,21,0.85);border:1px solid var(--line);box-shadow:var(--shadow-recess);font-size:11px}
   .role-chip .dot{width:6px;height:6px;border-radius:50%;background:var(--ok)}
+  /* consistent app nav in the Studio chrome (matches the shared app bar on other pages) */
+  header .studio-nav{display:flex;align-items:center;gap:2px}
+  header .studio-nav a{display:inline-flex;align-items:center;height:26px;padding:0 9px;border-radius:7px;
+    color:var(--muted);text-decoration:none;font-size:12px;font-weight:600;border:1px solid transparent;
+    transition:background .15s,color .15s;white-space:nowrap}
+  header .studio-nav a:hover{color:var(--bright);background:rgba(255,255,255,0.06)}
+  header .studio-nav a.active{color:var(--bright);background:rgba(var(--hf-accent-rgb,200,154,60),0.16);
+    border-color:rgba(var(--hf-accent-rgb,200,154,60),0.35)}
   /* ---- TOP MENU BAR (single row, full width) ---- */
   #menuChrome{grid-column:1/-1;grid-row:2;position:relative;z-index:110;display:flex;align-items:stretch;min-height:0;overflow:visible;
     padding:0 10px;
@@ -125,8 +133,8 @@
   .note{color:var(--muted);font-size:11px;line-height:1.5}
   h3{font-size:11px;text-transform:uppercase;letter-spacing:1.4px;color:var(--muted);margin:16px 0 8px;font-weight:700}
   /* HF-INSPTABS: tabbed right Inspector (glass tab bar; one panel visible at a time). */
-  #inspTabs{display:flex;gap:1px;margin:-2px 0 12px;border-bottom:1px solid var(--line);overflow-x:auto}
-  #inspTabs button{flex:0 0 auto;background:transparent;border:none;color:var(--muted);font-size:11px;font-weight:700;letter-spacing:.3px;padding:7px 9px;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;font-family:inherit}
+  #inspTabs{display:flex;flex-wrap:wrap;gap:1px 2px;margin:-2px 0 12px;border-bottom:1px solid var(--line)}
+  #inspTabs button{flex:0 1 auto;background:transparent;border:none;color:var(--muted);font-size:11px;font-weight:700;letter-spacing:.2px;padding:7px 8px;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;font-family:inherit}
   #inspTabs button:hover{color:var(--bright)}
   #inspTabs button.on{color:var(--bright);border-bottom-color:var(--gold)}
   .insp-panel{display:none}
@@ -236,7 +244,7 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
 <link rel="stylesheet" href="/public/styles/halofire-tokens.css">
 <!-- Shared glass system: ember background, glass windows, type scale, and the
      Studio banner restyled to match the shared app bar on every other page. -->
-<link rel="stylesheet" href="/public/styles/halofire-glass.css?v=11">
+<link rel="stylesheet" href="/public/styles/halofire-glass.css?v=13">
 <style>
   /* Studio banner -> match the shared app bar (warm glass + Fraunces brandmark + app-bar nav). */
   body.hf #app > header{
@@ -324,9 +332,15 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
     <div class="right">
       <span id="autoLoadBadge">● auto-loaded</span>
       <button id="demoBtn" title="Animate the structure + sprinkler system rising out of the plan">▶ Demo</button>
-      <a class="link" href="/workbench.html?hf=r2">Workbench</a>
-      <span class="role-chip"><span style="color:var(--muted)">Home Depot — Rexburg ID</span></span>
-      <a class="link" href="/settings.html?hf=r2">⚙ Settings</a>
+      <nav class="studio-nav">
+        <a href="/workbench.html?hf=r2">Workbench</a>
+        <a class="active" href="/autosprink.html?hf=r2">Studio</a>
+        <a href="/calendar.html?hf=r2">Calendar</a>
+        <a href="/crm.html?hf=r2">CRM</a>
+        <a href="/reports.html?hf=r2">Reports</a>
+        <a href="/vendors.html?hf=r2">Vendors</a>
+        <a href="/settings.html?hf=r2">Settings</a>
+      </nav>
       <span class="role-chip"><span class="dot"></span> D. Steele · estimator</span>
     </div>
   </header>
@@ -650,6 +664,8 @@ const COLORS = { WALLS: 0x6b7280, WALLS_INT: 0x9aa3b2, COLUMN: 0x8a8f98, FLOOR: 
 // HF-A1-TRUESCALE: TRUE NFPA pipe scale (1) is the only render mode.
 const pipeVizScale = 1; // true NFPA pipe scale — the only render mode
 let renderer, scene, perspCam, orthoCam, camera, controls, ogReady = false;
+let gridHelper = null;       // HF-TOGGLE: Grid 1ft button toggles this helper's visibility
+let orthoLock = true;        // HF-TOGGLE: Ortho button — persistent ortho constraint for draw (no Shift needed)
 const layerGroups = {};
 let modelGroup, currentCadModel = null;
 let planGroup = null, planVisible = true, lastPlanBbox = null; // HF-A1-UNDERLAY ground-plane floor plan
@@ -772,7 +788,7 @@ async function initStudio() {
   controls = new OrbitControls(camera, renderer.domElement);
   scene.add(new THREE.AmbientLight(0xffffff, 0.75));
   const d = new THREE.DirectionalLight(0xffffff, 0.9); d.position.set(300, 600, 400); scene.add(d);
-  scene.add(new THREE.GridHelper(2000, 80, 0x222228, 0x18181c));
+  gridHelper = new THREE.GridHelper(2000, 80, 0x222228, 0x18181c); scene.add(gridHelper); // HF-TOGGLE: kept for Grid button
   planGroup = new THREE.Group(); scene.add(planGroup); // HF-A1-UNDERLAY
   // SELECTION INTERACTION CONTRACT (PRIORITIES.md, UE/AutoCAD-derived):
   // plain click = select ONLY (camera-neutral); F or double-click = frame the
@@ -973,7 +989,9 @@ function addInstancedHeads(worldPts, headSolids) {
   inst.instanceMatrix.needsUpdate = true;
   inst.userData.hfInstanced = { kind: 'head', solids: headSolids || [] }; // HF-A1-SELECT
   layerGroups.HEADS.add(inst);
-  window.__headDebug = { usingPartMesh: !!headPartGeo, source: partsSource, vertsPerHead: geo.attributes.position.count, instances: worldPts.length };
+  window.__headDebug = { usingPartMesh: !!headPartGeo, source: partsSource, vertsPerHead: geo.attributes.position.count, instances: worldPts.length,
+    headHalfH, sampleWorld: worldPts.length ? worldPts[0] : null, samplePlaced: worldPts.length ? [worldPts[0][0], worldPts[0][1]-headHalfH, worldPts[0][2]] : null,
+    bbox: geo.boundingBox ? { min: [geo.boundingBox.min.x, geo.boundingBox.min.y, geo.boundingBox.min.z], max: [geo.boundingBox.max.x, geo.boundingBox.max.y, geo.boundingBox.max.z] } : null };
 }
 
 // Instanced drops (vertical pipe stubs; cylinder default axis is world Y).
@@ -3558,6 +3576,46 @@ $('selBtn').onclick = () => {
   $('selBtn').classList.toggle('on', selectMode);
   if (!selectMode) clearSelection(true);
 };
+// HF-TOGGLE: wire the three toolbar toggles (Snap / Grid / Ortho) to the real
+// engine state (previously dead "display only" buttons with no handler — STUB).
+(function wireViewToggles() {
+  const snapBtn = $('snapToggleBtn'), gridBtn = $('gridToggleBtn'), orthoBtn = $('orthoToggleBtn');
+  // Only these are boolean snap-TYPE flags; gridSize/tolFt are numeric config and
+  // must never be coerced to booleans (that broke snap tolerance — gate evidence).
+  const SNAP_TYPE_KEYS = ['grid', 'endpoint', 'midpoint', 'intersection', 'perpendicular'];
+  let snapTypeMemo = null; // remembers per-type flags across a master off->on
+  if (snapBtn) snapBtn.onclick = () => {
+    const on = !snapBtn.classList.contains('on');
+    snapBtn.classList.toggle('on', on);
+    if (!on) {
+      // master OFF: remember the current per-type flags, then disable all types.
+      snapTypeMemo = {}; for (const k of SNAP_TYPE_KEYS) { snapTypeMemo[k] = snapState[k]; snapState[k] = false; }
+      hideSnapIndicator();
+    } else {
+      // master ON: restore the remembered flags (or sensible defaults first time).
+      const restore = snapTypeMemo || { grid: true, endpoint: true, midpoint: true, intersection: true, perpendicular: false };
+      for (const k of SNAP_TYPE_KEYS) snapState[k] = !!restore[k];
+    }
+    window.__hfSnapState = { ...snapState };
+    $('status').textContent = `object snap ${on ? 'ON' : 'off'}`;
+  };
+  if (gridBtn) gridBtn.onclick = () => {
+    const on = !gridBtn.classList.contains('on');
+    gridBtn.classList.toggle('on', on);
+    if (gridHelper) gridHelper.visible = on;
+    $('status').textContent = `reference grid ${on ? 'ON' : 'off'}`;
+  };
+  if (orthoBtn) orthoBtn.onclick = () => {
+    orthoLock = !orthoLock;
+    orthoBtn.classList.toggle('on', orthoLock);
+    window.__hfOrtho = orthoLock;
+    $('status').textContent = `ortho draw-lock ${orthoLock ? 'ON' : 'off'}`;
+  };
+  // sync initial UI state to engine defaults
+  if (gridBtn && gridHelper) gridBtn.classList.toggle('on', gridHelper.visible);
+  if (orthoBtn) orthoBtn.classList.toggle('on', orthoLock);
+  window.__hfOrtho = orthoLock;
+})();
 $('inspClose').onclick = () => clearSelection(true);
 $('regenBtn').onclick = generate;
 $('genBtn').onclick = generate;
@@ -3710,14 +3768,20 @@ window.addEventListener('keydown', (e) => {
 // plane (snapped). Plain orbit still works when no part is grabbed.
 let moveDrag = null; // { ref, startPlan, lastDelta }
 const groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
-function pointerToPlan(clientX, clientY) {
-  // Raycast the pointer onto the y=baseElevation ground plane, then UNDO the
-  // modelGroup offset (-cx,0,-cy) + W swap to recover plan [x,y].
+function pointerToPlan(clientX, clientY, elev) {
+  // Raycast the pointer onto the HORIZONTAL plane at world-Y = `elev` (the
+  // elevation the preview/snap marker is displayed at), then UNDO the modelGroup
+  // offset (-cx,0,-cy) + W swap to recover plan [x,y]. Using the display
+  // elevation (not y=0) is what keeps the green placement cursor centered on the
+  // mouse: a point recovered at y=0 but DRAWN at y=drawElev re-projects ~10px
+  // above the cursor under an oblique camera (HF cursor-offset fix).
   const r = renderer.domElement.getBoundingClientRect();
   const ndc = new THREE.Vector2(((clientX - r.left) / r.width) * 2 - 1, -((clientY - r.top) / r.height) * 2 + 1);
   raycaster.setFromCamera(ndc, camera);
   const hit = new THREE.Vector3();
-  if (!raycaster.ray.intersectPlane(groundPlane, hit)) return null;
+  const y = (elev === undefined || elev === null) ? 0 : elev;
+  const plane = (y === 0) ? groundPlane : new THREE.Plane(new THREE.Vector3(0, 1, 0), -y);
+  if (!raycaster.ray.intersectPlane(plane, hit)) return null;
   const off = modelGroup ? modelGroup.position : { x: 0, z: 0 };
   // world = modelGroup.pos + W([planX,planY,elev]) = (off.x+planX, elev, off.z+planY)
   return [hit.x - off.x, hit.z - off.z];
@@ -3823,15 +3887,25 @@ function drawPreviewPoint(pPlan, color) {
   const g = new THREE.SphereGeometry(0.5, 12, 8);
   drawPreview = new THREE.Mesh(g, new THREE.MeshBasicMaterial({ color: color || 0x00e676, depthTest: false, transparent: true, opacity: 0.8 }));
   drawPreview.position.copy(planToWorldVec(pPlan, drawElev)); drawPreview.renderOrder = 1100; scene.add(drawPreview);
+  // HF-DBG: expose preview world pos + its screen projection for cursor-alignment verification.
+  try {
+    const wp = drawPreview.position.clone();
+    const ndc = wp.clone().project(camera);
+    const r = renderer.domElement.getBoundingClientRect();
+    window.__drawPreviewDbg = {
+      worldPos: [wp.x, wp.y, wp.z], plan: pPlan, elev: drawElev,
+      screen: [r.left + (ndc.x * 0.5 + 0.5) * r.width, r.top + (-ndc.y * 0.5 + 0.5) * r.height],
+    };
+  } catch (_) {}
 }
 
 // Live preview follows the cursor while a draw tool is active (attached in initEditEngine).
 function attachDrawPreviewListener() {
   renderer.domElement.addEventListener('pointermove', (e) => {
     if (!drawTool || moveDrag) return;
-    const plan = pointerToPlan(e.clientX, e.clientY); if (!plan) return;
+    const plan = pointerToPlan(e.clientX, e.clientY, drawElev); if (!plan) return;
     let target = plan;
-    if (drawPts.length === 1 && e.shiftKey) target = orthoConstrain(drawPts[0], plan); // Shift = ortho lock
+    if (drawPts.length === 1 && (e.shiftKey || orthoLock)) target = orthoConstrain(drawPts[0], plan); // Ortho button or Shift = ortho lock
     const sn = snapPoint(target, segmentsFromModel(currentCadModel), snapState);
     showSnapIndicator(sn);
     if (drawPts.length === 1 && (drawTool === 'pipe' || drawTool === 'wall')) drawPreviewSegment(drawPts[0], sn.p, drawTool === 'wall' ? 0x9aa3b2 : 0x3b82f6);
@@ -3843,9 +3917,9 @@ function attachDrawPreviewListener() {
 // short-circuited here when a draw tool is active (handleCanvasClick is gated by
 // selectMode; draw mode owns clicks while active).
 function drawClick(clientX, clientY, shift) {
-  const plan0 = pointerToPlan(clientX, clientY); if (!plan0) return;
+  const plan0 = pointerToPlan(clientX, clientY, drawElev); if (!plan0) return;
   let target = plan0;
-  if (drawPts.length === 1 && shift && (drawTool === 'pipe' || drawTool === 'wall')) target = orthoConstrain(drawPts[0], plan0);
+  if (drawPts.length === 1 && (shift || orthoLock) && (drawTool === 'pipe' || drawTool === 'wall')) target = orthoConstrain(drawPts[0], plan0);
   const sn = snapPoint(target, segmentsFromModel(currentCadModel), snapState);
   const p = sn.p;
   if (drawTool === 'head') return commitHead(p);
@@ -4126,6 +4200,6 @@ document.querySelectorAll('#viewSeg button').forEach((b) => {
 </script>
 <!-- Shared shell: applies the glass-color theme + light/dark mode + the studio
      Fire color. App bar suppressed (the Studio keeps its own CAD chrome). -->
-<script src="/public/halofire-shell.js?v=11"></script>
+<script src="/public/halofire-shell.js?v=13"></script>
 </body>
 </html>

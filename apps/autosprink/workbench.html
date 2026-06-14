@@ -47,7 +47,7 @@ body{
 }
 
 /* ============ APP FRAME (under the shared app bar) ============ */
-/* The shared app bar (48px, injected by halofire-shell.js?v=11) is sticky at the
+/* The shared app bar (48px, injected by halofire-shell.js?v=13) is sticky at the
    top of <body>; the frame fills the remaining viewport height beneath it. */
 .frame{
   height:calc(100vh - 48px); width:100vw;
@@ -389,10 +389,10 @@ body{
 svg{display:block;}
 </style>
 <link rel="stylesheet" href="/public/styles/halofire-tokens.css">
-<link rel="stylesheet" href="/public/styles/halofire-glass.css?v=11">
+<link rel="stylesheet" href="/public/styles/halofire-glass.css?v=13">
 <style>
 /* Bridge: this page's bespoke card-surface vars become the themeable glass,
-   so the Settings glass-color picker (halofire-shell.js?v=11) recolors it too. */
+   so the Settings glass-color picker (halofire-shell.js?v=13) recolors it too. */
 :root{
   --surface:var(--hf-glass); --surface2:var(--hf-glass-2); --bg:var(--hf-bg);
   --panel:var(--hf-glass); --panel2:var(--hf-glass-2); --panel-raised:var(--hf-glass-raised);
@@ -406,7 +406,7 @@ svg{display:block;}
 <div class="frame">
 
   <!-- Top chrome + left workspace nav removed: the shared HaloFire app bar
-       (injected by /public/halofire-shell.js?v=11) now provides the brandmark,
+       (injected by /public/halofire-shell.js?v=13) now provides the brandmark,
        the 7-link nav, the role chip and Sign out. -->
 
   <!-- MAIN -->
@@ -416,7 +416,7 @@ svg{display:block;}
     <div class="greet">
       <div>
         <h1>Good morning, <span class="accent">Marcus</span></h1>
-        <div class="sub">Friday, June 13 · 7 jobs scheduled · 2 bids awaiting your approval · Phoenix &amp; Tucson crews active</div>
+        <div class="sub" id="greetSub">Loading your day…</div>
       </div>
       <div class="dock-ctl">
         <div class="seg">
@@ -725,6 +725,13 @@ svg{display:block;}
     // KPI strip — real bids out + win rate; honest '—' for crew/inspections (no source).
     var kpis = document.querySelectorAll('.kpi-strip .kpi');
     function setKpi(i, k, v, d) { if (!kpis[i]) return; var kk = kpis[i].querySelector('.k'), vv = kpis[i].querySelector('.v'), dd = kpis[i].querySelector('.d'); if (kk) kk.textContent = k; if (vv) vv.textContent = v; if (dd) { dd.textContent = d; dd.className = 'd'; } }
+    // Greeting subtitle — real date + real bid counts (no fabricated job/crew claims).
+    var subEl = document.getElementById('greetSub');
+    if (subEl) {
+      var today = new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
+      var awaitTxt = awaiting.length + ' bid' + (awaiting.length === 1 ? '' : 's') + ' awaiting your review';
+      subEl.textContent = today + ' · ' + total + ' bids in the pipeline · ' + awaitTxt;
+    }
     setKpi(0, 'Bids out', money(totalVal), total + ' total bids');
     setKpi(1, 'Win rate', decided ? Math.round(won / decided * 100) + '%' : '—', decided ? (won + ' won · ' + lost + ' lost') : 'no decided bids yet');
     setKpi(2, 'Crew utilization', '—', 'no crew data source yet');
@@ -759,6 +766,8 @@ svg{display:block;}
     var ins = cardByTitle('Inspections'); if (ins) { var ic = ins.querySelector('.card-hd .ct'); if (ic) ic.textContent = '—'; ins.querySelector('.card-bd').innerHTML = '<div style="color:var(--muted);padding:14px 4px">No inspection data source connected yet.</div>'; }
     var act = cardByTitle('Activity'); if (act) { act.querySelector('.card-bd').innerHTML = '<div style="color:var(--muted);padding:14px 4px">Activity will appear here as bids and jobs update.</div>'; }
   }).catch(function () {
+    var subEl = document.getElementById('greetSub');
+    if (subEl) subEl.textContent = new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
     var ap = cardByTitle('OpenClaw'); if (ap) ap.querySelector('.card-bd').innerHTML = '<div style="color:var(--muted);padding:14px">Could not load bids.</div>';
   });
 })();
@@ -803,6 +812,6 @@ svg{display:block;}
 </script>
 <!-- Shared HaloFire shell: injects the top app bar, applies the saved glass
      theme, and sets the per-page Fire brandmark color (workbench = paper). -->
-<script src="/public/halofire-shell.js?v=11"></script>
+<script src="/public/halofire-shell.js?v=13"></script>
 </body>
 </html>

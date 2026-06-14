@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HaloFire — Calendar</title>
 <!-- Shared HaloFire apple-glass shell (themeable glass + app bar + brandmark). -->
-<link rel="stylesheet" href="/public/styles/halofire-glass.css?v=11">
+<link rel="stylesheet" href="/public/styles/halofire-glass.css?v=13">
 <style>
   *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
   :root{--bg:#08080a;--surface:#111114;--surface2:#18181c;--fire:#E53935;--gold:#d9a441;--cyan:#4DD0E1;--green:#4ade80;--text:#d4d4d8;--muted:#71717a;--bright:#fafafa;--border:rgba(255,255,255,.08);--font:'Inter Variable','Inter',system-ui,sans-serif;--mono:'JetBrains Mono Variable',ui-monospace,monospace}
@@ -69,6 +69,21 @@
   .agenda-hour.now{background:rgba(229,57,53,.07)}
   .agenda-hour .hr{font-family:var(--mono);font-size:11px;color:var(--muted);padding:8px 12px;border-right:1px solid var(--border);text-align:right}
   .agenda-hour .slot{padding:8px 12px}
+  /* clickable day/event cells + due-date markers */
+  .day{cursor:pointer;transition:border-color .12s,background .12s;display:flex;flex-direction:column}
+  .day:not(.out):hover{border-color:rgba(217,164,65,.5);background:rgba(255,255,255,.04)}
+  .day.has-due{border-color:rgba(217,164,65,.35)}
+  .day .ev{margin-top:auto;font-family:var(--mono);font-size:9px;color:var(--gold);background:rgba(217,164,65,.14);border-radius:4px;padding:1px 4px;line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .week-col{cursor:pointer}
+  .week-col .wk-ev{font-family:var(--mono);font-size:9px;color:var(--gold);background:rgba(217,164,65,.14);border-radius:4px;margin:2px 4px;padding:2px 5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .agenda-hour .slot .ag-ev{font-family:var(--mono);font-size:11px;color:var(--gold);background:rgba(217,164,65,.14);border:1px solid rgba(217,164,65,.3);border-radius:6px;padding:4px 8px;margin-bottom:4px}
+  /* event-detail panel */
+  #eventDetail{margin-top:14px;border-top:1px solid var(--border);padding-top:12px;display:none}
+  #eventDetail.open{display:block}
+  #eventDetail .ed-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+  #eventDetail .ed-date{font-size:14px;font-weight:800;color:var(--bright)}
+  #eventDetail .ed-close{background:var(--surface2)!important;color:var(--muted)!important;border:1px solid var(--border)!important;filter:none!important;padding:3px 9px!important;font-size:11px!important}
+  #eventDetail .ed-empty{font-family:var(--mono);font-size:11px;color:var(--muted)}
 </style>
 <!-- Shared HaloFire design system (AAA tokens + self-hosted fonts). -->
 <link rel="stylesheet" href="/public/styles/halofire-tokens.css">
@@ -76,7 +91,7 @@
 <script src="/public/halofire-auth.js"></script>
 </head>
 <body class="hf hf-shell" data-hf-page="calendar">
-<!-- Top app bar (brandmark + nav + role chip + Sign out) is injected by /public/halofire-shell.js?v=11 -->
+<!-- Top app bar (brandmark + nav + role chip + Sign out) is injected by /public/halofire-shell.js?v=13 -->
 <main>
   <div class="banner"><b>NEEDS VERIFICATION</b> — Calendar core under construction (CAL-1). Dates and lanes below are placeholders, not scheduled work.</div>
 
@@ -98,6 +113,7 @@
       </div>
     </div>
     <div id="calBody"></div>
+    <div id="eventDetail" aria-live="polite"></div>
   </div>
 
   <div class="card">
@@ -110,7 +126,7 @@
 <script>
 (function () {
   'use strict';
-  // Sign out now lives in the shared app bar injected by /public/halofire-shell.js?v=11.
+  // Sign out now lives in the shared app bar injected by /public/halofire-shell.js?v=13.
 
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
@@ -123,8 +139,22 @@
   var MON = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   var view = 'month';
   var cursor = new Date();
+  var ALL_BIDS = [];          // bids fetched from /bids, used to drive event markers + detail
+  var BY_DUE = {};            // 'YYYY-MM-DD' -> [bids due that day]
   function sameDay(a, b) { return a.toDateString() === b.toDateString(); }
   function hourLabel(h) { return (h % 12 || 12) + ':00 ' + (h < 12 ? 'AM' : 'PM'); }
+  function dateKey(d) {
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+  function indexBids(bids) {
+    BY_DUE = {};
+    (bids || []).forEach(function (b) {
+      var k = (b.due_date || '').slice(0, 10);
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(k)) return;
+      (BY_DUE[k] = BY_DUE[k] || []).push(b);
+    });
+  }
+  function eventsFor(d) { return BY_DUE[dateKey(d)] || []; }
 
   function render() {
     var body = document.getElementById('calBody');
@@ -141,7 +171,13 @@
       for (var i = 0; i < 42; i++) {
         var d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
         var out = d.getMonth() !== cursor.getMonth();
-        html += '<div class="day' + (out ? ' out' : '') + (sameDay(d, now) ? ' today' : '') + '"><span class="n">' + d.getDate() + '</span></div>';
+        var evs = eventsFor(d);
+        var marker = evs.length
+          ? '<span class="ev" title="' + esc(evs.length + ' due') + '">' + evs.length + ' due</span>'
+          : '';
+        html += '<div class="day' + (out ? ' out' : '') + (sameDay(d, now) ? ' today' : '') +
+          (evs.length ? ' has-due' : '') + '" data-date="' + dateKey(d) + '">' +
+          '<span class="n">' + d.getDate() + '</span>' + marker + '</div>';
       }
       body.innerHTML = html;
     } else if (view === 'week') {
@@ -156,7 +192,11 @@
       var cols = '';
       for (var c = 0; c < 7; c++) {
         var wd = new Date(ws.getFullYear(), ws.getMonth(), ws.getDate() + c);
-        cols += '<div class="week-col' + (sameDay(wd, now) ? ' today' : '') + '"><div class="week-col-head"><div class="dn">' + DOW[c] + '</div><div class="dd">' + wd.getDate() + '</div></div><div class="week-body">' + hrs + '</div></div>';
+        var wEvs = eventsFor(wd);
+        var wMark = wEvs.map(function (b) {
+          return '<div class="wk-ev" title="' + esc(b.project || ('Bid #' + b.id)) + '">' + esc(b.project || ('Bid #' + b.id)) + '</div>';
+        }).join('');
+        cols += '<div class="week-col' + (sameDay(wd, now) ? ' today' : '') + '" data-date="' + dateKey(wd) + '"><div class="week-col-head"><div class="dn">' + DOW[c] + '</div><div class="dd">' + wd.getDate() + '</div></div><div class="week-body">' + wMark + hrs + '</div></div>';
       }
       body.innerHTML = cols;
     } else {
@@ -164,7 +204,15 @@
       sub.textContent = 'day view';
       body.className = 'day-agenda';
       var isToday = sameDay(cursor, now);
-      var rows = '';
+      var dEvs = eventsFor(cursor);
+      var allDay = dEvs.length
+        ? '<div class="agenda-hour"><div class="hr">Due</div><div class="slot">' +
+            dEvs.map(function (b) {
+              return '<div class="ag-ev">' + esc(b.project || ('Bid #' + b.id)) +
+                ' · <span style="color:var(--muted)">' + esc(b.contractor || '—') + '</span></div>';
+            }).join('') + '</div></div>'
+        : '';
+      var rows = allDay;
       for (var hh = 7; hh <= 18; hh++) {
         rows += '<div class="agenda-hour' + (isToday && now.getHours() === hh ? ' now' : '') + '"><div class="hr">' + hourLabel(hh) + '</div><div class="slot"></div></div>';
       }
@@ -177,6 +225,33 @@
     else cursor = new Date(cursor.getFullYear(), cursor.getMonth(), cursor.getDate() + dir);
     render();
   }
+  function closeDetail() {
+    var ed = document.getElementById('eventDetail');
+    ed.classList.remove('open');
+    ed.innerHTML = '';
+  }
+  function openDetail(key) {
+    var ed = document.getElementById('eventDetail');
+    var parts = key.split('-');
+    var d = new Date(+parts[0], +parts[1] - 1, +parts[2]);
+    var label = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+    var evs = BY_DUE[key] || [];
+    var rows = evs.length
+      ? evs.map(function (b) {
+          return '<div class="lane-item">' +
+            '<div class="proj">' + esc(b.project || ('Bid #' + b.id)) + '</div>' +
+            '<div class="meta">' + esc(b.contractor || '—') +
+              ' · due ' + esc(b.due_date) +
+              ' · <span class="st">' + esc(b.status || 'Pending') + '</span></div>' +
+            '</div>';
+        }).join('')
+      : '<div class="ed-empty">No bids due on this day.</div>';
+    ed.innerHTML =
+      '<div class="ed-head"><div class="ed-date">' + esc(label) + '</div>' +
+      '<button type="button" class="ed-close" id="edClose">Close</button></div>' + rows;
+    ed.classList.add('open');
+    document.getElementById('edClose').onclick = closeDetail;
+  }
   function wireCalendarControls() {
     document.getElementById('prevBtn').onclick = function () { step(-1); };
     document.getElementById('nextBtn').onclick = function () { step(1); };
@@ -186,8 +261,14 @@
       b.onclick = function () {
         view = b.getAttribute('data-view');
         segs.forEach(function (x) { x.classList.toggle('on', x === b); });
+        closeDetail();
         render();
       };
+    });
+    // Clicking any day / week column / agenda cell with a date opens its event detail.
+    document.getElementById('calBody').addEventListener('click', function (e) {
+      var cell = e.target.closest('[data-date]');
+      if (cell) openDetail(cell.getAttribute('data-date'));
     });
   }
 
@@ -219,7 +300,10 @@
   HFAuth.guard().then(function (me) {
     if (!me) return;
     return HFAuth.api('/bids?limit=50').then(function (data) {
-      renderLane(data && data.bids);
+      ALL_BIDS = (data && data.bids) || [];
+      indexBids(ALL_BIDS);
+      render();              // re-render so due-date markers appear in the active view
+      renderLane(ALL_BIDS);
     });
   }).catch(function (err) {
     document.getElementById('lane').innerHTML =
@@ -228,6 +312,6 @@
 })();
 </script>
 <!-- Shared shell: injects the top app bar, applies the saved glass theme, sets the per-page Fire color (gold). -->
-<script src="/public/halofire-shell.js?v=11"></script>
+<script src="/public/halofire-shell.js?v=13"></script>
 </body>
 </html>

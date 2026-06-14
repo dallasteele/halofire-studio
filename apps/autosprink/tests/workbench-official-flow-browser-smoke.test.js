@@ -86,9 +86,7 @@ describe('Workbench official-flow browser smoke', () => {
     const token = await adminToken();
     const page = await browser.newPage({ acceptDownloads: true });
     page.setDefaultTimeout(10_000);
-    await page.addInitScript((authToken) => {
-      localStorage.setItem('halofire_token', authToken);
-    }, token);
+    await page.context().addCookies([{ name: 'halofire_session', value: token, url: BASE }]);
 
     try {
       await page.goto(`${BASE}/workbench.html?project=${encodeURIComponent(PROJECT_NAME)}#officialFlowAttachmentIntake`, {
@@ -149,9 +147,7 @@ describe('Workbench official-flow browser smoke', () => {
     const replayEvidenceId = String(persisted.id);
     const page = await browser.newPage({ acceptDownloads: true });
     page.setDefaultTimeout(10_000);
-    await page.addInitScript((authToken) => {
-      localStorage.setItem('halofire_token', authToken);
-    }, token);
+    await page.context().addCookies([{ name: 'halofire_session', value: token, url: BASE }]);
 
     try {
       await page.goto(`${BASE}/workbench.html?project=${encodeURIComponent(PROJECT_NAME)}#official-flow-replay-review`, {
@@ -217,9 +213,7 @@ describe('Workbench official-flow browser smoke', () => {
     const token = await adminToken();
     const page = await browser.newPage({ acceptDownloads: true });
     page.setDefaultTimeout(10_000);
-    await page.addInitScript((authToken) => {
-      localStorage.setItem('halofire_token', authToken);
-    }, token);
+    await page.context().addCookies([{ name: 'halofire_session', value: token, url: BASE }]);
 
     try {
       await page.goto(`${BASE}/workbench.html?project=${encodeURIComponent(PROJECT_NAME)}#officialFlowAttachmentIntake`, {
@@ -470,9 +464,7 @@ describe('Workbench official-flow browser smoke', () => {
 
     const page = await browser.newPage({ acceptDownloads: true });
     page.setDefaultTimeout(10_000);
-    await page.addInitScript((authToken) => {
-      localStorage.setItem('halofire_token', authToken);
-    }, token);
+    await page.context().addCookies([{ name: 'halofire_session', value: token, url: BASE }]);
 
     try {
       await page.goto(`${BASE}/workbench.html?project=${encodeURIComponent(PROJECT_NAME)}#resolverQueue`, { waitUntil: 'domcontentloaded' });
@@ -697,9 +689,7 @@ describe('Workbench official-flow browser smoke', () => {
 
     const page = await browser.newPage({ acceptDownloads: true });
     page.setDefaultTimeout(10_000);
-    await page.addInitScript((authToken) => {
-      localStorage.setItem('halofire_token', authToken);
-    }, token);
+    await page.context().addCookies([{ name: 'halofire_session', value: token, url: BASE }]);
 
     try {
       await page.goto(`${BASE}/workbench.html?project=${encodeURIComponent(projectName)}#resolverQueue`, { waitUntil: 'domcontentloaded' });

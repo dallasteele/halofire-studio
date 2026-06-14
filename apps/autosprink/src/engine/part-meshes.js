@@ -54,16 +54,20 @@ export const PART_MESH_DISCLAIMER =
 export const PART_KEY_ALIASES = Object.freeze({
   sprinkler_head: 'head_pendent',
   head: 'head_pendent',
-  rigid_coupling: 'grooved_coupling', // one grooved-coupling massing serves both
-  flexible_coupling: 'grooved_coupling', // until distinct rigid/flex models exist
+  // W3: rigid and flexible grooved couplings now have DISTINCT dimensioned
+  // meshes (Victaulic Style 005H rigid vs Style 177 flexible) — visually
+  // different bodies, so the aliases map to their own keys, no longer shared.
+  rigid_coupling: 'grooved_coupling_rigid',
+  flexible_coupling: 'grooved_coupling_flexible',
   coupling: 'fitting_coupling',
   branch_tee: 'fitting_tee',
   tee: 'fitting_tee',
   elbow: 'fitting_elbow_90',
   hanger_ring: 'hanger',
   band_hanger: 'hanger',
-  drop_nipple: null, // no honest generated mesh — primitive fallback
-  escutcheon: null, // no honest generated mesh — primitive fallback
+  // W3: these now have real spec-dimensioned meshes (variant renders).
+  drop_nipple: 'drop_nipple',
+  escutcheon: 'escutcheon',
 });
 
 /** Resolve a Studio part kind or registry key to a canonical registry key (or null). */
@@ -83,16 +87,29 @@ function provenanceFor(requestedKey, key, entry, status) {
   const manufacturerExact = Boolean(
     entry && REAL_PART_SOURCES.has(source) && entry.manufacturerExact === true,
   );
+  // W3: surface whether this mesh is dimensioned to spec, and its dim provenance
+  // (spec-nominal / cutsheet) so the Inspector can show real dimensions + source.
+  const dimensioned = Boolean(entry && entry.dimensioned === true) || (status === 'mesh' && source === 'generated');
+  const dimProvenance =
+    entry && typeof entry.dimProvenance === 'string'
+      ? entry.dimProvenance
+      : dimensioned
+        ? 'spec-nominal'
+        : null;
   return Object.freeze({
     requestedKey: String(requestedKey),
     key: key || null,
     status, // 'mesh' | 'primitive'
     source: status === 'mesh' ? source : 'primitive',
     manufacturerExact,
+    dimensioned,
+    dimProvenance,
     needsVerification: true, // ALWAYS — flag-don't-gate
     note:
       status === 'mesh'
-        ? PART_MESH_DISCLAIMER
+        ? (dimensioned
+            ? `Spec-dimensioned mesh (${dimProvenance}) at true scale — NOT manufacturer-exact; needs-verification.`
+            : PART_MESH_DISCLAIMER)
         : 'No real part mesh available for this part — rendered as a marked primitive. needs-verification.',
   });
 }

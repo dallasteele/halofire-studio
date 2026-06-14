@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta http-equiv="Cache-Control" content="no-store" />
 <title>HaloFire — Vendors</title>
-<link rel="stylesheet" href="/public/styles/halofire-glass.css?v=11" />
+<link rel="stylesheet" href="/public/styles/halofire-glass.css?v=13" />
 <style>
   .wrap{ max-width:1180px; margin:0 auto; padding:22px 24px 80px; }
   .ptitle{ font-family:var(--hf-display); font-size:var(--hf-fs-title); font-weight:600; margin:6px 0 2px; }
@@ -53,10 +53,11 @@
     </section>
   </div>
 
-  <script src="/public/halofire-shell.js?v=11"></script>
+  <script src="/public/halofire-shell.js?v=13"></script>
   <script>
     // Real pricebook rollup (the one thing we can show honestly today).
-    fetch('/api/pricebook?limit=5000', { credentials: 'include' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+    function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+    fetch('/api/pricebook?limit=100000', { credentials: 'include' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
       var items = (d && (d.items || d.pricebook || d)) || [];
       if (!Array.isArray(items)) items = [];
       var bySup = {};
@@ -67,7 +68,7 @@
       document.getElementById('kLinesD').textContent = items.length ? 'across ' + sups.length + ' suppliers' : 'no pricebook data';
       var vl = document.getElementById('vlist');
       vl.innerHTML = sups.length ? sups.map(function (s) {
-        return '<div class="vrow"><span class="nm">' + s + '</span><span class="mt">' + bySup[s].toLocaleString() + ' price lines</span></div>';
+        return '<div class="vrow"><span class="nm">' + esc(s) + '</span><span class="mt">' + bySup[s].toLocaleString() + ' price lines</span></div>';
       }).join('') : '<div class="note">No pricebook data connected yet.</div>';
     }).catch(function () {
       var vl = document.getElementById('vlist'); if (vl) vl.innerHTML = '<div class="note">Could not load the pricebook.</div>';

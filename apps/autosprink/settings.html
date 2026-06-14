@@ -41,7 +41,7 @@
 <style id="hf-glass-override">:root{--bg:#0b0d10;--surface:rgba(22,26,32,0.72);--surface2:rgba(12,15,19,0.82);--gold:#d9a441;--gold-bright:#f0bd5a;--cyan:#5aa9e6;--green:#54b67a;--text:#e8ecf2;--muted:#9aa4b2;--bright:#fafafa;--border:rgba(255,255,255,.08)}</style>
 <!-- Themeable glass system: bridge the legacy surfaces to the user's chosen glass
      so the Settings > Appearance picker recolors this page (and the whole app) live. -->
-<link rel="stylesheet" href="/public/styles/halofire-glass.css?v=11">
+<link rel="stylesheet" href="/public/styles/halofire-glass.css?v=13">
 <style>:root{--surface:var(--hf-glass);--surface2:var(--hf-glass-2);--bg:var(--hf-bg)}</style>
 <!-- Shared cookie-session auth guard (HFAuth). Loaded as a classic script so
      window.HFAuth exists before any module script runs. -->
@@ -62,7 +62,15 @@
     <div id="hfSwatches" style="display:flex;flex-wrap:wrap;gap:12px;margin-top:4px"></div>
     <p class="muted" style="margin:18px 0 8px"><b style="color:var(--text)">Ember background</b> — the static ember image's glow color, set independently of the glass.</p>
     <div id="hfEmberSwatches" style="display:flex;flex-wrap:wrap;gap:12px;margin-top:4px"></div>
-    <p class="muted" style="margin-top:12px;font-size:11px">Both apply live across the whole app and are remembered for you.</p>
+    <div style="display:flex;align-items:center;gap:14px;margin-top:16px">
+      <span class="muted" style="min-width:80px">Embers</span>
+      <div id="hfEmberMotionToggle" style="display:inline-flex;border:1px solid var(--hf-line,rgba(255,255,255,.12));border-radius:8px;overflow:hidden">
+        <button type="button" data-motion="off" style="all:unset;cursor:pointer;padding:7px 16px;font-size:12px;font-weight:600">Static</button>
+        <button type="button" data-motion="on" style="all:unset;cursor:pointer;padding:7px 16px;font-size:12px;font-weight:600">Moving</button>
+      </div>
+      <span class="muted" style="font-size:11px">Slow drift · automatically off under reduced-motion</span>
+    </div>
+    <p class="muted" style="margin-top:12px;font-size:11px">All apply live across the whole app and are remembered for you.</p>
   </div>
   <div class="card wide">
     <h2>AutoSprink Parity</h2>
@@ -277,7 +285,7 @@ const HALOFIRE_API_BASE = HALOFIRE_BASE_PATH + ['', 'api'].join('/');
 // 'halofire_token' gate is GONE — cookie logins never set that key, so it
 // falsely bounced signed-in users back to the login page.
 const $ = (id) => document.getElementById(id);
-// Sign-out now lives in the shared app bar (halofire-shell.js?v=11). Guard the legacy
+// Sign-out now lives in the shared app bar (halofire-shell.js?v=13). Guard the legacy
 // hook so it never throws if the bespoke #logout element is absent.
 const _logoutEl = $('logout');
 if (_logoutEl) _logoutEl.onclick = () => { HFAuth.logout(); };
@@ -1823,7 +1831,7 @@ $('attSubmit').onclick = async () => {
 
 loadParity(); loadDocs(); loadDeps(); loadIntake(); initWizard(); loadLibrary(); loadSettingsCatalogSourceAcquisition(); loadSettingsResolvedSignedReviewerGates(); loadSettingsSam31ActualValueWorkItems(); loadSettingsRoomBoundaryFloorPlanOverrides();
 </script>
-<script src="/public/halofire-shell.js?v=11"></script>
+<script src="/public/halofire-shell.js?v=13"></script>
 <script>
   // Settings > Appearance: two INDEPENDENT pickers (glass tint + ember background)
   // plus the light/dark mode toggle. Uses the shared HFTheme API.
@@ -1888,6 +1896,22 @@ loadParity(); loadDocs(); loadDeps(); loadIntake(); initWizard(); loadLibrary();
       paint(HFTheme.getMode());
       [].forEach.call(mt.querySelectorAll('button'), function (b) {
         b.onclick = function () { var m = b.getAttribute('data-mode'); HFTheme.setMode(m); paint(m); };
+      });
+    }
+
+    // ---- Floating embers: Static / Moving toggle ----
+    var et = document.getElementById('hfEmberMotionToggle');
+    if (et && HFTheme.getEmberMotion) {
+      var paintE = function (v) {
+        [].forEach.call(et.querySelectorAll('button'), function (b) {
+          var on = b.getAttribute('data-motion') === v;
+          b.style.background = on ? 'rgba(var(--hf-accent-rgb,200,154,60),0.22)' : 'transparent';
+          b.style.color = on ? 'var(--hf-text,#fff)' : 'var(--hf-muted,#9aa)';
+        });
+      };
+      paintE(HFTheme.getEmberMotion());
+      [].forEach.call(et.querySelectorAll('button'), function (b) {
+        b.onclick = function () { var v = b.getAttribute('data-motion'); HFTheme.setEmberMotion(v); paintE(v); };
       });
     }
   })();

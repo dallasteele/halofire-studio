@@ -13,12 +13,20 @@ const PROJECT_NAME = 'Home Depot - Rexburg ID';
 const PROJECT_PATH = `/api/projects/${encodeURIComponent(PROJECT_NAME)}`;
 
 let server;
+let serverExited = false;
 let tempDir;
 let browser;
 
 async function waitForHealth() {
   const started = Date.now();
   while (Date.now() - started < 8000) {
+    // Fail fast if our spawned server died (e.g. EADDRINUSE from a stale
+    // orphaned server.js still squatting on the port). Without this check a
+    // stale listener answers /api/health and silently poisons every test
+    // with its old code + old DB, producing misleading locator timeouts.
+    if (serverExited) {
+      throw new Error(`spawned server exited early — is a stale process already listening on port ${PORT}?`);
+    }
     try {
       const res = await fetch(`${BASE}/api/health`);
       if (res.ok) return;
@@ -68,6 +76,8 @@ beforeAll(async () => {
     },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
+  serverExited = false;
+  server.once('exit', () => { serverExited = true; });
   await waitForHealth();
   browser = await chromium.launch({ headless: true });
 });
@@ -86,9 +96,7 @@ describe('Settings signed reviewer browser smoke', () => {
     const token = await adminToken();
     const page = await browser.newPage();
     page.setDefaultTimeout(8000);
-    await page.addInitScript((authToken) => {
-      localStorage.setItem('halofire_token', authToken);
-    }, token);
+    await page.context().addCookies([{ name: 'halofire_session', value: token, url: BASE }]);
     try {
       await page.goto(`${BASE}/workbench.html`, { waitUntil: 'domcontentloaded' });
       const blockedGateButton = page.locator('[data-claim-gate-signed-reviewer-workflow="PROFESSIONAL_REVIEW_MISSING"]').first();
@@ -146,9 +154,7 @@ describe('Settings signed reviewer browser smoke', () => {
 
     const page = await browser.newPage();
     page.setDefaultTimeout(8000);
-    await page.addInitScript((authToken) => {
-      localStorage.setItem('halofire_token', authToken);
-    }, token);
+    await page.context().addCookies([{ name: 'halofire_session', value: token, url: BASE }]);
     try {
       await page.goto(`${BASE}/workbench.html`, { waitUntil: 'domcontentloaded' });
       await page.getByText('Signed reviewer packet browser-smoke PR-1881-100').waitFor();
@@ -195,9 +201,7 @@ describe('Settings signed reviewer browser smoke', () => {
 
     const page = await browser.newPage();
     page.setDefaultTimeout(8000);
-    await page.addInitScript((authToken) => {
-      localStorage.setItem('halofire_token', authToken);
-    }, token);
+    await page.context().addCookies([{ name: 'halofire_session', value: token, url: BASE }]);
 
     try {
       await page.goto(`${BASE}/workbench.html?project=${encodeURIComponent(projectName)}`, { waitUntil: 'domcontentloaded' });
@@ -274,9 +278,7 @@ describe('Settings signed reviewer browser smoke', () => {
 
     const page = await browser.newPage();
     page.setDefaultTimeout(8000);
-    await page.addInitScript((authToken) => {
-      localStorage.setItem('halofire_token', authToken);
-    }, token);
+    await page.context().addCookies([{ name: 'halofire_session', value: token, url: BASE }]);
 
     try {
       await page.goto(`${BASE}/workbench.html?project=${encodeURIComponent(projectName)}`, { waitUntil: 'domcontentloaded' });
@@ -370,9 +372,7 @@ describe('Settings signed reviewer browser smoke', () => {
 
     const page = await browser.newPage();
     page.setDefaultTimeout(8000);
-    await page.addInitScript((authToken) => {
-      localStorage.setItem('halofire_token', authToken);
-    }, token);
+    await page.context().addCookies([{ name: 'halofire_session', value: token, url: BASE }]);
 
     try {
       await page.goto(`${BASE}/workbench.html?project=${encodeURIComponent(projectName)}`, { waitUntil: 'domcontentloaded' });
@@ -496,9 +496,7 @@ describe('Settings signed reviewer browser smoke', () => {
 
     const page = await browser.newPage();
     page.setDefaultTimeout(8000);
-    await page.addInitScript((authToken) => {
-      localStorage.setItem('halofire_token', authToken);
-    }, token);
+    await page.context().addCookies([{ name: 'halofire_session', value: token, url: BASE }]);
 
     try {
       await page.goto(
@@ -614,9 +612,7 @@ describe('Settings signed reviewer browser smoke', () => {
 
     const page = await browser.newPage();
     page.setDefaultTimeout(8000);
-    await page.addInitScript((authToken) => {
-      localStorage.setItem('halofire_token', authToken);
-    }, token);
+    await page.context().addCookies([{ name: 'halofire_session', value: token, url: BASE }]);
 
     try {
       await page.goto(
@@ -742,9 +738,7 @@ describe('Settings signed reviewer browser smoke', () => {
 
     const page = await browser.newPage();
     page.setDefaultTimeout(8000);
-    await page.addInitScript((authToken) => {
-      localStorage.setItem('halofire_token', authToken);
-    }, token);
+    await page.context().addCookies([{ name: 'halofire_session', value: token, url: BASE }]);
 
     try {
       await page.goto(
@@ -849,9 +843,7 @@ describe('Settings signed reviewer browser smoke', () => {
 
     const page = await browser.newPage();
     page.setDefaultTimeout(8000);
-    await page.addInitScript((authToken) => {
-      localStorage.setItem('halofire_token', authToken);
-    }, token);
+    await page.context().addCookies([{ name: 'halofire_session', value: token, url: BASE }]);
 
     try {
       await page.goto(`${BASE}/settings.html`, { waitUntil: 'domcontentloaded' });
@@ -949,9 +941,7 @@ describe('Settings signed reviewer browser smoke', () => {
     const projectPath = PROJECT_PATH;
     const page = await browser.newPage({ acceptDownloads: true });
     page.setDefaultTimeout(8000);
-    await page.addInitScript((authToken) => {
-      localStorage.setItem('halofire_token', authToken);
-    }, token);
+    await page.context().addCookies([{ name: 'halofire_session', value: token, url: BASE }]);
 
     try {
       await page.goto(`${BASE}/settings.html`, { waitUntil: 'domcontentloaded' });

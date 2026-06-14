@@ -89,9 +89,7 @@ describe('Workbench catalog source browser smoke', () => {
     const token = await adminToken();
     const page = await browser.newPage();
     page.setDefaultTimeout(8000);
-    await page.addInitScript((authToken) => {
-      localStorage.setItem('halofire_token', authToken);
-    }, token);
+    await page.context().addCookies([{ name: 'halofire_session', value: token, url: BASE }]);
 
     try {
       await page.goto(`${BASE}/workbench.html?project=${encodeURIComponent(DISPOSABLE_PROJECT_NAME)}#catalogSourceAcquisition`, {
@@ -136,9 +134,7 @@ describe('Workbench catalog source browser smoke', () => {
     const token = await adminToken();
     const page = await browser.newPage();
     page.setDefaultTimeout(8000);
-    await page.addInitScript((authToken) => {
-      localStorage.setItem('halofire_token', authToken);
-    }, token);
+    await page.context().addCookies([{ name: 'halofire_session', value: token, url: BASE }]);
 
     try {
       await page.goto(`${BASE}/workbench.html?project=${encodeURIComponent(PROJECT_NAME)}#catalogSourceAcquisition`, {
@@ -213,9 +209,7 @@ describe('Workbench catalog source browser smoke', () => {
     const token = await adminToken();
     const page = await browser.newPage();
     page.setDefaultTimeout(8000);
-    await page.addInitScript((authToken) => {
-      localStorage.setItem('halofire_token', authToken);
-    }, token);
+    await page.context().addCookies([{ name: 'halofire_session', value: token, url: BASE }]);
 
     try {
       await page.goto(`${BASE}/workbench.html?project=${encodeURIComponent(PROJECT_NAME)}#catalogSourceAcquisition`, {

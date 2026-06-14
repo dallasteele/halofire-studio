@@ -211,9 +211,7 @@ describe('Workbench SAM31 saved consumer intake smoke browser controls', () => {
 
     const page = await browser.newPage();
     page.setDefaultTimeout(10_000);
-    await page.addInitScript((authToken) => {
-      localStorage.setItem('halofire_token', authToken);
-    }, token);
+    await page.context().addCookies([{ name: 'halofire_session', value: token, url: BASE }]);
     try {
       await page.goto(`${BASE}/workbench.html`, { waitUntil: 'domcontentloaded' });
       await page.selectOption('#projectTarget', PROJECT_NAME);
@@ -267,9 +265,7 @@ describe('Workbench SAM31 saved consumer intake smoke browser controls', () => {
 
     const page = await browser.newPage();
     page.setDefaultTimeout(10_000);
-    await page.addInitScript((authToken) => {
-      localStorage.setItem('halofire_token', authToken);
-    }, token);
+    await page.context().addCookies([{ name: 'halofire_session', value: token, url: BASE }]);
     try {
       await page.goto(`${BASE}/workbench.html`, { waitUntil: 'domcontentloaded' });
       await page.selectOption('#projectTarget', PROJECT_NAME);

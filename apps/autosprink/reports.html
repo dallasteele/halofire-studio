@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta http-equiv="Cache-Control" content="no-store" />
 <title>HaloFire — Reports</title>
-<link rel="stylesheet" href="/public/styles/halofire-glass.css?v=11" />
+<link rel="stylesheet" href="/public/styles/halofire-glass.css?v=13" />
 <style>
   .wrap{ max-width:1180px; margin:0 auto; padding:22px 24px 80px; }
   .ptitle{ font-family:var(--hf-display); font-size:24px; font-weight:700; margin:6px 0 2px; }
@@ -53,7 +53,7 @@
     </div>
   </div>
 
-  <script src="/public/halofire-shell.js?v=11"></script>
+  <script src="/public/halofire-shell.js?v=13"></script>
   <script>
     // real bid KPIs (win-rate/pipeline are the only trustworthy metrics today)
     fetch('/api/bids?limit=3000', { credentials: 'include' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {

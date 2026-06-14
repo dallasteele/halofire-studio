@@ -86,9 +86,7 @@ describe('Workbench supplied bid-truth browser smoke', () => {
     const token = await adminToken();
     const page = await browser.newPage({ acceptDownloads: true });
     page.setDefaultTimeout(12000);
-    await page.addInitScript((authToken) => {
-      localStorage.setItem('halofire_token', authToken);
-    }, token);
+    await page.context().addCookies([{ name: 'halofire_session', value: token, url: BASE }]);
 
     try {
       await page.goto(`${BASE}/workbench.html`, { waitUntil: 'domcontentloaded' });
@@ -227,9 +225,7 @@ describe('Workbench supplied bid-truth browser smoke', () => {
 
     const page = await browser.newPage({ acceptDownloads: true });
     page.setDefaultTimeout(12000);
-    await page.addInitScript((authToken) => {
-      localStorage.setItem('halofire_token', authToken);
-    }, token);
+    await page.context().addCookies([{ name: 'halofire_session', value: token, url: BASE }]);
 
     try {
       await page.goto(`${BASE}/workbench.html`, { waitUntil: 'domcontentloaded' });
@@ -895,9 +891,7 @@ describe('Workbench supplied bid-truth browser smoke', () => {
 
     const page = await browser.newPage({ acceptDownloads: true });
     page.setDefaultTimeout(12000);
-    await page.addInitScript((authToken) => {
-      localStorage.setItem('halofire_token', authToken);
-    }, token);
+    await page.context().addCookies([{ name: 'halofire_session', value: token, url: BASE }]);
 
     try {
       await page.goto(`${BASE}/workbench.html`, { waitUntil: 'domcontentloaded' });

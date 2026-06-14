@@ -3,8 +3,12 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { buildPartManifest } from '../src/components/part-mesh.js';
+import { buildPartManifest, PART_VARIANT_COUNT } from '../src/components/part-mesh.js';
 import { COMPONENTS } from '../src/components/registry.js';
+
+// Total manifest rows = one per registry component + the extra DIMENSIONED
+// variant renders (rigid/flexible grooved couplings, escutcheon, drop nipple).
+const TOTAL_ROWS = COMPONENTS.length + PART_VARIANT_COUNT;
 
 // R1 part-mesh pipeline: generated-modelable parts render to real STL (via an
 // injected mock runner), non-generatable parts stay 'missing', and the
@@ -35,8 +39,8 @@ describe('R1 buildPartManifest', () => {
     const manifest = await buildPartManifest({ scadRunner: mockRunner });
 
     const byKey = new Map(manifest.components.map((e) => [e.key, e]));
-    // every registry component is represented
-    expect(manifest.components.length).toBe(COMPONENTS.length);
+    // every registry component is represented, plus the variant renders
+    expect(manifest.components.length).toBe(TOTAL_ROWS);
 
     for (const head of ['head_pendent', 'head_upright', 'head_esfr']) {
       const e = byKey.get(head);
@@ -73,17 +77,19 @@ describe('R1 buildPartManifest', () => {
     // gate stays blocked because required non-generatable parts remain missing
     expect(manifest.parityGateStatus).toBe('blocked');
 
-    const expectedGenerated = COMPONENTS.filter(isGeneratable).length;
+    // generated = generatable registry components + all variant renders (they
+    // all render under the mock runner).
+    const expectedGenerated = COMPONENTS.filter(isGeneratable).length + PART_VARIANT_COUNT;
     expect(manifest.generatedCount).toBe(expectedGenerated);
-    expect(manifest.missingCount).toBe(COMPONENTS.length - expectedGenerated);
-    expect(manifest.generatedCount + manifest.missingCount).toBe(COMPONENTS.length);
+    expect(manifest.missingCount).toBe(TOTAL_ROWS - expectedGenerated);
+    expect(manifest.generatedCount + manifest.missingCount).toBe(TOTAL_ROWS);
   });
 
   it('with NO runner, everything is missing and no entry claims a file/present', async () => {
     const manifest = await buildPartManifest({});
 
     expect(manifest.generatedCount).toBe(0);
-    expect(manifest.missingCount).toBe(COMPONENTS.length);
+    expect(manifest.missingCount).toBe(TOTAL_ROWS);
     expect(manifest.parityGateStatus).toBe('blocked');
     expect(manifest.manufacturerExactCount).toBe(0);
     for (const e of manifest.components) {
@@ -97,7 +103,7 @@ describe('R1 buildPartManifest', () => {
     const throwingRunner = async () => { throw new Error('boom'); };
     const manifest = await buildPartManifest({ scadRunner: throwingRunner });
     expect(manifest.generatedCount).toBe(0);
-    expect(manifest.missingCount).toBe(COMPONENTS.length);
+    expect(manifest.missingCount).toBe(TOTAL_ROWS);
     expect(manifest.components.every((e) => e.present === false && e.file === null)).toBe(true);
   });
 
@@ -105,7 +111,7 @@ describe('R1 buildPartManifest', () => {
     const emptyRunner = async () => ({ stl: '' });
     const manifest = await buildPartManifest({ scadRunner: emptyRunner });
     expect(manifest.generatedCount).toBe(0);
-    expect(manifest.missingCount).toBe(COMPONENTS.length);
+    expect(manifest.missingCount).toBe(TOTAL_ROWS);
   });
 
   it('write:true + temp outDir writes <key>.stl for generated entries only', async () => {
