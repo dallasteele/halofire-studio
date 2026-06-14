@@ -230,6 +230,10 @@ img{user-select:none;-webkit-user-drag:none}
 .field input:hover{border-color:rgba(255,255,255,0.26)}
 .field input:focus{border-color:rgba(232,67,45,0.72);box-shadow:0 0 0 3px rgba(232,67,45,0.15),inset 0 1px 0 rgba(255,255,255,0.16)}
 .field input::placeholder{color:#777}
+.pass-wrap{position:relative;display:block}
+.pass-wrap input{padding-right:64px}
+.pass-toggle{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:transparent;border:0;color:rgba(242,236,224,0.6);font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:0.07em;cursor:pointer;padding:6px 8px;border-radius:6px}
+.pass-toggle:hover{color:var(--paper);background:rgba(255,255,255,0.06)}
 .login-remember{display:flex;align-items:center;gap:9px;color:rgba(242,236,224,0.66);font-size:11px;margin:7px 0 18px;cursor:pointer}
 .login-remember input{accent-color:var(--halo-yellow)}
 .login-actions{display:flex;justify-content:flex-end;margin:-5px 0 17px}
@@ -385,7 +389,7 @@ body.hf-shell .field input{
       </div>
       <form id="form" method="post" action="#" novalidate>
         <div class="field"><label for="user">Email or username</label><input type="email" id="user" name="username" placeholder="name@company.com" autocomplete="username"></div>
-        <div class="field" id="passField"><label for="pass">Password</label><input type="password" id="pass" name="password" placeholder="Password" autocomplete="current-password"></div>
+        <div class="field" id="passField"><label for="pass">Password</label><div class="pass-wrap"><input type="password" id="pass" name="password" placeholder="Password" autocomplete="current-password"><button type="button" id="passToggle" class="pass-toggle" aria-label="Show password" tabindex="-1">Show</button></div></div>
         <div class="field" id="confirmPassField" hidden><label for="confirmPass">Confirm password</label><input type="password" id="confirmPass" name="confirm-password" placeholder="Confirm password" autocomplete="new-password"></div>
         <p class="login-note" id="passwordHelp">Apple can generate and save this password for future HaloFire sign-ins.</p>
         <label class="login-remember" id="rememberRow"><input type="checkbox" id="remember" checked> Keep me signed in</label>
@@ -1365,6 +1369,13 @@ if(params.get('recover')){
 }
 
 let redirecting = false;
+const passToggle=document.getElementById('passToggle');
+if(passToggle)passToggle.addEventListener('click',()=>{
+  const show=passInput.type==='password';
+  passInput.type=show?'text':'password';
+  passToggle.textContent=show?'Hide':'Show';
+  passToggle.setAttribute('aria-label',show?'Hide password':'Show password');
+});
 form.onsubmit=async e=>{
   e.preventDefault();
   clearMessages();
@@ -1423,6 +1434,16 @@ form.onsubmit=async e=>{
     if(!res.ok)throw new Error('bad credentials');
     const data=await res.json();
     acceptCookieSession(data);
+    // Offer to save the password. The JS fetch + redirect login bypasses the
+    // browser's native form-submit save heuristic, so ask explicitly via the
+    // Credential Management API (Chrome/Edge/iCloud-on-Windows honor this).
+    try {
+      if (window.PasswordCredential && navigator.credentials && navigator.credentials.store) {
+        await navigator.credentials.store(new window.PasswordCredential({
+          id: userInput.value.trim(), name: userInput.value.trim(), password: passInput.value,
+        }));
+      }
+    } catch (_) { /* non-fatal — never block sign-in on the save prompt */ }
     redirecting = true;
     window.location.href=safePostLoginRedirect();
   }catch(error){
