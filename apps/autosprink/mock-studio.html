@@ -1,0 +1,676 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>HaloFire Studio — AutoSprink</title>
+<style>
+:root{
+  /* Base surfaces */
+  --bg:#0b0d10;
+  --panel:rgba(22,26,32,0.72);
+  --panel2:rgba(14,17,21,0.85);
+  --panel-raised:rgba(30,35,42,0.78);
+  /* Text */
+  --text:#e8ecf2; --muted:#9aa4b2; --faint:#5d6675;
+  /* Borders / hairlines */
+  --line:rgba(255,255,255,0.08);
+  --line-strong:rgba(255,255,255,0.14);
+  --line-inset:rgba(0,0,0,0.40);
+  /* Accent */
+  --gold:#d9a441; --gold-bright:#f0bd5a; --gold-dim:rgba(217,164,65,0.18);
+  /* Status */
+  --ok:#54b67a; --warn:#d9a441; --crit:#d9534f; --info:#5aa9e6;
+  --select:#4ea1ff;
+  /* Radii / spacing */
+  --r-control:7px; --r-panel:12px;
+  --s1:4px; --s2:6px; --s3:8px; --s4:10px; --s5:12px; --s6:16px; --s7:24px;
+  /* Glass blur + elevation */
+  --blur-panel:blur(18px) saturate(1.2);
+  --blur-overlay:blur(28px) saturate(1.3);
+  --shadow-panel:0 1px 0 var(--line) inset, 0 8px 24px rgba(0,0,0,0.35);
+  --shadow-overlay:0 1px 0 var(--line) inset, 0 16px 48px rgba(0,0,0,0.50);
+  --shadow-recess:0 1px 0 var(--line-inset) inset, 0 -1px 0 rgba(255,255,255,0.03) inset;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{height:100%;}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  font-size:12px; color:var(--text); background:var(--bg);
+  /* Ambient gradient so glass has something to refract */
+  background:
+    radial-gradient(1200px 700px at 70% -10%, rgba(217,164,65,0.06), transparent 60%),
+    radial-gradient(900px 600px at 15% 110%, rgba(90,169,230,0.05), transparent 55%),
+    var(--bg);
+  overflow:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ====== APP FRAME (fixed 100vh, never page-scrolls) ====== */
+.app{
+  height:100vh; width:100vw;
+  display:grid;
+  grid-template-rows:40px 32px 38px 1fr 28px;
+  grid-template-areas:
+    "chrome"
+    "menubar"
+    "toolbar"
+    "body"
+    "statusbar";
+}
+
+/* ---- TOP CHROME (z=100) ---- */
+.chrome{
+  grid-area:chrome; z-index:100;
+  display:flex; align-items:center; gap:var(--s6);
+  padding:0 var(--s6);
+  background:linear-gradient(180deg, rgba(28,33,40,0.85), rgba(16,19,24,0.92));
+  backdrop-filter:var(--blur-panel);
+  border-bottom:1px solid var(--line);
+  box-shadow:0 1px 0 rgba(255,255,255,0.04) inset, 0 2px 10px rgba(0,0,0,0.4);
+}
+.brand{display:flex; align-items:baseline; gap:8px; font-weight:600; letter-spacing:0.2px;}
+.brand .mark{font-size:14px; font-style:italic; font-weight:700;}
+.brand .mark b{color:var(--gold);}
+.brand .sub{color:var(--muted); font-size:10px; letter-spacing:1.4px; text-transform:uppercase;}
+.chrome .spacer{flex:1;}
+.parity-badge{
+  font-size:9.5px; letter-spacing:0.6px; text-transform:uppercase;
+  color:var(--gold); padding:3px 10px; border-radius:999px;
+  background:var(--gold-dim); border:1px solid rgba(217,164,65,0.35);
+}
+.chrome-right{display:flex; align-items:center; gap:var(--s5); color:var(--muted);}
+.chrome-right a{color:var(--muted); text-decoration:none; padding:4px 8px; border-radius:var(--r-control);}
+.chrome-right a:hover{color:var(--text); background:rgba(255,255,255,0.05);}
+.role-chip{
+  display:inline-flex; align-items:center; gap:6px;
+  padding:3px 10px; border-radius:999px; color:var(--text);
+  background:var(--panel2); border:1px solid var(--line); box-shadow:var(--shadow-recess);
+}
+.role-chip .dot{width:6px; height:6px; border-radius:50%; background:var(--ok);}
+
+/* ---- MENU BAR (z=110, single row, width:100%) ---- */
+.menubar{
+  grid-area:menubar; z-index:110;
+  display:flex; align-items:stretch;
+  width:100%;
+  padding:0 var(--s4);
+  background:linear-gradient(180deg, rgba(24,28,34,0.78), rgba(15,18,23,0.85));
+  backdrop-filter:var(--blur-panel);
+  border-bottom:1px solid var(--line);
+  overflow-x:hidden; white-space:nowrap;
+}
+.menubar .menu-scroll{display:flex; align-items:stretch; gap:0; overflow:hidden;}
+.menu-item{
+  display:flex; align-items:center; padding:0 9px; height:100%;
+  color:var(--text); cursor:default; user-select:none; border-radius:var(--r-control);
+  position:relative;
+}
+.menu-item:hover{background:rgba(255,255,255,0.05);}
+.menu-item.open{background:var(--gold-dim); color:var(--gold-bright);}
+.menu-item u{text-decoration:none; border-bottom:1px solid transparent;}
+
+/* open dropdown (overlay z=1000) */
+.dropdown{
+  position:absolute; top:32px; left:0; min-width:228px; z-index:1000;
+  padding:6px;
+  background:var(--panel-raised); backdrop-filter:var(--blur-overlay);
+  border:1px solid var(--line-strong); border-radius:10px; box-shadow:var(--shadow-overlay);
+}
+.dropdown .row{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:6px 10px; border-radius:var(--r-control); color:var(--text); gap:18px;
+}
+.dropdown .row:hover{background:var(--gold-dim); box-shadow:inset 2px 0 0 var(--gold);}
+.dropdown .row .kbd{color:var(--faint); font-size:10px;}
+.dropdown .row.soon{color:var(--faint);}
+.dropdown .row.soon .tag{font-size:9px; color:var(--muted); border:1px solid var(--line); padding:1px 5px; border-radius:6px;}
+.dropdown .sep{height:1px; background:var(--line); margin:5px 6px;}
+
+/* ---- TOOLBAR (z=20, icon row) ---- */
+.toolbar{
+  grid-area:toolbar; z-index:20;
+  display:flex; align-items:center; gap:var(--s2);
+  padding:0 var(--s4);
+  background:linear-gradient(180deg, rgba(20,24,30,0.7), rgba(13,16,20,0.82));
+  backdrop-filter:var(--blur-panel);
+  border-bottom:1px solid var(--line);
+}
+.tool-group{display:flex; align-items:center; gap:3px;}
+.tool-sep{width:1px; height:20px; background:var(--line); margin:0 var(--s3);}
+.tbtn{
+  display:inline-flex; align-items:center; justify-content:center; gap:6px;
+  height:26px; min-width:28px; padding:0 7px;
+  border-radius:var(--r-control); color:var(--muted);
+  background:transparent; border:1px solid transparent; cursor:default;
+}
+.tbtn svg{width:15px; height:15px; display:block;}
+.tbtn:hover{color:var(--text); background:rgba(255,255,255,0.05); border-color:var(--line);}
+.tbtn.active{color:var(--gold-bright); background:var(--gold-dim); border-color:rgba(217,164,65,0.35);}
+.tbtn.toggle.on{color:var(--info); background:rgba(90,169,230,0.14); border-color:rgba(90,169,230,0.3);}
+.tbtn .lbl{font-size:11px;}
+.toolbar .spacer{flex:1;}
+.readout{display:flex; gap:14px; color:var(--faint); font-variant-numeric:tabular-nums; font-size:11px;}
+.readout b{color:var(--muted); font-weight:600;}
+
+/* ---- BODY GRID (left dock | viewport | right dock) ---- */
+.body{
+  grid-area:body; position:relative;
+  display:grid;
+  grid-template-columns:248px 1fr 288px;
+  min-height:0;
+}
+
+/* dock columns */
+.dock{
+  z-index:10; min-height:0;
+  display:flex; flex-direction:column; gap:var(--s4);
+  padding:var(--s4);
+  overflow-y:auto;
+}
+.dock.left{border-right:1px solid var(--line);}
+.dock.right{border-left:1px solid var(--line);}
+.dock::-webkit-scrollbar{width:8px;}
+.dock::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08); border-radius:6px;}
+
+/* a dockable panel */
+.panel{
+  background:var(--panel); backdrop-filter:var(--blur-panel);
+  border:1px solid var(--line); border-radius:var(--r-panel);
+  box-shadow:var(--shadow-panel);
+  position:relative; overflow:hidden;
+}
+.panel::before{ /* layered top sheen — the glass gradient */
+  content:""; position:absolute; inset:0; pointer-events:none; border-radius:var(--r-panel);
+  background:linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0) 40%);
+}
+.panel > *{position:relative;}
+.phead{
+  display:flex; align-items:center; gap:8px;
+  padding:7px 10px; border-bottom:1px solid var(--line);
+  cursor:grab; user-select:none;
+}
+.phead .grip{display:flex; flex-direction:column; gap:2px;}
+.phead .grip i{width:11px; height:1.5px; background:var(--faint); border-radius:2px; display:block;}
+.phead .title{font-size:10.5px; letter-spacing:0.9px; text-transform:uppercase; color:var(--muted); font-weight:600; flex:1;}
+.phead .pbtn{color:var(--faint); width:16px; height:16px; display:inline-flex; align-items:center; justify-content:center; border-radius:4px;}
+.phead .pbtn:hover{color:var(--text); background:rgba(255,255,255,0.06);}
+.pbody{padding:10px;}
+
+/* tab header (right dock stacked-as-tabs) */
+.tabwell{display:flex; align-items:center; gap:2px; padding:6px 8px 0; border-bottom:1px solid var(--line); flex-wrap:wrap;}
+.tab{
+  padding:5px 9px; font-size:10.5px; letter-spacing:0.5px; color:var(--muted);
+  border-radius:7px 7px 0 0; cursor:default; border:1px solid transparent; border-bottom:none;
+}
+.tab:hover{color:var(--text); background:rgba(255,255,255,0.04);}
+.tab.active{color:var(--text); background:var(--panel2); border-color:var(--line); box-shadow:inset 0 2px 0 var(--gold);}
+
+/* recessed well */
+.well{
+  background:var(--panel2); border-radius:var(--r-control);
+  box-shadow:var(--shadow-recess); padding:9px 10px;
+}
+.field{margin-bottom:9px;}
+.field:last-child{margin-bottom:0;}
+.field label{display:block; font-size:10px; color:var(--muted); margin-bottom:4px; letter-spacing:0.3px;}
+.field .ctl{
+  width:100%; height:30px; padding:0 10px; display:flex; align-items:center; justify-content:space-between;
+  background:rgba(0,0,0,0.25); border:1px solid var(--line); border-radius:var(--r-control); color:var(--text);
+}
+.field .ctl.input{color:var(--text);}
+.field .ctl .car{color:var(--faint);}
+
+.job-row{display:flex; align-items:center; justify-content:space-between; padding:4px 0;}
+.job-row + .job-row{border-top:1px solid var(--line);}
+.job-row .k{color:var(--muted);}
+.job-row .v{color:var(--text); font-weight:600;}
+.job-title{font-size:14px; font-weight:700; margin-bottom:2px;}
+.job-sub{color:var(--muted); margin-bottom:8px;}
+
+/* status chips */
+.chip{display:inline-flex; align-items:center; gap:6px; padding:2px 9px; border-radius:999px; font-size:10.5px; border:1px solid var(--line);}
+.chip .gl{width:6px; height:6px; border-radius:50%;}
+.chip.ok{color:var(--ok);} .chip.ok .gl{background:var(--ok);}
+.chip.warn{color:var(--warn);} .chip.warn .gl{background:var(--warn);}
+.chip.crit{color:var(--crit);} .chip.crit .gl{background:var(--crit);}
+.chip.pend{color:var(--muted);} .chip.pend .gl{background:var(--faint);}
+.chip.info{color:var(--info);} .chip.info .gl{background:var(--info);}
+
+/* next-actions task list */
+.task{display:flex; align-items:flex-start; gap:9px; padding:8px 0;}
+.task + .task{border-top:1px solid var(--line);}
+.task .ico{width:18px; height:18px; flex:none; border-radius:5px; display:flex; align-items:center; justify-content:center; font-size:11px; margin-top:1px;}
+.task .ico.ok{color:var(--ok); background:rgba(84,182,122,0.14);}
+.task .ico.warn{color:var(--warn); background:var(--gold-dim);}
+.task .ico.pend{color:var(--faint); background:rgba(255,255,255,0.04);}
+.task .tx{flex:1;}
+.task .tx .t{display:block; color:var(--text);}
+.task .tx .d{display:block; color:var(--muted); font-size:11px; margin-top:2px; line-height:1.4;}
+.task .tx .disc{display:block; color:var(--info); font-size:10.5px; margin-top:3px; cursor:default;}
+
+/* primary CTA — the ONE gold action */
+.btn-primary{
+  width:100%; height:34px; margin-top:10px;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  background:linear-gradient(180deg, var(--gold-bright), var(--gold));
+  color:#1a1206; font-weight:700; letter-spacing:0.3px;
+  border:1px solid rgba(255,255,255,0.18); border-radius:var(--r-control);
+  box-shadow:0 1px 0 rgba(255,255,255,0.35) inset, 0 4px 14px rgba(217,164,65,0.3);
+  cursor:default;
+}
+.btn-ghost{
+  width:100%; height:32px; margin-top:8px;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  background:rgba(255,255,255,0.04); color:var(--text);
+  border:1px solid var(--line); border-radius:var(--r-control);
+}
+
+/* layers list */
+.layer{display:flex; align-items:center; gap:9px; padding:5px 2px;}
+.layer .box{
+  width:15px; height:15px; border-radius:4px; border:1px solid var(--line-strong);
+  display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.25);
+}
+.layer.on .box{background:var(--gold-dim); border-color:rgba(217,164,65,0.4);}
+.layer.on .box svg{width:10px; height:10px; color:var(--gold-bright);}
+.layer .sw{width:9px; height:9px; border-radius:2px; flex:none;}
+.layer .nm{flex:1; color:var(--text);}
+.layer.off .nm{color:var(--muted);}
+
+.note{color:var(--muted); font-size:11px; line-height:1.5;}
+.subsec-label{font-size:10px; letter-spacing:0.9px; text-transform:uppercase; color:var(--faint); margin:2px 0 6px;}
+.empty{
+  border:1px dashed var(--line); border-radius:var(--r-control);
+  padding:14px; text-align:center; color:var(--muted); background:rgba(0,0,0,0.15);
+}
+.empty .e-t{color:var(--text); margin-bottom:3px;}
+.empty .e-link{color:var(--gold); font-size:11px;}
+
+/* ---- VIEWPORT (z=0, center — sacred) ---- */
+.viewport{
+  position:relative; z-index:0; min-height:0; overflow:hidden;
+  background:
+    radial-gradient(900px 600px at 50% 38%, rgba(40,48,60,0.55), transparent 70%),
+    linear-gradient(180deg, #0d1015, #070809);
+}
+/* subtle floor grid so the canvas reads as a 3D scene, not empty */
+.grid-floor{position:absolute; inset:0; overflow:hidden;}
+.model-wrap{position:absolute; inset:0; display:flex; align-items:center; justify-content:center;}
+.plan{
+  width:62%; max-width:640px; aspect-ratio:4/3;
+  transform:rotateX(58deg) rotateZ(-32deg);
+  transform-style:preserve-3d;
+  background:linear-gradient(135deg, rgba(150,160,175,0.22), rgba(110,120,135,0.12));
+  border:1px solid rgba(255,255,255,0.16);
+  box-shadow:0 40px 90px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.1) inset;
+  position:relative; border-radius:2px;
+}
+.plan::before{
+  content:""; position:absolute; inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px);
+  background-size:7% 9%;
+}
+/* mains / branch lines on the plan to read as sprinkler geometry */
+.plan .main{position:absolute; height:2px; background:var(--info); opacity:0.85; box-shadow:0 0 6px rgba(90,169,230,0.6);}
+.plan .branch{position:absolute; height:1.5px; background:rgba(84,182,122,0.85); box-shadow:0 0 4px rgba(84,182,122,0.5);}
+.plan .head{position:absolute; width:5px; height:5px; border-radius:50%; background:var(--gold-bright); box-shadow:0 0 6px rgba(240,189,90,0.8); transform:translate(-50%,-50%);}
+
+/* view toolbar (z=20, top-center of canvas) */
+.view-tb{
+  position:absolute; top:12px; left:50%; transform:translateX(-50%); z-index:20;
+  display:flex; gap:3px; padding:4px;
+  background:var(--panel-raised); backdrop-filter:var(--blur-overlay);
+  border:1px solid var(--line-strong); border-radius:9px; box-shadow:var(--shadow-overlay);
+}
+.view-tb button{
+  height:26px; padding:0 12px; border-radius:6px; color:var(--muted);
+  background:transparent; border:1px solid transparent; font-size:11px; cursor:default;
+}
+.view-tb button:hover{color:var(--text); background:rgba(255,255,255,0.06);}
+.view-tb button.active{color:var(--gold-bright); background:var(--gold-dim); border-color:rgba(217,164,65,0.35);}
+
+/* orientation cube (z=20, top-right) */
+.cube-wrap{position:absolute; top:14px; right:16px; z-index:20; width:72px; height:72px; perspective:320px;}
+.cube{width:54px; height:54px; margin:9px; position:relative; transform-style:preserve-3d;
+  transform:rotateX(-24deg) rotateY(-36deg);}
+.cube .face{
+  position:absolute; width:54px; height:54px;
+  background:rgba(38,44,54,0.78); border:1px solid var(--line-strong);
+  display:flex; align-items:center; justify-content:center;
+  font-size:9px; letter-spacing:1px; color:var(--muted); text-transform:uppercase;
+  backdrop-filter:blur(6px);
+}
+.cube .front{transform:translateZ(27px); color:var(--text); background:rgba(50,58,70,0.85);}
+.cube .back{transform:rotateY(180deg) translateZ(27px);}
+.cube .right{transform:rotateY(90deg) translateZ(27px);}
+.cube .left{transform:rotateY(-90deg) translateZ(27px);}
+.cube .top{transform:rotateX(90deg) translateZ(27px);}
+.cube .bottom{transform:rotateX(-90deg) translateZ(27px);}
+.cube-label{position:absolute; bottom:-2px; left:0; right:0; text-align:center; font-size:8.5px; color:var(--faint); letter-spacing:0.5px;}
+
+/* scale bar (z=20, bottom-left) */
+.scalebar{
+  position:absolute; bottom:14px; left:16px; z-index:20;
+  display:flex; flex-direction:column; gap:4px;
+  padding:6px 9px; border-radius:8px;
+  background:var(--panel-raised); backdrop-filter:var(--blur-overlay);
+  border:1px solid var(--line-strong); box-shadow:var(--shadow-overlay);
+}
+.scalebar .bar{display:flex; height:7px; width:120px; border:1px solid var(--line-strong); border-radius:2px; overflow:hidden;}
+.scalebar .bar span{flex:1; border-right:1px solid var(--line-strong);}
+.scalebar .bar span:nth-child(odd){background:rgba(255,255,255,0.7);}
+.scalebar .bar span:nth-child(even){background:rgba(255,255,255,0.12);}
+.scalebar .bar span:last-child{border-right:none;}
+.scalebar .lab{font-size:9.5px; color:var(--muted); letter-spacing:0.5px;}
+
+/* ---- STATUS / BOTTOM DOCK (z=10) ---- */
+.statusbar{
+  grid-area:statusbar; z-index:10;
+  display:flex; align-items:center; gap:var(--s5);
+  padding:0 var(--s5);
+  background:linear-gradient(180deg, rgba(18,22,28,0.82), rgba(11,14,18,0.9));
+  backdrop-filter:var(--blur-panel);
+  border-top:1px solid var(--line);
+  color:var(--muted); font-size:11px;
+}
+.statusbar .cmd{display:flex; align-items:center; gap:8px; flex:1; color:var(--faint);}
+.statusbar .cmd .prompt{color:var(--gold);}
+.statusbar .pip{display:inline-flex; align-items:center; gap:6px;}
+.statusbar .pip .gl{width:6px; height:6px; border-radius:50%; background:var(--ok);}
+.statusbar .seg{padding:0 4px;}
+.statusbar a{color:var(--muted); text-decoration:none;}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- TOP CHROME -->
+  <header class="chrome">
+    <div class="brand">
+      <span class="mark">Halo<b>Fire</b> Studio</span>
+      <span class="sub">Sprinkler CAD · OpenGeometry</span>
+    </div>
+    <div class="spacer"></div>
+    <span class="parity-badge">Internal Alpha · NOT AHJ/PE/AutoSprink parity</span>
+    <div class="spacer"></div>
+    <div class="chrome-right">
+      <a href="#">Workbench</a>
+      <span class="role-chip"><span style="color:var(--muted)">Home Depot — Rexburg ID</span></span>
+      <a href="#">⚙ Settings</a>
+      <span class="role-chip"><span class="dot"></span> D. Steele · estimator</span>
+    </div>
+  </header>
+
+  <!-- MENU BAR (single row, width:100%) -->
+  <nav class="menubar">
+    <div class="menu-scroll" id="menuScroll">
+      <div class="menu-item open" id="fileMenu"><u>F</u>ile
+        <div class="dropdown">
+          <div class="row"><span>New Drawing</span><span class="kbd">Ctrl N</span></div>
+          <div class="row"><span>Open Project…</span><span class="kbd">Ctrl O</span></div>
+          <div class="row"><span>Save</span><span class="kbd">Ctrl S</span></div>
+          <div class="sep"></div>
+          <div class="row"><span>Import Floor Plan…</span><span class="kbd"></span></div>
+          <div class="row soon"><span>Export Submittal PDF</span><span class="tag">coming soon</span></div>
+          <div class="sep"></div>
+          <div class="row"><span>Close Project</span><span class="kbd">Ctrl W</span></div>
+        </div>
+      </div>
+      <div class="menu-item"><u>E</u>dit</div>
+      <div class="menu-item"><u>S</u>elect</div>
+      <div class="menu-item">S<u>n</u>aps</div>
+      <div class="menu-item"><u>T</u>ools</div>
+      <div class="menu-item"><u>A</u>ctions</div>
+      <div class="menu-item"><u>C</u>ommands</div>
+      <div class="menu-item">Auto <u>D</u>raw</div>
+      <div class="menu-item"><u>R</u>oof Planes</div>
+      <div class="menu-item"><u>W</u>izards</div>
+      <div class="menu-item"><u>H</u>ydraulics</div>
+      <div class="menu-item">Fi<u>n</u>ish</div>
+      <div class="menu-item">Al<u>e</u>rts</div>
+      <div class="menu-item"><u>L</u>isting</div>
+      <div class="menu-item"><u>P</u>arts Database</div>
+      <div class="menu-item">Auto<u>P</u>REP</div>
+      <div class="menu-item">Se<u>t</u>tings</div>
+      <div class="menu-item"><u>V</u>iew</div>
+      <div class="menu-item">Win<u>d</u>ow</div>
+      <div class="menu-item">Hel<u>p</u></div>
+    </div>
+  </nav>
+
+  <!-- TOOLBAR (draw / select / snap) -->
+  <div class="toolbar">
+    <div class="tool-group">
+      <button class="tbtn active" title="Select">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3l6 18 2-7 7-2z"/></svg>
+      </button>
+      <button class="tbtn" title="Move / Transform">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20M12 2l-3 3M12 2l3 3M12 22l-3-3M12 22l3-3M2 12l3-3M2 12l3 3M22 12l-3-3M22 12l-3 3"/></svg>
+      </button>
+      <button class="tbtn" title="Delete">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>
+      </button>
+    </div>
+    <div class="tool-sep"></div>
+    <div class="tool-group">
+      <button class="tbtn" title="Wall"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18M9 6v6M15 12v6"/></svg><span class="lbl">Wall</span></button>
+      <button class="tbtn" title="Pipe"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h12a3 3 0 003-3V5"/><circle cx="3" cy="12" r="1.6" fill="currentColor"/></svg><span class="lbl">Pipe</span></button>
+      <button class="tbtn" title="Head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="9" r="3.5"/><path d="M12 12.5V21M9 21h6"/></svg><span class="lbl">Head</span></button>
+      <button class="tbtn" title="Drop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3c3 5 5 7.5 5 10.5A5 5 0 017 13.5C7 10.5 9 8 12 3z"/></svg><span class="lbl">Drop</span></button>
+      <button class="tbtn" title="Door / Opening"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 21V4h9v17M14 4l5 2v15M9 12h.5"/></svg></button>
+    </div>
+    <div class="tool-sep"></div>
+    <div class="tool-group">
+      <button class="tbtn toggle on" title="Snap to endpoint / grid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg><span class="lbl">Snap</span></button>
+      <button class="tbtn toggle" title="Grid"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg><span class="lbl">Grid 1ft</span></button>
+      <button class="tbtn toggle on" title="Ortho"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 19V5h14M5 19h14"/></svg><span class="lbl">Ortho</span></button>
+    </div>
+    <div class="spacer"></div>
+    <div class="readout"><span><b>X</b> 124.0 ft</span><span><b>Y</b> 86.5 ft</span><span><b>Z</b> 0.0 ft</span><span><b>Scale</b> 1 : 96</span></div>
+  </div>
+
+  <!-- BODY -->
+  <div class="body">
+
+    <!-- LEFT DOCK -->
+    <aside class="dock left">
+      <!-- THIS JOB -->
+      <section class="panel">
+        <div class="phead"><span class="grip"><i></i><i></i></span><span class="title">This Job</span><span class="pbtn">⌄</span></div>
+        <div class="pbody">
+          <div class="job-title">Home Depot — Rexburg</div>
+          <div class="job-sub">Distribution Center · Rexburg, ID</div>
+          <div class="well" style="margin-bottom:2px;">
+            <div class="job-row"><span class="k">State</span><span class="v">ID · 21 ft pipe stock</span></div>
+            <div class="job-row"><span class="k">Bid value</span><span class="v">$842,500</span></div>
+            <div class="job-row"><span class="k">Phase</span><span class="v"><span class="chip info"><span class="gl"></span> Takeoff</span></span></div>
+            <div class="job-row"><span class="k">Due</span><span class="v">Jun 24, 2026</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- NEXT ACTIONS -->
+      <section class="panel">
+        <div class="phead"><span class="grip"><i></i><i></i></span><span class="title">Next Actions</span><span class="pbtn">⌄</span></div>
+        <div class="pbody">
+          <div class="task">
+            <span class="ico pend">○</span>
+            <span class="tx"><span class="t">Generate layout from plan</span><span class="d">No layout yet — start the AutoDraw pass.</span></span>
+          </div>
+          <div class="task">
+            <span class="ico warn">⚠</span>
+            <span class="tx"><span class="t">Square footage doesn't match the proposal</span><span class="d">Plan reads 84,200 sq ft · proposal lists 81,900.</span><span class="disc">View details ›</span></span>
+          </div>
+          <div class="task">
+            <span class="ico pend">○</span>
+            <span class="tx"><span class="t">Awaiting AHJ approval</span><span class="d">Attach the AHJ approval packet when received.</span></span>
+          </div>
+          <button class="btn-primary">⚡ Generate Layout</button>
+        </div>
+      </section>
+
+      <!-- LAYERS -->
+      <section class="panel">
+        <div class="phead"><span class="grip"><i></i><i></i></span><span class="title">Layers</span><span class="pbtn">⌄</span></div>
+        <div class="pbody">
+          <div class="layer on"><span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span class="sw" style="background:#7c8694"></span><span class="nm">Floor plan</span></div>
+          <div class="layer on"><span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span class="sw" style="background:#9aa4b2"></span><span class="nm">Building shell</span></div>
+          <div class="layer on"><span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span class="sw" style="background:#6b7280"></span><span class="nm">Columns</span></div>
+          <div class="layer off"><span class="box"></span><span class="sw" style="background:#4b5563"></span><span class="nm">Floor</span></div>
+          <div class="layer on"><span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span class="sw" style="background:#5aa9e6"></span><span class="nm">Mains / riser</span></div>
+          <div class="layer on"><span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span class="sw" style="background:#54b67a"></span><span class="nm">Branch lines</span></div>
+          <div class="layer on"><span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span class="sw" style="background:#d9a441"></span><span class="nm">Drops</span></div>
+          <div class="layer on"><span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span><span class="sw" style="background:#f0bd5a"></span><span class="nm">Sprinkler heads</span></div>
+          <div class="layer off"><span class="box"></span><span class="sw" style="background:#9333ea"></span><span class="nm">Fittings &amp; components</span></div>
+          <div class="layer off"><span class="box"></span><span class="sw" style="background:#dc2626"></span><span class="nm">Hangers</span></div>
+          <div class="layer off"><span class="box"></span><span class="sw" style="background:#475569"></span><span class="nm">Ceiling grid</span></div>
+        </div>
+      </section>
+
+      <!-- TOOLS / DESIGN -->
+      <section class="panel">
+        <div class="phead"><span class="grip"><i></i><i></i></span><span class="title">Tools · Design</span><span class="pbtn">⌄</span></div>
+        <div class="pbody">
+          <div class="well">
+            <div class="field"><label>Source</label><div class="ctl input">Selected project built-in plan<span class="car">⌄</span></div></div>
+            <div class="field"><label>Hazard class (NFPA 13)</label><div class="ctl input">Ordinary Hazard Group 2<span class="car">⌄</span></div></div>
+            <div class="field"><label>Markup %</label><div class="ctl input">25<span class="car">⌄</span></div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PROPERTIES -->
+      <section class="panel">
+        <div class="phead"><span class="grip"><i></i><i></i></span><span class="title">Properties</span><span class="pbtn">⌄</span></div>
+        <div class="pbody">
+          <p class="note">No element selected. Click a part in the viewport to inspect it.</p>
+          <p class="note" style="margin-top:8px; color:var(--faint)">True NFPA pipe scale (thin at building scale) — the only render mode.</p>
+        </div>
+      </section>
+    </aside>
+
+    <!-- VIEWPORT -->
+    <main class="viewport">
+      <div class="model-wrap">
+        <div class="plan">
+          <div class="main" style="left:8%; right:8%; top:50%"></div>
+          <div class="main" style="left:50%; top:8%; bottom:8%; width:2px; height:auto"></div>
+          <div class="branch" style="left:12%; right:12%; top:24%"></div>
+          <div class="branch" style="left:12%; right:12%; top:38%"></div>
+          <div class="branch" style="left:12%; right:12%; top:62%"></div>
+          <div class="branch" style="left:12%; right:12%; top:76%"></div>
+          <div class="head" style="left:22%; top:24%"></div>
+          <div class="head" style="left:38%; top:24%"></div>
+          <div class="head" style="left:62%; top:24%"></div>
+          <div class="head" style="left:78%; top:24%"></div>
+          <div class="head" style="left:22%; top:38%"></div>
+          <div class="head" style="left:38%; top:38%"></div>
+          <div class="head" style="left:62%; top:38%"></div>
+          <div class="head" style="left:78%; top:38%"></div>
+          <div class="head" style="left:22%; top:62%"></div>
+          <div class="head" style="left:38%; top:62%"></div>
+          <div class="head" style="left:62%; top:62%"></div>
+          <div class="head" style="left:78%; top:62%"></div>
+          <div class="head" style="left:22%; top:76%"></div>
+          <div class="head" style="left:38%; top:76%"></div>
+          <div class="head" style="left:62%; top:76%"></div>
+          <div class="head" style="left:78%; top:76%"></div>
+        </div>
+      </div>
+
+      <!-- view toolbar -->
+      <div class="view-tb">
+        <button class="active">3D</button>
+        <button>Top</button>
+        <button>Fit</button>
+        <button>Select</button>
+      </div>
+
+      <!-- orientation cube -->
+      <div class="cube-wrap">
+        <div class="cube">
+          <div class="face front">Front</div>
+          <div class="face back">Back</div>
+          <div class="face right">Right</div>
+          <div class="face left">Left</div>
+          <div class="face top">Top</div>
+          <div class="face bottom">Bot</div>
+        </div>
+        <div class="cube-label">Orient</div>
+      </div>
+
+      <!-- scale bar -->
+      <div class="scalebar">
+        <div class="bar"><span></span><span></span><span></span><span></span></div>
+        <div class="lab">0 ———— 50 ft</div>
+      </div>
+    </main>
+
+    <!-- RIGHT DOCK -->
+    <aside class="dock right">
+      <section class="panel" style="flex:1; display:flex; flex-direction:column;">
+        <div class="tabwell">
+          <span class="tab active">Inspector</span>
+          <span class="tab">Layout</span>
+          <span class="tab">Pipe Sched</span>
+          <span class="tab">Hydraulics</span>
+          <span class="tab">Compliance</span>
+          <span class="tab">Submittal</span>
+        </div>
+        <div class="pbody" style="flex:1; overflow-y:auto;">
+          <div class="subsec-label">Inspector</div>
+          <div class="empty" style="margin-bottom:14px;">
+            <div class="e-t">No part selected</div>
+            <div>Click a pipe, head, or fitting in the viewport to see its type, OD, length, spec and provenance here.</div>
+          </div>
+
+          <div class="subsec-label">Layout</div>
+          <div class="empty" style="margin-bottom:14px;">
+            <div class="e-t">No layout yet</div>
+            <div class="e-link">Generate from plan ›</div>
+          </div>
+
+          <div class="subsec-label">Pipe Schedule (NFPA-13)</div>
+          <div class="well" style="margin-bottom:14px;">
+            <div class="job-row"><span class="k">Status</span><span class="v"><span class="chip pend"><span class="gl"></span> Pending layout</span></span></div>
+            <p class="note" style="margin-top:6px;">Schedule computes after the layout pass completes.</p>
+          </div>
+
+          <div class="subsec-label">Hydraulics <span style="color:var(--faint)">(NFPA-13, est.)</span></div>
+          <div class="well" style="margin-bottom:14px;">
+            <p class="note">Estimated calc only — not a stamped hydraulic design. Runs after layout.</p>
+          </div>
+
+          <div class="subsec-label">Compliance <span style="color:var(--faint)">(NFPA-13, geometric)</span></div>
+          <div class="well" style="margin-bottom:14px;">
+            <div class="job-row"><span class="k">Head spacing</span><span class="v"><span class="chip pend"><span class="gl"></span> Not run</span></span></div>
+            <div class="job-row"><span class="k">Coverage</span><span class="v"><span class="chip pend"><span class="gl"></span> Not run</span></span></div>
+          </div>
+
+          <div class="subsec-label">Auto Bid · Submittal</div>
+          <div class="well">
+            <p class="note" style="margin-bottom:8px;">Best-effort internal-alpha package — NOT a stamped/sealed submittal, NOT AHJ/PE approved, NOT permit-ready.</p>
+            <button class="btn-primary" style="margin-top:0;">Build Submittal Package</button>
+          </div>
+        </div>
+      </section>
+    </aside>
+
+  </div>
+
+  <!-- STATUS / BOTTOM DOCK -->
+  <footer class="statusbar">
+    <div class="cmd"><span class="prompt">command ›</span><span>type a command or pick a tool…</span></div>
+    <span class="seg pip"><span class="gl"></span> OpenGeometry ready</span>
+    <span class="seg">Snap: <b style="color:var(--info)">on</b></span>
+    <span class="seg">Ortho: <b style="color:var(--info)">on</b></span>
+    <span class="seg">Units: ft (true scale)</span>
+    <a href="#" class="seg">▴ Expand log</a>
+  </footer>
+
+</div>
+</body>
+</html>
