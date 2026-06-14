@@ -19,7 +19,9 @@
     ash:     { name: 'Ash',     tint: '26,25,23', accent: '#c89a3c', accentRgb: '200,154,60', accentBright: '#ffd54f' },
     crimson: { name: 'Crimson', tint: '34,16,14', accent: '#e8432d', accentRgb: '232,67,45',  accentBright: '#ff6a52' },
     gold:    { name: 'Gold',    tint: '32,26,15', accent: '#c89a3c', accentRgb: '200,154,60',  accentBright: '#e6bf63' },
-    halo:    { name: 'Halo',    tint: '34,30,16', accent: '#ffd54f', accentRgb: '255,213,79',  accentBright: '#ffe48a' }
+    halo:    { name: 'Halo',    tint: '34,30,16', accent: '#ffd54f', accentRgb: '255,213,79',  accentBright: '#ffe48a' },
+    steel:   { name: 'Steel',   tint: '20,26,34', accent: '#5aa9e6', accentRgb: '90,169,230',  accentBright: '#86c4f5' },
+    azure:   { name: 'Azure',   tint: '16,26,42', accent: '#4d9fff', accentRgb: '77,159,255',  accentBright: '#8fc4ff' }
   };
 
   // ---- per-page "Fire" color, by function — every color from the login palette ----
@@ -52,10 +54,20 @@
     r.setProperty('--hf-accent', t.accent);
     r.setProperty('--hf-accent-rgb', t.accentRgb);
     r.setProperty('--hf-accent-bright', t.accentBright);
+    // Sync the legacy token surfaces so flat token-based cards recolor with the theme too.
+    r.setProperty('--hf-color-surface', 'rgba(' + t.tint + ',0.80)');
+    r.setProperty('--hf-color-surface-raised', 'rgba(' + t.tint + ',0.90)');
+    r.setProperty('--surface', 'rgba(' + t.tint + ',0.80)');
+    r.setProperty('--surface2', 'rgba(' + t.tint + ',0.90)');
     document.documentElement.setAttribute('data-hf-theme', id);
   }
   function savedTheme() { try { return localStorage.getItem('hf-theme') || 'ember'; } catch (e) { return 'ember'; } }
   function setTheme(id) { try { localStorage.setItem('hf-theme', id); } catch (e) {} applyTheme(id); }
+
+  // ---- light / dark MODE (separate from the glass color) ----
+  function savedMode() { try { return localStorage.getItem('hf-mode') || 'dark'; } catch (e) { return 'dark'; } }
+  function applyMode(m) { document.documentElement.setAttribute('data-hf-mode', m === 'light' ? 'light' : 'dark'); }
+  function setMode(m) { try { localStorage.setItem('hf-mode', m); } catch (e) {} applyMode(m); }
 
   function page() { return (document.body && document.body.getAttribute('data-hf-page')) || '_default'; }
   function applyFire() { document.documentElement.style.setProperty('--hf-fire-color', FIRE[page()] || FIRE._default); }
@@ -105,12 +117,13 @@
 
   function boot() {
     document.body.classList.add('hf');
+    applyMode(savedMode());
     applyTheme(savedTheme());
     applyFire();
     injectAppbar();
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 
-  // public API for the Settings glass-color picker
-  window.HFTheme = { themes: THEMES, get: savedTheme, set: setTheme, apply: applyTheme, fireMap: FIRE };
+  // public API for the Settings appearance controls
+  window.HFTheme = { themes: THEMES, get: savedTheme, set: setTheme, apply: applyTheme, fireMap: FIRE, getMode: savedMode, setMode: setMode };
 })();

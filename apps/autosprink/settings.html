@@ -50,8 +50,15 @@
 <body class="hf-shell hf" data-hf-page="settings">
 <main>
   <div class="card">
-    <h2>Appearance · Glass</h2>
-    <p class="muted" style="margin-bottom:10px">Choose the glass color — all within the Halo Fire palette. Applies live across the whole app and is remembered for you.</p>
+    <h2>Appearance</h2>
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">
+      <span class="muted" style="min-width:80px">Mode</span>
+      <div id="hfModeToggle" style="display:inline-flex;border:1px solid var(--hf-line,rgba(255,255,255,.12));border-radius:8px;overflow:hidden">
+        <button type="button" data-mode="dark" style="all:unset;cursor:pointer;padding:7px 18px;font-size:12px;font-weight:600">Dark</button>
+        <button type="button" data-mode="light" style="all:unset;cursor:pointer;padding:7px 18px;font-size:12px;font-weight:600">Light</button>
+      </div>
+    </div>
+    <p class="muted" style="margin-bottom:10px">Glass color — warm and blue options within the Halo Fire palette. Applies live across the whole app and is remembered for you.</p>
     <div id="hfSwatches" style="display:flex;flex-wrap:wrap;gap:12px;margin-top:4px"></div>
   </div>
   <div class="card wide">
@@ -1836,6 +1843,22 @@ loadParity(); loadDocs(); loadDeps(); loadIntake(); initWizard(); loadLibrary();
       var nm = document.createElement('div'); nm.style.cssText = 'font-size:10.5px;color:var(--muted);margin-top:5px'; nm.textContent = t.name;
       w.appendChild(nm); box.appendChild(w);
     });
+    // Light / Dark mode toggle.
+    var mt = document.getElementById('hfModeToggle');
+    if (mt && HFTheme.getMode) {
+      var paint = function (mode) {
+        var arb = (HFTheme.themes[HFTheme.get()] || {}).accentRgb || '200,154,60';
+        [].forEach.call(mt.querySelectorAll('button'), function (b) {
+          var on = b.getAttribute('data-mode') === mode;
+          b.style.background = on ? 'rgba(' + arb + ',0.22)' : 'transparent';
+          b.style.color = on ? 'var(--hf-text,#fff)' : 'var(--hf-muted,#9aa)';
+        });
+      };
+      paint(HFTheme.getMode());
+      [].forEach.call(mt.querySelectorAll('button'), function (b) {
+        b.onclick = function () { var m = b.getAttribute('data-mode'); HFTheme.setMode(m); paint(m); };
+      });
+    }
   })();
 </script>
 </body>

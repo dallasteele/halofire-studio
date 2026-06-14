@@ -164,3 +164,49 @@ body.hf h3{ font-size:var(--hf-fs-lg); font-weight:var(--hf-fw-semi); }
 .hf-scroll{ scrollbar-width:thin; scrollbar-color:var(--hf-line-strong) transparent; }
 .hf-scroll::-webkit-scrollbar{ width:9px; } .hf-scroll::-webkit-scrollbar-thumb{ background:rgba(255,255,255,0.10); border-radius:6px; }
 @media (prefers-reduced-motion:reduce){ *{ transition-duration:0.001ms !important; } }
+
+/* ===== THEMEABLE LEGACY SURFACES — make EVERY window recolor with the picker ===
+   tokens.css pins .hf-shell .card to a flat --hf-color-surface that ignored the
+   theme (only the app bar recolored). Re-glass the common legacy surfaces to the
+   THEMEABLE glass so changing the glass color recolors the windows, not just the bar. */
+body.hf .card, body.hf .panel, body.hf .well, body.hf .intake, body.hf .col, body.hf .note{
+  background:
+    linear-gradient(142deg, rgba(255,255,255,0.08), rgba(255,255,255,0.022) 30%, rgba(255,255,255,0.008)),
+    radial-gradient(circle at 12% 0%, rgba(var(--hf-accent-rgb),0.07), transparent 36%),
+    var(--hf-glass) !important;
+  border-color:var(--hf-line) !important;
+  -webkit-backdrop-filter:var(--hf-blur-panel); backdrop-filter:var(--hf-blur-panel);
+}
+
+/* ===== LIGHT MODE ===========================================================
+   data-hf-mode="light" flips to a warm-paper light theme; glass becomes a white
+   frost tinted by the chosen accent. Dark is the default (no attribute / "dark"). */
+:root[data-hf-mode="light"]{
+  --hf-bg:#f4efe6;
+  --hf-text:#1c1712; --hf-muted:#5c544b; --hf-faint:#8a8175;
+  --hf-line:rgba(20,15,10,0.12); --hf-line-strong:rgba(20,15,10,0.20);
+  /* legacy + AAA-token text vars too, so every page's content goes dark in light mode */
+  --text:#1c1712; --muted:#5c544b; --bright:#0d0a07; --faint:#8a8175;
+  --hf-color-text-primary:#1c1712; --hf-color-text-secondary:#3a332b; --hf-color-text-muted:#5c544b;
+}
+:root[data-hf-mode="light"] body.hf{ color:var(--hf-text); }
+:root[data-hf-mode="light"] body.hf{
+  background:
+    radial-gradient(circle at 33% 14%, rgba(247,213,22,0.18), transparent 28%),
+    radial-gradient(circle at 80% 20%, rgba(232,67,45,0.10), transparent 32%),
+    linear-gradient(150deg,#f8f3ea 0%,#efe7da 50%,#f3ece0 100%);
+  color:var(--hf-text);
+}
+:root[data-hf-mode="light"] .hf-win, :root[data-hf-mode="light"] .hf-panel, :root[data-hf-mode="light"] .hf-card,
+:root[data-hf-mode="light"] body.hf .card, :root[data-hf-mode="light"] body.hf .panel,
+:root[data-hf-mode="light"] body.hf .well, :root[data-hf-mode="light"] body.hf .intake, :root[data-hf-mode="light"] body.hf .col{
+  background:
+    linear-gradient(142deg, rgba(255,255,255,0.74), rgba(255,255,255,0.56) 42%),
+    radial-gradient(circle at 12% 0%, rgba(var(--hf-accent-rgb),0.12), transparent 42%),
+    rgba(255,255,255,0.52) !important;
+  color:var(--hf-text);
+}
+:root[data-hf-mode="light"] .hf-appbar{ background:linear-gradient(180deg, rgba(255,255,255,0.84), rgba(255,255,255,0.70)); }
+:root[data-hf-mode="light"] .hf-appbar .hf-nav a{ color:var(--hf-muted); }
+:root[data-hf-mode="light"] .hf-appbar .hf-nav a:hover{ color:var(--hf-text); background:rgba(0,0,0,0.05); }
+:root[data-hf-mode="light"] .hf-role-chip, :root[data-hf-mode="light"] .hf-appbar .hf-signout{ color:var(--hf-text); }
