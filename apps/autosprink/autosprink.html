@@ -157,6 +157,23 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
   #sourceLockNote{display:none;font-size:10px;color:var(--gold);font-family:var(--mono);margin-top:4px;line-height:1.5}
 </style>
 <link rel="stylesheet" href="/public/styles/halofire-tokens.css">
+<!-- Shared glass system: ember background, glass windows, type scale, and the
+     Studio banner restyled to match the shared app bar on every other page. -->
+<link rel="stylesheet" href="/public/styles/halofire-glass.css">
+<style>
+  /* Studio banner -> match the shared app bar (warm glass + Fraunces brandmark + app-bar nav). */
+  body.hf #app > header{
+    background:linear-gradient(180deg, rgba(var(--hf-glass-tint),0.88), rgba(var(--hf-glass-tint),0.74));
+    -webkit-backdrop-filter:var(--hf-blur-panel); backdrop-filter:var(--hf-blur-panel);
+    border-bottom:1px solid var(--hf-line);
+    box-shadow:0 1px 0 rgba(255,255,255,0.04) inset, 0 2px 12px rgba(0,0,0,0.35);
+  }
+  body.hf #app > header .brand{ font-family:var(--hf-display)!important; font-weight:700!important; font-style:normal!important; font-size:16px!important; color:var(--hf-text)!important; letter-spacing:0.2px; }
+  body.hf #app > header .brand span{ color:var(--hf-fire-color)!important; }
+  body.hf #app > header .brand small{ font-family:var(--hf-ui)!important; font-weight:500!important; color:var(--hf-muted)!important; }
+  body.hf #app > header .right a.link{ color:var(--hf-muted)!important; text-decoration:none; padding:5px 11px; border-radius:7px; font-size:13px; }
+  body.hf #app > header .right a.link:hover{ color:var(--hf-text)!important; background:rgba(255,255,255,0.06); }
+</style>
 <style id="employee-studio-glass-overrides">
   body.hf-studio-glass{
     --panel:rgba(13,12,10,0.76);
@@ -220,7 +237,7 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
   }
 </style>
 </head>
-<body class="hf-shell hf-studio-glass">
+<body class="hf-shell hf-studio-glass hf" data-hf-page="studio" data-hf-appbar="off">
 <div id="app">
   <header>
     <div class="brand">Halo<span>Fire</span> Studio <small>SPRINKLER CAD · OpenGeometry</small></div>
@@ -3970,5 +3987,8 @@ document.querySelectorAll('#viewSeg button').forEach((b) => {
   await autoLoadOrUnderlay();   // HF-A1-AUTOLOAD: saved layout or plan underlay, no Generate click
 })();
 </script>
+<!-- Shared shell: applies the glass-color theme + light/dark mode + the studio
+     Fire color. App bar suppressed (the Studio keeps its own CAD chrome). -->
+<script src="/public/halofire-shell.js"></script>
 </body>
 </html>

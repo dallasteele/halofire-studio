@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta http-equiv="Cache-Control" content="no-store" />
+<title>HaloFire — Vendors</title>
+<link rel="stylesheet" href="/public/styles/halofire-glass.css" />
+<style>
+  .wrap{ max-width:1180px; margin:0 auto; padding:22px 24px 80px; }
+  .ptitle{ font-family:var(--hf-display); font-size:var(--hf-fs-title); font-weight:600; margin:6px 0 2px; }
+  .psub{ color:var(--hf-muted); font-size:var(--hf-fs-sm); margin-bottom:20px; }
+  .grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-bottom:18px; }
+  .kpi{ padding:14px 16px; }
+  .kpi .k{ font-size:var(--hf-fs-label); letter-spacing:0.5px; text-transform:uppercase; color:var(--hf-muted); }
+  .kpi .v{ font-size:24px; font-weight:600; margin-top:6px; font-variant-numeric:tabular-nums; }
+  .kpi .d{ font-size:var(--hf-fs-label); color:var(--hf-faint); margin-top:4px; }
+  .phd{ display:flex; align-items:center; gap:8px; padding:11px 14px; border-bottom:1px solid var(--hf-line); }
+  .phd .t{ font-size:var(--hf-fs-label); letter-spacing:0.9px; text-transform:uppercase; color:var(--hf-muted); font-weight:600; flex:1; }
+  .pbd{ padding:14px; }
+  .note{ color:var(--hf-muted); font-size:var(--hf-fs-sm); line-height:1.55; }
+  .vlist{ display:flex; flex-direction:column; }
+  .vrow{ display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-top:1px solid var(--hf-line); }
+  .vrow:first-child{ border-top:0; }
+  .vrow .nm{ color:var(--hf-text); font-weight:600; }
+  .vrow .mt{ color:var(--hf-muted); font-size:var(--hf-fs-sm); }
+  @media(max-width:900px){ .grid{ grid-template-columns:1fr 1fr; } }
+</style>
+</head>
+<body class="hf" data-hf-page="vendors">
+  <div class="wrap">
+    <div class="ptitle">Vendors</div>
+    <div class="psub">Supplier price books, profiles, and the AI price-sync — design ready, build pending (see vendor price-sync plan).</div>
+
+    <div class="grid">
+      <div class="kpi hf-card"><div class="k">Known suppliers</div><div class="v" id="kVend">3</div><div class="d">ARGCO · Ferguson (FFF) · Victaulic</div></div>
+      <div class="kpi hf-card"><div class="k">Price-book lines</div><div class="v" id="kLines">—</div><div class="d" id="kLinesD">from /api/pricebook</div></div>
+      <div class="kpi hf-card"><div class="k">Auto price-sync</div><div class="v">Manual</div><div class="d">email→review→commit not wired yet</div></div>
+    </div>
+
+    <section class="hf-panel">
+      <div class="phd"><span class="t">Suppliers</span><span class="hf-chip"><span class="gl"></span> live pricebook</span></div>
+      <div class="pbd">
+        <div class="vlist" id="vlist"><div class="note">Loading suppliers from the pricebook…</div></div>
+      </div>
+    </section>
+
+    <section class="hf-panel" style="margin-top:14px">
+      <div class="phd"><span class="t">What's coming</span></div>
+      <div class="pbd">
+        <p class="note">Per the vendor price-sync &amp; part-CAD design: a vendor registry with per-supplier profiles, <b>OAuth-inbox price-book ingestion</b> (email → extract → <b>review queue</b> → approve → commit) so price sheets stay current without manual Excel updates, price-history, and a per-part CAD acquisition pipeline. Every price change stays human-in-the-loop until the brain earns the right to automate it.</p>
+      </div>
+    </section>
+  </div>
+
+  <script src="/public/halofire-shell.js"></script>
+  <script>
+    // Real pricebook rollup (the one thing we can show honestly today).
+    fetch('/api/pricebook?limit=5000', { credentials: 'include' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+      var items = (d && (d.items || d.pricebook || d)) || [];
+      if (!Array.isArray(items)) items = [];
+      var bySup = {};
+      items.forEach(function (it) { var s = it.supplier || 'Unknown'; bySup[s] = (bySup[s] || 0) + 1; });
+      var sups = Object.keys(bySup).sort(function (a, b) { return bySup[b] - bySup[a]; });
+      document.getElementById('kVend').textContent = sups.length || 3;
+      document.getElementById('kLines').textContent = items.length ? items.length.toLocaleString() : '—';
+      document.getElementById('kLinesD').textContent = items.length ? 'across ' + sups.length + ' suppliers' : 'no pricebook data';
+      var vl = document.getElementById('vlist');
+      vl.innerHTML = sups.length ? sups.map(function (s) {
+        return '<div class="vrow"><span class="nm">' + s + '</span><span class="mt">' + bySup[s].toLocaleString() + ' price lines</span></div>';
+      }).join('') : '<div class="note">No pricebook data connected yet.</div>';
+    }).catch(function () {
+      var vl = document.getElementById('vlist'); if (vl) vl.innerHTML = '<div class="note">Could not load the pricebook.</div>';
+    });
+  </script>
+</body>
+</html>
