@@ -166,8 +166,25 @@ body.hf h3{ font-size:var(--hf-fs-lg); font-weight:var(--hf-fw-semi); }
 .hf-swatch{ width:46px; height:46px; border-radius:10px; border:2px solid var(--hf-line); cursor:pointer; position:relative; backdrop-filter:blur(8px); }
 .hf-swatch.sel{ border-color:var(--hf-accent-bright); box-shadow:0 0 0 3px rgba(var(--hf-accent-rgb),0.25); }
 
-.hf-scroll{ scrollbar-width:thin; scrollbar-color:var(--hf-line-strong) transparent; }
-.hf-scroll::-webkit-scrollbar{ width:9px; } .hf-scroll::-webkit-scrollbar-thumb{ background:rgba(255,255,255,0.10); border-radius:6px; }
+/* ===== GLASS SCROLLBARS — no raw OS scrollbars anywhere ======================
+   Every scrollable surface in the app gets a thin GLASS scrollbar tinted by the
+   SELECTED glass color (--hf-glass-tint), with an accent-glow thumb on hover.
+   Applies app-wide (content pages AND the Studio menus/docks/inspector). */
+body.hf, body.hf *{ scrollbar-width:thin; scrollbar-color:rgba(var(--hf-glass-tint),0.95) transparent; }
+body.hf::-webkit-scrollbar, body.hf *::-webkit-scrollbar{ width:10px; height:10px; }
+body.hf::-webkit-scrollbar-track, body.hf *::-webkit-scrollbar-track{ background:transparent; }
+body.hf::-webkit-scrollbar-corner, body.hf *::-webkit-scrollbar-corner{ background:transparent; }
+body.hf::-webkit-scrollbar-thumb, body.hf *::-webkit-scrollbar-thumb{
+  /* glassy: white sheen over the selected glass tint, so it reads as glass yet stays visible */
+  background:linear-gradient(180deg, rgba(255,255,255,0.22), rgba(255,255,255,0.05)), rgba(var(--hf-glass-tint),0.88);
+  border:2px solid transparent; background-clip:padding-box; border-radius:9px;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,0.10);
+}
+body.hf::-webkit-scrollbar-thumb:hover, body.hf *::-webkit-scrollbar-thumb:hover{
+  background:linear-gradient(180deg, rgba(var(--hf-accent-rgb),0.55), rgba(var(--hf-accent-rgb),0.30)), rgba(var(--hf-glass-tint),0.92);
+  background-clip:padding-box;
+}
+.hf-scroll{ scrollbar-width:thin; }
 @media (prefers-reduced-motion:reduce){ *{ transition-duration:0.001ms !important; } }
 
 /* ===== THEMEABLE LEGACY SURFACES — make EVERY window recolor with the picker ===
