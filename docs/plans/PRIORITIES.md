@@ -5,7 +5,17 @@
 > When the user gives new direction, THIS file is updated first — loops re-aim
 > without losing context. Updated: 2026-06-14.
 
-## CURRENT WAVE (user 2026-06-14): WIRE THE STUDIO TOOLS + MENUS
+## CURRENT WAVE (user 2026-06-14b): BUILD AUTOSPRINK PARITY — PHASE 1 (precision drafting)
+Plan: `docs/plans/AUTOSPRINK_PARITY_GAP_AND_PLAN.md` (honest: ~30% by tool count / ~15%
+by "does the engineer's job"). User: "use an ultramode workflow to build it out." Building
+phase by phase, hardest-and-most-defining first. **Phase 1 = precision drafting core**:
+full O-snap suite + glyphs, grip-handle editing + stretch, command line + live coords +
+dynamic input, dimension engine, polar/ortho tracking. Sequential engine builds (one file),
+each LIVE-verified. Then Phase 2 (Smart Pipe + system intelligence), Phase 3 (real hydraulic
+solve: Hazen-Williams network + Hardy-Cross + remote-area + NFPA report), Phase 4 (PDF→building
+model + submittal), Phase 5 (fabrication + polish). Verify what the user DOES, not button counts.
+
+## PRIOR WAVE (done 2026-06-14): WIRE THE STUDIO TOOLS + MENUS
 Functional verify+fix wave 1 is DONE (140 controls, 0 broken, 14 fixes; honest
 matrix at apps/autosprink/docs/HALOFIRE_STACK_FUNCTIONAL_STATUS.md, shipReady:false).
 User picked the next wave: **make the ~332 stub Studio menu items + the draw/edit
