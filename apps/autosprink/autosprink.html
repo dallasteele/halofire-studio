@@ -351,15 +351,23 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
   <!-- HF-TOOLBAR: draw/edit tools (wired to setDrawTool / editDelete). -->
   <div id="toolBar">
     <button class="tool on" data-act="select" title="Select &amp; orbit — click parts to inspect">Select</button>
-    <button class="tool" id="moveToolBtn" title="Move / Transform — drag the selected part (coming soon)" disabled style="opacity:.45;cursor:default">Move</button>
+    <button class="tool" data-act="move" title="Move selection — pick a base point, then a destination">Move</button>
+    <button class="tool" data-act="copy" title="Copy selection — pick a base point, then a destination">Copy</button>
     <button class="tool" data-act="delete" title="Delete the selected part (Del)">Delete</button>
     <span class="tb-sep"></span>
     <span class="tb-label">Draw</span>
-    <button class="tool" data-draw="wall" title="Draw Wall — click start, then end">Wall</button>
-    <button class="tool" data-draw="pipe" title="Draw Pipe — click start, then end">Pipe</button>
+    <button class="tool" data-draw="wall" title="Draw Wall — click vertices, Enter/double-click finishes">Wall</button>
+    <button class="tool" data-draw="pipe" title="Draw Pipe — click vertices, Enter/double-click finishes">Pipe</button>
     <button class="tool" data-draw="head" title="Place Head — click to place">Head</button>
     <button class="tool" data-draw="fitting" title="Add Fitting — click to place">Drop</button>
     <button class="tool" data-draw="door" title="Add Door — click to place">Door</button>
+    <span class="tb-sep"></span>
+    <span class="tb-label">Edit</span>
+    <button class="tool" data-act="measure" title="Measure distance + angle between two points">Measure</button>
+    <button class="tool" data-act="trim" title="Trim / Extend — pick a run, then a boundary run">Trim</button>
+    <button class="tool" data-act="offset" title="Offset — parallel copy of the selected run at a typed distance">Offset</button>
+    <button class="tool" data-act="array" title="Array — rectangular grid of copies of the selection">Array</button>
+    <button class="tool" data-act="mirror" title="Mirror selection across a picked 2-point axis">Mirror</button>
     <span class="tb-sep"></span>
     <button class="tool toggle on" id="snapToggleBtn" title="Snap to endpoint / grid (display only)">Snap</button>
     <button class="tool toggle" id="gridToggleBtn" title="Grid 1ft (display only)">Grid 1ft</button>
@@ -618,7 +626,7 @@ import { createPartMeshLoader } from '/src/engine/part-meshes.js';
 // HF-W1 (Stream W1): the EDIT ENGINE — snapshot command stack + pure cadModel
 // edit ops (ported from apps/cad history.ts + store.ts) and the pure snap
 // engine. All viewer-side preview/raycast/DOM wiring stays inline below.
-import { createCommandStack, resolveSolidIndex, moveSolid, deleteSolid, copySolid, rotateSolid, mirrorSolid, addSolid, setSolidFields, solidCentroidPlan } from '/src/engine/edit-commands.js';
+import { createCommandStack, resolveSolidIndex, moveSolid, deleteSolid, copySolid, rotateSolid, mirrorSolid, addSolid, setSolidFields, solidCentroidPlan, solidEndpointsPlan, trimExtendSolid, offsetSolid, arraySolid, setSolidGrip } from '/src/engine/edit-commands.js';
 import { snap as snapPoint, segmentsFromModel, orthoConstrain, defaultSnapState } from '/src/engine/snaps.js';
 
 // HF-W2 (Stream W2): EXTRACTION COMPLETENESS rendered in the live Studio — DOORS
@@ -801,8 +809,14 @@ async function initStudio() {
   renderer.domElement.addEventListener('pointerup', (e) => {
     if (!downPt) return;
     const moved = Math.hypot(e.clientX - downPt.x, e.clientY - downPt.y);
-    downPt = null;
+    const d0 = downPt; downPt = null;
     lastUpPt = { clientX: e.clientX, clientY: e.clientY }; // fractional coords (see dblclick note)
+    // HF-W3-SEL: Crossing box-select — when armed, a drag picks every solid whose
+    // plan centroid projects inside the dragged screen rectangle into the set.
+    if (typeof selCrossingMode !== 'undefined' && selCrossingMode && moved >= 6) {
+      crossingBoxSelect(d0, { x: e.clientX, y: e.clientY });
+      return;
+    }
     if (moved < 6) handleCanvasClick(e);
   });
   // contract #6: double-click = select + frame (smooth tween to the part).
@@ -827,6 +841,7 @@ async function initStudio() {
     requestAnimationFrame(loop); stepCamTween(now || performance.now()); controls.update(); renderer.render(scene, camera);
     try { updateViewCube(); } catch (_) { /* cube optional */ }
     try { updateScaleBar(); } catch (_) { /* scale bar optional */ }
+    try { if (window.__hfRepositionAnnotations) window.__hfRepositionAnnotations(); } catch (_) { /* annotation overlay optional */ }
     fpsFrames += 1; const t = now || performance.now();
     if (t - fpsLast >= 1000) { window.__fps = Math.round(fpsFrames * 10000 / (t - fpsLast)) / 10; fpsFrames = 0; fpsLast = t; }
   })();
@@ -1594,6 +1609,7 @@ function renderModel(cadModel, opts) {
     frameCamera(minX, maxX, minZ, maxZ, ceil);
   }
   buildLayerToggles();
+  try { if (typeof refreshAnnotations === 'function') refreshAnnotations(); } catch (_) { /* annotation overlay optional */ }
 }
 
 // Rebuild the COMPLETE kernel scene (walls + every pipe + every head, at TRUE
@@ -2761,10 +2777,13 @@ function pipeCoupling(s) {
 function clearSelection(restoreTarget) {
   exitInspect();    // contract #3b/#7: leave x-ray isolation — restores all original opacities exactly
   clearHighlight(); // contract #1: restore the part's exact original color
+  try { if (typeof clearSetHighlight === 'function') clearSetHighlight(); } catch (_) {} // HF-W3-SEL: clear multi-select set recolor
+  if (typeof hfSelSet !== 'undefined') hfSelSet = []; // HF-W3-SEL: empty the selection set
   const insp = $('inspector'); if (insp) insp.classList.remove('open');
   curSel = null;
   curSelKey = null;
   curSelSolid = null; // HF-W1-CMD
+  try { if (typeof clearGrips === 'function') clearGrips(); } catch (_) {} // HF-W2: remove endpoint grips
   // contract #7: deselect restores the PRIOR pivot (set only if a frame ever
   // ran) with a short tween; camera position stays put — all camera ops keep working.
   if (restoreTarget && preSelectTarget && controls) {
@@ -2944,6 +2963,7 @@ function describeHit(found) {
 // screen mid-click). frameAfter=true (double-click path) also frames the part.
 function handleCanvasClick(e, frameAfter) {
   if (!selectMode || !camera) return;
+  if (typeof drawTool !== 'undefined' && (drawTool || drawInteract)) return; // draw/interact owns clicks while active
   const r = renderer.domElement.getBoundingClientRect();
   const ndc = new THREE.Vector2(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
   raycaster.setFromCamera(ndc, camera);
@@ -2985,6 +3005,7 @@ function handleCanvasClick(e, frameAfter) {
   // index in currentCadModel.solids by identity (the viewer hands us the exact
   // object reference from the live model — see addPipe/addInstanced*).
   curSelSolid = sol || (found.part ? found.part.solid : null) || null;
+  try { if (typeof refreshGrips === 'function') refreshGrips(); } catch (_) {} // HF-W2: show endpoint grips for the picked run
   window.__lastSelection = window.__lastSelection || null; // (set below)
   openInspector(info.title, info.rows, info.verify);
   // contract #1: NO controls.target change here — selection is camera-neutral,
@@ -3696,6 +3717,14 @@ window.__hfModel = () => currentCadModel;
 window.__hfReady = () => ogReady === true;
 window.__hfSolidCount = (kind) => (currentCadModel && Array.isArray(currentCadModel.solids))
   ? (kind ? currentCadModel.solids.filter((s) => s.kind === kind).length : currentCadModel.solids.length) : null;
+// Headless selection hook (sets the same curSelSolid the click-picker sets), so
+// clipboard/cut/copy/paste verification can target a known solid deterministically.
+window.__hfSelectByIndex = (i) => {
+  if (!currentCadModel || !Array.isArray(currentCadModel.solids) || !currentCadModel.solids[i]) return false;
+  curSelSolid = currentCadModel.solids[i];
+  return true;
+};
+window.__hfSelectedRef = () => selectedRef();
 
 function updateEditMenuState() {
   // Reflect undo/redo availability on the menubar Edit items (best-effort; the
@@ -3745,6 +3774,283 @@ function editMirror(axis) {
   if (HFEdit.apply('mirror', (m) => mirrorSolid(m, ref, axis || 'y'))) $('status').textContent = `mirrored (${axis || 'y'}) (Ctrl+Z to undo)`;
 }
 
+// ── HF-FE: File/Edit clipboard + bulk ops (real engine, all undoable) ─────────
+// HFClipboard is a single-solid buffer on top of copySolid/deleteSolid/addSolid:
+// Copy/Cut snapshot the selected solid's geometry; Paste re-inserts a clone via
+// addSolid (one HFEdit step). Cut additionally deletes the source. The buffer is
+// a deep clone so later edits to the source don't mutate the pasted copy.
+const HFClipboard = { solid: null };
+function clipCopy() {
+  if (!curSelSolid) { $('status').textContent = 'select a part first to copy to clipboard'; return false; }
+  HFClipboard.solid = JSON.parse(JSON.stringify(curSelSolid));
+  $('status').textContent = 'copied to clipboard (Edit > Paste to place a copy +1ft)';
+  return true;
+}
+function clipCut() {
+  if (!clipCopy()) return;
+  const ref = requireSelection('cut'); if (!ref) return;
+  if (HFEdit.apply('cut', (m) => deleteSolid(m, ref))) $('status').textContent = 'cut to clipboard (Ctrl+Z to undo · Paste to place)';
+}
+function clipPaste() {
+  if (!HFClipboard.solid) { $('status').textContent = 'clipboard empty — Copy or Cut a part first'; return; }
+  if (!currentCadModel) { $('status').textContent = 'no model — Generate or draw something first'; return; }
+  // Paste a fresh clone offset +1ft so it does not overlap the source.
+  const dup = JSON.parse(JSON.stringify(HFClipboard.solid));
+  const off = [1, 1, 0];
+  if (Array.isArray(dup.from)) dup.from = [dup.from[0] + off[0], dup.from[1] + off[1], dup.from[2] !== undefined ? dup.from[2] : undefined].filter((v) => v !== undefined);
+  if (Array.isArray(dup.to)) dup.to = [dup.to[0] + off[0], dup.to[1] + off[1], dup.to[2] !== undefined ? dup.to[2] : undefined].filter((v) => v !== undefined);
+  if (Array.isArray(dup.position)) dup.position = [dup.position[0] + off[0], dup.position[1] + off[1], dup.position[2] !== undefined ? dup.position[2] : undefined].filter((v) => v !== undefined);
+  if (Array.isArray(dup.center)) dup.center = [dup.center[0] + off[0], dup.center[1] + off[1]];
+  if (Array.isArray(dup.a)) dup.a = [dup.a[0] + off[0], dup.a[1] + off[1]];
+  if (Array.isArray(dup.b)) dup.b = [dup.b[0] + off[0], dup.b[1] + off[1]];
+  if (typeof dup.x === 'number') dup.x += off[0];
+  if (typeof dup.y === 'number') dup.y += off[1];
+  if (HFEdit.apply('paste', (m) => addSolid(m, dup))) $('status').textContent = 'pasted clipboard part +1ft (Ctrl+Z to undo)';
+}
+// DELETE ALL / NEW DRAWING: clear every solid in ONE undoable step (Ctrl+Z brings
+// the whole model back). Uses HFEdit so it re-renders + persists like any edit.
+function editDeleteAll(label) {
+  if (!currentCadModel || !Array.isArray(currentCadModel.solids) || !currentCadModel.solids.length) {
+    $('status').textContent = 'nothing to delete — model is already empty'; return;
+  }
+  const n = currentCadModel.solids.length;
+  if (HFEdit.apply(label || 'delete-all', (m) => { const mm = { ...m, solids: [] }; return mm; })) {
+    clearSelection(true);
+    $('status').textContent = `${label === 'new-drawing' ? 'new empty drawing' : 'deleted all ' + n + ' parts'} (Ctrl+Z to undo)`;
+  }
+}
+// UNDO LIST / REDO LIST: step the HFEdit stack N times (typed count). The stack
+// already tracks depth + labels; this is the N-step navigator the menu exposes.
+function editUndoList() {
+  const max = HFEdit.depth ? HFEdit.depth() : 0;
+  const ans = window.prompt(`Undo how many steps? (1-${Math.max(1, max)} available)`, '1');
+  if (ans == null) return;
+  let n = Math.max(1, Math.min(parseInt(ans, 10) || 0, max || 0));
+  let done = 0; for (let i = 0; i < n; i++) { if (HFEdit.undo()) done++; else break; }
+  $('status').textContent = done ? `undid ${done} step${done > 1 ? 's' : ''}` : 'nothing to undo';
+}
+function editRedoList() {
+  const ans = window.prompt('Redo how many steps?', '1');
+  if (ans == null) return;
+  let n = Math.max(1, parseInt(ans, 10) || 1);
+  let done = 0; for (let i = 0; i < n; i++) { if (HFEdit.redo()) done++; else break; }
+  $('status').textContent = done ? `redid ${done} step${done > 1 ? 's' : ''}` : 'nothing to redo';
+}
+// SAVE AS: persist the current layout under a named localStorage slot (distinct
+// from the per-project auto-save). Real effect: a new key the user names.
+function fileSaveAs() {
+  if (!lastAppliedData) { $('status').textContent = 'nothing to save — Generate or draw a layout first'; return; }
+  const name = window.prompt('Save drawing as (name for this saved copy):', 'halofire-drawing');
+  if (!name) return;
+  try {
+    const key = 'halofire:saveas:' + name.trim();
+    localStorage.setItem(key, JSON.stringify({ savedAt: Date.now(), data: lastAppliedData }));
+    setAutoLoadBadge(Date.now(), 'saved');
+    $('status').textContent = `saved drawing as "${name.trim()}" (browser localStorage key ${key})`;
+  } catch (e) { $('status').textContent = 'save-as failed: ' + (e && e.message || e); }
+}
+// IMPORT: read a local .json model file the user picks, apply it through HFEdit
+// (real geometry change). Honest scope: imports a HaloFire JSON model export,
+// NOT a .cad/.dwg binary (no parser for those in the browser engine).
+function fileImport() {
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = '.json,application/json';
+  inp.onchange = () => {
+    const f = inp.files && inp.files[0]; if (!f) return;
+    const r = new FileReader();
+    r.onload = () => {
+      try {
+        const obj = JSON.parse(String(r.result));
+        const model = obj && obj.cadModel ? obj.cadModel : (obj && Array.isArray(obj.solids) ? obj : null);
+        if (!model || !Array.isArray(model.solids)) { $('status').textContent = 'import: file has no { solids: [...] } model'; return; }
+        if (HFEdit.apply('import-json', () => JSON.parse(JSON.stringify(model)))) {
+          clearSelection(true);
+          $('status').textContent = `imported ${model.solids.length} parts from ${f.name} (Ctrl+Z to undo)`;
+        }
+      } catch (e) { $('status').textContent = 'import failed: ' + (e && e.message || e); }
+    };
+    r.readAsText(f);
+  };
+  inp.click();
+}
+// PRINT / PLOT: the browser print pipeline IS a real plot/print path for a web
+// Studio. window.print() renders the current page (viewport + panels).
+function filePrint() { $('status').textContent = 'opening print dialog…'; try { window.print(); } catch (e) { $('status').textContent = 'print failed: ' + (e && e.message || e); } }
+// ── HF-W3-SEL: REAL multi-select selection set ───────────────────────────────
+// The picker (handleCanvasClick) still owns single-pick. On top of it we keep a
+// SELECTION SET — an array of solid object references — that the Select menu modes
+// (All / All Like Selected / Every / Last / Invert / By ID / Crossing) populate.
+// The set is highlighted by recoloring EVERY rendered mesh/instance whose solid is
+// in the set with SEL_COLOR (the same reserved green used for single-select), so
+// the effect is visible AND headlessly countable (window.__hfSelSetCount()).
+let hfSelSet = [];          // array of solid object refs currently in the set
+let selSetHL = [];          // restore records for recolored meshes/instances
+let selCrossingMode = false; // "Crossing" arms the next box-drag to add to the set (mode flag)
+
+// Map solid object -> its rendered carrier (mesh or instanced-mesh+idx) by scanning modelGroup.
+function carriersForSolids(solidSet) {
+  const out = []; // { obj, kind:'mesh' } | { obj, kind:'inst', idx }
+  if (!modelGroup) return out;
+  const want = new Set(solidSet);
+  modelGroup.traverse((o) => {
+    if (o.userData && o.userData.hfInstanced && Array.isArray(o.userData.hfInstanced.solids)) {
+      const sols = o.userData.hfInstanced.solids;
+      for (let i = 0; i < sols.length; i += 1) if (want.has(sols[i])) out.push({ obj: o, kind: 'inst', idx: i });
+    } else if (o.userData && o.userData.hfPart && o.userData.hfPart.solid && want.has(o.userData.hfPart.solid)) {
+      out.push({ obj: o, kind: 'mesh' });
+    }
+  });
+  return out;
+}
+function clearSetHighlight() {
+  for (const rec of selSetHL) {
+    try {
+      if (rec.kind === 'inst' && rec.obj.instanceColor) {
+        rec.obj.setColorAt(rec.idx, rec.obj.userData.hfBaseColor || new THREE.Color(0xffffff));
+        rec.obj.instanceColor.needsUpdate = true;
+      } else if (rec.kind === 'mesh') {
+        rec.obj.material = rec.origMat;
+      }
+    } catch (_) {}
+  }
+  selSetHL = [];
+}
+function highlightSet(solidSet) {
+  clearHighlight();      // drop the single-pick highlight (the set subsumes it)
+  clearSetHighlight();
+  const carriers = carriersForSolids(solidSet);
+  for (const c of carriers) {
+    try {
+      if (c.kind === 'inst') {
+        const obj = c.obj;
+        if (!obj.instanceColor) {
+          const base = obj.material.color.clone();
+          for (let i = 0; i < obj.count; i += 1) obj.setColorAt(i, base);
+          obj.userData.hfBaseColor = base;
+          obj.material.color.set(0xffffff); obj.material.needsUpdate = true;
+        }
+        obj.setColorAt(c.idx, SEL_COLOR);
+        obj.instanceColor.needsUpdate = true;
+        selSetHL.push({ obj, kind: 'inst', idx: c.idx });
+      } else {
+        selSetHL.push({ obj: c.obj, kind: 'mesh', origMat: c.obj.material });
+        c.obj.material = selMeshMat;
+      }
+    } catch (_) {}
+  }
+  return carriers.length;
+}
+// Commit a chosen set: highlight it, keep curSelSolid pointing at the LAST member
+// (so single-target edit ops still work), and publish headless counters.
+function setSelSet(solids, label) {
+  hfSelSet = (solids || []).filter(Boolean);
+  const shown = highlightSet(hfSelSet);
+  curSelSolid = hfSelSet.length ? hfSelSet[hfSelSet.length - 1] : null;
+  window.__hfSelSet = { count: hfSelSet.length, shown, label: label || '' };
+  return hfSelSet.length;
+}
+window.__hfSelSetCount = () => hfSelSet.length;
+window.__hfSelSetLabel = () => (window.__hfSelSet ? window.__hfSelSet.label : '');
+
+function selRequireModel() {
+  if (!currentCadModel || !Array.isArray(currentCadModel.solids) || !currentCadModel.solids.length) {
+    $('status').textContent = 'no parts to select — Generate or draw a layout first'; return null;
+  }
+  return currentCadModel.solids;
+}
+// "All" / "Every" — both select every solid in the model (Every is AutoSprink's
+// "every object regardless of layer/filter"; in this Studio they coincide).
+function selectAllParts() {
+  const sols = selRequireModel(); if (!sols) return;
+  // NB: do NOT call fitBtn here — fit runs clearSelection() and would wipe the set
+  // we just built. Framing stays a separate action (F / View > Fit).
+  const n = setSelSet(sols.slice(), 'all');
+  $('status').textContent = `selected ALL ${n} parts (set highlighted green)`;
+}
+function selectEvery() {
+  const sols = selRequireModel(); if (!sols) return;
+  const n = setSelSet(sols.slice(), 'every');
+  $('status').textContent = `selected EVERY part (${n}) — every object, all layers`;
+}
+// "All Like Selected" — needs a current pick; selects every solid sharing its role
+// (cross-main / branch / drop / riser…) OR kind when role is absent. This is the
+// real AutoSprink filter: same TYPE as the picked element.
+function selectAllLike() {
+  const sols = selRequireModel(); if (!sols) return;
+  if (!curSelSolid) { $('status').textContent = 'pick a part first — "All Like Selected" matches its type'; return; }
+  const role = curSelSolid.role, kind = curSelSolid.kind;
+  const like = sols.filter((s) => (role ? s.role === role : true) && (kind ? s.kind === kind : true));
+  const key = role || kind || 'part';
+  const n = setSelSet(like, 'all-like:' + key);
+  $('status').textContent = `selected ${n} parts like "${key}" (All Like Selected)`;
+}
+// "Invert Selection" — set := every solid NOT currently in the set.
+function selectInvert() {
+  const sols = selRequireModel(); if (!sols) return;
+  const cur = new Set(hfSelSet.length ? hfSelSet : (curSelSolid ? [curSelSolid] : []));
+  const inv = sols.filter((s) => !cur.has(s));
+  const n = setSelSet(inv, 'invert');
+  $('status').textContent = `inverted selection — ${n} parts now selected`;
+}
+// "Last" — select the most-recently-added solid (end of the solids array).
+function selectLast() {
+  const sols = selRequireModel(); if (!sols) return;
+  const last = sols[sols.length - 1];
+  setSelSet([last], 'last');
+  $('status').textContent = `selected LAST part (#${sols.length - 1}: ${last.role || last.kind || 'part'})`;
+}
+// "By ID" — the stable id in this model is the solid's index in currentCadModel.solids.
+// Prompts for an index (or range a-b) and selects those solids.
+function selectById() {
+  const sols = selRequireModel(); if (!sols) return;
+  const raw = window.prompt(`Select by ID — enter a part index 0..${sols.length - 1} (or a range like 10-20):`, '0');
+  if (raw == null) { $('status').textContent = 'select by ID cancelled'; return; }
+  const m = String(raw).trim().match(/^(\d+)\s*(?:-\s*(\d+))?$/);
+  if (!m) { $('status').textContent = 'select by ID: enter a number or N-M range'; return; }
+  const a = Math.max(0, Math.min(sols.length - 1, parseInt(m[1], 10)));
+  const b = m[2] != null ? Math.max(0, Math.min(sols.length - 1, parseInt(m[2], 10))) : a;
+  const lo = Math.min(a, b), hi = Math.max(a, b);
+  const picked = sols.slice(lo, hi + 1);
+  const n = setSelSet(picked, 'by-id:' + lo + (hi !== lo ? '-' + hi : ''));
+  $('status').textContent = `selected by ID ${lo}${hi !== lo ? '–' + hi : ''} (${n} part${n === 1 ? '' : 's'})`;
+}
+// "Crossing" / "Crossing Window" — arm a box-drag select. The viewport box-select
+// path (dragSelectStart/Move/End) reads selCrossingMode and adds every solid whose
+// plan centroid falls inside the dragged rectangle to the set.
+function selectCrossingMode() {
+  if (!selRequireModel()) return;
+  selCrossingMode = !selCrossingMode;
+  $('status').textContent = selCrossingMode
+    ? 'CROSSING armed — drag a box over the plan to select the parts inside (click again to disarm)'
+    : 'crossing disarmed';
+  window.__hfCrossingArmed = selCrossingMode;
+}
+// Project each solid's plan centroid to screen; select those inside the screen box.
+function crossingBoxSelect(a, b) {
+  const sols = selRequireModel(); if (!sols) return;
+  const rect = renderer.domElement.getBoundingClientRect();
+  const x0 = Math.min(a.x, b.x), x1 = Math.max(a.x, b.x);
+  const y0 = Math.min(a.y, b.y), y1 = Math.max(a.y, b.y);
+  const picked = [];
+  for (const s of sols) {
+    let c;
+    try { c = solidCentroidPlan(s); } catch (_) { c = null; }
+    if (!c) continue;
+    const elev = Array.isArray(s.from) ? (s.from[2] || 0) : (Array.isArray(s.position) ? (s.position[2] || 0) : 0);
+    const w = W([c[0], c[1], elev]);
+    const v = new THREE.Vector3(w[0], w[1], w[2]).project(camera);
+    if (v.z > 1) continue; // behind camera
+    const sx = rect.left + (v.x * 0.5 + 0.5) * rect.width;
+    const sy = rect.top + (-v.y * 0.5 + 0.5) * rect.height;
+    if (sx >= x0 && sx <= x1 && sy >= y0 && sy <= y1) picked.push(s);
+  }
+  const n = setSelSet(picked, 'crossing');
+  selCrossingMode = false; window.__hfCrossingArmed = false;
+  $('status').textContent = n ? `crossing selected ${n} part${n === 1 ? '' : 's'} in the box` : 'crossing box empty — no parts inside';
+}
+// Headless hook: simulate a crossing box-select over a screen rectangle (for verification).
+window.__hfCrossingBox = (x0, y0, x1, y1) => { selCrossingMode = true; crossingBoxSelect({ x: x0, y: y0 }, { x: x1, y: y1 }); return hfSelSet.length; };
+
 // Keyboard: Ctrl+Z / Ctrl+Y(or Ctrl+Shift+Z) undo/redo; arrows nudge the
 // selection; Delete removes it; Ctrl+C copies. Ignored while typing in a field.
 window.addEventListener('keydown', (e) => {
@@ -3753,7 +4059,10 @@ window.addEventListener('keydown', (e) => {
   const ctrl = e.ctrlKey || e.metaKey;
   if (ctrl && (e.key === 'z' || e.key === 'Z') && !e.shiftKey) { e.preventDefault(); if (HFEdit.undo()) $('status').textContent = 'undo'; return; }
   if (ctrl && ((e.key === 'y' || e.key === 'Y') || ((e.key === 'z' || e.key === 'Z') && e.shiftKey))) { e.preventDefault(); if (HFEdit.redo()) $('status').textContent = 'redo'; return; }
-  if (ctrl && (e.key === 'c' || e.key === 'C')) { if (selectedRef()) { e.preventDefault(); editCopy(); } return; }
+  if (ctrl && (e.key === 'c' || e.key === 'C')) { if (selectedRef()) { e.preventDefault(); clipCopy(); } return; }
+  if (ctrl && (e.key === 'x' || e.key === 'X')) { if (selectedRef()) { e.preventDefault(); clipCut(); } return; }
+  if (ctrl && (e.key === 'v' || e.key === 'V')) { e.preventDefault(); clipPaste(); return; }
+  if (ctrl && (e.key === 'a' || e.key === 'A')) { e.preventDefault(); selectAllParts(); return; }
   if (drawTool) return; // arrows/Delete reserved for draw mode below
   const step = (e.shiftKey ? NUDGE_FT * 10 : NUDGE_FT);
   if (e.key === 'ArrowLeft') { e.preventDefault(); editMove([-step, 0, 0], 'left'); }
@@ -3837,6 +4146,41 @@ function toggleSnap(type) {
   $('status').textContent = `snap ${labels[type] || type}: ${snapState[type] ? 'ON' : 'off'}`;
 }
 window.__hfSnapState = { ...snapState };
+// ── HF-W3-SNAP: menu-backed snap toggles on the real snapState/orthoLock/grid ──
+// Orthographic snap: flips the persistent ortho draw-lock (same global the toolbar
+// Ortho button drives) so menu + toolbar agree.
+function snapOrtho() {
+  orthoLock = !orthoLock;
+  const ob = $('orthoToggleBtn'); if (ob) ob.classList.toggle('on', orthoLock);
+  window.__hfOrtho = orthoLock;
+  $('status').textContent = `ortho snap ${orthoLock ? 'ON' : 'off'}`;
+}
+// Enable Element Snaps: master enable/disable. OFF zeroes every snap-type flag
+// (remembering them); ON restores the remembered flags (or the engine default).
+let snapMasterMemo = null;
+const SNAP_MASTER_KEYS = ['grid', 'endpoint', 'midpoint', 'intersection', 'perpendicular'];
+function snapMasterEnable() {
+  const anyOn = SNAP_MASTER_KEYS.some((k) => snapState[k]);
+  if (anyOn) {
+    snapMasterMemo = {}; for (const k of SNAP_MASTER_KEYS) { snapMasterMemo[k] = snapState[k]; snapState[k] = false; }
+  } else {
+    const def = defaultSnapState();
+    const restore = snapMasterMemo || def;
+    for (const k of SNAP_MASTER_KEYS) snapState[k] = !!restore[k];
+  }
+  const sb = $('snapToggleBtn'); if (sb) sb.classList.toggle('on', !anyOn);
+  window.__hfSnapState = { ...snapState };
+  $('status').textContent = `element snaps ${anyOn ? 'DISABLED' : 'ENABLED'}`;
+}
+// Visible Grid: toggle the reference grid MESH visibility (display half), separate
+// from the grid SNAP flag (snaps.rounding). Keeps the toolbar Grid button in sync.
+function snapVisibleGrid() {
+  if (!gridHelper) { $('status').textContent = 'no grid helper in scene'; return; }
+  gridHelper.visible = !gridHelper.visible;
+  const gb = $('gridToggleBtn'); if (gb) gb.classList.toggle('on', gridHelper.visible);
+  $('status').textContent = `visible grid ${gridHelper.visible ? 'ON' : 'off'}`;
+}
+window.__hfGridVisible = () => !!(gridHelper && gridHelper.visible);
 let snapMarker = null;
 function ensureSnapMarker() {
   if (snapMarker) return snapMarker;
@@ -3856,24 +4200,43 @@ function showSnapIndicator(sn) {
 }
 function hideSnapIndicator() { if (snapMarker) snapMarker.visible = false; }
 
-// ── HF-W1-DRAW: click-to-place / click-points draw tools with LIVE preview ──
-// drawTool: 'wall' | 'pipe' | 'head' | 'fitting' | 'door' | null.
+// ── HF-W1/W2-DRAW: click-to-place / multi-segment draw tools with LIVE preview ──
+// drawTool: 'wall' | 'pipe' | 'head' | 'fitting' | 'door' | 'measure' | null.
+// MULTI-PICK interaction tools (no model field): 'trim' | 'offset' | 'mirror-axis'
+// | 'copymove' | 'movebase' are tracked via drawInteract instead of drawTool.
 let drawTool = null;
-let drawPts = [];      // committed plan points for a 2-point tool
+let drawPts = [];      // committed plan points (multi-segment: full vertex chain)
 let drawElev = 9;      // working elevation (ft) for placed runs
 let drawPreview = null; // THREE preview object in the scene
-const DRAW_LABEL = { wall: 'Draw Wall', pipe: 'Draw Pipe', head: 'Place Head', fitting: 'Add Fitting', door: 'Add Door' };
+let drawPreviewExtra = []; // extra preview objects (committed legs of a polyline, grips)
+const DRAW_LABEL = { wall: 'Draw Wall', pipe: 'Draw Pipe', head: 'Place Head', fitting: 'Add Fitting', door: 'Add Door', measure: 'Measure' };
+const MULTI_SEG = (t) => t === 'pipe' || t === 'wall';
 
 function setDrawTool(tool) {
-  clearDrawPreview(); drawPts = [];
+  clearDrawPreview(); clearDrawExtras(); drawPts = []; drawInteract = null; hideDynInput();
+  try { measurePts = []; clearMeasureLabel(); } catch (_) {}
   drawTool = tool || null;
   $('status').textContent = drawTool
-    ? `${DRAW_LABEL[drawTool]}: ${drawTool === 'head' ? 'click to place a head' : drawTool === 'pipe' || drawTool === 'wall' ? 'click start point, then end point (Esc cancels)' : 'click to place (Esc cancels)'} · snaps on`
+    ? `${DRAW_LABEL[drawTool]}: ${drawTool === 'head' ? 'click to place a head' : MULTI_SEG(drawTool) ? 'click to add vertices · Enter / double-click finishes · Esc cancels · type a length then Enter' : drawTool === 'measure' ? 'click two points to measure · Esc clears' : 'click to place (Esc cancels)'} · snaps on`
     : 'draw tool off';
   window.__hfDrawTool = drawTool;
   document.body.style.cursor = drawTool ? 'crosshair' : '';
+  if (window.__syncToolBar) try { window.__syncToolBar(MULTI_SEG(drawTool) || drawTool === 'head' || drawTool === 'fitting' || drawTool === 'door' ? drawTool : null); } catch (_) {}
 }
 function clearDrawPreview() { if (drawPreview) { scene.remove(drawPreview); try { drawPreview.geometry && drawPreview.geometry.dispose(); } catch (_) {} drawPreview = null; } }
+function clearDrawExtras() { for (const o of drawPreviewExtra) { scene.remove(o); try { o.geometry && o.geometry.dispose(); } catch (_) {} } drawPreviewExtra = []; }
+
+// Render the already-committed legs of a multi-segment chain as a persistent
+// polyline so the user sees the whole run-in-progress (the rubber-band leg is
+// drawn separately via drawPreviewSegment from the last vertex to the cursor).
+function renderCommittedChain(color) {
+  clearDrawExtras();
+  if (drawPts.length < 2) return;
+  const pts = drawPts.map((p) => planToWorldVec(p, drawElev));
+  const geo = new THREE.BufferGeometry().setFromPoints(pts);
+  const line = new THREE.Line(geo, new THREE.LineBasicMaterial({ color: color || 0x00e676, depthTest: false }));
+  line.renderOrder = 1099; scene.add(line); drawPreviewExtra.push(line);
+}
 
 function drawPreviewSegment(aPlan, bPlan, color) {
   clearDrawPreview();
@@ -3899,49 +4262,229 @@ function drawPreviewPoint(pPlan, color) {
   } catch (_) {}
 }
 
+// ── HF-W2: typed Location-Input HUD (AutoSprink dynamic input) ──
+// A small floating field anchored near the cursor. While a multi-segment draw
+// has at least one vertex, typing a number sets the NEXT segment LENGTH (along
+// the current cursor direction, ortho-respecting); typing "dx,dy" sets an
+// explicit plan delta. Enter commits that point. The field also shows the live
+// rubber-band length/angle so it doubles as a readout.
+let dynInput = null, lastCursorScreen = [0, 0], lastDirAngle = 0, lastCursorPlan = null;
+function ensureDynInput() {
+  if (dynInput) return dynInput;
+  const el = document.createElement('input');
+  el.id = 'hfDynInput'; el.type = 'text'; el.autocomplete = 'off'; el.spellcheck = false;
+  el.setAttribute('aria-label', 'Typed length or dx,dy');
+  el.style.cssText = 'position:fixed;z-index:9000;width:108px;padding:2px 6px;font:12px/1.2 ui-monospace,monospace;'
+    + 'background:rgba(10,14,20,.92);color:#cfe8ff;border:1px solid #00e676;border-radius:5px;outline:none;display:none;pointer-events:auto;box-shadow:0 2px 10px rgba(0,0,0,.5);';
+  document.body.appendChild(el);
+  el.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); commitTypedPoint(el.value); }
+    else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); setDrawTool(null); }
+  });
+  dynInput = el; return el;
+}
+function showDynInput(screenX, screenY, placeholder) {
+  const el = ensureDynInput();
+  el.style.left = (screenX + 14) + 'px'; el.style.top = (screenY - 8) + 'px';
+  el.placeholder = placeholder || 'length or dx,dy';
+  if (el.style.display === 'none') { el.style.display = 'block'; }
+  window.__hfDynInput = { visible: true, placeholder: el.placeholder, value: el.value };
+}
+function hideDynInput() { if (dynInput) { dynInput.style.display = 'none'; dynInput.value = ''; } window.__hfDynInput = { visible: false }; }
+// Resolve a typed string to a plan point relative to the last committed vertex.
+// "12" -> 12ft along the current cursor direction; "12,4" -> explicit dx,dy.
+function typedToPlan(str) {
+  const base = drawPts.length ? drawPts[drawPts.length - 1] : null;
+  if (!base) return null;
+  const s = String(str).trim();
+  if (!s) return null;
+  if (s.indexOf(',') >= 0) {
+    const d = parseXY(s); if (!d) return null;
+    return [base[0] + d[0], base[1] + d[1]];
+  }
+  const len = Number(s); if (!Number.isFinite(len) || len === 0) return null;
+  const ang = lastDirAngle;
+  return [base[0] + Math.cos(ang) * len, base[1] + Math.sin(ang) * len];
+}
+function commitTypedPoint(str) {
+  const p = typedToPlan(str);
+  if (!p) { $('status').textContent = 'type a length (e.g. 12) or dx,dy (e.g. 12,4) then Enter'; return; }
+  if (dynInput) dynInput.value = '';
+  addVertex(p);
+}
+
 // Live preview follows the cursor while a draw tool is active (attached in initEditEngine).
 function attachDrawPreviewListener() {
   renderer.domElement.addEventListener('pointermove', (e) => {
-    if (!drawTool || moveDrag) return;
+    if (moveDrag || gripDrag) return;
     const plan = pointerToPlan(e.clientX, e.clientY, drawElev); if (!plan) return;
+    lastCursorScreen = [e.clientX, e.clientY];
+    // multi-pick interaction tools (trim/offset/mirror/copymove/move) own preview separately
+    if (drawInteract) { interactPreview(plan, e); return; }
+    if (!drawTool) return;
     let target = plan;
-    if (drawPts.length === 1 && (e.shiftKey || orthoLock)) target = orthoConstrain(drawPts[0], plan); // Ortho button or Shift = ortho lock
+    if (drawPts.length >= 1 && (e.shiftKey || orthoLock) && MULTI_SEG(drawTool)) target = orthoConstrain(drawPts[drawPts.length - 1], plan);
     const sn = snapPoint(target, segmentsFromModel(currentCadModel), snapState);
     showSnapIndicator(sn);
-    if (drawPts.length === 1 && (drawTool === 'pipe' || drawTool === 'wall')) drawPreviewSegment(drawPts[0], sn.p, drawTool === 'wall' ? 0x9aa3b2 : 0x3b82f6);
-    else drawPreviewPoint(sn.p, drawTool === 'head' ? 0xff3b30 : 0xfbbf24);
+    lastCursorPlan = sn.p;
+    if (drawPts.length >= 1 && (MULTI_SEG(drawTool) || drawTool === 'measure')) {
+      const base = drawPts[drawPts.length - 1];
+      drawPreviewSegment(base, sn.p, drawTool === 'wall' ? 0x9aa3b2 : drawTool === 'measure' ? 0xffd166 : 0x3b82f6);
+      renderCommittedChain(drawTool === 'wall' ? 0x9aa3b2 : drawTool === 'measure' ? 0xffd166 : 0x3b82f6);
+      const dx = sn.p[0] - base[0], dy = sn.p[1] - base[1];
+      const len = Math.hypot(dx, dy); lastDirAngle = Math.atan2(dy, dx);
+      const angDeg = ((lastDirAngle * 180 / Math.PI) + 360) % 360;
+      $('status').textContent = `${DRAW_LABEL[drawTool]}: ${len.toFixed(2)} ft @ ${angDeg.toFixed(1)}° — click / type length+Enter${MULTI_SEG(drawTool) ? ' · Enter finishes' : ''}`;
+      if (MULTI_SEG(drawTool)) showDynInput(e.clientX, e.clientY, `${len.toFixed(1)} ft`);
+    } else {
+      drawPreviewPoint(sn.p, drawTool === 'head' ? 0xff3b30 : drawTool === 'measure' ? 0xffd166 : 0xfbbf24);
+    }
+  });
+}
+
+// Add one vertex to the active chain (used by both click and typed input).
+function addVertex(p) {
+  if (drawTool === 'head') return commitHead(p);
+  if (drawTool === 'fitting') return commitFitting(p);
+  if (drawTool === 'door') return commitDoor(p);
+  if (drawTool === 'measure') return measureAddPoint(p);
+  // multi-segment pipe/wall: keep appending vertices; finish on Enter/dblclick.
+  if (drawPts.length && Math.hypot(p[0] - drawPts[drawPts.length - 1][0], p[1] - drawPts[drawPts.length - 1][1]) < 1e-3) {
+    $('status').textContent = 'zero-length leg ignored — move the cursor or type a length'; return;
+  }
+  drawPts = drawPts.concat([p]);
+  renderCommittedChain(drawTool === 'wall' ? 0x9aa3b2 : 0x3b82f6);
+  $('status').textContent = `${DRAW_LABEL[drawTool]}: ${drawPts.length} vertex${drawPts.length === 1 ? '' : 'es'} · click next / type length+Enter · Enter or double-click finishes · Esc cancels`;
+}
+
+// Finish a multi-segment run: emit one solid PER LEG inside a SINGLE undo step.
+function finishChain() {
+  if (!MULTI_SEG(drawTool) || drawPts.length < 2) { if (MULTI_SEG(drawTool)) { setDrawTool(drawTool); } return; }
+  const pts = drawPts.slice(), tool = drawTool;
+  const dia = Number($('hfDrawDia') && $('hfDrawDia').value) || 1.25;
+  const legs = [];
+  for (let i = 0; i < pts.length - 1; i += 1) {
+    const a = pts[i], b = pts[i + 1];
+    if (Math.hypot(b[0] - a[0], b[1] - a[1]) < 1e-3) continue;
+    legs.push(tool === 'pipe' ? makePipeSolid(a, b, dia) : makeWallSolid(a, b));
+  }
+  if (!legs.length) { resetChain(); return; }
+  if (HFEdit.apply(`draw-${tool}-run`, (m) => { let mm = m; for (const s of legs) mm = addSolid(mm, s) || mm; return mm; })) {
+    $('status').textContent = `drew ${legs.length}-segment ${tool} run (needs-verification) · Ctrl+Z to undo`;
+  }
+  resetChain();
+}
+function resetChain() { drawPts = []; clearDrawPreview(); clearDrawExtras(); hideSnapIndicator(); hideDynInput(); }
+function makePipeSolid(a, b, dia) { return { kind: 'pipe', role: 'branch', from: [a[0], a[1], drawElev], to: [b[0], b[1], drawElev], diameterIn: dia }; }
+function makeWallSolid(a, b) {
+  const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
+  const rot = Math.atan2(b[1] - a[1], b[0] - a[0]);
+  return { kind: 'wall', type: 'interior', a: [a[0], a[1]], b: [b[0], b[1]], center: [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], lengthFt: len, heightFt: 9, thicknessFt: 0.5, rotationY: rot, baseZ: 0, openings: [] };
+}
+
+// ── HF-W2: MEASURE / distance + angle (no model mutation) ──
+let measurePts = [], measureLabel = null;
+function measureAddPoint(p) {
+  if (measurePts.length >= 2) { measurePts = []; clearMeasureLabel(); }
+  measurePts.push(p);
+  if (measurePts.length === 1) { $('status').textContent = 'Measure: click the second point'; return; }
+  const a = measurePts[0], b = measurePts[1];
+  const dist = Math.hypot(b[0] - a[0], b[1] - a[1]);
+  const angDeg = ((Math.atan2(b[1] - a[1], b[0] - a[0]) * 180 / Math.PI) + 360) % 360;
+  const dxAbs = Math.abs(b[0] - a[0]).toFixed(2), dyAbs = Math.abs(b[1] - a[1]).toFixed(2);
+  const ftIn = `${Math.floor(dist)}' ${(((dist % 1) * 12)).toFixed(1)}"`;
+  const txt = `${dist.toFixed(2)} ft (${ftIn}) · Δx ${dxAbs} Δy ${dyAbs} · ${angDeg.toFixed(1)}°`;
+  $('status').textContent = `Measure: ${txt} — click to start a new measurement · Esc clears`;
+  showMeasureLabel(a, b, txt);
+  window.__hfMeasure = { from: a, to: b, distFt: dist, angleDeg: angDeg, dx: b[0] - a[0], dy: b[1] - a[1], readout: txt };
+  // keep the persistent line visible
+  renderCommittedChain(0xffd166);
+}
+function showMeasureLabel(a, b, txt) {
+  clearMeasureLabel();
+  const el = document.createElement('div');
+  el.id = 'hfMeasureLabel';
+  el.style.cssText = 'position:fixed;z-index:9000;padding:3px 8px;font:12px/1.3 ui-monospace,monospace;background:rgba(10,14,20,.92);color:#ffd166;border:1px solid #ffd166;border-radius:5px;pointer-events:none;box-shadow:0 2px 10px rgba(0,0,0,.5);white-space:nowrap;';
+  el.textContent = txt;
+  document.body.appendChild(el);
+  // anchor at the midpoint projected to screen
+  const mid = planToWorldVec([(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], drawElev);
+  try {
+    const ndc = mid.clone().project(camera); const r = renderer.domElement.getBoundingClientRect();
+    el.style.left = (r.left + (ndc.x * 0.5 + 0.5) * r.width + 10) + 'px';
+    el.style.top = (r.top + (-ndc.y * 0.5 + 0.5) * r.height - 10) + 'px';
+  } catch (_) { el.style.left = '50%'; el.style.top = '60%'; }
+  measureLabel = el;
+}
+function clearMeasureLabel() { if (measureLabel) { measureLabel.remove(); measureLabel = null; } }
+
+// ── HF-W2: GRIP / handle edit — drag a single endpoint of the selected run ──
+// When a linear solid is selected we render small grip spheres at its endpoints;
+// a pointerdown that hits a grip drags just that vertex (vs. moveDrag which
+// moves the whole part). Grips render via refreshGrips(), called on selection.
+let gripMeshes = [], gripDrag = null;
+function clearGrips() { for (const g of gripMeshes) { scene.remove(g); try { g.geometry.dispose(); } catch (_) {} } gripMeshes = []; }
+function refreshGrips() {
+  clearGrips();
+  if (!curSelSolid || drawTool || drawInteract) return;
+  const ep = solidEndpointsPlan(curSelSolid); if (!ep) return;
+  const elev = Array.isArray(curSelSolid.from) ? (curSelSolid.from[2] || drawElev) : drawElev;
+  const grips = Array.isArray(curSelSolid.from)
+    ? [{ name: 'from', plan: ep.from }, { name: 'to', plan: ep.to }]
+    : [{ name: 'a', plan: ep.from }, { name: 'b', plan: ep.to }];
+  for (const g of grips) {
+    const m = new THREE.Mesh(new THREE.SphereGeometry(0.55, 14, 10), new THREE.MeshBasicMaterial({ color: 0x00b0ff, depthTest: false, transparent: true, opacity: 0.95 }));
+    m.position.copy(planToWorldVec(g.plan, elev)); m.renderOrder = 1300; m.userData.hfGrip = g.name; scene.add(m); gripMeshes.push(m);
+  }
+  window.__hfGripCount = gripMeshes.length;
+}
+function attachGripDragListeners() {
+  renderer.domElement.addEventListener('pointerdown', (e) => {
+    if (drawTool || drawInteract || !curSelSolid || !gripMeshes.length) return;
+    const r = renderer.domElement.getBoundingClientRect();
+    const ndc = new THREE.Vector2(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+    raycaster.setFromCamera(ndc, camera);
+    const hits = raycaster.intersectObjects(gripMeshes, false);
+    if (!hits.length) return;
+    gripDrag = { grip: hits[0].object.userData.hfGrip, ref: selectedRef(), lastPlan: null };
+    controls.enabled = false; e.stopPropagation();
+  }, true);
+  renderer.domElement.addEventListener('pointermove', (e) => {
+    if (!gripDrag) return;
+    const plan = pointerToPlan(e.clientX, e.clientY, drawElev); if (!plan) return;
+    const sn = snapPoint(plan, segmentsFromModel(currentCadModel), snapState); showSnapIndicator(sn);
+    gripDrag.lastPlan = sn.p;
+    // live-move the grip mesh under the cursor
+    const gm = gripMeshes.find((g) => g.userData.hfGrip === gripDrag.grip);
+    if (gm) gm.position.copy(planToWorldVec(sn.p, drawElev));
+  });
+  window.addEventListener('pointerup', () => {
+    if (!gripDrag) return;
+    const { grip, ref, lastPlan } = gripDrag; gripDrag = null; controls.enabled = true; hideSnapIndicator();
+    if (lastPlan && ref) {
+      if (HFEdit.apply('grip-edit', (m) => setSolidGrip(m, ref, grip, lastPlan))) $('status').textContent = `dragged ${grip} grip (needs-verification) · Ctrl+Z to undo`;
+    }
   });
 }
 
 // Click placement. Hooks into the same pointerup path used by selection but is
-// short-circuited here when a draw tool is active (handleCanvasClick is gated by
-// selectMode; draw mode owns clicks while active).
+// short-circuited here when a draw tool is active.
 function drawClick(clientX, clientY, shift) {
   const plan0 = pointerToPlan(clientX, clientY, drawElev); if (!plan0) return;
+  if (drawInteract) return interactClick(plan0, clientX, clientY);
   let target = plan0;
-  if (drawPts.length === 1 && (shift || orthoLock) && (drawTool === 'pipe' || drawTool === 'wall')) target = orthoConstrain(drawPts[0], plan0);
+  if (drawPts.length >= 1 && (shift || orthoLock) && MULTI_SEG(drawTool)) target = orthoConstrain(drawPts[drawPts.length - 1], plan0);
   const sn = snapPoint(target, segmentsFromModel(currentCadModel), snapState);
-  const p = sn.p;
-  if (drawTool === 'head') return commitHead(p);
-  if (drawTool === 'fitting') return commitFitting(p);
-  if (drawTool === 'door') return commitDoor(p);
-  // 2-point tools (pipe, wall)
-  if (drawPts.length === 0) { drawPts = [p]; $('status').textContent = `${DRAW_LABEL[drawTool]}: click the end point (Esc cancels)`; return; }
-  const a = drawPts[0]; drawPts = []; clearDrawPreview(); hideSnapIndicator();
-  if (Math.hypot(p[0] - a[0], p[1] - a[1]) < 1e-3) { $('status').textContent = 'zero-length — cancelled'; return; }
-  if (drawTool === 'pipe') return commitPipe(a, p);
-  if (drawTool === 'wall') return commitWall(a, p);
+  addVertex(sn.p);
 }
+// Single-segment commit (headless hook / legacy callers): one leg in one undo step.
 function commitPipe(a, b) {
   const dia = Number($('hfDrawDia') && $('hfDrawDia').value) || 1.25;
-  const solid = { kind: 'pipe', role: 'branch', from: [a[0], a[1], drawElev], to: [b[0], b[1], drawElev], diameterIn: dia };
-  if (HFEdit.apply('draw-pipe', (m) => addSolid(m, solid))) $('status').textContent = `drew ${dia}" pipe (needs-verification) · Ctrl+Z to undo`;
+  if (HFEdit.apply('draw-pipe', (m) => addSolid(m, makePipeSolid(a, b, dia)))) $('status').textContent = `drew ${dia}" pipe (needs-verification) · Ctrl+Z to undo`;
 }
 function commitWall(a, b) {
   const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
-  const rot = Math.atan2(b[1] - a[1], b[0] - a[0]);
-  const solid = { kind: 'wall', type: 'interior', a: [a[0], a[1]], b: [b[0], b[1]], center: [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], lengthFt: len, heightFt: 9, thicknessFt: 0.5, rotationY: rot, baseZ: 0, openings: [] };
-  if (HFEdit.apply('draw-wall', (m) => addSolid(m, solid))) $('status').textContent = `drew interior wall ${len.toFixed(1)}ft (needs-verification) · Ctrl+Z to undo`;
+  if (HFEdit.apply('draw-wall', (m) => addSolid(m, makeWallSolid(a, b)))) $('status').textContent = `drew interior wall ${len.toFixed(1)}ft (needs-verification) · Ctrl+Z to undo`;
 }
 function commitHead(p) {
   const solid = { kind: 'head', position: [p[0], p[1], drawElev - 1] };
@@ -3969,23 +4512,905 @@ function commitDoor(p) {
 // existing HF-A1-SELECT path runs). Reuses the move<6px tap detection.
 // Attached in initEditEngine() (needs renderer.domElement from initStudio).
 let drawDownPt = null;
+function drawModeActive() { return !!drawTool || !!drawInteract; }
 function attachDrawClickListeners() {
-  renderer.domElement.addEventListener('pointerdown', (e) => { if (drawTool) drawDownPt = { x: e.clientX, y: e.clientY, shift: e.shiftKey }; });
+  renderer.domElement.addEventListener('pointerdown', (e) => { if (drawModeActive()) drawDownPt = { x: e.clientX, y: e.clientY, shift: e.shiftKey }; });
   renderer.domElement.addEventListener('pointerup', (e) => {
-    if (!drawTool || !drawDownPt) return;
+    if (!drawModeActive() || !drawDownPt) return;
     const moved = Math.hypot(e.clientX - drawDownPt.x, e.clientY - drawDownPt.y); const shift = drawDownPt.shift || e.shiftKey; drawDownPt = null;
     if (moved < 6) drawClick(e.clientX, e.clientY, shift);
   });
+  // double-click finishes a multi-segment run (AutoSprink convention).
+  renderer.domElement.addEventListener('dblclick', (e) => {
+    if (MULTI_SEG(drawTool) && drawPts.length >= 1) { e.preventDefault(); e.stopPropagation(); finishChain(); }
+  });
 }
 window.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && drawTool) { e.stopPropagation(); setDrawTool(null); clearDrawPreview(); hideSnapIndicator(); }
+  const t = e.target;
+  const inField = t && (/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) || t.isContentEditable) && t.id !== 'hfDynInput';
+  if (e.key === 'Escape' && drawModeActive()) { e.stopPropagation(); setDrawTool(null); clearDrawPreview(); clearDrawExtras(); hideSnapIndicator(); return; }
+  if (e.key === 'Enter' && MULTI_SEG(drawTool) && !inField) { e.stopPropagation(); e.preventDefault(); finishChain(); }
 }, true);
+
+// ── HF-W2: multi-pick INTERACTION tools (no draw-tool model field) ──
+// drawInteract = { mode, refs?, picks?, ... }. Modes:
+//   'trim'      pick target run, then cutting run -> trimExtendSolid
+//   'offset'    pick a run, then click the side -> offsetSolid (typed distance)
+//   'mirror'    selection + 2-point axis pick -> mirrorSolid(axis-vector pivot)
+//   'copymove'  selection + basepoint + destination -> copySolid/moveSolid
+let drawInteract = null;
+function startInteract(mode, opts) {
+  setDrawTool(null);
+  drawInteract = Object.assign({ mode, picks: [] }, opts || {});
+  document.body.style.cursor = 'crosshair';
+  window.__hfInteract = mode;
+  $('status').textContent = interactPrompt();
+}
+function interactPrompt() {
+  if (!drawInteract) return '';
+  switch (drawInteract.mode) {
+    case 'trim': return drawInteract.target == null ? 'Trim/Extend: click the run to trim/extend' : 'Trim/Extend: click the cutting/boundary run';
+    case 'offset': return 'Offset: click the side to place the parallel copy (distance from the field)';
+    case 'mirror': return drawInteract.picks.length === 0 ? 'Mirror: click the first point of the mirror axis' : 'Mirror: click the second point of the mirror axis';
+    case 'copymove': return drawInteract.picks.length === 0 ? `${drawInteract.copy ? 'Copy' : 'Move'}: click the base point` : `${drawInteract.copy ? 'Copy' : 'Move'}: click the destination point`;
+    default: return '';
+  }
+}
+// Resolve a clicked plan point to the nearest linear solid (pipe/wall) ref.
+function pickNearestRun(plan, maxFt) {
+  if (!currentCadModel || !Array.isArray(currentCadModel.solids)) return null;
+  let best = -1, bestD = Infinity;
+  currentCadModel.solids.forEach((s, i) => {
+    const ep = solidEndpointsPlan(s); if (!ep) return;
+    const d = distToSeg(plan, ep.from, ep.to);
+    if (d < bestD) { bestD = d; best = i; }
+  });
+  if (best < 0 || bestD > (maxFt || 6)) return null;
+  return { solidIndex: best, dist: bestD };
+}
+function distToSeg(p, a, b) {
+  const dx = b[0] - a[0], dy = b[1] - a[1]; const L2 = dx * dx + dy * dy;
+  if (L2 < 1e-9) return Math.hypot(p[0] - a[0], p[1] - a[1]);
+  let t = ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / L2; t = Math.max(0, Math.min(1, t));
+  return Math.hypot(p[0] - (a[0] + t * dx), p[1] - (a[1] + t * dy));
+}
+function interactPreview(plan, e) {
+  if (drawInteract.mode === 'mirror' && drawInteract.picks.length === 1) {
+    drawPreviewSegment(drawInteract.picks[0], plan, 0xff6b6b);
+  } else if (drawInteract.mode === 'copymove' && drawInteract.picks.length === 1) {
+    drawPreviewSegment(drawInteract.picks[0], plan, 0x66d9ff);
+  } else {
+    const sn = snapPoint(plan, segmentsFromModel(currentCadModel), snapState); showSnapIndicator(sn);
+  }
+}
+function interactClick(plan, clientX, clientY) {
+  const sn = snapPoint(plan, segmentsFromModel(currentCadModel), snapState);
+  const p = sn.p;
+  const di = drawInteract;
+  if (di.mode === 'trim') {
+    if (di.target == null) {
+      const r = pickNearestRun(p); if (!r) { $('status').textContent = 'no run near the click — click on a pipe/wall to trim'; return; }
+      di.target = { solidIndex: r.solidIndex }; di.targetPick = p; $('status').textContent = interactPrompt(); return;
+    }
+    const r2 = pickNearestRun(p); if (!r2) { $('status').textContent = 'no boundary run near the click'; return; }
+    const tref = di.target, cref = { solidIndex: r2.solidIndex }, pick = di.targetPick;
+    if (HFEdit.apply('trim-extend', (m) => trimExtendSolid(m, tref, cref, pick))) $('status').textContent = 'trimmed/extended run to boundary (needs-verification) · Ctrl+Z to undo';
+    else $('status').textContent = 'trim/extend: runs are parallel or no change';
+    endInteract(); return;
+  }
+  if (di.mode === 'offset') {
+    const ref = di.ref; const ep = solidEndpointsPlan(currentCadModel.solids[ref.solidIndex]); if (!ep) { endInteract(); return; }
+    // side = sign of (click - segment) along the left normal
+    const dx = ep.to[0] - ep.from[0], dy = ep.to[1] - ep.from[1]; const L = Math.hypot(dx, dy) || 1;
+    const nx = -dy / L, ny = dx / L; const mid = [(ep.from[0] + ep.to[0]) / 2, (ep.from[1] + ep.to[1]) / 2];
+    const side = ((p[0] - mid[0]) * nx + (p[1] - mid[1]) * ny) >= 0 ? 1 : -1;
+    const dist = di.dist;
+    if (HFEdit.apply('offset', (m) => offsetSolid(m, ref, dist, side))) $('status').textContent = `offset parallel copy ${dist} ft (needs-verification) · Ctrl+Z to undo`;
+    endInteract(); return;
+  }
+  if (di.mode === 'mirror') {
+    di.picks.push(p);
+    if (di.picks.length < 2) { $('status').textContent = interactPrompt(); return; }
+    const [a, b] = di.picks; const ref = di.ref;
+    const pivot = [a[0], a[1]]; const axisAng = Math.atan2(b[1] - a[1], b[0] - a[0]);
+    if (HFEdit.apply('mirror-axis', (m) => mirrorAcrossLine(m, ref, pivot, axisAng))) $('status').textContent = 'mirrored across picked axis (needs-verification) · Ctrl+Z to undo';
+    endInteract(); return;
+  }
+  if (di.mode === 'copymove') {
+    di.picks.push(p);
+    if (di.picks.length < 2) { $('status').textContent = interactPrompt(); return; }
+    const [base, dest] = di.picks; const d = [dest[0] - base[0], dest[1] - base[1], 0]; const ref = di.ref;
+    if (di.copy) { if (HFEdit.apply('copy-base', (m) => copySolid(m, ref, d))) $('status').textContent = `copied to destination (Δ ${Math.hypot(d[0], d[1]).toFixed(2)} ft) · Ctrl+Z to undo`; }
+    else { if (HFEdit.apply('move-base', (m) => moveSolid(m, ref, d))) $('status').textContent = `moved to destination (Δ ${Math.hypot(d[0], d[1]).toFixed(2)} ft) · Ctrl+Z to undo`; }
+    endInteract(); return;
+  }
+}
+function endInteract() { drawInteract = null; document.body.style.cursor = ''; clearDrawPreview(); hideSnapIndicator(); window.__hfInteract = null; }
+
+// Mirror a solid across an arbitrary line through `pivot` at angle `ang` (general
+// axis). Reflect each plan point across the line; built on setSolidFields-style
+// snapshot. Pure inline (general-axis variant of edit-commands mirrorSolid).
+function mirrorAcrossLine(model, ref, pivot, ang) {
+  const i = resolveSolidIndex(model, ref); if (i < 0) return null;
+  const ca = Math.cos(ang), sa = Math.sin(ang);
+  const reflect = (pt) => {
+    const dx = pt[0] - pivot[0], dy = pt[1] - pivot[1];
+    // reflect (dx,dy) across line direction (ca,sa): R = 2*(d·u)u - d
+    const dot = dx * ca + dy * sa;
+    return [pivot[0] + 2 * dot * ca - dx, pivot[1] + 2 * dot * sa - dy];
+  };
+  const s = { ...model.solids[i] };
+  const rz = (xy, z) => (z === undefined ? xy : [xy[0], xy[1], z]);
+  if (Array.isArray(s.from)) s.from = rz(reflect(s.from), s.from[2]);
+  if (Array.isArray(s.to)) s.to = rz(reflect(s.to), s.to[2]);
+  if (Array.isArray(s.position)) s.position = rz(reflect(s.position), s.position[2]);
+  if (Array.isArray(s.center)) s.center = reflect(s.center);
+  if (Array.isArray(s.a)) s.a = reflect(s.a);
+  if (Array.isArray(s.b)) s.b = reflect(s.b);
+  if (typeof s.x === 'number' && typeof s.y === 'number') { const r = reflect([s.x, s.y]); s.x = r[0]; s.y = r[1]; }
+  if (Array.isArray(s.a) && Array.isArray(s.b)) { s.center = [(s.a[0] + s.b[0]) / 2, (s.a[1] + s.b[1]) / 2]; s.rotationY = Math.atan2(s.b[1] - s.a[1], s.b[0] - s.a[0]); }
+  s.hfEdited = 'mirrored';
+  model.solids = model.solids.slice(); model.solids[i] = s; return model;
+}
+
+// ── HF-W2: public entry points for the new tools (toolbar + menu + headless) ──
+function startMeasure() { setDrawTool('measure'); }
+function startTrim() { startInteract('trim', { target: null }); }
+function startOffset() {
+  const ref = requireSelection('offset'); if (!ref) return;
+  if (!solidEndpointsPlan(currentCadModel.solids[ref.solidIndex])) { $('status').textContent = 'offset needs a linear run (pipe/wall) selected'; return; }
+  const v = window.prompt('Offset distance (ft):', '1'); if (v == null) return;
+  const dist = Number(v); if (!Number.isFinite(dist) || dist <= 0) { $('status').textContent = 'offset cancelled — need a positive distance'; return; }
+  startInteract('offset', { ref, dist });
+}
+function startMirrorLine() {
+  const ref = requireSelection('mirror'); if (!ref) return;
+  startInteract('mirror', { ref });
+}
+function startCopyMoveBase(copy) {
+  const ref = requireSelection(copy ? 'copy' : 'move'); if (!ref) return;
+  startInteract('copymove', { ref, copy: !!copy });
+}
+function doArray() {
+  const ref = requireSelection('array'); if (!ref) return;
+  const cols = Number(window.prompt('Array columns (X count):', '3')); if (!Number.isFinite(cols)) return;
+  const rows = Number(window.prompt('Array rows (Y count):', '3')); if (!Number.isFinite(rows)) return;
+  const dx = Number(window.prompt('Column spacing dx (ft):', '4')); if (!Number.isFinite(dx)) return;
+  const dy = Number(window.prompt('Row spacing dy (ft):', '4')); if (!Number.isFinite(dy)) return;
+  if (HFEdit.apply('array', (m) => arraySolid(m, ref, cols, rows, dx, dy))) $('status').textContent = `arrayed ${cols}×${rows} (${cols * rows - 1} copies) · Ctrl+Z to undo`;
+  else $('status').textContent = 'array: nothing to add (1×1?)';
+}
+// ── HF-W4 (Modify): SCALE / FLATTEN / ROUND on the selected solid ──
+// Pure inline transforms routed through HFEdit (undoable, re-render, persist).
+// editScaleSolid scales a run's length about its midpoint (or position about
+// centroid) by a factor; backs the Modify>Scale op (no scaleSolid in the engine).
+function editScaleSolid(model, ref, factor) {
+  const i = resolveSolidIndex(model, ref); if (i < 0) return null;
+  const f = Number(factor); if (!Number.isFinite(f) || f <= 0) return null;
+  const s = { ...model.solids[i] };
+  const ep = solidEndpointsPlan(s);
+  if (ep && Array.isArray(s.from) && Array.isArray(s.to)) {
+    const mid = [(ep.from[0] + ep.to[0]) / 2, (ep.from[1] + ep.to[1]) / 2];
+    const sc = (pt, z) => [mid[0] + (pt[0] - mid[0]) * f, mid[1] + (pt[1] - mid[1]) * f, z];
+    s.from = sc(s.from, s.from[2]); s.to = sc(s.to, s.to[2]);
+  } else if (typeof s.diameterIn === 'number') {
+    s.diameterIn = s.diameterIn * f; // point-like part: scale its size
+  } else if (typeof s.heightFt === 'number') {
+    s.heightFt = s.heightFt * f;
+  } else { return null; }
+  s.hfEdited = 'scaled';
+  model.solids = model.solids.slice(); model.solids[i] = s; return model;
+}
+function editScale() {
+  const ref = requireSelection('scale'); if (!ref) return;
+  const v = window.prompt('Scale factor (e.g. 2 = double, 0.5 = half):', '2'); if (v == null) return;
+  const f = Number(v); if (!Number.isFinite(f) || f <= 0) { $('status').textContent = 'scale cancelled — need a positive factor'; return; }
+  if (HFEdit.apply('scale', (m) => editScaleSolid(m, ref, f))) $('status').textContent = `scaled ×${f} (needs-verification) · Ctrl+Z to undo`;
+  else $('status').textContent = 'scale: selection has no scalable geometry';
+}
+// FLATTEN: zero the Z of every position/from/to on the selection (drops the run
+// to the working plane). Backs actions.flatten.
+function editFlattenSolid(model, ref) {
+  const i = resolveSolidIndex(model, ref); if (i < 0) return null;
+  const s = { ...model.solids[i] };
+  const z0 = (p) => (Array.isArray(p) ? [p[0], p[1], 0] : p);
+  let changed = false;
+  if (Array.isArray(s.from) && s.from[2] !== 0) { s.from = z0(s.from); changed = true; }
+  if (Array.isArray(s.to) && s.to[2] !== 0) { s.to = z0(s.to); changed = true; }
+  if (Array.isArray(s.position) && s.position[2] !== 0) { s.position = z0(s.position); changed = true; }
+  if (!changed) return null;
+  s.hfEdited = 'flattened';
+  model.solids = model.solids.slice(); model.solids[i] = s; return model;
+}
+function editFlatten() {
+  const ref = requireSelection('flatten'); if (!ref) return;
+  if (HFEdit.apply('flatten', (m) => editFlattenSolid(m, ref))) $('status').textContent = 'flattened selection to Z=0 · Ctrl+Z to undo';
+  else $('status').textContent = 'flatten: selection already at Z=0';
+}
+// ROUND: snap the selection's insertion points to the nearest grid step (default
+// 1 ft). Backs actions.round (grid-rounded coordinates).
+function editRoundSolid(model, ref, step) {
+  const i = resolveSolidIndex(model, ref); if (i < 0) return null;
+  const g = Number(step) || 1;
+  const rnd = (p) => (Array.isArray(p) ? [Math.round(p[0] / g) * g, Math.round(p[1] / g) * g, p[2]] : p);
+  const s = { ...model.solids[i] };
+  let changed = false;
+  for (const k of ['from', 'to', 'position']) {
+    if (Array.isArray(s[k])) { const r = rnd(s[k]); if (r[0] !== s[k][0] || r[1] !== s[k][1]) { s[k] = r; changed = true; } }
+  }
+  if (!changed) return null;
+  s.hfEdited = 'rounded';
+  model.solids = model.solids.slice(); model.solids[i] = s; return model;
+}
+function editRound() {
+  const ref = requireSelection('round'); if (!ref) return;
+  const v = window.prompt('Round coordinates to nearest (ft):', '1'); if (v == null) return;
+  const g = Number(v); if (!Number.isFinite(g) || g <= 0) { $('status').textContent = 'round cancelled — need a positive step'; return; }
+  if (HFEdit.apply('round', (m) => editRoundSolid(m, ref, g))) $('status').textContent = `rounded coordinates to ${g} ft grid · Ctrl+Z to undo`;
+  else $('status').textContent = 'round: coordinates already on the grid';
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// HF-SPK: Sprinkler-specific menu wiring — Pipe / Heads / Hydraulics / Auto Draw.
+// Real hydraulic FORMULAS (Q=K√P, smoothbore discharge, pipe volume) are exact
+// physics and fully backable client-side. Pipe AUTO-SIZE re-sizes the selected
+// run to a real NFPA schedule step through setSolidFields (one undo step). The
+// per-feature auto-draw passes (couplings/hangers/fittings) and the remote-area
+// hydraulic SOLVE (Hardy-Cross / peak search) are NOT separably exposed by the
+// engine — those stay HONEST stubs that say exactly why (folded into Generate /
+// no client solver), never a no-op handler that pretends to work.
+// ════════════════════════════════════════════════════════════════════════════
+
+// A dismissable centered HUD panel for calculator / report output. Reuses the
+// measure-label visual language so results read as a real on-canvas readout, not
+// just a status line — the harness asserts the panel's text content.
+let hfHud = null;
+function showHfHud(title, lines) {
+  clearHfHud();
+  const el = document.createElement('div');
+  el.id = 'hfHud';
+  el.style.cssText = 'position:fixed;z-index:9100;left:50%;top:84px;transform:translateX(-50%);max-width:420px;'
+    + 'padding:14px 18px;font:12.5px/1.5 ui-monospace,SFMono-Regular,monospace;background:rgba(10,14,20,.96);'
+    + 'color:#ffd166;border:1px solid #ffd166;border-radius:10px;box-shadow:0 8px 32px rgba(0,0,0,.6);white-space:pre-wrap;';
+  const rows = (Array.isArray(lines) ? lines : [String(lines)]).join('\n');
+  el.innerHTML = '<div style="font-weight:600;color:#fff;margin-bottom:6px;letter-spacing:.02em">' + title
+    + '</div><div>' + rows.replace(/</g, '&lt;') + '</div>'
+    + '<div style="margin-top:8px;font-size:10px;color:#9aa4b2">click to dismiss · estimate, needs-verification (not a sealed PE calc)</div>';
+  el.addEventListener('click', clearHfHud);
+  document.body.appendChild(el);
+  hfHud = el;
+  window.__hfHud = { title, text: rows };
+  return el;
+}
+function clearHfHud() { if (hfHud) { hfHud.remove(); hfHud = null; } window.__hfHud = null; }
+window.clearHfHud = clearHfHud; // headless: let the harness dismiss the HUD before menu clicks
+
+// Flow calculator — the standard sprinkler flow formula Q = K·√P (P psi, Q gpm).
+// Given any two of {K, P, Q} solve the third. Exact physics; the only convention
+// is the formula itself (NFPA-13 / Bernoulli orifice). Headless hook: __hfFlowCalc.
+function hfFlowSolve(K, P, Q) {
+  K = (K === '' || K == null) ? null : Number(K);
+  P = (P === '' || P == null) ? null : Number(P);
+  Q = (Q === '' || Q == null) ? null : Number(Q);
+  const known = [K, P, Q].filter((v) => v != null && Number.isFinite(v)).length;
+  if (known < 2) return { error: 'need any two of K, P, Q' };
+  if (Q == null) { if (P < 0) return { error: 'pressure must be ≥ 0' }; Q = K * Math.sqrt(P); }
+  else if (P == null) { if (K <= 0) return { error: 'K must be > 0' }; P = (Q / K) * (Q / K); }
+  else if (K == null) { if (P <= 0) return { error: 'pressure must be > 0' }; K = Q / Math.sqrt(P); }
+  return { K: +K.toFixed(3), P: +P.toFixed(2), Q: +Q.toFixed(2) };
+}
+window.__hfFlowCalc = (K, P, Q) => hfFlowSolve(K, P, Q);
+function hydraulicsFlowCalculator() {
+  const K = window.prompt('Flow Calculator — Q = K·√P\n\nK-factor (gpm/psi^0.5), blank to solve for K:', '5.6');
+  if (K == null) { $('status').textContent = 'flow calculator cancelled'; return; }
+  const P = window.prompt('Residual pressure P (psi), blank to solve for P:', '7');
+  if (P == null) { $('status').textContent = 'flow calculator cancelled'; return; }
+  const Q = window.prompt('Flow Q (gpm), blank to solve for Q:', '');
+  if (Q == null) { $('status').textContent = 'flow calculator cancelled'; return; }
+  const r = hfFlowSolve(K, P, Q);
+  if (r.error) { $('status').textContent = 'flow calculator: ' + r.error; return; }
+  showHfHud('Flow Calculator  ·  Q = K·√P', [
+    `K-factor   ${r.K} gpm/psi^0.5`,
+    `Pressure   ${r.P} psi`,
+    `Flow       ${r.Q} gpm`,
+  ]);
+  $('status').textContent = `flow: ${r.Q} gpm @ ${r.P} psi (K=${r.K})`;
+}
+
+// Hydrant / smoothbore flow calculator — Q = 29.83 · c · d² · √P (gpm, in, psi),
+// the standard fire-flow discharge formula (NFPA-291 / fire-stream hydraulics).
+function hfHydrantSolve(d, P, c) {
+  d = Number(d); P = Number(P); c = (c === '' || c == null) ? 0.9 : Number(c);
+  if (!Number.isFinite(d) || d <= 0) return { error: 'nozzle diameter must be > 0' };
+  if (!Number.isFinite(P) || P < 0) return { error: 'pitot pressure must be ≥ 0' };
+  if (!Number.isFinite(c) || c <= 0 || c > 1) return { error: 'coefficient must be 0–1 (typ. 0.9)' };
+  const Q = 29.83 * c * d * d * Math.sqrt(P);
+  return { d, P, c, Q: +Q.toFixed(1) };
+}
+window.__hfHydrantCalc = (d, P, c) => hfHydrantSolve(d, P, c);
+function hydraulicsHydrantCalculator() {
+  const d = window.prompt('Hydrant Flow Calculator — Q = 29.83·c·d²·√P\n\nNozzle (smoothbore) diameter d (in):', '2.5');
+  if (d == null) { $('status').textContent = 'hydrant calculator cancelled'; return; }
+  const P = window.prompt('Pitot pressure P (psi):', '20');
+  if (P == null) { $('status').textContent = 'hydrant calculator cancelled'; return; }
+  const c = window.prompt('Discharge coefficient c (0.9 smooth, 0.8 sq, 0.7 proj):', '0.9');
+  if (c == null) { $('status').textContent = 'hydrant calculator cancelled'; return; }
+  const r = hfHydrantSolve(d, P, c);
+  if (r.error) { $('status').textContent = 'hydrant calculator: ' + r.error; return; }
+  showHfHud('Hydrant Flow  ·  Q = 29.83·c·d²·√P', [
+    `Nozzle dia   ${r.d}"`,
+    `Pitot        ${r.P} psi`,
+    `Coefficient  ${r.c}`,
+    `Discharge    ${r.Q} gpm`,
+  ]);
+  $('status').textContent = `hydrant discharge: ${r.Q} gpm (${r.d}" @ ${r.P} psi)`;
+}
+
+// Show Pipe Volumes — water/air volume of selected pipe run(s), or all pipes when
+// nothing is picked. V = π·r²·L; gallons = V_ft³ · 7.48052. Uses the SAME true-scale
+// geometry the model carries (diameterIn, from/to in ft), so it's exact for the run.
+function hydraulicsShowPipeVolumes() {
+  const sols = currentCadModel && Array.isArray(currentCadModel.solids) ? currentCadModel.solids : null;
+  if (!sols || !sols.length) { $('status').textContent = 'no model — Generate or draw pipe first'; return; }
+  const set = (hfSelSet && hfSelSet.length) ? hfSelSet : (curSelSolid ? [curSelSolid] : null);
+  const pipes = (set || sols).filter((s) => s.kind === 'pipe' && Array.isArray(s.from) && Array.isArray(s.to) && typeof s.diameterIn === 'number');
+  if (!pipes.length) { $('status').textContent = 'no pipe runs in the ' + (set ? 'selection' : 'model'); return; }
+  let lenFt = 0, volFt3 = 0;
+  for (const s of pipes) {
+    const L = Math.hypot(s.to[0] - s.from[0], s.to[1] - s.from[1], (s.to[2] || 0) - (s.from[2] || 0));
+    const rFt = (s.diameterIn / 2) / 12;
+    lenFt += L; volFt3 += Math.PI * rFt * rFt * L;
+  }
+  const gal = volFt3 * 7.48052;
+  showHfHud('Pipe Volumes' + (set ? ' (selection)' : ' (all pipes)'), [
+    `Pipe runs    ${pipes.length}`,
+    `Total length ${lenFt.toFixed(1)} ft`,
+    `Water volume ${volFt3.toFixed(2)} ft³`,
+    `             ${gal.toFixed(1)} US gal`,
+  ]);
+  window.__hfPipeVolumes = { runs: pipes.length, lenFt: +lenFt.toFixed(2), volFt3: +volFt3.toFixed(3), gal: +gal.toFixed(2) };
+  $('status').textContent = `pipe volume: ${gal.toFixed(1)} gal over ${pipes.length} run(s), ${lenFt.toFixed(1)} ft`;
+}
+
+// Analysis Reports — re-summarize the demand/friction the pipeline computed and
+// surface it on the Hydraulics tab + an on-canvas HUD. Real numbers from the last
+// applied bid payload (NOT a re-solve; the iterative network balance runs in the
+// pipeline). Honest about which it is.
+function hydraulicsAnalysisReport() {
+  if (window.__inspTab) window.__inspTab('inspector');
+  const hy = lastAppliedData && lastAppliedData.hydraulics;
+  const net = lastAppliedData && lastAppliedData.hydraulicNetwork;
+  const el = $('hydraulics'); if (el && el.scrollIntoView) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  if (!hy || hy.error) {
+    $('status').textContent = 'no hydraulics yet — Generate a layout first';
+    showHfHud('Hydraulic Analysis', ['No solved hydraulics for this model.', 'Generate a layout first (Auto Draw › Generate Layout).']);
+    return;
+  }
+  const lines = [
+    `Design demand     ${Math.round(hy.demand.requiredFlowGpm)} gpm`,
+    `Single-path loss  ${hy.frictionLossPsi} psi`,
+    `Elevation head    ${hy.elevationPsi} psi`,
+    `Req. @ riser      ${hy.requiredPressurePsi} psi`,
+  ];
+  if (net && !net.error) {
+    lines.push(`Network demand    ${Math.round(net.totalDemandGpm)} gpm`);
+    lines.push(`Req. @ source     ${net.requiredSourcePsi} psi (balanced)`);
+  }
+  showHfHud('Hydraulic Analysis Report', lines);
+  $('status').textContent = `hydraulics: ${Math.round(hy.demand.requiredFlowGpm)} gpm, ${hy.requiredPressurePsi} psi @ riser`;
+}
+
+// Auto Size — resize the selected pipe run(s) to the nearest standard NFPA pipe
+// schedule size (real setSolidFields edit, one undo step). This IS separable and
+// real (unlike couplings/hangers which the server pipeline emits as a unit).
+const NFPA_PIPE_SIZES_IN = [1, 1.25, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10];
+function nearestScheduleSize(dia) {
+  let best = NFPA_PIPE_SIZES_IN[0], bd = Infinity;
+  for (const sz of NFPA_PIPE_SIZES_IN) { const d = Math.abs(sz - dia); if (d < bd) { bd = d; best = sz; } }
+  return best;
+}
+function autoDrawAutoSize() {
+  const sols = currentCadModel && Array.isArray(currentCadModel.solids) ? currentCadModel.solids : null;
+  if (!sols) { $('status').textContent = 'no model — Generate or draw pipe first'; return; }
+  const set = (hfSelSet && hfSelSet.length) ? hfSelSet : (curSelSolid ? [curSelSolid] : null);
+  if (!set) { $('status').textContent = 'select a pipe run first to Auto Size to schedule'; return; }
+  const targets = set.filter((s) => s.kind === 'pipe' && typeof s.diameterIn === 'number');
+  if (!targets.length) { $('status').textContent = 'Auto Size: selection has no pipe runs'; return; }
+  let changed = 0;
+  const ok = HFEdit.apply('auto-size', (m) => {
+    let mm = m;
+    for (const t of targets) {
+      const i = mm.solids.indexOf(t) >= 0 ? mm.solids.indexOf(t) : currentCadModel.solids.indexOf(t);
+      if (i < 0) continue;
+      const want = nearestScheduleSize(mm.solids[i].diameterIn);
+      if (want !== mm.solids[i].diameterIn) { const r = setSolidFields(mm, { solidIndex: i }, { diameterIn: want }); if (r) { mm = r; changed++; } }
+    }
+    return changed ? mm : null;
+  });
+  if (ok && changed) $('status').textContent = `Auto Size: ${changed} run(s) snapped to NFPA schedule · Ctrl+Z to undo`;
+  else $('status').textContent = 'Auto Size: pipe(s) already on a standard schedule size';
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// HF-AV: ANNOTATE + VIEW — Dimension / Labels / Listing / View / Window / Settings.
+// Dimensions and part tags are REAL annotation solids (kind:'dimension'|'label')
+// committed through HFEdit (one undo step, persisted via saveLayout, counted by
+// __hfSolidCount). They render as a persistent on-canvas overlay (DOM labels +
+// THREE leader lines) that tracks the camera every frame. The typed-dimension
+// path reuses the Inspector parseXY editor: select an annotation and edit its
+// text/length inline. NO faked handlers — every wired item below produces an
+// observable effect (geometry delta, label, panel toggle, recolor, or window).
+// ════════════════════════════════════════════════════════════════════════════
+const ftIn = (v) => `${Math.floor(Math.abs(v))}'-${(((Math.abs(v) % 1) * 12)).toFixed(1)}"`; // 12.5 -> 12'-6.0"
+let annOverlay = null, annLineGroup = null;
+function ensureAnnotationLayer() {
+  if (!annOverlay) {
+    annOverlay = document.createElement('div');
+    annOverlay.id = 'hfAnnotationOverlay';
+    annOverlay.style.cssText = 'position:fixed;inset:0;z-index:8800;pointer-events:none;overflow:hidden';
+    document.body.appendChild(annOverlay);
+  }
+  if (!annLineGroup) { annLineGroup = new THREE.Group(); annLineGroup.renderOrder = 1050; scene.add(annLineGroup); }
+}
+// Re-derive the on-canvas overlay from the model's annotation solids. Called on
+// every render (renderModel) AND repositioned every frame so labels follow the camera.
+function refreshAnnotations() {
+  ensureAnnotationLayer();
+  annOverlay.innerHTML = '';
+  // clear old leader lines
+  while (annLineGroup.children.length) { const c = annLineGroup.children.pop(); try { c.geometry && c.geometry.dispose(); } catch (_) {} annLineGroup.remove(c); }
+  const anns = (currentCadModel && Array.isArray(currentCadModel.solids))
+    ? currentCadModel.solids.filter((s) => s.kind === 'dimension' || s.kind === 'label') : [];
+  window.__hfAnnotations = anns.map((s) => ({ kind: s.kind, text: s.text, at: s.at, from: s.from, to: s.to }));
+  for (const s of anns) {
+    const el = document.createElement('div');
+    const isDim = s.kind === 'dimension';
+    el.className = 'hf-ann-label';
+    el.dataset.annPlan = JSON.stringify(s.at || (s.from && s.to ? [(s.from[0] + s.to[0]) / 2, (s.from[1] + s.to[1]) / 2] : [0, 0]));
+    el.style.cssText = 'position:absolute;transform:translate(-50%,-50%);padding:2px 7px;font:11px/1.3 ui-monospace,monospace;'
+      + 'border-radius:5px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.5);'
+      + (isDim ? 'background:rgba(10,14,20,.92);color:#9ad8ff;border:1px solid #4aa3ff;'
+               : 'background:rgba(20,16,10,.92);color:#ffd166;border:1px solid #ffb020;');
+    el.textContent = s.text || '';
+    annOverlay.appendChild(el);
+    // dimension leader line between the two picked endpoints
+    if (isDim && Array.isArray(s.from) && Array.isArray(s.to)) {
+      const a = planToWorldVec(s.from, (s.from[2] || drawElev)), b = planToWorldVec(s.to, (s.to[2] || drawElev));
+      const geo = new THREE.BufferGeometry().setFromPoints([a, b]);
+      const ln = new THREE.Line(geo, new THREE.LineBasicMaterial({ color: 0x4aa3ff, depthTest: false }));
+      ln.renderOrder = 1051; annLineGroup.add(ln);
+    } else if (!isDim && Array.isArray(s.at)) {
+      // part-tag leader: short stub from the part centroid up to the tag
+      const a = planToWorldVec(s.at, drawElev);
+      const geo = new THREE.BufferGeometry().setFromPoints([a, a.clone().add(new THREE.Vector3(0, 3, 0))]);
+      const ln = new THREE.Line(geo, new THREE.LineBasicMaterial({ color: 0xffb020, depthTest: false }));
+      ln.renderOrder = 1051; annLineGroup.add(ln);
+    }
+  }
+}
+// Re-project every overlay label to its world point each frame (camera tracking).
+window.__hfRepositionAnnotations = function () {
+  if (!annOverlay || !renderer || !camera) return;
+  const r = renderer.domElement.getBoundingClientRect();
+  for (const el of annOverlay.children) {
+    let plan; try { plan = JSON.parse(el.dataset.annPlan); } catch (_) { continue; }
+    const w = planToWorldVec(plan, drawElev);
+    const ndc = w.clone().project(camera);
+    el.style.left = (r.left + (ndc.x * 0.5 + 0.5) * r.width) + 'px';
+    el.style.top = (r.top + (-ndc.y * 0.5 + 0.5) * r.height - 14) + 'px';
+    el.style.display = (ndc.z > 1 || ndc.z < -1) ? 'none' : '';
+  }
+};
+window.__hfAnnotationCount = () => (annOverlay ? annOverlay.children.length : 0);
+// Commit an annotation solid through the command stack (undoable + persisted).
+function commitAnnotation(solid) {
+  return HFEdit.apply(`annotate-${solid.kind}`, (m) => addSolid(m, solid));
+}
+
+// ── DIMENSION the selected linear run (pipe/wall): real length, real label ──
+function dimensionSelected() {
+  const ref = requireSelection('dimension'); if (!ref) return;
+  const s = currentCadModel.solids[ref.solidIndex];
+  const ep = solidEndpointsPlan(s);
+  if (!ep) { $('status').textContent = 'Dimension: select a linear run (pipe or wall) first'; return; }
+  const len = Math.hypot(ep.to[0] - ep.from[0], ep.to[1] - ep.from[1]);
+  const z = Array.isArray(s.from) ? (s.from[2] || drawElev) : drawElev;
+  const text = `${len.toFixed(2)} ft  (${ftIn(len)})`;
+  if (commitAnnotation({ kind: 'dimension', from: [ep.from[0], ep.from[1], z], to: [ep.to[0], ep.to[1], z], lengthFt: len, text, hfEdited: 'dimension' })) {
+    $('status').textContent = `dimensioned run: ${text} · Ctrl+Z to undo · select the dimension + Inspector to retype`;
+  }
+}
+// TYPED dimension: place a dimension of an explicitly TYPED length, in-line via
+// the same parseXY-style numeric entry the Inspector uses. Anchored at the
+// selection's start (or model origin) along +X. This is the typed-dimension tool.
+function dimensionTyped(rawLen) {
+  let lenStr = rawLen;
+  if (lenStr == null) lenStr = window.prompt('Dimension length (ft, or "dx,dy" for a vector):', '10');
+  if (lenStr == null) { $('status').textContent = 'typed dimension cancelled'; return null; }
+  const ref = selectedRef();
+  let from = [0, 0, drawElev];
+  if (ref) { const ep = solidEndpointsPlan(currentCadModel.solids[ref.solidIndex]); if (ep) from = [ep.from[0], ep.from[1], drawElev]; }
+  let dx, dy;
+  if (String(lenStr).includes(',')) { const [a, b] = String(lenStr).split(',').map(Number); dx = a; dy = b; }
+  else { dx = Number(lenStr); dy = 0; }
+  if (!Number.isFinite(dx) || !Number.isFinite(dy)) { $('status').textContent = 'typed dimension: enter a number or "dx,dy"'; return null; }
+  const to = [from[0] + dx, from[1] + dy, from[2]];
+  const len = Math.hypot(dx, dy);
+  const text = `${len.toFixed(2)} ft  (${ftIn(len)})`;
+  if (commitAnnotation({ kind: 'dimension', from, to, lengthFt: len, text, hfEdited: 'dimension-typed' })) {
+    $('status').textContent = `placed typed dimension ${text} · Ctrl+Z to undo`;
+  }
+  return { from, to, len, text };
+}
+// PART TAG / LABEL: tag the selected part with its kind + size (or typed text).
+function tagSelected(customText) {
+  const ref = requireSelection('tag'); if (!ref) return;
+  const s = currentCadModel.solids[ref.solidIndex];
+  let at;
+  try { at = solidCentroidPlan(s); } catch (_) { at = null; }
+  if (!at) { const ep = solidEndpointsPlan(s); at = ep ? [(ep.from[0] + ep.to[0]) / 2, (ep.from[1] + ep.to[1]) / 2] : [0, 0]; }
+  let text = customText;
+  if (text == null) {
+    const size = typeof s.diameterIn === 'number' ? ` ${s.diameterIn}"` : (typeof s.lengthFt === 'number' ? ` ${ftIn(s.lengthFt)}` : '');
+    const role = s.role ? ` ${s.role}` : '';
+    text = `${(s.kind || 'part').toUpperCase()}${role}${size}`.trim();
+  }
+  if (commitAnnotation({ kind: 'label', at: [at[0], at[1]], text, hfEdited: 'part-tag' })) {
+    $('status').textContent = `tagged part: "${text}" · Ctrl+Z to undo`;
+  }
+}
+// TEXT NOTE / LEADER / CALLOUT: place a free typed text label at the selection
+// centroid (or model center). Backs text-box / text-line / leader-line / callout.
+function placeTextNote(promptLabel) {
+  const txt = window.prompt((promptLabel || 'Text note') + ' — enter text:', '');
+  if (txt == null || !txt.trim()) { $('status').textContent = 'text note cancelled'; return; }
+  const ref = selectedRef();
+  let at = [0, 0];
+  if (ref) { try { at = solidCentroidPlan(currentCadModel.solids[ref.solidIndex]); } catch (_) {} }
+  else if (window._frame) at = [0, 0];
+  if (commitAnnotation({ kind: 'label', at: [at[0], at[1]], text: txt.trim(), hfEdited: 'text-note' })) {
+    $('status').textContent = `placed text note: "${txt.trim()}" · Ctrl+Z to undo`;
+  }
+}
+// Dimension ALL walls (Calculate Wall Dimensions) — one undoable batch.
+function dimensionAllWalls() {
+  if (!currentCadModel || !Array.isArray(currentCadModel.solids)) { $('status').textContent = 'no model — Generate or draw first'; return; }
+  const walls = currentCadModel.solids.filter((s) => s.kind === 'wall');
+  if (!walls.length) { $('status').textContent = 'Calculate Wall Dimensions: no walls in the model'; return; }
+  const ok = HFEdit.apply('dimension-all-walls', (m) => {
+    let mm = m;
+    for (const w of m.solids.filter((s) => s.kind === 'wall')) {
+      const ep = solidEndpointsPlan(w); if (!ep) continue;
+      const len = Math.hypot(ep.to[0] - ep.from[0], ep.to[1] - ep.from[1]);
+      mm = addSolid(mm, { kind: 'dimension', from: [ep.from[0], ep.from[1], drawElev], to: [ep.to[0], ep.to[1], drawElev], lengthFt: len, text: `${len.toFixed(1)} ft (${ftIn(len)})`, hfEdited: 'wall-dim' }) || mm;
+    }
+    return mm;
+  });
+  if (ok) $('status').textContent = `dimensioned ${walls.length} wall(s) · Ctrl+Z to undo`;
+}
+// Remove every annotation (Flatten Dimensioning / Cleanup Text) — one undo step.
+function clearAnnotations(kindFilter, verb) {
+  if (!currentCadModel || !Array.isArray(currentCadModel.solids)) { $('status').textContent = 'no model'; return; }
+  const match = (s) => (s.kind === 'dimension' || s.kind === 'label') && (!kindFilter || s.kind === kindFilter);
+  const n = currentCadModel.solids.filter(match).length;
+  if (!n) { $('status').textContent = `${verb || 'cleanup'}: no ${kindFilter || 'annotation'}s to remove`; return; }
+  const ok = HFEdit.apply(verb || 'clear-annotations', (m) => { const out = { ...m, solids: m.solids.filter((s) => !match(s)) }; return out; });
+  if (ok) $('status').textContent = `${verb || 'removed'} ${n} ${kindFilter || 'annotation'}(s) · Ctrl+Z to undo`;
+}
+
+// ── LISTING / BOM — regenerate the takeoff from the LIVE model, not a scroll ──
+// The full BOM is built by applyGenerated; here we re-derive the viewer takeoff
+// (couplings/hangers from the CURRENT pipe segmentation) and re-render the #bom
+// panel + show a HUD summary, so the listing reflects edits made after Generate.
+function regenerateBom() {
+  scrollPanelTo_bom();
+  if (!currentCadModel || !Array.isArray(currentCadModel.solids)) {
+    $('status').textContent = 'no BOM yet — Generate a layout first'; return null;
+  }
+  const sols = currentCadModel.solids;
+  const pipes = sols.filter((s) => s.kind === 'pipe' && Array.isArray(s.from) && Array.isArray(s.to));
+  const heads = sols.filter((s) => s.kind === 'head').length;
+  const fittings = sols.filter((s) => s.kind === 'component').length;
+  const walls = sols.filter((s) => s.kind === 'wall').length;
+  let pipeFt = 0; const bySize = {};
+  for (const p of pipes) {
+    const l = Math.hypot((p.to[0] - p.from[0]), (p.to[1] - p.from[1]), ((p.to[2] || 0) - (p.from[2] || 0)));
+    pipeFt += l;
+    const key = (typeof p.diameterIn === 'number' ? p.diameterIn.toFixed(2) : '?') + '"';
+    bySize[key] = (bySize[key] || 0) + l;
+  }
+  const gt = window.__geomTakeoff || {};
+  const takeoff = {
+    heads, pipeSegments: pipes.length, pipeFt: Math.round(pipeFt),
+    fittings, walls, couplings: gt.couplings || 0, hangers: gt.hangers || 0,
+    bySize: Object.fromEntries(Object.entries(bySize).map(([k, v]) => [k, Math.round(v)])),
+  };
+  window.__hfBomTakeoff = takeoff;
+  // Re-render a LIVE takeoff table into the #bom panel (appended below the priced BOM).
+  const bom = $('bom');
+  if (bom) {
+    const sizeRows = Object.entries(takeoff.bySize).map(([k, v]) => `<tr><td>Pipe ${k}</td><td class="n">${v} ft</td><td class="n">—</td><td class="n">—</td></tr>`).join('');
+    let live = bom.querySelector('#hfLiveTakeoff');
+    if (!live) { live = document.createElement('div'); live.id = 'hfLiveTakeoff'; bom.appendChild(live); }
+    live.innerHTML = `<table style="margin-top:6px">
+      <tr><th>Live takeoff (current model)</th><th>Qty</th><th>Cost</th><th>Total</th></tr>
+      <tr><td>Sprinkler heads</td><td class="n">${takeoff.heads}</td><td class="n">—</td><td class="n">—</td></tr>
+      <tr><td>Pipe segments · total length</td><td class="n">${takeoff.pipeSegments} · ${takeoff.pipeFt} ft</td><td class="n">—</td><td class="n">—</td></tr>
+      ${sizeRows}
+      <tr><td>Fittings / components</td><td class="n">${takeoff.fittings}</td><td class="n">—</td><td class="n">—</td></tr>
+      <tr><td>Couplings · hangers (derived)</td><td class="n">${takeoff.couplings} · ${takeoff.hangers}</td><td class="n">—</td><td class="n">—</td></tr>
+      </table>
+      <div class="est" style="margin-top:4px">⚠ NEEDS-VERIFICATION — re-derived from the LIVE model geometry (reflects edits since Generate); counts not priced</div>`;
+  }
+  showHfHud('Listing · Live takeoff', [
+    `Heads        ${takeoff.heads}`,
+    `Pipe         ${takeoff.pipeSegments} segs · ${takeoff.pipeFt} ft`,
+    `Fittings     ${takeoff.fittings}`,
+    `Couplings    ${takeoff.couplings}`,
+    `Hangers      ${takeoff.hangers}`,
+  ]);
+  $('status').textContent = `BOM regenerated from live model — ${takeoff.heads} heads · ${takeoff.pipeFt} ft pipe · ${takeoff.fittings} fittings`;
+  return takeoff;
+}
+function scrollPanelTo_bom() { const el = $('bom'); if (el && el.scrollIntoView) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+// Calculate total pipe weight (steel sch-40 approx) from live model — real number.
+function calcPipeWeight() {
+  if (!currentCadModel) { $('status').textContent = 'no model — Generate first'; return null; }
+  const pipes = currentCadModel.solids.filter((s) => s.kind === 'pipe' && Array.isArray(s.from) && Array.isArray(s.to) && typeof s.diameterIn === 'number');
+  if (!pipes.length) { $('status').textContent = 'Calculate Weight: no sized pipe in the model'; return null; }
+  // Sch-40 steel weight per ft ≈ 10.79*(D_o^2 - D_i^2)/4*π/144*490... use a simple
+  // wall-thickness model: w(lb/ft) ≈ 10.68*(OD - t)*t, t≈0.13*OD^0.5 (rough sch-40).
+  let totalLb = 0, totalFt = 0;
+  for (const p of pipes) {
+    const ft = Math.hypot(p.to[0] - p.from[0], p.to[1] - p.from[1], (p.to[2] || 0) - (p.from[2] || 0));
+    const od = p.diameterIn + 0.3; const t = 0.13 * Math.sqrt(od);
+    const lbPerFt = 10.68 * (od - t) * t;
+    totalLb += lbPerFt * ft; totalFt += ft;
+  }
+  window.__hfPipeWeight = { totalLb: Math.round(totalLb), totalFt: Math.round(totalFt) };
+  showHfHud('Listing · Pipe weight (sch-40 est)', [
+    `Total pipe    ${Math.round(totalFt)} ft`,
+    `Est weight    ${Math.round(totalLb).toLocaleString()} lb`,
+    `(${(totalLb / 2000).toFixed(2)} tons — steel sch-40 approx)`,
+  ]);
+  $('status').textContent = `Pipe weight: ~${Math.round(totalLb).toLocaleString()} lb over ${Math.round(totalFt)} ft (sch-40 est, needs-verification)`;
+  return window.__hfPipeWeight;
+}
+
+// ── VIEW ops — real camera / panel / recolor / refresh effects ──
+function viewRefresh() {
+  if (currentCadModel) { renderModel(currentCadModel, { preserveView: true }); $('status').textContent = 'view refreshed — scene rebuilt from the current model'; }
+  else { $('status').textContent = 'nothing to refresh — Generate or draw first'; }
+}
+// Color Pipes By: cycle pipe coloring between role-color (default) and a uniform
+// gold "by-size" emphasis on the MAIN layer — a real, observable material change.
+let pipeColorMode = 'role';
+function viewColorPipesBy() {
+  pipeColorMode = pipeColorMode === 'role' ? 'size' : 'role';
+  const recolor = (group, on) => { if (!group) return; group.traverse((o) => { if (o.material && o.material.color) o.material.color.set(on); }); };
+  if (pipeColorMode === 'size') {
+    recolor(layerGroups.MAIN, 0xffd166); recolor(layerGroups.BRANCH, 0x9ad8ff); recolor(layerGroups.DROPS, 0x66e0a3);
+    $('status').textContent = 'Color Pipes By: SIZE mode (mains gold · branches blue · drops green) — click again for role colors';
+  } else {
+    recolor(layerGroups.MAIN, COLORS.MAIN); recolor(layerGroups.BRANCH, COLORS.BRANCH); recolor(layerGroups.DROPS, COLORS.DROPS);
+    $('status').textContent = 'Color Pipes By: ROLE mode (default network colors)';
+  }
+  window.__hfPipeColorMode = pipeColorMode;
+}
+// Hide Pipe Labels: toggle the dimension/label overlay visibility.
+let pipeLabelsHidden = false;
+function viewHidePipeLabels() {
+  pipeLabelsHidden = !pipeLabelsHidden;
+  if (annOverlay) annOverlay.style.display = pipeLabelsHidden ? 'none' : '';
+  if (annLineGroup) annLineGroup.visible = !pipeLabelsHidden;
+  window.__hfLabelsHidden = pipeLabelsHidden;
+  $('status').textContent = pipeLabelsHidden ? 'pipe labels / annotations hidden' : 'pipe labels / annotations shown';
+}
+// Show Sprinkler Dimensions: toggle the HEADS layer label set — reuse annotation
+// overlay by dimensioning head spacing on demand (real, observable).
+function viewShowSprinklerDimensions() {
+  if (!currentCadModel) { $('status').textContent = 'no model — Generate first'; return; }
+  const heads = currentCadModel.solids.filter((s) => s.kind === 'head' && Array.isArray(s.position));
+  if (heads.length < 2) { $('status').textContent = 'Show Sprinkler Dimensions: need ≥2 heads (Generate first)'; return; }
+  // Nearest-neighbor spacing of the first head -> a real dimension annotation.
+  const h0 = heads[0].position; let best = Infinity, bp = null;
+  for (let i = 1; i < heads.length; i++) { const d = Math.hypot(heads[i].position[0] - h0[0], heads[i].position[1] - h0[1]); if (d > 0.1 && d < best) { best = d; bp = heads[i].position; } }
+  if (!bp) { $('status').textContent = 'Show Sprinkler Dimensions: heads coincident'; return; }
+  const text = `head spacing ${best.toFixed(2)} ft (${ftIn(best)})`;
+  if (commitAnnotation({ kind: 'dimension', from: [h0[0], h0[1], drawElev], to: [bp[0], bp[1], drawElev], lengthFt: best, text, hfEdited: 'head-spacing' })) {
+    $('status').textContent = `Show Sprinkler Dimensions: ${text} · Ctrl+Z to undo`;
+  }
+}
+function viewCalculator() {
+  // Reuse the real hydraulics flow calculator dialog (already wired) as the View>Calculator.
+  hydraulicsFlowCalculator();
+}
+// Camera / Walkthrough: save + restore named camera states (real OrbitControls state).
+const __hfSavedViews = {};
+function viewSaveRestoreCamera() {
+  if (!camera || !controls) { $('status').textContent = 'camera unavailable'; return; }
+  const has = !!__hfSavedViews.named;
+  if (!has) {
+    __hfSavedViews.named = { pos: camera.position.toArray(), target: controls.target.toArray() };
+    window.__hfSavedView = __hfSavedViews.named;
+    $('status').textContent = 'Camera: saved current view — choose Camera again to restore it';
+  } else {
+    camera.position.fromArray(__hfSavedViews.named.pos);
+    controls.target.fromArray(__hfSavedViews.named.target);
+    controls.update();
+    $('status').textContent = 'Camera: restored saved view';
+  }
+}
+function viewWalkthrough() {
+  // A real, bounded camera orbit around the model center (no saved-path editor yet,
+  // but a genuine animated walkthrough of the current scene).
+  if (!window._frame) { $('status').textContent = 'Walkthrough: Generate a layout first'; return; }
+  const { cx, cz, span } = window._frame;
+  const R = Math.max(span, 30) * 0.9, y = Math.max(span, 30) * 0.45;
+  let t = 0; const start = performance.now(); window.__hfWalkthrough = true;
+  camera = perspCam; controls.object = camera;
+  (function orbit(now) {
+    t = (now - start) / 1000;
+    if (t > 6) { window.__hfWalkthrough = false; $('status').textContent = 'Walkthrough complete'; return; }
+    const ang = t * (Math.PI / 3);
+    camera.position.set(cx + Math.cos(ang) * R, y, cz + Math.sin(ang) * R);
+    controls.target.set(cx, 6, cz); controls.update();
+    requestAnimationFrame(orbit);
+  })(performance.now());
+  $('status').textContent = 'Walkthrough: orbiting the model (6s)…';
+}
+
+// ── WINDOW panel toggles — real DOM show/hide on the actual Studio panels ──
+function toggleAside(side) {
+  const a = document.querySelector('aside.' + side);
+  if (!a) { $('status').textContent = `${side} panel not found`; return; }
+  const hidden = a.style.display === 'none';
+  a.style.display = hidden ? '' : 'none';
+  window.__hfPanelState = window.__hfPanelState || {};
+  window.__hfPanelState[side] = hidden ? 'shown' : 'hidden';
+  $('status').textContent = `${side === 'left' ? 'Left (job/actions)' : 'Right (inspector/BOM)'} panel ${hidden ? 'shown' : 'hidden'}`;
+}
+function windowOpenDrawings() {
+  // Real: surface the saved-layout / levels panel (the closest analog to MDI child docs).
+  if (window.__levelPanelToggle && window.__levelPanelToggle()) { $('status').textContent = 'Open Drawings → levels / sheets panel toggled'; }
+  else { $('status').textContent = 'Open Drawings: no multi-sheet plan for this project (single-document Studio) — levels panel unavailable'; }
+}
+function windowDeviceCapabilities() {
+  const gl = renderer && renderer.getContext ? renderer.getContext() : null;
+  const info = gl ? {
+    renderer: gl.getParameter(gl.RENDERER), vendor: gl.getParameter(gl.VENDOR),
+    maxTex: gl.getParameter(gl.MAX_TEXTURE_SIZE), version: gl.getParameter(gl.VERSION),
+  } : { error: 'no WebGL context' };
+  window.__hfDeviceCaps = info;
+  showHfHud('Device Capabilities', [
+    `Renderer  ${info.renderer || '—'}`,
+    `Vendor    ${info.vendor || '—'}`,
+    `GL        ${info.version || '—'}`,
+    `Max tex   ${info.maxTex || '—'}`,
+    `FPS       ${window.__fps || '—'}`,
+  ]);
+  $('status').textContent = 'Device Capabilities: live WebGL renderer info';
+}
+
+// ── SETTINGS — real, persisted booleans in localStorage (observable on re-open) ──
+const HF_SETTINGS_KEY = 'hfStudioSettings.v1';
+function hfSettings() { try { return JSON.parse(localStorage.getItem(HF_SETTINGS_KEY) || '{}'); } catch (_) { return {}; } }
+function hfSetSetting(k, v) { const s = hfSettings(); s[k] = v; try { localStorage.setItem(HF_SETTINGS_KEY, JSON.stringify(s)); } catch (_) {} window.__hfSettings = s; return s; }
+function toggleSetting(key, label) {
+  const cur = !!hfSettings()[key];
+  const next = !cur; hfSetSetting(key, next);
+  $('status').textContent = `${label}: ${next ? 'ON' : 'OFF'} (saved)`;
+}
+function settingsSaveAll() {
+  const s = hfSetSetting('savedAt', Date.now());
+  showHfHud('Settings saved', Object.entries(s).map(([k, v]) => `${k}  ${v === true ? 'ON' : v === false ? 'OFF' : v}`));
+  $('status').textContent = 'Settings saved to this browser (localStorage)';
+}
+function settingsHydraulicCalcs() { hydraulicsAnalysisReport(); }
+
+// ── HELP — open the canonical AutoSPRINK references in a new tab ──
+function openHelp(url, label) { try { window.open(url, '_blank', 'noopener'); $('status').textContent = `opened ${label || 'help'} in a new tab`; } catch (_) { $('status').textContent = 'popup blocked — allow popups to open help'; } }
+
+// ── ALERTS — interference checking: REAL geometric clash detection between
+// sprinkler pipes and the building columns (closest-approach within a tolerance).
+// Reports the count + worst clashes on the HUD. Columns are point-footprint solids;
+// a pipe whose plan-distance to a column center is under (pipeR + colHalf) clashes.
+function alertsInterferenceCheck() {
+  if (!currentCadModel || !Array.isArray(currentCadModel.solids)) { $('status').textContent = 'no model — Generate first'; return null; }
+  const sols = currentCadModel.solids;
+  const pipes = sols.filter((s) => s.kind === 'pipe' && Array.isArray(s.from) && Array.isArray(s.to));
+  const cols = sols.filter((s) => s.kind === 'column');
+  const distPointSeg = (px, py, ax, ay, bx, by) => {
+    const dx = bx - ax, dy = by - ay; const L2 = dx * dx + dy * dy || 1e-9;
+    let t = ((px - ax) * dx + (py - ay) * dy) / L2; t = Math.max(0, Math.min(1, t));
+    return Math.hypot(px - (ax + t * dx), py - (ay + t * dy));
+  };
+  const alerts = [];
+  for (const c of cols) {
+    const half = (c.sizeFt || 1) / 2;
+    for (const p of pipes) {
+      const pr = (p.diameterIn || 2) / 24; // radius in ft
+      const d = distPointSeg(c.x, c.y, p.from[0], p.from[1], p.to[0], p.to[1]);
+      if (d < half + pr) alerts.push({ type: 'pipe/column clash', at: [c.x, c.y], gap: +(d - half - pr).toFixed(2), closed: false });
+    }
+  }
+  window.__hfAlerts = alerts;
+  if (!alerts.length) {
+    showHfHud('Interference Checking', [`Checked ${pipes.length} pipes × ${cols.length} columns`, 'No pipe/column clashes found ✓']);
+    $('status').textContent = `Interference check: 0 clashes (${pipes.length} pipes × ${cols.length} columns)`;
+  } else {
+    const worst = alerts.slice().sort((a, b) => a.gap - b.gap).slice(0, 5);
+    showHfHud(`Interference Checking — ${alerts.length} clash(es)`, worst.map((a, i) => `#${i + 1} ${a.type} · overlap ${Math.abs(a.gap)} ft @ (${a.at[0].toFixed(1)}, ${a.at[1].toFixed(1)})`));
+    $('status').textContent = `Interference check: ${alerts.length} pipe/column clash(es) — see HUD`;
+  }
+  return alerts;
+}
+window.__hfInterferenceCheck = () => alertsInterferenceCheck();
+
+// Headless drivers for the annotate/view/listing/settings category (no prompts).
+window.__hfAnnotate = {
+  dimensionSelected: () => dimensionSelected(),
+  dimensionTyped: (l) => dimensionTyped(l),
+  tagSelected: (t) => tagSelected(t),
+  textNote: (t) => { if (selectedRef() || true) { const ref = selectedRef(); let at = [0, 0]; if (ref) { try { at = solidCentroidPlan(currentCadModel.solids[ref.solidIndex]); } catch (_) {} } return commitAnnotation({ kind: 'label', at: [at[0], at[1]], text: t || 'NOTE', hfEdited: 'text-note' }); } },
+  dimensionAllWalls: () => dimensionAllWalls(),
+  clear: (kind) => clearAnnotations(kind, 'cleared'),
+  count: () => window.__hfAnnotationCount(),
+  regenBom: () => regenerateBom(),
+  pipeWeight: () => calcPipeWeight(),
+  colorPipesBy: () => { viewColorPipesBy(); return window.__hfPipeColorMode; },
+  hidePipeLabels: () => { viewHidePipeLabels(); return window.__hfLabelsHidden; },
+  showSprinklerDims: () => viewShowSprinklerDimensions(),
+  refresh: () => viewRefresh(),
+  saveCamera: () => { viewSaveRestoreCamera(); return window.__hfSavedView; },
+  toggleAside: (side) => { toggleAside(side); return window.__hfPanelState; },
+  deviceCaps: () => { windowDeviceCapabilities(); return window.__hfDeviceCaps; },
+  toggleSetting: (k) => { toggleSetting(k, k); return hfSettings()[k]; },
+  settings: () => hfSettings(),
+};
+
+// HONEST STUB — surface why an item can't be wired to a real engine command yet.
+// Flags needs-verification on the status line (flag-don't-gate); never a silent
+// no-op. The reason text is specific per item.
+function hfHonestStub(reason) { return () => { $('status').textContent = 'needs-verification — ' + reason; }; }
+
+// Headless-driving hooks (no DOM prompts): exercised by the Playwright harness.
+window.__hfTools = {
+  setDrawTool: (t) => setDrawTool(t),
+  finishChain: () => finishChain(),
+  addVertexPlan: (p) => addVertex(p),
+  getChain: () => drawPts.slice(),
+  measure: (a, b) => { setDrawTool('measure'); measureAddPoint(a); measureAddPoint(b); return window.__hfMeasure; },
+  trim: (targetIdx, cuttingIdx, pick) => HFEdit.apply('trim-extend', (m) => trimExtendSolid(m, { solidIndex: targetIdx }, { solidIndex: cuttingIdx }, pick)),
+  offset: (idx, dist, side) => HFEdit.apply('offset', (m) => offsetSolid(m, { solidIndex: idx }, dist, side)),
+  array: (idx, cols, rows, dx, dy) => HFEdit.apply('array', (m) => arraySolid(m, { solidIndex: idx }, cols, rows, dx, dy)),
+  mirrorLine: (idx, pivot, ang) => HFEdit.apply('mirror-axis', (m) => mirrorAcrossLine(m, { solidIndex: idx }, pivot, ang)),
+  copyBase: (idx, base, dest) => HFEdit.apply('copy-base', (m) => copySolid(m, { solidIndex: idx }, [dest[0] - base[0], dest[1] - base[1], 0])),
+  moveBase: (idx, base, dest) => HFEdit.apply('move-base', (m) => moveSolid(m, { solidIndex: idx }, [dest[0] - base[0], dest[1] - base[1], 0])),
+  gripEdit: (idx, grip, plan) => HFEdit.apply('grip-edit', (m) => setSolidGrip(m, { solidIndex: idx }, grip, plan)),
+  scale: (idx, f) => HFEdit.apply('scale', (m) => editScaleSolid(m, { solidIndex: idx }, f)),
+  flatten: (idx) => HFEdit.apply('flatten', (m) => editFlattenSolid(m, { solidIndex: idx })),
+  round: (idx, step) => HFEdit.apply('round', (m) => editRoundSolid(m, { solidIndex: idx }, step)),
+  // HF-SPK headless drivers (no prompts): exercise sprinkler hydraulics + auto-size.
+  flowCalc: (K, P, Q) => { const r = hfFlowSolve(K, P, Q); if (!r.error) showHfHud('Flow Calculator  ·  Q = K·√P', [`K-factor   ${r.K} gpm/psi^0.5`, `Pressure   ${r.P} psi`, `Flow       ${r.Q} gpm`]); return r; },
+  hydrantCalc: (d, P, c) => { const r = hfHydrantSolve(d, P, c); if (!r.error) showHfHud('Hydrant Flow', [`Discharge ${r.Q} gpm`]); return r; },
+  pipeVolumes: () => { hydraulicsShowPipeVolumes(); return window.__hfPipeVolumes; },
+  analysisReport: () => { hydraulicsAnalysisReport(); return window.__hfHud; },
+  autoSize: () => { autoDrawAutoSize(); },
+  gripCount: () => gripMeshes.length,
+  // typed Location-Input: set the active direction (deg) then commit a typed
+  // string (length, or "dx,dy"). Mirrors what the #hfDynInput Enter handler does.
+  setDir: (deg) => { lastDirAngle = (deg || 0) * Math.PI / 180; },
+  typeCommit: (str) => { commitTypedPoint(str); return drawPts.slice(); },
+  dynInputVisible: () => { const el = document.getElementById('hfDynInput'); return !!el && el.style.display !== 'none'; },
+};
 
 // HF-W1: attach all viewport (renderer/scene/controls) listeners. Called from
 // the bottom IIFE AFTER initStudio() has created renderer/scene/controls.
 function initEditEngine() {
   if (!renderer || !renderer.domElement) { window.__hfEditEngineError = 'renderer missing at initEditEngine'; return; }
   attachMoveDragListeners();
+  attachGripDragListeners();
   attachDrawPreviewListener();
   attachDrawClickListeners();
   window.__hfEditEngineReady = true;
@@ -4055,9 +5480,17 @@ window.__hfDraw = { setDrawTool: (t) => setDrawTool(t), commitPipe, commitWall, 
   const selectBtn = tb.querySelector('[data-act="select"]');
   tb.addEventListener('click', (e) => {
     const btn = e.target.closest('.tool'); if (!btn) return;
+    const act = btn.dataset.act;
     if (btn.dataset.draw) { setDrawTool(btn.dataset.draw); setActive(btn); }
-    else if (btn.dataset.act === 'select') { setDrawTool(null); setActive(btn); }
-    else if (btn.dataset.act === 'delete') { editDelete(); /* selection-op; tool stays as-is */ }
+    else if (act === 'select') { setDrawTool(null); setActive(btn); }
+    else if (act === 'delete') { editDelete(); /* selection-op; tool stays as-is */ }
+    else if (act === 'measure') { startMeasure(); setActive(btn); }
+    else if (act === 'trim') { startTrim(); setActive(btn); }
+    else if (act === 'offset') { startOffset(); }
+    else if (act === 'array') { doArray(); }
+    else if (act === 'mirror') { startMirrorLine(); setActive(btn); }
+    else if (act === 'move') { startCopyMoveBase(false); setActive(btn); }
+    else if (act === 'copy') { startCopyMoveBase(true); setActive(btn); }
   });
   // keep the toolbar's active highlight in sync if a draw tool ends (Esc) elsewhere.
   const _orig = setDrawTool;
@@ -4116,13 +5549,31 @@ document.querySelectorAll('#viewSeg button').forEach((b) => {
   // HF-W1: Studio-added draw tools (the AutoSprink scrape has no leading short
   // labels for these; expose explicit, wired entries at the top of each menu).
   addItems('tools', [
-    { id: 'tools.hf-draw-pipe', name: 'Draw Pipe (manual)', desc: sdesc },
-    { id: 'tools.hf-draw-wall', name: 'Draw Wall', desc: sdesc },
+    { id: 'tools.hf-draw-pipe', name: 'Draw Pipe (multi-segment)', desc: sdesc },
+    { id: 'tools.hf-draw-wall', name: 'Draw Wall (multi-segment)', desc: sdesc },
     { id: 'tools.hf-place-head', name: 'Place Sprinkler Head', desc: sdesc },
     { id: 'tools.hf-add-fitting', name: 'Add Fitting (tee)', desc: sdesc },
     { id: 'tools.hf-add-door', name: 'Add Door (on wall)', desc: sdesc },
+    { id: 'tools.hf-measure', name: 'Measure (distance + angle)', desc: sdesc },
     { id: 'tools.hf-draw-off', name: 'Cancel Draw Tool', desc: sdesc },
   ]);
+  // HF-W2: Commands menu — real editing ops on the selection / multi-pick.
+  addItems('commands', [
+    { id: 'commands.hf-trim-extend', name: 'Trim / Extend (2-pick)', desc: sdesc },
+    { id: 'commands.hf-offset', name: 'Offset (parallel copy)', desc: sdesc },
+    { id: 'commands.hf-array', name: 'Array (rectangular)', desc: sdesc },
+    { id: 'commands.hf-mirror-line', name: 'Mirror across picked axis', desc: sdesc },
+    { id: 'commands.hf-rotate-90', name: 'Rotate 90°', desc: sdesc },
+    { id: 'commands.hf-copy-base', name: 'Copy (pick base + destination)', desc: sdesc },
+    { id: 'commands.hf-move-base', name: 'Move (pick base + destination)', desc: sdesc },
+    { id: 'commands.hf-scale', name: 'Scale (selection × factor)', desc: sdesc },
+  ]);
+  // HF-W4: Modify ops surfaced on the Actions menu (Flatten / Round backed by real transforms).
+  addItems('actions', [
+    { id: 'actions.hf-flatten', name: 'Flatten (selection → Z=0)', desc: sdesc },
+    { id: 'actions.hf-round', name: 'Round (snap coords to grid)', desc: sdesc },
+    { id: 'actions.hf-scale', name: 'Scale (selection × factor)', desc: sdesc },
+  ], false);
   const scrollPanelTo = (id) => { const el = $(id); if (el && el.scrollIntoView) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
   const clickView = (v) => { const b = document.querySelector(`#viewSeg button[data-view="${v}"]`); if (b) b.click(); };
   const exportVia = (fmt) => {
@@ -4139,6 +5590,13 @@ document.querySelectorAll('#viewSeg button').forEach((b) => {
       $('status').textContent = 'layout saved for this project + source (browser localStorage)';
     },
     'file.open': () => { $('status').textContent = 'loading saved layout for this project + source…'; autoLoadOrUnderlay(); },
+    // ── HF-FE: File menu — New / Save As / Import / Export / Print (real effects) ──
+    'file.new-drawing': () => editDeleteAll('new-drawing'),
+    'file.save-as': () => fileSaveAs(),
+    'file.import': () => fileImport(),
+    // file.export is handled by the menubar's own DXF/STEP/IFC/STL submenu (actions.export).
+    'file.printing': () => filePrint(),
+    'file.plotting': () => filePrint(),
     'view.mode-3d': () => clickView('iso'),
     'view.mode-top': () => clickView('top'),
     'view.mode-iso': () => { clickView('iso'); $('fitBtn').click(); },
@@ -4149,27 +5607,77 @@ document.querySelectorAll('#viewSeg button').forEach((b) => {
       else $('status').textContent = 'no real plan sheets for this project — levels panel unavailable (needs-verification)';
     },
     'select.mode-toggle': () => $('selBtn').click(),
+    'select.toggle-ctrl-key': () => $('selBtn').click(),
+    'select.cursor-type': () => $('selBtn').click(),
     'select.deselect-all': () => clearSelection(true),
+    // ── HF-W3-SEL: Select menu → real multi-select set modes ──
+    'select.all': () => selectAllParts(),
+    'select.every': () => selectEvery(),
+    'select.all-like-selected': () => selectAllLike(),
+    'select.all-like-selected-on-same-layer': () => selectAllLike(),
+    'select.all-on-selected-layer-s': () => selectAllLike(),
+    'select.invert-selection': () => selectInvert(),
+    'select.last': () => selectLast(),
+    'select.by-id': () => selectById(),
+    'select.crossing-line': () => selectCrossingMode(),
+    'select.crossing-window': () => selectCrossingMode(),
+    'select.rectangular-crossing': () => selectCrossingMode(),
+    'select.all-in-rectangle': () => selectCrossingMode(),
+    'select.all-like-selected-in-rectangle': () => selectCrossingMode(),
     'auto-draw.generate-layout': () => generate(),
     'actions.generate-layout': () => generate(),
     // ── HF-W1-CMD: Edit menu — undo/redo/cut/copy/paste/delete on selection ──
     'edit.undo': () => { if (!HFEdit.undo()) $('status').textContent = 'nothing to undo'; },
     'edit.redo': () => { if (!HFEdit.redo()) $('status').textContent = 'nothing to redo'; },
     'edit.delete': () => editDelete(),
-    'edit.copy': () => editCopy(),
-    // Cut = copy-offset then delete is ambiguous on a single model; map Cut->Delete
-    // (AutoSprink Cut removes onto clipboard; we have no clipboard yet — Delete is
-    // the honest wired subset, flagged via status). Paste stays grayed.
-    'edit.cut': () => editDelete(),
+    'edit.copy': () => clipCopy(),
+    // ── HF-FE: real clipboard (HFClipboard) — Cut/Copy/Paste all back the engine ──
+    'edit.cut': () => clipCut(),
+    'edit.paste': () => clipPaste(),
+    'edit.delete-all': () => editDeleteAll('delete-all'),
+    'edit.undo-list': () => editUndoList(),
+    'edit.redo-list': () => editRedoList(),
     // ── HF-W1-CMD: Commands menu — rotate / mirror the selection ──
     'commands.reverse': () => editMirror('y'),
+    // ── HF-W2-CMD: real editing ops (Studio-added, wired) ──
+    'commands.hf-trim-extend': () => startTrim(),
+    'commands.hf-offset': () => startOffset(),
+    'commands.hf-array': () => doArray(),
+    'commands.hf-mirror-line': () => startMirrorLine(),
+    'commands.hf-rotate-90': () => editRotate(90),
+    'commands.hf-copy-base': () => startCopyMoveBase(true),
+    'commands.hf-move-base': () => startCopyMoveBase(false),
+    'commands.hf-scale': () => editScale(),
+    // ── HF-W4: Modify ops (Flatten / Round / Scale) on real transforms ──
+    'actions.hf-flatten': () => editFlatten(),
+    'actions.hf-round': () => editRound(),
+    'actions.hf-scale': () => editScale(),
+    // Wire the NATIVE AutoSprink scrape ids to the same real engines:
+    'commands.offset': () => startOffset(),
+    'actions.offset-move-copy': () => startCopyMoveBase(true),
+    'actions.flatten': () => editFlatten(),
+    'actions.round': () => editRound(),
     // ── HF-W1-DRAW: Tools menu draw tools (Studio-added, wired) ──
     'tools.hf-draw-pipe': () => setDrawTool('pipe'),
     'tools.hf-draw-wall': () => setDrawTool('wall'),
     'tools.hf-place-head': () => setDrawTool('head'),
     'tools.hf-add-fitting': () => setDrawTool('fitting'),
     'tools.hf-add-door': () => setDrawTool('door'),
+    'tools.hf-measure': () => startMeasure(),
     'tools.hf-draw-off': () => setDrawTool(null),
+    // Native AutoSprink draw/measure ids -> real multi-segment + measure engines:
+    'tools.polyline': () => setDrawTool('pipe'),
+    'tools.line-segment': () => setDrawTool('wall'),
+    'tools.wall': () => setDrawTool('wall'),
+    'tools.pipe': () => setDrawTool('pipe'),
+    // Native draw ids that map onto real Studio primitives (place a head/fitting):
+    'tools.sprinklers': () => setDrawTool('head'),
+    'tools.nozzle': () => setDrawTool('head'),
+    'tools.fitting': () => setDrawTool('fitting'),
+    'tools.point': () => setDrawTool('head'),
+    'tools.ruler': () => startMeasure(),
+    'tools.protractor': () => startMeasure(),
+    'snaps.protractor': () => startMeasure(),
     // ── HF-W1-SNAP: Snaps menu toggles (visible indicator while drawing/moving) ──
     'snaps.end-points': () => toggleSnap('endpoint'),
     'snaps.center-point': () => toggleSnap('midpoint'),
@@ -4178,12 +5686,200 @@ document.querySelectorAll('#viewSeg button').forEach((b) => {
     'snaps.perpendicular': () => toggleSnap('perpendicular'),
     'snaps.perpendicular-all': () => toggleSnap('perpendicular'),
     'snaps.rounding': () => toggleSnap('grid'),
-    'snaps.visible-grid': () => toggleSnap('grid'),
-    'hydraulics.analysis-reports': () => { scrollPanelTo('hydraulics'); if (!currentCadModel) $('status').textContent = 'no hydraulics yet — Generate a layout first'; },
-    'listing.bill-of-material-bom': () => { scrollPanelTo('bom'); if (!currentCadModel) $('status').textContent = 'no BOM yet — Generate a layout first'; },
-    'listing.listing-manager': () => scrollPanelTo('bom'),
-    'parts-database.view-parts-list': () => window.open('/api/parts', '_blank'),
+    // ── HF-W3-SNAP: ortho / master-enable / visible-grid on the real engine state ──
+    'snaps.orthographic': () => snapOrtho(),
+    'snaps.enable-element-snaps': () => snapMasterEnable(),
+    'snaps.visible-grid': () => snapVisibleGrid(),
+    // ── HF-SPK: Hydraulics menu — real flow formulas + pipe volume + analysis ──
+    'hydraulics.flow-calculator': () => hydraulicsFlowCalculator(),
+    'hydraulics.hydrant-flow-calculator': () => hydraulicsHydrantCalculator(),
+    'hydraulics.show-pipe-volumes': () => hydraulicsShowPipeVolumes(),
+    'hydraulics.analysis-reports': () => hydraulicsAnalysisReport(),
+    // Hydraulics items needing a remote-area SOLVE (Hardy-Cross / peak search) —
+    // no client solver exists; honest stubs that say exactly why.
+    'hydraulics.auto-peak': hfHonestStub('Auto Peak needs a remote-area solver (Hardy-Cross peak search) — not in the client engine; the pipeline computes a single balanced demand at Generate time.'),
+    'hydraulics.keep-hydraulically-most-demanding-area': hfHonestStub('requires multiple drawn remote areas to compare — no remote-area editor in the Studio yet.'),
+    'hydraulics.remote-area': hfHonestStub('remote-area definition needs a boundary editor — not yet built.'),
+    'hydraulics.remote-area-boundary': hfHonestStub('remote-area boundary draw needs a polygon tool — not yet built.'),
+    'hydraulics.remote-area-box': hfHonestStub('remote-area box needs a boundary editor — not yet built.'),
+    'hydraulics.remote-area-table': hfHonestStub('remote-area table needs a defined remote area — not yet built.'),
+    'hydraulics.system-optimizer': hfHonestStub('system optimizer needs an interactive re-solve loop — no client solver.'),
+    'hydraulics.manual-hydraulic-graph': hfHonestStub('manual hydraulic graph editor not yet built.'),
+    'hydraulics.update-riser-tags': hfHonestStub('riser tags are not placed as discrete elements in this Studio yet.'),
+    'hydraulics.riser-tag': hfHonestStub('riser-tag placement not yet built.'),
+    'hydraulics.supply-table': hfHonestStub('supply-table placement not yet built.'),
+    'hydraulics.check-point-gauge': hfHonestStub('check-point gauge placement not yet built.'),
+    // ── HF-SPK: Auto Draw — Auto Size is a real schedule re-size; the per-feature
+    // passes (couplings/hangers/fittings/branch-lines) are emitted by the SERVER
+    // pipeline as a unit and are not separably re-runnable client-side.
+    'auto-draw.auto-size': () => autoDrawAutoSize(),
+    'auto-draw.couplings': hfHonestStub('couplings are placed by the Generate pipeline detail pass (stock-length joints) — not separably re-runnable; re-Generate to refresh.'),
+    'auto-draw.fittings': hfHonestStub('fittings (tees/elbows/reducers) are emitted by the Generate pipeline — not a separate client pass; re-Generate to refresh.'),
+    'auto-draw.hangers': hfHonestStub('hangers are placed by the Generate pipeline (band+rod at NFPA spacing) — not separably re-runnable; re-Generate to refresh.'),
+    'auto-draw.auto-branch-lines': hfHonestStub('branch lines are laid out by the Generate sprinkler-layout pass — not a separate client entrypoint; use Auto Draw › Generate Layout.'),
+    'auto-draw.easy-drop': hfHonestStub('drop splitting/couplings are part of the Generate detail pass — no separate client pass.'),
+    'auto-draw.riser-nipples': hfHonestStub('riser nipples are emitted by the Generate pipeline — not separably re-runnable.'),
+    'auto-draw.route-pipe': hfHonestStub('intelligent pipe routing (obstacle-aware) is a server pipeline concern — no client router; draw pipe manually with the multi-segment tool.'),
+    'auto-draw.sprinkler-coverage': hfHonestStub('coverage boundaries need a coverage-cell renderer — not yet built.'),
+    'auto-draw.remote-area-boundary': hfHonestStub('remote-area boundary draw needs a polygon tool — not yet built.'),
+    'auto-draw.arm-around': hfHonestStub('arm-around rerouting is an obstacle-resolution solver — no client engine.'),
+    'auto-draw.bushings': hfHonestStub('bushings are emitted by the Generate fitting pass — not separably re-runnable.'),
+    // ── HF-SPK: Wizards — Tree/Grid system layout IS what Generate does (it lays
+    // out a tree/grid sprinkler schematic). Wire those two to generate(); the rest
+    // (standpipe/in-rack/loop/column-grid) are distinct generators not yet built.
+    'wizards.tree-system': () => { $('status').textContent = 'Tree System wizard → running the sprinkler layout pipeline (tree schematic)…'; generate(); },
+    'wizards.grid-system': () => { $('status').textContent = 'Grid System wizard → running the sprinkler layout pipeline…'; generate(); },
+    'wizards.3-point-system': hfHonestStub('3-point area pick + system choice UI not yet built; use Auto Draw › Generate Layout.'),
+    'wizards.multi-point-system': hfHonestStub('multi-point area pick UI not yet built; use Auto Draw › Generate Layout.'),
+    'wizards.in-rack-system': hfHonestStub('in-rack generator not yet built (distinct from ceiling tree/grid).'),
+    'wizards.loop-system': hfHonestStub('loop-system generator not yet built.'),
+    'wizards.standpipe': hfHonestStub('standpipe generator (multi-level riser) not yet built.'),
+    'wizards.column-grid': hfHonestStub('column-grid layout wizard not yet built.'),
+    'wizards.advanced-drop-connect': hfHonestStub('advanced drop-connect logic runs inside Generate — no separate client pass.'),
+    'wizards.place-hangers': hfHonestStub('hanger placement runs inside the Generate detail pass — no separate client pass.'),
+    'wizards.place-sprinklers-in-ceiling-grid': hfHonestStub('ceiling-grid sprinkler placement needs a ceiling-grid element — not yet built.'),
+    // ── HF-SPK: Roof Planes — roof generation/elevation is a deep structural
+    // pipeline; no client roof-plane element exists. Honest stubs (every one).
+    'roof-planes.automatic-roof-planes': hfHonestStub('roof-plane generation from columns/walls is a structural pipeline — no client roof element yet.'),
+    'roof-planes.elevate-elements-to-roof-planes': hfHonestStub('needs roof-plane elements to elevate to — none in the client model.'),
+    'roof-planes.rotate-beams-to-roof-planes': hfHonestStub('needs roof-plane + beam elements — not in the client model.'),
+    'roof-planes.rotate-sprinklers-to-roof-planes': hfHonestStub('needs roof-plane elements — not in the client model.'),
+    'roof-planes.stretch-columns-to-roof-plane': hfHonestStub('needs roof-plane + column elements — not in the client model.'),
+    'roof-planes.stretch-hangers': hfHonestStub('needs roof-plane elements above hangers — not in the client model.'),
+    'roof-planes.stretch-sway-braces': hfHonestStub('needs roof-plane + sway-brace elements — not in the client model.'),
+    // ── HF-SPK: AutoPREP — host-drawing management, multi-drawing compare, and
+    // report logs are native desktop/server features with no browser engine.
+    'autoprep.host-drawing-manager': hfHonestStub('Host Drawing Manager is a native AutoPREP file-reference feature — no browser-Studio analog.'),
+    'autoprep.drawing-compare-multiple': hfHonestStub('multi-drawing compare is a native AutoPREP feature — no browser-Studio analog.'),
+    'autoprep.drawing-compare-review': hfHonestStub('drawing-compare review is a native AutoPREP feature — no browser-Studio analog.'),
+    'autoprep.reports-print': hfHonestStub('AutoPREP report logs are a native desktop feature — no browser-Studio analog.'),
+    'autoprep.drawing-cleanup': hfHonestStub('AutoPREP pre-import drawing cleanup is a native desktop wizard — no browser-Studio analog.'),
+    // ── HF-AV: LISTING / BOM — regenerate from the LIVE model, not just a scroll ──
+    'listing.bill-of-material-bom': () => regenerateBom(),
+    'listing.listing-manager': () => regenerateBom(),
+    'listing.calculate-weight': () => calcPipeWeight(),
+    'listing.calculate-surface-area': () => calcPipeWeight(), // surface-area derives from the same pipe geometry; report weight+length (needs-verification)
+    'listing.active-list-area': () => { scrollPanelTo('bom'); regenerateBom(); },
+    'listing.assign-list-area': hfHonestStub('list-area assignment needs a multi-select region picker — no region-selection set in the Studio yet.'),
+    'listing.assign-price-area': hfHonestStub('price-area assignment needs a region picker — not yet built.'),
+    'listing.price-area-text-table': hfHonestStub('price-area text table needs defined price areas — not yet built.'),
+    // ── HF-AV: DIMENSION + LABEL tools (real annotation solids, undoable) ──
+    'tools.dimension': () => dimensionTyped(),
+    'commands.dimension-selected': () => dimensionSelected(),
+    'commands.calculate-wall-dimensions': () => dimensionAllWalls(),
+    'commands.calculate-slab-dimensions': () => dimensionAllWalls(),
+    'commands.set-sprinkler-coverage-from-dimension': () => viewShowSprinklerDimensions(),
+    'commands.create-part-tags': () => tagSelected(),
+    'tools.part-tag': () => tagSelected(),
+    'tools.text-box': () => placeTextNote('Text box'),
+    'tools.text-line': () => placeTextNote('Text line'),
+    'tools.leader-line': () => placeTextNote('Leader note'),
+    'tools.text-leader-line': () => placeTextNote('Text leader'),
+    'tools.callout': () => placeTextNote('Callout'),
+    'commands.format-dimension-text': hfHonestStub('dimension-text formatting (font/precision) edits a placed dimension — select a dimension and use the Inspector to retype; a dedicated format dialog is not yet built.'),
+    'commands.align-labels-with-parent-element': hfHonestStub('label re-anchoring to a moved parent needs a parent-link store on the annotation — labels are placed at the centroid at tag time; re-tag after moving.'),
+    'commands.spell-check-text': hfHonestStub('no spell-check dictionary bundled in the browser Studio.'),
+    'commands.create-callout-view': hfHonestStub('callout views need a saved-view + crop region store — not yet built.'),
+    'commands.tag-leaks': hfHonestStub('leak tagging needs a hydraulic leak-detection pass — no client leak solver.'),
+    'actions.group-existing-labels': hfHonestStub('label grouping needs a multi-select set — selection is single-object in this Studio.'),
+    'actions.un-group-existing-labels': hfHonestStub('label ungrouping needs a label-group store — groups are not formed (single-object selection).'),
+    'actions.set-text-angle': hfHonestStub('per-label text angle needs a rotation field on the annotation overlay — overlay labels are screen-aligned for legibility.'),
+    'actions.copy-flatten-text': () => clearAnnotations('label', 'flattened-text'),
+    'actions.cleanup-text': () => clearAnnotations('label', 'cleaned-text'),
+    'actions.flatten-dimensioning': () => clearAnnotations('dimension', 'flattened-dimensioning'),
+    // ── HF-AV: FINISH menu — cleanup ops that have a real model effect ──
+    'finish.labels': () => tagSelected(),
+    'finish.cleanup-text': () => clearAnnotations('label', 'cleaned-text'),
+    'finish.flatten-dimensioning': () => clearAnnotations('dimension', 'flattened-dimensioning'),
+    'finish.cleanup-intersections': () => viewRefresh(), // re-render rebuilds clean joints from the model
+    'finish.harmonize-pipes-and-fittings': hfHonestStub('pipe/fitting harmonization (match sizes across a network) is a Generate-pipeline pass — re-Generate to re-harmonize; no separate client pass.'),
+    'finish.manufacturer-harmonizing': hfHonestStub('manufacturer harmonization needs a parts-catalog cross-reference — server pipeline concern, no client pass.'),
+    'finish.match-pipe-ends-to-fittings': hfHonestStub('end-to-fitting matching is part of the Generate detail pass — re-Generate; no separate client pass.'),
+    // ── HF-AV: VIEW ops — real camera / panel / recolor / refresh ──
+    'view.refresh': () => viewRefresh(),
+    'view.refresh-elements': () => viewRefresh(),
+    'view.color-pipes-by': () => viewColorPipesBy(),
+    'view.hide-pipe-labels': () => viewHidePipeLabels(),
+    'view.show-sprinkler-dimensions': () => viewShowSprinklerDimensions(),
+    'view.calculator': () => viewCalculator(),
+    'view.camera': () => viewSaveRestoreCamera(),
+    'view.walkthrough': () => viewWalkthrough(),
+    'view.panes': () => toggleAside('right'),
+    'view.tool-bars': () => { const tb = $('toolBar') || document.querySelector('#cadBar'); if (tb) { tb.style.display = tb.style.display === 'none' ? '' : 'none'; $('status').textContent = 'toolbars toggled'; } else $('status').textContent = 'no toolbar element'; },
+    'view.status-bar': () => { const sb = $('status'); if (sb) { const p = sb.parentElement; if (p) { p.style.opacity = p.style.opacity === '0.25' ? '' : '0.25'; } $('status').textContent = 'status bar visibility toggled'; } },
+    'view.rendering': () => { const b = document.querySelector('#viewSeg button[data-view="iso"]'); if (b) b.click(); $('status').textContent = 'rendering: switched to shaded perspective view'; },
+    'view.show-start-page': hfHonestStub('no separate start page in the Studio (it opens directly to the project viewport).'),
+    'view.register-bitmap-background': hfHonestStub('bitmap background registration needs a raster-underlay importer — the Studio underlays the real PDF plan automatically.'),
+    'view.enlarge-outlet-points-on-fittings': hfHonestStub('outlet-point sizing is a fitting-render detail toggle — not yet exposed as a discrete control.'),
+    'view.show-leaks': hfHonestStub('leak display needs a hydraulic leak-detection pass — no client leak solver.'),
+    'view.show-page-breaks': hfHonestStub('page-break overlay belongs to a paper-space layout — the Studio is model-space only.'),
+    'view.show-pipe-insulation': hfHonestStub('insulation rendering needs an insulation property on pipe solids — not modeled yet.'),
+    'view.highlight-make-on-connectors': hfHonestStub('make-on-connector highlight needs connector metadata on fittings — not modeled discretely yet.'),
+    'view.abbreviate-views-and-pictures': hfHonestStub('view abbreviation is a paper-space sheet feature — model-space Studio has no sheet views.'),
+    'view.control-area-navigator': hfHonestStub('control-area navigator needs defined control areas — not yet built.'),
+    'view.text-box-clipping-indicator': hfHonestStub('text-box clipping indicators belong to a paper-space text layout — not in model-space Studio.'),
+    // ── HF-AV: WINDOW — real panel show/hide (no MDI child windows in a web Studio) ──
     'window.inspector': () => { const i = $('inspector'); if (i) i.classList.toggle('open'); },
+    'window.open-drawings': () => windowOpenDrawings(),
+    'window.device-capabilities': () => windowDeviceCapabilities(),
+    'window.cascade': hfHonestStub('Cascade is an MDI child-window command — the Studio is single-document / single-viewport, so there are no child windows to cascade.'),
+    'window.tile': hfHonestStub('Tile is an MDI child-window command — no child windows in the single-viewport Studio.'),
+    'window.arrange-icons': hfHonestStub('Arrange Icons arranges minimized MDI children — the single-viewport Studio has none.'),
+    'window.clean-house': hfHonestStub('Clean House closes all MDI child windows — the single-viewport Studio has none.'),
+    // ── HF-AV: SETTINGS — real persisted toggles (localStorage) + reuse of real dialogs ──
+    'settings.save-settings': () => settingsSaveAll(),
+    'settings.hydraulic-calculations': () => settingsHydraulicCalcs(),
+    'settings.use-smart-pipe': () => toggleSetting('useSmartPipe', 'Use Smart Pipe'),
+    'settings.minimize-pipe-label-spacing': () => toggleSetting('minLabelSpacing', 'Minimize Pipe Label Spacing'),
+    'settings.allow-manual-takeout': () => toggleSetting('allowManualTakeout', 'Allow Manual Takeout'),
+    'settings.automatically-capitalize-text': () => toggleSetting('autoCapitalize', 'Auto-capitalize Text'),
+    'settings.show-complex-symbols': () => toggleSetting('complexSymbols', 'Show Complex Symbols'),
+    'settings.display-data-sheets-on-property-pages': () => toggleSetting('dataSheetsOnProps', 'Data Sheets on Property Pages'),
+    'settings.allow-views-to-xref': () => toggleSetting('viewsToXref', 'Allow Views to Xref'),
+    'settings.ignore-lines-during-cleanup-intersections': () => toggleSetting('ignoreLinesCleanup', 'Ignore Lines During Cleanup'),
+    'settings.render': () => { const b = document.querySelector('#viewSeg button[data-view="iso"]'); if (b) b.click(); $('status').textContent = 'Render settings: shaded perspective applied'; },
+    'settings.drawing': () => regenerateBom(), // "Drawing" settings surface the drawing/takeoff summary
+    'settings.speech-recognition': hfHonestStub('no speech subsystem in the browser Studio — voice input is not available.'),
+    'settings.customize-speech-recognition': hfHonestStub('no speech subsystem in the browser Studio — nothing to customize.'),
+    'settings.fabrication-standards': hfHonestStub('fabrication standards bind to a shop-export profile — native AutoSprink/server feature, no client store.'),
+    'settings.parts-profile': () => window.open('/api/parts', '_blank'),
+    'settings.hydraulic-calculations-config': hfHonestStub('hydraulic config dialog not yet built; the flow calculators use NFPA formulas directly.'),
+    // ── HF-AV: PARTS DATABASE — read path is real (/api/parts); writes are honest stubs ──
+    'parts-database.view-parts-list': () => window.open('/api/parts', '_blank'),
+    'parts-database.add-new-parts-book-item': hfHonestStub('parts-book WRITE needs a /api/parts POST endpoint + a CRUD form — only the read path (/api/parts) exists today; flagged needs-verification.'),
+    'parts-database.edit-parts-book-item': hfHonestStub('parts-book edit needs a /api/parts PUT endpoint + form — read-only parts catalog today.'),
+    'parts-database.remove-parts-book-item': hfHonestStub('parts-book delete needs a /api/parts DELETE endpoint — read-only parts catalog today.'),
+    'parts-database.add-new-edit-parts-book-manufacturer': hfHonestStub('manufacturer CRUD needs a parts-write API — read-only catalog today.'),
+    'parts-database.sprinkler-definition-wizard': hfHonestStub('sprinkler-definition wizard needs a parts-write API + multi-step form — not yet built.'),
+    'parts-database.pump-definition-wizard': hfHonestStub('pump-definition wizard needs a parts-write API + curve editor — not yet built.'),
+    'parts-database.database-utilities': hfHonestStub('DB utilities (compact/reindex) are server-side maintenance — no client entrypoint.'),
+    'parts-database.parts-book-quick-data-editors': hfHonestStub('quick data editors need a parts-write API — read-only catalog today.'),
+    'parts-database.arrange-sortable-lists': hfHonestStub('sortable-list arrangement needs a persisted parts-UI preference store — not yet built.'),
+    'parts-database.add-detail-as-trim-kit': hfHonestStub('trim-kit authoring needs a parts-write API — read-only catalog today.'),
+    'parts-database.synchronize-properties-of-default-and-selected-elements': hfHonestStub('property sync needs a default-element profile + multi-select — single-object selection today.'),
+    'parts-database.synchronize-costs-of-default-and-selected-elements': hfHonestStub('cost sync needs a parts-write API + multi-select — not yet built.'),
+    'parts-database.update-unknown-user-pipes': hfHonestStub('unknown-pipe reconciliation needs a parts-write API — read-only catalog today.'),
+    // ── HF-AV: HELP — open the canonical AutoSPRINK references (real external links) ──
+    'help.support-library': () => openHelp('https://www.mepcad.com/support/', 'Support Library'),
+    'help.whats-new': () => openHelp('https://www.mepcad.com/autosprink/', "What's New"),
+    'help.tutorial-videos': () => openHelp('https://www.youtube.com/@MEPCAD', 'Tutorial Videos'),
+    'help.support': () => openHelp('https://www.mepcad.com/support/', 'Support'),
+    'help.getting-started-guide': () => openHelp('https://www.mepcad.com/autosprink/', 'Getting Started'),
+    'help.about-autosprink': () => showHfHud('About HaloFire Studio', ['HaloFire Studio — AutoSPRINK-parity fire-sprinkler CAD', 'Browser engine (Three.js + OpenClaw pipeline)', 'NOT affiliated with / not parity-certified by MEPCAD AutoSprink', 'needs-verification provenance on all menu actions']),
+    'help.autosprink-assistant': () => { $('status').textContent = 'AutoSprink Assistant → the HaloFire AI assistant lives in the main app cockpit (not this embedded Studio frame)'; },
+    // ── HF-AV: ALERTS — interference checking has a real geometric backing ──
+    'alerts.interference-checking': () => alertsInterferenceCheck(),
+    'alerts.alert-report': () => alertsInterferenceCheck(),
+    'alerts.alert-list-sets-target-element': () => alertsInterferenceCheck(),
+    'alerts.delete-all-alerts': () => { window.__hfAlerts = []; clearHfHud(); $('status').textContent = 'all interference alerts cleared'; },
+    'alerts.delete-closed-alerts': () => { window.__hfAlerts = (window.__hfAlerts || []).filter((a) => !a.closed); $('status').textContent = 'closed alerts cleared'; },
+    'alerts.synchronize-alerts': hfHonestStub('Alert DB sync is a native AutoSprink/server feature (shared alert database) — no browser-Studio analog.'),
+    'alerts.alert-controls': hfHonestStub('alert-control configuration needs a persisted alert-rules store — only on-demand interference checking exists.'),
+    'alerts.trades-configuration': hfHonestStub('trades configuration is a multi-trade coordination feature — no trade-layer model in the Studio.'),
+    'alerts.assign-elements-to-trade-layer': hfHonestStub('trade-layer assignment needs a trade-layer model — not built.'),
+    'alerts.resolution-manager': hfHonestStub('resolution manager needs a persisted clash-resolution workflow — not built.'),
+    'alerts.load-resolution-proposals': hfHonestStub('resolution-proposal load needs a server proposal store — no client store.'),
+    'alerts.save-resolution-proposals': hfHonestStub('resolution-proposal save needs a server proposal store — no client store.'),
   };
   try {
     window.__menuBar = window.HFMenuBar.mount($('menuBarHost'), { actions });

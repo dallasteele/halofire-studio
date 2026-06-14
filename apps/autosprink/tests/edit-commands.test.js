@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   createCommandStack, cloneModel, resolveSolidIndex,
   moveSolid, deleteSolid, copySolid, rotateSolid, mirrorSolid, addSolid, setSolidFields,
+  solidEndpointsPlan, trimExtendSolid, offsetSolid, arraySolid, setSolidGrip,
 } from '../src/engine/edit-commands.js';
 
 // HF-W1-CMD — the snapshot command stack + pure cadModel edit ops. The stack
@@ -164,5 +165,92 @@ describe('edit ops (pure)', () => {
     const b = cloneModel(a);
     b.solids[0].from[0] = 99;
     expect(a.solids[0].from[0]).toBe(0);
+  });
+});
+
+// ── HF-W2 edit ops (trim/extend, offset, array, grip) ──
+describe('HF-W2 edit ops', () => {
+  it('solidEndpointsPlan reads pipe from/to and wall a/b', () => {
+    const m = sampleModel();
+    expect(solidEndpointsPlan(m.solids[0])).toEqual({ from: [0, 0], to: [10, 0], z: 9 });
+    expect(solidEndpointsPlan(m.solids[4])).toEqual({ from: [0, 0], to: [10, 0], z: undefined });
+    expect(solidEndpointsPlan(m.solids[3])).toBeNull(); // head — not linear
+  });
+
+  it('trimExtendSolid extends the near end to the boundary line', () => {
+    // target horizontal pipe [0,0]->[10,0]; boundary vertical line at x=15.
+    const m = { solids: [
+      { kind: 'pipe', role: 'branch', from: [0, 0, 9], to: [10, 0, 9], diameterIn: 1 },
+      { kind: 'pipe', role: 'main', from: [15, -5, 9], to: [15, 5, 9], diameterIn: 2 },
+    ], counts: {} };
+    const out = trimExtendSolid(m, { solidIndex: 0 }, { solidIndex: 1 }, [10, 0]);
+    expect(out).not.toBeNull();
+    expect(out.solids[0].to[0]).toBeCloseTo(15, 6);
+    expect(out.solids[0].to[1]).toBeCloseTo(0, 6);
+    expect(out.solids[0].from).toEqual([0, 0, 9]); // far end untouched
+  });
+
+  it('trimExtendSolid trims the near end inward when the cut is inside', () => {
+    const m = { solids: [
+      { kind: 'pipe', from: [0, 0, 9], to: [10, 0, 9] },
+      { kind: 'pipe', from: [4, -5, 9], to: [4, 5, 9] },
+    ], counts: {} };
+    const out = trimExtendSolid(m, { solidIndex: 0 }, { solidIndex: 1 }, [10, 0]);
+    expect(out.solids[0].to[0]).toBeCloseTo(4, 6);
+  });
+
+  it('trimExtendSolid returns null for parallel runs', () => {
+    const m = { solids: [
+      { kind: 'pipe', from: [0, 0, 9], to: [10, 0, 9] },
+      { kind: 'pipe', from: [0, 5, 9], to: [10, 5, 9] },
+    ], counts: {} };
+    expect(trimExtendSolid(m, { solidIndex: 0 }, { solidIndex: 1 }, [10, 0])).toBeNull();
+  });
+
+  it('offsetSolid adds one parallel copy at the given distance + side', () => {
+    const mk = () => ({ solids: [{ kind: 'pipe', from: [0, 0, 9], to: [10, 0, 9], diameterIn: 1 }], counts: {} });
+    const out = offsetSolid(mk(), { solidIndex: 0 }, 3, 1);
+    expect(out.solids.length).toBe(2);
+    // horizontal segment, left normal is +Y; side +1 => +3 in Y
+    expect(out.solids[1].from[1]).toBeCloseTo(3, 6);
+    expect(out.solids[1].to[1]).toBeCloseTo(3, 6);
+    const out2 = offsetSolid(mk(), { solidIndex: 0 }, 3, -1);
+    expect(out2.solids[1].from[1]).toBeCloseTo(-3, 6);
+  });
+
+  it('arraySolid tiles a cols×rows grid (source stays, adds cols*rows-1)', () => {
+    const m = { solids: [{ kind: 'head', position: [0, 0, 8] }], counts: { heads: 1 } };
+    const out = arraySolid(m, { solidIndex: 0 }, 3, 2, 4, 5);
+    expect(out.solids.length).toBe(6); // 3*2
+    // corner cell (2,1) => +8 X, +5 Y
+    const positions = out.solids.map((s) => s.position);
+    expect(positions).toContainEqual([8, 5, 8]);
+    expect(positions).toContainEqual([0, 0, 8]); // source unchanged
+    expect(out.counts.heads).toBe(6);
+  });
+
+  it('arraySolid 1x1 is a no-op', () => {
+    const m = { solids: [{ kind: 'head', position: [0, 0, 8] }], counts: {} };
+    expect(arraySolid(m, { solidIndex: 0 }, 1, 1, 4, 4)).toBeNull();
+  });
+
+  it('setSolidGrip moves only the named endpoint and keeps wall fields in sync', () => {
+    const m = { solids: [
+      { kind: 'pipe', from: [0, 0, 9], to: [10, 0, 9] },
+      { kind: 'wall', a: [0, 0], b: [10, 0], center: [5, 0], lengthFt: 10, rotationY: 0 },
+    ], counts: {} };
+    const out = setSolidGrip(m, { solidIndex: 0 }, 'to', [10, 6]);
+    expect(out.solids[0].to).toEqual([10, 6, 9]);
+    expect(out.solids[0].from).toEqual([0, 0, 9]);
+    const out2 = setSolidGrip(m, { solidIndex: 1 }, 'b', [0, 8]);
+    expect(out2.solids[1].b).toEqual([0, 8]);
+    expect(out2.solids[1].lengthFt).toBeCloseTo(8, 6);
+    expect(out2.solids[1].center).toEqual([0, 4]);
+  });
+
+  it('setSolidGrip rejects a non-applicable grip name and degenerate moves', () => {
+    const m = { solids: [{ kind: 'pipe', from: [0, 0, 9], to: [10, 0, 9] }], counts: {} };
+    expect(setSolidGrip(m, { solidIndex: 0 }, 'a', [1, 1])).toBeNull(); // pipe has no a/b
+    expect(setSolidGrip(m, { solidIndex: 0 }, 'to', [0, 0])).toBeNull(); // would be zero-length
   });
 });

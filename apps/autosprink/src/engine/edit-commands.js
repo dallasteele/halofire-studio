@@ -309,6 +309,161 @@ export function setSolidFields(model, ref, fields) {
   return model;
 }
 
+// ── HF-W2 EDIT OPS (trim/extend/offset/array/copy-move/grip) — pure mutators ──
+// Each takes (model, ref|refs, ...args) and returns a NEW model (or null no-op),
+// mirroring the moveSolid/copySolid contract above so the live caller wraps them
+// in HFEdit.apply(label, m => fn(m, ...)) for one undo step.
+
+// The two plan endpoints of a linear solid (pipe from/to, wall a/b). Returns
+// { from:[x,y], to:[x,y], z } or null if the solid isn't a linear run.
+export function solidEndpointsPlan(s) {
+  if (!s) return null;
+  if (Array.isArray(s.from) && Array.isArray(s.to)) {
+    return { from: [s.from[0], s.from[1]], to: [s.to[0], s.to[1]], z: s.from[2] };
+  }
+  if (Array.isArray(s.a) && Array.isArray(s.b)) {
+    return { from: [s.a[0], s.a[1]], to: [s.b[0], s.b[1]], z: undefined };
+  }
+  return null;
+}
+
+// Write back updated plan endpoints onto a linear solid (keeps z + derived
+// fields like center/lengthFt/rotationY in sync for walls).
+function setEndpointsPlan(s, from, to) {
+  if (Array.isArray(s.from) && Array.isArray(s.to)) {
+    const z0 = s.from[2], z1 = s.to[2];
+    s.from = z0 === undefined ? [from[0], from[1]] : [from[0], from[1], z0];
+    s.to = z1 === undefined ? [to[0], to[1]] : [to[0], to[1], z1];
+  } else if (Array.isArray(s.a) && Array.isArray(s.b)) {
+    s.a = [from[0], from[1]];
+    s.b = [to[0], to[1]];
+    s.center = [(from[0] + to[0]) / 2, (from[1] + to[1]) / 2];
+    s.lengthFt = Math.hypot(to[0] - from[0], to[1] - from[1]);
+    s.rotationY = Math.atan2(to[1] - from[1], to[0] - from[0]);
+  }
+  return s;
+}
+
+// Intersection of two infinite lines (p1->p2) and (p3->p4) in plan space.
+// Returns [x,y] or null when parallel.
+function lineLineIntersect(p1, p2, p3, p4) {
+  const x1 = p1[0], y1 = p1[1], x2 = p2[0], y2 = p2[1];
+  const x3 = p3[0], y3 = p3[1], x4 = p4[0], y4 = p4[1];
+  const den = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+  if (Math.abs(den) < 1e-9) return null;
+  const t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / den;
+  return [x1 + t * (x2 - x1), y1 + t * (y2 - y1)];
+}
+
+/**
+ * TRIM/EXTEND: move whichever endpoint of `targetRef` is nearer the pick point
+ * to the intersection with `cuttingRef`'s (infinite) line. Works for both trim
+ * (intersection lies inside the run) and extend (intersection lies beyond it) —
+ * the geometric op is identical: snap the near end to the boundary line.
+ */
+export function trimExtendSolid(model, targetRef, cuttingRef, pickPlan) {
+  const ti = resolveSolidIndex(model, targetRef);
+  const ci = resolveSolidIndex(model, cuttingRef);
+  if (ti < 0 || ci < 0 || ti === ci) return null;
+  const tgt = solidEndpointsPlan(model.solids[ti]);
+  const cut = solidEndpointsPlan(model.solids[ci]);
+  if (!tgt || !cut) return null;
+  const x = lineLineIntersect(tgt.from, tgt.to, cut.from, cut.to);
+  if (!x) return null; // parallel — nothing to trim to
+  const pick = pickPlan || tgt.to;
+  const dFrom = Math.hypot(pick[0] - tgt.from[0], pick[1] - tgt.from[1]);
+  const dTo = Math.hypot(pick[0] - tgt.to[0], pick[1] - tgt.to[1]);
+  const s = { ...model.solids[ti] };
+  if (dTo <= dFrom) setEndpointsPlan(s, tgt.from, x); else setEndpointsPlan(s, x, tgt.to);
+  // reject a degenerate (zero-length) result
+  const ep = solidEndpointsPlan(s);
+  if (ep && Math.hypot(ep.to[0] - ep.from[0], ep.to[1] - ep.from[1]) < 1e-4) return null;
+  markEdited(s, 'trim-extend');
+  model.solids = model.solids.slice();
+  model.solids[ti] = s;
+  return model;
+}
+
+/**
+ * OFFSET: duplicate a linear solid parallel to itself at `dist` ft on `side`
+ * (+1 / -1 = which way along the segment normal). Returns model with the new
+ * parallel copy appended.
+ */
+export function offsetSolid(model, ref, dist, side) {
+  const i = resolveSolidIndex(model, ref);
+  if (i < 0) return null;
+  const ep = solidEndpointsPlan(model.solids[i]);
+  if (!ep) return null;
+  const dx = ep.to[0] - ep.from[0], dy = ep.to[1] - ep.from[1];
+  const len = Math.hypot(dx, dy);
+  if (len < 1e-6) return null;
+  // unit normal (left of the segment direction); side flips it
+  const nx = (-dy / len) * (side < 0 ? -1 : 1);
+  const ny = (dx / len) * (side < 0 ? -1 : 1);
+  const off = [nx * dist, ny * dist, 0];
+  const dup = cloneModel(model.solids[i]);
+  applyTranslate(dup, off);
+  markEdited(dup, 'offset');
+  model.solids = model.solids.concat([dup]);
+  return recountCounts(model);
+}
+
+/**
+ * ARRAY (rectangular): tile copies of a solid in a cols×rows grid spaced by
+ * (dx,dy) ft. The source counts as cell (0,0); every other cell is a copy, so
+ * the result adds cols*rows-1 solids. One undo step covers the whole array.
+ */
+export function arraySolid(model, ref, cols, rows, dx, dy) {
+  const i = resolveSolidIndex(model, ref);
+  if (i < 0) return null;
+  const nc = Math.max(1, Math.floor(cols) || 1);
+  const nr = Math.max(1, Math.floor(rows) || 1);
+  if (nc === 1 && nr === 1) return null;
+  const base = model.solids[i];
+  const additions = [];
+  for (let c = 0; c < nc; c += 1) {
+    for (let r = 0; r < nr; r += 1) {
+      if (c === 0 && r === 0) continue; // source stays in place
+      const dup = cloneModel(base);
+      applyTranslate(dup, [c * dx, r * dy, 0]);
+      markEdited(dup, 'array');
+      additions.push(dup);
+    }
+  }
+  if (!additions.length) return null;
+  model.solids = model.solids.concat(additions);
+  return recountCounts(model);
+}
+
+/**
+ * GRIP EDIT: move a single named endpoint of a linear solid to a new plan point.
+ * `grip` is 'from'|'to' (pipe) or 'a'|'b' (wall). Keeps derived wall fields in
+ * sync. Returns null if the grip name doesn't apply to the solid.
+ */
+export function setSolidGrip(model, ref, grip, plan) {
+  const i = resolveSolidIndex(model, ref);
+  if (i < 0 || !plan) return null;
+  const s = { ...model.solids[i] };
+  if ((grip === 'from' || grip === 'to') && Array.isArray(s.from) && Array.isArray(s.to)) {
+    const ep = solidEndpointsPlan(s);
+    const nf = grip === 'from' ? [plan[0], plan[1]] : ep.from;
+    const nt = grip === 'to' ? [plan[0], plan[1]] : ep.to;
+    if (Math.hypot(nt[0] - nf[0], nt[1] - nf[1]) < 1e-4) return null;
+    setEndpointsPlan(s, nf, nt);
+  } else if ((grip === 'a' || grip === 'b') && Array.isArray(s.a) && Array.isArray(s.b)) {
+    const nf = grip === 'a' ? [plan[0], plan[1]] : [s.a[0], s.a[1]];
+    const nt = grip === 'b' ? [plan[0], plan[1]] : [s.b[0], s.b[1]];
+    if (Math.hypot(nt[0] - nf[0], nt[1] - nf[1]) < 1e-4) return null;
+    setEndpointsPlan(s, nf, nt);
+  } else {
+    return null;
+  }
+  markEdited(s, 'grip-edit');
+  model.solids = model.solids.slice();
+  model.solids[i] = s;
+  return model;
+}
+
 // ── plan-space geometry helpers (pure) ──
 function withZ(xy, z) { return z === undefined ? xy : [xy[0], xy[1], z]; }
 function rotatePlan(p, piv, rad) {

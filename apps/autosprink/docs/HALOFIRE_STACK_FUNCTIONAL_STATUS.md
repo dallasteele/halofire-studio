@@ -119,3 +119,96 @@ labeled." Large swaths of promised functionality simply don't exist yet (see §4
 The discipline here is good: nothing fabricated, every gap is labeled. Ship the console as an internal
 operator/evidence tool with the limitations visible; do **not** market it as real hydraulic design or
 automated plan reconstruction until §4 items 1–3 are genuinely built and independently verified.
+
+---
+
+## 6. Studio Tools & Menu Wiring (2026-06-14)
+
+Six wiring waves drove the AutoSPRINK menubar from a near-empty shell to a mostly-wired CAD surface.
+All work landed in `apps/autosprink/autosprink.html` (the inline engine module is the source of truth;
+`public/halofire-menubar.js` was untouched — it auto-detects wired vs. stub by whether `actions[id]` is a
+function). Every wave deployed to the VPS with a local==remote md5 match and was re-checked by an
+independent verifier driving real DOM `.hf-menu-item[data-id]` clicks under Playwright (chromium
+`--use-gl=swiftshader`).
+
+### Headline counts
+
+| Metric | Count | Source |
+|---|---:|---|
+| **Total menu items** | **386** | latest `__menuBar.stats()` (annotate-view wave; +12 over the 374 baseline — new HaloFire ops: scale/flatten/round/dimension variants) |
+| **Wired + verified** | **258** | latest `__menuBar.stats().wired` (baseline was ~42 of 374) |
+| **Honest stubs (NEEDS-VER, flagged not gated)** | **128** | `stubbed` = 386 − 258 |
+| **Dead-on-arrival** | **0** | every independent sweep returned `deadOnArrival:[]` |
+
+Progression of `__menuBar.stats()` as waves stacked on the same file:
+file-edit `69/313` → select-snaps `85/297` → draw-modify `95/291` → annotate-view `258/128`.
+(The annotate-view wave wired the large dimensioning/listing/view/settings/alerts/help families, which is
+the bulk of the jump to 258.)
+
+### Independent verification (real DOM-click sweeps, 0 pageerrors each)
+
+| Wave | Checks | Result |
+|---|---:|---|
+| file-edit (New/Open/Save/Save-As/Import/Cut/Copy/Paste/Delete/Undo/Redo/Undo-List/Redo-List/Select-All + Ctrl-A/C/V) | 13 | all `works:true` |
+| select-snaps (all/every/last/invert/by-id/all-like/crossing-arm/deselect + endpoint/ortho/visible-grid/master-snap/protractor) | 13 | all `works:true` |
+| draw-modify (array/offset/copy/move/scale/round/rotate90/flatten/mirror + draw pipe/head/measure) | 13 | 12 `works:true`; trim/extend `works:false` **but explicitly NOT a dead stub** (handler reaches `trimExtendSolid`; couldn't force a crossing-run pick in a read-only run — NEEDS-VER, not DOA) |
+| sprinkler/hydraulics (flow-calc, hydrant-calc, pipe-volumes, analysis, auto-size, tree/grid wizard) | 7 | all `works:true`; flow Q=14.82 and hydrant Q=750.4 reproduced exactly |
+| annotate-view (dimension-selected/typed, part-tag, text-note, batch-wall-dims, BOM, weight, color-by, hide-labels, sprinkler-dims, refresh, interference, settings, device-caps, about, flatten-dims, walkthrough, camera) | 18 | all `works:true` |
+
+### NEW tools that exist and were independently verified live
+
+These are genuinely new engine transforms / subsystems (no prior `scaleSolid`/`flatten`/`round`/clipboard/
+multi-select/annotation engine existed), each confirmed by an observable effect (solid-count delta, geometry
+mutation with `hfEdited` flag, persisted state, or on-canvas readout) and 0 pageerrors:
+
+1. **Multi-segment polyline draw** (Wall + Pipe): click N vertices, Enter/double-click finishes, one-undo N-leg commit; verified `wallsAddedByRealClicks:3` via real canvas clicks.
+2. **Typed Location-Input HUD** (`#hfDynInput`): length-along-direction or `dx,dy` entry during draw; verified HUD visible during real mouse draw, 18ft + 6,8 honored.
+3. **Measure tool** (`#hfMeasureLabel`): 2-pick distance + ft'in" + dx/dy + angle on-canvas readout; verified `155.36 ft … 350.0°`.
+4. **Trim/Extend** (`trimExtendSolid`) — engine-verified; reaches engine on live DOM-click (parallel-pick correctly reported no-change).
+5. **Offset** parallel duplicate (`offsetSolid`) — verified +1 solid live.
+6. **Array** rectangular (`arraySolid`) — verified 2718→2726 (+8) and one-undo removes all.
+7. **Mirror** across a picked 2-point axis (`mirrorAcrossLine`, general-axis) — verified geometry reflected.
+8. **Copy/Move** with picked basepoint+destination (`copySolid`/`moveSolid`) — verified +1 copy and `delta 132.06 ft`.
+9. **Grip/handle edit** (`setSolidGrip`): drag a single endpoint of the selected run, keeps wall length/center/rotation in sync.
+10. **Scale / Flatten / Round** (`editScaleSolid`/`editFlattenSolid`/`editRoundSolid`) — three new undoable transforms; verified geometry deltas (`to[0] 295.5→443` scale, `z 23→0` flatten, coords snapped to grid round).
+11. **HFClipboard** single-solid Cut/Copy/Paste (`clipCut`/`clipCopy`/`clipPaste`) — verified cut→paste roundtrip and Ctrl-X/C/V keyboard bindings.
+12. **Multi-select selection set** (`hfSelSet` + `highlightSet`/`setSelSet`): the missing-capability prior waves flagged — All/Every/Last/Invert/ByID/AllLike/Crossing-box with visible green multi-highlight; verified `__hfSelSetCount` 0→2718 and 2551 carriers recolored.
+13. **Snap toggles** (`snapOrtho`/`snapMasterEnable`/`snapVisibleGrid`) on the real `orthoLock`/`snapState`/`gridHelper` — verified flag flips.
+14. **Hydraulics solvers** (`hfFlowSolve` Q=K√P, `hfHydrantSolve` Q=29.83·c·d²·√P, `hydraulicsShowPipeVolumes` πr²L) — exact physics; verified Q=14.82, Q=750.4, 5585.6 gal.
+15. **Auto-size** (`autoDrawAutoSize`/`nearestScheduleSize`): snap selected pipe to nearest NFPA schedule via `HFEdit` — verified 2.31"→2.5".
+16. **Annotation engine** (`commitAnnotation` → kind:dimension|label solids, camera-tracked `#hfAnnotationOverlay`): dimensions/tags/text-notes committed through `HFEdit` (undoable, persisted, solid-count delta); verified `295.00 ft (295-0.0)` label + HEAD tag overlays.
+17. **Live BOM / pipe-weight** (`regenerateBom`, `calcPipeWeight`): re-derive takeoff from live geometry — verified 1230 heads / 13139 ft / ~108,173 lb.
+18. **Interference check** (`alertsInterferenceCheck`): real pipe×column geometric clash (point-segment distance) — verified runs, `__hfAlerts` populated.
+19. **Exposed Rotate 90** (`editRotate(90)` → `rotateSolid`): engine existed but was unbound; now on Commands menu and verified.
+
+### Dead-on-arrival "wired" claims
+
+**None.** Every independent sweep returned `deadOnArrival:[]`. The only build-report "verified" item the
+verifier could not reproduce a geometry delta for was **`modify.trim/extend`**, and the verifier explicitly
+recorded it as **wired-and-reaching-the-engine, NOT a dead stub** — the read-only run simply couldn't force a
+crossing-run pick (projection globals `__camera`/`__THREE` are exposed only on the plan-extraction path, not
+the Generate-Layout path). It is a NEEDS-VER caveat, not a DOA. (Note: one build report listed
+`file.export` with `verified:false` — an honest self-flag by the authoring agent, not a verifier DOA.)
+
+### Honest stubs — why (128 items, flagged NEEDS-VER, never faked)
+
+Stubs render grayed with a `needs-verification` tooltip and route through `hfHonestStub()` (writes a specific
+reason to the status line) — no silent no-ops. They fall into clear buckets:
+
+- **Single-object selection blocker (recurring):** group-edit, Select-with-filter, label grouping/un-grouping,
+  list/price-area assignment, resize-assembly — all need `curSelSolid` promoted to a multi-select *set* for the
+  *operate-on* path (the *highlight* set now exists; bulk-edit ops do not yet consume it).
+- **Un-built engineering:** real NFPA Hardy-Cross hydraulic solver, remote-area editor, obstacle-aware
+  pipe-routing, roof-plane elements, leak detection, pipe insulation — no client engine.
+- **Native-desktop AutoSPRINK features with no browser analog:** AutoPREP, licensing, source-control,
+  plot-sheet/paper-space manager, MDI cascade/tile, speech recognition, fabrication-standards,
+  shared Alert DB / trade-layer model, UCS/benchmark coordinate systems.
+- **No write API:** Parts-database CRUD (add/edit/remove parts-book items, manufacturer wizards, cost sync) —
+  only the `/api/parts` *read* path exists.
+- **No renderer kind:** generic 2D annotation/structural primitives (rectangle/circle/arc/sketch/crosshatch,
+  beam/column/roof-plane/slab/ceiling-grid) — `addSolid` has no renderer for them, so they'd draw nothing.
+- **Pipeline-unit operations:** harmonize-pipes/fittings, couplings/hangers/auto-branch passes — emitted by the
+  server Generate pipeline as a unit, not separably re-runnable client-side (re-Generate to refresh).
+
+This preserves the project's flag-don't-gate discipline: of 386 items, 258 do a real, observably-verified
+thing and 128 are honestly inert with a stated reason — zero fabricated handlers.
