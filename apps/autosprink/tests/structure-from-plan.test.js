@@ -5,6 +5,7 @@ import {
   extractStructuralGrid,
   parseMemberTags,
   detectColumns,
+  detectColumnMarkers,
   detectBeams,
   buildStructureLayer,
   matchGridOffset,
@@ -130,6 +131,73 @@ describe('detectColumns', () => {
   });
   it('fabricates NOTHING at intersections with no markers', () => {
     const r = detectColumns(grid, [], [], {});
+    expect(r.columns.length).toBe(0);
+  });
+});
+
+describe('detectColumnMarkers (REAL marker extraction — replaces grid-intersection heuristic)', () => {
+  // Build a small near-square box marker (4 short ortho edges) centered at (cx,cy), sizeFt.
+  const boxAt = (cx, cy, sizeFt = 1.5) => {
+    const h = sizeFt / 2;
+    return [
+      { x1: cx - h, y1: cy - h, x2: cx + h, y2: cy - h }, // bottom (H)
+      { x1: cx - h, y1: cy + h, x2: cx + h, y2: cy + h }, // top (H)
+      { x1: cx - h, y1: cy - h, x2: cx - h, y2: cy + h }, // left (V)
+      { x1: cx + h, y1: cy - h, x2: cx + h, y2: cy + h }, // right (V)
+    ];
+  };
+  // A 3x3 regular column field at xs=[0,20,40], ys=[0,20,40].
+  const fieldSegs = () => {
+    const segs = [];
+    for (const x of [0, 20, 40]) for (const y of [0, 20, 40]) segs.push(...boxAt(x, y, 1.5));
+    return segs;
+  };
+
+  it('extracts the regular 2-D column field as real marker boxes (RECALL: all 9 found)', () => {
+    const r = detectColumnMarkers(fieldSegs(), {});
+    expect(r.columns.length).toBe(9);
+    expect(r.columns.every((c) => c.source === 'marker-extraction')).toBe(true);
+    expect(r.xLines.length).toBe(3);
+    expect(r.yLines.length).toBe(3);
+    // every emitted column carries a real marker (>= 4 segs) and a measured size.
+    for (const c of r.columns) {
+      expect(c.markerSegs).toBeGreaterThanOrEqual(4);
+      expect(c.sizeFt).toBeGreaterThan(1);
+      expect(c.sizeFt).toBeLessThan(2.5);
+    }
+  });
+
+  it('REJECTS an isolated stray box that is not on the 2-D grid (precision: no off-grid fabrication)', () => {
+    const segs = [...fieldSegs(), ...boxAt(7, 33, 1.5)]; // off both an x-line and a y-line
+    const r = detectColumnMarkers(segs, {});
+    // The stray box shares no x-line (7) and no y-line (33) with >=2 boxes -> dropped.
+    expect(r.columns.find((c) => Math.abs(c.x - 7) < 1 && Math.abs(c.y - 33) < 1)).toBeUndefined();
+    expect(r.columns.length).toBe(9);
+  });
+
+  it('DROPS a packed schedule-table row (many tiny boxes in a tight line) — not columns', () => {
+    const table = [];
+    for (let i = 0; i < 12; i++) table.push(...boxAt(100 + i * 3.5, 200, 1.2)); // packed legend row (<6ft pitch)
+    const r = detectColumnMarkers([...fieldSegs(), ...table], {});
+    expect(r.droppedTableRows).toBeGreaterThanOrEqual(1);
+    expect(r.columns.find((c) => Math.abs(c.y - 200) < 2)).toBeUndefined();
+    expect(r.columns.length).toBe(9);
+  });
+
+  it('ignores long wall/grid lines and over-large boxes (only compact markers qualify)', () => {
+    const segs = [
+      ...fieldSegs(),
+      { x1: -50, y1: 0, x2: 200, y2: 0 },     // long wall/grid line
+      { x1: 0, y1: -50, x2: 0, y2: 200 },     // long grid line
+      ...boxAt(60, 60, 8),                     // too-large box (a room, not a column)
+    ];
+    const r = detectColumnMarkers(segs, {});
+    expect(r.columns.length).toBe(9);
+    expect(r.columns.find((c) => Math.abs(c.x - 60) < 1)).toBeUndefined();
+  });
+
+  it('returns nothing (no fabrication) when there is no marker linework', () => {
+    const r = detectColumnMarkers([{ x1: 0, y1: 0, x2: 100, y2: 0 }], {});
     expect(r.columns.length).toBe(0);
   });
 });

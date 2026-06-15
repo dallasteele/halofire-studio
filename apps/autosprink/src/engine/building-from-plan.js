@@ -696,7 +696,9 @@ export function buildBuildingFromPlans(THREE, levelPlans, opts = {}) {
       planColumns = synth.columns;
       columnSource = planColumns.length ? 'grid-intersection(synth)' : null;
     } else if (planColumns.length) {
-      columnSource = 'extracted';
+      // Prefer the specific extraction provenance the data carries (e.g. 'marker-extraction' —
+      // real column marker boxes), falling back to the generic 'extracted' label.
+      columnSource = (typeof plan.columnSource === 'string' && plan.columnSource) ? plan.columnSource : 'extracted';
     }
     if (planColumns.length && THREE.BoxGeometry) {
       const cGroup = new THREE.Group();
@@ -780,6 +782,12 @@ export function buildBuildingFromPlans(THREE, levelPlans, opts = {}) {
         ? recallLevel.recallMeasure.inEnvelopeRecallPct : null,
       fixtures: recallLevel.counts.fixtures, fixtureCounts: recallLevel.fixtureCounts,
       columns: recallLevel.counts.columns, columnSource: recallLevel.counts.columnSource,
+      // PHASE 4 — honest column split (marker-extraction: medium = real-sized marker box on the
+      // 2-D grid; low = on-grid size outlier). Grid-intersection synth levels are all 'low'.
+      confidentColumns: Array.isArray(recallLevel.columns)
+        ? recallLevel.columns.filter((c) => c && (c.confidence === 'medium' || c.confidence === 'high')).length : null,
+      suspectColumns: Array.isArray(recallLevel.columns)
+        ? recallLevel.columns.filter((c) => c && (c.confidence === 'low' || c.confidence === 'suspect')).length : null,
       recoveredWalls: recallLevel.counts.wallsFull,
       // RECORE: the honest primary structure — collinear-merged wall RUNS (real walls), with the
       // raw fragment count + excluded non-wall ink, so the panel headlines correctness not coverage.

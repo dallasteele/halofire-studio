@@ -249,6 +249,157 @@ export function parseMemberTags(textItemsFt) {
 }
 
 /**
+ * PURE. Detect REAL COLUMN MARKERS directly from the plan linework — the honest
+ * structure-from-raster path that REPLACES the grid-intersection heuristic.
+ *
+ * On the Cooperative-1881 architectural floor plan (A-101, page 8, vector/CAD-exported) a
+ * structural column prints as a SMALL COMPACT BOX of short orthogonal segments (an HSS tube,
+ * a filled/hatched square, or a concrete pier ~1–2.5 ft). We extract these as clusters and
+ * keep only the ones that form a regular 2-D grid (a column sits on BOTH a column datum line
+ * and a row datum line, shared by other columns), so incidental small linework (text glyphs,
+ * furniture corners, hatch) is rejected. This is GEOMETRY-DERIVED, not synthesized at grid
+ * crossings: every emitted column has a real marker box in the drawing.
+ *
+ * Pipeline (deterministic, pure):
+ *   1) SHORT ORTHO segments (0.05–markerMaxFt, axis-aligned) = candidate marker linework.
+ *   2) CLUSTER by proximity (grid-bucket BFS on segment midpoints, cellFt).
+ *   3) Each cluster -> compact box if it has BOTH H and V edges, near-square
+ *      (aspect <= maxAspect), and both dims in [minBoxFt, maxBoxFt].
+ *   4) Drop PACKED ROWS (a Y-band of >= rowMinBoxes boxes with median X-spacing < rowGapFt is a
+ *      schedule table / symbol legend, not a column line).
+ *   5) MUTUAL-GRID CONSENSUS: snap box centers to X datum lines and Y datum lines (a line needs
+ *      >= lineMinBoxes boxes); keep only boxes whose center lies on BOTH an X line and a Y line.
+ *      A real column field is regular in both axes; this rejects stray near-square glyphs.
+ *
+ * Honest confidence:
+ *   - 'medium' for boxes whose size is the median column size (real HSS/pier),
+ *   - 'low' for outliers (smaller/larger boxes that still landed on the grid).
+ * NOTHING is AHJ/PE/fabrication-ready; every column carries needs-verification.
+ *
+ * @param {Array<{x1,y1,x2,y2}>} segments - ALL segments in FEET (plan body).
+ * @param {Object} [opts]
+ * @returns {{columns:Array<{x,y,sizeFt,w,h,markerSegs,gridLabel:null,source:'marker-extraction',confidence:string}>,
+ *            xLines:number[], yLines:number[], droppedTableRows:number, candidateBoxes:number, note:string}}
+ */
+export function detectColumnMarkers(segments, opts = {}) {
+  const markerMaxFt = Number.isFinite(opts.markerMaxFt) ? opts.markerMaxFt : 2.5;
+  const minBoxFt = Number.isFinite(opts.minBoxFt) ? opts.minBoxFt : 0.25;
+  const maxBoxFt = Number.isFinite(opts.maxBoxFt) ? opts.maxBoxFt : 3.0;
+  const maxAspect = Number.isFinite(opts.maxAspect) ? opts.maxAspect : 4;
+  const minClusterSegs = Number.isFinite(opts.minClusterSegs) ? opts.minClusterSegs : 4;
+  const cellFt = Number.isFinite(opts.cellFt) ? opts.cellFt : 0.7;
+  const orthoTolFt = Number.isFinite(opts.orthoTolFt) ? opts.orthoTolFt : 0.06;
+  const lineTolFt = Number.isFinite(opts.lineTolFt) ? opts.lineTolFt : 2.0;
+  const lineMinBoxes = Number.isFinite(opts.lineMinBoxes) ? opts.lineMinBoxes : 2;
+  const rowMinBoxes = Number.isFinite(opts.rowMinBoxes) ? opts.rowMinBoxes : 8;
+  const rowGapFt = Number.isFinite(opts.rowGapFt) ? opts.rowGapFt : 6;
+  const note =
+    'Columns EXTRACTED as real marker boxes (small compact orthogonal clusters) that form a ' +
+    'regular 2-D grid — NOT synthesized at every grid crossing. Each emitted column has a real ' +
+    'marker box in the drawing. Best-effort, deterministic; NOT AHJ/PE/fabrication-ready.';
+
+  const all = Array.isArray(segments) ? segments : [];
+  const isOrtho = (s) => Math.abs(s.x2 - s.x1) < orthoTolFt || Math.abs(s.y2 - s.y1) < orthoTolFt;
+  const shorts = [];
+  for (const s of all) { const L = segLen(s); if (L > 0.05 && L <= markerMaxFt && isOrtho(s)) shorts.push(s); }
+  if (shorts.length < minClusterSegs) {
+    return { columns: [], xLines: [], yLines: [], droppedTableRows: 0, candidateBoxes: 0, note: note + ' (too few short ortho segments)' };
+  }
+
+  // 1) grid-bucket BFS cluster on midpoints.
+  const buckets = new Map();
+  const bkey = (x, y) => Math.round(x / cellFt) + ',' + Math.round(y / cellFt);
+  shorts.forEach((s, i) => { const [mx, my] = segMid(s); const k = bkey(mx, my); let a = buckets.get(k); if (!a) { a = []; buckets.set(k, a); } a.push(i); });
+  const visited = new Set(); const clusters = [];
+  for (const k of buckets.keys()) {
+    if (visited.has(k)) continue;
+    const queue = [k]; visited.add(k); const members = [];
+    while (queue.length) {
+      const cur = queue.pop(); const [cx, cy] = cur.split(',').map(Number);
+      const arr = buckets.get(cur); if (arr) members.push(...arr);
+      for (let dx = -1; dx <= 1; dx++) for (let dy = -1; dy <= 1; dy++) {
+        const nk = (cx + dx) + ',' + (cy + dy);
+        if (buckets.has(nk) && !visited.has(nk)) { visited.add(nk); queue.push(nk); }
+      }
+    }
+    clusters.push(members);
+  }
+
+  // 2) compact near-square boxes with both H and V edges.
+  const boxes = [];
+  for (const m of clusters) {
+    if (m.length < minClusterSegs) continue;
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity, hasH = false, hasV = false;
+    for (const i of m) {
+      const s = shorts[i];
+      minX = Math.min(minX, s.x1, s.x2); minY = Math.min(minY, s.y1, s.y2);
+      maxX = Math.max(maxX, s.x1, s.x2); maxY = Math.max(maxY, s.y1, s.y2);
+      if (Math.abs(s.x2 - s.x1) >= Math.abs(s.y2 - s.y1)) hasH = true; else hasV = true;
+    }
+    const w = maxX - minX, h = maxY - minY;
+    if (!hasH || !hasV) continue;
+    if (w < minBoxFt || w > maxBoxFt || h < minBoxFt || h > maxBoxFt) continue;
+    if (Math.max(w, h) / Math.max(0.05, Math.min(w, h)) > maxAspect) continue;
+    boxes.push({ cx: round((minX + maxX) / 2), cy: round((minY + maxY) / 2), w: round(w), h: round(h), n: m.length });
+  }
+  const candidateBoxes = boxes.length;
+
+  // 3) drop PACKED ROWS (schedule tables / legends).
+  const byY = new Map();
+  for (const r of boxes) { const yk = Math.round(r.cy / 3); let a = byY.get(yk); if (!a) { a = []; byY.set(yk, a); } a.push(r); }
+  const tableRows = [];
+  for (const arr of byY.values()) {
+    if (arr.length < rowMinBoxes) continue;
+    const xs = arr.map((r) => r.cx).sort((a, b) => a - b);
+    const gaps = xs.slice(1).map((v, i) => v - xs[i]);
+    const medGap = gaps.length ? gaps.sort((a, b) => a - b)[Math.floor(gaps.length / 2)] : Infinity;
+    if (medGap < rowGapFt) tableRows.push(arr[0].cy);
+  }
+  const inTableRow = (r) => tableRows.some((ty) => Math.abs(r.cy - ty) <= 3);
+  const candidate = boxes.filter((r) => !inTableRow(r));
+
+  // 4) MUTUAL-GRID CONSENSUS.
+  const snapLines = (vals) => {
+    const sorted = [...vals].sort((a, b) => a - b); const lines = [];
+    for (const v of sorted) {
+      const last = lines[lines.length - 1];
+      if (last && v - last.vals[last.vals.length - 1] <= lineTolFt) last.vals.push(v);
+      else lines.push({ vals: [v] });
+    }
+    const med = (a) => a[Math.floor(a.length / 2)];
+    return lines.map((l) => ({ coord: round(med([...l.vals].sort((a, b) => a - b))), n: l.vals.length }))
+      .filter((l) => l.n >= lineMinBoxes);
+  };
+  const xLines = snapLines(candidate.map((c) => c.cx));
+  const yLines = snapLines(candidate.map((c) => c.cy));
+  const onLine = (v, L) => L.some((l) => Math.abs(l.coord - v) <= lineTolFt);
+  const onGrid = candidate.filter((c) => onLine(c.cx, xLines) && onLine(c.cy, yLines));
+
+  // 5) honest confidence by size (median column size = medium; outliers = low).
+  const majors = onGrid.map((c) => Math.max(c.w, c.h)).sort((a, b) => a - b);
+  const medMajor = majors.length ? majors[Math.floor(majors.length / 2)] : 1.5;
+  const columns = onGrid.map((c) => {
+    const major = Math.max(c.w, c.h);
+    const near = medMajor > 0 ? Math.abs(major - medMajor) / medMajor : 1;
+    return {
+      x: c.cx, y: c.cy, sizeFt: round(Math.max(c.w, c.h)), w: c.w, h: c.h,
+      markerSegs: c.n, gridLabel: null, source: 'marker-extraction',
+      confidence: near <= 0.4 ? 'medium' : 'low',
+    };
+  }).sort((a, b) => a.x - b.x || a.y - b.y);
+
+  return {
+    columns,
+    xLines: xLines.map((l) => l.coord),
+    yLines: yLines.map((l) => l.coord),
+    droppedTableRows: tableRows.length,
+    candidateBoxes,
+    medianSizeFt: round(medMajor),
+    note,
+  };
+}
+
+/**
  * PURE. Detect COLUMNS at grid intersections, validated by a local dense marker cluster.
  *
  * A structural column is drawn as a small filled/hatched marker (a box, I-shape, or HSS
