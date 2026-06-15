@@ -186,6 +186,45 @@ describe('buildSubmittalSheets', () => {
   });
 });
 
+describe('FP-CS cut-sheet index sheet', () => {
+  const bundle = {
+    entries: [
+      { key: 'head|pendent|K5.6|155F', klass: 'head', label: 'Standard-spray pendent sprinkler, K=5.6, 155°F', count: 8, unit: 'ea', matched: true, ref: { key: 'head_pendent', manufacturer: 'Tyco Fire Products', name: 'Pendent sprinkler head', url: 'https://www.tyco-fire.com/TD_TFP/TFP/TFP171_09_2021.pdf', confidence: 'probable' } },
+      { key: 'pipe|2|SCH40', klass: 'pipe', label: '2" SCH40 black steel pipe', count: 120, unit: 'ft', matched: true, ref: { key: 'pipe_sch40', manufacturer: 'Wheatland Tube', name: 'Schedule 40 steel pipe', url: 'https://www.wheatland.com/x.pdf', confidence: 'verified' } },
+      { key: 'hanger|listed', klass: 'hanger', label: 'Pipe hangers (listed)', count: 14, unit: 'ea', matched: false, ref: null, reason: 'engineer must supply' },
+    ],
+    matchedCount: 2,
+    disclaimer: 'ENGINEERING AID — cut-sheet REFERENCES... NOT AHJ-approved, NOT PE-stamped.',
+  };
+
+  it('adds an FP-CS sheet when a cut-sheet bundle is supplied', () => {
+    const set = buildSubmittalSheets({ cadModel: makeModel(), hydraulicReport: report, bom, cutsheetBundle: bundle });
+    expect(set.sheetIds).toContain('FP-CS');
+    expect(set.hasCutsheets).toBe(true);
+    const cs = set.sheets.find((s) => s.code === 'FP-CS');
+    expect(cs.kind).toBe('cutsheets');
+    // real content: SKU labels, a public datasheet URL, confidence, and an honest "none"
+    expect(cs.svg).toContain('CUT-SHEET INDEX');
+    expect(cs.svg).toContain('tyco-fire.com');
+    expect(cs.svg).toContain('verified');
+    expect(cs.svg).toContain('engineer must supply');
+    // titleblock + disclaimer present on the FP-CS sheet
+    expect(cs.svg).toContain('FP-CS');
+  });
+
+  it('omits FP-CS when no cut-sheet bundle is supplied', () => {
+    const set = buildSubmittalSheets({ cadModel: makeModel(), hydraulicReport: report, bom });
+    expect(set.sheetIds).not.toContain('FP-CS');
+    expect(set.hasCutsheets).toBe(false);
+  });
+
+  it('lists FP-CS in the FP-0 sheet index when present', () => {
+    const set = buildSubmittalSheets({ cadModel: makeModel(), bom, cutsheetBundle: bundle });
+    const cover = set.sheets.find((s) => s.code === 'FP-0');
+    expect(cover.svg).toContain('FP-CS');
+  });
+});
+
 describe('renderSheetSetHtml', () => {
   it('produces one printable page per sheet with page-breaks', () => {
     const set = buildSubmittalSheets({ cadModel: makeModel(), hydraulicReport: report, bom });

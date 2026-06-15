@@ -505,6 +505,22 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
       <div id="sectionStatus" style="font-size:10px;margin-top:4px;color:var(--muted)">no section — place a cut line</div>
     </div>
 
+    <!-- PHASE 4: DROP-CEILING TILE GRID. Synthesize a 2x2 / 2x4 ft lay-in lattice over
+         the level (drawn flat on the plan), and optionally CENTER heads on tile centres
+         respecting NFPA-13 max coverage / min spacing. Camera-neutral; center is undoable. -->
+    <div id="ceilingBox" style="margin-top:8px">
+      <label>Drop-ceiling tile grid</label>
+      <div style="display:flex;gap:4px;align-items:center">
+        <button class="act ghost" id="ceilingToggleBtn" type="button" style="font-size:11px;padding:7px;flex:1">▦ Show tile grid</button>
+        <select id="ceilingTileSize" title="lay-in tile size" style="font-size:11px;padding:6px;background:var(--panel,#0d1118);color:inherit;border:1px solid #2b3543;border-radius:5px">
+          <option value="2x2">2×2 ft</option>
+          <option value="2x4">2×4 ft</option>
+        </select>
+      </div>
+      <button class="act ghost" id="ceilingCenterBtn" type="button" style="font-size:11px;padding:7px;margin-top:4px;width:100%">⌖ Center heads on tile (NFPA-checked)</button>
+      <div id="ceilingStatus" style="font-size:10px;margin-top:4px;color:var(--muted)">no grid — generate a layout, then show the tile grid</div>
+    </div>
+
     <!-- PHASE 4 chunk 3: SUBMITTAL SHEET SET. Generate FP-0..FP-D on a titleblock,
          pulling from the live model + Phase-3 hydraulics + Phase-2 BOM + last section.
          Opens a multi-sheet viewer overlay (never the 3D camera) with export/print. -->
@@ -515,6 +531,19 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
         <button class="act ghost" id="submittalCloseBtn" type="button" style="font-size:11px;padding:7px 9px;flex:1">Close viewer</button>
       </div>
       <div id="submittalStatus" style="font-size:10px;margin-top:4px;color:var(--muted)">no submittal — generate a layout, then build sheets</div>
+    </div>
+
+    <!-- PHASE 4 chunk 5: CUT-SHEET BUNDLE. Derive the distinct USED SKUs and match
+         each to a PUBLIC manufacturer datasheet reference (verified|probable|none).
+         Surfaces an FP-CS index sheet in the submittal set. No datasheet content is
+         fabricated — links/records only. -->
+    <div id="cutsheetBox" style="margin-top:8px">
+      <label>Cut-sheet bundle (datasheet refs per SKU)</label>
+      <button class="act ghost" id="cutsheetBuildBtn" type="button" style="font-size:11px;padding:7px">📄 Build cut-sheet index</button>
+      <div style="display:flex;gap:4px;margin-top:4px">
+        <button class="act ghost" id="cutsheetShowBtn" type="button" style="font-size:11px;padding:7px 9px;flex:1">Show in submittal (FP-CS)</button>
+      </div>
+      <div id="cutsheetStatus" style="font-size:10px;margin-top:4px;color:var(--muted)">no cut-sheets — generate a layout, then build the index</div>
     </div>
 
     <div id="sourceLockNote">Source locked: AI-pulled email PDF (bid-originated project)</div>
@@ -794,6 +823,33 @@ import { buildSupply, evaluateSupplies, supplyDemandCurve, defaultCityWaterSpec,
 import { generateSection as hfGenerateSection, planeFromPoints as hfPlaneFromPoints, SECTION_DISCLAIMER } from '/src/engine/section-cut.js';
 // PHASE 4 chunk 3: submittal sheet set (FP-0..FP-D) on a titleblock (pure builder).
 import { buildSubmittalSheets as hfBuildSubmittalSheets, renderSheetSetHtml as hfRenderSheetSetHtml, SUBMITTAL_SHEETS_DISCLAIMER } from '/src/engine/submittal-sheets.js';
+// PHASE 4: drop-ceiling tile grid + center-heads-on-tile (pure synthesizer). Drives the
+// CEILING tool (synthesize a 2x2/2x4 lay-in lattice over a level, drawn on the plan;
+// optional snap heads to tile centres respecting NFPA-13 max coverage/min spacing).
+import { synthesizeCeilingGrid as hfSynthCeilingGrid, centerHeadsOnTiles as hfCenterHeadsOnTiles, tileForPoint as hfTileForPoint, CEILING_GRID_DISCLAIMER } from '/src/engine/ceiling-grid.js';
+// PHASE 4 chunk 5: cut-sheet bundle (pure builder). Derives the distinct USED SKUs
+// from the live model + BOM + hydraulics and matches each to a PUBLIC manufacturer
+// datasheet REFERENCE from the canonical catalog (no datasheet content fabricated).
+// The catalog JSON is FETCHED at runtime (not import-asserted — the browser ESM
+// loader rejects `assert {type:'json'}`) and injected into the pure builder.
+import { buildCutsheetBundle as hfBuildCutsheetBundle, deriveUsedSkus as hfDeriveUsedSkus, CUTSHEETS_DISCLAIMER } from '/src/engine/cut-sheets.js';
+let hfCutsheetCatalog = null;
+fetch('/src/data/cutsheet-urls-fittings.json').then((r) => r.ok ? r.json() : null)
+  .then((j) => { if (Array.isArray(j)) hfCutsheetCatalog = j; })
+  .catch(() => { hfCutsheetCatalog = null; });
+// NFPA-13 coverage lookup for the center-on-tile legality check — the SAME public
+// standard-spray limits (max protection area + max/min spacing) the live coverage
+// overlay uses, via getHazardRule. (We avoid compliance.js here because it imports
+// JSON with an import-assertion the browser ESM loader rejects; the rule values are
+// identical: light/ordinary 225/130 ft² @ 15 ft, extra 100 ft² @ 12 ft, min 6 ft.)
+import { getHazardRule as hfGetHazardRule } from '/src/engine/sprinkler-layout.js';
+// coverage(hazard) adapter matching compliance.coverage's shape {maxAreaFt2,maxSpacingFt,minSpacingFt}.
+const hfComplianceCoverage = (hazard) => {
+  try {
+    const r = hfGetHazardRule(hazard);
+    return { maxAreaFt2: r.maxAreaSqFt, maxSpacingFt: r.maxSpacingFt, minSpacingFt: r.minSpacingFt || 6, source: 'getHazardRule(NFPA-13 std-spray)' };
+  } catch (_) { return null; }
+};
 
 // HF-W2 (Stream W2): EXTRACTION COMPLETENESS rendered in the live Studio — DOORS
 // (leaf + swing arc), recovered partition-inclusive WALLS, and FIXTURES/cores are
@@ -1890,6 +1946,10 @@ function renderModel(cadModel, opts) {
   // Built from the live solve's per-node results so the labels match the numbers.
   // Camera-neutral (geometry only).
   try { renderNodeTagOverlay(); } catch (e) { window.__nodeTagOverlayError = String(e && e.message || e); }
+  // PHASE 4: draw the drop-ceiling tile lattice on the plan when the toggle is on.
+  // Camera-neutral (flat geometry only). Built from lastCeilingGrid so the picture
+  // matches the published __hfPhase4.ceiling contract.
+  try { renderCeilingOverlay(); } catch (e) { window.__ceilingOverlayError = String(e && e.message || e); }
   buildLayerToggles();
   try { if (typeof refreshAnnotations === 'function') refreshAnnotations(); } catch (_) { /* annotation overlay optional */ }
 }
@@ -5052,6 +5112,167 @@ function renderNodeTagOverlay() {
   window.__nodeTagOverlayDebug = { placed, sampled: tags.sampled.length, on: true };
 }
 
+// ── PHASE 4: DROP-CEILING TILE GRID + CENTER-ON-TILE ──────────────────────────
+// Synthesize a lay-in (2x2 / 2x4 ft) ceiling tile lattice over the level and draw it
+// FLAT on the plan (a toggleable overlay group in modelGroup — never the 3D camera).
+// Optional "center heads on tile" snaps each head to the centre of the tile it sits
+// in, but only when the snap stays NFPA-legal (>= hazard min spacing, <= hazard max
+// spacing from compliance.coverage). Centering goes through HFEdit (undoable,
+// preserveView). Published on window.__hfPhase4.ceiling -> {tileW,tileH,tiles,headsCentered}.
+// CAMERA-NEUTRAL: synthesize/draw never reframe; the center edit uses preserveView.
+let lastCeilingGrid = null;        // synthesizeCeilingGrid() result
+let lastCeilingCenter = null;      // centerHeadsOnTiles() result (last run)
+let ceilingOverlayOn = false;      // draw the tile lattice on the plan
+let ceilingTileW = 2, ceilingTileH = 2; // active tile size (2x2 default; 2x4 selectable)
+const CEILING_LINE_COLOR = 0x5b87c4;     // cool blue grid lines
+const CEILING_CENTER_COLOR = 0x22d3ee;   // tile-centre tick
+
+// Gather the level metadata so heads are tiled/binned per floor (reuses submittalLevels).
+function ceilingLevelsMeta() {
+  try { return submittalLevels(); } catch (_) { return []; }
+}
+function ceilingHazard() {
+  return (currentCadModel && currentCadModel.sizing && currentCadModel.sizing.hazard) || (typeof projectHazard === 'function' ? projectHazard() : 'ordinary');
+}
+// (Re)synthesize the grid for the active tile size from the live model. Pure read;
+// publishes lastCeilingGrid. opts may override tileW/tileH/level/originMode.
+function runCeilingGrid(opts = {}) {
+  const tileW = Number.isFinite(Number(opts.tileW)) ? Number(opts.tileW) : ceilingTileW;
+  const tileH = Number.isFinite(Number(opts.tileH)) ? Number(opts.tileH) : ceilingTileH;
+  const levels = ceilingLevelsMeta();
+  // when there is exactly one (or zero) level, tile the whole model (level=null)
+  const level = (opts.level !== undefined) ? opts.level : (levels.length > 1 ? (levels[0] && levels[0].level) : null);
+  lastCeilingGrid = hfSynthCeilingGrid({
+    cadModel: currentCadModel, tileW, tileH,
+    level, levels: levels.length ? levels : undefined,
+    originMode: opts.originMode || 'corner',
+    extent: opts.extent, origin: opts.origin, padFt: opts.padFt,
+  });
+  ceilingTileW = tileW; ceilingTileH = tileH;
+  publishCeiling();
+  return lastCeilingGrid;
+}
+// Draw the synthesized tile lattice flat on the plan (lines + centre ticks).
+function renderCeilingOverlay() {
+  if (!ceilingOverlayOn || !lastCeilingGrid || !lastCeilingGrid.ok || !modelGroup) return;
+  const g = lastCeilingGrid;
+  // place the lattice just under the heads so it reads as a top-down ceiling map.
+  const heads = (currentCadModel && Array.isArray(currentCadModel.solids))
+    ? currentCadModel.solids.filter((s) => s.kind === 'head' && Array.isArray(s.position)) : [];
+  let zPlan = 8;
+  if (heads.length) zPlan = Math.min(...heads.map((h) => Number(h.position[2]) || 8)) - 0.04;
+  const grp = new THREE.Group();
+  grp.userData.hfCeilingOverlay = true;
+  grp.renderOrder = 1098;
+  // grid lines (vertical + horizontal) as one LineSegments mesh.
+  const pts = [];
+  const b = g.bounds;
+  for (let i = 0; i <= g.cols; i += 1) {
+    const x = g.origin[0] + i * g.tileW;
+    const a0 = W([x, b.y0, zPlan]), a1 = W([x, b.y1, zPlan]);
+    pts.push(new THREE.Vector3(a0[0], a0[1], a0[2]), new THREE.Vector3(a1[0], a1[1], a1[2]));
+  }
+  for (let j = 0; j <= g.rows; j += 1) {
+    const y = g.origin[1] + j * g.tileH;
+    const a0 = W([b.x0, y, zPlan]), a1 = W([b.x1, y, zPlan]);
+    pts.push(new THREE.Vector3(a0[0], a0[1], a0[2]), new THREE.Vector3(a1[0], a1[1], a1[2]));
+  }
+  if (pts.length) {
+    const geo = new THREE.BufferGeometry().setFromPoints(pts);
+    grp.add(new THREE.LineSegments(geo, new THREE.LineBasicMaterial({ color: CEILING_LINE_COLOR, transparent: true, opacity: 0.5, depthWrite: false })));
+  }
+  // tile-centre ticks (a tiny cross at each tile centre) — kept light, capped so a
+  // huge lattice doesn't spam geometry.
+  if (g.tiles.length && g.tiles.length <= 4000) {
+    const ticks = [];
+    const s = Math.min(g.tileW, g.tileH) * 0.16;
+    for (const t of g.tiles) {
+      const c = W([t.cx, t.cy, zPlan + 0.01]);
+      ticks.push(new THREE.Vector3(c[0] - s, c[1], c[2]), new THREE.Vector3(c[0] + s, c[1], c[2]));
+      ticks.push(new THREE.Vector3(c[0], c[1], c[2] - s), new THREE.Vector3(c[0], c[1], c[2] + s));
+    }
+    const tg = new THREE.BufferGeometry().setFromPoints(ticks);
+    grp.add(new THREE.LineSegments(tg, new THREE.LineBasicMaterial({ color: CEILING_CENTER_COLOR, transparent: true, opacity: 0.55, depthWrite: false })));
+  }
+  modelGroup.add(grp);
+  window.__ceilingOverlayDebug = { tiles: g.tileCount, cols: g.cols, rows: g.rows, tileW: g.tileW, tileH: g.tileH, on: true, zPlan };
+}
+// Toggle the ceiling overlay + preserveView rebuild (GUARD#1).
+window.__hfCeilingToggle = (on) => {
+  ceilingOverlayOn = (on === undefined) ? !ceilingOverlayOn : !!on;
+  if (ceilingOverlayOn && (!lastCeilingGrid || !lastCeilingGrid.ok)) runCeilingGrid();
+  if (currentCadModel) renderModel(currentCadModel, { preserveView: true }); // GUARD#1: keep camera
+  return ceilingOverlayOn;
+};
+// CENTER HEADS ON TILE — NFPA-legal snap, applied through HFEdit (undoable, camera-neutral).
+function centerHeadsOnCeiling(opts = {}) {
+  if (!currentCadModel || !Array.isArray(currentCadModel.solids)) return { ok: false, reason: 'no model — Generate a layout first', headsCentered: 0 };
+  const grid = (lastCeilingGrid && lastCeilingGrid.ok) ? lastCeilingGrid : runCeilingGrid(opts);
+  if (!grid || !grid.ok) return { ok: false, reason: (grid && grid.reason) || 'no ceiling grid', headsCentered: 0 };
+  const hazard = ceilingHazard();
+  const levels = ceilingLevelsMeta();
+  // dry-run first so we can report the contract even if 0 heads move.
+  const dry = hfCenterHeadsOnTiles({ cadModel: currentCadModel, grid, hazard, complianceCoverage: hfComplianceCoverage, levels: levels.length ? levels : undefined, cloneModel: false });
+  lastCeilingCenter = dry;
+  if (dry.ok && dry.headsCentered > 0) {
+    // apply as a single undoable edit: the transform returns the centered clone.
+    HFEdit.apply('center-heads-on-tile', (m) => {
+      const r = hfCenterHeadsOnTiles({ cadModel: m, grid, hazard, complianceCoverage: hfComplianceCoverage, levels: levels.length ? levels : undefined });
+      return (r && r.model) ? r.model : m;
+    });
+  }
+  publishCeiling();
+  return dry;
+}
+function publishCeiling() {
+  window.__hfPhase4 = window.__hfPhase4 || {};
+  // CHUNK contract: __hfPhase4.ceiling -> { tileW, tileH, tiles, headsCentered }.
+  const fn = (opts) => { runCeilingGrid(opts || {}); return ceilingContract(); };
+  fn.synth = (opts) => { runCeilingGrid(opts || {}); return ceilingContract(); };
+  fn.get = () => ceilingContract();
+  fn.grid = () => lastCeilingGrid;                 // full grid (tiles, bounds, extent)
+  fn.tiles = () => (lastCeilingGrid && lastCeilingGrid.ok ? lastCeilingGrid.tiles : []);
+  fn.center = (opts) => { const r = centerHeadsOnCeiling(opts || {}); return { ...ceilingContract(), centered: r }; };
+  fn.dryRun = (opts) => {
+    if (!currentCadModel) return { ok: false, reason: 'no model' };
+    const grid = (lastCeilingGrid && lastCeilingGrid.ok) ? lastCeilingGrid : runCeilingGrid(opts || {});
+    return hfCenterHeadsOnTiles({ cadModel: currentCadModel, grid, hazard: ceilingHazard(), complianceCoverage: hfComplianceCoverage, cloneModel: false });
+  };
+  fn.show = (on) => window.__hfCeilingToggle(on === undefined ? true : !!on);
+  fn.hide = () => window.__hfCeilingToggle(false);
+  fn.setTile = (tw, th) => { ceilingTileW = Number(tw) || 2; ceilingTileH = Number(th) || ceilingTileW; runCeilingGrid(); if (ceilingOverlayOn && currentCadModel) renderModel(currentCadModel, { preserveView: true }); return ceilingContract(); };
+  window.__hfPhase4.ceiling = fn;
+}
+// The observable CHUNK contract surface (no heavy tile blobs unless asked).
+function ceilingContract() {
+  const g = lastCeilingGrid;
+  const c = lastCeilingCenter;
+  if (!g || !g.ok) {
+    return { available: false, tileW: ceilingTileW, tileH: ceilingTileH, tiles: 0, headsCentered: (c && c.headsCentered) || 0, reason: (g && g.reason) || 'no grid yet — call __hfPhase4.ceiling() after Generate Layout', disclaimer: CEILING_GRID_DISCLAIMER };
+  }
+  return {
+    available: true,
+    tileW: g.tileW,                 // CHUNK contract
+    tileH: g.tileH,                 // CHUNK contract
+    tiles: g.tileCount,             // CHUNK contract (count; full records via .tiles())
+    cols: g.cols, rows: g.rows,
+    bounds: g.bounds, extent: g.extent,
+    origin: g.origin, originSource: g.originSource, extentSource: g.extentSource,
+    level: g.level, headsOnLevel: g.headsOnLevel,
+    overlayOn: ceilingOverlayOn,
+    headsCentered: (c && c.headsCentered) || 0,   // CHUNK contract (last center run)
+    alreadyCentered: (c && c.alreadyCentered) || 0,
+    skipped: (c && c.skipped) || [],
+    maxSpacingFt: c && c.maxSpacingFt, minSpacingFt: c && c.minSpacingFt,
+    hazard: (c && c.hazard) || ceilingHazard(),
+    coverageSource: c && c.coverageSource,
+    clamped: g.clamped,
+    disclaimer: CEILING_GRID_DISCLAIMER,
+  };
+}
+window.__hfPhase4 = window.__hfPhase4 || {};
+publishCeiling(); // ensure __hfPhase4.ceiling exists pre-build
+
 // Build the coverage overlay group into modelGroup (called from renderModel after
 // the model meshes). When the toggle is off, nothing is drawn. When on: a faint
 // translucent coverage disc + a colored ring per head (green=ok, red=too-close,
@@ -6218,6 +6439,61 @@ function buildPhase4Intake() {
   window.__hfPhase4.submittal.html = () => (window.__hfLastSubmittal ? hfRenderSheetSetHtml(window.__hfLastSubmittal, { project: lastSubmittalProject }) : '');
   window.__hfPhase4.submittal.export = () => exportSubmittalHtml();
   window.__hfPhase4.submittal.print = () => printSubmittal();
+
+  // ── PHASE 4 chunk 5: CUT-SHEET BUNDLE (manufacturer datasheet refs per SKU) ──
+  // Pure builder derives the distinct USED SKUs from the LIVE model + Phase-2 BOM
+  // (__hfBomTakeoff) + Phase-3 hydraulics (__hf3.report) and matches each to a
+  // PUBLIC datasheet reference from the canonical catalog (verified|probable|
+  // not-found). Returns the CHUNK contract { skus, entries }. Analysis-only — no
+  // solve, no scene mutation, no camera move. Surfaces an FP-CS sheet in the
+  // submittal set when present.
+  window.__hfPhase4.cutsheets = (opts) => buildCutsheetBundle(opts || {});
+  window.__hfPhase4.cutsheets.build = (opts) => buildCutsheetBundle(opts || {});
+  window.__hfPhase4.cutsheets.get = () => window.__hfLastCutsheets || null;
+  window.__hfPhase4.cutsheets.skus = () => hfDeriveUsedSkus(cutsheetInput());
+  window.__hfPhase4.cutsheets.catalog = () => hfCutsheetCatalog || null;
+  // Build the bundle AND (re)build the submittal set so FP-CS appears in the viewer.
+  window.__hfPhase4.cutsheets.show = (opts) => { const b = buildCutsheetBundle(opts || {}); buildAndShowSubmittal(opts || {}); return b; };
+}
+
+// Live read of the inputs the cut-sheet builder derives SKUs from. Pure.
+function cutsheetInput() {
+  const report = (window.__hf3 && window.__hf3.report) || (window.__hfPhase3 && window.__hfPhase3.report) || null;
+  return {
+    cadModel: currentCadModel || { solids: [] },
+    bom: window.__hfBomTakeoff || null,
+    hydraulicReport: report,
+    catalog: hfCutsheetCatalog || null,
+    generatedAt: new Date().toISOString().slice(0, 10),
+  };
+}
+
+// Build the cut-sheet bundle from live state. Pure + camera-neutral. Returns the
+// { skus, entries } contract (+ provenance). Stores it for the submittal FP-CS sheet.
+function buildCutsheetBundle(opts) {
+  if (!currentCadModel || !Array.isArray(currentCadModel.solids) || !currentCadModel.solids.length) {
+    return { available: false, skus: [], entries: [], skuCount: 0, matchedCount: 0, exportReady: false, reason: 'no model — Generate a layout first' };
+  }
+  const input = Object.assign(cutsheetInput(), opts && opts.input ? opts.input : {});
+  const bundle = hfBuildCutsheetBundle(input);
+  window.__hfLastCutsheets = bundle;
+  const cs = document.getElementById('cutsheetStatus');
+  if (cs) cs.textContent = bundle.skuCount
+    ? (bundle.skuCount + ' used SKUs · ' + bundle.matchedCount + ' with public datasheet ref'
+       + (bundle.catalogUsed === false ? ' (fallback catalog)' : '')
+       + (bundle.unmatched.length ? ' · ' + bundle.unmatched.length + ' unmatched' : ''))
+    : 'cut-sheets: no SKUs';
+  return {
+    available: true,
+    skus: bundle.skus,                 // CHUNK contract
+    entries: bundle.entries,           // CHUNK contract
+    skuCount: bundle.skuCount,
+    matchedCount: bundle.matchedCount,
+    unmatched: bundle.unmatched,
+    exportReady: bundle.exportReady,
+    catalogEntries: (hfCutsheetCatalog || []).length,
+    disclaimer: bundle.disclaimer,
+  };
 }
 
 // Gather the level metadata the sheet builder splits FP-N plans by (from the
@@ -6248,6 +6524,10 @@ function buildSubmittalSet(opts) {
   const report = (window.__hf3 && window.__hf3.report) || (window.__hfPhase3 && window.__hfPhase3.report) || null;
   const bom = window.__hfBomTakeoff || null;
   const section = window.__hfLastSection && window.__hfLastSection.ok ? window.__hfLastSection : null;
+  // Chunk-5 cut-sheet bundle: derive the used-SKU datasheet references and embed an
+  // FP-CS index sheet in the set. Build fresh from live state (cheap, pure).
+  let cutsheetBundle = null;
+  try { cutsheetBundle = hfBuildCutsheetBundle(cutsheetInput()); window.__hfLastCutsheets = cutsheetBundle; } catch (_) {}
   const levels = submittalLevels();
   const project = Object.assign({
     name: (planBuildState && planBuildState.project) || (currentCadModel && currentCadModel.name) || 'HaloFire AutoSPRINK — design model',
@@ -6257,7 +6537,7 @@ function buildSubmittalSet(opts) {
   }, opts.project || {});
   lastSubmittalProject = project.name;
   const set = hfBuildSubmittalSheets({
-    cadModel: currentCadModel, hydraulicReport: report, bom, section, levels, project,
+    cadModel: currentCadModel, hydraulicReport: report, bom, section, cutsheetBundle, levels, project,
     generatedAt: new Date().toISOString().slice(0, 10),
   });
   window.__hfLastSubmittal = set;
@@ -6272,6 +6552,8 @@ function buildSubmittalSet(opts) {
     hasHydraulics: set.hasHydraulics,
     hasBom: set.hasBom,
     hasSection: set.hasSection,
+    hasCutsheets: set.hasCutsheets,
+    cutsheetSkus: cutsheetBundle ? cutsheetBundle.skuCount : 0,
     titles: set.sheets.map((s) => ({ id: s.id, title: s.title, kind: s.kind })),
     disclaimer: set.disclaimer,
   };
@@ -6385,6 +6667,14 @@ function printSubmittal() {
   const close = document.getElementById('submittalCloseBtn');
   if (gen) gen.addEventListener('click', () => { try { buildAndShowSubmittal({}); } catch (e) { console.warn(e); } });
   if (close) close.addEventListener('click', () => { try { closeSubmittalPanel(); } catch (e) { console.warn(e); } });
+})();
+
+// UI wiring for the cut-sheet bundle tool buttons (chunk 5).
+(function wireCutsheetUI() {
+  const build = document.getElementById('cutsheetBuildBtn');
+  const show = document.getElementById('cutsheetShowBtn');
+  if (build) build.addEventListener('click', () => { try { buildCutsheetBundle({}); } catch (e) { console.warn(e); } });
+  if (show) show.addEventListener('click', () => { try { buildCutsheetBundle({}); buildAndShowSubmittal({}); } catch (e) { console.warn(e); } });
 })();
 
 // Interactive 2-point calibration state. The picks are CAMERA-NEUTRAL (pointerToPlan only).
@@ -6590,6 +6880,45 @@ function closeSectionPanel() {
   const close = document.getElementById('sectionCloseBtn');
   if (pick) pick.addEventListener('click', () => { try { armSection(); } catch (e) { console.warn(e); } });
   if (close) close.addEventListener('click', () => { try { closeSectionPanel(); } catch (e) { console.warn(e); } });
+})();
+
+// PHASE 4: DROP-CEILING tile-grid UI — show/hide the lattice, pick tile size, and
+// center heads on tiles (NFPA-checked, undoable). Camera-neutral (overlay/edit only).
+(function wireCeilingUI() {
+  const toggle = document.getElementById('ceilingToggleBtn');
+  const sizeSel = document.getElementById('ceilingTileSize');
+  const center = document.getElementById('ceilingCenterBtn');
+  const status = document.getElementById('ceilingStatus');
+  const setStatus = (txt) => { if (status) status.textContent = txt; };
+  if (sizeSel) sizeSel.addEventListener('change', () => {
+    try {
+      const [tw, th] = String(sizeSel.value).split('x').map(Number);
+      window.__hfPhase4.ceiling.setTile(tw, th);
+      const g = lastCeilingGrid;
+      if (g && g.ok) setStatus(`${tw}×${th} ft grid · ${g.cols}×${g.rows} = ${g.tileCount} tiles${ceilingOverlayOn ? ' (shown)' : ''}`);
+    } catch (e) { console.warn(e); }
+  });
+  if (toggle) toggle.addEventListener('click', () => {
+    try {
+      const on = window.__hfCeilingToggle();
+      toggle.classList.toggle('on', on);
+      toggle.textContent = on ? '▦ Hide tile grid' : '▦ Show tile grid';
+      const g = lastCeilingGrid;
+      if (on && g && g.ok) setStatus(`${g.tileW}×${g.tileH} ft grid · ${g.cols}×${g.rows} = ${g.tileCount} tiles · origin ${g.originSource}`);
+      else if (on) setStatus('no grid — generate a layout first');
+      else setStatus('tile grid hidden');
+    } catch (e) { console.warn(e); }
+  });
+  if (center) center.addEventListener('click', () => {
+    try {
+      const r = centerHeadsOnCeiling();
+      if (!r || r.ok === false) { setStatus('center failed: ' + ((r && r.reason) || 'no grid')); return; }
+      const parts = [`${r.headsCentered} head(s) centered`];
+      if (r.alreadyCentered) parts.push(`${r.alreadyCentered} already centered`);
+      if (r.skipped && r.skipped.length) parts.push(`${r.skipped.length} skipped (NFPA spacing)`);
+      setStatus(parts.join(' · ') + ` · ${r.hazard} ≤${r.maxSpacingFt}ft (Ctrl+Z to undo)`);
+    } catch (e) { console.warn(e); setStatus('center error: ' + (e && e.message || e)); }
+  });
 })();
 
 // ── HF-DM: direct-manipulation grab-drag (AutoSPRINK-style) ────────────────────

@@ -3,7 +3,7 @@
 
 ## 0. Honest headline
 
-**We are roughly 30% of an AutoSPRINK clone by tool count — and closer to ~15% by "does it do the fire-protection engineer's job."**
+**We are roughly 45% of an AutoSPRINK clone by tool count — and closer to ~30% by "does it do the fire-protection engineer's job."** (Up from ~30%/~15% pre-Phase-4. Phases 1–3 are DONE and Phase 4 closed the section cut, submittal/cut-sheet deliverables, drop-ceiling grid, and scale calibration — all live-verified with real output; the one remaining XL hole is raster/scan→building reconstruction, where only the vector half and calibration are built.)
 
 This session moved the **interaction shell** a long way: real undo/redo, multi-select, clipboard, 2D plan mode, direct grab-drag move, multi-segment draw, typed input, measure, trim/offset/array/mirror/copy/scale/single-grip, 258 wired menu items. That is real and it matters. **But the load-bearing CAD/engineering is still mostly absent**, and that is the 70% that makes AutoSPRINK AutoSPRINK:
 
@@ -12,9 +12,10 @@ This session moved the **interaction shell** a long way: real undo/redo, multi-s
 - ~~No **arm-over / drop / sprig** routing intelligence~~ — **DONE (Phase 2):** arm-over/easy-drop/sprig connection engine + auto branch-line tie-in-to-mains, live-verified (arm-around obstruction routing still MISS).
 - ~~No full O-snap suite~~ — **DONE (Phase 1, 2026-06-14):** all 7 snap types with glyphs/tooltips + per-type settings, polar/ortho tracking, command line, dynamic input, dimension engine, grip-handle drag-reshape + stretch all shipped and live-verified.
 - ~~No **object Properties editing**~~ — **DONE (Phase 2):** material/diameter/end-prep/K-factor/cost/labor edits route through one undoable edit and reflect in the live BOM, live-verified.
-- No **Remote-Area boundary tool**, **section tool**, **node tags** (pressure/flow/velocity).
-- No **NFPA-format hydraulic report** or **submittal sheet set** (FP-0…FP-D).
-- No **PDF/DWG → full building model** reconstruction in the critical path.
+- ~~No **Remote-Area boundary tool**, **section tool**, **node tags**~~ — **DONE:** Remote-Area + node tags (Phase 3); **section/elevation cut DONE (Phase 4, 2026-06-15):** two-point cut plane projecting structure/pipes/heads at true elevations onto a selectable SVG elevation panel, live-verified, camera-neutral.
+- ~~No **NFPA-format hydraulic report** or **submittal sheet set** (FP-0…FP-D)~~ — **DONE:** NFPA report (Phase 3); **submittal sheet set + cut-sheet bundle DONE (Phase 4, 2026-06-15):** FP-0/FP-H/FP-N(per-level)/FP-R/FP-B/FP-D/FP-CS on an ANSI-D titleblock with printable HTML export, real content on every sheet, live-verified.
+- **PARTIAL: PDF/DWG → full building model** — **vector intake DONE (Phase 4, 2026-06-15):** walls/openings/columns/levels + scale calibration (pick-2-points / known-scale) live-verified on the 1881 vector plan (822 walls / 139 openings / 405 columns / 8 levels). **The XL half is NOT done:** columns are a grid-intersection HEURISTIC (synth placeholder, not an extracted schedule), and **RASTER/scan → building extraction is NOT built**. Flagged needs-verification in-product.
+- ~~No drop-ceiling tile grid~~ — **DONE (Phase 4, 2026-06-15):** 2×2/2×4 lay-in lattice + NFPA-checked center-heads-on-tile, live-verified (1230 heads centered, 0 NFPA skips), camera-neutral.
 - Parts: 296 SKUs but ~276 are parametric stubs, not manufacturer-exact.
 
 The honest framing: **a credible CAD *interaction* shell sitting on top of unbuilt sprinkler *engineering*.** The plan below is ordered to close that, hardest-and-most-defining first.
@@ -61,7 +62,7 @@ Legend: **HAVE** = real + verified · **PART** = exists but incomplete/shallow �
 |---|---|---|---|---|
 | 2D plan / 3D toggle | HAVE | — (true 2D built this session) | — | — |
 | Zoom extents / window / pan / orbit / view-cube | HAVE | — | — | — |
-| **Section / elevation cut** | MISS | live section plane → 2D section view | **L** | **P1** |
+| **Section / elevation cut** | HAVE | **DONE + live-verified (Phase 4, 2026-06-15):** `section-cut.js` PURE projector places a cut plane from two plan points and projects structure/pipes/heads within a depth band onto the plane at TRUE elevations (live: Section A-A 225 pipes/210 heads/65 cut/372 beyond, bounds v0..v1 = 0..24 ft floor→ceiling, heads at true z=22.5); cut-vs-beyond drafting distinction; selectable/closable/draggable SVG elevation panel (HTML overlay, NOT the 3D camera); interactive 2-point pick camera-neutral (drift 0). 16 unit tests. Residual: flat depth-band projection (no true hidden-line/poché), no section dimensions/section-mark drawn back on plan — labeled engineering aid, NOT AHJ/PE-stamped | **L** | **P1** |
 | Named views / saved viewpoints | MISS | — | S | P3 |
 | Show/Hide layers · grid · elevation HUD | PART | elevation HUD, per-layer isolate, grid toggle polish | S | P1 |
 | Isolate selection (x-ray) | HAVE | — | — | — |
@@ -72,11 +73,11 @@ Legend: **HAVE** = real + verified · **PART** = exists but incomplete/shallow �
 |---|---|---|---|---|
 | Import PDF (raster) | PART | reliable scale auto-calibration | M | P0 |
 | Import DWG / DXF | PART | full DWG (LibreDWG); layer mapping | L | P1 |
-| **PDF/DWG → full building model** (walls/openings/columns/levels) | MISS | the reconstruction critical path is heuristic/down | **XL** | **P0** |
+| **PDF/DWG → full building model** (walls/openings/columns/levels) | PART | **vector intake DONE + live-verified (Phase 4, 2026-06-15):** `__hfPhase4.intake` reconstructs walls/openings/columns/levels from the vector PDF (live 1881: 822 walls, 139 openings, 405 columns, 8 levels, scale 0.1481 ft/px), camera-neutral, deployed. **The XL half is NOT done:** columns are a GRID-INTERSECTION HEURISTIC (synth, confidence "low", fixed 1.2 ft placeholder — not an extracted column schedule; `structure-from-plan.detectColumns` not yet wired); openings conflate doors+cased w/ no host-wall index; **RASTER/scan → building extraction is NOT built** (only the calibration two-point flow is). NOT AHJ/PE-stamped, flagged `needsVerification` in-product | **XL** | **P0** |
 | "Clean" import (strip blocks/layers) | MISS | layer-filter wizard | M | P1 |
 | Lock source layer (read-only underlay) | MISS | — | S | P1 |
-| Drawing scale / units setup | PART | imperial-native, scale picker | S | P1 |
-| Drop-ceiling / tile grid synthesis | MISS | center heads on tiles | M | P1 |
+| Drawing scale / units setup | HAVE | **scale calibration DONE + live-verified (Phase 4):** `__hfPhase4.calibrate` — pick-2-points→type-distance (`setByTwoPoints`→0.25 ft/px), known-scale picker (`setByKnownScale("1/8\"=1'") `→0.1111 ft/px via `parseArchScale`), plan-point correction, clear→sheet scale, operator scale overrides sheet-derived; camera-neutral pick (drift 0). Residual: records the correction for intake/future imports but does NOT yet re-scale already-built live geometry | S | P1 |
+| Drop-ceiling / tile grid synthesis | HAVE | **DONE + live-verified (Phase 4, 2026-06-15):** `synthesizeCeilingGrid` builds a 2×2/2×4 ft lay-in lattice over the level extent (live: 31160 tiles, 2 ft pitch exact, drawn on the plan); `centerHeadsOnTiles` NFPA-checked snap (live: 1230 heads centered on tile centres, z preserved, 0 NFPA skips; 0 too-close/too-far after) routed through undoable HFEdit; camera-neutral. 16 unit tests. Residual: a drafting aid from the reconstructed extent, NOT the architect's RCP (no soffits/bulkheads/per-room heights/obstructions) — labeled engineering aid | M | P1 |
 
 ### F. Pipe routing & system building
 | AutoSPRINK tool | our status | what's missing | eff | pri |
@@ -130,10 +131,10 @@ Legend: **HAVE** = real + verified · **PART** = exists but incomplete/shallow �
 | Stock listing / BOM (export) | HAVE | grouped-by-role, Hydralist (.hlf) | M | P1 |
 | Material summary | PART | role grouping | S | P1 |
 | **NFPA-format hydraulic report** | HAVE | buildHydraulicReport mirrors a solveNetwork() result into NFPA-format summary + node-analysis (Ref/Elev/K/P/Q) + pipe-data (From→To/dia/len+Le/effLen/C/Q/V/loss) rows, K only on sprinkler nodes, printable self-contained HTML export (Phase 3): 26 golden + 188/188 hydraulics suite + 28/28 live. **PURE mirror of the validated solve — node-row pressures Δ=0 and pipe-row friction/velocity Δ=0 over 2543 rows vs the live per-element solve; hand-calc agrees EXACT** (P1 friction 6.5452 psi, P2 2.2766 psi, v 20.175 fps). Report summary now carries `designBasisLabel` ('NFPA-13 remote-area design demand (auto-selected most-remote area)') + `remoteAreaAutoSelected`/`remoteAreaFlowingHeads`; **default report basis is the auto remote-area subset** (177.794 gpm, designBasis 'remote-area-subset', mirrors the live solve Δ=0), and reflects the now-balanced Hardy-Cross loop verdict. Residual: in-panel preview samples 4+4 rows (full set in the .html export) | — | — |
-| **Submittal sheet set** (FP-0 cover/FP-H/FP-N/FP-R/FP-B/FP-D) | MISS | multi-sheet PDF plot set | **L** | **P1** |
-| Cut-sheet PDF bundle | MISS | merge mfr datasheets per used SKU | M | P2 |
-| Plot / print (letter/tabloid) | PART | titleblock, sheet plotting | M | P1 |
-| 2D drawing extract from 3D (per level) | PART | multi-sheet, dimensioned | M | P1 |
+| **Submittal sheet set** (FP-0 cover/FP-H/FP-N/FP-R/FP-B/FP-D) | HAVE | **DONE + live-verified (Phase 4, 2026-06-15):** `submittal-sheets.js` builds the standard set as self-contained SVG on an ANSI-D titleblock @72px/in — FP-0 cover/index, FP-H hydraulic placard, FP-N per-level plan(s) (split by head/pipe Z), FP-R schematic riser, FP-B BOM, FP-D details (embeds last section), FP-CS cut-sheet index; printable multi-page HTML export/print. Live: 14 sheets (FP-N1..N8 split), real content on every sheet (FP-N 462KB head grid, FP-H gpm/demand, FP-D Section A-A), titleblock+disclaimer on each, camera-neutral. 15 unit tests. Residual: FP-D embeds only the single last section; FP-R riser stub-count is head-count/6 (schematic, not topology-accurate); titleblock scale "AS NOTED" (not a fixed plotted architectural scale); BOM is module-scoped (FP-B shows honest "no BOM" placeholder until `regenerateBom` runs) | **L** | **P1** |
+| Cut-sheet PDF bundle | HAVE | **DONE + live-verified (Phase 4, 2026-06-15):** `cut-sheets.js` derives the distinct used SKUs from the live model (live: 5 SKUs — K5.6 pendent ×1230, 8"SCH10 429ft, 3"SCH40 12095ft, 1"SCH40 615ft, fittings ×168 with REAL summed footage) and matches each to a REAL PUBLIC manufacturer datasheet REFERENCE from a 22-entry network-checked catalog (live: 5/5 matched, 0 unmatched; never fabricates a datasheet — links/records only, honest matched:false for SKU classes w/o a public entry e.g. hangers). FP-CS index sheet appended to the submittal set. camera-neutral, 16 unit tests. Residual: this is a cut-sheet INDEX (links), NOT a merged/stitched PDF of datasheet pages; head refs (Tyco TFP171/172/312) are confidence "probable" (Incapsula-gated, body not auto-fetch-verified); refs are REPRESENTATIVE for the SKU class, NOT the project-specified product (no product-selection UI) — labeled engineering aid | M | P2 |
+| Plot / print (letter/tabloid) | PART | **ANSI-D titleblock + multi-sheet printable HTML export DONE (Phase 4 submittal set, verified)**; remaining: letter/tabloid page sizes + true fixed-scale plot (titleblock scale is "AS NOTED", fit-to-page) | M | P1 |
+| 2D drawing extract from 3D (per level) | PART | **per-level FP-N plan sheets DONE (Phase 4 submittal set, verified — live split into FP-N1..N8 by head/pipe Z)**; remaining: dimensioned extract (FP-N carries head/pipe geometry but no dimension annotations yet) | M | P1 |
 
 ### K. Annotation
 | AutoSPRINK tool | our status | what's missing | eff | pri |
@@ -173,7 +174,7 @@ These are the load-bearing gaps. Nothing reads as "an AutoSPRINK clone" without 
 5. **Real hydraulic solve** — ✅ DONE (Phase 3): system-wide Hazen-Williams + fitting Le, golden + hand-verified EXACT, **default basis = NFPA-13 remote-area subset** (live 177.794 gpm / 18.896 psi, demandMet true). **Hardy-Cross** loop/grid solver is built, proven on the textbook net, AND now **wired to the live demand tree** (live gridded loop converges, `hardyCrossBalanced=true`, maxResidual 2.06e-9) — the former PARTIAL is closed.
 6. ~~**Remote-Area boundary tool**~~ — ✅ DONE (Phase 3): draw rect/polygon, NFPA density/area demand, feeds the solve subset.
 7. ~~**NFPA-format hydraulic report**~~ — ✅ DONE (Phase 3): summary + node-analysis + pipe-data, pure mirror of the validated solve (Δ=0), printable HTML.
-8. **PDF/DWG → real building model** in the critical path (+ scale calibration).
+8. **PDF/DWG → real building model** in the critical path (+ scale calibration) — ⚠️ **PARTIAL (Phase 4):** VECTOR intake + scale calibration ✅ DONE + live-verified (walls/openings/columns/levels on the 1881 vector plan); **RASTER/scan → building extraction NOT built** and columns are a grid-intersection heuristic, not an extracted schedule. This is the one remaining XL P0 hole.
 9. **Insert/place tools** for heads (✅ DONE Phase 2: head-place + live coverage/spacing-violation overlay) + devices with live snap preview (devices still PART).
 
 ---
@@ -200,15 +201,26 @@ Shipped as pure, deterministic `src/engine/*` engines (`network-solve.js`, `hard
 
 **Next: Phase 4 — Intake & deliverables** (PDF/DWG → building model + scale calibration · section/elevation cut → 2D views · submittal sheet set FP-0…FP-D + titleblock plot · drop-ceiling tile grid · cut-sheet bundle). With the remote-area default and Hardy-Cross live wiring both closed, Phase 3 carries no open PARTIAL; a residual followup worth confirming is **whether the live generator's single gridded loop is an intended designed cross-main vs an artifact of buildGraph's interior-tap splitting / near-coincident node merge** (the solver balances it either way at residual 2e-9).
 
-**Phase 4 — Intake & deliverables** *(real plans in, real submittal out)*
+**Phase 4 — Intake & deliverables** *(real plans in, real submittal out)* — ✅ **DONE except the raster-intake XL half** (5 chunks live-verified, 2026-06-15)
 `PDF/DWG → building model + scale calibration` · `clean/strip + lock source layer` · `drop-ceiling tile grid` · `section/elevation cut → 2D views` · `submittal sheet set (FP-0…FP-D) + titleblock plot` · `2D dimensioned extract per level` · `BOM role-grouping + Hydralist export` · `cut-sheet bundle`.
 
-**Chunk 1 — PDF/DWG → building model + scale calibration — FIRST PASS LANDED (2026-06-15).** `__hfPhase4.intake -> {scaleFtPerPx, walls, openings, columns, levels, source}` is live on `/autosprink.html`; an interactive **scale-calibration** tool (pick-2-points→type-distance, plus a known-scale picker: 1/8"=1', 1:48, 1"=20', …) sets ft/px and overrides the sheet-derived scale. Camera-neutral (calibration pick + plain click both drift 0.00 ft). New `synthesizeColumnsFromGrid()` (PURE, unit-tested ×5) reconstructs structural columns at architectural grid-line intersections inside the footprint — the one missing structural primitive (Cooperative 1881 previously had **columns: 0**; now 405 across 8 levels, 35/level on the upper floors). Live intake for 1881: 822 wall RUNS, 139 openings (swing-arc doors + collinear-gap cased openings), 405 columns, 8 levels, scale 0.1481 ft/px. Gate 1371 green; VPS md5 == local; 0 pageerror.
-  - **HONEST RESIDUALS (chunk 1):**
-    - *Columns are a GRID-INTERSECTION HEURISTIC, not a verified column schedule.* Real plans skip intersections at corridors/openings and add off-grid columns; column SIZE is a fixed 1.2 ft placeholder (no extracted pier dimension). `structure-from-plan.detectColumns` (geometric pier/hatch detection) is NOT yet wired into `building-from-plan` — when it is, prefer it over the grid synthesis. Grid-datum LABELS are absent in the baked 1881 plan, so `gridLabel` falls back to the datum coordinate (e.g. "0.9-C") — wire real bubble labels through `extractGrid` for true column callouts.
-    - *Openings conflate doors + cased openings* into one set for the router; door confidence is already split (confident vs suspect) but openings carry no host-wall index yet.
-    - *`scaleFtPerPx` treats PDF user-space points as the "px"* of the vector model (correct for vector intake); for a RASTER PDF/scan the calibration two-point flow is the real path (raster underlay + ft/px), and that raster→building extraction is still the larger XL item (only the calibration half is done — raster wall/opening/column extraction from a scan is NOT built).
-    - *Scale calibration sets ft/px but does NOT re-scale already-built geometry* — it records the correction for the intake report + future imports; applying a correction factor to a live rebuilt model is a follow-up.
+All five built chunks shipped as pure, deterministic `src/engine/*` engines (`building-from-plan.js`+`synthesizeColumnsFromGrid`, `section-cut.js`, `submittal-sheets.js`, `ceiling-grid.js`, `cut-sheets.js`) with golden/property unit tests AND each driven through a logged-in Studio with a live Playwright harness + an independent verify pass (every check `works:true`, zero broken, **GUARD#1 camera-neutrality held at `__dbgTarget` drift 0.00 ft on every build/pick/overlay/toggle**, 0 pageerror), deployed to the VPS (md5 local==remote on `autosprink.html` + every engine). Full gate green (vitest 1439 pass / 131 files as of the cut-sheet chunk). Evidence: `E:/ClaudeBot/out/phase4-intake/{intake-model,section-cut,submittal-sheets,ceiling-grid,cutsheets}/`. Brain episodes 51179/51243.
+
+**DONE + live-verified (real output, camera-neutral):**
+- **Section / elevation cut** — two-point cut plane → structure/pipes/heads at TRUE elevations on a selectable/closable SVG elevation panel. Live Section A-A: 225 pipes / 210 heads / 65 cut / 372 beyond, v 0..24 ft floor→ceiling. 16 unit tests.
+- **Submittal sheet set (FP-0…FP-D + FP-CS)** — ANSI-D titleblock sheets + printable HTML export; live 14 sheets w/ real content on each (FP-N 462KB head grid, FP-H gpm/demand, FP-D Section A-A). 15 unit tests.
+- **Drop-ceiling tile grid** — 2×2/2×4 lay-in lattice + NFPA-checked center-heads-on-tile; live 31160 tiles 2 ft pitch, 1230 heads centered (0 NFPA skips), 0 too-close/too-far after. 16 unit tests.
+- **Cut-sheet bundle** — distinct used-SKU derivation + match to REAL public datasheet refs (live 5/5 matched, 0 unmatched, never fabricates), FP-CS index in the submittal set. 16 unit tests.
+- **Scale calibration** — pick-2-points→type-distance + known-scale picker (`parseArchScale`), operator scale overrides sheet-derived; camera-neutral pick.
+
+**⚠️ PARTIAL — Chunk 1: PDF/DWG → building model (the XL critical path).** VECTOR intake is live + verified (`__hfPhase4.intake` on the 1881 vector plan: 822 wall RUNS, 139 openings, 405 columns, 8 levels, scale 0.1481 ft/px; columns previously 0). But the load-bearing XL half is NOT done — this chunk stays PART:
+  - **Columns are a GRID-INTERSECTION HEURISTIC, not a verified column schedule.** Synth placeholders at architectural grid intersections inside the footprint, confidence "low", fixed 1.2 ft SIZE (no extracted pier dimension). Real plans skip intersections at corridors/openings and add off-grid columns. `structure-from-plan.detectColumns` (geometric pier/hatch detection) is NOT yet wired into `building-from-plan`; grid-datum LABELS are absent so `gridLabel` falls back to the datum coordinate (e.g. "0.9-C") not a real bubble callout.
+  - **RASTER/scan → building extraction is NOT built.** `scaleFtPerPx` treats PDF user-space points as "px" (correct for VECTOR intake); for a raster PDF/scan only the two-point calibration path exists — raster wall/opening/column EXTRACTION is the larger XL item and is unbuilt.
+  - **Openings conflate doors + cased openings** into one router set with no host-wall index (doors already split confident vs suspect).
+  - **Scale calibration records the correction but does NOT re-scale already-built live geometry** — applying the correction factor to rebuild a calibrated model is a follow-up.
+  - Whole intake model is labeled an engineering aid — NOT AHJ/PE-stamped; every reconstructed entity flagged `needsVerification`.
+
+**Next: Phase 5 — Fabrication & polish**, plus the standing Phase-4 XL follow-up: wire `detectColumns` (true extracted columns over the grid synthesis) and build the RASTER/scan → building extraction path.
 
 **Phase 5 — Fabrication & polish**
 `prefab drawings + DO-NOT-FAB <3" flag` · `manufacturer-exact part GLBs (OpenSCAD forge / catalog crawler)` · `sway brace / hanger pass` · `arm-around obstruction routing` · `quick-data BOM editor` · `command palette` · `wire the remaining 128 menu stubs or retire them` · `help/docs`.

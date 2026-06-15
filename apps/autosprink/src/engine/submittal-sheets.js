@@ -471,6 +471,60 @@ function bodyDetails(section) {
   return out;
 }
 
+/**
+ * FP-CS cut-sheet index body — a REFERENCE INDEX of the public manufacturer
+ * datasheet for every distinct used SKU (from the Phase-4 cut-sheet bundle). It
+ * lists SKU / quantity / manufacturer+model / public doc-ref / confidence. It does
+ * NOT reproduce datasheet content — it indexes links/records to be appended.
+ */
+function bodyCutsheets(bundle) {
+  const r = drawRect();
+  let out = '';
+  out += `<text x="${r.x}" y="${r.y + 8}" font-size="28" font-weight="700" fill="#111">CUT-SHEET INDEX (MANUFACTURER DATASHEET REFERENCES)</text>`;
+  if (!bundle || !Array.isArray(bundle.entries) || !bundle.entries.length) {
+    out += `<text x="${r.x + r.w / 2}" y="${r.y + r.h / 2}" font-size="26" fill="#999" text-anchor="middle">no SKUs — generate a layout (and run hydraulics) first</text>`;
+    return out;
+  }
+  const tx = r.x + 24, tw = Math.min(r.w - 48, 1640), rowH = 56;
+  let ty = r.y + 56;
+  const rows = bundle.entries;
+  out += `<rect x="${tx}" y="${ty}" width="${tw}" height="${(rows.length + 1) * rowH + 8}" fill="#fff" stroke="#111" stroke-width="2"/>`;
+  // header
+  out += `<rect x="${tx}" y="${ty}" width="${tw}" height="${rowH}" fill="#1b2430"/>`;
+  const cols = [
+    ['SKU (used in design)', tx + 16, 'start'],
+    ['QTY', tx + 720, 'end'],
+    ['MANUFACTURER / DOC REF', tx + 760, 'start'],
+    ['CONF.', tx + tw - 16, 'end'],
+  ];
+  for (const [t, x, anchor] of cols) {
+    out += `<text x="${x}" y="${ty + 36}" font-size="18" font-weight="700" fill="#e8f0ff" text-anchor="${anchor}">${esc(t)}</text>`;
+  }
+  ty += rowH;
+  for (const e of rows) {
+    out += `<line x1="${tx}" y1="${ty + rowH}" x2="${tx + tw}" y2="${ty + rowH}" stroke="#ddd" stroke-width="1"/>`;
+    out += `<text x="${tx + 16}" y="${ty + 24}" font-size="17" fill="#111">${esc(e.label)}</text>`;
+    const qty = e.unit === 'ft' ? (num(e.count) + ' ft') : (num(e.count) + ' ea');
+    out += `<text x="${tx + 720}" y="${ty + 24}" font-size="17" fill="#111" text-anchor="end">${esc(qty)}</text>`;
+    if (e.matched && e.ref) {
+      const mm = (e.ref.manufacturer || '') + (e.ref.name ? ' · ' + e.ref.name : (e.ref.docNo ? ' · ' + e.ref.docNo : ''));
+      out += `<text x="${tx + 760}" y="${ty + 24}" font-size="15" fill="#1b3a8a">${esc(mm.slice(0, 92))}</text>`;
+      out += `<text x="${tx + 760}" y="${ty + 44}" font-size="13" fill="#1565c0">${esc((e.ref.url || '').slice(0, 110))}</text>`;
+      const cc = e.ref.confidence || 'probable';
+      const col = cc === 'verified' ? '#1b7a2f' : (cc === 'not-found' ? '#b71c1c' : '#a86b00');
+      out += `<text x="${tx + tw - 16}" y="${ty + 24}" font-size="15" font-weight="700" fill="${col}" text-anchor="end">${esc(cc)}</text>`;
+    } else {
+      out += `<text x="${tx + 760}" y="${ty + 24}" font-size="15" fill="#b71c1c">${esc('no public datasheet reference — engineer must supply specified product')}</text>`;
+      out += `<text x="${tx + tw - 16}" y="${ty + 24}" font-size="15" font-weight="700" fill="#b71c1c" text-anchor="end">none</text>`;
+    }
+    ty += rowH;
+  }
+  const matched = bundle.matchedCount != null ? bundle.matchedCount : rows.filter((e) => e.matched).length;
+  out += `<text x="${tx}" y="${ty + 40}" font-size="17" fill="#333">${esc(matched)} of ${rows.length} used SKUs reference a public manufacturer datasheet. confidence: verified = URL HTTP-200 checked · probable = real doc/URL, content not auto-verified · none = engineer must supply.</text>`;
+  out += `<text x="${tx}" y="${ty + 66}" font-size="15" fill="#7a1010">${esc(bundle.disclaimer || '')}</text>`;
+  return out;
+}
+
 /* ── public builder ──────────────────────────────────────────────────────── */
 
 /**
@@ -521,6 +575,7 @@ export function buildSubmittalSheets(input = {}) {
   const report = input.hydraulicReport || null;
   const bom = input.bom || null;
   const section = input.section || null;
+  const cutsheetBundle = input.cutsheetBundle || null;
   const levels = Array.isArray(input.levels) ? input.levels : [];
   const p = input.project || {};
 
@@ -548,6 +603,9 @@ export function buildSubmittalSheets(input = {}) {
   plan.push({ code: 'FP-R', title: 'Riser Diagram', kind: 'riser' });
   plan.push({ code: 'FP-B', title: 'Bill of Materials', kind: 'bom' });
   plan.push({ code: 'FP-D', title: 'Details / Sections', kind: 'details' });
+  if (cutsheetBundle && Array.isArray(cutsheetBundle.entries) && cutsheetBundle.entries.length) {
+    plan.push({ code: 'FP-CS', title: 'Cut-Sheet Index (Datasheet References)', kind: 'cutsheets' });
+  }
 
   const sheetIndex = plan.map((s) => ({ code: s.code, title: s.title }));
   const total = plan.length;
@@ -567,6 +625,7 @@ export function buildSubmittalSheets(input = {}) {
     else if (s.kind === 'riser') body = bodyRiser(solids, levels);
     else if (s.kind === 'bom') body = bodyBom(bom);
     else if (s.kind === 'details') body = bodyDetails(section);
+    else if (s.kind === 'cutsheets') body = bodyCutsheets(cutsheetBundle);
     return {
       id: s.code,
       code: s.code,
@@ -588,6 +647,7 @@ export function buildSubmittalSheets(input = {}) {
     hasHydraulics: !!(report && report.summary),
     hasBom: !!bom,
     hasSection: !!(section && section.ok && Array.isArray(section.entities) && section.entities.length),
+    hasCutsheets: !!(cutsheetBundle && Array.isArray(cutsheetBundle.entries) && cutsheetBundle.entries.length),
     disclaimer: SUBMITTAL_SHEETS_DISCLAIMER,
     generatedAt: input.generatedAt || null,
   };
