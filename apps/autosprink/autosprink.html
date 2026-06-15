@@ -505,6 +505,18 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
       <div id="sectionStatus" style="font-size:10px;margin-top:4px;color:var(--muted)">no section — place a cut line</div>
     </div>
 
+    <!-- PHASE 4 chunk 3: SUBMITTAL SHEET SET. Generate FP-0..FP-D on a titleblock,
+         pulling from the live model + Phase-3 hydraulics + Phase-2 BOM + last section.
+         Opens a multi-sheet viewer overlay (never the 3D camera) with export/print. -->
+    <div id="submittalBox" style="margin-top:8px">
+      <label>Submittal sheet set (FP-0…FP-D)</label>
+      <button class="act ghost" id="submittalGenBtn" type="button" style="font-size:11px;padding:7px">📐 Generate submittal sheets</button>
+      <div style="display:flex;gap:4px;margin-top:4px">
+        <button class="act ghost" id="submittalCloseBtn" type="button" style="font-size:11px;padding:7px 9px;flex:1">Close viewer</button>
+      </div>
+      <div id="submittalStatus" style="font-size:10px;margin-top:4px;color:var(--muted)">no submittal — generate a layout, then build sheets</div>
+    </div>
+
     <div id="sourceLockNote">Source locked: AI-pulled email PDF (bid-originated project)</div>
 
     <label>Hazard class (NFPA 13)</label>
@@ -780,6 +792,8 @@ import { buildSupply, evaluateSupplies, supplyDemandCurve, defaultCityWaterSpec,
 // PHASE 4 chunk 2: section / elevation cut (pure projector). Drives the SECTION tool
 // (pick a cut line on the plan -> generated 2D elevation in a selectable/closable panel).
 import { generateSection as hfGenerateSection, planeFromPoints as hfPlaneFromPoints, SECTION_DISCLAIMER } from '/src/engine/section-cut.js';
+// PHASE 4 chunk 3: submittal sheet set (FP-0..FP-D) on a titleblock (pure builder).
+import { buildSubmittalSheets as hfBuildSubmittalSheets, renderSheetSetHtml as hfRenderSheetSetHtml, SUBMITTAL_SHEETS_DISCLAIMER } from '/src/engine/submittal-sheets.js';
 
 // HF-W2 (Stream W2): EXTRACTION COMPLETENESS rendered in the live Studio — DOORS
 // (leaf + swing arc), recovered partition-inclusive WALLS, and FIXTURES/cores are
@@ -6189,7 +6203,189 @@ function buildPhase4Intake() {
   window.__hfPhase4.section.close = () => { closeSectionPanel(); return { closed: true }; };
   window.__hfPhase4.section.get = () => window.__hfLastSection || null;
   window.__hfPhase4.section.select = (name) => selectSectionEntity(name);
+
+  // ── PHASE 4 chunk 3: SUBMITTAL SHEET SET (FP-0..FP-D) on a titleblock ──
+  // Pure builder pulls from the LIVE model + Phase-3 hydraulics (__hf3.report) +
+  // Phase-2 BOM (__hfBomTakeoff) + the last section (FP-D detail). Returns the
+  // observable contract { sheets:[ids], hasTitleblock, exportReady }. Building the
+  // set is analysis-only (no solve, no scene mutation, no camera move) — it reads
+  // state and renders SVG strings into an HTML overlay panel (never the 3D camera).
+  window.__hfPhase4.submittal = (opts) => buildAndShowSubmittal(opts || {});
+  window.__hfPhase4.submittal.build = (opts) => buildSubmittalSet(opts || {});       // build only (no panel)
+  window.__hfPhase4.submittal.show = (opts) => buildAndShowSubmittal(opts || {});     // build + open viewer
+  window.__hfPhase4.submittal.get = () => window.__hfLastSubmittal || null;
+  window.__hfPhase4.submittal.close = () => { closeSubmittalPanel(); return { closed: true }; };
+  window.__hfPhase4.submittal.html = () => (window.__hfLastSubmittal ? hfRenderSheetSetHtml(window.__hfLastSubmittal, { project: lastSubmittalProject }) : '');
+  window.__hfPhase4.submittal.export = () => exportSubmittalHtml();
+  window.__hfPhase4.submittal.print = () => printSubmittal();
 }
+
+// Gather the level metadata the sheet builder splits FP-N plans by (from the
+// reconstructed plan build when present, else the model's own levels). Pure read.
+function submittalLevels() {
+  const st = planBuildState;
+  if (st && Array.isArray(st.levelPlans) && st.levelPlans.length) {
+    return st.levelPlans.map((lp) => ({ level: lp.level, name: lp.name, elevationFt: lp.elevationFt }));
+  }
+  // derive from the model: distinct head/pipe elevations -> implicit levels.
+  if (currentCadModel && Array.isArray(currentCadModel.solids)) {
+    const zs = new Set();
+    for (const s of currentCadModel.solids) {
+      if (s.kind === 'head' && Array.isArray(s.position)) zs.add(Math.round(Number(s.position[2]) || 0));
+    }
+    const arr = [...zs].sort((a, b) => a - b);
+    if (arr.length > 1) return arr.map((z, i) => ({ level: i + 1, name: 'Level ' + (i + 1), elevationFt: z }));
+  }
+  return [];
+}
+
+let lastSubmittalProject = null;
+// Build the submittal sheet set from live state. Pure + camera-neutral.
+function buildSubmittalSet(opts) {
+  if (!currentCadModel || !Array.isArray(currentCadModel.solids) || !currentCadModel.solids.length) {
+    return { available: false, sheets: [], sheetIds: [], hasTitleblock: false, exportReady: false, reason: 'no model — Generate a layout first' };
+  }
+  const report = (window.__hf3 && window.__hf3.report) || (window.__hfPhase3 && window.__hfPhase3.report) || null;
+  const bom = window.__hfBomTakeoff || null;
+  const section = window.__hfLastSection && window.__hfLastSection.ok ? window.__hfLastSection : null;
+  const levels = submittalLevels();
+  const project = Object.assign({
+    name: (planBuildState && planBuildState.project) || (currentCadModel && currentCadModel.name) || 'HaloFire AutoSPRINK — design model',
+    designer: 'HaloFire AutoSPRINK clone',
+    date: new Date().toISOString().slice(0, 10),
+    system: (report && report.meta && report.meta.system) || 'Wet-pipe sprinkler system',
+  }, opts.project || {});
+  lastSubmittalProject = project.name;
+  const set = hfBuildSubmittalSheets({
+    cadModel: currentCadModel, hydraulicReport: report, bom, section, levels, project,
+    generatedAt: new Date().toISOString().slice(0, 10),
+  });
+  window.__hfLastSubmittal = set;
+  // Return the contract surface (+ a little provenance) without the heavy svg blobs.
+  return {
+    available: true,
+    sheets: set.sheetIds,              // CHUNK contract: sheets:[ids]
+    sheetIds: set.sheetIds,
+    sheetCount: set.sheetCount,
+    hasTitleblock: set.hasTitleblock,  // CHUNK contract
+    exportReady: set.exportReady,      // CHUNK contract
+    hasHydraulics: set.hasHydraulics,
+    hasBom: set.hasBom,
+    hasSection: set.hasSection,
+    titles: set.sheets.map((s) => ({ id: s.id, title: s.title, kind: s.kind })),
+    disclaimer: set.disclaimer,
+  };
+}
+
+function buildAndShowSubmittal(opts) {
+  const res = buildSubmittalSet(opts);
+  if (res.available && window.__hfLastSubmittal) renderSubmittalPanel(window.__hfLastSubmittal);
+  const ss = document.getElementById('submittalStatus');
+  if (ss) ss.textContent = res.available
+    ? (res.sheetCount + ' sheets: ' + res.sheets.join(', ') + (res.exportReady ? ' · export-ready' : ' · partial') + (res.hasHydraulics ? '' : ' · NO hydraulics') + (res.hasSection ? '' : ' · NO section detail'))
+    : ('submittal: ' + res.reason);
+  return res;
+}
+
+// ── Submittal multi-sheet VIEWER (HTML+SVG overlay; not the 3D camera) ──
+let submittalPanel = null, submittalSheetIdx = 0;
+function ensureSubmittalPanel() {
+  if (submittalPanel) return submittalPanel;
+  const wrap = document.createElement('div');
+  wrap.id = 'hfSubmittalPanel';
+  wrap.style.cssText = 'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:9100;width:min(1100px,92vw);height:min(760px,90vh);'
+    + 'background:rgba(12,16,22,.98);border:1px solid #2b3543;border-radius:10px;box-shadow:0 12px 48px rgba(0,0,0,.7);'
+    + 'display:none;flex-direction:column;font:12px/1.35 ui-sans-serif,system-ui,sans-serif;color:#cfe8ff;overflow:hidden;';
+  wrap.innerHTML = ''
+    + '<div id="hfSubHdr" style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:#141b25;border-bottom:1px solid #2b3543;cursor:move;">'
+    + '<span id="hfSubTitle" style="font-weight:700;color:#9fd0ff;">Submittal Sheet Set</span>'
+    + '<div style="display:flex;align-items:center;gap:8px;">'
+    + '<button id="hfSubPrev" type="button" style="background:#1f2937;border:1px solid #374151;color:#cfe8ff;border-radius:5px;padding:3px 9px;cursor:pointer;">◀</button>'
+    + '<span id="hfSubPager" style="min-width:120px;text-align:center;color:#9fb4cc;"></span>'
+    + '<button id="hfSubNext" type="button" style="background:#1f2937;border:1px solid #374151;color:#cfe8ff;border-radius:5px;padding:3px 9px;cursor:pointer;">▶</button>'
+    + '<button id="hfSubExport" type="button" style="background:#1b3a5a;border:1px solid #2563eb;color:#cfe8ff;border-radius:5px;padding:3px 11px;cursor:pointer;margin-left:8px;">Export HTML</button>'
+    + '<button id="hfSubPrint" type="button" style="background:#1b3a5a;border:1px solid #2563eb;color:#cfe8ff;border-radius:5px;padding:3px 11px;cursor:pointer;">Print / PDF</button>'
+    + '<button id="hfSubCloseX" type="button" style="background:none;border:none;color:#ff6b6b;font-size:17px;cursor:pointer;line-height:1;padding:0 4px;margin-left:6px;">✕</button>'
+    + '</div></div>'
+    + '<div id="hfSubTabs" style="display:flex;flex-wrap:wrap;gap:4px;padding:6px 12px;background:#101620;border-bottom:1px solid #2b3543;"></div>'
+    + '<div id="hfSubView" style="flex:1;overflow:auto;background:#46505c;padding:14px;display:flex;align-items:flex-start;justify-content:center;"></div>'
+    + '<div style="padding:5px 12px;background:#101620;border-top:1px solid #2b3543;color:#6f7c8c;font-size:10px;">'
+    + 'Engineering aid — generated sheet set, NOT an AHJ/PE-stamped submittal. Schedules/BOM/hydraulics are best-effort estimates.</div>';
+  document.body.appendChild(wrap);
+  wrap.querySelector('#hfSubCloseX').addEventListener('click', closeSubmittalPanel);
+  wrap.querySelector('#hfSubPrev').addEventListener('click', () => showSubmittalSheet(submittalSheetIdx - 1));
+  wrap.querySelector('#hfSubNext').addEventListener('click', () => showSubmittalSheet(submittalSheetIdx + 1));
+  wrap.querySelector('#hfSubExport').addEventListener('click', exportSubmittalHtml);
+  wrap.querySelector('#hfSubPrint').addEventListener('click', printSubmittal);
+  // draggable header (overlay-only; never the 3D camera)
+  const hdr = wrap.querySelector('#hfSubHdr');
+  let dragS = null;
+  hdr.addEventListener('pointerdown', (e) => { if (e.target.tagName === 'BUTTON') return; dragS = { x: e.clientX, y: e.clientY, r: wrap.getBoundingClientRect() }; e.preventDefault(); });
+  window.addEventListener('pointermove', (e) => {
+    if (!dragS) return;
+    const nx = dragS.r.left + (e.clientX - dragS.x), ny = dragS.r.top + (e.clientY - dragS.y);
+    wrap.style.left = Math.max(0, nx) + 'px'; wrap.style.top = Math.max(0, ny) + 'px'; wrap.style.transform = 'none';
+  });
+  window.addEventListener('pointerup', () => { dragS = null; });
+  submittalPanel = wrap; return wrap;
+}
+function renderSubmittalPanel(set) {
+  const wrap = ensureSubmittalPanel();
+  wrap.style.display = 'flex';
+  const tabs = wrap.querySelector('#hfSubTabs');
+  tabs.innerHTML = set.sheets.map((s, i) =>
+    '<button type="button" class="hfSubTab" data-i="' + i + '" style="background:' + (i === submittalSheetIdx ? '#2563eb' : '#1f2937') + ';border:1px solid #374151;color:#cfe8ff;border-radius:5px;padding:3px 9px;cursor:pointer;font-size:11px;">' + s.code + '</button>'
+  ).join('');
+  tabs.querySelectorAll('.hfSubTab').forEach((b) => b.addEventListener('click', () => showSubmittalSheet(Number(b.getAttribute('data-i')))));
+  if (submittalSheetIdx >= set.sheets.length) submittalSheetIdx = 0;
+  showSubmittalSheet(submittalSheetIdx);
+}
+function showSubmittalSheet(i) {
+  const set = window.__hfLastSubmittal;
+  if (!set || !submittalPanel) return;
+  const n = set.sheets.length;
+  submittalSheetIdx = ((i % n) + n) % n;
+  const sh = set.sheets[submittalSheetIdx];
+  const view = submittalPanel.querySelector('#hfSubView');
+  // wrap the sheet SVG in a white page so it reads like paper
+  view.innerHTML = '<div style="width:100%;max-width:960px;background:#fff;box-shadow:0 6px 24px rgba(0,0,0,.5);">' + sh.svg + '</div>';
+  submittalPanel.querySelector('#hfSubTitle').textContent = 'Submittal — ' + sh.code + ' · ' + sh.title;
+  submittalPanel.querySelector('#hfSubPager').textContent = (submittalSheetIdx + 1) + ' / ' + n + '  (' + sh.code + ')';
+  submittalPanel.querySelectorAll('.hfSubTab').forEach((b, idx) => { b.style.background = (idx === submittalSheetIdx) ? '#2563eb' : '#1f2937'; });
+}
+function closeSubmittalPanel() {
+  if (submittalPanel) submittalPanel.style.display = 'none';
+  const ss = document.getElementById('submittalStatus'); if (ss) ss.textContent = 'submittal viewer closed';
+  return true;
+}
+function exportSubmittalHtml() {
+  const set = window.__hfLastSubmittal;
+  if (!set) return false;
+  const html = hfRenderSheetSetHtml(set, { project: lastSubmittalProject });
+  const blob = new Blob([html], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'halofire-submittal-sheet-set.html';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+  return true;
+}
+function printSubmittal() {
+  const set = window.__hfLastSubmittal;
+  if (!set) return false;
+  const html = hfRenderSheetSetHtml(set, { project: lastSubmittalProject });
+  const w = window.open('', '_blank');
+  if (!w) return false;
+  w.document.write(html); w.document.close();
+  return true;
+}
+// UI wiring for the submittal tool buttons.
+(function wireSubmittalUI() {
+  const gen = document.getElementById('submittalGenBtn');
+  const close = document.getElementById('submittalCloseBtn');
+  if (gen) gen.addEventListener('click', () => { try { buildAndShowSubmittal({}); } catch (e) { console.warn(e); } });
+  if (close) close.addEventListener('click', () => { try { closeSubmittalPanel(); } catch (e) { console.warn(e); } });
+})();
 
 // Interactive 2-point calibration state. The picks are CAMERA-NEUTRAL (pointerToPlan only).
 let calibArmed = false, calibPts = [];
