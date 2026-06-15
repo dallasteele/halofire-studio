@@ -3274,6 +3274,25 @@ function handleCanvasClick(e, frameAfter) {
 // ── data + actions ──
 let lastBody = {};
 let lastAppliedData = null; // HF-MENUBAR: last applied sprinkler-bid payload (File > Save)
+window.__hfPhase4 = window.__hfPhase4 || {};
+window.__hfPhase4.intake = function () {
+  if (!lastAppliedData || !lastAppliedData.pdfMeta || !lastAppliedData.isBuilding) return null;
+  const intake = lastAppliedData.pdfMeta.intake || {};
+  return {
+    source: intake.source || lastAppliedData.pdfMeta.source || null,
+    walls: intake.walls ?? null,
+    openings: intake.openings ?? null,
+    columns: intake.columns ?? null,
+    levels: intake.levels ?? null,
+    spaces: intake.spaces ?? null,
+    scaleFtPerUnit: intake.scaleFtPerUnit ?? lastAppliedData.pdfMeta.scaleFtPerUnit ?? lastAppliedData.pdfMeta.scale ?? null,
+    scaleFtPerPx: intake.scaleFtPerPx ?? null,
+    wallRecallPct: intake.wallRecallPct ?? lastAppliedData.pdfMeta.wallRecallPct ?? null,
+    precisionPct: intake.precisionPct ?? lastAppliedData.pdfMeta.precisionPct ?? null,
+    label: intake.label || 'engineering-aid — needsVerification',
+    needsVerification: intake.needsVerification !== false,
+  };
+};
 function currentBody() {
   const body = { markupPct: Number($('markup').value) || 25 };
   const hz = $('hazard').value; if (hz) body.hazard = hz;
@@ -3521,7 +3540,7 @@ async function applyGenerated(data) {
   const COMP_TARGET_FT = { riser_assembly: 3.0, valve_alarm_check: 1.2, fdc: 1.5, fitting_tee: 0.8, fitting_elbow_90: 0.55, fitting_coupling: 0.45, fitting_reducer: 0.4 };
   await Promise.all(compKeys.map((k) => loadPartGeo(k, COMP_TARGET_FT[k] || 1.5)));
   await preloadDetailMeshes(); // HF-C1-PARTMESH: real coupling/hanger/tee/elbow meshes for the detail pass
-  renderModel(cadModel);
+  renderModel(cadModel, { preserveView: true });
   await renderRealOrFixtureUnderlay(floorPlan); // HF-B1-PDFUNDERLAY: REAL sheets when the project has them
   // HF-E2-NETALIGN: register the sprinkler network onto the EXTRACTED plate frame.
   // For Cooperative 1881 the server now lays the network against the REAL extracted

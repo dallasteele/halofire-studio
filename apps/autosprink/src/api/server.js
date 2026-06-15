@@ -23,6 +23,8 @@ import { buildScene } from '../engine/geometry.js';
 import { buildResolverFromDb } from '../engine/pricebook-pricing.js';
 import { floorPlanFromSvg, floorPlanFromDxf, normalizeFloorPlan, buildingFromSvg, buildingFromDxf } from '../engine/floorplan-import.js';
 import { floorPlanFromPdf } from '../engine/pdf-floorplan.js';
+import { extractStackedFloorPlanFromPdf } from '../engine/plan-extract.js';
+import { buildingFromLevelPlans } from '../engine/levelplan-building.js';
 import { buildCadModel } from '../engine/cad-model.js';
 import { toDxf } from '../engine/dxf-export.js';
 import { invokeOpenClawCad, buildGenerate3dModelPayload, buildGenerateDxfPayload } from '../cad/openclaw-cad.js';
@@ -6702,6 +6704,74 @@ async function resolvePdfFloorPlan(req) {
   const wantsSam = pdfExtract === 'sam';
   try {
     const pdfjs = await loadPdfjs();
+    let extractedBuilding = null;
+    let extractedPdfMeta = null;
+    try {
+      const doc = await pdfjs.getDocument({ data: new Uint8Array(data), isEvalSupported: false }).promise;
+      try {
+        const pageNum = Math.min(Math.max(1, pageIndex + 1), doc.numPages);
+        const page = await doc.getPage(pageNum);
+        const extractedPlan = await extractStackedFloorPlanFromPdf(page, {
+          scaleFtPerUnit: Number.isFinite(scale) && scale > 0 ? scale : undefined,
+          layerOpts: { partitionInclusive: true, clipPadFt: 3 },
+        });
+        const { building, summary } = buildingFromLevelPlans([{
+          level: 0,
+          name: req.params.name || 'Imported PDF Plan',
+          elevationFt: 0,
+          plan: extractedPlan,
+        }], {
+          name: req.params.name || 'Imported PDF Building',
+          source: 'vector',
+        });
+        extractedBuilding = building;
+        extractedPdfMeta = {
+          pageIndex,
+          source: 'vector',
+          extraction: 'plan-extract-building',
+          scale: extractedPlan.scaleFtPerUnit,
+          scaleFtPerUnit: extractedPlan.scaleFtPerUnit,
+          scaleSource: extractedPlan.scaleSource || extractedPlan.scaleText || null,
+          wallRecallPct: extractedPlan.wallsFullMeta?.recallPct ?? null,
+          precisionPct: extractedPlan.wallsFullMeta?.precisionPct ?? null,
+          extractionCompleteness: {
+            wallRecallPct: extractedPlan.wallsFullMeta?.recallPct ?? null,
+            precisionPct: extractedPlan.wallsFullMeta?.precisionPct ?? null,
+            measurement: extractedPlan.wallsFullMeta?.recallMeasure || null,
+          },
+          intake: {
+            ...summary,
+            source: 'vector',
+            wallRecallPct: extractedPlan.wallsFullMeta?.recallPct ?? null,
+            precisionPct: extractedPlan.wallsFullMeta?.precisionPct ?? null,
+            extractionCompleteness: {
+              wallRecallPct: extractedPlan.wallsFullMeta?.recallPct ?? null,
+              precisionPct: extractedPlan.wallsFullMeta?.precisionPct ?? null,
+              measurement: extractedPlan.wallsFullMeta?.recallMeasure || null,
+            },
+          },
+          counts: {
+            segments: extractedPlan.counts?.segments ?? 0,
+            wallSegments: extractedPlan.counts?.wallSegments ?? 0,
+            rooms: extractedPlan.counts?.rooms ?? 0,
+            stairs: extractedPlan.counts?.stairs ?? 0,
+            gridCols: extractedPlan.counts?.gridCols ?? 0,
+            gridRows: extractedPlan.counts?.gridRows ?? 0,
+          },
+          needsVerification: true,
+          label: 'engineering-aid — needsVerification',
+        };
+      } finally {
+        try { await doc.destroy?.(); } catch { /* ignore doc teardown */ }
+      }
+    } catch {
+      extractedBuilding = null;
+      extractedPdfMeta = null;
+    }
+    if (extractedBuilding && extractedPdfMeta) {
+      return { building: extractedBuilding, pdfMeta: extractedPdfMeta };
+    }
+
     let samSkipped = false;
     let samReason = null;
     if (wantsSam) {
@@ -20559,7 +20629,7 @@ function runSprinklerPipeline(req, prebuilt = null) {
     ? uniqueStrings(req.body.source_refs.map((ref) => String(ref || '').trim()).filter(Boolean))
     : [];
   let floorPlan = (prebuilt && prebuilt.floorPlan) || null;
-  let building = null;
+  let building = (prebuilt && prebuilt.building) || null;
   let replayInput = null;
   if (floorPlan) {
     // A PDF (or other async) source was resolved upstream; skip source selection.
