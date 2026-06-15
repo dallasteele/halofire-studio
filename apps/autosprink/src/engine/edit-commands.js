@@ -464,6 +464,57 @@ export function setSolidGrip(model, ref, grip, plan) {
   return model;
 }
 
+/**
+ * STRETCH / multi-vertex grip move: translate a SET of named endpoints by one
+ * plan delta in a single undoable step. `targets` is an array of
+ * { solidIndex, grip } where grip is 'from'|'to' (pipe) or 'a'|'b' (wall). Each
+ * affected solid is cloned once even if both its ends are in the set (a
+ * whole-segment translate then reads as moving both vertices). Coincident
+ * vertices of connected runs stay connected because the caller collects every
+ * endpoint within the snap/window tolerance into `targets`. Returns the mutated
+ * model, or null if nothing moved / every result would be degenerate.
+ */
+export function moveVertices(model, targets, delta) {
+  if (!Array.isArray(targets) || !targets.length) return null;
+  const dx = Number(delta[0]) || 0, dy = Number(delta[1]) || 0;
+  if (dx === 0 && dy === 0) return null;
+  // group target grips by solid so each solid is cloned/edited exactly once
+  const bySolid = new Map();
+  for (const t of targets) {
+    const i = resolveSolidIndex(model, t);
+    if (i < 0) continue;
+    if (!bySolid.has(i)) bySolid.set(i, new Set());
+    bySolid.get(i).add(t.grip);
+  }
+  if (!bySolid.size) return null;
+  const next = model.solids.slice();
+  let changed = false;
+  for (const [i, grips] of bySolid) {
+    const ep = solidEndpointsPlan(model.solids[i]); if (!ep) continue;
+    const isPipe = Array.isArray(model.solids[i].from);
+    const fromName = isPipe ? 'from' : 'a';
+    const toName = isPipe ? 'to' : 'b';
+    let nf = [ep.from[0], ep.from[1]];
+    let nt = [ep.to[0], ep.to[1]];
+    const movedFrom = grips.has(fromName), movedTo = grips.has(toName);
+    if (movedFrom) { nf = [nf[0] + dx, nf[1] + dy]; }
+    if (movedTo) { nt = [nt[0] + dx, nt[1] + dy]; }
+    // Only guard against a NEW degeneracy: when a single end is dragged onto the
+    // other, the run collapses — skip it. When BOTH ends move by the same delta
+    // it's a whole-run translate (e.g. a vertical riser/drop with zero plan
+    // length), which must be allowed even though plan-length stays ~0.
+    if (!(movedFrom && movedTo) && Math.hypot(nt[0] - nf[0], nt[1] - nf[1]) < 1e-4) continue;
+    const s = { ...model.solids[i] };
+    setEndpointsPlan(s, nf, nt);
+    markEdited(s, 'stretch');
+    next[i] = s;
+    changed = true;
+  }
+  if (!changed) return null;
+  model.solids = next;
+  return model;
+}
+
 // ── plan-space geometry helpers (pure) ──
 function withZ(xy, z) { return z === undefined ? xy : [xy[0], xy[1], z]; }
 function rotatePlan(p, piv, rad) {

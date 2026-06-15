@@ -10,8 +10,7 @@ This session moved the **interaction shell** a long way: real undo/redo, multi-s
 - No **real hydraulic network solve** (Hazen-Williams + Hardy-Cross loop/grid, remote-area demand, iterative pipe upsizing). We have point formulas (K√P, hydrant), not a system solver.
 - No **Smart Pipe** classification (branch / cross-main / main / arm-over / sprig) → BOM + hydraulics can't be correct.
 - No **arm-over / arm-around / drop / sprig** routing intelligence.
-- No **full O-snap suite** (endpoint / midpoint / intersection / perpendicular / node / extension glyphs) — the precision backbone of CAD.
-- No **grip-handle editing of geometry** (drag an endpoint to re-shape a run); we move whole parts only.
+- ~~No full O-snap suite~~ — **DONE (Phase 1, 2026-06-14):** all 7 snap types with glyphs/tooltips + per-type settings, polar/ortho tracking, command line, dynamic input, dimension engine, grip-handle drag-reshape + stretch all shipped and live-verified.
 - No **object Properties editing** (material / diameter / end-prep / K-factor / cost / labor).
 - No **Remote-Area boundary tool**, **section tool**, **node tags** (pressure/flow/velocity).
 - No **NFPA-format hydraulic report** or **submittal sheet set** (FP-0…FP-D).
@@ -30,7 +29,7 @@ Legend: **HAVE** = real + verified · **PART** = exists but incomplete/shallow �
 | AutoSPRINK tool | our status | what's missing | eff | pri |
 |---|---|---|---|---|
 | Multi-segment polyline draw (pipe/wall) | HAVE | — (built this session) | — | — |
-| Typed Location-Input (length / dx,dy) | HAVE | polar angle entry, relative/absolute coord modes | M | P1 |
+| Typed Location-Input (length / dx,dy) | HAVE | now full grammar: absolute `12,8`, relative `@10,0`, polar `10<45`, bare length — shared by command line + dynamic input (Phase 1, verified). Relative/polar require a base vertex (first point is absolute-only, by design) | — | — |
 | Line / Rectangle / Arc / Circle primitives | PART | arc, circle, fillet not real | M | P2 |
 | Insert Sprinkler (click-to-place tool) | PART | dedicated head-place tool w/ live coverage preview | M | P0 |
 | Insert fitting / riser / valve / device | PART | device library place tools | M | P1 |
@@ -41,9 +40,9 @@ Legend: **HAVE** = real + verified · **PART** = exists but incomplete/shallow �
 |---|---|---|---|---|
 | Select (single / window / crossing / all-like / by-id) | HAVE | fence-select, previous, last-edited | S | P2 |
 | Direct grab-drag move | HAVE | snap-to-object-during-move, multi-part drag | M | P1 |
-| **Grip-handle editing** (drag endpoints/vertices to reshape) | MISS | the core CAD edit gesture; only whole-part move + 1 endpoint exists | **L** | **P0** |
+| **Grip-handle editing** (drag endpoints/vertices to reshape) | HAVE | endpoint + midpoint grips drag-reshape/translate a run, O-snapped + undoable (Phase 1, verified). True N-vertex polyline grips deferred until the data model adds a multi-vertex solid | — | — |
 | Rotate / Mirror / Array / Offset / Trim-Extend / Scale / Copy | PART | basepoint/reference-angle UX, dynamic preview, multi-select targets | M | P1 |
-| Stretch (drag a window edge) | MISS | window-stretch of vertices | M | P1 |
+| Stretch (drag a window edge) | HAVE | crossing-window captures vertices + group-moves them, connected runs stay joined, one undoable edit (Phase 1, verified) | — | — |
 | Align / Distribute | MISS | — | S | P2 |
 | Undo / Redo | HAVE | — | — | — |
 | Cut / Copy / Paste (+ paste-to-point) | PART | paste at picked point, cross-drawing | S | P2 |
@@ -51,11 +50,11 @@ Legend: **HAVE** = real + verified · **PART** = exists but incomplete/shallow �
 ### C. Snapping & precision (the CAD backbone)
 | AutoSPRINK tool | our status | what's missing | eff | pri |
 |---|---|---|---|---|
-| **O-snap suite** (endpoint/mid/intersection/perp/node/center/extension) w/ glyphs | PART | only grid/ortho; no per-type snap with on-screen glyph + tooltip | **L** | **P0** |
-| Polar / Ortho tracking | PART | polar angle increments, tracking lines | M | P1 |
-| Object snap tracking (acquire + align) | MISS | — | M | P2 |
-| Dynamic input near cursor | PART | full coord/length/angle field | S | P1 |
-| Snap settings dialog | MISS | per-snap on/off UI | S | P2 |
+| **O-snap suite** (endpoint/mid/intersection/perp/node/center/extension) w/ glyphs | HAVE | all 7 types fire against the live model with distinct SVG glyphs + tooltips; extension draws a tracking line (Phase 1, verified). Glyphs are constant screen-size (matches AutoSPRINK); node label surfaces solid.kind only (not port-level) | — | — |
+| Polar / Ortho tracking | HAVE | polar increments (90/45/30/22.5/15) with dashed tracking ray + angle/length chip, engine `polarConstrain` + 7 unit tests; ortho H/V lock (Phase 1, verified). Engage-band not yet user-configurable; polar owns the constraint when on (ortho is the degenerate case) | — | — |
+| Object snap tracking (acquire + align) | PART | extension/tracking line exists; full multi-point acquire+align not built | M | P2 |
+| Dynamic input near cursor | HAVE | floating len<angle field, live during drag, typed override commits the point; shares one coord grammar with the command line (Phase 1, verified) | — | — |
+| Snap settings dialog | HAVE | per-type popover bound to live snapState + All On/Off (Phase 1, verified) | — | — |
 
 ### D. Views, sections & navigation
 | AutoSPRINK tool | our status | what's missing | eff | pri |
@@ -139,7 +138,7 @@ Legend: **HAVE** = real + verified · **PART** = exists but incomplete/shallow �
 ### K. Annotation
 | AutoSPRINK tool | our status | what's missing | eff | pri |
 |---|---|---|---|---|
-| Dimension / label engine | PART | aligned/linear/angular dims, leader text | M | P1 |
+| Dimension / label engine | HAVE | aligned/linear-H/linear-V/angular dims + leader/callout, O-snapped, true ft-in (1/16"), real selectable/deletable/undoable geometry (Phase 1, verified). Text is a screen-aligned DOM overlay (not in-scene 3D text); retype-text editor + baseline/continued/ordinate chains deferred | — | — |
 | Node tags (pressure/flow/velocity) | MISS | — | M | P1 |
 | Riser tag + supply table | MISS | — | M | P1 |
 | Text / mtext / callouts | PART | — | S | P2 |
@@ -155,8 +154,8 @@ Legend: **HAVE** = real + verified · **PART** = exists but incomplete/shallow �
 | AutoSPRINK tool | our status | what's missing | eff | pri |
 |---|---|---|---|---|
 | Ribbon / menubar (258 items wired) | HAVE | 128 honest stubs remain | M | P2 |
-| Status bar (snap/grid/units/coords) | PART | live cursor coords, snap state | S | P1 |
-| **Command line** (type a command/coords) | MISS | AutoCAD-class command parser | M | P1 |
+| Status bar (snap/grid/units/coords) | HAVE | live X/Y/Z cursor coords (true ft) + Snap/Ortho/Polar pills on a passive listener (Phase 1, verified). Snap pill shows aggregate state, not per-type | — | — |
+| **Command line** (type a command/coords) | HAVE | AutoCAD-style parser: command names via aliases → menu actions, coordinate tokens (abs/rel/polar/length), verbs (ortho/snap/polar/zoom e), honest "unknown" (Phase 1, verified). No fuzzy/autocomplete; interaction-pick coord path wired but not auto-asserted | — | — |
 | Command palette (Ctrl+K) | MISS | — | S | P2 |
 | Properties panel (live, editable) | PART | wire to selection + BOM | L | P0 |
 | Quick-access toolbar (user-pinned) | MISS | — | S | P3 |
@@ -183,8 +182,9 @@ These are the load-bearing gaps. Nothing reads as "an AutoSPRINK clone" without 
 
 Each phase is a coherent, demoable vertical slice. Every function lands with a live-verified loop (select/draw/edit/calc → real effect → screenshot), never a flag-pass.
 
-**Phase 1 — Precision drafting core** *(makes drawing feel like CAD)*
+**Phase 1 — Precision drafting core** *(makes drawing feel like CAD)* — ✅ **DONE** (live-verified, 2026-06-14)
 `osnap-suite (per-type + glyphs)` · `grip-handle drag-edit` · `stretch` · `polar/ortho tracking` · `command line + live cursor coords in status bar` · `dynamic-input coord/angle field` · `dimension engine (aligned/linear/angular + leaders)`.
+All seven shipped and were each driven through a logged-in Studio with real gestures + an independent verify pass (every check `works:true`, zero broken, GUARD#1/#3 camera-neutrality held, 0 pageerror); deployed to the VPS (md5 local==remote). Evidence: `E:/ClaudeBot/out/phase1-drafting/{osnap,grip-stretch,cmdline,dimensions,polar-snapcfg}/`. Honest residuals (not blockers, tracked above): true N-vertex polyline grips await a multi-vertex solid type; dimension text is a screen-aligned DOM overlay + no retype-text editor + no baseline/continued/ordinate chains; snap glyphs are constant screen-size; node snap labels surface `solid.kind` only; command line has no fuzzy match and the interaction-pick coord path isn't auto-asserted; polar engage-band isn't user-configurable. Intersection snap was proven via injected crossing pipes (the dense generated model has no naturally-occurring crossings). Next: **Phase 2 — System intelligence**.
 
 **Phase 2 — System intelligence** *(makes the model a real sprinkler system)*
 `Smart Pipe classification (branch/cross-main/main/arm-over/sprig)` · `auto branch-lines + tie-in to mains` · `arm-over + easy-drop/sprig` · `head insert tool + live coverage/spacing-violation overlay` · `apply-schedule cascade` · `object Properties editing (material/dia/end-prep/K/cost/labor)`.

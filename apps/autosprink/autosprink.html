@@ -93,8 +93,14 @@
     background:linear-gradient(180deg, rgba(18,22,28,0.82), rgba(11,14,18,0.9));
     -webkit-backdrop-filter:var(--blur-panel);backdrop-filter:var(--blur-panel);
     border-top:1px solid var(--line);color:var(--muted);font-size:11px}
-  #statusBar .cmd{display:flex;align-items:center;gap:8px;flex:1;color:var(--faint)}
-  #statusBar .cmd .prompt{color:var(--gold)}
+  #statusBar .cmd{display:flex;align-items:center;gap:8px;flex:1;color:var(--faint);margin:0}
+  #statusBar .cmd .prompt{color:var(--gold);font-family:var(--mono);white-space:nowrap}
+  #statusBar #hfCmdLine{flex:1;min-width:120px;background:rgba(0,0,0,0.28);border:1px solid var(--line);
+    border-radius:6px;color:var(--text,#dfe7f0);font:11px/1.4 var(--mono,ui-monospace,monospace);
+    padding:3px 8px;outline:none}
+  #statusBar #hfCmdLine:focus{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold)}
+  #statusBar #hfCoordReadout{font-family:var(--mono);color:var(--info);white-space:pre;min-width:170px}
+  #statusBar #hfSnapState b,#statusBar #hfOrthoState b{font-family:var(--mono)}
   #statusBar .pip{display:inline-flex;align-items:center;gap:6px}
   #statusBar .pip .gl{width:6px;height:6px;border-radius:50%;background:var(--ok)}
   #statusBar .seg-s{padding:0 4px}
@@ -369,9 +375,12 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
     <button class="tool" data-act="array" title="Array — rectangular grid of copies of the selection">Array</button>
     <button class="tool" data-act="mirror" title="Mirror selection across a picked 2-point axis">Mirror</button>
     <span class="tb-sep"></span>
-    <button class="tool toggle on" id="snapToggleBtn" title="Snap to endpoint / grid (display only)">Snap</button>
+    <button class="tool toggle on" id="snapToggleBtn" title="Object snap master on/off (endpoint, midpoint, intersection, perpendicular, node, extension, grid)">Snap</button>
+    <button class="tool" id="snapSettingsBtn" title="Object-snap settings — enable / disable each snap type">⚙</button>
     <button class="tool toggle" id="gridToggleBtn" title="Grid 1ft (display only)">Grid 1ft</button>
-    <button class="tool toggle on" id="orthoToggleBtn" title="Ortho (display only)">Ortho</button>
+    <button class="tool toggle on" id="orthoToggleBtn" title="Ortho — lock draw to H/V">Ortho</button>
+    <button class="tool toggle" id="polarToggleBtn" title="Polar tracking — snap draw direction to angle increments">Polar 45°</button>
+    <button class="tool" id="polarSettingsBtn" title="Polar angle increment (90/45/30/22.5/15°)">⚙</button>
     <span class="tb-spacer"></span>
     <div class="tb-readout"><span><b>X</b> 124.0 ft</span><span><b>Y</b> 86.5 ft</span><span><b>Z</b> 0.0 ft</span><span><b>Scale</b> 1 : 96</span></div>
   </div>
@@ -580,15 +589,23 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
     </div>
   </aside>
 
-  <!-- STATUS / BOTTOM DOCK: command line + readiness pips (display-only — engine
-       has no command parser yet, so the input is an honest placeholder). -->
+  <!-- STATUS / BOTTOM DOCK: real command line + live cursor coords + snap/ortho
+       state. The command line invokes a tool by name ("pipe","move","zoom e") OR
+       feeds COORDINATES to the active draw ("12,8" abs · "@10,0" rel · "10<45"
+       polar). #hfCmdPrompt echoes the active draw prompt (AutoSPRINK-style). -->
   <footer id="statusBar">
-    <div class="cmd"><span class="prompt">command ›</span><span>type a command or pick a tool…</span></div>
-    <span class="seg-s pip"><span class="gl"></span> OpenGeometry ready</span>
-    <span class="seg-s">Snap: <b style="color:var(--info)">on</b></span>
-    <span class="seg-s">Ortho: <b style="color:var(--info)">on</b></span>
+    <form class="cmd" id="hfCmdForm" autocomplete="off">
+      <span class="prompt" id="hfCmdPrompt">Command:</span>
+      <input id="hfCmdLine" type="text" spellcheck="false" autocomplete="off"
+             placeholder="type a command (pipe, move, zoom e) or a coordinate (12,8 · @10,0 · 10&lt;45)"
+             aria-label="Command line" />
+    </form>
+    <span class="seg-s" id="hfCoordReadout" title="Live cursor position (true ft)">X 0.00  Y 0.00  Z 0.00</span>
+    <span class="seg-s" id="hfSnapState">Snap: <b style="color:var(--info)">on</b></span>
+    <span class="seg-s" id="hfOrthoState">Ortho: <b style="color:var(--info)">on</b></span>
+    <span class="seg-s" id="hfPolarState">Polar: <b style="color:var(--muted)">off</b></span>
     <span class="seg-s">Units: ft (true scale)</span>
-    <a href="#" class="seg-s">▴ Expand log</a>
+    <a href="#" class="seg-s" id="hfLogExpand">▴ Expand log</a>
   </footer>
 </div>
 
@@ -627,8 +644,8 @@ import { createPartMeshLoader } from '/src/engine/part-meshes.js';
 // HF-W1 (Stream W1): the EDIT ENGINE — snapshot command stack + pure cadModel
 // edit ops (ported from apps/cad history.ts + store.ts) and the pure snap
 // engine. All viewer-side preview/raycast/DOM wiring stays inline below.
-import { createCommandStack, resolveSolidIndex, moveSolid, deleteSolid, copySolid, rotateSolid, mirrorSolid, addSolid, setSolidFields, solidCentroidPlan, solidEndpointsPlan, trimExtendSolid, offsetSolid, arraySolid, setSolidGrip } from '/src/engine/edit-commands.js';
-import { snap as snapPoint, segmentsFromModel, orthoConstrain, defaultSnapState } from '/src/engine/snaps.js';
+import { createCommandStack, resolveSolidIndex, moveSolid, deleteSolid, copySolid, rotateSolid, mirrorSolid, addSolid, setSolidFields, solidCentroidPlan, solidEndpointsPlan, trimExtendSolid, offsetSolid, arraySolid, setSolidGrip, moveVertices } from '/src/engine/edit-commands.js';
+import { snap as snapPoint, segmentsFromModel, nodesFromModel, orthoConstrain, polarConstrain, defaultSnapState } from '/src/engine/snaps.js';
 
 // HF-W2 (Stream W2): EXTRACTION COMPLETENESS rendered in the live Studio — DOORS
 // (leaf + swing arc), recovered partition-inclusive WALLS, and FIXTURES/cores are
@@ -675,6 +692,14 @@ const pipeVizScale = 1; // true NFPA pipe scale — the only render mode
 let renderer, scene, perspCam, orthoCam, camera, controls, ogReady = false;
 let gridHelper = null;       // HF-TOGGLE: Grid 1ft button toggles this helper's visibility
 let orthoLock = true;        // HF-TOGGLE: Ortho button — persistent ortho constraint for draw (no Shift needed)
+// HF-PHASE1-POLAR: polar tracking config. When `enabled`, the draw vector snaps to
+// the nearest multiple of `incrementDeg` (90/45/30/22.5/15) and engages within
+// `bandDeg` of an increment (showing a tracking line + angle readout). Ortho and
+// polar are mutually exclusive constraints — when polar is enabled it OWNS the
+// constraint (ortho's 90°-only lock is the degenerate case of polar at inc=90).
+const polarState = { enabled: false, incrementDeg: 45, bandDeg: 4 };
+const POLAR_INCREMENTS = [90, 45, 30, 22.5, 15];
+let lastPolarEngaged = null; // { angleDeg, lengthFt, from:[x,y], to:[x,y] } when polar engaged this frame, else null
 const layerGroups = {};
 let modelGroup, currentCadModel = null;
 let planGroup = null, planVisible = true, lastPlanBbox = null; // HF-A1-UNDERLAY ground-plane floor plan
@@ -809,6 +834,7 @@ async function initStudio() {
   renderer.domElement.addEventListener('pointerdown', (e) => { downPt = { x: e.clientX, y: e.clientY }; hfTryStartObjectDrag(e); });
   renderer.domElement.addEventListener('pointermove', (e) => { if (hfDrag) hfUpdateObjectDrag(e); });
   renderer.domElement.addEventListener('pointerup', (e) => {
+    if (typeof stretchMode !== 'undefined' && stretchMode) { downPt = null; return; } // HF-PHASE1: stretch owns the gesture
     if (hfDrag) { hfCommitObjectDrag(); downPt = null; return; }   // direct grab-drag move committed
     if (!downPt) return;
     const moved = Math.hypot(e.clientX - downPt.x, e.clientY - downPt.y);
@@ -841,6 +867,7 @@ async function initStudio() {
   // HF-C1-PARTMESH: live fps + draw-call stats for performance evidence.
   let fpsFrames = 0, fpsLast = performance.now();
   (function loop(now) {
+    try { if (typeof faceGripsToCamera === 'function') faceGripsToCamera(); } catch (_) { /* grips optional */ }
     requestAnimationFrame(loop); stepCamTween(now || performance.now()); controls.update(); renderer.render(scene, camera);
     try { updateViewCube(); } catch (_) { /* cube optional */ }
     try { updateScaleBar(); } catch (_) { /* scale bar optional */ }
@@ -1583,6 +1610,11 @@ function renderModel(cadModel, opts) {
       headPts.push(W(s.position)); headSolids.push(s);
     } else if (s.kind === 'component') {
       componentSolids.push(s);
+    } else if (s.kind === 'dimension' || s.kind === 'label') {
+      // HF-PHASE1-DIM: real annotation geometry (extension + dimension lines +
+      // arrowheads / leader) added as a SELECTABLE part to modelGroup so the
+      // existing raycast-select + delete + Inspector path works on dimensions.
+      try { addDimensionGeometry(s); } catch (e) { window.__dimGeomError = String(e && e.message || e); }
     }
   }
   // Heads + drops are the high-count, identical geometry -> instanced (perf).
@@ -2963,6 +2995,24 @@ function describeHit(found) {
         ['Type', 'Column'], ['Size', fmtFt(s.sizeFt || 0)], ['Height', fmtFt(s.heightFt || 0)], ['Plan coords (ft)', fmtPt([s.x, s.y])],
       ] };
     }
+    // HF-PHASE1-DIM: dimension + leader/label annotations are selectable parts.
+    if (found.part.kind === 'dimension') {
+      const anchor = annLabelAnchor(s); const c = toWorld([anchor[0], anchor[1], drawElev]);
+      const dt = s.dimType || 'aligned';
+      const rows = [['Type', `${dt} dimension`], ['Value', s.text || '']];
+      if (Array.isArray(s.from)) rows.push(['From (ft)', fmtPt(s.from)]);
+      if (Array.isArray(s.to)) rows.push(['To (ft)', fmtPt(s.to)]);
+      rows.push(['Delete', 'Del / Edit ▸ Delete · Ctrl+Z undoes']);
+      return { title: `Dimension — ${s.text || dt}`, center: c, sizeFt: 4, verify: 'measured directly from the picked O-snapped points (true scale)', rows };
+    }
+    if (found.part.kind === 'label') {
+      const anchor = annLabelAnchor(s); const c = toWorld([anchor[0], anchor[1], drawElev]);
+      return { title: `Leader / text — ${s.text || ''}`, center: c, sizeFt: 4, verify: 'user-placed annotation', rows: [
+        ['Type', s.from ? 'leader callout' : 'text label'], ['Text', s.text || ''],
+        ...(Array.isArray(s.from) ? [['Points at (ft)', fmtPt(s.from)]] : []),
+        ['Delete', 'Del / Edit ▸ Delete · Ctrl+Z undoes'],
+      ] };
+    }
   }
   return null;
 }
@@ -3612,7 +3662,7 @@ $('selBtn').onclick = () => {
   const snapBtn = $('snapToggleBtn'), gridBtn = $('gridToggleBtn'), orthoBtn = $('orthoToggleBtn');
   // Only these are boolean snap-TYPE flags; gridSize/tolFt are numeric config and
   // must never be coerced to booleans (that broke snap tolerance — gate evidence).
-  const SNAP_TYPE_KEYS = ['grid', 'endpoint', 'midpoint', 'intersection', 'perpendicular'];
+  const SNAP_TYPE_KEYS = ['grid', 'endpoint', 'midpoint', 'intersection', 'perpendicular', 'node', 'extension'];
   let snapTypeMemo = null; // remembers per-type flags across a master off->on
   if (snapBtn) snapBtn.onclick = () => {
     const on = !snapBtn.classList.contains('on');
@@ -3623,10 +3673,11 @@ $('selBtn').onclick = () => {
       hideSnapIndicator();
     } else {
       // master ON: restore the remembered flags (or sensible defaults first time).
-      const restore = snapTypeMemo || { grid: true, endpoint: true, midpoint: true, intersection: true, perpendicular: false };
+      const restore = snapTypeMemo || { grid: true, endpoint: true, midpoint: true, intersection: true, perpendicular: true, node: true, extension: true };
       for (const k of SNAP_TYPE_KEYS) snapState[k] = !!restore[k];
     }
     window.__hfSnapState = { ...snapState };
+    if (typeof syncSnapPopover === 'function') try { syncSnapPopover(); } catch (_) {}
     $('status').textContent = `object snap ${on ? 'ON' : 'off'}`;
   };
   if (gridBtn) gridBtn.onclick = () => {
@@ -3731,6 +3782,7 @@ window.__hfSolidCount = (kind) => (currentCadModel && Array.isArray(currentCadMo
 window.__hfSelectByIndex = (i) => {
   if (!currentCadModel || !Array.isArray(currentCadModel.solids) || !currentCadModel.solids[i]) return false;
   curSelSolid = currentCadModel.solids[i];
+  try { if (typeof refreshGrips === 'function') refreshGrips(); } catch (_) {} // HF-PHASE1: show grips on headless select too
   return true;
 };
 window.__hfSelectedRef = () => selectedRef();
@@ -4060,6 +4112,174 @@ function crossingBoxSelect(a, b) {
 // Headless hook: simulate a crossing box-select over a screen rectangle (for verification).
 window.__hfCrossingBox = (x0, y0, x1, y1) => { selCrossingMode = true; crossingBoxSelect({ x: x0, y: y0 }, { x: x1, y: y1 }); return hfSelSet.length; };
 
+// ── HF-PHASE1: STRETCH — crossing window selects VERTICES, drag moves only those ──
+// The classic CAD STRETCH: arm it, drag a window over the plan; every run ENDPOINT
+// (vertex) inside the window is captured. Then dragging any captured vertex moves
+// ONLY those vertices (one snapped delta) and commits ONE moveVertices edit. Because
+// coincident endpoints of connected runs both fall in the window, connected runs
+// stay joined. This is gated entirely behind `stretchMode` so it never competes with
+// the base pointerdown/click handlers (guard #2): when disarmed, none of its pointer
+// logic runs. No camera reframe at any point (guard #1).
+let stretchMode = false;            // armed?
+let stretchPicked = [];             // [{ solidIndex, grip, plan:[x,y], elev }]
+let stretchMarks = [];              // THREE squares marking captured vertices
+let stretchPhase = 'idle';          // 'idle' (awaiting window) | 'ready' (vertices picked, awaiting drag) | 'drag'
+let stretchDrag = null;             // { base:[x,y], lastDelta:[dx,dy] }
+let stretchBoxEl = null, stretchBoxStart = null;
+function stretchBox() {
+  if (stretchBoxEl) return stretchBoxEl;
+  const d = document.createElement('div');
+  d.id = 'hfStretchBox';
+  d.style.cssText = 'position:fixed;z-index:8400;display:none;border:1px dashed #00e676;'
+    + 'background:rgba(0,230,118,.10);pointer-events:none;';
+  document.body.appendChild(d); stretchBoxEl = d; return d;
+}
+function clearStretchMarks() {
+  for (const m of stretchMarks) { scene.remove(m); try { m.geometry.dispose(); m.material.dispose(); } catch (_) {} }
+  stretchMarks = [];
+}
+function exitStretch(msg) {
+  stretchMode = false; stretchPhase = 'idle'; stretchPicked = []; stretchDrag = null; stretchBoxStart = null;
+  clearStretchMarks();
+  if (stretchBoxEl) stretchBoxEl.style.display = 'none';
+  controls.enabled = true; hideSnapIndicator();
+  window.__hfStretch = stretchSnapshot();
+  if (msg) $('status').textContent = msg;
+}
+function armStretch() {
+  if (!selRequireModel()) return;
+  if (stretchMode) { exitStretch('stretch disarmed'); return; }
+  stretchMode = true; stretchPhase = 'idle'; stretchPicked = []; stretchDrag = null;
+  document.body.style.cursor = 'crosshair';
+  window.__hfStretch = stretchSnapshot();
+  $('status').textContent = 'STRETCH armed — drag a window over the vertices to move (Esc to cancel)';
+}
+// Capture every run endpoint whose screen projection falls inside the window.
+function stretchSelectBox(a, b) {
+  const sols = (currentCadModel && Array.isArray(currentCadModel.solids)) ? currentCadModel.solids : [];
+  const rect = renderer.domElement.getBoundingClientRect();
+  const x0 = Math.min(a.x, b.x), x1 = Math.max(a.x, b.x);
+  const y0 = Math.min(a.y, b.y), y1 = Math.max(a.y, b.y);
+  clearStretchMarks();
+  stretchPicked = [];
+  for (let i = 0; i < sols.length; i += 1) {
+    const s = sols[i];
+    const ep = solidEndpointsPlan(s); if (!ep) continue;
+    const isPipe = Array.isArray(s.from);
+    const elev = isPipe ? (s.from[2] || 0) : 0;
+    const ends = [{ grip: isPipe ? 'from' : 'a', plan: ep.from }, { grip: isPipe ? 'to' : 'b', plan: ep.to }];
+    for (const e of ends) {
+      const w = W([e.plan[0], e.plan[1], elev]);
+      const v = new THREE.Vector3(w[0], w[1], w[2]).project(camera);
+      if (v.z > 1) continue;
+      const sx = rect.left + (v.x * 0.5 + 0.5) * rect.width;
+      const sy = rect.top + (-v.y * 0.5 + 0.5) * rect.height;
+      if (sx >= x0 && sx <= x1 && sy >= y0 && sy <= y1) {
+        stretchPicked.push({ solidIndex: i, grip: e.grip, plan: [e.plan[0], e.plan[1]], elev });
+        const geo = new THREE.PlaneGeometry(0.85, 0.85);
+        const mat = new THREE.MeshBasicMaterial({ color: 0x00e676, depthTest: false, transparent: true, opacity: 0.95, side: THREE.DoubleSide });
+        const mk = new THREE.Mesh(geo, mat); mk.position.copy(planToWorldVec(e.plan, elev || drawElev));
+        mk.renderOrder = 1320; try { mk.quaternion.copy(camera.quaternion); } catch (_) {}
+        scene.add(mk); stretchMarks.push(mk);
+      }
+    }
+  }
+  if (stretchPicked.length) {
+    stretchPhase = 'ready';
+    $('status').textContent = `STRETCH — ${stretchPicked.length} vertex(es) captured · drag any of them to move (Esc to cancel)`;
+  } else {
+    stretchPhase = 'idle';
+    $('status').textContent = 'STRETCH window empty — no vertices inside · drag again';
+  }
+  window.__hfStretch = stretchSnapshot();
+  return stretchPicked.length;
+}
+// Live-preview the captured vertex marks under a snapped delta.
+function stretchPreview(dx, dy) {
+  for (let k = 0; k < stretchMarks.length; k += 1) {
+    const pk = stretchPicked[k]; if (!pk) continue;
+    stretchMarks[k].position.copy(planToWorldVec([pk.plan[0] + dx, pk.plan[1] + dy], pk.elev || drawElev));
+  }
+}
+// Commit the captured-vertex move as ONE undoable moveVertices edit.
+function stretchCommit(dx, dy) {
+  if (!stretchPicked.length) return false;
+  if (Math.abs(dx) < 1e-4 && Math.abs(dy) < 1e-4) return false;
+  const targets = stretchPicked.map((p) => ({ solidIndex: p.solidIndex, grip: p.grip }));
+  return HFEdit.apply('stretch', (m) => moveVertices(m, targets, [dx, dy]));
+}
+function stretchSnapshot() {
+  return { armed: stretchMode, phase: stretchPhase, count: stretchPicked.length,
+    picked: stretchPicked.map((p) => ({ solidIndex: p.solidIndex, grip: p.grip, plan: p.plan.slice() })) };
+}
+window.__hfStretch = stretchSnapshot();
+function attachStretchListeners() {
+  // All four handlers no-op unless stretch is armed -> zero interference with the
+  // base select/draw/grip handlers when disarmed (guard #2).
+  renderer.domElement.addEventListener('pointerdown', (e) => {
+    if (!stretchMode) return;
+    if (stretchPhase === 'ready') {
+      // does the press land on a captured vertex? -> begin the move drag
+      const r = renderer.domElement.getBoundingClientRect();
+      const ndc = new THREE.Vector2(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+      raycaster.setFromCamera(ndc, camera);
+      const hits = raycaster.intersectObjects(stretchMarks, false);
+      const sp = pointerToPlan(e.clientX, e.clientY, drawElev);
+      if (hits.length && sp) { stretchPhase = 'drag'; stretchDrag = { base: sp.slice(), lastDelta: [0, 0] }; controls.enabled = false; e.stopPropagation(); return; }
+    }
+    // otherwise: start the rubber-band selection window
+    stretchBoxStart = { x: e.clientX, y: e.clientY };
+    const box = stretchBox(); box.style.left = e.clientX + 'px'; box.style.top = e.clientY + 'px'; box.style.width = '0px'; box.style.height = '0px'; box.style.display = 'block';
+    controls.enabled = false; e.stopPropagation();
+  }, true);
+  renderer.domElement.addEventListener('pointermove', (e) => {
+    if (!stretchMode) return;
+    if (stretchPhase === 'drag' && stretchDrag) {
+      const cur = pointerToPlan(e.clientX, e.clientY, drawElev); if (!cur) return;
+      let target = [cur[0], cur[1]];
+      const sn = hfSnapAt(target); showSnapIndicator(sn);
+      const dx = sn.p[0] - stretchDrag.base[0], dy = sn.p[1] - stretchDrag.base[1];
+      stretchDrag.lastDelta = [dx, dy];
+      stretchPreview(dx, dy);
+      $('status').textContent = `STRETCH Δ ${dx.toFixed(1)}, ${dy.toFixed(1)} ft · release to commit`;
+      return;
+    }
+    if (stretchBoxStart) {
+      const box = stretchBox();
+      const x0 = Math.min(stretchBoxStart.x, e.clientX), y0 = Math.min(stretchBoxStart.y, e.clientY);
+      box.style.left = x0 + 'px'; box.style.top = y0 + 'px';
+      box.style.width = Math.abs(e.clientX - stretchBoxStart.x) + 'px'; box.style.height = Math.abs(e.clientY - stretchBoxStart.y) + 'px';
+    }
+  });
+  window.addEventListener('pointerup', (e) => {
+    if (!stretchMode) return;
+    if (stretchPhase === 'drag' && stretchDrag) {
+      const d = stretchDrag.lastDelta; stretchDrag = null; controls.enabled = true; hideSnapIndicator();
+      const ok = stretchCommit(d[0], d[1]);
+      exitStretch(ok ? `stretched ${d[0].toFixed(1)}, ${d[1].toFixed(1)} ft (needs-verification) · Ctrl+Z to undo` : 'stretch cancelled (no move)');
+      return;
+    }
+    if (stretchBoxStart) {
+      const a = stretchBoxStart, b = { x: e.clientX, y: e.clientY }; stretchBoxStart = null;
+      if (stretchBoxEl) stretchBoxEl.style.display = 'none';
+      controls.enabled = true;
+      if (Math.hypot(b.x - a.x, b.y - a.y) >= 5) stretchSelectBox(a, b);
+    }
+  });
+}
+// Esc cancels stretch.
+window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && stretchMode) { e.stopPropagation(); exitStretch('stretch cancelled'); } }, true);
+// Headless driver: arm, window-select a screen rect, then move the captured set.
+window.__hfStretchRun = (x0, y0, x1, y1, dx, dy) => {
+  armStretch();
+  const n = stretchSelectBox({ x: x0, y: y0 }, { x: x1, y: y1 });
+  let committed = false;
+  if (n && (dx || dy)) committed = !!stretchCommit(dx, dy);
+  const snap = stretchSnapshot();
+  exitStretch(committed ? 'stretch (headless) committed' : 'stretch (headless) done');
+  return { captured: n, committed, picked: snap.picked };
+};
+
 // Keyboard: Ctrl+Z / Ctrl+Y(or Ctrl+Shift+Z) undo/redo; arrows nudge the
 // selection; Delete removes it; Ctrl+C copies. Ignored while typing in a field.
 window.addEventListener('keydown', (e) => {
@@ -4116,6 +4336,8 @@ function hfWorldToScreen(v) {
   return { x: r.left + (p.x * 0.5 + 0.5) * r.width, y: r.top + (-p.y * 0.5 + 0.5) * r.height };
 }
 function hfTryStartObjectDrag(e) {
+  if (typeof stretchMode !== 'undefined' && stretchMode) return false; // HF-PHASE1: stretch owns the gesture
+  if (gripDrag) return false;                                  // a grip drag is in progress — don't also grab the part
   if (!selectMode || !curSelSolid || drawTool) return false;   // only when a part is selected + not drawing
   let c; try { c = solidCentroidPlan(curSelSolid); } catch (_) { return false; }
   if (!c) return false;
@@ -4181,7 +4403,7 @@ function attachMoveDragListeners() {
     if (!moveDrag) return;
     const cur = pointerToPlan(e.clientX, e.clientY); if (!cur) return;
     let target = [moveDrag.startPlan[0] + (cur[0] - moveDrag.startPlan[0]), moveDrag.startPlan[1] + (cur[1] - moveDrag.startPlan[1])];
-    const sn = snapPoint(target, segmentsFromModel(currentCadModel), snapState);
+    const sn = hfSnapAt(target);
     showSnapIndicator(sn);
     moveDrag.lastDelta = [sn.p[0] - moveDrag.startPlan[0], sn.p[1] - moveDrag.startPlan[1]];
   });
@@ -4196,14 +4418,299 @@ function attachMoveDragListeners() {
 
 // ── HF-W1-SNAP: snap state + visible indicator ──
 const snapState = defaultSnapState();
+// Full AutoSPRINK O-snap suite — every geometric + tracking snap type the engine
+// (snaps.js) supports. The toolbar master toggle + settings popover both drive these.
+const SNAP_ALL_KEYS = ['endpoint', 'midpoint', 'intersection', 'perpendicular', 'node', 'extension', 'grid'];
+const SNAP_LABELS = { endpoint: 'Endpoint', midpoint: 'Midpoint', intersection: 'Intersection', perpendicular: 'Perpendicular', node: 'Node / Center', extension: 'Extension', grid: 'Grid' };
 function toggleSnap(type) {
   if (!(type in snapState)) return;
   snapState[type] = !snapState[type];
   window.__hfSnapState = { ...snapState };
-  const labels = { endpoint: 'Endpoint', midpoint: 'Midpoint', intersection: 'Intersection', perpendicular: 'Perpendicular', grid: 'Grid' };
-  $('status').textContent = `snap ${labels[type] || type}: ${snapState[type] ? 'ON' : 'off'}`;
+  if (typeof syncSnapPopover === 'function') try { syncSnapPopover(); } catch (_) {}
+  $('status').textContent = `snap ${SNAP_LABELS[type] || type}: ${snapState[type] ? 'ON' : 'off'}`;
 }
 window.__hfSnapState = { ...snapState };
+
+// ── HF-PHASE1-OSNAP: ONE snap entry point for the whole engine ──
+// Every draw / move / grip-edit gesture resolves its target through hfSnapAt so
+// the SAME per-type object snapping (endpoint/midpoint/intersection/perpendicular/
+// node/extension/grid) is applied everywhere, against existing solids near the
+// cursor (segmentsFromModel = pipe/wall runs; nodesFromModel = head/fitting centers).
+function hfSnapAt(point) {
+  const segs = segmentsFromModel(currentCadModel);
+  const nodes = nodesFromModel(currentCadModel);
+  return snapPoint(point, segs, snapState, nodes);
+}
+
+// HF-PHASE1-POLAR: apply the active angular constraint to a draft vector from
+// `base` toward raw cursor `plan`. POLAR (when enabled) wins — it snaps to the
+// configured increment and, when it engages near an increment, records
+// `lastPolarEngaged` so the preview can draw the tracking line + angle readout.
+// Otherwise, when ortho is requested (orthoLock or Shift), the vector is locked
+// cleanly to H/V. Returns the constrained plan point. ALWAYS clears/sets
+// lastPolarEngaged so stale tracking lines never linger.
+function hfApplyDrawConstraint(base, plan, wantOrtho) {
+  lastPolarEngaged = null;
+  if (!base) return plan;
+  if (polarState.enabled) {
+    const r = polarConstrain(base, plan, polarState.incrementDeg, polarState.bandDeg);
+    if (r.onAxis) {
+      lastPolarEngaged = { angleDeg: r.snappedAngleDeg, lengthFt: r.lengthFt, from: base.slice(), to: r.p.slice(), incrementDeg: polarState.incrementDeg };
+      return r.p;
+    }
+    return r.p; // off-axis: follow the cursor freely (no constraint, no tracking line)
+  }
+  if (wantOrtho) return orthoConstrain(base, plan);
+  return plan;
+}
+// Helpers used by the verification harness to isolate / restore snap types.
+window.__hfSetSnapOnly = (type) => {
+  for (const k of SNAP_ALL_KEYS) snapState[k] = (k === type);
+  window.__hfSnapState = { ...snapState };
+  if (typeof syncSnapPopover === 'function') try { syncSnapPopover(); } catch (_) {}
+};
+window.__hfSetSnapAll = (on) => {
+  for (const k of SNAP_ALL_KEYS) snapState[k] = !!on;
+  window.__hfSnapState = { ...snapState };
+  if (typeof syncSnapPopover === 'function') try { syncSnapPopover(); } catch (_) {}
+};
+window.__hfToggleSnap = (type) => toggleSnap(type);
+// Segment-intersection probe (pure) the harness uses to find a real crossing.
+window.__hfSegX = (p1, p2, p3, p4) => {
+  const d1x = p2[0] - p1[0], d1y = p2[1] - p1[1];
+  const d2x = p4[0] - p3[0], d2y = p4[1] - p3[1];
+  const denom = d1x * d2y - d1y * d2x;
+  if (Math.abs(denom) < 1e-9) return null;
+  const t = ((p3[0] - p1[0]) * d2y - (p3[1] - p1[1]) * d2x) / denom;
+  const u = ((p3[0] - p1[0]) * d1y - (p3[1] - p1[1]) * d1x) / denom;
+  if (t < 0 || t > 1 || u < 0 || u > 1) return null;
+  return [p1[0] + t * d1x, p1[1] + t * d1y];
+};
+
+// ── HF-PHASE1-OSNAP: per-type snap-settings popover (bound to snapState) ──
+let snapPopEl = null, snapPopOpen = false;
+function buildSnapPopover() {
+  if (snapPopEl) return snapPopEl;
+  const pop = document.createElement('div');
+  pop.id = 'snapSettingsPop';
+  pop.style.cssText = 'position:fixed;z-index:9200;display:none;min-width:208px;padding:8px 0;'
+    + 'background:rgba(12,16,22,.97);border:1px solid #2a3340;border-radius:8px;'
+    + 'box-shadow:0 10px 34px rgba(0,0,0,.6);font:12px/1.3 system-ui,sans-serif;color:#cfe8ff;';
+  const head = document.createElement('div');
+  head.textContent = 'Object Snaps';
+  head.style.cssText = 'padding:2px 12px 8px;font-weight:600;color:#9fb6cc;border-bottom:1px solid #1f2731;margin-bottom:4px;';
+  pop.appendChild(head);
+  for (const k of SNAP_ALL_KEYS) {
+    const row = document.createElement('label');
+    row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:4px 12px;cursor:pointer;';
+    row.onmouseenter = () => { row.style.background = 'rgba(0,230,118,.08)'; };
+    row.onmouseleave = () => { row.style.background = ''; };
+    const cb = document.createElement('input');
+    cb.type = 'checkbox'; cb.dataset.snap = k; cb.checked = !!snapState[k];
+    cb.style.cssText = 'accent-color:#00e676;width:14px;height:14px;cursor:pointer;';
+    cb.onchange = () => {
+      snapState[k] = cb.checked;
+      window.__hfSnapState = { ...snapState };
+      const sb = $('snapToggleBtn'); if (sb) sb.classList.toggle('on', SNAP_ALL_KEYS.some((x) => snapState[x]));
+      $('status').textContent = `snap ${SNAP_LABELS[k] || k}: ${snapState[k] ? 'ON' : 'off'}`;
+    };
+    const span = document.createElement('span'); span.textContent = SNAP_LABELS[k] || k;
+    row.appendChild(cb); row.appendChild(span); pop.appendChild(row);
+  }
+  const foot = document.createElement('div');
+  foot.style.cssText = 'display:flex;gap:8px;padding:8px 12px 2px;border-top:1px solid #1f2731;margin-top:4px;';
+  const mk = (id, txt) => { const b = document.createElement('button'); b.id = id; b.textContent = txt;
+    b.style.cssText = 'flex:1;padding:4px 0;background:#1a2230;border:1px solid #2a3340;border-radius:5px;color:#cfe8ff;cursor:pointer;font:11px system-ui;';
+    return b; };
+  const allOn = mk('snapAllOn', 'All On'); allOn.onclick = () => { window.__hfSetSnapAll(true); const sb = $('snapToggleBtn'); if (sb) sb.classList.add('on'); $('status').textContent = 'all object snaps ON'; };
+  const allOff = mk('snapAllOff', 'All Off'); allOff.onclick = () => { window.__hfSetSnapAll(false); const sb = $('snapToggleBtn'); if (sb) sb.classList.remove('on'); hideSnapIndicator(); $('status').textContent = 'all object snaps off'; };
+  foot.appendChild(allOn); foot.appendChild(allOff); pop.appendChild(foot);
+  document.body.appendChild(pop);
+  snapPopEl = pop; return pop;
+}
+function syncSnapPopover() {
+  if (!snapPopEl) return;
+  for (const cb of snapPopEl.querySelectorAll('input[data-snap]')) cb.checked = !!snapState[cb.dataset.snap];
+}
+function openSnapPopover() {
+  const pop = buildSnapPopover(); syncSnapPopover();
+  const btn = $('snapSettingsBtn');
+  const r = btn ? btn.getBoundingClientRect() : { left: 120, bottom: 64 };
+  pop.style.left = Math.round(r.left) + 'px';
+  pop.style.top = Math.round(r.bottom + 6) + 'px';
+  pop.style.display = 'block'; snapPopOpen = true;
+}
+function closeSnapPopover() { if (snapPopEl) snapPopEl.style.display = 'none'; snapPopOpen = false; }
+function toggleSnapPopover() { snapPopOpen ? closeSnapPopover() : openSnapPopover(); }
+(function wireSnapSettingsBtn() {
+  const btn = $('snapSettingsBtn');
+  if (btn) btn.onclick = (e) => { e.stopPropagation(); toggleSnapPopover(); };
+  document.addEventListener('pointerdown', (e) => {
+    if (!snapPopOpen) return;
+    if (snapPopEl && (snapPopEl.contains(e.target) || (btn && btn.contains(e.target)))) return;
+    closeSnapPopover();
+  });
+})();
+
+// ── HF-PHASE1-POLAR: polar toggle + angle-increment popover ──────────────────────
+function syncPolarUI() {
+  const tb = $('polarToggleBtn');
+  if (tb) {
+    tb.classList.toggle('on', polarState.enabled);
+    const inc = polarState.incrementDeg;
+    tb.textContent = `Polar ${inc % 1 ? inc.toFixed(1) : inc}°`;
+  }
+  if (polarPopEl) for (const r of polarPopEl.querySelectorAll('[data-inc]')) {
+    r.classList.toggle('on', Math.abs(parseFloat(r.dataset.inc) - polarState.incrementDeg) < 1e-6);
+  }
+  window.__hfPolar = { enabled: polarState.enabled, incrementDeg: polarState.incrementDeg, bandDeg: polarState.bandDeg };
+}
+let polarPopEl = null, polarPopOpen = false;
+function buildPolarPopover() {
+  if (polarPopEl) return polarPopEl;
+  const pop = document.createElement('div');
+  pop.id = 'polarSettingsPop';
+  pop.style.cssText = 'position:fixed;z-index:9200;display:none;min-width:172px;padding:8px 0;'
+    + 'background:rgba(12,16,22,.97);border:1px solid #2a3340;border-radius:8px;'
+    + 'box-shadow:0 10px 34px rgba(0,0,0,.6);font:12px/1.3 system-ui,sans-serif;color:#cfe8ff;';
+  const head = document.createElement('div');
+  head.textContent = 'Polar angle increment';
+  head.style.cssText = 'padding:2px 12px 8px;font-weight:600;color:#9fb6cc;border-bottom:1px solid #1f2731;margin-bottom:4px;';
+  pop.appendChild(head);
+  for (const inc of POLAR_INCREMENTS) {
+    const row = document.createElement('div');
+    row.dataset.inc = String(inc);
+    row.textContent = (inc % 1 ? inc.toFixed(1) : inc) + '°';
+    row.style.cssText = 'padding:5px 12px;cursor:pointer;';
+    row.onmouseenter = () => { row.style.background = 'rgba(54,211,153,.10)'; };
+    row.onmouseleave = () => { row.style.background = row.classList.contains('on') ? 'rgba(54,211,153,.16)' : ''; };
+    row.onclick = () => {
+      polarState.incrementDeg = inc;
+      polarState.enabled = true; // picking an increment turns polar ON (AutoSPRINK behaviour)
+      syncPolarUI();
+      $('status').textContent = `polar tracking ON · ${inc % 1 ? inc.toFixed(1) : inc}° increment`;
+      closePolarPopover();
+    };
+    pop.appendChild(row);
+  }
+  // reflect current selection background
+  document.body.appendChild(pop);
+  polarPopEl = pop;
+  // post-build: shade the selected row
+  const styleSel = () => { for (const r of pop.querySelectorAll('[data-inc]')) r.style.background = r.classList.contains('on') ? 'rgba(54,211,153,.16)' : ''; };
+  pop.__styleSel = styleSel;
+  return pop;
+}
+function openPolarPopover() {
+  const pop = buildPolarPopover(); syncPolarUI(); if (pop.__styleSel) pop.__styleSel();
+  const b = $('polarSettingsBtn');
+  const r = b ? b.getBoundingClientRect() : { left: 240, bottom: 64 };
+  pop.style.left = Math.round(r.left) + 'px';
+  pop.style.top = Math.round(r.bottom + 6) + 'px';
+  pop.style.display = 'block'; polarPopOpen = true;
+}
+function closePolarPopover() { if (polarPopEl) polarPopEl.style.display = 'none'; polarPopOpen = false; }
+function togglePolar() {
+  polarState.enabled = !polarState.enabled;
+  if (!polarState.enabled) { hidePolarTrack(); lastPolarEngaged = null; }
+  syncPolarUI();
+  $('status').textContent = `polar tracking ${polarState.enabled ? 'ON · ' + (polarState.incrementDeg % 1 ? polarState.incrementDeg.toFixed(1) : polarState.incrementDeg) + '°' : 'off'}`;
+}
+(function wirePolarButtons() {
+  const tb = $('polarToggleBtn'); if (tb) tb.onclick = (e) => { e.stopPropagation(); togglePolar(); };
+  const sb = $('polarSettingsBtn'); if (sb) sb.onclick = (e) => { e.stopPropagation(); polarPopOpen ? closePolarPopover() : openPolarPopover(); };
+  document.addEventListener('pointerdown', (e) => {
+    if (!polarPopOpen) return;
+    if (polarPopEl && (polarPopEl.contains(e.target) || (sb && sb.contains(e.target)))) return;
+    closePolarPopover();
+  });
+  syncPolarUI();
+})();
+
+// ── HF-PHASE1-OSNAP: unambiguous live verification hook ──
+window.__hfPhase1 = window.__hfPhase1 || {};
+window.__hfPhase1.osnap = function (point) {
+  const segs = segmentsFromModel(currentCadModel);
+  const nodes = nodesFromModel(currentCadModel);
+  const out = {
+    segCount: segs.length,
+    nodeCount: nodes.length,
+    types: SNAP_ALL_KEYS.filter((k) => snapState[k]),
+    snapState: { ...snapState },
+    popoverOpen: snapPopOpen,
+    lastSnap: window.__lastSnap || null,
+  };
+  if (Array.isArray(point)) out.result = snapPoint(point, segs, snapState, nodes);
+  return out;
+};
+// Drive the real glyph at a plan point (snaps it first) and return the descriptor.
+window.__hfPhase1.showSnapAt = function (point) {
+  const sn = hfSnapAt(point);
+  showSnapIndicator(sn);
+  return { type: sn.type, p: sn.p, snapped: sn.snapped, from: sn.from || null, label: sn.label || null };
+};
+window.__hfPhase1.hideSnap = function () { hideSnapIndicator(); };
+// ── HF-PHASE1: grip + stretch verification hooks ──
+// Observable state of the grip handles on the current selection.
+window.__hfPhase1.grips = function () {
+  const kindOf = (g) => g.userData.hfGrip === 'mid' ? 'mid' : 'end';
+  return {
+    selected: !!curSelSolid,
+    count: gripMeshes.length,
+    hover: (typeof gripHover !== 'undefined' && gripHover) ? gripHover.userData.hfGrip : null,
+    dragging: gripDrag ? gripDrag.grip : null,
+    handles: gripMeshes.map((g) => ({ grip: g.userData.hfGrip, kind: kindOf(g), plan: g.userData.hfGripPlan ? g.userData.hfGripPlan.slice() : null })),
+    endpoints: curSelSolid ? solidEndpointsPlan(curSelSolid) : null,
+  };
+};
+// Drive a full grip drag (begin -> snap to plan -> commit) on the current selection.
+// Returns the before/after endpoints so verification can assert the geometry moved.
+window.__hfPhase1.dragGrip = function (gripName, plan) {
+  if (!curSelSolid) return { error: 'no selection' };
+  const before = solidEndpointsPlan(curSelSolid);
+  if (!beginGripDrag(gripName)) return { error: 'beginGripDrag failed' };
+  if (gripName === 'mid') {
+    const c = solidCentroidPlan(curSelSolid); gripDrag.base = [c[0], c[1]];
+  }
+  const sn = hfSnapAt(plan); showSnapIndicator(sn); gripDrag.lastPlan = sn.p;
+  const gd = gripDrag; gripDrag = null; controls.enabled = true;
+  const committed = commitGripDrag(gd);
+  const sel = curSelSolid; // reselectSolidByIndex re-pointed curSelSolid at the edited solid
+  const after = sel ? solidEndpointsPlan(sel) : null;
+  return { committed, ok: committed, snap: { type: sn.type, p: sn.p, snapped: sn.snapped }, before, after, gripCount: gripMeshes.length };
+};
+// Explicit framing helper (debug only — allowed to move the camera, unlike click/edit).
+window.__hfPhase1.frameOnPlan = function (plan, radiusFt) {
+  try {
+    const r = Math.max(2, radiusFt || 12);
+    const w = planToWorldVec(plan, drawElev);
+    controls.target.copy(w);
+    const off = camera.position.clone().sub(w); const len = off.length() || 1;
+    camera.position.copy(w.clone().add(off.multiplyScalar((r * 3) / len)));
+    controls.update();
+  } catch (_) {}
+  return { target: [plan[0], plan[1]] };
+};
+window.__hfPhase1.armStretch = function () { armStretch(); return window.__hfStretch; };
+// Capture vertices inside a screen rectangle (no move yet). { selected:n, picked:[...] }.
+window.__hfPhase1.stretchSelectBox = function (x0, y0, x1, y1) {
+  if (!stretchMode) armStretch();
+  const n = stretchSelectBox({ x: x0, y: y0 }, { x: x1, y: y1 });
+  return { selected: n, picked: stretchSnapshot().picked };
+};
+// Move the captured stretch set by a plan delta + commit. { ok, count }.
+window.__hfPhase1.stretchMove = function (dx, dy) {
+  const count = stretchPicked.length;
+  const ok = !!stretchCommit(dx, dy);
+  exitStretch(ok ? `stretch moved ${dx}, ${dy} ft` : 'stretch move no-op');
+  return { ok, count, delta: [dx, dy] };
+};
+// No-arg = current stretch state; full-arg = one-shot headless run.
+window.__hfPhase1.stretch = function (x0, y0, x1, y1, dx, dy) {
+  if (arguments.length === 0) return window.__hfStretch;
+  return window.__hfStretchRun(x0, y0, x1, y1, dx, dy);
+};
+window.__hfPhase1.stretchState = function () { return window.__hfStretch; };
 // ── HF-W3-SNAP: menu-backed snap toggles on the real snapState/orthoLock/grid ──
 // Orthographic snap: flips the persistent ortho draw-lock (same global the toolbar
 // Ortho button drives) so menu + toolbar agree.
@@ -4216,7 +4723,7 @@ function snapOrtho() {
 // Enable Element Snaps: master enable/disable. OFF zeroes every snap-type flag
 // (remembering them); ON restores the remembered flags (or the engine default).
 let snapMasterMemo = null;
-const SNAP_MASTER_KEYS = ['grid', 'endpoint', 'midpoint', 'intersection', 'perpendicular'];
+const SNAP_MASTER_KEYS = ['grid', 'endpoint', 'midpoint', 'intersection', 'perpendicular', 'node', 'extension'];
 function snapMasterEnable() {
   const anyOn = SNAP_MASTER_KEYS.some((k) => snapState[k]);
   if (anyOn) {
@@ -4239,24 +4746,115 @@ function snapVisibleGrid() {
   $('status').textContent = `visible grid ${gridHelper.visible ? 'ON' : 'off'}`;
 }
 window.__hfGridVisible = () => !!(gridHelper && gridHelper.visible);
-let snapMarker = null;
-function ensureSnapMarker() {
-  if (snapMarker) return snapMarker;
-  const g = new THREE.SphereGeometry(0.4, 12, 8);
-  const m = new THREE.MeshBasicMaterial({ color: 0x00e676, depthTest: false, transparent: true, opacity: 0.95 });
-  snapMarker = new THREE.Mesh(g, m); snapMarker.renderOrder = 1200; snapMarker.visible = false; scene.add(snapMarker);
-  return snapMarker;
-}
 function planToWorldVec(plan, elev) {
   const off = modelGroup ? modelGroup.position : { x: 0, z: 0 };
   return new THREE.Vector3(off.x + plan[0], elev || 9, off.z + plan[1]);
 }
-function showSnapIndicator(sn) {
-  const mk = ensureSnapMarker();
-  if (sn && sn.snapped) { mk.position.copy(planToWorldVec(sn.p, drawElev)); mk.visible = true; window.__lastSnap = { type: sn.type, p: sn.p }; }
-  else { mk.visible = false; }
+// ── HF-PHASE1-OSNAP: AutoSPRINK-style snap GLYPH + tooltip ──
+// Rendered as a screen-space SVG overlay anchored at the snap point's screen
+// projection so each per-type glyph reads crisply in BOTH 2D and 3D views:
+//   endpoint     -> square        midpoint     -> triangle
+//   intersection -> X             perpendicular -> right-angle
+//   node/center  -> circle        extension     -> dashed line + open box
+// The dashed extension also draws a tracking line back to the run endpoint it
+// emanates from (sn.from). A small tooltip names the snap, exactly like AutoSPRINK.
+const SNAP_GLYPH_COLOR = '#00e676';
+let snapOverlay = null;
+function ensureSnapOverlay() {
+  if (snapOverlay) return snapOverlay;
+  const wrap = document.createElement('div');
+  wrap.id = 'hfSnapGlyph';
+  wrap.style.cssText = 'position:fixed;left:0;top:0;z-index:8500;pointer-events:none;display:none;';
+  wrap.innerHTML = '<svg width="200" height="120" style="position:absolute;left:-100px;top:-60px;overflow:visible;">'
+    + '<line id="hfSnapTrack" x1="100" y1="60" x2="100" y2="60" stroke="' + SNAP_GLYPH_COLOR + '" stroke-width="1.4" stroke-dasharray="5 4" opacity="0"/>'
+    + '<g id="hfSnapShape" transform="translate(100,60)"></g>'
+    + '</svg>'
+    + '<div id="hfSnapTip" style="position:absolute;left:12px;top:8px;font:11px/1.2 ui-monospace,monospace;'
+    + 'background:rgba(8,12,18,.92);color:#cfe8ff;border:1px solid ' + SNAP_GLYPH_COLOR + ';border-radius:4px;'
+    + 'padding:2px 6px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.5);"></div>';
+  document.body.appendChild(wrap);
+  snapOverlay = wrap; return wrap;
 }
-function hideSnapIndicator() { if (snapMarker) snapMarker.visible = false; }
+// Build the SVG shape for a snap type, centered at (0,0). 9px half-extent reads
+// like AutoSPRINK's compact glyphs without obscuring the geometry.
+function snapGlyphSVG(type) {
+  const c = SNAP_GLYPH_COLOR, sw = 1.8, R = 9;
+  const stroke = `stroke="${c}" stroke-width="${sw}" fill="none"`;
+  switch (type) {
+    case 'endpoint':     return `<rect x="${-R}" y="${-R}" width="${2*R}" height="${2*R}" ${stroke}/>`;
+    case 'midpoint':     return `<polygon points="0,${-R} ${R},${R} ${-R},${R}" ${stroke}/>`;
+    case 'intersection': return `<line x1="${-R}" y1="${-R}" x2="${R}" y2="${R}" ${stroke}/><line x1="${-R}" y1="${R}" x2="${R}" y2="${-R}" ${stroke}/>`;
+    case 'perpendicular':return `<path d="M ${-R} ${-R} L ${-R} ${R} L ${R} ${R}" ${stroke}/><path d="M ${-R} ${R-6} L ${-R+6} ${R-6} L ${-R+6} ${R}" ${stroke}/>`;
+    case 'node':         return `<circle cx="0" cy="0" r="${R}" ${stroke}/><circle cx="0" cy="0" r="1.6" fill="${c}"/>`;
+    case 'extension':    return `<rect x="${-R}" y="${-R}" width="${2*R}" height="${2*R}" ${stroke} stroke-dasharray="4 3"/>`;
+    case 'grid':         return `<circle cx="0" cy="0" r="3.2" fill="${c}"/>`;
+    default:             return `<circle cx="0" cy="0" r="3.2" fill="${c}"/>`;
+  }
+}
+function showSnapIndicator(sn) {
+  const wrap = ensureSnapOverlay();
+  if (!sn || !sn.snapped) { wrap.style.display = 'none'; window.__lastSnap = null; return; }
+  const scr = hfWorldToScreen(planToWorldVec(sn.p, drawElev));
+  if (!scr || !Number.isFinite(scr.x) || !Number.isFinite(scr.y)) { wrap.style.display = 'none'; return; }
+  wrap.style.left = scr.x + 'px'; wrap.style.top = scr.y + 'px'; wrap.style.display = 'block';
+  const shape = wrap.querySelector('#hfSnapShape'); shape.innerHTML = snapGlyphSVG(sn.type);
+  // extension tracking line back to the originating run endpoint
+  const track = wrap.querySelector('#hfSnapTrack');
+  if (sn.type === 'extension' && Array.isArray(sn.from)) {
+    const fs = hfWorldToScreen(planToWorldVec(sn.from, drawElev));
+    if (fs && Number.isFinite(fs.x)) {
+      track.setAttribute('x2', String(100 + (fs.x - scr.x)));
+      track.setAttribute('y2', String(60 + (fs.y - scr.y)));
+      track.setAttribute('opacity', '0.85');
+    } else track.setAttribute('opacity', '0');
+  } else track.setAttribute('opacity', '0');
+  const tip = wrap.querySelector('#hfSnapTip');
+  const name = SNAP_LABELS[sn.type] || sn.type;
+  tip.textContent = sn.type === 'node' && sn.label ? `${name} · ${sn.label}` : name;
+  window.__lastSnap = { type: sn.type, p: sn.p, from: sn.from || null, label: sn.label || null, screen: [scr.x, scr.y] };
+}
+function hideSnapIndicator() { if (snapOverlay) snapOverlay.style.display = 'none'; }
+
+// ── HF-PHASE1-POLAR: tracking line + angle readout overlay ──────────────────────
+// A full-viewport SVG, separate from the snap glyph so the two coexist. When polar
+// engages (lastPolarEngaged set) we draw a dashed alignment ray from the run base
+// through the constrained point (extended a little past, AutoSPRINK-style) plus an
+// angle chip (e.g. "45°  12.3 ft"). Cleared every frame when polar isn't engaged.
+const POLAR_TRACK_COLOR = '#36d399';
+let polarOverlay = null;
+function ensurePolarOverlay() {
+  if (polarOverlay) return polarOverlay;
+  const wrap = document.createElement('div');
+  wrap.id = 'hfPolarTrack';
+  wrap.style.cssText = 'position:fixed;left:0;top:0;width:100%;height:100%;z-index:8400;pointer-events:none;display:none;';
+  wrap.innerHTML = '<svg width="100%" height="100%" style="position:absolute;inset:0;overflow:visible;">'
+    + '<line id="hfPolarLine" x1="0" y1="0" x2="0" y2="0" stroke="' + POLAR_TRACK_COLOR + '" stroke-width="1.3" stroke-dasharray="7 5" opacity="0.9"/>'
+    + '</svg>'
+    + '<div id="hfPolarChip" style="position:absolute;font:11px/1.2 ui-monospace,monospace;'
+    + 'background:rgba(8,16,12,.92);color:#bdf5dc;border:1px solid ' + POLAR_TRACK_COLOR + ';border-radius:4px;'
+    + 'padding:2px 6px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.5);transform:translate(10px,-22px);"></div>';
+  document.body.appendChild(wrap);
+  polarOverlay = wrap; return wrap;
+}
+function hidePolarTrack() { if (polarOverlay) polarOverlay.style.display = 'none'; }
+function showPolarTrack() {
+  const eng = lastPolarEngaged;
+  if (!eng || !Array.isArray(eng.from) || !Array.isArray(eng.to)) { hidePolarTrack(); return; }
+  const wrap = ensurePolarOverlay();
+  const a = hfWorldToScreen(planToWorldVec(eng.from, drawElev));
+  const b = hfWorldToScreen(planToWorldVec(eng.to, drawElev));
+  if (!a || !b || !Number.isFinite(a.x) || !Number.isFinite(b.x)) { hidePolarTrack(); return; }
+  // Extend the alignment ray ~36px past the cursor so it reads like a tracking line.
+  let dx = b.x - a.x, dy = b.y - a.y; const L = Math.hypot(dx, dy) || 1;
+  const ex = b.x + (dx / L) * 36, ey = b.y + (dy / L) * 36;
+  const line = wrap.querySelector('#hfPolarLine');
+  line.setAttribute('x1', String(a.x)); line.setAttribute('y1', String(a.y));
+  line.setAttribute('x2', String(ex));  line.setAttribute('y2', String(ey));
+  const chip = wrap.querySelector('#hfPolarChip');
+  chip.textContent = `${(+eng.angleDeg).toFixed(eng.angleDeg % 1 ? 1 : 0)}°  ${eng.lengthFt.toFixed(1)} ft`;
+  chip.style.left = b.x + 'px'; chip.style.top = b.y + 'px';
+  wrap.style.display = 'block';
+}
 
 // ── HF-W1/W2-DRAW: click-to-place / multi-segment draw tools with LIVE preview ──
 // drawTool: 'wall' | 'pipe' | 'head' | 'fitting' | 'door' | 'measure' | null.
@@ -4272,6 +4870,7 @@ const MULTI_SEG = (t) => t === 'pipe' || t === 'wall';
 
 function setDrawTool(tool) {
   clearDrawPreview(); clearDrawExtras(); drawPts = []; drawInteract = null; hideDynInput();
+  hidePolarTrack(); lastPolarEngaged = null;
   try { measurePts = []; clearMeasureLabel(); } catch (_) {}
   drawTool = tool || null;
   $('status').textContent = drawTool
@@ -4280,6 +4879,7 @@ function setDrawTool(tool) {
   window.__hfDrawTool = drawTool;
   document.body.style.cursor = drawTool ? 'crosshair' : '';
   if (window.__syncToolBar) try { window.__syncToolBar(MULTI_SEG(drawTool) || drawTool === 'head' || drawTool === 'fitting' || drawTool === 'door' ? drawTool : null); } catch (_) {}
+  try { if (typeof updateCmdPrompt === 'function') updateCmdPrompt(); } catch (_) {}
 }
 function clearDrawPreview() { if (drawPreview) { scene.remove(drawPreview); try { drawPreview.geometry && drawPreview.geometry.dispose(); } catch (_) {} drawPreview = null; } }
 function clearDrawExtras() { for (const o of drawPreviewExtra) { scene.remove(o); try { o.geometry && o.geometry.dispose(); } catch (_) {} } drawPreviewExtra = []; }
@@ -4336,38 +4936,81 @@ function ensureDynInput() {
     + 'background:rgba(10,14,20,.92);color:#cfe8ff;border:1px solid #00e676;border-radius:5px;outline:none;display:none;pointer-events:auto;box-shadow:0 2px 10px rgba(0,0,0,.5);';
   document.body.appendChild(el);
   el.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); commitTypedPoint(el.value); }
-    else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); setDrawTool(null); }
+    if (e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); delete el.dataset.userTyping; commitTypedPoint(el.value); }
+    else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); delete el.dataset.userTyping; setDrawTool(null); }
+    else { el.dataset.userTyping = '1'; }   // user is editing — stop the live tracker from clobbering
   });
+  el.addEventListener('input', () => { el.dataset.userTyping = '1'; });
+  el.addEventListener('blur', () => { delete el.dataset.userTyping; });
   dynInput = el; return el;
 }
-function showDynInput(screenX, screenY, placeholder) {
+function showDynInput(screenX, screenY, placeholder, liveValue) {
   const el = ensureDynInput();
   el.style.left = (screenX + 14) + 'px'; el.style.top = (screenY - 8) + 'px';
   el.placeholder = placeholder || 'length or dx,dy';
   if (el.style.display === 'none') { el.style.display = 'block'; }
+  // Mirror the live len<angle readout into the field UNLESS the user is editing it
+  // (focused / has typed something) — typing overrides the live tracker.
+  if (liveValue != null && document.activeElement !== el && !el.dataset.userTyping) el.value = liveValue;
   window.__hfDynInput = { visible: true, placeholder: el.placeholder, value: el.value };
 }
-function hideDynInput() { if (dynInput) { dynInput.style.display = 'none'; dynInput.value = ''; } window.__hfDynInput = { visible: false }; }
-// Resolve a typed string to a plan point relative to the last committed vertex.
-// "12" -> 12ft along the current cursor direction; "12,4" -> explicit dx,dy.
+function hideDynInput() { if (dynInput) { dynInput.style.display = 'none'; dynInput.value = ''; delete dynInput.dataset.userTyping; } window.__hfDynInput = { visible: false, value: '' }; }
+// ── HF-PHASE1-CMD: shared AutoSPRINK coordinate grammar ──
+// coordParse(str, base) resolves an AutoSPRINK coordinate token to a PLAN POINT
+// relative to `base` (the last committed vertex, or null). Returns
+//   { kind:'absolute'|'relative'|'polar'|'length', p:[x,y] }  or  null (not a coord).
+//   "12,8"   -> absolute plan point                      kind 'absolute'
+//   "@10,0"  -> relative dx,dy from base                 kind 'relative'  (needs base)
+//   "10<45"  -> polar: 10 ft at 45° from base            kind 'polar'     (needs base)
+//   "@10<90" -> same as polar (the @ is optional)        kind 'polar'
+//   "12"     -> length along the live cursor dir lastDirAngle, from base   kind 'length'
+function coordParse(str, base) {
+  let s = String(str || '').trim();
+  if (!s) return null;
+  if (s[0] === '@') s = s.slice(1).trim();           // @ marks relative; polar/comma already are
+  const lt = s.indexOf('<');
+  if (lt >= 0) {                                       // polar  len<angleDeg
+    const len = Number(s.slice(0, lt).trim());
+    const angDeg = Number(s.slice(lt + 1).trim());
+    if (!Number.isFinite(len) || !Number.isFinite(angDeg)) return null;
+    if (!base) return null;
+    const a = angDeg * Math.PI / 180;
+    return { kind: 'polar', p: [base[0] + Math.cos(a) * len, base[1] + Math.sin(a) * len] };
+  }
+  if (s.indexOf(',') >= 0) {                           // x,y
+    const d = parseXY(s); if (!d) return null;
+    const wasRel = String(str).trim()[0] === '@';
+    if (wasRel) { if (!base) return null; return { kind: 'relative', p: [base[0] + d[0], base[1] + d[1]] }; }
+    return { kind: 'absolute', p: [d[0], d[1]] };
+  }
+  const n = Number(s);                                 // bare length along cursor dir
+  if (Number.isFinite(n) && s !== '') {
+    if (!base) return null;
+    return { kind: 'length', p: [base[0] + Math.cos(lastDirAngle) * n, base[1] + Math.sin(lastDirAngle) * n] };
+  }
+  return null;
+}
+// Resolve a typed string to a plan point for the ACTIVE draw chain.
 function typedToPlan(str) {
   const base = drawPts.length ? drawPts[drawPts.length - 1] : null;
-  if (!base) return null;
-  const s = String(str).trim();
-  if (!s) return null;
-  if (s.indexOf(',') >= 0) {
-    const d = parseXY(s); if (!d) return null;
-    return [base[0] + d[0], base[1] + d[1]];
-  }
-  const len = Number(s); if (!Number.isFinite(len) || len === 0) return null;
-  const ang = lastDirAngle;
-  return [base[0] + Math.cos(ang) * len, base[1] + Math.sin(ang) * len];
+  const r = coordParse(str, base);
+  return r ? r.p : null;
 }
 function commitTypedPoint(str) {
-  const p = typedToPlan(str);
-  if (!p) { $('status').textContent = 'type a length (e.g. 12) or dx,dy (e.g. 12,4) then Enter'; return; }
-  if (dynInput) dynInput.value = '';
+  // Empty Enter in the dynamic-input field FINISHES the active multi-seg run
+  // (AutoSPRINK convention) — the live tracker leaves a len<ang readout in the
+  // field, so an explicit empty submit means "done".
+  const raw = String(str == null ? '' : str).trim();
+  const looksLiveReadout = /^\d+(\.\d+)?<-?\d+(\.\d+)?$/.test(raw); // the auto-filled len<ang tracker
+  if (raw === '' && MULTI_SEG(drawTool) && drawPts.length >= 1) { finishChain(); return; }
+  const p = typedToPlan(raw);
+  if (!p) {
+    // a bare live-readout token (len<ang) with no explicit edit -> treat as commit
+    if (looksLiveReadout && MULTI_SEG(drawTool) && drawPts.length >= 1) { finishChain(); return; }
+    $('status').textContent = 'type a length (12), delta (@10,0), polar (10<45) or abs point (12,8) then Enter';
+    return;
+  }
+  if (dynInput) { dynInput.value = ''; delete dynInput.dataset.userTyping; }
   addVertex(p);
 }
 
@@ -4381,9 +5024,12 @@ function attachDrawPreviewListener() {
     if (drawInteract) { interactPreview(plan, e); return; }
     if (!drawTool) return;
     let target = plan;
-    if (drawPts.length >= 1 && (e.shiftKey || orthoLock) && MULTI_SEG(drawTool)) target = orthoConstrain(drawPts[drawPts.length - 1], plan);
-    const sn = snapPoint(target, segmentsFromModel(currentCadModel), snapState);
+    if (drawPts.length >= 1 && MULTI_SEG(drawTool)) {
+      target = hfApplyDrawConstraint(drawPts[drawPts.length - 1], plan, (e.shiftKey || orthoLock));
+    } else { lastPolarEngaged = null; }
+    const sn = hfSnapAt(target);
     showSnapIndicator(sn);
+    showPolarTrack();
     lastCursorPlan = sn.p;
     if (drawPts.length >= 1 && (MULTI_SEG(drawTool) || drawTool === 'measure')) {
       const base = drawPts[drawPts.length - 1];
@@ -4392,13 +5038,324 @@ function attachDrawPreviewListener() {
       const dx = sn.p[0] - base[0], dy = sn.p[1] - base[1];
       const len = Math.hypot(dx, dy); lastDirAngle = Math.atan2(dy, dx);
       const angDeg = ((lastDirAngle * 180 / Math.PI) + 360) % 360;
+      // HF-PHASE1: live draft readout (length + angle) consumed by the dynamic-
+      // input field and exposed for verification.
+      window.__hfDraftReadout = { lengthFt: len, angleDeg: angDeg, from: base.slice(), to: sn.p.slice() };
       $('status').textContent = `${DRAW_LABEL[drawTool]}: ${len.toFixed(2)} ft @ ${angDeg.toFixed(1)}° — click / type length+Enter${MULTI_SEG(drawTool) ? ' · Enter finishes' : ''}`;
-      if (MULTI_SEG(drawTool)) showDynInput(e.clientX, e.clientY, `${len.toFixed(1)} ft`);
+      if (MULTI_SEG(drawTool)) showDynInput(e.clientX, e.clientY, `${len.toFixed(1)} ft`, `${len.toFixed(1)}<${angDeg.toFixed(0)}`);
     } else {
       drawPreviewPoint(sn.p, drawTool === 'head' ? 0xff3b30 : drawTool === 'measure' ? 0xffd166 : 0xfbbf24);
     }
   });
 }
+
+// ── HF-PHASE1-CMD: STATUS-BAR COMMAND LINE + LIVE COORDS + PROMPT ECHO ──────────
+// A real AutoSPRINK-style command line lives in #hfCmdLine. Submitting either:
+//   (a) a COORDINATE token (12,8 abs · @10,0 rel · 10<45 polar · 12 length) — fed
+//       into the ACTIVE draw as the next point (same grammar as the floating
+//       dynamic-input field), OR
+//   (b) a COMMAND NAME ("pipe","wall","head","move","trim","offset","dim","zoom e",
+//       "fit","undo","esc"…) — invoked via the alias table -> __hfActions / tools.
+// The prompt (#hfCmdPrompt) echoes the active draw state. Live cursor coords
+// (#hfCoordReadout) + snap/ortho state (#hfSnapState/#hfOrthoState) update on
+// every pointermove. Built WITH the existing engine — NO camera reframe here, and
+// no competing renderer pointer handler (the coord readout listener is passive).
+// COMMAND NAME aliases -> menu-action ids (dispatched via window.__hfActions).
+// Coordinate tokens, ortho/snap/cancel/zoom are handled specially (not here).
+const CMD_ALIASES = {
+  // draw tools
+  pipe: 'tools.hf-draw-pipe', line: 'tools.hf-draw-wall', wall: 'tools.hf-draw-wall',
+  pl: 'tools.hf-draw-pipe', polyline: 'tools.hf-draw-pipe',
+  head: 'tools.hf-place-head', sprinkler: 'tools.hf-place-head', spk: 'tools.hf-place-head',
+  fitting: 'tools.hf-add-fitting', door: 'tools.hf-add-door',
+  measure: 'tools.hf-measure', dist: 'tools.hf-measure', ruler: 'tools.hf-measure',
+  // modify
+  move: 'commands.hf-move-base', m: 'commands.hf-move-base',
+  copy: 'commands.hf-copy-base', cp: 'commands.hf-copy-base',
+  trim: 'commands.hf-trim-extend', extend: 'commands.hf-trim-extend', tr: 'commands.hf-trim-extend',
+  offset: 'commands.hf-offset', o: 'commands.hf-offset',
+  array: 'commands.hf-array', ar: 'commands.hf-array',
+  mirror: 'commands.hf-mirror-line', mi: 'commands.hf-mirror-line',
+  rotate: 'commands.hf-rotate-90', ro: 'commands.hf-rotate-90',
+  scale: 'commands.hf-scale',
+  stretch: 'commands.hf-stretch', s: 'commands.hf-stretch',
+  // annotate
+  dim: 'tools.dimension', dimension: 'tools.dimension', tag: 'tools.part-tag',
+  aligned: 'tools.hf-dim-aligned', dimaligned: 'tools.hf-dim-aligned', dal: 'tools.hf-dim-aligned',
+  horizontal: 'tools.hf-dim-horizontal', dimh: 'tools.hf-dim-horizontal', dimhor: 'tools.hf-dim-horizontal',
+  vertical: 'tools.hf-dim-vertical', dimv: 'tools.hf-dim-vertical', dimver: 'tools.hf-dim-vertical',
+  angular: 'tools.hf-dim-angular', dimangular: 'tools.hf-dim-angular', dan: 'tools.hf-dim-angular',
+  leader: 'tools.leader-line', callout: 'tools.callout', le: 'tools.leader-line',
+  text: 'tools.text-box',
+  // edit
+  undo: 'edit.undo', u: 'edit.undo', redo: 'edit.redo', delete: 'edit.delete', del: 'edit.delete',
+  erase: 'edit.delete',
+  // view / camera (the ONLY commands allowed to move the camera)
+  top: 'view.mode-top', iso: 'view.mode-iso', refresh: 'view.refresh', regen: 'view.refresh',
+  // generate
+  generate: 'auto-draw.generate-layout', gen: 'auto-draw.generate-layout',
+};
+let lastCmdResult = null;
+// runCommandLine(raw) — the command interpreter. Returns a structured result:
+//   { ok, command|kind, coordKind?, echo?, reason? }.
+function runCommandLine(raw) {
+  const input = String(raw || '').trim();
+  const out = (o) => { lastCmdResult = o; updateCmdPrompt(); return o; };
+  if (!input) return out({ ok: false, reason: 'empty' });
+  const key = input.toLowerCase();
+
+  // ── 1) coordinate token: feed the ACTIVE draw / interaction ──
+  const base = drawPts.length ? drawPts[drawPts.length - 1] : null;
+  const coord = coordParse(input, base);
+  if (coord) {
+    if (drawTool) {
+      // absolute / length without a prior vertex is fine for the FIRST point only
+      // when it's absolute (length/relative/polar need a base).
+      if (!base && coord.kind !== 'absolute') {
+        return out({ ok: false, reason: 'no-base', echo: 'place a start point first (click or type an absolute X,Y)' });
+      }
+      addVertex(coord.p);
+      return out({ ok: true, kind: 'vertex', coordKind: coord.kind, point: coord.p, echo: `${coord.kind} ${coord.p[0].toFixed(2)}, ${coord.p[1].toFixed(2)}` });
+    }
+    if (drawInteract && typeof interactClick === 'function') {
+      const scr = (typeof hfWorldToScreen === 'function' && typeof planToWorldVec === 'function')
+        ? hfWorldToScreen(planToWorldVec(coord.p, drawElev)) : { x: 0, y: 0 };
+      interactClick(coord.p, scr.x, scr.y);
+      return out({ ok: true, kind: 'pick', coordKind: coord.kind, point: coord.p, echo: `picked ${coord.p[0].toFixed(2)}, ${coord.p[1].toFixed(2)}` });
+    }
+    // no active draw — report the absolute coordinate (and snap-resolve it)
+    if (coord.kind === 'absolute') {
+      const sn = hfSnapAt(coord.p); lastCursorPlan = sn.p;
+      $('status').textContent = `coordinate ${coord.p[0].toFixed(2)}, ${coord.p[1].toFixed(2)} ft — start a draw tool to place it`;
+      return out({ ok: true, kind: 'coord-idle', coordKind: coord.kind, point: sn.p, echo: 'coordinate (no active draw)' });
+    }
+  }
+
+  // ── 2) special verbs ──
+  if (key === 'cancel' || key === 'esc' || key === 'escape') {
+    if (drawTool) setDrawTool(null);
+    else if (drawInteract && typeof endInteract === 'function') endInteract();
+    else clearSelection(true);
+    return out({ ok: true, command: 'cancel', echo: 'cancelled' });
+  }
+  if (key === 'ortho') { snapOrtho(); return out({ ok: true, command: 'ortho', echo: `Ortho ${orthoLock ? 'ON' : 'off'}` }); }
+  // POLAR: "polar" toggles; "polar off"/"polar on"; "polar 30" / "polar 22.5" set the increment + enable.
+  if (key === 'polar' || key.startsWith('polar ')) {
+    const arg = key.slice(5).trim();
+    if (arg === 'off' || arg === '0') { polarState.enabled = false; hidePolarTrack(); lastPolarEngaged = null; }
+    else if (arg === 'on') { polarState.enabled = true; }
+    else if (arg && !isNaN(parseFloat(arg))) {
+      const v = parseFloat(arg);
+      if (POLAR_INCREMENTS.includes(v)) { polarState.incrementDeg = v; polarState.enabled = true; }
+      else { syncPolarUI(); return out({ ok: false, command: 'polar', reason: 'bad-increment', echo: `increment must be one of ${POLAR_INCREMENTS.join('/')}°` }); }
+    } else { togglePolar(); }
+    if (typeof syncPolarUI === 'function') syncPolarUI();
+    $('status').textContent = `polar tracking ${polarState.enabled ? 'ON · ' + polarState.incrementDeg + '°' : 'off'}`;
+    return out({ ok: true, command: 'polar', echo: `Polar ${polarState.enabled ? 'ON ' + polarState.incrementDeg + '°' : 'off'}` });
+  }
+  if (key === 'snap') { snapMasterEnable(); return out({ ok: true, command: 'snap', echo: 'Snap toggled' }); }
+  if (key === 'enter' || key === 'done' || key === 'finish' || key === 'close') {
+    if (MULTI_SEG(drawTool) && drawPts.length >= 1) { finishChain(); return out({ ok: true, command: 'finish', echo: 'run finished' }); }
+    return out({ ok: false, reason: 'nothing-to-finish' });
+  }
+  // zoom: "zoom e" / "zoom extents" / "ze" -> fit (camera move allowed). "zoom"
+  // alone or other args also fit (the only zoom the Studio exposes).
+  if (key === 'zoom e' || key === 'zoom extents' || key === 'ze' || key === 'fit' || key === '2d' || key.startsWith('zoom')) {
+    if (key === '2d') { (window.__hfActions || {})['view.mode-top'] && window.__hfActions['view.mode-top'](); return out({ ok: true, command: 'top', echo: 'Top / 2D view' }); }
+    const fb = $('fitBtn'); if (fb) fb.click(); else if ((window.__hfActions || {})['view.fit']) window.__hfActions['view.fit']();
+    return out({ ok: true, command: 'zoom', echo: 'Zoom Extents (fit)' });
+  }
+
+  // ── 3) command-name dispatch via the alias table -> __hfActions ──
+  const id = CMD_ALIASES[key] || (input.indexOf('.') > 0 ? input : null);
+  const acts = window.__hfActions || {};
+  if (id && typeof acts[id] === 'function') {
+    try { acts[id](); } catch (err) { $('status').textContent = `command "${input}" failed: ${err && err.message || err}`; return out({ ok: false, command: key, reason: 'error', error: String(err) }); }
+    return out({ ok: true, command: key, id, echo: `→ ${id}` });
+  }
+
+  $('status').textContent = `unknown command: "${input}" — try pipe · move · trim · offset · dim · zoom e · ortho · undo, or a coord (12,8 · @10,0 · 10<45)`;
+  return out({ ok: false, command: key, reason: 'unknown' });
+}
+// Echo an AutoSPRINK-style prompt in the command label reflecting active state.
+function updateCmdPrompt() {
+  const el = $('hfCmdPrompt'); if (!el) return;
+  let txt = 'Command:';
+  if (drawTool === 'pipe' || drawTool === 'wall') {
+    txt = (typeof drawPts !== 'undefined' && drawPts.length) ? 'Specify next point or [length]:' : 'Specify start point:';
+  } else if (drawTool === 'head') txt = 'Specify head location:';
+  else if (drawTool === 'fitting') txt = 'Specify fitting location:';
+  else if (drawTool === 'door') txt = 'Specify door location:';
+  else if (drawTool === 'measure') txt = (typeof measurePts !== 'undefined' && measurePts.length === 1) ? 'Specify second point:' : 'Specify first point:';
+  else if (drawInteract) txt = 'Specify point:';
+  el.textContent = txt;
+}
+// Compute the live snap/ortho strip states ('on'|'off'|'grid').
+function snapStripState() {
+  const elemKeys = (typeof SNAP_ALL_KEYS !== 'undefined') ? SNAP_ALL_KEYS.filter((k) => k !== 'grid') : [];
+  const anyElem = elemKeys.some((k) => snapState[k]);
+  if (anyElem) return 'on';
+  if (snapState && snapState.grid) return 'grid';
+  return 'off';
+}
+// Live cursor coords + snap/ortho readout. Passive (read-only) — never touches
+// geometry / selection / camera. Reuses pointerToPlan for true-ft coords.
+let liveCoordStrip = { x: '—', y: '—', z: '—' };
+function updateCoordReadout(clientX, clientY) {
+  const plan = pointerToPlan(clientX, clientY, drawElev);
+  if (plan) {
+    const z = (drawTool || drawInteract) ? drawElev : 0;
+    liveCoordStrip = { x: plan[0].toFixed(2), y: plan[1].toFixed(2), z: z.toFixed(2) };
+    const co = $('hfCoordReadout');
+    if (co) co.textContent = `X ${liveCoordStrip.x}  Y ${liveCoordStrip.y}  Z ${liveCoordStrip.z}`;
+    window.__hfCoordReadout = { x: plan[0], y: plan[1], z };
+  }
+  const ss = $('hfSnapState');
+  if (ss) { const s = snapStripState(); ss.innerHTML = `Snap: <b style="color:${s === 'off' ? 'var(--muted)' : 'var(--info)'}">${s}</b>`; }
+  const os = $('hfOrthoState');
+  if (os) os.innerHTML = `Ortho: <b style="color:${orthoLock ? 'var(--info)' : 'var(--muted)'}">${orthoLock ? 'on' : 'off'}</b>`;
+  const ps = $('hfPolarState');
+  if (ps) {
+    const inc = polarState.incrementDeg;
+    ps.innerHTML = `Polar: <b style="color:${polarState.enabled ? '#36d399' : 'var(--muted)'}">${polarState.enabled ? (inc % 1 ? inc.toFixed(1) : inc) + '°' : 'off'}</b>`;
+  }
+}
+function attachCommandLine() {
+  const form = $('hfCmdForm'), input = $('hfCmdLine');
+  if (form && input) {
+    form.addEventListener('submit', (e) => { e.preventDefault(); const v = input.value; runCommandLine(v); input.value = ''; });
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') { e.preventDefault(); if (drawTool) setDrawTool(null); else if (drawInteract && typeof endInteract === 'function') endInteract(); input.value = ''; updateCmdPrompt(); input.blur(); }
+    });
+    window.__hfCmdLine = input;
+  }
+  if (renderer && renderer.domElement) {
+    renderer.domElement.addEventListener('pointermove', (e) => updateCoordReadout(e.clientX, e.clientY), { passive: true });
+  }
+  updateCmdPrompt();
+  updateCoordReadout(window.innerWidth / 2, window.innerHeight / 2);
+}
+// ── Debug hooks (headless verification) ──
+window.__hfPhase1 = window.__hfPhase1 || {};
+window.__hfPhase1.cmd = function (str) { return runCommandLine(str); };
+window.__hfPhase1.coordParse = function (str, base) { return coordParse(str, base); };
+window.__hfPhase1.cmdline = function () {
+  return {
+    cmdLinePresent: !!$('hfCmdLine'),
+    drawTool,
+    prompt: ($('hfCmdPrompt') || {}).textContent,
+    drawPts: (typeof drawPts !== 'undefined' ? drawPts.slice() : []),
+    coordStrip: { x: liveCoordStrip.x, y: liveCoordStrip.y, z: liveCoordStrip.z },
+    coords: window.__hfCoordReadout || null,
+    snapStrip: snapStripState(),
+    orthoStrip: orthoLock ? 'on' : 'off',
+    dynInput: window.__hfDynInput || { visible: false, value: '' },
+    draft: window.__hfDraftReadout || null,
+    lastCmdResult,
+  };
+};;
+// ── HF-PHASE1-POLAR: polar/ortho tracking debug hooks ──
+// .polar()                      -> current polar+ortho config + last engaged track
+// .polar({enabled,increment})   -> set config (turns polar on/off, picks increment)
+// .polarConstrain(base, plan)   -> run the pure constraint with current config and
+//                                  return the constrained point + engagement detail
+//                                  WITHOUT touching live draw state.
+// .polarDraft(base, plan)       -> drive the LIVE constraint path (sets lastPolarEngaged
+//                                  + renders the tracking overlay) exactly as a
+//                                  pointermove would, returning the observable result.
+window.__hfPhase1.polar = function (cfg) {
+  if (cfg && typeof cfg === 'object') {
+    if (typeof cfg.enabled === 'boolean') polarState.enabled = cfg.enabled;
+    if (typeof cfg.increment === 'number') polarState.incrementDeg = cfg.increment;
+    if (typeof cfg.incrementDeg === 'number') polarState.incrementDeg = cfg.incrementDeg;
+    if (typeof cfg.bandDeg === 'number') polarState.bandDeg = cfg.bandDeg;
+    if (typeof syncPolarUI === 'function') try { syncPolarUI(); } catch (_) {}
+    if (!polarState.enabled) { hidePolarTrack(); lastPolarEngaged = null; }
+  }
+  return {
+    enabled: polarState.enabled,
+    incrementDeg: polarState.incrementDeg,
+    bandDeg: polarState.bandDeg,
+    orthoLock,
+    increments: POLAR_INCREMENTS.slice(),
+    toggleBtnText: ($('polarToggleBtn') || {}).textContent || null,
+    toggleBtnOn: !!($('polarToggleBtn') && $('polarToggleBtn').classList.contains('on')),
+    popoverOpen: !!polarPopOpen,
+    engaged: lastPolarEngaged ? { ...lastPolarEngaged } : null,
+  };
+};
+window.__hfPhase1.polarConstrain = function (base, plan) {
+  return polarConstrain(base, plan, polarState.incrementDeg, polarState.bandDeg);
+};
+window.__hfPhase1.polarDraft = function (base, plan, wantOrtho) {
+  const p = hfApplyDrawConstraint(base, plan, !!wantOrtho);
+  showPolarTrack();
+  const chip = $('hfPolarChip');
+  return {
+    constrained: p.slice(),
+    engaged: lastPolarEngaged ? { ...lastPolarEngaged } : null,
+    overlayVisible: !!(polarOverlay && polarOverlay.style.display !== 'none'),
+    chipText: chip ? chip.textContent : null,
+  };
+};
+// ── HF-PHASE1-DIM: dimension/leader debug hooks (unambiguous observable state) ──
+// .dim(kind, picks[, text]) drives a COMPLETE dimension/leader placement headlessly:
+//   kind: 'aligned'|'linear-h'|'linear-v'|'angular'|'leader'; picks = array of
+//   [x,y] plan points (2 for linear/aligned + a 3rd place point; 4 for angular
+//   = vertex,r1,r2,place; 2 for leader). Returns the committed solid + measured
+//   value. Each pick is O-snapped via hfSnapAt, exactly like a live click.
+window.__hfPhase1.dim = function (kind, picks, text) {
+  const startMap = { aligned: startDimAligned, 'linear-h': startDimLinearH, 'linear-v': startDimLinearV, angular: startDimAngular, leader: () => startLeader(text) };
+  (startMap[kind] || startDimAligned)();
+  if (!drawInteract) return { ok: false, reason: 'interact-not-armed' };
+  const before = currentCadModel ? currentCadModel.solids.length : 0;
+  for (const pt of (picks || [])) {
+    const sn = hfSnapAt(pt);
+    const scr = (typeof hfWorldToScreen === 'function') ? hfWorldToScreen(planToWorldVec(sn.p, drawElev)) : { x: 0, y: 0 };
+    interactClick(sn.p, scr.x, scr.y);
+  }
+  const after = currentCadModel ? currentCadModel.solids.length : 0;
+  const sols = (currentCadModel && currentCadModel.solids) || [];
+  const placed = after > before ? sols[sols.length - 1] : null;
+  return {
+    ok: !!placed && after === before + 1,
+    added: after - before,
+    interactStillArmed: !!drawInteract,
+    solid: placed ? { kind: placed.kind, dimType: placed.dimType, value: placed.value, text: placed.text, from: placed.from, to: placed.to, vertex: placed.vertex, place: placed.place, at: placed.at } : null,
+    annotationCount: typeof window.__hfAnnotationCount === 'function' ? window.__hfAnnotationCount() : null,
+  };
+};
+// Snapshot of all annotation solids + their geometry presence in modelGroup.
+window.__hfPhase1.dimState = function () {
+  const sols = (currentCadModel && currentCadModel.solids) || [];
+  const anns = sols.map((s, i) => ({ i, kind: s.kind, dimType: s.dimType, text: s.text, value: s.value })).filter((x) => x.kind === 'dimension' || x.kind === 'label');
+  let dimMeshes = 0; try { if (dimGeoGroup) dimGeoGroup.traverse((o) => { if (o.userData && o.userData.hfPart) dimMeshes += 1; }); } catch (_) {}
+  return { annotations: anns, annotationCount: anns.length, overlayLabels: typeof window.__hfAnnotationCount === 'function' ? window.__hfAnnotationCount() : null, dimGeoNodes: dimMeshes, geomError: window.__dimGeomError || null };
+};
+// Select a dimension by its solid index then delete it (tests selectable+deletable).
+window.__hfPhase1.selectDim = function (solidIndex) {
+  if (!window.__hfSelectByIndex(solidIndex)) return { ok: false, reason: 'no-solid' };
+  const s = currentCadModel.solids[solidIndex];
+  return { ok: !!s, selectedKind: s && s.kind, isAnnotation: s && (s.kind === 'dimension' || s.kind === 'label'), ref: window.__hfSelectedRef() };
+};
+window.__hfPhase1.deleteSelected = function () { const before = currentCadModel.solids.length; editDelete(); return { ok: currentCadModel.solids.length === before - 1, count: currentCadModel.solids.length }; };
+window.__hfPhase1.undo = function () { return HFEdit.undo(); };
+// Plan point -> screen pixel (for real-click verification at known plan coords).
+window.__hfPhase1.planToScreen = function (plan) { const s = hfWorldToScreen(planToWorldVec(plan, drawElev)); return { x: s.x, y: s.y }; };
+// Explicit close-up framing for verification screenshots (allowed: explicit
+// framing op, not a click/draw side-effect). Sets the orbit target on `plan` and
+// pulls the camera to `distFt` above/around it.
+window.__hfPhase1.zoomTo = function (plan, distFt) {
+  try {
+    const w = planToWorldVec(plan, drawElev); controls.target.copy(w);
+    const dir = camera.position.clone().sub(w).normalize();
+    camera.position.copy(w.clone().add(dir.multiplyScalar(distFt || 24)));
+    controls.update();
+  } catch (_) {}
+  return window.__dbgTarget ? window.__dbgTarget() : null;
+};
+window.__hfPhase1.startDim = function (kind) { return ({ aligned: startDimAligned, 'linear-h': startDimLinearH, 'linear-v': startDimLinearV, angular: startDimAngular, leader: () => startLeader() }[kind] || startDimAligned)(); };
+window.__hfPhase1.ftInExact = function (v) { return ftInExact(v); };
 
 // Add one vertex to the active chain (used by both click and typed input).
 function addVertex(p) {
@@ -4413,6 +5370,7 @@ function addVertex(p) {
   drawPts = drawPts.concat([p]);
   renderCommittedChain(drawTool === 'wall' ? 0x9aa3b2 : 0x3b82f6);
   $('status').textContent = `${DRAW_LABEL[drawTool]}: ${drawPts.length} vertex${drawPts.length === 1 ? '' : 'es'} · click next / type length+Enter · Enter or double-click finishes · Esc cancels`;
+  try { if (typeof updateCmdPrompt === 'function') updateCmdPrompt(); } catch (_) {}
 }
 
 // Finish a multi-segment run: emit one solid PER LEG inside a SINGLE undo step.
@@ -4432,7 +5390,7 @@ function finishChain() {
   }
   resetChain();
 }
-function resetChain() { drawPts = []; clearDrawPreview(); clearDrawExtras(); hideSnapIndicator(); hideDynInput(); }
+function resetChain() { drawPts = []; clearDrawPreview(); clearDrawExtras(); hideSnapIndicator(); hidePolarTrack(); lastPolarEngaged = null; hideDynInput(); try { if (typeof updateCmdPrompt === 'function') updateCmdPrompt(); } catch (_) {} }
 function makePipeSolid(a, b, dia) { return { kind: 'pipe', role: 'branch', from: [a[0], a[1], drawElev], to: [b[0], b[1], drawElev], diameterIn: dia }; }
 function makeWallSolid(a, b) {
   const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
@@ -4476,25 +5434,81 @@ function showMeasureLabel(a, b, txt) {
 }
 function clearMeasureLabel() { if (measureLabel) { measureLabel.remove(); measureLabel = null; } }
 
-// ── HF-W2: GRIP / handle edit — drag a single endpoint of the selected run ──
-// When a linear solid is selected we render small grip spheres at its endpoints;
-// a pointerdown that hits a grip drags just that vertex (vs. moveDrag which
-// moves the whole part). Grips render via refreshGrips(), called on selection.
-let gripMeshes = [], gripDrag = null;
-function clearGrips() { for (const g of gripMeshes) { scene.remove(g); try { g.geometry.dispose(); } catch (_) {} } gripMeshes = []; }
+// ── HF-W2 / PHASE1: GRIP / handle edit — the core AutoSPRINK reshape gesture ──
+// When a linear solid is selected we render draggable SQUARE grip handles at its
+// two ENDPOINTS (reshape that vertex) plus a MIDPOINT grip (move the whole run).
+// A pointerdown that hits a grip drags just that handle, O-snapped, and commits
+// ONE undoable edit on release (endpoint -> setSolidGrip; midpoint -> moveVertices
+// of both ends = a clean segment translate). Hovering a grip highlights it. Built
+// WITH the existing snapState/hfSnapAt + HFEdit stack — no camera reframe, ever.
+const GRIP_BLUE = 0x2f6bff, GRIP_HOT = 0x00e676, GRIP_MID = 0x9aa7b8;
+const GRIP_SIZE = 0.85;          // world ft — square half handled below
+let gripMeshes = [], gripDrag = null, gripHover = null;
+// A small camera-facing square (AutoSPRINK grip look) at a plan point.
+function makeGripMesh(name, plan, elev, color) {
+  const geo = new THREE.PlaneGeometry(GRIP_SIZE, GRIP_SIZE);
+  const mat = new THREE.MeshBasicMaterial({ color, depthTest: false, transparent: true, opacity: 0.96, side: THREE.DoubleSide });
+  const m = new THREE.Mesh(geo, mat);
+  m.position.copy(planToWorldVec(plan, elev));
+  m.renderOrder = 1300;
+  m.userData.hfGrip = name;          // 'from'|'to'|'a'|'b' = endpoint; 'mid' = segment-move
+  m.userData.hfGripBase = color;
+  m.userData.hfGripPlan = [plan[0], plan[1]];
+  gripMeshes.push(m); scene.add(m);
+  return m;
+}
+function clearGrips() {
+  for (const g of gripMeshes) { scene.remove(g); try { g.geometry.dispose(); g.material.dispose(); } catch (_) {} }
+  gripMeshes = []; gripHover = null;
+}
 function refreshGrips() {
   clearGrips();
   if (!curSelSolid || drawTool || drawInteract) return;
   const ep = solidEndpointsPlan(curSelSolid); if (!ep) return;
   const elev = Array.isArray(curSelSolid.from) ? (curSelSolid.from[2] || drawElev) : drawElev;
-  const grips = Array.isArray(curSelSolid.from)
-    ? [{ name: 'from', plan: ep.from }, { name: 'to', plan: ep.to }]
-    : [{ name: 'a', plan: ep.from }, { name: 'b', plan: ep.to }];
-  for (const g of grips) {
-    const m = new THREE.Mesh(new THREE.SphereGeometry(0.55, 14, 10), new THREE.MeshBasicMaterial({ color: 0x00b0ff, depthTest: false, transparent: true, opacity: 0.95 }));
-    m.position.copy(planToWorldVec(g.plan, elev)); m.renderOrder = 1300; m.userData.hfGrip = g.name; scene.add(m); gripMeshes.push(m);
-  }
+  const isPipe = Array.isArray(curSelSolid.from);
+  const fromName = isPipe ? 'from' : 'a', toName = isPipe ? 'to' : 'b';
+  makeGripMesh(fromName, ep.from, elev, GRIP_BLUE);
+  makeGripMesh(toName, ep.to, elev, GRIP_BLUE);
+  const mid = [(ep.from[0] + ep.to[0]) / 2, (ep.from[1] + ep.to[1]) / 2];
+  makeGripMesh('mid', mid, elev, GRIP_MID);
+  faceGripsToCamera();
   window.__hfGripCount = gripMeshes.length;
+}
+// Keep the square grips facing the camera (billboard) so they read as flat
+// handles in 3D + 2D. Called from refreshGrips and the render loop hook.
+function faceGripsToCamera() {
+  if (!camera) return;
+  for (const g of gripMeshes) { try { g.quaternion.copy(camera.quaternion); } catch (_) {} }
+  if (typeof stretchMarks !== 'undefined') for (const m of stretchMarks) { try { m.quaternion.copy(camera.quaternion); } catch (_) {} }
+}
+window.__hfFaceGrips = faceGripsToCamera;
+// Hover highlight: enlarge + recolor the grip under the cursor (when idle).
+function gripHoverTest(clientX, clientY) {
+  if (!gripMeshes.length || gripDrag) return;
+  const r = renderer.domElement.getBoundingClientRect();
+  const ndc = new THREE.Vector2(((clientX - r.left) / r.width) * 2 - 1, -((clientY - r.top) / r.height) * 2 + 1);
+  raycaster.setFromCamera(ndc, camera);
+  const hits = raycaster.intersectObjects(gripMeshes, false);
+  const hit = hits.length ? hits[0].object : null;
+  if (hit === gripHover) return;
+  if (gripHover) { gripHover.material.color.setHex(gripHover.userData.hfGripBase); gripHover.scale.set(1, 1, 1); }
+  gripHover = hit;
+  if (gripHover) {
+    gripHover.material.color.setHex(GRIP_HOT); gripHover.scale.set(1.5, 1.5, 1.5);
+    renderer.domElement.style.cursor = 'pointer';
+  } else if (!hfDrag && !moveDrag) { renderer.domElement.style.cursor = ''; }
+  window.__hfGripHover = gripHover ? gripHover.userData.hfGrip : null;
+}
+// Begin a grip drag at a plan point. Shared by pointerdown + the __hfPhase1 hook.
+function beginGripDrag(gripName) {
+  const ref = selectedRef(); if (!ref) return false;
+  const ep = solidEndpointsPlan(curSelSolid); if (!ep) return false;
+  gripDrag = { grip: gripName, ref, lastPlan: null,
+    // for the midpoint segment-move we track the original endpoints + a base point
+    base: null, ep: { from: ep.from.slice(), to: ep.to.slice() } };
+  controls.enabled = false;
+  return true;
 }
 function attachGripDragListeners() {
   renderer.domElement.addEventListener('pointerdown', (e) => {
@@ -4504,25 +5518,100 @@ function attachGripDragListeners() {
     raycaster.setFromCamera(ndc, camera);
     const hits = raycaster.intersectObjects(gripMeshes, false);
     if (!hits.length) return;
-    gripDrag = { grip: hits[0].object.userData.hfGrip, ref: selectedRef(), lastPlan: null };
-    controls.enabled = false; e.stopPropagation();
+    if (!beginGripDrag(hits[0].object.userData.hfGrip)) return;
+    // midpoint drag records the press point so we translate by a clean delta
+    if (gripDrag.grip === 'mid') {
+      const sp = pointerToPlan(e.clientX, e.clientY, drawElev); gripDrag.base = sp ? sp.slice() : null;
+    }
+    e.stopPropagation();
   }, true);
   renderer.domElement.addEventListener('pointermove', (e) => {
-    if (!gripDrag) return;
+    if (!gripDrag) { gripHoverTest(e.clientX, e.clientY); return; }
     const plan = pointerToPlan(e.clientX, e.clientY, drawElev); if (!plan) return;
-    const sn = snapPoint(plan, segmentsFromModel(currentCadModel), snapState); showSnapIndicator(sn);
+    const sn = hfSnapAt(plan); showSnapIndicator(sn);
     gripDrag.lastPlan = sn.p;
-    // live-move the grip mesh under the cursor
-    const gm = gripMeshes.find((g) => g.userData.hfGrip === gripDrag.grip);
-    if (gm) gm.position.copy(planToWorldVec(sn.p, drawElev));
+    if (gripDrag.grip === 'mid' && gripDrag.base) {
+      // whole-segment move: live-preview all three grips by the snapped delta
+      const dx = sn.p[0] - gripDrag.base[0], dy = sn.p[1] - gripDrag.base[1];
+      const nf = [gripDrag.ep.from[0] + dx, gripDrag.ep.from[1] + dy];
+      const nt = [gripDrag.ep.to[0] + dx, gripDrag.ep.to[1] + dy];
+      moveGripMesh('from', nf); moveGripMesh('a', nf);
+      moveGripMesh('to', nt); moveGripMesh('b', nt);
+      moveGripMesh('mid', [(nf[0] + nt[0]) / 2, (nf[1] + nt[1]) / 2]);
+      $('status').textContent = `move run Δ ${dx.toFixed(1)}, ${dy.toFixed(1)} ft · release to commit`;
+    } else {
+      // endpoint drag: the dragged vertex follows the cursor; midpoint trails it
+      moveGripMesh(gripDrag.grip, sn.p);
+      const other = otherEndPlan(gripDrag.grip);
+      if (other) moveGripMesh('mid', [(sn.p[0] + other[0]) / 2, (sn.p[1] + other[1]) / 2]);
+      $('status').textContent = `drag ${gripDrag.grip} grip to ${sn.p[0].toFixed(1)}, ${sn.p[1].toFixed(1)} · release to commit`;
+    }
   });
   window.addEventListener('pointerup', () => {
     if (!gripDrag) return;
-    const { grip, ref, lastPlan } = gripDrag; gripDrag = null; controls.enabled = true; hideSnapIndicator();
-    if (lastPlan && ref) {
-      if (HFEdit.apply('grip-edit', (m) => setSolidGrip(m, ref, grip, lastPlan))) $('status').textContent = `dragged ${grip} grip (needs-verification) · Ctrl+Z to undo`;
-    }
+    const gd = gripDrag; gripDrag = null; controls.enabled = true; hideSnapIndicator();
+    renderer.domElement.style.cursor = '';
+    commitGripDrag(gd);
   });
+}
+// Live-move a grip square (by grip name) to a plan point in the current view.
+function moveGripMesh(name, plan) {
+  const gm = gripMeshes.find((g) => g.userData.hfGrip === name);
+  if (gm) { gm.position.copy(planToWorldVec(plan, drawElev)); gm.userData.hfGripPlan = [plan[0], plan[1]]; }
+}
+// The OTHER endpoint's plan (relative to a dragged endpoint grip) from the model.
+function otherEndPlan(grip) {
+  if (!curSelSolid) return null;
+  const ep = solidEndpointsPlan(curSelSolid); if (!ep) return null;
+  if (grip === 'from' || grip === 'a') return ep.to;
+  if (grip === 'to' || grip === 'b') return ep.from;
+  return null;
+}
+// Re-select the solid at `idx` after an edit rebuild (renderModel clears the
+// selection) so the gesture feels continuous and the grips stay on the run.
+function reselectSolidByIndex(idx) {
+  if (!currentCadModel || !Array.isArray(currentCadModel.solids)) return;
+  const s = currentCadModel.solids[idx]; if (!s) return;
+  curSelSolid = s;
+  // Re-apply the part highlight by locating its rebuilt mesh/instance in modelGroup.
+  try {
+    let found = null;
+    if (modelGroup) {
+      modelGroup.traverse((o) => {
+        if (found) return;
+        if (o.userData && o.userData.hfPart && o.userData.hfPart.solid === s) { found = { obj: o }; }
+        else if (o.isInstancedMesh && o.userData && o.userData.hfInstanced && Array.isArray(o.userData.hfInstanced.solids)) {
+          const k = o.userData.hfInstanced.solids.indexOf(s);
+          if (k >= 0) found = { obj: o, idx: k };
+        }
+      });
+    }
+    if (found) applyHighlight(found);
+  } catch (_) {}
+  try { refreshGrips(); } catch (_) {}
+}
+// Commit the finished grip drag as ONE undoable edit, then re-select the run.
+function commitGripDrag(gd) {
+  if (!gd || !gd.ref || !gd.lastPlan) return false;
+  const i = gd.ref.solidIndex;
+  if (gd.grip === 'mid' && gd.base) {
+    const dx = gd.lastPlan[0] - gd.base[0], dy = gd.lastPlan[1] - gd.base[1];
+    if (Math.abs(dx) < 1e-4 && Math.abs(dy) < 1e-4) { refreshGrips(); return false; }
+    const isPipe = Array.isArray(curSelSolid && curSelSolid.from);
+    const targets = [{ solidIndex: i, grip: isPipe ? 'from' : 'a' }, { solidIndex: i, grip: isPipe ? 'to' : 'b' }];
+    if (HFEdit.apply('move-run', (m) => moveVertices(m, targets, [dx, dy]))) {
+      reselectSolidByIndex(i);
+      $('status').textContent = `moved run ${dx.toFixed(1)}, ${dy.toFixed(1)} ft (needs-verification) · Ctrl+Z to undo`;
+      return true;
+    }
+    refreshGrips(); return false;
+  }
+  if (HFEdit.apply('grip-edit', (m) => setSolidGrip(m, gd.ref, gd.grip, gd.lastPlan))) {
+    reselectSolidByIndex(i);
+    $('status').textContent = `dragged ${gd.grip} grip (needs-verification) · Ctrl+Z to undo`;
+    return true;
+  }
+  refreshGrips(); return false;
 }
 
 // Click placement. Hooks into the same pointerup path used by selection but is
@@ -4531,8 +5620,10 @@ function drawClick(clientX, clientY, shift) {
   const plan0 = pointerToPlan(clientX, clientY, drawElev); if (!plan0) return;
   if (drawInteract) return interactClick(plan0, clientX, clientY);
   let target = plan0;
-  if (drawPts.length >= 1 && (shift || orthoLock) && MULTI_SEG(drawTool)) target = orthoConstrain(drawPts[drawPts.length - 1], plan0);
-  const sn = snapPoint(target, segmentsFromModel(currentCadModel), snapState);
+  if (drawPts.length >= 1 && MULTI_SEG(drawTool)) {
+    target = hfApplyDrawConstraint(drawPts[drawPts.length - 1], plan0, (shift || orthoLock));
+  }
+  const sn = hfSnapAt(target);
   addVertex(sn.p);
 }
 // Single-segment commit (headless hook / legacy callers): one leg in one undo step.
@@ -4585,7 +5676,10 @@ function attachDrawClickListeners() {
 }
 window.addEventListener('keydown', (e) => {
   const t = e.target;
-  const inField = t && (/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) || t.isContentEditable) && t.id !== 'hfDynInput';
+  // Treat any form field (incl. #hfDynInput / #hfCmdLine) as in-field for the
+  // capture-phase finish: those fields own Enter themselves (commit a typed point,
+  // and finish the run only when EMPTY) — so capture must NOT pre-empt them.
+  const inField = t && (/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) || t.isContentEditable);
   if (e.key === 'Escape' && drawModeActive()) { e.stopPropagation(); setDrawTool(null); clearDrawPreview(); clearDrawExtras(); hideSnapIndicator(); return; }
   if (e.key === 'Enter' && MULTI_SEG(drawTool) && !inField) { e.stopPropagation(); e.preventDefault(); finishChain(); }
 }, true);
@@ -4611,6 +5705,19 @@ function interactPrompt() {
     case 'offset': return 'Offset: click the side to place the parallel copy (distance from the field)';
     case 'mirror': return drawInteract.picks.length === 0 ? 'Mirror: click the first point of the mirror axis' : 'Mirror: click the second point of the mirror axis';
     case 'copymove': return drawInteract.picks.length === 0 ? `${drawInteract.copy ? 'Copy' : 'Move'}: click the base point` : `${drawInteract.copy ? 'Copy' : 'Move'}: click the destination point`;
+    case 'dim-aligned': case 'dim-linear-h': case 'dim-linear-v': {
+      const lbl = drawInteract.mode === 'dim-aligned' ? 'Aligned dimension' : drawInteract.mode === 'dim-linear-h' ? 'Horizontal dimension' : 'Vertical dimension';
+      return drawInteract.picks.length === 0 ? `${lbl}: pick the FIRST point (O-snapped)`
+           : drawInteract.picks.length === 1 ? `${lbl}: pick the SECOND point`
+           : `${lbl}: click to place the dimension line`;
+    }
+    case 'dim-angular':
+      return drawInteract.picks.length === 0 ? 'Angular dimension: pick the VERTEX (corner)'
+           : drawInteract.picks.length === 1 ? 'Angular dimension: pick the first ray endpoint'
+           : drawInteract.picks.length === 2 ? 'Angular dimension: pick the second ray endpoint'
+           : 'Angular dimension: click to place the arc';
+    case 'leader':
+      return drawInteract.picks.length === 0 ? 'Leader: pick the point to call out (O-snapped)' : 'Leader: click where the text should sit';
     default: return '';
   }
 }
@@ -4633,16 +5740,51 @@ function distToSeg(p, a, b) {
   return Math.hypot(p[0] - (a[0] + t * dx), p[1] - (a[1] + t * dy));
 }
 function interactPreview(plan, e) {
-  if (drawInteract.mode === 'mirror' && drawInteract.picks.length === 1) {
-    drawPreviewSegment(drawInteract.picks[0], plan, 0xff6b6b);
-  } else if (drawInteract.mode === 'copymove' && drawInteract.picks.length === 1) {
-    drawPreviewSegment(drawInteract.picks[0], plan, 0x66d9ff);
+  const di = drawInteract;
+  if (di.mode === 'mirror' && di.picks.length === 1) {
+    drawPreviewSegment(di.picks[0], plan, 0xff6b6b);
+  } else if (di.mode === 'copymove' && di.picks.length === 1) {
+    drawPreviewSegment(di.picks[0], plan, 0x66d9ff);
+  } else if (di.mode && di.mode.startsWith('dim-')) {
+    // ALWAYS show the O-snap glyph during a dimension pick, plus a rubber-band.
+    const sn = hfSnapAt(plan); showSnapIndicator(sn); const p = sn.p;
+    clearDrawExtras();
+    if (di.mode === 'dim-angular') {
+      if (di.picks.length === 1) drawPreviewSegment(di.picks[0], p, 0x4aa3ff);
+      else if (di.picks.length >= 2) { drawPreviewSegment(di.picks[0], di.picks[1], 0x4aa3ff); previewExtraLine(di.picks[0], p, 0x4aa3ff); }
+    } else {
+      if (di.picks.length === 1) drawPreviewSegment(di.picks[0], previewDimSecond(di, p), 0x4aa3ff);
+      else if (di.picks.length >= 2) { previewDimGhost(di, p); }
+    }
+  } else if (di.mode === 'leader') {
+    const sn = hfSnapAt(plan); showSnapIndicator(sn);
+    if (di.picks.length === 1) drawPreviewSegment(di.picks[0], sn.p, 0xffb020);
   } else {
-    const sn = snapPoint(plan, segmentsFromModel(currentCadModel), snapState); showSnapIndicator(sn);
+    const sn = hfSnapAt(plan); showSnapIndicator(sn);
   }
 }
+// The constrained second point for an H/V dimension (so the rubber-band reflects
+// the axis lock) — aligned uses the raw point.
+function previewDimSecond(di, p) {
+  const a = di.picks[0];
+  if (di.mode === 'dim-linear-h') return [p[0], a[1]];
+  if (di.mode === 'dim-linear-v') return [a[0], p[1]];
+  return p;
+}
+function previewExtraLine(a, b, color) {
+  const wa = planToWorldVec(a, drawElev), wb = planToWorldVec(b, drawElev);
+  const geo = new THREE.BufferGeometry().setFromPoints([wa, wb]);
+  const ln = new THREE.Line(geo, new THREE.LineBasicMaterial({ color: color || 0x4aa3ff, depthTest: false }));
+  ln.renderOrder = 1100; scene.add(ln); drawPreviewExtra.push(ln);
+}
+// Ghost the full dimension (extension + dim line) while the user places the line.
+function previewDimGhost(di, place) {
+  const a = di.picks[0], b = previewDimSecond(di, di.picks[1]);
+  const dl = dimLinePlan(a, b, place);
+  previewExtraLine(a, dl.da, 0x4aa3ff); previewExtraLine(b, dl.db, 0x4aa3ff); previewExtraLine(dl.da, dl.db, 0x4aa3ff);
+}
 function interactClick(plan, clientX, clientY) {
-  const sn = snapPoint(plan, segmentsFromModel(currentCadModel), snapState);
+  const sn = hfSnapAt(plan);
   const p = sn.p;
   const di = drawInteract;
   if (di.mode === 'trim') {
@@ -4682,6 +5824,54 @@ function interactClick(plan, clientX, clientY) {
     else { if (HFEdit.apply('move-base', (m) => moveSolid(m, ref, d))) $('status').textContent = `moved to destination (Δ ${Math.hypot(d[0], d[1]).toFixed(2)} ft) · Ctrl+Z to undo`; }
     endInteract(); return;
   }
+  // ── HF-PHASE1-DIM: interactive ALIGNED / LINEAR-H / LINEAR-V dimensions ──
+  if (di.mode === 'dim-aligned' || di.mode === 'dim-linear-h' || di.mode === 'dim-linear-v') {
+    di.picks.push([p[0], p[1], drawElev]);
+    if (di.picks.length < 3) { $('status').textContent = interactPrompt(); return; }
+    const [a, b, place] = di.picks;
+    const dimType = di.mode === 'dim-aligned' ? 'aligned' : di.mode === 'dim-linear-h' ? 'linear-h' : 'linear-v';
+    if (commitDimension(dimType, a, b, place)) { /* status set inside */ }
+    endInteract(); return;
+  }
+  // ── HF-PHASE1-DIM: interactive ANGULAR dimension (vertex, ray1, ray2, place) ──
+  if (di.mode === 'dim-angular') {
+    di.picks.push([p[0], p[1], drawElev]);
+    if (di.picks.length < 4) { $('status').textContent = interactPrompt(); return; }
+    const [vertex, r1, r2, place] = di.picks;
+    if (commitAngularDimension(vertex, r1, r2, place)) { /* status set inside */ }
+    endInteract(); return;
+  }
+  // ── HF-PHASE1-DIM: LEADER + text callout ──
+  if (di.mode === 'leader') {
+    di.picks.push([p[0], p[1], drawElev]);
+    if (di.picks.length < 2) { $('status').textContent = interactPrompt(); return; }
+    const [pointAt, textAt] = di.picks;
+    const txt = (di.text != null) ? di.text : window.prompt('Leader / callout text:', '');
+    if (txt == null || !String(txt).trim()) { $('status').textContent = 'leader cancelled'; endInteract(); return; }
+    if (commitAnnotation({ kind: 'label', from: pointAt, to: textAt, text: String(txt).trim(), hfEdited: 'leader' })) {
+      $('status').textContent = `placed leader callout "${String(txt).trim()}" · Ctrl+Z to undo · click it to select/delete`;
+    }
+    endInteract(); return;
+  }
+}
+// Commit an interactive linear/aligned dimension (real measured value).
+function commitDimension(dimType, a, b, place) {
+  const s = { kind: 'dimension', dimType, from: a, to: b, place: [place[0], place[1]], hfEdited: `dim-${dimType}` };
+  const m = dimMeasure(s); s.value = m.value; s.lengthFt = m.value; s.text = m.text;
+  if (commitAnnotation(s)) {
+    $('status').textContent = `${dimType} dimension: ${m.text} · Ctrl+Z to undo · click it to select/delete`;
+    return true;
+  }
+  return false;
+}
+function commitAngularDimension(vertex, r1, r2, place) {
+  const s = { kind: 'dimension', dimType: 'angular', vertex: [vertex[0], vertex[1], vertex[2]], from: r1, to: r2, place: [place[0], place[1]], hfEdited: 'dim-angular' };
+  const m = dimMeasure(s); s.value = m.value; s.text = m.text;
+  if (commitAnnotation(s)) {
+    $('status').textContent = `angular dimension: ${m.text} · Ctrl+Z to undo · click it to select/delete`;
+    return true;
+  }
+  return false;
 }
 function endInteract() { drawInteract = null; document.body.style.cursor = ''; clearDrawPreview(); hideSnapIndicator(); window.__hfInteract = null; }
 
@@ -4713,6 +5903,44 @@ function mirrorAcrossLine(model, ref, pivot, ang) {
 
 // ── HF-W2: public entry points for the new tools (toolbar + menu + headless) ──
 function startMeasure() { setDrawTool('measure'); }
+// ── HF-PHASE1-DIM: public entry points for the dimension + leader tools ──
+function startDimAligned() { startInteract('dim-aligned'); }
+function startDimLinearH() { startInteract('dim-linear-h'); }
+function startDimLinearV() { startInteract('dim-linear-v'); }
+function startDimAngular() { startInteract('dim-angular'); }
+function startLeader(text) { startInteract('leader', text != null ? { text } : {}); }
+// The Tools > Dimension entry: a small picker for ALIGNED / H / V / ANGULAR, then
+// start the interactive O-snapped gesture. Closing the popover (or Esc) cancels.
+let dimPicker = null;
+function startDimensionTool(presetType) {
+  if (presetType) { return ({ aligned: startDimAligned, 'linear-h': startDimLinearH, 'linear-v': startDimLinearV, angular: startDimAngular }[presetType] || startDimAligned)(); }
+  if (dimPicker) { dimPicker.remove(); dimPicker = null; return; }
+  const pop = document.createElement('div');
+  dimPicker = pop;
+  pop.id = 'hfDimPicker';
+  pop.style.cssText = 'position:fixed;left:50%;top:64px;transform:translateX(-50%);z-index:9200;display:flex;gap:6px;'
+    + 'padding:8px 10px;background:rgba(13,16,20,.94);border:1px solid rgba(74,163,255,.5);border-radius:12px;'
+    + 'box-shadow:0 12px 36px rgba(0,0,0,.6);backdrop-filter:blur(18px) saturate(1.3);font:12px ui-monospace,monospace';
+  const mk = (label, type) => {
+    const b = document.createElement('button');
+    b.textContent = label;
+    b.style.cssText = 'cursor:pointer;padding:5px 11px;border-radius:8px;border:1px solid rgba(255,255,255,.16);'
+      + 'background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(0,0,0,.42)),rgba(13,12,10,.6);color:#cfe8ff;font:12px ui-monospace,monospace';
+    b.onclick = () => { pop.remove(); dimPicker = null; startDimensionTool(type); };
+    return b;
+  };
+  pop.appendChild(mk('Aligned', 'aligned'));
+  pop.appendChild(mk('Horizontal', 'linear-h'));
+  pop.appendChild(mk('Vertical', 'linear-v'));
+  pop.appendChild(mk('Angular', 'angular'));
+  document.body.appendChild(pop);
+  $('status').textContent = 'Dimension: choose Aligned / Horizontal / Vertical / Angular';
+  // close on outside click
+  setTimeout(() => {
+    const off = (ev) => { if (dimPicker && !dimPicker.contains(ev.target)) { dimPicker.remove(); dimPicker = null; document.removeEventListener('pointerdown', off, true); } };
+    document.addEventListener('pointerdown', off, true);
+  }, 0);
+}
 function startTrim() { startInteract('trim', { target: null }); }
 function startOffset() {
   const ref = requireSelection('offset'); if (!ref) return;
@@ -5000,6 +6228,115 @@ function autoDrawAutoSize() {
 // observable effect (geometry delta, label, panel toggle, recolor, or window).
 // ════════════════════════════════════════════════════════════════════════════
 const ftIn = (v) => `${Math.floor(Math.abs(v))}'-${(((Math.abs(v) % 1) * 12)).toFixed(1)}"`; // 12.5 -> 12'-6.0"
+// True ft-in dimension text rounded to the nearest 1/16" (AutoSPRINK convention).
+function ftInExact(v) {
+  const sign = v < 0 ? '-' : ''; let ft = Math.floor(Math.abs(v));
+  let inches = (Math.abs(v) - ft) * 12;
+  let whole = Math.floor(inches); let frac = inches - whole;
+  let n = Math.round(frac * 16); // sixteenths
+  if (n === 16) { n = 0; whole += 1; }
+  if (whole === 12) { whole = 0; ft += 1; }
+  // reduce the sixteenths fraction
+  let d = 16; while (n && n % 2 === 0) { n /= 2; d /= 2; }
+  const fracStr = n ? ` ${n}/${d}"` : '';
+  return `${sign}${ft}'-${whole}${fracStr ? '' : '"'}${fracStr}`.replace("0\"\"", "0\"");
+}
+// ── HF-PHASE1-DIM: dimension geometry value math ──────────────────────────────
+// Resolve the measured value + the two leg points a dimension spans, accounting
+// for the dimType. Returns { value, text, a:[x,y], b:[x,y] } in PLAN coords (the
+// a/b are the projected dimension endpoints; for angular, value is degrees).
+function dimMeasure(s) {
+  const f = s.from, t = s.to;
+  if (s.dimType === 'angular') {
+    // angle at vertex between ray->from and ray->to (0..180)
+    const v = s.vertex || f;
+    const a1 = Math.atan2(f[1] - v[1], f[0] - v[0]);
+    const a2 = Math.atan2(t[1] - v[1], t[0] - v[0]);
+    let d = (a2 - a1) * 180 / Math.PI; d = ((d % 360) + 360) % 360; if (d > 180) d = 360 - d;
+    return { value: d, text: `${d.toFixed(1)}°`, a: f, b: t, vertex: v };
+  }
+  let a = [f[0], f[1]], b = [t[0], t[1]];
+  if (s.dimType === 'linear-h') { b = [t[0], f[1]]; }         // horizontal: measure ΔX
+  else if (s.dimType === 'linear-v') { b = [f[0], t[1]]; }    // vertical:   measure ΔY
+  const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
+  return { value: len, text: `${len.toFixed(2)} ft  (${ftInExact(len)})`, a, b };
+}
+// The offset (perpendicular) dimension-line endpoints in plan, given the measured
+// a/b and the placement point `place` (third pick). The dimension line is parallel
+// to a->b, shifted to pass through `place`.
+function dimLinePlan(a, b, place) {
+  const dx = b[0] - a[0], dy = b[1] - a[1]; const L = Math.hypot(dx, dy) || 1;
+  const ux = dx / L, uy = dy / L;            // along
+  const nx = -uy, ny = ux;                    // left normal
+  if (!place) return { da: a.slice(), db: b.slice(), off: 0 };
+  const off = (place[0] - a[0]) * nx + (place[1] - a[1]) * ny; // signed perpendicular distance
+  return { da: [a[0] + nx * off, a[1] + ny * off], db: [b[0] + nx * off, b[1] + ny * off], off, ux, uy, nx, ny };
+}
+let dimGeoGroup = null;
+// Build SELECTABLE three.js geometry for one dimension/label solid into modelGroup.
+function addDimensionGeometry(s) {
+  if (!modelGroup) return;
+  if (!dimGeoGroup || dimGeoGroup.parent !== modelGroup) { dimGeoGroup = new THREE.Group(); dimGeoGroup.name = 'hfDimGeo'; modelGroup.add(dimGeoGroup); }
+  const z = (Array.isArray(s.from) && s.from[2] != null) ? s.from[2] : (drawElev);
+  const col = s.kind === 'label' ? 0xffb020 : 0x4aa3ff;
+  const grp = new THREE.Group();
+  grp.userData.hfPart = { kind: s.kind, solid: s };   // makes it raycast-selectable
+  const lineMat = () => new THREE.LineBasicMaterial({ color: col, depthTest: false, transparent: true });
+  const addLine = (p0, p1) => { const g = new THREE.BufferGeometry().setFromPoints([planToWorldVec(p0, p0[2] != null ? p0[2] : z), planToWorldVec(p1, p1[2] != null ? p1[2] : z)]); const ln = new THREE.Line(g, lineMat()); ln.renderOrder = 1052; grp.add(ln); };
+  // a fat invisible pick-tube along a segment so thin lines are easy to click/raycast
+  const addPickTube = (p0, p1) => {
+    const wa = planToWorldVec(p0, z), wb = planToWorldVec(p1, z); const mid = wa.clone().add(wb).multiplyScalar(0.5);
+    const len = wa.distanceTo(wb) || 0.01; const geo = new THREE.CylinderGeometry(0.6, 0.6, len, 6);
+    const m = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ visible: false }));
+    m.position.copy(mid); m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), wb.clone().sub(wa).normalize());
+    m.userData.hfPart = { kind: s.kind, solid: s }; grp.add(m);
+  };
+  const arrow = (tip, dirX, dirY) => {
+    // little 3D cone arrowhead at tip pointing along (dirX,dirY) in plan
+    const w = planToWorldVec(tip, z); const ang = Math.atan2(dirY, dirX);
+    const back = [tip[0] - Math.cos(ang) * 1.0, tip[1] - Math.sin(ang) * 1.0];
+    const side = 0.35;
+    const l = [back[0] - Math.sin(ang) * side, back[1] + Math.cos(ang) * side];
+    const r = [back[0] + Math.sin(ang) * side, back[1] - Math.cos(ang) * side];
+    addLine(tip, l); addLine(tip, r);
+  };
+  if (s.kind === 'label') {
+    // leader: arrow at the pointed object (from) -> elbow -> text anchor (to)
+    if (Array.isArray(s.from) && Array.isArray(s.to)) {
+      addLine(s.from, s.to); addPickTube(s.from, s.to);
+      const ang = Math.atan2(s.from[1] - s.to[1], s.from[0] - s.to[0]);
+      arrow(s.from, Math.cos(ang), Math.sin(ang));
+    } else if (Array.isArray(s.at)) {
+      const tip = [s.at[0], s.at[1], z];
+      addLine(tip, [s.at[0], s.at[1] + 3, z]); addPickTube(tip, [s.at[0], s.at[1] + 3, z]);
+    }
+    modelGroup.children.includes(dimGeoGroup) || modelGroup.add(dimGeoGroup);
+    dimGeoGroup.add(grp); return;
+  }
+  const m = dimMeasure(s);
+  if (s.dimType === 'angular') {
+    const v = m.vertex; const r = Math.max(2, Math.min(Math.hypot(m.a[0] - v[0], m.a[1] - v[1]), Math.hypot(m.b[0] - v[0], m.b[1] - v[1])) * 0.6);
+    // two rays from vertex + an arc between them
+    addLine(v, m.a); addLine(v, m.b);
+    addPickTube(v, m.a); addPickTube(v, m.b);
+    const a1 = Math.atan2(m.a[1] - v[1], m.a[0] - v[0]); let a2 = Math.atan2(m.b[1] - v[1], m.b[0] - v[0]);
+    // sweep the short way
+    let span = a2 - a1; while (span <= -Math.PI) span += 2 * Math.PI; while (span > Math.PI) span -= 2 * Math.PI;
+    const N = 24; const pts = [];
+    for (let i = 0; i <= N; i++) { const a = a1 + span * (i / N); pts.push([v[0] + Math.cos(a) * r, v[1] + Math.sin(a) * r, z]); }
+    for (let i = 0; i < N; i++) addLine(pts[i], pts[i + 1]);
+  } else {
+    // linear / aligned: extension lines from the measured points out to the dim
+    // line, the dim line itself with arrowheads, between the projected endpoints.
+    const dl = dimLinePlan(m.a, m.b, s.place);
+    addLine(m.a, dl.da); addLine(m.b, dl.db);     // extension lines
+    addLine(dl.da, dl.db);                         // dimension line
+    addPickTube(dl.da, dl.db);
+    const dx = dl.db[0] - dl.da[0], dy = dl.db[1] - dl.da[1]; const L = Math.hypot(dx, dy) || 1;
+    arrow(dl.da, dx / L, dy / L); arrow(dl.db, -dx / L, -dy / L); // inward arrowheads
+  }
+  dimGeoGroup.add(grp);
+}
 let annOverlay = null, annLineGroup = null;
 function ensureAnnotationLayer() {
   if (!annOverlay) {
@@ -5019,32 +6356,40 @@ function refreshAnnotations() {
   while (annLineGroup.children.length) { const c = annLineGroup.children.pop(); try { c.geometry && c.geometry.dispose(); } catch (_) {} annLineGroup.remove(c); }
   const anns = (currentCadModel && Array.isArray(currentCadModel.solids))
     ? currentCadModel.solids.filter((s) => s.kind === 'dimension' || s.kind === 'label') : [];
-  window.__hfAnnotations = anns.map((s) => ({ kind: s.kind, text: s.text, at: s.at, from: s.from, to: s.to }));
+  window.__hfAnnotations = anns.map((s) => ({ kind: s.kind, dimType: s.dimType, text: s.text, value: s.value, at: s.at, from: s.from, to: s.to }));
   for (const s of anns) {
     const el = document.createElement('div');
     const isDim = s.kind === 'dimension';
     el.className = 'hf-ann-label';
-    el.dataset.annPlan = JSON.stringify(s.at || (s.from && s.to ? [(s.from[0] + s.to[0]) / 2, (s.from[1] + s.to[1]) / 2] : [0, 0]));
+    // Anchor the text at the geometric centre of the annotation: the dimension-
+    // line midpoint (linear/aligned), the arc midpoint (angular), the leader text
+    // anchor (label/leader), or the part centroid (legacy part-tag).
+    el.dataset.annPlan = JSON.stringify(annLabelAnchor(s));
     el.style.cssText = 'position:absolute;transform:translate(-50%,-50%);padding:2px 7px;font:11px/1.3 ui-monospace,monospace;'
       + 'border-radius:5px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.5);'
       + (isDim ? 'background:rgba(10,14,20,.92);color:#9ad8ff;border:1px solid #4aa3ff;'
                : 'background:rgba(20,16,10,.92);color:#ffd166;border:1px solid #ffb020;');
     el.textContent = s.text || '';
     annOverlay.appendChild(el);
-    // dimension leader line between the two picked endpoints
-    if (isDim && Array.isArray(s.from) && Array.isArray(s.to)) {
-      const a = planToWorldVec(s.from, (s.from[2] || drawElev)), b = planToWorldVec(s.to, (s.to[2] || drawElev));
-      const geo = new THREE.BufferGeometry().setFromPoints([a, b]);
-      const ln = new THREE.Line(geo, new THREE.LineBasicMaterial({ color: 0x4aa3ff, depthTest: false }));
-      ln.renderOrder = 1051; annLineGroup.add(ln);
-    } else if (!isDim && Array.isArray(s.at)) {
-      // part-tag leader: short stub from the part centroid up to the tag
-      const a = planToWorldVec(s.at, drawElev);
-      const geo = new THREE.BufferGeometry().setFromPoints([a, a.clone().add(new THREE.Vector3(0, 3, 0))]);
-      const ln = new THREE.Line(geo, new THREE.LineBasicMaterial({ color: 0xffb020, depthTest: false }));
-      ln.renderOrder = 1051; annLineGroup.add(ln);
-    }
   }
+}
+// Plan-coord anchor for an annotation's text label (per dimType).
+function annLabelAnchor(s) {
+  if (s.kind === 'label') {
+    if (Array.isArray(s.to)) return [s.to[0], s.to[1]];
+    if (Array.isArray(s.at)) return [s.at[0], s.at[1]];
+    return [0, 0];
+  }
+  if (!Array.isArray(s.from) || !Array.isArray(s.to)) return [0, 0];
+  const m = dimMeasure(s);
+  if (s.dimType === 'angular') {
+    const v = m.vertex; const a1 = Math.atan2(m.a[1] - v[1], m.a[0] - v[0]); let a2 = Math.atan2(m.b[1] - v[1], m.b[0] - v[0]);
+    let span = a2 - a1; while (span <= -Math.PI) span += 2 * Math.PI; while (span > Math.PI) span -= 2 * Math.PI;
+    const r = Math.max(2.4, Math.min(Math.hypot(m.a[0] - v[0], m.a[1] - v[1]), Math.hypot(m.b[0] - v[0], m.b[1] - v[1])) * 0.7);
+    const am = a1 + span / 2; return [v[0] + Math.cos(am) * r, v[1] + Math.sin(am) * r];
+  }
+  const dl = dimLinePlan(m.a, m.b, s.place);
+  return [(dl.da[0] + dl.db[0]) / 2, (dl.da[1] + dl.db[1]) / 2];
 }
 // Re-project every overlay label to its world point each frame (camera tracking).
 window.__hfRepositionAnnotations = function () {
@@ -5071,11 +6416,13 @@ function dimensionSelected() {
   const s = currentCadModel.solids[ref.solidIndex];
   const ep = solidEndpointsPlan(s);
   if (!ep) { $('status').textContent = 'Dimension: select a linear run (pipe or wall) first'; return; }
-  const len = Math.hypot(ep.to[0] - ep.from[0], ep.to[1] - ep.from[1]);
   const z = Array.isArray(s.from) ? (s.from[2] || drawElev) : drawElev;
-  const text = `${len.toFixed(2)} ft  (${ftIn(len)})`;
-  if (commitAnnotation({ kind: 'dimension', from: [ep.from[0], ep.from[1], z], to: [ep.to[0], ep.to[1], z], lengthFt: len, text, hfEdited: 'dimension' })) {
-    $('status').textContent = `dimensioned run: ${text} · Ctrl+Z to undo · select the dimension + Inspector to retype`;
+  // place the dimension line ~3 ft off the run (left normal) — a real aligned dim.
+  const dx = ep.to[0] - ep.from[0], dy = ep.to[1] - ep.from[1]; const L = Math.hypot(dx, dy) || 1;
+  const nx = -dy / L, ny = dx / L; const off = 3;
+  const place = [(ep.from[0] + ep.to[0]) / 2 + nx * off, (ep.from[1] + ep.to[1]) / 2 + ny * off];
+  if (commitDimension('aligned', [ep.from[0], ep.from[1], z], [ep.to[0], ep.to[1], z], place)) {
+    $('status').textContent = $('status').textContent + ' (dimensioned the selected run)';
   }
 }
 // TYPED dimension: place a dimension of an explicitly TYPED length, in-line via
@@ -5140,7 +6487,10 @@ function dimensionAllWalls() {
     for (const w of m.solids.filter((s) => s.kind === 'wall')) {
       const ep = solidEndpointsPlan(w); if (!ep) continue;
       const len = Math.hypot(ep.to[0] - ep.from[0], ep.to[1] - ep.from[1]);
-      mm = addSolid(mm, { kind: 'dimension', from: [ep.from[0], ep.from[1], drawElev], to: [ep.to[0], ep.to[1], drawElev], lengthFt: len, text: `${len.toFixed(1)} ft (${ftIn(len)})`, hfEdited: 'wall-dim' }) || mm;
+      const dx = ep.to[0] - ep.from[0], dy = ep.to[1] - ep.from[1]; const L = Math.hypot(dx, dy) || 1;
+      const nx = -dy / L, ny = dx / L; const off = 2;
+      const place = [(ep.from[0] + ep.to[0]) / 2 + nx * off, (ep.from[1] + ep.to[1]) / 2 + ny * off];
+      mm = addSolid(mm, { kind: 'dimension', dimType: 'aligned', from: [ep.from[0], ep.from[1], drawElev], to: [ep.to[0], ep.to[1], drawElev], place, value: len, lengthFt: len, text: `${len.toFixed(2)} ft  (${ftInExact(len)})`, hfEdited: 'wall-dim' }) || mm;
     }
     return mm;
   });
@@ -5274,8 +6624,9 @@ function viewShowSprinklerDimensions() {
   const h0 = heads[0].position; let best = Infinity, bp = null;
   for (let i = 1; i < heads.length; i++) { const d = Math.hypot(heads[i].position[0] - h0[0], heads[i].position[1] - h0[1]); if (d > 0.1 && d < best) { best = d; bp = heads[i].position; } }
   if (!bp) { $('status').textContent = 'Show Sprinkler Dimensions: heads coincident'; return; }
-  const text = `head spacing ${best.toFixed(2)} ft (${ftIn(best)})`;
-  if (commitAnnotation({ kind: 'dimension', from: [h0[0], h0[1], drawElev], to: [bp[0], bp[1], drawElev], lengthFt: best, text, hfEdited: 'head-spacing' })) {
+  const text = `head spacing ${best.toFixed(2)} ft (${ftInExact(best)})`;
+  const place = [(h0[0] + bp[0]) / 2, (h0[1] + bp[1]) / 2 + 2];
+  if (commitAnnotation({ kind: 'dimension', dimType: 'aligned', from: [h0[0], h0[1], drawElev], to: [bp[0], bp[1], drawElev], place, value: best, lengthFt: best, text, hfEdited: 'head-spacing' })) {
     $('status').textContent = `Show Sprinkler Dimensions: ${text} · Ctrl+Z to undo`;
   }
 }
@@ -5446,6 +6797,10 @@ window.__hfTools = {
   copyBase: (idx, base, dest) => HFEdit.apply('copy-base', (m) => copySolid(m, { solidIndex: idx }, [dest[0] - base[0], dest[1] - base[1], 0])),
   moveBase: (idx, base, dest) => HFEdit.apply('move-base', (m) => moveSolid(m, { solidIndex: idx }, [dest[0] - base[0], dest[1] - base[1], 0])),
   gripEdit: (idx, grip, plan) => HFEdit.apply('grip-edit', (m) => setSolidGrip(m, { solidIndex: idx }, grip, plan)),
+  // HF-PHASE1: stretch (move a set of vertices by one delta) — headless driver.
+  stretch: (x0, y0, x1, y1, dx, dy) => window.__hfStretchRun(x0, y0, x1, y1, dx, dy),
+  moveVerts: (targets, dx, dy) => HFEdit.apply('stretch', (m) => moveVertices(m, targets, [dx, dy])),
+  armStretch: () => armStretch(),
   scale: (idx, f) => HFEdit.apply('scale', (m) => editScaleSolid(m, { solidIndex: idx }, f)),
   flatten: (idx) => HFEdit.apply('flatten', (m) => editFlattenSolid(m, { solidIndex: idx })),
   round: (idx, step) => HFEdit.apply('round', (m) => editRoundSolid(m, { solidIndex: idx }, step)),
@@ -5461,6 +6816,14 @@ window.__hfTools = {
   setDir: (deg) => { lastDirAngle = (deg || 0) * Math.PI / 180; },
   typeCommit: (str) => { commitTypedPoint(str); return drawPts.slice(); },
   dynInputVisible: () => { const el = document.getElementById('hfDynInput'); return !!el && el.style.display !== 'none'; },
+  viewRefresh: () => viewRefresh(),
+  // HF-PHASE1-DIM: dimension/leader tool starters (headless).
+  startDimAligned: () => startDimAligned(),
+  startDimLinearH: () => startDimLinearH(),
+  startDimLinearV: () => startDimLinearV(),
+  startDimAngular: () => startDimAngular(),
+  startLeader: (t) => startLeader(t),
+  startDimensionTool: (t) => startDimensionTool(t),
 };
 
 // HF-W1: attach all viewport (renderer/scene/controls) listeners. Called from
@@ -5469,8 +6832,10 @@ function initEditEngine() {
   if (!renderer || !renderer.domElement) { window.__hfEditEngineError = 'renderer missing at initEditEngine'; return; }
   attachMoveDragListeners();
   attachGripDragListeners();
+  attachStretchListeners();
   attachDrawPreviewListener();
   attachDrawClickListeners();
+  attachCommandLine();   // HF-PHASE1: status-bar command line + live coords + prompt echo
   window.__hfEditEngineReady = true;
 }
 
@@ -5706,6 +7071,10 @@ document.querySelectorAll('#viewSeg button').forEach((b) => {
     'commands.hf-copy-base': () => startCopyMoveBase(true),
     'commands.hf-move-base': () => startCopyMoveBase(false),
     'commands.hf-scale': () => editScale(),
+    // ── HF-PHASE1: STRETCH (crossing-window vertex move) ──
+    'commands.hf-stretch': () => armStretch(),
+    'commands.stretch': () => armStretch(),
+    'modify.stretch': () => armStretch(),
     // ── HF-W4: Modify ops (Flatten / Round / Scale) on real transforms ──
     'actions.hf-flatten': () => editFlatten(),
     'actions.hf-round': () => editRound(),
@@ -5821,8 +7190,14 @@ document.querySelectorAll('#viewSeg button').forEach((b) => {
     'listing.assign-list-area': hfHonestStub('list-area assignment needs a multi-select region picker — no region-selection set in the Studio yet.'),
     'listing.assign-price-area': hfHonestStub('price-area assignment needs a region picker — not yet built.'),
     'listing.price-area-text-table': hfHonestStub('price-area text table needs defined price areas — not yet built.'),
-    // ── HF-AV: DIMENSION + LABEL tools (real annotation solids, undoable) ──
-    'tools.dimension': () => dimensionTyped(),
+    // ── HF-PHASE1-DIM: real interactive ALIGNED/LINEAR/ANGULAR dimensions ──
+    // tools.dimension opens the type picker (Aligned/H/V/Angular); each starts a
+    // two-point O-snapped gesture that places a real dimension annotation solid.
+    'tools.dimension': () => startDimensionTool(),
+    'tools.hf-dim-aligned': () => startDimAligned(),
+    'tools.hf-dim-horizontal': () => startDimLinearH(),
+    'tools.hf-dim-vertical': () => startDimLinearV(),
+    'tools.hf-dim-angular': () => startDimAngular(),
     'commands.dimension-selected': () => dimensionSelected(),
     'commands.calculate-wall-dimensions': () => dimensionAllWalls(),
     'commands.calculate-slab-dimensions': () => dimensionAllWalls(),
@@ -5831,9 +7206,11 @@ document.querySelectorAll('#viewSeg button').forEach((b) => {
     'tools.part-tag': () => tagSelected(),
     'tools.text-box': () => placeTextNote('Text box'),
     'tools.text-line': () => placeTextNote('Text line'),
-    'tools.leader-line': () => placeTextNote('Leader note'),
-    'tools.text-leader-line': () => placeTextNote('Text leader'),
-    'tools.callout': () => placeTextNote('Callout'),
+    // Leader + callout are now interactive: pick the called-out point (O-snapped)
+    // then the text anchor — a real leader line with arrowhead + text.
+    'tools.leader-line': () => startLeader(),
+    'tools.text-leader-line': () => startLeader(),
+    'tools.callout': () => startLeader(),
     'commands.format-dimension-text': hfHonestStub('dimension-text formatting (font/precision) edits a placed dimension — select a dimension and use the Inspector to retype; a dedicated format dialog is not yet built.'),
     'commands.align-labels-with-parent-element': hfHonestStub('label re-anchoring to a moved parent needs a parent-link store on the annotation — labels are placed at the centroid at tag time; re-tag after moving.'),
     'commands.spell-check-text': hfHonestStub('no spell-check dictionary bundled in the browser Studio.'),
@@ -5939,6 +7316,9 @@ document.querySelectorAll('#viewSeg button').forEach((b) => {
     'alerts.load-resolution-proposals': hfHonestStub('resolution-proposal load needs a server proposal store — no client store.'),
     'alerts.save-resolution-proposals': hfHonestStub('resolution-proposal save needs a server proposal store — no client store.'),
   };
+  // HF-PHASE1-CMD: expose the menu-action map so the status-bar command line can
+  // dispatch a tool/command by name (e.g. "move", "offset", "dimension").
+  window.__hfActions = actions;
   try {
     window.__menuBar = window.HFMenuBar.mount($('menuBarHost'), { actions });
     window.__menuBarStats = window.__menuBar.stats();

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   createCommandStack, cloneModel, resolveSolidIndex,
   moveSolid, deleteSolid, copySolid, rotateSolid, mirrorSolid, addSolid, setSolidFields,
-  solidEndpointsPlan, trimExtendSolid, offsetSolid, arraySolid, setSolidGrip,
+  solidEndpointsPlan, trimExtendSolid, offsetSolid, arraySolid, setSolidGrip, moveVertices,
 } from '../src/engine/edit-commands.js';
 
 // HF-W1-CMD — the snapshot command stack + pure cadModel edit ops. The stack
@@ -252,5 +252,35 @@ describe('HF-W2 edit ops', () => {
     const m = { solids: [{ kind: 'pipe', from: [0, 0, 9], to: [10, 0, 9] }], counts: {} };
     expect(setSolidGrip(m, { solidIndex: 0 }, 'a', [1, 1])).toBeNull(); // pipe has no a/b
     expect(setSolidGrip(m, { solidIndex: 0 }, 'to', [0, 0])).toBeNull(); // would be zero-length
+  });
+
+  it('moveVertices stretches a connected polyline vertex, keeping both legs joined', () => {
+    const m = { solids: [
+      { kind: 'pipe', from: [0, 0, 9], to: [10, 0, 9] },
+      { kind: 'pipe', from: [10, 0, 9], to: [10, 10, 9] },
+    ], counts: {} };
+    const out = moveVertices(m, [{ solidIndex: 0, grip: 'to' }, { solidIndex: 1, grip: 'from' }], [2, 3]);
+    expect(out.solids[0].to).toEqual([12, 3, 9]);
+    expect(out.solids[1].from).toEqual([12, 3, 9]); // shared vertex stays joined
+    expect(out.solids[0].from).toEqual([0, 0, 9]);  // far ends unchanged
+    expect(out.solids[1].to).toEqual([10, 10, 9]);
+  });
+
+  it('moveVertices moves only the windowed vertices and updates wall derived fields', () => {
+    const m = { solids: [
+      { kind: 'wall', a: [0, 0], b: [10, 0], center: [5, 0], lengthFt: 10, rotationY: 0 },
+      { kind: 'pipe', from: [0, 0, 9], to: [10, 0, 9] },
+    ], counts: {} };
+    const out = moveVertices(m, [{ solidIndex: 0, grip: 'b' }], [0, 5]);
+    expect(out.solids[0].b).toEqual([10, 5]);
+    expect(out.solids[0].lengthFt).toBeCloseTo(Math.hypot(10, 5), 6);
+    expect(out.solids[1].from).toEqual([0, 0, 9]); // untouched solid stays put
+  });
+
+  it('moveVertices is a no-op (null) for an empty set, zero delta, or a fully degenerate collapse', () => {
+    const m = { solids: [{ kind: 'pipe', from: [0, 0, 9], to: [1, 0, 9] }], counts: {} };
+    expect(moveVertices(m, [], [1, 1])).toBeNull();
+    expect(moveVertices(m, [{ solidIndex: 0, grip: 'to' }], [0, 0])).toBeNull();
+    expect(moveVertices(m, [{ solidIndex: 0, grip: 'to' }], [-1, 0])).toBeNull(); // collapses to zero length
   });
 });
