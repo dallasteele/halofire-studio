@@ -1,0 +1,124 @@
+{
+  "$schema": "halofire.nfpa13-compliance.v1",
+  "meta": {
+    "title": "HaloFire NFPA-13 Compliance Knowledge Base",
+    "purpose": "Encoded fire-sprinkler DESIGN PARAMETERS + methods used by the Studio design engine and the autobidder, with NFPA section citations. Improves design correctness AND bid accuracy (correct density -> correct head count -> correct pipe sizes -> accurate takeoff; fewer under/over-bids and change orders).",
+    "legal": "These are factual engineering design parameters + methods (not copyrightable), encoded by HaloFire and CITED to NFPA 13 sections. This file does NOT reproduce NFPA's copyrighted text or tables. NFPA 13 is copyrighted by the National Fire Protection Association; read it free at nfpa.org (Free Access) or via NFPA LiNK.",
+    "disclaimer": "ENGINEERING REFERENCE — NOT a substitute for the standard, a licensed PE, or AHJ approval. Every value MUST be verified against the edition of NFPA 13 adopted by the project's jurisdiction (editions differ; local amendments apply). Items flagged verify:true especially.",
+    "edition_basis": "Values reflect commonly-published NFPA 13 design practice (≈2016–2022 editions). Confirm the project's adopted edition.",
+    "version": "0.1.0-seed",
+    "authored": "2026-06-14"
+  },
+
+  "hazardClasses": {
+    "citation": "NFPA 13 Ch. 4 (Hazard / Occupancy Classification) + Annex A",
+    "verify": true,
+    "classes": {
+      "light": { "name": "Light Hazard", "examples": ["offices", "churches", "schools (classrooms)", "hospitals", "libraries (seating areas)", "residential", "museums", "theaters/auditoriums (non-stage)"] },
+      "ordinary_1": { "name": "Ordinary Hazard Group 1", "examples": ["parking garages", "bakeries", "canneries", "laundries", "restaurant service areas", "electronics plants", "beverage mfg", "glass/glass-products mfg"] },
+      "ordinary_2": { "name": "Ordinary Hazard Group 2", "examples": ["machine shops", "repair garages", "mercantile / retail", "library stack rooms", "post offices", "wood machining", "paper/printing (non-flammable inks)", "metal working"] },
+      "extra_1": { "name": "Extra Hazard Group 1", "examples": ["aircraft hangars", "die casting", "particleboard/plywood mfg", "printing with flammable inks (low flashpoint)", "sawmills", "textile picking/opening"] },
+      "extra_2": { "name": "Extra Hazard Group 2", "examples": ["flammable-liquid spraying", "flow coating", "plastics processing (open)", "solvent cleaning", "varnish/paint dipping", "saturating"] },
+      "storage": { "name": "Storage (high-piled / rack)", "note": "Governed by NFPA 13 storage chapters (commodity class, storage height, rack vs pile, in-rack sprinklers) — NOT the simple density/area below. verify required.", "verify": true }
+    }
+  },
+
+  "densityArea": {
+    "citation": "NFPA 13 density/area design curves (formerly Fig. 11.2.3.1.1 / current equivalent)",
+    "verify": true,
+    "note": "Density (gpm/ft^2) over a design area (ft^2). The curve trades density vs area; 1500 ft^2 is the common default for wet systems (adjustable 1500-3000+). Below are the curve's lower-area design densities.",
+    "byHazard": {
+      "light":     { "densityGpmFt2": 0.10, "designAreaFt2": 1500 },
+      "ordinary_1":{ "densityGpmFt2": 0.15, "designAreaFt2": 1500 },
+      "ordinary_2":{ "densityGpmFt2": 0.20, "designAreaFt2": 1500 },
+      "extra_1":   { "densityGpmFt2": 0.30, "designAreaFt2": 2500 },
+      "extra_2":   { "densityGpmFt2": 0.40, "designAreaFt2": 2500 }
+    },
+    "hoseAllowanceGpm": { "citation": "NFPA 13 / NFPA 14 hose stream allowance added at the source", "light": 100, "ordinary": 250, "extra": 500, "verify": true }
+  },
+
+  "coverageSpacing": {
+    "citation": "NFPA 13 standard spray sprinkler spacing/coverage (Ch. 10/11)",
+    "verify": true,
+    "note": "Max protection area per sprinkler (ft^2) + max spacing (ft) for STANDARD-SPRAY upright/pendent, unobstructed/light obstruction construction. Extended-coverage, sidewall, residential, and CMSA/ESFR have their own rules.",
+    "minSpacingFt": 6.0,
+    "minSpacingNote": "Minimum 6 ft between sprinklers to prevent cold-soldering (spray wetting an adjacent head); exceptions with baffles.",
+    "byHazard": {
+      "light":     { "maxAreaFt2": 225, "maxSpacingFt": 15 },
+      "ordinary_1":{ "maxAreaFt2": 130, "maxSpacingFt": 15 },
+      "ordinary_2":{ "maxAreaFt2": 130, "maxSpacingFt": 15 },
+      "extra_1":   { "maxAreaFt2": 100, "maxSpacingFt": 12 },
+      "extra_2":   { "maxAreaFt2": 100, "maxSpacingFt": 12 },
+      "storage":   { "maxAreaFt2": 100, "maxSpacingFt": 12, "verify": true }
+    },
+    "deflectorBelowCeilingIn": { "unobstructed": { "min": 1, "max": 12 }, "note": "Deflector distance below ceiling for standard spray, smooth ceiling; obstructed construction differs.", "verify": true }
+  },
+
+  "pipeSchedule": {
+    "citation": "NFPA 13 schedule method (steel pipe) — permitted for Light & Ordinary hazard within limits; Extra hazard & all calc'd systems use hydraulics.",
+    "verify": true,
+    "note": "Max number of sprinklers served by each pipe size (steel). Use ONLY where the schedule method is permitted; otherwise size by the hydraulic solve.",
+    "light_steel": { "1": 2, "1.25": 3, "1.5": 5, "2": 10, "2.5": 30, "3": 60 },
+    "ordinary_steel": { "1": 2, "1.25": 3, "1.5": 5, "2": 10, "2.5": 20, "3": 40, "3.5": 65, "4": 100, "5": 160, "6": 275, "8": 300 }
+  },
+
+  "fittingEquivalentLengths": {
+    "citation": "NFPA 13 friction-loss fitting equivalent length table (C=120, Schedule 40). Multiply by 0.713 for C=100, 1.16 for C=130, etc. per the standard's C-factor correction.",
+    "verify": true,
+    "unit": "feet of equivalent pipe",
+    "cFactorBasis": 120,
+    "byTypeBySizeIn": {
+      "elbow_90": { "1": 2, "1.25": 3, "1.5": 4, "2": 5, "2.5": 6, "3": 7, "4": 10, "6": 14, "8": 18 },
+      "elbow_45": { "1": 1, "1.25": 1, "1.5": 2, "2": 2, "2.5": 3, "3": 3, "4": 4, "6": 7, "8": 9 },
+      "tee_branch": { "1": 5, "1.25": 6, "1.5": 8, "2": 10, "2.5": 12, "3": 15, "4": 20, "6": 30, "8": 35 },
+      "gate_valve": { "1": 1, "2": 1, "2.5": 1, "3": 1, "4": 2, "6": 3, "8": 4 },
+      "butterfly_valve": { "2": 6, "2.5": 7, "3": 10, "4": 12, "6": 9, "8": 10 },
+      "check_valve_swing": { "2": 5, "2.5": 11, "3": 13, "4": 16, "6": 22, "8": 27 }
+    }
+  },
+
+  "hangerSpacing": {
+    "citation": "NFPA 13 hanger/support max spacing (steel pipe)",
+    "verify": true,
+    "maxSpacingFtBySizeIn": { "1": 12, "1.25": 12, "1.5": 15, "2": 15, "2.5": 15, "3": 15, "4": 15, "6": 15, "8": 15 },
+    "note": "Plus an end-of-line hanger within the allowed distance of the last head; seismic bracing per NFPA 13 Ch. 18 where required."
+  },
+
+  "obstructionRules": {
+    "citation": "NFPA 13 obstruction to sprinkler discharge (standard spray)",
+    "verify": true,
+    "rules": [
+      { "id": "three_times_rule", "name": "Beam / 3× rule", "summary": "A sprinkler must be located away from an obstruction (beam, duct, column) by at least 3× the obstruction's greatest dimension below the deflector (commonly tabulated up to 24 in max), OR the deflector must be raised so the obstruction is above a defined plane.", "verify": true },
+      { "id": "below_obstruction", "name": "Obstruction wider than 4 ft", "summary": "Sprinklers required below obstructions over 4 ft wide (e.g., wide ducts, tables) to cover the shadowed floor.", "verify": true }
+    ]
+  },
+
+  "headTypes": {
+    "citation": "Sprinkler types (K-factor, orientation, response, temperature)",
+    "verify": true,
+    "kFactorsCommon": [
+      { "k": 5.6, "orifice": "1/2 in", "note": "standard" },
+      { "k": 8.0, "orifice": "17/32 in", "note": "common large-orifice" },
+      { "k": 11.2, "orifice": "5/8 in" },
+      { "k": 14.0, "orifice": "ESFR / large drop" },
+      { "k": 25.2, "orifice": "ESFR K25 storage" }
+    ],
+    "temperatureRatings": [
+      { "rating": "ordinary", "fahrenheit": "135-170", "colorCode": "uncolored/black" },
+      { "rating": "intermediate", "fahrenheit": "175-225", "colorCode": "white" },
+      { "rating": "high", "fahrenheit": "250-300", "colorCode": "blue" }
+    ],
+    "note": "Q = K * sqrt(P). Temperature rating selected from max expected ceiling temperature per NFPA 13."
+  },
+
+  "bidAccuracyNotes": {
+    "purpose": "Why this DB tightens the autobid (reduces under/over-bid + change-order risk).",
+    "links": [
+      "Correct hazard -> correct density/area -> correct flowing-head count -> correct demand -> correct pipe sizes (no over-sizing waste / under-sizing rework).",
+      "Correct max coverage/spacing -> correct head COUNT off the plan area (the single biggest takeoff driver).",
+      "Pipe schedule / hydraulic sizing -> correct footage by diameter -> correct steel + fitting + hanger counts in the BOM.",
+      "Fitting equivalent lengths -> correct friction -> correct sizing -> avoids the under-bid that becomes a change order when the AHJ rejects an under-sized main.",
+      "Obstruction + min-spacing rules -> realistic head adds (the heads a estimator forgets -> change orders)."
+    ]
+  }
+}
