@@ -734,7 +734,7 @@ import { analyzeGraphLoops, hardyCross } from '/src/engine/hardy-cross.js';
 // look up the NFPA-13 design density for the hazard, and produce the area demand
 // + per-head required flow. The returned predicate restricts the H-W solve to
 // JUST that design set (the real NFPA basis). Validated in tests/remote-area.test.js.
-import { computeRemoteArea, polygonArea, pointInPolygon, rectRing, getDensityCurve, DENSITY_CURVES } from '/src/engine/remote-area.js';
+import { computeRemoteArea, autoRemoteArea, polygonArea, pointInPolygon, rectRing, getDensityCurve, DENSITY_CURVES } from '/src/engine/remote-area.js';
 // HF-PHASE3-SUPPLIES: named/multiple water supplies (city-water flow-test N^1.85
 // curve, NFPA-20 pump three-point curve, tank) evaluated against the system
 // demand point → the binding (governing) supply + supply-vs-demand graph data.
@@ -1726,10 +1726,15 @@ function renderModel(cadModel, opts) {
   // pressure solve over the just-classified topology and publish on
   // window.__hfPhase3.solve { demandGpm, requiredPsi, worstPath, upsized, ... }.
   // ANALYSIS-ONLY (no mutation — upsizing runs on a clone). Deterministic; fail-soft.
-  // If a remote-area boundary is active, the auto-solve honors it (the design
-  // SUBSET) so a render refresh doesn't silently revert to all-heads-open.
+  // The DEFAULT hydraulic solve basis is the NFPA-13 remote-area DESIGN demand,
+  // not all-heads-open. If the user has NOT drawn a boundary, AUTO-SELECT the
+  // hydraulically most-remote design area (mark it auto-remote) and solve on that
+  // contiguous head subset — yielding a realistic ~300-900 gpm design point. A
+  // user-drawn boundary overrides the auto area; the explicit all-heads-open
+  // worst-case is a separate toggle (worstCaseAllHeads).
   try {
-    const raOpts = (typeof lastRemoteArea !== 'undefined' && lastRemoteArea && lastRemoteArea.predicate)
+    ensureRemoteAreaForModel(cadModel); // sets lastRemoteArea (auto or user-drawn)
+    const raOpts = (!worstCaseAllHeads && lastRemoteArea && lastRemoteArea.predicate)
       ? { flowingHeads: lastRemoteArea.predicate } : undefined;
     runHydraulicSolve(cadModel, raOpts);
   } catch (e) { window.__hydraulicSolveError = String(e && e.message || e); }
@@ -4333,6 +4338,7 @@ window.__hfCoverage = () => lastCoverage; // direct accessor for verification
 // NOT AutoSprink, NOT PE-stamped, NOT AHJ-approved. Verify before permit.
 const DEFAULT_AVAILABLE_PSI = 65; // representative city-water static for demo solve
 let lastHydraulicSolve = null;
+let lastSolveOpts = null; // demand basis of the last solve (for __hfLoops re-run)
 function projectKFactor() {
   // honor an explicit K on heads; the solver falls back to 5.6 per head when absent.
   return undefined;
@@ -4350,6 +4356,9 @@ function runHydraulicSolve(cadModel, opts) {
   // drawn remote-area design set), forward it so the solve runs on JUST that
   // subset — designBasis becomes 'remote-area-subset', the real NFPA basis.
   if (opts && typeof opts.flowingHeads === 'function') solveOpts.flowingHeads = opts.flowingHeads;
+  // Stash the live solve opts so __hfLoops() re-runs the loop balance on the SAME
+  // demand basis (remote-area subset predicate + min head pressure) the headline used.
+  lastSolveOpts = solveOpts;
   // The auto-render path runs a SINGLE base solve (one O(N^2) graph build) so a
   // large model never blocks the render. Iterative upsizing (which re-solves up
   // to maxIterations times) only runs when the caller explicitly opts in
@@ -4404,30 +4413,60 @@ function runHydraulicSolve(cadModel, opts) {
     minNodePressureKey: fin.minNodePressureKey,
     disclaimer: fin.disclaimer,
   };
-  // HARDY-CROSS loop analysis over the SAME built graph. For a pure tree this is
-  // loopCount 0 (nothing to balance); for gridded mains it iterates Σh_f→0. This
-  // is analysis-only and camera-neutral (no scene mutation).
-  try { lastLoopAnalysis = computeLoopAnalysis(cadModel); } catch (_) { lastLoopAnalysis = null; }
+  // HARDY-CROSS loop analysis over the SAME built graph, with the SAME demand
+  // basis as the headline solve (remote-area subset predicate when one is set, K√P
+  // at min operating pressure otherwise). For a pure tree this is loopCount 0
+  // (nothing to balance); for gridded mains it assigns each flowing head's K√P as a
+  // nodal outflow and iterates Σh_f→0 around every loop, flipping
+  // hardyCrossBalanced true. Analysis-only and camera-neutral (no scene mutation).
+  try { lastLoopAnalysis = computeLoopAnalysis(cadModel, solveOpts); } catch (_) { lastLoopAnalysis = null; }
+  // Reflect the REAL loop-balance verdict in the headline solve: a tree is
+  // trivially balanced; a gridded model is balanced once Hardy-Cross converged
+  // (Σh_f→0 around every loop, ΣQ=0 at nodes). network-solve always reports false
+  // (it walks loops as a tree) — the loop balancer is the authority here.
+  if (lastLoopAnalysis) {
+    lastHydraulicSolve.hardyCrossBalanced = lastLoopAnalysis.hardyCrossBalanced === true;
+    lastHydraulicSolve.loopCount = lastLoopAnalysis.loopCount;
+    lastHydraulicSolve.loopMaxResidual = lastLoopAnalysis.maxResidual;
+    lastHydraulicSolve.loopIterations = lastLoopAnalysis.iterations;
+  }
   publishHydraulicSolve();
   return lastHydraulicSolve;
 }
 // Build the network graph and report loop structure (+ Hardy-Cross balance when
 // the model is gridded). Pure; never moves the camera or mutates the model.
 let lastLoopAnalysis = null;
-function computeLoopAnalysis(cadModel) {
+function computeLoopAnalysis(cadModel, solveOpts) {
   if (!cadModel || !Array.isArray(cadModel.solids)) return null;
-  const graph = buildGraph(cadModel, { C: 120 });
-  const a = analyzeGraphLoops(graph);
+  const C = (solveOpts && solveOpts.C) || 120;
+  const graph = buildGraph(cadModel, { C });
+  // Feed the live demand basis into the loop balance: the same flowing-heads
+  // predicate (remote-area design subset) and min operating pressure the headline
+  // solve uses, so the looped balance reflects the NFPA-13 design demand.
+  const a = analyzeGraphLoops(graph, {
+    C,
+    minHeadPressurePsi: (solveOpts && solveOpts.minHeadPressurePsi != null) ? solveOpts.minHeadPressurePsi : 7,
+    kFactor: solveOpts && solveOpts.kFactor,
+    flowingHeads: solveOpts && typeof solveOpts.flowingHeads === 'function' ? solveOpts.flowingHeads : undefined,
+  });
   return {
     // CHUNK contract: { loopCount, maxResidual, iterations, converged }
     loopCount: a.loopCount,
     maxResidual: a.maxResidual,
     iterations: a.iterations,
     converged: a.converged,
-    // richer honest context
+    // CHUNK contract: hardyCrossBalanced flips true once Σh_f→0 around every loop
+    // AND continuity holds at every node (the live looped model is balanced).
+    hardyCrossBalanced: a.hardyCrossBalanced,
+    // richer honest context — converged per-edge flows + demand for the hook
     cyclomatic: a.cyclomatic,
     components: a.components,
     isTree: a.isTree,
+    demandGpm: a.demandGpm,
+    flowingHeads: a.flowingHeads,
+    flows: a.flows,
+    loopResiduals: a.loopResiduals,
+    nodeImbalance: a.nodeImbalance,
     note: a.note,
     disclaimer: a.disclaimer,
   };
@@ -4446,6 +4485,10 @@ function publishHydraulicSolve() {
   // supply-vs-demand graph) and republish the per-node tags (sample P/Q/V).
   try { publishSupplies(); } catch (e) { window.__suppliesError = String(e && e.message || e); }
   try { publishNodeTags(); } catch (e) { window.__nodeTagsError = String(e && e.message || e); }
+  // Publish the (auto or drawn) remote-area design basis + refresh its panel. The
+  // overlay is already rebuilt by the renderModel currently in flight, so pass
+  // render:false to avoid recursive renderModel (publishRemoteArea→render→solve).
+  try { publishRemoteArea({ render: false }); } catch (e) { window.__remoteAreaPubError = String(e && e.message || e); }
   try { publishHydraulicReport(); } catch (e) { window.__reportError = String(e && e.message || e); }
   try { refreshHydraulicPanel(); } catch (_) { /* panel optional */ }
 }
@@ -4464,8 +4507,13 @@ function reportMeta() {
   if (ra) {
     if (ra.hazard) meta.hazard = ra.hazard;
     if (ra.densityGpmFt2 != null) meta.densityGpmFt2 = ra.densityGpmFt2;
-    if (ra.designAreaSqFt != null) meta.designAreaSqFt = ra.designAreaSqFt;
-    else if (ra.areaSqFt != null) meta.designAreaSqFt = ra.areaSqFt;
+    // report the ACTUAL design area used (the drawn/auto rectangle), so the
+    // "over N ft²" line matches the heads that flowed.
+    if (ra.areaSqFt != null) meta.designAreaSqFt = ra.areaSqFt;
+    else if (ra.designAreaSqFt != null) meta.designAreaSqFt = ra.designAreaSqFt;
+    meta.remoteAreaAutoSelected = ra.autoSelected === true;
+    meta.remoteAreaFlowingHeads = ra.flowingHeadCount;
+    meta.remoteAreaDemandGpm = ra.demandGpm;
   }
   return meta;
 }
@@ -4512,10 +4560,19 @@ window.__hfPhase3.fittingLe = window.__hfPhase3.fittingLe || { totalEquivFt: 0, 
 // runs the pure Hardy-Cross balancer on an ARBITRARY {edges, demands} network
 // (used for the textbook golden + future gridded mains). Both analysis-only.
 window.__hfLoops = () => {
-  if (currentCadModel) { lastLoopAnalysis = computeLoopAnalysis(currentCadModel); window.__hfPhase3.loops = lastLoopAnalysis; }
+  if (currentCadModel) { lastLoopAnalysis = computeLoopAnalysis(currentCadModel, lastSolveOpts); window.__hfPhase3.loops = lastLoopAnalysis; }
   return lastLoopAnalysis;
 };
 window.__hfHardyCross = (spec, opts) => hardyCross(spec || { edges: [] }, opts || {});
+// Run the loop balance on an ARBITRARY cadModel (e.g. a gridded-mains fixture) WITHOUT
+// touching the live scene — pure analysis, camera-neutral. Proves the live loop solver
+// converges on looped topology even while the generated layout is a tree.
+window.__hfLoopsModel = (model, opts) => computeLoopAnalysis(model, opts || {});
+// CHUNK contract: expose window.__hf3 as the live Phase-3 hydraulics surface. It
+// is the SAME object as __hfPhase3 (alias, not a copy) so __hf3.loops ->
+// { loopCount, converged, maxResidual, iterations, flows, hardyCrossBalanced, ... }
+// always reflects the latest published loop balance.
+window.__hf3 = window.__hfPhase3;
 // Direct accessor + re-run hook (accepts {availablePsi,minHeadPressurePsi,C,kFactor}).
 window.__hfHydraulics = (opts) => {
   if (currentCadModel && opts) return runHydraulicSolve(currentCadModel, opts);
@@ -5030,34 +5087,87 @@ function refreshCoverageLegend() {
 // HONESTY: density/area are the public NFPA-13 design curves — an ENGINEERING AID,
 // NOT AHJ/PE-stamped. The AHJ/PE picks the governing curve + hose + safety factor.
 let lastRemoteArea = null;          // computed result
-let remoteAreaBoundary = null;      // the drawn boundary (ring [{x,y}] or rect)
+let remoteAreaBoundary = null;      // the USER-drawn boundary (ring [{x,y}] or rect)
 let remoteAreaOverlayOn = true;     // show the boundary + shaded heads
 let remoteAreaDrawPts = [];         // in-progress polygon click points (plan x/y)
 let remoteAreaDrawMode = null;      // 'rect' | 'polygon' while drawing, else null
+// DEFAULT-BASIS state: when true, the solve flows ALL heads (worst-case envelope)
+// instead of the NFPA-13 remote-area design demand. Default false (remote-area is
+// the DEFAULT basis). Toggled by the "All-heads-open (worst case)" control.
+let worstCaseAllHeads = false;
+// The auto-selected remote area (when the user has NOT drawn one). Recomputed from
+// the model whenever the model changes; marked autoSelected:true so the UI/report
+// can label it "auto-remote". Cached boundary so we don't re-pick every render.
+let autoRemoteBoundary = null;      // {x0,y0,x1,y1} auto-picked design area
+let autoRemoteMeta = null;          // { seed, designAreaSqFt, hazard, ... }
+let autoRemoteForModel = null;      // identity of the model the auto-area was picked for
+
+// Ensure lastRemoteArea reflects the right boundary BEFORE the solve runs:
+//  • a USER-drawn boundary (remoteAreaBoundary) always wins, autoSelected:false;
+//  • otherwise AUTO-SELECT the most-remote NFPA-13 design area, autoSelected:true;
+//  • in worst-case mode we still compute the area (for display) but the solve
+//    block flows all heads.
+// PURE w.r.t. the scene — computes numbers + the predicate only. NEVER renders,
+// NEVER moves the camera (GUARD#1). Called from inside renderModel's solve block.
+function ensureRemoteAreaForModel(cadModel) {
+  if (!cadModel || !Array.isArray(cadModel.solids)) { lastRemoteArea = null; return null; }
+  const hazard = (cadModel.sizing && cadModel.sizing.hazard) || 'ordinary';
+  if (remoteAreaBoundary) {
+    // user-drawn area governs
+    lastRemoteArea = computeRemoteArea(cadModel, remoteAreaBoundary, { hazard, autoSelected: false });
+    return lastRemoteArea;
+  }
+  // AUTO: pick (and cache) the most-remote design-area rectangle for this model.
+  if (autoRemoteForModel !== cadModel || !autoRemoteBoundary) {
+    try {
+      const auto = autoRemoteArea(cadModel, { hazard });
+      autoRemoteBoundary = auto.boundary;
+      autoRemoteMeta = auto;
+      autoRemoteForModel = cadModel;
+    } catch (e) { window.__autoRemoteAreaError = String(e && e.message || e); autoRemoteBoundary = null; autoRemoteMeta = null; }
+  }
+  if (autoRemoteBoundary) {
+    lastRemoteArea = computeRemoteArea(cadModel, autoRemoteBoundary, { hazard, autoSelected: true });
+    if (autoRemoteMeta) lastRemoteArea.autoSeed = autoRemoteMeta.seed;
+  } else {
+    lastRemoteArea = null;
+  }
+  return lastRemoteArea;
+}
 
 // Recompute the remote-area demand from the current boundary + model, then (if a
 // boundary is set) re-run the H-W solve restricted to the flowing-head subset.
 function computeRemoteAreaLive(opts) {
-  if (!currentCadModel || !remoteAreaBoundary) { lastRemoteArea = null; publishRemoteArea(); return null; }
+  if (!currentCadModel) { lastRemoteArea = null; publishRemoteArea(); return null; }
   const o = opts || {};
   const hazard = o.hazard || (currentCadModel.sizing && currentCadModel.sizing.hazard) || 'ordinary';
-  lastRemoteArea = computeRemoteArea(currentCadModel, remoteAreaBoundary, {
-    hazard,
-    densityGpmFt2: o.densityGpmFt2,
-  });
+  if (remoteAreaBoundary) {
+    // USER-drawn boundary governs (override the auto area), autoSelected:false.
+    lastRemoteArea = computeRemoteArea(currentCadModel, remoteAreaBoundary, {
+      hazard,
+      densityGpmFt2: o.densityGpmFt2,
+      autoSelected: false,
+    });
+  } else {
+    // No drawn boundary — AUTO-SELECT the most-remote design area (the DEFAULT
+    // NFPA-13 basis). ensureRemoteAreaForModel sets lastRemoteArea (autoSelected).
+    ensureRemoteAreaForModel(currentCadModel);
+    if (!lastRemoteArea) { publishRemoteArea(); return null; }
+  }
   // Tie into the H-W solve as the demand SET: re-run the live solver with the
-  // remote-area predicate so __hfPhase3.solve reflects the design subset.
+  // remote-area predicate so __hfPhase3.solve reflects the design subset (unless
+  // the user has explicitly switched to the all-heads-open worst-case basis).
   try {
     runHydraulicSolve(currentCadModel, {
       availablePsi: (o.availablePsi != null) ? o.availablePsi : DEFAULT_AVAILABLE_PSI,
       minHeadPressurePsi: o.minHeadPressurePsi,
-      flowingHeads: lastRemoteArea.predicate,
+      flowingHeads: worstCaseAllHeads ? undefined : lastRemoteArea.predicate,
     });
   } catch (e) { window.__remoteAreaSolveError = String(e && e.message || e); }
   publishRemoteArea();
   return lastRemoteArea;
 }
-function publishRemoteArea() {
+function publishRemoteArea(opts) {
   window.__hfPhase3 = window.__hfPhase3 || {};
   // CHUNK contract: areaSqFt, flowingHeads, densityGpmFt2, demandGpm (+ richer).
   window.__hfPhase3.remoteArea = lastRemoteArea ? {
@@ -5074,9 +5184,20 @@ function publishRemoteArea() {
     designAreaSqFt: lastRemoteArea.designAreaSqFt,
     boundaryKind: lastRemoteArea.boundaryKind,
     vertices: lastRemoteArea.vertices,
+    // auto-selected flag + seed (the most-remote head the area was grown from),
+    // so the UI/report can show "auto-remote" vs a user-drawn area.
+    autoSelected: lastRemoteArea.autoSelected === true,
+    autoSeed: lastRemoteArea.autoSeed || null,
+    worstCaseAllHeads,
     disclaimer: lastRemoteArea.disclaimer,
   } : null;
-  try { renderModel(currentCadModel, { preserveView: true }); } catch (_) { /* overlay refresh */ }
+  // `render` defaults true (user-action path needs the overlay rebuilt). The
+  // render-path caller (publishHydraulicSolve) passes render:false because the
+  // overlay is already rebuilt by the renderModel currently in flight — calling
+  // renderModel again here would recurse infinitely.
+  if (!opts || opts.render !== false) {
+    try { renderModel(currentCadModel, { preserveView: true }); } catch (_) { /* overlay refresh */ }
+  }
   try { refreshRemoteAreaPanel(); } catch (_) { /* panel optional */ }
 }
 window.__hfPhase3 = window.__hfPhase3 || {};
@@ -5088,12 +5209,27 @@ window.__hfRemoteArea = (boundary, opts) => {
   if (boundary !== undefined) remoteAreaBoundary = boundary;
   return computeRemoteAreaLive(opts || {});
 };
-// Clear the drawn boundary (and the subset solve — reverts to all-heads-open).
+// Clear the USER-drawn boundary. The solve reverts to the AUTO-selected most-
+// remote design area (the DEFAULT NFPA-13 basis), NOT all-heads-open.
 window.__hfRemoteAreaClear = () => {
-  remoteAreaBoundary = null; remoteAreaDrawPts = []; remoteAreaDrawMode = null; lastRemoteArea = null;
-  publishRemoteArea();
-  try { if (currentCadModel) runHydraulicSolve(currentCadModel, {}); } catch (_) { /* base solve */ }
-  return null;
+  remoteAreaBoundary = null; remoteAreaDrawPts = []; remoteAreaDrawMode = null;
+  autoRemoteForModel = null; autoRemoteBoundary = null; // force a fresh auto-pick
+  // recompute the auto remote area + re-solve on it (camera-neutral)
+  try { if (currentCadModel) computeRemoteAreaLive({}); } catch (_) { lastRemoteArea = null; publishRemoteArea(); }
+  return lastRemoteArea;
+};
+// Toggle the DEFAULT solve basis: false = NFPA-13 remote-area design demand
+// (default), true = all-heads-open worst-case envelope. Re-solves + republishes.
+window.__hfWorstCaseAllHeads = (on) => {
+  worstCaseAllHeads = (on === undefined) ? !worstCaseAllHeads : !!on;
+  try {
+    if (currentCadModel) {
+      ensureRemoteAreaForModel(currentCadModel);
+      runHydraulicSolve(currentCadModel, (!worstCaseAllHeads && lastRemoteArea && lastRemoteArea.predicate) ? { flowingHeads: lastRemoteArea.predicate } : {});
+      publishRemoteArea();
+    }
+  } catch (e) { window.__worstCaseError = String(e && e.message || e); }
+  return worstCaseAllHeads;
 };
 // Snap the boundary to the hazard design area centered on the model centroid (a
 // quick way to drop a correctly-sized NFPA design area for the live solve).
@@ -5179,13 +5315,20 @@ function renderRemoteAreaOverlay() {
 function refreshRemoteAreaPanel() {
   const el = $('remoteArea'); if (!el) return;
   const ra = lastRemoteArea;
-  if (!ra) { el.innerHTML = '<span class="muted" style="font-size:12px">Draw a remote-area boundary to compute the design demand.</span>'; return; }
+  if (!ra) { el.innerHTML = '<span class="muted" style="font-size:12px">No model — Generate a layout to auto-select the most-remote design area.</span>'; return; }
+  const basisTag = worstCaseAllHeads
+    ? '<span style="color:#f59e0b;font-weight:700">all-heads-open (worst case)</span>'
+    : (ra.autoSelected ? '<span style="color:#22c55e;font-weight:700">auto-remote</span>' : '<span style="color:#38bdf8;font-weight:700">drawn area</span>');
+  const seed = ra.autoSeed ? ` &nbsp;<span class="muted" style="font-size:10px">most-remote head @(${ra.autoSeed.x}, ${ra.autoSeed.y})${ra.autoSeed.distFt != null ? ', ' + ra.autoSeed.distFt + ' ft path' : ''}</span>` : '';
+  // The "design basis" line the CHUNK requires: Design area · heads · gpm · basis.
   el.innerHTML =
     `<div style="font-size:12px;line-height:1.6">`
+    + `<div style="background:#0b3a4a;border:1px solid #155e75;border-radius:6px;padding:5px 8px;margin-bottom:6px">`
+    + `<b>Design basis:</b> ${ra.areaSqFt} ft² · ${ra.flowingHeadCount} heads · ${ra.demandGpm} gpm · ${basisTag}${seed}</div>`
     + `<b>Area</b> ${ra.areaSqFt} ft² &nbsp; <b>Density</b> ${ra.densityGpmFt2} gpm/ft² &nbsp; <span class="muted">(${ra.hazardLabel})</span>`
     + `<br><b>Flowing heads</b> ${ra.flowingHeadCount}/${ra.totalHeadCount} &nbsp; <b>Per-head min</b> ${ra.requiredHeadFlowGpm} gpm`
     + `<br><b style="color:#38bdf8">Demand</b> ${ra.demandGpm} gpm (Σ head flow) &nbsp; <span class="muted">area-density ${ra.areaDemandGpm} gpm</span>`
-    + `<br><span class="muted" style="font-size:10px">NFPA-13 design area for ${ra.hazardLabel}: ${ra.designAreaSqFt} ft². Boundary: ${ra.boundaryKind} (${ra.vertices} pts).</span>`
+    + `<br><span class="muted" style="font-size:10px">NFPA-13 design area for ${ra.hazardLabel}: ${ra.designAreaSqFt} ft². Boundary: ${ra.boundaryKind} (${ra.vertices} pts)${ra.autoSelected ? ' · auto-selected most-remote (greatest supply path resistance)' : ''}.</span>`
     + `<br><span class="muted" style="font-size:10px">ENGINEERING AID — NFPA-13 density/area, NOT AHJ/PE-stamped. AHJ/PE selects governing curve + hose + safety factor. Verify before permit.</span>`
     + `</div>`;
 }

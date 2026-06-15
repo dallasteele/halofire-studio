@@ -227,6 +227,90 @@ describe('analyzeGraphLoops over a network-solve graph', () => {
   });
 });
 
+// ===========================================================================
+// 🔬 GOLDEN/LIVE: analyzeGraphLoops now WIRES the live demand into Hardy-Cross —
+// it derives each flowing head's Q=K√P as a nodal outflow (supply balances) and
+// iterates the looped graph to Σh_f→0. These tests prove the live loop CONVERGES
+// (maxResidual small) and flips hardyCrossBalanced true — the gap this chunk closes.
+// ===========================================================================
+describe('analyzeGraphLoops — live looped model CONVERGES (Hardy-Cross wired in)', () => {
+  // A square loop fed at one corner (supply, low Z) with a head drawing at the
+  // OPPOSITE corner. Flow splits two ways around the loop; Hardy-Cross balances it.
+  //   supply S at (0,0,0); the loop mains sit at Z=0; head H at the far corner.
+  // Square loop of 4 mains at Z=10 + a riser DROP from the supply (Z=0, the network
+  // floor → source) up to one loop corner. The drop is a real distinct edge (not a
+  // degenerate self-loop), so the graph has exactly ONE fundamental loop (the
+  // square). Head draws at the diagonally opposite corner.
+  const grid = (kFactor = 5.6) => ({
+    solids: [
+      // riser drop: supply S(z=0) -> loop corner A(z=10)
+      { kind: 'pipe', name: 'riser', from: [0, 0, 0], to: [0, 0, 10], diameterIn: 6 },
+      // square loop in the mains (4 edges) at z=10
+      { kind: 'pipe', name: 'm1', from: [0, 0, 10], to: [40, 0, 10], diameterIn: 4 },
+      { kind: 'pipe', name: 'm2', from: [40, 0, 10], to: [40, 40, 10], diameterIn: 4 },
+      { kind: 'pipe', name: 'm3', from: [40, 40, 10], to: [0, 40, 10], diameterIn: 4 },
+      { kind: 'pipe', name: 'm4', from: [0, 40, 10], to: [0, 0, 10], diameterIn: 4 },
+      // a head drawing at the far corner of the loop
+      { kind: 'head', name: 'h-far', position: [40, 40, 10], kFactor },
+    ],
+  });
+
+  it('balances the live loop: converged true, maxResidual tiny, hardyCrossBalanced true', () => {
+    const graph = buildGraph(grid());
+    const a = analyzeGraphLoops(graph, { tol: 1e-9, maxIterations: 500 });
+    expect(a.loopCount).toBe(1);                // exactly the square loop
+    expect(a.isTree).toBe(false);
+    expect(a.converged).toBe(true);
+    expect(a.maxResidual).toBeLessThan(1e-6);   // Σh_f around every loop ~ 0
+    expect(a.nodeImbalance).toBeLessThan(1e-6); // ΣQ = 0 at every node
+    expect(a.hardyCrossBalanced).toBe(true);
+  });
+
+  it('assigns the head K√P as the live demand (Q = K·√7 at min operating pressure)', () => {
+    const K = 5.6;
+    const graph = buildGraph(grid(K));
+    const a = analyzeGraphLoops(graph, { minHeadPressurePsi: 7 });
+    expect(a.flowingHeads).toBe(1);
+    // one head -> total demand = K·√7
+    expect(a.demandGpm).toBeCloseTo(K * Math.sqrt(7), 3);
+  });
+
+  it('per-edge converged flows are returned and split around the symmetric loop', () => {
+    const graph = buildGraph(grid());
+    const a = analyzeGraphLoops(graph, { tol: 1e-10, maxIterations: 800 });
+    expect(Array.isArray(a.flows)).toBe(true);
+    expect(a.flows.length).toBe(5); // riser + 4 loop mains
+    // The riser carries the FULL demand (14.816 gpm = K√7); the square loop is
+    // symmetric about the supply-corner→head-corner diagonal, so the two loop
+    // paths each carry HALF (7.408 gpm). Hand-verified.
+    const demand = 5.6 * Math.sqrt(7);
+    const riser = a.flows.find((f) => Math.abs(Math.abs(f.Q) - demand) < 1e-3);
+    expect(riser).toBeDefined();
+    const loopMains = a.flows.filter((f) => f !== riser);
+    expect(loopMains.length).toBe(4);
+    for (const f of loopMains) {
+      expect(Math.abs(f.Q)).toBeCloseTo(demand / 2, 3); // symmetric 50/50 split
+    }
+  });
+
+  it('a pure tree model reports loopCount 0 AND hardyCrossBalanced true (trivially)', () => {
+    const solids = [];
+    let x = 0;
+    for (let i = 0; i < 3; i += 1) {
+      const x2 = x + 8;
+      solids.push({ kind: 'pipe', name: `seg-${i}`, from: [x, 0, 0], to: [x2, 0, 0], diameterIn: 1.049 });
+      solids.push({ kind: 'head', name: `h-${i}`, position: [x2, 0, 0], kFactor: 5.6 });
+      x = x2;
+    }
+    const a = analyzeGraphLoops(buildGraph({ solids }));
+    expect(a.loopCount).toBe(0);
+    expect(a.isTree).toBe(true);
+    expect(a.converged).toBe(true);
+    expect(a.hardyCrossBalanced).toBe(true);
+    expect(a.maxResidual).toBe(0);
+  });
+});
+
 describe('honesty disclaimer', () => {
   it('every result carries the ENGINEERING AID disclaimer (not PE/AHJ stamped)', () => {
     const res = hardyCross({ edges: TWO_LOOP_R.map((e, i) => ({ ...e, Q0: [50, 50, 50, 50, 0][i] })), demands: DEMANDS }, {});

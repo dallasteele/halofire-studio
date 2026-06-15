@@ -33,6 +33,7 @@
 // safety factor for the actual occupancy. NOT PE-stamped. Verify before permit.
 
 import { getHazardRule } from './sprinkler-layout.js';
+import { buildGraph } from './network-solve.js';
 
 // ---------------------------------------------------------------------------
 // NFPA-13 density/area design curves (gpm/ft^2 @ design area in ft^2).
@@ -267,6 +268,9 @@ export function computeRemoteArea(model, boundary, opts = {}) {
     designAreaSqFt: curve.designAreaSqFt,
     boundaryKind: isRect ? 'rectangle' : 'polygon',
     vertices: ring.length,
+    // true when this area was auto-selected (most-remote, NFPA-13 default) rather
+    // than drawn by the user — surfaced in the UI/report as "auto-remote".
+    autoSelected: opts.autoSelected === true,
     predicate,
     disclaimer: 'ENGINEERING AID — NFPA-13 density/area design demand, NOT AHJ/PE-stamped. AHJ/PE selects the governing curve, hose allowance, and safety factor. Verify before permit.',
   };
@@ -294,4 +298,178 @@ export function solveRemoteArea(model, boundary, solveFn, opts = {}) {
   };
   const solve = typeof solveFn === 'function' ? solveFn(model, solveOpts) : null;
   return { remoteArea, solve };
+}
+
+// ---------------------------------------------------------------------------
+// AUTO remote-area selection — the NFPA-13 most-hydraulically-remote design area
+// when the user has NOT drawn a boundary. This is what makes the DEFAULT solve
+// basis the code design demand instead of the all-heads-open worst-case envelope.
+//
+// NFPA-13 §19/§23: the design area is a CONTIGUOUS rectangle of the hazard's
+// design area (e.g. 1500 ft² ordinary, 2500 ft² extra) located over the
+// hydraulically MOST-REMOTE heads — the heads with the greatest path resistance
+// (greatest pipe-length distance) from the supply. AutoSPRINK & hand calcs both
+// build a roughly rectangular contiguous block (typically ~1.2× the branch-line
+// spacing on the long axis) at the far end of the most-remote branch lines.
+//
+// Strategy (pure, deterministic, label-independent):
+//   1. Build the real pipe graph and BFS from the supply to get each head's
+//      tree-distance (= path resistance) from the source.
+//   2. Pick the single most-remote head as the SEED (greatest distance).
+//   3. Grow a CONTIGUOUS axis-aligned rectangle of the hazard design area
+//      around the seed, biased toward the far (high-distance) side, capturing a
+//      compact block of the most-remote heads. The rectangle dimensions follow
+//      NFPA practice: long axis = 1.2·√(designArea) along the branch-line run.
+//   4. Return the boundary rect + autoSelected:true so computeRemoteArea() can
+//      derive the per-head design flow on exactly that contiguous subset.
+//
+// HONESTY: this is an automatic, geometry-derived selection of the remote area
+// for a DEFAULT realistic design point — an ENGINEERING AID, NOT a PE/AHJ
+// determination of the governing area. The user can always draw an explicit
+// boundary (which overrides this) or toggle all-heads-open worst-case.
+// ---------------------------------------------------------------------------
+
+/** Head tree-distance (path resistance) from the supply over the real graph. */
+export function headDistancesFromSupply(model) {
+  const graph = buildGraph(model, {});
+  const { nodes, edges } = graph;
+  // find supply node = lowest-Z node with highest edge degree (mirrors solver)
+  let minZ = Infinity;
+  for (const n of nodes.values()) minZ = Math.min(minZ, n.z);
+  let source = null;
+  for (const n of nodes.values()) {
+    if (Math.abs(n.z - minZ) <= 0.05) {
+      if (!source || n.edges.length > source.edges.length) source = n;
+    }
+  }
+  const dist = new Map();
+  if (source) {
+    dist.set(source.key, 0);
+    const queue = [source.key];
+    const visited = new Set([source.key]);
+    while (queue.length) {
+      const nk = queue.shift();
+      const node = nodes.get(nk);
+      for (const ei of node.edges) {
+        const e = edges[ei];
+        const other = e.a === nk ? e.b : e.a;
+        if (other === nk || visited.has(other)) continue;
+        visited.add(other);
+        dist.set(other, (dist.get(nk) || 0) + e.length);
+        queue.push(other);
+      }
+    }
+  }
+  // attach distance to each head (by its node coincidence)
+  const q = 0.05;
+  const keyOf = (p) => `${Math.round(p[0] / q)}|${Math.round(p[1] / q)}|${Math.round(p[2] / q)}`;
+  const heads = [];
+  (Array.isArray(model && model.solids) ? model.solids : []).forEach((s, i) => {
+    if (!s || s.kind !== 'head' || !Array.isArray(s.position)) return;
+    const x = Number(s.position[0]); const y = Number(s.position[1]); const z = Number(s.position[2]) || 0;
+    if (!Number.isFinite(x) || !Number.isFinite(y)) return;
+    const d = dist.get(keyOf([x, y, z]));
+    heads.push({ x, y, z, _idx: i, distFt: Number.isFinite(d) ? d : null });
+  });
+  return { heads, hasSource: !!source };
+}
+
+/**
+ * Auto-select the NFPA-13 most-remote design-area boundary (a contiguous rect).
+ *
+ * @param {object} model cadModel
+ * @param {object} [opts]
+ *   @param {string} [opts.hazard]  hazard class (else model.sizing.hazard)
+ *   @param {number} [opts.designAreaSqFt]  override the hazard design area
+ * @returns {{ boundary:{x0,y0,x1,y1}|null, autoSelected:boolean,
+ *   seed:object|null, designAreaSqFt:number, hazard:string,
+ *   flowingHeadCount:number, reason:string }}
+ */
+export function autoRemoteArea(model, opts = {}) {
+  const hazardKey = String(opts.hazard || (model && model.sizing && model.sizing.hazard) || DEFAULT_HAZARD).toLowerCase();
+  const curve = getDensityCurve(hazardKey);
+  const designAreaSqFt = Number(opts.designAreaSqFt) > 0 ? Number(opts.designAreaSqFt) : curve.designAreaSqFt;
+
+  const { heads, hasSource } = headDistancesFromSupply(model);
+  if (!heads.length) {
+    return { boundary: null, autoSelected: false, seed: null, designAreaSqFt, hazard: hazardKey, flowingHeadCount: 0, reason: 'no heads in model' };
+  }
+
+  // SEED = the most-remote head (greatest path resistance). Fall back to the head
+  // farthest from the head-cloud centroid if the graph has no source (degenerate).
+  let seed = null;
+  const haveDist = heads.some((h) => h.distFt != null);
+  if (haveDist) {
+    for (const h of heads) {
+      if (h.distFt == null) continue;
+      if (!seed || h.distFt > seed.distFt) seed = h;
+    }
+  } else {
+    const cx = heads.reduce((a, h) => a + h.x, 0) / heads.length;
+    const cy = heads.reduce((a, h) => a + h.y, 0) / heads.length;
+    for (const h of heads) {
+      const d = Math.hypot(h.x - cx, h.y - cy);
+      if (!seed || d > (seed._fallbackD || -1)) { seed = h; seed._fallbackD = d; }
+    }
+  }
+
+  // Rectangle dimensions: NFPA practice puts the long axis (1.2·√area) along the
+  // branch-line direction. We don't always know branch orientation, so size a
+  // rectangle with the conventional 1.2 long / (area/long) short aspect and
+  // align the long axis to the model's wider head-extent axis (the run direction).
+  const longSide = 1.2 * Math.sqrt(designAreaSqFt);
+  const shortSide = designAreaSqFt / longSide;
+  const xs = heads.map((h) => h.x); const ys = heads.map((h) => h.y);
+  const spanX = Math.max(...xs) - Math.min(...xs);
+  const spanY = Math.max(...ys) - Math.min(...ys);
+  // long axis follows the wider span (branch lines usually run the long way)
+  const longIsX = spanX >= spanY;
+  const halfLong = longSide / 2;
+  const halfShort = shortSide / 2;
+  const w = longIsX ? halfLong : halfShort;   // half-width  (x)
+  const h2 = longIsX ? halfShort : halfLong;  // half-height (y)
+
+  // Center the box on the most-remote CONTIGUOUS block: start at the seed, then
+  // shift the center toward the mean of the design-area's worth of nearest
+  // most-remote heads so the box sits on a real cluster (contiguous), not half
+  // off the edge of the plan. Take the N nearest heads to the seed where N ≈
+  // designArea / per-head footprint, and center on their centroid (clamped so the
+  // seed stays inside the box — the most-remote head MUST be in the design area).
+  let perHeadFt2 = 130;
+  try { perHeadFt2 = getHazardRule(hazardKey).maxAreaSqFt; } catch (_) { /* default */ }
+  const targetCount = Math.max(1, Math.round(designAreaSqFt / perHeadFt2));
+  const near = heads
+    .map((hd) => ({ hd, d: Math.hypot(hd.x - seed.x, hd.y - seed.y) }))
+    .sort((a, b) => a.d - b.d)
+    .slice(0, targetCount)
+    .map((o) => o.hd);
+  let ccx = near.reduce((a, hd) => a + hd.x, 0) / near.length;
+  let ccy = near.reduce((a, hd) => a + hd.y, 0) / near.length;
+  // clamp center so the seed (most-remote head) remains inside the rectangle
+  ccx = Math.min(seed.x + w, Math.max(seed.x - w, ccx));
+  ccy = Math.min(seed.y + h2, Math.max(seed.y - h2, ccy));
+
+  const boundary = { x0: ccx - w, y0: ccy - h2, x1: ccx + w, y1: ccy + h2 };
+
+  // count heads inside (so the caller can confirm a real contiguous block landed)
+  const ring = rectRing(boundary);
+  let inside = 0;
+  for (const hd of heads) { if (pointInPolygon({ x: hd.x, y: hd.y }, ring)) inside += 1; }
+
+  return {
+    boundary,
+    autoSelected: true,
+    seed: { x: round(seed.x), y: round(seed.y), z: round(seed.z), _idx: seed._idx, distFt: seed.distFt != null ? round(seed.distFt) : null },
+    designAreaSqFt,
+    hazard: hazardKey,
+    hazardLabel: curve.label,
+    densityGpmFt2: curve.densityGpmFt2,
+    flowingHeadCount: inside,
+    longSideFt: round(longSide),
+    shortSideFt: round(shortSide),
+    basedOnPathResistance: haveDist,
+    reason: haveDist
+      ? 'most-remote head by supply path-resistance; contiguous hazard design-area rectangle'
+      : 'no graph source — fell back to farthest-from-centroid seed',
+  };
 }

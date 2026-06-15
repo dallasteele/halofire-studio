@@ -442,21 +442,86 @@ function seedInitialFlows(edges, nodeIds, demands) {
 // and report loop structure + a Hardy-Cross balance over those loops.
 // ---------------------------------------------------------------------------
 
+const DEFAULT_MIN_HEAD_PRESSURE_PSI = 7;   // NFPA-13 min operating pressure (= network-solve)
+const DEFAULT_K_FACTOR = 5.6;              // standard K5.6 spray head (= network-solve)
+
+/** K-factor head discharge Q = K·√P (inlined to keep hardy-cross self-contained). */
+function kFlow(k, psi) {
+  const kk = Number(k) > 0 ? Number(k) : DEFAULT_K_FACTOR;
+  const p = Number(psi);
+  return p > 0 ? kk * Math.sqrt(p) : 0;
+}
+
+/**
+ * Pick the supply/source node key of a built graph: the lowest-Z node (network
+ * floor = riser base) and, among ties, the highest edge degree (the manifold).
+ * Mirrors network-solve.findSourceNode so the loop balance is rooted at the SAME
+ * supply the tree solve uses.
+ */
+function findGraphSource(graph) {
+  let minZ = Infinity;
+  for (const n of graph.nodes.values()) minZ = Math.min(minZ, Number(n.z) || 0);
+  let source = null;
+  for (const n of graph.nodes.values()) {
+    if (Math.abs((Number(n.z) || 0) - minZ) <= NODE_TOL_FT) {
+      if (!source || n.edges.length > source.edges.length) source = n;
+    }
+  }
+  return source;
+}
+
+/**
+ * Derive the NODAL OUTFLOW demands for a Hardy-Cross balance from the live graph:
+ * every flowing head discharges Q = K·√P at the NFPA-13 minimum operating pressure
+ * (the balanced-demand basis network-solve uses for the remote-area hand calc), so
+ * its node draws that gpm OUT of the network; the supply node carries the balancing
+ * NEGATIVE total so ΣQ over all nodes is exactly 0 (required for Hardy-Cross).
+ *
+ * @param {{nodes:Map}} graph
+ * @param {string} sourceKey supply node key (the balancing negative)
+ * @param {object} opts { minHeadPressurePsi?, kFactor?, flowingHeads?(solid,head)->bool }
+ * @returns {{demands:Object<string,number>, totalDemand:number, flowingHeads:number}}
+ */
+function graphNodalDemands(graph, sourceKey, opts = {}) {
+  const minHead = opts.minHeadPressurePsi != null ? Number(opts.minHeadPressurePsi) : DEFAULT_MIN_HEAD_PRESSURE_PSI;
+  const isFlowing = typeof opts.flowingHeads === 'function' ? opts.flowingHeads : () => true;
+  const demands = {};
+  for (const id of graph.nodes.keys()) demands[id] = 0;
+  let total = 0;
+  let flowingHeads = 0;
+  for (const [nk, node] of graph.nodes) {
+    let q = 0;
+    for (const h of (node.heads || [])) {
+      if (!isFlowing(h.solid, h)) continue;
+      const k = Number(h.kFactor) > 0 ? Number(h.kFactor) : (opts.kFactor > 0 ? opts.kFactor : DEFAULT_K_FACTOR);
+      const hq = kFlow(k, minHead);
+      if (hq > 0) { q += hq; flowingHeads += 1; }
+    }
+    if (q > 0) { demands[nk] = (demands[nk] || 0) + q; total += q; }
+  }
+  // Supply carries the balancing negative so ΣQ = 0 exactly.
+  if (sourceKey != null && demands[sourceKey] != null) demands[sourceKey] -= total;
+  else if (sourceKey != null) demands[sourceKey] = -total;
+  return { demands, totalDemand: total, flowingHeads };
+}
+
 /**
  * Analyze the loop structure of a network-solve graph ({nodes, edges}) and,
- * when there ARE loops, run Hardy-Cross over them. For a pure tree this honestly
- * returns loopCount 0 with converged:true (nothing to balance) — the model is a
- * tree, said so plainly.
+ * when there ARE loops, ACTUALLY run Hardy-Cross over the live demand: detect the
+ * fundamental loops in the real model graph, assign each flowing head's Q=K√P as a
+ * nodal outflow (the supply node balances), seed a continuity-satisfying flow on
+ * the spanning tree, then iterate ΔQ_k = −Σh_f / (n·Σ|h_f|/|Q|) per loop until
+ * Σh_f→0 around every loop (converged) with ΣQ=0 held at every node by construction.
+ * `hardyCrossBalanced` flips true once the worst loop residual is below tolerance.
  *
- * NOTE: a generated sprinkler tree has no loops, so this reports loopCount 0 on
- * the live model. The solver's correctness is proven by the textbook golden test,
- * not by the (loopless) live model. When gridded mains land, the same solver
- * balances them with no code change.
+ * For a pure tree this honestly returns loopCount 0 with converged:true and
+ * hardyCrossBalanced:true (nothing to balance — the model is a tree, said plainly).
  *
  * @param {{nodes:Map, edges:Array}} graph from network-solve.buildGraph
- * @param {object} [opts]
- * @returns {{loopCount, maxResidual, iterations, converged, cyclomatic,
- *   components, ...}}
+ * @param {object} [opts] { tol, maxIterations, C, minHeadPressurePsi, kFactor,
+ *   flowingHeads(solid,head)->bool }
+ * @returns {{loopCount, maxResidual, iterations, converged, hardyCrossBalanced,
+ *   cyclomatic, components, isTree, demandGpm, flows, loopResiduals, nodeImbalance, ...}}
  */
 export function analyzeGraphLoops(graph, opts = {}) {
   const edgeList = (graph && Array.isArray(graph.edges)) ? graph.edges : [];
@@ -474,25 +539,60 @@ export function analyzeGraphLoops(graph, opts = {}) {
       maxResidual: 0,
       iterations: 0,
       converged: true,
+      hardyCrossBalanced: true,   // a tree is trivially balanced (no loop residual)
       isTree: cyclomatic === 0,
+      demandGpm: 0,
+      flowingHeads: 0,
+      flows: [],
+      loopResiduals: [],
+      nodeImbalance: 0,
       note: cyclomatic === 0
         ? 'pure TREE topology (no loops) — nothing for Hardy-Cross to balance; loopCount 0 reported honestly.'
         : 'no fundamental loops resolved.',
       disclaimer: DISCLAIMER,
     };
   }
-  // There are loops — but a forward-demand balance needs nodal demands, which the
-  // live tree model doesn't carry as a grid. We still report loop structure; a
-  // demand-driven balance would be wired when gridded mains exist.
+
+  // --- There ARE loops. Wire the LIVE demand into Hardy-Cross. ---
+  // 1. Supply node = the same source network-solve roots at (lowest-Z manifold).
+  const source = (graph && graph.nodes) ? findGraphSource(graph) : null;
+  const sourceKey = source ? source.key : nodeIds[0];
+  // 2. Each flowing head draws Q=K√P at min operating pressure; supply balances.
+  const { demands, totalDemand, flowingHeads } = graphNodalDemands(graph, sourceKey, opts);
+
+  // 3. Balance the looped network with those fixed nodal demands. hardyCross seeds
+  //    a continuity-satisfying flow on the spanning tree (ΣQ=0 at every node) and
+  //    iterates loop circulations (which preserve continuity) until Σh_f→0.
+  const bal = hardyCross(
+    { edges, demands },
+    {
+      tol: opts.tol,
+      maxIterations: opts.maxIterations,
+      C: opts.C,
+    },
+  );
+
   return {
-    loopCount: loops.length,
-    cyclomatic,
-    components,
-    maxResidual: null,
-    iterations: 0,
-    converged: false,
+    loopCount: bal.loopCount,
+    cyclomatic: bal.cyclomatic,
+    components: bal.components,
+    maxResidual: bal.maxResidual,
+    iterations: bal.iterations,
+    converged: bal.converged,
+    // The CHUNK contract field: true once Σh_f around every loop is ~0 AND
+    // continuity holds at every node. This is the honest "wired into the live
+    // looped model" signal the headline solve reports.
+    hardyCrossBalanced: bal.converged && bal.nodeImbalance < 1e-6,
     isTree: false,
-    note: 'looped mains detected — Hardy-Cross balance available via hardyCross() with nodal demands.',
+    demandGpm: round(totalDemand),
+    flowingHeads,
+    sourceKey,
+    flows: bal.flows,
+    loopResiduals: bal.loopResiduals,
+    nodeImbalance: bal.nodeImbalance,
+    note: `looped mains detected — Hardy-Cross balanced ${bal.loopCount} loop(s) `
+      + `against ${flowingHeads} flowing head(s) (${round(totalDemand)} gpm); `
+      + `Σh_f→${bal.maxResidual} psi, ΣQ residual ${bal.nodeImbalance} gpm.`,
     disclaimer: DISCLAIMER,
   };
 }

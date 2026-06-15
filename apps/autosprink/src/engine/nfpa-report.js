@@ -127,6 +127,16 @@ export function buildHydraulicReport(solve, meta = {}) {
       conservationOk: solve.conservationOk === true,
       designBasis: solve.designBasis || null,
       designBasisNote: solve.designBasisNote || null,
+      // human-readable design-basis label: distinguishes the NFPA-13 most-remote
+      // AUTO-selected design area from a user-drawn area and the all-heads-open
+      // worst-case envelope, so the report header reads honestly.
+      designBasisLabel: (solve.designBasis === 'remote-area-subset')
+        ? (meta.remoteAreaAutoSelected
+          ? 'NFPA-13 remote-area design demand (auto-selected most-remote area)'
+          : 'NFPA-13 remote-area design demand (user-drawn area)')
+        : 'all-heads-open worst-case envelope',
+      remoteAreaAutoSelected: meta.remoteAreaAutoSelected === true,
+      remoteAreaFlowingHeads: meta.remoteAreaFlowingHeads != null ? meta.remoteAreaFlowingHeads : null,
       // remote-area design context (when supplied via meta)
       hazard: hazardKey,
       hazardLabel,
@@ -254,7 +264,7 @@ export function renderReportHtml(report, opts = {}) {
         <tr><th>C-factor (Hazen-Williams)</th><td>${s.cFactor == null ? '—' : s.cFactor}</td></tr>
         <tr><th>Heads flowing</th><td>${s.headsFlowing == null ? '—' : s.headsFlowing} of ${s.headsTotal == null ? '—' : s.headsTotal}</td></tr>
         <tr><th>Hazard / density</th><td>${m.hazardLabel ? esc(m.hazardLabel) : '—'}${s.densityGpmFt2 != null ? ' · ' + s.densityGpmFt2 + ' gpm/ft²' : ''}${s.designAreaSqFt != null ? ' over ' + s.designAreaSqFt + ' ft²' : ''}</td></tr>
-        <tr><th>Design basis</th><td>${esc(s.designBasis || '—')}</td></tr>
+        <tr><th>Design basis</th><td>${esc(s.designBasisLabel || s.designBasis || '—')}${s.remoteAreaFlowingHeads != null ? ' · ' + s.remoteAreaFlowingHeads + ' heads' : ''}</td></tr>
         <tr><th>Flow conservation</th><td class="${s.conservationOk ? 'good' : 'bad'}">${s.conservationOk ? 'OK (ΣQ balanced at every node)' : 'CHECK'}</td></tr>
       </table>`
     : '<p class="muted">No solve available — generate a layout and solve hydraulics.</p>';
