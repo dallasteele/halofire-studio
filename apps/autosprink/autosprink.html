@@ -585,6 +585,35 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
       <div id="coverage"><span class="muted" style="font-size:12px">Generate a layout to compute coverage.</span></div>
       <h3>Hydraulics (NFPA-13, est.)</h3>
       <div id="hydraulics"><span class="muted" style="font-size:12px">—</span></div>
+      <h3 style="display:flex;align-items:center;justify-content:space-between">Network solve (Phase 3)
+        <button id="hydraulicSolveBtn" class="act ghost" style="font-size:10px;padding:3px 7px;margin:0">Re-solve</button>
+      </h3>
+      <div id="hydraulicPanel"><span class="muted" style="font-size:12px">Generate a layout to solve hydraulics.</span></div>
+      <h3 style="display:flex;align-items:center;justify-content:space-between;gap:4px;flex-wrap:wrap">Remote area (NFPA-13 demand)
+        <span style="display:flex;gap:4px">
+          <button id="remoteAreaRectBtn" class="act ghost" style="font-size:10px;padding:3px 7px;margin:0">Draw rect</button>
+          <button id="remoteAreaPolyBtn" class="act ghost" style="font-size:10px;padding:3px 7px;margin:0">Polygon</button>
+          <button id="remoteAreaBoxBtn" class="act ghost" style="font-size:10px;padding:3px 7px;margin:0">Design box</button>
+          <button id="remoteAreaClearBtn" class="act ghost" style="font-size:10px;padding:3px 7px;margin:0">Clear</button>
+        </span>
+      </h3>
+      <div id="remoteArea"><span class="muted" style="font-size:12px">Draw a remote-area boundary to compute the design demand.</span></div>
+      <h3>Water supplies (NFPA-13/20)</h3>
+      <div id="supplyPanel"><span class="muted" style="font-size:12px">Generate a layout to evaluate supply vs demand.</span></div>
+      <h3 style="display:flex;align-items:center;justify-content:space-between;gap:4px;flex-wrap:wrap">Node tags &amp; condition
+        <span style="display:flex;gap:4px">
+          <button id="nodeTagsToggle" class="act ghost" style="font-size:10px;padding:3px 7px;margin:0">P/Q/V tags</button>
+          <button id="colorConditionToggle" class="act ghost" style="font-size:10px;padding:3px 7px;margin:0">Color by velocity</button>
+        </span>
+      </h3>
+      <div id="conditionPanel"><span class="muted" style="font-size:12px">Solve hydraulics, then toggle tags / color-by-condition.</span></div>
+      <h3 style="display:flex;align-items:center;justify-content:space-between;gap:4px;flex-wrap:wrap">NFPA hydraulic report
+        <span style="display:flex;gap:4px">
+          <button id="reportPrintBtn" class="act ghost" style="font-size:10px;padding:3px 7px;margin:0">Print</button>
+          <button id="reportExportBtn" class="act ghost" style="font-size:10px;padding:3px 7px;margin:0">Export .html</button>
+        </span>
+      </h3>
+      <div id="reportPanel"><span class="muted" style="font-size:12px">Solve hydraulics to build the NFPA calculation report.</span></div>
     </div>
     <div class="insp-panel" data-panel="compliance">
       <h3>Compliance (NFPA-13, geometric)</h3>
@@ -684,6 +713,33 @@ import { computeCoverage } from '/src/engine/coverage.js';
 // applying the schedule across the WHOLE system cascades feed mains larger and
 // branch tails smaller. Pure + unit-tested (tests/pipe-schedule.test.js).
 import { applyPipeSchedule, scheduleSizeFor, SCHEDULE_TABLES } from '/src/engine/pipe-schedule.js';
+// HF-PHASE3-HYDRAULICS: REAL connected-network Hazen-Williams solve over the
+// Phase-2 topology (junction flow conservation, Q=K√P heads, elevation +
+// velocity pressure) + iterative pipe upsizing. Pure + golden-tested against
+// hand-computed NFPA-13 values (tests/network-solve.test.js). ENGINEERING AID
+// ONLY — not Hardy-Cross grid, not PE/AHJ-stamped.
+import { solveNetwork, solveWithUpsizing, buildGraph } from '/src/engine/network-solve.js';
+// HF-PHASE3-NFPA-REPORT: NFPA-format hydraulic calculation report — a PURE
+// transform of the solve result into a printable summary + node-analysis +
+// pipe-data report (header carries the NOT-stamped engineering-aid disclaimer).
+import { buildHydraulicReport, renderReportHtml } from '/src/engine/nfpa-report.js';
+// HF-PHASE3-HARDY-CROSS: REAL Hardy-Cross loop/grid balance. Identifies the
+// independent loops of the network (cyclomatic μ = E−N+components) and, for a
+// looped/gridded system, iterates each loop to Σh_f→0 (continuity ΣQ=0 held by
+// construction). A pure sprinkler tree has μ=0 — honestly reported loopCount 0
+// (the solver still passes its textbook 2-loop golden, tests/hardy-cross.test.js).
+import { analyzeGraphLoops, hardyCross } from '/src/engine/hardy-cross.js';
+// HF-PHASE3-REMOTE-AREA: interactive DRAW the remote-area boundary (polygon or
+// rectangle, plan x/y feet), identify the flowing heads inside (point-in-polygon),
+// look up the NFPA-13 design density for the hazard, and produce the area demand
+// + per-head required flow. The returned predicate restricts the H-W solve to
+// JUST that design set (the real NFPA basis). Validated in tests/remote-area.test.js.
+import { computeRemoteArea, polygonArea, pointInPolygon, rectRing, getDensityCurve, DENSITY_CURVES } from '/src/engine/remote-area.js';
+// HF-PHASE3-SUPPLIES: named/multiple water supplies (city-water flow-test N^1.85
+// curve, NFPA-20 pump three-point curve, tank) evaluated against the system
+// demand point → the binding (governing) supply + supply-vs-demand graph data.
+// Validated against hand calcs in tests/supplies.test.js.
+import { buildSupply, evaluateSupplies, supplyDemandCurve, defaultCityWaterSpec, SUPPLY_DISCLAIMER } from '/src/engine/supplies.js';
 
 // HF-W2 (Stream W2): EXTRACTION COMPLETENESS rendered in the live Studio — DOORS
 // (leaf + swing arc), recovered partition-inclusive WALLS, and FIXTURES/cores are
@@ -1054,6 +1110,16 @@ function pipeMat(layer) {
   if (!pipeMats[layer]) pipeMats[layer] = new THREE.MeshStandardMaterial({ color: COLORS[layer], metalness: 0.45, roughness: 0.55 });
   return pipeMats[layer];
 }
+// HF-PHASE3-COLOR-BY-CONDITION: per-color shared material keyed by the velocity
+// condition bucket (ok / high / over). velocityColor() is defined with the Phase-3
+// supplies/node-tags block; it returns the bucket hex from the live threshold.
+const condMats = {};
+function conditionMat(velocityFps) {
+  const thr = (lastHydraulicSolve && lastHydraulicSolve.maxVelocityThresholdFps) || 32;
+  const hex = velocityColor(velocityFps, thr);
+  if (!condMats[hex]) condMats[hex] = new THREE.MeshStandardMaterial({ color: hex, metalness: 0.3, roughness: 0.5, emissive: hex, emissiveIntensity: 0.12 });
+  return condMats[hex];
+}
 function addPipe(s) {
   if (s.role === 'drop') return; // drops are instanced in renderModel for perf
   const aw = W(s.from), bw = W(s.to);
@@ -1062,9 +1128,17 @@ function addPipe(s) {
   const [rx, ry, rz] = pipeRot(aw, bw);
   const layer = layerOf(s.role);
   const r = (s.diameterIn / 12 / 2) * pipeVizScale; // TRUE NFPA OD — no minimum-radius fudge floor (gate 6c)
-  // HF-PHASE2-SMARTPIPE: when the Smart Pipe legend is on, color the run by its
-  // TOPOLOGY role (solid.smartRole) instead of the coarse layer color.
-  const mat = (smartPipeColorOn && s.smartRole) ? roleMat(s.smartRole) : pipeMat(layer);
+  // HF-PHASE3-COLOR-BY-CONDITION: when the condition legend is on, shade the run by
+  // its WATER VELOCITY (green ok / amber high / red over-limit) from the live solve.
+  // Otherwise: Smart Pipe topology role (if on), else the coarse layer color.
+  let mat;
+  if (colorByConditionOn && typeof condBySolid !== 'undefined' && condBySolid.has(s)) {
+    mat = conditionMat(condBySolid.get(s));
+  } else if (smartPipeColorOn && s.smartRole) {
+    mat = roleMat(s.smartRole);
+  } else {
+    mat = pipeMat(layer);
+  }
   const cyl = new THREE.Mesh(new THREE.CylinderGeometry(r, r, len, PIPE_BODY_SEGMENTS), mat);
   cyl.position.set((aw[0]+bw[0])/2, (aw[1]+bw[1])/2, (aw[2]+bw[2])/2);
   cyl.rotation.set(rx, ry, rz);
@@ -1648,6 +1722,17 @@ function renderModel(cadModel, opts) {
   // window.__hfPhase2.coverage. ANALYSIS-ONLY (no mutation) — the overlay meshes
   // are built below from this result when the coverage toggle is on. Deterministic.
   try { runCoverage(cadModel); } catch (e) { window.__coverageError = String(e && e.message || e); }
+  // HF-PHASE3-HYDRAULICS: run the REAL connected-network Hazen-Williams demand/
+  // pressure solve over the just-classified topology and publish on
+  // window.__hfPhase3.solve { demandGpm, requiredPsi, worstPath, upsized, ... }.
+  // ANALYSIS-ONLY (no mutation — upsizing runs on a clone). Deterministic; fail-soft.
+  // If a remote-area boundary is active, the auto-solve honors it (the design
+  // SUBSET) so a render refresh doesn't silently revert to all-heads-open.
+  try {
+    const raOpts = (typeof lastRemoteArea !== 'undefined' && lastRemoteArea && lastRemoteArea.predicate)
+      ? { flowingHeads: lastRemoteArea.predicate } : undefined;
+    runHydraulicSolve(cadModel, raOpts);
+  } catch (e) { window.__hydraulicSolveError = String(e && e.message || e); }
   window.__wallDebug = [];
   if (modelGroup) scene.remove(modelGroup);
   modelGroup = new THREE.Group(); scene.add(modelGroup);
@@ -1727,6 +1812,14 @@ function renderModel(cadModel, opts) {
   // highlights + gap markers) into modelGroup when the toggle is on. Built from
   // the published __hfPhase2.coverage result so the picture matches the numbers.
   try { renderCoverageOverlay(); } catch (e) { window.__coverageOverlayError = String(e && e.message || e); }
+  // HF-PHASE3-REMOTE-AREA: draw the remote-area boundary polygon + shade the
+  // flowing heads inside it. Built from the published __hfPhase3.remoteArea so
+  // the picture matches the numbers. Camera-neutral (geometry only).
+  try { renderRemoteAreaOverlay(); } catch (e) { window.__remoteAreaOverlayError = String(e && e.message || e); }
+  // HF-PHASE3-NODE TAGS: draw P/Q/V tags at junctions when the toggle is on.
+  // Built from the live solve's per-node results so the labels match the numbers.
+  // Camera-neutral (geometry only).
+  try { renderNodeTagOverlay(); } catch (e) { window.__nodeTagOverlayError = String(e && e.message || e); }
   buildLayerToggles();
   try { if (typeof refreshAnnotations === 'function') refreshAnnotations(); } catch (_) { /* annotation overlay optional */ }
 }
@@ -3105,7 +3198,16 @@ function describeHit(found) {
 // recentering here is what broke re-selection: every other part shifted on
 // screen mid-click). frameAfter=true (double-click path) also frames the part.
 function handleCanvasClick(e, frameAfter) {
-  if (!selectMode || !camera) return;
+  if (!camera) return;
+  // HF-PHASE3-REMOTE-AREA: while a boundary draw is armed, a click APPENDS a plan
+  // point (via pointerToPlan — the same camera-neutral projector the draw/measure
+  // tools use). It consumes the click (no selection, no framing, no camera move).
+  if (remoteAreaDrawMode) {
+    const plan = pointerToPlan(e.clientX, e.clientY, 0);
+    if (plan) window.__hfRemoteAreaAddPoint([plan[0], plan[1]]);
+    return;
+  }
+  if (!selectMode) return;
   if (typeof drawTool !== 'undefined' && (drawTool || drawInteract)) return; // draw/interact owns clicks while active
   const r = renderer.domElement.getBoundingClientRect();
   const ndc = new THREE.Vector2(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
@@ -3809,6 +3911,94 @@ $('genBtn').onclick = generate;
     }
   };
 }
+// HF-PHASE3-HYDRAULICS: Re-solve the real network (camera-neutral analysis only).
+{
+  const hsBtn = $('hydraulicSolveBtn');
+  if (hsBtn) hsBtn.onclick = () => {
+    if (!currentCadModel) { $('status').textContent = 'Generate a layout first'; return; }
+    $('status').textContent = 'Solving network + upsizing…';
+    const s = runHydraulicSolve(currentCadModel, { upsize: true });
+    if (s) {
+      hsBtn.classList.add('active');
+      const met = s.demandMet === true ? `MET (+${s.safetyMargin} psi)` : `SHORT ${Math.abs(s.safetyMargin)} psi`;
+      $('status').textContent = `Network solve: demand ${s.demandGpm} gpm · required ${s.requiredPsi} psi · supply ${met}`
+        + (s.upsized && s.upsized.length ? ` · upsized ${s.upsized.length} pipe(s)` : '');
+    }
+  };
+}
+// HF-PHASE3-REMOTE-AREA: draw-tool buttons (camera-neutral — they only arm the
+// click collector / set the boundary; no camera or selection side effects).
+{
+  const rectBtn = $('remoteAreaRectBtn');
+  const polyBtn = $('remoteAreaPolyBtn');
+  const boxBtn = $('remoteAreaBoxBtn');
+  const clrBtn = $('remoteAreaClearBtn');
+  if (rectBtn) rectBtn.onclick = () => {
+    if (!currentCadModel) { $('status').textContent = 'Generate a layout first'; return; }
+    window.__hfRemoteAreaDrawStart('rect');
+  };
+  if (polyBtn) polyBtn.onclick = () => {
+    if (!currentCadModel) { $('status').textContent = 'Generate a layout first'; return; }
+    if (remoteAreaDrawMode === 'polygon') {
+      const r = window.__hfRemoteAreaFinish();
+      if (r) { $('status').textContent = `Remote area: ${r.areaSqFt} ft² · ${r.flowingHeadCount} heads · demand ${r.demandGpm} gpm`; }
+      else $('status').textContent = 'Polygon needs ≥ 3 points';
+      polyBtn.textContent = 'Polygon';
+    } else {
+      window.__hfRemoteAreaDrawStart('polygon');
+      polyBtn.textContent = 'Finish polygon';
+    }
+  };
+  if (boxBtn) boxBtn.onclick = () => {
+    if (!currentCadModel) { $('status').textContent = 'Generate a layout first'; return; }
+    const r = window.__hfRemoteAreaDesignBox({});
+    if (r) $('status').textContent = `Remote area (design box ${r.designAreaSqFt} ft²): ${r.flowingHeadCount} heads · demand ${r.demandGpm} gpm · density ${r.densityGpmFt2}`;
+  };
+  if (clrBtn) clrBtn.onclick = () => { window.__hfRemoteAreaClear(); $('status').textContent = 'Remote area cleared (solve reverted to all-heads-open)'; if (polyBtn) polyBtn.textContent = 'Polygon'; };
+}
+// HF-PHASE3-NODE TAGS + COLOR-BY-CONDITION: toggle buttons (camera-neutral —
+// they only flip an overlay flag + preserveView rebuild; no camera/selection side
+// effect; __dbgTarget unchanged).
+{
+  const ntBtn = $('nodeTagsToggle');
+  const ccBtn = $('colorConditionToggle');
+  if (ntBtn) ntBtn.onclick = () => {
+    if (!currentCadModel) { $('status').textContent = 'Generate a layout first'; return; }
+    const on = window.__hfNodeTagsToggle();
+    ntBtn.classList.toggle('active', on);
+    const t = window.__hfPhase3 && window.__hfPhase3.nodeTags;
+    $('status').textContent = on
+      ? `Node tags ON · ${t ? t.sampledCount : 0} junctions tagged (P/Q/V) · max ${t ? t.maxVelocityFps : 0} fps`
+      : 'Node tags off';
+  };
+  if (ccBtn) ccBtn.onclick = () => {
+    if (!currentCadModel) { $('status').textContent = 'Generate a layout first'; return; }
+    const on = window.__hfColorByConditionToggle();
+    ccBtn.classList.toggle('active', on);
+    const t = window.__hfPhase3 && window.__hfPhase3.nodeTags;
+    const ec = t && t.edgeConditions;
+    $('status').textContent = on
+      ? `Color by velocity ON · ${ec ? ec.over : 0} over-limit / ${ec ? ec.high : 0} high / ${ec ? ec.ok : 0} ok pipes`
+      : 'Color by velocity off';
+  };
+}
+// HF-PHASE3-NFPA-REPORT: Print / Export buttons. Both build the report HTML from
+// the LIVE solve and open/download it — analysis-only, camera-neutral (no solve,
+// no render, no camera move; the report is a pure transform already published).
+{
+  const prBtn = $('reportPrintBtn');
+  const exBtn = $('reportExportBtn');
+  if (prBtn) prBtn.onclick = () => {
+    if (!lastHydraulicReport || !lastHydraulicReport.hasSummary) { $('status').textContent = 'Solve hydraulics first to build the report'; return; }
+    const ok = window.__hfReportPrint();
+    $('status').textContent = ok ? 'NFPA report opened (print)' : 'Report print blocked (pop-up?) — use Export';
+  };
+  if (exBtn) exBtn.onclick = () => {
+    if (!lastHydraulicReport || !lastHydraulicReport.hasSummary) { $('status').textContent = 'Solve hydraulics first to build the report'; return; }
+    const ok = window.__hfReportExport();
+    $('status').textContent = ok ? 'NFPA report exported (.html)' : 'Report export failed';
+  };
+}
 // HF-PHASE2-SCHEDULE: APPLY PIPE SCHEDULE — cascade sizes across the whole system.
 {
   const asBtn = $('applyScheduleBtn');
@@ -4127,6 +4317,596 @@ window.__hfPhase2 = window.__hfPhase2 || {};
 window.__hfPhase2.coverage = window.__hfPhase2.coverage || null;
 window.__hfCoverage = () => lastCoverage; // direct accessor for verification
 
+// ── HF-PHASE3-HYDRAULICS: real connected-network solve + iterative upsizing ──
+// Runs the pure solver (src/engine/network-solve.js) over the current model: it
+// builds the actual pipe/head graph (same topology Smart Pipe classifies), seeds
+// each flowing head at the NFPA-13 minimum operating pressure, accumulates flow
+// at every junction (conservation), and walks the most-remote head back to the
+// supply summing Hazen-Williams friction + elevation + velocity pressure to get
+// the system DEMAND (gpm) and REQUIRED pressure at the source. If an available
+// supply is set and the demand isn't met, it iteratively upsizes the worst pipes
+// on the remote path (on a CLONE — never mutates the live model) and re-solves.
+// Published on window.__hfPhase3.solve. ANALYSIS-ONLY. Deterministic; fail-soft.
+//
+// HONESTY: this is an ENGINEERING AID. It is a forward demand-fixed TREE solve
+// (Q=K√P heads, junction conservation), NOT a sealed Hardy-Cross GRID balance,
+// NOT AutoSprink, NOT PE-stamped, NOT AHJ-approved. Verify before permit.
+const DEFAULT_AVAILABLE_PSI = 65; // representative city-water static for demo solve
+let lastHydraulicSolve = null;
+function projectKFactor() {
+  // honor an explicit K on heads; the solver falls back to 5.6 per head when absent.
+  return undefined;
+}
+function runHydraulicSolve(cadModel, opts) {
+  if (!cadModel || !Array.isArray(cadModel.solids)) { lastHydraulicSolve = null; publishHydraulicSolve(); return null; }
+  const avail = (opts && opts.availablePsi != null) ? Number(opts.availablePsi) : DEFAULT_AVAILABLE_PSI;
+  const solveOpts = {
+    availablePsi: avail,
+    minHeadPressurePsi: (opts && opts.minHeadPressurePsi != null) ? opts.minHeadPressurePsi : 7,
+    C: (opts && opts.C) || 120,
+    kFactor: (opts && opts.kFactor) || projectKFactor(),
+  };
+  // HF-PHASE3-REMOTE-AREA: when the caller passes a flowingHeads predicate (the
+  // drawn remote-area design set), forward it so the solve runs on JUST that
+  // subset — designBasis becomes 'remote-area-subset', the real NFPA basis.
+  if (opts && typeof opts.flowingHeads === 'function') solveOpts.flowingHeads = opts.flowingHeads;
+  // The auto-render path runs a SINGLE base solve (one O(N^2) graph build) so a
+  // large model never blocks the render. Iterative upsizing (which re-solves up
+  // to maxIterations times) only runs when the caller explicitly opts in
+  // (opts.upsize === true — the Re-solve button / __hfHydraulics({upsize:true})).
+  let base; let fin; let up = { upsized: [], iterations: 0 };
+  if (opts && opts.upsize === true) {
+    up = solveWithUpsizing(cadModel, solveOpts);
+    base = up.base;
+    fin = up.final;
+  } else {
+    base = solveNetwork(cadModel, solveOpts);
+    fin = base;
+  }
+  lastHydraulicSolve = {
+    // CHUNK contract: demandGpm, requiredPsi, worstPath, upsized
+    demandGpm: fin.demandGpm,
+    requiredPsi: fin.requiredPsi,
+    worstPath: fin.worstPath,
+    upsized: up.upsized,
+    // richer real numbers for the hook + report
+    availablePsi: fin.availablePsi,
+    safetyMargin: fin.safetyMargin,
+    demandMet: fin.demandMet,
+    minHeadPressurePsi: fin.minHeadPressurePsi,
+    frictionLossPsi: fin.frictionLossPsi,
+    elevationPsi: fin.elevationPsi,
+    velocityPressurePsi: fin.velocityPressurePsi,
+    fittingLe: fin.fittingLe,
+    headsTotal: fin.headsTotal,
+    headsFlowing: fin.headsFlowing,
+    remoteHeadFlowGpm: fin.remoteHeadFlowGpm,
+    remotePathLengthFt: fin.remotePathLengthFt,
+    loopCount: fin.loopCount,
+    hardyCrossBalanced: fin.hardyCrossBalanced,
+    conservationOk: fin.conservationOk,
+    nodeCount: fin.nodeCount,
+    pipeCount: fin.pipeCount,
+    C: fin.C,
+    kFactor: fin.kFactor,
+    iterations: up.iterations,
+    requiredPsiBeforeUpsizing: base.requiredPsi,
+    designBasis: fin.designBasis,
+    designBasisNote: fin.designBasisNote,
+    // HF-PHASE3 node tags + color-by-condition feed: per-node P/Q/V + per-edge
+    // velocity/over-velocity from the solver (used by publishNodeTags + addPipe).
+    nodes: fin.nodes,
+    edgeResults: fin.edgeResults,
+    maxVelocityFps: fin.maxVelocityFps,
+    maxVelocityEdge: fin.maxVelocityEdge,
+    maxVelocityThresholdFps: fin.maxVelocityThresholdFps,
+    minNodePressurePsi: fin.minNodePressurePsi,
+    minNodePressureKey: fin.minNodePressureKey,
+    disclaimer: fin.disclaimer,
+  };
+  // HARDY-CROSS loop analysis over the SAME built graph. For a pure tree this is
+  // loopCount 0 (nothing to balance); for gridded mains it iterates Σh_f→0. This
+  // is analysis-only and camera-neutral (no scene mutation).
+  try { lastLoopAnalysis = computeLoopAnalysis(cadModel); } catch (_) { lastLoopAnalysis = null; }
+  publishHydraulicSolve();
+  return lastHydraulicSolve;
+}
+// Build the network graph and report loop structure (+ Hardy-Cross balance when
+// the model is gridded). Pure; never moves the camera or mutates the model.
+let lastLoopAnalysis = null;
+function computeLoopAnalysis(cadModel) {
+  if (!cadModel || !Array.isArray(cadModel.solids)) return null;
+  const graph = buildGraph(cadModel, { C: 120 });
+  const a = analyzeGraphLoops(graph);
+  return {
+    // CHUNK contract: { loopCount, maxResidual, iterations, converged }
+    loopCount: a.loopCount,
+    maxResidual: a.maxResidual,
+    iterations: a.iterations,
+    converged: a.converged,
+    // richer honest context
+    cyclomatic: a.cyclomatic,
+    components: a.components,
+    isTree: a.isTree,
+    note: a.note,
+    disclaimer: a.disclaimer,
+  };
+}
+function publishHydraulicSolve() {
+  window.__hfPhase3 = window.__hfPhase3 || {};
+  window.__hfPhase3.solve = lastHydraulicSolve;
+  window.__hfPhase3.loops = lastLoopAnalysis;
+  // CHUNK contract: window.__hfPhase3.fittingLe -> { totalEquivFt, byType }.
+  // The exact NFPA-13 fitting equivalent length the solve added to the friction
+  // calc on the worst path (real, not a separate display number).
+  window.__hfPhase3.fittingLe = (lastHydraulicSolve && lastHydraulicSolve.fittingLe)
+    ? lastHydraulicSolve.fittingLe : { totalEquivFt: 0, byType: {} };
+  // HF-PHASE3-SUPPLIES + NODE TAGS: now that we have a fresh demand/required pair,
+  // re-evaluate the defined supplies against that demand point (binding supply +
+  // supply-vs-demand graph) and republish the per-node tags (sample P/Q/V).
+  try { publishSupplies(); } catch (e) { window.__suppliesError = String(e && e.message || e); }
+  try { publishNodeTags(); } catch (e) { window.__nodeTagsError = String(e && e.message || e); }
+  try { publishHydraulicReport(); } catch (e) { window.__reportError = String(e && e.message || e); }
+  try { refreshHydraulicPanel(); } catch (_) { /* panel optional */ }
+}
+// HF-PHASE3-NFPA-REPORT: build the NFPA-format report from the LIVE solve and
+// publish window.__hfPhase3.report -> { hasSummary, nodeRows, pipeRows, summary,
+// meta, disclaimer, ... }. Pure transform — NO physics, NO camera move, NO scene
+// mutation. Pulls hazard/density/design-area from the active remote area when one
+// is drawn (so the summary reflects the real NFPA-13 design basis).
+let lastHydraulicReport = null;
+function reportMeta() {
+  const meta = {
+    projectName: 'HaloFire AutoSPRINK clone — design model',
+    generatedAt: new Date().toISOString().slice(0, 10),
+  };
+  const ra = window.__hfPhase3 && window.__hfPhase3.remoteArea;
+  if (ra) {
+    if (ra.hazard) meta.hazard = ra.hazard;
+    if (ra.densityGpmFt2 != null) meta.densityGpmFt2 = ra.densityGpmFt2;
+    if (ra.designAreaSqFt != null) meta.designAreaSqFt = ra.designAreaSqFt;
+    else if (ra.areaSqFt != null) meta.designAreaSqFt = ra.areaSqFt;
+  }
+  return meta;
+}
+function publishHydraulicReport() {
+  window.__hfPhase3 = window.__hfPhase3 || {};
+  lastHydraulicReport = buildHydraulicReport(lastHydraulicSolve, reportMeta());
+  // CHUNK contract: __hfPhase3.report -> { hasSummary, nodeRows, pipeRows }.
+  window.__hfPhase3.report = lastHydraulicReport;
+  try { refreshReportPanel(); } catch (_) { /* panel optional */ }
+}
+window.__hfPhase3 = window.__hfPhase3 || {};
+window.__hfPhase3.report = window.__hfPhase3.report || null;
+// Live accessor + printable export. __hfReport() returns the current report
+// object; __hfReportHtml() returns the self-contained printable HTML string;
+// __hfReportExport()/__hfReportPrint() download / print the report. All are
+// analysis-only and camera-neutral (no solve, no render, no camera move).
+window.__hfReport = () => lastHydraulicReport;
+window.__hfReportHtml = () => (lastHydraulicReport ? renderReportHtml(lastHydraulicReport) : '');
+window.__hfReportExport = () => {
+  if (!lastHydraulicReport) return false;
+  const html = renderReportHtml(lastHydraulicReport);
+  const blob = new Blob([html], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'nfpa-hydraulic-report.html';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+  return true;
+};
+window.__hfReportPrint = () => {
+  if (!lastHydraulicReport) return false;
+  const html = renderReportHtml(lastHydraulicReport);
+  const w = window.open('', '_blank');
+  if (!w) return false;
+  w.document.write(html); w.document.close();
+  return true;
+};
+window.__hfPhase3 = window.__hfPhase3 || {};
+window.__hfPhase3.solve = window.__hfPhase3.solve || null;
+window.__hfPhase3.loops = window.__hfPhase3.loops || null;
+window.__hfPhase3.fittingLe = window.__hfPhase3.fittingLe || { totalEquivFt: 0, byType: {} };
+// Hardy-Cross hooks. __hfLoops() returns the live model's loop analysis
+// {loopCount, maxResidual, iterations, converged, ...}. __hfHardyCross(spec,opts)
+// runs the pure Hardy-Cross balancer on an ARBITRARY {edges, demands} network
+// (used for the textbook golden + future gridded mains). Both analysis-only.
+window.__hfLoops = () => {
+  if (currentCadModel) { lastLoopAnalysis = computeLoopAnalysis(currentCadModel); window.__hfPhase3.loops = lastLoopAnalysis; }
+  return lastLoopAnalysis;
+};
+window.__hfHardyCross = (spec, opts) => hardyCross(spec || { edges: [] }, opts || {});
+// Direct accessor + re-run hook (accepts {availablePsi,minHeadPressurePsi,C,kFactor}).
+window.__hfHydraulics = (opts) => {
+  if (currentCadModel && opts) return runHydraulicSolve(currentCadModel, opts);
+  return lastHydraulicSolve;
+};
+// Solve an ARBITRARY model (used by the remote-area subset path + verification).
+// Does not publish/mutate the live solve — pure pass-through to the engine.
+window.__hfSolveModel = (model, opts) => {
+  const o = opts || {};
+  const solveOpts = { availablePsi: o.availablePsi, minHeadPressurePsi: o.minHeadPressurePsi != null ? o.minHeadPressurePsi : 7, C: o.C || 120, kFactor: o.kFactor };
+  if (o.upsize === true) { const up = solveWithUpsizing(model, solveOpts); return { ...up.final, upsized: up.upsized, iterations: up.iterations }; }
+  const r = solveNetwork(model, solveOpts); return { ...r, upsized: [], iterations: 0 };
+};
+
+// ── HF-PHASE3-SUPPLIES: named/multiple water supplies + supply-vs-demand ───────
+// One or more supplies (city-water flow test, fire pump, tank) are evaluated
+// against the LIVE solve's demand point {demandGpm, requiredPsi}. The BINDING
+// (least-margin) supply governs. The supply-vs-demand graph data is published for
+// the UI plot. HONEST: supply curves are only as good as the field flow test /
+// pump submittal — ENGINEERING AID, NOT AHJ/PE-stamped.
+// Default supply set: a representative municipal flow test (overridable via
+// __hfSupplies(specs)). Multiple supplies allowed.
+let supplySpecs = [defaultCityWaterSpec()];
+let lastSupplies = null;
+let lastSupplyGraph = null;
+function demandPoint() {
+  const s = lastHydraulicSolve;
+  if (!s) return { demandGpm: 0, requiredPsi: 7 };
+  return { demandGpm: Number(s.demandGpm) || 0, requiredPsi: Number(s.requiredPsi) || 0 };
+}
+function publishSupplies() {
+  window.__hfPhase3 = window.__hfPhase3 || {};
+  const demand = demandPoint();
+  lastSupplies = evaluateSupplies(supplySpecs, demand);
+  // graph the binding supply (the one the design must satisfy) vs the demand curve
+  const bindingSpec = lastSupplies.binding
+    ? supplySpecs.find((sp) => (sp.name || sp.kind) === lastSupplies.binding.name) || supplySpecs[0]
+    : supplySpecs[0];
+  lastSupplyGraph = bindingSpec ? supplyDemandCurve(bindingSpec, demand, { samples: 24 }) : null;
+  // CHUNK contract: __hfPhase3.supplies -> { supplies:[{name,kind,availablePsi,
+  // marginPsi,demandMet,...}], binding, bindingName, demandMet, demandGpm,
+  // requiredPsi, graph:{supplyCurve, demandCurve, designPoint, operatingPoint} }.
+  window.__hfPhase3.supplies = {
+    supplies: lastSupplies.supplies,
+    binding: lastSupplies.binding,
+    bindingName: lastSupplies.bindingName,
+    demandMet: lastSupplies.demandMet,
+    demandGpm: lastSupplies.demandGpm,
+    requiredPsi: lastSupplies.requiredPsi,
+    marginPsi: lastSupplies.marginPsi,
+    graph: lastSupplyGraph,
+    disclaimer: SUPPLY_DISCLAIMER,
+  };
+  try { refreshSupplyPanel(); } catch (_) { /* panel optional */ }
+}
+window.__hfPhase3 = window.__hfPhase3 || {};
+window.__hfPhase3.supplies = window.__hfPhase3.supplies || null;
+// Replace/define the supply set (each spec: {kind:'cityWater'|'pump'|'tank', ...}).
+// Re-evaluates against the current demand point and republishes. Camera-neutral.
+window.__hfSupplies = (specs) => {
+  if (Array.isArray(specs)) supplySpecs = specs.filter(Boolean);
+  else if (specs && typeof specs === 'object') supplySpecs = [specs];
+  publishSupplies();
+  return window.__hfPhase3.supplies;
+};
+// Add a single named supply to the set (without dropping the existing ones).
+window.__hfAddSupply = (spec) => {
+  if (spec && typeof spec === 'object') { supplySpecs = supplySpecs.concat([spec]); publishSupplies(); }
+  return window.__hfPhase3.supplies;
+};
+
+// ── HF-PHASE3-NODE TAGS: sample P/Q/V at junctions + color-by-condition ────────
+// The solver now reports per-node pressure/flow/velocity and per-edge velocity +
+// over-velocity. We publish a sampled subset of node tags (so a 1000-head model
+// doesn't flood the hook) and the color-by-condition edge bins. The DRAWING
+// overlay (node tag sprites + shaded pipes) is built in renderModel from these.
+let nodeTagsOn = false;          // overlay toggle (node tag labels on the plan)
+let colorByConditionOn = false;  // shade pipes by velocity/over-pressure
+// Map each live pipe SOLID -> the max water velocity across its sub-edges, so
+// addPipe can shade it by condition. edgeResults carry pipeIdx = index into the
+// SAME filtered pipe list render iterates (kind==='pipe'); we rebuild that index.
+let condBySolid = new WeakMap();
+let condMaxVelocity = 0;
+function rebuildConditionMap(s) {
+  condBySolid = new WeakMap();
+  condMaxVelocity = s ? (Number(s.maxVelocityFps) || 0) : 0;
+  if (!s || !Array.isArray(s.edgeResults) || !currentCadModel) return;
+  const pipes = currentCadModel.solids.filter((x) => x && x.kind === 'pipe' && Array.isArray(x.from) && Array.isArray(x.to));
+  for (const er of s.edgeResults) {
+    const sol = pipes[er.pipeIdx];
+    if (!sol) continue;
+    const prev = condBySolid.get(sol);
+    if (prev == null || er.velocityFps > prev) condBySolid.set(sol, er.velocityFps);
+  }
+}
+function publishNodeTags() {
+  window.__hfPhase3 = window.__hfPhase3 || {};
+  const s = lastHydraulicSolve;
+  if (!s || !Array.isArray(s.nodes)) { window.__hfPhase3.nodeTags = null; rebuildConditionMap(null); return; }
+  rebuildConditionMap(s);
+  // Sample: ALWAYS include the source + remote head (the two headline tags), then
+  // junctions (degree>=3) + head nodes, then thin the rest so the hook stays bounded
+  // for huge models. Source/remote are pinned first so they survive the cap.
+  const MAX = 200;
+  const pinned = s.nodes.filter((n) => n.isSource || n.isRemote);
+  const junctions = s.nodes.filter((n) => !(n.isSource || n.isRemote) && (n.degree >= 3 || n.headCount > 0));
+  const others = s.nodes.filter((n) => !(n.isSource || n.isRemote) && !(n.degree >= 3 || n.headCount > 0));
+  const keep = pinned.slice();
+  for (const n of junctions) { if (keep.length >= MAX) break; keep.push(n); }
+  if (keep.length < MAX && others.length) {
+    const step = Math.max(1, Math.floor(others.length / Math.max(1, MAX - keep.length)));
+    for (let i = 0; i < others.length && keep.length < MAX; i += step) keep.push(others[i]);
+  }
+  // CHUNK contract: __hfPhase3.nodeTags -> { count, sampled:[{key, x, y, z,
+  // pressurePsi, flowGpm, velocityFps, isSource, isRemote, headCount}], maxVelocity,
+  // minPressure }. Sample P/Q/V at junctions.
+  window.__hfPhase3.nodeTags = {
+    count: s.nodes.length,
+    sampledCount: keep.length,
+    sampled: keep.map((n) => ({
+      key: n.key,
+      x: n.pt[0], y: n.pt[1], z: n.pt[2],
+      pressurePsi: n.pressurePsi,
+      flowGpm: n.flowGpm,
+      velocityFps: n.velocityFps,
+      isSource: n.isSource,
+      isRemote: n.isRemote,
+      headCount: n.headCount,
+    })),
+    maxVelocityFps: s.maxVelocityFps,
+    maxVelocityThresholdFps: s.maxVelocityThresholdFps,
+    minNodePressurePsi: s.minNodePressurePsi,
+    edgeConditions: colorByConditionBins(s.edgeResults || [], s.maxVelocityThresholdFps),
+    disclaimer: s.disclaimer,
+  };
+  try { refreshConditionPanel(); } catch (_) { /* panel optional */ }
+}
+function refreshConditionPanel() {
+  const el = document.getElementById('conditionPanel');
+  if (!el) return;
+  const t = window.__hfPhase3 && window.__hfPhase3.nodeTags;
+  if (!t) { el.innerHTML = '<span class="muted" style="font-size:12px">Solve hydraulics, then toggle tags / color-by-condition.</span>'; return; }
+  const ec = t.edgeConditions || { ok: 0, high: 0, over: 0, thresholdFps: 32 };
+  const sw = (hex, label, n, c) => `<div class="kv" style="font-size:11px"><span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${hex};margin-right:6px;vertical-align:middle"></span>${label}</span><b style="color:${c || 'inherit'}">${n}</b></div>`;
+  el.innerHTML =
+    sw('#22c55e', `OK (&lt; ${ec.highFps} fps)`, ec.ok)
+    + sw('#f59e0b', `High (${ec.highFps}–${ec.thresholdFps} fps)`, ec.high, ec.high ? '#f59e0b' : undefined)
+    + sw('#ef4444', `Over-velocity (&gt; ${ec.thresholdFps} fps)`, ec.over, ec.over ? '#ef4444' : undefined)
+    + `<div class="muted" style="font-size:10px;margin-top:3px">Max velocity ${t.maxVelocityFps} fps · min node ${t.minNodePressurePsi == null ? '—' : t.minNodePressurePsi + ' psi'} · ${t.count} nodes (${t.sampledCount} tagged)</div>`
+    + `<div class="muted" style="font-size:9px;margin-top:2px">Velocity from the live tree solve · ${ec.thresholdFps} fps advisory cap (NFPA-13 §23.4.2). ENGINEERING AID — verify before permit.</div>`;
+}
+window.__hfPhase3 = window.__hfPhase3 || {};
+window.__hfPhase3.nodeTags = window.__hfPhase3.nodeTags || null;
+// Bin edges by condition for color-by-condition: ok / high-velocity / over-velocity.
+// "high" is >70% of the threshold (advisory amber), "over" exceeds it (red).
+function colorByConditionBins(edgeResults, threshold) {
+  const thr = threshold || 32;
+  let ok = 0, high = 0, over = 0;
+  for (const e of edgeResults) {
+    if (e.velocityFps > thr) over += 1;
+    else if (e.velocityFps > thr * 0.7) high += 1;
+    else ok += 1;
+  }
+  return { ok, high, over, thresholdFps: thr, highFps: round1(thr * 0.7) };
+}
+function round1(n) { return Math.round(Number(n) * 10) / 10; }
+// Velocity → color (color-by-condition): green ok, amber high, red over-limit.
+const COND_OK_COLOR = 0x22c55e;
+const COND_HIGH_COLOR = 0xf59e0b;
+const COND_OVER_COLOR = 0xef4444;
+function velocityColor(v, threshold) {
+  const thr = threshold || 32;
+  if (v > thr) return COND_OVER_COLOR;
+  if (v > thr * 0.7) return COND_HIGH_COLOR;
+  return COND_OK_COLOR;
+}
+// Toggle node-tag overlay (P/Q/V labels at junctions). Camera-neutral rebuild.
+window.__hfNodeTagsToggle = (on) => {
+  nodeTagsOn = (on === undefined) ? !nodeTagsOn : !!on;
+  if (currentCadModel) renderModel(currentCadModel, { preserveView: true }); // GUARD#1
+  return nodeTagsOn;
+};
+// Toggle color-by-condition pipe shading. Camera-neutral rebuild.
+window.__hfColorByConditionToggle = (on) => {
+  colorByConditionOn = (on === undefined) ? !colorByConditionOn : !!on;
+  publishNodeTags(); // rebin (the edge bins reflect the active mode)
+  if (currentCadModel) renderModel(currentCadModel, { preserveView: true }); // GUARD#1
+  return colorByConditionOn;
+};
+
+// ── HF-PHASE3-LIVE RECALC: debounced re-solve on edit (preserveView) ───────────
+// An edit (HFEdit) already rebuilds the scene with preserveView; the auto-solve in
+// renderModel keeps __hfPhase3.solve fresh. This debounced hook lets external edit
+// flows request a recalc WITHOUT a full re-render (e.g. a property tweak), coalescing
+// rapid edits into one solve. Camera-neutral (no render → no camera touch).
+let _recalcTimer = null;
+window.__hfLiveRecalc = (delayMs) => {
+  const d = (delayMs != null) ? Number(delayMs) : 120;
+  if (_recalcTimer) clearTimeout(_recalcTimer);
+  _recalcTimer = setTimeout(() => {
+    _recalcTimer = null;
+    try {
+      if (!currentCadModel) return;
+      const raOpts = (lastRemoteArea && lastRemoteArea.predicate) ? { flowingHeads: lastRemoteArea.predicate } : undefined;
+      runHydraulicSolve(currentCadModel, raOpts); // republishes solve+supplies+nodeTags
+    } catch (e) { window.__liveRecalcError = String(e && e.message || e); }
+  }, d);
+  return { scheduledMs: d };
+};
+
+function refreshHydraulicPanel() {
+  const el = document.getElementById('hydraulicPanel');
+  if (!el) return;
+  const s = lastHydraulicSolve;
+  if (!s) { el.innerHTML = '<span class="muted" style="font-size:12px">Generate a layout to solve hydraulics.</span>'; return; }
+  const met = s.demandMet === true;
+  const metColor = met ? '#22c55e' : '#ef4444';
+  const metTxt = s.availablePsi == null ? 'n/a'
+    : (met ? `MET (margin ${s.safetyMargin} psi)` : `NOT MET (short ${Math.abs(s.safetyMargin)} psi)`);
+  el.innerHTML =
+    `<div style="font-size:12px;line-height:1.6">`
+    + `<b>Demand</b> ${s.demandGpm} gpm &nbsp; <b>Required</b> ${s.requiredPsi} psi`
+    + ` &nbsp; <b>Available</b> ${s.availablePsi == null ? '—' : s.availablePsi + ' psi'}`
+    + `<br><span style="color:${metColor};font-weight:600">Supply ${metTxt}</span>`
+    + ` &nbsp; <span class="muted">friction ${s.frictionLossPsi} / elev ${s.elevationPsi} / vel ${s.velocityPressurePsi} psi</span>`
+    + (s.fittingLe
+      ? `<br><span class="muted">Fitting Le (NFPA-13): +${s.fittingLe.totalEquivFt} ft equiv on remote path`
+        + (s.fittingLe.byType && Object.keys(s.fittingLe.byType).length
+          ? ' · ' + Object.entries(s.fittingLe.byType).map(([t, v]) => `${v.count}× ${t} ${v.equivFt}ft`).join(' · ')
+          : ' (none — all carriers ≥ 6 ft)')
+        + `</span>`
+      : '')
+    + `<br><span class="muted">${s.headsFlowing}/${s.headsTotal} heads flowing · remote path ${s.remotePathLengthFt} ft · ${s.pipeCount} pipes · conservation ${s.conservationOk ? 'OK' : 'FAIL'}</span>`
+    + (lastLoopAnalysis
+      ? `<br><span class="muted">Hardy-Cross loops: ${lastLoopAnalysis.loopCount}`
+        + (lastLoopAnalysis.loopCount === 0
+          ? ' (pure tree — nothing to balance)'
+          : (lastLoopAnalysis.converged
+            ? ` · converged (residual ${lastLoopAnalysis.maxResidual}, ${lastLoopAnalysis.iterations} iter)`
+            : ` detected (cyclomatic ${lastLoopAnalysis.cyclomatic}) — loop balance not wired to the live K√P demand tree yet; solver golden-verified on the textbook 2-loop net`))
+        + `</span>`
+      : '')
+    + (s.upsized && s.upsized.length
+      ? `<br><span style="color:#f59e0b">Upsized ${s.upsized.length} pipe(s) over ${s.iterations} iter to meet demand</span>`
+      : '')
+    + `<br><span class="muted" style="font-size:10px">Basis: ${s.designBasis === 'all-heads-open' ? 'ALL heads open (worst-case envelope, not the NFPA remote-area design demand)' : 'remote-area subset'}.</span>`
+    + `<br><span class="muted" style="font-size:10px">ENGINEERING AID — NOT AHJ/PE-stamped, NOT a Hardy-Cross grid balance. Verify before permit.</span>`
+    + `</div>`;
+}
+
+// HF-PHASE3-NFPA-REPORT panel: a compact in-product preview of the NFPA report —
+// summary line + a sample of the node-analysis and pipe-data tables — with the
+// NOT-stamped engineering-aid disclaimer. Print / Export build the full report.
+function refreshReportPanel() {
+  const el = document.getElementById('reportPanel');
+  if (!el) return;
+  const r = lastHydraulicReport;
+  if (!r || !r.hasSummary) {
+    el.innerHTML = '<span class="muted" style="font-size:12px">Solve hydraulics to build the NFPA calculation report.</span>';
+    return;
+  }
+  const s = r.summary;
+  const metColor = s.demandMet === false ? '#ef4444' : '#22c55e';
+  const metTxt = s.demandMet == null ? 'n/a' : (s.demandMet ? 'MET' : 'NOT MET');
+  const esc = (v) => String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  // sample up to 4 node rows (source + remote pinned) and 4 pipe rows for the
+  // in-panel preview; the printable export carries every row.
+  const cc = 'border-bottom:1px solid rgba(148,163,184,0.18);padding:1px 4px';
+  const rc = `${cc};text-align:right`;
+  const tblCss = 'width:100%;border-collapse:collapse;font-size:10px;margin:2px 0';
+  const pinned = r.nodeRows.filter((n) => n.isSource || n.isRemote);
+  const rest = r.nodeRows.filter((n) => !n.isSource && !n.isRemote).slice(0, Math.max(0, 4 - pinned.length));
+  const nodeSample = pinned.concat(rest).slice(0, 4);
+  const nodeTbl = nodeSample.map((n) =>
+    `<tr><td style="${cc}">${esc(n.ref)}${n.isSource ? ' <span style="color:#38bdf8">(SUP)</span>' : (n.isRemote ? ' <span style="color:#f87171">(REM)</span>' : '')}</td>`
+    + `<td style="${rc}">${n.elevationFt}</td>`
+    + `<td style="${rc}">${n.kFactor == null ? '—' : n.kFactor}</td>`
+    + `<td style="${rc}">${n.pressurePsi == null ? '—' : n.pressurePsi}</td>`
+    + `<td style="${rc}">${n.flowGpm}</td></tr>`).join('');
+  const pipeSample = r.pipeRows.slice(0, 4);
+  const pipeTbl = pipeSample.map((p) =>
+    `<tr${p.overVelocity ? ' style="color:#f87171"' : ''}><td style="${cc}">${esc(p.ref)}</td>`
+    + `<td style="${rc}">${p.diameterIn}"</td>`
+    + `<td style="${rc}">${p.lengthFt}${p.fittingLeFt ? '+' + p.fittingLeFt : ''}</td>`
+    + `<td style="${rc}">${p.flowGpm}</td>`
+    + `<td style="${rc}">${p.velocityFps}</td>`
+    + `<td style="${rc}">${p.frictionLossPsi}</td></tr>`).join('');
+  el.innerHTML =
+    `<div style="font-size:12px;line-height:1.5">`
+    + `<b>${s.demandGpm} gpm</b> @ <b>${s.requiredPsi} psi</b> required`
+    + ` · supply ${s.availablePsi == null ? '—' : s.availablePsi + ' psi'}`
+    + ` · <span style="color:${metColor};font-weight:600">${s.safetyMarginPsi == null ? '' : (s.safetyMarginPsi >= 0 ? '+' : '') + s.safetyMarginPsi + ' psi ' }${metTxt}</span>`
+    + `<div class="muted" style="font-size:10px">${r.nodeRows.length} nodes · ${r.pipeRows.length} pipes · K ${s.kFactor == null ? '—' : s.kFactor} · C ${s.cFactor == null ? '—' : s.cFactor}`
+    + (s.hazardLabel ? ` · ${esc(s.hazardLabel)}` : '')
+    + (s.densityGpmFt2 != null ? ` · ${s.densityGpmFt2} gpm/ft²` : '') + `</div>`
+    + `<div class="muted" style="font-size:10px;margin-top:3px">Node analysis (Ref/Elev/K/P/Q)</div>`
+    + `<table style="${tblCss}"><tbody>${nodeTbl}</tbody></table>`
+    + (r.nodeRows.length > nodeSample.length ? `<div class="muted" style="font-size:9px">+${r.nodeRows.length - nodeSample.length} more nodes in the export</div>` : '')
+    + `<div class="muted" style="font-size:10px;margin-top:3px">Pipe data (Ref/Dia/Len+Le/Q/V/Loss)</div>`
+    + `<table style="${tblCss}"><tbody>${pipeTbl}</tbody></table>`
+    + (r.pipeRows.length > pipeSample.length ? `<div class="muted" style="font-size:9px">+${r.pipeRows.length - pipeSample.length} more pipes in the export</div>` : '')
+    + `<span class="muted" style="font-size:10px">ENGINEERING AID — NOT a PE-stamped or AHJ-approved hydraulic calculation. Verify the sealed calc before permit.</span>`
+    + `</div>`;
+}
+
+// HF-PHASE3-SUPPLIES panel: per-supply availability + binding (governing) supply +
+// supply-vs-demand operating point. Honest ENGINEERING-AID label.
+function refreshSupplyPanel() {
+  const el = document.getElementById('supplyPanel');
+  if (!el) return;
+  const sup = lastSupplies;
+  if (!sup || !sup.supplies || !sup.supplies.length) {
+    el.innerHTML = '<span class="muted" style="font-size:12px">Generate a layout (and define supplies) to evaluate supply vs demand.</span>';
+    return;
+  }
+  const rows = sup.supplies.map((e) => {
+    const ok = e.demandMet;
+    const c = ok ? '#22c55e' : '#ef4444';
+    const bind = (e.name === sup.bindingName) ? ' <span style="color:#38bdf8">◀ binding</span>' : '';
+    const extra = e.kind === 'tank' && e.durationMin != null ? ` · ${e.durationMin} min @ demand` : '';
+    return `<div class="kv" style="font-size:11px"><span>${e.name} <span class="muted">(${e.kind})</span>${bind}</span>`
+      + `<b style="color:${c}">${e.availablePsi} psi · ${ok ? '+' : ''}${e.marginPsi}${extra}</b></div>`;
+  }).join('');
+  const g = lastSupplyGraph;
+  const op = g && g.operatingPoint ? `${g.operatingPoint.flowGpm} gpm @ ${g.operatingPoint.psi} psi` : '—';
+  el.innerHTML =
+    `<div style="font-size:12px;line-height:1.5">`
+    + `<b>Demand point</b> ${sup.demandGpm} gpm @ ${sup.requiredPsi} psi`
+    + `<div style="margin:3px 0">${rows}</div>`
+    + `<span style="color:${sup.demandMet ? '#22c55e' : '#ef4444'};font-weight:600">`
+    + `${sup.demandMet ? 'Supply ADEQUATE' : 'Supply INADEQUATE'} (binding: ${sup.bindingName}, margin ${sup.marginPsi} psi)</span>`
+    + `<br><span class="muted" style="font-size:10px">Operating point (supply∩demand): ${op}</span>`
+    + `<br><span class="muted" style="font-size:10px">ENGINEERING AID — flow-test/pump/tank curves NOT AHJ/PE-stamped. Verify the field flow test + stamped pump curve before permit.</span>`
+    + `</div>`;
+}
+
+// HF-PHASE3-NODE TAGS overlay: a small P/Q/V label sprite at each sampled junction
+// (source / remote / tees / heads). Built from the live solve so labels match the
+// numbers. Camera-neutral — adds sprites to modelGroup, never touches the camera.
+function makeTagSprite(text, color) {
+  const pad = 8; const fs = 30;
+  const cnv = document.createElement('canvas');
+  const ctx = cnv.getContext('2d');
+  ctx.font = `600 ${fs}px Inter,system-ui,sans-serif`;
+  const lines = text.split('\n');
+  const w = Math.max(...lines.map((l) => ctx.measureText(l).width));
+  cnv.width = Math.ceil(w + pad * 2);
+  cnv.height = Math.ceil(lines.length * (fs + 4) + pad * 2);
+  const c2 = cnv.getContext('2d');
+  c2.fillStyle = 'rgba(15,23,42,0.82)';
+  roundRect(c2, 0, 0, cnv.width, cnv.height, 8); c2.fill();
+  c2.strokeStyle = color || '#38bdf8'; c2.lineWidth = 3; roundRect(c2, 1.5, 1.5, cnv.width - 3, cnv.height - 3, 8); c2.stroke();
+  c2.font = `600 ${fs}px Inter,system-ui,sans-serif`;
+  c2.textBaseline = 'top'; c2.fillStyle = '#e2e8f0';
+  lines.forEach((l, i) => { c2.fillText(l, pad, pad + i * (fs + 4)); });
+  const tex = new THREE.CanvasTexture(cnv);
+  if ('colorSpace' in tex && THREE.SRGBColorSpace) tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = 4;
+  const spr = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false, depthWrite: false }));
+  const scale = 0.018; // world units per pixel (true-scale plan; tags ~ readable)
+  spr.scale.set(cnv.width * scale, cnv.height * scale, 1);
+  spr.renderOrder = 2000;
+  return spr;
+}
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+}
+function renderNodeTagOverlay() {
+  if (!nodeTagsOn || !modelGroup) return;
+  const tags = window.__hfPhase3 && window.__hfPhase3.nodeTags;
+  if (!tags || !tags.sampled || !tags.sampled.length) return;
+  const grp = new THREE.Group();
+  grp.userData.hfNodeTagOverlay = true;
+  const thr = tags.maxVelocityThresholdFps || 32;
+  let placed = 0;
+  for (const n of tags.sampled) {
+    if (n.pressurePsi == null) continue;
+    const col = n.isSource ? '#a78bfa' : (n.isRemote ? '#f43f5e' : '#'.concat(((velocityColor(n.velocityFps, thr) >>> 0).toString(16).padStart(6, '0'))));
+    const label = `${n.pressurePsi}psi\n${n.flowGpm}gpm\n${n.velocityFps}fps`;
+    const spr = makeTagSprite(label, col);
+    const w = W([n.x, n.y, n.z]);
+    spr.position.set(w[0], w[1] + 0.9, w[2]);
+    grp.add(spr);
+    placed += 1;
+  }
+  modelGroup.add(grp);
+  window.__nodeTagOverlayDebug = { placed, sampled: tags.sampled.length, on: true };
+}
+
 // Build the coverage overlay group into modelGroup (called from renderModel after
 // the model meshes). When the toggle is off, nothing is drawn. When on: a faint
 // translucent coverage disc + a colored ring per head (green=ok, red=too-close,
@@ -4236,6 +5016,221 @@ function refreshCoverageLegend() {
     + `<div class="muted" style="font-size:10px;margin-top:4px">${cov.hazard} hazard · max spacing ${cov.maxSpacingFt} ft · ${cov.coveredPct}% area covered · ${verdict}</div>`
     + `<div class="muted" style="font-size:9px;margin-top:2px">Public NFPA-13 standard-spray geometry only — not AHJ/PE approval.</div>`;
 }
+
+// ── HF-PHASE3-REMOTE-AREA: draw the remote-area boundary + design demand ──────
+// The user DRAWS a boundary (rectangle or polygon) on the plan; we identify the
+// flowing heads inside (point-in-polygon), look up the NFPA-13 design density for
+// the hazard, and compute the area demand + per-head required flow. The result is
+// fed into the H-W solver as the design SUBSET (opts.flowingHeads), so the live
+// solve reports the real NFPA remote-area demand, not the all-heads-open envelope.
+// Published on window.__hfPhase3.remoteArea. Analysis-only; camera-neutral.
+//
+// CONTRACT: __hfPhase3.remoteArea -> { areaSqFt, flowingHeads, densityGpmFt2,
+//   demandGpm, requiredHeadFlowGpm, hazard, ... }.
+// HONESTY: density/area are the public NFPA-13 design curves — an ENGINEERING AID,
+// NOT AHJ/PE-stamped. The AHJ/PE picks the governing curve + hose + safety factor.
+let lastRemoteArea = null;          // computed result
+let remoteAreaBoundary = null;      // the drawn boundary (ring [{x,y}] or rect)
+let remoteAreaOverlayOn = true;     // show the boundary + shaded heads
+let remoteAreaDrawPts = [];         // in-progress polygon click points (plan x/y)
+let remoteAreaDrawMode = null;      // 'rect' | 'polygon' while drawing, else null
+
+// Recompute the remote-area demand from the current boundary + model, then (if a
+// boundary is set) re-run the H-W solve restricted to the flowing-head subset.
+function computeRemoteAreaLive(opts) {
+  if (!currentCadModel || !remoteAreaBoundary) { lastRemoteArea = null; publishRemoteArea(); return null; }
+  const o = opts || {};
+  const hazard = o.hazard || (currentCadModel.sizing && currentCadModel.sizing.hazard) || 'ordinary';
+  lastRemoteArea = computeRemoteArea(currentCadModel, remoteAreaBoundary, {
+    hazard,
+    densityGpmFt2: o.densityGpmFt2,
+  });
+  // Tie into the H-W solve as the demand SET: re-run the live solver with the
+  // remote-area predicate so __hfPhase3.solve reflects the design subset.
+  try {
+    runHydraulicSolve(currentCadModel, {
+      availablePsi: (o.availablePsi != null) ? o.availablePsi : DEFAULT_AVAILABLE_PSI,
+      minHeadPressurePsi: o.minHeadPressurePsi,
+      flowingHeads: lastRemoteArea.predicate,
+    });
+  } catch (e) { window.__remoteAreaSolveError = String(e && e.message || e); }
+  publishRemoteArea();
+  return lastRemoteArea;
+}
+function publishRemoteArea() {
+  window.__hfPhase3 = window.__hfPhase3 || {};
+  // CHUNK contract: areaSqFt, flowingHeads, densityGpmFt2, demandGpm (+ richer).
+  window.__hfPhase3.remoteArea = lastRemoteArea ? {
+    areaSqFt: lastRemoteArea.areaSqFt,
+    flowingHeads: lastRemoteArea.flowingHeads,
+    densityGpmFt2: lastRemoteArea.densityGpmFt2,
+    demandGpm: lastRemoteArea.demandGpm,
+    requiredHeadFlowGpm: lastRemoteArea.requiredHeadFlowGpm,
+    areaDemandGpm: lastRemoteArea.areaDemandGpm,
+    flowingHeadCount: lastRemoteArea.flowingHeadCount,
+    totalHeadCount: lastRemoteArea.totalHeadCount,
+    hazard: lastRemoteArea.hazard,
+    hazardLabel: lastRemoteArea.hazardLabel,
+    designAreaSqFt: lastRemoteArea.designAreaSqFt,
+    boundaryKind: lastRemoteArea.boundaryKind,
+    vertices: lastRemoteArea.vertices,
+    disclaimer: lastRemoteArea.disclaimer,
+  } : null;
+  try { renderModel(currentCadModel, { preserveView: true }); } catch (_) { /* overlay refresh */ }
+  try { refreshRemoteAreaPanel(); } catch (_) { /* panel optional */ }
+}
+window.__hfPhase3 = window.__hfPhase3 || {};
+window.__hfPhase3.remoteArea = window.__hfPhase3.remoteArea || null;
+
+// Programmatic boundary set (used by the draw tool + verification). Accepts a
+// polygon ring [{x,y}|[x,y]] or a rectangle {x0,y0,x1,y1}. Recomputes + publishes.
+window.__hfRemoteArea = (boundary, opts) => {
+  if (boundary !== undefined) remoteAreaBoundary = boundary;
+  return computeRemoteAreaLive(opts || {});
+};
+// Clear the drawn boundary (and the subset solve — reverts to all-heads-open).
+window.__hfRemoteAreaClear = () => {
+  remoteAreaBoundary = null; remoteAreaDrawPts = []; remoteAreaDrawMode = null; lastRemoteArea = null;
+  publishRemoteArea();
+  try { if (currentCadModel) runHydraulicSolve(currentCadModel, {}); } catch (_) { /* base solve */ }
+  return null;
+};
+// Snap the boundary to the hazard design area centered on the model centroid (a
+// quick way to drop a correctly-sized NFPA design area for the live solve).
+window.__hfRemoteAreaDesignBox = (opts) => {
+  if (!currentCadModel) return null;
+  const hazard = (opts && opts.hazard) || (currentCadModel.sizing && currentCadModel.sizing.hazard) || 'ordinary';
+  const curve = getDensityCurve(hazard);
+  const side = Math.sqrt(curve.designAreaSqFt); // square design area
+  // center on the head cloud
+  const heads = currentCadModel.solids.filter((s) => s && s.kind === 'head' && Array.isArray(s.position));
+  if (!heads.length) return null;
+  const cx = heads.reduce((a, h) => a + Number(h.position[0]), 0) / heads.length;
+  const cy = heads.reduce((a, h) => a + Number(h.position[1]), 0) / heads.length;
+  remoteAreaBoundary = { x0: cx - side / 2, y0: cy - side / 2, x1: cx + side / 2, y1: cy + side / 2 };
+  return computeRemoteAreaLive(opts || {});
+};
+window.__hfRemoteAreaToggle = (on) => {
+  remoteAreaOverlayOn = (on === undefined) ? !remoteAreaOverlayOn : !!on;
+  try { if (currentCadModel) renderModel(currentCadModel, { preserveView: true }); } catch (_) { /* GUARD#1 */ }
+  return remoteAreaOverlayOn;
+};
+
+// Draw the boundary polygon + shade the flowing heads inside it. Built from the
+// published lastRemoteArea so the picture matches the numbers. Camera-neutral
+// (adds geometry only — never touches controls/camera).
+const REMOTE_AREA_FILL = 0x38bdf8;     // sky-blue boundary fill
+const REMOTE_AREA_EDGE = 0x0ea5e9;     // boundary outline
+const REMOTE_AREA_HEAD = 0xf43f5e;     // flowing-head marker (rose)
+function remoteAreaRing() {
+  if (!remoteAreaBoundary) return [];
+  if (!Array.isArray(remoteAreaBoundary) && remoteAreaBoundary.x0 != null) return rectRing(remoteAreaBoundary);
+  return remoteAreaBoundary
+    .map((p) => (Array.isArray(p) ? { x: Number(p[0]), y: Number(p[1]) } : { x: Number(p.x), y: Number(p.y) }))
+    .filter((p) => Number.isFinite(p.x) && Number.isFinite(p.y));
+}
+function renderRemoteAreaOverlay() {
+  if (!remoteAreaOverlayOn || !modelGroup) return;
+  const ring = remoteAreaRing();
+  if (ring.length < 2 && remoteAreaDrawPts.length < 1) return;
+  // place the boundary just under the heads so it reads as a plan footprint.
+  const heads = (lastRemoteArea && lastRemoteArea.flowingHeads) || [];
+  let zPlan = 7;
+  const allHeads = currentCadModel ? currentCadModel.solids.filter((s) => s && s.kind === 'head' && Array.isArray(s.position)) : [];
+  if (allHeads.length) zPlan = Math.min(...allHeads.map((h) => Number(h.position[2]) || 7)) - 0.08;
+  const grp = new THREE.Group();
+  grp.userData.hfRemoteAreaOverlay = true;
+  grp.renderOrder = 1150;
+  // filled boundary (translucent) — triangulate the ring as a fan (works for
+  // convex draws; concave still shows the outline + heads correctly).
+  if (ring.length >= 3) {
+    const verts = [];
+    for (let i = 1; i < ring.length - 1; i += 1) {
+      const a = W([ring[0].x, ring[0].y, zPlan]);
+      const b = W([ring[i].x, ring[i].y, zPlan]);
+      const c = W([ring[i + 1].x, ring[i + 1].y, zPlan]);
+      verts.push(...a, ...b, ...c);
+    }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
+    grp.add(new THREE.Mesh(g, new THREE.MeshBasicMaterial({ color: REMOTE_AREA_FILL, transparent: true, opacity: 0.12, side: THREE.DoubleSide, depthWrite: false })));
+  }
+  // boundary outline (closed loop)
+  const loopPts = (ring.length ? ring : remoteAreaDrawPts.map((p) => ({ x: p[0], y: p[1] }))).map((p) => {
+    const w = W([p.x, p.y, zPlan + 0.03]); return new THREE.Vector3(w[0], w[1], w[2]);
+  });
+  if (loopPts.length >= 2) {
+    if (ring.length >= 3) loopPts.push(loopPts[0].clone()); // close it
+    const lg = new THREE.BufferGeometry().setFromPoints(loopPts);
+    grp.add(new THREE.Line(lg, new THREE.LineBasicMaterial({ color: REMOTE_AREA_EDGE, transparent: true, opacity: 0.95, depthTest: false })));
+  }
+  // flowing-head markers (rose rings) over each head inside the area
+  for (const h of heads) {
+    const c = W([h.x, h.y, zPlan + 0.05]);
+    const ring2 = new THREE.RingGeometry(0.6, 1.0, 24);
+    ring2.rotateX(-Math.PI / 2);
+    ring2.translate(c[0], c[1], c[2]);
+    grp.add(new THREE.Mesh(ring2, new THREE.MeshBasicMaterial({ color: REMOTE_AREA_HEAD, transparent: true, opacity: 0.9, side: THREE.DoubleSide, depthWrite: false, depthTest: false })));
+  }
+  modelGroup.add(grp);
+  window.__remoteAreaOverlayDebug = { ring: ring.length, flowingHeads: heads.length, on: true, zPlan, draftPts: remoteAreaDrawPts.length };
+}
+// Panel readout (real numbers + honesty label).
+function refreshRemoteAreaPanel() {
+  const el = $('remoteArea'); if (!el) return;
+  const ra = lastRemoteArea;
+  if (!ra) { el.innerHTML = '<span class="muted" style="font-size:12px">Draw a remote-area boundary to compute the design demand.</span>'; return; }
+  el.innerHTML =
+    `<div style="font-size:12px;line-height:1.6">`
+    + `<b>Area</b> ${ra.areaSqFt} ft² &nbsp; <b>Density</b> ${ra.densityGpmFt2} gpm/ft² &nbsp; <span class="muted">(${ra.hazardLabel})</span>`
+    + `<br><b>Flowing heads</b> ${ra.flowingHeadCount}/${ra.totalHeadCount} &nbsp; <b>Per-head min</b> ${ra.requiredHeadFlowGpm} gpm`
+    + `<br><b style="color:#38bdf8">Demand</b> ${ra.demandGpm} gpm (Σ head flow) &nbsp; <span class="muted">area-density ${ra.areaDemandGpm} gpm</span>`
+    + `<br><span class="muted" style="font-size:10px">NFPA-13 design area for ${ra.hazardLabel}: ${ra.designAreaSqFt} ft². Boundary: ${ra.boundaryKind} (${ra.vertices} pts).</span>`
+    + `<br><span class="muted" style="font-size:10px">ENGINEERING AID — NFPA-13 density/area, NOT AHJ/PE-stamped. AHJ/PE selects governing curve + hose + safety factor. Verify before permit.</span>`
+    + `</div>`;
+}
+
+// Click-to-draw interaction (camera-neutral): each click on the plan appends a
+// plan x/y point via pointerToPlan (the same projector the measure/draw tools use
+// — no new pointer system, no camera change). 'rect' captures two corner clicks;
+// 'polygon' accumulates until __hfRemoteAreaFinish(). The render only adds overlay
+// geometry, so the camera target is untouched (GUARD#1).
+window.__hfRemoteAreaDrawStart = (mode) => {
+  remoteAreaDrawMode = (mode === 'rect') ? 'rect' : 'polygon';
+  remoteAreaDrawPts = [];
+  $('status') && ($('status').textContent = `Remote-area: click ${remoteAreaDrawMode === 'rect' ? 'two opposite corners' : 'boundary points, then Finish'} on the plan`);
+  return remoteAreaDrawMode;
+};
+// Append a plan point (called by the click handler OR programmatically with [x,y]).
+window.__hfRemoteAreaAddPoint = (planXY) => {
+  if (!remoteAreaDrawMode || !Array.isArray(planXY)) return remoteAreaDrawPts.length;
+  remoteAreaDrawPts.push([Number(planXY[0]), Number(planXY[1])]);
+  if (remoteAreaDrawMode === 'rect' && remoteAreaDrawPts.length === 2) {
+    const [a, b] = remoteAreaDrawPts;
+    remoteAreaBoundary = { x0: a[0], y0: a[1], x1: b[0], y1: b[1] };
+    remoteAreaDrawMode = null; remoteAreaDrawPts = [];
+    computeRemoteAreaLive({});
+  } else {
+    try { if (currentCadModel) renderModel(currentCadModel, { preserveView: true }); } catch (_) { /* draft overlay */ }
+  }
+  return remoteAreaDrawPts.length;
+};
+// Finish a polygon draw (>=3 pts -> commit the ring + compute).
+window.__hfRemoteAreaFinish = () => {
+  if (remoteAreaDrawMode === 'polygon' && remoteAreaDrawPts.length >= 3) {
+    remoteAreaBoundary = remoteAreaDrawPts.map((p) => ({ x: p[0], y: p[1] }));
+    remoteAreaDrawMode = null; remoteAreaDrawPts = [];
+    return computeRemoteAreaLive({});
+  }
+  return null;
+};
+window.__hfRemoteAreaState = () => ({
+  hasBoundary: !!remoteAreaBoundary,
+  drawMode: remoteAreaDrawMode,
+  draftPts: remoteAreaDrawPts.slice(),
+  overlayOn: remoteAreaOverlayOn,
+  result: window.__hfPhase3.remoteArea,
+});
 
 // Menu entrypoint for Easy Drop / Arm-over / Sprig: build the missing connections
 // on the live model (undoable) and report the real result in the status bar.
