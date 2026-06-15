@@ -321,6 +321,134 @@ export function detectOpenings(walls = [], doors = [], opts = {}) {
   return { openings: uniq, note };
 }
 
+const segAngle = (s) => Math.atan2(s.y2 - s.y1, s.x2 - s.x1);
+const segMid = (s) => [(s.x1 + s.x2) / 2, (s.y1 + s.y2) / 2];
+// smallest absolute difference between two undirected line angles, in [0, PI/2]
+function angDiffUndirected(a, b) {
+  let d = Math.abs(a - b) % Math.PI;
+  if (d > Math.PI / 2) d = Math.PI - d;
+  return d;
+}
+
+/**
+ * PURE. Detect WINDOWS from wall-band segments.
+ *
+ * In a plan, a WINDOW is NOT a swing arc (that's a door) — it is drawn as a GAP in the wall where
+ * the glazing is shown by a cluster of SHORT, mutually-PARALLEL "mullion / sill" lines that run
+ * ALONG the wall (parallel to the wall axis), spaced a small distance apart (the sill + glass +
+ * head lines of a double-line wall section). Concretely the window symbol is >=minLines short
+ * collinear-bundle segments: same direction, short length (windowMinFt..windowMaxFt span), and
+ * perpendicular spacing that fits a wall thickness (<=maxBandFt). We cluster such bundles, require
+ * NO door hinge within excludeDoorFt (so a door is never re-counted as a window), and emit one
+ * window per bundle at the bundle centroid. Width = the along-axis extent of the bundle.
+ *
+ * This is a heuristic recovered from REAL plan vector segments; it is conservative and every
+ * window is flagged needs-verification (it is NOT a verified window schedule and NOT AHJ/egress).
+ *
+ * @param {Array<{a,b}|{x1,y1,x2,y2}>} wallSegs - wall-band segments in FEET (the heavier band, the
+ *   same set the wall extractor used — mullions live in this band).
+ * @param {Array} doors - detected doors (to exclude door symbols).
+ * @param {Object} [opts]
+ * @returns {{windows:Array, note:string}}
+ */
+export function detectWindows(wallSegs = [], doors = [], opts = {}) {
+  const minLines = Number.isFinite(opts.minLines) ? opts.minLines : 3;
+  const windowMinFt = Number.isFinite(opts.windowMinFt) ? opts.windowMinFt : 1.5;
+  const windowMaxFt = Number.isFinite(opts.windowMaxFt) ? opts.windowMaxFt : 12;
+  const maxBandFt = Number.isFinite(opts.maxBandFt) ? opts.maxBandFt : 1.5;   // wall thickness band
+  const minSpacingFt = Number.isFinite(opts.minSpacingFt) ? opts.minSpacingFt : 0.08;
+  const angTol = Number.isFinite(opts.angTolDeg) ? opts.angTolDeg * Math.PI / 180 : 7 * Math.PI / 180;
+  const excludeDoorFt = Number.isFinite(opts.excludeDoorFt) ? opts.excludeDoorFt : 4;
+  const dedupFt = Number.isFinite(opts.dedupFt) ? opts.dedupFt : 3;
+  const note =
+    'Geometric window detection: a cluster of >=' + minLines + ' SHORT, mutually-parallel mullion/sill ' +
+    'lines (each ' + windowMinFt + '-' + windowMaxFt + ' ft long) packed within a wall-thickness band ' +
+    '(<=' + maxBandFt + ' ft perpendicular spread) with NO door swing arc on it = a window glazing ' +
+    'symbol. Best-effort, deterministic; NOT a verified window/glazing schedule; NOT AHJ/egress. ' +
+    'needs-verification.';
+
+  // normalize + keep only SHORT segments in the plausible mullion length band
+  const segs = (Array.isArray(wallSegs) ? wallSegs : []).map((w) => (
+    w && w.a && w.b ? { x1: w.a[0], y1: w.a[1], x2: w.b[0], y2: w.b[1] } : w
+  )).filter((w) => w && Number.isFinite(w.x1));
+  const mull = segs.filter((s) => { const L = segLen(s); return L >= windowMinFt && L <= windowMaxFt; })
+    .map((s) => ({ s, ang: segAngle(s), mid: segMid(s), len: segLen(s) }));
+
+  const doorPts = (Array.isArray(doors) ? doors : []).map((d) => d.position).filter(Array.isArray);
+  const used = new Array(mull.length).fill(false);
+  const windows = [];
+
+  for (let i = 0; i < mull.length; i++) {
+    if (used[i]) continue;
+    const seed = mull[i];
+    // perpendicular direction (unit) to measure cross-band spacing
+    const px = -Math.sin(seed.ang), py = Math.cos(seed.ang);
+    // gather parallel neighbours whose midpoint projects near the seed along the PERP axis (i.e. a
+    // stack of parallel lines forming the glazing band), and whose along-axis offset overlaps.
+    const group = [i];
+    const seedAlong = seed.mid[0] * Math.cos(seed.ang) + seed.mid[1] * Math.sin(seed.ang);
+    for (let j = 0; j < mull.length; j++) {
+      if (j === i || used[j]) continue;
+      const m = mull[j];
+      if (angDiffUndirected(m.ang, seed.ang) > angTol) continue;
+      const dx = m.mid[0] - seed.mid[0], dy = m.mid[1] - seed.mid[1];
+      const perpDist = Math.abs(dx * px + dy * py);     // cross-band spread
+      const alongDist = Math.abs((m.mid[0] * Math.cos(seed.ang) + m.mid[1] * Math.sin(seed.ang)) - seedAlong);
+      if (perpDist <= maxBandFt && perpDist >= 0 && alongDist <= windowMaxFt) group.push(j);
+    }
+    if (group.length < minLines) continue;
+    // verify there ARE >=2 distinct perpendicular offsets (real mullions are spaced, not coincident)
+    const perpOffsets = group.map((g) => { const dx = mull[g].mid[0] - seed.mid[0], dy = mull[g].mid[1] - seed.mid[1]; return dx * px + dy * py; });
+    const spanPerp = Math.max(...perpOffsets) - Math.min(...perpOffsets);
+    if (spanPerp < minSpacingFt) continue;             // all coincident => not a glazing band
+    // centroid + along-axis width of the bundle
+    let cx = 0, cy = 0; for (const g of group) { cx += mull[g].mid[0]; cy += mull[g].mid[1]; }
+    cx /= group.length; cy /= group.length;
+    // no door symbol on this window
+    if (doorPts.some((dp) => dist(dp[0], dp[1], cx, cy) <= excludeDoorFt)) continue;
+    // along-axis extent of the bundle = window width
+    const alongVals = group.flatMap((g) => [
+      mull[g].s.x1 * Math.cos(seed.ang) + mull[g].s.y1 * Math.sin(seed.ang),
+      mull[g].s.x2 * Math.cos(seed.ang) + mull[g].s.y2 * Math.sin(seed.ang),
+    ]);
+    const widthFt = Math.max(...alongVals) - Math.min(...alongVals);
+    if (widthFt < windowMinFt || widthFt > windowMaxFt) continue;
+    for (const g of group) used[g] = true;
+    // HONEST CONFIDENCE: a 'medium' (confident) window is a typical glazing symbol — a SMALL bundle
+    // (3-8 mullion/sill lines) spanning a real wall-thickness band (0.2-1.5 ft) at a typical window
+    // width (<= realWindowMaxFt). Very wide bundles (storefront/curtain-wall OR a regularly-spaced
+    // partition-hatch/stair-tread the clusterer latched onto) and very dense (>realMullionMax line)
+    // clusters are KEPT (geometry is real) but DOWN-RANKED to 'low' so the Studio never asserts them
+    // as confident windows.
+    const realWindowMaxFt = Number.isFinite(opts.realWindowMaxFt) ? opts.realWindowMaxFt : 8;
+    const realMullionMax = Number.isFinite(opts.realMullionMax) ? opts.realMullionMax : 8;
+    const typicalBand = spanPerp >= 0.2 && spanPerp <= maxBandFt;
+    const typicalWidth = widthFt <= realWindowMaxFt;
+    const typicalCount = group.length >= minLines && group.length <= realMullionMax;
+    const confident = typicalBand && typicalWidth && typicalCount;
+    windows.push({
+      kind: 'window',
+      position: [round(cx), round(cy)],
+      width: round(widthFt),
+      mullionLines: group.length,
+      bandFt: round(spanPerp),
+      axisDeg: round(seed.ang * 180 / Math.PI),
+      evidence: 'mullion-bundle(parallel-short-lines,wall-band,no-arc)',
+      widthClass: typicalWidth ? 'typical-window' : 'wide(storefront-or-suspect)',
+      suspect: !confident,
+      confidence: confident ? 'medium' : 'low',
+      provenance: 'extracted (vector PDF wall-band mullion cluster) — needs-verification',
+      needsVerification: true,
+    });
+  }
+  // dedup nearby windows
+  const uniq = [];
+  for (const w of windows) { if (!uniq.some((u) => dist(u.position[0], u.position[1], w.position[0], w.position[1]) <= dedupFt)) uniq.push(w); }
+  uniq.sort((p, q) => p.position[0] - q.position[0] || p.position[1] - q.position[1]);
+  const confidentCount = uniq.filter((w) => !w.suspect).length;
+  return { windows: uniq, note, confidentCount, suspectCount: uniq.length - confidentCount };
+}
+
 const FIXTURE_KINDS = Object.freeze([
   { kind: 'restroom', re: /\bREST\s*ROOM\b|\bTOILET\b|\bW\.?C\.?\b|\bBATH(ROOM)?\b|\bLAV\b|\bURINAL\b/i },
   { kind: 'elevator', re: /\bELEV(ATOR)?\b|\bLIFT\b/i },

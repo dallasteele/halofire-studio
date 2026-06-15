@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { fitCircle, detectDoors, detectOpenings, detectFixtures } from '../src/engine/plan-doors.js';
+import { fitCircle, detectDoors, detectOpenings, detectFixtures, detectWindows } from '../src/engine/plan-doors.js';
 import { selectWallLayer } from '../src/engine/pdf-floorplan.js';
 
 describe('fitCircle', () => {
@@ -106,6 +106,48 @@ describe('detectFixtures', () => {
     const { fixtures, counts } = detectFixtures([], [], []);
     expect(fixtures).toHaveLength(0);
     expect(counts).toEqual({});
+  });
+});
+
+describe('detectWindows', () => {
+  // a 4ft window: 4 parallel mullion/sill lines (each 4ft long, running along +x at y=0,0.15,0.3,0.45)
+  // packed in a 0.45ft band — the glazing symbol of a double-line wall window.
+  const windowSym = [
+    { a: [10, 0.0], b: [14, 0.0] },
+    { a: [10, 0.15], b: [14, 0.15] },
+    { a: [10, 0.3], b: [14, 0.3] },
+    { a: [10, 0.45], b: [14, 0.45] },
+  ];
+
+  it('detects a mullion bundle as a window at the bundle centroid', () => {
+    const { windows } = detectWindows(windowSym, [], {});
+    expect(windows).toHaveLength(1);
+    const w = windows[0];
+    expect(w.kind).toBe('window');
+    expect(w.position[0]).toBeCloseTo(12, 1);
+    expect(w.width).toBeCloseTo(4, 1);
+    expect(w.mullionLines).toBeGreaterThanOrEqual(3);
+    expect(w.needsVerification).toBe(true);
+  });
+
+  it('does NOT report a window where a door swing arc sits (door wins)', () => {
+    const doors = [{ position: [12, 0.2], width: 3 }];
+    const { windows } = detectWindows(windowSym, doors, {});
+    expect(windows).toHaveLength(0);
+  });
+
+  it('rejects too-few parallel lines (a single wall double-line is not a window)', () => {
+    const twoLines = [{ a: [10, 0], b: [14, 0] }, { a: [10, 0.3], b: [14, 0.3] }];
+    const { windows } = detectWindows(twoLines, [], {});
+    expect(windows).toHaveLength(0);
+  });
+
+  it('rejects long structural wall lines (only short mullion-length segments cluster)', () => {
+    const longWalls = [
+      { a: [0, 0], b: [60, 0] }, { a: [0, 0.3], b: [60, 0.3] }, { a: [0, 0.6], b: [60, 0.6] },
+    ];
+    const { windows } = detectWindows(longWalls, [], {});
+    expect(windows).toHaveLength(0);
   });
 });
 

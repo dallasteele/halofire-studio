@@ -229,6 +229,7 @@ function makeRoomTile(THREE, room, bounds, elevationFt) {
 const DOOR_COLOR = 0xffb454;       // CONFIDENT door leaf + swing arc — warm amber
 const DOOR_SUSPECT_COLOR = 0x6b7280; // SUSPECT (down-ranked) door — muted grey, visually de-emphasized
 const OPENING_COLOR = 0x4ab0ff;    // cased opening / passage marker — blue
+const WINDOW_COLOR = 0x00c8d4;     // window glazing (mullion bundle) marker — cyan
 const FIXTURE_COLOR = 0x4ad6c0;    // fixture / core marker — teal
 const WALLSFULL_COLOR = 0xc77dff;  // recovered partition-inclusive walls (recall layer) — violet
 const COLUMN_COLOR = 0xd1495b;     // structural column — deep red
@@ -302,6 +303,23 @@ function makeOpening(THREE, op, bounds, elevationFt) {
   mesh.position.set(op.position[0] - bounds.cx, elevationFt + 0.05, op.position[1] - bounds.cy);
   mesh.name = `plan-opening:${wft.toFixed(1)}ft`;
   mesh.userData = { kind: 'plan-opening', widthFt: Math.round(wft * 100) / 100, evidence: op.evidence, confidence: op.confidence, needsVerification: true };
+  return mesh;
+}
+
+/** Build a glazing-bar marker for a WINDOW (mullion bundle). A thin cyan sill bar at the opening. */
+function makeWindow(THREE, win, bounds, elevationFt) {
+  if (!win || !Array.isArray(win.position) || !THREE.BoxGeometry) return null;
+  const wft = Math.max(0.5, Number(win.width) || 3);
+  const suspect = win.confidence === 'low';
+  const geo = new THREE.BoxGeometry(wft, 0.12, 0.12);
+  const mat = THREE.MeshStandardMaterial
+    ? new THREE.MeshStandardMaterial({ color: WINDOW_COLOR, transparent: true, opacity: suspect ? 0.45 : 0.8, metalness: 0.1, roughness: 0.5 })
+    : new THREE.MeshBasicMaterial({ color: WINDOW_COLOR, transparent: true, opacity: suspect ? 0.45 : 0.8 });
+  const mesh = new THREE.Mesh(geo, mat);
+  if (Number.isFinite(win.axisDeg)) mesh.rotation.y = -win.axisDeg * Math.PI / 180;
+  mesh.position.set(win.position[0] - bounds.cx, elevationFt + 0.06, win.position[1] - bounds.cy);
+  mesh.name = `plan-window:${wft.toFixed(1)}ft`;
+  mesh.userData = { kind: 'plan-window', widthFt: Math.round(wft * 100) / 100, mullionLines: win.mullionLines || null, evidence: win.evidence, confidence: win.confidence, suspect, needsVerification: true };
   return mesh;
 }
 
@@ -640,6 +658,19 @@ export function buildBuildingFromPlans(THREE, levelPlans, opts = {}) {
       group.add(oGroup);
     }
 
+    // HF-W2: WINDOWS — glazing-bar markers (mullion bundles with no swing arc), toggleable with doors.
+    let windowCount = 0;
+    if (Array.isArray(plan.windows) && plan.windows.length) {
+      const wGroup = new THREE.Group();
+      wGroup.name = 'windows';
+      wGroup.userData = { kind: 'plan-windows-layer', toggleKey: 'DOORS', needsVerification: true };
+      for (const win of plan.windows) {
+        const m = makeWindow(THREE, win, bounds, elevationFt);
+        if (m) { wGroup.add(m); windowCount += 1; }
+      }
+      group.add(wGroup);
+    }
+
     // HF-W2: FIXTURES / cores — labeled space content, toggleable.
     let fixtureCount = 0;
     if (Array.isArray(plan.fixtures) && plan.fixtures.length) {
@@ -689,7 +720,7 @@ export function buildBuildingFromPlans(THREE, levelPlans, opts = {}) {
       columnSource,
       counts: {
         walls: wallCount, rooms: roomCount, stairs: stairCount,
-        doors: doorCount, openings: openingCount, fixtures: fixtureCount,
+        doors: doorCount, windows: windowCount, openings: openingCount, fixtures: fixtureCount,
         columns: columnCount, columnSource,
         wallsFull: wallsFullCount,
         // RECORE: the honest primary wall count is the merged wall RUNS (when present).
@@ -733,12 +764,17 @@ export function buildBuildingFromPlans(THREE, levelPlans, opts = {}) {
     extractionCompleteness: recallLevel ? {
       wallRecallPct: recallLevel.recallPct,
       recallMeasure: recallLevel.recallMeasure,
-      doors: recallLevel.counts.doors, openings: recallLevel.counts.openings,
+      doors: recallLevel.counts.doors, windows: recallLevel.counts.windows, openings: recallLevel.counts.openings,
       // HF-W2b: honest door split — confident = on-wall + real leaf width; suspect = down-ranked.
       confidentDoors: (recallLevel.doorExtraction && Number.isFinite(recallLevel.doorExtraction.confidentDoors))
         ? recallLevel.doorExtraction.confidentDoors : null,
       suspectDoors: (recallLevel.doorExtraction && Number.isFinite(recallLevel.doorExtraction.suspectDoors))
         ? recallLevel.doorExtraction.suspectDoors : null,
+      // HF-W2c: honest window split — confident = >=4 mullion lines w/ real band; suspect = down-ranked.
+      confidentWindows: (recallLevel.doorExtraction && Number.isFinite(recallLevel.doorExtraction.windowsConfident))
+        ? recallLevel.doorExtraction.windowsConfident : null,
+      suspectWindows: (recallLevel.doorExtraction && Number.isFinite(recallLevel.doorExtraction.windowsSuspect))
+        ? recallLevel.doorExtraction.windowsSuspect : null,
       // HF-W2b: building-wall coverage measured in-envelope (drops non-wall sheet furniture).
       inEnvelopeRecallPct: (recallLevel.recallMeasure && Number.isFinite(recallLevel.recallMeasure.inEnvelopeRecallPct))
         ? recallLevel.recallMeasure.inEnvelopeRecallPct : null,

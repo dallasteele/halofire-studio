@@ -2356,8 +2356,8 @@ function appendPlanW2LayerToggles() {
   const ext = st.api.summary && st.api.summary.extractionCompleteness;
   if (!ext) return;
   const items = [];
-  if ((ext.doors || 0) + (ext.openings || 0) > 0) {
-    items.push({ key: 'DOORS', label: `Doors & openings (${ext.doors || 0} / ${ext.openings || 0})`, names: ['doors', 'openings'], on: true });
+  if ((ext.doors || 0) + (ext.windows || 0) + (ext.openings || 0) > 0) {
+    items.push({ key: 'DOORS', label: `Doors / windows / openings (${ext.doors || 0} / ${ext.windows || 0} / ${ext.openings || 0})`, names: ['doors', 'windows', 'openings'], on: true });
   }
   if ((ext.recoveredWalls || 0) > 0) {
     items.push({ key: 'WALLSFULL', label: `Recovered walls (${ext.wallRecallPct != null ? ext.wallRecallPct + '%' : 'recall'})`, names: ['recovered-walls'], on: false });
@@ -2780,6 +2780,13 @@ function buildPlanBuildPanel() {
     const doorLine = (cd != null && sd != null)
       ? `doors <b style="color:#4ade80">${cd} confident</b> · <b style="color:#fbbf24">${sd} suspect</b> (of ${ext.doors || 0})`
       : `doors ${ext.doors || 0}`;
+    // HF-W2c: confident windows = >=4 mullion lines w/ real band; suspect = down-ranked.
+    const cw = ext.confidentWindows, sw = ext.suspectWindows;
+    const windowLine = (ext.windows != null && ext.windows > 0)
+      ? ((cw != null && sw != null)
+        ? `windows <b style="color:#4ade80">${cw} confident</b> · <b style="color:#fbbf24">${sw} suspect</b> (of ${ext.windows})`
+        : `windows ${ext.windows}`)
+      : '';
     // RECORE: headline the HONEST primary structure — collinear-merged wall RUNS (real walls:
     // envelope + partitions, non-wall ink excluded), NOT a coverage %. The 41,784-segment
     // lineweight union is demoted to an off-by-default diagnostic overlay.
@@ -2796,7 +2803,7 @@ function buildPlanBuildPanel() {
         ${runLine ? `<div>${runLine}</div>` : ''}
         ${inEnv ? `<div>wall-ink coverage (diagnostic): <b style="color:${ext.inEnvelopeRecallPct >= 90 ? '#4ade80' : '#fbbf24'}">${inEnv}</b> in-envelope</div>` : ''}
         <div>whole-sheet wall-ink coverage (diagnostic): <b style="color:#fbbf24">${recall}</b> floor (denominator incl. border/grid/dim ink) (L${ext.level})</div>
-        <div>${doorLine} · openings ${ext.openings || 0} · lineweight-union overlay ${ext.recoveredWalls ? ext.recoveredWalls.toLocaleString() : 0} segs (off by default)</div>
+        <div>${doorLine}${windowLine ? ' · ' + windowLine : ''} · openings ${ext.openings || 0} · lineweight-union overlay ${ext.recoveredWalls ? ext.recoveredWalls.toLocaleString() : 0} segs (off by default)</div>
         ${ext.fixtures ? `<div>fixtures/cores: ${ext.fixtures}${fxLine ? ' (' + fxLine + ')' : ''}</div>` : ''}
         <div style="margin-top:4px"><a href="#" id="w2HeatLink" style="color:#7dd3fc;text-decoration:underline">view recall heatmap ▸</a></div>
         <img id="w2HeatThumb" src="${W2_HEATMAP_URL}" alt="wall recall heatmap (covered green / missed red)"
@@ -6320,12 +6327,20 @@ function buildPhase4Intake() {
     for (const lp of lps) {
       const p = lp.plan || {};
       if (scaleFtPerUnit == null && Number.isFinite(p.scaleFtPerUnit)) scaleFtPerUnit = p.scaleFtPerUnit;
-      // WALLS: prefer collinear-merged runs (real walls); fall back to raw segments.
-      const wsrc = (Array.isArray(p.wallRuns) && p.wallRuns.length) ? p.wallRuns : (p.walls || []);
+      // WALLS: prefer the HIGH-RECALL partition-inclusive runs (wallRunsFull — collinear-merged
+      // from the full heavier-than-baseline wall ink with dashed grid datums excluded; >=90% ink
+      // recall measured on A-101 p8), then the single-band runs, then raw segments. This surfaces
+      // interior partitions + cores the single-band set under-captured, so intake reports REAL
+      // (complete) walls, not the depleted 66-run set.
+      const wsrc = (Array.isArray(p.wallRunsFull) && p.wallRunsFull.length) ? p.wallRunsFull
+        : (Array.isArray(p.wallRuns) && p.wallRuns.length) ? p.wallRuns
+        : (p.walls || []);
       for (const w of wsrc) if (w && Array.isArray(w.a) && Array.isArray(w.b)) walls.push({ level: lp.level, a: w.a, b: w.b });
-      // OPENINGS: cased openings + door positions (both are wall openings the router cares about).
+      // OPENINGS: cased openings + door positions + window positions (all are wall openings the
+      // router cares about — each carries kind so a consumer can split doors/windows/cased gaps).
       for (const o of (p.openings || [])) if (o && Array.isArray(o.position)) openings.push({ level: lp.level, kind: 'opening', position: o.position, width: o.width, confidence: o.confidence });
       for (const d of (p.doors || [])) if (d && Array.isArray(d.position)) openings.push({ level: lp.level, kind: 'door', position: d.position, width: d.width, confidence: d.confidence, suspect: d.suspect });
+      for (const w of (p.windows || [])) if (w && Array.isArray(w.position)) openings.push({ level: lp.level, kind: 'window', position: w.position, width: w.width, confidence: w.confidence, mullionLines: w.mullionLines });
       levels.push({ level: lp.level, name: lp.name, elevationFt: lp.elevationFt, scaleFtPerUnit: p.scaleFtPerUnit, scaleText: p.scaleText });
     }
     // COLUMNS: from the resolved api levels (extracted or grid-synthesized in building-from-plan).
@@ -6351,7 +6366,7 @@ function buildPhase4Intake() {
       walls, openings, columns, levels,
       counts: { walls: walls.length, openings: openings.length, columns: columns.length, levels: levels.length },
       columnSource,
-      provenance: 'Engineering aid — building model reconstructed from the imported plan. Walls = collinear-merged runs (heuristic real-wall count); openings = swing-arc doors + collinear-gap cased openings (best-effort); columns = ' + (columnSource || 'none') + '. NOT AHJ/PE-stamped — needs-verification.',
+      provenance: 'Engineering aid — building model reconstructed from the imported plan. Walls = high-recall collinear-merged runs from the partition-inclusive wall-ink band, dashed grid datums excluded (>=90% ink recall, ~99% precision measured on A-101 p8); openings = swing-arc doors + mullion-bundle windows + collinear-gap cased openings (best-effort); columns = ' + (columnSource || 'none') + '. NOT AHJ/PE-stamped — needs-verification.',
       needsVerification: true,
     };
   };
