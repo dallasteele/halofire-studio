@@ -571,6 +571,18 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
     <div class="insp-panel" data-panel="hydraulics">
       <h3>Pipe Schedule (NFPA-13)</h3>
       <div id="pipes"><span class="muted" style="font-size:12px">—</span></div>
+      <h3 style="display:flex;align-items:center;justify-content:space-between">Apply Pipe Schedule (cascade)
+        <button id="applyScheduleBtn" class="act ghost" style="font-size:10px;padding:3px 7px;margin:0">Apply schedule</button>
+      </h3>
+      <div id="scheduleLegend"><span class="muted" style="font-size:12px">Apply Pipe Schedule to size the whole system by NFPA head-count.</span></div>
+      <h3 style="display:flex;align-items:center;justify-content:space-between">Smart Pipe (topology)
+        <button id="smartPipeToggle" class="act ghost" style="font-size:10px;padding:3px 7px;margin:0">Color by role</button>
+      </h3>
+      <div id="smartPipe"><span class="muted" style="font-size:12px">Generate a layout to classify pipe roles.</span></div>
+      <h3 style="display:flex;align-items:center;justify-content:space-between">Coverage &amp; spacing (NFPA-13)
+        <button id="coverageToggle" class="act ghost" style="font-size:10px;padding:3px 7px;margin:0">Show coverage</button>
+      </h3>
+      <div id="coverage"><span class="muted" style="font-size:12px">Generate a layout to compute coverage.</span></div>
       <h3>Hydraulics (NFPA-13, est.)</h3>
       <div id="hydraulics"><span class="muted" style="font-size:12px">—</span></div>
     </div>
@@ -646,6 +658,32 @@ import { createPartMeshLoader } from '/src/engine/part-meshes.js';
 // engine. All viewer-side preview/raycast/DOM wiring stays inline below.
 import { createCommandStack, resolveSolidIndex, moveSolid, deleteSolid, copySolid, rotateSolid, mirrorSolid, addSolid, setSolidFields, solidCentroidPlan, solidEndpointsPlan, trimExtendSolid, offsetSolid, arraySolid, setSolidGrip, moveVertices } from '/src/engine/edit-commands.js';
 import { snap as snapPoint, segmentsFromModel, nodesFromModel, orthoConstrain, polarConstrain, defaultSnapState } from '/src/engine/snaps.js';
+// HF-PHASE2-SMARTPIPE (Stream Phase 2 — system intelligence): topology pipe-role
+// classifier (main / cross-main / branch-line / arm-over / drop / sprig / riser),
+// the data foundation the BOM + hydraulics depend on. Re-derives roles from
+// connectivity (degree, heads served, orientation, what-feeds-what), independent
+// of the generator's labels. Pure + unit-tested (tests/smart-pipe.test.js).
+import { classifyPipes, tagPipeRoles, distributionIsSensible, PIPE_ROLES } from '/src/engine/smart-pipe.js';
+// HF-PHASE2-BRANCHCONNECT: branch-line connectivity + tie-in repair. Verifies
+// every head traces back to a riser through real pipe topology (node + interior
+// taps), and synthesizes missing branch tie-ins + tee fittings when a head-bearing
+// run is orphaned. Pure + unit-tested (tests/branch-connect.test.js).
+import { analyzeConnectivity, repairConnectivity } from '/src/engine/branch-connect.js';
+// HF-PHASE2-DROPCONNECT: arm-over / easy-drop / sprig connection engine. Classifies
+// the runs that physically join a branch line to each head (drop=down to pendent,
+// sprig=up to upright, arm-over=offset horizontal leg + nipple) and synthesizes the
+// MISSING ones, geometry-derived. Pure + unit-tested (tests/drop-connect.test.js).
+import { analyzeDrops, buildDropConnections } from '/src/engine/drop-connect.js';
+// HF-PHASE2-COVERAGE: live coverage + NFPA-13 spacing-violation engine. Per head:
+// a coverage disc sized from the hazard max spacing; REAL spacing checks (too
+// close < min, too far > max) + a gap scan for unprotected floor. Pure +
+// unit-tested (tests/coverage.test.js). Drives the live coverage overlay.
+import { computeCoverage } from '/src/engine/coverage.js';
+// HF-PHASE2-SCHEDULE: NFPA-13 pipe-schedule cascade. Sizes every pipe by its
+// heads-served credit (from smart-pipe classification) + role + hazard class, so
+// applying the schedule across the WHOLE system cascades feed mains larger and
+// branch tails smaller. Pure + unit-tested (tests/pipe-schedule.test.js).
+import { applyPipeSchedule, scheduleSizeFor, SCHEDULE_TABLES } from '/src/engine/pipe-schedule.js';
 
 // HF-W2 (Stream W2): EXTRACTION COMPLETENESS rendered in the live Studio — DOORS
 // (leaf + swing arc), recovered partition-inclusive WALLS, and FIXTURES/cores are
@@ -682,6 +720,24 @@ function api(path, options = {}) {
 
 // ── OpenGeometry / Three scene ──
 const COLORS = { WALLS: 0x6b7280, WALLS_INT: 0x9aa3b2, COLUMN: 0x8a8f98, FLOOR: 0x16161c, MAIN: 0xE53935, BRANCH: 0x3b82f6, DROPS: 0x22d3ee, HEADS: 0xff3b30, COMPONENTS: 0xfbbf24, HANGERS: 0xb6bcc6, CEILING: 0xd8d2c2 }; // HF-G4-HANGER + HF-G5-CEILGRID layers
+// HF-PHASE2-SMARTPIPE: per-topology-role pipe colors for the Smart Pipe legend.
+// Mains hot (red->orange), cross-mains amber, branch lines blue, leaves cyan/teal,
+// riser violet — so the system hierarchy reads at a glance in the 3D view.
+const ROLE_COLORS = {
+  main: 0xE53935, 'cross-main': 0xff8c1a, 'branch-line': 0x3b82f6,
+  'arm-over': 0x8b5cf6, drop: 0x22d3ee, sprig: 0x34d399, riser: 0xa855f7,
+  unknown: 0x9aa3b2,
+};
+const ROLE_LABELS = {
+  main: 'Main', 'cross-main': 'Cross-main', 'branch-line': 'Branch line',
+  'arm-over': 'Arm-over', drop: 'Drop', sprig: 'Sprig', riser: 'Riser', unknown: 'Unclassified',
+};
+let smartPipeColorOn = false; // legend toggle: recolor pipes by topology role
+const roleMats = {}; // per-role shared material cache
+function roleMat(role) {
+  if (!roleMats[role]) roleMats[role] = new THREE.MeshStandardMaterial({ color: ROLE_COLORS[role] || ROLE_COLORS.unknown, metalness: 0.45, roughness: 0.55 });
+  return roleMats[role];
+}
 // CAD-structural geometry
 // (walls/mains/branches/riser) is built on the OpenGeometry kernel; the many
 // identical heads + drops are drawn with Three InstancedMesh for performance at
@@ -1006,7 +1062,10 @@ function addPipe(s) {
   const [rx, ry, rz] = pipeRot(aw, bw);
   const layer = layerOf(s.role);
   const r = (s.diameterIn / 12 / 2) * pipeVizScale; // TRUE NFPA OD — no minimum-radius fudge floor (gate 6c)
-  const cyl = new THREE.Mesh(new THREE.CylinderGeometry(r, r, len, PIPE_BODY_SEGMENTS), pipeMat(layer));
+  // HF-PHASE2-SMARTPIPE: when the Smart Pipe legend is on, color the run by its
+  // TOPOLOGY role (solid.smartRole) instead of the coarse layer color.
+  const mat = (smartPipeColorOn && s.smartRole) ? roleMat(s.smartRole) : pipeMat(layer);
+  const cyl = new THREE.Mesh(new THREE.CylinderGeometry(r, r, len, PIPE_BODY_SEGMENTS), mat);
   cyl.position.set((aw[0]+bw[0])/2, (aw[1]+bw[1])/2, (aw[2]+bw[2])/2);
   cyl.rotation.set(rx, ry, rz);
   cyl.userData.hfPart = { kind: 'pipe', solid: s }; // HF-A1-SELECT
@@ -1044,7 +1103,10 @@ function addInstancedDrops(dropSolids) {
   if (!dropSolids.length) return;
   const r = (1.0 / 12 / 2) * pipeVizScale; // drop pipe dia 1" — TRUE NFPA OD, no fudge floor (gate 6c)
   const geo = new THREE.CylinderGeometry(r, r, 1, 16); // unit height, scaled per drop; smooth body (>=16 radial segments, gate 5a)
-  const mat = new THREE.MeshStandardMaterial({ color: COLORS.DROPS });
+  // HF-PHASE2-SMARTPIPE: tint drops by their topology role when the legend is on
+  // (drops are head leaves; a few may classify as sprigs — keep the cyan drop hue
+  // for the instanced batch, sprigs are rare and the legend lists both).
+  const mat = new THREE.MeshStandardMaterial({ color: smartPipeColorOn ? ROLE_COLORS.drop : COLORS.DROPS });
   const inst = new THREE.InstancedMesh(geo, mat, dropSolids.length);
   const d = new THREE.Object3D();
   dropSolids.forEach((s, i) => {
@@ -1568,6 +1630,24 @@ function alignNetworkToExtractedPlate(floorPlan) {
 function renderModel(cadModel, opts) {
   clearSelection(false); // HF-A1-SELECT: model rebuild invalidates the selection
   currentCadModel = cadModel;
+  // HF-PHASE2-SMARTPIPE: classify every pipe by TOPOLOGY and tag solid.smartRole
+  // BEFORE the render loop, so addPipe can color by role and the BOM/hydraulics
+  // can read the role off each solid. Pure + deterministic; fail-soft on error.
+  try { runSmartPipeClassification(cadModel); } catch (e) { window.__smartPipeError = String(e && e.message || e); }
+  // HF-PHASE2-BRANCHCONNECT: verify every head traces back to a riser; auto-repair
+  // orphaned head-bearing runs by splicing in tie-ins + tee fittings, then publish
+  // window.__hfPhase2.branches { branchCount, headsConnected, orphanHeads }.
+  try { runBranchConnectivity(cadModel); } catch (e) { window.__branchConnectError = String(e && e.message || e); }
+  // HF-PHASE2-DROPCONNECT: classify the arm-over/drop/sprig connection runs and
+  // report which heads still need one. ANALYSIS-ONLY here (no auto-build) so the
+  // render loop never mutates a generated model -> no rebuild recursion. The
+  // explicit Auto › Easy Drop / Arm-over tools (and window.__hfDropConnect) build.
+  try { runDropConnect(cadModel, { build: false }); } catch (e) { window.__dropConnectError = String(e && e.message || e); }
+  // HF-PHASE2-COVERAGE: compute the per-head coverage discs + REAL NFPA-13 spacing
+  // violations (too close / too far / gap) for the current model and publish on
+  // window.__hfPhase2.coverage. ANALYSIS-ONLY (no mutation) — the overlay meshes
+  // are built below from this result when the coverage toggle is on. Deterministic.
+  try { runCoverage(cadModel); } catch (e) { window.__coverageError = String(e && e.message || e); }
   window.__wallDebug = [];
   if (modelGroup) scene.remove(modelGroup);
   modelGroup = new THREE.Group(); scene.add(modelGroup);
@@ -1643,6 +1723,10 @@ function renderModel(cadModel, opts) {
   } else {
     frameCamera(minX, maxX, minZ, maxZ, ceil);
   }
+  // HF-PHASE2-COVERAGE: build the coverage overlay (per-head discs + violation
+  // highlights + gap markers) into modelGroup when the toggle is on. Built from
+  // the published __hfPhase2.coverage result so the picture matches the numbers.
+  try { renderCoverageOverlay(); } catch (e) { window.__coverageOverlayError = String(e && e.message || e); }
   buildLayerToggles();
   try { if (typeof refreshAnnotations === 'function') refreshAnnotations(); } catch (_) { /* annotation overlay optional */ }
 }
@@ -3700,6 +3784,39 @@ $('selBtn').onclick = () => {
 $('inspClose').onclick = () => clearSelection(true);
 $('regenBtn').onclick = generate;
 $('genBtn').onclick = generate;
+// HF-PHASE2-SMARTPIPE: toggle topology-role coloring on the pipes (camera-neutral).
+{
+  const spBtn = $('smartPipeToggle');
+  if (spBtn) spBtn.onclick = () => {
+    const on = window.__hfSmartPipeColor();
+    spBtn.classList.toggle('active', on);
+    spBtn.textContent = on ? 'Role colors: ON' : 'Color by role';
+    $('status').textContent = on ? 'Smart Pipe: colored by topology role' : 'Smart Pipe: default layer colors';
+  };
+}
+// HF-PHASE2-COVERAGE: toggle the live coverage + spacing-violation overlay (camera-neutral).
+{
+  const cvBtn = $('coverageToggle');
+  if (cvBtn) cvBtn.onclick = () => {
+    const on = window.__hfCoverageToggle();
+    cvBtn.classList.toggle('active', on);
+    cvBtn.textContent = on ? 'Coverage: ON' : 'Show coverage';
+    const cov = window.__hfCoverage && window.__hfCoverage();
+    if (on && cov) {
+      $('status').textContent = `Coverage: ${cov.counts.heads} heads · ${cov.counts.tooClose} too close · ${cov.counts.tooFar} too far · ${cov.counts.gaps} gaps · ${cov.coveredPct}% covered (${cov.hazard})`;
+    } else {
+      $('status').textContent = 'Coverage overlay off';
+    }
+  };
+}
+// HF-PHASE2-SCHEDULE: APPLY PIPE SCHEDULE — cascade sizes across the whole system.
+{
+  const asBtn = $('applyScheduleBtn');
+  if (asBtn) asBtn.onclick = () => {
+    const rep = applyScheduleToSystem();
+    if (rep && rep.total) asBtn.classList.add('active');
+  };
+}
 $('submitBtn').onclick = async () => {
   const btn = $('submitBtn'); btn.disabled = true; const label = btn.textContent; btn.textContent = 'Building…';
   try {
@@ -3777,6 +3894,373 @@ window.__hfModel = () => currentCadModel;
 window.__hfReady = () => ogReady === true;
 window.__hfSolidCount = (kind) => (currentCadModel && Array.isArray(currentCadModel.solids))
   ? (kind ? currentCadModel.solids.filter((s) => s.kind === kind).length : currentCadModel.solids.length) : null;
+
+// ── HF-PHASE2-SMARTPIPE: topology pipe-role classification driver ──
+// Runs the pure classifier (src/engine/smart-pipe.js) over the current model,
+// tags every pipe solid with solid.smartRole, and publishes the observable
+// result on window.__hfPhase2.smartPipe { roleCounts, headsServed, unknownCount,
+// sensible, total, byHead }. Called from renderModel BEFORE meshing so addPipe
+// can color by role. Deterministic; never throws into the render loop.
+let lastSmartPipe = null;
+function runSmartPipeClassification(cadModel) {
+  if (!cadModel || !Array.isArray(cadModel.solids)) { lastSmartPipe = null; publishSmartPipe(); return null; }
+  const result = tagPipeRoles(cadModel); // stamps solid.smartRole + returns counts
+  const headCount = cadModel.solids.filter((s) => s.kind === 'head').length;
+  const totalPipes = cadModel.solids.filter((s) => s.kind === 'pipe').length;
+  lastSmartPipe = {
+    roleCounts: result.roleCounts,
+    headsServed: result.headsServed,
+    unknownCount: result.unknownCount,
+    nodeCount: result.nodeCount,
+    totalPipes,
+    headCount,
+    sensible: distributionIsSensible(result.roleCounts),
+    // heads each drop serves should equal the model head count (conservation)
+    dropsServeAllHeads: (result.headsServed.drop || 0) === headCount,
+    roles: PIPE_ROLES.slice(),
+  };
+  publishSmartPipe();
+  return lastSmartPipe;
+}
+function publishSmartPipe() {
+  window.__hfPhase2 = window.__hfPhase2 || {};
+  window.__hfPhase2.smartPipe = lastSmartPipe;
+  try { refreshSmartPipeLegend(); } catch (_) { /* legend optional */ }
+}
+// Render the Smart Pipe legend: a colored swatch + count + heads-served per role,
+// the sensible-tree verdict, and the head-conservation check.
+function refreshSmartPipeLegend() {
+  const el = $('smartPipe'); if (!el) return;
+  const sp = lastSmartPipe;
+  if (!sp) { el.innerHTML = '<span class="muted" style="font-size:12px">Generate a layout to classify pipe roles.</span>'; return; }
+  const hex = (n) => '#' + (n >>> 0).toString(16).padStart(6, '0').slice(-6);
+  const rows = PIPE_ROLES
+    .filter((role) => (sp.roleCounts[role] || 0) > 0)
+    .map((role) => {
+      const c = ROLE_COLORS[role] || ROLE_COLORS.unknown;
+      const cnt = sp.roleCounts[role] || 0;
+      const hs = sp.headsServed[role] || 0;
+      const hsTxt = hs > 0 ? ` · ${hs} heads` : '';
+      return `<div class="kv" style="font-size:11px"><span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${hex(c)};margin-right:6px;vertical-align:middle"></span>${ROLE_LABELS[role]}</span><b>${cnt}${hsTxt}</b></div>`;
+    }).join('');
+  const verdict = sp.sensible
+    ? '<span style="color:#34d399">✓ sensible tree</span>'
+    : '<span style="color:#f59e0b">⚠ check topology</span>';
+  const cons = sp.dropsServeAllHeads
+    ? `<span style="color:#34d399">✓ ${sp.headCount}/${sp.headCount} heads served</span>`
+    : `<span style="color:#f59e0b">⚠ heads-served mismatch</span>`;
+  el.innerHTML = rows
+    + `<div class="muted" style="font-size:10px;margin-top:4px">${sp.totalPipes} pipe runs · ${sp.unknownCount} unclassified · ${verdict} · ${cons}</div>`;
+}
+window.__hfPhase2 = window.__hfPhase2 || {};
+window.__hfPhase2.smartPipe = null;
+// Toggle topology-role coloring on the pipes + (re)render keeping the camera.
+window.__hfSmartPipeColor = (on) => {
+  smartPipeColorOn = (on === undefined) ? !smartPipeColorOn : !!on;
+  if (currentCadModel) renderModel(currentCadModel, { preserveView: true }); // GUARD#1: keep camera
+  refreshSmartPipeLegend();
+  return smartPipeColorOn;
+};
+window.__hfSmartPipe = () => lastSmartPipe; // direct accessor for verification
+
+// ── HF-PHASE2-BRANCHCONNECT: branch-line connectivity + tie-in repair driver ──
+// Runs the pure connectivity engine (src/engine/branch-connect.js) over the
+// current model. AUTO-REPAIR is on by default: any head-bearing pipe run that is
+// orphaned (does not trace back to a riser source) gets a synthesized branch
+// tie-in + tee fitting marker spliced into the live network, then the network is
+// re-verified. The observable result is published on window.__hfPhase2.branches
+// { branchCount, headsConnected, orphanHeads, ... }. Deterministic; fail-soft.
+let lastBranchConnect = null;
+function runBranchConnectivity(cadModel, opts) {
+  const repair = !(opts && opts.repair === false);
+  if (!cadModel || !Array.isArray(cadModel.solids)) { lastBranchConnect = null; publishBranchConnect(); return null; }
+  let added = [];
+  let result;
+  if (repair) {
+    const rep = repairConnectivity(cadModel); // mutates solids: adds tie-ins + tees
+    added = rep.added;
+    result = rep.analysisAfter;
+    lastBranchConnect = {
+      branchCount: result.branchCount,
+      headsConnected: result.headsConnected,
+      orphanHeads: result.orphanHeads,
+      totalHeads: result.totalHeads,
+      riserCount: result.riserCount,
+      componentCount: result.componentCount,
+      sourcedComponentCount: result.sourcedComponentCount,
+      orphanHeadNames: result.orphanHeadNames.slice(0, 20),
+      tieInsAdded: added.filter((s) => s.kind === 'pipe').length,
+      teesAdded: added.filter((s) => s.kind === 'component').length,
+      repaired: added.length > 0,
+      orphansBefore: rep.analysisBefore.orphanHeads,
+    };
+  } else {
+    result = analyzeConnectivity(cadModel);
+    lastBranchConnect = {
+      branchCount: result.branchCount,
+      headsConnected: result.headsConnected,
+      orphanHeads: result.orphanHeads,
+      totalHeads: result.totalHeads,
+      riserCount: result.riserCount,
+      componentCount: result.componentCount,
+      sourcedComponentCount: result.sourcedComponentCount,
+      orphanHeadNames: result.orphanHeadNames.slice(0, 20),
+      tieInsAdded: 0, teesAdded: 0, repaired: false,
+      orphansBefore: result.orphanHeads,
+    };
+  }
+  publishBranchConnect();
+  return lastBranchConnect;
+}
+function publishBranchConnect() {
+  window.__hfPhase2 = window.__hfPhase2 || {};
+  window.__hfPhase2.branches = lastBranchConnect;
+}
+window.__hfPhase2 = window.__hfPhase2 || {};
+window.__hfPhase2.branches = window.__hfPhase2.branches || null;
+window.__hfBranches = () => lastBranchConnect; // direct accessor for verification
+// Force a connectivity re-check (+ repair) on the current model, camera-neutral.
+window.__hfBranchRepair = (doRepair) => {
+  if (!currentCadModel) return null;
+  const res = runBranchConnectivity(currentCadModel, { repair: doRepair !== false });
+  // If repair added solids, rebuild so the new tie-ins/tees mesh — keep the camera.
+  if (res && res.repaired) renderModel(currentCadModel, { preserveView: true }); // GUARD#1
+  return res;
+};
+
+// ── HF-PHASE2-DROPCONNECT: arm-over / easy-drop / sprig connection driver ──
+// Runs the pure connection engine (src/engine/drop-connect.js) over the current
+// model. ANALYSIS classifies every drop/sprig/arm-over run + reports which heads
+// still need a connection. BUILD synthesizes the missing arm-over legs + drop/sprig
+// nipples + elbow/reducer fittings for offset/unconnected heads. Auto-build is OFF
+// in renderModel (so generated models aren't mutated mid-render); the Auto menu
+// tools + window.__hfDropConnect(true) drive the build. Result is published on
+// window.__hfPhase2.drops { armOvers, drops, sprigs, ... }. Deterministic; fail-soft.
+let lastDropConnect = null;
+function runDropConnect(cadModel, opts) {
+  const doBuild = !!(opts && opts.build);
+  if (!cadModel || !Array.isArray(cadModel.solids)) { lastDropConnect = null; publishDropConnect(); return null; }
+  let added = [];
+  let a;
+  if (doBuild) {
+    const r = buildDropConnections(cadModel); // mutates solids: arm-overs + nipples + fittings
+    added = r.added;
+    a = r.analysisAfter;
+    lastDropConnect = dropSnapshot(a, {
+      armOversAdded: r.armOversAdded, dropsAdded: r.dropsAdded, sprigsAdded: r.sprigsAdded,
+      built: added.length > 0, before: r.analysisBefore,
+    });
+  } else {
+    a = analyzeDrops(cadModel);
+    lastDropConnect = dropSnapshot(a, {
+      armOversAdded: 0, dropsAdded: 0, sprigsAdded: 0, built: false, before: a,
+    });
+  }
+  publishDropConnect();
+  return lastDropConnect;
+}
+function dropSnapshot(a, extra) {
+  return {
+    // existing connection runs by type (the CHUNK's headline observable)
+    armOvers: a.armOvers, drops: a.drops, sprigs: a.sprigs,
+    totalHeads: a.totalHeads, headsConnected: a.headsConnected,
+    headsNeedingWork: a.headsNeedingWork,
+    needArmOver: a.needArmOver, needDrop: a.needDrop, needSprig: a.needSprig,
+    branchCarriers: a.branchCarriers,
+    armOversAdded: extra.armOversAdded, dropsAdded: extra.dropsAdded, sprigsAdded: extra.sprigsAdded,
+    built: extra.built,
+    needArmOverBefore: extra.before ? extra.before.needArmOver : a.needArmOver,
+    needWorkBefore: extra.before ? extra.before.headsNeedingWork : a.headsNeedingWork,
+  };
+}
+function publishDropConnect() {
+  window.__hfPhase2 = window.__hfPhase2 || {};
+  window.__hfPhase2.drops = lastDropConnect;
+}
+window.__hfPhase2 = window.__hfPhase2 || {};
+window.__hfPhase2.drops = window.__hfPhase2.drops || null;
+window.__hfDrops = () => lastDropConnect; // direct accessor for verification
+// Build the missing arm-over/drop/sprig connections on the current model, camera-
+// neutral. If runs were added, rebuild so they mesh — KEEP the camera (GUARD#1).
+window.__hfDropConnect = (doBuild) => {
+  if (!currentCadModel) return null;
+  const res = runDropConnect(currentCadModel, { build: doBuild !== false });
+  if (res && res.built) renderModel(currentCadModel, { preserveView: true }); // GUARD#1
+  return res;
+};
+// ── HF-PHASE2-COVERAGE: live coverage + NFPA-13 spacing-violation driver ──
+// Runs the pure coverage engine (src/engine/coverage.js) over the current model:
+// per-head coverage disc (radius from hazard max spacing) + REAL spacing checks
+// (too close < hazard min, too far > hazard max, gap = unprotected floor). The
+// result is published on window.__hfPhase2.coverage { heads, violations,
+// maxSpacingFt, ... }. ANALYSIS-ONLY: never mutates the model. Deterministic.
+let lastCoverage = null;
+let coverageOverlayOn = false;
+function projectHazard() {
+  try { const v = $('hazard') && $('hazard').value; if (v) return v; } catch (_) {}
+  return (currentCadModel && currentCadModel.sizing && currentCadModel.sizing.hazard) || 'ordinary';
+}
+function runCoverage(cadModel) {
+  if (!cadModel || !Array.isArray(cadModel.solids)) { lastCoverage = null; publishCoverage(); return null; }
+  const res = computeCoverage(cadModel, projectHazard());
+  lastCoverage = {
+    heads: res.heads,
+    violations: res.violations,
+    gapCells: res.gapCells,
+    maxSpacingFt: res.maxSpacingFt,
+    minSpacingFt: res.minSpacingFt,
+    hazard: res.hazard,
+    counts: res.counts,
+    coveredPct: res.coveredPct,
+    sampled: res.sampled,
+  };
+  publishCoverage();
+  return lastCoverage;
+}
+function publishCoverage() {
+  window.__hfPhase2 = window.__hfPhase2 || {};
+  // The CHUNK contract: __hfPhase2.coverage -> { heads, violations, maxSpacingFt }.
+  window.__hfPhase2.coverage = lastCoverage;
+  try { refreshCoverageLegend(); } catch (_) { /* legend optional */ }
+}
+window.__hfPhase2 = window.__hfPhase2 || {};
+window.__hfPhase2.coverage = window.__hfPhase2.coverage || null;
+window.__hfCoverage = () => lastCoverage; // direct accessor for verification
+
+// Build the coverage overlay group into modelGroup (called from renderModel after
+// the model meshes). When the toggle is off, nothing is drawn. When on: a faint
+// translucent coverage disc + a colored ring per head (green=ok, red=too-close,
+// orange=too-far), plus a magenta cross at every gap-scan point. Built from the
+// published lastCoverage so the picture always matches the numbers. Camera-neutral
+// (adds geometry only — never touches controls/camera).
+const COVERAGE_OK_COLOR = 0x22c55e;
+const COVERAGE_CLOSE_COLOR = 0xef4444;
+const COVERAGE_FAR_COLOR = 0xf59e0b;
+const COVERAGE_GAP_COLOR = 0xff2bd6;
+function renderCoverageOverlay() {
+  if (!coverageOverlayOn || !lastCoverage || !modelGroup) return;
+  const cov = lastCoverage;
+  // Overlay sits as a flat plan layer just under the ceiling so discs read as a
+  // top-down coverage map without fighting the heads/pipes for depth.
+  const zPlan = (() => {
+    // place a hair below the lowest head so it lies under the heads in plan view
+    let z = 7;
+    if (cov.heads.length) { z = Math.min(...cov.heads.map((h) => (typeof h.z === 'number' ? h.z : 7))) - 0.05; }
+    return z;
+  })();
+  const grp = new THREE.Group();
+  grp.userData.hfCoverageOverlay = true;
+  grp.renderOrder = 1100;
+  const discGeos = [];
+  const ringGeos = [];
+  const okRingGeos = [];
+  for (const h of cov.heads) {
+    const c = W([h.x, h.y, zPlan]);
+    const r = h.protectRadiusFt;
+    const violColor = h.tooClose ? COVERAGE_CLOSE_COLOR : (h.tooFar ? COVERAGE_FAR_COLOR : null);
+    // faint filled disc (translucent), batched per ok/violation bucket below
+    const disc = new THREE.CircleGeometry(r, 40);
+    disc.rotateX(-Math.PI / 2); // lay flat in the X-Z world plane (Y up)
+    disc.translate(c[0], c[1], c[2]);
+    discGeos.push({ geo: disc, viol: !!violColor });
+    // ring outline (thin annulus)
+    const ring = new THREE.RingGeometry(Math.max(0, r - 0.18), r, 40);
+    ring.rotateX(-Math.PI / 2);
+    ring.translate(c[0], c[1] + 0.02, c[2]);
+    if (violColor) ringGeos.push({ geo: ring, color: violColor });
+    else okRingGeos.push(ring);
+  }
+  // Merge + add the OK discs (one faint green wash) and violation discs (red wash).
+  const okDiscs = discGeos.filter((d) => !d.viol).map((d) => d.geo);
+  const violDiscs = discGeos.filter((d) => d.viol).map((d) => d.geo);
+  if (okDiscs.length) {
+    const m = mergeGeometries(okDiscs, false);
+    if (m) grp.add(new THREE.Mesh(m, new THREE.MeshBasicMaterial({ color: COVERAGE_OK_COLOR, transparent: true, opacity: 0.07, side: THREE.DoubleSide, depthWrite: false })));
+  }
+  if (violDiscs.length) {
+    const m = mergeGeometries(violDiscs, false);
+    if (m) grp.add(new THREE.Mesh(m, new THREE.MeshBasicMaterial({ color: COVERAGE_CLOSE_COLOR, transparent: true, opacity: 0.12, side: THREE.DoubleSide, depthWrite: false })));
+  }
+  // OK rings (green outline) merged into one mesh.
+  if (okRingGeos.length) {
+    const m = mergeGeometries(okRingGeos, false);
+    if (m) grp.add(new THREE.Mesh(m, new THREE.MeshBasicMaterial({ color: COVERAGE_OK_COLOR, transparent: true, opacity: 0.5, side: THREE.DoubleSide, depthWrite: false })));
+  }
+  // Violation rings split by color (red too-close, orange too-far).
+  for (const color of [COVERAGE_CLOSE_COLOR, COVERAGE_FAR_COLOR]) {
+    const geos = ringGeos.filter((r) => r.color === color).map((r) => r.geo);
+    if (geos.length) {
+      const m = mergeGeometries(geos, false);
+      if (m) grp.add(new THREE.Mesh(m, new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.95, side: THREE.DoubleSide, depthWrite: false })));
+    }
+  }
+  // Gap markers: a small magenta cross at each unprotected sample point.
+  if (cov.gapCells && cov.gapCells.length) {
+    const pts = [];
+    const s = 0.9;
+    for (const g of cov.gapCells) {
+      const c = W([g.x, g.y, zPlan]);
+      pts.push(new THREE.Vector3(c[0] - s, c[1] + 0.05, c[2]), new THREE.Vector3(c[0] + s, c[1] + 0.05, c[2]));
+      pts.push(new THREE.Vector3(c[0], c[1] + 0.05, c[2] - s), new THREE.Vector3(c[0], c[1] + 0.05, c[2] + s));
+    }
+    const g = new THREE.BufferGeometry().setFromPoints(pts);
+    grp.add(new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color: COVERAGE_GAP_COLOR, transparent: true, opacity: 0.95, depthTest: false })));
+  }
+  modelGroup.add(grp);
+  window.__coverageOverlayDebug = { heads: cov.heads.length, discs: discGeos.length, gapMarkers: cov.gapCells ? cov.gapCells.length : 0, on: true, zPlan };
+}
+// Toggle the coverage overlay + (re)render keeping the camera (GUARD#1).
+window.__hfCoverageToggle = (on) => {
+  coverageOverlayOn = (on === undefined) ? !coverageOverlayOn : !!on;
+  if (currentCadModel) renderModel(currentCadModel, { preserveView: true }); // GUARD#1: keep camera
+  refreshCoverageLegend();
+  return coverageOverlayOn;
+};
+// Refresh the coverage legend panel (counts + verdict + hazard rule cited).
+function refreshCoverageLegend() {
+  const el = $('coverage'); if (!el) return;
+  const cov = lastCoverage;
+  if (!cov) { el.innerHTML = '<span class="muted" style="font-size:12px">Generate a layout to compute coverage.</span>'; return; }
+  const c = cov.counts;
+  const swatch = (hex, label, n, color) => `<div class="kv" style="font-size:11px"><span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${hex};margin-right:6px;vertical-align:middle"></span>${label}</span><b style="color:${color || 'inherit'}">${n}</b></div>`;
+  const hx = (n) => '#' + (n >>> 0).toString(16).padStart(6, '0').slice(-6);
+  const cleanSpacing = c.tooClose === 0 && c.tooFar === 0;
+  const verdict = (cleanSpacing && c.gaps === 0)
+    ? '<span style="color:#34d399">✓ spacing + coverage OK</span>'
+    : '<span style="color:#f59e0b">⚠ violations — see overlay</span>';
+  el.innerHTML =
+    swatch(hx(COVERAGE_OK_COLOR), 'Heads (coverage disc)', c.heads)
+    + swatch(hx(COVERAGE_CLOSE_COLOR), `Too close (&lt; ${cov.minSpacingFt} ft)`, c.tooClose, c.tooClose ? '#ef4444' : undefined)
+    + swatch(hx(COVERAGE_FAR_COLOR), `Too far (&gt; ${cov.maxSpacingFt} ft)`, c.tooFar, c.tooFar ? '#f59e0b' : undefined)
+    + swatch(hx(COVERAGE_GAP_COLOR), 'Coverage gaps', c.gaps, c.gaps ? '#ff2bd6' : undefined)
+    + `<div class="muted" style="font-size:10px;margin-top:4px">${cov.hazard} hazard · max spacing ${cov.maxSpacingFt} ft · ${cov.coveredPct}% area covered · ${verdict}</div>`
+    + `<div class="muted" style="font-size:9px;margin-top:2px">Public NFPA-13 standard-spray geometry only — not AHJ/PE approval.</div>`;
+}
+
+// Menu entrypoint for Easy Drop / Arm-over / Sprig: build the missing connections
+// on the live model (undoable) and report the real result in the status bar.
+function dropConnectMenu(label) {
+  if (!currentCadModel || !Array.isArray(currentCadModel.solids) || !currentCadModel.solids.length) {
+    $('status').textContent = `${label}: no model — Generate or draw a branch + heads first`; return;
+  }
+  // Pre-check: if every head already has a connection, say so honestly (no-op).
+  const pre = runDropConnect(currentCadModel, { build: false });
+  if (pre && pre.headsNeedingWork === 0) {
+    $('status').textContent = `${label}: all ${pre.totalHeads} heads already connected (drops ${pre.drops} · arm-overs ${pre.armOvers} · sprigs ${pre.sprigs}) — nothing to build`;
+    return;
+  }
+  // Build inside an undoable HFEdit step so the synthesized runs persist + Ctrl+Z works.
+  let res = null;
+  HFEdit.apply(`drop-connect:${label}`, (m) => { res = buildDropConnections(m); return res.model; });
+  // refresh the published snapshot from the post-build model + status report
+  const a = runDropConnect(currentCadModel, { build: false });
+  if (res) {
+    $('status').textContent = `${label}: built ${res.armOversAdded} arm-over · ${res.dropsAdded} drop · ${res.sprigsAdded} sprig connection(s); ${a.headsConnected}/${a.totalHeads} heads connected (Ctrl+Z to undo)`;
+  } else {
+    $('status').textContent = `${label}: nothing built`;
+  }
+}
+
 // Headless selection hook (sets the same curSelSolid the click-picker sets), so
 // clipboard/cut/copy/paste verification can target a known solid deterministically.
 window.__hfSelectByIndex = (i) => {
@@ -6217,6 +6701,80 @@ function autoDrawAutoSize() {
   else $('status').textContent = 'Auto Size: pipe(s) already on a standard schedule size';
 }
 
+// ── HF-PHASE2-SCHEDULE: APPLY PIPE SCHEDULE across the WHOLE system at once ──
+// Cascades every pipe's diameter from its heads-served credit (smart-pipe topology)
+// + role + hazard class via the pure pipe-schedule engine. Feed mains size up,
+// branch tails size down — one undo step (HFEdit), preserveView rebuild (GUARD#1),
+// and the BOM re-derives so the takeoff reflects the new sizes. Publishes the
+// observable result on window.__hfPhase2.schedule { changed, bySize, byRole, ... }.
+let lastSchedule = null;
+function applyScheduleToSystem(hazardOverride) {
+  if (!currentCadModel || !Array.isArray(currentCadModel.solids)) {
+    $('status').textContent = 'no model — Generate a layout first to apply a pipe schedule'; return null;
+  }
+  const hazard = hazardOverride || projectHazard();
+  // dry-run to get the report (pure — no mutation) so we can report even on no-op
+  const dry = applyPipeSchedule(currentCadModel, hazard);
+  lastSchedule = dry.report;
+  publishSchedule();
+  if (!dry.model) {
+    $('status').textContent = dry.report.total
+      ? `Apply Pipe Schedule (${hazard}): all ${dry.report.total} runs already on-schedule — no change`
+      : 'Apply Pipe Schedule: no sized pipe in the model';
+    return lastSchedule;
+  }
+  // commit through the undo stack: re-run the engine INSIDE the mutator so the
+  // applied model is the one installed (one undo step), then preserveView rebuild.
+  const ok = HFEdit.apply(`pipe-schedule:${hazard}`, (m) => {
+    const res = applyPipeSchedule(m, hazard);
+    return res.model; // null => no-op (HFEdit records nothing)
+  });
+  if (ok) {
+    // KEEP the dry-run report: it is the deterministic record of THIS apply (how
+    // many runs changed + the resulting size distribution). Re-deriving from the
+    // now-scheduled model would report changed:0 (it would be comparing the
+    // scheduled model to itself), masking the real cascade. The engine is pure +
+    // deterministic so dry.report's sizes == the committed model's sizes exactly.
+    lastSchedule = dry.report;
+    publishSchedule();
+    try { regenerateBom(); } catch (_) {}            // BOM reflects the new sizes
+    refreshScheduleLegend();
+    const top = lastSchedule.maxSizeIn;
+    $('status').textContent =
+      `Apply Pipe Schedule (${hazard}): ${lastSchedule.changed} runs re-sized · top feed ${top}" · ${Object.keys(lastSchedule.bySize).length} sizes · Ctrl+Z to undo`;
+  } else {
+    // HFEdit no-op (model already on-schedule) — dry.report.changed is the truth.
+    $('status').textContent =
+      `Apply Pipe Schedule (${hazard}): all ${dry.report.total} runs already on-schedule — no change`;
+  }
+  return lastSchedule;
+}
+function publishSchedule() {
+  window.__hfPhase2 = window.__hfPhase2 || {};
+  // CHUNK contract: __hfPhase2.schedule -> the observable cascade report.
+  window.__hfPhase2.schedule = lastSchedule;
+}
+window.__hfPhase2 = window.__hfPhase2 || {};
+window.__hfPhase2.schedule = window.__hfPhase2.schedule || null;
+window.__hfSchedule = () => lastSchedule;                          // direct accessor
+window.__hfApplySchedule = (hazard) => applyScheduleToSystem(hazard); // headless driver
+// Live legend for the schedule cascade (counts per size + per-role + verdict).
+function refreshScheduleLegend() {
+  const el = document.getElementById('scheduleLegend'); if (!el) return;
+  if (!lastSchedule || !lastSchedule.total) { el.innerHTML = '<div class="muted" style="font-size:10px">Apply Pipe Schedule to size the whole system by NFPA head-count.</div>'; return; }
+  const sc = lastSchedule;
+  const sizeRows = Object.entries(sc.bySize).sort((a, b) => parseFloat(a[0]) - parseFloat(b[0]))
+    .map(([k, v]) => `<div class="kv"><span>Pipe ${k}</span><b>${v} runs</b></div>`).join('');
+  el.innerHTML = `
+    <div class="kv"><span>Hazard schedule</span><b>${sc.hazard}</b></div>
+    <div class="kv"><span>Runs re-sized</span><b>${sc.changed} / ${sc.total}</b></div>
+    <div class="kv"><span>Top feed size</span><b>${sc.maxSizeIn}"</b></div>
+    ${sizeRows}
+    <div class="kv"><span>Cascade pyramid</span><b style="color:${sc.cascadeIsSensible ? '#7CFFB0' : '#ef4444'}">${sc.cascadeIsSensible ? 'sensible ✓' : 'check ✗'}</b></div>
+    ${sc.hydraulicRequired ? '<div class="est" style="margin-top:4px">⚠ Extra-hazard: schedule method is NOT NFPA-recognized — hydraulic calc required for sign-off</div>' : ''}
+    <div class="muted" style="font-size:10px;margin-top:4px">SCHEDULE method (head-count table lookup per NFPA 13) — sizes light/ordinary occupancies up to listed counts; NOT a hydraulic pressure/flow solve, not AHJ/PE approval.</div>`;
+}
+
 // ════════════════════════════════════════════════════════════════════════════
 // HF-AV: ANNOTATE + VIEW — Dimension / Labels / Listing / View / Window / Settings.
 // Dimensions and part tags are REAL annotation solids (kind:'dimension'|'label')
@@ -6527,17 +7085,31 @@ function regenerateBom() {
     const key = (typeof p.diameterIn === 'number' ? p.diameterIn.toFixed(2) : '?') + '"';
     bySize[key] = (bySize[key] || 0) + l;
   }
+  // HF-PHASE2-PROPS: roll up the editable PROPERTIES so a part edit REFLECTS in the
+  // BOM — explicit per-part cost/labor overrides, plus a per-material count from the
+  // (possibly edited) material field. These appear in the live takeoff table below.
+  const byMaterial = {}; let editedCost = 0, editedLabor = 0, editedParts = 0;
+  for (const s of sols) {
+    if (typeof s.material === 'string') byMaterial[s.material] = (byMaterial[s.material] || 0) + 1;
+    if (typeof s.costUsd === 'number') { editedCost += s.costUsd; editedParts++; }
+    if (typeof s.laborHours === 'number') editedLabor += s.laborHours;
+  }
   const gt = window.__geomTakeoff || {};
   const takeoff = {
     heads, pipeSegments: pipes.length, pipeFt: Math.round(pipeFt),
     fittings, walls, couplings: gt.couplings || 0, hangers: gt.hangers || 0,
     bySize: Object.fromEntries(Object.entries(bySize).map(([k, v]) => [k, Math.round(v)])),
+    byMaterial, editedCost: Math.round(editedCost * 100) / 100, editedLabor: Math.round(editedLabor * 100) / 100, editedParts,
   };
   window.__hfBomTakeoff = takeoff;
   // Re-render a LIVE takeoff table into the #bom panel (appended below the priced BOM).
   const bom = $('bom');
   if (bom) {
     const sizeRows = Object.entries(takeoff.bySize).map(([k, v]) => `<tr><td>Pipe ${k}</td><td class="n">${v} ft</td><td class="n">—</td><td class="n">—</td></tr>`).join('');
+    const matRows = Object.entries(takeoff.byMaterial).map(([k, v]) => `<tr><td>Material · ${k}</td><td class="n">${v} parts</td><td class="n">—</td><td class="n">—</td></tr>`).join('');
+    const editRow = takeoff.editedParts
+      ? `<tr><td>Edited part cost · labor</td><td class="n">${takeoff.editedParts} parts</td><td class="n">$${takeoff.editedCost.toFixed(2)}</td><td class="n">${takeoff.editedLabor.toFixed(2)} hr</td></tr>`
+      : '';
     let live = bom.querySelector('#hfLiveTakeoff');
     if (!live) { live = document.createElement('div'); live.id = 'hfLiveTakeoff'; bom.appendChild(live); }
     live.innerHTML = `<table style="margin-top:6px">
@@ -6545,10 +7117,12 @@ function regenerateBom() {
       <tr><td>Sprinkler heads</td><td class="n">${takeoff.heads}</td><td class="n">—</td><td class="n">—</td></tr>
       <tr><td>Pipe segments · total length</td><td class="n">${takeoff.pipeSegments} · ${takeoff.pipeFt} ft</td><td class="n">—</td><td class="n">—</td></tr>
       ${sizeRows}
+      ${matRows}
+      ${editRow}
       <tr><td>Fittings / components</td><td class="n">${takeoff.fittings}</td><td class="n">—</td><td class="n">—</td></tr>
       <tr><td>Couplings · hangers (derived)</td><td class="n">${takeoff.couplings} · ${takeoff.hangers}</td><td class="n">—</td><td class="n">—</td></tr>
       </table>
-      <div class="est" style="margin-top:4px">⚠ NEEDS-VERIFICATION — re-derived from the LIVE model geometry (reflects edits since Generate); counts not priced</div>`;
+      <div class="est" style="margin-top:4px">⚠ NEEDS-VERIFICATION — re-derived from the LIVE model geometry (reflects edits since Generate); property edits (size/material/cost/labor) roll up above</div>`;
   }
   showHfHud('Listing · Live takeoff', [
     `Heads        ${takeoff.heads}`,
@@ -6848,29 +7422,75 @@ openInspector = function (title, rows, verifyNote) {
   _origOpenInspector(title, rows, verifyNote);
   try { renderInspectorEditor(); } catch (_) {}
 };
+// HF-PHASE2-PROPS: end-prep options per joint method; material + K-factor menus.
+const HF_END_PREPS = ['threaded', 'grooved', 'solvent', 'flanged', 'welded', 'plain'];
+const HF_MATERIALS = ['Steel, sch-40', 'Steel, sch-10', 'CPVC (solvent-weld)', 'Copper (type L)', 'Brass'];
+const HF_KFACTORS = [2.8, 4.2, 5.6, 8.0, 11.2, 14.0, 16.8, 22.4, 25.2]; // common NFPA K-factors
+// Resolve the current end-prep / material / k-factor / cost / labor a part carries,
+// falling back to the same conventions the BOM uses so the field shows the live value.
+function propDefault(s, key) {
+  switch (key) {
+    case 'material': return s.material || (typeof s.diameterIn === 'number' ? (Number(s.diameterIn) >= 2.5 ? 'Steel, sch-10' : 'Steel, sch-40') : '');
+    case 'endPrep': return s.endPrep || (typeof s.diameterIn === 'number' ? (Number(s.diameterIn) >= 2.5 ? 'grooved' : 'threaded') : 'threaded');
+    case 'kFactor': return (typeof s.kFactor === 'number') ? s.kFactor : (s.kind === 'head' ? 5.6 : null);
+    case 'costUsd': return (typeof s.costUsd === 'number') ? s.costUsd : null;
+    case 'laborHours': return (typeof s.laborHours === 'number') ? s.laborHours : null;
+    default: return undefined;
+  }
+}
 function renderInspectorEditor() {
   const ref = selectedRef(); if (!ref) return;
   const s = currentCadModel.solids[ref.solidIndex]; if (!s) return;
   const body = $('inspBody'); if (!body) return;
+  // GEOMETRY fields (existing) + PROPERTIES fields (material/end-prep/K/cost/labor).
+  // type: 'number' | 'text' | 'select'; selects carry an options array.
   const fields = [];
-  if (typeof s.diameterIn === 'number') fields.push(['diameterIn', 'Size (in)', s.diameterIn, 'number', '0.25', '0.25']);
+  if (typeof s.diameterIn === 'number') fields.push(['diameterIn', 'Diameter (in)', s.diameterIn, 'number', '0.25', '0.25']);
   if (Array.isArray(s.position)) fields.push(['position', 'Plan X,Y (ft)', `${s.position[0]}, ${s.position[1]}`, 'text']);
   if (Array.isArray(s.from)) fields.push(['from', 'From X,Y (ft)', `${s.from[0]}, ${s.from[1]}`, 'text']);
   if (Array.isArray(s.to)) fields.push(['to', 'To X,Y (ft)', `${s.to[0]}, ${s.to[1]}`, 'text']);
   if (typeof s.heightFt === 'number') fields.push(['heightFt', 'Height (ft)', s.heightFt, 'number', '0.5', '0']);
   if (typeof s.thicknessFt === 'number') fields.push(['thicknessFt', 'Thickness (ft)', s.thicknessFt, 'number', '0.125', '0']);
-  if (!fields.length) return;
+  // PROPERTIES (Phase 2): apply to the part + reflect in the BOM.
+  const propFields = [];
+  if (s.kind === 'pipe' || s.kind === 'component') {
+    propFields.push(['material', 'Material', propDefault(s, 'material'), 'select', HF_MATERIALS]);
+    propFields.push(['endPrep', 'End prep', propDefault(s, 'endPrep'), 'select', HF_END_PREPS]);
+  }
+  if (s.kind === 'head') {
+    propFields.push(['kFactor', 'K-factor', propDefault(s, 'kFactor'), 'select', HF_KFACTORS]);
+  }
+  // Cost + labor apply to every part type (clerical takeoff fields).
+  propFields.push(['costUsd', 'Cost ($)', propDefault(s, 'costUsd'), 'number', '0.01', '0']);
+  propFields.push(['laborHours', 'Labor (hrs)', propDefault(s, 'laborHours'), 'number', '0.05', '0']);
+
+  if (!fields.length && !propFields.length) return;
   const wrap = document.createElement('div');
   wrap.className = 'hf-insp-edit';
   wrap.style.cssText = 'margin-top:8px;border-top:1px solid var(--border);padding-top:6px;display:flex;flex-direction:column;gap:5px';
   wrap.innerHTML = '<div style="font-size:10px;letter-spacing:.04em;color:var(--muted)">EDIT (commits via undo-able command · needs-verification preserved)</div>';
-  for (const [key, label, val, type, step, min] of fields) {
+  const mkField = (key, label, val, type, a, b) => {
     const row = document.createElement('label'); row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11px';
     const span = document.createElement('span'); span.textContent = label; span.style.color = 'var(--muted)';
-    const inp = document.createElement('input'); inp.type = type; inp.value = val; inp.dataset.key = key;
-    if (step) inp.step = step; if (min !== undefined) inp.min = min;
-    inp.style.cssText = 'width:120px;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:3px 6px;font:inherit;text-align:right';
+    let inp;
+    if (type === 'select') {
+      inp = document.createElement('select');
+      for (const opt of a) { const o = document.createElement('option'); o.value = String(opt); o.textContent = String(opt); if (String(opt) === String(val)) o.selected = true; inp.appendChild(o); }
+      inp.style.cssText = 'width:128px;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:3px 6px;font:inherit';
+    } else {
+      inp = document.createElement('input'); inp.type = type; inp.value = (val === null || val === undefined) ? '' : val;
+      if (a) inp.step = a; if (b !== undefined) inp.min = b;
+      inp.style.cssText = 'width:120px;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:3px 6px;font:inherit;text-align:right';
+    }
+    inp.dataset.key = key; inp.dataset.ftype = type;
     row.appendChild(span); row.appendChild(inp); wrap.appendChild(row);
+  };
+  for (const [key, label, val, type, a, b] of fields) mkField(key, label, val, type, a, b);
+  if (propFields.length) {
+    const hdr = document.createElement('div'); hdr.textContent = 'PROPERTIES (material · end-prep · K · cost · labor — reflect in BOM)';
+    hdr.style.cssText = 'font-size:9px;letter-spacing:.04em;color:var(--muted);margin-top:4px';
+    wrap.appendChild(hdr);
+    for (const [key, label, val, type, a, b] of propFields) mkField(key, label, val, type, a, b);
   }
   const btn = document.createElement('button'); btn.textContent = 'Apply edits'; btn.style.cssText = 'margin-top:2px;padding:5px;border-radius:7px;border:1px solid var(--border);background:rgba(0,230,118,.14);color:#7CFFB0;cursor:pointer;font:inherit';
   btn.onclick = () => commitInspectorEdits(ref, wrap);
@@ -6882,19 +7502,95 @@ function parseXY(str, fallbackZ) {
   if (parts.length < 2 || parts.some((n) => !Number.isFinite(n))) return null;
   return fallbackZ === undefined ? [parts[0], parts[1]] : [parts[0], parts[1], fallbackZ];
 }
+// Set of property fields that must reflect in the BOM after an edit.
+const HF_PROP_KEYS = new Set(['material', 'endPrep', 'kFactor', 'costUsd', 'laborHours', 'diameterIn']);
+let lastPropsEdit = null;
 function commitInspectorEdits(ref, wrap) {
   const s = currentCadModel.solids[ref.solidIndex]; if (!s) return;
   const patch = {};
-  wrap.querySelectorAll('input[data-key]').forEach((inp) => {
+  const changes = []; // {field, old, new} for the __hfPhase2.props contract
+  // inputs (number/text) AND selects (material/end-prep/K-factor) carry data-key.
+  wrap.querySelectorAll('[data-key]').forEach((inp) => {
     const k = inp.dataset.key;
-    if (inp.type === 'number') { const v = Number(inp.value); if (Number.isFinite(v)) patch[k] = v; }
-    else if (k === 'position') { const v = parseXY(inp.value, Array.isArray(s.position) ? s.position[2] : 0); if (v) patch[k] = v; }
-    else if (k === 'from') { const v = parseXY(inp.value, Array.isArray(s.from) ? s.from[2] : drawElev); if (v) patch[k] = v; }
-    else if (k === 'to') { const v = parseXY(inp.value, Array.isArray(s.to) ? s.to[2] : drawElev); if (v) patch[k] = v; }
+    const ftype = inp.dataset.ftype || inp.type;
+    let v;
+    if (ftype === 'select') {
+      // K-factor is numeric in a select; material/end-prep are strings.
+      v = (k === 'kFactor') ? Number(inp.value) : inp.value;
+    } else if (ftype === 'number') {
+      if (inp.value === '') return; // empty number field => leave unset
+      v = Number(inp.value); if (!Number.isFinite(v)) return;
+    } else if (k === 'position') { v = parseXY(inp.value, Array.isArray(s.position) ? s.position[2] : 0); }
+    else if (k === 'from') { v = parseXY(inp.value, Array.isArray(s.from) ? s.from[2] : drawElev); }
+    else if (k === 'to') { v = parseXY(inp.value, Array.isArray(s.to) ? s.to[2] : drawElev); }
+    else { v = inp.value; }
+    if (v === null || v === undefined) return;
+    // record old->new for fields that actually change
+    const oldVal = (k === 'material' || k === 'endPrep' || k === 'kFactor' || k === 'costUsd' || k === 'laborHours')
+      ? propDefault(s, k) : s[k];
+    const same = Array.isArray(v) ? JSON.stringify(oldVal) === JSON.stringify(v) : oldVal === v;
+    if (!same) changes.push({ field: k, old: oldVal === undefined ? null : oldVal, new: v });
+    patch[k] = v;
   });
-  if (HFEdit.apply('inspector-edit', (m) => setSolidFields(m, ref, patch))) $('status').textContent = 'applied inspector edits (Ctrl+Z to undo)';
-  else $('status').textContent = 'no field changes to apply';
+  const applied = HFEdit.apply('inspector-edit', (m) => setSolidFields(m, ref, patch));
+  if (applied) {
+    // PROPERTIES edits must REFLECT in the BOM — re-derive the live takeoff so the
+    // listing reflects the changed diameter / material / cost. Round-trip proof.
+    const touchedBom = changes.some((c) => HF_PROP_KEYS.has(c.field));
+    let bomReflected = false;
+    if (touchedBom) { try { regenerateBom(); bomReflected = true; } catch (_) {} }
+    // Publish the observable property round-trip for verification (CHUNK contract).
+    publishPropsEdit(ref, changes, bomReflected);
+    $('status').textContent = changes.length
+      ? `applied ${changes.length} edit(s)${touchedBom ? ' · BOM updated' : ''} (Ctrl+Z to undo)`
+      : 'applied inspector edits (Ctrl+Z to undo)';
+  } else {
+    publishPropsEdit(ref, [], false);
+    $('status').textContent = 'no field changes to apply';
+  }
 }
+// CHUNK contract: window.__hfPhase2.props -> { edited:{field,old,new}, bomReflected }.
+// Exposes the LAST property edit (the single most-recent changed field) plus the
+// full change list + the part it applied to, so a verifier can prove a real
+// round-trip (e.g. change diameter -> part + BOM both updated).
+function publishPropsEdit(ref, changes, bomReflected) {
+  const s = (currentCadModel && currentCadModel.solids[ref.solidIndex]) || null;
+  const primary = changes.length ? changes[changes.length - 1] : null;
+  lastPropsEdit = {
+    edited: primary,                       // { field, old, new } — the contract field
+    changes,                               // every changed field this commit
+    bomReflected: !!bomReflected,
+    solidIndex: ref.solidIndex,
+    kind: s ? s.kind : null,
+    nowValue: (primary && s) ? (HF_PROP_KEYS.has(primary.field) ? (s[primary.field] !== undefined ? s[primary.field] : propDefault(s, primary.field)) : s[primary.field]) : null,
+    bomTakeoff: window.__hfBomTakeoff || null,
+  };
+  window.__hfPhase2 = window.__hfPhase2 || {};
+  window.__hfPhase2.props = lastPropsEdit;
+}
+window.__hfPhase2 = window.__hfPhase2 || {};
+window.__hfPhase2.props = window.__hfPhase2.props || null;
+window.__hfProps = () => lastPropsEdit; // direct accessor
+window.regenerateBom = regenerateBom;   // headless-verification hook (BOM round-trip)
+// Headless property-edit driver for verification: select a part by index, set a
+// patch of property fields, commit (undoable) + regenerateBom, return the round-trip.
+window.__hfEditProps = (solidIndex, patch) => {
+  if (!currentCadModel || !currentCadModel.solids[solidIndex]) return { error: 'no such solid' };
+  const s = currentCadModel.solids[solidIndex];
+  const ref = { solidIndex };
+  const changes = [];
+  for (const k of Object.keys(patch || {})) {
+    const oldVal = HF_PROP_KEYS.has(k) ? (s[k] !== undefined ? s[k] : propDefault(s, k)) : s[k];
+    const v = patch[k];
+    const same = Array.isArray(v) ? JSON.stringify(oldVal) === JSON.stringify(v) : oldVal === v;
+    if (!same) changes.push({ field: k, old: oldVal === undefined ? null : oldVal, new: v });
+  }
+  const applied = HFEdit.apply('props-edit', (m) => setSolidFields(m, ref, patch));
+  let bomReflected = false;
+  if (applied && changes.some((c) => HF_PROP_KEYS.has(c.field))) { try { regenerateBom(); bomReflected = true; } catch (_) {} }
+  publishPropsEdit(ref, changes, bomReflected);
+  return lastPropsEdit;
+};
 window.__hfDraw = { setDrawTool: (t) => setDrawTool(t), commitPipe, commitWall, commitHead }; // headless hooks
 // HF-TOOLBAR: wire the draw/edit toolbar to the real tool functions (no dead stubs).
 (function wireToolBar() {
@@ -6964,6 +7660,7 @@ document.querySelectorAll('#viewSeg button').forEach((b) => {
     { id: 'view.fit', name: 'Fit View', desc: sdesc },
     { id: 'view.layers', name: 'Layers panel', desc: sdesc },
     { id: 'view.levels', name: 'Levels / sheets panel', desc: sdesc },
+    { id: 'view.coverage', name: 'Coverage & spacing overlay (toggle)', desc: sdesc },
   ]);
   addItems('auto-draw', [{ id: 'auto-draw.generate-layout', name: 'Generate Layout', desc: sdesc }]);
   addItems('actions', [{ id: 'actions.generate-layout', name: 'Generate Layout', desc: sdesc }]);
@@ -7025,6 +7722,11 @@ document.querySelectorAll('#viewSeg button').forEach((b) => {
     'view.mode-iso': () => { clickView('iso'); $('fitBtn').click(); },
     'view.fit': () => $('fitBtn').click(),
     'view.layers': () => scrollPanelTo('layers'),
+    'view.coverage': () => {
+      const btn = $('coverageToggle');
+      if (btn) { btn.click(); scrollPanelTo('coverage'); }
+      else window.__hfCoverageToggle && window.__hfCoverageToggle();
+    },
     'view.levels': () => {
       if (window.__levelPanelToggle) window.__levelPanelToggle();
       else $('status').textContent = 'no real plan sheets for this project — levels panel unavailable (needs-verification)';
@@ -7140,16 +7842,25 @@ document.querySelectorAll('#viewSeg button').forEach((b) => {
     // passes (couplings/hangers/fittings/branch-lines) are emitted by the SERVER
     // pipeline as a unit and are not separably re-runnable client-side.
     'auto-draw.auto-size': () => autoDrawAutoSize(),
+    'auto-draw.apply-pipe-schedule': () => applyScheduleToSystem(),
+    'auto-draw.pipe-schedule': () => applyScheduleToSystem(),
+    'tools.apply-pipe-schedule': () => applyScheduleToSystem(),
     'auto-draw.couplings': hfHonestStub('couplings are placed by the Generate pipeline detail pass (stock-length joints) — not separably re-runnable; re-Generate to refresh.'),
     'auto-draw.fittings': hfHonestStub('fittings (tees/elbows/reducers) are emitted by the Generate pipeline — not a separate client pass; re-Generate to refresh.'),
     'auto-draw.hangers': hfHonestStub('hangers are placed by the Generate pipeline (band+rod at NFPA spacing) — not separably re-runnable; re-Generate to refresh.'),
     'auto-draw.auto-branch-lines': hfHonestStub('branch lines are laid out by the Generate sprinkler-layout pass — not a separate client entrypoint; use Auto Draw › Generate Layout.'),
-    'auto-draw.easy-drop': hfHonestStub('drop splitting/couplings are part of the Generate detail pass — no separate client pass.'),
+    // HF-PHASE2-DROPCONNECT: Easy Drop = build the vertical drop/sprig nipple (+
+    // arm-over leg when the head is offset) for every head that lacks a connection.
+    'auto-draw.easy-drop': () => dropConnectMenu('Easy Drop'),
     'auto-draw.riser-nipples': hfHonestStub('riser nipples are emitted by the Generate pipeline — not separably re-runnable.'),
     'auto-draw.route-pipe': hfHonestStub('intelligent pipe routing (obstacle-aware) is a server pipeline concern — no client router; draw pipe manually with the multi-segment tool.'),
     'auto-draw.sprinkler-coverage': hfHonestStub('coverage boundaries need a coverage-cell renderer — not yet built.'),
     'auto-draw.remote-area-boundary': hfHonestStub('remote-area boundary draw needs a polygon tool — not yet built.'),
-    'auto-draw.arm-around': hfHonestStub('arm-around rerouting is an obstacle-resolution solver — no client engine.'),
+    // HF-PHASE2-DROPCONNECT: Arm Over = insert the short horizontal arm-over leg
+    // from a branch to each offset head (then a drop/sprig nipple to the head).
+    'auto-draw.arm-around': () => dropConnectMenu('Arm-over'),
+    'tools.smart-pipe-arm-over': () => dropConnectMenu('Arm-over'),
+    'tools.smart-pipe-sprig': () => dropConnectMenu('Sprig'),
     'auto-draw.bushings': hfHonestStub('bushings are emitted by the Generate fitting pass — not separably re-runnable.'),
     // ── HF-SPK: Wizards — Tree/Grid system layout IS what Generate does (it lays
     // out a tree/grid sprinkler schematic). Wire those two to generate(); the rest
@@ -7162,7 +7873,7 @@ document.querySelectorAll('#viewSeg button').forEach((b) => {
     'wizards.loop-system': hfHonestStub('loop-system generator not yet built.'),
     'wizards.standpipe': hfHonestStub('standpipe generator (multi-level riser) not yet built.'),
     'wizards.column-grid': hfHonestStub('column-grid layout wizard not yet built.'),
-    'wizards.advanced-drop-connect': hfHonestStub('advanced drop-connect logic runs inside Generate — no separate client pass.'),
+    'wizards.advanced-drop-connect': () => dropConnectMenu('Advanced Drop-Connect'),
     'wizards.place-hangers': hfHonestStub('hanger placement runs inside the Generate detail pass — no separate client pass.'),
     'wizards.place-sprinklers-in-ceiling-grid': hfHonestStub('ceiling-grid sprinkler placement needs a ceiling-grid element — not yet built.'),
     // ── HF-SPK: Roof Planes — roof generation/elevation is a deep structural
