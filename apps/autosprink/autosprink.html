@@ -468,6 +468,28 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
       </p>
     </div>
 
+    <!-- PHASE 4: scale calibration — pick two points + type the real distance, or pick a
+         known architectural scale. Camera-neutral; sets ft/px for the intake model. -->
+    <div id="calibBox" style="margin-top:8px">
+      <label>Scale calibration</label>
+      <button class="act ghost" id="calibPickBtn" type="button" style="font-size:11px;padding:7px">📐 Pick 2 points → type distance</button>
+      <div style="display:flex;gap:4px;margin-top:4px">
+        <select id="calibKnown" style="flex:1;font-size:11px">
+          <option value="">Known scale…</option>
+          <option value='1/16"=1&apos;'>1/16" = 1'</option>
+          <option value='3/32"=1&apos;'>3/32" = 1'</option>
+          <option value='1/8"=1&apos;'>1/8" = 1'</option>
+          <option value='3/16"=1&apos;'>3/16" = 1'</option>
+          <option value='1/4"=1&apos;'>1/4" = 1'</option>
+          <option value='1"=20&apos;'>1" = 20'</option>
+          <option value="1:48">1:48</option>
+          <option value="1:100">1:100</option>
+        </select>
+        <button class="act ghost" id="calibClearBtn" type="button" style="font-size:11px;padding:7px 9px">Clear</button>
+      </div>
+      <div id="calibStatus" style="font-size:10px;margin-top:4px;color:var(--muted)">scale: sheet-derived (uncalibrated)</div>
+    </div>
+
     <div id="sourceLockNote">Source locked: AI-pulled email PDF (bid-originated project)</div>
 
     <label>Hazard class (NFPA 13)</label>
@@ -946,6 +968,11 @@ async function initStudio() {
   renderer.domElement.addEventListener('pointerdown', (e) => { downPt = { x: e.clientX, y: e.clientY }; hfTryStartObjectDrag(e); });
   renderer.domElement.addEventListener('pointermove', (e) => { if (hfDrag) hfUpdateObjectDrag(e); });
   renderer.domElement.addEventListener('pointerup', (e) => {
+    // PHASE 4: scale-calibration picks pre-empt the normal pick path. Camera-neutral — the
+    // intercept only reads world coords (pointerToPlan) and never reframes.
+    if (calibArmed && downPt && Math.hypot(e.clientX - downPt.x, e.clientY - downPt.y) < 6) {
+      downPt = null; if (calibrationClickIntercept(e)) return;
+    }
     if (typeof stretchMode !== 'undefined' && stretchMode) { downPt = null; return; } // HF-PHASE1: stretch owns the gesture
     if (hfDrag) { hfCommitObjectDrag(); downPt = null; return; }   // direct grab-drag move committed
     if (!downPt) return;
@@ -1073,6 +1100,7 @@ async function initStudio() {
   };
   await OpenGeometry.create({ wasmURL: '/vendor/opengeometry/opengeometry_bg.wasm' });
   ogReady = true;
+  try { buildPhase4Intake(); } catch (_) {} // PHASE 4: ensure __hfPhase4.intake/calibrate exist pre-build
   await loadPartMeshes(); // best-effort; heads render as a real part mesh when available
   $('status').textContent = 'OpenGeometry ready' + (headPartGeo ? ` · head part: ${partsSource}` : '');
 }
@@ -2744,6 +2772,15 @@ async function renderPlanComprehensionBuild(name) {
     setLayerVisible: planBuildState.api.setLayerVisible,
     activeLevel: planBuildState.activeLevel,
   } : null);
+
+  // PHASE 4 — INTAKE hook. Exposes the reconstructed building model (the head-placer + router
+  // run on this): aggregated wall RUNS, openings (cased openings + door positions), and COLUMNS
+  // (extracted or grid-synthesized), plus the scale the geometry was reconstructed at. HONEST:
+  // wall RUNS are collinear-merged real walls (the fragmented `walls` count is also surfaced);
+  // openings/columns are best-effort heuristics flagged needs-verification; scaleFtPerPx is the
+  // sheet-derived true scale unless the operator has run scale calibration (then it is the
+  // calibrated value). source = how the model was reconstructed. NOT AHJ/PE-stamped.
+  buildPhase4Intake();
   window.__THREE = THREE; window.__scene = scene; window.__renderer = renderer;
   try { Object.defineProperty(window, '__camera', { configurable: true, get: () => camera }); } catch (_) { window.__camera = camera; }
   window.__hfSetSelectMode = (v) => { selectMode = !!v; };
@@ -3890,6 +3927,20 @@ $('selBtn').onclick = () => {
 })();
 $('inspClose').onclick = () => clearSelection(true);
 $('regenBtn').onclick = generate;
+
+// PHASE 4: scale-calibration UI wiring (camera-neutral). Pick-2-points arms the click intercept;
+// the known-scale dropdown + clear set/reset the operator scale directly.
+(function wireCalibrationUI() {
+  const pick = document.getElementById('calibPickBtn');
+  const known = document.getElementById('calibKnown');
+  const clr = document.getElementById('calibClearBtn');
+  if (pick) pick.onclick = () => { try { window.__hfPhase4.calibrate.arm(); pick.classList.add('on'); } catch (e) { console.warn(e); } };
+  if (known) known.onchange = () => {
+    const v = known.value; if (!v) return;
+    try { const r = window.__hfPhase4.calibrate.setByKnownScale(v); const s = document.getElementById('status'); if (s) s.textContent = r && r.ok ? ('Scale set: ' + v + ' → ' + (Math.round(r.scaleFtPerPx * 1e6) / 1e6) + ' ft/px') : ('Scale parse failed: ' + (r && r.error)); } catch (e) { console.warn(e); }
+  };
+  if (clr) clr.onclick = () => { try { window.__hfPhase4.calibrate.clear(); if (known) known.value = ''; if (pick) pick.classList.remove('on'); const s = document.getElementById('status'); if (s) s.textContent = 'Scale calibration cleared — back to sheet-derived scale.'; } catch (e) { console.warn(e); } };
+})();
 $('genBtn').onclick = generate;
 // HF-PHASE2-SMARTPIPE: toggle topology-role coloring on the pipes (camera-neutral).
 {
@@ -5945,6 +5996,191 @@ function pointerToPlan(clientX, clientY, elev) {
   const off = modelGroup ? modelGroup.position : { x: 0, z: 0 };
   // world = modelGroup.pos + W([planX,planY,elev]) = (off.x+planX, elev, off.z+planY)
   return [hit.x - off.x, hit.z - off.z];
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// PHASE 4 — INTAKE MODEL + SCALE CALIBRATION
+// ══════════════════════════════════════════════════════════════════════════════
+// Reconstructed-building intake hook + an interactive scale-calibration tool. Both are
+// CAMERA-NEUTRAL: picking calibration points raycasts the existing ground plane via
+// pointerToPlan and NEVER reframes the camera (guard #1). The intake hook aggregates the
+// reconstructed model (walls / openings / columns / levels) the head-placer + router run on,
+// at the scale it was reconstructed at. Honest: heuristic pieces are flagged; nothing is
+// AHJ/PE-stamped.
+
+// Operator-set calibrated scale (ft per PDF/screen px). Null until calibration is run; the
+// intake hook then reports the sheet-derived true scale as the fallback.
+window.__hfCalibratedScale = window.__hfCalibratedScale || null; // { scaleFtPerPx, method, pxDist, realFt, ts }
+
+// Parse an architectural scale notation (e.g. 1/8"=1'-0", 3/32"=1', 1:48, 1"=20') into FEET
+// per drawing INCH (the printed paper inch). PDF user-space points are 1/72 inch, so
+// scaleFtPerPoint = feetPerPaperInch / 72. Returns { feetPerPaperInch, feetPerPoint } or null.
+function parseArchScale(text) {
+  if (!text) return null;
+  const s = String(text).replace(/[‘’“”]/g, '"').replace(/\s+/g, ' ').trim();
+  // ratio form 1:48 or 1:100  ->  1 paper unit = N drawing units of same unit; feet per paper inch = N/12
+  let m = s.match(/^1\s*:\s*([\d.]+)$/);
+  if (m) { const n = parseFloat(m[1]); if (n > 0) return { feetPerPaperInch: n / 12, feetPerPoint: (n / 12) / 72, label: s }; }
+  // engineering form 1"=20'  (one paper inch = 20 feet)
+  m = s.match(/^([\d./]+)\s*"?\s*=\s*([\d.]+)\s*'?$/);
+  if (m) {
+    const paperIn = evalFrac(m[1]); const ft = parseFloat(m[2]);
+    if (paperIn > 0 && ft > 0) return { feetPerPaperInch: ft / paperIn, feetPerPoint: (ft / paperIn) / 72, label: s };
+  }
+  // architectural form 1/8"=1'-0"  or  3/32" = 1'  (fraction of a paper inch = some feet[-inches])
+  m = s.match(/^([\d./]+)\s*"?\s*=\s*([\d.]+)\s*'(?:\s*-?\s*([\d.]+)\s*")?$/);
+  if (m) {
+    const paperIn = evalFrac(m[1]); const ft = parseFloat(m[2]); const inch = m[3] ? parseFloat(m[3]) : 0;
+    const realFt = ft + inch / 12;
+    if (paperIn > 0 && realFt > 0) return { feetPerPaperInch: realFt / paperIn, feetPerPoint: (realFt / paperIn) / 72, label: s };
+  }
+  return null;
+}
+function evalFrac(t) { // "1/8" -> 0.125 ; "3/32" -> 0.09375 ; "1" -> 1
+  const f = String(t).match(/^([\d.]+)\s*\/\s*([\d.]+)$/);
+  if (f) { const a = parseFloat(f[1]), b = parseFloat(f[2]); return b ? a / b : NaN; }
+  return parseFloat(t);
+}
+
+// Camera-neutral world pick for calibration: returns plan [x,y] FEET at the active elevation,
+// reusing pointerToPlan (no reframe). Returns null if the ray misses the plane.
+function calibPickPlan(clientX, clientY) {
+  const elev = (planBuildState && planBuildState.api) ? 0 : 0;
+  return pointerToPlan(clientX, clientY, elev);
+}
+
+// Build the __hfPhase4.intake aggregation from the live planBuildState. Re-run on each build.
+function buildPhase4Intake() {
+  window.__hfPhase4 = window.__hfPhase4 || {};
+  window.__hfPhase4.intake = () => {
+    const st = planBuildState;
+    if (!st || !st.api) return { available: false, reason: 'no plan build — import a PDF/DXF plan first', walls: [], openings: [], columns: [], levels: [], scaleFtPerPx: null, source: 'none' };
+    const lps = Array.isArray(st.levelPlans) ? st.levelPlans : [];
+    const apiLevels = (st.api && Array.isArray(st.api.levels)) ? st.api.levels : [];
+    const walls = [], openings = [], columns = [], levels = [];
+    let scaleFtPerUnit = null;
+    for (const lp of lps) {
+      const p = lp.plan || {};
+      if (scaleFtPerUnit == null && Number.isFinite(p.scaleFtPerUnit)) scaleFtPerUnit = p.scaleFtPerUnit;
+      // WALLS: prefer collinear-merged runs (real walls); fall back to raw segments.
+      const wsrc = (Array.isArray(p.wallRuns) && p.wallRuns.length) ? p.wallRuns : (p.walls || []);
+      for (const w of wsrc) if (w && Array.isArray(w.a) && Array.isArray(w.b)) walls.push({ level: lp.level, a: w.a, b: w.b });
+      // OPENINGS: cased openings + door positions (both are wall openings the router cares about).
+      for (const o of (p.openings || [])) if (o && Array.isArray(o.position)) openings.push({ level: lp.level, kind: 'opening', position: o.position, width: o.width, confidence: o.confidence });
+      for (const d of (p.doors || [])) if (d && Array.isArray(d.position)) openings.push({ level: lp.level, kind: 'door', position: d.position, width: d.width, confidence: d.confidence, suspect: d.suspect });
+      levels.push({ level: lp.level, name: lp.name, elevationFt: lp.elevationFt, scaleFtPerUnit: p.scaleFtPerUnit, scaleText: p.scaleText });
+    }
+    // COLUMNS: from the resolved api levels (extracted or grid-synthesized in building-from-plan).
+    let columnSource = null;
+    for (const al of apiLevels) {
+      if (Array.isArray(al.columns)) {
+        if (!columnSource && al.columnSource) columnSource = al.columnSource;
+        for (const c of al.columns) if (c && Number.isFinite(c.x) && Number.isFinite(c.y)) columns.push({ level: al.level, x: c.x, y: c.y, sizeFt: c.sizeFt, gridLabel: c.gridLabel, source: c.source, confidence: c.confidence });
+      }
+    }
+    // SCALE. PDF user-space points are the "px" of the vector model, so scaleFtPerUnit (ft per
+    // PDF point) IS ft-per-px for this source. Operator calibration overrides it.
+    const cal = window.__hfCalibratedScale;
+    const sheetFtPerPx = Number.isFinite(scaleFtPerUnit) ? scaleFtPerUnit : null;
+    const scaleFtPerPx = (cal && Number.isFinite(cal.scaleFtPerPx)) ? cal.scaleFtPerPx : sheetFtPerPx;
+    return {
+      available: true,
+      source: st.project + ' — reconstructed from vector PDF plan set',
+      scaleFtPerPx,
+      scaleSource: cal ? ('operator-calibration(' + cal.method + ')') : (sheetFtPerPx != null ? 'sheet-printed-scale' : 'unknown'),
+      calibrated: !!cal,
+      sheetFtPerPx,
+      walls, openings, columns, levels,
+      counts: { walls: walls.length, openings: openings.length, columns: columns.length, levels: levels.length },
+      columnSource,
+      provenance: 'Engineering aid — building model reconstructed from the imported plan. Walls = collinear-merged runs (heuristic real-wall count); openings = swing-arc doors + collinear-gap cased openings (best-effort); columns = ' + (columnSource || 'none') + '. NOT AHJ/PE-stamped — needs-verification.',
+      needsVerification: true,
+    };
+  };
+
+  // SCALE CALIBRATION API (interactive + programmatic). Camera-neutral.
+  window.__hfPhase4.calibrate = {
+    // Programmatic: two screen points + the real distance between them -> ft/px.
+    setByTwoPoints(pxA, pxB, realFt) {
+      if (!Array.isArray(pxA) || !Array.isArray(pxB)) return { error: 'pxA/pxB must be [x,y] screen px' };
+      const realDist = Number(realFt);
+      if (!(realDist > 0)) return { error: 'realFt must be > 0' };
+      const pxDist = Math.hypot(pxB[0] - pxA[0], pxB[1] - pxA[1]);
+      if (!(pxDist > 0)) return { error: 'the two screen points coincide' };
+      const scaleFtPerPx = realDist / pxDist;
+      window.__hfCalibratedScale = { scaleFtPerPx, method: 'two-point', pxDist: Math.round(pxDist * 100) / 100, realFt: realDist, ts: Date.now() };
+      reflectCalibration();
+      return { ok: true, scaleFtPerPx, pxDist, realFt: realDist };
+    },
+    // Programmatic: two PLAN-feet points + the real distance -> a correction factor on the model
+    // scale (how far off the reconstructed scale is). Camera-neutral; never moves geometry.
+    setByPlanPoints(planA, planB, realFt) {
+      if (!Array.isArray(planA) || !Array.isArray(planB)) return { error: 'planA/planB must be [x,y] FEET' };
+      const realDist = Number(realFt);
+      if (!(realDist > 0)) return { error: 'realFt must be > 0' };
+      const modelDist = Math.hypot(planB[0] - planA[0], planB[1] - planA[1]);
+      if (!(modelDist > 0)) return { error: 'the two plan points coincide' };
+      const it = window.__hfPhase4.intake();
+      const base = (it && Number.isFinite(it.sheetFtPerPx)) ? it.sheetFtPerPx : null;
+      const correction = realDist / modelDist; // model reads modelDist ft; should read realFt
+      const scaleFtPerPx = base != null ? base * correction : null;
+      window.__hfCalibratedScale = { scaleFtPerPx, method: 'plan-two-point', modelDistFt: Math.round(modelDist * 100) / 100, realFt: realDist, correction: Math.round(correction * 10000) / 10000, ts: Date.now() };
+      reflectCalibration();
+      return { ok: true, scaleFtPerPx, modelDistFt: modelDist, realFt: realDist, correction };
+    },
+    // Known-scale picker (e.g. "1/8\"=1'-0\"", "3/32\"=1'", "1:48", "1\"=20'").
+    setByKnownScale(notation) {
+      const parsed = parseArchScale(notation);
+      if (!parsed) return { error: 'unrecognized scale notation: ' + notation };
+      window.__hfCalibratedScale = { scaleFtPerPx: parsed.feetPerPoint, method: 'known-scale', notation: parsed.label, feetPerPaperInch: parsed.feetPerPaperInch, ts: Date.now() };
+      reflectCalibration();
+      return { ok: true, scaleFtPerPx: parsed.feetPerPoint, feetPerPaperInch: parsed.feetPerPaperInch, notation: parsed.label };
+    },
+    // Camera-neutral world pick (for the interactive 2-point flow + headless tests).
+    pickPlan(clientX, clientY) { return calibPickPlan(clientX, clientY); },
+    // Arm the interactive 2-point pick (clicking two points on the canvas, then prompting for
+    // the real distance). Camera-neutral: uses pointerToPlan, never reframes.
+    arm() { armCalibration(); return { armed: true }; },
+    disarm() { disarmCalibration(); return { armed: false }; },
+    clear() { window.__hfCalibratedScale = null; reflectCalibration(); return { cleared: true }; },
+    get() { return window.__hfCalibratedScale; },
+  };
+}
+
+// Interactive 2-point calibration state. The picks are CAMERA-NEUTRAL (pointerToPlan only).
+let calibArmed = false, calibPts = [];
+function reflectCalibration() {
+  const el = document.getElementById('calibStatus');
+  const cal = window.__hfCalibratedScale;
+  if (el) el.textContent = cal ? ('scale: ' + (Math.round(cal.scaleFtPerPx * 1e6) / 1e6) + ' ft/px (' + cal.method + ')') : 'scale: sheet-derived (uncalibrated)';
+}
+function armCalibration() {
+  calibArmed = true; calibPts = [];
+  const s = document.getElementById('status'); if (s) s.textContent = 'Scale calibration: click TWO points a known distance apart (camera stays put).';
+}
+function disarmCalibration() { calibArmed = false; calibPts = []; }
+// Intercept calibration clicks BEFORE the normal pick path (registered in the capture phase so
+// it pre-empts handleCanvasClick). Camera-neutral: only reads world coords, never moves camera.
+function calibrationClickIntercept(e) {
+  if (!calibArmed) return false;
+  const plan = calibPickPlan(e.clientX, e.clientY);
+  if (!plan) return true; // armed but missed the plane — swallow the click, no reframe
+  calibPts.push({ screen: [e.clientX, e.clientY], plan });
+  const s = document.getElementById('status');
+  if (calibPts.length === 1) { if (s) s.textContent = 'Scale calibration: now click the SECOND point.'; return true; }
+  // second point — prompt for the real-world distance, then set scale from PLAN distance.
+  const a = calibPts[0], b = calibPts[1];
+  calibArmed = false;
+  const ans = (typeof window.__hfCalibPrompt === 'function')
+    ? window.__hfCalibPrompt()
+    : window.prompt('Real distance between the two points, in feet (e.g. 20):', '');
+  const realFt = parseFloat(ans);
+  if (realFt > 0) {
+    const r = window.__hfPhase4.calibrate.setByPlanPoints(a.plan, b.plan, realFt);
+    if (s) s.textContent = r && r.ok ? ('Scale calibrated: ' + (Math.round(r.scaleFtPerPx * 1e6) / 1e6) + ' ft/px (correction ' + r.correction + 'x)') : ('Calibration failed: ' + (r && r.error));
+  } else if (s) { s.textContent = 'Scale calibration cancelled.'; }
+  calibPts = [];
+  return true;
 }
 
 // ── HF-DM: direct-manipulation grab-drag (AutoSPRINK-style) ────────────────────

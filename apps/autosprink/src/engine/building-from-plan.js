@@ -231,6 +231,7 @@ const DOOR_SUSPECT_COLOR = 0x6b7280; // SUSPECT (down-ranked) door — muted gre
 const OPENING_COLOR = 0x4ab0ff;    // cased opening / passage marker — blue
 const FIXTURE_COLOR = 0x4ad6c0;    // fixture / core marker — teal
 const WALLSFULL_COLOR = 0xc77dff;  // recovered partition-inclusive walls (recall layer) — violet
+const COLUMN_COLOR = 0xd1495b;     // structural column — deep red
 
 /**
  * Build a single DOOR as a thin leaf box + a swing-arc line, parented in one group so
@@ -302,6 +303,80 @@ function makeOpening(THREE, op, bounds, elevationFt) {
   mesh.name = `plan-opening:${wft.toFixed(1)}ft`;
   mesh.userData = { kind: 'plan-opening', widthFt: Math.round(wft * 100) / 100, evidence: op.evidence, confidence: op.confidence, needsVerification: true };
   return mesh;
+}
+
+/** Build a structural COLUMN (square pier extruded to wall height). Selectable/inspectable. */
+function makeColumn(THREE, col, bounds, elevationFt, heightFt) {
+  if (!col || !Number.isFinite(col.x) || !Number.isFinite(col.y) || !THREE.BoxGeometry) return null;
+  const sizeFt = Math.max(0.5, Number(col.sizeFt) || 1.2);
+  const h = Math.max(1, Number(heightFt) || 9);
+  const geo = new THREE.BoxGeometry(sizeFt, h, sizeFt);
+  const mat = THREE.MeshStandardMaterial
+    ? new THREE.MeshStandardMaterial({ color: COLUMN_COLOR, transparent: true, opacity: 0.85, metalness: 0.1, roughness: 0.6 })
+    : new THREE.MeshBasicMaterial({ color: COLUMN_COLOR, transparent: true, opacity: 0.85 });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.set(col.x - bounds.cx, elevationFt + h / 2, col.y - bounds.cy);
+  mesh.name = `plan-column${col.gridLabel ? ':' + col.gridLabel : ''}`;
+  mesh.userData = {
+    kind: 'plan-column', sizeFt: Math.round(sizeFt * 100) / 100,
+    gridLabel: col.gridLabel || null, source: col.source || 'extracted',
+    confidence: col.confidence || 'low', needsVerification: true,
+  };
+  return mesh;
+}
+
+/**
+ * PURE. Synthesize structural COLUMNS at the architectural grid intersections that fall
+ * inside the building footprint, when the extracted plan carries grid datum lines but no
+ * first-class column entities. This is a HEURISTIC first pass — a column is most often drawn
+ * at a grid-line crossing, so the {xs} x {ys} intersection field is the honest best estimate
+ * of column locations from grid data alone. It is NOT a verified column schedule: real
+ * drawings omit columns at some intersections (corridors/openings) and add some off-grid. Every
+ * synthesized column is flagged confidence:'low', source:'grid-intersection', needsVerification.
+ *
+ * Inset: intersections within `edgeInsetFt` of the footprint bbox edge are dropped (perimeter
+ * grid lines usually mark the wall face, not an interior column). Caller passes the footprint
+ * bbox; with no bbox every in-range intersection is kept.
+ *
+ * @param {{xs:number[], ys:number[], labels?:object}} grid - grid datum lines in FEET.
+ * @param {{minX,minY,maxX,maxY}|null} bboxFt - footprint bbox in FEET (optional inset clip).
+ * @param {Object} [opts]
+ * @returns {{columns:Array<{x,y,sizeFt,gridLabel,source,confidence}>, note:string}}
+ */
+export function synthesizeColumnsFromGrid(grid, bboxFt = null, opts = {}) {
+  const xs = (grid && Array.isArray(grid.xs)) ? grid.xs.filter(Number.isFinite) : [];
+  const ys = (grid && Array.isArray(grid.ys)) ? grid.ys.filter(Number.isFinite) : [];
+  const note =
+    'Columns SYNTHESIZED at architectural grid-line intersections inside the footprint (heuristic ' +
+    'first pass: a column is usually drawn at a grid crossing). NOT a verified column schedule — ' +
+    'real plans skip some intersections and add off-grid columns. needs-verification.';
+  if (xs.length < 2 || ys.length < 2) return { columns: [], note: note + ' (insufficient grid datums)' };
+  const inset = Number.isFinite(opts.edgeInsetFt) ? opts.edgeInsetFt : 4;
+  const sizeFt = Number.isFinite(opts.sizeFt) ? opts.sizeFt : 1.2;
+  const labels = (grid && grid.labels) || {};
+  const colLabels = labels.cols || labels.x || null; // optional map / array of column datum labels
+  const rowLabels = labels.rows || labels.y || null;
+  const inFootprint = (x, y) => {
+    if (!bboxFt) return true;
+    return x >= bboxFt.minX + inset && x <= bboxFt.maxX - inset &&
+           y >= bboxFt.minY + inset && y <= bboxFt.maxY - inset;
+  };
+  const labelAt = (arr, i) => {
+    if (!arr) return null;
+    if (Array.isArray(arr)) return arr[i] != null ? String(arr[i]) : null;
+    return null;
+  };
+  const columns = [];
+  for (let i = 0; i < xs.length; i++) {
+    for (let j = 0; j < ys.length; j++) {
+      const x = Math.round(xs[i] * 100) / 100, y = Math.round(ys[j] * 100) / 100;
+      if (!inFootprint(x, y)) continue;
+      const cl = labelAt(colLabels, i), rl = labelAt(rowLabels, j);
+      const gridLabel = (cl && rl) ? `${cl}-${rl}` : (cl || rl || null);
+      columns.push({ x, y, sizeFt, gridLabel, source: 'grid-intersection', confidence: 'low' });
+    }
+  }
+  return { columns, note };
 }
 
 /** Build a FIXTURE/core marker (small upright box, colored by fixture kind). */
@@ -579,15 +654,43 @@ export function buildBuildingFromPlans(THREE, levelPlans, opts = {}) {
       group.add(fGroup);
     }
 
+    // PHASE 4 — COLUMNS. Prefer first-class extracted columns (plan.columns from
+    // structure-from-plan's detectColumns); fall back to SYNTHESIZING them at grid-line
+    // intersections inside the footprint when the plan carries grid datums but no column
+    // entities (the common case for the 1881 architectural set). Heuristic + flagged.
+    let columnCount = 0, columnSource = null;
+    let planColumns = Array.isArray(plan.columns) ? plan.columns.filter((c) => c && Number.isFinite(c.x) && Number.isFinite(c.y)) : [];
+    if (!planColumns.length && plan.grid && Array.isArray(plan.grid.xs) && Array.isArray(plan.grid.ys)) {
+      const synth = synthesizeColumnsFromGrid(plan.grid, plan.footprintBboxFt || null, {});
+      planColumns = synth.columns;
+      columnSource = planColumns.length ? 'grid-intersection(synth)' : null;
+    } else if (planColumns.length) {
+      columnSource = 'extracted';
+    }
+    if (planColumns.length && THREE.BoxGeometry) {
+      const cGroup = new THREE.Group();
+      cGroup.name = 'columns';
+      cGroup.userData = { kind: 'plan-columns-layer', toggleKey: 'COLUMNS', source: columnSource, needsVerification: true };
+      for (const col of planColumns) {
+        const m = makeColumn(THREE, col, bounds, elevationFt, wallHeightFt);
+        if (m) { cGroup.add(m); columnCount += 1; }
+      }
+      group.add(cGroup);
+    }
+
     root.add(group);
     levels.push({
       level: lp.level,
       name: lp.name || `Level ${lp.level}`,
       elevationFt,
       group,
+      // PHASE 4: the resolved column entities (extracted or grid-synthesized) for the intake hook.
+      columns: planColumns,
+      columnSource,
       counts: {
         walls: wallCount, rooms: roomCount, stairs: stairCount,
         doors: doorCount, openings: openingCount, fixtures: fixtureCount,
+        columns: columnCount, columnSource,
         wallsFull: wallsFullCount,
         // RECORE: the honest primary wall count is the merged wall RUNS (when present).
         wallRuns: (Array.isArray(plan.wallRuns) ? plan.wallRuns.length : 0),
@@ -640,6 +743,7 @@ export function buildBuildingFromPlans(THREE, levelPlans, opts = {}) {
       inEnvelopeRecallPct: (recallLevel.recallMeasure && Number.isFinite(recallLevel.recallMeasure.inEnvelopeRecallPct))
         ? recallLevel.recallMeasure.inEnvelopeRecallPct : null,
       fixtures: recallLevel.counts.fixtures, fixtureCounts: recallLevel.fixtureCounts,
+      columns: recallLevel.counts.columns, columnSource: recallLevel.counts.columnSource,
       recoveredWalls: recallLevel.counts.wallsFull,
       // RECORE: the honest primary structure — collinear-merged wall RUNS (real walls), with the
       // raw fragment count + excluded non-wall ink, so the panel headlines correctness not coverage.
