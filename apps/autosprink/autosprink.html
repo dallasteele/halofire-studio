@@ -490,6 +490,21 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
       <div id="calibStatus" style="font-size:10px;margin-top:4px;color:var(--muted)">scale: sheet-derived (uncalibrated)</div>
     </div>
 
+    <!-- PHASE 4 chunk 2: SECTION / ELEVATION cut. Pick a cut line on the plan -> a generated
+         2D elevation (structure + pipes + heads at true elevations) in a selectable/closable
+         panel. Camera-neutral; reuses the calibration-grade world pick. -->
+    <div id="sectionBox" style="margin-top:8px">
+      <label>Section / elevation cut</label>
+      <button class="act ghost" id="sectionPickBtn" type="button" style="font-size:11px;padding:7px">✂️ Place cut line → elevation</button>
+      <div style="display:flex;gap:4px;margin-top:4px">
+        <label style="flex:1;font-size:10px;color:var(--muted)">Band ±ft
+          <input id="sectionBand" type="number" value="8" min="1" max="60" step="1" style="width:48px;font-size:11px;margin-left:4px">
+        </label>
+        <button class="act ghost" id="sectionCloseBtn" type="button" style="font-size:11px;padding:7px 9px">Close</button>
+      </div>
+      <div id="sectionStatus" style="font-size:10px;margin-top:4px;color:var(--muted)">no section — place a cut line</div>
+    </div>
+
     <div id="sourceLockNote">Source locked: AI-pulled email PDF (bid-originated project)</div>
 
     <label>Hazard class (NFPA 13)</label>
@@ -762,6 +777,9 @@ import { computeRemoteArea, autoRemoteArea, polygonArea, pointInPolygon, rectRin
 // demand point → the binding (governing) supply + supply-vs-demand graph data.
 // Validated against hand calcs in tests/supplies.test.js.
 import { buildSupply, evaluateSupplies, supplyDemandCurve, defaultCityWaterSpec, SUPPLY_DISCLAIMER } from '/src/engine/supplies.js';
+// PHASE 4 chunk 2: section / elevation cut (pure projector). Drives the SECTION tool
+// (pick a cut line on the plan -> generated 2D elevation in a selectable/closable panel).
+import { generateSection as hfGenerateSection, planeFromPoints as hfPlaneFromPoints, SECTION_DISCLAIMER } from '/src/engine/section-cut.js';
 
 // HF-W2 (Stream W2): EXTRACTION COMPLETENESS rendered in the live Studio — DOORS
 // (leaf + swing arc), recovered partition-inclusive WALLS, and FIXTURES/cores are
@@ -968,6 +986,11 @@ async function initStudio() {
   renderer.domElement.addEventListener('pointerdown', (e) => { downPt = { x: e.clientX, y: e.clientY }; hfTryStartObjectDrag(e); });
   renderer.domElement.addEventListener('pointermove', (e) => { if (hfDrag) hfUpdateObjectDrag(e); });
   renderer.domElement.addEventListener('pointerup', (e) => {
+    // PHASE 4: SECTION-cut picks pre-empt the normal pick path. Camera-neutral — the
+    // intercept only reads world coords (calibPickPlan -> pointerToPlan) and never reframes.
+    if (sectionArmed && downPt && Math.hypot(e.clientX - downPt.x, e.clientY - downPt.y) < 6) {
+      downPt = null; if (sectionClickIntercept(e)) return;
+    }
     // PHASE 4: scale-calibration picks pre-empt the normal pick path. Camera-neutral — the
     // intercept only reads world coords (pointerToPlan) and never reframes.
     if (calibArmed && downPt && Math.hypot(e.clientX - downPt.x, e.clientY - downPt.y) < 6) {
@@ -6145,6 +6168,27 @@ function buildPhase4Intake() {
     clear() { window.__hfCalibratedScale = null; reflectCalibration(); return { cleared: true }; },
     get() { return window.__hfCalibratedScale; },
   };
+
+  // SECTION / ELEVATION cut API (chunk 2). Programmatic + interactive. Camera-neutral.
+  // The cut PLANE is two plan points; generateSection projects structure+pipes+heads
+  // within a depth band onto the plane at TRUE elevations. The result is a selectable,
+  // closable 2D panel. Hook returns the observable {plane, entities, kind}.
+  window.__hfPhase4.section = (aPlan, bPlan, secOpts) => {
+    // Programmatic generate: __hfPhase4.section([x,y],[x,y],{bandFt}). With no args,
+    // returns the LAST generated section (or {available:false}).
+    if (Array.isArray(aPlan) && Array.isArray(bPlan)) {
+      return generateAndShowSection(aPlan, bPlan, secOpts || {});
+    }
+    const last = window.__hfLastSection;
+    if (!last) return { available: false, kind: 'section', plane: null, entities: [], reason: 'no section yet — place a cut line (✂️) or call __hfPhase4.section([x,y],[x,y])' };
+    return last;
+  };
+  // sub-API: arm interactive pick / close / get
+  window.__hfPhase4.section.arm = () => { armSection(); return { armed: true }; };
+  window.__hfPhase4.section.disarm = () => { disarmSection(); return { armed: false }; };
+  window.__hfPhase4.section.close = () => { closeSectionPanel(); return { closed: true }; };
+  window.__hfPhase4.section.get = () => window.__hfLastSection || null;
+  window.__hfPhase4.section.select = (name) => selectSectionEntity(name);
 }
 
 // Interactive 2-point calibration state. The picks are CAMERA-NEUTRAL (pointerToPlan only).
@@ -6182,6 +6226,175 @@ function calibrationClickIntercept(e) {
   calibPts = [];
   return true;
 }
+
+// ── PHASE 4 chunk 2: SECTION / ELEVATION CUT ───────────────────────────────────
+// The user places a cut line (two plan points). We project structure+pipes+heads
+// within a depth band onto that plane at TRUE elevations, and render the result in
+// a selectable/closable 2D panel. CAMERA-NEUTRAL: picks reuse calibPickPlan (which
+// reads pointerToPlan only) and never reframe; rendering touches an HTML overlay,
+// not the 3D camera. The observable result is published on window.__hfLastSection
+// and surfaced through window.__hfPhase4.section.
+let sectionArmed = false, sectionPts = [], sectionLetter = 'A';
+function armSection() {
+  sectionArmed = true; sectionPts = [];
+  const s = document.getElementById('status'); if (s) s.textContent = 'Section cut: click the START of the cut line on the plan (camera stays put).';
+  const ss = document.getElementById('sectionStatus'); if (ss) ss.textContent = 'pick the cut line: click start point…';
+  const btn = document.getElementById('sectionPickBtn'); if (btn) btn.classList.add('on');
+}
+function disarmSection() {
+  sectionArmed = false; sectionPts = [];
+  const btn = document.getElementById('sectionPickBtn'); if (btn) btn.classList.remove('on');
+}
+// Camera-neutral click handler for the 2-point cut line. Returns true if it consumed the click.
+function sectionClickIntercept(e) {
+  if (!sectionArmed) return false;
+  const plan = calibPickPlan(e.clientX, e.clientY); // reuse the calibration-grade world pick
+  if (!plan) return true; // armed but missed the plane — swallow, no reframe
+  sectionPts.push(plan);
+  const s = document.getElementById('status');
+  const ss = document.getElementById('sectionStatus');
+  if (sectionPts.length === 1) {
+    if (s) s.textContent = 'Section cut: now click the END of the cut line.';
+    if (ss) ss.textContent = 'pick the cut line: click end point…';
+    return true;
+  }
+  // second point — generate.
+  sectionArmed = false;
+  const btn = document.getElementById('sectionPickBtn'); if (btn) btn.classList.remove('on');
+  const bandEl = document.getElementById('sectionBand');
+  const bandFt = bandEl ? Number(bandEl.value) : 8;
+  const a = sectionPts[0], b = sectionPts[1];
+  sectionPts = [];
+  const res = generateAndShowSection(a, b, { bandFt });
+  if (ss) ss.textContent = res && res.ok
+    ? ('Section ' + res.label.replace(/^Section\s*/, '') + ': ' + res.counts.cut + ' cut / ' + res.counts.beyond + ' beyond · ' + res.counts.heads + ' heads, ' + res.counts.pipes + ' pipes')
+    : ('Section failed: ' + (res && res.reason));
+  if (s && res && res.ok) s.textContent = 'Section generated (' + res.label + ') — view in the panel. Camera unchanged.';
+  return true;
+}
+// Generate the section (pure), publish it, and render the panel.
+function generateAndShowSection(aPlan, bPlan, secOpts) {
+  const model = (typeof currentCadModel !== 'undefined' && currentCadModel) ? currentCadModel : (window.__hfModel ? window.__hfModel() : null);
+  const letter = secOpts && secOpts.label ? secOpts.label : ('Section ' + sectionLetter + '-' + sectionLetter);
+  if (!secOpts || !secOpts.label) sectionLetter = String.fromCharCode(((sectionLetter.charCodeAt(0) - 65 + 1) % 26) + 65);
+  const res = hfGenerateSection(model, aPlan, bPlan, { ...(secOpts || {}), label: letter });
+  window.__hfLastSection = res;
+  if (res && res.ok) renderSectionPanel(res);
+  return res;
+}
+// ── Selectable / closable 2D SECTION PANEL (HTML+SVG overlay; not the 3D camera) ──
+let sectionPanel = null, sectionSelectedName = null;
+function ensureSectionPanel() {
+  if (sectionPanel) return sectionPanel;
+  const wrap = document.createElement('div');
+  wrap.id = 'hfSectionPanel';
+  wrap.style.cssText = 'position:fixed;right:16px;bottom:16px;z-index:9000;width:480px;height:320px;'
+    + 'background:rgba(10,14,20,.97);border:1px solid #2b3543;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,.6);'
+    + 'display:none;flex-direction:column;font:11px/1.3 ui-monospace,monospace;color:#cfe8ff;overflow:hidden;';
+  wrap.innerHTML = ''
+    + '<div id="hfSectionHdr" style="display:flex;align-items:center;justify-content:space-between;padding:6px 10px;'
+    + 'background:#141b25;border-bottom:1px solid #2b3543;cursor:move;">'
+    + '<span id="hfSectionTitle" style="font-weight:600;color:#9fd0ff;">Section</span>'
+    + '<div><span id="hfSectionPick" style="color:#7e8a9a;margin-right:10px;"></span>'
+    + '<button id="hfSectionCloseX" type="button" style="background:none;border:none;color:#ff6b6b;font-size:15px;cursor:pointer;line-height:1;padding:0 2px;">✕</button></div>'
+    + '</div>'
+    + '<svg id="hfSectionSvg" style="flex:1;width:100%;height:100%;background:#0b0f15;" preserveAspectRatio="xMidYMid meet"></svg>'
+    + '<div id="hfSectionFoot" style="padding:4px 10px;background:#101620;border-top:1px solid #2b3543;color:#6f7c8c;font-size:9px;">'
+    + 'Engineering aid — geometric projection, NOT an AHJ/PE-stamped detail.</div>';
+  document.body.appendChild(wrap);
+  wrap.querySelector('#hfSectionCloseX').addEventListener('click', closeSectionPanel);
+  // draggable header (overlay-only; never touches the 3D camera)
+  const hdr = wrap.querySelector('#hfSectionHdr');
+  let dragS = null;
+  hdr.addEventListener('pointerdown', (e) => { dragS = { x: e.clientX, y: e.clientY, r: wrap.getBoundingClientRect() }; e.preventDefault(); });
+  window.addEventListener('pointermove', (e) => {
+    if (!dragS) return;
+    const nx = dragS.r.left + (e.clientX - dragS.x), ny = dragS.r.top + (e.clientY - dragS.y);
+    wrap.style.left = Math.max(0, nx) + 'px'; wrap.style.top = Math.max(0, ny) + 'px';
+    wrap.style.right = 'auto'; wrap.style.bottom = 'auto';
+  });
+  window.addEventListener('pointerup', () => { dragS = null; });
+  sectionPanel = wrap; return wrap;
+}
+const SECTION_COLORS = { wall: '#6b7280', column: '#8a8f98', main: '#e53935', branch: '#3b82f6', drop: '#22d3ee', riser: '#f59e0b', pipe: '#9aa3b2', head: '#ff3b30' };
+function sectionEntColor(ent) {
+  if (ent.kind === 'pipe') return SECTION_COLORS[ent.role] || SECTION_COLORS.pipe;
+  return SECTION_COLORS[ent.kind] || '#aab';
+}
+function renderSectionPanel(sec) {
+  const wrap = ensureSectionPanel();
+  wrap.style.display = 'flex';
+  wrap.querySelector('#hfSectionTitle').textContent = sec.label + '  (band ±' + sec.bandFt + 'ft)';
+  wrap.querySelector('#hfSectionPick').textContent = '';
+  const svg = wrap.querySelector('#hfSectionSvg');
+  const W = 480, H = 250, pad = 30;
+  const b = sec.bounds;
+  const du = Math.max(b.u1 - b.u0, 1), dv = Math.max(b.v1 - b.v0, 1);
+  const sx = (W - 2 * pad) / du, sy = (H - 2 * pad) / dv;
+  const sc = Math.min(sx, sy);
+  // map section coords (u,v) -> svg (x,y) — v is elevation, draw UP (flip y).
+  const X = (u) => pad + (u - b.u0) * sc;
+  const Y = (v) => H - pad - (v - b.v0) * sc;
+  svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+  let out = '';
+  // datum guide lines first (background)
+  for (const e of sec.entities) {
+    if (e.type !== 'datum') continue;
+    const y = Y(e.v);
+    out += '<line x1="' + X(b.u0) + '" y1="' + y + '" x2="' + X(b.u1) + '" y2="' + y + '" stroke="#3a4656" stroke-width="0.8" stroke-dasharray="4 3"/>';
+    out += '<text x="' + (X(b.u0) + 2) + '" y="' + (y - 2) + '" fill="#5d6b7d" font-size="7">' + e.label + '</text>';
+  }
+  // beyond entities (light), then cut (bold) so cut reads on top
+  const draw = (ent) => {
+    const col = sectionEntColor(ent);
+    const op = ent.cut ? 1 : 0.38;
+    const seld = (ent.name && ent.name === sectionSelectedName);
+    const sel = seld ? ' stroke="#ffe08a" stroke-width="2.5"' : '';
+    if (ent.type === 'rect') {
+      const x0 = X(Math.min(ent.u0, ent.u1)), x1 = X(Math.max(ent.u0, ent.u1));
+      const y0 = Y(ent.v1), y1 = Y(ent.v0);
+      out += '<rect class="hfSecEnt" data-name="' + (ent.name || '') + '" x="' + x0 + '" y="' + y0 + '" width="' + Math.max(1, x1 - x0) + '" height="' + Math.max(1, y1 - y0) + '" fill="' + col + '" fill-opacity="' + (op * 0.55) + '"' + (seld ? sel : (' stroke="' + col + '" stroke-width="' + (ent.cut ? 1.2 : 0.6) + '"')) + ' style="cursor:pointer"/>';
+    } else if (ent.type === 'line') {
+      out += '<line class="hfSecEnt" data-name="' + (ent.name || '') + '" x1="' + X(ent.a[0]) + '" y1="' + Y(ent.a[1]) + '" x2="' + X(ent.b[0]) + '" y2="' + Y(ent.b[1]) + '" stroke="' + (seld ? '#ffe08a' : col) + '" stroke-width="' + (seld ? 3 : (ent.cut ? 2 : 1)) + '" stroke-opacity="' + op + '" style="cursor:pointer"/>';
+    } else if (ent.type === 'head') {
+      const cx = X(ent.u), cy = Y(ent.v);
+      out += '<g class="hfSecEnt" data-name="' + (ent.name || '') + '" style="cursor:pointer">';
+      out += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (seld ? 4.5 : 3) + '" fill="' + (seld ? '#ffe08a' : col) + '" fill-opacity="' + op + '"/>';
+      out += '<line x1="' + (cx - 4) + '" y1="' + cy + '" x2="' + (cx + 4) + '" y2="' + cy + '" stroke="' + col + '" stroke-width="0.8" stroke-opacity="' + op + '"/>';
+      out += '</g>';
+    }
+  };
+  sec.entities.filter((e) => e.type !== 'datum' && !e.cut).forEach(draw);
+  sec.entities.filter((e) => e.type !== 'datum' && e.cut).forEach(draw);
+  svg.innerHTML = out;
+  // click-to-select (overlay only — never moves the 3D camera)
+  svg.querySelectorAll('.hfSecEnt').forEach((el) => {
+    el.addEventListener('click', (ev) => { ev.stopPropagation(); selectSectionEntity(el.getAttribute('data-name')); });
+  });
+}
+function selectSectionEntity(name) {
+  sectionSelectedName = name || null;
+  const sec = window.__hfLastSection;
+  let ent = null;
+  if (sec && sec.ok && name) ent = sec.entities.find((e) => e.name === name) || null;
+  if (sec && sec.ok) renderSectionPanel(sec);
+  const pick = sectionPanel && sectionPanel.querySelector('#hfSectionPick');
+  if (pick) pick.textContent = ent ? ('▸ ' + (ent.name || ent.kind)) : '';
+  return ent ? { selected: ent.name, kind: ent.kind, ...(ent.diameterIn ? { diameterIn: ent.diameterIn } : {}) } : { selected: null };
+}
+function closeSectionPanel() {
+  if (sectionPanel) sectionPanel.style.display = 'none';
+  sectionSelectedName = null;
+  const ss = document.getElementById('sectionStatus'); if (ss) ss.textContent = 'section closed';
+  return true;
+}
+// UI wiring for the section tool buttons.
+(function wireSectionUI() {
+  const pick = document.getElementById('sectionPickBtn');
+  const close = document.getElementById('sectionCloseBtn');
+  if (pick) pick.addEventListener('click', () => { try { armSection(); } catch (e) { console.warn(e); } });
+  if (close) close.addEventListener('click', () => { try { closeSectionPanel(); } catch (e) { console.warn(e); } });
+})();
 
 // ── HF-DM: direct-manipulation grab-drag (AutoSPRINK-style) ────────────────────
 // When a part is SELECTED, pressing on it and dragging MOVES it live (grid-snapped)
