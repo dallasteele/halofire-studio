@@ -17,3 +17,11 @@ export function maxCoverageSqFtPerHead(hazardClass) {
 
   return value
 }
+
+/**
+ * Minimum sprinkler head count needed to cover a floor area.
+ * Uses the coarse hazard-class coverage cap and rounds partial heads up.
+ */
+export function headsForArea(areaSqFt, hazardClass) {
+  return Math.ceil(areaSqFt / maxCoverageSqFtPerHead(hazardClass))
+}
