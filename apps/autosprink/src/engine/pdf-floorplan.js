@@ -37,7 +37,7 @@
  * Text/image/other ops are ignored.
  */
 
-import { OPS } from 'pdfjs-dist/legacy/build/pdf.mjs';
+import { OPS } from './pdfjs-ops.js';
 import { segmentFloorPlanViaSam, reconstructFloorPlanFromSam } from '../components/sam-floorplan.js';
 
 // pdfjs-internal DrawOPS codes for the v6 constructPath path buffer. These are a
