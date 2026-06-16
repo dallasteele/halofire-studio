@@ -18,6 +18,11 @@
  * Units: gpm (flow), inches (pipe diameter), feet (length/elevation), psi.
  */
 
+import { bom } from './bom.js';
+import { labor } from './labor.js';
+import { stock } from './stock.js';
+import { priceNormalize } from './priceNormalize.js';
+
 /**
  * Hazen-Williams friction loss, psi per foot of pipe.
  *   p = 4.52 * Q^1.852 / (C^1.852 * d^4.8704)
@@ -229,11 +234,74 @@ export function flagSchedule(networkOrCad, hazard) {
   return warnings;
 }
 
+/**
+ * Compose the single-path hydraulic estimate with a component BOM / labor rollup.
+ * The model may provide repeated component solids, a `components` array, and/or
+ * explicit quantity overrides via `quantities`.
+ *
+ * @param {{solids?:Array, components?:Array, quantities?:Record<string, number>,
+ *   network?:object, cadModel?:object, hazard?:string}} model
+ */
+export function computeHydraulics(model = {}) {
+  const calc = requiredPressureAtRiser({
+    cadModel: model.cadModel || model,
+    network: model.network,
+    hazard: model.hazard || model.sizing?.hazard || 'ordinary',
+  });
+
+  const components = collectComponents(model);
+  const quantities = model.quantities || {};
+
+  // Resolve stock directly here as part of the orchestration contract, even
+  // though the BOM line builder also consumes the same catalog defaults.
+  const stockItems = collectStock(components, quantities);
+  const items = bom(components, quantities).map((item) => ({
+    ...item,
+    stock: stockItems[item.key],
+  }));
+  const totalCost = roundMoney(items.reduce((sum, item) => sum + item.lineTotal, 0));
+  const laborResult = labor(items);
+  const normalizedCost = priceNormalize(totalCost);
+
+  return {
+    ...calc,
+    bomResult: {
+      items,
+      totalCost,
+      laborHours: laborResult.laborHours,
+      normalizedCost,
+    },
+  };
+}
+
 // Re-export the full hydraulic NETWORK balance (P1) so callers can import the
 // K-factor head discharge + node-by-node balance from the same hydraulics entry
 // point as the T2 single-path estimate. The network module is the source of
 // truth; this is a convenience re-export and keeps the T2 API above untouched.
 export { kFactorFlow, balanceNetwork } from './hydraulic-network.js';
+
+function collectComponents(model) {
+  if (Array.isArray(model.components)) return model.components;
+  if (Array.isArray(model.solids)) return model.solids.filter((solid) => solid?.kind === 'component');
+  if (model.cadModel && Array.isArray(model.cadModel.solids)) {
+    return model.cadModel.solids.filter((solid) => solid?.kind === 'component');
+  }
+  return [];
+}
+
+function collectStock(components, quantities) {
+  const out = {};
+  const keys = new Set();
+  for (const component of components) {
+    const key = String(component?.componentKey || component?.key || '').trim();
+    if (key) keys.add(key);
+  }
+  for (const key of Object.keys(quantities || {})) {
+    if (key) keys.add(key);
+  }
+  for (const key of keys) out[key] = stock(key);
+  return out;
+}
 
 function num(v, fallback = 0) {
   const n = Number(v);
@@ -246,4 +314,8 @@ function round(n) {
 
 function round6(n) {
   return Math.round((n + Number.EPSILON) * 1e6) / 1e6;
+}
+
+function roundMoney(n) {
+  return Math.round((n + Number.EPSILON) * 100) / 100;
 }
