@@ -778,6 +778,25 @@ Running state at session end:
 
 ### Entry 20 — XYZ placement + auto-grid spawns heads into scene
 
+### Entry 21 — Recovered bidTotal helper and extended acceptance coverage
+
+- Recovered the missing `packages/halofire-sprinkler/src/bidTotal.mjs`
+  helper on branch `ocx/bid-total-extended-test-395447` from prior repo
+  history after scope recovery showed the handoff referenced files that
+  were absent from this worktree.
+- Restored `packages/halofire-sprinkler/src/bidTotal.test.mjs` and
+  extended it to three `node:test` cases:
+  baseline material/labor/margin math, all-zero inputs, and the
+  extended `materialUsd: 200`, `laborHours: 10`, `laborRateUsd: 25`,
+  `marginPct: 15` scenario returning `{ cost: 450, sell: 517.5 }`.
+- Verification run that actually executed in this harness:
+  `node --test packages/halofire-sprinkler/src/bidTotal.test.mjs`
+  passed with 3/3 tests.
+- Repo-level AGENTS preflight gates remained unavailable in this Linux
+  worktree at execution time: `curl http://localhost:18080/health`
+  could not connect, so the broader service/runtime checks were not
+  claimable for this scoped package task.
+
 - ✅ `CatalogPanel.tsx` PlaceButton now has X/Y/Z cm inputs in a 3-col
      grid; "Place at origin" renamed "Place at coordinates"; reads the
      inputs, converts cm → m, and creates the ItemNode with the user's
