@@ -698,6 +698,7 @@ import { classifyPipes, tagPipeRoles, distributionIsSensible, PIPE_ROLES } from 
 // taps), and synthesizes missing branch tie-ins + tee fittings when a head-bearing
 // run is orphaned. Pure + unit-tested (tests/branch-connect.test.js).
 import { analyzeConnectivity, repairConnectivity } from '/src/engine/branch-connect.js';
+import { getBom, getNfpaReport } from '/src/engine/ui-panels.js';
 // HF-PHASE2-DROPCONNECT: arm-over / easy-drop / sprig connection engine. Classifies
 // the runs that physically join a branch line to each head (drop=down to pendent,
 // sprig=up to upright, arm-over=offset horizontal leg + nipple) and synthesizes the
@@ -4523,6 +4524,7 @@ function publishHydraulicReport() {
   // CHUNK contract: __hfPhase3.report -> { hasSummary, nodeRows, pipeRows }.
   window.__hfPhase3.report = lastHydraulicReport;
   try { refreshReportPanel(); } catch (_) { /* panel optional */ }
+  try { refreshCompliancePanel(); } catch (_) { /* panel optional */ }
 }
 window.__hfPhase3 = window.__hfPhase3 || {};
 window.__hfPhase3.report = window.__hfPhase3.report || null;
@@ -4875,6 +4877,21 @@ function refreshReportPanel() {
     + `<table style="${tblCss}"><tbody>${pipeTbl}</tbody></table>`
     + (r.pipeRows.length > pipeSample.length ? `<div class="muted" style="font-size:9px">+${r.pipeRows.length - pipeSample.length} more pipes in the export</div>` : '')
     + `<span class="muted" style="font-size:10px">ENGINEERING AID — NOT a PE-stamped or AHJ-approved hydraulic calculation. Verify the sealed calc before permit.</span>`
+    + `</div>`;
+}
+
+function refreshCompliancePanel() {
+  const el = document.getElementById('compliance');
+  if (!el) return;
+  const nfpaReport = getNfpaReport();
+  const bom = getBom();
+  const nfpaColor = nfpaReport.status === 'short' ? '#ef4444' : (nfpaReport.status === 'met' ? '#22c55e' : '#94a3b8');
+  el.innerHTML =
+    `<div style="font-size:12px;line-height:1.5">`
+    + `<div class="kv"><span>NFPA report status</span><b style="color:${nfpaColor}">${nfpaReport.summary}</b></div>`
+    + `<div class="muted" style="font-size:10px">${nfpaReport.detail}</div>`
+    + `<div class="kv" style="margin-top:6px"><span>BOM summary</span><b>${bom.summary}</b></div>`
+    + `<div class="muted" style="font-size:10px">${bom.detail}</div>`
     + `</div>`;
 }
 
@@ -8270,6 +8287,7 @@ function regenerateBom() {
     `Hangers      ${takeoff.hangers}`,
   ]);
   $('status').textContent = `BOM regenerated from live model — ${takeoff.heads} heads · ${takeoff.pipeFt} ft pipe · ${takeoff.fittings} fittings`;
+  try { refreshCompliancePanel(); } catch (_) { /* panel optional */ }
   return takeoff;
 }
 function scrollPanelTo_bom() { const el = $('bom'); if (el && el.scrollIntoView) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
@@ -8774,6 +8792,7 @@ window.__hfDraw = { setDrawTool: (t) => setDrawTool(t), commitPipe, commitWall, 
   watch('inspBody', 'inspector'); // selecting a part surfaces the Inspector
   watch('layout', 'layout');      // generating a layout surfaces Layout
 })();
+try { refreshCompliancePanel(); } catch (_) { /* panel optional */ }
 $('demoBtn').onclick = playDemo;
 document.querySelectorAll('#viewSeg button').forEach((b) => {
   b.onclick = () => { if (demoRAF) { cancelAnimationFrame(demoRAF); demoRAF = null; $('demoBtn').disabled = false; } document.querySelectorAll('#viewSeg button').forEach((x) => x.classList.remove('on')); b.classList.add('on'); setView(b.dataset.view); };
