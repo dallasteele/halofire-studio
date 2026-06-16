@@ -17,6 +17,25 @@ reference log entries by date; log entries reference commits by short hash.
 - **⚠️ incomplete / known issue** — reviewer attention needed
 - **📝 note** — rationale or architectural decision
 
+## 2026-06-15
+
+### Entry — priceDiff utility for normalized sprinkler price sheets
+
+- ✅ Added `packages/halofire-sprinkler/src/priceDiff.mjs` with
+     `diffPriceSheets(oldRows, newRows)` returning `{changed, added,
+     removed, pctChangeBySku}` by SKU for normalized `{sku, priceUsd}`
+     rows.
+- ✅ Added `packages/halofire-sprinkler/src/priceDiff.test.mjs` using
+     `node:test`, covering the required changed-price acceptance case plus
+     added/removed and unchanged-row behavior.
+- ✅ Verified with `node --test packages/halofire-sprinkler/src/priceDiff.test.mjs`
+     (`pass 3`, `fail 0`).
+- ⚠️ Repo-wide AGENTS preflight gates were not green in this Linux
+     worktree: `localhost:18080` and `localhost:3002` were not serving,
+     and the Windows-specific `C:/Python312/python.exe` path in
+     `AGENTS.md` does not exist here. Scope was kept to the package-local
+     module/test slice requested by the handoff.
+
 ---
 
 ## 2026-04-18
