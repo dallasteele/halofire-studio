@@ -205,6 +205,27 @@ function makeWall(THREE, seg, bounds, elevationFt, heightFt, thicknessFt, mat) {
   return mesh;
 }
 
+function makeColumn(THREE, col, bounds, elevationFt, heightFt, fallbackSizeFt, mat) {
+  if (!THREE.BoxGeometry || !col) return null;
+  let x = null;
+  let y = null;
+  if (Array.isArray(col.center)) {
+    x = Number(col.center[0]);
+    y = Number(col.center[1]);
+  } else if (Number.isFinite(col.x) && Number.isFinite(col.y)) {
+    x = Number(col.x);
+    y = Number(col.y);
+  }
+  if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
+  const sizeFt = Math.max(0.5, Number(col.sizeFt) || Number(col.widthFt) || Number(fallbackSizeFt) || 1);
+  const geo = new THREE.BoxGeometry(sizeFt, heightFt, sizeFt);
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.set(x - bounds.cx, elevationFt + heightFt / 2, y - bounds.cy);
+  mesh.name = 'plan-column';
+  mesh.userData = { kind: 'plan-column', sizeFt, needsVerification: true };
+  return mesh;
+}
+
 /** Build a room/space floor tile (thin colored slab) for a rectilinear room polygon. */
 function makeRoomTile(THREE, room, bounds, elevationFt) {
   if (!THREE.Shape || !THREE.ExtrudeGeometry) return null;
@@ -397,6 +418,8 @@ export function buildBuildingFromPlans(THREE, levelPlans, opts = {}) {
     stairExtraFt = 2,
     includeRooms = true,
     includeWalls = true,
+    includeColumns = true,
+    columnSizeFt = 1,
     // Perf: real floor plans carry thousands of wall segments (floor 1 = 6858).
     // One Mesh per wall = thousands of draw calls and tanks the live viewport. When a
     // geometry merger (e.g. three's mergeGeometries) is injected AND a level exceeds
@@ -449,7 +472,7 @@ export function buildBuildingFromPlans(THREE, levelPlans, opts = {}) {
       needsVerification: true,
     };
 
-    let wallCount = 0, roomCount = 0, stairCount = 0;
+    let wallCount = 0, roomCount = 0, stairCount = 0, columnCount = 0;
 
     // Footprint slab.
     if (Array.isArray(plan.footprintFt) && plan.footprintFt.length >= 3) {
@@ -495,6 +518,16 @@ export function buildBuildingFromPlans(THREE, levelPlans, opts = {}) {
           const m = makeWall(THREE, seg, bounds, elevationFt, wallHeightFt, wallThicknessFt, wallMat);
           if (m) { group.add(m); wallCount += 1; }
         }
+      }
+    }
+
+    const columnSource = Array.isArray(plan.columnSolids) && plan.columnSolids.length
+      ? plan.columnSolids
+      : (Array.isArray(plan.columns) ? plan.columns : []);
+    if (includeColumns && wallMat && Array.isArray(columnSource)) {
+      for (const col of columnSource) {
+        const mesh = makeColumn(THREE, col, bounds, elevationFt, wallHeightFt, columnSizeFt, wallMat);
+        if (mesh) { group.add(mesh); columnCount += 1; }
       }
     }
 
@@ -586,7 +619,7 @@ export function buildBuildingFromPlans(THREE, levelPlans, opts = {}) {
       elevationFt,
       group,
       counts: {
-        walls: wallCount, rooms: roomCount, stairs: stairCount,
+        walls: wallCount, rooms: roomCount, stairs: stairCount, columns: columnCount,
         doors: doorCount, openings: openingCount, fixtures: fixtureCount,
         wallsFull: wallsFullCount,
         // RECORE: the honest primary wall count is the merged wall RUNS (when present).
