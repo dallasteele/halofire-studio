@@ -38,6 +38,10 @@ const DEFAULTS = Object.freeze({
   perpTolFt: 0.25,   // collinear pieces share a perpendicular coordinate within this band
   gapFt: 1.0,        // merge pieces whose along-axis gap is <= this (bridges hairline breaks)
   minRunFt: 2.0,     // drop runs shorter than a real wall stub (sub-2ft = dimension tick / glyph)
+  pairParallelMinFt: 0.5, // observed wall face separation lower bound
+  pairParallelMaxFt: 1.5, // observed wall face separation upper bound
+  minPairOverlapFt: 4.0,  // paired faces must overlap enough to be a real shared wall span
+  minPairOverlapRatio: 0.8, // reject offset/nearby lines that only graze each other
 });
 
 function round(n) { return Math.round((Number(n) + Number.EPSILON) * 1e4) / 1e4; }
@@ -86,6 +90,112 @@ function mergeAxisRuns(segs, axis, perpTolFt, gapFt, minRunFt) {
     flush();
   }
   return runs;
+}
+
+function cloneRun(run, extra = {}) {
+  return {
+    a: [run.a[0], run.a[1]],
+    b: [run.b[0], run.b[1]],
+    axis: run.axis,
+    lengthFt: run.lengthFt,
+    ...extra,
+  };
+}
+
+function runCoord(run) {
+  return run.axis === 'H' ? run.a[1] : run.a[0];
+}
+
+function runSpan(run) {
+  return run.axis === 'H'
+    ? [Math.min(run.a[0], run.b[0]), Math.max(run.a[0], run.b[0])]
+    : [Math.min(run.a[1], run.b[1]), Math.max(run.a[1], run.b[1])];
+}
+
+function normalizePairOpts(opts = {}) {
+  return {
+    gapFt: Number.isFinite(opts.gapFt) ? opts.gapFt : DEFAULTS.gapFt,
+    minRunFt: Number.isFinite(opts.minRunFt) ? opts.minRunFt : DEFAULTS.minRunFt,
+    pairParallelMinFt: Number.isFinite(opts.pairParallelMinFt) ? opts.pairParallelMinFt : DEFAULTS.pairParallelMinFt,
+    pairParallelMaxFt: Number.isFinite(opts.pairParallelMaxFt) ? opts.pairParallelMaxFt : DEFAULTS.pairParallelMaxFt,
+    minPairOverlapFt: Number.isFinite(opts.minPairOverlapFt) ? opts.minPairOverlapFt : DEFAULTS.minPairOverlapFt,
+    minPairOverlapRatio: Number.isFinite(opts.minPairOverlapRatio) ? opts.minPairOverlapRatio : DEFAULTS.minPairOverlapRatio,
+  };
+}
+
+function mergeCenterlinePathRuns(runs, opts) {
+  const buckets = new Map();
+  for (const run of runs) {
+    const key = `${run.axis}:${round(runCoord(run))}:${run.source || 'unknown'}:${round(run.thicknessFt || 0)}`;
+    let arr = buckets.get(key);
+    if (!arr) {
+      arr = [];
+      buckets.set(key, arr);
+    }
+    arr.push(run);
+  }
+
+  const merged = [];
+  for (const arr of buckets.values()) {
+    arr.sort((a, b) => runSpan(a)[0] - runSpan(b)[0] || runSpan(a)[1] - runSpan(b)[1]);
+    let current = null;
+    const flush = () => {
+      if (!current) return;
+      if (current.hi - current.lo < opts.minRunFt) return;
+      if (current.axis === 'H') {
+        merged.push({
+          a: [round(current.lo), round(current.coord)],
+          b: [round(current.hi), round(current.coord)],
+          axis: 'H',
+          lengthFt: round(current.hi - current.lo),
+          source: current.source,
+          ...(current.thicknessFt != null ? { thicknessFt: round(current.thicknessFt) } : {}),
+        });
+      } else {
+        merged.push({
+          a: [round(current.coord), round(current.lo)],
+          b: [round(current.coord), round(current.hi)],
+          axis: 'V',
+          lengthFt: round(current.hi - current.lo),
+          source: current.source,
+          ...(current.thicknessFt != null ? { thicknessFt: round(current.thicknessFt) } : {}),
+        });
+      }
+    };
+
+    for (const run of arr) {
+      const [lo, hi] = runSpan(run);
+      const coord = runCoord(run);
+      if (!current) {
+        current = {
+          axis: run.axis,
+          coord,
+          lo,
+          hi,
+          source: run.source,
+          thicknessFt: run.thicknessFt,
+        };
+        continue;
+      }
+      if (lo <= current.hi + opts.gapFt) {
+        current.hi = Math.max(current.hi, hi);
+      } else {
+        flush();
+        current = {
+          axis: run.axis,
+          coord,
+          lo,
+          hi,
+          source: run.source,
+          thicknessFt: run.thicknessFt,
+        };
+      }
+    }
+    flush();
+  }
+
+  merged.sort((a, b) => (a.axis < b.axis ? -1 : a.axis > b.axis ? 1 : 0) || a.a[0] - b.a[0] || a.a[1] - b.a[1]);
+  return merged;
 }
 
 /**
@@ -150,6 +260,134 @@ export function buildWallRuns(walls, opts = {}) {
         'diagonals (door-swing arcs/hatch) dropped, sub-minRunFt stubs (dimension ticks/glyphs) dropped',
       provenance: 'reconstructed wall runs from real vector cut-wall segments — needs-verification; ' +
         'NOT AHJ/PE/manufacturer-exact/AutoSprink-parity. Non-wall ink EXCLUDED, never re-labeled.',
+      needsVerification: true,
+    },
+  };
+}
+
+/**
+ * PURE. Label merged single-edge wall paths from axis-aligned wall segments.
+ * This does not invent centerlines; it just tags the observed merged edge paths.
+ */
+export function extractWallCenterlines(walls, opts = {}) {
+  const built = buildWallRuns(walls, opts);
+  const params = normalizePairOpts(opts);
+  const singleLineRuns = built.runs.map((run) => cloneRun(run, { source: 'single-line' }));
+  const paired = pairParallelWallRuns(singleLineRuns, params);
+  return {
+    runs: paired.runs,
+    meta: {
+      build: built.meta,
+      pair: paired.meta,
+      method: 'buildWallRuns axis merge + optional near-parallel pairing into wall paths',
+      needsVerification: true,
+    },
+  };
+}
+
+/**
+ * PURE. Pair near-parallel merged runs into one wall centerline when two observed faces
+ * overlap enough to plausibly be the same double-line wall. Unpaired runs are preserved.
+ */
+export function pairParallelWallRuns(runs, opts = {}) {
+  const params = normalizePairOpts(opts);
+  const input = Array.isArray(runs) ? runs.filter((run) => run && (run.axis === 'H' || run.axis === 'V')) : [];
+  const grouped = new Map();
+  for (const run of input) {
+    let arr = grouped.get(run.axis);
+    if (!arr) {
+      arr = [];
+      grouped.set(run.axis, arr);
+    }
+    arr.push(run);
+  }
+
+  const derived = [];
+  let pairedRuns = 0;
+  let singleLineFallbacks = 0;
+
+  for (const axis of ['H', 'V']) {
+    const axisRuns = grouped.get(axis) || [];
+    axisRuns.sort((a, b) => runCoord(a) - runCoord(b) || runSpan(a)[0] - runSpan(b)[0]);
+    const used = new Set();
+    const candidates = [];
+
+    for (let i = 0; i < axisRuns.length; i += 1) {
+      for (let j = i + 1; j < axisRuns.length; j += 1) {
+        const a = axisRuns[i];
+        const b = axisRuns[j];
+        const sep = Math.abs(runCoord(a) - runCoord(b));
+        if (sep < params.pairParallelMinFt || sep > params.pairParallelMaxFt) continue;
+        const [aLo, aHi] = runSpan(a);
+        const [bLo, bHi] = runSpan(b);
+        const overlapLo = Math.max(aLo, bLo);
+        const overlapHi = Math.min(aHi, bHi);
+        const overlapFt = overlapHi - overlapLo;
+        if (overlapFt < params.minPairOverlapFt) continue;
+        const overlapRatio = overlapFt / Math.min(a.lengthFt, b.lengthFt);
+        if (overlapRatio < params.minPairOverlapRatio) continue;
+        candidates.push({
+          i,
+          j,
+          sep,
+          overlapLo,
+          overlapHi,
+          overlapFt,
+          overlapRatio,
+          score: overlapFt - sep,
+        });
+      }
+    }
+
+    candidates.sort((a, b) => b.score - a.score || b.overlapRatio - a.overlapRatio || a.sep - b.sep || a.i - b.i || a.j - b.j);
+
+    for (const cand of candidates) {
+      if (used.has(cand.i) || used.has(cand.j)) continue;
+      const a = axisRuns[cand.i];
+      const b = axisRuns[cand.j];
+      used.add(cand.i);
+      used.add(cand.j);
+      pairedRuns += 1;
+      const centerCoord = round((runCoord(a) + runCoord(b)) / 2);
+      const thicknessFt = round(Math.abs(runCoord(a) - runCoord(b)));
+      if (axis === 'H') {
+        derived.push({
+          a: [round(cand.overlapLo), centerCoord],
+          b: [round(cand.overlapHi), centerCoord],
+          axis: 'H',
+          lengthFt: round(cand.overlapFt),
+          thicknessFt,
+          source: 'double-line-pair',
+        });
+      } else {
+        derived.push({
+          a: [centerCoord, round(cand.overlapLo)],
+          b: [centerCoord, round(cand.overlapHi)],
+          axis: 'V',
+          lengthFt: round(cand.overlapFt),
+          thicknessFt,
+          source: 'double-line-pair',
+        });
+      }
+    }
+
+    for (let i = 0; i < axisRuns.length; i += 1) {
+      if (used.has(i)) continue;
+      singleLineFallbacks += 1;
+      derived.push(cloneRun(axisRuns[i], { source: axisRuns[i].source || 'single-line' }));
+    }
+  }
+
+  const mergedRuns = mergeCenterlinePathRuns(derived, params);
+  return {
+    runs: mergedRuns,
+    meta: {
+      inputRuns: input.length,
+      pairedRuns,
+      singleLineFallbacks,
+      params,
+      method: 'pair near-parallel merged wall-face runs into centerline wall paths when overlap and thickness are plausible',
+      provenance: 'paired runs trace observed double-line walls only; unmatched runs remain backed by single observed edges. needs-verification.',
       needsVerification: true,
     },
   };
