@@ -10,7 +10,7 @@
 // every finding carries its citation. This is a DESIGN AID / estimate, NOT a
 // certified hydraulic calculation, AHJ, PE, or for construction.
 
-import { useMemo, useState, type CSSProperties, type ReactElement } from 'react';
+import { useEffect, useMemo, useState, type CSSProperties, type ReactElement } from 'react';
 import { selectHydraulics, useCadStore } from '../store';
 import { colors, radii, spacing, typeScale } from '../lib/tokens';
 import { solveFlow } from '../lib/flow-calculator';
@@ -19,6 +19,7 @@ import { effectiveHeadDemand, type HazardClass } from '../lib/density-demand';
 import { HAZARD_CLASSES } from '../lib/model';
 import { formatHydraulicReport } from '../lib/hydraulic-report';
 import { buildReportInput, safePipeVolumes } from '../lib/report-from-result';
+import { getCoverage, getHazenWilliams } from '../lib/hydraulics-panel-adapter';
 
 export function HydraulicsPanel(): ReactElement {
   const project = useCadStore((s) => s.project);
@@ -42,6 +43,26 @@ export function HydraulicsPanel(): ReactElement {
   const [residualDraft, setResidualDraft] = useState<string>(supply ? String(supply.residualPsi) : '');
   const [flowDraft, setFlowDraft] = useState<string>(supply ? String(supply.flowGpm) : '');
   const [areaDraft, setAreaDraft] = useState<string>(designAreaSqFt ? String(designAreaSqFt) : '');
+  const [hazenWilliams, setHazenWilliams] = useState<string>('loading...');
+  const [coverage, setCoverage] = useState<string>('loading...');
+
+  useEffect(() => {
+    let active = true;
+    const material = project.network.segments[0]?.material ?? 'STEEL_SCH40';
+    const hazard = project.hazardDefaults.defaultClass;
+    void Promise.all([getHazenWilliams(material), getCoverage(hazard)]).then(
+      ([nextHazenWilliams, nextCoverage]) => {
+        if (!active) return;
+        setHazenWilliams(`${nextHazenWilliams.value} (${nextHazenWilliams.material})`);
+        setCoverage(nextCoverage.value);
+      },
+    );
+    return () => {
+      active = false;
+    };
+    // Mount-time adapter readout only; the live solver table below remains reactive.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const applySupply = (): void => {
     const st = Number(staticDraft);
@@ -164,6 +185,8 @@ export function HydraulicsPanel(): ReactElement {
         <div style={cardTitleStyle}>Results</div>
         {hasSystem ? (
           <dl style={dlStyle}>
+            <ResultRow label="Hazen-Williams" value={hazenWilliams} />
+            <ResultRow label="Coverage" value={coverage} />
             <ResultRow label="Operating heads (remote area)" value={String(result.remoteAreaHeadIds.length)} />
             <ResultRow label="System demand" value={`${result.systemDemand.gpm.toFixed(1)} gpm`} />
             <ResultRow label="Required @ riser" value={`${result.systemDemand.psiAtRiser.toFixed(1)} psi`} />
@@ -190,9 +213,15 @@ export function HydraulicsPanel(): ReactElement {
             />
           </dl>
         ) : (
-          <p style={emptyBodyStyle}>
-            No routed system. Place heads and Route pipe (W4) first, then enter a supply.
-          </p>
+          <>
+            <dl style={dlStyle}>
+              <ResultRow label="Hazen-Williams" value={hazenWilliams} />
+              <ResultRow label="Coverage" value={coverage} />
+            </dl>
+            <p style={emptyBodyStyle}>
+              No routed system. Place heads and Route pipe (W4) first, then enter a supply.
+            </p>
+          </>
         )}
         {adequacy && (
           <div
