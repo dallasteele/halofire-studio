@@ -20,6 +20,8 @@
 // physics (so it stays exactly as honest / PARTIAL as the underlying solve).
 //
 // Golden-tested in tests/nfpa-report.test.js against a hand-built solve result.
+import { checkCompliance } from './nfpa-compliance.js';
+
 // ===========================================================================
 
 export const REPORT_DISCLAIMER =
@@ -234,6 +236,114 @@ export function buildHydraulicReport(solve, meta = {}) {
     },
     disclaimer: REPORT_DISCLAIMER,
     generatedAt: meta.generatedAt || null,
+  };
+}
+
+function toViolation(code, message, extras = {}) {
+  return { code, message, ...extras };
+}
+
+function roundSummaryValue(n, dp = 3) {
+  if (n == null || !isFinite(n)) return null;
+  const f = 10 ** dp;
+  return Math.round(n * f) / f;
+}
+
+function canCheckCompliance(model) {
+  if (!model || typeof model !== 'object') return false;
+  return Array.isArray(model.stories)
+    || Array.isArray(model.heads)
+    || (model.bbox && typeof model.bbox === 'object')
+    || (model.rule && typeof model.rule === 'object');
+}
+
+/**
+ * Compose the structured NFPA report payload used by the computeHydraulics API.
+ *
+ * Keeps the existing hydraulic report intact, then adds a compliance-oriented
+ * wrapper with an explicit pass/fail contract and a flat list of violations.
+ */
+export function nfpaReport(model, computed = {}, meta = {}) {
+  const solve = computed.solve || computed.networkSolve || computed.hydraulicSolve || null;
+  const base = buildHydraulicReport(solve, meta);
+  const hazard = meta.hazard || computed.hazard || model?.hazard || null;
+  const scheduleWarnings = Array.isArray(computed.scheduleWarnings) ? computed.scheduleWarnings : [];
+
+  let compliance = null;
+  if (canCheckCompliance(model) && hazard) {
+    try {
+      compliance = checkCompliance(model, hazard);
+    } catch (_) {
+      compliance = null;
+    }
+  }
+
+  const violations = [];
+
+  if (solve && solve.availablePsi != null && solve.demandMet === false) {
+    violations.push(toViolation(
+      'HYDRAULIC_SUPPLY_INADEQUATE',
+      `Available supply ${solve.availablePsi} psi is below required demand ${solve.requiredPsi} psi.`,
+      {
+        source: 'hydraulic-solve',
+        availablePsi: solve.availablePsi,
+        requiredPsi: solve.requiredPsi,
+        safetyMarginPsi: solve.safetyMargin ?? null,
+      },
+    ));
+  }
+
+  for (const warning of scheduleWarnings) {
+    violations.push(toViolation(
+      warning.type === 'velocity' ? 'PIPE_VELOCITY_LIMIT' : 'PIPE_FRICTION_LIMIT',
+      warning.message,
+      { source: 'schedule-check', severity: 'fail', ...warning },
+    ));
+  }
+
+  if (compliance) {
+    for (const finding of compliance.findings) {
+      if (finding.severity !== 'fail') continue;
+      violations.push(toViolation(
+        finding.code,
+        finding.detail,
+        { source: 'nfpa-compliance', severity: finding.severity, rule: finding.rule },
+      ));
+    }
+  }
+
+  const complianceFailures = compliance
+    ? compliance.findings.filter((finding) => finding.severity === 'fail').length
+    : 0;
+  const complianceWarnings = compliance
+    ? compliance.findings.filter((finding) => finding.severity === 'warn').length
+    : 0;
+  const compliancePasses = compliance
+    ? compliance.findings.filter((finding) => finding.severity === 'pass').length
+    : 0;
+
+  return {
+    ...base,
+    complianceSummary: {
+      hazard,
+      checksRun: {
+        hydraulicSolve: !!solve,
+        scheduleCheck: Array.isArray(computed.scheduleWarnings),
+        geometryCompliance: !!compliance,
+      },
+      demandGpm: base.summary?.demandGpm ?? computed.singlePath?.requiredFlowGpm ?? null,
+      requiredPsi: base.summary?.requiredPsi ?? computed.singlePath?.requiredPressurePsi ?? null,
+      availablePsi: base.summary?.availablePsi ?? null,
+      safetyMarginPsi: base.summary?.safetyMarginPsi ?? null,
+      passCount: compliancePasses,
+      warningCount: complianceWarnings,
+      violationCount: violations.length,
+      complianceFailureCount: complianceFailures,
+      scheduleWarningCount: scheduleWarnings.length,
+      singlePathRequiredPressurePsi: roundSummaryValue(computed.singlePath?.requiredPressurePsi),
+    },
+    violations,
+    passFail: violations.length === 0,
   };
 }
 

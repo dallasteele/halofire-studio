@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  computeHydraulics,
   hazenWilliamsLossPsiPerFt,
   remoteAreaDemand,
   requiredPressureAtRiser,
@@ -151,5 +152,30 @@ describe('flagSchedule', () => {
     };
     const warnings = flagSchedule(network, 'extra');
     expect(warnings.some((w) => w.type === 'velocity')).toBe(true);
+  });
+});
+
+describe('computeHydraulics', () => {
+  const cad = {
+    solids: [
+      { kind: 'pipe', from: [0, 0, 0], to: [0, 0, 10], diameterIn: 2.067 },
+      { kind: 'head', position: [0, 0, 10], kFactor: 5.6 },
+    ],
+  };
+
+  it('returns a structured nfpaReport with passFail true when checks pass', () => {
+    const result = computeHydraulics({ model: cad, availablePsi: 65, hazard: 'ordinary' });
+    expect(result.nfpaReport).toMatchObject({
+      passFail: true,
+      complianceSummary: expect.any(Object),
+      violations: [],
+    });
+    expect(result.nfpaReport.complianceSummary.requiredPsi).toBe(result.networkSolve.requiredPsi);
+  });
+
+  it('sets passFail false when the available supply does not meet the solve demand', () => {
+    const result = computeHydraulics({ model: cad, availablePsi: 1, hazard: 'ordinary' });
+    expect(result.nfpaReport.passFail).toBe(false);
+    expect(result.nfpaReport.violations.some((v) => v.code === 'HYDRAULIC_SUPPLY_INADEQUATE')).toBe(true);
   });
 });

@@ -1,3 +1,6 @@
+import { solveNetwork } from './network-solve.js';
+import { nfpaReport as buildStructuredNfpaReport } from './nfpa-report.js';
+
 /**
  * HaloFire NFPA-13 hydraulic calculation engine (internal alpha, best-effort).
  *
@@ -227,6 +230,88 @@ export function flagSchedule(networkOrCad, hazard) {
     }
   }
   return warnings;
+}
+
+function looksLikeModel(arg) {
+  return !!arg && typeof arg === 'object' && (
+    Array.isArray(arg.solids)
+    || Array.isArray(arg.branchLines)
+    || Array.isArray(arg.stories)
+    || Array.isArray(arg.heads)
+  );
+}
+
+function looksLikeComputeHydraulicsArg(arg) {
+  return !!arg && typeof arg === 'object' && (
+    'model' in arg
+    || 'cadModel' in arg
+    || 'network' in arg
+    || 'hazard' in arg
+    || 'availablePsi' in arg
+    || 'reportMeta' in arg
+  );
+}
+
+function normalizeComputeHydraulicsArgs(modelOrArg, opts = {}) {
+  if (looksLikeComputeHydraulicsArg(modelOrArg) && !looksLikeModel(modelOrArg)) {
+    return { ...modelOrArg };
+  }
+  return { ...opts, model: modelOrArg };
+}
+
+/**
+ * Aggregate the available hydraulic calculations into one structured result.
+ *
+ * This is the stable entry point for callers that need the single-path estimate,
+ * the connected-network solve, schedule warnings, and the structured NFPA report
+ * in one deterministic payload.
+ */
+export function computeHydraulics(modelOrArg, opts = {}) {
+  const arg = normalizeComputeHydraulicsArgs(modelOrArg, opts);
+  const model = arg.model || arg.cadModel || null;
+  const cadModel = arg.cadModel || (model && Array.isArray(model.solids) ? model : null);
+  const network = arg.network
+    || (cadModel && cadModel.network ? cadModel.network : null)
+    || (model && Array.isArray(model.branchLines) ? model : null);
+  const hazard = arg.hazard || model?.hazard || cadModel?.hazard || 'ordinary';
+
+  const singlePath = network
+    ? requiredPressureAtRiser({
+      network,
+      hazard,
+      C: arg.C,
+      minHeadPressurePsi: arg.minHeadPressurePsi,
+    })
+    : null;
+
+  const scheduleWarnings = network
+    ? flagSchedule(network, hazard)
+    : [];
+
+  const networkSolve = cadModel
+    ? solveNetwork(cadModel, {
+      C: arg.C,
+      kFactor: arg.kFactor,
+      minHeadPressurePsi: arg.minHeadPressurePsi,
+      availablePsi: arg.availablePsi,
+      fittingsPerHead: arg.fittingsPerHead,
+      flowingHeads: arg.flowingHeads,
+    })
+    : null;
+
+  const nfpaReport = buildStructuredNfpaReport(
+    model,
+    { hazard, singlePath, networkSolve, scheduleWarnings },
+    { hazard, ...(arg.reportMeta || {}) },
+  );
+
+  return {
+    hazard,
+    singlePath,
+    networkSolve,
+    scheduleWarnings,
+    nfpaReport,
+  };
 }
 
 // Re-export the full hydraulic NETWORK balance (P1) so callers can import the
