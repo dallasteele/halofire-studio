@@ -1294,3 +1294,20 @@ User direction across 4 messages this session:
 - Next blocker: obtain a real source-backed family with verified
   dimensions and an approved source/license path before the next
   promotion attempt.
+
+### Entry 38 - Sprinkler price normalizer test recovery
+
+- Added `packages/halofire-sprinkler/src/priceNormalize.mjs` with a
+  small built-in-JS `normalizePriceSheet(rows)` helper that coerces
+  `sku` and `desc` to strings, defaults blank or missing units to `EA`,
+  and parses `price` / `priceUsd` into numeric `priceUsd` with invalid
+  values falling back to `0`.
+- Added `packages/halofire-sprinkler/src/priceNormalize.test.mjs`
+  covering the recovered acceptance scope: empty input, invalid price,
+  missing or blank units, and string coercion for `sku` / `desc`.
+- Required repo baseline checks remain blocked in this worktree:
+  `curl http://localhost:18080/health` and `curl http://localhost:3002/`
+  both fail connection, and the Windows-specific
+  `C:/Python312/python.exe -m pytest ...` path is unavailable here.
+- Verification target for this slice: `node --test
+  packages/halofire-sprinkler/src/priceNormalize.test.mjs`.
