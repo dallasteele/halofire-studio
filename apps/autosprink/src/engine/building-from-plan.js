@@ -20,6 +20,8 @@
  * manufacturer-exact / AutoSprink parity.
  */
 
+import { extractWallRuns } from './wall-extraction.js';
+
 const SLAB_COLOR = 0x2dd4bf;
 const WALL_COLOR = 0x8b9bb4;
 const KIND_COLORS = Object.freeze({
@@ -191,18 +193,18 @@ function makeFootprintSlab(THREE, footprintFt, bounds, elevationFt, slabThicknes
 }
 
 /** Build one extruded wall box from a plan-feet segment {a:[x,y], b:[x,y]}. */
-function makeWall(THREE, seg, bounds, elevationFt, heightFt, thicknessFt, mat) {
+function makeWall(THREE, seg, bounds, elevationFt, heightFt, defaultThicknessFt, mat) {
   const ax = seg.a[0] - bounds.cx, az = seg.a[1] - bounds.cy;
   const bx = seg.b[0] - bounds.cx, bz = seg.b[1] - bounds.cy;
   const len = Math.hypot(bx - ax, bz - az);
   if (!(len > 0.01)) return null;
-  const wallDepthFt = Number.isFinite(seg.thicknessFt) && seg.thicknessFt > 0 ? seg.thicknessFt : thicknessFt;
-  const geo = new THREE.BoxGeometry(len, heightFt, wallDepthFt);
+  const thicknessFt = Number.isFinite(seg?.thicknessFt) && seg.thicknessFt > 0 ? seg.thicknessFt : defaultThicknessFt;
+  const geo = new THREE.BoxGeometry(len, heightFt, thicknessFt);
   const mesh = new THREE.Mesh(geo, mat);
   mesh.position.set((ax + bx) / 2, elevationFt + heightFt / 2, (az + bz) / 2);
   mesh.rotation.y = -Math.atan2(bz - az, bx - ax);
   mesh.name = 'plan-wall';
-  mesh.userData = { kind: 'plan-wall', needsVerification: true };
+  mesh.userData = { kind: 'plan-wall', thicknessFt, needsVerification: true };
   return mesh;
 }
 
@@ -462,8 +464,12 @@ export function buildBuildingFromPlans(THREE, levelPlans, opts = {}) {
     // excluded — a plausible count of REAL walls) over the thousands of fragmented `walls`
     // segments. Each run extrudes as one continuous wall box. Falls back to `walls` only if no
     // runs were computed (older data). The fragmented `walls` set is no longer the headline.
-    const wallSource = (Array.isArray(plan.wallRuns) && plan.wallRuns.length) ? plan.wallRuns : plan.walls;
-    const usingRuns = (Array.isArray(plan.wallRuns) && plan.wallRuns.length) ? true : false;
+    const wallEvidence = (Array.isArray(plan.wallRuns) && plan.wallRuns.length) ? plan.wallRuns : plan.walls;
+    const faithfulWallExtraction = Array.isArray(wallEvidence) && wallEvidence.length
+      ? extractWallRuns(wallEvidence, { includeSingleFaces: true })
+      : { runs: [], meta: null };
+    const wallSource = faithfulWallExtraction.runs.length ? faithfulWallExtraction.runs : wallEvidence;
+    const usingRuns = faithfulWallExtraction.runs.length > 0;
     if (includeWalls && wallMat && THREE.BoxGeometry && Array.isArray(wallSource)) {
       const validWalls = wallSource.filter((seg) => seg && Array.isArray(seg.a) && Array.isArray(seg.b));
       const doMerge = typeof mergeGeometries === 'function' && validWalls.length >= wallMergeThreshold;
@@ -475,8 +481,10 @@ export function buildBuildingFromPlans(THREE, levelPlans, opts = {}) {
           const bx = seg.b[0] - bounds.cx, bz = seg.b[1] - bounds.cy;
           const len = Math.hypot(bx - ax, bz - az);
           if (!(len > 0.01)) continue;
-          const wallDepthFt = Number.isFinite(seg.thicknessFt) && seg.thicknessFt > 0 ? seg.thicknessFt : wallThicknessFt;
-          const g = new THREE.BoxGeometry(len, wallHeightFt, wallDepthFt);
+          const thicknessFt = Number.isFinite(seg?.thicknessFt) && seg.thicknessFt > 0 ? seg.thicknessFt : wallThicknessFt;
+          const g = new THREE.BoxGeometry(len, wallHeightFt, thicknessFt);
+          const thicknessFt = Number.isFinite(seg?.thicknessFt) && seg.thicknessFt > 0 ? seg.thicknessFt : wallThicknessFt;
+          const g = new THREE.BoxGeometry(len, wallHeightFt, thicknessFt);
           if (g.rotateY) g.rotateY(-Math.atan2(bz - az, bx - ax));
           if (g.translate) g.translate((ax + bx) / 2, elevationFt + wallHeightFt / 2, (az + bz) / 2);
           geos.push(g);
@@ -596,7 +604,7 @@ export function buildBuildingFromPlans(THREE, levelPlans, opts = {}) {
         wallSegmentsRaw: (Array.isArray(plan.walls) ? plan.walls.length : 0),
         wallSource: usingRuns ? 'wall-runs' : 'wall-segments',
       },
-      wallRunsMeta: plan.wallRunsMeta || null,
+      wallRunsMeta: faithfulWallExtraction.meta || plan.wallRunsMeta || null,
       // HF-W2: honest recall of the rendered recovered-wall set vs the sheet wall-ink.
       recallPct: (plan.wallsFullMeta && Number.isFinite(plan.wallsFullMeta.recallPct))
         ? plan.wallsFullMeta.recallPct : null,

@@ -25,7 +25,8 @@ for (const lvl of (data.levels || [])) {
   plan.wallRunsMeta = meta;
   touched += 1;
   console.log(`L${lvl.level} ${lvl.sheet}: ${plan.walls.length} segs -> ${runs.length} wall runs ` +
-    `(${meta.totalRunLengthFt.toFixed(0)} ft; dropped ${meta.diagonalDropped} diag, ${meta.shortRunsDropped} short)`);
+    `(${meta.totalRunLengthFt.toFixed(0)} ft; dropped ${meta.diagonalDropped} diag, ` +
+    `${meta.singleFaceRuns} single-face evidence run${meta.singleFaceRuns === 1 ? '' : 's'})`);
 }
 
 data.recoreWallRunsNote = 'wallRuns = collinear-merged single-band cut-wall segments into real ' +

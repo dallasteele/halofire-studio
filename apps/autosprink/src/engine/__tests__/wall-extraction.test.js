@@ -1,73 +1,164 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { buildWallRuns } from '../plan-wall-runs.js';
+import { extractWallRuns } from '../wall-extraction.js';
 
-function seg(a, b) {
-  return { a, b };
-}
-
-test('buildWallRuns pairs double-line wall ink and merges collinear centerlines into wall paths', () => {
+test('extractWallRuns pairs double-line faces and merges collinear spans into wall paths', () => {
   const segments = [
-    seg([0, 10], [4, 10]),
-    seg([4.2, 10], [8.1, 10]),
-    seg([8.3, 10], [12, 10]),
-    seg([0.1, 10.5], [3.9, 10.5]),
-    seg([4, 10.5], [8, 10.5]),
-    seg([8.2, 10.5], [12.2, 10.5]),
-
-    seg([20, 0], [20, 4.1]),
-    seg([20, 4.4], [20, 8.2]),
-    seg([20, 8.4], [20, 12]),
-    seg([20.6, 0.1], [20.6, 4]),
-    seg([20.6, 4.3], [20.6, 8.1]),
-    seg([20.6, 8.3], [20.6, 12.2]),
-
-    seg([30, 30], [36, 30]),
-
-    seg([50, 50], [50.7, 50.7]),
-    seg([60, 60], [61, 60]),
+    { a: [0, 0], b: [0, 4] },
+    { a: [0, 4.4], b: [0, 10] },
+    { a: [1, 0], b: [1, 10] },
+    { a: [5, 20], b: [10, 20] },
+    { a: [10.4, 20], b: [16, 20] },
+    { a: [5, 21], b: [16, 21] },
+    { a: [30, 30], b: [30.5, 30.5] },
   ];
 
-  const { runs, meta } = buildWallRuns(segments, {
-    gapFt: 0.5,
-    pairMaxSepFt: 1,
-    minPairOverlapFt: 3,
-    minRunFt: 2,
-    fallbackThicknessFt: 0.5,
+  const result = extractWallRuns(segments, {
+    faceGapFt: 0.5,
+    minOverlapFt: 3,
+    includeSingleFaces: false,
   });
 
-  assert.equal(runs.length, 3);
-  assert.deepEqual(runs, [
+  assert.deepEqual(result.runs, [
     {
-      a: [0.1, 10.25],
-      b: [12, 10.25],
+      a: [5, 20.5],
+      b: [16, 20.5],
       axis: 'H',
-      lengthFt: 11.9,
-      thicknessFt: 0.5,
-      source: 'double-line-pair',
+      lengthFt: 11,
+      thicknessFt: 1,
+      sourceFaces: 2,
+      source: 'paired-double-line',
     },
     {
-      a: [30, 30],
-      b: [36, 30],
-      axis: 'H',
-      lengthFt: 6,
-      thicknessFt: 0.5,
-      source: 'single-edge-fallback',
-    },
-    {
-      a: [20.3, 0.1],
-      b: [20.3, 12],
+      a: [0.5, 0],
+      b: [0.5, 10],
       axis: 'V',
-      lengthFt: 11.9,
-      thicknessFt: 0.6,
-      source: 'double-line-pair',
+      lengthFt: 10,
+      thicknessFt: 1,
+      sourceFaces: 2,
+      source: 'paired-double-line',
     },
   ]);
+  assert.equal(result.meta.diagonalDropped, 1);
+  assert.equal(result.meta.pairedRuns, 2);
+  assert.equal(result.meta.singleFaceRuns, 0);
+});
 
-  assert.equal(meta.doubleLinePairs, 2);
-  assert.equal(meta.doubleLineWalls, 2);
-  assert.equal(meta.singleEdgeWalls, 1);
-  assert.equal(meta.diagonalDropped, 1);
-  assert.equal(meta.shortRunsDropped, 1);
+test('extractWallRuns handles fragmented horizontal and vertical double-line walls in one sample set', () => {
+  const segments = [
+    { a: [0, 0], b: [8, 0] },
+    { a: [8.3, 0], b: [16, 0] },
+    { a: [0, 0.6], b: [7.7, 0.6] },
+    { a: [8, 0.6], b: [16, 0.6] },
+    { a: [20, 2], b: [20, 10] },
+    { a: [20, 10.3], b: [20, 18] },
+    { a: [20.7, 2], b: [20.7, 9.8] },
+    { a: [20.7, 10], b: [20.7, 18] },
+    { a: [4, 4], b: [5, 5] },
+    { a: [30, 30], b: [30, 30] },
+  ];
+
+  const result = extractWallRuns(segments, {
+    faceGapFt: 0.5,
+    minOverlapFt: 4,
+    maxWallThicknessFt: 1.2,
+    includeSingleFaces: false,
+  });
+
+  assert.equal(result.meta.diagonalDropped, 1);
+  assert.equal(result.meta.degenerateDropped, 1);
+  assert.equal(result.meta.pairedRuns, 2);
+  assert.equal(result.meta.singleFaceRuns, 0);
+  assert.deepEqual(result.runs, [
+    {
+      a: [0, 0.3],
+      b: [16, 0.3],
+      axis: 'H',
+      lengthFt: 16,
+      thicknessFt: 0.6,
+      sourceFaces: 2,
+      source: 'paired-double-line',
+    },
+    {
+      a: [20.35, 2],
+      b: [20.35, 18],
+      axis: 'V',
+      lengthFt: 16,
+      thicknessFt: 0.7,
+      sourceFaces: 2,
+      source: 'paired-double-line',
+    },
+  ]);
+});
+
+test('extractWallRuns keeps single-face wall evidence instead of fabricating a bbox wall', () => {
+  const segments = [
+    { a: [40, 3], b: [40, 9] },
+    { a: [60, 0], b: [60.25, 0.25] },
+  ];
+
+  const result = extractWallRuns(segments, {
+    includeSingleFaces: true,
+    minFaceRunFt: 2,
+  });
+
+  assert.deepEqual(result.runs, [
+    {
+      a: [40, 3],
+      b: [40, 9],
+      axis: 'V',
+      lengthFt: 6,
+      sourceFaces: 1,
+      source: 'single-face',
+    },
+  ]);
+  assert.equal(result.meta.diagonalDropped, 1);
+  assert.equal(result.meta.singleFaceRuns, 1);
+});
+
+test('extractWallRuns keeps doorway-sized single-face gaps split', () => {
+  const segments = [
+    { a: [0, 0], b: [10, 0] },
+    { a: [0, 0.5], b: [10, 0.5] },
+    { a: [20, 8], b: [28, 8] },
+    { a: [32.5, 8], b: [40, 8] },
+  ];
+
+  const result = extractWallRuns(segments, {
+    faceGapFt: 1,
+    wallGapFt: 1,
+    maxWallThicknessFt: 1,
+    includeSingleFaces: true,
+  });
+
+  assert.equal(result.meta.pairedRuns, 1);
+  assert.equal(result.meta.singleFaceRuns, 2);
+  assert.deepEqual(result.runs, [
+    {
+      a: [0, 0.25],
+      b: [10, 0.25],
+      axis: 'H',
+      lengthFt: 10,
+      thicknessFt: 0.5,
+      sourceFaces: 2,
+      source: 'paired-double-line',
+    },
+    {
+      a: [20, 8],
+      b: [28, 8],
+      axis: 'H',
+      lengthFt: 8,
+      sourceFaces: 1,
+      source: 'single-face',
+    },
+    {
+      a: [32.5, 8],
+      b: [40, 8],
+      axis: 'H',
+      lengthFt: 7.5,
+      sourceFaces: 1,
+      source: 'single-face',
+    },
+  ]);
 });
