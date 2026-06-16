@@ -39,7 +39,10 @@ import { balanceNetwork } from '../engine/hydraulic-network.js';
 import { checkCompliance } from '../engine/nfpa-compliance.js';
 import { buildSubmittal, renderSubmittalPdf } from '../engine/submittal.js';
 import { homeDepotRexburgFloorPlan, cooperative1881FloorPlan, COOPERATIVE_1881_PROJECT_NAME } from '../data/floorplans.js';
-import { cooperative1881FloorPlanFromExtractedPlate } from '../data/floorplans-server.js';
+import {
+  cooperative1881BuildingFromExtractedPlan,
+  cooperative1881FloorPlanFromExtractedPlate,
+} from '../data/floorplans-server.js';
 import { HOME_DEPOT_PROJECT_NAME } from '../data/evidence-gates.js';
 import { readHomeDepotBidPackage, readHomeDepotRealTakeoff } from '../data/home-depot-bid-package.js';
 import { readCooperative1881BidPackage, readCooperative1881RealTakeoff } from '../data/cooperative-1881-bid-package.js';
@@ -20618,7 +20621,17 @@ function runSprinklerPipeline(req, prebuilt = null) {
     if (hasSuppliedTruth) {
       floorPlan = scaleFloorPlanAreaForSuppliedBidTruth(cooperative1881FloorPlan(), suppliedDocumentBidTruth);
     } else {
-      floorPlan = cooperative1881FloorPlanFromExtractedPlate() || cooperative1881FloorPlan();
+      building = cooperative1881BuildingFromExtractedPlan();
+      floorPlan = building ? {
+        name: projectName,
+        units: building.units || 'ft',
+        extractedPlate: true,
+        source: 'extracted level-1 rooms + wall runs from the architectural PDF — needs-verification',
+        rooms: building.stories.flatMap((story) => story.spaces.map((space) => ({
+          ...space,
+          ceilingHeightFt: story.ceilingHeightFt,
+        }))),
+      } : (cooperative1881FloorPlanFromExtractedPlate() || cooperative1881FloorPlan());
       if (!floorPlan.extractedPlate) {
         floorPlan = scaleFloorPlanAreaForSuppliedBidTruth(floorPlan, suppliedDocumentBidTruth);
       }

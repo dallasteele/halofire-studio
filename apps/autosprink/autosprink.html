@@ -2713,7 +2713,7 @@ async function renderPlanComprehensionBuild(name) {
     api = buildBuildingFromPlans(THREE, levelPlans, {
       mergeGeometries,            // HF-G1-COUPLE merger — collapse thousands of walls to 1 mesh/level
       wallMergeThreshold: 600,
-      wallHeightFt: 9, wallThicknessFt: 0.5, slabThicknessFt: 0.75,
+      wallHeightFt: 14, wallThicknessFt: 0.5, slabThicknessFt: 0.75,
     });
   } catch (e) { window.__planBuildError = 'buildBuildingFromPlans: ' + String(e.message || e); return false; }
 

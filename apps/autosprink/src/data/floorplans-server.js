@@ -10,6 +10,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { COOPERATIVE_1881_PROJECT_NAME } from './floorplans.js';
+import { normalizeBuilding } from '../engine/building-model.js';
 
 const __floorplansDir = path.dirname(fileURLToPath(import.meta.url));
 
@@ -27,6 +28,39 @@ function polyAreaSqft(poly) {
     s += x1 * y2 - x2 * y1;
   }
   return Math.abs(s) / 2;
+}
+
+function round2(n) {
+  return Math.round((Number(n) + Number.EPSILON) * 100) / 100;
+}
+
+function bboxFromPoly(poly) {
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+  for (const [x, y] of poly) {
+    minX = Math.min(minX, x);
+    minY = Math.min(minY, y);
+    maxX = Math.max(maxX, x);
+    maxY = Math.max(maxY, y);
+  }
+  return { minX, minY, maxX, maxY };
+}
+
+function isBoundaryWall(seg, bbox, tol = 0.75) {
+  const [[ax, ay], [bx, by]] = [seg.a, seg.b];
+  const onMinX = Math.abs(ax - bbox.minX) <= tol && Math.abs(bx - bbox.minX) <= tol;
+  const onMaxX = Math.abs(ax - bbox.maxX) <= tol && Math.abs(bx - bbox.maxX) <= tol;
+  const onMinY = Math.abs(ay - bbox.minY) <= tol && Math.abs(by - bbox.minY) <= tol;
+  const onMaxY = Math.abs(ay - bbox.maxY) <= tol && Math.abs(by - bbox.maxY) <= tol;
+  return onMinX || onMaxX || onMinY || onMaxY;
+}
+
+function normalizeRoomHazard(room) {
+  const kind = String(room?.kind || '').toLowerCase();
+  if (kind === 'stair' || kind === 'elevator') return 'ordinary';
+  return 'ordinary';
 }
 
 /**
@@ -116,4 +150,96 @@ export function cooperative1881FloorPlanFromExtractedPlate() {
       },
     ],
   };
+}
+
+/**
+ * Build a level-1 BUILDING model from the extracted architectural plan so the
+ * Studio CAD render can carry the assembled rooms + interior walls inside
+ * `cadModel.solids`, not only as a separate plan underlay overlay.
+ *
+ * This is still architectural-plan extraction only. If future level data adds
+ * explicit `columns` / `columnSolids`, they are passed through; otherwise the
+ * building honestly carries zero columns rather than fabricating structure.
+ *
+ * @returns {object|null} normalizeBuilding(...) output or null on any parse gap.
+ */
+export function cooperative1881BuildingFromExtractedPlan() {
+  let data;
+  try {
+    data = JSON.parse(fs.readFileSync(COOPERATIVE_1881_PLAN_LEVELS_PATH, 'utf8'));
+  } catch (_) {
+    return null;
+  }
+  const levels = Array.isArray(data?.levels) ? data.levels : [];
+  const l1 = levels.find((l) => l && l.level === 1 && l.plan);
+  const plan = l1?.plan;
+  if (!plan) return null;
+
+  const rooms = Array.isArray(plan.rooms)
+    ? plan.rooms
+      .filter((room) => room && Array.isArray(room.poly) && room.poly.length >= 3)
+      .map((room, index) => ({
+        name: room.label || room.name || `Extracted Room ${index + 1}`,
+        polygon: room.poly.map(([x, y]) => [Number(x), Number(y)]),
+        hazard: normalizeRoomHazard(room),
+      }))
+    : [];
+  if (!rooms.length) return null;
+
+  const platePoly = Array.isArray(plan.footprintFt)
+    ? plan.footprintFt
+      .map(([x, y]) => [Number(x), Number(y)])
+      .filter(([x, y]) => Number.isFinite(x) && Number.isFinite(y))
+    : [];
+  if (platePoly.length < 3) return null;
+  const plate = (platePoly.length > 3
+    && Math.abs(platePoly[0][0] - platePoly[platePoly.length - 1][0]) < 1e-6
+    && Math.abs(platePoly[0][1] - platePoly[platePoly.length - 1][1]) < 1e-6)
+    ? platePoly.slice(0, -1)
+    : platePoly;
+  const plateBbox = bboxFromPoly(plate);
+
+  const wallSource = Array.isArray(plan.wallRuns) && plan.wallRuns.length ? plan.wallRuns : plan.walls;
+  const walls = Array.isArray(wallSource)
+    ? wallSource
+      .filter((seg) => seg && Array.isArray(seg.a) && Array.isArray(seg.b))
+      .map((seg, index) => ({
+        a: [Number(seg.a[0]), Number(seg.a[1])],
+        b: [Number(seg.b[0]), Number(seg.b[1])],
+        thicknessFt: 0.5,
+        type: isBoundaryWall(seg, plateBbox) ? 'exterior' : 'interior',
+        openings: [],
+        sourceIndex: index,
+      }))
+    : [];
+
+  const columnSource = Array.isArray(plan.columnSolids) && plan.columnSolids.length
+    ? plan.columnSolids
+    : (Array.isArray(plan.columns) ? plan.columns : []);
+  const columns = columnSource
+    .map((col) => {
+      if (Array.isArray(col.center) && Number.isFinite(col.sizeFt)) {
+        return { x: Number(col.center[0]), y: Number(col.center[1]), sizeFt: round2(Number(col.sizeFt)) };
+      }
+      if (Number.isFinite(col.x) && Number.isFinite(col.y)) {
+        return { x: Number(col.x), y: Number(col.y), sizeFt: round2(Number(col.sizeFt) || 1) };
+      }
+      return null;
+    })
+    .filter(Boolean);
+
+  const story = {
+    level: 0,
+    baseElevationFt: 0,
+    ceilingHeightFt: 14,
+    spaces: rooms,
+    walls,
+    columns,
+  };
+
+  return normalizeBuilding({
+    name: COOPERATIVE_1881_PROJECT_NAME,
+    units: 'ft',
+    stories: [story],
+  });
 }
