@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
   placeSupports,
+  hangerSpacing,
+  checkSpacing,
   maxHangerSpacingFt,
   SEISMIC_BRACE_INTERVAL_FT,
   SUPPORTS_NOTE,
@@ -134,5 +136,53 @@ describe('placeSupports — deterministic + real cad-model + honesty', () => {
     expect(out.note).toMatch(/best-effort/i);
     expect(out.note).toMatch(/NOT a seismic engineering design/i);
     expect(out.note).toMatch(/NOT AutoSprink parity/i);
+  });
+});
+
+describe('hanger spacing checks', () => {
+  it('computes the required hanger count for supported runs', () => {
+    const pipe = {
+      kind: 'pipe',
+      name: 'branch-2',
+      role: 'branch',
+      diameterIn: 2.0,
+      from: [0, 0, 10],
+      to: [30, 0, 10],
+    };
+    const result = hangerSpacing([pipe], 'steel');
+    expect(result.spacing).toBe(15);
+    expect(result.requiredCount).toBe(3);
+    expect(result.segments[0].requiredOffsets).toEqual([0, 15, 30]);
+  });
+
+  it('marks a run compliant when hangers stay within the max spacing', () => {
+    const pipe = {
+      kind: 'pipe',
+      name: 'branch-3',
+      role: 'branch',
+      diameterIn: 2.0,
+      from: [0, 0, 10],
+      to: [30, 0, 10],
+      hangers: [{ offsetFt: 0 }, { offsetFt: 15 }, { offsetFt: 30 }],
+    };
+    const result = checkSpacing([pipe], 'steel');
+    expect(result.spacing).toBe(15);
+    expect(result.requiredCount).toBe(3);
+    expect(result.isCompliant).toBe(true);
+  });
+
+  it('fails closed when provided hangers leave a span over the max spacing', () => {
+    const pipe = {
+      kind: 'pipe',
+      name: 'branch-4',
+      role: 'branch',
+      diameterIn: 2.0,
+      from: [0, 0, 10],
+      to: [30, 0, 10],
+      hangers: [{ offsetFt: 0 }, { offsetFt: 20 }],
+    };
+    const result = checkSpacing([pipe], 'steel');
+    expect(result.requiredCount).toBe(3);
+    expect(result.isCompliant).toBe(false);
   });
 });

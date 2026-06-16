@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  computeHydraulics,
   hazenWilliamsLossPsiPerFt,
   remoteAreaDemand,
   requiredPressureAtRiser,
@@ -151,5 +152,40 @@ describe('flagSchedule', () => {
     };
     const warnings = flagSchedule(network, 'extra');
     expect(warnings.some((w) => w.type === 'velocity')).toBe(true);
+  });
+});
+
+describe('computeHydraulics', () => {
+  it('includes hanger spacing compliance for a model with properly spaced hangers', () => {
+    const cadModel = {
+      material: 'steel',
+      solids: [
+        {
+          kind: 'pipe',
+          name: 'branch-0',
+          role: 'branch',
+          diameterIn: 2,
+          from: [0, 0, 10],
+          to: [30, 0, 10],
+          hangers: [{ offsetFt: 0 }, { offsetFt: 15 }, { offsetFt: 30 }],
+        },
+      ],
+      network: {
+        branchLines: [{ row: 0, y: 0, startX: 0, endX: 30, headCount: 6, diameterIn: 2 }],
+        mainX: 0,
+        mainZ: 13,
+        branchZ: 10,
+        headZ: 9,
+        totalHeads: 6,
+      },
+    };
+
+    const result = computeHydraulics({ cadModel, hazard: 'light' });
+    expect(result.hangerSpacingResult).toEqual({
+      spacing: 15,
+      requiredCount: 3,
+      isCompliant: true,
+    });
+    expect(result.requiredFlowGpm).toBeGreaterThan(0);
   });
 });

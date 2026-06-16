@@ -18,6 +18,8 @@
  * Units: gpm (flow), inches (pipe diameter), feet (length/elevation), psi.
  */
 
+import { hangerSpacing, checkSpacing } from './supports.js';
+
 /**
  * Hazen-Williams friction loss, psi per foot of pipe.
  *   p = 4.52 * Q^1.852 / (C^1.852 * d^4.8704)
@@ -227,6 +229,38 @@ export function flagSchedule(networkOrCad, hazard) {
     }
   }
   return warnings;
+}
+
+function resolvePipeSegments(arg) {
+  if (Array.isArray(arg?.pipeSegments)) return arg.pipeSegments;
+  if (Array.isArray(arg?.cadModel?.solids)) return arg.cadModel.solids;
+  if (Array.isArray(arg?.solids)) return arg.solids;
+  return [];
+}
+
+/**
+ * Convenience wrapper for the current engine tree: returns the existing
+ * single-path hydraulic estimate plus hanger-spacing compliance for the model's
+ * pipe segments.
+ *
+ * @param {{cadModel?:object, network?:object, hazard?:string, material?:string, pipeSegments?:Array}} arg
+ * @returns {ReturnType<typeof requiredPressureAtRiser> & {hangerSpacingResult:{spacing:number|null,requiredCount:number,isCompliant:boolean}}}
+ */
+export function computeHydraulics(arg = {}) {
+  const hydraulics = requiredPressureAtRiser(arg);
+  const material = arg.material || arg.cadModel?.material || 'steel';
+  const pipeSegments = resolvePipeSegments(arg);
+  const spacingPlan = hangerSpacing(pipeSegments, material);
+  const spacingCheck = checkSpacing(pipeSegments, material);
+
+  return {
+    ...hydraulics,
+    hangerSpacingResult: {
+      spacing: spacingCheck.spacing ?? spacingPlan.spacing,
+      requiredCount: spacingCheck.requiredCount || spacingPlan.requiredCount,
+      isCompliant: spacingCheck.isCompliant,
+    },
+  };
 }
 
 // Re-export the full hydraulic NETWORK balance (P1) so callers can import the

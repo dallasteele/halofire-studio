@@ -98,6 +98,142 @@ function braceOffsets(len, interval) {
   return offsets;
 }
 
+function normalizeMaterial(material) {
+  return String(material || 'steel').trim().toLowerCase();
+}
+
+function resolveActualHangerOffsets(pipe, len) {
+  const raw = Array.isArray(pipe?.hangers) ? pipe.hangers : [];
+  return raw
+    .map((hanger) => {
+      if (typeof hanger === 'number') return hanger;
+      if (hanger && Number.isFinite(Number(hanger.offsetFt))) return Number(hanger.offsetFt);
+      if (hanger && Array.isArray(hanger.position)) {
+        const [ax, ay, az] = pipe.from;
+        const [bx, by, bz] = pipe.to;
+        const [hx, hy, hz] = hanger.position;
+        const dx = bx - ax;
+        const dy = by - ay;
+        const dz = bz - az;
+        const denom = (dx * dx) + (dy * dy) + (dz * dz);
+        if (denom <= 0) return 0;
+        return (((hx - ax) * dx) + ((hy - ay) * dy) + ((hz - az) * dz)) / Math.sqrt(denom);
+      }
+      return null;
+    })
+    .filter((off) => Number.isFinite(off))
+    .map((off) => Math.min(len, Math.max(0, round(off))))
+    .sort((a, b) => a - b);
+}
+
+function segmentCompliance(pipe, spacing) {
+  const len = pipeLength(pipe);
+  const requiredOffsets = hangerOffsets(len, spacing);
+  const actualOffsets = resolveActualHangerOffsets(pipe, len);
+  const spans = [];
+  let isCompliant = actualOffsets.length > 0;
+
+  if (actualOffsets.length > 0) {
+    spans.push(round(actualOffsets[0]));
+    for (let i = 1; i < actualOffsets.length; i += 1) {
+      spans.push(round(actualOffsets[i] - actualOffsets[i - 1]));
+    }
+    spans.push(round(len - actualOffsets[actualOffsets.length - 1]));
+    isCompliant = spans.every((span) => span <= spacing + 1e-6);
+  }
+
+  return {
+    pipe: pipe.name,
+    role: pipe.role,
+    lengthFt: round(len),
+    spacingFt: spacing,
+    requiredCount: requiredOffsets.length,
+    actualCount: actualOffsets.length,
+    requiredOffsets,
+    actualOffsets,
+    isCompliant,
+  };
+}
+
+function supportedRuns(pipeSegments) {
+  return (Array.isArray(pipeSegments) ? pipeSegments : [])
+    .filter((pipe) => pipe && pipe.kind === 'pipe' && RUN_ROLES.has(pipe.role) && isHorizontal(pipe));
+}
+
+/**
+ * Compute the required hanger spacing/count for branch/main pipe segments.
+ *
+ * @param {Array} pipeSegments
+ * @param {string} [material='steel']
+ * @returns {{material:string, spacing:number|null, requiredCount:number, segments:Array, note:string}}
+ */
+export function hangerSpacing(pipeSegments, material = 'steel') {
+  const normalizedMaterial = normalizeMaterial(material);
+  const pipes = supportedRuns(pipeSegments);
+  const note = normalizedMaterial === 'steel'
+    ? SUPPORTS_NOTE
+    : `unsupported hanger spacing material "${normalizedMaterial}" — only steel rules are encoded; ${SUPPORTS_NOTE}`;
+
+  const segments = normalizedMaterial === 'steel'
+    ? pipes.map((pipe) => {
+      const spacingFt = maxHangerSpacingFt(pipe.diameterIn);
+      const requiredOffsets = hangerOffsets(pipeLength(pipe), spacingFt);
+      return {
+        pipe: pipe.name,
+        role: pipe.role,
+        lengthFt: round(pipeLength(pipe)),
+        spacingFt,
+        requiredCount: requiredOffsets.length,
+        requiredOffsets,
+      };
+    })
+    : [];
+
+  return {
+    material: normalizedMaterial,
+    spacing: segments.length ? Math.min(...segments.map((segment) => segment.spacingFt)) : null,
+    requiredCount: segments.reduce((sum, segment) => sum + segment.requiredCount, 0),
+    segments,
+    note,
+  };
+}
+
+/**
+ * Check whether provided hanger placements comply with the encoded steel rules.
+ *
+ * Each pipe segment may carry `hangers` as offsets in feet, `{ offsetFt }`, or
+ * `{ position:[x,y,z] }` markers along the segment.
+ *
+ * @param {Array} pipeSegments
+ * @param {string} [material='steel']
+ * @returns {{material:string, spacing:number|null, requiredCount:number, isCompliant:boolean, segments:Array, note:string}}
+ */
+export function checkSpacing(pipeSegments, material = 'steel') {
+  const normalizedMaterial = normalizeMaterial(material);
+  const plan = hangerSpacing(pipeSegments, normalizedMaterial);
+  if (normalizedMaterial !== 'steel') {
+    return {
+      material: normalizedMaterial,
+      spacing: null,
+      requiredCount: 0,
+      isCompliant: false,
+      segments: [],
+      note: plan.note,
+    };
+  }
+
+  const pipes = supportedRuns(pipeSegments);
+  const segments = pipes.map((pipe) => segmentCompliance(pipe, maxHangerSpacingFt(pipe.diameterIn)));
+  return {
+    material: normalizedMaterial,
+    spacing: plan.spacing,
+    requiredCount: segments.reduce((sum, segment) => sum + segment.requiredCount, 0),
+    isCompliant: segments.every((segment) => segment.isCompliant),
+    segments,
+    note: plan.note,
+  };
+}
+
 /**
  * Place hangers + seismic braces for a cad-model's pipe solids.
  *
