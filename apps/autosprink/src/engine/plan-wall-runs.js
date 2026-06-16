@@ -38,9 +38,35 @@ const DEFAULTS = Object.freeze({
   perpTolFt: 0.25,   // collinear pieces share a perpendicular coordinate within this band
   gapFt: 1.0,        // merge pieces whose along-axis gap is <= this (bridges hairline breaks)
   minRunFt: 2.0,     // drop runs shorter than a real wall stub (sub-2ft = dimension tick / glyph)
+  pairParallelMinFt: 0.15,  // minimum face-to-face spacing to consider a double-line wall
+  pairParallelMaxFt: 1.5,   // maximum face-to-face spacing for double-line pairing
+  minPairOverlapFt: 4.0,    // minimum shared span before two faces can become one centerline wall
+  minPairOverlapRatio: 0.6, // the overlap must cover most of the shorter face
 });
 
 function round(n) { return Math.round((Number(n) + Number.EPSILON) * 1e4) / 1e4; }
+
+function runCoord(run) { return run.axis === 'H' ? run.a[1] : run.a[0]; }
+
+function runSpan(run) {
+  return run.axis === 'H'
+    ? [Math.min(run.a[0], run.b[0]), Math.max(run.a[0], run.b[0])]
+    : [Math.min(run.a[1], run.b[1]), Math.max(run.a[1], run.b[1])];
+}
+
+function overlapSpan(a, b) {
+  const lo = Math.max(a[0], b[0]);
+  const hi = Math.min(a[1], b[1]);
+  return hi > lo ? [lo, hi] : null;
+}
+
+function spanLen(span) { return Math.max(0, span[1] - span[0]); }
+
+function toRun(axis, coord, lo, hi, extra = {}) {
+  return axis === 'H'
+    ? { a: [round(lo), round(coord)], b: [round(hi), round(coord)], axis, lengthFt: round(hi - lo), ...extra }
+    : { a: [round(coord), round(lo)], b: [round(coord), round(hi)], axis, lengthFt: round(hi - lo), ...extra };
+}
 
 /** Classify a segment {a,b} as 'H' (horizontal), 'V' (vertical), 'D' (diagonal), or null (degenerate). */
 function axisOf(seg, axisTolFt) {
@@ -150,6 +176,142 @@ export function buildWallRuns(walls, opts = {}) {
         'diagonals (door-swing arcs/hatch) dropped, sub-minRunFt stubs (dimension ticks/glyphs) dropped',
       provenance: 'reconstructed wall runs from real vector cut-wall segments — needs-verification; ' +
         'NOT AHJ/PE/manufacturer-exact/AutoSprink-parity. Non-wall ink EXCLUDED, never re-labeled.',
+      needsVerification: true,
+    },
+  };
+}
+
+/**
+ * PURE. Pair near-parallel wall faces into centerline wall paths.
+ *
+ * This is the next deterministic step after buildWallRuns: the raw linework often
+ * contains BOTH faces of a double-line wall. This reducer pairs those faces when
+ * they are close, parallel, and substantially overlapping, then emits a centerline
+ * run carrying the observed wall thickness. Unpaired runs are preserved so the
+ * algorithm never fabricates missing walls.
+ *
+ * @param {Array<{a:[number,number], b:[number,number], axis:'H'|'V', lengthFt:number}>} runs
+ * @param {Object} [opts]
+ * @returns {{
+ *   runs: Array<{a:[number,number], b:[number,number], axis:'H'|'V', lengthFt:number, thicknessFt?:number, source:string}>,
+ *   meta: { inputRuns:number, pairedRuns:number, preservedSingles:number, pairCandidates:number, params:object, needsVerification:true }
+ * }}
+ */
+export function pairParallelWallRuns(runs, opts = {}) {
+  const pairParallelMinFt = Number.isFinite(opts.pairParallelMinFt) ? opts.pairParallelMinFt : DEFAULTS.pairParallelMinFt;
+  const pairParallelMaxFt = Number.isFinite(opts.pairParallelMaxFt) ? opts.pairParallelMaxFt : DEFAULTS.pairParallelMaxFt;
+  const minPairOverlapFt = Number.isFinite(opts.minPairOverlapFt) ? opts.minPairOverlapFt : DEFAULTS.minPairOverlapFt;
+  const minPairOverlapRatio = Number.isFinite(opts.minPairOverlapRatio) ? opts.minPairOverlapRatio : DEFAULTS.minPairOverlapRatio;
+  const gapFt = Number.isFinite(opts.gapFt) ? opts.gapFt : DEFAULTS.gapFt;
+  const minRunFt = Number.isFinite(opts.minRunFt) ? opts.minRunFt : DEFAULTS.minRunFt;
+
+  const input = Array.isArray(runs) ? runs.filter((run) => run && (run.axis === 'H' || run.axis === 'V')) : [];
+  const used = new Set();
+  const out = [];
+  let pairCandidates = 0;
+  let pairedRuns = 0;
+
+  for (const axis of ['H', 'V']) {
+    const axisRuns = input
+      .map((run, index) => ({ run, index }))
+      .filter((item) => item.run.axis === axis)
+      .sort((a, b) => runCoord(a.run) - runCoord(b.run) || runSpan(a.run)[0] - runSpan(b.run)[0]);
+
+    for (let i = 0; i < axisRuns.length; i += 1) {
+      const left = axisRuns[i];
+      if (used.has(left.index)) continue;
+      const leftCoord = runCoord(left.run);
+      const leftSpan = runSpan(left.run);
+      let best = null;
+      for (let j = i + 1; j < axisRuns.length; j += 1) {
+        const right = axisRuns[j];
+        if (used.has(right.index)) continue;
+        const spacing = runCoord(right.run) - leftCoord;
+        if (spacing > pairParallelMaxFt) break;
+        if (spacing < pairParallelMinFt) continue;
+        const rightSpan = runSpan(right.run);
+        const overlap = overlapSpan(leftSpan, rightSpan);
+        if (!overlap) continue;
+        const overlapFt = spanLen(overlap);
+        const shorterFt = Math.min(left.run.lengthFt, right.run.lengthFt);
+        const overlapRatio = shorterFt > 0 ? overlapFt / shorterFt : 0;
+        if (overlapFt < minPairOverlapFt || overlapRatio < minPairOverlapRatio) continue;
+        pairCandidates += 1;
+        const score = overlapFt - (spacing * 0.01);
+        if (!best || score > best.score) {
+          best = { right, spacing, overlap, score };
+        }
+      }
+      if (!best) continue;
+      used.add(left.index);
+      used.add(best.right.index);
+      pairedRuns += 1;
+      const centerCoord = (leftCoord + runCoord(best.right.run)) / 2;
+      out.push(toRun(axis, centerCoord, best.overlap[0], best.overlap[1], {
+        thicknessFt: round(best.spacing),
+        source: 'double-line-pair',
+      }));
+    }
+  }
+
+  for (let i = 0; i < input.length; i += 1) {
+    if (used.has(i)) continue;
+    const run = input[i];
+    const span = runSpan(run);
+    out.push(toRun(run.axis, runCoord(run), span[0], span[1], {
+      ...(Number.isFinite(run.thicknessFt) ? { thicknessFt: run.thicknessFt } : {}),
+      source: 'single-line',
+    }));
+  }
+
+  const rematerialized = out.map((run) => ({ a: run.a, b: run.b }));
+  const merged = buildWallRuns(rematerialized, { gapFt, minRunFt, axisTolFt: DEFAULTS.axisTolFt, perpTolFt: DEFAULTS.perpTolFt }).runs;
+  const thicknessByKey = new Map();
+  for (const run of out) {
+    const key = `${run.axis}:${run.a[0]}:${run.a[1]}:${run.b[0]}:${run.b[1]}`;
+    thicknessByKey.set(key, run);
+  }
+  const mergedWithMeta = merged.map((run) => {
+    const key = `${run.axis}:${run.a[0]}:${run.a[1]}:${run.b[0]}:${run.b[1]}`;
+    const original = thicknessByKey.get(key);
+    return {
+      ...run,
+      ...(original && Number.isFinite(original.thicknessFt) ? { thicknessFt: original.thicknessFt } : {}),
+      source: (original && original.source) || 'single-line',
+    };
+  });
+
+  return {
+    runs: mergedWithMeta,
+    meta: {
+      inputRuns: input.length,
+      pairedRuns,
+      preservedSingles: input.length - (pairedRuns * 2),
+      pairCandidates,
+      params: { pairParallelMinFt, pairParallelMaxFt, minPairOverlapFt, minPairOverlapRatio, gapFt, minRunFt },
+      needsVerification: true,
+    },
+  };
+}
+
+/**
+ * PURE. Convenience extractor for sample vectors -> merged centerline wall paths.
+ *
+ * @param {Array<{a:[number,number], b:[number,number]}>} walls
+ * @param {Object} [opts]
+ * @returns {{
+ *   runs: Array<{a:[number,number], b:[number,number], axis:'H'|'V', lengthFt:number, thicknessFt?:number, source:string}>,
+ *   meta: { build:object, pair:object, needsVerification:true }
+ * }}
+ */
+export function extractWallCenterlines(walls, opts = {}) {
+  const build = buildWallRuns(walls, opts);
+  const pair = pairParallelWallRuns(build.runs, opts);
+  return {
+    runs: pair.runs,
+    meta: {
+      build: build.meta,
+      pair: pair.meta,
       needsVerification: true,
     },
   };
