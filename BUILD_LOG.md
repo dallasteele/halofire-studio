@@ -218,6 +218,22 @@ Every task ends with an Entry here + a commit.
 - ✅ `services/halopenclaw-gateway/deploy/halopenclaw.service` —
      systemd unit for uvicorn. Runs as unprivileged `halofire` user,
      `Type=exec`, 2 workers, `Restart=on-failure`, hardened with
+
+## 2026-06-15
+
+### Entry 10 — Sprinkler price diff acceptance slice
+
+- ✅ Added `packages/halofire-sprinkler/src/priceDiff.mjs` with
+     `diffPriceSheets(oldRows, newRows)` returning `changed`, `added`,
+     `removed`, and `pctChangeBySku` keyed by SKU for changed rows only.
+- ✅ Added `packages/halofire-sprinkler/src/priceDiff.test.mjs` covering
+     the recovered handoff acceptance cases: empty inputs, unchanged rows,
+     changed price, added SKU, removed SKU, and percentage change math.
+- ✅ Verified with `node --test packages/halofire-sprinkler/src/priceDiff.test.mjs`
+     (`# tests 6`, `# pass 6`, `# fail 0`).
+- ⚠️ Repo-level AGENTS preflight remains environment-blocked in this
+     worktree: `localhost:18080` and `localhost:3002` are not running, and
+     `C:/Python312/python.exe` is not available from this Linux shell.
      `NoNewPrivileges`, `ProtectSystem=strict`, `PrivateTmp=true`,
      ReadWritePaths limited to the jobs dir.
 - ✅ `services/halopenclaw-gateway/deploy/nginx.conf.example` — reverse
