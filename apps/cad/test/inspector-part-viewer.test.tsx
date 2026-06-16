@@ -36,6 +36,7 @@ const { useCadStore, EMPTY_SELECTION } = await import('../src/store');
 const { emptyProject } = await import('../src/lib/model');
 type Project = import('../src/lib/model').Project;
 type Node = import('../src/lib/model').Node;
+type Room = import('../src/lib/model').Room;
 type Segment = import('../src/lib/model').Segment;
 
 /** A tiny real network: one source, one head, one branch pipe between them. */
@@ -56,7 +57,25 @@ function fixtureProject(): Project {
       material: 'STEEL_SCH40',
     },
   ];
-  return { ...p, network: { ...p.network, nodes, segments } };
+  const rooms: Room[] = [
+    {
+      id: 'room1',
+      name: 'Room A',
+      hazard: 'LIGHT',
+      polygon: [
+        { x: 0, y: 0 },
+        { x: 10, y: 0 },
+        { x: 10, y: 10 },
+        { x: 0, y: 10 },
+      ],
+      ceilingHt: 10,
+    },
+  ];
+  return {
+    ...p,
+    network: { ...p.network, nodes, segments },
+    building: { ...p.building, rooms },
+  };
 }
 
 function selectInStore(
@@ -98,6 +117,11 @@ describe('Inspector part viewer (jsdom — no WebGL)', () => {
     // The part body caption names the resolved build123d key (also in the
     // ModelProvenance Key row — both are present).
     expect(screen.getAllByText(/head_pendent/).length).toBeGreaterThan(0);
+    // Coverage value is surfaced in the inspector from the live room coverage report.
+    expect(
+      screen.getByText('Coverage 100.0 ft^2/head (limit 225.0 ft^2/head)'),
+    ).toBeTruthy();
+    expect(screen.getByText('Spacing single head (limit 15.0 ft)')).toBeTruthy();
   });
 
   it('selected SEGMENT: shows the pipe spec rows and the diameter-true parametric-cylinder caption', () => {

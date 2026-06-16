@@ -284,6 +284,10 @@ function HeadDetail({
 
   let finding: CoverageFinding | null = null;
   let covered: boolean | null = null;
+  let coverageValue: string | null = null;
+  let spacingValue: string | null = null;
+  let coverageLimitValue: string | null = null;
+  let spacingLimitValue: string | null = null;
   if (room) {
     const polyFt = room.polygon.map((p) => ({ x: p.x * scale, y: p.y * scale }));
     const inRoom = project.network.nodes
@@ -292,6 +296,13 @@ function HeadDetail({
       .filter((h) => pointInPolygonFt(h, polyFt));
     const rep = coverageReport(polyFt, inRoom, room.hazard);
     covered = rep.covered;
+    coverageValue = `${rep.maxAreaPerHead.toFixed(1)} ft^2/head`;
+    coverageLimitValue = `${rep.maxAllowedAreaPerHead.toFixed(1)} ft^2/head`;
+    spacingValue =
+      rep.headCount >= 2
+        ? `${rep.maxObservedSpacingFt.toFixed(1)} ft`
+        : 'single head';
+    spacingLimitValue = `${rep.maxAllowedSpacingFt.toFixed(1)} ft`;
     finding = rep.findings.find((f) => !f.ok) ?? rep.findings[0] ?? null;
   }
 
@@ -324,6 +335,12 @@ function HeadDetail({
             Room {room.name ?? room.id} ({room.hazard}):{' '}
             {covered ? 'coverage OK' : 'coverage FAIL'}
           </div>
+          {coverageValue && coverageLimitValue && (
+            <div>{`Coverage ${coverageValue} (limit ${coverageLimitValue})`}</div>
+          )}
+          {spacingValue && spacingLimitValue && (
+            <div>{`Spacing ${spacingValue} (limit ${spacingLimitValue})`}</div>
+          )}
           {finding && <div>{finding.message}</div>}
           {finding && <div style={citationStyle}>{finding.citation}</div>}
         </div>
