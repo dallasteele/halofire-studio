@@ -32,6 +32,12 @@ export const SUBMITTAL_DISCLAIMER =
   + 'permit-ready, NOT manufacturer-approved, NOT fabrication-ready, and NOT '
   + 'AutoSprink/AutoCAD parity. Professional review and approval are required.';
 
+export const SUBMITTAL_DATA_DISCLAIMER =
+  'best-effort internal alpha submittal data export — summary, drawing schedules, '
+  + 'and attachments are derived from the current CAD model and computed results '
+  + 'for internal coordination only. This is NOT a stamped/sealed submittal, NOT '
+  + 'AHJ-approved, NOT PE-reviewed, NOT permit-ready, and NOT AutoSprink parity.';
+
 /** Round to 3 decimals, EPSILON-safe. */
 function round(n) {
   return Math.round((Number(n) + Number.EPSILON) * 1000) / 1000;
@@ -136,6 +142,30 @@ function buildHydraulicSummary(hydraulics) {
   };
 }
 
+function resolveTotalCost(bid) {
+  if (!bid) return 0;
+  const candidate = bid.fullScopeTotal
+    ?? bid.total
+    ?? bid.bareMaterialsTotal
+    ?? bid.pricing?.total
+    ?? bid.pricing?.subtotal
+    ?? bid.pricing?.materialCost
+    ?? null;
+  return round(candidate ?? 0);
+}
+
+function summarizeModel(solids, bid) {
+  const totalSprinklers = solids.filter((s) => s.kind === 'head').length;
+  const totalPipeLength = round(solids
+    .filter((s) => s.kind === 'pipe')
+    .reduce((sum, s) => sum + pipeLengthFt(s), 0));
+  return {
+    totalSprinklers,
+    totalPipeLength,
+    totalCost: resolveTotalCost(bid),
+  };
+}
+
 /**
  * Compute the gate status block. The AUTOSPRINK_PARITY gate is fail-closed: with
  * no real-evidence inventory it stays 'blocked', so submittalReady is always
@@ -227,6 +257,42 @@ export function buildSubmittal(input = {}) {
       }
       : null,
     disclaimer: SUBMITTAL_DISCLAIMER,
+  };
+}
+
+/**
+ * Structured submittal-data export for hydraulics/report callers that need a
+ * compact summary plus deterministic drawing/attachment payloads.
+ *
+ * @param {{model?:object, cadModel?:object, bid?:object, hydraulicEstimate?:object,
+ *   hydraulicBalance?:object, hydraulics?:object, compliance?:object}} input
+ * @returns {{summary: {totalSprinklers:number,totalPipeLength:number,totalCost:number},
+ *   drawings:Array, attachments:Array, disclaimer:string}}
+ */
+export function submittalData(input = {}) {
+  const model = input.model || input.cadModel;
+  if (!model || !Array.isArray(model.solids)) {
+    throw new Error('submittalData requires a CAD model with a solids array');
+  }
+
+  const solids = model.solids;
+  const headSchedule = buildHeadSchedule(solids);
+  const pipeSchedule = buildPipeSchedule(solids);
+  const billOfMaterials = buildBillOfMaterials(solids, headSchedule, pipeSchedule);
+  const hydraulics = input.hydraulicBalance || input.hydraulics || input.hydraulicEstimate || null;
+
+  return {
+    summary: summarizeModel(solids, input.bid || null),
+    drawings: [
+      { key: 'head-schedule', title: 'Head Schedule', rows: headSchedule },
+      { key: 'pipe-schedule', title: 'Pipe Schedule', rows: pipeSchedule },
+    ],
+    attachments: [
+      { key: 'hydraulic-summary', title: 'Hydraulic Summary', data: buildHydraulicSummary(hydraulics) },
+      { key: 'bill-of-materials', title: 'Bill of Materials', data: billOfMaterials },
+      { key: 'gate-status', title: 'Gate Status', data: buildGateStatus(input.compliance || null) },
+    ],
+    disclaimer: SUBMITTAL_DATA_DISCLAIMER,
   };
 }
 

@@ -18,6 +18,9 @@
  * Units: gpm (flow), inches (pipe diameter), feet (length/elevation), psi.
  */
 
+import { submittalData } from './submittal.js';
+import { balanceNetwork } from './hydraulic-network.js';
+
 /**
  * Hazen-Williams friction loss, psi per foot of pipe.
  *   p = 4.52 * Q^1.852 / (C^1.852 * d^4.8704)
@@ -227,6 +230,54 @@ export function flagSchedule(networkOrCad, hazard) {
     }
   }
   return warnings;
+}
+
+/**
+ * Stable convenience entrypoint for callers that want the existing hydraulic
+ * outputs plus a structured submittal-data export in one deterministic payload.
+ *
+ * @param {object} input
+ * @returns {{hydraulicEstimate:object, hydraulicBalance:object, scheduleWarnings:Array,
+ *   submittalData:object, hazard:string}}
+ */
+export function computeHydraulics(input = {}) {
+  const cadModel = input.cadModel || input.model || null;
+  const network = input.network || null;
+  const hazard = input.hazard || 'ordinary';
+
+  if (!cadModel && !network) {
+    throw new Error('computeHydraulics needs { model|cadModel } or { network }');
+  }
+
+  const shared = {
+    cadModel,
+    network,
+    hazard,
+    C: input.C,
+    minHeadPressurePsi: input.minHeadPressurePsi,
+  };
+
+  const hydraulicEstimate = requiredPressureAtRiser(shared);
+  const hydraulicBalance = balanceNetwork({
+    ...shared,
+    kFactor: input.kFactor,
+    sourcePsi: input.sourcePsi,
+  });
+  const scheduleWarnings = flagSchedule(cadModel || network, hazard);
+
+  return {
+    hazard,
+    hydraulicEstimate,
+    hydraulicBalance,
+    scheduleWarnings,
+    submittalData: submittalData({
+      model: cadModel,
+      bid: input.bid || null,
+      hydraulicEstimate,
+      hydraulicBalance,
+      compliance: input.compliance || null,
+    }),
+  };
 }
 
 // Re-export the full hydraulic NETWORK balance (P1) so callers can import the
