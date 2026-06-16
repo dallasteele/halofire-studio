@@ -4,7 +4,7 @@ import assert from 'node:assert/strict'
 import { hydraulicReport } from './nfpaReport.mjs'
 
 test('hydraulicReport returns the accepted rounded NFPA report shape', () => {
-  assert.deepEqual(
+  assert.deepStrictEqual(
     hydraulicReport({ demandGpm: 10, demandPsi: 20, safetyMarginPct: 10 }),
     {
       demandGpm: 10,
@@ -19,7 +19,7 @@ test('hydraulicReport returns the accepted rounded NFPA report shape', () => {
 })
 
 test('hydraulicReport rounds all derived and passthrough values to 2 decimals', () => {
-  assert.deepEqual(
+  assert.deepStrictEqual(
     hydraulicReport({
       demandGpm: 10.126,
       demandPsi: 20.555,
