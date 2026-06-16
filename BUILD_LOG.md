@@ -17,6 +17,22 @@ reference log entries by date; log entries reference commits by short hash.
 - **⚠️ incomplete / known issue** — reviewer attention needed
 - **📝 note** — rationale or architectural decision
 
+## 2026-06-15
+
+### Entry 01 — Sprinkler markup utility module
+
+- ✅ Added `packages/halofire-sprinkler/src/markup.mjs` with pure
+     `applyMarkup(costUsd, marginPct)` and `sellPrice(costUsd, marginPct)`
+     helpers using built-in JavaScript only.
+- ✅ Added `packages/halofire-sprinkler/src/markup.test.mjs` with direct
+     `node --test` assertions covering the required `100 + 20% = 120`
+     acceptance cases.
+- ⚠️ Repo-level AGENTS runtime gates were not satisfiable in this
+     environment during scope recovery: `localhost:18080` and
+     `localhost:3002` were both down, and `E:/ClaudeBot/AGENTIC_RULES.md`
+     was not mounted here. The change was kept package-local and verified
+     with the required package-level Node test gate.
+
 ---
 
 ## 2026-04-18
