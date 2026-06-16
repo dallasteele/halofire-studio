@@ -204,7 +204,7 @@ function makeWall(THREE, seg, bounds, elevationFt, heightFt, defaultThicknessFt,
   mesh.position.set((ax + bx) / 2, elevationFt + heightFt / 2, (az + bz) / 2);
   mesh.rotation.y = -Math.atan2(bz - az, bx - ax);
   mesh.name = 'plan-wall';
-  mesh.userData = { kind: 'plan-wall', needsVerification: true };
+  mesh.userData = { kind: 'plan-wall', thicknessFt, needsVerification: true };
   return mesh;
 }
 
@@ -384,7 +384,7 @@ function makeWallsFullLayer(THREE, segs, bounds, elevationFt, heightFt, mergeGeo
  *   Each entry pairs a level number + elevation (from the sheets / estimated + flagged) with its
  *   extracted LevelPlan. ALL share the same world origin (the union footprint center) so floors stack.
  * @param {Object} [opts]
- *   wallHeightFt (default 9), wallThicknessFt (0.5), slabThicknessFt (0.75), stairExtraFt (height
+ *   wallHeightFt (default 14), wallThicknessFt (0.5), slabThicknessFt (0.75), stairExtraFt (height
  *   bump for stair shafts, default 2), includeRooms (true), includeWalls (true).
  * @returns {{root, levels, setActiveLevel, setLevelVisible, bounds, summary}}
  */
@@ -394,7 +394,7 @@ export function buildBuildingFromPlans(THREE, levelPlans, opts = {}) {
     throw new Error('buildBuildingFromPlans: at least one {level, elevationFt, plan} entry is required (no plan -> no building; never fabricate)');
   }
   const {
-    wallHeightFt = 9,
+    wallHeightFt = 14,
     wallThicknessFt = 0.5,
     slabThicknessFt = 0.75,
     stairExtraFt = 2,
@@ -481,6 +481,8 @@ export function buildBuildingFromPlans(THREE, levelPlans, opts = {}) {
           const bx = seg.b[0] - bounds.cx, bz = seg.b[1] - bounds.cy;
           const len = Math.hypot(bx - ax, bz - az);
           if (!(len > 0.01)) continue;
+          const thicknessFt = Number.isFinite(seg?.thicknessFt) && seg.thicknessFt > 0 ? seg.thicknessFt : wallThicknessFt;
+          const g = new THREE.BoxGeometry(len, wallHeightFt, thicknessFt);
           const thicknessFt = Number.isFinite(seg?.thicknessFt) && seg.thicknessFt > 0 ? seg.thicknessFt : wallThicknessFt;
           const g = new THREE.BoxGeometry(len, wallHeightFt, thicknessFt);
           if (g.rotateY) g.rotateY(-Math.atan2(bz - az, bx - ax));
