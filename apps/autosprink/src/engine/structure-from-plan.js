@@ -249,6 +249,60 @@ export function parseMemberTags(textItemsFt) {
 }
 
 /**
+ * PURE. Detect real column-marker clusters from short local linework only, without synthesizing
+ * a column from grid intersections. Each returned marker is a centroid of dense short-segment
+ * midpoints and represents observed ink, not an inferred crossing.
+ *
+ * @param {Array<{x1,y1,x2,y2}>} segments
+ * @param {Object} [opts]
+ * @returns {{markers:Array<{x:number,y:number,markerSegs:number}>, note:string}}
+ */
+export function detectColumnMarkers(segments, opts = {}) {
+  const markerRadiusFt = Number.isFinite(opts.markerRadiusFt) ? opts.markerRadiusFt : 2.5;
+  const markerMaxLenFt = Number.isFinite(opts.markerMaxLenFt) ? opts.markerMaxLenFt : 3;
+  const minMarkerSegs = Number.isFinite(opts.minMarkerSegs) ? opts.minMarkerSegs : 4;
+  const note =
+    'Column markers are emitted ONLY from dense clusters of short local linework (real ink), ' +
+    'never from bare grid intersections.';
+
+  const mids = (Array.isArray(segments) ? segments : [])
+    .filter((s) => segLen(s) <= markerMaxLenFt)
+    .map((s) => ({ x: (s.x1 + s.x2) / 2, y: (s.y1 + s.y2) / 2 }))
+    .sort((a, b) => a.x - b.x || a.y - b.y);
+  if (!mids.length) return { markers: [], note };
+
+  const clusters = [];
+  for (const mid of mids) {
+    let best = null;
+    let bestDist = Infinity;
+    for (const cluster of clusters) {
+      const d = Math.hypot(mid.x - cluster.x, mid.y - cluster.y);
+      if (d <= markerRadiusFt && d < bestDist) {
+        best = cluster;
+        bestDist = d;
+      }
+    }
+    if (!best) {
+      clusters.push({ x: mid.x, y: mid.y, markerSegs: 1 });
+      continue;
+    }
+    best.x = (best.x * best.markerSegs + mid.x) / (best.markerSegs + 1);
+    best.y = (best.y * best.markerSegs + mid.y) / (best.markerSegs + 1);
+    best.markerSegs += 1;
+  }
+
+  const markers = clusters
+    .filter((cluster) => cluster.markerSegs >= minMarkerSegs)
+    .map((cluster) => ({
+      x: round(cluster.x),
+      y: round(cluster.y),
+      markerSegs: cluster.markerSegs,
+    }))
+    .sort((a, b) => a.x - b.x || a.y - b.y);
+  return { markers, note };
+}
+
+/**
  * PURE. Detect COLUMNS at grid intersections, validated by a local dense marker cluster.
  *
  * A structural column is drawn as a small filled/hatched marker (a box, I-shape, or HSS
@@ -264,56 +318,55 @@ export function parseMemberTags(textItemsFt) {
  * @returns {{columns:Array<{x,y,grid:{col,row},size:string|null,kind:string|null,markerSegs:number,confidence:string}>, note:string}}
  */
 export function detectColumns(grid, segments, members = [], opts = {}) {
-  const markerRadiusFt = Number.isFinite(opts.markerRadiusFt) ? opts.markerRadiusFt : 2.5;
-  const markerMaxLenFt = Number.isFinite(opts.markerMaxLenFt) ? opts.markerMaxLenFt : 3;
-  const minMarkerSegs = Number.isFinite(opts.minMarkerSegs) ? opts.minMarkerSegs : 4;
   const tagRadiusFt = Number.isFinite(opts.tagRadiusFt) ? opts.tagRadiusFt : 8;
   const note =
-    'Columns at grid intersections validated by a local dense marker cluster (short segments ' +
-    'within markerRadiusFt). Sized from the nearest member token (role column). Best-effort, ' +
+    'Columns come ONLY from detectColumnMarkers(real marker ink), then inherit the nearest grid ' +
+    'label and member tag when available. No grid-intersection synthesis. Best-effort, ' +
     'deterministic; NOT verified, NOT AHJ/PE/fabrication-ready.';
 
   const xs = (grid && Array.isArray(grid.xs)) ? grid.xs : [];
   const ys = (grid && Array.isArray(grid.ys)) ? grid.ys : [];
-  if (xs.length === 0 || ys.length === 0) return { columns: [], note };
-
-  // Short marker segments only (the column's own box/hatch linework, not long beams/grid lines).
-  const segs = (Array.isArray(segments) ? segments : []).filter((s) => segLen(s) <= markerMaxLenFt);
+  const cols = grid && grid.labels && Array.isArray(grid.labels.cols) ? grid.labels.cols : [];
+  const rows = grid && grid.labels && Array.isArray(grid.labels.rows) ? grid.labels.rows : [];
+  const markerRes = detectColumnMarkers(segments, opts);
   const colMembers = members.filter((m) => m.role === 'column');
   const anyMembers = members;
 
   const columns = [];
-  for (let ci = 0; ci < xs.length; ci++) {
-    for (let ri = 0; ri < ys.length; ri++) {
-      const gx = xs[ci], gy = ys[ri];
-      let n = 0;
-      for (const s of segs) {
-        const [mx, my] = segMid(s);
-        if (Math.hypot(mx - gx, my - gy) <= markerRadiusFt) n += 1;
-      }
-      if (n < minMarkerSegs) continue; // no marker linework here -> no column (no fabrication)
-      // Nearest member tag (prefer a column-role token; fall back to any member within tagRadius).
-      const pick = (pool) => {
-        let best = null, bd = Infinity;
-        for (const m of pool) {
-          const d = Math.hypot(m.xFt - gx, m.yFt - gy);
-          if (d < bd && d <= tagRadiusFt) { bd = d; best = m; }
-        }
-        return best;
-      };
-      const tag = pick(colMembers) || pick(anyMembers);
-      columns.push({
-        x: round(gx), y: round(gy),
-        grid: { col: ci < (grid.labels && grid.labels.cols || []).length ? grid.labels.cols[ci] : String(ci + 1),
-                row: ri < (grid.labels && grid.labels.rows || []).length ? grid.labels.rows[ri] : String.fromCharCode(65 + ri) },
-        size: tag ? tag.size : null,
-        kind: tag ? tag.kind : null,
-        markerSegs: n,
-        confidence: tag ? 'medium' : 'low',
-      });
+  const nearestIndex = (values, target) => {
+    let best = -1, bd = Infinity;
+    for (let i = 0; i < values.length; i++) {
+      const d = Math.abs(values[i] - target);
+      if (d < bd) { bd = d; best = i; }
     }
+    return best;
+  };
+  const pick = (x, y, pool) => {
+    let best = null, bd = Infinity;
+    for (const m of pool) {
+      const d = Math.hypot(m.xFt - x, m.yFt - y);
+      if (d < bd && d <= tagRadiusFt) { bd = d; best = m; }
+    }
+    return best;
+  };
+  for (const marker of markerRes.markers) {
+    const ci = nearestIndex(xs, marker.x);
+    const ri = nearestIndex(ys, marker.y);
+    const tag = pick(marker.x, marker.y, colMembers) || pick(marker.x, marker.y, anyMembers);
+    columns.push({
+      x: ci >= 0 ? round(xs[ci]) : marker.x,
+      y: ri >= 0 ? round(ys[ri]) : marker.y,
+      grid: {
+        col: ci >= 0 && ci < cols.length ? cols[ci] : (ci >= 0 ? String(ci + 1) : null),
+        row: ri >= 0 && ri < rows.length ? rows[ri] : (ri >= 0 ? String.fromCharCode(65 + ri) : null),
+      },
+      size: tag ? tag.size : null,
+      kind: tag ? tag.kind : null,
+      markerSegs: marker.markerSegs,
+      confidence: tag ? 'medium' : 'low',
+    });
   }
-  return { columns, note };
+  return { columns, note: `${note} ${markerRes.note}` };
 }
 
 /**

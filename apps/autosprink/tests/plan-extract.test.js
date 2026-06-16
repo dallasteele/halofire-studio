@@ -228,7 +228,10 @@ describe('buildBuildingFromPlans (stub THREE)', () => {
   const plan = {
     scaleFtPerUnit: 0.1481, scaleText: 'SCALE: 3/32" = 1\'',
     footprintFt: [[0, 0], [100, 0], [100, 50], [0, 50]],
-    walls: [{ a: [0, 0], b: [100, 0] }, { a: [50, 0], b: [50, 50] }],
+    walls: [
+      { a: [0, 0], b: [100, 0], source: 'test-wall:0' },
+      { a: [50, 0], b: [50, 50], source: 'test-wall:1' },
+    ],
     rooms: [{ poly: [[0, 0], [50, 0], [50, 50], [0, 50]], kind: 'parking', label: 'PARKING', areaSqft: 2500, confidence: 'medium' }],
     stairs: [{ poly: [[60, 10], [70, 10], [70, 20], [60, 20]], bbox: { minX: 60, minY: 10, maxX: 70, maxY: 20 }, evidence: 'label-classified-stair', confidence: 'medium' }],
     provenance: 'extracted — needs-verification',
@@ -262,7 +265,7 @@ describe('buildBuildingFromPlans (stub THREE)', () => {
       class MeshStandardMaterial {}
       return { Group, Shape, ExtrudeGeometry, BoxGeometry, Mesh, MeshStandardMaterial };
     }
-    const manyWalls = Array.from({ length: 700 }, (_, i) => ({ a: [i, 0], b: [i, 50] }));
+    const manyWalls = Array.from({ length: 700 }, (_, i) => ({ a: [i, 0], b: [i, 50], source: `test-wall:${i}` }));
     const bigPlan = { ...plan, walls: manyWalls };
     let mergeCalls = 0;
     const mergeGeometries = (geos) => { mergeCalls += 1; return { _merged: true, _count: geos.length }; };
@@ -303,7 +306,11 @@ describe('buildBuildingFromPlans (stub THREE)', () => {
   }
   const w2Plan = {
     ...plan,
-    wallsFull: [{ a: [0, 0], b: [100, 0] }, { a: [50, 0], b: [50, 50] }, { a: [10, 10], b: [40, 10] }],
+    wallsFull: [
+      { a: [0, 0], b: [100, 0], source: 'test-wallsfull:0' },
+      { a: [50, 0], b: [50, 50], source: 'test-wallsfull:1' },
+      { a: [10, 10], b: [40, 10], source: 'test-wallsfull:2' },
+    ],
     wallsFullMeta: { merged: false, count: 3, recallPct: 71, recallMeasure: { method: 'stored-vs-ink', wallInkPx: 100, coveredPx: 71 } },
     doors: [
       { kind: 'door', position: [25, 0], width: 2, swingDir: [0, 1], leafDir: [1, 0], swingAngleDeg: 90, hostWall: 7, onWall: true, evidence: 'swing-arc', confidence: 'medium' },

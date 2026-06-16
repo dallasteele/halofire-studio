@@ -22,6 +22,9 @@
 
 const SLAB_COLOR = 0x2dd4bf;
 const WALL_COLOR = 0x8b9bb4;
+const DEFAULT_STANDING_HEIGHT_FT = 14;
+const DEFAULT_WALL_THICKNESS_FT = 0.5;
+const DEFAULT_COLUMN_SIZE_FT = 1;
 const KIND_COLORS = Object.freeze({
   parking: 0x5b6b7a,
   stair: 0xff6b4a,
@@ -40,6 +43,39 @@ const KIND_COLORS = Object.freeze({
 
 function kindColor(kind) {
   return KIND_COLORS[kind] || KIND_COLORS.unknown;
+}
+
+function cleanPoint2(pt) {
+  if (!Array.isArray(pt) || pt.length < 2) return null;
+  const x = Number(pt[0]);
+  const y = Number(pt[1]);
+  if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
+  return [x, y];
+}
+
+function cleanPositive(value, fallback) {
+  const n = Number(value);
+  return n > 0 ? n : fallback;
+}
+
+function sourceInkReference(rec) {
+  if (!rec || typeof rec !== 'object') return null;
+  return rec.sourceInkRef || rec.sourceRef || rec.source || null;
+}
+
+function requireSourceInkReference(kind, rec) {
+  const ref = sourceInkReference(rec);
+  if (!ref) {
+    throw new Error(`${kind}: refusing to emit geometry without a source-ink reference (extract-or-omit)`);
+  }
+  return ref;
+}
+
+function shouldEmitFootprintSlab(plan) {
+  const method = String(plan && plan.footprintMethod || '');
+  if (!Array.isArray(plan && plan.footprintFt) || plan.footprintFt.length < 3) return false;
+  if (/bbox/i.test(method)) return false;
+  return true;
 }
 
 /**
@@ -192,6 +228,7 @@ function makeFootprintSlab(THREE, footprintFt, bounds, elevationFt, slabThicknes
 
 /** Build one extruded wall box from a plan-feet segment {a:[x,y], b:[x,y]}. */
 function makeWall(THREE, seg, bounds, elevationFt, heightFt, thicknessFt, mat) {
+  const sourceInkRef = requireSourceInkReference('makeWall', seg);
   const ax = seg.a[0] - bounds.cx, az = seg.a[1] - bounds.cy;
   const bx = seg.b[0] - bounds.cx, bz = seg.b[1] - bounds.cy;
   const len = Math.hypot(bx - ax, bz - az);
@@ -201,8 +238,70 @@ function makeWall(THREE, seg, bounds, elevationFt, heightFt, thicknessFt, mat) {
   mesh.position.set((ax + bx) / 2, elevationFt + heightFt / 2, (az + bz) / 2);
   mesh.rotation.y = -Math.atan2(bz - az, bx - ax);
   mesh.name = 'plan-wall';
-  mesh.userData = { kind: 'plan-wall', needsVerification: true };
+  mesh.userData = { kind: 'plan-wall', sourceInkRef, needsVerification: true };
   return mesh;
+}
+
+function normalizeWallSolid(seg, heightFt, thicknessFt) {
+  if (!seg || typeof seg !== 'object') return null;
+  const a = cleanPoint2(seg.a);
+  const b = cleanPoint2(seg.b);
+  if (!a || !b) return null;
+  const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
+  if (!(len > 0.01)) return null;
+  return {
+    kind: 'wall',
+    a,
+    b,
+    lengthFt: len,
+    baseZFt: 0,
+    heightFt,
+    thicknessFt: cleanPositive(seg.thicknessFt, thicknessFt),
+    sourceInkRef: requireSourceInkReference('normalizeWallSolid', seg),
+  };
+}
+
+function normalizeColumnSolid(col, heightFt, defaultSizeFt) {
+  if (!col || typeof col !== 'object') return null;
+  const center = cleanPoint2(col.position || col.centroidFt || col.center || [col.x, col.y]);
+  if (!center) return null;
+  let sizeFt = Number(col.sizeFt);
+  if (!(sizeFt > 0) && col.bbox) {
+    const w = Number(col.bbox.maxX) - Number(col.bbox.minX);
+    const d = Number(col.bbox.maxY) - Number(col.bbox.minY);
+    if (w > 0 && d > 0) sizeFt = Math.max(w, d);
+  }
+  if (!(sizeFt > 0) && Array.isArray(col.poly) && col.poly.length >= 4) {
+    const xs = col.poly.map((pt) => Number(pt[0])).filter(Number.isFinite);
+    const ys = col.poly.map((pt) => Number(pt[1])).filter(Number.isFinite);
+    if (xs.length && ys.length) sizeFt = Math.max(Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys));
+  }
+  return {
+    kind: 'column',
+    x: center[0],
+    y: center[1],
+    sizeFt: cleanPositive(sizeFt, defaultSizeFt),
+    baseZFt: 0,
+    heightFt,
+    sourceInkRef: requireSourceInkReference('normalizeColumnSolid', col),
+  };
+}
+
+export function buildBuildingSolids(levelPlan) {
+  const plan = levelPlan && levelPlan.plan ? levelPlan.plan : (levelPlan || {});
+  const wallSource = Array.isArray(plan.wallRuns) && plan.wallRuns.length
+    ? plan.wallRuns
+    : (Array.isArray(plan.walls) ? plan.walls : []);
+  const wallSolids = wallSource
+    .map((seg) => normalizeWallSolid(seg, DEFAULT_STANDING_HEIGHT_FT, DEFAULT_WALL_THICKNESS_FT))
+    .filter(Boolean);
+  const columnSolids = (Array.isArray(plan.columns) ? plan.columns : [])
+    .map((col) => normalizeColumnSolid(col, DEFAULT_STANDING_HEIGHT_FT, DEFAULT_COLUMN_SIZE_FT))
+    .filter(Boolean);
+  const roomPolys = (Array.isArray(plan.rooms) ? plan.rooms : [])
+    .map((room) => Array.isArray(room && room.poly) ? room.poly.map(cleanPoint2).filter(Boolean) : null)
+    .filter((poly) => Array.isArray(poly) && poly.length >= 3);
+  return { wallSolids, columnSolids, roomPolys };
 }
 
 /** Build a room/space floor tile (thin colored slab) for a rectilinear room polygon. */
@@ -392,7 +491,7 @@ export function buildBuildingFromPlans(THREE, levelPlans, opts = {}) {
   }
   const {
     wallHeightFt = 9,
-    wallThicknessFt = 0.5,
+    wallThicknessFt = DEFAULT_WALL_THICKNESS_FT,
     slabThicknessFt = 0.75,
     stairExtraFt = 2,
     includeRooms = true,
@@ -452,7 +551,7 @@ export function buildBuildingFromPlans(THREE, levelPlans, opts = {}) {
     let wallCount = 0, roomCount = 0, stairCount = 0;
 
     // Footprint slab.
-    if (Array.isArray(plan.footprintFt) && plan.footprintFt.length >= 3) {
+    if (shouldEmitFootprintSlab(plan)) {
       const slab = makeFootprintSlab(THREE, plan.footprintFt, bounds, elevationFt, slabThicknessFt);
       group.add(slab);
     }
@@ -469,7 +568,9 @@ export function buildBuildingFromPlans(THREE, levelPlans, opts = {}) {
       if (doMerge) {
         // Build each wall's geometry, bake its transform into the verts, merge into one.
         const geos = [];
+        const sourceInkRefs = [];
         for (const seg of validWalls) {
+          sourceInkRefs.push(requireSourceInkReference('buildBuildingFromPlans', seg));
           const ax = seg.a[0] - bounds.cx, az = seg.a[1] - bounds.cy;
           const bx = seg.b[0] - bounds.cx, bz = seg.b[1] - bounds.cy;
           const len = Math.hypot(bx - ax, bz - az);
@@ -486,7 +587,13 @@ export function buildBuildingFromPlans(THREE, levelPlans, opts = {}) {
           if (merged) {
             const mesh = new THREE.Mesh(merged, wallMat);
             mesh.name = 'plan-walls-merged';
-            mesh.userData = { kind: 'plan-wall', merged: true, wallCount: geos.length, needsVerification: true };
+            mesh.userData = {
+              kind: 'plan-wall',
+              merged: true,
+              wallCount: geos.length,
+              sourceInkRefs: [...new Set(sourceInkRefs)],
+              needsVerification: true,
+            };
             group.add(mesh);
           }
         }
