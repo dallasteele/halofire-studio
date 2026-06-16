@@ -205,6 +205,17 @@ function makeWall(THREE, seg, bounds, elevationFt, heightFt, thicknessFt, mat) {
   return mesh;
 }
 
+function makeColumn(THREE, col, bounds, elevationFt, mat) {
+  if (!THREE.BoxGeometry) return null;
+  const sizeFt = cleanPositive(col && col.sizeFt, DEFAULT_COLUMN_SIZE_FT);
+  const geo = new THREE.BoxGeometry(sizeFt, col.heightFt, sizeFt);
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.set(col.x - bounds.cx, elevationFt + col.heightFt / 2, col.y - bounds.cy);
+  mesh.name = 'plan-column';
+  mesh.userData = { kind: 'plan-column', sizeFt, needsVerification: true };
+  return mesh;
+}
+
 /** Build a room/space floor tile (thin colored slab) for a rectilinear room polygon. */
 function makeRoomTile(THREE, room, bounds, elevationFt) {
   if (!THREE.Shape || !THREE.ExtrudeGeometry) return null;
@@ -231,6 +242,84 @@ const DOOR_SUSPECT_COLOR = 0x6b7280; // SUSPECT (down-ranked) door — muted gre
 const OPENING_COLOR = 0x4ab0ff;    // cased opening / passage marker — blue
 const FIXTURE_COLOR = 0x4ad6c0;    // fixture / core marker — teal
 const WALLSFULL_COLOR = 0xc77dff;  // recovered partition-inclusive walls (recall layer) — violet
+const DEFAULT_STANDING_HEIGHT_FT = 14;
+const DEFAULT_WALL_THICKNESS_FT = 0.5;
+const DEFAULT_COLUMN_SIZE_FT = 1;
+
+function cleanPoint2(pt) {
+  if (!Array.isArray(pt) || pt.length < 2) return null;
+  const x = Number(pt[0]);
+  const y = Number(pt[1]);
+  if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
+  return [x, y];
+}
+
+function cleanPositive(value, fallback) {
+  const n = Number(value);
+  return n > 0 ? n : fallback;
+}
+
+function normalizeWallSolid(seg, heightFt, thicknessFt) {
+  if (!seg || typeof seg !== 'object') return null;
+  const a = cleanPoint2(seg.a);
+  const b = cleanPoint2(seg.b);
+  if (!a || !b) return null;
+  const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
+  if (!(len > 0.01)) return null;
+  return {
+    kind: 'wall',
+    a,
+    b,
+    lengthFt: len,
+    baseZFt: 0,
+    heightFt,
+    thicknessFt: cleanPositive(seg.thicknessFt, thicknessFt),
+    source: seg.source || null,
+  };
+}
+
+function normalizeColumnSolid(col, heightFt, defaultSizeFt) {
+  if (!col || typeof col !== 'object') return null;
+  const center = cleanPoint2(col.position || col.centroidFt || col.center || [col.x, col.y]);
+  if (!center) return null;
+  let sizeFt = Number(col.sizeFt);
+  if (!(sizeFt > 0) && col.bbox) {
+    const w = Number(col.bbox.maxX) - Number(col.bbox.minX);
+    const d = Number(col.bbox.maxY) - Number(col.bbox.minY);
+    if (w > 0 && d > 0) sizeFt = Math.max(w, d);
+  }
+  if (!(sizeFt > 0) && Array.isArray(col.poly) && col.poly.length >= 4) {
+    const xs = col.poly.map((pt) => Number(pt[0])).filter(Number.isFinite);
+    const ys = col.poly.map((pt) => Number(pt[1])).filter(Number.isFinite);
+    if (xs.length && ys.length) sizeFt = Math.max(Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys));
+  }
+  return {
+    kind: 'column',
+    x: center[0],
+    y: center[1],
+    sizeFt: cleanPositive(sizeFt, defaultSizeFt),
+    baseZFt: 0,
+    heightFt,
+    source: col.source || col.fixtureKind || null,
+  };
+}
+
+export function buildBuildingSolids(levelPlan) {
+  const plan = levelPlan && levelPlan.plan ? levelPlan.plan : (levelPlan || {});
+  const wallSource = Array.isArray(plan.wallRuns) && plan.wallRuns.length
+    ? plan.wallRuns
+    : (Array.isArray(plan.walls) ? plan.walls : []);
+  const wallSolids = wallSource
+    .map((seg) => normalizeWallSolid(seg, DEFAULT_STANDING_HEIGHT_FT, DEFAULT_WALL_THICKNESS_FT))
+    .filter(Boolean);
+  const columnSolids = (Array.isArray(plan.columns) ? plan.columns : [])
+    .map((col) => normalizeColumnSolid(col, DEFAULT_STANDING_HEIGHT_FT, DEFAULT_COLUMN_SIZE_FT))
+    .filter(Boolean);
+  const roomPolys = (Array.isArray(plan.rooms) ? plan.rooms : [])
+    .map((room) => Array.isArray(room && room.poly) ? room.poly.map(cleanPoint2).filter(Boolean) : null)
+    .filter((poly) => Array.isArray(poly) && poly.length >= 3);
+  return { wallSolids, columnSolids, roomPolys };
+}
 
 /**
  * Build a single DOOR as a thin leaf box + a swing-arc line, parented in one group so
@@ -391,8 +480,8 @@ export function buildBuildingFromPlans(THREE, levelPlans, opts = {}) {
     throw new Error('buildBuildingFromPlans: at least one {level, elevationFt, plan} entry is required (no plan -> no building; never fabricate)');
   }
   const {
-    wallHeightFt = 9,
-    wallThicknessFt = 0.5,
+    wallHeightFt = DEFAULT_STANDING_HEIGHT_FT,
+    wallThicknessFt = DEFAULT_WALL_THICKNESS_FT,
     slabThicknessFt = 0.75,
     stairExtraFt = 2,
     includeRooms = true,
@@ -449,7 +538,8 @@ export function buildBuildingFromPlans(THREE, levelPlans, opts = {}) {
       needsVerification: true,
     };
 
-    let wallCount = 0, roomCount = 0, stairCount = 0;
+    let wallCount = 0, columnCount = 0, roomCount = 0, stairCount = 0;
+    const solids = buildBuildingSolids(plan);
 
     // Footprint slab.
     if (Array.isArray(plan.footprintFt) && plan.footprintFt.length >= 3) {
@@ -461,10 +551,13 @@ export function buildBuildingFromPlans(THREE, levelPlans, opts = {}) {
     // excluded — a plausible count of REAL walls) over the thousands of fragmented `walls`
     // segments. Each run extrudes as one continuous wall box. Falls back to `walls` only if no
     // runs were computed (older data). The fragmented `walls` set is no longer the headline.
-    const wallSource = (Array.isArray(plan.wallRuns) && plan.wallRuns.length) ? plan.wallRuns : plan.walls;
     const usingRuns = (Array.isArray(plan.wallRuns) && plan.wallRuns.length) ? true : false;
-    if (includeWalls && wallMat && THREE.BoxGeometry && Array.isArray(wallSource)) {
-      const validWalls = wallSource.filter((seg) => seg && Array.isArray(seg.a) && Array.isArray(seg.b));
+    if (includeWalls && wallMat && THREE.BoxGeometry && solids.wallSolids.length) {
+      const validWalls = solids.wallSolids.map((wall) => ({
+        a: wall.a,
+        b: wall.b,
+        thicknessFt: wall.thicknessFt,
+      }));
       const doMerge = typeof mergeGeometries === 'function' && validWalls.length >= wallMergeThreshold;
       if (doMerge) {
         // Build each wall's geometry, bake its transform into the verts, merge into one.
@@ -474,7 +567,7 @@ export function buildBuildingFromPlans(THREE, levelPlans, opts = {}) {
           const bx = seg.b[0] - bounds.cx, bz = seg.b[1] - bounds.cy;
           const len = Math.hypot(bx - ax, bz - az);
           if (!(len > 0.01)) continue;
-          const g = new THREE.BoxGeometry(len, wallHeightFt, wallThicknessFt);
+          const g = new THREE.BoxGeometry(len, wallHeightFt, cleanPositive(seg.thicknessFt, wallThicknessFt));
           if (g.rotateY) g.rotateY(-Math.atan2(bz - az, bx - ax));
           if (g.translate) g.translate((ax + bx) / 2, elevationFt + wallHeightFt / 2, (az + bz) / 2);
           geos.push(g);
@@ -492,9 +585,16 @@ export function buildBuildingFromPlans(THREE, levelPlans, opts = {}) {
         }
       } else {
         for (const seg of validWalls) {
-          const m = makeWall(THREE, seg, bounds, elevationFt, wallHeightFt, wallThicknessFt, wallMat);
+          const m = makeWall(THREE, seg, bounds, elevationFt, wallHeightFt, cleanPositive(seg.thicknessFt, wallThicknessFt), wallMat);
           if (m) { group.add(m); wallCount += 1; }
         }
+      }
+    }
+
+    if (wallMat && THREE.BoxGeometry && solids.columnSolids.length) {
+      for (const col of solids.columnSolids) {
+        const m = makeColumn(THREE, col, bounds, elevationFt, wallMat);
+        if (m) { group.add(m); columnCount += 1; }
       }
     }
 
@@ -586,7 +686,7 @@ export function buildBuildingFromPlans(THREE, levelPlans, opts = {}) {
       elevationFt,
       group,
       counts: {
-        walls: wallCount, rooms: roomCount, stairs: stairCount,
+        walls: wallCount, columns: columnCount, rooms: roomCount, stairs: stairCount,
         doors: doorCount, openings: openingCount, fixtures: fixtureCount,
         wallsFull: wallsFullCount,
         // RECORE: the honest primary wall count is the merged wall RUNS (when present).

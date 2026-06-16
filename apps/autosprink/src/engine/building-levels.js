@@ -168,7 +168,7 @@ export function buildBuildingLevels(THREE, manifest, opts = {}) {
    * in FEET in the level's plan space (origin = footprint center). Everything
    * is flagged needs-verification; this is massing, not a verified model.
    */
-  function addWallSolids(level, segments, { defaultHeightFt = 9, defaultThicknessFt = 0.5 } = {}) {
+  function addWallSolids(level, segments, { defaultHeightFt = 14, defaultThicknessFt = 0.5 } = {}) {
     const l = levelEntry(level);
     if (!l || !Array.isArray(segments)) return [];
     const meshes = [];
@@ -196,5 +196,29 @@ export function buildBuildingLevels(THREE, manifest, opts = {}) {
     return meshes;
   }
 
-  return { root, levels, setActiveLevel, setLevelVisible, setDisciplineVisible, loadUnderlays, addWallSolids };
+  function addColumnSolids(level, columns, { defaultHeightFt = 14, defaultSizeFt = 1 } = {}) {
+    const l = levelEntry(level);
+    if (!l || !Array.isArray(columns)) return [];
+    const meshes = [];
+    const mat = new THREE.MeshStandardMaterial
+      ? new THREE.MeshStandardMaterial({ color: WALL_COLOR, transparent: true, opacity: 0.45, metalness: 0, roughness: 0.9 })
+      : new THREE.MeshBasicMaterial({ color: WALL_COLOR, transparent: true, opacity: 0.45 });
+    for (const col of columns) {
+      const x = Number(col.x);
+      const z = Number(col.y);
+      if (![x, z].every(Number.isFinite)) continue;
+      const h = Number(col.heightFt) > 0 ? Number(col.heightFt) : defaultHeightFt;
+      const sizeFt = Number(col.sizeFt) > 0 ? Number(col.sizeFt) : defaultSizeFt;
+      const geo = new THREE.BoxGeometry(sizeFt, h, sizeFt);
+      const mesh = new THREE.Mesh(geo, mat);
+      mesh.position.set(x, l.elevationFt + h / 2, z);
+      mesh.name = `column-extrusion:L${l.level}`;
+      mesh.userData = { kind: 'column-extrusion-best-effort', needsVerification: true, level: l.level };
+      l.group.add(mesh);
+      meshes.push(mesh);
+    }
+    return meshes;
+  }
+
+  return { root, levels, setActiveLevel, setLevelVisible, setDisciplineVisible, loadUnderlays, addWallSolids, addColumnSolids };
 }
