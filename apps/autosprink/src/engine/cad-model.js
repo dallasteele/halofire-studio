@@ -252,7 +252,7 @@ function isBuilding(input) {
 function buildWallSolid(wall, ceiling, name) {
   const { a, b } = wall;
   const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
-  return {
+  const out = {
     kind: 'wall', name,
     layer: wall.type === 'interior' ? 'WALLS-INT' : 'WALLS',
     type: wall.type === 'interior' ? 'interior' : 'exterior',
@@ -269,15 +269,19 @@ function buildWallSolid(wall, ceiling, name) {
       type: op.type === 'window' ? 'window' : 'door',
     })),
   };
+  if (wall.inkRef) out.inkRef = wall.inkRef;
+  return out;
 }
 
 /** Column solid: a vertical square post at (x,y), sizeFt across, full ceiling height. */
 function buildColumnSolid(col, ceiling, name) {
-  return {
+  const out = {
     kind: 'column', name, layer: 'COLUMNS',
     x: round(col.x), y: round(col.y), sizeFt: round(col.sizeFt ?? 1),
     heightFt: ceiling, baseZ: 0,
   };
+  if (col.inkRef) out.inkRef = col.inkRef;
+  return out;
 }
 
 /**

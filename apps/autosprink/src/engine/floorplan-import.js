@@ -400,6 +400,9 @@ function attachOpeningToNearestWall(walls, mid, widthFt, type, heightFt) {
  *  - openings:<line data-opening ...> with data-opening-type="door"|"window";
  *             attached to the nearest wall. width = segment length.
  *  - columns: <circle data-column cx cy r> (sizeFt = 2*r)
+ *  - source ink refs: every emitted wall/column carries an inkRef tied to the
+ *             originating SVG element segment, and the story records the valid
+ *             sourceInkRefs set so normalization can reject drifted elements.
  * Coordinates scaled px->ft via opts.unitsPerPx. opts.layers is accepted for
  * API symmetry with DXF but SVG keys off data-* attrs. NOT CAD recognition AI.
  * @param {string} svgText
@@ -414,6 +417,9 @@ export function buildingFromSvg(svgText, opts = {}) {
   const spaces = [];
   const walls = [];
   const columns = [];
+  const sourceInkRefs = [];
+  let wallInkIndex = 0;
+  let columnInkIndex = 0;
 
   // Spaces: <polygon data-space>
   let m;
@@ -436,7 +442,9 @@ export function buildingFromSvg(svgText, opts = {}) {
 
   const pushWall = (a, b, type) => {
     if (Math.hypot(b[0] - a[0], b[1] - a[1]) < 1e-9) return;
-    walls.push({ a, b, thicknessFt: 0.5, type, openings: [] });
+    const inkRef = `svg:wall:${wallInkIndex++}`;
+    walls.push({ a, b, thicknessFt: 0.5, type, openings: [], inkRef });
+    sourceInkRefs.push(inkRef);
   };
 
   for (const t of wallTags) {
@@ -476,7 +484,9 @@ export function buildingFromSvg(svgText, opts = {}) {
     const cy = Number(attr(t, 'cy'));
     const r = Number(attr(t, 'r')) || 0.5;
     if (!Number.isFinite(cx) || !Number.isFinite(cy)) continue;
-    columns.push({ x: sc(cx), y: sc(cy), sizeFt: round(2 * r * unitsPerPx) });
+    const inkRef = `svg:column:${columnInkIndex++}`;
+    columns.push({ x: sc(cx), y: sc(cy), sizeFt: round(2 * r * unitsPerPx), inkRef });
+    sourceInkRefs.push(inkRef);
   }
 
   if (!spaces.length && !walls.length) {
@@ -490,6 +500,8 @@ export function buildingFromSvg(svgText, opts = {}) {
     spaces,
     walls,
     columns,
+    sourceInkRefs,
+    requireSourceInkRefs: true,
   };
   return normalizeBuilding({ name: opts.name || 'Imported SVG Building', units: 'ft', stories: [story] });
 }
@@ -521,6 +533,9 @@ function lineEntity(ent) {
  *             type from layer (exterior vs interior groups) else interior
  *  - openings:LINE on a DOOR/WINDOW layer -> attached to the nearest wall
  *  - columns: CIRCLE (or POINT) on a COLUMN layer
+ *  - source ink refs: every emitted wall/column carries an inkRef tied to the
+ *             originating DXF entity/segment, and the story records the valid
+ *             sourceInkRefs set so normalization can reject drifted elements.
  * opts.unitsPerDrawingUnit scales to feet. NOT CAD object-recognition AI —
  * only the documented layer/attr conventions are honored. Deterministic.
  * @param {string} dxfText
@@ -538,6 +553,9 @@ export function buildingFromDxf(dxfText, opts = {}) {
   const walls = [];
   const columns = [];
   const openings = []; // {mid, widthFt, type, heightFt}
+  const sourceInkRefs = [];
+  let wallInkIndex = 0;
+  let columnInkIndex = 0;
 
   const wallTypeFor = (layer) => {
     if (inGroup(layer, groups.wallsExterior)) return 'exterior';
@@ -549,7 +567,9 @@ export function buildingFromDxf(dxfText, opts = {}) {
 
   const pushWall = (a, b, type) => {
     if (Math.hypot(b[0] - a[0], b[1] - a[1]) < 1e-9) return;
-    walls.push({ a, b, thicknessFt: 0.5, type, openings: [] });
+    const inkRef = `dxf:wall:${wallInkIndex++}`;
+    walls.push({ a, b, thicknessFt: 0.5, type, openings: [], inkRef });
+    sourceInkRefs.push(inkRef);
   };
 
   for (const ent of entities) {
@@ -583,7 +603,9 @@ export function buildingFromDxf(dxfText, opts = {}) {
       if (!inGroup(layer, groups.columns)) continue;
       const c = circleEntity(ent);
       if (!c) continue;
-      columns.push({ x: sc(c.x), y: sc(c.y), sizeFt: round(2 * (c.r || 0.5) * scaleFactor) });
+      const inkRef = `dxf:column:${columnInkIndex++}`;
+      columns.push({ x: sc(c.x), y: sc(c.y), sizeFt: round(2 * (c.r || 0.5) * scaleFactor), inkRef });
+      sourceInkRefs.push(inkRef);
     }
   }
 
@@ -603,6 +625,8 @@ export function buildingFromDxf(dxfText, opts = {}) {
     spaces,
     walls,
     columns,
+    sourceInkRefs,
+    requireSourceInkRefs: true,
   };
   return normalizeBuilding({ name: opts.name || 'Imported DXF Building', units: 'ft', stories: [story] });
 }

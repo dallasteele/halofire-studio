@@ -13,8 +13,11 @@
  *       level:int, baseElevationFt:number, ceilingHeightFt:number,
  *       spaces: [{ name, polygon:[[x,y],...], hazard }],
  *       walls:  [{ a:[x,y], b:[x,y], thicknessFt, type:'exterior'|'interior',
- *                  openings:[{offsetFt, widthFt, heightFt, sill?:number, type:'door'|'window'}] }],
- *       columns:[{ x, y, sizeFt }],
+ *                  openings:[{offsetFt, widthFt, heightFt, sill?:number, type:'door'|'window'}],
+ *                  inkRef?:string }],
+ *       columns:[{ x, y, sizeFt, inkRef?:string }],
+ *       sourceInkRefs?: string[],
+ *       requireSourceInkRefs?: boolean,
  *     }],
  *   }
  *
@@ -64,6 +67,16 @@ function wallLength(a, b) {
   return Math.hypot(b[0] - a[0], b[1] - a[1]);
 }
 
+function cleanInkRef(inkRef, opts = {}) {
+  const text = typeof inkRef === 'string' ? inkRef.trim() : '';
+  if (!opts.requireSourceInkRefs) return text || null;
+  if (!text) return null;
+  if (opts.validInkRefs instanceof Set && opts.validInkRefs.size > 0 && !opts.validInkRefs.has(text)) {
+    return null;
+  }
+  return text;
+}
+
 /** Clean a single opening against its host wall length; returns null if unusable. */
 function cleanOpening(op, len) {
   if (!op || typeof op !== 'object') return null;
@@ -88,7 +101,7 @@ function cleanOpening(op, len) {
 }
 
 /** Clean a wall; returns null if zero-length or malformed. */
-function cleanWall(wall) {
+function cleanWall(wall, opts = {}) {
   if (!wall || typeof wall !== 'object') return null;
   const a = cleanVertex(wall.a);
   const b = cleanVertex(wall.b);
@@ -102,7 +115,11 @@ function cleanWall(wall) {
   const openings = Array.isArray(wall.openings)
     ? wall.openings.map((o) => cleanOpening(o, len)).filter(Boolean)
     : [];
-  return { a, b, thicknessFt: round(thicknessFt), type, openings };
+  const inkRef = cleanInkRef(wall.inkRef, opts);
+  if (opts.requireSourceInkRefs && !inkRef) return null;
+  const out = { a, b, thicknessFt: round(thicknessFt), type, openings };
+  if (inkRef) out.inkRef = inkRef;
+  return out;
 }
 
 /** Clean a space polygon; returns null if degenerate (<3 verts). */
@@ -119,13 +136,17 @@ function cleanSpace(space, index) {
   };
 }
 
-function cleanColumn(col) {
+function cleanColumn(col, opts = {}) {
   if (!col || typeof col !== 'object') return null;
   const x = Number(col.x);
   const y = Number(col.y);
   if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
   const sizeFt = Number.isFinite(Number(col.sizeFt)) && Number(col.sizeFt) > 0 ? Number(col.sizeFt) : 1;
-  return { x, y, sizeFt: round(sizeFt) };
+  const inkRef = cleanInkRef(col.inkRef, opts);
+  if (opts.requireSourceInkRefs && !inkRef) return null;
+  const out = { x, y, sizeFt: round(sizeFt) };
+  if (inkRef) out.inkRef = inkRef;
+  return out;
 }
 
 function cleanStory(story, index) {
@@ -139,13 +160,23 @@ function cleanStory(story, index) {
   const spaces = (Array.isArray(story.spaces) ? story.spaces : [])
     .map((sp, i) => cleanSpace(sp, i))
     .filter(Boolean);
+  const sourceInkRefs = Array.isArray(story.sourceInkRefs)
+    ? story.sourceInkRefs
+      .map((ref) => (typeof ref === 'string' ? ref.trim() : ''))
+      .filter(Boolean)
+    : [];
+  const requireSourceInkRefs = story.requireSourceInkRefs === true;
+  const inkOpts = { requireSourceInkRefs, validInkRefs: new Set(sourceInkRefs) };
   const walls = (Array.isArray(story.walls) ? story.walls : [])
-    .map(cleanWall)
+    .map((wall) => cleanWall(wall, inkOpts))
     .filter(Boolean);
   const columns = (Array.isArray(story.columns) ? story.columns : [])
-    .map(cleanColumn)
+    .map((col) => cleanColumn(col, inkOpts))
     .filter(Boolean);
-  return { level, baseElevationFt, ceilingHeightFt, spaces, walls, columns };
+  const out = { level, baseElevationFt, ceilingHeightFt, spaces, walls, columns };
+  if (sourceInkRefs.length) out.sourceInkRefs = sourceInkRefs;
+  if (requireSourceInkRefs) out.requireSourceInkRefs = true;
+  return out;
 }
 
 /**
