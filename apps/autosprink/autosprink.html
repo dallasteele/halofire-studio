@@ -621,10 +621,12 @@ select option,select optgroup{background:#12141a;color:#f5f5f5}
     </div>
     <div class="insp-panel" data-panel="submittal">
       <h3>Auto Bid</h3>
+      <div id="bidTotal"><span class="muted" style="font-size:12px">—</span></div>
       <div id="bid"></div>
       <div id="bom"></div>
       <div class="warn" id="warn"></div>
       <h3>Submittal</h3>
+      <div id="submittalData"><span class="muted" style="font-size:12px">Generate a layout to build the submittal package.</span></div>
       <button id="submitBtn" disabled style="width:100%;margin-bottom:4px">Download submittal (.json)</button>
       <div class="muted" style="font-size:10px">Best-effort internal-alpha package — NOT a stamped/sealed submittal, NOT AHJ/PE approved, NOT permit-ready.</div>
     </div>
@@ -723,6 +725,7 @@ import { solveNetwork, solveWithUpsizing, buildGraph } from '/src/engine/network
 // transform of the solve result into a printable summary + node-analysis +
 // pipe-data report (header carries the NOT-stamped engineering-aid disclaimer).
 import { buildHydraulicReport, renderReportHtml } from '/src/engine/nfpa-report.js';
+import { getSubmittalData, getBidTotal } from '/src/engine/ui-panels.js';
 // HF-PHASE3-HARDY-CROSS: REAL Hardy-Cross loop/grid balance. Identifies the
 // independent loops of the network (cyclomatic μ = E−N+components) and, for a
 // looped/gridded system, iterates each loop to Σh_f→0 (continuity ΣQ=0 held by
@@ -3511,6 +3514,11 @@ async function generate() {
 async function applyGenerated(data) {
   lastAppliedData = data; // HF-MENUBAR: File > Save re-persists the current layout
   const { bid, cadModel, hydraulics, hydraulicNetwork, compliance, fullScopeBid, isBuilding, floorPlan } = data;
+  const submittalData = getSubmittalData({
+    ...data,
+    projectName: currentProjectName(),
+  });
+  const bidTotal = getBidTotal({ ...data, submittalData });
   // R6: preload the part meshes for the distinct component keys in this model
   // (riser_assembly/valve_alarm_check/fdc/fitting_tee) so renderModel can
   // instance them synchronously; missing parts fall back to a marked primitive.
@@ -3640,6 +3648,18 @@ async function applyGenerated(data) {
     }
     $('warn').textContent = (bid.pricing.anyEstimated ? '⚠ some unit costs are fallback estimates. ' : '')
       + cadModel.disclaimer;
+    $('bidTotal').innerHTML = bidTotal
+      ? `<div class="kv"><span>${bidTotal.label}</span><b>${usd(bidTotal.amount)}</b></div>`
+        + `<div class="muted" style="font-size:10px">${bidTotal.source === 'full_scope_bid' ? 'full-scope estimate from the engine adapter' : 'priced bid total from the engine adapter'}${bidTotal.estimated ? ' · estimate only' : ''}</div>`
+      : '<span class="muted" style="font-size:12px">Bid total unavailable.</span>';
+    $('submittalData').innerHTML = submittalData
+      ? `<div class="kv"><span>Project</span><b>${submittalData.header.project || 'Project'}</b></div>`
+        + `<div class="kv"><span>Heads scheduled</span><b>${submittalData.headSchedule.reduce((sum, row) => sum + (row.count || 0), 0)}</b></div>`
+        + `<div class="kv"><span>Pipe schedule rows</span><b>${submittalData.pipeSchedule.length}</b></div>`
+        + `<div class="kv"><span>Hydraulic summary</span><b>${submittalData.hydraulicSummary ? 'present' : 'unavailable'}</b></div>`
+        + `<div class="kv"><span>Blocked gates</span><b>${submittalData.gateStatus.blockedGates.length}</b></div>`
+        + `<div class="muted" style="font-size:10px">${submittalData.disclaimer}</div>`
+      : '<span class="muted" style="font-size:12px">Submittal data unavailable.</span>';
     ['dxfBtn','stepBtn','ifcBtn','stlBtn'].forEach((id) => { $(id).disabled = false; });
     const headsNote = headPartGeo
       ? `heads: ${partsSource} CAD part${partsSource === 'catalog' ? '' : ' (best-effort, not mfg-exact)'}`
@@ -3710,7 +3730,9 @@ async function autoLoadOrUnderlay() {
       if (lastPlanBbox) frameCamera(lastPlanBbox.minX, lastPlanBbox.maxX, lastPlanBbox.minY, lastPlanBbox.maxY, 14);
       $('layout').innerHTML = '<span class="muted" style="font-size:12px">No saved layout for this project + source yet — Generate to begin.</span>';
       ['pipes', 'hydraulics', 'compliance'].forEach((id) => { $(id).innerHTML = '<span class="muted" style="font-size:12px">—</span>'; });
+      $('bidTotal').innerHTML = '<span class="muted" style="font-size:12px">—</span>';
       $('bid').innerHTML = ''; $('bom').innerHTML = ''; $('warn').textContent = '';
+      $('submittalData').innerHTML = '<span class="muted" style="font-size:12px">Generate a layout to build the submittal package.</span>';
       $('status').textContent = 'floor-plan underlay · Generate Layout to build the sprinkler system';
     }
   } finally { autoLoading = false; }
