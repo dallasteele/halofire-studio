@@ -1294,3 +1294,21 @@ User direction across 4 messages this session:
 - Next blocker: obtain a real source-backed family with verified
   dimensions and an approved source/license path before the next
   promotion attempt.
+
+### Entry 38 - Sprinkler price sheet normalizer recovery
+
+- Added `packages/halofire-sprinkler/src/priceNormalize.mjs` with a
+  built-in-JS `normalizePriceSheet(rows)` helper that coerces `sku`,
+  `desc`, and `unit` to strings, defaults missing units to `EA`,
+  normalizes common "each" variants to `EA`, and parses `price` /
+  `priceUsd` into numeric `priceUsd` with invalid values falling back
+  to `0`.
+- Added `packages/halofire-sprinkler/src/priceNormalize.test.mjs`
+  covering the handoff acceptance example plus defaulting and price
+  parsing edge cases.
+- Verification target for this slice: `node --test
+  packages/halofire-sprinkler/src/priceNormalize.test.mjs`.
+- Workspace-wide AGENTS gates remain blocked in this environment
+  baseline: `localhost:18080` and `localhost:3002` are down, and the
+  Windows-specific pytest path from repo `AGENTS.md` is unavailable in
+  this Linux worktree.
