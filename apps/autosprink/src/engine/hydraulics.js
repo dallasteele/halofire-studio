@@ -1,3 +1,6 @@
+import { bidRisk } from './bidRisk.js';
+import { bidTotal } from './bidTotal.js';
+
 /**
  * HaloFire NFPA-13 hydraulic calculation engine (internal alpha, best-effort).
  *
@@ -229,11 +232,38 @@ export function flagSchedule(networkOrCad, hazard) {
   return warnings;
 }
 
+/**
+ * Compatibility wrapper that keeps the hydraulic estimate intact while allowing
+ * adjacent autobid stages to attach BOM-driven pricing outputs.
+ *
+ * @param {{cadModel?:object, network?:object, hazard?:string, C?:number,
+ *   minHeadPressurePsi?:number, bomResult?:object, project?:object,
+ *   projectContext?:object}} arg
+ * @returns {object}
+ */
+export function computeHydraulics(arg = {}) {
+  const hydraulicResult = requiredPressureAtRiser(arg);
+  const warnings = flagSchedule(arg, arg.hazard);
+  const bomResult = arg.bomResult || null;
+  const projectContext = arg.projectContext || arg.project || {};
+  const risk = bidRisk(projectContext);
+  const bidResult = bidTotal(bomResult || {}, risk.riskFactor);
+
+  return {
+    ...hydraulicResult,
+    warnings,
+    bomResult,
+    bidResult,
+  };
+}
+
 // Re-export the full hydraulic NETWORK balance (P1) so callers can import the
 // K-factor head discharge + node-by-node balance from the same hydraulics entry
 // point as the T2 single-path estimate. The network module is the source of
 // truth; this is a convenience re-export and keeps the T2 API above untouched.
 export { kFactorFlow, balanceNetwork } from './hydraulic-network.js';
+export { bidRisk } from './bidRisk.js';
+export { bidTotal } from './bidTotal.js';
 
 function num(v, fallback = 0) {
   const n = Number(v);
