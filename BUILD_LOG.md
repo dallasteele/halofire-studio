@@ -17,6 +17,22 @@ reference log entries by date; log entries reference commits by short hash.
 - **⚠️ incomplete / known issue** — reviewer attention needed
 - **📝 note** — rationale or architectural decision
 
+## 2026-06-15
+
+### Entry 10 — @halofire/sprinkler markup helper + direct node test
+
+- ✅ Added `packages/halofire-sprinkler/src/markup.mjs` with pure
+     `applyMarkup(costUsd, marginPct)` and `sellPrice(costUsd, marginPct)`
+     helpers using percentage markup math.
+- ✅ Added `packages/halofire-sprinkler/src/markup.test.mjs` with direct
+     `node:test` coverage for the requested happy paths plus negative and
+     zero-margin behavior.
+- ✅ Verified with `node --test packages/halofire-sprinkler/src/markup.test.mjs`.
+- ⚠️ Repo-wide AGENTS preflight remains blocked in this runner:
+     `localhost:18080` and `localhost:3002` were down before the change,
+     and `python3 -m pytest` is unavailable because `pytest` is not
+     installed in the current environment.
+
 ---
 
 ## 2026-04-18
