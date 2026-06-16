@@ -24,9 +24,9 @@
  *     1/8" = 1'-0" and carry per-location MEMBER tags: HSS steel columns (HSS8X4X5/16,
  *     HSS4x4x1/4, HSS5x5x1/2) and wood/engineered beams (6x12, 2x8, (1)1 3/4x11 7/8 LVL, GLB).
  *   So this is a concrete-podium + wood/steel-framed building. The honest structural model:
- *     COLUMNS sit at GRID INTERSECTIONS (validated by a local dense marker cluster), sized
- *     from the nearest member token; BEAMS/JOISTS are the long member lines spanning between
- *     grid lines, sized from the nearest beam token.
+ *     COLUMNS come from the sheet's own marker linework, then inherit the nearest grid datum
+ *     labels only when a real marker sits near that datum; BEAMS/JOISTS are the long member
+ *     lines spanning between grid lines, sized from the nearest beam token.
  *
  * HONESTY (hard, fail-closed):
  *   - Scale is DERIVED FROM THE STRUCTURAL SHEET's printed notation. If none is readable AND
@@ -249,12 +249,12 @@ export function parseMemberTags(textItemsFt) {
 }
 
 /**
- * PURE. Detect COLUMNS at grid intersections, validated by a local dense marker cluster.
+ * PURE. Detect real structural COLUMN markers from local dense short-segment clusters.
  *
  * A structural column is drawn as a small filled/hatched marker (a box, I-shape, or HSS
- * rectangle) sitting ON a grid intersection. We DON'T fabricate a column at every crossing —
- * we require geometric EVIDENCE: a cluster of short segments within markerRadiusFt of the
- * intersection (the column marker's own linework). Each validated column is sized from the
+ * rectangle). We detect those clusters first from the sheet's own short linework and only then
+ * attach the nearest grid labels when a marker lands near a real datum. This avoids fabricating
+ * columns by enumerating every structural grid crossing. Each validated column is sized from the
  * nearest member token (role 'column' preferred), else left size:null.
  *
  * @param {{xs:number[], ys:number[]}} grid - structural grid datums in FEET.
@@ -263,56 +263,92 @@ export function parseMemberTags(textItemsFt) {
  * @param {Object} [opts]
  * @returns {{columns:Array<{x,y,grid:{col,row},size:string|null,kind:string|null,markerSegs:number,confidence:string}>, note:string}}
  */
-export function detectColumns(grid, segments, members = [], opts = {}) {
+export function detectColumnMarkers(grid, segments, members = [], opts = {}) {
   const markerRadiusFt = Number.isFinite(opts.markerRadiusFt) ? opts.markerRadiusFt : 2.5;
   const markerMaxLenFt = Number.isFinite(opts.markerMaxLenFt) ? opts.markerMaxLenFt : 3;
   const minMarkerSegs = Number.isFinite(opts.minMarkerSegs) ? opts.minMarkerSegs : 4;
   const tagRadiusFt = Number.isFinite(opts.tagRadiusFt) ? opts.tagRadiusFt : 8;
+  const snapRadiusFt = Number.isFinite(opts.snapRadiusFt) ? opts.snapRadiusFt : markerRadiusFt;
   const note =
-    'Columns at grid intersections validated by a local dense marker cluster (short segments ' +
-    'within markerRadiusFt). Sized from the nearest member token (role column). Best-effort, ' +
-    'deterministic; NOT verified, NOT AHJ/PE/fabrication-ready.';
+    'Columns come only from real dense marker clusters (short segments within markerRadiusFt), ' +
+    'then inherit nearby grid labels when available. Sized from the nearest member token ' +
+    '(role column). Best-effort, deterministic; NOT verified, NOT AHJ/PE/fabrication-ready.';
 
   const xs = (grid && Array.isArray(grid.xs)) ? grid.xs : [];
   const ys = (grid && Array.isArray(grid.ys)) ? grid.ys : [];
-  if (xs.length === 0 || ys.length === 0) return { columns: [], note };
+  const colLabels = (grid && grid.labels && Array.isArray(grid.labels.cols)) ? grid.labels.cols : [];
+  const rowLabels = (grid && grid.labels && Array.isArray(grid.labels.rows)) ? grid.labels.rows : [];
 
-  // Short marker segments only (the column's own box/hatch linework, not long beams/grid lines).
+  // Short marker segments only (the column's own box/hatch linework, not long beams or datum lines).
   const segs = (Array.isArray(segments) ? segments : []).filter((s) => segLen(s) <= markerMaxLenFt);
+  if (!segs.length) return { columns: [], note };
   const colMembers = members.filter((m) => m.role === 'column');
   const anyMembers = members;
 
-  const columns = [];
-  for (let ci = 0; ci < xs.length; ci++) {
-    for (let ri = 0; ri < ys.length; ri++) {
-      const gx = xs[ci], gy = ys[ri];
-      let n = 0;
-      for (const s of segs) {
-        const [mx, my] = segMid(s);
-        if (Math.hypot(mx - gx, my - gy) <= markerRadiusFt) n += 1;
+  const markers = [];
+  for (const s of segs) {
+    const [mx, my] = segMid(s);
+    let best = null;
+    let bestDist = Infinity;
+    for (const marker of markers) {
+      const d = Math.hypot(marker.x - mx, marker.y - my);
+      if (d <= markerRadiusFt && d < bestDist) {
+        best = marker;
+        bestDist = d;
       }
-      if (n < minMarkerSegs) continue; // no marker linework here -> no column (no fabrication)
-      // Nearest member tag (prefer a column-role token; fall back to any member within tagRadius).
-      const pick = (pool) => {
-        let best = null, bd = Infinity;
-        for (const m of pool) {
-          const d = Math.hypot(m.xFt - gx, m.yFt - gy);
-          if (d < bd && d <= tagRadiusFt) { bd = d; best = m; }
-        }
-        return best;
-      };
-      const tag = pick(colMembers) || pick(anyMembers);
-      columns.push({
-        x: round(gx), y: round(gy),
-        grid: { col: ci < (grid.labels && grid.labels.cols || []).length ? grid.labels.cols[ci] : String(ci + 1),
-                row: ri < (grid.labels && grid.labels.rows || []).length ? grid.labels.rows[ri] : String.fromCharCode(65 + ri) },
-        size: tag ? tag.size : null,
-        kind: tag ? tag.kind : null,
-        markerSegs: n,
-        confidence: tag ? 'medium' : 'low',
-      });
     }
+    if (best) {
+      best.points.push([mx, my]);
+      best.segCount += 1;
+      continue;
+    }
+    markers.push({ x: mx, y: my, points: [[mx, my]], segCount: 1 });
   }
+
+  const columns = [];
+  const nearestDatum = (coord, datums, labels, fallbackFactory) => {
+    let bestIdx = -1;
+    let bestDist = Infinity;
+    for (let i = 0; i < datums.length; i++) {
+      const d = Math.abs(datums[i] - coord);
+      if (d < bestDist) { bestDist = d; bestIdx = i; }
+    }
+    if (bestIdx < 0 || bestDist > snapRadiusFt) return { coord, label: fallbackFactory(coord), snapped: false };
+    return {
+      coord: datums[bestIdx],
+      label: labels[bestIdx] || fallbackFactory(datums[bestIdx]),
+      snapped: true,
+    };
+  };
+  const pick = (x, y, pool) => {
+    let best = null;
+    let bd = Infinity;
+    for (const m of pool) {
+      const d = Math.hypot(m.xFt - x, m.yFt - y);
+      if (d < bd && d <= tagRadiusFt) { bd = d; best = m; }
+    }
+    return best;
+  };
+
+  for (const marker of markers) {
+    if (marker.segCount < minMarkerSegs) continue;
+    const sx = marker.points.reduce((sum, [x]) => sum + x, 0) / marker.points.length;
+    const sy = marker.points.reduce((sum, [, y]) => sum + y, 0) / marker.points.length;
+    const xMatch = nearestDatum(sx, xs, colLabels, (v) => String(round(v)));
+    const yMatch = nearestDatum(sy, ys, rowLabels, (v) => String(round(v)));
+    const tag = pick(sx, sy, colMembers) || pick(sx, sy, anyMembers);
+    columns.push({
+      x: round(sx),
+      y: round(sy),
+      grid: { col: xMatch.label, row: yMatch.label },
+      size: tag ? tag.size : null,
+      kind: tag ? tag.kind : null,
+      markerSegs: marker.segCount,
+      confidence: tag ? 'medium' : 'low',
+    });
+  }
+
+  columns.sort((a, b) => a.x - b.x || a.y - b.y);
   return { columns, note };
 }
 
@@ -450,8 +486,8 @@ export function buildStructureLayer(input, opts = {}) {
   const wl = selectWallLayer(segments, opts.layerOpts || {});
   const framingSegs = wl.wallSegments.length >= 3 ? wl.wallSegments : segments;
 
-  // 4) COLUMNS at grid intersections (use FULL segments for marker density — markers are thin).
-  const colRes = detectColumns(grid, segments, members, opts.columnOpts || {});
+  // 4) COLUMNS from real marker clusters (use FULL segments for marker density — markers are thin).
+  const colRes = detectColumnMarkers(grid, segments, members, opts.columnOpts || {});
 
   // 5) BEAMS / JOISTS from the framing layer.
   const beamRes = detectBeams(framingSegs, members, grid, opts.beamOpts || {});
