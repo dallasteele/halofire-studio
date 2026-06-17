@@ -54,6 +54,10 @@ function round(n) {
 const segLen = (s) => Math.hypot(s.x2 - s.x1, s.y2 - s.y1);
 const segMid = (s) => [(s.x1 + s.x2) / 2, (s.y1 + s.y2) / 2];
 
+function rasterIndex(n, x, y) {
+  return y * n + x;
+}
+
 /**
  * Member-tag vocabulary (probed from the real 1881 area framing sheets). Order: first match
  * wins for `kind`. Each entry captures the SIZE string so the model carries the printed member.
@@ -249,6 +253,109 @@ export function parseMemberTags(textItemsFt) {
 }
 
 /**
+ * PURE. Validate candidate column markers by requiring a filled blob signature in a
+ * small raster window centered on the candidate. Real structural columns are solid/filled
+ * blobs around 18x18in or larger; parking-stall corner ticks are sparse open strokes that
+ * leave the window mostly exterior after flood-filling.
+ *
+ * The extractor only carries vector segments here, so we rasterize the local linework into
+ * a square window, flood-fill the exterior from the border, and treat the enclosed interior
+ * plus the stroke pixels as "black". Closed dense blobs therefore read as high fill-ratio;
+ * open L/tick intersections stay low.
+ *
+ * @param {Array<{x:number,y:number,grid?:Object,markerSegs?:number}>} candidates
+ * @param {Array<{x1:number,y1:number,x2:number,y2:number}>} segments
+ * @param {Object} [opts]
+ * @returns {{markers:Array, note:string}}
+ */
+export function detectColumnMarkers(candidates, segments, opts = {}) {
+  const windowSizeFt = Number.isFinite(opts.windowSizeFt) ? opts.windowSizeFt : 1.5;
+  const minFillRatio = Number.isFinite(opts.minFillRatio) ? opts.minFillRatio : 0.6;
+  const rasterSize = Number.isFinite(opts.rasterSize) ? Math.max(8, Math.floor(opts.rasterSize)) : 24;
+  const strokePadCells = Number.isFinite(opts.strokePadCells) ? Math.max(0, Math.floor(opts.strokePadCells)) : 1;
+  const note =
+    'Column markers require a filled-blob signature: at least 60% black fill inside an 18x18in ' +
+    'window centered on the candidate. The local vector linework is rasterized, the exterior is ' +
+    'flood-filled from the border, and only enclosed/solid blobs pass. Open parking-stall ticks ' +
+    'and hollow corner marks fail closed.';
+
+  const half = windowSizeFt / 2;
+  const cell = windowSizeFt / rasterSize;
+  const segs = Array.isArray(segments) ? segments : [];
+  const markers = [];
+
+  const markCell = (mask, x, y) => {
+    if (x < 0 || y < 0 || x >= rasterSize || y >= rasterSize) return;
+    mask[rasterIndex(rasterSize, x, y)] = 1;
+  };
+
+  for (const candidate of (Array.isArray(candidates) ? candidates : [])) {
+    const cx = Number(candidate.x);
+    const cy = Number(candidate.y);
+    if (!Number.isFinite(cx) || !Number.isFinite(cy)) continue;
+    const minX = cx - half;
+    const maxX = cx + half;
+    const minY = cy - half;
+    const maxY = cy + half;
+    const localSegs = segs.filter((s) =>
+      Math.max(s.x1, s.x2) >= minX
+      && Math.min(s.x1, s.x2) <= maxX
+      && Math.max(s.y1, s.y2) >= minY
+      && Math.min(s.y1, s.y2) <= maxY);
+
+    const stroke = new Uint8Array(rasterSize * rasterSize);
+    for (const s of localSegs) {
+      const x1 = (s.x1 - minX) / cell;
+      const y1 = (s.y1 - minY) / cell;
+      const x2 = (s.x2 - minX) / cell;
+      const y2 = (s.y2 - minY) / cell;
+      const steps = Math.max(1, Math.ceil(Math.max(Math.abs(x2 - x1), Math.abs(y2 - y1)) * 2));
+      for (let i = 0; i <= steps; i++) {
+        const t = i / steps;
+        const px = Math.round(x1 + (x2 - x1) * t);
+        const py = Math.round(y1 + (y2 - y1) * t);
+        for (let ox = -strokePadCells; ox <= strokePadCells; ox++) {
+          for (let oy = -strokePadCells; oy <= strokePadCells; oy++) markCell(stroke, px + ox, py + oy);
+        }
+      }
+    }
+
+    const exterior = new Uint8Array(rasterSize * rasterSize);
+    const queue = [];
+    const pushExterior = (x, y) => {
+      if (x < 0 || y < 0 || x >= rasterSize || y >= rasterSize) return;
+      const idx = rasterIndex(rasterSize, x, y);
+      if (stroke[idx] || exterior[idx]) return;
+      exterior[idx] = 1;
+      queue.push([x, y]);
+    };
+    for (let i = 0; i < rasterSize; i++) {
+      pushExterior(i, 0);
+      pushExterior(i, rasterSize - 1);
+      pushExterior(0, i);
+      pushExterior(rasterSize - 1, i);
+    }
+    for (let qi = 0; qi < queue.length; qi++) {
+      const [x, y] = queue[qi];
+      pushExterior(x + 1, y);
+      pushExterior(x - 1, y);
+      pushExterior(x, y + 1);
+      pushExterior(x, y - 1);
+    }
+
+    let filled = 0;
+    for (let i = 0; i < stroke.length; i++) {
+      if (stroke[i] || !exterior[i]) filled += 1;
+    }
+    const fillRatio = filled / stroke.length;
+    if (fillRatio >= minFillRatio) {
+      markers.push({ ...candidate, fillRatio: round(fillRatio), rasterWindowFt: round(windowSizeFt) });
+    }
+  }
+  return { markers, note };
+}
+
+/**
  * PURE. Detect COLUMNS at grid intersections, validated by a local dense marker cluster.
  *
  * A structural column is drawn as a small filled/hatched marker (a box, I-shape, or HSS
@@ -268,10 +375,12 @@ export function detectColumns(grid, segments, members = [], opts = {}) {
   const markerMaxLenFt = Number.isFinite(opts.markerMaxLenFt) ? opts.markerMaxLenFt : 3;
   const minMarkerSegs = Number.isFinite(opts.minMarkerSegs) ? opts.minMarkerSegs : 4;
   const tagRadiusFt = Number.isFinite(opts.tagRadiusFt) ? opts.tagRadiusFt : 8;
+  const markerFillOpts = opts.markerFillOpts || {};
   const note =
     'Columns at grid intersections validated by a local dense marker cluster (short segments ' +
-    'within markerRadiusFt). Sized from the nearest member token (role column). Best-effort, ' +
-    'deterministic; NOT verified, NOT AHJ/PE/fabrication-ready.';
+    'within markerRadiusFt) AND a filled-blob check in an 18x18in centered window. Sized from ' +
+    'the nearest member token (role column). Best-effort, deterministic; NOT verified, NOT ' +
+    'AHJ/PE/fabrication-ready.';
 
   const xs = (grid && Array.isArray(grid.xs)) ? grid.xs : [];
   const ys = (grid && Array.isArray(grid.ys)) ? grid.ys : [];
@@ -282,7 +391,7 @@ export function detectColumns(grid, segments, members = [], opts = {}) {
   const colMembers = members.filter((m) => m.role === 'column');
   const anyMembers = members;
 
-  const columns = [];
+  const candidates = [];
   for (let ci = 0; ci < xs.length; ci++) {
     for (let ri = 0; ri < ys.length; ri++) {
       const gx = xs[ci], gy = ys[ri];
@@ -292,6 +401,23 @@ export function detectColumns(grid, segments, members = [], opts = {}) {
         if (Math.hypot(mx - gx, my - gy) <= markerRadiusFt) n += 1;
       }
       if (n < minMarkerSegs) continue; // no marker linework here -> no column (no fabrication)
+      candidates.push({
+        x: round(gx),
+        y: round(gy),
+        grid: {
+          col: ci < (grid.labels && grid.labels.cols || []).length ? grid.labels.cols[ci] : String(ci + 1),
+          row: ri < (grid.labels && grid.labels.rows || []).length ? grid.labels.rows[ri] : String.fromCharCode(65 + ri),
+        },
+        markerSegs: n,
+      });
+    }
+  }
+
+  const fillRes = detectColumnMarkers(candidates, segs, markerFillOpts);
+  const columns = [];
+  for (const marker of fillRes.markers) {
+    const gx = marker.x;
+    const gy = marker.y;
       // Nearest member tag (prefer a column-role token; fall back to any member within tagRadius).
       const pick = (pool) => {
         let best = null, bd = Infinity;
@@ -304,14 +430,13 @@ export function detectColumns(grid, segments, members = [], opts = {}) {
       const tag = pick(colMembers) || pick(anyMembers);
       columns.push({
         x: round(gx), y: round(gy),
-        grid: { col: ci < (grid.labels && grid.labels.cols || []).length ? grid.labels.cols[ci] : String(ci + 1),
-                row: ri < (grid.labels && grid.labels.rows || []).length ? grid.labels.rows[ri] : String.fromCharCode(65 + ri) },
+        grid: marker.grid,
         size: tag ? tag.size : null,
         kind: tag ? tag.kind : null,
-        markerSegs: n,
+        markerSegs: marker.markerSegs,
+        fillRatio: marker.fillRatio,
         confidence: tag ? 'medium' : 'low',
       });
-    }
   }
   return { columns, note };
 }

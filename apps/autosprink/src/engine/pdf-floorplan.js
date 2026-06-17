@@ -37,8 +37,35 @@
  * Text/image/other ops are ignored.
  */
 
-import { OPS } from 'pdfjs-dist/legacy/build/pdf.mjs';
 import { segmentFloorPlanViaSam, reconstructFloorPlanFromSam } from '../components/sam-floorplan.js';
+
+// Keep the pure geometry helpers importable even in stripped test worktrees where
+// pdfjs-dist is absent. Runtime installs still load the real OPS table from pdfjs.
+const PDFJS_OPS_FALLBACK = Object.freeze({
+  moveTo: 'moveTo',
+  lineTo: 'lineTo',
+  curveTo: 'curveTo',
+  curveTo2: 'curveTo2',
+  curveTo3: 'curveTo3',
+  rectangle: 'rectangle',
+  closePath: 'closePath',
+  constructPath: 'constructPath',
+  save: 'save',
+  restore: 'restore',
+  transform: 'transform',
+  setLineWidth: 'setLineWidth',
+  setStrokeRGBColor: 'setStrokeRGBColor',
+  setStrokeColor: 'setStrokeColor',
+  setStrokeColorN: 'setStrokeColorN',
+});
+
+let OPS = PDFJS_OPS_FALLBACK;
+try {
+  const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs');
+  if (pdfjs && pdfjs.OPS) OPS = pdfjs.OPS;
+} catch {
+  // Pure tests can still exercise non-pdfjs code paths with the fallback table.
+}
 
 // pdfjs-internal DrawOPS codes for the v6 constructPath path buffer. These are a
 // stable wire contract of the operator list (see pdf.worker buildPath); mirrored
