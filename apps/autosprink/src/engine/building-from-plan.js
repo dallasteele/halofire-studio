@@ -670,6 +670,69 @@ export function buildBuildingFromPlan(THREE, model, opts = {}) {
 }
 
 /**
+ * Build a single-level REAL building directly from one extracted LevelPlan.
+ *
+ * Scope is deliberately narrow for the real PDF->CAD step-3 path: one standing wall solid
+ * per real wall RUN (or derived run fallback from plan.walls) plus one perimeter shell
+ * extruded from plan.footprintFt, all in true plan feet (1 world unit = 1 ft).
+ */
+export function buildRealBuilding(THREE, plan, opts = {}) {
+  if (!THREE || !THREE.Group) throw new Error('buildRealBuilding: THREE namespace is required');
+  if (!plan || !Array.isArray(plan.footprintFt) || plan.footprintFt.length < 3) {
+    throw new Error('buildRealBuilding: plan.footprintFt with at least 3 points is required');
+  }
+
+  const {
+    elevationFt = 0,
+    wallHeightFt = 10,
+    wallThicknessFt = 0.5,
+  } = opts;
+
+  const bounds = planBounds(plan.footprintFt);
+  const resolvedWalls = resolveWallSource(plan);
+  const wallSource = Array.isArray(resolvedWalls.wallSource) ? resolvedWalls.wallSource : [];
+
+  const root = new THREE.Group();
+  root.name = 'real-building';
+  root.userData = { kind: 'real-building', needsVerification: true };
+
+  const shell = makeShellMesh(THREE, plan.footprintFt, bounds, wallHeightFt, elevationFt);
+  root.add(shell);
+
+  const wallMat = THREE.MeshStandardMaterial
+    ? new THREE.MeshStandardMaterial({ color: WALL_COLOR, transparent: true, opacity: 0.72, metalness: 0, roughness: 0.88 })
+    : (THREE.MeshBasicMaterial ? new THREE.MeshBasicMaterial({ color: WALL_COLOR, transparent: true, opacity: 0.72 }) : null);
+
+  let wallCount = 0;
+  if (wallMat) {
+    for (const seg of wallSource) {
+      const wall = makeWall(THREE, seg, bounds, elevationFt, wallHeightFt, wallThicknessFt, wallMat);
+      if (!wall) continue;
+      wall.name = 'real-wall-solid';
+      wall.userData = {
+        ...(wall.userData || {}),
+        kind: 'real-wall-solid',
+        axis: seg.axis || null,
+        lengthFt: Number(seg.lengthFt) || Math.hypot(seg.b[0] - seg.a[0], seg.b[1] - seg.a[1]),
+        needsVerification: true,
+      };
+      root.add(wall);
+      wallCount += 1;
+    }
+  }
+
+  root.userData.summary = {
+    wallSolids: wallCount,
+    shellMeshes: 1,
+    bounds,
+    wallRunsCount: resolvedWalls.wallRunsCount,
+    wallRunsMeta: resolvedWalls.wallRunsMeta,
+    needsVerification: true,
+  };
+  return root;
+}
+
+/**
  * Build the multi-level building from extracted LevelPlans.
  *
  * @param {Object} THREE - injected three.js namespace.
