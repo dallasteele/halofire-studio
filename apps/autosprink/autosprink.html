@@ -1552,13 +1552,28 @@ function renderGeometryDetail(cadModel, ceilFt) {
         nTee += 1;
       }
     }
-    // reducing fitting just above the head (drop bottom)
-    const wb = W(bot);
-    const redLen = Math.min(0.16, Math.max(0.08, drec.len * 0.25));
-    push('reducer', dropR.toFixed(3), () => { const g = new THREE.CylinderGeometry(dropR * 1.18, dropR * 0.72, redLen, 12); return g; }, 0xc9a84c, {
-      p: [wb[0], wb[1] + redLen / 2 + 0.02, wb[2]],
-      info: { p: wb, label: 'Reducing fitting (drop -> head)', verify: 'inferred drop-to-head reducer; head thread size not mfg-exact', rows: [
-        ['Type', 'Reducer, drop nipple -> sprinkler head'], ['Drop size', `${drec.s.diameterIn}"`], ['Plan coords (ft)', fmtP(bot)],
+    // reducing fitting between the nipple end and the head connection point
+    const reducer = drec.s && drec.s.reducer && typeof drec.s.reducer === 'object' ? drec.s.reducer : null;
+    const redLen = reducer && reducer.lengthFt > 0 ? reducer.lengthFt : Math.min(0.16, Math.max(0.08, drec.len * 0.25));
+    const redTopR = reducer && reducer.topOdIn > 0 ? ((reducer.topOdIn / 12) / 2) * pipeVizScale : dropR * 1.18;
+    const redBotR = reducer && reducer.bottomOdIn > 0 ? ((reducer.bottomOdIn / 12) / 2) * pipeVizScale : dropR * 0.72;
+    const redCenter = reducer && Array.isArray(reducer.center)
+      ? W(reducer.center)
+      : (() => {
+          const wb = W(bot);
+          return [wb[0], wb[1] + redLen / 2, wb[2]];
+        })();
+    const redInfoPt = reducer && Array.isArray(reducer.headPort) ? reducer.headPort : bot;
+    push('reducer', `${redTopR.toFixed(3)}/${redBotR.toFixed(3)}`, () => new THREE.CylinderGeometry(redTopR, redBotR, redLen, 12), 0xc9a84c, {
+      p: redCenter,
+      info: { p: W(redInfoPt), label: 'Reducing fitting (drop -> head)', verify: reducer ? 'spec-derived drop-to-head reducer from drop size and head thread size; not manufacturer-exact' : 'inferred drop-to-head reducer; head thread size not mfg-exact', rows: [
+        ['Type', 'Reducer, drop nipple -> sprinkler head'],
+        ['Drop size', `${drec.s.diameterIn}"`],
+        ['Reducer length', `${Math.round(redLen * 12 * 100) / 100}"`],
+        ['Top OD', reducer ? `${reducer.topOdIn}"` : 'inferred'],
+        ['Bottom OD', reducer ? `${reducer.bottomOdIn}"` : 'inferred'],
+        ['Head thread', reducer ? `${reducer.headThreadIn}" NPT` : 'assumed'],
+        ['Plan coords (ft)', fmtP(redInfoPt)],
       ] },
     });
     nReducer += 1;

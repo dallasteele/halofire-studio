@@ -48,9 +48,74 @@ const BRANCH_REACH_FT = 8.0;
 const FLAT_DZ_FT = 0.05;
 import { createFittingPlacement, normalizeRunAxis, stablePerpendicularAxis } from './fitting-orient.js';
 
+import { HEAD_DIMS, REDUCER_DIMS, nearestNps, pipeOdIn } from '../components/openscad/part-dims.js';
+
 function num3(p) { return [Number(p[0]), Number(p[1]), Number(p[2])]; }
 function len3(a, b) { return Math.hypot(b[0] - a[0], b[1] - a[1], b[2] - a[2]); }
 function round(n) { return Math.round((n + Number.EPSILON) * 1000) / 1000; }
+function roundPt(p) { return [round(p[0]), round(p[1]), round(p[2])]; }
+
+function headThreadNominalIn(head) {
+  if (Number(head && head.threadSizeIn) > 0) return Number(head.threadSizeIn);
+  const thread = String(head && head.thread ? head.thread : '').trim();
+  if (/3\/4/.test(thread)) return 0.75;
+  if (/(^|\D)1\s*NPT/.test(thread)) return 1.0;
+  return 0.5;
+}
+
+function headThreadOdIn(head) {
+  const nominal = headThreadNominalIn(head);
+  if (nominal >= 1.0) return HEAD_DIMS.thread_one_npt_od.value;
+  if (nominal >= 0.75) return HEAD_DIMS.thread_three_quarter_npt_od.value;
+  return HEAD_DIMS.thread_half_npt_od.value;
+}
+
+function reducerLengthIn(dropNominalIn) {
+  const largeNps = nearestNps(dropNominalIn);
+  return REDUCER_DIMS.lengthByLargeNps[largeNps] || REDUCER_DIMS.lengthByLargeNps[1.5] || 2.0;
+}
+
+function buildReducerSpec({ head, towardPipe, dropNominalIn }) {
+  const towardPipePt = num3(towardPipe);
+  const headPt = num3(head.position);
+  const dist = len3(towardPipePt, headPt);
+  if (dist < 1e-9) return null;
+  const lenIn = reducerLengthIn(dropNominalIn);
+  const lenFt = lenIn / 12;
+  const ux = (towardPipePt[0] - headPt[0]) / dist;
+  const uy = (towardPipePt[1] - headPt[1]) / dist;
+  const uz = (towardPipePt[2] - headPt[2]) / dist;
+  const actualLenFt = Math.min(lenFt, dist);
+  const pipePt = [
+    headPt[0] + ux * actualLenFt,
+    headPt[1] + uy * actualLenFt,
+    headPt[2] + uz * actualLenFt,
+  ];
+  const center = [
+    headPt[0] + ux * actualLenFt / 2,
+    headPt[1] + uy * actualLenFt / 2,
+    headPt[2] + uz * actualLenFt / 2,
+  ];
+  const dropOdIn = pipeOdIn(dropNominalIn);
+  const threadOd = headThreadOdIn(head);
+  const topPort = pipePt[2] >= headPt[2] ? pipePt : headPt;
+  const bottomPort = pipePt[2] >= headPt[2] ? headPt : pipePt;
+  return {
+    center: roundPt(center),
+    lengthFt: round(actualLenFt),
+    lengthIn: round(actualLenFt * 12),
+    dropNominalIn: round(dropNominalIn),
+    headThreadIn: round(headThreadNominalIn(head)),
+    topOdIn: round(dropOdIn),
+    bottomOdIn: round(threadOd),
+    topOdFt: round(dropOdIn / 12),
+    bottomOdFt: round(threadOd / 12),
+    pipePort: roundPt(pipePt),
+    headPort: roundPt(headPt),
+    topPort: roundPt(topPort),
+    bottomPort: roundPt(bottomPort),
+  };
+}
 
 /** Orientation of a from->to run: 'vertical' (z-dominant) or 'horizontal'. */
 function orientationOf(from, to) {
@@ -99,7 +164,8 @@ function splitSolids(cadModel) {
   const solids = (cadModel && Array.isArray(cadModel.solids)) ? cadModel.solids : [];
   const pipes = solids.filter((s) => s && s.kind === 'pipe' && Array.isArray(s.from) && Array.isArray(s.to));
   const heads = solids.filter((s) => s && s.kind === 'head' && Array.isArray(s.position));
-  return { solids, pipes, heads };
+  const components = solids.filter((s) => s && s.kind === 'component' && Array.isArray(s.position));
+  return { solids, pipes, heads, components };
 }
 
 /**
@@ -146,13 +212,19 @@ function servingBranch(head, carriers) {
  * honest signal: is there a pipe whose endpoint coincides with the head position?
  * (the drop/sprig nipple). Generated models always have this for in-line heads.
  */
-function headHasConnection(head, pipes) {
+function headHasConnection(head, pipes, components = []) {
   const p = num3(head.position);
   for (const r of pipes) {
     const from = num3(r.from), to = num3(r.to);
     if (len3(from, p) <= NODE_TOL_FT || len3(to, p) <= NODE_TOL_FT) return true;
     // head sits on a run interior (rare, but a pass-through nipple counts)
     if (pointOnSegment(p, from, to, NODE_TOL_FT)) return true;
+  }
+  for (const c of components) {
+    if (c.componentKey !== 'fitting_reducer') continue;
+    if (Array.isArray(c.headPort) && len3(num3(c.headPort), p) <= NODE_TOL_FT) return true;
+    if (Array.isArray(c.bottomPort) && len3(num3(c.bottomPort), p) <= NODE_TOL_FT) return true;
+    if (Array.isArray(c.topPort) && len3(num3(c.topPort), p) <= NODE_TOL_FT) return true;
   }
   return false;
 }
@@ -201,7 +273,7 @@ function connectionFor(head, serve) {
  * }}
  */
 export function analyzeDrops(cadModel) {
-  const { pipes, heads } = splitSolids(cadModel);
+  const { pipes, heads, components } = splitSolids(cadModel);
   const carriers = branchCarriers(pipes);
 
   // --- 1. Classify EXISTING connection runs by geometry. A vertical short run is
@@ -249,7 +321,7 @@ export function analyzeDrops(cadModel) {
   let headsConnected = 0, needArmOver = 0, needDrop = 0, needSprig = 0;
   for (const h of heads) {
     const serve = servingBranch(h, carriers);
-    const connected = headHasConnection(h, pipes);
+    const connected = headHasConnection(h, pipes, components);
     if (connected) headsConnected += 1;
     let type = h.orientation === 'upright' ? 'sprig' : 'drop';
     let armOver = false, offset = 0, dz = 0;
@@ -302,7 +374,7 @@ function keyOf(p) {
  */
 export function buildDropConnections(cadModel) {
   const analysisBefore = analyzeDrops(cadModel);
-  const { solids, pipes, heads } = splitSolids(cadModel);
+  const { solids, pipes, heads, components } = splitSolids(cadModel);
   const added = [];
   if (heads.length === 0) {
     return { model: cadModel, added, analysisBefore, analysisAfter: analysisBefore, armOversAdded: 0, dropsAdded: 0, sprigsAdded: 0 };
@@ -311,7 +383,7 @@ export function buildDropConnections(cadModel) {
   let armOversAdded = 0, dropsAdded = 0, sprigsAdded = 0;
 
   for (const h of heads) {
-    if (headHasConnection(h, pipes)) continue; // already wired — idempotent
+    if (headHasConnection(h, pipes, components)) continue; // already wired — idempotent
     const serve = servingBranch(h, carriers);
     if (!serve) continue; // orphan head, no branch in reach — branch-connect's job
     const c = connectionFor(h, serve);
@@ -360,22 +432,21 @@ export function buildDropConnections(cadModel) {
     }
     // vertical nipple: turn -> head (down = drop, up = sprig)
     if (len3(turn, p) > NODE_TOL_FT * 0.5) {
+      const reducer = buildReducerSpec({ head: h, towardPipe: turn, dropNominalIn: 1.0 });
+      const nipTo = reducer ? reducer.pipePort : [round(p[0]), round(p[1]), round(p[2])];
       const nip = {
         kind: 'pipe', name: `auto-${c.type}-${added.length}`, layer: 'DROPS',
         role: 'drop', connKind: c.type, // role 'drop' so the render path instances it
-        from: turn, to: [round(p[0]), round(p[1]), round(p[2])],
+        from: turn, to: nipTo,
         diameterIn: 1.0, autoGenerated: true,
       };
-      solids.push(nip); added.push(nip);
-      if (c.type === 'drop') dropsAdded += 1; else sprigsAdded += 1;
-      // reducer marker at the head deflector
-      const nippleAxis = [0, 0, c.type === 'drop' ? -1 : 1];
-      solids.push(fitting(
-        'fitting_reducer',
-        [round(p[0]), round(p[1]), round(p[2])],
-        added.length,
-        createFittingPlacement('fitting_reducer', nippleAxis, stablePerpendicularAxis(nippleAxis), { fittingType: 'drop-reducer' }),
-      ));
+      if (reducer) nip.reducer = reducer;
+      if (len3(nip.from, nip.to) > NODE_TOL_FT * 0.5) {
+        solids.push(nip); added.push(nip);
+        if (c.type === 'drop') dropsAdded += 1; else sprigsAdded += 1;
+      }
+      // reducer marker centered on the actual nipple -> head junction segment
+      solids.push(fitting('fitting_reducer', reducer ? reducer.center : [round(p[0]), round(p[1]), round(p[2])], added.length, reducer || undefined));
       added.push(solids[solids.length - 1]);
     }
   }
@@ -384,11 +455,12 @@ export function buildDropConnections(cadModel) {
   return { model: cadModel, added, analysisBefore, analysisAfter, armOversAdded, dropsAdded, sprigsAdded };
 }
 
-function fitting(componentKey, position, n, placement = null) {
+function fitting(componentKey, position, n, extra = undefined) {
   return {
     kind: 'component', name: `auto-${componentKey}-${n}`, layer: 'COMPONENTS',
     componentKey, category: 'fitting',
     position: [round(position[0]), round(position[1]), round(position[2])],
+    ...(extra && typeof extra === 'object' ? extra : {}),
     autoGenerated: true,
     ...(placement ? { placement } : {}),
   };
